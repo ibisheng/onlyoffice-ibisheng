@@ -440,7 +440,21 @@
 								}
 								else if (AscCommon.c_oEditorId.Spreadsheet === editorId)
 								{
-									window.g_asc_plugins.api.asc_Recalculate();
+									var oApi    = window.g_asc_plugins.api;
+									var oFonts  = oApi.wbModel._generateFontMap();
+									var aImages = oApi.wbModel.getAllImageUrls();
+									var oImages = {};
+									for (var i = 0; i < aImages.length; i++)
+									{
+										oImages[aImages[i]] = aImages[i];
+									}
+									window.g_asc_plugins.images_rename = oImages;
+									AscCommon.Check_LoadingDataBeforePrepaste(window.g_asc_plugins.api, oFonts, oImages,
+										function(){
+											oApi.wbModel.reassignImageUrls(window.g_asc_plugins.images_rename);
+											delete window.g_asc_plugins.images_rename;
+											window.g_asc_plugins.api.asc_Recalculate();
+										});
 								}
 							}
 						}

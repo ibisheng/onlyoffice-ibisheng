@@ -3225,10 +3225,29 @@ var editor;
     return true;
   };
   spreadsheet_api.prototype.asc_Recalculate = function () {
-    var t = this;
-    this._loadFonts(this.wbModel.generateFontMap(), function() {
       History.EndTransaction();
-      t._onUpdateAfterApplyChanges();
+      this._onUpdateAfterApplyChanges();
+  };
+
+
+  spreadsheet_api.prototype.pre_Paste = function(_fonts, _images, callback)
+  {
+    var oFontMap = {};
+    for(var i = 0; i < _fonts.length; ++i){
+      oFontMap[_fonts[i].name] = 1;
+    }
+    this._loadFonts(oFontMap, function() {
+
+      var aImages = [];
+      for(var key in _images){
+        if(_images.hasOwnProperty(key)){
+          aImages.push(_images[key])
+        }
+      }
+      if(aImages.length > 0)      {
+         window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImages, null);
+      }
+      callback();
     });
   };
 

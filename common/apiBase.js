@@ -1021,6 +1021,9 @@
 	baseEditorsApi.prototype.onKeyUp = function(e)
 	{
 	};
+	baseEditorsApi.prototype.pre_Paste = function(_fonts, _images, callback)
+	{
+	};
 
 	// System input
 	baseEditorsApi.prototype.SetTextBoxInputMode = function(bIsEnable)
