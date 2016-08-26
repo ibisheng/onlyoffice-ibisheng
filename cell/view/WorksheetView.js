@@ -820,53 +820,47 @@
 
     // Проверяет, есть ли числовые значения в диапазоне
     WorksheetView.prototype._hasNumberValueInActiveRange = function () {
-        var cell, cellType, isNumberFormat, arrCols = null, arrRows = null;
-        if ( this._rangeIsSingleCell( this.activeRange ) ) {
+        var cell, cellType, isNumberFormat, arrCols = [], arrRows = [];
+        if (this.activeRange.isOneCell()) {
             // Для одной ячейки не стоит ничего делать
             return null;
         }
-        var mergedRange = this.model.getMergedByCell( this.activeRange.r1, this.activeRange.c1 );
-        if ( mergedRange && mergedRange.isEqual( this.activeRange ) ) {
+        var mergedRange = this.model.getMergedByCell(this.activeRange.r1, this.activeRange.c1);
+        if (mergedRange && mergedRange.isEqual(this.activeRange)) {
             // Для одной ячейки не стоит ничего делать
             return null;
         }
 
-        for ( var c = this.activeRange.c1; c <= this.activeRange.c2; ++c ) {
-            for ( var r = this.activeRange.r1; r <= this.activeRange.r2; ++r ) {
-                cell = this._getCellTextCache( c, r );
-                if ( cell ) {
+        for (var c = this.activeRange.c1; c <= this.activeRange.c2; ++c) {
+            for (var r = this.activeRange.r1; r <= this.activeRange.r2; ++r) {
+                cell = this._getCellTextCache(c, r);
+                if (cell) {
                     // Нашли не пустую ячейку, проверим формат
                     cellType = cell.cellType;
                     isNumberFormat = (null == cellType || CellValueType.Number === cellType);
-                    if ( isNumberFormat ) {
-                        if ( !arrCols ) {
-                            arrCols = [];
-                            arrRows = [];
-                        }
-                        arrCols.push( c );
-                        arrRows.push( r );
+                    if (isNumberFormat) {
+                        arrCols.push(c);
+                        arrRows.push(r);
                     }
                 }
             }
         }
-        if ( arrCols ) {
+        if (0 !== arrCols.length) {
             // Делаем массивы уникальными и сортируем
-            arrCols = arrCols.filter( AscCommon.fOnlyUnique );
-            arrRows = arrRows.filter( AscCommon.fOnlyUnique );
-            return {arrCols: arrCols.sort( fSortAscending ), arrRows: arrRows.sort( fSortAscending )};
-        }
-        else {
+            arrCols = arrCols.filter(AscCommon.fOnlyUnique);
+            arrRows = arrRows.filter(AscCommon.fOnlyUnique);
+            return {arrCols: arrCols.sort(fSortAscending), arrRows: arrRows.sort(fSortAscending)};
+        } else {
             return null;
         }
     };
 
     // Автодополняет формулу диапазоном, если это возможно
-    WorksheetView.prototype.autoCompleteFormula = function ( functionName ) {
+    WorksheetView.prototype.autoCompleteFormula = function (functionName) {
         var t = this;
-        this.activeRange.normalize();
         var ar = this.activeRange;
         var arCopy = null;
-        var arHistorySelect = ar.clone( true );
+        var arHistorySelect = ar.clone(true);
         var vr = this.visibleRange;
 
         // Первая верхняя не числовая ячейка
@@ -882,7 +876,7 @@
         var hasNumber = this._hasNumberValueInActiveRange();
         var val, text;
 
-        if ( hasNumber ) {
+        if (hasNumber) {
             var i;
             // Есть ли значения в последней строке и столбце
             var hasNumberInLastColumn = (ar.c2 === hasNumber.arrCols[hasNumber.arrCols.length - 1]);
@@ -896,28 +890,27 @@
             var startRowOld = ar.r1;
             // Нужно ли перерисовывать
             var bIsUpdate = false;
-            if ( startColOld !== startCol || startRowOld !== startRow ) {
+            if (startColOld !== startCol || startRowOld !== startRow) {
                 bIsUpdate = true;
             }
-            if ( true === hasNumberInLastRow && true === hasNumberInLastColumn ) {
+            if (true === hasNumberInLastRow && true === hasNumberInLastColumn) {
                 bIsUpdate = true;
             }
-            if ( bIsUpdate ) {
+            if (bIsUpdate) {
                 this.cleanSelection();
                 ar.c1 = startCol;
                 ar.r1 = startRow;
-                if ( false === ar.contains( ar.startCol, ar.startRow ) ) {
+                if (false === ar.contains(ar.startCol, ar.startRow)) {
                     // Передвинуть первую ячейку в выделении
                     ar.startCol = startCol;
                     ar.startRow = startRow;
                 }
-                if ( true === hasNumberInLastRow && true === hasNumberInLastColumn ) {
+                if (true === hasNumberInLastRow && true === hasNumberInLastColumn) {
                     // Мы расширяем диапазон
-                    if ( 1 === hasNumber.arrRows.length ) {
+                    if (1 === hasNumber.arrRows.length) {
                         // Одна строка или только в последней строке есть значения... (увеличиваем вправо)
                         ar.c2 += 1;
-                    }
-                    else {
+                    } else {
                         // Иначе вводим в строку вниз
                         ar.r2 += 1;
                     }
@@ -925,135 +918,141 @@
                 this._drawSelection();
             }
 
-            arCopy = ar.clone( true );
+            arCopy = ar.clone(true);
 
             var functionAction = null;
             var changedRange = null;
 
-            if ( false === hasNumberInLastColumn && false === hasNumberInLastRow ) {
+            if (false === hasNumberInLastColumn && false === hasNumberInLastRow) {
                 // Значений нет ни в последней строке ни в последнем столбце (значит нужно сделать формулы в каждой последней ячейке)
-                changedRange = [new asc_Range( hasNumber.arrCols[0], arCopy.r2, hasNumber.arrCols[hasNumber.arrCols.length - 1], arCopy.r2 ), new asc_Range( arCopy.c2, hasNumber.arrRows[0], arCopy.c2, hasNumber.arrRows[hasNumber.arrRows.length - 1] )];
+                changedRange =
+                  [new asc_Range(hasNumber.arrCols[0], arCopy.r2, hasNumber.arrCols[hasNumber.arrCols.length -
+                  1], arCopy.r2),
+                      new asc_Range(arCopy.c2, hasNumber.arrRows[0], arCopy.c2, hasNumber.arrRows[hasNumber.arrRows.length -
+                      1])];
                 functionAction = function () {
                     // Пройдемся по последней строке
-                    for ( i = 0; i < hasNumber.arrCols.length; ++i ) {
+                    for (i = 0; i < hasNumber.arrCols.length; ++i) {
                         c = hasNumber.arrCols[i];
-                        cell = t._getVisibleCell( c, arCopy.r2 );
-                        text = t._getCellTitle( c, arCopy.r1 ) + ":" + t._getCellTitle( c, arCopy.r2 - 1 );
+                        cell = t._getVisibleCell(c, arCopy.r2);
+                        text = t._getCellTitle(c, arCopy.r1) + ":" + t._getCellTitle(c, arCopy.r2 - 1);
                         val = "=" + functionName + "(" + text + ")";
                         // ToDo - при вводе формулы в заголовок автофильтра надо писать "0"
-                        cell.setValue( val );
+                        cell.setValue(val);
                     }
                     // Пройдемся по последнему столбцу
-                    for ( i = 0; i < hasNumber.arrRows.length; ++i ) {
+                    for (i = 0; i < hasNumber.arrRows.length; ++i) {
                         r = hasNumber.arrRows[i];
-                        cell = t._getVisibleCell( arCopy.c2, r );
-                        text = t._getCellTitle( arCopy.c1, r ) + ":" + t._getCellTitle( arCopy.c2 - 1, r );
+                        cell = t._getVisibleCell(arCopy.c2, r);
+                        text = t._getCellTitle(arCopy.c1, r) + ":" + t._getCellTitle(arCopy.c2 - 1, r);
                         val = "=" + functionName + "(" + text + ")";
-                        cell.setValue( val );
+                        cell.setValue(val);
                     }
                     // Значение в правой нижней ячейке
-                    cell = t._getVisibleCell( arCopy.c2, arCopy.r2 );
-                    text = t._getCellTitle( arCopy.c1, arCopy.r2 ) + ":" + t._getCellTitle( arCopy.c2 - 1, arCopy.r2 );
+                    cell = t._getVisibleCell(arCopy.c2, arCopy.r2);
+                    text = t._getCellTitle(arCopy.c1, arCopy.r2) + ":" + t._getCellTitle(arCopy.c2 - 1, arCopy.r2);
                     val = "=" + functionName + "(" + text + ")";
-                    cell.setValue( val );
+                    cell.setValue(val);
                 };
-            }
-            else if ( true === hasNumberInLastRow && false === hasNumberInLastColumn ) {
+            } else if (true === hasNumberInLastRow && false === hasNumberInLastColumn) {
                 // Есть значения только в последней строке (значит нужно заполнить только последнюю колонку)
-                changedRange = new asc_Range( arCopy.c2, hasNumber.arrRows[0], arCopy.c2, hasNumber.arrRows[hasNumber.arrRows.length - 1] );
+                changedRange =
+                  new asc_Range(arCopy.c2, hasNumber.arrRows[0], arCopy.c2, hasNumber.arrRows[hasNumber.arrRows.length -
+                  1]);
                 functionAction = function () {
                     // Пройдемся по последнему столбцу
-                    for ( i = 0; i < hasNumber.arrRows.length; ++i ) {
+                    for (i = 0; i < hasNumber.arrRows.length; ++i) {
                         r = hasNumber.arrRows[i];
-                        cell = t._getVisibleCell( arCopy.c2, r );
-                        text = t._getCellTitle( arCopy.c1, r ) + ":" + t._getCellTitle( arCopy.c2 - 1, r );
+                        cell = t._getVisibleCell(arCopy.c2, r);
+                        text = t._getCellTitle(arCopy.c1, r) + ":" + t._getCellTitle(arCopy.c2 - 1, r);
                         val = "=" + functionName + "(" + text + ")";
-                        cell.setValue( val );
+                        cell.setValue(val);
                     }
                 };
-            }
-            else if ( false === hasNumberInLastRow && true === hasNumberInLastColumn ) {
+            } else if (false === hasNumberInLastRow && true === hasNumberInLastColumn) {
                 // Есть значения только в последнем столбце (значит нужно заполнить только последнюю строчку)
-                changedRange = new asc_Range( hasNumber.arrCols[0], arCopy.r2, hasNumber.arrCols[hasNumber.arrCols.length - 1], arCopy.r2 );
+                changedRange =
+                  new asc_Range(hasNumber.arrCols[0], arCopy.r2, hasNumber.arrCols[hasNumber.arrCols.length -
+                  1], arCopy.r2);
                 functionAction = function () {
                     // Пройдемся по последней строке
-                    for ( i = 0; i < hasNumber.arrCols.length; ++i ) {
+                    for (i = 0; i < hasNumber.arrCols.length; ++i) {
                         c = hasNumber.arrCols[i];
-                        cell = t._getVisibleCell( c, arCopy.r2 );
-                        text = t._getCellTitle( c, arCopy.r1 ) + ":" + t._getCellTitle( c, arCopy.r2 - 1 );
+                        cell = t._getVisibleCell(c, arCopy.r2);
+                        text = t._getCellTitle(c, arCopy.r1) + ":" + t._getCellTitle(c, arCopy.r2 - 1);
                         val = "=" + functionName + "(" + text + ")";
-                        cell.setValue( val );
+                        cell.setValue(val);
                     }
                 };
-            }
-            else {
+            } else {
                 // Есть значения и в последнем столбце, и в последней строке
-                if ( 1 === hasNumber.arrRows.length ) {
-                    changedRange = new asc_Range( arCopy.c2, arCopy.r2, arCopy.c2, arCopy.r2 );
+                if (1 === hasNumber.arrRows.length) {
+                    changedRange = new asc_Range(arCopy.c2, arCopy.r2, arCopy.c2, arCopy.r2);
                     functionAction = function () {
                         // Одна строка или только в последней строке есть значения...
-                        cell = t._getVisibleCell( arCopy.c2, arCopy.r2 );
+                        cell = t._getVisibleCell(arCopy.c2, arCopy.r2);
                         // ToDo вводить в первое свободное место, а не сразу за диапазоном
-                        text = t._getCellTitle( arCopy.c1, arCopy.r2 ) + ":" + t._getCellTitle( arCopy.c2 - 1, arCopy.r2 );
+                        text = t._getCellTitle(arCopy.c1, arCopy.r2) + ":" + t._getCellTitle(arCopy.c2 - 1, arCopy.r2);
                         val = "=" + functionName + "(" + text + ")";
-                        cell.setValue( val );
+                        cell.setValue(val);
                     };
-                }
-                else {
-                    changedRange = new asc_Range( hasNumber.arrCols[0], arCopy.r2, hasNumber.arrCols[hasNumber.arrCols.length - 1], arCopy.r2 );
+                } else {
+                    changedRange =
+                      new asc_Range(hasNumber.arrCols[0], arCopy.r2, hasNumber.arrCols[hasNumber.arrCols.length -
+                      1], arCopy.r2);
                     functionAction = function () {
                         // Иначе вводим в строку вниз
-                        for ( i = 0; i < hasNumber.arrCols.length; ++i ) {
+                        for (i = 0; i < hasNumber.arrCols.length; ++i) {
                             c = hasNumber.arrCols[i];
-                            cell = t._getVisibleCell( c, arCopy.r2 );
+                            cell = t._getVisibleCell(c, arCopy.r2);
                             // ToDo вводить в первое свободное место, а не сразу за диапазоном
-                            text = t._getCellTitle( c, arCopy.r1 ) + ":" + t._getCellTitle( c, arCopy.r2 - 1 );
+                            text = t._getCellTitle(c, arCopy.r1) + ":" + t._getCellTitle(c, arCopy.r2 - 1);
                             val = "=" + functionName + "(" + text + ")";
-                            cell.setValue( val );
+                            cell.setValue(val);
                         }
                     };
                 }
             }
 
-            var onAutoCompleteFormula = function ( isSuccess ) {
-                if ( false === isSuccess ) {
+            var onAutoCompleteFormula = function (isSuccess) {
+                if (false === isSuccess) {
                     return;
                 }
 
                 History.Create_NewPoint();
-                History.SetSelection( arHistorySelect.clone() );
-                History.SetSelectionRedo( arCopy.clone() );
+                History.SetSelection(arHistorySelect.clone());
+                History.SetSelectionRedo(arCopy.clone());
                 History.StartTransaction();
 
-                asc_applyFunction( functionAction );
-                t.handlers.trigger( "selectionMathInfoChanged", t.getSelectionMathInfo() );
+                asc_applyFunction(functionAction);
+                t.handlers.trigger("selectionMathInfoChanged", t.getSelectionMathInfo());
 
                 History.EndTransaction();
             };
 
             // Можно ли применять автоформулу
-            this._isLockedCells( changedRange, /*subType*/null, onAutoCompleteFormula );
+            this._isLockedCells(changedRange, /*subType*/null, onAutoCompleteFormula);
 
             result.notEditCell = true;
             return result;
         }
 
         // Ищем первую ячейку с числом
-        for ( ; r >= vr.r1; --r ) {
-            cell = this._getCellTextCache( ar.startCol, r );
-            if ( cell ) {
+        for (; r >= vr.r1; --r) {
+            cell = this._getCellTextCache(ar.startCol, r);
+            if (cell) {
                 // Нашли не пустую ячейку, проверим формат
                 cellType = cell.cellType;
                 isNumberFormat = (null === cellType || CellValueType.Number === cellType);
-                if ( isNumberFormat ) {
+                if (isNumberFormat) {
                     // Это число, мы нашли то, что искали
                     topCell = {
                         c: ar.startCol, r: r, isFormula: cell.isFormula
                     };
                     // смотрим вторую ячейку
-                    if ( topCell.isFormula && r - 1 >= vr.r1 ) {
-                        cell = this._getCellTextCache( ar.startCol, r - 1 );
-                        if ( cell && cell.isFormula ) {
+                    if (topCell.isFormula && r - 1 >= vr.r1) {
+                        cell = this._getCellTextCache(ar.startCol, r - 1);
+                        if (cell && cell.isFormula) {
                             topCell.isFormulaSeq = true;
                         }
                     }
@@ -1062,14 +1061,14 @@
             }
         }
         // Проверим, первой все равно должна быть колонка
-        if ( null === topCell || topCell.r !== ar.startRow - 1 || topCell.isFormula && !topCell.isFormulaSeq ) {
-            for ( ; c >= vr.c1; --c ) {
-                cell = this._getCellTextCache( c, ar.startRow );
-                if ( cell ) {
+        if (null === topCell || topCell.r !== ar.startRow - 1 || topCell.isFormula && !topCell.isFormulaSeq) {
+            for (; c >= vr.c1; --c) {
+                cell = this._getCellTextCache(c, ar.startRow);
+                if (cell) {
                     // Нашли не пустую ячейку, проверим формат
                     cellType = cell.cellType;
                     isNumberFormat = (null === cellType || CellValueType.Number === cellType);
-                    if ( isNumberFormat ) {
+                    if (isNumberFormat) {
                         // Это число, мы нашли то, что искали
                         leftCell = {
                             r: ar.startRow, c: c
@@ -1077,91 +1076,87 @@
                         break;
                     }
                 }
-                if ( null !== topCell ) {
+                if (null !== topCell) {
                     // Если это не первая ячейка слева от текущей и мы нашли верхнюю, то дальше не стоит искать
                     break;
                 }
             }
         }
 
-        if ( leftCell ) {
+        if (leftCell) {
             // Идем влево до первой не числовой ячейки
             --c;
-            for ( ; c >= 0; --c ) {
-                cell = this._getCellTextCache( c, ar.startRow );
-                if ( !cell ) {
+            for (; c >= 0; --c) {
+                cell = this._getCellTextCache(c, ar.startRow);
+                if (!cell) {
                     // Могут быть еще не закешированные данные
-                    this._addCellTextToCache( c, ar.startRow );
-                    cell = this._getCellTextCache( c, ar.startRow );
-                    if ( !cell ) {
+                    this._addCellTextToCache(c, ar.startRow);
+                    cell = this._getCellTextCache(c, ar.startRow);
+                    if (!cell) {
                         break;
                     }
                 }
                 cellType = cell.cellType;
                 isNumberFormat = (null === cellType || CellValueType.Number === cellType);
-                if ( !isNumberFormat ) {
+                if (!isNumberFormat) {
                     break;
                 }
             }
             // Мы ушли чуть дальше
             ++c;
             // Диапазон или только 1 ячейка
-            if ( ar.startCol - 1 !== c ) {
+            if (ar.startCol - 1 !== c) {
                 // Диапазон
-                result = new asc_Range( c, leftCell.r, ar.startCol - 1, leftCell.r );
-            }
-            else {
+                result = new asc_Range(c, leftCell.r, ar.startCol - 1, leftCell.r);
+            } else {
                 // Одна ячейка
-                result = new asc_Range( c, leftCell.r, c, leftCell.r );
+                result = new asc_Range(c, leftCell.r, c, leftCell.r);
             }
             result.type = c_oAscSelectionType.RangeCells;
-            this._fixSelectionOfMergedCells( result );
-            if ( result.c1 === result.c2 && result.r1 === result.r2 ) {
-                result.text = this._getCellTitle( result.c1, result.r1 );
-            }
-            else {
-                result.text = this._getCellTitle( result.c1, result.r1 ) + ":" + this._getCellTitle( result.c2, result.r2 );
+            this._fixSelectionOfMergedCells(result);
+            if (result.c1 === result.c2 && result.r1 === result.r2) {
+                result.text = this._getCellTitle(result.c1, result.r1);
+            } else {
+                result.text = this._getCellTitle(result.c1, result.r1) + ":" + this._getCellTitle(result.c2, result.r2);
             }
             return result;
         }
 
-        if ( topCell ) {
+        if (topCell) {
             // Идем вверх до первой не числовой ячейки
             --r;
-            for ( ; r >= 0; --r ) {
-                cell = this._getCellTextCache( ar.startCol, r );
-                if ( !cell ) {
+            for (; r >= 0; --r) {
+                cell = this._getCellTextCache(ar.startCol, r);
+                if (!cell) {
                     // Могут быть еще не закешированные данные
-                    this._addCellTextToCache( ar.startCol, r );
-                    cell = this._getCellTextCache( ar.startCol, r );
-                    if ( !cell ) {
+                    this._addCellTextToCache(ar.startCol, r);
+                    cell = this._getCellTextCache(ar.startCol, r);
+                    if (!cell) {
                         break;
                     }
                 }
                 cellType = cell.cellType;
                 isNumberFormat = (null === cellType || CellValueType.Number === cellType);
-                if ( !isNumberFormat ) {
+                if (!isNumberFormat) {
                     break;
                 }
             }
             // Мы ушли чуть дальше
             ++r;
             // Диапазон или только 1 ячейка
-            if ( ar.startRow - 1 !== r ) {
+            if (ar.startRow - 1 !== r) {
                 // Диапазон
-                result = new asc_Range( topCell.c, r, topCell.c, ar.startRow - 1 );
-            }
-            else {
+                result = new asc_Range(topCell.c, r, topCell.c, ar.startRow - 1);
+            } else {
                 // Одна ячейка
-                result = new asc_Range( topCell.c, r, topCell.c, r );
+                result = new asc_Range(topCell.c, r, topCell.c, r);
             }
             result.type = c_oAscSelectionType.RangeCells;
-            this._fixSelectionOfMergedCells( result );
-            if ( result.c1 === result.c2 && result.r1 === result.r2 ) {
-                result.text = this._getCellTitle( result.c1, result.r1 );
-            }
-            else {
-                result.text = this._getCellTitle( result.c1, result.r1 ) + ":" + this._getCellTitle( result.c2, result.r2 );
+            this._fixSelectionOfMergedCells(result);
+            if (result.c1 === result.c2 && result.r1 === result.r2) {
+                result.text = this._getCellTitle(result.c1, result.r1);
+            } else {
+                result.text = this._getCellTitle(result.c1, result.r1) + ":" + this._getCellTitle(result.c2, result.r2);
             }
             return result;
         }
@@ -4646,15 +4641,14 @@
         return r ? r.columns[col] : undefined;
     };
 
-    WorksheetView.prototype._getCellTextCache = function ( col, row, dontLookupMergedCells ) {
+    WorksheetView.prototype._getCellTextCache = function (col, row, dontLookupMergedCells) {
         var r = this.cache.rows[row], c = r ? r.columns[col] : undefined;
-        if ( c && c.text ) {
+        if (c && c.text) {
             return c.text;
-        }
-        else if ( !dontLookupMergedCells ) {
+        } else if (!dontLookupMergedCells) {
             // ToDo проверить это условие, возможно оно избыточно
-            var range = this.model.getMergedByCell( row, col );
-            return null !== range ? this._getCellTextCache( range.c1, range.r1, true ) : undefined;
+            var range = this.model.getMergedByCell(row, col);
+            return null !== range ? this._getCellTextCache(range.c1, range.r1, true) : undefined;
         }
         return undefined;
     };
@@ -5226,15 +5220,6 @@
     WorksheetView.prototype._isLargeRange = function ( range ) {
         var vr = this.visibleRange;
         return range.c2 - range.c1 + 1 > (vr.c2 - vr.c1 + 1) * 3 || range.r2 - range.r1 + 1 > (vr.r2 - vr.r1 + 1) * 3;
-    };
-
-    /**
-     * Возвращает true, если диапазон состоит из одной ячейки
-     * @param {Asc.Range} range  Диапазон
-     * @returns {Boolean}
-     */
-    WorksheetView.prototype._rangeIsSingleCell = function ( range ) {
-        return range.c1 === range.c2 && range.r1 === range.r2;
     };
 
     WorksheetView.prototype.drawDepCells = function () {
