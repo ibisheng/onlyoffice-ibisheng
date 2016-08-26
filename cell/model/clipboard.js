@@ -2521,7 +2521,7 @@
 				//настройки параграфа
 				paragraph.elem.CompiledPr.NeedRecalc = true;
 				var paraPr = paragraph.elem.Get_CompiledPr();
-				var paragraphFontFamily = paraPr.TextPr.FontFamily.Name;
+				//var paragraphFontFamily = paraPr.TextPr.FontFamily.Name;
 				
 				//горизонтальное выравнивание
 				var horisonalAlign = this._getAlignHorisontal(paraPr);
@@ -2540,7 +2540,7 @@
 				//Numbering
 				var LvlPr = null;
 				var Lvl = null;
-				var oNumPr = paragraph.elem.Numbering_Get();
+				var oNumPr = paragraph.elem.Numbering_Get ? paragraph.elem.Numbering_Get() : null;
 				var numberingText = null;
 				var formatText;
 				if(oNumPr != null)
