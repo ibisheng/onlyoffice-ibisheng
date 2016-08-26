@@ -3589,7 +3589,7 @@
 						var sSrc = oGraphicObj.getBase64Img();
 						if(sSrc.length > 0)
 						{
-							sRes += "<img style=\"max-width:100%;\" width=\""+Math.round(ParaItem.Extent.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(ParaItem.Extent.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
+							sRes += "<img style=\"max-width:100%;\" width=\""+Math.round(ParaItem.Extent.W * AscCommon.g_dKoef_mm_to_pix)+"\" height=\""+Math.round(ParaItem.Extent.H * AscCommon.g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
 							break;
 						}
 						// var _canvas     = document.createElement('canvas');
