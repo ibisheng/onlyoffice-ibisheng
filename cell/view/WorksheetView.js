@@ -9646,7 +9646,7 @@
                                     r1: range.first.row, r2: range.last.row, c1: range.first.col, c2: range.last.col
                                 };
                                 n++;
-                                if ( currentObj[0] == undefined ) 
+                                if ( contentCurrentObj[0] == undefined ) 
 								{
                                     range.setValue( '' );
                                 }
