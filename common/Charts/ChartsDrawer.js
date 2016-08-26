@@ -6420,6 +6420,7 @@ drawHBarChart.prototype =
 			DiffGapDepth = perspectiveDepth * (gapDepth / 2) / 100;
 		}		
 		
+		var cubeCount = 0;
 		for (var i = 0; i < this.chartProp.series.length; i++) 
 		{
 			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : this.chartProp.series[i].val.numLit;
@@ -6559,6 +6560,19 @@ drawHBarChart.prototype =
 					
 					var arrPoints2 = [[point11, point44, point88, point55], [point11, point22, point33, point44], [point11, point22, point66, point55], [point44, point88, point77, point33], [point55, point66, point77, point88], [point66, point22, point33, point77]];
 					
+				
+					if(!this.temp)
+					{
+						this.temp = [];
+					}
+					if(!this.temp[cubeCount])
+					{
+						this.temp[cubeCount] = {};
+					}
+					if(!this.temp[cubeCount].faces)
+					{
+						this.temp[cubeCount].faces = [];
+					}
 					
 					for(var k = 0; k < paths.length; k++)
 					{
@@ -6571,7 +6585,10 @@ drawHBarChart.prototype =
 							continue;
 						
 						this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquations[k]});
+						this.temp[cubeCount].faces.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquations[k]});
 					}
+					
+					cubeCount++;
 				}
 				else
 				{
@@ -6596,7 +6613,8 @@ drawHBarChart.prototype =
 		{
 			console.time("asd");
 			var cSortFaces = new CSortFaces(this.cChartDrawer);
-			this.sortZIndexPaths = cSortFaces.sortFaces(this.sortZIndexPaths);
+			//this.sortZIndexPaths = cSortFaces.sortFaces(this.sortZIndexPaths);
+			this.sortCubs = cSortFaces.sortCubs(this.temp, this.sortZIndexPaths);
 			console.timeEnd("asd");
 		}
     },
@@ -7034,7 +7052,7 @@ drawHBarChart.prototype =
 		}
 	},
 	
-	_DrawBars3D: function()
+	_DrawBars3D1: function()
 	{
 		var t = this;
 		var processor3D = this.cChartDrawer.processor3D;
@@ -7069,6 +7087,36 @@ drawHBarChart.prototype =
 				//}
 			}
 			
+		}
+	},
+	
+	_DrawBars3D: function()
+	{
+		var t = this;
+		var processor3D = this.cChartDrawer.processor3D;
+		
+		var drawVerges = function(i, j, paths, onlyLessNull, k)
+		{
+			var brush, pen, options;
+			options = t._getOptionsForDrawing(i, j, onlyLessNull);
+			if(paths !== null && options !== null)
+			{
+				pen = options.pen;
+				brush = options.brush;
+				
+				t._drawBar3D(paths, pen, brush, k);
+			}
+		};
+		
+		for(var i = 0; i < this.sortCubs.length; i++)
+		{
+			var index = this.sortCubs[i].nextIndex;
+			var faces = this.temp[index].faces;
+			for(var j = 0; j < faces.length; j++)
+			{
+				var face = faces[j];
+				drawVerges(face.seria, face.point, face.paths, null, face.verge);
+			}	
 		}
 	},
 	
@@ -11849,21 +11897,241 @@ CColorObj.prototype =
 };
 
 //sort parallalepiped faces
-function CSortFaces(cChartDrawer)
+function CSortFaces(cChartDrawer, centralViewPoint)
 {
 	this.cChartDrawer = cChartDrawer;
 	this.chartProp = cChartDrawer.calcProp;
 	this.centralViewPoint = null;
+	this._initProperties(centralViewPoint)
 }
 
 CSortFaces.prototype =
 {
 	constructor: CSortFaces,
 	
-	sortFaces: function(faces, centralViewPoint)
+	sortCubs: function(cubs, faces)
 	{
-		this._initProperties(centralViewPoint);
+		var res = [];
+		var res2 = [];
 		
+		var temp = [];
+		
+		var usuallyIntersect = {};
+		
+		for(var i = 0; i < cubs.length; i++)
+		{
+			var fromParallalepiped = cubs[i];
+			
+			for(var m = 0; m < cubs.length; m++)
+			{
+				var toParallalepiped = cubs[m];
+				
+				if(m === i || usuallyIntersect[i] === m)
+				{
+					continue;
+				}
+				
+				for(var j = 0; j < fromParallalepiped.faces.length; j++)
+				{
+					var fromVerge = fromParallalepiped.faces[j];
+					
+					for(var l = 0; l < fromVerge.points.length; l++)
+					{
+						var point = fromVerge.points[l];
+						
+	
+						var toParallalepiped = cubs[m];
+						var counter = 0;
+						for(var n = 0; n < toParallalepiped.faces.length; n++)
+						{
+							var toVerge = toParallalepiped.faces[n];
+							var lineEqucation = this.cChartDrawer.getLineEquation(point, this.centralViewPoint);
+							var test = this._isIntersectionFaceAndLine(toVerge, lineEqucation, point);
+							if(test)
+							{
+								usuallyIntersect[i] = m;
+								
+								counter++;
+								
+								if(!temp[i])
+								{
+									temp[i] = [];
+								}
+								if(!temp[i][m])
+								{
+									temp[i][m] = 0;
+								}
+								temp[i][m]++;
+								
+								if(!res[i])
+								{
+									res[i] = [];
+								}
+								
+								if(!res2[m])
+								{
+									res2[m] = [];
+								}
+								
+								res[i][m] = 1;
+								res2[m][i] = 1;
+								//res2[m] = i;
+								console.log("fromParallalepiped: " + i + " toParallalepiped " + m + " x: " + test.x  + " y: " + test.y  + " z: " + test.z);
+								
+								l = fromVerge.points.length;
+								j = fromParallalepiped.faces.length;
+								break;
+							}
+						}			
+					}
+				}
+			}
+		}
+		
+		
+		
+		var startIndexs = [];
+		var test = [];
+		for(var i = 0; i < cubs.length; i++)
+		{
+			if(res[i] === undefined)
+			{
+				startIndexs.push({index: parseInt(i)});
+			}
+		}
+		
+		var getAfter = function(index)
+		{
+			if(res2[index] !== undefined)
+			{
+				for(var i in res2[index])
+				{
+					test.push({nextIndex: parseInt(i)});
+					
+					if(test.length >= cubs.length)
+					{
+						return;
+					}
+					
+					getAfter(i);
+				}
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		};
+		
+		
+		
+		for(var i = 0; i < startIndexs.length; i++)
+		{
+			test.push({nextIndex: startIndexs[i].index});
+			getAfter(startIndexs[i].index);
+		}
+		
+		
+		
+		
+		
+		
+		
+		/*var getFirst = function()
+		{
+			var result = null;
+			for(var i = 0; i < cubs.length; i++)
+			{
+				if((res[i] === undefined || res[i].length === 0) && !firstArr[i])
+				{
+					result = parseInt(i);
+					break;
+				}
+			}
+			return result;
+		};
+		
+		var getLast = function()
+		{
+			var result = null;
+			for(var i = 0; i < cubs.length; i++)
+			{
+				if((res2[i] === undefined || res2[i].length === 0) && !firstArr[i])
+				{
+					result = parseInt(i);
+					break;
+				}
+			}
+			return result;
+		};
+		
+		var cleanStartIndex = function(startIndex)
+		{
+			res2.splice(startIndex, 1);
+			for(var i = 0; i < res.length; i++)
+			{
+				if(res[i] && res[i][startIndex])
+				{
+					res[i].splice(startIndex, 1);
+				}
+			}
+		};
+		
+		var cleanLastIndex = function(lastIndex)
+		{
+			res.splice(lastIndex, 1);
+			for(var i = 0; i < res2.length; i++)
+			{
+				if(res2[i] && res2[i][lastIndex])
+				{
+					res2[i].splice(lastIndex, 1);
+				}
+			}
+		};
+		
+		var firstMainArray = [];
+		var lastMainArray = [];
+		
+		var firstArr = {};
+		var lastArr = {};
+		var arr1 = [];
+		var arr2 = [];
+		while(true)
+		{
+			var startIndex = getFirst();
+			var lastIndex = getLast();
+			
+			if(null !== startIndex)
+			{
+				firstMainArray.push({nextIndex: startIndex});
+			}
+			
+			if(null !== lastIndex)
+			{
+				lastMainArray.push({nextIndex: lastIndex});
+			}
+			
+			firstArr[startIndex]  = 1;
+			firstArr[lastIndex] = 1;
+			
+			cleanStartIndex(startIndex);
+			cleanLastIndex(lastIndex);
+			
+			if(res.length === 0 && res2.length === 0)
+			{
+				break;
+			}
+		}
+		
+		lastMainArray = lastMainArray.reverse()
+		var mainTest = lastMainArray.concat(firstMainArray);*/
+		//return mainTest;
+		
+		return test.reverse();
+	},
+	
+	sortFaces: function(faces)
+	{
 		var firstVerges = [];
 		var lastVerges = [];
 		var t = this;
@@ -11880,28 +12148,33 @@ CSortFaces.prototype =
 			lastFaces = lastFaces1;
 			iterCount++;
 			
-			if(iterCount > 100)
+			if(iterCount > 50)
 			{
 				newArr = lastFaces.concat(newArr);
 				break;
 			}
 		}
 		
+		console.log(iterCount);
+		
 		return newArr;
 		
 		/*var firstFaces1 = [], lastFaces1 = [];
-		getFirstLastVerges(lastVerges, firstFaces1, lastFaces1);
-		this.sortZIndexPaths = lastFaces1.concat(firstFaces1);
-		this.sortZIndexPaths = this.sortZIndexPaths.concat(firstVerges);*/
+		t._getFirstLastFaces(faces, firstFaces1, lastFaces1);
+		newArr = lastFaces1.concat(firstFaces1);
+		newArr = newArr.concat(firstVerges);*/
+		
+		return newArr;
 	},
 	
 	_initProperties: function(centralViewPoint)
 	{
 		if(!centralViewPoint)
 		{
-			var diffY = this.cChartDrawer.processor3D.cameraDiffY;
-			var diffX = 0/*-this.cChartDrawer.processor3D.cameraDiffX*/;
-			this.centralViewPoint = {x: this.chartProp.widthCanvas / 2 - diffX, y: this.chartProp.heightCanvas / 2 - diffY, z: -500};
+			var diffY = this.chartProp.heightCanvas / 2 - this.cChartDrawer.processor3D.cameraDiffY;
+			var diffX = this.chartProp.widthCanvas / 2 - this.cChartDrawer.processor3D.cameraDiffX;
+			var diffZ = -1 / this.cChartDrawer.processor3D.rPerspective/*- 1 / this.cChartDrawer.processor3D.rPerspective + this.cChartDrawer.processor3D.cameraDiffZ*/;
+			this.centralViewPoint = {x: diffX, y: diffY, z: diffZ};
 		}
 		else
 		{
@@ -12003,26 +12276,69 @@ CSortFaces.prototype =
 		var iSY = nIntersectionPlainAndLine.y;
 		var iSZ = nIntersectionPlainAndLine.z;
 		
-		if(iSZ < pointFromVerge.z /*&& t._isBetweenPoint(iSZ, minZ, maxZ)*/ && t._isBetweenPoint(iSX, minX, maxX) && t._isBetweenPoint(iSY, minY, maxY))
+		
+		if(/*parseInt(iSZ) < parseInt(pointFromVerge.z)*/ Math.round(iSZ * 1000) / 1000 < Math.round(pointFromVerge.z * 1000) / 1000)
 		{
-			var point0 = plain.points2[0];
-			var point1 = plain.points2[1];
-			var point2 = plain.points2[2];
-			var point3 = plain.points2[3];
+			var isBeetwenX = t._isBetweenPoint(iSX, minX, maxX);
+			var isBeetwenY = t._isBetweenPoint(iSY, minY, maxY);
+			var isBeetwenZ = t._isBetweenPoint(iSZ, minZ, maxZ);
 			
-			
-			var areaQuadrilateral = t.cChartDrawer.getAreaQuadrilateral(point0, point1, point2, point3);
-			var areaTriangle1 = t.cChartDrawer.getAreaTriangle(point0, projectIntersection, point1);
-			var areaTriangle2 = t.cChartDrawer.getAreaTriangle(point1, projectIntersection, point2);
-			var areaTriangle3 = t.cChartDrawer.getAreaTriangle(point2, projectIntersection, point3);
-			var areaTriangle4 = t.cChartDrawer.getAreaTriangle(point3, projectIntersection, point0);
-			
-			if(parseInt(areaQuadrilateral) === parseInt(areaTriangle1 + areaTriangle2 + areaTriangle3 + areaTriangle4))
+			var isAllBetween = false;
+			if(isBeetwenX && isBeetwenY && isBeetwenZ)
 			{
-				//var pointFromVergeProject = t.cChartDrawer._convertAndTurnPoint(pointFromVerge.x, pointFromVerge.y, pointFromVerge.z, true, true);
-				//console.log("x: " + projectIntersection.x + " ;y: " + projectIntersection.y + " ;fromX:" + pointFromVergeProject.x + " ;fromY:" + pointFromVergeProject.y);
+				isAllBetween = true;
+			}
+			/*else if(isBeetwenX && isBeetwenY)
+			{
+				if(parseInt(iSZ) === parseInt(minZ) || parseInt(iSZ) === parseInt(maxZ))
+				{
+					isAllBetween = true;
+				}
+			}
+			else if(isBeetwenX && isBeetwenZ)
+			{
+				if(parseInt(iSY) === parseInt(minY) || parseInt(iSY) === parseInt(maxY))
+				{
+					isAllBetween = true;
+				}
+			}
+			else if(isBeetwenY && isBeetwenZ)
+			{
+				if(parseInt(iSX) === parseInt(minX) || parseInt(iSX) === parseInt(maxX))
+				{
+					isAllBetween = true;
+				}
+			}*/
+			
+			
+			if(isAllBetween)
+			{
+				if(t._isEqualPoints(plain.points[0], nIntersectionPlainAndLine) || t._isEqualPoints(plain.points[1], nIntersectionPlainAndLine) || t._isEqualPoints(plain.points[2], nIntersectionPlainAndLine) || t._isEqualPoints(plain.points[3], nIntersectionPlainAndLine) || t._isEqualPoints(pointFromVerge, nIntersectionPlainAndLine))
+				{
+					return res;
+					console.log("SOS");
+				}
 				
-				res = true;
+				
+				var point0 = plain.points2[0];
+				var point1 = plain.points2[1];
+				var point2 = plain.points2[2];
+				var point3 = plain.points2[3];
+				
+				
+				var areaQuadrilateral = t.cChartDrawer.getAreaQuadrilateral(point0, point1, point2, point3);
+				var areaTriangle1 = t.cChartDrawer.getAreaTriangle(point0, projectIntersection, point1);
+				var areaTriangle2 = t.cChartDrawer.getAreaTriangle(point1, projectIntersection, point2);
+				var areaTriangle3 = t.cChartDrawer.getAreaTriangle(point2, projectIntersection, point3);
+				var areaTriangle4 = t.cChartDrawer.getAreaTriangle(point3, projectIntersection, point0);
+				
+				if(parseInt(areaQuadrilateral) === parseInt(areaTriangle1 + areaTriangle2 + areaTriangle3 + areaTriangle4))
+				{
+					//var pointFromVergeProject = t.cChartDrawer._convertAndTurnPoint(pointFromVerge.x, pointFromVerge.y, pointFromVerge.z, true, true);
+					//console.log("x: " + projectIntersection.x + " ;y: " + projectIntersection.y + " ;fromX:" + pointFromVergeProject.x + " ;fromY:" + pointFromVergeProject.y);
+					
+					res = nIntersectionPlainAndLine;
+				}
 			}
 		}
 		
@@ -12033,13 +12349,31 @@ CSortFaces.prototype =
 	{
 		//TODO округление пересмотреть
 		var res = false;
-		/*point = Math.round(point * 100) / 100;
-		start = Math.round(start * 100) / 100;
-		end = Math.round(end * 100) / 100;*/
+		
+		//if(this.cChartDrawer.processor3D.angleOx !== 0 && this.cChartDrawer.processor3D.angleOy === 0)
+		//{
+			point = Math.round(point * 100) / 100;
+			start = Math.round(start * 100) / 100;
+			end = Math.round(end * 100) / 100;
+		//}
+		
 		if(point >= start && point <= end)
 		{
 			res = true;
 		}
+		return res;
+	},
+	
+	_isEqualPoints: function(point1, point2)
+	{
+		//TODO округление пересмотреть
+		var res = false;
+		
+		if(parseInt(point1.x) === parseInt(point2.x) && parseInt(point1.y) === parseInt(point2.y) && parseInt(point1.y) === parseInt(point2.y))
+		{
+			res = true;
+		}
+		
 		return res;
 	}
 };
