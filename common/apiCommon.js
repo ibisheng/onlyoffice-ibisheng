@@ -107,7 +107,8 @@
 		Expired     : 2,
 		Success     : 3,
 		UnknownUser : 4,
-		Connections : 5
+		Connections : 5,
+		ExpiredTrial: 6
 	};
 
 	/**
