@@ -2357,6 +2357,29 @@ var editor;
     this.handlers.trigger("asc_onEndAddShape");
   };
 
+  spreadsheet_api.prototype.asc_addOleObjectAction = function(sLocalUrl, sData, sApplicationId, fWidth, fHeight, nWidthPix, nHeightPix)
+  {
+    var _image = this.ImageLoader.LoadImage(AscCommon.getFullImageSrc2(sLocalUrl), 1);
+    if (null != _image){
+        var ws = this.wb.getWorksheet();
+      if(ws.objectRender){
+        ws.objectRender.addOleObject(fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId);
+      }
+    }
+  };
+
+  spreadsheet_api.prototype.asc_editOleObjectAction = function(bResize, oOleObject, sImageUrl, sData, nPixWidth, nPixHeight)
+  {
+    if (oOleObject)
+    {
+      var ws = this.wb.getWorksheet();
+      if(ws.objectRender){
+        ws.objectRender.editOleObject(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight, bResize);
+      }
+    }
+  };
+
+
   spreadsheet_api.prototype.asc_isAddAutoshape = function() {
     return this.isStartAddShape;
   };
