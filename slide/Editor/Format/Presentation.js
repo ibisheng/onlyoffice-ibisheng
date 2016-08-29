@@ -3081,6 +3081,7 @@ CPresentation.prototype =
         }
         this.noShowContextMenu = false;
         this.Document_UpdateInterfaceState();
+        this.Api.sendEvent("asc_onSelectionEnd");
     },
 
     OnMouseMove : function(e, X, Y, PageIndex)
