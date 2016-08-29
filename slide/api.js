@@ -1225,6 +1225,13 @@
 		return this.isDocumentModify;
 	};
 
+	asc_docs_api.prototype.asc_getCurrentFocusObject = function()
+    {
+        if (!this.WordControl || !this.WordControl.Thumbnails)
+            return 1;
+        return this.WordControl.Thumbnails.FocusObjType;
+    };
+
 	asc_docs_api.prototype.sync_BeginCatchSelectedElements = function()
 	{
 		if (0 != this.SelectedObjectsStack.length)
@@ -6855,6 +6862,8 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_addOleObject"]                    = asc_docs_api.prototype.asc_addOleObject;
 	asc_docs_api.prototype["asc_editOleObject"]                   = asc_docs_api.prototype.asc_editOleObject;
 	asc_docs_api.prototype["asc_InputClearKeyboardElement"]       = asc_docs_api.prototype.asc_InputClearKeyboardElement;
+
+	asc_docs_api.prototype["asc_getCurrentFocusObject"]           = asc_docs_api.prototype.asc_getCurrentFocusObject;
 
 
 	window['Asc']['asc_CCommentData'] = window['Asc'].asc_CCommentData = asc_CCommentData;
