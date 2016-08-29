@@ -1577,6 +1577,12 @@
 			var x = ((event.pageX * AscBrowser.zoom) >> 0) - offs.left;
 			var y = ((event.pageY * AscBrowser.zoom) >> 0) - offs.top;
 
+			if (AscBrowser.isRetina) {
+				x <<= 1;
+				y <<= 1;
+			}
+
+
 			return {x: x, y: y};
 		};
 
