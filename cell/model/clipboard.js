@@ -144,7 +144,10 @@
 						if(ws.getCellEditMode() === true)
 						{
 							var text = data1.innerText;
-							window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+							if(text)
+							{
+								window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+							}
 						}
 						else
 						{
@@ -158,7 +161,10 @@
 						if(ws.getCellEditMode() === true)
 						{
 							var text = t.pasteProcessor.pasteFromBinary(ws, data1, true);
-							window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+							if(text)
+							{
+								window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+							}
 						}
 						else
 						{
@@ -171,7 +177,10 @@
 					{
 						if(ws.getCellEditMode() === true)
 						{
-							window["Asc"]["editor"].wb.cellEditor.pasteText(data1);
+							if(text)
+							{
+								window["Asc"]["editor"].wb.cellEditor.pasteText(data1);
+							}
 						}
 						else
 						{
