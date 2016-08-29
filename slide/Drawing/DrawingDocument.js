@@ -3993,6 +3993,8 @@ function CThumbnailsManager()
 			if (i >= this.m_arrPages.length)
 			{
 				this.m_arrPages[i] = new CThPage();
+				if (0 == i)
+				    this.m_arrPages[0].IsSelected = true;
 			}
 
 			if (false === bIsFoundFirst)
