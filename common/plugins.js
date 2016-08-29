@@ -402,7 +402,7 @@
 				{
 					try
 					{
-						if (window.g_asc_plugins.api.asc_canPaste())
+						if (pluginData.privateData.resize || window.g_asc_plugins.api.asc_canPaste())
 						{
 							var editorId = window.g_asc_plugins.api.getEditorId();
 							if (AscCommon.c_oEditorId.Word === editorId ||
