@@ -3160,7 +3160,11 @@ CPresentation.prototype =
     // Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.
     Get_SelectedText : function(bClearText)
     {
-        return this.Slides[this.CurPage].graphicObjects.Get_SelectedText(bClearText);
+        if(this.Slides[this.CurPage]){
+            return this.Slides[this.CurPage].graphicObjects.Get_SelectedText(bClearText);
+        }
+        return "";
+
     },
 
 //-----------------------------------------------------------------------------------
