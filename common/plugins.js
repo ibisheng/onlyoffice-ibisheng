@@ -351,6 +351,16 @@
 				// re-init
 				this.init();
 			}
+		},
+
+		onExternalMouseUp : function()
+		{
+		    if (!this.current)
+		        return;
+
+		    this.startData.setAttribute("type", "onExternalMouseUp");
+		    this.correctData(this.startData);
+		    this.sendMessage(this.startData);
 		}
 	};
 

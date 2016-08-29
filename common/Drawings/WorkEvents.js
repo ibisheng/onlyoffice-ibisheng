@@ -491,6 +491,9 @@
 				}
 			}
 		}
+
+		if (window.g_asc_plugins)
+		    window.g_asc_plugins.onExternalMouseUp();
 	}
 
 	InitCaptureEvents();
