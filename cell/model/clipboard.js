@@ -1287,9 +1287,10 @@
 				drawingObject.graphicObject.setWordFlag(false, newCDocument);
 				
 				var oTempDrawingDocument = ws.model.DrawingDocument;
+				var oldLogicDocument = oTempDrawingDocument.m_oLogicDocument;
 				oTempDrawingDocument.m_oLogicDocument = newCDocument;
-				
 				drawingObject.graphicObject.graphicObject.Set_Parent(newCDocument);
+				oTempDrawingDocument.m_oLogicDocument = oldLogicDocument;
 				
 				History.TurnOn();
 				
