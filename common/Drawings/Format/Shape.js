@@ -3689,7 +3689,7 @@ CShape.prototype.hitInTextRectWord = function(x, y)
 {
 
     var content = this.getDocContent && this.getDocContent();
-    if (content)
+    if (content && this.invertTransform)
     {
         var t_x, t_y;
         t_x = this.invertTransform.TransformPointX(x, y);
@@ -4806,7 +4806,7 @@ CShape.prototype.hitToAdjustment = function (x, y) {
             return ret;
         }
     }
-    if(this.recalcInfo.warpGeometry)
+    if(this.recalcInfo.warpGeometry && this.invertTransformTextWordArt)
     {
         invert_transform = this.invertTransformTextWordArt;
         t_x = invert_transform.TransformPointX(x, y);
