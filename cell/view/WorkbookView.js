@@ -882,6 +882,7 @@
       }
     }
     this.handlers.trigger("asc_onSelectionChanged", info);
+    this.handlers.trigger("asc_onSelectionEnd");
   };
 
 

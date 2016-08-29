@@ -854,7 +854,7 @@ CShape.prototype.checkPosTransformText = function()
 };
 CShape.prototype.getNearestPos = function(x, y, pageIndex)
 {
-    if(isRealObject(this.textBoxContent))
+    if(isRealObject(this.textBoxContent) && this.invertTransformText)
     {
         var t_x = this.invertTransformText.TransformPointX(x, y);
         var t_y = this.invertTransformText.TransformPointY(x, y);
@@ -883,7 +883,7 @@ CShape.prototype.cursorGetPos = function()
 CShape.prototype.cursorMoveAt = function( X, Y, AddToSelect )
 {
     var content = this.getDocContent();
-    if(isRealObject(content))
+    if(isRealObject(content) && this.invertTransformText)
     {
         var t_x = this.invertTransformText.TransformPointX(X, Y);
         var t_y = this.invertTransformText.TransformPointY(X, Y);
