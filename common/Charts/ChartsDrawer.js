@@ -12032,100 +12032,68 @@ CSortFaces.prototype =
 		}
 		
 		
-		
-		
-		
-		
-		
-		/*var getFirst = function()
+		var g = res2;
+		var color = {}; // цвет вершины (0, 1, или 2)
+		var time_in = {}, time_out = {}; // "времена" захода и выхода из вершины
+		var dfs_timer = 0;
+
+		var dfs = function(v) 
 		{
-			var result = null;
-			for(var i = 0; i < cubs.length; i++)
+			time_in[v] = dfs_timer++;
+			color[v] = 1;
+			
+			for (var i in g[v])
 			{
-				if((res[i] === undefined || res[i].length === 0) && !firstArr[i])
+				if (!color[i])
 				{
-					result = parseInt(i);
-					break;
+					dfs (i);
 				}
 			}
-			return result;
-		};
+				
+			color[v] = 2;
+			time_out[v] = dfs_timer++;
+		}
 		
-		var getLast = function()
+		for(var i = 0; i < startIndexs.length; i++)
 		{
-			var result = null;
-			for(var i = 0; i < cubs.length; i++)
+			dfs(startIndexs[i].index);
+		}
+		
+		
+		
+		var addIndexes = {};
+		var getMax = function()
+		{
+			var max = 0;
+			var res = null;
+			for(var i in time_out)
 			{
-				if((res2[i] === undefined || res2[i].length === 0) && !firstArr[i])
+				if(!addIndexes[i] && time_out[i] > max)
 				{
-					result = parseInt(i);
-					break;
+					max = time_out[i];
+					res = i;
 				}
 			}
-			return result;
+			return res;
 		};
 		
-		var cleanStartIndex = function(startIndex)
-		{
-			res2.splice(startIndex, 1);
-			for(var i = 0; i < res.length; i++)
-			{
-				if(res[i] && res[i][startIndex])
-				{
-					res[i].splice(startIndex, 1);
-				}
-			}
-		};
+		var i = 0;
+		var test = [];
 		
-		var cleanLastIndex = function(lastIndex)
-		{
-			res.splice(lastIndex, 1);
-			for(var i = 0; i < res2.length; i++)
-			{
-				if(res2[i] && res2[i][lastIndex])
-				{
-					res2[i].splice(lastIndex, 1);
-				}
-			}
-		};
-		
-		var firstMainArray = [];
-		var lastMainArray = [];
-		
-		var firstArr = {};
-		var lastArr = {};
-		var arr1 = [];
-		var arr2 = [];
 		while(true)
 		{
-			var startIndex = getFirst();
-			var lastIndex = getLast();
+			var index = getMax();
 			
-			if(null !== startIndex)
-			{
-				firstMainArray.push({nextIndex: startIndex});
-			}
-			
-			if(null !== lastIndex)
-			{
-				lastMainArray.push({nextIndex: lastIndex});
-			}
-			
-			firstArr[startIndex]  = 1;
-			firstArr[lastIndex] = 1;
-			
-			cleanStartIndex(startIndex);
-			cleanLastIndex(lastIndex);
-			
-			if(res.length === 0 && res2.length === 0)
+			if(null === index)
 			{
 				break;
 			}
+			
+			test.push({nextIndex: index});
+			addIndexes[index] = 1;
 		}
 		
-		lastMainArray = lastMainArray.reverse()
-		var mainTest = lastMainArray.concat(firstMainArray);*/
-		//return mainTest;
+		
 		
 		return test.reverse();
 	},
