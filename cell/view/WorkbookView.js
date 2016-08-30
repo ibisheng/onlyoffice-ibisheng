@@ -2463,7 +2463,7 @@
     var countWorksheets = this.model.getWorksheetCount();
     for (var i = 0; i < countWorksheets; ++i) {
       tmpWs = this.model.getWorksheet(i);
-      if (tmpWs && 0 < tmpWs.aComments.length) {
+      if (tmpWs && (0 < tmpWs.aComments.length || isFirst)) {
         wsView = this.getWorksheet(i);
         wsModel = wsView.model;
         wsModel.aCommentsCoords = wsView.cellCommentator.getCoordsToSave();

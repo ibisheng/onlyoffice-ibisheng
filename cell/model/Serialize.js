@@ -2456,9 +2456,7 @@
             if ( ws.Drawings && (ws.Drawings.length) )
                 this.bs.WriteItem(c_oSerWorksheetsTypes.Drawings, function(){oThis.WriteDrawings(ws.Drawings);});
 
-            //init comments for copy/paste
-            if(oThis.isCopyPaste)
-                window["Asc"]["editor"].wb._initCommentsToSave();
+            window["Asc"]["editor"].wb._initCommentsToSave();
 
             var aComments = (0 === index) ? this.wb.aComments.concat(ws.aComments) : ws.aComments;
             var aCommentsCoords = (0 === index) ? this.wb.aCommentsCoords.concat(ws.aCommentsCoords) :
