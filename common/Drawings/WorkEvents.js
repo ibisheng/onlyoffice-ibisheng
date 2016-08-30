@@ -308,6 +308,8 @@
 		var lockedElement = null;
 
 		var newSender = (e.srcElement) ? e.srcElement : e.target;
+		if (!newSender)
+		    newSender = { id : "emulation_oo_id" };
 
 		if (global_mouseEvent.Sender && global_mouseEvent.Sender.id == newSender.id)
 		{

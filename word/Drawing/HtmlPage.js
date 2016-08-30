@@ -2046,6 +2046,9 @@ function CEditorPage(api)
 			oWordControl.m_oScrollHorApi.evt_mouseup(__e);
 		}
 
+		if (window.g_asc_plugins)
+            window.g_asc_plugins.onExternalMouseUp();
+
 		global_mouseEvent.Sender = null;
 
 		global_mouseEvent.UnLockMouse();
