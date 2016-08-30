@@ -484,7 +484,9 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_PasteData = function (_format, data1, data2) {
-    this.wb.pasteData(_format, data1, data2);
+    if (!this.getViewMode()) {
+      this.wb.pasteData(_format, data1, data2);
+    }
   };
 
   spreadsheet_api.prototype.asc_CheckCopy = function (_clipboard /* CClipboardData */, _formats) {
