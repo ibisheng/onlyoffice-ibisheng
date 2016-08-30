@@ -743,9 +743,6 @@
     this.model.handlers.add("setDocumentModified", function(bIsModified) {
       self.Api.onUpdateDocumentModified(bIsModified);
     });
-    this.model.handlers.add("initCommentsToSave", function() {
-      self._initCommentsToSave();
-    });
     this.model.handlers.add("replaceWorksheet", function(from, to) {
       self.replaceWorksheet(from, to);
     });
@@ -1425,23 +1422,26 @@
   };
 
   WorkbookView.prototype._onShowNextPrevWorksheet = function(direction) {
-    // Проверка на неправильное направление
-    if (0 === direction) {
-      return false;
-    }
     // Колличество листов
     var countWorksheets = this.model.getWorksheetCount();
     // Покажем следующий лист или предыдущий (если больше нет)
-    var i, ws;
-    for (i = this.wsActive + direction; (0 > direction) ? (i >= 0) : (i < countWorksheets); i += direction) {
+    var i = this.wsActive + direction, ws;
+    while (i !== this.wsActive) {
+      if (0 > i) {
+        i = countWorksheets - 1;
+      } else  if (i >= countWorksheets) {
+        i = 0;
+      }
+
       ws = this.model.getWorksheet(i);
-      if (false === ws.getHidden()) {
+      if (!ws.getHidden()) {
         this.showWorksheet(i);
         this.handlers.trigger("asc_onActiveSheetChanged", i);
         return true;
       }
-    }
 
+      i += direction;
+    }
     return false;
   };
 
@@ -2460,7 +2460,7 @@
     var countWorksheets = this.model.getWorksheetCount();
     for (var i = 0; i < countWorksheets; ++i) {
       tmpWs = this.model.getWorksheet(i);
-      if (tmpWs && 0 < tmpWs.aComments.length) {
+      if (tmpWs && (0 < tmpWs.aComments.length || isFirst)) {
         wsView = this.getWorksheet(i);
         wsModel = wsView.model;
         wsModel.aCommentsCoords = wsView.cellCommentator.getCoordsToSave();

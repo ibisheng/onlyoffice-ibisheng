@@ -402,13 +402,14 @@
 				{
 					try
 					{
-						if (window.g_asc_plugins.api.asc_canPaste())
+						if (pluginData.privateData.resize || window.g_asc_plugins.api.asc_canPaste())
 						{
+							var oLogicDocument, i;
 							var editorId = window.g_asc_plugins.api.getEditorId();
 							if (AscCommon.c_oEditorId.Word === editorId ||
 								AscCommon.c_oEditorId.Presentation === editorId)
 							{
-								var oLogicDocument = window.g_asc_plugins.api.WordControl ?
+								oLogicDocument = window.g_asc_plugins.api.WordControl ?
 									window.g_asc_plugins.api.WordControl.m_oLogicDocument : null;
 								if(AscCommon.c_oEditorId.Word === editorId){
 									oLogicDocument.LockPanelStyles();
@@ -420,16 +421,15 @@
 
 							if (pluginData.getAttribute("recalculate") == true)
 							{
-								var editorId = window.g_asc_plugins.api.getEditorId();
 								if (AscCommon.c_oEditorId.Word === editorId ||
 									AscCommon.c_oEditorId.Presentation === editorId)
 								{
-									var oLogicDocument = window.g_asc_plugins.api.WordControl ?
+									oLogicDocument = window.g_asc_plugins.api.WordControl ?
 										window.g_asc_plugins.api.WordControl.m_oLogicDocument : null;
 									var _fonts         = oLogicDocument.Document_Get_AllFontNames();
 									var _imagesArray   = oLogicDocument.Get_AllImageUrls();
 									var _images        = {};
-									for (var i = 0; i < _imagesArray.length; i++)
+									for (i = 0; i < _imagesArray.length; i++)
 									{
 										_images[_imagesArray[i]] = _imagesArray[i];
 									}
@@ -458,7 +458,7 @@
 									var oFonts  = oApi.wbModel._generateFontMap();
 									var aImages = oApi.wbModel.getAllImageUrls();
 									var oImages = {};
-									for (var i = 0; i < aImages.length; i++)
+									for (i = 0; i < aImages.length; i++)
 									{
 										oImages[aImages[i]] = aImages[i];
 									}
@@ -469,6 +469,11 @@
 											delete window.g_asc_plugins.images_rename;
 											window.g_asc_plugins.api.asc_Recalculate();
 										});
+								}
+							} else {
+								if (AscCommon.c_oEditorId.Spreadsheet === editorId) {
+									// На asc_canPaste создается точка в истории и startTransaction. Поэтому нужно ее закрыть без пересчета.
+									window.g_asc_plugins.api.asc_endPaste();
 								}
 							}
 						}
