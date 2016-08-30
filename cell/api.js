@@ -635,10 +635,6 @@ var editor;
 
       // Отправка стилей
       this._sendWorkbookStyles();
-      if (this.wb) {
-        this.wb._initCommentsToSave();
-      }
-
       if (this.IsSendDocumentLoadCompleate && this.collaborativeEditing) {
         // Принимаем чужие изменения
         this.collaborativeEditing.applyChanges();
@@ -771,7 +767,6 @@ var editor;
     oAdditionalData["vkey"] = this.documentVKey;
     oAdditionalData["outputformat"] = filetype;
     oAdditionalData["title"] = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype));
-    this.wb._initCommentsToSave();
     oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.CompleteAll;
     var t = this;
     t.fCurCallback = function(incomeObject) {
@@ -835,7 +830,6 @@ var editor;
       this.handlers.trigger("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), this.advancedOptionsAction);
       return;
     } else {
-      this.wb._initCommentsToSave();
       var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
       if (c_oAscFileType.CSV === sFormat) {
         if (options.CSVOptions instanceof asc.asc_CCSVAdvancedOptions) {
@@ -2256,7 +2250,6 @@ var editor;
 
   // Для вставки диаграмм в Word
   spreadsheet_api.prototype.asc_getBinaryFileWriter = function() {
-    this.wb._initCommentsToSave();
     return new AscCommonExcel.BinaryFileWriter(this.wbModel);
   };
 
@@ -3139,12 +3132,10 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_nativeGetFile = function() {
-    this.wb._initCommentsToSave();
     var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
     return oBinaryFileWriter.Write();
   };
   spreadsheet_api.prototype.asc_nativeGetFileData = function() {
-    this.wb._initCommentsToSave();
     var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
     oBinaryFileWriter.Write2();
 

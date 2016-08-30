@@ -743,9 +743,6 @@
     this.model.handlers.add("setDocumentModified", function(bIsModified) {
       self.Api.onUpdateDocumentModified(bIsModified);
     });
-    this.model.handlers.add("initCommentsToSave", function() {
-      self._initCommentsToSave();
-    });
     this.model.handlers.add("replaceWorksheet", function(from, to) {
       self.replaceWorksheet(from, to);
     });

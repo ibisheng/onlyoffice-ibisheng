@@ -2407,6 +2407,7 @@
         {
             var oThis = this;
             this._prepeareStyles();
+            window["Asc"]["editor"].wb._initCommentsToSave();
             this.bs.WriteItemWithLength(function(){oThis.WriteWorksheetsContent();});
         };
         this.WriteWorksheetsContent = function()
@@ -2453,10 +2454,8 @@
 
             this.bs.WriteItem(c_oSerWorksheetsTypes.MergeCells, function(){oThis.WriteMergeCells(ws);});
 
-            if ( ws.Drawings && (ws.Drawings.length) )
+            if (ws.Drawings && (ws.Drawings.length))
                 this.bs.WriteItem(c_oSerWorksheetsTypes.Drawings, function(){oThis.WriteDrawings(ws.Drawings);});
-
-            window["Asc"]["editor"].wb._initCommentsToSave();
 
             var aComments = (0 === index) ? this.wb.aComments.concat(ws.aComments) : ws.aComments;
             var aCommentsCoords = (0 === index) ? this.wb.aCommentsCoords.concat(ws.aCommentsCoords) :
