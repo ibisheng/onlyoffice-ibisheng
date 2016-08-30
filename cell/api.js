@@ -3247,6 +3247,9 @@ var editor;
     History.StartTransaction();
     return true;
   };
+  spreadsheet_api.prototype.asc_endPaste = function () {
+    History.EndTransaction();
+  };
   spreadsheet_api.prototype.asc_Recalculate = function () {
       History.EndTransaction();
       this._onUpdateAfterApplyChanges();
