@@ -1952,7 +1952,7 @@ function CDrawingDocument()
     {
         // Пути указаны относительно html в меню, не надо их исправлять
         // и коммитить на пути относительно тестового меню
-        this.cursorMarkerFormat = "url(../../../sdk/Common/Images/marker_format.cur), pointer";
+        this.cursorMarkerFormat = "url(../../../../sdkjs/common/Images/marker_format.cur), pointer";
     }
     else if (window.opera)
     {
