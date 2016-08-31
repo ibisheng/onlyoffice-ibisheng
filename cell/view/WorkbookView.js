@@ -2029,12 +2029,10 @@
   };
 
   WorkbookView.prototype.selectionCut = function() {
-    var t = this, ws;
-    if (!t.getCellEditMode()) {
-      ws = t.getWorksheet();
-      ws.emptySelection(c_oAscCleanOptions.All);
+    if (this.getCellEditMode()) {
+      this.cellEditor.cutSelection();
     } else {
-      t.cellEditor.cutSelection();
+      this.getWorksheet().emptySelection(c_oAscCleanOptions.All);
     }
   };
 

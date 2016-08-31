@@ -475,9 +475,6 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_Cut = function() {
-    if (this.getViewMode()) {
-      return false;
-    }
     if (window["AscDesktopEditor"])
     {
       window["AscDesktopEditor"]["Cut"]();
@@ -497,7 +494,9 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_SelectionCut = function () {
-    return this.wb.selectionCut();
+    if (!this.getViewMode()) {
+      this.wb.selectionCut();
+    }
   };
 
   spreadsheet_api.prototype.asc_bIsEmptyClipboard = function() {
