@@ -12089,15 +12089,15 @@
             }
 
             var applyFilterProps = t.model.autoFilters.applyAutoFilter(autoFilterObject, ar);
-            var rowChange = applyFilterProps.rowChange;
+            var minChangeRow = applyFilterProps.minChangeRow;
             var rangeOldFilter = applyFilterProps.rangeOldFilter;
 
             if (null !== rangeOldFilter && !t.model.workbook.bUndoChanges && !t.model.workbook.bRedoChanges) {
                 t._onUpdateFormatTable(rangeOldFilter, false, true);
             }
 
-            if (null !== rowChange) {
-                t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: rowChange});
+            if (null !== minChangeRow) {
+                t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: minChangeRow});
             }
         };
         this._isLockedAll(onChangeAutoFilterCallback);
@@ -12154,15 +12154,15 @@
 
             t.model.autoFilters._resetTablePartStyle();
 
-            var rowChange = applyFilterProps.rowChange;
+            var minChangeRow = applyFilterProps.minChangeRow;
             var updateRange = applyFilterProps.updateRange;
 
             if (updateRange && !t.model.workbook.bUndoChanges && !t.model.workbook.bRedoChanges) {
                 t._onUpdateFormatTable(updateRange, false, true);
             }
 
-            if (null !== rowChange) {
-                t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: rowChange});
+            if (null !== minChangeRow) {
+                t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: minChangeRow});
             }
         };
         this._isLockedAll(onChangeAutoFilterCallback);
@@ -12243,15 +12243,15 @@
                 }
 
                 var applyFilterProps = t.model.autoFilters.applyAutoFilter(autoFilterObject, ar);
-                var rowChange = applyFilterProps.rowChange;
+                var minChangeRow = applyFilterProps.minChangeRow;
                 var rangeOldFilter = applyFilterProps.rangeOldFilter;
 
                 if (null !== rangeOldFilter && !t.model.workbook.bUndoChanges && !t.model.workbook.bRedoChanges) {
                     t._onUpdateFormatTable(rangeOldFilter, false, true);
                 }
 
-                if (null !== rowChange) {
-                    t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: rowChange});
+                if (null !== minChangeRow) {
+                    t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: minChangeRow});
                 }
             }
 
