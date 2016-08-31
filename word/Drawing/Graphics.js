@@ -1417,7 +1417,11 @@ CGraphics.prototype =
         var _w2 = 3;
 
         var _lineWidth = 1;
-        if (AscBrowser.isRetina)
+        var _isRetina = AscBrowser.isRetina;
+        if (_isRetina && !editor.WordControl.bIsRetinaSupport)
+            _isRetina = false;
+
+        if (_isRetina)
         {
             _y >>= 0;
             _lineWidth = 2;
@@ -1456,7 +1460,7 @@ CGraphics.prototype =
             }
         }
 
-        if (AscBrowser.isRetina)
+        if (_isRetina)
         {
             _w1 <<= 1;
             _w2 <<= 1;
@@ -1496,10 +1500,10 @@ CGraphics.prototype =
             }
         }
 
-        this.DrawStringASCII("Courier New", AscBrowser.isRetina ? 18 : 9, false, false, _header_text, 2, yPos, true);
+        this.DrawStringASCII("Courier New", _isRetina ? 18 : 9, false, false, _header_text, 2, yPos, true);
 
         if (bIsRepeat)
-            this.DrawStringASCII2("Courier New", AscBrowser.isRetina ? 18 : 9, false, false, "Same as Previous", 2, yPos, true);
+            this.DrawStringASCII2("Courier New", _isRetina ? 18 : 9, false, false, "Same as Previous", 2, yPos, true);
 
         if (false == bIsNoIntGrid)
             this.SetIntegerGrid(false);
@@ -1514,7 +1518,11 @@ CGraphics.prototype =
         var _w2 = 3;
 
         var _lineWidth = 1;
-        if (AscBrowser.isRetina)
+        var _isRetina = AscBrowser.isRetina;
+        if (_isRetina && !editor.WordControl.bIsRetinaSupport)
+            _isRetina = false;
+
+        if (_isRetina)
         {
             _y >>= 0;
             _lineWidth = 2;
@@ -1552,7 +1560,7 @@ CGraphics.prototype =
             }
         }
 
-        if (AscBrowser.isRetina)
+        if (_isRetina)
         {
             _w1 <<= 1;
             _w2 <<= 1;
@@ -1594,10 +1602,10 @@ CGraphics.prototype =
             }
         }
 
-        this.DrawStringASCII("Courier New", AscBrowser.isRetina ? 18 : 9, false, false, _header_text, 2, yPos, false);
+        this.DrawStringASCII("Courier New", _isRetina ? 18 : 9, false, false, _header_text, 2, yPos, false);
 
         if (bIsRepeat)
-            this.DrawStringASCII2("Courier New", AscBrowser.isRetina ? 18 : 9, false, false, "Same as Previous", 2, yPos, false);
+            this.DrawStringASCII2("Courier New", _isRetina ? 18 : 9, false, false, "Same as Previous", 2, yPos, false);
 
         if (false == bIsNoIntGrid)
             this.SetIntegerGrid(false);

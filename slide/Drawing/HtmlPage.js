@@ -3039,10 +3039,20 @@ function CEditorPage(api)
 
 		this.m_oApi.syncOnThumbnailsShow();
 
-		AscCommon.InitBrowserInputContext(this.m_oApi, "id_target_cursor");
+		if (!this.m_oApi.isMobileVersion)
+        {
+            AscCommon.InitBrowserInputContext(this.m_oApi, "id_target_cursor");
+            if (AscCommon.g_inputContext)
+                AscCommon.g_inputContext.onResize("id_main_view");
+        }
+        else
+        {
+            window.onkeydown = this.onKeyDown;
+            window.onkeypress = this.onKeyPress;
+            window.onkeyup = this.onKeyUp;
 
-		if (AscCommon.g_inputContext)
-			AscCommon.g_inputContext.onResize("id_main_view");
+            window['AscCommon'].g_clipboardBase.Init(api);
+        }
 	};
 
 	this.StartMainTimer = function()

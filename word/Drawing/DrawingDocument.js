@@ -2032,6 +2032,8 @@ function CDrawingDocument()
     this.TargetShowFlag = false;
     this.TargetShowNeedFlag = false;
 
+    this.SelectionMatrix = null;
+
     this.CanvasHit = document.createElement('canvas');
     this.CanvasHit.width = 10;
     this.CanvasHit.height = 10;
@@ -2636,7 +2638,7 @@ function CDrawingDocument()
         var x_mm = (_x - rect.left) * dKoef;
         var y_mm = (_y - rect.top) * dKoef;
 
-        return { X : x_mm, Y : y_mm, Page: rect.pageIndex, DrawPage: i };
+        return { X : x_mm, Y : y_mm, Page: rect.pageIndex, DrawPage: page };
     }
 
     this.ConvertCoordsToAnotherPage = function(x, y, pageCoord, pageNeed)
@@ -4394,6 +4396,9 @@ function CDrawingDocument()
 
     this.AddPageSelection = function(pageIndex, x, y, w, h)
     {
+        if (null == this.SelectionMatrix)
+            this.SelectionMatrix = this.TextMatrix;
+
         this.IsTextMatrixUse = ((null != this.TextMatrix) && !global_MatrixTransformer.IsIdentity(this.TextMatrix));
 
         if (pageIndex < this.m_lDrawingFirst || pageIndex > this.m_lDrawingEnd)
