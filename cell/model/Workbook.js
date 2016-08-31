@@ -2570,100 +2570,95 @@ Workbook.prototype.isDefinedNamesExists = function ( name, sheetId ) {
     var n = name.toLowerCase();
     return !!this.dependencyFormulas.defNameList[getDefNameVertexId(sheetId, n)];
 };
-Workbook.prototype.getDefinedNamesWB = function (defNameListId) {
-    var names = [], name, thas = this, activeWS;
+	Workbook.prototype.getDefinedNamesWB = function (defNameListId) {
+		var names = [], name, t = this;
 
-    /*c_oAscGetDefinedNamesList.
-        Worksheet           :   0,
-        WorksheetWorkbook   :   1,
-        All*/
+		function getNames(_id, arr) {
+			var listDN = t.dependencyFormulas.defNameSheets[_id], name;
+			for (var id in listDN) {
+				name = listDN[id];
 
-    function getNames(id,arr){
-        var listDN = thas.dependencyFormulas.defNameSheets[id], name;
-        for ( var id in listDN ) {
-            name = listDN[id];
+				if (name.Ref && !name.Hidden && name.Name.indexOf("_xlnm") < 0) {
+					if (name.isTable || name.parsedRef && name.parsedRef.isParsed && name.parsedRef.countRef == 1 &&
+						name.parsedRef.outStack.length == 1 &&
+						name.parsedRef.calculate().errorType !== AscCommonExcel.cErrorType.bad_reference) {
+						arr.push(name.getAscCDefName());
+					}
+				}
+			}
+		}
 
-            if ( name.Ref && !name.Hidden && name.Name.indexOf("_xlnm") < 0 ) {
-                if( name.isTable || name.parsedRef && name.parsedRef.isParsed && name.parsedRef.countRef == 1 && name.parsedRef.outStack.length == 1 && name.parsedRef.calculate().errorType !== AscCommonExcel.cErrorType.bad_reference ){
-                    arr.push( name.getAscCDefName() );
-                }
-            }
-        }
-    }
+		function sort(a, b) {
+			if (a.Name > b.Name) {
+				return 1;
+			}
+			if (a.Name < b.Name) {
+				return -1;
+			}
+		}
 
-    function sort(a,b){
-        if (a.Name > b.Name) return 1;
-        if (a.Name < b.Name) return -1;
-    }
+		switch (defNameListId) {
+			case c_oAscGetDefinedNamesList.Worksheet:
+			case c_oAscGetDefinedNamesList.WorksheetWorkbook:
+				getNames(this.getActiveWs().getId(), names);
+				if (c_oAscGetDefinedNamesList.WorksheetWorkbook === defNameListId) {
+					getNames("WB", names);
+				}
+				break;
+			case c_oAscGetDefinedNamesList.All:
+			default:
+				for (var id in this.dependencyFormulas.defNameList) {
+					name = this.dependencyFormulas.defNameList[id].getAscCDefName();
+					if (name.Ref && !name.Hidden && name.Name.indexOf("_xlnm") < 0) {
+						names.push(name);
+					}
+				}
+				break;
+		}
 
-    switch(defNameListId){
-        case c_oAscGetDefinedNamesList.Worksheet:
-        case c_oAscGetDefinedNamesList.WorksheetWorkbook:
-            activeWS = this.getActiveWs();
+		return names.sort(sort);
+	};
+	Workbook.prototype.getDefinesNames = function (name, sheetId) {
+		return this.dependencyFormulas.getDefNameNodeByName(name, sheetId);
+	};
+	Workbook.prototype.getDefinedName = function (name) {
+		var ws = this.getWorksheet(name.LocalSheetId);
+		return this.dependencyFormulas.getDefNameNodeByName(name.Name, ws ? ws.getId() : null);
+	};
+	Workbook.prototype.delDefinesNames = function (defName, bUndo) {
+		History.Create_NewPoint();
+		var retRes = this.dependencyFormulas.removeDefName(defName.LocalSheetId, defName.Name);
+		if (retRes) {
+			/*
+			 * #1. поменяли название - перестроили формулу. нужно вызвать пересборку формул в ячейках, в которыйх есть эта именованная ссылка.
+			 *  для этого пробегаемся по всем slave, и вызываем пересборку. в результате должна получиться новая формула, где используется новый диапазон.
+			 * #2. поменяли диапазон. нужно перестроить граф зависимосте и пересчитать формулу. находим диапазон; меняем в нем ссылку; разбираем ссылку;
+			 *  удаляем старые master и добавляем новые, которые получились в результате разбора новой ссылки; пересчитываем формулу.
+			 * */
 
-            getNames(activeWS.getId(),names);
+			var nSE, se, seUndoRedo = [];
+			nSE = retRes.getSlaveEdges();
 
-            if( c_oAscGetDefinedNamesList.WorksheetWorkbook ){
-                getNames("WB",names);
-            }
-            break;
-        case c_oAscGetDefinedNamesList.All:
-        default:
-            for ( var id in this.dependencyFormulas.defNameList ) {
-                name = this.dependencyFormulas.defNameList[id].getAscCDefName()
-                if ( name.Ref && !name.Hidden && name.Name.indexOf("_xlnm") < 0 ) {
-                    names.push( name );
-                }
-            }
-            break;
-    }
+			retRes.deleteAllMasterEdges();
 
-    return names.sort(sort);
-};
-Workbook.prototype.getDefinesNames = function ( name, sheetId ) {
-    return this.dependencyFormulas.getDefNameNodeByName( name, sheetId );
-};
-Workbook.prototype.getDefinedName = function ( name ) {
-    var ws = this.getWorksheet( name.LocalSheetId ), sheetId = null;
-    ws ? sheetId = ws.getId() : null;
-    return this.dependencyFormulas.getDefNameNodeByName( name.Name, sheetId );
-};
-Workbook.prototype.delDefinesNames = function ( defName, bUndo ) {
-    History.Create_NewPoint();
-    var retRes = false;
+			for (var id in nSE) {
+				seUndoRedo.push(id);
+				se = nSE[id];
+				addToArrRecalc(se.sheetId, se.cell);
+				this.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId];
+				this.needRecalc.length++;
+			}
 
-    retRes = this.dependencyFormulas.removeDefName( defName.LocalSheetId, defName.Name );
+			if (!bUndo) {
+				this.buildRecalc();
+			}
 
-    if ( retRes ) {
-        /*
-         * #1. поменяли название - перестроили формулу. нужно вызвать пересборку формул в ячейках, в которыйх есть эта именованная ссылка.
-         *  для этого пробегаемся по всем slave, и вызываем пересборку. в результате должна получиться новая формула, где используется новый диапазон.
-         * #2. поменяли диапазон. нужно перестроить граф зависимосте и пересчитать формулу. находим диапазон; меняем в нем ссылку; разбираем ссылку;
-         *  удаляем старые master и добавляем новые, которые получились в результате разбора новой ссылки; пересчитываем формулу.
-         * */
+			History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesDelete, null, null,
+				new UndoRedoData_DefinedNames(defName.Name, defName.Ref, defName.LocalSheetId, defName.isTable, seUndoRedo));
+		}
 
-        var nSE, se, seUndoRedo = [];
-        nSE = retRes.getSlaveEdges();
-
-        retRes.deleteAllMasterEdges();
-
-        for ( var id in nSE ) {
-            seUndoRedo.push( id );
-            se = nSE[id];
-            addToArrRecalc(se.sheetId, se.cell);
-            this.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId ];
-            this.needRecalc.length++;
-        }
-
-        if(!bUndo)
-            this.buildRecalc();
-
-        History.Add( AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames( defName.Name, defName.Ref, defName.LocalSheetId, defName.isTable, seUndoRedo ) );
-    }
-
-    return retRes;
-
-};
+		return retRes;
+	};
 Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
 
     var newN = newName.Name.toLowerCase(), retRes = null, rename = false, nSE, se;

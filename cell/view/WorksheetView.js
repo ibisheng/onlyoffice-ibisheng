@@ -7225,17 +7225,20 @@
         return oSelectionMathInfo;
     };
 
-    WorksheetView.prototype.getSelectionName = function ( bRangeText ) {
-        if ( this.isSelectOnShape ) {
+    WorksheetView.prototype.getSelectionName = function (bRangeText) {
+        if (this.isSelectOnShape) {
             return " ";
         }	// Пока отправим пустое имя(с пробелом, пустое не воспринимаем в меню..) ToDo
 
         var ar = this.activeRange;
-        var mc = this.model.getMergedByCell( ar.startRow, ar.startCol );
-        var c1 = mc ? mc.c1 : ar.startCol, r1 = mc ? mc.r1 : ar.startRow, ar_norm = ar.normalize(), mc_norm = mc ? mc.normalize() : null, c2 = mc_norm ? mc_norm.isEqual( ar_norm ) ? mc_norm.c1 : ar_norm.c2 : ar_norm.c2, r2 = mc_norm ? mc_norm.isEqual( ar_norm ) ? mc_norm.r1 : ar_norm.r2 : ar_norm.r2, selectionSize = !bRangeText ? "" : (function ( r ) {
-            var rc = Math.abs( r.r2 - r.r1 ) + 1;
-            var cc = Math.abs( r.c2 - r.c1 ) + 1;
-            switch ( r.type ) {
+        var mc = this.model.getMergedByCell(ar.startRow, ar.startCol);
+        var c1 = mc ? mc.c1 : ar.startCol, r1 = mc ? mc.r1 : ar.startRow, ar_norm = ar.normalize(), mc_norm = mc ?
+          mc.normalize() : null, c2 = mc_norm ? mc_norm.isEqual(ar_norm) ? mc_norm.c1 : ar_norm.c2 :
+          ar_norm.c2, r2 = mc_norm ? mc_norm.isEqual(ar_norm) ? mc_norm.r1 : ar_norm.r2 :
+          ar_norm.r2, selectionSize = !bRangeText ? "" : (function (r) {
+            var rc = Math.abs(r.r2 - r.r1) + 1;
+            var cc = Math.abs(r.c2 - r.c1) + 1;
+            switch (r.type) {
                 case c_oAscSelectionType.RangeCells:
                     return rc + "R x " + cc + "C";
                 case c_oAscSelectionType.RangeCol:
@@ -7246,20 +7249,19 @@
                     return gc_nMaxRow + "R x " + gc_nMaxCol + "C";
             }
             return "";
-        })( ar ), cellName = this._getColumnTitle( c1 ) + this._getRowTitle( r1 ), defName = null, dN = new Asc.Range( ar_norm.c1, ar_norm.r1, c2, r2, true ).normalize();
+        })(ar);
+        if (selectionSize) {
+            return selectionSize;
+        }
 
-        /*if( c1==c2 && r1==r2 ){
-         defName = this.model.getName() + "!" + dN.getAbsName();
-         }
-         else{
-         defName = this.model.getName() + "!" + dN.getAbsName();
-         }*/
+        var dN = new Asc.Range(ar_norm.c1, ar_norm.r1, c2, r2, true);
+        var defName = parserHelp.get3DRef(this.model.getName(), dN.getAbsName());
+        defName = this.model.workbook.findDefinesNames(defName, this.model.getId());
+        if (defName) {
+            return defName;
+        }
 
-        defName = parserHelp.getEscapeSheetName( this.model.getName() ) + "!" + dN.getAbsName();
-
-        defName = defName ? this.model.workbook.findDefinesNames( defName, this.model.getId() ) : null;
-
-        return selectionSize || defName || cellName;
+        return this._getColumnTitle(c1) + this._getRowTitle(r1);
     };
 
     WorksheetView.prototype.getSelectionRangeValue = function () {
@@ -11198,7 +11200,7 @@
 
                 ascRange = new asc_Range(c1, r1, c2, r2);
                 defName = this.model.workbook.editDefinesNames(null,
-                  new Asc.asc_CDefName(reference, this.model.getName() + "!" + ascRange.getAbsName()));
+                  new Asc.asc_CDefName(reference, parserHelp.get3DRef(this.model.getName(), ascRange.getAbsName())));
                 bNew = true;
             }
 

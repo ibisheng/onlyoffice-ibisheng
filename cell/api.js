@@ -2017,7 +2017,7 @@ var editor;
    * @param {String} reference  Ссылка на ячейку вида A1 или R1C1
    */
   spreadsheet_api.prototype.asc_findCell = function (reference) {
-    if (this.wb.cellEditor.isOpened) {
+    if (this.asc_getCellEditMode()) {
       return;
     }
     var d = this.wb.findCell(reference);
