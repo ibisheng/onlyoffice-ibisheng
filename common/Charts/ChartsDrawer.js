@@ -12036,8 +12036,8 @@ CSortFaces.prototype =
 			var centerChartY = top + heightChart / 2;
 			var centerChartX = left + widthChart / 2;
 			
-			var diffX = this.cChartDrawer.processor3D.widthCanvas / 2 - this.cChartDrawer.processor3D.cameraDiffX;
-			var diffY = this.cChartDrawer.processor3D.heightCanvas / 2 - this.cChartDrawer.processor3D.cameraDiffY;
+			var diffX = (this.cChartDrawer.processor3D.widthCanvas / 2) / this.cChartDrawer.processor3D.aspectRatioX - this.cChartDrawer.processor3D.cameraDiffX;
+			var diffY = (this.cChartDrawer.processor3D.heightCanvas / 2) / this.cChartDrawer.processor3D.aspectRatioY - this.cChartDrawer.processor3D.cameraDiffY;
 			var diffZ = -1 / this.cChartDrawer.processor3D.rPerspective - this.cChartDrawer.processor3D.cameraDiffZ;
 			
 			this.centralViewPoint = {x: diffX, y: diffY, z: diffZ};
