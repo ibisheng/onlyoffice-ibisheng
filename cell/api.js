@@ -494,7 +494,9 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_SelectionCut = function () {
-    return this.wb.selectionCut();
+    if (!this.getViewMode()) {
+      this.wb.selectionCut();
+    }
   };
 
   spreadsheet_api.prototype.asc_bIsEmptyClipboard = function() {
@@ -2017,7 +2019,7 @@ var editor;
    * @param {String} reference  Ссылка на ячейку вида A1 или R1C1
    */
   spreadsheet_api.prototype.asc_findCell = function (reference) {
-    if (this.wb.cellEditor.isOpened) {
+    if (this.asc_getCellEditMode()) {
       return;
     }
     var d = this.wb.findCell(reference);

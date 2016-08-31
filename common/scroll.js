@@ -1710,6 +1710,7 @@ ScrollObject.prototype = {
         this.canvas.style.zIndex = 100;
         this.canvas.style.position = "absolute";
         this.canvas.style.top = "0px";
+        this.canvas.style["msTouchAction"] = "none";
         if ( navigator.userAgent.toLowerCase().indexOf( "webkit" ) != -1 ){
             this.canvas.style.webkitUserSelect = "none";
         }
