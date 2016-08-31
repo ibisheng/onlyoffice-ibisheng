@@ -2663,8 +2663,6 @@ CChartsDrawer.prototype =
 	//TODO временная функция для теста результата значений
 	getPlainEquation: function(point1, point2, point3)
 	{
-		var ppl = 2;
-		var set0 = 0.00000001;
 		var subMatrix = function(oldmat, row, col) 
 		{
 			var i;
@@ -2690,33 +2688,10 @@ CChartsDrawer.prototype =
 				m = 0;
 			}
 			return retmat;
-		}
-		
-		 var isMatSquare = function(mat) 
-		 {
-			var len = mat.length - 1;
-			var i = 0;
-			
-			try{
-			for (i = 0; i < 9; i++) {
-				if (isNaN(mat[i][0]))
-					break;
-			}
-			}
-			catch(ex){
-
-			}
-
-			if (i - 1 == len)
-				return true;
-			else
-				return false;
-		}
+		};
 		
 		var determinant = function(mat) 
 		{
-			var sqrMat = isMatSquare(mat);
-
 			var i;
 			var tmpVal = 0;
 			var row = mat.length;
@@ -2741,51 +2716,6 @@ CChartsDrawer.prototype =
 			}
 		};
 		
-		var round = function(inVal, plc) 
-		{
-			inVal = parseFloat(inVal);
-			if (isNaN(inVal)) return "";
-			if (inVal == 0) return "0";
-			if (inVal=="") return "";
-			var value = 0;
-
-			if (Math.abs(inVal) < set0) return 0;
-			
-			if (inVal == 0) {
-				return inVal;
-			}
-
-			var inE = inVal.toString().indexOf("e");
-
-			if (inE == -1) {
-				value = Math.round(inVal * Math.pow(10, plc)) / Math.pow(10, plc);
-			}
-			else {
-				var newVal = inVal.toString().substring(0, inE);
-				var Epart = inVal.toString().substring(inE, inVal.toString().length);
-				var calVal = parseFloat(newVal);
-				value = Math.round(calVal * Math.pow(10, plc)) / Math.pow(10, plc);
-				Epart = value + Epart;
-				return Epart;
-			}
-			
-			var i;
-			
-			if (value != 0)
-				return value;
-			else
-			{
-				i = plc + 1;
-				while (value==0){
-					value = Math.round(inVal * Math.pow(10, i))/Math.pow(10, i);
-					i++;
-					}
-					
-					i = i + plc - 1;
-				return Math.round(inVal * Math.pow(10, i))/Math.pow(10, i);
-			}
-		}
-		
 		var replaceCol = function(mat, col, vec) 
 		{
 			var i = 0;
@@ -2804,7 +2734,7 @@ CChartsDrawer.prototype =
 				}
 			}
 			return tmp;
-		}
+		};
 		
 		var a1 = point1.x;
 		var b1 = point1.y;
@@ -2827,12 +2757,20 @@ CChartsDrawer.prototype =
 		var vec = [-1, -1, -1];
 		var factor;
 
-		var a = round(determinant(replaceCol(mat, 0, vec)), ppl);
-		if (a < 0) factor = -1; else factor = 1;
+		var a = determinant(replaceCol(mat, 0, vec));
+		if (a < 0) 
+		{
+			factor = -1;
+		}
+		else 
+		{
+			factor = 1;
+		}
 		a *= factor;
-		var b = round(determinant(replaceCol(mat, 1, vec)) * factor, ppl);
-		var c = round(determinant(replaceCol(mat, 2, vec)) * factor, ppl);
-		var d = round(det, ppl) * factor;
+		
+		var b = determinant(replaceCol(mat, 1, vec)) * factor;
+		var c = determinant(replaceCol(mat, 2, vec)) * factor;
+		var d = det * factor;
 		
 		return {a: a, b: b, c: c, d: d};
 	},
@@ -6354,6 +6292,7 @@ drawHBarChart.prototype =
 	
 	reCalculate : function(chartsDrawer)
 	{
+		console.time("recalculate");
 		this.paths = {};
 		this.summBarVal = [];
 		
@@ -6364,6 +6303,7 @@ drawHBarChart.prototype =
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		
 		this._recalculateBars();
+		console.timeEnd("recalculate");
 	},
 	
 	draw : function(chartsDrawer)
@@ -6859,32 +6799,20 @@ drawHBarChart.prototype =
 		
 		paths = this.cChartDrawer.calculateRect3D(point1, point2, point3, point4, point5, point6, point7, point8, val);
 		
+		//рассчитываем 8 точек для каждого столбца одинакового размера для рассчета положения столбцов
+		var startXColumnPosition = this._getStartYColumnPosition(seriesHeight, idx, i, this.cChartDrawer.calcProp.max, xPoints);
+		width = startXColumnPosition.width / this.chartProp.pxToMM;
 		
-		if(this.cChartDrawer.processor3D.angleOy !== 0 || (this.cChartDrawer.processor3D.angleOy === 0 && this.cChartDrawer.processor3D.angleOx === 0))
-		{
-			var startXColumnPosition = this._getStartYColumnPosition(seriesHeight, idx, i, this.cChartDrawer.calcProp.max, xPoints);
-			width = startXColumnPosition.width / this.chartProp.pxToMM;
-			
-			//рассчитываем 8 точек для каждого столбца одинакового размера для рассчета положения столбцов
-			x1 = newStartX, y1 = newStartY, z1 = DiffGapDepth;
-			x2 = newStartX, y2 = newStartY, z2 = perspectiveDepth + DiffGapDepth;
-			x3 = newStartX + width, y3 = newStartY, z3 = perspectiveDepth + DiffGapDepth;
-			x4 = newStartX + width, y4 = newStartY, z4 = DiffGapDepth;
-			x5 = newStartX, y5 = newStartY + individualBarHeight, z5 = DiffGapDepth;
-			x6 = newStartX, y6 = newStartY + individualBarHeight, z6 = perspectiveDepth + DiffGapDepth;
-			x7 = newStartX + width, y7 = newStartY + individualBarHeight, z7 = perspectiveDepth + DiffGapDepth;
-			x8 = newStartX + width, y8 = newStartY + individualBarHeight, z8 = DiffGapDepth;
-			
-			//поворот относительно осей
-			point1 = this.cChartDrawer._convertAndTurnPoint(x1, y1, z1);
-			point2 = this.cChartDrawer._convertAndTurnPoint(x2, y2, z2);
-			point3 = this.cChartDrawer._convertAndTurnPoint(x3, y3, z3);
-			point4 = this.cChartDrawer._convertAndTurnPoint(x4, y4, z4);
-			point5 = this.cChartDrawer._convertAndTurnPoint(x5, y5, z5);
-			point6 = this.cChartDrawer._convertAndTurnPoint(x6, y6, z6);
-			point7 = this.cChartDrawer._convertAndTurnPoint(x7, y7, z7);
-			point8 = this.cChartDrawer._convertAndTurnPoint(x8, y8, z8);
-		}
+		x3 = newStartX + width, y3 = newStartY, z3 = perspectiveDepth + DiffGapDepth;
+		x4 = newStartX + width, y4 = newStartY, z4 = DiffGapDepth;
+		x7 = newStartX + width, y7 = newStartY + individualBarHeight, z7 = perspectiveDepth + DiffGapDepth;
+		x8 = newStartX + width, y8 = newStartY + individualBarHeight, z8 = DiffGapDepth;
+		
+		point3 = this.cChartDrawer._convertAndTurnPoint(x3, y3, z3);
+		point4 = this.cChartDrawer._convertAndTurnPoint(x4, y4, z4);
+		point7 = this.cChartDrawer._convertAndTurnPoint(x7, y7, z7);
+		point8 = this.cChartDrawer._convertAndTurnPoint(x8, y8, z8);
+		
 		
 		//не проецируем на плоскость
 		var point11 = this.cChartDrawer._convertAndTurnPoint(x1, y1, z1, null, null, true);
@@ -6895,15 +6823,6 @@ drawHBarChart.prototype =
 		var point66 = this.cChartDrawer._convertAndTurnPoint(x6, y6, z6, null, null, true);
 		var point77 = this.cChartDrawer._convertAndTurnPoint(x7, y7, z7, null, null, true);
 		var point88 = this.cChartDrawer._convertAndTurnPoint(x8, y8, z8, null, null, true);
-
-		var plainEquation1 = this.cChartDrawer.getPlainEquation(point11, point44, point88, point55);
-		var plainEquation2 = this.cChartDrawer.getPlainEquation(point11, point22, point33, point44);
-		var plainEquation3 = this.cChartDrawer.getPlainEquation(point11, point22, point66, point55);
-		var plainEquation4 = this.cChartDrawer.getPlainEquation(point44, point88, point77, point33);
-		var plainEquation5 = this.cChartDrawer.getPlainEquation(point55, point66, point77, point88);
-		var plainEquation6 = this.cChartDrawer.getPlainEquation(point66, point22, point33, point77);
-		var plainEquations = [plainEquation1, plainEquation2, plainEquation3, plainEquation4, plainEquation5, plainEquation6];
-		
 		
 		
 		var arrPoints = [[point1, point4, point8, point5], [point1, point2, point3, point4], [point1, point2, point6, point5], [point4, point8, point7, point3], [point5, point6, point7, point8], [point6, point2, point3, point7]];
@@ -6922,6 +6841,7 @@ drawHBarChart.prototype =
 		if(!this.temp[cubeCount].faces)
 		{
 			this.temp[cubeCount].faces = [];
+			this.temp[cubeCount].arrPoints = [point11, point22, point33, point44, point55, point66, point77, point88];
 		}
 		
 		for(var k = 0; k < paths.length; k++)
@@ -6929,12 +6849,10 @@ drawHBarChart.prototype =
 			if(null === paths[k])
 				continue;
 			
-			this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquations[k]});
-			this.temp[cubeCount].faces.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquations[k]});
-			if(!this.temp[cubeCount].arrPoints)
-			{
-				this.temp[cubeCount].arrPoints = [point11, point22, point33, point44, point55, point66, point77, point88];
-			}
+			//this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquation});
+			
+			var plainEquation = this.cChartDrawer.getPlainEquation(arrPoints2[k][0], arrPoints2[k][1], arrPoints2[k][2], arrPoints2[k][3]);
+			this.temp[cubeCount].faces.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquation});
 		}
 		
 		return paths;
@@ -12118,25 +12036,9 @@ CSortFaces.prototype =
 			var centerChartY = top + heightChart / 2;
 			var centerChartX = left + widthChart / 2;
 			
-			
-			if(this.cChartDrawer.processor3D.angleOy === 0)
-			{
-				var diffX = (this.cChartDrawer.processor3D.widthCanvas / 2) / this.cChartDrawer.processor3D.aspectRatioX - this.cChartDrawer.processor3D.cameraDiffX;
-				var diffY = (this.cChartDrawer.processor3D.heightCanvas / 2) / this.cChartDrawer.processor3D.aspectRatioY - this.cChartDrawer.processor3D.cameraDiffY;
-				var diffZ = -1 / this.cChartDrawer.processor3D.rPerspective - this.cChartDrawer.processor3D.cameraDiffZ/*- 1 / this.cChartDrawer.processor3D.rPerspective + this.cChartDrawer.processor3D.cameraDiffZ*/;
-			}
-			else if(this.cChartDrawer.processor3D.angleOy !== 0 && this.cChartDrawer.processor3D.angleOx !== 0)
-			{
-				var diffY = heightCanvas / 2 - this.cChartDrawer.processor3D.cameraDiffY;
-				var diffX = widthCanvas / 2 - this.cChartDrawer.processor3D.cameraDiffX;
-				var diffZ = -1 / this.cChartDrawer.processor3D.rPerspective - this.cChartDrawer.processor3D.cameraDiffZ;
-			}
-			else if(this.cChartDrawer.processor3D.angleOy !== 0)
-			{
-				var diffY = heightCanvas / 2 - this.cChartDrawer.processor3D.cameraDiffY;
-				var diffX = widthCanvas / 2 - this.cChartDrawer.processor3D.cameraDiffX;
-				var diffZ = -1 / this.cChartDrawer.processor3D.rPerspective - this.cChartDrawer.processor3D.cameraDiffZ;
-			}
+			var diffX = this.cChartDrawer.processor3D.widthCanvas / 2 - this.cChartDrawer.processor3D.cameraDiffX;
+			var diffY = this.cChartDrawer.processor3D.heightCanvas / 2 - this.cChartDrawer.processor3D.cameraDiffY;
+			var diffZ = -1 / this.cChartDrawer.processor3D.rPerspective - this.cChartDrawer.processor3D.cameraDiffZ;
 			
 			this.centralViewPoint = {x: diffX, y: diffY, z: diffZ};
 		}
