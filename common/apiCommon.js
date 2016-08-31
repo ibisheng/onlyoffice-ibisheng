@@ -2674,6 +2674,7 @@
 	prot['Success'] = prot.Success;
 	prot['UnknownUser'] = prot.UnknownUser;
 	prot['Connections'] = prot.Connections;
+	prot['ExpiredTrial'] = prot.ExpiredTrial;
 
 	window["AscCommon"].asc_CAscEditorPermissions = asc_CAscEditorPermissions;
 	prot = asc_CAscEditorPermissions.prototype;
