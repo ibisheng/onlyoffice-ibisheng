@@ -83,7 +83,7 @@ window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
 
 Asc['asc_docs_api'].prototype.asc_setAdvancedOptions = function(idOption, option) 
 {
-	if (c_oAscAdvancedOptionsID.CSV === idOption) {
+	if (window["Asc"].c_oAscAdvancedOptionsID.TXT === idOption) {
 		window["AscDesktopEditor"]["SetAdvancedOptions"]("" + option.asc_getCodePage());
 	}
 };
@@ -160,7 +160,7 @@ window["DesktopOfflineAppDocumentApplyChanges"] = function(_changes)
 Asc['asc_docs_api'].prototype.SetDocumentModified = function(bValue)
 {
     this.isDocumentModify = bValue;
-    this.asc_fireCallback("asc_onDocumentModifiedChanged");
+    this.sendEvent("asc_onDocumentModifiedChanged");
 
     if (undefined !== window["AscDesktopEditor"])
     {

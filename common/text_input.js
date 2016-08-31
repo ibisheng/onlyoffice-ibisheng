@@ -106,6 +106,9 @@
 
 		this.compositionValue = [];		// коды символов
 		this.compositionState = c_oCompositionState.end;
+		this.compositionStateApi = c_oCompositionState.end;
+
+		this.DisableCompositeInput = false;
 
 		this.TargetId = null;			// id caret
 		this.HtmlDiv  = null;			// для незаметной реализации одной textarea недостаточно
@@ -342,10 +345,12 @@
 
 		putAreaValue : function(val)
 		{
+			this.DisableCompositeInput = true;
 			if (this.TextArea_Not_ContentEditableDiv)
 				this.HtmlArea.value = val;
 			else
 				this.HtmlArea.innerHTML = val;
+			this.DisableCompositeInput = false;
 		},
 
 		getAreaValue : function()
@@ -525,17 +530,17 @@
 			{
 				ti_console_log("ti: external input");
 
-				this.Api.Begin_CompositeInput();
+				this.apiCompositeStart();
 				this.checkCompositionData(_value);
-				this.Api.Replace_CompositeText(this.compositionValue);
-				this.Api.End_CompositeInput();
+				this.apiCompositeReplace(this.compositionValue);
+				this.apiCompositeEnd();
 			}
 
 			this.TextInputAfterComposition = false;
 
 			if (this.isChromeKeysNoKeyPressPresent && c_oCompositionState.end == this.compositionState)
 			{
-				this.Api.Begin_CompositeInput();
+				this.apiCompositeStart();
 
 				if (this.isChromeKeysNoKeyPressPresentStartValue != "")
 				{
@@ -544,8 +549,8 @@
 				}
 
 				this.checkCompositionData(_value);
-				this.Api.Replace_CompositeText(this.compositionValue);
-				this.Api.End_CompositeInput();
+				this.apiCompositeReplace(this.compositionValue);
+				this.apiCompositeEnd();
 			}
 
 			/*
@@ -638,7 +643,7 @@
 					ti_console_log("ti: ea space");
 				}
 
-				if (!AscCommon.AscBrowser.isMozilla && !this.IsUseInputEventOnlyWithCtx)
+				if (!AscCommon.AscBrowser.isMozilla/* && !this.IsUseInputEventOnlyWithCtx*/)
 				{
 					// у мозиллы есть проблемы, если делать тут clear
 					// например на корейском языке - слетает композиция в некоторых случаях
@@ -824,10 +829,10 @@
 
 			if (_language == AscFonts.LanguagesFontSelectTypes.Unknown || undefined === this.Api.WordControl)
 			{
-				this.Api.Begin_CompositeInput();
+				this.apiCompositeStart();
 				this.checkCompositionData(_value);
-				this.Api.Replace_CompositeText(this.compositionValue);
-				this.Api.End_CompositeInput();
+				this.apiCompositeReplace(this.compositionValue);
+				this.apiCompositeEnd();
 			}
 			else
 			{
@@ -862,10 +867,10 @@
 				}
 				else
 				{
-					this.Api.Begin_CompositeInput();
+					this.apiCompositeStart();
 					this.checkCompositionData(_value);
-					this.Api.Replace_CompositeText(this.compositionValue);
-					this.Api.End_CompositeInput();
+					this.apiCompositeReplace(this.compositionValue);
+					this.apiCompositeEnd();
 				}
 			}
 		},
@@ -1073,12 +1078,45 @@
 			this.Api.asc_LockTargetUpdate(false);
 		},
 
+		apiCompositeStart : function()
+		{
+			if (this.compositionStateApi != c_oCompositionState.end)
+				return;
+
+			//console.log("[apiCompositeStart]");
+			this.Api.Begin_CompositeInput();
+			this.compositionStateApi = c_oCompositionState.process;
+		},
+
+		apiCompositeReplace : function(_value)
+		{
+			if (this.compositionStateApi == c_oCompositionState.end)
+				this.apiCompositeStart();
+
+			//console.log("[apiCompositeReplace] " + _value);
+			this.Api.Replace_CompositeText(_value);
+			this.compositionStateApi = c_oCompositionState.process;
+		},
+
+		apiCompositeEnd : function()
+		{
+			if (this.compositionStateApi == c_oCompositionState.end)
+				return;
+
+			//console.log("[apiCompositeEnd]");
+			this.Api.End_CompositeInput();
+			this.compositionStateApi = c_oCompositionState.end;
+		},
+
 		onCompositionStart : function(e)
 		{
+			if (this.DisableCompositeInput)
+				return;
+
+			//console.log("[START] value: " + this.getAreaValue() + ", data: " + e.data);
 			if (this.IsUseInputEventOnlyWithCtx)
 			{
-				if (this.compositionState == c_oCompositionState.end)
-					this.Api.Begin_CompositeInput();
+				this.apiCompositeStart();
 
 				this.compositionState = c_oCompositionState.start;
 				this.msCheskComposition(e, c_oCompositionState.start);
@@ -1096,7 +1134,7 @@
 
 			ti_console_log2("begin");
 			if (this.compositionState == c_oCompositionState.end)
-				this.Api.Begin_CompositeInput();
+				this.apiCompositeStart();
 
 			this.compositionState = c_oCompositionState.start;
 
@@ -1125,8 +1163,13 @@
 
 		onCompositionUpdate : function(e, isLockTarget, _data, isFromEnd)
 		{
+			if (this.DisableCompositeInput)
+				return;
+
+			//console.log("[UPDATE] value: " + this.getAreaValue() + ", data: " + e.data);
 			if (this.IsUseInputEventOnlyWithCtx)
 			{
+				this.compositionState = c_oCompositionState.process;
 				this.msCheskComposition(e, c_oCompositionState.process);
 				return;
 			}
@@ -1218,13 +1261,11 @@
 								ti_console_log("ti: emulateCompositeConfirm: " + _newConfirm);
 
 								this.checkCompositionData(_newConfirm);
-								ti_console_log2("replace: " + this.compositionValue);
-								this.Api.Replace_CompositeText(this.compositionValue);
-								ti_console_log2("end");
-								this.Api.End_CompositeInput();
 
-								ti_console_log2("begin");
-								this.Api.Begin_CompositeInput();
+								this.apiCompositeReplace(this.compositionValue);
+								this.apiCompositeEnd();
+
+								this.apiCompositeStart();
 							}
 						}
 					}
@@ -1265,7 +1306,7 @@
 					_max = this.Api.Get_MaxCursorPosInCompositeText();
 				}
 				ti_console_log2("replace: " + this.compositionValue);
-				this.Api.Replace_CompositeText(this.compositionValue);
+				this.apiCompositeReplace(this.compositionValue);
 				if (_isNeedSavePos)
 				{
 					if (_old != _max)
@@ -1338,6 +1379,12 @@
 				var _index = _value.lastIndexOf(_compositionData);
 				if (-1 != _index)
 					_compositionConfirm = _compositionConfirm.substr(0, _index);
+				else
+				{
+					// не может такого быть (повторяется на корейском языке, если написать - и изменить фокус).
+					// тогда дату мы очищаем, а e.data приходит неадекватная
+					_compositionData = "";
+				}
 			}
 
 			var _offset = this.ieNonCompositionPrefixConfirm.length - _compositionConfirm.length;
@@ -1348,10 +1395,10 @@
 				var _newConfirm = this.ieNonCompositionPrefixConfirm.substr(this.ieNonCompositionPrefixConfirm.length + _offset);
 
 				this.checkCompositionData(_newConfirm);
-				this.Api.Replace_CompositeText(this.compositionValue);
-				this.Api.End_CompositeInput();
+				this.apiCompositeReplace(this.compositionValue);
+				this.apiCompositeEnd();
 
-				this.Api.Begin_CompositeInput();
+				this.apiCompositeStart();
 			}
 			else if (_offset > 0)
 			{
@@ -1362,11 +1409,11 @@
 			}
 
 			this.checkCompositionData(_compositionData);
-			this.Api.Replace_CompositeText(this.compositionValue);
+			this.apiCompositeReplace(this.compositionValue);
 
 			if (type == c_oCompositionState.end)
 			{
-				this.Api.End_CompositeInput();
+				this.apiCompositeEnd();
 
 				this.unlockTarget();
 				this.TextInputAfterComposition = true;
@@ -1383,6 +1430,10 @@
 
 		onCompositionEnd : function(e, _data)
 		{
+			if (this.DisableCompositeInput)
+				return;
+
+			//console.log("[END] value: " + this.getAreaValue() + ", data: " + e.data);
 			if (this.IsUseInputEventOnlyWithCtx)
 			{
 				this.msCheskComposition(e, c_oCompositionState.end);
@@ -1409,7 +1460,8 @@
 
 			ti_console_log("ti: onCompositionEnd -> onCompositionUpdate");
 			this.onCompositionUpdate(e, false, _data, true);
-			this.Api.Set_CursorPosInCompositeText(1000); // max
+			var _max = this.Api.Get_MaxCursorPosInCompositeText();
+			this.Api.Set_CursorPosInCompositeText(_max); // max
 
 			this.clear(true);
 			ti_console_log2("end");
@@ -1428,15 +1480,13 @@
 				}
 				else
 				{
-					this.Api.End_CompositeInput();
+					this.apiCompositeEnd();
 				}
 			}
 			else
 			{
-				this.Api.End_CompositeInput();
+				this.apiCompositeEnd();
 			}
-
-			this.Api.End_CompositeInput();
 
 			this.unlockTarget();
 			this.TextInputAfterComposition = true;
@@ -1462,7 +1512,7 @@
 					}
 					else
 					{
-						this.compositionValue.push(((_code & 0x3FF) << 10) | (_code2 & 0x3FF));
+						this.compositionValue.push(0x10000 + (((_code & 0x3FF) << 10) | (_code2 & 0x3FF)));
 					}
 				}
 			}
@@ -1480,6 +1530,15 @@
 		externalEndCompositeInput : function()
 		{
 			this.clear();
+		},
+
+		externalChangeFocus : function()
+		{
+			if (this.compositionState == c_oCompositionState.process)
+			{
+				this.apiCompositeEnd();
+				this.clear();
+			}
 		}
 	};
 

@@ -948,6 +948,39 @@ Slide.prototype =
         return oRet;
     },
 
+    copySelectedObjects: function(){
+        var aSelectedObjects, i, fShift = 5.0;
+        var oSelector = this.graphicObjects.selection.groupSelection ? this.graphicObjects.selection.groupSelection : this.graphicObjects;
+        aSelectedObjects = [].concat(oSelector.selectedObjects);
+        oSelector.resetSelection(undefined, false);
+        var bGroup = this.graphicObjects.selection.groupSelection ? true : false;
+        if(bGroup){
+            oSelector.normalize();
+        }
+        for(i = 0; i < aSelectedObjects.length; ++i){
+            var oCopy = aSelectedObjects[i].copy();
+            oCopy.x = aSelectedObjects[i].x;
+            oCopy.y = aSelectedObjects[i].y;
+            oCopy.extX = aSelectedObjects[i].extX;
+            oCopy.extY = aSelectedObjects[i].extY;
+            AscFormat.CheckSpPrXfrm(oCopy, true);
+            oCopy.spPr.xfrm.setOffX(oCopy.x + fShift);
+            oCopy.spPr.xfrm.setOffY(oCopy.y + fShift);
+            oCopy.setParent(this);
+            if(!bGroup){
+                this.addToSpTreeToPos(undefined, oCopy);
+            }
+            else{
+                oCopy.setGroup(aSelectedObjects[i].group);
+                aSelectedObjects[i].group.addToSpTree(undefined, oCopy);
+            }
+            oSelector.selectObject(oCopy, 0);
+        }
+        if(bGroup){
+            oSelector.updateCoordinatesAfterInternalResize();
+        }
+    },
+
     Get_AllImageUrls: function(images)
     {
         if(this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill && this.cSld.Bg.bgPr.Fill.fill instanceof  AscFormat.CBlipFill && typeof this.cSld.Bg.bgPr.Fill.fill.RasterImageId === "string" )
@@ -1269,7 +1302,7 @@ Slide.prototype =
 
     showChartSettings:  function()
     {
-        editor.asc_fireCallback("asc_doubleClickOnChart", this.graphicObjects.getChartObject());
+        editor.sendEvent("asc_doubleClickOnChart", this.graphicObjects.getChartObject());
         this.graphicObjects.changeCurrentState(new AscFormat.NullState(this.graphicObjects));
     },
 

@@ -431,7 +431,7 @@ var editor;
       this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
     }
     /* Нужно закрыть редактор (до выставления флага canSave, т.к. мы должны успеть отправить
-     asc_onDocumentModifiedChanged для подписки на сборку) Баг http://bugzserver/show_bug.cgi?id=28331 */
+     asc_onDocumentModifiedChanged для подписки на сборку) Баг http://bugzilla.onlyoffice.com/show_bug.cgi?id=28331 */
     this.asc_closeCellEditor();
 
     // Не даем пользователю сохранять, пока не закончится сохранение
@@ -953,11 +953,6 @@ var editor;
     this.handlers.remove(name, callback);
   };
 
-  spreadsheet_api.prototype.asc_fireCallback = function(name)
-  {
-    return this.handlers.trigger.apply(this.handlers, arguments);
-  };
-
   spreadsheet_api.prototype.asc_getController = function() {
     return this.controller;
 //				return null;
@@ -1472,7 +1467,7 @@ var editor;
       this.sendEvent('asc_onError', c_oAscError.ID.OpenWarning, c_oAscError.Level.NoCritical);
     }
 
-    //this.asc_Resize(); // Убрал, т.к. сверху приходит resize (http://bugzserver/show_bug.cgi?id=14680)
+    //this.asc_Resize(); // Убрал, т.к. сверху приходит resize (http://bugzilla.onlyoffice.com/show_bug.cgi?id=14680)
   };
 
   // Переход на диапазон в листе

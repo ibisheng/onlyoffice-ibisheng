@@ -813,7 +813,7 @@ function CDrawingDocument()
 
 	this.OnRecalculatePage = function(index, pageObject)
 	{
-		editor.asc_fireCallback("asc_onDocumentChanged");
+		editor.sendEvent("asc_onDocumentChanged");
 
 		if (true === this.m_bIsSearching)
 		{
@@ -962,7 +962,7 @@ function CDrawingDocument()
 			this.m_bIsSendApiDocChanged = true;
 			this.m_oWordControl.m_oApi.SetDocumentModified(true);
 
-			this.m_oWordControl.m_oApi.asc_fireCallback("asc_onDocumentChanged");
+			this.m_oWordControl.m_oApi.sendEvent("asc_onDocumentChanged");
 		}
 	}
 
@@ -1773,7 +1773,6 @@ function CDrawingDocument()
 		if (false === this.m_bIsSelection)
 		{
 			this.SelectClear();
-			this.m_oWordControl.CheckUnShowOverlay();
 			this.m_oWordControl.OnUpdateOverlay();
 			this.m_oWordControl.m_oOverlayApi.m_oContext.globalAlpha = 1.0;
 		}
@@ -3232,6 +3231,9 @@ function CThumbnailsManager()
 			e.preventDefault();
 		else
 			e.returnValue = false;
+
+		if (AscCommon.g_inputContext)
+			AscCommon.g_inputContext.externalChangeFocus();
 
 		var control = oThis.m_oWordControl.m_oThumbnails.HtmlElement;
 		if (global_mouseEvent.IsLocked == true && global_mouseEvent.Sender != control)
@@ -4722,6 +4724,7 @@ function CThumbnailsManager()
 					if (this.m_oWordControl.m_oLogicDocument.viewMode === false)
 					{
 						editor.DublicateSlide();
+						e.preventDefault();
 						return false;
 					}
 				}

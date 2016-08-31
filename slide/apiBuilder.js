@@ -71,6 +71,7 @@
      */
     function ApiShape(oShape){
         ApiShape.superclass.constructor.call(this, oShape);
+        this.Shape = oShape;
     }
     AscCommon.extendClass(ApiShape, ApiDrawing);
 
@@ -89,6 +90,7 @@
      */
     function ApiChart(oChart){
         ApiChart.superclass.constructor.call(this, oChart);
+        this.Chart = oChart;
     }
     AscCommon.extendClass(ApiChart, ApiDrawing);
 
@@ -294,7 +296,17 @@
      */
     Api.prototype.CreateParagraph = function()
     {
-        return this.private_CreateApiParagraph(new Paragraph(private_GetDrawingDocument(), null));
+        var oDrawingDocument = null;
+        if(this.GetActiveSheet){
+            var oWorksheet = this.GetActiveSheet();
+            if(oWorksheet){
+                oDrawingDocument = oWorksheet.DrawingDocument;
+            }
+        }
+        else{
+            oDrawingDocument = private_GetDrawingDocument();
+        }
+        return this.private_CreateApiParagraph(new Paragraph(oDrawingDocument, null, 0, 0, 0, 0, 0, true));
     };
 
 
@@ -712,7 +724,7 @@
 
     function private_GetDrawingDocument(){
         if(editor.WordControl){
-            return editor.m_oDrawingDocument;
+            return editor.WordControl.m_oDrawingDocument;
         }
         return null;
     }

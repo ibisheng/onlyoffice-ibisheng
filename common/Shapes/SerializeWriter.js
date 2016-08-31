@@ -1107,7 +1107,7 @@ function CBinaryFileWriter()
         }
         else if (_timing.TransitionType == c_oAscSlideTransitionTypes.None)
         {
-            oThis._WriteInt1(2, 10);
+            oThis._WriteInt1(2, 2000);
         }
 
         if (_timing.TransitionType != c_oAscSlideTransitionTypes.None)

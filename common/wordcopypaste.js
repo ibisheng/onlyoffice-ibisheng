@@ -1785,6 +1785,17 @@ function trimString( str ){
     return str.replace(/^\s+|\s+$/g, '') ;
 }
 function sendImgUrls(api, images, callback, bExcel) {
+
+  if (window["AscDesktopEditor"])
+  {
+    // correct local images
+    for (var nIndex = images.length - 1; nIndex >= 0; nIndex--)
+    {
+      if (0 == images[nIndex].indexOf("file:/"))
+        images[nIndex] = window["AscDesktopEditor"]["GetImageBase64"](images[nIndex]);
+    }
+  }
+
   var rData = {"id": api.documentId, "c": "imgurls", "vkey": api.documentVKey, "userid":  api.documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": images};
   api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.LoadImage);
 
@@ -1811,7 +1822,7 @@ function sendImgUrls(api, images, callback, bExcel) {
     }
     if ( c_oAscError.ID.No !== nError ) {
       if(!bExcel)
-        api.asc_fireCallback("asc_onError", nError, c_oAscError.Level.NoCritical);
+        api.sendEvent("asc_onError", nError, c_oAscError.Level.NoCritical);
       else
         api.handlers.trigger("asc_onError", nError, c_oAscError.Level.NoCritical);
     }
@@ -2747,7 +2758,9 @@ PasteProcessor.prototype =
                         case "Content":
                         {
                             var docContent = this.ReadPresentationText(stream);
-							
+							if(docContent.length === 0){
+							    return;
+							}
 							var presentationSelectedContent = new PresentationSelectedContent();
 							presentationSelectedContent.DocContent = new CSelectedContent();
 							presentationSelectedContent.DocContent.Elements = docContent;

@@ -984,15 +984,15 @@ Path.prototype = {
 
     isSmartLine : function()
     {
-        if (this.ArrPathCommandInfo.length != 2)
+        if (this.ArrPathCommand.length != 2)
             return false;
 
-        if (this.ArrPathCommandInfo[0].id == moveTo && this.ArrPathCommandInfo[1].id == lineTo)
+        if (this.ArrPathCommand[0].id == moveTo && this.ArrPathCommand[1].id == lineTo)
         {
-            if (Math.abs(this.ArrPathCommandInfo[0].X - this.ArrPathCommandInfo[1].X) < 0.0001)
+            if (Math.abs(this.ArrPathCommand[0].X - this.ArrPathCommand[1].X) < 0.0001)
                 return true;
 
-            if (Math.abs(this.ArrPathCommandInfo[0].Y - this.ArrPathCommandInfo[1].Y) < 0.0001)
+            if (Math.abs(this.ArrPathCommand[0].Y - this.ArrPathCommand[1].Y) < 0.0001)
                 return true;
         }
 
@@ -1001,47 +1001,47 @@ Path.prototype = {
 
     isSmartRect : function()
     {
-        if (this.ArrPathCommandInfo.length != 5)
+        if (this.ArrPathCommand.length != 5)
             return false;
 
-        if (this.ArrPathCommandInfo[0].id != moveTo ||
-            this.ArrPathCommandInfo[1].id != lineTo ||
-            this.ArrPathCommandInfo[2].id != lineTo ||
-            this.ArrPathCommandInfo[3].id != lineTo ||
-            (this.ArrPathCommandInfo[4].id != lineTo && this.ArrPathCommandInfo[4].id != close))
+        if (this.ArrPathCommand[0].id != moveTo ||
+            this.ArrPathCommand[1].id != lineTo ||
+            this.ArrPathCommand[2].id != lineTo ||
+            this.ArrPathCommand[3].id != lineTo ||
+            (this.ArrPathCommand[4].id != lineTo && this.ArrPathCommand[4].id != close))
             return false;
 
         var _float_eps = 0.0001;
-        if (Math.abs(this.ArrPathCommandInfo[0].X - this.ArrPathCommandInfo[1].X) < _float_eps)
+        if (Math.abs(this.ArrPathCommand[0].X - this.ArrPathCommand[1].X) < _float_eps)
         {
-            if (Math.abs(this.ArrPathCommandInfo[1].Y - this.ArrPathCommandInfo[2].Y) < _float_eps)
+            if (Math.abs(this.ArrPathCommand[1].Y - this.ArrPathCommand[2].Y) < _float_eps)
             {
-                if (Math.abs(this.ArrPathCommandInfo[2].X - this.ArrPathCommandInfo[3].X) < _float_eps &&
-                    Math.abs(this.ArrPathCommandInfo[3].Y - this.ArrPathCommandInfo[0].Y) < _float_eps)
+                if (Math.abs(this.ArrPathCommand[2].X - this.ArrPathCommand[3].X) < _float_eps &&
+                    Math.abs(this.ArrPathCommand[3].Y - this.ArrPathCommand[0].Y) < _float_eps)
                 {
-                    if (this.ArrPathCommandInfo[4].id == close)
+                    if (this.ArrPathCommand[4].id == close)
                         return true;
 
-                    if (Math.abs(this.ArrPathCommandInfo[0].X - this.ArrPathCommandInfo[4].X) < _float_eps &&
-                        Math.abs(this.ArrPathCommandInfo[0].Y - this.ArrPathCommandInfo[4].Y) < _float_eps)
+                    if (Math.abs(this.ArrPathCommand[0].X - this.ArrPathCommand[4].X) < _float_eps &&
+                        Math.abs(this.ArrPathCommand[0].Y - this.ArrPathCommand[4].Y) < _float_eps)
                     {
                         return true;
                     }
                 }
             }
         }
-        else if (Math.abs(this.ArrPathCommandInfo[0].Y - this.ArrPathCommandInfo[1].Y) < _float_eps)
+        else if (Math.abs(this.ArrPathCommand[0].Y - this.ArrPathCommand[1].Y) < _float_eps)
         {
-            if (Math.abs(this.ArrPathCommandInfo[1].X - this.ArrPathCommandInfo[2].X) < _float_eps)
+            if (Math.abs(this.ArrPathCommand[1].X - this.ArrPathCommand[2].X) < _float_eps)
             {
-                if (Math.abs(this.ArrPathCommandInfo[2].Y - this.ArrPathCommandInfo[3].Y) < _float_eps &&
-                    Math.abs(this.ArrPathCommandInfo[3].X - this.ArrPathCommandInfo[0].X) < _float_eps)
+                if (Math.abs(this.ArrPathCommand[2].Y - this.ArrPathCommand[3].Y) < _float_eps &&
+                    Math.abs(this.ArrPathCommand[3].X - this.ArrPathCommand[0].X) < _float_eps)
                 {
-                    if (this.ArrPathCommandInfo[4].id == close)
+                    if (this.ArrPathCommand[4].id == close)
                         return true;
 
-                    if (Math.abs(this.ArrPathCommandInfo[0].X - this.ArrPathCommandInfo[4].X) < _float_eps &&
-                        Math.abs(this.ArrPathCommandInfo[0].Y - this.ArrPathCommandInfo[4].Y) < _float_eps)
+                    if (Math.abs(this.ArrPathCommand[0].X - this.ArrPathCommand[4].X) < _float_eps &&
+                        Math.abs(this.ArrPathCommand[0].Y - this.ArrPathCommand[4].Y) < _float_eps)
                     {
                         return true;
                     }

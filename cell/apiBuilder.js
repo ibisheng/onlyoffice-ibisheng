@@ -73,6 +73,7 @@
 	 */
 	function ApiShape(oShape){
 		ApiShape.superclass.constructor.call(this, oShape);
+		this.Shape = oShape;
 	}
 	AscCommon.extendClass(ApiShape, ApiDrawing);
 
@@ -91,6 +92,7 @@
 	 */
 	function ApiChart(oChart){
 		ApiChart.superclass.constructor.call(this, oChart);
+		this.Chart = oChart;
 	}
 	AscCommon.extendClass(ApiChart, ApiDrawing);
 
@@ -316,7 +318,16 @@
 			settings.inColumns = !bInRows;
 			settings.range = sDataRange;
 			var oChart = AscFormat.DrawingObjectsController.prototype.getChartSpace(this.worksheet, settings);
-			private_SetCoords(oChart, this.worksheet, nExtX, nExtY, nFromCol, nColOffset,  nFromRow, nRowOffset);
+			if(arguments.length === 8){//support old variant
+				oChart.setBDeleted(false);
+				oChart.setWorksheet(this.worksheet);
+				oChart.setBFromSerialize(true);
+				oChart.addToDrawingObjects();
+				oChart.setDrawingBaseCoords(arguments[4], 0, arguments[5], 0, arguments[6], 0, arguments[7], 0, 0, 0, 0, 0);
+			}
+			else{
+				private_SetCoords(oChart, this.worksheet, nExtX, nExtY, nFromCol, nColOffset,  nFromRow, nRowOffset);
+			}
 			if (AscFormat.isRealNumber(nStyleIndex)) {
 				oChart.setStyle(nStyleIndex);
 			}
@@ -339,7 +350,7 @@
 	 * @returns {ApiShape}
 	 * */
 	ApiWorksheet.prototype.AddShape = function(sType, nWidth, nHeight, oFill, oStroke, nFromCol, nColOffset, nFromRow, nRowOffset){
-		var oShape = AscFormat.builder_CreateShape(sType, nWidth/36000, nHeight/36000, oFill.UniFill, oStroke.Ln, null, this.worksheet.theme, this.worksheet.DrawingDocument, false);
+		var oShape = AscFormat.builder_CreateShape(sType, nWidth/36000, nHeight/36000, oFill.UniFill, oStroke.Ln, null, this.worksheet.workbook.theme, this.worksheet.DrawingDocument, false);
 		private_SetCoords(oShape, this.worksheet, nWidth, nHeight, nFromCol, nColOffset,  nFromRow, nRowOffset);
 		return new ApiShape(oShape);
 	};
@@ -475,8 +486,26 @@
 	 * @param {EMU} nRowOffset
 	* */
 	ApiDrawing.prototype.SetPosition = function(nFromCol, nColOffset, nFromRow, nRowOffset){
+		var extX = null, extY = null;
+		if(this.Drawing.drawingBase){
+			if(this.Drawing.drawingBase.Type === AscCommon.c_oAscCellAnchorType.cellanchorOneCell ||
+				this.Drawing.drawingBase.Type === AscCommon.c_oAscCellAnchorType.cellanchorAbsolute){
+				extX = this.Drawing.drawingBase.ext.cx;
+				extY = this.Drawing.drawingBase.ext.cy;
+			}
+		}
+		if(!AscFormat.isRealNumber(extX) || !AscFormat.isRealNumber(extY)){
+			if(this.Drawing.spPr && this.Drawing.spPr.xfrm){
+				extX = this.Drawing.spPr.xfrm.extX;
+				extY = this.Drawing.spPr.xfrm.extY;
+			}
+			else{
+				extX = 5;
+				extY = 5;
+			}
+		}
 		this.Drawing.setDrawingBaseType(AscCommon.c_oAscCellAnchorType.cellanchorOneCell);
-		this.Drawing.setDrawingBaseCoords(nFromCol, nColOffset/36000.0, nFromRow, nRowOffset/36000.0, 0, 0, 0, 0, 0, 0, 0, 0);
+		this.Drawing.setDrawingBaseCoords(nFromCol, nColOffset/36000.0, nFromRow, nRowOffset/36000.0, 0, 0, 0, 0, 0, 0, extX, extY);
 	};
 
 
@@ -517,7 +546,7 @@
 	 */
 	ApiShape.prototype.GetDocContent = function()
 	{
-		var oApi = Asc.editor;
+		var oApi = Asc["editor"];
 		if(oApi && this.Drawing && this.Drawing.txBody && this.Drawing.txBody.content)
 		{
 			return oApi.private_CreateApiDocContent(this.Drawing.txBody.content);

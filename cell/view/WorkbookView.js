@@ -33,11 +33,10 @@
 "use strict";
 
 (/**
- * @param {jQuery} $
  * @param {Window} window
  * @param {undefined} undefined
  */
-  function($, window, undefined) {
+  function(window, undefined) {
 
 
   /*
@@ -430,8 +429,6 @@
           return self._onGraphicObjectWindowKeyPress.apply(self, arguments);
         }, "getGraphicsInfo": function () {
           return self._onGetGraphicsInfo.apply(self, arguments);
-        }, "getSelectedGraphicObjects": function () {
-          return self._onGetSelectedGraphicObjects.apply(self, arguments);
         }, "updateSelectionShape": function () {
           return self._onUpdateSelectionShape.apply(self, arguments);
         }, "canReceiveKeyPress": function () {
@@ -513,6 +510,14 @@
         }
       };
       this.Api.Begin_CompositeInput = function () {
+        var oWSView = self.getWorksheet();
+        if(oWSView && oWSView.isSelectOnShape){
+          if(oWSView.objectRender){
+            oWSView.objectRender.Begin_CompositeInput();
+          }
+          return;
+        }
+
         if (!self.isCellEditMode) {
           self._onEditCell(false, true, undefined, true, function () {
             self.cellEditor.Begin_CompositeInput();
@@ -522,30 +527,62 @@
         }
       };
       this.Api.Replace_CompositeText = function (arrCharCodes) {
+        var oWSView = self.getWorksheet();
+        if(oWSView && oWSView.isSelectOnShape){
+          if(oWSView.objectRender){
+            oWSView.objectRender.Replace_CompositeText(arrCharCodes);
+          }
+          return;
+        }
         if (self.isCellEditMode) {
           self.cellEditor.Replace_CompositeText(arrCharCodes);
         }
       };
       this.Api.End_CompositeInput = function () {
+        var oWSView = self.getWorksheet();
+        if(oWSView && oWSView.isSelectOnShape){
+          if(oWSView.objectRender){
+            oWSView.objectRender.End_CompositeInput();
+          }
+          return;
+        }
         if (self.isCellEditMode) {
           self.cellEditor.End_CompositeInput();
         }
       };
       this.Api.Set_CursorPosInCompositeText = function (nPos) {
+        var oWSView = self.getWorksheet();
+        if(oWSView && oWSView.isSelectOnShape){
+          if(oWSView.objectRender){
+            oWSView.objectRender.Set_CursorPosInCompositeText(nPos);
+          }
+          return;
+        }
         if (self.isCellEditMode) {
           self.cellEditor.Set_CursorPosInCompositeText(nPos);
         }
       };
       this.Api.Get_CursorPosInCompositeText = function () {
         var res = 0;
-        if (self.isCellEditMode) {
+        var oWSView = self.getWorksheet();
+        if(oWSView && oWSView.isSelectOnShape){
+          if(oWSView.objectRender){
+            res = oWSView.objectRender.Get_CursorPosInCompositeText();
+          }
+        }
+        else if (self.isCellEditMode) {
           res = self.cellEditor.Get_CursorPosInCompositeText();
         }
         return res;
       };
       this.Api.Get_MaxCursorPosInCompositeText = function () {
-        var res = 0;
-        if (self.isCellEditMode) {
+        var res = 0; var oWSView = self.getWorksheet();
+        if(oWSView && oWSView.isSelectOnShape){
+          if(oWSView.objectRender){
+            res = oWSView.objectRender.Get_CursorPosInCompositeText();
+          }
+        }
+        else if (self.isCellEditMode) {
           res = self.cellEditor.Get_MaxCursorPosInCompositeText();
         }
         return res;
@@ -1235,23 +1272,18 @@
   };
 
   WorkbookView.prototype._onGraphicObjectWindowKeyDown = function(e) {
-    var ws = this.getWorksheet();
-    return ws.objectRender.graphicObjectKeyDown(e);
+    var objectRender = this.getWorksheet().objectRender;
+    return (0 < objectRender.getSelectedGraphicObjects().length) ? objectRender.graphicObjectKeyDown(e) : false;
   };
 
   WorkbookView.prototype._onGraphicObjectWindowKeyPress = function(e) {
-    var ws = this.getWorksheet();
-    return ws.objectRender.graphicObjectKeyPress(e);
+    var objectRender = this.getWorksheet().objectRender;
+    return (0 < objectRender.getSelectedGraphicObjects().length) ? objectRender.graphicObjectKeyPress(e) : false;
   };
 
   WorkbookView.prototype._onGetGraphicsInfo = function(x, y) {
     var ws = this.getWorksheet();
     return ws.objectRender.checkCursorDrawingObject(x, y);
-  };
-
-  WorkbookView.prototype._onGetSelectedGraphicObjects = function() {
-    var ws = this.getWorksheet();
-    return ws.objectRender.getSelectedGraphicObjects();
   };
 
   WorkbookView.prototype._onUpdateSelectionShape = function(isSelectOnShape) {
@@ -2989,4 +3021,4 @@
   //------------------------------------------------------------export---------------------------------------------------
   window['AscCommonExcel'] = window['AscCommonExcel'] || {};
   window["AscCommonExcel"].WorkbookView = WorkbookView;
-})(jQuery, window);
+})(window);

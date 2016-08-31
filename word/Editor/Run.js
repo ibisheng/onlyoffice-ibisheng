@@ -1990,7 +1990,11 @@ ParaRun.prototype.Get_SelectedText = function(bAll, bClearText, oPr)
                 break;
             }
 
-            case para_Text : Str += String.fromCharCode(Item.Value); break;
+            case para_Text :
+            {
+                Str += AscCommon.encodeSurrogateChar(Item.Value);
+                break;
+            }
             case para_Space:
             case para_Tab  : Str += " "; break;
 			case para_End:
@@ -2339,12 +2343,12 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
 					if (para_FootnoteReference === ItemType)
 					{
-						Item.UpdateNumber(Para.Get_AbsolutePage(PRS.Page));
+						Item.UpdateNumber(Para.Get_AbsolutePage(PRS.Page), Para.Get_AbsoluteColumn(PRS.Page));
 						PRS.Add_FootnoteReference(Item, Pos);
 					}
 					else if (para_FootnoteRef === ItemType)
 					{
-						Item.UpdateNumber(Para.Get_AbsolutePage(PRS.Page));
+						Item.UpdateNumber(Para.Get_AbsolutePage(PRS.Page), Para.Get_AbsoluteColumn(PRS.Page));
 					}
 
                     // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.

@@ -2529,10 +2529,16 @@ CShape.prototype.recalculateLocalTransform = function(transform)
             var metrics = this.drawingBase.getGraphicObjectMetrics();
             this.x = metrics.x;
             this.y = metrics.y;
-            extX = metrics.extX;
-            extY = metrics.extY;
-            var rot = this.spPr && this.spPr.xfrm && AscFormat.isRealNumber(this.spPr.xfrm.rot) ? AscFormat.normalizeRotate(this.spPr.xfrm.rot) : 0;
+            var rot = 0;
+            if(this.spPr && this.spPr.xfrm){
+                if(AscFormat.isRealNumber(this.spPr.xfrm.rot)){
+                    rot =  AscFormat.normalizeRotate(this.spPr.xfrm.rot);
+                }
+                this.flipH = this.spPr.xfrm.flipH === true;
+                this.flipV = this.spPr.xfrm.flipV === true;
+            }
             this.rot = rot;
+
             var metricExtX, metricExtY;
             if(!(this instanceof AscFormat.CGroupShape))
             {

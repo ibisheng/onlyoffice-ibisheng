@@ -11991,7 +11991,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     function builder_CreateShape(sType, nWidth, nHeight, oFill, oStroke, oParent, oTheme, oDrawingDocument, bWord){
         var oShapeTrack = new AscFormat.NewShapeTrack(sType, 0, 0, oTheme, null, null, null, 0);
         oShapeTrack.track({}, nWidth, nHeight);
-        var oShape = oShapeTrack.getShape(true, oDrawingDocument, null);
+        var oShape = oShapeTrack.getShape(bWord === true, oDrawingDocument, null);
         oShape.setParent(oParent);
         if(bWord){
             oShape.createTextBoxContent();
@@ -12314,6 +12314,24 @@ function CorrectUniColor(asc_color, unicolor, flag)
     }
 
 
+    function builder_CreateTitle(sTitle, nFontSize, oChartSpace)
+    {
+        if(typeof sTitle === "string" && sTitle.length > 0){
+            var oTitle = new AscFormat.CTitle();
+            oTitle.setOverlay(false);
+            oTitle.setTx(new AscFormat.CChartText());
+            var oTextBody = AscFormat.CreateTextBodyFromString(sTitle, oChartSpace.getDrawingDocument(), oTitle.tx);
+            if(AscFormat.isRealNumber(nFontSize)){
+                oTextBody.content.Set_ApplyToAll(true);
+                oTextBody.content.Paragraph_Add(new ParaTextPr({ FontSize : nFontSize}));
+                oTextBody.content.Set_ApplyToAll(false);
+            }
+            oTitle.tx.setRich(oTextBody);
+            return oTitle;
+        }
+        return null;
+    }
+
     function builder_SetChartTitle(oChartSpace, sTitle, nFontSize){
         if(oChartSpace){
             oChartSpace.chart.setTitle(builder_CreateChartTitle(sTitle, nFontSize, oChartSpace.getDrawingDocument()));
@@ -12324,7 +12342,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
         if(oChartSpace){
             var horAxis = oChartSpace.chart.plotArea.getHorizontalAxis();
             if(horAxis){
-                horAxis.setTitle(this.CreateTitle(sTitle, nFontSize));
+                horAxis.setTitle(builder_CreateTitle(sTitle, nFontSize, oChartSpace));
             }
         }
     }
@@ -12336,7 +12354,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
             {
                 if(typeof sTitle === "string" && sTitle.length > 0)
                 {
-                    verAxis.setTitle(this.CreateTitle(sTitle, nFontSize));
+                    verAxis.setTitle(builder_CreateTitle(sTitle, nFontSize, oChartSpace));
                     if(verAxis.title){
                         var _body_pr = new AscFormat.CBodyPr();
                         _body_pr.reset();

@@ -855,6 +855,7 @@ function DrawingObjects() {
     _this.drawingDocument = null;
     _this.asyncImageEndLoaded = null;
     _this.asyncImagesDocumentEndLoaded = null;
+    _this.CompositeInput = null;
 
 
     _this.nCurPointItemsLength = -1;
@@ -3660,6 +3661,154 @@ function DrawingObjects() {
 
         return info;
     };
+
+
+    _this.beginCompositeInput = function(){
+        History.Create_NewPoint(AscDFH.historydescription_Document_CompositeInput);
+        _this.controller.CreateDocContent();
+        _this.drawingDocument.TargetStart();
+        _this.drawingDocument.TargetShow();
+        var oContent = _this.controller.getTargetDocContent(true);
+        if (!oContent) {
+            return false;
+        }
+        var oPara = oContent.Get_CurrentParagraph();
+        if (!oPara) {
+            return false;
+        }
+        if (true === oContent.Is_SelectionUse())
+            oContent.Remove(1, true, false, true);
+        var oRun = oPara.Get_ElementByPos(oPara.Get_ParaContentPos(false, false));
+        if (!oRun || !(oRun instanceof ParaRun)) {
+            return false;
+        }
+
+        _this.CompositeInput = {
+            Run    : oRun,
+            Pos    : oRun.State.ContentPos,
+            Length : 0
+        };
+
+        oRun.Set_CompositeInput(_this.CompositeInput);
+        _this.controller.startRecalculate();
+        _this.sendGraphicObjectProps();
+        return true;
+    };
+
+    _this.Begin_CompositeInput = function(){
+        if(_this.controller){
+            if(window['Asc']['editor'].collaborativeEditing.getFast()){
+                _this.controller.checkSelectedObjectsAndCallbackNoCheckLock(_this.beginCompositeInput,  [], false, AscDFH.historydescription_Document_CompositeInput);
+            }
+            else{
+                _this.controller.checkSelectedObjectsAndCallback(_this.beginCompositeInput, [], false, AscDFH.historydescription_Document_CompositeInput);
+            }
+        }
+        _this.beginCompositeInput();
+    };
+
+
+    _this.addCompositeText = function(nCharCode){
+
+        if (null === _this.CompositeInput)
+            return;
+
+        var oRun = _this.CompositeInput.Run;
+        var nPos = _this.CompositeInput.Pos + _this.CompositeInput.Length;
+        var oChar;
+        if (32 == nCharCode || 12288 == nCharCode)
+        {
+            oChar = new ParaSpace();
+        }
+        else
+        {
+            oChar = new ParaText();
+            oChar.Set_CharCode(nCharCode);
+        }
+        oRun.Add_ToContent(nPos, oChar, true);
+        _this.CompositeInput.Length++;
+    };
+    _this.Add_CompositeText = function(nCharCode)
+    {
+
+        if (null === _this.CompositeInput)
+            return;
+        History.Create_NewPoint(AscDFH.historydescription_Document_CompositeInputReplace);
+        _this.addCompositeText(nCharCode);
+        _this.controller.recalculate();
+        _this.controller.recalculateCurPos();
+        _this.controller.updateSelectionState();
+    };
+
+    _this.removeCompositeText = function(nCount){
+        if (null === _this.CompositeInput)
+            return;
+
+        var oRun = _this.CompositeInput.Run;
+        var nPos = _this.CompositeInput.Pos + _this.CompositeInput.Length;
+
+        var nDelCount = Math.max(0, Math.min(nCount, _this.CompositeInput.Length, oRun.Content.length, nPos));
+        oRun.Remove_FromContent(nPos - nDelCount, nDelCount, true);
+        _this.CompositeInput.Length -= nDelCount;
+    };
+
+    _this.Remove_CompositeText = function(nCount){
+        _this.removeCompositeText(nCount);
+        _this.controller.recalculate();
+        _this.controller.updateSelectionState();
+    };
+    _this.Replace_CompositeText = function(arrCharCodes)
+    {
+        if (null === _this.CompositeInput)
+            return;
+        History.Create_NewPoint(AscDFH.historydescription_Document_CompositeInputReplace);
+        _this.removeCompositeText(_this.CompositeInput.Length);
+        for (var nIndex = 0, nCount = arrCharCodes.length; nIndex < nCount; ++nIndex)
+        {
+            _this.addCompositeText(arrCharCodes[nIndex]);
+        }
+        _this.controller.recalculate();
+        _this.controller.updateSelectionState();
+    };
+    _this.Set_CursorPosInCompositeText = function(nPos)
+    {
+        if (null === _this.CompositeInput)
+            return;
+        var oRun = _this.CompositeInput.Run;
+
+        var nInRunPos = Math.max(Math.min(_this.CompositeInput.Pos + nPos, _this.CompositeInput.Pos + _this.CompositeInput.Length, oRun.Content.length), _this.CompositeInput.Pos);
+        oRun.State.ContentPos = nInRunPos;
+        _this.controller.updateSelectionState();
+    };
+    _this.Get_CursorPosInCompositeText = function()
+    {
+        if (null === _this.CompositeInput)
+            return 0;
+
+        var oRun = _this.CompositeInput.Run;
+        var nInRunPos = oRun.State.ContentPos;
+        var nPos = Math.min(_this.CompositeInput.Length, Math.max(0, nInRunPos - _this.CompositeInput.Pos));
+        return nPos;
+    };
+    _this.End_CompositeInput = function()
+    {
+        if (null === _this.CompositeInput)
+            return;
+
+        var oRun = _this.CompositeInput.Run;
+        oRun.Set_CompositeInput(null);
+        _this.CompositeInput = null;
+        _this.sendGraphicObjectProps();
+        _this.showDrawingObjects(true);
+    };
+    _this.Get_MaxCursorPosInCompositeText = function()
+    {
+        if (null === _this.CompositeInput)
+            return 0;
+
+        return _this.CompositeInput.Length;
+    };
+
 
     //-----------------------------------------------------------------------------------
     // Private Misc Methods
