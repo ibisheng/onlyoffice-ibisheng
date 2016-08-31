@@ -507,6 +507,7 @@ function CEditorPage(api)
 		else
 		{
 			this.bIsRetinaSupport = false;
+			this.m_oOverlayApi.IsRetina = this.bIsRetinaSupport;
 		}
 
 		if (old != this.bIsRetinaSupport)
