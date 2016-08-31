@@ -2862,7 +2862,8 @@ CDocument.prototype.private_RecalculateIsNewSection = function(nPageAbs, nConten
 };
 CDocument.prototype.private_RecalculatePageFootnotes = function(nPageAbs, nColumnAbs)
 {
-	this.Footnotes.Recalculate(nPageAbs, nColumnAbs, 0, 10000);
+    var oPageMetrics = this.Get_PageContentStartPos(nPageAbs);
+	this.Footnotes.Recalculate(nPageAbs, nColumnAbs, oPageMetrics.YLimit);
 };
 CDocument.prototype.private_RecalculateShiftFootnotes = function(nPageAbs, nColumnAbs)
 {
