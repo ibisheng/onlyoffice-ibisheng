@@ -836,6 +836,9 @@ function CEditorPage(api)
 
 				this.TextBoxBackground.HtmlElement["ontouchstart"] = function(e)
 				{
+				    if (!oThis.IsFocus)
+				        oThis.m_oApi.asc_enableKeyEvents(true);
+
 					oThis.IsUpdateOverlayOnlyEndReturn = true;
 					oThis.StartUpdateOverlay();
 					var ret                            = oThis.MobileTouchManager.onTouchStart(e);
