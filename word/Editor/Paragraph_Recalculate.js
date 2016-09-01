@@ -1853,7 +1853,7 @@ Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, Cu
             if (true === RecalcInfo.Can_RecalcObject())
             {
                 RecalcInfo.Set_FootnoteReference(oFootnote, nPageAbs, nColumnAbs);
-                this.Parent.Footnotes.AddFootnoteToPage(nPageAbs, nColumnAbs, oFootnote, this.Lines[CurLine].Bottom);
+                this.Parent.Footnotes.AddFootnoteToPage(nPageAbs, nColumnAbs, oFootnote, this.Pages[CurPage].Y + this.Lines[CurLine].Bottom);
                 PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Column | recalcresultflags_Footnotes;
                 return false;
             }

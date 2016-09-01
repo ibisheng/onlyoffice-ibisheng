@@ -52,9 +52,13 @@ CFootEndnote.prototype.GetElementPageIndex = function(nPageAbs, nColumnAbs)
 	var nStartColumn  = this.StartColumn;
 	var nColumnsCount = this.ColumnsCount;
 
-	var nCurPage = nColumnAbs - nStartColumn + (nPageAbs - nStartPage) * nColumnsCount;
-	nCurPage = Math.max(0, Math.min(this.Pages.length - 1, nCurPage));
-	return nCurPage;
+	return Math.max(0, nColumnAbs - nStartColumn + (nPageAbs - nStartPage) * nColumnsCount);
+};
+CFootEndnote.prototype.Get_PageContentStartPos = function(nCurPage)
+{
+	var nPageAbs   = this.Get_AbsolutePage(nCurPage);
+	var nColumnAbs = this.Get_AbsoluteColumn(nCurPage);
+	return this.Parent.Get_PageContentStartPos(nPageAbs, nColumnAbs);
 };
 CFootEndnote.prototype.Write_ToBinary2 = function(Writer)
 {

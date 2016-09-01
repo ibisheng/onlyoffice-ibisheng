@@ -8410,34 +8410,48 @@ CDocumentContent.prototype.Internal_Content_RemoveAll = function()
 //-----------------------------------------------------------------------------------
 CDocumentContent.prototype.Get_StartPage_Absolute = function()
 {
-    return this.Get_AbsolutePage(0);
+	return this.Get_AbsolutePage(0);
 };
 CDocumentContent.prototype.Get_StartPage_Relative = function()
 {
-    return this.StartPage;
-};
-CDocumentContent.prototype.Get_AbsolutePage       = function(CurPage)
-{
-    return this.Parent.Get_AbsolutePage(this.StartPage + CurPage);
-};
-CDocumentContent.prototype.Get_AbsoluteColumn     = function(CurPage)
-{
-	return (this.StartColumn + CurPage) - (((this.StartColumn + CurPage) / this.ColumnsCount | 0) * this.ColumnsCount);
+	return this.StartPage;
 };
 CDocumentContent.prototype.Set_StartPage = function(StartPage, StartColumn, ColumnsCount)
 {
-    this.StartPage    = StartPage;
-    this.StartColumn  = undefined !== StartColumn ? StartColumn : 0;
+	this.StartPage    = StartPage;
+	this.StartColumn  = undefined !== StartColumn ? StartColumn : 0;
 	this.ColumnsCount = undefined !== ColumnsCount ? ColumnsCount : 1;
 };
-// Приходит абсолютное значение страницы(по отношению к родительскому классу), на выходе - относительное
-CDocumentContent.prototype.Get_Page_Relative      = function(AbsPage)
+CDocumentContent.prototype.Get_ColumnsCount = function()
 {
-    return Math.min(this.Pages.length - 1, Math.max(AbsPage - this.StartPage, 0));
+	return this.ColumnsCount;
 };
-CDocumentContent.prototype.Get_ColumnsCount      = function()
+CDocumentContent.prototype.private_GetRelativePageIndex = function(CurPage)
 {
-    return this.ColumnsCount;
+	if (!this.ColumnsCount || 0 === this.ColumnsCount)
+		return this.StartPage + CurPage;
+
+	return this.StartPage + ((this.StartColumn + CurPage) / this.ColumnsCount | 0);
+};
+CDocumentContent.prototype.private_GetAbsolutePageIndex = function(CurPage)
+{
+	return this.Parent.Get_AbsolutePage(this.private_GetRelativePageIndex(CurPage));
+};
+CDocumentContent.prototype.Get_StartColumn = function()
+{
+	return this.StartColumn;
+};
+CDocumentContent.prototype.Get_AbsolutePage = function(CurPage)
+{
+	return this.private_GetAbsolutePageIndex(CurPage);
+};
+CDocumentContent.prototype.Get_AbsoluteColumn = function(CurPage)
+{
+	return this.private_GetColumnIndex(CurPage);
+};
+CDocumentContent.prototype.private_GetColumnIndex = function(CurPage)
+{
+	return (this.StartColumn + CurPage) - (((this.StartColumn + CurPage) / this.ColumnsCount | 0) * this.ColumnsCount);
 };
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
