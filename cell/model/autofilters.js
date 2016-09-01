@@ -3421,10 +3421,11 @@
 					return ar;
 			},
 			
-			_addNewFilter: function(ref, style, bWithoutFilter, tablePartDisplayName, tablePart)
+			_addNewFilter: function(ref, style, bWithoutFilter, tablePartDisplayName, tablePart, isCloneTableColumns)
 			{
 				var worksheet = this.worksheet;
 				var newFilter;
+				var newTableName = tablePartDisplayName ? tablePartDisplayName : worksheet.workbook.dependencyFormulas.getNextTableName();
 				
 				if(!style)
 				{
@@ -3455,17 +3456,7 @@
 					return 	worksheet.AutoFilter;
 				}
 				else
-				{
-					var tableColumns;
-					if(tablePart && tablePart.TableColumns)
-					{
-						tableColumns = tablePart.TableColumns;
-					}
-					else
-					{
-						tableColumns = this._generateColumnNameWithoutTitle(ref);
-					}
-					
+				{	
 					if(!worksheet.TableParts)
 						worksheet.TableParts = [];
 					//ref = Asc.g_oRangeCache.getAscRange(val[0].id + ':' + val[val.length - 1].idNext).clone();
@@ -3501,12 +3492,37 @@
 					}
 					
 					
+					var tableColumns;
+					var isChangeTableNameInFormulaDependency = false;
+					if(tablePart && tablePart.TableColumns)
+					{
+						var cloneTableColumns = [];
+						for(var i = 0; i < tablePart.TableColumns.length; i++)
+						{
+							cloneTableColumns.push(tablePart.TableColumns[i].clone());
+						}
+						tableColumns = cloneTableColumns;
+						isChangeTableNameInFormulaDependency = true;
+					}
+					else
+					{
+						tableColumns = this._generateColumnNameWithoutTitle(ref);
+					}
+					
 					newFilter.TableColumns = tableColumns;
-					newFilter.DisplayName = tablePartDisplayName ? tablePartDisplayName : worksheet.workbook.dependencyFormulas.getNextTableName();
+					newFilter.DisplayName = newTableName;
 					worksheet.workbook.dependencyFormulas.addTableName(worksheet, newFilter);
 					
 					worksheet.TableParts[worksheet.TableParts.length] = newFilter;
-
+					
+					if(isChangeTableNameInFormulaDependency)
+					{
+						var renameParams = {};
+						renameParams.tableNameMap = {};
+						renameParams.tableNameMap[tablePart.DisplayName] = newTableName;
+						newFilter.renameSheetCopy(worksheet, renameParams);
+					}
+					
 					return worksheet.TableParts[worksheet.TableParts.length - 1];
 				}
 			},
