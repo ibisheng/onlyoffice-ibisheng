@@ -942,7 +942,7 @@
 			this.TimeDown      = new Date().getTime();
 
 			var bIsKoefPixToMM = false;
-			var _matrix        = this.DrawingDocument.TextMatrix;
+			var _matrix        = this.DrawingDocument.SelectionMatrix;
 			if (_matrix && global_MatrixTransformer.IsIdentity(_matrix))
 				_matrix = null;
 
@@ -1941,7 +1941,7 @@
 
 			if (null != this.RectSelect1 && null != this.RectSelect2 && !this.HtmlPage.m_oApi.isViewMode)
 			{
-				var _matrix = this.DrawingDocument.TextMatrix;
+				var _matrix = this.DrawingDocument.SelectionMatrix;
 
 				var pos1 = null;
 				var pos4 = null;
@@ -2038,7 +2038,7 @@
 				var pos1 = null;
 				var pos4 = null;
 
-				var _matrix = this.DrawingDocument.TextMatrix;
+				var _matrix = this.DrawingDocument.SelectionMatrix;
 				if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
 				{
 					pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1);
@@ -2068,7 +2068,7 @@
 			if (null == this.RectSelect1 || null == this.RectSelect2)
 				return;
 
-			var _matrix = this.DrawingDocument.TextMatrix;
+			var _matrix = this.DrawingDocument.SelectionMatrix;
 
 			if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
 			{
@@ -2179,7 +2179,7 @@
 			if (null == this.RectSelect1 || null == this.RectSelect2)
 				return;
 
-			var _matrix = this.DrawingDocument.TextMatrix;
+			var _matrix = this.DrawingDocument.SelectionMatrix;
 
 			if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
 			{
@@ -2558,6 +2558,8 @@
 				return;
 
 			var _table_markup = horRuler.m_oTableMarkup;
+			if (_table_markup.Rows.length == 0)
+			    return;
 
 			this.HtmlPage.CheckShowOverlay();
 

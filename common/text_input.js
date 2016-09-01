@@ -331,6 +331,9 @@
 			var xPos    = x ? x : parseInt(oTarget.style.left);
 			var yPos    = (y ? y : parseInt(oTarget.style.top)) + parseInt(oTarget.style.height);
 
+            if (AscCommon.AscBrowser.isSafari && AscCommon.AscBrowser.isMobile)
+                xPos = -100;
+
 			if (!this.isDebug && !this.isSystem)
 			{
 				this.HtmlDiv.style.left = xPos + this.FixedPosCheckElementX + "px";
@@ -450,6 +453,9 @@
 				_top				= _b_max - 50;
 				this.debugTexBoxMaxH = 50;
 			}
+
+			if (AscCommon.AscBrowser.isSafari && AscCommon.AscBrowser.isMobile)
+			    _left = -100;
 
 			this.HtmlDiv.style.left = _left + "px";
 			this.HtmlDiv.style.top  = _top + "px";

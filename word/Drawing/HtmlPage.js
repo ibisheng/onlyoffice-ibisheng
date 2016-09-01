@@ -507,6 +507,7 @@ function CEditorPage(api)
 		else
 		{
 			this.bIsRetinaSupport = false;
+			this.m_oOverlayApi.IsRetina = this.bIsRetinaSupport;
 		}
 
 		if (old != this.bIsRetinaSupport)
@@ -835,6 +836,9 @@ function CEditorPage(api)
 
 				this.TextBoxBackground.HtmlElement["ontouchstart"] = function(e)
 				{
+				    if (!oThis.IsFocus)
+				        oThis.m_oApi.asc_enableKeyEvents(true);
+
 					oThis.IsUpdateOverlayOnlyEndReturn = true;
 					oThis.StartUpdateOverlay();
 					var ret                            = oThis.MobileTouchManager.onTouchStart(e);
@@ -3021,6 +3025,7 @@ function CEditorPage(api)
 		var ctx = overlay.m_oContext;
 
 		var drDoc = this.m_oDrawingDocument;
+		drDoc.SelectionMatrix = null;
 		if (drDoc.m_lDrawingFirst < 0 || drDoc.m_lDrawingEnd < 0)
 			return true;
 
@@ -3674,9 +3679,20 @@ function CEditorPage(api)
 			window["AutoTester"]["RunTest"]();
 		}
 
-		AscCommon.InitBrowserInputContext(this.m_oApi, "id_target_cursor");
-		if (AscCommon.g_inputContext)
-			AscCommon.g_inputContext.onResize("id_main_view");
+        if (!this.m_oApi.isMobileVersion)
+        {
+            AscCommon.InitBrowserInputContext(this.m_oApi, "id_target_cursor");
+            if (AscCommon.g_inputContext)
+                AscCommon.g_inputContext.onResize("id_main_view");
+        }
+        else
+        {
+            window.onkeydown = this.onKeyDown;
+            window.onkeypress = this.onKeyPress;
+            window.onkeyup = this.onKeyUp;
+
+            window['AscCommon'].g_clipboardBase.Init(api);
+        }
 
 		//this.m_oDrawingDocument.CheckFontCache();
 	};
