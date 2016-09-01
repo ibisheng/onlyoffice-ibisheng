@@ -485,10 +485,10 @@ function CEditorPage(api)
 		this.checkNeedRules();
 		this.initEvents2();
 
-		this.UnShowOverlay();
 		this.m_oOverlayApi.m_oControl  = this.m_oOverlay;
 		this.m_oOverlayApi.m_oHtmlPage = this;
 		this.m_oOverlayApi.Clear();
+		this.ShowOverlay();
 
 		this.m_oDrawingDocument.AutoShapesTrack = new AscCommon.CAutoshapeTrack();
 		this.m_oDrawingDocument.AutoShapesTrack.init2(this.m_oOverlayApi);
@@ -682,6 +682,141 @@ function CEditorPage(api)
 			return false;
 		};
 
+		if (!this.m_oApi.isMobileVersion)
+		{
+			var _check_e = function(e)
+			{
+				if (e.touches && e.touches[0])
+					return e.touches[0];
+				if (e.changedTouches && e.changedTouches[0])
+					return e.changedTouches[0];
+				return e;
+			};
+
+			var _cur = document.getElementById('id_target_cursor');
+
+			_cur["ontouchstart"] = this.m_oEditor.HtmlElement["ontouchstart"] = this.m_oOverlay.HtmlElement["ontouchstart"] 	= function(e) {
+				//console.log("start: " + AscCommon.isTouch);
+				if (AscCommon.isTouch)
+					return;
+
+				var _old = global_mouseEvent.KoefPixToMM;
+				global_mouseEvent.KoefPixToMM = 5;
+				AscCommon.isTouch 			= true;
+				AscCommon.isTouchMove 		= false;
+				AscCommon.TouchStartTime 	= new Date().getTime();
+				AscCommon.stopEvent(e);
+				var _ret = this.onmousedown(_check_e(e), true);
+				global_mouseEvent.KoefPixToMM = _old;
+
+				if ((document.activeElement !== undefined) &&
+					(AscCommon.g_inputContext != null) &&
+					(document.activeElement != AscCommon.g_inputContext.HtmlArea))
+				{
+					AscCommon.g_inputContext.HtmlArea.focus();
+				}
+
+				return _ret;
+			};
+			_cur["ontouchmove"] = this.m_oEditor.HtmlElement["ontouchmove"] = this.m_oOverlay.HtmlElement["ontouchmove"] 		= function(e) {
+				//console.log("move: " + AscCommon.isTouch);
+
+				var _old = global_mouseEvent.KoefPixToMM;
+				global_mouseEvent.KoefPixToMM = 5;
+				AscCommon.isTouch 		= true;
+				AscCommon.isTouchMove 	= true;
+				AscCommon.stopEvent(e);
+				var _ret = this.onmousemove(_check_e(e), true);
+				global_mouseEvent.KoefPixToMM = _old;
+				return _ret;
+			};
+			_cur["ontouchend"] = this.m_oEditor.HtmlElement["ontouchend"] = this.m_oOverlay.HtmlElement["ontouchend"] 		= function(e) {
+				//console.log("end: " + AscCommon.isTouch);
+
+				if (!AscCommon.isTouch)
+					return;
+
+				var _old = global_mouseEvent.KoefPixToMM;
+				global_mouseEvent.KoefPixToMM = 5;
+				AscCommon.isTouch = false;
+				AscCommon.stopEvent(e);
+				var _natE = _check_e(e);
+				var _ret = this.onmouseup(_natE, undefined, true);
+				global_mouseEvent.KoefPixToMM = _old;
+
+				if (!AscCommon.isTouchMove && (-1 != AscCommon.TouchStartTime) && (Math.abs(AscCommon.TouchStartTime - (new Date().getTime())) > 900))
+				{
+					var _eContextMenu = {
+						pageX   : _natE.pageX,
+						pageY   : _natE.pageY,
+						clientX : _natE.clientX,
+						clientY : _natE.clientY,
+
+						altKey   : _natE.altKey,
+						shiftKey : _natE.shiftKey,
+						ctrlKey  : _natE.ctrlKey,
+						metaKey  : _natE.metaKey,
+
+						button : AscCommon.g_mouse_button_right,
+
+						target     : e.target,
+						srcElement : e.srcElement
+					};
+
+					AscCommon.isTouch = true;
+					this.onmousedown(_eContextMenu, true);
+					this.onmouseup(_eContextMenu, undefined, true);
+					AscCommon.isTouch = false;
+				}
+				AscCommon.isTouchMove = false;
+				AscCommon.TouchStartTime = -1;
+
+				return _ret;
+			};
+			_cur["ontouchcancel"] = this.m_oEditor.HtmlElement["ontouchcancel"] = this.m_oOverlay.HtmlElement["ontouchcancel"] 	= function(e) {
+				//console.log("cancel: " + AscCommon.isTouch);
+
+				if (!AscCommon.isTouch)
+					return;
+
+				var _old = global_mouseEvent.KoefPixToMM;
+				global_mouseEvent.KoefPixToMM = 5;
+				AscCommon.isTouch = false;
+				AscCommon.stopEvent(e);
+				var _ret = this.onmouseup(_check_e(e), undefined, true);
+				global_mouseEvent.KoefPixToMM = _old;
+
+				if (!AscCommon.isTouchMove && (-1 != AscCommon.TouchStartTime) && (Math.abs(AscCommon.TouchStartTime - (new Date().getTime())) > 900))
+				{
+					var _eContextMenu = {
+						pageX   : _natE.pageX,
+						pageY   : _natE.pageY,
+						clientX : _natE.clientX,
+						clientY : _natE.clientY,
+
+						altKey   : _natE.altKey,
+						shiftKey : _natE.shiftKey,
+						ctrlKey  : _natE.ctrlKey,
+						metaKey  : _natE.metaKey,
+
+						button : AscCommon.g_mouse_button_right,
+
+						target     : e.target,
+						srcElement : e.srcElement
+					};
+
+					AscCommon.isTouch = true;
+					this.onmousedown(_eContextMenu, true);
+					this.onmouseup(_eContextMenu, undefined, true);
+					AscCommon.isTouch = false;
+				}
+				AscCommon.isTouchMove = false;
+				AscCommon.TouchStartTime = -1;
+
+				return _ret;
+			};
+		}
+
 		if (this.m_oApi.isMobileVersion)
 		{
 			var __hasTouch = 'ontouchstart' in window;
@@ -759,23 +894,6 @@ function CEditorPage(api)
 
 			if (AscBrowser.isAndroid)
 			{
-				/*
-				 var moveCursorToEnd = function(el)
-				 {
-				 if (typeof el.selectionStart == "number")
-				 {
-				 el.selectionStart = el.selectionEnd = el.value.length;
-				 }
-				 else if (typeof el.createTextRange != "undefined")
-				 {
-				 el.focus();
-				 var range = el.createTextRange();
-				 range.collapse(false);
-				 range.select();
-				 }
-				 };
-				 */
-
 				this.TextBoxBackground.HtmlElement["oncontextmenu"] = function(e)
 				{
 					if (e.preventDefault)
@@ -795,30 +913,6 @@ function CEditorPage(api)
 					e.returnValue = false;
 					return false;
 				};
-
-				/*
-				 this.TextBoxBackground.HtmlElement["oncopy"] = function(e){
-				 Editor_Copy(oThis.m_oApi);
-				 };
-
-				 this.TextBoxBackground.HtmlElement["oncut"] = function(e){
-				 Editor_Copy(oThis.m_oApi, true);
-				 };
-
-				 this.TextBoxBackground.HtmlElement["onpaste"] = function(e){
-				 if ( false === oThis.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content) )
-				 {
-				 oThis.m_oLogicDocument.Create_NewHistoryPoint();
-				 Editor_Paste(oThis.m_oApi, true);
-				 }
-
-				 if (e.preventDefault)
-				 e.preventDefault();
-
-				 e.returnValue = false;
-				 return false;
-				 };
-				 */
 
 				this.TextBoxBackground.HtmlElement["oninput"] = function(e)
 				{
@@ -919,18 +1013,6 @@ function CEditorPage(api)
 					e.returnValue = false;
 				}
 			}
-
-			/*
-			 document.oncopy = function(e)
-			 {
-			 Editor_Copy(oThis.m_oApi);
-			 };
-			 document.onpaste = function(e)
-			 {
-			 oThis.m_oLogicDocument.Create_NewHistoryPoint();
-			 Editor_Paste(oThis.m_oApi, true);
-			 };
-			 */
 		}
 	};
 	this.onButtonRulersClick       = function()
@@ -1619,9 +1701,10 @@ function CEditorPage(api)
 			oWordControl.onMouseMove2();
 	};
 
-	this.onMouseDown = function(e)
+	this.onMouseDown = function(e, isTouch)
 	{
-		if (false === oThis.m_oApi.bInit_word_control)
+		//console.log("down: " + isTouch + ", " + AscCommon.isTouch);
+		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
 			return;
 
 		if (!oThis.m_bIsIE)
@@ -1631,6 +1714,9 @@ function CEditorPage(api)
 			else
 				e.returnValue = false;
 		}
+
+		if (AscCommon.g_inputContext)
+			AscCommon.g_inputContext.externalChangeFocus();
 
 		var oWordControl = oThis;
 
@@ -1718,9 +1804,9 @@ function CEditorPage(api)
 		oWordControl.EndUpdateOverlay();
 	};
 
-	this.onMouseMove  = function(e)
+	this.onMouseMove  = function(e, isTouch)
 	{
-		if (false === oThis.m_oApi.bInit_word_control)
+		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
 			return;
 
 		if (e.preventDefault)
@@ -1804,9 +1890,10 @@ function CEditorPage(api)
 		oWordControl.m_oLogicDocument.OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
 		oWordControl.EndUpdateOverlay();
 	};
-	this.onMouseUp    = function(e, bIsWindow)
+	this.onMouseUp    = function(e, bIsWindow, isTouch)
 	{
-		if (false === oThis.m_oApi.bInit_word_control)
+		//console.log("up: " + isTouch + ", " + AscCommon.isTouch);
+		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
 			return;
 		//if (true == global_mouseEvent.IsLocked)
 		//    return;
@@ -2707,7 +2794,7 @@ function CEditorPage(api)
 			this.m_oScrollVerApi = this.m_oScrollVer_;
 		}
 
-		this.m_oApi.asc_fireCallback("asc_onUpdateScrolls", this.m_dDocumentWidth, this.m_dDocumentHeight);
+		this.m_oApi.sendEvent("asc_onUpdateScrolls", this.m_dDocumentWidth, this.m_dDocumentHeight);
 
 		this.m_dScrollX_max = this.m_oScrollHorApi.getMaxScrolledX();
 		this.m_dScrollY_max = this.m_oScrollVerApi.getMaxScrolledY();
@@ -3228,17 +3315,17 @@ function CEditorPage(api)
 		if ((this.m_oApi.isMobileVersion || this.m_oApi.isViewMode) && (!window["NATIVE_EDITOR_ENJINE"]))
 		{
 			var lPage = this.m_oApi.GetCurrentVisiblePage();
-			this.m_oApi.asc_fireCallback("asc_onCurrentVisiblePage", this.m_oApi.GetCurrentVisiblePage());
+			this.m_oApi.sendEvent("asc_onCurrentVisiblePage", this.m_oApi.GetCurrentVisiblePage());
 
 			if (null != this.m_oDrawingDocument.m_oDocumentRenderer)
 			{
 				this.m_oDrawingDocument.m_lCurrentPage = lPage;
-				this.m_oApi.asc_fireCallback("asc_onCurrentPage", lPage);
+				this.m_oApi.sendEvent("asc_onCurrentPage", lPage);
 			}
 		}
 
 		if (this.m_bDocumentPlaceChangedEnabled)
-			this.m_oApi.asc_fireCallback("asc_onDocumentPlaceChanged");
+			this.m_oApi.sendEvent("asc_onDocumentPlaceChanged");
 	};
 
 	this.OnPaint = function()
@@ -3712,7 +3799,7 @@ function CEditorPage(api)
 			}
 		}
 
-		oWordControl.m_oApi.asc_fireCallback("asc_onPaintTimer");
+		oWordControl.m_oApi.sendEvent("asc_onPaintTimer");
 		//window.requestAnimationFrame(oWordControl.onTimerScroll2);
 	};
 	this.onTimerScroll2          = function(is_no_timer)

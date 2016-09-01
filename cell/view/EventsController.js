@@ -697,10 +697,8 @@
 				t.lastKeyCode = event.which;
 			}
 
-			var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
-			if (!t.isMousePressed && graphicObjects.length && t.enableKeyEvents) {
-				if (t.handlers.trigger("graphicObjectWindowKeyDown", event))
-					return result;
+			if (!t.isMousePressed && t.enableKeyEvents && t.handlers.trigger("graphicObjectWindowKeyDown", event)) {
+				return result;
 			}
 
 			// Двигаемся ли мы в выделенной области
@@ -710,9 +708,11 @@
 			// окна редактора и отпускания кнопки, будем отрабатывать выход из окна (только Chrome присылает эвент MouseUp даже при выходе из браузера)
 			this.showCellEditorCursor();
 
-			while (t.handlers.trigger("getCellEditMode") && !t.hasFocus || !t.enableKeyEvents || t.isSelectMode || t.isFillHandleMode || t.isMoveRangeMode || t.isMoveResizeRange) {
+			while (t.handlers.trigger("getCellEditMode") && !t.hasFocus || !t.enableKeyEvents || t.isSelectMode ||
+			t.isFillHandleMode || t.isMoveRangeMode || t.isMoveResizeRange) {
 
-				if (t.handlers.trigger("getCellEditMode") && !t.strictClose && t.enableKeyEvents && event.which >= 37 && event.which <= 40) {
+				if (t.handlers.trigger("getCellEditMode") && !t.strictClose && t.enableKeyEvents && event.which >= 37 &&
+					event.which <= 40) {
 					// обрабатываем нажатие клавиш со стрелками, если редактор открыт не по F2 и включены эвенты
 					break;
 				}
@@ -731,38 +731,48 @@
 			switch (event.which) {
 
 				case 113: // F2
-					if (isViewerMode || t.handlers.trigger("getCellEditMode") || t.isSelectionDialogMode || graphicObjects.length) {return true;}
-					if (AscBrowser.isOpera) {stop();}
+					if (isViewerMode || t.handlers.trigger("getCellEditMode") || t.isSelectionDialogMode) {
+						return true;
+					}
+					if (AscBrowser.isOpera) {
+						stop();
+					}
 					// Выставляем блокировку на выход из редактора по клавишам-стрелкам
 					t.strictClose = true;
 					// При F2 выставляем фокус в редакторе
-					t.handlers.trigger("editCell", /*isFocus*/true, /*isClearCell*/false,
-						/*isHideCursor*/undefined, /*isQuickInput*/false);
+					t.handlers.trigger("editCell", /*isFocus*/true, /*isClearCell*/false, /*isHideCursor*/undefined,
+						/*isQuickInput*/false);
 					return result;
 
 				case 8: // backspace
-					if (isViewerMode || t.handlers.trigger("getCellEditMode") || t.isSelectionDialogMode) {return true;}
+					if (isViewerMode || t.handlers.trigger("getCellEditMode") || t.isSelectionDialogMode) {
+						return true;
+					}
 					stop();
 
 					// При backspace фокус не в редакторе (стираем содержимое)
-					t.handlers.trigger("editCell", /*isFocus*/false, /*isClearCell*/true,
-						/*isHideCursor*/undefined, /*isQuickInput*/false, /*callback*/undefined);
+					t.handlers.trigger("editCell", /*isFocus*/false, /*isClearCell*/true, /*isHideCursor*/undefined,
+						/*isQuickInput*/false, /*callback*/undefined);
 					return true;
 
 				case 46: // Del
-					if (isViewerMode || t.handlers.trigger("getCellEditMode") || t.isSelectionDialogMode) {return true;}
+					if (isViewerMode || t.handlers.trigger("getCellEditMode") || t.isSelectionDialogMode) {
+						return true;
+					}
 					// Удаляем содержимое
 					t.handlers.trigger("empty");
 					return result;
 
 				case 9: // tab
-					if (t.handlers.trigger("getCellEditMode")) {return true;}
+					if (t.handlers.trigger("getCellEditMode")) {
+						return true;
+					}
 					// Отключим стандартную обработку браузера нажатия tab
 					stop();
 
 					// Особый случай (возможно движение в выделенной области)
 					selectionActivePointChanged = true;
-					if (shiftKey){
+					if (shiftKey) {
 						dc = -1;			// (shift + tab) - движение по ячейкам влево на 1 столбец
 						shiftKey = false;	// Сбросим shift, потому что мы не выделяем
 					} else {
@@ -771,7 +781,9 @@
 					break;
 
 				case 13:  // "enter"
-					if (t.handlers.trigger("getCellEditMode")) {return true;}
+					if (t.handlers.trigger("getCellEditMode")) {
+						return true;
+					}
 					// Особый случай (возможно движение в выделенной области)
 					selectionActivePointChanged = true;
 					if (shiftKey) {
@@ -789,11 +801,15 @@
 
 				case 144: //Num Lock
 				case 145: //Scroll Lock
-					if (AscBrowser.isOpera) {stop();}
+					if (AscBrowser.isOpera) {
+						stop();
+					}
 					return result;
 
 				case 32: // Spacebar
-					if (t.handlers.trigger("getCellEditMode")) {return true;}
+					if (t.handlers.trigger("getCellEditMode")) {
+						return true;
+					}
 					// Обработать как обычный текст
 					if (!ctrlKey && !shiftKey) {
 						t.skipKeyPress = false;
@@ -804,8 +820,7 @@
 					stop();
 					// Обработать как спец селект
 					if (ctrlKey && shiftKey) {
-						t.handlers.trigger("changeSelection", /*isStartPoint*/true, 0,
-							0, /*isCoord*/true, /*isSelectMode*/false);
+						t.handlers.trigger("changeSelection", /*isStartPoint*/true, 0, 0, /*isCoord*/true, /*isSelectMode*/false);
 					} else if (ctrlKey) {
 						t.handlers.trigger("selectColumnsByRange");
 					} else {
@@ -816,26 +831,30 @@
 				case 33: // PageUp
 					// Отключим стандартную обработку браузера нажатия PageUp
 					stop();
-					if (ctrlKey) {
+					if (ctrlKey || event.altKey) {
 						// Перемещение по листам справа налево
 						// В chrome не работает (т.к. там своя обработка на некоторые нажатия вместе с Ctrl
 						t.handlers.trigger("showNextPrevWorksheet", -1);
 						return true;
 					} else {
-						event.altKey ? dc = -0.5 : dr = -0.5;
+						// Solution design department to handle Alt + PgUp \ Alt + PgDown as a transition by sheets
+						/*event.altKey ? dc = -0.5 : */
+						dr = -0.5;
 					}
 					break;
 
 				case 34: // PageDown
 					// Отключим стандартную обработку браузера нажатия PageDown
 					stop();
-					if (ctrlKey) {
+					if (ctrlKey || event.altKey) {
 						// Перемещение по листам слева направо
 						// В chrome не работает (т.к. там своя обработка на некоторые нажатия вместе с Ctrl
 						t.handlers.trigger("showNextPrevWorksheet", +1);
 						return true;
 					} else {
-						event.altKey ? dc = +0.5 : dr = +0.5;
+						// Solution design department to handle Alt + PgUp \ Alt + PgDown as a transition by sheets
+						/*event.altKey ? dc = +0.5 : */
+						dr = +0.5;
 					}
 					break;
 
@@ -866,15 +885,21 @@
 
 				case 36: // home
 					stop();                          // Отключим стандартную обработку браузера нажатия home
-					if( t.isFormulaEditMode ) break;
-                    dc = -2.5;
-					if (ctrlKey) {dr = -2.5;}
+					if (t.isFormulaEditMode) {
+						break;
+					}
+					dc = -2.5;
+					if (ctrlKey) {
+						dr = -2.5;
+					}
 					break;
 
 				case 35: // end
 					stop();                          // Отключим стандартную обработку браузера нажатия end
-                    if( t.isFormulaEditMode ) break;
-                    dc = 2.5;
+					if (t.isFormulaEditMode) {
+						break;
+					}
+					dc = 2.5;
 					if (ctrlKey) {
 						dr = 2.5;
 					}
@@ -887,31 +912,49 @@
 				case 85: // make underline		Ctrl + u
 				case 89: // redo				Ctrl + y
 				case 90: // undo				Ctrl + z
-					if (isViewerMode || t.isSelectionDialogMode) {stop(); return result;}
+					if (isViewerMode || t.isSelectionDialogMode) {
+						stop();
+						return result;
+					}
 
 				case 65: // select all      Ctrl + a
-					//if (t.handlers.trigger("getCellEditMode")) { return true; }
+				//if (t.handlers.trigger("getCellEditMode")) { return true; }
 
 				case 80: // print           Ctrl + p
-					if (t.handlers.trigger("getCellEditMode")) { stop(); return result; }
+					if (t.handlers.trigger("getCellEditMode")) {
+						stop();
+						return result;
+					}
 
-					if (!ctrlKey) { t.skipKeyPress = false; return true; }
+					if (!ctrlKey) {
+						t.skipKeyPress = false;
+						return true;
+					}
 
 					stop();
 
 					// Вызовем обработчик
 					if (!t.__handlers) {
 						t.__handlers = {
-							53: function () {t.handlers.trigger("setFontAttributes", "s");},
-							65: function () {t.handlers.trigger("changeSelection", /*isStartPoint*/true,
-								-1, -1, /*isCoord*/true, /*isSelectMode*/false);},
-							66: function () {t.handlers.trigger("setFontAttributes", "b");},
-							73: function () {t.handlers.trigger("setFontAttributes", "i");},
-							85: function () {t.handlers.trigger("setFontAttributes", "u");},
-							80: function () {t.handlers.trigger("print");},
-							//83: function () {t.handlers.trigger("save");},
-							89: function () {t.handlers.trigger("redo");},
-							90: function () {t.handlers.trigger("undo");}
+							53: function () {
+								t.handlers.trigger("setFontAttributes", "s");
+							}, 65: function () {
+								t.handlers.trigger("changeSelection", /*isStartPoint*/true, -1, -1, /*isCoord*/true, /*isSelectMode*/
+									false);
+							}, 66: function () {
+								t.handlers.trigger("setFontAttributes", "b");
+							}, 73: function () {
+								t.handlers.trigger("setFontAttributes", "i");
+							}, 85: function () {
+								t.handlers.trigger("setFontAttributes", "u");
+							}, 80: function () {
+								t.handlers.trigger("print");
+							}, //83: function () {t.handlers.trigger("save");},
+							89: function () {
+								t.handlers.trigger("redo");
+							}, 90: function () {
+								t.handlers.trigger("undo");
+							}
 						};
 					}
 					t.__handlers[event.which]();
@@ -919,7 +962,9 @@
 
 				case 61:  // Firefox, Opera (+/=)
 				case 187: // +/=
-					if (isViewerMode || t.handlers.trigger("getCellEditMode") || t.isSelectionDialogMode) {return true;}
+					if (isViewerMode || t.handlers.trigger("getCellEditMode") || t.isSelectionDialogMode) {
+						return true;
+					}
 
 					if (event.altKey) {
 						t.handlers.trigger('addFunction', 'SUM', Asc.c_oAscPopUpSelectorType.Func, true);
@@ -935,7 +980,9 @@
 
 				default:
 					// При зажатом Ctrl или Alt не вводим символ
-					if (!ctrlKey && !event.altKey) {t.skipKeyPress = false;}
+					if (!ctrlKey && !event.altKey) {
+						t.skipKeyPress = false;
+					}
 					return true;
 
 			} // end of switch
@@ -944,30 +991,35 @@
 
 				// Проверка на движение в выделенной области
 				if (selectionActivePointChanged) {
-					t.handlers.trigger("selectionActivePointChanged", dc, dr, function (d) {t.scroll(d);});
+					t.handlers.trigger("selectionActivePointChanged", dc, dr, function (d) {
+						t.scroll(d);
+					});
 				} else {
 					if (this.handlers.trigger("getCellEditMode") && !this.isFormulaEditMode) {
-						if (!t.handlers.trigger("stopCellEditing")) {return true;}
+						if (!t.handlers.trigger("stopCellEditing")) {
+							return true;
+						}
 					}
 
 					if (t.isFormulaEditMode) {
 						// для определения рэнджа под курсором и активизации его для WorksheetView
 						if (false === t.handlers.trigger("canEnterCellRange")) {
-							if (!t.handlers.trigger("stopCellEditing")) {return true;}
+							if (!t.handlers.trigger("stopCellEditing")) {
+								return true;
+							}
 						}
 					}
 
-					t.handlers.trigger("changeSelection", /*isStartPoint*/!shiftKey, dc, dr,
-							/*isCoord*/false, /*isSelectMode*/false,
-							function (d) {
-								t.scroll(d);
+					t.handlers.trigger("changeSelection", /*isStartPoint*/!shiftKey, dc, dr, /*isCoord*/false, /*isSelectMode*/
+						false, function (d) {
+							t.scroll(d);
 
-								if (t.isFormulaEditMode) {
-									t.handlers.trigger("enterCellRange");
-								} else if (t.handlers.trigger("getCellEditMode")) {
-									t.handlers.trigger("stopCellEditing");
-								}
-							});
+							if (t.isFormulaEditMode) {
+								t.handlers.trigger("enterCellRange");
+							} else if (t.handlers.trigger("getCellEditMode")) {
+								t.handlers.trigger("stopCellEditing");
+							}
+						});
 				}
 			}
 
@@ -977,12 +1029,16 @@
 		/** @param event {KeyboardEvent} */
 		asc_CEventsController.prototype._onWindowKeyPress = function (event) {
 			// Нельзя при отключенных эвентах возвращать false (это касается и ViewerMode)
-			if (!this.enableKeyEvents) {return true;}
+			if (!this.enableKeyEvents) {
+				return true;
+			}
 
 			// не вводим текст в режиме просмотра
 			// если в FF возвращать false, то отменяется дальнейшая обработка серии keydown -> keypress -> keyup
 			// и тогда у нас не будут обрабатываться ctrl+c и т.п. события
-			if (this.settings.isViewerMode || this.isSelectionDialogMode) {return true;}
+			if (this.settings.isViewerMode || this.isSelectionDialogMode) {
+				return true;
+			}
 
 			// Для таких браузеров, которые не присылают отжатие левой кнопки мыши для двойного клика, при выходе из
 			// окна редактора и отпускания кнопки, будем отрабатывать выход из окна (только Chrome присылает эвент MouseUp даже при выходе из браузера)
@@ -990,23 +1046,24 @@
 
 			// Не можем вводить когда селектим или когда совершаем действия с объектом
 			if (this.handlers.trigger("getCellEditMode") && !this.hasFocus || this.isSelectMode ||
-				!this.handlers.trigger('canReceiveKeyPress'))
+				!this.handlers.trigger('canReceiveKeyPress')) {
 				return true;
+			}
 
 			if (this.skipKeyPress || event.which < 32) {
 				this.skipKeyPress = true;
 				return true;
 			}
 
-			var graphicObjects = this.handlers.trigger("getSelectedGraphicObjects");
-			if (graphicObjects.length && this.handlers.trigger("graphicObjectWindowKeyPress", event))
+			if (this.handlers.trigger("graphicObjectWindowKeyPress", event)) {
 				return true;
+			}
 
 			if (!this.handlers.trigger("getCellEditMode")) {
 				// При нажатии символа, фокус не ставим
 				// Очищаем содержимое ячейки
-				this.handlers.trigger("editCell", /*isFocus*/false, /*isClearCell*/true,
-					/*isHideCursor*/undefined, /*isQuickInput*/true, /*callback*/undefined);
+				this.handlers.trigger("editCell", /*isFocus*/false, /*isClearCell*/true, /*isHideCursor*/undefined,
+					/*isQuickInput*/true, /*callback*/undefined);
 			}
 			return true;
 		};
@@ -1153,6 +1210,9 @@
 
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseDown = function (event) {
+			if (AscCommon.g_inputContext)
+				AscCommon.g_inputContext.externalChangeFocus();
+			
 			var t = this;
 			var coord = t._getCoordinates(event);
 			event.isLocked = t.isMousePressed = true;
@@ -1509,31 +1569,32 @@
 		/** @param event */
 		asc_CEventsController.prototype._getCoordinates = function (event) {
 			// ToDo стоит переделать
-			if (event.coord)
+			if (event.coord) {
 				return event.coord;
+			}
 
-			var offs = $(this.element).offset();
-			var x = event.pageX - offs.left;
-			var y = event.pageY - offs.top;
+			var offs = this.element.getBoundingClientRect();
+			var x = ((event.pageX * AscBrowser.zoom) >> 0) - offs.left;
+			var y = ((event.pageY * AscBrowser.zoom) >> 0) - offs.top;
 
-			// ToDo возможно стоит переделать
 			if (AscBrowser.isRetina) {
 				x <<= 1;
 				y <<= 1;
 			}
 
+
 			return {x: x, y: y};
 		};
 
-        asc_CEventsController.prototype._onTouchStart = function (event){
-            this.view.MobileTouchManager.onTouchStart(event);
-        };
-        asc_CEventsController.prototype._onTouchMove = function (event){
-            this.view.MobileTouchManager.onTouchMove(event);
-        };
-        asc_CEventsController.prototype._onTouchEnd = function (event){
-            this.view.MobileTouchManager.onTouchEnd(event);
-        };
+		asc_CEventsController.prototype._onTouchStart = function (event) {
+			this.view.MobileTouchManager.onTouchStart(event);
+		};
+		asc_CEventsController.prototype._onTouchMove = function (event) {
+			this.view.MobileTouchManager.onTouchMove(event);
+		};
+		asc_CEventsController.prototype._onTouchEnd = function (event) {
+			this.view.MobileTouchManager.onTouchEnd(event);
+		};
 
 		//------------------------------------------------------------export---------------------------------------------------
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};

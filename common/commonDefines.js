@@ -179,7 +179,8 @@
 
 	var c_oAscAdvancedOptionsID = {
 		CSV : 0,
-		TXT : 1
+		TXT : 1,
+		DRM : 2
 	};
 
 	var c_oAscAdvancedOptionsAction = {
@@ -1052,6 +1053,7 @@
 	prot                                         = c_oAscAdvancedOptionsID;
 	prot['CSV']                                  = prot.CSV;
 	prot['TXT']                                  = prot.TXT;
+	prot['DRM']                                  = prot.DRM;
 	window['Asc']['c_oAscFontRenderingModeType'] = window['Asc'].c_oAscFontRenderingModeType = c_oAscFontRenderingModeType;
 	prot                                   = c_oAscFontRenderingModeType;
 	prot['noHinting']                      = prot.noHinting;
@@ -1531,8 +1533,7 @@
 		this.buttons = [{"text" : "Ok", "primary" : true}, {"text" : "Cancel", "primary" : false}];
 
 		this.size = undefined;
-		this.maximumSize = undefined;
-		this.minimumSize = undefined;
+		this.initOnSelectionChanged = undefined;
 	}
 
 	CPluginVariation.prototype["get_Description"] = function()
@@ -1645,21 +1646,13 @@
 	{
 		this.size = value;
 	};
-	CPluginVariation.prototype["get_MinimumSize"]           = function()
+	CPluginVariation.prototype["get_InitOnSelectionChanged"]           = function()
 	{
-		return this.minimumSize;
+		return this.initOnSelectionChanged;
 	};
-	CPluginVariation.prototype["set_MinimumSize"]           = function(value)
+	CPluginVariation.prototype["set_InitOnSelectionChanged"]           = function(value)
 	{
-		this.minimumSize = value;
-	};
-	CPluginVariation.prototype["get_MaximumSize"]           = function()
-	{
-		return this.maximumSize;
-	};
-	CPluginVariation.prototype["set_MaximumSize"]           = function(value)
-	{
-		this.maximumSize = value;
+		this.initOnSelectionChanged = value;
 	};
 
 	CPluginVariation.prototype["serialize"]   = function()
@@ -1685,8 +1678,7 @@
 		_object["buttons"] = this.buttons;
 
 		_object["size"] = this.size;
-		_object["minimumSize"] = this.minimumSize;
-		_object["maximumSize"] = this.maximumSize;
+		_object["initOnSelectionChanged"] = this.initOnSelectionChanged;
 
 		return _object;
 	};
@@ -1712,8 +1704,7 @@
 		this.buttons = (_object["buttons"] != null) ? _object["buttons"] : this.buttons;
 
 		this.size = (_object["size"] != null) ? _object["size"] : this.size;
-		this.minimumSize = (_object["minimumSize"] != null) ? _object["minimumSize"] : this.minimumSize;
-		this.maximumSize = (_object["maximumSize"] != null) ? _object["maximumSize"] : this.maximumSize;
+		this.initOnSelectionChanged = (_object["initOnSelectionChanged"] != null) ? _object["initOnSelectionChanged"] : this.initOnSelectionChanged;
 	};
 
 	function CPlugin()

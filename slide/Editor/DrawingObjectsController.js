@@ -85,6 +85,27 @@ DrawingObjectsController.prototype.getColorMap = function()
     return AscFormat.G_O_DEFAULT_COLOR_MAP;
 };
 
+
+
+DrawingObjectsController.prototype.handleOleObjectDoubleClick = function(drawing, oleObject, e, x, y, pageIndex)
+{
+    var oPresentation = editor && editor.WordControl && editor.WordControl.m_oLogicDocument;
+    if(oPresentation && false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props))
+    {
+        var pluginData = new Asc.CPluginData();
+        pluginData.setAttribute("data", oleObject.m_sData);
+        pluginData.setAttribute("guid", oleObject.m_sApplicationId);
+        pluginData.setAttribute("width", oleObject.extX);
+        pluginData.setAttribute("height", oleObject.extY);
+        pluginData.setAttribute("widthPix", oleObject.m_nPixWidth);
+        pluginData.setAttribute("heightPix", oleObject.m_nPixHeight);
+        pluginData.setAttribute("objectId", oleObject.Id);
+        editor.asc_pluginRun(oleObject.m_sApplicationId, 0, pluginData);
+    }
+    this.changeCurrentState(new AscFormat.NullState(this));
+    oPresentation.OnMouseUp(e, x, y, pageIndex);
+};
+
 DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(callback, args, bNoSendProps, nHistoryPointType)
 {
     var check_type = AscCommon.changestype_Drawing_Props, comment;

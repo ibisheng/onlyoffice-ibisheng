@@ -34,7 +34,9 @@
 
 (function(window, undefined)
 {
-
+	AscCommon.isTouch 			= false;
+	AscCommon.isTouchMove 		= false;
+	AscCommon.TouchStartTime 	= -1;
 	// Import
 	var AscBrowser               = AscCommon.AscBrowser;
 	var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
@@ -52,6 +54,14 @@
 
 	var MouseUpLock = {
 		MouseUpLockedSend : false
+	};
+
+	AscCommon.stopEvent = function(e)
+	{
+		if (e.preventDefault)
+			e.preventDefault();
+		if (e.stopPropagation)
+			e.stopPropagation();
 	};
 
 	function CMouseEventHandler()
@@ -245,7 +255,8 @@
 			global_mouseEvent.Sender = (e.srcElement) ? e.srcElement : e.target;
 		}
 
-		if ((Math.abs(global_mouseEvent.X - global_mouseEvent.LastX) > 3) || (Math.abs(global_mouseEvent.Y - global_mouseEvent.LastY) > 3))
+		var _eps = 3 * global_mouseEvent.KoefPixToMM;
+		if ((Math.abs(global_mouseEvent.X - global_mouseEvent.LastX) > _eps) || (Math.abs(global_mouseEvent.Y - global_mouseEvent.LastY) > _eps))
 		{
 			global_mouseEvent.LastClickTime = -1;
 			global_mouseEvent.ClickCount    = 0;
@@ -292,7 +303,7 @@
 		global_keyboardEvent.CtrlKey  = global_mouseEvent.CtrlKey;
 
 		global_mouseEvent.Type   = g_mouse_event_type_up;
-		global_mouseEvent.Button = e.button;
+		global_mouseEvent.Button = (e.button !== undefined) ? e.button : 0;
 
 		var lockedElement = null;
 
@@ -333,6 +344,14 @@
 		global_mouseEvent.X = (global_mouseEvent.X * AscBrowser.zoom) >> 0;
 		global_mouseEvent.Y = (global_mouseEvent.Y * AscBrowser.zoom) >> 0;
 
+		var _eps = 3 * global_mouseEvent.KoefPixToMM;
+		if ((Math.abs(global_mouseEvent.X - global_mouseEvent.LastX) > _eps) || (Math.abs(global_mouseEvent.Y - global_mouseEvent.LastY) > _eps))
+		{
+			// not only move!!! (touch - fast click in different places)
+			global_mouseEvent.LastClickTime = -1;
+			global_mouseEvent.ClickCount    = 0;
+		}
+
 		global_mouseEvent.LastX = global_mouseEvent.X;
 		global_mouseEvent.LastY = global_mouseEvent.Y;
 
@@ -345,7 +364,7 @@
 		global_keyboardEvent.CtrlKey  = global_mouseEvent.CtrlKey;
 
 		global_mouseEvent.Type   = g_mouse_event_type_down;
-		global_mouseEvent.Button = e.button;
+		global_mouseEvent.Button = (e.button !== undefined) ? e.button : 0;
 
 		global_mouseEvent.Sender = (e.srcElement) ? e.srcElement : e.target;
 
@@ -472,6 +491,9 @@
 				}
 			}
 		}
+
+		if (window.g_asc_plugins)
+		    window.g_asc_plugins.onExternalMouseUp();
 	}
 
 	InitCaptureEvents();
@@ -601,6 +623,70 @@
 			global_mouseEvent.buttonObject = null;
 			return false;
 		}
+	}
+
+	function emulateKeyDown(_code, _element)
+	{
+		var oEvent = document.createEvent('KeyboardEvent');
+
+		// Chromium Hack
+		Object.defineProperty(oEvent, 'keyCode', {
+			get : function()
+			{
+				return this.keyCodeVal;
+			}
+		});
+		Object.defineProperty(oEvent, 'which', {
+			get : function()
+			{
+				return this.keyCodeVal;
+			}
+		});
+		Object.defineProperty(oEvent, 'shiftKey', {
+			get : function()
+			{
+				return false;
+			}
+		});
+		Object.defineProperty(oEvent, 'altKey', {
+			get : function()
+			{
+				return false;
+			}
+		});
+		Object.defineProperty(oEvent, 'metaKey', {
+			get : function()
+			{
+				return false;
+			}
+		});
+		Object.defineProperty(oEvent, 'ctrlKey', {
+			get : function()
+			{
+				return false;
+			}
+		});
+
+		if (AscCommon.AscBrowser.isIE)
+		{
+			oEvent.preventDefault = function () {
+				Object.defineProperty(this, "defaultPrevented", {get: function () {return true;}});
+			};
+		}
+
+		if (oEvent.initKeyboardEvent)
+		{
+			oEvent.initKeyboardEvent("keydown", true, true, window, false, false, false, false, _code, _code);
+		}
+		else
+		{
+			oEvent.initKeyEvent("keydown", true, true, window, false, false, false, false, _code, 0);
+		}
+
+		oEvent.keyCodeVal = _code;
+
+		_element.dispatchEvent(oEvent);
+		return oEvent.defaultPrevented;
 	}
 
 	function CTouchManager()
@@ -842,7 +928,7 @@
 
 			check_MouseDownEvent(e.touches ? e.touches[0] : e, true);
 			global_mouseEvent.LockMouse();
-			this.HtmlPage.m_oApi.asc_fireCallback("asc_onHidePopMenu");
+			this.HtmlPage.m_oApi.sendEvent("asc_onHidePopMenu");
 
 			this.ScrollH = this.HtmlPage.m_dScrollX;
 			this.ScrollV = this.HtmlPage.m_dScrollY;
@@ -1528,7 +1614,7 @@
 
 						this.LogicDocument.Update_CursorType(pos.X, pos.Y, pos.Page, global_mouseEvent);
 
-						this.HtmlPage.m_oApi.asc_fireCallback("asc_onTapEvent", e);
+						this.HtmlPage.m_oApi.sendEvent("asc_onTapEvent", e);
 					}
 					else
 					{
@@ -1815,7 +1901,7 @@
 
 					if (!this.MoveAfterDown)
 					{
-						this.HtmlPage.m_oApi.asc_fireCallback("asc_onTapEvent", e);
+						this.HtmlPage.m_oApi.sendEvent("asc_onTapEvent", e);
 					}
 					break;
 				}
@@ -1936,7 +2022,7 @@
 			var that             = this;
 			that.ShowMenuTimerId = setTimeout(function()
 			{
-				that.HtmlPage.m_oApi.asc_fireCallback("asc_onShowPopMenu", x, y);
+				that.HtmlPage.m_oApi.sendEvent("asc_onShowPopMenu", x, y);
 			}, 500);
 		}
 
@@ -2754,7 +2840,7 @@
 			this.DrawingDocument = ctrl.m_oDrawingDocument;
 
 			this.iScroll = new AscCommon.CTouchScroll(ctrl, {bounce : true}, this.HtmlPage.ReaderModeDiv);
-			this.HtmlPage.m_oApi.asc_fireCallback("asc_onHidePopMenu");
+			this.HtmlPage.m_oApi.sendEvent("asc_onHidePopMenu");
 		}
 
 		this.onTouchStart = function(e)
@@ -2777,7 +2863,7 @@
 
 			if (this.bIsMoveAfterDown === false)
 			{
-				this.HtmlPage.m_oApi.asc_fireCallback("asc_onTapEvent", e);
+				this.HtmlPage.m_oApi.sendEvent("asc_onTapEvent", e);
 			}
 		}
 
@@ -2864,4 +2950,6 @@
 	window['AscCommon'].button_eventHandlers     = button_eventHandlers;
 	window['AscCommon'].CMobileTouchManager      = CMobileTouchManager;
 	window['AscCommon'].CReaderTouchManager      = CReaderTouchManager;
+	window['AscCommon'].emulateKeyDown 			 = emulateKeyDown;
+
 })(window);

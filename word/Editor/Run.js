@@ -277,6 +277,7 @@ ParaRun.prototype.Get_Text = function(Text)
             case para_Drawing:
             case para_End:
             case para_PageNum:
+            case para_PageCount:
             {
                 Text.Text = null;
                 bBreak = true;
@@ -1785,6 +1786,7 @@ ParaRun.prototype.Get_Layout = function(DrawingLayout, UseContentPos, ContentPos
             case para_Text:
             case para_Space:
             case para_PageNum:
+            case para_PageCount:
             {
                 DrawingLayout.LastW = WidthVisible;
 
@@ -1862,7 +1864,7 @@ ParaRun.prototype.Collect_DocumentStatistics = function(ParaStats)
         var bSpace   = false;
         var bNewWord = false;
 
-        if ((para_Text === ItemType && false === Item.Is_NBSP()) || (para_PageNum === ItemType))
+        if ((para_Text === ItemType && false === Item.Is_NBSP()) || (para_PageNum === ItemType || para_PageCount === ItemType))
         {
             if ( false === ParaStats.Word )
                 bNewWord = true;
@@ -1944,7 +1946,7 @@ ParaRun.prototype.Get_AllFontNames = function(AllFonts)
     }
 };
 
-ParaRun.prototype.Get_SelectedText = function(bAll, bClearText)
+ParaRun.prototype.Get_SelectedText = function(bAll, bClearText, oPr)
 {
     var StartPos = 0;
     var EndPos   = 0;
@@ -1977,10 +1979,10 @@ ParaRun.prototype.Get_SelectedText = function(bAll, bClearText)
         switch ( ItemType )
         {
             case para_Drawing:
-            //case para_End:
             case para_Numbering:
             case para_PresentationNumbering:
             case para_PageNum:
+            case para_PageCount:
             {
                 if ( true === bClearText )
                     return null;
@@ -1988,9 +1990,22 @@ ParaRun.prototype.Get_SelectedText = function(bAll, bClearText)
                 break;
             }
 
-            case para_Text : Str += String.fromCharCode(Item.Value); break;
+            case para_Text :
+            {
+                Str += AscCommon.encodeSurrogateChar(Item.Value);
+                break;
+            }
             case para_Space:
             case para_Tab  : Str += " "; break;
+			case para_End:
+			{
+				if (oPr && true === oPr.NewLineParagraph)
+				{
+					Str += '\n';
+				}
+
+				break;
+			}
         }
     }
 
@@ -2025,6 +2040,7 @@ ParaRun.prototype.Can_AddDropCap = function()
             case para_Space:
             case para_Tab:
             case para_PageNum:
+            case para_PageCount:
                 return false;
 
         }
@@ -2044,7 +2060,7 @@ ParaRun.prototype.Get_TextForDropCap = function(DropCapText, UseContentPos, Cont
 
         if ( true === DropCapText.Check )
         {
-            if ( para_Space === ItemType || para_Tab === ItemType || para_PageNum === ItemType || para_Drawing === ItemType )
+            if ( para_Space === ItemType || para_Tab === ItemType || para_PageNum === ItemType || para_PageCount === ItemType || para_Drawing === ItemType )
             {
                 DropCapText.Mixed = true;
                 return;
@@ -2082,7 +2098,7 @@ ParaRun.prototype.Get_StartTabsCount = function(TabsCounter)
             TabsCounter.Count++;
             TabsCounter.Pos.push( Pos );
         }
-        else if ( para_Text === ItemType || para_Space === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_Math === ItemType )
+        else if ( para_Text === ItemType || para_Space === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_PageCount === ItemType || para_Math === ItemType )
             return false;
     }
 
@@ -2105,7 +2121,7 @@ ParaRun.prototype.Remove_StartTabs = function(TabsCounter)
             Pos--;
             ContentLen--;
         }
-        else if ( para_Text === ItemType || para_Space === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_Math === ItemType )
+        else if ( para_Text === ItemType || para_Space === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_PageCount === ItemType || para_Math === ItemType )
             return false;
     }
 
@@ -2174,7 +2190,7 @@ ParaRun.prototype.Recalculate_MeasureContent = function()
             continue;
         }
 
-        Item.Measure( g_oTextMeasurer, Pr, InfoMathText );
+        Item.Measure( g_oTextMeasurer, Pr, InfoMathText, this);
 
 
         if (para_Drawing === Item.Type)
@@ -2325,11 +2341,18 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     if (para_ContinuationSeparator === ItemType)
                         Item.Update_Width(PRS);
 
+					if (para_FootnoteReference === ItemType)
+					{
+						Item.UpdateNumber(Para.Get_AbsolutePage(PRS.Page), Para.Get_AbsoluteColumn(PRS.Page));
+						PRS.Add_FootnoteReference(Item, Pos);
+					}
+					else if (para_FootnoteRef === ItemType)
+					{
+						Item.UpdateNumber(Para.Get_AbsolutePage(PRS.Page), Para.Get_AbsoluteColumn(PRS.Page));
+					}
+
                     // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.
                     var LetterLen = Item.Width / TEXTWIDTH_DIVIDER;//var LetterLen = Item.Get_Width();
-                    
-                    if (para_FootnoteReference === ItemType)
-                        PRS.Add_FootnoteReference(Item, Pos);
 
                     if (true !== Word)
                     {
@@ -2841,14 +2864,22 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     break;
                 }
+                case para_PageCount:
                 case para_PageNum:
                 {
-                    // Выставляем номер страницы
+                    if (para_PageCount === ItemType)
+                    {
+                        var oHdrFtr = Para.Parent.Is_HdrFtr(true);
+                        if (oHdrFtr)
+                            oHdrFtr.Add_PageCountElement(Item);
+                    }
+                    else if (para_PageNum === ItemType)
+                    {
+                        var LogicDocument = Para.LogicDocument;
+                        var SectionPage   = LogicDocument.Get_SectionPageNumInfo2(Para.Get_AbsolutePage(PRS.Page)).CurPage;
 
-                    var LogicDocument = Para.LogicDocument;
-                    var SectionPage = LogicDocument.Get_SectionPageNumInfo2(Para.Get_AbsolutePage(PRS.Page)).CurPage;
-
-                    Item.Set_Page(SectionPage);
+                        Item.Set_Page(SectionPage);
+                    }
 
                     // Если до этого было слово, тогда не надо проверять убирается ли оно, но если стояли пробелы,
                     // тогда мы их учитываем при проверке убирается ли данный элемент, и добавляем только если
@@ -3166,6 +3197,7 @@ ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
             case para_Sym:
             case para_Text:
             case para_PageNum:
+            case para_PageCount:
             case para_FootnoteReference:
             case para_FootnoteRef:
             case para_Separator:
@@ -3345,6 +3377,7 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
                 break;
             }
             case para_PageNum:
+            case para_PageCount:
             {
                 PRSC.Words++;
                 PRSC.Range.W += PRSC.SpaceLen;
@@ -3670,6 +3703,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                 break;
             }
             case para_PageNum:
+            case para_PageCount:
             {
                 PRSA.X    += Item.WidthVisible;
                 PRSA.LastW = Item.WidthVisible;
@@ -4076,6 +4110,7 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
             }
 
             case para_PageNum:
+            case para_PageCount:
             {
                 if ( true === bWord )
                 {
@@ -4201,6 +4236,7 @@ ParaRun.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange)
                 break;
             }
             case para_PageNum:
+            case para_PageCount:
             case para_Tab:
             {
                 RangeW.W += Item.Width;
@@ -4314,6 +4350,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
         switch( ItemType )
         {
             case para_PageNum:
+            case para_PageCount:
             case para_Drawing:
             case para_Tab:
             case para_Text:
@@ -4511,6 +4548,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
         switch( ItemType )
         {
             case para_PageNum:
+            case para_PageCount:
             case para_Drawing:
             case para_Tab:
             case para_Text:
@@ -4785,6 +4823,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             }
 
             case para_PageNum:
+            case para_PageCount:
             case para_Drawing:
             case para_Tab:
             case para_Text:

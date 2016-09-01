@@ -33,11 +33,10 @@
 "use strict";
 (
 	/**
-	 * @param {jQuery} $
 	 * @param {Window} window
 	 * @param {undefined} undefined
 	 */
-	function ($, window, undefined) {
+	function (window, undefined) {
 
 		/*
 		 * Import
@@ -1500,7 +1499,7 @@
 					var oldFilter = null;
 					if(activeRange.c1 <= ref.c1 && activeRange.c2 >= ref.c2)
 					{
-						if(activeRange.r1 < ref.r1)//until
+						if(activeRange.r1 <= ref.r1)//until
 						{
 							oldFilter = filter.clone(null);
 							
@@ -2105,6 +2104,43 @@
 				return isUpdate ? range : null;
 			},
 			
+			afterMoveAutoFilters: function(arnFrom, arnTo)
+			{
+				//если переносим часть ф/т, применяем стиль к ячейкам arnTo
+				//todo пересмотреть перенос ячеек из ф/т. скорее всего нужно будет внести правки со стилями внутри moveRange
+				var worksheet = this.worksheet;
+				
+				var intersectionRangeWithTablePartsFrom = this._intersectionRangeWithTableParts(arnFrom);
+				var intersectionRangeWithTablePartsTo = this._intersectionRangeWithTableParts(arnTo);
+				if(intersectionRangeWithTablePartsFrom && intersectionRangeWithTablePartsFrom.length === 1 && intersectionRangeWithTablePartsTo === false)
+				{
+					var refTable = intersectionRangeWithTablePartsFrom[0] ? intersectionRangeWithTablePartsFrom[0].Ref : null;
+					if(refTable && !arnFrom.containsRange(refTable))
+					{
+						var intersection = refTable.intersection(arnFrom);
+						//проходимся по всем ячейкам
+						var cell, cellTo;
+						var diffRow = arnTo.r1 - arnFrom.r1;
+						var diffCol = arnTo.c1 - arnFrom.c1;
+						for(var i = intersection.r1; i <= intersection.r2; i++)
+						{
+							for(var j = intersection.c1; j <= intersection.c2; j++)
+							{
+								cell = worksheet._getCell(i, j);
+								cellTo = worksheet._getCell(i + diffRow, j + diffCol);
+								
+								var xfsTo = cellTo.getCompiledStyle();
+								if(null === xfsTo)
+								{
+									var xfsFrom = cell.getCompiledStyle();
+									cellTo.setStyle(xfsFrom);
+								}
+							}
+						}
+					}
+				}
+			},
+			
 			//if active range intersect even a part tablePart(for insert(delete) cells)
 			isActiveCellsCrossHalfFTable: function(activeCells, val, prop)
 			{
@@ -2551,6 +2587,34 @@
 						{activeCells: tablePart.Ref.clone(), val: newName, displayName: tableName});
 				
 				History.EndTransaction();
+			},
+			
+			checkDeleteAllRowsFormatTable: function(range, emptyRange)
+			{
+				var worksheet = this.worksheet;
+		
+				if(worksheet.TableParts && worksheet.TableParts.length)
+				{
+					for(var i = 0; i < worksheet.TableParts.length; i++)
+					{
+						var table = worksheet.TableParts[i];
+						var intersection = range.intersection(table.Ref);
+						if(null !== intersection && intersection.r1 === table.Ref.r1 + 1 && intersection.r2 >= table.Ref.r2)
+						{
+							range.r1++;
+							
+							if(emptyRange)
+							{
+								var deleteRange = this.worksheet.getRange3(table.Ref.r1 + 1, range.c1, table.Ref.r1 + 1, range.c2);
+								deleteRange.cleanText()
+							}
+							
+							break;
+						}
+					}
+				}
+				
+				return range;
 			},
 			
 			_clearRange: function(range, isClearText)
@@ -4445,8 +4509,6 @@
 				var diffCol = arnTo.c1 - arnFrom.c1;
 				var diffRow = arnTo.r1 - arnFrom.r1;
 				
-				var applyStyleByCells = true;
-				
 				if(!copyRange)
 				{
 					var findFilters = this._searchFiltersInRange(arnFrom);
@@ -4473,7 +4535,6 @@
 							
 							this._openHiddenRows(findFilters[i]);
 						}
-						applyStyleByCells = false;
 					}
 					
 					//TODO пока будем всегда чистить фильтры, которые будут в месте вставки. Позже сделать аналогично MS либо пересмотреть все возможные ситуации.
@@ -4487,26 +4548,6 @@
 							//если переносим просто данные, причём шапки совпадают, то фильтр не очищаем
 							if(!(arnTo.r1 === ref.r1 && arnTo.c1 === ref.c1) && !arnFrom.containsRange(ref))
 								this.isEmptyAutoFilters(ref, null, findFilters);
-						}
-						applyStyleByCells = false;
-					}
-				}
-				
-				if(applyStyleByCells)
-				{
-					var intersectionRangeWithTablePartsFrom = this._intersectionRangeWithTableParts(arnFrom);
-					var intersectionRangeWithTablePartsTo = this._intersectionRangeWithTableParts(arnTo);
-					if(intersectionRangeWithTablePartsFrom && intersectionRangeWithTablePartsFrom.length === 1 && intersectionRangeWithTablePartsTo === false)
-					{
-						//проходимся по всем ячейкам
-						var cell;
-						for(var i = arnFrom.r1; i <= arnFrom.r2; i++)
-						{
-							for(var j = arnFrom.c1; j <= arnFrom.c2; j++)
-							{
-								cell = worksheet._getCell(i, j);
-								cell.setStyle(cell.compiledXfs);
-							}
 						}
 					}
 				}
@@ -5112,4 +5153,4 @@
 		prot["asc_getType"]						= prot.asc_getType;
 		prot["asc_getImage"]					= prot.asc_getImage;
 	}
-)(jQuery, window);
+)(window);

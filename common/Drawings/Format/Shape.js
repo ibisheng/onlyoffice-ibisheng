@@ -473,7 +473,7 @@ function ConvertTableToGraphicFrame(oTable, oPresentation){
         }
         var nIndex = oTable2.Content.length;
         oTable2.Content[nIndex] = oNewRow;
-        History.Add( oTable2, { Type : AscDFH.historyitem_Table_AddRow, Pos : Index, Item : { Row : oTable2.Content[nIndex], TableRowsBottom : {}, RowsInfo : {} } } );
+        History.Add( oTable2, { Type : AscDFH.historyitem_Table_AddRow, Pos : nIndex, Item : { Row : oTable2.Content[nIndex], TableRowsBottom : {}, RowsInfo : {} } } );
     }
 
     if(!oGraphicFrame.spPr){
@@ -491,6 +491,7 @@ function ConvertTableToGraphicFrame(oTable, oPresentation){
     }
     oGraphicFrame.setGraphicObject(oTable2);
     oGraphicFrame.setBDeleted(false);
+    return oGraphicFrame;
 }
 
 function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDrawings)
@@ -2528,10 +2529,16 @@ CShape.prototype.recalculateLocalTransform = function(transform)
             var metrics = this.drawingBase.getGraphicObjectMetrics();
             this.x = metrics.x;
             this.y = metrics.y;
-            extX = metrics.extX;
-            extY = metrics.extY;
-            var rot = this.spPr && this.spPr.xfrm && AscFormat.isRealNumber(this.spPr.xfrm.rot) ? AscFormat.normalizeRotate(this.spPr.xfrm.rot) : 0;
+            var rot = 0;
+            if(this.spPr && this.spPr.xfrm){
+                if(AscFormat.isRealNumber(this.spPr.xfrm.rot)){
+                    rot =  AscFormat.normalizeRotate(this.spPr.xfrm.rot);
+                }
+                this.flipH = this.spPr.xfrm.flipH === true;
+                this.flipV = this.spPr.xfrm.flipV === true;
+            }
             this.rot = rot;
+
             var metricExtX, metricExtY;
             if(!(this instanceof AscFormat.CGroupShape))
             {
@@ -3682,7 +3689,7 @@ CShape.prototype.hitInTextRectWord = function(x, y)
 {
 
     var content = this.getDocContent && this.getDocContent();
-    if (content)
+    if (content && this.invertTransform)
     {
         var t_x, t_y;
         t_x = this.invertTransform.TransformPointX(x, y);
@@ -4799,7 +4806,7 @@ CShape.prototype.hitToAdjustment = function (x, y) {
             return ret;
         }
     }
-    if(this.recalcInfo.warpGeometry)
+    if(this.recalcInfo.warpGeometry && this.invertTransformTextWordArt)
     {
         invert_transform = this.invertTransformTextWordArt;
         t_x = invert_transform.TransformPointX(x, y);
@@ -4998,6 +5005,26 @@ CShape.prototype.Undo = function (data)
 {
     switch (data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetDrawingBasePos:{
+            if(this.drawingBase && this.drawingBase.Pos){
+                this.drawingBase.Pos.X = data.OldPr.X;
+                this.drawingBase.Pos.Y = data.OldPr.Y;
+            }
+            break;
+        }
+        case AscDFH.historyitem_AutoShapes_SetDrawingBaseExt:{
+            if(this.drawingBase && this.drawingBase.ext){
+                this.drawingBase.ext.cx = data.OldPr.cx;
+                this.drawingBase.ext.cy = data.OldPr.cy;
+            }
+            break;
+        }
+        case AscDFH.historyitem_AutoShapes_SetDrawingBaseType:{
+            if(this.drawingBase){
+                this.drawingBase.Type = data.OldPr;
+            }
+            break;
+        }
         case AscDFH.historyitem_AutoShapes_SetLocks:
         {
             this.locks = data.oldPr;
@@ -5110,6 +5137,26 @@ CShape.prototype.Redo = function (data)
 {
     switch (data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetDrawingBasePos:{
+            if(this.drawingBase && this.drawingBase.Pos){
+                this.drawingBase.Pos.X = data.NewPr.X;
+                this.drawingBase.Pos.Y = data.NewPr.Y;
+            }
+            break;
+        }
+        case AscDFH.historyitem_AutoShapes_SetDrawingBaseExt:{
+            if(this.drawingBase && this.drawingBase.ext){
+                this.drawingBase.ext.cx = data.NewPr.cx;
+                this.drawingBase.ext.cy = data.NewPr.cy;
+            }
+            break;
+        }
+        case AscDFH.historyitem_AutoShapes_SetDrawingBaseType:{
+            if(this.drawingBase){
+                this.drawingBase.Type = data.NewPr;
+            }
+            break;
+        }
         case AscDFH.historyitem_AutoShapes_SetLocks:
         {
             this.locks = data.newPr;
@@ -5222,6 +5269,22 @@ CShape.prototype.Save_Changes = function (data, w)
     w.WriteLong(data.Type);
     switch (data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetDrawingBasePos:{
+
+            w.WriteDouble(data.NewPr.X);
+            w.WriteDouble(data.NewPr.Y);
+            break;
+        }
+        case AscDFH.historyitem_AutoShapes_SetDrawingBaseExt:{
+           w.WriteDouble(data.NewPr.cx);
+           w.WriteDouble(data.NewPr.cy);
+            break;
+        }
+        case AscDFH.historyitem_AutoShapes_SetDrawingBaseType:
+        {
+            w.WriteLong(data.NewPr);
+            break;
+        }
         case AscDFH.historyitem_AutoShapes_SetLocks:
         {
             w.WriteLong(data.newPr);
@@ -5306,6 +5369,28 @@ CShape.prototype.Load_Changes = function (r)
         var type = r.GetLong();
         switch (type)
         {
+            case AscDFH.historyitem_AutoShapes_SetDrawingBasePos:{
+                if(this.drawingBase && this.drawingBase.Pos){
+                    this.drawingBase.Pos.X = r.GetDouble();
+                    this.drawingBase.Pos.Y = r.GetDouble();
+                }
+                break;
+            }
+            case AscDFH.historyitem_AutoShapes_SetDrawingBaseExt:{
+                if(this.drawingBase && this.drawingBase.ext){
+                    this.drawingBase.ext.cx = r.GetDouble();
+                    this.drawingBase.ext.cy = r.GetDouble();
+                }
+                break;
+            }
+            case AscDFH.historyitem_AutoShapes_SetDrawingBaseType:
+            {
+                if(this.drawingBase)
+                {
+                    this.drawingBase.Type = r.GetLong();
+                }
+                break;
+            }
             case AscDFH.historyitem_AutoShapes_SetLocks:
             {
                 this.locks = r.GetLong();

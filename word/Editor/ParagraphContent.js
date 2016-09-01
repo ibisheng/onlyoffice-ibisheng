@@ -104,7 +104,7 @@ var para_FootnoteReference         = 0x0039; // Ссылка на сноску
 var para_FootnoteRef               = 0x0040; // Номер сноски (должен быть только внутри сноски)
 var para_Separator                 = 0x0041; // Разделить, который используется для сносок
 var para_ContinuationSeparator     = 0x0042; // Большой разделитель, который используется для сносок
-
+var para_PageCount                 = 0x0043; // Количество страниц
 
 var break_Line   = 0x01;
 var break_Page   = 0x02;
@@ -5983,10 +5983,10 @@ ParaDrawing.prototype =
         if (this.Parent instanceof Paragraph)
             return this.Parent;
     },
-    getSelectedText: function(bClearText)
+    getSelectedText: function(bClearText, oPr)
     {
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.getSelectedText === "function")
-            return this.GraphicObj.getSelectedText(bClearText);
+            return this.GraphicObj.getSelectedText(bClearText, oPr);
         return "";
     },
 
@@ -7576,6 +7576,8 @@ function ParaFootnoteReference(Footnote)
 	this.Width        = 0;
 	this.WidthVisible = 0;
 	this.Number       = 1;
+
+	this.Run          = null;
 }
 AscCommon.extendClass(ParaFootnoteReference, CRunElementBase);
 ParaFootnoteReference.prototype.Type            = para_FootnoteReference;
@@ -7614,22 +7616,10 @@ ParaFootnoteReference.prototype.Draw            = function(X, Y, Context, PDSE)
 			Context.m_oContext.setLineDash([]);
 	}
 };
-ParaFootnoteReference.prototype.Measure         = function(Context, TextPr)
+ParaFootnoteReference.prototype.Measure         = function(Context, TextPr, MathInfo, Run)
 {
-	Context.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
-
-	// TODO: Пока делаем обычный вариант с типом Decimal
-	var X = 0;
-	var T = Numbering_Number_To_String(this.Number);
-	for (var nPos = 0; nPos < T.length; ++nPos)
-	{
-		var Char = T.charAt(nPos);
-		X += Context.Measure(Char).Width;
-	}
-
-	var ResultWidth   = (Math.max((X + TextPr.Spacing), 0) * TEXTWIDTH_DIVIDER) | 0;
-	this.Width        = ResultWidth;
-	this.WidthVisible = ResultWidth;
+	this.Run = Run;
+	this.private_Measure();
 };
 ParaFootnoteReference.prototype.Copy            = function()
 {
@@ -7650,6 +7640,42 @@ ParaFootnoteReference.prototype.Read_FromBinary = function(Reader)
 ParaFootnoteReference.prototype.Get_Footnote    = function()
 {
 	return this.Footnote;
+};
+ParaFootnoteReference.prototype.UpdateNumber = function(nPageAbs, nColumnAbs)
+{
+	if (this.Footnote)
+	{
+		var oLogicDocument = this.Footnote.Get_LogicDocument();
+		var oFootnotesController = oLogicDocument.GetFootnotesController();
+		this.Number = oFootnotesController.GetFootnoteNumberOnPage(nPageAbs, nColumnAbs, this.Footnote);
+		this.private_Measure();
+	}
+};
+ParaFootnoteReference.prototype.private_Measure = function()
+{
+	if (!this.Run)
+		return;
+
+	var oMeasurer = g_oTextMeasurer;
+
+	var TextPr = this.Run.Get_CompiledPr(false);
+	var Theme  = this.Run.Get_Paragraph().Get_Theme();
+
+	oMeasurer.SetTextPr(TextPr, Theme);
+	oMeasurer.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
+
+	// TODO: Пока делаем обычный вариант с типом Decimal
+	var X = 0;
+	var T = Numbering_Number_To_String(this.Number);
+	for (var nPos = 0; nPos < T.length; ++nPos)
+	{
+		var Char = T.charAt(nPos);
+		X += oMeasurer.Measure(Char).Width;
+	}
+
+	var ResultWidth   = (Math.max((X + TextPr.Spacing), 0) * TEXTWIDTH_DIVIDER) | 0;
+	this.Width        = ResultWidth;
+	this.WidthVisible = ResultWidth;
 };
 
 /**
@@ -7784,6 +7810,88 @@ ParaContinuationSeparator.prototype.Update_Width = function(PRS)
 	this.WidthVisible = nWidth;
 };
 
+function ParaPageCount(PageCount)
+{
+	this.FontKoef  = 1;
+	this.NumWidths = [];
+	this.Widths    = [];
+	this.String    = "";
+	this.PageCount = undefined !== PageCount ? PageCount : 1;
+}
+AscCommon.extendClass(ParaPageCount, CRunElementBase);
+ParaPageCount.prototype.Type = para_PageCount;
+ParaPageCount.prototype.Copy = function()
+{
+	return new ParaPageCount();
+};
+ParaPageCount.prototype.Is_RealContent = function()
+{
+	return true;
+};
+ParaPageCount.prototype.Can_AddNumbering = function()
+{
+	return true;
+};
+ParaPageCount.prototype.Measure = function(Context, TextPr)
+{
+	this.FontKoef = TextPr.Get_FontKoef();
+	Context.SetFontSlot(fontslot_ASCII, this.FontKoef);
+
+	for (var Index = 0; Index < 10; Index++)
+	{
+		this.NumWidths[Index] = Context.Measure("" + Index).Width;
+	}
+
+	this.private_UpdateWidth();
+};
+ParaPageCount.prototype.Draw = function(X, Y, Context)
+{
+	var Len = this.String.length;
+
+	var _X = X;
+	var _Y = Y;
+
+	Context.SetFontSlot(fontslot_ASCII, this.FontKoef);
+	for (var Index = 0; Index < Len; Index++)
+	{
+		var Char = this.String.charAt(Index);
+		Context.FillText(_X, _Y, Char);
+		_X += this.Widths[Index];
+	}
+};
+ParaPageCount.prototype.Document_CreateFontCharMap = function(FontCharMap)
+{
+	var sValue = "1234567890";
+	for (var Index = 0; Index < sValue.length; Index++)
+	{
+		var Char = sValue.charAt(Index);
+		FontCharMap.AddChar(Char);
+	}
+};
+ParaPageCount.prototype.Update_PageCount = function(nPageCount)
+{
+	this.PageCount = nPageCount;
+	this.private_UpdateWidth();
+};
+ParaPageCount.prototype.private_UpdateWidth = function()
+{
+	this.String = "" + this.PageCount;
+
+	var RealWidth = 0;
+	for (var Index = 0, Len = this.String.length; Index < Len; Index++)
+	{
+		var Char = parseInt(this.String.charAt(Index));
+
+		this.Widths[Index] = this.NumWidths[Char];
+		RealWidth += this.NumWidths[Char];
+	}
+
+	RealWidth = (RealWidth * TEXTWIDTH_DIVIDER) | 0;
+
+	this.Width        = RealWidth;
+	this.WidthVisible = RealWidth;
+};
+
 function ParagraphContent_Read_FromBinary(Reader)
 {
 	var ElementType = Reader.GetLong();
@@ -7816,6 +7924,7 @@ function ParagraphContent_Read_FromBinary(Reader)
 		case para_FootnoteRef           : Element = new ParaFootnoteRef(); break;
 		case para_Separator             : Element = new ParaSeparator(); break;
 		case para_ContinuationSeparator : Element = new ParaContinuationSeparator(); break;
+		case para_PageCount             : Element = new ParaPageCount(); break;
 	}
 
 	if (null != Element)

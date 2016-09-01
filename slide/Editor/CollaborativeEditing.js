@@ -250,15 +250,15 @@ CCollaborativeEditing.prototype.Release_Locks = function()
                 {
                     if(Class === editor.WordControl.m_oLogicDocument.themeLock)
                     {
-                        editor.asc_fireCallback("asc_onUnLockDocumentTheme");
+                        editor.sendEvent("asc_onUnLockDocumentTheme");
                     }
                     else if(Class === editor.WordControl.m_oLogicDocument.schemeLock)
                     {
-                        editor.asc_fireCallback("asc_onUnLockDocumentSchema");
+                        editor.sendEvent("asc_onUnLockDocumentSchema");
                     }
                     else if(Class === editor.WordControl.m_oLogicDocument.slideSizeLock)
                     {
-                        editor.asc_fireCallback("asc_onUnLockDocumentProps");
+                        editor.sendEvent("asc_onUnLockDocumentProps");
                     }
                 }
                 if(object.getObjectType && object.getObjectType() === AscDFH.historyitem_type_Slide && object.deleteLock === Class)

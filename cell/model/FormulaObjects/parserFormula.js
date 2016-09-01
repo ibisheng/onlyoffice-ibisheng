@@ -1047,13 +1047,16 @@ cArea.prototype.isValid = function () {
     var r = this.getRange();
     return !!r;
 };
-cArea.prototype.countCells = function () {
-  var r = this.getRange(), bbox = r.bbox, count = (Math.abs(bbox.c1 - bbox.c2) + 1) * (Math.abs(bbox.r1 - bbox.r2) + 1);
-    r._foreachNoEmpty( function () {
-        count--;
-    } );
-    return new cNumber( count );
-};
+	cArea.prototype.countCells = function () {
+		var r = this.getRange(), bbox = r.bbox, count = (Math.abs(bbox.c1 - bbox.c2) + 1) *
+			(Math.abs(bbox.r1 - bbox.r2) + 1);
+		r._foreachNoEmpty(function (cell) {
+			if (!cell || !cell.isEmptyTextString()) {
+				count--;
+			}
+		});
+		return new cNumber(count);
+	};
 cArea.prototype.foreach = function ( action ) {
     var r = this.getRange();
     if ( r ) {
@@ -1211,7 +1214,7 @@ cArea3D.prototype.getRange = function () {
 		}
 		_r[0]._foreachNoEmpty(function (_cell) {
 			if (cell.getID() === _cell.getName()) {
-				_val.push(checkTypeCell(cell));
+				_val.push(checkTypeCell(_cell));
 			}
 		});
 
@@ -1292,36 +1295,33 @@ cArea3D.prototype.isValid = function () {
     }
     return true;
 };
-cArea3D.prototype.countCells = function () {
-    var _wsA = this.wsRange();
-    var _val = [];
-    if ( _wsA.length < 1 ) {
-        _val.push( new cError( cErrorType.bad_reference ) );
-        return _val;
-    }
-    for ( var i = 0; i < _wsA.length; i++ ) {
-        if ( !_wsA[i] ) {
-            _val.push( new cError( cErrorType.bad_reference ) );
-            return _val;
-        }
+	cArea3D.prototype.countCells = function () {
+		var _wsA = this.wsRange();
+		var _val = [];
+		if (_wsA.length < 1) {
+			_val.push(new cError(cErrorType.bad_reference));
+			return _val;
+		}
+		var i;
+		for (i = 0; i < _wsA.length; i++) {
+			if (!_wsA[i]) {
+				_val.push(new cError(cErrorType.bad_reference));
+				return _val;
+			}
 
-    }
-  var _r = this.range(_wsA), bbox = _r[0].bbox, count = (Math.abs(bbox.c1 - bbox.c2) + 1) *
-    (Math.abs(bbox.r1 - bbox.r2) + 1);
-    count = _r.length * count;
-    for ( var i = 0; i < _r.length; i++ ) {
-        _r[i]._foreachNoEmpty( function ( _cell ) {
-
-            if ( _cell.getType() === CellValueType.Number && _cell.getValueWithoutFormat() === "" ) {
-                return null;
-            }
-
-            count--;
-            return !null;
-        } );
-    }
-    return new cNumber( count );
-};
+		}
+		var _r = this.range(_wsA), bbox = _r[0].bbox, count = (Math.abs(bbox.c1 - bbox.c2) + 1) *
+			(Math.abs(bbox.r1 - bbox.r2) + 1);
+		count = _r.length * count;
+		for (i = 0; i < _r.length; i++) {
+			_r[i]._foreachNoEmpty(function (cell) {
+				if (!cell || !cell.isEmptyTextString()) {
+					count--;
+				}
+			});
+		}
+		return new cNumber(count);
+	};
 	cArea3D.prototype.getMatrix = function () {
 		var arr = [], r = this.getRange(), res;
 		for (var k = 0; k < r.length; k++) {
@@ -5275,44 +5275,53 @@ function parseNum( str ) {
     return !isNaN( str );
 }
 
-function matching( x, y, oper ) {
-    var res = false, rS;
-    if ( y instanceof cString ) {
-        rS = searchRegExp2( x.value, y.toString() );
-        switch ( oper ) {
-            case "<>":
-                res = !rS;
-                break;
-            case "=":
-            default:
-                res = rS;
-                break;
-        }
-  } else if (typeof x === typeof y) {
-        switch ( oper ) {
-            case "<>":
-                res = (x.value != y.value);
-                break;
-            case ">":
-                res = (x.value > y.value);
-                break;
-            case "<":
-                res = (x.value < y.value);
-                break;
-            case ">=":
-                res = (x.value >= y.value);
-                break;
-            case "<=":
-                res = (x.value <= y.value);
-                break;
-            case "=":
-            default:
-                res = (x.value == y.value);
-                break;
-        }
-    }
-    return res;
-}
+	function matching(x, y, operator) {
+		var res = false, rS;
+		if (cElementType.string === y.type) {
+			y = y.toString();
+			if ('' === y) {
+				// Empty compare string
+				rS = (cElementType.empty === x.type);
+			} else {
+				// Equal only string values
+				rS = (cElementType.string === x.type) ? searchRegExp2(x.value, y) : false;
+			}
+
+			switch (operator) {
+				case "<>":
+					res = !rS;
+					break;
+				case "=":
+				default:
+					res = rS;
+					break;
+			}
+		} else {
+			rS = (x.type === y.type);
+			switch (operator) {
+				case "<>":
+					res = !rS || (x.value != y.value);
+					break;
+				case ">":
+					res = rS && (x.value > y.value);
+					break;
+				case "<":
+					res = rS && (x.value < y.value);
+					break;
+				case ">=":
+					res = rS && (x.value >= y.value);
+					break;
+				case "<=":
+					res = rS && (x.value <= y.value);
+					break;
+				case "=":
+				default:
+					res = (x.value == y.value);
+					break;
+			}
+		}
+		return res;
+	}
 
 function GetDiffDate360( nDay1, nMonth1, nYear1, nDay2, nMonth2, nYear2, bUSAMethod ) {
     var nDayDiff;

@@ -1549,7 +1549,7 @@ function CDrawingDocument(drawingObjects)
 
     this.OnRecalculatePage = function(index, pageObject)
     {
-        editor.asc_fireCallback("asc_onDocumentChanged");
+        editor.sendEvent("asc_onDocumentChanged");
         if (true === this.m_bIsSearching)
         {
             this.SearchClear();

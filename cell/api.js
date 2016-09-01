@@ -430,7 +430,7 @@ var editor;
       this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
     }
     /* Нужно закрыть редактор (до выставления флага canSave, т.к. мы должны успеть отправить
-     asc_onDocumentModifiedChanged для подписки на сборку) Баг http://bugzserver/show_bug.cgi?id=28331 */
+     asc_onDocumentModifiedChanged для подписки на сборку) Баг http://bugzilla.onlyoffice.com/show_bug.cgi?id=28331 */
     this.asc_closeCellEditor();
 
     // Не даем пользователю сохранять, пока не закончится сохранение
@@ -511,12 +511,14 @@ var editor;
     this.wb.restoreFocus();
   };
 
-  spreadsheet_api.prototype.asc_Resize = function() {
+  spreadsheet_api.prototype.asc_Resize = function () {
+    AscCommon.AscBrowser.checkZoom();
     if (this.wb) {
       this.wb.resize();
 
-      if (AscCommon.g_inputContext)
+      if (AscCommon.g_inputContext) {
         AscCommon.g_inputContext.onResize("ws-canvas-outer");
+      }
     }
   };
 
@@ -677,6 +679,24 @@ var editor;
           this._asc_downloadAs(c_oAscFileType.CSV, c_oAscAsyncAction.DownloadAs, options);
         }
         break;
+      case c_oAscAdvancedOptionsID.DRM:
+        // Проверяем тип состояния в данный момент
+        if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Open) {
+          var v = {
+            "id": this.documentId,
+            "userid": this.documentUserId,
+            "format": this.documentFormat,
+            "vkey": this.documentVKey,
+            "c": "reopen",
+            "url": this.documentUrl,
+            "title": this.documentTitle,
+            "embeddedfonts": this.isUseEmbeddedCutFonts,
+            "password": option.asc_getPassword()
+          };
+
+          sendCommand(this, null, v);
+        }
+        break;
     }
   };
   // Опции страницы (для печати)
@@ -690,17 +710,19 @@ var editor;
     return this.wbModel.getWorksheet(sheetIndex).PagePrintOptions;
   };
 
-  spreadsheet_api.prototype._onNeedParams = function(data) {
+  spreadsheet_api.prototype._onNeedParams = function(data, opt_isPassword) {
     var t = this;
     // Проверяем, возможно нам пришли опции для CSV
-    if (this.documentOpenOptions) {
+    if (this.documentOpenOptions && !opt_isPassword) {
       var codePageCsv = AscCommon.c_oAscEncodingsMap[this.documentOpenOptions["codePage"]] || AscCommon.c_oAscCodePageUtf8, delimiterCsv = this.documentOpenOptions["delimiter"];
       if (null != codePageCsv && null != delimiterCsv) {
         this.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV, new asc.asc_CCSVAdvancedOptions(codePageCsv, delimiterCsv));
         return;
       }
     }
-    if (data) {
+    if (opt_isPassword) {
+      t.handlers.trigger("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.DRM), this.advancedOptionsAction);
+    } else if (data) {
       AscCommon.loadFileContent(data, function(result) {
         if (null === result) {
           t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
@@ -1444,14 +1466,17 @@ var editor;
       this.sendEvent('asc_onError', c_oAscError.ID.OpenWarning, c_oAscError.Level.NoCritical);
     }
 
-    //this.asc_Resize(); // Убрал, т.к. сверху приходит resize (http://bugzserver/show_bug.cgi?id=14680)
+    //this.asc_Resize(); // Убрал, т.к. сверху приходит resize (http://bugzilla.onlyoffice.com/show_bug.cgi?id=14680)
   };
 
   // Переход на диапазон в листе
   spreadsheet_api.prototype._asc_setWorksheetRange = function(val) {
     // Получаем sheet по имени
     var ws = this.wbModel.getWorksheetByName(val.asc_getSheet());
-    if (!ws || ws.getHidden()) {
+    if (!ws) {
+      this.handlers.trigger("asc_onHyperlinkClick", null);
+      return;
+    } else if (ws.getHidden()) {
       return;
     }
     // Индекс листа
@@ -2006,6 +2031,9 @@ var editor;
       }
       return;
     }
+    if (d.new) {
+      return;
+    }
 
     // Получаем sheet по имени
     var ws = this.wbModel.getWorksheetByName(d.sheet);
@@ -2328,6 +2356,29 @@ var editor;
     this.isStartAddShape = false;
     this.handlers.trigger("asc_onEndAddShape");
   };
+
+  spreadsheet_api.prototype.asc_addOleObjectAction = function(sLocalUrl, sData, sApplicationId, fWidth, fHeight, nWidthPix, nHeightPix)
+  {
+    var _image = this.ImageLoader.LoadImage(AscCommon.getFullImageSrc2(sLocalUrl), 1);
+    if (null != _image){
+        var ws = this.wb.getWorksheet();
+      if(ws.objectRender){
+        ws.objectRender.addOleObject(fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId);
+      }
+    }
+  };
+
+  spreadsheet_api.prototype.asc_editOleObjectAction = function(bResize, oOleObject, sImageUrl, sData, nPixWidth, nPixHeight)
+  {
+    if (oOleObject)
+    {
+      var ws = this.wb.getWorksheet();
+      if(ws.objectRender){
+        ws.objectRender.editOleObject(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight, bResize);
+      }
+    }
+  };
+
 
   spreadsheet_api.prototype.asc_isAddAutoshape = function() {
     return this.isStartAddShape;
@@ -3197,8 +3248,30 @@ var editor;
     return true;
   };
   spreadsheet_api.prototype.asc_Recalculate = function () {
-    History.EndTransaction();
-    this._onUpdateAfterApplyChanges();
+      History.EndTransaction();
+      this._onUpdateAfterApplyChanges();
+  };
+
+
+  spreadsheet_api.prototype.pre_Paste = function(_fonts, _images, callback)
+  {
+    var oFontMap = {};
+    for(var i = 0; i < _fonts.length; ++i){
+      oFontMap[_fonts[i].name] = 1;
+    }
+    this._loadFonts(oFontMap, function() {
+
+      var aImages = [];
+      for(var key in _images){
+        if(_images.hasOwnProperty(key)){
+          aImages.push(_images[key])
+        }
+      }
+      if(aImages.length > 0)      {
+         window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImages, null);
+      }
+      callback();
+    });
   };
 
   spreadsheet_api.prototype._onEndLoadSdk = function() {

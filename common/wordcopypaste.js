@@ -524,10 +524,14 @@ CopyProcessor.prototype =
             }
 			else if(para_Math == item.Type){
                 var sSrc = item.MathToImageConverter();
-				if (null != sSrc && "" != sSrc && null != sSrc.ImageUrl){
+				if (null != sSrc && null != sSrc.ImageUrl){
 					var oImg = new CopyElement("img");
-					oImg.oAttributes["width"] = item.Width;
-					oImg.oAttributes["height"] = item.Height;
+					if (sSrc.w_px > 0) {
+						oImg.oAttributes["width"] = sSrc.w_px;
+					}
+					if (sSrc.h_px > 0) {
+						oImg.oAttributes["height"] = sSrc.h_px;
+					}
 					oImg.oAttributes["src"] = sSrc.ImageUrl;
 					oTarget.addChild(oImg);
 				}
@@ -1134,7 +1138,8 @@ CopyProcessor.prototype =
 					}
 					else
 					{
-						this.CopyPresentationTableFull(oDomTarget, elements[i].Drawing);
+						var isOnlyTable = elements.length === 1 ? true : false;
+						this.CopyPresentationTableFull(oDomTarget, elements[i].Drawing, isOnlyTable);
 						
 						this.oPresentationWriter.WriteDouble(elements[i].X);
 						this.oPresentationWriter.WriteDouble(elements[i].Y);
@@ -1593,7 +1598,7 @@ CopyProcessor.prototype =
         this.oBinaryFileWriter.copyParams.itemCount = 0;
     },
 
-    CopyPresentationTableFull: function(oDomTarget, graphicFrame)
+    CopyPresentationTableFull: function(oDomTarget, graphicFrame, isOnlyTable)
     {
         var aSelectedRows = [];
         var oRowElems = {};
@@ -1624,11 +1629,66 @@ CopyProcessor.prototype =
 			this.oPresentationWriter.WriteBool(true);
 			this.oPresentationWriter.WriteString2(Item.TableStyle);
         }
+		
+		History.TurnOff();
         this.oPresentationWriter.WriteTable(graphicFrame);
 		
+		//для случая, когда копируем 1 таблицу из презентаций, в бинарник заносим ещё одну такую же табличку, но со скомпиоированными стилями(для вставки в word / excel)
+		if(isOnlyTable)
+		{
+			this.convertToCompileStylesTable(Item);
+			this.oPresentationWriter.WriteTable(graphicFrame);
+		}
+		History.TurnOn();
+
 		this.CopyTable(oDomTarget, Item, null);   
     },
 
+	convertToCompileStylesTable: function(table)
+	{
+		var t = this;
+		
+		for(var i = 0; i < table.Content.length; i++)
+		{
+			var row = table.Content[i];
+			for(var j = 0; j < row.Content.length; j++)
+			{
+				var cell = row.Content[j];
+				var compilePr = cell.Get_CompiledPr();
+				
+				cell.Pr = compilePr;
+				
+				var shd = compilePr.Shd;
+				var color = shd.Get_Color2(this.oDocument.Get_Theme(), this.oDocument.Get_ColorMap());
+				cell.Pr.Shd.Unifill = AscFormat.CreteSolidFillRGB(color.r, color.g, color.b);
+				
+				if(compilePr.TableCellBorders.Bottom)
+				{
+					var color = compilePr.TableCellBorders.Bottom.Get_Color2(this.oDocument.Get_Theme(), this.oDocument.Get_ColorMap());
+					cell.Pr.TableCellBorders.Bottom.Unifill = AscFormat.CreteSolidFillRGB(color.r, color.g, color.b);
+				}
+				
+				if(compilePr.TableCellBorders.Top)
+				{
+					var color = compilePr.TableCellBorders.Top.Get_Color2(this.oDocument.Get_Theme(), this.oDocument.Get_ColorMap());
+					cell.Pr.TableCellBorders.Top.Unifill = AscFormat.CreteSolidFillRGB(color.r, color.g, color.b);
+				}
+				
+				if(compilePr.TableCellBorders.Left)
+				{
+					var color = compilePr.TableCellBorders.Left.Get_Color2(this.oDocument.Get_Theme(), this.oDocument.Get_ColorMap());
+					cell.Pr.TableCellBorders.Left.Unifill = AscFormat.CreteSolidFillRGB(color.r, color.g, color.b);
+				}
+				
+				if(compilePr.TableCellBorders.Right)
+				{
+					var color = compilePr.TableCellBorders.Right.Get_Color2(this.oDocument.Get_Theme(), this.oDocument.Get_ColorMap());
+					cell.Pr.TableCellBorders.Right.Unifill = AscFormat.CreteSolidFillRGB(color.r, color.g, color.b);
+				}
+			}
+		}
+	},
+	
     CopyGraphicObject: function(oDomTarget, oGraphicObj, drawingCopyObject)
     {
         var sSrc = oGraphicObj.getBase64Img();
@@ -1725,6 +1785,17 @@ function trimString( str ){
     return str.replace(/^\s+|\s+$/g, '') ;
 }
 function sendImgUrls(api, images, callback, bExcel) {
+
+  if (window["AscDesktopEditor"])
+  {
+    // correct local images
+    for (var nIndex = images.length - 1; nIndex >= 0; nIndex--)
+    {
+      if (0 == images[nIndex].indexOf("file:/"))
+        images[nIndex] = window["AscDesktopEditor"]["GetImageBase64"](images[nIndex]);
+    }
+  }
+
   var rData = {"id": api.documentId, "c": "imgurls", "vkey": api.documentVKey, "userid":  api.documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": images};
   api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.LoadImage);
 
@@ -1751,7 +1822,7 @@ function sendImgUrls(api, images, callback, bExcel) {
     }
     if ( c_oAscError.ID.No !== nError ) {
       if(!bExcel)
-        api.asc_fireCallback("asc_onError", nError, c_oAscError.Level.NoCritical);
+        api.sendEvent("asc_onError", nError, c_oAscError.Level.NoCritical);
       else
         api.handlers.trigger("asc_onError", nError, c_oAscError.Level.NoCritical);
     }
@@ -2128,10 +2199,11 @@ PasteProcessor.prototype =
 			content[i].RecalcInfo.Set_Type_0(pararecalc_0_All);
 		}
 	},
-    ReadFromBinary : function(sBase64)
+    ReadFromBinary : function(sBase64, oDocument)
 	{
         var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
-        var oBinaryFileReader = new AscCommonWord.BinaryFileReader(this.oLogicDocument, openParams);
+		var doc = oDocument ? oDocument : this.oLogicDocument;
+        var oBinaryFileReader = new AscCommonWord.BinaryFileReader(doc, openParams);
         var oRes = oBinaryFileReader.ReadFromString(sBase64, true);
         this.bInBlock = oRes.bInBlock;
         return oRes;
@@ -2287,6 +2359,7 @@ PasteProcessor.prototype =
 					else
 					{
 						var aContent = oThis._convertExcelBinary(aContentExcel);
+						oThis.aContent = aContent.content;
 						oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
 					}
 					if(bTurnOffTrackRevisions){
@@ -2685,7 +2758,9 @@ PasteProcessor.prototype =
                         case "Content":
                         {
                             var docContent = this.ReadPresentationText(stream);
-							
+							if(docContent.length === 0){
+							    return;
+							}
 							var presentationSelectedContent = new PresentationSelectedContent();
 							presentationSelectedContent.DocContent = new CSelectedContent();
 							presentationSelectedContent.DocContent.Elements = docContent;
@@ -3054,7 +3129,7 @@ PasteProcessor.prototype =
 					this.oDocument = AscFormat.ExecuteNoHistory(tempCDocument , this, []);
 
 					AscCommon.g_oIdCounter.m_bRead = true;
-					var aContent = AscFormat.ExecuteNoHistory(this.ReadFromBinary, this, [base64FromWord]);
+					var aContent = AscFormat.ExecuteNoHistory(this.ReadFromBinary, this, [base64FromWord, this.oDocument]);
 					AscCommon.g_oIdCounter.m_bRead = false;
 					//возврщаем обратно переменные и историю, документ которой заменяется при создании CDocument
 					this.oDocument = trueDocument;
@@ -3092,7 +3167,7 @@ PasteProcessor.prototype =
 							graphic_frame.spPr.xfrm.setExtY(7.478268771701388 * Rows);
 							graphic_frame.setNvSpPr(new AscFormat.UniNvPr());
 							
-							element = this._convertTableToPPTX(element);
+							element = this._convertTableToPPTX(element, true);
 							graphic_frame.setGraphicObject(element.Copy(graphic_frame));
 							graphic_frame.graphicObject.Set_TableStyle(defaultTableStyleId);
 
@@ -3689,7 +3764,16 @@ PasteProcessor.prototype =
 				//merge				
 				oCurCell.Set_GridSpan(gridSpan);
 				if(vMerge != 1)
-					oCurCell.Set_VMerge(vmerge_Continue);
+				{
+					if(isMergedCell.r1 === i + activeRange.r1)
+					{
+						oCurCell.Set_VMerge(vmerge_Restart);
+					}
+					else
+					{
+						oCurCell.Set_VMerge(vmerge_Continue);
+					}
+				}
 				
 				var oCurPar = oCurCell.Content.Content[0];
 				
@@ -3780,35 +3864,42 @@ PasteProcessor.prototype =
 		return fonts;
 	},
 	
-	_convertTableToPPTX: function(table)
+	_convertTableToPPTX: function(table, isFromWord)
 	{
 		//TODO пересмотреть обработку для вложенных таблиц(можно сделать так, как при копировании из документов в таблицы)
-		var allRows = [];
-		this.maxTableCell = 0;
-		table = this._replaceInnerTables(table, allRows, true);
-		
-		//ковертим внутренние параграфы
-		table.bPresentation = true;
-		for(var i = 0; i < table.Content.length; i++)
-		{
-			for(var j = 0; j < table.Content[i].Content.length; j++)
+        var oTable = AscFormat.ExecuteNoHistory(function(){
+            var allRows = [];
+            this.maxTableCell = 0;
+			
+			if(isFromWord)
 			{
-				var cDocumentContent = table.Content[i].Content[j].Content;
-				cDocumentContent.bPresentation = true;
-				var nIndex = 0;
-				for(var n = 0; n < cDocumentContent.Content.length; n++)
-				{
-                    if(cDocumentContent.Content[n] instanceof Paragraph)
-                    {
-                        cDocumentContent.Content[nIndex] = AscFormat.ConvertParagraphToPPTX(cDocumentContent.Content[nIndex]);
-                        ++nIndex;
-                    }
-
-				}
+				table = this._replaceInnerTables(table, allRows, true);
 			}
-		}
-		
-		return table;
+            
+            //ковертим внутренние параграфы
+            table.bPresentation = true;
+            for(var i = 0; i < table.Content.length; i++)
+            {
+                for(var j = 0; j < table.Content[i].Content.length; j++)
+                {
+                    var cDocumentContent = table.Content[i].Content[j].Content;
+                    cDocumentContent.bPresentation = true;
+                    var nIndex = 0;
+                    for(var n = 0; n < cDocumentContent.Content.length; n++)
+                    {
+                        if(cDocumentContent.Content[n] instanceof Paragraph)
+                        {
+                            cDocumentContent.Content[nIndex] = AscFormat.ConvertParagraphToPPTX(cDocumentContent.Content[nIndex]);
+                            ++nIndex;
+                        }
+
+                    }
+                }
+            }
+            table.Set_TableLayout(tbllayout_Fixed);
+            return table;
+        }, this, []);
+        return oTable;
 	},
 	
 	_replaceInnerTables: function(table, allRows, isRoot)
@@ -4053,6 +4144,21 @@ PasteProcessor.prototype =
             }
             
 			var drawing = loader.ReadGraphicObject();
+			
+			//для случая, когда копируем 1 таблицу из презентаций, в бинарник заносим ещё одну такую же табличку, но со скомпилированными стилями(для вставки в word/excel)
+			if(count === 1 && typeof AscFormat.CGraphicFrame !== "undefined" && drawing instanceof AscFormat.CGraphicFrame)
+			{
+				//в презентациях пропускаю чтение ещё раз графического объекта
+				if(presentation.Slides)
+				{
+					loader.stream.Skip2(1);
+					loader.stream.SkipRecord();
+				}
+				else
+				{
+					drawing = loader.ReadGraphicObject();
+				}
+			}
 			
             var x = stream.GetULong()/100000;
             var y = stream.GetULong()/100000;
@@ -5722,7 +5828,9 @@ PasteProcessor.prototype =
 			{
 				var sClass = child.getAttribute("class");
 				var sStyle = child.getAttribute("style");
-				if(sClass || sStyle)
+				var sHref = child.getAttribute("href");
+				
+				if(sClass || sStyle || sHref)
 				{
 					bIsPlainText = false;
 					break;

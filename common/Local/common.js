@@ -200,7 +200,7 @@ window["UpdateInstallPlugins"] = function()
 {
 	var _plugins = JSON.parse(window["AscDesktopEditor"]["GetInstallPlugins"]());
 	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
-	_editor.asc_fireCallback("asc_onPluginsInit", _plugins);
+	_editor.sendEvent("asc_onPluginsInit", _plugins);
 };
 
 AscCommon.InitDragAndDrop = function(oHtmlElement, callback) {

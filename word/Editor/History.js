@@ -647,20 +647,20 @@ CHistory.prototype =
         // Не объединяем точки в истории, когда отключается пересчет.
         // TODO: Неправильно изменяется RecalcIndex
         if (true !== this.Document.Is_OnRecalculate())
-            return;
+            return false;
 
         // Не объединяем точки истории, если на предыдущей точке произошло сохранение
         if (this.Points.length < 2
             || (true !== this.Is_UserSaveMode() && null !== this.SavedIndex && this.SavedIndex >= this.Points.length - 2)
             || (true === this.Is_UserSaveMode() && null !== this.UserSavedIndex && this.UserSavedIndex >= this.Points.length - 2))
-            return;
+            return false;
 
         var Point1 = this.Points[this.Points.length - 2];
         var Point2 = this.Points[this.Points.length - 1];
 
         // Не объединяем слова больше 63 элементов
-        if ( Point1.Items.length > 63 )
-            return;
+        if (Point1.Items.length > 63 && AscDFH.historydescription_Document_AddLetterUnion === Point1.Description)
+            return false;
 
         var StartIndex1 = 0;
         var StartIndex2 = 0;
@@ -731,7 +731,19 @@ CHistory.prototype =
             this.Index    += DiffIndex;
             this.RecIndex  = Math.max( -1, this.RecIndex + DiffIndex);
         }
+
+        return true;
 	},
+
+    CanRemoveLastPoint : function()
+    {
+        if (this.Points.length <= 0
+            || (true !== this.Is_UserSaveMode() && null !== this.SavedIndex && this.SavedIndex >= this.Points.length - 1)
+            || (true === this.Is_UserSaveMode() && null !== this.UserSavedIndex && this.UserSavedIndex >= this.Points.length - 1))
+            return false;
+
+        return true;
+    },
 
     TurnOff : function()
     {

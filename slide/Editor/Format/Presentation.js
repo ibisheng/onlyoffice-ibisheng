@@ -504,7 +504,7 @@ CPresentation.prototype =
 
     Get_TargetDocContent: function(){
         if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects){
-            return this.Slides[this.CurPage].graphicObjects.getTargetDocContent();
+            return this.Slides[this.CurPage].graphicObjects.getTargetDocContent(true);
         }
         return null;
     },
@@ -580,6 +580,9 @@ CPresentation.prototype =
     },
     Add_CompositeText: function(nCharCode)
     {
+        if (null === this.CompositeInput)
+            return;
+        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_CompositeInputReplace);
         this.addCompositeText(nCharCode);
         this.Recalculate();
         this.Document_UpdateSelectionState();
@@ -606,6 +609,7 @@ CPresentation.prototype =
     {
         if (null === this.CompositeInput)
             return;
+        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_CompositeInputReplace);
         this.removeCompositeText(this.CompositeInput.Length);
         for (var nIndex = 0, nCount = arrCharCodes.length; nIndex < nCount; ++nIndex)
         {
@@ -1505,6 +1509,28 @@ CPresentation.prototype =
             this.Recalculate();
             this.Document_UpdateInterfaceState();
         }
+    },
+
+    Add_OleObject: function(fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId){
+        if(this.Slides[this.CurPage]){
+            var fPosX = (this.Width - fWidth)/2;
+            var fPosY = (this.Height - fHeight)/2;
+            var Image = this.Slides[this.CurPage].graphicObjects.createOleObject(sData, sApplicationId, sLocalUrl, fPosX, fPosY, fWidth, fHeight, nWidthPix, nHeightPix);
+            Image.setParent(this.Slides[this.CurPage]);
+            Image.addToDrawingObjects();
+            this.Slides[this.CurPage].graphicObjects.resetSelection();
+            this.Slides[this.CurPage].graphicObjects.selectObject(Image, 0);
+            this.Recalculate();
+            this.Document_UpdateInterfaceState();
+        }
+    },
+
+    Edit_OleObject: function(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight){
+        oOleObject.setData(sData);
+        var _blipFill           = new AscFormat.CBlipFill();
+        _blipFill.RasterImageId = sImageUrl;
+        oOleObject.setBlipFill(_blipFill);
+        oOleObject.setPixSizes(nPixWidth, nPixHeight);
     },
 
     addChart: function(binary)
@@ -2625,7 +2651,17 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 68 && false === editor.isViewMode && true === e.CtrlKey )
         {
-            editor.DublicateSlide();
+           if(this.Slides[this.CurPage]){
+               if(this.Slides[this.CurPage].graphicObjects.selectedObjects.length > 0){
+                   this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphAlignHotKey);
+                   this.Slides[this.CurPage].copySelectedObjects();
+                   this.Recalculate();
+                   this.Document_UpdateInterfaceState();
+               }
+               else{
+                   this.DublicateSlide();
+               }
+           }
             bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 69 && false === editor.isViewMode && true === e.CtrlKey )
@@ -3045,6 +3081,7 @@ CPresentation.prototype =
         }
         this.noShowContextMenu = false;
         this.Document_UpdateInterfaceState();
+        this.Api.sendEvent("asc_onSelectionEnd");
     },
 
     OnMouseMove : function(e, X, Y, PageIndex)
@@ -3124,7 +3161,10 @@ CPresentation.prototype =
     // Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.
     Get_SelectedText : function(bClearText)
     {
-        return this.Slides[this.CurPage].graphicObjects.Get_SelectedText(bClearText);
+        if(this.Slides[this.CurPage]){
+            return this.Slides[this.CurPage].graphicObjects.Get_SelectedText(bClearText);
+        }
+        return "";
     },
 
 //-----------------------------------------------------------------------------------
@@ -3332,6 +3372,23 @@ CPresentation.prototype =
     },
 
 
+    Get_AllImageUrls: function(aImages){
+        if(!Array.isArray(aImages)){
+            aImages = [];
+        }
+        for(var i = 0; i < this.Slides.length; ++i){
+            this.Slides[i].getAllRasterImages(aImages);
+        }
+        return aImages;
+    },
+
+    Reassign_ImageUrls : function (images_rename) {
+        for(var i = 0; i < this.Slides.length; ++i){
+            this.Slides[i].Reassign_ImageUrls(images_rename);
+        }
+    },
+
+
     Get_GraphicObjectsProps : function()
     {
         if(this.Slides[this.CurPage])
@@ -3390,6 +3447,10 @@ CPresentation.prototype =
                 drawing_props.imageProps.Width = drawing_props.imageProps.w;
                 drawing_props.imageProps.Height = drawing_props.imageProps.h;
                 drawing_props.imageProps.Position = {X: drawing_props.imageProps.x, Y: drawing_props.imageProps.y};
+                if(AscFormat.isRealBool(drawing_props.imageProps.locked) && drawing_props.imageProps.locked)
+                {
+                    drawing_props.imageProps.Locked = true;
+                }
                 editor.sync_ImgPropCallback(drawing_props.imageProps);
             }
 
@@ -3405,7 +3466,7 @@ CPresentation.prototype =
                 if(this.bNeedUpdateChartPreview)
                 {
                     editor.chartPreviewManager.clearPreviews();
-                    editor.asc_fireCallback("asc_onUpdateChartStyles");
+                    editor.sendEvent("asc_onUpdateChartStyles");
                     this.bNeedUpdateChartPreview = false;
                 }
                 editor.sync_ImgPropCallback(drawing_props.chartProps);
@@ -3466,11 +3527,11 @@ CPresentation.prototype =
         this.Document_UpdateRulersState();
 
         this.Document_UpdateCanAddHyperlinkState();
-        editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
-        editor.asc_fireCallback("asc_canIncreaseIndent", this.Can_IncreaseParagraphLevel(true));
-        editor.asc_fireCallback("asc_canDecreaseIndent", this.Can_IncreaseParagraphLevel(false));
-        editor.asc_fireCallback("asc_onCanGroup", this.canGroup());
-        editor.asc_fireCallback("asc_onCanUnGroup", this.canUnGroup());
+        editor.sendEvent("asc_onPresentationSize", this.Width, this.Height);
+        editor.sendEvent("asc_canIncreaseIndent", this.Can_IncreaseParagraphLevel(true));
+        editor.sendEvent("asc_canDecreaseIndent", this.Can_IncreaseParagraphLevel(false));
+        editor.sendEvent("asc_onCanGroup", this.canGroup());
+        editor.sendEvent("asc_onCanUnGroup", this.canUnGroup());
     },
 
     changeBackground: function(bg, arr_ind, bNoCreatePoint)
@@ -3928,28 +3989,30 @@ CPresentation.prototype =
             }
             else if(Content.DocContent)
             {
-                var target_doc_content = this.Slides[this.CurPage].graphicObjects.getTargetDocContent(true), paragraph, NearPos;
-                if(target_doc_content)
-                {
-                    if(target_doc_content.Selection.Use)
+                if(Content.DocContent.Elements.length > 0){
+                    var target_doc_content = this.Slides[this.CurPage].graphicObjects.getTargetDocContent(true), paragraph, NearPos;
+                    if(target_doc_content)
                     {
-                        this.Slides[this.CurPage].graphicObjects.removeCallback(1);
+                        if(target_doc_content.Selection.Use)
+                        {
+                            this.Slides[this.CurPage].graphicObjects.removeCallback(1);
+                        }
+                        paragraph = target_doc_content.Content[target_doc_content.CurPos.ContentPos];
+                        if (null != paragraph && type_Paragraph == paragraph.GetType())
+                        {
+                            NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
+                            paragraph.Check_NearestPos(NearPos);
+                            target_doc_content.Insert_Content(Content.DocContent, NearPos);
+                        }
+                        var oTargetTextObject = AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects);
+                        oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
                     }
-                    paragraph = target_doc_content.Content[target_doc_content.CurPos.ContentPos];
-                    if (null != paragraph && type_Paragraph == paragraph.GetType())
+                    else
                     {
-                        NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
-                        paragraph.Check_NearestPos(NearPos);
-                        target_doc_content.Insert_Content(Content.DocContent, NearPos);
+                        var shape = this.CreateAndAddShapeFromSelectedContent(Content.DocContent);
+                        this.Slides[this.CurPage].graphicObjects.resetSelection();
+                        this.Slides[this.CurPage].graphicObjects.selectObject(shape, 0);
                     }
-                    var oTargetTextObject = AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects);
-                    oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
-                }
-                else
-                {
-                    var shape = this.CreateAndAddShapeFromSelectedContent(Content.DocContent);
-                    this.Slides[this.CurPage].graphicObjects.resetSelection();
-                    this.Slides[this.CurPage].graphicObjects.selectObject(shape, 0);
                 }
             }
         }
@@ -4024,7 +4087,7 @@ CPresentation.prototype =
                 this.Width = Data.oldW;
                 this.Height = Data.oldH;
                 this.changeSlideSizeFunction(this.Width, this.Height);
-                editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
+                editor.sendEvent("asc_onPresentationSize", this.Width, this.Height);
 
                 break;
             }
@@ -4078,7 +4141,7 @@ CPresentation.prototype =
                 this.Width = Data.newW;
                 this.Height = Data.newH;
                 this.changeSlideSizeFunction(this.Width, this.Height);
-                editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
+                editor.sendEvent("asc_onPresentationSize", this.Width, this.Height);
                 break;
             }
             case AscDFH.historyitem_Presentation_AddSlideMaster:
@@ -4884,7 +4947,7 @@ CPresentation.prototype =
                 AscCommon.CollaborativeEditing.ScaleX = kw;
                 AscCommon.CollaborativeEditing.ScaleY = kh;
                 this.changeSlideSizeFunction(this.Width, this.Height);
-                editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
+                editor.sendEvent("asc_onPresentationSize", this.Width, this.Height);
                 break;
             }
             case AscDFH.historyitem_Presentation_AddSlideMaster:

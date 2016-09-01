@@ -482,7 +482,7 @@ function CheckStockChart(oDrawingObjects, oApi)
         {
             if(chartSpace.chart.plotArea.charts[0].series.length !== 4)
             {
-                oApi.asc_fireCallback("asc_onError", c_oAscError.ID.StockChartError, c_oAscError.Level.NoCritical);
+                oApi.sendEvent("asc_onError", c_oAscError.ID.StockChartError, c_oAscError.Level.NoCritical);
                 oApi.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
                 return false;
             }
@@ -1223,22 +1223,35 @@ DrawingObjectsController.prototype =
         if(oController.selection.textSelection){
             return;
         }
-        if(oController.selectedObjects.length === 1 && oController.selectedObjects[0].getObjectType() === AscDFH.historyitem_type_Shape){
-            var oShape = oController.selectedObjects[0];
-            if(oShape.bWordShape){
-                if(!oShape.textBoxContent){
-                    oShape.createTextBoxContent();
+        if(oController.selection.chartSelection){
+           if(oController.selection.chartSelection.selection.textSelection){
+               oController.selection.chartSelection.selection.textSelection.checkDocContent && oController.selection.chartSelection.selection.textSelection.checkDocContent();
+               return;
+           }
+        }
+        if(oController.selectedObjects.length === 1 ){
+            if(oController.selectedObjects[0].getObjectType() === AscDFH.historyitem_type_Shape){
+                var oShape = oController.selectedObjects[0];
+                if(oShape.bWordShape){
+                    if(!oShape.textBoxContent){
+                        oShape.createTextBoxContent();
+                    }
                 }
+                else{
+                    if(!oShape.txBody){
+                        oShape.createTextBody();
+                    }
+                }
+                oController.selection.textSelection = oShape;
             }
             else{
-                if(!oShape.txBody){
-                    oShape.createTextBody();
+                if(oController.selection.chartSelection && oController.selection.chartSelection.selection.title){
+                    oController.selection.chartSelection.selection.textSelection = oController.selection.chartSelection.selection.title;
+                    oController.selection.chartSelection.selection.textSelection.checkDocContent && oController.selection.chartSelection.selection.textSelection.checkDocContent();
                 }
             }
-            oController.selection.textSelection = oShape;
         }
     },
-
 
     getContextMenuPosition: function(pageIndex)
     {
@@ -3664,7 +3677,8 @@ DrawingObjectsController.prototype =
                         {
                             if(!(finish_dlbl_pos === c_oAscChartDataLabelsPos.ctr
                                 || finish_dlbl_pos === c_oAscChartDataLabelsPos.inEnd
-                                || finish_dlbl_pos === c_oAscChartDataLabelsPos.outEnd))
+                                || finish_dlbl_pos === c_oAscChartDataLabelsPos.outEnd
+                                || finish_dlbl_pos === c_oAscChartDataLabelsPos.bestFit))
                             {
                                 finish_dlbl_pos = c_oAscChartDataLabelsPos.ctr;
                             }
@@ -4044,11 +4058,12 @@ DrawingObjectsController.prototype =
         var data_labels = plot_area.charts[0].dLbls;
         if(data_labels)
         {
+            var nDefaultDatalabelsPos = chart_type && chart_type.getDefaultDataLabelsPosition ? chart_type.getDefaultDataLabelsPosition() :  c_oAscChartDataLabelsPos.none;
             ret.putShowSerName(data_labels.showSerName === true);
             ret.putShowCatName(data_labels.showCatName === true);
             ret.putShowVal(data_labels.showVal === true);
             ret.putSeparator(data_labels.separator);
-            ret.putDataLabelsPos(AscFormat.isRealNumber(data_labels.dLblPos) ? data_labels.dLblPos :  c_oAscChartDataLabelsPos.none);
+            ret.putDataLabelsPos(AscFormat.isRealNumber(data_labels.dLblPos) ? data_labels.dLblPos :  nDefaultDatalabelsPos);
         }
         else
         {
@@ -4620,6 +4635,9 @@ DrawingObjectsController.prototype =
                     {
                         this.selection.groupSelection.selectedObjects[i].group.removeFromSpTree(this.selection.groupSelection.selectedObjects[i].Get_Id());
                         group_map[this.selection.groupSelection.selectedObjects[i].group.Get_Id()+""] = this.selection.groupSelection.selectedObjects[i].group;
+                        if(this.selection.groupSelection.selectedObjects[i].setBDeleted){
+                            this.selection.groupSelection.selectedObjects[i].setBDeleted(true);
+                        }
                     }
                     group_map[this.selection.groupSelection.Get_Id()+""] = this.selection.groupSelection;
                     for(var key in group_map)
@@ -4707,6 +4725,10 @@ DrawingObjectsController.prototype =
                 for(var i = 0; i < this.selectedObjects.length; ++i)
                 {
                     this.selectedObjects[i].deleteDrawingBase(true);
+                    if(this.selectedObjects[i].setBDeleted){
+                        this.selectedObjects[i].setBDeleted(true);
+                    }
+
                 }
                 this.resetSelection();
                 this.recalculate();
@@ -5610,6 +5632,11 @@ DrawingObjectsController.prototype =
         else if ( e.keyCode == 221 && false === isViewMode && true === ctrlKey ) // Ctrl + ]
         {
             drawingObjectsController.increaseFontSize();
+            bRetValue = true;
+        }
+        else if ( e.keyCode === 113 ) // F2
+        {
+            // ToDo обработать эту горячую клавишу. В автофигуры можно добавлять формулу
             bRetValue = true;
         }
         if(bRetValue)
@@ -6958,7 +6985,12 @@ DrawingObjectsController.prototype =
                 {
                     oTextArtProperties.Fill = AscFormat.CreateUnfilFromRGB(oTextPr.Color.r, oTextPr.Color.g, oTextPr.Color.b);
                 }
-                oTextArtProperties.Line = oTextPr.TextOutline;
+                if(oTextPr.TextOutline){
+                    oTextArtProperties.Line = oTextPr.TextOutline;
+                }
+                else{
+                    oTextArtProperties.Line = AscFormat.CreateNoFillLine();
+                }
                 if(oTextArtProperties.Fill)
                 {
                     oTextArtProperties.Fill.check(this.getTheme(), this.getColorMap());

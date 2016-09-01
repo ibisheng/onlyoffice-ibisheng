@@ -143,6 +143,8 @@
 		// Использовать ли обрезанные шрифты
 		this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
 
+		this.isSendStandartTextures = false;
+
 		this.tmpFocus = null;
 
 		this.fCurCallback = null;
@@ -431,7 +433,7 @@
 	baseEditorsApi.prototype._onOpenCommand                      = function(data)
 	{
 	};
-	baseEditorsApi.prototype._onNeedParams                       = function(data)
+	baseEditorsApi.prototype._onNeedParams                       = function(data, opt_isPassword)
 	{
 	};
 	baseEditorsApi.prototype.asyncServerIdEndLoaded              = function()
@@ -633,7 +635,7 @@
 								t._onNeedParams(input["data"]);
 								break;
 							case "needpassword":
-								t.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationPassword, c_oAscError.Level.Critical);
+								t._onNeedParams(null, true);
 								break;
 							case "err":
 								t.sendEvent("asc_onError", AscCommon.mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
@@ -915,6 +917,11 @@
 
 	baseEditorsApi.prototype.sendStandartTextures = function()
 	{
+	    if (this.isSendStandartTextures)
+	        return;
+
+	    this.isSendStandartTextures = true;
+
 		var _count = AscCommon.g_oUserTexturePresets.length;
 		var arr    = new Array(_count);
 		for (var i = 0; i < _count; ++i)
@@ -1019,6 +1026,9 @@
 	{
 	};
 	baseEditorsApi.prototype.onKeyUp = function(e)
+	{
+	};
+	baseEditorsApi.prototype.pre_Paste = function(_fonts, _images, callback)
 	{
 	};
 

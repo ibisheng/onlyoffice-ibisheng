@@ -71,6 +71,12 @@ StartAddNewShape.prototype =
     {
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
             return {objectId: null, bMarker: true};
+
+        if(this.bStart){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+
         this.pageIndex = pageIndex;
         this.startX = x;
         this.startY = y;
@@ -421,7 +427,14 @@ function PreChangeAdjState(drawingObjects, majorObject)
 PreChangeAdjState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -454,6 +467,10 @@ PreMoveInlineObject.prototype =
     {
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
             return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
     },
 
     onMouseMove: function(e, x, y, pageIndex)
@@ -490,6 +507,10 @@ MoveInlineObject.prototype =
     {
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
             return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
     },
 
     onMouseMove: function(e, x, y, pageIndex)
@@ -552,7 +573,15 @@ function PreRotateState(drawingObjects, majorObject)
 PreRotateState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -582,7 +611,15 @@ function RotateState(drawingObjects, majorObject)
 RotateState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -732,7 +769,15 @@ function ChangeAdjState(drawingObjects, majorObject)
 ChangeAdjState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -761,7 +806,14 @@ function PreResizeState(drawingObjects, majorObject, cardDirection)
 PreResizeState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -792,7 +844,14 @@ function ResizeState(drawingObjects, majorObject, handleNum)
 ResizeState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -826,7 +885,14 @@ function PreMoveState(drawingObjects,  startX, startY, shift, ctrl, majorObject,
 PreMoveState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -861,7 +927,14 @@ function MoveState(drawingObjects, majorObject, startX, startY)
 MoveState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -1097,7 +1170,14 @@ function PreMoveInGroupState(drawingObjects, group, startX, startY, ShiftKey, Ct
 PreMoveInGroupState.prototype =
 {
     onMouseDown: function(e, x,y,pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -1133,7 +1213,14 @@ function MoveInGroupState(drawingObjects, majorObject, group, startX, startY)
 MoveInGroupState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+    },
 
     onMouseMove: MoveState.prototype.onMouseMove,
 
@@ -1207,7 +1294,14 @@ function PreRotateInGroupState(drawingObjects, group, majorObject)
 PreRotateInGroupState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -1233,7 +1327,14 @@ function RotateInGroupState(drawingObjects, group, majorObject)
 RotateInGroupState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+    },
 
     onMouseMove: RotateState.prototype.onMouseMove,
 
@@ -1251,7 +1352,14 @@ function PreResizeInGroupState(drawingObjects, group, majorObject, cardDirection
 PreResizeInGroupState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -1275,7 +1383,14 @@ function ResizeInGroupState(drawingObjects, group, majorObject, handleNum, cardD
 ResizeInGroupState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+    },
     onMouseMove: ResizeState.prototype.onMouseMove,
     onMouseUp: MoveInGroupState.prototype.onMouseUp
 };
@@ -1289,7 +1404,12 @@ function PreChangeAdjInGroupState(drawingObjects, group)
 PreChangeAdjInGroupState.prototype =
 {
     onMouseDown: function(e, x, y,pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -1311,7 +1431,14 @@ function ChangeAdjInGroupState(drawingObjects, group)
 ChangeAdjInGroupState.prototype =
 {
     onMouseDown: function(e, x, y,pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+    },
 
     onMouseMove: ChangeAdjState.prototype.onMouseMove,
 
@@ -1327,7 +1454,27 @@ function TextAddState(drawingObjects, majorObject)
 TextAddState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR){
+            var oCheckObject = this.majorObject;
+            if(oCheckObject instanceof AscFormat.CTitle){
+                oCheckObject = oCheckObject.chart;
+            }
+
+            if(oCheckObject && oCheckObject.group){
+                while(!oCheckObject.group){
+                    oCheckObject = oCheckObject.group;
+                }
+            }
+            if(oCheckObject && oCheckObject.parent){
+                return {cursorType: "default", objectId: oCheckObject.Get_Id()};
+            }
+        }
+    },
     onMouseMove: function(e, x, y, pageIndex)
     {
         var startPos = this.drawingObjects.startTrackPos;
@@ -1403,7 +1550,12 @@ function PreChangeWrapContour(drawingObjects, majorObject, pointNum)
 }
 
 PreChangeWrapContour.prototype.onMouseDown = function(e, x, y, pageIndex)
-{};
+{
+    if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+        this.onMouseUp(e, x, y, pageIndex);
+        this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+    }
+};
 PreChangeWrapContour.prototype.onMouseMove = function(e, x, y, pageIndex)
 {
     this.drawingObjects.clearPreTrackObjects();
@@ -1427,7 +1579,12 @@ function ChangeWrapContour(drawingObjects, majorObject)
 
 
 ChangeWrapContour.prototype.onMouseDown = function(e, x, y, pageIndex)
-{};
+{
+    if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+        this.onMouseUp(e, x, y, pageIndex);
+        this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+    }
+};
 ChangeWrapContour.prototype.onMouseMove = function(e, x, y, pageIndex)
 {
     var coords = AscFormat.CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage);
@@ -1478,7 +1635,12 @@ function PreChangeWrapContourAddPoint(drawingObjects, majorObject, pointNum1, st
 PreChangeWrapContourAddPoint.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -1512,7 +1674,12 @@ function ChangeWrapContourAddPoint(drawingObjects, majorObject)
 
 
 ChangeWrapContourAddPoint.prototype.onMouseDown = function(e, x, y, pageIndex)
-{};
+{
+    if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+        this.onMouseUp(e, x, y, pageIndex);
+        this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+    }
+};
 ChangeWrapContourAddPoint.prototype.onMouseMove = function(e, x, y, pageIndex)
 {
     var coords = AscFormat.CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage);

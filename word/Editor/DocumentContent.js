@@ -68,6 +68,10 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     this.XLimit = XLimit;
     this.YLimit = YLimit;
 
+	this.StartPage    = 0;
+	this.StartColumn  = 0;
+	this.ColumnsCount = 1;
+
     this.Parent = Parent;
     
     this.DrawingDocument = null;
@@ -4119,14 +4123,14 @@ CDocumentContent.prototype.Is_TextSelectionUse                = function()
     return this.Is_SelectionUse();
 };
 // Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.
-CDocumentContent.prototype.Get_SelectedText                   = function(bClearText)
+CDocumentContent.prototype.Get_SelectedText                   = function(bClearText, oPr)
 {
     if (true === this.ApplyToAll)
     {
         if (true === bClearText && this.Content.length <= 1)
         {
             this.Content[0].Set_ApplyToAll(true);
-            var ResultText = this.Content[0].Get_SelectedText(true);
+            var ResultText = this.Content[0].Get_SelectedText(true, oPr);
             this.Content[0].Set_ApplyToAll(false);
             return ResultText;
         }
@@ -4137,7 +4141,7 @@ CDocumentContent.prototype.Get_SelectedText                   = function(bClearT
             for (var Index = 0; Index < Count; Index++)
             {
                 this.Content[Index].Set_ApplyToAll(true);
-                ResultText += this.Content[Index].Get_SelectedText(false);
+                ResultText += this.Content[Index].Get_SelectedText(false, oPr);
                 this.Content[Index].Set_ApplyToAll(false);
             }
 
@@ -4147,7 +4151,7 @@ CDocumentContent.prototype.Get_SelectedText                   = function(bClearT
     else
     {
         if (docpostype_DrawingObjects === this.CurPos.Type)
-            return this.LogicDocument.DrawingObjects.getSelectedText(bClearText);
+            return this.LogicDocument.DrawingObjects.getSelectedText(bClearText, oPr);
 
         // Либо у нас нет выделения, либо выделение внутри одного элемента
         if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && selectionflag_Common === this.Selection.Flag ) || false === this.Selection.Use ))
@@ -4155,7 +4159,7 @@ CDocumentContent.prototype.Get_SelectedText                   = function(bClearT
             if (true === bClearText && (this.Selection.StartPos === this.Selection.EndPos || false === this.Selection.Use ))
             {
                 var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
-                return this.Content[Pos].Get_SelectedText(true);
+                return this.Content[Pos].Get_SelectedText(true, oPr);
             }
             else if (false === bClearText)
             {
@@ -4166,7 +4170,7 @@ CDocumentContent.prototype.Get_SelectedText                   = function(bClearT
 
                 for (var Index = StartPos; Index <= EndPos; Index++)
                 {
-                    ResultText += this.Content[Index].Get_SelectedText(false);
+                    ResultText += this.Content[Index].Get_SelectedText(false, oPr);
                 }
 
                 return ResultText;
@@ -8339,7 +8343,7 @@ CDocumentContent.prototype.Internal_Content_Add       = function(Position, NewOb
 
     this.private_ReindexContent(Position);
 };
-CDocumentContent.prototype.Internal_Content_Remove    = function(Position, Count)
+CDocumentContent.prototype.Internal_Content_Remove    = function(Position, Count, bCorrectionCheck)
 {
     if (Position < 0 || Position >= this.Content.length || Count <= 0)
         return;
@@ -8371,7 +8375,7 @@ CDocumentContent.prototype.Internal_Content_Remove    = function(Position, Count
         NextObj.Set_DocumentPrev(PrevObj);
 
     // Проверим, что последний элемент не таблица
-    if (type_Table == this.Content[this.Content.length - 1].GetType())
+    if (false !== bCorrectionCheck && (this.Content.length <= 0 || type_Table == this.Content[this.Content.length - 1].GetType()))
         this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, 0, 50, 50, this.XLimit, this.YLimit, this.bPresentation === true));
 
     this.private_ReindexContent(Position);
@@ -8418,11 +8422,13 @@ CDocumentContent.prototype.Get_AbsolutePage       = function(CurPage)
 };
 CDocumentContent.prototype.Get_AbsoluteColumn     = function(CurPage)
 {
-    return this.Parent.Get_AbsoluteColumn(this.StartPage + CurPage);
+	return (this.StartColumn + CurPage) - (((this.StartColumn + CurPage) / this.ColumnsCount | 0) * this.ColumnsCount);
 };
-CDocumentContent.prototype.Set_StartPage          = function(StartPage)
+CDocumentContent.prototype.Set_StartPage = function(StartPage, StartColumn, ColumnsCount)
 {
-    this.StartPage = StartPage;
+    this.StartPage    = StartPage;
+    this.StartColumn  = undefined !== StartColumn ? StartColumn : 0;
+	this.ColumnsCount = undefined !== ColumnsCount ? ColumnsCount : 1;
 };
 // Приходит абсолютное значение страницы(по отношению к родительскому классу), на выходе - относительное
 CDocumentContent.prototype.Get_Page_Relative      = function(AbsPage)
@@ -8431,7 +8437,7 @@ CDocumentContent.prototype.Get_Page_Relative      = function(AbsPage)
 };
 CDocumentContent.prototype.Get_ColumnsCount      = function()
 {
-    return 1;
+    return this.ColumnsCount;
 };
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
@@ -9776,6 +9782,10 @@ CDocumentContent.prototype.Set_LogicDocument = function(oLogicDocument)
     this.Styles          = oLogicDocument.Get_Styles();
     this.Numbering       = oLogicDocument.Get_Numbering();
     this.DrawingObjects  = oLogicDocument.DrawingObjects;
+};
+CDocumentContent.prototype.Get_LogicDocument = function()
+{
+	return this.LogicDocument;
 };
 
 function CDocumentContentStartState(DocContent)

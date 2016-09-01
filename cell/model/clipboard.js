@@ -73,7 +73,7 @@
 			
 			checkCopyToClipboard: function(ws, _clipboard, _formats)
 			{
-				var _data;
+				var _data = null;
 				var activeRange = ws.getSelectedRange();
 				var wb = window["Asc"]["editor"].wb;
 				
@@ -81,7 +81,11 @@
 				{
 					//only TEXT
 					var fragments = wb.cellEditor.copySelection();
-					_data = wb.cellEditor._getFragmentsText(fragments);
+					
+					if(null !== fragments)
+					{
+						_data = wb.cellEditor._getFragmentsText(fragments);
+					}
 					
 					_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _data)
 				}
@@ -140,7 +144,10 @@
 						if(ws.getCellEditMode() === true)
 						{
 							var text = data1.innerText;
-							window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+							if(text)
+							{
+								window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+							}
 						}
 						else
 						{
@@ -154,7 +161,10 @@
 						if(ws.getCellEditMode() === true)
 						{
 							var text = t.pasteProcessor.pasteFromBinary(ws, data1, true);
-							window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+							if(text)
+							{
+								window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+							}
 						}
 						else
 						{
@@ -167,7 +177,10 @@
 					{
 						if(ws.getCellEditMode() === true)
 						{
-							window["Asc"]["editor"].wb.cellEditor.pasteText(data1);
+							if(text)
+							{
+								window["Asc"]["editor"].wb.cellEditor.pasteText(data1);
+							}
 						}
 						else
 						{
@@ -1283,9 +1296,10 @@
 				drawingObject.graphicObject.setWordFlag(false, newCDocument);
 				
 				var oTempDrawingDocument = ws.model.DrawingDocument;
+				var oldLogicDocument = oTempDrawingDocument.m_oLogicDocument;
 				oTempDrawingDocument.m_oLogicDocument = newCDocument;
-				
 				drawingObject.graphicObject.graphicObject.Set_Parent(newCDocument);
+				oTempDrawingDocument.m_oLogicDocument = oldLogicDocument;
 				
 				History.TurnOn();
 				
@@ -1782,6 +1796,13 @@
 					}
 					
 					var drawing = loader.ReadGraphicObject();
+					var isGraphicFrame = !!(typeof AscFormat.CGraphicFrame !== "undefined" && drawing instanceof AscFormat.CGraphicFrame);
+					
+					//для случая, когда копируем 1 таблицу из презентаций, в бинарник заносим ещё одну такую же табличку, но со скомпиоированными стилями(для вставки в word / excel)
+					if(count === 1 && isGraphicFrame)
+					{
+						drawing = loader.ReadGraphicObject();
+					}
 					
 					var x = stream.GetULong() / 100000;
 					var y = stream.GetULong() / 100000;
@@ -1789,7 +1810,7 @@
 					var extY = stream.GetULong() / 100000;
 					var base64 = stream.GetString2();
 					
-					if(count !== 1 && typeof AscFormat.CGraphicFrame !== "undefined" && drawing instanceof AscFormat.CGraphicFrame)
+					if(count !== 1 && isGraphicFrame)
 					{
 						drawing = AscFormat.DrawingObjectsController.prototype.createImage(base64, x, y, extX, extY);
 						arrBase64Img.push(new AscCommon.CBuilderImages(drawing.blipFill, base64, drawing, drawing.spPr, null));
@@ -2140,7 +2161,7 @@
 					return res.length > 0 ? res.join(",") : "";
 				}
 				
-				var getSpan = function(text, format, isAddSpace)
+				var getSpan = function(text, format, isAddSpace, isHyperLink)
 				{
 					var value = "";
 					
@@ -2159,7 +2180,18 @@
 						value += " ";
 					}
 					
-					var elem = document.createElement("span");
+					var elem;
+					if(isHyperLink)
+					{
+						elem = document.createElement("a");
+						elem.href = isHyperLink.Hyperlink;
+						elem.title = isHyperLink.ToolTip;
+					}
+					else
+					{
+						elem = document.createElement("span");
+					}
+					
 					elem.innerText = value;
 					
 					if(format)
@@ -2187,6 +2219,7 @@
 					for(var j in row.c)
 					{
 						var cell = row.c[j];
+						var isHyperlink = worksheet.getCell3( i, j ).getHyperlink();
 						
 						if(cell.oValue && cell.oValue.multiText)
 						{
@@ -2204,7 +2237,9 @@
 						else
 						{
 							var format = cell.xfs && cell.xfs.font ? cell.xfs.font : null;
-							var elem = getSpan(cell.getValue(), format, true);
+							
+							var isAddSpace = row.c[parseInt(j) + 1] || (!row.c[parseInt(j) + 1] && worksheet.aGCells[parseInt(i) + 1]) ? true : false;
+							var elem = getSpan(cell.getValue(), format, isAddSpace, isHyperlink);
 							if(null !== elem)
 							{	
 								res.appendChild(elem);
@@ -2496,7 +2531,7 @@
 				//настройки параграфа
 				paragraph.elem.CompiledPr.NeedRecalc = true;
 				var paraPr = paragraph.elem.Get_CompiledPr();
-				var paragraphFontFamily = paraPr.TextPr.FontFamily.Name;
+				//var paragraphFontFamily = paraPr.TextPr.FontFamily.Name;
 				
 				//горизонтальное выравнивание
 				var horisonalAlign = this._getAlignHorisontal(paraPr);
@@ -2515,7 +2550,7 @@
 				//Numbering
 				var LvlPr = null;
 				var Lvl = null;
-				var oNumPr = paragraph.elem.Numbering_Get();
+				var oNumPr = paragraph.elem.Numbering_Get ? paragraph.elem.Numbering_Get() : null;
 				var numberingText = null;
 				var formatText;
 				if(oNumPr != null)
@@ -2718,42 +2753,66 @@
 				var heigthCell = cellTable.height;
 				var defaultStyle = "solid";
 				var borderStyleName;
+				var t = this;
+				
+				var getBorderColor = function(curBorder)
+				{
+					var color = null;
+					var backgroundColor = null;
+					
+					if(curBorder.Unifill && curBorder.Unifill.fill && curBorder.Unifill.fill.color && curBorder.Unifill.fill.color.color && curBorder.Unifill.fill.color.color.RGBA)
+					{
+						color = curBorder.Unifill.fill.color.color.RGBA;
+						backgroundColor = new AscCommonExcel.RgbColor(t.clipboard._getBinaryColor("rgb(" + color.R + "," + color.G + "," + color.B + ")"));
+					}
+					else
+					{
+						color = curBorder.Color;
+						backgroundColor = new AscCommonExcel.RgbColor(t.clipboard._getBinaryColor("rgb(" + color.r + "," + color.g + "," + color.b + ")"));
+					}
+					
+					return backgroundColor;
+				};
 				
 				var formatBorders = oldBorders ? oldBorders : new AscCommonExcel.Border();
 				//top border for cell
 				if(top == cellTable.top && !formatBorders.t.s && borders.Top.Value !== 0/*border_None*/)
 				{
-					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Top.Size,3,1));
-					if (null !== borderStyleName) {
+					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Top.Size, 3, 1));
+					if (null !== borderStyleName) 
+					{
 						formatBorders.t.setStyle(borderStyleName);
-						formatBorders.t.c = new AscCommonExcel.RgbColor(this.clipboard._getBinaryColor("rgb(" + borders.Top.Color.r + "," + borders.Top.Color.g + "," + borders.Top.Color.b + ")"));
+						formatBorders.t.c = getBorderColor(borders.Top);
 					}
 				}
 				//left border for cell
 				if(left == cellTable.left && !formatBorders.l.s && borders.Left.Value !== 0/*border_None*/)
 				{
-					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Left.Size,3,1));
-					if (null !== borderStyleName) {
+					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Left.Size, 3, 1));
+					if (null !== borderStyleName) 
+					{
 						formatBorders.l.setStyle(borderStyleName);
-						formatBorders.l.c = new AscCommonExcel.RgbColor(this.clipboard._getBinaryColor("rgb(" + borders.Left.Color.r + "," + borders.Left.Color.g + "," + borders.Left.Color.b + ")"));
+						formatBorders.l.c = getBorderColor(borders.Left);
 					}
 				}
 				//bottom border for cell
 				if(top == cellTable.top + heigthCell - 1 && !formatBorders.b.s && borders.Bottom.Value !== 0/*border_None*/)
 				{
-					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Bottom.Size,3,1));
-					if (null !== borderStyleName) {
+					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Bottom.Size, 3, 1));
+					if (null !== borderStyleName) 
+					{
 						formatBorders.b.setStyle(borderStyleName);
-						formatBorders.b.c = new AscCommonExcel.RgbColor(this.clipboard._getBinaryColor("rgb(" + borders.Bottom.Color.r + "," + borders.Bottom.Color.g + "," + borders.Bottom.Color.b + ")"));
+						formatBorders.b.c = getBorderColor(borders.Bottom);
 					}
 				}
 				//right border for cell
 				if(left == cellTable.left + widthCell - 1 && !formatBorders.r.s && borders.Right.Value !== 0/*border_None*/)
 				{
-					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Right.Size,3,1));
-					if (null !== borderStyleName) {
+					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Right.Size, 3, 1));
+					if (null !== borderStyleName) 
+					{
 						formatBorders.r.setStyle(borderStyleName);
-						formatBorders.r.c = new AscCommonExcel.RgbColor(this.clipboard._getBinaryColor("rgb(" + borders.Right.Color.r + "," + borders.Right.Color.g + "," + borders.Right.Color.b + ")"));
+						formatBorders.r.c = getBorderColor(borders.Right);
 					}
 				}
 				
@@ -2809,8 +2868,17 @@
 					
 					if(compiledPrCell && compiledPrCell.Shd.Value !== 1/*shd_Nil*/)
 					{	
-						var color = compiledPrCell.Shd.Color;
-						backgroundColor = new AscCommonExcel.RgbColor(this.clipboard._getBinaryColor("rgb(" + color.r + "," + color.g + "," + color.b + ")"));
+						var shd = compiledPrCell.Shd;
+						if(shd.Unifill && shd.Unifill.fill && shd.Unifill.fill.color && shd.Unifill.fill.color.color && shd.Unifill.fill.color.color.RGBA)
+						{
+							var color = shd.Unifill.fill.color.color.RGBA;
+							backgroundColor = new AscCommonExcel.RgbColor(this.clipboard._getBinaryColor("rgb(" + color.R + "," + color.G + "," + color.B + ")"));
+						}
+						else
+						{
+							var color = shd.Color;
+							backgroundColor = new AscCommonExcel.RgbColor(this.clipboard._getBinaryColor("rgb(" + color.r + "," + color.g + "," + color.b + ")"));
+						}
 					};
 				};
 				
@@ -3531,7 +3599,7 @@
 						var sSrc = oGraphicObj.getBase64Img();
 						if(sSrc.length > 0)
 						{
-							sRes += "<img style=\"max-width:100%;\" width=\""+Math.round(ParaItem.Extent.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(ParaItem.Extent.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
+							sRes += "<img style=\"max-width:100%;\" width=\""+Math.round(ParaItem.Extent.W * AscCommon.g_dKoef_mm_to_pix)+"\" height=\""+Math.round(ParaItem.Extent.H * AscCommon.g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
 							break;
 						}
 						// var _canvas     = document.createElement('canvas');

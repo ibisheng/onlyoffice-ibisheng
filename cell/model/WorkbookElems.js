@@ -425,31 +425,35 @@ ColorManager.prototype =
 };
 g_oColorManager = new ColorManager();
 
-/** @constructor */
-function Fragment(val) {
-	this.text = null;
-	this.format = null;
-	this.sFormula = null;
-	this.sId = null;
-	if (null != val) {
-		this.set(val);
+	/** @constructor */
+	function Fragment(val) {
+		this.text = null;
+		this.format = null;
+		this.sFormula = null;
+		this.sId = null;
+		if (null != val) {
+			this.set(val);
+		}
 	}
-}
-Fragment.prototype = {
-	clone : function () {
+
+	Fragment.prototype.clone = function () {
 		return new Fragment(this);
-	},
-	set : function(oVal) {
-		if (null != oVal.text)
+	};
+	Fragment.prototype.set = function (oVal) {
+		if (null != oVal.text) {
 			this.text = oVal.text;
-		if (null != oVal.format)
+		}
+		if (null != oVal.format) {
 			this.format = oVal.format;
-		if (null != oVal.sFormula)
+		}
+		if (null != oVal.sFormula) {
 			this.sFormula = oVal.sFormula;
-		if (null != oVal.sId)
+		}
+		if (null != oVal.sId) {
 			this.sId = oVal.sId;
-	}
-};
+		}
+	};
+
 var g_oFontProperties = {
 		fn: 0,
 		scheme: 1,

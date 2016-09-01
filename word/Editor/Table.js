@@ -7989,10 +7989,10 @@ CTable.prototype =
         return false;
     },
 
-    Get_SelectedText : function(bClearText)
+    Get_SelectedText : function(bClearText, oPr)
     {
         if ( true === bClearText && ( (true == this.Selection.Use && table_Selection_Text == this.Selection.Type) || false === this.Selection.Use ) )
-            return this.CurCell.Content.Get_SelectedText(true);
+            return this.CurCell.Content.Get_SelectedText(true, oPr);
         else if ( false === bClearText )
         {
             if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
@@ -8005,14 +8005,14 @@ CTable.prototype =
                     var Cell = this.Content[Pos.Row].Get_Cell( Pos.Cell );
 
                     Cell.Content.Set_ApplyToAll( true );
-                    ResultText += Cell.Content.Get_SelectedText( false );
+                    ResultText += Cell.Content.Get_SelectedText( false, oPr );
                     Cell.Content.Set_ApplyToAll( false );
                 }
 
                 return ResultText;
             }
             else
-                return this.CurCell.Content.Get_SelectedText(false);
+                return this.CurCell.Content.Get_SelectedText(false, oPr);
         }
 
         return null;
@@ -10007,7 +10007,7 @@ CTable.prototype =
                 // Сообщение об ошибке : "Value Rows must be between 1 and " + VMerge_count
                 var ErrData = new AscCommon.CErrorData();
                 ErrData.put_Value( VMerge_count );
-                editor.asc_fireCallback("asc_onError",c_oAscError.ID.SplitCellMaxRows,c_oAscError.Level.NoCritical, ErrData );
+                editor.sendEvent("asc_onError",c_oAscError.ID.SplitCellMaxRows,c_oAscError.Level.NoCritical, ErrData );
                 return false;
             }
             else if ( 0 != VMerge_count % Rows )
@@ -10015,7 +10015,7 @@ CTable.prototype =
                 // Сообщение об ошибке : "Value must be a divisor of the number " + VMerge_count
                 var ErrData = new AscCommon.CErrorData();
                 ErrData.put_Value( VMerge_count );
-                editor.asc_fireCallback("asc_onError",c_oAscError.ID.SplitCellRowsDivider,c_oAscError.Level.NoCritical, ErrData );
+                editor.sendEvent("asc_onError",c_oAscError.ID.SplitCellRowsDivider,c_oAscError.Level.NoCritical, ErrData );
                 return false;
             }
         }
@@ -10041,7 +10041,7 @@ CTable.prototype =
                 // Сообщение об ошибке : "Value Cols must be a between 1 and " + MaxCols
                 var ErrData = new AscCommon.CErrorData();
                 ErrData.put_Value( MaxCols );
-                editor.asc_fireCallback("asc_onError",c_oAscError.ID.SplitCellMaxCols,c_oAscError.Level.NoCritical, ErrData );
+                editor.sendEvent("asc_onError",c_oAscError.ID.SplitCellMaxCols,c_oAscError.Level.NoCritical, ErrData );
                 return false;
             }
         }

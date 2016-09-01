@@ -88,6 +88,11 @@
 
 		this.inputContext = null;
 		this.LastCopyBinary = null; // для вставки по кнопке, еогда браузер не позволяет
+
+		// images counter
+		this.PasteImagesCount = 0;
+		this.PasteImagesCounter = 0;
+		this.PasteImagesBody = "";
 	}
 
 	CClipboardBase.prototype =
@@ -271,8 +276,63 @@
 					this.CommonIframe_PasteStart(sHtml);
 					return false;
 				}
+
+				var items = _clipboard.items;
+                if (null != items && 0 != items.length)
+                {
+                    g_clipboardBase.PasteImagesBody = "";
+                    g_clipboardBase.PasteImagesCount = items.length;
+                    g_clipboardBase.PasteImagesCounter = 0;
+                    for (var i = 0; i < items.length; ++i)
+                    {
+                        if (items[i].kind == 'file' && items[i].type.indexOf('image/') !== -1)
+                        {
+                            var blob = items[i].getAsFile();
+                            var reader = new FileReader();
+
+                            reader.onload = function(e) {
+                                g_clipboardBase.PasteImagesCounter++;
+                                g_clipboardBase.PasteImagesBody += ("<img src=\"" + e.target.result + "\"/>");
+
+                                if (g_clipboardBase.PasteImagesCounter == g_clipboardBase.PasteImagesCount)
+                                {
+                                    g_clipboardBase.CommonIframe_PasteStart("<html><body>" + g_clipboardBase.PasteImagesBody + "</body></html>");
+
+                                    g_clipboardBase.PasteImagesBody = "";
+                                    g_clipboardBase.PasteImagesCounter = 0;
+                                    g_clipboardBase.PasteImagesCount = 0;
+                                }
+                            };
+
+                            reader.onabort = reader.onerror = function(e) {
+                                g_clipboardBase.PasteImagesCounter++;
+
+                                if (g_clipboardBase.PasteImagesCounter == g_clipboardBase.PasteImagesCount)
+                                {
+                                    g_clipboardBase.CommonIframe_PasteStart("<html><body>" + g_clipboardBase.PasteImagesBody + "</body></html>");
+
+                                    g_clipboardBase.PasteImagesBody = "";
+                                    g_clipboardBase.PasteImagesCounter = 0;
+                                    g_clipboardBase.PasteImagesCount = 0;
+                                }
+                            };
+
+                            reader.readAsDataURL(blob);
+                        }
+                        else
+                        {
+                            g_clipboardBase.PasteImagesCounter++;
+                        }
+                    }
+
+                    if (g_clipboardBase.PasteImagesCounter == g_clipboardBase.PasteImagesCount)
+                        g_clipboardBase.Paste_End();
+
+                    return false;
+                }
 			}
 
+            g_clipboardBase.Paste_End();
 			return false;
 		},
 
@@ -847,13 +907,18 @@
 			if (!_ret && null != this.LastCopyBinary)
 			{
 				var _data = null;
+				var _isInternal = false;
 				for (var i = 0; i < this.LastCopyBinary.length; i++)
 				{
 					if (c_oAscClipboardDataFormat.Internal == this.LastCopyBinary[i].type)
 					{
 						this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, this.LastCopyBinary[i].data);
+						_isInternal = true;
 					}
 				}
+
+				if (!_isInternal && this.LastCopyBinary.length > 0)
+					this.Api.asc_PasteData(this.LastCopyBinary[0].type, this.LastCopyBinary[0].data);
 			}
 			return _ret;
 		}

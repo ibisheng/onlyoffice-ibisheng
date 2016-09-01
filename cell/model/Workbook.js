@@ -2507,6 +2507,18 @@ Workbook.prototype.generateFontMap2=function(){
 		aRes.push(new AscFonts.CFont(i, 0, "", 0));
 	return aRes;
 };
+Workbook.prototype.getAllImageUrls = function(){
+    var aImageUrls = [];
+    for(var i = 0; i < this.aWorksheets.length; ++i){
+        this.aWorksheets[i].getAllImageUrls(aImageUrls);
+    }
+    return aImageUrls;
+};
+Workbook.prototype.reassignImageUrls = function(oImages){
+    for(var i = 0; i < this.aWorksheets.length; ++i){
+        this.aWorksheets[i].reassignImageUrls(oImages);
+    }
+};
 Workbook.prototype.recalcWB = function(isRecalcWB){
 	//todo
     if ( this.dependencyFormulas.getNodesLength() > 0 ) {
@@ -3407,6 +3419,16 @@ Woorksheet.prototype.generateFontMap=function(oFontMap){
 			}
 		}
 	}
+};
+Woorksheet.prototype.getAllImageUrls = function(aImages){
+    for(var i = 0; i < this.Drawings.length; ++i){
+        this.Drawings[i].graphicObject.getAllRasterImages(aImages);
+    }
+};
+Woorksheet.prototype.reassignImageUrls = function(oImages){
+    for(var i = 0; i < this.Drawings.length; ++i){
+        this.Drawings[i].graphicObject.Reassign_ImageUrls(oImages);
+    }
 };
 Woorksheet.prototype.clone=function(sNewId, sName, tableNames){
 	var i, elem, range;
@@ -4467,7 +4489,7 @@ Woorksheet.prototype.isDefaultWidthHidden=function(){
 	return null != this.oAllCol && this.oAllCol.hd;
 };
 Woorksheet.prototype.getDefaultHeight=function(){
-    // ToDo http://bugzserver/show_bug.cgi?id=19666 (флага CustomHeight нет)
+    // ToDo http://bugzilla.onlyoffice.com/show_bug.cgi?id=19666 (флага CustomHeight нет)
 	var dRes = null;
 	// Нужно возвращать выставленную, только если флаг CustomHeight = true
 	if(null != this.oSheetFormatPr.oAllRow && 0 != (AscCommonExcel.g_nRowFlag_CustomHeight & this.oSheetFormatPr.oAllRow.flags))

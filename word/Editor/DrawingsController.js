@@ -330,9 +330,9 @@ CDrawingsController.prototype.GetCurPosXY = function()
 {
 	return this.DrawingObjects.getCurPosXY();
 };
-CDrawingsController.prototype.GetSelectedText = function(bClearText)
+CDrawingsController.prototype.GetSelectedText = function(bClearText, oPr)
 {
-	return this.DrawingObjects.getSelectedText(bClearText);
+	return this.DrawingObjects.getSelectedText(bClearText, oPr);
 };
 CDrawingsController.prototype.GetCurrentParagraph = function()
 {

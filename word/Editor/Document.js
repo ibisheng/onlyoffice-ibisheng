@@ -496,10 +496,23 @@ function CDocumentRecalculateState()
     this.MainStartPos      = -1;
 }
 
+function CDocumentRecalculateHdrFtrPageCountState()
+{
+	this.Id        = null;
+	this.PageIndex = 0;
+	this.PageCount = -1;
+}
+
 function Document_Recalculate_Page()
 {
     var LogicDocument = editor.WordControl.m_oLogicDocument;
     LogicDocument.Recalculate_Page();
+}
+
+function Document_Recalculate_HdrFtrPageCount()
+{
+	var LogicDocument = editor.WordControl.m_oLogicDocument;
+	LogicDocument.private_RecalculateHdrFtrPageCountUpdate();
 }
 
 function CDocumentPageSection()
@@ -896,6 +909,8 @@ function CDocumentRecalcInfo()
     this.ParaMath                  = null;
 
     this.FootnoteReference         = null;    // Ссылка на сноску, которую мы пересчитываем
+    this.FootnotePage              = 0;
+    this.FootnoteColumn            = 0;
 
     this.AdditionalInfo            = null;
 }
@@ -920,6 +935,8 @@ CDocumentRecalcInfo.prototype =
         this.ParaMath                  = null;
 
         this.FootnoteReference         = null;
+        this.FootnotePage              = 0;
+        this.FootnoteColumn            = 0;
     },
 
     Can_RecalcObject : function()
@@ -1033,22 +1050,24 @@ CDocumentRecalcInfo.prototype =
         this.FrameRecalc = Value;
     },
 
-    Set_FootnoteReference : function(FootnoteReference, PageIndex)
+    Set_FootnoteReference : function(oFootnoteReference, nPageAbs, nColumnAbs)
     {
-        this.FootnoteReference = FootnoteReference;
-        this.FlowObjectPage    = PageIndex;
+        this.FootnoteReference = oFootnoteReference;
+        this.FootnotePage      = nPageAbs;
+		this.FootnoteColumn    = nColumnAbs;
     },
 
-    Check_FootnoteReference : function(FootnoteReference)
+    Check_FootnoteReference : function(oFootnoteReference)
     {
-        return (this.FootnoteReference === FootnoteReference ? true : false);
+        return (this.FootnoteReference === oFootnoteReference ? true : false);
     },
 
     Reset_FootnoteReference : function()
     {
         this.FootnoteReference         = null;
-        this.FlowObjectPage            = 0;
-        this.FlowObjectPageBreakBefore = false;
+		this.FootnotePage              = 0;
+		this.FootnoteColumn            = 0;
+		this.FlowObjectPageBreakBefore = false;
     }
 };
 
@@ -1371,8 +1390,9 @@ function CDocument(DrawingDocument, isMainLogicDocument)
 
     this.RecalcInfo = new CDocumentRecalcInfo();
 
-    this.RecalcId   = 0; // Номер пересчета
-    this.FullRecalc = new CDocumentRecalculateState();
+    this.RecalcId     = 0; // Номер пересчета
+    this.FullRecalc   = new CDocumentRecalculateState(); // Объект полного пересчета
+    this.HdrFtrRecalc = new CDocumentRecalculateHdrFtrPageCountState(); // Объект дополнительного пересчета колонтитулов после полного пересчета
 
     this.TurnOffRecalc          = 0;
     this.TurnOffInterfaceEvents = false;
@@ -1467,7 +1487,8 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.TrackRevisionsManager = new CTrackRevisionsManager(this);
 
     // Контролируем изменения интерфейса
-    this.ChangedStyles = []; // Объект с Id стилями, которые были изменены/удалены/добавлены
+    this.ChangedStyles      = []; // Объект с Id стилями, которые были изменены/удалены/добавлены
+	this.TurnOffPanelStyles = 0;  // == 0 - можно обновлять панельку со стилями, != 0 - нельзя обновлять
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     this.TableId.Add(this, this.Id);
@@ -1649,18 +1670,19 @@ CDocument.prototype.Get_PageContentStartPos2       = function(StartPageIndex, St
 
     var SectPr = this.SectionsInfo.Get_SectPr(ElementIndex).SectPr;
 
-    var FootnotesHeight = this.Footnotes.Get_Height(StartPageIndex);
-
-    var Y      = SectPr.Get_PageMargin_Top();
-    var YLimit = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom() - FootnotesHeight;
-    var X      = SectPr.Get_PageMargin_Left();
-    var XLimit = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
-
     var ColumnsCount = SectPr.Get_ColumnsCount();
     var ColumnAbs    = (StartColumnIndex + ElementPageIndex) - ((StartColumnIndex + ElementPageIndex) / ColumnsCount | 0) * ColumnsCount;
     var PageAbs      = StartPageIndex + ((StartColumnIndex + ElementPageIndex) / ColumnsCount | 0);
 
-    var SectionIndex = this.FullRecalc.SectionIndex;
+	var FootnotesHeight = this.Footnotes.GetHeight(StartPageIndex, ColumnAbs);
+
+	var Y      = SectPr.Get_PageMargin_Top();
+	var YLimit = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom() - FootnotesHeight;
+	var X      = SectPr.Get_PageMargin_Left();
+	var XLimit = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
+
+
+	var SectionIndex = this.FullRecalc.SectionIndex;
     if (this.Pages[PageAbs] && this.Pages[PageAbs].Sections[SectionIndex])
     {
         Y      = this.Pages[PageAbs].Sections[SectionIndex].Get_Y();
@@ -2077,21 +2099,17 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
             StartPage  = this.FullRecalc.PageIndex;
         }
     }
+	else if (null !== this.HdrFtrRecalc.Id)
+	{
+		clearTimeout(this.HdrFtrRecalc.Id);
+		this.HdrFtrRecalc.Id = null;
+		this.DrawingDocument.OnEndRecalculate(false);
+	}
+
+	this.HdrFtrRecalc.PageCount = -1;
 
     // Очищаем данные пересчета
     this.RecalcInfo.Reset();
-
-    // Определим, является ли данная страница первой в новой секции
-    var bNewSection = ( 0 === StartPage ? true : false );
-    if (0 !== StartPage)
-    {
-        var PrevStartIndex = this.Pages[StartPage - 1].Pos;
-        var CurSectInfo    = this.SectionsInfo.Get_SectPr(StartIndex);
-        var PrevSectInfo   = this.SectionsInfo.Get_SectPr(PrevStartIndex);
-
-        if (PrevSectInfo !== CurSectInfo && (c_oAscSectionBreakType.Continuous !== CurSectInfo.SectPr.Get_Type() || true !== CurSectInfo.SectPr.Compare_PageSize(PrevSectInfo.SectPr) ))
-            bNewSection = true;
-    }
 
     this.FullRecalc.PageIndex         = StartPage;
     this.FullRecalc.SectionIndex      = 0;
@@ -2099,7 +2117,7 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
     this.FullRecalc.StartIndex        = StartIndex;
     this.FullRecalc.Start             = true;
     this.FullRecalc.StartPage         = StartPage;
-    this.FullRecalc.ResetStartElement = bNewSection;
+    this.FullRecalc.ResetStartElement = this.private_RecalculateIsNewSection(StartPage, StartIndex);
 
     // Если у нас произошли какие-либо изменения с основной частью документа, тогда начинаем его пересчитывать сразу,
     // а если изменения касались только секций, тогда пересчитываем основную часть документа только с того места, где
@@ -2240,8 +2258,10 @@ CDocument.prototype.Recalculate_Page = function()
         //console.log( "Regular Recalc " + PageIndex );
 
         var StartPos = this.Get_PageContentStartPos(PageIndex, StartIndex);
-        this.Footnotes.Reset(PageIndex);
-        this.private_RecalculatePageFootnotes(PageIndex);
+
+		this.Footnotes.Reset(PageIndex, this.SectionsInfo.Get_SectPr(StartIndex).SectPr);
+
+		//this.private_RecalculatePageFootnotes(PageIndex);
 
         this.Pages[PageIndex].ResetStartElement = this.FullRecalc.ResetStartElement;
         this.Pages[PageIndex].X                 = StartPos.X;
@@ -2268,8 +2288,8 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
     var StartIndex         = this.FullRecalc.StartIndex;
     var bResetStartElement = this.FullRecalc.ResetStartElement;
 
-    // console.log("Page " + PageIndex + " Section " + SectionIndex + " Column " + ColumnIndex + " Element " + StartIndex);
-    // console.log(this.RecalcInfo);
+     // console.log("Page " + PageIndex + " Section " + SectionIndex + " Column " + ColumnIndex + " Element " + StartIndex);
+     // console.log(this.RecalcInfo);
 
     var StartPos = this.Get_PageContentStartPos2(PageIndex, ColumnIndex, 0, StartIndex);
 
@@ -2419,7 +2439,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
 
         Element.TurnOn_RecalcEvent();
 
-        if (true != bFlow && RecalcResult & recalcresult_NextElement)
+        if (true != bFlow && (RecalcResult & recalcresult_NextElement || RecalcResult & recalcresult_NextPage))
         {
             var ElementPageIndex = this.private_GetElementPageIndex(Index, PageIndex, ColumnIndex, ColumnsCount);
             Y                    = Element.Get_PageBounds(ElementPageIndex).Bottom;
@@ -2448,7 +2468,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
 
             if (RecalcResult & recalcresultflags_Footnotes)
             {
-                this.private_RecalculatePageFootnotes(PageIndex);
+                this.private_RecalculatePageFootnotes(PageIndex, ColumnIndex);
             }
 
             break;
@@ -2511,8 +2531,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
                             var NewPageSection           = new CDocumentPageSection();
                             NewPageSection.Pos           = Index;
                             NewPageSection.EndPos        = Index;
-                            NewPageSection.Y             = SectionY + 0.001; // bug fix 32748 проверить здесь
-                            //NewPageSection.Y             = true === PageSection.Is_CalculatingSectionBottomLine() ? PageSection.CurrentY : SectionY + 0.001;
+                            NewPageSection.Y             = SectionY + 0.001;
                             NewPageSection.YLimit        = true === PageSection.Is_CalculatingSectionBottomLine() ? PageSection.YLimit2 : RealYLimit;
                             Page.Sections[_SectionIndex] = NewPageSection;
 
@@ -2743,9 +2762,9 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
         //console.log("LastRecalc: " + ((new Date().getTime() - this.StartTime) / 1000));
     }
 
-    if (Index >= Count || _PageIndex > PageIndex)
+    if (Index >= Count || _PageIndex > PageIndex || _ColumnIndex > ColumnIndex)
     {
-        this.private_RecalculateShiftFootnotes(PageIndex);
+        this.private_RecalculateShiftFootnotes(PageIndex, ColumnIndex);
     }
 
     if (true === bReDraw)
@@ -2767,6 +2786,24 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
 
         this.FullRecalc.Id           = null;
         this.FullRecalc.MainStartPos = -1;
+
+		// Основной пересчет окончен, если в колонтитулах есть элемент с количеством страниц, тогда нам надо
+		// запустить дополнительный пересчет колонтитулов.
+		// Если так случилось, что после повторного полного пересчета, вызванного изменением количества страниц и
+		// изменением метрик колонтитула, новое количество страниц стало меньше, чем раньше, тогда мы не пересчитываем
+		// дальше, чтобы избежать зацикливаний.
+
+		if (-1 === this.HdrFtrRecalc.PageCount || this.HdrFtrRecalc.PageCount < this.Pages.length)
+		{
+			this.HdrFtrRecalc.PageCount = this.Pages.length;
+			var nPageCountStartPage = this.HdrFtr.HavePageCountElement();
+			if (-1 !== nPageCountStartPage)
+			{
+				this.DrawingDocument.OnStartRecalculate(nPageCountStartPage);
+				this.HdrFtrRecalc.PageIndex = nPageCountStartPage;
+				this.private_RecalculateHdrFtrPageCountUpdate();
+			}
+		}
     }
 
     if (true === bContinue)
@@ -2807,16 +2844,31 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
         }
     }
 };
-CDocument.prototype.private_RecalculatePageFootnotes         = function(PageIndex)
+CDocument.prototype.private_RecalculateIsNewSection = function(nPageAbs, nContentIndex)
 {
-    var PageMetrics = this.Get_PageContentStartPos(PageIndex);
-    this.Footnotes.Recalculate(PageIndex, PageMetrics.X, PageMetrics.XLimit, 0, 10000);
+	// Определим, является ли данная страница первой в новой секции
+	var bNewSection = ( 0 === nPageAbs ? true : false );
+	if (0 !== nPageAbs)
+	{
+		var PrevStartIndex = this.Pages[nPageAbs - 1].Pos;
+		var CurSectInfo    = this.SectionsInfo.Get_SectPr(nContentIndex);
+		var PrevSectInfo   = this.SectionsInfo.Get_SectPr(PrevStartIndex);
+
+		if (PrevSectInfo !== CurSectInfo && (c_oAscSectionBreakType.Continuous !== CurSectInfo.SectPr.Get_Type() || true !== CurSectInfo.SectPr.Compare_PageSize(PrevSectInfo.SectPr) ))
+			bNewSection = true;
+	}
+
+	return bNewSection;
 };
-CDocument.prototype.private_RecalculateShiftFootnotes        = function(PageIndex)
+CDocument.prototype.private_RecalculatePageFootnotes = function(nPageAbs, nColumnAbs)
 {
-    var FootnotesHeight = this.Footnotes.Get_Height(PageIndex);
-    var PageMetrics = this.Get_PageContentStartPos(PageIndex);
-    this.Footnotes.Shift(PageIndex, 0, PageMetrics.YLimit - FootnotesHeight);
+	this.Footnotes.Recalculate(nPageAbs, nColumnAbs, 0, 10000);
+};
+CDocument.prototype.private_RecalculateShiftFootnotes = function(nPageAbs, nColumnAbs)
+{
+	var dFootnotesHeight = this.Footnotes.GetHeight(nPageAbs, nColumnAbs);
+	var oPageMetrics     = this.Get_PageContentStartPos(nPageAbs);
+	this.Footnotes.Shift(nPageAbs, nColumnAbs, 0, oPageMetrics.YLimit - dFootnotesHeight);
 };
 CDocument.prototype.private_RecalculateFlowTable             = function(RecalcInfo)
 {
@@ -3296,6 +3348,58 @@ CDocument.prototype.private_RecalculateFlowParagraphCount    = function(Index)
     }
 
     return FlowCount;
+};
+CDocument.prototype.private_RecalculateHdrFtrPageCountUpdate = function()
+{
+	this.HdrFtrRecalc.Id = null;
+
+	var nPageAbs = this.HdrFtrRecalc.PageIndex;
+	var nPagesCount = this.Pages.length;
+
+	while (nPageAbs < nPagesCount)
+	{
+		var Result = this.HdrFtr.RecalculatePageCountUpdate(nPageAbs, nPagesCount);
+		if (null === Result)
+		{
+			nPageAbs++;
+		}
+		else if (false === Result)
+		{
+			this.DrawingDocument.OnRecalculatePage(nPageAbs, this.Pages[nPageAbs]);
+
+			if (nPageAbs < this.HdrFtrRecalc.PageIndex + 5)
+			{
+				nPageAbs++;
+			}
+			else
+			{
+				this.HdrFtrRecalc.PageIndex = nPageAbs + 1;
+				this.HdrFtrRecalc.Id = setTimeout(Document_Recalculate_HdrFtrPageCount, 20);
+				return;
+			}
+		}
+		else
+		{
+			this.RecalcInfo.Reset();
+			this.FullRecalc.PageIndex         = nPageAbs;
+			this.FullRecalc.SectionIndex      = 0;
+			this.FullRecalc.ColumnIndex       = 0;
+			this.FullRecalc.StartIndex        = this.Pages[nPageAbs].Pos;
+			this.FullRecalc.Start             = true;
+			this.FullRecalc.StartPage         = nPageAbs;
+			this.FullRecalc.ResetStartElement = this.private_RecalculateIsNewSection(nPageAbs, this.Pages[nPageAbs].Pos);
+			this.FullRecalc.MainStartPos      = this.Pages[nPageAbs].Pos;
+
+			this.DrawingDocument.OnStartRecalculate(nPageAbs);
+			this.Recalculate_Page();
+			return;
+		}
+	}
+	
+	if (nPageAbs >= nPagesCount)
+	{
+		this.DrawingDocument.OnEndRecalculate(true);
+	}
 };
 CDocument.prototype.OnColumnBreak_WhileRecalculate           = function()
 {
@@ -6668,6 +6772,10 @@ CDocument.prototype.OnKeyDown = function(e)
         bUpdateSelection = false;
         bRetValue        = keydownresult_PreventAll;
     }
+    // else if (e.KeyCode === 113)
+    // {
+    //     this.AddFootnote();
+    // }
     else if (e.KeyCode == 121 && true === e.ShiftKey) // Shift + F10 - контекстное меню
     {
         var X_abs, Y_abs, oPosition, ConvertedPos;
@@ -7304,7 +7412,7 @@ CDocument.prototype.Internal_Content_Add = function(Position, NewObject, bCheckT
 	// Запоминаем, что нам нужно произвести переиндексацию элементов
 	this.private_ReindexContent(Position);
 };
-CDocument.prototype.Internal_Content_Remove = function(Position, Count)
+CDocument.prototype.Internal_Content_Remove = function(Position, Count, bCorrectionCheck)
 {
 	var ChangePos = -1;
 
@@ -7340,7 +7448,7 @@ CDocument.prototype.Internal_Content_Remove = function(Position, Count)
 		NextObj.Set_DocumentPrev(PrevObj);
 
 	// Проверим, что последний элемент не таблица
-	if (type_Table == this.Content[this.Content.length - 1].GetType())
+	if (false !== bCorrectionCheck && (this.Content.length <= 0 || type_Table == this.Content[this.Content.length - 1].GetType()))
 		this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0));
 
 	// Обновим информацию о секциях
@@ -7743,14 +7851,18 @@ CDocument.prototype.Get_CurPosXY = function()
 /**
  * Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.
  * @param bClearText
+ * @param oPr
  * @returns {*}
  */
-CDocument.prototype.Get_SelectedText = function(bClearText)
+CDocument.prototype.Get_SelectedText = function(bClearText, oPr)
 {
+	if (undefined === oPr)
+		oPr = {};
+
 	if (undefined === bClearText)
 		bClearText = false;
 
-	return this.Controller.GetSelectedText(bClearText);
+	return this.Controller.GetSelectedText(bClearText, oPr);
 };
 CDocument.prototype.Get_CurrentParagraph = function()
 {
@@ -10008,6 +10120,9 @@ CDocument.prototype.Add_ChangedStyle = function(arrStylesId)
 };
 CDocument.prototype.Document_UpdateStylesPanel = function()
 {
+	if (0 !== this.TurnOffPanelStyles)
+		return;
+
 	var bNeedUpdate = false;
 	for (var StyleId in this.ChangedStyles)
 	{
@@ -10021,6 +10136,17 @@ CDocument.prototype.Document_UpdateStylesPanel = function()
 	{
 		editor.GenerateStyles();
 	}
+};
+CDocument.prototype.LockPanelStyles = function()
+{
+	this.TurnOffPanelStyles++;
+};
+CDocument.prototype.UnlockPanelStyles = function(isUpdate)
+{
+	this.TurnOffPanelStyles = Math.max(0, this.TurnOffPanelStyles - 1);
+
+	if (true === isUpdate)
+		this.Document_UpdateStylesPanel();
 };
 CDocument.prototype.Get_AllParagraphs = function(Props)
 {
@@ -10991,7 +11117,15 @@ CDocument.prototype.GetColumnSize = function()
 };
 CDocument.prototype.private_OnSelectionEnd = function()
 {
-	this.Api.asc_fireCallback("asc_onSelectionEnd");
+	this.Api.sendEvent("asc_onSelectionEnd");
+};
+CDocument.prototype.AddPageCount = function()
+{
+	if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+	{
+		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddPageCount);
+		this.Paragraph_Add(new ParaPageCount(this.Pages.length));
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Settings
@@ -11109,12 +11243,14 @@ CDocument.prototype.Begin_CompositeInput = function()
 		}
 
 		this.CompositeInput = {
-			Run    : oRun,
-			Pos    : oRun.State.ContentPos,
-			Length : 0
+			Run     : oRun,
+			Pos     : oRun.State.ContentPos,
+			Length  : 0,
+			CanUndo : true
 		};
 
 		oRun.Set_CompositeInput(this.CompositeInput);
+
 		return true;
 	}
 
@@ -11138,7 +11274,8 @@ CDocument.prototype.Replace_CompositeText = function(arrCharCodes)
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateUndoRedoState();
 
-	this.History.Check_UninonLastPoints();
+	if (!this.History.Check_UninonLastPoints())
+		this.CompositeInput.CanUndo = false;
 };
 CDocument.prototype.Set_CursorPosInCompositeText = function(nPos)
 {
@@ -11166,11 +11303,18 @@ CDocument.prototype.End_CompositeInput = function()
 	if (null === this.CompositeInput)
 		return;
 
+	var nLen = this.CompositeInput.Length;
+	
 	var oRun = this.CompositeInput.Run;
 	oRun.Set_CompositeInput(null);
-	this.CompositeInput = null;
+	
+	if (0 === nLen && true === this.History.CanRemoveLastPoint() && true === this.CompositeInput.CanUndo)
+	{
+		this.Document_Undo();
+		this.History.Clear_Redo();
+	}
 
-	this.History.Check_UninonLastPoints();
+	this.CompositeInput = null;
 
 	this.Document_UpdateInterfaceState();
 
@@ -11306,6 +11450,10 @@ CDocument.prototype.AddFootnote = function()
 			this.Recalculate();
 		}
 	}
+};
+CDocument.prototype.GetFootnotesController = function()
+{
+	return this.Footnotes;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые вызываются из CLogicDocumentController
@@ -15154,6 +15302,9 @@ CDocument.prototype.controller_IsMovingTableBorder = function()
 };
 CDocument.prototype.controller_CheckPosInSelection = function(X, Y, PageAbs, NearPos)
 {
+	if (true === this.Footnotes.CheckHitInFootnote(X, Y, PageAbs))
+		return false;
+
 	if (true === this.Selection.Use)
 	{
 		switch (this.Selection.Flag)
@@ -15312,14 +15463,14 @@ CDocument.prototype.controller_GetCurPosXY = function()
 		return this.Content[this.CurPos.ContentPos].Get_CurPosXY();
 	}
 };
-CDocument.prototype.controller_GetSelectedText = function(bClearText)
+CDocument.prototype.controller_GetSelectedText = function(bClearText, oPr)
 {
 	if ((true === this.Selection.Use && selectionflag_Common === this.Selection.Flag) || false === this.Selection.Use)
 	{
 		if (true === bClearText && this.Selection.StartPos === this.Selection.EndPos)
 		{
 			var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
-			return this.Content[Pos].Get_SelectedText(true);
+			return this.Content[Pos].Get_SelectedText(true, oPr);
 		}
 		else if (false === bClearText)
 		{
@@ -15330,7 +15481,7 @@ CDocument.prototype.controller_GetSelectedText = function(bClearText)
 
 			for (var Index = StartPos; Index <= EndPos; Index++)
 			{
-				ResultText += this.Content[Index].Get_SelectedText(false);
+				ResultText += this.Content[Index].Get_SelectedText(false, oPr);
 			}
 
 			return ResultText;

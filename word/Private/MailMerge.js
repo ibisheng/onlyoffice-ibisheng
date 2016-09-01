@@ -120,19 +120,19 @@ Asc['asc_docs_api'].prototype.asc_EndPreviewMailMergeResult = function()
 };
 Asc['asc_docs_api'].prototype.sync_StartMailMerge = function()
 {
-    this.asc_fireCallback("asc_onStartMailMerge");
+    this.sendEvent("asc_onStartMailMerge");
 };
 Asc['asc_docs_api'].prototype.sync_PreviewMailMergeResult = function(Index)
 {
-    this.asc_fireCallback("asc_onPreviewMailMergeResult", Index);
+    this.sendEvent("asc_onPreviewMailMergeResult", Index);
 };
 Asc['asc_docs_api'].prototype.sync_EndPreviewMailMergeResult = function()
 {
-    this.asc_fireCallback("asc_onEndPreviewMailMergeResult");
+    this.sendEvent("asc_onEndPreviewMailMergeResult");
 };
 Asc['asc_docs_api'].prototype.sync_HighlightMailMergeFields = function(Value)
 {
-    this.asc_fireCallback("asc_onHighlightMailMergeFields", Value);
+    this.sendEvent("asc_onHighlightMailMergeFields", Value);
 };
 Asc['asc_docs_api'].prototype.asc_getMailMergeData = function()
 {
@@ -158,12 +158,12 @@ Asc['asc_docs_api'].prototype.asc_sendMailMergeData = function(oData)
             }
             else
             {
-                t.asc_fireCallback("asc_onError", AscCommon.mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+                t.sendEvent("asc_onError", AscCommon.mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
             }
         }
         else
         {
-            t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+            t.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
         }
         t.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, actionType);
     });

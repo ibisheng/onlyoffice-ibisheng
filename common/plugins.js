@@ -195,6 +195,9 @@
 				ifr.style.overflow = 'hidden';
 				ifr.style.zIndex   = -1000;
 				document.body.appendChild(ifr);
+
+				if (this.startData.getAttribute("resize") !== true)
+					this.api.sendEvent("asc_onPluginShow", this.current, this.currentVariation);
 			}
 		},
 
@@ -240,6 +243,8 @@
 					};
 
 					this.api.asc_CheckCopy(text_data, 1);
+					if (text_data.data == null)
+					    text_data.data = "";
 					this.startData.setAttribute("data", text_data.data);
 					break;
 				}
@@ -254,6 +259,8 @@
 					};
 
 					this.api.asc_CheckCopy(text_data, 2);
+					if (text_data.data == null)
+                        text_data.data = "";
 					this.startData.setAttribute("data", text_data.data);
 					break;
 				}
@@ -335,6 +342,25 @@
 				pluginData.setAttribute("guid", this.current.guid);
 				_iframe.contentWindow.postMessage(pluginData.serialize(), "*");
 			}
+		},
+
+		onChangedSelectionData : function()
+		{
+			if (this.current && this.current.variations[this.currentVariation].initOnSelectionChanged === true)
+			{
+				// re-init
+				this.init();
+			}
+		},
+
+		onExternalMouseUp : function()
+		{
+		    if (!this.current)
+		        return;
+
+		    this.startData.setAttribute("type", "onExternalMouseUp");
+		    this.correctData(this.startData);
+		    this.sendMessage(this.startData);
 		}
 	};
 
@@ -378,13 +404,25 @@
 					{
 						if (window.g_asc_plugins.api.asc_canPaste())
 						{
+							var editorId = window.g_asc_plugins.api.getEditorId();
+							if (AscCommon.c_oEditorId.Word === editorId ||
+								AscCommon.c_oEditorId.Presentation === editorId)
+							{
+								var oLogicDocument = window.g_asc_plugins.api.WordControl ?
+									window.g_asc_plugins.api.WordControl.m_oLogicDocument : null;
+								if(AscCommon.c_oEditorId.Word === editorId){
+									oLogicDocument.LockPanelStyles();
+								}
+							}
+							
 							var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + value + "})();";
 							eval(_script);
 
 							if (pluginData.getAttribute("recalculate") == true)
 							{
 								var editorId = window.g_asc_plugins.api.getEditorId();
-								if (AscCommon.c_oEditorId.Word === editorId)
+								if (AscCommon.c_oEditorId.Word === editorId ||
+									AscCommon.c_oEditorId.Presentation === editorId)
 								{
 									var oLogicDocument = window.g_asc_plugins.api.WordControl ?
 										window.g_asc_plugins.api.WordControl.m_oLogicDocument : null;
@@ -409,11 +447,28 @@
 											}
 											delete window.g_asc_plugins.images_rename;
 											window.g_asc_plugins.api.asc_Recalculate();
+											if(AscCommon.c_oEditorId.Word === editorId) {
+												oLogicDocument.UnlockPanelStyles(true);
+											}
 										});
 								}
 								else if (AscCommon.c_oEditorId.Spreadsheet === editorId)
 								{
-									window.g_asc_plugins.api.asc_Recalculate();
+									var oApi    = window.g_asc_plugins.api;
+									var oFonts  = oApi.wbModel._generateFontMap();
+									var aImages = oApi.wbModel.getAllImageUrls();
+									var oImages = {};
+									for (var i = 0; i < aImages.length; i++)
+									{
+										oImages[aImages[i]] = aImages[i];
+									}
+									window.g_asc_plugins.images_rename = oImages;
+									AscCommon.Check_LoadingDataBeforePrepaste(window.g_asc_plugins.api, oFonts, oImages,
+										function(){
+											oApi.wbModel.reassignImageUrls(window.g_asc_plugins.images_rename);
+											delete window.g_asc_plugins.images_rename;
+											window.g_asc_plugins.api.asc_Recalculate();
+										});
 								}
 							}
 						}
@@ -431,19 +486,22 @@
 			{
 				var _sizes = JSON.parse(value);
 
-				window.g_asc_plugins.api.asc_fireCallback("asc_onPluginResize", _sizes["width"], _sizes["height"], function() {
+				window.g_asc_plugins.api.sendEvent("asc_onPluginResize",
+					[_sizes["width"], _sizes["height"]],
+					[_sizes["minw"], _sizes["minh"]],
+					[_sizes["maxw"], _sizes["maxh"]], function() {
 					// TODO: send resize end event
 				});
 			}
 			else if ("onmousemove" == name)
 			{
 				var _pos = JSON.parse(value);
-				window.g_asc_plugins.api.asc_fireCallback("asc_onPluginMouseMove", _pos["x"], _pos["y"]);
+				window.g_asc_plugins.api.sendEvent("asc_onPluginMouseMove", _pos["x"], _pos["y"]);
 			}
 			else if ("onmouseup" == name)
 			{
 				var _pos = JSON.parse(value);
-				window.g_asc_plugins.api.asc_fireCallback("asc_onPluginMouseUp", _pos["x"], _pos["y"]);
+				window.g_asc_plugins.api.sendEvent("asc_onPluginMouseUp", _pos["x"], _pos["y"]);
 			}
 		}
 	}
@@ -467,6 +525,10 @@
 		window["g_asc_plugins"]     = window.g_asc_plugins;
 		window.g_asc_plugins.api    = api;
 		window.g_asc_plugins["api"] = window.g_asc_plugins.api;
+
+		api.asc_registerCallback('asc_onSelectionEnd', function(){
+			window.g_asc_plugins.onChangedSelectionData();
+		});
 
 		window.g_asc_plugins.api.asc_registerCallback('asc_onDocumentContentReady', function()
 		{
@@ -496,275 +558,3 @@
 			};
 	};
 })(window, undefined);
-
-// потом удалить!!!
-function TEST_PLUGINS()
-{
-	var _plugins = [
-		{
-			name : "chess (fen)",
-			guid : "asc.{FFE1F462-1EA2-4391-990D-4CC84940B754}",
-
-			variations : [
-				{
-					description : "chess",
-					url         : "chess/index.html",
-
-					icons          : ["chess/icon.png", "chess/icon@2x.png"],
-					isViewer       : true,
-					EditorsSupport : ["word", "cell", "slide"],
-
-					isVisual     : true,
-					isModal      : true,
-					isInsideMode : false,
-
-					initDataType : "ole",
-					initData     : "",
-
-					isUpdateOleOnResize : true,
-
-					buttons : [{text : "Ok", primary : true},
-						{text : "Cancel", primary : false}]
-				},
-				{
-					description : "about",
-					url         : "chess/index_about.html",
-
-					icons          : ["chess/icon.png", "chess/icon@2x.png"],
-					isViewer       : true,
-					EditorsSupport : ["word", "cell", "slide"],
-
-					isVisual     : true,
-					isModal      : true,
-					isInsideMode : false,
-
-					initDataType : "none",
-					initData     : "",
-
-					isUpdateOleOnResize : false,
-
-					buttons : [{"text" : "Ok", "primary" : true}]
-				}
-			]
-		},
-		{
-			name : "glavred",
-			guid : "asc.{B631E142-E40B-4B4C-90B9-2D00222A286E}",
-
-			variations : [
-				{
-					description : "glavred",
-					url         : "glavred/index.html",
-
-					icons          : ["glavred/icon.png", "glavred/icon@2x.png"],
-					isViewer       : true,
-					EditorsSupport : ["word", "cell", "slide"],
-
-					isVisual     : true,
-					isModal      : true,
-					isInsideMode : false,
-
-					initDataType : "text",
-					initData     : "",
-
-					isUpdateOleOnResize : false,
-
-					buttons : [{text : "Ok", primary : true}]
-				}
-			]
-		},
-		{
-			name : "bold",
-			guid : "asc.{14E46CC2-5E56-429C-9D55-1032B596D928}",
-
-			variations : [
-				{
-					description : "bold",
-					url         : "bold/index.html",
-
-					icons          : ["bold/icon.png", "bold/icon@2x.png"],
-					isViewer       : false,
-					EditorsSupport : ["word", "cell", "slide"],
-
-					isVisual     : false,
-					isModal      : false,
-					isInsideMode : false,
-
-					initDataType : "none",
-					initData     : "",
-
-					isUpdateOleOnResize : false,
-
-					buttons : []
-				}
-			]
-		},
-		{
-			name : "speech",
-			guid : "asc.{D71C2EF0-F15B-47C7-80E9-86D671F9C595}",
-
-			variations : [
-				{
-					description : "speech",
-					url         : "speech/index.html",
-
-					icons          : ["speech/icon.png", "speech/icon@2x.png"],
-					isViewer       : true,
-					EditorsSupport : ["word", "cell", "slide"],
-
-					isVisual     : false,
-					isModal      : false,
-					isInsideMode : false,
-
-					initDataType : "text",
-					initData     : "",
-
-					isUpdateOleOnResize : false,
-
-					buttons : []
-				}
-			]
-		},
-		{
-			name : "youtube",
-			guid : "asc.{38E022EA-AD92-45FC-B22B-49DF39746DB4}",
-
-			variations : [
-				{
-					description : "youtube",
-					url         : "youtube/index.html",
-
-					icons          : ["youtube/icon.png", "youtube/icon@2x.png"],
-					isViewer       : true,
-					EditorsSupport : ["word", "cell", "slide"],
-
-					isVisual     : true,
-					isModal      : true,
-					isInsideMode : false,
-
-					initDataType : "ole",
-					initData     : "",
-
-					isUpdateOleOnResize : false,
-
-					buttons : [{text : "Ok", primary : true},
-						{text : "Cancel", primary : false}]
-				}
-			]
-		},
-		{
-			"name" : "cbr",
-			"guid" : "asc.{5F9D4EB4-AF61-46EF-AE25-46C96E75E1DD}",
-
-			"variations" : [
-				{
-					"description" : "cbr",
-					"url"         : "cbr/index.html",
-
-					"icons"          : ["cbr/icon.png", "cbr/icon@2x.png"],
-					//            "isViewer"        : true,
-					"isViewer"       : false,
-					"EditorsSupport" : ["word", "cell", "slide"],
-
-					//            "isVisual"        : true,
-					//            "isModal"         : true,
-					"isVisual"     : false,
-					"isModal"      : false,
-					"isInsideMode" : false,
-
-					"initDataType" : "none",
-					"initData"     : "",
-
-					//            "isUpdateOleOnResize" : true,
-					"isUpdateOleOnResize" : false,
-
-					//            "buttons"         : [ { "text": "Ok", "primary": true },
-					//                                { "text": "Cancel", "primary": false } ]
-					"buttons" : []
-				}
-			]
-		},
-		{
-			"name"    : "ocr(Tesseract.js)",
-			"guid"    : "asc.{440EBF13-9B19-4BD8-8621-05200E58140B}",
-			"baseUrl" : "",
-
-			"variations" : [
-				{
-					"description" : "ocr",
-					"url"         : "ocr/index.html",
-
-					"icons"          : ["ocr/icon.png", "ocr/icon@2x.png"],
-					"isViewer"       : false,
-					"EditorsSupport" : ["word"],
-
-					"isVisual"     : true,
-					"isModal"      : false,
-					"isInsideMode" : false,
-
-					"initDataType" : "html",
-					"initData"     : "",
-
-					"isUpdateOleOnResize" : false,
-
-					"buttons" : [{"text" : "Insert In Document", "primary" : true},
-						{"text" : "Cancel", "primary" : false}]
-				}
-			]
-		},
-		{
-			"name" : "yandextranslate",
-			"guid" : "asc.{D3E759F7-3947-4BD6-B066-E184BBEDC675}",
-
-			"variations" : [
-				{
-					"description" : "yandextranslate",
-					"url"         : "yandextranslate/index.html",
-
-					"icons"          : ["yandextranslate/icon.png", "yandextranslate/icon@2x.png"],
-					"isViewer"       : false,
-					"EditorsSupport" : ["word", "cell", "slide"],
-
-					"isVisual"     : false,
-					"isModal"      : false,
-					"isInsideMode" : false,
-
-					"initDataType" : "text",
-					"initData"     : "",
-
-					"isUpdateOleOnResize" : false,
-
-					"buttons" : []
-				}
-			]
-		},
-		{
-			"name" : "ClipArt",
-			"guid" : "asc.{F5BACB61-64C5-4711-AC8A-D01EC3B2B6F1}",
-
-			"variations" : [
-				{
-					"description" : "ClipArt",
-					"url"         : "clipart/index.html",
-
-					"icons"          : ["clipart/icon.png", "clipart/icon@2x.png"],
-					"isViewer"       : true,
-					"EditorsSupport" : ["word"],
-
-					"isVisual"     : true,
-					"isModal"      : false,
-					"isInsideMode" : true,
-
-					"initDataType" : "none",
-					"initData"     : "",
-
-					"isUpdateOleOnResize" : false,
-
-					"buttons" : [{"text" : "Ok", "primary" : true}]
-				}
-			]
-		}
-	];
-
-	window.g_asc_plugins.loadExtensionPlugins(_plugins);
-}

@@ -75,11 +75,17 @@ var c_oAscError = Asc.c_oAscError;
 		this.onUpdateDocumentModified(AscCommon.History.Is_Modified());
 	};
 	
-	asc['spreadsheet_api'].prototype._onNeedParams = function(data) 
+	asc['spreadsheet_api'].prototype._onNeedParams = function(data, opt_isPassword)
 	{
-		var cp = JSON.parse("{\"codepage\":46,\"delimiter\":1}");
-		cp['encodings'] = AscCommon.getEncodingParams();
-		this.handlers.trigger("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(Asc.c_oAscAdvancedOptionsID.CSV, cp), AscCommon.c_oAscAdvancedOptionsAction.Open);
+		var options;
+		if(opt_isPassword){
+			options = new AscCommon.asc_CAdvancedOptions(Asc.c_oAscAdvancedOptionsID.DRM);
+		} else {
+			var cp = JSON.parse("{\"codepage\":46,\"delimiter\":1}");
+			cp['encodings'] = AscCommon.getEncodingParams();
+			options = new AscCommon.asc_CAdvancedOptions(Asc.c_oAscAdvancedOptionsID.CSV, cp);
+		}
+		this.handlers.trigger("asc_onAdvancedOptions", options, AscCommon.c_oAscAdvancedOptionsAction.Open);
 	};
 	
 	asc['spreadsheet_api'].prototype.asc_addImageDrawingObject = function(url)
@@ -105,7 +111,9 @@ var c_oAscError = Asc.c_oAscError;
 
 window["Asc"]['spreadsheet_api'].prototype.asc_setAdvancedOptions = function(idOption, option) 
 {
-	window["AscDesktopEditor"]["SetAdvancedOptions"]("" + option.asc_getCodePage(), "" + option.asc_getDelimiter());
+	if (window["Asc"].c_oAscAdvancedOptionsID.CSV === idOption) {
+		window["AscDesktopEditor"]["SetAdvancedOptions"]("" + option.asc_getCodePage(), "" + option.asc_getDelimiter());
+	}
 };
 window["Asc"]['spreadsheet_api'].prototype["asc_setAdvancedOptions"] = window["Asc"]['spreadsheet_api'].prototype.asc_setAdvancedOptions;
 
