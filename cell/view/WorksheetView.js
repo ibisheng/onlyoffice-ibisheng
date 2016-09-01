@@ -32,11 +32,10 @@
 
 "use strict";
 (/**
- * @param {jQuery} $
  * @param {Window} window
  * @param {undefined} undefined
  */
-    function ( $, window, undefined ) {
+    function (window, undefined) {
 
 
     /*
@@ -5425,12 +5424,13 @@
             to1 = this.model.workbook.dependencyFormulas.getNode( this.model.getId(), c.getName() );
             for ( var id2 in nodes ) {
                 if ( this.depDrawCells[id2] ) {
-                    $.extend( this.depDrawCells[id2].to, to )
+                    // remove extend
+                    //$.extend( this.depDrawCells[id2].to, to )
                 }
                 else {
-                    this.depDrawCells[id2] = {}
-                    this.depDrawCells[id2].from = nodes[id2].returnCell()
-                    this.depDrawCells[id2].to = {}
+                    this.depDrawCells[id2] = {};
+                    this.depDrawCells[id2].from = nodes[id2].returnCell();
+                    this.depDrawCells[id2].to = {};
                     this.depDrawCells[id2].to[id] = to1;
                 }
             }
@@ -13801,4 +13801,4 @@
     //------------------------------------------------------------export---------------------------------------------------
     window['AscCommonExcel'] = window['AscCommonExcel'] || {};
     window["AscCommonExcel"].WorksheetView = WorksheetView;
-})( jQuery, window );
+})(window);
