@@ -1078,6 +1078,7 @@
 	prot                                         = c_oAscAdvancedOptionsID;
 	prot['CSV']                                  = prot.CSV;
 	prot['TXT']                                  = prot.TXT;
+	prot['DRM']                                  = prot.DRM;
 	window['Asc']['c_oAscFontRenderingModeType'] = window['Asc'].c_oAscFontRenderingModeType = c_oAscFontRenderingModeType;
 	prot                                   = c_oAscFontRenderingModeType;
 	prot['noHinting']                      = prot.noHinting;

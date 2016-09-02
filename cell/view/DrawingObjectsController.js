@@ -306,6 +306,22 @@ DrawingObjectsController.prototype.handleChartDoubleClick = function()
     this.checkSelectedObjectsAndFireCallback(function(){
         drawingObjects.showChartSettings();
     }, []);
+}
+DrawingObjectsController.prototype.handleOleObjectDoubleClick = function(drawing, oleObject, e, x, y, pageIndex)
+{
+    var drawingObjects = this.drawingObjects;
+    this.checkSelectedObjectsAndFireCallback(function(){
+        var pluginData = new Asc.CPluginData();
+        pluginData.setAttribute("data", oleObject.m_sData);
+        pluginData.setAttribute("guid", oleObject.m_sApplicationId);
+        pluginData.setAttribute("width", oleObject.extX);
+        pluginData.setAttribute("height", oleObject.extY);
+        pluginData.setAttribute("widthPix", oleObject.m_nPixWidth);
+        pluginData.setAttribute("heightPix", oleObject.m_nPixHeight);
+        pluginData.setAttribute("objectId", oleObject.Id);
+        window["Asc"]["editor"].asc_pluginRun(oleObject.m_sApplicationId, 0, pluginData);
+        this.onMouseUp(e, x, y);
+    }, []);
 };
 
 DrawingObjectsController.prototype.addChartDrawingObject = function(options)
@@ -403,6 +419,31 @@ DrawingObjectsController.prototype.addImageFromParams = function(rasterImageId, 
     image.checkDrawingBaseCoords();
     this.selectObject(image, 0);
     image.addToRecalculate();
+    this.startRecalculate();
+};
+
+DrawingObjectsController.prototype.addOleObjectFromParams = function(fPosX, fPosY, fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId){
+    History.Create_NewPoint();
+    var oOleObject = this.createOleObject(sData, sApplicationId, sLocalUrl, fPosX, fPosY, fWidth, fHeight, nWidthPix, nHeightPix);
+    this.resetSelection();
+    oOleObject.setWorksheet(this.drawingObjects.getWorksheetModel());
+    oOleObject.setDrawingObjects(this.drawingObjects);
+    oOleObject.addToDrawingObjects();
+    oOleObject.checkDrawingBaseCoords();
+    this.selectObject(oOleObject, 0);
+    oOleObject.addToRecalculate();
+    this.startRecalculate();
+};
+
+DrawingObjectsController.prototype.editOleObjectFromParams = function(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight, bResize){
+    if(!bResize){
+        History.Create_NewPoint();
+    }
+    oOleObject.setData(sData);
+    var _blipFill           = new AscFormat.CBlipFill();
+    _blipFill.RasterImageId = sImageUrl;
+    oOleObject.setBlipFill(_blipFill);
+    oOleObject.setPixSizes(nPixWidth, nPixHeight);
     this.startRecalculate();
 };
 

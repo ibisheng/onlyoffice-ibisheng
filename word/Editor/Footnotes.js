@@ -47,6 +47,8 @@ function CFootnotesController(LogicDocument)
 	this.Footnote = {}; // Список всех сносок с ключом - Id.
 	this.Pages    = [];
 
+	this.NeedShift = false; // Нужно ли делать перенос после пересчета.
+
 	// Специальные сноски
 	this.ContinuationNoticeFootnote    = null;
 	this.ContinuationSeparatorFootnote = null;
@@ -91,6 +93,11 @@ CFootnotesController.prototype.Init = function()
 	this.SeparatorFootnote = new CFootEndnote(this);
 	this.SeparatorFootnote.Paragraph_Add(new ParaSeparator(), false);
 	var oParagraph = this.SeparatorFootnote.Get_ElementByIndex(0);
+	oParagraph.Set_Spacing({After : 0, Line : 1, LineRule : Asc.linerule_Auto}, false);
+
+	this.ContinuationSeparatorFootnote = new CFootEndnote(this);
+	this.ContinuationSeparatorFootnote.Paragraph_Add(new ParaContinuationSeparator(), false);
+	oParagraph = this.ContinuationSeparatorFootnote.Get_ElementByIndex(0);
 	oParagraph.Set_Spacing({After : 0, Line : 1, LineRule : Asc.linerule_Auto}, false);
 };
 /**
@@ -150,46 +157,92 @@ CFootnotesController.prototype.Reset = function(nPageIndex, oSectPr)
  */
 CFootnotesController.prototype.Recalculate = function(nPageAbs, nColumnAbs, Y, YLimit)
 {
-	if (true === this.IsEmptyPageColumn(nPageAbs, nColumnAbs))
+	var oPrevColumn = (nColumnAbs > 0 ? this.Pages[nPageAbs].Columns[nColumnAbs - 1] : (nPageAbs > 0 ? this.Pages[nPageAbs - 1].Columns[this.Pages[nPageAbs - 1].Columns.length - 1] : null));
+	if (true === this.IsEmptyPageColumn(nPageAbs, nColumnAbs) && (null === oPrevColumn || true !== oPrevColumn.Continue))
 		return;
 
-	var oPage   = this.Pages[nPageAbs];
-	var oColumn = oPage.Columns[nColumnAbs];
+	var oPage         = this.Pages[nPageAbs];
+	var oColumn       = oPage.Columns[nColumnAbs];
 	var nColumnsCount = oPage.Columns.length;
 
 	var X      = oColumn.X;
 	var XLimit = oColumn.XLimit;
+	oColumn.YLimit = YLimit;
 
 	// Мы пересчет начинаем с 0, потом просто делаем сдвиг, через функцию Shift.
-
-	var CurY = Y;
-
-	if (null !== this.SeparatorFootnote)
+	if (null !== oPrevColumn && true === oPrevColumn.Continue && oPrevColumn.Elements.length > 0)
 	{
-		this.SeparatorFootnote.Prepare_RecalculateObject();
-		this.SeparatorFootnote.Reset(X, CurY, XLimit, 10000);
-		this.SeparatorFootnote.Set_StartPage(nPageAbs, nColumnAbs, nColumnsCount);
-		this.SeparatorFootnote.Recalculate_Page(0, true);
-		oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.Save_RecalculateObject();
+		var oLastFootnote = oPrevColumn.Elements[oPrevColumn.Elements.length - 1];
+		if (oLastFootnote !== oColumn.Elements[0])
+			oColumn.Elements.splice(0, 0, oLastFootnote);
 
-		var Bounds = this.SeparatorFootnote.Get_PageBounds(0);
-		CurY += Bounds.Bottom - Bounds.Top;
+		oColumn.ContinuePrev = true;
+		oColumn.Y            = Y;
 	}
 
+	var _YLimit = YLimit - oColumn.Y;
+	var CurY = 0;
+
+	if (oColumn.ContinuePrev)
+	{
+		if (null !== this.ContinuationSeparatorFootnote)
+		{
+			this.ContinuationSeparatorFootnote.Prepare_RecalculateObject();
+			this.ContinuationSeparatorFootnote.Reset(X, CurY, XLimit, _YLimit);
+			this.ContinuationSeparatorFootnote.Set_StartPage(nPageAbs, nColumnAbs, nColumnsCount);
+			this.ContinuationSeparatorFootnote.Recalculate_Page(0, true);
+			oColumn.ContinuationSeparatorRecalculateObject = this.ContinuationSeparatorFootnote.Save_RecalculateObject();
+
+			var Bounds = this.ContinuationSeparatorFootnote.Get_PageBounds(0);
+			CurY += Bounds.Bottom - Bounds.Top;
+		}
+	}
+	else
+	{
+		if (null !== this.SeparatorFootnote)
+		{
+			this.SeparatorFootnote.Prepare_RecalculateObject();
+			this.SeparatorFootnote.Reset(X, CurY, XLimit, _YLimit);
+			this.SeparatorFootnote.Set_StartPage(nPageAbs, nColumnAbs, nColumnsCount);
+			this.SeparatorFootnote.Recalculate_Page(0, true);
+			oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.Save_RecalculateObject();
+
+			var Bounds = this.SeparatorFootnote.Get_PageBounds(0);
+			CurY += Bounds.Bottom - Bounds.Top;
+		}
+	}
+
+	oColumn.YStart = CurY;
 	for (var nIndex = 0; nIndex < oColumn.Elements.length; ++nIndex)
 	{
 		var Footnote = oColumn.Elements[nIndex];
-		Footnote.Reset(X, CurY, XLimit, 10000);
-		Footnote.Set_StartPage(nPageAbs, nColumnAbs, nColumnsCount);
+		if (0 !== nIndex || true !== oColumn.ContinuePrev)
+		{
+			Footnote.Reset(X, CurY, XLimit, _YLimit);
+			Footnote.Set_StartPage(nPageAbs, nColumnAbs, nColumnsCount);
+		}
 
-		var CurPage      = 0;
-		var RecalcResult = recalcresult2_NextPage;
-		while (recalcresult2_End != RecalcResult)
-			RecalcResult = Footnote.Recalculate_Page(CurPage++, true);
+		var nRelativePage = Footnote.GetElementPageIndex(nPageAbs, nColumnAbs);
+		if (recalcresult2_NextPage === Footnote.Recalculate_Page(nRelativePage, true))
+		{
+			if (nIndex === oColumn.Elements.length - 1)
+			{
+				// Продолжаем сноску
+				oColumn.Continue = true;
+			}
+			else
+			{
+				// TODO: Надо пересчитать данную колонку заново, с учетом того, что последнюю сноску необходимо перенести на новую страницу
+			}
 
-		var Bounds = Footnote.Get_PageBounds(0);
+			break;
+		}
+
+		var Bounds = Footnote.Get_PageBounds(nRelativePage);
 		CurY += Bounds.Bottom - Bounds.Top;
 	}
+
+	this.NeedShift = true;
 };
 /**
  * Получаем суммарную высоту, занимаемую сносками на заданной странице.
@@ -205,18 +258,32 @@ CFootnotesController.prototype.GetHeight = function(nPageAbs, nColumnAbs)
 	var oColumn = this.Pages[nPageAbs].Columns[nColumnAbs];
 
 	var nHeight = 0;
-	if (null !== oColumn.SeparatorRecalculateObject)
+	if (true === oColumn.ContinuePrev)
 	{
-		this.SeparatorFootnote.Load_RecalculateObject(oColumn.SeparatorRecalculateObject);
-		var Bounds = this.SeparatorFootnote.Get_PageBounds(0);
-		nHeight += Bounds.Bottom - Bounds.Top;
+		if (null !== oColumn.ContinuationSeparatorRecalculateObject)
+		{
+			this.ContinuationSeparatorFootnote.Load_RecalculateObject(oColumn.ContinuationSeparatorRecalculateObject);
+			var oBounds = this.ContinuationSeparatorFootnote.Get_PageBounds(0);
+			nHeight += oBounds.Bottom - oBounds.Top;
+		}
+	}
+	else
+	{
+		if (null !== oColumn.SeparatorRecalculateObject)
+		{
+			this.SeparatorFootnote.Load_RecalculateObject(oColumn.SeparatorRecalculateObject);
+			var oBounds = this.SeparatorFootnote.Get_PageBounds(0);
+			nHeight += oBounds.Bottom - oBounds.Top;
+		}
 	}
 
 	for (var nIndex = 0, nCount = oColumn.Elements.length; nIndex < nCount; ++nIndex)
 	{
-		var Footnote = oColumn.Elements[nIndex];
-		var Bounds   = Footnote.Get_PageBounds(0);
-		nHeight += Bounds.Bottom - Bounds.Top;
+		var oFootnote          = oColumn.Elements[nIndex];
+		var nFootnotePageIndex = oFootnote.GetElementPageIndex(nPageAbs, nColumnAbs);
+
+		var oBounds = oFootnote.Get_PageBounds(nFootnotePageIndex);
+		nHeight += oBounds.Bottom - oBounds.Top;
 	}
 
 	return nHeight;
@@ -239,16 +306,28 @@ CFootnotesController.prototype.Draw = function(nPageAbs, pGraphics)
 		if (!oColumn || oColumn.Elements.length <= 0)
 			continue;
 
-		if (null !== this.SeparatorFootnote && null !== oColumn.SeparatorRecalculateObject)
+		if (true === oColumn.ContinuePrev)
 		{
-			this.SeparatorFootnote.Load_RecalculateObject(oColumn.SeparatorRecalculateObject);
-			this.SeparatorFootnote.Draw(nPageAbs, pGraphics);
+			if (null !== this.ContinuationSeparatorFootnote && null !== oColumn.ContinuationSeparatorRecalculateObject)
+			{
+				this.ContinuationSeparatorFootnote.Load_RecalculateObject(oColumn.ContinuationSeparatorRecalculateObject);
+				this.ContinuationSeparatorFootnote.Draw(nPageAbs, pGraphics);
+			}
+		}
+		else
+		{
+			if (null !== this.SeparatorFootnote && null !== oColumn.SeparatorRecalculateObject)
+			{
+				this.SeparatorFootnote.Load_RecalculateObject(oColumn.SeparatorRecalculateObject);
+				this.SeparatorFootnote.Draw(nPageAbs, pGraphics);
+			}
 		}
 
 		for (var nIndex = 0, nCount = oColumn.Elements.length; nIndex < nCount; ++nIndex)
 		{
-			var Footnote = oColumn.Elements[nIndex];
-			Footnote.Draw(nPageAbs, pGraphics);
+			var oFootnote = oColumn.Elements[nIndex];
+			var nFootnotePageIndex = oFootnote.GetElementPageIndex(nPageAbs, nColumnIndex);
+			oFootnote.Draw(nFootnotePageIndex + oFootnote.StartPage, pGraphics);
 		}
 	}
 };
@@ -261,34 +340,57 @@ CFootnotesController.prototype.Draw = function(nPageAbs, pGraphics)
  */
 CFootnotesController.prototype.Shift = function(nPageAbs, nColumnAbs, dX, dY)
 {
+	if (true !== this.NeedShift)
+		return;
+
 	var oColumn = this.private_GetPageColumn(nPageAbs, nColumnAbs);
 	if (!oColumn)
 		return;
 
-	if (null !== this.SeparatorFootnote && null !== oColumn.SeparatorRecalculateObject)
+	if (true === oColumn.ContinuePrev)
 	{
-		this.SeparatorFootnote.Load_RecalculateObject(oColumn.SeparatorRecalculateObject);
-		this.SeparatorFootnote.Shift(0, dX, dY);
-		oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.Save_RecalculateObject();
+		if (null !== this.ContinuationSeparatorFootnote && null !== oColumn.ContinuationSeparatorRecalculateObject)
+		{
+			this.ContinuationSeparatorFootnote.Load_RecalculateObject(oColumn.ContinuationSeparatorRecalculateObject);
+			this.ContinuationSeparatorFootnote.Shift(0, dX, dY);
+			oColumn.ContinuationSeparatorRecalculateObject = this.ContinuationSeparatorFootnote.Save_RecalculateObject();
+		}
+	}
+	else
+	{
+		if (null !== this.SeparatorFootnote && null !== oColumn.SeparatorRecalculateObject)
+		{
+			this.SeparatorFootnote.Load_RecalculateObject(oColumn.SeparatorRecalculateObject);
+			this.SeparatorFootnote.Shift(0, dX, dY);
+			oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.Save_RecalculateObject();
+		}
 	}
 
 	for (var nIndex = 0, nCount = oColumn.Elements.length; nIndex < nCount; ++nIndex)
 	{
-		var Footnote = oColumn.Elements[nIndex];
-		Footnote.Shift(0, dX, dY);
+		var oFootnote = oColumn.Elements[nIndex];
+		var nFootnotePageIndex = oFootnote.GetElementPageIndex(nPageAbs, nColumnAbs);
+		oFootnote.Shift(nFootnotePageIndex, dX, dY);
 	}
+
+	this.NeedShift = false;
 };
 /**
  * Добавляем заданную сноску на страницу для пересчета.
  * @param {number} nPageAbs
  * @param {number} nColumnAbs
  * @param {CFootEndnote} oFootnote
+ * @param {number} dBottom
  */
-CFootnotesController.prototype.AddFootnoteToPage = function(nPageAbs, nColumnAbs, oFootnote)
+CFootnotesController.prototype.AddFootnoteToPage = function(nPageAbs, nColumnAbs, oFootnote, dBottom)
 {
 	var oColumn = this.private_GetPageColumn(nPageAbs, nColumnAbs);
 	if (!oColumn)
 		return;
+
+	// TODO: Проверить ссылку с предыдущей колонки
+	if (oColumn.Elements.length <= 0)
+		oColumn.Y = dBottom;
 
 	oColumn.Elements.push(oFootnote);
 };
@@ -326,10 +428,15 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nCol
 
 		for (var nIndex = 0, nCount = oColumn.Elements.length; nIndex < nCount; ++nIndex)
 		{
-			if (oFootnote && oFootnote === oColumn.Elements[nIndex])
-				return nFootnoteIndex;
+			var oCurFootnote = oColumn.Elements[nIndex];
+			// Сноски начинающиеся не на данной колонке мы не учитываем
+			if (0 === oCurFootnote.GetElementPageIndex(nPageAbs, nColumnIndex))
+			{
+				if (oFootnote && oFootnote === oCurFootnote)
+					return nFootnoteIndex;
 
-			nFootnoteIndex++;
+				nFootnoteIndex++;
+			}
 		}
 	}
 
@@ -417,10 +524,13 @@ CFootnotesController.prototype.Refresh_RecalcData2 = function(nRelPageIndex)
 		this.LogicDocument.Refresh_RecalcData2(nIndex, nAbsPageIndex);
 	}
 };
-CFootnotesController.prototype.Get_PageContentStartPos = function(PageAbs)
+CFootnotesController.prototype.Get_PageContentStartPos = function(nPageAbs, nColumnAbs)
 {
-	//TODO: Реализовать
-	return {X : 0, Y : 0, XLimit : 0, YLimit : 0};
+	var oColumn = this.private_GetPageColumn(nPageAbs, nColumnAbs);
+	if (!oColumn)
+		return {X : 0, Y : 0, XLimit : 0, YLimit : 0};
+
+	return {X : oColumn.X, Y : oColumn.YStart, XLimit : oColumn.XLimit, YLimit : oColumn.YLimit - oColumn.Y};
 };
 CFootnotesController.prototype.GetCurFootnote = function()
 {
@@ -432,8 +542,7 @@ CFootnotesController.prototype.IsInDrawing = function(X, Y, PageAbs)
 	if (oResult)
 	{
 		var oFootnote = oResult.Footnote;
-		var PageRel = oFootnote.GetRelaitivePageIndex(PageAbs);
-		return oFootnote.Is_InDrawing(X, Y, PageRel);
+		return oFootnote.Is_InDrawing(X, Y, oResult.FootnotePageIndex);
 	}
 
 	return false;
@@ -444,8 +553,7 @@ CFootnotesController.prototype.IsTableBorder = function(X, Y, PageAbs)
 	if (oResult)
 	{
 		var oFootnote = oResult.Footnote;
-		var PageRel = oFootnote.GetRelaitivePageIndex(PageAbs);
-		return oFootnote.Is_TableBorder(X, Y, PageRel);
+		return oFootnote.Is_TableBorder(X, Y, oResult.FootnotePageIndex);
 	}
 
 	return null;
@@ -456,8 +564,7 @@ CFootnotesController.prototype.IsInText = function(X, Y, PageAbs)
 	if (oResult)
 	{
 		var oFootnote = oResult.Footnote;
-		var PageRel = oFootnote.GetRelaitivePageIndex(PageAbs);
-		return oFootnote.Is_InText(X, Y, PageRel);
+		return oFootnote.Is_InText(X, Y, oResult.FootnotePageIndex);
 	}
 
 	return null;
@@ -468,8 +575,7 @@ CFootnotesController.prototype.GetNearestPos = function(X, Y, PageAbs, bAnchor, 
 	if (oResult)
 	{
 		var oFootnote = oResult.Footnote;
-		var PageRel = oFootnote.GetRelaitivePageIndex(PageAbs);
-		return oFootnote.Get_NearestPos(PageRel, X, Y, bAnchor, Drawing);
+		return oFootnote.Get_NearestPos(oResult.FootnotePageIndex, X, Y, bAnchor, Drawing);
 	}
 
 	return null;
@@ -488,29 +594,33 @@ CFootnotesController.prototype.CheckHitInFootnote = function(X, Y, nPageAbs)
 
 	var oPage   = this.Pages[nPageAbs];
 	var oColumn = null;
-	for (var nColumnIndex = 0, nColumnsCount = oPage.Columns.length; nColumnIndex < nColumnsCount; ++nColumnIndex)
+	var nFindedColumnIndex = 0, nColumnsCount = oPage.Columns.length;
+	for (var nColumnIndex = 0; nColumnIndex < nColumnsCount; ++nColumnIndex)
 	{
 		if (nColumnIndex < nColumnsCount - 1)
 		{
 			if (X < (oPage.Columns[nColumnIndex].XLimit + oPage.Columns[nColumnIndex + 1].X) / 2)
 			{
-				oColumn = oPage.Columns[nColumnIndex];
+				oColumn            = oPage.Columns[nColumnIndex];
+				nFindedColumnIndex = nColumnIndex;
 				break;
 			}
 		}
 		else
 		{
-			oColumn = oPage.Columns[nColumnIndex];
+			oColumn            = oPage.Columns[nColumnIndex];
+			nFindedColumnIndex = nColumnIndex;
 		}
 	}
 
-	if (!oColumn)
+	if (!oColumn || nFindedColumnIndex >= nColumnsCount)
 		return false;
 
 	for (var nIndex = 0, nCount = oColumn.Elements.length; nIndex < nCount; ++nIndex)
 	{
-		var oFootnote = oColumn.Elements[nIndex];
-		var oBounds   = oFootnote.Get_PageBounds(0);
+		var oFootnote          = oColumn.Elements[nIndex];
+		var nFootnotePageIndex = oFootnote.GetElementPageIndex(nPageAbs, nFindedColumnIndex);
+		var oBounds            = oFootnote.Get_PageBounds(nFootnotePageIndex);
 
 		if (oBounds.Top <= Y)
 			return true;
@@ -543,7 +653,7 @@ CFootnotesController.prototype.StartSelection = function(X, Y, PageAbs, MouseEve
 	this.Selection.Start = oResult;
 	this.Selection.End   = oResult;
 
-	this.Selection.Start.Footnote.Selection_SetStart(X, Y, 0, MouseEvent);
+	this.Selection.Start.Footnote.Selection_SetStart(X, Y, this.Selection.Start.FootnotePageIndex, MouseEvent);
 
 	this.CurFootnote = this.Selection.Start.Footnote;
 
@@ -586,16 +696,16 @@ CFootnotesController.prototype.EndSelection = function(X, Y, PageAbs, MouseEvent
 		if (this.Selection.Start.Page > this.Selection.End.Page || this.Selection.Start.Index > this.Selection.End.Index)
 		{
 			this.Selection.Start.Footnote.Selection_SetEnd(-MEASUREMENT_MAX_MM_VALUE, -MEASUREMENT_MAX_MM_VALUE, 0, MouseEvent);
-			this.Selection.End.Footnote.Selection_SetStart(MEASUREMENT_MAX_MM_VALUE, MEASUREMENT_MAX_MM_VALUE, 0, MouseEvent);
+			this.Selection.End.Footnote.Selection_SetStart(MEASUREMENT_MAX_MM_VALUE, MEASUREMENT_MAX_MM_VALUE, this.Selection.End.Footnote.Pages.length - 1, MouseEvent);
 			this.Selection.Direction = -1;
 		}
 		else
 		{
-			this.Selection.Start.Footnote.Selection_SetEnd(MEASUREMENT_MAX_MM_VALUE, MEASUREMENT_MAX_MM_VALUE, 0, MouseEvent);
+			this.Selection.Start.Footnote.Selection_SetEnd(MEASUREMENT_MAX_MM_VALUE, MEASUREMENT_MAX_MM_VALUE, this.Selection.Start.Footnote.Pages.length - 1, MouseEvent);
 			this.Selection.End.Footnote.Selection_SetStart(-MEASUREMENT_MAX_MM_VALUE, -MEASUREMENT_MAX_MM_VALUE, 0, MouseEvent);
 			this.Selection.Direction = 1;
 		}
-		this.Selection.End.Footnote.Selection_SetEnd(X, Y, 0, MouseEvent);
+		this.Selection.End.Footnote.Selection_SetEnd(X, Y, this.Selection.End.FootnotePageIndex, MouseEvent);
 
 		var oRange = this.private_GetFootnotesRange(this.Selection.Start, this.Selection.End);
 		for (var sFootnoteId in oRange)
@@ -610,7 +720,7 @@ CFootnotesController.prototype.EndSelection = function(X, Y, PageAbs, MouseEvent
 	}
 	else
 	{
-		this.Selection.End.Footnote.Selection_SetEnd(X, Y, 0, MouseEvent);
+		this.Selection.End.Footnote.Selection_SetEnd(X, Y, this.Selection.End.FootnotePageIndex, MouseEvent);
 		this.Selection.Footnotes = {};
 		this.Selection.Footnotes[this.Selection.Start.Footnote.Get_Id()] = this.Selection.Start.Footnote;
 		this.Selection.Direction = 0;
@@ -789,14 +899,17 @@ CFootnotesController.prototype.private_GetFootnoteOnPageByXY = function(X, Y, nP
 	for (var nIndex = oColumn.Elements.length - 1; nIndex >= 0; --nIndex)
 	{
 		var oFootnote = oColumn.Elements[nIndex];
-		var oBounds   = oFootnote.Get_PageBounds(0);
+
+		var nElementPageIndex = oFootnote.GetElementPageIndex(nPageAbs, nColumnIndex);
+		var oBounds = oFootnote.Get_PageBounds(nElementPageIndex);
 
 		if (oBounds.Top <= Y || 0 === nIndex)
 			return {
-				Footnote : oFootnote,
-				Index    : nIndex,
-				Page     : nPageAbs,
-				Column   : nColumnIndex
+				Footnote          : oFootnote,
+				Index             : nIndex,
+				Page              : nPageAbs,
+				Column            : nColumnIndex,
+				FootnotePageIndex : nElementPageIndex
 			};
 	}
 
@@ -1748,7 +1861,7 @@ CFootnotesController.prototype.MoveCursorToXY = function(X, Y, PageAbs, AddToSel
 		return;
 
 	var oFootnote = oResult.Footnote;
-	var PageRel   = oFootnote.GetRelaitivePageIndex(PageAbs);
+	var PageRel   = oResult.FootnotePageIndex;
 	if (true === AddToSelect)
 	{
 		var StartFootnote = null;
@@ -2098,8 +2211,8 @@ CFootnotesController.prototype.DrawSelectionOnPage = function(nPageAbs)
 			var oFootnote = oColumn.Elements[nIndex];
 			if (oFootnote === this.Selection.Footnotes[oFootnote.Get_Id()])
 			{
-				var nPageRel = oFootnote.GetRelaitivePageIndex(nPageAbs, nColumnIndex);
-				oFootnote.Selection_Draw_Page(nPageRel);
+				var nFootnotePageIndex = oFootnote.GetElementPageIndex(nPageAbs, nColumnIndex);
+				oFootnote.Selection_Draw_Page(nFootnotePageIndex);
 			}
 		}
 	}
@@ -2145,8 +2258,7 @@ CFootnotesController.prototype.CheckPosInSelection = function(X, Y, PageAbs, Nea
 	if (oResult)
 	{
 		var oFootnote = oResult.Footnote;
-		var PageRel = oFootnote.GetRelaitivePageIndex(PageAbs);
-		return oFootnote.Selection_Check(X, Y, PageRel, NearPos);
+		return oFootnote.Selection_Check(X, Y, oResult.FootnotePageIndex, NearPos);
 	}
 
 	return false;
@@ -2225,8 +2337,7 @@ CFootnotesController.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseE
 	if (oResult)
 	{
 		var oFootnote = oResult.Footnote;
-		var PageRel = oFootnote.GetRelaitivePageIndex(PageAbs);
-		oFootnote.Update_CursorType(X, Y, PageRel, MouseEvent);
+		oFootnote.Update_CursorType(X, Y, oResult.FootnotePageIndex, MouseEvent);
 	}
 };
 CFootnotesController.prototype.PasteFormatting = function(TextPr, ParaPr)
@@ -2813,8 +2924,12 @@ function CFootEndnotePageColumn()
 	this.Y      = 0;
 	this.XLimit = 0;
 	this.YLimit = 0;
+	this.YStart = 0; // фактически тут задается высота специальной сноски-разделителя
 
 	this.Elements = [];
+	this.Continue = false;
+
+	this.ContinuePrev = false;
 
 	this.SeparatorRecalculateObject             = null;
 	this.ContinuationSeparatorRecalculateObject = null;
@@ -2826,8 +2941,12 @@ CFootEndnotePageColumn.prototype.Reset = function()
 	this.Y      = 0;
 	this.XLimit = 0;
 	this.YLimit = 0;
+	this.YStart = 0;
 
 	this.Elements = [];
+	this.Continue = false;
+
+	this.ContinuePrev = false;
 
 	this.SeparatorRecalculateObject             = null;
 	this.ContinuationSeparatorRecalculateObject = null;

@@ -416,7 +416,7 @@
 		};
 
 		Range.prototype.isOneCell = function () {
-			return this.r1 == this.r2 && this.c1 == this.c2;
+			return this.r1 === this.r2 && this.c1 === this.c2;
 		};
 
 		Range.prototype.union = function (range) {

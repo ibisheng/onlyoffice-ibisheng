@@ -144,7 +144,10 @@
 						if(ws.getCellEditMode() === true)
 						{
 							var text = data1.innerText;
-							window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+							if(text)
+							{
+								window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+							}
 						}
 						else
 						{
@@ -158,7 +161,10 @@
 						if(ws.getCellEditMode() === true)
 						{
 							var text = t.pasteProcessor.pasteFromBinary(ws, data1, true);
-							window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+							if(text)
+							{
+								window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+							}
 						}
 						else
 						{
@@ -171,7 +177,10 @@
 					{
 						if(ws.getCellEditMode() === true)
 						{
-							window["Asc"]["editor"].wb.cellEditor.pasteText(data1);
+							if(text)
+							{
+								window["Asc"]["editor"].wb.cellEditor.pasteText(data1);
+							}
 						}
 						else
 						{
@@ -1287,9 +1296,10 @@
 				drawingObject.graphicObject.setWordFlag(false, newCDocument);
 				
 				var oTempDrawingDocument = ws.model.DrawingDocument;
+				var oldLogicDocument = oTempDrawingDocument.m_oLogicDocument;
 				oTempDrawingDocument.m_oLogicDocument = newCDocument;
-				
 				drawingObject.graphicObject.graphicObject.Set_Parent(newCDocument);
+				oTempDrawingDocument.m_oLogicDocument = oldLogicDocument;
 				
 				History.TurnOn();
 				
@@ -2521,7 +2531,7 @@
 				//настройки параграфа
 				paragraph.elem.CompiledPr.NeedRecalc = true;
 				var paraPr = paragraph.elem.Get_CompiledPr();
-				var paragraphFontFamily = paraPr.TextPr.FontFamily.Name;
+				//var paragraphFontFamily = paraPr.TextPr.FontFamily.Name;
 				
 				//горизонтальное выравнивание
 				var horisonalAlign = this._getAlignHorisontal(paraPr);
@@ -2540,7 +2550,7 @@
 				//Numbering
 				var LvlPr = null;
 				var Lvl = null;
-				var oNumPr = paragraph.elem.Numbering_Get();
+				var oNumPr = paragraph.elem.Numbering_Get ? paragraph.elem.Numbering_Get() : null;
 				var numberingText = null;
 				var formatText;
 				if(oNumPr != null)
@@ -3589,7 +3599,7 @@
 						var sSrc = oGraphicObj.getBase64Img();
 						if(sSrc.length > 0)
 						{
-							sRes += "<img style=\"max-width:100%;\" width=\""+Math.round(ParaItem.Extent.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(ParaItem.Extent.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
+							sRes += "<img style=\"max-width:100%;\" width=\""+Math.round(ParaItem.Extent.W * AscCommon.g_dKoef_mm_to_pix)+"\" height=\""+Math.round(ParaItem.Extent.H * AscCommon.g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
 							break;
 						}
 						// var _canvas     = document.createElement('canvas');

@@ -45,13 +45,20 @@ function CFootEndnote(DocumentController)
 
 AscCommon.extendClass(CFootEndnote, CDocumentContent);
 
-CFootEndnote.prototype.GetRelaitivePageIndex = function(nPageAbs, nColumnAbs)
+CFootEndnote.prototype.GetElementPageIndex = function(nPageAbs, nColumnAbs)
 {
-	// TODO: Переделать с учетом колонок
+	// Функция аналогична Document.private_GetElementPageIndex
+	var nStartPage    = this.StartPage;
+	var nStartColumn  = this.StartColumn;
+	var nColumnsCount = this.ColumnsCount;
 
-	var StartPageAbs = this.Get_StartPage_Absolute();
-	var PagesCount   = this.Get_PagesCount();
-	return Math.max(0, Math.min(PagesCount - 1, nPageAbs - StartPageAbs));
+	return Math.max(0, nColumnAbs - nStartColumn + (nPageAbs - nStartPage) * nColumnsCount);
+};
+CFootEndnote.prototype.Get_PageContentStartPos = function(nCurPage)
+{
+	var nPageAbs   = this.Get_AbsolutePage(nCurPage);
+	var nColumnAbs = this.Get_AbsoluteColumn(nCurPage);
+	return this.Parent.Get_PageContentStartPos(nPageAbs, nColumnAbs);
 };
 CFootEndnote.prototype.Write_ToBinary2 = function(Writer)
 {

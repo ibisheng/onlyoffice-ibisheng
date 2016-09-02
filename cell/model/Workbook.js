@@ -1687,6 +1687,18 @@ Workbook.prototype.generateFontMap2=function(){
 		aRes.push(new AscFonts.CFont(i, 0, "", 0));
 	return aRes;
 };
+Workbook.prototype.getAllImageUrls = function(){
+    var aImageUrls = [];
+    for(var i = 0; i < this.aWorksheets.length; ++i){
+        this.aWorksheets[i].getAllImageUrls(aImageUrls);
+    }
+    return aImageUrls;
+};
+Workbook.prototype.reassignImageUrls = function(oImages){
+    for(var i = 0; i < this.aWorksheets.length; ++i){
+        this.aWorksheets[i].reassignImageUrls(oImages);
+    }
+};
 Workbook.prototype.recalcWB = function(isRecalcWB){
 	//todo
 };
@@ -2175,8 +2187,17 @@ Woorksheet.prototype.generateFontMap=function(oFontMap){
 		}
 	}
 };
-Woorksheet.prototype.copyFrom=function(wsFrom, sName, tableNames){
-	var i, elem, range;
+Woorksheet.prototype.getAllImageUrls = function(aImages){
+    for(var i = 0; i < this.Drawings.length; ++i){
+        this.Drawings[i].graphicObject.getAllRasterImages(aImages);
+    }
+};
+Woorksheet.prototype.reassignImageUrls = function(oImages){
+    for(var i = 0; i < this.Drawings.length; ++i){
+        this.Drawings[i].graphicObject.Reassign_ImageUrls(oImages);
+    }
+};
+Woorksheet.prototype.copyFrom=function(wsFrom, sName, tableNames){	var i, elem, range;
 	this.sName = this.workbook.checkValidSheetName(sName) ? sName : this.workbook.getUniqueSheetNameFrom(wsFrom.sName, true);
 	this.bHidden = wsFrom.bHidden;
 	this.oSheetFormatPr = wsFrom.oSheetFormatPr.clone();

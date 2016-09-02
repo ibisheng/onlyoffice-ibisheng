@@ -3081,6 +3081,7 @@ CPresentation.prototype =
         }
         this.noShowContextMenu = false;
         this.Document_UpdateInterfaceState();
+        this.Api.sendEvent("asc_onSelectionEnd");
     },
 
     OnMouseMove : function(e, X, Y, PageIndex)
@@ -3160,7 +3161,10 @@ CPresentation.prototype =
     // Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.
     Get_SelectedText : function(bClearText)
     {
-        return this.Slides[this.CurPage].graphicObjects.Get_SelectedText(bClearText);
+        if(this.Slides[this.CurPage]){
+            return this.Slides[this.CurPage].graphicObjects.Get_SelectedText(bClearText);
+        }
+        return "";
     },
 
 //-----------------------------------------------------------------------------------
@@ -3443,6 +3447,10 @@ CPresentation.prototype =
                 drawing_props.imageProps.Width = drawing_props.imageProps.w;
                 drawing_props.imageProps.Height = drawing_props.imageProps.h;
                 drawing_props.imageProps.Position = {X: drawing_props.imageProps.x, Y: drawing_props.imageProps.y};
+                if(AscFormat.isRealBool(drawing_props.imageProps.locked) && drawing_props.imageProps.locked)
+                {
+                    drawing_props.imageProps.Locked = true;
+                }
                 editor.sync_ImgPropCallback(drawing_props.imageProps);
             }
 

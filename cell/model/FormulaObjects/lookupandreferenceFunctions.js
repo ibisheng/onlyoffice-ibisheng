@@ -111,7 +111,6 @@
 
 	cADDRESS.prototype = Object.create(cBaseFunction.prototype);
 	cADDRESS.prototype.Calculate = function (arg) {
-
 		var rowNumber = arg[0], colNumber = arg[1], refType = arg[2] ? arg[2] : new cNumber(1), A1RefType = arg[3] ?
 			arg[3] : new cBool(true), sheetName = arg[4] ? arg[4] : new cEmpty();
 
@@ -176,25 +175,29 @@
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 		var strRef;
-		var strColumn = A1RefType ? g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) : colNumber;
-		var strRow;
+		var absR, absC;
 		switch (refType - 1) {
 			case AscCommonExcel.referenceType.A:
-				strRow = this._absolute(rowNumber, A1RefType);
-				strColumn = this._absolute(strColumn, A1RefType);
+				absR = true;
+				absC = true;
 				break;
 			case AscCommonExcel.referenceType.ARRC:
-				strRow = this._absolute(rowNumber, A1RefType);
+				absR = true;
+				absC = false;
 				break;
 			case AscCommonExcel.referenceType.RRAC:
-				strColumn = this._absolute(strColumn, A1RefType);
-				strRow = rowNumber;
+				absR = false;
+				absC = true;
 				break;
 			case AscCommonExcel.referenceType.R:
-				strRow = rowNumber;
+				absR = false;
+				absC = false;
 				break;
 		}
-		strRef = this._getRef(strRow, strColumn, A1RefType);
+
+		strRef = this._getRef(this._absolute(absR, rowNumber, A1RefType),
+			this._absolute(absC, A1RefType ? g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) : colNumber, A1RefType),
+			A1RefType);
 
 		return this.value =
 			new cString((cElementType.empty === sheetName.type) ? strRef : parserHelp.get3DRef(sheetName.toString(), strRef));
@@ -202,8 +205,9 @@
 	cADDRESS.prototype._getRef = function (row, col, A1RefType) {
 		return A1RefType ? col + row : 'R' + row + 'C' + col;
 	};
-	cADDRESS.prototype._absolute = function (val, A1RefType) {
-		return A1RefType ? '$' + val : '[' + val + ']';
+	cADDRESS.prototype._absolute = function (abs, val, A1RefType) {
+
+		return abs ? (A1RefType ? '$' + val : val) : (A1RefType ? val : '[' + val + ']');
 	};
 	cADDRESS.prototype.getInfo = function () {
 		return {

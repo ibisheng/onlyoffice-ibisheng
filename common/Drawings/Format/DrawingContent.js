@@ -33,7 +33,11 @@
 (function (window, undefined){
 
 
-
+    /**
+     * CDrawingDocContent
+     * @constructor
+     * @extends {CDocumentContent}
+     */
     function CDrawingDocContent(Parent, DrawingDocument, X, Y, XLimit, YLimit) {
         CDrawingDocContent.superclass.constructor.call(this, Parent, DrawingDocument, X, Y, XLimit, YLimit, false, false, true);
         this.FullRecalc = new CDocumentRecalculateState();
@@ -558,12 +562,11 @@
     CDrawingDocContent.prototype.private_GetElementPageIndexByXY = function(ElementPos, X, Y, PageIndex){
         if(this.Pages.length > 0){
             if(this.Pages[0].Sections.length > 0){
-                return CDocument.prototype.private_GetElementPageIndexByXY.call(this, ElementPos, X, Y, PageIndex);
+                return CDocument_prototype_private_GetElementPageIndexByXY.call(this, ElementPos, X, Y, PageIndex);
             }
         }
         return CDocumentContent.prototype.private_GetElementPageIndexByXY.call(this, ElementPos, X, Y, PageIndex);
     };
-
     CDrawingDocContent.prototype.Copy            = function(Parent, DrawingDocument)
     {
         var DC = new CDrawingDocContent(Parent, DrawingDocument ? DrawingDocument : this.DrawingDocument, 0, 0, 0, 0, this.Split, this.TurnOffInnerWrap, this.bPresentation);
@@ -593,6 +596,66 @@
         }
         return DC;
     };
+
+    // TODO: сделать по-нормальному!!!
+    function CDocument_prototype_private_GetElementPageIndexByXY(ElementPos, X, Y, PageIndex)
+    {
+        var Element = this.Content[ElementPos];
+    	if (!Element)
+    		return 0;
+
+    	var Page = this.Pages[PageIndex];
+    	if (!Page)
+    		return 0;
+
+    	var PageSection = null;
+    	for (var SectionIndex = 0, SectionsCount = Page.Sections.length; SectionIndex < SectionsCount; ++SectionIndex)
+    	{
+    		if (Page.Sections[SectionIndex].Pos <= ElementPos && ElementPos <= Page.Sections[SectionIndex].EndPos)
+    		{
+    			PageSection = Page.Sections[SectionIndex];
+    			break;
+    		}
+    	}
+
+    	if (!PageSection)
+    		return 0;
+
+    	var ElementStartPage   = Element.Get_StartPage_Relative();
+    	var ElementStartColumn = Element.Get_StartColumn();
+    	var ElementPagesCount  = Element.Get_PagesCount();
+
+    	var ColumnsCount = PageSection.Columns.length;
+    	var StartColumn  = 0;
+    	var EndColumn    = ColumnsCount - 1;
+
+    	if (PageIndex === ElementStartPage)
+    	{
+    		StartColumn = Element.Get_StartColumn();
+    		EndColumn   = Math.min(ElementStartColumn + ElementPagesCount - 1, ColumnsCount - 1);
+    	}
+    	else
+    	{
+    		StartColumn = 0;
+    		EndColumn   = Math.min(ElementPagesCount - ElementStartColumn + (PageIndex - ElementStartPage) * ColumnsCount, ColumnsCount - 1);
+    	}
+
+    	// TODO: Разобраться с ситуацией, когда пустые колонки стоят не только в конце
+    	while (true === PageSection.Columns[EndColumn].Empty && EndColumn > StartColumn)
+    		EndColumn--;
+
+    	var ResultColumn = EndColumn;
+    	for (var ColumnIndex = StartColumn; ColumnIndex < EndColumn; ++ColumnIndex)
+    	{
+    		if (X < (PageSection.Columns[ColumnIndex].XLimit + PageSection.Columns[ColumnIndex + 1].X) / 2)
+    		{
+    			ResultColumn = ColumnIndex;
+    			break;
+    		}
+    	}
+
+    	return this.private_GetElementPageIndex(ElementPos, PageIndex, ResultColumn, ColumnsCount);
+    }
 
     AscFormat.CDrawingDocContent = CDrawingDocContent;
 })(window);

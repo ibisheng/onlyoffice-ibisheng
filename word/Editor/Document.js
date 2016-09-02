@@ -2260,8 +2260,7 @@ CDocument.prototype.Recalculate_Page = function()
         var StartPos = this.Get_PageContentStartPos(PageIndex, StartIndex);
 
 		this.Footnotes.Reset(PageIndex, this.SectionsInfo.Get_SectPr(StartIndex).SectPr);
-
-		//this.private_RecalculatePageFootnotes(PageIndex);
+        this.private_RecalculatePageFootnotes(PageIndex, 0);
 
         this.Pages[PageIndex].ResetStartElement = this.FullRecalc.ResetStartElement;
         this.Pages[PageIndex].X                 = StartPos.X;
@@ -2765,6 +2764,9 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
     if (Index >= Count || _PageIndex > PageIndex || _ColumnIndex > ColumnIndex)
     {
         this.private_RecalculateShiftFootnotes(PageIndex, ColumnIndex);
+
+		if (Index < Count && _PageIndex === PageIndex || _ColumnIndex > ColumnIndex)
+			this.private_RecalculatePageFootnotes(_PageIndex, _ColumnIndex);
     }
 
     if (true === bReDraw)
@@ -2862,7 +2864,8 @@ CDocument.prototype.private_RecalculateIsNewSection = function(nPageAbs, nConten
 };
 CDocument.prototype.private_RecalculatePageFootnotes = function(nPageAbs, nColumnAbs)
 {
-	this.Footnotes.Recalculate(nPageAbs, nColumnAbs, 0, 10000);
+    var oPageMetrics = this.Get_PageContentStartPos(nPageAbs);
+	this.Footnotes.Recalculate(nPageAbs, nColumnAbs, oPageMetrics.Y, oPageMetrics.YLimit);
 };
 CDocument.prototype.private_RecalculateShiftFootnotes = function(nPageAbs, nColumnAbs)
 {

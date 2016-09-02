@@ -1237,6 +1237,16 @@ CChartSpace.prototype.changeListName = function(val, oldName, newName)
 {
     if(val)
     {
+        if(val.numRef && typeof val.numRef.f === "string")
+        {
+            if(val.numRef.f.indexOf(newName) > -1)
+                return;
+        }
+        if(val.strRef && typeof val.strRef.f === "string")
+        {
+            if(val.strRef.f.indexOf(newName) > -1)
+                return;
+        }
         if(val.numRef && typeof val.numRef.f === "string" || val.strRef && typeof val.strRef.f === "string")
         {
             var checkString = oldName.replace(/[-[\]{}()*+?.,\\^$|#\s]/g,  "\\$&");
