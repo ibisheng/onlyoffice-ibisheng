@@ -3299,6 +3299,7 @@ function CEditorPage(api)
 			var _len = master.sldLayoutLst.length;
 			var arr  = new Array(_len);
 
+			var bRedraw = Math.abs(this.m_oLayoutDrawer.WidthMM - this.m_oLogicDocument.Width) > MOVE_DELTA || Math.abs(this.m_oLayoutDrawer.HeightMM - this.m_oLogicDocument.Height) > MOVE_DELTA;
 			for (var i = 0; i < _len; i++)
 			{
 				arr[i]       = new CLayoutThumbnail();
@@ -3310,7 +3311,7 @@ function CEditorPage(api)
 
 				arr[i].Name = master.sldLayoutLst[i].cSld.name;
 
-				if ("" == master.sldLayoutLst[i].ImageBase64 || Math.abs(this.m_oLayoutDrawer.WidthMM - this.m_oLogicDocument.Width) > MOVE_DELTA || Math.abs(this.m_oLayoutDrawer.HeightMM - this.m_oLogicDocument.Height) > MOVE_DELTA)
+				if ("" == master.sldLayoutLst[i].ImageBase64 || bRedraw)
 				{
 					this.m_oLayoutDrawer.WidthMM       = this.m_oLogicDocument.Width;
 					this.m_oLayoutDrawer.HeightMM      = this.m_oLogicDocument.Height;
