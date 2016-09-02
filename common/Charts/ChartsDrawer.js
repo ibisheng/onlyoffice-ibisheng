@@ -49,6 +49,20 @@ var c_oAscTickMark = Asc.c_oAscTickMark;
 var c_oAscChartDataLabelsPos = Asc.c_oAscChartDataLabelsPos;
 var c_oAscChartLegendShowSettings = Asc.c_oAscChartLegendShowSettings;
 
+var c_oChartTypes =
+{
+	Bar: 0,
+	Line: 1,
+	HBar: 2,
+	Pie: 3,
+	Scatter: 4,
+	Area: 5,
+	Stock: 6,
+	DoughnutChart: 7,
+	Radar: 8,
+	BubbleChart: 9
+};
+
 var globalGapDepth = 150;
 var isTurnOn3DCharts = true;
 var standartMarginForCharts = 13;
@@ -140,52 +154,52 @@ CChartsDrawer.prototype =
 		var newChart;
 		switch ( this.calcProp.type )
 		{
-			case "Bar":
+			case c_oChartTypes.Bar:
 			{
 				newChart = new drawBarChart();
 				break;
 			}
-			case "Line":
+			case c_oChartTypes.Line:
 			{
 				newChart = new drawLineChart();
 				break;
 			}
-			case "HBar":
+			case c_oChartTypes.HBar:
 			{
 				newChart = new drawHBarChart();
 				break;
 			}
-			case "Pie":
+			case c_oChartTypes.Pie:
 			{
 				newChart = new drawPieChart();
 				break;
 			}
-			case "Scatter":
+			case c_oChartTypes.Scatter:
 			{
 				newChart = new drawScatterChart();
 				break;
 			}
-			case "Area":
+			case c_oChartTypes.Area:
 			{
 				newChart = new drawAreaChart();
 				break;
 			}
-			case "Stock":
+			case c_oChartTypes.Stock:
 			{
 				newChart = new drawStockChart();
 				break;
 			}
-			case "DoughnutChart":
+			case c_oChartTypes.DoughnutChart:
 			{
 				newChart = new drawDoughnutChart();
 				break;
 			}
-			case "Radar":
+			case c_oChartTypes.Radar:
 			{
 				newChart = new drawRadarChart();
 				break;
 			}
-			case "BubbleChart":
+			case c_oChartTypes.BubbleChart:
 			{
 				newChart = new drawBubbleChart();
 				break;
@@ -201,13 +215,13 @@ CChartsDrawer.prototype =
 			
 			this.areaChart.reCalculate(this);
 			
-			if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
+			if(this.calcProp.type != c_oChartTypes.Pie && this.calcProp.type != c_oChartTypes.DoughnutChart)
 				this.gridChart.reCalculate(this);
 		}
 		
 		this.allAreaChart.reCalculate(this);
 		
-		if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart" && !chartSpace.bEmptySeries)
+		if(this.calcProp.type != c_oChartTypes.Pie && this.calcProp.type != c_oChartTypes.DoughnutChart && !chartSpace.bEmptySeries)
 		{
 			this.catAxisChart.reCalculate(this);
 			this.valAxisChart.reCalculate(this);
@@ -242,7 +256,7 @@ CChartsDrawer.prototype =
 		{
 			this.areaChart.draw(this);
 			
-			if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
+			if(this.calcProp.type != c_oChartTypes.Pie && this.calcProp.type != c_oChartTypes.DoughnutChart)
 			{
 				if(this.nDimensionCount === 3)
 				{
@@ -260,7 +274,7 @@ CChartsDrawer.prototype =
 				this.cShapeDrawer.bIsNoSmartAttack = false;
 			}
 			
-			if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
+			if(this.calcProp.type != c_oChartTypes.Pie && this.calcProp.type != c_oChartTypes.DoughnutChart)
 			{
 				this.catAxisChart.draw(this);
 				this.valAxisChart.draw(this);
@@ -269,7 +283,7 @@ CChartsDrawer.prototype =
 			
 			if(this.nDimensionCount !== 3)
 			{
-				if(this.calcProp.type === "Line" || this.calcProp.type === "Scatter")
+				if(this.calcProp.type === c_oChartTypes.Line || this.calcProp.type === c_oChartTypes.Scatter)
 				{
 					this.cShapeDrawer.bIsNoSmartAttack = true;
 					this.chart.draw(this);
@@ -362,7 +376,7 @@ CChartsDrawer.prototype =
 		
 		if(this.nDimensionCount === 3)
 		{
-			if(!this.processor3D.view3D.rAngAx && (this.calcProp.type === "Bar" || this.calcProp.type === "Line"))
+			if(!this.processor3D.view3D.rAngAx && (this.calcProp.type === c_oChartTypes.Bar || this.calcProp.type === c_oChartTypes.Line))
 			{
 				var posX = chartSpace.chart.plotArea.valAx.posX;
 				var widthLabels = chartSpace.chart.plotArea.valAx.labels && chartSpace.chart.plotArea.valAx.labels.extX ? chartSpace.chart.plotArea.valAx.labels.extX : 0;
@@ -399,7 +413,7 @@ CChartsDrawer.prototype =
 		var orientationValAx = chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.scaling.orientation == ORIENTATION_MIN_MAX ? true : false;
 		
 		var x, y;
-		if(orientationValAx || this.calcProp.type == "HBar")
+		if(orientationValAx || this.calcProp.type == c_oChartTypes.HBar)
 		{
 			y = (this.calcProp.heightCanvas - standartMarginForCharts) / this.calcProp.pxToMM -  heightTitle;
 			x = (this.calcProp.chartGutter._left + this.calcProp.trueWidth / 2) / this.calcProp.pxToMM - widthTitle / 2;
@@ -694,7 +708,7 @@ CChartsDrawer.prototype =
 			var catAx = chartSpace.chart.plotArea.catAx;
 			var curBetween = 0, diffPoints = 0;
 			
-			if(this.calcProp.type == "Scatter" && this.calcProp.widthCanvas != undefined && catAx.xPoints)
+			if(this.calcProp.type == c_oChartTypes.Scatter && this.calcProp.widthCanvas != undefined && catAx.xPoints)
 			{
 				if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
@@ -804,7 +818,7 @@ CChartsDrawer.prototype =
 		var orientationCatAx = catAx && catAx.scaling.orientation === ORIENTATION_MIN_MAX ? true : false;
 		
 		var crossBetween = chartSpace.getValAxisCrossType();
-		if(isHBar === 'HBar' && catAx && valAx && catAx.yPoints && valAx.xPoints)
+		if(isHBar === c_oChartTypes.HBar && catAx && valAx && catAx.yPoints && valAx.xPoints)
 		{
 			if(orientationCatAx)
 			{
@@ -1004,14 +1018,14 @@ CChartsDrawer.prototype =
 		{	
 			if(chartProp.chart.plotArea.valAx.yPoints)
 				this.calcProp.numhlines = chartProp.chart.plotArea.valAx.yPoints.length - 1;
-			if(this.calcProp.type == "Bar")
+			if(this.calcProp.type == c_oChartTypes.Bar)
 			{
 				this.calcProp.numvlines = chartProp.chart.plotArea.catAx.xPoints.length;
 				
 				this.calcProp.numvMinorlines = 2;
 				this.calcProp.numhMinorlines = 5;
 			}
-			else if(this.calcProp.type == "HBar")
+			else if(this.calcProp.type == c_oChartTypes.HBar)
 			{
 				this.calcProp.numhlines = chartProp.chart.plotArea.catAx.yPoints.length;
 				this.calcProp.numvlines = chartProp.chart.plotArea.valAx.xPoints.length - 1;
@@ -1019,21 +1033,21 @@ CChartsDrawer.prototype =
 				this.calcProp.numhMinorlines = 2;
 				this.calcProp.numvMinorlines = 5;
 			}
-			else if(this.calcProp.type == "Line" || this.calcProp.type == "Stock")
+			else if(this.calcProp.type == c_oChartTypes.Line || this.calcProp.type == c_oChartTypes.Stock)
 			{
 				this.calcProp.numvlines = chartProp.chart.plotArea.catAx.xPoints.length;
 				
 				this.calcProp.numvMinorlines = 2;
 				this.calcProp.numhMinorlines = 5;
 			}
-			else if(this.calcProp.type == "Scatter" || this.calcProp.type == "BubbleChart")
+			else if(this.calcProp.type == c_oChartTypes.Scatter || this.calcProp.type == c_oChartTypes.BubbleChart)
 			{
 				this.calcProp.numvlines = chartProp.chart.plotArea.catAx.xPoints.length;
 				
 				this.calcProp.numvMinorlines = 5;
 				this.calcProp.numhMinorlines = 5;
 			}
-			else if(this.calcProp.type == "Area")
+			else if(this.calcProp.type == c_oChartTypes.Area)
 			{
 				this.calcProp.numvlines = chartProp.chart.plotArea.catAx.xPoints.length;
 				
@@ -1043,7 +1057,7 @@ CChartsDrawer.prototype =
 		}
 		
 		
-		if(this.calcProp.type != "Scatter")
+		if(this.calcProp.type != c_oChartTypes.Scatter)
 		{
 			this.calcProp.nullPositionOX = this._getNullPosition();
 			this.calcProp.nullPositionOXLog = this._getNullPositionLog();
@@ -1056,7 +1070,7 @@ CChartsDrawer.prototype =
 			this.calcProp.nullPositionOY = scatterNullPos.y;
 		}
 	
-		if(this.calcProp.type == "Bar")
+		if(this.calcProp.type == c_oChartTypes.Bar)
 		{
 			this.calcProp.max = this.calcProp.scale[this.calcProp.scale.length -1];
 			this.calcProp.min = this.calcProp.scale[0];
@@ -1067,7 +1081,7 @@ CChartsDrawer.prototype =
 	_calculateStackedData2: function()
 	{	
 		var maxMinObj;
-		if(this.calcProp.type == "Bar" || this.calcProp.type == "HBar")
+		if(this.calcProp.type == c_oChartTypes.Bar || this.calcProp.type == c_oChartTypes.HBar)
 		{
 			if (this.calcProp.subType == 'stacked') {
 				var originalData = $.extend(true, [], this.calcProp.data);
@@ -1101,7 +1115,7 @@ CChartsDrawer.prototype =
 		}
 		
 		
-		if(this.calcProp.type == "Line" || this.calcProp.type == "Area")
+		if(this.calcProp.type == c_oChartTypes.Line || this.calcProp.type == c_oChartTypes.Area)
 		{
 			if (this.calcProp.subType == 'stacked') {
 				for (var j = 0; j < (this.calcProp.data.length - 1); j++) {
@@ -1201,7 +1215,7 @@ CChartsDrawer.prototype =
 						}
 					}
 						
-					if(isNaN(value) && val == '' && (((t.calcProp.type == 'Line' ) && t.calcProp.type == 'normal')))
+					if(isNaN(value) && val == '' && (((t.calcProp.type == c_oChartTypes.Line ) && t.calcProp.type == 'normal')))
 					{
 						value = '';
 					}
@@ -1210,7 +1224,7 @@ CChartsDrawer.prototype =
 						value = 0;
 					}
 					
-					if(t.calcProp.type == 'Pie' || t.calcProp.type == "DoughnutChart")
+					if(t.calcProp.type == c_oChartTypes.Pie || t.calcProp.type == c_oChartTypes.DoughnutChart)
 					{
 						value = Math.abs(value);
 					}
@@ -1303,7 +1317,7 @@ CChartsDrawer.prototype =
 			t.calcProp.ymax = maxY;
 		};
 		
-		if(this.calcProp.type != 'Scatter')//берём данные из NumCache
+		if(this.calcProp.type != c_oChartTypes.Scatter)//берём данные из NumCache
 		{
 			generateArrValues();
 		}
@@ -1318,7 +1332,7 @@ CChartsDrawer.prototype =
 		if(newArr)
 			arrValues = newArr;
 			
-		if(this.calcProp.type == 'Bar' || this.calcProp.type == 'HBar')
+		if(this.calcProp.type == c_oChartTypes.Bar || this.calcProp.type == c_oChartTypes.HBar)
 			this.calcProp.data = arrReverse(arrValues);
 		else
 			this.calcProp.data = arrValues
@@ -1334,7 +1348,7 @@ CChartsDrawer.prototype =
 		//chartProp.chart.plotArea.valAx.scaling.logBase
 		var axisMin, axisMax, firstDegree, step, arrayValues;
 
-		if(!('Scatter' == this.calcProp.type && isOx)){
+		if(!(c_oChartTypes.Scatter == this.calcProp.type && isOx)){
 			if(chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.scaling.logBase)
 			{
 				arrayValues = this._getLogArray(yMin, yMax, chartProp.chart.plotArea.valAx.scaling.logBase);
@@ -1354,7 +1368,7 @@ CChartsDrawer.prototype =
 		
 		var manualMin;
 		var manualMax;
-		if('Scatter' == this.calcProp.type && isOx)
+		if(c_oChartTypes.Scatter == this.calcProp.type && isOx)
 		{
 			manualMin = chartProp.chart.plotArea.catAx && chartProp.chart.plotArea.catAx.scaling && chartProp.chart.plotArea.catAx.scaling.min !== null ? chartProp.chart.plotArea.catAx.scaling.min : null;
 			manualMax = chartProp.chart.plotArea.catAx && chartProp.chart.plotArea.catAx.scaling && chartProp.chart.plotArea.catAx.scaling.max !== null ? chartProp.chart.plotArea.catAx.scaling.max : null;
@@ -1399,7 +1413,7 @@ CChartsDrawer.prototype =
 		//приводим к первому порядку
 		firstDegree = this._getFirstDegree((Math.abs(axisMax - axisMin)) / 10);
 
-		var axis = 'Scatter' == this.calcProp.type && isOx ? chartProp.chart.plotArea.catAx : chartProp.chart.plotArea.valAx;
+		var axis = c_oChartTypes.Scatter == this.calcProp.type && isOx ? chartProp.chart.plotArea.catAx : chartProp.chart.plotArea.valAx;
 		//находим шаг
 		if(axis && axis.majorUnit !== null)
 		{
@@ -1408,7 +1422,7 @@ CChartsDrawer.prototype =
 		else
 		{
 			var firstStep;
-			if(isOx || 'HBar' == this.calcProp.type)
+			if(isOx || c_oChartTypes.HBar == this.calcProp.type)
 				step = this._getStep(firstDegree.val + (firstDegree.val / 10) * 3);
 			else
 				step = this._getStep(firstDegree.val);
@@ -1662,7 +1676,7 @@ CChartsDrawer.prototype =
 			else
 			{
 				numNull = this.calcProp.numhlines;
-				if(this.calcProp.type == "HBar")
+				if(this.calcProp.type == c_oChartTypes.HBar)
 					numNull = this.calcProp.numvlines;
 			}
 		}
@@ -1671,7 +1685,7 @@ CChartsDrawer.prototype =
 			if(orientation == ORIENTATION_MIN_MAX)
 			{
 				numNull = this.calcProp.numhlines;
-				if(this.calcProp.type == "HBar")
+				if(this.calcProp.type == c_oChartTypes.HBar)
 					numNull = this.calcProp.numvlines;
 			}
 			else
@@ -1682,7 +1696,7 @@ CChartsDrawer.prototype =
 			var valPoints;
 			if(this.cChartSpace.chart.plotArea.valAx)
 			{
-				if(this.calcProp.type == "HBar")
+				if(this.calcProp.type == c_oChartTypes.HBar)
 					valPoints = this.cChartSpace.chart.plotArea.valAx.xPoints;
 				else
 					valPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
@@ -1704,13 +1718,13 @@ CChartsDrawer.prototype =
 		var nullPosition;
 		if(0 == numNull)
 			nullPosition = 0;
-		else if(this.calcProp.type == "HBar")
+		else if(this.calcProp.type == c_oChartTypes.HBar)
 			nullPosition = (this.calcProp.widthCanvas - this.calcProp.chartGutter._left - this.calcProp.chartGutter._right)/(this.calcProp.numvlines)*numNull;
 		else
 			nullPosition = (this.calcProp.heightCanvas - this.calcProp.chartGutter._bottom - this.calcProp.chartGutter._top)/(this.calcProp.numhlines)*numNull;
 		
 		var result;
-		if(this.calcProp.type == "HBar")
+		if(this.calcProp.type == c_oChartTypes.HBar)
 			result = nullPosition + this.calcProp.chartGutter._left;
 		else
 			result = this.calcProp.heightCanvas - this.calcProp.chartGutter._bottom - nullPosition;
@@ -1726,7 +1740,7 @@ CChartsDrawer.prototype =
 		var valPoints, result;
 		if(this.cChartSpace.chart.plotArea.valAx)
 		{
-			if(this.calcProp.type == "HBar")
+			if(this.calcProp.type == c_oChartTypes.HBar)
 				valPoints = this.cChartSpace.chart.plotArea.valAx.xPoints;
 			else
 				valPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
@@ -1784,57 +1798,56 @@ CChartsDrawer.prototype =
 		{
 			case AscDFH.historyitem_type_LineChart:
 			{
-				this.calcProp.type = "Line";
+				this.calcProp.type = c_oChartTypes.Line;
 				break;
 			}
 			case AscDFH.historyitem_type_BarChart:
 			{
 				if(chartProp.chart.plotArea.chart.barDir !== AscFormat.BAR_DIR_BAR)
-					this.calcProp.type = "Bar";
+					this.calcProp.type = c_oChartTypes.Bar;
 				else 
-					this.calcProp.type = "HBar";
+					this.calcProp.type = c_oChartTypes.HBar;
 				break;
 			}
 			case AscDFH.historyitem_type_PieChart:
 			{
-				this.calcProp.type = "Pie";
+				this.calcProp.type = c_oChartTypes.Pie;
 				break;
 			}
 			case AscDFH.historyitem_type_AreaChart:
 			{
-				this.calcProp.type = "Area";
+				this.calcProp.type = c_oChartTypes.Area;
 				break;
 			}
 			case AscDFH.historyitem_type_ScatterChart:
 			{
-				this.calcProp.type = "Scatter";
+				this.calcProp.type = c_oChartTypes.Scatter;
 				break;
 			}
 			case AscDFH.historyitem_type_StockChart:
 			{
-				this.calcProp.type = "Stock";
+				this.calcProp.type = c_oChartTypes.Stock;
 				break;
 			}
 			case AscDFH.historyitem_type_DoughnutChart:
 			{
-				this.calcProp.type = "DoughnutChart";
+				this.calcProp.type = c_oChartTypes.DoughnutChart;
 				break;
 			}
 			case AscDFH.historyitem_type_RadarChart:
 			{
-				this.calcProp.type = "Radar";
+				this.calcProp.type = c_oChartTypes.Radar;
 				break;
 			}
 			case AscDFH.historyitem_type_BubbleChart:
 			{
-				//this.calcProp.type = "BubbleChart";
-				this.calcProp.type = "Scatter";
+				this.calcProp.type = c_oChartTypes.Scatter;
 				break;
 			}
 		}
 		
 		var grouping = chartProp.chart.plotArea.chart.grouping;
-		if(this.calcProp.type == "Line" || this.calcProp.type == "Area")
+		if(this.calcProp.type == c_oChartTypes.Line || this.calcProp.type == c_oChartTypes.Area)
 			this.calcProp.subType = (grouping === AscFormat.GROUPING_PERCENT_STACKED) ? "stackedPer" : (grouping === AscFormat.GROUPING_STACKED) ? "stacked" : "normal";
 		else if(this.nDimensionCount === 3 && grouping === AscFormat.BAR_GROUPING_STANDARD)
 			this.calcProp.subType = "standard";
@@ -1858,7 +1871,7 @@ CChartsDrawer.prototype =
 		//отсеиваем пустые серии
 		this.calcProp.seriesCount = this._calculateCountSeries(chartProp);
 		
-		if(this.calcProp.type == "Scatter")
+		if(this.calcProp.type == c_oChartTypes.Scatter)
 		{
 			this.calcProp.scale = this._roundValues(this._getAxisData2(false, this.calcProp.ymin, this.calcProp.ymax, chartProp));	
 			this.calcProp.xScale = this._roundValues(this._getAxisData2(true, this.calcProp.min, this.calcProp.max, chartProp));
@@ -2090,7 +2103,7 @@ CChartsDrawer.prototype =
 					}	
 					else	
 					{
-						if(this.calcProp.type == "Scatter" || this.calcProp.type == "Stock")
+						if(this.calcProp.type == c_oChartTypes.Scatter || this.calcProp.type == c_oChartTypes.Stock)
 						{
 							if(plotArea.catAx.scaling.orientation != ORIENTATION_MIN_MAX)
 								result = - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + startPos;
@@ -2099,7 +2112,7 @@ CChartsDrawer.prototype =
 						}
 						else
 						{
-							if((plotArea.valAx.scaling.orientation == ORIENTATION_MIN_MAX && this.calcProp.type != "Line") || (plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX && this.calcProp.type == "Line"))
+							if((plotArea.valAx.scaling.orientation == ORIENTATION_MIN_MAX && this.calcProp.type != c_oChartTypes.Line) || (plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX && this.calcProp.type == c_oChartTypes.Line))
 								result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + startPos;
 							else
 								result = - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + startPos;
@@ -2930,17 +2943,17 @@ CChartsDrawer.prototype =
 		var visible = aX + bY + cZ;
 		
 		var result;
-		if(this.calcProp.type == "Bar")
+		if(this.calcProp.type == c_oChartTypes.Bar)
 		{
 			result = (val > 0 && visible < 0 || val < 0 && visible > 0) ? true : false;
 			if(!(this.calcProp.subType == "stacked") && !(this.calcProp.subType == "stackedPer") && this.cChartSpace.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
 				result = !result;
 		}
-		else if(this.calcProp.type == "Line")
+		else if(this.calcProp.type == c_oChartTypes.Line)
 		{
 			result = visible < 0 ? true : false
 		}
-		else if(this.calcProp.type == "HBar")
+		else if(this.calcProp.type == c_oChartTypes.HBar)
 		{
 			result = (val < 0 && visible < 0 || val > 0 && visible > 0) ? true : false;
 			
@@ -10038,7 +10051,7 @@ gridChart.prototype =
 		if(crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN && this.cChartSpace.chart.plotArea.valAx.posY)
 			crossDiff = yPoints[1] ? Math.abs((yPoints[1].pos - yPoints[0].pos) / 2) : Math.abs(yPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posY);
 		
-		if(this.chartProp.type == "Radar")
+		if(this.chartProp.type == c_oChartTypes.Radar)
 		{
 			var y, x, path;
 			
@@ -10054,7 +10067,7 @@ gridChart.prototype =
 		
 		for(var i = 0; i < yPoints.length; i++)
 		{
-			if(this.chartProp.type == "Radar")
+			if(this.chartProp.type == c_oChartTypes.Radar)
 			{
 				path  = new Path();
 				for(var k = 0; k < numCache.length; k++)
@@ -10171,7 +10184,7 @@ gridChart.prototype =
 		
 		var crossBetween = this.cChartSpace.getValAxisCrossType();
 		var crossDiff;
-		if(crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN && this.cChartSpace.chart.plotArea.valAx.posX && this.chartProp.type != "HBar")
+		if(crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN && this.cChartSpace.chart.plotArea.valAx.posX && this.chartProp.type != c_oChartTypes.HBar)
 			crossDiff = xPoints[1] ? Math.abs((xPoints[1].pos - xPoints[0].pos) / 2) : Math.abs(xPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posX);
 			
 		for(var i = 0; i < xPoints.length; i++)
@@ -10415,7 +10428,7 @@ gridChart.prototype =
 		
 		for(var i = 0; i < this.paths.horisontalLines.length; i++)
 		{
-			if(this.chartProp.type == "HBar")
+			if(this.chartProp.type == c_oChartTypes.HBar)
 				pen = this.cChartSpace.chart.plotArea.catAx.compiledMajorGridLines;
 			else
 				pen = this.cChartSpace.chart.plotArea.valAx.compiledMajorGridLines;
@@ -10429,7 +10442,7 @@ gridChart.prototype =
 				for(var n = 0; n < this.paths.horisontalMinorLines[i].length ; n++)
 				{
 					path = this.paths.horisontalMinorLines[i][n];
-					if(this.chartProp.type == "HBar")
+					if(this.chartProp.type == c_oChartTypes.HBar)
 						pen = this.cChartSpace.chart.plotArea.catAx.compiledMinorGridLines;
 					else
 						pen = this.cChartSpace.chart.plotArea.valAx.compiledMinorGridLines;
@@ -10446,7 +10459,7 @@ gridChart.prototype =
 		
 		for(var i = 0; i < this.paths.verticalLines.length; i++)
 		{
-			if(this.chartProp.type == "HBar")
+			if(this.chartProp.type == c_oChartTypes.HBar)
 				pen = this.cChartSpace.chart.plotArea.valAx.compiledMajorGridLines;
 			else
 				pen = this.cChartSpace.chart.plotArea.catAx.compiledMajorGridLines;
@@ -10460,7 +10473,7 @@ gridChart.prototype =
 				for(var n = 0; n < this.paths.verticalMinorLines[i].length ; n++)
 				{
 					path = this.paths.verticalMinorLines[i][n];
-					if(this.chartProp.type == "HBar")
+					if(this.chartProp.type == c_oChartTypes.HBar)
 						pen = this.cChartSpace.chart.plotArea.valAx.compiledMinorGridLines;
 					else
 						pen = this.cChartSpace.chart.plotArea.catAx.compiledMinorGridLines;
@@ -10514,7 +10527,7 @@ catAxisChart.prototype =
 	{
 		var nullPoisition = this.chartProp.nullPositionOX;
 		var axisPos;
-		if(this.chartProp.type == "HBar")
+		if(this.chartProp.type == c_oChartTypes.HBar)
 		{	
 			axisPos = this.cChartSpace.chart.plotArea.catAx.posX ? this.cChartSpace.chart.plotArea.catAx.posX : this.cChartSpace.chart.plotArea.catAx.xPos;
 			this.paths.axisLine = this._calculateLine( axisPos, this.chartProp.chartGutter._top / this.chartProp.pxToMM, axisPos, (this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom) / this.chartProp.pxToMM);
@@ -10582,7 +10595,7 @@ catAxisChart.prototype =
 			}
 		}
 		
-		if(this.chartProp.type == "HBar")
+		if(this.chartProp.type == c_oChartTypes.HBar)
 		{
 			widthMinorLine = - widthMinorLine;
 			widthLine = - widthLine;
@@ -10602,7 +10615,7 @@ catAxisChart.prototype =
 		if(!(widthLine === 0 && widthMinorLine === 0))
 		{	
 			//исчключение для вертикальной оси
-			if(this.chartProp.type == "HBar")
+			if(this.chartProp.type == c_oChartTypes.HBar)
 			{
 				this._calculateVerticalTickMarks(widthLine, widthMinorLine, crossMajorStep, crossMinorStep);
 				
@@ -10867,7 +10880,7 @@ valAxisChart.prototype =
 	{
 		var nullPoisition = this.cChartSpace.chart.plotArea.valAx.posX != undefined ? this.cChartSpace.chart.plotArea.valAx.posX : this.cChartSpace.chart.plotArea.valAx.xPos;
 
-		if(this.chartProp.type == "HBar")
+		if(this.chartProp.type == c_oChartTypes.HBar)
 		{	
 			nullPoisition = this.cChartSpace.chart.plotArea.valAx.posY;
 			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left / this.chartProp.pxToMM, nullPoisition, (this.chartProp.widthCanvas - this.chartProp.chartGutter._right) / this.chartProp.pxToMM, nullPoisition );
@@ -10933,7 +10946,7 @@ valAxisChart.prototype =
 			}
 		}
 		
-		if(this.chartProp.type == "HBar")
+		if(this.chartProp.type == c_oChartTypes.HBar)
 		{
 			widthMinorLine = - widthMinorLine;
 			widthLine = - widthLine;
@@ -10952,7 +10965,7 @@ valAxisChart.prototype =
 		
 		if(!(widthLine === 0 && widthMinorLine === 0))
 		{
-			if(this.chartProp.type == "HBar")
+			if(this.chartProp.type == c_oChartTypes.HBar)
 			{
 				var yPoints = this.cChartSpace.chart.plotArea.valAx.xPoints;
 				
@@ -11328,7 +11341,7 @@ floor3DChart.prototype =
 		
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		var convertResult, x1n, y1n, x2n, y2n, x3n, y3n, x4n, y4n;
-		if(this.chartProp.type == "HBar")
+		if(this.chartProp.type == c_oChartTypes.HBar)
 		{
 			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, nullPositionOy, 0);
 			x1n = convertResult.x / this.chartProp.pxToMM;
@@ -11420,7 +11433,7 @@ sideWall3DChart.prototype =
 		
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		var convertResult, x1n, y1n, x2n, y2n, x3n, y3n, x4n, y4n;
-		if(this.chartProp.type == "HBar")
+		if(this.chartProp.type == c_oChartTypes.HBar)
 		{
 			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, nullPositionOy, 0);
 			x1n = convertResult.x / this.chartProp.pxToMM;
@@ -11511,7 +11524,7 @@ backWall3DChart.prototype =
 		
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		var convertResult, x1n, y1n, x2n, y2n, x3n, y3n, x4n, y4n;
-		if(this.chartProp.type == "HBar")
+		if(this.chartProp.type == c_oChartTypes.HBar)
 		{
 			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, nullPositionOy, perspectiveDepth);
 			x1n = convertResult.x / this.chartProp.pxToMM;
@@ -12715,4 +12728,5 @@ TEST3D.prototype =
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscFormat'] = window['AscFormat'] || {};
 	window['AscFormat'].CChartsDrawer = CChartsDrawer;
+	window["AscFormat"].c_oChartTypes = c_oChartTypes;
 })(window);
