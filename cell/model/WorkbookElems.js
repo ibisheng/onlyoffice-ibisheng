@@ -5368,7 +5368,7 @@ function TableColumn() {
 			this.TotalsRowFormula.removeDependencies();
 		}
 	};
-TableColumn.prototype.clone = function(opt_TableName) {
+TableColumn.prototype.clone = function(opt_TableName, ws, renameParams) {
 	var res = new TableColumn();
 	res.Name = this.Name;
 	res.TotalsRowLabel = this.TotalsRowLabel;
@@ -5380,7 +5380,14 @@ TableColumn.prototype.clone = function(opt_TableName) {
 		} else {
 			
 		}
-		res._setTotalRowFormula(this.TotalsRowFormula.Formula, this.TotalsRowFormula.ws, false);
+		
+		ws = ws ? ws : this.TotalsRowFormula.ws;
+		if(renameParams)
+		{
+			this.renameSheetCopy(ws, renameParams);
+		}
+		
+		res._setTotalRowFormula(this.TotalsRowFormula.Formula, ws, false);
 	}
 	if (this.dxf)
 		res.dxf = this.dxf.clone;

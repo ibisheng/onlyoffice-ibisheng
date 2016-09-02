@@ -3491,18 +3491,22 @@
 						newFilter.TableStyleInfo.ShowRowStripes = true;
 					}
 					
+					newFilter.DisplayName = newTableName;
+					worksheet.workbook.dependencyFormulas.addTableName(worksheet, newFilter);
 					
 					var tableColumns;
-					var isChangeTableNameInFormulaDependency = false;
 					if(tablePart && tablePart.TableColumns)
 					{
+						var renameParams = {};
+						renameParams.tableNameMap = {};
+						renameParams.tableNameMap[tablePart.DisplayName] = newTableName;
+						
 						var cloneTableColumns = [];
 						for(var i = 0; i < tablePart.TableColumns.length; i++)
 						{
-							cloneTableColumns.push(tablePart.TableColumns[i].clone());
+							cloneTableColumns.push(tablePart.TableColumns[i].clone(null, worksheet, renameParams));
 						}
 						tableColumns = cloneTableColumns;
-						isChangeTableNameInFormulaDependency = true;
 					}
 					else
 					{
@@ -3510,18 +3514,7 @@
 					}
 					
 					newFilter.TableColumns = tableColumns;
-					newFilter.DisplayName = newTableName;
-					worksheet.workbook.dependencyFormulas.addTableName(worksheet, newFilter);
-					
 					worksheet.TableParts[worksheet.TableParts.length] = newFilter;
-					
-					if(isChangeTableNameInFormulaDependency)
-					{
-						var renameParams = {};
-						renameParams.tableNameMap = {};
-						renameParams.tableNameMap[tablePart.DisplayName] = newTableName;
-						newFilter.renameSheetCopy(worksheet, renameParams);
-					}
 					
 					return worksheet.TableParts[worksheet.TableParts.length - 1];
 				}
