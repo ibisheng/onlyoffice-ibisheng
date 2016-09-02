@@ -1152,76 +1152,56 @@ CChartsDrawer.prototype =
 		}
 	},
 	
-	_calculateData2: function(chart) {	
-		var max = 0;
-		var min = 0; 
-		var minY = 0;
-		var maxY = 0;
-		var xNumCache, yNumCache, newArr;
-		
+	_calculateData2: function(chart) 
+	{	
+		var xNumCache, yNumCache, newArr, arrValues = [], max = 0, min = 0, minY = 0, maxY = 0;
 		var series = chart.chart.plotArea.chart.series;
-		if(this.calcProp.type != 'Scatter')//берём данные из NumCache
-		{
-			var arrValues = [];
-			var isSkip = [];
-			var skipSeries = [];
-			
-			var isEn = false;
-			var isEnY = false;
-			var numSeries = 0;
-			var curSeria;
-			var isNumberVal = true;
-			
-			
-			for(var l = 0; l < series.length; ++l)
-			{
-				var firstCol = 0;
-				var firstRow = 0;
-				
-				curSeria = series[l].val.numRef && series[l].val.numRef.numCache ? series[l].val.numRef.numCache.pts : series[l].val.numLit ? series[l].val.numLit.pts : null;
-				
-				skipSeries[l] = true;
-			
-				if(series[l].isHidden == true)
-					continue;
-				if(!curSeria || !curSeria.length)
-					continue;
-				
-				skipSeries[l] = false;
-				arrValues[numSeries] = [];
-				isSkip[numSeries] = true;
+		var t = this;
 		
-				var row = firstRow;
-				var n = 0;
-				for(var col = firstCol; col < curSeria.length; ++col)
+		var generateArrValues = function()
+		{	
+			var numSeries = 0;
+			for(var l = 0; l < series.length; l++)
+			{
+				var seria = series[l];
+				var numCache = seria.val.numRef && seria.val.numRef.numCache ? seria.val.numRef.numCache : seria.val.numLit ? seria.val.numLit : null;
+				var pts = numCache ? numCache.pts : null;
+				
+				if( !pts || !pts.length || seria.isHidden == true)
 				{
-					if(!curSeria[col])
+					continue;
+				}
+		
+				var n = 0;
+				arrValues[numSeries] = [];
+				for(var col = 0; col < numCache.ptCount; col++)
+				{
+					var curPoint = t.getIdxPoint(seria, col);
+					
+					if(!curPoint)
 					{
-						curSeria[col] = {val:0};
+						curPoint = {val: 0};
 					}
-					else if(curSeria[col].isHidden == true)
+					else if(curPoint.isHidden == true)
 					{
 						continue;
 					}
 					
-					var cell = curSeria[col];
-					
-					var orValue = cell.val;
-
-					if('' != orValue)
-						isSkip[numSeries] = false;
-					var value =  parseFloat(orValue);
-					if(!isEn && !isNaN(value))
+					var val = curPoint.val;
+					var value =  parseFloat(val);
+					if(!isNaN(value))
 					{
-						min = value;
-						max = value;
-						isEn = true;
+						if(value > max)
+						{
+							max = value;
+						}
+						if(value  < min)
+						{
+							min = value;
+						}
 					}
-					if(!isNaN(value) && value > max)
-						max = value;
-					if(!isNaN(value) && value < min)
-						min = value;
-					if(isNaN(value) && orValue == '' && (((this.calcProp.type == 'Line' ) && this.calcProp.type == 'normal')))
+						
+					if(isNaN(value) && val == '' && (((t.calcProp.type == 'Line' ) && t.calcProp.type == 'normal')))
 					{
 						value = '';
 					}
@@ -1230,17 +1210,19 @@ CChartsDrawer.prototype =
 						value = 0;
 					}
 					
-					if(this.calcProp.type == 'Pie' || this.calcProp.type == "DoughnutChart")
-						arrValues[numSeries][n] = Math.abs(value);
-					else
-						arrValues[numSeries][n] = value;
-
+					if(t.calcProp.type == 'Pie' || t.calcProp.type == "DoughnutChart")
+					{
+						value = Math.abs(value);
+					}
+					
+					arrValues[numSeries][n] = value;
 					n++;
 				}
 				numSeries++;
 			}
-		}
-		else //point(scatter) chart
+		};
+		
+		var generateArrValuesScatter = function()
 		{
 			var yVal;
 			var xVal;
@@ -1317,8 +1299,17 @@ CChartsDrawer.prototype =
 					
 				}
 			}
-			this.calcProp.ymin = minY;
-			this.calcProp.ymax = maxY;
+			t.calcProp.ymin = minY;
+			t.calcProp.ymax = maxY;
+		};
+		
+		if(this.calcProp.type != 'Scatter')//берём данные из NumCache
+		{
+			generateArrValues();
+		}
+		else //point(scatter) chart
+		{
+			generateArrValuesScatter();
 		}
 
 		this.calcProp.min = min;
