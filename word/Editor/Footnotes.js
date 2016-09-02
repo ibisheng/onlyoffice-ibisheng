@@ -428,10 +428,15 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nCol
 
 		for (var nIndex = 0, nCount = oColumn.Elements.length; nIndex < nCount; ++nIndex)
 		{
-			if (oFootnote && oFootnote === oColumn.Elements[nIndex])
-				return nFootnoteIndex;
+			var oCurFootnote = oColumn.Elements[nIndex];
+			// Сноски начинающиеся не на данной колонке мы не учитываем
+			if (0 === oCurFootnote.GetElementPageIndex(nPageAbs, nColumnIndex))
+			{
+				if (oFootnote && oFootnote === oCurFootnote)
+					return nFootnoteIndex;
 
-			nFootnoteIndex++;
+				nFootnoteIndex++;
+			}
 		}
 	}
 
@@ -589,29 +594,33 @@ CFootnotesController.prototype.CheckHitInFootnote = function(X, Y, nPageAbs)
 
 	var oPage   = this.Pages[nPageAbs];
 	var oColumn = null;
-	for (var nColumnIndex = 0, nColumnsCount = oPage.Columns.length; nColumnIndex < nColumnsCount; ++nColumnIndex)
+	var nFindedColumnIndex = 0, nColumnsCount = oPage.Columns.length;
+	for (var nColumnIndex = 0; nColumnIndex < nColumnsCount; ++nColumnIndex)
 	{
 		if (nColumnIndex < nColumnsCount - 1)
 		{
 			if (X < (oPage.Columns[nColumnIndex].XLimit + oPage.Columns[nColumnIndex + 1].X) / 2)
 			{
-				oColumn = oPage.Columns[nColumnIndex];
+				oColumn            = oPage.Columns[nColumnIndex];
+				nFindedColumnIndex = nColumnIndex;
 				break;
 			}
 		}
 		else
 		{
-			oColumn = oPage.Columns[nColumnIndex];
+			oColumn            = oPage.Columns[nColumnIndex];
+			nFindedColumnIndex = nColumnIndex;
 		}
 	}
 
-	if (!oColumn)
+	if (!oColumn || nFindedColumnIndex >= nColumnsCount)
 		return false;
 
 	for (var nIndex = 0, nCount = oColumn.Elements.length; nIndex < nCount; ++nIndex)
 	{
-		var oFootnote = oColumn.Elements[nIndex];
-		var oBounds   = oFootnote.Get_PageBounds(0);
+		var oFootnote          = oColumn.Elements[nIndex];
+		var nFootnotePageIndex = oFootnote.GetElementPageIndex(nPageAbs, nFindedColumnIndex);
+		var oBounds            = oFootnote.Get_PageBounds(nFootnotePageIndex);
 
 		if (oBounds.Top <= Y)
 			return true;
@@ -644,7 +653,7 @@ CFootnotesController.prototype.StartSelection = function(X, Y, PageAbs, MouseEve
 	this.Selection.Start = oResult;
 	this.Selection.End   = oResult;
 
-	this.Selection.Start.Footnote.Selection_SetStart(X, Y, 0, MouseEvent);
+	this.Selection.Start.Footnote.Selection_SetStart(X, Y, this.Selection.Start.FootnotePageIndex, MouseEvent);
 
 	this.CurFootnote = this.Selection.Start.Footnote;
 
@@ -687,16 +696,16 @@ CFootnotesController.prototype.EndSelection = function(X, Y, PageAbs, MouseEvent
 		if (this.Selection.Start.Page > this.Selection.End.Page || this.Selection.Start.Index > this.Selection.End.Index)
 		{
 			this.Selection.Start.Footnote.Selection_SetEnd(-MEASUREMENT_MAX_MM_VALUE, -MEASUREMENT_MAX_MM_VALUE, 0, MouseEvent);
-			this.Selection.End.Footnote.Selection_SetStart(MEASUREMENT_MAX_MM_VALUE, MEASUREMENT_MAX_MM_VALUE, 0, MouseEvent);
+			this.Selection.End.Footnote.Selection_SetStart(MEASUREMENT_MAX_MM_VALUE, MEASUREMENT_MAX_MM_VALUE, this.Selection.End.Footnote.Pages.length - 1, MouseEvent);
 			this.Selection.Direction = -1;
 		}
 		else
 		{
-			this.Selection.Start.Footnote.Selection_SetEnd(MEASUREMENT_MAX_MM_VALUE, MEASUREMENT_MAX_MM_VALUE, 0, MouseEvent);
+			this.Selection.Start.Footnote.Selection_SetEnd(MEASUREMENT_MAX_MM_VALUE, MEASUREMENT_MAX_MM_VALUE, this.Selection.Start.Footnote.Pages.length - 1, MouseEvent);
 			this.Selection.End.Footnote.Selection_SetStart(-MEASUREMENT_MAX_MM_VALUE, -MEASUREMENT_MAX_MM_VALUE, 0, MouseEvent);
 			this.Selection.Direction = 1;
 		}
-		this.Selection.End.Footnote.Selection_SetEnd(X, Y, 0, MouseEvent);
+		this.Selection.End.Footnote.Selection_SetEnd(X, Y, this.Selection.End.FootnotePageIndex, MouseEvent);
 
 		var oRange = this.private_GetFootnotesRange(this.Selection.Start, this.Selection.End);
 		for (var sFootnoteId in oRange)
@@ -711,7 +720,7 @@ CFootnotesController.prototype.EndSelection = function(X, Y, PageAbs, MouseEvent
 	}
 	else
 	{
-		this.Selection.End.Footnote.Selection_SetEnd(X, Y, 0, MouseEvent);
+		this.Selection.End.Footnote.Selection_SetEnd(X, Y, this.Selection.End.FootnotePageIndex, MouseEvent);
 		this.Selection.Footnotes = {};
 		this.Selection.Footnotes[this.Selection.Start.Footnote.Get_Id()] = this.Selection.Start.Footnote;
 		this.Selection.Direction = 0;
@@ -892,7 +901,7 @@ CFootnotesController.prototype.private_GetFootnoteOnPageByXY = function(X, Y, nP
 		var oFootnote = oColumn.Elements[nIndex];
 
 		var nElementPageIndex = oFootnote.GetElementPageIndex(nPageAbs, nColumnIndex);
-		var oBounds   = oFootnote.Get_PageBounds(nElementPageIndex);
+		var oBounds = oFootnote.Get_PageBounds(nElementPageIndex);
 
 		if (oBounds.Top <= Y || 0 === nIndex)
 			return {
