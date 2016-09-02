@@ -5048,10 +5048,10 @@ background-repeat: no-repeat;\
 			var _h = Math.max(1, ColumnSize.H);
 			if (_image.Image != null)
 			{
-				var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
-				var __h = Math.max(parseInt(_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
+				var __w = Math.max((_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
+				var __h = Math.max((_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
 				_w      = Math.max(5, Math.min(_w, __w));
-				_h      = Math.max(5, Math.min(parseInt(_w * __h / __w)));
+				_h      = Math.max(5, Math.min((_w * __h / __w)));
 			}
 
 			var src = _image.src;
@@ -5101,10 +5101,10 @@ background-repeat: no-repeat;\
 				var _h = Math.max(1, ColumnSize.H);
 				if (_image.Image != null)
 				{
-					var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
-					var __h = Math.max(parseInt(_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
+					var __w = Math.max((_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
+					var __h = Math.max((_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
 					_w      = Math.max(5, Math.min(_w, __w));
-					_h      = Math.max(5, Math.min(parseInt(_w * __h / __w)));
+					_h      = Math.max(5, Math.min((_w * __h / __w)));
 				}
 				var src = _image.src;
 
