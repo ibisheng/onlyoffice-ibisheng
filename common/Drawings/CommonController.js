@@ -9015,6 +9015,7 @@ function CalcLiterByLength(aAlphaBet, nLength)
     window['AscFormat'].SCATTER_STYLE_SMOOTH = SCATTER_STYLE_SMOOTH;
     window['AscFormat'].SCATTER_STYLE_SMOOTH_MARKER = SCATTER_STYLE_SMOOTH_MARKER;
     window['AscFormat'].CARD_DIRECTION_N = CARD_DIRECTION_N;
+    window['AscFormat'].CURSOR_TYPES_BY_CARD_DIRECTION = CURSOR_TYPES_BY_CARD_DIRECTION;
     window['AscFormat'].removeDPtsFromSeries = removeDPtsFromSeries;
     window['AscFormat'].checkTxBodyDefFonts = checkTxBodyDefFonts;
     window['AscFormat'].CheckShapeBodyAutoFitReset = CheckShapeBodyAutoFitReset;
