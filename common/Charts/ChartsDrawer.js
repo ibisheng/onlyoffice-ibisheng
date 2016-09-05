@@ -6478,11 +6478,22 @@ drawHBarChart.prototype =
 		
 		if(this.cChartDrawer.nDimensionCount === 3)
 		{
-			console.time("asd");
-			var cSortFaces = new CSortFaces(this.cChartDrawer);
-			//this.sortZIndexPaths = cSortFaces.sortFaces(this.sortZIndexPaths);
-			this.sortParallelepipeds = cSortFaces.sortParallelepipeds(this.temp, this.sortZIndexPaths);
-			console.timeEnd("asd");
+			if(this.cChartDrawer.processor3D.view3D.rAngAx)
+			{
+				this.sortZIndexPaths.sort (function sortArr(a, b)
+				{
+					if(b.zIndex == a.zIndex)
+						return  a.x - b.x;
+					else
+						return  b.zIndex - a.zIndex;
+				});
+			}
+			else
+			{
+				var cSortFaces = new CSortFaces(this.cChartDrawer);
+				//this.sortZIndexPaths = cSortFaces.sortFaces(this.sortZIndexPaths);
+				this.sortParallelepipeds = cSortFaces.sortParallelepipeds(this.temp, this.sortZIndexPaths);
+			}
 		}
     },
 	
@@ -6840,63 +6851,82 @@ drawHBarChart.prototype =
 		
 		paths = this.cChartDrawer.calculateRect3D(point1, point2, point3, point4, point5, point6, point7, point8, val);
 		
-		//рассчитываем 8 точек для каждого столбца одинакового размера для рассчета положения столбцов
-		if(this.chartProp.subType === "normal")
+		if(this.cChartDrawer.processor3D.view3D.rAngAx)
 		{
-			var startXColumnPosition = this._getStartYColumnPosition(seriesHeight, idx, i, this.cChartDrawer.calcProp.max, xPoints);
-			width = startXColumnPosition.width / this.chartProp.pxToMM;
+			var controlPoint1 = this.cChartDrawer._convertAndTurnPoint(x5 + width / 2, y5 - individualBarHeight / 2, z5);
+			var controlPoint2 = this.cChartDrawer._convertAndTurnPoint(x5 + width / 2, y5, z5 + perspectiveDepth / 2);
+			var controlPoint3 = this.cChartDrawer._convertAndTurnPoint(x5, y5 - individualBarHeight / 2, z5 + perspectiveDepth / 2);
+			var controlPoint4 = this.cChartDrawer._convertAndTurnPoint(x8, y8 - individualBarHeight / 2, z8 + perspectiveDepth / 2);
+			var controlPoint5 = this.cChartDrawer._convertAndTurnPoint(x1 + width / 2 , y1, z1 + perspectiveDepth / 2);
+			var controlPoint6 = this.cChartDrawer._convertAndTurnPoint(x6 + width / 2 , y6 - individualBarHeight / 2, z6);
 			
-			x3 = newStartX + width, y3 = newStartY, z3 = perspectiveDepth + DiffGapDepth;
-			x4 = newStartX + width, y4 = newStartY, z4 = DiffGapDepth;
-			x7 = newStartX + width, y7 = newStartY + individualBarHeight, z7 = perspectiveDepth + DiffGapDepth;
-			x8 = newStartX + width, y8 = newStartY + individualBarHeight, z8 = DiffGapDepth;
+			var sortPaths = [controlPoint1, controlPoint2, controlPoint3, controlPoint4, controlPoint5, controlPoint6];
 			
-			point3 = this.cChartDrawer._convertAndTurnPoint(x3, y3, z3);
-			point4 = this.cChartDrawer._convertAndTurnPoint(x4, y4, z4);
-			point7 = this.cChartDrawer._convertAndTurnPoint(x7, y7, z7);
-			point8 = this.cChartDrawer._convertAndTurnPoint(x8, y8, z8);
+			for(var k = 0; k < paths.length; k++)
+			{
+				this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], x: sortPaths[k].x, y: sortPaths[k].y, zIndex: sortPaths[k].z});
+			}
 		}
-		
-		//не проецируем на плоскость
-		var point11 = this.cChartDrawer._convertAndTurnPoint(x1, y1, z1, null, null, true);
-		var point22 = this.cChartDrawer._convertAndTurnPoint(x2, y2, z2, null, null, true);
-		var point33 = this.cChartDrawer._convertAndTurnPoint(x3, y3, z3, null, null, true);
-		var point44 = this.cChartDrawer._convertAndTurnPoint(x4, y4, z4, null, null, true);
-		var point55 = this.cChartDrawer._convertAndTurnPoint(x5, y5, z5, null, null, true);
-		var point66 = this.cChartDrawer._convertAndTurnPoint(x6, y6, z6, null, null, true);
-		var point77 = this.cChartDrawer._convertAndTurnPoint(x7, y7, z7, null, null, true);
-		var point88 = this.cChartDrawer._convertAndTurnPoint(x8, y8, z8, null, null, true);
-		
-		
-		var arrPoints = [[point1, point4, point8, point5], [point1, point2, point3, point4], [point1, point2, point6, point5], [point4, point8, point7, point3], [point5, point6, point7, point8], [point6, point2, point3, point7]];
-		
-		var arrPoints2 = [[point11, point44, point88, point55], [point11, point22, point33, point44], [point11, point22, point66, point55], [point44, point88, point77, point33], [point55, point66, point77, point88], [point66, point22, point33, point77]];
-		
-	
-		if(!this.temp)
+		else
 		{
-			this.temp = [];
-		}
-		if(!this.temp[cubeCount])
-		{
-			this.temp[cubeCount] = {};
-		}
-		if(!this.temp[cubeCount].faces)
-		{
-			this.temp[cubeCount].faces = [];
-			this.temp[cubeCount].arrPoints = [point11, point22, point33, point44, point55, point66, point77, point88];
-		}
-		
-		for(var k = 0; k < paths.length; k++)
-		{
-			if(null === paths[k])
-				continue;
+			//рассчитываем 8 точек для каждого столбца одинакового размера для рассчета положения столбцов
+			if(this.chartProp.subType === "normal")
+			{
+				var startXColumnPosition = this._getStartYColumnPosition(seriesHeight, idx, i, this.cChartDrawer.calcProp.max, xPoints);
+				width = startXColumnPosition.width / this.chartProp.pxToMM;
+				
+				x3 = newStartX + width, y3 = newStartY, z3 = perspectiveDepth + DiffGapDepth;
+				x4 = newStartX + width, y4 = newStartY, z4 = DiffGapDepth;
+				x7 = newStartX + width, y7 = newStartY + individualBarHeight, z7 = perspectiveDepth + DiffGapDepth;
+				x8 = newStartX + width, y8 = newStartY + individualBarHeight, z8 = DiffGapDepth;
+				
+				point3 = this.cChartDrawer._convertAndTurnPoint(x3, y3, z3);
+				point4 = this.cChartDrawer._convertAndTurnPoint(x4, y4, z4);
+				point7 = this.cChartDrawer._convertAndTurnPoint(x7, y7, z7);
+				point8 = this.cChartDrawer._convertAndTurnPoint(x8, y8, z8);
+			}
 			
-			//this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquation});
+			//не проецируем на плоскость
+			var point11 = this.cChartDrawer._convertAndTurnPoint(x1, y1, z1, null, null, true);
+			var point22 = this.cChartDrawer._convertAndTurnPoint(x2, y2, z2, null, null, true);
+			var point33 = this.cChartDrawer._convertAndTurnPoint(x3, y3, z3, null, null, true);
+			var point44 = this.cChartDrawer._convertAndTurnPoint(x4, y4, z4, null, null, true);
+			var point55 = this.cChartDrawer._convertAndTurnPoint(x5, y5, z5, null, null, true);
+			var point66 = this.cChartDrawer._convertAndTurnPoint(x6, y6, z6, null, null, true);
+			var point77 = this.cChartDrawer._convertAndTurnPoint(x7, y7, z7, null, null, true);
+			var point88 = this.cChartDrawer._convertAndTurnPoint(x8, y8, z8, null, null, true);
 			
-			var plainEquation = this.cChartDrawer.getPlainEquation(arrPoints2[k][0], arrPoints2[k][1], arrPoints2[k][2], arrPoints2[k][3]);
-			var plainArea = this.cChartDrawer.getAreaQuadrilateral(arrPoints[k][0], arrPoints[k][1], arrPoints[k][2], arrPoints[k][3]);
-			this.temp[cubeCount].faces.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquation, plainArea: plainArea});
+			
+			var arrPoints = [[point1, point4, point8, point5], [point1, point2, point3, point4], [point1, point2, point6, point5], [point4, point8, point7, point3], [point5, point6, point7, point8], [point6, point2, point3, point7]];
+			
+			var arrPoints2 = [[point11, point44, point88, point55], [point11, point22, point33, point44], [point11, point22, point66, point55], [point44, point88, point77, point33], [point55, point66, point77, point88], [point66, point22, point33, point77]];
+			
+		
+			if(!this.temp)
+			{
+				this.temp = [];
+			}
+			if(!this.temp[cubeCount])
+			{
+				this.temp[cubeCount] = {};
+			}
+			if(!this.temp[cubeCount].faces)
+			{
+				this.temp[cubeCount].faces = [];
+				this.temp[cubeCount].arrPoints = [point11, point22, point33, point44, point55, point66, point77, point88];
+			}
+			
+			for(var k = 0; k < paths.length; k++)
+			{
+				if(null === paths[k])
+					continue;
+				
+				//this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquation});
+				
+				var plainEquation = this.cChartDrawer.getPlainEquation(arrPoints2[k][0], arrPoints2[k][1], arrPoints2[k][2], arrPoints2[k][3]);
+				var plainArea = this.cChartDrawer.getAreaQuadrilateral(arrPoints[k][0], arrPoints[k][1], arrPoints[k][2], arrPoints[k][3]);
+				this.temp[cubeCount].faces.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquation, plainArea: plainArea});
+			}
 		}
 		
 		return paths;
@@ -7097,15 +7127,25 @@ drawHBarChart.prototype =
 			}
 		};
 		
-		for(var i = 0; i < this.sortParallelepipeds.length; i++)
+		if(this.cChartDrawer.processor3D.view3D.rAngAx)
 		{
-			var index = this.sortParallelepipeds[i].nextIndex;
-			var faces = this.temp[index].faces;
-			for(var j = 0; j < faces.length; j++)
+			for(var i = 0; i < this.sortZIndexPaths.length; i++)
 			{
-				var face = faces[j];
-				drawVerges(face.seria, face.point, face.paths, null, face.verge);
-			}	
+				drawVerges(this.sortZIndexPaths[i].seria, this.sortZIndexPaths[i].point, this.sortZIndexPaths[i].paths, null, this.sortZIndexPaths[i].verge);
+			}
+		}
+		else
+		{
+			for(var i = 0; i < this.sortParallelepipeds.length; i++)
+			{
+				var index = this.sortParallelepipeds[i].nextIndex;
+				var faces = this.temp[index].faces;
+				for(var j = 0; j < faces.length; j++)
+				{
+					var face = faces[j];
+					drawVerges(face.seria, face.point, face.paths, null, face.verge);
+				}	
+			}
 		}
 	},
 	
