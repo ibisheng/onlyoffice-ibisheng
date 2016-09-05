@@ -1349,8 +1349,10 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
     var RealCurPage = this.private_GetRelativePageIndex(CurPage) - this.Get_StartPage_Relative();
 
 	// TODO: Здесь надо бы ускорить эту проверку
+    
+    var oTopDocument = this.Parent.Get_TopDocumentContent();
 	var bNoFootnotes = true;
-	if (this.Parent instanceof CDocument && this.Parent.Footnotes.GetHeight(this.Get_AbsolutePage(CurPage), this.Get_AbsoluteColumn(CurPage)) > 0.001)
+	if (oTopDocument instanceof CDocument && oTopDocument.Footnotes.GetHeight(this.Get_AbsolutePage(CurPage), this.Get_AbsoluteColumn(CurPage)) > 0.001)
 		bNoFootnotes = false;
 
     // Сначала проверяем не нужно ли сделать перенос страницы в данном месте
