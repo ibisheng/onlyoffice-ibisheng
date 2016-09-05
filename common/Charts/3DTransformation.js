@@ -85,7 +85,7 @@ function Processor3D(width, height, left, right, bottom, top, chartSpace, charts
 	this.orientationValAx = null;
 }
 
-Processor3D.prototype.calaculate3DProperties = function(baseDepth, gapDepth, isTest)
+Processor3D.prototype.calaculate3DProperties = function(baseDepth, gapDepth, bIsCheck)
 {
 	this.calculateCommonOptions();
 	
@@ -109,11 +109,15 @@ Processor3D.prototype.calaculate3DProperties = function(baseDepth, gapDepth, isT
 		this._calculateScaleFromDepth();
 	
 	//сдвиг камеры для того, чтобы попали все линии
-	if(!isTest)
+	if(!bIsCheck)
+	{
 		this._calculateCameraDiff();
-	
-	if(!isTest && this.view3D.rAngAx)
-		this._recalculateScaleWithMaxWidth();
+		
+		if(this.view3D.rAngAx || (!this.view3D.rAngAx && this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar && null !== this.view3D.hPercent))
+		{
+			this._recalculateScaleWithMaxWidth();
+		}
+	}
 };
 
 Processor3D.prototype.calculateCommonOptions = function()
