@@ -1348,9 +1348,14 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
 
     var RealCurPage = this.private_GetRelativePageIndex(CurPage) - this.Get_StartPage_Relative();
 
+	// TODO: Здесь надо бы ускорить эту проверку
+	var bNoFootnotes = true;
+	if (this.Parent instanceof CDocument && this.Parent.Footnotes.GetHeight(this.Get_AbsolutePage(CurPage), this.Get_AbsoluteColumn(CurPage)) > 0.001)
+		bNoFootnotes = false;
+
     // Сначала проверяем не нужно ли сделать перенос страницы в данном месте
     // Перенос не делаем, если это первая строка на новой странице
-    if (true === this.Use_YLimit() && (Top > PRS.YLimit || Bottom2 > PRS.YLimit) && (CurLine != this.Pages[CurPage].FirstLine || (0 === RealCurPage && (null != this.Get_DocumentPrev() || (true === this.Parent.Is_TableCellContent() && true !== this.Parent.Is_TableFirstRowOnNewPage())))) && false === BreakPageLineEmpty)
+    if (true === this.Use_YLimit() && (Top > PRS.YLimit || Bottom2 > PRS.YLimit) && (CurLine != this.Pages[CurPage].FirstLine || false === bNoFootnotes || (0 === RealCurPage && (null != this.Get_DocumentPrev() || (true === this.Parent.Is_TableCellContent() && true !== this.Parent.Is_TableFirstRowOnNewPage())))) && false === BreakPageLineEmpty)
     {
         // TODO: Неразрывные абзацы и висячие строки внутри колонок вместе с плавающими объектами пока не обсчитываем
         var bSkipWidowAndKeepLines = this.private_CheckSkipKeepLinesAndWidowControl(CurPage);

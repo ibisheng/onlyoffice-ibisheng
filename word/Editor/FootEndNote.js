@@ -60,6 +60,10 @@ CFootEndnote.prototype.Get_PageContentStartPos = function(nCurPage)
 	var nColumnAbs = this.Get_AbsoluteColumn(nCurPage);
 	return this.Parent.Get_PageContentStartPos(nPageAbs, nColumnAbs);
 };
+CFootEndnote.prototype.Refresh_RecalcData2 = function(nIndex, nCurPage)
+{
+	this.Parent.Refresh_RecalcData2(this.Get_AbsolutePage(nCurPage));
+};
 CFootEndnote.prototype.Write_ToBinary2 = function(Writer)
 {
 	Writer.WriteLong(AscDFH.historyitem_type_FootEndNote);

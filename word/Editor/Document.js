@@ -1674,7 +1674,7 @@ CDocument.prototype.Get_PageContentStartPos2       = function(StartPageIndex, St
     var ColumnAbs    = (StartColumnIndex + ElementPageIndex) - ((StartColumnIndex + ElementPageIndex) / ColumnsCount | 0) * ColumnsCount;
     var PageAbs      = StartPageIndex + ((StartColumnIndex + ElementPageIndex) / ColumnsCount | 0);
 
-	var FootnotesHeight = this.Footnotes.GetHeight(StartPageIndex, ColumnAbs);
+	var FootnotesHeight = this.Footnotes.GetHeight(PageAbs, ColumnAbs);
 
 	var Y      = SectPr.Get_PageMargin_Top();
 	var YLimit = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom() - FootnotesHeight;
