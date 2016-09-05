@@ -1075,6 +1075,10 @@ CChartsDrawer.prototype =
 			this.calcProp.max = this.calcProp.scale[this.calcProp.scale.length -1];
 			this.calcProp.min = this.calcProp.scale[0];
 		}
+		
+		
+		this.calcProp.axisMin = this.calcProp.scale[0] < this.calcProp.scale[this.calcProp.scale.length - 1] ? this.calcProp.scale[0] : this.calcProp.scale[this.calcProp.scale.length - 1];
+		this.calcProp.axisMax = this.calcProp.scale[0] < this.calcProp.scale[this.calcProp.scale.length - 1] ? this.calcProp.scale[this.calcProp.scale.length - 1] : this.calcProp.scale[0];
 	},
 	
 	//****new calculate data****
@@ -1397,9 +1401,9 @@ CChartsDrawer.prototype =
 		axisMax =  manualMax !== null && manualMax !== undefined ? manualMax : trueMinMax.max;
 		
 		var percentChartMax = 100;
-		if(this.calcProp.subType == 'stackedPer' && axisMax > percentChartMax)
+		if(this.calcProp.subType == 'stackedPer' && axisMax > percentChartMax && manualMax === null)
 			axisMax = percentChartMax;
-		if(this.calcProp.subType == 'stackedPer' && axisMin < - percentChartMax)
+		if(this.calcProp.subType == 'stackedPer' && axisMin < - percentChartMax && manualMin === null)
 			axisMin = - percentChartMax;
 		
 		
@@ -1418,6 +1422,10 @@ CChartsDrawer.prototype =
 		if(axis && axis.majorUnit !== null)
 		{
 			step = axis.majorUnit;
+			if(this.calcProp.subType == 'stackedPer')
+			{
+				step = step * 100;
+			}
 		}
 		else
 		{
@@ -1553,9 +1561,11 @@ CChartsDrawer.prototype =
 	_getArrayAxisValues: function(minUnit, axisMin, axisMax, step, manualMin, manualMax)
 	{
 		var arrayValues = [];
+		var stackedPerMax = null !== manualMax ? manualMax : 100;
+		
 		for(var i = 0; i < 20; i++)
 		{
-			if(this.calcProp.subType == 'stackedPer' && (minUnit + step * i) > 100)
+			if(this.calcProp.subType == 'stackedPer' && (minUnit + step * i) > stackedPerMax)
 				break;
 			
 			arrayValues[i] = minUnit + step * i;
@@ -6522,30 +6532,57 @@ drawHBarChart.prototype =
 	_getStartYColumnPosition: function (seriesHeight, j, i, val, xPoints, summBarVal)
 	{
 		var startY, diffYVal, width, numCache, dVal, curVal, prevVal, endBlockPosition, startBlockPosition;
-		var nullPositionOX = this.cChartSpace.chart.plotArea.catAx.posX ? this.cChartSpace.chart.plotArea.catAx.posX * this.chartProp.pxToMM : this.cChartSpace.chart.plotArea.catAx.xPos * this.chartProp.pxToMM;
-		if(this.chartProp.subType == "stacked")
+		var catAx = this.cChartSpace.chart.plotArea.catAx;
+		var nullPositionOX = catAx.posX ? catAx.posX * this.chartProp.pxToMM : catAx.xPos * this.chartProp.pxToMM;
+		
+		if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
 		{
 			curVal = this._getStackedValue(this.chartProp.series, i, j, val);
 			prevVal = this._getStackedValue(this.chartProp.series, i - 1, j, val);
 			
-			endBlockPosition = this.cChartDrawer.getYPosition((curVal), xPoints, true) * this.chartProp.pxToMM;
-			startBlockPosition = prevVal ? this.cChartDrawer.getYPosition((prevVal), xPoints, true) * this.chartProp.pxToMM : nullPositionOX;
-			
-			startY = startBlockPosition;
-			width = endBlockPosition - startBlockPosition;
-			
-			if(this.cChartSpace.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
-				width = - width;
-		}
-		else if(this.chartProp.subType == "stackedPer")
-		{	
-			this._calculateSummStacked(j);
-			
-			curVal = this._getStackedValue(this.chartProp.series, i, j, val);
-			prevVal = this._getStackedValue(this.chartProp.series, i - 1, j, val);
-			
-			endBlockPosition = this.cChartDrawer.getYPosition((curVal / this.summBarVal[j]), xPoints, true) * this.chartProp.pxToMM;
-			startBlockPosition = this.summBarVal[j] ? this.cChartDrawer.getYPosition((prevVal / this.summBarVal[j]), xPoints, true) * this.chartProp.pxToMM : nullPositionOX;
+			if(this.chartProp.subType == "stacked")
+			{
+				//если максимальное значение задано вручную, и присутвуют точки, которые больше этого значения
+				if(curVal > this.cChartDrawer.calcProp.axisMax)
+				{
+					curVal = this.cChartDrawer.calcProp.axisMax;
+				}
+				if(curVal < this.cChartDrawer.calcProp.axisMin)
+				{
+					curVal = this.cChartDrawer.calcProp.axisMin;
+				}
+				
+				endBlockPosition = this.cChartDrawer.getYPosition((curVal), xPoints, true) * this.chartProp.pxToMM;
+				startBlockPosition = prevVal ? this.cChartDrawer.getYPosition((prevVal), xPoints, true) * this.chartProp.pxToMM : nullPositionOX;
+			}
+			else
+			{	
+				this._calculateSummStacked(j);
+				
+				var test = this.summBarVal[j];
+				
+				//если максимальное значение задано вручную, и присутвуют точки, которые больше этого значения
+				if(curVal / test > this.cChartDrawer.calcProp.axisMax)
+				{
+					curVal = this.cChartDrawer.calcProp.axisMax * test;
+				}
+				if(curVal / test < this.cChartDrawer.calcProp.axisMin)
+				{
+					curVal = this.cChartDrawer.calcProp.axisMin * test;
+				}
+				
+				if(prevVal / test > this.cChartDrawer.calcProp.axisMax)
+				{
+					prevVal = this.cChartDrawer.calcProp.axisMax * test;
+				}
+				if(prevVal / test < this.cChartDrawer.calcProp.axisMin)
+				{
+					prevVal = this.cChartDrawer.calcProp.axisMin * test;
+				}
+				
+				endBlockPosition = this.cChartDrawer.getYPosition((curVal / test), xPoints, true) * this.chartProp.pxToMM;
+				startBlockPosition = test ? this.cChartDrawer.getYPosition((prevVal / test), xPoints, true) * this.chartProp.pxToMM : nullPositionOX;
+			}
 			
 			startY = startBlockPosition;
 			width = endBlockPosition - startBlockPosition;

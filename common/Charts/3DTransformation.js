@@ -243,7 +243,7 @@ Processor3D.prototype._calculateScaleNStandard = function()
 	var widthLine = this.widthCanvas - (this.left + this.right);
 	var heightLine = this.heightCanvas - (this.top + this.bottom);
 	
-	var trueDepth = this.depthPerspective * Math.sin(-this.angleOx);
+	var trueDepth = Math.abs(this.depthPerspective * Math.sin(-this.angleOx));
 	var mustHeight = heightLine - trueDepth;
 	var mustWidth = this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar ? mustHeight * this.hPercent : mustHeight / this.hPercent;
 	
@@ -846,7 +846,7 @@ Processor3D.prototype._calculateDepth = function()
 	var basePercent = this.view3D && this.view3D.depthPercent ? this.view3D.depthPercent / 100 : globalBasePercent / 100;//процент от базовой глубины
 	var seriesCount = this.chartsDrawer.calcProp.seriesCount;
 	var ptCount = this.chartsDrawer.calcProp.ptCount;
-	var sinOx = Math.sin(-this.angleOx);
+	var sinOx = Math.abs(Math.sin(-this.angleOx));
 	var sinOy = Math.sin(-this.angleOy);
 	var hPercent = type == AscFormat.c_oChartTypes.HBar ? 1 : this.hPercent;
 	var depthPercent = this.view3D.depthPercent !== null ? this.view3D.depthPercent / 100 : 1;
@@ -872,7 +872,7 @@ Processor3D.prototype._calculateDepth = function()
 		{
 			chartWidth = widthOneBar + heightHPercent;
 		}
-		else if(this.angleOx !== 0/* && this.angleOy !== 0*/)//AngleOYNoAut + AngleOYNoAutPerHeight + (ANGLEOX+ANGLEOY) + AngleOYOXNoAut + ANGLEOXANGLEOYHPerDPer(ANGLEOX+ANGLEOY HPercent)
+		else if(this.angleOx !== 0)//AngleOYNoAut + AngleOYNoAutPerHeight + (ANGLEOX+ANGLEOY) + AngleOYOXNoAut + ANGLEOXANGLEOYHPerDPer(ANGLEOX+ANGLEOY HPercent)
 		{
 			//если выставить ширину 255 будет так же, как и в документе с расчётами
 			b = (seriesCount - (seriesCount - 1) * overlap + gapWidth);
@@ -912,7 +912,7 @@ Processor3D.prototype._calculateDepth = function()
 			depth = depth * Math.sin(-this.angleOx);
 	}
 	
-	return sinOx !== 0 ? depth / Math.sin(-this.angleOx) : depth;
+	return sinOx !== 0 ? depth / sinOx : depth;
 };
 
 Processor3D.prototype._calculateDepthPerspective = function()
