@@ -2228,6 +2228,10 @@
 				return false;
 
 			case 8:   // "backspace"
+				if (!this.enableKeyEvents) {
+					break;
+				}
+
 				if (window['IS_NATIVE_EDITOR']) {
 					t._removeChars(ctrlKey ? kPrevWord : kPrevChar);
 				} else {
@@ -2242,6 +2246,10 @@
 				return false;
 
 			case 46:  // "del"
+				if (!this.enableKeyEvents) {
+					break;
+				}
+
 				if (!t.hasFocus) {
 					t.setFocus(true);
 				}
@@ -2254,6 +2262,10 @@
 				return true;
 
 			case 37:  // "left"
+				if (!this.enableKeyEvents) {
+					break;
+				}
+
 				event.stopPropagation();
 				event.preventDefault();
 				if (!t.hasFocus) {
@@ -2267,6 +2279,10 @@
 				return false;
 
 			case 39:  // "right"
+				if (!this.enableKeyEvents) {
+					break;
+				}
+
 				event.stopPropagation();
 				event.preventDefault();
 				if (!t.hasFocus) {
@@ -2280,6 +2296,10 @@
 				return false;
 
 			case 38:  // "up"
+				if (!this.enableKeyEvents) {
+					break;
+				}
+
 				event.stopPropagation();
 				event.preventDefault();
 				if (!t.hasFocus) {
@@ -2292,6 +2312,10 @@
 				return false;
 
 			case 40:  // "down"
+				if (!this.enableKeyEvents) {
+					break;
+				}
+
 				event.stopPropagation();
 				event.preventDefault();
 				if (!t.hasFocus) {
@@ -2304,6 +2328,10 @@
 				return false;
 
 			case 35:  // "end"
+				if (!this.enableKeyEvents) {
+					break;
+				}
+
 				// Отключим стандартную обработку браузера нажатия end
 				event.stopPropagation();
 				event.preventDefault();
@@ -2318,6 +2346,10 @@
 				return false;
 
 			case 36:  // "home"
+				if (!this.enableKeyEvents) {
+					break;
+				}
+
 				// Отключим стандартную обработку браузера нажатия home
 				event.stopPropagation();
 				event.preventDefault();
@@ -2439,6 +2471,10 @@
 				break;
 			case 89:  // ctrl + y
 			case 90:  // ctrl + z
+				if (!this.enableKeyEvents) {
+					break;
+				}
+
 				if (ctrlKey) {
 					event.stopPropagation();
 					event.preventDefault();
