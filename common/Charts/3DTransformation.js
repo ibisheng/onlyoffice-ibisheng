@@ -355,58 +355,28 @@ Processor3D.prototype.convertAndTurnPointRAngAx = function(x, y, z)
 	var heightChart = this.heightCanvas - this.top - this.bottom;
 	var widthOriginalChart = this.widthCanvas - this.left - this.right;
 
-	//aspectRatio
-	if(this.view3D.rAngAx)
-	{
-		x = x / this.aspectRatioX;
-		y = y / this.aspectRatioY;
-	}
-	else
-	{
-		var aspectRatio = (widthOriginalChart) / (heightChart);
-		x = x / aspectRatio;
-	}
-	
-
-	x = x / this.scaleX;
-	y = y / this.scaleY;
-	z = z / this.scaleZ;
-	
 	var point3D = new Point3D(x, y, z, this);
+	this.scale(point3D);
 	
 	//diff
 	var centerXDiff = heightChart / 2 + this.left / 2;
 	var centerYDiff = heightChart / 2 + this.top;
 	var centerZDiff = this.depthPerspective / 2;
 	
-	
 	point3D.offset(-centerXDiff, -centerYDiff, -centerZDiff);
 	
 	//rotate
-	var matrixRotateAllAxis;
-	if(!this.view3D.rAngAx)
-		matrixRotateAllAxis = this._getMatrixRotateAllAxis();
-	else
-		matrixRotateAllAxis = this._shearXY();
-		
+	var matrixRotateAllAxis = this._shearXY();
 	point3D.multiplyPointOnMatrix1(matrixRotateAllAxis);
 	
 	// diff camera for charts write into rect
 	point3D.offset(this.cameraDiffX, this.cameraDiffY, this.cameraDiffZ);
 	
-	//project
-	var projectionPoint = point3D;
-	if(!this.view3D.rAngAx)
-	{
-		var projectiveMatrix = this._getPerspectiveProjectionMatrix(1 / (this.rPerspective));
-		projectionPoint = point3D.project(projectiveMatrix);
-	}
-	
 	//undiff
 	var specialReverseDiff = this.widthCanvas / 2 + (this.left - this.right) / 2;
-	projectionPoint.offset(specialReverseDiff, centerYDiff, centerZDiff);
+	point3D.offset(specialReverseDiff, centerYDiff, centerZDiff);
 	
-	return {x: projectionPoint.x, y: projectionPoint.y, z: z};
+	return {x: point3D.x, y: point3D.y, z: z};
 };
 
 Processor3D.prototype.convertAndTurnPointPerspective = function(x, y, z, isNScale, isNRotate, isNProject)
@@ -420,12 +390,12 @@ Processor3D.prototype.convertAndTurnPointPerspective = function(x, y, z, isNScal
 	
 	if(!isNRotate)
 	{
-		this.rotate1(point3D);
+		this.rotatePerspective(point3D);
 	}
 	
 	if(!isNProject)
 	{
-		this.project1(point3D);
+		this.projectPerspective(point3D);
 	}
 	
 	return {x: point3D.x, y: point3D.y, z: point3D.z};
@@ -443,7 +413,7 @@ Processor3D.prototype.scale = function(point3D)
 },
 
 
-Processor3D.prototype.rotate1 = function(point3D)
+Processor3D.prototype.rotatePerspective = function(point3D)
 {
 	//diff
 	point3D.offset((-this.widthCanvas / 2) / this.aspectRatioX, (-this.heightCanvas / 2) / this.aspectRatioY, 0);
@@ -455,7 +425,7 @@ Processor3D.prototype.rotate1 = function(point3D)
 };
 
 
-Processor3D.prototype.project1 = function(point3D)
+Processor3D.prototype.projectPerspective = function(point3D)
 {
 	//diff
 	point3D.offset((-this.widthCanvas / 2) / this.aspectRatioX, (-this.heightCanvas / 2) / this.aspectRatioY /** aspectRatio*/, 0);
