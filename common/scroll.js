@@ -37,6 +37,10 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
+
+    window['AscCommon'] = window['AscCommon'] || {};
+    var AscCommon = window['AscCommon'];
+
 var debug = false;
 
 var ScrollArrowType = {
@@ -1706,6 +1710,7 @@ ScrollObject.prototype = {
         this.canvas.style.zIndex = 100;
         this.canvas.style.position = "absolute";
         this.canvas.style.top = "0px";
+        this.canvas.style["msTouchAction"] = "none";
         if ( navigator.userAgent.toLowerCase().indexOf( "webkit" ) != -1 ){
             this.canvas.style.webkitUserSelect = "none";
         }
@@ -1784,8 +1789,9 @@ ScrollObject.prototype = {
         }
 
         // return relative mouse position
-        var mouseX = evt.clientX - left + window.pageXOffset;
-        var mouseY = evt.clientY - top + window.pageYOffset;
+        var mouseX = ((evt.clientX * AscCommon.AscBrowser.zoom) >> 0) - left + window.pageXOffset;
+        var mouseY = ((evt.clientY * AscCommon.AscBrowser.zoom) >> 0) - top + window.pageYOffset;
+
         return {
             x:mouseX,
             y:mouseY
@@ -3352,6 +3358,5 @@ ScrollObject.prototype = {
 };
 
     //---------------------------------------------------------export---------------------------------------------------
-    window['AscCommon'] = window['AscCommon'] || {};
     window["AscCommon"].ScrollObject = ScrollObject;
 })(window);

@@ -415,73 +415,9 @@ CChartSpace.prototype.recalculate = function()
             }
         }
 
-        for(var i = 0; i < this.recalcInfo.dataLbls.length; ++i)
-        {
-            var series = this.chart.plotArea.chart.series;
-            if(this.recalcInfo.dataLbls[i].series && this.recalcInfo.dataLbls[i].pt)
-            {
 
-                var ser_idx = this.recalcInfo.dataLbls[i].series.idx; //сделаем проверку лежит ли серия с индексом this.recalcInfo.dataLbls[i].series.idx в сериях первой диаграммы
-                for(var j = 0;  j < series.length; ++j)
-                {
-                    if(series[j].idx === this.recalcInfo.dataLbls[i].series.idx)
-                    {
-                        var pos = this.chartObj.reCalculatePositionText("dlbl", this, /*this.recalcInfo.dataLbls[i].series.idx todo здесь оставить как есть в chartDrawere выбирать серии по индексу*/j, this.recalcInfo.dataLbls[i].pt.idx);//
-                        this.recalcInfo.dataLbls[i].setPosition(pos.x, pos.y);
-                        break;
-                    }
-                }
-            }
-        }
-        this.recalcInfo.dataLbls.length = 0;
-
-        if(b_recalc_labels)
-        {
-            if(this.chart && this.chart.title)
-            {
-                var pos = this.chartObj.reCalculatePositionText("title", this, this.chart.title);
-                this.chart.title.setPosition(pos.x, pos.y);
-            }
-
-            if(this.chart && this.chart.plotArea && this.chart.plotArea)
-            {
-                var hor_axis = this.chart.plotArea.getHorizontalAxis();
-                if(hor_axis && hor_axis.title)
-                {
-                    var old_cat_ax = this.chart.plotArea.catAx;
-                    this.chart.plotArea.catAx = hor_axis;
-                    var pos = this.chartObj.reCalculatePositionText("catAx", this, hor_axis.title);
-                    hor_axis.title.setPosition(pos.x, pos.y);
-
-                    this.chart.plotArea.catAx = old_cat_ax;
-                }
-                var vert_axis = this.chart.plotArea.getVerticalAxis();
-                if(vert_axis && vert_axis.title)
-                {
-                    var old_val_ax = this.chart.plotArea.valAx;
-                    this.chart.plotArea.valAx = vert_axis;
-                    var pos = this.chartObj.reCalculatePositionText("valAx", this, vert_axis.title);
-                    vert_axis.title.setPosition(pos.x, pos.y);
-                    this.chart.plotArea.valAx = old_val_ax;
-                }
-            }
-        }
-
-        if(b_recalc_legend && this.chart && this.chart.legend)
-        {
-            var bResetLegendPos = false;
-            if(!AscFormat.isRealNumber(this.chart.legend.legendPos))
-            {
-                this.chart.legend.legendPos = Asc.c_oAscChartLegendShowSettings.bottom;
-                bResetLegendPos = true;
-            }
-            var pos = this.chartObj.reCalculatePositionText("legend", this, this.chart.legend);
-            this.chart.legend.setPosition(pos.x, pos.y);
-            if(bResetLegendPos)
-            {
-                this.chart.legend.legendPos = null;
-            }
-        }
+        this.calculateLabelsPositions(b_recalc_labels, b_recalc_legend);
+        
         if(this.recalcInfo.recalculateTextPr)
         {
             this.recalculateTextPr();

@@ -304,8 +304,9 @@ CTable.prototype =
             var Border_insideH = null;
             var Border_insideV = null;
 
-            var CellShd   = null;
-            var CellWidth = undefined;
+			var CellShd        = null;
+			var CellWidth      = undefined;
+			var CellWidthStart = undefined;
 
             var Prev_row = -1;
             var bFirstRow = true;
@@ -360,6 +361,8 @@ CTable.prototype =
 						CellWidth = Cell_w.W;
 					else// if (tblwidth_Pct === Cell_w.Type)
 						CellWidth = -Cell_w.W;
+
+					CellWidthStart = CellWidth;
 				}
 				else
 				{
@@ -487,7 +490,18 @@ CTable.prototype =
             Pr.CellsVAlign = VAlign;
             Pr.CellsTextDirection = TextDirection;
             Pr.CellsNoWrap        = NoWrap;
-            Pr.CellsWidth         = CellWidth;
+
+			if (undefined === CellWidth)
+			{
+				Pr.CellsWidth         = CellWidthStart;
+				Pr.CellsWidthNotEqual = true;
+			}
+			else
+			{
+				Pr.CellsWidth         = CellWidthStart;
+				Pr.CellsWidthNotEqual = false;
+			}
+
 
             Pr.CellBorders =
             {
@@ -568,6 +582,8 @@ CTable.prototype =
                 Pr.CellsWidth = CellW.W;
             else// if (tblwidth_Pct === CellW.Type)
                 Pr.CellsWidth = -CellW.W;
+
+			Pr.CellsWidthNotEqual = false;
 
             var Spacing = this.Content[0].Get_CellSpacing();
 
@@ -2198,7 +2214,7 @@ CTable.prototype =
             }
         }
 
-        Pos.X += this.Get_TableOffsetCorrection();
+		Pos.X = this.Pages[CurPage].X;
 
         Y += MaxTopBorder;
         
@@ -6642,11 +6658,6 @@ CTable.prototype =
         this.Markup.Internal.PageNum   = 0;
     },
 
-    Selection_Clear : function()
-    {
-
-    },
-
     Selection_Check : function(X, Y, CurPage, NearPos)
     {
         if (undefined != NearPos)
@@ -6714,7 +6725,7 @@ CTable.prototype =
         return true;
     },
 
-    Select_All : function()
+    Select_All : function(nDirection)
     {
         this.Selection.Use      = true;
         this.Selection.Start    = false;
@@ -6723,11 +6734,34 @@ CTable.prototype =
 
         this.Selection.Data2 = null;
 
-        this.Selection.StartPos.Pos        = { Row : 0, Cell : 0 };
-        this.Selection.StartPos.PageIndex  = 0;
+        if (nDirection && nDirection < 0)
+        {
+            this.Selection.EndPos.Pos       = {
+                Row  : 0,
+                Cell : 0
+            };
+            this.Selection.EndPos.PageIndex = 0;
 
-        this.Selection.EndPos.Pos          = { Row : this.Content.length - 1, Cell : this.Content[this.Content.length - 1].Get_CellsCount() - 1 };
-        this.Selection.EndPos.PageIndex    = this.Pages.length - 1;
+            this.Selection.StartPos.Pos       = {
+                Row  : this.Content.length - 1,
+                Cell : this.Content[this.Content.length - 1].Get_CellsCount() - 1
+            };
+            this.Selection.StartPos.PageIndex = this.Pages.length - 1;
+        }
+        else
+        {
+            this.Selection.StartPos.Pos       = {
+                Row  : 0,
+                Cell : 0
+            };
+            this.Selection.StartPos.PageIndex = 0;
+
+            this.Selection.EndPos.Pos       = {
+                Row  : this.Content.length - 1,
+                Cell : this.Content[this.Content.length - 1].Get_CellsCount() - 1
+            };
+            this.Selection.EndPos.PageIndex = this.Pages.length - 1;
+        }
 
         this.Internal_Selection_UpdateCells();
     },
@@ -6847,11 +6881,11 @@ CTable.prototype =
         this.CurCell.Content.Add_InlineImage(W,H,Img, Chart, bFlow);
     },
 
-    Add_OleObject : function(W, H, Img, Data)
+    Add_OleObject : function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
     {
         this.Selection.Use  = true;
         this.Selection.Type = table_Selection_Text;
-        this.CurCell.Content.Add_OleObject(W, H, Img, Data);
+        this.CurCell.Content.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
     },
 
     Add_TextArt : function(nStyle)
@@ -7955,10 +7989,10 @@ CTable.prototype =
         return false;
     },
 
-    Get_SelectedText : function(bClearText)
+    Get_SelectedText : function(bClearText, oPr)
     {
         if ( true === bClearText && ( (true == this.Selection.Use && table_Selection_Text == this.Selection.Type) || false === this.Selection.Use ) )
-            return this.CurCell.Content.Get_SelectedText(true);
+            return this.CurCell.Content.Get_SelectedText(true, oPr);
         else if ( false === bClearText )
         {
             if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
@@ -7971,14 +8005,14 @@ CTable.prototype =
                     var Cell = this.Content[Pos.Row].Get_Cell( Pos.Cell );
 
                     Cell.Content.Set_ApplyToAll( true );
-                    ResultText += Cell.Content.Get_SelectedText( false );
+                    ResultText += Cell.Content.Get_SelectedText( false, oPr );
                     Cell.Content.Set_ApplyToAll( false );
                 }
 
                 return ResultText;
             }
             else
-                return this.CurCell.Content.Get_SelectedText(false);
+                return this.CurCell.Content.Get_SelectedText(false, oPr);
         }
 
         return null;
@@ -8458,7 +8492,7 @@ CTable.prototype =
         else
         {
             var CellContent = this.CurCell.Content;
-            if (this.LogicDocument && true === this.LogicDocument.UseTextShd && docpostype_Content === CellContent.CurPos.Type && true !== CellContent.Selection.Use && type_Paragraph === CellContent.Content[CellContent.CurPos.ContentPos].GetType())
+            if (this.LogicDocument && true === this.LogicDocument.UseTextShd && docpostype_Content === CellContent.Get_DocPosType() && true !== CellContent.Selection.Use && type_Paragraph === CellContent.Content[CellContent.CurPos.ContentPos].GetType())
             {
                 this.CurCell.Set_Shd( Shd );
                 this.CurCell.Content.ReDraw();                
@@ -9973,7 +10007,7 @@ CTable.prototype =
                 // Сообщение об ошибке : "Value Rows must be between 1 and " + VMerge_count
                 var ErrData = new AscCommon.CErrorData();
                 ErrData.put_Value( VMerge_count );
-                editor.asc_fireCallback("asc_onError",c_oAscError.ID.SplitCellMaxRows,c_oAscError.Level.NoCritical, ErrData );
+                editor.sendEvent("asc_onError",c_oAscError.ID.SplitCellMaxRows,c_oAscError.Level.NoCritical, ErrData );
                 return false;
             }
             else if ( 0 != VMerge_count % Rows )
@@ -9981,7 +10015,7 @@ CTable.prototype =
                 // Сообщение об ошибке : "Value must be a divisor of the number " + VMerge_count
                 var ErrData = new AscCommon.CErrorData();
                 ErrData.put_Value( VMerge_count );
-                editor.asc_fireCallback("asc_onError",c_oAscError.ID.SplitCellRowsDivider,c_oAscError.Level.NoCritical, ErrData );
+                editor.sendEvent("asc_onError",c_oAscError.ID.SplitCellRowsDivider,c_oAscError.Level.NoCritical, ErrData );
                 return false;
             }
         }
@@ -10007,7 +10041,7 @@ CTable.prototype =
                 // Сообщение об ошибке : "Value Cols must be a between 1 and " + MaxCols
                 var ErrData = new AscCommon.CErrorData();
                 ErrData.put_Value( MaxCols );
-                editor.asc_fireCallback("asc_onError",c_oAscError.ID.SplitCellMaxCols,c_oAscError.Level.NoCritical, ErrData );
+                editor.sendEvent("asc_onError",c_oAscError.ID.SplitCellMaxCols,c_oAscError.Level.NoCritical, ErrData );
                 return false;
             }
         }
@@ -12608,7 +12642,7 @@ CTable.prototype =
             TableGrid_min[Index] = SumGrid_min[Index] - SumGrid_min[Index - 1];
 
         var CurrentW = SumGrid[SumGrid.length - 1];
-        while ( Grids_to_scale_count > 0 )
+        while ( Grids_to_scale_count > 0 && CurrentW > 0.001 )
         {
             // Пробуем ужать колонки таблицы
             var Koef = TableW / CurrentW;

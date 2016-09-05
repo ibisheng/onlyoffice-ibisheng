@@ -533,7 +533,7 @@ $( function () {
 
         oParser = new parserFormula( "2<>\"3\"", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), "TRUE", "2<>\"3\"" )
+        strictEqual( oParser.calculate().getValue(), "TRUE", "2<>\"3\"" );
 
         oParser = new parserFormula( "2=\"3\"", "A1", ws );
         ok( oParser.parse() );
@@ -635,50 +635,50 @@ $( function () {
         strictEqual( ws.getCell2( "K1" ).getValueWithFormat(), "TRUE" );
     } )
 
-    test( "Test: \"ROUNDUP(31415.92654;-2)\"", function () {
-        oParser = new parserFormula( "ROUNDUP(31415.92654;-2)", "A1", ws );
+    test( "Test: \"ROUNDUP(31415.92654,-2)\"", function () {
+        oParser = new parserFormula( "ROUNDUP(31415.92654,-2)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 31500 );
     } )
 
-    test( "Test: \"ROUNDUP(3.2;0)\"", function () {
-        oParser = new parserFormula( "ROUNDUP(3.2;0)", "A1", ws );
+    test( "Test: \"ROUNDUP(3.2,0)\"", function () {
+        oParser = new parserFormula( "ROUNDUP(3.2,0)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 4 );
     } )
 
-    test( "Test: \"ROUNDUP(-3.14159;1)\"", function () {
-        oParser = new parserFormula( "ROUNDUP(-3.14159;1)", "A1", ws );
+    test( "Test: \"ROUNDUP(-3.14159,1)\"", function () {
+        oParser = new parserFormula( "ROUNDUP(-3.14159,1)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), -3.2 );
     } )
 
-    test( "Test: \"ROUNDUP(3.14159;3)\"", function () {
-        oParser = new parserFormula( "ROUNDUP(3.14159;3)", "A1", ws );
+    test( "Test: \"ROUNDUP(3.14159,3)\"", function () {
+        oParser = new parserFormula( "ROUNDUP(3.14159,3)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 3.142 );
     } )
 
-    test( "Test: \"ROUNDDOWN(31415.92654;-2)\"", function () {
-        oParser = new parserFormula( "ROUNDDOWN(31415.92654;-2)", "A1", ws );
+    test( "Test: \"ROUNDDOWN(31415.92654,-2)\"", function () {
+        oParser = new parserFormula( "ROUNDDOWN(31415.92654,-2)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 31400 );
     } )
 
-    test( "Test: \"ROUNDDOWN(-3.14159;1)\"", function () {
-        oParser = new parserFormula( "ROUNDDOWN(-3.14159;1)", "A1", ws );
+    test( "Test: \"ROUNDDOWN(-3.14159,1)\"", function () {
+        oParser = new parserFormula( "ROUNDDOWN(-3.14159,1)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), -3.1 );
     } )
 
-    test( "Test: \"ROUNDDOWN(3.14159;3)\"", function () {
-        oParser = new parserFormula( "ROUNDDOWN(3.14159;3)", "A1", ws );
+    test( "Test: \"ROUNDDOWN(3.14159,3)\"", function () {
+        oParser = new parserFormula( "ROUNDDOWN(3.14159,3)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 3.141 );
     } )
 
-    test( "Test: \"ROUNDDOWN(3.2;0)\"", function () {
-        oParser = new parserFormula( "ROUNDDOWN(3.2;0)", "A1", ws );
+    test( "Test: \"ROUNDDOWN(3.2,0)\"", function () {
+        oParser = new parserFormula( "ROUNDDOWN(3.2,0)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 3 );
     } )
@@ -701,17 +701,17 @@ $( function () {
         }
 
 
-        oParser = new parserFormula( "MROUND(10;3)", "A1", ws );
+        oParser = new parserFormula( "MROUND(10,3)", "A1", ws );
         ok( oParser.parse() );
         multiple = 3;
         strictEqual( oParser.calculate().getValue(), mroundHelper( 10 + 3 / 2 ) );
 
-        oParser = new parserFormula( "MROUND(-10;-3)", "A1", ws );
+        oParser = new parserFormula( "MROUND(-10,-3)", "A1", ws );
         ok( oParser.parse() );
         multiple = -3;
         strictEqual( oParser.calculate().getValue(), mroundHelper( -10 + -3 / 2 ) );
 
-        oParser = new parserFormula( "MROUND(1.3;0.2)", "A1", ws );
+        oParser = new parserFormula( "MROUND(1.3,0.2)", "A1", ws );
         ok( oParser.parse() );
         multiple = 0.2;
         strictEqual( oParser.calculate().getValue(), mroundHelper( 1.3 + 0.2 / 2 ) );
@@ -2087,7 +2087,7 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( difBetween( oParser.calculate().getValue(), -1.3753740625 ), true );
 
-        oParser = new parserFormula( "COVAR({1,2};{4,5})", "B1", ws );
+        oParser = new parserFormula( "COVAR({1,2},{4,5})", "B1", ws );
         ok( oParser.parse() );
         strictEqual( difBetween( oParser.calculate().getValue(), 0.25 ), true );
 
@@ -3289,31 +3289,31 @@ $( function () {
         ws.getRange2( "C554" ).setValue( "29" );
         ws.getRange2( "C555" ).setValue( "28" );
 
-        oParser = new parserFormula( "MATCH(30;A551:A555;-1)", "A2", ws );
+        oParser = new parserFormula( "MATCH(30,A551:A555,-1)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), "#N/A" );
 
-        oParser = new parserFormula( "MATCH(30;A551:A555;1)", "A2", ws );
+        oParser = new parserFormula( "MATCH(30,A551:A555,1)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 2 );
 
-        oParser = new parserFormula( "MATCH(30;A551:A555;0)", "A2", ws );
+        oParser = new parserFormula( "MATCH(30,A551:A555,0)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), "#N/A" );
 
-        oParser = new parserFormula( "MATCH(30;B551:B555)", "A2", ws );
+        oParser = new parserFormula( "MATCH(30,B551:B555)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), "#N/A" );
 
-        oParser = new parserFormula( "MATCH(30;B551:B555;-1)", "A2", ws );
+        oParser = new parserFormula( "MATCH(30,B551:B555,-1)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 3 );
 
-        oParser = new parserFormula( "MATCH(30;B551:B555;0)", "A2", ws );
+        oParser = new parserFormula( "MATCH(30,B551:B555,0)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), "#N/A" );
 
-        oParser = new parserFormula( "MATCH(31;C551:C555;0)", "A2", ws );
+        oParser = new parserFormula( "MATCH(31,C551:C555,0)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 3 );
 
@@ -3395,7 +3395,7 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 27 );
 
-        oParser = new parserFormula( "OFFSET(B3; -2; 0; 1; 1)", "A2", ws );
+        oParser = new parserFormula( "OFFSET(B3, -2, 0, 1, 1)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().toString(), "B1" );
 
@@ -4844,7 +4844,7 @@ $( function () {
         ok( oParser.parse() );
         ok( difBetween(oParser.calculate().getValue(), 113.597717474079) );
 
-        oParser = new parserFormula( "ODDFPRICE(DATE(1990;6;1);DATE(1995;12;31);DATE(1990;1;1);DATE(1990;12;31);6%;5%;1000;1;1)", "A2", ws );
+        oParser = new parserFormula( "ODDFPRICE(DATE(1990,6,1),DATE(1995,12,31),DATE(1990,1,1),DATE(1990,12,31),6%,5%,1000,1,1)", "A2", ws );
         ok( oParser.parse() );
         ok( difBetween(oParser.calculate().getValue(), 790.11323221867) );
 
@@ -4852,7 +4852,7 @@ $( function () {
 
     test( "Test: \"ODDFYIELD\"", function () {
 
-        oParser = new parserFormula( "ODDFYIELD(DATE(1990;6;1);DATE(1995;12;31);DATE(1990;1;1);DATE(1990;12;31);6%;790;100;1;1)", "A2", ws );
+        oParser = new parserFormula( "ODDFYIELD(DATE(1990,6,1),DATE(1995,12,31),DATE(1990,1,1),DATE(1990,12,31),6%,790,100,1,1)", "A2", ws );
         ok( oParser.parse() );
         ok( oParser.assemble() == "ODDFYIELD(DATE(1990,6,1),DATE(1995,12,31),DATE(1990,1,1),DATE(1990,12,31),6%,790,100,1,1)" );
         ok( difBetween(oParser.calculate().getValue(),-0.2889178784774840 ) );
@@ -4862,7 +4862,7 @@ $( function () {
         ok( oParser.assemble() == "ODDFYIELD(DATE(2008,11,11),DATE(2021,3,1),DATE(2008,10,15),DATE(2009,3,1),0.0575,84.5,100,2,0)" );
         ok( difBetween(oParser.calculate().getValue(), 0.0772455415972989 ) );
 
-        oParser = new parserFormula( "ODDFYIELD(DATE(2008;12;11);DATE(2021;4;1);DATE(2008;10;15);DATE(2009;4;1);6%;100;100;4;1)", "A2", ws );
+        oParser = new parserFormula( "ODDFYIELD(DATE(2008,12,11),DATE(2021,4,1),DATE(2008,10,15),DATE(2009,4,1),6%,100,100,4,1)", "A2", ws );
         ok( oParser.parse() );
         ok( oParser.assemble() == "ODDFYIELD(DATE(2008,12,11),DATE(2021,4,1),DATE(2008,10,15),DATE(2009,4,1),6%,100,100,4,1)" );
         ok( difBetween(oParser.calculate().getValue(), 0.0599769985558904 ) );

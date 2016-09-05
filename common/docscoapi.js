@@ -1277,8 +1277,7 @@
       //TODO: add checks and error handling
       //Get data type
       var dataObject = JSON.parse(e.data);
-      var type = dataObject['type'];
-      switch (type) {
+      switch (dataObject['type']) {
         case 'auth'        :
           t._onAuth(dataObject);
           break;
@@ -1325,6 +1324,7 @@
           break;
         case 'license':
           t._onLicense(dataObject);
+          break;
       }
     };
     sockjs.onclose = function(evt) {

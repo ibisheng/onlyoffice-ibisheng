@@ -4282,7 +4282,7 @@ function OfflineEditor () {
         var adjustPrint = asc_ReadAdjustPrint(s, p);
         var pagesData   = _api.wb.calcPagesPrint(adjustPrint);
         var pdfWriter   = new AscCommonExcel.CPdfPrinter();
-        var isEndPrint  = _api.wb.printSheet(pdfWriter, pagesData);
+        _api.wb.printSheets(pdfWriter, pagesData);
         return pdfWriter.DocumentRenderer.Memory.GetBase64Memory();
     };
 
@@ -5310,7 +5310,7 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
     if (ct.target && ct.target === AscCommonExcel.c_oTargetType.FilterObject) {
         ws.af_setDialogProp(ct.idFilter);
         //var cell = offline_get_cell_in_coord(x, y);
-        return;
+        return {};
     }
 
     if (isRangeResize) {
@@ -5622,7 +5622,7 @@ function offline_cell_editor_open(x, y, width, height, ratio, isSelectAll, isFor
 
     wb.cellEditor.isSelectAll = isSelectAll;
     if (!isFormulaInsertMode) {
-        wb._onEditCell(x, y, true, undefined, undefined, true, false);
+        wb._onEditCell(undefined, undefined, true, false);
     }
     ws.visibleRange = range;
 }
@@ -5948,50 +5948,56 @@ function offline_insertFormula(functionName, autoComplete, isDefName) {
 function offline_copy() {
     var worksheet = _api.wb.getWorksheet();
     var sBase64 = {};
-
+    
+    var dataBuffer = {};
+    
     if (_api.wb.cellEditor.isOpened) {
         var v = _api.wb.cellEditor.copySelection();
         if (v) {
-            sBase64.text = _api.wb.cellEditor._getFragmentsText(v);
-            sBase64.sBase64 = '';
-            sBase64.drawingUrls = null;
+            dataBuffer.text = _api.wb.cellEditor._getFragmentsText(v);
         }
+    } else {
+        
+        var clipboard = {};
+        clipboard.pushData = function(type, data) {
+            
+            if (AscCommon.c_oAscClipboardDataFormat.Text === type) {
+                
+                dataBuffer.text = data;
+                
+            } else if (AscCommon.c_oAscClipboardDataFormat.Internal === type) {
+                
+                if (null != data.drawingUrls && data.drawingUrls.length > 0) {
+                    dataBuffer.drawingUrls = data.drawingUrls[0];
+                }
+                
+                dataBuffer.sBase64 = data.sBase64;
+            }
+        }
+        
+        _api.asc_CheckCopy(clipboard, AscCommon.c_oAscClipboardDataFormat.Internal|AscCommon.c_oAscClipboardDataFormat.Text);
     }
-    else {
-        sBase64 = _api.wb.clipboard.getSelectedBinary(false);
-    }
-
+    
     var _stream = global_memory_stream_menu;
     _stream["ClearNoAttack"]();
-
-    // TODO: для картинок и текста
-    if (!sBase64)
-    {
-        _stream["WriteByte"](255);
-        return _stream;
+    
+    if (dataBuffer.text) {
+        _stream["WriteByte"](0);
+        _stream["WriteString2"](dataBuffer.text);
     }
-
-    _stream["WriteByte"](0);
-    _stream["WriteString2"](sBase64.text);
-
-    // image
-    if (null != sBase64.drawingUrls && sBase64.drawingUrls.length > 0)
-    {
+    
+    if (dataBuffer.drawingUrls) {
         _stream["WriteByte"](1);
-        _stream["WriteStringA"](sBase64.drawingUrls[0]);
+        _stream["WriteStringA"](dataBuffer.drawingUrls);
     }
-    // else
-    //{
-    // owner format
-    _stream["WriteByte"](2);
-    _stream["WriteStringA"](sBase64.sBase64);
-    // }
-
-    // _stream["WriteByte"](3);
-    // _stream["WriteString2"](sBase64.html);
-
+    
+    if (dataBuffer.sBase64) {
+        _stream["WriteByte"](2);
+        _stream["WriteStringA"](dataBuffer.sBase64);
+    }
+    
     _stream["WriteByte"](255);
-
+    
     return _stream;
 }
 function offline_paste(params) {
@@ -6000,62 +6006,73 @@ function offline_paste(params) {
 
     if (0 == type)
     {
-        _api.wb.clipboard._pasteTextOnSheet(params[1],worksheet);
+        _api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Text, params[1]);
     }
     else if (1 == type)
     {
-        _s.offline_addImageDrawingObject(params[1], {width: params[2], height: params[3]});
+        _s.offline_addImageDrawingObject([params[1], params[2],params[3]]);
     }
     else if (2 == type)
     {
-        _api.wb.clipboard._pasteFromBinaryExcel(worksheet, params[1], null, true);
+        _api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, params[1]);
     }
 }
 function offline_cut() {
     var worksheet = _api.wb.getWorksheet();
-    var sBase64 = {};
-
+    
+    var dataBuffer = {};
+    
     if (_api.wb.cellEditor.isOpened) {
         var v = _api.wb.cellEditor.copySelection();
         if (v) {
-            sBase64.text = _api.wb.cellEditor._getFragmentsText(v);
-            sBase64.sBase64 = '';
-            sBase64.drawingUrls = null;
-
+            dataBuffer.text = _api.wb.cellEditor._getFragmentsText(v);
             _api.wb.cellEditor.cutSelection();
         }
-    }
-    else {
-        sBase64 =  _api.wb.clipboard.getSelectedBinary(true);
+        
+    } else {
+        
+        var clipboard = {};
+        clipboard.pushData = function(type, data) {
+            
+            if (AscCommon.c_oAscClipboardDataFormat.Text === type) {
+                
+                dataBuffer.text = data;
+                
+            } else if (AscCommon.c_oAscClipboardDataFormat.Internal === type) {
+                
+                if (null != data.drawingUrls && data.drawingUrls.length > 0) {
+                    dataBuffer.drawingUrls = data.drawingUrls[0];
+                }
+                
+                dataBuffer.sBase64 = data.sBase64;
+            }
+        }
+        
+        _api.asc_CheckCopy(clipboard, AscCommon.c_oAscClipboardDataFormat.Internal|AscCommon.c_oAscClipboardDataFormat.Text);
+        
         worksheet.emptySelection(Asc.c_oAscCleanOptions.All);
     }
 
     var _stream = global_memory_stream_menu;
     _stream["ClearNoAttack"]();
-
-    // TODO: для картинок и текста
-    if (!sBase64)
-    {
-        _stream["WriteByte"](255);
-        return _stream;
+    
+    if (dataBuffer.text) {
+        _stream["WriteByte"](0);
+        _stream["WriteString2"](dataBuffer.text);
     }
-
-    // text format
-    _stream["WriteByte"](0);
-    _stream["WriteString2"](sBase64.text);
-
-    // image
-    if (null != sBase64.drawingUrls && sBase64.drawingUrls.length > 0)
-    {
+    
+    if (dataBuffer.drawingUrls) {
         _stream["WriteByte"](1);
-        _stream["WriteStringA"](sBase64.drawingUrls[0]);
+        _stream["WriteStringA"](dataBuffer.drawingUrls);
     }
-
-    _stream["WriteByte"](2);
-    _stream["WriteStringA"](sBase64.sBase64);
-
+    
+    if (dataBuffer.sBase64) {
+        _stream["WriteByte"](2);
+        _stream["WriteStringA"](dataBuffer.sBase64);
+    }
+    
     _stream["WriteByte"](255);
-
+    
     return _stream;
 }
 function offline_delete() {
@@ -6723,8 +6740,8 @@ function offline_apply_event(type,params) {
         case 2040: // ASC_SPREADSHEETS_EVENT_TYPE_COLUMN_SORT_FILTER
         {
             if (params.length) {
-                var typeF = params[0], cellId ='';
-                if (2===params.length)
+                var typeF = parseInt(params[0]), cellId = '';
+                if (2 === params.length)
                     cellId = params[1];
                 _api.asc_sortColFilter(typeF, cellId);
             }
@@ -7081,14 +7098,27 @@ function offline_apply_event(type,params) {
             break;
         }
 
-        case 7000: // ASC_SPREADSHEETS_EVENT_TYPE_CHECK_DATA_RANGE
+        case 7001: // ASC_SPREADSHEETS_EVENT_TYPE_CHECK_DATA_RANGE
         {
-            var isValid = _api.asc_checkDataRange(Asc.c_oAscSelectionDialogType.Chart, params, false);
+            var isValid = _api.asc_checkDataRange(parseInt(params[0]), params[1], params[2], params[3], parseInt(params[4]));
 
             _stream = global_memory_stream_menu;
             _stream["ClearNoAttack"]();
             _stream["WriteLong"](isValid);
             _return = _stream;
+            break;
+        }
+            
+        case 7005: // ASC_SPREADSHEETS_EVENT_TYPE_GET_CHART_SETTINGS
+        {
+            var chartSettings = _api.asc_getChartObject();
+            if (chartSettings) {
+                _stream = global_memory_stream_menu;
+                _stream["ClearNoAttack"]();
+                
+                asc_menu_WriteChartPr(12, chartSettings, _stream);
+                _return = _stream;
+            }
             break;
         }
 

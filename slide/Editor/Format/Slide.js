@@ -117,6 +117,12 @@ Slide.prototype =
         return editor.WordControl.m_oLogicDocument.DrawingDocument;
     },
 
+    Reassign_ImageUrls: function(images_rename){
+        for(var i = 0; i < this.cSld.spTree.length; ++i){
+            this.cSld.spTree[i].Reassign_ImageUrls(images_rename);
+        }
+    },
+
     createDuplicate: function()
     {
         var copy = new Slide(this.presentation, this.Layout, 0), i;
@@ -942,7 +948,40 @@ Slide.prototype =
         return oRet;
     },
 
-    getAllImages: function(images)
+    copySelectedObjects: function(){
+        var aSelectedObjects, i, fShift = 5.0;
+        var oSelector = this.graphicObjects.selection.groupSelection ? this.graphicObjects.selection.groupSelection : this.graphicObjects;
+        aSelectedObjects = [].concat(oSelector.selectedObjects);
+        oSelector.resetSelection(undefined, false);
+        var bGroup = this.graphicObjects.selection.groupSelection ? true : false;
+        if(bGroup){
+            oSelector.normalize();
+        }
+        for(i = 0; i < aSelectedObjects.length; ++i){
+            var oCopy = aSelectedObjects[i].copy();
+            oCopy.x = aSelectedObjects[i].x;
+            oCopy.y = aSelectedObjects[i].y;
+            oCopy.extX = aSelectedObjects[i].extX;
+            oCopy.extY = aSelectedObjects[i].extY;
+            AscFormat.CheckSpPrXfrm(oCopy, true);
+            oCopy.spPr.xfrm.setOffX(oCopy.x + fShift);
+            oCopy.spPr.xfrm.setOffY(oCopy.y + fShift);
+            oCopy.setParent(this);
+            if(!bGroup){
+                this.addToSpTreeToPos(undefined, oCopy);
+            }
+            else{
+                oCopy.setGroup(aSelectedObjects[i].group);
+                aSelectedObjects[i].group.addToSpTree(undefined, oCopy);
+            }
+            oSelector.selectObject(oCopy, 0);
+        }
+        if(bGroup){
+            oSelector.updateCoordinatesAfterInternalResize();
+        }
+    },
+
+    Get_AllImageUrls: function(images)
     {
         if(this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill && this.cSld.Bg.bgPr.Fill.fill instanceof  AscFormat.CBlipFill && typeof this.cSld.Bg.bgPr.Fill.fill.RasterImageId === "string" )
         {
@@ -953,6 +992,20 @@ Slide.prototype =
             if(typeof this.cSld.spTree[i].getAllImages === "function")
             {
                 this.cSld.spTree[i].getAllImages(images);
+            }
+        }
+    },
+
+    getAllRasterImages: function(images){
+        if(this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill && this.cSld.Bg.bgPr.Fill.fill instanceof  AscFormat.CBlipFill && typeof this.cSld.Bg.bgPr.Fill.fill.RasterImageId === "string" )
+        {
+            images.push(AscCommon.getFullImageSrc2(this.cSld.Bg.bgPr.Fill.fill.RasterImageId));
+        }
+        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            if(typeof this.cSld.spTree[i].getAllRasterImages === "function")
+            {
+                this.cSld.spTree[i].getAllRasterImages(images);
             }
         }
     },
@@ -1249,7 +1302,7 @@ Slide.prototype =
 
     showChartSettings:  function()
     {
-        editor.asc_fireCallback("asc_doubleClickOnChart", this.graphicObjects.getChartObject());
+        editor.sendEvent("asc_doubleClickOnChart", this.graphicObjects.getChartObject());
         this.graphicObjects.changeCurrentState(new AscFormat.NullState(this.graphicObjects));
     },
 

@@ -384,6 +384,19 @@ CCollaborativeEditingBase.prototype.Apply_Changes = function()
                 this.Add_DocumentPosition(DocState.StartPos);
             if (DocState.EndPos)
                 this.Add_DocumentPosition(DocState.EndPos);
+
+            if (DocState.FootnotesStart && DocState.FootnotesStart.Pos)
+                this.Add_DocumentPosition(DocState.FootnotesStart.Pos);
+            if (DocState.FootnotesStart && DocState.FootnotesStart.StartPos)
+                this.Add_DocumentPosition(DocState.FootnotesStart.StartPos);
+            if (DocState.FootnotesStart && DocState.FootnotesStart.EndPos)
+                this.Add_DocumentPosition(DocState.FootnotesStart.EndPos);
+            if (DocState.FootnotesEnd && DocState.FootnotesEnd.Pos)
+                this.Add_DocumentPosition(DocState.FootnotesEnd.Pos);
+            if (DocState.FootnotesEnd && DocState.FootnotesEnd.StartPos)
+                this.Add_DocumentPosition(DocState.FootnotesEnd.StartPos);
+            if (DocState.FootnotesEnd && DocState.FootnotesEnd.EndPos)
+                this.Add_DocumentPosition(DocState.FootnotesEnd.EndPos);
         }
 
         this.Clear_NewImages();
@@ -405,6 +418,20 @@ CCollaborativeEditingBase.prototype.Apply_Changes = function()
                 this.Update_DocumentPosition(DocState.StartPos);
             if (DocState.EndPos)
                 this.Update_DocumentPosition(DocState.EndPos);
+
+            if (DocState.FootnotesStart && DocState.FootnotesStart.Pos)
+                this.Update_DocumentPosition(DocState.FootnotesStart.Pos);
+            if (DocState.FootnotesStart && DocState.FootnotesStart.StartPos)
+                this.Update_DocumentPosition(DocState.FootnotesStart.StartPos);
+            if (DocState.FootnotesStart && DocState.FootnotesStart.EndPos)
+                this.Update_DocumentPosition(DocState.FootnotesStart.EndPos);
+            if (DocState.FootnotesEnd && DocState.FootnotesEnd.Pos)
+                this.Update_DocumentPosition(DocState.FootnotesEnd.Pos);
+            if (DocState.FootnotesEnd && DocState.FootnotesEnd.StartPos)
+                this.Update_DocumentPosition(DocState.FootnotesEnd.StartPos);
+            if (DocState.FootnotesEnd && DocState.FootnotesEnd.EndPos)
+                this.Update_DocumentPosition(DocState.FootnotesEnd.EndPos);
+
 
             LogicDocument.Load_DocumentStateAfterLoadChanges(DocState);
             this.Refresh_ForeignCursors();

@@ -333,17 +333,17 @@ Processor3D.prototype.calculateZPositionCatAxis = function()
 
 
 //***functions for complete transformation point***
-Processor3D.prototype.convertAndTurnPoint = function(x, y, z, cameraDiffZ)
+Processor3D.prototype.convertAndTurnPoint = function(x, y, z, isNotProject)
 {
 	var res = null;
 	
 	if(this.view3D.rAngAx)
 	{
-		res = this.convertAndTurnPointRAngAx(x, y, z, cameraDiffZ);
+		res = this.convertAndTurnPointRAngAx(x, y, z);
 	}
 	else
 	{
-		res = this.convertAndTurnPointPerspective(x, y, z, cameraDiffZ);
+		res = this.convertAndTurnPointPerspective(x, y, z, isNotProject);
 	}
 	
 	return res;
@@ -408,7 +408,7 @@ Processor3D.prototype.convertAndTurnPointRAngAx = function(x, y, z)
 	return {x: projectionPoint.x, y: projectionPoint.y, z: z};
 };
 
-Processor3D.prototype.convertAndTurnPointPerspective = function(x, y, z)
+Processor3D.prototype.convertAndTurnPointPerspective = function(x, y, z, isNotProject)
 {
 	//aspectRatio
 	x = x / this.aspectRatioX;
@@ -439,7 +439,7 @@ Processor3D.prototype.convertAndTurnPointPerspective = function(x, y, z)
 	
 	//project
 	var projectionPoint = point3D;
-	if(!this.view3D.rAngAx)
+	if(!this.view3D.rAngAx && !isNotProject)
 	{
 		var projectiveMatrix = this._getPerspectiveProjectionMatrix(1 / (this.rPerspective));
 		projectionPoint = point3D.project(projectiveMatrix);
@@ -1914,8 +1914,8 @@ Processor3D.prototype._calculateCameraDiffZ = function (points, faces)
 	var depthChart = this.depthPerspective;
 	
 	var minMaxOx = this._getMinMaxOx(points, faces);
-	var point1 = this.convertAndTurnPoint(minMaxOx.mostLeftPointX.x, minMaxOx.mostLeftPointX.y, minMaxOx.mostLeftPointX.z, true);
-	var point2 = this.convertAndTurnPoint(minMaxOx.mostRightPointX.x, minMaxOx.mostRightPointX.y, minMaxOx.mostRightPointX.z, true);
+	var point1 = this.convertAndTurnPoint(minMaxOx.mostLeftPointX.x, minMaxOx.mostLeftPointX.y, minMaxOx.mostLeftPointX.z);
+	var point2 = this.convertAndTurnPoint(minMaxOx.mostRightPointX.x, minMaxOx.mostRightPointX.y, minMaxOx.mostRightPointX.z);
 	var x1 = point1.x;
 	var x2 = point2.x;
 	var y1 = point1.y;
@@ -1927,8 +1927,8 @@ Processor3D.prototype._calculateCameraDiffZ = function (points, faces)
 	while(diffX > widthChart || diffY > heightChart)
 	{
 		var minMaxOx = this._getMinMaxOx(points, faces);
-		var point1 = this.convertAndTurnPoint(minMaxOx.mostLeftPointX.x, minMaxOx.mostLeftPointX.y, minMaxOx.mostLeftPointX.z, true);
-		var point2 = this.convertAndTurnPoint(minMaxOx.mostRightPointX.x, minMaxOx.mostRightPointX.y, minMaxOx.mostRightPointX.z, true);
+		var point1 = this.convertAndTurnPoint(minMaxOx.mostLeftPointX.x, minMaxOx.mostLeftPointX.y, minMaxOx.mostLeftPointX.z);
+		var point2 = this.convertAndTurnPoint(minMaxOx.mostRightPointX.x, minMaxOx.mostRightPointX.y, minMaxOx.mostRightPointX.z);
 
 		var x1 = point1.x;
 		var x2 = point2.x;
@@ -1957,14 +1957,14 @@ Processor3D.prototype._calculateCameraDiffZ = function (points, faces)
 	}
 	
 	var minMaxOy = this._getMinMaxOy(points, faces);
-	var point1 = this.convertAndTurnPoint(minMaxOy.mostTopPointY.x, minMaxOy.mostTopPointY.y, minMaxOy.mostTopPointY.z, true);
-	var point2 = this.convertAndTurnPoint(minMaxOy.mostBottomPointY.x, minMaxOy.mostBottomPointY.y, minMaxOy.mostBottomPointY.z, true);
+	var point1 = this.convertAndTurnPoint(minMaxOy.mostTopPointY.x, minMaxOy.mostTopPointY.y, minMaxOy.mostTopPointY.z);
+	var point2 = this.convertAndTurnPoint(minMaxOy.mostBottomPointY.x, minMaxOy.mostBottomPointY.y, minMaxOy.mostBottomPointY.z);
 	var y1 = point1.y;
 	var y2 = point2.y;
 	
 	var minMaxOx = this._getMinMaxOx(points, faces);
-	var point1 = this.convertAndTurnPoint(minMaxOx.mostLeftPointX.x, minMaxOx.mostLeftPointX.y, minMaxOx.mostLeftPointX.z, true);
-	var point2 = this.convertAndTurnPoint(minMaxOx.mostRightPointX.x, minMaxOx.mostRightPointX.y, minMaxOx.mostRightPointX.z, true);
+	var point1 = this.convertAndTurnPoint(minMaxOx.mostLeftPointX.x, minMaxOx.mostLeftPointX.y, minMaxOx.mostLeftPointX.z);
+	var point2 = this.convertAndTurnPoint(minMaxOx.mostRightPointX.x, minMaxOx.mostRightPointX.y, minMaxOx.mostRightPointX.z);
 	var x1 = point1.x;
 	var x2 = point2.x;
 	
@@ -1974,15 +1974,15 @@ Processor3D.prototype._calculateCameraDiffZ = function (points, faces)
 	while(diffY > heightChart)
 	{
 		var minMaxOy = this._getMinMaxOy(points, faces);
-		var point1 = this.convertAndTurnPoint(minMaxOy.mostTopPointY.x, minMaxOy.mostTopPointY.y, minMaxOy.mostTopPointY.z, true);
-		var point2 = this.convertAndTurnPoint(minMaxOy.mostBottomPointY.x, minMaxOy.mostBottomPointY.y, minMaxOy.mostBottomPointY.z, true);
+		var point1 = this.convertAndTurnPoint(minMaxOy.mostTopPointY.x, minMaxOy.mostTopPointY.y, minMaxOy.mostTopPointY.z);
+		var point2 = this.convertAndTurnPoint(minMaxOy.mostBottomPointY.x, minMaxOy.mostBottomPointY.y, minMaxOy.mostBottomPointY.z);
 
 		var y1 = point1.y;
 		var y2 = point2.y;
 		
 		var minMaxOx = this._getMinMaxOx(points, faces);
-		var point1 = this.convertAndTurnPoint(minMaxOx.mostLeftPointX.x, minMaxOx.mostLeftPointX.y, minMaxOx.mostLeftPointX.z, true);
-		var point2 = this.convertAndTurnPoint(minMaxOx.mostRightPointX.x, minMaxOx.mostRightPointX.y, minMaxOx.mostRightPointX.z, true);
+		var point1 = this.convertAndTurnPoint(minMaxOx.mostLeftPointX.x, minMaxOx.mostLeftPointX.y, minMaxOx.mostLeftPointX.z);
+		var point2 = this.convertAndTurnPoint(minMaxOx.mostRightPointX.x, minMaxOx.mostRightPointX.y, minMaxOx.mostRightPointX.z);
 		var x1 = point1.x;
 		var x2 = point2.x;
 		
@@ -2140,7 +2140,7 @@ Processor3D.prototype._getMinMaxOx = function (points, faces)
 	for(var i = 0; i < faces.length - 1; i++){
 		for(var k = 0; k <= 3; k++){
 			
-			var point1 = this.convertAndTurnPoint(points[faces[i][k]].x, points[faces[i][k]].y, points[faces[i][k]].z, true);
+			var point1 = this.convertAndTurnPoint(points[faces[i][k]].x, points[faces[i][k]].y, points[faces[i][k]].z);
 			//var point2 = this.convertAndTurnPoint(points[faces[i][k + 1]].x, points[faces[i][k + 1]].y, points[faces[i][k + 1]].z, true);
 			var x1 = point1.x;
 			//var x2 = point2.x;
@@ -2183,8 +2183,8 @@ Processor3D.prototype._getMinMaxOy = function (points, faces)
 	for(var i = 0; i < faces.length - 1; i++){
 		for(var k = 0; k < 3; k++){
 			
-			var point1 = this.convertAndTurnPoint(points[faces[i][k]].x, points[faces[i][k]].y, points[faces[i][k]].z, true);
-			var point2 = this.convertAndTurnPoint(points[faces[i][k + 1]].x, points[faces[i][k + 1]].y, points[faces[i][k + 1]].z, true);
+			var point1 = this.convertAndTurnPoint(points[faces[i][k]].x, points[faces[i][k]].y, points[faces[i][k]].z);
+			var point2 = this.convertAndTurnPoint(points[faces[i][k + 1]].x, points[faces[i][k + 1]].y, points[faces[i][k + 1]].z);
 			var y1 = point1.y;
 			var y2 = point2.y;
 		

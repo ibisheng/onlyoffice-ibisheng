@@ -48,14 +48,14 @@ var align_Left = AscCommon.align_Left;
 var align_Center = AscCommon.align_Center;
 var align_Justify = AscCommon.align_Justify;
 var g_oDocumentUrls = AscCommon.g_oDocumentUrls;
-  var History = AscCommon.History;
-  var pptx_content_loader = AscCommon.pptx_content_loader;
-  var pptx_content_writer = AscCommon.pptx_content_writer;
-  var g_dKoef_pix_to_mm = AscCommon.g_dKoef_pix_to_mm;
-  var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
+var History = AscCommon.History;
+var pptx_content_loader = AscCommon.pptx_content_loader;
+var pptx_content_writer = AscCommon.pptx_content_writer;
+var g_dKoef_pix_to_mm = AscCommon.g_dKoef_pix_to_mm;
+var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
 var CShape = AscFormat.CShape;
-  var CGraphicFrame = AscFormat.CGraphicFrame;
+var CGraphicFrame = AscFormat.CGraphicFrame;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscShdClear = Asc.c_oAscShdClear;
@@ -149,433 +149,11 @@ function ResetNewUrls(data, aUrls, aBuilderImagesByUrl, oImageMap)
     }
 }
 
-window.GlobalPasteFlagCounter = 0; window.GlobalPasteFlagCounter;
-window.GlobalPasteFlag = false; window.GlobalPasteFlag;
-window.GlobalCopyFlag = false; window.GlobalCopyFlag;
-
-window.PasteEndTimerId = -1; window.PasteEndTimerId;
 
 var PasteElementsId = {
-  COPY_ELEMENT_ID : 'SelectId',
-  PASTE_ELEMENT_ID : 'wrd_pastebin',
-  ELEMENT_DISPAY_STYLE : 'none',
-  COPYPASTE_ELEMENT_CLASS : 'sdk-element',
   copyPasteUseBinary : true,
   g_bIsDocumentCopyPaste : true
 };
-
-if (AscBrowser.isSafariMacOs)
-{
-  PasteElementsId.PASTE_ELEMENT_ID = PasteElementsId.COPY_ELEMENT_ID;
-  PasteElementsId.ELEMENT_DISPAY_STYLE = "block";
-}
-
-var PASTE_EMPTY = {
-  PASTE_EMPTY_COUNTER_MAX : 10,
-  PASTE_EMPTY_COUNTER     : 0,
-  PASTE_EMPTY_USE         : AscBrowser.isMozilla
-};
-
-function Editor_Copy_GetElem(api)
-{
-    var ElemToSelect = document.getElementById( PasteElementsId.COPY_ELEMENT_ID );
-    if ( !ElemToSelect )
-    {
-        ElemToSelect = document.createElement("div");
-        ElemToSelect.id = PasteElementsId.COPY_ELEMENT_ID;
-        ElemToSelect.className = PasteElementsId.COPYPASTE_ELEMENT_CLASS;
-        ElemToSelect.style.position = "absolute";
-        //���� ������� width ���������, �� �������� ����� ��������� ������������ �� span
-        //� �������� � ����� ������ ��������� ������ <span>1</span><span> </span><span>2</span>
-        //style.left = 0px, ���� ������� ���������� ������ ������� ������� ����, �� ����� ������� ������ �������� �����, �� � ����������� ����(� iframe) ������� ������������� � ����� ������ ��� ����� ������� ������ ����������.
-        ElemToSelect.style.left = '0px';
-        ElemToSelect.style.top = '-100px';
-        ElemToSelect.style.width = '10000px';
-        ElemToSelect.style.height = '100px';
-        ElemToSelect.style.overflow = 'hidden';
-        ElemToSelect.style.zIndex = -1000;
-        ElemToSelect.style.MozUserSelect = "text";
-        ElemToSelect.style["-khtml-user-select"] = "text";
-        ElemToSelect.style["-o-user-select"] = "text";
-        ElemToSelect.style["user-select"] = "text";
-        ElemToSelect.style["-webkit-user-select"] = "text";
-        ElemToSelect.setAttribute("contentEditable", true);
-
-        if (!api || !api.GetCopyPasteDivId)
-            document.body.appendChild( ElemToSelect );
-        else
-        {
-            var _div_id = api.GetCopyPasteDivId();
-            if ("" == _div_id)
-                document.body.appendChild( ElemToSelect );
-            else
-            {
-                var _div = document.getElementById(_div_id);
-                _div.appendChild( ElemToSelect );
-            }
-        }
-    }
-    return ElemToSelect;
-}
-function Editor_Copy_Button(api, bCut)
-{
-	
-	if(bCut)
-		History.Create_NewPoint(AscDFH.historydescription_Cut);
-	
-    if(AscBrowser.isIE)
-    {
-        var ElemToSelect = Editor_Copy_GetElem(api);
-        ElemToSelect.style.display  = "block";
-
-        while ( ElemToSelect.hasChildNodes() )
-            ElemToSelect.removeChild( ElemToSelect.lastChild );
-
-        //������ ��������� ���������
-        document.body.style.MozUserSelect = "text";
-        delete document.body.style["-khtml-user-select"];
-        delete document.body.style["-o-user-select"];
-        delete document.body.style["user-select"];
-        document.body.style["-webkit-user-select"] = "text";
-
-        if (null != api.WordControl.m_oLogicDocument)
-        {
-            var oCopyProcessor = new CopyProcessor(api);
-            oCopyProcessor.Start();
-            ElemToSelect.innerHTML = oCopyProcessor.getInnerHtml();
-        }
-        else
-        {
-            ElemToSelect.innerHTML = api.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Copy();
-        }
-
-        var selection = window.getSelection();
-        var rangeToSelect = document.createRange();
-        rangeToSelect.selectNodeContents (ElemToSelect);
-
-        if (ElemToSelect.childElementCount !== 0)
-            selection.removeAllRanges ();
-
-        selection.addRange(rangeToSelect);
-
-        document.execCommand("copy");
-        //rangeToSelect.execCommand("copy");
-
-        //�������� ����������� ���������
-        ElemToSelect.style.display  = "none";
-        document.body.style.MozUserSelect = "none";
-        document.body.style["-khtml-user-select"] = "none";
-        document.body.style["-o-user-select"] = "none";
-        document.body.style["user-select"] = "none";
-        document.body.style["-webkit-user-select"] = "none";
-
-        if(true == bCut)
-        {
-            //������� ���������� ��������
-            api.WordControl.m_oLogicDocument.Remove(1, true, true);
-            api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
-        }
-        return true;
-    }
-	else
-	{
-		var ElemToSelect = Editor_Copy_GetElem(api);
-		while ( ElemToSelect.hasChildNodes() )
-			ElemToSelect.removeChild( ElemToSelect.lastChild );
-		if (null != api.WordControl.m_oLogicDocument)
-		{
-			var oCopyProcessor = new CopyProcessor(api);
-			oCopyProcessor.Start();
-			ElemToSelect.innerHTML = oCopyProcessor.getInnerHtml();
-		}
-		else
-		{
-			ElemToSelect.innerHTML = api.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Copy();
-		}
-		if(true == bCut)
-        {
-            //������� ���������� ��������
-            api.WordControl.m_oLogicDocument.Remove(1, true, true);
-            api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
-        }
-		return true;
-	}
-    return false;
-}
-function Editor_Copy(api, bCut)
-{
-    if(AscBrowser.isSafariMacOs)
-		return;
-	
-	//todo ��������� �����
-    //������� ������� ����� ����������� ����������
-    var ElemToSelect = Editor_Copy_GetElem(api);
-    ElemToSelect.style.display  = "block";
-
-    while ( ElemToSelect.hasChildNodes() )
-        ElemToSelect.removeChild( ElemToSelect.lastChild );
-
-    //������ ��������� ���������
-    document.body.style.MozUserSelect = "text";
-    delete document.body.style["-khtml-user-select"];
-    delete document.body.style["-o-user-select"];
-    delete document.body.style["user-select"];
-    document.body.style["-webkit-user-select"] = "text";
-	
-	var overflowBody = document.body.style.overflow;
-	document.body.style.overflow = 'hidden';
-	
-	var oldBackgroundcolor = document.body.style["background-color"];
-	//var oldColor = document.body.style["color"];
-	document.body.style["background-color"] = "transparent";
-	//document.body.style["color"] = "transparent";
-	
-	ElemToSelect.style.MozUserSelect = "all";
-
-    if (!AscBrowser.isMozilla)
-    {
-        ElemToSelect.focus();
-    }
-    else
-    {
-        if (window.editor && window.editor.GetTextBoxInputMode)
-        {
-            if (window.editor.GetTextBoxInputMode() === true)
-                ElemToSelect.focus();
-        }
-    }
-	
-    if (null != api.WordControl.m_oLogicDocument)
-    {
-        var oCopyProcessor = new CopyProcessor(api);
-        oCopyProcessor.Start();
-        ElemToSelect.innerHTML = oCopyProcessor.getInnerHtml();
-    }
-    else
-    {
-        ElemToSelect.innerHTML = api.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Copy();
-    };
-	
-    //��������
-    if (window.getSelection) // all browsers, except IE before version 9
-    {
-        var selection = window.getSelection ();
-        var rangeToSelect = document.createRange ();
-
-        //� FF 8 ����� ��������� selectNodeContents ���������� � ������������ div, ����� ����� �������� � FF8 � ������ ��������� ����� ��� ����� ������ ��������� �������������� node
-        //�������� ���� ��� ��� ��������� ��������� �� ����������. Chrome ������ ��������� ������ ����� ����� ������ ����������
-        var is_gecko = AscBrowser.isGecko;
-        if(is_gecko)
-        {
-            ElemToSelect.appendChild( document.createTextNode( '\xa0' ) );
-            ElemToSelect.insertBefore( document.createTextNode( '\xa0' ), ElemToSelect.firstChild );
-            rangeToSelect.setStartAfter (ElemToSelect.firstChild);
-            rangeToSelect.setEndBefore (ElemToSelect.lastChild);
-        }
-        else
-        {
-            //�������� � webkit: ���� ���������� ����� ���� ��������, �� ���������� ������ ��� ������������
-            //������ ��� docs.google ����������� ��� � ��� <b>
-            if(AscBrowser.isWebkit && (true !== AscBrowser.isSafariMacOs))
-            {
-                var aChildNodes = ElemToSelect.childNodes;
-                if(aChildNodes.length == 1)
-                {
-                    var elem = aChildNodes[0];
-                    var wrap = document.createElement("b");
-                    wrap.setAttribute("style", "font-weight:normal; background-color: transparent; color: transparent;");
-                    elem = ElemToSelect.removeChild(elem);
-                    wrap.appendChild(elem);
-                    ElemToSelect.appendChild(wrap);
-                }
-            }
-            rangeToSelect.selectNodeContents (ElemToSelect);
-        }
-
-        selection.removeAllRanges ();
-        selection.addRange (rangeToSelect);
-    }
-    else
-    {
-        if (document.body.createTextRange) // Internet Explorer
-        {
-            var rangeToSelect = document.body.createTextRange ();
-            rangeToSelect.moveToElementText (ElemToSelect);
-            rangeToSelect.select ();
-        }
-    }
-
-    if (window["AscDesktopEditorButtonMode"] === true && window["AscDesktopEditor"]) {
-        
-        if (bCut)
-        {
-            var __oncut = ElemToSelect.oncut;
-
-            ElemToSelect.oncut = function (e) {
-
-                ElemToSelect.oncut = __oncut;
-                __oncut = null;
-
-                if (false === api.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content)) {
-					api.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_CutHotKey);
-                    api.WordControl.m_oLogicDocument.Remove(1, true, true);
-                    api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
-                }
-            }
-
-            window["AscDesktopEditor"]["Cut"]();
-        }
-        else
-        {
-            var __oncopy = ElemToSelect.oncopy;
-
-            ElemToSelect.oncopy = function (e) {
-
-                ElemToSelect.oncopy = __oncopy;
-                __oncopy = null;
-            }
-
-            window["AscDesktopEditor"]["Copy"]();
-        }
-
-		ElemToSelect.innerHTML = "";
-        return;
-    }       
-
-    //���� ���������� copy
-    var time_interval = 200;
-    if (AscBrowser.isSafariMacOs)
-        time_interval = 200;
-
-    window.GlobalCopyFlag = true;
-    window.setTimeout( function()
-    {
-        window.GlobalCopyFlag = false;
-        //�������� ����������� ���������
-        ElemToSelect.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
-        document.body.style.MozUserSelect = "none";
-        document.body.style["-khtml-user-select"] = "none";
-        document.body.style["-o-user-select"] = "none";
-        document.body.style["user-select"] = "none";
-        document.body.style["-webkit-user-select"] = "none";
-		
-		document.body.style["background-color"] = oldBackgroundcolor;
-		//document.body.style["color"] = oldColor;
-		
-		ElemToSelect.style.MozUserSelect = "none";
-		document.body.style.overflow = overflowBody;
-
-        if(true == bCut)
-        {
-            //������� ���������� ��������
-            api.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_CutHotKey);
-            api.WordControl.m_oLogicDocument.Remove(1, true, true);
-            api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
-        }
-    }, time_interval);
-    /*
-     if (e.dataTransfer)
-     {
-     e.dataTransfer.setData('text', '2|16|190');
-     }
-
-     if (e.clipboardData)
-     {
-     e.preventDefault();
-     e.clipboardData.setData('text/xcustom', 'Added this custom data at copy');
-     e.clipboardData.setData('text/plain', 'This is not the text you copied, it was changed by the copy event handler');
-
-     var TempXCustom = e.clipboardData.getData('text/xcustom');
-     var TempPlain = e.clipboardData.getData('text/plain');
-     var Temp = "sdf";
-     }
-     if (window.clipboardData)
-     {
-     e.returnValue = false;
-     var setStatus = window.clipboardData.setData('Text', 'This is not the text you copied, it was changed by the copy event handler');
-     }
-     */
-}
-
-function Editor_Copy_Event(e, ElemToSelect)
-{
-	var api = editor;
-	var oWordControl = api.WordControl;
-	
-	if (oWordControl.m_oApi.isLongAction())
-	{
-		e.preventDefault();
-		return;
-	}
-
-	if (oWordControl.TextBoxInputMode)
-	{
-		oWordControl.onKeyDownTBIM(e);
-		return;
-	}
-
-	if (false === oWordControl.m_oApi.bInit_word_control)
-	{
-		e.preventDefault();
-		return;
-	}
-
-	if (oWordControl.m_bIsRuler && oWordControl.m_oHorRuler.m_bIsMouseDown)
-	{
-		e.preventDefault();
-		return;
-	}
-
-	if (oWordControl.m_bIsMouseLock === true)
-	{
-		if (!AscBrowser.isMacOs)
-		{
-			e.preventDefault();
-			return;
-		}
-
-		// на масОс есть мега выделение на трекпаде. там моусАп приходит с задержкой.
-		// нужно лдибо копить команды клавиатуры, либо насильно заранее сделать моусАп самому.
-		// мы выбараем второе
-
-		oWordControl.onMouseUpExternal(AscCommon.global_mouseEvent.X, AscCommon.global_mouseEvent.Y);
-	}
-
-	if (oWordControl.IsFocus === false)
-	{
-		// некоторые команды нужно продолжать обрабатывать
-		if (!oWordControl.onKeyDownNoActiveControl(AscCommon.global_keyboardEvent))
-			return;
-	}
-
-	if (null == oWordControl.m_oLogicDocument)
-	{
-		var bIsPrev = (oWordControl.m_oDrawingDocument.m_oDocumentRenderer.OnKeyDown(AscCommon.global_keyboardEvent) === true) ? false : true;
-		if (false === bIsPrev)
-		{
-			e.preventDefault();
-		}
-		return;
-	}
-
-	if (oWordControl.m_oDrawingDocument.IsFreezePage && oWordControl.m_oDrawingDocument.IsFreezePage(oWordControl.m_oDrawingDocument.m_lCurrentPage))
-		return;
-	
-	if(!ElemToSelect)
-		ElemToSelect = document.createElement("div");
-		
-	var oCopyProcessor = new CopyProcessor(api);
-	var sBase64 = oCopyProcessor.Start();
-	ElemToSelect.innerHTML = oCopyProcessor.getInnerHtml();
-	
-	if(sBase64 !== false || PasteElementsId.g_bIsDocumentCopyPaste)
-	{
-		e.clipboardData.setData("text/x-custom", sBase64);
-		e.clipboardData.setData("text/html", ElemToSelect.innerHTML);
-		e.clipboardData.setData("text/plain", ElemToSelect.innerText);
-		e.preventDefault();
-	}
-}
 function CopyElement(sName, bText){
 	this.sName = sName;
 	this.oAttributes = {};
@@ -946,10 +524,14 @@ CopyProcessor.prototype =
             }
 			else if(para_Math == item.Type){
                 var sSrc = item.MathToImageConverter();
-				if (null != sSrc && "" != sSrc && null != sSrc.ImageUrl){
+				if (null != sSrc && null != sSrc.ImageUrl){
 					var oImg = new CopyElement("img");
-					oImg.oAttributes["width"] = item.Width;
-					oImg.oAttributes["height"] = item.Height;
+					if (sSrc.w_px > 0) {
+						oImg.oAttributes["width"] = sSrc.w_px;
+					}
+					if (sSrc.h_px > 0) {
+						oImg.oAttributes["height"] = sSrc.h_px;
+					}
 					oImg.oAttributes["src"] = sSrc.ImageUrl;
 					oTarget.addChild(oImg);
 				}
@@ -1556,7 +1138,8 @@ CopyProcessor.prototype =
 					}
 					else
 					{
-						this.CopyPresentationTableFull(oDomTarget, elements[i].Drawing);
+						var isOnlyTable = elements.length === 1 ? true : false;
+						this.CopyPresentationTableFull(oDomTarget, elements[i].Drawing, isOnlyTable);
 						
 						this.oPresentationWriter.WriteDouble(elements[i].X);
 						this.oPresentationWriter.WriteDouble(elements[i].Y);
@@ -1572,6 +1155,8 @@ CopyProcessor.prototype =
 				var selected_slides = elementsContent.SlideObjects;
 
 				this.oPresentationWriter.WriteString2("SlideObjects");
+				
+				this.oPresentationWriter.WriteString2(selected_slides[0].ImageUrl);
 				
 				this.oPresentationWriter.WriteULong(selected_slides.length);
 				var layouts_map = {};
@@ -1699,7 +1284,7 @@ CopyProcessor.prototype =
             if (oDocument.Get_SelectedText)
                 text = oDocument.Get_SelectedText();
 			
-			return {sBase64: sBase64, text: text, drawingUrls: drawingUrls};
+			return {sBase64: "docData;" + sBase64, text: text, drawingUrls: drawingUrls};
 		}
 	},
 	
@@ -1720,18 +1305,18 @@ CopyProcessor.prototype =
 				
 			//TODO заглушка для презентационных параграфов(выделен текст внутри диаграммы) - пока не пишем в бинарник
 			if(selectedContent.Elements[0].Element && selectedContent.Elements[0].Element.bFromDocument === false)
-				bFromPresentation = true;
-			
-			//подменяем Document для копирования(если не подменить, то commentId будет не соответствовать)
-			this.oBinaryFileWriter.Document = elementsContent[0].Element.LogicDocument;
-			
-			if(!bFromPresentation)
-				this.oBinaryFileWriter.CopyStart();
+			{
+				this.oBinaryFileWriter.Document = this.oDocument;
+			}
+			else
+			{
+				//подменяем Document для копирования(если не подменить, то commentId будет не соответствовать)
+				this.oBinaryFileWriter.Document = elementsContent[0].Element.LogicDocument;
+			}
 				
+			this.oBinaryFileWriter.CopyStart();	
 			this.CopyDocument2(this.oRoot, oDocument, elementsContent, bFromPresentation);
-			
-			if(!bFromPresentation)
-				this.oBinaryFileWriter.CopyEnd();			
+			this.oBinaryFileWriter.CopyEnd();
 		}
         else
         {
@@ -1770,7 +1355,7 @@ CopyProcessor.prototype =
 			this.CopyDocument2(this.oRoot, oDocument, selectedContent);
 
             var sBase64 = this.oPresentationWriter.GetBase64Memory();
-            sBase64 = "" + this.oPresentationWriter.pos + ";" + sBase64;
+            sBase64 = "pptData;" + this.oPresentationWriter.pos + ";" + sBase64;
 			if(this.oRoot.aChildren && this.oRoot.aChildren.length == 1 && AscBrowser.isSafariMacOs)
 			{
 				var oElem = this.oRoot.aChildren[0];
@@ -1782,12 +1367,12 @@ CopyProcessor.prototype =
 				this.oRoot.wrapChild(new CopyElement("b"));
 			}
 			if(this.oRoot.aChildren && this.oRoot.aChildren.length  > 0)
-				this.oRoot.aChildren[0].oAttributes["class"] = "pptData;" + sBase64;
+				this.oRoot.aChildren[0].oAttributes["class"] = sBase64;
         }
 		
 		if(PasteElementsId.g_bIsDocumentCopyPaste && PasteElementsId.copyPasteUseBinary && this.oBinaryFileWriter.copyParams.itemCount > 0 && !bFromPresentation)
 		{
-			var sBase64 = this.oBinaryFileWriter.GetResult();
+			var sBase64 = "docData;" + this.oBinaryFileWriter.GetResult();
 			if(this.oRoot.aChildren && this.oRoot.aChildren.length == 1 && AscBrowser.isSafariMacOs)
 			{
 				var oElem = this.oRoot.aChildren[0];
@@ -1799,7 +1384,7 @@ CopyProcessor.prototype =
 				this.oRoot.wrapChild(new CopyElement("b"));
 			}
 			if(this.oRoot.aChildren && this.oRoot.aChildren.length  > 0)
-				this.oRoot.aChildren[0].oAttributes["class"] = "docData;" + sBase64;
+				this.oRoot.aChildren[0].oAttributes["class"] = sBase64;
 		}
 		
 		return sBase64;
@@ -2013,7 +1598,7 @@ CopyProcessor.prototype =
         this.oBinaryFileWriter.copyParams.itemCount = 0;
     },
 
-    CopyPresentationTableFull: function(oDomTarget, graphicFrame)
+    CopyPresentationTableFull: function(oDomTarget, graphicFrame, isOnlyTable)
     {
         var aSelectedRows = [];
         var oRowElems = {};
@@ -2044,11 +1629,66 @@ CopyProcessor.prototype =
 			this.oPresentationWriter.WriteBool(true);
 			this.oPresentationWriter.WriteString2(Item.TableStyle);
         }
+		
+		History.TurnOff();
         this.oPresentationWriter.WriteTable(graphicFrame);
 		
+		//для случая, когда копируем 1 таблицу из презентаций, в бинарник заносим ещё одну такую же табличку, но со скомпиоированными стилями(для вставки в word / excel)
+		if(isOnlyTable)
+		{
+			this.convertToCompileStylesTable(Item);
+			this.oPresentationWriter.WriteTable(graphicFrame);
+		}
+		History.TurnOn();
+
 		this.CopyTable(oDomTarget, Item, null);   
     },
 
+	convertToCompileStylesTable: function(table)
+	{
+		var t = this;
+		
+		for(var i = 0; i < table.Content.length; i++)
+		{
+			var row = table.Content[i];
+			for(var j = 0; j < row.Content.length; j++)
+			{
+				var cell = row.Content[j];
+				var compilePr = cell.Get_CompiledPr();
+				
+				cell.Pr = compilePr;
+				
+				var shd = compilePr.Shd;
+				var color = shd.Get_Color2(this.oDocument.Get_Theme(), this.oDocument.Get_ColorMap());
+				cell.Pr.Shd.Unifill = AscFormat.CreteSolidFillRGB(color.r, color.g, color.b);
+				
+				if(compilePr.TableCellBorders.Bottom)
+				{
+					var color = compilePr.TableCellBorders.Bottom.Get_Color2(this.oDocument.Get_Theme(), this.oDocument.Get_ColorMap());
+					cell.Pr.TableCellBorders.Bottom.Unifill = AscFormat.CreteSolidFillRGB(color.r, color.g, color.b);
+				}
+				
+				if(compilePr.TableCellBorders.Top)
+				{
+					var color = compilePr.TableCellBorders.Top.Get_Color2(this.oDocument.Get_Theme(), this.oDocument.Get_ColorMap());
+					cell.Pr.TableCellBorders.Top.Unifill = AscFormat.CreteSolidFillRGB(color.r, color.g, color.b);
+				}
+				
+				if(compilePr.TableCellBorders.Left)
+				{
+					var color = compilePr.TableCellBorders.Left.Get_Color2(this.oDocument.Get_Theme(), this.oDocument.Get_ColorMap());
+					cell.Pr.TableCellBorders.Left.Unifill = AscFormat.CreteSolidFillRGB(color.r, color.g, color.b);
+				}
+				
+				if(compilePr.TableCellBorders.Right)
+				{
+					var color = compilePr.TableCellBorders.Right.Get_Color2(this.oDocument.Get_Theme(), this.oDocument.Get_ColorMap());
+					cell.Pr.TableCellBorders.Right.Unifill = AscFormat.CreteSolidFillRGB(color.r, color.g, color.b);
+				}
+			}
+		}
+	},
+	
     CopyGraphicObject: function(oDomTarget, oGraphicObj, drawingCopyObject)
     {
         var sSrc = oGraphicObj.getBase64Img();
@@ -2100,275 +1740,6 @@ CopyProcessor.prototype =
     }
 };
 
-function Editor_Paste_GetElem(api, bClean)
-{
-    var oWordControl = api.WordControl;
-    var pastebin = document.getElementById(PasteElementsId.PASTE_ELEMENT_ID);
-    if(!pastebin){
-        pastebin = document.createElement("div");
-        pastebin.setAttribute( 'id', PasteElementsId.PASTE_ELEMENT_ID );
-        pastebin.className = PasteElementsId.COPYPASTE_ELEMENT_CLASS;
-
-        if (AscBrowser.isIE)
-            pastebin.style.position = 'fixed';
-        else
-            pastebin.style.position = 'absolute';
-
-        pastebin.style.top = '-100px';
-        pastebin.style.left = '0px';
-        pastebin.style.width = '10000px';
-        pastebin.style.height = '100px';
-        pastebin.style.overflow = 'hidden';
-        pastebin.style.zIndex = -1000;
-        //��������� ������ ������������, ����� �������� �������� ����� pastebin �������� span � ������� ��� �������� ������ � computedStyle ���������� ����������� ��������� ��������� �� ���������
-        var Def_rPr;
-		if(PasteElementsId.g_bIsDocumentCopyPaste)
-			Def_rPr = oWordControl.m_oLogicDocument.Styles.Default.TextPr;
-		else	
-			Def_rPr = oWordControl.m_oLogicDocument.globalTableStyles.Default.TextPr;
-			
-		pastebin.style.fontFamily = Def_rPr.FontFamily.Name;
-
-        if (!api.DocumentReaderMode)
-            pastebin.style.fontSize = Def_rPr.FontSize + "pt";
-        else
-        {
-            api.DocumentReaderMode.CorrectDefaultFontSize(Def_rPr.FontSize);
-            pastebin.style.fontSize = "1em";
-        }
-        pastebin.style.MozUserSelect = "text";
-        pastebin.style["-khtml-user-select"] = "text";
-        pastebin.style["-o-user-select"] = "text";
-        pastebin.style["user-select"] = "text";
-        pastebin.style["-webkit-user-select"] = "text";
-        pastebin.setAttribute("contentEditable", true);
-
-        document.body.appendChild( pastebin );
-    }
-    else if(bClean){
-        //������� ����������
-        var aChildNodes = pastebin.childNodes;
-        for (var length = aChildNodes.length, i = length - 1; i >= 0; i--)
-        {
-            pastebin.removeChild(aChildNodes[i]);
-        }
-    }
-
-    if (!AscBrowser.isSafariMacOs && !AscBrowser.isIE)
-    {
-        pastebin.onpaste = function(e){
-            if (!window.GlobalPasteFlag)
-                return;
-
-            Body_Paste(api,e);
-            pastebin.onpaste = null;
-        };
-    }
-
-    return pastebin;
-}
-function Editor_Paste_Button(api)
-{
-    if(AscBrowser.isIE)
-    {
-        document.body.style.MozUserSelect = "text";
-        delete document.body.style["-khtml-user-select"];
-        delete document.body.style["-o-user-select"];
-        delete document.body.style["user-select"];
-        document.body.style["-webkit-user-select"] = "text";
-
-        var pastebin = Editor_Paste_GetElem(api, true);
-
-        pastebin.style.display  = "block";
-        pastebin.focus();
-
-        var selection = window.getSelection();
-        var rangeToSelect = document.createRange();
-        rangeToSelect.selectNodeContents (pastebin);
-        selection.removeAllRanges ();
-        selection.addRange(rangeToSelect);
-
-        //rangeToSelect.execCommand("paste", false);
-        document.execCommand("paste");
-
-        if (!AscBrowser.isSafariMacOs)
-            pastebin.blur();
-
-        pastebin.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
-
-        document.body.style.MozUserSelect = "none";
-        document.body.style["-khtml-user-select"] = "none";
-        document.body.style["-o-user-select"] = "none";
-        document.body.style["user-select"] = "none";
-        document.body.style["-webkit-user-select"] = "none";
-
-		History.Create_NewPoint(AscDFH.historydescription_PasteButtonIE);
-        editor.incrementCounterLongAction();
-        Editor_Paste(api, false);
-        return true;
-    }
-	else
-	{
-		var ElemToSelect = document.getElementById( PasteElementsId.COPY_ELEMENT_ID );
-		if(ElemToSelect && ElemToSelect.innerHTML !== "&nbsp;" && ElemToSelect.innerHTML !== "")
-		{
-			History.Create_NewPoint(AscDFH.historydescription_PasteButtonNotIE);
-            editor.incrementCounterLongAction();
-			Editor_Paste_Exec(api, ElemToSelect);
-		}
-		else
-		{
-			window.GlobalPasteFlagCounter = 0;
-			window.GlobalPasteFlag = false;
-		};
-		
-		return true;
-	}
-    return false;
-}
-function CanPaste(oDocument)
-{
-    //����� ������ paste ����� Select � ���������
-    //�� ����� ������ paste ����� select �� ������� �������, ��������, ������
-    var oTargetDoc = oDocument;
-    if(PasteElementsId.g_bIsDocumentCopyPaste)
-    {
-        if ( docpostype_HdrFtr === oTargetDoc.CurPos.Type )
-        {
-            if(null != oTargetDoc.HdrFtr.CurHdrFtr)
-                oTargetDoc = oTargetDoc.HdrFtr.CurHdrFtr.Content;
-            else
-                return false;
-        }
-    }
-    return true;
-}
-function Editor_Paste(api, bClean)
-{
-    window.GlobalPasteFlagCounter = 1;
-    var oWordControl = api.WordControl;
-    oWordControl.bIsEventPaste = false;
-    var oDocument = oWordControl.m_oLogicDocument;
-
-    if(false == CanPaste(oDocument))
-        return;
-
-    document.body.style.MozUserSelect = "text";
-    delete document.body.style["-khtml-user-select"];
-    delete document.body.style["-o-user-select"];
-    delete document.body.style["user-select"];
-    document.body.style["-webkit-user-select"] = "text";
-	
-	var overflowBody = document.body.style.overflow;
-	document.body.style.overflow = 'hidden';
-
-    var Text;
-    var pastebin = Editor_Paste_GetElem(api, bClean);
-    pastebin.style.display  = "block";
-    pastebin.focus();
-    // Safari requires a filler node inside the div to have the content pasted into it. (#4882)
-    pastebin.appendChild( document.createTextNode( '\xa0' ) );
-
-    if (window.getSelection) {  // all browsers, except IE before version 9
-        var selection = document.defaultView.getSelection ();
-        selection.removeAllRanges ();
-        var rangeToSelect = document.createRange ();
-        rangeToSelect.selectNodeContents (pastebin);
-
-        selection.removeAllRanges ();
-        selection.addRange (rangeToSelect);
-    } else {
-        if (document.body.createTextRange) {    // Internet Explorer
-            var rangeToSelect = document.body.createTextRange ();
-            rangeToSelect.moveToElementText (pastebin);
-            rangeToSelect.select ();
-        }
-    }
-
-    if (window["AscDesktopEditorButtonMode"] === true && window["AscDesktopEditor"])
-    {
-        var __onpaste = pastebin.onpaste;
-
-        pastebin.onpaste = function (e) {
-
-            pastebin.onpaste = __onpaste;
-            __onpaste = null;
-
-            if (!window.GlobalPasteFlag)
-                return;
-
-            // тут onpaste не обрубаем, так как он в сафари под macos приходить должен
-            if (window.GlobalPasteFlagCounter == 1) {
-                Body_Paste(api, e);
-
-                if (window.GlobalPasteFlag)
-                    window.GlobalPasteFlagCounter = 2;
-            }
-        }
-
-        window["AscDesktopEditor"]["Paste"]();
-
-        return;
-    }
-
-    //���� ���������� paste
-    var func_timeout = function() {
-
-        if (PASTE_EMPTY.PASTE_EMPTY_USE && !oWordControl.bIsEventPaste)
-        {
-            // не править. это сделано для фаерфокса. ну не успевает он вставить
-            // в дивку контент. и получалось, что мы через раз вставляем пробел.
-            // тут идет надежда на то, что вставлять пробел не будут. А если будут - то он вставится,
-            // но может с задержкой 1-2 секунды.
-            if (pastebin.innerHTML == "&nbsp;")
-            {
-              PASTE_EMPTY.PASTE_EMPTY_COUNTER++;
-                if (PASTE_EMPTY.PASTE_EMPTY_COUNTER < PASTE_EMPTY.PASTE_EMPTY_COUNTER_MAX)
-                {
-                    window.PasteEndTimerId = window.setTimeout( func_timeout, 100 );
-                    return;
-                }
-            }
-        }
-
-        if (AscBrowser.isSafariMacOs)
-        {
-            if (window.GlobalPasteFlagCounter != 2 && !window.GlobalPasteFlag)
-            {
-                window.PasteEndTimerId = window.setTimeout(func_timeout, 10);
-                return;
-            }
-        }
-
-        document.body.style.MozUserSelect = "none";
-        document.body.style["-khtml-user-select"] = "none";
-        document.body.style["-o-user-select"] = "none";
-        document.body.style["user-select"] = "none";
-        document.body.style["-webkit-user-select"] = "none";
-		
-		document.body.style.overflow = overflowBody;
-
-        if (!AscBrowser.isSafariMacOs)
-            pastebin.onpaste = null;
-
-        if(!oWordControl.bIsEventPaste)
-        {
-            Editor_Paste_Exec(api, pastebin);
-        }
-        else
-            pastebin.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
-
-        window.PasteEndTimerId = -1;
-    };
-
-    var _interval_time = AscBrowser.isMacOs ? 200 : 0;
-
-    if (-1 != window.PasteEndTimerId)
-        clearTimeout(window.PasteEndTimerId);
-
-  PASTE_EMPTY.PASTE_EMPTY_COUNTER = 0;
-    window.PasteEndTimerId = window.setTimeout( func_timeout, _interval_time );
-}
 function CopyPasteCorrectString(str)
 {
     /*
@@ -2404,172 +1775,7 @@ function CopyPasteCorrectString(str)
     res = res.replace(/"/g,'&quot;');
     return res;
 }
-function Body_Paste(api, e)
-{
-    var oWordControl = api.WordControl;
-    if (e && e.clipboardData && e.clipboardData.getData) {// Webkit - get data from clipboard, put into editdiv, cleanup, then cancel event
-        var bExist = false;
-        //������ chrome ��������� �������� 'text/html', safari ������ 'text/plain'
-        var is_chrome = AscBrowser.isChrome;
-        var sHtml = null;
 
-        var fPasteHtml = function(sHtml, sBase64)
-        {
-            if(null != sHtml)
-            {
-                //���������� html � IFrame
-                var ifr = document.getElementById("pasteFrame");
-                if (!ifr)
-                {
-                    ifr = document.createElement("iframe");
-                    ifr.name = "pasteFrame";
-                    ifr.id = "pasteFrame";
-                    ifr.style.position = 'absolute';
-                    ifr.style.top = '-100px';
-                    ifr.style.left = '0px';
-                    ifr.style.width = '10000px';
-                    ifr.style.height = '100px';
-                    ifr.style.overflow = 'hidden';
-                    ifr.style.zIndex = -1000;
-					ifr.setAttribute("sandbox", "allow-same-origin");
-                    document.body.appendChild(ifr);
-                }
-				else
-					ifr.style.width = '10000px';
-					
-                var frameWindow = window.frames["pasteFrame"];
-                if(frameWindow)
-                {
-                    frameWindow.document.open();
-                    frameWindow.document.write(sHtml);
-                    frameWindow.document.close();
-					if(null != frameWindow.document && null != frameWindow.document.body)
-					{
-						ifr.style.display  = "block";
-						Editor_Paste_Exec(api, frameWindow.document.body, ifr);
-						bExist = true;
-					}
-                }
-				
-				ifr.style.width = '100px';
-            }
-			else if(sBase64)
-			{
-				Editor_Paste_Exec(api, null, null, sBase64);
-			}
-			
-            if(bExist)
-            {
-                oWordControl.bIsEventPaste = true;
-                if (e.preventDefault)
-                {
-                    e.stopPropagation();
-                    e.preventDefault();
-                }
-                return false;
-            }
-        }
-		var fTest = function(types, sPattern)
-		{
-            if (!types)
-                return false;
-			for(var i = 0, length = types.length; i < length; ++i)
-			{
-				if(sPattern == types[i])
-					return true;
-			}
-			return false;
-		}
-		
-		
-		//TODO сделать тоже самое для xslxData
-		var sBase64 = e.clipboardData.getData("text/x-custom");
-		var html = e.clipboardData.getData("text/html");
-		if(sBase64 && sBase64 != '' && sBase64.indexOf("docData;") > -1)
-		{
-			fPasteHtml(null, sBase64);
-			return;
-		}
-		else if(html)
-		{
-			var sHtml = e.clipboardData.getData('text/html');
-            //������ ��� ��������� ����� ������ �� Word � chrome ��������� ���������� ������� ����� </html>, �������� ��.
-            var nIndex = sHtml.lastIndexOf("</html>");
-            if(-1 != nIndex)
-                sHtml = sHtml.substring(0, nIndex + "</html>".length);
-        }
-        else if (is_chrome && fTest(e.clipboardData.types, "text/plain"))
-        {
-            bExist = true;
-            var sText = e.clipboardData.getData('text/plain');
-            sHtml = "<html><body>";
-            var sCurPar = "";
-            var nParCount = 0;
-            for ( var i = 0, length = sText.length; i < length; i++ )
-            {
-                var Char = sText.charAt(i);
-                var Code = sText.charCodeAt(i);
-                var Item = null;
-
-                if ( '\n' === Char )
-                {
-                    if("" == sCurPar)
-                        sHtml += "<p><span>&nbsp;</span></p>";
-                    else
-                    {
-                        sHtml += "<p><span>" + sCurPar + "</span></p>";
-                        sCurPar = "";
-                    }
-                    nParCount++;
-                }
-                else if ( 13 === Code )
-                {
-                    continue;
-                }
-                else
-                {
-                    if(32 == Code || 160 == Code) //160 - nbsp
-                        sCurPar += " ";
-                    else if ( 9 === Code )
-                        sCurPar += "<span style='mso-tab-count:1'>    </span>";
-                    else
-                        sCurPar += CopyPasteCorrectString(Char);
-                }
-            }
-            if("" != sCurPar)
-            {
-                if(0 == nParCount)
-                    sHtml += "<span>" + sCurPar + "</span>";
-                else
-                    sHtml += "<p><span>" + sCurPar + "</span></p>";
-                sCurPar = "";
-            }
-            sHtml += "</body></html>";
-        }
-        if(sHtml)
-            fPasteHtml(sHtml);
-        else
-        {
-            var items = e.clipboardData.items;
-            if(null != items)
-            {
-                for (var i = 0; i < items.length; ++i) {
-                    if (items[i].kind == 'file' &&
-                        items[i].type.indexOf('image/') !== -1) {
-
-                        var blob = items[i].getAsFile();
-                        var reader = new FileReader();
-
-                        reader.onload = function(evt) {
-                            fPasteHtml("<html><body><img src=\"" + evt.target.result + "\"/></body></html>");
-                        };
-                        reader.readAsDataURL(blob);
-                    }
-                }
-            }
-        }
-    }
-}
 function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary)
 {
     var oPasteProcessor = new PasteProcessor(api, true, true, false);
@@ -2579,6 +1785,17 @@ function trimString( str ){
     return str.replace(/^\s+|\s+$/g, '') ;
 }
 function sendImgUrls(api, images, callback, bExcel) {
+
+  if (window["AscDesktopEditor"])
+  {
+    // correct local images
+    for (var nIndex = images.length - 1; nIndex >= 0; nIndex--)
+    {
+      if (0 == images[nIndex].indexOf("file:/"))
+        images[nIndex] = window["AscDesktopEditor"]["GetImageBase64"](images[nIndex]);
+    }
+  }
+
   var rData = {"id": api.documentId, "c": "imgurls", "vkey": api.documentVKey, "userid":  api.documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": images};
   api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.LoadImage);
 
@@ -2605,7 +1822,7 @@ function sendImgUrls(api, images, callback, bExcel) {
     }
     if ( c_oAscError.ID.No !== nError ) {
       if(!bExcel)
-        api.asc_fireCallback("asc_onError", nError, c_oAscError.Level.NoCritical);
+        api.sendEvent("asc_onError", nError, c_oAscError.Level.NoCritical);
       else
         api.handlers.trigger("asc_onError", nError, c_oAscError.Level.NoCritical);
     }
@@ -2677,7 +1894,8 @@ PasteProcessor.prototype =
     {
         if(PasteElementsId.g_bIsDocumentCopyPaste)
         {
-            if(docpostype_HdrFtr === oDocument.CurPos.Type)
+			var nDocPosType = oDocument.Get_DocPosType();
+            if(docpostype_HdrFtr === nDocPosType)
             {
                 if(null != oDocument.HdrFtr && null != oDocument.HdrFtr.CurHdrFtr && null != oDocument.HdrFtr.CurHdrFtr.Content)
                 {
@@ -2686,7 +1904,7 @@ PasteProcessor.prototype =
                 }
             }
 
-            if(oDocument.CurPos.Type === docpostype_DrawingObjects)
+            if(nDocPosType === docpostype_DrawingObjects)
             {
                 var content = oDocument.DrawingObjects.getTargetDocContent(true);
                 if(content)
@@ -2773,7 +1991,7 @@ PasteProcessor.prototype =
             var bNeedMoveCursor = History.Is_LastPointNeedRecalc();
             this.oRecalcDocument.Recalculate();
             
-            if ((oDocument.CurPos.Type !== docpostype_DrawingObjects || true === this.oLogicDocument.DrawingObjects.isSelectedText()) && true === bNeedMoveCursor)
+            if ((oDocument.Get_DocPosType() !== docpostype_DrawingObjects || true === this.oLogicDocument.DrawingObjects.isSelectedText()) && true === bNeedMoveCursor)
             {
                 this.oLogicDocument.Cursor_MoveRight(false, false, true);
             }
@@ -2781,8 +1999,6 @@ PasteProcessor.prototype =
             this.oLogicDocument.Document_UpdateInterfaceState();
             this.oLogicDocument.Document_UpdateSelectionState();
         }
-
-        window.GlobalPasteFlagCounter = 0;
     },
     InsertInPlace : function(oDoc, aNewContent)
     {
@@ -2983,10 +2199,11 @@ PasteProcessor.prototype =
 			content[i].RecalcInfo.Set_Type_0(pararecalc_0_All);
 		}
 	},
-    ReadFromBinary : function(sBase64)
+    ReadFromBinary : function(sBase64, oDocument)
 	{
         var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
-        var oBinaryFileReader = new AscCommonWord.BinaryFileReader(this.oDocument, openParams);
+		var doc = oDocument ? oDocument : this.oLogicDocument;
+        var oBinaryFileReader = new AscCommonWord.BinaryFileReader(doc, openParams);
         var oRes = oBinaryFileReader.ReadFromString(sBase64, true);
         this.bInBlock = oRes.bInBlock;
         return oRes;
@@ -3019,17 +2236,7 @@ PasteProcessor.prototype =
 			//todo с удалением в начале есть проблема, что удаляем элементы даже при пустом буфере
 			this.oLogicDocument.Remove(1, true, true, true);
             this.oDocument = this._GetTargetDocument(this.oDocument);
-            // var oPasteContent = this.ReadFromBinary(node.innerText);
-            // this.aContent = oPasteContent.content;
-            // oThis.api.pre_Paste(oPasteContent.fonts, oPasteContent.images, function(){
-            // if(false == oThis.bNested)
-            // {
-            // oThis.InsertInDocument();
-            // node.blur();
-            // node.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
-            // }
-            // });
-            // return;
+            
             var bTurnOffTrackRevisions = false;
             if(this.oDocument && this.oDocument.bPresentation){
                 if(oThis.api.WordControl.m_oLogicDocument.TrackRevisions){
@@ -3041,10 +2248,18 @@ PasteProcessor.prototype =
             {
                 if(onlyBinary)
 				{
-					base64 = onlyBinary;
-					if(base64 != null)
-						aContent = this.ReadFromBinary(base64);
-					pasteFromBinary = true;
+					if(onlyBinary.indexOf("xslData;") > -1)
+					{
+						base64FromExcel = onlyBinary.split('xslData;')[1];
+					}
+					else if(onlyBinary.indexOf("docData;") > -1)
+					{
+						base64 = onlyBinary.split('docData;')[1];
+					}
+					else if(onlyBinary.indexOf("pptData;") > -1)
+					{
+						base64FromPresentation = onlyBinary.split('pptData;')[1];
+					}
 				}
 				else
 				{
@@ -3074,30 +2289,43 @@ PasteProcessor.prototype =
 							}
 						}
 					}
-					
-					//если находимся внутри шейп, вставляем html
-					if(this.oDocument.Parent && this.oDocument.Parent instanceof CShape)
-					{
-						if(oThis.oDocument && oThis.oDocument.Parent && oThis.oDocument.Parent.parent && oThis.oDocument.Parent.parent.parent && oThis.oDocument.Parent.parent.parent.getObjectType && oThis.oDocument.Parent.parent.parent.getObjectType() == AscDFH.historyitem_type_Chart)
-							base64 = null;
-						base64FromExcel = null;
-					}
-					else if(this.oDocument.bPresentation)
-					{
-						base64 = null;
-						base64FromExcel = null;
-						this.pasteInPresentationShape = true;
-					}
-					
-					var isImageInNode = node.getElementsByTagName('img') && node.getElementsByTagName('img').length ? true : false;
-					if(base64 != null)
-						aContent = this.ReadFromBinary(base64);
-						
-					if(base64 != null && aContent)
-						pasteFromBinary = true;
-					else if(aContentExcel != null && aContent && aContent.content)
-						pasteFromBinary = true;
 				}
+				
+				//если находимся внутри шейп, вставляем html
+				if(this.oDocument.Parent && this.oDocument.Parent instanceof CShape)
+				{
+					if(oThis.oDocument && oThis.oDocument.Parent && oThis.oDocument.Parent.parent && oThis.oDocument.Parent.parent.parent && oThis.oDocument.Parent.parent.parent.getObjectType && oThis.oDocument.Parent.parent.parent.getObjectType() == AscDFH.historyitem_type_Chart)
+						base64 = null;
+					base64FromExcel = null;
+				}
+				else if(this.oDocument.bPresentation)
+				{
+					this.pasteInPresentationShape = true;
+				}
+				
+				var isImageInNode = node && node.getElementsByTagName('img') && node.getElementsByTagName('img').length ? true : false;
+				if(base64 != null)
+					aContent = this.ReadFromBinary(base64);
+				
+				//вставляем в заголовок диаграммы, предварительно конвертируем все параграфы в презентационный формат
+				if(aContent && aContent.content && this.oDocument.bPresentation && oThis.oDocument && oThis.oDocument.Parent && oThis.oDocument.Parent.parent && oThis.oDocument.Parent.parent.parent && oThis.oDocument.Parent.parent.parent.getObjectType && oThis.oDocument.Parent.parent.parent.getObjectType() == AscDFH.historyitem_type_Chart)
+				{
+					var newContent = [];
+					for(var i = 0; i < aContent.content.length; i++)
+					{
+						if(type_Paragraph === aContent.content[i].Get_Type())
+						{
+							newContent.push(AscFormat.ConvertParagraphToPPTX(aContent.content[i], this.oDocument.DrawingDocument, this.oDocument));
+						}
+					}
+					
+					aContent.content = newContent;
+				}
+				
+				if(base64 != null && aContent)
+					pasteFromBinary = true;
+				else if(aContentExcel != null && aContent && aContent.content)
+					pasteFromBinary = true;
 				
 				
 				//***вставка из редактора таблиц в документы***
@@ -3107,11 +2335,6 @@ PasteProcessor.prototype =
                         if(false == oThis.bNested)
                         {
                             oThis.InsertInDocument();
-							if(nodeDisplay)
-							{
-								nodeDisplay.blur();
-								nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
-							}
                             if(oThis.aContent.bAddNewStyles)
                                 oThis.api.GenerateStyles();
                         }
@@ -3125,7 +2348,7 @@ PasteProcessor.prototype =
 					if(aContentExcel.arrImages && aContentExcel.arrImages.length)
 					{
                         var oObjectsForDownload = GetObjectsForImageDownload(aContentExcel.arrImages);
-            AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
+						AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
                             var oImageMap = {};
                             ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
                             var aContent = oThis._convertExcelBinary(aContentExcel);
@@ -3136,7 +2359,7 @@ PasteProcessor.prototype =
 					else
 					{
 						var aContent = oThis._convertExcelBinary(aContentExcel);
-						this.aContent = aContent.content;
+						oThis.aContent = aContent.content;
 						oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
 					}
 					if(bTurnOffTrackRevisions){
@@ -3150,11 +2373,6 @@ PasteProcessor.prototype =
                         if(false == oThis.bNested)
                         {
                             oThis.InsertInDocument();
-							if(nodeDisplay)
-							{
-								nodeDisplay.blur();
-								nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
-							}
                             if(aContent.bAddNewStyles)
                                 oThis.api.GenerateStyles();
                         }
@@ -3184,7 +2402,7 @@ PasteProcessor.prototype =
 						}
 						else
 						{
-              AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data)
+							AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data)
                             {
                                 ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, aContent.images);
                                 oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
@@ -3207,11 +2425,6 @@ PasteProcessor.prototype =
                         if(false == oThis.bNested)
                         {
                             oThis.InsertInDocument();
-							if(nodeDisplay)
-							{
-								nodeDisplay.blur();
-								nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
-							}
                             if(aContent.bAddNewStyles)
                                 oThis.api.GenerateStyles();
                         }
@@ -3261,9 +2474,24 @@ PasteProcessor.prototype =
 							if(!objects.arrImages.length && objects.arrShapes.length === 1 && objects.arrShapes[0] && objects.arrShapes[0].Drawing && objects.arrShapes[0].Drawing.graphicObject)
 							{
 								var drawing = objects.arrShapes[0].Drawing;
-								//TODO в данном вставляется как html
+								
 								if(typeof CGraphicFrame !== "undefined" && drawing instanceof CGraphicFrame)
-									break;
+								{
+									var aContent = [];
+									var table = AscFormat.ConvertGraphicFrameToWordTable(drawing, this.oLogicDocument);
+									//TODO стиль не прокидывается. в будущем нужно реализовать
+									table.TableStyle = null;
+									aContent.push(table);
+									
+									this.aContent = aContent;
+									
+									oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
+									if(bTurnOffTrackRevisions){
+										oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
+									}
+									
+									return;
+								}
 							}
 							
 								
@@ -3289,45 +2517,118 @@ PasteProcessor.prototype =
 							for(var i = 0; i < objects.arrImages.length; ++i)
 							{
 								var oBuilderImage = objects.arrImages[i];
-								if (oBuilderImage.AdditionalUrls) {
-									for(var j = 0; j < oBuilderImage.AdditionalUrls.length; ++j) {
+								if (oBuilderImage.AdditionalUrls) 
+								{
+									for(var j = 0; j < oBuilderImage.AdditionalUrls.length; ++j) 
+									{
 										aImagesToDownload.push(oBuilderImage.AdditionalUrls[j]);
 									}
 								}
 							}
-                          AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
-                            var image_map = {};
-                            for (var i = 0, length = Math.min(data.length, objects.arrImages.length); i < length; ++i) {
-                              var elem = data[i];
-                              if (null != elem.url) {
-                                var name = g_oDocumentUrls.imagePath2Local(elem.path);
-                                var imageElem = objects.arrImages[i];
-                                if (null != imageElem) {
-                                  //для вставки graphicFrame в виде картинки(если было при копировании выделено несколько графических объектов)
-                                  if (imageElem.base64) {
-                                    imageElem.base64 = name;
-                                  } else {
-                                    imageElem.SetUrl(name);
-                                  }
-                                }
-                                image_map[i] = name;
-                              } else {
-                                image_map[i] = aImagesToDownload[i];
-                              }
-                            }
-                            aContent = oThis._convertExcelBinary(null, arr_shapes);
-                            oThis.aContent = aContent.content;
-                            oThis.api.pre_Paste(aContent.fonts, image_map, fPrepasteCallback);
-                          });
-                            if(bTurnOffTrackRevisions){
-                                oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
-                            }
+							
+							AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
+								var image_map = {};
+								for (var i = 0, length = Math.min(data.length, objects.arrImages.length); i < length; ++i) 
+								{
+									var elem = data[i];
+									if (null != elem.url) 
+									{
+										var name = g_oDocumentUrls.imagePath2Local(elem.path);
+										var imageElem = objects.arrImages[i];
+										if (null != imageElem) 
+										{
+											//для вставки graphicFrame в виде картинки(если было при копировании выделено несколько графических объектов)
+											if (imageElem.base64) 
+											{
+												imageElem.base64 = name;
+											} 
+											else 
+											{
+												imageElem.SetUrl(name);
+											}
+										}
+										image_map[i] = name;
+									} 
+									else 
+									{
+										image_map[i] = aImagesToDownload[i];
+									}
+								}
+								
+								aContent = oThis._convertExcelBinary(null, arr_shapes);
+								oThis.aContent = aContent.content;
+								oThis.api.pre_Paste(aContent.fonts, image_map, fPrepasteCallback);
+							});
+							
+							if(bTurnOffTrackRevisions)
+							{
+								oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
+							}
+							return;
+						}
+						case "SlideObjects":
+						{
+							History.TurnOff();
+							
+							var loader = new AscCommon.BinaryPPTYLoader();
+							loader.Start_UseFullUrl();
+							
+							pptx_content_loader.Reader.Start_UseFullUrl();
+							
+							loader.stream = stream;
+							loader.presentation = editor.WordControl.m_oLogicDocument;
+							var imageUrl = stream.GetString2();
+							
+							History.TurnOn();
+							
+							var aImagesToDownload = [];
+							aImagesToDownload.push(imageUrl);
+							
+							//load image(slide base64)
+							AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
+								var image_map = {};
+								var elem = data[0];
+								if (null != elem.url) 
+								{
+									imageUrl = g_oDocumentUrls.imagePath2Local(elem.path);
+									image_map[0] = imageUrl;
+								} 
+								
+								//create paragraph, pararun and paradrawing
+								var tempParagraph = new Paragraph(oThis.oDocument.DrawingDocument, oThis.oDocument, 0, 0, 0, 0, 0);
+								var graphicObj = AscFormat.DrawingObjectsController.prototype.createImage(imageUrl, 0, 0, p_width, p_height);	
+								
+								var tempParaRun = new ParaRun();
+								tempParaRun.Paragraph = null;
+								tempParaRun.Add_ToContent( 0, new ParaDrawing(), false );
+
+								tempParaRun.Content[0].Set_GraphicObject(graphicObj);
+								tempParaRun.Content[0].GraphicObj.setParent(tempParaRun.Content[0]);
+								tempParaRun.Content[0].CheckWH();
+								
+								tempParagraph.Content.splice(tempParagraph.Content.length - 1, 0, tempParaRun);
+								
+								aContent = [];
+								aContent.push(tempParagraph);
+								oThis.aContent = aContent;
+								
+								oThis.api.pre_Paste(null, image_map, fPrepasteCallback);
+							});
+							
+							if(bTurnOffTrackRevisions)
+							{
+								oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
+							}
 							return;
 						}
 					}
 				}
             }
 			
+			if(onlyBinary)
+			{
+				return;
+			}
 			
 			//***вставляем извне в редактор документов***
             var presentation = editor.WordControl.m_oLogicDocument;
@@ -3378,8 +2679,6 @@ PasteProcessor.prototype =
                     if(false == oThis.bNested)
                     {
                         oThis.InsertInDocument();
-						nodeDisplay.blur();
-						nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
                     }
                     if(bTurnOffTrackRevisions){
                         oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
@@ -3396,28 +2695,49 @@ PasteProcessor.prototype =
             if(PasteElementsId.copyPasteUseBinary)
             {
                 var base64 = null, base64FromWord = null, base64FromExcel = null;
-                var classNode;
-                if(node.children[0] && node.children[0].getAttribute("class") != null)
-                    classNode = node.children[0].getAttribute("class");
-                else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null)
-                    classNode = node.children[0].children[0].getAttribute("class");
-                if( classNode != null ){
-                    cL = classNode.split(" ");
-                    for (var i = 0; i < cL.length; i++){
-                        if(cL[i].indexOf("pptData;") > -1)
-                        {
-                            base64 = cL[i].split('pptData;')[1];
-                        }
-						else if(cL[i].indexOf("docData;") > -1)
-                        {
-                            base64FromWord = cL[i].split('docData;')[1];
-                        }
-						else if(cL[i].indexOf("xslData;") > -1)
-                        {
-                            base64FromExcel = cL[i].split('xslData;')[1];
-                        }
-                    }
-                }
+                if(onlyBinary)
+				{
+					if(onlyBinary.indexOf("pptData;") > -1)
+					{
+						base64 = onlyBinary.split('pptData;')[1];
+					}
+					else if(onlyBinary.indexOf("docData;") > -1)
+					{
+						base64FromWord = onlyBinary.split('docData;')[1];
+					}
+					else if(onlyBinary.indexOf("xslData;") > -1)
+					{
+						base64FromExcel = onlyBinary.split('xslData;')[1];
+					}
+				}
+				else
+				{
+					var classNode;
+					if(node.children[0] && node.children[0].getAttribute("class") != null)
+						classNode = node.children[0].getAttribute("class");
+					else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null)
+						classNode = node.children[0].children[0].getAttribute("class");
+						
+					 if( classNode != null ){
+						cL = classNode.split(" ");
+						for (var i = 0; i < cL.length; i++){
+							if(cL[i].indexOf("pptData;") > -1)
+							{
+								base64 = cL[i].split('pptData;')[1];
+							}
+							else if(cL[i].indexOf("docData;") > -1)
+							{
+								base64FromWord = cL[i].split('docData;')[1];
+							}
+							else if(cL[i].indexOf("xslData;") > -1)
+							{
+								base64FromExcel = cL[i].split('xslData;')[1];
+							}
+						}
+					}
+				}
+					
+               
                 if(typeof base64 === "string")//вставляем в презентации из презентаций
                 {
                     pptx_content_loader.Clear();
@@ -3438,7 +2758,9 @@ PasteProcessor.prototype =
                         case "Content":
                         {
                             var docContent = this.ReadPresentationText(stream);
-							
+							if(docContent.length === 0){
+							    return;
+							}
 							var presentationSelectedContent = new PresentationSelectedContent();
 							presentationSelectedContent.DocContent = new CSelectedContent();
 							presentationSelectedContent.DocContent.Elements = docContent;
@@ -3467,9 +2789,6 @@ PasteProcessor.prototype =
                                     presentation.Recalculate();
                                     presentation.Check_CursorMoveRight();
                                     presentation.Document_UpdateInterfaceState();
-
-                                    nodeDisplay.blur();
-                                    nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
                                 }
                             };
 
@@ -3507,9 +2826,6 @@ PasteProcessor.prototype =
 									
                                     presentation.Recalculate();
                                     presentation.Document_UpdateInterfaceState();
-
-                                    nodeDisplay.blur();
-                                    nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
                                 }
                             };
 
@@ -3548,6 +2864,7 @@ PasteProcessor.prototype =
                             loader.presentation = editor.WordControl.m_oLogicDocument;
 							
 							//read slides
+							var imageUrl = stream.GetString2();
                             var slide_count = stream.GetULong();
                             var arr_arrTransforms = [];
                             for(var i = 0; i < slide_count; ++i)
@@ -3781,7 +3098,7 @@ PasteProcessor.prototype =
                             var oObjectsForDownload = GetObjectsForImageDownload(objects.arrImages);
                             if(oObjectsForDownload.aUrls.length > 0)
                             {
-                              AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
+								AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
                                     var oImageMap = {};
                                     ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
                                     oThis.api.pre_Paste(fonts, oImageMap, paste_callback);
@@ -3811,9 +3128,9 @@ PasteProcessor.prototype =
 					//создаём темповый CDocument
 					this.oDocument = AscFormat.ExecuteNoHistory(tempCDocument , this, []);
 
-          AscCommon.g_oIdCounter.m_bRead = true;
-					var aContent = AscFormat.ExecuteNoHistory(this.ReadFromBinary, this, [base64FromWord]);
-          AscCommon.g_oIdCounter.m_bRead = false;
+					AscCommon.g_oIdCounter.m_bRead = true;
+					var aContent = AscFormat.ExecuteNoHistory(this.ReadFromBinary, this, [base64FromWord, this.oDocument]);
+					AscCommon.g_oIdCounter.m_bRead = false;
 					//возврщаем обратно переменные и историю, документ которой заменяется при создании CDocument
 					this.oDocument = trueDocument;
 					History.Document = trueDocument;
@@ -3850,7 +3167,7 @@ PasteProcessor.prototype =
 							graphic_frame.spPr.xfrm.setExtY(7.478268771701388 * Rows);
 							graphic_frame.setNvSpPr(new AscFormat.UniNvPr());
 							
-							element = this._convertTableToPPTX(element);
+							element = this._convertTableToPPTX(element, true);
 							graphic_frame.setGraphicObject(element.Copy(graphic_frame));
 							graphic_frame.graphicObject.Set_TableStyle(defaultTableStyleId);
 
@@ -3896,9 +3213,6 @@ PasteProcessor.prototype =
 							presentation.Recalculate();
                             presentation.Check_CursorMoveRight();
 							presentation.Document_UpdateInterfaceState();
-
-							nodeDisplay.blur();
-							nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
 						}
 					}
 					
@@ -3915,7 +3229,7 @@ PasteProcessor.prototype =
                     var oObjectsForDownload = GetObjectsForImageDownload(aContent.aPastedImages);
 					if(oObjectsForDownload.aUrls.length > 0)
 					{
-            AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data){
+						AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data){
                             var oImageMap = {};
                             ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
                             //ковертим изображения в презентационный формат
@@ -3959,9 +3273,7 @@ PasteProcessor.prototype =
 				}
 				else if(base64FromExcel)//вставляем в презентации из таблиц
 				{	
-					History.TurnOff();
-					var excelContent = this._readFromBinaryExcel(base64FromExcel);
-					History.TurnOn();
+					var excelContent = AscFormat.ExecuteNoHistory(this._readFromBinaryExcel, this, [base64FromExcel]);
 					
 					var aContentExcel = excelContent.workbook;
 					var aPastedImages = excelContent.arrImages;
@@ -3969,22 +3281,6 @@ PasteProcessor.prototype =
 					//если есть шейпы, то вставляем их из excel
 					if(aContentExcel && aContentExcel.aWorksheets && aContentExcel.aWorksheets[0] && aContentExcel.aWorksheets[0].Drawings && aContentExcel.aWorksheets[0].Drawings.length)
 					{
-						var arr_shapes = aContentExcel.aWorksheets[0].Drawings;
-						var shape;
-						
-						var aImagesToDownload = [];
-						for(var i = 0; i < aPastedImages.length; i++)
-						{
-							aImagesToDownload.push(aPastedImages[i].Url);
-						}
-						
-                        var aContent = {aPastedImages: aPastedImages, images: aImagesToDownload};
-						
-						//var arrTransforms = objects.arrTransforms;
-						var presentation = editor.WordControl.m_oLogicDocument;
-						oThis = this;
-						var font_map = {};
-
 						var paste_callback = function()
 						{
 							if(false == oThis.bNested)
@@ -4005,27 +3301,46 @@ PasteProcessor.prototype =
 								presentation.Insert_Content(presentationSelectedContent);
 								presentation.Recalculate();
 
-                                presentation.Check_CursorMoveRight();
+								presentation.Check_CursorMoveRight();
 								presentation.Document_UpdateInterfaceState();
-
-								nodeDisplay.blur();
-								nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
 							}
+						};
+						
+						
+						var arr_shapes = aContentExcel.aWorksheets[0].Drawings;
+						
+						var aImagesToDownload = [];
+						for(var i = 0; i < aPastedImages.length; i++)
+						{
+							aImagesToDownload.push(aPastedImages[i].Url);
 						}
-
+						
+                        var aContent = {aPastedImages: aPastedImages, images: aImagesToDownload};
+						
+						//var arrTransforms = objects.arrTransforms;
+						var presentation = editor.WordControl.m_oLogicDocument;
+						oThis = this;
+						
+						//fonts
+						var font_map = {};
+						for(var i = 0; i < arr_shapes.length; ++i)
+						{
+							var shape = arr_shapes[i].graphicObject;
+							shape.getAllFonts(font_map);
+						}
+						
 						var fonts = [];
 						//грузим картинки и фонты
 						for(var i in font_map)
 							fonts.push(new CFont(i, 0, "", 0));
 
-
+						//images
                         var images = aContent.images;
                         var arrImages = aContent.aPastedImages;
-
                         var oObjectsForDownload = GetObjectsForImageDownload(arrImages);
 						if(oObjectsForDownload.aUrls.length > 0)
 						{
-              AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
+							AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
                                 var oImageMap = {};
 								
 								History.TurnOff();
@@ -4046,8 +3361,73 @@ PasteProcessor.prototype =
 						
 						return;
 					}
+					else
+					{
+						var presentationSelectedContent = new PresentationSelectedContent();
+						presentationSelectedContent.DocContent = new CSelectedContent();
+						
+						var aContent = AscFormat.ExecuteNoHistory(this._convertExcelBinary, this, [excelContent]);
+						
+						var elements = [], selectedElement, element, drawings = [], pDrawings = [], drawingCopyObject;
+						var defaultTableStyleId = presentation.DefaultTableStyleId;
+						for(var i = 0; i < aContent.content.length; ++i)
+						{
+							selectedElement = new CSelectedElement();
+							element = aContent.content[i];
+							
+							if(type_Table == element.GetType())//table
+							{
+								//TODO переделать количество строк и ширину
+								var W = 100;
+								var Rows = 3;
+								var graphic_frame = new CGraphicFrame();
+								graphic_frame.setSpPr(new AscFormat.CSpPr());
+								graphic_frame.spPr.setParent(graphic_frame);
+								graphic_frame.spPr.setXfrm(new AscFormat.CXfrm());
+								graphic_frame.spPr.xfrm.setParent(graphic_frame.spPr);
+								graphic_frame.spPr.xfrm.setOffX((this.oDocument.Width - W)/2);
+								graphic_frame.spPr.xfrm.setOffY(this.oDocument.Height/5);
+								graphic_frame.spPr.xfrm.setExtX(W);
+								graphic_frame.spPr.xfrm.setExtY(7.478268771701388 * Rows);
+								graphic_frame.setNvSpPr(new AscFormat.UniNvPr());
+								
+								element = this._convertTableToPPTX(element);
+								graphic_frame.setGraphicObject(element.Copy(graphic_frame));
+								graphic_frame.graphicObject.Set_TableStyle(defaultTableStyleId);
+
+								drawingCopyObject = new DrawingCopyObject();
+								drawingCopyObject.Drawing = graphic_frame;
+								pDrawings.push(drawingCopyObject);	
+							}
+						}
+						presentationSelectedContent.Drawings = pDrawings;
+						
+						var presentation = editor.WordControl.m_oLogicDocument;
+						
+						//вставка
+						var paste_callback = function()
+						{
+							if(false == oThis.bNested)
+							{
+								presentation.Insert_Content(presentationSelectedContent);
+								presentation.Recalculate();
+								presentation.Check_CursorMoveRight();
+								presentation.Document_UpdateInterfaceState();
+							}
+						}
+						
+						oThis.api.pre_Paste(aContent.content.fonts, null, paste_callback);
+		
+						return;
+					}
 				}
             }
+			
+			if(onlyBinary)
+			{
+				return;
+			}
+			
             this.oRootNode = node;
             this._Prepeare(node,
                 function(){
@@ -4089,7 +3469,7 @@ PasteProcessor.prototype =
 						
                         var w =  shape.txBody.getRectWidth(presentation.Width*2/3);
                         var h = shape.txBody.content.Get_SummaryHeight();
-                      AscFormat.CheckSpPrXfrm(shape);
+						AscFormat.CheckSpPrXfrm(shape);
                         shape.spPr.xfrm.setExtX(w);
                         shape.spPr.xfrm.setExtY(h);
                         shape.spPr.xfrm.setOffX(0);
@@ -4107,7 +3487,7 @@ PasteProcessor.prototype =
                         //var h = shape.txBody.content.Get_SummaryHeight();
 						var w = 100;
 						var h = 100;
-                      AscFormat.CheckSpPrXfrm(shape);
+						AscFormat.CheckSpPrXfrm(shape);
                         shape.spPr.xfrm.setExtX(w);
                         shape.spPr.xfrm.setExtY(h);
                         shape.spPr.xfrm.setOffX(0);
@@ -4120,7 +3500,7 @@ PasteProcessor.prototype =
                     {
                         shape = arrImages[i];
 
-                      AscFormat.CheckSpPrXfrm(shape);
+						AscFormat.CheckSpPrXfrm(shape);
                         //shape.spPr.xfrm.setExtX(w);
                         //shape.spPr.xfrm.setExtY(h);
                         shape.spPr.xfrm.setOffX(0);
@@ -4149,8 +3529,6 @@ PasteProcessor.prototype =
                         presentation.Check_CursorMoveRight();
                         presentation.Document_UpdateInterfaceState();
                     }
-					nodeDisplay.blur();
-					nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
             });
         }
     },
@@ -4185,6 +3563,7 @@ PasteProcessor.prototype =
 		//пока только распознаём только графические объекты
 		var aContent = null, tempParagraph = null;
 		var imageUrl, isGraphicFrame, extX, extY;
+		var fonts = null;
 		
 		var drawings = pDrawings ? pDrawings : aContentExcel.workbook.aWorksheets[0].Drawings;
 		if(drawings && drawings.length)
@@ -4263,11 +3642,11 @@ PasteProcessor.prototype =
 		}
 		else
 		{
-			this._convertTableFromExcel(aContentExcel);
+			fonts = this._convertTableFromExcel(aContentExcel);
 			aContent = this.aContent;
 		}
 		
-		return {content: aContent};
+		return {content: aContent, fonts: fonts};
 	},
 	
 	_convertTableFromExcel: function(aContentExcel)
@@ -4278,6 +3657,7 @@ PasteProcessor.prototype =
 		var tempActiveRef = aContentExcel.activeRange;
 		var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(tempActiveRef);
 		var t = this;
+		var fonts = [];
 		
 		var convertBorder = function(border)
 		{
@@ -4301,7 +3681,7 @@ PasteProcessor.prototype =
 				t.oFonts = [];
 
 			t.oFonts[fontFamily] = {Name: fontFamily, Index: -1};
-            t.aContent.fonts.push(new CFont(fontFamily, 0, "", 0));
+			fonts.push(new CFont(fontFamily, 0, "", 0));
 		}
 		
 		//grid
@@ -4384,7 +3764,16 @@ PasteProcessor.prototype =
 				//merge				
 				oCurCell.Set_GridSpan(gridSpan);
 				if(vMerge != 1)
-					oCurCell.Set_VMerge(vmerge_Continue);
+				{
+					if(isMergedCell.r1 === i + activeRange.r1)
+					{
+						oCurCell.Set_VMerge(vmerge_Restart);
+					}
+					else
+					{
+						oCurCell.Set_VMerge(vmerge_Continue);
+					}
+				}
 				
 				var oCurPar = oCurCell.Content.Content[0];
 				
@@ -4471,37 +3860,46 @@ PasteProcessor.prototype =
 			//if((i + vMerge - 1) == diffRow)
 				//i = i + vMerge - 1;	
 		}
+		
+		return fonts;
 	},
 	
-	_convertTableToPPTX: function(table)
+	_convertTableToPPTX: function(table, isFromWord)
 	{
 		//TODO пересмотреть обработку для вложенных таблиц(можно сделать так, как при копировании из документов в таблицы)
-		var allRows = [];
-		this.maxTableCell = 0;
-		table = this._replaceInnerTables(table, allRows, true);
-		
-		//ковертим внутренние параграфы
-		table.bPresentation = true;
-		for(var i = 0; i < table.Content.length; i++)
-		{
-			for(var j = 0; j < table.Content[i].Content.length; j++)
+        var oTable = AscFormat.ExecuteNoHistory(function(){
+            var allRows = [];
+            this.maxTableCell = 0;
+			
+			if(isFromWord)
 			{
-				var cDocumentContent = table.Content[i].Content[j].Content;
-				cDocumentContent.bPresentation = true;
-				var nIndex = 0;
-				for(var n = 0; n < cDocumentContent.Content.length; n++)
-				{
-                    if(cDocumentContent.Content[n] instanceof Paragraph)
-                    {
-                        cDocumentContent.Content[nIndex] = AscFormat.ConvertParagraphToPPTX(cDocumentContent.Content[nIndex]);
-                        ++nIndex;
-                    }
-
-				}
+				table = this._replaceInnerTables(table, allRows, true);
 			}
-		}
-		
-		return table;
+            
+            //ковертим внутренние параграфы
+            table.bPresentation = true;
+            for(var i = 0; i < table.Content.length; i++)
+            {
+                for(var j = 0; j < table.Content[i].Content.length; j++)
+                {
+                    var cDocumentContent = table.Content[i].Content[j].Content;
+                    cDocumentContent.bPresentation = true;
+                    var nIndex = 0;
+                    for(var n = 0; n < cDocumentContent.Content.length; n++)
+                    {
+                        if(cDocumentContent.Content[n] instanceof Paragraph)
+                        {
+                            cDocumentContent.Content[nIndex] = AscFormat.ConvertParagraphToPPTX(cDocumentContent.Content[nIndex]);
+                            ++nIndex;
+                        }
+
+                    }
+                }
+            }
+            table.Set_TableLayout(tbllayout_Fixed);
+            return table;
+        }, this, []);
+        return oTable;
 	},
 	
 	_replaceInnerTables: function(table, allRows, isRoot)
@@ -4688,7 +4086,7 @@ PasteProcessor.prototype =
         var count = stream.GetULong() / 100000;
 		
 		//читаем контент, здесь только параграфы
-		var newDocContent = new CDocumentContent(shape.txBody, editor.WordControl.m_oDrawingDocument, 0 , 0, 0, 0, false, false);
+		var newDocContent = new AscFormat.CDrawingDocContent(shape.txBody, editor.WordControl.m_oDrawingDocument, 0 , 0, 0, 0, false, false);
 		var elements = [], paragraph, selectedElement;
         for(var i = 0; i < count; ++i)
         {
@@ -4746,6 +4144,21 @@ PasteProcessor.prototype =
             }
             
 			var drawing = loader.ReadGraphicObject();
+			
+			//для случая, когда копируем 1 таблицу из презентаций, в бинарник заносим ещё одну такую же табличку, но со скомпилированными стилями(для вставки в word/excel)
+			if(count === 1 && typeof AscFormat.CGraphicFrame !== "undefined" && drawing instanceof AscFormat.CGraphicFrame)
+			{
+				//в презентациях пропускаю чтение ещё раз графического объекта
+				if(presentation.Slides)
+				{
+					loader.stream.Skip2(1);
+					loader.stream.SkipRecord();
+				}
+				else
+				{
+					drawing = loader.ReadGraphicObject();
+				}
+			}
 			
             var x = stream.GetULong()/100000;
             var y = stream.GetULong()/100000;
@@ -6415,7 +5828,9 @@ PasteProcessor.prototype =
 			{
 				var sClass = child.getAttribute("class");
 				var sStyle = child.getAttribute("style");
-				if(sClass || sStyle)
+				var sHref = child.getAttribute("href");
+				
+				if(sClass || sStyle || sHref)
 				{
 					bIsPlainText = false;
 					break;
@@ -7684,116 +7099,7 @@ PasteProcessor.prototype =
 		}
 	}
 };
-
-function SafariIntervalFocus()
-{
-    if (window.editor && window.editor.WordControl && window.editor.WordControl.IsFocus && (!PasteElementsId.g_bIsDocumentCopyPaste || (PasteElementsId.g_bIsDocumentCopyPaste && !window.editor.WordControl.TextBoxInputFocus)))
-    {
-        var pastebin = document.getElementById(PasteElementsId.COPY_ELEMENT_ID);
-        if (pastebin)
-            pastebin.focus();
-        else
-        {
-            // create
-            Editor_CopyPaste_Create(window.editor);
-        }
-    }
-}
-
-function Editor_CopyPaste_Create(api)
-{
-    var ElemToSelect = document.createElement("div");
-    ElemToSelect.id = PasteElementsId.COPY_ELEMENT_ID;
-    ElemToSelect.className = PasteElementsId.COPYPASTE_ELEMENT_CLASS;
-    ElemToSelect.style.position = "absolute";
-
-    ElemToSelect.style.left = '0px';
-    ElemToSelect.style.top = '-100px';
-    ElemToSelect.style.width = '1000px';
-    ElemToSelect.style.height = '100px';
-    ElemToSelect.style.overflow = 'hidden';
-    ElemToSelect.style.zIndex = -1000;
-    ElemToSelect.style.MozUserSelect = "text";
-    ElemToSelect.style["-khtml-user-select"] = "text";
-    ElemToSelect.style["-o-user-select"] = "text";
-    ElemToSelect.style["user-select"] = "text";
-    ElemToSelect.style["-webkit-user-select"] = "text";
-    ElemToSelect.setAttribute("contentEditable", true);
-
-	var Def_rPr;
-	if(PasteElementsId.g_bIsDocumentCopyPaste)
-		Def_rPr = api.WordControl.m_oLogicDocument.Styles.Default.TextPr;
-	else	
-		Def_rPr = api.WordControl.m_oLogicDocument.globalTableStyles.Default.TextPr;
-		
-    ElemToSelect.style.fontFamily = Def_rPr.FontFamily.Name;
-
-    if (!api.DocumentReaderMode)
-        ElemToSelect.style.fontSize = Def_rPr.FontSize + "pt";
-    else
-    {
-        api.DocumentReaderMode.CorrectDefaultFontSize(Def_rPr.FontSize);
-        ElemToSelect.style.fontSize = "1em";
-    }
-
-    ElemToSelect.onpaste = function(e){
-        if (!window.GlobalPasteFlag)
-            return;
-		
-        // тут onpaste не обрубаем, так как он в сафари под macos приходить должен
-        if (window.GlobalPasteFlagCounter == 1)
-        {
-            Body_Paste(api,e);
-
-            if (window.GlobalPasteFlag)
-                window.GlobalPasteFlagCounter = 2;
-        }
-    }
-
-	ElemToSelect.oncopy = function(e){
-		ElemToSelect.innerHTML = "";
-		Editor_Copy_Event(e, ElemToSelect);
-	}
 	
-	ElemToSelect.oncut = function(e){
-		if(false === api.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content))
-		{	
-			ElemToSelect.innerHTML = "";
-			Editor_Copy_Event(e, ElemToSelect);
-
-            api.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_CutHotKey);
-			api.WordControl.m_oLogicDocument.Remove(1, true, true);
-			api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
-		}
-	}
-
-    ElemToSelect["onbeforecut"] = function(e){
-        var selection = window.getSelection();
-		var rangeToSelect = document.createRange();
-
-		ElemToSelect.innerHTML = "&nbsp;";
-		
-        rangeToSelect.selectNodeContents (ElemToSelect);
-
-        selection.removeAllRanges ();
-        selection.addRange (rangeToSelect);
-    }
-
-    ElemToSelect["onbeforecopy"] = function(e){
-		var selection = window.getSelection();
-		var rangeToSelect = document.createRange();
-		
-		ElemToSelect.innerHTML = "&nbsp;";
-
-        rangeToSelect.selectNodeContents (ElemToSelect);
-
-        selection.removeAllRanges ();
-        selection.addRange (rangeToSelect);
-    }
-
-    document.body.appendChild( ElemToSelect );
-}
-
 function CreateImageFromBinary(bin, nW, nH)
 {
     var w, h;
@@ -7927,18 +7233,11 @@ function Check_LoadingDataBeforePrepaste(_api, _fonts, _images, _callback)
   window["AscCommon"].CDocumentReaderMode = CDocumentReaderMode;
   window["AscCommon"].GetObjectsForImageDownload = GetObjectsForImageDownload;
   window["AscCommon"].ResetNewUrls = ResetNewUrls;
-  window["AscCommon"].Editor_Copy_Button = Editor_Copy_Button;
-  window["AscCommon"].Editor_Copy = Editor_Copy;
   window["AscCommon"].CopyProcessor = CopyProcessor;
-  window["AscCommon"].Editor_Paste_GetElem = Editor_Paste_GetElem;
-  window["AscCommon"].Editor_Paste_Button = Editor_Paste_Button;
-  window["AscCommon"].Editor_Paste = Editor_Paste;
   window["AscCommon"].CopyPasteCorrectString = CopyPasteCorrectString;
   window["AscCommon"].Editor_Paste_Exec = Editor_Paste_Exec;
   window["AscCommon"].sendImgUrls = sendImgUrls;
   window["AscCommon"].PasteProcessor = PasteProcessor;
-  window["AscCommon"].SafariIntervalFocus = SafariIntervalFocus;
 
   window["AscCommon"].PasteElementsId = PasteElementsId;
-  window["AscCommon"].PASTE_EMPTY = PASTE_EMPTY;
 })(window);

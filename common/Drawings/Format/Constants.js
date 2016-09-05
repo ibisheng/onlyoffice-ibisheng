@@ -989,6 +989,12 @@
 			case AscDFH.historydescription_Document_CompositeInput:
 				sString = "Document_CompositeInput                    ";
 				break;
+			case AscDFH.historydescription_Document_CompositeInputReplace:
+				sString = "Document_CompositeInputReplace             ";
+				break;
+			case AscDFH.historydescription_Document_AddPageCount:
+				sString = "Document_AddPageCount                      ";
+				break;
 		}
 		return sString;
 	}
@@ -1004,6 +1010,9 @@
 	window['AscDFH'].historyitem_AutoShapes_RemoveFromDrawingObjects = 1004;
 	window['AscDFH'].historyitem_AutoShapes_SetBFromSerialize        = 1009;
 	window['AscDFH'].historyitem_AutoShapes_SetLocks                 = 1010;
+	window['AscDFH'].historyitem_AutoShapes_SetDrawingBaseType       = 1011;
+	window['AscDFH'].historyitem_AutoShapes_SetDrawingBaseExt        = 1012;
+	window['AscDFH'].historyitem_AutoShapes_SetDrawingBasePos        = 1013;
 	window['AscDFH'].historyitem_CommonChart_RemoveSeries            = 1005;
 	window['AscDFH'].historyitem_CommonSeries_RemoveDPt              = 1006;
 	window['AscDFH'].historyitem_CommonLit_RemoveDPt                 = 1007;
@@ -1860,6 +1869,7 @@
 	window['AscDFH'].historyitem_type_GraphicFrame           = 1122;
 	window['AscDFH'].historyitem_type_GrpFill                = 1123;
 	window['AscDFH'].historyitem_type_OleObject              = 1124;
+	window['AscDFH'].historyitem_type_DrawingContent         = 1125;
 
 
 	// Типы изменений в классе CDocument
@@ -2291,6 +2301,8 @@
 	window['AscDFH'].historyitem_type_deg              = 53;
 	window['AscDFH'].historyitem_type_ParaComment      = 54;
 	window['AscDFH'].historyitem_type_Field            = 55;
+	window['AscDFH'].historyitem_type_Footnotes        = 56;
+	window['AscDFH'].historyitem_type_FootEndNote      = 57;
 
 	window['AscDFH'].historyitem_Math_AddItem               = 1; // Добавляем элемент
 	window['AscDFH'].historyitem_Math_RemoveItem            = 2; // Удаляем элемент
@@ -2349,6 +2361,8 @@
 	window['AscDFH'].historyitem_Math_BarLinePos            = 55;
 	window['AscDFH'].historyitem_Math_BoxForcedBreak        = 56;
 	window['AscDFH'].historyitem_Math_DegreeSubSupType      = 57;
+
+	window['AscDFH'].historyitem_Footnotes_AddFootnote = 1;
 
 	window['AscDFH'].historydescription_Cut                                         = 0x0001;
 	window['AscDFH'].historydescription_PasteButtonIE                               = 0x0002;
@@ -2667,4 +2681,6 @@
 	window['AscDFH'].historydescription_Document_AddOleObject                       = 0x0137;
 	window['AscDFH'].historydescription_Document_EditOleObject                      = 0x0138;
 	window['AscDFH'].historydescription_Document_CompositeInput                     = 0x0139;
+	window['AscDFH'].historydescription_Document_CompositeInputReplace              = 0x013a;
+	window['AscDFH'].historydescription_Document_AddPageCount                       = 0x013b;
 })(window);

@@ -339,6 +339,7 @@ function NativeOpenFile()
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
         _api = new window["Asc"]["asc_docs_api"]("");
+
         _api.asc_nativeOpenFile(doc_bin);
     }
     else
@@ -369,6 +370,16 @@ function NativeOpenFile2(_params)
         
         if (_api.NativeAfterLoad)
             _api.NativeAfterLoad();
+
+        _api.__SendThemeColorScheme();
+
+        var schemes = _api.get_PropertyThemeColorSchemes();
+        if (schemes) {
+            var st = global_memory_stream_menu;
+            st["ClearNoAttack"]();
+            asc_WriteColorSchemes(schemes, st);
+            window["native"]["OnCallMenuEvent"](2404, st); // ASC_MENU_EVENT_TYPE_COLOR_SCHEMES
+        }
     }
     else
     {
@@ -583,8 +594,134 @@ window.clearInterval    = clearInterval;
 window.setInterval      = setInterval;
 
 var console = {
-	log : function(param) { window.native.ConsoleLog(param); }
+	log : function(param) { window.native.ConsoleLog(param); },
+    time : function(param) {},
+    timeEnd : function(param) {}
 };
+
+window["NativeCorrectImageUrlOnPaste"] = function(url) {
+    return window["native"]["CorrectImageUrlOnPaste"](url);
+};
+window["NativeCorrectImageUrlOnCopy"] = function(url) {
+    return window["native"]["CorrectImageUrlOnCopy"](url);
+};
+
+window['AscFonts'].CFontManager = function CFontManager() {
+    this.m_oLibrary = {};
+    this.Initialize = function(){};
+    this.ClearFontsRasterCache = function(){};
+};
+
+// FT_Common
+function _FT_Common() {
+    this.UintToInt = function(v)
+    {
+        return (v>2147483647)?v-4294967296:v;
+    };
+    this.UShort_To_Short = function(v)
+    {
+        return (v>32767)?v-65536:v;
+    };
+    this.IntToUInt = function(v)
+    {
+        return (v<0)?v+4294967296:v;
+    };
+    this.Short_To_UShort = function(v)
+    {
+        return (v<0)?v+65536:v;
+    };
+    this.memset = function(d,v,s)
+    {
+        for (var i=0;i<s;i++)
+            d[i]=v;
+    };
+    this.memcpy = function(d,s,l)
+    {
+        for (var i=0;i<l;i++)
+            d[i]=s[i];
+    };
+    this.memset_p = function(d,v,s)
+    {
+        var _d = d.data;
+        var _e = d.pos+s;
+        for (var i=d.pos;i<_e;i++)
+            _d[i]=v;
+    };
+    this.memcpy_p = function(d,s,l)
+    {
+        var _d1=d.data;
+        var _p1=d.pos;
+        var _d2=s.data;
+        var _p2=s.pos;
+        for (var i=0;i<l;i++)
+            _d1[_p1++]=_d2[_p2++];
+    };
+    this.memcpy_p2 = function(d,s,p,l)
+    {
+        var _d1=d.data;
+        var _p1=d.pos;
+        var _p2=p;
+        for (var i=0;i<l;i++)
+            _d1[_p1++]=s[_p2++];
+    };
+    this.realloc = function(memory, pointer, cur_count, new_count)
+    {
+        var ret = { block: null, err : 0, size : new_count};
+        if (cur_count < 0 || new_count < 0)
+        {
+            /* may help catch/prevent nasty security issues */
+            ret.err = 6;
+        }
+        else if (new_count == 0)
+        {
+            ret.block = null;
+        }
+        else if (cur_count == 0)
+        {
+            ret.block = memory.Alloc(new_count);
+        }
+        else
+        {
+            var block2 = memory.Alloc(new_count);
+            FT_Common.memcpy_p(block2, pointer, cur_count);
+            ret.block = block2;
+        }
+        return ret;
+    };
+
+    this.realloc_long = function(memory, pointer, cur_count, new_count)
+    {
+        var ret = { block: null, err : 0, size : new_count};
+        if (cur_count < 0 || new_count < 0)
+        {
+            /* may help catch/prevent nasty security issues */
+            ret.err = 6;
+        }
+        else if (new_count == 0)
+        {
+            ret.block = null;
+        }
+        else if (cur_count == 0)
+        {
+            ret.block = CreateIntArray(new_count);
+        }
+        else
+        {
+            var block2 = CreateIntArray(new_count);
+            for (var i = 0; i < cur_count; i++)
+                block2[i] = pointer[i];
+
+            ret.block = block2;
+        }
+        return ret;
+    };
+}
+var FT_Common = new _FT_Common();
+
+var global_memory_stream_menu = CreateNativeMemoryStream();
+
+window['AscFonts'] = window['AscFonts'] || {};
+window['AscFonts'].FT_Common = FT_Common;
 
 // HTML page interface
 window.native.Call_OnUpdateOverlay = function(param)
@@ -683,3 +820,4 @@ window.native.Call_Menu_Event = function(type, _params)
 {
     return _api.Call_Menu_Event(type, _params);
 };
+

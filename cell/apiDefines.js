@@ -220,7 +220,7 @@ var c_oAscDynamicAutoFilter = {
 var c_oAscTop10AutoFilter = {
     max: 1,
     min: 2
-}
+};
 
 var c_oAscChangeFilterOptions = {
   filter: 1,

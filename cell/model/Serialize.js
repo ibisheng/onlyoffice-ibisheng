@@ -2407,6 +2407,7 @@
         {
             var oThis = this;
             this._prepeareStyles();
+            window["Asc"]["editor"].wb._initCommentsToSave();
             this.bs.WriteItemWithLength(function(){oThis.WriteWorksheetsContent();});
         };
         this.WriteWorksheetsContent = function()
@@ -2453,15 +2454,17 @@
 
             this.bs.WriteItem(c_oSerWorksheetsTypes.MergeCells, function(){oThis.WriteMergeCells(ws);});
 
-            if ( ws.Drawings && (ws.Drawings.length) )
+            if (ws.Drawings && (ws.Drawings.length))
                 this.bs.WriteItem(c_oSerWorksheetsTypes.Drawings, function(){oThis.WriteDrawings(ws.Drawings);});
 
-            //init comments for copy/paste
-            if(oThis.isCopyPaste)
-                window["Asc"]["editor"].wb._initCommentsToSave();
-
-            if(ws.aComments.length > 0 && ws.aCommentsCoords.length > 0)
-                this.bs.WriteItem(c_oSerWorksheetsTypes.Comments, function(){oThis.WriteComments(ws.aComments, ws.aCommentsCoords);});
+            var aComments = (0 === index) ? this.wb.aComments.concat(ws.aComments) : ws.aComments;
+            var aCommentsCoords = (0 === index) ? this.wb.aCommentsCoords.concat(ws.aCommentsCoords) :
+              ws.aCommentsCoords;
+            if (aComments.length > 0 && aCommentsCoords.length > 0) {
+                this.bs.WriteItem(c_oSerWorksheetsTypes.Comments, function () {
+                    oThis.WriteComments(aComments, aCommentsCoords);
+                });
+            }
 
             var oBinaryTableWriter;
             if(null != ws.AutoFilter && !this.isCopyPaste)
@@ -3122,11 +3125,13 @@
             var styles = this.wb.CellStyles.CustomStyles;
             var xfs = null;
             for(var i = 0, length = styles.length; i < length; ++i) {
-                xfs = styles[i].xfs;
+				var style = styles[i];
+				xfs = style.xfs;
                 if (xfs) {
                     var sStyle = this.prepareXfsStyle(xfs);
+					//XfId в CustomStyles писать не нужно, поэтому null
                     var oXfs = {borderid: sStyle.borderid, fontid: sStyle.fontid, fillid: sStyle.fillid,
-                        numid: sStyle.numid, align: null, QuotePrefix: null, XfId: xfs.XfId};
+                        numid: sStyle.numid, align: null, QuotePrefix: null, XfId: null, index: style.XfId};
                     if("0" != sStyle.align)
                         oXfs.align = xfs.align;
                     if(null != xfs.QuotePrefix)
@@ -3135,6 +3140,10 @@
                     this.oXfsStylesMap.push(oXfs);
                 }
             }
+			//XfId это порядковый номер, поэтому сортируем
+			this.oXfsStylesMap.sort(function (a, b) {
+				return a.index - b.index;
+			});
         };
         this.prepareXfsStyle = function(xfs) {
             var sStyle = {val: "", borderid: 0, fontid: 0, fillid: 0, numid: 0, align: "0"};

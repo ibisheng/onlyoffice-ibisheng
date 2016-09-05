@@ -38,8 +38,6 @@ var align_Justify = AscCommon.align_Justify;
 var vertalign_Baseline = AscCommon.vertalign_Baseline;
 var changestype_Drawing_Props = AscCommon.changestype_Drawing_Props;
 var g_oTableId = AscCommon.g_oTableId;
-var Editor_Copy = AscCommon.Editor_Copy;
-var Editor_Paste = AscCommon.Editor_Paste;
 var isRealObject = AscCommon.isRealObject;
 var History = AscCommon.History;
 
@@ -476,6 +474,7 @@ function CPresentation(DrawingDocument)
     this.LastUpdateTargetTime             = 0;
     this.NeedUpdateTargetForCollaboration = false;
     this.oLastCheckContent = null;
+    this.CompositeInput    = null;
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
    //
@@ -495,6 +494,174 @@ function CPresentation(DrawingDocument)
 
 CPresentation.prototype =
 {
+    //----------------------------------------------------------------------------------------------------------------------
+// Функции для работы с составным вводом
+//----------------------------------------------------------------------------------------------------------------------
+    /**
+     * Сообщаем о начале составного ввода текста.
+     * @returns {boolean} Начался или нет составной ввод.
+     */
+
+    Get_TargetDocContent: function(){
+        if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects){
+            return this.Slides[this.CurPage].graphicObjects.getTargetDocContent(true);
+        }
+        return null;
+    },
+
+    Begin_CompositeInput: function()
+    {
+        if (false === this.Document_Is_SelectionLocked(changestype_Drawing_Props, null, true))
+        {
+            this.Create_NewHistoryPoint(AscDFH.historydescription_Document_CompositeInput);
+            if(this.Slides[this.CurPage]){
+                this.Slides[this.CurPage].graphicObjects.CreateDocContent();
+            }
+            this.DrawingDocument.TargetStart();
+            this.DrawingDocument.TargetShow();
+
+
+            var oContent = this.Get_TargetDocContent();
+            if (!oContent)
+            {
+                this.History.Remove_LastPoint();
+                return false;
+            }
+            var oPara = oContent.Get_CurrentParagraph();
+            if (!oPara)
+            {
+                this.History.Remove_LastPoint();
+                return false;
+            }
+            if (true === oContent.Is_SelectionUse())
+                oContent.Remove(1, true, false, true);
+            var oRun = oPara.Get_ElementByPos(oPara.Get_ParaContentPos(false, false));
+            if (!oRun || !(oRun instanceof ParaRun))
+            {
+                this.History.Remove_LastPoint();
+                return false;
+            }
+
+            this.CompositeInput = {
+                Run    : oRun,
+                Pos    : oRun.State.ContentPos,
+                Length : 0
+            };
+
+            oRun.Set_CompositeInput(this.CompositeInput);
+
+            return true;
+        }
+
+        return false;
+    },
+
+
+    addCompositeText: function(nCharCode){
+        // TODO: При таком вводе не меняется язык в зависимости от раскладки, не учитывается режим рецензирования.
+
+        if (null === this.CompositeInput)
+            return;
+
+        var oRun = this.CompositeInput.Run;
+        var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
+        var oChar;
+        if (32 == nCharCode || 12288 == nCharCode)
+        {
+            oChar = new ParaSpace();
+        }
+        else
+        {
+            oChar = new ParaText();
+            oChar.Set_CharCode(nCharCode);
+        }
+        oRun.Add_ToContent(nPos, oChar, true);
+        this.CompositeInput.Length++;
+    },
+    Add_CompositeText: function(nCharCode)
+    {
+        if (null === this.CompositeInput)
+            return;
+        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_CompositeInputReplace);
+        this.addCompositeText(nCharCode);
+        this.Recalculate();
+        this.Document_UpdateSelectionState();
+    },
+
+    removeCompositeText: function(nCount){
+        if (null === this.CompositeInput)
+            return;
+
+        var oRun = this.CompositeInput.Run;
+        var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
+
+        var nDelCount = Math.max(0, Math.min(nCount, this.CompositeInput.Length, oRun.Content.length, nPos));
+        oRun.Remove_FromContent(nPos - nDelCount, nDelCount, true);
+        this.CompositeInput.Length -= nDelCount;
+    },
+
+    Remove_CompositeText: function(nCount){
+        this.removeCompositeText(nCount);
+        this.Recalculate();
+        this.Document_UpdateSelectionState();
+    },
+    Replace_CompositeText: function(arrCharCodes)
+    {
+        if (null === this.CompositeInput)
+            return;
+        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_CompositeInputReplace);
+        this.removeCompositeText(this.CompositeInput.Length);
+        for (var nIndex = 0, nCount = arrCharCodes.length; nIndex < nCount; ++nIndex)
+        {
+            this.addCompositeText(arrCharCodes[nIndex]);
+        }
+        this.Recalculate();
+        this.Document_UpdateSelectionState();
+    },
+    Set_CursorPosInCompositeText: function(nPos)
+    {
+        if (null === this.CompositeInput)
+            return;
+
+        var oRun = this.CompositeInput.Run;
+
+        var nInRunPos = Math.max(Math.min(this.CompositeInput.Pos + nPos, this.CompositeInput.Pos + this.CompositeInput.Length, oRun.Content.length), this.CompositeInput.Pos);
+        oRun.State.ContentPos = nInRunPos;
+        this.Document_UpdateSelectionState();
+    },
+    Get_CursorPosInCompositeText: function()
+    {
+        if (null === this.CompositeInput)
+            return 0;
+
+        var oRun = this.CompositeInput.Run;
+        var nInRunPos = oRun.State.ContentPos;
+        var nPos = Math.min(this.CompositeInput.Length, Math.max(0, nInRunPos - this.CompositeInput.Pos));
+        return nPos;
+    },
+    End_CompositeInput: function()
+    {
+        if (null === this.CompositeInput)
+            return;
+
+        var oRun = this.CompositeInput.Run;
+        oRun.Set_CompositeInput(null);
+        this.CompositeInput = null;
+
+        this.Document_UpdateInterfaceState();
+
+        this.DrawingDocument.ClearCachePages();
+        this.DrawingDocument.FirePaint();
+    },
+    Get_MaxCursorPosInCompositeText: function()
+    {
+        if (null === this.CompositeInput)
+            return 0;
+
+        return this.CompositeInput.Length;
+    },
+
+
     setShowLoop: function(value){
         if(value === false){
             if(!this.showPr){
@@ -1342,6 +1509,28 @@ CPresentation.prototype =
             this.Recalculate();
             this.Document_UpdateInterfaceState();
         }
+    },
+
+    Add_OleObject: function(fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId){
+        if(this.Slides[this.CurPage]){
+            var fPosX = (this.Width - fWidth)/2;
+            var fPosY = (this.Height - fHeight)/2;
+            var Image = this.Slides[this.CurPage].graphicObjects.createOleObject(sData, sApplicationId, sLocalUrl, fPosX, fPosY, fWidth, fHeight, nWidthPix, nHeightPix);
+            Image.setParent(this.Slides[this.CurPage]);
+            Image.addToDrawingObjects();
+            this.Slides[this.CurPage].graphicObjects.resetSelection();
+            this.Slides[this.CurPage].graphicObjects.selectObject(Image, 0);
+            this.Recalculate();
+            this.Document_UpdateInterfaceState();
+        }
+    },
+
+    Edit_OleObject: function(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight){
+        oOleObject.setData(sData);
+        var _blipFill           = new AscFormat.CBlipFill();
+        _blipFill.RasterImageId = sImageUrl;
+        oOleObject.setBlipFill(_blipFill);
+        oOleObject.setPixSizes(nPixWidth, nPixHeight);
     },
 
     addChart: function(binary)
@@ -2404,46 +2593,6 @@ CPresentation.prototype =
             this.Cursor_MoveDown( true === e.ShiftKey );
             bRetValue = keydownresult_PreventAll;
         }
-        else if ( e.KeyCode == 45 ) // Insert
-        {
-            if ( true === e.CtrlKey ) // Ctrl + Insert (аналогично Ctrl + C)
-            {
-                Editor_Copy(this.DrawingDocument.m_oWordControl.m_oApi);
-                bRetValue = keydownresult_PreventKeyPress;
-            }
-            else if ( true === e.ShiftKey && false === editor.isViewMode ) // Shift + Insert (аналогично Ctrl + V)
-            {
-                if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
-                {
-                    if (!window.GlobalPasteFlag)
-                    {
-                        if (!AscCommon.AscBrowser.isSafariMacOs)
-                        {
-                            this.Create_NewHistoryPoint(AscDFH.historydescription_Document_ShiftInsert);
-
-                            window.GlobalPasteFlag = true;
-                            editor.incrementCounterLongAction();
-                            Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
-                            bRetValue = keydownresult_PreventKeyPress;
-                        }
-                        else
-                        {
-                            if (0 === window.GlobalPasteFlagCounter)
-                            {
-                                this.Create_NewHistoryPoint(AscDFH.historydescription_Document_ShiftInsertSafari);
-
-                                AscCommon.SafariIntervalFocus();
-                                window.GlobalPasteFlag = true;
-                                editor.incrementCounterLongAction();
-                                Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
-                                bRetValue = keydownresult_PreventKeyPress;
-                            }
-                        }
-                    }
-                }
-                //не возвращаем true чтобы не было preventDefault
-            }
-        }
         else if ( e.KeyCode == 46 && false === editor.isViewMode ) // Delete
         {
             if ( true != e.ShiftKey )
@@ -2454,14 +2603,6 @@ CPresentation.prototype =
                     this.Remove( 1, true );
                 }
                 bRetValue = keydownresult_PreventAll;
-            }
-            else // Shift + Delete (аналогично Ctrl + X)
-            {
-                if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
-                {
-                    Editor_Copy(this.DrawingDocument.m_oWordControl.m_oApi, true);
-                }
-                bRetValue = keydownresult_PreventKeyPress;
             }
         }
         else if ( e.KeyCode == 49 && false === editor.isViewMode && true === e.AltKey && !e.AltGr ) // Alt + Ctrl + Num1 - применяем стиль Heading1
@@ -2507,15 +2648,20 @@ CPresentation.prototype =
                 this.Document_Format_Copy();
                 bRetValue = keydownresult_PreventAll;
             }
-            else // Ctrl + C - copy
-            {
-                Editor_Copy(this.DrawingDocument.m_oWordControl.m_oApi);
-                bRetValue = keydownresult_PreventKeyPress;
-            }
         }
         else if ( e.KeyCode == 68 && false === editor.isViewMode && true === e.CtrlKey )
         {
-            editor.DublicateSlide();
+           if(this.Slides[this.CurPage]){
+               if(this.Slides[this.CurPage].graphicObjects.selectedObjects.length > 0){
+                   this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphAlignHotKey);
+                   this.Slides[this.CurPage].copySelectedObjects();
+                   this.Recalculate();
+                   this.Document_UpdateInterfaceState();
+               }
+               else{
+                   this.DublicateSlide();
+               }
+           }
             bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 69 && false === editor.isViewMode && true === e.CtrlKey )
@@ -2700,48 +2846,7 @@ CPresentation.prototype =
                     this.Document_Format_Paste();
                     bRetValue = keydownresult_PreventAll;
                 }
-                else // Ctrl + V - paste
-                {
-                    if (!window.GlobalPasteFlag)
-                    {
-                        if (!AscCommon.AscBrowser.isSafariMacOs)
-                        {
-                            this.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
-
-                            window.GlobalPasteFlag = true;
-                            editor.incrementCounterLongAction();
-                            Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
-                            bRetValue = keydownresult_PreventKeyPress;
-                        }
-                        else
-                        {
-                            if (0 === window.GlobalPasteFlagCounter)
-                            {
-                                this.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteSafariHotKey);
-
-                                AscCommon.SafariIntervalFocus();
-                                window.GlobalPasteFlag = true;
-                                editor.incrementCounterLongAction();
-                                Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
-                                bRetValue = keydownresult_PreventKeyPress;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (!AscCommon.AscBrowser.isSafariMacOs)
-                            bRetValue = keydownresult_PreventKeyPress;
-                    }
-                }
             }
-        }
-        else if ( e.KeyCode == 88 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + X - cut
-        {
-            if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
-            {
-                Editor_Copy(this.DrawingDocument.m_oWordControl.m_oApi, true);
-            }
-            bRetValue = keydownresult_PreventKeyPress;
         }
         else if ( e.KeyCode == 89 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + Y - Redo
         {
@@ -2976,6 +3081,7 @@ CPresentation.prototype =
         }
         this.noShowContextMenu = false;
         this.Document_UpdateInterfaceState();
+        this.Api.sendEvent("asc_onSelectionEnd");
     },
 
     OnMouseMove : function(e, X, Y, PageIndex)
@@ -3055,7 +3161,10 @@ CPresentation.prototype =
     // Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.
     Get_SelectedText : function(bClearText)
     {
-        return this.Slides[this.CurPage].graphicObjects.Get_SelectedText(bClearText);
+        if(this.Slides[this.CurPage]){
+            return this.Slides[this.CurPage].graphicObjects.Get_SelectedText(bClearText);
+        }
+        return "";
     },
 
 //-----------------------------------------------------------------------------------
@@ -3263,6 +3372,23 @@ CPresentation.prototype =
     },
 
 
+    Get_AllImageUrls: function(aImages){
+        if(!Array.isArray(aImages)){
+            aImages = [];
+        }
+        for(var i = 0; i < this.Slides.length; ++i){
+            this.Slides[i].getAllRasterImages(aImages);
+        }
+        return aImages;
+    },
+
+    Reassign_ImageUrls : function (images_rename) {
+        for(var i = 0; i < this.Slides.length; ++i){
+            this.Slides[i].Reassign_ImageUrls(images_rename);
+        }
+    },
+
+
     Get_GraphicObjectsProps : function()
     {
         if(this.Slides[this.CurPage])
@@ -3321,6 +3447,10 @@ CPresentation.prototype =
                 drawing_props.imageProps.Width = drawing_props.imageProps.w;
                 drawing_props.imageProps.Height = drawing_props.imageProps.h;
                 drawing_props.imageProps.Position = {X: drawing_props.imageProps.x, Y: drawing_props.imageProps.y};
+                if(AscFormat.isRealBool(drawing_props.imageProps.locked) && drawing_props.imageProps.locked)
+                {
+                    drawing_props.imageProps.Locked = true;
+                }
                 editor.sync_ImgPropCallback(drawing_props.imageProps);
             }
 
@@ -3336,7 +3466,7 @@ CPresentation.prototype =
                 if(this.bNeedUpdateChartPreview)
                 {
                     editor.chartPreviewManager.clearPreviews();
-                    editor.asc_fireCallback("asc_onUpdateChartStyles");
+                    editor.sendEvent("asc_onUpdateChartStyles");
                     this.bNeedUpdateChartPreview = false;
                 }
                 editor.sync_ImgPropCallback(drawing_props.chartProps);
@@ -3397,11 +3527,11 @@ CPresentation.prototype =
         this.Document_UpdateRulersState();
 
         this.Document_UpdateCanAddHyperlinkState();
-        editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
-        editor.asc_fireCallback("asc_canIncreaseIndent", this.Can_IncreaseParagraphLevel(true));
-        editor.asc_fireCallback("asc_canDecreaseIndent", this.Can_IncreaseParagraphLevel(false));
-        editor.asc_fireCallback("asc_onCanGroup", this.canGroup());
-        editor.asc_fireCallback("asc_onCanUnGroup", this.canUnGroup());
+        editor.sendEvent("asc_onPresentationSize", this.Width, this.Height);
+        editor.sendEvent("asc_canIncreaseIndent", this.Can_IncreaseParagraphLevel(true));
+        editor.sendEvent("asc_canDecreaseIndent", this.Can_IncreaseParagraphLevel(false));
+        editor.sendEvent("asc_onCanGroup", this.canGroup());
+        editor.sendEvent("asc_onCanUnGroup", this.canUnGroup());
     },
 
     changeBackground: function(bg, arr_ind, bNoCreatePoint)
@@ -3859,28 +3989,30 @@ CPresentation.prototype =
             }
             else if(Content.DocContent)
             {
-                var target_doc_content = this.Slides[this.CurPage].graphicObjects.getTargetDocContent(true), paragraph, NearPos;
-                if(target_doc_content)
-                {
-                    if(target_doc_content.Selection.Use)
+                if(Content.DocContent.Elements.length > 0){
+                    var target_doc_content = this.Slides[this.CurPage].graphicObjects.getTargetDocContent(true), paragraph, NearPos;
+                    if(target_doc_content)
                     {
-                        this.Slides[this.CurPage].graphicObjects.removeCallback(1);
+                        if(target_doc_content.Selection.Use)
+                        {
+                            this.Slides[this.CurPage].graphicObjects.removeCallback(1);
+                        }
+                        paragraph = target_doc_content.Content[target_doc_content.CurPos.ContentPos];
+                        if (null != paragraph && type_Paragraph == paragraph.GetType())
+                        {
+                            NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
+                            paragraph.Check_NearestPos(NearPos);
+                            target_doc_content.Insert_Content(Content.DocContent, NearPos);
+                        }
+                        var oTargetTextObject = AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects);
+                        oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
                     }
-                    paragraph = target_doc_content.Content[target_doc_content.CurPos.ContentPos];
-                    if (null != paragraph && type_Paragraph == paragraph.GetType())
+                    else
                     {
-                        NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
-                        paragraph.Check_NearestPos(NearPos);
-                        target_doc_content.Insert_Content(Content.DocContent, NearPos);
+                        var shape = this.CreateAndAddShapeFromSelectedContent(Content.DocContent);
+                        this.Slides[this.CurPage].graphicObjects.resetSelection();
+                        this.Slides[this.CurPage].graphicObjects.selectObject(shape, 0);
                     }
-                    var oTargetTextObject = AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects);
-                    oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
-                }
-                else
-                {
-                    var shape = this.CreateAndAddShapeFromSelectedContent(Content.DocContent);
-                    this.Slides[this.CurPage].graphicObjects.resetSelection();
-                    this.Slides[this.CurPage].graphicObjects.selectObject(shape, 0);
                 }
             }
         }
@@ -3955,7 +4087,7 @@ CPresentation.prototype =
                 this.Width = Data.oldW;
                 this.Height = Data.oldH;
                 this.changeSlideSizeFunction(this.Width, this.Height);
-                editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
+                editor.sendEvent("asc_onPresentationSize", this.Width, this.Height);
 
                 break;
             }
@@ -4009,7 +4141,7 @@ CPresentation.prototype =
                 this.Width = Data.newW;
                 this.Height = Data.newH;
                 this.changeSlideSizeFunction(this.Width, this.Height);
-                editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
+                editor.sendEvent("asc_onPresentationSize", this.Width, this.Height);
                 break;
             }
             case AscDFH.historyitem_Presentation_AddSlideMaster:
@@ -4815,7 +4947,7 @@ CPresentation.prototype =
                 AscCommon.CollaborativeEditing.ScaleX = kw;
                 AscCommon.CollaborativeEditing.ScaleY = kh;
                 this.changeSlideSizeFunction(this.Width, this.Height);
-                editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
+                editor.sendEvent("asc_onPresentationSize", this.Width, this.Height);
                 break;
             }
             case AscDFH.historyitem_Presentation_AddSlideMaster:
@@ -5045,7 +5177,7 @@ CPresentation.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с textbox
 //-----------------------------------------------------------------------------------
-    TextBox_Put : function(sText)
+    TextBox_Put : function(sText, rFonts)
     {
         // Отключаем пересчет, включим перед последним добавлением. Поскольку,
         // у нас все добавляется в 1 параграф, так можно делать.
@@ -5053,19 +5185,55 @@ CPresentation.prototype =
 
         if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
             History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-            var Count = sText.length;
-            for (var Index = 0; Index < Count; Index++) {
-                if (Index === Count - 1)
+            if(!rFonts){
+                var Count = sText.length;
+                for (var Index = 0; Index < Count; Index++) {
+                    if (Index === Count - 1)
+                        this.TurnOffRecalc = false;
+
+                    var _char = sText.charAt(Index);
+                    if (" " == _char)
+                        this.Paragraph_Add(new ParaSpace(1));
+                    else
+                        this.Paragraph_Add(new ParaText(_char));
+
+                    // На случай, если Count = 0
                     this.TurnOffRecalc = false;
+                }
+            }
+            else{
+                if(this.Slides[this.CurPage]){
+                    this.Slides[this.CurPage].graphicObjects.CreateDocContent();
 
-                var _char = sText.charAt(Index);
-                if (" " == _char)
-                    this.Paragraph_Add(new ParaSpace(1));
-                else
-                    this.Paragraph_Add(new ParaText(_char));
+                    var oTargetContent = this.Slides[this.CurPage].graphicObjects.getTargetDocContent(true);
+                    if(oTargetContent){
+                        var Para = oTargetContent.Get_CurrentParagraph();
+                        if (null === Para)
+                            return;
 
-                // На случай, если Count = 0
-                this.TurnOffRecalc = false;
+                        var RunPr = Para.Get_TextPr();
+                        if (null === RunPr || undefined === RunPr)
+                            RunPr = new CTextPr();
+
+                        RunPr.RFonts = rFonts;
+
+                        var Run = new ParaRun(Para);
+                        Run.Set_Pr(RunPr);
+
+                        var Count = sText.length;
+                        for (var Index = 0; Index < Count; Index++)
+                        {
+                            var _char = sText.charAt(Index);
+                            if (" " == _char)
+                                Run.Add_ToContent(Index, new ParaSpace(), false);
+                            else
+                                Run.Add_ToContent(Index, new ParaText(_char), false);
+                        }
+
+                        Para.Add(Run);
+                    }
+                    this.Slides[this.CurPage].graphicObjects.startRecalculate();
+                }
             }
         }
         this.Document_UpdateUndoRedoState();

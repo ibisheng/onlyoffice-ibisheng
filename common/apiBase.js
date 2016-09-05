@@ -143,6 +143,8 @@
 		// Использовать ли обрезанные шрифты
 		this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
 
+		this.isSendStandartTextures = false;
+
 		this.tmpFocus = null;
 
 		this.fCurCallback = null;
@@ -249,12 +251,18 @@
 			window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
 		}
 	};
-	baseEditorsApi.prototype.asc_enableKeyEvents             = function(isEnabled)
+	baseEditorsApi.prototype.asc_enableKeyEvents             = function(isEnabled, isFromInput)
 	{
 	};
 	// Copy/Past/Cut
 	baseEditorsApi.prototype.asc_IsFocus                     = function(bIsNaturalFocus)
 	{
+		var _ret = false;
+		if (this.WordControl.IsFocus)
+			_ret = true;
+		if (_ret && bIsNaturalFocus && this.WordControl.TextBoxInputFocus)
+			_ret = false;
+		return _ret;
 	};
 	// target pos
 	baseEditorsApi.prototype.asc_LockTargetUpdate		     = function(isLock)
@@ -303,9 +311,6 @@
 	baseEditorsApi.prototype.sync_TryUndoInFastCollaborative = function()
 	{
 		this.sendEvent("asc_OnTryUndoInFastCollaborative");
-	};
-	baseEditorsApi.prototype.asc_enableKeyEvents             = function(val)
-	{
 	};
 	baseEditorsApi.prototype.asc_setViewMode                 = function()
 	{
@@ -428,7 +433,7 @@
 	baseEditorsApi.prototype._onOpenCommand                      = function(data)
 	{
 	};
-	baseEditorsApi.prototype._onNeedParams                       = function(data)
+	baseEditorsApi.prototype._onNeedParams                       = function(data, opt_isPassword)
 	{
 	};
 	baseEditorsApi.prototype.asyncServerIdEndLoaded              = function()
@@ -630,7 +635,7 @@
 								t._onNeedParams(input["data"]);
 								break;
 							case "needpassword":
-								t.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationPassword, c_oAscError.Level.Critical);
+								t._onNeedParams(null, true);
 								break;
 							case "err":
 								t.sendEvent("asc_onError", AscCommon.mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
@@ -793,7 +798,6 @@
 	{
 		Asc.CPluginData_wrap(oPluginData);
 		var oThis      = this;
-		var oThis      = this;
 		var sImgSrc    = oPluginData.getAttribute("imgSrc");
 		var nWidthPix  = oPluginData.getAttribute("widthPix");
 		var nHeightPix = oPluginData.getAttribute("heightPix");
@@ -913,6 +917,11 @@
 
 	baseEditorsApi.prototype.sendStandartTextures = function()
 	{
+	    if (this.isSendStandartTextures)
+	        return;
+
+	    this.isSendStandartTextures = true;
+
 		var _count = AscCommon.g_oUserTexturePresets.length;
 		var arr    = new Array(_count);
 		for (var i = 0; i < _count; ++i)
@@ -948,6 +957,18 @@
 			this.pluginsManager.buttonClick(id);
 	};
 
+	baseEditorsApi.prototype.asc_pluginEnableMouseEvents = function(isEnable)
+	{
+		if (!this.pluginsManager)
+			return;
+
+		var _pluginData = new Asc.CPluginData();
+		_pluginData.setAttribute("type", "enableMouseEvent");
+		_pluginData.setAttribute("isEnabled", isEnable);
+
+		this.pluginsManager.sendMessage(_pluginData);
+	};
+
 	// Builder
 	baseEditorsApi.prototype.asc_nativeInitBuilder = function()
 	{
@@ -964,6 +985,64 @@
 	{
 	};
 
+	// input
+	baseEditorsApi.prototype.Begin_CompositeInput = function()
+	{
+	};
+	baseEditorsApi.prototype.Add_CompositeText = function(nCharCode)
+	{
+	};
+	baseEditorsApi.prototype.Remove_CompositeText = function(nCount)
+	{
+	};
+	baseEditorsApi.prototype.Replace_CompositeText = function(arrCharCodes)
+	{
+	};
+	baseEditorsApi.prototype.Set_CursorPosInCompositeText = function(nPos)
+	{
+	};
+	baseEditorsApi.prototype.Get_CursorPosInCompositeText = function()
+	{
+	};
+	baseEditorsApi.prototype.End_CompositeInput = function()
+	{
+	};
+	baseEditorsApi.prototype.Get_MaxCursorPosInCompositeText = function()
+	{
+	};
+	baseEditorsApi.prototype.Input_UpdatePos = function()
+	{
+	};
+	baseEditorsApi.prototype.asc_InputClearKeyboardElement = function()
+	{
+		if (AscCommon.g_inputContext)
+			AscCommon.g_inputContext.nativeFocusElement = null;
+	};
+
+	baseEditorsApi.prototype.onKeyDown = function(e)
+	{
+	};
+	baseEditorsApi.prototype.onKeyPress = function(e)
+	{
+	};
+	baseEditorsApi.prototype.onKeyUp = function(e)
+	{
+	};
+	baseEditorsApi.prototype.pre_Paste = function(_fonts, _images, callback)
+	{
+	};
+
+	// System input
+	baseEditorsApi.prototype.SetTextBoxInputMode = function(bIsEnable)
+	{
+		AscCommon.TextBoxInputMode = bIsEnable;
+		if (AscCommon.g_inputContext)
+			AscCommon.g_inputContext.systemInputEnable(AscCommon.TextBoxInputMode);
+	};
+	baseEditorsApi.prototype.GetTextBoxInputMode = function()
+	{
+		return AscCommon.TextBoxInputMode;
+	};
 
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommon']                = window['AscCommon'] || {};

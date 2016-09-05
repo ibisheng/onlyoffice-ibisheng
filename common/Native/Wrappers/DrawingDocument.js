@@ -31,8 +31,91 @@
  */
 
 // Import
-var global_mouseEvent = AscCommon.global_mouseEvent;
+var FontStyle = AscFonts.FontStyle;
+var g_fontApplication = AscFonts.g_fontApplication;
 
+var CColor = AscCommon.CColor;
+var CAscMathCategory = AscCommon.CAscMathCategory;
+var g_oTableId = AscCommon.g_oTableId;
+var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
+var global_mouseEvent = AscCommon.global_mouseEvent;
+var History = AscCommon.History;
+var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
+var g_dKoef_pix_to_mm = AscCommon.g_dKoef_pix_to_mm;
+var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
+
+var _canvas_tables = null;
+var _table_styles = null;
+
+function CColumnsMarkupColumn()
+{
+    this.W     = 0;
+    this.Space = 0;
+}
+
+function CColumnsMarkup()
+{
+    this.CurCol = 0;
+    this.X      = 0; // левое поле
+    this.R      = 0; // правое поле
+
+    this.EqualWidth = true;
+    this.Num        = 1;
+    this.Space      = 30;
+    this.Cols       = [];
+
+    this.SectPr     = null;
+}
+CColumnsMarkup.prototype.Update_FromSectPr = function(SectPr)
+{
+    if (!SectPr)
+        return;
+
+    this.SectPr = SectPr;
+
+    var Columns = SectPr.Columns;
+
+    this.X          = SectPr.Get_PageMargin_Left();
+    this.R          = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
+    this.EqualWidth = Columns.EqualWidth;
+    this.Num        = Columns.Num;
+    this.Space      = Columns.Space;
+
+    this.Cols = [];
+    for (var Index = 0, Count = Columns.Cols.length; Index < Count; ++Index)
+    {
+        this.Cols[Index]       = new CColumnsMarkupColumn();
+        this.Cols[Index].W     = Columns.Cols[Index].W;
+        this.Cols[Index].Space = Columns.Cols[Index].Space;
+    }
+};
+CColumnsMarkup.prototype.Set_CurCol = function(CurCol)
+{
+    this.CurCol = CurCol;
+};
+CColumnsMarkup.prototype.CreateDuplicate = function()
+{
+    var _ret = new CColumnsMarkup();
+    _ret.SectPr = this.SectPr;
+    _ret.CurCol = this.CurCol;
+    _ret.X      = this.X;
+    _ret.R      = this.R;
+
+    _ret.EqualWidth = this.EqualWidth;
+    _ret.Num        = this.Num;
+    _ret.Space      = this.Space;
+
+    _ret.Cols = [];
+
+    for (var i = 0; i < this.Cols.length; i++)
+    {
+        var _col = new CColumnsMarkupColumn();
+        _col.W = this.Cols[i].W;
+        _col.Space = this.Cols[i].Space;
+        _ret.Cols.push(_col);
+    }
+    return _ret;
+};
 function CTableOutlineDr()
 {
     this.image = {};
@@ -543,6 +626,9 @@ CDrawingDocument.prototype =
         this.m_oApi.DocumentUrl = "";
         this.LogicDocument = window.editor.WordControl.m_oLogicDocument;
         this.LogicDocument.DrawingDocument = this;
+       
+        this.selectionMatrix = null;
+        this.isSelectionMatrix = false;
     },
     RenderPage : function(nPageIndex)
     {
@@ -671,6 +757,7 @@ CDrawingDocument.prototype =
     TargetStart : function()
     {
         this.Native["DD_TargetStart"]();
+        this.TextMatrix = null;
     },
     TargetEnd : function()
     {
@@ -694,7 +781,7 @@ CDrawingDocument.prototype =
             this.TextMatrix.sy = matrix.sy;
             this.TextMatrix.tx = matrix.tx;
             this.TextMatrix.ty = matrix.ty;
-
+            
             this.Native["DD_UpdateTargetTransform"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
         }
         else
@@ -816,6 +903,7 @@ CDrawingDocument.prototype =
     },
     AddPageSelection : function(pageIndex, x, y, w, h)
     {
+        this.selectionMatrix = this.TextMatrix;
         this.Native["DD_AddPageSelection"](pageIndex, x, y, w, h);
     },
     OnSelectEnd : function()
@@ -868,6 +956,11 @@ CDrawingDocument.prototype =
     EndSearch : function(bIsChange)
     {
         this.Native["DD_EndSearch"](bIsChange);
+    },
+    
+    SetTextSelectionOutline : function(isSelectionOutline)
+    {
+        
     },
 
     // ruler states
@@ -1153,12 +1246,16 @@ CDrawingDocument.prototype =
 	
 	BeginDrawTracking: function()
     {
-        this.AutoShapesTrack.BeginDrawTracking();
+        if (this.AutoShapesTrack.BeginDrawTracking) {
+            this.AutoShapesTrack.BeginDrawTracking();
+        }
     },
 
     EndDrawTracking: function()
     {
-        this.AutoShapesTrack.EndDrawTracking();
+        if (this.AutoShapesTrack.EndDrawTracking) {
+            this.AutoShapesTrack.EndDrawTracking();
+        }
     },
 
     // треки
@@ -1236,6 +1333,8 @@ CDrawingDocument.prototype =
     },
     OnUpdateOverlay : function()
     {
+        isSelectionMatrix = false;
+        
         if (this.IsUpdateOverlayOnlyEnd)
         {
             this.IsUpdateOverlayOnEndCheck = true;
@@ -1361,6 +1460,8 @@ CDrawingDocument.prototype =
         // 0 - none
         // 1 - select markers
         // 2 - drawing track
+        
+        var matrixCheck = this.selectionMatrix; // this.TextMatrix
 
         check_MouseDownEvent(e, false);
 
@@ -1387,7 +1488,7 @@ CDrawingDocument.prototype =
             var _circlePos2_x = 0;
             var _circlePos2_y = 0;
 
-            if (!this.TextMatrix)
+            if (!matrixCheck)
             {
                 _circlePos1_x = this.SelectRect1.X;
                 _circlePos1_y = this.SelectRect1.Y - radiusMM;
@@ -1403,10 +1504,10 @@ CDrawingDocument.prototype =
                 var _circlePos2_x_mem = this.SelectRect2.X + this.SelectRect2.W;
                 var _circlePos2_y_mem = this.SelectRect2.Y + this.SelectRect2.H + radiusMM;
 
-                _circlePos1_x = this.TextMatrix.TransformPointX(_circlePos1_x_mem, _circlePos1_y_mem);
-                _circlePos1_y = this.TextMatrix.TransformPointY(_circlePos1_x_mem, _circlePos1_y_mem);
-                _circlePos2_x = this.TextMatrix.TransformPointX(_circlePos2_x_mem, _circlePos2_y_mem);
-                _circlePos2_y = this.TextMatrix.TransformPointY(_circlePos2_x_mem, _circlePos2_y_mem);
+                _circlePos1_x = matrixCheck.TransformPointX(_circlePos1_x_mem, _circlePos1_y_mem);
+                _circlePos1_y = matrixCheck.TransformPointY(_circlePos1_x_mem, _circlePos1_y_mem);
+                _circlePos2_x = matrixCheck.TransformPointX(_circlePos2_x_mem, _circlePos2_y_mem);
+                _circlePos2_y = matrixCheck.TransformPointY(_circlePos2_x_mem, _circlePos2_y_mem);
             }
 
             var _selectCircleEpsMM = 10; // 1cm;
@@ -1426,43 +1527,12 @@ CDrawingDocument.prototype =
                 this.SelectDrag = 1;
                 this.LogicDocument.Cursor_MoveRight();
 
-                /*
-                это старая версия. грамотная реализация - моус даун и ап с шифтом. Так и проще и правильнее
-                var _xDown = this.SelectRect2.X + this.SelectRect2.W;
-                var _yDown = this.SelectRect2.Y + this.SelectRect2.H / 2;
-                if (!this.TextMatrix)
-                {
-                    this.LogicDocumentOnMouseDown(global_mouseEvent, _xDown, _yDown, this.SelectRect2.Page);
-                }
-                else
-                {
-                    this.LogicDocumentOnMouseDown(global_mouseEvent, this.TextMatrix.TransformPointX(_xDown, _yDown),
-                        this.TextMatrix.TransformPointY(_xDown, _yDown), this.SelectRect2.Page);
-                }
-
-                //теперь сдвиги
                 var _xStamp = this.SelectRect1.X;
                 var _yStamp = this.SelectRect1.Y;
-                if (this.TextMatrix)
+                if (matrixCheck)
                 {
-                    _xStamp = this.TextMatrix.TransformPointX(this.SelectRect1.X, this.SelectRect1.Y);
-                    _yStamp = this.TextMatrix.TransformPointY(this.SelectRect1.X, this.SelectRect1.Y);
-                }
-
-                var ret = this.__DD_ConvertCoordsToCursor(_xStamp, _yStamp, this.SelectRect1.Page);
-                var ret2 = this.CorrectMouseSelectPosition(Math.min(this.SelectMobileConstantOffsetEpsilon, this.SelectRect1.H / 2));
-                this.SelectMobileXOffset = (ret.X + ret2.X) - global_mouseEvent.X;
-                this.SelectMobileYOffset = (ret.Y + ret2.Y) - global_mouseEvent.Y;
-
-                this.OnMouseMove(e);
-                */
-
-                var _xStamp = this.SelectRect1.X;
-                var _yStamp = this.SelectRect1.Y;
-                if (this.TextMatrix)
-                {
-                    _xStamp = this.TextMatrix.TransformPointX(this.SelectRect1.X, this.SelectRect1.Y);
-                    _yStamp = this.TextMatrix.TransformPointY(this.SelectRect1.X, this.SelectRect1.Y);
+                    _xStamp = matrixCheck.TransformPointX(this.SelectRect1.X, this.SelectRect1.Y);
+                    _yStamp = matrixCheck.TransformPointY(this.SelectRect1.X, this.SelectRect1.Y);
                 }
 
                 var ret = this.__DD_ConvertCoordsToCursor(_xStamp, _yStamp, this.SelectRect1.Page);
@@ -1489,45 +1559,13 @@ CDrawingDocument.prototype =
                 this.SelectDrag = 2;
                 this.LogicDocument.Cursor_MoveLeft();
 
-                /*
-                это старая версия. грамотная реализация - моус даун и ап с шифтом. Так и проще и правильнее
-                var _xDown = this.SelectRect1.X;
-                var _yDown = this.SelectRect1.Y + this.SelectRect1.H / 2;
-                if (!this.TextMatrix)
-                {
-                    this.LogicDocumentOnMouseDown(global_mouseEvent, _xDown, _yDown, this.SelectRect1.Page);
-                }
-                else
-                {
-                    this.LogicDocumentOnMouseDown(global_mouseEvent, this.TextMatrix.TransformPointX(_xDown, _yDown),
-                        this.TextMatrix.TransformPointY(_xDown, _yDown), this.SelectRect1.Page);
-                }
-
-                //теперь сдвиги
                 var _xStamp = this.SelectRect2.X + this.SelectRect2.W;
                 var _yStamp = this.SelectRect2.Y + this.SelectRect2.H;
-                if (this.TextMatrix)
+                if (matrixCheck)
                 {
                     var _xTmp = _xStamp;
-                    _xStamp = this.TextMatrix.TransformPointX(_xTmp, _yStamp);
-                    _yStamp = this.TextMatrix.TransformPointY(_xTmp, _yStamp);
-                }
-
-                var ret = this.__DD_ConvertCoordsToCursor(_xStamp, _yStamp, this.SelectRect2.Page);
-                var ret2 = this.CorrectMouseSelectPosition(Math.min(this.SelectMobileConstantOffsetEpsilon, this.SelectRect2.H / 2));
-                this.SelectMobileXOffset = (ret.X - ret2.X) - global_mouseEvent.X;
-                this.SelectMobileYOffset = (ret.Y - ret2.Y) - global_mouseEvent.Y;
-
-                this.OnMouseMove(e);
-                */
-
-                var _xStamp = this.SelectRect2.X + this.SelectRect2.W;
-                var _yStamp = this.SelectRect2.Y + this.SelectRect2.H;
-                if (this.TextMatrix)
-                {
-                    var _xTmp = _xStamp;
-                    _xStamp = this.TextMatrix.TransformPointX(_xTmp, _yStamp);
-                    _yStamp = this.TextMatrix.TransformPointY(_xTmp, _yStamp);
+                    _xStamp = matrixCheck.TransformPointX(_xTmp, _yStamp);
+                    _yStamp = matrixCheck.TransformPointY(_xTmp, _yStamp);
                 }
 
                 var ret = this.__DD_ConvertCoordsToCursor(_xStamp, _yStamp, this.SelectRect2.Page);
@@ -1766,12 +1804,12 @@ CDrawingDocument.prototype =
         var xOff = 0;
         var yOff = 1;
 
-        if (null != this.TextMatrix)
+        if (null != this.selectionMatrix)
         {
-            var xOff1 = this.TextMatrix.TransformPointX(0, 0);
-            var yOff1 = this.TextMatrix.TransformPointY(0, 0);
-            var xOff2 = this.TextMatrix.TransformPointX(0, 1);
-            var yOff2 = this.TextMatrix.TransformPointY(0, 1);
+            var xOff1 = this.selectionMatrix.TransformPointX(0, 0);
+            var yOff1 = this.selectionMatrix.TransformPointY(0, 0);
+            var xOff2 = this.selectionMatrix.TransformPointX(0, 1);
+            var yOff2 = this.selectionMatrix.TransformPointY(0, 1);
 
             // по идее скэйла нет. но на всякий
             var _len = Math.sqrt((xOff1 - xOff2) * (xOff1 - xOff2) + (yOff1 - yOff2) * (yOff1 - yOff2));
@@ -1810,14 +1848,14 @@ CDrawingDocument.prototype =
             _ret.push(this.TargetPos.Y);
             _ret.push(this.TargetPos.Page);
 
-            if (this.TextMatrix && !this.TextMatrix.IsIdentity())
+            if (this.selectionMatrix && !this.selectionMatrix.IsIdentity())
             {
-                _ret.push(this.TextMatrix.sx);
-                _ret.push(this.TextMatrix.shy);
-                _ret.push(this.TextMatrix.shx);
-                _ret.push(this.TextMatrix.sy);
-                _ret.push(this.TextMatrix.tx);
-                _ret.push(this.TextMatrix.ty);
+                _ret.push(this.selectionMatrix.sx);
+                _ret.push(this.selectionMatrix.shy);
+                _ret.push(this.selectionMatrix.shx);
+                _ret.push(this.selectionMatrix.sy);
+                _ret.push(this.selectionMatrix.tx);
+                _ret.push(this.selectionMatrix.ty);
             }
 
             return _ret;
@@ -1835,7 +1873,7 @@ CDrawingDocument.prototype =
 
             var _x1 = _rect1.X;
             var _y1 = _rect1.Y;
-            var _y11 = _rect1.Y + _rect.H;
+            var _y11 = _rect1.Y + _rect2.H;
             var _x2 = _rect2.X + _rect2.W;
             var _y2 = _rect2.Y;
             var _y22 = _rect2.Y + _rect2.Y;
@@ -1856,14 +1894,14 @@ CDrawingDocument.prototype =
                 _ret.push(_select.End.Y + _select.End.H);
                 _ret.push(_select.End.Page);
 
-                if (this.TextMatrix && !this.TextMatrix.IsIdentity())
+                if (this.selectionMatrix && !this.selectionMatrix.IsIdentity())
                 {
-                    _ret.push(this.TextMatrix.sx);
-                    _ret.push(this.TextMatrix.shy);
-                    _ret.push(this.TextMatrix.shx);
-                    _ret.push(this.TextMatrix.sy);
-                    _ret.push(this.TextMatrix.tx);
-                    _ret.push(this.TextMatrix.ty);
+                    _ret.push(this.selectionMatrix.sx);
+                    _ret.push(this.selectionMatrix.shy);
+                    _ret.push(this.selectionMatrix.shx);
+                    _ret.push(this.selectionMatrix.sy);
+                    _ret.push(this.selectionMatrix.tx);
+                    _ret.push(this.selectionMatrix.ty);
                 }
 
                 return _ret;
@@ -2189,7 +2227,11 @@ CDrawingDocument.prototype =
 
         this.Native["DD_EndNativeDraw"](_stream);
     },
-
+    
+    CheckGuiControlColors : function ()
+    {
+        
+    },
     SendControlColors : function()
     {
     },
@@ -2867,4 +2909,6 @@ function check_MouseUpEvent(e)
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+//window['AscCommon'].CPage = CPage;
 window['AscCommon'].CDrawingDocument = CDrawingDocument;

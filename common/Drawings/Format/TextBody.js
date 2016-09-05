@@ -755,6 +755,14 @@ CTextBody.prototype =
         return {w: max_content, h: this.content.Get_SummaryHeight()};
     },
 
+    Get_FirstParagraphNextCell: function(){
+        return null;
+    },
+
+    Get_LastParagraphPrevCell: function(){
+        return null;
+    },
+
     getRectWidth: function(maxWidth)
     {
         var body_pr = this.getBodyPr();

@@ -30,8 +30,6 @@
  *
  */
 
-var global_memory_stream_menu = CreateNativeMemoryStream();
-
 Asc['asc_docs_api'].prototype.Update_ParaInd = function( Ind )
 {
     this.WordControl.m_oDrawingDocument.Update_ParaInd(Ind);
@@ -239,6 +237,148 @@ Asc['asc_docs_api'].prototype.GenerateNativeStyles = function()
     var StylesPainter = new CStylesPainter();
     StylesPainter.GenerateStyles(this, this.LoadedObjectDS);
 };
+
+window['AscFormat'].Path.prototype.drawSmart = function(shape_drawer) {
+
+    var _graphics   = shape_drawer.Graphics;
+    var _full_trans = _graphics.m_oFullTransform;
+
+    if (!_graphics || !_full_trans || undefined == _graphics.m_bIntegerGrid || true === shape_drawer.bIsNoSmartAttack)
+        return this.draw(shape_drawer);
+
+    var bIsTransformed = (_full_trans.shx == 0 && _full_trans.shy == 0) ? false : true;
+
+    if (bIsTransformed)
+        return this.draw(shape_drawer);
+
+    var isLine = this.isSmartLine();
+    var isRect = false;
+    if (!isLine)
+        isRect = this.isSmartRect();
+
+    //if (!isLine && !isRect)   // IOS убрать
+    return this.draw(shape_drawer);
+
+    var _old_int = _graphics.m_bIntegerGrid;
+
+    if (false == _old_int)
+        _graphics.SetIntegerGrid(true);
+
+    var dKoefMMToPx = Math.max(_graphics.m_oCoordTransform.sx, 0.001);
+
+    var _ctx = _graphics.m_oContext;
+    var bIsStroke = (shape_drawer.bIsNoStrokeAttack || (this.stroke !== true)) ? false : true;
+    var bIsEven = false;
+    if (bIsStroke)
+    {
+        var _lineWidth = Math.max((shape_drawer.StrokeWidth * dKoefMMToPx + 0.5) >> 0, 1);
+        _ctx.lineWidth = _lineWidth;
+
+        if (_lineWidth & 0x01 == 0x01)
+            bIsEven = true;
+    }
+
+    var bIsDrawLast = false;
+    var path = this.ArrPathCommand;
+    shape_drawer._s();
+
+    if (!isRect)
+    {
+        for(var j = 0, l = path.length; j < l; ++j)
+        {
+            var cmd=path[j];
+            switch(cmd.id)
+            {
+                case AscFormat.moveTo:
+                {
+                    bIsDrawLast = true;
+
+                    var _x = (_full_trans.TransformPointX(cmd.X, cmd.Y)) >> 0;
+                    var _y = (_full_trans.TransformPointY(cmd.X, cmd.Y)) >> 0;
+                    if (bIsEven)
+                    {
+                        _x -= 0.5;
+                        _y -= 0.5;
+                    }
+                    _ctx.moveTo(_x, _y);
+                    break;
+                }
+                case AscFormat.lineTo:
+                {
+                    bIsDrawLast = true;
+
+                    var _x = (_full_trans.TransformPointX(cmd.X, cmd.Y)) >> 0;
+                    var _y = (_full_trans.TransformPointY(cmd.X, cmd.Y)) >> 0;
+                    if (bIsEven)
+                    {
+                        _x -= 0.5;
+                        _y -= 0.5;
+                    }
+                    _ctx.lineTo(_x, _y);
+                    break;
+                }
+                case AscFormat.close:
+                {
+                    _ctx.closePath();
+                    break;
+                }
+            }
+        }
+    }
+    else
+    {
+        var minX = 100000;
+        var minY = 100000;
+        var maxX = -100000;
+        var maxY = -100000;
+        bIsDrawLast = true;
+        for(var j = 0, l = path.length; j < l; ++j)
+        {
+            var cmd=path[j];
+            switch(cmd.id)
+            {
+                case AscFormat.moveTo:
+                case AscFormat.lineTo:
+                {
+                    if (minX > cmd.X)
+                        minX = cmd.X;
+                    if (minY > cmd.Y)
+                        minY = cmd.Y;
+
+                    if (maxX < cmd.X)
+                        maxX = cmd.X;
+                    if (maxY < cmd.Y)
+                        maxY = cmd.Y;
+
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
+        var _x1 = (_full_trans.TransformPointX(minX, minY)) >> 0;
+        var _y1 = (_full_trans.TransformPointY(minX, minY)) >> 0;
+        var _x2 = (_full_trans.TransformPointX(maxX, maxY)) >> 0;
+        var _y2 = (_full_trans.TransformPointY(maxX, maxY)) >> 0;
+
+        if (bIsEven)
+            _ctx.rect(_x1 + 0.5, _y1 + 0.5, _x2 - _x1, _y2 - _y1);
+        else
+            _ctx.rect(_x1, _y1, _x2 - _x1, _y2 - _y1);
+    }
+
+    if (bIsDrawLast)
+    {
+        shape_drawer.drawFillStroke(true, this.fill, bIsStroke);
+    }
+
+    shape_drawer._e();
+
+    if (false == _old_int)
+        _graphics.SetIntegerGrid(false);
+};
+
 
 // TEXTFONTFAMILY
 function asc_menu_ReadFontFamily(_params, _cursor)
@@ -1757,44 +1897,49 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 21:
                     {
                         var bIsNeed = _params[_current.pos++];
-
+                        
                         if (bIsNeed)
                         {
-                            var _originSize = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"](_imagePr.ImageUrl);
-                            var _w = _originSize[0];
-                            var _h = _originSize[1];
-
-                            // сбрасываем урл
-                            _imagePr.ImageUrl = undefined;
-
-                            var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
-                            var _page_width = AscCommon.Page_Width;
-                            var _page_height = AscCommon.Page_Height;
-                            var _page_x_left_margin = AscCommon.X_Left_Margin;
-                            var _page_y_top_margin = AscCommon.Y_Top_Margin;
-                            var _page_x_right_margin = AscCommon.X_Right_Margin;
-                            var _page_y_bottom_margin = AscCommon.Y_Bottom_Margin;
-
-                            if (_section_select)
-                            {
-                                if (_section_select.W)
-                                    _page_width = _section_select.W;
-
-                                if (_section_select.H)
-                                    _page_height = _section_select.H;
+                            var currImage = this.WordControl.m_oLogicDocument.DrawingObjects.Get_Props();
+                            if (currImage && currImage.length) {
+                               
+                                var _originSize = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"](currImage[0].ImageUrl);
+                                
+                                var _w = _originSize[0];
+                                var _h = _originSize[1];
+                                
+                                // сбрасываем урл
+                                _imagePr.ImageUrl = undefined;
+                                
+                                var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
+                                var _page_width = AscCommon.Page_Width;
+                                var _page_height = AscCommon.Page_Height;
+                                var _page_x_left_margin = AscCommon.X_Left_Margin;
+                                var _page_y_top_margin = AscCommon.Y_Top_Margin;
+                                var _page_x_right_margin = AscCommon.X_Right_Margin;
+                                var _page_y_bottom_margin = AscCommon.Y_Bottom_Margin;
+                                
+                                if (_section_select)
+                                {
+                                    if (_section_select.W)
+                                        _page_width = _section_select.W;
+                                    
+                                    if (_section_select.H)
+                                        _page_height = _section_select.H;
+                                }
+                                
+                                var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
+                                var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
+                                
+                                var wI = (undefined !== _w) ? Math.max(_w * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
+                                var hI = (undefined !== _h) ? Math.max(_h * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
+                                
+                                wI = Math.max(5, Math.min(wI, __w));
+                                hI = Math.max(5, Math.min(hI, __h));
+                                
+                                _imagePr.Width = wI;
+                                _imagePr.Height = hI;
                             }
-
-                            var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
-                            var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
-
-                            var wI = (undefined !== _w) ? Math.max(_w * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
-                            var hI = (undefined !== _h) ? Math.max(_h * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
-
-                            wI = Math.max(5, Math.min(wI, __w));
-                            hI = Math.max(5, Math.min(hI, __h));
-
-                            _imagePr.Width = wI;
-                            _imagePr.Height = hI;
                         }
 
                         break;
@@ -2160,6 +2305,15 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
 
             break;
         }
+        case 2415: // ASC_MENU_EVENT_TYPE_CHANGE_COLOR_SCHEME
+        {
+            if (undefined !== _params) {
+                var indexScheme = parseInt(_params);
+                this.ChangeColorScheme(indexScheme);
+            }
+            break;
+        }
+
         default:
             break;
     }
@@ -4182,6 +4336,22 @@ function asc_menu_WriteHyperPr(_hyperPr, _stream)
     _stream["WriteByte"](255);
 };
 
+function asc_WriteColorSchemes(schemas, s) {
+
+    s["WriteLong"](schemas.length);
+
+    for (var i = 0; i < schemas.length; ++i) {
+        s["WriteString2"](schemas[i].get_name());
+
+        var colors = schemas[i].get_colors();
+        s["WriteLong"](colors.length);
+
+        for (var j = 0; j < colors.length; ++j) {
+            asc_menu_WriteColor(0, colors[j], s);
+        }
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////
 
 
@@ -4479,26 +4649,13 @@ Asc['asc_docs_api'].prototype.ImgApply = function(obj)
             {
                 if(chartSpace.chart.plotArea.charts[0].series.length !== 4)
                 {
-                    this.asc_fireCallback("asc_onError", Asc.c_oAscError.ID.StockChartError,Asc.c_oAscError.Level.NoCritical);
+                    this.sendEvent("asc_onError", Asc.c_oAscError.ID.StockChartError,Asc.c_oAscError.Level.NoCritical);
                     this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
                     return;
                 }
             }
         }
     }
-    /*
-     if ( docpostype_FlowObjects == LogicDocument.CurPos.Type && "undefined" != typeof( ImagePr.WrappingStyle ) && null != ImagePr.WrappingStyle && c_oAscWrapStyle.Flow != ImagePr.WrappingStyle )
-     {
-     var FlowObject = LogicDocument.Pages[LogicDocument.Selection.Data.PageNum].FlowObjects.Get_ByIndex( LogicDocument.CurPos.ContentPos );
-     AdditionalData =
-     {
-     Type    : 1,
-     X       : FlowObject.X,
-     Y       : FlowObject.Y,
-     PageNum : LogicDocument.Selection.Data.PageNum
-     }
-     }
-     */
 
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Image_Properties, AdditionalData) )
     {
@@ -4548,23 +4705,6 @@ Asc['asc_docs_api'].prototype.ImgApply = function(obj)
 
             this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
         }
-    }
-};
-
-Asc['asc_docs_api'].prototype.IncreaseIndent = function()
-{
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
-    {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        this.WordControl.m_oLogicDocument.Paragraph_IncDecIndent( true );
-    }
-};
-Asc['asc_docs_api'].prototype.DecreaseIndent = function()
-{
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
-    {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        this.WordControl.m_oLogicDocument.Paragraph_IncDecIndent( false );
     }
 };
 
@@ -5145,11 +5285,7 @@ CStylesPainter.prototype =
         var dKoefToMM = AscCommon.g_dKoef_pix_to_mm;
 
         if (AscCommon.AscBrowser.isRetina)
-        {
-            _w_px *= 2;
-            _h_px *= 2;
             dKoefToMM /= 2;
-        }
 
         _api.WordControl.m_oDrawingDocument.Native["DD_StartNativeDraw"](_w_px, _h_px, _w_px * dKoefToMM, _h_px * dKoefToMM);
 
@@ -5273,7 +5409,6 @@ CStylesPainter.prototype =
     }
 };
 
-window["use_native_fonts_only"] = true;
 // -------------------------------------------------
 
 // declarate unused methods and objects
@@ -5361,79 +5496,104 @@ Asc['asc_docs_api'].prototype["Native_Editor_Initialize_Settings"] = function(_p
 };
 
 /***************************** COPY|PASTE *******************************/
+
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Copy = function()
 {
-    var oCopyProcessor = new AscCommon.CopyProcessor(this, true);
-    var _binary_data = oCopyProcessor.getSelectedBinary();
-
+    var dataBuffer = {};
+    
+    var clipboard = {};
+    clipboard.pushData = function(type, data) {
+        
+        if (AscCommon.c_oAscClipboardDataFormat.Text === type) {
+            
+            dataBuffer.text = data;
+            
+        } else if (AscCommon.c_oAscClipboardDataFormat.Internal === type) {
+            
+            if (null != data.drawingUrls && data.drawingUrls.length > 0) {
+                dataBuffer.drawingUrls = data.drawingUrls[0];
+            }
+            
+            dataBuffer.sBase64 = data.sBase64;
+        }
+    }
+    
+    this.asc_CheckCopy(clipboard, AscCommon.c_oAscClipboardDataFormat.Internal|AscCommon.c_oAscClipboardDataFormat.Text);
+    
     var _stream = global_memory_stream_menu;
     _stream["ClearNoAttack"]();
-
-    if (!_binary_data)
-    {
-        _stream["WriteByte"](255);
-        return _stream;
+    
+    if (dataBuffer.text) {
+        _stream["WriteByte"](0);
+        _stream["WriteString2"](dataBuffer.text);
     }
-
-    // text format
-    _stream["WriteByte"](0);
-    _stream["WriteString2"](_binary_data.text);
-
-    // image
-    if (null != _binary_data.drawingUrls && _binary_data.drawingUrls.length > 0)
-    {
+    
+    if (dataBuffer.drawingUrls) {
         _stream["WriteByte"](1);
-        _stream["WriteStringA"](_binary_data.drawingUrls[0]);
+        _stream["WriteStringA"](dataBuffer.drawingUrls);
     }
-
-    // owner format
-    _stream["WriteByte"](2);
-    _stream["WriteStringA"](_binary_data.sBase64);
-
+    
+    if (dataBuffer.sBase64) {
+        _stream["WriteByte"](2);
+        _stream["WriteStringA"](dataBuffer.sBase64);
+    }
+    
     _stream["WriteByte"](255);
+    
     return _stream;
 };
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Cut = function()
 {
-    var oCopyProcessor = new AscCommon.CopyProcessor(this, true);
-    var _binary_data = oCopyProcessor.getSelectedBinary();
+    var dataBuffer = {};
+    
+    var clipboard = {};
+    clipboard.pushData = function(type, data) {
+        
+        if (AscCommon.c_oAscClipboardDataFormat.Text === type) {
+            
+            dataBuffer.text = data;
+            
+        } else if (AscCommon.c_oAscClipboardDataFormat.Internal === type) {
+            
+            if (null != data.drawingUrls && data.drawingUrls.length > 0) {
+                 dataBuffer.drawingUrls = data.drawingUrls[0];
+            }
 
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    this.WordControl.m_oLogicDocument.Remove(1, true, true);
-    this.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
-
+            dataBuffer.sBase64 = data.sBase64;
+        }
+    }
+    
+    this.asc_CheckCopy(clipboard, AscCommon.c_oAscClipboardDataFormat.Internal|AscCommon.c_oAscClipboardDataFormat.Text);
+    
+    this.asc_SelectionCut();
+    
     var _stream = global_memory_stream_menu;
     _stream["ClearNoAttack"]();
-
-    if (!_binary_data)
-    {
-        _stream["WriteByte"](255);
-        return _stream;
+    
+    if (dataBuffer.text) {
+        _stream["WriteByte"](0);
+        _stream["WriteString2"](dataBuffer.text);
     }
-
-    // text format
-    _stream["WriteByte"](0);
-    _stream["WriteString2"](_binary_data.text);
-
-    // image
-    if (null != _binary_data.drawingUrls && _binary_data.drawingUrls.length > 0)
-    {
+   
+    if (dataBuffer.drawingUrls) {
         _stream["WriteByte"](1);
-        _stream["WriteStringA"](_binary_data.drawingUrls[0]);
+        _stream["WriteStringA"](dataBuffer.drawingUrls);
     }
-
-    // owner format
-    _stream["WriteByte"](2);
-    _stream["WriteStringA"](_binary_data.sBase64);
-
+   
+    if (dataBuffer.sBase64) {
+        _stream["WriteByte"](2);
+        _stream["WriteStringA"](dataBuffer.sBase64);
+    }
+    
     _stream["WriteByte"](255);
+    
     return _stream;
 };
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Paste = function(type, param)
 {
     if (0 == type)
     {
-        this.WordControl.m_oLogicDocument.TextBox_Put(param, undefined);
+        this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Text, param);
     }
     else if (1 == type)
     {
@@ -5441,8 +5601,7 @@ Asc['asc_docs_api'].prototype.Call_Menu_Context_Paste = function(type, param)
     }
     else if (2 == type)
     {
-        var oPasteProcessor = new AscCommon.PasteProcessor(this, true, true, false);
-        oPasteProcessor.Start(null, null, false, param);
+        this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, param);
     }
 };
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Delete = function()
@@ -5469,15 +5628,6 @@ Asc['asc_docs_api'].prototype.pre_Paste = function(_fonts, _images, callback)
     callback();
 };
 /************************************************************************/
-
-window["NativeCorrectImageUrlOnPaste"] = function(url)
-{
-    return window["native"]["CorrectImageUrlOnPaste"](url);
-};
-window["NativeCorrectImageUrlOnCopy"] = function(url)
-{
-    return window["native"]["CorrectImageUrlOnCopy"](url);
-};
 
 // chat styles
 AscCommon.ChartPreviewManager.prototype.clearPreviews = function()
@@ -5553,109 +5703,126 @@ AscCommon.ChartPreviewManager.prototype.getChartPreviews = function(chartType)
     }
 };
 
-// FT_Common
-function _FT_Common()
+// additional
+
+Asc['asc_docs_api'].prototype.__SendThemeColorScheme = function()
 {
-    this.UintToInt = function(v)
-    {
-        return (v>2147483647)?v-4294967296:v;
-    };
-    this.UShort_To_Short = function(v)
-    {
-        return (v>32767)?v-65536:v;
-    };
-    this.IntToUInt = function(v)
-    {
-        return (v<0)?v+4294967296:v;
-    };
-    this.Short_To_UShort = function(v)
-    {
-        return (v<0)?v+65536:v;
-    };
-    this.memset = function(d,v,s)
-    {
-        for (var i=0;i<s;i++)
-            d[i]=v;
-    };
-    this.memcpy = function(d,s,l)
-    {
-        for (var i=0;i<l;i++)
-            d[i]=s[i];
-    };
-    this.memset_p = function(d,v,s)
-    {
-        var _d = d.data;
-        var _e = d.pos+s;
-        for (var i=d.pos;i<_e;i++)
-            _d[i]=v;
-    };
-    this.memcpy_p = function(d,s,l)
-    {
-        var _d1=d.data;
-        var _p1=d.pos;
-        var _d2=s.data;
-        var _p2=s.pos;
-        for (var i=0;i<l;i++)
-            _d1[_p1++]=_d2[_p2++];
-    };
-    this.memcpy_p2 = function(d,s,p,l)
-    {
-        var _d1=d.data;
-        var _p1=d.pos;
-        var _p2=p;
-        for (var i=0;i<l;i++)
-            _d1[_p1++]=s[_p2++];
-    };
-    this.realloc = function(memory, pointer, cur_count, new_count)
-    {
-        var ret = { block: null, err : 0, size : new_count};
-        if (cur_count < 0 || new_count < 0)
-        {
-            /* may help catch/prevent nasty security issues */
-            ret.err = 6;
-        }
-        else if (new_count == 0)
-        {
-            ret.block = null;
-        }
-        else if (cur_count == 0)
-        {
-            ret.block = memory.Alloc(new_count);
-        }
-        else
-        {
-            var block2 = memory.Alloc(new_count);
-            FT_Common.memcpy_p(block2, pointer, cur_count);
-            ret.block = block2;
-        }
-        return ret;
-    };
+    var infos = [];
+    var _index = 0;
 
-    this.realloc_long = function(memory, pointer, cur_count, new_count)
-    {
-        var ret = { block: null, err : 0, size : new_count};
-        if (cur_count < 0 || new_count < 0)
-        {
-            /* may help catch/prevent nasty security issues */
-            ret.err = 6;
-        }
-        else if (new_count == 0)
-        {
-            ret.block = null;
-        }
-        else if (cur_count == 0)
-        {
-            ret.block = CreateIntArray(new_count);
-        }
-        else
-        {
-            var block2 = CreateIntArray(new_count);
-            for (var i = 0; i < cur_count; i++)
-                block2[i] = pointer[i];
+    var _c = null;
 
-            ret.block = block2;
-        }
-        return ret;
-    };
-}
-var FT_Common = new _FT_Common();
+    // user scheme
+    var oColorScheme = AscCommon.g_oUserColorScheme;
+    var _count_defaults = oColorScheme.length;
+    for (var i = 0; i < _count_defaults; ++i)
+    {
+        var _obj = oColorScheme[i];
+        infos[_index] = new AscCommon.CAscColorScheme();
+        infos[_index].Name = _obj.name;
+
+        _c = _obj.dk1;
+        infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.lt1;
+        infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.dk2;
+        infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.lt2;
+        infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.accent1;
+        infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.accent2;
+        infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.accent3;
+        infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.accent4;
+        infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.accent5;
+        infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.accent6;
+        infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.hlink;
+        infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.folHlink;
+        infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
+
+        ++_index;
+    }
+
+    // theme colors
+    var _theme = this.WordControl.m_oLogicDocument.theme;
+    var _extra = _theme.extraClrSchemeLst;
+    var _count = _extra.length;
+    var _rgba = {R:0, G: 0, B: 0, A: 255};
+    for (var i = 0; i < _count; ++i)
+    {
+        var _scheme = _extra[i].clrScheme;
+
+        infos[_index] = new AscCommon.CAscColorScheme();
+        infos[_index].Name = _scheme.name;
+
+        _scheme.colors[8].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[8].RGBA;
+        infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[12].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[12].RGBA;
+        infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[9].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[9].RGBA;
+        infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[13].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[13].RGBA;
+        infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[0].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[0].RGBA;
+        infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[1].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[1].RGBA;
+        infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[2].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[2].RGBA;
+        infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[3].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[3].RGBA;
+        infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[4].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[4].RGBA;
+        infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[5].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[5].RGBA;
+        infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[11].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[11].RGBA;
+        infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[10].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[10].RGBA;
+        infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
+
+        _index++;
+    }
+
+    this.WordControl.m_oApi.sync_SendThemeColorSchemes(infos);
+};
+

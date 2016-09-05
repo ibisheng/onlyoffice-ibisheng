@@ -179,7 +179,8 @@
 
 	var c_oAscAdvancedOptionsID = {
 		CSV : 0,
-		TXT : 1
+		TXT : 1,
+		DRM : 2
 	};
 
 	var c_oAscAdvancedOptionsAction = {
@@ -791,6 +792,20 @@
 		CustomMode : 3
 	};
 
+	var c_oDashType = {
+		dash          : 0,
+		dashDot       : 1,
+		dot           : 2,
+		lgDash        : 3,
+		lgDashDot     : 4,
+		lgDashDotDot  : 5,
+		solid         : 6,
+		sysDash       : 7,
+		sysDashDot    : 8,
+		sysDashDotDot : 9,
+		sysDot        : 10
+	};
+
 	var c_oAscEncodings    = [
 		[0, 28596, "ISO-8859-6", "Arabic (ISO 8859-6)"],
 		[1, 720, "DOS-720", "Arabic (OEM 720)"],
@@ -1038,6 +1053,7 @@
 	prot                                         = c_oAscAdvancedOptionsID;
 	prot['CSV']                                  = prot.CSV;
 	prot['TXT']                                  = prot.TXT;
+	prot['DRM']                                  = prot.DRM;
 	window['Asc']['c_oAscFontRenderingModeType'] = window['Asc'].c_oAscFontRenderingModeType = c_oAscFontRenderingModeType;
 	prot                                   = c_oAscFontRenderingModeType;
 	prot['noHinting']                      = prot.noHinting;
@@ -1381,6 +1397,20 @@
 	prot['DeleteRows']              = prot.DeleteRows;
 	prot['DeleteTable']             = prot.DeleteTable;
 
+	window['Asc']['c_oDashType'] = window['Asc'].c_oDashType = c_oDashType;
+	prot                  = c_oDashType;
+	prot['dash']          = prot.dash;
+	prot['dashDot']       = prot.dashDot;
+	prot['dot']           = prot.dot;
+	prot['lgDash']        = prot.lgDash;
+	prot['lgDashDot']     = prot.lgDashDot;
+	prot['lgDashDotDot']  = prot.lgDashDotDot;
+	prot['solid']         = prot.solid;
+	prot['sysDash']       = prot.sysDash;
+	prot['sysDashDot']    = prot.sysDashDot;
+	prot['sysDashDotDot'] = prot.sysDashDotDot;
+	prot['sysDot']        = prot.sysDot;
+
 	window['AscCommon']                             = window['AscCommon'] || {};
 	window["AscCommon"].g_cCharDelimiter            = g_cCharDelimiter;
 	window["AscCommon"].bDate1904                   = false;
@@ -1501,6 +1531,9 @@
 		this.isUpdateOleOnResize = false;
 
 		this.buttons = [{"text" : "Ok", "primary" : true}, {"text" : "Cancel", "primary" : false}];
+
+		this.size = undefined;
+		this.initOnSelectionChanged = undefined;
 	}
 
 	CPluginVariation.prototype["get_Description"] = function()
@@ -1605,6 +1638,22 @@
 	{
 		this.buttons = value;
 	};
+	CPluginVariation.prototype["get_Size"]           = function()
+	{
+		return this.size;
+	};
+	CPluginVariation.prototype["set_Size"]           = function(value)
+	{
+		this.size = value;
+	};
+	CPluginVariation.prototype["get_InitOnSelectionChanged"]           = function()
+	{
+		return this.initOnSelectionChanged;
+	};
+	CPluginVariation.prototype["set_InitOnSelectionChanged"]           = function(value)
+	{
+		this.initOnSelectionChanged = value;
+	};
 
 	CPluginVariation.prototype["serialize"]   = function()
 	{
@@ -1627,8 +1676,12 @@
 		_object["isUpdateOleOnResize"] = this.isUpdateOleOnResize;
 
 		_object["buttons"] = this.buttons;
+
+		_object["size"] = this.size;
+		_object["initOnSelectionChanged"] = this.initOnSelectionChanged;
+
 		return _object;
-	}
+	};
 	CPluginVariation.prototype["deserialize"] = function(_object)
 	{
 		this.description = (_object["description"] != null) ? _object["description"] : this.description;
@@ -1649,7 +1702,10 @@
 		this.isUpdateOleOnResize = (_object["isUpdateOleOnResize"] != null) ? _object["isUpdateOleOnResize"] : this.isUpdateOleOnResize;
 
 		this.buttons = (_object["buttons"] != null) ? _object["buttons"] : this.buttons;
-	}
+
+		this.size = (_object["size"] != null) ? _object["size"] : this.size;
+		this.initOnSelectionChanged = (_object["initOnSelectionChanged"] != null) ? _object["initOnSelectionChanged"] : this.initOnSelectionChanged;
+	};
 
 	function CPlugin()
 	{

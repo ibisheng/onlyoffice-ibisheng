@@ -53,7 +53,7 @@ Asc['asc_docs_api'].prototype.sync_BeginCatchRevisionsChanges = function()
 };
 Asc['asc_docs_api'].prototype.sync_EndCatchRevisionsChanges = function()
 {
-    this.asc_fireCallback("asc_onShowRevisionsChange", this.RevisionChangesStack);
+    this.sendEvent("asc_onShowRevisionsChange", this.RevisionChangesStack);
 };
 Asc['asc_docs_api'].prototype.sync_AddRevisionsChange = function(Change)
 {
@@ -91,7 +91,7 @@ Asc['asc_docs_api'].prototype.asc_GetPrevRevisionsChange = function()
 };
 Asc['asc_docs_api'].prototype.sync_UpdateRevisionsChangesPosition = function(X, Y)
 {
-    this.asc_fireCallback("asc_onUpdateRevisionsChangesPosition", X, Y);
+    this.sendEvent("asc_onUpdateRevisionsChangesPosition", X, Y);
 };
 Asc['asc_docs_api'].prototype.asc_AcceptAllChanges = function()
 {
@@ -193,7 +193,7 @@ CDocument.prototype.private_GetRevisionsChangeParagraph = function(Direction, Cu
     }
     else
     {
-        var Pos = (true === this.Selection.Use && docpostype_DrawingObjects !== this.CurPos.Type ? (this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos) : this.CurPos.ContentPos);
+        var Pos = (true === this.Selection.Use && docpostype_DrawingObjects !== this.Get_DocPosType() ? (this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos) : this.CurPos.ContentPos);
         this.private_GetRevisionsChangeParagraphInDocument(SearchEngine, Pos);
 
         if (true !== SearchEngine.Is_Found())

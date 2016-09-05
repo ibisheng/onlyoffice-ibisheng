@@ -1848,18 +1848,23 @@ Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, Cu
         if (this.Parent instanceof CDocument)
         {
             var RecalcInfo = this.Parent.RecalcInfo;
+			var nPageAbs   = this.Get_AbsolutePage(CurPage);
+			var nColumnAbs = this.Get_AbsoluteColumn(CurPage);
             if (true === RecalcInfo.Can_RecalcObject())
             {
-                var PageAbs = this.Get_AbsolutePage(CurPage);
-                RecalcInfo.Set_FootnoteReference(oFootnote, PageAbs);
-                this.Parent.Footnotes.Add_FootnoteOnPage(PageAbs, oFootnote);
-                PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Page | recalcresultflags_Footnotes;
+                RecalcInfo.Set_FootnoteReference(oFootnote, nPageAbs, nColumnAbs);
+                this.Parent.Footnotes.AddFootnoteToPage(nPageAbs, nColumnAbs, oFootnote);
+                PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Column | recalcresultflags_Footnotes;
                 return false;
             }
             else if (true === RecalcInfo.Check_FootnoteReference(oFootnote))
             {
-                var PageAbs = this.Get_AbsolutePage(CurPage);
-                if (PageAbs === RecalcInfo.FlowObjectPage)
+				if (true === RecalcInfo.Is_PageBreakBefore())
+				{
+					//PRS.RecalcResult
+				}
+
+                if (nPageAbs === RecalcInfo.FootnotePage && nColumnAbs === RecalcInfo.FootnoteColumn)
                 {
                     // Все нормально пересчиталось
                     RecalcInfo.Reset_FootnoteReference();
@@ -1867,7 +1872,10 @@ Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, Cu
                 else
                 {
                     // TODO: Реализовать
-                    RecalcInfo.FlowObjectPageBreakBefore = true;
+                    RecalcInfo.Set_PageBreaFlowObjectPageBreakBefore(true);
+					this.Parent.Footnotes.RemoveFootnoteFromPage(nPageAbs, nColumnAbs, oFootnote);
+					PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Column | recalcresultflags_Footnotes;
+                    return false;
                 }
             }
             else
@@ -2102,7 +2110,8 @@ Paragraph.prototype.private_CheckColumnBreak = function(CurPage)
 
     if (Line.Info & paralineinfo_BreakPage && !(Line.Info & paralineinfo_BreakRealPage))
     {
-        this.Parent.OnColumnBreak_WhileRecalculate();
+        if (this.LogicDocument)
+            this.LogicDocument.OnColumnBreak_WhileRecalculate();
     }
 };
 

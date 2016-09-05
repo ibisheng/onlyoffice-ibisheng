@@ -1549,7 +1549,7 @@ function CDrawingDocument(drawingObjects)
 
     this.OnRecalculatePage = function(index, pageObject)
     {
-        editor.asc_fireCallback("asc_onDocumentChanged");
+        editor.sendEvent("asc_onDocumentChanged");
         if (true === this.m_bIsSearching)
         {
             this.SearchClear();
@@ -2633,8 +2633,6 @@ function CDrawingDocument(drawingObjects)
 
         oThis.TargetHtmlElement.style.left = pos.X + "px";
         oThis.TargetHtmlElement.style.top  = pos.Y + "px";
-
-        this.m_oWordControl.CheckTextBoxInputPos();
 
         if (this.m_bIsSearching && null != this.CurrentSearchNavi)
         {

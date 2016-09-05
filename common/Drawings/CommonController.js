@@ -134,6 +134,73 @@ var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
             }
         }
     }
+
+    function fApproxEqual(a, b, fDelta){
+        if ( a === b ) {
+            return true;
+        }
+        if(AscFormat.isRealNumber(fDelta)){
+            return Math.abs( a - b ) < fDelta;
+        }
+        return Math.abs( a - b ) < 1e-15;
+    };
+
+
+	function fSolveQuadraticEquation(a, b, c){
+		var oResult = {x1: null, x2: null, bError: true}
+		var D = b*b - 4*a*c;
+        if(D < 0){
+            return oResult;
+        }
+		oResult.bError = false;
+        oResult.x1 = (-b + Math.sqrt(D))/(2*a), oResult.x2 = (-b - Math.sqrt(D))/(2*a);
+		return oResult;
+	}
+
+    function fCheckBoxIntersectionSegment(fX, fY, fWidth, fHeight, x1, y1, x2, y2){
+        return fCheckSegementIntersection(fX, fY, fX + fWidth, fY, x1, y1, x2, y2) ||
+            fCheckSegementIntersection(fX + fWidth, fY, fX + fWidth, fY + fHeight, x1, y1, x2, y2) ||
+            fCheckSegementIntersection(fX + fWidth, fY + fHeight, fX, fY + fHeight, x1, y1, x2, y2) ||
+            fCheckSegementIntersection(fX, fY + fHeight, fX, fY, x1, y1, x2, y2);
+
+    }
+
+    function fCheckSegementIntersection(x11, y11, x12, y12, x21, y21, x22, y22){
+        //check bounding boxes intersection
+        if(Math.max(x11, x12) < Math.min(x21, x22)){
+            return false;
+        }
+        if(Math.min(x11, x12) > Math.max(x21, x22)){
+            return false;
+        }
+        if(Math.max(y11, y12) < Math.min(y21, y22)){
+            return false;
+        }
+        if(Math.min(y11, y12) > Math.max(y21, y22)){
+            return false;
+        }
+
+        var oCoeffs = fResolve2LinearSystem(x12-x11, -(x22-x21), y12-y11, -(y22-y21), x21-x11, y21-y11);
+        if(oCoeffs.bError){
+            return false;
+        }
+        return (oCoeffs.x1 >= 0 && oCoeffs.x1 <= 1
+            && oCoeffs.x2 >= 0 && oCoeffs.x2 <= 1);
+    }
+
+
+    function fResolve2LinearSystem(a11, a12, a21, a22, t1, t2){
+        var oResult = {bError: true};
+        var D = a11*a22 - a12*a21;
+        if(fApproxEqual(D,  0)){
+            return oResult;
+        }
+        oResult.bError = false;
+        oResult.x1 = (t1*a22 - a12*t2)/D;
+        oResult.x2 = (a11*t2 - t1*a21)/D;
+        return oResult;
+    }
+
     function checkParagraphDefFonts(map, par)
     {
         par && par.Pr && par.Pr.DefaultRunPr && checkRFonts(map, par.Pr.DefaultRunPr.RFonts);
@@ -415,7 +482,7 @@ function CheckStockChart(oDrawingObjects, oApi)
         {
             if(chartSpace.chart.plotArea.charts[0].series.length !== 4)
             {
-                oApi.asc_fireCallback("asc_onError", c_oAscError.ID.StockChartError, c_oAscError.Level.NoCritical);
+                oApi.sendEvent("asc_onError", c_oAscError.ID.StockChartError, c_oAscError.Level.NoCritical);
                 oApi.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
                 return false;
             }
@@ -1147,6 +1214,45 @@ DrawingObjectsController.prototype =
         return {X: 0, Y: 0, PageIndex: pageIndex};
     },
 
+
+    CreateDocContent: function(){
+        var oController = this;
+        if(this.selection.groupSelection){
+            oController = this.selection.groupSelection;
+        }
+        if(oController.selection.textSelection){
+            return;
+        }
+        if(oController.selection.chartSelection){
+           if(oController.selection.chartSelection.selection.textSelection){
+               oController.selection.chartSelection.selection.textSelection.checkDocContent && oController.selection.chartSelection.selection.textSelection.checkDocContent();
+               return;
+           }
+        }
+        if(oController.selectedObjects.length === 1 ){
+            if(oController.selectedObjects[0].getObjectType() === AscDFH.historyitem_type_Shape){
+                var oShape = oController.selectedObjects[0];
+                if(oShape.bWordShape){
+                    if(!oShape.textBoxContent){
+                        oShape.createTextBoxContent();
+                    }
+                }
+                else{
+                    if(!oShape.txBody){
+                        oShape.createTextBody();
+                    }
+                }
+                oController.selection.textSelection = oShape;
+            }
+            else{
+                if(oController.selection.chartSelection && oController.selection.chartSelection.selection.title){
+                    oController.selection.chartSelection.selection.textSelection = oController.selection.chartSelection.selection.title;
+                    oController.selection.chartSelection.selection.textSelection.checkDocContent && oController.selection.chartSelection.selection.textSelection.checkDocContent();
+                }
+            }
+        }
+    },
+
     getContextMenuPosition: function(pageIndex)
     {
         var i, aDrawings, dX, dY, oTargetTextObject;
@@ -1622,7 +1728,7 @@ DrawingObjectsController.prototype =
             {
                 this.parent.GoTo_Text();
                 this.resetSelection();
-                if(this.document && (docpostype_DrawingObjects !== this.document.CurPos.Type || isRealObject(getTargetTextObject(this.document.DrawingObjects))) && CDocumentContent.prototype.Add_NewParagraph === docContentFunction)
+                if(this.document && (docpostype_DrawingObjects !== this.document.Get_DocPosType() || isRealObject(getTargetTextObject(this.document.DrawingObjects))) && CDocumentContent.prototype.Add_NewParagraph === docContentFunction)
                 {
                     this.document.Add_NewParagraph(args[0]);
                 }
@@ -1631,7 +1737,7 @@ DrawingObjectsController.prototype =
             {
                 this.selectedObjects[0].parent.GoTo_Text();
                 this.resetSelection();
-                if(this.document && (docpostype_DrawingObjects !== this.document.CurPos.Type || isRealObject(getTargetTextObject(this))) && CDocumentContent.prototype.Add_NewParagraph === docContentFunction)
+                if(this.document && (docpostype_DrawingObjects !== this.document.Get_DocPosType() || isRealObject(getTargetTextObject(this))) && CDocumentContent.prototype.Add_NewParagraph === docContentFunction)
                 {
                     this.document.Add_NewParagraph(args[0]);
                 }
@@ -3350,7 +3456,7 @@ DrawingObjectsController.prototype =
                             }
                             if(!hor_axis.title.txPr.content)
                             {
-                                hor_axis.title.txPr.setContent(new CDocumentContent(hor_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
+                                hor_axis.title.txPr.setContent(new AscFormat.CDrawingDocContent(hor_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
                             }
                             _text_body = hor_axis.title.txPr;
                         }
@@ -3423,7 +3529,7 @@ DrawingObjectsController.prototype =
                             var _body_pr = _text_body.bodyPr.createDuplicate();
                             if(!_text_body.content)
                             {
-                                _text_body.setContent(new CDocumentContent(_text_body, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
+                                _text_body.setContent(new AscFormat.CDrawingDocContent(_text_body, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
                             }
                             if(vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.rotated)
                             {
@@ -3571,7 +3677,8 @@ DrawingObjectsController.prototype =
                         {
                             if(!(finish_dlbl_pos === c_oAscChartDataLabelsPos.ctr
                                 || finish_dlbl_pos === c_oAscChartDataLabelsPos.inEnd
-                                || finish_dlbl_pos === c_oAscChartDataLabelsPos.outEnd))
+                                || finish_dlbl_pos === c_oAscChartDataLabelsPos.outEnd
+                                || finish_dlbl_pos === c_oAscChartDataLabelsPos.bestFit))
                             {
                                 finish_dlbl_pos = c_oAscChartDataLabelsPos.ctr;
                             }
@@ -3951,11 +4058,12 @@ DrawingObjectsController.prototype =
         var data_labels = plot_area.charts[0].dLbls;
         if(data_labels)
         {
+            var nDefaultDatalabelsPos = chart_type && chart_type.getDefaultDataLabelsPosition ? chart_type.getDefaultDataLabelsPosition() :  c_oAscChartDataLabelsPos.none;
             ret.putShowSerName(data_labels.showSerName === true);
             ret.putShowCatName(data_labels.showCatName === true);
             ret.putShowVal(data_labels.showVal === true);
             ret.putSeparator(data_labels.separator);
-            ret.putDataLabelsPos(AscFormat.isRealNumber(data_labels.dLblPos) ? data_labels.dLblPos :  c_oAscChartDataLabelsPos.none);
+            ret.putDataLabelsPos(AscFormat.isRealNumber(data_labels.dLblPos) ? data_labels.dLblPos :  nDefaultDatalabelsPos);
         }
         else
         {
@@ -4527,6 +4635,9 @@ DrawingObjectsController.prototype =
                     {
                         this.selection.groupSelection.selectedObjects[i].group.removeFromSpTree(this.selection.groupSelection.selectedObjects[i].Get_Id());
                         group_map[this.selection.groupSelection.selectedObjects[i].group.Get_Id()+""] = this.selection.groupSelection.selectedObjects[i].group;
+                        if(this.selection.groupSelection.selectedObjects[i].setBDeleted){
+                            this.selection.groupSelection.selectedObjects[i].setBDeleted(true);
+                        }
                     }
                     group_map[this.selection.groupSelection.Get_Id()+""] = this.selection.groupSelection;
                     for(var key in group_map)
@@ -4614,6 +4725,10 @@ DrawingObjectsController.prototype =
                 for(var i = 0; i < this.selectedObjects.length; ++i)
                 {
                     this.selectedObjects[i].deleteDrawingBase(true);
+                    if(this.selectedObjects[i].setBDeleted){
+                        this.selectedObjects[i].setBDeleted(true);
+                    }
+
                 }
                 this.resetSelection();
                 this.recalculate();
@@ -5050,6 +5165,11 @@ DrawingObjectsController.prototype =
                     this.selectObject(drawings[i], 0);
                 }
             }
+        }
+        else{
+            this.resetSelection();
+            this.document.Set_DocPosType(docpostype_Content);
+            this.document.Select_All();
         }
         this.updateSelectionState();
     },
@@ -5512,6 +5632,11 @@ DrawingObjectsController.prototype =
         else if ( e.keyCode == 221 && false === isViewMode && true === ctrlKey ) // Ctrl + ]
         {
             drawingObjectsController.increaseFontSize();
+            bRetValue = true;
+        }
+        else if ( e.keyCode === 113 ) // F2
+        {
+            // ToDo обработать эту горячую клавишу. В автофигуры можно добавлять формулу
             bRetValue = true;
         }
         if(bRetValue)
@@ -6860,7 +6985,12 @@ DrawingObjectsController.prototype =
                 {
                     oTextArtProperties.Fill = AscFormat.CreateUnfilFromRGB(oTextPr.Color.r, oTextPr.Color.g, oTextPr.Color.b);
                 }
-                oTextArtProperties.Line = oTextPr.TextOutline;
+                if(oTextPr.TextOutline){
+                    oTextArtProperties.Line = oTextPr.TextOutline;
+                }
+                else{
+                    oTextArtProperties.Line = AscFormat.CreateNoFillLine();
+                }
                 if(oTextArtProperties.Fill)
                 {
                     oTextArtProperties.Fill.check(this.getTheme(), this.getColorMap());
@@ -7231,7 +7361,7 @@ DrawingObjectsController.prototype =
                 oContent.Selection.EndPos   = 0;
                 oContent.Selection.Flag     = selectionflag_Common;
 
-                oContent.CurPos.Type       = docpostype_Content;
+                oContent.Set_DocPosType(docpostype_Content);
                 oContent.CurPos.ContentPos = 0;
                 oShape.bSelectedText = true;
             }
@@ -8861,6 +8991,9 @@ function CalcLiterByLength(aAlphaBet, nLength)
     return sResultLiter;
 }
 
+
+
+
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].HANDLE_EVENT_MODE_HANDLE = HANDLE_EVENT_MODE_HANDLE;
@@ -8908,4 +9041,7 @@ function CalcLiterByLength(aAlphaBet, nLength)
     window['AscFormat'].GetMinSnapDistanceYObjectByArrays = GetMinSnapDistanceYObjectByArrays;
     window['AscFormat'].CalcLiterByLength = CalcLiterByLength;
     window['AscFormat'].fillImage = fillImage;
+	window['AscFormat'].fSolveQuadraticEquation = fSolveQuadraticEquation;
+	window['AscFormat'].fApproxEqual = fApproxEqual;
+	window['AscFormat'].fCheckBoxIntersectionSegment = fCheckBoxIntersectionSegment;
 })(window);

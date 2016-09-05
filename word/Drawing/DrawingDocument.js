@@ -1952,7 +1952,7 @@ function CDrawingDocument()
     {
         // Пути указаны относительно html в меню, не надо их исправлять
         // и коммитить на пути относительно тестового меню
-        this.cursorMarkerFormat = "url(../../../sdk/Common/Images/marker_format.cur), pointer";
+        this.cursorMarkerFormat = "url(../../../../sdkjs/common/Images/marker_format.cur), pointer";
     }
     else if (window.opera)
     {
@@ -1995,6 +1995,7 @@ function CDrawingDocument()
     this.NeedScrollToTargetFlag = false;
 
     this.TargetHtmlElement = null;
+    this.TargetHtmlElementBlock = false; // true - block, false - visibility
     this.TargetHtmlElementLeft = 0;
     this.TargetHtmlElementTop = 0;
 
@@ -2030,6 +2031,8 @@ function CDrawingDocument()
     this.TextMatrix = null;
     this.TargetShowFlag = false;
     this.TargetShowNeedFlag = false;
+
+    this.SelectionMatrix = null;
 
     this.CanvasHit = document.createElement('canvas');
     this.CanvasHit.width = 10;
@@ -2086,6 +2089,21 @@ function CDrawingDocument()
     this._search_HdrFtr_Even         = []; // Поиск в колонтитуле, который находится только на нечетных страницах
     this._search_HdrFtr_Odd          = []; // Поиск в колонтитуле, который находится только на четных страницах, включая первую
     this._search_HdrFtr_Odd_no_First = []; // Поиск в колонтитуле, который находится только на нечетных страницах, кроме первой
+
+    this.showTarget = function(isShow)
+    {
+        if (this.TargetHtmlElementBlock)
+            this.TargetHtmlElement.style.display = isShow ? "display" : "none";
+        else
+            this.TargetHtmlElement.style.visibility = isShow ? "visible" : "hidden";
+    };
+    this.isShowTarget = function()
+    {
+        if (this.TargetHtmlElementBlock)
+            return (this.TargetHtmlElement.style.display == "display") ? true : false;
+        else
+            return (this.TargetHtmlElement.style.visibility == "visible") ? true : false;
+    };
 
     this.Start_CollaborationEditing = function()
     {
@@ -2150,7 +2168,7 @@ function CDrawingDocument()
     {
         if (!this.m_oWordControl.MobileTouchManager)
             this.TableOutlineDr.TableOutline = null;
-        editor.asc_fireCallback("asc_onDocumentChanged");
+        editor.sendEvent("asc_onDocumentChanged");
         if (true === this.m_bIsSearching)
         {
             this.SearchClear();
@@ -2251,7 +2269,7 @@ function CDrawingDocument()
         {
             //this.m_oWordControl.m_oLogicDocument.RecalculateCurPos();
             this.m_lCurrentPage = this.m_oWordControl.m_oLogicDocument.Get_CurPage();
-			this.m_oWordControl.m_oApi.asc_fireCallback("asc_onEndCalculate");
+			this.m_oWordControl.m_oApi.sendEvent("asc_onEndCalculate");
         }
 
         if (-1 != this.m_lCurrentPage)
@@ -2620,7 +2638,7 @@ function CDrawingDocument()
         var x_mm = (_x - rect.left) * dKoef;
         var y_mm = (_y - rect.top) * dKoef;
 
-        return { X : x_mm, Y : y_mm, Page: rect.pageIndex, DrawPage: i };
+        return { X : x_mm, Y : y_mm, Page: rect.pageIndex, DrawPage: page };
     }
 
     this.ConvertCoordsToAnotherPage = function(x, y, pageCoord, pageNeed)
@@ -2942,9 +2960,8 @@ function CDrawingDocument()
             clearInterval( this.m_lTimerTargetId );
             this.m_lTimerTargetId = -1;
         }
-        this.TargetHtmlElement.style.display = "none";
 
-        this.m_oWordControl.DisableTextEATextboxAttack();
+        this.showTarget(false);
     }
     this.UpdateTargetNoAttack = function()
     {
@@ -3093,9 +3110,15 @@ function CDrawingDocument()
                 oThis.TargetHtmlElement.style.top  = "0px";
                 oThis.TargetHtmlElement.style["webkitTransform"] = "matrix(1, 0, 0, 1, " + oThis.TargetHtmlElementLeft + "," + oThis.TargetHtmlElementTop + ")";
             }
-
-            this.m_oWordControl.CheckTextBoxInputPos();
         }
+
+        this.MoveTargetInInputContext();
+    };
+
+    this.MoveTargetInInputContext = function()
+    {
+        if (AscCommon.g_inputContext)
+            AscCommon.g_inputContext.move(this.TargetHtmlElementLeft, this.TargetHtmlElementTop);
     }
 
     this.UpdateTargetTransform = function(matrix)
@@ -3446,8 +3469,6 @@ function CDrawingDocument()
         oThis.TargetHtmlElementTop = pos.Y >> 0;
         oThis.TargetHtmlElement.style.left = oThis.TargetHtmlElementLeft + "px";
         oThis.TargetHtmlElement.style.top  = oThis.TargetHtmlElementTop + "px";
-
-        this.m_oWordControl.CheckTextBoxInputPos();
     }
 
     this.SetTargetSize = function(size)
@@ -3458,11 +3479,11 @@ function CDrawingDocument()
     }
     this.DrawTarget = function()
     {
-        if ( "block" != oThis.TargetHtmlElement.style.display && oThis.NeedTarget && oThis.m_oWordControl.IsFocus )
-            oThis.TargetHtmlElement.style.display = "block";
-        else
-            oThis.TargetHtmlElement.style.display = "none";
-    }
+        if (oThis.NeedTarget && oThis.m_oWordControl.IsFocus)
+        {
+            oThis.showTarget(!oThis.isShowTarget());
+        }
+    };
 
     this.TargetShow = function()
     {
@@ -3472,7 +3493,7 @@ function CDrawingDocument()
     {
         if (this.TargetShowFlag && this.TargetShowNeedFlag)
         {
-            this.TargetHtmlElement.style.display = "block";
+            this.showTarget(true);
             this.TargetShowNeedFlag = false;
             return;
         }
@@ -3486,7 +3507,7 @@ function CDrawingDocument()
             this.TargetStart();
 
         if (oThis.NeedTarget)
-            this.TargetHtmlElement.style.display = "block";
+            this.showTarget(true);
 
         this.TargetShowFlag = true;
     }
@@ -4375,6 +4396,9 @@ function CDrawingDocument()
 
     this.AddPageSelection = function(pageIndex, x, y, w, h)
     {
+        if (null == this.SelectionMatrix)
+            this.SelectionMatrix = this.TextMatrix;
+
         this.IsTextMatrixUse = ((null != this.TextMatrix) && !global_MatrixTransformer.IsIdentity(this.TextMatrix));
 
         if (pageIndex < this.m_lDrawingFirst || pageIndex > this.m_lDrawingEnd)

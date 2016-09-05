@@ -695,12 +695,12 @@ CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
         var hdr_ftr = para_drawing.DocumentContent.Is_HdrFtr(true);
         if(hdr_ftr)
         {
-            hdr_ftr.Content.CurPos.Type = docpostype_DrawingObjects;
+            hdr_ftr.Content.Set_DocPosType(docpostype_DrawingObjects);
             hdr_ftr.Set_CurrentElement(bUpdate);
         }
         else
         {
-            drawing_objects.document.CurPos.Type = docpostype_DrawingObjects;
+            drawing_objects.document.Set_DocPosType(docpostype_DrawingObjects);
             drawing_objects.document.Selection.Use = true;
 
             if ( true === bUpdate )
@@ -854,7 +854,7 @@ CShape.prototype.checkPosTransformText = function()
 };
 CShape.prototype.getNearestPos = function(x, y, pageIndex)
 {
-    if(isRealObject(this.textBoxContent))
+    if(isRealObject(this.textBoxContent) && this.invertTransformText)
     {
         var t_x = this.invertTransformText.TransformPointX(x, y);
         var t_y = this.invertTransformText.TransformPointY(x, y);
@@ -883,7 +883,7 @@ CShape.prototype.cursorGetPos = function()
 CShape.prototype.cursorMoveAt = function( X, Y, AddToSelect )
 {
     var content = this.getDocContent();
-    if(isRealObject(content))
+    if(isRealObject(content) && this.invertTransformText)
     {
         var t_x = this.invertTransformText.TransformPointX(X, Y);
         var t_y = this.invertTransformText.TransformPointY(X, Y);

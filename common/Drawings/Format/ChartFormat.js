@@ -334,7 +334,8 @@ CDLbl.prototype =
             _r = _rect.r - _body_pr.rIns;
             _b = _rect.b - _body_pr.bIns;
         }
-        else {
+        else
+        {
             _l = _body_pr.lIns;
             _t = _body_pr.tIns;
             _r = this.extX - _body_pr.rIns;
@@ -964,7 +965,7 @@ CDLbl.prototype =
                     }
                 }
             }
-            max_width += 2;
+            max_width += 1;
             content.Reset(0, 0, max_width, 20000);
             content.Recalculate_Page(0, true);
 
@@ -1064,6 +1065,11 @@ CDLbl.prototype =
 
         if(dLbl.idx != null)
             this.setIdx(dLbl.idx);
+        
+        if(dLbl.layout != null)
+        {
+            this.setLayout(dLbl.layout.createDuplicate());
+        }
 
         if(dLbl.numFmt != null)
             this.setNumFmt(dLbl.numFmt);
@@ -1148,31 +1154,9 @@ CDLbl.prototype =
         this.x = x;
         this.y = y;
 
-        if(this.layout && this.layout.manualLayout)
-        {
-            if(typeof this.layout.manualLayout.x === "number")
-            {
-                this.calcX = this.chart.extX*this.layout.x + this.x;
-            }
-            else
-            {
-                this.calcX = this.x;
-            }
-            if(typeof this.layout.manualLayout.y === "number")
-            {
-                this.calcY = this.chart.extY*this.layout.y + this.y;
-            }
-            else
-            {
-                this.calcY = this.y;
-            }
-        }
-        else
-        {
+    
             this.calcX = this.x;
             this.calcY = this.y;
-        }
-
 
         this.localTransform.Reset();
         global_MatrixTransformer.TranslateAppend(this.localTransform, this.calcX, this.calcY);
@@ -1202,30 +1186,8 @@ CDLbl.prototype =
         this.x = x;
         this.y = y;
 
-        if(this.layout && this.layout.manualLayout)
-        {
-            if(typeof this.layout.manualLayout.x === "number")
-            {
-                this.calcX = this.chart.extX*this.layout.x + this.x;
-            }
-            else
-            {
-                this.calcX = this.x;
-            }
-            if(typeof this.layout.manualLayout.y === "number")
-            {
-                this.calcY = this.chart.extY*this.layout.y + this.y;
-            }
-            else
-            {
-                this.calcY = this.y;
-            }
-        }
-        else
-        {
-            this.calcX = this.x;
-            this.calcY = this.y;
-        }
+        this.calcX = this.x;
+        this.calcY = this.y;
 
 
 
@@ -23278,12 +23240,12 @@ CTitle.prototype =
                     var hdr_ftr = para_drawing.DocumentContent.Is_HdrFtr(true);
                     if(hdr_ftr)
                     {
-                        hdr_ftr.Content.CurPos.Type = docpostype_DrawingObjects;
+                        hdr_ftr.Content.Set_DocPosType(docpostype_DrawingObjects);
                         hdr_ftr.Set_CurrentElement(bUpdate);
                     }
                     else
                     {
-                        drawing_objects.document.CurPos.Type = docpostype_DrawingObjects;
+                        drawing_objects.document.Set_DocPosType(docpostype_DrawingObjects);
                     }
                 }
             }
@@ -23404,6 +23366,10 @@ CTitle.prototype =
 
     getDocContent: function()
     {
+        if(this.recalcInfo.recalculateTxBody){
+            AscFormat.ExecuteNoHistory(this.recalculateTxBody, this, []);
+            this.recalcInfo.recalculateTxBody = false;
+        }
         if(this.txBody && this.txBody.content)
         {
             return this.txBody.content;
@@ -25720,7 +25686,7 @@ function CreateTextBodyFromString(str, drawingDocument, parent)
 
 function CreateDocContentFromString(str, drawingDocument, parent)
 {
-    var content = new CDocumentContent(parent, drawingDocument, 0, 0, 0, 0, false, false, true);
+    var content = new AscFormat.CDrawingDocContent(parent, drawingDocument, 0, 0, 0, 0, false, false, true);
     AddToContentFromString(content, str);
     return content;
 }

@@ -286,7 +286,7 @@ CChartsDrawer.prototype =
 	
 	
 	//****positions text labels****
-	reCalculatePositionText : function(type, chartSpace, ser, val)
+	reCalculatePositionText : function(type, chartSpace, ser, val, bLayout)
 	{
 		var pos;
 		
@@ -296,7 +296,7 @@ CChartsDrawer.prototype =
 			{
 				case "dlbl":
 				{
-					pos = this._calculatePositionDlbl(chartSpace, ser, val);
+					pos = this._calculatePositionDlbl(chartSpace, ser, val, bLayout);
 					break;
 				}
 				case "title":
@@ -330,9 +330,9 @@ CChartsDrawer.prototype =
 		return {x: pos ? pos.x : undefined, y : pos ? pos.y : undefined};
 	},
 	
-	_calculatePositionDlbl: function(chartSpace, ser, val)
+	_calculatePositionDlbl: function(chartSpace, ser, val, bLayout)
 	{	
-		return this.chart._calculateDLbl(chartSpace, ser, val);
+		return this.chart._calculateDLbl(chartSpace, ser, val, bLayout);
 	},
 	
 	_calculatePositionTitle: function(chartSpace)
@@ -554,33 +554,41 @@ CChartsDrawer.prototype =
 		//KEY
 		if(chartSpace.chart.legend && !chartSpace.chart.legend.overlay)
 		{
+			var fLegendExtX = chartSpace.chart.legend.extX;
+			var fLegendExtY = chartSpace.chart.legend.extY;
+			if(chartSpace.chart.legend.layout){
+				if(AscFormat.isRealNumber(chartSpace.chart.legend.naturalWidth) && AscFormat.isRealNumber(chartSpace.chart.legend.naturalHeight)){
+					fLegendExtX = chartSpace.chart.legend.naturalWidth;
+					fLegendExtY = chartSpace.chart.legend.naturalHeight;
+				}
+			}
 			switch ( chartSpace.chart.legend.legendPos )
 			{
 				case c_oAscChartLegendShowSettings.left:
 				case c_oAscChartLegendShowSettings.leftOverlay:
 				{
-					leftKey += chartSpace.chart.legend.extX;
+					leftKey += fLegendExtX;
 					break;
 				}
 				case c_oAscChartLegendShowSettings.top:
 				{
-					topKey += chartSpace.chart.legend.extY;
+					topKey += fLegendExtY
 					break;
 				}
 				case c_oAscChartLegendShowSettings.right:
 				case c_oAscChartLegendShowSettings.rightOverlay:
 				{
-					rightKey += chartSpace.chart.legend.extX;
+					rightKey += fLegendExtX;
 					break;
 				}
 				case c_oAscChartLegendShowSettings.bottom:
 				{
-					bottomKey += chartSpace.chart.legend.extY;
+					bottomKey += fLegendExtY;
 					break;
 				}
 				case c_oAscChartLegendShowSettings.topRight:
 				{
-					rightKey += chartSpace.chart.legend.extX;
+					rightKey += fLegendExtX;
 					break;
 				}
 			}
@@ -597,7 +605,25 @@ CChartsDrawer.prototype =
 		this.calcProp.chartGutter._right = calculateRight ? calculateRight * pxToMM : right * pxToMM;
 		this.calcProp.chartGutter._top = calculateTop ? calculateTop * pxToMM : top * pxToMM;
 		this.calcProp.chartGutter._bottom = calculateBottom ? calculateBottom * pxToMM : bottom * pxToMM;
-		
+
+        if(chartSpace.chart.plotArea.chart.getObjectType() == AscDFH.historyitem_type_PieChart){
+            if(chartSpace.chart.plotArea.layout){
+                var oLayout = chartSpace.chart.plotArea.layout;
+                this.calcProp.chartGutter._left = chartSpace.calculatePosByLayout(this.calcProp.chartGutter._left/pxToMM, oLayout.xMode, oLayout.x,
+                    (this.calcProp.chartGutter._right - this.calcProp.chartGutter._left)/pxToMM, chartSpace.extX)*pxToMM;
+                this.calcProp.chartGutter._top = chartSpace.calculatePosByLayout(this.calcProp.chartGutter._top/pxToMM, oLayout.yMode, oLayout.y,
+                    (this.calcProp.chartGutter._bottom - this.calcProp.chartGutter._top)/pxToMM, chartSpace.extY)*pxToMM;
+                var fWidthPlotArea = chartSpace.calculateSizeByLayout(this.calcProp.chartGutter._left/pxToMM, chartSpace.extX, oLayout.w, oLayout.wMode );
+                if(fWidthPlotArea > 0){
+                    this.calcProp.chartGutter._right = chartSpace.extX*pxToMM - (this.calcProp.chartGutter._left + fWidthPlotArea*pxToMM);
+                }
+                var fHeightPlotArea = chartSpace.calculateSizeByLayout(this.calcProp.chartGutter._top/pxToMM, chartSpace.extY, oLayout.h, oLayout.hMode );
+                if(fHeightPlotArea > 0){
+                    this.calcProp.chartGutter._bottom = chartSpace.extY*pxToMM - (this.calcProp.chartGutter._top + fHeightPlotArea*pxToMM);
+                }
+            }
+        }
+
 		this._checkMargins();
 	},
 	
@@ -724,7 +750,8 @@ CChartsDrawer.prototype =
 				}
 			}
 		}
-		
+
+
 		return {calculateLeft: calculateLeft, calculateRight : calculateRight, calculateTop: calculateTop, calculateBottom: calculateBottom};
 	},
 	
@@ -1213,7 +1240,7 @@ CChartsDrawer.prototype =
 				numSeries++;
 			}
 		}
-		else
+		else //point(scatter) chart
 		{
 			var yVal;
 			var xVal;
@@ -1226,39 +1253,68 @@ CChartsDrawer.prototype =
 				if(!yNumCache)
 					continue;
 				
-				for(var j = 0; j < yNumCache.pts.length; ++j)
+				for(var j = 0; j < yNumCache.ptCount; ++j)
 				{
-					yVal = parseFloat(yNumCache.pts[j].val);
-					
-					xNumCache = series[l].xVal && series[l].xVal.numRef ? series[l].xVal.numRef.numCache : series[l].xVal && series[l].xVal.numLit ? series[l].xVal.numLit : null;
-					if(xNumCache && xNumCache.pts[j])
+					if(yNumCache.pts[j])
 					{
-						if(!isNaN(parseFloat(xNumCache.pts[j].val)))
-							xVal = parseFloat(xNumCache.pts[j].val);
+						yVal = parseFloat(yNumCache.pts[j].val);
+					
+						xNumCache = series[l].xVal && series[l].xVal.numRef ? series[l].xVal.numRef.numCache : series[l].xVal && series[l].xVal.numLit ? series[l].xVal.numLit : null;
+						if(xNumCache && xNumCache.pts[j])
+						{
+							if(!isNaN(parseFloat(xNumCache.pts[j].val)))
+								xVal = parseFloat(xNumCache.pts[j].val);
+							else
+								xVal = j + 1;
+						}
 						else
 							xVal = j + 1;
+						
+						newArr[l][j] = [xVal, yVal];
+						
+						if(l == 0 && j == 0)
+						{
+							min = xVal;
+							max = xVal;
+							minY = yVal;
+							maxY = yVal;
+						}
+						
+						if(xVal < min)
+							min = xVal;
+						if(xVal > max)
+							max = xVal;
+						if(yVal < minY)
+							minY = yVal;
+						if(yVal > maxY)
+							maxY = yVal;
 					}
 					else
-						xVal = j + 1;
-					
-					newArr[l][j] = [xVal, yVal];
-					
-					if(l == 0 && j == 0)
 					{
-						min = xVal;
-						max = xVal;
-						minY = yVal;
-						maxY = yVal;
+						xNumCache = series[l].xVal && series[l].xVal.numRef ? series[l].xVal.numRef.numCache : series[l].xVal && series[l].xVal.numLit ? series[l].xVal.numLit : null;
+						if(xNumCache && xNumCache.pts[j])
+						{
+							if(!isNaN(parseFloat(xNumCache.pts[j].val)))
+								xVal = parseFloat(xNumCache.pts[j].val);
+							else
+								xVal = j + 1;
+						}
+						else
+							xVal = j + 1;
+						
+						if(l == 0 && j == 0)
+						{
+							min = xVal;
+							max = xVal;
+							
+						}
+						
+						if(xVal < min)
+							min = xVal;
+						if(xVal > max)
+							max = xVal;
 					}
 					
-					if(xVal < min)
-						min = xVal;
-					if(xVal > max)
-						max = xVal;
-					if(yVal < minY)
-						minY = yVal;
-					if(yVal > maxY)
-						maxY = yVal;
 				}
 			}
 			this.calcProp.ymin = minY;
@@ -2168,9 +2224,9 @@ CChartsDrawer.prototype =
 		this.processor3D.correctPointsPosition(chartSpace);
 	},
 	
-	_convertAndTurnPoint: function(x, y, z)
+	_convertAndTurnPoint: function(x, y, z, isNProject)
 	{
-		return this.processor3D.convertAndTurnPoint(x, y, z);
+		return this.processor3D.convertAndTurnPoint(x, y, z, isNProject);
 	},
 
 	//position of catAx labels(left or right) - returns false(left of axis)/true(right of axis) or null(standard position)
@@ -5955,13 +6011,19 @@ drawHBarChart.prototype =
 		//соответствует подписям оси значений(OY)
 		var yPoints = this.cChartSpace.chart.plotArea.catAx.yPoints;
 		
-		var xaxispos      = this.chartProp.xaxispos;
+		var xaxispos       = this.chartProp.xaxispos;
 		var heightGraph    = this.chartProp.heightCanvas - this.chartProp.chartGutter._top - this.chartProp.chartGutter._bottom;
 		
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
 		var overlap        = this.cChartSpace.chart.plotArea.chart.overlap ? this.cChartSpace.chart.plotArea.chart.overlap : defaultOverlap;
 		var ptCount        = this.cChartDrawer.getPtCount(this.chartProp.series);
         var height         = heightGraph / ptCount;
+		var crossBetween   = this.cChartSpace.getValAxisCrossType();
+		
+		if(crossBetween)
+		{
+			height = heightGraph / (ptCount - 1);
+		}
 		
 		var gapWidth = this.cChartSpace.chart.plotArea.chart.gapWidth ? this.cChartSpace.chart.plotArea.chart.gapWidth : 150;
 		
@@ -5984,11 +6046,14 @@ drawHBarChart.prototype =
 			DiffGapDepth = perspectiveDepth * (gapDepth / 2) / 100;
 		}		
 		
-		for (var i = 0; i < this.chartProp.series.length; i++) {
+		for (var i = 0; i < this.chartProp.series.length; i++) 
+		{
 			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : this.chartProp.series[i].val.numLit;
 			
 			if(!numCache || this.chartProp.series[i].isHidden)
+			{
 				continue;
+			}
 			
 			seria = this.chartProp.series[i].val.numRef.numCache.pts;
 			seriesHeight[i] = [];
@@ -5996,8 +6061,8 @@ drawHBarChart.prototype =
 			
 			var isValMoreZero = false;
 			var isValLessZero = 0;
-			for (var j = 0; j < seria.length; j++) {
-				
+			for (var j = 0; j < seria.length; j++) 
+			{			
 				//стартовая позиция колонки Y(+ высота с учётом поправок на накопительные диаграммы)
 				val = parseFloat(seria[j].val);
 				
@@ -6017,8 +6082,6 @@ drawHBarChart.prototype =
 
 				seriesHeight[i][idx] = startXColumnPosition.width;
 				
-				
-
 				
 				//стартовая позиция колонки Y
 				if(this.cChartSpace.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
@@ -6051,17 +6114,18 @@ drawHBarChart.prototype =
 					else
 						startY = startYPosition * this.chartProp.pxToMM + hmargin + (seriesCounter * individualBarHeight - seriesCounter * widthOverLap);
 				}
-				
-				
 
 				newStartY = startY;
 				if(this.cChartSpace.chart.plotArea.catAx.scaling.orientation != ORIENTATION_MIN_MAX)
-						newStartY = startY + individualBarHeight;
-				
+				{
+					newStartY = startY + individualBarHeight;
+				}
 				
 				newStartX = startX;
 				if(this.cChartSpace.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX && (this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked"))
+				{
 					newStartX = startX - width;
+				}
 				
 				if(this.cChartDrawer.nDimensionCount === 3)
 				{
@@ -6090,25 +6154,198 @@ drawHBarChart.prototype =
 					point7 = this.cChartDrawer._convertAndTurnPoint(x7, y7, z7);
 					point8 = this.cChartDrawer._convertAndTurnPoint(x8, y8, z8);
 					
+					//не проецируем на плоскость
+					var point11 = this.cChartDrawer._convertAndTurnPoint(x1, y1, z1, true);
+					var point22 = this.cChartDrawer._convertAndTurnPoint(x2, y2, z2, true);
+					var point33 = this.cChartDrawer._convertAndTurnPoint(x3, y3, z3, true);
+					var point44 = this.cChartDrawer._convertAndTurnPoint(x4, y4, z4, true);
+					var point55 = this.cChartDrawer._convertAndTurnPoint(x5, y5, z5, true);
+					var point66 = this.cChartDrawer._convertAndTurnPoint(x6, y6, z6, true);
+					var point77 = this.cChartDrawer._convertAndTurnPoint(x7, y7, z7, true);
+					var point88 = this.cChartDrawer._convertAndTurnPoint(x8, y8, z8, true);
+					
 					paths = this.cChartDrawer.calculateRect3D(point1, point2, point3, point4, point5, point6, point7, point8, val);
 					
 					//расскомментируем, чтобы включить старую схему отрисовки(+ переименовать функции _DrawBars3D -> _DrawBars3D2)
 					//this.sortZIndexPaths.push({seria: i, point: idx, paths: paths, x: point1.x, y: point1.y, zIndex: point1.z});
 					
 					//width = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
-					var controlPoint1 = this.cChartDrawer._convertAndTurnPoint(x5 + width / 2, y5 - individualBarHeight / 2, z5);
-					var controlPoint2 = this.cChartDrawer._convertAndTurnPoint(x5 + width / 2, y5, z5 + perspectiveDepth / 2);
+					
+					
+					//TODO delete after unused code
+					var calculateDistance = function(point1, point2)
+					{
+						var res = Math.sqrt(Math.pow(point2.x - point1.x , 2) + Math.pow(point2.y - point1.y , 2) + Math.pow(point2.z - point1.z , 2));
+						return res;
+					};
+					
+					var getMinPoint = function(point1, point2, point3, point4)
+					{
+						var arrPoints = [point1, point2, point3, point4];
+						
+						var minPoint = null;
+						for(var i = 0; i < arrPoints.length; i++)
+						{
+							if(null === minPoint)
+							{
+								minPoint = arrPoints[i];
+							}
+							else
+							{
+								if(arrPoints[i].z > minPoint.z)
+								{
+									minPoint = arrPoints[i];
+								}
+							}
+						}
+						
+						return minPoint;
+					};
+					
+					
+					var getMidPoint = function(point1, point2, point3, point4)
+					{
+						var res = (point1.z + point2.z + point3.z ) / 3;
+						
+						return res;
+					};
+					
+					var widthScreen = this.chartProp.widthCanvas - this.chartProp.chartGutter._right;
+					var centralViewPoint = {x: widthScreen / 2, y: heightGraph + this.chartProp.chartGutter._bottom, z: 0};
+					
+					//уравнение плоскости
+					var getPlainEquation2 = function(point1, point2, point3, point4)
+					{
+						var x0 = point1.x, y0 = point1.y, z0 = point1.z;
+						var x1 = point2.x, y1 = point2.y, z1 = point2.z;
+						var x2 = point3.x, y1 = point3.y, z1 = point3.z;
+						
+						
+						var tempA = ((y1 - y0) * (z2 - z0) - (y2 - y0) * (z1 - z0));
+						var tempB = ((x1 - x0) * (z2 - z0) - (x2 - x0) * (z1 - z0));
+						var tempC = ((x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0));
+						
+						/*(x - x0) * tempA - (y - y0) * tempB  + (z - z0) * tempC = 0;
+						x * tempA - x0 * tempA - y * tempB + y0 * tempB + z * tempC - z0 * tempC = 0;
+						x * tempA - y * tempB + z * tempC + (y0 * tempB - x0 * tempA - z0 * tempC)*/
+						
+						var a = tempA;
+						var b = tempB;
+						var c = tempC;
+						var d = y0 * tempB - x0 * tempA - z0 * tempC;
+						
+						
+						var test1 = a * point1.x + b * point1.y + c * point1.z + d;
+						var test2 = a * point2.x + b * point2.y + c * point2.z + d
+						var test3 = a * point3.x + b * point3.y + c * point3.z + d
+						var test4 = a * point4.x + b * point4.y + c * point4.z + d
+						
+
+						return {a: a, b: b, c: c, d: d};
+					};	
+					
+					//уравнение плоскости
+					var getPlainEquation = function(point1, point2, point3, point4)
+					{
+						var x1 = point1.x, y1 = point1.y, z1 = point1.z;
+						var x2 = point2.x, y2 = point2.y, z2 = point2.z;
+						var x3 = point3.x, y3 = point3.y, z3 = point3.z;
+						
+						var x21 = x2 - x1;
+						var y21 = y2 - y1;
+						var z21 = z2 - z1;
+						
+						var x31 = x3 - x1;
+						var y31 = y3 - y1;
+						var z31 = z3 - z1;
+						
+						/*
+							
+						(x - x1)*(y21 * z31 - x21 * y31) - (y - y1)*(x21 * z31 - z21 * x31) + (z - z1)(x21 * y31 - y21 * x31) 
+						
+						*/
+						
+						var tempA = y21 * z31 - z21 * y31;
+						
+						var tempB = x21 * z31 - z21 * x31;
+						
+						var tempC = x21 * y31 - y21 * x31;
+						
+						/*(x - x1)*(tempA) - (y - y1)*(tempB) + (z - z1)(tempC)
+						
+						x * tempA - x1 * tempA - y * tempB + y1 * tempB + z * tempC - z1 * tempC*/
+						
+						var a = tempA;
+						var b = tempB;
+						var c = tempC;
+						var d =  y1 * tempB - x1 * tempA - z1 * tempC;
+							
+						return {a: a, b: b, c: c, d: d};
+					};					
+						
+						
+					
+					var plainEquation1 = getPlainEquation(point11, point44, point88, point55);
+					var plainEquation2 = getPlainEquation(point11, point22, point33, point44);
+					var plainEquation3 = getPlainEquation(point11, point22, point66, point55);
+					var plainEquation4 = getPlainEquation(point44, point88, point77, point33);
+					var plainEquation5 = getPlainEquation(point55, point66, point77, point88);
+					var plainEquation6 = getPlainEquation(point66, point22, point33, point77);
+					var plainEquations = [plainEquation1, plainEquation2, plainEquation3, plainEquation4, plainEquation5, plainEquation6];
+					
+					
+					var tempWidth = width /*< 0 ? -50 : 50*/;
+					var controlPoint1 = this.cChartDrawer._convertAndTurnPoint(x5 + tempWidth / 2, y5 - individualBarHeight / 2, z5);
+					var controlPoint2 = this.cChartDrawer._convertAndTurnPoint(x5 + tempWidth / 2, y5, z5 + perspectiveDepth / 2);
 					var controlPoint3 = this.cChartDrawer._convertAndTurnPoint(x5, y5 - individualBarHeight / 2, z5 + perspectiveDepth / 2);
 					var controlPoint4 = this.cChartDrawer._convertAndTurnPoint(x8, y8 - individualBarHeight / 2, z8 + perspectiveDepth / 2);
-					var controlPoint5 = this.cChartDrawer._convertAndTurnPoint(x1 + width / 2 , y1, z1 + perspectiveDepth / 2);
-					var controlPoint6 = this.cChartDrawer._convertAndTurnPoint(x6 + width / 2 , y6 - individualBarHeight / 2, z6);
+					var controlPoint5 = this.cChartDrawer._convertAndTurnPoint(x1 + tempWidth / 2 , y1, z1 + perspectiveDepth / 2);
+					var controlPoint6 = this.cChartDrawer._convertAndTurnPoint(x6 + tempWidth / 2 , y6 - individualBarHeight / 2, z6);
 					
+					var distance0 = calculateDistance(centralViewPoint, controlPoint1);
+					var distance1 = calculateDistance(centralViewPoint, controlPoint2);
+					var distance2 = calculateDistance(centralViewPoint, controlPoint3);
+					var distance3 = calculateDistance(centralViewPoint, controlPoint4);
+					var distance4 = calculateDistance(centralViewPoint, controlPoint5);
+					var distance5 = calculateDistance(centralViewPoint, controlPoint6);
+					
+					
+					var midPoint0 = getMidPoint(point1, point4, point8, point5);
+					var midPoint1 = getMidPoint(point1, point2, point3, point4);
+					var midPoint2 = getMidPoint(point1, point2, point6, point5);
+					var midPoint3 = getMidPoint(point4, point8, point7, point3);
+					var midPoint4 = getMidPoint(point5, point6, point7, point8);
+					var midPoint5 = getMidPoint(point6, point2, point3, point7);
+					var midPaths = [midPoint0, midPoint1, midPoint2, midPoint3, midPoint4, midPoint5];
+						
+					
+					var testPoint0 = getMinPoint(point1, point4, point8, point5);
+					var testPoint1 = getMinPoint(point1, point2, point3, point4);
+					var testPoint2 = getMinPoint(point1, point2, point6, point5);
+					var testPoint3 = getMinPoint(point4, point8, point7, point3);
+					var testPoint4 = getMinPoint(point5, point6, point7, point8);
+					var testPoint5 = getMinPoint(point6, point2, point3, point7);
+					var testPaths = [testPoint0, testPoint1, testPoint2, testPoint3, testPoint4, testPoint5];
+					
+					
+					
+					var arrPoints = [[point1, point4, point8, point5], [point1, point2, point3, point4], [point1, point2, point6, point5], [point4, point8, point7, point3], [point5, point6, point7, point8], [point6, point2, point3, point7]];
+					
+					var arrPoints2 = [[point11, point44, point88, point55], [point11, point22, point33, point44], [point11, point22, point66, point55], [point44, point88, point77, point33], [point55, point66, point77, point88], [point66, point22, point33, point77]];
 					
 					var sortPaths = [controlPoint1, controlPoint2, controlPoint3, controlPoint4, controlPoint5, controlPoint6];
 					
+					var distancePaths = [distance0, distance1, distance2, distance3, distance4, distance5];
+					
 					for(var k = 0; k < paths.length; k++)
 					{
-						this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], x: sortPaths[k].x, y: sortPaths[k].y, zIndex: sortPaths[k].z});
+						if(null === paths[k])
+							continue;
+						var zIndex = midPaths[k];
+						
+						
+						
+						this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], x: sortPaths[k].x, y: sortPaths[k].y, zIndex: zIndex, points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquations[k]});
 					}
 				}
 				else
@@ -6132,15 +6369,353 @@ drawHBarChart.prototype =
 		
 		if(this.cChartDrawer.nDimensionCount === 3)
 		{
-			this.sortZIndexPaths.sort (function sortArr(a, b)
-			{
-				if(b.zIndex == a.zIndex)
-					return  a.x - b.x;
-				else
-					return  b.zIndex - a.zIndex;
-			});
+			this._sort3DVerges();
 		}
     },
+	
+	_sort3DVerges: function()
+	{
+		var heightGraph    = this.chartProp.heightCanvas - this.chartProp.chartGutter._top - this.chartProp.chartGutter._bottom;
+		var widthScreen = this.chartProp.widthCanvas - this.chartProp.chartGutter._right;
+		var centralViewPoint = {x: widthScreen / 2 - this.cChartDrawer.processor3D.cameraDiffX, y: heightGraph / 2 + this.chartProp.chartGutter._bottom, z: -this.cChartDrawer.processor3D.cameraDiffZ};
+		
+		var firstVerges = [];
+		var lastVerges = [];
+		
+		
+		//уравнение плоскости
+		var getLineEquation = function(point1, point2)
+		{
+			var x0 = point1.x, y0 = point1.y, z0 = point1.z;
+			var x1 = point2.x, y1 = point2.y, z1 = point2.z;
+			
+			
+			/*x - x0 	 =  	y - y0 	 =  	z - z0
+			x1 - x0 			y1 - y0 		z1 - z0
+			
+				l 					m 				n
+			*/
+			
+			var l = x1 - x0;
+			var m = y1 - y0;
+			var n = z1 - z0;
+			
+			//check line
+			var x123 = (point1.x - x0) / (x1 - x0);
+			var y123 = (point1.y - y0) / (y1 - y0);
+			var z123 = (point1.z - z0) / (z1 - z0);
+			
+			var x321 = (point2.x - x0) / (x1 - x0);
+			var y321 = (point2.y - y0) / (y1 - y0);
+			var z321 = (point2.z - z0) / (z1 - z0);
+			
+			
+			
+			return {l: l, m: m, n: n, x1: x0, y1: y0, z1: z0};
+		};
+		
+		//уравнение плоскости
+		var isIntersectionPlainAndLine = function(plainEquation, lineEquation)
+		{
+			var A = plainEquation.a;
+			var B = plainEquation.b;
+			var C = plainEquation.c;
+			var D = plainEquation.d;
+			
+			var l = lineEquation.l;
+			var m = lineEquation.m;
+			var n = lineEquation.n;
+			var x1 = lineEquation.x1;
+			var y1 = lineEquation.y1;
+			var z1 = lineEquation.z1;
+			
+			
+			//x - x1		y - y1		z - z1
+			//			=			=			t
+			//  l			  m		 	  n
+			
+			/*x = t * l + x1
+			y = t * m + y1
+			z = t * n + z1*/
+			
+			
+			/*A * x + B * y + C * z + D = 0
+			
+			A * (t * l + x1) + B * (t * m + y1) + C * (t * n + z1) + D = 0;
+			
+			A * t * l + A * x1 + B * t * m + B * y1 + C * t * n + C * z1 + D
+			
+			A * t * l + B * t * m + C * t * n       + A * x1 + B * y1 + C * z1 + D*/
+			
+			var t = -(A * x1 + B * y1 + C * z1 + D) / (A * l + B * m + C * n); 
+			
+			var x = t * l + x1;
+			var y = t * m + y1;
+			var z = t * n + z1;
+			
+			return {x: x, y: y, z: z};
+		};
+		
+		
+		var getEquationLineOnPlane =  function(point1, point2)
+		{
+			var x1 = point1.x;
+			var y1 = point1.y;
+			
+			var x2 = point2.x;
+			var y2 = point2.y;
+			
+			/*
+			
+			(x-xa) * (yb - ya) = (y - ya) * (xb - xa)
+			
+			x * yb - x * ya - xa * yb + xa * ya = y * xb - y * xa - ya * xb + ya * xa
+			
+			y * xb - y * xa = x * yb - x * ya - xa * yb + xa * ya - ya * xa + ya * xb
+			
+			var tempKY = xb - xa;
+			var tempKX = yb - ya;
+			var tempC = - xa * yb + xa * ya - ya * xa + ya * xb;
+			
+			y * tempKY = tempKX * x + tempC
+			
+			var a = tempKX / tempKY;
+			var b = tempC / tempKY;
+			
+			var a = (y1 - y2) / (x1 - x2);
+			var b = y2 - a * x2;
+			*/
+			
+			
+			var tempKY = x2 - x1;
+			var tempKX = y2 - y1;
+			var tempC = - x1 * y2 + x1 * y1 - y1 * x1 + y1 * x2;
+			
+			if(tempKY === 0)
+			{
+				var a = 0;
+				var b = x1;
+			}
+			else
+			{
+				var a = tempKX / tempKY;
+				var b = tempC / tempKY;
+			}
+			
+
+			/*var a = (y1 - y2) / (x1 - x2);
+			
+			if(x1 - x2 === 0)
+			{
+				a = 0;
+			}
+			
+			var b = y2 - a * x2;*/
+			
+			return {a: a, b: b};
+		};
+		
+		var getMinMaxPoints = function(points)
+		{
+			var minX, maxX, minY, maxY, minZ, maxZ;
+			
+			for(var n = 0; n < points.length; n++)
+			{
+				if(0 === n)
+				{
+					minX = points[0].x;
+					maxX = points[0].x;
+					minY = points[0].y;
+					maxY = points[0].y;
+					minZ = points[0].z;
+					maxZ = points[0].z;
+				}
+				else
+				{
+					if(points[n].x < minX)
+					{
+						minX = points[n].x;
+					}
+					
+					if(points[n].x > maxX)
+					{
+						maxX = points[n].x;
+					}
+					
+					if(points[n].y < minY)
+					{
+						minY = points[n].y;
+					}
+					
+					if(points[n].y > maxY)
+					{
+						maxY = points[n].y;
+					}
+					
+					if(points[n].z < minZ)
+					{
+						minZ = points[n].z;
+					}
+					
+					if(points[n].z > maxZ)
+					{
+						maxZ = points[n].z;
+					}
+				}
+			}
+			
+			return {minX: minX, maxX: maxX, minY : minY, maxY: maxY, minZ: minZ, maxZ: maxZ};
+		};
+		
+		var getAreaQuadrilateral = function(point0, point1, point2, point3)
+		{
+			//длины сторон
+			var a = Math.sqrt(Math.pow(point3.x - point0.x, 2) + Math.pow(point3.y - point0.y, 2));
+			var b = Math.sqrt(Math.pow(point1.x - point0.x, 2) + Math.pow(point1.x - point0.x, 2));
+			var c = Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.x - point1.x, 2));
+			var d = Math.sqrt(Math.pow(point3.x - point2.x, 2) + Math.pow(point3.x - point2.x, 2));
+			
+			//длины диагоналей
+			var e = Math.sqrt(Math.pow(point3.x - point1.x, 2) + Math.pow(point3.y - point1.y, 2));
+			var f = Math.sqrt(Math.pow(point0.x - point2.x, 2) + Math.pow(point0.y - point2.y, 2));
+			
+			//полупериметр
+			var p = (a + b + c + d) / 2;
+			
+			
+			var res = Math.sqrt((p - a) * (p - b) * (p - c) * (p - d) + (1/4) * ((e * f + a * c + b * d) * (e * f - a * c - b * d)));
+			
+			return res;
+		};
+		
+		var getAreaTriangle = function(point0, point1, point2)
+		{
+			//длины сторон
+			var a = Math.sqrt(Math.pow(point1.x - point0.x, 2) + Math.pow(point1.y - point0.y, 2));
+			var b = Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.x - point1.x, 2));
+			var c = Math.sqrt(Math.pow(point2.x - point0.x, 2) + Math.pow(point2.x - point0.x, 2));
+			
+			//полупериметр
+			var p = (a + b + c ) / 2;
+
+			var res = Math.sqrt(p * (p - a) * (p - b) * (p - c));
+			
+			return res;
+		};
+		
+		var t = this;
+		var isNotIntersectionVergesAndLine = function(lineEqucation, pointFromVerge)
+		{
+			var res = true;
+			
+			for(var k = 0; k < t.sortZIndexPaths.length; k++)
+			{
+				var plainEqucation = t.sortZIndexPaths[k].plainEquation;
+				
+				var nIntersectionPlainAndLine = isIntersectionPlainAndLine(plainEqucation ,lineEqucation);
+				if(null !== nIntersectionPlainAndLine && nIntersectionPlainAndLine.z < pointFromVerge.z)
+				{
+					var minMaxpoints = getMinMaxPoints(t.sortZIndexPaths[k].points2);
+					var minX = minMaxpoints.minX, maxX = minMaxpoints.maxX, minY = minMaxpoints.minY, maxY = minMaxpoints.maxY, minZ = minMaxpoints.minZ, maxZ = minMaxpoints.maxZ;
+					
+					
+					
+					//уравнения прямых, отсекающих плоскость
+					/*var line1 = getEquationLineOnPlane(t.sortZIndexPaths[k].points[0], t.sortZIndexPaths[k].points[1]);//left
+					var line2 = getEquationLineOnPlane(t.sortZIndexPaths[k].points[1], t.sortZIndexPaths[k].points[2]);//bottom
+					var line3 = getEquationLineOnPlane(t.sortZIndexPaths[k].points[2], t.sortZIndexPaths[k].points[3]);//right
+					var line4 = getEquationLineOnPlane(t.sortZIndexPaths[k].points[3], t.sortZIndexPaths[k].points[0]);//top*/
+					var convertnIntersectionPlainAndLine = t.cChartDrawer._convertAndTurnPoint(nIntersectionPlainAndLine.x, nIntersectionPlainAndLine.y, nIntersectionPlainAndLine.z, true);
+					var x = convertnIntersectionPlainAndLine.x;
+					var y = convertnIntersectionPlainAndLine.y;
+					
+					
+					if(x > minX && x < maxX && y > minY && y < maxY /*&& z > minZ && z < maxZ*/)
+					{
+						res = false;
+						break;
+						
+						
+						/*if(y < line2.a * x + line2.b && y > line4.a * x + line4.b && x > (y - line1.b) / line1.a && x < (y - line3.b) / line3.a)
+						{
+							res = false;
+							break;
+						}*/
+					}
+					
+					
+					
+					/*if(nIntersectionPlainAndLine.x > minX && nIntersectionPlainAndLine.x < maxX && nIntersectionPlainAndLine.y > minY && nIntersectionPlainAndLine.y < maxY && nIntersectionPlainAndLine.z > minZ && nIntersectionPlainAndLine.z < maxZ)
+					{
+						res = false;
+						break;
+					}*/
+					
+				}
+			}
+			
+			return res;
+		};
+		
+		var isIntersectionVergePointsLinesWithAnotherVerges = function(plainVerge, centralViewPoint)
+		{
+			var res = true;
+			
+			for(var j = 0; j < plainVerge.points.length; j++)
+			{
+				var pointFromVerge = plainVerge.points[j];
+				
+				//centralViewPoint.y = pointFromVerge.y;
+				centralViewPoint.x = pointFromVerge.x;
+				var lineEqucation = getLineEquation(pointFromVerge, centralViewPoint);
+				
+				//пересечение грани и прямой
+				var isFirstVerge = isNotIntersectionVergesAndLine(lineEqucation, pointFromVerge);
+				
+				if(false === isFirstVerge)
+				{
+					res = false;
+					break;
+				}
+			}
+			
+			return res;
+		};
+		
+		
+		
+		//перебираем все грани
+		for(var i = 0; i < this.sortZIndexPaths.length; i++)
+		{
+			var plainVerge = this.sortZIndexPaths[i];
+			var isFirstVerge = isIntersectionVergePointsLinesWithAnotherVerges(plainVerge, centralViewPoint);
+			
+			//push into array
+			if(isFirstVerge)
+			{
+				firstVerges.push(this.sortZIndexPaths[i]);
+			}
+			else
+			{
+				lastVerges.push(this.sortZIndexPaths[i]);
+			}
+		}
+
+		this.sortZIndexPaths = lastVerges.concat(firstVerges);
+		
+		
+		
+		
+		
+		
+		/*this.sortZIndexPaths.sort(function sortArr(a, b)
+		{
+			if(b.zIndex == a.zIndex)
+				return  a.x - b.x;
+			else
+				return  b.zIndex - a.zIndex;
+		});*/
+	},
 	
 	_getOptionsForDrawing: function(ser, point, onlyLessNull)
 	{
@@ -7165,8 +7740,314 @@ drawPieChart.prototype =
 		
 		return {frontPath: null, upPath: upPath};	
 	},
-	
-	_calculateDLbl: function(chartSpace, ser, val)
+
+	_calculateBestFitPosition: function(fStartAngle, fSweepAngle, fRadius, fWidth, fHeight, fCenterX, fCenterY, bLayout){
+		var fStartAngle_ = fStartAngle;
+		var fEndAngle = fStartAngle + fSweepAngle;
+        if(bLayout){
+            return this._calculateBestFitPositionOuter(fStartAngle_, fEndAngle, fRadius, fWidth, fHeight, fCenterX, fCenterY);
+        }
+		var oRet = this._calculateBestFitPositionInner(fStartAngle_, fEndAngle, fRadius, fWidth, fHeight, fCenterX, fCenterY);
+        if(!oRet.bError){
+            if(AscFormat.fCheckBoxIntersectionSegment(oRet.fX, oRet.fY, fWidth, fHeight, fCenterX, fCenterY, fCenterX + fRadius*Math.cos(fStartAngle_), fCenterY + fRadius*Math.sin(fStartAngle_))
+                || AscFormat.fCheckBoxIntersectionSegment(oRet.fX, oRet.fY, fWidth, fHeight, fCenterX, fCenterY, fCenterX + fRadius*Math.cos(fEndAngle), fCenterY + fRadius*Math.sin(fEndAngle))){
+                oRet.bError = true;
+            }
+        }
+		if(oRet.bError){
+			return this._calculateBestFitPositionOuter(fStartAngle_, fEndAngle, fRadius, fWidth, fHeight, fCenterX, fCenterY);
+		}
+		return oRet;
+	},
+
+	_calculateBestFitPositionInner: function(fStartAngle, fEndAngle, fPieRadius, fLabelWidth, fLabelHeight, fCenterX, fCenterY){
+		var oResult = {bError: true};
+		var fBisectAngle = AscFormat.normalizeRotate((fStartAngle + fEndAngle)/2.0);
+		
+		if(AscFormat.fApproxEqual(fBisectAngle, 0) || AscFormat.fApproxEqual(fBisectAngle, Math.PI/2) || AscFormat.fApproxEqual(fBisectAngle, Math.PI) || AscFormat.fApproxEqual(fBisectAngle, 3*Math.PI/2)){
+			return this._calculateInEndDLblPosition(fStartAngle, fStartAngle + fEndAngle, fPieRadius, fLabelWidth, fLabelHeight, fCenterX, fCenterY);
+		}
+		var fBisectAngle2 = AscFormat.normalizeRotate(fBisectAngle + Math.PI/4) - Math.PI/4; 
+		var nIndexArea = ((fBisectAngle2 + Math.PI/4)/(Math.PI/2)) >> 0;
+				
+		
+		var fLengthCoeff =  ((fBisectAngle2 + Math.PI/4) - (Math.PI/2)*nIndexArea)/(Math.PI/2);		
+				
+		var fXs = fCenterX + fPieRadius*Math.cos(fBisectAngle);
+		var fYs = fCenterY + fPieRadius*Math.sin(fBisectAngle);
+		var fDeltaX, fDeltaY, oSolvation;
+
+        switch(nIndexArea){
+            case 0:{
+                if(fBisectAngle2 < 0){
+                    fDeltaX = fLabelWidth;
+                    fDeltaY = -(1 - fLengthCoeff)*fLabelHeight;
+                }
+                else{
+                    fDeltaX = fLabelWidth;
+                    fDeltaY = fLabelHeight*fLengthCoeff;
+                }
+                oSolvation = AscFormat.fSolveQuadraticEquation(fPieRadius*fPieRadius, 2*(fDeltaX*(fXs - fCenterX) + fDeltaY*(fYs - fCenterY)), fDeltaX*fDeltaX + fDeltaY*fDeltaY - fPieRadius*fPieRadius);
+                if(!oSolvation.bError){
+                    if(oSolvation.x1 > 0 && oSolvation.x1 < 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX);
+                        oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY) - (1 - fLengthCoeff)*fLabelHeight;
+                    }
+                    else if(oSolvation.x2 > 0 && oSolvation.x2 < 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX);
+                        oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - (1 - fLengthCoeff)*fLabelHeight;
+                    }
+                }
+                break;
+            }
+            case 1:{
+                if(fBisectAngle < Math.PI/2){
+                    fDeltaX = (1 - fLengthCoeff)*fLabelWidth;
+                    fDeltaY = fLabelHeight;
+                }
+                else{
+                    fDeltaX = - fLengthCoeff*fLabelWidth;
+                    fDeltaY = fLabelHeight;
+                }
+                oSolvation = AscFormat.fSolveQuadraticEquation(fPieRadius*fPieRadius, 2*(fDeltaX*(fXs - fCenterX) + fDeltaY*(fYs - fCenterY)), fDeltaX*fDeltaX + fDeltaY*fDeltaY - fPieRadius*fPieRadius);
+                if(!oSolvation.bError){
+                    if(oSolvation.x1 > 0 && oSolvation.x1 < 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX) - fLabelWidth*fLengthCoeff;
+                        oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY);
+                    }
+                    else if(oSolvation.x2 > 0 && oSolvation.x2 < 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - fLabelWidth*fLengthCoeff;
+                        oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY);
+                    }
+                }
+                break;
+            }
+            case 2:{
+                if(fBisectAngle < Math.PI){
+                    fDeltaX = -fLabelWidth;
+                    fDeltaY = (1 - fLengthCoeff)*fLabelHeight;
+                }
+                else{
+                    fDeltaX = -fLabelWidth;
+                    fDeltaY = - fLengthCoeff*fLabelHeight;
+                }
+                oSolvation = AscFormat.fSolveQuadraticEquation(fPieRadius*fPieRadius, 2*(fDeltaX*(fXs - fCenterX) + fDeltaY*(fYs - fCenterY)), fDeltaX*fDeltaX + fDeltaY*fDeltaY - fPieRadius*fPieRadius);
+                if(!oSolvation.bError){
+                    if(oSolvation.x1 > 0 && oSolvation.x1 < 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX) - fLabelWidth;
+                        oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY) - fLabelHeight*fLengthCoeff;
+
+                    }
+                    else if(oSolvation.x2 > 0 && oSolvation.x2 < 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - fLabelWidth;
+                        oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - fLabelHeight*fLengthCoeff;
+                    }
+                }
+                break;
+            }
+            case 3:{
+                fLengthCoeff = 1 - fLengthCoeff;
+                if(fBisectAngle < 3*Math.PI/2){
+                    fDeltaX = -fLabelWidth*fLengthCoeff;
+                    fDeltaY = -fLabelHeight;
+                }
+                else{
+                    fDeltaX = (1 - fLengthCoeff)*fLabelWidth;
+                    fDeltaY = -fLabelHeight;
+                }
+                oSolvation = AscFormat.fSolveQuadraticEquation(fPieRadius*fPieRadius, 2*(fDeltaX*(fXs - fCenterX) + fDeltaY*(fYs - fCenterY)), fDeltaX*fDeltaX + fDeltaY*fDeltaY - fPieRadius*fPieRadius);
+                if(!oSolvation.bError){
+                    if(oSolvation.x1 > 0 && oSolvation.x1 < 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX) - fLabelWidth*fLengthCoeff;
+                        oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY) - fLabelHeight;
+                    }
+                    else if(oSolvation.x2 > 0 && oSolvation.x2 < 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - fLabelWidth*fLengthCoeff;
+                        oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - fLabelHeight;
+                    }
+                }
+                break;
+            }
+        }
+		return oResult;
+	},
+
+	_calculateBestFitPositionOuter: function(fStartAngle, fEndAngle, fPieRadius, fLabelWidth, fLabelHeight, fCenterX, fCenterY){
+        var oResult = {bError: true};
+        var fBisectAngle = AscFormat.normalizeRotate((fStartAngle + fEndAngle)/2.0);
+        var fBisectAngle2 = AscFormat.normalizeRotate(fBisectAngle + Math.PI/4) - Math.PI/4;
+        var nIndexArea = ((fBisectAngle2 + Math.PI/4)/(Math.PI/2)) >> 0;
+
+
+        var fLengthCoeff =  ((fBisectAngle2 + Math.PI/4) - (Math.PI/2)*nIndexArea)/(Math.PI/2);
+
+        var fXs = fCenterX + fPieRadius*Math.cos(fBisectAngle);
+        var fYs = fCenterY + fPieRadius*Math.sin(fBisectAngle);
+        var fDeltaX, fDeltaY, oSolvation;
+
+        var fAngleApproxDelta = 1e-4;
+        switch(nIndexArea){
+            case 0:{
+                if(AscFormat.fApproxEqual(fBisectAngle2, 0, fAngleApproxDelta)){
+                    fDeltaX = 0;
+                    fDeltaY = 0;
+                }
+                else if(fBisectAngle2 < 0){
+                    fDeltaX = 0;
+                    fDeltaY = fLengthCoeff*fLabelHeight;
+                }
+                else{
+                    fDeltaX = 0;
+                    fDeltaY = -(1 - fLengthCoeff)*fLabelHeight;
+                }
+                oSolvation = AscFormat.fSolveQuadraticEquation(fPieRadius*fPieRadius, 2*(fDeltaX*(fXs - fCenterX) + fDeltaY*(fYs - fCenterY)), fDeltaX*fDeltaX + fDeltaY*fDeltaY - fPieRadius*fPieRadius);
+                if(!oSolvation.bError){
+                    if(oSolvation.x1 >= 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX);
+                        oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY) - (1 - fLengthCoeff)*fLabelHeight;
+                    }
+                    else if(oSolvation.x2 >= 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX);
+                        oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - (1 - fLengthCoeff)*fLabelHeight;
+                    }
+                }
+                break;
+            }
+            case 1:{
+                if(AscFormat.fApproxEqual(fBisectAngle, Math.PI/2, fAngleApproxDelta)){
+                    fDeltaX = 0;
+                    fDeltaY = 0;
+                }
+                else if(fBisectAngle < Math.PI/2){
+                    fDeltaX = -fLengthCoeff*fLabelWidth;
+                    fDeltaY = 0;
+                }
+                else{
+                    fDeltaX = (1 - fLengthCoeff)*fLabelWidth;
+                    fDeltaY = 0;
+                }
+                oSolvation = AscFormat.fSolveQuadraticEquation(fPieRadius*fPieRadius, 2*(fDeltaX*(fXs - fCenterX) + fDeltaY*(fYs - fCenterY)), fDeltaX*fDeltaX + fDeltaY*fDeltaY - fPieRadius*fPieRadius);
+                if(!oSolvation.bError){
+                    if(oSolvation.x1 >= 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX) - fLabelWidth*fLengthCoeff;
+                        oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY);
+                    }
+                    else if(oSolvation.x2 >= 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - fLabelWidth*fLengthCoeff;
+                        oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY);
+                    }
+                }
+                break;
+            }
+            case 2:{
+                if(AscFormat.fApproxEqual(fBisectAngle, Math.PI, fAngleApproxDelta)){
+                    fDeltaX = 0;
+                    fDeltaY = 0;
+                }
+                else if(fBisectAngle < Math.PI){
+                    fDeltaX = 0;
+                    fDeltaY = -fLengthCoeff*fLabelHeight;
+                }
+                else{
+                    fDeltaX = 0;
+                    fDeltaY = (1 - fLengthCoeff)*fLabelHeight;
+                }
+                oSolvation = AscFormat.fSolveQuadraticEquation(fPieRadius*fPieRadius, 2*(fDeltaX*(fXs - fCenterX) + fDeltaY*(fYs - fCenterY)), fDeltaX*fDeltaX + fDeltaY*fDeltaY - fPieRadius*fPieRadius);
+                if(!oSolvation.bError){
+                    if(oSolvation.x1 >= 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX) - fLabelWidth;
+                        oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY) - fLabelHeight*fLengthCoeff;
+
+                    }
+                    else if(oSolvation.x2 >= 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - fLabelWidth;
+                        oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - fLabelHeight*fLengthCoeff;
+                    }
+                }
+                break;
+            }
+            case 3:{
+                if(fBisectAngle < 3*Math.PI/2){
+                    fDeltaX = fLabelWidth*fLengthCoeff;
+                    fDeltaY = 0;
+                }
+                else{
+                    fDeltaX = -(1 - fLengthCoeff)*fLabelWidth;
+                    fDeltaY = 0;
+                }
+                oSolvation = AscFormat.fSolveQuadraticEquation(fPieRadius*fPieRadius, 2*(fDeltaX*(fXs - fCenterX) + fDeltaY*(fYs - fCenterY)), fDeltaX*fDeltaX + fDeltaY*fDeltaY - fPieRadius*fPieRadius);
+                if(!oSolvation.bError){
+                    if(oSolvation.x1 >= 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX) - (1 - fLengthCoeff)*fLabelWidth;
+                        oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY) - fLabelHeight;
+                    }
+                    else if(oSolvation.x2 >= 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - (1 - fLengthCoeff)*fLabelWidth;
+                        oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - fLabelHeight;
+                    }
+                }
+                break;
+            }
+        }
+        return oResult;
+	},
+
+    _calculateInEndDLblPosition: function(fStartAngle, fSweepAngle, fPieRadius, fLabelWidth, fLabelHeight, fCenterX, fCenterY){
+        var fEndAngle = fStartAngle + fSweepAngle;
+        var oResult = {bError: true, fX: 0.0, fY: 0.0};
+        var fBisectAngle = AscFormat.normalizeRotate((fStartAngle + fEndAngle)/2);
+        var nQuadrantIndex = (2.0*fBisectAngle/Math.PI) >> 0;
+        var fHalfRectWidthVector = fLabelWidth/ 2, fHalfRectHeightVector = fLabelHeight/2;
+        if(nQuadrantIndex === 1 || nQuadrantIndex == 2){
+            fHalfRectWidthVector = -fHalfRectWidthVector;
+        }
+        if(nQuadrantIndex === 2 || nQuadrantIndex == 3){
+            fHalfRectHeightVector = -fHalfRectHeightVector;
+        }
+
+        var fXs = fCenterX + fPieRadius*Math.cos(fBisectAngle), fYs = fCenterY + fPieRadius*Math.sin(fBisectAngle);
+        var a = fPieRadius*fPieRadius, b = 2*( (fXs - fCenterX)*fHalfRectWidthVector + (fYs - fCenterY)*fHalfRectHeightVector), c = fHalfRectWidthVector*fHalfRectWidthVector + fHalfRectHeightVector*fHalfRectHeightVector - fPieRadius*fPieRadius;
+        var oSolution = AscFormat.fSolveQuadraticEquation(a, b, c);
+		if(oSolution.bError){
+			return oResult;
+		}
+		var D = b*b - 4*a*c;
+        if(D < 0){
+            return oResult;
+        }
+        var t1 = oSolution.x1, t2 = oSolution.x2;
+        if(t1 > 0 && t1 < 1){
+            oResult.bError = false;
+            oResult.fX = fCenterX + t1*(fXs - fCenterX) - fLabelWidth/2;
+            oResult.fY = fCenterY + t1*(fYs - fCenterY) - fLabelHeight/2;
+            return oResult
+        }
+        if(t2 > 0 && t2 < 1){
+            oResult.bError = false;
+            oResult.fX = fCenterX + t2*(fXs - fCenterX) - fLabelWidth/2;
+            oResult.fY = fCenterY + t2*(fYs - fCenterY) - fLabelHeight/2;
+            return oResult
+        }
+        return oResult;
+    },
+
+	_calculateDLbl: function(chartSpace, ser, val, bLayout)
 	{
 		var pxToMm = this.chartProp.pxToMM;
 		
@@ -7174,9 +8055,19 @@ drawPieChart.prototype =
 		if(!this.paths.series[val])
 			return;
 		
-		var path
+		var path;
 		if(this.cChartDrawer.nDimensionCount === 3)
-			path = this.paths.series[this.paths.series.length - 1][val].ArrPathCommand;
+		{
+			//TODO переделать на idx
+			if(!this.paths.series[this.paths.series.length - 1][val])
+			{
+				return;
+			}
+			else
+			{
+				path = this.paths.series[this.paths.series.length - 1][val].ArrPathCommand;
+			}
+		}
 		else
 			path = this.paths.series[val].ArrPathCommand;
 		
@@ -7218,8 +8109,15 @@ drawPieChart.prototype =
 		{
 			case c_oAscChartDataLabelsPos.bestFit:
 			{
-				centerX = centerX + (radius / 2) * Math.cos(-1 * stAng - swAng / 2) - width / 2;
-				centerY = centerY - (radius / 2) * Math.sin(-1 * stAng - swAng / 2) - height / 2;
+				var oPos = this._calculateBestFitPosition(stAng, swAng, radius, width, height, centerX, centerY, bLayout);
+				if(!oPos.bError){
+					centerX = oPos.fX;
+					centerY = oPos.fY;
+				}
+				else{
+					centerX = centerX + (radius / 2) * Math.cos(-1 * stAng - swAng / 2) - width / 2;
+					centerY = centerY - (radius / 2) * Math.sin(-1 * stAng - swAng / 2) - height / 2;
+				}
 				break;
 			}
 			case c_oAscChartDataLabelsPos.ctr:
@@ -7236,6 +8134,12 @@ drawPieChart.prototype =
 			}
 			case c_oAscChartDataLabelsPos.inEnd:
 			{
+                var oPos = this._calculateInEndDLblPosition(stAng, swAng, radius, width, height, centerX, centerY);
+                if(!oPos.bError){
+                    centerX = oPos.fX;
+                    centerY = oPos.fY;
+                    break;
+                }
 				tempCenterX = centerX + (radius) * Math.cos(-1 * stAng - swAng / 2);
 				tempCenterY = centerY - (radius) * Math.sin(-1 * stAng - swAng / 2);
 				
@@ -7439,7 +8343,6 @@ drawPieChart.prototype =
 		
 		stAng = this.angleFor3D;
 		
-		console.log("swAng: " + swAng);
 		
 		//корректируем центр
 		yCenter = yCenter - depth / 2;
@@ -9427,16 +10330,16 @@ gridChart.prototype =
 			var rAngAx = this.cChartDrawer.processor3D.view3D.rAngAx;
 			var isVertLine = x === x1 ? true : false;
 			
-			var convertResult = this.cChartDrawer._convertAndTurnPoint(x, y, 0, angleOx, angleOy, angleOz);
+			var convertResult = this.cChartDrawer._convertAndTurnPoint(x, y, 0);
 			var x1n = convertResult.x;
 			var y1n = convertResult.y;
-			convertResult = this.cChartDrawer._convertAndTurnPoint(x, y, perspectiveDepth, angleOx, angleOy, angleOz);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(x, y, perspectiveDepth);
 			var x2n = convertResult.x;
 			var y2n = convertResult.y;
-			convertResult = this.cChartDrawer._convertAndTurnPoint(x1, y1, perspectiveDepth, angleOx, angleOy, angleOz);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(x1, y1, perspectiveDepth);
 			var x3n = convertResult.x;
 			var y3n = convertResult.y;
-			convertResult = this.cChartDrawer._convertAndTurnPoint(x1, y1, 0, angleOx, angleOy, angleOz);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(x1, y1, 0);
 			var x4n = convertResult.x;
 			var y4n = convertResult.y;
 			
@@ -10921,19 +11824,19 @@ areaChart.prototype =
 		var angleOz = 0;
 		
 		
-		var convertResult = this.cChartDrawer._convertAndTurnPoint(leftMargin, heightGraph - bottomMargin, perspectiveDepth, angleOx, angleOy, angleOz);
+		var convertResult = this.cChartDrawer._convertAndTurnPoint(leftMargin, heightGraph - bottomMargin, perspectiveDepth);
 		var x1n = convertResult.x;
 		var y1n = convertResult.y;
-		convertResult = this.cChartDrawer._convertAndTurnPoint(widthGraph - rightMargin, heightGraph - bottomMargin, perspectiveDepth, angleOx, angleOy, angleOz);
+		convertResult = this.cChartDrawer._convertAndTurnPoint(widthGraph - rightMargin, heightGraph - bottomMargin, perspectiveDepth);
 		var x2n = convertResult.x;
 		var y2n = convertResult.y;
-		convertResult = this.cChartDrawer._convertAndTurnPoint(widthGraph - rightMargin, topMargin, perspectiveDepth, angleOx, angleOy, angleOz);
+		convertResult = this.cChartDrawer._convertAndTurnPoint(widthGraph - rightMargin, topMargin, perspectiveDepth);
 		var x3n = convertResult.x;
 		var y3n = convertResult.y;
-		convertResult = this.cChartDrawer._convertAndTurnPoint(leftMargin, topMargin, perspectiveDepth, angleOx, angleOy, angleOz);
+		convertResult = this.cChartDrawer._convertAndTurnPoint(leftMargin, topMargin, perspectiveDepth);
 		var x4n = convertResult.x;
 		var y4n = convertResult.y;
-		convertResult = this.cChartDrawer._convertAndTurnPoint(leftMargin, heightGraph - bottomMargin, perspectiveDepth, angleOx, angleOy, angleOz);
+		convertResult = this.cChartDrawer._convertAndTurnPoint(leftMargin, heightGraph - bottomMargin, perspectiveDepth);
 		var x5n = convertResult.x;
 		var y5n = convertResult.y;
 

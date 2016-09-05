@@ -372,12 +372,12 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_SelectedElementsInfo = f
     else if (false === Selection.Use && this.Content[this.State.ContentPos].Get_SelectedElementsInfo)
         this.Content[this.State.ContentPos].Get_SelectedElementsInfo(Info);
 };
-CParagraphContentWithParagraphLikeContent.prototype.Get_SelectedText = function(bAll, bClearText)
+CParagraphContentWithParagraphLikeContent.prototype.Get_SelectedText = function(bAll, bClearText, oPr)
 {
     var Str = "";
     for (var Pos = 0, Count = this.Content.length; Pos < Count; Pos++)
     {
-        var _Str = this.Content[Pos].Get_SelectedText(bAll, bClearText);
+        var _Str = this.Content[Pos].Get_SelectedText(bAll, bClearText, oPr);
 
         if (null === _Str)
             return null;
@@ -2568,6 +2568,17 @@ CParagraphContentWithParagraphLikeContent.prototype.private_UpdateTrackRevisions
         var RevisionsManager = this.Paragraph.LogicDocument.Get_TrackRevisionsManager();
         RevisionsManager.Check_Paragraph(this.Paragraph);
     }
+};
+CParagraphContentWithParagraphLikeContent.prototype.Get_FootnotesList = function(oEngine)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Content[nIndex].Get_FootnotesList)
+			this.Content[nIndex].Get_FootnotesList(oEngine);
+
+		if (oEngine.IsRangeFull())
+			return;
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые должны быть реализованы в классах наследниках

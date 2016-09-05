@@ -146,6 +146,9 @@
         "../word/Editor/Document.js",
         "../word/Editor/DocumentContent.js",
 		"../word/Editor/DocumentControllerBase.js",
+		"../word/Editor/LogicDocumentController.js",
+		"../word/Editor/DrawingsController.js",
+		"../word/Editor/HeaderFooterController.js",		
         "../word/Editor/HeaderFooter.js",
         "../word/Editor/Math.js",
         "../word/Editor/Spelling.js",
@@ -160,8 +163,12 @@
         "../slide/apiCommon.js",
         "../word/apiCommon.js",
 		
+		"../word/apiBuilder.js",
+		"../slide/apiBuilder.js",
 		"../common/clipboard_base.js",
+		"../common/text_input.js",
 		"../common/Drawings/Format/OleObject.js",
+		"../common/Drawings/Format/DrawingContent.js",
 		"../common/plugins.js"
       ],
       "private": [

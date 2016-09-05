@@ -292,7 +292,7 @@ CGraphicObjects.prototype =
     createTextArt: DrawingObjectsController.prototype.createTextArt,
     getChartObject: DrawingObjectsController.prototype.getChartObject,
     getChartSpace2: DrawingObjectsController.prototype.getChartSpace2,
-
+    CreateDocContent: DrawingObjectsController.prototype.CreateDocContent,
 
     getAllBoundsRectOnPageForMath: function(nPageIndex)
     {
@@ -1138,11 +1138,11 @@ CGraphicObjects.prototype =
 
     addShapeOnPage: function(sPreset, nPageIndex, dX, dY, dExtX, dExtY)
     {
-        if ( docpostype_HdrFtr !== this.document.CurPos.Type || null !== this.document.HdrFtr.CurHdrFtr )
+        if ( docpostype_HdrFtr !== this.document.Get_DocPosType() || null !== this.document.HdrFtr.CurHdrFtr )
         {
-            if (docpostype_HdrFtr !== this.document.CurPos.Type)
+            if (docpostype_HdrFtr !== this.document.Get_DocPosType())
             {
-                this.document.CurPos.Type     = docpostype_DrawingObjects;
+                this.document.Set_DocPosType(docpostype_DrawingObjects);
                 this.document.Selection.Use   = true;
                 this.document.Selection.Start = true;
             }
@@ -1154,7 +1154,7 @@ CGraphicObjects.prototype =
                 var CurHdrFtr = this.document.HdrFtr.CurHdrFtr;
                 var DocContent = CurHdrFtr.Content;
 
-                DocContent.CurPos.Type     = docpostype_DrawingObjects;
+                DocContent.Set_DocPosType(docpostype_DrawingObjects);
                 DocContent.Selection.Use   = true;
                 DocContent.Selection.Start = true;
             }
@@ -1961,12 +1961,12 @@ CGraphicObjects.prototype =
         }
     },
 
-    getSelectedText: function(bClearText)
+    getSelectedText: function(bClearText, oPr)
     {
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.Get_SelectedText(bClearText);
+            return content.Get_SelectedText(bClearText, oPr);
         }
         else
         {
@@ -3177,7 +3177,7 @@ CGraphicObjects.prototype =
     getLeftTopSelectedObjectByPage: function(pageIndex)
     {
         var oDrawingPage, oRes;
-        if(this.document.CurPos.Type === docpostype_HdrFtr)
+        if(this.document.Get_DocPosType(docpostype_HdrFtr))
         {
             if(this.graphicPages[pageIndex])
             {

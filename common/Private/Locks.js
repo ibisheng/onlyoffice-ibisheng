@@ -37,141 +37,156 @@ var changestype_Paragraph_Content = AscCommon.changestype_Paragraph_Content;
 
 if(typeof CDocument !== "undefined")
 {
-    CDocument.prototype.Document_Is_SelectionLocked = function(CheckType, AdditionalData, DontLockInFastMode)
-    {
-        if ( true === AscCommon.CollaborativeEditing.Get_GlobalLock() )
-            return true;
+	CDocument.prototype.Document_Is_SelectionLocked = function(CheckType, AdditionalData, DontLockInFastMode)
+	{
+		if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
+			return true;
 
-        AscCommon.CollaborativeEditing.OnStart_CheckLock();
+		AscCommon.CollaborativeEditing.OnStart_CheckLock();
 
-        this.private_DocumentIsSelectionLocked(CheckType);
+		this.private_DocumentIsSelectionLocked(CheckType);
 
-        if ( "undefined" != typeof(AdditionalData) && null != AdditionalData )
-        {
-            if ( AscCommon.changestype_2_InlineObjectMove === AdditionalData.Type )
-            {
-                var PageNum = AdditionalData.PageNum;
-                var X       = AdditionalData.X;
-                var Y       = AdditionalData.Y;
+		if ("undefined" != typeof(AdditionalData) && null != AdditionalData)
+		{
+			if (AscCommon.changestype_2_InlineObjectMove === AdditionalData.Type)
+			{
+				var PageNum = AdditionalData.PageNum;
+				var X       = AdditionalData.X;
+				var Y       = AdditionalData.Y;
 
-                var NearestPara = this.Get_NearestPos(PageNum, X, Y).Paragraph;
-                NearestPara.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content);
-            }
-            else if ( AscCommon.changestype_2_HdrFtr === AdditionalData.Type )
-            {
-                this.HdrFtr.Document_Is_SelectionLocked(AscCommon.changestype_HdrFtr);
-            }
-            else if ( AscCommon.changestype_2_Comment === AdditionalData.Type )
-            {
-                this.Comments.Document_Is_SelectionLocked( AdditionalData.Id );
-            }
-            else if ( AscCommon.changestype_2_Element_and_Type === AdditionalData.Type )
-            {
-                AdditionalData.Element.Document_Is_SelectionLocked( AdditionalData.CheckType, false );
-            }
-            else if ( AscCommon.changestype_2_ElementsArray_and_Type === AdditionalData.Type )
-            {
-                var Count = AdditionalData.Elements.length;
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    AdditionalData.Elements[Index].Document_Is_SelectionLocked( AdditionalData.CheckType, false );
-                }
-            }
-            else if (AscCommon.changestype_2_AdditionalTypes === AdditionalData.Type)
-            {
-                var Count = AdditionalData.Types.length;
-                for (var Index = 0; Index < Count; ++Index)
-                {
-                    this.private_DocumentIsSelectionLocked(AdditionalData.Types[Index]);
-                }
-            }
-        }
+				var NearestPara = this.Get_NearestPos(PageNum, X, Y).Paragraph;
+				NearestPara.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content);
+			}
+			else if (AscCommon.changestype_2_HdrFtr === AdditionalData.Type)
+			{
+				this.HdrFtr.Document_Is_SelectionLocked(AscCommon.changestype_HdrFtr);
+			}
+			else if (AscCommon.changestype_2_Comment === AdditionalData.Type)
+			{
+				this.Comments.Document_Is_SelectionLocked(AdditionalData.Id);
+			}
+			else if (AscCommon.changestype_2_Element_and_Type === AdditionalData.Type)
+			{
+				AdditionalData.Element.Document_Is_SelectionLocked(AdditionalData.CheckType, false);
+			}
+			else if (AscCommon.changestype_2_ElementsArray_and_Type === AdditionalData.Type)
+			{
+				var Count = AdditionalData.Elements.length;
+				for (var Index = 0; Index < Count; Index++)
+				{
+					AdditionalData.Elements[Index].Document_Is_SelectionLocked(AdditionalData.CheckType, false);
+				}
+			}
+			else if (AscCommon.changestype_2_AdditionalTypes === AdditionalData.Type)
+			{
+				var Count = AdditionalData.Types.length;
+				for (var Index = 0; Index < Count; ++Index)
+				{
+					this.private_DocumentIsSelectionLocked(AdditionalData.Types[Index]);
+				}
+			}
+		}
 
-        var bResult = AscCommon.CollaborativeEditing.OnEnd_CheckLock(DontLockInFastMode);
+		var bResult = AscCommon.CollaborativeEditing.OnEnd_CheckLock(DontLockInFastMode);
 
-        if ( true === bResult )
-        {
-            this.Document_UpdateSelectionState();
-            this.Document_UpdateInterfaceState();
-            //this.Document_UpdateRulersState();
-        }
+		if (true === bResult)
+		{
+			this.Document_UpdateSelectionState();
+			this.Document_UpdateInterfaceState();
+			//this.Document_UpdateRulersState();
+		}
 
-        return bResult;
-    };
+		return bResult;
+	};
+	CDocument.prototype.private_DocumentIsSelectionLocked = function(CheckType)
+	{
+		if (AscCommon.changestype_None != CheckType)
+		{
+			if (AscCommon.changestype_Document_SectPr === CheckType)
+			{
+				this.Lock.Check(this.Get_Id());
+			}
+			else if (AscCommon.changestype_Document_Styles === CheckType)
+			{
+				this.Styles.Lock.Check(this.Styles.Get_Id());
+			}
+			else if (AscCommon.changestype_ColorScheme === CheckType)
+			{
+				this.DrawingObjects.Lock.Check(this.DrawingObjects.Get_Id());
+			}
+			else
+			{
+				this.Controller.IsSelectionLocked(CheckType);
+			}
+		}
+	};
+	CDocumentControllerBase.prototype.IsSelectionLocked  = function(CheckType)
+	{
+	};
+	CLogicDocumentController.prototype.IsSelectionLocked = function(CheckType)
+	{
+		this.LogicDocument.controller_IsSelectionLocked(CheckType);
+	};
+	CDocument.prototype.controller_IsSelectionLocked = function(CheckType)
+	{
+		switch (this.Selection.Flag)
+		{
+			case selectionflag_Common :
+			{
+				if (true === this.Selection.Use)
+				{
+					var StartPos = ( this.Selection.StartPos > this.Selection.EndPos ? this.Selection.EndPos : this.Selection.StartPos );
+					var EndPos   = ( this.Selection.StartPos > this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos );
 
-    CDocument.prototype.private_DocumentIsSelectionLocked = function(CheckType)
-    {
-        if ( AscCommon.changestype_None != CheckType )
-        {
-            if ( AscCommon.changestype_Document_SectPr === CheckType )
-            {
-                this.Lock.Check( this.Get_Id() );
-            }
-            else if (AscCommon.changestype_Document_Styles === CheckType)
-            {
-                this.Styles.Lock.Check(this.Styles.Get_Id());
-            }
-            else if(AscCommon.changestype_ColorScheme === CheckType )
-            {
-                this.DrawingObjects.Lock.Check( this.DrawingObjects.Get_Id());
-            }
-            else
-            {
-                if ( docpostype_HdrFtr === this.CurPos.Type )
-                {
-                    this.HdrFtr.Document_Is_SelectionLocked(CheckType);
-                }
-                else if ( docpostype_DrawingObjects == this.CurPos.Type )
-                {
-                    this.DrawingObjects.documentIsSelectionLocked(CheckType);
-                }
-                else if ( docpostype_Content == this.CurPos.Type )
-                {
-                    switch ( this.Selection.Flag )
-                    {
-                        case selectionflag_Common :
-                        {
-                            if ( true === this.Selection.Use )
-                            {
-                                var StartPos = ( this.Selection.StartPos > this.Selection.EndPos ? this.Selection.EndPos : this.Selection.StartPos );
-                                var EndPos   = ( this.Selection.StartPos > this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos );
+					if (StartPos != EndPos && AscCommon.changestype_Delete === CheckType)
+						CheckType = AscCommon.changestype_Remove;
 
-                                if ( StartPos != EndPos && AscCommon.changestype_Delete === CheckType )
-                                    CheckType = AscCommon.changestype_Remove;
+					for (var Index = StartPos; Index <= EndPos; Index++)
+						this.Content[Index].Document_Is_SelectionLocked(CheckType);
+				}
+				else
+				{
+					var CurElement = this.Content[this.CurPos.ContentPos];
 
-                                for ( var Index = StartPos; Index <= EndPos; Index++ )
-                                    this.Content[Index].Document_Is_SelectionLocked(CheckType);
-                            }
-                            else
-                            {
-                                var CurElement = this.Content[this.CurPos.ContentPos];
+					if (AscCommon.changestype_Document_Content_Add === CheckType && type_Paragraph === CurElement.GetType() && true === CurElement.Cursor_IsEnd())
+						AscCommon.CollaborativeEditing.Add_CheckLock(false);
+					else
+						this.Content[this.CurPos.ContentPos].Document_Is_SelectionLocked(CheckType);
+				}
 
-                                if ( AscCommon.changestype_Document_Content_Add === CheckType && type_Paragraph === CurElement.GetType() && true === CurElement.Cursor_IsEnd() )
-                                    AscCommon.CollaborativeEditing.Add_CheckLock(false);
-                                else
-                                    this.Content[this.CurPos.ContentPos].Document_Is_SelectionLocked(CheckType);
-                            }
+				break;
+			}
+			case selectionflag_Numbering:
+			{
+				var NumPr = this.Content[this.Selection.Data[0]].Numbering_Get();
+				if (null != NumPr)
+				{
+					var AbstrNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
+					AbstrNum.Document_Is_SelectionLocked(CheckType);
+				}
 
-                            break;
-                        }
-                        case selectionflag_Numbering:
-                        {
-                            var NumPr = this.Content[this.Selection.Data[0]].Numbering_Get();
-                            if ( null != NumPr )
-                            {
-                                var AbstrNum = this.Numbering.Get_AbstractNum( NumPr.NumId );
-                                AbstrNum.Document_Is_SelectionLocked(CheckType);
-                            }
+				this.Content[this.CurPos.ContentPos].Document_Is_SelectionLocked(CheckType);
 
-                            this.Content[this.CurPos.ContentPos].Document_Is_SelectionLocked(CheckType);
-
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    };
+				break;
+			}
+		}
+	};
+	CHdrFtrController.prototype.IsSelectionLocked = function(CheckType)
+	{
+		this.HdrFtr.Document_Is_SelectionLocked(CheckType);
+	};
+	CDrawingsController.prototype.IsSelectionLocked = function(CheckType)
+	{
+		this.DrawingObjects.documentIsSelectionLocked(CheckType);
+	};
+	CFootnotesController.prototype.IsSelectionLocked = function(CheckType)
+	{
+		for (var sId in this.Selection.Footnotes)
+		{
+			var oFootnote = this.Selection.Footnotes[sId];
+			oFootnote.Document_Is_SelectionLocked(CheckType);
+		}
+	};
 }
 
 if(typeof CHeaderFooterController !== "undefined")

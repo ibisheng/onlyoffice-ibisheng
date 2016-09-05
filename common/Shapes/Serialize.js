@@ -6008,48 +6008,32 @@ function BinaryPPTYLoader()
 			}
 		}
 
-		var bLoadVal = AscCommon.g_oIdCounter.m_bLoad;
-		var bRead = AscCommon.g_oIdCounter.m_bRead;
-		AscCommon.g_oIdCounter.m_bLoad = false;
-		AscCommon.g_oIdCounter.m_bRead = false;
-		
-        for(i = 0;  i < row.Content.length; ++i){
-			var oCell = row.Content[i];
-			var oMargins = oCell.Get_Margins();
-			if(oMargins.Bottom.W > fMaxBottomMargin){
-				fMaxBottomMargin = oMargins.Bottom.W;
-			}
-			if(oMargins.Top.W > fMaxTopMargin){
-				fMaxTopMargin = oMargins.Top.W;
-			}
-			var oBorders = oCell.Get_Borders();
-			if(oBorders.Top.Size > fMaxTopBorder){
-				fMaxTopBorder = oBorders.Top.Size;
-			}
-			if(oBorders.Bottom.Size > fMaxBottomBorder){
-				fMaxBottomBorder = oBorders.Bottom.Size;
-			}
-		}
-		AscCommon.g_oIdCounter.m_bLoad = bLoadVal;
-		AscCommon.g_oIdCounter.m_bRead = bRead;
-		 row.Set_Height(Math.max(1, fRowHeight - fMaxTopMargin - fMaxBottomMargin - fMaxTopBorder/2 - fMaxBottomBorder/2), Asc.linerule_AtLeast);
-		/*
-        if (row.Content.length == _count)
-        {
-            for (var i = 0; i < _count; i++)
-            {
-                s.Skip2(1);
-                var bIsNoHMerge = this.ReadCell(row.Content[i]);
-                if (bIsNoHMerge === false)
-                {
-                    row.Remove_Cell(i);
-                    i--;
-                    _count--;
+		if(this.presentation && Array.isArray(this.presentation.Slides)){
+            var bLoadVal = AscCommon.g_oIdCounter.m_bLoad;
+            var bRead = AscCommon.g_oIdCounter.m_bRead;
+            AscCommon.g_oIdCounter.m_bLoad = false;
+            AscCommon.g_oIdCounter.m_bRead = false;
+            for(i = 0;  i < row.Content.length; ++i){
+                var oCell = row.Content[i];
+                var oMargins = oCell.Get_Margins();
+                if(oMargins.Bottom.W > fMaxBottomMargin){
+                    fMaxBottomMargin = oMargins.Bottom.W;
+                }
+                if(oMargins.Top.W > fMaxTopMargin){
+                    fMaxTopMargin = oMargins.Top.W;
+                }
+                var oBorders = oCell.Get_Borders();
+                if(oBorders.Top.Size > fMaxTopBorder){
+                    fMaxTopBorder = oBorders.Top.Size;
+                }
+                if(oBorders.Bottom.Size > fMaxBottomBorder){
+                    fMaxBottomBorder = oBorders.Bottom.Size;
                 }
             }
+            AscCommon.g_oIdCounter.m_bLoad = bLoadVal;
+            AscCommon.g_oIdCounter.m_bRead = bRead;
+            row.Set_Height(Math.max(1, fRowHeight - fMaxTopMargin - fMaxBottomMargin - fMaxTopBorder/2 - fMaxBottomBorder/2), Asc.linerule_AtLeast);
         }
-        */
-
         s.Seek2(_end_rec);
     }
 
@@ -6965,7 +6949,7 @@ function BinaryPPTYLoader()
                 }
                 case 13:
                 {
-                    bodyPr.spcCol = s.GetLong();
+                    bodyPr.spcCol = s.GetLong()/36000;
                     break;
                 }
                 case 14:
@@ -7609,7 +7593,7 @@ function BinaryPPTYLoader()
                 {
                     s.Skip2(4);
                     var _c = s.GetULong();
-                    txbody.setContent(new CDocumentContent(txbody, this.presentation ? this.presentation.DrawingDocument : null, 0, 0, 0, 0, 0, 0, true));
+                    txbody.setContent(new AscFormat.CDrawingDocContent(txbody, this.presentation ? this.presentation.DrawingDocument : null, 0, 0, 0, 0, 0, 0, true));
                     if(_c>0)
                     {
                         txbody.content.Internal_Content_RemoveAll();
@@ -7712,7 +7696,7 @@ function BinaryPPTYLoader()
                      History.TurnOff();
                      }*/
                     if(!txbody.content)
-                        txbody.content = new CDocumentContent(shape, this.presentation ? this.presentation.DrawingDocument : null, 0, 0, 0, 0, 0, 0, true);
+                        txbody.content = new AscFormat.CDrawingDocContent(shape, this.presentation ? this.presentation.DrawingDocument : null, 0, 0, 0, 0, 0, 0, true);
                     if(_c>0)
                     {
                         txbody.content.Internal_Content_RemoveAll();
@@ -8760,26 +8744,6 @@ function CPres()
             shape.setParent(this.TempMainObject == null ? this.ParaDrawing : null);
             var _rec_start = s.cur;
             var _end_rec = _rec_start + s.GetULong() + 4;
-
-            s.Skip2(1); // start attributes
-
-            while (true)
-            {
-                var _at = s.GetUChar();
-                if (_at == AscCommon.g_nodeAttributeEnd)
-                    break;
-
-                switch (_at)
-                {
-                    case 0:
-                    {
-                        shape.attrUseBgFill = s.GetBool();
-                        break;
-                    }
-                    default:
-                        break;
-                }
-            }
 
             while (s.cur < _end_rec)
             {

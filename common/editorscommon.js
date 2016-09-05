@@ -354,8 +354,7 @@ function mapAscServerErrorToAscError(nServerError) {
 		case c_oAscServerError.ConvertDownload : nRes = Asc.c_oAscError.ID.DownloadError; break;
 		case c_oAscServerError.ConvertTimeout : nRes = Asc.c_oAscError.ID.ConvertationTimeout; break;
 		case c_oAscServerError.ConvertDRM :
-		case c_oAscServerError.ConvertPASSWORD :
-		case c_oAscServerError.ConvertMS_OFFCRYPTO : nRes = Asc.c_oAscError.ID.ConvertationPassword; break;
+		case c_oAscServerError.ConvertPASSWORD : nRes = Asc.c_oAscError.ID.ConvertationPassword; break;
 		case c_oAscServerError.ConvertCONVERT_CORRUPTED :
 		case c_oAscServerError.ConvertLIBREOFFICE :
 		case c_oAscServerError.ConvertPARAMS :
@@ -763,7 +762,6 @@ var c_oAscServerError = {
     ConvertUnknownFormat:-82,
     ConvertTimeout:-83,
     ConvertReadFile:-84,
-    ConvertMS_OFFCRYPTO:-85,
     ConvertCONVERT_CORRUPTED:-86,
     ConvertLIBREOFFICE:-87,
     ConvertPARAMS:-88,
@@ -1559,12 +1557,12 @@ parserHelper.prototype.parse3DRef = function ( formula ) {
 		var indexStartRange = formula.indexOf( "!" ) + 1;
 		if ( this.isArea( formula, indexStartRange ) ) {
 			if ( this.operand_str.length == formula.substring( indexStartRange ).length )
-				return {sheet:sheetName, range:this.operand_str};
+				return {sheet:sheetName, sheet2:is3DRefResult[2], range:this.operand_str};
 			else
 				return null;
 		} else if ( this.isRef( formula, indexStartRange ) ) {
 			if ( this.operand_str.length == formula.substring( indexStartRange ).length )
-				return {sheet:sheetName, range:this.operand_str};
+				return {sheet:sheetName, sheet2:is3DRefResult[2], range:this.operand_str};
 			else
 				return null;
 		}
@@ -2032,6 +2030,7 @@ CTableId.prototype.Read_Class_FromBinary = function(Reader)
         case AscDFH.historyitem_type_ParaRun                  : Element = new AscCommonWord.ParaRun(); break;
         case AscDFH.historyitem_type_Section                  : Element = new AscCommonWord.CSectionPr(); break;
         case AscDFH.historyitem_type_Field                    : Element = new AscCommonWord.ParaField(); break;
+		case AscDFH.historyitem_type_FootEndNote              : Element = new AscCommonWord.CFootEndnote(); break;
 
         case AscDFH.historyitem_type_DefaultShapeDefinition   : Element = new AscFormat.DefaultShapeDefinition(); break;
         case AscDFH.historyitem_type_CNvPr                    : Element = new AscFormat.CNvPr(); break;
@@ -2129,32 +2128,33 @@ CTableId.prototype.Read_Class_FromBinary = function(Reader)
         case AscDFH.historyitem_type_SerAx                    : Element = new AscFormat.CSerAx(); break;
         case AscDFH.historyitem_type_Title                    : Element = new AscFormat.CTitle(); break;
         case AscDFH.historyitem_type_OleObject                : Element = new AscFormat.COleObject(); break;
+        case AscDFH.historyitem_type_DrawingContent           : Element = new AscFormat.CDrawingDocContent(); break;
 
-        case AscDFH.historyitem_type_Math						: Element = new AscCommonWord.ParaMath(false); break;
-        case AscDFH.historyitem_type_MathContent				: Element = new AscCommonWord.CMathContent(); break;
-        case AscDFH.historyitem_type_acc						: Element = new AscCommonWord.CAccent(); break;
-        case AscDFH.historyitem_type_bar						: Element = new AscCommonWord.CBar(); break;
-        case AscDFH.historyitem_type_box						: Element = new AscCommonWord.CBox(); break;
-        case AscDFH.historyitem_type_borderBox					: Element = new AscCommonWord.CBorderBox(); break;
-        case AscDFH.historyitem_type_delimiter					: Element = new AscCommonWord.CDelimiter(); break;
-        case AscDFH.historyitem_type_eqArr						: Element = new AscCommonWord.CEqArray(); break;
-        case AscDFH.historyitem_type_frac                      : Element = new AscCommonWord.CFraction(); break;
-        case AscDFH.historyitem_type_mathFunc					: Element = new AscCommonWord.CMathFunc(); break;
-        case AscDFH.historyitem_type_groupChr					: Element = new AscCommonWord.CGroupCharacter(); break;
-        case AscDFH.historyitem_type_lim						: Element = new AscCommonWord.CLimit(); break;
-        case AscDFH.historyitem_type_matrix					: Element = new AscCommonWord.CMathMatrix(); break;
-        case AscDFH.historyitem_type_nary						: Element = new AscCommonWord.CNary(); break;
-        case AscDFH.historyitem_type_phant						: Element = new AscCommonWord.CPhantom(); break;
-        case AscDFH.historyitem_type_rad						: Element = new AscCommonWord.CRadical(); break;
-        case AscDFH.historyitem_type_deg_subsup				: Element = new AscCommonWord.CDegreeSubSup(); break;
-        case AscDFH.historyitem_type_deg						: Element = new AscCommonWord.CDegree(); break;
-        case AscDFH.historyitem_type_Slide                     : Element = new AscCommonSlide.Slide(); break;
-        case  AscDFH.historyitem_type_SlideLayout              : Element = new AscCommonSlide.SlideLayout(); break;
-        case  AscDFH.historyitem_type_SlideMaster              : Element = new AscCommonSlide.MasterSlide(); break;
-        case  AscDFH.historyitem_type_SlideComments            : Element = new AscCommonSlide.SlideComments(); break;
-        case  AscDFH.historyitem_type_PropLocker               : Element = new AscCommonSlide.PropLocker(); break;
-        case  AscDFH.historyitem_type_Theme                    : Element = new AscFormat.CTheme(); break;
-        case  AscDFH.historyitem_type_GraphicFrame             : Element = new AscFormat.CGraphicFrame(); break;
+        case AscDFH.historyitem_type_Math                     : Element = new AscCommonWord.ParaMath(false); break;
+        case AscDFH.historyitem_type_MathContent              : Element = new AscCommonWord.CMathContent(); break;
+        case AscDFH.historyitem_type_acc                      : Element = new AscCommonWord.CAccent(); break;
+        case AscDFH.historyitem_type_bar                      : Element = new AscCommonWord.CBar(); break;
+        case AscDFH.historyitem_type_box                      : Element = new AscCommonWord.CBox(); break;
+        case AscDFH.historyitem_type_borderBox                : Element = new AscCommonWord.CBorderBox(); break;
+        case AscDFH.historyitem_type_delimiter                : Element = new AscCommonWord.CDelimiter(); break;
+        case AscDFH.historyitem_type_eqArr	                  : Element = new AscCommonWord.CEqArray(); break;
+        case AscDFH.historyitem_type_frac                     : Element = new AscCommonWord.CFraction(); break;
+        case AscDFH.historyitem_type_mathFunc                 : Element = new AscCommonWord.CMathFunc(); break;
+        case AscDFH.historyitem_type_groupChr                 : Element = new AscCommonWord.CGroupCharacter(); break;
+        case AscDFH.historyitem_type_lim                      : Element = new AscCommonWord.CLimit(); break;
+        case AscDFH.historyitem_type_matrix                   : Element = new AscCommonWord.CMathMatrix(); break;
+        case AscDFH.historyitem_type_nary                     : Element = new AscCommonWord.CNary(); break;
+        case AscDFH.historyitem_type_phant                    : Element = new AscCommonWord.CPhantom(); break;
+        case AscDFH.historyitem_type_rad                      : Element = new AscCommonWord.CRadical(); break;
+        case AscDFH.historyitem_type_deg_subsup               : Element = new AscCommonWord.CDegreeSubSup(); break;
+        case AscDFH.historyitem_type_deg                      : Element = new AscCommonWord.CDegree(); break;
+        case AscDFH.historyitem_type_Slide                    : Element = new AscCommonSlide.Slide(); break;
+        case AscDFH.historyitem_type_SlideLayout              : Element = new AscCommonSlide.SlideLayout(); break;
+        case AscDFH.historyitem_type_SlideMaster              : Element = new AscCommonSlide.MasterSlide(); break;
+        case AscDFH.historyitem_type_SlideComments            : Element = new AscCommonSlide.SlideComments(); break;
+        case AscDFH.historyitem_type_PropLocker               : Element = new AscCommonSlide.PropLocker(); break;
+        case AscDFH.historyitem_type_Theme                    : Element = new AscFormat.CTheme(); break;
+        case AscDFH.historyitem_type_GraphicFrame             : Element = new AscFormat.CGraphicFrame(); break;
     }
 
     if ( null !== Element )

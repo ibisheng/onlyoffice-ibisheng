@@ -1107,7 +1107,7 @@ function CBinaryFileWriter()
         }
         else if (_timing.TransitionType == c_oAscSlideTransitionTypes.None)
         {
-            oThis._WriteInt1(2, 10);
+            oThis._WriteInt1(2, 2000);
         }
 
         if (_timing.TransitionType != c_oAscSlideTransitionTypes.None)
@@ -2057,7 +2057,7 @@ function CBinaryFileWriter()
         oThis._WriteInt4(10, bodyPr.rIns, 36000);
         oThis._WriteInt2(11, bodyPr.rot);
         oThis._WriteBool2(12, bodyPr.rtlCol);
-        oThis._WriteInt2(13, bodyPr.spcCol);
+        oThis._WriteInt4(13, bodyPr.spcCol, 36000);
         oThis._WriteBool2(14, bodyPr.spcFirstLastPara);
         oThis._WriteInt4(15, bodyPr.tIns, 36000);
         oThis._WriteBool2(16, bodyPr.upright);

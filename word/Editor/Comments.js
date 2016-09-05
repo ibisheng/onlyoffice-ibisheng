@@ -974,7 +974,7 @@ ParaComment.prototype =
     {
     },
 
-    Get_SelectedText : function(bAll, bClearText)
+    Get_SelectedText : function(bAll, bClearText, oPr)
     {        
         return "";
     },

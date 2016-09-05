@@ -117,6 +117,9 @@
         "../word/Editor/Document.js",
         "../word/Editor/DocumentContent.js",
 		"../word/Editor/DocumentControllerBase.js",		
+		"../word/Editor/LogicDocumentController.js",
+		"../word/Editor/DrawingsController.js",
+		"../word/Editor/HeaderFooterController.js",
         "../word/Editor/Common.js",
         "../word/Editor/Table.js",
         "../word/Editor/Table/TableRecalculate.js",
@@ -157,7 +160,9 @@
 		"../word/apiBuilder.js",
 		
 		"../common/clipboard_base.js",
+		"../common/text_input.js",
 		"../common/Drawings/Format/OleObject.js",
+		"../common/Drawings/Format/DrawingContent.js",
 		"../common/plugins.js"
       ],
       "private": [
@@ -179,10 +184,33 @@
 		]
       },
 	  "mobile_banners": {
-		  "min": [],
+		  "min": [
+          "../../web-apps/vendor/xregexp/xregexp-all-min.js",
+          "../../web-apps/vendor/underscore/underscore-min.js",
+          "../common/Native/native.js",
+          "../common/Native/Wrappers/memory.js",
+          "../common/Native/jquery_native.js"
+          ],
 		  "common": []
 	  },
-      "exclude_mobile": [],
+      "mobile": [    
+        "../common/Native/Wrappers/TextMeasurerWrapper.js",
+        "../common/Native/Wrappers/DrawingStream.js",
+        "../common/Native/Wrappers/ShapeDrawer.js",
+        "../common/Native/Wrappers/Overlay.js",
+        "../common/Native/Wrappers/DrawingDocument.js",
+        "../common/Native/Wrappers/api.js"
+      ],
+      "exclude_mobile": [
+        "../common/Overlay.js",
+        "../word/Drawing/ShapeDrawer.js",
+        "../word/Drawing/DrawingDocument.js", 
+        "../common/FontsFreeType/font_engine.js",
+        "../common/FontsFreeType/FontFile.js",
+        "../common/FontsFreeType/FontManager.js",
+        "../common/FontsFreeType/TextMeasurer.js",       
+        "../common/Scrolls/iscroll.js"
+      ],
       "dst": "../word",
       "externs": [
         "../common/Build/Externs.js",

@@ -6221,6 +6221,9 @@ Paragraph.prototype =
 
                     this.Selection.Use = true;
                     this.Set_SelectionContentPos( StartPos, EndPos );
+
+                    if (this.LogicDocument)
+                        this.LogicDocument.Set_WordSelection();
                 }
                 else // ( 1 == ClickCounter % 2 )
                 {
@@ -6278,11 +6281,6 @@ Paragraph.prototype =
         this.Selection.Flag     = selectionflag_Common;
         this.Selection.StartPos = 0;
         this.Selection.EndPos   = 0;
-        this.Selection_Clear();
-    },
-
-    Selection_Clear : function()
-    {
     },
 
     Selection_Draw_Page : function(CurPage)
@@ -6889,13 +6887,13 @@ Paragraph.prototype =
     },
 
     // Возвращаем выделенный текст
-    Get_SelectedText : function(bClearText)
+    Get_SelectedText : function(bClearText, oPr)
     {
         var Str = "";
         var Count = this.Content.length;        
         for ( var Pos = 0; Pos < Count; Pos++ )
         {
-            var _Str = this.Content[Pos].Get_SelectedText( true === this.ApplyToAll, bClearText );
+            var _Str = this.Content[Pos].Get_SelectedText( true === this.ApplyToAll, bClearText, oPr );
 
             if ( null === _Str )
                 return null;
@@ -7855,12 +7853,18 @@ Paragraph.prototype =
                     Pr.ParaPr.Spacing.After = 0;
                 }
             }
+			else if (true === this.Parent.Is_TableCellContent() && true === Pr.ParaPr.Spacing.AfterAutoSpacing)
+			{
+				Pr.ParaPr.Spacing.After = 0;
+			}
             else if(!(this.bFromDocument === true))
             {
                 Pr.ParaPr.Spacing.After = 0;
             }
             else
-                Pr.ParaPr.Spacing.After = this.Internal_CalculateAutoSpacing( Pr.ParaPr.Spacing.After, Pr.ParaPr.Spacing.AfterAutoSpacing, this );
+			{
+				Pr.ParaPr.Spacing.After = this.Internal_CalculateAutoSpacing(Pr.ParaPr.Spacing.After, Pr.ParaPr.Spacing.AfterAutoSpacing, this);
+			}
         }
 
         return Pr;
@@ -9568,7 +9572,7 @@ Paragraph.prototype =
         var Parent = this.Parent;
 
         Parent.Update_ContentIndexing();
-        if ( docpostype_Content === Parent.CurPos.Type && false === Parent.Selection.Use && this.Index === Parent.CurPos.ContentPos && Parent.Content[this.Index] === this )
+        if ( docpostype_Content === Parent.Get_DocPosType() && false === Parent.Selection.Use && this.Index === Parent.CurPos.ContentPos && Parent.Content[this.Index] === this )
             return this.Parent.Is_ThisElementCurrent();
 
         return false;
@@ -13994,7 +13998,17 @@ Paragraph.prototype.private_CompareBorderSettings = function(Pr1, Pr2)
 
 	return true;
 };
+Paragraph.prototype.Get_FootnotesList = function(oEngine)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Content[nIndex].Get_FootnotesList)
+			this.Content[nIndex].Get_FootnotesList(oEngine);
 
+		if (oEngine.IsRangeFull())
+			return;
+	}
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;
