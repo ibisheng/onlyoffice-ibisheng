@@ -104,6 +104,7 @@ var recalcresultflags_Footnotes         = 0x010000; // Сообщаем, что 
 // Типы которые возвращают классы CDocument и CDocumentContent после пересчета страницы
 var recalcresult2_End      = 0x00; // Документ рассчитан до конца
 var recalcresult2_NextPage = 0x01; // Рассчет нужно продолжить
+var recalcresult2_CurPage  = 0x02; // Нужно заново пересчитать данную страницу
 
 var document_EditingType_Common = 0x00; // Обычный режим редактирования
 var document_EditingType_Review = 0x01; // Режим рецензирования
@@ -11401,29 +11402,6 @@ CDocument.prototype.Goto_FootnotesOnPage = function(nPageIndex)
 
 
 	return true;
-};
-/**
- * Находим отрезок сносок, заданный между сносками.
- * @param {?CFootEndnote} oFirstFootnote - если null, то иещм с начала документа
- * @param {?CFootEndnote} oLastFootnote - если null, то ищем до конца документа
- */
-CDocument.prototype.Get_FootnotesList = function(oFirstFootnote, oLastFootnote)
-{
-	var oEngine = new CDocumentFootnotesRangeEngine();
-	oEngine.Init(oFirstFootnote, oLastFootnote);
-
-	var arrFootnotes = [];
-
-	var arrParagraphs = this.Get_AllParagraphs({OnlyMainDocument : true, All : true});
-	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
-	{
-		var oParagraph = arrParagraphs[nIndex];
-
-		if (true === oParagraph.Get_FootnotesList(oEngine))
-			return arrFootnotes;
-	}
-
-	return oEngine.GetRange();
 };
 CDocument.prototype.AddFootnote = function()
 {

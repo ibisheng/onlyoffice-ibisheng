@@ -348,7 +348,7 @@ Paragraph.prototype.Recalculate_FastRange = function(SimpleChanges)
  * Предыдущая страница ДОЛЖНА быть пересчитана, если задано не нулевое значение.
  * @returns {*} Возвращается результат пересчета
  */
-Paragraph.prototype.Recalculate_Page = function(PageIndex)
+Paragraph.prototype.Recalculate_Page = function(CurPage)
 {
     this.Clear_NearestPosArray();
 
@@ -360,7 +360,6 @@ Paragraph.prototype.Recalculate_Page = function(PageIndex)
 
     this.Internal_CheckSpelling();
 
-    var CurPage = PageIndex;
     var RecalcResult = this.private_RecalculatePage( CurPage );
 
     this.private_CheckColumnBreak(CurPage);
@@ -560,11 +559,7 @@ Paragraph.prototype.private_RecalculateFastRange       = function(CurRange, CurL
 Paragraph.prototype.private_RecalculatePage            = function(CurPage, bFirstRecalculate)
 {
     var PRS = this.m_oPRSW;
-
-    PRS.Page      = CurPage;
-
-    PRS.RunRecalcInfoLast  = (0 === CurPage ? null : this.Pages[CurPage - 1].EndInfo.RunRecalcInfo);
-    PRS.RunRecalcInfoBreak = PRS.RunRecalcInfoLast;
+	PRS.Reset_Page(this, CurPage);
 
     var Pr     = this.Get_CompiledPr();
     var ParaPr = Pr.ParaPr;
@@ -1348,11 +1343,9 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
 
     var RealCurPage = this.private_GetRelativePageIndex(CurPage) - this.Get_StartPage_Relative();
 
-	// TODO: Здесь надо бы ускорить эту проверку
-    
-    var oTopDocument = this.Parent.Get_TopDocumentContent();
+    var oTopDocument = PRS.TopDocument;
 	var bNoFootnotes = true;
-	if (oTopDocument instanceof CDocument && oTopDocument.Footnotes.GetHeight(this.Get_AbsolutePage(CurPage), this.Get_AbsoluteColumn(CurPage)) > 0.001)
+	if (oTopDocument instanceof CDocument && oTopDocument.Footnotes.GetHeight(PRS.PageAbs, PRS.ColumnAbs) > 0.001)
 		bNoFootnotes = false;
 
     // Сначала проверяем не нужно ли сделать перенос страницы в данном месте
@@ -1842,6 +1835,7 @@ Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, Cu
     if (!((PRS.RecalcResult & recalcresult_NextElement) || (PRS.RecalcResult & recalcresult_NextLine)))
         return false;
 
+	var oTopDocument = PRS.TopDocument;
     for (var nIndex = 0, nCount = PRS.Footnotes.length; nIndex < nCount; ++nIndex)
     {
         var oFootnote = PRS.Footnotes[nIndex].FootnoteReference.Get_Footnote();
@@ -1852,15 +1846,15 @@ Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, Cu
             return true;
 
         // TODO: Здесь надо разобраться с параграфами внутри таблицы.
-        if (this.Parent instanceof CDocument)
+        if (oTopDocument instanceof CDocument)
         {
-            var RecalcInfo = this.Parent.RecalcInfo;
-			var nPageAbs   = this.Get_AbsolutePage(CurPage);
-			var nColumnAbs = this.Get_AbsoluteColumn(CurPage);
+            var RecalcInfo = oTopDocument.RecalcInfo;
+			var nPageAbs   = PRS.PageAbs;
+			var nColumnAbs = PRS.ColumnAbs;
             if (true === RecalcInfo.Can_RecalcObject())
             {
                 RecalcInfo.Set_FootnoteReference(oFootnote, nPageAbs, nColumnAbs);
-                this.Parent.Footnotes.AddFootnoteToPage(nPageAbs, nColumnAbs, oFootnote, this.Pages[CurPage].Y + this.Lines[CurLine].Bottom);
+                oTopDocument.Footnotes.AddFootnoteToPage(nPageAbs, nColumnAbs, oFootnote, this.Pages[CurPage].Y + this.Lines[CurLine].Bottom);
                 PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Column | recalcresultflags_Footnotes;
                 return false;
             }
@@ -1880,7 +1874,7 @@ Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, Cu
                 {
                     // TODO: Реализовать
                     RecalcInfo.Set_PageBreakBefore(true);
-					this.Parent.Footnotes.RemoveFootnoteFromPage(nPageAbs, nColumnAbs, oFootnote);
+					oTopDocument.Footnotes.RemoveFootnoteFromPage(nPageAbs, nColumnAbs, oFootnote);
 					PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Column | recalcresultflags_Footnotes;
                     return false;
                 }
@@ -2526,8 +2520,14 @@ CParagraphRecalculateTabInfo.prototype =
 
 function CParagraphRecalculateStateWrap(Para)
 {
+    // Общие параметры, которые заполняются 1 раз на пересчет всей страницы
     this.Paragraph       = Para;
+    this.Parent          = null;
+    this.TopDocument     = null;
+    this.PageAbs         = 0;
+    this.ColumnAbs       = 0;
 
+    //
     this.Page            = 0;
     this.Line            = 0;
     this.Range           = 0;
@@ -2636,6 +2636,18 @@ function CParagraphRecalculateStateWrap(Para)
 
 CParagraphRecalculateStateWrap.prototype =
 {
+    Reset_Page : function(Paragraph, CurPage)
+    {
+		this.Paragraph   = Paragraph;
+		this.Parent      = Paragraph.Parent;
+		this.TopDocument = Paragraph.Parent.Get_TopDocumentContent();
+		this.PageAbs     = Paragraph.Get_AbsolutePage(CurPage);
+		this.ColumnAbs   = Paragraph.Get_AbsoluteColumn(CurPage);
+
+		this.RunRecalcInfoLast  = (0 === CurPage ? null : Paragraph.Pages[CurPage - 1].EndInfo.RunRecalcInfo);
+		this.RunRecalcInfoBreak = this.RunRecalcInfoLast;
+	},
+
     // Обнуляем некоторые параметры перед новой строкой
     Reset_Line : function()
     {

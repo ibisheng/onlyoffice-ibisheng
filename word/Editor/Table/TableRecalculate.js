@@ -51,6 +51,8 @@ CTable.prototype.Recalculate_Page = function(PageIndex)
     this.private_RecalculatePositionX(PageIndex);
 
     var Result = this.private_RecalculatePage(PageIndex);
+	if (Result & recalcresult_CurPage)
+		return Result;
 
     this.private_RecalculatePositionY(PageIndex);
 
@@ -2366,6 +2368,11 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                     {
                         bCanShift = true;
                         ShiftDy   = -Cell.Content.Pages[0].Y + Y_content_start;
+
+						// Если в ячейке есть ссылки на сноски, тогда такую ячейку нужно пересчитывать
+						var arrFootnotes = Cell.Content.Get_FootnotesList(null, null);
+						if (arrFootnotes && arrFootnotes.length > 0)
+							bCanShift = false;
                     }
                 }
 
@@ -2385,10 +2392,31 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                     Cell.Content.Shift( 0, ShiftDx, ShiftDy );
                     Cell.Content.Update_EndInfo();
                 }
-                else if ( recalcresult2_NextPage === Cell.Content.Recalculate_Page( CellPageIndex, true ) )
+                else
                 {
-                    Cell.PagesCount = Cell.Content.Pages.length + 1;
-                    bNextPage = true;
+					var RecalcResult = Cell.Content.Recalculate_Page(CellPageIndex, true);
+					if (recalcresult2_CurPage & RecalcResult)
+					{
+						var _RecalcResult = recalcresult_CurPage;
+
+						if (RecalcResult & recalcresultflags_Column)
+							_RecalcResult |= recalcresultflags_Column;
+
+						if (RecalcResult & recalcresultflags_Footnotes)
+							_RecalcResult |= recalcresultflags_Footnotes;
+
+						this.TurnOffRecalc = false;
+						return _RecalcResult;
+					}
+					else if (recalcresult2_NextPage & RecalcResult)
+					{
+						Cell.PagesCount = Cell.Content.Pages.length + 1;
+						bNextPage       = true;
+					}
+					else if (recalcresult2_End & RecalcResult)
+					{
+						// Ничего не делаем
+					}
                 }
 
                 var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex, undefined, true );
