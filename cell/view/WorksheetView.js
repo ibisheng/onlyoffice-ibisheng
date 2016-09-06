@@ -3551,8 +3551,17 @@
     /** */
 
     WorksheetView.prototype._drawSelectionElement = function (visibleRange, offsetX, offsetY, args) {
-        var range = args[0], isDashLine = args[1], lineWidth = args[2], strokeColor = args[3], fillColor = args[4], isAllRange = args[5], colorN = this.settings.activeCellBorderColor2, ctx = this.overlayCtx, c = this.cols, r = this.rows, oIntersection = range.intersectionSimple(
-          visibleRange), ppiX = this._getPPIX(), ppiY = this._getPPIY();
+        var range = args[0];
+        var isDashLine = args[1];
+        var strokeColor = args[2];
+        var fillColor = args[3];
+        var isAllRange = args[4];
+        var colorN = this.settings.activeCellBorderColor2;
+        var ctx = this.overlayCtx;
+        var c = this.cols;
+        var r = this.rows;
+        var oIntersection = range.intersectionSimple(visibleRange);
+        var ppiX = this._getPPIX(), ppiY = this._getPPIY();
 
         if (!oIntersection) {
             return;
@@ -3589,7 +3598,7 @@
         var y1 = r[oIntersection.r1].top - offsetY;
         var y2 = r[oIntersection.r2].top + r[oIntersection.r2].height - offsetY;
 
-        ctx.setLineWidth(isDashLine ? lineWidth : 2).setStrokeStyle(strokeColor);
+        ctx.setLineWidth(isDashLine ? 1 : 2).setStrokeStyle(strokeColor);
         /*2px для селекта ячеек в формулах*/
         if (fillColor) {
             ctx.setFillStyle(fillColor);
@@ -4102,12 +4111,12 @@
     };
 
     WorksheetView.prototype._drawFormatPainterRange = function () {
-        var lineWidth = 1, isDashLine = true, strokeColor = new CColor(0, 0, 0);
-        this._drawElements(this._drawSelectionElement, this.copyActiveRange, isDashLine, lineWidth, strokeColor);
+        var strokeColor = new CColor(0, 0, 0);
+        this._drawElements(this._drawSelectionElement, this.copyActiveRange, true, strokeColor);
     };
 
     WorksheetView.prototype._drawFormulaRanges = function (arrRanges) {
-        var i, lineWidth = 1, isDashLine = false, length = AscCommonExcel.c_oAscFormulaRangeBorderColor.length;
+        var i, length = AscCommonExcel.c_oAscFormulaRangeBorderColor.length;
         var strokeColor, fillColor, colorIndex, uniqueColorIndex = 0, tmpColors = [];
         for (i = 0; i < arrRanges.length; ++i) {
             var oFormulaRange = arrRanges[i].clone(true);
@@ -4121,14 +4130,12 @@
             tmpColors.push(colorIndex);
 
             strokeColor = fillColor = AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % length];
-            this._drawElements(this._drawSelectionElement, oFormulaRange, isDashLine, lineWidth, strokeColor,
-              fillColor);
+            this._drawElements(this._drawSelectionElement, oFormulaRange, false, strokeColor, fillColor);
         }
     };
 
     WorksheetView.prototype._drawSelectRange = function (oSelectRange) {
-        var lineWidth = 1, isDashLine = true;
-        this._drawElements(this._drawSelectionElement, oSelectRange, isDashLine, lineWidth,
+        this._drawElements(this._drawSelectionElement, oSelectRange, true,
           AscCommonExcel.c_oAscCoAuthoringOtherBorderColor);
     };
 
@@ -4144,16 +4151,15 @@
         var currentSheetId = this.model.getId();
         var nLockAllType = this.collaborativeEditing.isLockAllOther(currentSheetId);
         if (Asc.c_oAscMouseMoveLockedObjectType.None !== nLockAllType) {
-            var lineWidth = 1, isDashLine = true, isAllRange = true, strokeColor = (Asc.c_oAscMouseMoveLockedObjectType.TableProperties ===
+            var isAllRange = true, strokeColor = (Asc.c_oAscMouseMoveLockedObjectType.TableProperties ===
             nLockAllType) ? AscCommonExcel.c_oAscCoAuthoringLockTablePropertiesBorderColor :
               AscCommonExcel.c_oAscCoAuthoringOtherBorderColor, oAllRange = new asc_Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
-            this._drawElements(this._drawSelectionElement, oAllRange, isDashLine, lineWidth, strokeColor, null,
-              isAllRange);
+            this._drawElements(this._drawSelectionElement, oAllRange, true, strokeColor, null, isAllRange);
         }
     };
 
     WorksheetView.prototype._drawCollaborativeElementsMeOther = function (type) {
-        var currentSheetId = this.model.getId(), i, lineWidth = 1, isDashLine = true, strokeColor, arrayCells, oCellTmp;
+        var currentSheetId = this.model.getId(), i, strokeColor, arrayCells, oCellTmp;
         if (c_oAscLockTypes.kLockTypeMine === type) {
             strokeColor = AscCommonExcel.c_oAscCoAuthoringMeBorderColor;
             arrayCells = this.collaborativeEditing.getLockCellsMe(currentSheetId);
@@ -4167,7 +4173,7 @@
 
         for (i = 0; i < arrayCells.length; ++i) {
             oCellTmp = new asc_Range(arrayCells[i].c1, arrayCells[i].r1, arrayCells[i].c2, arrayCells[i].r2);
-            this._drawElements(this._drawSelectionElement, oCellTmp, isDashLine, lineWidth, strokeColor);
+            this._drawElements(this._drawSelectionElement, oCellTmp, true, strokeColor);
         }
     };
 
