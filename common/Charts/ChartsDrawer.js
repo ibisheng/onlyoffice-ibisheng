@@ -11943,14 +11943,54 @@ CSortFaces.prototype =
 		var intersectionsParallelepipeds = this._getIntersectionsParallelepipeds(parallelepipeds);
 		var intersections = intersectionsParallelepipeds.intersections;
 		var revIntersections = intersectionsParallelepipeds.reverseIntersections;
+		var countIntersection = intersectionsParallelepipeds.countIntersection;
 		
-		var startIndexs = [];
-		var test = [];
-		for(var i = 0; i < parallelepipeds.length; i++)
+		var startIndexes = [];
+		for(var i = 0; i < countIntersection.length; i++)
 		{
-			if(intersections[i] === undefined)
+			if(countIntersection[i] === 0)
 			{
-				startIndexs.push({index: parseInt(i)});
+				startIndexes.push({index: parseInt(i)});
+			}
+		}
+		
+		if(startIndexes.length === 0)
+		{
+			var maxIndexes = 1;
+			var mapIndexes = {};
+			for(var i = 0; i < countIntersection.length; i++)
+			{
+				if(countIntersection[i] === maxIndexes)
+				{
+					startIndexes.push({index: parseInt(i)});
+					mapIndexes[parseInt(i)] = 1;
+				}
+			}
+			
+			//для stacked заглушка. пересмотреть!!!
+			var arr = [];
+			for(var i = 0; i < startIndexes.length; i++)
+			{
+				var index = startIndexes[i].index;
+				var temp = false;
+				for(var j  in revIntersections[index])
+				{
+					if(mapIndexes[j])
+					{
+						temp = true;
+						break;
+					}
+				}
+				
+				if(temp)
+				{
+					arr.push({index: parseInt(index)});
+				}
+			}
+			
+			if(arr.length)
+			{
+				startIndexes = arr;
 			}
 		}
 		
@@ -11990,10 +12030,9 @@ CSortFaces.prototype =
 			return res;
 		};
 		
-		
-		for(var i = 0; i < startIndexs.length; i++)
+		for(var i = 0; i < startIndexes.length; i++)
 		{
-			dfs(startIndexs[i].index);
+			dfs(startIndexes[i].index);
 		}
 		
 		var addIndexes = {};
@@ -12022,11 +12061,13 @@ CSortFaces.prototype =
 		
 		var intersections = [];
 		var reverseIntersections = [];
+		var countIntersection = [];
 		console.time("_getIntersectionsParallelepipeds");
 		for(var i = 0; i < parallelepipeds.length; i++)
 		{
 			//из каждой точки данного параллалепипеда строим прямые до точки наблюдателя
 			var fromParallalepiped = parallelepipeds[i];
+			countIntersection[i] = 0;
 			
 			for(var m = 0; m < parallelepipeds.length; m++)
 			{
@@ -12065,6 +12106,8 @@ CSortFaces.prototype =
 								reverseIntersections[m] = [];
 							}
 							
+							countIntersection[i]++;
+							
 							intersections[i][m] = 1;
 							reverseIntersections[m][i] = 1;
 							
@@ -12079,7 +12122,7 @@ CSortFaces.prototype =
 		}
 		console.timeEnd("_getIntersectionsParallelepipeds");
 		
-		return {intersections: intersections, reverseIntersections: reverseIntersections};
+		return {intersections: intersections, reverseIntersections: reverseIntersections, countIntersection: countIntersection};
 	},
 	
 	sortFaces: function(faces)

@@ -113,7 +113,7 @@ Processor3D.prototype.calaculate3DProperties = function(baseDepth, gapDepth, bIs
 	{
 		this._calculateCameraDiff();
 		
-		if(this.view3D.rAngAx || (!this.view3D.rAngAx && this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar && null !== this.view3D.hPercent))
+		if(this.view3D.rAngAx)
 		{
 			this._recalculateScaleWithMaxWidth();
 		}
@@ -134,7 +134,7 @@ Processor3D.prototype._calculateAutoHPercent = function()
 	if(this.hPercent == null)
 	{
 		this.hPercent = this.view3D.hPercent === null ? (heightLine / widthLine) : this.view3D.hPercent / 100;
-		if(this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar && this.view3D.hPercent === null && this.view3D.rAngAx)
+		if(this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar && ((this.view3D.hPercent === null && this.view3D.rAngAx) || (this.view3D.hPercent !== null && !this.view3D.rAngAx)))
 			this.hPercent = 1 / this.hPercent;
 	}
 };
