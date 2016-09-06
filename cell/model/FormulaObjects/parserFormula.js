@@ -3726,12 +3726,12 @@ function parserFormula( formula, parent, _ws ) {
 			if (!this.isDirty) {
 				this.isDirty = true;
 				if (this.parent && this.parent.onFormulaEvent) {
-					this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.Change);
+					this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.Change, eventData);
 				}
 			}
 		} else if (AscCommon.c_oNotifyType.Changed === data.type) {
 			if (this.parent && this.parent.onFormulaEvent) {
-				this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.Change);
+				this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.Change, eventData);
 			}
 		} else {
 			var assembleType = AscCommon.c_oNotifyParentAssemble.Normal;

@@ -153,7 +153,7 @@ function getRangeType(oBBox){
 
 	function getDefNameIndex(name) {
 		//можно создавать имена в разном регистре, но уникальность проверяется независимо от регистра
-		return name.toLowerCase();
+		return name ? name.toLowerCase() : name;
 	}
 
 	function getDefNameId(sheetId, name) {
@@ -572,7 +572,7 @@ function getRangeType(oBBox){
 			if (oldAscName) {
 				res = this.getDefNameByName(oldAscName.Name, this.wb.getSheetIdByIndex(oldAscName.LocalSheetId));
 			} else {
-				res = this.addDefNameOpen(newAscName.Name, newAscName.Ref, newAscName.LocalSheetId, newAscName.Hidden,
+				res = this.addDefName(newAscName.Name, newAscName.Ref, newAscName.LocalSheetId, newAscName.Hidden,
 										  false);
 			}
 			History.Create_NewPoint();
@@ -592,8 +592,19 @@ function getRangeType(oBBox){
 					res.setAscCDefName(newAscName);
 				}
 			}
-			History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesChange, null, null,
-						new UndoRedoData_DefinedNamesChange(oldAscName, newAscName));
+			if(History.Is_On()){
+				var changesFormula = null;
+				if (!oldAscName) {
+					if (newAscName.Ref) {
+						changesFormula = new parserFormula(newAscName.Ref, History, AscCommonExcel.g_DefNameWorksheet);
+						changesFormula.parse();
+						History.changesFormulaAdd(changesFormula);
+					}
+				}
+				History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesChange, null, null,
+							new UndoRedoData_DefinedNamesChange(oldAscName, newAscName, changesFormula));
+			}
+
 			return res;
 		},
 		checkDefName: function (name, sheetIndex) {
@@ -1757,7 +1768,7 @@ Workbook.prototype._SerializeHistoryBase64 = function (oMemory, item, aPointChan
 Workbook.prototype.SerializeHistory = function(){
 	var aRes = [];
 	//соединяем изменения, которые были до приема данных с теми, что получились после.
-
+	History.changesFormulaRemoveDep();
     var worksheets = this.aWorksheets, t, j, length2;
     for(t = 0; t < worksheets.length; ++t)
     {
@@ -1802,6 +1813,7 @@ Workbook.prototype.SerializeHistory = function(){
 };
 Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 	var oThis = this;
+	History.changesFormulaBuildDep();
 	//сохраняем те изменения, которые были до приема данных, потому что дальше undo/redo будет очищено
 	this.aCollaborativeActions = this.aCollaborativeActions.concat(History.GetSerializeArray());
 	if(aChanges.length > 0)
@@ -4376,9 +4388,14 @@ Cell.prototype.setValue=function(val,callback, isCopyPaste) {
 		DataNew = this.getValueData();
 	}
 	if (History.Is_On() && false == DataOld.isEqual(DataNew)) {
+		var changesFormula = null;
+		if (this.formulaParsed) {
+			changesFormula = this.formulaParsed.clone(null, History, ws);
+			History.changesFormulaAdd(changesFormula);
+		}
 		History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValue, this.ws.getId(),
 			new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow),
-			new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew));
+			new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew, changesFormula));
 	}
 	//sortDependency вызывается ниже History.Add(AscCH.historyitem_Cell_ChangeValue, потому что в ней может быть выставлен формат ячейки(если это текстовый, то принимая изменения формула станет текстом)
 	this.ws.workbook.sortDependency();
@@ -4427,8 +4444,17 @@ Cell.prototype.setValue2=function(array){
 
 		if (History.Is_On()) {
 			DataNew = this.getValueData();
-			if (false == DataOld.isEqual(DataNew))
-				History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew));
+			if (false == DataOld.isEqual(DataNew)) {
+				var changesFormula = null;
+				if (this.formulaParsed) {
+					changesFormula = new parserFormula(formula, History, this.ws);
+					changesFormula.parse();
+					History.changesFormulaAdd(changesFormula);
+				}
+				History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValue, this.ws.getId(),
+							new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow),
+							new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew, changesFormula));
+			}
 		}
 	};
 	Cell.prototype.removeDependencies = function() {

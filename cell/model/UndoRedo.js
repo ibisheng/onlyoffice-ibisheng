@@ -555,7 +555,12 @@ UndoRedoData_CellSimpleData.prototype = {
 		{
 			case this.Properties.Row: return this.nRow;break;
 			case this.Properties.Col: return this.nCol;break;
-			case this.Properties.NewVal: return this.oNewVal;break;
+			case this.Properties.NewVal:
+				if (this.oNewVal && this.sFormula) {
+					this.oNewVal.formula = this.sFormula.assemble(true);
+				}
+				return this.oNewVal;
+				break;
 		}
 		return null;
 	},
@@ -1692,10 +1697,11 @@ var g_oUndoRedoData_DefinedNamesChangeProperties = {
     oldName: 0,
     newName:1
 };
-function UndoRedoData_DefinedNamesChange(oldName, newName){
+function UndoRedoData_DefinedNamesChange(oldName, newName, formula){
     this.Properties = g_oUndoRedoData_DefinedNamesChangeProperties;
     this.oldName = oldName?new UndoRedoData_DefinedNames(oldName.Name, oldName.Ref, oldName.LocalSheetId, oldName.isTable, null):undefined;
     this.newName = newName?new UndoRedoData_DefinedNames(newName.Name, newName.Ref, newName.LocalSheetId, newName.isTable, null):undefined;
+	this.formula = formula;
 }
 UndoRedoData_DefinedNamesChange.prototype = {
     getType : function()
@@ -1711,7 +1717,12 @@ UndoRedoData_DefinedNamesChange.prototype = {
         switch(nType)
         {
             case this.Properties.oldName: return this.oldName;break;
-            case this.Properties.newName: return this.newName;break;
+			case this.Properties.newName:
+				if (this.newName && this.formula) {
+					this.newName.Ref = this.formula.assemble(true);
+				}
+				return this.newName;
+				break;
         }
         return null;
     },
