@@ -351,12 +351,13 @@
 				var tablePartsContainsRange = filterInfo.tablePartsContainsRange;
 				
 				//props from paste
-				var bWithoutFilter, displayName, tablePart;
+				var bWithoutFilter, displayName, tablePart, offset;
 				if(props)
 				{
 					bWithoutFilter = props.bWithoutFilter;
 					displayName = props.displayName;
 					tablePart = props.tablePart;
+					offset = props.offset;
 				}
 				
 				//*****callBack on add filter
@@ -397,7 +398,7 @@
 						}
 
 						//add to model
-						var newTablePart = t._addNewFilter(filterRange, styleName, bWithoutFilter, displayName, tablePart);
+						var newTablePart = t._addNewFilter(filterRange, styleName, bWithoutFilter, displayName, tablePart, offset);
 						var newDisplayName = newTablePart && newTablePart.DisplayName ? newTablePart.DisplayName : null;
 
 						if(styleName)
@@ -3458,7 +3459,7 @@
 					return ar;
 			},
 			
-			_addNewFilter: function(ref, style, bWithoutFilter, tablePartDisplayName, tablePart, isCloneTableColumns)
+			_addNewFilter: function(ref, style, bWithoutFilter, tablePartDisplayName, tablePart, offset)
 			{
 				var worksheet = this.worksheet;
 				var newFilter;
@@ -3534,14 +3535,9 @@
 					var tableColumns;
 					if(tablePart && tablePart.TableColumns)
 					{
-						var renameParams = {};
-						renameParams.tableNameMap = {};
-						renameParams.tableNameMap[tablePart.DisplayName] = newTableName;
-						
 						var cloneTableColumns = [];
-						for(var i = 0; i < tablePart.TableColumns.length; i++)
-						{
-							cloneTableColumns.push(tablePart.TableColumns[i].clone(null, worksheet, renameParams));
+						for(var i = 0; i < tablePart.TableColumns.length; i++) {
+							cloneTableColumns.push(tablePart.TableColumns[i].clone(worksheet));
 						}
 						tableColumns = cloneTableColumns;
 					}
@@ -3552,6 +3548,13 @@
 					
 					newFilter.TableColumns = tableColumns;
 					worksheet.TableParts[worksheet.TableParts.length] = newFilter;
+					if (tablePart) {
+						var renameParams = {};
+						renameParams.offset = offset;
+						renameParams.tableNameMap = {};
+						renameParams.tableNameMap[tablePart.DisplayName] = newTableName;
+						newFilter.renameSheetCopy(worksheet, renameParams);
+					}
 					
 					return worksheet.TableParts[worksheet.TableParts.length - 1];
 				}
@@ -4677,6 +4680,7 @@
 				{
 					var diffCol = arnTo.c1 - arnFrom.c1;
 					var diffRow = arnTo.r1 - arnFrom.r1;
+					var offset = {offsetCol: diffCol, offsetRow: diffRow};
 					var newRange, ref, bWithoutFilter;
 					
 					for(var i = 0; i < findFilters.length; i++)
@@ -4695,7 +4699,7 @@
 									var cleanRange = new AscCommonExcel.Range(worksheet, newRange.r1, newRange.c1, newRange.r2, newRange.c2);
 									cleanRange.cleanFormat();
 								}
-								this.addAutoFilter(findFilters[i].TableStyleInfo.Name, newRange, null, offLock, {tablePart: findFilters[i]});
+								this.addAutoFilter(findFilters[i].TableStyleInfo.Name, newRange, null, offLock, {tablePart: findFilters[i], offset: offset});
 							}	
 						}
 					}

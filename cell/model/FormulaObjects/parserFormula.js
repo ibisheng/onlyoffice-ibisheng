@@ -1516,7 +1516,6 @@ cEmpty.prototype.toString = function () {
 /** @constructor */
 function cName( val, wb, ws ) {
     this.constructor.call( this, val, cElementType.name );
-    this.regSpace = /\$/g;
     this.wb = wb;
     this.ws = ws;
 }
@@ -1615,74 +1614,19 @@ cStrucTable.prototype.toRef = function (opt_bbox) {
     return this.area;
 };
 cStrucTable.prototype.toString = function () {
-	var tblStr, columns_1, columns_2;
-	var table = this.wb.getDefinesNames( this.tableName, this.ws ? this.ws.getId() : null );
-	if( !table ){
-		return this.value;
-	}
-	tblStr = table.name + '[%1]';
-	if ( this.oneColumn ) {
-
-		columns_1= this.wb.getTableNameColumnByIndex( this.tableName, this.oneColumnIndex.index );
-		if( columns_1 ){
-			this.oneColumn = columns_1.columnName;
-		}
-
-		return tblStr.replace( "%1", this.oneColumn.replace(/#/g,"'#")  );
-	}
-	if ( this.columnRange ) {
-		columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.colStartIndex.index );
-		columns_2 = this.wb.getTableNameColumnByIndex( this.tableName, this.colEndIndex.index );
-		if(columns_1){
-			this.colStart = columns_1.columnName
-		}
-		if(columns_2){
-			this.colEnd = columns_2.columnName
-		}
-    return tblStr.replace("%1",
-      "[" + this.colStart.replace(/#/g, "'#") + "]:[" + this.colEnd.replace(/#/g, "'#") + "]");
-	}
-	if ( this.reservedColumn ) {
-		return tblStr.replace( "%1", this._buildLocalTableString(this.reservedColumnIndex,false) );
-	}
-	if ( this.hdt ) {
-		var re = /\[(.*?)\]/ig, m, data = "",i=0;
-		while ( null !== (m = re.exec( this.hdt )) ) {
-
-      data += "[" + this._buildLocalTableString(this.hdtIndexes[i], false) + "]" + FormulaSeparators.functionArgumentSeparatorDef;
-		}
-		data = data.substr( 0, data.length - 1 );
-		if ( this.hdtcstart ) {
-
-			columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.hdtcstartIndex.index );
-			if( columns_1 ){
-				this.hdtcstart = columns_1.columnName;
-			}
-
-      data += FormulaSeparators.functionArgumentSeparatorDef + "[" + this.hdtcstart.replace(/#/g, "'#") + "]"
-		}
-		if ( this.hdtcend ) {
-
-			columns_2 = this.wb.getTableNameColumnByIndex( this.tableName, this.hdtcendIndex.index );
-			if( columns_2 ){
-				this.hdtcend = columns_2.columnName;
-			}
-
-			data += ":[" + this.hdtcend.replace(/#/g,"'#") + "]"
-		}
-		return tblStr.replace( "%1", data );
-	}
-	//do not replace [] becase 'Table1[]' - right, 'Table1' - wrong
-	return tblStr.replace( "%1", "" );
+	return this._toString(false);
 };
 cStrucTable.prototype.toLocaleString = function () {
+	return this._toString(true);
+};
+cStrucTable.prototype._toString = function (isLocal) {
 	var tblStr, columns_1, columns_2;
 	var table = this.wb.getDefinesNames( this.tableName, this.ws ? this.ws.getId() : null );
 	if( !table ){
 		return this.value;
 	}
 	tblStr = table.name;
-	this.columnName ? tblStr += "[%1]" : null;
+	(!isLocal || this.columnName) ? tblStr += "[%1]" : null;
 	if ( this.oneColumn ) {
 
 		columns_1= this.wb.getTableNameColumnByIndex( this.tableName, this.oneColumnIndex.index );
@@ -1705,13 +1649,13 @@ cStrucTable.prototype.toLocaleString = function () {
       "[" + this.colStart.replace(/#/g, "'#") + "]:[" + this.colEnd.replace(/#/g, "'#") + "]");
 	}
 	if ( this.reservedColumn ) {
-		return tblStr.replace( "%1", this._buildLocalTableString(this.reservedColumnIndex,true) );
+		return tblStr.replace( "%1", this._buildLocalTableString(this.reservedColumnIndex, isLocal) );
 	}
 	if ( this.hdt ) {
 		var re = /\[(.*?)\]/ig, m, data = "",i=0;
 		while ( null !== (m = re.exec( this.hdt )) ) {
 
-      data += "[" + this._buildLocalTableString(this.hdtIndexes[i], true) + "]" + FormulaSeparators.functionArgumentSeparatorDef;
+      data += "[" + this._buildLocalTableString(this.hdtIndexes[i], isLocal) + "]" + FormulaSeparators.functionArgumentSeparatorDef;
 		}
 		data = data.substr( 0, data.length - 1 );
 		if ( this.hdtcstart ) {
@@ -1734,7 +1678,12 @@ cStrucTable.prototype.toLocaleString = function () {
 		}
 		return tblStr.replace( "%1", data );
 	}
-	return tblStr.replace( "%1", "" ).replace("[]","");
+	if (isLocal) {
+		return tblStr.replace("%1", "").replace("[]", "");
+	} else {
+		//do not replace [] becase 'Table1[]' - right, 'Table1' - wrong
+		return tblStr.replace( "%1", "" );
+	}
 };
 cStrucTable.prototype._createArea = function ( val, opt_bbox ) {
     this.columnName  = val['columnName'];
@@ -3766,7 +3715,7 @@ function parserFormula( formula, parent, _ws ) {
     this.isDirty = isDirty;
   };
 	parserFormula.prototype.notify = function(data) {
-		var eventData = {notifyData: data, assemble: null, isRebuild: false};
+		var eventData = {notifyData: data, assemble: null, isRebuild: false, formula: this};
 		if (this.parent && this.parent.onFormulaEvent) {
 			var checkCanDo = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.CanDo, eventData);
 			if(!checkCanDo){
@@ -4522,7 +4471,9 @@ parserFormula.prototype.parse = function(local, digitDelim) {
           found_operand = new cArea3D(this.operand_str.toUpperCase(), _wsFrom, _wsTo, this.wb);
           pos.oper = found_operand;
           this.RefPos.push(pos);
-          checkAbsArea(this.operand_str, found_operand);
+          if (this.operand_str.indexOf("$") > -1) {
+          	checkAbsArea(this.operand_str, found_operand);
+          }
         } else if (parserHelp.isRef.call(this, this.Formula, this.pCurrPos)) {
           pos.end = this.pCurrPos;
           if (_wsTo != _wsFrom) {
@@ -4825,68 +4776,68 @@ parserFormula.prototype.getRef = function() {
 
 	/* Для обратной сборки функции иногда необходимо поменять ссылки на ячейки */
 	parserFormula.prototype.changeOffset = function (offset) {//offset = AscCommonExcel.CRangeOffset
-		var elem, r, a, b;
 		for (var i = 0; i < this.outStack.length; i++) {
-			elem = this.outStack[i];
-			if (cElementType.cell === elem.type || cElementType.cell3D === elem.type ||
-				cElementType.cellsRange === elem.type) {
-
-				r = elem.getRange();
-				if (!r) {
-					break;
-				}
-
-				if (elem.isAbsolute) {
-					this._changeOffsetHelper(elem, offset);
-				} else {
-					if (cElementType.cellsRange === elem.type && (r.isColumn() && offset.offsetRow != 0 || r.isRow() && offset.offsetCol != 0)) {
-						continue;
-					}
-					r.setOffset(offset);
-					if (r.isColumn()) {
-						a = r.first.getColLetter();
-						b = r.last.getColLetter();
-					} else if (r.isRow()) {
-						a = r.first.getRow();
-						b = r.last.getRow();
-					} else {
-						a = r.first.getID();
-						b = r.last.getID();
-					}
-
-
-					if (a != b || cElementType.cellsRange === elem.type) {
-						elem.value = elem._cells = a + ":" + b;
-					} else {
-						elem.value = elem._cells = a;
-					}
-				}
-				continue;
-			}
-			if (cElementType.cellsRange3D === elem.type) {
-				r = elem._cells.indexOf(":") > -1 ? (new cArea(elem._cells, this.ws)) : (new cRef(elem._cells, this.ws));
-				var _r = r.getRange();
-
-				if (!_r) {
-					break;
-				}
-
-				if (elem.isAbsolute) {
-					this._changeOffsetHelper(r, offset);
-				} else {
-					_r.setOffset(offset);
-					a = _r.first.getID();
-					b = _r.last.getID();
-					if (a != b) {
-						r.value = r._cells = a + ":" + b;
-					} else {
-						r.value = r._cells = a;
-					}
-				}
-				elem._cells = r._cells;
-			}
+			this.changeOffsetElem(this.outStack[i], offset);
 		}
 		return this;
+	};
+	parserFormula.prototype.changeOffsetElem = function (elem, offset) {//offset = AscCommonExcel.CRangeOffset
+		var r, a, b;
+		if (cElementType.cell === elem.type || cElementType.cell3D === elem.type ||
+			cElementType.cellsRange === elem.type) {
+
+			r = elem.getRange();
+			if (!r) {
+				return;
+			}
+
+			if (elem.isAbsolute) {
+				this._changeOffsetHelper(elem, offset);
+			} else {
+				if (cElementType.cellsRange === elem.type && (r.isColumn() && offset.offsetRow != 0 || r.isRow() && offset.offsetCol != 0)) {
+					return;
+				}
+				r.setOffset(offset);
+				if (r.isColumn()) {
+					a = r.first.getColLetter();
+					b = r.last.getColLetter();
+				} else if (r.isRow()) {
+					a = r.first.getRow();
+					b = r.last.getRow();
+				} else {
+					a = r.first.getID();
+					b = r.last.getID();
+				}
+
+
+				if (a != b || cElementType.cellsRange === elem.type) {
+					elem.value = elem._cells = a + ":" + b;
+				} else {
+					elem.value = elem._cells = a;
+				}
+			}
+		} else if (cElementType.cellsRange3D === elem.type) {
+			r = elem._cells.indexOf(":") > -1 ? (new cArea(elem._cells, this.ws)) : (new cRef(elem._cells, this.ws));
+			var _r = r.getRange();
+
+			if (!_r) {
+				return;
+			}
+
+			if (elem.isAbsolute) {
+				this._changeOffsetHelper(r, offset);
+			} else {
+				_r.setOffset(offset);
+				a = _r.first.getID();
+				b = _r.last.getID();
+				if (a != b) {
+					r.value = r._cells = a + ":" + b;
+				} else {
+					r.value = r._cells = a;
+				}
+			}
+			elem._cells = r._cells;
+		}
 	};
 	parserFormula.prototype.changeDefName = function(from, to) {
 		var i, elem, LocalSheetId;
@@ -4912,13 +4863,19 @@ parserFormula.prototype.getRef = function() {
 			if (elem.type == cElementType.table) {
 				LocalSheetId = elem.ws ? elem.ws.getIndex() : null;
 				if (elem.tableName == defName.Name && (null == defName.LocalSheetId || LocalSheetId == defName.LocalSheetId )) {
-					this.outStack[i] = elem.toRef();
+					var rangeCell = null;
+					if (this.parent && this.parent.onFormulaEvent) {
+						rangeCell = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.GetRangeCell);
+					}
+					if (!rangeCell) {
+						rangeCell = this.ws.getCell3(0, 0);
+					}
+					this.outStack[i] = elem.toRef(rangeCell.getBBox0());
 				}
 			}
 		}
 	};
 	parserFormula.prototype.shiftCells = function(notifyType, sheetId, bbox, offset) {
-		var isHor = offset && 0 != offset.offsetCol;
 		var elem;
 		for (var i = 0; i < this.outStack.length; i++) {
 			elem = this.outStack[i];
@@ -4944,8 +4901,7 @@ parserFormula.prototype.getRef = function() {
 				} else if (AscCommon.c_oNotifyType.Move == notifyType) {
 					isIntersect = bbox.containsRange(_cellsBbox);
 				} else if (AscCommon.c_oNotifyType.Delete == notifyType) {
-					//isIntersect = bbox.isIntersect(_cellsBbox);
-					isIntersect = bbox.containsRange(_cellsBbox);
+					isIntersect = bbox.isIntersect(_cellsBbox);
 				}
 				if (isIntersect) {
 					var isNoDelete;
@@ -4957,28 +4913,25 @@ parserFormula.prototype.getRef = function() {
 						_cellsBbox.setOffset(offset);
 						isNoDelete = true;
 					} else if (AscCommon.c_oNotifyType.Delete == notifyType) {
-						isNoDelete = false;
-						// if (bbox.containsRange(_cellsBbox)) {
-						// 	isNoDelete = false;
-						// } else {
-						// 	isNoDelete = true;
-						// 	if (!_cellsBbox.containsRange(bbox)) {
-						// 		var ltIn = bbox.contains(_cellsBbox.c1, _cellsBbox.r1);
-						// 		var rtIn = bbox.contains(_cellsBbox.c2, _cellsBbox.r1);
-						// 		var lbIn = bbox.contains(_cellsBbox.c1, _cellsBbox.r2);
-						// 		var rbIn = bbox.contains(_cellsBbox.c2, _cellsBbox.r2);
-						// 		_cellsBbox = _cellsBbox.clone();
-						// 		if (ltIn && rtIn) {
-						// 			_cellsBbox.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r2 - _cellsBbox.r1 + 1});
-						// 		} else if (rtIn && rbIn) {
-						// 			_cellsBbox.setOffsetLast({offsetCol: bbox.c1 - _cellsBbox.c2 - 1, offsetRow: 0});
-						// 		} else if (rbIn && lbIn) {
-						// 			_cellsBbox.setOffsetLast({offsetCol: 0, offsetRow: bbox.r1 - _cellsBbox.r2 - 1});
-						// 		} else if (lbIn && ltIn) {
-						// 			_cellsBbox.setOffsetFirst({offsetCol: bbox.c2 - _cellsBbox.c1 + 1, offsetRow: 0});
-						// 		}
-						// 	}
-						// }
+						if (bbox.containsRange(_cellsBbox)) {
+							isNoDelete = false;
+						} else {
+							isNoDelete = true;
+							_cellsBbox = _cellsBbox.clone();
+							var ltIn = bbox.contains(_cellsBbox.c1, _cellsBbox.r1);
+							var rtIn = bbox.contains(_cellsBbox.c2, _cellsBbox.r1);
+							var lbIn = bbox.contains(_cellsBbox.c1, _cellsBbox.r2);
+							var rbIn = bbox.contains(_cellsBbox.c2, _cellsBbox.r2);
+							if (ltIn && rtIn && bbox.r1 != _cellsBbox.r1) {
+								_cellsBbox.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r2 - _cellsBbox.r1 + 1});
+							} else if (rtIn && rbIn && bbox.c2 != _cellsBbox.c2) {
+								_cellsBbox.setOffsetLast({offsetCol: bbox.c1 - _cellsBbox.c2 - 1, offsetRow: 0});
+							} else if (rbIn && lbIn && bbox.r2 != _cellsBbox.r2) {
+								_cellsBbox.setOffsetLast({offsetCol: 0, offsetRow: bbox.r1 - _cellsBbox.r2 - 1});
+							} else if (lbIn && ltIn && bbox.c1 != _cellsBbox.c1) {
+								_cellsBbox.setOffsetFirst({offsetCol: bbox.c2 - _cellsBbox.c1 + 1, offsetRow: 0});
+							}
+						}
 					}
 					if (isNoDelete) {
 						elem.value = elem._cells =
@@ -5008,18 +4961,30 @@ parserFormula.prototype.getRef = function() {
 	parserFormula.prototype.renameSheetCopy = function(params) {
 		for (var i = 0; i < this.outStack.length; i++) {
 			var elem = this.outStack[i];
-			if (params.lastName && cElementType.cell3D === elem.type) {
-				elem.changeSheet(params.lastName, params.newName);
-			} else if (params.lastName && cElementType.cellsRange3D === elem.type) {
-				if(elem.wsTo === elem.wsFrom){
+			if (cElementType.cell3D === elem.type) {
+				if(params.offset){
+					this.changeOffsetElem(elem, params.offset);
+				}
+				if(params.lastName){
 					elem.changeSheet(params.lastName, params.newName);
-				} else {
-					var wsTo = this.wb.getWorksheetById(elem.wsTo);
-					var wsFrom = this.wb.getWorksheetById(elem.wsFrom);
-					if (wsFrom.getName() == params.lastName || wsTo.getName() == params.lastName) {
-						this.outStack[i] = new cError(cErrorType.bad_reference);
+				}
+			} else if (cElementType.cellsRange3D === elem.type) {
+				if(params.offset){
+					this.changeOffsetElem(elem, params.offset);
+				}
+				if(params.lastName) {
+					if (elem.wsTo === elem.wsFrom) {
+						elem.changeSheet(params.lastName, params.newName);
+					} else {
+						var wsTo = this.wb.getWorksheetById(elem.wsTo);
+						var wsFrom = this.wb.getWorksheetById(elem.wsFrom);
+						if (wsFrom.getName() == params.lastName || wsTo.getName() == params.lastName) {
+							this.outStack[i] = new cError(cErrorType.bad_reference);
+						}
 					}
 				}
+			} else if (params.offset && (cElementType.cellsRange === elem.type || cElementType.cell === elem.type)) {
+				this.changeOffsetElem(elem, params.offset);
 			} else if (params.lastName && cElementType.name3D === elem.type) {
 				elem.changeSheet(params.lastName, params.newName);
 			} else if (params.tableNameMap && cElementType.table === elem.type) {

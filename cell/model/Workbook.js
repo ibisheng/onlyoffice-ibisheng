@@ -167,7 +167,7 @@ function getRangeType(oBBox){
 	var g_FDNI = {sheetId: null, name: null};
 
 	function getFromDefNameId(nodeId) {
-		var index = nodeId.indexOf(AscCommon.g_cCharDelimiter);
+		var index = nodeId ? nodeId.indexOf(AscCommon.g_cCharDelimiter) : -1;
 		if (-1 != index) {
 			g_FDNI.sheetId = nodeId.substring(0, index);
 			g_FDNI.name = nodeId.substring(index + 1);
@@ -397,21 +397,15 @@ function getRangeType(oBBox){
 		},
 		//shift, move
 		deleteNodes: function(sheetId, bbox) {
-			//обязательно, формула не в зависимостях не сдвинутся
 			this.buildDependency();
 			this._shiftMoveDelete(AscCommon.c_oNotifyType.Delete, sheetId, bbox, null);
 			this.addToChangedRange(sheetId, bbox);
 		},
 		shift: function(sheetId, bbox, offset) {
-			//обязательно, формула не в зависимостях не сдвинутся
 			this.buildDependency();
-			this._shiftMoveDelete(AscCommon.c_oNotifyType.Shift, sheetId, bbox, offset);
-			var bHor = 0 != offset.offsetCol;
-			var bboxShift = AscCommonExcel.shiftGetBBox(bbox, bHor);
-			this.addToChangedRange(sheetId, bboxShift);
+			return this._shiftMoveDelete(AscCommon.c_oNotifyType.Shift, sheetId, bbox, offset);
 		},
 		move: function(sheetId, bboxFrom, offset) {
-			//обязательно, формула не в зависимостях не сдвинутся
 			this.buildDependency();
 			this._shiftMoveDelete(AscCommon.c_oNotifyType.Move, sheetId, bboxFrom, offset);
 			this.addToChangedRange(sheetId, bboxFrom);
@@ -1062,9 +1056,15 @@ function getRangeType(oBBox){
 			this.tempGetByCells = [];
 		},
 		_shiftMoveDelete: function(notifyType, sheetId, bbox, offset) {
+			var listeners = {};
 			var sheetContainer = this.sheetListeners[sheetId];
 			if (sheetContainer) {
-				var listeners = {};
+				var bboxShift;
+				if (AscCommon.c_oNotifyType.Shift == notifyType) {
+					var bHor = 0 != offset.offsetCol;
+					bboxShift = AscCommonExcel.shiftGetBBox(bbox, bHor);
+				}
+				var changed = {};
 				var isIntersect;
 				for (var cellIndex in sheetContainer.cellMap) {
 					getFromCellIndex(cellIndex);
@@ -1083,12 +1083,18 @@ function getRangeType(oBBox){
 				for (var areaIndex in sheetContainer.areaMap) {
 					var areaMapElem = sheetContainer.areaMap[areaIndex];
 					if (AscCommon.c_oNotifyType.Shift == notifyType) {
-						isIntersect = bbox.isIntersectForShift(areaMapElem.bbox, offset);
+						if (bboxShift.isIntersect(areaMapElem.bbox)) {
+							isIntersect = bbox.isIntersectForShift(areaMapElem.bbox, offset);
+							if (!isIntersect) {
+								for (var listenerId in areaMapElem.listeners) {
+									changed[listenerId] = areaMapElem.listeners[listenerId];
+								}
+							}
+						}
 					} else if (AscCommon.c_oNotifyType.Move == notifyType) {
 						isIntersect = bbox.containsRange(areaMapElem.bbox);
 					} else if (AscCommon.c_oNotifyType.Delete == notifyType) {
-						//isIntersect = bbox.isIntersect(areaMapElem.bbox);
-						isIntersect = bbox.containsRange(areaMapElem.bbox);
+						isIntersect = bbox.isIntersect(areaMapElem.bbox);
 					}
 					if (isIntersect) {
 						for (var listenerId in areaMapElem.listeners) {
@@ -1100,7 +1106,12 @@ function getRangeType(oBBox){
 				for (var listenerId in listeners) {
 					listeners[listenerId].notify(notifyData);
 				}
+				//add formula for recalculate
+				for (var listenerId in changed) {
+					listeners[listenerId] = changed[listenerId];
+				}
 			}
+			return listeners;
 		}
 	};
 
@@ -2776,6 +2787,8 @@ Woorksheet.prototype._removeRows=function(start, stop){
 	//start, stop 0 based
 	var nDif = -(stop - start + 1);
 	var oActualRange = new Asc.Range(0, start, gc_nMaxCol0, stop);
+	//renameDependencyNodes before move cells to store current location in history
+	var changedFormulas = this.renameDependencyNodes({offsetRow: nDif, offsetCol: 0}, oActualRange);
 	var i, j, length, nIndex, aIndexes = [];
 	for(i in this.aGCells)
 	{
@@ -2815,9 +2828,8 @@ Woorksheet.prototype._removeRows=function(start, stop){
 		}
 		delete this.aGCells[nIndex];
 	}
-	//renameDependencyNodes after move cells because addToChanged has to add new locations
-	this.renameDependencyNodes({offsetRow:nDif,offsetCol:0}, oActualRange);
-
+	//renameDependencyNodesChanged after move cells to get new locations
+	this.renameDependencyNodesChanged(changedFormulas);
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RemoveRows, this.getId(), new Asc.Range(0, start, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, start, stop));
     this.autoFilters.insertRows( "delCell", new Asc.Range(0, start, gc_nMaxCol0, stop), c_oAscDeleteOptions.DeleteRows );
 
@@ -2833,6 +2845,8 @@ Woorksheet.prototype._insertRowsBefore=function(index, count){
 	this.workbook.dependencyFormulas.lockRecal();
 	var oActualRange = new Asc.Range(0, index, gc_nMaxCol0, index + count - 1);
 	History.Create_NewPoint();
+	//renameDependencyNodes before move cells to store current location in history
+	var changedFormulas = this.renameDependencyNodes({offsetRow: nDif, offsetCol: 0}, oActualRange);
 	//index 0 based
 	var aIndexes = [];
 	for(var i in this.aGCells)
@@ -2870,9 +2884,8 @@ Woorksheet.prototype._insertRowsBefore=function(index, count){
         }
         History.LocalChange = false;
     }
-	//renameDependencyNodes after move cells because addToChanged has to add new locations
-	this.renameDependencyNodes({offsetRow:count,offsetCol:0},oActualRange);
-
+	//renameDependencyNodesChanged after move cells to get new locations
+	this.renameDependencyNodesChanged(changedFormulas);
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_AddRows, this.getId(), new Asc.Range(0, index, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, index, index + count - 1));
 
     this.autoFilters.insertRows( "insCell", new Asc.Range(0, index, gc_nMaxCol0, index + count - 1), c_oAscInsertOptions.InsertColumns );
@@ -2904,6 +2917,8 @@ Woorksheet.prototype._removeCols=function(start, stop){
 	//start, stop 0 based
 	var nDif = -(stop - start + 1), i, j, length, nIndex;
 	var oActualRange = new Asc.Range(start, 0, stop, gc_nMaxRow0);
+	//renameDependencyNodes before move cells to store current location in history
+	var changedFormulas = this.renameDependencyNodes({ offsetRow: 0, offsetCol: nDif }, oActualRange);
 	for(i in this.aGCells)
 	{
 		var nRowIndex = i - 0;
@@ -2950,9 +2965,8 @@ Woorksheet.prototype._removeCols=function(start, stop){
 		if(null != elem)
 			elem.moveHor(nDif);
 	}
-	//renameDependencyNodes after move cells because addToChanged has to add new locations
-	this.renameDependencyNodes({ offsetRow: 0, offsetCol: nDif }, oActualRange);
-
+	//renameDependencyNodesChanged after move cells to get new locations
+	this.renameDependencyNodesChanged(changedFormulas);
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RemoveCols, this.getId(), new Asc.Range(start, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, start, stop));
 	
 	this.autoFilters.insertColumn( "delCell",  new Asc.Range(start, 0, stop, gc_nMaxRow0), c_oAscInsertOptions.InsertColumns );
@@ -2968,6 +2982,8 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 	this.workbook.dependencyFormulas.lockRecal();
 	var oActualRange = new Asc.Range(index, 0, index + count - 1, gc_nMaxRow0);
 	History.Create_NewPoint();
+	//renameDependencyNodes before move cells to store current location in history
+	var changedFormulas = this.renameDependencyNodes({offsetRow: 0, offsetCol: count}, oActualRange);
 	//index 0 based
 	for(var i in this.aGCells)
 	{
@@ -2988,9 +3004,8 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 			this._moveCellHor(nRowIndex, nIndex, count, oActualRange);
 		}
 	}
-	//renameDependencyNodes after move cells because addToChanged has to add new locations
-	this.renameDependencyNodes({offsetRow:0,offsetCol:count},oActualRange);
-	
+	//renameDependencyNodesChanged after move cells to get new locations
+	this.renameDependencyNodesChanged(changedFormulas);
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_AddCols, this.getId(), new Asc.Range(index, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, index, index + count - 1));
 
 	this.autoFilters.insertColumn( "insCells",  new Asc.Range(index, 0, index + count - 1, gc_nMaxRow0), c_oAscInsertOptions.InsertColumns );
@@ -3757,9 +3772,6 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 		}
 	}
     if(!copyRange){
-		//до перемещения ячеек, перед функцией, в которой используются nodesSheetArea/nodesSheetCell move/shift нужно обязательно вызвать force buildRecalc
-		//чтобы формулы, которые копим попали в струкруры nodesSheet, иначе формулы не сдвинутся
-		//например принимаем изменения: добавление формул, сдвиг с помощью _removeRows. результат формулы указывают на теже ячейки, что и до _removeRows
         this.workbook.dependencyFormulas.move(this.Id, oBBoxFrom, offset);
     }
 
@@ -3772,7 +3784,6 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
                 oTempCell.moveHor( offset.offsetCol );
                 oTempCell.moveVer( offset.offsetRow );
                 row.c[j] = oTempCell;
-
                 if ( oTempCell.formulaParsed ) {
                     if(copyRange) {
 						oTempCell.formulaParsed.removeDependencies();
@@ -3786,9 +3797,6 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
             }
         }
     }
-
-    if(false == this.workbook.bUndoChanges && false == this.workbook.bRedoChanges)
-        this.autoFilters._moveAutoFilters( oBBoxTo, oBBoxFrom, null, copyRange, true, oBBoxFrom );
 
 	if(false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || true == this.workbook.bCollaborativeChanges))
 	{
@@ -3840,10 +3848,6 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 	if(oBBoxTo.c2 >= this.nColsCount)
 		this.nColsCount = oBBoxTo.c2 + 1;
 
-	if(!copyRange){
-		var sBBoxFromName = oBBoxFrom.getName();
-	}
-	var sBBoxToName = oBBoxTo.getName();
 	this.workbook.sortDependency();
 	
 	if(true == this.workbook.bUndoChanges || true == this.workbook.bRedoChanges)
@@ -3855,6 +3859,9 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
     History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_MoveRange,
 				this.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0),
 				new UndoRedoData_FromTo(new UndoRedoData_BBox(oBBoxFrom), new UndoRedoData_BBox(oBBoxTo), copyRange));
+	
+	if(false == this.workbook.bUndoChanges && false == this.workbook.bRedoChanges)
+		this.autoFilters._moveAutoFilters( oBBoxTo, oBBoxFrom, null, copyRange, true, oBBoxFrom );
 	History.EndTransaction();
 	return true;
 };
@@ -3863,6 +3870,8 @@ Woorksheet.prototype._shiftCellsLeft=function(oBBox){
 	var nLeft = oBBox.c1;
 	var nRight = oBBox.c2;
 	var dif = nLeft - nRight - 1;
+	//renameDependencyNodes before move cells to store current location in history
+	var changedFormulas = this.renameDependencyNodes({offsetRow: 0, offsetCol: dif}, oBBox);
 	for(var i = oBBox.r1; i <= oBBox.r2; i++){
 		var row = this.aGCells[i];
 		if(row){
@@ -3888,9 +3897,8 @@ Woorksheet.prototype._shiftCellsLeft=function(oBBox){
 			}
 		}
 	}
-	//renameDependencyNodes after move cells because addToChanged has to add new locations
-	this.renameDependencyNodes( {offsetRow:0,offsetCol:dif}, oBBox );
-	
+	//renameDependencyNodesChanged after move cells to get new locations
+	this.renameDependencyNodesChanged(changedFormulas);
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsLeft, this.getId(), new Asc.Range(nLeft, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
     this.autoFilters.insertColumn( "delCell",  oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftLeft );
 	//todo проверить не уменьшились ли границы таблицы
@@ -3899,6 +3907,8 @@ Woorksheet.prototype._shiftCellsUp=function(oBBox){
 	var nTop = oBBox.r1;
 	var nBottom = oBBox.r2;
 	var dif = nTop - nBottom - 1;
+	//renameDependencyNodes before move cells to store current location in history
+	var changedFormulas = this.renameDependencyNodes({offsetRow: dif, offsetCol: 0}, oBBox);
 	var aIndexes = [];
 	for(var i in this.aGCells)
 	{
@@ -3928,9 +3938,8 @@ Woorksheet.prototype._shiftCellsUp=function(oBBox){
 			}
 		}
 	}
-	//renameDependencyNodes after move cells because addToChanged has to add new locations
-	this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox );
-	
+	//renameDependencyNodesChanged after move cells to get new locations
+	this.renameDependencyNodesChanged(changedFormulas);
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsTop, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
     this.autoFilters.insertRows( "delCell", oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftTop );
 	//todo проверить не уменьшились ли границы таблицы
@@ -3939,7 +3948,8 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox, displayNameFormatTable){
 	var nLeft = oBBox.c1;
 	var nRight = oBBox.c2;
 	var dif = nRight - nLeft + 1;
-
+	//renameDependencyNodes before move cells to store current location in history
+	var changedFormulas = this.renameDependencyNodes({offsetRow: 0, offsetCol: dif}, oBBox);
 	for(var i = oBBox.r1; i <= oBBox.r2; i++){
 		var row = this.aGCells[i];
 		if(row){
@@ -3964,9 +3974,8 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox, displayNameFormatTable){
 			}
 		}
 	}
-	//renameDependencyNodes after move cells because addToChanged has to add new locations
-	this.renameDependencyNodes({offsetRow:0,offsetCol:dif}, oBBox);
-	
+	//renameDependencyNodesChanged after move cells to get new locations
+	this.renameDependencyNodesChanged(changedFormulas);
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsRight, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
     this.autoFilters.insertColumn( "insCells",  oBBox, c_oAscInsertOptions.InsertCellsAndShiftRight, displayNameFormatTable );
 };
@@ -3975,6 +3984,8 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox, displayNameFormatTable){
 	var nBottom = oBBox.r2;
 	var dif = nBottom - nTop + 1;
 	var aIndexes = [];
+	//renameDependencyNodes before move cells to store current location in history
+	var changedFormulas = this.renameDependencyNodes({offsetRow: dif, offsetCol: 0}, oBBox);
 	for(var i in this.aGCells){
 		var rowInd = i - 0;
 		if(rowInd >= nTop)
@@ -3996,9 +4007,8 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox, displayNameFormatTable){
 			}
 		}
 	}
-	//renameDependencyNodes after move cells because addToChanged has to add new locations
-	this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox);
-	
+	//renameDependencyNodesChanged after move cells to get new locations
+	this.renameDependencyNodesChanged(changedFormulas);
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsBottom, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
 	
 	if(!this.workbook.bUndoChanges)
@@ -4093,8 +4103,14 @@ Woorksheet.prototype.getTableNameColumnByIndex = function(tableName, columnIndex
 		return res;
 	};
 Woorksheet.prototype.renameDependencyNodes = function(offset, oBBox, rec, noDelete){
-	this.workbook.dependencyFormulas.shift(this.Id, oBBox, offset);
+	return this.workbook.dependencyFormulas.shift(this.Id, oBBox, offset);
 };
+	Woorksheet.prototype.renameDependencyNodesChanged = function(changedFormulas){
+		var notifyData = {type: AscCommon.c_oNotifyType.Changed};
+		for (var listenerId in changedFormulas) {
+			changedFormulas[listenerId].notify(notifyData);
+		}
+	};
 Woorksheet.prototype.getAllCol = function(){
 	if(null == this.oAllCol)
 		this.oAllCol = new AscCommonExcel.Col(this, g_nAllColIndex);
@@ -4348,10 +4364,10 @@ Cell.prototype.setValue=function(val,callback, isCopyPaste) {
 	if (newFP) {
 		this.formulaParsed = newFP;
 		wb.dependencyFormulas.addToBuildDependencyCell(this);
-	} else if(val){
+	} else if (val) {
 		this.oValue.setValue(this, val);
 		wb.dependencyFormulas.addToChangedCell(this);
-	} else{
+	} else {
 		wb.dependencyFormulas.addToChangedCell(this);
 	}
 

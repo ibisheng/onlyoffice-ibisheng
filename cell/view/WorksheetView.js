@@ -9238,7 +9238,7 @@
                 diffRow = tablePartRange.r1 - refInsertBinary.r1;
                 diffCol = tablePartRange.c1 - refInsertBinary.c1;
                 range = t.model.getRange3( diffRow + selectionRange.r1, diffCol + selectionRange.c1, diffRow + selectionRange.r1 + (tablePartRange.r2 - tablePartRange.r1), diffCol + selectionRange.c1 + (tablePartRange.c2 - tablePartRange.c1) );
-
+                var offset = {offsetCol: range.bbox.c1 - tablePartRange.c1, offsetRow: range.bbox.r1 - tablePartRange.r1};
                 //если область вставки содержит форматированную таблицу, которая пересекается с вставляемой форматированной таблицей
                 var intersectionRangeWithTableParts = t.model.autoFilters._intersectionRangeWithTableParts( range.bbox );
                 if ( intersectionRangeWithTableParts )
@@ -9254,7 +9254,7 @@
                     bWithoutFilter = true;
                 }
 
-                var props = {bWithoutFilter: bWithoutFilter, tablePart: aFilters[aF]};
+                var props = {bWithoutFilter: bWithoutFilter, tablePart: aFilters[aF], offset: offset};
                 t.model.autoFilters.addAutoFilter( aFilters[aF].TableStyleInfo.Name, range.bbox, true, true, props );
             }
         }

@@ -4701,6 +4701,11 @@ TablePart.prototype.clone = function(ws, tableName) {
 		res.AutoFilter = this.AutoFilter.clone();
 	if (this.SortState)
 		res.SortState = this.SortState.clone();
+	if (this.TableColumns) {
+		res.TableColumns = [];
+		for (i = 0; i < this.TableColumns.length; ++i)
+			res.TableColumns.push(this.TableColumns[i].clone());
+	}
 	if (this.TableStyleInfo)
 		res.TableStyleInfo = this.TableStyleInfo.clone();
 	
@@ -4709,7 +4714,6 @@ TablePart.prototype.clone = function(ws, tableName) {
 		for (i = 0; i < this.result.length; ++i)
 			res.result.push(this.result[i].clone());
 	}
-	var oldName = this.DisplayName;
 	if(tableName)
 	{
 		res.DisplayName = tableName;
@@ -4721,12 +4725,6 @@ TablePart.prototype.clone = function(ws, tableName) {
 	
 	if(ws !== null)
 		res.recalc(ws, tableName);
-	var newName = oldName == res.DisplayName ? null : res.DisplayName;
-	if (this.TableColumns) {
-		res.TableColumns = [];
-		for (i = 0; i < this.TableColumns.length; ++i)
-			res.TableColumns.push(this.TableColumns[i].clone(newName));
-	}
 	return res;
 };
 	TablePart.prototype.renameSheetCopy = function(ws, renameParams) {
@@ -5368,26 +5366,15 @@ function TableColumn() {
 			this.TotalsRowFormula.removeDependencies();
 		}
 	};
-TableColumn.prototype.clone = function(opt_TableName, ws, renameParams) {
+TableColumn.prototype.clone = function(opt_ws) {
 	var res = new TableColumn();
 	res.Name = this.Name;
 	res.TotalsRowLabel = this.TotalsRowLabel;
 	res.TotalsRowFunction = this.TotalsRowFunction;
 
 	if (this.TotalsRowFormula) {
-		if(opt_TableName){
-
-		} else {
-			
-		}
-		
-		ws = ws ? ws : this.TotalsRowFormula.ws;
-		if(renameParams)
-		{
-			this.renameSheetCopy(ws, renameParams);
-		}
-		
-		res._setTotalRowFormula(this.TotalsRowFormula.Formula, ws, false);
+		opt_ws = opt_ws ? opt_ws : this.TotalsRowFormula.ws;
+		res._setTotalRowFormula(this.TotalsRowFormula.Formula, opt_ws, false);
 	}
 	if (this.dxf)
 		res.dxf = this.dxf.clone;
