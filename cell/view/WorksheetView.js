@@ -654,17 +654,15 @@
         return this._getRange( this.activeRange.c1, this.activeRange.r1, this.activeRange.c2, this.activeRange.r2 );
     };
 
-    WorksheetView.prototype.resize = function ( isUpdate ) {
-        if ( isUpdate ) {
-            this._initCellsArea( true );
+    WorksheetView.prototype.resize = function (isUpdate) {
+        if (isUpdate) {
+            this._initCellsArea(true);
             this._normalizeViewRange();
-            this._cleanCellsTextMetricsCache();
             this._prepareCellTextMetricsCache();
             this.updateResize = false;
 
             this.objectRender.resizeCanvas();
-        }
-        else {
+        } else {
             this.updateResize = true;
         }
         return this;
