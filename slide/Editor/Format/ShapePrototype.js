@@ -615,7 +615,7 @@ CShape.prototype.recalculateContent2 = function()
 
                 if(!body_pr.upright)
                 {
-                    if(!(body_pr.vert === AscFormat.nVertTTvert || body_pr.vert === AscFormat.nVertTTvert270))
+                    if(!(body_pr.vert === AscFormat.nVertTTvert || body_pr.vert === AscFormat.nVertTTvert270 || body_pr.vert === AscFormat.nVertTTeaVert))
                     {
                         this.txBody.contentWidth2 = w;
                         this.txBody.contentHeight2 = h;
@@ -632,7 +632,7 @@ CShape.prototype.recalculateContent2 = function()
                     var _full_rotate = this.getFullRotate();
                     if(AscFormat.checkNormalRotate(_full_rotate))
                     {
-                        if(!(body_pr.vert === AscFormat.nVertTTvert || body_pr.vert === AscFormat.nVertTTvert270))
+                        if(!(body_pr.vert === AscFormat.nVertTTvert || body_pr.vert === AscFormat.nVertTTvert270 || body_pr.vert === AscFormat.nVertTTeaVert))
                         {
 
                             this.txBody.contentWidth2 = w;
@@ -646,7 +646,7 @@ CShape.prototype.recalculateContent2 = function()
                     }
                     else
                     {
-                        if(!(body_pr.vert === AscFormat.nVertTTvert || body_pr.vert === AscFormat.nVertTTvert270))
+                        if(!(body_pr.vert === AscFormat.nVertTTvert || body_pr.vert === AscFormat.nVertTTvert270 || body_pr.vert === AscFormat.nVertTTeaVert))
                         {
 
                             this.txBody.contentWidth2 = h;
