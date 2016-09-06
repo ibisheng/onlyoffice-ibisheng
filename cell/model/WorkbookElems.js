@@ -5072,7 +5072,11 @@ TablePart.prototype.generateTotalsRowLabel = function(ws)
 		return;
 	}
 	
-	this.TableColumns[0].generateTotalsRowLabel();
+	//в случае одной колонки выставляем только формулу
+	if(this.TableColumns.length > 1)
+	{
+		this.TableColumns[0].generateTotalsRowLabel();
+	}
 	this.TableColumns[this.TableColumns.length - 1].generateTotalsRowFunction(ws, this);
 };
 
