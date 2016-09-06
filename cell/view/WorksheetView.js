@@ -3702,9 +3702,8 @@
 
     /**
      * Рисует выделение вокруг ячеек
-     * @param {Asc.Range} [range]
      */
-    WorksheetView.prototype._drawSelection = function(range) {
+    WorksheetView.prototype._drawSelection = function () {
         if (window['IS_NATIVE_EDITOR']) {
             return;
         }
@@ -3726,7 +3725,7 @@
                 this._drawFormulaRanges(this.arrActiveFormulaRanges);
             }
         } else {
-            this._drawSelectionRange(range);
+            this._drawSelectionRange();
         }
 
         // restore canvas' original clipping range
