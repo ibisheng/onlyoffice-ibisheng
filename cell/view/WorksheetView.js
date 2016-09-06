@@ -3554,8 +3554,7 @@
         var range = args[0];
         var isDashLine = args[1];
         var strokeColor = args[2];
-        var fillColor = args[3];
-        var isAllRange = args[4];
+        var isAllRange = args[3];
         var colorN = this.settings.activeCellBorderColor2;
         var ctx = this.overlayCtx;
         var c = this.cols;
@@ -3598,11 +3597,13 @@
         var y1 = r[oIntersection.r1].top - offsetY;
         var y2 = r[oIntersection.r2].top + r[oIntersection.r2].height - offsetY;
 
-        ctx.setLineWidth(isDashLine ? 1 : 2).setStrokeStyle(strokeColor);
-        /*2px для селекта ячеек в формулах*/
-        if (fillColor) {
-            ctx.setFillStyle(fillColor);
+        if (!isDashLine) {
+            var fillColor = strokeColor.Copy();
+            fillColor.a = 0.1;
+            ctx.setFillStyle(fillColor).fillRect(x1, y1, x2 - x1, y2 - y1);
         }
+
+        ctx.setLineWidth(isDashLine ? 1 : 2).setStrokeStyle(strokeColor);
 
         ctx.beginPath();
         if (drawTopSide && !firstRow) {
@@ -4111,13 +4112,12 @@
     };
 
     WorksheetView.prototype._drawFormatPainterRange = function () {
-        var strokeColor = new CColor(0, 0, 0);
-        this._drawElements(this._drawSelectionElement, this.copyActiveRange, true, strokeColor);
+        this._drawElements(this._drawSelectionElement, this.copyActiveRange, true, new CColor(0, 0, 0));
     };
 
     WorksheetView.prototype._drawFormulaRanges = function (arrRanges) {
         var i, length = AscCommonExcel.c_oAscFormulaRangeBorderColor.length;
-        var strokeColor, fillColor, colorIndex, uniqueColorIndex = 0, tmpColors = [];
+        var strokeColor, colorIndex, uniqueColorIndex = 0, tmpColors = [];
         for (i = 0; i < arrRanges.length; ++i) {
             var oFormulaRange = arrRanges[i].clone(true);
             if (arrRanges[i].isName) {
@@ -4129,8 +4129,8 @@
             }
             tmpColors.push(colorIndex);
 
-            strokeColor = fillColor = AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % length];
-            this._drawElements(this._drawSelectionElement, oFormulaRange, false, strokeColor, fillColor);
+            strokeColor = AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % length];
+            this._drawElements(this._drawSelectionElement, oFormulaRange, false, strokeColor);
         }
     };
 
@@ -4154,7 +4154,7 @@
             var isAllRange = true, strokeColor = (Asc.c_oAscMouseMoveLockedObjectType.TableProperties ===
             nLockAllType) ? AscCommonExcel.c_oAscCoAuthoringLockTablePropertiesBorderColor :
               AscCommonExcel.c_oAscCoAuthoringOtherBorderColor, oAllRange = new asc_Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
-            this._drawElements(this._drawSelectionElement, oAllRange, true, strokeColor, null, isAllRange);
+            this._drawElements(this._drawSelectionElement, oAllRange, true, strokeColor, isAllRange);
         }
     };
 
