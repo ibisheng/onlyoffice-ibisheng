@@ -401,13 +401,15 @@
 						var newTablePart = t._addNewFilter(filterRange, styleName, bWithoutFilter, displayName, tablePart, offset);
 						var newDisplayName = newTablePart && newTablePart.DisplayName ? newTablePart.DisplayName : null;
 
-						if(styleName)
-							t._setColorStyleTable(worksheet.TableParts[worksheet.TableParts.length - 1].Ref, worksheet.TableParts[worksheet.TableParts.length - 1], null, true);
-
 						//history
 						t._addHistoryObj({Ref: filterRange}, AscCH.historyitem_AutoFilter_Add,
 							{activeCells: filterRange, styleName: styleName, addFormatTableOptionsObj: addFormatTableOptionsObj, displayName: newDisplayName, tablePart: tablePart}, null, filterRange, bWithoutFilter);
 						History.SetSelectionRedo(filterRange);
+						
+						if(styleName)
+						{
+							t._setColorStyleTable(worksheet.TableParts[worksheet.TableParts.length - 1].Ref, worksheet.TableParts[worksheet.TableParts.length - 1], null, true);
+						}	
 					}
 
 					History.EndTransaction();
