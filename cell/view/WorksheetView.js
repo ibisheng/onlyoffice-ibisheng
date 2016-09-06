@@ -1990,23 +1990,23 @@
 
     // ----- Drawing -----
 
-    WorksheetView.prototype.draw = function ( lockDraw ) {
-        if ( lockDraw || this.model.workbook.bCollaborativeChanges || window['IS_NATIVE_EDITOR'] ) {
+    WorksheetView.prototype.draw = function (lockDraw) {
+        if (lockDraw || this.model.workbook.bCollaborativeChanges || window['IS_NATIVE_EDITOR']) {
             return this;
         }
         this._clean();
         this._drawCorner();
-        this._drawColumnHeaders( /*drawingCtx*/ undefined );
-        this._drawRowHeaders( /*drawingCtx*/ undefined );
-        this._drawGrid( /*drawingCtx*/ undefined );
-        this._drawCellsAndBorders( /*drawingCtx*/undefined );
+        this._drawColumnHeaders(/*drawingCtx*/ undefined);
+        this._drawRowHeaders(/*drawingCtx*/ undefined);
+        this._drawGrid(/*drawingCtx*/ undefined);
+        this._drawCellsAndBorders(/*drawingCtx*/undefined);
         this._drawFrozenPane();
         this._drawFrozenPaneLines();
         this._fixSelectionOfMergedCells();
-        this._drawAutoF();
+        this._drawElements(this.af_drawButtons);
         this.cellCommentator.drawCommentCells();
-        this.objectRender.showDrawingObjectsEx( true );
-        if ( this.overlayCtx ) {
+        this.objectRender.showDrawingObjectsEx(true);
+        if (this.overlayCtx) {
             this._drawSelection();
         }
 
@@ -3550,39 +3550,28 @@
 
     /** */
 
-    WorksheetView.prototype._drawSelectionElement = function ( visibleRange, offsetX, offsetY, args ) {
-        var range = args[0], isDashLine = args[1], lineWidth = args[2],
-			strokeColor = args[3], fillColor = args[4], isAllRange = args[5],
-			colorN = this.settings.activeCellBorderColor2,
-			ctx = this.overlayCtx, c = this.cols, r = this.rows,
-			oIntersection = range.intersectionSimple( visibleRange ),
-			ppiX = this._getPPIX(), ppiY = this._getPPIY();
+    WorksheetView.prototype._drawSelectionElement = function (visibleRange, offsetX, offsetY, args) {
+        var range = args[0], isDashLine = args[1], lineWidth = args[2], strokeColor = args[3], fillColor = args[4], isAllRange = args[5], colorN = this.settings.activeCellBorderColor2, ctx = this.overlayCtx, c = this.cols, r = this.rows, oIntersection = range.intersectionSimple(
+          visibleRange), ppiX = this._getPPIX(), ppiY = this._getPPIY();
 
-        if ( !oIntersection ) {
+        if (!oIntersection) {
             return;
         }
 
-		var width_1px = asc_calcnpt( 0, ppiX, 1/*px*/ ),
-			width_2px = asc_calcnpt( 0, ppiX, 2/*px*/ ),
-			width_3px = asc_calcnpt( 0, ppiX, 3/*px*/ ),
-			width_4px = asc_calcnpt( 0, ppiX, 4/*px*/ ),
-			width_5px = asc_calcnpt( 0, ppiX, 5/*px*/ ),
-			width_7px = asc_calcnpt( 0, ppiX, 7/*px*/ ),
+        var width_1px = asc_calcnpt(0, ppiX, 1/*px*/), width_2px = asc_calcnpt(0, ppiX, 2
+          /*px*/), width_3px = asc_calcnpt(0, ppiX, 3/*px*/), width_4px = asc_calcnpt(0, ppiX, 4
+          /*px*/), width_5px = asc_calcnpt(0, ppiX, 5/*px*/), width_7px = asc_calcnpt(0, ppiX, 7/*px*/),
 
-			height_1px = asc_calcnpt( 0, ppiY, 1/*px*/ ),
-			height_2px = asc_calcnpt( 0, ppiY, 2/*px*/ ),
-			height_3px = asc_calcnpt( 0, ppiY, 3/*px*/ ),
-			height_4px = asc_calcnpt( 0, ppiY, 4/*px*/ ),
-			height_5px = asc_calcnpt( 0, ppiY, 5/*px*/ ),
-			height_7px = asc_calcnpt( 0, ppiY, 7/*px*/ );
+          height_1px = asc_calcnpt(0, ppiY, 1/*px*/), height_2px = asc_calcnpt(0, ppiY, 2
+          /*px*/), height_3px = asc_calcnpt(0, ppiY, 3/*px*/), height_4px = asc_calcnpt(0, ppiY, 4
+          /*px*/), height_5px = asc_calcnpt(0, ppiY, 5/*px*/), height_7px = asc_calcnpt(0, ppiY, 7/*px*/);
 
 
         var fHorLine, fVerLine;
-        if ( isDashLine ) {
+        if (isDashLine) {
             fHorLine = ctx.dashLineCleverHor;
             fVerLine = ctx.dashLineCleverVer;
-        }
-        else {
+        } else {
             fHorLine = ctx.lineHorPrevPx;
             fVerLine = ctx.lineVerPrevPx;
         }
@@ -3600,80 +3589,83 @@
         var y1 = r[oIntersection.r1].top - offsetY;
         var y2 = r[oIntersection.r2].top + r[oIntersection.r2].height - offsetY;
 
-        ctx.setLineWidth( isDashLine ? lineWidth : 2 ).setStrokeStyle( strokeColor );/*2px для селекта ячеек в формулах*/
-        if ( fillColor ) {
-            ctx.setFillStyle( fillColor );
+        ctx.setLineWidth(isDashLine ? lineWidth : 2).setStrokeStyle(strokeColor);
+        /*2px для селекта ячеек в формулах*/
+        if (fillColor) {
+            ctx.setFillStyle(fillColor);
         }
 
-		ctx.beginPath();
-		if ( drawTopSide && !firstRow ) {
-			fHorLine.apply( ctx, [x1 - !isDashLine * width_2px, y1, x2 + !isDashLine * width_1px] );
-		}
-		if ( drawBottomSide ) {
-			fHorLine.apply( ctx, [x1, y2 + !isDashLine * height_1px, x2] );
-		}
-		if ( drawLeftSide && !firstCol ) {
-			fVerLine.apply( ctx, [x1, y1, y2 + !isDashLine * height_1px] );
-		}
-		if ( drawRightSide ) {
-			fVerLine.apply( ctx, [x2 + !isDashLine * width_1px, y1, y2 + !isDashLine * height_1px] );
-		}
-		ctx.closePath().stroke();
+        ctx.beginPath();
+        if (drawTopSide && !firstRow) {
+            fHorLine.apply(ctx, [x1 - !isDashLine * width_2px, y1, x2 + !isDashLine * width_1px]);
+        }
+        if (drawBottomSide) {
+            fHorLine.apply(ctx, [x1, y2 + !isDashLine * height_1px, x2]);
+        }
+        if (drawLeftSide && !firstCol) {
+            fVerLine.apply(ctx, [x1, y1, y2 + !isDashLine * height_1px]);
+        }
+        if (drawRightSide) {
+            fVerLine.apply(ctx, [x2 + !isDashLine * width_1px, y1, y2 + !isDashLine * height_1px]);
+        }
+        ctx.closePath().stroke();
 
-		if ( !isDashLine ) {/*Отрисовка светлой полосы при выборе ячеек для формулы*/
-			ctx.setLineWidth( 1 );
-			ctx.setStrokeStyle( colorN );
-			ctx.beginPath();
-			if ( drawTopSide && !firstRow ) {
-				fHorLine.apply( ctx, [x1, y1 + height_1px, x2 - width_1px] );
-			}
-			if ( drawBottomSide ) {
-				fHorLine.apply( ctx, [x1, y2 - height_1px, x2 - width_1px] );
-			}
-			if ( drawLeftSide && !firstCol ) {
-				fVerLine.apply( ctx, [x1 + width_1px, y1, y2 - height_2px] );
-			}
-			if ( drawRightSide ) {
-				fVerLine.apply( ctx, [x2 - width_1px, y1, y2 - height_2px] );
-			}
-			ctx.closePath().stroke();
-		}
+        if (!isDashLine) {/*Отрисовка светлой полосы при выборе ячеек для формулы*/
+            ctx.setLineWidth(1);
+            ctx.setStrokeStyle(colorN);
+            ctx.beginPath();
+            if (drawTopSide && !firstRow) {
+                fHorLine.apply(ctx, [x1, y1 + height_1px, x2 - width_1px]);
+            }
+            if (drawBottomSide) {
+                fHorLine.apply(ctx, [x1, y2 - height_1px, x2 - width_1px]);
+            }
+            if (drawLeftSide && !firstCol) {
+                fVerLine.apply(ctx, [x1 + width_1px, y1, y2 - height_2px]);
+            }
+            if (drawRightSide) {
+                fVerLine.apply(ctx, [x2 - width_1px, y1, y2 - height_2px]);
+            }
+            ctx.closePath().stroke();
+        }
 
         // Отрисовка квадратов для move/resize
-        if ( fillColor && !range.isName ) {
-			ctx.setFillStyle( colorN );
-			if ( drawLeftSide && drawTopSide ) {
-				ctx.fillRect( x1 - width_4px, y1 - height_4px, width_7px, height_7px );
-			}
-			if ( drawRightSide && drawTopSide ) {
-				ctx.fillRect( x2 - width_4px, y1 - height_4px, width_7px, height_7px );
-			}
-			if ( drawRightSide && drawBottomSide ) {
-				ctx.fillRect( x2 - width_4px, y2 - height_4px, width_7px, height_7px );
-			}
-			if ( drawLeftSide && drawBottomSide ) {
-				ctx.fillRect( x1 - width_4px, y2 - height_4px, width_7px, height_7px );
-			}
+        if (fillColor && !range.isName) {
+            ctx.setFillStyle(colorN);
+            if (drawLeftSide && drawTopSide) {
+                ctx.fillRect(x1 - width_4px, y1 - height_4px, width_7px, height_7px);
+            }
+            if (drawRightSide && drawTopSide) {
+                ctx.fillRect(x2 - width_4px, y1 - height_4px, width_7px, height_7px);
+            }
+            if (drawRightSide && drawBottomSide) {
+                ctx.fillRect(x2 - width_4px, y2 - height_4px, width_7px, height_7px);
+            }
+            if (drawLeftSide && drawBottomSide) {
+                ctx.fillRect(x1 - width_4px, y2 - height_4px, width_7px, height_7px);
+            }
 
-			ctx.setFillStyle( strokeColor );
-			if ( drawLeftSide && drawTopSide ) {
-				ctx.fillRect( x1 - width_3px, y1 - height_3px, width_5px, height_5px );
-			}
-			if ( drawRightSide && drawTopSide ) {
-				ctx.fillRect( x2 - width_3px, y1 - height_3px, width_5px, height_5px );
-			}
-			if ( drawRightSide && drawBottomSide ) {
-				ctx.fillRect( x2 - width_3px, y2 - height_3px, width_5px, height_5px );
-			}
-			if ( drawLeftSide && drawBottomSide ) {
-				ctx.fillRect( x1 - width_3px, y2 - height_3px, width_5px, height_5px );
-			}
+            ctx.setFillStyle(strokeColor);
+            if (drawLeftSide && drawTopSide) {
+                ctx.fillRect(x1 - width_3px, y1 - height_3px, width_5px, height_5px);
+            }
+            if (drawRightSide && drawTopSide) {
+                ctx.fillRect(x2 - width_3px, y1 - height_3px, width_5px, height_5px);
+            }
+            if (drawRightSide && drawBottomSide) {
+                ctx.fillRect(x2 - width_3px, y2 - height_3px, width_5px, height_5px);
+            }
+            if (drawLeftSide && drawBottomSide) {
+                ctx.fillRect(x1 - width_3px, y2 - height_3px, width_5px, height_5px);
+            }
         }
     };
     /**Отрисовывает диапазон с заданными параметрами*/
-    WorksheetView.prototype._drawElements = function ( thisArg, drawFunction ) {
-        var cFrozen = 0, rFrozen = 0, args = Array.prototype.slice.call( arguments, 2 ), c = this.cols, r = this.rows, offsetX = c[this.visibleRange.c1].left - this.cellsLeft, offsetY = r[this.visibleRange.r1].top - this.cellsTop;
-        if ( this.topLeftFrozenCell ) {
+    WorksheetView.prototype._drawElements = function (drawFunction) {
+        var cFrozen = 0, rFrozen = 0, args = Array.prototype.slice.call(arguments,
+          1), c = this.cols, r = this.rows, offsetX = c[this.visibleRange.c1].left -
+          this.cellsLeft, offsetY = r[this.visibleRange.r1].top - this.cellsTop;
+        if (this.topLeftFrozenCell) {
             cFrozen = this.topLeftFrozenCell.getCol0();
             rFrozen = this.topLeftFrozenCell.getRow0();
             offsetX -= this.cols[cFrozen].left - this.cols[0].left;
@@ -3682,22 +3674,22 @@
             var oFrozenRange;
             cFrozen -= 1;
             rFrozen -= 1;
-            if ( 0 <= cFrozen && 0 <= rFrozen ) {
-                oFrozenRange = new asc_Range( 0, 0, cFrozen, rFrozen );
-                drawFunction.call( thisArg, oFrozenRange, c[0].left - this.cellsLeft, r[0].top - this.cellsTop, args );
+            if (0 <= cFrozen && 0 <= rFrozen) {
+                oFrozenRange = new asc_Range(0, 0, cFrozen, rFrozen);
+                drawFunction.call(this, oFrozenRange, c[0].left - this.cellsLeft, r[0].top - this.cellsTop, args);
             }
-            if ( 0 <= cFrozen ) {
-                oFrozenRange = new asc_Range( 0, this.visibleRange.r1, cFrozen, this.visibleRange.r2 );
-                drawFunction.call( thisArg, oFrozenRange, c[0].left - this.cellsLeft, offsetY, args );
+            if (0 <= cFrozen) {
+                oFrozenRange = new asc_Range(0, this.visibleRange.r1, cFrozen, this.visibleRange.r2);
+                drawFunction.call(this, oFrozenRange, c[0].left - this.cellsLeft, offsetY, args);
             }
-            if ( 0 <= rFrozen ) {
-                oFrozenRange = new asc_Range( this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen );
-                drawFunction.call( thisArg, oFrozenRange, offsetX, r[0].top - this.cellsTop, args );
+            if (0 <= rFrozen) {
+                oFrozenRange = new asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen);
+                drawFunction.call(this, oFrozenRange, offsetX, r[0].top - this.cellsTop, args);
             }
         }
 
         // Можно вместо call попользовать apply, но тогда нужно каждый раз соединять массив аргументов и 3 объекта
-        drawFunction.call( thisArg, this.visibleRange, offsetX, offsetY, args );
+        drawFunction.call(this, this.visibleRange, offsetX, offsetY, args);
     };
 
     /**
@@ -4110,30 +4102,34 @@
     };
 
     WorksheetView.prototype._drawFormatPainterRange = function () {
-        var lineWidth = 1, isDashLine = true, strokeColor = new CColor( 0, 0, 0 );
-        this._drawElements( this, this._drawSelectionElement, this.copyActiveRange, isDashLine, lineWidth, strokeColor );
+        var lineWidth = 1, isDashLine = true, strokeColor = new CColor(0, 0, 0);
+        this._drawElements(this._drawSelectionElement, this.copyActiveRange, isDashLine, lineWidth, strokeColor);
     };
 
-    WorksheetView.prototype._drawFormulaRanges = function ( arrRanges ) {
+    WorksheetView.prototype._drawFormulaRanges = function (arrRanges) {
         var i, lineWidth = 1, isDashLine = false, length = AscCommonExcel.c_oAscFormulaRangeBorderColor.length;
         var strokeColor, fillColor, colorIndex, uniqueColorIndex = 0, tmpColors = [];
-        for ( i = 0; i < arrRanges.length; ++i ) {
-            var oFormulaRange = arrRanges[i].clone( true );
-			if ( arrRanges[i].isName )oFormulaRange.isName = true;
-            colorIndex = asc.getUniqueRangeColor( arrRanges, i, tmpColors );
-            if ( null == colorIndex ) {
+        for (i = 0; i < arrRanges.length; ++i) {
+            var oFormulaRange = arrRanges[i].clone(true);
+            if (arrRanges[i].isName) {
+                oFormulaRange.isName = true;
+            }
+            colorIndex = asc.getUniqueRangeColor(arrRanges, i, tmpColors);
+            if (null == colorIndex) {
                 colorIndex = uniqueColorIndex++;
             }
-            tmpColors.push( colorIndex );
+            tmpColors.push(colorIndex);
 
             strokeColor = fillColor = AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % length];
-            this._drawElements( this, this._drawSelectionElement, oFormulaRange, isDashLine, lineWidth, strokeColor, fillColor );
+            this._drawElements(this._drawSelectionElement, oFormulaRange, isDashLine, lineWidth, strokeColor,
+              fillColor);
         }
     };
 
-    WorksheetView.prototype._drawSelectRange = function ( oSelectRange ) {
+    WorksheetView.prototype._drawSelectRange = function (oSelectRange) {
         var lineWidth = 1, isDashLine = true;
-        this._drawElements( this, this._drawSelectionElement, oSelectRange, isDashLine, lineWidth, AscCommonExcel.c_oAscCoAuthoringOtherBorderColor);
+        this._drawElements(this._drawSelectionElement, oSelectRange, isDashLine, lineWidth,
+          AscCommonExcel.c_oAscCoAuthoringOtherBorderColor);
     };
 
     WorksheetView.prototype._drawCollaborativeElements = function () {
@@ -4146,39 +4142,32 @@
 
     WorksheetView.prototype._drawCollaborativeElementsAllLock = function () {
         var currentSheetId = this.model.getId();
-        var nLockAllType = this.collaborativeEditing.isLockAllOther( currentSheetId );
-        if ( Asc.c_oAscMouseMoveLockedObjectType.None !== nLockAllType ) {
-            var lineWidth = 1, isDashLine = true, isAllRange = true, strokeColor = (Asc.c_oAscMouseMoveLockedObjectType.TableProperties === nLockAllType) ? AscCommonExcel.c_oAscCoAuthoringLockTablePropertiesBorderColor : AscCommonExcel.c_oAscCoAuthoringOtherBorderColor, oAllRange = new asc_Range( 0, 0, gc_nMaxCol0, gc_nMaxRow0 );
-            this._drawElements( this, this._drawSelectionElement, oAllRange, isDashLine, lineWidth, strokeColor, null, isAllRange );
+        var nLockAllType = this.collaborativeEditing.isLockAllOther(currentSheetId);
+        if (Asc.c_oAscMouseMoveLockedObjectType.None !== nLockAllType) {
+            var lineWidth = 1, isDashLine = true, isAllRange = true, strokeColor = (Asc.c_oAscMouseMoveLockedObjectType.TableProperties ===
+            nLockAllType) ? AscCommonExcel.c_oAscCoAuthoringLockTablePropertiesBorderColor :
+              AscCommonExcel.c_oAscCoAuthoringOtherBorderColor, oAllRange = new asc_Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
+            this._drawElements(this._drawSelectionElement, oAllRange, isDashLine, lineWidth, strokeColor, null,
+              isAllRange);
         }
     };
 
     WorksheetView.prototype._drawCollaborativeElementsMeOther = function (type) {
         var currentSheetId = this.model.getId(), i, lineWidth = 1, isDashLine = true, strokeColor, arrayCells, oCellTmp;
-        if ( c_oAscLockTypes.kLockTypeMine === type ) {
+        if (c_oAscLockTypes.kLockTypeMine === type) {
             strokeColor = AscCommonExcel.c_oAscCoAuthoringMeBorderColor;
-            arrayCells = this.collaborativeEditing.getLockCellsMe( currentSheetId );
+            arrayCells = this.collaborativeEditing.getLockCellsMe(currentSheetId);
 
-            arrayCells = arrayCells.concat( this.collaborativeEditing.getArrayInsertColumnsBySheetId( currentSheetId ) );
-            arrayCells = arrayCells.concat( this.collaborativeEditing.getArrayInsertRowsBySheetId( currentSheetId ) );
-        }
-        else {
+            arrayCells = arrayCells.concat(this.collaborativeEditing.getArrayInsertColumnsBySheetId(currentSheetId));
+            arrayCells = arrayCells.concat(this.collaborativeEditing.getArrayInsertRowsBySheetId(currentSheetId));
+        } else {
             strokeColor = AscCommonExcel.c_oAscCoAuthoringOtherBorderColor;
-            arrayCells = this.collaborativeEditing.getLockCellsOther( currentSheetId );
+            arrayCells = this.collaborativeEditing.getLockCellsOther(currentSheetId);
         }
 
-        for ( i = 0; i < arrayCells.length; ++i ) {
-            oCellTmp = new asc_Range( arrayCells[i].c1, arrayCells[i].r1, arrayCells[i].c2, arrayCells[i].r2 );
-            this._drawElements( this, this._drawSelectionElement, oCellTmp, isDashLine, lineWidth, strokeColor );
-        }
-    };
-
-    WorksheetView.prototype._drawAutoF = function ( updatedRange, offsetX, offsetY ) {
-        if ( updatedRange ) {
-            this.af_drawButtons( updatedRange, offsetX, offsetY );
-        }
-        else {
-            this._drawElements( this, this.af_drawButtons );
+        for (i = 0; i < arrayCells.length; ++i) {
+            oCellTmp = new asc_Range(arrayCells[i].c1, arrayCells[i].r1, arrayCells[i].c2, arrayCells[i].r2);
+            this._drawElements(this._drawSelectionElement, oCellTmp, isDashLine, lineWidth, strokeColor);
         }
     };
 
@@ -5874,7 +5863,7 @@
             offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
             this._drawGrid( /*drawingCtx*/ undefined, range );
             this._drawCellsAndBorders( /*drawingCtx*/undefined, range );
-            this._drawAutoF( range, offsetX, offsetY );
+            this.af_drawButtons(range, offsetX, offsetY);
             this.objectRender.showDrawingObjectsEx( false, new AscFormat.GraphicOption( this, c_oAscGraphicOption.ScrollVertical, range, {
                 offsetX: offsetX, offsetY: offsetY
             } ) );
@@ -5884,7 +5873,7 @@
                 offsetX = this.cols[0].left - this.cellsLeft;
                 this._drawGrid( /*drawingCtx*/ undefined, range, offsetX );
                 this._drawCellsAndBorders( /*drawingCtx*/undefined, range, offsetX );
-                this._drawAutoF( range, offsetX, offsetY );
+                this.af_drawButtons(range, offsetX, offsetY);
                 this.objectRender.showDrawingObjectsEx( false, new AscFormat.GraphicOption( this, c_oAscGraphicOption.ScrollVertical, range, {
                     offsetX: offsetX, offsetY: offsetY
                 } ) );
@@ -6032,7 +6021,7 @@
             this._drawColumnHeaders( /*drawingCtx*/ undefined, c1, c2 );
             this._drawGrid( /*drawingCtx*/ undefined, range );
             this._drawCellsAndBorders( /*drawingCtx*/undefined, range );
-            this._drawAutoF( range, offsetX, offsetY );
+            this.af_drawButtons(range, offsetX, offsetY);
             this.objectRender.showDrawingObjectsEx( false, new AscFormat.GraphicOption( this, c_oAscGraphicOption.ScrollHorizontal, range, {
                 offsetX: offsetX, offsetY: offsetY
             } ) );
@@ -6042,7 +6031,7 @@
                 offsetY = this.rows[0].top - this.cellsTop;
                 this._drawGrid( /*drawingCtx*/ undefined, range, undefined, offsetY );
                 this._drawCellsAndBorders( /*drawingCtx*/undefined, range, undefined, offsetY );
-                this._drawAutoF( range, offsetX, offsetY );
+                this.af_drawButtons(range, offsetX, offsetY);
                 this.objectRender.showDrawingObjectsEx( false, new AscFormat.GraphicOption( this, c_oAscGraphicOption.ScrollHorizontal, range, {
                     offsetX: offsetX, offsetY: offsetY
                 } ) );
