@@ -321,6 +321,14 @@ var c_oAscFormulaRangeBorderColor = [
   new CColor(55, 127, 158)
 ];
 
+  var selectionLineType = {
+    Dash            : 1,
+    RangeWithPromote: 2,
+    RangeWithResize : 3,
+    Range           : 4,
+    RangeOut        : 5
+  };
+
 var c_oAscLockNameFrozenPane = "frozenPane";
 var c_oAscLockNameTabColor = "tabColor";
 
@@ -369,6 +377,7 @@ var c_oAscPopUpSelectorType = {
   window['AscCommonExcel'].c_oAscCoAuthoringDottedWidth = c_oAscCoAuthoringDottedWidth;
   window['AscCommonExcel'].c_oAscCoAuthoringDottedDistance = c_oAscCoAuthoringDottedDistance;
   window['AscCommonExcel'].c_oAscFormulaRangeBorderColor = c_oAscFormulaRangeBorderColor;
+  window['AscCommonExcel'].selectionLineType = selectionLineType;
   window['AscCommonExcel'].c_oAscLockNameFrozenPane = c_oAscLockNameFrozenPane;
   window['AscCommonExcel'].c_oAscLockNameTabColor = c_oAscLockNameTabColor;
 

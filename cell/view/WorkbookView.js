@@ -102,7 +102,7 @@
       paddingPlusBorder: -1
     };
     this.activeCellBorderColor = new CColor(126, 152, 63);
-    this.activeCellBorderColor2 = new CColor(255, 255, 255, 0.75);
+    this.activeCellBorderColor2 = new CColor(255, 255, 255, 1);
     this.activeCellBackground = new CColor(157, 185, 85, 0.2);
 
     // Цвет заливки границы выделения области автозаполнения

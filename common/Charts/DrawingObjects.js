@@ -3573,13 +3573,15 @@ function DrawingObjects() {
         {
             worksheet._drawElements(worksheet._drawSelectionElement,
               asc.Range(drawing.bbox.serBBox.c1, drawing.bbox.serBBox.r1, drawing.bbox.serBBox.c2,
-                drawing.bbox.serBBox.r2, true), false, AscCommonExcel.c_oAscFormulaRangeBorderColor[1]);
+                drawing.bbox.serBBox.r2, true), AscCommonExcel.selectionLineType.RangeWithResize,
+              AscCommonExcel.c_oAscFormulaRangeBorderColor[1]);
         }
         if(drawing.bbox.catBBox)
         {
             worksheet._drawElements(worksheet._drawSelectionElement,
               asc.Range(drawing.bbox.catBBox.c1, drawing.bbox.catBBox.r1, drawing.bbox.catBBox.c2,
-                drawing.bbox.catBBox.r2, true), false, AscCommonExcel.c_oAscFormulaRangeBorderColor[2]);
+                drawing.bbox.catBBox.r2, true), AscCommonExcel.selectionLineType.RangeWithResize,
+              AscCommonExcel.c_oAscFormulaRangeBorderColor[2]);
         }
         var BB = drawing.bbox.seriesBBox;
         var range = asc.Range(BB.c1, BB.r1, BB.c2, BB.r2, true);
