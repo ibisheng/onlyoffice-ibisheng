@@ -6914,6 +6914,7 @@ drawHBarChart.prototype =
 			{
 				this.temp[cubeCount].faces = [];
 				this.temp[cubeCount].arrPoints = [point11, point22, point33, point44, point55, point66, point77, point88];
+				this.temp[cubeCount].z = point11.z;
 			}
 			
 			for(var k = 0; k < paths.length; k++)
@@ -11956,42 +11957,24 @@ CSortFaces.prototype =
 		
 		if(startIndexes.length === 0)
 		{
-			var maxIndexes = 1;
-			var mapIndexes = {};
-			for(var i = 0; i < countIntersection.length; i++)
+			//TODO сделано для графиков типа stacked, когда пересечения найдены всех параллалеп.
+			var minZ = parallelepipeds[0].z;
+			var minZArray = [];
+			for(var i = 0; i < parallelepipeds.length; i++)
 			{
-				if(countIntersection[i] === maxIndexes)
+				if(parallelepipeds[i].z < minZ)
 				{
-					startIndexes.push({index: parseInt(i)});
-					mapIndexes[parseInt(i)] = 1;
-				}
-			}
-			
-			//для stacked заглушка. пересмотреть!!!
-			var arr = [];
-			for(var i = 0; i < startIndexes.length; i++)
-			{
-				var index = startIndexes[i].index;
-				var temp = false;
-				for(var j  in revIntersections[index])
-				{
-					if(mapIndexes[j])
-					{
-						temp = true;
-						break;
-					}
+					minZ = parallelepipeds[i].z;
+					minZArray = [];
 				}
 				
-				if(temp)
+				if(minZ === parallelepipeds[i].z)
 				{
-					arr.push({index: parseInt(index)});
+					minZArray.push({index: parseInt(i)});
 				}
 			}
 			
-			if(arr.length)
-			{
-				startIndexes = arr;
-			}
+			startIndexes = minZArray.reverse();
 		}
 		
 		var g = revIntersections;
