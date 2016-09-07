@@ -729,7 +729,7 @@ CImageShape.prototype.Undo = function(data)
         }
         case AscDFH.historyitem_ImageShapeSetApplicationId:
         {
-            this.m_sData = data.oldId;
+            this.m_sApplicationId = data.oldId;
             break;
         }
         case AscDFH.historyitem_ImageShapeSetPixSizes:
@@ -853,7 +853,7 @@ CImageShape.prototype.Redo = function(data)
         }
         case AscDFH.historyitem_ImageShapeSetApplicationId:
         {
-            this.m_sData = data.newId;
+            this.m_sApplicationId = data.newId;
             break;
         }
 

@@ -423,7 +423,6 @@ DrawingObjectsController.prototype.addImageFromParams = function(rasterImageId, 
 };
 
 DrawingObjectsController.prototype.addOleObjectFromParams = function(fPosX, fPosY, fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId){
-    History.Create_NewPoint();
     var oOleObject = this.createOleObject(sData, sApplicationId, sLocalUrl, fPosX, fPosY, fWidth, fHeight, nWidthPix, nHeightPix);
     this.resetSelection();
     oOleObject.setWorksheet(this.drawingObjects.getWorksheetModel());
@@ -436,9 +435,6 @@ DrawingObjectsController.prototype.addOleObjectFromParams = function(fPosX, fPos
 };
 
 DrawingObjectsController.prototype.editOleObjectFromParams = function(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight, bResize){
-    if(!bResize){
-        History.Create_NewPoint();
-    }
     oOleObject.setData(sData);
     var _blipFill           = new AscFormat.CBlipFill();
     _blipFill.RasterImageId = sImageUrl;
