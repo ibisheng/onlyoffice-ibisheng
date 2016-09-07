@@ -3574,6 +3574,7 @@
 
 
         var fHorLine, fVerLine;
+        var isRangeOut = AscCommonExcel.selectionLineType.RangeOut === selectionLineType;
         var isDashLine = AscCommonExcel.selectionLineType.Dash === selectionLineType;
         if (isDashLine) {
             fHorLine = ctx.dashLineCleverHor;
@@ -3596,7 +3597,7 @@
         var y1 = r[oIntersection.r1].top - offsetY;
         var y2 = r[oIntersection.r2].top + r[oIntersection.r2].height - offsetY;
 
-        if (!isDashLine && AscCommonExcel.selectionLineType.RangeOut !== selectionLineType) {
+        if (!isDashLine && !isRangeOut) {
             var fillColor = strokeColor.Copy();
             fillColor.a = 0.15;
             ctx.setFillStyle(fillColor).fillRect(x1, y1, x2 - x1, y2 - y1);
@@ -3619,7 +3620,7 @@
         }
         ctx.closePath().stroke();
 
-        if (!isDashLine) {/*Отрисовка светлой полосы при выборе ячеек для формулы*/
+        if (!isDashLine && !isRangeOut) {/*Отрисовка светлой полосы при выборе ячеек для формулы*/
             ctx.setLineWidth(1);
             ctx.setStrokeStyle(colorN);
             ctx.beginPath();
