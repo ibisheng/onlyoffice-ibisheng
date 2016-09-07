@@ -37,7 +37,7 @@ AscCommon.baseEditorsApi.prototype._onEndPermissions = function()
 	if (this.isOnFirstConnectEnd && this.isOnLoadLicense)
 	{
 		var oResult = new AscCommon.asc_CAscEditorPermissions();
-		oResult.setCanLicense(true);
+		oResult.setLicenseType(Asc.c_oLicenseResult.Success);
 		oResult.setCanBranding(true);
 		this.sendEvent('asc_onGetEditorPermissions', oResult);
 	}

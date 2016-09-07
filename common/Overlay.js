@@ -45,10 +45,6 @@ var TRACK_ADJUSTMENT_SIZE   = 10;
 var TRACK_WRAPPOINTS_SIZE   = 6;
 var IMAGE_ROTATE_TRACK_W    = 21;
 
-if (AscBrowser.isRetina && AscBrowser.isMobile) {
-    TRACK_DISTANCE_ROTATE <<= 1;
-}
-
 var bIsUseImageRotateTrack  = true;
 if (bIsUseImageRotateTrack)
 {

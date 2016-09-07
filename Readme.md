@@ -1,5 +1,5 @@
 
-[![License](https://img.shields.io/badge/License-GNU%20AGPL%20V3-green.svg?style=flat)](http://www.gnu.org/licenses/agpl-3.0.ru.html) ![Release](https://img.shields.io/badge/Release-v4.1.0-blue.svg?style=flat)
+[![License](https://img.shields.io/badge/License-GNU%20AGPL%20V3-green.svg?style=flat)](http://www.gnu.org/licenses/agpl-3.0.ru.html) ![Release](https://img.shields.io/badge/Release-v4.1.1-blue.svg?style=flat)
 
 ## Sdkjs
 
@@ -15,10 +15,11 @@ SaaS version: [http://www.onlyoffice.com](http://www.onlyoffice.com "http://www.
 
 ## User Feedback and Support
 
-If you have any problems with or questions about [ONLYOFFICE Document Server][2], please visit our official forum to find answers to your questions: [dev.onlyoffice.org][1].
+If you have any problems with or questions about [ONLYOFFICE Document Server][2], please visit our official forum to find answers to your questions: [dev.onlyoffice.org][1] or you can ask and answer ONLYOFFICE development questions on [Stack Overflow][3].
 
   [1]: http://dev.onlyoffice.org
   [2]: https://github.com/ONLYOFFICE/DocumentServer
+  [3]: http://stackoverflow.com/questions/tagged/onlyoffice
   
 ## License
 

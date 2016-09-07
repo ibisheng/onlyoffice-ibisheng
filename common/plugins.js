@@ -385,9 +385,19 @@
 			var name  = pluginData.getAttribute("type");
 			var value = pluginData.getAttribute("data");
 
-			if ("initialize" == name)
+            if ("initialize_internal" == name)
+            {
+                window.g_asc_plugins.init();
+            }
+			else if ("initialize" == name)
 			{
-				window.g_asc_plugins.init();
+				var pluginData = new CPluginData();
+                pluginData.setAttribute("guid", guid);
+                pluginData.setAttribute("type", "plugin_init");
+                pluginData.setAttribute("data", "(function(n,t){var i=!1;n.plugin_sendMessage=function(t){n.parent.postMessage(t,\"*\")};n.plugin_onMessage=function(r){var u,f;if(n.Asc.plugin&&typeof r.data==\"string\"){u={};try{u=JSON.parse(r.data)}catch(e){u={}}if(u.guid!=n.Asc.plugin.guid)return;f=u.type;f==\"init\"&&(n.Asc.plugin.info=u);switch(f){case\"init\":n.Asc.plugin.executeCommand=function(t,i){n.Asc.plugin.info.type=t;n.Asc.plugin.info.data=i;var r=\"\";try{r=JSON.stringify(n.Asc.plugin.info)}catch(u){r=JSON.stringify({type:i})}n.plugin_sendMessage(r)};n.Asc.plugin.resizeWindow=function(i,r,u,f,e,o){var h,s;t==u&&(u=0);t==f&&(f=0);t==e&&(e=0);t==o&&(o=0);h=JSON.stringify({width:i,height:r,minw:u,minh:f,maxw:e,maxh:o});n.Asc.plugin.info.type=\"resize\";n.Asc.plugin.info.data=h;s=\"\";try{s=JSON.stringify(n.Asc.plugin.info)}catch(c){s=JSON.stringify({type:h})}n.plugin_sendMessage(s)};n.Asc.plugin.init(n.Asc.plugin.info.data);break;case\"button\":n.Asc.plugin.button(parseInt(u.button));break;case\"enableMouseEvent\":i=u.isEnabled;break;case\"onExternalMouseUp\":n.Asc.plugin.onExternalMouseUp&&n.Asc.plugin.onExternalMouseUp()}}};n.onmousemove=function(r){if(i&&n.Asc.plugin&&n.Asc.plugin.executeCommand){var u=t===r.clientX?r.pageX:r.clientX,f=t===r.clientY?r.pageY:r.clientY;n.Asc.plugin.executeCommand(\"onmousemove\",JSON.stringify({x:u,y:f}))}};n.onmouseup=function(r){if(i&&n.Asc.plugin&&n.Asc.plugin.executeCommand){var u=t===r.clientX?r.pageX:r.clientX,f=t===r.clientY?r.pageY:r.clientY;n.Asc.plugin.executeCommand(\"onmouseup\",JSON.stringify({x:u,y:f}))}};n.plugin_sendMessage(JSON.stringify({guid:n.Asc.plugin.guid,type:\"initialize_internal\"}))})(window,undefined);");
+                var _iframe = document.getElementById("plugin_iframe");
+                if (_iframe)
+                    _iframe.contentWindow.postMessage(pluginData.serialize(), "*");
 				return;
 			}
 			else if ("close" == name || "command" == name)
@@ -402,13 +412,14 @@
 				{
 					try
 					{
-						if (window.g_asc_plugins.api.asc_canPaste())
+						if (pluginData.privateData.resize || window.g_asc_plugins.api.asc_canPaste())
 						{
+							var oLogicDocument, i;
 							var editorId = window.g_asc_plugins.api.getEditorId();
 							if (AscCommon.c_oEditorId.Word === editorId ||
 								AscCommon.c_oEditorId.Presentation === editorId)
 							{
-								var oLogicDocument = window.g_asc_plugins.api.WordControl ?
+								oLogicDocument = window.g_asc_plugins.api.WordControl ?
 									window.g_asc_plugins.api.WordControl.m_oLogicDocument : null;
 								if(AscCommon.c_oEditorId.Word === editorId){
 									oLogicDocument.LockPanelStyles();
@@ -420,16 +431,15 @@
 
 							if (pluginData.getAttribute("recalculate") == true)
 							{
-								var editorId = window.g_asc_plugins.api.getEditorId();
 								if (AscCommon.c_oEditorId.Word === editorId ||
 									AscCommon.c_oEditorId.Presentation === editorId)
 								{
-									var oLogicDocument = window.g_asc_plugins.api.WordControl ?
+									oLogicDocument = window.g_asc_plugins.api.WordControl ?
 										window.g_asc_plugins.api.WordControl.m_oLogicDocument : null;
 									var _fonts         = oLogicDocument.Document_Get_AllFontNames();
 									var _imagesArray   = oLogicDocument.Get_AllImageUrls();
 									var _images        = {};
-									for (var i = 0; i < _imagesArray.length; i++)
+									for (i = 0; i < _imagesArray.length; i++)
 									{
 										_images[_imagesArray[i]] = _imagesArray[i];
 									}
@@ -458,7 +468,7 @@
 									var oFonts  = oApi.wbModel._generateFontMap();
 									var aImages = oApi.wbModel.getAllImageUrls();
 									var oImages = {};
-									for (var i = 0; i < aImages.length; i++)
+									for (i = 0; i < aImages.length; i++)
 									{
 										oImages[aImages[i]] = aImages[i];
 									}
@@ -469,6 +479,11 @@
 											delete window.g_asc_plugins.images_rename;
 											window.g_asc_plugins.api.asc_Recalculate();
 										});
+								}
+							} else {
+								if (AscCommon.c_oEditorId.Spreadsheet === editorId) {
+									// На asc_canPaste создается точка в истории и startTransaction. Поэтому нужно ее закрыть без пересчета.
+									window.g_asc_plugins.api.asc_endPaste();
 								}
 							}
 						}

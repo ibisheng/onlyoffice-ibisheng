@@ -1187,6 +1187,9 @@
 			if (null != x && null != y)
 				event.coord = {x: x, y: y};
 			this._onWindowMouseUp(event);
+
+			if (window.g_asc_plugins)
+                window.g_asc_plugins.onExternalMouseUp();
 		};
 
 		/** @param event {MouseEvent} */

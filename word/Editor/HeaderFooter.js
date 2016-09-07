@@ -1572,14 +1572,14 @@ CHeaderFooterController.prototype =
 
         if (oHeader)
         {
-            oHeader.Set_Page(nPageIndex);
             nOldHeaderCurPage = oHeader.RecalcInfo.CurPage;
+            oHeader.Set_Page(nPageIndex);
         }
 
         if (oFooter)
         {
-            oFooter.Set_Page(nPageIndex);
             nOldFooterCurPage = oFooter.RecalcInfo.CurPage;
+            oFooter.Set_Page(nPageIndex);
         }
 
         this.LogicDocument.DrawingObjects.mergeDrawings(nPageIndex, arrHeaderDrawings, arrHeaderTables, arrFooterDrawings, arrFooterTables);
@@ -1602,14 +1602,14 @@ CHeaderFooterController.prototype =
 
         if (oHeader)
         {
-            oHeader.Set_Page(nPageIndex);
             nOldHeaderCurPage = oHeader.RecalcInfo.CurPage;
+            oHeader.Set_Page(nPageIndex);
         }
 
         if (oFooter)
         {
-            oFooter.Set_Page(nPageIndex);
             nOldFooterCurPage = oFooter.RecalcInfo.CurPage;
+            oFooter.Set_Page(nPageIndex);
         }
 
         this.LogicDocument.DrawingObjects.drawBehindDocHdrFtr(nPageIndex, pGraphics);

@@ -3147,7 +3147,7 @@ function OfflineEditor () {
 
             if (false === istoplayer) {
                 this._drawCellsAndBorders(drawingCtx, range, offsetXForDraw, offsetYForDraw);
-                this._drawAutoF(range, offsetXForDraw, offsetYForDraw);
+                this.af_drawButtons(range, offsetXForDraw, offsetYForDraw);
             }
 
             var oldrange = this.visibleRange;

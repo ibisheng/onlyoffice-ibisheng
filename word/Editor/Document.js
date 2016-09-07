@@ -104,6 +104,7 @@ var recalcresultflags_Footnotes         = 0x010000; // Сообщаем, что 
 // Типы которые возвращают классы CDocument и CDocumentContent после пересчета страницы
 var recalcresult2_End      = 0x00; // Документ рассчитан до конца
 var recalcresult2_NextPage = 0x01; // Рассчет нужно продолжить
+var recalcresult2_CurPage  = 0x02; // Нужно заново пересчитать данную страницу
 
 var document_EditingType_Common = 0x00; // Обычный режим редактирования
 var document_EditingType_Review = 0x01; // Режим рецензирования
@@ -1674,7 +1675,7 @@ CDocument.prototype.Get_PageContentStartPos2       = function(StartPageIndex, St
     var ColumnAbs    = (StartColumnIndex + ElementPageIndex) - ((StartColumnIndex + ElementPageIndex) / ColumnsCount | 0) * ColumnsCount;
     var PageAbs      = StartPageIndex + ((StartColumnIndex + ElementPageIndex) / ColumnsCount | 0);
 
-	var FootnotesHeight = this.Footnotes.GetHeight(StartPageIndex, ColumnAbs);
+	var FootnotesHeight = this.Footnotes.GetHeight(PageAbs, ColumnAbs);
 
 	var Y      = SectPr.Get_PageMargin_Top();
 	var YLimit = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom() - FootnotesHeight;
@@ -2260,8 +2261,7 @@ CDocument.prototype.Recalculate_Page = function()
         var StartPos = this.Get_PageContentStartPos(PageIndex, StartIndex);
 
 		this.Footnotes.Reset(PageIndex, this.SectionsInfo.Get_SectPr(StartIndex).SectPr);
-
-		//this.private_RecalculatePageFootnotes(PageIndex);
+        this.private_RecalculatePageFootnotes(PageIndex, 0);
 
         this.Pages[PageIndex].ResetStartElement = this.FullRecalc.ResetStartElement;
         this.Pages[PageIndex].X                 = StartPos.X;
@@ -2765,6 +2765,9 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
     if (Index >= Count || _PageIndex > PageIndex || _ColumnIndex > ColumnIndex)
     {
         this.private_RecalculateShiftFootnotes(PageIndex, ColumnIndex);
+
+		if (Index < Count && _PageIndex === PageIndex || _ColumnIndex > ColumnIndex)
+			this.private_RecalculatePageFootnotes(_PageIndex, _ColumnIndex);
     }
 
     if (true === bReDraw)
@@ -2862,7 +2865,8 @@ CDocument.prototype.private_RecalculateIsNewSection = function(nPageAbs, nConten
 };
 CDocument.prototype.private_RecalculatePageFootnotes = function(nPageAbs, nColumnAbs)
 {
-	this.Footnotes.Recalculate(nPageAbs, nColumnAbs, 0, 10000);
+    var oPageMetrics = this.Get_PageContentStartPos(nPageAbs);
+	this.Footnotes.Recalculate(nPageAbs, nColumnAbs, oPageMetrics.Y, oPageMetrics.YLimit);
 };
 CDocument.prototype.private_RecalculateShiftFootnotes = function(nPageAbs, nColumnAbs)
 {
@@ -11398,29 +11402,6 @@ CDocument.prototype.Goto_FootnotesOnPage = function(nPageIndex)
 
 
 	return true;
-};
-/**
- * Находим отрезок сносок, заданный между сносками.
- * @param {?CFootEndnote} oFirstFootnote - если null, то иещм с начала документа
- * @param {?CFootEndnote} oLastFootnote - если null, то ищем до конца документа
- */
-CDocument.prototype.Get_FootnotesList = function(oFirstFootnote, oLastFootnote)
-{
-	var oEngine = new CDocumentFootnotesRangeEngine();
-	oEngine.Init(oFirstFootnote, oLastFootnote);
-
-	var arrFootnotes = [];
-
-	var arrParagraphs = this.Get_AllParagraphs({OnlyMainDocument : true, All : true});
-	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
-	{
-		var oParagraph = arrParagraphs[nIndex];
-
-		if (true === oParagraph.Get_FootnotesList(oEngine))
-			return arrFootnotes;
-	}
-
-	return oEngine.GetRange();
 };
 CDocument.prototype.AddFootnote = function()
 {

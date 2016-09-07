@@ -1074,6 +1074,10 @@ CDocumentContent.prototype.Recalculate_Page               = function(PageIndex, 
 
         if (RecalcResult & recalcresult_CurPage)
         {
+            // Такое не должно приходить в автофигурах, только в таблицах основного документа. Проверка на это находится в параграфе.
+            if (RecalcResult & recalcresultflags_Footnotes)
+				return recalcresult2_CurPage | recalcresultflags_Column | recalcresultflags_Footnotes;
+
             return this.Recalculate_Page(PageIndex, false);
         }
         else if (RecalcResult & recalcresult_NextElement)
@@ -1430,14 +1434,18 @@ CDocumentContent.prototype.Get_FirstParagraph             = function()
 
     return null;
 };
-CDocumentContent.prototype.Get_AllParagraphs              = function(Props, ParaArray)
+CDocumentContent.prototype.Get_AllParagraphs = function(Props, ParaArray)
 {
-    var Count = this.Content.length;
-    for (var Index = 0; Index < Count; Index++)
-    {
-        var Element = this.Content[Index];
-        Element.Get_AllParagraphs(Props, ParaArray);
-    }
+	var arrParagraphs = (ParaArray ? ParaArray : []);
+
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Element = this.Content[Index];
+		Element.Get_AllParagraphs(Props, arrParagraphs);
+	}
+
+	return arrParagraphs;
 };
 // Специальная функция, используемая в колонтитулах для добавления номера страницы
 // При этом удаляются все параграфы. Добавляются два новых
@@ -8410,34 +8418,48 @@ CDocumentContent.prototype.Internal_Content_RemoveAll = function()
 //-----------------------------------------------------------------------------------
 CDocumentContent.prototype.Get_StartPage_Absolute = function()
 {
-    return this.Get_AbsolutePage(0);
+	return this.Get_AbsolutePage(0);
 };
 CDocumentContent.prototype.Get_StartPage_Relative = function()
 {
-    return this.StartPage;
-};
-CDocumentContent.prototype.Get_AbsolutePage       = function(CurPage)
-{
-    return this.Parent.Get_AbsolutePage(this.StartPage + CurPage);
-};
-CDocumentContent.prototype.Get_AbsoluteColumn     = function(CurPage)
-{
-	return (this.StartColumn + CurPage) - (((this.StartColumn + CurPage) / this.ColumnsCount | 0) * this.ColumnsCount);
+	return this.StartPage;
 };
 CDocumentContent.prototype.Set_StartPage = function(StartPage, StartColumn, ColumnsCount)
 {
-    this.StartPage    = StartPage;
-    this.StartColumn  = undefined !== StartColumn ? StartColumn : 0;
+	this.StartPage    = StartPage;
+	this.StartColumn  = undefined !== StartColumn ? StartColumn : 0;
 	this.ColumnsCount = undefined !== ColumnsCount ? ColumnsCount : 1;
 };
-// Приходит абсолютное значение страницы(по отношению к родительскому классу), на выходе - относительное
-CDocumentContent.prototype.Get_Page_Relative      = function(AbsPage)
+CDocumentContent.prototype.Get_ColumnsCount = function()
 {
-    return Math.min(this.Pages.length - 1, Math.max(AbsPage - this.StartPage, 0));
+	return this.ColumnsCount;
 };
-CDocumentContent.prototype.Get_ColumnsCount      = function()
+CDocumentContent.prototype.private_GetRelativePageIndex = function(CurPage)
 {
-    return this.ColumnsCount;
+	if (!this.ColumnsCount || 0 === this.ColumnsCount)
+		return this.StartPage + CurPage;
+
+	return this.StartPage + ((this.StartColumn + CurPage) / this.ColumnsCount | 0);
+};
+CDocumentContent.prototype.private_GetAbsolutePageIndex = function(CurPage)
+{
+	return this.Parent.Get_AbsolutePage(this.private_GetRelativePageIndex(CurPage));
+};
+CDocumentContent.prototype.Get_StartColumn = function()
+{
+	return this.StartColumn;
+};
+CDocumentContent.prototype.Get_AbsolutePage = function(CurPage)
+{
+	return this.private_GetAbsolutePageIndex(CurPage);
+};
+CDocumentContent.prototype.Get_AbsoluteColumn = function(CurPage)
+{
+	return this.private_GetColumnIndex(CurPage);
+};
+CDocumentContent.prototype.private_GetColumnIndex = function(CurPage)
+{
+	return (this.StartColumn + CurPage) - (((this.StartColumn + CurPage) / this.ColumnsCount | 0) * this.ColumnsCount);
 };
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции

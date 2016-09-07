@@ -563,6 +563,7 @@ function CEditorPage(api)
 		else
 		{
 			this.bIsRetinaSupport = false;
+			this.m_oOverlayApi.IsRetina = this.bIsRetinaSupport;
 		}
 
 		if (old != this.bIsRetinaSupport)
@@ -3038,10 +3039,20 @@ function CEditorPage(api)
 
 		this.m_oApi.syncOnThumbnailsShow();
 
-		AscCommon.InitBrowserInputContext(this.m_oApi, "id_target_cursor");
+		if (!this.m_oApi.isMobileVersion)
+        {
+            AscCommon.InitBrowserInputContext(this.m_oApi, "id_target_cursor");
+            if (AscCommon.g_inputContext)
+                AscCommon.g_inputContext.onResize("id_main_view");
+        }
+        else
+        {
+            window.onkeydown = this.onKeyDown;
+            window.onkeypress = this.onKeyPress;
+            window.onkeyup = this.onKeyUp;
 
-		if (AscCommon.g_inputContext)
-			AscCommon.g_inputContext.onResize("id_main_view");
+            window['AscCommon'].g_clipboardBase.Init(api);
+        }
 	};
 
 	this.StartMainTimer = function()
@@ -3288,6 +3299,7 @@ function CEditorPage(api)
 			var _len = master.sldLayoutLst.length;
 			var arr  = new Array(_len);
 
+			var bRedraw = Math.abs(this.m_oLayoutDrawer.WidthMM - this.m_oLogicDocument.Width) > MOVE_DELTA || Math.abs(this.m_oLayoutDrawer.HeightMM - this.m_oLogicDocument.Height) > MOVE_DELTA;
 			for (var i = 0; i < _len; i++)
 			{
 				arr[i]       = new CLayoutThumbnail();
@@ -3299,7 +3311,7 @@ function CEditorPage(api)
 
 				arr[i].Name = master.sldLayoutLst[i].cSld.name;
 
-				if ("" == master.sldLayoutLst[i].ImageBase64 || Math.abs(this.m_oLayoutDrawer.WidthMM - this.m_oLogicDocument.Width) > MOVE_DELTA || Math.abs(this.m_oLayoutDrawer.HeightMM - this.m_oLogicDocument.Height) > MOVE_DELTA)
+				if ("" == master.sldLayoutLst[i].ImageBase64 || bRedraw)
 				{
 					this.m_oLayoutDrawer.WidthMM       = this.m_oLogicDocument.Width;
 					this.m_oLayoutDrawer.HeightMM      = this.m_oLogicDocument.Height;

@@ -120,7 +120,6 @@
 	 */
 	function asc_CAscEditorPermissions() {
 		this.licenseType = c_oLicenseResult.Error;
-		this.canLicense = false;
 		this.isLight = false;
 		this.canCoAuthoring = true;
 		this.canReaderMode = true;
@@ -133,9 +132,6 @@
 
 	asc_CAscEditorPermissions.prototype.asc_getLicenseType = function () {
 		return this.licenseType;
-	};
-	asc_CAscEditorPermissions.prototype.asc_getCanLicense = function () {
-		return this.canLicense;
 	};
 	asc_CAscEditorPermissions.prototype.asc_getCanCoAuthoring = function () {
 		return this.canCoAuthoring;
@@ -161,9 +157,6 @@
 
 	asc_CAscEditorPermissions.prototype.setLicenseType = function (v) {
 		this.licenseType = v;
-	};
-	asc_CAscEditorPermissions.prototype.setCanLicense = function (v) {
-		this.canLicense = v;
 	};
 	asc_CAscEditorPermissions.prototype.setCanBranding = function (v) {
 		this.canBranding = v;
@@ -2083,8 +2076,8 @@
 
 				var bIsCorrect = false;
 				if (_image.Image != null) {
-					var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
-					var __h = Math.max(parseInt(_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
+					var __w = Math.max((_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
+					var __h = Math.max((_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
 
 					var dKoef = Math.max(__w / _w, __h / _h);
 					if (dKoef > 1) {
@@ -2098,7 +2091,7 @@
 					}
 				}
 
-				return new asc_CImageSize(parseInt(_w), parseInt(_h), bIsCorrect);
+				return new asc_CImageSize(_w, _h, bIsCorrect);
 			}
 			return new asc_CImageSize(50, 50, false);
 		},
@@ -2681,11 +2674,11 @@
 	prot['Success'] = prot.Success;
 	prot['UnknownUser'] = prot.UnknownUser;
 	prot['Connections'] = prot.Connections;
+	prot['ExpiredTrial'] = prot.ExpiredTrial;
 
 	window["AscCommon"].asc_CAscEditorPermissions = asc_CAscEditorPermissions;
 	prot = asc_CAscEditorPermissions.prototype;
 	prot["asc_getLicenseType"] = prot.asc_getLicenseType;
-	prot["asc_getCanLicense"] = prot.asc_getCanLicense;
 	prot["asc_getCanCoAuthoring"] = prot.asc_getCanCoAuthoring;
 	prot["asc_getCanReaderMode"] = prot.asc_getCanReaderMode;
 	prot["asc_getCanBranding"] = prot.asc_getCanBranding;

@@ -714,7 +714,7 @@ background-repeat: no-repeat;\
 		this.CreateCSS();
 
 		if (this.HtmlElement != null)
-			this.HtmlElement.innerHTML = "<div id=\"id_main\" class=\"block_elem\" style=\"-moz-user-select:none;-khtml-user-select:none;user-select:none;background-color:" + AscCommonWord.GlobalSkin.BackgroundColor + ";overflow:hidden;\" UNSELECTABLE=\"on\">\
+			this.HtmlElement.innerHTML = "<div id=\"id_main\" class=\"block_elem\" style=\"-ms-touch-action: none;-moz-user-select:none;-khtml-user-select:none;user-select:none;background-color:" + AscCommonWord.GlobalSkin.BackgroundColor + ";overflow:hidden;\" UNSELECTABLE=\"on\">\
 								<div id=\"id_panel_left\" class=\"block_elem\">\
 									<canvas id=\"id_buttonTabs\" class=\"block_elem\"></canvas>\
 									<canvas id=\"id_vert_ruler\" class=\"block_elem\"></canvas>\
@@ -723,9 +723,9 @@ background-repeat: no-repeat;\
 									<canvas id=\"id_hor_ruler\" class=\"block_elem\"></canvas>\
 									</div>\
                                     <div id=\"id_main_view\" class=\"block_elem\" style=\"overflow:hidden\">\
-                                        <canvas id=\"id_viewer\" class=\"block_elem\" style=\"-webkit-user-select: none; background-color:" + AscCommonWord.GlobalSkin.BackgroundColor + ";z-index:1\"></canvas>\
-									    <canvas id=\"id_viewer_overlay\" class=\"block_elem\" style=\"-webkit-user-select: none; z-index:2\"></canvas>\
-									    <canvas id=\"id_target_cursor\" class=\"block_elem\" width=\"1\" height=\"1\" style=\"-webkit-user-select: none;width:2px;height:13px;z-index:4;\"></canvas>\
+                                        <canvas id=\"id_viewer\" class=\"block_elem\" style=\"-ms-touch-action: none;-webkit-user-select: none; background-color:" + AscCommonWord.GlobalSkin.BackgroundColor + ";z-index:1\"></canvas>\
+									    <canvas id=\"id_viewer_overlay\" class=\"block_elem\" style=\"-ms-touch-action: none;-webkit-user-select: none; z-index:2\"></canvas>\
+									    <canvas id=\"id_target_cursor\" class=\"block_elem\" width=\"1\" height=\"1\" style=\"-ms-touch-action: none;-webkit-user-select: none;width:2px;height:13px;z-index:4;\"></canvas>\
                                     </div>\
 								</div>\
 									<div id=\"id_panel_right\" class=\"block_elem\" style=\"margin-right:1px;background-color:" + AscCommonWord.GlobalSkin.BackgroundScroll + ";\">\
@@ -1956,6 +1956,9 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_SelectionCut = function()
 	{
+	    if (AscCommon.CollaborativeEditing.m_bGlobalLock)
+    	    return;
+
 		var _logicDoc = this.WordControl.m_oLogicDocument;
 		if (!_logicDoc)
 			return;
@@ -1970,6 +1973,9 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_PasteData = function(_format, data1, data2)
 	{
+	    if (AscCommon.CollaborativeEditing.m_bGlobalLock)
+	        return;
+
 		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
 		switch (_format)
 		{
@@ -5042,10 +5048,10 @@ background-repeat: no-repeat;\
 			var _h = Math.max(1, ColumnSize.H);
 			if (_image.Image != null)
 			{
-				var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
-				var __h = Math.max(parseInt(_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
+				var __w = Math.max((_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
+				var __h = Math.max((_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
 				_w      = Math.max(5, Math.min(_w, __w));
-				_h      = Math.max(5, Math.min(parseInt(_w * __h / __w)));
+				_h      = Math.max(5, Math.min((_w * __h / __w)));
 			}
 
 			var src = _image.src;
@@ -5095,10 +5101,10 @@ background-repeat: no-repeat;\
 				var _h = Math.max(1, ColumnSize.H);
 				if (_image.Image != null)
 				{
-					var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
-					var __h = Math.max(parseInt(_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
+					var __w = Math.max((_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
+					var __h = Math.max((_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
 					_w      = Math.max(5, Math.min(_w, __w));
-					_h      = Math.max(5, Math.min(parseInt(_w * __h / __w)));
+					_h      = Math.max(5, Math.min((_w * __h / __w)));
 				}
 				var src = _image.src;
 

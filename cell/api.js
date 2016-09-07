@@ -484,7 +484,9 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_PasteData = function (_format, data1, data2) {
-    this.wb.pasteData(_format, data1, data2);
+    if (!this.getViewMode()) {
+      this.wb.pasteData(_format, data1, data2);
+    }
   };
 
   spreadsheet_api.prototype.asc_CheckCopy = function (_clipboard /* CClipboardData */, _formats) {
@@ -492,7 +494,9 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_SelectionCut = function () {
-    return this.wb.selectionCut();
+    if (!this.getViewMode()) {
+      this.wb.selectionCut();
+    }
   };
 
   spreadsheet_api.prototype.asc_bIsEmptyClipboard = function() {
@@ -633,10 +637,6 @@ var editor;
 
       // Отправка стилей
       this._sendWorkbookStyles();
-      if (this.wb) {
-        this.wb._initCommentsToSave();
-      }
-
       if (this.IsSendDocumentLoadCompleate && this.collaborativeEditing) {
         // Принимаем чужие изменения
         this.collaborativeEditing.applyChanges();
@@ -769,7 +769,6 @@ var editor;
     oAdditionalData["vkey"] = this.documentVKey;
     oAdditionalData["outputformat"] = filetype;
     oAdditionalData["title"] = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype));
-    this.wb._initCommentsToSave();
     oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.CompleteAll;
     var t = this;
     t.fCurCallback = function(incomeObject) {
@@ -833,7 +832,6 @@ var editor;
       this.handlers.trigger("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), this.advancedOptionsAction);
       return;
     } else {
-      this.wb._initCommentsToSave();
       var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
       if (c_oAscFileType.CSV === sFormat) {
         if (options.CSVOptions instanceof asc.asc_CCSVAdvancedOptions) {
@@ -2021,7 +2019,7 @@ var editor;
    * @param {String} reference  Ссылка на ячейку вида A1 или R1C1
    */
   spreadsheet_api.prototype.asc_findCell = function (reference) {
-    if (this.wb.cellEditor.isOpened) {
+    if (this.asc_getCellEditMode()) {
       return;
     }
     var d = this.wb.findCell(reference);
@@ -2254,7 +2252,6 @@ var editor;
 
   // Для вставки диаграмм в Word
   spreadsheet_api.prototype.asc_getBinaryFileWriter = function() {
-    this.wb._initCommentsToSave();
     return new AscCommonExcel.BinaryFileWriter(this.wbModel);
   };
 
@@ -3137,12 +3134,10 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_nativeGetFile = function() {
-    this.wb._initCommentsToSave();
     var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
     return oBinaryFileWriter.Write();
   };
   spreadsheet_api.prototype.asc_nativeGetFileData = function() {
-    this.wb._initCommentsToSave();
     var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
     oBinaryFileWriter.Write2();
 
@@ -3246,6 +3241,9 @@ var editor;
     History.Create_NewPoint();
     History.StartTransaction();
     return true;
+  };
+  spreadsheet_api.prototype.asc_endPaste = function () {
+    History.EndTransaction();
   };
   spreadsheet_api.prototype.asc_Recalculate = function () {
       History.EndTransaction();

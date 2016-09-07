@@ -1543,7 +1543,7 @@ CShape.prototype.recalculateTransformText2 = function () {
     var _text_rect_height = _b - _t;
     var _text_rect_width = _r - _l;
     if (!_body_pr.upright) {
-        if (!(_body_pr.vert === AscFormat.nVertTTvert || _body_pr.vert === AscFormat.nVertTTvert270)) {
+        if (!(_body_pr.vert === AscFormat.nVertTTvert || _body_pr.vert === AscFormat.nVertTTvert270  || _body_pr.vert === AscFormat.nVertTTeaVert)) {
             if (/*_content_height < _text_rect_height*/true) {
                 switch (_body_pr.anchor) {
                     case 0: //b
@@ -1684,7 +1684,7 @@ CShape.prototype.recalculateTransformText2 = function () {
 
         var _content_width, content_height2;
         if (checkNormalRotate(_full_rotate)) {
-            if (!(_body_pr.vert === AscFormat.nVertTTvert || _body_pr.vert === AscFormat.nVertTTvert270)) {
+            if (!(_body_pr.vert === AscFormat.nVertTTvert || _body_pr.vert === AscFormat.nVertTTvert270 || _body_pr.vert === AscFormat.nVertTTeaVert)) {
                 _content_width = _r - _l;
                 content_height2 = _b - _t;
             }
@@ -1694,7 +1694,7 @@ CShape.prototype.recalculateTransformText2 = function () {
             }
         }
         else {
-            if (!(_body_pr.vert === AscFormat.nVertTTvert || _body_pr.vert === AscFormat.nVertTTvert270)) {
+            if (!(_body_pr.vert === AscFormat.nVertTTvert || _body_pr.vert === AscFormat.nVertTTvert270 || _body_pr.vert === AscFormat.nVertTTeaVert)) {
                 _content_width = _b - _t;
                 content_height2 = _r - _l;
 
@@ -1774,7 +1774,7 @@ CShape.prototype.recalculateTransformText2 = function () {
             global_MatrixTransformer.TranslateAppend(_text_transform, _content_width * 0.5, content_height2 * 0.5);
 
         }
-        if (_body_pr.vert === AscFormat.nVertTTvert270) {
+        if (_body_pr.vert === AscFormat.nVertTTvert270 || _body_pr.vert === AscFormat.nVertTTeaVert) {
             global_MatrixTransformer.TranslateAppend(_text_transform, -_content_width * 0.5, -content_height2 * 0.5);
             global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 1.5);
             global_MatrixTransformer.TranslateAppend(_text_transform, _content_width * 0.5, content_height2 * 0.5);
@@ -1857,7 +1857,7 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
     var _text_rect_width = _r - _l;
     var oClipRect;
     if (!oBodyPr.upright) {
-        if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270)) {
+        if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert)) {
             if (bWordArtTransform) {
                 _vertical_shift = 0;
             }
@@ -2011,7 +2011,7 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
 
         var _content_width, content_height2;
         if (checkNormalRotate(_full_rotate)) {
-            if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270)) {
+            if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert)) {
                 _content_width = _r - _l;
                 content_height2 = _b - _t;
             }
@@ -2021,7 +2021,7 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
             }
         }
         else {
-            if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270)) {
+            if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert)) {
                 _content_width = _b - _t;
                 content_height2 = _r - _l;
 
@@ -2104,7 +2104,7 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
             global_MatrixTransformer.TranslateAppend(oMatrix, _content_width * 0.5, content_height2 * 0.5);
 
         }
-        if (oBodyPr.vert === AscFormat.nVertTTvert270) {
+        if (oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert) {
             global_MatrixTransformer.TranslateAppend(oMatrix, -_content_width * 0.5, -content_height2 * 0.5);
             global_MatrixTransformer.RotateRadAppend(oMatrix, -Math.PI * 1.5);
             global_MatrixTransformer.TranslateAppend(oMatrix, _content_width * 0.5, content_height2 * 0.5);
@@ -2835,7 +2835,7 @@ CShape.prototype.recalculateLocalTransform = function(transform)
 
         if (oBodyPr.wrap === AscFormat.nTWTNone) {
             if (!oBodyPr.upright) {
-                if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270)) {
+                if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert)) {
                     if (oGeometry) {
                         oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + l_ins + r_ins, oContentMetrics.contentH + t_ins + b_ins);
                         if(!oWH.bError)
@@ -2868,7 +2868,7 @@ CShape.prototype.recalculateLocalTransform = function(transform)
             else {
                 var _full_rotate = this.getFullRotate();
                 if (checkNormalRotate(_full_rotate)) {
-                    if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270)) {
+                    if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert)) {
 
                         if (oGeometry) {
                             oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + l_ins + r_ins, oContentMetrics.contentH + t_ins + b_ins);
@@ -2898,7 +2898,7 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                     }
                 }
                 else {
-                    if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270)) {
+                    if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert)) {
                         if (oGeometry) {
                             oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + l_ins + r_ins, oContentMetrics.contentH + t_ins + b_ins);
                             if(!oWH.bError) {
@@ -2929,7 +2929,7 @@ CShape.prototype.recalculateLocalTransform = function(transform)
         }
         else {
             if (!oBodyPr.upright) {
-                if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270)) {
+                if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert)) {
                     if (oGeometry) {
                         oWH = oGeometry.getNewWHByTextRect(undefined, oContentMetrics.contentH + t_ins + b_ins, this.extX, undefined);
                         if(!oWH.bError) {
@@ -2955,7 +2955,7 @@ CShape.prototype.recalculateLocalTransform = function(transform)
             else {
                 var _full_rotate = this.getFullRotate();
                 if (checkNormalRotate(_full_rotate)) {
-                    if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270)) {
+                    if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert)) {
                         if (oGeometry) {
                             oWH = oGeometry.getNewWHByTextRect(undefined, oContentMetrics.contentH + t_ins + b_ins, this.extX, undefined);
                             if(!oWH.bError) {
@@ -2979,7 +2979,7 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                     }
                 }
                 else {
-                    if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270)) {
+                    if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert)) {
                         if (oGeometry) {
                             oWH = oGeometry.getNewWHByTextRect(oContentMetrics.contentH + l_ins + r_ins, undefined, undefined, this.extY);
                             if(!oWH.bError) {
@@ -3182,7 +3182,7 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
                     var oSectPr = oParentParagraph.Get_SectPr();
                     if(oSectPr)
                     {
-                        if(!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270))
+                        if(!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert))
                         {
                             dMaxWidth = oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Left() - oSectPr.Get_PageMargin_Right() - l_ins - r_ins;
                         }
@@ -3197,7 +3197,7 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
             }
         }
         var dMaxWidthRec = RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, this.bWordShape);
-        if(!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270))
+        if(!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert))
         {
             if(dMaxWidthRec < w && (!this.bWordShape && !this.bCheckAutoFitFlag))
             {
@@ -3244,7 +3244,7 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
     {
         if(!oBodyPr.upright)
         {
-            if(!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270))
+            if(!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert))
             {
                 oRet.w = w + 0.001;
                 oRet.h = h + 0.001;
@@ -3264,7 +3264,7 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
             var _full_rotate = this.getFullRotate();
             if(checkNormalRotate(_full_rotate))
             {
-                if(!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270))
+                if(!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert))
                 {
                     oRet.w = w + 0.001;
                     oRet.h = h + 0.001;
@@ -3281,7 +3281,7 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
             }
             else
             {
-                if(!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270))
+                if(!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert))
                 {
                     oRet.w = h + 0.001;
                     oRet.h = w + 0.001;

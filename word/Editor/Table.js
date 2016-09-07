@@ -12821,7 +12821,7 @@ CTable.prototype =
     {
         var VMergeCount = this.Internal_GetVertMergeCount(CurRow, StartGridCol, GridSpan);
 
-        if (CurRow + VMergeCount - 1 >= this.Pages[CurPage].LastRow)
+        if (true !== this.Is_EmptyPage(CurPage) && CurRow + VMergeCount - 1 >= this.Pages[CurPage].LastRow)
         {
             VMergeCount = this.Pages[CurPage].LastRow + 1 - CurRow;
             if (false === this.RowsInfo[CurRow + VMergeCount - 1].FirstPage && CurPage === this.RowsInfo[CurRow + VMergeCount - 1].StartPage)
