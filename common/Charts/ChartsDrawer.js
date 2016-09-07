@@ -6306,7 +6306,6 @@ drawHBarChart.prototype =
 	
 	reCalculate : function(chartsDrawer)
 	{
-		console.time("recalculate");
 		this.paths = {};
 		this.summBarVal = [];
 		
@@ -6317,7 +6316,6 @@ drawHBarChart.prototype =
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		
 		this._recalculateBars();
-		console.timeEnd("recalculate");
 	},
 	
 	draw : function(chartsDrawer)
@@ -8330,8 +8328,6 @@ drawPieChart.prototype =
 		swAng = this._changeAngle(radius, stAng, swAng, xCenter, yCenter, properties);
 		
 		stAng = this.angleFor3D;
-		
-		console.log("swAng: " + swAng);
 		
 		//корректируем центр
 		yCenter = yCenter - depth / 2;
@@ -12045,7 +12041,6 @@ CSortFaces.prototype =
 		var intersections = [];
 		var reverseIntersections = [];
 		var countIntersection = [];
-		console.time("_getIntersectionsParallelepipeds");
 		for(var i = 0; i < parallelepipeds.length; i++)
 		{
 			//из каждой точки данного параллалепипеда строим прямые до точки наблюдателя
@@ -12103,7 +12098,6 @@ CSortFaces.prototype =
 				}
 			}
 		}
-		console.timeEnd("_getIntersectionsParallelepipeds");
 		
 		return {intersections: intersections, reverseIntersections: reverseIntersections, countIntersection: countIntersection};
 	},
