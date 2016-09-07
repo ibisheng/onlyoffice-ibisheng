@@ -153,6 +153,160 @@ CFootnotesController.prototype.Reset = function(nPageIndex, oSectPr)
 	oPage.XLimit = XLimit;
 };
 /**
+ * Рассчитываем сноски, которые перенеслись с предыдущей колонки
+ * @param {number} nPageAbs
+ * @param {number} nColumnAbs
+ * @param {number} Y
+ * @param {number} YLimit
+ */
+CFootnotesController.prototype.ContinueElementsFromPreviousColumn = function(nPageAbs, nColumnAbs, Y, YLimit)
+{
+	var oColumn = this.private_GetPageColumn(nPageAbs, nColumnAbs);
+	if (!oColumn)
+		return;
+
+	var nColumnsCount = this.Pages[nPageAbs].Columns.length;
+
+	var X      = oColumn.X;
+	var XLimit = oColumn.XLimit;
+
+	var _Y      = 0;
+	var _YLimit = YLimit - Y;
+
+	oColumn.Y      = Y;
+	oColumn.YLimit = YLimit;
+
+	oColumn.Reset();
+	var oPrevColumn = (nColumnAbs > 0 ? this.Pages[nPageAbs].Columns[nColumnAbs - 1] : (nPageAbs > 0 ? this.Pages[nPageAbs - 1].Columns[this.Pages[nPageAbs - 1].Columns.length - 1] : null));
+	if (null !== oPrevColumn)
+	{
+		var arrElements = oPrevColumn.GetContinuesElements();
+
+		if (arrElements.length > 0 && null !== this.ContinuationSeparatorFootnote)
+		{
+			this.ContinuationSeparatorFootnote.Prepare_RecalculateObject();
+			this.ContinuationSeparatorFootnote.Reset(X, _Y, XLimit, _YLimit);
+			this.ContinuationSeparatorFootnote.Set_StartPage(nPageAbs, nColumnAbs, nColumnsCount);
+			this.ContinuationSeparatorFootnote.Recalculate_Page(0, true);
+			oColumn.ContinuationSeparatorRecalculateObject = this.ContinuationSeparatorFootnote.Save_RecalculateObject();
+
+			var oBounds = this.ContinuationSeparatorFootnote.Get_PageBounds(0);
+			_Y += oBounds.Bottom - oBounds.Top;
+
+			oColumn.Height = _Y;
+		}
+
+		for (var nIndex = 0, nCount = arrElements.length; nIndex < nCount; ++nIndex)
+		{
+			var oFootnote = arrElements[nIndex];
+			if (0 !== nIndex)
+			{
+				oFootnote.Reset(X, _Y, XLimit, _YLimit);
+				oFootnote.Set_StartPage(nPageAbs, nColumnAbs, nColumnsCount);
+			}
+
+			oColumn.Elements.push(oFootnote);
+
+			var nRelativePage = oFootnote.GetElementPageIndex(nPageAbs, nColumnAbs);
+			var nRecalcResult = oFootnote.Recalculate_Page(nRelativePage, true);
+
+			if (recalcresult2_NextPage === nRecalcResult)
+			{
+				// Начиная с данной сноски мы все оставшиеся сноски заносим в массив ContinuesElements у данной колонки
+				var arrContniuesElements = arrElements.slice(nIndex);
+				oColumn.SetContinutesElements(arrContniuesElements);
+				break;
+			}
+			else if (recalcresult2_CurPage === nRecalcResult)
+			{
+				// Такого не должно быть при расчете сносок
+			}
+
+			var oBounds = oFootnote.Get_PageBounds(nRelativePage);
+			_Y += oBounds.Bottom - oBounds.Top;
+			oColumn.Height = _Y;
+		}
+	}
+};
+/**
+ * Рассчитываем сноски, которые перенеслись с предыдущей колонки
+ * @param {number} nPageAbs
+ * @param {number} nColumnAbs
+ * @param {number} Y
+ * @param {Array.CFootEndnote} arrFootnotes
+ * @returns {boolean} true - расчиталось нормально, и перенос делать не надо, false - данные сноски перенеслись на следующую страницу
+ */
+CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumnAbs, Y, arrFootnotes)
+{
+	if (!arrFootnotes || arrFootnotes.length <= 0)
+		return true;
+
+	var oColumn = this.private_GetPageColumn(nPageAbs, nColumnAbs);
+	if (!oColumn)
+		return true;
+
+	// Если уже есть элементы, которые переносятся, тогда данные сноски точно не убирутся
+	if (oColumn.GetContinuesElements().length > 0)
+		return false;
+
+	var nColumnsCount = this.Pages[nPageAbs].Columns.length;
+
+	var X      = oColumn.X;
+	var XLimit = oColumn.XLimit;
+
+	var _Y      = oColumn.Height;
+	var _YLimit = oColumn.YLimit - oColumn.Y;
+
+	if (oColumn.Elements.length <= 0 && null !== this.SeparatorFootnote)
+	{
+		this.SeparatorFootnote.Prepare_RecalculateObject();
+		this.SeparatorFootnote.Reset(X, _Y, XLimit, _YLimit);
+		this.SeparatorFootnote.Set_StartPage(nPageAbs, nColumnAbs, nColumnsCount);
+		this.SeparatorFootnote.Recalculate_Page(0, true);
+		oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.Save_RecalculateObject();
+
+		var oBounds    = this.SeparatorFootnote.Get_PageBounds(0);
+		_Y += oBounds.Bottom - oBounds.Top;
+		oColumn.Height = _Y;
+	}
+
+	for (var nIndex = 0, nCount = arrFootnotes.length; nIndex < nCount; ++nIndex)
+	{
+		var oFootnote = arrFootnotes[nIndex];
+		oFootnote.Reset(X, _Y, XLimit, _YLimit);
+		oFootnote.Set_StartPage(nPageAbs, nColumnAbs, nColumnsCount);
+
+
+		var nRelativePage = oFootnote.GetElementPageIndex(nPageAbs, nColumnAbs);
+		var nRecalcResult = oFootnote.Recalculate_Page(nRelativePage, true);
+
+		if (recalcresult2_NextPage === nRecalcResult)
+		{
+			if (0 === nIndex && true !== oFootnote.Is_ContentOnFirstPage())
+				return false;
+
+			// Начиная с данной сноски мы все оставшиеся сноски заносим в массив ContinuesElements у данной колонки
+			var arrContniuesElements = arrFootnotes.slice(nIndex);
+			oColumn.SetContinutesElements(arrContniuesElements);
+		}
+		else if (recalcresult2_CurPage === nRecalcResult)
+		{
+			// Такого не должно быть при расчете сносок
+		}
+
+		oColumn.Elements.push(oFootnote);
+
+		var oBounds    = oFootnote.Get_PageBounds(nRelativePage);
+		_Y += oBounds.Bottom - oBounds.Top;
+		oColumn.Height = _Y;
+
+		if (recalcresult2_NextPage === nRecalcResult)
+			break;
+	}
+
+	return true;
+};
+/**
  * Пересчитываем сноски на заданной странице.
  */
 CFootnotesController.prototype.Recalculate = function(nPageAbs, nColumnAbs, Y, YLimit)
@@ -388,8 +542,11 @@ CFootnotesController.prototype.AddFootnoteToPage = function(nPageAbs, nColumnAbs
 	if (!oColumn)
 		return;
 
+
+
+
 	// TODO: Проверить ссылку с предыдущей колонки
-	if (oColumn.Elements.length <= 0)
+	if (oColumn.Elements.length <= 0 || oColumn.Y < dBottom)
 		oColumn.Y = dBottom;
 
 	oColumn.Elements.push(oFootnote);
@@ -2926,9 +3083,16 @@ function CFootEndnotePageColumn()
 	this.YLimit = 0;
 	this.YStart = 0; // фактически тут задается высота специальной сноски-разделителя
 
-	this.Elements = [];
-	this.Continue = false;
+	this.Height = 0;
 
+
+	this.ElementsY         = []; // Начальная позиция
+
+
+	this.Elements          = []; // Элементы, которые пересчитаны на данной странице
+	this.ContniuesElements = []; // Элементы, которые нужно пересчитывать на следующей колонке
+
+	this.Continue = false;
 	this.ContinuePrev = false;
 
 	this.SeparatorRecalculateObject             = null;
@@ -2951,6 +3115,14 @@ CFootEndnotePageColumn.prototype.Reset = function()
 	this.SeparatorRecalculateObject             = null;
 	this.ContinuationSeparatorRecalculateObject = null;
 	this.ContinuationNoticeRecalculateObject    = null;
+};
+CFootEndnotePageColumn.prototype.GetContinuesElements = function()
+{
+	return this.ContniuesElements;
+};
+CFootEndnotePageColumn.prototype.SetContinutesElements = function(arrContniuesElements)
+{
+	this.ContniuesElements = arrContniuesElements;
 };
 
 function CFootEndnotePage()
