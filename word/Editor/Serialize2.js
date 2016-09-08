@@ -9425,8 +9425,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = this.bcr.Read2(length, function(t, l){
                 return oThis.Read_tblGrid(t,l, aNewGrid);
             });
-			table.Internal_SaveTableGridInHistory(aNewGrid, table.TableGrid);
-			table.TableGrid = aNewGrid;
+			table.SetTableGrid(aNewGrid);
         }
         else if( c_oSerDocTableType.Content === type )
         {

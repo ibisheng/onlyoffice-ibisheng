@@ -553,6 +553,7 @@
             return null;
 
         var oTable = new CTable(private_GetDrawingDocument(), private_GetLogicDocument(), true, 0, 0, 0, 0, 0, nRows, nCols, [], false);
+        oTable.CorrectBadGrid();
         oTable.Set_TableStyle2(undefined);
         return new ApiTable(oTable);
     };

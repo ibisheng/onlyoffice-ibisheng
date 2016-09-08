@@ -233,14 +233,12 @@ CTable.prototype.private_RecalculateGrid = function()
     if ( this.Content.length <= 0 )
         return;
 
-    this.private_RecalculateGridOpen();
-
     //---------------------------------------------------------------------------
     // 1 часть пересчета ширины таблицы : Рассчитываем фиксированную ширину
     //---------------------------------------------------------------------------
     var TablePr = this.Get_CompiledPr(false).TablePr;
 
-    var Grid   = this.TableGrid;
+    var Grid    = this.TableGrid;
     var SumGrid = [];
 
     var TempSum = 0;
@@ -354,18 +352,11 @@ CTable.prototype.private_RecalculateGrid = function()
     else if ( MinWidth > SumGrid[SumGrid.length - 1] )
         SumGrid = this.Internal_ScaleTableWidth( SumGrid, SumGrid[SumGrid.length - 1] );
 
-    var TableGrid_old = [];
-    for ( var Index = 0; Index < this.TableGrid.length; Index++ )
-        TableGrid_old[Index] = this.TableGrid[Index];
-
     // По массиву SumGrid восстанавливаем ширины самих колонок
-    this.TableGrid[0] = SumGrid[0];
+    this.TableGridCalc = [];
+	this.TableGridCalc[0] = SumGrid[0];
     for ( var Index = 1; Index < SumGrid.length; Index++ )
-        this.TableGrid[Index] = SumGrid[Index] - SumGrid[Index - 1];
-
-    this.Internal_SaveTableGridInHistory( this.TableGrid, TableGrid_old );
-
-    this.TableGridCalc = this.Internal_Copy_Grid(this.TableGrid);
+		this.TableGridCalc[Index] = SumGrid[Index] - SumGrid[Index - 1];
 
     this.TableSumGrid = SumGrid;
 
@@ -437,13 +428,13 @@ CTable.prototype.private_RecalculateGrid = function()
                 {
                     SumSpanMinContent += MinContent[CurSpan];
                     SumSpanMaxContent += MaxContent[CurSpan];
-                    SumSpanCurContent += this.TableGrid[CurSpan];
+                    SumSpanCurContent += this.TableGridCalc[CurSpan];
                 }
 
                 if (null !== WBeforeW && SumSpanMinContent < WBeforeW)
                 {
                     for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
-                        MinContent[CurSpan] = WBeforeW * this.TableGrid[CurSpan] / SumSpanCurContent;
+                        MinContent[CurSpan] = WBeforeW * this.TableGridCalc[CurSpan] / SumSpanCurContent;
                 }
 
                 // Если у нас в объединении несколько колонок, тогда явно записанная ширина ячейки не
@@ -454,7 +445,7 @@ CTable.prototype.private_RecalculateGrid = function()
                     // TODO: На самом деле, распределение здесь идет в каком-то отношении.
                     //       Неплохо было бы выяснить как именно.
                     for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridBefore; CurSpan++ )
-                        MaxContent[CurSpan] = WBeforeW * this.TableGrid[CurSpan] / SumSpanCurContent;
+                        MaxContent[CurSpan] = WBeforeW * this.TableGridCalc[CurSpan] / SumSpanCurContent;
                 }
             }
 
@@ -546,13 +537,13 @@ CTable.prototype.private_RecalculateGrid = function()
                     {
                         SumSpanMinContent += MinContent[CurSpan];
                         SumSpanMaxContent += MaxContent[CurSpan];
-                        SumSpanCurContent += this.TableGrid[CurSpan];
+                        SumSpanCurContent += this.TableGridCalc[CurSpan];
                     }
 
                     if ( SumSpanMinContent < CellMin )
                     {
                         for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
-                            MinContent[CurSpan] = CellMin * this.TableGrid[CurSpan] / SumSpanCurContent;
+                            MinContent[CurSpan] = CellMin * this.TableGridCalc[CurSpan] / SumSpanCurContent;
                     }
 
                     // Если у нас в объединении несколько колонок, тогда явно записанная ширина ячейки не
@@ -566,7 +557,7 @@ CTable.prototype.private_RecalculateGrid = function()
                         // TODO: На самом деле, распределение здесь идет в каком-то отношении.
                         //       Неплохо было бы выяснить как именно.
                         for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
-                            MaxContent[CurSpan] = CellMax * this.TableGrid[CurSpan] / SumSpanCurContent;
+                            MaxContent[CurSpan] = CellMax * this.TableGridCalc[CurSpan] / SumSpanCurContent;
                     }
                 }
 
@@ -616,13 +607,13 @@ CTable.prototype.private_RecalculateGrid = function()
                 {
                     SumSpanMinContent += MinContent[CurSpan];
                     SumSpanMaxContent += MaxContent[CurSpan];
-                    SumSpanCurContent += this.TableGrid[CurSpan];
+                    SumSpanCurContent += this.TableGridCalc[CurSpan];
                 }
 
                 if (null !== WAfterW && SumSpanMinContent < WAfterW)
                 {
                     for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
-                        MinContent[CurSpan] = WAfterW * this.TableGrid[CurSpan] / SumSpanCurContent;
+                        MinContent[CurSpan] = WAfterW * this.TableGridCalc[CurSpan] / SumSpanCurContent;
                 }
 
                 // Если у нас в объединении несколько колонок, тогда явно записанная ширина ячейки не
@@ -633,7 +624,7 @@ CTable.prototype.private_RecalculateGrid = function()
                     // TODO: На самом деле, распределение здесь идет в каком-то отношении.
                     //       Неплохо было бы выяснить как именно.
                     for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridAfter; CurSpan++ )
-                        MaxContent[CurSpan] = WAfterW * this.TableGrid[CurSpan] / SumSpanCurContent;
+                        MaxContent[CurSpan] = WAfterW * this.TableGridCalc[CurSpan] / SumSpanCurContent;
                 }
             }
         }
@@ -894,80 +885,6 @@ CTable.prototype.private_RecalculateGrid = function()
     }
 
     this.RecalcInfo.TableGrid = false;
-};
-CTable.prototype.private_RecalculateGridOpen = function()
-{
-    if ( true != this.RecalcInfo.TableGridOpen )
-        return;
-
-    // Сначала пробежимся по всем ячейкам и посмотрим, чтобы у них были корректные GridSpan (т.е. >= 1)
-    for ( var Index = 0; Index < this.Content.length; Index++ )
-    {
-        var Row = this.Content[Index];
-        var CellsCount = Row.Get_CellsCount();
-        for ( var CellIndex = 0; CellIndex < CellsCount; CellIndex++ )
-        {
-            var Cell = Row.Get_Cell( CellIndex );
-            var GridSpan = Cell.Get_GridSpan();
-            if ( GridSpan <= 0 )
-                Cell.Set_GridSpan( 1 );
-        }
-    }
-
-    var RowGrid = [];
-    var GridCount = 0;
-    for ( var Index = 0; Index < this.Content.length; Index++ )
-    {
-        var Row = this.Content[Index];
-        Row.Set_Index( Index );
-
-        // Смотрим на ширину пропущенных колонок сетки в начале строки
-        var BeforeInfo = Row.Get_Before();
-        var CurGridCol = BeforeInfo.GridBefore;
-
-        var CellsCount = Row.Get_CellsCount();
-        for ( var CellIndex = 0; CellIndex < CellsCount; CellIndex++ )
-        {
-            var Cell = Row.Get_Cell( CellIndex );
-            var GridSpan = Cell.Get_GridSpan();
-            CurGridCol += GridSpan;
-        }
-
-        // Смотрим на ширину пропущенных колонок сетки в конце строки
-        var AfterInfo = Row.Get_After();
-        CurGridCol += AfterInfo.GridAfter;
-
-        if ( GridCount < CurGridCol )
-            GridCount = CurGridCol;
-
-        RowGrid[Index] = CurGridCol;
-    }
-
-    for ( var Index = 0; Index < this.Content.length; Index++ )
-    {
-        var Row = this.Content[Index];
-        var AfterInfo = Row.Get_After();
-
-        if ( RowGrid[Index] < GridCount )
-        {
-            Row.Set_After( AfterInfo.GridAfter + GridCount - RowGrid[Index],  AfterInfo.WAfter );
-        }
-    }
-
-    if ( this.TableGrid.length != GridCount )
-    {
-        if (this.TableGrid.length < GridCount)
-        {
-            for (var Index = 0; Index < GridCount; Index++)
-                this.TableGrid[Index] = 20;
-        }
-        else
-        {
-            this.TableGrid.splice(GridCount, this.TableGrid.length - GridCount);
-        }
-    }
-
-    this.RecalcInfo.TableGridOpen = false;
 };
 CTable.prototype.private_RecalculateBorders = function()
 {
@@ -3094,7 +3011,6 @@ CTablePage.prototype.Shift = function(Dx, Dy)
 //----------------------------------------------------------------------------------------------------------------------
 function CTableRecalcInfo()
 {
-    this.TableGridOpen = true;
     this.TableGrid     = true;
     this.TableBorders  = true;
 
