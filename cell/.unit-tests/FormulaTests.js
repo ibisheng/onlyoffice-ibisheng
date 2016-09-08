@@ -472,6 +472,21 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 6 );
     } )
+	
+	test( "Test: \"Cross\"", function () {
+
+		ws.getRange2( "A7" ).setValue( "1" );
+		ws.getRange2( "A8" ).setValue( "2" );
+		ws.getRange2( "A9" ).setValue( "3" );
+		oParser = new parserFormula( 'A7:A9', null, ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().cross(new AscCommon.CellAddress(5, 0, 0), ws.getId()).getValue(), "#VALUE!" );
+		strictEqual( oParser.calculate().cross(new AscCommon.CellAddress(6, 0, 0), ws.getId()).getValue(), 1 );
+		strictEqual( oParser.calculate().cross(new AscCommon.CellAddress(7, 0, 0), ws.getId()).getValue(), 2 );
+		strictEqual( oParser.calculate().cross(new AscCommon.CellAddress(8, 0, 0), ws.getId()).getValue(), 3 );
+		strictEqual( oParser.calculate().cross(new AscCommon.CellAddress(9, 0, 0), ws.getId()).getValue(), "#VALUE!" );
+
+	} )
 
 	test( "Test: \"Parse intersection\"", function () {
 

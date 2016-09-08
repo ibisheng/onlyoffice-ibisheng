@@ -2344,7 +2344,7 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
 								oCell.formulaParsed = fs.fVal.clone(null, oCell, this);
 								oCell.formulaParsed.ca = oFormulaExt.ca;
 								oCell.formulaParsed.changeOffset(off);
-								oCell.formulaParsed.Formula = oCell.formulaParsed.assemble();
+								oCell.formulaParsed.Formula = oCell.formulaParsed.assemble(true);
 								oFormulaExt.v = oCell.formulaParsed.Formula;
 								if (!bNoBuildDep) {
 									oCell._BuildDependencies(false);
@@ -3800,7 +3800,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
                     if(copyRange) {
 						oTempCell.formulaParsed.removeDependencies();
 						oTempCell.formulaParsed.changeOffset(offset);
-						oTempCell.formulaParsed.Formula = oTempCell.formulaParsed.assemble();
+						oTempCell.formulaParsed.Formula = oTempCell.formulaParsed.assemble(true);
 						this.workbook.dependencyFormulas.addToBuildDependencyCell(oTempCell);
 					} else {
 						this.workbook.dependencyFormulas.addToChangedCell(oTempCell);
@@ -4907,7 +4907,7 @@ Cell.prototype.setValueData = function(Val){
 		}
 		else if (val.type == cElementType.cellsRange || val.type == cElementType.cellsRange3D) {
 			var nF = val.numFormat;
-			val = val.cross(new CellAddress(this.nRow, this.nCol), this.ws.getId());
+			val = val.cross(new CellAddress(this.nRow, this.nCol, 0), this.ws.getId());
 //		val = val.getElementByCell(new CellAddress(cell));
 			val.numFormat = nF;
 		}
@@ -4975,7 +4975,7 @@ Range.prototype.createFromBBox=function(worksheet, bbox){
 Range.prototype.clone=function(oNewWs){
 	if(!oNewWs)
 		oNewWs = this.worksheet;
-	return new Range(oNewWs, this.bbox.r1, this.bbox.c1, this.bbox.r2, this.bbox.c2);
+	return this.createFromBBox(oNewWs, this.bbox);
 };
 Range.prototype.getFirst=function(){
 	return this.first;
@@ -7745,7 +7745,7 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 				if (oCurCell.formulaParsed) {
 					History.TurnOff();
 					var _p_ = oCurCell.formulaParsed.clone(null, oCurCell, this);
-					var assemb = _p_.changeOffset({offsetCol: 0, offsetRow: shift}).assemble();
+					var assemb = _p_.changeOffset({offsetCol: 0, offsetRow: shift}).assemble(true);
 					oCurCell.setFormula(assemb);
 					History.TurnOn();
 				}
@@ -8285,7 +8285,7 @@ function _promoteFromTo(from, wsFrom, to, wsTo, bIsPromote, oCanPromote, bCtrl, 
 									// wsTo._getHyperlink().remove({r1: oCopyCell.nRow, c1: oCopyCell.nCol, r2: oCopyCell.nRow, c2: oCopyCell.nCol});
 							} else {
 								var _p_ = oFromCell.formulaParsed.clone(null, oFromCell, this);
-								var assemb = _p_.changeOffset(oCopyCell.getOffset2(oFromCell.getName())).assemble();
+								var assemb = _p_.changeOffset(oCopyCell.getOffset2(oFromCell.getName())).assemble(true);
 								oCopyCell.setFormula(assemb);
 							}
 						}

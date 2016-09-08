@@ -9553,7 +9553,7 @@
 
                                     if ( _p_.parse() ) 
 									{
-                                        assemb = _p_.changeOffset( offset ).assemble();
+                                        assemb = _p_.changeOffset( offset ).assemble(true);
                                         //range.setValue("="+assemb);
                                         arrFormula[numFor] = {};
                                         arrFormula[numFor].range = range;
@@ -9947,7 +9947,7 @@
 										_p_ = new AscCommonExcel.parserFormula( value2[numFormula].sFormula, null, range.worksheet );
 
                                     if ( _p_.parse() ) {
-                                        assemb = _p_.changeOffset( offset ).assemble();
+                                        assemb = _p_.changeOffset( offset ).assemble(true);
 
                                         arrFormula[numFor] = {};
                                         arrFormula[numFor].range = range;

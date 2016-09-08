@@ -439,7 +439,87 @@
 			this.r1 = Math.min(this.r1, r);
 			this.r2 = Math.max(this.r2, r);
 		};
-
+		Range.prototype.setOffsetWithAbs = function(offset) {
+			var temp;
+			var offsetRow = offset.offsetRow;
+			var offsetCol = offset.offsetCol;
+			if (0 === this.r1 && gc_nMaxRow0 === this.r2) {
+				//full sheet is 1:1048576 but offsetRow is valid for it
+				offsetRow = 0;
+			} else if (0 === this.c1 && gc_nMaxCol0 === this.c2) {
+				offsetCol = 0;
+			}
+			var isAbsRow1 = this.isAbsRow(this.refType1);
+			var isAbsCol1 = this.isAbsCol(this.refType1);
+			var isAbsRow2 = this.isAbsRow(this.refType2);
+			var isAbsCol2 = this.isAbsCol(this.refType2);
+			if (!isAbsRow1) {
+				this.r1 += offsetRow;
+				if (this.r1 < 0) {
+					this.r1 = 0;
+					return false;
+				}
+				if (this.r1 > gc_nMaxRow0) {
+					this.r1 = gc_nMaxRow0;
+					return false;
+				}
+			}
+			if (!isAbsCol1) {
+				this.c1 += offsetCol;
+				if (this.c1 < 0) {
+					this.c1 = 0;
+					return false;
+				}
+				if (this.c1 > gc_nMaxCol0) {
+					this.c1 = gc_nMaxCol0;
+					return false;
+				}
+			}
+			if (!isAbsRow2) {
+				this.r2 += offsetRow;
+				if (this.r2 < 0) {
+					this.r2 = 0;
+					return false;
+				}
+				if (this.r2 > gc_nMaxRow0) {
+					this.r2 = gc_nMaxRow0;
+					return false;
+				}
+			}
+			if (!isAbsCol2) {
+				this.c2 += offsetCol;
+				if (this.c2 < 0) {
+					this.c2 = 0;
+					return false;
+				}
+				if (this.c2 > gc_nMaxCol0) {
+					this.c2 = gc_nMaxCol0;
+					return false;
+				}
+			}
+			//switch abs flag
+			if (this.r1 > this.r2) {
+				temp = this.r1;
+				this.r1 = this.r2;
+				this.r2 = temp;
+				if (!isAbsRow1 && isAbsRow2) {
+					isAbsRow1 = !isAbsRow1;
+					isAbsRow2 = !isAbsRow2;
+					this.setAbs(isAbsRow1, isAbsCol1, isAbsRow2, isAbsCol2);
+				}
+			}
+			if (this.c1 > this.c2) {
+				temp = this.c1;
+				this.c1 = this.c2;
+				this.c2 = temp;
+				if (!isAbsCol1 && isAbsCol2) {
+					isAbsCol1 = !isAbsCol1;
+					isAbsCol2 = !isAbsCol2;
+					this.setAbs(isAbsRow1, isAbsCol1, isAbsRow2, isAbsCol2);
+				}
+			}
+			return true;
+		};
 		Range.prototype.setOffset = function (offset) {
 			if (this.r1 == 0 && this.r2 == gc_nMaxRow0 && offset.offsetRow != 0 ||
 				this.c1 == 0 && this.c2 == gc_nMaxCol0 && offset.offsetCol != 0) {
@@ -515,7 +595,7 @@
 					sRes += "$";
 				}
 				sRes += (this.r1 + 1);
-				if (!this.isOneCell()) {
+				if (!this.isOneCell() || r1Abs !== r2Abs || c1Abs !== c2Abs) {
 					sRes += ":";
 					if (c2Abs) {
 						sRes += "$";

@@ -601,29 +601,17 @@
 				}
 				if (parserHelp.isArea.call(o, o.Formula, o.pCurrPos)) {
 					found_operand = new cArea3D(o.operand_str.toUpperCase(), _wsFrom, _wsTo, wb);
-					if (o.operand_str.indexOf("$") > -1) {
-						found_operand.isAbsolute = true;
-					}
 				} else if (parserHelp.isRef.call(o, o.Formula, o.pCurrPos)) {
 					if (_wsTo != _wsFrom) {
 						found_operand = new cArea3D(o.operand_str.toUpperCase(), _wsFrom, _wsTo, wb);
 					} else {
 						found_operand = new cRef3D(o.operand_str.toUpperCase(), _wsFrom, wb);
 					}
-					if (o.operand_str.indexOf("$") > -1) {
-						found_operand.isAbsolute = true;
-					}
 				}
 			} else if (parserHelp.isArea.call(o, o.Formula, o.pCurrPos)) {
 				found_operand = new cArea(o.operand_str.toUpperCase(), r1.worksheet);
-				if (o.operand_str.indexOf("$") > -1) {
-					found_operand.isAbsolute = true;
-				}
 			} else if (parserHelp.isRef.call(o, o.Formula, o.pCurrPos, true)) {
 				found_operand = new cRef(o.operand_str.toUpperCase(), r1.worksheet);
-				if (o.operand_str.indexOf("$") > -1) {
-					found_operand.isAbsolute = true;
-				}
 			} else if (parserHelp.isName.call(o, o.Formula, o.pCurrPos, wb)[0]) {
 				found_operand = new AscCommonExcel.cName(o.operand_str, wb, r1.worksheet);
 			}
