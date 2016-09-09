@@ -1404,7 +1404,7 @@ ParaRun.prototype.Is_SimpleChanges = function(Changes)
         // нельзя обсчитывать функцией Recalculate_Fast.
         // TODO: Но на самом деле стоило бы сделать нормальную проверку на высоту строки в функции Recalculate_Fast
         var ItemType = Item.Type;
-        if (para_Drawing === ItemType || para_NewLine === ItemType)
+        if (para_Drawing === ItemType || para_NewLine === ItemType || para_FootnoteRef === ItemType || para_FootnoteReference === ItemType)
             return false;
 
         // Проверяем, что все изменения произошли в одном и том же отрезке

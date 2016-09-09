@@ -1665,10 +1665,8 @@ CDocument.prototype.Get_PageContentStartPos2       = function(StartPageIndex, St
     var ColumnAbs    = (StartColumnIndex + ElementPageIndex) - ((StartColumnIndex + ElementPageIndex) / ColumnsCount | 0) * ColumnsCount;
     var PageAbs      = StartPageIndex + ((StartColumnIndex + ElementPageIndex) / ColumnsCount | 0);
 
-	var FootnotesHeight = this.Footnotes.GetHeight(PageAbs, ColumnAbs);
-
 	var Y      = SectPr.Get_PageMargin_Top();
-	var YLimit = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom() - FootnotesHeight;
+	var YLimit = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom();
 	var X      = SectPr.Get_PageMargin_Left();
 	var XLimit = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
 
@@ -1677,7 +1675,7 @@ CDocument.prototype.Get_PageContentStartPos2       = function(StartPageIndex, St
     if (this.Pages[PageAbs] && this.Pages[PageAbs].Sections[SectionIndex])
     {
         Y      = this.Pages[PageAbs].Sections[SectionIndex].Get_Y();
-        YLimit = this.Pages[PageAbs].Sections[SectionIndex].Get_YLimit() - FootnotesHeight;
+        YLimit = this.Pages[PageAbs].Sections[SectionIndex].Get_YLimit();
     }
 
     var HdrFtrLine = this.HdrFtr.Get_HdrFtrLines(PageAbs);
@@ -2300,7 +2298,6 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
     PageColumn.SpaceBefore = StartPos.ColumnSpaceBefore;
     PageColumn.SpaceAfter  = StartPos.ColumnSpaceAfter;
 
-    //var YLimitOrigin = YLimit;
     this.Footnotes.ContinueElementsFromPreviousColumn(PageIndex, ColumnIndex, Y, YLimit);
 
     var SectElement  = this.SectionsInfo.Get_SectPr(StartIndex);
