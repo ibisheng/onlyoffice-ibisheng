@@ -3800,7 +3800,6 @@
             this.activeRange.c2 = this.cols.length - 1;
         }
 
-        this.activeRange.isName = true;
         this._drawElements(this._drawSelectionElement, this.activeRange,
           AscCommonExcel.selectionLineType.RangeWithPromote, this.settings.activeCellBorderColor);
         return;
