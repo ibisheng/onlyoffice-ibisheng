@@ -6225,90 +6225,88 @@
         return null;
     };
 
-    WorksheetView.prototype._getCursorFormulaOrChart = function ( vr, x, y, offsetX, offsetY ) {
+    WorksheetView.prototype._hitResizeCorner = function (x1, y1, x2, y2) {
+        var wEps = this.width_1px, hEps = this.height_1px;
+        return Math.abs(x2 - x1) <= wEps + this.width_2px && Math.abs(y2 - y1) <= hEps + this.height_2px;
+    };
+
+    WorksheetView.prototype._getCursorFormulaOrChart = function (vr, x, y, offsetX, offsetY) {
         var i, l;
         var cursor, oFormulaRange, oFormulaRangeIn, xFormula1, xFormula2, yFormula1, yFormula2;
         var col = -1, row = -1;
-        var arrRanges = this.isFormulaEditMode ? this.arrActiveFormulaRanges : this.arrActiveChartsRanges, targetArr = this.isFormulaEditMode ? 0 : -1;
-		var ppiX = this._getPPIX(), ppiY = this._getPPIY();
-		var width_1px = asc_calcnpt( 0, ppiX, 1/*px*/ ),
-			width_2px = asc_calcnpt( 0, ppiX, 2/*px*/ ),
-			width_3px = asc_calcnpt( 0, ppiX, 3/*px*/ ),
-			width_4px = asc_calcnpt( 0, ppiX, 4/*px*/ ),
-			width_5px = asc_calcnpt( 0, ppiX, 5/*px*/ ),
-			width_7px = asc_calcnpt( 0, ppiX, 7/*px*/ ),
+        var arrRanges = this.isFormulaEditMode ? this.arrActiveFormulaRanges :
+          this.arrActiveChartsRanges, targetArr = this.isFormulaEditMode ? 0 : -1;
+        var wEps = this.width_2px, hEps = this.height_2px;
 
-			height_1px = asc_calcnpt( 0, ppiY, 1/*px*/ ),
-			height_2px = asc_calcnpt( 0, ppiY, 2/*px*/ ),
-			height_3px = asc_calcnpt( 0, ppiY, 3/*px*/ ),
-			height_4px = asc_calcnpt( 0, ppiY, 4/*px*/ ),
-			height_5px = asc_calcnpt( 0, ppiY, 5/*px*/ ),
-			height_7px = asc_calcnpt( 0, ppiY, 7/*px*/ );
-
-        for ( i = 0, l = arrRanges.length; i < l; ++i ) {
-            oFormulaRange = arrRanges[i].clone( true );
+        for (i = 0, l = arrRanges.length; i < l; ++i) {
+            oFormulaRange = arrRanges[i].clone(true);
             oFormulaRange.isName = arrRanges[i].isName;
-            oFormulaRangeIn = oFormulaRange.intersectionSimple( vr );
-            if ( oFormulaRangeIn && !oFormulaRange.isName ) {
+            oFormulaRangeIn = oFormulaRange.intersectionSimple(vr);
+            if (oFormulaRangeIn && !oFormulaRange.isName) {
                 xFormula1 = this.cols[oFormulaRangeIn.c1].left - offsetX;
                 xFormula2 = this.cols[oFormulaRangeIn.c2].left + this.cols[oFormulaRangeIn.c2].width - offsetX;
                 yFormula1 = this.rows[oFormulaRangeIn.r1].top - offsetY;
                 yFormula2 = this.rows[oFormulaRangeIn.r2].top + this.rows[oFormulaRangeIn.r2].height - offsetY;
 
-                if ( (x >= xFormula1 + width_3px && x <= xFormula2 - width_5px) &&
-					 ((y >= yFormula1 - height_2px && y <= yFormula1 + height_2px) || (y >= yFormula2 - height_2px && y <= yFormula2 + height_2px)) ||
-					 (y >= yFormula1 + height_3px && y <= yFormula2 - height_5px) &&
-					 ((x >= xFormula1 - width_2px && x <= xFormula1 + width_2px) || (x >= xFormula2 - width_2px && x <= xFormula2 + width_2px)) ) {
-                    cursor = kCurMove;
-                    break;
-                }
-				else if ( x >= xFormula1 - width_3px && x < xFormula1 + width_2px && y >= yFormula1 - height_3px && y < yFormula1 + height_2px ) {/*TOP-LEFT*/
+                if (this.hitResizeCorner(xFormula1 - this.width_1px, yFormula1 - this.height_1px, x, y)) {
+                    /*TOP-LEFT*/
                     cursor = kCurSEResize;
                     col = oFormulaRange.c2;
                     row = oFormulaRange.r2;
                     break;
-                }
-				else if ( x > xFormula2 - width_3px && x <= xFormula2 + width_2px && y >= yFormula1 - height_3px && y < yFormula1 + height_2px ) {/*TOP-RIGHT*/
-					cursor = kCurNEResize;
-					col = oFormulaRange.c1;
-					row = oFormulaRange.r2;
-					break;
-				}
-                else if ( x > xFormula2 - width_3px && x <= xFormula2 + width_2px && y > yFormula2 - height_3px && y <= yFormula2 + height_2px ) {/*BOTTOM-RIGHT*/
+                } else if (this.hitResizeCorner(xFormula2, yFormula1 - this.height_1px, x, y)) {
+                    /*TOP-RIGHT*/
+                    cursor = kCurNEResize;
+                    col = oFormulaRange.c1;
+                    row = oFormulaRange.r2;
+                    break;
+                } else if (this.hitResizeCorner(xFormula1 - this.width_1px, yFormula2, x, y)) {
+                    /*BOTTOM-LEFT*/
+                    cursor = kCurNEResize;
+                    col = oFormulaRange.c2;
+                    row = oFormulaRange.r1;
+                    break;
+                } else if (this.hitResizeCorner(xFormula2, yFormula2, x, y)) {
+                    /*BOTTOM-RIGHT*/
                     cursor = kCurSEResize;
                     col = oFormulaRange.c1;
                     row = oFormulaRange.r1;
                     break;
-                }
-                else if ( x >= xFormula1 - width_3px && x < xFormula1 + width_2px && y > yFormula2 - height_3px && y <= yFormula2 + height_2px ) {/*BOTTOM-LEFT*/
-                    cursor = kCurNEResize;
-                    col = oFormulaRange.c2;
-                    row = oFormulaRange.r1;
+                } else if (((Math.abs(x - xFormula1) <= wEps || Math.abs(x - xFormula2) <= wEps) &&
+                  hEps <= y - yFormula1 && y - yFormula2 <= hEps) ||
+                  ((Math.abs(y - yFormula1) <= hEps || Math.abs(y - yFormula2) <= hEps) && wEps <= x - xFormula1 &&
+                  x - xFormula2 <= wEps)) {
+                    cursor = kCurMove;
                     break;
                 }
             }
         }
         return cursor ? {
-            cursor           : cursor,
-            target           : c_oTargetType.MoveResizeRange,
-            col              : col,
-            row              : row,
-            formulaRange     : oFormulaRange,
+            cursor: cursor,
+            target: c_oTargetType.MoveResizeRange,
+            col: col,
+            row: row,
+            formulaRange: oFormulaRange,
             indexFormulaRange: i,
-            targetArr        : targetArr
+            targetArr: targetArr
         } : null;
     };
-    WorksheetView.prototype._isCursorOnSelectionBorder = function ( ar, vr, x, y ) {
-        var arIntersection = ar.intersectionSimple( vr );
+    WorksheetView.prototype._isCursorOnSelectionBorder = function (ar, vr, x, y) {
+        var arIntersection = ar.intersectionSimple(vr);
         var left, top, right, bottom, wEps = this.width_2px, hEps = this.height_2px;
-        if ( arIntersection ) {
+        if (arIntersection) {
             left = ar.c1 === arIntersection.c1 ? this.cols[ar.c1].left : null;
             right = ar.c2 === arIntersection.c2 ? this.cols[ar.c2].left + this.cols[ar.c2].width : null;
             top = ar.r1 === arIntersection.r1 ? this.rows[ar.r1].top : null;
             bottom = ar.r2 === arIntersection.r2 ? this.rows[ar.r2].top + this.rows[ar.r2].height : null;
-            var isLeft = (null !== left && x >= left - wEps && x <= left + wEps), isRight = (null !== right && x >= right - wEps && x <= right + wEps), isTop = (null !== top && y >= top - hEps && y <= top + hEps), isBottom = (null !== bottom && y >= bottom - hEps && y <= bottom + hEps), isHorMiddle = ((null === left || x >= left - wEps) && (null === right || x <= right + wEps)), isVerMiddle = ((null === top || y >= top - hEps) && (null === bottom || y <= bottom + hEps));
+            var isLeft = (null !== left && x >= left - wEps && x <= left + wEps), isRight = (null !== right &&
+            x >= right - wEps && x <= right + wEps), isTop = (null !== top && y >= top - hEps &&
+            y <= top + hEps), isBottom = (null !== bottom && y >= bottom - hEps &&
+            y <= bottom + hEps), isHorMiddle = ((null === left || x >= left - wEps) &&
+            (null === right || x <= right + wEps)), isVerMiddle = ((null === top || y >= top - hEps) &&
+            (null === bottom || y <= bottom + hEps));
 
-            if ( ((isLeft || isRight) && isVerMiddle) || ((isTop || isBottom) && isHorMiddle) ) {
+            if (((isLeft || isRight) && isVerMiddle) || ((isTop || isBottom) && isHorMiddle)) {
                 // Мы навели на границу выделения
                 return true;
             }
@@ -6316,92 +6314,94 @@
         return false;
     };
 
-    WorksheetView.prototype.getCursorTypeFromXY = function ( x, y, isViewerMode ) {
+    WorksheetView.prototype.getCursorTypeFromXY = function (x, y, isViewerMode) {
         var c, r, f, i, offsetX, offsetY, cellCursor, sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink, widthDiff = 0, heightDiff = 0, isLocked = false, ar = this.activeRange, target = c_oTargetType.Cells, row = -1, col = -1, isSelGraphicObject, isNotFirst;
 
-        var frozenCursor = this._isFrozenAnchor( x, y );
-        if ( !isViewerMode && frozenCursor.result ) {
-            lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Object, null, sheetId, AscCommonExcel.c_oAscLockNameFrozenPane );
-            isLocked = this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, false );
-            if ( false !== isLocked ) {
+        var frozenCursor = this._isFrozenAnchor(x, y);
+        if (!isViewerMode && frozenCursor.result) {
+            lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId,
+              AscCommonExcel.c_oAscLockNameFrozenPane);
+            isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false);
+            if (false !== isLocked) {
                 // Кто-то сделал lock
-                var frozenCell = this.topLeftFrozenCell ? this.topLeftFrozenCell : new AscCommon.CellAddress( 0, 0, 0 );
+                var frozenCell = this.topLeftFrozenCell ? this.topLeftFrozenCell : new AscCommon.CellAddress(0, 0, 0);
                 userId = isLocked.UserId;
-                lockRangePosLeft = this.getCellLeft( frozenCell.getCol0(), 0 );
-                lockRangePosTop = this.getCellTop( frozenCell.getRow0(), 0 );
+                lockRangePosLeft = this.getCellLeft(frozenCell.getCol0(), 0);
+                lockRangePosTop = this.getCellTop(frozenCell.getRow0(), 0);
             }
             return {
-                cursor          : frozenCursor.cursor,
-                target          : frozenCursor.name,
-                col             : -1,
-                row             : -1,
-                userId          : userId,
+                cursor: frozenCursor.cursor,
+                target: frozenCursor.name,
+                col: -1,
+                row: -1,
+                userId: userId,
                 lockRangePosLeft: lockRangePosLeft,
-                lockRangePosTop : lockRangePosTop
+                lockRangePosTop: lockRangePosTop
             };
         }
 
-        var drawingInfo = this.objectRender.checkCursorDrawingObject( x, y );
-        if ( asc["editor"].isStartAddShape && AscCommonExcel.CheckIdSatetShapeAdd( this.objectRender.controller.curState ) ) {
+        var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
+        if (asc["editor"].isStartAddShape &&
+          AscCommonExcel.CheckIdSatetShapeAdd(this.objectRender.controller.curState)) {
             return {cursor: kCurFillHandle, target: c_oTargetType.Shape, col: -1, row: -1};
         }
 
-        if ( drawingInfo && drawingInfo.id ) {
+        if (drawingInfo && drawingInfo.id) {
             // Возможно картинка с lock
-            lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Object, null, sheetId, drawingInfo.id );
-            isLocked = this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, false );
-            if ( false !== isLocked ) {
+            lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, drawingInfo.id);
+            isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false);
+            if (false !== isLocked) {
                 // Кто-то сделал lock
                 userId = isLocked.UserId;
-                lockRangePosLeft = drawingInfo.object.getVisibleLeftOffset( true );
-                lockRangePosTop = drawingInfo.object.getVisibleTopOffset( true );
+                lockRangePosLeft = drawingInfo.object.getVisibleLeftOffset(true);
+                lockRangePosTop = drawingInfo.object.getVisibleTopOffset(true);
             }
 
-            if ( drawingInfo.hyperlink instanceof ParaHyperlink ) {
+            if (drawingInfo.hyperlink instanceof ParaHyperlink) {
                 oHyperlink = new AscCommonExcel.Hyperlink();
                 oHyperlink.Tooltip = drawingInfo.hyperlink.ToolTip;
-                var spl = drawingInfo.hyperlink.Value.split( "!" );
-                if ( spl.length === 2 ) {
-                    oHyperlink.setLocation( drawingInfo.hyperlink.Value );
-                }
-                else {
+                var spl = drawingInfo.hyperlink.Value.split("!");
+                if (spl.length === 2) {
+                    oHyperlink.setLocation(drawingInfo.hyperlink.Value);
+                } else {
                     oHyperlink.Hyperlink = drawingInfo.hyperlink.Value;
                 }
 
-                cellCursor = {cursor: drawingInfo.cursor, target: c_oTargetType.Cells, col: -1, row: -1, userId: userId};
+                cellCursor =
+                {cursor: drawingInfo.cursor, target: c_oTargetType.Cells, col: -1, row: -1, userId: userId};
                 return {
-                    cursor    : kCurHyperlink,
-                    target    : c_oTargetType.Hyperlink,
-                    hyperlink : new asc_CHyperlink( oHyperlink ),
+                    cursor: kCurHyperlink,
+                    target: c_oTargetType.Hyperlink,
+                    hyperlink: new asc_CHyperlink(oHyperlink),
                     cellCursor: cellCursor,
-                    userId    : userId
+                    userId: userId
                 };
             }
 
             return {
-                cursor          : drawingInfo.cursor,
-                target          : c_oTargetType.Shape,
-                drawingId       : drawingInfo.id,
-                col             : -1,
-                row             : -1,
-                userId          : userId,
+                cursor: drawingInfo.cursor,
+                target: c_oTargetType.Shape,
+                drawingId: drawingInfo.id,
+                col: -1,
+                row: -1,
+                userId: userId,
                 lockRangePosLeft: lockRangePosLeft,
-                lockRangePosTop : lockRangePosTop
+                lockRangePosTop: lockRangePosTop
             };
         }
 
-        x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
-        y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
+        x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
+        y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
 
         var oResDefault = {cursor: kCurDefault, target: c_oTargetType.None, col: -1, row: -1};
-        if ( x < this.cellsLeft && y < this.cellsTop ) {
+        if (x < this.cellsLeft && y < this.cellsTop) {
             return {cursor: kCurCorner, target: c_oTargetType.Corner, col: -1, row: -1};
         }
 
         var cFrozen = -1, rFrozen = -1;
         offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
         offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
-        if ( this.topLeftFrozenCell ) {
+        if (this.topLeftFrozenCell) {
             cFrozen = this.topLeftFrozenCell.getCol0();
             rFrozen = this.topLeftFrozenCell.getRow0();
             widthDiff = this.cols[cFrozen].left - this.cols[0].left;
@@ -6411,9 +6411,9 @@
             offsetY = (y < this.cellsTop + heightDiff) ? 0 : offsetY - heightDiff;
         }
 
-        if ( x <= this.cellsLeft && y >= this.cellsTop ) {
-            r = this._findRowUnderCursor( y, true );
-            if ( r === null ) {
+        if (x <= this.cellsLeft && y >= this.cellsTop) {
+            r = this._findRowUnderCursor(y, true);
+            if (r === null) {
                 return oResDefault;
             }
             isNotFirst = (r.row !== (-1 !== rFrozen ? 0 : this.visibleRange.r1));
@@ -6422,14 +6422,14 @@
             return {
                 cursor: f ? kCurRowResize : kCurRowSelect,
                 target: f ? c_oTargetType.RowResize : c_oTargetType.RowHeader,
-                col   : -1,
-                row   : r.row + (isNotFirst && f && y < r.top + 3 ? -1 : 0),
+                col: -1,
+                row: r.row + (isNotFirst && f && y < r.top + 3 ? -1 : 0),
                 mouseY: f ? ((y < r.top + 3) ? (r.top - y - this.height_1px) : (r.bottom - y - this.height_1px)) : null
             };
         }
-        if ( y <= this.cellsTop && x >= this.cellsLeft ) {
-            c = this._findColUnderCursor( x, true );
-            if ( c === null ) {
+        if (y <= this.cellsTop && x >= this.cellsLeft) {
+            c = this._findColUnderCursor(x, true);
+            if (c === null) {
                 return oResDefault;
             }
             isNotFirst = c.col !== (-1 !== cFrozen ? 0 : this.visibleRange.c1);
@@ -6438,23 +6438,23 @@
             return {
                 cursor: f ? kCurColResize : kCurColSelect,
                 target: f ? c_oTargetType.ColumnResize : c_oTargetType.ColumnHeader,
-                col   : c.col + (isNotFirst && f && x < c.left + 3 ? -1 : 0),
-                row   : -1,
+                col: c.col + (isNotFirst && f && x < c.left + 3 ? -1 : 0),
+                row: -1,
                 mouseX: f ? ((x < c.left + 3) ? (c.left - x - this.width_1px) : (c.right - x - this.width_1px)) : null
             };
         }
 
-        if ( this.stateFormatPainter ) {
-            if ( x <= this.cellsLeft && y >= this.cellsTop ) {
-                r = this._findRowUnderCursor( y, true );
-                if ( r !== null ) {
+        if (this.stateFormatPainter) {
+            if (x <= this.cellsLeft && y >= this.cellsTop) {
+                r = this._findRowUnderCursor(y, true);
+                if (r !== null) {
                     target = c_oTargetType.RowHeader;
                     row = r.row;
                 }
             }
-            if ( y <= this.cellsTop && x >= this.cellsLeft ) {
-                c = this._findColUnderCursor( x, true );
-                if ( c !== null ) {
+            if (y <= this.cellsTop && x >= this.cellsLeft) {
+                c = this._findColUnderCursor(x, true);
+                if (c !== null) {
                     target = c_oTargetType.ColumnHeader;
                     col = c.col;
                 }
@@ -6462,9 +6462,9 @@
             return {cursor: kCurFormatPainterExcel, target: target, col: col, row: row};
         }
 
-        if ( this.isFormulaEditMode || this.isChartAreaEditMode ) {
-            var oFormulaOrChartCursor = this._getCursorFormulaOrChart( this.visibleRange, x, y, offsetX, offsetY );
-            if ( oFormulaOrChartCursor ) {
+        if (this.isFormulaEditMode || this.isChartAreaEditMode) {
+            var oFormulaOrChartCursor = this._getCursorFormulaOrChart(this.visibleRange, x, y, offsetX, offsetY);
+            if (oFormulaOrChartCursor) {
                 return oFormulaOrChartCursor;
             }
         }
@@ -6473,47 +6473,49 @@
         var yWithOffset = y + offsetY;
 
         isSelGraphicObject = this.objectRender.selectedGraphicObjectsExists();
-        if ( !isViewerMode && !isSelGraphicObject ) {
+        if (!isViewerMode && !isSelGraphicObject) {
             // Эпсилон для fillHandle
             var fillHandleEpsilon = this.width_1px;
-            if ( !this.isChartAreaEditMode && x >= (this.fillHandleL - fillHandleEpsilon) && x <= (this.fillHandleR + fillHandleEpsilon) && y >= (this.fillHandleT - fillHandleEpsilon) && y <= (this.fillHandleB + fillHandleEpsilon) ) {
+            if (!this.isChartAreaEditMode && x >= (this.fillHandleL - fillHandleEpsilon) &&
+              x <= (this.fillHandleR + fillHandleEpsilon) && y >= (this.fillHandleT - fillHandleEpsilon) &&
+              y <= (this.fillHandleB + fillHandleEpsilon)) {
                 // Мы на "квадрате" для автозаполнения
                 return {cursor: kCurFillHandle, target: c_oTargetType.FillHandle, col: -1, row: -1};
             }
 
             // Навели на выделение (стоит вынести в отдельный метод)
-            if ( this._isCursorOnSelectionBorder( ar, this.visibleRange, xWithOffset, yWithOffset ) ) {
+            if (this._isCursorOnSelectionBorder(ar, this.visibleRange, xWithOffset, yWithOffset)) {
                 return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
             }
-            if ( this.topLeftFrozenCell ) {
+            if (this.topLeftFrozenCell) {
                 var oFrozenRange;
                 cFrozen -= 1;
                 rFrozen -= 1;
-                if ( 0 <= cFrozen && 0 <= rFrozen ) {
-                    oFrozenRange = new asc_Range( 0, 0, cFrozen, rFrozen );
-                    if ( this._isCursorOnSelectionBorder( ar, oFrozenRange, x, y ) ) {
+                if (0 <= cFrozen && 0 <= rFrozen) {
+                    oFrozenRange = new asc_Range(0, 0, cFrozen, rFrozen);
+                    if (this._isCursorOnSelectionBorder(ar, oFrozenRange, x, y)) {
                         return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
                     }
                 }
-                if ( 0 <= cFrozen ) {
-                    oFrozenRange = new asc_Range( 0, this.visibleRange.r1, cFrozen, this.visibleRange.r2 );
-                    if ( this._isCursorOnSelectionBorder( ar, oFrozenRange, x, yWithOffset ) ) {
+                if (0 <= cFrozen) {
+                    oFrozenRange = new asc_Range(0, this.visibleRange.r1, cFrozen, this.visibleRange.r2);
+                    if (this._isCursorOnSelectionBorder(ar, oFrozenRange, x, yWithOffset)) {
                         return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
                     }
                 }
-                if ( 0 <= rFrozen ) {
-                    oFrozenRange = new asc_Range( this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen );
-                    if ( this._isCursorOnSelectionBorder( ar, oFrozenRange, xWithOffset, y ) ) {
+                if (0 <= rFrozen) {
+                    oFrozenRange = new asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen);
+                    if (this._isCursorOnSelectionBorder(ar, oFrozenRange, xWithOffset, y)) {
                         return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
                     }
                 }
             }
         }
 
-        if ( x > this.cellsLeft && y > this.cellsTop ) {
-            c = this._findColUnderCursor( x, true );
-            r = this._findRowUnderCursor( y, true );
-            if ( c === null || r === null ) {
+        if (x > this.cellsLeft && y > this.cellsTop) {
+            c = this._findColUnderCursor(x, true);
+            r = this._findRowUnderCursor(y, true);
+            if (c === null || r === null) {
                 return oResDefault;
             }
 
@@ -6523,115 +6525,126 @@
             var lockAllPosTop = undefined;
             var userIdAllProps = undefined;
             var userIdAllSheet = undefined;
-            if ( !isViewerMode && this.collaborativeEditing.getCollaborativeEditing() ) {
+            if (!isViewerMode && this.collaborativeEditing.getCollaborativeEditing()) {
                 var c1Recalc = null, r1Recalc = null;
-                var selectRangeRecalc = new asc_Range( c.col, r.row, c.col, r.row );
+                var selectRangeRecalc = new asc_Range(c.col, r.row, c.col, r.row);
                 // Пересчет для входящих ячеек в добавленные строки/столбцы
-                var isIntersection = this._recalcRangeByInsertRowsAndColumns( sheetId, selectRangeRecalc );
-                if ( false === isIntersection ) {
-                    lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Range, /*subType*/null, sheetId, new AscCommonExcel.asc_CCollaborativeRange( selectRangeRecalc.c1, selectRangeRecalc.r1, selectRangeRecalc.c2, selectRangeRecalc.r2 ) );
-                    isLocked = this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false );
-                    if ( false !== isLocked ) {
+                var isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, selectRangeRecalc);
+                if (false === isIntersection) {
+                    lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId,
+                      new AscCommonExcel.asc_CCollaborativeRange(selectRangeRecalc.c1, selectRangeRecalc.r1, selectRangeRecalc.c2, selectRangeRecalc.r2));
+                    isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
+                      /*bCheckOnlyLockAll*/false);
+                    if (false !== isLocked) {
                         // Кто-то сделал lock
                         userId = isLocked.UserId;
                         lockRange = isLocked.Element["rangeOrObjectId"];
 
-                        c1Recalc = this.collaborativeEditing.m_oRecalcIndexColumns[sheetId].getLockOther( lockRange["c1"], c_oAscLockTypes.kLockTypeOther );
-                        r1Recalc = this.collaborativeEditing.m_oRecalcIndexRows[sheetId].getLockOther( lockRange["r1"], c_oAscLockTypes.kLockTypeOther );
-                        if ( null !== c1Recalc && null !== r1Recalc ) {
-                            lockRangePosLeft = this.getCellLeft( c1Recalc, /*pt*/1 );
-                            lockRangePosTop = this.getCellTop( r1Recalc, /*pt*/1 );
+                        c1Recalc =
+                          this.collaborativeEditing.m_oRecalcIndexColumns[sheetId].getLockOther(lockRange["c1"],
+                            c_oAscLockTypes.kLockTypeOther);
+                        r1Recalc = this.collaborativeEditing.m_oRecalcIndexRows[sheetId].getLockOther(lockRange["r1"],
+                          c_oAscLockTypes.kLockTypeOther);
+                        if (null !== c1Recalc && null !== r1Recalc) {
+                            lockRangePosLeft = this.getCellLeft(c1Recalc, /*pt*/1);
+                            lockRangePosTop = this.getCellTop(r1Recalc, /*pt*/1);
                             // Пересчитываем X и Y относительно видимой области
                             lockRangePosLeft -= offsetX;
                             lockRangePosTop -= offsetY;
                             // Пересчитываем в px
-                            lockRangePosLeft *= asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
-                            lockRangePosTop *= asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIY() );
+                            lockRangePosLeft *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
+                            lockRangePosTop *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
                         }
                     }
-                }
-                else {
-                    lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Range, /*subType*/null, sheetId, null );
+                } else {
+                    lockInfo =
+                      this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId, null);
                 }
                 // Проверим не удален ли весь лист (именно удален, т.к. если просто залочен, то не рисуем рамку вокруг)
                 lockInfo["type"] = c_oAscLockTypeElem.Sheet;
-                isLocked = this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/true );
-                if ( false !== isLocked ) {
+                isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
+                  /*bCheckOnlyLockAll*/true);
+                if (false !== isLocked) {
                     // Кто-то сделал lock
                     userIdAllSheet = isLocked.UserId;
-                    lockAllPosLeft = this.cellsLeft * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
-                    lockAllPosTop = this.cellsTop * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIY() );
+                    lockAllPosLeft = this.cellsLeft * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
+                    lockAllPosTop = this.cellsTop * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
                 }
 
                 // Проверим не залочены ли все свойства листа (только если не удален весь лист)
-                if ( undefined === userIdAllSheet ) {
+                if (undefined === userIdAllSheet) {
                     lockInfo["type"] = c_oAscLockTypeElem.Range;
                     lockInfo["subType"] = c_oAscLockTypeElemSubType.InsertRows;
-                    isLocked = this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/true );
-                    if ( false !== isLocked ) {
+                    isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
+                      /*bCheckOnlyLockAll*/true);
+                    if (false !== isLocked) {
                         // Кто-то сделал lock
                         userIdAllProps = isLocked.UserId;
 
-                        lockAllPosLeft = this.cellsLeft * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
-                        lockAllPosTop = this.cellsTop * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIY() );
+                        lockAllPosLeft = this.cellsLeft * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
+                        lockAllPosTop = this.cellsTop * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
                     }
                 }
             }
 
-            var autoFilterInfo = this.af_checkCursor( x, y, offsetX, offsetY, {
+            var autoFilterInfo = this.af_checkCursor(x, y, offsetX, offsetY, {
                 cFrozen: cFrozen, rFrozen: rFrozen
-            }, r, c );
-            if ( autoFilterInfo && !isViewerMode ) {
+            }, r, c);
+            if (autoFilterInfo && !isViewerMode) {
                 return {
-                    cursor: kCurAutoFilter, target: c_oTargetType.FilterObject, col: -1, row: -1, idFilter: autoFilterInfo.id
+                    cursor: kCurAutoFilter,
+                    target: c_oTargetType.FilterObject,
+                    col: -1,
+                    row: -1,
+                    idFilter: autoFilterInfo.id
                 };
             }
 
             // Проверим есть ли комменты
-            var comments = this.cellCommentator.getComments( c.col, r.row );
+            var comments = this.cellCommentator.getComments(c.col, r.row);
             var coords = undefined;
             var indexes = undefined;
 
-            if ( 0 < comments.length ) {
+            if (0 < comments.length) {
                 indexes = [];
-                for ( i = 0; i < comments.length; ++i ) {
-                    indexes.push( comments[i].asc_getId() );
+                for (i = 0; i < comments.length; ++i) {
+                    indexes.push(comments[i].asc_getId());
                 }
-                coords = this.cellCommentator.getCommentsCoords( comments );
+                coords = this.cellCommentator.getCommentsCoords(comments);
             }
 
             // Проверим, может мы в гиперлинке
-            oHyperlink = this.model.getHyperlinkByCell( r.row, c.col );
+            oHyperlink = this.model.getHyperlinkByCell(r.row, c.col);
             cellCursor = {
-                cursor          : kCurCells,
-                target          : c_oTargetType.Cells,
-                col             : (c ? c.col : -1),
-                row             : (r ? r.row : -1),
-                userId          : userId,
+                cursor: kCurCells,
+                target: c_oTargetType.Cells,
+                col: (c ? c.col : -1),
+                row: (r ? r.row : -1),
+                userId: userId,
                 lockRangePosLeft: lockRangePosLeft,
-                lockRangePosTop : lockRangePosTop,
-                userIdAllProps  : userIdAllProps,
-                lockAllPosLeft  : lockAllPosLeft,
-                lockAllPosTop   : lockAllPosTop,
-                userIdAllSheet  : userIdAllSheet,
-                commentIndexes  : indexes,
-                commentCoords   : coords
+                lockRangePosTop: lockRangePosTop,
+                userIdAllProps: userIdAllProps,
+                lockAllPosLeft: lockAllPosLeft,
+                lockAllPosTop: lockAllPosTop,
+                userIdAllSheet: userIdAllSheet,
+                commentIndexes: indexes,
+                commentCoords: coords
             };
-            if ( null !== oHyperlink ) {
+            if (null !== oHyperlink) {
                 return {
-                    cursor          : kCurHyperlink,
-                    target          : c_oTargetType.Hyperlink,
-                    hyperlink       : new asc_CHyperlink( oHyperlink ),
-                    cellCursor      : cellCursor,
-                    userId          : userId,
+                    cursor: kCurHyperlink,
+                    target: c_oTargetType.Hyperlink,
+                    hyperlink: new asc_CHyperlink(oHyperlink),
+                    cellCursor: cellCursor,
+                    userId: userId,
                     lockRangePosLeft: lockRangePosLeft,
-                    lockRangePosTop : lockRangePosTop,
-                    userIdAllProps  : userIdAllProps,
-                    userIdAllSheet  : userIdAllSheet,
-                    lockAllPosLeft  : lockAllPosLeft,
-                    lockAllPosTop   : lockAllPosTop,
-                    commentIndexes  : indexes,
-                    commentCoords   : coords
+                    lockRangePosTop: lockRangePosTop,
+                    userIdAllProps: userIdAllProps,
+                    userIdAllSheet: userIdAllSheet,
+                    lockAllPosLeft: lockAllPosLeft,
+                    lockAllPosTop: lockAllPosTop,
+                    commentIndexes: indexes,
+                    commentCoords: coords
                 };
             }
             return cellCursor;
