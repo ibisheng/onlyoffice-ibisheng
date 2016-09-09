@@ -1421,9 +1421,9 @@ ParaRun.prototype.Is_SimpleChanges = function(Changes)
     return true;
 };
 
-/*
-    Проверяем произошло ли простое изменение параграфа, сейчас главное, чтобы это было не добавление или удаление картинки.
-    На вход приходит либо массив изменений, либо одно изменение (можно не в массиве).
+/**
+ * Проверяем произошло ли простое изменение параграфа, сейчас главное, чтобы это было не добавлениe/удаление картинки
+ * или ссылки на сноску. На вход приходит либо массив изменений, либо одно изменение (можно не в массиве).
  */
 ParaRun.prototype.Is_ParagraphSimpleChanges = function(_Changes)
 {
@@ -1442,7 +1442,7 @@ ParaRun.prototype.Is_ParagraphSimpleChanges = function(_Changes)
             for (var ItemIndex = 0, ItemsCount = Data.Items.length; ItemIndex < ItemsCount; ItemIndex++)
             {
                 var Item = Data.Items[ItemIndex];
-                if (para_Drawing === Item.Type)
+                if (para_Drawing === Item.Type || para_FootnoteReference === Item.Type)
                     return false;
             }
         }
