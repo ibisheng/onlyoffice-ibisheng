@@ -6248,25 +6248,25 @@
                 yFormula1 = this.rows[oFormulaRangeIn.r1].top - offsetY;
                 yFormula2 = this.rows[oFormulaRangeIn.r2].top + this.rows[oFormulaRangeIn.r2].height - offsetY;
 
-                if (this.hitResizeCorner(xFormula1 - this.width_1px, yFormula1 - this.height_1px, x, y)) {
+                if (this._hitResizeCorner(xFormula1 - this.width_1px, yFormula1 - this.height_1px, x, y)) {
                     /*TOP-LEFT*/
                     cursor = kCurSEResize;
                     col = oFormulaRange.c2;
                     row = oFormulaRange.r2;
                     break;
-                } else if (this.hitResizeCorner(xFormula2, yFormula1 - this.height_1px, x, y)) {
+                } else if (this._hitResizeCorner(xFormula2, yFormula1 - this.height_1px, x, y)) {
                     /*TOP-RIGHT*/
                     cursor = kCurNEResize;
                     col = oFormulaRange.c1;
                     row = oFormulaRange.r2;
                     break;
-                } else if (this.hitResizeCorner(xFormula1 - this.width_1px, yFormula2, x, y)) {
+                } else if (this._hitResizeCorner(xFormula1 - this.width_1px, yFormula2, x, y)) {
                     /*BOTTOM-LEFT*/
                     cursor = kCurNEResize;
                     col = oFormulaRange.c2;
                     row = oFormulaRange.r1;
                     break;
-                } else if (this.hitResizeCorner(xFormula2, yFormula2, x, y)) {
+                } else if (this._hitResizeCorner(xFormula2, yFormula2, x, y)) {
                     /*BOTTOM-RIGHT*/
                     cursor = kCurSEResize;
                     col = oFormulaRange.c1;
