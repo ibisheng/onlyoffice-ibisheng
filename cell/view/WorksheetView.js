@@ -3802,6 +3802,11 @@
 
         this._drawElements(this._drawSelectionElement, this.activeRange,
           AscCommonExcel.selectionLineType.RangeWithPromote, this.settings.activeCellBorderColor);
+
+        if (this.activeFillHandle) {
+            this._drawElements(this._drawSelectionElement, this.activeFillHandle,
+              AscCommonExcel.selectionLineType.RangeOut, this.settings.activeCellBorderColor);
+        }
         return;
 
         var diffWidth = 0, diffHeight = 0;
