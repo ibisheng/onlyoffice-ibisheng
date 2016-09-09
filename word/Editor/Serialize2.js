@@ -5236,7 +5236,8 @@ function BinaryFileReader(doc, openParams)
 		headers: null,
 		footers: null,
 		trackRevisions: null,
-		drawingToMath: null
+		drawingToMath: null,
+		aTableCorrect: null
 	};   
     
     this.getbase64DecodedData = function(szSrc)
@@ -5416,6 +5417,7 @@ function BinaryFileReader(doc, openParams)
 		this.oReadResult.headers = [];
 		this.oReadResult.footers = [];
 		this.oReadResult.drawingToMath = [];
+		this.oReadResult.aTableCorrect = [];
 		
         var res = c_oSerConstants.ReadOk;
         //mtLen
@@ -5869,6 +5871,11 @@ function BinaryFileReader(doc, openParams)
 		for (var i = 0; i < this.oReadResult.drawingToMath.length; ++i) {
 			this.oReadResult.drawingToMath[i].Convert_ToMathObject(true);
 		}
+		for (var i = 0, length = this.oReadResult.aTableCorrect.length; i < length; ++i) {
+			var table = this.oReadResult.aTableCorrect[i];
+			table.ReIndexing(0);
+			table.Correct_BadTable();
+		}
         this.Document.On_EndLoad();
 		//чтобы удалялся stream с бинарником
 		pptx_content_loader.Clear(true);
@@ -6159,6 +6166,11 @@ function BinaryFileReader(doc, openParams)
 		{
 			var oNewComment = oCommentsNewId[i];
 			this.Document.DrawingDocument.m_oWordControl.m_oApi.sync_AddComment( oNewComment.Id, oNewComment.Data );
+		}
+		for (var i = 0, length = this.oReadResult.aTableCorrect.length; i < length; ++i) {
+			var table = this.oReadResult.aTableCorrect[i];
+			table.ReIndexing(0);
+			table.Correct_BadTable();
 		}
 		//чтобы удалялся stream с бинарником
 		pptx_content_loader.Clear(true);
@@ -8272,8 +8284,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
                 return oThis.ReadDocTable(t, l, oNewTable);
             });
             if (oNewTable.Content.length > 0) {
-              oNewTable.ReIndexing(0);
-              oNewTable.Correct_BadTable();
+				this.oReadResult.aTableCorrect.push(oNewTable);
               if(2 == AscCommon.CurFileVersion && false == oNewTable.Inline)
               {
                   //делаем смещение левой границы
