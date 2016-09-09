@@ -5370,15 +5370,14 @@ function TableColumn() {
 			this.TotalsRowFormula.removeDependencies();
 		}
 	};
-TableColumn.prototype.clone = function(opt_ws) {
+TableColumn.prototype.clone = function() {
 	var res = new TableColumn();
 	res.Name = this.Name;
 	res.TotalsRowLabel = this.TotalsRowLabel;
 	res.TotalsRowFunction = this.TotalsRowFunction;
 
 	if (this.TotalsRowFormula) {
-		opt_ws = opt_ws ? opt_ws : this.TotalsRowFormula.ws;
-		res._setTotalRowFormula(this.TotalsRowFormula.Formula, opt_ws, false);
+		res._setTotalRowFormula(this.TotalsRowFormula.Formula, this.TotalsRowFormula.ws, false);
 	}
 	if (this.dxf)
 		res.dxf = this.dxf.clone;

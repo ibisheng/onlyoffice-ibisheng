@@ -1560,7 +1560,7 @@ cName.prototype.Calculate = function () {
 
 /** @constructor */
 function cStrucTable( val, wb, ws ) {
-    this.constructor.call( this, val[0].replace("[]",""), cElementType.table );
+    this.constructor.call( this, val[0], cElementType.table );
     this.wb = wb;
     this.ws = ws;
     this.tableName = val['tableName'];
@@ -1598,72 +1598,95 @@ cStrucTable.prototype.toString = function () {
 cStrucTable.prototype.toLocaleString = function () {
 	return this._toString(true);
 };
-cStrucTable.prototype._toString = function (isLocal) {
-	var tblStr, columns_1, columns_2;
-	var table = this.wb.getDefinesNames( this.tableName, this.ws ? this.ws.getId() : null );
-	if( !table ){
-		return this.value;
-	}
-	tblStr = table.name;
-	(!isLocal || this.columnName) ? tblStr += "[%1]" : null;
-	if ( this.oneColumn ) {
-
-		columns_1= this.wb.getTableNameColumnByIndex( this.tableName, this.oneColumnIndex.index );
-		if( columns_1 ){
-			this.oneColumn = columns_1.columnName;
+	cStrucTable.prototype._toString = function(isLocal) {
+		var tblStr, columns_1, columns_2;
+		var table = this.wb.getDefinesNames(this.tableName, this.ws ? this.ws.getId() : null);
+		if (!table) {
+			if (!this.tableName) {
+				if (isLocal) {
+					return this.value.replace("[]", "");
+				} else {
+					//do not replace [] becase 'Table1[]' - right, 'Table1' - wrong
+					return this.value;
+				}
+			} else {
+				tblStr = this.tableName;
+			}
+		} else {
+			tblStr = table.name;
 		}
 
-		return tblStr.replace( "%1", this.oneColumn.replace(/#/g,"'#")  );
-	}
-	if ( this.columnRange ) {
-		columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.colStartIndex.index );
-		columns_2 = this.wb.getTableNameColumnByIndex( this.tableName, this.colEndIndex.index );
-		if(columns_1){
-			this.colStart = columns_1.columnName
-		}
-		if(columns_2){
-			this.colEnd = columns_2.columnName
-		}
-    return tblStr.replace("%1",
-      "[" + this.colStart.replace(/#/g, "'#") + "]:[" + this.colEnd.replace(/#/g, "'#") + "]");
-	}
-	if ( this.reservedColumn ) {
-		return tblStr.replace( "%1", this._buildLocalTableString(this.reservedColumnIndex, isLocal) );
-	}
-	if ( this.hdt ) {
-		var re = /\[(.*?)\]/ig, m, data = "",i=0;
-		while ( null !== (m = re.exec( this.hdt )) ) {
+		(!isLocal || this.columnName) ? tblStr += "[%1]" : null;
+		if (this.oneColumn) {
 
-      data += "[" + this._buildLocalTableString(this.hdtIndexes[i], isLocal) + "]" + FormulaSeparators.functionArgumentSeparatorDef;
-		}
-		data = data.substr( 0, data.length - 1 );
-		if ( this.hdtcstart ) {
-
-			columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.hdtcstartIndex.index );
-			if( columns_1 ){
-				this.hdtcstart = columns_1.columnName;
+			columns_1 = this.wb.getTableNameColumnByIndex(this.tableName, this.oneColumnIndex.index);
+			if (columns_1) {
+				this.oneColumn = columns_1.columnName;
+			} else if (this.oneColumnIndex.name) {
+				this.oneColumn = this.oneColumnIndex.name;
 			}
 
-      data += FormulaSeparators.functionArgumentSeparatorDef + "[" + this.hdtcstart.replace(/#/g, "'#") + "]"
+			return tblStr.replace("%1", this.oneColumn.replace(/#/g, "'#"));
 		}
-		if ( this.hdtcend ) {
-
-			columns_2 = this.wb.getTableNameColumnByIndex( this.tableName, this.hdtcendIndex.index );
-			if( columns_2 ){
-				this.hdtcend = columns_2.columnName;
+		if (this.columnRange) {
+			columns_1 = this.wb.getTableNameColumnByIndex(this.tableName, this.colStartIndex.index);
+			columns_2 = this.wb.getTableNameColumnByIndex(this.tableName, this.colEndIndex.index);
+			if (columns_1) {
+				this.colStart = columns_1.columnName
+			} else if (this.colStartIndex.name) {
+				this.colStart = this.colStartIndex.name;
 			}
-
-			data += ":[" + this.hdtcend.replace(/#/g,"'#") + "]"
+			if (columns_2) {
+				this.colEnd = columns_2.columnName
+			} else if (this.colEndIndex.name) {
+				this.colEnd = this.colEndIndex.name;
+			}
+			var colStart = this.colStart.replace(/#/g, "'#");
+			var colEnd = this.colEnd.replace(/#/g, "'#");
+			return tblStr.replace("%1", "[" + colStart + "]:[" + colEnd + "]");
 		}
-		return tblStr.replace( "%1", data );
-	}
-	if (isLocal) {
-		return tblStr.replace("%1", "").replace("[]", "");
-	} else {
-		//do not replace [] becase 'Table1[]' - right, 'Table1' - wrong
-		return tblStr.replace( "%1", "" );
-	}
-};
+		if (this.reservedColumn) {
+			return tblStr.replace("%1", this._buildLocalTableString(this.reservedColumnIndex, isLocal));
+		}
+		if (this.hdt) {
+			var re = /\[(.*?)\]/ig, m, data = "", i = 0;
+			while (null !== (m = re.exec(this.hdt))) {
+
+				data += "[" + this._buildLocalTableString(this.hdtIndexes[i], isLocal) + "]" +
+					FormulaSeparators.functionArgumentSeparatorDef;
+			}
+			data = data.substr(0, data.length - 1);
+			if (this.hdtcstart) {
+
+				columns_1 = this.wb.getTableNameColumnByIndex(this.tableName, this.hdtcstartIndex.index);
+				if (columns_1) {
+					this.hdtcstart = columns_1.columnName;
+				} else if (this.hdtcstartIndex.name) {
+					this.hdtcstart = this.hdtcstartIndex.name;
+				}
+
+				data += FormulaSeparators.functionArgumentSeparatorDef + "[" + this.hdtcstart.replace(/#/g, "'#") + "]"
+			}
+			if (this.hdtcend) {
+
+				columns_2 = this.wb.getTableNameColumnByIndex(this.tableName, this.hdtcendIndex.index);
+				if (columns_2) {
+					this.hdtcend = columns_2.columnName;
+				} else if (this.hdtcendIndex.name) {
+					this.hdtcend = this.hdtcendIndex.name;
+				}
+
+				data += ":[" + this.hdtcend.replace(/#/g, "'#") + "]"
+			}
+			return tblStr.replace("%1", data);
+		}
+		if (isLocal) {
+			return tblStr.replace("%1", "").replace("[]", "");
+		} else {
+			//do not replace [] becase 'Table1[]' - right, 'Table1' - wrong
+			return tblStr.replace("%1", "");
+		}
+	};
 cStrucTable.prototype._createArea = function ( val, opt_bbox ) {
     this.columnName  = val['columnName'];
 

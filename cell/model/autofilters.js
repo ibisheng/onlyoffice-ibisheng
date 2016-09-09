@@ -3539,7 +3539,7 @@
 					{
 						var cloneTableColumns = [];
 						for(var i = 0; i < tablePart.TableColumns.length; i++) {
-							cloneTableColumns.push(tablePart.TableColumns[i].clone(worksheet));
+							cloneTableColumns.push(tablePart.TableColumns[i].clone());
 						}
 						tableColumns = cloneTableColumns;
 					}

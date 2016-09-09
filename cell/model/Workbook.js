@@ -2017,7 +2017,7 @@ Workbook.prototype.getTableIndexColumnByName = function(tableName, columnName){
         var ws = this.aWorksheets[i];
 		res = ws.getTableIndexColumnByName(tableName, columnName);
 		if(res !== null){
-            res = {wsID:ws.getId(), index: res};
+            res = {wsID:ws.getId(), index: res, name: columnName};
             break;
         }
     }
