@@ -3561,7 +3561,7 @@
         var ppiX = this._getPPIX(), ppiY = this._getPPIY();
 
         if (!oIntersection) {
-            return;
+            return true;
         }
 
         var width_1px = asc_calcnpt(0, ppiX, 1/*px*/), width_2px = asc_calcnpt(0, ppiX, 2
@@ -3682,12 +3682,13 @@
                 ctx.fillRect(x2 - width_3px, y2 - height_3px, width_5px, height_5px);
             }
         }
+        return true;
     };
     /**Отрисовывает диапазон с заданными параметрами*/
     WorksheetView.prototype._drawElements = function (drawFunction) {
         var cFrozen = 0, rFrozen = 0, args = Array.prototype.slice.call(arguments,
           1), c = this.cols, r = this.rows, offsetX = c[this.visibleRange.c1].left -
-          this.cellsLeft, offsetY = r[this.visibleRange.r1].top - this.cellsTop;
+          this.cellsLeft, offsetY = r[this.visibleRange.r1].top - this.cellsTop, res;
         if (this.topLeftFrozenCell) {
             cFrozen = this.topLeftFrozenCell.getCol0();
             rFrozen = this.topLeftFrozenCell.getRow0();
@@ -3699,15 +3700,24 @@
             rFrozen -= 1;
             if (0 <= cFrozen && 0 <= rFrozen) {
                 oFrozenRange = new asc_Range(0, 0, cFrozen, rFrozen);
-                drawFunction.call(this, oFrozenRange, c[0].left - this.cellsLeft, r[0].top - this.cellsTop, args);
+                res = drawFunction.call(this, oFrozenRange, c[0].left - this.cellsLeft, r[0].top - this.cellsTop, args);
+                if (!res) {
+                    return;
+                }
             }
             if (0 <= cFrozen) {
                 oFrozenRange = new asc_Range(0, this.visibleRange.r1, cFrozen, this.visibleRange.r2);
-                drawFunction.call(this, oFrozenRange, c[0].left - this.cellsLeft, offsetY, args);
+                res = drawFunction.call(this, oFrozenRange, c[0].left - this.cellsLeft, offsetY, args);
+                if (!res) {
+                    return;
+                }
             }
             if (0 <= rFrozen) {
                 oFrozenRange = new asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen);
-                drawFunction.call(this, oFrozenRange, offsetX, r[0].top - this.cellsTop, args);
+                res = drawFunction.call(this, oFrozenRange, offsetX, r[0].top - this.cellsTop, args);
+                if (!res) {
+                    return;
+                }
             }
         }
 
@@ -6272,10 +6282,12 @@
                     col = oFormulaRange.c1;
                     row = oFormulaRange.r1;
                     break;
-                } else if (((Math.abs(x - xFormula1) <= wEps || Math.abs(x - xFormula2) <= wEps) &&
+                } else if ((((oFormulaRange.c1 === oFormulaRangeIn.c1 && Math.abs(x - xFormula1) <= wEps) ||
+                  (oFormulaRange.c2 === oFormulaRangeIn.c2 && Math.abs(x - xFormula2) <= wEps)) &&
                   hEps <= y - yFormula1 && y - yFormula2 <= hEps) ||
-                  ((Math.abs(y - yFormula1) <= hEps || Math.abs(y - yFormula2) <= hEps) && wEps <= x - xFormula1 &&
-                  x - xFormula2 <= wEps)) {
+                  (((oFormulaRange.r1 === oFormulaRangeIn.r1 && Math.abs(y - yFormula1) <= hEps) ||
+                  (oFormulaRange.r2 === oFormulaRangeIn.r2 && Math.abs( y - yFormula2) <= hEps)) &&
+                  wEps <= x - xFormula1 && x - xFormula2 <= wEps)) {
                     cursor = kCurMove;
                     break;
                 }
@@ -6463,7 +6475,10 @@
         }
 
         if (this.isFormulaEditMode || this.isChartAreaEditMode) {
-            var oFormulaOrChartCursor = this._getCursorFormulaOrChart(this.visibleRange, x, y, offsetX, offsetY);
+            var oFormulaOrChartCursor;
+            this._drawElements(function (_vr, _offsetX, _offsetY, args) {
+                return (null === (oFormulaOrChartCursor = this._getCursorFormulaOrChart(_vr, x, y, _offsetX, _offsetY)));
+            });
             if (oFormulaOrChartCursor) {
                 return oFormulaOrChartCursor;
             }
@@ -12486,7 +12501,7 @@
         var m_oColor = new CColor(120, 120, 120);
 
         if (aWs.workbook.bUndoChanges || aWs.workbook.bRedoChanges) {
-            return;
+            return false;
         }
 
         var _drawFilterMark = function (x, y, height, index) {
@@ -12672,6 +12687,8 @@
                 }
             }
         }
+
+        return true;
     };
 
     WorksheetView.prototype.af_checkCursor = function (x, y, offsetX, offsetY, frozenObj, r, c) {
