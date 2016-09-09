@@ -626,7 +626,7 @@
 				ElemToSelect                              = document.createElement("div");
 				ElemToSelect.id                           = this.CommonDivId;
 				ElemToSelect.className                    = this.CommonDivClassName;
-				ElemToSelect.style.position               = "absolute";
+				ElemToSelect.style.position               = "fixed";
 				ElemToSelect.style.left                   = '0px';
 				ElemToSelect.style.top                    = '-100px';
 				ElemToSelect.style.width                  = '10000px';
