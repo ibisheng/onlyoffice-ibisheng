@@ -3014,6 +3014,11 @@ CParagraphRecalculateStateWrap.prototype =
         this.Footnotes.push({FootnoteReference : FootnoteReference, Pos : Pos});
     },
 
+	GetFootnoteReferencesCount : function()
+	{
+		return this.Footnotes.length;
+	},
+
 	SetFast : function(bValue)
 	{
 		this.Fast = bValue;

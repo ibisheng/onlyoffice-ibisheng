@@ -7641,14 +7641,15 @@ ParaFootnoteReference.prototype.Get_Footnote    = function()
 {
 	return this.Footnote;
 };
-ParaFootnoteReference.prototype.UpdateNumber = function(nPageAbs, nColumnAbs)
+ParaFootnoteReference.prototype.UpdateNumber = function(nPageAbs, nColumnAbs, nAdditional)
 {
 	if (this.Footnote)
 	{
 		var oLogicDocument = this.Footnote.Get_LogicDocument();
 		var oFootnotesController = oLogicDocument.GetFootnotesController();
-		this.Number = oFootnotesController.GetFootnoteNumberOnPage(nPageAbs, nColumnAbs, this.Footnote);
+		this.Number = oFootnotesController.GetFootnoteNumberOnPage(nPageAbs, nColumnAbs) + nAdditional;
 		this.private_Measure();
+		this.Footnote.SetNumber(this.Number);
 	}
 };
 ParaFootnoteReference.prototype.private_Measure = function()
@@ -7689,14 +7690,22 @@ function ParaFootnoteRef(Footnote)
 	ParaFootnoteRef.superclass.constructor.call(this, Footnote);
 }
 AscCommon.extendClass(ParaFootnoteRef, ParaFootnoteReference);
-ParaFootnoteRef.prototype.Type     = para_FootnoteRef;
+ParaFootnoteRef.prototype.Type = para_FootnoteRef;
 ParaFootnoteRef.prototype.Get_Type = function()
 {
 	return para_FootnoteRef;
 };
-ParaFootnoteRef.prototype.Copy     = function()
+ParaFootnoteRef.prototype.Copy = function()
 {
 	return new ParaFootnoteRef(this.Get_Footnote());
+};
+ParaFootnoteRef.prototype.UpdateNumber = function()
+{
+	if (this.Footnote)
+	{
+		this.Number = this.Footnote.GetNumber();
+		this.private_Measure();
+	}
 };
 
 /**

@@ -392,75 +392,30 @@ CFootnotesController.prototype.Shift = function(nPageAbs, nColumnAbs, dX, dY)
 		oFootnote.Shift(nFootnotePageIndex, dX, dY);
 	}
 };
-/**
- * Добавляем заданную сноску на страницу для пересчета.
- * @param {number} nPageAbs
- * @param {number} nColumnAbs
- * @param {CFootEndnote} oFootnote
- * @param {number} dBottom
- */
-CFootnotesController.prototype.AddFootnoteToPage = function(nPageAbs, nColumnAbs, oFootnote, dBottom)
+CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nColumnAbs)
 {
-	var oColumn = this.private_GetPageColumn(nPageAbs, nColumnAbs);
-	if (!oColumn)
-		return;
-
-
-
-
-	// TODO: Проверить ссылку с предыдущей колонки
-	if (oColumn.Elements.length <= 0 || oColumn.Y < dBottom)
-		oColumn.Y = dBottom;
-
-	oColumn.Elements.push(oFootnote);
-};
-/**
- * Убираем заданную сноску со страницы при пересчетею..
- * @param {number} nPageAbs
- * @param {number} nColumnAbs
- * @param {CFootEndnote} oFootnote
- */
-CFootnotesController.prototype.RemoveFootnoteFromPage = function(nPageAbs, nColumnAbs, oFootnote)
-{
-	var oColumn = this.private_GetPageColumn(nPageAbs, nColumnAbs);
-	if (!oColumn)
-		return;
-
-	for (var nIndex = 0, nCount = oColumn.Elements.length; nIndex < nCount; ++nIndex)
+	// Случай, когда своя отдельная нумерация на каждой странице
+	// Мы делаем не совсем как в Word, если у нас происходит ситуация, что ссылка на сноску на одной странице, а сама
+	// сноска на следующей, тогда у этих страниц нумерация общая, в Word ставится номер "1" в такой ситуации, и становится
+	// непонятно, потому что есть две ссылки с номером 1 на странице, ссылающиеся на разные сноски.
+	for (var nColumnIndex = nColumnAbs; nColumnIndex >= 0; --nColumnIndex)
 	{
-		if (oColumn.Elements[nIndex] === oFootnote)
+		var oColumn = this.private_GetPageColumn(nPageAbs, nColumnIndex);
+
+		if (oColumn.Elements.length > 0)
 		{
-			oColumn.Elements.splice(nIndex, 1);
-			return;
+			var oFootnote = oColumn.Elements[oColumn.Elements.length - 1];
+			var nStartPage = oFootnote.Get_StartPage_Absolute();
+
+			if (nStartPage >= nPageAbs || (nStartPage === nPageAbs - 1 && true !== oFootnote.Is_ContentOnFirstPage()))
+				return oFootnote.GetNumber() + 1;
+			else
+				return 1;
 		}
-	}
-};
-CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nColumnAbs, oFootnote)
-{
-	var oPage = this.Pages[nPageAbs];
-	if (!oPage)
-		return 1;
 
-	var nFootnoteIndex = 1;
-	for (var nColumnIndex = 0, nColumnsCount = oPage.Columns.length; nColumnIndex <= Math.min(nColumnAbs, nColumnsCount - 1); ++nColumnIndex)
-	{
-		var oColumn = oPage.Columns[nColumnIndex];
-
-		for (var nIndex = 0, nCount = oColumn.Elements.length; nIndex < nCount; ++nIndex)
-		{
-			var oCurFootnote = oColumn.Elements[nIndex];
-			// Сноски начинающиеся не на данной колонке мы не учитываем
-			if (0 === oCurFootnote.GetElementPageIndex(nPageAbs, nColumnIndex))
-			{
-				if (oFootnote && oFootnote === oCurFootnote)
-					return nFootnoteIndex;
-
-				nFootnoteIndex++;
-			}
-		}
 	}
 
-	return nFootnoteIndex;
+	return 1;
 };
 /**
  * Проверяем, используется заданная сноска в документе.

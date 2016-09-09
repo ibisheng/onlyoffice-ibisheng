@@ -41,6 +41,8 @@
 function CFootEndnote(DocumentController)
 {
 	CFootEndnote.superclass.constructor.call(this, DocumentController, DocumentController ? DocumentController.Get_DrawingDocument() : undefined, 0, 0, 0, 0, true, false, false);
+
+	this.Number = 1;
 }
 
 AscCommon.extendClass(CFootEndnote, CDocumentContent);
@@ -73,6 +75,14 @@ CFootEndnote.prototype.Read_FromBinary2 = function(Reader)
 {
 	Reader.GetLong(); // Должен вернуть historyitem_type_DocumentContent
 	CFootEndnote.superclass.Read_FromBinary2.call(this, Reader);
+};
+CFootEndnote.prototype.SetNumber = function(nNumber)
+{
+	this.Number = nNumber;
+};
+CFootEndnote.prototype.GetNumber = function()
+{
+	return this.Number;
 };
 
 //--------------------------------------------------------export----------------------------------------------------
