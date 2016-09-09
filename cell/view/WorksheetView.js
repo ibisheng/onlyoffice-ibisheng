@@ -6239,65 +6239,89 @@
         var wEps = this.width_1px, hEps = this.height_1px;
         return Math.abs(x2 - x1) <= wEps + this.width_2px && Math.abs(y2 - y1) <= hEps + this.height_2px;
     };
-
-    WorksheetView.prototype._getCursorFormulaOrChart = function (vr, x, y, offsetX, offsetY) {
-        var i, l;
-        var cursor, oFormulaRange, oFormulaRangeIn, xFormula1, xFormula2, yFormula1, yFormula2;
-        var col = -1, row = -1;
-        var arrRanges = this.isFormulaEditMode ? this.arrActiveFormulaRanges :
-          this.arrActiveChartsRanges, targetArr = this.isFormulaEditMode ? 0 : -1;
+    WorksheetView.prototype._hitInRange = function (range, rangeType, vr, x, y, offsetX, offsetY) {
         var wEps = this.width_2px, hEps = this.height_2px;
+        var cursor, x1, x2, y1, y2, isResize;
+        var col = -1, row = -1;
+
+        var oFormulaRangeIn = range.intersectionSimple(vr);
+        if (oFormulaRangeIn) {
+            x1 = this.cols[oFormulaRangeIn.c1].left - offsetX;
+            x2 = this.cols[oFormulaRangeIn.c2].left + this.cols[oFormulaRangeIn.c2].width - offsetX;
+            y1 = this.rows[oFormulaRangeIn.r1].top - offsetY;
+            y2 = this.rows[oFormulaRangeIn.r2].top + this.rows[oFormulaRangeIn.r2].height - offsetY;
+
+            isResize = AscCommonExcel.selectionLineType.RangeWithResize === rangeType;
+
+            if (isResize && this._hitResizeCorner(x1 - this.width_1px, y1 - this.height_1px, x, y)) {
+                /*TOP-LEFT*/
+                cursor = kCurSEResize;
+                col = range.c2;
+                row = range.r2;
+            } else if (isResize && this._hitResizeCorner(x2, y1 - this.height_1px, x, y)) {
+                /*TOP-RIGHT*/
+                cursor = kCurNEResize;
+                col = range.c1;
+                row = range.r2;
+            } else if (isResize && this._hitResizeCorner(x1 - this.width_1px, y2, x, y)) {
+                /*BOTTOM-LEFT*/
+                cursor = kCurNEResize;
+                col = range.c2;
+                row = range.r1;
+            } else if (this._hitResizeCorner(x2, y2, x, y)) {
+                /*BOTTOM-RIGHT*/
+                cursor = kCurSEResize;
+                col = range.c1;
+                row = range.r1;
+            } else if ((((range.c1 === oFormulaRangeIn.c1 && Math.abs(x - x1) <= wEps) ||
+              (range.c2 === oFormulaRangeIn.c2 && Math.abs(x - x2) <= wEps)) && hEps <= y - y1 &&
+              y - y2 <= hEps) || (((range.r1 === oFormulaRangeIn.r1 && Math.abs(y - y1) <= hEps) ||
+              (range.r2 === oFormulaRangeIn.r2 && Math.abs(y - y2) <= hEps)) && wEps <= x - x1 &&
+              x - x2 <= wEps)) {
+                cursor = kCurMove;
+            }
+        }
+
+        return cursor ? {
+            cursor: cursor,
+            col: col,
+            row: row
+        } : null;
+    };
+
+    WorksheetView.prototype._hitCursorSelectionRange = function (vr, x, y, offsetX, offsetY) {
+        var res = this._hitInRange(this.activeRange, AscCommonExcel.selectionLineType.RangeWithPromote, vr, x, y,
+          offsetX, offsetY);
+        return res ? {
+            cursor: kCurMove === res.cursor ? kCurMove : kCurFillHandle,
+            target: kCurMove === res.cursor ? c_oTargetType.MoveRange : c_oTargetType.FillHandle,
+            col: -1,
+            row: -1
+        } : null;
+    };
+
+    WorksheetView.prototype._hitCursorFormulaOrChart = function (vr, x, y, offsetX, offsetY) {
+        var i, l, res;
+        var oFormulaRange;
+        var arrRanges = this.isFormulaEditMode ? this.arrActiveFormulaRanges : this.arrActiveChartsRanges;
+        var targetArr = this.isFormulaEditMode ? 0 : -1;
 
         for (i = 0, l = arrRanges.length; i < l; ++i) {
             oFormulaRange = arrRanges[i].clone(true);
             oFormulaRange.isName = arrRanges[i].isName;
-            oFormulaRangeIn = oFormulaRange.intersectionSimple(vr);
-            if (oFormulaRangeIn && !oFormulaRange.isName) {
-                xFormula1 = this.cols[oFormulaRangeIn.c1].left - offsetX;
-                xFormula2 = this.cols[oFormulaRangeIn.c2].left + this.cols[oFormulaRangeIn.c2].width - offsetX;
-                yFormula1 = this.rows[oFormulaRangeIn.r1].top - offsetY;
-                yFormula2 = this.rows[oFormulaRangeIn.r2].top + this.rows[oFormulaRangeIn.r2].height - offsetY;
-
-                if (this._hitResizeCorner(xFormula1 - this.width_1px, yFormula1 - this.height_1px, x, y)) {
-                    /*TOP-LEFT*/
-                    cursor = kCurSEResize;
-                    col = oFormulaRange.c2;
-                    row = oFormulaRange.r2;
-                    break;
-                } else if (this._hitResizeCorner(xFormula2, yFormula1 - this.height_1px, x, y)) {
-                    /*TOP-RIGHT*/
-                    cursor = kCurNEResize;
-                    col = oFormulaRange.c1;
-                    row = oFormulaRange.r2;
-                    break;
-                } else if (this._hitResizeCorner(xFormula1 - this.width_1px, yFormula2, x, y)) {
-                    /*BOTTOM-LEFT*/
-                    cursor = kCurNEResize;
-                    col = oFormulaRange.c2;
-                    row = oFormulaRange.r1;
-                    break;
-                } else if (this._hitResizeCorner(xFormula2, yFormula2, x, y)) {
-                    /*BOTTOM-RIGHT*/
-                    cursor = kCurSEResize;
-                    col = oFormulaRange.c1;
-                    row = oFormulaRange.r1;
-                    break;
-                } else if ((((oFormulaRange.c1 === oFormulaRangeIn.c1 && Math.abs(x - xFormula1) <= wEps) ||
-                  (oFormulaRange.c2 === oFormulaRangeIn.c2 && Math.abs(x - xFormula2) <= wEps)) &&
-                  hEps <= y - yFormula1 && y - yFormula2 <= hEps) ||
-                  (((oFormulaRange.r1 === oFormulaRangeIn.r1 && Math.abs(y - yFormula1) <= hEps) ||
-                  (oFormulaRange.r2 === oFormulaRangeIn.r2 && Math.abs( y - yFormula2) <= hEps)) &&
-                  wEps <= x - xFormula1 && x - xFormula2 <= wEps)) {
-                    cursor = kCurMove;
-                    break;
-                }
+            res = !oFormulaRange.isName &&
+              this._hitInRange(oFormulaRange, AscCommonExcel.selectionLineType.RangeWithResize, vr, x, y, offsetX,
+                offsetY);
+            if (res) {
+                break;
             }
+
         }
-        return cursor ? {
-            cursor: cursor,
+        return res ? {
+            cursor: res.cursor,
             target: c_oTargetType.MoveResizeRange,
-            col: col,
-            row: row,
+            col: res.col,
+            row: res.row,
             formulaRange: oFormulaRange,
             indexFormulaRange: i,
             targetArr: targetArr
@@ -6327,7 +6351,7 @@
     };
 
     WorksheetView.prototype.getCursorTypeFromXY = function (x, y, isViewerMode) {
-        var c, r, f, i, offsetX, offsetY, cellCursor, sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink, widthDiff = 0, heightDiff = 0, isLocked = false, ar = this.activeRange, target = c_oTargetType.Cells, row = -1, col = -1, isSelGraphicObject, isNotFirst;
+        var res, c, r, f, i, offsetX, offsetY, cellCursor, sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink, widthDiff = 0, heightDiff = 0, isLocked = false, ar = this.activeRange, target = c_oTargetType.Cells, row = -1, col = -1, isSelGraphicObject, isNotFirst;
 
         var frozenCursor = this._isFrozenAnchor(x, y);
         if (!isViewerMode && frozenCursor.result) {
@@ -6475,55 +6499,21 @@
         }
 
         if (this.isFormulaEditMode || this.isChartAreaEditMode) {
-            var oFormulaOrChartCursor;
-            this._drawElements(function (_vr, _offsetX, _offsetY, args) {
-                return (null === (oFormulaOrChartCursor = this._getCursorFormulaOrChart(_vr, x, y, _offsetX, _offsetY)));
+            this._drawElements(function (_vr, _offsetX, _offsetY) {
+                return (null === (res = this._hitCursorFormulaOrChart(_vr, x, y, _offsetX, _offsetY)));
             });
-            if (oFormulaOrChartCursor) {
-                return oFormulaOrChartCursor;
+            if (res) {
+                return res;
             }
         }
 
-        var xWithOffset = x + offsetX;
-        var yWithOffset = y + offsetY;
-
         isSelGraphicObject = this.objectRender.selectedGraphicObjectsExists();
         if (!isViewerMode && !isSelGraphicObject) {
-            // Эпсилон для fillHandle
-            var fillHandleEpsilon = this.width_1px;
-            if (!this.isChartAreaEditMode && x >= (this.fillHandleL - fillHandleEpsilon) &&
-              x <= (this.fillHandleR + fillHandleEpsilon) && y >= (this.fillHandleT - fillHandleEpsilon) &&
-              y <= (this.fillHandleB + fillHandleEpsilon)) {
-                // Мы на "квадрате" для автозаполнения
-                return {cursor: kCurFillHandle, target: c_oTargetType.FillHandle, col: -1, row: -1};
-            }
-
-            // Навели на выделение (стоит вынести в отдельный метод)
-            if (this._isCursorOnSelectionBorder(ar, this.visibleRange, xWithOffset, yWithOffset)) {
-                return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
-            }
-            if (this.topLeftFrozenCell) {
-                var oFrozenRange;
-                cFrozen -= 1;
-                rFrozen -= 1;
-                if (0 <= cFrozen && 0 <= rFrozen) {
-                    oFrozenRange = new asc_Range(0, 0, cFrozen, rFrozen);
-                    if (this._isCursorOnSelectionBorder(ar, oFrozenRange, x, y)) {
-                        return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
-                    }
-                }
-                if (0 <= cFrozen) {
-                    oFrozenRange = new asc_Range(0, this.visibleRange.r1, cFrozen, this.visibleRange.r2);
-                    if (this._isCursorOnSelectionBorder(ar, oFrozenRange, x, yWithOffset)) {
-                        return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
-                    }
-                }
-                if (0 <= rFrozen) {
-                    oFrozenRange = new asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen);
-                    if (this._isCursorOnSelectionBorder(ar, oFrozenRange, xWithOffset, y)) {
-                        return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
-                    }
-                }
+            this._drawElements(function (_vr, _offsetX, _offsetY) {
+                return (null === (res = this._hitCursorSelectionRange(_vr, x, y, _offsetX, _offsetY)));
+            });
+            if (res) {
+                return res;
             }
         }
 
