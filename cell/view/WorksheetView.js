@@ -8850,7 +8850,7 @@
         }
     };
 
-    WorksheetView.prototype.setSelectionInfo = function ( prop, val, onlyActive, isLocal, sortColor ) {
+    WorksheetView.prototype.setSelectionInfo = function ( prop, val, onlyActive, fromBinary, sortColor ) {
         // Проверка глобального лока
         if ( this.collaborativeEditing.getGlobalLock() ) {
             return;
@@ -9102,7 +9102,7 @@
                     break;
                 case "paste":
                     // Вставляем текст из локального буфера или нет
-                    isLocal ? t._pasteData(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth) : t._loadDataBeforePaste(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
+                    fromBinary ? t._pasteData(isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth) : t._loadDataBeforePaste(isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth);
                     bIsUpdate = false;
                     break;
                 case "hyperlink":
@@ -9146,13 +9146,13 @@
             }
 
             //в случае, если вставляем из глобального буфера, транзакцию закрываем внутри функции _loadDataBeforePaste на callbacks от загрузки шрифтов и картинок
-            if ( prop !== "paste" || (prop === "paste" && isLocal) ) {
+            if ( prop !== "paste" || (prop === "paste" && fromBinary) ) {
                 History.EndTransaction();
             }
         };
         if ( "paste" === prop && val.onlyImages !== true ) {
             // Для past свой диапазон
-            if ( isLocal === "binary" ) {
+            if ( fromBinary ) {
                 checkRange = t._pasteFromBinary( val, true );
             }
             else {
@@ -9167,7 +9167,7 @@
         }
     };
 
-    WorksheetView.prototype._pasteData = function ( isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth ) {
+    WorksheetView.prototype._pasteData = function ( isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth ) {
         var t = this;
         var callTrigger = false;
         if ( isLargeRange ) 
@@ -9178,7 +9178,7 @@
 
         t.model.workbook.dependencyFormulas.lockRecal();
         var selectData;
-        if ( isLocal === 'binary' ) 
+        if ( fromBinary ) 
 		{
             selectData = t._pasteFromBinary( val );
         }
@@ -9224,7 +9224,7 @@
         var selectionRange = arn.clone( true );
 
         //добавляем автофильтры и форматированные таблицы
-        if ( isLocal === 'binary' && val.TableParts && val.TableParts.length ) 
+        if ( fromBinary && val.TableParts && val.TableParts.length ) 
 		{
             var aFilters = val.TableParts;
             var range;
@@ -9292,7 +9292,7 @@
         }
     };
 
-    WorksheetView.prototype._loadDataBeforePaste = function ( isLargeRange, isLocal, pasteContent, bIsUpdate, canChangeColWidth ) {
+    WorksheetView.prototype._loadDataBeforePaste = function ( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth ) {
         var t = this;
 
         //загрузка шрифтов, в случае удачи на callback вставляем текст
@@ -9334,7 +9334,7 @@
 
                     if ( pasteContent.props.onlyImages !== true ) 
 					{
-                        t._pasteData( isLargeRange, isLocal, pasteContent, bIsUpdate, canChangeColWidth );
+                        t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
                     }
                     api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
                     isEndTransaction = true;
@@ -9348,7 +9348,7 @@
 
 						if ( pasteContent.props.onlyImages !== true ) 
 						{
-							t._pasteData( isLargeRange, isLocal, pasteContent, bIsUpdate, canChangeColWidth );
+							t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
 						}
 						api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
 						
@@ -9361,7 +9361,7 @@
 							AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
 
 							if ( pasteContent.props.onlyImages !== true ) {
-								t._pasteData( isLargeRange, isLocal, pasteContent, bIsUpdate, canChangeColWidth );
+								t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
 							}
 							api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
 							//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
@@ -9373,7 +9373,7 @@
             }
             else if ( pasteContent.props.onlyImages !== true ) 
 			{
-                t._pasteData( isLargeRange, isLocal, pasteContent, bIsUpdate, canChangeColWidth );
+                t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
                 isEndTransaction = true;
             }
 
