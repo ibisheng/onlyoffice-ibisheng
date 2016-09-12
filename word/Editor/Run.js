@@ -2343,8 +2343,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
 					if (para_FootnoteReference === ItemType)
 					{
-						Item.UpdateNumber(PRS.PageAbs, PRS.ColumnAbs, PRS.GetFootnoteReferencesCount());
-						PRS.Add_FootnoteReference(Item, Pos);
+						Item.UpdateNumber(PRS);
+						PRS.AddFootnoteReference(Item, PRS.GetCurrentContentPos(Pos));
 					}
 					else if (para_FootnoteRef === ItemType)
 					{

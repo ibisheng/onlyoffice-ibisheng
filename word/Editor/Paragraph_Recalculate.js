@@ -1875,56 +1875,6 @@ Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, Cu
 		return true;
 
 	var oTopDocument = PRS.TopDocument;
-    // for (var nIndex = 0, nCount = PRS.Footnotes.length; nIndex < nCount; ++nIndex)
-    // {
-    //     var oFootnote = PRS.Footnotes[nIndex].FootnoteReference.Get_Footnote();
-    //     var oPos      = PRS.Footnotes[nIndex].Pos;
-	//
-    //     // Проверим позицию
-    //     if (true === this.MoveToLBP && PRS.LineBreakPos.Compare(oPos) >= 0)
-    //         return true;
-	//
-    //     // TODO: Здесь надо разобраться с параграфами внутри таблицы.
-    //     if (oTopDocument instanceof CDocument)
-    //     {
-    //         var RecalcInfo = oTopDocument.RecalcInfo;
-		// 	var nPageAbs   = PRS.PageAbs;
-		// 	var nColumnAbs = PRS.ColumnAbs;
-    //         if (true === RecalcInfo.Can_RecalcObject())
-    //         {
-    //             RecalcInfo.Set_FootnoteReference(oFootnote, nPageAbs, nColumnAbs);
-    //             oTopDocument.Footnotes.AddFootnoteToPage(nPageAbs, nColumnAbs, oFootnote, this.Pages[CurPage].Y + this.Lines[CurLine].Bottom);
-    //             PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Column | recalcresultflags_Footnotes;
-    //             return false;
-    //         }
-    //         else if (true === RecalcInfo.Check_FootnoteReference(oFootnote))
-    //         {
-		// 		if (true === RecalcInfo.Is_PageBreakBefore())
-		// 		{
-		// 			//PRS.RecalcResult
-		// 		}
-	//
-    //             if (nPageAbs === RecalcInfo.FootnotePage && nColumnAbs === RecalcInfo.FootnoteColumn)
-    //             {
-    //                 // Все нормально пересчиталось
-    //                 RecalcInfo.Reset_FootnoteReference();
-    //             }
-    //             else
-    //             {
-    //                 // TODO: Реализовать
-    //                 RecalcInfo.Set_PageBreakBefore(true);
-		// 			oTopDocument.Footnotes.RemoveFootnoteFromPage(nPageAbs, nColumnAbs, oFootnote);
-		// 			PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Column | recalcresultflags_Footnotes;
-    //                 return false;
-    //             }
-    //         }
-    //         else
-    //         {
-    //             // Ничего не делаем, просто пропускаем ссылку на данную сноску
-    //         }
-    //     }
-    // }
-
 	var arrFootnotes = [];
 	for (var nIndex = 0, nCount = PRS.Footnotes.length; nIndex < nCount; ++nIndex)
 	{
@@ -1932,8 +1882,8 @@ Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, Cu
 		var oPos      = PRS.Footnotes[nIndex].Pos;
 
 		// Проверим позицию
-		if (true === this.MoveToLBP && PRS.LineBreakPos.Compare(oPos) >= 0)
-			return true;
+		if (true === PRS.MoveToLBP && PRS.LineBreakPos.Compare(oPos) <= 0)
+			continue;
 
 		arrFootnotes.push(oFootnote);
 	}
@@ -3007,22 +2957,38 @@ CParagraphRecalculateStateWrap.prototype =
         NumberingItem.LineAscent = LineAscent;
 
         return X;
-    },
-
-    Add_FootnoteReference : function(FootnoteReference, Pos)
-    {
-        this.Footnotes.push({FootnoteReference : FootnoteReference, Pos : Pos});
-    },
-
-	GetFootnoteReferencesCount : function()
-	{
-		return this.Footnotes.length;
-	},
-
-	SetFast : function(bValue)
-	{
-		this.Fast = bValue;
-	}
+    }
+};
+CParagraphRecalculateStateWrap.prototype.AddFootnoteReference = function(FootnoteReference, Pos)
+{
+	this.Footnotes.push({FootnoteReference : FootnoteReference, Pos : Pos});
+};
+CParagraphRecalculateStateWrap.prototype.GetFootnoteReferencesCount = function()
+{
+	return this.Footnotes.length;
+};
+CParagraphRecalculateStateWrap.prototype.SetFast = function(bValue)
+{
+	this.Fast = bValue;
+};
+CParagraphRecalculateStateWrap.prototype.IsFastRecalculate = function()
+{
+	return this.Fast;
+};
+CParagraphRecalculateStateWrap.prototype.GetPageAbs = function()
+{
+	return this.PageAbs;
+};
+CParagraphRecalculateStateWrap.prototype.GetColumnAbs = function()
+{
+	return this.ColumnAbs;
+};
+CParagraphRecalculateStateWrap.prototype.GetCurrentContentPos = function(nPos)
+{
+	var oContentPos = this.CurPos.Copy();
+	oContentPos.Set(this.CurPos);
+	oContentPos.Add(nPos);
+	return oContentPos;
 };
 
 function CParagraphRecalculateStateCounter()

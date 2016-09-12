@@ -7641,10 +7641,14 @@ ParaFootnoteReference.prototype.Get_Footnote    = function()
 {
 	return this.Footnote;
 };
-ParaFootnoteReference.prototype.UpdateNumber = function(nPageAbs, nColumnAbs, nAdditional)
+ParaFootnoteReference.prototype.UpdateNumber = function(PRS)
 {
-	if (this.Footnote)
+	if (this.Footnote && true !== PRS.IsFastRecalculate())
 	{
+		var nPageAbs    = PRS.GetPageAbs();
+		var nColumnAbs  = PRS.GetColumnAbs();
+		var nAdditional = PRS.GetFootnoteReferencesCount()
+
 		var oLogicDocument = this.Footnote.Get_LogicDocument();
 		var oFootnotesController = oLogicDocument.GetFootnotesController();
 		this.Number = oFootnotesController.GetFootnoteNumberOnPage(nPageAbs, nColumnAbs) + nAdditional;
