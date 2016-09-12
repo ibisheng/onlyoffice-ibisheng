@@ -127,7 +127,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     this.TableLook  = new CTableLook(true, true, false, false, true, false);
 
     this.TableSumGrid  = []; // данный массив будет заполнен после private_RecalculateGrid
-    this.TableGrid     = TableGrid;
+    this.TableGrid     = TableGrid ? TableGrid : [];
     this.TableGridCalc = this.private_CopyTableGrid();
 
     this.RecalcInfo = new CTableRecalcInfo();
