@@ -3550,6 +3550,7 @@
 					
 					newFilter.TableColumns = tableColumns;
 					worksheet.TableParts[worksheet.TableParts.length] = newFilter;
+					//TODO возможно дублируется при всавке(ф-ия _pasteFromBinary) - пересмотреть
 					if (tablePart) {
 						var renameParams = {};
 						renameParams.offset = offset;

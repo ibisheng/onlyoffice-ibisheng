@@ -9175,12 +9175,72 @@
             callTrigger = true;
             t.handlers.trigger( "slowOperation", true );
         }
+		
+		//добавляем форматированные таблицы
+		var tablesMap = null;
+        if ( fromBinary && val.TableParts && val.TableParts.length ) 
+		{
+            var range, tablePartRange, tables = val.TableParts, diffRow, diffCol, curTable;
+            var activeRange = window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange;
+            var refInsertBinary = AscCommonExcel.g_oRangeCache.getAscRange( activeRange );
+            for ( var i = 0; i < tables.length; i++ ) 
+			{
+                curTable = tables[i];
+				tablePartRange = curTable.Ref;
+                diffRow = tablePartRange.r1 - refInsertBinary.r1 + this.activeRange.r1;
+                diffCol = tablePartRange.c1 - refInsertBinary.c1 + this.activeRange.c1;
+                range = t.model.getRange3( diffRow, diffCol, diffRow + (tablePartRange.r2 - tablePartRange.r1), diffCol + (tablePartRange.c2 - tablePartRange.c1) );
+				
+                //если область вставки содержит форматированную таблицу, которая пересекается с вставляемой форматированной таблицей
+                var intersectionRangeWithTableParts = t.model.autoFilters._intersectionRangeWithTableParts( range.bbox );
+                if ( intersectionRangeWithTableParts )
+				{
+					continue;
+				} 
+
+                if ( curTable.style ) 
+				{
+                    range.cleanFormat();
+                }
+
+                //TODO использовать bWithoutFilter из tablePart
+                var bWithoutFilter = false;
+                if ( !curTable.AutoFilter ) 
+				{
+                    bWithoutFilter = true;
+                }
+				
+				var offset = {offsetCol: range.bbox.c1 - tablePartRange.c1, offsetRow: range.bbox.r1 - tablePartRange.r1};
+				var newDisplayName = this.model.workbook.dependencyFormulas.getNextTableName();
+                var props = {bWithoutFilter: bWithoutFilter, tablePart: curTable, offset: offset, displayName: newDisplayName};
+                t.model.autoFilters.addAutoFilter( curTable.TableStyleInfo.Name, range.bbox, true, true, props );
+				if(null === tablesMap)
+				{
+					tablesMap = {};
+				}
+				
+				tablesMap[curTable.DisplayName] = newDisplayName;
+            }
+        }
+
+        //делаем unmerge ф/т
+        var arnToRange = t.activeRange;
+        var intersectionRangeWithTableParts = t.model.autoFilters._intersectionRangeWithTableParts( arnToRange );
+        if ( intersectionRangeWithTableParts && intersectionRangeWithTableParts.length )
+		{
+            var tablePart;
+            for ( var i = 0; i < intersectionRangeWithTableParts.length; i++ )
+			{
+                tablePart = intersectionRangeWithTableParts[i];
+                this.model.getRange3( tablePart.Ref.r1, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2 ).unmerge();
+            }
+        }
 
         t.model.workbook.dependencyFormulas.lockRecal();
         var selectData;
         if ( fromBinary ) 
 		{
-            selectData = t._pasteFromBinary( val );
+            selectData = t._pasteFromBinary( val, null, tablesMap );
         }
         else 
 		{
@@ -9222,55 +9282,6 @@
         t.model.workbook.dependencyFormulas.unlockRecal();
         var arn = selectData[0];
         var selectionRange = arn.clone( true );
-
-        //добавляем автофильтры и форматированные таблицы
-        if ( fromBinary && val.TableParts && val.TableParts.length ) 
-		{
-            var aFilters = val.TableParts;
-            var range;
-            var tablePartRange;
-            var activeRange = window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange;
-            var refInsertBinary = AscCommonExcel.g_oRangeCache.getAscRange( activeRange );
-            var diffRow;
-            var diffCol;
-            for ( var aF = 0; aF < aFilters.length; aF++ ) {
-                tablePartRange = aFilters[aF].Ref;
-                diffRow = tablePartRange.r1 - refInsertBinary.r1;
-                diffCol = tablePartRange.c1 - refInsertBinary.c1;
-                range = t.model.getRange3( diffRow + selectionRange.r1, diffCol + selectionRange.c1, diffRow + selectionRange.r1 + (tablePartRange.r2 - tablePartRange.r1), diffCol + selectionRange.c1 + (tablePartRange.c2 - tablePartRange.c1) );
-                var offset = {offsetCol: range.bbox.c1 - tablePartRange.c1, offsetRow: range.bbox.r1 - tablePartRange.r1};
-                //если область вставки содержит форматированную таблицу, которая пересекается с вставляемой форматированной таблицей
-                var intersectionRangeWithTableParts = t.model.autoFilters._intersectionRangeWithTableParts( range.bbox );
-                if ( intersectionRangeWithTableParts )
-                    continue;
-
-                if ( aFilters[aF].style ) {
-                    range.cleanFormat();
-                }
-
-                //TODO использовать bWithoutFilter из tablePart
-                var bWithoutFilter = false;
-                if ( !aFilters[aF].AutoFilter ) {
-                    bWithoutFilter = true;
-                }
-
-                var props = {bWithoutFilter: bWithoutFilter, tablePart: aFilters[aF], offset: offset};
-                t.model.autoFilters.addAutoFilter( aFilters[aF].TableStyleInfo.Name, range.bbox, true, true, props );
-            }
-        }
-
-        //делаем unmerge ф/т
-        var arnToRange = t.activeRange;
-        var intersectionRangeWithTableParts = t.model.autoFilters._intersectionRangeWithTableParts( arnToRange );
-        if ( intersectionRangeWithTableParts && intersectionRangeWithTableParts.length )
-		{
-            var tablePart;
-            for ( var i = 0; i < intersectionRangeWithTableParts.length; i++ )
-			{
-                tablePart = intersectionRangeWithTableParts[i];
-                this.model.getRange3( tablePart.Ref.r1, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2 ).unmerge();
-            }
-        }
 
         if ( bIsUpdate )
 		{
@@ -9667,7 +9678,7 @@
         return arnFor;
     };
 
-    WorksheetView.prototype._pasteFromBinary = function ( val, isCheckSelection ) {
+    WorksheetView.prototype._pasteFromBinary = function ( val, isCheckSelection, tablesMap ) {
         var t = this;
         var arn = t.activeRange.clone( true );
         var arrFormula = [];
@@ -9947,7 +9958,18 @@
 										_p_ = new AscCommonExcel.parserFormula( value2[numFormula].sFormula, null, range.worksheet );
 
                                     if ( _p_.parse() ) {
-                                        assemb = _p_.changeOffset( offset ).assemble(true);
+										if(null !== tablesMap)
+										{
+											var renameParams = {};
+											renameParams.offset = offset;
+											renameParams.tableNameMap = tablesMap;
+											_p_.renameSheetCopy(renameParams);
+											assemb = _p_.assemble(true)
+										}
+										else
+										{
+											assemb = _p_.changeOffset( offset ).assemble(true);
+										}
 
                                         arrFormula[numFor] = {};
                                         arrFormula[numFor].range = range;
