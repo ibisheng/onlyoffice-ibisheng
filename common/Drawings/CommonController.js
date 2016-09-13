@@ -2491,7 +2491,7 @@ DrawingObjectsController.prototype =
                         checkObjectInArray(aGroups, objects_by_type.oleObjects[i].group.getMainGroup());
                     }
 
-                    var api = window.editor || window.Asc.editor;
+                    var api = window.editor || window["Asc"]["editor"];
                     if(api)
                     {
                         var pluginData = new Asc.CPluginData();
