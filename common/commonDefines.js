@@ -135,6 +135,9 @@
 			MaxDataSeriesError : -80,
 			CannotFillRange    : -81,
 
+			ConvertationOpenError : -82,
+            ConvertationSaveError : -83,
+
 			UserDrop : -100,
 			Warning  : -101,
 
@@ -981,6 +984,8 @@
 	prot['Unknown']                          = prot.Unknown;
 	prot['ConvertationTimeout']              = prot.ConvertationTimeout;
 	prot['ConvertationError']                = prot.ConvertationError;
+	prot['ConvertationOpenError']            = prot.ConvertationOpenError;
+	prot['ConvertationSaveError']            = prot.ConvertationSaveError;
 	prot['DownloadError']                    = prot.DownloadError;
 	prot['UnexpectedGuid']                   = prot.UnexpectedGuid;
 	prot['Database']                         = prot.Database;
