@@ -970,7 +970,7 @@ Paragraph.prototype.private_RecalculateLine            = function(CurLine, CurPa
     //-------------------------------------------------------------------------------------------------------------
     // 14. Проверяем Последние проверки
     //-------------------------------------------------------------------------------------------------------------
-    if (false === this.private_RecalculateLineCheckFootnotes(CurLine, CurPage, PRS))
+    if (false === this.private_RecalculateLineCheckFootnotes(CurLine, CurPage, PRS, ParaPr))
         return;
 };
 
@@ -1388,62 +1388,8 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
     // Перенос не делаем, если это первая строка на новой странице
     if (true === this.Use_YLimit() && (Top > YLimit || Bottom2 > YLimit) && (CurLine != this.Pages[CurPage].FirstLine || false === bNoFootnotes || (0 === RealCurPage && (null != this.Get_DocumentPrev() || (true === this.Parent.Is_TableCellContent() && true !== this.Parent.Is_TableFirstRowOnNewPage())))) && false === BreakPageLineEmpty)
     {
-        // TODO: Неразрывные абзацы и висячие строки внутри колонок вместе с плавающими объектами пока не обсчитываем
-        var bSkipWidowAndKeepLines = this.private_CheckSkipKeepLinesAndWidowControl(CurPage);
-
-        // Проверим висячую строку
-        if (this.Parent instanceof CDocument
-            && false === bSkipWidowAndKeepLines
-            && true === this.Parent.RecalcInfo.Can_RecalcWidowControl()
-            && true === ParaPr.WidowControl
-            && CurLine - this.Pages[CurPage].StartLine <= 1
-            && CurLine >= 1 && true != PRS.BreakPageLine
-            && ( 0 === CurPage && null != this.Get_DocumentPrev() ) )
-        {
-            // Вызываем данную функцию для удаления картинок с предыдущей страницы
-            this.Recalculate_Drawing_AddPageBreak(0, 0, true);
-
-            // TODO: Здесь перенос нужно делать сразу же, если в строке не было объектов с обтеканием
-            this.Parent.RecalcInfo.Set_WidowControl(this, CurLine - 1);
-            PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Column;
-            return false;
-        }
-        else
-        {
-            // Учитываем неразрывные абзацы:
-            //   1. В Word2010 (версия <= 14) просто проверяем, если параграф разбивается на 2 страницы, тогда
-            //      переносим его с новой страницы. Также не учитываем неразрывные параграфы внутри таблиц.
-            //   2. В Word2016 (версия >= 15) в добавок к предыдущему ориентируемся на колонки: пытаемся текущую
-            //      страницу параграфа разместить в какой либо колонке (пересчитывая их по очереди), если параграф
-            //      все равно не рассчитан до конца, тогда размещаем его в первой колонке и делаем перенос на следующую
-            //      страницу.
-            if (true === ParaPr.KeepLines && this.LogicDocument && false === bSkipWidowAndKeepLines)
-            {
-                var CompatibilityMode = this.LogicDocument.Get_CompatibilityMode();
-                if (CompatibilityMode <= document_compatibility_mode_Word14)
-                {
-                    if (null != this.Get_DocumentPrev() && true != this.Parent.Is_TableCellContent() && 0 === CurPage)
-                        CurLine = 0;
-                }
-                else if (CompatibilityMode >= document_compatibility_mode_Word15)
-                {
-                    // TODO: Разобраться с 2016 вордом
-                    if (null != this.Get_DocumentPrev() && 0 === CurPage)
-                        CurLine = 0;
-                }
-            }
-
-            // Восстанавливаем позицию нижней границы предыдущей страницы
-            this.Pages[CurPage].Bounds.Bottom = PRS.LinePrevBottom;
-            this.Pages[CurPage].Set_EndLine( CurLine - 1 );
-
-            if ( 0 === CurLine )
-                this.Lines[-1] = new CParaLine(0);
-
-            // Добавляем разрыв страницы
-            PRS.RecalcResult = recalcresult_NextPage;
-            return false;
-        }
+		this.private_RecalculateMoveLineToNextPage(CurLine, CurPage, PRS, ParaPr);
+		return false;
     }
 
     return true;
@@ -1866,7 +1812,7 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
     return PRSA.RecalcResult;
 };
 
-Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, CurPage, PRS)
+Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, CurPage, PRS, ParaPr)
 {
     if (!((PRS.RecalcResult & recalcresult_NextElement) || (PRS.RecalcResult & recalcresult_NextLine)))
         return false;
@@ -1890,17 +1836,14 @@ Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, Cu
 
 	if (oTopDocument instanceof CDocument)
 	{
-		if (oTopDocument.Footnotes.RecalculateFootnotes(PRS.PageAbs, PRS.ColumnAbs, this.Pages[CurPage].Y + this.Lines[CurLine].Bottom, arrFootnotes))
+		if (!oTopDocument.Footnotes.RecalculateFootnotes(PRS.PageAbs, PRS.ColumnAbs, this.Pages[CurPage].Y + this.Lines[CurLine].Bottom, arrFootnotes))
 		{
-			// Все нормально
-		}
-		else
-		{
-			console.log("Данную строчку нужно перенести на новую строку");
+			this.private_RecalculateMoveLineToNextPage(CurLine, CurPage, PRS, ParaPr);
+			return false;
 		}
 	}
 
-    return true;
+	return true;
 };
 
 Paragraph.prototype.private_RecalculateRange           = function(CurRange, CurLine, CurPage, RangesCount, PRS, ParaPr)
@@ -2128,6 +2071,66 @@ Paragraph.prototype.private_CheckColumnBreak = function(CurPage)
         if (this.LogicDocument)
             this.LogicDocument.OnColumnBreak_WhileRecalculate();
     }
+};
+
+Paragraph.prototype.private_RecalculateMoveLineToNextPage = function(CurLine, CurPage, PRS, ParaPr)
+{
+	// TODO: Неразрывные абзацы и висячие строки внутри колонок вместе с плавающими объектами пока не обсчитываем
+	var bSkipWidowAndKeepLines = this.private_CheckSkipKeepLinesAndWidowControl(CurPage);
+
+	// Проверим висячую строку
+	if (this.Parent instanceof CDocument
+		&& false === bSkipWidowAndKeepLines
+		&& true === this.Parent.RecalcInfo.Can_RecalcWidowControl()
+		&& true === ParaPr.WidowControl
+		&& CurLine - this.Pages[CurPage].StartLine <= 1
+		&& CurLine >= 1 && true != PRS.BreakPageLine
+		&& ( 0 === CurPage && null != this.Get_DocumentPrev() ) )
+	{
+		// Вызываем данную функцию для удаления картинок с предыдущей страницы
+		this.Recalculate_Drawing_AddPageBreak(0, 0, true);
+
+		// TODO: Здесь перенос нужно делать сразу же, если в строке не было объектов с обтеканием
+		this.Parent.RecalcInfo.Set_WidowControl(this, CurLine - 1);
+		PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Column;
+		return false;
+	}
+	else
+	{
+		// Учитываем неразрывные абзацы:
+		//   1. В Word2010 (версия <= 14) просто проверяем, если параграф разбивается на 2 страницы, тогда
+		//      переносим его с новой страницы. Также не учитываем неразрывные параграфы внутри таблиц.
+		//   2. В Word2016 (версия >= 15) в добавок к предыдущему ориентируемся на колонки: пытаемся текущую
+		//      страницу параграфа разместить в какой либо колонке (пересчитывая их по очереди), если параграф
+		//      все равно не рассчитан до конца, тогда размещаем его в первой колонке и делаем перенос на следующую
+		//      страницу.
+		if (true === ParaPr.KeepLines && this.LogicDocument && false === bSkipWidowAndKeepLines)
+		{
+			var CompatibilityMode = this.LogicDocument.Get_CompatibilityMode();
+			if (CompatibilityMode <= document_compatibility_mode_Word14)
+			{
+				if (null != this.Get_DocumentPrev() && true != this.Parent.Is_TableCellContent() && 0 === CurPage)
+					CurLine = 0;
+			}
+			else if (CompatibilityMode >= document_compatibility_mode_Word15)
+			{
+				// TODO: Разобраться с 2016 вордом
+				if (null != this.Get_DocumentPrev() && 0 === CurPage)
+					CurLine = 0;
+			}
+		}
+
+		// Восстанавливаем позицию нижней границы предыдущей страницы
+		this.Pages[CurPage].Bounds.Bottom = PRS.LinePrevBottom;
+		this.Pages[CurPage].Set_EndLine( CurLine - 1 );
+
+		if ( 0 === CurLine )
+			this.Lines[-1] = new CParaLine(0);
+
+		// Добавляем разрыв страницы
+		PRS.RecalcResult = recalcresult_NextPage;
+		return false;
+	}
 };
 
 var ERecalcPageType =

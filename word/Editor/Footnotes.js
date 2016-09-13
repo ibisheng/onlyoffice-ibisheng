@@ -306,6 +306,8 @@ CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumn
 			break;
 	}
 
+	oColumn.Height = Math.min(_YLimit, oColumn.Height);
+
 	return true;
 };
 /**
