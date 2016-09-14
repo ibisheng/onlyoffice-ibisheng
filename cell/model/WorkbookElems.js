@@ -4689,7 +4689,7 @@ CellArea.prototype = {
 		return this.sqref ? range.isIntersect(this.sqref) : false;
 	};
 	sparkline.prototype.contains = function (c, r) {
-		return this.sqref ? range.contains(c, r) : false;
+		return this.sqref ? this.sqref.contains(c, r) : false;
 	};
 
 // For Auto Filters
