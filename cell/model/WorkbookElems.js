@@ -4659,6 +4659,9 @@ CellArea.prototype = {
 		}
 		return -1;
 	};
+	sparklineGroup.prototype.asc_getType = function () {
+		return this.type;
+	};
 	/** @constructor */
 	function sparkline() {
 		this.sqref = null;
@@ -6856,6 +6859,8 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].RangeDataManager = RangeDataManager;
 	window['AscCommonExcel'].CellArea = CellArea;
 	window['AscCommonExcel'].sparklineGroup = sparklineGroup;
+	prot = sparklineGroup.prototype;
+	prot["asc_getType"]						= prot.asc_getType;
 	window['AscCommonExcel'].sparkline = sparkline;
 	window['AscCommonExcel'].TablePart = TablePart;
 	window['AscCommonExcel'].AutoFilter = AutoFilter;
