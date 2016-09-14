@@ -3620,7 +3620,6 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
       aRules = aCFs[i].aRules.sort(function(v1, v2) {
       	return v1.priority - v2.priority;
 			});
-			;
       if (oRule = aRules[0]) {
         // ToDo dataBar, expression, iconSet (page 2679)
         if (AscCommonExcel.ECfType.colorScale === oRule.type) {
