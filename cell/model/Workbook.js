@@ -3650,12 +3650,12 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
           l = oRuleElement.aColors.length;
           if (0 < values.length && 2 <= l) {
             oGradient1 = new AscCommonExcel.CGradient(oRuleElement.aColors[0], oRuleElement.aColors[1]);
-            min = oRuleElement.getMin(min, max, nc);
-            max = oRuleElement.getMax(min, max, nc);
+            min = oRuleElement.getMin(min, max, values);
+            max = oRuleElement.getMax(min, max, values);
             oGradient2 = null;
             if (2 < l) {
               oGradient2 = new AscCommonExcel.CGradient(oRuleElement.aColors[1], oRuleElement.aColors[2]);
-              mid = oRuleElement.getMid(min, max, nc);
+              mid = oRuleElement.getMid(min, max, values);
 
               oGradient1.init(min, mid);
               oGradient2.init(mid, max);
@@ -6306,6 +6306,14 @@ Cell.prototype.setFormulaCA = function(ca){
 };
 //-------------------------------------------------------------------------------------------------
 
+	function CellAndValue(c, v) {
+		this.c = c;
+		this.v = v;
+	}
+	CellAndValue.prototype.valueOf = function() {
+		return this.v;
+	};
+
 /**
  * @constructor
  */
@@ -6594,7 +6602,7 @@ Range.prototype._getRangeType=function(oBBox){
 Range.prototype._getValues = function (withEmpty) {
 	var res = [];
 	var fAction = function(c) {
-		res.push({c: c, v: c.getValueWithoutFormat()});
+		res.push(new CellAndValue(c, c.getValueWithoutFormat()));
 	};
 	if (withEmpty) {
 		this._setProperty(null, null, fAction);
@@ -6607,7 +6615,7 @@ Range.prototype._getValuesAndMap = function (withEmpty) {
 	var v, arrRes = [], mapRes = {};
 	var fAction = function(c) {
 		v = c.getValueWithoutFormat();
-		arrRes.push({c: c, v: v});
+		arrRes.push(new CellAndValue(c, v));
 		mapRes[v.toLowerCase()] = true;
 	};
 	if (withEmpty) {

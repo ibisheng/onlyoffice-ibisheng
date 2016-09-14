@@ -372,6 +372,27 @@ function (window, undefined) {
         return getLogGammaHelper(fZ + 2) - Math.log(fZ + 1) - Math.log(fZ);
     }
 
+    function getPercentile(values, alpha) {
+        values.sort(fSortAscending);
+
+        var nSize = values.length;
+        if (nSize === 0) {
+            return new cError(cErrorType.not_available);
+        } else {
+            if (nSize === 1) {
+                return new cNumber(values[0]);
+            } else {
+                var nIndex = Math.floor(alpha * (nSize - 1));
+                var fDiff = alpha * (nSize - 1) - Math.floor(alpha * (nSize - 1));
+                if (fDiff == 0.0) {
+                    return new cNumber(values[nIndex]);
+                } else {
+                    return new cNumber(values[nIndex] + fDiff * (values[nIndex + 1] - values[nIndex]));
+                }
+            }
+        }
+    }
+
 function cAVEDEV() {
 //    cBaseFunction.call( this, "AVEDEV" );
 //    this.setArgumentsMin( 1 );
@@ -391,7 +412,7 @@ function cAVEDEV() {
 
 }
 
-cAVEDEV.prototype = Object.create( cBaseFunction.prototype )
+cAVEDEV.prototype = Object.create( cBaseFunction.prototype );
 cAVEDEV.prototype.Calculate = function ( arg ) {
     var count = 0, sum = new cNumber( 0 ), arrX = [];
     for ( var i = 0; i < arg.length; i++ ) {
@@ -446,7 +467,7 @@ cAVEDEV.prototype.getInfo = function () {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cAVERAGE() {
 //    cBaseFunction.call( this, "AVERAGE" );
@@ -3664,26 +3685,7 @@ cPERCENTILE.prototype.Calculate = function ( arg ) {
             }
         }
 
-        tA.sort(fSortAscending);
-
-        var nSize = tA.length;
-        if ( tA.length < 1 || nSize == 0 )
-            return new cError( cErrorType.not_available );
-        else {
-            if ( nSize == 1 )
-                return new cNumber( tA[0] );
-            else {
-                var nIndex = Math.floor( alpha * (nSize - 1) );
-                var fDiff = alpha * (nSize - 1) - Math.floor( alpha * (nSize - 1) );
-                if ( fDiff == 0.0 )
-                    return new cNumber( tA[nIndex] );
-                else {
-                    return new cNumber( tA[nIndex] +
-                        fDiff * (tA[nIndex + 1] - tA[nIndex]) );
-                }
-            }
-        }
-
+        return getPercentile(tA, alpha);
     }
 
     var arg0 = arg[0], arg1 = arg[1];
@@ -5665,6 +5667,7 @@ cZTEST.prototype = Object.create( cBaseFunction.prototype );
     window['AscCommonExcel'].phi = phi;
     window['AscCommonExcel'].gauss = gauss;
     window['AscCommonExcel'].gaussinv = gaussinv;
+    window['AscCommonExcel'].getPercentile = getPercentile;
 
     window['AscCommonExcel'].cAVERAGE = cAVERAGE;
     window['AscCommonExcel'].cCOUNT = cCOUNT;
