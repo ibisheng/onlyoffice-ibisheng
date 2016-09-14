@@ -3260,7 +3260,7 @@ DrawingObjectsController.prototype =
                 {
                     if(type === c_oAscChartTypeSettings.pie3d)
                     {
-                        if(!chart.view3D)
+                        //if(!chart.view3D)
                         {
                             chart.setView3D(new AscFormat.CView3d());
                         }
