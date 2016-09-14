@@ -10750,7 +10750,10 @@ CTable.prototype =
 
         this.Internal_CreateNewGrid( Rows_info );
 
-        // Возможен случай, когда у нас остались строки, полностью состоящие из объединенных вертикально ячеек
+		// Пробегаемся по всем ячейкам и смотрим на их вертикальное объединение, было ли оно нарушено
+		this.private_CorrectVerticalMerge();
+
+		// Возможен случай, когда у нас остались строки, полностью состоящие из объединенных вертикально ячеек
         for ( var CurRow = this.Content.length - 1; CurRow >= 0; CurRow-- )
         {
             var bRemove = true;
@@ -13508,6 +13511,53 @@ CTable.prototype.CorrectBadGrid = function()
 	AscCommon.g_oIdCounter.m_bLoad = bLoad;
 	AscCommon.g_oIdCounter.m_bRead = bRead;
 	this.Recalc_CompiledPr2();
+};
+CTable.prototype.private_CorrectVerticalMerge = function()
+{
+	// Пробегаемся по всем ячейкам и смотрим на их вертикальное объединение, было ли оно нарушено
+	for (var nCurRow = 0, nRowsCount = this.Content.length; nCurRow < nRowsCount; ++nCurRow)
+	{
+		var oRow     = this.Content[nCurRow];
+		var nGridCol = oRow.Get_Before().GridBefore;
+		for (var nCurCell = 0, nCellsCount = oRow.Get_CellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			var oCell       = oRow.Get_Cell(nCurCell);
+			var nVMergeType = oCell.Get_VMerge();
+			var nGridSpan   = oCell.Get_GridSpan();
+
+			if (vmerge_Continue === nVMergeType)
+			{
+				var bNeedReset = true;
+				if (0 !== nCurRow)
+				{
+					var oPrevRow     = this.Content[nCurRow - 1];
+					var nPrevGridCol = oPrevRow.Get_Before().GridBefore;
+					for (var nPrevCell = 0, nPrevCellsCount = oPrevRow.Get_CellsCount(); nPrevCell < nPrevCellsCount; ++nPrevCell)
+					{
+						var oPrevCell     = oPrevRow.Get_Cell(nPrevCell);
+						var nPrevGridSpan = oPrevCell.Get_GridSpan();
+
+						if (nPrevGridCol === nGridCol)
+						{
+							if (nPrevGridSpan === nGridSpan)
+								bNeedReset = false;
+
+							break;
+						}
+						else if (nPrevGridCol > nGridCol)
+							break;
+
+						nPrevGridCol += nPrevGridSpan;
+					}
+				}
+
+				if (true === bNeedReset)
+					oCell.Set_VMerge(vmerge_Restart);
+			}
+
+			nGridCol += nGridSpan;
+		}
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook

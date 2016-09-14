@@ -1126,10 +1126,10 @@
 	window['AscDFH'].historyitem_Layout_SetH                         = 2101;
 	window['AscDFH'].historyitem_Layout_SetHMode                     = 2102;
 	window['AscDFH'].historyitem_Layout_SetLayoutTarget              = 2103;
-	window['AscDFH'].historyitem_Layout_SetW                         = 2103;
+	window['AscDFH'].historyitem_Layout_SetW                         = 2108;
 	window['AscDFH'].historyitem_Layout_SetWMode                     = 2104;
 	window['AscDFH'].historyitem_Layout_SetX                         = 2105;
-	window['AscDFH'].historyitem_Layout_SetXMode                     = 2105;
+	window['AscDFH'].historyitem_Layout_SetXMode                     = 2109;
 	window['AscDFH'].historyitem_Layout_SetY                         = 2106;
 	window['AscDFH'].historyitem_Layout_SetYMode                     = 2107;
 	window['AscDFH'].historyitem_LegendEntry_SetDelete               = 2108;
