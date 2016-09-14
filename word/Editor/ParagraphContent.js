@@ -7647,7 +7647,7 @@ ParaFootnoteReference.prototype.UpdateNumber = function(PRS)
 	{
 		var nPageAbs    = PRS.GetPageAbs();
 		var nColumnAbs  = PRS.GetColumnAbs();
-		var nAdditional = PRS.GetFootnoteReferencesCount()
+		var nAdditional = PRS.GetFootnoteReferencesCount(this);
 
 		var oLogicDocument = this.Footnote.Get_LogicDocument();
 		var oFootnotesController = oLogicDocument.GetFootnotesController();

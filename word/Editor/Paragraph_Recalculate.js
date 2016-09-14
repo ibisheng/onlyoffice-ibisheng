@@ -605,7 +605,12 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage, bFirs
     {
         PRS.Reset_RestartPageRecalcInfo();
         PRS.Reset_MathRecalcInfo();
+		PRS.SaveFootnotesInfo();
     }
+	else
+	{
+		PRS.LoadFootnotesInfo();
+	}
 
     var RecalcResult;
     while (true)
@@ -2621,7 +2626,8 @@ function CParagraphRecalculateStateWrap(Para)
         Object : null         // Объект, который вызвал пересчет
     };
 
-    this.Footnotes = [];
+    this.Footnotes                  = [];
+	this.FootnotesRecalculateObject = null;
 
     // for ParaMath
     this.bMath_OneLine       = false;
@@ -2962,12 +2968,28 @@ CParagraphRecalculateStateWrap.prototype =
         return X;
     }
 };
-CParagraphRecalculateStateWrap.prototype.AddFootnoteReference = function(FootnoteReference, Pos)
+CParagraphRecalculateStateWrap.prototype.AddFootnoteReference = function(oFootnoteReference, oPos)
 {
-	this.Footnotes.push({FootnoteReference : FootnoteReference, Pos : Pos});
+	// Ссылки могут добавляться несколько раз, если строка разбита на несколько отрезков
+	for (var nIndex = 0, nCount = this.Footnotes.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Footnotes[nIndex].FootnoteReference === oFootnoteReference)
+			return;
+	}
+
+	this.Footnotes.push({FootnoteReference : oFootnoteReference, Pos : oPos});
 };
-CParagraphRecalculateStateWrap.prototype.GetFootnoteReferencesCount = function()
+CParagraphRecalculateStateWrap.prototype.GetFootnoteReferencesCount = function(oFootnoteReference)
 {
+	// Если данную ссылку мы добавляли уже в строке, тогда ищем сколько было элементов до нее, если не добавляли,
+	// тогда возвращаем просто количество ссылок.
+
+	for (var nIndex = 0, nCount = this.Footnotes.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Footnotes[nIndex].FootnoteReference === oFootnoteReference)
+			return nIndex;
+	}
+
 	return this.Footnotes.length;
 };
 CParagraphRecalculateStateWrap.prototype.SetFast = function(bValue)
@@ -2992,6 +3014,18 @@ CParagraphRecalculateStateWrap.prototype.GetCurrentContentPos = function(nPos)
 	oContentPos.Set(this.CurPos);
 	oContentPos.Add(nPos);
 	return oContentPos;
+};
+CParagraphRecalculateStateWrap.prototype.SaveFootnotesInfo = function()
+{
+	var oTopDocument = this.TopDocument;
+	if (oTopDocument instanceof CDocument)
+		this.FootnotesRecalculateObject = oTopDocument.Footnotes.SaveRecalculateObject(this.PageAbs, this.ColumnAbs);
+};
+CParagraphRecalculateStateWrap.prototype.LoadFootnotesInfo = function()
+{
+	var oTopDocument = this.TopDocument;
+	if (oTopDocument instanceof CDocument && this.FootnotesRecalculateObject)
+		oTopDocument.Footnotes.LoadRecalculateObject(this.PageAbs, this.ColumnAbs, this.FootnotesRecalculateObject);
 };
 
 function CParagraphRecalculateStateCounter()

@@ -213,8 +213,8 @@ CFootnotesController.prototype.ContinueElementsFromPreviousColumn = function(nPa
 			if (recalcresult2_NextPage === nRecalcResult)
 			{
 				// Начиная с данной сноски мы все оставшиеся сноски заносим в массив ContinuesElements у данной колонки
-				var arrContniuesElements = arrElements.slice(nIndex);
-				oColumn.SetContinutesElements(arrContniuesElements);
+				var arrContinuesElements = arrElements.slice(nIndex);
+				oColumn.SetContinuesElements(arrContinuesElements);
 			}
 			else if (recalcresult2_CurPage === nRecalcResult)
 			{
@@ -288,8 +288,8 @@ CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumn
 				return false;
 
 			// Начиная с данной сноски мы все оставшиеся сноски заносим в массив ContinuesElements у данной колонки
-			var arrContniuesElements = arrFootnotes.slice(nIndex);
-			oColumn.SetContinutesElements(arrContniuesElements);
+			var arrContinuesElements = arrFootnotes.slice(nIndex);
+			oColumn.SetContinuesElements(arrContinuesElements);
 		}
 		else if (recalcresult2_CurPage === nRecalcResult)
 		{
@@ -418,6 +418,22 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nCol
 	}
 
 	return 1;
+};
+CFootnotesController.prototype.SaveRecalculateObject = function(nPageAbs, nColumnAbs)
+{
+	var oColumn = this.private_GetPageColumn(nPageAbs, nColumnAbs);
+	if (!oColumn)
+		return null;
+
+	return oColumn.SaveRecalculateObject();
+};
+CFootnotesController.prototype.LoadRecalculateObject = function(nPageAbs, nColumnAbs, oRObject)
+{
+	var oColumn = this.private_GetPageColumn(nPageAbs, nColumnAbs);
+	if (!oColumn)
+		return;
+
+	oColumn.LoadRecalculateObject(oRObject);
 };
 /**
  * Проверяем, используется заданная сноска в документе.
@@ -2904,7 +2920,7 @@ function CFootEndnotePageColumn()
 
 	this.Height            = 0;
 	this.Elements          = []; // Элементы, которые пересчитаны на данной странице
-	this.ContniuesElements = []; // Элементы, которые нужно пересчитывать на следующей колонке
+	this.ContinuesElements = []; // Элементы, которые нужно пересчитывать на следующей колонке
 
 	this.SeparatorRecalculateObject             = null;
 	this.ContinuationSeparatorRecalculateObject = null;
@@ -2914,7 +2930,7 @@ CFootEndnotePageColumn.prototype.Reset = function()
 {
 	this.Height            = 0;
 	this.Elements          = [];
-	this.ContniuesElements = [];
+	this.ContinuesElements = [];
 
 	this.SeparatorRecalculateObject             = null;
 	this.ContinuationSeparatorRecalculateObject = null;
@@ -2922,11 +2938,55 @@ CFootEndnotePageColumn.prototype.Reset = function()
 };
 CFootEndnotePageColumn.prototype.GetContinuesElements = function()
 {
-	return this.ContniuesElements;
+	return this.ContinuesElements;
 };
-CFootEndnotePageColumn.prototype.SetContinutesElements = function(arrContniuesElements)
+CFootEndnotePageColumn.prototype.SetContinuesElements = function(arrContinuesElements)
 {
-	this.ContniuesElements = arrContniuesElements;
+	this.ContinuesElements = arrContinuesElements;
+};
+CFootEndnotePageColumn.prototype.SaveRecalculateObject = function()
+{
+	var oColumn = new CFootEndnotePageColumn();
+
+	oColumn.X      = this.X;
+	oColumn.Y      = this.Y;
+	oColumn.XLimit = this.XLimit;
+	oColumn.YLimit = this.YLimit;
+
+	oColumn.Height = this.Height;
+
+	for (var nIndex = 0, nCount = this.Elements.length; nIndex < nCount; ++nIndex)
+	{
+		oColumn.Elements[nIndex] = this.Elements[nIndex];
+	}
+
+	oColumn.ContinuesElements = this.ContinuesElements;
+
+	oColumn.SeparatorRecalculateObject             = this.SeparatorRecalculateObject;
+	oColumn.ContinuationSeparatorRecalculateObject = this.SeparatorRecalculateObject;
+	oColumn.ContinuationNoticeRecalculateObject    = this.ContinuationSeparatorRecalculateObject;
+	return oColumn;
+};
+CFootEndnotePageColumn.prototype.LoadRecalculateObject = function(oObject)
+{
+	this.X      = oObject.X;
+	this.Y      = oObject.Y;
+	this.XLimit = oObject.XLimit;
+	this.YLimit = oObject.YLimit;
+
+	this.Height = oObject.Height;
+
+	this.Elements = [];
+	for (var nIndex = 0, nCount = oObject.Elements.length; nIndex < nCount; ++nIndex)
+	{
+		this.Elements[nIndex] = oObject.Elements[nIndex];
+	}
+
+	this.ContinuesElements = oObject.ContinuesElements;
+
+	this.SeparatorRecalculateObject             = oObject.SeparatorRecalculateObject;
+	this.ContinuationSeparatorRecalculateObject = oObject.SeparatorRecalculateObject;
+	this.ContinuationNoticeRecalculateObject    = oObject.ContinuationSeparatorRecalculateObject;
 };
 
 function CFootEndnotePage()
