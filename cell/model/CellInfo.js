@@ -328,6 +328,9 @@
   asc_CCellInfo.prototype.asc_getFormatTableInfo = function () {
     return this.formatTableInfo;
   };
+  asc_CCellInfo.prototype.asc_getSparklineInfo = function () {
+    return this.sparklineInfo;
+  };
 
     /** @constructor */
     function asc_CDefName(n, r, s, t, h, l) {
@@ -457,6 +460,7 @@
   prot["asc_getAngle"] = prot.asc_getAngle;
   prot["asc_getAutoFilterInfo"] = prot.asc_getAutoFilterInfo;
   prot["asc_getFormatTableInfo"] = prot.asc_getFormatTableInfo;
+  prot["asc_getSparklineInfo"] = prot.asc_getSparklineInfo;
 
   window["Asc"].asc_CDefName = window["Asc"]["asc_CDefName"] = asc_CDefName;
   prot = asc_CDefName.prototype;
