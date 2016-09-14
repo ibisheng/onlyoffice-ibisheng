@@ -4553,128 +4553,141 @@ CellArea.prototype = {
 	}
 };
 
-/** @constructor */
-function sparklineGroup() {
-	// attributes
-	this.manualMax = undefined;
-	this.manualMin = undefined;
-	this.lineWeight = 0.75;
-	this.type = Asc.ESparklineType.Line;
-	this.dateAxis = false;
-	this.displayEmptyCellsAs = Asc.EDispBlanksAs.Zero;
-	this.markers = false;
-	this.high = false;
-	this.low = false;
-	this.first = false;
-	this.last = false;
-	this.negative = false;
-	this.displayXAxis = false;
-	this.displayHidden = false;
-	this.minAxisType = Asc.SparklineAxisMinMax.Individual;
-	this.maxAxisType = Asc.SparklineAxisMinMax.Individual;
-	this.rightToLeft = false;
+	/** @constructor */
+	function sparklineGroup() {
+		// attributes
+		this.manualMax = undefined;
+		this.manualMin = undefined;
+		this.lineWeight = 0.75;
+		this.type = Asc.ESparklineType.Line;
+		this.dateAxis = false;
+		this.displayEmptyCellsAs = Asc.EDispBlanksAs.Zero;
+		this.markers = false;
+		this.high = false;
+		this.low = false;
+		this.first = false;
+		this.last = false;
+		this.negative = false;
+		this.displayXAxis = false;
+		this.displayHidden = false;
+		this.minAxisType = Asc.SparklineAxisMinMax.Individual;
+		this.maxAxisType = Asc.SparklineAxisMinMax.Individual;
+		this.rightToLeft = false;
 
-	// elements
-	this.colorSeries = null;
-	this.colorNegative = null;
-	this.colorAxis = null;
-	this.colorMarkers = null;
-	this.colorFirst = null;
-	this.colorLast = null;
-	this.colorHigh = null;
-	this.colorLow = null;
-	this.f = null;
-	this.arrSparklines = [];
-	this.arrCachedSparklines = [];
-}
-sparklineGroup.prototype.clone = function() {
-	var res = new sparklineGroup();
-	res.manualMax = this.manualMax;
-	res.manualMin = this.manualMin;
-	res.lineWeight = this.lineWeight;
-	res.type = this.type;
-	res.dateAxis = this.dateAxis;
-	res.displayEmptyCellsAs = this.displayEmptyCellsAs;
-	res.markers = this.markers;
-	res.high = this.high;
-	res.low = this.low;
-	res.first = this.first;
-	res.last = this.last;
-	res.negative = this.negative;
-	res.displayXAxis = this.displayXAxis;
-	res.displayHidden = this.displayHidden;
-	res.minAxisType = this.minAxisType;
-	res.maxAxisType = this.maxAxisType;
-	res.rightToLeft = this.rightToLeft;
-
-	res.colorSeries = this.colorSeries ? this.colorSeries.clone() : null;
-	res.colorNegative = this.colorNegative ? this.colorNegative.clone() : null;
-	res.colorAxis = this.colorAxis ? this.colorAxis : null;
-	res.colorMarkers = this.colorMarkers ? this.colorMarkers : null;
-	res.colorFirst = this.colorFirst ? this.colorFirst : null;
-	res.colorLast = this.colorLast ? this.colorLast : null;
-	res.colorHigh = this.colorHigh ? this.colorHigh : null;
-	res.colorLow = this.colorLow ? this.colorLow : null;
-	res.f = this.f;
-
-	for (var i = 0; i < this.arrSparklines.length; ++i) {
-		res.arrSparklines.push(this.arrSparklines[i].clone());
+		// elements
+		this.colorSeries = null;
+		this.colorNegative = null;
+		this.colorAxis = null;
+		this.colorMarkers = null;
+		this.colorFirst = null;
+		this.colorLast = null;
+		this.colorHigh = null;
+		this.colorLow = null;
+		this.f = null;
+		this.arrSparklines = [];
+		this.arrCachedSparklines = [];
 	}
-	return res;
-};
-sparklineGroup.prototype.addView = function(oSparklineView, index) {
-	this.arrCachedSparklines[index] = oSparklineView;
-};
-sparklineGroup.prototype.draw = function(oDrawingContext) {
-	var graphics = new AscCommon.CGraphics();
-	graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
-		oDrawingContext.getWidth(3), oDrawingContext.getHeight(3));
-	graphics.m_oFontManager = AscCommon.g_fontManager;
-	for (var i = 0; i < this.arrCachedSparklines.length; ++i) {
-		this.arrCachedSparklines[i].draw(graphics);
-	}
-};
-sparklineGroup.prototype.cleanCache = function() {
-	// ToDo clean only colors (for color scheme)
-	this.arrCachedSparklines = [];
-};
-sparklineGroup.prototype.updateCache = function(sheet, ranges) {
-	var sparklineRange;
-	for (var i = 0; i < this.arrSparklines.length; ++i) {
-		sparklineRange = this.arrSparklines[i]._f;
-		for (var j = 0; j < ranges.length; ++j) {
-			if (sparklineRange.isIntersect(ranges[j], sheet)) {
-				this.arrCachedSparklines[i] = null;
-				break;
+
+	sparklineGroup.prototype.clone = function () {
+		var res = new sparklineGroup();
+		res.manualMax = this.manualMax;
+		res.manualMin = this.manualMin;
+		res.lineWeight = this.lineWeight;
+		res.type = this.type;
+		res.dateAxis = this.dateAxis;
+		res.displayEmptyCellsAs = this.displayEmptyCellsAs;
+		res.markers = this.markers;
+		res.high = this.high;
+		res.low = this.low;
+		res.first = this.first;
+		res.last = this.last;
+		res.negative = this.negative;
+		res.displayXAxis = this.displayXAxis;
+		res.displayHidden = this.displayHidden;
+		res.minAxisType = this.minAxisType;
+		res.maxAxisType = this.maxAxisType;
+		res.rightToLeft = this.rightToLeft;
+
+		res.colorSeries = this.colorSeries ? this.colorSeries.clone() : null;
+		res.colorNegative = this.colorNegative ? this.colorNegative.clone() : null;
+		res.colorAxis = this.colorAxis ? this.colorAxis : null;
+		res.colorMarkers = this.colorMarkers ? this.colorMarkers : null;
+		res.colorFirst = this.colorFirst ? this.colorFirst : null;
+		res.colorLast = this.colorLast ? this.colorLast : null;
+		res.colorHigh = this.colorHigh ? this.colorHigh : null;
+		res.colorLow = this.colorLow ? this.colorLow : null;
+		res.f = this.f;
+
+		for (var i = 0; i < this.arrSparklines.length; ++i) {
+			res.arrSparklines.push(this.arrSparklines[i].clone());
+		}
+		return res;
+	};
+	sparklineGroup.prototype.addView = function (oSparklineView, index) {
+		this.arrCachedSparklines[index] = oSparklineView;
+	};
+	sparklineGroup.prototype.draw = function (oDrawingContext) {
+		var graphics = new AscCommon.CGraphics();
+		graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
+			oDrawingContext.getWidth(3), oDrawingContext.getHeight(3));
+		graphics.m_oFontManager = AscCommon.g_fontManager;
+		for (var i = 0; i < this.arrCachedSparklines.length; ++i) {
+			this.arrCachedSparklines[i].draw(graphics);
+		}
+	};
+	sparklineGroup.prototype.cleanCache = function () {
+		// ToDo clean only colors (for color scheme)
+		this.arrCachedSparklines = [];
+	};
+	sparklineGroup.prototype.updateCache = function (sheet, ranges) {
+		var sparklineRange;
+		for (var i = 0; i < this.arrSparklines.length; ++i) {
+			sparklineRange = this.arrSparklines[i]._f;
+			for (var j = 0; j < ranges.length; ++j) {
+				if (sparklineRange.isIntersect(ranges[j], sheet)) {
+					this.arrCachedSparklines[i] = null;
+					break;
+				}
 			}
 		}
+	};
+	sparklineGroup.prototype.contains = function (c, r) {
+		for (var j = 0; j < this.arrSparklines.length; ++j) {
+			if (oSparklineGroup.arrSparklines[j].contains(c, r)) {
+				return j;
+			}
+		}
+		return -1;
+	};
+	/** @constructor */
+	function sparkline() {
+		this.sqref = null;
+		this.f = null;
+		this._f = null;
 	}
-};
-/** @constructor */
-function sparkline() {
-	this.sqref = null;
-	this.f = null;
-	this._f = null;
-}
-sparkline.prototype.clone = function() {
-	var res = new sparkline();
-	
-	res.sqref = this.sqref ? this.sqref.clone() : null;
-	res.f = this.f;
-	res._f = this._f ? this._f.clone() : null;
-	
-	return res;
-};
-sparkline.prototype.setSqref = function(sqref) {
-	this.sqref = AscCommonExcel.g_oRangeCache.getAscRange(sqref);
-};
-sparkline.prototype.setF = function(f) {
-	this.f = f;
-	this._f = AscCommonExcel.g_oRangeCache.getRange3D(this.f);
-};
-sparkline.prototype.checkInRange = function(range) {
-	return this.sqref ? range.isIntersect(this.sqref) : false;
-};
+
+	sparkline.prototype.clone = function () {
+		var res = new sparkline();
+
+		res.sqref = this.sqref ? this.sqref.clone() : null;
+		res.f = this.f;
+		res._f = this._f ? this._f.clone() : null;
+
+		return res;
+	};
+	sparkline.prototype.setSqref = function (sqref) {
+		this.sqref = AscCommonExcel.g_oRangeCache.getAscRange(sqref);
+	};
+	sparkline.prototype.setF = function (f) {
+		this.f = f;
+		this._f = AscCommonExcel.g_oRangeCache.getRange3D(this.f);
+	};
+	sparkline.prototype.checkInRange = function (range) {
+		return this.sqref ? range.isIntersect(this.sqref) : false;
+	};
+	sparkline.prototype.contains = function (c, r) {
+		return this.sqref ? range.contains(c, r) : false;
+	};
 
 // For Auto Filters
 /** @constructor */

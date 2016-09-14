@@ -5694,6 +5694,14 @@ Woorksheet.prototype.updateSparklineCache = function(sheet, ranges) {
     this.aSparklineGroups[i].updateCache(sheet, ranges);
   }
 };
+	Woorksheet.prototype.getSparklineGroup = function(c, r) {
+		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
+			if (-1 !== this.aSparklineGroups[i].contains(c, r)) {
+				return this.aSparklineGroups[i];
+			}
+		}
+		return null;
+	};
 //-------------------------------------------------------------------------------------------------
 /**
  * @constructor

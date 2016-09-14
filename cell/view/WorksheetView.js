@@ -7108,6 +7108,8 @@
             }
         }
 
+        cell_info.sparklineInfo = this.model.getSparklineGroup(c1, r1);
+
         return cell_info;
     };
 
