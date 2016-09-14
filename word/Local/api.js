@@ -84,15 +84,17 @@ window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
 Asc['asc_docs_api'].prototype.asc_setAdvancedOptions = function(idOption, option) 
 {
 	if (window["Asc"].c_oAscAdvancedOptionsID.TXT === idOption) {
-		window["AscDesktopEditor"]["SetAdvancedOptions"]("" + option.asc_getCodePage());
+	    var _param = "";
+        _param += ("<m_nCsvTxtEncoding>" + option.asc_getCodePage() + "</m_nCsvTxtEncoding>");
+		window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
 	}
+	else if (window["Asc"].c_oAscAdvancedOptionsID.DRM === idOption) {
+        var _param = "";
+        _param += ("<m_sPassword>" + AscCommon.CopyPasteCorrectString(option.asc_getPassword()) + "</m_sPassword>");
+        window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
+    }
 };
 Asc['asc_docs_api'].prototype["asc_setAdvancedOptions"] = Asc['asc_docs_api'].prototype.asc_setAdvancedOptions;
-
-window["asc_initAdvancedOptions"] = function()
-{	
-	editor._onNeedParams(undefined);
-};
 
 /////////////////////////////////////////////////////////
 //////////////        CHANGES       /////////////////////
