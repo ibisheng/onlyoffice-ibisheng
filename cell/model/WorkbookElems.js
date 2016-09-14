@@ -3065,10 +3065,9 @@ CCellValue.prototype =
 					oNumFormat = oNumFormatCache.get(g_oDefaultFormat.Num.getFormat());
 				if(false == oNumFormat.isGeneralFormat())
 				{
-					var oAdditionalResult = {};
 					if(null != this.number)
 					{
-						aText = oNumFormat.format(this.number, this.type, dDigitsCount, oAdditionalResult);
+						aText = oNumFormat.format(this.number, this.type, dDigitsCount);
 						sText = null;
 					}
 					else if(CellValueType.String == this.type)
@@ -3076,12 +3075,12 @@ CCellValue.prototype =
 					    var oTextFormat = oNumFormat.getTextFormat();
 					    if (null != oTextFormat && "@" != oTextFormat.formatString) {
 					        if (null != this.text) {
-					            aText = oNumFormat.format(this.text, this.type, dDigitsCount, oAdditionalResult);
+					            aText = oNumFormat.format(this.text, this.type, dDigitsCount);
 					            sText = null;
 					        }
 					        else if (null != this.multiText) {
 					            var sSimpleString = this.getStringFromMultiText();
-					            aText = oNumFormat.format(sSimpleString, this.type, dDigitsCount, oAdditionalResult);
+					            aText = oNumFormat.format(sSimpleString, this.type, dDigitsCount);
 					            sText = null;
 					        }
 					    }

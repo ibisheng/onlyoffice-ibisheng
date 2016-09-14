@@ -5993,36 +5993,26 @@ Cell.prototype.setNumFormat=function(val){
 };
 Cell.prototype.shiftNumFormat=function(nShift, dDigitsCount){
 	var bRes = false;
-	var bGeneral = true;
     var sNumFormat;
     if(null != this.xfs && null != this.xfs.num)
         sNumFormat = this.xfs.num.getFormat();
     else
         sNumFormat = g_oDefaultFormat.Num.getFormat();
-	if("General" != sNumFormat)
-	{
-		var oCurNumFormat = oNumFormatCache.get(sNumFormat);
-		if(null != oCurNumFormat && false == oCurNumFormat.isGeneralFormat())
-		{
-			bGeneral = false;
-			var output = {};
-			bRes = oCurNumFormat.shiftFormat(output, nShift);
-			if(true == bRes)
-				this.setNumFormat(output.format);
+	var oCurNumFormat = oNumFormatCache.get(sNumFormat);
+	if (null != oCurNumFormat && false == oCurNumFormat.isGeneralFormat()) {
+		var output = {};
+		bRes = oCurNumFormat.shiftFormat(output, nShift);
+		if (true == bRes) {
+			this.setNumFormat(output.format);
 		}
-	}
-	if(bGeneral)
-	{
-		if(CellValueType.Number == this.oValue.type)
-		{
-			var sGeneral = AscCommon.DecodeGeneralFormat(this.oValue.number, this.oValue.type, dDigitsCount);
-			var oGeneral = oNumFormatCache.get(sGeneral);
-			if(null != oGeneral && false == oGeneral.isGeneralFormat())
-			{
-				var output = {};
-				bRes = oGeneral.shiftFormat(output, nShift);
-				if(true == bRes)
-					this.setNumFormat(output.format);
+	} else if (CellValueType.Number == this.oValue.type) {
+		var sGeneral = AscCommon.DecodeGeneralFormat(this.oValue.number, this.oValue.type, dDigitsCount);
+		var oGeneral = oNumFormatCache.get(sGeneral);
+		if (null != oGeneral && false == oGeneral.isGeneralFormat()) {
+			var output = {};
+			bRes = oGeneral.shiftFormat(output, nShift);
+			if (true == bRes) {
+				this.setNumFormat(output.format);
 			}
 		}
 	}
