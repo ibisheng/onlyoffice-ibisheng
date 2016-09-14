@@ -3064,6 +3064,10 @@ function CEditorPage(api)
 	this.onTimerScroll = function(isThUpdateSync)
 	{
 		var oWordControl                = oThis;
+
+		if (oWordControl.m_oApi.isLongAction())
+            return;
+
 		oWordControl.m_nTimeDrawingLast = new Date().getTime();
 
 		var isRepaint = oWordControl.m_bIsScroll;
