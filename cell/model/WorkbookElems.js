@@ -4653,7 +4653,7 @@ CellArea.prototype = {
 	};
 	sparklineGroup.prototype.contains = function (c, r) {
 		for (var j = 0; j < this.arrSparklines.length; ++j) {
-			if (oSparklineGroup.arrSparklines[j].contains(c, r)) {
+			if (this.arrSparklines[j].contains(c, r)) {
 				return j;
 			}
 		}
