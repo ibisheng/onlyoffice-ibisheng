@@ -7916,6 +7916,16 @@ drawPieChart.prototype =
                         oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX);
                         oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - (1 - fLengthCoeff)*fLabelHeight;
                     }
+                    else if(oSolvation.x1 >= 0){
+						oResult.bError = false;
+						oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX);
+						oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY) - (1 - fLengthCoeff)*fLabelHeight;
+					}
+					else if(oSolvation.x2 >= 0){
+						oResult.bError = false;
+						oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX);
+						oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - (1 - fLengthCoeff)*fLabelHeight;
+					}
                 }
                 break;
             }
@@ -7944,6 +7954,16 @@ drawPieChart.prototype =
                         oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - fLabelWidth*fLengthCoeff;
                         oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY);
                     }
+                    else if(oSolvation.x1 >= 0){
+						oResult.bError = false;
+						oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX) - fLabelWidth*fLengthCoeff;
+						oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY);
+					}
+					else if(oSolvation.x2 >= 0){
+						oResult.bError = false;
+						oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - fLabelWidth*fLengthCoeff;
+						oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY);
+					}
                 }
                 break;
             }
@@ -7973,6 +7993,17 @@ drawPieChart.prototype =
                         oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - fLabelWidth;
                         oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - fLabelHeight*fLengthCoeff;
                     }
+                    else if(oSolvation.x1 >= 0){
+						oResult.bError = false;
+						oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX) - fLabelWidth;
+						oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY) - fLabelHeight*fLengthCoeff;
+
+					}
+					else if(oSolvation.x2 >= 0){
+						oResult.bError = false;
+						oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - fLabelWidth;
+						oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - fLabelHeight*fLengthCoeff;
+					}
                 }
                 break;
             }
@@ -7997,6 +8028,16 @@ drawPieChart.prototype =
                         oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - (1 - fLengthCoeff)*fLabelWidth;
                         oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - fLabelHeight;
                     }
+					else if(oSolvation.x1 >= 0){
+						oResult.bError = false;
+						oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX) - (1 - fLengthCoeff)*fLabelWidth;
+						oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY) - fLabelHeight;
+					}
+					else if(oSolvation.x2 >= 0){
+						oResult.bError = false;
+						oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - (1 - fLengthCoeff)*fLabelWidth;
+						oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - fLabelHeight;
+					}
                 }
                 break;
             }
