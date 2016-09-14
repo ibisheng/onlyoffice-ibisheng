@@ -3617,10 +3617,11 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
       continue;
     }
     if (!range || range.isIntersect(sqref)) {
-      aRules = aCFs[i].aRules;
-      for (j = 0; j < aRules.length; ++j) {
-        oRule = aRules[j];
-
+      aRules = aCFs[i].aRules.sort(function(v1, v2) {
+      	return v1.priority - v2.priority;
+			});
+			;
+      if (oRule = aRules[0]) {
         // ToDo dataBar, expression, iconSet (page 2679)
         if (AscCommonExcel.ECfType.colorScale === oRule.type) {
           if (1 !== oRule.aRuleElements.length) {
