@@ -3066,7 +3066,10 @@ function CEditorPage(api)
 		var oWordControl                = oThis;
 
 		if (oWordControl.m_oApi.isLongAction())
+        {
+            oWordControl.m_nPaintTimerId = setTimeout(oWordControl.onTimerScroll, oWordControl.m_nTimerScrollInterval);
             return;
+        }
 
 		oWordControl.m_nTimeDrawingLast = new Date().getTime();
 
@@ -3127,7 +3130,7 @@ function CEditorPage(api)
 			}
 		}
 
-		this.m_nPaintTimerId = setTimeout(oWordControl.onTimerScroll, oWordControl.m_nTimerScrollInterval);
+		oWordControl.m_nPaintTimerId = setTimeout(oWordControl.onTimerScroll, oWordControl.m_nTimerScrollInterval);
 		//window.requestAnimationFrame(oWordControl.onTimerScroll);
 	};
 
