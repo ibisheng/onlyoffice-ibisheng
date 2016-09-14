@@ -3550,7 +3550,7 @@
 
     WorksheetView.prototype._drawSelectionElement = function (visibleRange, offsetX, offsetY, args) {
         var range = args[0];
-        var isDashLine = args[1];
+        var selectionLineType = args[1];
         var strokeColor = args[2];
         var isAllRange = args[3];
         var colorN = this.settings.activeCellBorderColor2;
@@ -3561,7 +3561,7 @@
         var ppiX = this._getPPIX(), ppiY = this._getPPIY();
 
         if (!oIntersection) {
-            return;
+            return true;
         }
 
         var width_1px = asc_calcnpt(0, ppiX, 1/*px*/), width_2px = asc_calcnpt(0, ppiX, 2
@@ -3574,6 +3574,8 @@
 
 
         var fHorLine, fVerLine;
+        var isRangeOut = AscCommonExcel.selectionLineType.RangeOut === selectionLineType;
+        var isDashLine = AscCommonExcel.selectionLineType.Dash === selectionLineType;
         if (isDashLine) {
             fHorLine = ctx.dashLineCleverHor;
             fVerLine = ctx.dashLineCleverVer;
@@ -3595,9 +3597,9 @@
         var y1 = r[oIntersection.r1].top - offsetY;
         var y2 = r[oIntersection.r2].top + r[oIntersection.r2].height - offsetY;
 
-        if (!isDashLine) {
+        if (!isDashLine && !isRangeOut) {
             var fillColor = strokeColor.Copy();
-            fillColor.a = 0.1;
+            fillColor.a = 0.15;
             ctx.setFillStyle(fillColor).fillRect(x1, y1, x2 - x1, y2 - y1);
         }
 
@@ -3618,17 +3620,17 @@
         }
         ctx.closePath().stroke();
 
-        if (!isDashLine) {/*Отрисовка светлой полосы при выборе ячеек для формулы*/
+        if (!isDashLine && !isRangeOut) {/*Отрисовка светлой полосы при выборе ячеек для формулы*/
             ctx.setLineWidth(1);
             ctx.setStrokeStyle(colorN);
             ctx.beginPath();
-            if (drawTopSide && !firstRow) {
+            if (drawTopSide) {
                 fHorLine.apply(ctx, [x1, y1 + height_1px, x2 - width_1px]);
             }
             if (drawBottomSide) {
                 fHorLine.apply(ctx, [x1, y2 - height_1px, x2 - width_1px]);
             }
-            if (drawLeftSide && !firstCol) {
+            if (drawLeftSide) {
                 fVerLine.apply(ctx, [x1 + width_1px, y1, y2 - height_2px]);
             }
             if (drawRightSide) {
@@ -3637,42 +3639,56 @@
             ctx.closePath().stroke();
         }
 
+        // draw active cell in selection
+        var isPromote = AscCommonExcel.selectionLineType.RangeWithPromote === selectionLineType;
+        if (isPromote && oIntersection.contains(range.startCol, range.startRow)) {
+            var _x1 = c[range.startCol].left - offsetX + width_1px;
+            var _y1 = r[range.startRow].top - offsetY + height_1px;
+            var _w = c[range.startCol].width - width_2px;
+            var _h = r[range.startRow].height - height_2px;
+            if (0 < _w && 0 < _h) {
+                ctx.clearRect(_x1, _y1, _w, _h);
+            }
+        }
+
         // Отрисовка квадратов для move/resize
-        if (fillColor && !range.isName) {
+        var isResize = AscCommonExcel.selectionLineType.RangeWithResize === selectionLineType;
+        if (isResize || isPromote) {
             ctx.setFillStyle(colorN);
-            if (drawLeftSide && drawTopSide) {
+            if (isResize && drawLeftSide && drawTopSide) {
                 ctx.fillRect(x1 - width_4px, y1 - height_4px, width_7px, height_7px);
             }
-            if (drawRightSide && drawTopSide) {
+            if (isResize && drawRightSide && drawTopSide) {
                 ctx.fillRect(x2 - width_4px, y1 - height_4px, width_7px, height_7px);
+            }
+            if (isResize && drawLeftSide && drawBottomSide) {
+                ctx.fillRect(x1 - width_4px, y2 - height_4px, width_7px, height_7px);
             }
             if (drawRightSide && drawBottomSide) {
                 ctx.fillRect(x2 - width_4px, y2 - height_4px, width_7px, height_7px);
             }
-            if (drawLeftSide && drawBottomSide) {
-                ctx.fillRect(x1 - width_4px, y2 - height_4px, width_7px, height_7px);
-            }
 
             ctx.setFillStyle(strokeColor);
-            if (drawLeftSide && drawTopSide) {
+            if (isResize && drawLeftSide && drawTopSide) {
                 ctx.fillRect(x1 - width_3px, y1 - height_3px, width_5px, height_5px);
             }
-            if (drawRightSide && drawTopSide) {
+            if (isResize && drawRightSide && drawTopSide) {
                 ctx.fillRect(x2 - width_3px, y1 - height_3px, width_5px, height_5px);
+            }
+            if (isResize && drawLeftSide && drawBottomSide) {
+                ctx.fillRect(x1 - width_3px, y2 - height_3px, width_5px, height_5px);
             }
             if (drawRightSide && drawBottomSide) {
                 ctx.fillRect(x2 - width_3px, y2 - height_3px, width_5px, height_5px);
             }
-            if (drawLeftSide && drawBottomSide) {
-                ctx.fillRect(x1 - width_3px, y2 - height_3px, width_5px, height_5px);
-            }
         }
+        return true;
     };
     /**Отрисовывает диапазон с заданными параметрами*/
     WorksheetView.prototype._drawElements = function (drawFunction) {
         var cFrozen = 0, rFrozen = 0, args = Array.prototype.slice.call(arguments,
           1), c = this.cols, r = this.rows, offsetX = c[this.visibleRange.c1].left -
-          this.cellsLeft, offsetY = r[this.visibleRange.r1].top - this.cellsTop;
+          this.cellsLeft, offsetY = r[this.visibleRange.r1].top - this.cellsTop, res;
         if (this.topLeftFrozenCell) {
             cFrozen = this.topLeftFrozenCell.getCol0();
             rFrozen = this.topLeftFrozenCell.getRow0();
@@ -3684,15 +3700,24 @@
             rFrozen -= 1;
             if (0 <= cFrozen && 0 <= rFrozen) {
                 oFrozenRange = new asc_Range(0, 0, cFrozen, rFrozen);
-                drawFunction.call(this, oFrozenRange, c[0].left - this.cellsLeft, r[0].top - this.cellsTop, args);
+                res = drawFunction.call(this, oFrozenRange, c[0].left - this.cellsLeft, r[0].top - this.cellsTop, args);
+                if (!res) {
+                    return;
+                }
             }
             if (0 <= cFrozen) {
                 oFrozenRange = new asc_Range(0, this.visibleRange.r1, cFrozen, this.visibleRange.r2);
-                drawFunction.call(this, oFrozenRange, c[0].left - this.cellsLeft, offsetY, args);
+                res = drawFunction.call(this, oFrozenRange, c[0].left - this.cellsLeft, offsetY, args);
+                if (!res) {
+                    return;
+                }
             }
             if (0 <= rFrozen) {
                 oFrozenRange = new asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen);
-                drawFunction.call(this, oFrozenRange, offsetX, r[0].top - this.cellsTop, args);
+                res = drawFunction.call(this, oFrozenRange, offsetX, r[0].top - this.cellsTop, args);
+                if (!res) {
+                    return;
+                }
             }
         }
 
@@ -3704,6 +3729,7 @@
      * Рисует выделение вокруг ячеек
      */
     WorksheetView.prototype._drawSelection = function () {
+        var isShapeSelect = false;
         if (window['IS_NATIVE_EDITOR']) {
             return;
         }
@@ -3725,392 +3751,63 @@
                 this._drawFormulaRanges(this.arrActiveFormulaRanges);
             }
         } else {
-            this._drawSelectionRange();
+            isShapeSelect = (asc["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists());
+            if (isShapeSelect) {
+                if (this.isChartAreaEditMode) {
+                    this._drawFormulaRanges(this.arrActiveChartsRanges);
+                }
+            } else {
+                this._drawSelectionRange();
+
+                if (this.isFormulaEditMode) {
+                    this._drawFormulaRanges(this.arrActiveFormulaRanges);
+                }
+                if (this.isChartAreaEditMode) {
+                    this._drawFormulaRanges(this.arrActiveChartsRanges);
+                }
+                if (this.isSelectionDialogMode) {
+                    this._drawSelectRange(this.activeRange.clone(true));
+                }
+                if (this.stateFormatPainter && this.handlers.trigger('isActive')) {
+                    this._drawFormatPainterRange();
+                }
+                if (null !== this.activeMoveRange) {
+                    this._drawElements(this._drawSelectionElement, this.activeMoveRange,
+                      AscCommonExcel.selectionLineType.RangeOut, new CColor(0, 0, 0));
+                }
+            }
         }
 
         // restore canvas' original clipping range
         ctx.restore();
 
-        if (!isOtherSelectionMode) {
+        if (!isOtherSelectionMode && !isShapeSelect) {
             this._drawActiveHeaders();
         }
     };
 
-    WorksheetView.prototype._drawSelectionRange = function ( range, isFrozen ) {
-        isFrozen = !!isFrozen;
-        if ( asc["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists() ) {
-            if ( this.isChartAreaEditMode ) {
-                this._drawFormulaRanges( this.arrActiveChartsRanges );
-            }
-            return;
-        }
-
-        if ( c_oAscSelectionType.RangeMax === this.activeRange.type ) {
+    WorksheetView.prototype._drawSelectionRange = function (range) {
+        if (c_oAscSelectionType.RangeMax === this.activeRange.type) {
             this.activeRange.c2 = this.cols.length - 1;
             this.activeRange.r2 = this.rows.length - 1;
-        }
-        else if ( c_oAscSelectionType.RangeCol === this.activeRange.type ) {
+        } else if (c_oAscSelectionType.RangeCol === this.activeRange.type) {
             this.activeRange.r2 = this.rows.length - 1;
-        }
-        else if ( c_oAscSelectionType.RangeRow === this.activeRange.type ) {
+        } else if (c_oAscSelectionType.RangeRow === this.activeRange.type) {
             this.activeRange.c2 = this.cols.length - 1;
         }
 
-        var diffWidth = 0, diffHeight = 0;
-        if ( this.topLeftFrozenCell ) {
-            var cFrozen = this.topLeftFrozenCell.getCol0();
-            var rFrozen = this.topLeftFrozenCell.getRow0();
-            diffWidth = this.cols[cFrozen].left - this.cols[0].left;
-            diffHeight = this.rows[rFrozen].top - this.rows[0].top;
+        this._drawElements(this._drawSelectionElement, this.activeRange,
+          AscCommonExcel.selectionLineType.RangeWithPromote, this.settings.activeCellBorderColor);
 
-            if ( !isFrozen ) {
-                var oFrozenRange;
-                cFrozen -= 1;
-                rFrozen -= 1;
-                if ( 0 <= cFrozen && 0 <= rFrozen ) {
-                    oFrozenRange = new asc_Range( 0, 0, cFrozen, rFrozen );
-                    this._drawSelectionRange( oFrozenRange, true );
-                }
-                if ( 0 <= cFrozen ) {
-                    oFrozenRange = new asc_Range( 0, this.visibleRange.r1, cFrozen, this.visibleRange.r2 );
-                    this._drawSelectionRange( oFrozenRange, true );
-                }
-                if ( 0 <= rFrozen ) {
-                    oFrozenRange = new asc_Range( this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen );
-                    this._drawSelectionRange( oFrozenRange, true );
-                }
-            }
-        }
-
-        var tmpRange = range;
-        if ( !this.isSelectionDialogMode ) {
-            range = this.activeRange.intersection( range !== undefined ? range : this.visibleRange );
-        }
-        else {
-            range = this.copyActiveRange.intersection( range !== undefined ? range : this.visibleRange );
-        }
-
-        // Copy fill Handle
-        var aFH = null;
-        // Вхождение range
-        var aFHIntersection = null;
-        if ( this.activeFillHandle !== null ) {
-            // Мы в режиме автозаполнения
-            aFH = this.activeFillHandle.clone( true );
-            aFHIntersection = this.activeFillHandle.intersection( tmpRange !== undefined ? tmpRange : this.visibleRange );
-        }
-
-        if ( !range && !aFHIntersection && !this.isFormulaEditMode && !this.activeMoveRange && !this.isChartAreaEditMode ) {
-            if ( !isFrozen ) {
-                this._drawActiveHeaders();
-                if ( this.isSelectionDialogMode ) {
-                    this._drawSelectRange( this.activeRange.clone( true ) );
-                }
-            }
-            return;
-        }
-
-        var ctx = this.overlayCtx;
-        var opt = this.settings;
-        var offsetX, offsetY;
-        if ( isFrozen ) {
-            if ( tmpRange.c1 !== this.visibleRange.c1 ) {
-                diffWidth = 0;
-            }
-            if ( tmpRange.r1 !== this.visibleRange.r1 ) {
-                diffHeight = 0;
-            }
-            offsetX = this.cols[tmpRange.c1].left - this.cellsLeft - diffWidth;
-            offsetY = this.rows[tmpRange.r1].top - this.cellsTop - diffHeight;
-        }
-        else {
-            offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft - diffWidth;
-            offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
-        }
-
-        var arn = (!this.isSelectionDialogMode) ? this.activeRange.clone( true ) : this.copyActiveRange.clone( true );
-        var x1 = (range) ? (this.cols[range.c1].left - offsetX - this.width_1px) : 0;
-        var x2 = (range) ? (this.cols[range.c2].left + this.cols[range.c2].width - offsetX - this.width_1px) : 0;
-        var y1 = (range) ? (this.rows[range.r1].top - offsetY) : 0;
-        var y2 = (range) ? (this.rows[range.r2].top + this.rows[range.r2].height - offsetY - this.height_1px) : 0;
-        var drawLeftSide = (range) ? (range.c1 === arn.c1) : false;
-        var drawRightSide = (range) ? (range.c2 === arn.c2 && y2 >= y1) : false;
-        var drawTopSide = (range) ? (range.r1 === arn.r1) : false;
-        var drawBottomSide = (range) ? (range.r2 === arn.r2 && y2 >= y1) : false;
-        var l, t, r, b, cr;
-        // Размеры "квадрата" автозаполнения
-        var fillHandleWidth = 2 * this.width_2px + this.width_1px;
-        var fillHandleHeight = 2 * this.height_2px + this.height_1px;
-
-        // Координаты выделения для автозаполнения
-        var xFH1 = 0;
-        var xFH2 = 0;
-        var yFH1 = 0;
-        var yFH2 = 0;
-        // Рисуем ли мы стороны автозаполнения
-        var drawLeftFillHandle;
-        var drawRightFillHandle;
-        var drawTopFillHandle;
-        var drawBottomFillHandle;
-
-        // draw frame around cells range
-        l = drawLeftSide ? -this.width_1px : 0;
-        r = drawRightSide ? this.width_1px : 0;
-        t = drawTopSide ? -this.height_1px : 0;
-        b = drawBottomSide ? this.height_2px : 0;
-
-        ctx.setStrokeStyle( opt.activeCellBorderColor )
-            .setLineWidth( 3 )
-            .beginPath();
-
-        if ( aFHIntersection ) {
-            // Считаем координаты автозаполнения
-            xFH1 = this.cols[aFHIntersection.c1].left - offsetX - this.width_1px;
-            xFH2 = this.cols[aFHIntersection.c2].left + this.cols[aFHIntersection.c2].width - offsetX - this.width_1px;
-            yFH1 = this.rows[aFHIntersection.r1].top - offsetY;
-            yFH2 = this.rows[aFHIntersection.r2].top + this.rows[aFHIntersection.r2].height - offsetY - this.height_1px;
-            drawLeftFillHandle = aFHIntersection.c1 === aFH.c1;
-            drawRightFillHandle = aFHIntersection.c2 === aFH.c2;
-            drawTopFillHandle = aFHIntersection.r1 === aFH.r1;
-            drawBottomFillHandle = aFHIntersection.r2 === aFH.r2;
-
-            // Если мы не в нулевом состоянии, то рисуем обводку автозаполнения (толстой линией)
-            if ( aFHIntersection.c1 !== aFHIntersection.c2 || aFHIntersection.r1 !== aFHIntersection.r2 || 2 !== this.fillHandleArea ) {
-                if ( drawTopFillHandle ) {
-                    ctx.lineHor( xFH1 + l, yFH1 - this.height_1px, xFH2 + this.width_1px + r );
-                }
-                if ( drawBottomFillHandle ) {
-                    ctx.lineHor( xFH1 + l, yFH2, xFH2 + this.width_1px + r );
-                }
-                if ( drawLeftFillHandle ) {
-                    ctx.lineVer( xFH1, yFH1 + t, yFH2 + b );
-                }
-                if ( drawRightFillHandle ) {
-                    ctx.lineVer( xFH2, yFH1 + t, yFH2 + b );
-                }
-            }
-
-            // Для некоторых вариантов областей нужно дорисовывать обводку для выделенной области
-            switch ( this.fillHandleArea ) {
-                case 1:
-                    switch ( this.fillHandleDirection ) {
-                        case 0:
-                            // Горизонтальный
-                            if ( drawLeftSide ) {
-                                ctx.lineVer( x1, y1 + t, y2 + b );
-                            }
-                            break;
-                        case 1:
-                            // Вертикальный
-                            if ( drawTopSide ) {
-                                ctx.lineHor( x1 + l, y1 - this.height_1px, x2 + this.width_1px + r );
-                            }
-                            break;
-                    }
-                    break;
-                case 2:
-                    // Для внутренней области нужны все обводки
-                    if ( drawTopSide ) {
-                        ctx.lineHor( x1 + l, y1 - this.height_1px, x2 + this.width_1px + r );
-                    }
-                    if ( drawBottomSide ) {
-                        ctx.lineHor( x1 + l, y2, x2 + this.width_1px + r );
-                    }
-                    if ( drawLeftSide ) {
-                        ctx.lineVer( x1, y1 + t, y2 + b );
-                    }
-                    if ( drawRightSide ) {
-                        ctx.lineVer( x2, y1 + t, y2 + b );
-                    }
-                    break;
-                case 3:
-                    switch ( this.fillHandleDirection ) {
-                        case 0:
-                            // Горизонтальный
-                            if ( range && aFH.c2 !== range.c2 ) {
-                                if ( drawRightSide ) {
-                                    ctx.lineVer( x2, y1 + t, y2 + b );
-                                }
-                            }
-                            break;
-                        case 1:
-                            // Вертикальный
-                            if ( range && aFH.r2 !== range.r2 ) {
-                                if ( drawBottomSide ) {
-                                    ctx.lineHor( x1 + l, y2, x2 + this.width_1px + r );
-                                }
-                            }
-                            break;
-                    }
-                    break;
-            }
-
-            ctx.stroke();
-        }
-        else {
-            // Автозаполнения нет, просто рисуем обводку
-            if ( drawTopSide ) {
-                ctx.lineHor( x1 + l, y1 - this.height_1px, x2 + this.width_1px + r );
-            }
-            if ( drawBottomSide ) {
-                if ( isFrozen && !drawRightSide ) {
-                    fillHandleWidth = 0;
-                }
-                ctx.lineHor( x1 + l, y2, x2 + this.width_1px + r - fillHandleWidth );
-            }
-            if ( drawLeftSide ) {
-                ctx.lineVer( x1, y1 + t, y2 + b );
-            }
-            if ( drawRightSide ) {
-                if ( isFrozen && !drawBottomSide ) {
-                    fillHandleHeight = 0;
-                }
-                ctx.lineVer( x2, y1 + t, y2 + b - fillHandleHeight );
-            }
-        }
-        ctx.stroke();
-
-        // draw cells overlay
-        if ( range ) {
-            if ( y2 >= y1 ) {
-                var lRect = x1 + (drawLeftSide ? this.width_3px : this.width_1px), rRect = x2 - (drawRightSide ? this.width_2px : 0), tRect = y1 + (drawTopSide ? this.height_2px : 0), bRect = y2 - (drawBottomSide ? this.width_2px : 0);
-                ctx.setFillStyle( opt.activeCellBackground )
-                    .fillRect( lRect, tRect, rRect - lRect, bRect - tRect );
-
-                var lRect2 = x1 + (drawLeftSide ? this.width_2px : this.width_1px), rRect2 = x2 - (drawRightSide ? this.width_2px : 0), tRect2 = y1 + (drawTopSide ? this.height_1px : 0), bRect2 = y2 - (drawBottomSide ? this.width_2px : 0);
-                ctx.setStrokeStyle( opt.activeCellBorderColor2 ).setLineWidth( 1 ).beginPath()
-                    .strokeRect( lRect2, tRect2, rRect2 - lRect2, bRect2 - tRect2 );
-
-                var firstCell = (!this.isSelectionDialogMode) ? this.activeRange : this.copyActiveRange;
-                cr = this.model.getMergedByCell( firstCell.startRow, firstCell.startCol );
-                // Проверяем скрыта ли ячейка выделения
-                // Получаем активную ячейку в выделении
-                cr = range.intersection( null !== cr ? cr : new asc_Range( firstCell.startCol, firstCell.startRow, firstCell.startCol, firstCell.startRow ) );
-                if ( cr !== null ) {
-                    ctx.save().beginPath().rect( lRect, tRect, rRect - lRect, bRect - tRect ).clip();
-                    var _l = this.cols[cr.c1].left - offsetX - this.width_1px, _r = this.cols[cr.c2].left + this.cols[cr.c2].width - offsetX, _t = this.rows[cr.r1].top - offsetY - this.height_1px, _b = this.rows[cr.r2].top + this.rows[cr.r2].height - offsetY;
-                    ctx.clearRect( _l, _t, _r - _l, _b - _t ).restore();
-                }
-
-                if ( !(isFrozen && (!drawRightSide || !drawBottomSide)) ) {
-                    // Рисуем "квадрат" для автозаполнения (располагается "квадрат" в правом нижнем углу последней ячейки выделения)
-                    cr = range.intersection( new asc_Range( range.c2, range.r2, range.c2, range.r2 ) );
-                    if ( cr !== null ) {
-                        this.fillHandleL = this.cols[cr.c1].left - offsetX + this.cols[cr.c1].width - this.width_1px - this.width_2px;
-                        this.fillHandleR = this.fillHandleL + fillHandleWidth;
-                        this.fillHandleT = this.rows[cr.r1].top - offsetY + this.rows[cr.r1].height - this.height_1px - this.height_2px;
-                        this.fillHandleB = this.fillHandleT + fillHandleHeight;
-
-                        ctx.setFillStyle( opt.activeCellBorderColor2 )
-							.fillRect( this.fillHandleL - this.width_1px, this.fillHandleT - this.height_1px, this.fillHandleR - this.fillHandleL + this.width_2px, this.fillHandleB - this.fillHandleT + this.height_2px);
-
-                        ctx.setFillStyle( opt.activeCellBorderColor )
-							.fillRect( this.fillHandleL, this.fillHandleT, this.fillHandleR - this.fillHandleL, this.fillHandleB - this.fillHandleT );
-
-                    }
-                }
-            }
-            else {
-                this.fillHandleL = this.fillHandleR = this.fillHandleT = this.fillHandleB = -1;
-            }
-        }
-
-        // draw fill handle select
-        if ( this.activeFillHandle !== null ) {
-            if ( 2 === this.fillHandleArea && (aFH.c1 !== aFH.c2 || aFH.r1 !== aFH.r2) ) {
-                // Для внутренней области мы должны "залить" еще и область автозаполнения
-                var lFH = xFH1 + (drawLeftFillHandle ? this.width_3px : this.width_1px), rFH = xFH2 - (drawRightFillHandle ? this.width_2px : 0), tFH = yFH1 + (drawTopFillHandle ? this.height_2px : 0), bFH = yFH2 - (drawBottomFillHandle ? this.width_2px : 0);
-                ctx.setFillStyle( opt.activeCellBackground )
-                    .fillRect( lFH, tFH, rFH - lFH, bFH - tFH );
-            }
-
-            ctx.setStrokeStyle( opt.fillHandleBorderColorSelect ).setLineWidth( 1 ).beginPath();
-
-            if ( aFH.c1 !== aFH.c2 || aFH.r1 !== aFH.r2 || 2 !== this.fillHandleArea ) {
-                // Рисуем обводку для области автозаполнения, если мы выделили что-то
-                if ( drawTopFillHandle ) {
-                    ctx.lineHor( xFH1 + l + this.width_1px, yFH1 - this.height_1px, xFH2 + r );
-                }
-                if ( drawBottomFillHandle ) {
-                    ctx.lineHor( xFH1 + l + this.width_1px, yFH2, xFH2 + r );
-                }
-                if ( drawLeftFillHandle ) {
-                    ctx.lineVer( xFH1, yFH1 + t + this.height_1px, yFH2 + b - this.height_1px );
-                }
-                if ( drawRightFillHandle ) {
-                    ctx.lineVer( xFH2, yFH1 + t + this.height_1px, yFH2 + b - this.height_1px );
-                }
-            }
-
-            if ( 2 === this.fillHandleArea ) {
-                // Если мы внутри, еще рисуем обводку для выделенной области
-                if ( drawTopSide ) {
-                    ctx.lineHor( x1 + l + this.width_1px, y1 - this.height_1px, x2 + r - this.width_1px );
-                }
-                if ( drawBottomSide ) {
-                    ctx.lineHor( x1 + l + this.width_1px, y2, x2 + r - this.width_1px );
-                }
-                if ( drawLeftSide ) {
-                    ctx.lineVer( x1, y1 + t + this.height_1px, y2 + b - this.height_1px );
-                }
-                if ( drawRightSide ) {
-                    ctx.lineVer( x2, y1 + t + this.height_1px, y2 + b - this.height_1px );
-                }
-            }
-
-            ctx.stroke();
-        }
-
-        if ( !isFrozen && this.isFormulaEditMode ) {
-            this._drawFormulaRanges( this.arrActiveFormulaRanges );
-        }
-
-        if ( !isFrozen && this.isChartAreaEditMode ) {
-            this._drawFormulaRanges( this.arrActiveChartsRanges );
-        }
-
-        if ( !isFrozen && this.isSelectionDialogMode ) {
-            this._drawSelectRange( this.activeRange.clone( true ) );
-        }
-        if ( !isFrozen && this.stateFormatPainter && this.handlers.trigger('isActive') ) {
-            this._drawFormatPainterRange();
-        }
-
-        if ( null !== this.activeMoveRange ) {
-            ctx.setStrokeStyle( new CColor( 0, 0, 0 ) )
-                .setLineWidth( 1 )
-                .beginPath();
-            var aActiveMoveRangeIntersection = this.activeMoveRange.intersection( tmpRange !== undefined ? tmpRange : this.visibleRange );
-            if ( aActiveMoveRangeIntersection ) {
-                var drawLeftSideMoveRange = aActiveMoveRangeIntersection.c1 === this.activeMoveRange.c1;
-                var drawRightSideMoveRange = aActiveMoveRangeIntersection.c2 === this.activeMoveRange.c2;
-                var drawTopSideMoveRange = aActiveMoveRangeIntersection.r1 === this.activeMoveRange.r1;
-                var drawBottomSideMoveRange = aActiveMoveRangeIntersection.r2 === this.activeMoveRange.r2;
-
-                var xMoveRange1 = this.cols[aActiveMoveRangeIntersection.c1].left - offsetX - this.width_1px;
-                var xMoveRange2 = this.cols[aActiveMoveRangeIntersection.c2].left + this.cols[aActiveMoveRangeIntersection.c2].width - offsetX - this.width_1px;
-                var yMoveRange1 = this.rows[aActiveMoveRangeIntersection.r1].top - offsetY;
-                var yMoveRange2 = this.rows[aActiveMoveRangeIntersection.r2].top + this.rows[aActiveMoveRangeIntersection.r2].height - offsetY - this.height_1px;
-
-                if ( drawTopSideMoveRange ) {
-                    ctx.lineHor( xMoveRange1, yMoveRange1 - this.height_1px, xMoveRange2 + this.width_1px );
-                }
-                if ( drawBottomSideMoveRange ) {
-                    ctx.lineHor( xMoveRange1, yMoveRange2, xMoveRange2 + this.width_1px );
-                }
-                if ( drawLeftSideMoveRange ) {
-                    ctx.lineVer( xMoveRange1, yMoveRange1, yMoveRange2 );
-                }
-                if ( drawRightSideMoveRange ) {
-                    ctx.lineVer( xMoveRange2, yMoveRange1, yMoveRange2 );
-                }
-            }
-            ctx.stroke();
+        if (this.activeFillHandle) {
+            this._drawElements(this._drawSelectionElement, this.activeFillHandle.clone(true),
+              AscCommonExcel.selectionLineType.RangeOut, this.settings.activeCellBorderColor);
         }
     };
 
     WorksheetView.prototype._drawFormatPainterRange = function () {
-        this._drawElements(this._drawSelectionElement, this.copyActiveRange, true, new CColor(0, 0, 0));
+        this._drawElements(this._drawSelectionElement, this.copyActiveRange, AscCommonExcel.selectionLineType.Dash,
+          new CColor(0, 0, 0));
     };
 
     WorksheetView.prototype._drawFormulaRanges = function (arrRanges) {
@@ -4118,9 +3815,6 @@
         var strokeColor, colorIndex, uniqueColorIndex = 0, tmpColors = [];
         for (i = 0; i < arrRanges.length; ++i) {
             var oFormulaRange = arrRanges[i].clone(true);
-            if (arrRanges[i].isName) {
-                oFormulaRange.isName = true;
-            }
             colorIndex = asc.getUniqueRangeColor(arrRanges, i, tmpColors);
             if (null == colorIndex) {
                 colorIndex = uniqueColorIndex++;
@@ -4128,12 +3822,14 @@
             tmpColors.push(colorIndex);
 
             strokeColor = AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % length];
-            this._drawElements(this._drawSelectionElement, oFormulaRange, false, strokeColor);
+            this._drawElements(this._drawSelectionElement, oFormulaRange,
+              arrRanges[i].isName ? AscCommonExcel.selectionLineType.Range :
+                AscCommonExcel.selectionLineType.RangeWithResize, strokeColor);
         }
     };
 
     WorksheetView.prototype._drawSelectRange = function (oSelectRange) {
-        this._drawElements(this._drawSelectionElement, oSelectRange, true,
+        this._drawElements(this._drawSelectionElement, oSelectRange, AscCommonExcel.selectionLineType.Dash,
           AscCommonExcel.c_oAscCoAuthoringOtherBorderColor);
     };
 
@@ -4152,7 +3848,8 @@
             var isAllRange = true, strokeColor = (Asc.c_oAscMouseMoveLockedObjectType.TableProperties ===
             nLockAllType) ? AscCommonExcel.c_oAscCoAuthoringLockTablePropertiesBorderColor :
               AscCommonExcel.c_oAscCoAuthoringOtherBorderColor, oAllRange = new asc_Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
-            this._drawElements(this._drawSelectionElement, oAllRange, true, strokeColor, isAllRange);
+            this._drawElements(this._drawSelectionElement, oAllRange, AscCommonExcel.selectionLineType.Dash,
+              strokeColor, isAllRange);
         }
     };
 
@@ -4171,7 +3868,8 @@
 
         for (i = 0; i < arrayCells.length; ++i) {
             oCellTmp = new asc_Range(arrayCells[i].c1, arrayCells[i].r1, arrayCells[i].c2, arrayCells[i].r2);
-            this._drawElements(this._drawSelectionElement, oCellTmp, true, strokeColor);
+            this._drawElements(this._drawSelectionElement, oCellTmp, AscCommonExcel.selectionLineType.Dash,
+              strokeColor);
         }
     };
 
@@ -6231,90 +5929,114 @@
         return null;
     };
 
-    WorksheetView.prototype._getCursorFormulaOrChart = function ( vr, x, y, offsetX, offsetY ) {
-        var i, l;
-        var cursor, oFormulaRange, oFormulaRangeIn, xFormula1, xFormula2, yFormula1, yFormula2;
+    WorksheetView.prototype._hitResizeCorner = function (x1, y1, x2, y2) {
+        var wEps = this.width_1px, hEps = this.height_1px;
+        return Math.abs(x2 - x1) <= wEps + this.width_2px && Math.abs(y2 - y1) <= hEps + this.height_2px;
+    };
+    WorksheetView.prototype._hitInRange = function (range, rangeType, vr, x, y, offsetX, offsetY) {
+        var wEps = this.width_2px, hEps = this.height_2px;
+        var cursor, x1, x2, y1, y2, isResize;
         var col = -1, row = -1;
-        var arrRanges = this.isFormulaEditMode ? this.arrActiveFormulaRanges : this.arrActiveChartsRanges, targetArr = this.isFormulaEditMode ? 0 : -1;
-		var ppiX = this._getPPIX(), ppiY = this._getPPIY();
-		var width_1px = asc_calcnpt( 0, ppiX, 1/*px*/ ),
-			width_2px = asc_calcnpt( 0, ppiX, 2/*px*/ ),
-			width_3px = asc_calcnpt( 0, ppiX, 3/*px*/ ),
-			width_4px = asc_calcnpt( 0, ppiX, 4/*px*/ ),
-			width_5px = asc_calcnpt( 0, ppiX, 5/*px*/ ),
-			width_7px = asc_calcnpt( 0, ppiX, 7/*px*/ ),
 
-			height_1px = asc_calcnpt( 0, ppiY, 1/*px*/ ),
-			height_2px = asc_calcnpt( 0, ppiY, 2/*px*/ ),
-			height_3px = asc_calcnpt( 0, ppiY, 3/*px*/ ),
-			height_4px = asc_calcnpt( 0, ppiY, 4/*px*/ ),
-			height_5px = asc_calcnpt( 0, ppiY, 5/*px*/ ),
-			height_7px = asc_calcnpt( 0, ppiY, 7/*px*/ );
+        var oFormulaRangeIn = range.intersectionSimple(vr);
+        if (oFormulaRangeIn) {
+            x1 = this.cols[oFormulaRangeIn.c1].left - offsetX;
+            x2 = this.cols[oFormulaRangeIn.c2].left + this.cols[oFormulaRangeIn.c2].width - offsetX;
+            y1 = this.rows[oFormulaRangeIn.r1].top - offsetY;
+            y2 = this.rows[oFormulaRangeIn.r2].top + this.rows[oFormulaRangeIn.r2].height - offsetY;
 
-        for ( i = 0, l = arrRanges.length; i < l; ++i ) {
-            oFormulaRange = arrRanges[i].clone( true );
-            oFormulaRange.isName = arrRanges[i].isName;
-            oFormulaRangeIn = oFormulaRange.intersectionSimple( vr );
-            if ( oFormulaRangeIn && !oFormulaRange.isName ) {
-                xFormula1 = this.cols[oFormulaRangeIn.c1].left - offsetX;
-                xFormula2 = this.cols[oFormulaRangeIn.c2].left + this.cols[oFormulaRangeIn.c2].width - offsetX;
-                yFormula1 = this.rows[oFormulaRangeIn.r1].top - offsetY;
-                yFormula2 = this.rows[oFormulaRangeIn.r2].top + this.rows[oFormulaRangeIn.r2].height - offsetY;
+            isResize = AscCommonExcel.selectionLineType.RangeWithResize === rangeType;
 
-                if ( (x >= xFormula1 + width_3px && x <= xFormula2 - width_5px) &&
-					 ((y >= yFormula1 - height_2px && y <= yFormula1 + height_2px) || (y >= yFormula2 - height_2px && y <= yFormula2 + height_2px)) ||
-					 (y >= yFormula1 + height_3px && y <= yFormula2 - height_5px) &&
-					 ((x >= xFormula1 - width_2px && x <= xFormula1 + width_2px) || (x >= xFormula2 - width_2px && x <= xFormula2 + width_2px)) ) {
-                    cursor = kCurMove;
-                    break;
-                }
-				else if ( x >= xFormula1 - width_3px && x < xFormula1 + width_2px && y >= yFormula1 - height_3px && y < yFormula1 + height_2px ) {/*TOP-LEFT*/
-                    cursor = kCurSEResize;
-                    col = oFormulaRange.c2;
-                    row = oFormulaRange.r2;
-                    break;
-                }
-				else if ( x > xFormula2 - width_3px && x <= xFormula2 + width_2px && y >= yFormula1 - height_3px && y < yFormula1 + height_2px ) {/*TOP-RIGHT*/
-					cursor = kCurNEResize;
-					col = oFormulaRange.c1;
-					row = oFormulaRange.r2;
-					break;
-				}
-                else if ( x > xFormula2 - width_3px && x <= xFormula2 + width_2px && y > yFormula2 - height_3px && y <= yFormula2 + height_2px ) {/*BOTTOM-RIGHT*/
-                    cursor = kCurSEResize;
-                    col = oFormulaRange.c1;
-                    row = oFormulaRange.r1;
-                    break;
-                }
-                else if ( x >= xFormula1 - width_3px && x < xFormula1 + width_2px && y > yFormula2 - height_3px && y <= yFormula2 + height_2px ) {/*BOTTOM-LEFT*/
-                    cursor = kCurNEResize;
-                    col = oFormulaRange.c2;
-                    row = oFormulaRange.r1;
-                    break;
-                }
+            if (isResize && this._hitResizeCorner(x1 - this.width_1px, y1 - this.height_1px, x, y)) {
+                /*TOP-LEFT*/
+                cursor = kCurSEResize;
+                col = range.c2;
+                row = range.r2;
+            } else if (isResize && this._hitResizeCorner(x2, y1 - this.height_1px, x, y)) {
+                /*TOP-RIGHT*/
+                cursor = kCurNEResize;
+                col = range.c1;
+                row = range.r2;
+            } else if (isResize && this._hitResizeCorner(x1 - this.width_1px, y2, x, y)) {
+                /*BOTTOM-LEFT*/
+                cursor = kCurNEResize;
+                col = range.c2;
+                row = range.r1;
+            } else if (this._hitResizeCorner(x2, y2, x, y)) {
+                /*BOTTOM-RIGHT*/
+                cursor = kCurSEResize;
+                col = range.c1;
+                row = range.r1;
+            } else if ((((range.c1 === oFormulaRangeIn.c1 && Math.abs(x - x1) <= wEps) ||
+              (range.c2 === oFormulaRangeIn.c2 && Math.abs(x - x2) <= wEps)) && hEps <= y - y1 &&
+              y - y2 <= hEps) || (((range.r1 === oFormulaRangeIn.r1 && Math.abs(y - y1) <= hEps) ||
+              (range.r2 === oFormulaRangeIn.r2 && Math.abs(y - y2) <= hEps)) && wEps <= x - x1 &&
+              x - x2 <= wEps)) {
+                cursor = kCurMove;
             }
         }
+
         return cursor ? {
-            cursor           : cursor,
-            target           : c_oTargetType.MoveResizeRange,
-            col              : col,
-            row              : row,
-            formulaRange     : oFormulaRange,
-            indexFormulaRange: i,
-            targetArr        : targetArr
+            cursor: cursor,
+            col: col,
+            row: row
         } : null;
     };
-    WorksheetView.prototype._isCursorOnSelectionBorder = function ( ar, vr, x, y ) {
-        var arIntersection = ar.intersectionSimple( vr );
+
+    WorksheetView.prototype._hitCursorSelectionRange = function (vr, x, y, offsetX, offsetY) {
+        var res = this._hitInRange(this.activeRange, AscCommonExcel.selectionLineType.RangeWithPromote, vr, x, y,
+          offsetX, offsetY);
+        return res ? {
+            cursor: kCurMove === res.cursor ? kCurMove : kCurFillHandle,
+            target: kCurMove === res.cursor ? c_oTargetType.MoveRange : c_oTargetType.FillHandle,
+            col: -1,
+            row: -1
+        } : null;
+    };
+
+    WorksheetView.prototype._hitCursorFormulaOrChart = function (vr, x, y, offsetX, offsetY) {
+        var i, l, res;
+        var oFormulaRange;
+        var arrRanges = this.isFormulaEditMode ? this.arrActiveFormulaRanges : this.arrActiveChartsRanges;
+        var targetArr = this.isFormulaEditMode ? 0 : -1;
+
+        for (i = 0, l = arrRanges.length; i < l; ++i) {
+            oFormulaRange = arrRanges[i].clone(true);
+            oFormulaRange.isName = arrRanges[i].isName;
+            res = !oFormulaRange.isName &&
+              this._hitInRange(oFormulaRange, AscCommonExcel.selectionLineType.RangeWithResize, vr, x, y, offsetX,
+                offsetY);
+            if (res) {
+                break;
+            }
+
+        }
+        return res ? {
+            cursor: res.cursor,
+            target: c_oTargetType.MoveResizeRange,
+            col: res.col,
+            row: res.row,
+            formulaRange: oFormulaRange,
+            indexFormulaRange: i,
+            targetArr: targetArr
+        } : null;
+    };
+    WorksheetView.prototype._isCursorOnSelectionBorder = function (ar, vr, x, y) {
+        var arIntersection = ar.intersectionSimple(vr);
         var left, top, right, bottom, wEps = this.width_2px, hEps = this.height_2px;
-        if ( arIntersection ) {
+        if (arIntersection) {
             left = ar.c1 === arIntersection.c1 ? this.cols[ar.c1].left : null;
             right = ar.c2 === arIntersection.c2 ? this.cols[ar.c2].left + this.cols[ar.c2].width : null;
             top = ar.r1 === arIntersection.r1 ? this.rows[ar.r1].top : null;
             bottom = ar.r2 === arIntersection.r2 ? this.rows[ar.r2].top + this.rows[ar.r2].height : null;
-            var isLeft = (null !== left && x >= left - wEps && x <= left + wEps), isRight = (null !== right && x >= right - wEps && x <= right + wEps), isTop = (null !== top && y >= top - hEps && y <= top + hEps), isBottom = (null !== bottom && y >= bottom - hEps && y <= bottom + hEps), isHorMiddle = ((null === left || x >= left - wEps) && (null === right || x <= right + wEps)), isVerMiddle = ((null === top || y >= top - hEps) && (null === bottom || y <= bottom + hEps));
+            var isLeft = (null !== left && x >= left - wEps && x <= left + wEps), isRight = (null !== right &&
+            x >= right - wEps && x <= right + wEps), isTop = (null !== top && y >= top - hEps &&
+            y <= top + hEps), isBottom = (null !== bottom && y >= bottom - hEps &&
+            y <= bottom + hEps), isHorMiddle = ((null === left || x >= left - wEps) &&
+            (null === right || x <= right + wEps)), isVerMiddle = ((null === top || y >= top - hEps) &&
+            (null === bottom || y <= bottom + hEps));
 
-            if ( ((isLeft || isRight) && isVerMiddle) || ((isTop || isBottom) && isHorMiddle) ) {
+            if (((isLeft || isRight) && isVerMiddle) || ((isTop || isBottom) && isHorMiddle)) {
                 // Мы навели на границу выделения
                 return true;
             }
@@ -6322,92 +6044,94 @@
         return false;
     };
 
-    WorksheetView.prototype.getCursorTypeFromXY = function ( x, y, isViewerMode ) {
-        var c, r, f, i, offsetX, offsetY, cellCursor, sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink, widthDiff = 0, heightDiff = 0, isLocked = false, ar = this.activeRange, target = c_oTargetType.Cells, row = -1, col = -1, isSelGraphicObject, isNotFirst;
+    WorksheetView.prototype.getCursorTypeFromXY = function (x, y, isViewerMode) {
+        var res, c, r, f, i, offsetX, offsetY, cellCursor, sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink, widthDiff = 0, heightDiff = 0, isLocked = false, ar = this.activeRange, target = c_oTargetType.Cells, row = -1, col = -1, isSelGraphicObject, isNotFirst;
 
-        var frozenCursor = this._isFrozenAnchor( x, y );
-        if ( !isViewerMode && frozenCursor.result ) {
-            lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Object, null, sheetId, AscCommonExcel.c_oAscLockNameFrozenPane );
-            isLocked = this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, false );
-            if ( false !== isLocked ) {
+        var frozenCursor = this._isFrozenAnchor(x, y);
+        if (!isViewerMode && frozenCursor.result) {
+            lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId,
+              AscCommonExcel.c_oAscLockNameFrozenPane);
+            isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false);
+            if (false !== isLocked) {
                 // Кто-то сделал lock
-                var frozenCell = this.topLeftFrozenCell ? this.topLeftFrozenCell : new AscCommon.CellAddress( 0, 0, 0 );
+                var frozenCell = this.topLeftFrozenCell ? this.topLeftFrozenCell : new AscCommon.CellAddress(0, 0, 0);
                 userId = isLocked.UserId;
-                lockRangePosLeft = this.getCellLeft( frozenCell.getCol0(), 0 );
-                lockRangePosTop = this.getCellTop( frozenCell.getRow0(), 0 );
+                lockRangePosLeft = this.getCellLeft(frozenCell.getCol0(), 0);
+                lockRangePosTop = this.getCellTop(frozenCell.getRow0(), 0);
             }
             return {
-                cursor          : frozenCursor.cursor,
-                target          : frozenCursor.name,
-                col             : -1,
-                row             : -1,
-                userId          : userId,
+                cursor: frozenCursor.cursor,
+                target: frozenCursor.name,
+                col: -1,
+                row: -1,
+                userId: userId,
                 lockRangePosLeft: lockRangePosLeft,
-                lockRangePosTop : lockRangePosTop
+                lockRangePosTop: lockRangePosTop
             };
         }
 
-        var drawingInfo = this.objectRender.checkCursorDrawingObject( x, y );
-        if ( asc["editor"].isStartAddShape && AscCommonExcel.CheckIdSatetShapeAdd( this.objectRender.controller.curState ) ) {
+        var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
+        if (asc["editor"].isStartAddShape &&
+          AscCommonExcel.CheckIdSatetShapeAdd(this.objectRender.controller.curState)) {
             return {cursor: kCurFillHandle, target: c_oTargetType.Shape, col: -1, row: -1};
         }
 
-        if ( drawingInfo && drawingInfo.id ) {
+        if (drawingInfo && drawingInfo.id) {
             // Возможно картинка с lock
-            lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Object, null, sheetId, drawingInfo.id );
-            isLocked = this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, false );
-            if ( false !== isLocked ) {
+            lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, drawingInfo.id);
+            isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false);
+            if (false !== isLocked) {
                 // Кто-то сделал lock
                 userId = isLocked.UserId;
-                lockRangePosLeft = drawingInfo.object.getVisibleLeftOffset( true );
-                lockRangePosTop = drawingInfo.object.getVisibleTopOffset( true );
+                lockRangePosLeft = drawingInfo.object.getVisibleLeftOffset(true);
+                lockRangePosTop = drawingInfo.object.getVisibleTopOffset(true);
             }
 
-            if ( drawingInfo.hyperlink instanceof ParaHyperlink ) {
+            if (drawingInfo.hyperlink instanceof ParaHyperlink) {
                 oHyperlink = new AscCommonExcel.Hyperlink();
                 oHyperlink.Tooltip = drawingInfo.hyperlink.ToolTip;
-                var spl = drawingInfo.hyperlink.Value.split( "!" );
-                if ( spl.length === 2 ) {
-                    oHyperlink.setLocation( drawingInfo.hyperlink.Value );
-                }
-                else {
+                var spl = drawingInfo.hyperlink.Value.split("!");
+                if (spl.length === 2) {
+                    oHyperlink.setLocation(drawingInfo.hyperlink.Value);
+                } else {
                     oHyperlink.Hyperlink = drawingInfo.hyperlink.Value;
                 }
 
-                cellCursor = {cursor: drawingInfo.cursor, target: c_oTargetType.Cells, col: -1, row: -1, userId: userId};
+                cellCursor =
+                {cursor: drawingInfo.cursor, target: c_oTargetType.Cells, col: -1, row: -1, userId: userId};
                 return {
-                    cursor    : kCurHyperlink,
-                    target    : c_oTargetType.Hyperlink,
-                    hyperlink : new asc_CHyperlink( oHyperlink ),
+                    cursor: kCurHyperlink,
+                    target: c_oTargetType.Hyperlink,
+                    hyperlink: new asc_CHyperlink(oHyperlink),
                     cellCursor: cellCursor,
-                    userId    : userId
+                    userId: userId
                 };
             }
 
             return {
-                cursor          : drawingInfo.cursor,
-                target          : c_oTargetType.Shape,
-                drawingId       : drawingInfo.id,
-                col             : -1,
-                row             : -1,
-                userId          : userId,
+                cursor: drawingInfo.cursor,
+                target: c_oTargetType.Shape,
+                drawingId: drawingInfo.id,
+                col: -1,
+                row: -1,
+                userId: userId,
                 lockRangePosLeft: lockRangePosLeft,
-                lockRangePosTop : lockRangePosTop
+                lockRangePosTop: lockRangePosTop
             };
         }
 
-        x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
-        y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
+        x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
+        y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
 
         var oResDefault = {cursor: kCurDefault, target: c_oTargetType.None, col: -1, row: -1};
-        if ( x < this.cellsLeft && y < this.cellsTop ) {
+        if (x < this.cellsLeft && y < this.cellsTop) {
             return {cursor: kCurCorner, target: c_oTargetType.Corner, col: -1, row: -1};
         }
 
         var cFrozen = -1, rFrozen = -1;
         offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
         offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
-        if ( this.topLeftFrozenCell ) {
+        if (this.topLeftFrozenCell) {
             cFrozen = this.topLeftFrozenCell.getCol0();
             rFrozen = this.topLeftFrozenCell.getRow0();
             widthDiff = this.cols[cFrozen].left - this.cols[0].left;
@@ -6417,9 +6141,9 @@
             offsetY = (y < this.cellsTop + heightDiff) ? 0 : offsetY - heightDiff;
         }
 
-        if ( x <= this.cellsLeft && y >= this.cellsTop ) {
-            r = this._findRowUnderCursor( y, true );
-            if ( r === null ) {
+        if (x <= this.cellsLeft && y >= this.cellsTop) {
+            r = this._findRowUnderCursor(y, true);
+            if (r === null) {
                 return oResDefault;
             }
             isNotFirst = (r.row !== (-1 !== rFrozen ? 0 : this.visibleRange.r1));
@@ -6428,14 +6152,14 @@
             return {
                 cursor: f ? kCurRowResize : kCurRowSelect,
                 target: f ? c_oTargetType.RowResize : c_oTargetType.RowHeader,
-                col   : -1,
-                row   : r.row + (isNotFirst && f && y < r.top + 3 ? -1 : 0),
+                col: -1,
+                row: r.row + (isNotFirst && f && y < r.top + 3 ? -1 : 0),
                 mouseY: f ? ((y < r.top + 3) ? (r.top - y - this.height_1px) : (r.bottom - y - this.height_1px)) : null
             };
         }
-        if ( y <= this.cellsTop && x >= this.cellsLeft ) {
-            c = this._findColUnderCursor( x, true );
-            if ( c === null ) {
+        if (y <= this.cellsTop && x >= this.cellsLeft) {
+            c = this._findColUnderCursor(x, true);
+            if (c === null) {
                 return oResDefault;
             }
             isNotFirst = c.col !== (-1 !== cFrozen ? 0 : this.visibleRange.c1);
@@ -6444,23 +6168,23 @@
             return {
                 cursor: f ? kCurColResize : kCurColSelect,
                 target: f ? c_oTargetType.ColumnResize : c_oTargetType.ColumnHeader,
-                col   : c.col + (isNotFirst && f && x < c.left + 3 ? -1 : 0),
-                row   : -1,
+                col: c.col + (isNotFirst && f && x < c.left + 3 ? -1 : 0),
+                row: -1,
                 mouseX: f ? ((x < c.left + 3) ? (c.left - x - this.width_1px) : (c.right - x - this.width_1px)) : null
             };
         }
 
-        if ( this.stateFormatPainter ) {
-            if ( x <= this.cellsLeft && y >= this.cellsTop ) {
-                r = this._findRowUnderCursor( y, true );
-                if ( r !== null ) {
+        if (this.stateFormatPainter) {
+            if (x <= this.cellsLeft && y >= this.cellsTop) {
+                r = this._findRowUnderCursor(y, true);
+                if (r !== null) {
                     target = c_oTargetType.RowHeader;
                     row = r.row;
                 }
             }
-            if ( y <= this.cellsTop && x >= this.cellsLeft ) {
-                c = this._findColUnderCursor( x, true );
-                if ( c !== null ) {
+            if (y <= this.cellsTop && x >= this.cellsLeft) {
+                c = this._findColUnderCursor(x, true);
+                if (c !== null) {
                     target = c_oTargetType.ColumnHeader;
                     col = c.col;
                 }
@@ -6468,58 +6192,29 @@
             return {cursor: kCurFormatPainterExcel, target: target, col: col, row: row};
         }
 
-        if ( this.isFormulaEditMode || this.isChartAreaEditMode ) {
-            var oFormulaOrChartCursor = this._getCursorFormulaOrChart( this.visibleRange, x, y, offsetX, offsetY );
-            if ( oFormulaOrChartCursor ) {
-                return oFormulaOrChartCursor;
+        if (this.isFormulaEditMode || this.isChartAreaEditMode) {
+            this._drawElements(function (_vr, _offsetX, _offsetY) {
+                return (null === (res = this._hitCursorFormulaOrChart(_vr, x, y, _offsetX, _offsetY)));
+            });
+            if (res) {
+                return res;
             }
         }
-
-        var xWithOffset = x + offsetX;
-        var yWithOffset = y + offsetY;
 
         isSelGraphicObject = this.objectRender.selectedGraphicObjectsExists();
-        if ( !isViewerMode && !isSelGraphicObject ) {
-            // Эпсилон для fillHandle
-            var fillHandleEpsilon = this.width_1px;
-            if ( !this.isChartAreaEditMode && x >= (this.fillHandleL - fillHandleEpsilon) && x <= (this.fillHandleR + fillHandleEpsilon) && y >= (this.fillHandleT - fillHandleEpsilon) && y <= (this.fillHandleB + fillHandleEpsilon) ) {
-                // Мы на "квадрате" для автозаполнения
-                return {cursor: kCurFillHandle, target: c_oTargetType.FillHandle, col: -1, row: -1};
-            }
-
-            // Навели на выделение (стоит вынести в отдельный метод)
-            if ( this._isCursorOnSelectionBorder( ar, this.visibleRange, xWithOffset, yWithOffset ) ) {
-                return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
-            }
-            if ( this.topLeftFrozenCell ) {
-                var oFrozenRange;
-                cFrozen -= 1;
-                rFrozen -= 1;
-                if ( 0 <= cFrozen && 0 <= rFrozen ) {
-                    oFrozenRange = new asc_Range( 0, 0, cFrozen, rFrozen );
-                    if ( this._isCursorOnSelectionBorder( ar, oFrozenRange, x, y ) ) {
-                        return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
-                    }
-                }
-                if ( 0 <= cFrozen ) {
-                    oFrozenRange = new asc_Range( 0, this.visibleRange.r1, cFrozen, this.visibleRange.r2 );
-                    if ( this._isCursorOnSelectionBorder( ar, oFrozenRange, x, yWithOffset ) ) {
-                        return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
-                    }
-                }
-                if ( 0 <= rFrozen ) {
-                    oFrozenRange = new asc_Range( this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen );
-                    if ( this._isCursorOnSelectionBorder( ar, oFrozenRange, xWithOffset, y ) ) {
-                        return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
-                    }
-                }
+        if (!isViewerMode && !isSelGraphicObject) {
+            this._drawElements(function (_vr, _offsetX, _offsetY) {
+                return (null === (res = this._hitCursorSelectionRange(_vr, x, y, _offsetX, _offsetY)));
+            });
+            if (res) {
+                return res;
             }
         }
 
-        if ( x > this.cellsLeft && y > this.cellsTop ) {
-            c = this._findColUnderCursor( x, true );
-            r = this._findRowUnderCursor( y, true );
-            if ( c === null || r === null ) {
+        if (x > this.cellsLeft && y > this.cellsTop) {
+            c = this._findColUnderCursor(x, true);
+            r = this._findRowUnderCursor(y, true);
+            if (c === null || r === null) {
                 return oResDefault;
             }
 
@@ -6529,115 +6224,126 @@
             var lockAllPosTop = undefined;
             var userIdAllProps = undefined;
             var userIdAllSheet = undefined;
-            if ( !isViewerMode && this.collaborativeEditing.getCollaborativeEditing() ) {
+            if (!isViewerMode && this.collaborativeEditing.getCollaborativeEditing()) {
                 var c1Recalc = null, r1Recalc = null;
-                var selectRangeRecalc = new asc_Range( c.col, r.row, c.col, r.row );
+                var selectRangeRecalc = new asc_Range(c.col, r.row, c.col, r.row);
                 // Пересчет для входящих ячеек в добавленные строки/столбцы
-                var isIntersection = this._recalcRangeByInsertRowsAndColumns( sheetId, selectRangeRecalc );
-                if ( false === isIntersection ) {
-                    lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Range, /*subType*/null, sheetId, new AscCommonExcel.asc_CCollaborativeRange( selectRangeRecalc.c1, selectRangeRecalc.r1, selectRangeRecalc.c2, selectRangeRecalc.r2 ) );
-                    isLocked = this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false );
-                    if ( false !== isLocked ) {
+                var isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, selectRangeRecalc);
+                if (false === isIntersection) {
+                    lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId,
+                      new AscCommonExcel.asc_CCollaborativeRange(selectRangeRecalc.c1, selectRangeRecalc.r1, selectRangeRecalc.c2, selectRangeRecalc.r2));
+                    isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
+                      /*bCheckOnlyLockAll*/false);
+                    if (false !== isLocked) {
                         // Кто-то сделал lock
                         userId = isLocked.UserId;
                         lockRange = isLocked.Element["rangeOrObjectId"];
 
-                        c1Recalc = this.collaborativeEditing.m_oRecalcIndexColumns[sheetId].getLockOther( lockRange["c1"], c_oAscLockTypes.kLockTypeOther );
-                        r1Recalc = this.collaborativeEditing.m_oRecalcIndexRows[sheetId].getLockOther( lockRange["r1"], c_oAscLockTypes.kLockTypeOther );
-                        if ( null !== c1Recalc && null !== r1Recalc ) {
-                            lockRangePosLeft = this.getCellLeft( c1Recalc, /*pt*/1 );
-                            lockRangePosTop = this.getCellTop( r1Recalc, /*pt*/1 );
+                        c1Recalc =
+                          this.collaborativeEditing.m_oRecalcIndexColumns[sheetId].getLockOther(lockRange["c1"],
+                            c_oAscLockTypes.kLockTypeOther);
+                        r1Recalc = this.collaborativeEditing.m_oRecalcIndexRows[sheetId].getLockOther(lockRange["r1"],
+                          c_oAscLockTypes.kLockTypeOther);
+                        if (null !== c1Recalc && null !== r1Recalc) {
+                            lockRangePosLeft = this.getCellLeft(c1Recalc, /*pt*/1);
+                            lockRangePosTop = this.getCellTop(r1Recalc, /*pt*/1);
                             // Пересчитываем X и Y относительно видимой области
                             lockRangePosLeft -= offsetX;
                             lockRangePosTop -= offsetY;
                             // Пересчитываем в px
-                            lockRangePosLeft *= asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
-                            lockRangePosTop *= asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIY() );
+                            lockRangePosLeft *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
+                            lockRangePosTop *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
                         }
                     }
-                }
-                else {
-                    lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Range, /*subType*/null, sheetId, null );
+                } else {
+                    lockInfo =
+                      this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId, null);
                 }
                 // Проверим не удален ли весь лист (именно удален, т.к. если просто залочен, то не рисуем рамку вокруг)
                 lockInfo["type"] = c_oAscLockTypeElem.Sheet;
-                isLocked = this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/true );
-                if ( false !== isLocked ) {
+                isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
+                  /*bCheckOnlyLockAll*/true);
+                if (false !== isLocked) {
                     // Кто-то сделал lock
                     userIdAllSheet = isLocked.UserId;
-                    lockAllPosLeft = this.cellsLeft * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
-                    lockAllPosTop = this.cellsTop * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIY() );
+                    lockAllPosLeft = this.cellsLeft * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
+                    lockAllPosTop = this.cellsTop * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
                 }
 
                 // Проверим не залочены ли все свойства листа (только если не удален весь лист)
-                if ( undefined === userIdAllSheet ) {
+                if (undefined === userIdAllSheet) {
                     lockInfo["type"] = c_oAscLockTypeElem.Range;
                     lockInfo["subType"] = c_oAscLockTypeElemSubType.InsertRows;
-                    isLocked = this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/true );
-                    if ( false !== isLocked ) {
+                    isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
+                      /*bCheckOnlyLockAll*/true);
+                    if (false !== isLocked) {
                         // Кто-то сделал lock
                         userIdAllProps = isLocked.UserId;
 
-                        lockAllPosLeft = this.cellsLeft * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
-                        lockAllPosTop = this.cellsTop * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIY() );
+                        lockAllPosLeft = this.cellsLeft * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
+                        lockAllPosTop = this.cellsTop * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
                     }
                 }
             }
 
-            var autoFilterInfo = this.af_checkCursor( x, y, offsetX, offsetY, {
+            var autoFilterInfo = this.af_checkCursor(x, y, offsetX, offsetY, {
                 cFrozen: cFrozen, rFrozen: rFrozen
-            }, r, c );
-            if ( autoFilterInfo && !isViewerMode ) {
+            }, r, c);
+            if (autoFilterInfo && !isViewerMode) {
                 return {
-                    cursor: kCurAutoFilter, target: c_oTargetType.FilterObject, col: -1, row: -1, idFilter: autoFilterInfo.id
+                    cursor: kCurAutoFilter,
+                    target: c_oTargetType.FilterObject,
+                    col: -1,
+                    row: -1,
+                    idFilter: autoFilterInfo.id
                 };
             }
 
             // Проверим есть ли комменты
-            var comments = this.cellCommentator.getComments( c.col, r.row );
+            var comments = this.cellCommentator.getComments(c.col, r.row);
             var coords = undefined;
             var indexes = undefined;
 
-            if ( 0 < comments.length ) {
+            if (0 < comments.length) {
                 indexes = [];
-                for ( i = 0; i < comments.length; ++i ) {
-                    indexes.push( comments[i].asc_getId() );
+                for (i = 0; i < comments.length; ++i) {
+                    indexes.push(comments[i].asc_getId());
                 }
-                coords = this.cellCommentator.getCommentsCoords( comments );
+                coords = this.cellCommentator.getCommentsCoords(comments);
             }
 
             // Проверим, может мы в гиперлинке
-            oHyperlink = this.model.getHyperlinkByCell( r.row, c.col );
+            oHyperlink = this.model.getHyperlinkByCell(r.row, c.col);
             cellCursor = {
-                cursor          : kCurCells,
-                target          : c_oTargetType.Cells,
-                col             : (c ? c.col : -1),
-                row             : (r ? r.row : -1),
-                userId          : userId,
+                cursor: kCurCells,
+                target: c_oTargetType.Cells,
+                col: (c ? c.col : -1),
+                row: (r ? r.row : -1),
+                userId: userId,
                 lockRangePosLeft: lockRangePosLeft,
-                lockRangePosTop : lockRangePosTop,
-                userIdAllProps  : userIdAllProps,
-                lockAllPosLeft  : lockAllPosLeft,
-                lockAllPosTop   : lockAllPosTop,
-                userIdAllSheet  : userIdAllSheet,
-                commentIndexes  : indexes,
-                commentCoords   : coords
+                lockRangePosTop: lockRangePosTop,
+                userIdAllProps: userIdAllProps,
+                lockAllPosLeft: lockAllPosLeft,
+                lockAllPosTop: lockAllPosTop,
+                userIdAllSheet: userIdAllSheet,
+                commentIndexes: indexes,
+                commentCoords: coords
             };
-            if ( null !== oHyperlink ) {
+            if (null !== oHyperlink) {
                 return {
-                    cursor          : kCurHyperlink,
-                    target          : c_oTargetType.Hyperlink,
-                    hyperlink       : new asc_CHyperlink( oHyperlink ),
-                    cellCursor      : cellCursor,
-                    userId          : userId,
+                    cursor: kCurHyperlink,
+                    target: c_oTargetType.Hyperlink,
+                    hyperlink: new asc_CHyperlink(oHyperlink),
+                    cellCursor: cellCursor,
+                    userId: userId,
                     lockRangePosLeft: lockRangePosLeft,
-                    lockRangePosTop : lockRangePosTop,
-                    userIdAllProps  : userIdAllProps,
-                    userIdAllSheet  : userIdAllSheet,
-                    lockAllPosLeft  : lockAllPosLeft,
-                    lockAllPosTop   : lockAllPosTop,
-                    commentIndexes  : indexes,
-                    commentCoords   : coords
+                    lockRangePosTop: lockRangePosTop,
+                    userIdAllProps: userIdAllProps,
+                    userIdAllSheet: userIdAllSheet,
+                    lockAllPosLeft: lockAllPosLeft,
+                    lockAllPosTop: lockAllPosTop,
+                    commentIndexes: indexes,
+                    commentCoords: coords
                 };
             }
             return cellCursor;
@@ -12479,7 +12185,7 @@
         var m_oColor = new CColor(120, 120, 120);
 
         if (aWs.workbook.bUndoChanges || aWs.workbook.bRedoChanges) {
-            return;
+            return false;
         }
 
         var _drawFilterMark = function (x, y, height, index) {
@@ -12665,6 +12371,8 @@
                 }
             }
         }
+
+        return true;
     };
 
     WorksheetView.prototype.af_checkCursor = function (x, y, offsetX, offsetY, frozenObj, r, c) {
