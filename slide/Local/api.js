@@ -260,3 +260,12 @@ window["on_editor_native_message"] = function(sCommand, sParam)
 	else if (sCommand == "editor:stopDemonstration")
 		editor.EndDemonstration(true);
 };
+
+Asc['asc_docs_api'].prototype.asc_setAdvancedOptions = function(idOption, option)
+{
+	if (window["Asc"].c_oAscAdvancedOptionsID.DRM === idOption) {
+        var _param = "";
+        _param += ("<m_sPassword>" + AscCommon.CopyPasteCorrectString(option.asc_getPassword()) + "</m_sPassword>");
+        window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
+    }
+};

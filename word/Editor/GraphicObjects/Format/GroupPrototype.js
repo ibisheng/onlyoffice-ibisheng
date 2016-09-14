@@ -146,7 +146,6 @@ CGroupShape.prototype.setRecalculateInfo = function()
         recalculateWrapPolygon: true
     };
     this.localTransform = new AscCommon.CMatrix();
-    this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
     this.posX = null;
     this.posY = null;
     this.bNeedUpdatePosition = true;
