@@ -1621,6 +1621,11 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
     if ( true === this.TurnOffRecalc )
         return;
 
+	var oTopDocument       = this.Parent.Is_TopDocument(true);
+	var isTopLogicDocument = (oTopDocument instanceof CDocument ? true : false);
+	var nPageAbs           = this.Get_AbsolutePage(CurPage);
+	var nColumnAbs         = this.Get_AbsoluteColumn(CurPage);
+
     this.TurnOffRecalc = true;
 
     var FirstRow = 0;
@@ -2280,8 +2285,12 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                     var X_content_end_old    = Cell.Content.Pages[0].XLimit;
                     var Y_content_height_old = Cell.Content.Pages[0].Bounds.Bottom - Cell.Content.Pages[0].Bounds.Top;
 
-                    // Проверим по X, Y
-                    if ( Math.abs( X_content_start - X_content_start_old ) < 0.001 && Math.abs( X_content_end_old - X_content_end ) < 0.001 && Y_content_start + Y_content_height_old < Y_content_end )
+                    // Проверим по X, Y.
+					var nFootnotesHeight = 0;
+					if (oTopDocument && isTopLogicDocument)
+						nFootnotesHeight = oTopDocument.Footnotes.GetHeight(nPageAbs, nColumnAbs);
+
+                    if ( Math.abs( X_content_start - X_content_start_old ) < 0.001 && Math.abs( X_content_end_old - X_content_end ) < 0.001 && Y_content_start + Y_content_height_old < Y_content_end - nFootnotesHeight )
                     {
                         bCanShift = true;
                         ShiftDy   = -Cell.Content.Pages[0].Y + Y_content_start;
