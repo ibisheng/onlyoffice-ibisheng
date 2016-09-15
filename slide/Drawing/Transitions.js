@@ -3091,6 +3091,7 @@ function CDemonstrationManager(htmlpage)
         {
             oThis.CheckSlideDuration = setTimeout(function()
             {
+                oThis.CheckSlideDuration = -1;
                 if (oThis.IsPlayMode)
                 {
                     oThis.SlideNum++;
@@ -3208,6 +3209,11 @@ function CDemonstrationManager(htmlpage)
     this.Play = function()
     {
         this.IsPlayMode = true;
+
+        if (-1 == this.CheckSlideDuration)
+        {
+            this.NextSlide();
+        }
     }
 
     this.Pause = function()
@@ -3361,6 +3367,6 @@ function CDemonstrationManager(htmlpage)
         }
 
         if (this.SlideNum < this.SlidesCount)
-            this.StartSlide(true, false);
+            this.StartSlide(this.Transition.IsPlaying(), false);
     }
 }
