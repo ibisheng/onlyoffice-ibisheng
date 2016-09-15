@@ -2415,7 +2415,7 @@ CellFormat.prototype =
 	_formatToText : function(number, nValType, dDigitsCount, bChart, cultureInfo)
 	{
 		var result = "";
-		var arrFormat = this.format(number, nValType, dDigitsCount, null, bChart, cultureInfo);
+		var arrFormat = this.format(number, nValType, dDigitsCount, bChart, cultureInfo);
 		for (var i = 0, item; i < arrFormat.length; ++i) {
 			item = arrFormat[i];
 			if (item.format) {
