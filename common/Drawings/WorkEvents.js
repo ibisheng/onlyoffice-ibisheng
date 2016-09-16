@@ -1731,7 +1731,13 @@
 						var _markup                            = this.HtmlPage.m_oHorRuler.m_oTableMarkup;
 						_markup.Cols[this.TableCurrentMovePos] += (this.TableCurrentMoveValue - this.TableCurrentMoveValueOld);
 						_markup.Cols[this.TableCurrentMovePos] = Math.max(_markup.Cols[this.TableCurrentMovePos], 1);
-						_markup.Table.Update_TableMarkupFromRuler(_markup, true, this.TableCurrentMovePos + 1);
+
+						if ( false === this.HtmlPage.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
+                        {
+                            this.HtmlPage.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTableMarkup_Hor);
+                            _markup.Table.Update_TableMarkupFromRuler(_markup, true, this.TableCurrentMovePos + 1);
+                            this.HtmlPage.m_oLogicDocument.Document_UpdateInterfaceState();
+                        }
 					}
 					else
 					{
@@ -1750,7 +1756,13 @@
 
 						var _markup = this.HtmlPage.m_oHorRuler.m_oTableMarkup;
 						_markup.Rows[this.TableCurrentMovePos].H += (this.TableCurrentMoveValue - this.TableCurrentMoveValueOld);
-						_markup.Table.Update_TableMarkupFromRuler(_markup, false, this.TableCurrentMovePos + 1);
+
+						if ( false === this.HtmlPage.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
+                        {
+                            this.HtmlPage.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTableMarkup_Hor);
+                            _markup.Table.Update_TableMarkupFromRuler(_markup, false, this.TableCurrentMovePos + 1);
+                            this.HtmlPage.m_oLogicDocument.Document_UpdateInterfaceState();
+                        }
 					}
 
 					this.HtmlPage.OnUpdateOverlay();
