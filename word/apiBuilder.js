@@ -1294,6 +1294,7 @@
                 oSelectedContent.Add(new CSelectedElement(oElement.private_GetImpl(), true));
             }
         }
+		oSelectedContent.On_EndCollectElements(this.Document, true);
 
         if (this.Document.Is_SelectionUse())
         {
