@@ -297,12 +297,12 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         var settings = new AscCommon.asc_ChartSettings();
         switch(oSparklineGroup.type)
         {
-            case Asc.ESparklineType.Column:
+            case Asc.c_oAscSparklineType.Column:
             {
                 settings.type = c_oAscChartTypeSettings.barNormal;
                 break;
             }
-            case Asc.ESparklineType.Stacked:
+            case Asc.c_oAscSparklineType.Stacked:
             {
                 settings.type = c_oAscChartTypeSettings.barStackedPer;
                 break;
@@ -436,7 +436,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         chart_space.recalculateReferences();
         chart_space.recalcInfo.recalculateReferences = false;
         var fCallbackSeries = null;
-        if(oSparklineGroup.type === Asc.ESparklineType.Line)
+        if(oSparklineGroup.type === Asc.c_oAscSparklineType.Line)
         {
             var oLn = new AscFormat.CLn();
             oLn.setW(36000*nSparklineMultiplier*25.4*(oSparklineGroup.lineWidth != null ? oSparklineGroup.lineWidth : 0.75)/72);
@@ -613,7 +613,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         {
             var oUnifill = CreateUniFillFromExcelColor(oSparklineGroup.colorSeries);
             var oSerie = chart_space.chart.plotArea.charts[0].series[0];
-            if(oSparklineGroup.type === Asc.ESparklineType.Line)
+            if(oSparklineGroup.type === Asc.c_oAscSparklineType.Line)
             {
                 var oLn = oSerie.spPr.ln;
                 oLn.setFill(oUnifill);
@@ -2391,7 +2391,7 @@ function DrawingObjects() {
     _this.checkSparklineGroupMinMaxVal = function(oSparklineGroup)
     {
         var maxVal = null, minVal = null, i, j;
-        if(oSparklineGroup.type !== Asc.ESparklineType.Stacked &&
+        if(oSparklineGroup.type !== Asc.c_oAscSparklineType.Stacked &&
             (Asc.SparklineAxisMinMax.Group === oSparklineGroup.minAxisType || Asc.SparklineAxisMinMax.Group === oSparklineGroup.maxAxisType))
         {
             for(i = 0; i < oSparklineGroup.arrSparklines.length; ++i)
@@ -2465,7 +2465,7 @@ function DrawingObjects() {
         for(i = 0; i < aSparklineGroups.length; ++i) {
             var oSparklineGroup = aSparklineGroups[i];
 
-            if(oSparklineGroup.type !== Asc.ESparklineType.Stacked &&
+            if(oSparklineGroup.type !== Asc.c_oAscSparklineType.Stacked &&
                 (Asc.SparklineAxisMinMax.Group === oSparklineGroup.minAxisType || Asc.SparklineAxisMinMax.Group === oSparklineGroup.maxAxisType))
             {
                 _this.checkSparklineGroupMinMaxVal(oSparklineGroup);

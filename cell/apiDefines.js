@@ -359,6 +359,12 @@ var c_oAscPopUpSelectorType = {
     Signature	: "XLSY"
   };
 
+  var c_oAscSparklineType = {
+    Line: 0,
+    Column: 1,
+    Stacked: 2
+  };
+
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommonExcel'] = window['AscCommonExcel'] || {};
   window['AscCommonExcel'].c_oAscAlignType = c_oAscAlignType;
@@ -530,4 +536,9 @@ var c_oAscPopUpSelectorType = {
   prot['Func'] = prot.Func;
   prot['Range'] = prot.Range;
   prot['Table'] = prot.Table;
+  window['Asc']['c_oAscSparklineType'] = window['Asc'].c_oAscSparklineType = c_oAscSparklineType;
+  prot = c_oAscSparklineType;
+  prot['Line'] = prot.Line;
+  prot['Column'] = prot.Column;
+  prot['Stacked'] = prot.Stacked;
 })(window);
