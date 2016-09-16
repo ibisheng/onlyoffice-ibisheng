@@ -4661,6 +4661,9 @@ CellArea.prototype = {
 	sparklineGroup.prototype.asc_getType = function () {
 		return this.type;
 	};
+	sparklineGroup.prototype.asc_getLineWeight = function () {
+		return this.lineWeight;
+	};
 	/** @constructor */
 	function sparkline() {
 		this.sqref = null;
@@ -6860,6 +6863,7 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].sparklineGroup = sparklineGroup;
 	prot = sparklineGroup.prototype;
 	prot["asc_getType"]						= prot.asc_getType;
+	prot["asc_getLineWeight"]			= prot.asc_getLineWeight;
 	window['AscCommonExcel'].sparkline = sparkline;
 	window['AscCommonExcel'].TablePart = TablePart;
 	window['AscCommonExcel'].AutoFilter = AutoFilter;
