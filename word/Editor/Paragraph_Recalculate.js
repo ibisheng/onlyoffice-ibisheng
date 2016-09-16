@@ -1377,7 +1377,10 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
 		if (nHeight > 0.001)
 		{
 			bNoFootnotes = false;
-			YLimit -= nHeight;
+
+			// В таблицах граница разруливается по своему
+			if (true !== PRS.IsInTable())
+				YLimit -= nHeight;
 		}
 	}
     else if (oTopDocument instanceof CFootEndnote)
@@ -2548,6 +2551,7 @@ function CParagraphRecalculateStateWrap(Para)
     this.TopDocument     = null;
     this.PageAbs         = 0;
     this.ColumnAbs       = 0;
+	this.InTable         = false;
 
 	this.Fast            = false; // Быстрый ли пересчет
 
@@ -2668,6 +2672,7 @@ CParagraphRecalculateStateWrap.prototype =
 		this.TopDocument = Paragraph.Parent.Get_TopDocumentContent();
 		this.PageAbs     = Paragraph.Get_AbsolutePage(CurPage);
 		this.ColumnAbs   = Paragraph.Get_AbsoluteColumn(CurPage);
+		this.InTable     = Paragraph.Parent.Is_TableCellContent();
 
 		this.RunRecalcInfoLast  = (0 === CurPage ? null : Paragraph.Pages[CurPage - 1].EndInfo.RunRecalcInfo);
 		this.RunRecalcInfoBreak = this.RunRecalcInfoLast;
@@ -3026,6 +3031,10 @@ CParagraphRecalculateStateWrap.prototype.LoadFootnotesInfo = function()
 	var oTopDocument = this.TopDocument;
 	if (oTopDocument instanceof CDocument && this.FootnotesRecalculateObject)
 		oTopDocument.Footnotes.LoadRecalculateObject(this.PageAbs, this.ColumnAbs, this.FootnotesRecalculateObject);
+};
+CParagraphRecalculateStateWrap.prototype.IsInTable = function()
+{
+	return this.InTable;
 };
 
 function CParagraphRecalculateStateCounter()

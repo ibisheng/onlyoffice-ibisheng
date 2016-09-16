@@ -247,6 +247,8 @@ CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumn
 	if (!oColumn)
 		return true;
 
+	var isLowerY = (Y < oColumn.ReferenceY + 0.001 ? true : false);
+
 	if (oColumn.GetContinuesElements().length > 0)
 	{
 		// Если уже есть элементы, которые переносятся, тогда данные сноски точно не убирутся
@@ -254,7 +256,7 @@ CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumn
 		// на следующую страницу. Такое возможно в таблицах, когда сноски расположены в разных ячейках одной строки,
 		// причем вторая сноска выше первой.
 
-		if (Y < oColumn.ReferenceY)
+		if (isLowerY)
 		{
 			oColumn.AddContinuesElements(arrFootnotes);
 			return true;
@@ -273,7 +275,7 @@ CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumn
 	var _Y      = oColumn.Height;
 	var _YLimit = oColumn.YLimit - Y;
 
-	if (Y < oColumn.ReferenceY)
+	if (isLowerY)
 		_YLimit = oColumn.YLimit - oColumn.ReferenceY;
 
 	if (oColumn.Elements.length <= 0 && null !== this.SeparatorFootnote)
@@ -303,7 +305,7 @@ CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumn
 		{
 			// Если у нас первая сноска не убирается, тогда мы переносим. Есть исключение, когда мы находимся в таблице
 			// и у нас уже есть сноски на странице, а ссылка на данную сноску выше чем те, которые мы уже добавили.
-			if (0 === nIndex && true !== oFootnote.Is_ContentOnFirstPage() && (0 === oColumn.Elements.length || Y > oColumn.ReferenceY))
+			if (0 === nIndex && true !== oFootnote.Is_ContentOnFirstPage() && (0 === oColumn.Elements.length || !isLowerY))
 				return false;
 
 			// Начиная с данной сноски мы все оставшиеся сноски заносим в массив ContinuesElements у данной колонки
@@ -327,7 +329,7 @@ CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumn
 
 	oColumn.Height = Math.min(_YLimit, oColumn.Height);
 
-	if (oColumn.ReferenceY < Y)
+	if (!isLowerY)
 		oColumn.ReferenceY = Y;
 
 	return true;
@@ -422,9 +424,30 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nCol
 	// Мы делаем не совсем как в Word, если у нас происходит ситуация, что ссылка на сноску на одной странице, а сама
 	// сноска на следующей, тогда у этих страниц нумерация общая, в Word ставится номер "1" в такой ситуации, и становится
 	// непонятно, потому что есть две ссылки с номером 1 на странице, ссылающиеся на разные сноски.
+
+	// В таблицах сами сноски могут переносится на другую колонку, а ссылки будут оставаться на данной, и они пока еще
+	// не рассчитаны и никуда не добавлены, поэтому нам также надо учитывать количество переносимы сносок на следующую
+	// колонку.
+	var nAdditional = 0;
+
 	for (var nColumnIndex = nColumnAbs; nColumnIndex >= 0; --nColumnIndex)
 	{
 		var oColumn = this.private_GetPageColumn(nPageAbs, nColumnIndex);
+		if (nColumnIndex === nColumnAbs)
+		{
+			var arrContinuesElements = oColumn.GetContinuesElements();
+			if (arrContinuesElements.length > 0)
+			{
+				var oFootnote    = arrContinuesElements[0];
+				var nStartPage   = oFootnote.Get_StartPage_Absolute();
+				var nStartColumn = oFootnote.Get_StartColumn_Absolute();
+				
+				if (nStartPage === nPageAbs && nStartColumn === nColumnAbs && true !== oFootnote.Is_ContentOnFirstPage())
+					nAdditional = arrContinuesElements.length;
+				else
+					nAdditional = arrContinuesElements.length - 1;
+			}
+		}
 
 		if (oColumn.Elements.length > 0)
 		{
@@ -432,9 +455,9 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nCol
 			var nStartPage = oFootnote.Get_StartPage_Absolute();
 
 			if (nStartPage >= nPageAbs || (nStartPage === nPageAbs - 1 && true !== oFootnote.Is_ContentOnFirstPage()))
-				return oFootnote.GetNumber() + 1;
+				return oFootnote.GetNumber() + 1 + nAdditional;
 			else
-				return 1;
+				return 1 + nAdditional;
 		}
 
 	}
@@ -2995,8 +3018,8 @@ CFootEndnotePageColumn.prototype.SaveRecalculateObject = function()
 	oColumn.ContinuesElements = this.ContinuesElements;
 
 	oColumn.SeparatorRecalculateObject             = this.SeparatorRecalculateObject;
-	oColumn.ContinuationSeparatorRecalculateObject = this.SeparatorRecalculateObject;
-	oColumn.ContinuationNoticeRecalculateObject    = this.ContinuationSeparatorRecalculateObject;
+	oColumn.ContinuationSeparatorRecalculateObject = this.ContinuationSeparatorRecalculateObject;
+	oColumn.ContinuationNoticeRecalculateObject    = this.ContinuationNoticeRecalculateObject;
 	return oColumn;
 };
 CFootEndnotePageColumn.prototype.LoadRecalculateObject = function(oObject)
@@ -3018,38 +3041,16 @@ CFootEndnotePageColumn.prototype.LoadRecalculateObject = function(oObject)
 	this.ContinuesElements = oObject.ContinuesElements;
 
 	this.SeparatorRecalculateObject             = oObject.SeparatorRecalculateObject;
-	this.ContinuationSeparatorRecalculateObject = oObject.SeparatorRecalculateObject;
-	this.ContinuationNoticeRecalculateObject    = oObject.ContinuationSeparatorRecalculateObject;
+	this.ContinuationSeparatorRecalculateObject = oObject.ContinuationSeparatorRecalculateObject;
+	this.ContinuationNoticeRecalculateObject    = oObject.ContinuationNoticeRecalculateObject;
 };
 
 function CFootEndnotePage()
 {
-	this.X      = 0;
-	this.Y      = 0;
-	this.XLimit = 0;
-	this.YLimit = 0;
-
-	this.Elements = [];
-
-	this.SeparatorRecalculateObject             = null;
-	this.ContinuationSeparatorRecalculateObject = null;
-	this.ContinuationNoticeRecalculateObject    = null;
-
 	this.Columns = [];
 }
 CFootEndnotePage.prototype.Reset = function()
 {
-	this.X      = 0;
-	this.Y      = 0;
-	this.XLimit = 0;
-	this.YLimit = 0;
-
-	this.Elements = [];
-
-	this.SeparatorRecalculateObject             = null;
-	this.ContinuationSeparatorRecalculateObject = null;
-	this.ContinuationNoticeRecalculateObject    = null;
-
 	this.Columns = [];
 };
 CFootEndnotePage.prototype.AddColumn = function(oColumn)
