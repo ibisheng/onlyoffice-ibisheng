@@ -4664,6 +4664,24 @@ CellArea.prototype = {
 	sparklineGroup.prototype.asc_getLineWeight = function () {
 		return this.lineWeight;
 	};
+	sparklineGroup.prototype.asc_getMarkersPoint = function () {
+		return this.markers;
+	};
+	sparklineGroup.prototype.asc_getHighPoint = function () {
+		return this.high;
+	};
+	sparklineGroup.prototype.asc_getLowPoint = function () {
+		return this.low;
+	};
+	sparklineGroup.prototype.asc_getFirstPoint = function () {
+		return this.first;
+	};
+	sparklineGroup.prototype.asc_getLastPoint = function () {
+		return this.last;
+	};
+	sparklineGroup.prototype.asc_getNegativePoint = function () {
+		return this.negative;
+	};
 	/** @constructor */
 	function sparkline() {
 		this.sqref = null;
@@ -6864,6 +6882,12 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	prot = sparklineGroup.prototype;
 	prot["asc_getType"]						= prot.asc_getType;
 	prot["asc_getLineWeight"]			= prot.asc_getLineWeight;
+	prot["asc_getMarkersPoint"]		= prot.asc_getMarkersPoint;
+	prot["asc_getHighPoint"]			= prot.asc_getHighPoint;
+	prot["asc_getLowPoint"]				= prot.asc_getLowPoint;
+	prot["asc_getFirstPoint"]			= prot.asc_getFirstPoint;
+	prot["asc_getLastPoint"]			= prot.asc_getLastPoint;
+	prot["asc_getNegativePoint"]	= prot.asc_getNegativePoint;
 	window['AscCommonExcel'].sparkline = sparkline;
 	window['AscCommonExcel'].TablePart = TablePart;
 	window['AscCommonExcel'].AutoFilter = AutoFilter;
