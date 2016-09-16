@@ -3365,8 +3365,10 @@ drawBarChart.prototype =
 			return;
 		
 		var path = this.paths.series[ser][val].ArrPathCommand;
-		if(this.cChartDrawer.nDimensionCount === 3)
+		if(this.cChartDrawer.nDimensionCount === 3 && this.paths.series[ser][val][0])
+		{
 			path = this.paths.series[ser][val][0].ArrPathCommand;
+		}
 		
 		if(!path)
 			return;
@@ -8093,10 +8095,14 @@ drawPieChart.prototype =
 			return;
 		
 		var path;
-		if(this.cChartDrawer.nDimensionCount === 3)
+		if(this.cChartDrawer.nDimensionCount === 3 && this.paths.series[this.paths.series.length - 1][val])
+		{
 			path = this.paths.series[this.paths.series.length - 1][val].ArrPathCommand;
+		}	
 		else
+		{
 			path = this.paths.series[val].ArrPathCommand;
+		}
 		
 		var getEllipseRadius = function(radius1, radius2, alpha)
 		{
