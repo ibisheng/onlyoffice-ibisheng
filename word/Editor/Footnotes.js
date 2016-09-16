@@ -247,9 +247,23 @@ CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumn
 	if (!oColumn)
 		return true;
 
-	// Если уже есть элементы, которые переносятся, тогда данные сноски точно не убирутся
 	if (oColumn.GetContinuesElements().length > 0)
-		return false;
+	{
+		// Если уже есть элементы, которые переносятся, тогда данные сноски точно не убирутся
+		// Но если пришедший Y выше нашего самого нижнего, тогда мы все пришедшие элементы добавляем в список
+		// на следующую страницу. Такое возможно в таблицах, когда сноски расположены в разных ячейках одной строки,
+		// причем вторая сноска выше первой.
+
+		if (Y < oColumn.ReferenceY)
+		{
+			oColumn.AddContinuesElements(arrFootnotes);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 
 	var nColumnsCount = this.Pages[nPageAbs].Columns.length;
 
@@ -258,6 +272,9 @@ CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumn
 
 	var _Y      = oColumn.Height;
 	var _YLimit = oColumn.YLimit - Y;
+
+	if (Y < oColumn.ReferenceY)
+		_YLimit = oColumn.YLimit - oColumn.ReferenceY;
 
 	if (oColumn.Elements.length <= 0 && null !== this.SeparatorFootnote)
 	{
@@ -284,7 +301,9 @@ CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumn
 
 		if (recalcresult2_NextPage === nRecalcResult)
 		{
-			if (0 === nIndex && true !== oFootnote.Is_ContentOnFirstPage())
+			// Если у нас первая сноска не убирается, тогда мы переносим. Есть исключение, когда мы находимся в таблице
+			// и у нас уже есть сноски на странице, а ссылка на данную сноску выше чем те, которые мы уже добавили.
+			if (0 === nIndex && true !== oFootnote.Is_ContentOnFirstPage() && (0 === oColumn.Elements.length || Y > oColumn.ReferenceY))
 				return false;
 
 			// Начиная с данной сноски мы все оставшиеся сноски заносим в массив ContinuesElements у данной колонки
@@ -307,6 +326,9 @@ CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumn
 	}
 
 	oColumn.Height = Math.min(_YLimit, oColumn.Height);
+
+	if (oColumn.ReferenceY < Y)
+		oColumn.ReferenceY = Y;
 
 	return true;
 };
@@ -2918,6 +2940,7 @@ function CFootEndnotePageColumn()
 	this.XLimit = 0;
 	this.YLimit = 0;
 
+	this.ReferenceY        = 0;
 	this.Height            = 0;
 	this.Elements          = []; // Элементы, которые пересчитаны на данной странице
 	this.ContinuesElements = []; // Элементы, которые нужно пересчитывать на следующей колонке
@@ -2928,6 +2951,7 @@ function CFootEndnotePageColumn()
 }
 CFootEndnotePageColumn.prototype.Reset = function()
 {
+	this.ReferenceY        = 0;
 	this.Height            = 0;
 	this.Elements          = [];
 	this.ContinuesElements = [];
@@ -2944,6 +2968,13 @@ CFootEndnotePageColumn.prototype.SetContinuesElements = function(arrContinuesEle
 {
 	this.ContinuesElements = arrContinuesElements;
 };
+CFootEndnotePageColumn.prototype.AddContinuesElements = function(arrElements)
+{
+	for (var nIndex = 0, nCount = arrElements.length; nIndex < nCount; ++nIndex)
+	{
+		this.ContinuesElements.push(arrElements[nIndex]);
+	}
+};
 CFootEndnotePageColumn.prototype.SaveRecalculateObject = function()
 {
 	var oColumn = new CFootEndnotePageColumn();
@@ -2953,7 +2984,8 @@ CFootEndnotePageColumn.prototype.SaveRecalculateObject = function()
 	oColumn.XLimit = this.XLimit;
 	oColumn.YLimit = this.YLimit;
 
-	oColumn.Height = this.Height;
+	oColumn.ReferenceY = this.ReferenceY;
+	oColumn.Height     = this.Height;
 
 	for (var nIndex = 0, nCount = this.Elements.length; nIndex < nCount; ++nIndex)
 	{
@@ -2974,7 +3006,8 @@ CFootEndnotePageColumn.prototype.LoadRecalculateObject = function(oObject)
 	this.XLimit = oObject.XLimit;
 	this.YLimit = oObject.YLimit;
 
-	this.Height = oObject.Height;
+	this.ReferenceY = oObject.ReferenceY;
+	this.Height     = oObject.Height;
 
 	this.Elements = [];
 	for (var nIndex = 0, nCount = oObject.Elements.length; nIndex < nCount; ++nIndex)

@@ -1623,6 +1623,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
 
 	var oTopDocument       = this.Parent.Is_TopDocument(true);
 	var isTopLogicDocument = (oTopDocument instanceof CDocument ? true : false);
+	var oFootnotes         = (isTopLogicDocument? oTopDocument.Footnotes : null);
 	var nPageAbs           = this.Get_AbsolutePage(CurPage);
 	var nColumnAbs         = this.Get_AbsoluteColumn(CurPage);
 
@@ -2103,10 +2104,20 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         this.HeaderInfo.Pages[CurPage].Draw = false;
     }
 
+	var bResetFootnotes = true;
+	var oFootnotesObject, nFootnotesHeight = 0, nSavedY = 0, nSavedTableHeight = 0;
     var bNextPage = false;
     for (var CurRow = FirstRow; CurRow < this.Content.length; ++CurRow)
     {
-        if ((0 === CurRow && true === this.Check_EmptyPages(CurPage - 1)) || CurRow != FirstRow || (CurRow === FirstRow && true === ResetStartElement))
+		if (true === bResetFootnotes && oFootnotes)
+		{
+			oFootnotesObject  = oFootnotes.SaveRecalculateObject();
+			nFootnotesHeight  = oFootnotes.GetHeight(nPageAbs, nColumnAbs);
+			nSavedY           = Y;
+			nSavedTableHeight = TableHeight;
+		}
+
+		if ((0 === CurRow && true === this.Check_EmptyPages(CurPage - 1)) || CurRow != FirstRow || (CurRow === FirstRow && true === ResetStartElement))
         {
             this.RowsInfo[CurRow] = {};
             this.RowsInfo[CurRow].Pages        = 1;
@@ -2204,6 +2215,9 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         var VerticallCells = [];
         var bAllCellsVertical = true;
 
+		var bNeedRecalcFootnotes = false;
+		var nCurFootnotesHeight  = 0;
+
         for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
         {
             var Cell     = Row.Get_Cell( CurCell );
@@ -2219,7 +2233,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             var X_content_end   = Page.X + CellMetrics.X_content_end;
 
             var Y_content_start = Y + CellMar.Top.W;
-            var Y_content_end   = this.Pages[CurPage].YLimit;
+            var Y_content_end   = this.Pages[CurPage].YLimit + nFootnotesHeight;
 
             // TODO: При расчете YLimit для ячейки сделать учет толщины нижних
             //       границ ячейки и таблицы
@@ -2286,11 +2300,11 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                     var Y_content_height_old = Cell.Content.Pages[0].Bounds.Bottom - Cell.Content.Pages[0].Bounds.Top;
 
                     // Проверим по X, Y.
-					var nFootnotesHeight = 0;
-					if (oTopDocument && isTopLogicDocument)
-						nFootnotesHeight = oTopDocument.Footnotes.GetHeight(nPageAbs, nColumnAbs);
-
-                    if ( Math.abs( X_content_start - X_content_start_old ) < 0.001 && Math.abs( X_content_end_old - X_content_end ) < 0.001 && Y_content_start + Y_content_height_old < Y_content_end - nFootnotesHeight )
+					// var nFootnotesHeight = 0;
+					// if (oTopDocument && isTopLogicDocument)
+						// nFootnotesHeight = oTopDocument.Footnotes.GetHeight(nPageAbs, nColumnAbs);
+					//
+                    if ( Math.abs( X_content_start - X_content_start_old ) < 0.001 && Math.abs( X_content_end_old - X_content_end ) < 0.001 && Y_content_start + Y_content_height_old < Y_content_end )
                     {
                         bCanShift = true;
                         ShiftDy   = -Cell.Content.Pages[0].Y + Y_content_start;
@@ -2358,8 +2372,35 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 }
             }
 
+			if (oFootnotes)
+			{
+				nCurFootnotesHeight = oFootnotes.GetHeight(nPageAbs, nColumnAbs);
+				if (Math.abs(nCurFootnotesHeight - nFootnotesHeight) > 0.001)
+				{
+					bNeedRecalcFootnotes = true;
+					break;
+				}
+			}
+
             CurGridCol += GridSpan;
         }
+
+		if (true === bNeedRecalcFootnotes && nCurFootnotesHeight > nFootnotesHeight)
+		{
+			nFootnotesHeight = nCurFootnotesHeight;
+			bResetFootnotes  = false;
+			Y                = nSavedY;
+			TableHeight      = nSavedTableHeight;
+
+			oFootnotes.LoadRecalculateObject(oFootnotesObject);
+
+			CurRow--;
+			continue;
+		}
+		else
+		{
+			bResetFootnotes = true;
+		}
 
         if (undefined === this.TableRowsBottom[CurRow][CurPage])
             this.TableRowsBottom[CurRow][CurPage] = Y;
