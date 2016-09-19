@@ -4664,6 +4664,9 @@ CellArea.prototype = {
 	sparklineGroup.prototype.asc_getLineWeight = function () {
 		return this.lineWeight;
 	};
+	sparklineGroup.prototype.asc_getDisplayEmpty = function () {
+		return this.displayEmptyCellsAs;
+	};
 	sparklineGroup.prototype.asc_getMarkersPoint = function () {
 		return this.markers;
 	};
@@ -4681,6 +4684,21 @@ CellArea.prototype = {
 	};
 	sparklineGroup.prototype.asc_getNegativePoint = function () {
 		return this.negative;
+	};
+	sparklineGroup.prototype.asc_getDisplayXAxis = function () {
+		return this.displayXAxis;
+	};
+	sparklineGroup.prototype.asc_getDisplayHidden = function () {
+		return this.displayHidden;
+	};
+	sparklineGroup.prototype.asc_getMinAxisType = function () {
+		return this.minAxisType;
+	};
+	sparklineGroup.prototype.asc_getMaxAxisType = function () {
+		return this.maxAxisType;
+	};
+	sparklineGroup.prototype.asc_getRightToLeft = function () {
+		return this.rightToLeft;
 	};
 	/** @constructor */
 	function sparkline() {
@@ -6882,12 +6900,18 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	prot = sparklineGroup.prototype;
 	prot["asc_getType"]						= prot.asc_getType;
 	prot["asc_getLineWeight"]			= prot.asc_getLineWeight;
+	prot["asc_getDisplayEmpty"]		= prot.asc_getDisplayEmpty;
 	prot["asc_getMarkersPoint"]		= prot.asc_getMarkersPoint;
 	prot["asc_getHighPoint"]			= prot.asc_getHighPoint;
 	prot["asc_getLowPoint"]				= prot.asc_getLowPoint;
 	prot["asc_getFirstPoint"]			= prot.asc_getFirstPoint;
 	prot["asc_getLastPoint"]			= prot.asc_getLastPoint;
 	prot["asc_getNegativePoint"]	= prot.asc_getNegativePoint;
+	prot["asc_getDisplayXAxis"]		= prot.asc_getDisplayXAxis;
+	prot["asc_getDisplayHidden"]	= prot.asc_getDisplayHidden;
+	prot["asc_getMinAxisType"]		= prot.asc_getMinAxisType;
+	prot["asc_getMaxAxisType"]		= prot.asc_getMaxAxisType;
+	prot["asc_getRightToLeft"]		= prot.asc_getRightToLeft;
 	window['AscCommonExcel'].sparkline = sparkline;
 	window['AscCommonExcel'].TablePart = TablePart;
 	window['AscCommonExcel'].AutoFilter = AutoFilter;
