@@ -393,11 +393,6 @@
         this.startCellMoveRange = null;
         // Дипазон перемещения
         this.activeMoveRange = null;
-        // Координаты fillHandle ("квадрата" автозаполнения)
-        this.fillHandleL = 0;
-        this.fillHandleT = 0;
-        this.fillHandleR = 0;
-        this.fillHandleB = 0;
         // Range fillHandle
         this.activeFillHandle = null;
         // Горизонтальное (0) или вертикальное (1) направление автозаполнения
