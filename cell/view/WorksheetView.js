@@ -3786,7 +3786,7 @@
         }
     };
 
-    WorksheetView.prototype._drawSelectionRange = function (range) {
+    WorksheetView.prototype._drawSelectionRange = function () {
         if (c_oAscSelectionType.RangeMax === this.activeRange.type) {
             this.activeRange.c2 = this.cols.length - 1;
             this.activeRange.r2 = this.rows.length - 1;
