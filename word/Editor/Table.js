@@ -2218,8 +2218,12 @@ CTable.prototype =
         // Учтем верхнее поле ячейки
         Y += CellMar.Top.W;
 
+        var YLimit = Pos.YLimit;
+
+		YLimit -= this.Pages[CurPage].FootnotesH;
+
         // TODO: Здесь надо учитывать нижнюю границу ячейки и вычесть ее ширину из YLimit
-        return { X : Pos.X + CellInfo.X_content_start, XLimit : Pos.X + CellInfo.X_content_end, Y : Y, YLimit : Pos.YLimit, MaxTopBorder : MaxTopBorder };
+        return { X : Pos.X + CellInfo.X_content_start, XLimit : Pos.X + CellInfo.X_content_end, Y : Y, YLimit : YLimit, MaxTopBorder : MaxTopBorder };
     },
 
     Get_MaxTopBorder : function(RowIndex)

@@ -33,142 +33,141 @@
 "use strict";
 CTable.prototype.Recalculate_Page = function(PageIndex)
 {
-    if (0 === PageIndex)
-    {
-        // TODO: Внутри функции private_RecalculateBorders происходит персчет метрик каждой ячейки, это надо бы
-        //       вынести в отдельную функцию. Из-за этого функцию private_RecalculateHeader приходится запускать позже.
+	if (0 === PageIndex)
+	{
+		// TODO: Внутри функции private_RecalculateBorders происходит персчет метрик каждой ячейки, это надо бы
+		//       вынести в отдельную функцию. Из-за этого функцию private_RecalculateHeader приходится запускать позже.
 
-        this.private_RecalculateGrid();
-        this.private_RecalculateBorders();
-        this.private_RecalculateHeader();
-    }
+		this.private_RecalculateGrid();
+		this.private_RecalculateBorders();
+		this.private_RecalculateHeader();
+	}
 
-    this.private_RecalculatePageXY(PageIndex);
+	this.private_RecalculatePageXY(PageIndex);
 
-    if (true !== this.private_RecalculateCheckPageColumnBreak(PageIndex))
-        return recalcresult_NextPage | recalcresultflags_Column;
+	if (true !== this.private_RecalculateCheckPageColumnBreak(PageIndex))
+		return recalcresult_NextPage | recalcresultflags_Column;
 
-    this.private_RecalculatePositionX(PageIndex);
+	this.private_RecalculatePositionX(PageIndex);
 
-    var Result = this.private_RecalculatePage(PageIndex);
+	var Result = this.private_RecalculatePage(PageIndex);
 	if (Result & recalcresult_CurPage)
 		return Result;
 
-    this.private_RecalculatePositionY(PageIndex);
+	this.private_RecalculatePositionY(PageIndex);
 
-    if (Result & recalcresult_NextElement)
-        this.RecalcInfo.Reset(false);
+	if (Result & recalcresult_NextElement)
+		this.RecalcInfo.Reset(false);
 
-    return Result;
+	return Result;
 };
 CTable.prototype.Recalculate_SkipPage = function(PageIndex)
 {
-    if (0 === PageIndex)
-    {
-        this.Start_FromNewPage();
-    }
-    else
-    {
-        var PrevPage = this.Pages[PageIndex - 1];
+	if (0 === PageIndex)
+	{
+		this.Start_FromNewPage();
+	}
+	else
+	{
+		var PrevPage = this.Pages[PageIndex - 1];
 
-        var LastRow       = Math.max(PrevPage.FirstRow, PrevPage.LastRow); // На случай, если предыдущая страница тоже пустая
-        var NewPage       = new CTablePage(PrevPage.X, PrevPage.Y, PrevPage.XLimit, PrevPage.YLimit, LastRow, PrevPage.MaxTopBorder);
-        NewPage.FirstRow  = LastRow;
-        NewPage.LastRow   = LastRow - 1;
+		var LastRow      = Math.max(PrevPage.FirstRow, PrevPage.LastRow); // На случай, если предыдущая страница тоже пустая
+		var NewPage      = new CTablePage(PrevPage.X, PrevPage.Y, PrevPage.XLimit, PrevPage.YLimit, LastRow, PrevPage.MaxTopBorder);
+		NewPage.FirstRow = LastRow;
+		NewPage.LastRow  = LastRow - 1;
 
-        this.Pages[PageIndex] = NewPage;
-    }
+		this.Pages[PageIndex] = NewPage;
+	}
 };
 CTable.prototype.Recalculate_Grid = function()
 {
-    this.private_RecalculateGrid();
+	this.private_RecalculateGrid();
 };
 CTable.prototype.Save_RecalculateObject = function()
 {
-    var RecalcObj = new CTableRecalculateObject();
-    RecalcObj.Save( this );
-    return RecalcObj;
+	var RecalcObj = new CTableRecalculateObject();
+	RecalcObj.Save(this);
+	return RecalcObj;
 };
 CTable.prototype.Load_RecalculateObject = function(RecalcObj)
 {
-    RecalcObj.Load(this);
+	RecalcObj.Load(this);
 };
 CTable.prototype.Prepare_RecalculateObject = function()
 {
-    this.TableSumGrid    = [];
-    this.TableGridCalc   = [];
+	this.TableSumGrid  = [];
+	this.TableGridCalc = [];
 
-    this.TableRowsBottom = [];
-    this.RowsInfo        = [];
+	this.TableRowsBottom = [];
+	this.RowsInfo        = [];
 
-    this.HeaderInfo =
-    {
-        Count     : 0,
-        H         : 0,
-        PageIndex : 0,
-        Pages     : []
-    };
+	this.HeaderInfo = {
+		Count     : 0,
+		H         : 0,
+		PageIndex : 0,
+		Pages     : []
+	};
 
-    this.Pages           = [];
+	this.Pages = [];
 
-    this.MaxTopBorder    = [];
-    this.MaxBotBorder    = [];
-    this.MaxBotMargin    = [];
+	this.MaxTopBorder = [];
+	this.MaxBotBorder = [];
+	this.MaxBotMargin = [];
 
-    this.RecalcInfo.Reset( true );
+	this.RecalcInfo.Reset(true);
 
-    var Count = this.Content.length;
-    for ( var Index = 0; Index < Count; Index++ )
-    {
-        this.Content[Index].Prepare_RecalculateObject();
-    }
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		this.Content[Index].Prepare_RecalculateObject();
+	}
 };
 CTable.prototype.Start_FromNewPage = function()
 {
-    this.Pages.length = 1;
-    this.Pages[0] = new CTablePage( 0, 0, 0, 0, 0, 0 );
+	this.Pages.length = 1;
+	this.Pages[0]     = new CTablePage(0, 0, 0, 0, 0, 0);
 
-    this.HeaderInfo.Pages[0] = {};
-    this.HeaderInfo.Pages[0].Draw = false;
+	this.HeaderInfo.Pages[0]      = {};
+	this.HeaderInfo.Pages[0].Draw = false;
 
-    this.RowsInfo[0] = {};
-    this.RowsInfo[0].Pages        = 1;
-    this.RowsInfo[0].Y            = [];
-    this.RowsInfo[0].H            = [];
-    this.RowsInfo[0].TopDy        = [];
-    this.RowsInfo[0].MaxTopBorder = [];
-    this.RowsInfo[0].FirstPage    = false;
-    this.RowsInfo[0].StartPage    = 0;
+	this.RowsInfo[0]              = {};
+	this.RowsInfo[0].Pages        = 1;
+	this.RowsInfo[0].Y            = [];
+	this.RowsInfo[0].H            = [];
+	this.RowsInfo[0].TopDy        = [];
+	this.RowsInfo[0].MaxTopBorder = [];
+	this.RowsInfo[0].FirstPage    = false;
+	this.RowsInfo[0].StartPage    = 0;
 
-    this.RowsInfo[0].X0           = 0;
-    this.RowsInfo[0].X1           = 0;
-    this.RowsInfo[0].MaxBotBorder = 0;
+	this.RowsInfo[0].X0           = 0;
+	this.RowsInfo[0].X1           = 0;
+	this.RowsInfo[0].MaxBotBorder = 0;
 
-    this.RowsInfo[0].Y[0]            = 0.0;
-    this.RowsInfo[0].H[0]            = 0.0;
-    this.RowsInfo[0].TopDy[0]        = 0.0;
-    this.RowsInfo[0].MaxTopBorder[0] = 0.0;
+	this.RowsInfo[0].Y[0]            = 0.0;
+	this.RowsInfo[0].H[0]            = 0.0;
+	this.RowsInfo[0].TopDy[0]        = 0.0;
+	this.RowsInfo[0].MaxTopBorder[0] = 0.0;
 
-    // Обнуляем таблицу суммарных высот ячеек
-    for ( var Index = -1; Index < this.Content.length; Index++ )
-    {
-        this.TableRowsBottom[Index] = [];
-        this.TableRowsBottom[Index][0] = 0;
-    }
+	// Обнуляем таблицу суммарных высот ячеек
+	for (var Index = -1; Index < this.Content.length; Index++)
+	{
+		this.TableRowsBottom[Index]    = [];
+		this.TableRowsBottom[Index][0] = 0;
+	}
 
-    this.Pages[0].MaxBotBorder = 0;
-    this.Pages[0].BotBorders   = [];
+	this.Pages[0].MaxBotBorder = 0;
+	this.Pages[0].BotBorders   = [];
 
-    if ( this.Content.length > 0 )
-    {
-        var CellsCount = this.Content[0].Get_CellsCount();
-        for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-        {
-            var Cell = this.Content[0].Get_Cell( CurCell );
-            Cell.Content.Start_FromNewPage();
-            Cell.PagesCount = 2;
-        }
-    }
+	if (this.Content.length > 0)
+	{
+		var CellsCount = this.Content[0].Get_CellsCount();
+		for (var CurCell = 0; CurCell < CellsCount; CurCell++)
+		{
+			var Cell = this.Content[0].Get_Cell(CurCell);
+			Cell.Content.Start_FromNewPage();
+			Cell.PagesCount = 2;
+		}
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Приватные функции связанные с рассчетом таблицы.
@@ -2116,6 +2115,8 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
 			nFootnotesHeight  = oFootnotes.GetHeight(nPageAbs, nColumnAbs);
 			nSavedY           = Y;
 			nSavedTableHeight = TableHeight;
+
+			this.Pages[CurPage].FootnotesH = nFootnotesHeight;
 		}
 
 		if ((0 === CurRow && true === this.Check_EmptyPages(CurPage - 1)) || CurRow != FirstRow || (CurRow === FirstRow && true === ResetStartElement))
@@ -2376,6 +2377,8 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         var nCurFootnotesHeight = oFootnotes ? oFootnotes.GetHeight(nPageAbs, nColumnAbs) : 0;
         if (oFootnotes && nCurFootnotesHeight > nFootnotesHeight + 0.001)
 		{
+			this.Pages[CurPage].FootnotesH = nCurFootnotesHeight;
+
 			nFootnotesHeight = nCurFootnotesHeight;
 			bResetFootnotes  = false;
 			Y                = nSavedY;
@@ -3036,6 +3039,7 @@ function CTablePage(X, Y, XLimit, YLimit, FirstRow, MaxTopBorder)
     this.LastRow      = FirstRow;
     this.Height       = 0;
     this.LastRowSplit = false;
+	this.FootnotesH   = 0;
 }
 CTablePage.prototype.Shift = function(Dx, Dy)
 {
