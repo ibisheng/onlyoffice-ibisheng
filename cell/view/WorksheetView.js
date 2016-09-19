@@ -3641,13 +3641,18 @@
 
         // draw active cell in selection
         var isPromote = AscCommonExcel.selectionLineType.RangeWithPromote === selectionLineType;
-        if (isPromote && oIntersection.contains(range.startCol, range.startRow)) {
-            var _x1 = c[range.startCol].left - offsetX + width_1px;
-            var _y1 = r[range.startRow].top - offsetY + height_1px;
-            var _w = c[range.startCol].width - width_2px;
-            var _h = r[range.startRow].height - height_2px;
-            if (0 < _w && 0 < _h) {
-                ctx.clearRect(_x1, _y1, _w, _h);
+        if (isPromote) {
+            var fs = this.model.getMergedByCell(range.startRow, range.startCol);
+            fs = range.intersectionSimple(
+              fs ? fs : new asc_Range(range.startCol, range.startRow, range.startCol, range.startRow));
+            if (fs) {
+                var _x1 = c[fs.c1].left - offsetX + width_1px;
+                var _y1 = r[fs.r1].top - offsetY + height_1px;
+                var _w = c[fs.c2].left - c[fs.c1].left + c[fs.c2].width - width_2px;
+                var _h = r[fs.r2].top - r[fs.r1].top + r[fs.r2].height - height_2px;
+                if (0 < _w && 0 < _h) {
+                    ctx.clearRect(_x1, _y1, _w, _h);
+                }
             }
         }
 
