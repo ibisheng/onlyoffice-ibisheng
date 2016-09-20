@@ -4701,28 +4701,28 @@ CellArea.prototype = {
 		return this.rightToLeft;
 	};
 	sparklineGroup.prototype.asc_getColorSeries = function () {
-		return this.colorSeries;
+		return this.colorSeries ? Asc.colorObjToAscColor(this.colorSeries) : this.colorSeries;
 	};
 	sparklineGroup.prototype.asc_getColorNegative = function () {
-		return this.colorNegative;
+		return this.colorNegative ? Asc.colorObjToAscColor(this.colorNegative) : this.colorNegative;
 	};
 	sparklineGroup.prototype.asc_getColorAxis = function () {
-		return this.colorAxis;
+		return this.colorAxis ? Asc.colorObjToAscColor(this.colorAxis) : this.colorAxis;
 	};
 	sparklineGroup.prototype.asc_getColorMarkers = function () {
-		return this.colorMarkers;
+		return this.colorMarkers ? Asc.colorObjToAscColor(this.colorMarkers) : this.colorMarkers;
 	};
 	sparklineGroup.prototype.asc_getColorFirst = function () {
-		return this.colorFirst;
+		return this.colorFirst ? Asc.colorObjToAscColor(this.colorFirst) : this.colorFirst;
 	};
 	sparklineGroup.prototype.asc_getColorLast = function () {
-		return this.colorLast;
+		return this.colorLast ? Asc.colorObjToAscColor(this.colorLast) : this.colorLast;
 	};
 	sparklineGroup.prototype.asc_getColorHigh = function () {
-		return this.colorHigh;
+		return this.colorHigh ? Asc.colorObjToAscColor(this.colorHigh) : this.colorHigh;
 	};
 	sparklineGroup.prototype.asc_getColorLow = function () {
-		return this.colorLow;
+		return this.colorLow ? Asc.colorObjToAscColor(this.colorLow) : this.colorLow;
 	};
 	/** @constructor */
 	function sparkline() {
