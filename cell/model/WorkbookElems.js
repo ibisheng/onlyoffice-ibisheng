@@ -4700,6 +4700,30 @@ CellArea.prototype = {
 	sparklineGroup.prototype.asc_getRightToLeft = function () {
 		return this.rightToLeft;
 	};
+	sparklineGroup.prototype.asc_getColorSeries = function () {
+		return this.colorSeries;
+	};
+	sparklineGroup.prototype.asc_getColorNegative = function () {
+		return this.colorNegative;
+	};
+	sparklineGroup.prototype.asc_getColorAxis = function () {
+		return this.colorAxis;
+	};
+	sparklineGroup.prototype.asc_getColorMarkers = function () {
+		return this.colorMarkers;
+	};
+	sparklineGroup.prototype.asc_getColorFirst = function () {
+		return this.colorFirst;
+	};
+	sparklineGroup.prototype.asc_getColorLast = function () {
+		return this.colorLast;
+	};
+	sparklineGroup.prototype.asc_getColorHigh = function () {
+		return this.colorHigh;
+	};
+	sparklineGroup.prototype.asc_getColorLow = function () {
+		return this.colorLow;
+	};
 	/** @constructor */
 	function sparkline() {
 		this.sqref = null;
@@ -6912,6 +6936,14 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	prot["asc_getMinAxisType"]		= prot.asc_getMinAxisType;
 	prot["asc_getMaxAxisType"]		= prot.asc_getMaxAxisType;
 	prot["asc_getRightToLeft"]		= prot.asc_getRightToLeft;
+	prot["asc_getColorSeries"]		= prot.asc_getColorSeries;
+	prot["asc_getColorNegative"]	= prot.asc_getColorNegative;
+	prot["asc_getColorAxis"]			= prot.asc_getColorAxis;
+	prot["asc_getColorMarkers"]		= prot.asc_getColorMarkers;
+	prot["asc_getColorFirst"]			= prot.asc_getColorFirst;
+	prot["asc_getColorLast"]			= prot.asc_getColorLast;
+	prot["asc_getColorHigh"]			= prot.asc_getColorHigh;
+	prot["asc_getColorLow"]				= prot.asc_getColorLow;
 	window['AscCommonExcel'].sparkline = sparkline;
 	window['AscCommonExcel'].TablePart = TablePart;
 	window['AscCommonExcel'].AutoFilter = AutoFilter;
