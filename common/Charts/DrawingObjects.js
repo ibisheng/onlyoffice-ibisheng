@@ -2392,7 +2392,7 @@ function DrawingObjects() {
     {
         var maxVal = null, minVal = null, i, j;
         if(oSparklineGroup.type !== Asc.c_oAscSparklineType.Stacked &&
-            (Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.minAxisType || Asc.SparklineAxisMinMax.Group === oSparklineGroup.maxAxisType))
+            (Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.minAxisType || Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.maxAxisType))
         {
             for(i = 0; i < oSparklineGroup.arrSparklines.length; ++i)
             {
@@ -2466,7 +2466,7 @@ function DrawingObjects() {
             var oSparklineGroup = aSparklineGroups[i];
 
             if(oSparklineGroup.type !== Asc.c_oAscSparklineType.Stacked &&
-                (Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.minAxisType || Asc.SparklineAxisMinMax.Group === oSparklineGroup.maxAxisType))
+                (Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.minAxisType || Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.maxAxisType))
             {
                 _this.checkSparklineGroupMinMaxVal(oSparklineGroup);
             }
