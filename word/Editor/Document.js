@@ -1977,122 +1977,128 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
         }
     }
 
-    if (-1 === RecalcData.Inline.Pos && -1 === SectPrIndex)
-    {
-        // Никаких изменений не было ни с самим документом, ни секциями
-        ChangeIndex               = -1;
-        RecalcData.Inline.PageNum = 0;
-    }
-    else if (-1 === RecalcData.Inline.Pos)
-    {
-        // Были изменения только внутри секций
-        MainChange = false;
-
-        // Выставляем начало изменений на начало секции
-        ChangeIndex               = ( 0 === SectPrIndex ? 0 : this.SectionsInfo.Get_SectPr2(SectPrIndex - 1).Index + 1 );
-        RecalcData.Inline.PageNum = 0;
-    }
-    else if (-1 === SectPrIndex)
-    {
-        // Изменения произошли только внутри основного документа
-        MainChange = true;
-
-        ChangeIndex = RecalcData.Inline.Pos;
-    }
-    else
-    {
-        // Изменения произошли и внутри документа, и внутри секций. Смотрим на более ранюю точку начала изменений
-        // для секций и основоной части документа.
-        MainChange = true;
-
-        ChangeIndex = RecalcData.Inline.Pos;
-
-        var ChangeIndex2 = ( 0 === SectPrIndex ? 0 : this.SectionsInfo.Get_SectPr2(SectPrIndex - 1).Index + 1 );
-
-        if (ChangeIndex2 <= ChangeIndex)
-        {
-            ChangeIndex               = ChangeIndex2;
-            RecalcData.Inline.PageNum = 0;
-        }
-    }
-
-    if (ChangeIndex < 0)
-    {
-        this.DrawingDocument.ClearCachePages();
-        this.DrawingDocument.FirePaint();
-        return;
-    }
-    else if (ChangeIndex >= this.Content.length)
-    {
-        ChangeIndex = this.Content.length - 1;
-    }
-
-    // Здсь мы должны проверить предыдущие элементы на наличие параматра KeepNext
-    while (ChangeIndex > 0)
-    {
-        var PrevElement = this.Content[ChangeIndex - 1];
-        if (type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Get_CompiledPr2(false).ParaPr.KeepNext)
-        {
-            ChangeIndex--;
-            RecalcData.Inline.PageNum = PrevElement.Get_StartPage_Absolute() + (PrevElement.Pages.length - 1); // считаем, что изменилась последняя страница
-        }
-        else
-        {
-            break;
-        }
-    }
-
-    // Найдем начальную страницу, с которой мы начнем пересчет
-    var StartPage  = 0;
-    var StartIndex = 0;
-
-    var ChangedElement = this.Content[ChangeIndex];
-    if (ChangedElement.Pages.length > 0 && -1 !== ChangedElement.Index && ChangedElement.Get_StartPage_Absolute() < RecalcData.Inline.PageNum - 1)
-    {
-        StartIndex = ChangeIndex;
-        StartPage  = RecalcData.Inline.PageNum - 1;
-    }
-    else
-    {
-        var PagesCount = this.Pages.length;
-        for (var PageIndex = 0; PageIndex < PagesCount; PageIndex++)
-        {
-            if (ChangeIndex > this.Pages[PageIndex].Pos)
-            {
-                StartPage  = PageIndex;
-                StartIndex = this.Pages[PageIndex].Pos;
-            }
-            else
-                break;
-        }
-
-        if (ChangeIndex === StartIndex && StartPage < RecalcData.Inline.PageNum)
-            StartPage = RecalcData.Inline.PageNum - 1;
-    }
-
-    // Если у нас уже начался долгий пересчет, тогда мы его останавливаем, и запускаем новый с текущими параметрами.
-    // Здесь возможен случай, когда мы долгий пересчет основной части документа останавливаем из-за пересчета
-    // колонтитулов, в этом случае параметр MainContentPos не меняется, и мы будем пересчитывать только колонтитулы
-    // либо до страницы, на которой они приводят к изменению основную часть документа, либо до страницы, где
-    // остановился предыдущий пересчет.
-
-    if (null != this.FullRecalc.Id)
-    {
-        clearTimeout(this.FullRecalc.Id);
-        this.FullRecalc.Id = null;
-        this.DrawingDocument.OnEndRecalculate(false);
-
-        if (this.FullRecalc.StartIndex < StartIndex)
-        {
-            StartIndex = this.FullRecalc.StartIndex;
-            StartPage  = this.FullRecalc.PageIndex;
-        }
-    }
-	else if (null !== this.HdrFtrRecalc.Id)
+	if (-1 === RecalcData.Inline.Pos && -1 === SectPrIndex)
 	{
-		clearTimeout(this.HdrFtrRecalc.Id);
-		this.HdrFtrRecalc.Id = null;
-		this.DrawingDocument.OnEndRecalculate(false);
+		// Никаких изменений не было ни с самим документом, ни секциями
+		ChangeIndex               = -1;
+		RecalcData.Inline.PageNum = 0;
+	}
+	else if (-1 === RecalcData.Inline.Pos)
+	{
+		// Были изменения только внутри секций
+		MainChange = false;
+
+		// Выставляем начало изменений на начало секции
+		ChangeIndex               = ( 0 === SectPrIndex ? 0 : this.SectionsInfo.Get_SectPr2(SectPrIndex - 1).Index + 1 );
+		RecalcData.Inline.PageNum = 0;
+	}
+	else if (-1 === SectPrIndex)
+	{
+		// Изменения произошли только внутри основного документа
+		MainChange = true;
+
+		ChangeIndex = RecalcData.Inline.Pos;
+	}
+	else
+	{
+		// Изменения произошли и внутри документа, и внутри секций. Смотрим на более ранюю точку начала изменений
+		// для секций и основоной части документа.
+		MainChange = true;
+
+		ChangeIndex = RecalcData.Inline.Pos;
+
+		var ChangeIndex2 = ( 0 === SectPrIndex ? 0 : this.SectionsInfo.Get_SectPr2(SectPrIndex - 1).Index + 1 );
+
+		if (ChangeIndex2 <= ChangeIndex)
+		{
+			ChangeIndex               = ChangeIndex2;
+			RecalcData.Inline.PageNum = 0;
+		}
+	}
+
+	if (ChangeIndex < 0)
+	{
+		this.DrawingDocument.ClearCachePages();
+		this.DrawingDocument.FirePaint();
+		return;
+	}
+
+	// Найдем начальную страницу, с которой мы начнем пересчет
+	var StartPage  = 0;
+	var StartIndex = 0;
+
+	if (ChangeIndex >= this.Content.length)
+	{
+		// Сюда мы попадаем при рассчете сносок, которые выходят за пределы самого документа
+		StartIndex = this.Content.length;
+		StartPage  = RecalcData.Inline.PageNum;
+	}
+	else
+	{
+
+		// Здсь мы должны проверить предыдущие элементы на наличие параматра KeepNext
+		while (ChangeIndex > 0)
+		{
+			var PrevElement = this.Content[ChangeIndex - 1];
+			if (type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Get_CompiledPr2(false).ParaPr.KeepNext)
+			{
+				ChangeIndex--;
+				RecalcData.Inline.PageNum = PrevElement.Get_StartPage_Absolute() + (PrevElement.Pages.length - 1); // считаем, что изменилась последняя страница
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		var ChangedElement = this.Content[ChangeIndex];
+		if (ChangedElement.Pages.length > 0 && -1 !== ChangedElement.Index && ChangedElement.Get_StartPage_Absolute() < RecalcData.Inline.PageNum - 1)
+		{
+			StartIndex = ChangeIndex;
+			StartPage  = RecalcData.Inline.PageNum - 1;
+		}
+		else
+		{
+			var PagesCount = this.Pages.length;
+			for (var PageIndex = 0; PageIndex < PagesCount; PageIndex++)
+			{
+				if (ChangeIndex > this.Pages[PageIndex].Pos)
+				{
+					StartPage  = PageIndex;
+					StartIndex = this.Pages[PageIndex].Pos;
+				}
+				else
+					break;
+			}
+
+			if (ChangeIndex === StartIndex && StartPage < RecalcData.Inline.PageNum)
+				StartPage = RecalcData.Inline.PageNum - 1;
+		}
+
+		// Если у нас уже начался долгий пересчет, тогда мы его останавливаем, и запускаем новый с текущими параметрами.
+		// Здесь возможен случай, когда мы долгий пересчет основной части документа останавливаем из-за пересчета
+		// колонтитулов, в этом случае параметр MainContentPos не меняется, и мы будем пересчитывать только колонтитулы
+		// либо до страницы, на которой они приводят к изменению основную часть документа, либо до страницы, где
+		// остановился предыдущий пересчет.
+
+		if (null != this.FullRecalc.Id)
+		{
+			clearTimeout(this.FullRecalc.Id);
+			this.FullRecalc.Id = null;
+			this.DrawingDocument.OnEndRecalculate(false);
+
+			if (this.FullRecalc.StartIndex < StartIndex)
+			{
+				StartIndex = this.FullRecalc.StartIndex;
+				StartPage  = this.FullRecalc.PageIndex;
+			}
+		}
+		else if (null !== this.HdrFtrRecalc.Id)
+		{
+			clearTimeout(this.HdrFtrRecalc.Id);
+			this.HdrFtrRecalc.Id = null;
+			this.DrawingDocument.OnEndRecalculate(false);
+		}
 	}
 
 	this.HdrFtrRecalc.PageCount = -1;
@@ -2758,34 +2764,53 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
 
     if (Index >= Count)
     {
-        this.Internal_CheckCurPage();
-        this.DrawingDocument.OnEndRecalculate(true);
-        this.DrawingObjects.onEndRecalculateDocument(this.Pages.length);
-
-        if (true === this.Selection.UpdateOnRecalc)
-        {
-            this.Selection.UpdateOnRecalc = false;
-            this.DrawingDocument.OnSelectEnd();
-        }
-
-        this.FullRecalc.Id           = null;
-        this.FullRecalc.MainStartPos = -1;
-
-		// Основной пересчет окончен, если в колонтитулах есть элемент с количеством страниц, тогда нам надо
-		// запустить дополнительный пересчет колонтитулов.
-		// Если так случилось, что после повторного полного пересчета, вызванного изменением количества страниц и
-		// изменением метрик колонтитула, новое количество страниц стало меньше, чем раньше, тогда мы не пересчитываем
-		// дальше, чтобы избежать зацикливаний.
-
-		if (-1 === this.HdrFtrRecalc.PageCount || this.HdrFtrRecalc.PageCount < this.Pages.length)
+		// Пересчет основной части документа законечен. Возможна ситуация, при которой последние сноски с данной
+		// страницы переносятся на следующую (т.е. остались непересчитанные сноски). Эти сноски нужно пересчитать
+		if (this.Footnotes.HaveContinuesFootnotes(PageIndex, ColumnIndex))
 		{
-			this.HdrFtrRecalc.PageCount = this.Pages.length;
-			var nPageCountStartPage = this.HdrFtr.HavePageCountElement();
-			if (-1 !== nPageCountStartPage)
+			bContinue    = true;
+			_PageIndex   = PageIndex;
+			_ColumnIndex = ColumnIndex + 1;
+			if (_ColumnIndex >= ColumnsCount)
 			{
-				this.DrawingDocument.OnStartRecalculate(nPageCountStartPage);
-				this.HdrFtrRecalc.PageIndex = nPageCountStartPage;
-				this.private_RecalculateHdrFtrPageCountUpdate();
+				_ColumnIndex = 0;
+				_PageIndex   = PageIndex + 1;
+			}
+
+			_bStart     = true;
+			_StartIndex = Count;
+		}
+		else
+		{
+			this.Internal_CheckCurPage();
+			this.DrawingDocument.OnEndRecalculate(true);
+			this.DrawingObjects.onEndRecalculateDocument(this.Pages.length);
+
+			if (true === this.Selection.UpdateOnRecalc)
+			{
+				this.Selection.UpdateOnRecalc = false;
+				this.DrawingDocument.OnSelectEnd();
+			}
+
+			this.FullRecalc.Id           = null;
+			this.FullRecalc.MainStartPos = -1;
+
+			// Основной пересчет окончен, если в колонтитулах есть элемент с количеством страниц, тогда нам надо
+			// запустить дополнительный пересчет колонтитулов.
+			// Если так случилось, что после повторного полного пересчета, вызванного изменением количества страниц и
+			// изменением метрик колонтитула, новое количество страниц стало меньше, чем раньше, тогда мы не пересчитываем
+			// дальше, чтобы избежать зацикливаний.
+
+			if (-1 === this.HdrFtrRecalc.PageCount || this.HdrFtrRecalc.PageCount < this.Pages.length)
+			{
+				this.HdrFtrRecalc.PageCount = this.Pages.length;
+				var nPageCountStartPage     = this.HdrFtr.HavePageCountElement();
+				if (-1 !== nPageCountStartPage)
+				{
+					this.DrawingDocument.OnStartRecalculate(nPageCountStartPage);
+					this.HdrFtrRecalc.PageIndex = nPageCountStartPage;
+					this.private_RecalculateHdrFtrPageCountUpdate();
+				}
 			}
 		}
     }

@@ -488,6 +488,16 @@ CFootnotesController.prototype.LoadRecalculateObject = function(nPageAbs, nColum
 
 	oColumn.LoadRecalculateObject(oRObject);
 };
+CFootnotesController.prototype.HaveContinuesFootnotes = function(nPageAbs, nColumnAbs)
+{
+	var oColumn = this.private_GetPageColumn(nPageAbs, nColumnAbs);
+	if (!oColumn)
+		return false;
+
+	var arrContinues = oColumn.GetContinuesElements();
+
+	return (arrContinues.length > 0 ? true : false);
+};
 /**
  * Проверяем, используется заданная сноска в документе.
  * @param {string} sFootnoteId
