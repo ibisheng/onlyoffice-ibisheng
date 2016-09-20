@@ -328,17 +328,17 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         {
             switch(oSparklineGroup.displayEmptyCellsAs)
             {
-                case Asc.EDispBlanksAs.Span:
+                case Asc.c_oAscEDispBlanksAs.Span:
                 {
                     chart_space.displayEmptyCellsAs = 0;
                     break;
                 }
-                case Asc.EDispBlanksAs.Gap:
+                case Asc.c_oAscEDispBlanksAs.Gap:
                 {
                     chart_space.displayEmptyCellsAs = 1;
                     break;
                 }
-                case Asc.EDispBlanksAs.Zero:
+                case Asc.c_oAscEDispBlanksAs.Zero:
                 {
                     chart_space.displayEmptyCellsAs = 2;
                     break;
@@ -356,7 +356,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         var val_ax_props = new AscCommon.asc_ValAxisSettings();
         if(settings.type !== c_oAscChartTypeSettings.barStackedPer)
         {
-            if(oSparklineGroup.minAxisType === Asc.SparklineAxisMinMax.Custom && oSparklineGroup.manualMin != null)
+            if(oSparklineGroup.minAxisType === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.manualMin != null)
             {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
                 val_ax_props.putMinVal(oSparklineGroup.manualMin);
@@ -365,7 +365,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.auto);
             }
-            if(oSparklineGroup.maxAxisType === Asc.SparklineAxisMinMax.Custom && oSparklineGroup.manualMax != null)
+            if(oSparklineGroup.maxAxisType === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.manualMax != null)
             {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
                 val_ax_props.putMinVal(oSparklineGroup.manualMax);
@@ -2392,7 +2392,7 @@ function DrawingObjects() {
     {
         var maxVal = null, minVal = null, i, j;
         if(oSparklineGroup.type !== Asc.c_oAscSparklineType.Stacked &&
-            (Asc.SparklineAxisMinMax.Group === oSparklineGroup.minAxisType || Asc.SparklineAxisMinMax.Group === oSparklineGroup.maxAxisType))
+            (Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.minAxisType || Asc.SparklineAxisMinMax.Group === oSparklineGroup.maxAxisType))
         {
             for(i = 0; i < oSparklineGroup.arrSparklines.length; ++i)
             {
@@ -2404,7 +2404,7 @@ function DrawingObjects() {
                 var aPoints = AscFormat.getPtsFromSeries(oSparklineGroup.arrCachedSparklines[i].chartSpace.chart.plotArea.charts[0].series[0]);
                 for(j = 0; j < aPoints.length; ++j)
                 {
-                    if(Asc.SparklineAxisMinMax.Group === oSparklineGroup.maxAxisType)
+                    if(Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.maxAxisType)
                     {
                         if(maxVal === null)
                         {
@@ -2418,7 +2418,7 @@ function DrawingObjects() {
                             }
                         }
                     }
-                    if(Asc.SparklineAxisMinMax.Group === oSparklineGroup.minAxisType)
+                    if(Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.minAxisType)
                     {
                         if(minVal === null)
                         {
@@ -2466,7 +2466,7 @@ function DrawingObjects() {
             var oSparklineGroup = aSparklineGroups[i];
 
             if(oSparklineGroup.type !== Asc.c_oAscSparklineType.Stacked &&
-                (Asc.SparklineAxisMinMax.Group === oSparklineGroup.minAxisType || Asc.SparklineAxisMinMax.Group === oSparklineGroup.maxAxisType))
+                (Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.minAxisType || Asc.SparklineAxisMinMax.Group === oSparklineGroup.maxAxisType))
             {
                 _this.checkSparklineGroupMinMaxVal(oSparklineGroup);
             }

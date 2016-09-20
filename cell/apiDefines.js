@@ -364,6 +364,16 @@ var c_oAscPopUpSelectorType = {
     Column: 1,
     Stacked: 2
   };
+  var c_oAscEDispBlanksAs = {
+    Span: 0,
+    Gap: 1,
+    Zero: 2
+  };
+  var c_oAscSparklineAxisMinMax = {
+    Individual: 0,
+    Group: 1,
+    Custom: 2
+  };
 
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommonExcel'] = window['AscCommonExcel'] || {};
@@ -541,4 +551,14 @@ var c_oAscPopUpSelectorType = {
   prot['Line'] = prot.Line;
   prot['Column'] = prot.Column;
   prot['Stacked'] = prot.Stacked;
+  window['Asc']['c_oAscEDispBlanksAs'] = window['Asc'].c_oAscEDispBlanksAs = c_oAscEDispBlanksAs;
+  prot = c_oAscEDispBlanksAs;
+  prot['Span'] = prot.Span;
+  prot['Gap'] = prot.Gap;
+  prot['Zero'] = prot.Zero;
+  window['Asc']['c_oAscSparklineAxisMinMax'] = window['Asc'].c_oAscSparklineAxisMinMax = c_oAscSparklineAxisMinMax;
+  prot = c_oAscSparklineAxisMinMax;
+  prot['Individual'] = prot.Individual;
+  prot['Group'] = prot.Group;
+  prot['Custom'] = prot.Custom;
 })(window);

@@ -4560,7 +4560,7 @@ CellArea.prototype = {
 		this.lineWeight = 0.75;
 		this.type = Asc.c_oAscSparklineType.Line;
 		this.dateAxis = false;
-		this.displayEmptyCellsAs = Asc.EDispBlanksAs.Zero;
+		this.displayEmptyCellsAs = Asc.c_oAscEDispBlanksAs.Zero;
 		this.markers = false;
 		this.high = false;
 		this.low = false;
@@ -4569,8 +4569,8 @@ CellArea.prototype = {
 		this.negative = false;
 		this.displayXAxis = false;
 		this.displayHidden = false;
-		this.minAxisType = Asc.SparklineAxisMinMax.Individual;
-		this.maxAxisType = Asc.SparklineAxisMinMax.Individual;
+		this.minAxisType = Asc.c_oAscSparklineAxisMinMax.Individual;
+		this.maxAxisType = Asc.c_oAscSparklineAxisMinMax.Individual;
 		this.rightToLeft = false;
 
 		// elements
