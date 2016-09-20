@@ -121,6 +121,7 @@
 	function asc_CAscEditorPermissions() {
 		this.licenseType = c_oLicenseResult.Error;
 		this.isLight = false;
+		this.trial = false;
 		this.canCoAuthoring = true;
 		this.canReaderMode = true;
 		this.canBranding = false;
@@ -154,6 +155,9 @@
 	asc_CAscEditorPermissions.prototype.asc_getIsLight = function () {
 		return this.isLight;
 	};
+	asc_CAscEditorPermissions.prototype.asc_getTrial = function () {
+		return this.trial;
+	};
 
 	asc_CAscEditorPermissions.prototype.setLicenseType = function (v) {
 		this.licenseType = v;
@@ -163,6 +167,9 @@
 	};
 	asc_CAscEditorPermissions.prototype.setIsLight = function (v) {
 		this.isLight = v;
+	};
+	asc_CAscEditorPermissions.prototype.setIsTrial = function (v) {
+		this.trial = v;
 	};
 
 	/** @constructor */
@@ -2686,6 +2693,7 @@
 	prot["asc_getAutosaveMinInterval"] = prot.asc_getAutosaveMinInterval;
 	prot["asc_getIsAnalyticsEnable"] = prot.asc_getIsAnalyticsEnable;
 	prot["asc_getIsLight"] = prot.asc_getIsLight;
+	prot["asc_getTrial"] = prot.asc_getTrial;
 
 	window["AscCommon"].asc_ValAxisSettings = asc_ValAxisSettings;
 	prot = asc_ValAxisSettings.prototype;
