@@ -70,6 +70,8 @@ function CFootnotesController(LogicDocument)
 		Direction : 0
 	};
 
+	this.CellLimits = []; // Для рассчета сносок, встречающихся в ячейках с минимальной или фиксированной высотой строки
+
 	this.CurFootnote = null;
 
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
@@ -234,11 +236,11 @@ CFootnotesController.prototype.ContinueElementsFromPreviousColumn = function(nPa
  * Рассчитываем сноски, которые перенеслись с предыдущей колонки
  * @param {number} nPageAbs
  * @param {number} nColumnAbs
- * @param {number} Y
+ * @param {number} dY
  * @param {Array.CFootEndnote} arrFootnotes
  * @returns {boolean} true - расчиталось нормально, и перенос делать не надо, false - данные сноски перенеслись на следующую страницу
  */
-CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumnAbs, Y, arrFootnotes)
+CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumnAbs, dY, arrFootnotes)
 {
 	if (!arrFootnotes || arrFootnotes.length <= 0)
 		return true;
@@ -246,6 +248,13 @@ CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumn
 	var oColumn = this.private_GetPageColumn(nPageAbs, nColumnAbs);
 	if (!oColumn)
 		return true;
+
+	var Y = dY;
+	for (var nIndex = 0, nCount = this.CellLimits.length; nIndex < nCount; ++nIndex)
+	{
+		if (Y < this.CellLimits[nIndex] - 0.001)
+			Y = this.CellLimits[nIndex];
+	}
 
 	var isLowerY = (Y < oColumn.ReferenceY + 0.001 ? true : false);
 
@@ -418,6 +427,14 @@ CFootnotesController.prototype.Shift = function(nPageAbs, nColumnAbs, dX, dY)
 		oFootnote.Shift(nFootnotePageIndex, dX, dY);
 	}
 };
+CFootnotesController.prototype.PushCellLimit = function(dY)
+{
+	this.CellLimits.push(dY);
+};
+CFootnotesController.prototype.PopCellLimit = function()
+{
+	this.CellLimits.length = Math.max(0, this.CellLimits.length - 1);
+};
 CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nColumnAbs)
 {
 	// Случай, когда своя отдельная нумерация на каждой странице
@@ -437,16 +454,7 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nCol
 		{
 			var arrContinuesElements = oColumn.GetContinuesElements();
 			if (arrContinuesElements.length > 0)
-			{
-				var oFootnote    = arrContinuesElements[0];
-				var nStartPage   = oFootnote.Get_StartPage_Absolute();
-				var nStartColumn = oFootnote.Get_StartColumn_Absolute();
-				
-				if (nStartPage === nPageAbs && nStartColumn === nColumnAbs && true !== oFootnote.Is_ContentOnFirstPage())
-					nAdditional = arrContinuesElements.length;
-				else
-					nAdditional = arrContinuesElements.length - 1;
-			}
+				nAdditional = arrContinuesElements.length - 1;
 		}
 
 		if (oColumn.Elements.length > 0)
