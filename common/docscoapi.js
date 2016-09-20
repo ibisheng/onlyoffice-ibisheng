@@ -49,6 +49,7 @@
       this.onParticipantsChanged = options.onParticipantsChanged;
       this.onMessage = options.onMessage;
       this.onCursor =  options.onCursor;
+      this.onMeta =  options.onMeta;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
@@ -83,6 +84,9 @@
       };
       this._CoAuthoringApi.onCursor = function(e) {
         t.callback_OnCursor(e);
+      };
+      this._CoAuthoringApi.onMeta = function(e) {
+        t.callback_OnMeta(e);
       };
       this._CoAuthoringApi.onLocksAcquired = function(e) {
         t.callback_OnLocksAcquired(e);
@@ -343,6 +347,12 @@
     }
   };
 
+  CDocsCoApi.prototype.callback_OnMeta = function(e) {
+    if (this.onMeta) {
+      this.onMeta(e);
+    }
+  };
+
   CDocsCoApi.prototype.callback_OnLocksAcquired = function(e) {
     if (this.onLocksAcquired) {
       this.onLocksAcquired(e);
@@ -456,6 +466,7 @@
       this.onParticipantsChanged = options.onParticipantsChanged;
       this.onMessage = options.onMessage;
       this.onCursor = options.onCursor;
+      this.onMeta = options.onMeta;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
@@ -818,6 +829,12 @@
   DocsCoApi.prototype._onCursor = function(data) {
     if (data["messages"] && this.onCursor) {
       this.onCursor(data["messages"]);
+    }
+  };
+
+  DocsCoApi.prototype._onMeta = function(data) {
+    if (data["messages"] && this.onMeta) {
+      this.onMeta(data["messages"]);
     }
   };
 
@@ -1286,6 +1303,9 @@
           break;
         case 'cursor'       :
           t._onCursor(dataObject);
+          break;
+        case 'meta' :
+          t._onMeta(dataObject);
           break;
         case 'getLock'      :
           t._onGetLock(dataObject);

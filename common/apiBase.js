@@ -572,6 +572,10 @@
 		{
 			t.sendEvent('asc_onError', c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
 		};
+		this.CoAuthoringApi.onMeta                    = function(data)
+		{
+			t.sendEvent('asc_onMeta', data);
+		};
 		/**
 		 * Event об отсоединении от сервера
 		 * @param {jQuery} e  event об отсоединении с причиной
