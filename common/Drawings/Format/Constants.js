@@ -2362,7 +2362,10 @@
 	window['AscDFH'].historyitem_Math_BoxForcedBreak        = 56;
 	window['AscDFH'].historyitem_Math_DegreeSubSupType      = 57;
 
-	window['AscDFH'].historyitem_Footnotes_AddFootnote = 1;
+	window['AscDFH'].historyitem_Footnotes_AddFootnote              = 1;
+	window['AscDFH'].historyitem_Footnotes_SetSeparator             = 2;
+	window['AscDFH'].historyitem_Footnotes_SetContinuationSeparator = 3;
+	window['AscDFH'].historyitem_Footnotes_SetContinuationNotice    = 4;
 
 	window['AscDFH'].historydescription_Cut                                         = 0x0001;
 	window['AscDFH'].historydescription_PasteButtonIE                               = 0x0002;

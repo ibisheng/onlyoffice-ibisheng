@@ -1550,7 +1550,7 @@ CDocument.prototype.On_EndLoad                     = function()
         this.Set_FastCollaborativeEditing(true);
     }
 
-    //this.Footnotes.Init();
+    //this.Footnotes.ResetSpecialFootnotes();
 };
 CDocument.prototype.Add_TestDocument               = function()
 {
@@ -11417,7 +11417,7 @@ CDocument.prototype.AddFootnote = function()
 		var nDocPosType = this.Get_DocPosType();
 		if (docpostype_Content === nDocPosType)
 		{
-			var oFootnote = this.Footnotes.Create_Footnote();
+			var oFootnote = this.Footnotes.CreateFootnote();
 			oFootnote.Paragraph_Add(new ParaFootnoteRef(oFootnote));
 			oFootnote.Paragraph_Add(new ParaSpace());
 			oFootnote.Cursor_MoveToEndPos(false);

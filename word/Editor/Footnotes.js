@@ -47,8 +47,6 @@ function CFootnotesController(LogicDocument)
 	this.Footnote = {}; // Список всех сносок с ключом - Id.
 	this.Pages    = [];
 
-	this.NeedShift = false; // Нужно ли делать перенос после пересчета.
-
 	// Специальные сноски
 	this.ContinuationNoticeFootnote    = null;
 	this.ContinuationSeparatorFootnote = null;
@@ -57,14 +55,14 @@ function CFootnotesController(LogicDocument)
 	this.Selection = {
 		Use       : false,
 		Start     : {
-			Footnote   : null,
-			Page       : 0,
-			Index      : 0
+			Footnote : null,
+			Page     : 0,
+			Index    : 0
 		},
 		End       : {
-			Footnote   : null,
-			Page       : 0,
-			Index      : 0
+			Footnote : null,
+			Page     : 0,
+			Index    : 0
 		},
 		Footnotes : {},
 		Direction : 0
@@ -90,32 +88,75 @@ CFootnotesController.prototype.Get_Id = function()
 /**
  * Начальная инициализация после загрузки всех файлов.
  */
-CFootnotesController.prototype.Init = function()
+CFootnotesController.prototype.ResetSpecialFootnotes = function()
 {
-	this.SeparatorFootnote = new CFootEndnote(this);
-	this.SeparatorFootnote.Paragraph_Add(new ParaSeparator(), false);
-	var oParagraph = this.SeparatorFootnote.Get_ElementByIndex(0);
+	var oSeparator = new CFootEndnote(this);
+	oSeparator.Paragraph_Add(new ParaSeparator(), false);
+	var oParagraph = oSeparator.Get_ElementByIndex(0);
 	oParagraph.Set_Spacing({After : 0, Line : 1, LineRule : Asc.linerule_Auto}, false);
+	this.SetSeparator(oSeparator);
 
-	this.ContinuationSeparatorFootnote = new CFootEndnote(this);
-	this.ContinuationSeparatorFootnote.Paragraph_Add(new ParaContinuationSeparator(), false);
-	oParagraph = this.ContinuationSeparatorFootnote.Get_ElementByIndex(0);
+	var oContinuationSeparator = new CFootEndnote(this);
+	oContinuationSeparator.Paragraph_Add(new ParaContinuationSeparator(), false);
+	oParagraph = oContinuationSeparator.Get_ElementByIndex(0);
 	oParagraph.Set_Spacing({After : 0, Line : 1, LineRule : Asc.linerule_Auto}, false);
+	this.SetContinuationSeparator(oContinuationSeparator);
+
+	this.SetContinuationNotice(null);
 };
 /**
  * Создаем новую сноску.
  * @returns {CFootEndnote}
  */
-CFootnotesController.prototype.Create_Footnote = function()
+CFootnotesController.prototype.CreateFootnote = function()
 {
 	var NewFootnote                     = new CFootEndnote(this);
 	this.Footnote[NewFootnote.Get_Id()] = NewFootnote;
-
-
+	
 	var oHistory = this.LogicDocument.Get_History();
 	oHistory.Add(this, {Type : AscDFH.historyitem_Footnotes_AddFootnote, Id : NewFootnote.Get_Id()});
 
 	return NewFootnote;
+};
+/**
+ * Добавляем сноску (функция для открытия файла)
+ * @param oFootnote
+ */
+CFootnotesController.prototype.AddFootnote = function(oFootnote)
+{
+	this.Footnote[oFootnote.Get_Id()] = oFootnote;
+	var oHistory = this.LogicDocument.Get_History();
+	oHistory.Add(this, {Type : AscDFH.historyitem_Footnotes_AddFootnote, Id : oFootnote.Get_Id()});
+};
+CFootnotesController.prototype.SetSeparator = function(oFootnote)
+{
+	var oNewValue = oFootnote ? oFootnote : null;
+	var oOldValue = this.SeparatorFootnote ? this.SeparatorFootnote : null;
+
+	var oHistory = this.LogicDocument.Get_History();
+	oHistory.Add(this, {Type : AscDFH.historyitem_Footnotes_SetSeparator, New : oNewValue, Old : oOldValue});
+
+	this.SeparatorFootnote = oNewValue;
+};
+CFootnotesController.prototype.SetContinuationSeparator = function(oFootnote)
+{
+	var oNewValue = oFootnote ? oFootnote : null;
+	var oOldValue = this.ContinuationSeparatorFootnote ? this.ContinuationSeparatorFootnote : null;
+
+	var oHistory = this.LogicDocument.Get_History();
+	oHistory.Add(this, {Type : AscDFH.historyitem_Footnotes_SetContinuationSeparator, New : oNewValue, Old : oOldValue});
+
+	this.ContinuationSeparatorFootnote = oNewValue;
+};
+CFootnotesController.prototype.SetContinuationNotice = function(oFootnote)
+{
+	var oNewValue = oFootnote ? oFootnote : null;
+	var oOldValue = this.ContinuationNoticeFootnote ? this.ContinuationNoticeFootnote : null;
+
+	var oHistory = this.LogicDocument.Get_History();
+	oHistory.Add(this, {Type : AscDFH.historyitem_Footnotes_SetContinuationNotice, New : oNewValue, Old : oOldValue});
+
+	this.ContinuationNoticeFootnote = oNewValue;
 };
 /**
  * Сбрасываем рассчетные данный для заданной страницы.
@@ -793,6 +834,21 @@ CFootnotesController.prototype.Undo = function(Data)
 			this.Footnote[Data.Id] = g_oTableId.Get_ById(Data.Id);
 			break;
 		}
+		case AscDFH.historyitem_Footnotes_SetSeparator:
+		{
+			this.SeparatorFootnote = Data.Old;
+			break;
+		}
+		case AscDFH.historyitem_Footnotes_SetContinuationSeparator:
+		{
+			this.ContinuationSeparatorFootnote = Data.Old;
+			break;
+		}
+		case AscDFH.historyitem_Footnotes_SetContinuationNotice:
+		{
+			this.ContinuationNoticeFootnote = Data.Old;
+			break;
+		}
 	}
 };
 CFootnotesController.prototype.Redo = function(Data)
@@ -804,6 +860,21 @@ CFootnotesController.prototype.Redo = function(Data)
 		case AscDFH.historyitem_Footnotes_AddFootnote:
 		{
 			delete this.Footnote[Data.Id];
+			break;
+		}
+		case AscDFH.historyitem_Footnotes_SetSeparator:
+		{
+			this.SeparatorFootnote = Data.New;
+			break;
+		}
+		case AscDFH.historyitem_Footnotes_SetContinuationSeparator:
+		{
+			this.ContinuationSeparatorFootnote = Data.New;
+			break;
+		}
+		case AscDFH.historyitem_Footnotes_SetContinuationNotice:
+		{
+			this.ContinuationNoticeFootnote = Data.New;
 			break;
 		}
 	}
@@ -827,6 +898,21 @@ CFootnotesController.prototype.Save_Changes = function(Data, Writer)
 		{
 			// String : Id
 			Writer.WriteString2(Data.Id);
+			break;
+		}
+		case AscDFH.historyitem_Footnotes_SetSeparator:
+		case AscDFH.historyitem_Footnotes_SetContinuationSeparator:
+		case AscDFH.historyitem_Footnotes_SetContinuationNotice:
+		{
+			if (Data.New)
+			{
+				Writer.WriteBool(false);
+				Writer.WriteString2(Data.New.Get_Id());
+			}
+			else
+			{
+				Writer.WriteBool(true);
+			}
 			break;
 		}
 	}
@@ -853,8 +939,47 @@ CFootnotesController.prototype.Load_Changes = function(Reader, Reader2)
 		case  AscDFH.historyitem_Footnotes_AddFootnote:
 		{
 			// String : Id
-			var Id = Reader.GetString2();
+			var Id            = Reader.GetString2();
 			this.Footnote[Id] = g_oTableId.Get_ById(Id);
+			break;
+		}
+		case AscDFH.historyitem_Footnotes_SetSeparator:
+		{
+			if (false === Reader.GetBool())
+			{
+				var Id                 = Reader.GetString2();
+				this.SeparatorFootnote = g_oTableId.Get_ById(Id);
+			}
+			else
+			{
+				this.SeparatorFootnote = null;
+			}
+			break;
+		}
+		case AscDFH.historyitem_Footnotes_SetContinuationSeparator:
+		{
+			if (false === Reader.GetBool())
+			{
+				var Id                             = Reader.GetString2();
+				this.ContinuationSeparatorFootnote = g_oTableId.Get_ById(Id);
+			}
+			else
+			{
+				this.ContinuationSeparatorFootnote = null;
+			}
+			break;
+		}
+		case AscDFH.historyitem_Footnotes_SetContinuationNotice:
+		{
+			if (false === Reader.GetBool())
+			{
+				var Id                          = Reader.GetString2();
+				this.ContinuationNoticeFootnote = g_oTableId.Get_ById(Id);
+			}
+			else
+			{
+				this.ContinuationNoticeFootnote = null;
+			}
 			break;
 		}
 	}
