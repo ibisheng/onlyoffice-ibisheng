@@ -7566,12 +7566,14 @@ ParaPresentationNumbering.prototype =
 /**
  * Класс представляющий ссылку на сноску.
  * @param {CFootEndnote} Footnote - Ссылка на сноску.
+ * @param {string} CustomMark
  * @constructor
  * @extends {CRunElementBase}
  */
-function ParaFootnoteReference(Footnote)
+function ParaFootnoteReference(Footnote, CustomMark)
 {
-	this.Footnote = Footnote;
+	this.Footnote   = Footnote;
+	this.CustomMark = CustomMark ? CustomMark : undefined;
 
 	this.Width        = 0;
 	this.WidthVisible = 0;
@@ -7629,13 +7631,30 @@ ParaFootnoteReference.prototype.Write_ToBinary  = function(Writer)
 {
 	// Long   : Type
 	// String : FootnoteId
+	// Bool : is undefined mark ?
+	// false -> String2 : CustomMark
 	Writer.WriteLong(this.Type);
 	Writer.WriteString2(this.Footnote.Get_Id());
+
+	if (undefined === this.CustomMark)
+	{
+		Writer.WriteBool(true);
+	}
+	else
+	{
+		Writer.WriteBool(false);
+		Writer.WriteString2(this.CustomMark);
+	}
 };
 ParaFootnoteReference.prototype.Read_FromBinary = function(Reader)
 {
 	// String : FootnoteId
+	// Bool : is undefined mark ?
+	// false -> String2 : CustomMark
 	this.Footnote = g_oTableId.Get_ById(Reader.GetString2());
+
+	if (false === Reader.GetBool())
+		this.CustomMark = Reader.GetString2();
 };
 ParaFootnoteReference.prototype.Get_Footnote    = function()
 {
