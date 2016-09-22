@@ -1811,7 +1811,44 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter, sav
 			this.bs.WriteItem(c_oSerProp_secPrType.cols, function(){oThis.WriteColumns(sectPr.Columns);});
 		if(null != sectPr.Borders)
 			this.bs.WriteItem(c_oSerProp_secPrType.pgBorders, function(){oThis.WritePgBorders(sectPr.Borders);});
+		if(null != sectPr.FootnotePr)
+			this.bs.WriteItem(c_oSerProp_secPrType.footnotePr, function(){oThis.WriteFootnotePr(sectPr.FootnotePr);});
     };
+	this.WriteFootnotePr = function(footnotePr)
+	{
+		var oThis = this;
+		if (null != footnotePr.NumRestart) {
+			this.bs.WriteItem(c_oSerNotes.PrRestart, function(){oThis.memory.WriteByte(footnotePr.NumRestart);});
+		}
+		if (null != footnotePr.NumFormat) {
+			this.bs.WriteItem(c_oSerNotes.PrFmt, function(){oThis.WriteNumFmt(footnotePr.NumFormat);});
+		}
+		if (null != footnotePr.NumStart) {
+			this.bs.WriteItem(c_oSerNotes.PrStart, function(){oThis.memory.WriteLong(footnotePr.NumStart);});
+		}
+		if (null != footnotePr.Pos) {
+			this.bs.WriteItem(c_oSerNotes.PrFntPos, function(){oThis.memory.WriteByte(footnotePr.Pos);});
+		}
+	};
+	this.WriteNumFmt = function(fmt)
+	{
+		var oThis = this;
+		if (fmt) {
+			var val;
+			switch (fmt) {
+				case numbering_numfmt_None: val = 48; break;
+				case numbering_numfmt_Bullet: val = 5; break;
+				case numbering_numfmt_Decimal: val = 13; break;
+				case numbering_numfmt_LowerRoman: val = 47; break;
+				case numbering_numfmt_UpperRoman: val = 61; break;
+				case numbering_numfmt_LowerLetter: val = 46; break;
+				case numbering_numfmt_UpperLetter: val = 60; break;
+				case numbering_numfmt_DecimalZero: val = 21; break;
+				default: val = 13; break;
+			}
+			this.bs.WriteItem(c_oSerNumTypes.NumFmtVal, function(){oThis.memory.WriteByte(val);});
+		}
+	};
     this.WritePageSize = function(sectPr, oDocument)
     {
         var oThis = this;
@@ -4400,7 +4437,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 					oThis.memory.WriteLong(c_oSerPropLenType.Null);
 					break;
 				case para_FootnoteReference:
-					oThis.bs.WriteItem(c_oSerRunType.footnoteReference, function() {oThis.WriteFootnoteRef(item.Get_Footnote());});
+					oThis.bs.WriteItem(c_oSerRunType.footnoteReference, function() {oThis.WriteFootnoteRef(item);});
 					break;
                 case para_Drawing:
                     sCurText = this.WriteText(sCurText, delText);
@@ -4428,9 +4465,13 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
         }
         sCurText = this.WriteText(sCurText, delText);
     };
-	this.WriteFootnoteRef = function(footnote)
+	this.WriteFootnoteRef = function(footnoteReference)
 	{
 		var oThis = this;
+		var footnote = footnoteReference.Get_Footnote();
+		if (null != footnoteReference.CustomMark) {
+			this.bs.WriteItem(c_oSerNotes.RefCustomMarkFollows, function() {oThis.memory.WriteBool(footnoteReference.CustomMark);});
+		}
 		var index = this.saveParams.footnotesIndex++;
 		this.saveParams.footnotes[index] = {type: null, content: footnote};
 		this.bs.WriteItem(c_oSerNotes.RefId, function () { oThis.memory.WriteLong(index); });
@@ -5036,6 +5077,7 @@ function BinarySettingsTableWriter(memory, doc, saveParams)
     this.Document = doc;
 	this.saveParams = saveParams;
     this.bs = new BinaryCommonWriter(this.memory);
+	this.bpPrs = new Binary_pPrWriter(this.memory, null, null, saveParams);
     this.Write = function()
     {
         var oThis = this;
@@ -5053,6 +5095,7 @@ function BinarySettingsTableWriter(memory, doc, saveParams)
 	this.WriteFootnotePr = function()
 	{
 		var oThis = this;
+		this.bpPrs.WriteFootnotePr(this.Document.Footnotes.FootnotePr);
 		var index = -1;
 		if (this.Document.Footnotes.SeparatorFootnote) {
 			this.saveParams.footnotes[index] = {type: 3, content: this.Document.Footnotes.SeparatorFootnote};
@@ -5624,7 +5667,7 @@ function BinaryFileReader(doc, openParams)
             if(c_oSerConstants.ReadOk != res)
                 return res;
         }
-        var oBinary_DocumentTableReader = new Binary_DocumentTableReader(this.Document, this.oReadResult, this.openParams, this.stream, true, this.oReadResult.oCommentsPlaces);
+        var oBinary_DocumentTableReader = new Binary_DocumentTableReader(this.Document, this.oReadResult, this.openParams, this.stream, null, this.oReadResult.oCommentsPlaces);
         for(var i = 0, length = aSeekTable.length; i < length; ++i)
         {
             var item = aSeekTable[i];
@@ -7026,10 +7069,67 @@ function Binary_pPrReader(doc, oReadResult, stream)
 				return oThis.Read_pgBorders(t, l, oSectPr.Borders);
 			});
 		}
+		else if( c_oSerProp_secPrType.footnotePr === type ) {
+			var props = {fmt: null, restart: null, start: null, pos: null};
+			res = this.bcr.Read1(length, function(t, l) {
+				return oThis.ReadFootnotePr(t, l, props);
+			});
+			if (props.fmt) {
+				oSectPr.SetFootnoteNumFormat(props.fmt);
+			}
+			if (props.restart) {
+				oSectPr.SetFootnoteNumRestart(props.restart);
+			}
+			if (props.start) {
+				oSectPr.SetFootnoteNumStart(props.start);
+			}
+			if (props.pos) {
+				oSectPr.SetFootnotePos(props.pos);
+			}
+		}
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
-    }
+    };
+	this.ReadFootnotePr = function(type, length, props) {
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		if (c_oSerNotes.PrFmt === type) {
+			res = this.bcr.Read1(length, function(t, l){
+				return oThis.ReadNumFmt(t, l, props);
+			});
+		} else if (c_oSerNotes.PrRestart === type) {
+			props.restart = this.stream.GetByte();
+		} else if (c_oSerNotes.PrStart === type) {
+			props.start = this.stream.GetULongLE();
+		} else if (c_oSerNotes.PrFntPos === type) {
+			props.pos = this.stream.GetByte();
+		} else if (c_oSerNotes.PrRef === type) {
+			this.oReadResult.footnoteRefs.push(this.stream.GetULongLE());
+		} else {
+			res = c_oSerConstants.ReadUnknown;
+		}
+		return res;
+	};
+	this.ReadNumFmt = function(type, length, props) {
+		var res = c_oSerConstants.ReadOk;
+		if (c_oSerNumTypes.NumFmtVal === type) {
+			switch (this.stream.GetByte()) {
+				case 48: props.fmt = numbering_numfmt_None; break;
+				case 5: props.fmt = numbering_numfmt_Bullet; break;
+				case 13: props.fmt = numbering_numfmt_Decimal; break;
+				case 47: props.fmt = numbering_numfmt_LowerRoman; break;
+				case 61: props.fmt = numbering_numfmt_UpperRoman; break;
+				case 46: props.fmt = numbering_numfmt_LowerLetter; break;
+				case 60: props.fmt = numbering_numfmt_UpperLetter; break;
+				case 21: props.fmt = numbering_numfmt_DecimalZero; break;
+				default: props.fmt = numbering_numfmt_Decimal; break;
+			}
+		} else {
+			res = c_oSerConstants.ReadUnknown;
+		}
+		return res;
+	};
     this.Read_setting = function(type, length, oSectPr, oAdditional)
     {
         var res = c_oSerConstants.ReadOk;
@@ -8280,7 +8380,7 @@ function Binary_HdrFtrTableReader(doc, oReadResult, openParams, stream)
 	this.openParams = openParams;
     this.stream = stream;
     this.bcr = new Binary_CommonReader(this.stream);
-    this.bdtr = new Binary_DocumentTableReader(this.Document, this.oReadResult, this.openParams, this.stream, true, this.oReadResult.oCommentsPlaces);
+    this.bdtr = new Binary_DocumentTableReader(this.Document, this.oReadResult, this.openParams, this.stream, null, this.oReadResult.oCommentsPlaces);
     this.Read = function()
     {
         var oThis = this;
@@ -8355,24 +8455,23 @@ function Binary_HdrFtrTableReader(doc, oReadResult, openParams, stream)
         return res;
     };
 };
-function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllowFlow, oComments)
+function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFootnote, oComments)
 {
     this.Document = doc;
 	this.oReadResult = oReadResult;
 	this.openParams = openParams;
     this.stream = stream;
     this.bcr = new Binary_CommonReader(this.stream);
-	this.boMathr = new Binary_oMathReader(this.stream, this.oReadResult);
+	this.boMathr = new Binary_oMathReader(this.stream, this.oReadResult, curFootnote);
     this.brPrr = new Binary_rPrReader(this.Document, this.oReadResult, this.stream);
     this.bpPrr = new Binary_pPrReader(this.Document, this.oReadResult, this.stream);
 	this.btblPrr = new Binary_tblPrReader(this.Document, this.oReadResult, this.stream);
-    this.bAllowFlow = bAllowFlow;
     this.lastPar = null;
     this.oComments = oComments;
     this.aFields = [];
 	this.nCurCommentsCount = 0;
 	this.oCurComments = {};//вспомогательный массив  для заполнения QuotedText
-	this.curFootnote = null;
+	this.curFootnote = curFootnote;
     this.Reset = function()
     {
         this.lastPar = null;
@@ -8953,14 +9052,14 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		}
 		else if (c_oSerRunType.footnoteReference === type)
 		{
-			var ref = {id: null};
+			var ref = {id: null, customMark: null};
 			res = this.bcr.Read1(length, function(t, l) {
 				return oThis.ReadFootnoteRef(t, l, ref);
 			});
 			var footnote = this.oReadResult.footnotes[ref.id];
 			if (footnote) {
 				this.oReadResult.logicDocument.Footnotes.AddFootnote(footnote.content);
-				oNewElem = new ParaFootnoteReference(footnote.content);
+				oNewElem = new ParaFootnoteReference(footnote.content, ref.customMark);
 			}
 		}
         else
@@ -8975,7 +9074,9 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 	this.ReadFootnoteRef = function (type, length, ref)
 	{
 		var res = c_oSerConstants.ReadOk;
-		if(c_oSerNotes.RefId === type) {
+		if(c_oSerNotes.RefCustomMarkFollows === type) {
+			ref.customMark = this.stream.GetBool();
+		} else if(c_oSerNotes.RefId === type) {
 			ref.id = this.stream.GetULongLE();
 		} else
 			res = c_oSerConstants.ReadUnknown;
@@ -9702,11 +9803,10 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         else if( c_oSerDocTableType.Cell_Content === type )
         {
 			var oCellContent = [];
-			var oCellContentReader = new Binary_DocumentTableReader(cell.Content, this.oReadResult, this.openParams, this.stream, false, this.oComments);
+			var oCellContentReader = new Binary_DocumentTableReader(cell.Content, this.oReadResult, this.openParams, this.stream, this.curFootnote, this.oComments);
 			oCellContentReader.aFields = this.aFields;
 			oCellContentReader.nCurCommentsCount = this.nCurCommentsCount;
 			oCellContentReader.oCurComments = this.oCurComments;
-			oCellContentReader.curFootnote = this.curFootnote;
 			oCellContentReader.Read(length, oCellContent);
 			this.nCurCommentsCount = oCellContentReader.nCurCommentsCount;
 			if(oCellContent.length > 0)
@@ -9729,9 +9829,11 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         return res;
     };
 };
-function Binary_oMathReader(stream, oReadResult)
+function Binary_oMathReader(stream, oReadResult, curFootnote)
 {	
     this.stream = stream;
+	this.oReadResult = oReadResult;
+	this.curFootnote = curFootnote;
 	this.bcr = new Binary_CommonReader(this.stream);
 	this.brPrr = new Binary_rPrReader(null, oReadResult, this.stream);
 	
@@ -9832,6 +9934,24 @@ function Binary_oMathReader(stream, oReadResult)
 		else if (c_oSerRunType.continuationSeparator === type)
 		{
 			oNewElem = new ParaContinuationSeparator();
+		}
+		else if (c_oSerRunType.footnoteRef === type)
+		{
+			if (this.curFootnote) {
+				oNewElem = new ParaFootnoteRef(this.curFootnote);
+			}
+		}
+		else if (c_oSerRunType.footnoteReference === type)
+		{
+			var ref = {id: null, customMark: null};
+			res = this.bcr.Read1(length, function(t, l) {
+				return oThis.ReadFootnoteRef(t, l, ref);
+			});
+			var footnote = this.oReadResult.footnotes[ref.id];
+			if (footnote) {
+				this.oReadResult.logicDocument.Footnotes.AddFootnote(footnote.content);
+				oNewElem = new ParaFootnoteReference(footnote.content, ref.customMark);
+			}
 		}
         else if (c_oSerRunType._LastRun === type)
             this.oReadResult.bLastRun = true;
@@ -12429,6 +12549,7 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
     this.stream = stream;
 	this.trackRevisions = null;
     this.bcr = new Binary_CommonReader(this.stream);
+	this.bpPrr = new Binary_pPrReader(this.Document, this.oReadResult, this.stream);
     this.Read = function()
     {
         var oThis = this;
@@ -12467,24 +12588,28 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
 		}
 		else if ( c_oSer_SettingsType.FootnotePr === type )
 		{
+			var props = {fmt: null, restart: null, start: null, pos: null};
 			res = this.bcr.Read1(length, function(t, l) {
-				return oThis.ReadFootnotePr(t, l);
+				return oThis.bpPrr.ReadFootnotePr(t, l, props);
 			});
+			var footnotes = this.oReadResult.logicDocument.Footnotes;
+			if (props.fmt) {
+				footnotes.SetFootnotePrNumFormat(props.fmt);
+			}
+			if (props.restart) {
+				footnotes.SetFootnotePrNumRestart(props.restart);
+			}
+			if (props.start) {
+				footnotes.SetFootnotePrNumStart(props.start);
+			}
+			if (props.pos) {
+				footnotes.SetFootnotePrPos(props.pos);
+			}
 		}
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadFootnotePr = function(type, length) {
-		var res = c_oSerConstants.ReadOk;
-		var oThis = this;
-		if (c_oSerNotes.PrRef === type) {
-			this.oReadResult.footnoteRefs.push(this.stream.GetULongLE());
-		} else {
-			res = c_oSerConstants.ReadUnknown;
-		}
-		return res;
-	}
 	this.ReadMathPr = function(type, length, props)
     {
         var res = c_oSerConstants.ReadOk;
@@ -12910,8 +13035,7 @@ function Binary_NotesTableReader(doc, oReadResult, openParams, stream)
 		} else if (c_oSerNotes.NoteContent === type) {
 			var footnote = new CFootEndnote(this.Document.Footnotes);
 			var footnoteContent = [];
-			var bdtr = new Binary_DocumentTableReader(footnote, this.oReadResult, this.openParams, this.stream, false, this.oReadResult.oCommentsPlaces);
-			bdtr.curFootnote = footnote;
+			var bdtr = new Binary_DocumentTableReader(footnote, this.oReadResult, this.openParams, this.stream, footnote, this.oReadResult.oCommentsPlaces);
 			bdtr.Read(length, footnoteContent);
 			if(footnoteContent.length > 0)
 			{

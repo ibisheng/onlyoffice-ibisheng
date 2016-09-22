@@ -1917,8 +1917,8 @@ CSectionPr.prototype.SetFootnoteNumFormat = function(nFormatType)
 	{
 		History.Add(this, {
 			Type : AscDFH.historyitem_Section_Footnote_NumFormat,
-			Old  : this.FootnotePr.NumRestart,
-			New  : nRestartType
+			Old  : this.FootnotePr.NumFormat,
+			New  : nFormatType
 		});
 
 		this.FootnotePr.NumFormat = nFormatType;
