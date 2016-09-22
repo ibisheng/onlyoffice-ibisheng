@@ -59,6 +59,344 @@ var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
 var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
 var c_oAscSelectionType = Asc.c_oAscSelectionType;
 
+var aSparklinesStyles =
+[
+    [
+        [4, -0.499984740745262],
+        [5, 0],
+        [4, -0.499984740745262],
+        [4,  0.39997558519241921],
+        [4, 0.39997558519241921],
+        [4, 0],
+        [4, 0]
+    ],
+    [
+        [5, -0.499984740745262],
+        [6, 0],
+        [5,  -0.499984740745262],
+        [5, 0.39997558519241921],
+        [5, 0.39997558519241921],
+        [5, 0],
+        [5, 0]
+    ],
+    [
+        [6, -0.499984740745262],
+        [7, 0],
+        [6, -0.499984740745262],
+        [6, 0.39997558519241921],
+        [6, 0.39997558519241921],
+        [6, 0],
+        [6, 0]
+    ],
+    [
+        [7, -0.499984740745262],
+        [8, 0],
+        [7, -0.499984740745262],
+        [7, 0.39997558519241921],
+        [7, 0.39997558519241921],
+        [7, 0],
+        [7, 0]
+    ],
+    [
+        [8, -0.499984740745262],
+        [9, 0],
+        [8, -0.499984740745262],
+        [8, 0.39997558519241921],
+        [8, 0.39997558519241921],
+        [8, 0],
+        [8, 0]
+    ],
+    [
+        [9, -0.499984740745262],
+        [4, 0],
+
+        [9, -0.499984740745262],
+        [9, 0.39997558519241921],
+        [9, 0.39997558519241921],
+        [9, 0],
+        [9, 0]
+    ],
+    [
+        [4, -0.249977111117893],
+        [5, 0],
+        [5, -0.249977111117893],
+        [5, -0.249977111117893],
+        [5, -0.249977111117893],
+        [5, -0.249977111117893],
+        [5, -0.249977111117893]
+    ],
+    [
+        [5, -0.249977111117893],
+        [6, 0],
+        [6, -0.249977111117893],
+        [6, -0.249977111117893],
+        [6, -0.249977111117893],
+        [6, -0.249977111117893],
+        [6, -0.249977111117893]
+    ],
+    [
+        [6, -0.249977111117893],
+        [7, 0],
+        [7, -0.249977111117893],
+        [7, -0.249977111117893],
+        [7, -0.249977111117893],
+        [7, -0.249977111117893],
+        [7, -0.249977111117893]
+    ],
+    [
+        [7, -0.249977111117893],
+        [8, 0],
+        [8, -0.249977111117893],
+        [8, -0.249977111117893],
+        [8, -0.249977111117893],
+        [8, -0.249977111117893],
+        [8, -0.249977111117893]
+    ],
+    [
+        [8, -0.249977111117893],
+        [9, 0],
+        [9, -0.249977111117893],
+        [9, -0.249977111117893],
+        [9, -0.249977111117893],
+        [9, -0.249977111117893],
+        [9, -0.249977111117893]
+    ],
+    [
+        [9, -0.249977111117893],
+        [4, 0],
+        [4, -0.249977111117893],
+        [4, -0.249977111117893],
+        [4, -0.249977111117893],
+        [4, -0.249977111117893],
+        [4, -0.249977111117893]
+    ],
+    [
+        [4, 0],
+        [5, 0],
+        [4, -0.249977111117893],
+        [4, -0.249977111117893],
+        [4, -0.249977111117893],
+        [4, -0.249977111117893],
+        [4, -0.249977111117893]
+    ],
+    [
+        [5, 0],
+        [6, 0],
+        [5, -0.249977111117893],
+        [5, -0.249977111117893],
+        [5, -0.249977111117893],
+        [5, -0.249977111117893],
+        [5, -0.249977111117893]
+    ],
+    [
+        [6, 0],
+        [7, 0],
+        [6, -0.249977111117893],
+        [6, -0.249977111117893],
+        [6, -0.249977111117893],
+        [6, -0.249977111117893],
+        [6, -0.249977111117893]
+    ],
+    [
+        [7, 0],
+        [8, 0],
+        [7, -0.249977111117893],
+        [7, -0.249977111117893],
+        [7, -0.249977111117893],
+        [7, -0.249977111117893],
+        [7, -0.249977111117893]
+    ],
+    [
+        [8, 0],
+        [9, 0],
+        [8, -0.249977111117893],
+        [8, -0.249977111117893],
+        [8, -0.249977111117893],
+        [8, -0.249977111117893],
+        [8, -0.249977111117893]
+    ],
+    [
+        [9, 0],
+        [4, 0],
+        [9, -0.249977111117893],
+        [9, -0.249977111117893],
+        [9, -0.249977111117893],
+        [9, -0.249977111117893],
+        [9, -0.249977111117893]
+    ],
+    [
+        [4, 0.39997558519241921],
+        [0, -0.499984740745262],
+        [4, 0.79998168889431442],
+        [4, -0.249977111117893],
+        [4, -0.249977111117893],
+        [4, -0.499984740745262],
+        [4, -0.499984740745262]
+    ],
+    [
+        [5, 0.39997558519241921],
+        [0, -0.499984740745262],
+        [5, 0.79998168889431442],
+        [5, -0.249977111117893],
+        [5, -0.249977111117893],
+        [5, -0.499984740745262],
+        [5, -0.499984740745262]
+    ],
+    [
+        [6, 0.39997558519241921],
+        [0, -0.499984740745262],
+        [6, 0.79998168889431442],
+        [6, -0.249977111117893],
+        [6, -0.249977111117893],
+        [6, -0.499984740745262],
+        [6, -0.499984740745262]
+    ],
+    [
+        [7, 0.39997558519241921],
+        [0, -0.499984740745262],
+        [7, 0.79998168889431442],
+        [7, -0.249977111117893],
+        [7, -0.249977111117893],
+        [7, -0.499984740745262],
+        [7, -0.499984740745262]
+    ],
+    [
+        [8, 0.39997558519241921],
+        [0, -0.499984740745262],
+        [8, 0.79998168889431442],
+        [8, -0.249977111117893],
+        [8, -0.249977111117893],
+        [8, -0.499984740745262],
+        [8, -0.499984740745262]
+    ],
+    [
+        [9, 0.39997558519241921],
+        [0, -0.499984740745262],
+        [9, 0.79998168889431442],
+        [9, -0.249977111117893],
+        [9, -0.249977111117893],
+        [9, -0.499984740745262],
+        [9, -0.499984740745262]
+    ],
+    [
+        [1, 0.499984740745262],
+        [1, 0.249977111117893],
+        [1, 0.249977111117893],
+        [1, 0.249977111117893],
+        [1, 0.249977111117893],
+        [1, 0.249977111117893],
+        [1, 0.249977111117893]
+    ],
+    [
+        [1, 0.34998626667073579],
+        [0, -0.249977111117893],
+        [0, -0.249977111117893],
+        [0, -0.249977111117893],
+        [0, -0.249977111117893],
+        [0, -0.249977111117893],
+        [0, -0.249977111117893]
+    ],
+    [
+        [0xFF323232],
+        [0xFFD00000],
+        [0xFFD00000],
+        [0xFFD00000],
+        [0xFFD00000],
+        [0xFFD00000],
+        [0xFFD00000]
+    ],
+    [
+        [0xFF000000],
+        [0xFF0070C0],
+        [0xFF000000],
+        [0xFF0070C0],
+        [0xFF0070C0],
+        [0xFF0070C0],
+        [0xFF0070C0],
+        [0xFF0070C0]
+    ],
+    [
+        [0xFF376092],
+        [0xFFD00000],
+        [0xFF000000],
+        [0xFFD00000],
+        [0xFFD00000],
+        [0xFFD00000],
+        [0xFFD00000],
+        [0xFFD00000]
+    ],
+    [
+    [0xFF0070C0],
+        [0xFF000000],
+        [0xFF000000],
+        [0xFF000000],
+        [0xFF000000],
+        [0xFF000000],
+        [0xFF000000],
+        [0xFF000000]
+    ],
+    [
+        [0xFF5F5F5F],
+        [0xFFFFB620],
+        [0xFF000000],
+        [0xFFD70077],
+        [0xFF5687C2],
+        [0xFF359CEB],
+        [0xFF56BE79],
+        [0xFFFF5055]
+    ],
+    [
+        [0xFF5687C2],
+        [0xFFFFB620],
+        [0xFF000000],
+        [0xFFD70077],
+        [0xFF777777],
+        [0xFF359CEB],
+        [0xFF56BE79],
+        [0xFFFF5055]
+    ],
+    [
+        [0xFFC6EFCE],
+        [0xFFFFC7CE],
+        [0xFF000000],
+        [0xFF8CADD6],
+        [0xFFFFDC47],
+        [0xFFFFEB9C],
+        [0xFF60D276],
+        [0xFFFF5367]
+    ],
+    [
+        [0xFF00B050],
+        [0xFFFF0000],
+        [0xFF000000],
+        [0xFF0070C0],
+        [0xFFFFC000],
+        [0xFFFFC000],
+        [0xFF00B050],
+        [0xFFFF0000]
+    ],
+    [
+        [3, 0],
+        [9, 0],
+        [0xFF000000],
+        [8, 0],
+        [4, 0],
+        [5, 0],
+        [6, 0],
+        [7, 0]
+    ],
+    [
+        [1, 0],
+        [9, 0],
+        [0xFF000000],
+        [8, 0],
+        [4, 0],
+        [5, 0],
+        [6, 0],
+        [7, 0]
+    ]
+];
+
 function isObject(what) {
     return ( (what != null) && (typeof(what) == "object") );
 }
@@ -315,10 +653,16 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         }
         var ser = new asc_CChartSeria();
         ser.Val.Formula = oSparkline.f;
+        if(oSparkline.oCache){
+            ser.Val.NumCache = oSparkline.oCache;
+        }
         var chartSeries = {series: [ser], parsedHeaders: {bLeft: false, bTop: false}};
         var chart_space = AscFormat.DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
         chart_space.setBDeleted(false);
-        chart_space.setWorksheet(worksheetView.model);
+        if(worksheetView){
+            chart_space.setWorksheet(worksheetView.model);
+        }
+
 
         chart_space.displayHidden = oSparklineGroup.displayHidden;
         chart_space.displayEmptyCellsAs = oSparklineGroup.displayEmptyCellsAs;
@@ -626,19 +970,22 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         }
 
         this.chartSpace = chart_space;
-        var oBBox = oSparkline.sqref;
-        this.col = oBBox.c1;
-        this.row = oBBox.r1;
-        this.x = worksheetView.getCellLeft(oBBox.c1, 3);
-        this.y = worksheetView.getCellTop(oBBox.r1, 3);
-        this.extX = worksheetView.getColumnWidth(oBBox.c1, 3);
-        this.extY = worksheetView.getRowHeight(oBBox.r1, 3);
-        AscFormat.CheckSpPrXfrm(this.chartSpace);
-        this.chartSpace.spPr.xfrm.setOffX(this.x*nSparklineMultiplier);
-        this.chartSpace.spPr.xfrm.setOffY(this.y*nSparklineMultiplier);
-        this.chartSpace.spPr.xfrm.setExtX(this.extX*nSparklineMultiplier);
-        this.chartSpace.spPr.xfrm.setExtY(this.extY*nSparklineMultiplier);
-        this.chartSpace.recalculate();
+        if(worksheetView){
+
+            var oBBox = oSparkline.sqref;
+            this.col = oBBox.c1;
+            this.row = oBBox.r1;
+            this.x = worksheetView.getCellLeft(oBBox.c1, 3);
+            this.y = worksheetView.getCellTop(oBBox.r1, 3);
+            this.extX = worksheetView.getColumnWidth(oBBox.c1, 3);
+            this.extY = worksheetView.getRowHeight(oBBox.r1, 3);
+            AscFormat.CheckSpPrXfrm(this.chartSpace);
+            this.chartSpace.spPr.xfrm.setOffX(this.x*nSparklineMultiplier);
+            this.chartSpace.spPr.xfrm.setOffY(this.y*nSparklineMultiplier);
+            this.chartSpace.spPr.xfrm.setExtX(this.extX*nSparklineMultiplier);
+            this.chartSpace.spPr.xfrm.setExtY(this.extY*nSparklineMultiplier);
+            this.chartSpace.recalculate();
+        }
     }, this, []);
 };
 
@@ -4088,7 +4435,9 @@ function CoordsManager(ws) {
     }
 }
 
-    //--------------------------------------------------------export----------------------------------------------------
+
+
+//--------------------------------------------------------export----------------------------------------------------
     var prot;
     window['AscFormat'] = window['AscFormat'] || {};
     window['Asc'] = window['Asc'] || {};
@@ -4134,4 +4483,6 @@ function CoordsManager(ws) {
     window["AscFormat"].GraphicOption = GraphicOption;
     window["AscFormat"].DrawingObjects = DrawingObjects;
     window["AscFormat"].ClickCounter = ClickCounter;
+    window["AscFormat"].aSparklinesStyles = aSparklinesStyles;
+    window["AscFormat"].CSparklineView = CSparklineView;
 })(window);

@@ -4585,9 +4585,13 @@ CellArea.prototype = {
 		this.f = null;
 		this.arrSparklines = [];
 		this.arrCachedSparklines = [];
+
+		//for drawing preview
+		this.canvas = null;
+		this.sparklineView = null;
 	}
 
-	sparklineGroup.prototype.clone = function () {
+	sparklineGroup.prototype.clone = function (bNoCloneSparklines) {
 		var res = new sparklineGroup();
 		res.manualMax = this.manualMax;
 		res.manualMin = this.manualMin;
@@ -4617,6 +4621,9 @@ CellArea.prototype = {
 		res.colorLow = this.colorLow ? this.colorLow : null;
 		res.f = this.f;
 
+		if(bNoCloneSparklines) {
+			return res;
+		}
 		for (var i = 0; i < this.arrSparklines.length; ++i) {
 			res.arrSparklines.push(this.arrSparklines[i].clone());
 		}
@@ -4724,11 +4731,98 @@ CellArea.prototype = {
 	sparklineGroup.prototype.asc_getColorLow = function () {
 		return this.colorLow ? Asc.colorObjToAscColor(this.colorLow) : this.colorLow;
 	};
+
+	sparklineGroup.prototype.createExcellColor = function(aColor) {
+		var oExcellColor = null;
+		if(Array.isArray(aColor)) {
+			if(2 === aColor.length){
+				oExcellColor = AscCommonExcel.g_oColorManager.getThemeColor(aColor[0], aColor[1]);
+			}
+			else if(1 === aColor.length){
+				oExcellColor = new AscCommonExcel.RgbColor(0x00ffffff & aColor[0]);
+			}
+		}
+		return oExcellColor;
+	};
+
+	sparklineGroup.prototype.asc_createSparklineGroupByStyle = function(nStyleIndex){
+		var oSparklineGroup = this.clone(true);
+		var oStyle = AscFormat.aSparklinesStyles[nStyleIndex];
+		if(oStyle) {
+			oSparklineGroup.colorSeries = this.createExcellColor(oStyle[0]);
+			oSparklineGroup.colorNegative = this.createExcellColor(oStyle[1]);
+			oSparklineGroup.colorAxis = this.createExcellColor(0xff000000);
+			oSparklineGroup.colorMarkers = this.createExcellColor(oStyle[2]);
+			oSparklineGroup.colorFirst = this.createExcellColor(oStyle[3]);
+			oSparklineGroup.colorLast = this.createExcellColor(oStyle[4]);
+			oSparklineGroup.colorHigh = this.createExcellColor(oStyle[5]);
+			oSparklineGroup.colorLow = this.createExcellColor(oStyle[6]);
+		}
+		return oSparklineGroup;
+	};
+
+	sparklineGroup.prototype.generateCache = function(){
+		function createItem(value) {
+			return { numFormatStr: "General", isDateTimeFormat: false, val: value, isHidden: false };
+		}
+		switch(this.type){
+			case Asc.c_oAscSparklineType.Line: {
+				return [createItem(128), createItem(56), createItem(175), createItem(0), createItem(248), createItem(184)];
+			}
+			case Asc.c_oAscSparklineType.Column: {
+				return [createItem(88), createItem(56), createItem(144), createItem(64), createItem(-56), createItem(-104), createItem(-40), createItem(-24), createItem(-56), createItem(104), createItem(56), createItem(80), createItem(-56), createItem(88)];
+			}
+			case Asc.c_oAscSparklineType.Stacked: {
+				return [createItem(1), createItem(-1), createItem(-1), createItem(-2), createItem(1), createItem(1), createItem(-1), createItem(1), createItem(1), createItem(1), createItem(1), createItem(2), createItem(-1), createItem(1)];
+			}
+		}
+		return [];
+	};
+
+	sparklineGroup.prototype.asc_getThumbBySparklineGroup = function(oSparklineGroup){
+	//	if(!this.sparklineView){
+			this.sparklineView = new AscFormat.CSparklineView();
+			var oSparkline = new sparkline();
+			oSparkline.oCache = this.generateCache();
+			this.sparklineView.initFromSparkline(oSparkline, oSparklineGroup, null);
+			var api_sheet = Asc['editor'];
+			this.sparklineView.chartSpace.setWorksheet(api_sheet.wb.getWorksheet().model);
+			this.sparklineView.chartSpace.extX = 100;
+			this.sparklineView.chartSpace.extY = 100;
+			this.sparklineView.chartSpace.x = 0;
+			this.sparklineView.chartSpace.x = 0;
+			AscFormat.ExecuteNoHistory(function () {
+				AscFormat.CheckSpPrXfrm(this.sparklineView.chartSpace);
+			}, this, []);
+			this.sparklineView.chartSpace.recalculate();
+	//	}
+		if(!this.canvas) {
+			this.canvas = document.createElement('canvas');
+			if(AscCommon.AscBrowser.isRetina) {
+				this.canvas.width = 100;
+				this.canvas.height = 100;
+			}
+			else{
+				this.canvas.width = 50;
+				this.canvas.height = 50;
+			}
+		}
+		var oGraphics = new AscCommon.CGraphics();
+		oGraphics.init(this.canvas.getContext('2d'), this.canvas.width, this.canvas.height, this.sparklineView.chartSpace.extX, this.sparklineView.chartSpace.extY);
+		oGraphics.m_oFontManager = AscCommon.g_fontManager;
+		oGraphics.transform(1,0,0,1,0,0);
+		this.sparklineView.chartSpace.draw(oGraphics);
+		return this.canvas.toDataURL("image/png");
+	};
+
 	/** @constructor */
 	function sparkline() {
 		this.sqref = null;
 		this.f = null;
 		this._f = null;
+
+		//for preview
+		this.oCache = null;
 	}
 
 	sparkline.prototype.clone = function () {
@@ -6944,6 +7038,8 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	prot["asc_getColorLast"]			= prot.asc_getColorLast;
 	prot["asc_getColorHigh"]			= prot.asc_getColorHigh;
 	prot["asc_getColorLow"]				= prot.asc_getColorLow;
+	prot["asc_createSparklineGroupByStyle"]				= prot.asc_createSparklineGroupByStyle;
+	prot["asc_getThumbBySparklineGroup"]				= prot.asc_getThumbBySparklineGroup;
 	window['AscCommonExcel'].sparkline = sparkline;
 	window['AscCommonExcel'].TablePart = TablePart;
 	window['AscCommonExcel'].AutoFilter = AutoFilter;
