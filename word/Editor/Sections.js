@@ -177,6 +177,11 @@ CSectionPr.prototype =
             var Column = Other.Columns.Cols[ColumnIndex];
             this.Set_Columns_Col(ColumnIndex, Column.W, Column.Space);
         }
+
+        this.SetFootnotePos(Other.FootnotePr.Pos);
+        this.SetFootnoteNumStart(Other.FootnotePr.NumStart);
+        this.SetFootnoteNumRestart(Other.FootnotePr.NumRestart);
+        this.SetFootnoteNumFormat(Other.FootnotePr.NumFormat);
     },
     
     Clear_AllHdrFtr : function()
@@ -1867,7 +1872,7 @@ CSectionPr.prototype.SetFootnotePos = function(nPos)
 CSectionPr.prototype.GetFootnotePos = function()
 {
 	if (undefined === this.FootnotePr.Pos)
-		return this.private_GetDocumentWideFootnotePr().Pos;
+		return section_footnote_PosPageBottom;
 
 	return this.FootnotePr.Pos;
 };

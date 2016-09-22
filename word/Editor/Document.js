@@ -1549,8 +1549,6 @@ CDocument.prototype.On_EndLoad                     = function()
     {
         this.Set_FastCollaborativeEditing(true);
     }
-
-    //this.Footnotes.ResetSpecialFootnotes();
 };
 CDocument.prototype.Add_TestDocument               = function()
 {
@@ -2754,7 +2752,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
 
     if (Index >= Count || _PageIndex > PageIndex || _ColumnIndex > ColumnIndex)
     {
-        this.private_RecalculateShiftFootnotes(PageIndex, ColumnIndex);
+        this.private_RecalculateShiftFootnotes(PageIndex, ColumnIndex, Y, SectPr);
     }
 
     if (true === bReDraw)
@@ -2869,11 +2867,23 @@ CDocument.prototype.private_RecalculateIsNewSection = function(nPageAbs, nConten
 
 	return bNewSection;
 };
-CDocument.prototype.private_RecalculateShiftFootnotes = function(nPageAbs, nColumnAbs)
+CDocument.prototype.private_RecalculateShiftFootnotes = function(nPageAbs, nColumnAbs, dY, oSectPr)
 {
-	var dFootnotesHeight = this.Footnotes.GetHeight(nPageAbs, nColumnAbs);
-	var oPageMetrics     = this.Get_PageContentStartPos(nPageAbs);
-	this.Footnotes.Shift(nPageAbs, nColumnAbs, 0, oPageMetrics.YLimit - dFootnotesHeight);
+	var nPosType = oSectPr.GetFootnotePos();
+
+	// section_footnote_PosDocEnd, section_footnote_PosSectEnd ненужные константы по логике, но Word воспринимает их
+	// именно как section_footnote_PosBeneathText, в то время как все остальное (даже константа не по формату)
+	// воспринимает как  section_footnote_PosPageBottom.
+	if (section_footnote_PosBeneathText === nPosType || section_footnote_PosDocEnd === nPosType || section_footnote_PosSectEnd === nPosType)
+	{
+		this.Footnotes.Shift(nPageAbs, nColumnAbs, 0, dY);
+	}
+	else
+	{
+		var dFootnotesHeight = this.Footnotes.GetHeight(nPageAbs, nColumnAbs);
+		var oPageMetrics     = this.Get_PageContentStartPos(nPageAbs);
+		this.Footnotes.Shift(nPageAbs, nColumnAbs, 0, oPageMetrics.YLimit - dFootnotesHeight);
+	}
 };
 CDocument.prototype.private_RecalculateFlowTable             = function(RecalcInfo)
 {
