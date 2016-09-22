@@ -4786,7 +4786,12 @@ CellArea.prototype = {
 			oSparkline.oCache = this.generateCache();
 			this.sparklineView.initFromSparkline(oSparkline, oSparklineGroup, null);
 			var api_sheet = Asc['editor'];
-			this.sparklineView.chartSpace.setWorksheet(api_sheet.wb.getWorksheet().model);
+
+			AscFormat.ExecuteNoHistory(
+				function () {
+					this.sparklineView.chartSpace.setWorksheet(api_sheet.wb.getWorksheet().model);
+				}, this, []);
+
 			this.sparklineView.chartSpace.extX = 100;
 			this.sparklineView.chartSpace.extY = 100;
 			this.sparklineView.chartSpace.x = 0;
@@ -4815,6 +4820,15 @@ CellArea.prototype = {
 		return this.canvas.toDataURL("image/png");
 	};
 
+	sparklineGroup.prototype.asc_getStyles = function()
+	{
+		var aRet = [];
+		for(var i = 0; i < 35; ++i){
+			var oSparklineGroup = this.asc_createSparklineGroupByStyle(i);
+			aRet.push([oSparklineGroup, this.asc_getThumbBySparklineGroup(oSparklineGroup)]);
+		}
+		return aRet;
+	};
 	/** @constructor */
 	function sparkline() {
 		this.sqref = null;
