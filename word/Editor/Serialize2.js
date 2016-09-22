@@ -7074,16 +7074,16 @@ function Binary_pPrReader(doc, oReadResult, stream)
 			res = this.bcr.Read1(length, function(t, l) {
 				return oThis.ReadFootnotePr(t, l, props);
 			});
-			if (props.fmt) {
+			if (null != props.fmt) {
 				oSectPr.SetFootnoteNumFormat(props.fmt);
 			}
-			if (props.restart) {
+			if (null != props.restart) {
 				oSectPr.SetFootnoteNumRestart(props.restart);
 			}
-			if (props.start) {
+			if (null != props.start) {
 				oSectPr.SetFootnoteNumStart(props.start);
 			}
-			if (props.pos) {
+			if (null != props.pos) {
 				oSectPr.SetFootnotePos(props.pos);
 			}
 		}
@@ -12593,16 +12593,16 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
 				return oThis.bpPrr.ReadFootnotePr(t, l, props);
 			});
 			var footnotes = this.oReadResult.logicDocument.Footnotes;
-			if (props.fmt) {
+			if (null != props.fmt) {
 				footnotes.SetFootnotePrNumFormat(props.fmt);
 			}
-			if (props.restart) {
+			if (null != props.restart) {
 				footnotes.SetFootnotePrNumRestart(props.restart);
 			}
-			if (props.start) {
+			if (null != props.start) {
 				footnotes.SetFootnotePrNumStart(props.start);
 			}
-			if (props.pos) {
+			if (null != props.pos) {
 				footnotes.SetFootnotePrPos(props.pos);
 			}
 		}
