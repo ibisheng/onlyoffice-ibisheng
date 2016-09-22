@@ -66,7 +66,6 @@ CShape.prototype.setRecalculateInfo = function()
     this.contentWidth = null;
     this.contentHeight = null;
     this.compiledStyles = [];
-    this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
     this.posX = null;
     this.posY = null;
 

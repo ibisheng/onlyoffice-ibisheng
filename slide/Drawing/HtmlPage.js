@@ -3064,6 +3064,13 @@ function CEditorPage(api)
 	this.onTimerScroll = function(isThUpdateSync)
 	{
 		var oWordControl                = oThis;
+
+		if (oWordControl.m_oApi.isLongAction())
+        {
+            oWordControl.m_nPaintTimerId = setTimeout(oWordControl.onTimerScroll, oWordControl.m_nTimerScrollInterval);
+            return;
+        }
+
 		oWordControl.m_nTimeDrawingLast = new Date().getTime();
 
 		var isRepaint = oWordControl.m_bIsScroll;
@@ -3123,7 +3130,7 @@ function CEditorPage(api)
 			}
 		}
 
-		this.m_nPaintTimerId = setTimeout(oWordControl.onTimerScroll, oWordControl.m_nTimerScrollInterval);
+		oWordControl.m_nPaintTimerId = setTimeout(oWordControl.onTimerScroll, oWordControl.m_nTimerScrollInterval);
 		//window.requestAnimationFrame(oWordControl.onTimerScroll);
 	};
 

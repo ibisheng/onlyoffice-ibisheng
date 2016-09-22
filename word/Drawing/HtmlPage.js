@@ -3765,6 +3765,9 @@ function CEditorPage(api)
 		if (!oWordControl.m_oApi.bInit_word_control)
 			return;
 
+        if (oWordControl.m_oApi.isLongAction())
+            return;
+
 		oWordControl.m_nTimeDrawingLast = new Date().getTime();
 		var isRepaint                   = oWordControl.m_bIsScroll;
 		if (oWordControl.m_bIsScroll)

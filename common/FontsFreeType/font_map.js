@@ -313,7 +313,10 @@ function FD_FontDictionary()
     // шрифты в массиве this.FD_Ascii_Font_Like_Names - в порядке важности.
     this.FD_Ascii_Font_Like_Names = [
         ["Cambria Math", "Asana Math", "XITS Math", "Latin Modern"],
-        ["OpenSymbol"]
+        ["OpenSymbol"],
+        ["Arial", "Liberation Sans", "Helvetica", "Nimbus Sans L"],
+        ["Times New Roman", "Liberation Serif"],
+        ["Courier New", "Liberation Mono"]
     ];
     this.FD_Ascii_Font_Like_Main = {
         "Cambria Math"  : 0,
@@ -322,7 +325,18 @@ function FD_FontDictionary()
         "Latin Modern"  : 0,
 
         "Symbol"        : 1,
-        "Wingdings"     : 1
+        "Wingdings"     : 1,
+
+        "Arial"             : 2,
+        "Liberation Sans"   : 2,
+        "Helvetica"         : 2,
+        "Nimbus Sans L"     : 2,
+
+        "Times New Roman"   : 3,
+        "Liberation Serif"  : 3,
+
+        "Courier New"       : 4,
+        "Liberation Mono"   : 4
     };
 
     this.ChangeGlyphsMap = {
@@ -1154,7 +1168,7 @@ CFontSelect.prototype =
             return 1000;
 
         if (g_fontApplication.g_fontDictionary.CheckLikeFonts(this.m_wsFontName, sReqName))
-            return 2000;
+            return 1000;
 
         return this.CheckEqualFonts2(sReqName, this.m_wsFontName);
     },
