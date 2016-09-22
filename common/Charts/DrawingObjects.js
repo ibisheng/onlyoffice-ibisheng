@@ -764,6 +764,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         new_line.setFill(AscFormat.CreateNoFillUniFill());
         chart_space.spPr.setLn(new_line);
         chart_space.spPr.setFill(AscFormat.CreateNoFillUniFill());
+        var dLineWidthSpaces = 500;
         if(!chart_space.chart.plotArea.spPr)
         {
             chart_space.chart.plotArea.setSpPr(new AscFormat.CSpPr());
@@ -821,15 +822,34 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
                     {
                         if(oSeries.dPt[t].spPr)
                         {
-                            oSeries.dPt[t].spPr.Fill = CreateUniFillFromExcelColor(oExcelColor);
+                            if(oExcelColor){
+                                oSeries.dPt[t].spPr.Fill = CreateUniFillFromExcelColor(oExcelColor);
+                                oSeries.dPt[t].spPr.ln = new AscFormat.CLn();
+                                oSeries.dPt[t].spPr.ln.Fill = oSeries.dPt[t].spPr.Fill.createDuplicate();
+                                oSeries.dPt[t].spPr.ln.w = dLineWidthSpaces;
+                            }
+                            else{
+                                oSeries.dPt[t].spPr.Fill = AscFormat.CreateNoFillUniFill();
+                                oSeries.dPt[t].spPr.ln = AscFormat.CreateNoFillLine();
+                            }
                         }
                         return;
                     }
                 }
+
                 var oDPt = new AscFormat.CDPt();
                 oDPt.idx = nIdx;
                 oDPt.spPr = new AscFormat.CSpPr();
-                oDPt.spPr.Fill = CreateUniFillFromExcelColor(oExcelColor);
+                if(oExcelColor) {
+                    oDPt.spPr.Fill = CreateUniFillFromExcelColor(oExcelColor);
+                    oDPt.spPr.ln = new AscFormat.CLn();
+                    oDPt.spPr.ln.Fill = oDPt.spPr.Fill.createDuplicate();
+                    oDPt.spPr.ln.w = dLineWidthSpaces;
+                }
+                else{
+                    oDPt.spPr.Fill = AscFormat.CreateNoFillUniFill();
+                    oDPt.spPr.ln = AscFormat.CreateNoFillLine();
+                }
                 oSeries.addDPt(oDPt);
             }
         }
@@ -839,6 +859,17 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         {
             if(fCallbackSeries)
             {
+
+                if(oSparklineGroup.type !== Asc.c_oAscSparklineType.Line){
+                    for(i = 0; i < aSeriesPoints.length; ++i)
+                    {
+                        if(AscFormat.fApproxEqual(aSeriesPoints[i].val,  0))
+                        {
+                            fCallbackSeries(oSerie, aSeriesPoints[i].idx, null);
+                        }
+                    }
+                }
+
                 if(oSparklineGroup.negative && oSparklineGroup.colorNegative)
                 {
                     for(i = 0; i < aSeriesPoints.length; ++i)
@@ -966,6 +997,9 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             else
             {
                 oSerie.spPr.setFill(oUnifill);
+                oSerie.spPr.ln = new AscFormat.CLn();
+                oSerie.spPr.ln.Fill = oSerie.spPr.Fill.createDuplicate();
+                oSerie.spPr.ln.w = dLineWidthSpaces;
             }
         }
 
