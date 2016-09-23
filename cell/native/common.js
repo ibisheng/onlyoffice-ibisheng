@@ -42,6 +42,8 @@ window.location.host = "";
 window.location.href = "";
 window.location.pathname = "";
 
+window.XMLHttpRequest = function () {};
+
 window.NATIVE_EDITOR_ENJINE = true;
 window.NATIVE_EDITOR_ENJINE_SYNC_RECALC = true;
 window.IS_NATIVE_EDITOR = true;
@@ -280,58 +282,80 @@ window["native"] = native;
 
 var _api = null;
 
-window.NativeSupportTimeouts = false;
+window.NativeSupportTimeouts = true;
 window.NativeTimeoutObject = {};
 
-function clearTimeout(_id) {
-    if (!window.NativeSupportTimeouts)
-        return;
-
-    window.NativeTimeoutObject["" + _id] = undefined;
-    window.native["ClearTimeout"](_id);
-}
 function setTimeout(func, interval) {
     if (!window.NativeSupportTimeouts)
         return;
 
-    var _id = window.native["GenerateTimeoutId"](interval);
-    window.NativeTimeoutObject["" + _id] = func;
-    return _id;
+    var id = window["native"]["GenerateTimeoutId"](interval);
+    window.NativeTimeoutObject["" + id] = {"func": func, repeat: false};
+   
+    return id;
 }
-function offline_timeoutFire(_id) {
+
+function clearTimeout(id) {
     if (!window.NativeSupportTimeouts)
         return;
 
-    var _prop = "" + _id;
-    var _func = window.NativeTimeoutObject[_prop];
-    window.NativeTimeoutObject[_prop] = undefined;
-
-    if (!_func)
-        return;
-
-    _func.call(null);
-    _func = null;
+    window.NativeTimeoutObject["" + id] = undefined;
+    window["native"]["ClearTimeout"](id);
 }
-function clearInterval(_id) {
-    if (!window.NativeSupportTimeouts)
-        return;
 
-    window.NativeTimeoutObject["" + _id] = undefined;
-    window.native["ClearTimeout"](_id);
-}
 function setInterval(func, interval) {
     if (!window.NativeSupportTimeouts)
         return;
 
-    var _intervalFunc = function()
-    {
-        func.call(null);
-        setTimeout(func, interval);
-    };
+   // console.log("setInterval");
+    
+//    var intervalFunc = function() {
+//
+//        console.log("intervalFunc");
+//
+//        func.call(null);
+//        setInterval(func, interval);
+//    }
 
-    var _id = window.native["GenerateTimeoutId"](interval);
-    window.NativeTimeoutObject["" + _id] = _intervalFunc;
-    return _id;
+    var id = window["native"]["GenerateTimeoutId"](interval);
+    window.NativeTimeoutObject["" + id] = {func: func, repeat: true, interval: interval}; // intervalFunc;
+    
+    return id;
+}
+function clearInterval(id) {
+    if (!window.NativeSupportTimeouts)
+        return;
+
+    window.NativeTimeoutObject["" + id] = undefined;
+    window["native"]["ClearTimeout"](id);
+}
+
+function offline_timeoutFire(id) {
+    if (!window.NativeSupportTimeouts)
+        return;
+
+    var prop = "" + id;
+    
+    if (undefined === window.NativeTimeoutObject[prop]) {
+        return;
+    }
+    
+    var func = window.NativeTimeoutObject[prop].func;
+    var repeat = window.NativeTimeoutObject[prop].repeat;
+    var interval = window.NativeTimeoutObject[prop].interval;
+   
+    window.NativeTimeoutObject[prop] = undefined;
+
+    if (!func)
+        return;
+
+    func.call(null);
+    
+    if (repeat) {
+        setInterval(func, interval);
+    }
+    
+    func = null;
 }
 
 window.clearTimeout = clearTimeout;
@@ -469,3 +493,5 @@ var global_memory_stream_menu = CreateNativeMemoryStream();
 
 window['AscFonts'] = window['AscFonts'] || {};
 window['AscFonts'].FT_Common = FT_Common;
+
+window['SockJS'] = createSockJS();

@@ -1336,8 +1336,10 @@ function DrawingObjects() {
     //-----------------------------------------------------------------------------------
 
     _this.init = function(currentSheet) {
-
-        setInterval(drawTaskFunction, 5);
+ 
+        if (!window['IS_NATIVE_EDITOR']) {
+            setInterval(drawTaskFunction, 5);
+        }
 
         var api = window["Asc"]["editor"];
         worksheet = currentSheet;

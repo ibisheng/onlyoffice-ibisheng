@@ -1259,9 +1259,16 @@
 
   DocsCoApi.prototype._initSocksJs = function() {
     var t = this;
-	//ограничиваем transports WebSocket и XHR / JSONP polling, как и engine.io https://github.com/socketio/engine.io
-	//при переборе streaming transports у клиента с wirewall происходило зацикливание(не повторялось в версии sock.js 0.3.4)
-	var sockjs = this.sockjs = new (this._getSockJs())(this.sockjs_url, null, {transports: ['websocket', 'xdr-polling', 'xhr-polling', 'iframe-xhr-polling', 'jsonp-polling']});
+ 
+    if (window['IS_NATIVE_EDITOR']) {
+        var sockjs = this.sockjs = window['SockJS'];
+        sockjs.open();
+        return sockjs;
+    } else {
+        //ограничиваем transports WebSocket и XHR / JSONP polling, как и engine.io https://github.com/socketio/engine.io
+        //при переборе streaming transports у клиента с wirewall происходило зацикливание(не повторялось в версии sock.js 0.3.4)
+        var sockjs = this.sockjs = new (this._getSockJs())(this.sockjs_url, null, {transports: ['websocket', 'xdr-polling', 'xhr-polling', 'iframe-xhr-polling', 'jsonp-polling']});
+    }
 
     sockjs.onopen = function() {
       if (t.reconnectTimeout) {

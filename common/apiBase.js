@@ -1,4 +1,4 @@
-﻿/*
+/*
  * (c) Copyright Ascensio System SIA 2010-2016
  *
  * This program is a free software product. You can redistribute it and/or
@@ -515,7 +515,7 @@
 		}
 		//в обычном серверном режиме портим ссылку, потому что CoAuthoring теперь имеет встроенный адрес
 		//todo надо использовать проверку get_OfflineApp
-		if (!(window['NATIVE_EDITOR_ENJINE'] || offlineMode === this.documentUrl))
+		if (!(window['NATIVE_EDITOR_ENJINE'] || offlineMode === this.documentUrl) || window['IS_NATIVE_EDITOR'])
 		{
 			this.CoAuthoringApi.set_url(null);
 		}
