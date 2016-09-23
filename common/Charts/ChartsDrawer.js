@@ -4372,9 +4372,9 @@ drawAreaChart.prototype =
 			
 			this.upFaces.sort (function sortArr(a, b)
 			{
-				/*if(b.midY === a.midY)
+				if(b.midY === a.midY)
 					return  a.seria - b.seria;
-				else*/
+				else
 					return  b.midY - a.midY;
 			})
 			
@@ -4509,7 +4509,7 @@ drawAreaChart.prototype =
 				var curRect = {point1: {x: x, y: y, z: gapDepth} , point2: {x: x1, y: y1, z: gapDepth} , prevPoint1: {x: prevX, y: prevY, z: gapDepth}, prevPoint2: {x: prevX1, y: prevY1, z: gapDepth}};
 				var curRectFar = {point1: {x: x, y: y, z: gapDepth + DiffGapDepth} , point2: {x: x1, y: y1, z: gapDepth + DiffGapDepth} , prevPoint1: {x: prevX, y: prevY, z: gapDepth + DiffGapDepth}, prevPoint2: {x: prevX1, y: prevY1, z: gapDepth + DiffGapDepth}};
 				
-				this._checkIntersection(curRect, i);
+				this._checkIntersection(curRect, i, seria);
 				this.prevPoints[i][seria] = curRect;
 			}
 		}
@@ -4616,14 +4616,15 @@ drawAreaChart.prototype =
 		return res;
     },
 	
-	_checkIntersection: function(curRect, pointIndex)
+	_checkIntersection: function(curRect, pointIndex, seria)
 	{
 		var curPoint1 = curRect.point1;
 		var curPoint2 = curRect.point2;
 		var curPoint3 = curRect.prevPoint1;
 		var curPoint4 = curRect.prevPoint2;
 		var curLine1 = this.cChartDrawer.getLineEquation(curPoint1, curPoint2);
-		var curLine2 = this.cChartDrawer.getLineEquation(curPoint3, curPoint4);	
+		var curLine2 = this.cChartDrawer.getLineEquation(curPoint3, curPoint4);
+		
 		var t = this;
 		
 		var addToArr = function(point, seria, isDown, elem)
@@ -4648,7 +4649,7 @@ drawAreaChart.prototype =
 			}
 			
 			var arr = isDown ? t.intersections[point][seria].down : t.intersections[point][seria].up;
-			var prevElem = arr[arr.length - 1];
+			var prevElem = arr[0];
 			
 			if(prevElem && prevElem.x < elem.x)
 			{
@@ -4672,56 +4673,256 @@ drawAreaChart.prototype =
 			var line1 = this.cChartDrawer.getLineEquation(point1, point2);
 			var line2 = this.cChartDrawer.getLineEquation(point3, point4);
 			
+			var curFacesIntersectionInPoint, prevFacesIntersectionInPoint;
+			var tempIntersection;
 			
 			//пересечение верхней и нижней прямых текущей грани
-			var intersection123 = this.cChartDrawer.isIntersectionLineAndLine(curLine1, curLine2);
-			if(intersection123 && intersection123.x > curPoint1.x && intersection123.x < curPoint2.x)
+			tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, curLine2);
+			if(tempIntersection && tempIntersection.x > curPoint1.x && tempIntersection.x < curPoint2.x)
 			{
-				addToArr(pointIndex, i + 1, null, intersection123);
-				addToArr(pointIndex, i + 1, true, intersection123);
+				curFacesIntersectionInPoint = tempIntersection;
+			}
+			
+			tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(line1, line2);
+			if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+			{
+				prevFacesIntersectionInPoint = tempIntersection;
+			}
+			
+			
+			if(curFacesIntersectionInPoint && prevFacesIntersectionInPoint)//есть пересечение между гранями одной точки(предыдущей + текущей)
+			{
+				//добавляем точки пересечения текущей точки
+				addToArr(pointIndex, seria, null, curFacesIntersectionInPoint);
+				addToArr(pointIndex, seria, true, curFacesIntersectionInPoint);
 				
-				console.log("sos");
-				continue;
+				//добавляем точки пересечения предыдущей точки
+				addToArr(pointIndex, i, null, prevFacesIntersectionInPoint);
+				addToArr(pointIndex, i, true, prevFacesIntersectionInPoint);
+				
+				
+				//здесь нужно разделить на низходящую и восходящую
+				if(curPoint1.y > curPoint2.y || curPoint3.y > curPoint4.y)
+				{
+					if(prevFacesIntersectionInPoint.x > curFacesIntersectionInPoint.x)
+					{
+						//ищем пересечения верхней текущей и предыдущей верхней
+						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
+						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+						{
+							addToArr(pointIndex, i, null, tempIntersection);
+						}
+						
+						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
+						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+						{
+							addToArr(pointIndex, seria, null, tempIntersection);
+						}
+						
+						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line2);
+						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x && curPoint1.y < curPoint3.y && curPoint3.y > curPoint4.y)
+						{
+							addToArr(pointIndex, seria, null, tempIntersection);
+						}
+						
+						//ищем пересечения верхней текущей и предыдущей верхней
+						if(curPoint1.y > curPoint3.y && curPoint4.y > curPoint2.y)
+						{
+							/*tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line2);
+							if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+							{
+								addToArr(pointIndex, i, null, tempIntersection);
+							}
+							
+							tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line2);
+							if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+							{
+								addToArr(pointIndex, seria, null, tempIntersection);
+							}*/
+						}
+						
+					}
+					else
+					{
+						//ищем пересечения верхней текущей и предыдущей верхней
+						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
+						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+						{
+							addToArr(pointIndex, i, null, tempIntersection);
+						}
+						
+						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
+						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+						{
+							addToArr(pointIndex, seria, null, tempIntersection);
+						}
+						
+						//ищем пересечения верхней текущей и предыдущей верхней
+						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line1);
+						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+						{
+							addToArr(pointIndex, i, null, tempIntersection);
+						}
+						
+						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line1);
+						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+						{
+							addToArr(pointIndex, seria, null, tempIntersection);
+						}
+					}
+				}
+				else
+				{
+					if(prevFacesIntersectionInPoint.x < curFacesIntersectionInPoint.x)
+					{
+						//ищем пересечения верхней текущей и предыдущей верхней
+						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
+						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+						{
+							addToArr(pointIndex, i, null, tempIntersection);
+						}
+						
+						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
+						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+						{
+							addToArr(pointIndex, seria, null, tempIntersection);
+						}
+						
+						//ищем пересечения верхней текущей и предыдущей верхней
+						if(curPoint1.y > curPoint3.y && curPoint4.y > curPoint2.y)
+						{
+							tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line2);
+							if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+							{
+								addToArr(pointIndex, i, null, tempIntersection);
+							}
+							
+							tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line2);
+							if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+							{
+								addToArr(pointIndex, seria, null, tempIntersection);
+							}
+						}
+						
+					}
+					else
+					{
+						//ищем пересечения верхней текущей и предыдущей верхней
+						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
+						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+						{
+							addToArr(pointIndex, i, null, tempIntersection);
+						}
+						
+						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
+						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+						{
+							addToArr(pointIndex, seria, null, tempIntersection);
+						}
+						
+						//ищем пересечения верхней текущей и предыдущей верхней
+						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line1);
+						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+						{
+							addToArr(pointIndex, i, null, tempIntersection);
+						}
+						
+						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line1);
+						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+						{
+							addToArr(pointIndex, seria, null, tempIntersection);
+						}
+					}
+				}
+				
+				
+				
+				/*//ищем пересечения верхней текущей и предыдущей нижней
+				tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
+				if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+				{
+					addToArr(pointIndex, seria, null, tempIntersection);
+				}
+				
+				//+ ищем пересечения нижней текущей и предыдущей нижней
+				tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line2);
+				if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+				{
+					addToArr(pointIndex, seria, true, tempIntersection);
+				}*/
+			}
+			else if(curFacesIntersectionInPoint)//есть пересечение между гранями одной точки - текущей
+			{
+				//добавляем точки пересечения текущей точки
+				addToArr(pointIndex, seria, null, curFacesIntersectionInPoint);
+				addToArr(pointIndex, seria, true, curFacesIntersectionInPoint);
+				
+				//ищем пересечения верхней текущей и предыдущей верхней
+				tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line1);
+				if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+				{
+					addToArr(pointIndex, i, null, tempIntersection);
+				}
+				
+				tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line1);
+				if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+				{
+					addToArr(pointIndex, seria, null, tempIntersection);
+				}
+			}
+			else if(prevFacesIntersectionInPoint)//есть пересечение между гранями одной точки - предыдущей
+			{
+				//добавляем точки пересечения предыдущей точки
+				addToArr(pointIndex, i, null, prevFacesIntersectionInPoint);
+				addToArr(pointIndex, i, true, prevFacesIntersectionInPoint);
+				
+				//ищем пересечения верхней текущей и предыдущей нижней
+				tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
+				if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+				{
+					addToArr(pointIndex, seria, null, tempIntersection);
+				}
+				
+				//+ ищем пересечения нижней текущей и предыдущей нижней
+				tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line2);
+				if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
+				{
+					addToArr(pointIndex, seria, true, tempIntersection);
+				}
+			}
+			else//нет пересечение между гранями одной точки(предыдущей + текущей)
+			{
+				//верхняя с верхней
+				if((curPoint1.y < point1.y && curPoint2.y > point2.y) || (curPoint1.y > point1.y && curPoint2.y < point2.y))
+				{
+					tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line1);
+					addToArr(pointIndex, seria, null, tempIntersection);
+					addToArr(pointIndex, i, null, tempIntersection);
+				}
+				//нижняя с нижней
+				/*if((curPoint3.y < point3.y && curPoint4.y > point4.y) || (curPoint3.y > point3.y && curPoint4.y < point4.y))
+				{
+					tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line2);
+					addToArr(pointIndex, i, null, tempIntersection);
+					//addToArr(pointIndex, i + 1, true, intersection2);
+				}
+				
+				//нижняя с верхней
+				if((curPoint3.y < point1.y && curPoint4.y > point2.y) || (curPoint3.y > point1.y && curPoint4.y < point2.y))
+				{
+					tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line1);
+					addToArr(pointIndex, i, true, tempIntersection);
+					//addToArr(pointIndex, i + 1, null, intersection3);
+				}
+				//верхняя с нижней
+				if((curPoint1.y < point3.y && curPoint2.y > point4.y) || (curPoint1.y > point3.y && curPoint2.y < point4.y))
+				{
+					tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
+					addToArr(pointIndex, i, null, tempIntersection);
+					addToArr(pointIndex, i + 1, null, tempIntersection);
+				}*/
 			}
 			
-			/*var intersection1232 = this.cChartDrawer.isIntersectionLineAndLine(line1, line2);
-			if(intersection1232 && intersection1232.x > point1.x && intersection1232.x < point2.x)
-			{
-				console.log("sos2");
-				continue;
-			}*/
-			
-			
-			var intersection1, intersection2, intersection3, intersection4;
-			//верхняя с верхней
-			if((curPoint1.y < point1.y && curPoint2.y > point2.y) || (curPoint1.y > point1.y && curPoint2.y < point2.y))
-			{
-				intersection1 = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line1);
-				addToArr(pointIndex, i, true, intersection1);
-				//addToArr(pointIndex, i + 1, null, intersection1);
-			}
-			//нижняя с нижней
-			if((curPoint3.y < point3.y && curPoint4.y > point4.y) || (curPoint3.y > point3.y && curPoint4.y < point4.y))
-			{
-				intersection2 = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line2);
-				addToArr(pointIndex, i, null, intersection2);
-				//addToArr(pointIndex, i + 1, true, intersection2);
-			}
-			
-			//нижняя с верхней
-			if((curPoint3.y < point1.y && curPoint4.y > point2.y) || (curPoint3.y > point1.y && curPoint4.y < point2.y))
-			{
-				intersection3 = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line1);
-				addToArr(pointIndex, i, true, intersection3);
-				//addToArr(pointIndex, i + 1, null, intersection3);
-			}
-			//верхняя с нижней
-			if((curPoint1.y < point3.y && curPoint2.y > point4.y) || (curPoint1.y > point3.y && curPoint2.y < point4.y))
-			{
-				intersection4 = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
-				addToArr(pointIndex, i, null, intersection4);
-				addToArr(pointIndex, i + 1, null, intersection4);
-			}
 		}
 	},
 	
@@ -4927,14 +5128,28 @@ drawAreaChart.prototype =
 				var prevNear, prevFar, prevNearProject, prevFarProject, prevNotRotateNear, prevNotRotateFar;
 				if(i === 0)
 				{
-					prevNearProject = point1;
-					prevFarProject = point2;
-					
-					prevNear = point11;
-					prevFar = point22;
-					
-					prevNotRotateNear = p1;
-					prevNotRotateFar = p2;
+					if(p1.y > p5.y)
+					{
+						prevNearProject = point5;
+						prevFarProject = point6;
+						
+						prevNear = point55;
+						prevFar = point66;
+						
+						prevNotRotateNear = p5;
+						prevNotRotateFar = p6;
+					}
+					else
+					{
+						prevNearProject = point1;
+						prevFarProject = point2;
+						
+						prevNear = point11;
+						prevFar = point22;
+						
+						prevNotRotateNear = p1;
+						prevNotRotateFar = p2;
+					}
 				}
 				else
 				{
@@ -6122,6 +6337,12 @@ drawAreaChart.prototype =
 		if(k != 5 && k != 0)
 		{
 			var  props = this.cChartSpace.getParentObjects();
+			
+			if(brush.fill.type === Asc.c_oAscFill.FILL_TYPE_NOFILL)
+			{
+				return;
+			}
+			
 			var duplicateBrush = brush.createDuplicate();
 			var cColorMod = new AscFormat.CColorMod;
 			if(k == 1 || k == 4)
