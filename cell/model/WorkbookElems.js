@@ -7054,6 +7054,7 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	prot["asc_getColorLow"]				= prot.asc_getColorLow;
 	prot["asc_createSparklineGroupByStyle"]				= prot.asc_createSparklineGroupByStyle;
 	prot["asc_getThumbBySparklineGroup"]				= prot.asc_getThumbBySparklineGroup;
+	prot["asc_getStyles"]				= prot.asc_getStyles;
 	window['AscCommonExcel'].sparkline = sparkline;
 	window['AscCommonExcel'].TablePart = TablePart;
 	window['AscCommonExcel'].AutoFilter = AutoFilter;
