@@ -7667,12 +7667,13 @@ ParaFootnoteReference.prototype.UpdateNumber = function(PRS)
 		var nPageAbs    = PRS.GetPageAbs();
 		var nColumnAbs  = PRS.GetColumnAbs();
 		var nAdditional = PRS.GetFootnoteReferencesCount(this);
+        var oSectPr     = PRS.GetSectPr();
 
 		var oLogicDocument = this.Footnote.Get_LogicDocument();
 		var oFootnotesController = oLogicDocument.GetFootnotesController();
-		this.Number = oFootnotesController.GetFootnoteNumberOnPage(nPageAbs, nColumnAbs) + nAdditional;
+		this.Number = oFootnotesController.GetFootnoteNumberOnPage(nPageAbs, nColumnAbs, oSectPr) + nAdditional;
 		this.private_Measure();
-		this.Footnote.SetNumber(this.Number);
+		this.Footnote.SetNumber(this.Number, oSectPr);
 	}
 };
 ParaFootnoteReference.prototype.private_Measure = function()

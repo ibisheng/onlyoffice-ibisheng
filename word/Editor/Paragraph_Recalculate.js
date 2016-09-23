@@ -2552,6 +2552,7 @@ function CParagraphRecalculateStateWrap(Para)
     this.PageAbs         = 0;
     this.ColumnAbs       = 0;
 	this.InTable         = false;
+    this.SectPr          = null; // настройки секции, к которой относится данный параграф
 
 	this.Fast            = false; // Быстрый ли пересчет
 
@@ -2673,6 +2674,7 @@ CParagraphRecalculateStateWrap.prototype =
 		this.PageAbs     = Paragraph.Get_AbsolutePage(CurPage);
 		this.ColumnAbs   = Paragraph.Get_AbsoluteColumn(CurPage);
 		this.InTable     = Paragraph.Parent.Is_TableCellContent();
+        this.SectPr      = null;
 
 		this.RunRecalcInfoLast  = (0 === CurPage ? null : Paragraph.Pages[CurPage - 1].EndInfo.RunRecalcInfo);
 		this.RunRecalcInfoBreak = this.RunRecalcInfoLast;
@@ -3035,6 +3037,13 @@ CParagraphRecalculateStateWrap.prototype.LoadFootnotesInfo = function()
 CParagraphRecalculateStateWrap.prototype.IsInTable = function()
 {
 	return this.InTable;
+};
+CParagraphRecalculateStateWrap.prototype.GetSectPr = function()
+{
+	if (null === this.SectPr && this.Paragraph)
+		this.SectPr = this.Paragraph.Get_SectPr();
+
+	return this.SectPr;
 };
 
 function CParagraphRecalculateStateCounter()

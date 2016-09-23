@@ -549,39 +549,117 @@ CFootnotesController.prototype.PopCellLimit = function()
 {
 	this.CellLimits.length = Math.max(0, this.CellLimits.length - 1);
 };
-CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nColumnAbs)
+CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nColumnAbs, oSectPr)
 {
-	// Случай, когда своя отдельная нумерация на каждой странице
-	// Мы делаем не совсем как в Word, если у нас происходит ситуация, что ссылка на сноску на одной странице, а сама
-	// сноска на следующей, тогда у этих страниц нумерация общая, в Word ставится номер "1" в такой ситуации, и становится
-	// непонятно, потому что есть две ссылки с номером 1 на странице, ссылающиеся на разные сноски.
-
-	// В таблицах сами сноски могут переносится на другую колонку, а ссылки будут оставаться на данной, и они пока еще
-	// не рассчитаны и никуда не добавлены, поэтому нам также надо учитывать количество переносимы сносок на следующую
-	// колонку.
-	var nAdditional = 0;
-
-	for (var nColumnIndex = nColumnAbs; nColumnIndex >= 0; --nColumnIndex)
+	var nNumRestart = section_footnote_RestartEachPage;
+	var nNumStart   = 1;
+	if (oSectPr)
 	{
-		var oColumn = this.private_GetPageColumn(nPageAbs, nColumnIndex);
-		if (nColumnIndex === nColumnAbs)
+		nNumRestart = oSectPr.GetFootnoteNumRestart();
+		nNumStart   = oSectPr.GetFootnoteNumStart();
+	}
+
+	// NumStart никак не влияет в случаях RestartEachPage и RestartEachSect. Влияет только на случай RestartContinious:
+	// к общему количеству сносок добавляется данное значение, взятое для текущей секции, этоже значение из предыдущих
+	// секций не учитывается.
+
+	if (section_footnote_RestartEachPage === nNumRestart)
+	{
+		// Случай, когда своя отдельная нумерация на каждой странице
+		// Мы делаем не совсем как в Word, если у нас происходит ситуация, что ссылка на сноску на одной странице, а сама
+		// сноска на следующей, тогда у этих страниц нумерация общая, в Word ставится номер "1" в такой ситуации, и становится
+		// непонятно, потому что есть две ссылки с номером 1 на странице, ссылающиеся на разные сноски.
+
+		// В таблицах сами сноски могут переносится на другую колонку, а ссылки будут оставаться на данной, и они пока еще
+		// не рассчитаны и никуда не добавлены, поэтому нам также надо учитывать количество переносимы сносок на следующую
+		// колонку.
+		var nAdditional = 0;
+
+		for (var nColumnIndex = nColumnAbs; nColumnIndex >= 0; --nColumnIndex)
+		{
+			var oColumn = this.private_GetPageColumn(nPageAbs, nColumnIndex);
+			if (nColumnIndex === nColumnAbs)
+			{
+				var arrContinuesElements = oColumn.GetContinuesElements();
+				if (arrContinuesElements.length > 0)
+					nAdditional = arrContinuesElements.length - 1;
+			}
+
+			if (oColumn.Elements.length > 0)
+			{
+				var oFootnote  = oColumn.Elements[oColumn.Elements.length - 1];
+				var nStartPage = oFootnote.Get_StartPage_Absolute();
+
+				if (nStartPage >= nPageAbs || (nStartPage === nPageAbs - 1 && true !== oFootnote.Is_ContentOnFirstPage()))
+					return oFootnote.GetNumber() + 1 + nAdditional;
+				else
+					return 1 + nAdditional;
+			}
+
+		}
+	}
+	else if (section_footnote_RestartEachSect === nNumRestart)
+	{
+		var oColumn = this.private_GetPageColumn(nPageAbs, nColumnAbs);
+		if (oColumn)
 		{
 			var arrContinuesElements = oColumn.GetContinuesElements();
-			if (arrContinuesElements.length > 0)
-				nAdditional = arrContinuesElements.length - 1;
+			if (arrContinuesElements.length > 0 && oColumn.Elements.length > 0)
+			{
+				var oFootnote = oColumn.Elements[oColumn.Elements.length - 1];
+				if (oFootnote.GetReferenceSectPr() !== oSectPr)
+					return 1;
+
+				// Второе условие не нужно, потому что если arrContinuesElements.length > 0, то на такой колонке
+				// пусть и пустая но должна быть хоть одна сноска рассчитана
+
+				return oColumn.Elements[oColumn.Elements.length - 1].GetNumber() + 1 + arrContinuesElements.length;
+			}
 		}
 
-		if (oColumn.Elements.length > 0)
+		// Дальше мы ищем колонку, на которой была последняя сноска. Заметим, что переносы сносок мы не проверяем, т.к.
+		// их не может быть вплоть до последней сноски, а что последняя сноска не переносится мы проверили выше.
+		for (var nPageIndex = nPageAbs; nPageIndex >= 0; --nPageIndex)
 		{
-			var oFootnote = oColumn.Elements[oColumn.Elements.length - 1];
-			var nStartPage = oFootnote.Get_StartPage_Absolute();
+			var nColumnStartIndex = (nPageIndex === nPageAbs ? nColumnAbs : this.Pages[nPageAbs].Columns.length - 1);
+			for (var nColumnIndex = nColumnStartIndex; nColumnIndex >= 0; --nColumnIndex)
+			{
+				oColumn = this.private_GetPageColumn(nPageIndex, nColumnIndex);
+				if (oColumn && oColumn.Elements.length > 0)
+				{
+					var oFootnote = oColumn.Elements[oColumn.Elements.length - 1];
+					if (oFootnote.GetReferenceSectPr() !== oSectPr)
+						return 1;
 
-			if (nStartPage >= nPageAbs || (nStartPage === nPageAbs - 1 && true !== oFootnote.Is_ContentOnFirstPage()))
-				return oFootnote.GetNumber() + 1 + nAdditional;
-			else
-				return 1 + nAdditional;
+					return oColumn.Elements[oColumn.Elements.length - 1].GetNumber() + 1;
+				}
+			}
+		}
+	}
+	else// if (section_footnote_RestartContinious === nNumRestart)
+	{
+		// Здесь нам надо считать, сколько сносок всего в документе до данного момента, отталкиваться от предыдущей мы
+		// не можем, потому что Word считает общее количество сносок, а не продолжает нумерацию с предыдущей секции,
+		// т.е. после последнего номера 4 в старой секции, в новой секции может идти уже, например, 9.
+		var nFootnotesCount = 0;
+		for (var nPageIndex = nPageAbs; nPageIndex >= 0; --nPageIndex)
+		{
+			var nColumnStartIndex = (nPageIndex === nPageAbs ? nColumnAbs : this.Pages[nPageAbs].Columns.length - 1);
+			for (var nColumnIndex = nColumnStartIndex; nColumnIndex >= 0; --nColumnIndex)
+			{
+				oColumn = this.private_GetPageColumn(nPageIndex, nColumnIndex);
+				if (oColumn && oColumn.Elements.length > 0)
+				{
+					var oFirstFootnote = oColumn.Elements[0];
+					if (oFirstFootnote.Pages.length > 1)
+						nFootnotesCount += oColumn.Elements.length - 1;
+					else
+						nFootnotesCount += oColumn.Elements.length;
+				}
+			}
 		}
 
+		return nFootnotesCount + nNumStart;
 	}
 
 	return 1;

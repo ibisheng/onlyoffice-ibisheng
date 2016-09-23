@@ -1892,7 +1892,7 @@ CSectionPr.prototype.SetFootnoteNumStart = function(nStart)
 CSectionPr.prototype.GetFootnoteNumStart = function()
 {
 	if (undefined === this.FootnotePr.NumStart)
-		return this.private_GetDocumentWideFootnotePr().NumStart;
+		return 1;
 
 	return this.FootnotePr.NumStart;
 };
