@@ -3920,6 +3920,47 @@ CStyle.prototype =
         }
     }
 };
+CStyle.prototype.CreateFootnoteText = function()
+{
+	var oParaPr = {
+		Spacing : {
+			After    : 0,
+			Line     : 1,
+			LineRule : linerule_Auto
+		}
+	};
+
+	var oTextPr = {
+		FontSize : 10
+	};
+
+	this.Set_UiPriority(99);
+	this.Set_SemiHidden(true);
+	this.Set_UnhideWhenUsed(true);
+	this.Set_TextPr(oTextPr);
+	this.Set_ParaPr(oParaPr);
+};
+CStyle.prototype.CreateFootnoteTextChar = function()
+{
+	var oTextPr = {
+		FontSize : 10
+	};
+
+	this.Set_UiPriority(99);
+	this.Set_SemiHidden(true);
+	this.Set_TextPr(oTextPr);
+};
+CStyle.prototype.CreateFootnoteReference = function()
+{
+	var oTextPr = {
+		VertAlign : vertalign_SuperScript
+	};
+
+	this.Set_UiPriority(99);
+	this.Set_SemiHidden(true);
+	this.Set_UnhideWhenUsed(true);
+	this.Set_TextPr(oTextPr);
+};
 
 function CStyles(bCreateDefault)
 {
@@ -3928,24 +3969,27 @@ function CStyles(bCreateDefault)
         this.Id = AscCommon.g_oIdCounter.Get_NewId();
         this.Lock = new AscCommon.CLock();
 
-        this.Default =
-        {
-            ParaPr      : new CParaPr(),
-            TextPr      : new CTextPr(),
-            TablePr     : new CTablePr(),
-            TableRowPr  : new CTableRowPr(),
-            TableCellPr : new CTableCellPr(),
-            Paragraph : null,
-            Character : null,
-            Numbering : null,
-            Table     : null,
-            TableGrid : null,
-            Headings  : [],
-            ParaList  : null,
-            Header    : null,
-            Footer    : null,
-            Hyperlink : null
-        };
+		this.Default = {
+			ParaPr      : new CParaPr(),
+			TextPr      : new CTextPr(),
+			TablePr     : new CTablePr(),
+			TableRowPr  : new CTableRowPr(),
+			TableCellPr : new CTableCellPr(),
+
+			Paragraph         : null,
+			Character         : null,
+			Numbering         : null,
+			Table             : null,
+			TableGrid         : null,
+			Headings          : [],
+			ParaList          : null,
+			Header            : null,
+			Footer            : null,
+			Hyperlink         : null,
+			FootnoteText      : null,
+			FootnoteTextChar  : null,
+			FootnoteReference : null
+		};
 
         // Заполняем значения по умолчанию
         this.Default.ParaPr.Init_Default();
@@ -4169,6 +4213,22 @@ function CStyles(bCreateDefault)
         var Style_Hyperlink = new CStyle("Hyperlink", null, null, styletype_Character );
         Style_Hyperlink.Create_Character_Hyperlink();
         this.Default.Hyperlink = this.Add( Style_Hyperlink );
+
+		// Создаем стили для сносок
+		var StyleFootnoteText = new CStyle("footnote text", this.Default.Paragraph, null, styletype_Paragraph);
+		StyleFootnoteText.CreateFootnoteText();
+		this.Default.FootnoteText = StyleFootnoteText;
+
+		var StyleFootnoteTextChar = new CStyle("Footnote Text Char", this.Default.Character, null, styletype_Character);
+		StyleFootnoteTextChar.CreateFootnoteTextChar();
+		this.Default.FootnoteTextChar = StyleFootnoteTextChar;
+
+		StyleFootnoteTextChar.Set_Link(StyleFootnoteText.GetId());
+		StyleFootnoteText.Set_Link(StyleFootnoteTextChar.GetId());
+
+		var StyleFootnoteReference = new CStyle("footnote reference", this.Default.Character, null, styletype_Character);
+		StyleFootnoteReference.CreateFootnoteReference();
+		this.Default.FootnoteReference = StyleFootnoteReference;
 
         // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
         g_oTableId.Add( this, this.Id );
