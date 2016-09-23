@@ -3571,8 +3571,8 @@
 
 
         var fHorLine, fVerLine;
-        var isRangeOut = AscCommonExcel.selectionLineType.RangeOut === selectionLineType;
-        var isDashLine = AscCommonExcel.selectionLineType.Dash === selectionLineType;
+        var canFill = AscCommonExcel.selectionLineType.Selection & selectionLineType;
+        var isDashLine = AscCommonExcel.selectionLineType.Dash & selectionLineType;
         if (isDashLine) {
             fHorLine = ctx.dashLineCleverHor;
             fVerLine = ctx.dashLineCleverVer;
@@ -3594,7 +3594,7 @@
         var y1 = r[oIntersection.r1].top - offsetY;
         var y2 = r[oIntersection.r2].top + r[oIntersection.r2].height - offsetY;
 
-        if (!isDashLine && !isRangeOut) {
+        if (canFill) {
             var fillColor = strokeColor.Copy();
             fillColor.a = 0.15;
             ctx.setFillStyle(fillColor).fillRect(x1, y1, x2 - x1, y2 - y1);
@@ -3617,7 +3617,7 @@
         }
         ctx.closePath().stroke();
 
-        if (!isDashLine && !isRangeOut) {/*Отрисовка светлой полосы при выборе ячеек для формулы*/
+        if (canFill) {/*Отрисовка светлой полосы при выборе ячеек для формулы*/
             ctx.setLineWidth(1);
             ctx.setStrokeStyle(colorN);
             ctx.beginPath();
@@ -3637,7 +3637,7 @@
         }
 
         // draw active cell in selection
-        var isPromote = AscCommonExcel.selectionLineType.RangeWithPromote === selectionLineType;
+        var isPromote = AscCommonExcel.selectionLineType.Promote & selectionLineType;
         if (isPromote) {
             var fs = this.model.getMergedByCell(range.startRow, range.startCol);
             fs = range.intersectionSimple(
@@ -3654,34 +3654,38 @@
         }
 
         // Отрисовка квадратов для move/resize
-        var isResize = AscCommonExcel.selectionLineType.RangeWithResize === selectionLineType;
+        var isResize = AscCommonExcel.selectionLineType.Resize & selectionLineType;
         if (isResize || isPromote) {
             ctx.setFillStyle(colorN);
-            if (isResize && drawLeftSide && drawTopSide) {
-                ctx.fillRect(x1 - width_4px, y1 - height_4px, width_7px, height_7px);
-            }
-            if (isResize && drawRightSide && drawTopSide) {
-                ctx.fillRect(x2 - width_4px, y1 - height_4px, width_7px, height_7px);
-            }
-            if (isResize && drawLeftSide && drawBottomSide) {
-                ctx.fillRect(x1 - width_4px, y2 - height_4px, width_7px, height_7px);
-            }
             if (drawRightSide && drawBottomSide) {
                 ctx.fillRect(x2 - width_4px, y2 - height_4px, width_7px, height_7px);
             }
-
             ctx.setFillStyle(strokeColor);
-            if (isResize && drawLeftSide && drawTopSide) {
-                ctx.fillRect(x1 - width_3px, y1 - height_3px, width_5px, height_5px);
-            }
-            if (isResize && drawRightSide && drawTopSide) {
-                ctx.fillRect(x2 - width_3px, y1 - height_3px, width_5px, height_5px);
-            }
-            if (isResize && drawLeftSide && drawBottomSide) {
-                ctx.fillRect(x1 - width_3px, y2 - height_3px, width_5px, height_5px);
-            }
             if (drawRightSide && drawBottomSide) {
                 ctx.fillRect(x2 - width_3px, y2 - height_3px, width_5px, height_5px);
+            }
+
+            if (isResize) {
+                ctx.setFillStyle(colorN);
+                if (drawLeftSide && drawTopSide) {
+                    ctx.fillRect(x1 - width_4px, y1 - height_4px, width_7px, height_7px);
+                }
+                if (drawRightSide && drawTopSide) {
+                    ctx.fillRect(x2 - width_4px, y1 - height_4px, width_7px, height_7px);
+                }
+                if (drawLeftSide && drawBottomSide) {
+                    ctx.fillRect(x1 - width_4px, y2 - height_4px, width_7px, height_7px);
+                }
+                ctx.setFillStyle(strokeColor);
+                if (drawLeftSide && drawTopSide) {
+                    ctx.fillRect(x1 - width_3px, y1 - height_3px, width_5px, height_5px);
+                }
+                if (drawRightSide && drawTopSide) {
+                    ctx.fillRect(x2 - width_3px, y1 - height_3px, width_5px, height_5px);
+                }
+                if (drawLeftSide && drawBottomSide) {
+                    ctx.fillRect(x1 - width_3px, y2 - height_3px, width_5px, height_5px);
+                }
             }
         }
         return true;
@@ -3761,6 +3765,10 @@
             } else {
                 this._drawSelectionRange();
 
+                if (this.activeFillHandle) {
+                    this._drawElements(this._drawSelectionElement, this.activeFillHandle.clone(true),
+                      AscCommonExcel.selectionLineType.None, this.settings.activeCellBorderColor);
+                }
                 if (this.isFormulaEditMode) {
                     this._drawFormulaRanges(this.arrActiveFormulaRanges);
                 }
@@ -3775,7 +3783,7 @@
                 }
                 if (null !== this.activeMoveRange) {
                     this._drawElements(this._drawSelectionElement, this.activeMoveRange,
-                      AscCommonExcel.selectionLineType.RangeOut, new CColor(0, 0, 0));
+                      AscCommonExcel.selectionLineType.None, new CColor(0, 0, 0));
                 }
             }
         }
@@ -3799,12 +3807,8 @@
         }
 
         this._drawElements(this._drawSelectionElement, this.activeRange,
-          AscCommonExcel.selectionLineType.RangeWithPromote, this.settings.activeCellBorderColor);
-
-        if (this.activeFillHandle) {
-            this._drawElements(this._drawSelectionElement, this.activeFillHandle.clone(true),
-              AscCommonExcel.selectionLineType.RangeOut, this.settings.activeCellBorderColor);
-        }
+          AscCommonExcel.selectionLineType.Selection | AscCommonExcel.selectionLineType.ActiveCell |
+          AscCommonExcel.selectionLineType.Promote, this.settings.activeCellBorderColor);
     };
 
     WorksheetView.prototype._drawFormatPainterRange = function () {
@@ -3825,8 +3829,8 @@
 
             strokeColor = AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % length];
             this._drawElements(this._drawSelectionElement, oFormulaRange,
-              arrRanges[i].isName ? AscCommonExcel.selectionLineType.Range :
-                AscCommonExcel.selectionLineType.RangeWithResize, strokeColor);
+              AscCommonExcel.selectionLineType.Selection | (arrRanges[i].isName ? AscCommonExcel.selectionLineType.None :
+                AscCommonExcel.selectionLineType.Resize), strokeColor);
         }
     };
 
@@ -5947,7 +5951,7 @@
             y1 = this.rows[oFormulaRangeIn.r1].top - offsetY;
             y2 = this.rows[oFormulaRangeIn.r2].top + this.rows[oFormulaRangeIn.r2].height - offsetY;
 
-            isResize = AscCommonExcel.selectionLineType.RangeWithResize === rangeType;
+            isResize = AscCommonExcel.selectionLineType.Resize & rangeType;
 
             if (isResize && this._hitResizeCorner(x1 - this.width_1px, y1 - this.height_1px, x, y)) {
                 /*TOP-LEFT*/
@@ -5986,8 +5990,9 @@
     };
 
     WorksheetView.prototype._hitCursorSelectionRange = function (vr, x, y, offsetX, offsetY) {
-        var res = this._hitInRange(this.activeRange, AscCommonExcel.selectionLineType.RangeWithPromote, vr, x, y,
-          offsetX, offsetY);
+        var res = this._hitInRange(this.activeRange,
+          AscCommonExcel.selectionLineType.Selection | AscCommonExcel.selectionLineType.ActiveCell |
+          AscCommonExcel.selectionLineType.Promote, vr, x, y, offsetX, offsetY);
         return res ? {
             cursor: kCurMove === res.cursor ? kCurMove : kCurFillHandle,
             target: kCurMove === res.cursor ? c_oTargetType.MoveRange : c_oTargetType.FillHandle,
@@ -6006,8 +6011,7 @@
             oFormulaRange = arrRanges[i].clone(true);
             oFormulaRange.isName = arrRanges[i].isName;
             res = !oFormulaRange.isName &&
-              this._hitInRange(oFormulaRange, AscCommonExcel.selectionLineType.RangeWithResize, vr, x, y, offsetX,
-                offsetY);
+              this._hitInRange(oFormulaRange, AscCommonExcel.selectionLineType.Resize, vr, x, y, offsetX, offsetY);
             if (res) {
                 break;
             }

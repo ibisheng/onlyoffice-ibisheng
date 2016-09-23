@@ -322,11 +322,12 @@ var c_oAscFormulaRangeBorderColor = [
 ];
 
   var selectionLineType = {
-    Dash            : 1,
-    RangeWithPromote: 2,
-    RangeWithResize : 3,
-    Range           : 4,
-    RangeOut        : 5
+    None        : 0,
+    Selection   : 1,
+    ActiveCell  : 2,
+    Resize      : 4,
+    Promote     : 8,
+    Dash        : 16
   };
 
 var c_oAscLockNameFrozenPane = "frozenPane";
