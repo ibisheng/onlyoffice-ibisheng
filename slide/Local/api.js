@@ -52,7 +52,7 @@ Asc['asc_docs_api'].prototype._OfflineAppDocumentEndLoad = function(_url, _data)
 	AscCommon.g_oIdCounter.m_sUserId = window["AscDesktopEditor"]["CheckUserId"]();
 	if (_data == "")
 	{
-		this.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
+		this.sendEvent("asc_onError", c_oAscError.ID.ConvertationOpenError, c_oAscError.Level.Critical);
 		return;
 	}
 	
@@ -199,7 +199,7 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error)
 	editor.LastUserSavedIndex = undefined;
 	
 	if (2 == error)
-		editor.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
+		editor.sendEvent("asc_onError", c_oAscError.ID.ConvertationSaveError, c_oAscError.Level.Critical);
 };
 Asc['asc_docs_api'].prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) 
 {
@@ -259,4 +259,13 @@ window["on_editor_native_message"] = function(sCommand, sParam)
 		editor.asc_Print();
 	else if (sCommand == "editor:stopDemonstration")
 		editor.EndDemonstration(true);
+};
+
+Asc['asc_docs_api'].prototype.asc_setAdvancedOptions = function(idOption, option)
+{
+	if (window["Asc"].c_oAscAdvancedOptionsID.DRM === idOption) {
+        var _param = "";
+        _param += ("<m_sPassword>" + AscCommon.CopyPasteCorrectString(option.asc_getPassword()) + "</m_sPassword>");
+        window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
+    }
 };

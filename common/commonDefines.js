@@ -39,6 +39,7 @@
 	function(window, undefined)
 {
 	var g_cCharDelimiter      = String.fromCharCode(5);
+	var g_cGeneralFormat      = 'General';
 	var FONT_THUMBNAIL_HEIGHT = (7 * 96.0 / 25.4) >> 0;
 	var c_oAscMaxColumnWidth  = 255;
 	var c_oAscMaxRowHeight    = 409;
@@ -134,6 +135,9 @@
 
 			MaxDataSeriesError : -80,
 			CannotFillRange    : -81,
+
+			ConvertationOpenError : -82,
+            ConvertationSaveError : -83,
 
 			UserDrop : -100,
 			Warning  : -101,
@@ -981,6 +985,8 @@
 	prot['Unknown']                          = prot.Unknown;
 	prot['ConvertationTimeout']              = prot.ConvertationTimeout;
 	prot['ConvertationError']                = prot.ConvertationError;
+	prot['ConvertationOpenError']            = prot.ConvertationOpenError;
+	prot['ConvertationSaveError']            = prot.ConvertationSaveError;
 	prot['DownloadError']                    = prot.DownloadError;
 	prot['UnexpectedGuid']                   = prot.UnexpectedGuid;
 	prot['Database']                         = prot.Database;
@@ -1413,6 +1419,7 @@
 
 	window['AscCommon']                             = window['AscCommon'] || {};
 	window["AscCommon"].g_cCharDelimiter            = g_cCharDelimiter;
+	window["AscCommon"].g_cGeneralFormat            = g_cGeneralFormat;
 	window["AscCommon"].bDate1904                   = false;
 	window["AscCommon"].c_oAscAdvancedOptionsAction = c_oAscAdvancedOptionsAction;
 	window["AscCommon"].DownloadType                = DownloadType;

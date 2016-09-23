@@ -3507,47 +3507,6 @@ UndoRedoWoorksheet.prototype = {
 			worksheetView.model.autoFilters.reDrawFilter(to);
 			worksheetView.model.autoFilters.reDrawFilter(from);
 		}
-		else if(AscCH.historyitem_Worksheet_Merge == Type || AscCH.historyitem_Worksheet_Unmerge == Type)
-		{
-			if(AscCH.historyitem_Worksheet_Unmerge == Type)
-				bUndo = !bUndo;
-			r1 = Data.r1;
-			c1 = Data.c1;
-			r2 = Data.r2;
-			c2 = Data.c2;
-			if(false != this.wb.bCollaborativeChanges)
-			{
-				r1 = collaborativeEditing.getLockOtherRow2(nSheetId, r1);
-				c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, c1);
-				r2 = collaborativeEditing.getLockOtherRow2(nSheetId, r2);
-				c2 = collaborativeEditing.getLockOtherColumn2(nSheetId, c2);
-			}
-			range = ws.getRange(new CellAddress(r1, c1, 0), new CellAddress(r2, c2, 0));
-			if(bUndo)
-				range.unmerge();
-			else
-				range.merge();
-		}
-		else if(AscCH.historyitem_Worksheet_SetHyperlink == Type || AscCH.historyitem_Worksheet_RemoveHyperlink == Type)
-		{
-			if(AscCH.historyitem_Worksheet_RemoveHyperlink == Type)
-				bUndo = !bUndo;
-			var Ref = Data.Ref;
-			if(false != this.wb.bCollaborativeChanges)
-			{
-				var bboxRef = Data.Ref.getBBox0();
-				r1 = collaborativeEditing.getLockOtherRow2(nSheetId, bboxRef.r1);
-				c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, bboxRef.c1);
-				r2 = collaborativeEditing.getLockOtherRow2(nSheetId, bboxRef.r2);
-				c2 = collaborativeEditing.getLockOtherColumn2(nSheetId, bboxRef.c2);
-				Ref.setOffsetFirst({offsetCol: c1 - bboxRef.c1, offsetRow: r1 - bboxRef.r1});
-				Ref.setOffsetLast({offsetCol: c2 - bboxRef.c2, offsetRow: r2 - bboxRef.r2});
-			}
-			if(bUndo)
-				Ref.removeHyperlink(Data);
-			else
-				Ref.setHyperlink(Data, true);
-		}
 		else if(AscCH.historyitem_Worksheet_Rename == Type)
 		{
 			if(bUndo)
@@ -3602,18 +3561,32 @@ UndoRedoWoorksheet.prototype = {
 		}
 		else if(AscCH.historyitem_Worksheet_ChangeMerge === Type){
 			from = null;
-			if(null != Data.from)
+			if (null != Data.from && null != Data.from.r1 && null != Data.from.c1 && null != Data.from.r2 && null != Data.from.c2) {
 				from = new Asc.Range(Data.from.c1, Data.from.r1, Data.from.c2, Data.from.r2);
+				if (false != this.wb.bCollaborativeChanges) {
+					from.r1 = collaborativeEditing.getLockOtherRow2(nSheetId, from.r1);
+					from.c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, from.c1);
+					from.r2 = collaborativeEditing.getLockOtherRow2(nSheetId, from.r2);
+					from.c2 = collaborativeEditing.getLockOtherColumn2(nSheetId, from.c2);
+				}
+			}
 			to = null;
-			if(null != Data.to)
+			if (null != Data.to && null != Data.to.r1 && null != Data.to.c1 && null != Data.to.r2 && null != Data.to.c2) {
 				to = new Asc.Range(Data.to.c1, Data.to.r1, Data.to.c2, Data.to.r2);
+				if (false != this.wb.bCollaborativeChanges) {
+					to.r1 = collaborativeEditing.getLockOtherRow2(nSheetId, to.r1);
+					to.c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, to.c1);
+					to.r2 = collaborativeEditing.getLockOtherRow2(nSheetId, to.r2);
+					to.c2 = collaborativeEditing.getLockOtherColumn2(nSheetId, to.c2);
+				}
+			}
 			if(bUndo)
 			{
 				temp = from;
 				from = to;
 				to = temp;
 			}
-			if(null != from && null != from.r1 && null != from.c1 && null != from.r2 && null != from.c2)
+			if(null != from)
 			{
 				var aMerged = ws.mergeManager.get(from);
 				for(i in aMerged.inner)
@@ -3627,16 +3600,30 @@ UndoRedoWoorksheet.prototype = {
 				}
 			}
 			data = 1;
-			if(null != to && null != to.r1 && null != to.c1 && null != to.r2 && null != to.c2)
+			if(null != to)
 				ws.mergeManager.add(to, data);
 		}
-		else if(AscCH.historyitem_Worksheet_ChangeHyperlink === Type){
+		else if(AscCH.historyitem_Worksheet_ChangeHyperlink === Type) {
 			from = null;
-			if(null != Data.from)
+			if (null != Data.from && null != Data.from.r1 && null != Data.from.c1 && null != Data.from.r2 && null != Data.from.c2) {
 				from = new Asc.Range(Data.from.c1, Data.from.r1, Data.from.c2, Data.from.r2);
+				if (false != this.wb.bCollaborativeChanges) {
+					from.r1 = collaborativeEditing.getLockOtherRow2(nSheetId, from.r1);
+					from.c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, from.c1);
+					from.r2 = collaborativeEditing.getLockOtherRow2(nSheetId, from.r2);
+					from.c2 = collaborativeEditing.getLockOtherColumn2(nSheetId, from.c2);
+				}
+			}
 			to = null;
-			if(null != Data.to)
+			if (null != Data.to && null != Data.to.r1 && null != Data.to.c1 && null != Data.to.r2 && null != Data.to.c2) {
 				to = new Asc.Range(Data.to.c1, Data.to.r1, Data.to.c2, Data.to.r2);
+				if (false != this.wb.bCollaborativeChanges) {
+					to.r1 = collaborativeEditing.getLockOtherRow2(nSheetId, to.r1);
+					to.c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, to.c1);
+					to.r2 = collaborativeEditing.getLockOtherRow2(nSheetId, to.r2);
+					to.c2 = collaborativeEditing.getLockOtherColumn2(nSheetId, to.c2);
+				}
+			}
 			if(bUndo)
 			{
 				temp = from;
@@ -3645,7 +3632,7 @@ UndoRedoWoorksheet.prototype = {
 			}
 			//не делаем clone потому что предполагаем, что здесь могут быть только операции изменения рзмеров, перемещение или удаления одной ссылки
 			data = null;
-			if(null != from && null != from.r1 && null != from.c1 && null != from.r2 && null != from.c2)
+			if(null != from)
 			{
 				var aHyperlinks = ws.hyperlinkManager.get(from);
 				for(i in aHyperlinks.inner)
@@ -3661,7 +3648,7 @@ UndoRedoWoorksheet.prototype = {
 			}
 			if(null == data)
 				data = Data.hyperlink;
-			if(null != data && null != to && null != to.r1 && null != to.c1 && null != to.r2 && null != to.c2)
+			if(null != data && null != to)
 			{
 				data.Ref = ws.getRange3(to.r1, to.c1, to.r2, to.c2);
 				ws.hyperlinkManager.add(to, data);

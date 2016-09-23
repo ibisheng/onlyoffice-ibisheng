@@ -79,10 +79,15 @@ Paragraph.prototype.Recalculate_FastWholeParagraph = function()
         // последнюю строку на pageBreak/columnBreak, а во время пересчета смотрим изменяeтся ли положение
         // flow-объектов, привязанных к данному параграфу, кроме того, если по какой-то причине пересчет возвращает
         // не recalcresult_NextElement, тогда тоже отменяем быстрый пересчет
+
+		this.m_oPRSW.SetFast(true);
+
         var OldBounds            = this.Pages[0].Bounds;
         var isPageBreakLastLine1 = this.Lines[this.Lines.length - 1].Info & paralineinfo_BreakPage;
         var isPageBreakLastLine2 = this.Lines[this.Lines.length - 1].Info & paralineinfo_BreakRealPage;
         var FastRecalcResult     = this.Recalculate_Page(0, true);
+
+		this.m_oPRSW.SetFast(false);
 
         if (FastRecalcResult & recalcresult_NextElement
             && 1 === this.Pages.length
@@ -118,12 +123,17 @@ Paragraph.prototype.Recalculate_FastWholeParagraph = function()
         var OldLinesCount_0 = this.Pages[0].EndLine - this.Pages[0].StartLine + 1;
         var OldLinesCount_1 = this.Pages[1].EndLine - this.Pages[1].StartLine + 1;
 
-        var FastRecalcResult = this.Recalculate_Page(0, true);
+		this.m_oPRSW.SetFast(true);
+		var FastRecalcResult = this.Recalculate_Page(0, true);
 
-        if (!(FastRecalcResult & recalcresult_NextPage))
-            return [];
+		if (!(FastRecalcResult & recalcresult_NextPage))
+		{
+			this.m_oPRSW.SetFast(false);
+			return [];
+		}
 
         FastRecalcResult = this.Recalculate_Page(1);
+		this.m_oPRSW.SetFast(false);
         if (!(FastRecalcResult & recalcresult_NextElement))
             return [];
 
@@ -252,6 +262,8 @@ Paragraph.prototype.Recalculate_FastRange = function(SimpleChanges)
     var PrevLine  = Line;
     var PrevRange = Range;
 
+	this.m_oPRSW.SetFast(true);
+
     while ( PrevLine >= 0 )
     {
         PrevRange--;
@@ -317,7 +329,10 @@ Paragraph.prototype.Recalculate_FastRange = function(SimpleChanges)
     {
         var TempResult = this.private_RecalculateFastRange(CurRange, CurLine);
         if ( -1 === TempResult )
-            return -1;
+		{
+			this.m_oPRSW.SetFast(false);
+			return -1;
+		}
 
         if ( CurLine === Line && CurRange === Range )
             Result = TempResult;
@@ -339,12 +354,13 @@ Paragraph.prototype.Recalculate_FastRange = function(SimpleChanges)
 
     //console.log("Recalc Fast Range");
 
+	this.m_oPRSW.SetFast(false);
     return this.Get_AbsolutePage(Result);
 };
 
 /**
  * Функция для пересчета страницы параграфа.
- * @param {number} PageIndex - Номер страницы, которую нужно пересчитать (относительный номер страницы для параграфа).
+ * @param {number} CurPage - Номер страницы, которую нужно пересчитать (относительный номер страницы для параграфа).
  * Предыдущая страница ДОЛЖНА быть пересчитана, если задано не нулевое значение.
  * @returns {*} Возвращается результат пересчета
  */
@@ -589,7 +605,12 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage, bFirs
     {
         PRS.Reset_RestartPageRecalcInfo();
         PRS.Reset_MathRecalcInfo();
+		PRS.SaveFootnotesInfo();
     }
+	else
+	{
+		PRS.LoadFootnotesInfo();
+	}
 
     var RecalcResult;
     while (true)
@@ -954,7 +975,7 @@ Paragraph.prototype.private_RecalculateLine            = function(CurLine, CurPa
     //-------------------------------------------------------------------------------------------------------------
     // 14. Проверяем Последние проверки
     //-------------------------------------------------------------------------------------------------------------
-    if (false === this.private_RecalculateLineCheckFootnotes(CurLine, CurPage, PRS))
+    if (false === this.private_RecalculateLineCheckFootnotes(CurLine, CurPage, PRS, ParaPr))
         return;
 };
 
@@ -1307,6 +1328,9 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
             Bottom += ParaPr.Brd.Between.Space;
         }
 
+		// TODO: Здесь нужно сделать корректировку YLimit с учетом сносок. Надо разобраться почему вообще здесь
+		// используется this.YLimit вместо Page.YLimit
+
         if ( false === this.Parent.Is_TableCellContent() && Bottom > this.YLimit && Bottom - this.YLimit <= ParaPr.Spacing.After )
             Bottom = this.YLimit;
     }
@@ -1343,71 +1367,37 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
 
     var RealCurPage = this.private_GetRelativePageIndex(CurPage) - this.Get_StartPage_Relative();
 
+    var YLimit = PRS.YLimit;
     var oTopDocument = PRS.TopDocument;
 	var bNoFootnotes = true;
-	if (oTopDocument instanceof CDocument && oTopDocument.Footnotes.GetHeight(PRS.PageAbs, PRS.ColumnAbs) > 0.001)
-		bNoFootnotes = false;
+	if (oTopDocument instanceof CDocument)
+	{
+		// bNoFootnotes - означает есть или нет сноска на данной колонке
+		var nHeight =  oTopDocument.Footnotes.GetHeight(PRS.PageAbs, PRS.ColumnAbs);
+		if (nHeight > 0.001)
+		{
+			bNoFootnotes = false;
+
+			// В таблицах граница разруливается по своему
+			if (true !== PRS.IsInTable())
+				YLimit -= nHeight;
+		}
+	}
+    else if (oTopDocument instanceof CFootEndnote)
+    {
+		// bNoFootnotes - означает, первая или нет данная сноска в колонке. Если она не первая,
+		// тогда если у нее не убирается первая строка первого параграфа, все равно надо делать перенос
+        var oLogicDocument = this.LogicDocument;
+        if (true !== oLogicDocument.Footnotes.IsEmptyPageColumn(PRS.PageAbs, PRS.ColumnAbs))
+			bNoFootnotes = false;
+    }
 
     // Сначала проверяем не нужно ли сделать перенос страницы в данном месте
     // Перенос не делаем, если это первая строка на новой странице
-    if (true === this.Use_YLimit() && (Top > PRS.YLimit || Bottom2 > PRS.YLimit) && (CurLine != this.Pages[CurPage].FirstLine || false === bNoFootnotes || (0 === RealCurPage && (null != this.Get_DocumentPrev() || (true === this.Parent.Is_TableCellContent() && true !== this.Parent.Is_TableFirstRowOnNewPage())))) && false === BreakPageLineEmpty)
+    if (true === this.Use_YLimit() && (Top > YLimit || Bottom2 > YLimit) && (CurLine != this.Pages[CurPage].FirstLine || false === bNoFootnotes || (0 === RealCurPage && (null != this.Get_DocumentPrev() || (true === this.Parent.Is_TableCellContent() && true !== this.Parent.Is_TableFirstRowOnNewPage())))) && false === BreakPageLineEmpty)
     {
-        // TODO: Неразрывные абзацы и висячие строки внутри колонок вместе с плавающими объектами пока не обсчитываем
-        var bSkipWidowAndKeepLines = this.private_CheckSkipKeepLinesAndWidowControl(CurPage);
-
-        // Проверим висячую строку
-        if (this.Parent instanceof CDocument
-            && false === bSkipWidowAndKeepLines
-            && true === this.Parent.RecalcInfo.Can_RecalcWidowControl()
-            && true === ParaPr.WidowControl
-            && CurLine - this.Pages[CurPage].StartLine <= 1
-            && CurLine >= 1 && true != PRS.BreakPageLine
-            && ( 0 === CurPage && null != this.Get_DocumentPrev() ) )
-        {
-            // Вызываем данную функцию для удаления картинок с предыдущей страницы
-            this.Recalculate_Drawing_AddPageBreak(0, 0, true);
-
-            // TODO: Здесь перенос нужно делать сразу же, если в строке не было объектов с обтеканием
-            this.Parent.RecalcInfo.Set_WidowControl(this, CurLine - 1);
-            PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Column;
-            return false;
-        }
-        else
-        {
-            // Учитываем неразрывные абзацы:
-            //   1. В Word2010 (версия <= 14) просто проверяем, если параграф разбивается на 2 страницы, тогда
-            //      переносим его с новой страницы. Также не учитываем неразрывные параграфы внутри таблиц.
-            //   2. В Word2016 (версия >= 15) в добавок к предыдущему ориентируемся на колонки: пытаемся текущую
-            //      страницу параграфа разместить в какой либо колонке (пересчитывая их по очереди), если параграф
-            //      все равно не рассчитан до конца, тогда размещаем его в первой колонке и делаем перенос на следующую
-            //      страницу.
-            if (true === ParaPr.KeepLines && this.LogicDocument && false === bSkipWidowAndKeepLines)
-            {
-                var CompatibilityMode = this.LogicDocument.Get_CompatibilityMode();
-                if (CompatibilityMode <= document_compatibility_mode_Word14)
-                {
-                    if (null != this.Get_DocumentPrev() && true != this.Parent.Is_TableCellContent() && 0 === CurPage)
-                        CurLine = 0;
-                }
-                else if (CompatibilityMode >= document_compatibility_mode_Word15)
-                {
-                    // TODO: Разобраться с 2016 вордом
-                    if (null != this.Get_DocumentPrev() && 0 === CurPage)
-                        CurLine = 0;
-                }
-            }
-
-            // Восстанавливаем позицию нижней границы предыдущей страницы
-            this.Pages[CurPage].Bounds.Bottom = PRS.LinePrevBottom;
-            this.Pages[CurPage].Set_EndLine( CurLine - 1 );
-
-            if ( 0 === CurLine )
-                this.Lines[-1] = new CParaLine(0);
-
-            // Добавляем разрыв страницы
-            PRS.RecalcResult = recalcresult_NextPage;
-            return false;
-        }
+		this.private_RecalculateMoveLineToNextPage(CurLine, CurPage, PRS, ParaPr);
+		return false;
     }
 
     return true;
@@ -1830,63 +1820,38 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
     return PRSA.RecalcResult;
 };
 
-Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, CurPage, PRS)
+Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, CurPage, PRS, ParaPr)
 {
     if (!((PRS.RecalcResult & recalcresult_NextElement) || (PRS.RecalcResult & recalcresult_NextLine)))
         return false;
 
+	if (PRS.Fast)
+		return true;
+
 	var oTopDocument = PRS.TopDocument;
-    for (var nIndex = 0, nCount = PRS.Footnotes.length; nIndex < nCount; ++nIndex)
-    {
-        var oFootnote = PRS.Footnotes[nIndex].FootnoteReference.Get_Footnote();
-        var oPos      = PRS.Footnotes[nIndex].Pos;
+	var arrFootnotes = [];
+	for (var nIndex = 0, nCount = PRS.Footnotes.length; nIndex < nCount; ++nIndex)
+	{
+		var oFootnote = PRS.Footnotes[nIndex].FootnoteReference.Get_Footnote();
+		var oPos      = PRS.Footnotes[nIndex].Pos;
 
-        // Проверим позицию
-        if (true === this.MoveToLBP && PRS.LineBreakPos.Compare(oPos) >= 0)
-            return true;
+		// Проверим позицию
+		if (true === PRS.MoveToLBP && PRS.LineBreakPos.Compare(oPos) <= 0)
+			continue;
 
-        // TODO: Здесь надо разобраться с параграфами внутри таблицы.
-        if (oTopDocument instanceof CDocument)
-        {
-            var RecalcInfo = oTopDocument.RecalcInfo;
-			var nPageAbs   = PRS.PageAbs;
-			var nColumnAbs = PRS.ColumnAbs;
-            if (true === RecalcInfo.Can_RecalcObject())
-            {
-                RecalcInfo.Set_FootnoteReference(oFootnote, nPageAbs, nColumnAbs);
-                oTopDocument.Footnotes.AddFootnoteToPage(nPageAbs, nColumnAbs, oFootnote, this.Pages[CurPage].Y + this.Lines[CurLine].Bottom);
-                PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Column | recalcresultflags_Footnotes;
-                return false;
-            }
-            else if (true === RecalcInfo.Check_FootnoteReference(oFootnote))
-            {
-				if (true === RecalcInfo.Is_PageBreakBefore())
-				{
-					//PRS.RecalcResult
-				}
+		arrFootnotes.push(oFootnote);
+	}
 
-                if (nPageAbs === RecalcInfo.FootnotePage && nColumnAbs === RecalcInfo.FootnoteColumn)
-                {
-                    // Все нормально пересчиталось
-                    RecalcInfo.Reset_FootnoteReference();
-                }
-                else
-                {
-                    // TODO: Реализовать
-                    RecalcInfo.Set_PageBreakBefore(true);
-					oTopDocument.Footnotes.RemoveFootnoteFromPage(nPageAbs, nColumnAbs, oFootnote);
-					PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Column | recalcresultflags_Footnotes;
-                    return false;
-                }
-            }
-            else
-            {
-                // Ничего не делаем, просто пропускаем ссылку на данную сноску
-            }
-        }
-    }
+	if (oTopDocument instanceof CDocument)
+	{
+		if (!oTopDocument.Footnotes.RecalculateFootnotes(PRS.PageAbs, PRS.ColumnAbs, this.Pages[CurPage].Y + this.Lines[CurLine].Bottom, arrFootnotes))
+		{
+			this.private_RecalculateMoveLineToNextPage(CurLine, CurPage, PRS, ParaPr);
+			return false;
+		}
+	}
 
-    return true;
+	return true;
 };
 
 Paragraph.prototype.private_RecalculateRange           = function(CurRange, CurLine, CurPage, RangesCount, PRS, ParaPr)
@@ -2114,6 +2079,66 @@ Paragraph.prototype.private_CheckColumnBreak = function(CurPage)
         if (this.LogicDocument)
             this.LogicDocument.OnColumnBreak_WhileRecalculate();
     }
+};
+
+Paragraph.prototype.private_RecalculateMoveLineToNextPage = function(CurLine, CurPage, PRS, ParaPr)
+{
+	// TODO: Неразрывные абзацы и висячие строки внутри колонок вместе с плавающими объектами пока не обсчитываем
+	var bSkipWidowAndKeepLines = this.private_CheckSkipKeepLinesAndWidowControl(CurPage);
+
+	// Проверим висячую строку
+	if (this.Parent instanceof CDocument
+		&& false === bSkipWidowAndKeepLines
+		&& true === this.Parent.RecalcInfo.Can_RecalcWidowControl()
+		&& true === ParaPr.WidowControl
+		&& CurLine - this.Pages[CurPage].StartLine <= 1
+		&& CurLine >= 1 && true != PRS.BreakPageLine
+		&& ( 0 === CurPage && null != this.Get_DocumentPrev() ) )
+	{
+		// Вызываем данную функцию для удаления картинок с предыдущей страницы
+		this.Recalculate_Drawing_AddPageBreak(0, 0, true);
+
+		// TODO: Здесь перенос нужно делать сразу же, если в строке не было объектов с обтеканием
+		this.Parent.RecalcInfo.Set_WidowControl(this, CurLine - 1);
+		PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Column;
+		return false;
+	}
+	else
+	{
+		// Учитываем неразрывные абзацы:
+		//   1. В Word2010 (версия <= 14) просто проверяем, если параграф разбивается на 2 страницы, тогда
+		//      переносим его с новой страницы. Также не учитываем неразрывные параграфы внутри таблиц.
+		//   2. В Word2016 (версия >= 15) в добавок к предыдущему ориентируемся на колонки: пытаемся текущую
+		//      страницу параграфа разместить в какой либо колонке (пересчитывая их по очереди), если параграф
+		//      все равно не рассчитан до конца, тогда размещаем его в первой колонке и делаем перенос на следующую
+		//      страницу.
+		if (true === ParaPr.KeepLines && this.LogicDocument && false === bSkipWidowAndKeepLines)
+		{
+			var CompatibilityMode = this.LogicDocument.Get_CompatibilityMode();
+			if (CompatibilityMode <= document_compatibility_mode_Word14)
+			{
+				if (null != this.Get_DocumentPrev() && true != this.Parent.Is_TableCellContent() && 0 === CurPage)
+					CurLine = 0;
+			}
+			else if (CompatibilityMode >= document_compatibility_mode_Word15)
+			{
+				// TODO: Разобраться с 2016 вордом
+				if (null != this.Get_DocumentPrev() && 0 === CurPage)
+					CurLine = 0;
+			}
+		}
+
+		// Восстанавливаем позицию нижней границы предыдущей страницы
+		this.Pages[CurPage].Bounds.Bottom = PRS.LinePrevBottom;
+		this.Pages[CurPage].Set_EndLine( CurLine - 1 );
+
+		if ( 0 === CurLine )
+			this.Lines[-1] = new CParaLine(0);
+
+		// Добавляем разрыв страницы
+		PRS.RecalcResult = recalcresult_NextPage;
+		return false;
+	}
 };
 
 var ERecalcPageType =
@@ -2526,6 +2551,9 @@ function CParagraphRecalculateStateWrap(Para)
     this.TopDocument     = null;
     this.PageAbs         = 0;
     this.ColumnAbs       = 0;
+	this.InTable         = false;
+
+	this.Fast            = false; // Быстрый ли пересчет
 
     //
     this.Page            = 0;
@@ -2602,7 +2630,8 @@ function CParagraphRecalculateStateWrap(Para)
         Object : null         // Объект, который вызвал пересчет
     };
 
-    this.Footnotes = [];
+    this.Footnotes                  = [];
+	this.FootnotesRecalculateObject = null;
 
     // for ParaMath
     this.bMath_OneLine       = false;
@@ -2643,6 +2672,7 @@ CParagraphRecalculateStateWrap.prototype =
 		this.TopDocument = Paragraph.Parent.Get_TopDocumentContent();
 		this.PageAbs     = Paragraph.Get_AbsolutePage(CurPage);
 		this.ColumnAbs   = Paragraph.Get_AbsoluteColumn(CurPage);
+		this.InTable     = Paragraph.Parent.Is_TableCellContent();
 
 		this.RunRecalcInfoLast  = (0 === CurPage ? null : Paragraph.Pages[CurPage - 1].EndInfo.RunRecalcInfo);
 		this.RunRecalcInfoBreak = this.RunRecalcInfoLast;
@@ -2941,12 +2971,70 @@ CParagraphRecalculateStateWrap.prototype =
         NumberingItem.LineAscent = LineAscent;
 
         return X;
-    },
-
-    Add_FootnoteReference : function(FootnoteReference, Pos)
-    {
-        this.Footnotes.push({FootnoteReference : FootnoteReference, Pos : Pos});
     }
+};
+CParagraphRecalculateStateWrap.prototype.AddFootnoteReference = function(oFootnoteReference, oPos)
+{
+	// Ссылки могут добавляться несколько раз, если строка разбита на несколько отрезков
+	for (var nIndex = 0, nCount = this.Footnotes.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Footnotes[nIndex].FootnoteReference === oFootnoteReference)
+			return;
+	}
+
+	this.Footnotes.push({FootnoteReference : oFootnoteReference, Pos : oPos});
+};
+CParagraphRecalculateStateWrap.prototype.GetFootnoteReferencesCount = function(oFootnoteReference)
+{
+	// Если данную ссылку мы добавляли уже в строке, тогда ищем сколько было элементов до нее, если не добавляли,
+	// тогда возвращаем просто количество ссылок.
+
+	for (var nIndex = 0, nCount = this.Footnotes.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Footnotes[nIndex].FootnoteReference === oFootnoteReference)
+			return nIndex;
+	}
+
+	return this.Footnotes.length;
+};
+CParagraphRecalculateStateWrap.prototype.SetFast = function(bValue)
+{
+	this.Fast = bValue;
+};
+CParagraphRecalculateStateWrap.prototype.IsFastRecalculate = function()
+{
+	return this.Fast;
+};
+CParagraphRecalculateStateWrap.prototype.GetPageAbs = function()
+{
+	return this.PageAbs;
+};
+CParagraphRecalculateStateWrap.prototype.GetColumnAbs = function()
+{
+	return this.ColumnAbs;
+};
+CParagraphRecalculateStateWrap.prototype.GetCurrentContentPos = function(nPos)
+{
+	var oContentPos = this.CurPos.Copy();
+	oContentPos.Set(this.CurPos);
+	oContentPos.Add(nPos);
+	return oContentPos;
+};
+CParagraphRecalculateStateWrap.prototype.SaveFootnotesInfo = function()
+{
+	var oTopDocument = this.TopDocument;
+	if (oTopDocument instanceof CDocument)
+		this.FootnotesRecalculateObject = oTopDocument.Footnotes.SaveRecalculateObject(this.PageAbs, this.ColumnAbs);
+};
+CParagraphRecalculateStateWrap.prototype.LoadFootnotesInfo = function()
+{
+	var oTopDocument = this.TopDocument;
+	if (oTopDocument instanceof CDocument && this.FootnotesRecalculateObject)
+		oTopDocument.Footnotes.LoadRecalculateObject(this.PageAbs, this.ColumnAbs, this.FootnotesRecalculateObject);
+};
+CParagraphRecalculateStateWrap.prototype.IsInTable = function()
+{
+	return this.InTable;
 };
 
 function CParagraphRecalculateStateCounter()

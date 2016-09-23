@@ -2272,25 +2272,26 @@ function BinaryPPTYLoader()
                             }
                         }
 
-                        if (null != uni_fill.fill.lin && null != uni_fill.fill.path)
-                        {
-                            // ms office не открывает такие файлы.
-                            uni_fill.fill.setPath(null);
-                        }
 
-                        if(uni_fill.fill.colors.length < 2)
+                    }
+                    if (null != uni_fill.fill.lin && null != uni_fill.fill.path)
+                    {
+                        // ms office не открывает такие файлы.
+                        uni_fill.fill.setPath(null);
+                    }
+
+                    if(uni_fill.fill.colors.length < 2)
+                    {
+                        if(uni_fill.fill.colors.length === 1)
                         {
-                            if(uni_fill.fill.colors.length === 1)
-                            {
-                                var oUniColor = uni_fill.fill.colors[0].color;
-                                uni_fill.fill = new AscFormat.CSolidFill();
-                                uni_fill.fill.color = oUniColor;
-                            }
-                            else
-                            {
-                                uni_fill.fill = new AscFormat.CSolidFill();
-                                uni_fill.fill.color =  AscFormat.CreateUniColorRGB(0, 0, 0);
-                            }
+                            var oUniColor = uni_fill.fill.colors[0].color;
+                            uni_fill.fill = new AscFormat.CSolidFill();
+                            uni_fill.fill.color = oUniColor;
+                        }
+                        else
+                        {
+                            uni_fill.fill = new AscFormat.CSolidFill();
+                            uni_fill.fill.color =  AscFormat.CreateUniColorRGB(0, 0, 0);
                         }
                     }
 

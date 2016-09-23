@@ -119,7 +119,6 @@ CChartSpace.prototype.setRecalculateInfo = function()
         recalculateBBoxRange: true
     };
     this.baseColors = [];
-    this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
     this.chartObj = null;
     this.rectGeometry = AscFormat.ExecuteNoHistory(function(){return  AscFormat.CreateGeometry("rect");},  this, []);
     this.lockType = AscCommon.c_oAscLockTypes.kLockTypeNone;

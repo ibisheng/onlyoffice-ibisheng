@@ -1529,6 +1529,13 @@
 			this.InterfaceEnableKeyEvents = value;
 			if (true == this.InterfaceEnableKeyEvents)
 			{
+			    if (document.activeElement)
+			    {
+			        var _id = document.activeElement.id;
+			        if (_id == "area_id" || _id == "plugin_iframe")
+			            return;
+			    }
+
 				this.HtmlArea.focus();
 			}
 		},

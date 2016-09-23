@@ -54,7 +54,7 @@ Asc['asc_docs_api'].prototype._OfflineAppDocumentEndLoad = function(_url, _data)
 	AscCommon.g_oIdCounter.m_sUserId = window["AscDesktopEditor"]["CheckUserId"]();
 	if (_data == "")
 	{
-		this.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
+		this.sendEvent("asc_onError", c_oAscError.ID.ConvertationOpenError, c_oAscError.Level.Critical);
 		return;
 	}
     if (AscCommon.c_oSerFormat.Signature !== _data.substring(0, AscCommon.c_oSerFormat.Signature.length))
@@ -84,15 +84,17 @@ window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
 Asc['asc_docs_api'].prototype.asc_setAdvancedOptions = function(idOption, option) 
 {
 	if (window["Asc"].c_oAscAdvancedOptionsID.TXT === idOption) {
-		window["AscDesktopEditor"]["SetAdvancedOptions"]("" + option.asc_getCodePage());
+	    var _param = "";
+        _param += ("<m_nCsvTxtEncoding>" + option.asc_getCodePage() + "</m_nCsvTxtEncoding>");
+		window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
 	}
+	else if (window["Asc"].c_oAscAdvancedOptionsID.DRM === idOption) {
+        var _param = "";
+        _param += ("<m_sPassword>" + AscCommon.CopyPasteCorrectString(option.asc_getPassword()) + "</m_sPassword>");
+        window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
+    }
 };
 Asc['asc_docs_api'].prototype["asc_setAdvancedOptions"] = Asc['asc_docs_api'].prototype.asc_setAdvancedOptions;
-
-window["asc_initAdvancedOptions"] = function()
-{	
-	editor._onNeedParams(undefined);
-};
 
 /////////////////////////////////////////////////////////
 //////////////        CHANGES       /////////////////////
@@ -226,7 +228,7 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error)
 	editor.LastUserSavedIndex = undefined;
 	
 	if (2 == error)
-		editor.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.NoCritical);
+		editor.sendEvent("asc_onError", c_oAscError.ID.ConvertationSaveError, c_oAscError.Level.NoCritical);
 };
 Asc['asc_docs_api'].prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) 
 {

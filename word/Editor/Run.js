@@ -1404,7 +1404,7 @@ ParaRun.prototype.Is_SimpleChanges = function(Changes)
         // нельзя обсчитывать функцией Recalculate_Fast.
         // TODO: Но на самом деле стоило бы сделать нормальную проверку на высоту строки в функции Recalculate_Fast
         var ItemType = Item.Type;
-        if (para_Drawing === ItemType || para_NewLine === ItemType)
+        if (para_Drawing === ItemType || para_NewLine === ItemType || para_FootnoteRef === ItemType || para_FootnoteReference === ItemType)
             return false;
 
         // Проверяем, что все изменения произошли в одном и том же отрезке
@@ -1421,9 +1421,9 @@ ParaRun.prototype.Is_SimpleChanges = function(Changes)
     return true;
 };
 
-/*
-    Проверяем произошло ли простое изменение параграфа, сейчас главное, чтобы это было не добавление или удаление картинки.
-    На вход приходит либо массив изменений, либо одно изменение (можно не в массиве).
+/**
+ * Проверяем произошло ли простое изменение параграфа, сейчас главное, чтобы это было не добавлениe/удаление картинки
+ * или ссылки на сноску. На вход приходит либо массив изменений, либо одно изменение (можно не в массиве).
  */
 ParaRun.prototype.Is_ParagraphSimpleChanges = function(_Changes)
 {
@@ -1442,7 +1442,7 @@ ParaRun.prototype.Is_ParagraphSimpleChanges = function(_Changes)
             for (var ItemIndex = 0, ItemsCount = Data.Items.length; ItemIndex < ItemsCount; ItemIndex++)
             {
                 var Item = Data.Items[ItemIndex];
-                if (para_Drawing === Item.Type)
+                if (para_Drawing === Item.Type || para_FootnoteReference === Item.Type)
                     return false;
             }
         }
@@ -2343,12 +2343,12 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
 					if (para_FootnoteReference === ItemType)
 					{
-						Item.UpdateNumber(Para.Get_AbsolutePage(PRS.Page), Para.Get_AbsoluteColumn(PRS.Page));
-						PRS.Add_FootnoteReference(Item, Pos);
+						Item.UpdateNumber(PRS);
+						PRS.AddFootnoteReference(Item, PRS.GetCurrentContentPos(Pos));
 					}
 					else if (para_FootnoteRef === ItemType)
 					{
-						Item.UpdateNumber(Para.Get_AbsolutePage(PRS.Page), Para.Get_AbsoluteColumn(PRS.Page));
+						Item.UpdateNumber();
 					}
 
                     // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.

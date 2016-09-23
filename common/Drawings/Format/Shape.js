@@ -2833,11 +2833,12 @@ CShape.prototype.recalculateLocalTransform = function(transform)
         var dOldExtX = this.extX, dOldExtY = this.extY, dDeltaX = 0, dDeltaY = 0;
 
 
+        var bAutoFit = AscCommon.isRealObject(oBodyPr.textFit) && oBodyPr.textFit.type === AscFormat.text_fit_Auto;
         if (oBodyPr.wrap === AscFormat.nTWTNone) {
             if (!oBodyPr.upright) {
                 if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert)) {
                     if (oGeometry) {
-                        oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + l_ins + r_ins, oContentMetrics.contentH + t_ins + b_ins);
+                        oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + l_ins + r_ins, oContentMetrics.contentH + t_ins + b_ins, undefined, bAutoFit ? undefined : this.extY);
                         if(!oWH.bError)
                         {
                             this.extX = oWH.W;
@@ -2846,22 +2847,22 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                     }
                     else {
                         this.extX = oContentMetrics.w + l_ins + r_ins;
-                        this.extY = oContentMetrics.contentH + t_ins + b_ins;
+                        this.extY =  bAutoFit ?  oContentMetrics.contentH + t_ins + b_ins : this.extY;
                     }
 
                 }
                 else {
                     if (oGeometry) {
-                        oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + t_ins + b_ins, oContentMetrics.contentH + l_ins + r_ins);
+                        oWH = oGeometry.getNewWHByTextRect(oContentMetrics.contentH + l_ins + r_ins, oContentMetrics.w + t_ins + b_ins, bAutoFit ? undefined : this.extX);
                         if(!oWH.bError)
                         {
-                            this.extX = oWH.H;
-                            this.extY = oWH.W;
+                            this.extX = oWH.W;
+                            this.extY = oWH.H;
                         }
                     }
                     else {
                         this.extY = oContentMetrics.w + t_ins + b_ins;
-                        this.extX = oContentMetrics.contentH + l_ins + r_ins;
+                        this.extX =  bAutoFit ? oContentMetrics.contentH + l_ins + r_ins : this.extX;
                     }
                 }
             }
@@ -2871,7 +2872,7 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                     if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert)) {
 
                         if (oGeometry) {
-                            oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + l_ins + r_ins, oContentMetrics.contentH + t_ins + b_ins);
+                            oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + l_ins + r_ins, oContentMetrics.contentH + t_ins + b_ins, undefined, bAutoFit ? undefined : this.extY);
                             if(!oWH.bError) {
                                 this.extX = oWH.W;
                                 this.extY = oWH.H;
@@ -2879,20 +2880,20 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                         }
                         else {
                             this.extX = oContentMetrics.w + l_ins + r_ins;
-                            this.extY = oContentMetrics.contentH + t_ins + b_ins;
+                            this.extY =  bAutoFit ? oContentMetrics.contentH + t_ins + b_ins : this.extY;
                         }
                     }
                     else {
                         if (oGeometry) {
-                            oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + t_ins + b_ins, oContentMetrics.contentH + l_ins + r_ins);
+                            oWH = oGeometry.getNewWHByTextRect(oContentMetrics.contentH + l_ins + r_ins, oContentMetrics.w + t_ins + b_ins, bAutoFit ? undefined : this.extX);
                             if(!oWH.bError) {
-                                this.extX = oWH.H;
-                                this.extY = oWH.W;
+                                this.extX = oWH.W;
+                                this.extY = oWH.H;
                             }
                         }
                         else {
                             this.extY = oContentMetrics.w + t_ins + b_ins;
-                            this.extX = oContentMetrics.contentH + l_ins + r_ins;
+                            this.extX = bAutoFit ? oContentMetrics.contentH + l_ins + r_ins : this.extX;
                         }
 
                     }
@@ -2900,7 +2901,7 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                 else {
                     if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert)) {
                         if (oGeometry) {
-                            oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + l_ins + r_ins, oContentMetrics.contentH + t_ins + b_ins);
+                            oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + l_ins + r_ins, oContentMetrics.contentH + t_ins + b_ins, undefined, bAutoFit ? undefined : this.extY);
                             if(!oWH.bError) {
                                 this.extX = oWH.W;
                                 this.extY = oWH.H;
@@ -2908,20 +2909,20 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                         }
                         else {
                             this.extX = oContentMetrics.w + l_ins + r_ins;
-                            this.extY = oContentMetrics.contentH + t_ins + b_ins;
+                            this.extY =  bAutoFit ?  oContentMetrics.contentH + t_ins + b_ins : this.extY;
                         }
                     }
                     else {
                         if (oGeometry) {
-                            oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + t_ins + b_ins, oContentMetrics.contentH + l_ins + r_ins);
+                            oWH = oGeometry.getNewWHByTextRect(oContentMetrics.contentH + l_ins + r_ins, oContentMetrics.w + t_ins + b_ins, bAutoFit ? undefined : this.extX);
                             if(!oWH.bError) {
-                                this.extX = oWH.H;
-                                this.extY = oWH.W;
+                                this.extX = oWH.W;
+                                this.extY = oWH.H;
                             }
                         }
                         else {
                             this.extY = oContentMetrics.w + t_ins + b_ins;
-                            this.extX = oContentMetrics.contentH + l_ins + r_ins;
+                            this.extX =  bAutoFit ? oContentMetrics.contentH + l_ins + r_ins : this.extX;
                         }
                     }
                 }
