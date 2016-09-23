@@ -4233,36 +4233,39 @@ function CStyles(bCreateDefault)
         // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
         g_oTableId.Add( this, this.Id );
     }
-    else
-    {
-        this.Default =
-        {
-            ParaPr      : new CParaPr(),
-            TextPr      : new CTextPr(),
-            TablePr     : new CTablePr(),
-            TableRowPr  : new CTableRowPr(),
-            TableCellPr : new CTableCellPr(),
-            Paragraph : null,
-            Character : null,
-            Numbering : null,
-            Table     : null,
-            TableGrid : null,
-            Headings  : [],
-            ParaList  : null,
-            Header    : null,
-            Footer    : null,
-            Hyperlink : null
-        };
+	else
+	{
+		this.Default = {
+			ParaPr      : new CParaPr(),
+			TextPr      : new CTextPr(),
+			TablePr     : new CTablePr(),
+			TableRowPr  : new CTableRowPr(),
+			TableCellPr : new CTableCellPr(),
 
-        // Заполняем значения по умолчанию
-        this.Default.ParaPr.Init_Default();
-        this.Default.TextPr.Init_Default();
-        this.Default.TablePr.Init_Default();
-        this.Default.TableRowPr.Init_Default();
-        this.Default.TableCellPr.Init_Default();
+			Paragraph         : null,
+			Character         : null,
+			Numbering         : null,
+			Table             : null,
+			TableGrid         : null,
+			Headings          : [],
+			ParaList          : null,
+			Header            : null,
+			Footer            : null,
+			Hyperlink         : null,
+			FootnoteText      : null,
+			FootnoteTextChar  : null,
+			FootnoteReference : null
+		};
 
-        this.Style = [];
-    }
+		// Заполняем значения по умолчанию
+		this.Default.ParaPr.Init_Default();
+		this.Default.TextPr.Init_Default();
+		this.Default.TablePr.Init_Default();
+		this.Default.TableRowPr.Init_Default();
+		this.Default.TableCellPr.Init_Default();
+
+		this.Style = [];
+	}
 
     this.LogicDocument = null;
 }
@@ -5190,6 +5193,18 @@ CStyles.prototype =
             }
         }
     }
+};
+CStyles.prototype.GetDefaultFootnoteText = function()
+{
+	return this.Default.FootnoteText;
+};
+CStyles.prototype.GetDefaultFootnoteTextChar = function()
+{
+	return this.Default.FootnoteTextChar;
+};
+CStyles.prototype.GetDefaultFootnoteReference = function()
+{
+	return this.Default.FootnoteReference;
 };
 
 function CDocumentColor(r,g,b, Auto)
