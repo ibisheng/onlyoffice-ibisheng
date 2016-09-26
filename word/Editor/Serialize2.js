@@ -5829,8 +5829,14 @@ function BinaryFileReader(doc, openParams)
                 stDefault.Footer = oNewId.id;
 			if(stDefault.Hyperlink == stId || "hyperlink" == sNewStyleName)
                 stDefault.Hyperlink = oNewId.id;
-            if(stDefault.TableGrid == stId || "table grid" == sNewStyleName)
+            if(stDefault.TableGrid == stId || "tablegrid" == sNewStyleName)
                 stDefault.TableGrid = oNewId.id;
+			if(stDefault.FootnoteText == stId || "footnotetext" == sNewStyleName)
+				stDefault.FootnoteText = oNewId.id;
+			if(stDefault.FootnoteTextChar == stId || "footnotetextchar" == sNewStyleName)
+				stDefault.FootnoteTextChar = oNewId.id;
+			if(stDefault.FootnoteReference == stId || "footnotereference" == sNewStyleName)
+				stDefault.FootnoteReference = oNewId.id;
             if(true == oNewId.def)
             {
                 switch(oNewId.type)
@@ -5880,8 +5886,14 @@ function BinaryFileReader(doc, openParams)
                 stDefault.Footer = sNewStyleId;
             if("hyperlink" == sNewStyleName)
                 stDefault.Hyperlink = sNewStyleId;
-            if("table grid" == sNewStyleName)
+            if("tablegrid" == sNewStyleName)
                 stDefault.TableGrid = sNewStyleId;
+			if("footnotetext" == sNewStyleName)
+				stDefault.FootnoteText = sNewStyleId;
+			if("footnotetextchar" == sNewStyleName)
+				stDefault.FootnoteTextChar = sNewStyleId;
+			if("footnotereference" == sNewStyleName)
+				stDefault.FootnoteReference = sNewStyleId;
 			oDocStyle.Add(oNewStyle);
 		}
 		var oStyleTypes = {par: 1, table: 2, lvl: 3, run: 4, styleLink: 5, numStyleLink: 6};
