@@ -3953,7 +3953,7 @@ CStyle.prototype.CreateFootnoteTextChar = function()
 CStyle.prototype.CreateFootnoteReference = function()
 {
 	var oTextPr = {
-		VertAlign : vertalign_SuperScript
+		VertAlign : AscCommon.vertalign_SuperScript
 	};
 
 	this.Set_UiPriority(99);
