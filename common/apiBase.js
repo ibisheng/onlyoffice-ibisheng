@@ -574,6 +574,10 @@
 		};
 		this.CoAuthoringApi.onMeta                    = function(data)
 		{
+			var newDocumentTitle = data["title"];
+			if (newDocumentTitle) {
+				t.documentTitle = newDocumentTitle;
+			}
 			t.sendEvent('asc_onMeta', data);
 		};
 		/**
