@@ -4217,18 +4217,18 @@ function CStyles(bCreateDefault)
 		// Создаем стили для сносок
 		var StyleFootnoteText = new CStyle("footnote text", this.Default.Paragraph, null, styletype_Paragraph);
 		StyleFootnoteText.CreateFootnoteText();
-		this.Default.FootnoteText = StyleFootnoteText;
+		this.Default.FootnoteText = this.Add(StyleFootnoteText);
 
 		var StyleFootnoteTextChar = new CStyle("Footnote Text Char", this.Default.Character, null, styletype_Character);
 		StyleFootnoteTextChar.CreateFootnoteTextChar();
-		this.Default.FootnoteTextChar = StyleFootnoteTextChar;
+		this.Default.FootnoteTextChar = this.Add(StyleFootnoteTextChar);
 
 		StyleFootnoteTextChar.Set_Link(StyleFootnoteText.GetId());
 		StyleFootnoteText.Set_Link(StyleFootnoteTextChar.GetId());
 
 		var StyleFootnoteReference = new CStyle("footnote reference", this.Default.Character, null, styletype_Character);
 		StyleFootnoteReference.CreateFootnoteReference();
-		this.Default.FootnoteReference = StyleFootnoteReference;
+		this.Default.FootnoteReference = this.Add(StyleFootnoteReference);
 
         // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
         g_oTableId.Add( this, this.Id );
