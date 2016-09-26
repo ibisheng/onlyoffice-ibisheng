@@ -346,51 +346,74 @@ ParaRun.prototype.Is_StartFromNewLine = function()
 // Добавляем элемент в текущую позицию
 ParaRun.prototype.Add = function(Item, bMath)
 {
-    if (this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.CheckLanguageOnTextAdd && editor)
-    {
-        var nRequiredLanguage = editor.asc_getKeyboardLanguage();
-        var nCurrentLanguage  = this.Get_CompiledPr(false).Lang.Val;
-        if (-1 !== nRequiredLanguage && nRequiredLanguage !== nCurrentLanguage)
-        {
-            var NewLang = new CLang();
-            NewLang.Val = nRequiredLanguage;
+	if (this.Paragraph && this.Paragraph.LogicDocument)
+	{
+		// Специальный код, связанный с обработкой изменения языка ввода при наборе.
+		if (true === this.Paragraph.LogicDocument.CheckLanguageOnTextAdd && editor)
+		{
+			var nRequiredLanguage = editor.asc_getKeyboardLanguage();
+			var nCurrentLanguage  = this.Get_CompiledPr(false).Lang.Val;
+			if (-1 !== nRequiredLanguage && nRequiredLanguage !== nCurrentLanguage)
+			{
+				var NewLang = new CLang();
+				NewLang.Val = nRequiredLanguage;
 
-            if (this.Is_Empty())
-                this.Set_Lang(NewLang);
-            else
-            {
-                var Parent  = this.Get_Parent();
-                var RunPos = this.private_GetPosInParent();
-                if (null !== Parent && -1 !== RunPos)
-                {
-                    // Если мы стоим в начале рана, тогда добавим новый ран в начало, если мы стоим в конце рана, тогда
-                    // добавим новый ран после текущего, а если мы в середине рана, тогда надо разбивать текущий ран.
+				if (this.Is_Empty())
+				{
+					this.Set_Lang(NewLang);
+				}
+				else
+				{
+					var NewRun = this.private_SplitRunInCurPos();
+					if (NewRun)
+					{
+						NewRun.Set_Lang(NewLang);
+						NewRun.Cursor_MoveToStartPos();
+						NewRun.Add(Item, bMath);
+						NewRun.Make_ThisElementCurrent();
+						return;
+					}
+				}
+			}
+		}
 
-                    var NewRun = new ParaRun(this.Paragraph, bMath);
-                    NewRun.Set_Pr(this.Pr.Copy());
-                    NewRun.Set_Lang(NewLang);
-                    NewRun.Cursor_MoveToStartPos();
-                    NewRun.Add(Item, bMath);
-
-                    var CurPos = this.State.ContentPos;
-                    if (0 === CurPos)
-                        Parent.Add_ToContent(RunPos, NewRun);
-                    else if (this.Content.length === CurPos)
-                        Parent.Add_ToContent(RunPos + 1, NewRun);
-                    else
-                    {
-                        // Нужно разделить данный ран в текущей позиции
-                        var RightRun = this.Split2(CurPos);
-                        Parent.Add_ToContent(RunPos + 1, NewRun);
-                        Parent.Add_ToContent(RunPos + 2, RightRun);
-                    }
-
-                    NewRun.Make_ThisElementCurrent();
-                    return;
-                }
-            }
-        }
-    }
+		// Специальный код, связанный с работой сносок:
+		// 1. При добавлении сноски мы ее оборачиваем в отдельный ран со специальным стилем.
+		// 2. Если мы находимся в ране со специальным стилем сносок и следующий или предыдущий элемент и есть сноска, тогда
+		//    мы добавляем элемент (если это не ссылка на сноску) в новый ран без стиля для сносок.
+		var oStyles = this.Paragraph.LogicDocument.Get_Styles();
+		if (para_FootnoteRef === Item.Type || para_FootnoteReference === Item.Type)
+		{
+			if (this.Is_Empty())
+			{
+				this.Set_RStyle(oStyles.GetDefaultFootnoteReference());
+			}
+			else
+			{
+				var NewRun = this.private_SplitRunInCurPos();
+				if (NewRun)
+				{
+					NewRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
+					NewRun.Cursor_MoveToStartPos();
+					NewRun.Add(Item, bMath);
+					NewRun.Make_ThisElementCurrent();
+					return;
+				}
+			}
+		}
+		else if (true === this.private_IsCurPosNearFootnoteReference())
+		{
+			var NewRun = this.private_SplitRunInCurPos();
+			if (NewRun)
+			{
+				NewRun.Set_VertAlign(AscCommon.vertalign_Baseline);
+				NewRun.Cursor_MoveToStartPos();
+				NewRun.Add(Item, bMath);
+				NewRun.Make_ThisElementCurrent();
+				return;
+			}
+		}
+	}
 
     var TrackRevisions = false;
     if (this.Paragraph && this.Paragraph.LogicDocument)
@@ -478,6 +501,54 @@ ParaRun.prototype.Add = function(Item, bMath)
     }
     else
         this.Add_ToContent(this.State.ContentPos, Item, true);
+};
+
+ParaRun.prototype.private_SplitRunInCurPos = function()
+{
+	var NewRun = null;
+	var Parent = this.Get_Parent();
+	var RunPos = this.private_GetPosInParent();
+	if (null !== Parent && -1 !== RunPos)
+	{
+		// Если мы стоим в начале рана, тогда добавим новый ран в начало, если мы стоим в конце рана, тогда
+		// добавим новый ран после текущего, а если мы в середине рана, тогда надо разбивать текущий ран.
+		NewRun = new ParaRun(this.Paragraph, para_Math_Run === this.Type);
+		NewRun.Set_Pr(this.Pr.Copy());
+
+		var CurPos = this.State.ContentPos;
+		if (0 === CurPos)
+		{
+			Parent.Add_ToContent(RunPos, NewRun);
+		}
+		else if (this.Content.length === CurPos)
+		{
+			Parent.Add_ToContent(RunPos + 1, NewRun);
+		}
+		else
+		{
+			// Нужно разделить данный ран в текущей позиции
+			var RightRun = this.Split2(CurPos);
+			Parent.Add_ToContent(RunPos + 1, NewRun);
+			Parent.Add_ToContent(RunPos + 2, RightRun);
+		}
+	}
+
+	return NewRun;
+};
+ParaRun.prototype.private_IsCurPosNearFootnoteReference = function()
+{
+	if (this.Paragraph && this.Paragraph.LogicDocument)
+	{
+		var oStyles = this.Paragraph.LogicDocument.Get_Styles();
+		var nCurPos = this.State.ContentPos;
+
+		if (this.Get_RStyle() === oStyles.GetDefaultFootnoteReference()
+			&& ((nCurPos > 0 && this.Content[nCurPos - 1] && (para_FootnoteRef === this.Content[nCurPos - 1].Type || para_FootnoteReference === this.Content[nCurPos - 1].Type))
+			|| (nCurPos < this.Content.length && this.Content[nCurPos] && (para_FootnoteRef === this.Content[nCurPos].Type || para_FootnoteReference === this.Content[nCurPos].Type))))
+			return true;
+	}
+
+	return false;
 };
 
 ParaRun.prototype.Remove = function(Direction, bOnAddText)
@@ -1206,6 +1277,7 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
         }
     }
 
+	var bNearFootnoteReference = this.private_IsCurPosNearFootnoteReference();
     if ( true === CurrentRun && Pos === this.State.ContentPos )
     {
         if ( true === UpdateCurPos )
@@ -1219,16 +1291,15 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
             if ( true === UpdateTarget )
             {
                 var CurTextPr = this.Get_CompiledPr(false);
+				var dFontKoef = bNearFootnoteReference ? 1 : CurTextPr.Get_FontKoef();
 
-                g_oTextMeasurer.SetTextPr( CurTextPr, this.Paragraph.Get_Theme() );
-                g_oTextMeasurer.SetFontSlot( fontslot_ASCII, CurTextPr.Get_FontKoef() );
-                var Height    = g_oTextMeasurer.GetHeight();
-                var Descender = Math.abs( g_oTextMeasurer.GetDescender() );
-                var Ascender  = Height - Descender;
-
+				g_oTextMeasurer.SetTextPr(CurTextPr, this.Paragraph.Get_Theme());
+				g_oTextMeasurer.SetFontSlot(fontslot_ASCII, dFontKoef);
+				var Height    = g_oTextMeasurer.GetHeight();
+				var Descender = Math.abs(g_oTextMeasurer.GetDescender());
+				var Ascender  = Height - Descender;
 
                 Para.DrawingDocument.SetTargetSize( Height );
-
 
                 var RGBA;
                 Para.DrawingDocument.UpdateTargetTransform(Para.Get_ParentTextTransform());
@@ -1282,21 +1353,24 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
                 }
 
                 var TargetY = Y - Ascender - CurTextPr.Position;
-                switch( CurTextPr.VertAlign )
-                {
-                    case AscCommon.vertalign_SubScript:
-                    {
-                        TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
-                        break;
-                    }
-                    case AscCommon.vertalign_SuperScript:
-                    {
-                        TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
-                        break;
-                    }
-                }
+				if (!bNearFootnoteReference)
+				{
+					switch (CurTextPr.VertAlign)
+					{
+						case AscCommon.vertalign_SubScript:
+						{
+							TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
+							break;
+						}
+						case AscCommon.vertalign_SuperScript:
+						{
+							TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
+							break;
+						}
+					}
+				}
 
-                var PageAbs = Para.Get_AbsolutePage(CurPage)
+                var PageAbs = Para.Get_AbsolutePage(CurPage);
                 // TODO: Тут делаем, чтобы курсор не выходил за границы буквицы. На самом деле, надо делать, чтобы
                 //       курсор не выходил за границы строки, но для этого надо делать обрезку по строкам, а без нее
                 //       такой вариант будет смотреться плохо.
@@ -1341,31 +1415,33 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
 
         if ( true === ReturnTarget )
         {
-            var CurTextPr = this.Get_CompiledPr(false);
+			var CurTextPr = this.Get_CompiledPr(false);
+			var dFontKoef = bNearFootnoteReference ? 1 : CurTextPr.Get_FontKoef();
 
-            g_oTextMeasurer.SetTextPr( CurTextPr, this.Paragraph.Get_Theme() );
-            g_oTextMeasurer.SetFontSlot( fontslot_ASCII, CurTextPr.Get_FontKoef() );
+			g_oTextMeasurer.SetTextPr(CurTextPr, this.Paragraph.Get_Theme());
+			g_oTextMeasurer.SetFontSlot(fontslot_ASCII, dFontKoef);
 
+			var Height    = g_oTextMeasurer.GetHeight();
+			var Descender = Math.abs(g_oTextMeasurer.GetDescender());
+			var Ascender  = Height - Descender;
 
-            var Height    = g_oTextMeasurer.GetHeight();
-            var Descender = Math.abs( g_oTextMeasurer.GetDescender() );
-            var Ascender  = Height - Descender;
-
-            var TargetY = Y - Ascender - CurTextPr.Position;
-
-            switch( CurTextPr.VertAlign )
-            {
-                case AscCommon.vertalign_SubScript:
-                {
-                    TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
-                    break;
-                }
-                case AscCommon.vertalign_SuperScript:
-                {
-                    TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
-                    break;
-                }
-            }
+			var TargetY = Y - Ascender - CurTextPr.Position;
+			if (!bNearFootnoteReference)
+			{
+				switch (CurTextPr.VertAlign)
+				{
+					case AscCommon.vertalign_SubScript:
+					{
+						TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
+						break;
+					}
+					case AscCommon.vertalign_SuperScript:
+					{
+						TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
+						break;
+					}
+				}
+			}
 
 
             return { X : X, Y : TargetY, Height : Height, PageNum : Para.Get_AbsolutePage(CurPage), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
@@ -4524,24 +4600,17 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
 
         var TempY = Y;
 
-        if (ItemType === para_FootnoteReference || ItemType === para_FootnoteRef)
+        switch (CurTextPr.VertAlign)
         {
-            Y -= vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm;
-        }
-        else
-        {
-            switch (CurTextPr.VertAlign)
+            case AscCommon.vertalign_SubScript:
             {
-                case AscCommon.vertalign_SubScript:
-                {
-                    Y -= vertalign_Koef_Sub * CurTextPr.FontSize * g_dKoef_pt_to_mm;
-                    break;
-                }
-                case AscCommon.vertalign_SuperScript:
-                {
-                    Y -= vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm;
-                    break;
-                }
+                Y -= vertalign_Koef_Sub * CurTextPr.FontSize * g_dKoef_pt_to_mm;
+                break;
+            }
+            case AscCommon.vertalign_SuperScript:
+            {
+                Y -= vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm;
+                break;
             }
         }
 
@@ -6883,6 +6952,10 @@ ParaRun.prototype.Set_RStyle = function(Value)
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
+};
+ParaRun.prototype.Get_RStyle = function()
+{
+	return this.Get_CompiledPr(false).RStyle;
 };
 
 ParaRun.prototype.Set_Spacing = function(Value)

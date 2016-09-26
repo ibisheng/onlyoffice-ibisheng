@@ -1256,8 +1256,11 @@ CFootnotesController.prototype.AddFootnoteRef = function()
 	if (!oParagraph)
 		return;
 
+	var oStyles = this.LogicDocument.Get_Styles();
+
 	var oRun = new ParaRun(oParagraph, false);
 	oRun.Add_ToContent(0, new ParaFootnoteRef(oFootnote), false);
+	oRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
 	oParagraph.Add_ToContent(0, oRun);
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

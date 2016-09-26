@@ -11419,7 +11419,7 @@ CDocument.prototype.AddFootnote = function()
 	var nDocPosType = this.Get_DocPosType();
 	if (docpostype_Content !== nDocPosType && docpostype_Footnotes !== nDocPosType)
 		return;
-	
+
 	if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 	{
 		this.History.Create_NewPoint();
@@ -11427,10 +11427,20 @@ CDocument.prototype.AddFootnote = function()
 		var nDocPosType = this.Get_DocPosType();
 		if (docpostype_Content === nDocPosType)
 		{
-			var oFootnote = this.Footnotes.CreateFootnote();
-			oFootnote.Paragraph_Add(new ParaFootnoteRef(oFootnote));
-			oFootnote.Paragraph_Add(new ParaSpace());
+			var oStyles    = this.Get_Styles();
+			var oFootnote  = this.Footnotes.CreateFootnote();
+			var oParagraph = oFootnote.Get_ElementByIndex(0);
+
+			oParagraph.Style_Add(oStyles.GetDefaultFootnoteText());
+			var oRun = new ParaRun(oParagraph, false);
+			oRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
+			oRun.Add_ToContent(0, new ParaFootnoteRef(oFootnote));
+			oParagraph.Add_ToContent(0, oRun);
+			oRun = new ParaRun(oParagraph, false);
+			oRun.Add_ToContent(0, new ParaSpace());
+			oParagraph.Add_ToContent(1, oRun);
 			oFootnote.Cursor_MoveToEndPos(false);
+
 			this.Paragraph_Add(new ParaFootnoteReference(oFootnote));
 
 			this.Set_DocPosType(docpostype_Footnotes);
