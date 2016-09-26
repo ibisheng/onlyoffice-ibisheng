@@ -2180,6 +2180,11 @@ CTextDrawer.prototype =
         {
             if(oTextPr.TextFill)
             {
+                if(AscFormat.isRealNumber(oTextPr.TextFill.transparent) && oTextPr.TextFill.transparent < 254.5){
+                    var oRetFill = oTextPr.TextFill.createDuplicate();
+                    oRetFill.transparent = 255.0 - oTextPr.TextFill.transparent;
+                    return oRetFill;
+                }
                 return oTextPr.TextFill;
             }
             if(oTextPr.Unifill)

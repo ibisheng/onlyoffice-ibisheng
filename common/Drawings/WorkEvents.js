@@ -552,10 +552,7 @@
 			global_mouseEvent.LockMouse();
 			global_mouseEvent.buttonObject = oThis;
 
-			if (e.preventDefault)
-				e.preventDefault();
-			else
-				e.returnValue = false;
+			AscCommon.stopEvent(e);
 
 			if (global_mouseEvent.IsLocked)
 			{
@@ -928,7 +925,9 @@
 			if (null != this.DrawingDocument.m_oDocumentRenderer)
 				return this.onTouchStart_renderer(e);
 
+            global_mouseEvent.KoefPixToMM = 5;
 			check_MouseDownEvent(e.touches ? e.touches[0] : e, true);
+            global_mouseEvent.KoefPixToMM = 1;
 			global_mouseEvent.LockMouse();
 			this.HtmlPage.m_oApi.sendEvent("asc_onHidePopMenu");
 
@@ -1279,18 +1278,25 @@
 				}
 				case MobileTouchMode.Select:
 				{
+				    var _x1 = this.RectSelect1.x;
+				    var _y1 = this.RectSelect1.y + this.RectSelect1.h / 2;
+
+				    var _x2 = this.RectSelect2.x + this.RectSelect2.w;
+                    var _y2 = this.RectSelect2.y + this.RectSelect2.h / 2;
+
+				    this.LogicDocument.Selection_Remove();
 					if (1 == this.DragSelect)
 					{
 						global_mouseEvent.Button = 0;
 
 						if (!_matrix)
 						{
-							this.LogicDocument.OnMouseDown(global_mouseEvent, this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h / 2, this.PageSelect2);
+							this.LogicDocument.OnMouseDown(global_mouseEvent, _x2, _y2, this.PageSelect2);
 						}
 						else
 						{
-							var __X = _matrix.TransformPointX(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h / 2);
-							var __Y = _matrix.TransformPointY(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h / 2);
+							var __X = _matrix.TransformPointX(_x2, _y2);
+							var __Y = _matrix.TransformPointY(_x2, _y2);
 
 							this.LogicDocument.OnMouseDown(global_mouseEvent, __X, __Y, this.PageSelect2);
 						}
@@ -1304,12 +1310,12 @@
 
 						if (!_matrix)
 						{
-							this.LogicDocument.OnMouseDown(global_mouseEvent, this.RectSelect1.x, this.RectSelect1.y + this.RectSelect1.h / 2, this.PageSelect1);
+							this.LogicDocument.OnMouseDown(global_mouseEvent, _x1, _y1, this.PageSelect1);
 						}
 						else
 						{
-							var __X = _matrix.TransformPointX(this.RectSelect1.x, this.RectSelect1.y + this.RectSelect1.h / 2);
-							var __Y = _matrix.TransformPointY(this.RectSelect1.x, this.RectSelect1.y + this.RectSelect1.h / 2);
+							var __X = _matrix.TransformPointX(_x1, _y1);
+							var __Y = _matrix.TransformPointY(_x1, _y1);
 
 							this.LogicDocument.OnMouseDown(global_mouseEvent, __X, __Y, this.PageSelect1);
 						}
@@ -1460,8 +1466,7 @@
 						 this.HtmlPage.m_oScrollVerApi.scrollToY(this.ScrollV - _offsetY);
 						 }*/
 
-						e.preventDefault();
-						e.returnValue = false;
+						AscCommon.stopEvent(e);
 					}
 					break;
 				}
@@ -1494,7 +1499,7 @@
 						_zoomCur = this.ZoomValueMax;
 
 					this.HtmlPage.m_oApi.zoom(_zoomCur);
-
+                    AscCommon.stopEvent(e);
 					break;
 				}
 				case MobileTouchMode.InlineObj:
@@ -1504,6 +1509,7 @@
 				case MobileTouchMode.FlowObj:
 				{
 					this.HtmlPage.onMouseMove(e.touches ? e.touches[0] : e);
+					AscCommon.stopEvent(e);
 					break;
 				}
 				case MobileTouchMode.Select:
@@ -1512,11 +1518,13 @@
 					global_mouseEvent.ClickCount = 1;
 					var pos                      = this.DrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
 					this.LogicDocument.OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
+					AscCommon.stopEvent(e);
 					break;
 				}
 				case MobileTouchMode.TableMove:
 				{
 					this.HtmlPage.onMouseMove(e.touches ? e.touches[0] : e);
+					AscCommon.stopEvent(e);
 					break;
 				}
 				case MobileTouchMode.TableRuler:
@@ -1570,6 +1578,8 @@
 						}
 					}
 					this.HtmlPage.OnUpdateOverlay();
+
+					AscCommon.stopEvent(e);
 					break;
 				}
 				default:
@@ -1582,7 +1592,10 @@
 				return this.onTouchEnd_renderer(e);
 
 			if (this.Mode != MobileTouchMode.FlowObj && this.Mode != MobileTouchMode.TableMove)
+            {
+
 				check_MouseUpEvent(e.changedTouches ? e.changedTouches[0] : e);
+            }
 
 			this.ScrollH = this.HtmlPage.m_dScrollX;
 			this.ScrollV = this.HtmlPage.m_dScrollY;
@@ -1601,6 +1614,7 @@
 					{
 						global_mouseEvent.Button = 0;
 						var pos                  = this.DrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
+
 						this.LogicDocument.OnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
 						global_mouseEvent.Type = g_mouse_event_type_up;
 						this.LogicDocument.OnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
@@ -1655,6 +1669,9 @@
 					// ничего не нужно делать
 					this.DragSelect = 0;
 					this.Mode       = MobileTouchMode.None;
+					var pos         = this.DrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
+                    this.LogicDocument.OnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
+                    AscCommon.stopEvent(e);
 					break;
 				}
 				case MobileTouchMode.TableMove:
@@ -1714,7 +1731,13 @@
 						var _markup                            = this.HtmlPage.m_oHorRuler.m_oTableMarkup;
 						_markup.Cols[this.TableCurrentMovePos] += (this.TableCurrentMoveValue - this.TableCurrentMoveValueOld);
 						_markup.Cols[this.TableCurrentMovePos] = Math.max(_markup.Cols[this.TableCurrentMovePos], 1);
-						_markup.Table.Update_TableMarkupFromRuler(_markup, true, this.TableCurrentMovePos + 1);
+
+						if ( false === this.HtmlPage.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
+                        {
+                            this.HtmlPage.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTableMarkup_Hor);
+                            _markup.Table.Update_TableMarkupFromRuler(_markup, true, this.TableCurrentMovePos + 1);
+                            this.HtmlPage.m_oLogicDocument.Document_UpdateInterfaceState();
+                        }
 					}
 					else
 					{
@@ -1733,7 +1756,13 @@
 
 						var _markup = this.HtmlPage.m_oHorRuler.m_oTableMarkup;
 						_markup.Rows[this.TableCurrentMovePos].H += (this.TableCurrentMoveValue - this.TableCurrentMoveValueOld);
-						_markup.Table.Update_TableMarkupFromRuler(_markup, false, this.TableCurrentMovePos + 1);
+
+						if ( false === this.HtmlPage.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
+                        {
+                            this.HtmlPage.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTableMarkup_Hor);
+                            _markup.Table.Update_TableMarkupFromRuler(_markup, false, this.TableCurrentMovePos + 1);
+                            this.HtmlPage.m_oLogicDocument.Document_UpdateInterfaceState();
+                        }
 					}
 
 					this.HtmlPage.OnUpdateOverlay();

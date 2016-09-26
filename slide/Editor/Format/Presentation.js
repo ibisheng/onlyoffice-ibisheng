@@ -1538,6 +1538,12 @@ CPresentation.prototype =
         return 0;
     },
 
+    Get_AbsoluteColumn: function()
+    {
+        return 0;
+    },
+
+
     addChart: function(binary)
     {
         var _this = this;

@@ -39,6 +39,7 @@
 	function(window, undefined)
 {
 	var g_cCharDelimiter      = String.fromCharCode(5);
+	var g_cGeneralFormat      = 'General';
 	var FONT_THUMBNAIL_HEIGHT = (7 * 96.0 / 25.4) >> 0;
 	var c_oAscMaxColumnWidth  = 255;
 	var c_oAscMaxRowHeight    = 409;
@@ -1418,6 +1419,7 @@
 
 	window['AscCommon']                             = window['AscCommon'] || {};
 	window["AscCommon"].g_cCharDelimiter            = g_cCharDelimiter;
+	window["AscCommon"].g_cGeneralFormat            = g_cGeneralFormat;
 	window["AscCommon"].bDate1904                   = false;
 	window["AscCommon"].c_oAscAdvancedOptionsAction = c_oAscAdvancedOptionsAction;
 	window["AscCommon"].DownloadType                = DownloadType;

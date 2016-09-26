@@ -303,13 +303,18 @@ DrawingObjectsController.prototype.createGroup = function()
 DrawingObjectsController.prototype.handleChartDoubleClick = function()
 {
     var drawingObjects = this.drawingObjects;
+    var oThis = this;
     this.checkSelectedObjectsAndFireCallback(function(){
+        oThis.clearTrackObjects();
+        oThis.clearPreTrackObjects();
+        oThis.changeCurrentState(new AscFormat.NullState(this));
         drawingObjects.showChartSettings();
     }, []);
 }
 DrawingObjectsController.prototype.handleOleObjectDoubleClick = function(drawing, oleObject, e, x, y, pageIndex)
 {
     var drawingObjects = this.drawingObjects;
+    var oThis = this;
     this.checkSelectedObjectsAndFireCallback(function(){
         var pluginData = new Asc.CPluginData();
         pluginData.setAttribute("data", oleObject.m_sData);
@@ -320,6 +325,9 @@ DrawingObjectsController.prototype.handleOleObjectDoubleClick = function(drawing
         pluginData.setAttribute("heightPix", oleObject.m_nPixHeight);
         pluginData.setAttribute("objectId", oleObject.Id);
         window["Asc"]["editor"].asc_pluginRun(oleObject.m_sApplicationId, 0, pluginData);
+        oThis.clearTrackObjects();
+        oThis.clearPreTrackObjects();
+        oThis.changeCurrentState(new AscFormat.NullState(this));
         this.onMouseUp(e, x, y);
     }, []);
 };

@@ -112,15 +112,19 @@ var c_oAscError = Asc.c_oAscError;
 window["Asc"]['spreadsheet_api'].prototype.asc_setAdvancedOptions = function(idOption, option) 
 {
 	if (window["Asc"].c_oAscAdvancedOptionsID.CSV === idOption) {
-		window["AscDesktopEditor"]["SetAdvancedOptions"]("" + option.asc_getCodePage(), "" + option.asc_getDelimiter());
+        var _param = "";
+	    _param += ("<m_nCsvTxtEncoding>" + option.asc_getCodePage() + "</m_nCsvTxtEncoding>");
+	    _param += ("<m_nCsvDelimiter>" + option.asc_getDelimiter() + "</m_nCsvDelimiter>");
+
+		window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
 	}
+	else if (window["Asc"].c_oAscAdvancedOptionsID.DRM === idOption) {
+        var _param = "";
+        _param += ("<m_sPassword>" + AscCommon.CopyPasteCorrectString(option.asc_getPassword()) + "</m_sPassword>");
+        window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
+    }
 };
 window["Asc"]['spreadsheet_api'].prototype["asc_setAdvancedOptions"] = window["Asc"]['spreadsheet_api'].prototype.asc_setAdvancedOptions;
-
-window["asc_initAdvancedOptions"] = function()
-{	
-	window["Asc"]["editor"]._onNeedParams(undefined);
-};
 
 window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
 {

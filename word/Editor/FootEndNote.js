@@ -43,6 +43,7 @@ function CFootEndnote(DocumentController)
 	CFootEndnote.superclass.constructor.call(this, DocumentController, DocumentController ? DocumentController.Get_DrawingDocument() : undefined, 0, 0, 0, 0, true, false, false);
 
 	this.Number = 1;
+	this.SectPr = null;
 }
 
 AscCommon.extendClass(CFootEndnote, CDocumentContent);
@@ -76,13 +77,18 @@ CFootEndnote.prototype.Read_FromBinary2 = function(Reader)
 	Reader.GetLong(); // Должен вернуть historyitem_type_DocumentContent
 	CFootEndnote.superclass.Read_FromBinary2.call(this, Reader);
 };
-CFootEndnote.prototype.SetNumber = function(nNumber)
+CFootEndnote.prototype.SetNumber = function(nNumber, oSectPr)
 {
 	this.Number = nNumber;
+	this.SectPr = oSectPr;
 };
 CFootEndnote.prototype.GetNumber = function()
 {
 	return this.Number;
+};
+CFootEndnote.prototype.GetReferenceSectPr = function()
+{
+	return this.SectPr;
 };
 
 //--------------------------------------------------------export----------------------------------------------------

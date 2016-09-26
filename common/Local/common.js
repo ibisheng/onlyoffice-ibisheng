@@ -226,6 +226,12 @@ AscCommon.InitDragAndDrop = function(oHtmlElement, callback) {
 	}
 }
 
+window["asc_initAdvancedOptions"] = function(_code)
+{
+    var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+	_editor._onNeedParams(undefined, (_code == 90 || _code == 91) ? true : undefined);
+};
+
 // меняем среду
 //AscBrowser.isSafari = false;
 //AscBrowser.isSafariMacOs = false;

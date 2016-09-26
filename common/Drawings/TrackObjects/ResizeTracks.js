@@ -879,7 +879,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
             }
             if(this.originalObject.getObjectType && this.originalObject.getObjectType() === AscDFH.historyitem_type_OleObject)
             {
-                var api = window.editor || window.Asc.editor;
+                var api = window.editor || window["Asc"]["editor"];
                 if(api)
                 {
                     var pluginData = new Asc.CPluginData();

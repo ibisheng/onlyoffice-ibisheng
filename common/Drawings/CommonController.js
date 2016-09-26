@@ -2491,7 +2491,7 @@ DrawingObjectsController.prototype =
                         checkObjectInArray(aGroups, objects_by_type.oleObjects[i].group.getMainGroup());
                     }
 
-                    var api = window.editor || window.Asc.editor;
+                    var api = window.editor || window["Asc"]["editor"];
                     if(api)
                     {
                         var pluginData = new Asc.CPluginData();
@@ -3260,7 +3260,7 @@ DrawingObjectsController.prototype =
                 {
                     if(type === c_oAscChartTypeSettings.pie3d)
                     {
-                        if(!chart.view3D)
+                        //if(!chart.view3D)
                         {
                             chart.setView3D(new AscFormat.CView3d());
                         }

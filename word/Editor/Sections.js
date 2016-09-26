@@ -53,6 +53,15 @@ var section_borders_OffsetFromText = 0x01;
 var section_borders_ZOrderBack  = 0x00;
 var section_borders_ZOrderFront = 0x01;
 
+var section_footnote_RestartContinious = 0x00;
+var section_footnote_RestartEachSect   = 0x01;
+var section_footnote_RestartEachPage   = 0x02;
+
+var section_footnote_PosBeneathText = 0x00;
+var section_footnote_PosDocEnd      = 0x01;
+var section_footnote_PosPageBottom  = 0x02;
+var section_footnote_PosSectEnd     = 0x03;
+
 function CSectionPr(LogicDocument)
 {
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
@@ -65,19 +74,19 @@ function CSectionPr(LogicDocument)
 
     this.Borders       = new CSectionBorders();
     this.PageNumType   = new CSectionPageNumType();
-    
+
     this.FooterFirst   = null;
     this.FooterEven    = null;
     this.FooterDefault = null;
-    
+
     this.HeaderFirst   = null;
     this.HeaderEven    = null;
     this.HeaderDefault = null;
-    
+
     this.TitlePage     = false;
-    
+
     this.Columns       = new CSectionColumns(this);
-       
+	this.FootnotePr    = new CFootnotePr();
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -168,6 +177,11 @@ CSectionPr.prototype =
             var Column = Other.Columns.Cols[ColumnIndex];
             this.Set_Columns_Col(ColumnIndex, Column.W, Column.Space);
         }
+
+        this.SetFootnotePos(Other.FootnotePr.Pos);
+        this.SetFootnoteNumStart(Other.FootnotePr.NumStart);
+        this.SetFootnoteNumRestart(Other.FootnotePr.NumRestart);
+        this.SetFootnoteNumFormat(Other.FootnotePr.NumFormat);
     },
     
     Clear_AllHdrFtr : function()
@@ -963,6 +977,27 @@ CSectionPr.prototype =
                 this.Columns.Cols = Data.Old;
                 break;
             }
+
+			case AscDFH.historyitem_Section_Footnote_Pos:
+			{
+				this.FootnotePr.Pos = Data.Old;
+				break;
+			}
+			case AscDFH.historyitem_Section_Footnote_NumStart:
+			{
+				this.FootnotePr.NumStart = Data.Old;
+				break;
+			}
+			case AscDFH.historyitem_Section_Footnote_NumRestart:
+			{
+				this.FootnotePr.NumRestart = Data.Old;
+				break;
+			}
+			case AscDFH.historyitem_Section_Footnote_NumFormat:
+			{
+				this.FootnotePr.NumFormat = Data.Old;
+				break;
+			}
         }
     },
 
@@ -1141,6 +1176,27 @@ CSectionPr.prototype =
                 this.Columns.Cols = Data.New;
                 break;
             }
+
+			case AscDFH.historyitem_Section_Footnote_Pos:
+			{
+				this.FootnotePr.Pos = Data.New;
+				break;
+			}
+			case AscDFH.historyitem_Section_Footnote_NumStart:
+			{
+				this.FootnotePr.NumStart = Data.New;
+				break;
+			}
+			case AscDFH.historyitem_Section_Footnote_NumRestart:
+			{
+				this.FootnotePr.NumRestart = Data.New;
+				break;
+			}
+			case AscDFH.historyitem_Section_Footnote_NumFormat:
+			{
+				this.FootnotePr.NumFormat = Data.New;
+				break;
+			}
         }
     },
 
@@ -1391,8 +1447,25 @@ CSectionPr.prototype =
                 }
                 break;
             }
-        }
 
+			case AscDFH.historyitem_Section_Footnote_Pos:
+			case AscDFH.historyitem_Section_Footnote_NumStart:
+			case AscDFH.historyitem_Section_Footnote_NumRestart:
+			case AscDFH.historyitem_Section_Footnote_NumFormat:
+			{
+				// Bool : undefined ?
+				// false -> Long : value
+
+				if (undefined === Data.New)
+					Writer.WriteBool(true);
+				else
+				{
+					Writer.WriteBool(false);
+					Writer.WriteLong(Data.New);
+				}
+				break;
+			}
+        }
     },
 
     Load_Changes : function(Reader)
@@ -1681,6 +1754,55 @@ CSectionPr.prototype =
                 }
                 break;
             }
+
+			case AscDFH.historyitem_Section_Footnote_Pos:
+			{
+				// Bool : undefined ?
+				// false -> Long : value
+
+				if (true === Reader.GetBool())
+					this.FootnotePr.Pos = undefined;
+				else
+					this.FootnotePr.Pos = Reader.GetLong();
+
+				break;
+			}
+			case AscDFH.historyitem_Section_Footnote_NumStart:
+			{
+				// Bool : undefined ?
+				// false -> Long : value
+
+				if (true === Reader.GetBool())
+					this.FootnotePr.NumStart = undefined;
+				else
+					this.FootnotePr.NumStart = Reader.GetLong();
+
+				break;
+			}
+			case AscDFH.historyitem_Section_Footnote_NumRestart:
+			{
+				// Bool : undefined ?
+				// false -> Long : value
+
+				if (true === Reader.GetBool())
+					this.FootnotePr.NumRestart = undefined;
+				else
+					this.FootnotePr.NumRestart = Reader.GetLong();
+
+				break;
+			}
+			case AscDFH.historyitem_Section_Footnote_NumFormat:
+			{
+				// Bool : undefined ?
+				// false -> Long : value
+
+				if (true === Reader.GetBool())
+					this.FootnotePr.NumFormat = undefined;
+				else
+					this.FootnotePr.NumFormat = Reader.GetLong();
+
+				break;
+			}
         }
     },
 
@@ -1697,6 +1819,7 @@ CSectionPr.prototype =
         // Колонтитулы не пишем в бинарник, при созданиии класса они всегда null, а TitlePage = false
         // Variable : PageNumType
         // Variable : CSectionColumns
+		// Variable : CFootnotePr
 
         Writer.WriteString2( "" + this.Id );
         Writer.WriteString2( "" + this.LogicDocument.Get_Id() );
@@ -1706,6 +1829,7 @@ CSectionPr.prototype =
         this.Borders.Write_ToBinary( Writer );
         this.PageNumType.Write_ToBinary( Writer );
         this.Columns.Write_ToBinary(Writer);
+		this.FootnotePr.WriteToBinary(Writer);
     },
 
     Read_FromBinary2 : function(Reader)
@@ -1719,6 +1843,7 @@ CSectionPr.prototype =
         // Колонтитулы не пишем в бинарник, при созданиии класса они всегда null, а TitlePage = false
         // Variable : PageNumType
         // Variable : CSectionColumns
+		// Variable : CFootnotePr
 
         this.Id = Reader.GetString2();
         this.LogicDocument = g_oTableId.Get_ById( Reader.GetString2() );
@@ -1728,7 +1853,92 @@ CSectionPr.prototype =
         this.Borders.Read_FromBinary( Reader );
         this.PageNumType.Read_FromBinary( Reader );
         this.Columns.Read_FromBinary(Reader);
+		this.FootnotePr.ReadFromBinary(Reader);
     }
+};
+CSectionPr.prototype.SetFootnotePos = function(nPos)
+{
+	if (this.FootnotePr.Pos !== nPos)
+	{
+		History.Add(this, {
+			Type : AscDFH.historyitem_Section_Footnote_Pos,
+			Old  : this.FootnotePr.Pos,
+			New  : nPos
+		});
+
+		this.FootnotePr.Pos = nPos;
+	}
+};
+CSectionPr.prototype.GetFootnotePos = function()
+{
+	if (undefined === this.FootnotePr.Pos)
+		return section_footnote_PosPageBottom;
+
+	return this.FootnotePr.Pos;
+};
+CSectionPr.prototype.SetFootnoteNumStart = function(nStart)
+{
+	if (this.FootnotePr.NumStart !== nStart)
+	{
+		History.Add(this, {
+			Type : AscDFH.historyitem_Section_Footnote_NumStart,
+			Old  : this.FootnotePr.NumStart,
+			New  : nStart
+		});
+
+		this.FootnotePr.NumStart = nStart;
+	}
+};
+CSectionPr.prototype.GetFootnoteNumStart = function()
+{
+	if (undefined === this.FootnotePr.NumStart)
+		return 1;
+
+	return this.FootnotePr.NumStart;
+};
+CSectionPr.prototype.SetFootnoteNumRestart = function(nRestartType)
+{
+	if (this.FootnotePr.NumRestart !== nRestartType)
+	{
+		History.Add(this, {
+			Type : AscDFH.historyitem_Section_Footnote_NumRestart,
+			Old  : this.FootnotePr.NumRestart,
+			New  : nRestartType
+		});
+
+		this.FootnotePr.NumRestart = nRestartType;
+	}
+};
+CSectionPr.prototype.GetFootnoteNumRestart = function()
+{
+	if (undefined === this.FootnotePr.NumRestart)
+		return this.private_GetDocumentWideFootnotePr().NumRestart;
+
+	return this.FootnotePr.NumRestart;
+};
+CSectionPr.prototype.SetFootnoteNumFormat = function(nFormatType)
+{
+	if (this.FootnotePr.NumFormat !== nFormatType)
+	{
+		History.Add(this, {
+			Type : AscDFH.historyitem_Section_Footnote_NumFormat,
+			Old  : this.FootnotePr.NumFormat,
+			New  : nFormatType
+		});
+
+		this.FootnotePr.NumFormat = nFormatType;
+	}
+};
+CSectionPr.prototype.GetFootnoteNumFormat = function()
+{
+	if (undefined === this.FootnotePr.NumFormat)
+		return this.private_GetDocumentWideFootnotePr().NumFormat;
+
+	return this.FootnotePr.NumFormat;
+};
+CSectionPr.prototype.private_GetDocumentWideFootnotePr = function()
+{
+	return this.LogicDocument.Footnotes.FootnotePr;
 };
 
 function CSectionPageSize()
@@ -2061,6 +2271,81 @@ function CSectionLayoutInfo(X, Y, XLimit, YLimit)
     this.YLimit  = YLimit;
     this.Columns = [];
 }
+
+function CFootnotePr()
+{
+	this.NumRestart = undefined;
+	this.NumFormat  = undefined;
+	this.NumStart   = undefined;
+	this.Pos        = undefined;
+}
+CFootnotePr.prototype.InitDefault = function()
+{
+	this.NumFormat  = numbering_numfmt_Decimal;
+	this.NumRestart = section_footnote_RestartContinious;
+	this.NumStart   = 1;
+	this.Pos        = section_footnote_PosPageBottom;
+};
+CFootnotePr.prototype.WriteToBinary = function(Writer)
+{
+	var StartPos = Writer.GetCurPosition();
+	Writer.Skip(4);
+	var Flags = 0;
+
+	if (undefined !== this.NumFormat)
+	{
+		Writer.WriteLong(this.NumFormat);
+		Flags |= 1;
+	}
+
+	if (undefined !== this.NumRestart)
+	{
+		Writer.WriteLong(this.NumRestart);
+		Flags |= 2;
+	}
+
+	if (undefined !== this.NumStart)
+	{
+		Writer.WriteLong(this.NumStart);
+		Flags |= 4;
+	}
+
+	if (undefined !== this.Pos)
+	{
+		Writer.WriteLong(this.Pos);
+		Flags |= 8;
+	}
+
+	var EndPos = Writer.GetCurPosition();
+	Writer.Seek(StartPos);
+	Writer.WriteLong(Flags);
+	Writer.Seek(EndPos);
+};
+CFootnotePr.prototype.ReadFromBinary = function(Reader)
+{
+	var Flags = Reader.GetLong();
+
+	if (Flags & 1)
+		this.NumFormat = Reader.GetLong();
+	else
+		this.NumFormat = undefined;
+
+	if (Flags & 2)
+		this.NumRestart = Reader.GetLong();
+	else
+		this.NumRestart = undefined;
+
+	if (Flags & 4)
+		this.NumStart = Reader.GetLong();
+	else
+		this.NumStart = undefined;
+
+	if (Flags & 8)
+		this.Pos = Reader.GetLong();
+	else
+		this.Pos = undefined;
+};
+
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

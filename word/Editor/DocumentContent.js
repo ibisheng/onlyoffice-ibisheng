@@ -8424,6 +8424,10 @@ CDocumentContent.prototype.Get_StartPage_Relative = function()
 {
 	return this.StartPage;
 };
+CDocumentContent.prototype.Get_StartColumn_Absolute = function()
+{
+	return this.Get_AbsoluteColumn(0);
+};
 CDocumentContent.prototype.Set_StartPage = function(StartPage, StartColumn, ColumnsCount)
 {
 	this.StartPage    = StartPage;
@@ -8459,6 +8463,11 @@ CDocumentContent.prototype.Get_AbsoluteColumn = function(CurPage)
 };
 CDocumentContent.prototype.private_GetColumnIndex = function(CurPage)
 {
+	// TODO: Разобраться здесь нужно ли данное условие. Оно появилось из-за параграфов в таблице в
+	//       основной части документа и из-за параграфов в сносках.
+	if (1 === this.ColumnsCount)
+    	return this.Parent.Get_AbsoluteColumn(this.private_GetRelativePageIndex(CurPage));
+
 	return (this.StartColumn + CurPage) - (((this.StartColumn + CurPage) / this.ColumnsCount | 0) * this.ColumnsCount);
 };
 //-----------------------------------------------------------------------------------

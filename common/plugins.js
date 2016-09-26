@@ -176,6 +176,12 @@
 			if (this.startData.getAttribute("resize") === true)
 				this.startLongAction();
 
+		    if (this.api.WordControl && this.api.WordControl.m_oTimerScrollSelect != -1)
+		    {
+		        clearInterval(this.api.WordControl.m_oTimerScrollSelect);
+                this.api.WordControl.m_oTimerScrollSelect = -1;
+		    }
+
 			if (this.current.variations[this.currentVariation].isVisual && this.startData.getAttribute("resize") !== true)
 			{
 				this.api.sendEvent("asc_onPluginShow", this.current, this.currentVariation);

@@ -7566,16 +7566,19 @@ ParaPresentationNumbering.prototype =
 /**
  * Класс представляющий ссылку на сноску.
  * @param {CFootEndnote} Footnote - Ссылка на сноску.
+ * @param {string} CustomMark
  * @constructor
  * @extends {CRunElementBase}
  */
-function ParaFootnoteReference(Footnote)
+function ParaFootnoteReference(Footnote, CustomMark)
 {
-	this.Footnote = Footnote;
+	this.Footnote   = Footnote;
+	this.CustomMark = CustomMark ? CustomMark : undefined;
 
 	this.Width        = 0;
 	this.WidthVisible = 0;
 	this.Number       = 1;
+	this.NumFormat    = numbering_numfmt_Decimal;
 
 	this.Run          = null;
 }
@@ -7590,9 +7593,8 @@ ParaFootnoteReference.prototype.Draw            = function(X, Y, Context, PDSE)
 	Context.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
 	g_oTextMeasurer.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
 
-	// TODO: Пока делаем обычный вариант с типом Decimal
 	var _X = X;
-	var T  = Numbering_Number_To_String(this.Number);
+	var T = this.private_GetString();
 	for (var nPos = 0; nPos < T.length; ++nPos)
 	{
 		var Char = T.charAt(nPos);
@@ -7629,13 +7631,30 @@ ParaFootnoteReference.prototype.Write_ToBinary  = function(Writer)
 {
 	// Long   : Type
 	// String : FootnoteId
+	// Bool : is undefined mark ?
+	// false -> String2 : CustomMark
 	Writer.WriteLong(this.Type);
 	Writer.WriteString2(this.Footnote.Get_Id());
+
+	if (undefined === this.CustomMark)
+	{
+		Writer.WriteBool(true);
+	}
+	else
+	{
+		Writer.WriteBool(false);
+		Writer.WriteString2(this.CustomMark);
+	}
 };
 ParaFootnoteReference.prototype.Read_FromBinary = function(Reader)
 {
 	// String : FootnoteId
+	// Bool : is undefined mark ?
+	// false -> String2 : CustomMark
 	this.Footnote = g_oTableId.Get_ById(Reader.GetString2());
+
+	if (false === Reader.GetBool())
+		this.CustomMark = Reader.GetString2();
 };
 ParaFootnoteReference.prototype.Get_Footnote    = function()
 {
@@ -7647,13 +7666,17 @@ ParaFootnoteReference.prototype.UpdateNumber = function(PRS)
 	{
 		var nPageAbs    = PRS.GetPageAbs();
 		var nColumnAbs  = PRS.GetColumnAbs();
-		var nAdditional = PRS.GetFootnoteReferencesCount()
+		var nAdditional = PRS.GetFootnoteReferencesCount(this);
+        var oSectPr     = PRS.GetSectPr();
+        var nNumFormat  = oSectPr.GetFootnoteNumFormat();
 
-		var oLogicDocument = this.Footnote.Get_LogicDocument();
+		var oLogicDocument       = this.Footnote.Get_LogicDocument();
 		var oFootnotesController = oLogicDocument.GetFootnotesController();
-		this.Number = oFootnotesController.GetFootnoteNumberOnPage(nPageAbs, nColumnAbs) + nAdditional;
+
+		this.NumFormat = nNumFormat;
+		this.Number    = oFootnotesController.GetFootnoteNumberOnPage(nPageAbs, nColumnAbs, oSectPr) + nAdditional;
 		this.private_Measure();
-		this.Footnote.SetNumber(this.Number);
+		this.Footnote.SetNumber(this.Number, oSectPr);
 	}
 };
 ParaFootnoteReference.prototype.private_Measure = function()
@@ -7669,9 +7692,8 @@ ParaFootnoteReference.prototype.private_Measure = function()
 	oMeasurer.SetTextPr(TextPr, Theme);
 	oMeasurer.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
 
-	// TODO: Пока делаем обычный вариант с типом Decimal
 	var X = 0;
-	var T = Numbering_Number_To_String(this.Number);
+	var T = this.private_GetString();
 	for (var nPos = 0; nPos < T.length; ++nPos)
 	{
 		var Char = T.charAt(nPos);
@@ -7681,6 +7703,21 @@ ParaFootnoteReference.prototype.private_Measure = function()
 	var ResultWidth   = (Math.max((X + TextPr.Spacing), 0) * TEXTWIDTH_DIVIDER) | 0;
 	this.Width        = ResultWidth;
 	this.WidthVisible = ResultWidth;
+};
+ParaFootnoteReference.prototype.private_GetString = function()
+{
+	if (numbering_numfmt_Decimal === this.NumFormat)
+		return Numbering_Number_To_String(this.Number);
+	if (numbering_numfmt_LowerRoman === this.NumFormat)
+		return Numbering_Number_To_Roman(this.Number, true);
+	else if (numbering_numfmt_UpperRoman === this.NumFormat)
+		return Numbering_Number_To_Roman(this.Number, false);
+	else if (numbering_numfmt_LowerLetter === this.NumFormat)
+		return Numbering_Number_To_Alpha(this.Number, true);
+	else if (numbering_numfmt_UpperLetter === this.NumFormat)
+		return Numbering_Number_To_Alpha(this.Number, false);
+	else// if (numbering_numfmt_Decimal === this.NumFormat)
+		return Numbering_Number_To_String(this.Number);
 };
 
 /**
@@ -7707,7 +7744,8 @@ ParaFootnoteRef.prototype.UpdateNumber = function()
 {
 	if (this.Footnote)
 	{
-		this.Number = this.Footnote.GetNumber();
+		this.Number    = this.Footnote.GetNumber();
+		this.NumFormat = this.Footnote.GetReferenceSectPr().GetFootnoteNumFormat();
 		this.private_Measure();
 	}
 };

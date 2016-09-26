@@ -3407,8 +3407,10 @@ drawBarChart.prototype =
 			return;
 		
 		var path = this.paths.series[ser][val].ArrPathCommand;
-		if(this.cChartDrawer.nDimensionCount === 3)
+		if(this.cChartDrawer.nDimensionCount === 3 && this.paths.series[ser][val][0])
+		{
 			path = this.paths.series[ser][val][0].ArrPathCommand;
+		}
 		
 		if(!path)
 			return;
@@ -9393,6 +9395,16 @@ drawPieChart.prototype =
                         oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX);
                         oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - (1 - fLengthCoeff)*fLabelHeight;
                     }
+                    else if(oSolvation.x1 >= 0){
+						oResult.bError = false;
+						oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX);
+						oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY) - (1 - fLengthCoeff)*fLabelHeight;
+					}
+					else if(oSolvation.x2 >= 0){
+						oResult.bError = false;
+						oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX);
+						oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - (1 - fLengthCoeff)*fLabelHeight;
+					}
                 }
                 break;
             }
@@ -9421,6 +9433,16 @@ drawPieChart.prototype =
                         oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - fLabelWidth*fLengthCoeff;
                         oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY);
                     }
+                    else if(oSolvation.x1 >= 0){
+						oResult.bError = false;
+						oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX) - fLabelWidth*fLengthCoeff;
+						oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY);
+					}
+					else if(oSolvation.x2 >= 0){
+						oResult.bError = false;
+						oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - fLabelWidth*fLengthCoeff;
+						oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY);
+					}
                 }
                 break;
             }
@@ -9450,6 +9472,17 @@ drawPieChart.prototype =
                         oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - fLabelWidth;
                         oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - fLabelHeight*fLengthCoeff;
                     }
+                    else if(oSolvation.x1 >= 0){
+						oResult.bError = false;
+						oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX) - fLabelWidth;
+						oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY) - fLabelHeight*fLengthCoeff;
+
+					}
+					else if(oSolvation.x2 >= 0){
+						oResult.bError = false;
+						oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - fLabelWidth;
+						oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - fLabelHeight*fLengthCoeff;
+					}
                 }
                 break;
             }
@@ -9474,6 +9507,16 @@ drawPieChart.prototype =
                         oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - (1 - fLengthCoeff)*fLabelWidth;
                         oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - fLabelHeight;
                     }
+					else if(oSolvation.x1 >= 0){
+						oResult.bError = false;
+						oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX) - (1 - fLengthCoeff)*fLabelWidth;
+						oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY) - fLabelHeight;
+					}
+					else if(oSolvation.x2 >= 0){
+						oResult.bError = false;
+						oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - (1 - fLengthCoeff)*fLabelWidth;
+						oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - fLabelHeight;
+					}
                 }
                 break;
             }
@@ -9529,10 +9572,14 @@ drawPieChart.prototype =
 			return;
 		
 		var path;
-		if(this.cChartDrawer.nDimensionCount === 3)
+		if(this.cChartDrawer.nDimensionCount === 3 && this.paths.series[this.paths.series.length - 1][val])
+		{
 			path = this.paths.series[this.paths.series.length - 1][val].ArrPathCommand;
+		}	
 		else
+		{
 			path = this.paths.series[val].ArrPathCommand;
+		}
 		
 		var getEllipseRadius = function(radius1, radius2, alpha)
 		{
