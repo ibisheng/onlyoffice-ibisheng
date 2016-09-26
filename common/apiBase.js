@@ -577,6 +577,9 @@
 			var newDocumentTitle = data["title"];
 			if (newDocumentTitle) {
 				t.documentTitle = newDocumentTitle;
+				if (t.DocInfo) {
+					t.DocInfo.asc_putTitle(newDocumentTitle);
+				}
 			}
 			t.sendEvent('asc_onMeta', data);
 		};
