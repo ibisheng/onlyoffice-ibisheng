@@ -1,4 +1,4 @@
-/*
+﻿/*
  * (c) Copyright Ascensio System SIA 2010-2016
  *
  * This program is a free software product. You can redistribute it and/or
@@ -1986,7 +1986,8 @@ var editor;
     if (window["NATIVE_EDITOR_ENJINE"]) {
       if (this.wb.findCellText(options)) {
         var ws = this.wb.getWorksheet();
-        return [ws.getCellLeftRelative(ws.activeRange.c1, 0), ws.getCellTopRelative(ws.activeRange.r1, 0)];
+        var range = ws.selectionRange.getLast();
+        return [ws.getCellLeftRelative(range.c1, 0), ws.getCellTopRelative(range.r1, 0)];
       }
 
       return null;

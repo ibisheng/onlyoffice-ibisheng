@@ -1779,14 +1779,6 @@ else if (AscBrowser.isOpera)
 else
 	kCurFormatPainterWord = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAATCAYAAACdkl3yAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJxJREFUeNrslGEOwBAMhVtxM5yauxnColWJzt+9pFkl9vWlBeac4VINYG4h3vueFUeKIHLOjRTsp+pdKaX6QY2jufripobpzRoB0ro6qdW5I+q3qGxowXONI9LACcBBBMYhA/RuFJxA+WnXK1CBJJg0kKMD2cc8hNKe25P9gxSy01VY3pjdhHYgCCG0RYyR5Bphpk8kMofHjh4BBgA9UXIXw7elTAAAAABJRU5ErkJggg==') 2 11, pointer";
 
-  function extendClass (Child, Parent) {
-    var F = function() { };
-    F.prototype = Parent.prototype;
-    Child.prototype = new F();
-    Child.prototype.constructor = Child;
-    Child.superclass = Parent.prototype;
-  }
-
 function asc_ajax (obj) {
 	var url = "", type = "GET",
 		async = true, data = null, dataType = "text/xml",
@@ -2767,7 +2759,6 @@ window["SetDoctRendererParams"] = function(_params)
   window["AscCommon"].CanDropFiles = CanDropFiles;
   window["AscCommon"].getUrlType = getUrlType;
   window["AscCommon"].prepareUrl = prepareUrl;
-  window["AscCommon"].extendClass = extendClass;
   window["AscCommon"].getUserColorById = getUserColorById;
   window["AscCommon"].isNullOrEmptyString = isNullOrEmptyString;
 
