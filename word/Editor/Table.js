@@ -13413,8 +13413,6 @@ CTable.prototype.SetTableGrid = function(arrGrid)
 		New  : arrGrid
 	});
 	this.TableGrid = arrGrid;
-
-	console.log("SetTableGrid");
 };
 CTable.prototype.private_CopyTableGrid = function()
 {

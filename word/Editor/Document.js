@@ -6639,9 +6639,8 @@ CDocument.prototype.OnKeyDown = function(e)
             bRetValue = keydownresult_PreventAll;
         }
     }
-	else if (e.KeyCode == 70 && false === editor.isViewMode && true === e.CtrlKey)
+	else if (e.KeyCode == 70 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + F + ...
 	{
-		// TODO: Заменить хоткей для сноски, или проверить можно ли использовать Ctrl+Alt
 		if (true === e.AltKey)
 		{
 			this.AddFootnote();
@@ -6787,10 +6786,11 @@ CDocument.prototype.OnKeyDown = function(e)
         bUpdateSelection = false;
         bRetValue        = keydownresult_PreventAll;
     }
-    // else if (e.KeyCode === 113)
-    // {
-    //     this.AddFootnote();
-    // }
+	// else if (e.KeyCode === 113)
+	// {
+	// 	this.AddFootnote();
+	// 	bRetValue = keydownresult_PreventAll;
+	// }
     else if (e.KeyCode == 121 && true === e.ShiftKey) // Shift + F10 - контекстное меню
     {
         var X_abs, Y_abs, oPosition, ConvertedPos;
@@ -11402,15 +11402,14 @@ CDocument.prototype.Check_CompositeInputRun = function()
  * @param {number} nPageIndex
  * @returns {boolean}
  */
-CDocument.prototype.Goto_FootnotesOnPage = function(nPageIndex)
+CDocument.prototype.GotoFootnotesOnPage = function(nPageIndex)
 {
-	if (this.Footnotes.Is_EmptyPage(nPageIndex))
+	if (this.Footnotes.IsEmptyPage(nPageIndex))
 		return false;
 
 	this.Set_DocPosType(docpostype_Footnotes);
-	this.Footnotes.CurFootnote = this.Footnotes.Pages[nPageIndex].Elements[0];
+	this.Footnotes.GotoPage(nPageIndex);
 	this.Document_UpdateSelectionState();
-
 
 	return true;
 };

@@ -581,8 +581,11 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nCol
 			if (nColumnIndex === nColumnAbs)
 			{
 				var arrContinuesElements = oColumn.GetContinuesElements();
-				if (arrContinuesElements.length > 0)
-					nAdditional = arrContinuesElements.length - 1;
+				for (var nTempIndex = 1; nTempIndex < arrContinuesElements.length; ++nTempIndex)
+				{
+					if (!arrContinuesElements[nTempIndex].IsCustomMarkFollows())
+						nAdditional++;
+				}
 			}
 
 			if (oColumn.Elements.length > 0)
@@ -610,10 +613,17 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nCol
 				if (oFootnote.GetReferenceSectPr() !== oSectPr)
 					return 1;
 
+				var nAdditional = 0;
+				for (var nTempIndex = 0; nTempIndex < arrContinuesElements.length; ++nTempIndex)
+				{
+					if (!arrContinuesElements[nTempIndex].IsCustomMarkFollows())
+						nAdditional++;
+				}
+
 				// Второе условие не нужно, потому что если arrContinuesElements.length > 0, то на такой колонке
 				// пусть и пустая но должна быть хоть одна сноска рассчитана
 
-				return oColumn.Elements[oColumn.Elements.length - 1].GetNumber() + 1 + arrContinuesElements.length;
+				return oColumn.Elements[oColumn.Elements.length - 1].GetNumber() + 1 + nAdditional;
 			}
 		}
 
@@ -650,11 +660,12 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nCol
 				oColumn = this.private_GetPageColumn(nPageIndex, nColumnIndex);
 				if (oColumn && oColumn.Elements.length > 0)
 				{
-					var oFirstFootnote = oColumn.Elements[0];
-					if (oFirstFootnote.Pages.length > 1)
-						nFootnotesCount += oColumn.Elements.length - 1;
-					else
-						nFootnotesCount += oColumn.Elements.length;
+					for (var nFootnoteIndex = 0, nTempCount = oColumn.Elements.length; nFootnoteIndex < nTempCount; ++nFootnoteIndex)
+					{
+						var oFootnote = oColumn.Elements[nFootnoteIndex];
+						if (oFootnote && true !== oFootnote.IsCustomMarkFollows() && (0 !== nFootnoteIndex || oFootnote.Pages.length <= 1))
+							nFootnotesCount++;
+					}
 				}
 			}
 		}
@@ -1262,6 +1273,16 @@ CFootnotesController.prototype.AddFootnoteRef = function()
 	oRun.Add_ToContent(0, new ParaFootnoteRef(oFootnote), false);
 	oRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
 	oParagraph.Add_ToContent(0, oRun);
+};
+CFootnotesController.prototype.GotoPage = function(nPageAbs)
+{
+	var oColumn = this.private_GetPageColumn(nPageAbs, 0);
+	if (!oColumn || oColumn.Elements.length <= 0)
+		return;
+
+	var oFootnote = oColumn.Elements[0];
+	this.private_SetCurrentFootnoteNoSelection(oFootnote);
+	oFootnote.Cursor_MoveToStartPos(false);
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private area

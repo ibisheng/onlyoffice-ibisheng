@@ -5294,63 +5294,67 @@ ParaRun.prototype.Get_LastRunInRange = function(_CurLine, _CurRange)
 
 ParaRun.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
 {
-    var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length );
+	var CurPos = true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length;
 
-    while ( true )
-    {
-        CurPos--;
+	while (true)
+	{
+		CurPos--;
 
-        var Item = this.Content[CurPos];
-        if ( CurPos < 0 || para_Drawing !== Item.Type || false !== Item.Is_Inline() )
-            break;
-    }
+		var Item = this.Content[CurPos];
+		if (CurPos < 0 || (!(para_Drawing === Item.Type && false === Item.Is_Inline()) && !(para_FootnoteReference === Item.Type && true === Item.IsCustomMarkFollows())))
+			break;
+	}
 
-    if ( CurPos >= 0 )
-    {
-        SearchPos.Found = true;
-        SearchPos.Pos.Update( CurPos, Depth );
-    }
+	if (CurPos >= 0)
+	{
+		SearchPos.Found = true;
+		SearchPos.Pos.Update(CurPos, Depth);
+	}
 };
 
 ParaRun.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
 {
-    var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : 0 );
+	var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : 0 );
 
-    var Count = this.Content.length;
-    while ( true )
-    {
-        CurPos++;
+	var Count = this.Content.length;
+	while (true)
+	{
+		CurPos++;
 
-        // Мы встали в конец рана:
-        //   Если мы перешагнули para_End или para_Drawing Anchor, тогда возвращаем false
-        //   В противном случае true
-        if ( Count === CurPos )
-        {
-            if ( CurPos === 0 )
-                return;
+		// Мы встали в конец рана:
+		//   Если мы перешагнули para_End или para_Drawing Anchor, тогда возвращаем false
+		//   В противном случае true
+		if (Count === CurPos)
+		{
+			if (CurPos === 0)
+				return;
 
-            var PrevItem = this.Content[CurPos - 1];
-            var PrevItemType = PrevItem.Type;
-            if ((true !== StepEnd && para_End === PrevItemType) || (para_Drawing === PrevItemType && false === PrevItem.Is_Inline()))
-                return;
+			var PrevItem     = this.Content[CurPos - 1];
+			var PrevItemType = PrevItem.Type;
+			if ((true !== StepEnd && para_End === PrevItemType) || (para_Drawing === PrevItemType && false === PrevItem.Is_Inline()) || (para_FootnoteReference === PrevItemType && true === PrevItem.IsCustomMarkFollows()))
+				return;
 
-            break;
-        }
+			break;
+		}
 
-        if (CurPos > Count)
-            break;
+		if (CurPos > Count)
+			break;
 
-        var Item = this.Content[CurPos];
-        var ItemType = Item.Type;
-        if ((para_Drawing !== ItemType && (false !== StepEnd || para_End !== this.Content[CurPos - 1].Type)) || (para_Drawing === ItemType && false !== Item.Is_Inline()))
-            break;
-    }
+		// Минимальное значение CurPos = 1, т.к. мы начинаем со значния >= 0 и добавляем 1
+		var Item     = this.Content[CurPos - 1];
+		var ItemType = Item.Type;
 
-    if ( CurPos <= Count )
-    {
-        SearchPos.Found = true;
-        SearchPos.Pos.Update( CurPos, Depth );
-    }
+		if (!(true !== StepEnd && para_End === ItemType)
+			&& !(para_Drawing === Item.Type && false === Item.Is_Inline())
+			&& !(para_FootnoteReference === Item.Type && true === Item.IsCustomMarkFollows()))
+			break;
+	}
+
+	if (CurPos <= Count)
+	{
+		SearchPos.Found = true;
+		SearchPos.Pos.Update(CurPos, Depth);
+	}
 };
 
 ParaRun.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseContentPos)

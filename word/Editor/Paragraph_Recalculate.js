@@ -2989,15 +2989,19 @@ CParagraphRecalculateStateWrap.prototype.AddFootnoteReference = function(oFootno
 CParagraphRecalculateStateWrap.prototype.GetFootnoteReferencesCount = function(oFootnoteReference)
 {
 	// Если данную ссылку мы добавляли уже в строке, тогда ищем сколько было элементов до нее, если не добавляли,
-	// тогда возвращаем просто количество ссылок.
+	// тогда возвращаем просто количество ссылок. Ссылки с флагом CustomMarkFollows не учитываются
 
+	var nRefsCount = 0;
 	for (var nIndex = 0, nCount = this.Footnotes.length; nIndex < nCount; ++nIndex)
 	{
 		if (this.Footnotes[nIndex].FootnoteReference === oFootnoteReference)
-			return nIndex;
+			return nRefsCount;
+
+		if (true !== this.Footnotes[nIndex].FootnoteReference.IsCustomMarkFollows())
+			nRefsCount++;
 	}
 
-	return this.Footnotes.length;
+	return nRefsCount;
 };
 CParagraphRecalculateStateWrap.prototype.SetFast = function(bValue)
 {
