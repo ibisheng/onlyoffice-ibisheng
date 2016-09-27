@@ -213,22 +213,22 @@ CChartsDrawer.prototype =
 			if(this.nDimensionCount === 3)
 				this._calaculate3DProperties(chartSpace);
 			
-			this.areaChart.reCalculate(this);
+			this.areaChart.recalculate(this);
 			
 			if(this.calcProp.type != c_oChartTypes.Pie && this.calcProp.type != c_oChartTypes.DoughnutChart)
-				this.gridChart.reCalculate(this);
+				this.gridChart.recalculate(this);
 		}
 		
-		this.allAreaChart.reCalculate(this);
+		this.allAreaChart.recalculate(this);
 		
 		if(this.calcProp.type != c_oChartTypes.Pie && this.calcProp.type != c_oChartTypes.DoughnutChart && !chartSpace.bEmptySeries)
 		{
-			this.catAxisChart.reCalculate(this);
-			this.valAxisChart.reCalculate(this);
+			this.catAxisChart.recalculate(this);
+			this.valAxisChart.recalculate(this);
 			if(this.nDimensionCount === 3)
 			{
 				this.floor3DChart.recalculate(this);
-				this.serAxisChart.reCalculate(this);
+				this.serAxisChart.recalculate(this);
 				this.sideWall3DChart.recalculate(this);
 				this.backWall3DChart.recalculate(this);
 			}
@@ -236,7 +236,7 @@ CChartsDrawer.prototype =
 		}
 		
 		if(!chartSpace.bEmptySeries)
-			this.chart.reCalculate(this);
+			this.chart.recalculate(this);
 	},
 	
 	draw : function(chartSpace, graphics)
@@ -3104,7 +3104,7 @@ drawBarChart.prototype =
 {
     constructor: drawBarChart,
 	
-	reCalculate : function(chartsDrawer)
+	recalculate : function(chartsDrawer)
 	{
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
@@ -3730,7 +3730,7 @@ drawLineChart.prototype =
 			this._drawLines();
 	},
 	
-	reCalculate : function(chartsDrawer)
+	recalculate: function(chartsDrawer)
     {
 		this.paths = {};
 		this.chartProp = chartsDrawer.calcProp;
@@ -4258,7 +4258,7 @@ drawLineChart.prototype =
 
 
 
-	/** @constructor */
+/** @constructor */
 function drawAreaChart()
 {
 	this.chartProp = null;
@@ -4266,7 +4266,6 @@ function drawAreaChart()
 	this.cShapeDrawer = null;
 	this.points = null;
 	this.paths = {};
-	this.usuallyCalculateSeries = [];
 	this.upFaces = [];
 	
 	this.sortZIndexPaths = [];
@@ -4296,7 +4295,7 @@ drawAreaChart.prototype =
 		console.timeEnd("asd");
 	},
 	
-	reCalculate : function(chartsDrawer)
+	recalculate : function(chartsDrawer)
     {
 		this.paths = {};
 		this.points = null;
@@ -4355,22 +4354,12 @@ drawAreaChart.prototype =
 			}
 		}
 		
+		
 		if(this.cChartDrawer.nDimensionCount === 3)
 		{
 			this._calculatePaths3D();
 			
-			/*this.sortZIndexPaths.sort (function sortArr(a, b)
-			{
-				if(b.z == a.z)
-					return  a.y - b.y;
-				else
-					return  b.z - a.z;
-			});*/
-			
 			var cSortFaces = new CSortFaces(this.cChartDrawer);
-			//this.sortZIndexPaths = this.upFaces.concat(this.sortZIndexPaths);
-			//this.sortZIndexPaths = cSortFaces.sortFaces(this.sortZIndexPaths);
-			//this.upFaces = cSortFaces.sortFaces(this.upFaces);
 			//this.upFaces = cSortFaces.sortFaces(this.upFaces);
 			
 			this.upFaces.sort (function sortArr(a, b)
@@ -4382,9 +4371,8 @@ drawAreaChart.prototype =
 			})
 			
 			
-			//this.upFaces = this.upFaces.reverse();
 			var anotherFaces = this.sortZIndexPathsFront.concat(this.sortZIndexPathsBack).concat(this.sortZIndexPathsLeft).concat(this.sortZIndexPathsRight);
-			//anotherFaces = anotherFaces.reverse();
+			
 			this.sortZIndexPaths = this.upFaces.concat(anotherFaces)
 			this.sortZIndexPaths = cSortFaces.sortFaces(this.sortZIndexPaths);
 		}
@@ -4425,8 +4413,6 @@ drawAreaChart.prototype =
 		
 		this._calculateDarkSideOfTheFace();
 		
-		this._breakFaces(points);
-		
 		this._calculateAllIntersection();
 		
 		for(var i = 0; i < points.length; i++)
@@ -4446,75 +4432,6 @@ drawAreaChart.prototype =
 				{
 					this.paths.series[i] = this._calculateLine3D(points[i], prevPoints, i, points);
 				}
-			}
-		}
-	},
-	
-	_calculateAllIntersection2()
-	{
-		var allPoints = this.points;
-		var prevPoints;
-		var nullPositionOX = this.chartProp.nullPositionOX;
-		var pxToMm = this.chartProp.pxToMM;
-		
-		//сдвиг по OZ в глубину
-		var gapDepth = this.cChartSpace.chart.plotArea.chart.gapDepth != null ? this.cChartSpace.chart.plotArea.chart.gapDepth : globalGapDepth;
-		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
-		var perspectiveDepth = this.chartProp.subType === "normal" ? (perspectiveDepth / (gapDepth / 100 + 1)) / this.chartProp.seriesCount : perspectiveDepth / (gapDepth / 100 + 1);
-		var DiffGapDepth = perspectiveDepth * (gapDepth / 2) / 100;
-		var gapDepth = this.chartProp.subType === "normal" ? (perspectiveDepth + DiffGapDepth + DiffGapDepth) * seria + DiffGapDepth : DiffGapDepth;
-		
-		for(var seria = 0; seria < allPoints.length; seria++)
-		{
-			var points = allPoints[seria];
-			for(var i = 0; i < points.length - 1; i++)
-			{
-				var x = points[i].x * pxToMm;
-				var y = points[i].y * pxToMm;
-				var x1 = points[i + 1].x * pxToMm;
-				var y1 = points[i + 1].y * pxToMm;
-				
-				prevPoints = this._getPrevSeriesPoints(allPoints, seria);
-				
-				//рассчитываем 8 точек для каждого ректа
-				var prevX = prevPoints ? prevPoints[i].x * pxToMm : x;
-				var prevY = prevPoints ? prevPoints[i].y * pxToMm : nullPositionOX;
-				var prevX1 = prevPoints ? prevPoints[i + 1].x * pxToMm : x1;
-				var prevY1 = prevPoints ? prevPoints[i + 1].y * pxToMm : nullPositionOX;
-				
-				
-				if(prevY < y && prevY1 < y1)
-				{
-					var temp = y;
-					y = prevY;
-					prevY = temp;
-					
-					var temp1 = y1;
-					y1 = prevY1;
-					prevY1 = temp1;
-					
-					var temp = x;
-					x = prevX;
-					prevX = temp;
-					
-					var temp1 = x1;
-					x1 = prevX1;
-					prevX1 = temp1;
-				}
-				
-				if(!this.prevPoints)
-					this.prevPoints = [];
-				
-				if(!this.prevPoints[i])
-					this.prevPoints[i] = [];
-
-				
-				
-				var curRect = {point1: {x: x, y: y, z: gapDepth} , point2: {x: x1, y: y1, z: gapDepth} , prevPoint1: {x: prevX, y: prevY, z: gapDepth}, prevPoint2: {x: prevX1, y: prevY1, z: gapDepth}};
-				var curRectFar = {point1: {x: x, y: y, z: gapDepth + DiffGapDepth} , point2: {x: x1, y: y1, z: gapDepth + DiffGapDepth} , prevPoint1: {x: prevX, y: prevY, z: gapDepth + DiffGapDepth}, prevPoint2: {x: prevX1, y: prevY1, z: gapDepth + DiffGapDepth}};
-				
-				this._checkIntersection(curRect, i, seria);
-				this.prevPoints[i][seria] = curRect;
 			}
 		}
 	},
@@ -4619,316 +4536,6 @@ drawAreaChart.prototype =
 		
 		return res;
     },
-	
-	_checkIntersection2: function(curRect, pointIndex, seria)
-	{
-		var curPoint1 = curRect.point1;
-		var curPoint2 = curRect.point2;
-		var curPoint3 = curRect.prevPoint1;
-		var curPoint4 = curRect.prevPoint2;
-		var curLine1 = this.cChartDrawer.getLineEquation(curPoint1, curPoint2);
-		var curLine2 = this.cChartDrawer.getLineEquation(curPoint3, curPoint4);
-		
-		var t = this;
-		
-		var addToArr = function(point, seria, isDown, elem)
-		{
-			if(!t.intersections[point])
-			{
-				t.intersections[point] = [];
-			}
-			
-			if(!t.intersections[point][seria])
-			{
-				t.intersections[point][seria] = {};
-			}
-			
-			if(isDown && !t.intersections[point][seria].down)
-			{
-				t.intersections[point][seria].down = [];
-			}
-			if(!isDown && !t.intersections[point][seria].up)
-			{
-				t.intersections[point][seria].up = [];
-			}
-			
-			var arr = isDown ? t.intersections[point][seria].down : t.intersections[point][seria].up;
-			var prevElem = arr[0];
-			
-			if(prevElem && prevElem.x < elem.x)
-			{
-				arr.push(elem);
-			}
-			else
-			{
-				arr.unshift(elem);
-			}
-		};
-		
-		var prevPoints = this.prevPoints;
-		
-		for(var i = 0; i < prevPoints[pointIndex].length; i++)
-		{
-			var rect = prevPoints[pointIndex][i];
-			var point1 = rect.point1;
-			var point2 = rect.point2;
-			var point3 = rect.prevPoint1;
-			var point4 = rect.prevPoint2;
-			var line1 = this.cChartDrawer.getLineEquation(point1, point2);
-			var line2 = this.cChartDrawer.getLineEquation(point3, point4);
-			
-			var curFacesIntersectionInPoint, prevFacesIntersectionInPoint;
-			var tempIntersection;
-			
-			//пересечение верхней и нижней прямых текущей грани
-			tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, curLine2);
-			if(tempIntersection && tempIntersection.x > curPoint1.x && tempIntersection.x < curPoint2.x)
-			{
-				curFacesIntersectionInPoint = tempIntersection;
-			}
-			
-			tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(line1, line2);
-			if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-			{
-				prevFacesIntersectionInPoint = tempIntersection;
-			}
-			
-			
-			if(curFacesIntersectionInPoint && prevFacesIntersectionInPoint)//есть пересечение между гранями одной точки(предыдущей + текущей)
-			{
-				//добавляем точки пересечения текущей точки
-				addToArr(pointIndex, seria, null, curFacesIntersectionInPoint);
-				addToArr(pointIndex, seria, true, curFacesIntersectionInPoint);
-				
-				//добавляем точки пересечения предыдущей точки
-				addToArr(pointIndex, i, null, prevFacesIntersectionInPoint);
-				addToArr(pointIndex, i, true, prevFacesIntersectionInPoint);
-				
-				
-				//здесь нужно разделить на низходящую и восходящую
-				if(curPoint1.y > curPoint2.y || curPoint3.y > curPoint4.y)
-				{
-					if(prevFacesIntersectionInPoint.x > curFacesIntersectionInPoint.x)
-					{
-						//ищем пересечения верхней текущей и предыдущей верхней
-						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
-						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-						{
-							addToArr(pointIndex, i, null, tempIntersection);
-						}
-						
-						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
-						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-						{
-							addToArr(pointIndex, seria, null, tempIntersection);
-						}
-						
-						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line2);
-						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x && curPoint1.y < curPoint3.y && curPoint3.y > curPoint4.y)
-						{
-							addToArr(pointIndex, seria, null, tempIntersection);
-						}
-						
-						//ищем пересечения верхней текущей и предыдущей верхней
-						if(curPoint1.y > curPoint3.y && curPoint4.y > curPoint2.y)
-						{
-							/*tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line2);
-							if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-							{
-								addToArr(pointIndex, i, null, tempIntersection);
-							}
-							
-							tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line2);
-							if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-							{
-								addToArr(pointIndex, seria, null, tempIntersection);
-							}*/
-						}
-						
-					}
-					else
-					{
-						//ищем пересечения верхней текущей и предыдущей верхней
-						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
-						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-						{
-							addToArr(pointIndex, i, null, tempIntersection);
-						}
-						
-						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
-						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-						{
-							addToArr(pointIndex, seria, null, tempIntersection);
-						}
-						
-						//ищем пересечения верхней текущей и предыдущей верхней
-						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line1);
-						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-						{
-							addToArr(pointIndex, i, null, tempIntersection);
-						}
-						
-						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line1);
-						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-						{
-							addToArr(pointIndex, seria, null, tempIntersection);
-						}
-					}
-				}
-				else
-				{
-					if(prevFacesIntersectionInPoint.x < curFacesIntersectionInPoint.x)
-					{
-						//ищем пересечения верхней текущей и предыдущей верхней
-						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
-						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-						{
-							addToArr(pointIndex, i, null, tempIntersection);
-						}
-						
-						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
-						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-						{
-							addToArr(pointIndex, seria, null, tempIntersection);
-						}
-						
-						//ищем пересечения верхней текущей и предыдущей верхней
-						if(curPoint1.y > curPoint3.y && curPoint4.y > curPoint2.y)
-						{
-							tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line2);
-							if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-							{
-								addToArr(pointIndex, i, null, tempIntersection);
-							}
-							
-							tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line2);
-							if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-							{
-								addToArr(pointIndex, seria, null, tempIntersection);
-							}
-						}
-						
-					}
-					else
-					{
-						//ищем пересечения верхней текущей и предыдущей верхней
-						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
-						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-						{
-							addToArr(pointIndex, i, null, tempIntersection);
-						}
-						
-						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
-						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-						{
-							addToArr(pointIndex, seria, null, tempIntersection);
-						}
-						
-						//ищем пересечения верхней текущей и предыдущей верхней
-						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line1);
-						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-						{
-							addToArr(pointIndex, i, null, tempIntersection);
-						}
-						
-						tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line1);
-						if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-						{
-							addToArr(pointIndex, seria, null, tempIntersection);
-						}
-					}
-				}
-				
-				
-				
-				/*//ищем пересечения верхней текущей и предыдущей нижней
-				tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
-				if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-				{
-					addToArr(pointIndex, seria, null, tempIntersection);
-				}
-				
-				//+ ищем пересечения нижней текущей и предыдущей нижней
-				tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line2);
-				if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-				{
-					addToArr(pointIndex, seria, true, tempIntersection);
-				}*/
-			}
-			else if(curFacesIntersectionInPoint)//есть пересечение между гранями одной точки - текущей
-			{
-				//добавляем точки пересечения текущей точки
-				addToArr(pointIndex, seria, null, curFacesIntersectionInPoint);
-				addToArr(pointIndex, seria, true, curFacesIntersectionInPoint);
-				
-				//ищем пересечения верхней текущей и предыдущей верхней
-				tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line1);
-				if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-				{
-					addToArr(pointIndex, i, null, tempIntersection);
-				}
-				
-				tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line1);
-				if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-				{
-					addToArr(pointIndex, seria, null, tempIntersection);
-				}
-			}
-			else if(prevFacesIntersectionInPoint)//есть пересечение между гранями одной точки - предыдущей
-			{
-				//добавляем точки пересечения предыдущей точки
-				addToArr(pointIndex, i, null, prevFacesIntersectionInPoint);
-				addToArr(pointIndex, i, true, prevFacesIntersectionInPoint);
-				
-				//ищем пересечения верхней текущей и предыдущей нижней
-				tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
-				if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-				{
-					addToArr(pointIndex, seria, null, tempIntersection);
-				}
-				
-				//+ ищем пересечения нижней текущей и предыдущей нижней
-				tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line2);
-				if(tempIntersection && tempIntersection.x > point1.x && tempIntersection.x < point2.x)
-				{
-					addToArr(pointIndex, seria, true, tempIntersection);
-				}
-			}
-			else//нет пересечение между гранями одной точки(предыдущей + текущей)
-			{
-				//верхняя с верхней
-				if((curPoint1.y < point1.y && curPoint2.y > point2.y) || (curPoint1.y > point1.y && curPoint2.y < point2.y))
-				{
-					tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line1);
-					addToArr(pointIndex, seria, null, tempIntersection);
-					addToArr(pointIndex, i, null, tempIntersection);
-				}
-				//нижняя с нижней
-				/*if((curPoint3.y < point3.y && curPoint4.y > point4.y) || (curPoint3.y > point3.y && curPoint4.y < point4.y))
-				{
-					tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line2);
-					addToArr(pointIndex, i, null, tempIntersection);
-					//addToArr(pointIndex, i + 1, true, intersection2);
-				}
-				
-				//нижняя с верхней
-				if((curPoint3.y < point1.y && curPoint4.y > point2.y) || (curPoint3.y > point1.y && curPoint4.y < point2.y))
-				{
-					tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine2, line1);
-					addToArr(pointIndex, i, true, tempIntersection);
-					//addToArr(pointIndex, i + 1, null, intersection3);
-				}
-				//верхняя с нижней
-				if((curPoint1.y < point3.y && curPoint2.y > point4.y) || (curPoint1.y > point3.y && curPoint2.y < point4.y))
-				{
-					tempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, line2);
-					addToArr(pointIndex, i, null, tempIntersection);
-					addToArr(pointIndex, i + 1, null, tempIntersection);
-				}*/
-			}
-			
-		}
-	},
 	
 	_calculateDarkSideOfTheFace: function()
 	{
@@ -5371,12 +4978,6 @@ drawAreaChart.prototype =
 		this.prevUp[pointIndex][seriaIndex] = curUp;
 	},
 	
-	
-	
-	
-	
-	
-	
 	_calculateSimpleRect(arrPoints, arrPointsProject, point, seria, props)
 	{
 		var path, pxToMm = this.chartProp.pxToMM, t = this, paths = [];
@@ -5507,434 +5108,6 @@ drawAreaChart.prototype =
 			paths[5] = calculateSimpleFace(point2, point6, point7, point3, point22, point66, point77, point33, 5);
 		}
 	},
-	
-	_calculatePrismRect(arrPoints, arrPointsProject, point, seria, isLeft, props)
-	{
-		var path, pxToMm = this.chartProp.pxToMM, t = this, paths = [];
-		var pathH = this.chartProp.pathH;
-		var pathW = this.chartProp.pathW;
-		var gdLst = [];
-		gdLst["w"] = 1;
-		gdLst["h"] = 1;
-		
-		var point1 = arrPointsProject[0];
-		var point2 = arrPointsProject[1];
-		var point3 = arrPointsProject[2];
-		var	point4 = arrPointsProject[3];
-		var	point5 = arrPointsProject[4];
-		var	point6 = arrPointsProject[5];
-		var	point7 = arrPointsProject[6];
-		var	point8 = arrPointsProject[7];
-		
-		var point11 = arrPoints[0];
-		var point22 = arrPoints[1];
-		var point33 = arrPoints[2];
-		var	point44 = arrPoints[3];
-		var	point55 = arrPoints[4];
-		var	point66 = arrPoints[5];
-		var	point77 = arrPoints[6];
-		var	point88 = arrPoints[7];
-		
-		var insidePoint = {};
-		insidePoint.x = (point11.x + point22.x + point33.x + point44.x + point55.x + point66.x + point77.x + point88.x) / 8;
-		insidePoint.y = (point11.y + point22.y + point33.y + point44.y + point55.y + point66.y + point77.y + point88.y) / 8;
-		insidePoint.z = (point11.z + point22.z + point33.z + point44.z + point55.z + point66.z + point77.z + point88.z) / 8;
-		
-		/*var diffX = (this.cChartDrawer.processor3D.widthCanvas / 2) / this.cChartDrawer.processor3D.aspectRatioX - this.cChartDrawer.processor3D.cameraDiffX;
-		var diffY = (this.cChartDrawer.processor3D.heightCanvas / 2) / this.cChartDrawer.processor3D.aspectRatioY - this.cChartDrawer.processor3D.cameraDiffY;
-		var diffZ = -1 / this.cChartDrawer.processor3D.rPerspective - this.cChartDrawer.processor3D.cameraDiffZ;
-			
-		var centralViewPoint = {x: diffX, y: diffY, z: diffZ};*/
-		
-		var calculateSimpleFace = function(p1, p2, p3, p4, p11, p22, p33, p44, faceIndex)
-		{
-			var path  = new Path();
-			
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			path.moveTo(p1.x / pxToMm * pathW, p1.y / pxToMm * pathH);
-			path.lnTo(p2.x / pxToMm * pathW, p2.y / pxToMm * pathH);
-			path.lnTo(p3.x / pxToMm * pathW, p3.y / pxToMm * pathH);
-			path.lnTo(p4.x / pxToMm * pathW, p4.y / pxToMm * pathH);
-			path.lnTo(p1.x / pxToMm * pathW, p1.y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			
-			var arrPoints = [p1, p2, p3, p4];
-			var arrPoints2 = [p11, p22, p33, p44];
-			var plainEquation = t.cChartDrawer.getPlainEquation(p11, p22, p33);
-			var plainArea = t.cChartDrawer.getAreaQuadrilateral(p1, p2, p3, p4);
-			var test = plainEquation.a * insidePoint.x + plainEquation.b * insidePoint.y + plainEquation.c * insidePoint.z + plainEquation.d * -1;
-			var test2 = plainEquation.a * insidePoint.x + plainEquation.b * insidePoint.y + plainEquation.c * insidePoint.z + plainEquation.d * 0;
-			var test3 = plainEquation.a * insidePoint.x + plainEquation.b * insidePoint.y + plainEquation.c * insidePoint.z + plainEquation.d * 1;
-			
-			//var lineEquation = this.cChartDrawer.getLineEquation(point11, point44);
-			//if(test2 > 0)
-			//{
-			
-			//добавляем центральные точки
-			//if(faceIndex === 4)
-			//{
-				var p55 = {x: (p44.x + p11.x) / 2, y: (p44.y + p11.y) / 2, z: (p44.z + p11.z) / 2};
-				var p66 = {x: (p22.x + p33.x) / 2, y: (p22.y + p33.y) / 2, z: (p22.z + p33.z) / 2};
-				
-				var p5 = {x: (p4.x + p1.x) / 2, y: (p4.y + p1.y) / 2};
-				var p6 = {x: (p2.x + p3.x) / 2, y: (p2.y + p3.y) / 2};
-				
-				arrPoints2.push(p55);
-				arrPoints2.push(p66);
-				arrPoints.push(p5);
-				arrPoints.push(p6);
-			//}
-			if(faceIndex === 0)
-			{
-				t.sortZIndexPathsFront.push({seria: seria, point: 0, verge: faceIndex, paths: path, points: arrPoints2, points2: arrPoints, plainEquation: plainEquation, plainArea: plainArea, z: insidePoint.z});
-			}
-			else if(faceIndex === 5)
-			{
-				t.sortZIndexPathsBack.push({seria: seria, point: 0, verge: faceIndex, paths: path, points: arrPoints2, points2: arrPoints, plainEquation: plainEquation, plainArea: plainArea, z: insidePoint.z});
-			}
-			else if(faceIndex === 2)
-			{
-				t.sortZIndexPathsLeft.push({seria: seria, point: 0, verge: faceIndex, paths: path, points: arrPoints2, points2: arrPoints, plainEquation: plainEquation, plainArea: plainArea, z: insidePoint.z});
-			}
-			else if(faceIndex === 3)
-			{
-				t.sortZIndexPathsRight.push({seria: seria, point: 0, verge: faceIndex, paths: path, points: arrPoints2, points2: arrPoints, plainEquation: plainEquation, plainArea: plainArea, z: insidePoint.z});
-			}
-			
-				
-			//}
-			
-			//}
-			
-			/*if((4 === faceIndex) || (1 === faceIndex))
-			{
-				//t.upFaces.push({seria: seria, point: 0, verge: faceIndex, paths: path, points: arrPoints2, points2: arrPoints, plainEquation: plainEquation, plainArea: plainArea, z: z});
-			}
-			else
-			{
-				t.sortZIndexPaths.push({seria: seria, point: 0, verge: faceIndex, paths: path, points: arrPoints2, points2: arrPoints, plainEquation: plainEquation, plainArea: plainArea, z: insidePoint.z});
-			}*/
-			
-			return path;
-		};
-		
-		if(isLeft)
-		{
-			//left
-			if(this.darkFaces["left"])
-			{
-				paths[2] = calculateSimpleFace(point1, point2, point6, point5, point11, point22, point66, point55, 2);
-			}
-			
-			//down
-			if(this.darkFaces["down"])
-			{
-				if(props && !props.isUp)
-				{
-					paths[4] = calculateSimpleFace(point5, point6, props.far, props.near, point55, point66, props.farProject, props.nearProject, 4);
-					paths[4] = calculateSimpleFace(props.near, props.far, point3, point4, props.nearProject, props.farProject, point33, point44, 4);
-				}
-				else
-				{
-					paths[4] = calculateSimpleFace(point5, point6, point3, point4, point55, point66, point33, point44, 4);
-				}
-			}
-			
-			//up
-			if(this.darkFaces["up"])
-			{
-				paths[1] = calculateSimpleFace(point1, point2, point3, point4, point11, point22, point33, point44, 1);
-			}
-			
-			//front
-			if(this.darkFaces["front"])
-			{
-				paths[0] = calculateSimpleFace(point1, point5, point4, point4, point11, point55, point44, point44, 0);
-			}
-			
-			//unfront
-			if(this.darkFaces["unfront"])
-			{
-				paths[5] = calculateSimpleFace(point2, point6, point3, point3, point22, point66, point33, point33, 5);
-			}
-		}
-		else
-		{
-			//right
-			if(this.darkFaces["right"])
-			{
-				paths[3] = calculateSimpleFace(point6, point5, point3, point4, point66, point55, point33, point44, 3);
-			}
-			
-			//up
-			if(this.darkFaces["up"])
-			{
-				paths[4] = calculateSimpleFace(point1, point2, point5, point6, point11, point22, point55, point66, 4);
-			}
-			
-			//down
-			if(this.darkFaces["down"])
-			{
-				paths[1] = calculateSimpleFace(point4, point3, point1, point2, point44, point33, point11, point22, 1);
-			}
-			
-			//front
-			if(this.darkFaces["front"])
-			{
-				paths[0] = calculateSimpleFace(point4, point6, point1, point1, point44, point66, point11, point11, 0);
-			}
-			
-			//unfront
-			if(this.darkFaces["unfront"])
-			{
-				paths[5] = calculateSimpleFace(point3, point5, point2, point2, point33, point55, point22, point22, 5);
-			}
-		}
-		
-		
-	},
-	
-	_breakFaces: function(faces)
-	{
-		var points = this.points;
-		var prevPoints;
-		var isStacked = !!(this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked");
-		
-		this._calculateDarkSideOfTheFace();
-		
-		for(var i = 0; i < points.length; i++)
-		{
-			prevPoints = isStacked ? this._getPrevSeriesPoints(points, i) : null;
-				
-			/*if(points[i])
-			{
-				this.paths.series[i] = this._calculateStacked3D(prevPoints, i, points);
-			}*/
-		}
-	},
-	
-	_calculateRect3DStacked2 : function(pointsIn3D, gapDepth, perspectiveDepth, seriaNum, allPoints)
-	{
-		var path;
-		var pxToMm = this.chartProp.pxToMM;
-		var nullPositionOX = this.chartProp.nullPositionOX;
-		var nullPositionOXProject = this.cChartDrawer._convertAndTurnPoint(0, nullPositionOX, gapDepth).y;
-		var t = this;
-		var chartHeight = this.chartProp.trueHeight;
-		var chartWidth = this.chartProp.trueWidth;
-		var left = this.chartProp.chartGutter._left;
-		var top = this.chartProp.chartGutter._top;
-		
-		var positions_verge = {front: 0, down: 1, left: 2, right: 3, up: 4, back: 5};
-		var upNear1 = 0, downNear1 = 1, upFar1 = 2, downFar1 = 3;
-		
-		var pathH = this.chartProp.pathH;
-		var pathW = this.chartProp.pathW;
-		var gdLst = [];
-		gdLst["w"] = 1;
-		gdLst["h"] = 1;
-
-		
-		
-		
-		
-		//this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquation});
-
-		
-		
-		
-		
-		
-		//for define VisibleVerge, as in bar charts
-		var point1 = pointsIn3D[downNear1][0].points;
-		var point2 = pointsIn3D[downFar1][0].points;
-		var point3 = pointsIn3D[downFar1][pointsIn3D[downFar1].length - 1].points;
-		var	point4 = pointsIn3D[downNear1][pointsIn3D[downNear1].length - 1].points;
-		
-		var	point5 = pointsIn3D[upNear1][0].points;
-		var	point6 = pointsIn3D[upFar1][0].points;
-		var	point7 = pointsIn3D[upFar1][pointsIn3D[upFar1].length - 1].points;
-		var	point8 = pointsIn3D[upNear1][pointsIn3D[upNear1].length - 1].points;
-		
-		var point11 = pointsIn3D[downNear1][0].points2;
-		var point22 = pointsIn3D[downFar1][0].points2;
-		var point33 = pointsIn3D[downFar1][pointsIn3D[downFar1].length - 1].points2;
-		var	point44 = pointsIn3D[downNear1][pointsIn3D[downNear1].length - 1].points2;
-		
-		var	point55 = pointsIn3D[upNear1][0].points2;
-		var	point66 = pointsIn3D[upFar1][0].points2;
-		var	point77 = pointsIn3D[upFar1][pointsIn3D[upFar1].length - 1].points2;
-		var	point88 = pointsIn3D[upNear1][pointsIn3D[upNear1].length - 1].points2;
-		
-		var allVergeLessNull = false;
-	
-		var paths = [], arrayPaths = null;
-		
-		if(!((point1.y > point5.y && point4.y > point8.y) || (point1.y < point5.y && point4.y < point8.y)))
-		{
-			var parseVerge = t._getPrevSeriesIntersection(0, pointsIn3D);
-			//return paths;
-		}
-		
-		//front
-		paths[0] = null;
-		if(this._isVisibleVerge3D(point5, point1, point4))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			path.moveTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-			path.lnTo(point8.x / pxToMm * pathW, point8.y / pxToMm * pathH);
-			path.lnTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
-			path.lnTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			paths[0] = path;
-			
-			var arrPoints = [point1, point5, point8, point4];
-			var arrPoints2 = [point11, point55, point88, point44];
-			var plainEquation = this.cChartDrawer.getPlainEquation(point11, point55, point88);
-			var plainArea = this.cChartDrawer.getAreaQuadrilateral(point1, point5, point8, point4);
-			var lineEquation = this.cChartDrawer.getLineEquation(point11, point44);
-			this.sortZIndexPaths.push({seria: seriaNum, point: 0, verge: 0, paths: path, points: arrPoints2, points2: arrPoints, plainEquation: plainEquation, plainArea: plainArea});
-		}
-		
-		//down
-		paths[1] = null;
-		if(this._isVisibleVerge3D(point4, point1, point2))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			path.moveTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			path.lnTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
-			path.lnTo(point3.x / pxToMm * pathW, point3.y / pxToMm * pathH);
-			path.lnTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
-			path.lnTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			paths[1] = path;
-			
-			var arrPoints = [point1, point2, point3, point4];
-			var arrPoints2 = [point11, point22, point33, point44];
-			var plainEquation = this.cChartDrawer.getPlainEquation(point11, point22, point33);
-			var plainArea = this.cChartDrawer.getAreaQuadrilateral(point1, point2, point3, point4);
-			this.sortZIndexPaths.push({seria: seriaNum, point: 0, verge: 1, paths: path, points: arrPoints2, points2: arrPoints, plainEquation: plainEquation, plainArea: plainArea});
-		}
-		
-		//left
-		paths[2] = null;
-		if(this._isVisibleVerge3D(point2, point1, point5))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			path.moveTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			path.lnTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
-			path.lnTo(point6.x / pxToMm * pathW, point6.y / pxToMm * pathH);
-			path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-			path.lnTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			paths[2] = path;
-			
-			var arrPoints = [point1, point2, point6, point5];
-			var arrPoints2 = [point11, point22, point66, point55];
-			var plainEquation = this.cChartDrawer.getPlainEquation(point11, point22, point66);
-			var plainArea = this.cChartDrawer.getAreaQuadrilateral(point1, point2, point6, point5);
-			this.sortZIndexPaths.push({seria: seriaNum, point: 0, verge: 2, paths: path, points: arrPoints2, points2: arrPoints, plainEquation: plainEquation, plainArea: plainArea});
-		}
-		
-		//right
-		paths[3] = null;
-		if(this._isVisibleVerge3D(point8, point4, point3))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			path.moveTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
-			path.lnTo(point8.x / pxToMm * pathW, point8.y / pxToMm * pathH);
-			path.lnTo(point7.x / pxToMm * pathW, point7.y / pxToMm * pathH);
-			path.lnTo(point3.x / pxToMm * pathW, point3.y / pxToMm * pathH);
-			path.lnTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			paths[3] = path;
-			
-			var arrPoints = [point4, point8, point7, point3];
-			var arrPoints2 = [point44, point88, point77, point33];
-			var plainEquation = this.cChartDrawer.getPlainEquation(point44, point88, point77);
-			var plainArea = this.cChartDrawer.getAreaQuadrilateral(point4, point8, point7, point3);
-			this.sortZIndexPaths.push({seria: seriaNum, point: 0, verge: 3, paths: path, points: arrPoints2, points2: arrPoints, plainEquation: plainEquation, plainArea: plainArea});
-		}
-		
-		//up
-		paths[4] = null;
-		if(this._isVisibleVerge3D(point6, point5, point8))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			path.moveTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-			path.lnTo(point6.x / pxToMm * pathW, point6.y / pxToMm * pathH);
-			path.lnTo(point7.x / pxToMm * pathW, point7.y / pxToMm * pathH);
-			path.lnTo(point8.x / pxToMm * pathW, point8.y / pxToMm * pathH);
-			path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			paths[4] = path;
-			
-			var arrPoints = [point5, point6, point7, point8];
-			var arrPoints2 = [point55, point66, point77, point88];
-			var plainEquation = this.cChartDrawer.getPlainEquation(point55, point66, point77);
-			var plainArea = this.cChartDrawer.getAreaQuadrilateral(point5, point6, point7, point8);
-			this.sortZIndexPaths.push({seria: seriaNum, point: 0, verge: 4, paths: path, points: arrPoints2, points2: arrPoints, plainEquation: plainEquation, plainArea: plainArea});
-		}
-		
-		
-		//back
-		paths[5] = null;
-		if(this._isVisibleVerge3D(point3, point2, point6))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			path.moveTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
-			path.lnTo(point6.x / pxToMm * pathW, point6.y / pxToMm * pathH);
-			path.lnTo(point7.x / pxToMm * pathW, point7.y / pxToMm * pathH);
-			path.lnTo(point3.x / pxToMm * pathW, point3.y / pxToMm * pathH);
-			path.lnTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			paths[5] = path;
-			
-			var arrPoints = [point2, point6, point7, point3];
-			var arrPoints2 = [point22, point66, point77, point33];
-			var plainEquation = this.cChartDrawer.getPlainEquation(point22, point66, point77);
-			var plainArea = this.cChartDrawer.getAreaQuadrilateral(point2, point6, point7, point3);
-			this.sortZIndexPaths.push({seria: seriaNum, point: 0, verge: 5, paths: path, points: arrPoints2, points2: arrPoints, plainEquation: plainEquation, plainArea: plainArea});
-		}
-		
-		this.usuallyCalculateSeries[seriaNum] = pointsIn3D;
-		
-		return paths;
-	}, 
-	
-	
-	
-	
-	
-	
 	
 	_getPrevSeriesPoints: function(points, i)
 	{
@@ -6236,104 +5409,6 @@ drawAreaChart.prototype =
     },	
 	
 	
-	_DrawBars3D2: function()
-	{
-		var pointChangeDirection = ((this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right)) / 2 + this.chartProp.chartGutter._left) / this.chartProp.pxToMM;
-		
-		var view3DProp = this.cChartSpace.chart.view3D;
-		var angleOy = view3DProp && view3DProp.rotY ? (view3DProp.rotY / 360) * (Math.PI * 2) : 0;
-		
-		//поворот вокруг оси OY
-		//if(Math.abs(angleOy) > 30)
-			//pointChangeDirection = this.chartProp.chartGutter._left + this.chartProp.widthCanvas;
-			
-		pointChangeDirection = pointChangeDirection + (this.chartProp.widthCanvas / 2) * Math.sin(angleOy);
-		
-		//pointChangeDirection = pointChangeDirection * Math.cos(angleOx);
-		
-		/*if(this.chartProp.subType !== "standard")
-		{
-			var brush, pen, seria;
-			for (var i = 0; i < this.chartProp.ptCount; i++) {	
-				for (var j = 0; j < this.paths.series.length; ++j) {
-					seria = this.chartProp.series[j];
-					brush = seria.brush;
-					pen = seria.pen;
-					
-					if(!this.paths.series[j] || !this.paths.series[j][i] || !seria.val.numRef.numCache.pts[i])
-						continue;
-					
-					if(seria.val.numRef.numCache.pts[i].pen)
-						pen = seria.val.numRef.numCache.pts[i].pen;
-					if(seria.val.numRef.numCache.pts[i].brush)
-						brush = seria.val.numRef.numCache.pts[i].brush;
-					
-					for(var k = 0; k < this.paths.series[j][i].length; k++)
-					{
-						if(this.paths.series[j][i][k] && this.paths.series[j][i][k].ArrPathCommand && this.paths.series[j][i][k].ArrPathCommand[0] && parseInt(this.paths.series[j][i][k].ArrPathCommand[0].X) >= parseInt(pointChangeDirection))
-							continue;
-						
-						this._drawBar3D(this.paths.series[j][i][k], pen, brush, k);
-					}
-				}
-			}
-		}*/
-		
-		
-		//вторую половину с конца рисуем
-		var brush, pen, seria;
-		if(this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked")
-		{
-			for (var j = 0 ; j < this.paths.series.length; j++) {
-				seria = this.chartProp.series[j];
-				brush = seria.brush;
-				pen = seria.pen;
-				
-				//if(!this.paths.series[j] || !this.paths.series[j][i] || !seria.val.numRef.numCache.pts[i])
-					//continue;
-				
-				if(seria.val.numRef.numCache.pts[0].pen)
-					pen = seria.val.numRef.numCache.pts[0].pen;
-				if(seria.val.numRef.numCache.pts[0].brush)
-					brush = seria.val.numRef.numCache.pts[0].brush;
-				
-				for(var k = this.paths.series[j].length - 1; k >=0 ; k--)
-				{
-					/*if(this.paths.series[j][i][k] && this.paths.series[j][i][k].ArrPathCommand && this.paths.series[j][i][k].ArrPathCommand[0] && parseInt(this.paths.series[j][i][k].ArrPathCommand[0].X) < parseInt(pointChangeDirection))
-						break;*/
-					
-					this._drawBar3D(this.paths.series[j][k], pen, brush, k);
-				}
-			}
-		}
-		else
-		{
-			for (var j = this.paths.series.length - 1; j >= 0; j--) {
-				seria = this.chartProp.series[j];
-				brush = seria.brush;
-				pen = seria.pen;
-				
-				//if(!this.paths.series[j] || !this.paths.series[j][i] || !seria.val.numRef.numCache.pts[i])
-					//continue;
-				
-				if(seria.val.numRef.numCache.pts[0].pen)
-					pen = seria.val.numRef.numCache.pts[0].pen;
-				if(seria.val.numRef.numCache.pts[0].brush)
-					brush = seria.val.numRef.numCache.pts[0].brush;
-				
-				for(var k = this.paths.series[j].length - 1; k >=0 ; k--)
-				{
-					/*if(this.paths.series[j][i][k] && this.paths.series[j][i][k].ArrPathCommand && this.paths.series[j][i][k].ArrPathCommand[0] && parseInt(this.paths.series[j][i][k].ArrPathCommand[0].X) < parseInt(pointChangeDirection))
-						break;*/
-					
-					this._drawBar3D(this.paths.series[j][k], pen, brush, k);
-				}
-			}
-		}
-				
-		
-	},
-	
 	_DrawBars3DStandart: function()
 	{
 		var view3DProp = this.cChartSpace.chart.view3D;
@@ -6481,71 +5556,6 @@ drawAreaChart.prototype =
 		return res;
     },
 	
-	
-	_calculateLine3DStacked2: function (points, prevPoints, seriaNum, allPoints)
-    {
-		//pointsIn3D[0] - верхняя грань ближней стороны, pointsIn3D[1] - нижняя грань ближней стороны, pointsIn3D[2] - верхняя грань дальней стороны, pointsIn3D[3] - нижняя грань дальней стороны
-		var pointsIn3D = [];
-		var t = this;
-		var nullPositionOX = this.chartProp.nullPositionOX;
-		var pxToMm = this.chartProp.pxToMM;
-		var upNear1 = 0, downNear1 = 1, upFar1 = 2, downFar1 = 3;
-		
-		//сдвиг по OZ в глубину
-		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
-		var gapDepth = this.cChartSpace.chart.plotArea.chart.gapDepth != null ? this.cChartSpace.chart.plotArea.chart.gapDepth : globalGapDepth;
-		
-		if(this.chartProp.subType === "normal")
-			perspectiveDepth = (perspectiveDepth / (gapDepth / 100 + 1)) / this.chartProp.seriesCount;
-		else	
-			perspectiveDepth = perspectiveDepth / (gapDepth / 100 + 1);
-		
-		var DiffGapDepth = perspectiveDepth * (gapDepth / 2) / 100;
-		
-		if(this.chartProp.subType === "normal")
-			gapDepth = (perspectiveDepth + DiffGapDepth + DiffGapDepth) * seriaNum + DiffGapDepth;
-		else
-			gapDepth = DiffGapDepth;
-		
-		
-		
-		var getProjectPoints = function(currentZ, startN)
-		{
-			pointsIn3D[startN] = [];
-			pointsIn3D[startN + 1] = [];
-			
-			for(var i = 0; i < points.length; i++)
-			{
-				var x = points[i].x * pxToMm;
-				var y = points[i].y * pxToMm;
-				var z = currentZ + gapDepth;
-				
-				//нижняя точка
-				pointsIn3D[startN][i] = {};
-				pointsIn3D[startN][i].points = t.cChartDrawer._convertAndTurnPoint(x, y, z);
-				pointsIn3D[startN][i].points2 = t.cChartDrawer._convertAndTurnPoint(x, y, z, null, null, true);
-				
-				//верхняя точка
-				var prevX = prevPoints ? prevPoints[i].x * pxToMm : x;
-				var prevY = prevPoints ? prevPoints[i].y * pxToMm : nullPositionOX;
-				pointsIn3D[startN + 1][i] = {};
-				pointsIn3D[startN + 1][i].points = t.cChartDrawer._convertAndTurnPoint(prevX, prevY, z);
-				pointsIn3D[startN + 1][i].points2 = t.cChartDrawer._convertAndTurnPoint(prevX, prevY, z, null, null, true);
-			}
-		};
-		
-		
-		var zNear = 0;
-		var zFar = perspectiveDepth;
-		//рассчитываем ближние и дальние точки конкретной серии
-		getProjectPoints(zNear, 0);
-		getProjectPoints(zFar, 2);
-		
-		var res = this._calculateRect3DStacked(pointsIn3D, gapDepth, perspectiveDepth, seriaNum, allPoints)
-		
-		return res;
-    },
-	
 	_getIntersectionLines: function(line1Point1, line1Point2, line2Point1, line2Point2)
 	{
 		var chartHeight = this.chartProp.trueHeight;
@@ -6575,950 +5585,6 @@ drawAreaChart.prototype =
 		
 		return res;
 	},
-	
-	
-	_getPrevSeriesIntersection2: function(i, pointsIn3D, revertDownUp)
-	{
-		var upNear = 0, downNear = 1, upFar = 2, downFar = 3;
-		if(revertDownUp)
-		{
-			upNear = 1, downNear = 0, upFar = 3, downFar = 2;
-		}
-		
-		var t = this, prevNear, prevFar, res = null, currentNearOld, currentFarOld;
-		var downNearPointOld1, downNearPointOld2, upNearPointOld1, upNearPointOld2, downFarPointOld1, downFarPointOld2, upFarPointOld1, upFarPointOld2;
-		
-		var downNearPoint1 = pointsIn3D[downNear][i];
-		var downNearPoint2 = pointsIn3D[downNear][i + 1];
-		//верхняя ближней плоскости
-		var upNearPoint1 = pointsIn3D[upNear][i];
-		var upNearPoint2 = pointsIn3D[upNear][i + 1];
-		//нижняя дальней плоскости
-		var downFarPoint1 = pointsIn3D[downFar][i];
-		var downFarPoint2 = pointsIn3D[downFar][i + 1];
-		//верхняя дальней плоскости
-		var upFarPoint1 = pointsIn3D[upFar][i];
-		var upFarPoint2 = pointsIn3D[upFar][i + 1];
-		
-		//точки пересечения текущей серии(её верхней и нижней грани)
-		var currentNear = t._getIntersectionLines(downNearPoint1, downNearPoint2, upNearPoint1, upNearPoint2);
-		var currentFar = t._getIntersectionLines(downFarPoint1, downFarPoint2, upFarPoint1, upFarPoint2);
-		
-		
-		var prevIntersectionNear, prevIntersectionFar;
-		
-		var calcCurrentNearCurrentOld = function()
-		{
-			//в данном случае нужно найти четыре пересечения(с нижней и верхней плоскостью)
-			var intersectionUpUpNear = t._getIntersectionLines(upNearPoint1, upNearPoint2, upNearPointOld1, upNearPointOld2);
-			var intersectionUpUpFar = t._getIntersectionLines(upFarPoint1, upFarPoint2, upFarPointOld1, upFarPointOld2);
-			
-			if(intersectionUpUpNear)
-			{
-				prevIntersectionNear = intersectionUpUpNear;
-				prevIntersectionFar = intersectionUpUpFar;
-			}
-				
-			
-			var intersectionDownUpNear = t._getIntersectionLines(downNearPoint1, downNearPoint2, upNearPointOld1, upNearPointOld2);
-			var intersectionDownUpFar = t._getIntersectionLines(downFarPoint1, downFarPoint2, upFarPointOld1, upFarPointOld2);
-			
-			if((intersectionDownUpNear && prevIntersectionNear && intersectionDownUpNear.y < prevIntersectionNear.y) || (!prevIntersectionNear))
-			{
-				prevIntersectionNear = intersectionDownUpNear;
-				prevIntersectionFar = intersectionDownUpFar;
-			}
-			
-			var intersectionUpDownNear = t._getIntersectionLines(upNearPoint1, upNearPoint2, downNearPointOld1, downNearPointOld2);
-			var intersectionUpDownFar = t._getIntersectionLines(upFarPoint1, upFarPoint2, downFarPointOld1, downFarPointOld2);
-			
-			if((intersectionUpDownNear && prevIntersectionNear && intersectionUpDownNear.y < prevIntersectionNear.y) || (!prevIntersectionNear))
-			{
-				prevIntersectionNear = intersectionUpDownNear;
-				prevIntersectionFar = intersectionUpDownFar;
-			}
-			
-			var intersectionDownDownNear = t._getIntersectionLines(downNearPoint1, downNearPoint2, downNearPointOld1, downNearPointOld2);
-			var intersectionDownDownFar = t._getIntersectionLines(downFarPoint1, downFarPoint2, downFarPointOld1, downFarPointOld2);
-			
-			if((intersectionDownDownNear && prevIntersectionNear && intersectionDownDownNear.y < prevIntersectionNear.y) || (!prevIntersectionNear))
-			{
-				prevIntersectionNear = intersectionDownDownNear;
-				prevIntersectionFar = intersectionDownDownFar;
-			}
-		};
-		
-		var calcCurrentNear = function()
-		{
-			//в данном случае нужно найти оба пересечения(с нижней и верхней плоскостью текущей серии)
-			var intersectionUpNear = t._getIntersectionLines(upNearPoint1, upNearPoint2, upNearPointOld1, upNearPointOld2);
-			var intersectionUpFar = t._getIntersectionLines(upFarPoint1, upFarPoint2, upFarPointOld1, upFarPointOld2);
-			
-			if((intersectionUpNear && prevIntersectionNear && intersectionUpNear.y < prevIntersectionNear.y) || (!prevIntersectionNear))
-			{
-				prevIntersectionNear = intersectionUpNear;
-				prevIntersectionFar = intersectionUpFar;
-			}
-			
-			var intersectionDownNear = t._getIntersectionLines(downNearPoint1, downNearPoint2, upNearPointOld1, upNearPointOld2);
-			var intersectionDownFar = t._getIntersectionLines(downFarPoint1, downFarPoint2, upFarPointOld1, upFarPointOld2);
-			
-			if((intersectionDownNear && prevIntersectionNear && intersectionDownNear.y < prevIntersectionNear.y) || (!prevIntersectionNear))
-			{
-				prevIntersectionNear = intersectionDownNear;
-				prevIntersectionFar = intersectionDownFar;
-			}
-			
-			if(intersectionUpNear && intersectionUpNear.y >= currentNear.y)
-			{
-				prevIntersectionNear = null;
-				prevIntersectionFar = null;
-			}
-		};
-		
-		
-		var calcCurrentNearOld = function()
-		{
-			//в данном случае нужно найти оба пересечения(с нижней и верхней плоскостью предыдущей серии)
-			var intersectionUpDownNear = t._getIntersectionLines(upNearPoint1, upNearPoint2, downNearPointOld1, downNearPointOld2);
-			var intersectionUpDownFar = t._getIntersectionLines(upFarPoint1, upFarPoint2, downFarPointOld1, downFarPointOld2);
-			
-			var intersectionUpUpNear = t._getIntersectionLines(upNearPoint1, upNearPoint2, upNearPointOld1, upNearPointOld2);
-			var intersectionUpUpFar = t._getIntersectionLines(upFarPoint1, upFarPoint2, upFarPointOld1, upFarPointOld2);
-			
-			if(intersectionUpDownNear && intersectionUpUpNear)
-			{
-				if(intersectionUpDownNear.y < intersectionUpUpNear.y)
-				{
-					prevIntersectionNear = intersectionUpDownNear;
-					prevIntersectionFar = intersectionUpDownFar;
-				}
-				else
-				{
-					prevIntersectionNear = intersectionUpUpNear;
-					prevIntersectionFar = intersectionUpUpFar;
-				}
-			}
-			else if(intersectionUpDownNear)
-			{
-				prevIntersectionNear = intersectionUpDownNear;
-				prevIntersectionFar = intersectionUpDownFar;
-			}
-			else if(intersectionUpUpNear)
-			{
-				prevIntersectionNear = intersectionUpUpNear;
-				prevIntersectionFar = intersectionUpUpFar;
-			}
-		};
-		
-		var calcWithoutCurrent = function()
-		{
-			//в данном случае нужно найти оба пересечения(с нижней и верхней плоскостью предыдущей серии)
-			var intersectionUpDownNear = t._getIntersectionLines(upNearPoint1, upNearPoint2, downNearPointOld1, downNearPointOld2);
-			var intersectionUpDownFar = t._getIntersectionLines(upFarPoint1, upFarPoint2, downFarPointOld1, downFarPointOld2);
-			
-			var intersectionUpUpNear = t._getIntersectionLines(upNearPoint1, upNearPoint2, upNearPointOld1, upNearPointOld2);
-			var intersectionUpUpFar = t._getIntersectionLines(upFarPoint1, upFarPoint2, upFarPointOld1, upFarPointOld2);
-			
-			if(intersectionUpDownNear && intersectionUpUpNear)
-			{
-				if(intersectionUpDownNear.y < intersectionUpUpNear.y)
-				{
-					prevIntersectionNear = intersectionUpDownNear;
-					prevIntersectionFar = intersectionUpDownFar;
-				}
-				else
-				{
-					prevIntersectionNear = intersectionUpUpNear;
-					prevIntersectionFar = intersectionUpUpFar;
-				}
-			}
-			else if(intersectionUpDownNear)
-			{
-				prevIntersectionNear = intersectionUpDownNear;
-				prevIntersectionFar = intersectionUpDownFar;
-			}
-			else if(intersectionUpUpNear)
-			{
-				prevIntersectionNear = intersectionUpUpNear;
-				prevIntersectionFar = intersectionUpUpFar;
-			}
-		};
-		
-	
-		
-		var calculateIntersectionWithPrevSeria = function()
-		{
-			prevIntersectionNear = null, prevIntersectionFar = null;
-			if(currentNear)
-			{
-				if(currentNearOld)
-				{
-					calcCurrentNearCurrentOld();
-				}
-				else
-				{
-					calcCurrentNear()
-				}
-			}
-			else
-			{
-				if(currentNearOld)
-				{
-					calcCurrentNearOld();
-				}
-				else
-				{
-					calcWithoutCurrent();
-				}
-			}
-		};
-		
-		var checkVergeAdd = function()
-		{
-			var res = true;
-			
-			if(upNearPointOld1.y < upNearPoint1.y && upNearPointOld2.y < upNearPoint2.y && downNearPointOld1.y < downNearPoint1.y && downNearPointOld2.y < downNearPoint2.y)
-			{
-				res = false;
-			}
-			
-			return res;
-		};
-		
-		//проходимся по всем предыдущим сериям
-		for(var n = 0; n < t.usuallyCalculateSeries.length; n++)
-		{
-			var pointsIn3dOld = t.usuallyCalculateSeries[n];
-			
-			var upNear1 = 0, downNear1 = 1, upFar1 = 2, downFar1 = 3;
-			if(pointsIn3dOld[downNear1][i].y < pointsIn3dOld[upNear1][i].y && pointsIn3dOld[downNear1][i + 1].y < pointsIn3dOld[upNear1][i + 1].y)
-			{	
-				upNear1 = 1, downNear1 = 0, upFar1 = 3, downFar1 = 2;
-			}
-			
-			//точки предыдущей серии
-			//нижняя ближней плоскости
-			downNearPointOld1 = pointsIn3dOld[downNear1][i];
-			downNearPointOld2 = pointsIn3dOld[downNear1][i + 1];
-			//верхняя ближней плоскости
-			upNearPointOld1 = pointsIn3dOld[upNear1][i];
-			upNearPointOld2 = pointsIn3dOld[upNear1][i + 1];
-			//нижняя дальней плоскости
-			downFarPointOld1 = pointsIn3dOld[downFar1][i];
-			downFarPointOld2 = pointsIn3dOld[downFar1][i + 1];
-			//верхняя дальней плоскости
-			upFarPointOld1 = pointsIn3dOld[upFar1][i];
-			upFarPointOld2 = pointsIn3dOld[upFar1][i + 1];
-			
-			if(!downNearPointOld1 || !upNearPointOld1 || !downNearPointOld2 || !upNearPointOld2)
-				continue;
-			
-			//точки пересечения предыдущей серии(её верхней и нижней грани)
-			currentNearOld = t._getIntersectionLines(downNearPointOld1, downNearPointOld2, upNearPointOld1, upNearPointOld2);
-			currentFarOld = t._getIntersectionLines(downFarPointOld1, downFarPointOld2, upFarPointOld1, upFarPointOld2);
-			
-			//проверка на то, нужно ли вообще рисовать грань
-			if(checkVergeAdd() === false)
-			{
-				res = false;
-				break;
-			}
-			
-			calculateIntersectionWithPrevSeria();
-			
-			//если пересечение находится выше, выбираем его
-			if(prevIntersectionNear && prevIntersectionFar && ((prevNear && prevIntersectionNear.y < prevNear.y) || !prevNear))
-			{
-				prevNear = prevIntersectionNear;
-				prevFar = prevIntersectionFar;
-			}
-		}
-		
-		
-		if((currentNear || prevNear) && res !== false)
-			res = {currentNear: currentNear, currentFar: currentFar, prevNear: prevNear, prevFar: prevFar, currentNearOld: currentNearOld, currentFarOld: currentFarOld};
-		
-		return res;
-	},
-	
-	_getPrevSeriesIntersection: function(i, pointsIn3D, revertDownUp)
-	{	
-		var upNear = 0, downNear = 1, upFar = 2, downFar = 3;
-		if(revertDownUp)
-		{
-			var upNear = 1, downNear = 0, upFar = 3, downFar = 2;
-		}
-		
-		var t = this;
-		var res = null;
-		
-		var descending = true;
-		if(pointsIn3D[upNear][i].points.y > pointsIn3D[upNear][i + 1].points.y)
-			descending = false;
-		
-		if(descending)
-		{
-			if((pointsIn3D[upNear][i].points.y > pointsIn3D[downNear][i].points.y && pointsIn3D[upNear][i + 1].points.y > pointsIn3D[downNear][i + 1].points.y))
-			{
-				//нижняя ближней плоскости
-				var downNearPoint1 = pointsIn3D[upNear][i].points;
-				var downNearPoint2 = pointsIn3D[upNear][i + 1].points;
-				//верхняя ближней плоскости
-				var upNearPoint1 = pointsIn3D[downNear][i].points;
-				var upNearPoint2 = pointsIn3D[downNear][i + 1].points;
-				//нижняя дальней плоскости
-				var downFarPoint1 = pointsIn3D[upFar][i].points;
-				var downFarPoint2 = pointsIn3D[upFar][i + 1].points;
-				//верхняя дальней плоскости
-				var upFarPoint1 = pointsIn3D[downFar][i].points;
-				var upFarPoint2 = pointsIn3D[downFar][i + 1].points;
-			}
-			else
-			{
-				//нижняя ближней плоскости
-				var downNearPoint1 = pointsIn3D[downNear][i].points;
-				var downNearPoint2 = pointsIn3D[downNear][i + 1].points;
-				//верхняя ближней плоскости
-				var upNearPoint1 = pointsIn3D[upNear][i].points;
-				var upNearPoint2 = pointsIn3D[upNear][i + 1].points;
-				//нижняя дальней плоскости
-				var downFarPoint1 = pointsIn3D[downFar][i].points;
-				var downFarPoint2 = pointsIn3D[downFar][i + 1].points;
-				//верхняя дальней плоскости
-				var upFarPoint1 = pointsIn3D[upFar][i].points;
-				var upFarPoint2 = pointsIn3D[upFar][i + 1].points;
-			}
-		}
-		else
-		{
-			if(!(pointsIn3D[upNear][i].points.y > pointsIn3D[downNear][i].points.y && pointsIn3D[upNear][i + 1].points.y > pointsIn3D[downNear][i + 1].points.y))
-			{
-				//нижняя ближней плоскости
-				var downNearPoint1 = pointsIn3D[upNear][i].points;
-				var downNearPoint2 = pointsIn3D[upNear][i + 1].points;
-				//верхняя ближней плоскости
-				var upNearPoint1 = pointsIn3D[downNear][i].points;
-				var upNearPoint2 = pointsIn3D[downNear][i + 1].points;
-				//нижняя дальней плоскости
-				var downFarPoint1 = pointsIn3D[upFar][i].points;
-				var downFarPoint2 = pointsIn3D[upFar][i + 1].points;
-				//верхняя дальней плоскости
-				var upFarPoint1 = pointsIn3D[downFar][i].points;
-				var upFarPoint2 = pointsIn3D[downFar][i + 1].points;
-			}
-			else
-			{
-				//нижняя ближней плоскости
-				var downNearPoint1 = pointsIn3D[downNear][i].points;
-				var downNearPoint2 = pointsIn3D[downNear][i + 1].points;
-				//верхняя ближней плоскости
-				var upNearPoint1 = pointsIn3D[upNear][i].points;
-				var upNearPoint2 = pointsIn3D[upNear][i + 1].points;
-				//нижняя дальней плоскости
-				var downFarPoint1 = pointsIn3D[downFar][i].points;
-				var downFarPoint2 = pointsIn3D[downFar][i + 1].points;
-				//верхняя дальней плоскости
-				var upFarPoint1 = pointsIn3D[upFar][i].points;
-				var upFarPoint2 = pointsIn3D[upFar][i + 1].points;
-			}
-		}
-		
-		
-		//смотрим, есть ли точки пересечения граней	одной серии
-		var currentNear = t._getIntersectionLines(downNearPoint1, downNearPoint2, upNearPoint1, upNearPoint2);
-		var currentFar = t._getIntersectionLines(downFarPoint1, downFarPoint2, upFarPoint1, upFarPoint2);
-		var prevNear, prevFar;
-		
-		//если нет предыдущих серий
-		if(!t.usuallyCalculateSeries.length)
-			return currentFar ? {currentNear: currentNear, currentFar: currentFar, prevNear: prevNear, prevFar: prevFar} : null;
-		
-		var downNearPointOld1, downNearPointOld2, upNearPointOld1, upNearPointOld2, downFarPointOld1, downFarPointOld2, upFarPointOld1, upFarPointOld2;
-		var currentNearOld = null, currentFarOld = null;
-		var descendingVerge = function()
-		{
-			var result = null;
-			
-			currentNearOld = t._getIntersectionLines(downNearPointOld1, downNearPointOld2, upNearPointOld1, upNearPointOld2);
-			currentFarOld = t._getIntersectionLines(downFarPointOld1, downFarPointOld2, upFarPointOld1, upFarPointOld2);
-			
-			if(currentNear)
-			{
-				var intersectionWithPrevSeriaNear = t._getIntersectionLines(downNearPoint1, downNearPoint2, downNearPointOld1, downNearPointOld2);
-				var intersectionWithPrevSeriaFar = t._getIntersectionLines(downFarPoint1, downFarPoint2, downFarPointOld1, downFarPointOld2);
-				
-				var intersectionWithPrevNearDownDown = t._getIntersectionLines(downNearPoint1, downNearPoint2, downNearPointOld1, downNearPointOld2);
-				var intersectionWithPrevFarDownDown = t._getIntersectionLines(downFarPoint1, downFarPoint2, downFarPointOld1, downFarPointOld2);
-				
-				var intersectionWithPrevNearUpDown = t._getIntersectionLines(upNearPoint1, upNearPoint2, downNearPointOld1, downNearPointOld2);
-				var intersectionWithPrevFarUpDown = t._getIntersectionLines(upFarPoint1, upFarPoint2, downFarPointOld1, downFarPointOld2);
-				
-				var intersectionWithPrevNearUpUp = t._getIntersectionLines(upNearPoint1, upNearPoint2, upNearPointOld1, upNearPointOld2);
-				var intersectionWithPrevFarUpUp = t._getIntersectionLines(upFarPoint1, upFarPoint2, upFarPointOld1, upFarPointOld2);
-				
-				var intersectionWithPrevNearDownUp = t._getIntersectionLines(downNearPoint1, downNearPoint2, upNearPointOld1, upNearPointOld2);
-				var intersectionWithPrevFarDownUp = t._getIntersectionLines(downFarPoint1, downFarPoint2, upFarPointOld1, upFarPointOld2);
-				
-				if(currentNearOld)
-				{
-					//если точка пересечения самой грани до пересечения с предыдущей
-					if(intersectionWithPrevNearUpDown)
-					{
-						if(parseInt(currentNear.x) <= parseInt(intersectionWithPrevNearUpDown.x) && parseInt(currentNearOld.x) <= parseInt(intersectionWithPrevNearUpDown.x))//точки пересечения самих линий до текущего
-						{
-							if((!prevNear || prevNear && prevNear.y > intersectionWithPrevNearUpDown.y))
-							{
-								prevNear = intersectionWithPrevNearDownDown;
-								prevFar = intersectionWithPrevFarDownDown;
-							}
-						}
-						else if(parseInt(currentNear.x) <= parseInt(intersectionWithPrevNearUpDown.x) && parseInt(currentNearOld.x) >= parseInt(intersectionWithPrevNearUpDown.x))
-						{
-							if(intersectionWithPrevNearDownUp && (!prevNear || prevNear && prevNear.y > intersectionWithPrevNearDownUp.y))
-							{
-								prevNear = intersectionWithPrevNearDownUp;
-								prevFar = intersectionWithPrevFarDownUp;
-							}
-							else if(intersectionWithPrevNearDownDown && (!prevNear || prevNear && prevNear.y > intersectionWithPrevNearDownDown.y))
-							{
-								prevNear = intersectionWithPrevNearDownDown;
-								prevFar = intersectionWithPrevFarDownDown;
-							}
-						}
-						else if(parseInt(currentNear.x) >= parseInt(intersectionWithPrevNearUpDown.x) && parseInt(currentNearOld.x) >= parseInt(intersectionWithPrevNearUpDown.x))
-						{
-							if(intersectionWithPrevNearUpUp && (!prevNear || prevNear && prevNear.y > intersectionWithPrevNearUpUp.y))
-							{
-								prevNear = intersectionWithPrevNearUpUp;
-								prevFar = intersectionWithPrevFarUpUp;
-							}
-						}
-						else if(parseInt(currentNear.x) >= parseInt(intersectionWithPrevNearUpDown.x) && parseInt(currentNearOld.x) <= parseInt(intersectionWithPrevNearUpDown.x))
-						{
-							if(intersectionWithPrevNearUpDown && (!prevNear || prevNear && prevNear.y > intersectionWithPrevNearUpDown.y))
-							{
-								prevNear = intersectionWithPrevNearUpDown;
-								prevFar = intersectionWithPrevFarUpDown;
-							}
-						}
-						
-					}
-					else if(intersectionWithPrevSeriaNear && intersectionWithPrevSeriaNear.x < currentNear.x && (!prevNear || prevNear && prevNear.y > intersectionWithPrevSeriaNear.y))
-					{
-						result = {};
-						prevNear = intersectionWithPrevSeriaNear;
-						prevFar = intersectionWithPrevSeriaFar;
-					}
-					else
-					{
-						//var intersectionWithPrevSeriaNear = t._getIntersectionLines(downNearPoint1, downNearPoint2, upNearPointOld1, upNearPointOld2);
-						//var intersectionWithPrevSeriaFar = t._getIntersectionLines(downFarPoint1, downFarPoint2, upFarPointOld1, upFarPointOld2);
-					}
-					
-					return;
-				}
-				else
-				{
-					
-					
-					
-					
-					//если точка пересечения самой грани до пересечения с предыдущей
-					if(intersectionWithPrevNearUpDown)
-					{
-						if(parseInt(currentNear.x) <= parseInt(intersectionWithPrevNearUpDown.x))//точки пересечения самих линий до текущего
-						{
-							if((!prevNear || prevNear && prevNear.y > intersectionWithPrevNearUpDown.y) && intersectionWithPrevNearDownDown)
-							{
-								prevNear = intersectionWithPrevNearDownDown;
-								prevFar = intersectionWithPrevFarDownDown;
-							}
-							/*else if((!prevNear || prevNear && prevNear.y > intersectionWithPrevNearUpDown.y) && intersectionWithPrevNearUpUp)
-							{
-								prevNear = intersectionWithPrevNearUpUp;
-								prevFar = intersectionWithPrevFarUpUp;
-							}*/
-						}
-						else if(parseInt(currentNear.x) <= parseInt(intersectionWithPrevNearUpDown.x))
-						{
-							if(intersectionWithPrevNearDownUp && (!prevNear || prevNear && prevNear.y > intersectionWithPrevNearDownUp.y))
-							{
-								prevNear = intersectionWithPrevNearDownUp;
-								prevFar = intersectionWithPrevFarDownUp;
-							}
-							else if(intersectionWithPrevNearDownDown && (!prevNear || prevNear && prevNear.y > intersectionWithPrevNearDownDown.y))
-							{
-								prevNear = intersectionWithPrevNearDownDown;
-								prevFar = intersectionWithPrevFarDownDown;
-							}
-						}
-						else if(parseInt(currentNear.x) >= parseInt(intersectionWithPrevNearUpDown.x))
-						{
-							if(intersectionWithPrevNearUpUp && (!prevNear || prevNear && prevNear.y > intersectionWithPrevNearUpUp.y))
-							{
-								prevNear = intersectionWithPrevNearUpUp;
-								prevFar = intersectionWithPrevFarUpUp;
-							}
-						}
-						else if(parseInt(currentNear.x) >= parseInt(intersectionWithPrevNearUpDown.x))
-						{
-							if(intersectionWithPrevNearUpDown && (!prevNear || prevNear && prevNear.y > intersectionWithPrevNearUpDown.y))
-							{
-								prevNear = intersectionWithPrevNearUpDown;
-								prevFar = intersectionWithPrevFarUpDown;
-							}
-						}
-						
-					}
-					else if(intersectionWithPrevSeriaNear && intersectionWithPrevSeriaNear.x < currentNear.x && (!prevNear || prevNear && prevNear.y > intersectionWithPrevSeriaNear.y))
-					{
-						result = {};
-						prevNear = intersectionWithPrevSeriaNear;
-						prevFar = intersectionWithPrevSeriaFar;
-					}
-					else
-					{
-						//var intersectionWithPrevSeriaNear = t._getIntersectionLines(downNearPoint1, downNearPoint2, upNearPointOld1, upNearPointOld2);
-						//var intersectionWithPrevSeriaFar = t._getIntersectionLines(downFarPoint1, downFarPoint2, upFarPointOld1, upFarPointOld2);
-					}
-					
-					return;
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					if(true)
-					{
-						var intersectionWithPrevSeriaNear = t._getIntersectionLines(upNearPoint1, upNearPoint2, upNearPointOld1, upNearPointOld2);
-						var intersectionWithPrevSeriaFar = t._getIntersectionLines(upFarPoint1, upFarPoint2, upFarPointOld1, upFarPointOld2);
-					}
-					else
-					{
-						var intersectionWithPrevSeriaNear = t._getIntersectionLines(downNearPoint1, downNearPoint2, upNearPointOld1, upNearPointOld2);
-						var intersectionWithPrevSeriaFar = t._getIntersectionLines(downFarPoint1, downFarPoint2, upFarPointOld1, upFarPointOld2);
-					}
-				}
-				
-			}
-			else if(currentNearOld)
-			{
-				var intersectionWithPrevSeriaNear = t._getIntersectionLines(upNearPoint1, upNearPoint2, downNearPointOld1, downNearPointOld2);
-				var intersectionWithPrevSeriaFar = t._getIntersectionLines(upFarPoint1, upFarPoint2, downFarPointOld1, downFarPointOld2);
-			}
-			else
-			{
-				var intersectionWithPrevSeriaNear = t._getIntersectionLines(upNearPoint1, upNearPoint2, upNearPointOld1, upNearPointOld2);
-				var intersectionWithPrevSeriaFar = t._getIntersectionLines(upFarPoint1, upFarPoint2, upFarPointOld1, upFarPointOld2);
-			}
-			
-			
-			if((!prevNear || intersectionWithPrevSeriaNear && intersectionWithPrevSeriaNear.y < prevNear.y) && intersectionWithPrevSeriaNear && ((currentNear && currentNear.y !== intersectionWithPrevSeriaNear.y) || !currentNear))
-			{
-				prevNear = intersectionWithPrevSeriaNear;
-				prevFar = intersectionWithPrevSeriaFar;
-			}
-		};
-		
-		var ascendingVerge = function()
-		{
-			currentNearOld = t._getIntersectionLines(downNearPointOld1, downNearPointOld2, upNearPointOld1, upNearPointOld2);
-			currentFarOld = t._getIntersectionLines(downFarPointOld1, downFarPointOld2, upFarPointOld1, upFarPointOld2);
-			
-			if(currentNear)
-			{
-				if(currentNearOld)
-				{
-					var intersectionWithPrevSeriaNear = t._getIntersectionLines(downNearPoint1, downNearPoint2, downNearPointOld1, downNearPointOld2);
-					var intersectionWithPrevSeriaFar = t._getIntersectionLines(downFarPoint1, downFarPoint2, downFarPointOld1, downFarPointOld2);
-					
-					var intersectionWithPrevNearDownDown = t._getIntersectionLines(downNearPoint1, downNearPoint2, downNearPointOld1, downNearPointOld2);
-					var intersectionWithPrevFarDownDown = t._getIntersectionLines(downFarPoint1, downFarPoint2, downFarPointOld1, downFarPointOld2);
-					
-					var intersectionWithPrevNearUpDown = t._getIntersectionLines(upNearPoint1, upNearPoint2, downNearPointOld1, downNearPointOld2);
-					var intersectionWithPrevFarUpDown = t._getIntersectionLines(upFarPoint1, upFarPoint2, downFarPointOld1, downFarPointOld2);
-					
-					var intersectionWithPrevNearUpUp = t._getIntersectionLines(upNearPoint1, upNearPoint2, upNearPointOld1, upNearPointOld2);
-					var intersectionWithPrevFarUpUp = t._getIntersectionLines(upFarPoint1, upFarPoint2, upFarPointOld1, upFarPointOld2);
-					
-					var intersectionWithPrevNearDownUp = t._getIntersectionLines(downNearPoint1, downNearPoint2, upNearPointOld1, upNearPointOld2);
-					var intersectionWithPrevFarDownUp = t._getIntersectionLines(downFarPoint1, downFarPoint2, upFarPointOld1, upFarPointOld2);
-					
-					
-					//если точка пересечения самой грани до пересечения с предыдущей
-					if(intersectionWithPrevNearDownDown)
-					{
-						if(parseInt(currentNear.x) <= parseInt(intersectionWithPrevNearDownDown.x) && parseInt(currentNearOld.x) <= parseInt(intersectionWithPrevNearDownDown.x))//точки пересечения самих линий до текущего
-						{
-							if(intersectionWithPrevNearDownDown && (!prevNear || prevNear && prevNear.y > intersectionWithPrevNearDownDown.y))
-							{
-								prevNear = intersectionWithPrevNearDownDown;
-								prevFar = intersectionWithPrevFarDownDown;
-							}
-						}
-						else if(parseInt(currentNear.x) <= parseInt(intersectionWithPrevNearDownDown.x) && parseInt(currentNearOld.x) >= parseInt(intersectionWithPrevNearDownDown.x))
-						{
-							if(intersectionWithPrevNearDownDown && (!prevNear || prevNear && prevNear.y > intersectionWithPrevNearDownDown.y))
-							{
-								prevNear = intersectionWithPrevNearDownDown;
-								prevFar = intersectionWithPrevFarDownDown;
-							}
-						}
-						else if(parseInt(currentNear.x) >= parseInt(intersectionWithPrevNearDownDown.x) && parseInt(currentNearOld.x) >= parseInt(intersectionWithPrevNearDownDown.x))
-						{
-							if(intersectionWithPrevNearUpDown && (!prevNear || prevNear && prevNear.y > intersectionWithPrevNearUpDown.y))
-							{
-								prevNear = intersectionWithPrevNearUpDown;
-								prevFar = intersectionWithPrevFarUpDown;
-							}
-						}
-						else if(parseInt(currentNear.x) >= parseInt(intersectionWithPrevNearDownDown.x) && parseInt(currentNearOld.x) <= parseInt(intersectionWithPrevNearDownDown.x))
-						{
-							if(intersectionWithPrevNearUpDown && (!prevNear || prevNear && prevNear.y > intersectionWithPrevNearUpDown.y))
-							{
-								prevNear = intersectionWithPrevNearUpDown;
-								prevFar = intersectionWithPrevFarUpDown;
-							}
-						}
-						
-					}
-					else if(intersectionWithPrevSeriaNear && intersectionWithPrevSeriaNear.x < currentNear.x && (!prevNear || prevNear && prevNear.y > intersectionWithPrevSeriaNear.y))
-					{
-						prevNear = intersectionWithPrevSeriaNear;
-						prevFar = intersectionWithPrevSeriaFar;
-					}
-					else
-					{
-						//var intersectionWithPrevSeriaNear = t._getIntersectionLines(downNearPoint1, downNearPoint2, upNearPointOld1, upNearPointOld2);
-						//var intersectionWithPrevSeriaFar = t._getIntersectionLines(downFarPoint1, downFarPoint2, upFarPointOld1, upFarPointOld2);
-					}
-					
-					return;
-				}
-				else
-				{
-					var intersectionWithPrevSeriaNear = t._getIntersectionLines(upNearPoint1, upNearPoint2, downNearPointOld1, downNearPointOld2);
-					var intersectionWithPrevSeriaFar = t._getIntersectionLines(upFarPoint1, upFarPoint2, downFarPointOld1, downFarPointOld2);
-				}
-				
-			}
-			else if(currentNearOld)
-			{
-				var intersectionWithPrevSeriaNear = t._getIntersectionLines(downNearPoint1, downNearPoint2, downNearPointOld1, downNearPointOld2);
-				var intersectionWithPrevSeriaFar = t._getIntersectionLines(downFarPoint1, downFarPoint2, downFarPointOld1, downFarPointOld2);
-			}
-			else
-			{
-				//var intersectionWithPrevSeriaNear = t._getIntersectionLines(upNearPoint1, upNearPoint2, downNearPointOld1, downNearPointOld2)
-				//var intersectionWithPrevSeriaFar = t._getIntersectionLines(upFarPoint1, upFarPoint2, downFarPointOld1, downFarPointOld2)
-				
-				var intersectionWithPrevSeriaNear = t._getIntersectionLines(downNearPoint1, downNearPoint2, upNearPointOld1, upNearPointOld2)
-				var intersectionWithPrevSeriaFar = t._getIntersectionLines(downFarPoint1, downFarPoint2, upFarPointOld1, upFarPointOld2)
-			}
-			
-			
-			if((!prevNear || intersectionWithPrevSeriaNear && intersectionWithPrevSeriaNear.y < prevNear.y) && intersectionWithPrevSeriaNear && ((currentNear && currentNear.y !== intersectionWithPrevSeriaNear.y) || !currentNear))
-			{
-				prevNear = intersectionWithPrevSeriaNear;
-				prevFar = intersectionWithPrevSeriaFar;
-			}
-		};
-		
-		var checkVergeAdd = function()
-		{
-			var res = true;
-			
-			//если все точки предыдущей грани выше данной грани, то не рисуем данную грань
-			if(upNearPointOld1.y < upNearPoint1.y && upNearPointOld2.y < upNearPoint2.y && downNearPointOld1.y >= upNearPointOld1.y && downNearPointOld2.y >= upNearPointOld2.y && downNearPoint1.y >= upNearPoint1.y && downNearPoint2.y >= upNearPoint2.y)
-			{
-				res = false;
-			}
-			else if(upNearPointOld1.y < upNearPoint1.y && upNearPointOld2.y < upNearPoint2.y && downNearPointOld1.y <= downNearPoint1.y && upNearPointOld2.y <= downNearPoint2.y)
-			{
-				res = false;
-			}
-			
-			return res;
-		};
-		
-		
-		for(var n = 0; n < t.usuallyCalculateSeries.length; n++)
-		{
-			var pointsIn3dOld = t.usuallyCalculateSeries[n];
-			
-			var upNear1 = 0, downNear1 = 1, upFar1 = 2, downFar1 = 3;
-			if(pointsIn3dOld[downNear1][i].y < pointsIn3dOld[upNear1][i].y && pointsIn3dOld[downNear1][i + 1].y < pointsIn3dOld[upNear1][i + 1].y)
-			{	
-				var upNear1 = 1, downNear1 = 0, upFar1 = 3, downFar1 = 2;
-			}
-			
-			//нижняя ближней плоскости
-			downNearPointOld1 = pointsIn3dOld[downNear1][i];
-			downNearPointOld2 = pointsIn3dOld[downNear1][i + 1];
-			//верхняя ближней плоскости
-			upNearPointOld1 = pointsIn3dOld[upNear1][i];
-			upNearPointOld2 = pointsIn3dOld[upNear1][i + 1];
-			//нижняя дальней плоскости
-			downFarPointOld1 = pointsIn3dOld[downFar1][i];
-			downFarPointOld2 = pointsIn3dOld[downFar1][i + 1];
-			//верхняя дальней плоскости
-			upFarPointOld1 = pointsIn3dOld[upFar1][i];
-			upFarPointOld2 = pointsIn3dOld[upFar1][i + 1];
-			
-			if(!downNearPointOld1 || !upNearPointOld1 || !downNearPointOld2 || !upNearPointOld2)
-				continue;
-			
-			
-			//проверка на то, нужно ли вообще рисовать грань
-			if(checkVergeAdd() === false)
-			{
-				res = false;
-				break;
-			}
-			
-			//1) смотрим на низходящую грань
-			if(downNearPoint1.y < downNearPoint2.y || upNearPoint1.y < upNearPoint2.y )
-			{
-				descendingVerge();
-			}
-			else
-			{
-				ascendingVerge();
-			}
-		}
-		
-		if((currentNear || prevNear) && res !== false)
-			res = {currentNear: currentNear, currentFar: currentFar, prevNear: prevNear, prevFar: prevFar, currentNearOld: currentNearOld, currentFarOld: currentFarOld};
-		
-		return res;
-	},
-	
-	_calculateRect3DStacked2 : function(pointsIn3D, gapDepth, perspectiveDepth, seriaNum, allPoints)
-	{
-		var path;
-		var pxToMm = this.chartProp.pxToMM;
-		var nullPositionOX = this.chartProp.nullPositionOX;
-		var nullPositionOXProject = this.cChartDrawer._convertAndTurnPoint(0, nullPositionOX, gapDepth).y;
-		var t = this;
-		var chartHeight = this.chartProp.trueHeight;
-		var chartWidth = this.chartProp.trueWidth;
-		var left = this.chartProp.chartGutter._left;
-		var top = this.chartProp.chartGutter._top;
-		
-		var positions_verge = {front: 0, down: 1, left: 2, right: 3, up: 4, back: 5};
-		var upNear1 = 0, downNear1 = 1, upFar1 = 2, downFar1 = 3;
-		
-		var pathH = this.chartProp.pathH;
-		var pathW = this.chartProp.pathW;
-		var gdLst = [];
-		gdLst["w"] = 1;
-		gdLst["h"] = 1;
-
-		
-		
-		
-		
-		//this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquation});
-
-		
-		
-		
-		
-		
-		//for define VisibleVerge, as in bar charts
-		var point1 = pointsIn3D[downNear1][0].points;
-		var point2 = pointsIn3D[downFar1][0].points;
-		var point3 = pointsIn3D[downFar1][pointsIn3D[downFar1].length - 1].points;
-		var	point4 = pointsIn3D[downNear1][pointsIn3D[downNear1].length - 1].points;
-		
-		var	point5 = pointsIn3D[upNear1][0].points;
-		var	point6 = pointsIn3D[upFar1][0].points;
-		var	point7 = pointsIn3D[upFar1][pointsIn3D[upFar1].length - 1].points;
-		var	point8 = pointsIn3D[upNear1][pointsIn3D[upNear1].length - 1].points;
-		
-		var point11 = pointsIn3D[downNear1][0].points2;
-		var point22 = pointsIn3D[downFar1][0].points2;
-		var point33 = pointsIn3D[downFar1][pointsIn3D[downFar1].length - 1].points2;
-		var	point44 = pointsIn3D[downNear1][pointsIn3D[downNear1].length - 1].points2;
-		
-		var	point55 = pointsIn3D[upNear1][0].points2;
-		var	point66 = pointsIn3D[upFar1][0].points2;
-		var	point77 = pointsIn3D[upFar1][pointsIn3D[upFar1].length - 1].points2;
-		var	point88 = pointsIn3D[upNear1][pointsIn3D[upNear1].length - 1].points2;
-		
-		var allVergeLessNull = false;
-	
-		var paths = [], arrayPaths = null;
-		
-		if(!((point1.y > point5.y && point4.y > point8.y) || (point1.y < point5.y && point4.y < point8.y)))
-		{
-			var parseVerge = t._getPrevSeriesIntersection(0, pointsIn3D);
-			//return paths;
-		}
-		
-		//front
-		paths[0] = null;
-		if(this._isVisibleVerge3D(point5, point1, point4))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			path.moveTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-			path.lnTo(point8.x / pxToMm * pathW, point8.y / pxToMm * pathH);
-			path.lnTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
-			path.lnTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			paths[0] = path;
-			
-			var arrPoints = [point1, point5, point8, point4];
-			var arrPoints2 = [point11, point55, point88, point44];
-			var plainEquation = this.cChartDrawer.getPlainEquation(point11, point55, point88);
-			var plainArea = this.cChartDrawer.getAreaQuadrilateral(point1, point5, point8, point4);
-			var lineEquation = this.cChartDrawer.getLineEquation(point11, point44);
-			this.sortZIndexPaths.push({seria: seriaNum, point: 0, verge: 0, paths: path, points: arrPoints2, points2: arrPoints, plainEquation: plainEquation, plainArea: plainArea});
-		}
-		
-		//down
-		paths[1] = null;
-		if(this._isVisibleVerge3D(point4, point1, point2))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			path.moveTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			path.lnTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
-			path.lnTo(point3.x / pxToMm * pathW, point3.y / pxToMm * pathH);
-			path.lnTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
-			path.lnTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			paths[1] = path;
-			
-			var arrPoints = [point1, point2, point3, point4];
-			var arrPoints2 = [point11, point22, point33, point44];
-			var plainEquation = this.cChartDrawer.getPlainEquation(point11, point22, point33);
-			var plainArea = this.cChartDrawer.getAreaQuadrilateral(point1, point2, point3, point4);
-			this.sortZIndexPaths.push({seria: seriaNum, point: 0, verge: 1, paths: path, points: arrPoints2, points2: arrPoints, plainEquation: plainEquation, plainArea: plainArea});
-		}
-		
-		//left
-		paths[2] = null;
-		if(this._isVisibleVerge3D(point2, point1, point5))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			path.moveTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			path.lnTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
-			path.lnTo(point6.x / pxToMm * pathW, point6.y / pxToMm * pathH);
-			path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-			path.lnTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			paths[2] = path;
-			
-			var arrPoints = [point1, point2, point6, point5];
-			var arrPoints2 = [point11, point22, point66, point55];
-			var plainEquation = this.cChartDrawer.getPlainEquation(point11, point22, point66);
-			var plainArea = this.cChartDrawer.getAreaQuadrilateral(point1, point2, point6, point5);
-			this.sortZIndexPaths.push({seria: seriaNum, point: 0, verge: 2, paths: path, points: arrPoints2, points2: arrPoints, plainEquation: plainEquation, plainArea: plainArea});
-		}
-		
-		//right
-		paths[3] = null;
-		if(this._isVisibleVerge3D(point8, point4, point3))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			path.moveTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
-			path.lnTo(point8.x / pxToMm * pathW, point8.y / pxToMm * pathH);
-			path.lnTo(point7.x / pxToMm * pathW, point7.y / pxToMm * pathH);
-			path.lnTo(point3.x / pxToMm * pathW, point3.y / pxToMm * pathH);
-			path.lnTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			paths[3] = path;
-			
-			var arrPoints = [point4, point8, point7, point3];
-			var arrPoints2 = [point44, point88, point77, point33];
-			var plainEquation = this.cChartDrawer.getPlainEquation(point44, point88, point77);
-			var plainArea = this.cChartDrawer.getAreaQuadrilateral(point4, point8, point7, point3);
-			this.sortZIndexPaths.push({seria: seriaNum, point: 0, verge: 3, paths: path, points: arrPoints2, points2: arrPoints, plainEquation: plainEquation, plainArea: plainArea});
-		}
-		
-		//up
-		paths[4] = null;
-		if(this._isVisibleVerge3D(point6, point5, point8))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			path.moveTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-			path.lnTo(point6.x / pxToMm * pathW, point6.y / pxToMm * pathH);
-			path.lnTo(point7.x / pxToMm * pathW, point7.y / pxToMm * pathH);
-			path.lnTo(point8.x / pxToMm * pathW, point8.y / pxToMm * pathH);
-			path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			paths[4] = path;
-			
-			var arrPoints = [point5, point6, point7, point8];
-			var arrPoints2 = [point55, point66, point77, point88];
-			var plainEquation = this.cChartDrawer.getPlainEquation(point55, point66, point77);
-			var plainArea = this.cChartDrawer.getAreaQuadrilateral(point5, point6, point7, point8);
-			this.sortZIndexPaths.push({seria: seriaNum, point: 0, verge: 4, paths: path, points: arrPoints2, points2: arrPoints, plainEquation: plainEquation, plainArea: plainArea});
-		}
-		
-		
-		//back
-		paths[5] = null;
-		if(this._isVisibleVerge3D(point3, point2, point6))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			path.moveTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
-			path.lnTo(point6.x / pxToMm * pathW, point6.y / pxToMm * pathH);
-			path.lnTo(point7.x / pxToMm * pathW, point7.y / pxToMm * pathH);
-			path.lnTo(point3.x / pxToMm * pathW, point3.y / pxToMm * pathH);
-			path.lnTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			paths[5] = path;
-			
-			var arrPoints = [point2, point6, point7, point3];
-			var arrPoints2 = [point22, point66, point77, point33];
-			var plainEquation = this.cChartDrawer.getPlainEquation(point22, point66, point77);
-			var plainArea = this.cChartDrawer.getAreaQuadrilateral(point2, point6, point7, point3);
-			this.sortZIndexPaths.push({seria: seriaNum, point: 0, verge: 5, paths: path, points: arrPoints2, points2: arrPoints, plainEquation: plainEquation, plainArea: plainArea});
-		}
-		
-		this.usuallyCalculateSeries[seriaNum] = pointsIn3D;
-		
-		return paths;
-	}, 
-	
 	
 	_DrawBars3D: function()
 	{
@@ -7784,7 +5850,7 @@ drawHBarChart.prototype =
 {
     constructor: drawHBarChart,
 	
-	reCalculate : function(chartsDrawer)
+	recalculate : function(chartsDrawer)
 	{
 		this.paths = {};
 		this.summBarVal = [];
@@ -8686,7 +6752,7 @@ drawPieChart.prototype =
 			this._drawPie();
 	},
 	
-	reCalculate : function(chartsDrawer)
+	recalculate : function(chartsDrawer)
 	{
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
@@ -9962,7 +8028,7 @@ drawDoughnutChart.prototype =
 		this._drawPie();
 	},
 	
-	reCalculate : function(chartsDrawer)
+	recalculate : function(chartsDrawer)
 	{
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
@@ -10191,7 +8257,7 @@ drawRadarChart.prototype =
 		this._drawLines();
 	},
 	
-	reCalculate : function(chartsDrawer)
+	recalculate : function(chartsDrawer)
     {
 		this.paths = {};
 		this.chartProp = chartsDrawer.calcProp;
@@ -10543,7 +8609,7 @@ drawScatterChart.prototype =
 {
     constructor: drawScatterChart,
 	
-	reCalculate : function(chartsDrawer)
+	recalculate : function(chartsDrawer)
 	{
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
@@ -11024,7 +9090,7 @@ drawStockChart.prototype =
 		this._drawLines();
 	},
 	
-	reCalculate : function(chartsDrawer)
+	recalculate : function(chartsDrawer)
     {
 		this.paths = {};
 		this.chartProp = chartsDrawer.calcProp;
@@ -11310,7 +9376,7 @@ drawBubbleChart.prototype =
 {
     constructor: drawBubbleChart,
 	
-	reCalculate : function(chartsDrawer)
+	recalculate : function(chartsDrawer)
 	{
 		this.chartProp = chartProp.calcProp;
 		this.cChartDrawer = chartsDrawer;
@@ -11615,7 +9681,7 @@ gridChart.prototype =
 		this._drawVerticalLines();
 	},
 	
-	reCalculate : function(chartsDrawer)
+	recalculate: function(chartsDrawer)
 	{
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartSpace = chartsDrawer.cChartSpace;
@@ -12108,7 +10174,7 @@ catAxisChart.prototype =
 		this._drawTickMark();
 	},
 	
-	reCalculate : function(chartsDrawer)
+	recalculate: function(chartsDrawer)
 	{
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartSpace = chartsDrawer.cChartSpace;
@@ -12461,7 +10527,7 @@ valAxisChart.prototype =
 		this._drawTickMark();
 	},
 	
-	reCalculate : function(chartsDrawer)
+	recalculate: function(chartsDrawer)
 	{
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartSpace = chartsDrawer.cChartSpace;
@@ -12729,7 +10795,7 @@ serAxisChart.prototype =
 		this._drawTickMark();
 	},
 	
-	reCalculate : function(chartsDrawer)
+	recalculate: function(chartsDrawer)
 	{
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartSpace = chartsDrawer.cChartSpace;
@@ -13192,7 +11258,7 @@ allAreaChart.prototype =
 		this._drawArea();
 	},
 	
-	reCalculate: function(chartsDrawer)
+	recalculate: function(chartsDrawer)
 	{
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartSpace = chartsDrawer.cChartSpace;
@@ -13258,7 +11324,7 @@ areaChart.prototype =
 		this._drawArea();
 	},
 	
-	reCalculate: function(chartsDrawer)
+	recalculate: function(chartsDrawer)
 	{
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartSpace = chartsDrawer.cChartSpace;
