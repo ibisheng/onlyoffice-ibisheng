@@ -4886,7 +4886,8 @@ CellArea.prototype = {
             }
 			aRet.push(this.asc_getThumbBySparklineGroup(oSparklineGroup));
 		}
-		return aRet.push(nStyleIndex);
+        aRet.push(nStyleIndex);
+		return aRet;
 	};
 
 
