@@ -4386,6 +4386,7 @@ drawAreaChart.prototype =
 			var anotherFaces = this.sortZIndexPathsFront.concat(this.sortZIndexPathsBack).concat(this.sortZIndexPathsLeft).concat(this.sortZIndexPathsRight);
 			//anotherFaces = anotherFaces.reverse();
 			this.sortZIndexPaths = this.upFaces.concat(anotherFaces)
+			this.sortZIndexPaths = cSortFaces.sortFaces(this.sortZIndexPaths);
 		}
 		else
 		{
