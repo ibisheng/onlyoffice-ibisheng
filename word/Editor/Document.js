@@ -2473,7 +2473,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
                     PageSection.EndPos = Index;
                     Page.EndPos        = Index;
 
-                    if (c_oAscSectionBreakType.Continuous === NextSectInfo.SectPr.Get_Type() && true === CurSectInfo.SectPr.Compare_PageSize(NextSectInfo.SectPr))
+                    if (c_oAscSectionBreakType.Continuous === NextSectInfo.SectPr.Get_Type() && true === CurSectInfo.SectPr.Compare_PageSize(NextSectInfo.SectPr) && this.Footnotes.IsEmptyPage(PageIndex))
                     {
                         // Новая секция начинается на данной странице. Нам надо получить новые поля данной секции, но
                         // на данной странице мы будет использовать только новые горизонтальные поля, а поля по вертикали
