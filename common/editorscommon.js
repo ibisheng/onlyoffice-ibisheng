@@ -270,7 +270,7 @@ function openFileCommand(binUrl, changesUrl, Signature, callback) {
   sFileUrl = sFileUrl.replace(/\\/g, "/");
  
   if (window['IS_NATIVE_EDITOR']) {
-    result = window["native"]["openFileCommand"](sFileUrl, changesUrl, Signature);
+    var result = window["native"]["openFileCommand"](sFileUrl, changesUrl, Signature);
  
     var url;
     var nIndex = sFileUrl.lastIndexOf("/");
