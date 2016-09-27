@@ -7590,8 +7590,14 @@ ParaFootnoteReference.prototype.Get_Type        = function()
 };
 ParaFootnoteReference.prototype.Draw            = function(X, Y, Context, PDSE)
 {
-	Context.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
-	g_oTextMeasurer.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
+    var TextPr = this.Run.Get_CompiledPr(false);
+
+    var FontKoef = 1;
+    if (TextPr.VertAlign !== AscCommon.vertalign_Baseline)
+        FontKoef = vertalign_Koef_Size;
+
+    Context.SetFontSlot(fontslot_ASCII, FontKoef);
+    g_oTextMeasurer.SetFontSlot(fontslot_ASCII, FontKoef);
 
 	var _X = X;
 	var T = this.private_GetString();
@@ -7689,8 +7695,12 @@ ParaFootnoteReference.prototype.private_Measure = function()
 	var TextPr = this.Run.Get_CompiledPr(false);
 	var Theme  = this.Run.Get_Paragraph().Get_Theme();
 
+    var FontKoef = 1;
+    if (TextPr.VertAlign !== AscCommon.vertalign_Baseline)
+        FontKoef = vertalign_Koef_Size;
+
 	oMeasurer.SetTextPr(TextPr, Theme);
-	oMeasurer.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
+	oMeasurer.SetFontSlot(fontslot_ASCII, FontKoef);
 
 	var X = 0;
 	var T = this.private_GetString();
