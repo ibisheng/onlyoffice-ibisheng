@@ -9877,11 +9877,17 @@ CDocument.prototype.private_UpdateCursorXY = function(bUpdateX, bUpdateY)
 			{
 				NewCursorPos.X = SelectionBounds.Start.X;
 				NewCursorPos.Y = SelectionBounds.Start.Y;
+
+				if (this.CurPage < SelectionBounds.Start.Page)
+					NewCursorPos.Y = this.Pages[this.CurPage].Height;
 			}
 			else
 			{
 				NewCursorPos.X = SelectionBounds.End.X + SelectionBounds.End.W;
 				NewCursorPos.Y = SelectionBounds.End.Y + SelectionBounds.End.H;
+
+				if (this.CurPage > SelectionBounds.End.Page)
+					NewCursorPos.Y = 0;
 			}
 		}
 	}
@@ -10027,6 +10033,7 @@ CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
 				StartY = this.Pages[this.CurPage].Height;
 
 				var NewPage = this.CurPage;
+				var bBreak  = false;
 				while (true)
 				{
 					this.Cursor_MoveAt(StartX, StartY, AddToSelect);
@@ -10039,9 +10046,14 @@ CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
 					}
 					else
 					{
+						Result = true;
+						bBreak = true;
 						break;
 					}
 				}
+
+				if (false === Result || true === bBreak)
+					break;
 
 				CurY = StartY;
 			}
