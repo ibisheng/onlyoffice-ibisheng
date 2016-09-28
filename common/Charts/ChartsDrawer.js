@@ -4267,6 +4267,7 @@ function drawAreaChart()
 	this.points = null;
 	this.paths = {};
 	this.upFaces = [];
+	this.downFaces = [];
 	
 	this.sortZIndexPaths = [];
 	this.sortZIndexPathsFront = [];
@@ -4295,12 +4296,11 @@ drawAreaChart.prototype =
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
-		console.time("asd");
+		
 		if(this.cChartDrawer.nDimensionCount === 3)
 			this._drawBars3D();
 		else
 			this._drawLines();
-		console.timeEnd("asd");
 	},
 	
 	recalculate : function(chartsDrawer)
@@ -4391,10 +4391,19 @@ drawAreaChart.prototype =
 					return  a.seria - b.seria;
 				else
 					return  b.midY - a.midY;
-			})
+			});
+			
+			/*this.downFaces.sort (function sortArr(a, b)
+			{
+				if(b.midY === a.midY)
+					return  b.seria - a.seria;
+				else
+					return  a.midY - b.midY;
+			})*/
 			
 			var anotherFaces = this.sortZIndexPathsFront.concat(this.sortZIndexPathsBack).concat(this.sortZIndexPathsLeft).concat(this.sortZIndexPathsRight);
-			this.sortZIndexPaths = this.upFaces.concat(anotherFaces)
+			this.sortZIndexPaths = this.upFaces.concat(anotherFaces);
+			this.sortZIndexPaths = this.downFaces.concat(this.sortZIndexPaths)
 			this.sortZIndexPaths = cSortFaces.sortFaces(this.sortZIndexPaths);
 		}
 		else
@@ -4975,7 +4984,7 @@ drawAreaChart.prototype =
 		//рассчитываем все грани, кроме верхних и нижних
 		this._calculateSimpleRect(arrPoints, arrPointsProject, point, seria);
 		
-		//находим пересечение грани с предыдущими гранями. если есть, что делим грани	
+		//находим пересечение грани с предыдущими гранями. если есть, то делим грани	
 		var breakFaces = this.intersections[point] && this.intersections[point][seria] ? this.intersections[point][seria] : null;
 		if(breakFaces && breakFaces.up && breakFaces.up.length)
 		{
@@ -5016,8 +5025,49 @@ drawAreaChart.prototype =
 				this.upFaces.push(face);
 			}
 		}
+		
+		if(breakFaces && breakFaces.down && breakFaces.down.length)
+		{
+			//сортируем грани одной точки
+			breakFaces.down = breakFaces.down.sort (function sortArr(a, b)
+			{
+				return  a.x - b.x;
+			});
+			
+			for(var i = 0; i < breakFaces.down.length - 1; i++)
+			{
+				var prevNear, prevFar, prevNearProject, prevFarProject, prevNotRotateNear, prevNotRotateFar;
+				
+				var prevPoint = breakFaces.down[i];
+				prevNearProject = t.cChartDrawer._convertAndTurnPoint(prevPoint.x, prevPoint.y, this.gapDepth /*+ DiffGapDepth*/);
+				prevFarProject = t.cChartDrawer._convertAndTurnPoint(prevPoint.x, prevPoint.y, this.gapDepth + this.perspectiveDepth);
+				
+				prevNear = t.cChartDrawer._convertAndTurnPoint(prevPoint.x, prevPoint.y, this.gapDepth /*+ DiffGapDepth*/, null, null, true);
+				prevFar = t.cChartDrawer._convertAndTurnPoint(prevPoint.x, prevPoint.y, this.gapDepth + this.perspectiveDepth, null, null, true);
+				
+				prevNotRotateNear = {x: prevPoint.x, y: prevPoint.y, z: this.gapDepth};
+				prevNotRotateFar = {x: prevPoint.x, y: prevPoint.y, z: this.gapDepth + this.perspectiveDepth};
+
+				var near, far, nearProject, farProject, notRotateNear, notRotateFar;
+			
+				var point = breakFaces.down[i + 1];
+				nearProject = t.cChartDrawer._convertAndTurnPoint(point.x, point.y, this.gapDepth /*+ DiffGapDepth*/);
+				farProject = t.cChartDrawer._convertAndTurnPoint(point.x, point.y, this.gapDepth + this.perspectiveDepth);
+				
+				near = t.cChartDrawer._convertAndTurnPoint(point.x, point.y, this.gapDepth /*+ DiffGapDepth*/, null, null, true);
+				far = t.cChartDrawer._convertAndTurnPoint(point.x, point.y, this.gapDepth + this.perspectiveDepth, null, null, true);
+				
+				notRotateNear = {x: point.x, y: point.y, z: this.gapDepth};
+				notRotateFar = {x: point.x, y: point.y, z: this.gapDepth + this.perspectiveDepth};
+				
+				
+				var face = generateFace(prevNearProject, prevFarProject, farProject, nearProject, prevNear, prevFar, far, near, prevNotRotateNear, prevNotRotateFar, notRotateNear, notRotateFar, 1);
+				this.downFaces.push(face);
+			}
+		}
 		else
 		{
+			//TODO проверить и убрать
 			var face = generateFace(point1, point2, point3, point4, point11, point22, point33, point44, p1, p2, p3, p4, 1);
 			this.upFaces.push(face);
 		}
@@ -5082,24 +5132,6 @@ drawAreaChart.prototype =
 			curPoint4 = curRect.point2;
 		}
 		
-		
-		var curLine1 = this.cChartDrawer.getLineEquation(curPoint1, curPoint2);
-		var curLine2 = this.cChartDrawer.getLineEquation(curPoint3, curPoint4);
-		var curTempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, curLine2);
-		
-		
-		var curUp = [{start: curPoint1, end: curPoint2, eq: curLine1}];
-		
-		var curIntersection = null;
-		if(curTempIntersection && curTempIntersection.x > curPoint1.x && curTempIntersection.x < curPoint2.x)
-		{
-			curIntersection = curTempIntersection;
-			
-			curUp[0] = {start: curPoint1, end: curIntersection, eq: curLine1};
-			curUp[1] = {start: curIntersection, end: curPoint2, eq: curLine2};
-		}
-		
-		
 		var addToArr = function(point, seria, isDown, elem)
 		{
 			if(!t.intersections[point])
@@ -5121,31 +5153,99 @@ drawAreaChart.prototype =
 				t.intersections[point][seria].up = [];
 			}
 			
-			//var arr = isDown ? t.intersections[point][seria].down : t.intersections[point][seria].up;
-			t.intersections[point][seria].up.push(elem);
+			var arr = isDown ? t.intersections[point][seria].down : t.intersections[point][seria].up;
+			arr.push(elem);
 		};
+		
+		//текущая верхняя и нижняя прямая и их пересечение
+		var curLine1 = this.cChartDrawer.getLineEquation(curPoint1, curPoint2);
+		var curLine2 = this.cChartDrawer.getLineEquation(curPoint3, curPoint4);
+		var curTempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, curLine2);
+		
+		var curDown = [{start: curPoint3, end: curPoint4, eq: curLine2}];
+		//если пересечения текущих прямых вписывается в границы диаграммы
+		var curIntersection = null;
+		if(curTempIntersection && curTempIntersection.x > curPoint3.x && curTempIntersection.x < curPoint4.x)
+		{
+			curIntersection = curTempIntersection;
+			
+			curDown[0] = {start: curPoint3, end: curIntersection, eq: curLine2};
+			curDown[1] = {start: curIntersection, end: curPoint4, eq: curLine1};
+		}
+		
+		var curUp = [{start: curPoint1, end: curPoint2, eq: curLine1}];
+		//если пересечения текущих прямых вписывается в границы диаграммы
+		var curIntersection = null;
+		if(curTempIntersection && curTempIntersection.x > curPoint1.x && curTempIntersection.x < curPoint2.x)
+		{
+			curIntersection = curTempIntersection;
+			
+			curUp[0] = {start: curPoint1, end: curIntersection, eq: curLine1};
+			curUp[1] = {start: curIntersection, end: curPoint2, eq: curLine2};
+		}
+		
 		
 		//первая/последняя точка текущей грани, пересечение текущей грани
 		if(!this.prevPoints[pointIndex].length || (this.prevPoints[pointIndex].length && !this.prevPoints[pointIndex][seriaIndex]))
 		{
 			//заносим первую точку грани - ПЕРЕПРОВеРИТЬ
+			addToArr(pointIndex, seriaIndex, true, curPoint3);
 			addToArr(pointIndex, seriaIndex, null, curPoint1);
 			
 			//заносим текущее пересечение
 			if(curIntersection)
 			{
+				addToArr(pointIndex, seriaIndex, true, curIntersection);
 				addToArr(pointIndex, seriaIndex, null, curIntersection);
 				
 				//сразу заносим последнюю точку грани
+				addToArr(pointIndex, seriaIndex, true, curPoint2);
 				addToArr(pointIndex, seriaIndex, null, curPoint4);
 			}
 			else
 			{
 				//сразу заносим последнюю точку грани
+				addToArr(pointIndex, seriaIndex, true, curPoint4);
 				addToArr(pointIndex, seriaIndex, null, curPoint2);
 			}
 		}
 		
+		//пересечения с прямыми предыдущих серий
+		if(this.prevDown && this.prevDown[pointIndex])
+		{
+			for(var i = 0; i < this.prevDown[pointIndex].length; i++)
+			{
+				var prevDown = this.prevDown[pointIndex][i];
+				
+				for(var j = 0; j < this.prevDown[pointIndex][i].length; j++)
+				{
+					for(var k = 0; k < curDown.length; k++)
+					{
+						var line1 = this.prevDown[pointIndex][i][j];
+						var line2 = curDown[k];
+						var intersection = this.cChartDrawer.isIntersectionLineAndLine(line1.eq, line2.eq);
+						
+						if(intersection)
+						{
+							//предыдущая - i
+							if(intersection.x > line1.start.x && intersection.x < line1.end.x)
+							{
+								addToArr(pointIndex, i, true, intersection);
+							}
+							
+							//текущая серия
+							if(intersection.x > line2.start.x && intersection.x < line2.end.x)
+							{
+								addToArr(pointIndex, seriaIndex, true, intersection);
+							}
+						}
+						
+					}
+				}
+			}
+		}
+		
+		//пересечения с прямыми предыдущих серий
 		if(this.prevUp && this.prevUp[pointIndex])
 		{
 			for(var i = 0; i < this.prevUp[pointIndex].length; i++)
@@ -5179,6 +5279,17 @@ drawAreaChart.prototype =
 				}
 			}
 		}
+		
+		if(!this.prevDown)
+		{
+			this.prevDown = [];
+		}
+		if(!this.prevDown[pointIndex])
+		{
+			this.prevDown[pointIndex] = [];
+		}
+		
+		this.prevDown[pointIndex][seriaIndex] = curDown;
 		
 		if(!this.prevUp)
 		{
