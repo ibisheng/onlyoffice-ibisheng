@@ -3638,8 +3638,8 @@
         }
 
         // draw active cell in selection
-        var isPromote = AscCommonExcel.selectionLineType.Promote & selectionLineType;
-        if (isPromote) {
+        var isActive = AscCommonExcel.selectionLineType.ActiveCell & selectionLineType;
+        if (isActive) {
             var cell = args[4];
             var fs = this.model.getMergedByCell(cell.row, cell.col);
             fs = range.intersectionSimple(
@@ -3657,6 +3657,7 @@
 
         // Отрисовка квадратов для move/resize
         var isResize = AscCommonExcel.selectionLineType.Resize & selectionLineType;
+        var isPromote = AscCommonExcel.selectionLineType.Promote & selectionLineType;
         if (isResize || isPromote) {
             ctx.setFillStyle(colorN);
             if (drawRightSide && drawBottomSide) {
@@ -3799,8 +3800,9 @@
     };
 
     WorksheetView.prototype._drawSelectionRange = function () {
+        var range, selectionLineType;
         for (var i = 0, l = this.selectionRange.ranges.length; i < l; ++i) {
-            var range = this.selectionRange.ranges[i];
+            range = this.selectionRange.ranges[i];
             if (c_oAscSelectionType.RangeMax === range.type) {
                 range.c2 = this.cols.length - 1;
                 range.r2 = this.rows.length - 1;
@@ -3810,9 +3812,15 @@
                 range.c2 = this.cols.length - 1;
             }
 
-            this._drawElements(this._drawSelectionElement, range, AscCommonExcel.selectionLineType.Selection |
-              (1 === l ? AscCommonExcel.selectionLineType.ActiveCell | AscCommonExcel.selectionLineType.Promote :
-                AscCommonExcel.selectionLineType.None), this.settings.activeCellBorderColor, false, this.selectionRange.cell);
+            selectionLineType = AscCommonExcel.selectionLineType.Selection;
+            if (1 === l) {
+                selectionLineType |=
+                  AscCommonExcel.selectionLineType.ActiveCell | AscCommonExcel.selectionLineType.Promote;
+            } else if (i === this.selectionRange.cellIndex) {
+                selectionLineType |= AscCommonExcel.selectionLineType.ActiveCell;
+            }
+            this._drawElements(this._drawSelectionElement, range, selectionLineType,
+              this.settings.activeCellBorderColor, false, this.selectionRange.cell);
         }
     };
 
@@ -3903,6 +3911,7 @@
         var x2 = -Number.MAX_VALUE;
         var y1 = Number.MAX_VALUE;
         var y2 = -Number.MAX_VALUE;
+        var _x1, _x2, _y1, _y2;
         var i;
 
         if (this.topLeftFrozenCell) {
@@ -3943,14 +3952,23 @@
             offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
         }
 
-        if (arnIntersection) {
-            x1 = this.cols[arnIntersection.c1].left - offsetX - this.width_2px;
-            x2 = this.cols[arnIntersection.c2].left + this.cols[arnIntersection.c2].width - offsetX +
-              this.width_1px + /* Это ширина "квадрата" для автофильтра от границы ячейки */this.width_2px;
-            y1 = this.rows[arnIntersection.r1].top - offsetY - this.height_2px;
-            y2 = this.rows[arnIntersection.r2].top + this.rows[arnIntersection.r2].height - offsetY +
-              this.height_1px + /* Это высота "квадрата" для автофильтра от границы ячейки */this.height_2px;
-        }
+        var t = this;
+        this.selectionRange.ranges.forEach(function (item) {
+            arnIntersection = item.intersectionSimple(range);
+            if (arnIntersection) {
+                _x1 = t.cols[arnIntersection.c1].left - offsetX - t.width_2px;
+                _x2 = t.cols[arnIntersection.c2].left + t.cols[arnIntersection.c2].width - offsetX +
+                  t.width_1px + /* Это ширина "квадрата" для автофильтра от границы ячейки */t.width_2px;
+                _y1 = t.rows[arnIntersection.r1].top - offsetY - t.height_2px;
+                _y2 = t.rows[arnIntersection.r2].top + t.rows[arnIntersection.r2].height - offsetY +
+                  t.height_1px + /* Это высота "квадрата" для автофильтра от границы ячейки */t.height_2px;
+
+                x1 = Math.min(x1, _x1);
+                x2 = Math.max(x2, _x2);
+                y1 = Math.min(y1, _y1);
+                y2 = Math.max(y2, _y2);
+            }
+        });
 
         if (!isFrozen) {
             this._activateOverlayCtx();
@@ -3964,18 +3982,18 @@
             var activeFillClone = this.activeFillHandle.clone(true);
 
             // Координаты для автозаполнения
-            var xFH1 = this.cols[activeFillClone.c1].left - offsetX - this.width_2px;
-            var xFH2 = this.cols[activeFillClone.c2].left + this.cols[activeFillClone.c2].width - offsetX +
-              this.width_1px + this.width_2px;
-            var yFH1 = this.rows[activeFillClone.r1].top - offsetY - this.height_2px;
-            var yFH2 = this.rows[activeFillClone.r2].top + this.rows[activeFillClone.r2].height - offsetY +
-              this.height_1px + this.height_2px;
+            _x1 = this.cols[activeFillClone.c1].left - offsetX - this.width_2px;
+            _x2 = this.cols[activeFillClone.c2].left + this.cols[activeFillClone.c2].width - offsetX + this.width_1px +
+              this.width_2px;
+            _y1 = this.rows[activeFillClone.r1].top - offsetY - this.height_2px;
+            _y2 = this.rows[activeFillClone.r2].top + this.rows[activeFillClone.r2].height - offsetY + this.height_1px +
+              this.height_2px;
 
             // Выбираем наибольший range для очистки
-            x1 = Math.min(x1, xFH1);
-            x2 = Math.max(x2, xFH2);
-            y1 = Math.min(y1, yFH1);
-            y2 = Math.max(y2, yFH2);
+            x1 = Math.min(x1, _x1);
+            x2 = Math.max(x2, _x2);
+            y1 = Math.min(y1, _y1);
+            y2 = Math.max(y2, _y2);
         }
 
         if (this.collaborativeEditing.getCollaborativeEditing()) {
@@ -3997,21 +4015,22 @@
                     var arFormulaTmp = new asc_Range(arrayElements[i].c1, arrayElements[i].r1, arrayElements[i].c2, arrayElements[i].r2);
 
                     var aFormulaIntersection = arFormulaTmp.intersection(range);
-
                     if (aFormulaIntersection) {
                         // Координаты для автозаполнения
-                        var xCE1 = this.cols[aFormulaIntersection.c1].left - offsetX - this.width_2px;
-                        var xCE2 = this.cols[aFormulaIntersection.c2].left + this.cols[aFormulaIntersection.c2].width -
-                          offsetX + this.width_1px + this.width_2px;
-                        var yCE1 = this.rows[aFormulaIntersection.r1].top - offsetY - this.height_2px;
-                        var yCE2 = this.rows[aFormulaIntersection.r2].top + this.rows[aFormulaIntersection.r2].height -
-                          offsetY + this.height_1px + this.height_2px;
+                        _x1 = this.cols[aFormulaIntersection.c1].left - offsetX - this.width_2px;
+                        _x2 =
+                          this.cols[aFormulaIntersection.c2].left + this.cols[aFormulaIntersection.c2].width - offsetX +
+                          this.width_1px + this.width_2px;
+                        _y1 = this.rows[aFormulaIntersection.r1].top - offsetY - this.height_2px;
+                        _y2 =
+                          this.rows[aFormulaIntersection.r2].top + this.rows[aFormulaIntersection.r2].height - offsetY +
+                          this.height_1px + this.height_2px;
 
                         // Выбираем наибольший range для очистки
-                        x1 = Math.min(x1, xCE1);
-                        x2 = Math.max(x2, xCE2);
-                        y1 = Math.min(y1, yCE1);
-                        y2 = Math.max(y2, yCE2);
+                        x1 = Math.min(x1, _x1);
+                        x2 = Math.max(x2, _x2);
+                        y1 = Math.min(y1, _y1);
+                        y2 = Math.max(y2, _y2);
                     }
                 }
             }
@@ -4028,18 +4047,18 @@
                 }
 
                 // Координаты для range формулы
-                var xF1 = this.cols[activeFormula.c1].left - offsetX - this.width_3px;
-                var xF2 = activeFormula.c2 > this.cols.length ? width :
+                _x1 = this.cols[activeFormula.c1].left - offsetX - this.width_3px;
+                _x2 = activeFormula.c2 > this.cols.length ? width :
                 this.cols[activeFormula.c2].left + this.cols[activeFormula.c2].width - offsetX + this.width_3px;
-                var yF1 = this.rows[activeFormula.r1].top - offsetY - this.height_3px;
-                var yF2 = activeFormula.r2 > this.rows.length ? height :
+                _y1 = this.rows[activeFormula.r1].top - offsetY - this.height_3px;
+                _y2 = activeFormula.r2 > this.rows.length ? height :
                 this.rows[activeFormula.r2].top + this.rows[activeFormula.r2].height - offsetY + this.height_3px;
 
                 // Выбираем наибольший range для очистки
-                x1 = Math.min(x1, xF1);
-                x2 = Math.max(x2, xF2);
-                y1 = Math.min(y1, yF1);
-                y2 = Math.max(y2, yF2);
+                x1 = Math.min(x1, _x1);
+                x2 = Math.max(x2, _x2);
+                y1 = Math.min(y1, _y1);
+                y2 = Math.max(y2, _y2);
             }
 
             // Вышли из редактора, очистим массив
@@ -4060,18 +4079,18 @@
                 }
 
                 // Координаты для range формулы
-                var xF1 = this.cols[activeFormula.c1].left - offsetX - this.width_2px;
-                var xF2 = activeFormula.c2 > this.cols.length ? width :
+                _x1 = this.cols[activeFormula.c1].left - offsetX - this.width_2px;
+                _x2 = activeFormula.c2 > this.cols.length ? width :
                 this.cols[activeFormula.c2].left + this.cols[activeFormula.c2].width - offsetX + this.width_1px;
-                var yF1 = this.rows[activeFormula.r1].top - offsetY - this.height_2px;
-                var yF2 = activeFormula.r2 > this.rows.length ? height :
+                _y1 = this.rows[activeFormula.r1].top - offsetY - this.height_2px;
+                _y2 = activeFormula.r2 > this.rows.length ? height :
                 this.rows[activeFormula.r2].top + this.rows[activeFormula.r2].height - offsetY + this.height_1px;
 
                 // Выбираем наибольший range для очистки
-                x1 = Math.min(x1, xF1);
-                x2 = Math.max(x2, xF2);
-                y1 = Math.min(y1, yF1);
-                y2 = Math.max(y2, yF2);
+                x1 = Math.min(x1, _x1);
+                x2 = Math.max(x2, _x2);
+                y1 = Math.min(y1, _y1);
+                y2 = Math.max(y2, _y2);
             }
         }
 
@@ -4089,34 +4108,34 @@
             }
 
             // Координаты для перемещения диапазона
-            var xMR1 = this.cols[activeMoveRangeClone.c1].left - offsetX - this.width_2px;
-            var xMR2 = this.cols[activeMoveRangeClone.c2].left + this.cols[activeMoveRangeClone.c2].width - offsetX +
+            _x1 = this.cols[activeMoveRangeClone.c1].left - offsetX - this.width_2px;
+            _x2 = this.cols[activeMoveRangeClone.c2].left + this.cols[activeMoveRangeClone.c2].width - offsetX +
               this.width_1px + this.width_2px;
-            var yMR1 = this.rows[activeMoveRangeClone.r1].top - offsetY - this.height_2px;
-            var yMR2 = this.rows[activeMoveRangeClone.r2].top + this.rows[activeMoveRangeClone.r2].height - offsetY +
+            _y1 = this.rows[activeMoveRangeClone.r1].top - offsetY - this.height_2px;
+            _y2 = this.rows[activeMoveRangeClone.r2].top + this.rows[activeMoveRangeClone.r2].height - offsetY +
               this.height_1px + this.height_2px;
 
             // Выбираем наибольший range для очистки
-            x1 = Math.min(x1, xMR1);
-            x2 = Math.max(x2, xMR2);
-            y1 = Math.min(y1, yMR1);
-            y2 = Math.max(y2, yMR2);
+            x1 = Math.min(x1, _x1);
+            x2 = Math.max(x2, _x2);
+            y1 = Math.min(y1, _y1);
+            y2 = Math.max(y2, _y2);
         }
 
         if (null !== this.copyActiveRange) {
             // Координаты для перемещения диапазона
-            var xCopyAr1 = this.cols[this.copyActiveRange.c1].left - offsetX - this.width_2px;
-            var xCopyAr2 = this.cols[this.copyActiveRange.c2].left + this.cols[this.copyActiveRange.c2].width -
-              offsetX + this.width_1px + this.width_2px;
-            var yCopyAr1 = this.rows[this.copyActiveRange.r1].top - offsetY - this.height_2px;
-            var yCopyAr2 = this.rows[this.copyActiveRange.r2].top + this.rows[this.copyActiveRange.r2].height -
-              offsetY + this.height_1px + this.height_2px;
+            _x1 = this.cols[this.copyActiveRange.c1].left - offsetX - this.width_2px;
+            _x2 = this.cols[this.copyActiveRange.c2].left + this.cols[this.copyActiveRange.c2].width - offsetX +
+              this.width_1px + this.width_2px;
+            _y1 = this.rows[this.copyActiveRange.r1].top - offsetY - this.height_2px;
+            _y2 = this.rows[this.copyActiveRange.r2].top + this.rows[this.copyActiveRange.r2].height - offsetY +
+              this.height_1px + this.height_2px;
 
             // Выбираем наибольший range для очистки
-            x1 = Math.min(x1, xCopyAr1);
-            x2 = Math.max(x2, xCopyAr2);
-            y1 = Math.min(y1, yCopyAr1);
-            y2 = Math.max(y2, yCopyAr2);
+            x1 = Math.min(x1, _x1);
+            x2 = Math.max(x2, _x2);
+            y1 = Math.min(y1, _y1);
+            y2 = Math.max(y2, _y2);
         }
 
         if (!(Number.MAX_VALUE === x1 && -Number.MAX_VALUE === x2 && Number.MAX_VALUE === y1 &&
@@ -7413,13 +7432,20 @@
         return oRes;
     };
 
-    WorksheetView.prototype.changeSelectionStartPoint = function (x, y, isCoord, isSelectMode) {
+    WorksheetView.prototype.changeSelectionStartPoint = function (x, y, isCoord, isSelectMode, isCtrl) {
+        this.cleanSelection();
+
+        if (!this.isFormulaEditMode) {
+            if (isCtrl) {
+                this.selectionRange.addRange();
+            } else {
+                this.selectionRange.clean();
+            }
+        }
         var ar = ((this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
           this.selectionRange.getLast()).clone();
         var ret = {};
         var isChangeSelectionShape = false;
-
-        this.cleanSelection();
 
         var commentList = this.cellCommentator.getCommentsXY(x, y);
         if (!commentList.length) {
@@ -7604,7 +7630,7 @@
     WorksheetView.prototype.changeSelectionActivePoint = function (dc, dr) {
         var ret;
         if (!this._moveActivePointInSelection(dc, dr)) {
-            return this.changeSelectionStartPoint(dc, dr, /*isCoord*/false, /*isSelectMode*/false);
+            return this.changeSelectionStartPoint(dc, dr, /*isCoord*/false, /*isSelectMode*/false, false);
         }
 
         // Очищаем выделение

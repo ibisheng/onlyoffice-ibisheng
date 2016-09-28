@@ -571,8 +571,7 @@
 
 		SelectionRange.prototype.clean = function () {
 			this.ranges = [new Range(0, 0, 0, 0)];
-			this.cell.clean();
-			this.cellIndex = 0;
+			this.cellIndex = -1;
 		};
 		SelectionRange.prototype.contains = function (c, r) {
 			return this.ranges.some(function (item) {
@@ -593,6 +592,11 @@
 		SelectionRange.prototype.isEqual = function (range) {
 			return false;
 			// todo return this.cell.isEqual(range.cell);
+		};
+		SelectionRange.prototype.addRange = function () {
+			this.ranges.push(new Range(0, 0, 0, 0));
+			this.cellIndex = -1;
+			this.cell.clean();
 		};
 		SelectionRange.prototype.offsetCell = function (dr, dc) {
 			var curRange;
@@ -657,10 +661,12 @@
 		SelectionRange.prototype.update = function () {
 			//меняем выделеную ячейку, если она не входит в диапазон
 			//возможно, в будующем придется пределать логику, пока нет примеров, когда это работает плохо
-			if (!this.contains2(this.cell)) {
-				var last = this.getLast();
-				this.cell.col = last.c1;
-				this.cell.row = last.r1;
+			var range = this.ranges[this.cellIndex];
+			if (!range || range.contains(this.cell.col, this.cell.row)) {
+				range = this.getLast();
+				this.cell.col = range.c1;
+				this.cell.row = range.r1;
+				this.cellIndex = this.ranges.length - 1;
 			}
 		};
 
