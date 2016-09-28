@@ -4625,8 +4625,17 @@ drawAreaChart.prototype =
 		
 		var minX = this.xPoints[0].pos < this.xPoints[this.xPoints.length - 1].pos ? this.xPoints[0].pos * pxToMm : this.xPoints[this.xPoints.length - 1].pos * pxToMm;
 		var maxX = this.xPoints[0].pos < this.xPoints[this.xPoints.length - 1].pos ? this.xPoints[this.xPoints.length - 1].pos * pxToMm : this.xPoints[0].pos * pxToMm;
-		var maxY = this.cChartDrawer.getYPosition(this.cChartDrawer.calcProp.min, this.yPoints) * pxToMm;
-		var minY= this.cChartDrawer.getYPosition(this.cChartDrawer.calcProp.max, this.yPoints) * pxToMm;
+		
+		var minValue = this.cChartDrawer.calcProp.min;
+		var maxValue = this.cChartDrawer.calcProp.max; 
+		if(this.chartProp.subType == "stackedPer")
+		{
+			minValue = minValue / 100;
+			maxValue = maxValue / 100;
+		}
+		
+		var maxY = this.cChartDrawer.getYPosition(minValue, this.yPoints) * pxToMm;
+		var minY = this.cChartDrawer.getYPosition(maxValue, this.yPoints) * pxToMm;
 		
 		var point1 = this.cChartDrawer._convertAndTurnPoint(minX, maxY, this.gapDepth);
 		var point2 = this.cChartDrawer._convertAndTurnPoint(minX, maxY, this.gapDepth + this.perspectiveDepth);
