@@ -1073,7 +1073,7 @@
         var Type = this.Document.Content[nPos].Get_Type();
         if (type_Paragraph === Type)
             return new ApiParagraph(this.Document.Content[nPos]);
-        else if (type_Paragraph === Type)
+        else if (type_Table === Type)
             return new ApiTable(this.Document.Content[nPos]);
 
         return null;
