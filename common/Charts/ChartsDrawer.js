@@ -4446,7 +4446,7 @@ drawAreaChart.prototype =
 				}
 				else
 				{
-					this.paths.series[i] = this._calculateLine3D(points[i], prevPoints, i, points);
+					this.paths.series[i] = this._calculateLine3D(points[i], i, points);
 				}
 			}
 		}
@@ -4504,65 +4504,32 @@ drawAreaChart.prototype =
 		return path;
 	},
 	
-	_calculateLine3D: function (points, prevPoints, seriaNum, allPoints)
+	_calculateLine3D: function (points, seriaNum, allPoints)
     {
-		//pointsIn3D[0] - верхняя грань ближней стороны, pointsIn3D[1] - нижняя грань ближней стороны, pointsIn3D[2] - верхняя грань дальней стороны, pointsIn3D[3] - нижняя грань дальней стороны
-		var pointsIn3D = [];
-		var t = this;
-		var nullPositionOX = this.chartProp.nullPositionOX;
-		var pxToMm = this.chartProp.pxToMM;
+		//pointsIn3D[0] - верхняя кривая ближней стороны, pointsIn3D[1] - нижняя кривая ближней стороны, pointsIn3D[2] - верхняя кривая дальней стороны, pointsIn3D[3] - нижняя кривая дальней стороны
+		var pointsIn3D = [], t = this, pxToMm = this.chartProp.pxToMM;
 		
 		//сдвиг по OZ в глубину
-		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
-		var gapDepth = this.cChartSpace.chart.plotArea.chart.gapDepth != null ? this.cChartSpace.chart.plotArea.chart.gapDepth : globalGapDepth;
-		
-		if(this.chartProp.subType === "normal")
-			perspectiveDepth = (perspectiveDepth / (gapDepth / 100 + 1)) / this.chartProp.seriesCount;
-		else	
-			perspectiveDepth = perspectiveDepth / (gapDepth / 100 + 1);
-		
-		var DiffGapDepth = perspectiveDepth * (gapDepth / 2) / 100;
-		
-		if(this.chartProp.subType === "normal")
-			gapDepth = (perspectiveDepth + DiffGapDepth + DiffGapDepth) * seriaNum + DiffGapDepth;
-		else
-			gapDepth = DiffGapDepth;
-		
-		
-		
+		var gapDepth = (this.perspectiveDepth + this.gapDepth + this.gapDepth) * seriaNum + this.gapDepth;
+
 		var getProjectPoints = function(currentZ, startN)
 		{
-			pointsIn3D[startN] = [];			
+			pointsIn3D[startN] = [];
+			pointsIn3D[startN + 1] = [];			
 			for(var i = 0; i < points.length; i++)
 			{
 				pointsIn3D[startN][i] = t.cChartDrawer._convertAndTurnPoint(points[i].x * pxToMm, points[i].y * pxToMm, currentZ + gapDepth);
-			}
-			
-			pointsIn3D[startN + 1] = [];
-			if(prevPoints != null)
-			{
-				for(var i = 0; i < prevPoints.length; i++)
-				{
-					if(i == 0)
-						pointsIn3D[startN + 1][0] = t.cChartDrawer._convertAndTurnPoint(points[0].x * pxToMm, points[0].y * pxToMm, currentZ + gapDepth);
-					
-					pointsIn3D[startN + 1][i + 1] = t.cChartDrawer._convertAndTurnPoint(prevPoints[i].x * pxToMm, prevPoints[i].y * pxToMm, currentZ + gapDepth);
-				}
-			}
-			else
-			{
-				pointsIn3D[startN + 1][0] = t.cChartDrawer._convertAndTurnPoint(points[0].x * pxToMm, nullPositionOX, currentZ + gapDepth);
-				pointsIn3D[startN + 1][1] = t.cChartDrawer._convertAndTurnPoint(points[points.length - 1].x * pxToMm, nullPositionOX, currentZ + gapDepth);
+				pointsIn3D[startN + 1][i] = t.cChartDrawer._convertAndTurnPoint(points[i].x * pxToMm, t.chartProp.nullPositionOX, currentZ + gapDepth);
 			}
 		};
 		
 		var zNear = 0;
-		var zFar = perspectiveDepth;
+		var zFar = this.perspectiveDepth;
 		//рассчитываем ближние и дальние точки конкретной серии
 		getProjectPoints(zNear, 0);
 		getProjectPoints(zFar, 2);
 		
-		var res = this._calculateRect3D(pointsIn3D, gapDepth, perspectiveDepth, seriaNum, allPoints);
+		var res = this._calculateRect3D(pointsIn3D, gapDepth);
 		
 		return res;
     },
@@ -5626,6 +5593,208 @@ drawAreaChart.prototype =
 	},
 	
 	_calculateRect3D : function(pointsIn3D)
+	{
+		var path;
+		var pxToMm = this.chartProp.pxToMM;
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
+		var drawVerge = function(number, isReverse, isFirstPoint)
+		{
+			if(!isReverse)
+			{
+				for(var i = 0; i < pointsIn3D[number].length; i++)
+				{
+					if(i == 0 && isFirstPoint)
+						path.moveTo(pointsIn3D[number][i].x / pxToMm * pathW, pointsIn3D[number][i].y / pxToMm * pathH);
+					else
+						path.lnTo(pointsIn3D[number][i].x / pxToMm * pathW, pointsIn3D[number][i].y / pxToMm * pathH);
+				}
+			}
+			else
+			{
+				for(var i = pointsIn3D[number].length - 1; i >= 0; i--)
+				{
+					if(i == pointsIn3D[number].length - 1 && isFirstPoint)
+						path.moveTo(pointsIn3D[number][i].x / pxToMm * pathW, pointsIn3D[number][i].y / pxToMm * pathH);
+					else
+						path.lnTo(pointsIn3D[number][i].x / pxToMm * pathW, pointsIn3D[number][i].y / pxToMm * pathH);
+				}
+			}
+		};
+		
+		var calculateRect = function(p1, p2, p3, p4)
+		{
+			var path  = new Path();
+			path.pathH = pathH;
+			path.pathW = pathW;
+			
+			path.moveTo(p1.x / pxToMm * pathW, p1.y / pxToMm * pathH);
+			path.lnTo(p2.x / pxToMm * pathW, p2.y / pxToMm * pathH);
+			path.lnTo(p3.x / pxToMm * pathW, p3.y / pxToMm * pathH);
+			path.lnTo(p4.x / pxToMm * pathW, p4.y / pxToMm * pathH);
+			path.lnTo(p1.x / pxToMm * pathW, p1.y / pxToMm * pathH);
+			path.recalculate(gdLst);
+			
+			return path;
+		};
+		
+		var drawUpDownFace = function(isDown)
+		{
+			var arrayPaths = [];
+			for(var i = 0; i < pointsIn3D[0].length - 1; i++)
+			{
+				var point1Up = pointsIn3D[0][i];
+				var point2Up = pointsIn3D[0][i + 1];
+				
+				var point1UpFar = pointsIn3D[2][i];
+				var point2UpFar = pointsIn3D[2][i + 1];
+				
+				var point1Down = pointsIn3D[1][i];
+				var point2Down = pointsIn3D[1][i + 1];
+				
+				var point1DownFar = pointsIn3D[3][i];
+				var point2DownFar = pointsIn3D[3][i + 1];
+				
+				var path = null;
+				
+				if(!isDown)
+				{
+					if(point1Up.y > point1Down.y && point2Up.y < point2Down.y)
+					{
+						path = calculateRect(point1Up, point1UpFar, point2UpFar, point2Up);
+						arrayPaths.push(path);
+						path = calculateRect(point1Down, point1DownFar, point2DownFar, point2Down);
+						arrayPaths.push(path);
+					}
+					else if(point1Up.y < point1Down.y && point2Up.y > point2Down.y)
+					{
+						path = calculateRect(point1Up, point1UpFar, point2UpFar, point2Up);
+						arrayPaths.push(path);
+						path = calculateRect(point1Down, point1DownFar, point2DownFar, point2Down);
+						arrayPaths.push(path);
+					}
+					else
+					{
+						path = calculateRect(point1Up, point1UpFar, point2UpFar, point2Up);
+						arrayPaths.push(path);
+					}
+				}
+				else
+				{
+					if(point1Up.y > point1Down.y && point2Up.y < point2Down.y)
+					{
+						path = calculateRect(point1Up, point1UpFar, point2UpFar, point2Up);
+						arrayPaths.push(path);
+						path = calculateRect(point1Down, point1DownFar, point2DownFar, point2Down);
+						arrayPaths.push(path);
+					}
+					else if(point1Up.y < point1Down.y && point2Up.y > point2Down.y)
+					{
+						path = calculateRect(point1Up, point1UpFar, point2UpFar, point2Up);
+						arrayPaths.push(path);
+						path = calculateRect(point1Down, point1DownFar, point2DownFar, point2Down);
+						arrayPaths.push(path);
+					}
+					else
+					{
+						path = calculateRect(point1Down, point1DownFar, point2DownFar, point2Down);
+						arrayPaths.push(path);
+					}
+				}
+			}
+			
+			return arrayPaths;
+		};
+		
+		var paths = [];
+		var upNear = 0, downNear = 1, upFar = 2, downFar = 3;
+		
+		//for define VisibleVerge, as in bar charts
+		var point1 = pointsIn3D[downNear][0];
+		var point2 = pointsIn3D[downFar][0];
+		var point3 = pointsIn3D[downFar][pointsIn3D[downFar].length - 1];
+		var	point4 = pointsIn3D[downNear][pointsIn3D[downNear].length - 1];
+		
+		var	point5 = pointsIn3D[upNear][0];
+		var	point6 = pointsIn3D[upFar][0];
+		var	point7 = pointsIn3D[upFar][pointsIn3D[upFar].length - 1];
+		var	point8 = pointsIn3D[upNear][pointsIn3D[upNear].length - 1]
+		
+		
+		//front
+		paths[0] = null;
+		if(this.darkFaces["front"])
+		{
+			path  = new Path();
+			path.pathH = pathH;
+			path.pathW = pathW;
+			
+			drawVerge(upNear, false, true);
+			drawVerge(downNear, true);
+			path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
+			
+			path.recalculate(gdLst);
+			paths[0] = path;
+		}
+		
+		//down
+		paths[1] = null;
+		if(this.darkFaces["down"])
+		{
+			var arrayPaths = drawUpDownFace(true);
+			paths[1] = arrayPaths;
+		}
+		
+		//left
+		paths[2] = null;
+		if(this.darkFaces["left"])
+		{
+			var arrayPaths = calculateRect(pointsIn3D[0][0], pointsIn3D[1][0], pointsIn3D[3][0], pointsIn3D[2][0]);
+			paths[2] = arrayPaths;
+		}
+		
+		//right
+		paths[3] = null;
+		if(this.darkFaces["right"])
+		{
+			var arrayPaths = calculateRect(pointsIn3D[0][pointsIn3D[0].length - 1], pointsIn3D[1][pointsIn3D[1].length - 1], pointsIn3D[3][pointsIn3D[3].length - 1], pointsIn3D[2][pointsIn3D[2].length - 1]);
+			paths[3] = arrayPaths;
+		}
+		
+		//up
+		paths[4] = null;
+		if(this.darkFaces["up"])
+		{
+			var arrayPaths = drawUpDownFace();	
+			paths[4] = arrayPaths;
+		}
+		
+		
+		//unfront
+		paths[5] = null;
+		if(this.darkFaces["unfront"])
+		{
+			path  = new Path();
+			path.pathH = pathH;
+			path.pathW = pathW;
+			
+			drawVerge(upFar, false, true);
+			drawVerge(downFar, true);
+			path.lnTo(pointsIn3D[upFar][0].x / pxToMm * pathW, pointsIn3D[upFar][0].y / pxToMm * pathH);
+			
+			path.recalculate(gdLst);
+			paths[5] = path;
+		}
+		
+		return paths;
+	}, 
+	
+	_calculateRect3D2 : function(pointsIn3D)
 	{
 		var path;
 		var pxToMm = this.chartProp.pxToMM;
