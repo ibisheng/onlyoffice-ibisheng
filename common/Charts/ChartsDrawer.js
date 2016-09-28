@@ -4683,6 +4683,216 @@ drawAreaChart.prototype =
 		}
 	},
 	
+	_calculateRect3D : function(pointsIn3D)
+	{
+		var path;
+		var pxToMm = this.chartProp.pxToMM;
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
+		var drawVerge = function(number, isReverse, isFirstPoint)
+		{
+			if(!isReverse)
+			{
+				for(var i = 0; i < pointsIn3D[number].length; i++)
+				{
+					if(i == 0 && isFirstPoint)
+						path.moveTo(pointsIn3D[number][i].x / pxToMm * pathW, pointsIn3D[number][i].y / pxToMm * pathH);
+					else
+						path.lnTo(pointsIn3D[number][i].x / pxToMm * pathW, pointsIn3D[number][i].y / pxToMm * pathH);
+				}
+			}
+			else
+			{
+				for(var i = pointsIn3D[number].length - 1; i >= 0; i--)
+				{
+					if(i == pointsIn3D[number].length - 1 && isFirstPoint)
+						path.moveTo(pointsIn3D[number][i].x / pxToMm * pathW, pointsIn3D[number][i].y / pxToMm * pathH);
+					else
+						path.lnTo(pointsIn3D[number][i].x / pxToMm * pathW, pointsIn3D[number][i].y / pxToMm * pathH);
+				}
+			}
+		};
+		
+		var calculateRect = function(p1, p2, p3, p4)
+		{
+			var path  = new Path();
+			path.pathH = pathH;
+			path.pathW = pathW;
+			
+			path.moveTo(p1.x / pxToMm * pathW, p1.y / pxToMm * pathH);
+			path.lnTo(p2.x / pxToMm * pathW, p2.y / pxToMm * pathH);
+			path.lnTo(p3.x / pxToMm * pathW, p3.y / pxToMm * pathH);
+			path.lnTo(p4.x / pxToMm * pathW, p4.y / pxToMm * pathH);
+			path.lnTo(p1.x / pxToMm * pathW, p1.y / pxToMm * pathH);
+			path.recalculate(gdLst);
+			
+			return path;
+		};
+		
+		var drawUpDownFace = function(isDown)
+		{
+			var arrayPaths = [];
+			for(var i = 0; i < pointsIn3D[0].length - 1; i++)
+			{
+				var point1Up = pointsIn3D[0][i];
+				var point2Up = pointsIn3D[0][i + 1];
+				
+				var point1UpFar = pointsIn3D[2][i];
+				var point2UpFar = pointsIn3D[2][i + 1];
+				
+				var point1Down = pointsIn3D[1][i];
+				var point2Down = pointsIn3D[1][i + 1];
+				
+				var point1DownFar = pointsIn3D[3][i];
+				var point2DownFar = pointsIn3D[3][i + 1];
+				
+				var path = null;
+				
+				if(!isDown)
+				{
+					if(point1Up.y > point1Down.y && point2Up.y < point2Down.y)
+					{
+						path = calculateRect(point1Up, point1UpFar, point2UpFar, point2Up);
+						arrayPaths.push(path);
+						path = calculateRect(point1Down, point1DownFar, point2DownFar, point2Down);
+						arrayPaths.push(path);
+					}
+					else if(point1Up.y < point1Down.y && point2Up.y > point2Down.y)
+					{
+						path = calculateRect(point1Down, point1DownFar, point2DownFar, point2Down);
+						arrayPaths.push(path);
+						path = calculateRect(point1Up, point1UpFar, point2UpFar, point2Up);
+						arrayPaths.push(path);
+					}
+					else
+					{
+						path = calculateRect(point1Up, point1UpFar, point2UpFar, point2Up);
+						arrayPaths.push(path);
+					}
+				}
+				else
+				{
+					if(point1Up.y > point1Down.y && point2Up.y < point2Down.y)
+					{
+						path = calculateRect(point1Up, point1UpFar, point2UpFar, point2Up);
+						arrayPaths.push(path);
+						path = calculateRect(point1Down, point1DownFar, point2DownFar, point2Down);
+						arrayPaths.push(path);
+					}
+					else if(point1Up.y < point1Down.y && point2Up.y > point2Down.y)
+					{
+						path = calculateRect(point1Up, point1UpFar, point2UpFar, point2Up);
+						arrayPaths.push(path);
+						path = calculateRect(point1Down, point1DownFar, point2DownFar, point2Down);
+						arrayPaths.push(path);
+					}
+					else
+					{
+						path = calculateRect(point1Down, point1DownFar, point2DownFar, point2Down);
+						arrayPaths.push(path);
+					}
+				}
+			}
+			
+			return arrayPaths;
+		};
+		
+		var paths = [];
+		var upNear = 0, downNear = 1, upFar = 2, downFar = 3;
+		
+		//for define VisibleVerge, as in bar charts
+		var point1 = pointsIn3D[downNear][0];
+		var point2 = pointsIn3D[downFar][0];
+		var point3 = pointsIn3D[downFar][pointsIn3D[downFar].length - 1];
+		var	point4 = pointsIn3D[downNear][pointsIn3D[downNear].length - 1];
+		
+		var	point5 = pointsIn3D[upNear][0];
+		var	point6 = pointsIn3D[upFar][0];
+		var	point7 = pointsIn3D[upFar][pointsIn3D[upFar].length - 1];
+		var	point8 = pointsIn3D[upNear][pointsIn3D[upNear].length - 1]
+		
+		
+		var p1 = point1.y > point5.y ? point1 : point5;
+		var p2 = point2.y > point6.y ? point2 : point6;
+		var p3 = point3.y > point7.y ? point3 : point7;
+		var	p4 = point4.y > point8.y ? point4 : point8;
+		
+		var	p5 = point1.y > point5.y ? point5 : point1;
+		var	p6 = point2.y < point6.y ? point2 : point6;
+		var	p7 = point3.y < point7.y ? point3 : point7;
+		var	p8 = point4.y > point8.y ? point8 : point4;
+		
+		//front
+		paths[0] = null;
+		if(this._isVisibleVerge3D(p5, p1, p4))
+		{
+			path  = new Path();
+			path.pathH = pathH;
+			path.pathW = pathW;
+			
+			drawVerge(upNear, false, true);
+			drawVerge(downNear, true);
+			path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
+			
+			path.recalculate(gdLst);
+			paths[0] = path;
+		}
+		
+		//down
+		paths[1] = null;
+		if(this._isVisibleVerge3D(point4, point1, point2))
+		{
+			var arrayPaths = drawUpDownFace(true);
+			paths[1] = arrayPaths;
+		}
+		
+		//left
+		paths[2] = null;
+		if(this._isVisibleVerge3D(p2, p1, p5))
+		{
+			var arrayPaths = calculateRect(pointsIn3D[0][0], pointsIn3D[1][0], pointsIn3D[3][0], pointsIn3D[2][0]);
+			paths[2] = arrayPaths;
+		}
+		
+		//right
+		paths[3] = null;
+		if(this._isVisibleVerge3D(p8, p4, p3))
+		{
+			var arrayPaths = calculateRect(pointsIn3D[0][pointsIn3D[0].length - 1], pointsIn3D[1][pointsIn3D[1].length - 1], pointsIn3D[3][pointsIn3D[3].length - 1], pointsIn3D[2][pointsIn3D[2].length - 1]);
+			paths[3] = arrayPaths;
+		}
+		
+		//up
+		paths[4] = null;
+		if(this._isVisibleVerge3D(point6, point5, point8))
+		{
+			var arrayPaths = drawUpDownFace();	
+			paths[4] = arrayPaths;
+		}
+		
+		//unfront
+		paths[5] = null;
+		if(this._isVisibleVerge3D(p7, p3, p2))
+		{
+			path  = new Path();
+			path.pathH = pathH;
+			path.pathW = pathW;
+			
+			drawVerge(upFar, false, true);
+			drawVerge(downFar, true);
+			path.lnTo(pointsIn3D[upFar][0].x / pxToMm * pathW, pointsIn3D[upFar][0].y / pxToMm * pathH);
+			
+			path.recalculate(gdLst);
+			paths[5] = path;
+		}
+		
+		return paths;
+	}, 
 	
 	_calculateRect3DStacked: function(arrPoints, arrPointsProject, arrNotRotatePoints, point, seria)
 	{	
@@ -5544,217 +5754,6 @@ drawAreaChart.prototype =
 			
 		return {pen: pen, brush: brush}
 	},
-	
-	_calculateRect3D : function(pointsIn3D)
-	{
-		var path;
-		var pxToMm = this.chartProp.pxToMM;
-		var pathH = this.chartProp.pathH;
-		var pathW = this.chartProp.pathW;
-		var gdLst = [];
-		
-		gdLst["w"] = 1;
-		gdLst["h"] = 1;
-		
-		var drawVerge = function(number, isReverse, isFirstPoint)
-		{
-			if(!isReverse)
-			{
-				for(var i = 0; i < pointsIn3D[number].length; i++)
-				{
-					if(i == 0 && isFirstPoint)
-						path.moveTo(pointsIn3D[number][i].x / pxToMm * pathW, pointsIn3D[number][i].y / pxToMm * pathH);
-					else
-						path.lnTo(pointsIn3D[number][i].x / pxToMm * pathW, pointsIn3D[number][i].y / pxToMm * pathH);
-				}
-			}
-			else
-			{
-				for(var i = pointsIn3D[number].length - 1; i >= 0; i--)
-				{
-					if(i == pointsIn3D[number].length - 1 && isFirstPoint)
-						path.moveTo(pointsIn3D[number][i].x / pxToMm * pathW, pointsIn3D[number][i].y / pxToMm * pathH);
-					else
-						path.lnTo(pointsIn3D[number][i].x / pxToMm * pathW, pointsIn3D[number][i].y / pxToMm * pathH);
-				}
-			}
-		};
-		
-		var calculateRect = function(p1, p2, p3, p4)
-		{
-			var path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			path.moveTo(p1.x / pxToMm * pathW, p1.y / pxToMm * pathH);
-			path.lnTo(p2.x / pxToMm * pathW, p2.y / pxToMm * pathH);
-			path.lnTo(p3.x / pxToMm * pathW, p3.y / pxToMm * pathH);
-			path.lnTo(p4.x / pxToMm * pathW, p4.y / pxToMm * pathH);
-			path.lnTo(p1.x / pxToMm * pathW, p1.y / pxToMm * pathH);
-			path.recalculate(gdLst);
-			
-			return path;
-		};
-		
-		var drawUpDownFace = function(isDown)
-		{
-			var arrayPaths = [];
-			for(var i = 0; i < pointsIn3D[0].length - 1; i++)
-			{
-				var point1Up = pointsIn3D[0][i];
-				var point2Up = pointsIn3D[0][i + 1];
-				
-				var point1UpFar = pointsIn3D[2][i];
-				var point2UpFar = pointsIn3D[2][i + 1];
-				
-				var point1Down = pointsIn3D[1][i];
-				var point2Down = pointsIn3D[1][i + 1];
-				
-				var point1DownFar = pointsIn3D[3][i];
-				var point2DownFar = pointsIn3D[3][i + 1];
-				
-				var path = null;
-				
-				if(!isDown)
-				{
-					if(point1Up.y > point1Down.y && point2Up.y < point2Down.y)
-					{
-						path = calculateRect(point1Up, point1UpFar, point2UpFar, point2Up);
-						arrayPaths.push(path);
-						path = calculateRect(point1Down, point1DownFar, point2DownFar, point2Down);
-						arrayPaths.push(path);
-					}
-					else if(point1Up.y < point1Down.y && point2Up.y > point2Down.y)
-					{
-						path = calculateRect(point1Down, point1DownFar, point2DownFar, point2Down);
-						arrayPaths.push(path);
-						path = calculateRect(point1Up, point1UpFar, point2UpFar, point2Up);
-						arrayPaths.push(path);
-					}
-					else
-					{
-						path = calculateRect(point1Up, point1UpFar, point2UpFar, point2Up);
-						arrayPaths.push(path);
-					}
-				}
-				else
-				{
-					if(point1Up.y > point1Down.y && point2Up.y < point2Down.y)
-					{
-						path = calculateRect(point1Up, point1UpFar, point2UpFar, point2Up);
-						arrayPaths.push(path);
-						path = calculateRect(point1Down, point1DownFar, point2DownFar, point2Down);
-						arrayPaths.push(path);
-					}
-					else if(point1Up.y < point1Down.y && point2Up.y > point2Down.y)
-					{
-						path = calculateRect(point1Up, point1UpFar, point2UpFar, point2Up);
-						arrayPaths.push(path);
-						path = calculateRect(point1Down, point1DownFar, point2DownFar, point2Down);
-						arrayPaths.push(path);
-					}
-					else
-					{
-						path = calculateRect(point1Down, point1DownFar, point2DownFar, point2Down);
-						arrayPaths.push(path);
-					}
-				}
-			}
-			
-			return arrayPaths;
-		};
-		
-		var paths = [];
-		var upNear = 0, downNear = 1, upFar = 2, downFar = 3;
-		
-		//for define VisibleVerge, as in bar charts
-		var point1 = pointsIn3D[downNear][0];
-		var point2 = pointsIn3D[downFar][0];
-		var point3 = pointsIn3D[downFar][pointsIn3D[downFar].length - 1];
-		var	point4 = pointsIn3D[downNear][pointsIn3D[downNear].length - 1];
-		
-		var	point5 = pointsIn3D[upNear][0];
-		var	point6 = pointsIn3D[upFar][0];
-		var	point7 = pointsIn3D[upFar][pointsIn3D[upFar].length - 1];
-		var	point8 = pointsIn3D[upNear][pointsIn3D[upNear].length - 1]
-		
-		
-		var p1 = point1.y > point5.y ? point1 : point5;
-		var p2 = point2.y > point6.y ? point2 : point6;
-		var p3 = point3.y > point7.y ? point3 : point7;
-		var	p4 = point4.y > point8.y ? point4 : point8;
-		
-		var	p5 = point1.y > point5.y ? point5 : point1;
-		var	p6 = point2.y < point6.y ? point2 : point6;
-		var	p7 = point3.y < point7.y ? point3 : point7;
-		var	p8 = point4.y > point8.y ? point8 : point4;
-		
-		//front
-		paths[0] = null;
-		if(this._isVisibleVerge3D(p5, p1, p4))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			drawVerge(upNear, false, true);
-			drawVerge(downNear, true);
-			path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			paths[0] = path;
-		}
-		
-		//down
-		paths[1] = null;
-		if(this._isVisibleVerge3D(point4, point1, point2))
-		{
-			var arrayPaths = drawUpDownFace(true);
-			paths[1] = arrayPaths;
-		}
-		
-		//left
-		paths[2] = null;
-		if(this._isVisibleVerge3D(p2, p1, p5))
-		{
-			var arrayPaths = calculateRect(pointsIn3D[0][0], pointsIn3D[1][0], pointsIn3D[3][0], pointsIn3D[2][0]);
-			paths[2] = arrayPaths;
-		}
-		
-		//right
-		paths[3] = null;
-		if(this._isVisibleVerge3D(p8, p4, p3))
-		{
-			var arrayPaths = calculateRect(pointsIn3D[0][pointsIn3D[0].length - 1], pointsIn3D[1][pointsIn3D[1].length - 1], pointsIn3D[3][pointsIn3D[3].length - 1], pointsIn3D[2][pointsIn3D[2].length - 1]);
-			paths[3] = arrayPaths;
-		}
-		
-		//up
-		paths[4] = null;
-		if(this._isVisibleVerge3D(point6, point5, point8))
-		{
-			var arrayPaths = drawUpDownFace();	
-			paths[4] = arrayPaths;
-		}
-		
-		//unfront
-		paths[5] = null;
-		if(this._isVisibleVerge3D(p7, p3, p2))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			drawVerge(upFar, false, true);
-			drawVerge(downFar, true);
-			path.lnTo(pointsIn3D[upFar][0].x / pxToMm * pathW, pointsIn3D[upFar][0].y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			paths[5] = path;
-		}
-		
-		return paths;
-	}, 
 	
 	_isVisibleVerge3D: function(k, n, m)
 	{
