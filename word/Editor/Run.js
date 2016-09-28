@@ -2449,7 +2449,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 					}
 					else if (para_FootnoteRef === ItemType)
 					{
-						Item.UpdateNumber();
+						Item.UpdateNumber(PRS.TopDocument);
 					}
 
                     // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.

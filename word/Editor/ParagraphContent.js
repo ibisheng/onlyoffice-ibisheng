@@ -7636,7 +7636,9 @@ ParaFootnoteReference.prototype.Measure = function(Context, TextPr, MathInfo, Ru
 };
 ParaFootnoteReference.prototype.Copy = function()
 {
-	return new ParaFootnoteReference(this.Footnote);
+	var oFootnote = this.Footnote.Parent.CreateFootnote();
+	oFootnote.Copy2(this.Footnote);
+	return new ParaFootnoteReference(oFootnote);
 };
 ParaFootnoteReference.prototype.Write_ToBinary = function(Writer)
 {
@@ -7775,12 +7777,19 @@ ParaFootnoteRef.prototype.Copy = function()
 {
 	return new ParaFootnoteRef(this.Get_Footnote());
 };
-ParaFootnoteRef.prototype.UpdateNumber = function()
+ParaFootnoteRef.prototype.UpdateNumber = function(oFootnote)
 {
-	if (this.Footnote)
+	this.Footnote = oFootnote;
+	if (this.Footnote && this.Footnote instanceof CFootEndnote)
 	{
 		this.Number    = this.Footnote.GetNumber();
 		this.NumFormat = this.Footnote.GetReferenceSectPr().GetFootnoteNumFormat();
+		this.private_Measure();
+	}
+	else
+	{
+		this.Number    = 1;
+		this.NumFormat = numbering_numfmt_Decimal;
 		this.private_Measure();
 	}
 };

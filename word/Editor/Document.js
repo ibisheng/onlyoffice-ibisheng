@@ -11440,45 +11440,12 @@ CDocument.prototype.AddFootnote = function(sText)
 		{
 			var oStyles    = this.Get_Styles();
 			var oFootnote  = this.Footnotes.CreateFootnote();
-			var oParagraph = oFootnote.Get_ElementByIndex(0);
+			oFootnote.AddDefaultFootnoteContent(sText);
 
 			if (sText)
-			{
-				oParagraph.Style_Add(oStyles.GetDefaultFootnoteText());
-				var oRun = new ParaRun(oParagraph, false);
-				oRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
-
-				for (var nIndex = 0, nLen = sText.length; nIndex < nLen; ++nIndex)
-				{
-					var nChar = sText.charAt(nIndex);
-
-					if (" " === nChar)
-						oRun.Add_ToContent(nIndex, new ParaSpace(), true);
-					else
-						oRun.Add_ToContent(nIndex, new ParaText(nChar), true);
-				}
-
-				oParagraph.Add_ToContent(0, oRun);
-				oRun = new ParaRun(oParagraph, false);
-				oRun.Add_ToContent(0, new ParaSpace());
-				oParagraph.Add_ToContent(1, oRun);
-				oFootnote.Cursor_MoveToEndPos(false);
-
 				this.Paragraph_Add(new ParaFootnoteReference(oFootnote, true, sText));
-			}
 			else
-			{
-				oParagraph.Style_Add(oStyles.GetDefaultFootnoteText());
-				var oRun = new ParaRun(oParagraph, false);
-				oRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
-				oRun.Add_ToContent(0, new ParaFootnoteRef(oFootnote));
-				oParagraph.Add_ToContent(0, oRun);
-				oRun = new ParaRun(oParagraph, false);
-				oRun.Add_ToContent(0, new ParaSpace());
-				oParagraph.Add_ToContent(1, oRun);
-				oFootnote.Cursor_MoveToEndPos(false);
 				this.Paragraph_Add(new ParaFootnoteReference(oFootnote));
-			}
 
 			this.Set_DocPosType(docpostype_Footnotes);
 			this.Footnotes.Set_CurrentElement(true, 0, oFootnote);

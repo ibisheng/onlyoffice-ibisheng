@@ -96,6 +96,38 @@ CFootEndnote.prototype.IsCustomMarkFollows = function()
 {
 	return this.CurtomMarkFollows;
 };
+CFootEndnote.prototype.AddDefaultFootnoteContent = function(sText)
+{
+	var oStyles    = this.LogicDocument.Get_Styles();
+	var oParagraph = this.Get_ElementByIndex(0);
+
+	oParagraph.Style_Add(oStyles.GetDefaultFootnoteText());
+	var oRun = new ParaRun(oParagraph, false);
+	oRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
+	if (sText)
+	{
+		for (var nIndex = 0, nLen = sText.length; nIndex < nLen; ++nIndex)
+		{
+			var nChar = sText.charAt(nIndex);
+
+			if (" " === nChar)
+				oRun.Add_ToContent(nIndex, new ParaSpace(), true);
+			else
+				oRun.Add_ToContent(nIndex, new ParaText(nChar), true);
+		}
+	}
+	else
+	{
+		oRun.Add_ToContent(0, new ParaFootnoteRef(this));
+	}
+
+	oParagraph.Add_ToContent(0, oRun);
+	oRun = new ParaRun(oParagraph, false);
+	oRun.Add_ToContent(0, new ParaSpace());
+	oParagraph.Add_ToContent(1, oRun);
+
+	this.Cursor_MoveToEndPos(false);
+};
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
