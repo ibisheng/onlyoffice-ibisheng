@@ -5453,98 +5453,51 @@ drawAreaChart.prototype =
 		
 		if(!isStacked)
 		{
-			var pointChangeDirection = ((this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right)) / 2 + this.chartProp.chartGutter._left) / this.chartProp.pxToMM;
-		
-			var view3DProp = this.cChartSpace.chart.view3D;
-			var angleOy = view3DProp && view3DProp.rotY ? (view3DProp.rotY / 360) * (Math.PI * 2) : 0;
-			
-			//поворот вокруг оси OY
-			//if(Math.abs(angleOy) > 30)
-				//pointChangeDirection = this.chartProp.chartGutter._left + this.chartProp.widthCanvas;
-				
-			pointChangeDirection = pointChangeDirection + (this.chartProp.widthCanvas / 2) * Math.sin(angleOy);
-			
-			//pointChangeDirection = pointChangeDirection * Math.cos(angleOx);
-			
-			/*if(this.chartProp.subType !== "standard")
+			var angle = Math.abs(this.cChartDrawer.processor3D.angleOy);
+			if(angle > Math.PI / 2 && angle < 3 * Math.PI / 2)
 			{
-				var brush, pen, seria;
-				for (var i = 0; i < this.chartProp.ptCount; i++) {	
-					for (var j = 0; j < this.paths.series.length; ++j) {
-						seria = this.chartProp.series[j];
-						brush = seria.brush;
-						pen = seria.pen;
-						
-						if(!this.paths.series[j] || !this.paths.series[j][i] || !seria.val.numRef.numCache.pts[i])
-							continue;
-						
-						if(seria.val.numRef.numCache.pts[i].pen)
-							pen = seria.val.numRef.numCache.pts[i].pen;
-						if(seria.val.numRef.numCache.pts[i].brush)
-							brush = seria.val.numRef.numCache.pts[i].brush;
-						
-						for(var k = 0; k < this.paths.series[j][i].length; k++)
-						{
-							if(this.paths.series[j][i][k] && this.paths.series[j][i][k].ArrPathCommand && this.paths.series[j][i][k].ArrPathCommand[0] && parseInt(this.paths.series[j][i][k].ArrPathCommand[0].X) >= parseInt(pointChangeDirection))
-								continue;
-							
-							this._drawBar3D(this.paths.series[j][i][k], pen, brush, k);
-						}
-					}
-				}
-			}*/
-			
-			
-			//вторую половину с конца рисуем
-			var brush, pen, seria;
-			if(this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked")
-			{
-				for (var j = 0 ; j < this.paths.series.length; j++) {
-					seria = this.chartProp.series[j];
-					brush = seria.brush;
-					pen = seria.pen;
-					
-					//if(!this.paths.series[j] || !this.paths.series[j][i] || !seria.val.numRef.numCache.pts[i])
-						//continue;
+				for (var j = 0; j < this.paths.series.length; j++) 
+				{
+					var seria = this.chartProp.series[j];
+					var brush = seria.brush;
+					var pen = seria.pen;
 					
 					if(seria.val.numRef.numCache.pts[0].pen)
 						pen = seria.val.numRef.numCache.pts[0].pen;
 					if(seria.val.numRef.numCache.pts[0].brush)
 						brush = seria.val.numRef.numCache.pts[0].brush;
 					
-					for(var k = this.paths.series[j].length - 1; k >=0 ; k--)
-					{
-						/*if(this.paths.series[j][i][k] && this.paths.series[j][i][k].ArrPathCommand && this.paths.series[j][i][k].ArrPathCommand[0] && parseInt(this.paths.series[j][i][k].ArrPathCommand[0].X) < parseInt(pointChangeDirection))
-							break;*/
-						
-						this._drawBar3D(this.paths.series[j][k], pen, brush, k);
-					}
+					this._drawBar3D(this.paths.series[j][1], pen, brush, 1);
+					this._drawBar3D(this.paths.series[j][4], pen, brush, 4);
+					this._drawBar3D(this.paths.series[j][2], pen, brush, 2);
+					this._drawBar3D(this.paths.series[j][3], pen, brush, 3);
+					this._drawBar3D(this.paths.series[j][5], pen, brush, 5);
+					this._drawBar3D(this.paths.series[j][0], pen, brush, 0);	
 				}
 			}
 			else
 			{
-				for (var j = this.paths.series.length - 1; j >= 0; j--) {
-					seria = this.chartProp.series[j];
-					brush = seria.brush;
-					pen = seria.pen;
-					
-					//if(!this.paths.series[j] || !this.paths.series[j][i] || !seria.val.numRef.numCache.pts[i])
-						//continue;
+				for (var j = this.paths.series.length - 1; j >= 0; j--) 
+				{
+					var seria = this.chartProp.series[j];
+					var brush = seria.brush;
+					var pen = seria.pen;
 					
 					if(seria.val.numRef.numCache.pts[0].pen)
 						pen = seria.val.numRef.numCache.pts[0].pen;
 					if(seria.val.numRef.numCache.pts[0].brush)
 						brush = seria.val.numRef.numCache.pts[0].brush;
 					
-					for(var k = this.paths.series[j].length - 1; k >=0 ; k--)
-					{
-						/*if(this.paths.series[j][i][k] && this.paths.series[j][i][k].ArrPathCommand && this.paths.series[j][i][k].ArrPathCommand[0] && parseInt(this.paths.series[j][i][k].ArrPathCommand[0].X) < parseInt(pointChangeDirection))
-							break;*/
-						
-						this._drawBar3D(this.paths.series[j][k], pen, brush, k);
-					}
+					this._drawBar3D(this.paths.series[j][1], pen, brush, 1);
+					this._drawBar3D(this.paths.series[j][4], pen, brush, 4);
+					this._drawBar3D(this.paths.series[j][2], pen, brush, 2);
+					this._drawBar3D(this.paths.series[j][3], pen, brush, 3);
+					this._drawBar3D(this.paths.series[j][5], pen, brush, 5);
+					this._drawBar3D(this.paths.series[j][0], pen, brush, 0);	
 				}
 			}
+			
+			
 		}
 		else
 		{
@@ -5673,9 +5626,9 @@ drawAreaChart.prototype =
 					}
 					else if(point1Up.y < point1Down.y && point2Up.y > point2Down.y)
 					{
-						path = calculateRect(point1Up, point1UpFar, point2UpFar, point2Up);
-						arrayPaths.push(path);
 						path = calculateRect(point1Down, point1DownFar, point2DownFar, point2Down);
+						arrayPaths.push(path);
+						path = calculateRect(point1Up, point1UpFar, point2UpFar, point2Up);
 						arrayPaths.push(path);
 					}
 					else
@@ -5726,148 +5679,19 @@ drawAreaChart.prototype =
 		var	point8 = pointsIn3D[upNear][pointsIn3D[upNear].length - 1]
 		
 		
-		//front
-		paths[0] = null;
-		if(this.darkFaces["front"])
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			drawVerge(upNear, false, true);
-			drawVerge(downNear, true);
-			path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			paths[0] = path;
-		}
+		var p1 = point1.y > point5.y ? point1 : point5;
+		var p2 = point2.y > point6.y ? point2 : point6;
+		var p3 = point3.y > point7.y ? point3 : point7;
+		var	p4 = point4.y > point8.y ? point4 : point8;
 		
-		//down
-		paths[1] = null;
-		if(this.darkFaces["down"])
-		{
-			var arrayPaths = drawUpDownFace(true);
-			paths[1] = arrayPaths;
-		}
-		
-		//left
-		paths[2] = null;
-		if(this.darkFaces["left"])
-		{
-			var arrayPaths = calculateRect(pointsIn3D[0][0], pointsIn3D[1][0], pointsIn3D[3][0], pointsIn3D[2][0]);
-			paths[2] = arrayPaths;
-		}
-		
-		//right
-		paths[3] = null;
-		if(this.darkFaces["right"])
-		{
-			var arrayPaths = calculateRect(pointsIn3D[0][pointsIn3D[0].length - 1], pointsIn3D[1][pointsIn3D[1].length - 1], pointsIn3D[3][pointsIn3D[3].length - 1], pointsIn3D[2][pointsIn3D[2].length - 1]);
-			paths[3] = arrayPaths;
-		}
-		
-		//up
-		paths[4] = null;
-		if(this.darkFaces["up"])
-		{
-			var arrayPaths = drawUpDownFace();	
-			paths[4] = arrayPaths;
-		}
-		
-		
-		//unfront
-		paths[5] = null;
-		if(this.darkFaces["unfront"])
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			drawVerge(upFar, false, true);
-			drawVerge(downFar, true);
-			path.lnTo(pointsIn3D[upFar][0].x / pxToMm * pathW, pointsIn3D[upFar][0].y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			paths[5] = path;
-		}
-		
-		return paths;
-	}, 
-	
-	_calculateRect3D2 : function(pointsIn3D)
-	{
-		var path;
-		var pxToMm = this.chartProp.pxToMM;
-		
-		var drawVerge = function(number, isReverse, isFirstPoint)
-		{
-			if(!isReverse)
-			{
-				for(var i = 0; i < pointsIn3D[number].length; i++)
-				{
-					if(i == 0 && isFirstPoint)
-						path.moveTo(pointsIn3D[number][i].x / pxToMm * pathW, pointsIn3D[number][i].y / pxToMm * pathH);
-					else
-						path.lnTo(pointsIn3D[number][i].x / pxToMm * pathW, pointsIn3D[number][i].y / pxToMm * pathH);
-				}
-			}
-			else
-			{
-				for(var i = pointsIn3D[number].length - 1; i >= 0; i--)
-				{
-					if(i == pointsIn3D[number].length - 1 && isFirstPoint)
-						path.moveTo(pointsIn3D[number][i].x / pxToMm * pathW, pointsIn3D[number][i].y / pxToMm * pathH);
-					else
-						path.lnTo(pointsIn3D[number][i].x / pxToMm * pathW, pointsIn3D[number][i].y / pxToMm * pathH);
-				}
-			}
-		};
-		
-		var drawVerge1 = function(number, number1)
-		{
-			var arrayPaths = [];
-			for(var i = 0; i < pointsIn3D[number].length - 1; i++)
-			{
-				path  = new Path();
-				path.pathH = pathH;
-				path.pathW = pathW;
-				//рисуем параллепипеды, из которых состоит линия
-				path.moveTo(pointsIn3D[number][i].x / pxToMm * pathW, pointsIn3D[number][i].y / pxToMm * pathH);
-				path.lnTo(pointsIn3D[number][i + 1].x / pxToMm * pathW, pointsIn3D[number][i + 1].y / pxToMm * pathH);
-				path.lnTo(pointsIn3D[number1][i + 1].x / pxToMm * pathW, pointsIn3D[number1][i + 1].y / pxToMm * pathH);
-				path.lnTo(pointsIn3D[number1][i].x / pxToMm * pathW, pointsIn3D[number1][i].y / pxToMm * pathH);
-				path.lnTo(pointsIn3D[number][i].x / pxToMm * pathW, pointsIn3D[number][i].y / pxToMm * pathH);
-				path.recalculate(gdLst);
-				arrayPaths.push(path);
-			}
-			return arrayPaths;
-		};
-		
-		var pathH = this.chartProp.pathH;
-		var pathW = this.chartProp.pathW;
-		var gdLst = [];
-		
-		gdLst["w"] = 1;
-		gdLst["h"] = 1;
-		
-		var paths = [];
-		var upNear = 0, downNear = 1, upFar = 2, downFar = 3;
-		
-		//for define VisibleVerge, as in bar charts
-		var point1 = pointsIn3D[downNear][0];
-		var point2 = pointsIn3D[downFar][0];
-		var point3 = pointsIn3D[downFar][pointsIn3D[downFar].length - 1];
-		var	point4 = pointsIn3D[downNear][pointsIn3D[downNear].length - 1];
-		
-		var	point5 = pointsIn3D[upNear][0];
-		var	point6 = pointsIn3D[upFar][0];
-		var	point7 = pointsIn3D[upFar][pointsIn3D[upFar].length - 1];
-		var	point8 = pointsIn3D[upNear][pointsIn3D[upNear].length - 1]
-		
+		var	p5 = point1.y > point5.y ? point5 : point1;
+		var	p6 = point2.y < point6.y ? point2 : point6;
+		var	p7 = point3.y < point7.y ? point3 : point7;
+		var	p8 = point4.y > point8.y ? point8 : point4;
 		
 		//front
 		paths[0] = null;
-		if(this._isVisibleVerge3D(point5, point1, point4))
+		if(this._isVisibleVerge3D(p5, p1, p4))
 		{
 			path  = new Path();
 			path.pathH = pathH;
@@ -5885,82 +5709,37 @@ drawAreaChart.prototype =
 		paths[1] = null;
 		if(this._isVisibleVerge3D(point4, point1, point2))
 		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			path.moveTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			drawVerge(downFar);
-			drawVerge(downNear, true);
-			
-			path.recalculate(gdLst);
-			paths[1] = path;
+			var arrayPaths = drawUpDownFace(true);
+			paths[1] = arrayPaths;
 		}
 		
 		//left
 		paths[2] = null;
-		if(this._isVisibleVerge3D(point2, point1, point5))
+		if(this._isVisibleVerge3D(p2, p1, p5))
 		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			path.moveTo(pointsIn3D[0][0].x / pxToMm * pathW, pointsIn3D[0][0].y / pxToMm * pathH);
-			path.lnTo(pointsIn3D[1][0].x / pxToMm * pathW, pointsIn3D[1][0].y / pxToMm * pathH);
-			path.lnTo(pointsIn3D[3][0].x / pxToMm * pathW, pointsIn3D[3][0].y / pxToMm * pathH);
-			path.lnTo(pointsIn3D[2][0].x / pxToMm * pathW, pointsIn3D[2][0].y / pxToMm * pathH);
-			path.lnTo(pointsIn3D[0][0].x / pxToMm * pathW, pointsIn3D[0][0].y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			paths[2] = path;
+			var arrayPaths = calculateRect(pointsIn3D[0][0], pointsIn3D[1][0], pointsIn3D[3][0], pointsIn3D[2][0]);
+			paths[2] = arrayPaths;
 		}
 		
 		//right
 		paths[3] = null;
-		if(this._isVisibleVerge3D(point8, point4, point3))
+		if(this._isVisibleVerge3D(p8, p4, p3))
 		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			path.moveTo(pointsIn3D[0][pointsIn3D[0].length - 1].x / pxToMm * pathW, pointsIn3D[0][pointsIn3D[0].length - 1].y / pxToMm * pathH);
-			path.lnTo(pointsIn3D[1][pointsIn3D[1].length - 1].x / pxToMm * pathW, pointsIn3D[1][pointsIn3D[1].length - 1].y / pxToMm * pathH);
-			path.lnTo(pointsIn3D[3][pointsIn3D[3].length - 1].x / pxToMm * pathW, pointsIn3D[3][pointsIn3D[3].length - 1].y / pxToMm * pathH);
-			path.lnTo(pointsIn3D[2][pointsIn3D[2].length - 1].x / pxToMm * pathW, pointsIn3D[2][pointsIn3D[2].length - 1].y / pxToMm * pathH);
-			path.lnTo(pointsIn3D[0][pointsIn3D[0].length - 1].x / pxToMm * pathW, pointsIn3D[0][pointsIn3D[0].length - 1].y / pxToMm * pathH);
-			
-			path.recalculate(gdLst);
-			paths[3] = path;
+			var arrayPaths = calculateRect(pointsIn3D[0][pointsIn3D[0].length - 1], pointsIn3D[1][pointsIn3D[1].length - 1], pointsIn3D[3][pointsIn3D[3].length - 1], pointsIn3D[2][pointsIn3D[2].length - 1]);
+			paths[3] = arrayPaths;
 		}
 		
 		//up
 		paths[4] = null;
 		if(this._isVisibleVerge3D(point6, point5, point8))
 		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			//path.moveTo(pointsIn3D[0][0].x / pxToMm * pathW, pointsIn3D[0][0].y / pxToMm * pathH);
-			
-			/*path.lnTo(pointsIn3D[1][pointsIn3D[1].length - 1].x / pxToMm * pathW, pointsIn3D[1][pointsIn3D[1].length - 1].y / pxToMm * pathH);
-			path.lnTo(pointsIn3D[3][pointsIn3D[3].length - 1].x / pxToMm * pathW, pointsIn3D[3][pointsIn3D[3].length - 1].y / pxToMm * pathH);
-			path.lnTo(pointsIn3D[2][pointsIn3D[2].length - 1].x / pxToMm * pathW, pointsIn3D[2][pointsIn3D[2].length - 1].y / pxToMm * pathH);
-			path.lnTo(pointsIn3D[0][pointsIn3D[0].length - 1].x / pxToMm * pathW, pointsIn3D[0][pointsIn3D[0].length - 1].y / pxToMm * pathH);*/
-			
-			//drawVerge(upFar);
-			//drawVerge(upNear, true);
-			
-			var arrayPaths = drawVerge1(upNear, upFar);
-			
-			//path.recalculate(gdLst);
+			var arrayPaths = drawUpDownFace();	
 			paths[4] = arrayPaths;
 		}
 		
-		
 		//unfront
 		paths[5] = null;
-		if(this._isVisibleVerge3D(point3, point2, point6))
+		if(this._isVisibleVerge3D(p7, p3, p2))
 		{
 			path  = new Path();
 			path.pathH = pathH;
