@@ -352,7 +352,8 @@ CFootnotesController.prototype.ContinueElementsFromPreviousColumn = function(nPa
  * @param {number} nColumnAbs
  * @param {number} dY
  * @param {Array.CFootEndnote} arrFootnotes
- * @returns {boolean} true - расчиталось нормально, и перенос делать не надо, false - данные сноски перенеслись на следующую страницу
+ * @returns {boolean} true - расчиталось нормально, и перенос делать не надо, false - данные сноски перенеслись на
+ *     следующую страницу
  */
 CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumnAbs, dY, arrFootnotes)
 {
@@ -663,7 +664,11 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nCol
 					for (var nFootnoteIndex = 0, nTempCount = oColumn.Elements.length; nFootnoteIndex < nTempCount; ++nFootnoteIndex)
 					{
 						var oFootnote = oColumn.Elements[nFootnoteIndex];
-						if (oFootnote && true !== oFootnote.IsCustomMarkFollows() && (0 !== nFootnoteIndex || oFootnote.Pages.length <= 1))
+						if (oFootnote
+							&& true !== oFootnote.IsCustomMarkFollows()
+							&& (0 !== nFootnoteIndex
+							|| oFootnote.Pages.length <= 1
+							|| (0 === nFootnoteIndex && 1 === oColumn.Elements.length && nPageIndex === oFootnote.Get_StartPage_Absolute() && nColumnIndex === oFootnote.Get_StartColumn_Absolute())))
 							nFootnotesCount++;
 					}
 				}
