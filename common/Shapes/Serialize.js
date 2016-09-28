@@ -160,6 +160,7 @@ function BinaryPPTYLoader()
     this.RebuildImages = [];
 
     this.textBodyTextFit = [];
+	this.DocReadResult = null;
 
     this.Start_UseFullUrl = function()
     {
@@ -8062,6 +8063,42 @@ function BinaryPPTYLoader()
                                 }
                                 break;
                             }
+							case AscFormat.PARRUN_TYPE_MATHPARA:
+							case AscFormat.PARRUN_TYPE_MATH:
+							{
+								var _end = s.cur + s.GetULong() + 4;
+
+								var _stream = new AscCommon.FT_Stream2();
+								_stream.data = s.data;
+								_stream.pos = s.pos;
+								_stream.cur = s.cur;
+								_stream.size = s.size;
+								var parContentOld = par.Content.length;
+
+								var oParStruct = new OpenParStruct(par, par);
+								if (!this.DocReadResult) {
+									this.DocReadResult = new AscCommonWord.DocReadResult(null);
+								}
+								var boMathr = new Binary_oMathReader(_stream, this.DocReadResult, null);
+								var nDocLength = _stream.GetULongLE();
+								if (AscFormat.PARRUN_TYPE_MATHPARA == _type) {
+									var props = {};
+									boMathr.bcr.Read1(nDocLength, function(t, l){
+										return boMathr.ReadMathOMathPara(t,l,oParStruct, props);
+									});
+								} else {
+									var oMath = new ParaMath();
+									oParStruct.addToContent(oMath);
+									boMathr.bcr.Read1(nDocLength, function(t, l){
+										return boMathr.ReadMathArg(t,l,oMath.Root,oParStruct);
+									});
+									oMath.Root.Correct_Content(true);
+								}
+								s.Seek2(_end);
+
+								EndPos += par.Content.length - parContentOld;
+								break;
+							}
                             default:
                                 break;
                         }
@@ -8622,6 +8659,41 @@ function CPres()
             this.LogicDocument = oLogicDocument;
             return oNewSpPr;
         };
+		
+		this.ReadRunProperties = function(stream, type)
+		{
+			if (this.Reader == null)
+				this.Reader = new AscCommon.BinaryPPTYLoader();
+
+			var oLogicDocument = this.LogicDocument;
+			this.LogicDocument = null;
+
+			this.Reader.ImageMapChecker = this.ImageMapChecker;
+
+			if (null == this.stream)
+			{
+				this.stream = new AscCommon.FileStream();
+				this.stream.obj	= stream.obj;
+				this.stream.data   = stream.data;
+				this.stream.size   = stream.size;
+			}
+
+			this.stream.pos	= stream.pos;
+			this.stream.cur	= stream.cur;
+
+			this.Reader.stream = this.stream;
+
+			var s = this.stream;
+			var _main_type = s.GetUChar(); // 0!!!
+
+			var oNewrPr = this.Reader.ReadRunProperties();
+
+			stream.pos = s.pos;
+			stream.cur = s.cur;
+
+			this.LogicDocument = oLogicDocument;
+			return oNewrPr;
+		};
 
         this.ReadShape = function()
         {
