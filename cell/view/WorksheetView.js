@@ -312,7 +312,7 @@
      * @constructor
      * @memberOf Asc
      */
-    function WorksheetView( model, handlers, buffers, stringRender, maxDigitWidth, collaborativeEditing, settings ) {
+    function WorksheetView(model, handlers, buffers, stringRender, maxDigitWidth, collaborativeEditing, settings) {
         this.settings = settings;
 
         this.vspRatio = 1.275;
@@ -372,8 +372,8 @@
         this.highlightedCol = -1;
         this.highlightedRow = -1;
         this.topLeftFrozenCell = null;	// Верхняя ячейка для закрепления диапазона
-        this.visibleRange = new asc_Range( 0, 0, 0, 0 );
-        this.activeRange = new asc_ActiveRange( 0, 0, 0, 0 );
+        this.visibleRange = new asc_Range(0, 0, 0, 0);
+        this.activeRange = new asc_ActiveRange(0, 0, 0, 0);
         this.isChanged = false;
         this.isCellEditMode = false;
         this.isFormulaEditMode = false;
@@ -413,7 +413,7 @@
 
         this.collaborativeEditing = collaborativeEditing;
 
-        this.drawingArea = new AscFormat.DrawingArea( this );
+        this.drawingArea = new AscFormat.DrawingArea(this);
         this.cellCommentator = new AscCommonExcel.CCellCommentator(this);
         this.objectRender = null;
 
@@ -597,21 +597,21 @@
         return (this.rows[row].top - offsetY) * asc_getcvt( 1/*pt*/, u, this._getPPIY() );
     };
 
-    WorksheetView.prototype.getColumnWidth = function ( index, units ) {
-        if ( index >= 0 && index < this.cols.length ) {
+    WorksheetView.prototype.getColumnWidth = function (index, units) {
+        if (index >= 0 && index < this.cols.length) {
             var u = units >= 0 && units <= 3 ? units : 0;
-            return this.cols[index].width * asc_getcvt( 1/*pt*/, u, this._getPPIX() );
+            return this.cols[index].width * asc_getcvt(1/*pt*/, u, this._getPPIX());
         }
         return null;
     };
 
     WorksheetView.prototype.getSelectedColumnWidthInSymbols = function () {
         var c, res = null;
-        for ( c = this.activeRange.c1; c <= this.activeRange.c2 && c < this.cols.length; ++c ) {
-            if ( null === res ) {
+        var range = this.selection.getLast();
+        for (c = range.c1; c <= range.c2 && c < this.cols.length; ++c) {
+            if (null === res) {
                 res = this.cols[c].charCount;
-            }
-            else if ( res !== this.cols[c].charCount ) {
+            } else if (res !== this.cols[c].charCount) {
                 return null;
             }
         }
@@ -621,11 +621,11 @@
 
     WorksheetView.prototype.getSelectedRowHeight = function () {
         var r, res = null;
-        for ( r = this.activeRange.r1; r <= this.activeRange.r2 && r < this.rows.length; ++r ) {
-            if ( null === res ) {
+        var range = this.selection.getLast();
+        for (r = range.r1; r <= range.r2 && r < this.rows.length; ++r) {
+            if (null === res) {
                 res = this.rows[r].heightReal;
-            }
-            else if ( res !== this.rows[r].heightReal ) {
+            } else if (res !== this.rows[r].heightReal) {
                 return null;
             }
         }
@@ -633,24 +633,25 @@
         return res;
     };
 
-    WorksheetView.prototype.getRowHeight = function ( index, units ) {
-        if ( index >= 0 && index < this.rows.length ) {
+    WorksheetView.prototype.getRowHeight = function (index, units) {
+        if (index >= 0 && index < this.rows.length) {
             var u = units >= 0 && units <= 3 ? units : 0;
-            return this.rows[index].height * asc_getcvt( 1/*pt*/, u, this._getPPIY() );
+            return this.rows[index].height * asc_getcvt(1/*pt*/, u, this._getPPIY());
         }
         return null;
     };
 
     WorksheetView.prototype.getSelectedColumnIndex = function () {
-        return this.activeRange.startCol;
+        return this.selectionRange.col;
     };
 
     WorksheetView.prototype.getSelectedRowIndex = function () {
-        return this.activeRange.startRow;
+        return this.selectionRange.row;
     };
 
     WorksheetView.prototype.getSelectedRange = function () {
-        return this._getRange( this.activeRange.c1, this.activeRange.r1, this.activeRange.c2, this.activeRange.r2 );
+        var cell = this.selectionRange.cell;
+        return this._getRange(cell.c1, cell.r1, cell.c2, cell.r2);
     };
 
     WorksheetView.prototype.resize = function (isUpdate) {
@@ -7271,7 +7272,7 @@
 
     // Получаем координаты активной ячейки
     WorksheetView.prototype.getActiveCellCoord = function () {
-        return this.getCellCoord(this.activeRange.startCol, this.activeRange.startRow);
+        return this.getCellCoord(this.selectionRange.cell.col, this.selectionRange.cell.row);
     };
     WorksheetView.prototype.getCellCoord = function (col, row) {
         var offsetX = 0, offsetY = 0;
@@ -8604,9 +8605,11 @@
 
         var t = this;
         var checkRange = null;
-        var arn = t.activeRange.clone(true);
+        var cell = this.selectionRange.cell.clone();
+        var arn = t.selectionRange.getLast().clone(true);
         if (onlyActive) {
-            checkRange = new asc_Range(arn.startCol, arn.startRow, arn.startCol, arn.startRow);
+            checkRange =
+              new asc_Range(cell.col, cell.row, cell.col, cell.row);
         } else {
             checkRange = arn.getAllRange();
         }
@@ -8620,7 +8623,7 @@
             var bIsUpdate = true;
 
             if (onlyActive) {
-                range = t.model.getRange3(arn.startRow, arn.startCol, arn.startRow, arn.startCol);
+                range = t.model.getRange3(cell.row, cell.col, cell.row, cell.col);
             } else {
                 if (c_oAscSelectionType.RangeMax === arn.type) {
                     range = t.model.getRange3(/*arn.r1*/0, /*arn.c1*/0, gc_nMaxRow0, gc_nMaxCol0);
@@ -8818,9 +8821,9 @@
                     canChangeColWidth = c_oAscCanChangeColWidth.numbers;
                     break;
                 case "changeFontSize":
-                    mc = t.model.getMergedByCell(arn.startRow, arn.startCol);
-                    c = mc ? mc.c1 : arn.startCol;
-                    r = mc ? mc.r1 : arn.startRow;
+                    mc = t.model.getMergedByCell(cell.row, cell.col);
+                    c = mc ? mc.c1 : cell.col;
+                    r = mc ? mc.r1 : cell.row;
                     cell = t._getVisibleCell(c, r);
                     if (undefined !== cell) {
                         var oldFontSize = cell.getFontsize();
@@ -8854,9 +8857,9 @@
                         val.hyperlinkModel.Ref = range;
                         range.setHyperlink(val.hyperlinkModel);
                         // Вставим текст в активную ячейку (а не так, как MSExcel в первую ячейку диапазона)
-                        mc = t.model.getMergedByCell(arn.startRow, arn.startCol);
-                        c = mc ? mc.c1 : arn.startCol;
-                        r = mc ? mc.r1 : arn.startRow;
+                        mc = t.model.getMergedByCell(cell.row, cell.col);
+                        c = mc ? mc.c1 : cell.col;
+                        r = mc ? mc.r1 : cell.row;
                         if (null !== val.asc_getText()) {
                             t.model.getRange3(r, c, r, c).setValue(val.asc_getText());
                             // Вызываем функцию пересчета для заголовков форматированной таблицы
