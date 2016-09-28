@@ -444,7 +444,7 @@ ParaRun.prototype.Add = function(Item, bMath)
             if (para_Run === PrevElement.Type && DstReviewType === PrevElement.Get_ReviewType() && true === this.Pr.Is_Equal(PrevElement.Pr) && PrevElement.ReviewInfo && true === PrevElement.ReviewInfo.Is_CurrentUser())
             {
                 PrevElement.State.ContentPos = PrevElement.Content.length;
-                PrevElement.Add_ToContent(PrevElement.Content.length, Item, true);
+                PrevElement.private_AddItemToRun(PrevElement.Content.length, Item);
                 PrevElement.Make_ThisElementCurrent();
                 return;
             }
@@ -456,7 +456,7 @@ ParaRun.prototype.Add = function(Item, bMath)
             if (para_Run === NextElement.Type && DstReviewType === NextElement.Get_ReviewType() && true === this.Pr.Is_Equal(NextElement.Pr) && NextElement.ReviewInfo && true === NextElement.ReviewInfo.Is_CurrentUser())
             {
                 NextElement.State.ContentPos = 0;
-                NextElement.Add_ToContent(0, Item, true);
+                NextElement.private_AddItemToRun(0, Item);
                 NextElement.Make_ThisElementCurrent();
                 return;
             }
@@ -466,7 +466,7 @@ ParaRun.prototype.Add = function(Item, bMath)
         var NewRun = new ParaRun(this.Paragraph, bMath);
         NewRun.Set_Pr(this.Pr.Copy());
         NewRun.Set_ReviewType(DstReviewType);
-        NewRun.Add_ToContent(0, Item, true);
+        NewRun.private_AddItemToRun(0, Item);
 
         if (0 === CurPos)
             Parent.Add_ToContent(RunPos, NewRun);
@@ -492,7 +492,7 @@ ParaRun.prototype.Add = function(Item, bMath)
     {
         var NewRun = new ParaRun(this.Paragraph, bMath);
         NewRun.Set_Pr(this.Pr.Copy());
-        NewRun.Add_ToContent(0, Item, true);
+        NewRun.private_AddItemToRun(0, Item);
 
         // Ищем данный элемент в родительском классе
         var RunPos = this.private_GetPosInParent(this.Parent);
@@ -500,7 +500,9 @@ ParaRun.prototype.Add = function(Item, bMath)
         this.Parent.Internal_Content_Add(RunPos, NewRun, true);
     }
     else
-        this.Add_ToContent(this.State.ContentPos, Item, true);
+	{
+		this.private_AddItemToRun(this.State.ContentPos, Item);
+	}
 };
 
 ParaRun.prototype.private_SplitRunInCurPos = function()
@@ -550,6 +552,29 @@ ParaRun.prototype.private_IsCurPosNearFootnoteReference = function()
 
 	return false;
 };
+ParaRun.prototype.private_AddItemToRun = function(nPos, Item)
+{
+	if (para_FootnoteReference === Item.Type && true === Item.IsCustomMarkFollows() && undefined !== Item.GetCustomText())
+	{
+		this.Add_ToContent(nPos, Item, true);
+
+		var sCustomText = Item.GetCustomText();
+		for (var nIndex = 0, nLen = sCustomText.length; nIndex < nLen; ++nIndex)
+		{
+			var nChar = sCustomText.charAt(nIndex);
+
+			if (" " === nChar)
+				this.Add_ToContent(nPos + 1 + nIndex, new ParaSpace(), true);
+			else
+				this.Add_ToContent(nPos + 1 + nIndex, new ParaText(nChar), true);
+		}
+	}
+	else
+	{
+		this.Add_ToContent(nPos, Item, true);
+	}
+};
+
 
 ParaRun.prototype.Remove = function(Direction, bOnAddText)
 {

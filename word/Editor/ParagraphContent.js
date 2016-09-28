@@ -7567,13 +7567,15 @@ ParaPresentationNumbering.prototype =
  * Класс представляющий ссылку на сноску.
  * @param {CFootEndnote} Footnote - Ссылка на сноску.
  * @param {string} CustomMark
+ * @param {string?} CustomText
  * @constructor
  * @extends {CRunElementBase}
  */
-function ParaFootnoteReference(Footnote, CustomMark)
+function ParaFootnoteReference(Footnote, CustomMark, CustomText)
 {
 	this.Footnote   = Footnote;
 	this.CustomMark = CustomMark ? CustomMark : undefined;
+	this.CustomText = CustomText ? CustomText : undefined;
 
 	this.Width        = 0;
 	this.WidthVisible = 0;
@@ -7747,6 +7749,10 @@ ParaFootnoteReference.prototype.private_GetString = function()
 ParaFootnoteReference.prototype.IsCustomMarkFollows = function()
 {
 	return (true === this.CustomMark ? true : false);
+};
+ParaFootnoteReference.prototype.GetCustomText = function()
+{
+	return this.CustomText;
 };
 
 /**
