@@ -1986,8 +1986,8 @@ var editor;
     if (window["NATIVE_EDITOR_ENJINE"]) {
       if (this.wb.findCellText(options)) {
         var ws = this.wb.getWorksheet();
-        var range = ws.selectionRange.getLast();
-        return [ws.getCellLeftRelative(range.c1, 0), ws.getCellTopRelative(range.r1, 0)];
+        var activeCell = this.wbModel.getActiveWs().selectionRange.activeCell;
+        return [ws.getCellLeftRelative(activeCell.col, 0), ws.getCellTopRelative(activeCell.row, 0)];
       }
 
       return null;

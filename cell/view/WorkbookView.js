@@ -851,7 +851,7 @@
 
   WorkbookView.prototype._onWSSelectionChanged = function(info) {
     var ws = this.cellFormulaEnterWSOpen ? this.cellFormulaEnterWSOpen : this.getWorksheet();
-    this.lastSendInfoRange = ws.selectionRange.getLast().clone(true);
+    this.lastSendInfoRange = ws.model.selectionRange.getLast().clone(true);
     this.lastSendInfoRangeIsSelectOnShape = ws.getSelectionShape();
 
     if (null === info) {
@@ -959,7 +959,7 @@
     ws.changeSelectionDone();
     this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
     // Проверим, нужно ли отсылать информацию о ячейке
-    var ar = ws.selectionRange.getLast();
+    var ar = ws.model.selectionRange.getLast();
     var isSelectOnShape = ws.getSelectionShape();
     if (!this._isEqualRange(ar, isSelectOnShape)) {
       this._onWSSelectionChanged(ws.getSelectionInfo());
@@ -1199,7 +1199,7 @@
 
   WorkbookView.prototype._onShowAutoComplete = function() {
     var ws = this.getWorksheet();
-    var arrValues = ws.getCellAutoCompleteValues(ws.selectionRange.cell);
+    var arrValues = ws.getCellAutoCompleteValues(ws.model.selectionRange.activeCell);
     this.handlers.trigger('asc_onEntriesListMenu', arrValues);
   };
 
@@ -1309,7 +1309,7 @@
 
     var ws = t.getWorksheet();
     var activeCellRange = ws.getActiveCell(0, 0, false);
-    var selectionRange = ws.selectionRange.clone();
+    var selectionRange = ws.model.selectionRange.clone();
 
     var editFunction = function() {
       t.setCellEditMode(true);
@@ -1557,7 +1557,7 @@
     if (c_oAscSelectionDialogType.Chart === this.selectionDialogType) {
       // Когда идет выбор диапазона, то должны на закрываемом листе отменить выбор диапазона
       tmpWorksheet = this.getWorksheet();
-      selectionRange = tmpWorksheet.selectionRange.getLast().clone(true);
+      selectionRange = tmpWorksheet.model.selectionRange.getLast().clone(true);
       tmpWorksheet.setSelectionDialogMode(c_oAscSelectionDialogType.None);
     }
     if (this.stateFormatPainter) {
@@ -1965,7 +1965,7 @@
         cursorPos = name.length - 1;
       }
 
-      var selectionRange = ws.selectionRange.clone();
+      var selectionRange = ws.model.selectionRange.clone();
 
       var openEditor = function(res) {
         if (res) {

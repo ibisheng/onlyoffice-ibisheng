@@ -2327,8 +2327,9 @@ function DrawingObjects() {
                     var drawingObject = _this.createDrawingObject();
                     drawingObject.worksheet = worksheet;
 
-                    drawingObject.from.col = isOption ? options.cell.col : worksheet.getSelectedColumnIndex();
-                    drawingObject.from.row = isOption ? options.cell.row : worksheet.getSelectedRowIndex();
+                    var activeCell = worksheet.model.selectionRange.activeCell;
+                    drawingObject.from.col = isOption ? options.cell.col : activeCell.col;
+                    drawingObject.from.row = isOption ? options.cell.row : activeCell.row;
 
                     // Проверяем начальные координаты при вставке
                     while (!worksheet.cols[drawingObject.from.col]) {
@@ -3447,8 +3448,9 @@ function DrawingObjects() {
         var drawingObject = _this.createDrawingObject();
         drawingObject.worksheet = worksheet;
 
-        drawingObject.from.col = worksheet.getSelectedColumnIndex();
-        drawingObject.from.row = worksheet.getSelectedRowIndex();
+        var activeCell = worksheet.model.selectionRange.activeCell;
+        drawingObject.from.col = activeCell.ccol;
+        drawingObject.from.row = activeCell.row;
 
         // Проверяем начальные координаты при вставке
         while (!worksheet.cols[drawingObject.from.col]) {

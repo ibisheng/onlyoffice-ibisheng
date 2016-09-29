@@ -4458,10 +4458,11 @@ function OfflineEditor () {
                 var drawingObject = _this.createDrawingObject();
                 drawingObject.worksheet = worksheet;
 
+                var activeCell = worksheet.model.selectionRange.activeCell;
                 drawingObject.from.col = //isOption ? options.cell.col :
-                    worksheet.getSelectedColumnIndex();
+                  activeCell.col;
                 drawingObject.from.row = //isOption ? options.cell.row :
-                    worksheet.getSelectedRowIndex();
+                  activeCell.row;
 
                 // Проверяем начальные координаты при вставке
                 while (!worksheet.cols[drawingObject.from.col]) {

@@ -565,13 +565,13 @@
 		 */
 		function SelectionRange() {
 			this.ranges = [new Range(0, 0, 0, 0)];
-			this.cell = new AscCommon.CellBase(0, 0); // Active cell
-			this.cellIndex = 0;
+			this.activeCell = new AscCommon.CellBase(0, 0); // Active cell
+			this.activeCellId = 0;
 		}
 
 		SelectionRange.prototype.clean = function () {
 			this.ranges = [new Range(0, 0, 0, 0)];
-			this.cellIndex = -1;
+			this.activeCellId = -1;
 		};
 		SelectionRange.prototype.contains = function (c, r) {
 			return this.ranges.some(function (item) {
@@ -586,61 +586,61 @@
 			res.ranges = this.ranges.map(function (range) {
 				return range.clone();
 			});
-			res.cell = this.cell.clone();
+			res.cell = this.activeCell.clone();
 			return res;
 		};
 		SelectionRange.prototype.isEqual = function (range) {
 			return false;
-			// todo return this.cell.isEqual(range.cell);
+			// todo return this.activeCell.isEqual(range.cell);
 		};
 		SelectionRange.prototype.addRange = function () {
 			this.ranges.push(new Range(0, 0, 0, 0));
-			this.cellIndex = -1;
-			this.cell.clean();
+			this.activeCellId = -1;
+			this.activeCell.clean();
 		};
 		SelectionRange.prototype.offsetCell = function (dr, dc) {
 			var curRange;
-			var lastRow = this.cell.row;
-			var lastCol = this.cell.col;
-			this.cell.row += dr;
-			this.cell.col += dc;
+			var lastRow = this.activeCell.row;
+			var lastCol = this.activeCell.col;
+			this.activeCell.row += dr;
+			this.activeCell.col += dc;
 
 			while (true) {
-				curRange = this.ranges[this.cellIndex];
-				if (!curRange.contains2(this.cell)) {
+				curRange = this.ranges[this.activeCellId];
+				if (!curRange.contains2(this.activeCell)) {
 					if (dr) {
 						if (0 < dr) {
-							this.cell.row = curRange.r1;
-							this.cell.col += 1;
+							this.activeCell.row = curRange.r1;
+							this.activeCell.col += 1;
 						} else {
-							this.cell.row = curRange.r2;
-							this.cell.col -= 1;
+							this.activeCell.row = curRange.r2;
+							this.activeCell.col -= 1;
 						}
 					} else {
 						if (0 < dc) {
-							this.cell.row += 1;
-							this.cell.col = curRange.c1;
+							this.activeCell.row += 1;
+							this.activeCell.col = curRange.c1;
 						} else {
-							this.cell.row -= 1;
-							this.cell.col = curRange.c2;
+							this.activeCell.row -= 1;
+							this.activeCell.col = curRange.c2;
 						}
 					}
 
-					if (!curRange.contains2(this.cell)) {
+					if (!curRange.contains2(this.activeCell)) {
 						if (0 < dc || 0 < dr) {
-							this.cellIndex += 1;
-							this.cellIndex = (this.ranges.length > this.cellIndex) ? this.cellIndex : 0;
-							curRange = this.ranges[this.cellIndex];
+							this.activeCellId += 1;
+							this.activeCellId = (this.ranges.length > this.activeCellId) ? this.activeCellId : 0;
+							curRange = this.ranges[this.activeCellId];
 
-							this.cell.row = curRange.r1;
-							this.cell.col = curRange.c1;
+							this.activeCell.row = curRange.r1;
+							this.activeCell.col = curRange.c1;
 						} else {
-							this.cellIndex -= 1;
-							this.cellIndex = (0 <= this.cellIndex) ? this.cellIndex : this.ranges.length - 1;
-							curRange = this.ranges[this.cellIndex];
+							this.activeCellId -= 1;
+							this.activeCellId = (0 <= this.activeCellId) ? this.activeCellId : this.ranges.length - 1;
+							curRange = this.ranges[this.activeCellId];
 
-							this.cell.row = curRange.r2;
-							this.cell.col = curRange.c2;
+							this.activeCell.row = curRange.r2;
+							this.activeCell.col = curRange.c2;
 						}
 					}
 				}
@@ -648,25 +648,28 @@
 				// ToDo merge and hidden
 				break;
 			}
-			return (lastRow !== this.cell.row || lastCol !== this.cell.col)
+			return (lastRow !== this.activeCell.row || lastCol !== this.activeCell.col)
 		};
 		SelectionRange.prototype.setCell = function (r, c) {
-			this.cell.row = r;
-			this.cell.col = c;
+			this.activeCell.row = r;
+			this.activeCell.col = c;
 			this.update();
 		};
 		SelectionRange.prototype.getLast = function () {
 			return this.ranges[this.ranges.length - 1];
 		};
+		SelectionRange.prototype.isSingleRange = function () {
+			return 1 === this.ranges.length;
+		};
 		SelectionRange.prototype.update = function () {
 			//меняем выделеную ячейку, если она не входит в диапазон
 			//возможно, в будующем придется пределать логику, пока нет примеров, когда это работает плохо
-			var range = this.ranges[this.cellIndex];
-			if (!range || !range.contains(this.cell.col, this.cell.row)) {
+			var range = this.ranges[this.activeCellId];
+			if (!range || !range.contains(this.activeCell.col, this.activeCell.row)) {
 				range = this.getLast();
-				this.cell.col = range.c1;
-				this.cell.row = range.r1;
-				this.cellIndex = this.ranges.length - 1;
+				this.activeCell.col = range.c1;
+				this.activeCell.row = range.r1;
+				this.activeCellId = this.ranges.length - 1;
 			}
 		};
 

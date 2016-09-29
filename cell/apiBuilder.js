@@ -116,7 +116,7 @@
 	 * @returns {ApiRange}
 	 */
 	ApiWorksheet.prototype.GetActiveCell = function () {
-		var cell = this.worksheetView.selectionRange.cell;
+		var cell = this.worksheet.selectionRange.activeCell;
 		return new ApiRange(this.worksheet.getCell3(cell.row, cell.col));
 	};
 

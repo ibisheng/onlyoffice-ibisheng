@@ -381,8 +381,6 @@
         this.lockDraw = false;
         this.isSelectOnShape = false;	// Выделен shape
 
-        this.selectionRange = new AscCommonExcel.SelectionRange();
-
         this.stateFormatPainter = c_oAscFormatPainterState.kOff;
 
         this.selectionDialogType = c_oAscSelectionDialogType.None;
@@ -641,17 +639,8 @@
         return null;
     };
 
-    WorksheetView.prototype.getSelectedColumnIndex = function () {
-        return this.selectionRange.col;
-    };
-
-    WorksheetView.prototype.getSelectedRowIndex = function () {
-        return this.selectionRange.row;
-    };
-
     WorksheetView.prototype.getSelectedRange = function () {
-        var cell = this.selectionRange.cell;
-        return this._getRange(cell.c1, cell.r1, cell.c2, cell.r2);
+        throw "ToDo check this method!!!";
     };
 
     WorksheetView.prototype.resize = function (isUpdate) {
@@ -2051,7 +2040,8 @@
     };
 
     WorksheetView.prototype._doCleanHighlightedHeaders = function () {
-        var hlc = this.highlightedCol, hlr = this.highlightedRow, arn = this.selectionRange.getLast();
+        // ToDo highlighted!
+        var hlc = this.highlightedCol, hlr = this.highlightedRow, arn = this.model.selectionRange.getLast();
         var hStyle = this.objectRender.selectedGraphicObjectsExists() ? kHeaderDefault : kHeaderActive;
         if (hlc >= 0) {
             if (hlc >= arn.c1 && hlc <= arn.c2) {
@@ -2070,7 +2060,7 @@
             if (hlr >= arn.r1 && hlr <= arn.r2) {
                 this._drawRowHeaders(/*drawingCtx*/ undefined, hlr, hlr, hStyle);
             } else {
-                this._cleanRowHeades(hlr);
+                this._cleanRowHeaders(hlr);
                 if (hlr + 1 === arn.r1) {
                     this._drawRowHeaders(/*drawingCtx*/ undefined, hlr + 1, hlr + 1, kHeaderActive);
                 } else if (hlr - 1 === arn.r2) {
@@ -2082,23 +2072,30 @@
     };
 
     WorksheetView.prototype._drawActiveHeaders = function () {
-        var arn = this.selectionRange.getLast(), vr = this.visibleRange, c1 = Math.max(vr.c1, arn.c1), c2 = Math.min(
-          vr.c2, arn.c2), r1 = Math.max(vr.r1, arn.r1), r2 = Math.min(vr.r2, arn.r2);
+        var vr = this.visibleRange;
+        var range, c1, c2, r1, r2;
         this._activateOverlayCtx();
-        this._drawColumnHeaders(/*drawingCtx*/ undefined, c1, c2, kHeaderActive);
-        this._drawRowHeaders(/*drawingCtx*/ undefined, r1, r2, kHeaderActive);
-        if (this.topLeftFrozenCell) {
-            var cFrozen = this.topLeftFrozenCell.getCol0() - 1;
-            var rFrozen = this.topLeftFrozenCell.getRow0() - 1;
-            if (0 <= cFrozen) {
-                c1 = Math.max(0, arn.c1);
-                c2 = Math.min(cFrozen, arn.c2);
-                this._drawColumnHeaders(/*drawingCtx*/ undefined, c1, c2, kHeaderActive);
-            }
-            if (0 <= rFrozen) {
-                r1 = Math.max(0, arn.r1);
-                r2 = Math.min(rFrozen, arn.r2);
-                this._drawRowHeaders(/*drawingCtx*/ undefined, r1, r2, kHeaderActive);
+        for (var i = 0; i < this.model.selectionRange.ranges.length; ++i) {
+            range = this.model.selectionRange.ranges[i];
+            c1 = Math.max(vr.c1, range.c1);
+            c2 = Math.min(vr.c2, range.c2);
+            r1 = Math.max(vr.r1, range.r1);
+            r2 = Math.min(vr.r2, range.r2);
+            this._drawColumnHeaders(/*drawingCtx*/ undefined, c1, c2, kHeaderActive);
+            this._drawRowHeaders(/*drawingCtx*/ undefined, r1, r2, kHeaderActive);
+            if (this.topLeftFrozenCell) {
+                var cFrozen = this.topLeftFrozenCell.getCol0() - 1;
+                var rFrozen = this.topLeftFrozenCell.getRow0() - 1;
+                if (0 <= cFrozen) {
+                    c1 = Math.max(0, range.c1);
+                    c2 = Math.min(cFrozen, range.c2);
+                    this._drawColumnHeaders(/*drawingCtx*/ undefined, c1, c2, kHeaderActive);
+                }
+                if (0 <= rFrozen) {
+                    r1 = Math.max(0, range.r1);
+                    r2 = Math.min(rFrozen, range.r2);
+                    this._drawRowHeaders(/*drawingCtx*/ undefined, r1, r2, kHeaderActive);
+                }
             }
         }
         this._deactivateOverlayCtx();
@@ -2347,7 +2344,7 @@
         }
     };
 
-    WorksheetView.prototype._cleanRowHeades = function (rowStart, rowEnd) {
+    WorksheetView.prototype._cleanRowHeaders = function (rowStart, rowEnd) {
         var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
         var i, rFrozen = 0;
         if (this.topLeftFrozenCell) {
@@ -3640,7 +3637,7 @@
         // draw active cell in selection
         var isActive = AscCommonExcel.selectionLineType.ActiveCell & selectionLineType;
         if (isActive) {
-            var cell = args[4];
+            var cell = this.model.selectionRange.activeCell;
             var fs = this.model.getMergedByCell(cell.row, cell.col);
             fs = range.intersectionSimple(
               fs ? fs : new asc_Range(cell.col, cell.row, cell.col, cell.row));
@@ -3801,8 +3798,8 @@
 
     WorksheetView.prototype._drawSelectionRange = function () {
         var range, selectionLineType;
-        for (var i = 0, l = this.selectionRange.ranges.length; i < l; ++i) {
-            range = this.selectionRange.ranges[i];
+        for (var i = 0, l = this.model.selectionRange.ranges.length; i < l; ++i) {
+            range = this.model.selectionRange.ranges[i];
             if (c_oAscSelectionType.RangeMax === range.type) {
                 range.c2 = this.cols.length - 1;
                 range.r2 = this.rows.length - 1;
@@ -3816,11 +3813,11 @@
             if (1 === l) {
                 selectionLineType |=
                   AscCommonExcel.selectionLineType.ActiveCell | AscCommonExcel.selectionLineType.Promote;
-            } else if (i === this.selectionRange.cellIndex) {
+            } else if (i === this.model.selectionRange.activeCellId) {
                 selectionLineType |= AscCommonExcel.selectionLineType.ActiveCell;
             }
             this._drawElements(this._drawSelectionElement, range, selectionLineType,
-              this.settings.activeCellBorderColor, false, this.selectionRange.cell);
+              this.settings.activeCellBorderColor);
         }
     };
 
@@ -3902,8 +3899,6 @@
             range = this.visibleRange;
         }
         var ctx = this.overlayCtx;
-        var arn = this.selectionRange.getLast();
-        var arnIntersection = arn.intersectionSimple(range);
         var width = ctx.getWidth();
         var height = ctx.getHeight();
         var offsetX, offsetY, diffWidth = 0, diffHeight = 0;
@@ -3952,9 +3947,10 @@
             offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
         }
 
+        this._activateOverlayCtx();
         var t = this;
-        this.selectionRange.ranges.forEach(function (item) {
-            arnIntersection = item.intersectionSimple(range);
+        this.model.selectionRange.ranges.forEach(function (item) {
+            var arnIntersection = item.intersectionSimple(range);
             if (arnIntersection) {
                 _x1 = t.cols[arnIntersection.c1].left - offsetX - t.width_2px;
                 _x2 = t.cols[arnIntersection.c2].left + t.cols[arnIntersection.c2].width - offsetX +
@@ -3968,14 +3964,13 @@
                 y1 = Math.min(y1, _y1);
                 y2 = Math.max(y2, _y2);
             }
-        });
 
-        if (!isFrozen) {
-            this._activateOverlayCtx();
-            this._cleanColumnHeaders(arn.c1, arn.c2);
-            this._cleanRowHeades(arn.r1, arn.r2);
-            this._deactivateOverlayCtx();
-        }
+            if (!isFrozen) {
+                t._cleanColumnHeaders(item.c1, item.c2);
+                t._cleanRowHeaders(item.r1, item.r2);
+            }
+        });
+        this._deactivateOverlayCtx();
 
         // Если есть активное автозаполнения, то нужно его тоже очистить
         if (this.activeFillHandle !== null) {
@@ -4917,7 +4912,7 @@
     };
 
     WorksheetView.prototype._selectColumnsByRange = function () {
-        var ar = this.selectionRange.getLast();
+        var ar = this.model.selectionRange.getLast();
         if (c_oAscSelectionType.RangeMax !== ar.type) {
             this.cleanSelection();
             if (c_oAscSelectionType.RangeRow === ar.type) {
@@ -4932,7 +4927,7 @@
     };
 
     WorksheetView.prototype._selectRowsByRange = function () {
-        var ar = this.selectionRange.getLast();
+        var ar = this.model.selectionRange.getLast();
         if (c_oAscSelectionType.RangeMax !== ar.type) {
             this.cleanSelection();
 
@@ -6023,7 +6018,7 @@
     };
 
     WorksheetView.prototype._hitCursorSelectionRange = function (vr, x, y, offsetX, offsetY) {
-        var res = this._hitInRange(this.selectionRange.getLast(),
+        var res = this._hitInRange(this.model.selectionRange.getLast(),
           AscCommonExcel.selectionLineType.Selection | AscCommonExcel.selectionLineType.ActiveCell |
           AscCommonExcel.selectionLineType.Promote, vr, x, y, offsetX, offsetY);
         return res ? {
@@ -6240,7 +6235,7 @@
         }
 
         isSelGraphicObject = this.objectRender.selectedGraphicObjectsExists();
-        if (!isViewerMode && !isSelGraphicObject) {
+        if (!isViewerMode && !isSelGraphicObject && this.model.selectionRange.isSingleRange()) {
             this._drawElements(function (_vr, _offsetX, _offsetY) {
                 return (null === (res = this._hitCursorSelectionRange(_vr, x, y, _offsetX, _offsetY)));
             });
@@ -6393,7 +6388,7 @@
     WorksheetView.prototype._fixSelectionOfMergedCells = function (fixedRange) {
         var ar = fixedRange ? fixedRange :
           ((this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
-            this.selectionRange.getLast());
+            this.model.selectionRange.getLast());
 
         if (!ar) {
             return;
@@ -6415,7 +6410,7 @@
         }
         ar.r2 = ar.r1 === res.r1 ? res.r2 : res.r1;
         ar.normalize();
-        this.selectionRange.update();
+        this.model.selectionRange.update();
     };
 
     WorksheetView.prototype._findVisibleCol = function (from, dc, flag) {
@@ -6519,7 +6514,7 @@
     WorksheetView.prototype._moveActiveCellToXY = function (x, y) {
         var c, r;
         var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
-          this.selectionRange.getLast();
+          this.model.selectionRange.getLast();
 
         x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
         y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
@@ -6527,65 +6522,64 @@
         if (x < this.cellsLeft && y < this.cellsTop) {
             ar.assign(0, 0, this.cols.length - 1, this.rows.length - 1);
             ar.type = c_oAscSelectionType.RangeMax;
-            ar.startCol = 0;
-            ar.startRow = 0;
-            this.selectionRange.setCell(0, 0);
+            //ar.startCol = 0;
+            //ar.startRow = 0;
+            this.model.selectionRange.setCell(0, 0);
             this._fixSelectionOfHiddenCells();
         } else if (x < this.cellsLeft) {
             r = this._findRowUnderCursor(y).row;
             ar.assign(0, r, this.cols.length - 1, r);
             ar.type = c_oAscSelectionType.RangeRow;
-            ar.startCol = 0;
-            ar.startRow = r;
-            this.selectionRange.setCell(r, 0);
+            //ar.startCol = 0;
+            //ar.startRow = r;
+            this.model.selectionRange.setCell(r, 0);
             this._fixSelectionOfHiddenCells();
         } else if (y < this.cellsTop) {
             c = this._findColUnderCursor(x).col;
             ar.assign(c, 0, c, this.rows.length - 1);
             ar.type = c_oAscSelectionType.RangeCol;
-            ar.startCol = c;
-            ar.startRow = 0;
+            //ar.startCol = c;
+            //ar.startRow = 0;
             this._fixSelectionOfHiddenCells();
-            this.selectionRange.setCell(0, c);
+            this.model.selectionRange.setCell(0, c);
         } else {
             c = this._findColUnderCursor(x).col;
             r = this._findRowUnderCursor(y).row;
             ar.assign(c, r, c, r);
-            ar.startCol = c;
-            ar.startRow = r;
+            //ar.startCol = c;
+            //ar.startRow = r;
             ar.type = c_oAscSelectionType.RangeCells;
-            this.selectionRange.setCell(r, c);
+            this.model.selectionRange.setCell(r, c);
             this._fixSelectionOfMergedCells();
         }
     };
 
     WorksheetView.prototype._moveActiveCellToOffset = function (dc, dr) {
         var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
-          this.selectionRange.getLast();
-        var mc = this.model.getMergedByCell(this.selectionRange.cell.row, this.selectionRange.cell.col);
-        var c = mc ?
-          ( dc < 0 ? mc.c1 : dc > 0 ? Math.min(mc.c2, this.nColsCount - 1 - dc) : this.selectionRange.cell.col) :
-          this.selectionRange.cell.col;
-        var r = mc ?
-          ( dr < 0 ? mc.r1 : dr > 0 ? Math.min(mc.r2, this.nRowsCount - 1 - dr) : this.selectionRange.cell.row ) :
-          this.selectionRange.cell.row;
+          this.model.selectionRange.getLast();
+        var activeCell = this.model.selectionRange.activeCell;
+        var mc = this.model.getMergedByCell(activeCell.row, activeCell.col);
+        var c = mc ? (dc < 0 ? mc.c1 : dc > 0 ? Math.min(mc.c2, this.nColsCount - 1 - dc) : activeCell.col) :
+          activeCell.col;
+        var r = mc ? (dr < 0 ? mc.r1 : dr > 0 ? Math.min(mc.r2, this.nRowsCount - 1 - dr) : activeCell.row) :
+          activeCell.row;
         var p = this._calcCellPosition(c, r, dc, dr);
         ar.assign(p.col, p.row, p.col, p.row);
         ar.type = c_oAscSelectionType.RangeCells;
-        this.selectionRange.setCell(p.row, p.col);
+        this.model.selectionRange.setCell(p.row, p.col);
         this._fixSelectionOfHiddenCells(dc >= 0 ? +1 : -1, dr >= 0 ? +1 : -1);
         this._fixSelectionOfMergedCells();
     };
 
     // Движение активной ячейки в выделенной области
     WorksheetView.prototype._moveActivePointInSelection = function (dc, dr) {
-        var cell = this.selectionRange.cell;
+        var cell = this.model.selectionRange.activeCell;
 
         // Если мы на скрытой строке или ячейке, то двигаться в выделении нельзя (так делает и Excel)
         if (this.width_1px > this.cols[cell.col].width || this.height_1px > this.rows[cell.row].height) {
             return;
         }
-        return this.selectionRange.offsetCell(dr, dc);
+        return this.model.selectionRange.offsetCell(dr, dc);
 
         var ar = this.activeRange;
         var arn = this.activeRange.clone(true);
@@ -6669,11 +6663,11 @@
 
     WorksheetView.prototype._calcSelectionEndPointByXY = function (x, y) {
         var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
-          this.selectionRange.getLast();
+          this.model.selectionRange.getLast();
         x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
         y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
 
-        var res = new asc_Range(this.selectionRange.cell.col, this.selectionRange.cell.row, this._findColUnderCursor(
+        var res = new asc_Range(this.model.selectionRange.activeCell.col, this.model.selectionRange.activeCell.row, this._findColUnderCursor(
           x).col, this._findRowUnderCursor(y).row, true);
         if (ar.type === c_oAscSelectionType.RangeCells) {
             this._fixSelectionOfMergedCells(res);
@@ -6683,8 +6677,8 @@
 
     WorksheetView.prototype._calcSelectionEndPointByOffset = function (dc, dr) {
         var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
-          this.selectionRange.getLast();
-        var startCol = this.selectionRange.cell.col, startRow = this.selectionRange.cell.row;
+          this.model.selectionRange.getLast();
+        var startCol = this.model.selectionRange.activeCell.col, startRow = this.model.selectionRange.activeCell.row;
         var c1, r1, c2, r2, tmp;
         tmp = asc.getEndValueRange(dc, startCol, ar.c1, ar.c2);
         c1 = tmp.x1;
@@ -6726,7 +6720,7 @@
 
     WorksheetView.prototype._calcActiveRangeOffsetIsCoord = function (x, y) {
         var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
-          this.selectionRange.getLast();
+          this.model.selectionRange.getLast();
         if (this.isFormulaEditMode) {
             // Для формул нужно сделать ограничение по range (у нас хранится полный диапазон)
             if (ar.c2 >= this.nColsCount || ar.r2 >= this.nRowsCount) {
@@ -6768,7 +6762,7 @@
     WorksheetView.prototype._calcActiveRangeOffset = function () {
         var vr = this.visibleRange;
         var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
-          this.selectionRange.getLast();
+          this.model.selectionRange.getLast();
         if (this.isFormulaEditMode) {
             // Для формул нужно сделать ограничение по range (у нас хранится полный диапазон)
             if (ar.c2 >= this.nColsCount || ar.r2 >= this.nRowsCount) {
@@ -6808,7 +6802,7 @@
      */
     WorksheetView.prototype._calcActiveCellOffset = function (range) {
         var vr = this.visibleRange;
-        var ar = range ? range : this.selectionRange.getLast();
+        var ar = range ? range : this.model.selectionRange.getLast();
         var mc = this.model.getMergedByCell(ar.startRow, ar.startCol);
         var startCol = mc ? mc.c1 : ar.startCol;
         var startRow = mc ? mc.r1 : ar.startRow;
@@ -6914,7 +6908,7 @@
     };
 
     WorksheetView.prototype.getSelectionMathInfo = function () {
-        var ar = this.selectionRange.getLast();
+        var ar = this.model.selectionRange.getLast();
         var range = this.model.getRange3(ar.r1, ar.c1, ar.r2, ar.c2);
         var tmp;
         var oSelectionMathInfo = new asc_CSelectionMathInfo();
@@ -6967,8 +6961,8 @@
             return " ";
         }	// Пока отправим пустое имя(с пробелом, пустое не воспринимаем в меню..) ToDo
 
-        var ar = this.selectionRange.getLast();
-        var cell = this.selectionRange.cell;
+        var ar = this.model.selectionRange.getLast();
+        var cell = this.model.selectionRange.activeCell;
         var mc = this.model.getMergedByCell(cell.row, cell.col);
         var c1 = mc ? mc.c1 : cell.col, r1 = mc ? mc.r1 : cell.row, ar_norm = ar.normalize(), mc_norm = mc ?
           mc.normalize() : null, c2 = mc_norm ? mc_norm.isEqual(ar_norm) ? mc_norm.c1 : ar_norm.c2 :
@@ -7004,7 +6998,7 @@
 
     WorksheetView.prototype.getSelectionRangeValue = function () {
         // ToDo проблема с выбором целого столбца/строки
-        var ar = this.selectionRange.getLast().clone(true);
+        var ar = this.model.selectionRange.getLast().clone(true);
         var sName = ar.getAbsName();
         return (c_oAscSelectionDialogType.FormatTable === this.selectionDialogType) ? sName :
           parserHelp.get3DRef(this.model.getName(), sName);
@@ -7017,7 +7011,7 @@
 
     WorksheetView.prototype._getSelectionInfoCell = function (bExt) {
         var c_opt = this.settings.cells;
-        var cell = this.selectionRange.cell;
+        var cell = this.model.selectionRange.activeCell;
         var mc = this.model.getMergedByCell(cell.row, cell.col);
         var c1 = mc ? mc.c1 : cell.col;
         var r1 = mc ? mc.r1 : cell.row;
@@ -7291,7 +7285,7 @@
 
     // Получаем координаты активной ячейки
     WorksheetView.prototype.getActiveCellCoord = function () {
-        return this.getCellCoord(this.selectionRange.cell.col, this.selectionRange.cell.row);
+        return this.getCellCoord(this.model.selectionRange.activeCell.col, this.model.selectionRange.activeCell.row);
     };
     WorksheetView.prototype.getCellCoord = function (col, row) {
         var offsetX = 0, offsetY = 0;
@@ -7437,13 +7431,13 @@
 
         if (!this.isFormulaEditMode) {
             if (isCtrl) {
-                this.selectionRange.addRange();
+                this.model.selectionRange.addRange();
             } else {
-                this.selectionRange.clean();
+                this.model.selectionRange.clean();
             }
         }
         var ar = ((this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
-          this.selectionRange.getLast()).clone();
+          this.model.selectionRange.getLast()).clone();
         var ret = {};
         var isChangeSelectionShape = false;
 
@@ -7460,8 +7454,8 @@
         } else {
             // move active range to offset x,y
             this._moveActiveCellToOffset(x, y);
-            var x1 = this.getCellLeftRelative(this.selectionRange.cell.col, /*pt*/0), y1 = this.getCellTopRelative(
-              this.selectionRange.cell.row, /*pt*/0);
+            var x1 = this.getCellLeftRelative(this.model.selectionRange.activeCell.col, /*pt*/0), y1 = this.getCellTopRelative(
+              this.model.selectionRange.activeCell.row, /*pt*/0);
             if (isCoord) {
                 ret = this._calcActiveRangeOffsetIsCoord(x1, y1);
             } else {
@@ -7471,12 +7465,12 @@
         }
 
         if (this.isSelectionDialogMode) {
-            if (!this.selectionRange.isEqual(ar)) {
+            if (!this.model.selectionRange.isEqual(ar)) {
                 // Смена диапазона
                 this.handlers.trigger("selectionRangeChanged", this.getSelectionRangeValue());
             }
         } else if (!this.isCellEditMode) {
-            if (isChangeSelectionShape || !this.selectionRange.isEqual(ar)) {
+            if (isChangeSelectionShape || !this.model.selectionRange.isEqual(ar)) {
                 this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
                 if (!isSelectMode) {
                     this.handlers.trigger("selectionChanged", this.getSelectionInfo());
@@ -7496,7 +7490,7 @@
 
     // Смена селекта по нажатию правой кнопки мыши
     WorksheetView.prototype.changeSelectionStartPointRightClick = function (x, y) {
-        var ar = this.selectionRange.getLast();
+        var ar = this.model.selectionRange.getLast();
         var isChangeSelectionShape = this._checkSelectionShape();
         this.model.workbook.handlers.trigger("asc_onHideComment");
 
@@ -7582,7 +7576,7 @@
         if (isCoord) {
             isChangeSelectionShape = this._checkSelectionShape();
         }
-        var lastActiveRange = this.selectionRange.getLast();
+        var lastActiveRange = this.model.selectionRange.getLast();
         var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
           lastActiveRange;
 
@@ -8631,8 +8625,8 @@
 
         var t = this;
         var checkRange = null;
-        var cell = this.selectionRange.cell.clone();
-        var arn = t.selectionRange.getLast().clone(true);
+        var cell = this.model.selectionRange.activeCell.clone();
+        var arn = this.model.selectionRange.getLast().clone(true);
         if (onlyActive) {
             checkRange =
               new asc_Range(cell.col, cell.row, cell.col, cell.row);
@@ -11125,8 +11119,8 @@
             col = col.col;
             row = row.row;
         } else {
-            col = t.selectionRange.cell.col;
-            row = t.selectionRange.cell.row;
+            col = t.model.selectionRange.activeCell.col;
+            row = t.model.selectionRange.activeCell.row;
         }
 
         // Проверим замерженность
@@ -11197,9 +11191,9 @@
           var t = this, tc = this.cols, tr = this.rows, col, row, c, fl, mc, bg, isMerged;
 
           if (selectionRange) {
-              this.selectionRange = selectionRange;
+              this.model.selectionRange = selectionRange;
           }
-          var cell = this.selectionRange.cell;
+          var cell = this.model.selectionRange.activeCell;
 
           function getVisibleRangeObject() {
               var vr = t.visibleRange.clone(), offsetX = 0, offsetY = 0;
@@ -11341,7 +11335,7 @@
 
     WorksheetView.prototype.openCellEditorWithText = function (editor, text, cursorPos, isFocus, selectionRange) {
         var t = this;
-        selectionRange = (selectionRange) ? selectionRange : this.selectionRange;
+        selectionRange = (selectionRange) ? selectionRange : this.model.selectionRange;
         var cell = selectionRange.cell;
         var c = t._getVisibleCell(cell.col, cell.row);
         var v, copyValue;

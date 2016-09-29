@@ -3335,13 +3335,15 @@ function Woorksheet(wb, _index, sId){
 	this.aConditionalFormatting = [];
 	this.sheetPr = null;
 	this.aFormulaExt = null;
-	
+
 	this.autoFilters = AscCommonExcel.AutoFilters !== undefined ? new AscCommonExcel.AutoFilters(this) : null;
 
-    this.oDrawingOjectsManager = new DrawingObjectsManager(this);
-    this.contentChanges = new AscCommon.CContentChanges();
+	this.oDrawingOjectsManager = new DrawingObjectsManager(this);
+	this.contentChanges = new AscCommon.CContentChanges();
 
-    this.aSparklineGroups = [];
+	this.aSparklineGroups = [];
+
+	this.selectionRange = new AscCommonExcel.SelectionRange();
 
 	/*handlers*/
 	this.handlers = null;

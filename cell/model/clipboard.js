@@ -355,7 +355,6 @@
 					return false;
 				
 				var worksheetView = api.wb.getWorksheet();
-				var activeRange = worksheetView.getSelectedRange();
 				
 				var objectRender = worksheetView.objectRender;
 				var isIntoShape = objectRender.controller.getTargetDocContent();
@@ -365,8 +364,7 @@
 				if(!isIntoShape)
 					sBase64 = this.getBinaryForCopy(worksheetView);
 				History.TurnOn();
-				
-				var objectRender = worksheetView.objectRender;
+
 				var selectedImages = objectRender.getSelectedGraphicObjects();
 
                 var drawingUrls = [];
