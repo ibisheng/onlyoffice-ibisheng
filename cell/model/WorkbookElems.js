@@ -1387,7 +1387,7 @@ Align.prototype =
 {
 	_mergeProperty : function(first, second, def)
 	{
-		if(false == def.isEqual(first))
+		if (def != first)
 			return first;
 		else
 			return second;
