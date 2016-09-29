@@ -4310,14 +4310,14 @@ drawAreaChart.prototype =
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
-		this.calculateProps();
+		this._calculateProps();
 		
 		console.time("recalc");
 		this._calculate();
 		console.timeEnd("recalc");
 	},
 	
-	calculateProps: function()
+	_calculateProps: function()
 	{
 		if(this.cChartDrawer.nDimensionCount === 3)
 		{
@@ -4327,8 +4327,20 @@ drawAreaChart.prototype =
 			var DiffGapDepth = perspectiveDepth * (gapDepth / 2) / 100;
 			//var gapDepth = this.chartProp.subType === "normal" ? (perspectiveDepth + DiffGapDepth + DiffGapDepth) * seria + DiffGapDepth : DiffGapDepth;
 			
-			this.gapDepth = DiffGapDepth;
 			this.perspectiveDepth = perspectiveDepth;
+			if(this.chartProp.subType === "normal")
+			{
+				this.gapDepth = [];
+				
+				for(var i = 0; i < this.chartProp.seriesCount; i++)
+				{
+					this.gapDepth[i] = (this.perspectiveDepth + DiffGapDepth + DiffGapDepth) * i + DiffGapDepth;
+				}
+			}
+			else
+			{
+				this.gapDepth = DiffGapDepth;
+			}
 		}
 		
 		this.xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
@@ -4374,12 +4386,24 @@ drawAreaChart.prototype =
 					this.points[i][n] = {x: x, y: nullPositionOX, val: val};
 				}
 			}
+			
+			if(this.cChartDrawer.nDimensionCount === 3)
+			{
+				//для normal рассчитываем видимые/невидимые грани для каждой серии
+				if(this.chartProp.subType === "normal")
+				{
+					this._calculateDarkSideOfTheFace(i);
+				}
+				else if(this.darkFaces === null)
+				{
+					this._calculateDarkSideOfTheFace(null);
+				}
+			}
 		}
 		
 		
 		if(this.cChartDrawer.nDimensionCount === 3)
 		{
-			this._calculateDarkSideOfTheFace();
 			this._calculatePaths3D();
 			
 			var cSortFaces = new CSortFaces(this.cChartDrawer);
@@ -4392,14 +4416,6 @@ drawAreaChart.prototype =
 				else
 					return  b.midY - a.midY;
 			});
-			
-			/*this.downFaces.sort (function sortArr(a, b)
-			{
-				if(b.midY === a.midY)
-					return  b.seria - a.seria;
-				else
-					return  a.midY - b.midY;
-			})*/
 			
 			var anotherFaces = this.sortZIndexPathsFront.concat(this.sortZIndexPathsBack).concat(this.sortZIndexPathsLeft).concat(this.sortZIndexPathsRight);
 			this.sortZIndexPaths = this.upFaces.concat(anotherFaces);
@@ -4519,7 +4535,7 @@ drawAreaChart.prototype =
 		var pointsIn3D = [], t = this, pxToMm = this.chartProp.pxToMM;
 		
 		//сдвиг по OZ в глубину
-		var gapDepth = (this.perspectiveDepth + this.gapDepth + this.gapDepth) * seriaNum + this.gapDepth;
+		var gapDepth = this.gapDepth[seriaNum];
 
 		var getProjectPoints = function(currentZ, startN)
 		{
@@ -4538,7 +4554,7 @@ drawAreaChart.prototype =
 		getProjectPoints(zNear, 0);
 		getProjectPoints(zFar, 2);
 		
-		var res = this._calculateRect3D(pointsIn3D, gapDepth);
+		var res = this._calculateRect3D(pointsIn3D, seriaNum);
 		
 		return res;
     },
@@ -4628,7 +4644,7 @@ drawAreaChart.prototype =
 		return res;
     },
 	
-	_calculateDarkSideOfTheFace: function()
+	_calculateDarkSideOfTheFace: function(seria)
 	{
 		var pxToMm = this.chartProp.pxToMM;	
 		
@@ -4646,62 +4662,79 @@ drawAreaChart.prototype =
 		var maxY = this.cChartDrawer.getYPosition(minValue, this.yPoints) * pxToMm;
 		var minY = this.cChartDrawer.getYPosition(maxValue, this.yPoints) * pxToMm;
 		
-		var point1 = this.cChartDrawer._convertAndTurnPoint(minX, maxY, this.gapDepth);
-		var point2 = this.cChartDrawer._convertAndTurnPoint(minX, maxY, this.gapDepth + this.perspectiveDepth);
-		var point3 = this.cChartDrawer._convertAndTurnPoint(maxX, maxY, this.gapDepth + this.perspectiveDepth);
-		var point4 = this.cChartDrawer._convertAndTurnPoint(maxX, maxY, this.gapDepth);
+		var gapDepth = seria === null ? this.gapDepth : this.gapDepth[seria];
 		
-		var point5 = this.cChartDrawer._convertAndTurnPoint(minX, minY, this.gapDepth);
-		var point6 = this.cChartDrawer._convertAndTurnPoint(minX, minY, this.gapDepth + this.perspectiveDepth);
-		var point7 = this.cChartDrawer._convertAndTurnPoint(maxX, minY, this.gapDepth + this.perspectiveDepth);
-		var point8 = this.cChartDrawer._convertAndTurnPoint(maxX, minY, this.gapDepth);
+		var point1 = this.cChartDrawer._convertAndTurnPoint(minX, maxY, gapDepth);
+		var point2 = this.cChartDrawer._convertAndTurnPoint(minX, maxY, gapDepth + this.perspectiveDepth);
+		var point3 = this.cChartDrawer._convertAndTurnPoint(maxX, maxY, gapDepth + this.perspectiveDepth);
+		var point4 = this.cChartDrawer._convertAndTurnPoint(maxX, maxY, gapDepth);
 		
-		this.darkFaces = {};
+		var point5 = this.cChartDrawer._convertAndTurnPoint(minX, minY, gapDepth);
+		var point6 = this.cChartDrawer._convertAndTurnPoint(minX, minY, gapDepth + this.perspectiveDepth);
+		var point7 = this.cChartDrawer._convertAndTurnPoint(maxX, minY, gapDepth + this.perspectiveDepth);
+		var point8 = this.cChartDrawer._convertAndTurnPoint(maxX, minY, gapDepth);
+		
+		var darkFaces;
+		if(seria === null)
+		{
+			this.darkFaces = {};
+			darkFaces = this.darkFaces;
+		}
+		else
+		{
+			if(null === this.darkFaces)
+			{
+				this.darkFaces = [];
+			}
+			this.darkFaces[seria] = {};
+			darkFaces = this.darkFaces[seria];
+		}
+		
 		
 		//front
-		this.darkFaces["front"] = null;
+		darkFaces["front"] = null;
 		if(this._isVisibleVerge3D(point5, point1, point4))
 		{
-			this.darkFaces["front"] = 1;
+			darkFaces["front"] = 1;
 		}
 		
 		//down
-		this.darkFaces["down"] = null;
+		darkFaces["down"] = null;
 		if(this._isVisibleVerge3D(point4, point1, point2))
 		{
-			this.darkFaces["down"] = 1;
+			darkFaces["down"] = 1;
 		}
 		
 		//left
-		this.darkFaces["left"] = null;
+		darkFaces["left"] = null;
 		if(this._isVisibleVerge3D(point2, point1, point5))
 		{
-			this.darkFaces["left"] = 1;
+			darkFaces["left"] = 1;
 		}
 		
 		//right
-		this.darkFaces["right"] = null;
+		darkFaces["right"] = null;
 		if(this._isVisibleVerge3D(point8, point4, point3))
 		{
-			this.darkFaces["right"] = 1;
+			darkFaces["right"] = 1;
 		}
 		
 		//up
-		this.darkFaces["up"] = null;
+		darkFaces["up"] = null;
 		if(this._isVisibleVerge3D(point6, point5, point8))
 		{
-			this.darkFaces["up"] = 1;
+			darkFaces["up"] = 1;
 		}
 		
 		//unfront
-		this.darkFaces["unfront"] = null;
+		darkFaces["unfront"] = null;
 		if(this._isVisibleVerge3D(point3, point2, point6))
 		{
-			this.darkFaces["unfront"] = 1;
+			darkFaces["unfront"] = 1;
 		}
 	},
 	
-	_calculateRect3D : function(pointsIn3D)
+	_calculateRect3D : function(pointsIn3D, seriaNum)
 	{
 		var path;
 		var pxToMm = this.chartProp.pxToMM;
@@ -4835,19 +4868,9 @@ drawAreaChart.prototype =
 		var	point8 = pointsIn3D[upNear][pointsIn3D[upNear].length - 1]
 		
 		
-		var p1 = point1.y > point5.y ? point1 : point5;
-		var p2 = point2.y > point6.y ? point2 : point6;
-		var p3 = point3.y > point7.y ? point3 : point7;
-		var	p4 = point4.y > point8.y ? point4 : point8;
-		
-		var	p5 = point1.y > point5.y ? point5 : point1;
-		var	p6 = point2.y < point6.y ? point2 : point6;
-		var	p7 = point3.y < point7.y ? point3 : point7;
-		var	p8 = point4.y > point8.y ? point8 : point4;
-		
 		//front
 		paths[0] = null;
-		if(this._isVisibleVerge3D(p5, p1, p4))
+		if(this.darkFaces[seriaNum]["front"])
 		{
 			path  = new Path();
 			path.pathH = pathH;
@@ -4863,7 +4886,7 @@ drawAreaChart.prototype =
 		
 		//down
 		paths[1] = null;
-		if(this._isVisibleVerge3D(point4, point1, point2))
+		if(this.darkFaces[seriaNum]["down"])
 		{
 			var arrayPaths = drawUpDownFace(true);
 			paths[1] = arrayPaths;
@@ -4871,7 +4894,7 @@ drawAreaChart.prototype =
 		
 		//left
 		paths[2] = null;
-		if(this._isVisibleVerge3D(p2, p1, p5))
+		if(this.darkFaces[seriaNum]["left"])
 		{
 			var arrayPaths = calculateRect(pointsIn3D[0][0], pointsIn3D[1][0], pointsIn3D[3][0], pointsIn3D[2][0]);
 			paths[2] = arrayPaths;
@@ -4879,7 +4902,7 @@ drawAreaChart.prototype =
 		
 		//right
 		paths[3] = null;
-		if(this._isVisibleVerge3D(p8, p4, p3))
+		if(this.darkFaces[seriaNum]["right"])
 		{
 			var arrayPaths = calculateRect(pointsIn3D[0][pointsIn3D[0].length - 1], pointsIn3D[1][pointsIn3D[1].length - 1], pointsIn3D[3][pointsIn3D[3].length - 1], pointsIn3D[2][pointsIn3D[2].length - 1]);
 			paths[3] = arrayPaths;
@@ -4887,7 +4910,7 @@ drawAreaChart.prototype =
 		
 		//up
 		paths[4] = null;
-		if(this._isVisibleVerge3D(point6, point5, point8))
+		if(this.darkFaces[seriaNum]["up"])
 		{
 			var arrayPaths = drawUpDownFace();	
 			paths[4] = arrayPaths;
@@ -4895,7 +4918,7 @@ drawAreaChart.prototype =
 		
 		//unfront
 		paths[5] = null;
-		if(this._isVisibleVerge3D(p7, p3, p2))
+		if(this.darkFaces[seriaNum]["unfront"])
 		{
 			path  = new Path();
 			path.pathH = pathH;
