@@ -44,9 +44,8 @@
 	 * Class representing a sheet.
 	 * @constructor
 	 */
-	function ApiWorksheet(worksheet, worksheetView) {
+	function ApiWorksheet(worksheet) {
 		this.worksheet = worksheet;
-		this.worksheetView = worksheetView;
 	}
 
 	/**
@@ -103,7 +102,7 @@
 	 */
 	Api.prototype.GetActiveSheet = function () {
 		var index = this.wbModel.getActive();
-		return new ApiWorksheet(this.wbModel.getWorksheet(index), this.wb.getWorksheet(index, true));
+		return new ApiWorksheet(this.wbModel.getWorksheet(index));
 	};
 
 	Api.prototype.CreateNewHistoryPoint = function(){
