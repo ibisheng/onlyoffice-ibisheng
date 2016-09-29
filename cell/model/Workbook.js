@@ -3490,6 +3490,8 @@ Woorksheet.prototype.clone=function(sNewId, sName, tableNames){
 	if (this.sheetPr)
 		oNewWs.sheetPr = this.sheetPr.clone();
 
+	oNewWs.selectionRange = this.selectionRange.clone();
+
 	return oNewWs;
 };
 Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
