@@ -36,6 +36,7 @@
 {
 
 	// Import
+	var c_oAscAdvancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction;
 	var DownloadType                = AscCommon.DownloadType;
 	var locktype_None               = AscCommon.locktype_None;
 	var locktype_Mine               = AscCommon.locktype_Mine;
@@ -56,6 +57,7 @@
 	var c_oAscError             = Asc.c_oAscError;
 	var c_oAscFileType          = Asc.c_oAscFileType;
 	var c_oAscAsyncAction       = Asc.c_oAscAsyncAction;
+	var c_oAscAdvancedOptionsID = Asc.c_oAscAdvancedOptionsID;
 	var c_oAscAsyncActionType   = Asc.c_oAscAsyncActionType;
 	var c_oAscTypeSelectElement = Asc.c_oAscTypeSelectElement;
 	var c_oAscFill              = Asc.c_oAscFill;
