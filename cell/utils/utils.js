@@ -662,7 +662,7 @@
 			//меняем выделеную ячейку, если она не входит в диапазон
 			//возможно, в будующем придется пределать логику, пока нет примеров, когда это работает плохо
 			var range = this.ranges[this.cellIndex];
-			if (!range || range.contains(this.cell.col, this.cell.row)) {
+			if (!range || !range.contains(this.cell.col, this.cell.row)) {
 				range = this.getLast();
 				this.cell.col = range.c1;
 				this.cell.row = range.r1;
