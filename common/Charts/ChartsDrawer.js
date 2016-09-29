@@ -4298,9 +4298,13 @@ drawAreaChart.prototype =
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		
 		if(this.cChartDrawer.nDimensionCount === 3)
+		{
 			this._drawBars3D();
+		}	
 		else
+		{
 			this._drawLines();
+		}
 	},
 	
 	recalculate : function(chartsDrawer)
@@ -4325,7 +4329,6 @@ drawAreaChart.prototype =
 			var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 			var perspectiveDepth = this.chartProp.subType === "normal" ? (perspectiveDepth / (gapDepth / 100 + 1)) / this.chartProp.seriesCount : perspectiveDepth / (gapDepth / 100 + 1);
 			var DiffGapDepth = perspectiveDepth * (gapDepth / 2) / 100;
-			//var gapDepth = this.chartProp.subType === "normal" ? (perspectiveDepth + DiffGapDepth + DiffGapDepth) * seria + DiffGapDepth : DiffGapDepth;
 			
 			this.perspectiveDepth = perspectiveDepth;
 			if(this.chartProp.subType === "normal")
@@ -4454,7 +4457,10 @@ drawAreaChart.prototype =
 		var prevPoints;
 		var isStacked = !!(this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked");
 		
-		this._calculateAllIntersection();
+		if(isStacked)
+		{
+			this._calculateAllIntersection();
+		}
 		
 		for(var i = 0; i < points.length; i++)
 		{	
@@ -5413,21 +5419,6 @@ drawAreaChart.prototype =
 			paths[3] = calculateSimpleFace(point4, point8, point7, point3, point44, point88, point77, point33, 3);
 		}
 		
-		//грани, которые, возможно, придётся разбивать - верхняя и нижняя
-		//up
-		paths[4] = null;
-		if(this.darkFaces["down"])
-		{
-			paths[4] = calculateSimpleFace(point5, point6, point7, point8, point55, point66, point77, point88, 4);
-		}
-		
-		//down
-		paths[1] = null;
-		if(this.darkFaces["up"])
-		{
-			paths[1] = calculateSimpleFace(point1, point2, point3, point4, point11, point22, point33, point44, 1);
-		}
-		
 		//front
 		if(this.darkFaces["front"])
 		{
@@ -5573,12 +5564,8 @@ drawAreaChart.prototype =
 		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
 		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 		
-		for (var i = 0; i < this.chartProp.series.length; i++) {
-			
-			//в случае накопительных дигарамм, рисуем в обратном порядке
-			/*if(this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked")
-				seria = this.chartProp.series[this.chartProp.series.length - 1 - i];
-			else*/
+		for (var i = 0; i < this.chartProp.series.length; i++) 
+		{	
 			seria = this.chartProp.series[i];
 			
 			dataSeries = seria.val.numRef && seria.val.numRef.numCache ? seria.val.numRef.numCache.pts : seria.val.numLit ? seria.val.numLit.pts : null;
@@ -5686,36 +5673,6 @@ drawAreaChart.prototype =
 		
 		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
     },	
-	
-	
-	_DrawBars3DStandart: function()
-	{
-		var view3DProp = this.cChartSpace.chart.view3D;
-		var angleOy = view3DProp && view3DProp.rotY ? (view3DProp.rotY / 360) * (Math.PI * 2) : 0;
-		
-		//вторую половину с конца рисуем
-		var brush, pen, seria;
-		for (var i = this.paths.series.length - 1; i >= 0; i--) {
-			for (var j = this.chartProp.ptCount - 1; j >= 0; j--) {
-				seria = this.chartProp.series[i];
-				brush = seria.brush;
-				pen = seria.pen;
-				
-				if(!this.paths.series[i] || !this.paths.series[i][j] || !seria.val.numRef.numCache.pts[j])
-					continue;
-				
-				if(seria.val.numRef.numCache.pts[j].pen)
-					pen = seria.val.numRef.numCache.pts[j].pen;
-				if(seria.val.numRef.numCache.pts[j].brush)
-					brush = seria.val.numRef.numCache.pts[j].brush;
-				
-				for(var k = 0; k < this.paths.series[i][j].length; k++)
-				{
-					this._drawBar3D(this.paths.series[i][j][k], pen, brush, k);
-				}
-			}
-		}
-	},
 	
 	_drawBar3D: function(path, pen, brush, k)
 	{
@@ -5900,9 +5857,6 @@ drawAreaChart.prototype =
 	
 	_isVisibleVerge3D: function(k, n, m)
 	{
-		//TODO переделать!
-		//if(this.chartProp.subType !== "normal")
-			//return true;
 		//roberts method - calculate normal
 		var aX = n.x * m.y - m.x * n.y;
 		var bY = - (k.x * m.y - m.x * k.y);
