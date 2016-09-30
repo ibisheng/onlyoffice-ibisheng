@@ -1750,7 +1750,7 @@
 				}
 				
 				
-				var curFilter = this._getFilterByDisplayName(displayName);
+				curFilter = this._getFilterByDisplayName(displayName);
 				if(null !== curFilter)
 				{
 					filterRef = curFilter.Ref;

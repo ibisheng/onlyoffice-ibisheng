@@ -373,7 +373,6 @@
         this.highlightedRow = -1;
         this.topLeftFrozenCell = null;	// Верхняя ячейка для закрепления диапазона
         this.visibleRange = new asc_Range(0, 0, 0, 0);
-        this.activeRange = new asc_ActiveRange(0, 0, 0, 0);
         this.isChanged = false;
         this.isCellEditMode = false;
         this.isFormulaEditMode = false;
@@ -7011,7 +7010,8 @@
 
     WorksheetView.prototype._getSelectionInfoCell = function (bExt) {
         var c_opt = this.settings.cells;
-        var cell = this.model.selectionRange.activeCell;
+        var selectionRange = this.model.selectionRange;
+        var cell = selectionRange.activeCell;
         var mc = this.model.getMergedByCell(cell.row, cell.col);
         var c1 = mc ? mc.c1 : cell.col;
         var r1 = mc ? mc.r1 : cell.row;
@@ -7037,7 +7037,8 @@
         cell_info.halign = c.getAlignHorizontal().toLowerCase();
         cell_info.valign = c.getAlignVertical().toLowerCase();
 
-        var tablePartsOptions = this.model.autoFilters.searchRangeInTableParts(this.activeRange);
+        var tablePartsOptions = selectionRange.isSingleRange() ?
+          this.model.autoFilters.searchRangeInTableParts(selectionRange.getLast()) : -2;
         var curTablePart = tablePartsOptions >= 0 ? this.model.TableParts[tablePartsOptions] : null;
         var tableStyleInfo = curTablePart && curTablePart.TableStyleInfo ? curTablePart.TableStyleInfo : null;
 
@@ -7069,15 +7070,7 @@
             cell_info.formatTableInfo.tableRange = curTablePart.Ref.getAbsName();
             cell_info.formatTableInfo.filterButton = curTablePart.isShowButton();
 
-            var checkDisableProps = this.af_checkDisableProps(curTablePart);
-
-            cell_info.formatTableInfo.isInsertRowAbove = checkDisableProps.insertRowAbove;
-            cell_info.formatTableInfo.isInsertRowBelow = checkDisableProps.insertRowBelow;
-            cell_info.formatTableInfo.isInsertColumnLeft = checkDisableProps.insertColumnLeft;
-            cell_info.formatTableInfo.isInsertColumnRight = checkDisableProps.insertColumnRight;
-            cell_info.formatTableInfo.isDeleteRow = checkDisableProps.deleteRow;
-            cell_info.formatTableInfo.isDeleteColumn = checkDisableProps.deleteColumn;
-            cell_info.formatTableInfo.isDeleteTable = checkDisableProps.deleteTable;
+            this.af_setDisableProps(curTablePart, cell_info.formatTableInfo);
         }
 
         cell_info.styleName = c.getStyleName();
@@ -7087,7 +7080,8 @@
         cell_info.flags.shrinkToFit = c.getShrinkToFit();
         cell_info.flags.wrapText = c.getWrap();
 
-        cell_info.flags.selectionType = this.activeRange.type;
+        // ToDo activeRange type
+        cell_info.flags.selectionType = selectionRange.getLast().type;
 
         cell_info.flags.lockText = ("" !== cell_info.text && (isNumberFormat || "" !== cell_info.formula));
 
@@ -7106,8 +7100,8 @@
 
         cell_info.numFormatType = c.getNumFormatType();
 
-        // Получаем гиперссылку
-        var ar = this.activeRange.clone();
+        // Получаем гиперссылку (//ToDo)
+        var ar = selectionRange.getLast();
         var range = this.model.getRange3(ar.r1, ar.c1, ar.r2, ar.c2);
         var hyperlink = range.getHyperlink();
         var oHyperlink;
@@ -13407,52 +13401,36 @@
         return res;
     };
 
-    WorksheetView.prototype.af_checkDisableProps = function (tablePart) {
-        var t = this;
-        var ws = this.model;
-        var acitveRange = this.activeRange;
+    WorksheetView.prototype.af_setDisableProps = function (tablePart, formatTableInfo) {
+        var selectionRange = this.model.selectionRange;
+        var lastRange = selectionRange.getLast();
+        var activeCell = selectionRange.activeCell;
 
         if (!tablePart) {
             return false;
         }
 
         var refTable = tablePart.Ref;
-        var refTableContainsActiveRange = refTable.containsRange(acitveRange);
-
-        var insertRowAbove, insertRowBelow, insertColumnLeft, insertColumnRight, deleteRow = true, deleteColumn = true, deleteTable = true;
+        var refTableContainsActiveRange = selectionRange.isSingleRange() && refTable.containsRange(lastRange);
 
         //если курсор стоит в нижней строке, то разрешаем добавление нижней строки
-        insertRowBelow = !!(((tablePart.TotalsRowCount === null && acitveRange.startRow === refTable.r2) ||
-        (tablePart.TotalsRowCount !== null && acitveRange.startRow === refTable.r2 - 1)) &&
-        refTableContainsActiveRange);
+        formatTableInfo.isInsertRowBelow = (refTableContainsActiveRange && ((tablePart.TotalsRowCount === null && activeCell.row === refTable.r2) ||
+        (tablePart.TotalsRowCount !== null && activeCell.row === refTable.r2 - 1)));
 
         //если курсор стоит в правом столбце, то разрешаем добавление одного столбца правее
-        insertColumnRight = !!(acitveRange.startCol === refTable.c2 && refTableContainsActiveRange);
+        formatTableInfo.isInsertColumnRight = (refTableContainsActiveRange && activeCell.col === refTable.c2);
 
         //если внутри находится вся активная область или если выходит активная область за границу справа
-        insertColumnLeft = !!(refTableContainsActiveRange ||
-        (acitveRange.c2 > refTable.c2 && acitveRange.r1 >= refTable.r1 && acitveRange.r2 <= refTable.r2 &&
-        acitveRange.c1 >= refTable.c1));
+        formatTableInfo.isInsertColumnLeft = refTableContainsActiveRange;
 
         //если внутри находится вся активная область(кроме строки заголовков) или если выходит активная область за границу снизу
-        insertRowAbove = !!(((acitveRange.r1 > refTable.r1 && tablePart.HeaderRowCount === null) ||
-        (acitveRange.r1 >= refTable.r1 && tablePart.HeaderRowCount !== null)) && (refTableContainsActiveRange ||
-        (acitveRange.r2 > refTable.r2 && acitveRange.c1 >= refTable.c1 && acitveRange.c2 <= refTable.c2 &&
-        acitveRange.r1 >= refTable.r1)));
+        formatTableInfo.isInsertRowAbove = (refTableContainsActiveRange && ((lastRange.r1 > refTable.r1 && tablePart.HeaderRowCount === null) ||
+        (lastRange.r1 >= refTable.r1 && tablePart.HeaderRowCount !== null)));
 
-        deleteRow =
-          acitveRange.r1 <= refTable.r1 && acitveRange.r2 >= refTable.r1 && null === tablePart.HeaderRowCount ? false :
-            true;
+        formatTableInfo.isDeleteRow = refTableContainsActiveRange && !(lastRange.r1 <= refTable.r1 && lastRange.r2 >= refTable.r1 && null === tablePart.HeaderRowCount);
 
-        return {
-            insertRowAbove: insertRowAbove,
-            insertRowBelow: insertRowBelow,
-            insertColumnLeft: insertColumnLeft,
-            insertColumnRight: insertColumnRight,
-            deleteRow: deleteRow,
-            deleteColumn: deleteColumn,
-            deleteTable: deleteTable
-        };
+        formatTableInfo.isDeleteColumn = true;
+        formatTableInfo.isDeleteTable = true;
     };
 
     WorksheetView.prototype.af_changeTableRange = function (tableName, range) {
