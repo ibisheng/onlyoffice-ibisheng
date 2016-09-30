@@ -1680,6 +1680,13 @@ function CBinaryFileWriter()
                     break;
             }
 
+
+            var defTab = pPr.DefaultTabSize;
+            if (defTab !== undefined && defTab != null)
+            {
+                oThis._WriteInt1(1, defTab * 36000);
+            }
+
             var ind = pPr.Ind;
             if (ind !== undefined && ind != null)
             {

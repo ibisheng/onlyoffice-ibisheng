@@ -6112,8 +6112,14 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
         {
             // выставим дефолтные текстовые настройки  для математических Run
             var Styles = this.Paragraph.Parent.Get_Styles();
+            var StyleId = this.Paragraph.Style_Get();
             // скопируем текстовые настройки прежде чем подменим на пустые
 
+            if(Styles && typeof Styles.lastId === "string")
+            {
+                StyleId = Styles.lastId;
+                Styles = Styles.styles;
+            }
             var StyleDefaultTextPr = Styles.Default.TextPr.Copy();
             var MathFont = {Name : "Cambria Math", Index : -1};
 
@@ -6121,7 +6127,6 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
             // hAnsi, eastAsia, cs - по умолчанию шрифты не Cambria Math, а те, которые компилируются в документе
             Styles.Default.TextPr.RFonts.Merge({Ascii: MathFont});
 
-            var StyleId    = this.Paragraph.Style_Get();
 
             var Pr = Styles.Get_Pr( StyleId, styletype_Paragraph, null, null );
 
@@ -10231,10 +10236,16 @@ ParaRun.prototype.IsNormalText = function()
 };
 ParaRun.prototype.getPropsForWrite = function()
 {
-    var wRPrp = this.Pr.Copy(),
-        mathRPrp = this.MathPrp.Copy();
+    var prRPr = null, wRPrp = null;
+    if(this.Paragraph && false === this.Paragraph.bFromDocument){
+        prRPr = this.Pr.Copy();
+    }
+    else{
+        wRPrp = this.Pr.Copy();
+    }
+    var mathRPrp = this.MathPrp.Copy();
 
-    return {wRPrp: wRPrp, mathRPrp: mathRPrp};
+    return {wRPrp: wRPrp, mathRPrp: mathRPrp, prRPrp: prRPr};
 };
 ParaRun.prototype.Get_MathPr = function(bCopy)
 {

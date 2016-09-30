@@ -466,7 +466,7 @@ CBorderBox.prototype.setPosition = function(pos, PosInfo)
 };
 CBorderBox.prototype.Apply_MenuProps = function(Props)
 {
-    if(Props.Type == c_oAscMathInterfaceType.BorderBox)
+    if(Props.Type == Asc.c_oAscMathInterfaceType.BorderBox)
     {
         if(Props.HideTop !== undefined && Props.HideTop !== this.Pr.hideTop)
         {
@@ -564,7 +564,7 @@ function CMathMenuBorderBox(BorderBox)
 {
     CMathMenuBorderBox.superclass.constructor.call(this, BorderBox);
 
-    this.Type = c_oAscMathInterfaceType.BorderBox;
+    this.Type = Asc.c_oAscMathInterfaceType.BorderBox;
 
     if(undefined !== BorderBox)
     {
@@ -949,7 +949,7 @@ function CMathMenuBox(Box)
 {
     CMathMenuBox.superclass.constructor.call(this, Box);
 
-    this.Type = c_oAscMathInterfaceType.Box;
+    this.Type = Asc.c_oAscMathInterfaceType.Box;
 }
 AscCommon.extendClass(CMathMenuBox, CMathMenuBase);
 window["CMathMenuBox"] = CMathMenuBox;
@@ -1052,9 +1052,9 @@ CBar.prototype.getAscent = function()
 };
 CBar.prototype.Apply_MenuProps = function(Props)
 {
-    if(Props.Type == c_oAscMathInterfaceType.Bar && Props.Pos !== undefined)
+    if(Props.Type == Asc.c_oAscMathInterfaceType.Bar && Props.Pos !== undefined)
     {
-        var Pos = Props.Pos == c_oAscMathInterfaceBarPos.Bottom ? LOCATION_BOT : LOCATION_TOP;
+        var Pos = Props.Pos == Asc.c_oAscMathInterfaceBarPos.Bottom ? LOCATION_BOT : LOCATION_TOP;
 
         if(Pos !== this.Pr.pos)
         {
@@ -1084,11 +1084,11 @@ function CMathMenuBar(Bar)
 {
     CMathMenuBar.superclass.constructor.call(this, Bar);
 
-    this.Type   = c_oAscMathInterfaceType.Bar;
+    this.Type   = Asc.c_oAscMathInterfaceType.Bar;
 
     if (undefined !== Bar)
     {
-        this.Pos = Bar.Pr.pos == LOCATION_BOT ? c_oAscMathInterfaceBarPos.Bottom : c_oAscMathInterfaceBarPos.Top;
+        this.Pos = Bar.Pr.pos == LOCATION_BOT ? Asc.c_oAscMathInterfaceBarPos.Bottom : Asc.c_oAscMathInterfaceBarPos.Top;
     }
     else
     {

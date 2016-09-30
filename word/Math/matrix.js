@@ -770,7 +770,7 @@ CMathMatrix.prototype.Get_ColumnPos = function(Pos)
 };
 CMathMatrix.prototype.Apply_MenuProps = function(Props)
 {
-    if(Props.Type == c_oAscMathInterfaceType.Matrix)
+    if(Props.Type == Asc.c_oAscMathInterfaceType.Matrix)
     {
         var ColumnCount = this.getColsCount(),
             RowPos      = this.Get_RowPos(this.CurPos),
@@ -783,15 +783,15 @@ CMathMatrix.prototype.Apply_MenuProps = function(Props)
         {
             var BaseJc = this.Pr.baseJc;
 
-            if(Props.BaseJc === c_oAscMathInterfaceMatrixMatrixAlign.Center)
+            if(Props.BaseJc === Asc.c_oAscMathInterfaceMatrixMatrixAlign.Center)
             {
                 BaseJc = BASEJC_CENTER;
             }
-            else if(Props.BaseJc === c_oAscMathInterfaceMatrixMatrixAlign.Bottom)
+            else if(Props.BaseJc === Asc.c_oAscMathInterfaceMatrixMatrixAlign.Bottom)
             {
                 BaseJc = BASEJC_BOTTOM;
             }
-            else if(Props.BaseJc === c_oAscMathInterfaceMatrixMatrixAlign.Top)
+            else if(Props.BaseJc === Asc.c_oAscMathInterfaceMatrixMatrixAlign.Top)
             {
                 BaseJc = BASEJC_TOP;
             }
@@ -804,15 +804,15 @@ CMathMatrix.prototype.Apply_MenuProps = function(Props)
             var CurrentMcJc = this.Pr.Get_ColumnMcJc(ColumnPos);
             var McJc = CurrentMcJc;
 
-            if(Props.ColumnJc === c_oAscMathInterfaceMatrixColumnAlign.Center)
+            if(Props.ColumnJc === Asc.c_oAscMathInterfaceMatrixColumnAlign.Center)
             {
                 McJc = MCJC_CENTER;
             }
-            else if(Props.ColumnJc === c_oAscMathInterfaceMatrixColumnAlign.Left)
+            else if(Props.ColumnJc === Asc.c_oAscMathInterfaceMatrixColumnAlign.Left)
             {
                 McJc = MCJC_LEFT;
             }
-            else if(Props.ColumnJc === c_oAscMathInterfaceMatrixColumnAlign.Right)
+            else if(Props.ColumnJc === Asc.c_oAscMathInterfaceMatrixColumnAlign.Right)
             {
                 McJc = MCJC_RIGHT;
             }
@@ -1086,7 +1086,7 @@ function CMathMenuMatrix(MathMatrix)
 {
     CMathMenuMatrix.superclass.constructor.call(this, MathMatrix);
 
-    this.Type           = c_oAscMathInterfaceType.Matrix;
+    this.Type           = Asc.c_oAscMathInterfaceType.Matrix;
 
     if (undefined !== MathMatrix)
     {
@@ -1159,8 +1159,8 @@ function CMathMenuMatrix(MathMatrix)
 
         var ColumnJc = MathMatrix.Pr.Get_ColumnMcJc(ColumnPos);
 
-        this.BaseJc         = MathMatrix.Pr.baseJc === BASEJC_CENTER ? c_oAscMathInterfaceMatrixMatrixAlign.Center : (MathMatrix.Pr.baseJc === BASEJC_BOTTOM ? c_oAscMathInterfaceMatrixMatrixAlign.Bottom : c_oAscMathInterfaceMatrixMatrixAlign.Top);
-        this.ColumnJc       = ColumnJc === MCJC_CENTER ? c_oAscMathInterfaceMatrixColumnAlign.Center : (ColumnJc === MCJC_RIGHT ? c_oAscMathInterfaceMatrixColumnAlign.Right : c_oAscMathInterfaceMatrixColumnAlign.Left);
+        this.BaseJc         = MathMatrix.Pr.baseJc === BASEJC_CENTER ? Asc.c_oAscMathInterfaceMatrixMatrixAlign.Center : (MathMatrix.Pr.baseJc === BASEJC_BOTTOM ? Asc.c_oAscMathInterfaceMatrixMatrixAlign.Bottom : Asc.c_oAscMathInterfaceMatrixMatrixAlign.Top);
+        this.ColumnJc       = ColumnJc === MCJC_CENTER ? Asc.c_oAscMathInterfaceMatrixColumnAlign.Center : (ColumnJc === MCJC_RIGHT ? Asc.c_oAscMathInterfaceMatrixColumnAlign.Right : Asc.c_oAscMathInterfaceMatrixColumnAlign.Left);
         this.RowRule        = RowRule;
         this.RowGap         = RowGap;
         this.ColumnRule     = ColumnRule;
@@ -1530,21 +1530,21 @@ CEqArray.prototype.getElementMathContent = function(Index)
 };
 CEqArray.prototype.Apply_MenuProps = function(Props)
 {
-    if(Props.Type == c_oAscMathInterfaceType.EqArray)
+    if(Props.Type == Asc.c_oAscMathInterfaceType.EqArray)
     {
         if(Props.BaseJc !== undefined)
         {
             var BaseJc = this.Pr.baseJc;
 
-            if(Props.BaseJc === c_oAscMathInterfaceEqArrayAlign.Center)
+            if(Props.BaseJc === Asc.c_oAscMathInterfaceEqArrayAlign.Center)
             {
                 BaseJc = BASEJC_CENTER;
             }
-            else if(Props.BaseJc === c_oAscMathInterfaceEqArrayAlign.Bottom)
+            else if(Props.BaseJc === Asc.c_oAscMathInterfaceEqArrayAlign.Bottom)
             {
                 BaseJc = BASEJC_BOTTOM;
             }
-            else if(Props.BaseJc === c_oAscMathInterfaceEqArrayAlign.Top)
+            else if(Props.BaseJc === Asc.c_oAscMathInterfaceEqArrayAlign.Top)
             {
                 BaseJc = BASEJC_TOP;
             }
@@ -1644,7 +1644,7 @@ function CMathMenuEqArray(EqArray)
 {
     CMathMenuEqArray.superclass.constructor.call(this, EqArray);
 
-    this.Type    = c_oAscMathInterfaceType.EqArray;
+    this.Type    = Asc.c_oAscMathInterfaceType.EqArray;
 
     if (undefined !== EqArray)
     {
@@ -1681,7 +1681,7 @@ function CMathMenuEqArray(EqArray)
             }
         }
 
-        this.BaseJc  = EqArray.Pr.baseJc === BASEJC_CENTER ? c_oAscMathInterfaceEqArrayAlign.Center : (EqArray.Pr.baseJc === BASEJC_BOTTOM ? c_oAscMathInterfaceEqArrayAlign.Bottom : c_oAscMathInterfaceEqArrayAlign.Top);
+        this.BaseJc  = EqArray.Pr.baseJc === BASEJC_CENTER ? Asc.c_oAscMathInterfaceEqArrayAlign.Center : (EqArray.Pr.baseJc === BASEJC_BOTTOM ? Asc.c_oAscMathInterfaceEqArrayAlign.Bottom : Asc.c_oAscMathInterfaceEqArrayAlign.Top);
         this.RowRule = RowRule;
         this.RowGap  = RowGap;
     }

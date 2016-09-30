@@ -2011,13 +2011,14 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
     var NewX = 0;
 
     // Если табов нет, либо их позиции левее текущей позиции ставим таб по умолчанию
+    var DefTab = ParaPr.DefaultTabSize != null ? ParaPr.DefaultTabSize : Default_Tab_Stop;
     if ( null === Tab )
     {
         if ( X < PageStart.X + ParaPr.Ind.Left )
         {
             NewX = PageStart.X + ParaPr.Ind.Left;
         }
-        else if (Default_Tab_Stop < 0.001)
+        else if (DefTab < 0.001)
         {
             NewX = X;
         }
@@ -2025,7 +2026,7 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
         {
             NewX = PageStart.X;
             while ( X >= NewX - 0.001 )
-                NewX += Default_Tab_Stop;
+                NewX += DefTab;
         }
     }
     else

@@ -485,11 +485,11 @@ CMathSettings.prototype.Set_MenuProps = function(Props)
 
     if(Props.IntLim !== undefined)
     {
-        if(Props.IntLim == c_oAscMathInterfaceNaryLimitLocation.SubSup)
+        if(Props.IntLim == Asc.c_oAscMathInterfaceNaryLimitLocation.SubSup)
         {
             this.Pr.intLim = NARY_SubSup;
         }
-        else if(Props.IntLim == c_oAscMathInterfaceNaryLimitLocation.UndOvr)
+        else if(Props.IntLim == Asc.c_oAscMathInterfaceNaryLimitLocation.UndOvr)
         {
             this.Pr.intLim = NARY_UndOvr;
         }
@@ -497,11 +497,11 @@ CMathSettings.prototype.Set_MenuProps = function(Props)
 
     if(Props.NaryLim !== undefined)
     {
-        if(Props.NaryLim == c_oAscMathInterfaceNaryLimitLocation.SubSup)
+        if(Props.NaryLim == Asc.c_oAscMathInterfaceNaryLimitLocation.SubSup)
         {
             this.Pr.naryLim = NARY_SubSup;
         }
-        else if(Props.NaryLim == c_oAscMathInterfaceNaryLimitLocation.UndOvr)
+        else if(Props.NaryLim == Asc.c_oAscMathInterfaceNaryLimitLocation.UndOvr)
         {
             this.Pr.naryLim = NARY_UndOvr;
         }
@@ -578,8 +578,8 @@ function CMathMenuSettings(oMathPr)
 
         this.UseSettings    = oMathPr.dispDef;
 
-        this.IntLim         = oMathPr.intLim === NARY_SubSup ? c_oAscMathInterfaceNaryLimitLocation.SubSup : c_oAscMathInterfaceNaryLimitLocation.UndOvr;
-        this.NaryLim        = oMathPr.naryLim === NARY_SubSup ? c_oAscMathInterfaceNaryLimitLocation.SubSup : c_oAscMathInterfaceNaryLimitLocation.UndOvr;
+        this.IntLim         = oMathPr.intLim === NARY_SubSup ? Asc.c_oAscMathInterfaceNaryLimitLocation.SubSup : Asc.c_oAscMathInterfaceNaryLimitLocation.UndOvr;
+        this.NaryLim        = oMathPr.naryLim === NARY_SubSup ? Asc.c_oAscMathInterfaceNaryLimitLocation.SubSup : Asc.c_oAscMathInterfaceNaryLimitLocation.UndOvr;
 
         this.LeftMargin     = oMathPr.lMargin/10;
         this.RightMargin    = oMathPr.rMargin/10;
@@ -647,7 +647,7 @@ CMathMenuSettings.prototype["put_SmallFraction"]   = CMathMenuSettings.prototype
 
 function Get_WordDocumentDefaultMathSettings()
 {
-    if (!editor)
+    if (!editor || !editor.WordControl.m_oLogicDocument || !editor.WordControl.m_oLogicDocument.Settings)
         return new CMathSettings();
 
     return editor.WordControl.m_oLogicDocument.Settings.MathSettings;

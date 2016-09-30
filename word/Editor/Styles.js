@@ -9908,6 +9908,7 @@ function CParaPr()
     this.DefaultRunPr      = undefined;
     this.Bullet            = undefined;
     this.Lvl               = undefined;
+    this.DefaultTabSize    = undefined;
 
     this.PrChange          = undefined;
 }
@@ -9976,6 +9977,9 @@ CParaPr.prototype =
 
         if(undefined != this.Lvl)
             ParaPr.Lvl = this.Lvl;
+
+        if(undefined != this.DefaultTabSize)
+            ParaPr.DefaultTabSize = this.DefaultTabSize;
 
         if (true === bCopyPrChange && undefined !== this.PrChange)
         {
@@ -10072,6 +10076,10 @@ CParaPr.prototype =
 
         if(undefined != ParaPr.Lvl)
             this.Lvl = ParaPr.Lvl;
+
+        if(undefined != ParaPr.DefaultTabSize)
+            this.DefaultTabSize = ParaPr.DefaultTabSize;
+
     },
 
     Init_Default : function()
@@ -10108,6 +10116,7 @@ CParaPr.prototype =
 
         this.DefaultRunPr              = undefined;
         this.Bullet                    = undefined;
+        this.DefaultTabSize            = undefined;
     },
 
     Set_FromObject : function(ParaPr)
@@ -10223,6 +10232,11 @@ CParaPr.prototype =
             this.Bullet = new AscFormat.CBullet();
             this.Bullet.Set_FromObject(ParaPr.Bullet);
         }
+
+        if(undefined != ParaPr.DefaultTabSize)
+        {
+            this.DefaultTabSize = ParaPr.DefaultTabSize;
+        }
     },
 
     Compare : function(ParaPr)
@@ -10335,6 +10349,10 @@ CParaPr.prototype =
 
         if(undefined != this.Lvl && undefined != ParaPr.Lvl && ParaPr.Lvl === this.Lvl)
             Result_ParaPr.Lvl = this.Lvl;
+
+
+        if(undefined != this.DefaultTabSize && undefined != ParaPr.DefaultTabSize && ParaPr.DefaultTabSize === this.DefaultTabSize)
+            Result_ParaPr.DefaultTabSize = this.DefaultTabSize;
 
 
         return Result_ParaPr;
@@ -10472,6 +10490,12 @@ CParaPr.prototype =
             Flags |= 1048576;
         }
 
+        if(undefined != this.DefaultTabSize)
+        {
+            Writer.WriteDouble(this.DefaultTabSize);
+            Flags |= 2097152;
+        }
+
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
         Writer.WriteLong( Flags );
@@ -10584,6 +10608,11 @@ CParaPr.prototype =
         if(Flags & 1048576)
         {
             this.Lvl = Reader.GetByte();
+        }
+
+        if(Flags & 2097152)
+        {
+            this.DefaultTabSize = Reader.GetDouble();
         }
     },
 

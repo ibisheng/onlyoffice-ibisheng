@@ -2204,6 +2204,7 @@ CShape.prototype.recalculateTextStyles = function (level) {
         default_style.ParaPr.Spacing.Line = 1;
         default_style.ParaPr.Spacing.Before = 0;
         default_style.ParaPr.Spacing.After = 0;
+        default_style.ParaPr.DefaultTabSize = 25.4;
         default_style.ParaPr.Align = AscCommon.align_Center;
         if(parent_objects.theme)
         {

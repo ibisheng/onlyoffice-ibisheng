@@ -23173,9 +23173,9 @@ CTitle.prototype =
         if(content && this.tx && this.tx.rich)
         {
             var dd = this.getDrawingDocument();
-            dd.StartSearchTransform( this.transformText);
+            dd.StartSearchTransform && dd.StartSearchTransform( this.transformText);
             content.Search(Str, Props, SearchEngine, Type);
-            dd.EndSearchTransform();
+            dd.EndSearchTransform && dd.EndSearchTransform();
         }
     },
 

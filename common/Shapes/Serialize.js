@@ -6703,7 +6703,10 @@ function BinaryPPTYLoader()
                 }
                 case 1:
                 {
-                    rPr.Unifill = this.ReadUniFill();
+                    var oUniFill = this.ReadUniFill();
+                    if(oUniFill.fill){
+                        rPr.Unifill = oUniFill;
+                    }
                     break;
                 }
                 case 2:
@@ -7130,7 +7133,7 @@ function BinaryPPTYLoader()
                 }
                 case 1:
                 {
-                    var default_tab = s.GetLong()/36000;
+                    para_pr.DefaultTabSize = s.GetLong()/36000;
                     break;
                 }
                 case 2:
@@ -8076,6 +8079,7 @@ function BinaryPPTYLoader()
 								var parContentOld = par.Content.length;
 
 								var oParStruct = new OpenParStruct(par, par);
+                                oParStruct.cur.pos = par.Content.length - 1;
 								if (!this.DocReadResult) {
 									this.DocReadResult = new AscCommonWord.DocReadResult(null);
 								}

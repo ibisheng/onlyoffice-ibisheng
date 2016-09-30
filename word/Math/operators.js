@@ -3771,7 +3771,7 @@ CDelimiter.prototype.Apply_MenuProps = function(Props)
 {
     var NewContent;
 
-    if(Props.Type == c_oAscMathInterfaceType.Delimiter)
+    if(Props.Type == Asc.c_oAscMathInterfaceType.Delimiter)
     {
         if(Props.HideBegOper !== undefined && Props.HideBegOper !== this.begOper.Is_Empty())
         {
@@ -4033,7 +4033,7 @@ function CMathMenuDelimiter(Delimiter)
 {
     CMathMenuDelimiter.superclass.constructor.call(this, Delimiter);
 
-    this.Type         = c_oAscMathInterfaceType.Delimiter;
+    this.Type         = Asc.c_oAscMathInterfaceType.Delimiter;
 
     if (Delimiter)
     {
@@ -4391,11 +4391,11 @@ CGroupCharacter.prototype.getAscent = function(oMeasure)
 };
 CGroupCharacter.prototype.Apply_MenuProps = function(Props)
 {
-    if(Props.Type == c_oAscMathInterfaceType.GroupChar)
+    if(Props.Type == Asc.c_oAscMathInterfaceType.GroupChar)
     {
         if(Props.Pos !== undefined && true == this.Can_ChangePos())
         {
-            var Pos = Props.Pos == c_oAscMathInterfaceGroupCharPos.Bottom ? LOCATION_BOT : LOCATION_TOP;
+            var Pos = Props.Pos == Asc.c_oAscMathInterfaceGroupCharPos.Bottom ? LOCATION_BOT : LOCATION_TOP;
 
             if(Pos !== this.Pr.pos)
                 this.private_InversePr();
@@ -4481,11 +4481,11 @@ function CMathMenuGroupCharacter(GroupChr)
 {
     CMathMenuGroupCharacter.superclass.constructor.call(this, GroupChr);
 
-    this.Type          = c_oAscMathInterfaceType.GroupChar;
+    this.Type          = Asc.c_oAscMathInterfaceType.GroupChar;
 
     if (undefined !== GroupChr)
     {
-        this.Pos           = GroupChr.Pr.pos == LOCATION_BOT ? c_oAscMathInterfaceGroupCharPos.Bottom : c_oAscMathInterfaceGroupCharPos.Top;
+        this.Pos           = GroupChr.Pr.pos == LOCATION_BOT ? Asc.c_oAscMathInterfaceGroupCharPos.Bottom : Asc.c_oAscMathInterfaceGroupCharPos.Top;
         this.bCanChangePos = GroupChr.Can_ChangePos();
     }
     else

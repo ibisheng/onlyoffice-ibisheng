@@ -4093,6 +4093,9 @@ background-repeat: no-repeat;\
 		}
 		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(type, objects);
 	};
+	asc_docs_api.prototype.sync_MathPropCallback  = function(mathProp)
+	{
+	};
 
 	asc_docs_api.prototype.SetDrawingFreeze = function(bIsFreeze)
 	{

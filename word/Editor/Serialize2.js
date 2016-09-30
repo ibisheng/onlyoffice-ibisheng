@@ -2458,14 +2458,16 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
             	case para_Tab : 				oText += " "; break;
             }
 		}
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.RPr,	function(){oThis.brPrs.Write_rPr(props.wRPrp, null, null);}); // w:rPr
+
+		if(null != props.wRPrp){
+            this.bs.WriteItem(c_oSer_OMathContentType.RPr,	function(){oThis.brPrs.Write_rPr(props.wRPrp, null, null);}); // w:rPr
+        }
 		this.bs.WriteItem(c_oSer_OMathContentType.MRPr,	function(){oThis.WriteMRPr(props.mathRPrp);}); // m:rPr
-		// if (oMRun.ARPr) { // a:rPr
-			// this.bs.WriteItem(c_oSer_OMathContentType.ARPr,	function(){
-				// pptx_content_writer.WriteRunProperties(oThis.memory, oMRun.ARPr);
-			// });
-		// }
+        if(null != props.prRPrp){
+            this.bs.WriteItem(c_oSer_OMathContentType.ARPr,	function(){
+                pptx_content_writer.WriteRunProperties(oThis.memory, props.prRPrp);
+            });
+        }
 		this.bs.WriteItem(c_oSer_OMathContentType.MText,function(){oThis.WriteMText(oText.toString());}); // m:t
 	}
 	this.WriteMText = function(sText)
@@ -2753,8 +2755,8 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
 		var props = oFraction.getPropsForWrite();
 		
 		this.bs.WriteItem(c_oSer_OMathContentType.FPr, function(){oThis.WriteFPr(props, oFraction);});
+        this.bs.WriteItem(c_oSer_OMathContentType.Num, function(){oThis.WriteArgNodes(oNum);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Den, function(){oThis.WriteArgNodes(oDen);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Num, function(){oThis.WriteArgNodes(oNum);});
 	}
 	this.WriteFPr = function(props,oFraction)
 	{
@@ -11368,7 +11370,7 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
 		else if (c_oSer_OMathContentType.ARPr === type)
 		{
 			var rPr = pptx_content_loader.ReadRunProperties(this.stream);
-			//oMRun.ARPr = rPr;
+            oMRun.Set_Pr(rPr);
 		}
 		else if (c_oSer_OMathContentType.RPr === type)
 		{

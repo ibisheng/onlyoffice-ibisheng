@@ -719,7 +719,7 @@ CRadical.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 };
 CRadical.prototype.Apply_MenuProps = function(Props)
 {
-    if(Props.Type == c_oAscMathInterfaceType.Radical && Props.HideDegree !== undefined)
+    if(Props.Type == Asc.c_oAscMathInterfaceType.Radical && Props.HideDegree !== undefined)
     {
         if(true == this.Iterator.IsPlaceholder() && Props.HideDegree !== this.Pr.degHide)
         {
@@ -778,12 +778,12 @@ function CMathMenuRadical(Radical)
         if (Radical.Iterator.IsPlaceholder())
             HideDegree = Radical.Pr.degHide == true;
 
-        this.Type       = c_oAscMathInterfaceType.Radical;
+        this.Type       = Asc.c_oAscMathInterfaceType.Radical;
         this.HideDegree = HideDegree;
     }
     else
     {
-        this.Type       = c_oAscMathInterfaceType.Radical;
+        this.Type       = Asc.c_oAscMathInterfaceType.Radical;
         this.HideDegree = undefined;
     }
 }
