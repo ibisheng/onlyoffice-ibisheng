@@ -7353,9 +7353,6 @@
         this.model.workbook.handlers.trigger( "asc_onHideComment" );
         this._updateSelectionNameAndInfo();
     };
-    WorksheetView.prototype.getActiveRangeObj = function () {
-        return this.activeRange.clone( true );
-    };
     WorksheetView.prototype.setSelection = function (range, validRange) {
         var selectionRange, tmpRange;
         // Проверка на валидность range.

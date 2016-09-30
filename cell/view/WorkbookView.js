@@ -712,9 +712,6 @@
     this.model.handlers.add("setSelection", function() {
       self._onSetSelection.apply(self, arguments);
     });
-    this.model.handlers.add("getSelection", function() {
-      return self._onGetSelection.apply(self);
-    });
     this.model.handlers.add("getSelectionState", function() {
       return self._onGetSelectionState.apply(self);
     });
@@ -907,11 +904,6 @@
     ws._checkSelectionShape();
     var d = ws.setSelectionUndoRedo(range, validRange);
     this.controller.scroll(d);
-  };
-
-  WorkbookView.prototype._onGetSelection = function() {
-    var ws = this.getWorksheet(null, true);
-    return ws ? ws.getActiveRangeObj() : null;
   };
 
   WorkbookView.prototype._onGetSelectionState = function() {

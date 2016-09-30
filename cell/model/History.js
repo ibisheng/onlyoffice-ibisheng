@@ -619,12 +619,13 @@ CHistory.prototype.Create_NewPoint = function()
 	var UpdateRigions = {};
 	var Time  = new Date().getTime();
 	var UndoSheetId = null, oSelectionState = this.workbook.handlers.trigger("getSelectionState");
-
-	// ToDo Берем всегда, т.к. в случае с LastState мы можем не попасть на нужный лист и не заселектить нужный диапазон!
-	var oSelectRange = this.workbook.handlers.trigger("getSelection");
+	var oSelectRange = null;
 	var wsActive = this.workbook.getWorksheet(this.workbook.getActive());
-	if (wsActive)
+	if (wsActive) {
 		UndoSheetId = wsActive.getId();
+		// ToDo Берем всегда, т.к. в случае с LastState мы можем не попасть на нужный лист и не заселектить нужный диапазон!
+		oSelectRange = wsActive.selectionRange.getLast(); // ToDo get only last selection range
+	}
 
     // Создаем новую точку
     this.Points[++this.Index] = {
