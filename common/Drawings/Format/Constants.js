@@ -995,6 +995,13 @@
 			case AscDFH.historydescription_Document_AddPageCount:
 				sString = "Document_AddPageCount                      ";
 				break;
+			case AscDFH.historydescription_Document_AddFootnote:
+				sString = "Document_AddFootnote                       ";
+				break;
+			case AscDFH.historydescription_Document_SetFootnotePr:
+				sString = "Document_SetFootnotePr                     ";
+				break;
+
 		}
 		return sString;
 	}
@@ -2694,4 +2701,6 @@
 	window['AscDFH'].historydescription_Document_CompositeInput                     = 0x0139;
 	window['AscDFH'].historydescription_Document_CompositeInputReplace              = 0x013a;
 	window['AscDFH'].historydescription_Document_AddPageCount                       = 0x013b;
+	window['AscDFH'].historydescription_Document_AddFootnote                        = 0x013c;
+	window['AscDFH'].historydescription_Document_SetFootnotePr                      = 0x013d;
 })(window);

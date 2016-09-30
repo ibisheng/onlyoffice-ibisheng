@@ -560,7 +560,7 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nCol
 		nNumStart   = oSectPr.GetFootnoteNumStart();
 	}
 
-	// NumStart никак не влияет в случаях RestartEachPage и RestartEachSect. Влияет только на случай RestartContinious:
+	// NumStart никак не влияет в случаях RestartEachPage и RestartEachSect. Влияет только на случай RestartContinuous:
 	// к общему количеству сносок добавляется данное значение, взятое для текущей секции, этоже значение из предыдущих
 	// секций не учитывается.
 
@@ -647,7 +647,7 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nCol
 			}
 		}
 	}
-	else// if (section_footnote_RestartContinious === nNumRestart)
+	else// if (section_footnote_RestartContinuous === nNumRestart)
 	{
 		// Здесь нам надо считать, сколько сносок всего в документе до данного момента, отталкиваться от предыдущей мы
 		// не можем, потому что Word считает общее количество сносок, а не продолжает нумерацию с предыдущей секции,
@@ -3351,6 +3351,10 @@ CFootnotesController.prototype.GetColumnSize = function()
 		W : AscCommon.Page_Width - (AscCommon.X_Left_Margin + AscCommon.X_Right_Margin),
 		H : AscCommon.Page_Height - (AscCommon.Y_Top_Margin + AscCommon.Y_Bottom_Margin)
 	};
+};
+CFootnotesController.prototype.GetCurrentSectionPr = function()
+{
+	return null;
 };
 
 

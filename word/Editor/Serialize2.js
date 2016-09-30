@@ -838,7 +838,7 @@ var ETblLayoutType = {
 	tbllayouttypeFixed: 2
 };
 var ESectionMark = {
-	sectionmarkContinious: 0,
+	sectionmarkContinuous: 0,
 	sectionmarkEvenPage: 1,
 	sectionmarkNextColumn: 2,
 	sectionmarkNextPage: 3,
@@ -1908,7 +1908,7 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter, sav
 		var nFormatType = null;
 		switch(sectPr.Get_Type())
 		{
-			case c_oAscSectionBreakType.Continuous: nFormatType = ESectionMark.sectionmarkContinious;break;
+			case c_oAscSectionBreakType.Continuous: nFormatType = ESectionMark.sectionmarkContinuous;break;
 			case c_oAscSectionBreakType.EvenPage: nFormatType = ESectionMark.sectionmarkEvenPage;break;
 			case c_oAscSectionBreakType.Column: nFormatType = ESectionMark.sectionmarkNextColumn;break;
 			case c_oAscSectionBreakType.NextPage: nFormatType = ESectionMark.sectionmarkNextPage;break;
@@ -7113,7 +7113,7 @@ function Binary_pPrReader(doc, oReadResult, stream)
 			var nEditorType = null;
 			switch(this.stream.GetByte())
 			{
-				case ESectionMark.sectionmarkContinious: nEditorType = c_oAscSectionBreakType.Continuous;break;
+				case ESectionMark.sectionmarkContinuous: nEditorType = c_oAscSectionBreakType.Continuous;break;
 				case ESectionMark.sectionmarkEvenPage: nEditorType = c_oAscSectionBreakType.EvenPage;break;
 				case ESectionMark.sectionmarkNextColumn: nEditorType = c_oAscSectionBreakType.Column;break;
 				case ESectionMark.sectionmarkNextPage: nEditorType = c_oAscSectionBreakType.NextPage;break;

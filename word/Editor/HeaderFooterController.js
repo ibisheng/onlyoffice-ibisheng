@@ -471,3 +471,7 @@ CHdrFtrController.prototype.GetColumnSize = function()
 
 	return {W : 0, H : 0};
 };
+CHdrFtrController.prototype.GetCurrentSectionPr = function()
+{
+	return null;
+};

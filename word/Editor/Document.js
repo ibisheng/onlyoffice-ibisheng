@@ -9727,6 +9727,14 @@ CDocument.prototype.Create_HdrFtrWidthPageNum = function(PageIndex, AlignV, Alig
 
 	this.Recalculate();
 };
+CDocument.prototype.GetCurrentSectionPr = function()
+{
+	var oSectPr = this.Controller.GetCurrentSectionPr();
+	if (null === oSectPr)
+		return this.controller_GetCurrentSectionPr();
+
+	return oSectPr;
+};
 /**
  * Определяем использовать ли заливку текста в особых случаях, когда вызывается заливка параграфа.
  * @param bUse
@@ -11433,13 +11441,12 @@ CDocument.prototype.AddFootnote = function(sText)
 
 	if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 	{
-		this.History.Create_NewPoint();
+		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddFootnote);
 
 		var nDocPosType = this.Get_DocPosType();
 		if (docpostype_Content === nDocPosType)
 		{
-			var oStyles    = this.Get_Styles();
-			var oFootnote  = this.Footnotes.CreateFootnote();
+			var oFootnote = this.Footnotes.CreateFootnote();
 			oFootnote.AddDefaultFootnoteContent(sText);
 
 			if (sText)
@@ -11460,6 +11467,63 @@ CDocument.prototype.AddFootnote = function(sText)
 CDocument.prototype.GetFootnotesController = function()
 {
 	return this.Footnotes;
+};
+CDocument.prototype.SetFootnotePr = function(oFootnotePr, bApplyToAll)
+{
+	var nNumStart   = oFootnotePr.get_NumStart();
+	var nNumRestart = oFootnotePr.get_NumRestart();
+	var nNumFormat  = oFootnotePr.get_NumFormat();
+	var nPos        = oFootnotePr.get_Pos();
+	if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr))
+	{
+		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetFootnotePr);
+
+		if (bApplyToAll)
+		{
+			for (var nIndex = 0, nCount = this.SectionsInfo.Get_SectionsCount(); nIndex < nCount; ++nIndex)
+			{
+				var oSectPr = this.SectionsInfo.Get_SectPr2(nIndex).SectPr;
+				if (undefined !== nNumStart)
+					oSectPr.SetFootnoteNumStart(nNumStart);
+
+				if (undefined !== nNumRestart)
+					oSectPr.SetFootnoteNumRestart(nNumRestart);
+
+				if (undefined !== nNumFormat)
+					oSectPr.SetFootnoteNumFormat(nNumFormat);
+
+				if (undefined !== nPos)
+					oSectPr.SetFootnotePos(nPos);
+			}
+		}
+		else
+		{
+			var oSectPr = this.GetCurrentSectionPr();
+			if (undefined !== nNumStart)
+				oSectPr.SetFootnoteNumStart(nNumStart);
+
+			if (undefined !== nNumRestart)
+				oSectPr.SetFootnoteNumRestart(nNumRestart);
+
+			if (undefined !== nNumFormat)
+				oSectPr.SetFootnoteNumFormat(nNumFormat);
+
+			if (undefined !== nPos)
+				oSectPr.SetFootnotePos(nPos);
+		}
+
+		this.Recalculate();
+	}
+};
+CDocument.prototype.GetFootnotePr = function()
+{
+	var oSectPr     = this.GetCurrentSectionPr();
+	var oFootnotePr = new Asc.CAscFootnotePr();
+	oFootnotePr.put_Pos(oSectPr.GetFootnotePos());
+	oFootnotePr.put_NumStart(oSectPr.GetFootnoteNumStart());
+	oFootnotePr.put_NumRestart(oSectPr.GetFootnoteNumRestart());
+	oFootnotePr.put_NumFormat(oSectPr.GetFootnoteNumFormat());
+	return oFootnotePr;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые вызываются из CLogicDocumentController
@@ -16129,6 +16193,11 @@ CDocument.prototype.controller_GetColumnSize = function()
 		W : XLimit - X,
 		H : YLimit - Y
 	};
+};
+CDocument.prototype.controller_GetCurrentSectionPr = function()
+{
+	var nContentPos = this.CurPos.ContentPos;
+	return this.SectionsInfo.Get_SectPr(nContentPos).SectPr;
 };
 //----------------------------------------------------------------------------------------------------------------------
 //
