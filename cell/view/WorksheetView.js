@@ -7356,41 +7356,45 @@
     WorksheetView.prototype.getActiveRangeObj = function () {
         return this.activeRange.clone( true );
     };
-    WorksheetView.prototype.setSelection = function ( range, validRange ) {
+    WorksheetView.prototype.setSelection = function (range, validRange) {
+        var selectionRange, tmpRange;
         // Проверка на валидность range.
-        if ( validRange && (range.c2 >= this.nColsCount || range.r2 >= this.nRowsCount) ) {
-            if ( range.c2 >= this.nColsCount ) {
-                this.expandColsOnScroll( false, true, range.c2 + 1 );
+        if (validRange && (range.c2 >= this.nColsCount || range.r2 >= this.nRowsCount)) {
+            if (range.c2 >= this.nColsCount) {
+                this.expandColsOnScroll(false, true, range.c2 + 1);
             }
-            if ( range.r2 >= this.nRowsCount ) {
-                this.expandRowsOnScroll( false, true, range.r2 + 1 );
+            if (range.r2 >= this.nRowsCount) {
+                this.expandRowsOnScroll(false, true, range.r2 + 1);
             }
         }
 
         this.cleanSelection();
         // Проверка на всякий случай
-        if ( !(range instanceof asc_Range) ) {
-            range = new asc_Range( range.c1, range.r1, range.c2, range.r2 );
+        if (!(range instanceof asc_Range)) {
+            range = new asc_Range(range.c1, range.r1, range.c2, range.r2);
         }
-        if ( gc_nMaxCol0 === range.c2 || gc_nMaxRow0 === range.r2 ) {
+        if (gc_nMaxCol0 === range.c2 || gc_nMaxRow0 === range.r2) {
             range = range.clone();
-            if ( gc_nMaxCol0 === range.c2 ) {
+            if (gc_nMaxCol0 === range.c2) {
                 range.c2 = this.cols.length - 1;
             }
-            if ( gc_nMaxRow0 === range.r2 ) {
+            if (gc_nMaxRow0 === range.r2) {
                 range.r2 = this.rows.length - 1;
             }
         }
 
-        this.activeRange = new asc_ActiveRange( range );
-        this.activeRange.type = c_oAscSelectionType.RangeCells;
-        this.activeRange.startCol = range.c1;
-        this.activeRange.startRow = range.r1;
+        selectionRange = this.model.selectionRange;
+        selectionRange.clean();
+        tmpRange = selectionRange.getLast();
+        tmpRange.type = c_oAscSelectionType.RangeCells;
+        tmpRange.c1 = range.c1;
+        tmpRange.c2 = range.c2;
+        tmpRange.r1 = range.r1;
+        tmpRange.r2 = range.r2;
+        tmpRange.normalize();
+        selectionRange.update();
 
-        // Нормализуем range
-        this.activeRange.normalize();
         this._drawSelection();
-
         this._updateSelectionNameAndInfo();
         return this._calcActiveCellOffset();
     };
@@ -10890,8 +10894,9 @@
     };
 
     WorksheetView.prototype.findCell = function (reference, isViewerMode) {
+        var mc, bNew = false;
         var range = AscCommonExcel.g_oRangeCache.getRange3D(reference) ||
-          AscCommonExcel.g_oRangeCache.getAscRange(reference), bNew = false;
+          AscCommonExcel.g_oRangeCache.getAscRange(reference);
         if (!range) {
             if (isViewerMode) {
                 return range;
@@ -10909,15 +10914,12 @@
                     return true;
                 }
 
-                var actRange = this.getActiveRangeObj(), ascRange, mc = this.model.getMergedByCell(actRange.startRow,
-                  actRange.startCol), c1 = mc ? mc.c1 : actRange.c1, r1 = mc ? mc.r1 :
-                  actRange.r1, ar_norm = actRange.normalize(), mc_norm = mc ? mc.normalize() : null, c2 = mc_norm ?
-                  ( mc_norm.isEqual(ar_norm) ? mc_norm.c1 : ar_norm.c2 ) : ar_norm.c2, r2 = mc_norm ?
-                  ( mc_norm.isEqual(ar_norm) ? mc_norm.r1 : ar_norm.r2 ) : ar_norm.r2;
-
-                ascRange = new asc_Range(c1, r1, c2, r2);
+                // ToDo multiselect defined names
+                var selectionLast = this.model.selection.getLast();
+                mc = selectionLast.isOneCell() ? this.model.getMergedByCell(selectionLast.r1, selectionLast.c1) : null;
                 defName = this.model.workbook.editDefinesNames(null,
-                  new Asc.asc_CDefName(reference, parserHelp.get3DRef(this.model.getName(), ascRange.getAbsName())));
+                  new Asc.asc_CDefName(reference, parserHelp.get3DRef(this.model.getName(),
+                    (mc || ascRange).getAbsName())));
                 bNew = true;
             }
 
@@ -10947,14 +10949,14 @@
                 }
 
                 if (range && sheetName) {
-                    ar_norm = range.normalize();
-                    mc = sheetName.getMergedByCell(ar_norm.r1, ar_norm.c1);
+                    range = range.normalize();
+                    mc = range.isOneCell() ? sheetName.getMergedByCell(range.r1, range.c1) : null;
                     range = {range: mc ? mc : range, sheet: sheetName.getName(), new: bNew};
                 }
             }
         } else {
-            var ar_norm = range.normalize(), mc = this.model.getMergedByCell(ar_norm.r1, ar_norm.c1);
-
+            range = range.normalize();
+            mc = range.isOneCell() ? this.model.getMergedByCell(range.r1, range.c1) : null;
             range = {range: mc ? mc : range, sheet: this.model.getName()};
         }
         return range;
