@@ -121,6 +121,7 @@
 	function asc_CAscEditorPermissions() {
 		this.licenseType = c_oLicenseResult.Error;
 		this.isLight = false;
+		this.trial = false;
 		this.canCoAuthoring = true;
 		this.canReaderMode = true;
 		this.canBranding = false;
@@ -154,6 +155,9 @@
 	asc_CAscEditorPermissions.prototype.asc_getIsLight = function () {
 		return this.isLight;
 	};
+	asc_CAscEditorPermissions.prototype.asc_getTrial = function () {
+		return this.trial;
+	};
 
 	asc_CAscEditorPermissions.prototype.setLicenseType = function (v) {
 		this.licenseType = v;
@@ -163,6 +167,9 @@
 	};
 	asc_CAscEditorPermissions.prototype.setIsLight = function (v) {
 		this.isLight = v;
+	};
+	asc_CAscEditorPermissions.prototype.setIsTrial = function (v) {
+		this.trial = v;
 	};
 
 	/** @constructor */
@@ -2076,8 +2083,8 @@
 
 				var bIsCorrect = false;
 				if (_image.Image != null) {
-					var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
-					var __h = Math.max(parseInt(_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
+					var __w = Math.max((_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
+					var __h = Math.max((_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
 
 					var dKoef = Math.max(__w / _w, __h / _h);
 					if (dKoef > 1) {
@@ -2091,7 +2098,7 @@
 					}
 				}
 
-				return new asc_CImageSize(parseInt(_w), parseInt(_h), bIsCorrect);
+				return new asc_CImageSize(_w, _h, bIsCorrect);
 			}
 			return new asc_CImageSize(50, 50, false);
 		},
@@ -2686,6 +2693,7 @@
 	prot["asc_getAutosaveMinInterval"] = prot.asc_getAutosaveMinInterval;
 	prot["asc_getIsAnalyticsEnable"] = prot.asc_getIsAnalyticsEnable;
 	prot["asc_getIsLight"] = prot.asc_getIsLight;
+	prot["asc_getTrial"] = prot.asc_getTrial;
 
 	window["AscCommon"].asc_ValAxisSettings = asc_ValAxisSettings;
 	prot = asc_ValAxisSettings.prototype;

@@ -1256,6 +1256,8 @@ CGraphicObjects.prototype =
         {
             editor.asc_doubleClickOnChart(this.getChartObject());
         }
+        this.clearTrackObjects();
+        this.clearPreTrackObjects();
         this.changeCurrentState(new AscFormat.NullState(this));
         this.document.OnMouseUp(e, x, y, pageIndex);
     },
@@ -1277,6 +1279,8 @@ CGraphicObjects.prototype =
             pluginData.setAttribute("objectId", oleObject.Id);
             editor.asc_pluginRun(oleObject.m_sApplicationId, 0, pluginData);
         }
+        this.clearTrackObjects();
+        this.clearPreTrackObjects();
         this.changeCurrentState(new AscFormat.NullState(this));
         this.document.OnMouseUp(e, x, y, pageIndex);
     },

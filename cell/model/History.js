@@ -64,10 +64,6 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Worksheet_RowProp = 11;
 	window['AscCH'].historyitem_Worksheet_Sort = 12;
 	window['AscCH'].historyitem_Worksheet_MoveRange = 13;
-	window['AscCH'].historyitem_Worksheet_Merge = 14;
-	window['AscCH'].historyitem_Worksheet_Unmerge = 15;
-	window['AscCH'].historyitem_Worksheet_SetHyperlink = 16;
-	window['AscCH'].historyitem_Worksheet_RemoveHyperlink = 17;
 	window['AscCH'].historyitem_Worksheet_Rename = 18;
 	window['AscCH'].historyitem_Worksheet_Hide = 19;
 //не добавляем в историю события historyitem_Worksheet_CreateRow, CreateCol, CreateCell - потому что появляется много ошибок(например удаление строк, если снизу были данные и undo)

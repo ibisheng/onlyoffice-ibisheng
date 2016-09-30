@@ -1881,6 +1881,9 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
     this.dScaleKoef = 1;
     this.bUseScaleKoef = false;
 	this.bIsPlainText = false;
+	
+	this.defaultImgWidth = 50;
+	this.defaultImgHeight = 50;
 
     this.MsoStyles = {"mso-style-type": 1, "mso-pagination": 1, "mso-line-height-rule": 1, "mso-style-textfill-fill-color": 1, "mso-tab-count": 1,
         "tab-stops": 1, "list-style-type": 1, "mso-special-character": 1, "mso-column-break-before": 1, "mso-break-type": 1, "mso-padding-alt": 1, "mso-border-insidev": 1,
@@ -6018,6 +6021,16 @@ PasteProcessor.prototype =
                         nWidth = or_sz.Width / g_dKoef_pix_to_mm;
                         nHeight = or_sz.Height / g_dKoef_pix_to_mm;
                     }
+					
+					if(!nWidth)
+					{
+						nWidth = this.defaultImgWidth / g_dKoef_pix_to_mm;
+					}
+					if(!nHeight)
+					{
+						nHeight = this.defaultImgHeight / g_dKoef_pix_to_mm;
+					}
+					
                     if(nWidth && nHeight && sSrc)
                     {
                         var sSrc = this.oImages[sSrc];

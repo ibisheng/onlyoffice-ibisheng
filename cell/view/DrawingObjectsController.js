@@ -303,13 +303,18 @@ DrawingObjectsController.prototype.createGroup = function()
 DrawingObjectsController.prototype.handleChartDoubleClick = function()
 {
     var drawingObjects = this.drawingObjects;
+    var oThis = this;
     this.checkSelectedObjectsAndFireCallback(function(){
+        oThis.clearTrackObjects();
+        oThis.clearPreTrackObjects();
+        oThis.changeCurrentState(new AscFormat.NullState(this));
         drawingObjects.showChartSettings();
     }, []);
 }
 DrawingObjectsController.prototype.handleOleObjectDoubleClick = function(drawing, oleObject, e, x, y, pageIndex)
 {
     var drawingObjects = this.drawingObjects;
+    var oThis = this;
     this.checkSelectedObjectsAndFireCallback(function(){
         var pluginData = new Asc.CPluginData();
         pluginData.setAttribute("data", oleObject.m_sData);
@@ -320,6 +325,9 @@ DrawingObjectsController.prototype.handleOleObjectDoubleClick = function(drawing
         pluginData.setAttribute("heightPix", oleObject.m_nPixHeight);
         pluginData.setAttribute("objectId", oleObject.Id);
         window["Asc"]["editor"].asc_pluginRun(oleObject.m_sApplicationId, 0, pluginData);
+        oThis.clearTrackObjects();
+        oThis.clearPreTrackObjects();
+        oThis.changeCurrentState(new AscFormat.NullState(this));
         this.onMouseUp(e, x, y);
     }, []);
 };
@@ -423,7 +431,6 @@ DrawingObjectsController.prototype.addImageFromParams = function(rasterImageId, 
 };
 
 DrawingObjectsController.prototype.addOleObjectFromParams = function(fPosX, fPosY, fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId){
-    History.Create_NewPoint();
     var oOleObject = this.createOleObject(sData, sApplicationId, sLocalUrl, fPosX, fPosY, fWidth, fHeight, nWidthPix, nHeightPix);
     this.resetSelection();
     oOleObject.setWorksheet(this.drawingObjects.getWorksheetModel());
@@ -436,9 +443,6 @@ DrawingObjectsController.prototype.addOleObjectFromParams = function(fPosX, fPos
 };
 
 DrawingObjectsController.prototype.editOleObjectFromParams = function(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight, bResize){
-    if(!bResize){
-        History.Create_NewPoint();
-    }
     oOleObject.setData(sData);
     var _blipFill           = new AscFormat.CBlipFill();
     _blipFill.RasterImageId = sImageUrl;

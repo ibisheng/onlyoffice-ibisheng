@@ -2702,10 +2702,11 @@ function OfflineEditor () {
     this.col0 = 0;
     this.row0 = 0;
     this.translate = null;
+    this.initSettings = null;
 
     // main
 
-    this.beforeOpen  = function() {
+    this.beforeOpen = function() {
 
         var offlineEditor = this;
 
@@ -3147,7 +3148,7 @@ function OfflineEditor () {
 
             if (false === istoplayer) {
                 this._drawCellsAndBorders(drawingCtx, range, offsetXForDraw, offsetYForDraw);
-                this._drawAutoF(range, offsetXForDraw, offsetYForDraw);
+                this.af_drawButtons(range, offsetXForDraw, offsetYForDraw);
             }
 
             var oldrange = this.visibleRange;
@@ -3756,8 +3757,10 @@ function OfflineEditor () {
         };
     };
 
-    this.openFile = function () {
+    this.openFile = function(settings) {
 
+        this.initSettings = settings;
+        
         this.beforeOpen();
 
         window["CreateMainTextMeasurerWrapper"]();
@@ -3769,25 +3772,32 @@ function OfflineEditor () {
         _api = new window["Asc"]["spreadsheet_api"]({});
 
         var userInfo = new Asc.asc_CUserInfo();
-        userInfo.asc_putId('ios');
-        userInfo.asc_putFullName('ios');
-        userInfo.asc_getLastName('ios');
+        userInfo.asc_putId(this.initSettings.userId);
+        userInfo.asc_putFullName(this.initSettings.fullName);
+        userInfo.asc_putFirstName(this.initSettings.firstName);
+        userInfo.asc_putLastName(this.initSettings.lastName);
 
-        var docInfo =  new Asc.asc_CDocInfo();
-        docInfo.put_Id('ios');
+        var docInfo = new Asc.asc_CDocInfo();
+        docInfo.put_Id(this.initSettings.documentId);
         docInfo.put_UserInfo(userInfo);
-
+       
+        _api.asc_setDocInfo(docInfo);
+     
         this.offline_beforeInit();
 
         this.registerEventsHandlers();
+        
+        _api.asc_setAutoSaveGap(1);
+        
+        _api.asc_nativeOpenFile(window.native["GetFileString"](), undefined, true);
 
-        _api.asc_setDocInfo(docInfo);
-        _api.asc_nativeOpenFile(window.native["GetFileString"]());
+        _api.asc_SetFastCollaborative(true);
 
         this.asc_WriteAllWorksheets(true);
 
         _api.asc_SendThemeColorScheme();
         _api.asc_ApplyColorScheme(false);
+        _api._applyFirstLoadChanges();
 
         window["NativeSupportTimeouts"] = true;
 
@@ -3805,6 +3815,14 @@ function OfflineEditor () {
         // TODO: Implement Text Art Styles
 
         this.offline_afteInit();
+        
+        setInterval(function() {
+                    
+                    //checkAUtoSave();
+                    //console.log("autosave");
+                    
+                    _api._autoSave();
+                    }, 100);
     };
     this.registerEventsHandlers = function () {
 
@@ -3892,6 +3910,25 @@ function OfflineEditor () {
             stream["ClearNoAttack"]();
             asc_WriteAutoFiltersOptions(state, stream);
             window["native"]["OnCallMenuEvent"](3060, stream); // ASC_SPREADSHEETS_EVENT_TYPE_FILTER_DIALOG
+        });
+        
+        _api.asc_registerCallback('asc_onGetEditorPermissions', function(state) {
+            //console.log("asc_onGetEditorPermissions");
+                                  
+            var rData = {
+                         "c"             : 'open',
+                         "id"            : t.initSettings.documentId,
+                         "userid"        : t.initSettings.userId,
+                         "format"        : "xlsx",
+                         "vkey"          : undefined,
+                         "url"           : this.documentUrl,
+                         "title"         : this.documentTitle,
+                         "embeddedfonts" : false,
+                         "viewmode"      : false// this.getViewMode()
+                          };
+                            
+                         _api.CoAuthoringApi.auth(false, // this.getViewMode()
+                                                           rData);
         });
     };
     this.updateFrozen = function () {
@@ -5228,7 +5265,7 @@ function OfflineEditor () {
 }
 var _s = new OfflineEditor();
 
-function offline_of() {_s.openFile();}
+function offline_of(arg) {_s.openFile(arg);}
 function offline_stz(v) {_s.zoom = v; _api.asc_setZoom(v);}
 function offline_ds(x, y, width, height, ratio, istoplayer) {_s.drawSheet(x, y, width, height, ratio, istoplayer);}
 function offline_dh(x, y, width, height, type, ratio) {_s.drawHeader(x, y, width, height, type, ratio);}
@@ -7143,7 +7180,84 @@ function offline_apply_event(type,params) {
             ws.changeRowHeight(toRow, height, 0);
             break;
         }
+            
+        case 10000: // ASC_SOCKET_EVENT_TYPE_OPEN
+        {
+            var t = _api.CoAuthoringApi._CoAuthoringApi;
+            
+            t._state = AscCommon.ConnectionState.WaitAuth;
+            t.onFirstConnect();
+            
+            break;
+        }
+            
+        case 10010: // ASC_SOCKET_EVENT_TYPE_CLOSE
+        {
+            
+            break;
+        }
+            
+        case 10020: // ASC_SOCKET_EVENT_TYPE_MESSAGE
+        {
+            var t = _api.CoAuthoringApi._CoAuthoringApi;
 
+            var dataObject = JSON.parse(params);
+            
+           // console.log(params + " : " + dataObject['type']);
+            
+            switch (dataObject['type']) {
+                case 'auth'        :
+                    t._onAuth(dataObject);
+                    break;
+                case 'message'      :
+                    t._onMessages(dataObject, false);
+                    break;
+                case 'cursor'       :
+                    t._onCursor(dataObject);
+                    break;
+                case 'getLock'      :
+                    t._onGetLock(dataObject);
+                    break;
+                case 'releaseLock'    :
+                    t._onReleaseLock(dataObject);
+                    break;
+                case 'connectState'    :
+                    t._onConnectionStateChanged(dataObject);
+                    break;
+                case 'saveChanges'    :
+                    t._onSaveChanges(dataObject);
+                    break;
+                case 'saveLock'      :
+                    t._onSaveLock(dataObject);
+                    break;
+                case 'unSaveLock'    :
+                    t._onUnSaveLock(dataObject);
+                    break;
+                case 'savePartChanges'  :
+                    t._onSavePartChanges(dataObject);
+                    break;
+                case 'drop'        :
+                    t._onDrop(dataObject);
+                    break;
+                case 'waitAuth'      : /*Ждем, когда придет auth, документ залочен*/
+                    break;
+                case 'error'      : /*Старая версия sdk*/
+                    t._onDrop(dataObject);
+                    break;
+                case 'documentOpen'    :
+                    t._documentOpen(dataObject);
+                    break;
+                case 'warning':
+                    t._onWarning(dataObject);
+                    break;
+                case 'license':
+                    t._onLicense(dataObject);
+                    break;
+            }
+            
+            break;
+        }
+            
         default:
             break;
     }

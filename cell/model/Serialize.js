@@ -1016,22 +1016,6 @@
         tomorrow  : 'tomorrow',
         yesterday : 'yesterday'
     };
-
-      var ESparklineType = {
-          Line: 0,
-          Column: 1,
-          Stacked: 2
-      };
-      var EDispBlanksAs = {
-          Span: 0,
-          Gap: 1,
-          Zero: 2
-      };
-      var SparklineAxisMinMax = {
-          Individual: 0,
-          Group: 1,
-          Custom: 2
-      };
     
     var g_nNumsMaxId = 160;
 
@@ -8142,9 +8126,6 @@
 	window["AscCommonExcel"].ECfType = ECfType;
     window["AscCommonExcel"].ECfvoType = ECfvoType;
     window["AscCommonExcel"].ST_TimePeriod = ST_TimePeriod;
-      window["Asc"].ESparklineType = ESparklineType;
-      window["Asc"].EDispBlanksAs = EDispBlanksAs;
-      window["Asc"].SparklineAxisMinMax = SparklineAxisMinMax;
 
     window["Asc"].CTableStyles = CTableStyles;
     window["Asc"].CTableStyle = CTableStyle;

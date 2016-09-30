@@ -127,8 +127,8 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     this.TableLook  = new CTableLook(true, true, false, false, true, false);
 
     this.TableSumGrid  = []; // данный массив будет заполнен после private_RecalculateGrid
-    this.TableGrid     = TableGrid;
-    this.TableGridCalc = this.Internal_Copy_Grid(TableGrid);
+    this.TableGrid     = TableGrid ? TableGrid : [];
+    this.TableGridCalc = this.private_CopyTableGrid();
 
     this.RecalcInfo = new CTableRecalcInfo();
 
@@ -904,15 +904,12 @@ CTable.prototype =
                     GridKoeff[Math.max( GridKoeff.length - 1 - GridAfter, 0 )] = 1.5;
                 }
 
-                var TableGrid_old = this.TableGrid;
-                this.TableGrid = [];
-
+				var arrNewGrid = [];
                 for ( var Index = 0; Index < ColsCount; Index++ )
                 {
-                    this.TableGrid[Index] = this.TableGridCalc[Index] + GridKoeff[Index] * Diff;
+                    arrNewGrid[Index] = this.TableGridCalc[Index] + GridKoeff[Index] * Diff;
                 }
-
-                History.Add( this, { Type : AscDFH.historyitem_Table_TableGrid, Old : TableGrid_old, New : this.TableGrid } );
+				this.SetTableGrid(arrNewGrid);
             }
         }
 
@@ -2221,8 +2218,12 @@ CTable.prototype =
         // Учтем верхнее поле ячейки
         Y += CellMar.Top.W;
 
+        var YLimit = Pos.YLimit;
+
+		YLimit -= this.Pages[CurPage].FootnotesH;
+
         // TODO: Здесь надо учитывать нижнюю границу ячейки и вычесть ее ширину из YLimit
-        return { X : Pos.X + CellInfo.X_content_start, XLimit : Pos.X + CellInfo.X_content_end, Y : Y, YLimit : Pos.YLimit, MaxTopBorder : MaxTopBorder };
+        return { X : Pos.X + CellInfo.X_content_start, XLimit : Pos.X + CellInfo.X_content_end, Y : Y, YLimit : YLimit, MaxTopBorder : MaxTopBorder };
     },
 
     Get_MaxTopBorder : function(RowIndex)
@@ -2494,12 +2495,7 @@ CTable.prototype =
 
     Copy : function(Parent)
     {
-        var TableGrid = [];
-        for ( var Index = 0; Index < this.TableGrid.length; Index++ )
-        {
-            TableGrid[Index] = this.TableGrid[Index];
-        }
-
+        var TableGrid = this.private_CopyTableGrid();
         var Table = new CTable( this.DrawingDocument, Parent, this.Inline, 0, 0, 0, 0, 0, 0, 0, TableGrid, this.bPresentation);
 
         Table.Set_Distance(this.Distance.L, this.Distance.T, this.Distance.R, this.Distance.B);
@@ -2888,7 +2884,7 @@ CTable.prototype =
         {
             var MinMargin = [], MinContent = [], MaxContent = [], MaxFlags = [];
 
-            var GridCount = this.TableGrid.length;
+            var GridCount = this.TableGridCalc.length;
             for (var CurCol = 0; CurCol < GridCount; CurCol++)
             {
                 MinMargin[CurCol]  = 0;
@@ -8124,7 +8120,7 @@ CTable.prototype =
             }
 
 
-            var TableGrid = this.Internal_Copy_Grid( this.TableGrid );
+            var TableGrid = this.Internal_Copy_Grid( this.TableGridCalc );
 
             // Посчитаем сколько слева и справа пустых спанов
             var MinBefore = -1;
@@ -9658,7 +9654,7 @@ CTable.prototype =
         if ( 0 === CurRow )
             return null;
         
-        var NewTable = new CTable(this.DrawingDocument, this.Parent, this.Inline, 0, 0, 0, 0, 0, 0, 0, this.Internal_Copy_Grid(this.TableGrid) );
+        var NewTable = new CTable(this.DrawingDocument, this.Parent, this.Inline, 0, 0, 0, 0, 0, 0, 0, this.private_CopyTableGrid());
         
         var Len = this.Content.length;
         for ( var RowIndex = CurRow; RowIndex < Len; RowIndex++ )
@@ -10240,13 +10236,10 @@ CTable.prototype =
                 }
             }
 
-            var TableGrid_old = [];
-            for ( var Index = 0; Index < this.TableGrid.length; Index++ )
-                TableGrid_old[Index] = this.TableGrid[Index];
-
             var OldTableGridLen = this.TableGridCalc.length;
+			var arrNewGrid = this.private_CopyTableGrid();
 
-            // Добавим новые колонки в TableGrid
+			// Добавим новые колонки в TableGrid
             // начинаем с конца, чтобы не пересчитывать номера
             for ( var Index = OldTableGridLen - 1; Index >= 0; Index-- )
             {
@@ -10254,7 +10247,7 @@ CTable.prototype =
 
                 if ( Grid_Info[Index] > 0 )
                 {
-                    this.TableGrid[Index] = Grid_Info_start[Index];
+					arrNewGrid[Index] = Grid_Info_start[Index];
                     Summary -= Grid_Info_start[Index] - Grid_width;
 
                     for ( var NewIndex = 0; NewIndex < Grid_Info[Index]; NewIndex++ )
@@ -10262,14 +10255,13 @@ CTable.prototype =
                         Summary -= Grid_width;
 
                         if ( NewIndex != Grid_Info[Index] - 1 )
-                            this.TableGrid.splice( Index + NewIndex + 1, 0, Grid_width );
+							arrNewGrid.splice( Index + NewIndex + 1, 0, Grid_width );
                         else
-                            this.TableGrid.splice( Index + NewIndex + 1, 0, Summary );
+							arrNewGrid.splice( Index + NewIndex + 1, 0, Summary );
                     }
                 }
             }
-
-            History.Add( this, { Type : AscDFH.historyitem_Table_TableGrid, Old : TableGrid_old, New : this.TableGrid } );
+			this.SetTableGrid(arrNewGrid);
 
             // Проходим по всем строкам и изменяем у ячеек GridSpan, в
             // соответствии со значениями массива Grid_Info
@@ -10762,7 +10754,10 @@ CTable.prototype =
 
         this.Internal_CreateNewGrid( Rows_info );
 
-        // Возможен случай, когда у нас остались строки, полностью состоящие из объединенных вертикально ячеек
+		// Пробегаемся по всем ячейкам и смотрим на их вертикальное объединение, было ли оно нарушено
+		this.private_CorrectVerticalMerge();
+
+		// Возможен случай, когда у нас остались строки, полностью состоящие из объединенных вертикально ячеек
         for ( var CurRow = this.Content.length - 1; CurRow >= 0; CurRow-- )
         {
             var bRemove = true;
@@ -11089,10 +11084,6 @@ CTable.prototype =
         var TablePr = this.Get_CompiledPr(false).TablePr;
         if ( true === bCol )
         {
-            var TableGrid_old = [];
-            for ( var TempIndex = 0; TempIndex < this.TableGrid.length; TempIndex++ )
-                TableGrid_old[TempIndex] = this.TableGrid[TempIndex];
-
             var RowIndex = NewMarkup.Internal.RowIndex;
             var Row = this.Content[RowIndex];
             var Col = 0;
@@ -11140,7 +11131,8 @@ CTable.prototype =
                 {
                     this.Set_TableAlign( align_Left );
                     this.Set_TableInd( TablePr.TableInd - Dx );
-                    this.private_SetTableLayoutFixedAndUpdateGrid(-1);
+                    this.private_SetTableLayoutFixedAndUpdateCellsWidth(-1);
+					this.SetTableGrid(this.private_CopyTableGridCalc());
                 }
                 else
                 {
@@ -11163,9 +11155,10 @@ CTable.prototype =
                         GridSpan = GridAfter;
                     }
 
-                    this.TableGrid[Col - 1] = this.TableGridCalc[Col - 1] + Dx;
+					this.TableGridCalc[Col - 1] = this.TableGridCalc[Col - 1] + Dx;
                     this.Internal_UpdateCellW(Col - 1);
-                    this.private_SetTableLayoutFixedAndUpdateGrid(Col - 1);
+                    this.private_SetTableLayoutFixedAndUpdateCellsWidth(Col - 1);
+					this.SetTableGrid(this.private_CopyTableGridCalc());
                 }
                 else
                 {
@@ -11183,9 +11176,10 @@ CTable.prototype =
 
                     if ( 1 === GridSpan || -Dx < this.TableSumGrid[Col - 1] - this.TableSumGrid[Col - 2] )
                     {
-                        this.TableGrid[Col - 1] = this.TableGridCalc[Col - 1] + Dx;
+						this.TableGridCalc[Col - 1] = this.TableGridCalc[Col - 1] + Dx;
                         this.Internal_UpdateCellW(Col - 1);
-                        this.private_SetTableLayoutFixedAndUpdateGrid(Col - 1);
+                        this.private_SetTableLayoutFixedAndUpdateCellsWidth(Col - 1);
+						this.SetTableGrid(this.private_CopyTableGridCalc());
                     }
                     else
                     {
@@ -11243,8 +11237,6 @@ CTable.prototype =
 
                 this.private_RecalculateGrid();
             }
-
-            History.Add( this, { Type : AscDFH.historyitem_Table_TableGrid, Old : TableGrid_old, New : this.TableGrid } );
         }
         else
         {
@@ -11307,7 +11299,7 @@ CTable.prototype =
 
         var CurPage = Math.min(this.Pages.length - 1, Math.max(0, PageIndex));
         var Page = this.Pages[CurPage];
-        var ColsCount = this.TableGrid.length;
+        var ColsCount = this.TableGridCalc.length;
         if (X >= Page.X)
         {
             for (CurGrid = 0; CurGrid < ColsCount; CurGrid++)
@@ -11867,10 +11859,7 @@ CTable.prototype =
                 Row.Set_After( 0 );
             }
         }
-
-        History.Add( this, { Type : AscDFH.historyitem_Table_TableGrid, Old : this.TableGrid, New : TableGrid } );
-        this.TableGrid = TableGrid;
-
+		this.SetTableGrid(TableGrid);
         return TableGrid;
     },
 
@@ -11894,7 +11883,7 @@ CTable.prototype =
                     {
                         var W = 0;
                         for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
-                            W += this.TableGrid[CurSpan];
+                            W += this.TableGridCalc[CurSpan];
 
                         Cell.Set_W( new CTableMeasurement( tblwidth_Mm, W ) );
                     }
@@ -12581,7 +12570,7 @@ CTable.prototype =
 
     Internal_Get_MinSumGrid : function()
     {
-        var ColsCount = this.TableGrid.length;
+        var ColsCount = this.TableGridCalc.length;
         var SumGrid = [];
         for (var Index = -1; Index < ColsCount; Index++ )
             SumGrid[Index] = 0;
@@ -12695,31 +12684,6 @@ CTable.prototype =
         return SumGrid_new;
     },
 
-    Internal_SaveTableGridInHistory : function(TableGrid_new, TableGrid_old)
-    {
-        var NeedSave = false;
-
-        if ( TableGrid_new.length != TableGrid_old.length )
-            NeedSave = true;
-
-        if ( false === NeedSave )
-        {
-            for ( var Index = 0; Index < TableGrid_new.length; Index++ )
-            {
-                if ( Math.abs(TableGrid_new[Index] - TableGrid_old[Index]) > 0.001 )
-                {
-                    NeedSave = true;
-                    break;
-                }
-            }
-        }
-
-        if ( true === NeedSave )
-        {
-            History.Add( this, { Type : AscDFH.historyitem_Table_TableGrid, Old : TableGrid_old, New : TableGrid_new } );
-        }
-    },
-
     Internal_Get_NextCell : function(Pos)
     {
         var Cell_Index = Pos.Cell;
@@ -12776,19 +12740,11 @@ CTable.prototype =
         return [];
     },
 
-    private_SetTableLayoutFixedAndUpdateGrid : function(nExceptColNum)
+    private_SetTableLayoutFixedAndUpdateCellsWidth : function(nExceptColNum)
     {
         if (tbllayout_AutoFit === this.Get_CompiledPr(false).TablePr.TableLayout)
         {
             this.Set_TableLayout(tbllayout_Fixed);
-
-            // Обновляем сетку таблицы
-            var nColsCount = this.TableGrid.length;
-            for (var nColIndex = 0; nColIndex < nColsCount; nColIndex++)
-            {
-                if (nColIndex != nExceptColNum)
-                    this.TableGrid[nColIndex] = this.TableGridCalc[nColIndex];
-            }
 
             // Обновляем ширины ячеек
             for (var nColIndex = 0; nColIndex < nColsCount; nColIndex++)
@@ -12821,7 +12777,7 @@ CTable.prototype =
     {
         var VMergeCount = this.Internal_GetVertMergeCount(CurRow, StartGridCol, GridSpan);
 
-        if (CurRow + VMergeCount - 1 >= this.Pages[CurPage].LastRow)
+        if (true !== this.Is_EmptyPage(CurPage) && CurRow + VMergeCount - 1 >= this.Pages[CurPage].LastRow)
         {
             VMergeCount = this.Pages[CurPage].LastRow + 1 - CurRow;
             if (false === this.RowsInfo[CurRow + VMergeCount - 1].FirstPage && CurPage === this.RowsInfo[CurRow + VMergeCount - 1].StartPage)
@@ -13353,6 +13309,7 @@ CTable.prototype.Correct_BadTable = function()
     //       сделать нормальный обсчет для случая, когда у нас есть "пустые" строки (составленные
     //       из вертикально объединенных ячеек).
     this.Internal_Check_TableRows(false);
+	this.CorrectBadGrid();
 };
 CTable.prototype.Get_NumberingInfo = function(NumberingEngine)
 {
@@ -13447,6 +13404,162 @@ CTable.prototype.IncDec_Indent = function(bIncrease)
     {
         this.CurCell.Content.Paragraph_IncDecIndent(bIncrease);
     }
+};
+CTable.prototype.SetTableGrid = function(arrGrid)
+{
+	History.Add(this, {
+		Type : AscDFH.historyitem_Table_TableGrid,
+		Old  : this.TableGrid,
+		New  : arrGrid
+	});
+	this.TableGrid = arrGrid;
+};
+CTable.prototype.private_CopyTableGrid = function()
+{
+	var arrGrid = [];
+	for (var nIndex = 0, nCount = this.TableGrid.length; nIndex < nCount; ++nIndex)
+	{
+		arrGrid[nIndex] = this.TableGrid[nIndex];
+	}
+	return arrGrid;
+};
+CTable.prototype.private_CopyTableGridCalc = function()
+{
+	var arrGrid = [];
+	for (var nIndex = 0, nCount = this.TableGridCalc.length; nIndex < nCount; ++nIndex)
+	{
+		arrGrid[nIndex] = this.TableGridCalc[nIndex];
+	}
+	return arrGrid;
+};
+CTable.prototype.CorrectBadGrid = function()
+{
+	// HACK: При загрузке мы запрещаем компилировать стили, но нам все-таки это здесь нужно
+	var bLoad = AscCommon.g_oIdCounter.m_bLoad;
+	var bRead = AscCommon.g_oIdCounter.m_bRead;
+	AscCommon.g_oIdCounter.m_bLoad = false;
+	AscCommon.g_oIdCounter.m_bRead = false;
+
+	// Сначала пробежимся по всем ячейкам и посмотрим, чтобы у них были корректные GridSpan (т.е. >= 1)
+	for (var Index = 0; Index < this.Content.length; Index++)
+	{
+		var Row        = this.Content[Index];
+		var CellsCount = Row.Get_CellsCount();
+		for (var CellIndex = 0; CellIndex < CellsCount; CellIndex++)
+		{
+			var Cell     = Row.Get_Cell(CellIndex);
+			var GridSpan = Cell.Get_GridSpan();
+			if (GridSpan <= 0)
+				Cell.Set_GridSpan(1);
+		}
+	}
+
+	var RowGrid   = [];
+	var GridCount = 0;
+	for (var Index = 0; Index < this.Content.length; Index++)
+	{
+		var Row = this.Content[Index];
+		Row.Set_Index(Index);
+
+		// Смотрим на ширину пропущенных колонок сетки в начале строки
+		var BeforeInfo = Row.Get_Before();
+		var CurGridCol = BeforeInfo.GridBefore;
+
+		var CellsCount = Row.Get_CellsCount();
+		for (var CellIndex = 0; CellIndex < CellsCount; CellIndex++)
+		{
+			var Cell     = Row.Get_Cell(CellIndex);
+			var GridSpan = Cell.Get_GridSpan();
+			CurGridCol += GridSpan;
+		}
+
+		// Смотрим на ширину пропущенных колонок сетки в конце строки
+		var AfterInfo = Row.Get_After();
+		CurGridCol += AfterInfo.GridAfter;
+
+		if (GridCount < CurGridCol)
+			GridCount = CurGridCol;
+
+		RowGrid[Index] = CurGridCol;
+	}
+
+	for (var Index = 0; Index < this.Content.length; Index++)
+	{
+		var Row       = this.Content[Index];
+		var AfterInfo = Row.Get_After();
+
+		if (RowGrid[Index] < GridCount)
+		{
+			Row.Set_After(AfterInfo.GridAfter + GridCount - RowGrid[Index], AfterInfo.WAfter);
+		}
+	}
+
+	var arrGrid = this.private_CopyTableGrid();
+	if (arrGrid.length != GridCount)
+	{
+		if (arrGrid.length < GridCount)
+		{
+			for (var nIndex = 0; nIndex < GridCount; ++nIndex)
+				arrGrid[nIndex] = 20;
+		}
+		else
+		{
+			arrGrid.splice(GridCount, arrGrid.length - GridCount);
+		}
+		this.SetTableGrid(arrGrid);
+	}
+
+	// HACK: Восстанавливаем флаги и выставляем, что стиль всей таблицы нужно пересчитать
+	AscCommon.g_oIdCounter.m_bLoad = bLoad;
+	AscCommon.g_oIdCounter.m_bRead = bRead;
+	this.Recalc_CompiledPr2();
+};
+CTable.prototype.private_CorrectVerticalMerge = function()
+{
+	// Пробегаемся по всем ячейкам и смотрим на их вертикальное объединение, было ли оно нарушено
+	for (var nCurRow = 0, nRowsCount = this.Content.length; nCurRow < nRowsCount; ++nCurRow)
+	{
+		var oRow     = this.Content[nCurRow];
+		var nGridCol = oRow.Get_Before().GridBefore;
+		for (var nCurCell = 0, nCellsCount = oRow.Get_CellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			var oCell       = oRow.Get_Cell(nCurCell);
+			var nVMergeType = oCell.Get_VMerge();
+			var nGridSpan   = oCell.Get_GridSpan();
+
+			if (vmerge_Continue === nVMergeType)
+			{
+				var bNeedReset = true;
+				if (0 !== nCurRow)
+				{
+					var oPrevRow     = this.Content[nCurRow - 1];
+					var nPrevGridCol = oPrevRow.Get_Before().GridBefore;
+					for (var nPrevCell = 0, nPrevCellsCount = oPrevRow.Get_CellsCount(); nPrevCell < nPrevCellsCount; ++nPrevCell)
+					{
+						var oPrevCell     = oPrevRow.Get_Cell(nPrevCell);
+						var nPrevGridSpan = oPrevCell.Get_GridSpan();
+
+						if (nPrevGridCol === nGridCol)
+						{
+							if (nPrevGridSpan === nGridSpan)
+								bNeedReset = false;
+
+							break;
+						}
+						else if (nPrevGridCol > nGridCol)
+							break;
+
+						nPrevGridCol += nPrevGridSpan;
+					}
+				}
+
+				if (true === bNeedReset)
+					oCell.Set_VMerge(vmerge_Restart);
+			}
+
+			nGridCol += nGridSpan;
+		}
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook

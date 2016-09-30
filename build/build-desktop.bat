@@ -13,24 +13,14 @@ copy ..\cell\sdk-all-min.js ..\..\core\build\jsdesktop\cell\sdk-all-min.js
 
 copy ..\common\Native\native.js ..\..\core\build\jsdesktop\common\Native\native.js
 
-copy ..\word\sdk-all.js ..\..\core-ext\ChromiumBasedEditors\app\test\src\build\win_64\Debug\Local\editors\sdkjs\word\sdk-all.js
-copy ..\slide\sdk-all.js ..\..\core-ext\ChromiumBasedEditors\app\test\src\build\win_64\Debug\Local\editors\sdkjs\slide\sdk-all.js
-copy ..\cell\sdk-all.js ..\..\core-ext\ChromiumBasedEditors\app\test\src\build\win_64\Debug\Local\editors\sdkjs\cell\sdk-all.js
+copy ..\word\sdk-all.js ..\..\core-ext\desktop-sdk-wrapper\test\src\build\win_64\Debug\Local\editors\sdkjs\word\sdk-all.js
+copy ..\slide\sdk-all.js ..\..\core-ext\desktop-sdk-wrapper\test\src\build\win_64\Debug\Local\editors\sdkjs\slide\sdk-all.js
+copy ..\cell\sdk-all.js ..\..\core-ext\desktop-sdk-wrapper\test\src\build\win_64\Debug\Local\editors\sdkjs\cell\sdk-all.js
 
-copy ..\word\sdk-all-min.js ..\..\core-ext\ChromiumBasedEditors\app\test\src\build\win_64\Debug\Local\editors\sdkjs\word\sdk-all-min.js
-copy ..\slide\sdk-all-min.js ..\..\core-ext\ChromiumBasedEditors\app\test\src\build\win_64\Debug\Local\editors\sdkjs\slide\sdk-all-min.js
-copy ..\cell\sdk-all-min.js ..\..\core-ext\ChromiumBasedEditors\app\test\src\build\win_64\Debug\Local\editors\sdkjs\cell\sdk-all-min.js
+copy ..\word\sdk-all-min.js ..\..\core-ext\desktop-sdk-wrapper\test\src\build\win_64\Debug\Local\editors\sdkjs\word\sdk-all-min.js
+copy ..\slide\sdk-all-min.js ..\..\core-ext\desktop-sdk-wrapper\test\src\build\win_64\Debug\Local\editors\sdkjs\slide\sdk-all-min.js
+copy ..\cell\sdk-all-min.js ..\..\core-ext\desktop-sdk-wrapper\test\src\build\win_64\Debug\Local\editors\sdkjs\cell\sdk-all-min.js
 
-copy ..\common\Native\native.js ..\..\core-ext\ChromiumBasedEditors\app\test\src\build\win_64\Debug\Local\editors\sdkjs\common\Native\native.js
-
-copy ..\word\sdk-all.js ..\..\core-ext\ChromiumBasedEditors\app\test\src\build\win_64\Release\Local\editors\sdkjs\word\sdk-all.js
-copy ..\slide\sdk-all.js ..\..\core-ext\ChromiumBasedEditors\app\test\src\build\win_64\Release\Local\editors\sdkjs\slide\sdk-all.js
-copy ..\cell\sdk-all.js ..\..\core-ext\ChromiumBasedEditors\app\test\src\build\win_64\Release\Local\editors\sdkjs\cell\sdk-all.js
-
-copy ..\word\sdk-all-min.js ..\..\core-ext\ChromiumBasedEditors\app\test\src\build\win_64\Release\Local\editors\sdkjs\word\sdk-all-min.js
-copy ..\slide\sdk-all-min.js ..\..\core-ext\ChromiumBasedEditors\app\test\src\build\win_64\Release\Local\editors\sdkjs\slide\sdk-all-min.js
-copy ..\cell\sdk-all-min.js ..\..\core-ext\ChromiumBasedEditors\app\test\src\build\win_64\Release\Local\editors\sdkjs\cell\sdk-all-min.js
-
-copy ..\common\Native\native.js ..\..\core-ext\ChromiumBasedEditors\app\test\src\build\win_64\Release\Local\editors\sdkjs\common\Native\native.js
+copy ..\common\Native\native.js ..\..\core-ext\desktop-sdk-wrapper\test\src\build\win_64\Debug\Local\editors\sdkjs\common\Native\native.js
 
 pause

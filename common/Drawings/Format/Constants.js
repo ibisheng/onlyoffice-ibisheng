@@ -995,6 +995,13 @@
 			case AscDFH.historydescription_Document_AddPageCount:
 				sString = "Document_AddPageCount                      ";
 				break;
+			case AscDFH.historydescription_Document_AddFootnote:
+				sString = "Document_AddFootnote                       ";
+				break;
+			case AscDFH.historydescription_Document_SetFootnotePr:
+				sString = "Document_SetFootnotePr                     ";
+				break;
+
 		}
 		return sString;
 	}
@@ -1126,10 +1133,10 @@
 	window['AscDFH'].historyitem_Layout_SetH                         = 2101;
 	window['AscDFH'].historyitem_Layout_SetHMode                     = 2102;
 	window['AscDFH'].historyitem_Layout_SetLayoutTarget              = 2103;
-	window['AscDFH'].historyitem_Layout_SetW                         = 2103;
+	window['AscDFH'].historyitem_Layout_SetW                         = 2108;
 	window['AscDFH'].historyitem_Layout_SetWMode                     = 2104;
 	window['AscDFH'].historyitem_Layout_SetX                         = 2105;
-	window['AscDFH'].historyitem_Layout_SetXMode                     = 2105;
+	window['AscDFH'].historyitem_Layout_SetXMode                     = 2109;
 	window['AscDFH'].historyitem_Layout_SetY                         = 2106;
 	window['AscDFH'].historyitem_Layout_SetYMode                     = 2107;
 	window['AscDFH'].historyitem_LegendEntry_SetDelete               = 2108;
@@ -2204,33 +2211,37 @@
 	window['AscDFH'].historyitem_Styles_ChangeDefaultParaPr = 4; // Изменяем настройки параграфа по умолчанию
 
 	// Тип изменений в классе CSectionPr
-	window['AscDFH'].historyitem_Section_PageSize_Orient    = 1; // Меняем ориентацию страницы
-	window['AscDFH'].historyitem_Section_PageSize_Size      = 2; // Меняем размер страницы
-	window['AscDFH'].historyitem_Section_PageMargins        = 3; // Меняем отступы страницы
-	window['AscDFH'].historyitem_Section_Type               = 4; // Меняем тип секции
-	window['AscDFH'].historyitem_Section_Borders_Left       = 5; // Меняем левую границу
-	window['AscDFH'].historyitem_Section_Borders_Top        = 6; // Меняем верхнюю границу
-	window['AscDFH'].historyitem_Section_Borders_Right      = 7; // Меняем правую границу
-	window['AscDFH'].historyitem_Section_Borders_Bottom     = 8; // Меняем нижнюю границу
-	window['AscDFH'].historyitem_Section_Borders_Display    = 9; // Меняем тип страниц, на которых рисуются границы
-	window['AscDFH'].historyitem_Section_Borders_OffsetFrom = 10; // Меняем тип отступа границ
-	window['AscDFH'].historyitem_Section_Borders_ZOrder     = 11; // Меняем Z-index границ
-	window['AscDFH'].historyitem_Section_Header_First       = 12; // Меняем верхний колонтитул первой страницы
-	window['AscDFH'].historyitem_Section_Header_Even        = 13; // Меняем верхний колонтитул четных страниц
-	window['AscDFH'].historyitem_Section_Header_Default     = 14; // Меняем верхний колонтитул по умолчанию
-	window['AscDFH'].historyitem_Section_Footer_First       = 15; // Меняем нижний колонтитул первой страницы
-	window['AscDFH'].historyitem_Section_Footer_Even        = 16; // Меняем нижний колонтитул четных страниц
-	window['AscDFH'].historyitem_Section_Footer_Default     = 17; // Меняем нижний колонтитул по умолчанию
-	window['AscDFH'].historyitem_Section_TitlePage          = 18; // Меняем настройку наличия специального колонтитула для первой страницы
-	window['AscDFH'].historyitem_Section_PageMargins_Header = 19; // Меняем расстояние от верха страницы до верхнего колонтитула
-	window['AscDFH'].historyitem_Section_PageMargins_Footer = 20; // Меняем расстояние от низа страницы до нижнего колонтитула
-	window['AscDFH'].historyitem_Section_PageNumType_Start  = 21; // Изменяем начальное значение для нумерации страниц
-	window['AscDFH'].historyitem_Section_Columns_EqualWidth = 22;
-	window['AscDFH'].historyitem_Section_Columns_Space      = 23;
-	window['AscDFH'].historyitem_Section_Columns_Num        = 24;
-	window['AscDFH'].historyitem_Section_Columns_Sep        = 25;
-	window['AscDFH'].historyitem_Section_Columns_Col        = 26;
-	window['AscDFH'].historyitem_Section_Columns_SetCols    = 27;
+	window['AscDFH'].historyitem_Section_PageSize_Orient     = 1; // Меняем ориентацию страницы
+	window['AscDFH'].historyitem_Section_PageSize_Size       = 2; // Меняем размер страницы
+	window['AscDFH'].historyitem_Section_PageMargins         = 3; // Меняем отступы страницы
+	window['AscDFH'].historyitem_Section_Type                = 4; // Меняем тип секции
+	window['AscDFH'].historyitem_Section_Borders_Left        = 5; // Меняем левую границу
+	window['AscDFH'].historyitem_Section_Borders_Top         = 6; // Меняем верхнюю границу
+	window['AscDFH'].historyitem_Section_Borders_Right       = 7; // Меняем правую границу
+	window['AscDFH'].historyitem_Section_Borders_Bottom      = 8; // Меняем нижнюю границу
+	window['AscDFH'].historyitem_Section_Borders_Display     = 9; // Меняем тип страниц, на которых рисуются границы
+	window['AscDFH'].historyitem_Section_Borders_OffsetFrom  = 10; // Меняем тип отступа границ
+	window['AscDFH'].historyitem_Section_Borders_ZOrder      = 11; // Меняем Z-index границ
+	window['AscDFH'].historyitem_Section_Header_First        = 12; // Меняем верхний колонтитул первой страницы
+	window['AscDFH'].historyitem_Section_Header_Even         = 13; // Меняем верхний колонтитул четных страниц
+	window['AscDFH'].historyitem_Section_Header_Default      = 14; // Меняем верхний колонтитул по умолчанию
+	window['AscDFH'].historyitem_Section_Footer_First        = 15; // Меняем нижний колонтитул первой страницы
+	window['AscDFH'].historyitem_Section_Footer_Even         = 16; // Меняем нижний колонтитул четных страниц
+	window['AscDFH'].historyitem_Section_Footer_Default      = 17; // Меняем нижний колонтитул по умолчанию
+	window['AscDFH'].historyitem_Section_TitlePage           = 18; // Меняем настройку наличия специального колонтитула для первой страницы
+	window['AscDFH'].historyitem_Section_PageMargins_Header  = 19; // Меняем расстояние от верха страницы до верхнего колонтитула
+	window['AscDFH'].historyitem_Section_PageMargins_Footer  = 20; // Меняем расстояние от низа страницы до нижнего колонтитула
+	window['AscDFH'].historyitem_Section_PageNumType_Start   = 21; // Изменяем начальное значение для нумерации страниц
+	window['AscDFH'].historyitem_Section_Columns_EqualWidth  = 22;
+	window['AscDFH'].historyitem_Section_Columns_Space       = 23;
+	window['AscDFH'].historyitem_Section_Columns_Num         = 24;
+	window['AscDFH'].historyitem_Section_Columns_Sep         = 25;
+	window['AscDFH'].historyitem_Section_Columns_Col         = 26;
+	window['AscDFH'].historyitem_Section_Columns_SetCols     = 27;
+	window['AscDFH'].historyitem_Section_Footnote_Pos        = 28;
+	window['AscDFH'].historyitem_Section_Footnote_NumStart   = 29;
+	window['AscDFH'].historyitem_Section_Footnote_NumRestart = 30;
+	window['AscDFH'].historyitem_Section_Footnote_NumFormat  = 31;
 
 	// Тип класса, к которому относится данный элемент истории
 	window['AscDFH'].historyitem_State_Unknown         = 0;
@@ -2362,7 +2373,14 @@
 	window['AscDFH'].historyitem_Math_BoxForcedBreak        = 56;
 	window['AscDFH'].historyitem_Math_DegreeSubSupType      = 57;
 
-	window['AscDFH'].historyitem_Footnotes_AddFootnote = 1;
+	window['AscDFH'].historyitem_Footnotes_AddFootnote              = 1;
+	window['AscDFH'].historyitem_Footnotes_SetSeparator             = 2;
+	window['AscDFH'].historyitem_Footnotes_SetContinuationSeparator = 3;
+	window['AscDFH'].historyitem_Footnotes_SetContinuationNotice    = 4;
+	window['AscDFH'].historyitem_Footnotes_SetFootnotePrPos         = 5;
+	window['AscDFH'].historyitem_Footnotes_SetFootnotePrNumStart    = 6;
+	window['AscDFH'].historyitem_Footnotes_SetFootnotePrNumRestart  = 7;
+	window['AscDFH'].historyitem_Footnotes_SetFootnotePrNumFormat   = 8;
 
 	window['AscDFH'].historydescription_Cut                                         = 0x0001;
 	window['AscDFH'].historydescription_PasteButtonIE                               = 0x0002;
@@ -2683,4 +2701,6 @@
 	window['AscDFH'].historydescription_Document_CompositeInput                     = 0x0139;
 	window['AscDFH'].historydescription_Document_CompositeInputReplace              = 0x013a;
 	window['AscDFH'].historydescription_Document_AddPageCount                       = 0x013b;
+	window['AscDFH'].historydescription_Document_AddFootnote                        = 0x013c;
+	window['AscDFH'].historydescription_Document_SetFootnotePr                      = 0x013d;
 })(window);

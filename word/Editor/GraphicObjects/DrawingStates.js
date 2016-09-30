@@ -618,7 +618,7 @@ RotateState.prototype =
         }
 
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+            return {cursorType: "crosshair", objectId: this.majorObject.Get_Id()};
     },
 
     onMouseMove: function(e, x, y, pageIndex)
@@ -776,7 +776,7 @@ ChangeAdjState.prototype =
         }
 
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+            return {cursorType: "crosshair", objectId: this.majorObject.Get_Id()};
     },
 
     onMouseMove: function(e, x, y, pageIndex)
@@ -823,7 +823,7 @@ PreResizeState.prototype =
             return;
         }
         this.drawingObjects.swapTrackObjects();
-        this.drawingObjects.changeCurrentState(new ResizeState(this.drawingObjects, this.majorObject, this.handleNum));
+        this.drawingObjects.changeCurrentState(new ResizeState(this.drawingObjects, this.majorObject, this.handleNum, this.cardDirection));
         this.drawingObjects.OnMouseMove(e, x, y, pageIndex);
     },
 
@@ -834,11 +834,12 @@ PreResizeState.prototype =
     }
 };
 
-function ResizeState(drawingObjects, majorObject, handleNum)
+function ResizeState(drawingObjects, majorObject, handleNum, cardDirection)
 {
     this.drawingObjects = drawingObjects;
     this.majorObject  = majorObject;
     this.handleNum = handleNum;
+    this.cardDirection = cardDirection;
 }
 
 ResizeState.prototype =
@@ -850,7 +851,7 @@ ResizeState.prototype =
             this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
         }
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+            return {cursorType: AscFormat.CURSOR_TYPES_BY_CARD_DIRECTION[this.cardDirection] ? AscFormat.CURSOR_TYPES_BY_CARD_DIRECTION[this.cardDirection] : "default", objectId: this.majorObject.Get_Id()};
     },
 
     onMouseMove: function(e, x, y, pageIndex)
@@ -1333,7 +1334,7 @@ RotateInGroupState.prototype =
             this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
         }
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+            return {cursorType: "crosshair", objectId: this.majorObject.Get_Id()};
     },
 
     onMouseMove: RotateState.prototype.onMouseMove,
@@ -1389,7 +1390,7 @@ ResizeInGroupState.prototype =
             this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
         }
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+            return {cursorType: AscFormat.CURSOR_TYPES_BY_CARD_DIRECTION[this.cardDirection] ? AscFormat.CURSOR_TYPES_BY_CARD_DIRECTION[this.cardDirection] : "default", objectId: this.majorObject.Get_Id()};
     },
     onMouseMove: ResizeState.prototype.onMouseMove,
     onMouseUp: MoveInGroupState.prototype.onMouseUp
@@ -1437,7 +1438,7 @@ ChangeAdjInGroupState.prototype =
             this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
         }
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+            return {cursorType: "crosshair", objectId: this.majorObject.Get_Id()};
     },
 
     onMouseMove: ChangeAdjState.prototype.onMouseMove,

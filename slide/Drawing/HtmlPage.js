@@ -3064,6 +3064,13 @@ function CEditorPage(api)
 	this.onTimerScroll = function(isThUpdateSync)
 	{
 		var oWordControl                = oThis;
+
+		if (oWordControl.m_oApi.isLongAction())
+        {
+            oWordControl.m_nPaintTimerId = setTimeout(oWordControl.onTimerScroll, oWordControl.m_nTimerScrollInterval);
+            return;
+        }
+
 		oWordControl.m_nTimeDrawingLast = new Date().getTime();
 
 		var isRepaint = oWordControl.m_bIsScroll;
@@ -3123,7 +3130,7 @@ function CEditorPage(api)
 			}
 		}
 
-		this.m_nPaintTimerId = setTimeout(oWordControl.onTimerScroll, oWordControl.m_nTimerScrollInterval);
+		oWordControl.m_nPaintTimerId = setTimeout(oWordControl.onTimerScroll, oWordControl.m_nTimerScrollInterval);
 		//window.requestAnimationFrame(oWordControl.onTimerScroll);
 	};
 
@@ -3299,6 +3306,7 @@ function CEditorPage(api)
 			var _len = master.sldLayoutLst.length;
 			var arr  = new Array(_len);
 
+			var bRedraw = Math.abs(this.m_oLayoutDrawer.WidthMM - this.m_oLogicDocument.Width) > MOVE_DELTA || Math.abs(this.m_oLayoutDrawer.HeightMM - this.m_oLogicDocument.Height) > MOVE_DELTA;
 			for (var i = 0; i < _len; i++)
 			{
 				arr[i]       = new CLayoutThumbnail();
@@ -3310,7 +3318,7 @@ function CEditorPage(api)
 
 				arr[i].Name = master.sldLayoutLst[i].cSld.name;
 
-				if ("" == master.sldLayoutLst[i].ImageBase64 || Math.abs(this.m_oLayoutDrawer.WidthMM - this.m_oLogicDocument.Width) > MOVE_DELTA || Math.abs(this.m_oLayoutDrawer.HeightMM - this.m_oLogicDocument.Height) > MOVE_DELTA)
+				if ("" == master.sldLayoutLst[i].ImageBase64 || bRedraw)
 				{
 					this.m_oLayoutDrawer.WidthMM       = this.m_oLogicDocument.Width;
 					this.m_oLayoutDrawer.HeightMM      = this.m_oLogicDocument.Height;

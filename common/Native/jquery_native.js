@@ -4683,34 +4683,35 @@ var makeArray = function( array, results ) {
 // converting a NodeList to an array using builtin methods.
 // Also verifies that the returned array holds DOM nodes
 // (which is not the case in the Blackberry browser)
-try {
-	Array.prototype.slice.call( document.documentElement.childNodes, 0 )[0].nodeType;
+//try {
+//	Array.prototype.slice.call( document.documentElement.childNodes, 0 )[0].nodeType;
+//
+//// Provide a fallback method if it does not work
+//} catch( e ) {
+//	makeArray = function( array, results ) {
+//		var i = 0,
+//			ret = results || [];
+//
+//		if ( toString.call(array) === "[object Array]" ) {
+//			Array.prototype.push.apply( ret, array );
+//
+//		} else {
+//			if ( typeof array.length === "number" ) {
+//				for ( var l = array.length; i < l; i++ ) {
+//					ret.push( array[i] );
+//				}
+//
+//			} else {
+//				for ( ; array[i]; i++ ) {
+//					ret.push( array[i] );
+//				}
+//			}
+//		}
+//
+//		return ret;
+//	};
+//}
 
-// Provide a fallback method if it does not work
-} catch( e ) {
-	makeArray = function( array, results ) {
-		var i = 0,
-			ret = results || [];
-
-		if ( toString.call(array) === "[object Array]" ) {
-			Array.prototype.push.apply( ret, array );
-
-		} else {
-			if ( typeof array.length === "number" ) {
-				for ( var l = array.length; i < l; i++ ) {
-					ret.push( array[i] );
-				}
-
-			} else {
-				for ( ; array[i]; i++ ) {
-					ret.push( array[i] );
-				}
-			}
-		}
-
-		return ret;
-	};
-}
 
 var sortOrder, siblingCheck;
 

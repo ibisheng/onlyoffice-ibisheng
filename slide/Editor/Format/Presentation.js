@@ -1533,6 +1533,17 @@ CPresentation.prototype =
         oOleObject.setPixSizes(nPixWidth, nPixHeight);
     },
 
+    Get_AbsolutePage: function()
+    {
+        return 0;
+    },
+
+    Get_AbsoluteColumn: function()
+    {
+        return 0;
+    },
+
+
     addChart: function(binary)
     {
         var _this = this;

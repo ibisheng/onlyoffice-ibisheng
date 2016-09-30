@@ -151,7 +151,29 @@ CDocumentContentBase.prototype.Reassign_ImageUrls = function(mapUrls)
 		oDrawing.Reassign_ImageUrls(mapUrls);
 	}
 };
+/**
+ * Находим отрезок сносок, заданный между сносками.
+ * @param {?CFootEndnote} oFirstFootnote - если null, то иещм с начала документа
+ * @param {?CFootEndnote} oLastFootnote - если null, то ищем до конца документа
+ */
+CDocumentContentBase.prototype.Get_FootnotesList = function(oFirstFootnote, oLastFootnote)
+{
+	var oEngine = new CDocumentFootnotesRangeEngine();
+	oEngine.Init(oFirstFootnote, oLastFootnote);
 
+	var arrFootnotes = [];
+
+	var arrParagraphs = this.Get_AllParagraphs({OnlyMainDocument : true, All : true});
+	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
+	{
+		var oParagraph = arrParagraphs[nIndex];
+
+		if (true === oParagraph.Get_FootnotesList(oEngine))
+			return arrFootnotes;
+	}
+
+	return oEngine.GetRange();
+};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private area
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

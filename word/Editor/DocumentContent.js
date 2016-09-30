@@ -1074,6 +1074,10 @@ CDocumentContent.prototype.Recalculate_Page               = function(PageIndex, 
 
         if (RecalcResult & recalcresult_CurPage)
         {
+            // Такое не должно приходить в автофигурах, только в таблицах основного документа. Проверка на это находится в параграфе.
+            if (RecalcResult & recalcresultflags_Footnotes)
+				return recalcresult2_CurPage | recalcresultflags_Column | recalcresultflags_Footnotes;
+
             return this.Recalculate_Page(PageIndex, false);
         }
         else if (RecalcResult & recalcresult_NextElement)
@@ -1430,14 +1434,18 @@ CDocumentContent.prototype.Get_FirstParagraph             = function()
 
     return null;
 };
-CDocumentContent.prototype.Get_AllParagraphs              = function(Props, ParaArray)
+CDocumentContent.prototype.Get_AllParagraphs = function(Props, ParaArray)
 {
-    var Count = this.Content.length;
-    for (var Index = 0; Index < Count; Index++)
-    {
-        var Element = this.Content[Index];
-        Element.Get_AllParagraphs(Props, ParaArray);
-    }
+	var arrParagraphs = (ParaArray ? ParaArray : []);
+
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Element = this.Content[Index];
+		Element.Get_AllParagraphs(Props, arrParagraphs);
+	}
+
+	return arrParagraphs;
 };
 // Специальная функция, используемая в колонтитулах для добавления номера страницы
 // При этом удаляются все параграфы. Добавляются два новых
@@ -8416,6 +8424,10 @@ CDocumentContent.prototype.Get_StartPage_Relative = function()
 {
 	return this.StartPage;
 };
+CDocumentContent.prototype.Get_StartColumn_Absolute = function()
+{
+	return this.Get_AbsoluteColumn(0);
+};
 CDocumentContent.prototype.Set_StartPage = function(StartPage, StartColumn, ColumnsCount)
 {
 	this.StartPage    = StartPage;
@@ -8451,6 +8463,11 @@ CDocumentContent.prototype.Get_AbsoluteColumn = function(CurPage)
 };
 CDocumentContent.prototype.private_GetColumnIndex = function(CurPage)
 {
+	// TODO: Разобраться здесь нужно ли данное условие. Оно появилось из-за параграфов в таблице в
+	//       основной части документа и из-за параграфов в сносках.
+	if (1 === this.ColumnsCount)
+    	return this.Parent.Get_AbsoluteColumn(this.private_GetRelativePageIndex(CurPage));
+
 	return (this.StartColumn + CurPage) - (((this.StartColumn + CurPage) / this.ColumnsCount | 0) * this.ColumnsCount);
 };
 //-----------------------------------------------------------------------------------

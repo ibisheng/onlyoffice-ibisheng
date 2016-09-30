@@ -243,19 +243,19 @@
 			res.aColors.push(this.aColors[i].clone());
 		return res;
 	};
-	CColorScale.prototype.getMin = function(min, max, count) {
+	CColorScale.prototype.getMin = function(min, max, values) {
 		var oCFVO = (0 < this.aCFVOs.length) ? this.aCFVOs[0] : null;
-		return this.getValue(min, max, count, oCFVO);
+		return this.getValue(min, max, values, oCFVO);
 	};
-	CColorScale.prototype.getMid = function(min, max, count) {
+	CColorScale.prototype.getMid = function(min, max, values) {
 		var oCFVO = (2 < this.aCFVOs.length ? this.aCFVOs[1] : null);
-		return this.getValue(min, max, count, oCFVO);
+		return this.getValue(min, max, values, oCFVO);
 	};
-	CColorScale.prototype.getMax = function(min, max, count) {
+	CColorScale.prototype.getMax = function(min, max, values) {
 		var oCFVO = (2 === this.aCFVOs.length) ? this.aCFVOs[1] : (2 < this.aCFVOs.length ? this.aCFVOs[2] : null);
-		return this.getValue(min, max, count, oCFVO);
+		return this.getValue(min, max, values, oCFVO);
 	};
-	CColorScale.prototype.getValue = function(min, max, count, oCFVO) {
+	CColorScale.prototype.getValue = function(min, max, values, oCFVO) {
 		var res = min;
 		if (oCFVO) {
 			// ToDo Formula
@@ -273,7 +273,12 @@
 					res = min + Math.floor((max - min) * parseFloat(oCFVO.Val) / 100);
 					break;
 				case AscCommonExcel.ECfvoType.Percentile:
-					res = min + Math.floor(count * parseFloat(oCFVO.Val) / 100);
+					res = AscCommonExcel.getPercentile(values, parseFloat(oCFVO.Val) / 100.0);
+					if (AscCommonExcel.cElementType.number === res.type) {
+						res = res.getValue();
+					} else {
+						res = min;
+					}
 					break;
 			}
 		}

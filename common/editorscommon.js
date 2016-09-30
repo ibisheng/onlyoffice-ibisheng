@@ -1,4 +1,4 @@
-﻿/*
+/*
  * (c) Copyright Ascensio System SIA 2010-2016
  *
  * This program is a free software product. You can redistribute it and/or
@@ -268,7 +268,26 @@ function openFileCommand(binUrl, changesUrl, Signature, callback) {
   };
   var sFileUrl = binUrl;
   sFileUrl = sFileUrl.replace(/\\/g, "/");
-  asc_ajax({
+ 
+  if (window['IS_NATIVE_EDITOR']) {
+    var result = window["native"]["openFileCommand"](sFileUrl, changesUrl, Signature);
+ 
+    var url;
+    var nIndex = sFileUrl.lastIndexOf("/");
+    url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
+    if (0 < result.length) {
+        oResult.bSerFormat = Signature === result.substring(0, Signature.length);
+        oResult.data = result;
+        oResult.url = url;
+    } else {
+        bError = true;
+    }
+ 
+    bEndLoadFile = true;
+    onEndOpen();
+ } else {
+ 
+    asc_ajax({
     url: sFileUrl,
     dataType: "text",
     success: function(result) {
@@ -292,6 +311,8 @@ function openFileCommand(binUrl, changesUrl, Signature, callback) {
       onEndOpen();
     }
   });
+  }
+ 
   if (null != changesUrl) {
     getJSZipUtils().getBinaryContent(changesUrl, function(err, data) {
       bEndLoadChanges = true;

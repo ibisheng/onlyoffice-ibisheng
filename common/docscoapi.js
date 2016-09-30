@@ -49,6 +49,7 @@
       this.onParticipantsChanged = options.onParticipantsChanged;
       this.onMessage = options.onMessage;
       this.onCursor =  options.onCursor;
+      this.onMeta =  options.onMeta;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
@@ -83,6 +84,9 @@
       };
       this._CoAuthoringApi.onCursor = function(e) {
         t.callback_OnCursor(e);
+      };
+      this._CoAuthoringApi.onMeta = function(e) {
+        t.callback_OnMeta(e);
       };
       this._CoAuthoringApi.onLocksAcquired = function(e) {
         t.callback_OnLocksAcquired(e);
@@ -343,6 +347,12 @@
     }
   };
 
+  CDocsCoApi.prototype.callback_OnMeta = function(e) {
+    if (this.onMeta) {
+      this.onMeta(e);
+    }
+  };
+
   CDocsCoApi.prototype.callback_OnLocksAcquired = function(e) {
     if (this.onLocksAcquired) {
       this.onLocksAcquired(e);
@@ -456,6 +466,7 @@
       this.onParticipantsChanged = options.onParticipantsChanged;
       this.onMessage = options.onMessage;
       this.onCursor = options.onCursor;
+      this.onMeta = options.onMeta;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
@@ -821,6 +832,12 @@
     }
   };
 
+  DocsCoApi.prototype._onMeta = function(data) {
+    if (data["messages"] && this.onMeta) {
+      this.onMeta(data["messages"]);
+    }
+  };
+
   DocsCoApi.prototype._onGetLock = function(data) {
     if (data["locks"]) {
       for (var key in data["locks"]) {
@@ -1080,14 +1097,14 @@
 
       userId = userStateChanged.asc_getId();
       isEditUser = !userStateChanged.asc_getView();
-      if (userStateChanged.asc_getState()) {
+      if (userStateChanged.asc_getState() && !this._participants.hasOwnProperty(userId)) {
         this._participants[userId] = userStateChanged;
         ++this._countUsers;
         if (isEditUser) {
           ++this._countEditUsers;
         }
         stateChanged = true;
-      } else if (this._participants.hasOwnProperty(userId)) {
+      } else if (!userStateChanged.asc_getState() && this._participants.hasOwnProperty(userId)) {
         delete this._participants[userId];
         --this._countUsers;
         if (isEditUser) {
@@ -1259,9 +1276,16 @@
 
   DocsCoApi.prototype._initSocksJs = function() {
     var t = this;
-	//ограничиваем transports WebSocket и XHR / JSONP polling, как и engine.io https://github.com/socketio/engine.io
-	//при переборе streaming transports у клиента с wirewall происходило зацикливание(не повторялось в версии sock.js 0.3.4)
-	var sockjs = this.sockjs = new (this._getSockJs())(this.sockjs_url, null, {transports: ['websocket', 'xdr-polling', 'xhr-polling', 'iframe-xhr-polling', 'jsonp-polling']});
+ 
+    if (window['IS_NATIVE_EDITOR']) {
+        var sockjs = this.sockjs = window['SockJS'];
+        sockjs.open();
+        return sockjs;
+    } else {
+        //ограничиваем transports WebSocket и XHR / JSONP polling, как и engine.io https://github.com/socketio/engine.io
+        //при переборе streaming transports у клиента с wirewall происходило зацикливание(не повторялось в версии sock.js 0.3.4)
+        var sockjs = this.sockjs = new (this._getSockJs())(this.sockjs_url, null, {transports: ['websocket', 'xdr-polling', 'xhr-polling', 'iframe-xhr-polling', 'jsonp-polling']});
+    }
 
     sockjs.onopen = function() {
       if (t.reconnectTimeout) {
@@ -1286,6 +1310,9 @@
           break;
         case 'cursor'       :
           t._onCursor(dataObject);
+          break;
+        case 'meta' :
+          t._onMeta(dataObject);
           break;
         case 'getLock'      :
           t._onGetLock(dataObject);

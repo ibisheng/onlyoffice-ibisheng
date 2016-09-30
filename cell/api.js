@@ -1,4 +1,4 @@
-﻿/*
+/*
  * (c) Copyright Ascensio System SIA 2010-2016
  *
  * This program is a free software product. You can redistribute it and/or
@@ -3088,14 +3088,16 @@ var editor;
     }
   };
 
-  spreadsheet_api.prototype.asc_nativeOpenFile = function(base64File, version) {
+  spreadsheet_api.prototype.asc_nativeOpenFile = function(base64File, version, isUser) {
     asc["editor"] = this;
 
     this.SpellCheckUrl = '';
-
-    this.User = new AscCommon.asc_CUser();
-    this.User.setId("TM");
-    this.User.setUserName("native");
+ 
+    if (undefined == isUser) {
+        this.User = new AscCommon.asc_CUser();
+        this.User.setId("TM");
+        this.User.setUserName("native");
+    }
 
     this.wbModel = new AscCommonExcel.Workbook(this.handlers, this);
     this.initGlobalObjects(this.wbModel);

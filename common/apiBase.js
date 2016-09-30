@@ -1,4 +1,4 @@
-﻿/*
+/*
  * (c) Copyright Ascensio System SIA 2010-2016
  *
  * This program is a free software product. You can redistribute it and/or
@@ -515,7 +515,7 @@
 		}
 		//в обычном серверном режиме портим ссылку, потому что CoAuthoring теперь имеет встроенный адрес
 		//todo надо использовать проверку get_OfflineApp
-		if (!(window['NATIVE_EDITOR_ENJINE'] || offlineMode === this.documentUrl))
+		if (!(window['NATIVE_EDITOR_ENJINE'] || offlineMode === this.documentUrl) || window['IS_NATIVE_EDITOR'])
 		{
 			this.CoAuthoringApi.set_url(null);
 		}
@@ -571,6 +571,17 @@
 		this.CoAuthoringApi.onWarning                 = function(e)
 		{
 			t.sendEvent('asc_onError', c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
+		};
+		this.CoAuthoringApi.onMeta                    = function(data)
+		{
+			var newDocumentTitle = data["title"];
+			if (newDocumentTitle) {
+				t.documentTitle = newDocumentTitle;
+				if (t.DocInfo) {
+					t.DocInfo.asc_putTitle(newDocumentTitle);
+				}
+			}
+			t.sendEvent('asc_onMeta', data);
 		};
 		/**
 		 * Event об отсоединении от сервера
@@ -778,18 +789,25 @@
 
 	baseEditorsApi.prototype.asc_checkImageUrlAndAction = function(sImageUrl, fCallback)
 	{
+		var oThis = this;
+		this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+		var fCallback2 = function()
+		{
+			oThis.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+			fCallback.apply(oThis, arguments);
+		};
 		var sLocalImage = AscCommon.g_oDocumentUrls.getImageLocal(sImageUrl);
 		if (sLocalImage)
 		{
-			this.asc_loadLocalImageAndAction(sLocalImage, fCallback);
+			this.asc_loadLocalImageAndAction(sLocalImage, fCallback2);
 			return;
 		}
-		var oThis = this;
+
 		AscCommon.sendImgUrls(oThis, [sImageUrl], function(data)
 		{
 			if (data[0] && data[0].path != null)
 			{
-				oThis.asc_loadLocalImageAndAction(AscCommon.g_oDocumentUrls.imagePath2Local(data[0].path), fCallback);
+				oThis.asc_loadLocalImageAndAction(AscCommon.g_oDocumentUrls.imagePath2Local(data[0].path), fCallback2);
 			}
 		}, this.editorId === c_oEditorId.Spreadsheet);
 	};
@@ -810,6 +828,7 @@
 			&& AscFormat.isRealNumber(nWidthPix) && AscFormat.isRealNumber(nHeightPix)
 			&& AscFormat.isRealNumber(fWidth) && AscFormat.isRealNumber(fHeight)
 		)
+
 			this.asc_checkImageUrlAndAction(sImgSrc, function(oImage)
 			{
 				oThis.asc_addOleObjectAction(AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), sData, sGuid, fWidth, fHeight, nWidthPix, nHeightPix);

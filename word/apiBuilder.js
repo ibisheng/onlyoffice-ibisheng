@@ -553,6 +553,8 @@
             return null;
 
         var oTable = new CTable(private_GetDrawingDocument(), private_GetLogicDocument(), true, 0, 0, 0, 0, 0, nRows, nCols, [], false);
+        oTable.CorrectBadGrid();
+		oTable.Set_TableW(undefined);
         oTable.Set_TableStyle2(undefined);
         return new ApiTable(oTable);
     };
@@ -1071,7 +1073,7 @@
         var Type = this.Document.Content[nPos].Get_Type();
         if (type_Paragraph === Type)
             return new ApiParagraph(this.Document.Content[nPos]);
-        else if (type_Paragraph === Type)
+        else if (type_Table === Type)
             return new ApiTable(this.Document.Content[nPos]);
 
         return null;
@@ -1294,6 +1296,7 @@
                 oSelectedContent.Add(new CSelectedElement(oElement.private_GetImpl(), true));
             }
         }
+		oSelectedContent.On_EndCollectElements(this.Document, true);
 
         if (this.Document.Is_SelectionUse())
         {
@@ -1303,9 +1306,9 @@
             this.Document.Selection_Remove(true);
         }
 
-        var oParagraph = this.Document.Content[this.Document.CurPos.ContentPos];
-        if (!oParagraph || !(oParagraph instanceof Paragraph))
-            return false;
+        var oParagraph = this.Document.Get_CurrentParagraph();
+        if (!oParagraph)
+            return;
 
         var oNearestPos = {
             Paragraph  : oParagraph,
@@ -1317,9 +1320,9 @@
         if (!this.Document.Can_InsertContent(oSelectedContent, oNearestPos))
             return false;
 
-        this.Document.Insert_Content(oSelectedContent, oNearestPos);
-        this.Document.Selection_Remove(true);
+		oParagraph.Parent.Insert_Content(oSelectedContent, oNearestPos);
         oParagraph.Clear_NearestPosArray();
+		this.Document.Selection_Remove(true);
         return true;
     };
 

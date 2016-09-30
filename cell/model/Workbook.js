@@ -2411,10 +2411,10 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
       continue;
     }
     if (!range || range.isIntersect(sqref)) {
-      aRules = aCFs[i].aRules;
-      for (j = 0; j < aRules.length; ++j) {
-        oRule = aRules[j];
-
+      aRules = aCFs[i].aRules.sort(function(v1, v2) {
+      	return v1.priority - v2.priority;
+			});
+      if (oRule = aRules[0]) {
         // ToDo dataBar, expression, iconSet (page 2679)
         if (AscCommonExcel.ECfType.colorScale === oRule.type) {
           if (1 !== oRule.aRuleElements.length) {
@@ -2444,12 +2444,12 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
           l = oRuleElement.aColors.length;
           if (0 < values.length && 2 <= l) {
             oGradient1 = new AscCommonExcel.CGradient(oRuleElement.aColors[0], oRuleElement.aColors[1]);
-            min = oRuleElement.getMin(min, max, nc);
-            max = oRuleElement.getMax(min, max, nc);
+            min = oRuleElement.getMin(min, max, values);
+            max = oRuleElement.getMax(min, max, values);
             oGradient2 = null;
             if (2 < l) {
               oGradient2 = new AscCommonExcel.CGradient(oRuleElement.aColors[1], oRuleElement.aColors[2]);
-              mid = oRuleElement.getMid(min, max, nc);
+              mid = oRuleElement.getMid(min, max, values);
 
               oGradient1.init(min, mid);
               oGradient2.init(mid, max);
@@ -4200,6 +4200,14 @@ Woorksheet.prototype.updateSparklineCache = function(sheet, ranges) {
     this.aSparklineGroups[i].updateCache(sheet, ranges);
   }
 };
+	Woorksheet.prototype.getSparklineGroup = function(c, r) {
+		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
+			if (-1 !== this.aSparklineGroups[i].contains(c, r)) {
+				return this.aSparklineGroups[i];
+			}
+		}
+		return null;
+	};
 	Woorksheet.prototype.getCwf = function() {
 		var cwf = {};
 		var range = this.getRange3(0,0, gc_nMaxRow0, gc_nMaxCol0);
@@ -4513,36 +4521,26 @@ Cell.prototype.setNumFormat=function(val){
 };
 Cell.prototype.shiftNumFormat=function(nShift, dDigitsCount){
 	var bRes = false;
-	var bGeneral = true;
     var sNumFormat;
     if(null != this.xfs && null != this.xfs.num)
         sNumFormat = this.xfs.num.getFormat();
     else
         sNumFormat = g_oDefaultFormat.Num.getFormat();
-	if("General" != sNumFormat)
-	{
-		var oCurNumFormat = oNumFormatCache.get(sNumFormat);
-		if(null != oCurNumFormat && false == oCurNumFormat.isGeneralFormat())
-		{
-			bGeneral = false;
-			var output = {};
-			bRes = oCurNumFormat.shiftFormat(output, nShift);
-			if(true == bRes)
-				this.setNumFormat(output.format);
+	var oCurNumFormat = oNumFormatCache.get(sNumFormat);
+	if (null != oCurNumFormat && false == oCurNumFormat.isGeneralFormat()) {
+		var output = {};
+		bRes = oCurNumFormat.shiftFormat(output, nShift);
+		if (true == bRes) {
+			this.setNumFormat(output.format);
 		}
-	}
-	if(bGeneral)
-	{
-		if(CellValueType.Number == this.oValue.type)
-		{
-			var sGeneral = AscCommon.DecodeGeneralFormat(this.oValue.number, this.oValue.type, dDigitsCount);
-			var oGeneral = oNumFormatCache.get(sGeneral);
-			if(null != oGeneral && false == oGeneral.isGeneralFormat())
-			{
-				var output = {};
-				bRes = oGeneral.shiftFormat(output, nShift);
-				if(true == bRes)
-					this.setNumFormat(output.format);
+	} else if (CellValueType.Number == this.oValue.type) {
+		var sGeneral = AscCommon.DecodeGeneralFormat(this.oValue.number, this.oValue.type, dDigitsCount);
+		var oGeneral = oNumFormatCache.get(sGeneral);
+		if (null != oGeneral && false == oGeneral.isGeneralFormat()) {
+			var output = {};
+			bRes = oGeneral.shiftFormat(output, nShift);
+			if (true == bRes) {
+				this.setNumFormat(output.format);
 			}
 		}
 	}
@@ -4957,6 +4955,14 @@ Cell.prototype.setValueData = function(Val){
 	};
 //-------------------------------------------------------------------------------------------------
 
+	function CellAndValue(c, v) {
+		this.c = c;
+		this.v = v;
+	}
+	CellAndValue.prototype.valueOf = function() {
+		return this.v;
+	};
+
 /**
  * @constructor
  */
@@ -5245,7 +5251,7 @@ Range.prototype._getRangeType=function(oBBox){
 Range.prototype._getValues = function (withEmpty) {
 	var res = [];
 	var fAction = function(c) {
-		res.push({c: c, v: c.getValueWithoutFormat()});
+		res.push(new CellAndValue(c, c.getValueWithoutFormat()));
 	};
 	if (withEmpty) {
 		this._setProperty(null, null, fAction);
@@ -5258,7 +5264,7 @@ Range.prototype._getValuesAndMap = function (withEmpty) {
 	var v, arrRes = [], mapRes = {};
 	var fAction = function(c) {
 		v = c.getValueWithoutFormat();
-		arrRes.push({c: c, v: v});
+		arrRes.push(new CellAndValue(c, v));
 		mapRes[v.toLowerCase()] = true;
 	};
 	if (withEmpty) {

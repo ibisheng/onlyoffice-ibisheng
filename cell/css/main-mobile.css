@@ -17,7 +17,7 @@
 	border: 0;
 }
 
-#ws-canvas-overlay {
+#ws-canvas-overlay, #ws-canvas-graphic, #ws-canvas-graphic-overlay {
 	border: 0;
 	position: absolute;
 	left: 0;

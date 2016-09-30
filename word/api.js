@@ -342,6 +342,54 @@
 		this["userId"] = v;
 	};
 
+	function CAscFootnotePr(obj)
+	{
+		this.NumRestart = undefined;
+		this.NumFormat  = undefined;
+		this.NumStart   = undefined;
+		this.Pos        = undefined;
+
+		if (obj)
+		{
+			this.NumRestart = obj.NumRestart;
+			this.NumFormat  = obj.NumFormat;
+			this.NumStart   = obj.NumStart;
+			this.Pos        = obj.Pos;
+		}
+	}
+	CAscFootnotePr.prototype.get_Pos = function()
+	{
+		return this.Pos;
+	};
+	CAscFootnotePr.prototype.put_Pos = function(v)
+	{
+		this.Pos = v;
+	};
+	CAscFootnotePr.prototype.get_NumStart = function()
+	{
+		return this.NumStart;
+	};
+	CAscFootnotePr.prototype.put_NumStart = function(v)
+	{
+		this.NumStart = v;
+	};
+	CAscFootnotePr.prototype.get_NumFormat = function()
+	{
+		return this.NumFormat;
+	};
+	CAscFootnotePr.prototype.put_NumFormat = function(v)
+	{
+		this.NumFormat = v;
+	};
+	CAscFootnotePr.prototype.get_NumRestart = function()
+	{
+		return this.NumRestart;
+	};
+	CAscFootnotePr.prototype.put_NumRestart = function(v)
+	{
+		this.NumRestart = v;
+	};
+
 	// пользоваться так:
 	// подрубить его последним из скриптов к страничке
 	// и вызвать, после подгрузки (конец метода OnInit <- Drawing/HtmlPage.js)
@@ -3720,6 +3768,16 @@ background-repeat: no-repeat;\
 	{
 		this.sendEvent("asc_onColumnsProps", ColumnsProps);
 	};
+	asc_docs_api.prototype.asc_SetFootnoteProps = function(oFootnotePr, bApplyToAll)
+	{
+		this.WordControl.m_oLogicDocument.SetFootnotePr(oFootnotePr, bApplyToAll);
+	};
+	asc_docs_api.prototype.asc_GetFootnoteProps = function()
+	{
+		return this.WordControl.m_oLogicDocument.GetFootnotePr();
+	};
+	asc_docs_api.prototype["asc_GetFootnoteProps"] = asc_docs_api.prototype.asc_GetFootnoteProps;
+	asc_docs_api.prototype["asc_SetFootnoteProps"] = asc_docs_api.prototype.asc_SetFootnoteProps;
 
 	asc_docs_api.prototype.put_AddPageBreak              = function()
 	{
@@ -5048,10 +5106,10 @@ background-repeat: no-repeat;\
 			var _h = Math.max(1, ColumnSize.H);
 			if (_image.Image != null)
 			{
-				var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
-				var __h = Math.max(parseInt(_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
+				var __w = Math.max((_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
+				var __h = Math.max((_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
 				_w      = Math.max(5, Math.min(_w, __w));
-				_h      = Math.max(5, Math.min(parseInt(_w * __h / __w)));
+				_h      = Math.max(5, Math.min((_w * __h / __w)));
 			}
 
 			var src = _image.src;
@@ -5101,10 +5159,10 @@ background-repeat: no-repeat;\
 				var _h = Math.max(1, ColumnSize.H);
 				if (_image.Image != null)
 				{
-					var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
-					var __h = Math.max(parseInt(_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
+					var __w = Math.max((_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
+					var __h = Math.max((_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
 					_w      = Math.max(5, Math.min(_w, __w));
-					_h      = Math.max(5, Math.min(parseInt(_w * __h / __w)));
+					_h      = Math.max(5, Math.min((_w * __h / __w)));
 				}
 				var src = _image.src;
 
@@ -5580,11 +5638,7 @@ background-repeat: no-repeat;\
 		var _image = this.ImageLoader.LoadImage(AscCommon.getFullImageSrc2(sLocalUrl), 1);
 		if (null != _image)//картинка уже должна быть загружена
 		{
-			if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
-			{
-				this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddOleObject);
-				this.WordControl.m_oLogicDocument.Add_OleObject(fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId);
-			}
+			this.WordControl.m_oLogicDocument.Add_OleObject(fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId);
 		}
 	};
 
@@ -5592,22 +5646,9 @@ background-repeat: no-repeat;\
 	{
 		if (oOleObject)
 		{
-			if (!bResize)
-			{
-				if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
-				{
-					this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_EditOleObject);
-					this.WordControl.m_oLogicDocument.Edit_OleObject(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight);
-					this.WordControl.m_oLogicDocument.Recalculate();
-                    this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
-				}
-			}
-			else
-			{
-				this.WordControl.m_oLogicDocument.Edit_OleObject(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight);
-				this.WordControl.m_oLogicDocument.Recalculate();
-                this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
-			}
+			this.WordControl.m_oLogicDocument.Edit_OleObject(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight);
+			this.WordControl.m_oLogicDocument.Recalculate();
+			this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 		}
 	};
 	//-----------------------------------------------------------------
@@ -8474,6 +8515,15 @@ background-repeat: no-repeat;\
 	CMailMergeSendData.prototype['put_RecordCount']                     = CMailMergeSendData.prototype.put_RecordCount;
 	CMailMergeSendData.prototype['get_UserId']                          = CMailMergeSendData.prototype.get_UserId;
 	CMailMergeSendData.prototype['put_UserId']                          = CMailMergeSendData.prototype.put_UserId;
+	window['Asc']['CAscFootnotePr']                                     = CAscFootnotePr;
+	CAscFootnotePr.prototype['get_Pos']                                 = CAscFootnotePr.prototype.get_Pos;
+	CAscFootnotePr.prototype['put_Pos']                                 = CAscFootnotePr.prototype.put_Pos;
+	CAscFootnotePr.prototype['get_NumStart']                            = CAscFootnotePr.prototype.get_NumStart;
+	CAscFootnotePr.prototype['put_NumStart']                            = CAscFootnotePr.prototype.put_NumStart;
+	CAscFootnotePr.prototype['get_NumFormat']                           = CAscFootnotePr.prototype.get_NumFormat;
+	CAscFootnotePr.prototype['put_NumFormat']                           = CAscFootnotePr.prototype.put_NumFormat;
+	CAscFootnotePr.prototype['get_NumRestart']                          = CAscFootnotePr.prototype.get_NumRestart;
+	CAscFootnotePr.prototype['put_NumRestart']                          = CAscFootnotePr.prototype.put_NumRestart;
 	window['Asc']['asc_docs_api']                                       = asc_docs_api;
 	asc_docs_api.prototype['LoadFontsFromServer']                       = asc_docs_api.prototype.LoadFontsFromServer;
 	asc_docs_api.prototype['SetCollaborativeMarksShowType']             = asc_docs_api.prototype.SetCollaborativeMarksShowType;
