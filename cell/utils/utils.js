@@ -563,10 +563,12 @@
 		/**
 		 * @constructor
 		 */
-		function SelectionRange() {
+		function SelectionRange(ws) {
 			this.ranges = [new Range(0, 0, 0, 0)];
 			this.activeCell = new AscCommon.CellBase(0, 0); // Active cell
 			this.activeCellId = 0;
+
+			this.worksheet = ws;
 		}
 
 		SelectionRange.prototype.clean = function () {
@@ -598,14 +600,16 @@
 			this.activeCellId = -1;
 			this.activeCell.clean();
 		};
-		SelectionRange.prototype.offsetCell = function (dr, dc) {
-			var curRange;
+		SelectionRange.prototype.offsetCell = function (dr, dc, fCheckSize) {
+			var done, curRange, mc;
 			var lastRow = this.activeCell.row;
 			var lastCol = this.activeCell.col;
 			this.activeCell.row += dr;
 			this.activeCell.col += dc;
 
-			while (true) {
+			while (!done) {
+				done = true;
+
 				curRange = this.ranges[this.activeCellId];
 				if (!curRange.contains2(this.activeCell)) {
 					if (dr) {
@@ -645,7 +649,45 @@
 					}
 				}
 
-				// ToDo merge and hidden
+				mc = this.worksheet.getMergedByCell(this.activeCell.row, this.activeCell.col);
+
+				if (mc) {
+					if (dc > 0 && (this.activeCell.col > mc.c1 || this.activeCell.row !== mc.r1)) {
+						// Движение слева направо
+						this.activeCell.col = mc.c2 + 1;
+						done = false;
+					} else if (dc < 0 && (this.activeCell.col < mc.c2 || this.activeCell.row !== mc.r1)) {
+						// Движение справа налево
+						this.activeCell.col = mc.c1 - 1;
+						done = false;
+					}
+					if (dr > 0 && (this.activeCell.row > mc.r1 || this.activeCell.col !== mc.c1)) {
+						// Движение сверху вниз
+						this.activeCell.row = mc.r2 + 1;
+						done = false;
+					} else if (dr < 0 && (this.activeCell.row < mc.r2 || this.activeCell.col !== mc.c1)) {
+						// Движение снизу вверх
+						this.activeCell.row = mc.r1 - 1;
+						done = false;
+					}
+				}
+				if (!done) {
+					continue;
+				}
+
+				while (this.activeCell.col >= curRange.c1 && this.activeCell.col <= curRange.c2 && fCheckSize(0, this.activeCell.col)) {
+					this.activeCell.col += dc || (dr > 0 ? +1 : -1);
+					done = false;
+				}
+				if (!done) {
+					continue;
+				}
+
+				while (this.activeCell.row >= curRange.r1 && this.activeCell.row <= curRange.r2 && fCheckSize(this.activeCell.row, 0)) {
+					this.activeCell.row += dr || (dc > 0 ? +1 : -1);
+					done = false;
+				}
+
 				break;
 			}
 			return (lastRow !== this.activeCell.row || lastCol !== this.activeCell.col)

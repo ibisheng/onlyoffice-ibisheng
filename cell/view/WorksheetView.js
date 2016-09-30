@@ -6572,13 +6572,15 @@
 
     // Движение активной ячейки в выделенной области
     WorksheetView.prototype._moveActivePointInSelection = function (dc, dr) {
-        var cell = this.model.selectionRange.activeCell;
+        var t = this, cell = this.model.selectionRange.activeCell;
 
         // Если мы на скрытой строке или ячейке, то двигаться в выделении нельзя (так делает и Excel)
         if (this.width_1px > this.cols[cell.col].width || this.height_1px > this.rows[cell.row].height) {
             return;
         }
-        return this.model.selectionRange.offsetCell(dr, dc);
+        return this.model.selectionRange.offsetCell(dr, dc, function(row, col) {
+            return (0 <= row) ? (t.rows[row].height < t.height_1px) : (t.cols[col].width < t.width_1px);
+        });
 
         var ar = this.activeRange;
         var arn = this.activeRange.clone(true);
@@ -6865,22 +6867,23 @@
     };
 
     // Потеряем ли мы что-то при merge ячеек
-    WorksheetView.prototype.getSelectionMergeInfo = function ( options ) {
-        var arn = this.activeRange.clone( true );
+    WorksheetView.prototype.getSelectionMergeInfo = function (options) {
+        // ToDo now check only last selection range
+        var arn = this.model.selectionRange.getLast().clone(true);
         var notEmpty = false;
         var r, c;
 
-        if ( this.cellCommentator.isMissComments( arn ) ) {
+        if (this.cellCommentator.isMissComments(arn)) {
             return true;
         }
 
-        switch ( options ) {
+        switch (options) {
             case c_oAscMergeOptions.Merge:
             case c_oAscMergeOptions.MergeCenter:
-                for ( r = arn.r1; r <= arn.r2; ++r ) {
-                    for ( c = arn.c1; c <= arn.c2; ++c ) {
-                        if ( false === this._isCellEmptyText( c, r ) ) {
-                            if ( notEmpty ) {
+                for (r = arn.r1; r <= arn.r2; ++r) {
+                    for (c = arn.c1; c <= arn.c2; ++c) {
+                        if (false === this._isCellEmptyText(c, r)) {
+                            if (notEmpty) {
                                 return true;
                             }
                             notEmpty = true;
@@ -6889,11 +6892,11 @@
                 }
                 break;
             case c_oAscMergeOptions.MergeAcross:
-                for ( r = arn.r1; r <= arn.r2; ++r ) {
+                for (r = arn.r1; r <= arn.r2; ++r) {
                     notEmpty = false;
-                    for ( c = arn.c1; c <= arn.c2; ++c ) {
-                        if ( false === this._isCellEmptyText( c, r ) ) {
-                            if ( notEmpty ) {
+                    for (c = arn.c1; c <= arn.c2; ++c) {
+                        if (false === this._isCellEmptyText(c, r)) {
+                            if (notEmpty) {
                                 return true;
                             }
                             notEmpty = true;

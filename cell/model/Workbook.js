@@ -3343,7 +3343,7 @@ function Woorksheet(wb, _index, sId){
 
 	this.aSparklineGroups = [];
 
-	this.selectionRange = new AscCommonExcel.SelectionRange();
+	this.selectionRange = new AscCommonExcel.SelectionRange(this);
 
 	/*handlers*/
 	this.handlers = null;
@@ -3490,7 +3490,7 @@ Woorksheet.prototype.clone=function(sNewId, sName, tableNames){
 	if (this.sheetPr)
 		oNewWs.sheetPr = this.sheetPr.clone();
 
-	oNewWs.selectionRange = this.selectionRange.clone();
+	oNewWs.selectionRange = this.selectionRange.clone(oNewWs);
 
 	return oNewWs;
 };
