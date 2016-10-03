@@ -4412,18 +4412,39 @@ drawAreaChart.prototype =
 			var cSortFaces = new CSortFaces(this.cChartDrawer);
 			//this.upFaces = cSortFaces.sortFaces(this.upFaces);
 			
-			this.upFaces.sort (function sortArr(a, b)
+			var upDownFaces = this.upFaces.concat(this.downFaces);
+			
+			//более быстрая сортировка
+			var angle = this.cChartDrawer.processor3D.angleOx;			
+			if(angle < 0)
 			{
-				if(b.midY === a.midY)
-					return  a.seria - b.seria;
-				else
-					return  b.midY - a.midY;
-			});
+				upDownFaces.sort (function sortArr(a, b)
+				{
+					if(b.midY === a.midY)
+						return  a.seria - b.seria;
+					else
+						return  b.midY - a.midY;
+				});
+			}
+			else
+			{
+				upDownFaces.sort (function sortArr(a, b)
+				{
+					if(b.midY === a.midY)
+						return  a.seria - b.seria;
+					else
+						return  a.midY - b.midY;
+				});
+			}
 			
 			var anotherFaces = this.sortZIndexPathsFront.concat(this.sortZIndexPathsBack).concat(this.sortZIndexPathsLeft).concat(this.sortZIndexPathsRight);
-			this.sortZIndexPaths = this.upFaces.concat(anotherFaces);
-			this.sortZIndexPaths = this.downFaces.concat(this.sortZIndexPaths)
-			this.sortZIndexPaths = cSortFaces.sortFaces(this.sortZIndexPaths);
+			this.sortZIndexPaths = upDownFaces.concat(anotherFaces)
+			
+			//медленная, но более качественный сортировка
+			//var anotherFaces = this.sortZIndexPathsFront.concat(this.sortZIndexPathsBack).concat(this.sortZIndexPathsLeft).concat(this.sortZIndexPathsRight);
+			//this.sortZIndexPaths = this.upFaces.concat(anotherFaces);
+			//this.sortZIndexPaths = this.downFaces.concat(this.sortZIndexPaths)
+			//this.sortZIndexPaths = cSortFaces.sortFaces(this.sortZIndexPaths);
 		}
 		else
 		{
@@ -5098,7 +5119,7 @@ drawAreaChart.prototype =
 		{
 			//TODO проверить и убрать
 			var face = generateFace(point1, point2, point3, point4, point11, point22, point33, point44, p1, p2, p3, p4, 1);
-			this.upFaces.push(face);
+			this.downFaces.push(face);
 		}
 		
 		return [];
@@ -11559,6 +11580,35 @@ CSortFaces.prototype =
 {
 	constructor: CSortFaces,
 	
+	_initProperties: function(centralViewPoint)
+	{
+		if(!centralViewPoint)
+		{
+			var top = this.chartProp.chartGutter._top;
+			var bottom = this.chartProp.chartGutter._bottom;
+			var left = this.chartProp.chartGutter._left;
+			var right = this.chartProp.chartGutter._right;
+			
+			var widthCanvas = this.chartProp.widthCanvas;
+			var heightCanvas = this.chartProp.heightCanvas;
+			var heightChart = heightCanvas - top - bottom;
+			var widthChart = widthCanvas - left - right;
+			
+			var centerChartY = top + heightChart / 2;
+			var centerChartX = left + widthChart / 2;
+			
+			var diffX = (this.cChartDrawer.processor3D.widthCanvas / 2) / this.cChartDrawer.processor3D.aspectRatioX - this.cChartDrawer.processor3D.cameraDiffX;
+			var diffY = (this.cChartDrawer.processor3D.heightCanvas / 2) / this.cChartDrawer.processor3D.aspectRatioY - this.cChartDrawer.processor3D.cameraDiffY;
+			var diffZ = -1 / this.cChartDrawer.processor3D.rPerspective - this.cChartDrawer.processor3D.cameraDiffZ;
+			
+			this.centralViewPoint = {x: diffX, y: diffY, z: diffZ};
+		}
+		else
+		{
+			this.centralViewPoint = centralViewPoint;
+		}
+	},
+	
 	sortParallelepipeds: function(parallelepipeds)
 	{
 		var intersectionsParallelepipeds = this._getIntersectionsParallelepipeds(parallelepipeds);
@@ -11754,36 +11804,7 @@ CSortFaces.prototype =
 		return newArr;
 	},
 	
-	_initProperties: function(centralViewPoint)
-	{
-		if(!centralViewPoint)
-		{
-			var top = this.chartProp.chartGutter._top;
-			var bottom = this.chartProp.chartGutter._bottom;
-			var left = this.chartProp.chartGutter._left;
-			var right = this.chartProp.chartGutter._right;
-			
-			var widthCanvas = this.chartProp.widthCanvas;
-			var heightCanvas = this.chartProp.heightCanvas;
-			var heightChart = heightCanvas - top - bottom;
-			var widthChart = widthCanvas - left - right;
-			
-			var centerChartY = top + heightChart / 2;
-			var centerChartX = left + widthChart / 2;
-			
-			var diffX = (this.cChartDrawer.processor3D.widthCanvas / 2) / this.cChartDrawer.processor3D.aspectRatioX - this.cChartDrawer.processor3D.cameraDiffX;
-			var diffY = (this.cChartDrawer.processor3D.heightCanvas / 2) / this.cChartDrawer.processor3D.aspectRatioY - this.cChartDrawer.processor3D.cameraDiffY;
-			var diffZ = -1 / this.cChartDrawer.processor3D.rPerspective - this.cChartDrawer.processor3D.cameraDiffZ;
-			
-			this.centralViewPoint = {x: diffX, y: diffY, z: diffZ};
-		}
-		else
-		{
-			this.centralViewPoint = centralViewPoint;
-		}
-	},
-	
-	_getFirstLastFaces: function(all, first, last)
+	_getFirstLastFaces: function(sortZIndexPaths, first, last)
 	{
 		//перебираем все грани
 		for(var i = 0; i < all.length; i++)
