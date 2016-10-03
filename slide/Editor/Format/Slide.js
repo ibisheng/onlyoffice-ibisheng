@@ -1078,6 +1078,7 @@ Slide.prototype =
         {
             return;
         }
+        this.Layout.recalculate();
         if(this.recalcInfo.recalculateBackground)
         {
             this.recalculateBackground();
