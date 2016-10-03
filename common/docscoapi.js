@@ -1080,14 +1080,14 @@
 
       userId = userStateChanged.asc_getId();
       isEditUser = !userStateChanged.asc_getView();
-      if (userStateChanged.asc_getState()) {
+      if (userStateChanged.asc_getState() && !this._participants.hasOwnProperty(userId)) {
         this._participants[userId] = userStateChanged;
         ++this._countUsers;
         if (isEditUser) {
           ++this._countEditUsers;
         }
         stateChanged = true;
-      } else if (this._participants.hasOwnProperty(userId)) {
+      } else if (!userStateChanged.asc_getState() && this._participants.hasOwnProperty(userId)) {
         delete this._participants[userId];
         --this._countUsers;
         if (isEditUser) {
