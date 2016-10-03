@@ -3453,71 +3453,69 @@
     };
 
     /** Для api закрепленных областей */
-
     WorksheetView.prototype.freezePane = function () {
         var t = this;
-        var ar = this.activeRange.clone();
-        var onChangeFreezePane = function ( isSuccess ) {
-            if ( false === isSuccess ) {
+        var activeCell = this.model.selectionRange.activeCell.clone();
+        var onChangeFreezePane = function (isSuccess) {
+            if (false === isSuccess) {
                 return;
             }
             var col, row, mc;
-            if ( null !== t.topLeftFrozenCell ) {
+            if (null !== t.topLeftFrozenCell) {
                 col = row = 0;
-            }
-            else {
-                col = ar.startCol;
-                row = ar.startRow;
+            } else {
+                col = activeCell.col;
+                row = activeCell.row;
 
-                if ( 0 !== row || 0 !== col ) {
-                    mc = t.model.getMergedByCell( row, col );
-                    if ( mc ) {
+                if (0 !== row || 0 !== col) {
+                    mc = t.model.getMergedByCell(row, col);
+                    if (mc) {
                         col = mc.c1;
                         row = mc.r1;
                     }
                 }
 
-                if ( 0 === col && 0 === row ) {
+                if (0 === col && 0 === row) {
                     col = ((t.visibleRange.c2 - t.visibleRange.c1) / 2) >> 0;
                     row = ((t.visibleRange.r2 - t.visibleRange.r1) / 2) >> 0;
                 }
             }
-            t._updateFreezePane( col, row );
+            t._updateFreezePane(col, row);
         };
 
-        return this._isLockedFrozenPane( onChangeFreezePane );
+        return this._isLockedFrozenPane(onChangeFreezePane);
     };
 
-    WorksheetView.prototype._updateFreezePane = function ( col, row, lockDraw ) {
+    WorksheetView.prototype._updateFreezePane = function (col, row, lockDraw) {
         var lastCol = 0, lastRow = 0;
-        if ( this.topLeftFrozenCell ) {
+        if (this.topLeftFrozenCell) {
             lastCol = this.topLeftFrozenCell.getCol0();
             lastRow = this.topLeftFrozenCell.getRow0();
         }
         History.Create_NewPoint();
-        var oData = new AscCommonExcel.UndoRedoData_FromTo( new AscCommonExcel.UndoRedoData_BBox( new asc_Range( lastCol, lastRow, lastCol, lastRow ) ), new AscCommonExcel.UndoRedoData_BBox( new asc_Range( col, row, col, row ) ), null );
-        History.Add( AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ChangeFrozenCell, this.model.getId(), null, oData );
+        var oData = new AscCommonExcel.UndoRedoData_FromTo(new AscCommonExcel.UndoRedoData_BBox(new asc_Range(lastCol, lastRow, lastCol, lastRow)), new AscCommonExcel.UndoRedoData_BBox(new asc_Range(col, row, col, row)), null);
+        History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ChangeFrozenCell,
+          this.model.getId(), null, oData);
 
         var isUpdate = false;
-        if ( 0 === col && 0 === row ) { // Очистка
-            if ( null !== this.topLeftFrozenCell ) {
+        if (0 === col && 0 === row) { // Очистка
+            if (null !== this.topLeftFrozenCell) {
                 isUpdate = true;
             }
             this.topLeftFrozenCell = this.model.sheetViews[0].pane = null;
-        }
-        else { // Создание
-            if ( null === this.topLeftFrozenCell ) {
+        } else { // Создание
+            if (null === this.topLeftFrozenCell) {
                 isUpdate = true;
             }
             var pane = this.model.sheetViews[0].pane = new AscCommonExcel.asc_CPane();
-            this.topLeftFrozenCell = pane.topLeftFrozenCell = new AscCommon.CellAddress( row, col, 0 );
+            this.topLeftFrozenCell = pane.topLeftFrozenCell = new AscCommon.CellAddress(row, col, 0);
         }
         this.visibleRange.c1 = col;
         this.visibleRange.r1 = row;
-        if ( col >= this.nColsCount ) {
+        if (col >= this.nColsCount) {
             this.expandColsOnScroll(false, true);
         }
-        if ( row >= this.nRowsCount ) {
+        if (row >= this.nRowsCount) {
             this.expandRowsOnScroll(false, true);
         }
 
@@ -3525,18 +3523,18 @@
         this._calcVisibleRows();
         this.visibleRange.c2 = 0;
         this._calcVisibleColumns();
-        this.handlers.trigger( "reinitializeScroll" );
+        this.handlers.trigger("reinitializeScroll");
 
-        if ( this.objectRender && this.objectRender.drawingArea ) {
+        if (this.objectRender && this.objectRender.drawingArea) {
             this.objectRender.drawingArea.init();
         }
-        if ( !lockDraw ) {
+        if (!lockDraw) {
             this.draw();
         }
 
         // Эвент на обновление
-        if ( isUpdate && !this.model.workbook.bUndoChanges && !this.model.workbook.bRedoChanges ) {
-            this.handlers.trigger( "updateSheetViewSettings" );
+        if (isUpdate && !this.model.workbook.bUndoChanges && !this.model.workbook.bRedoChanges) {
+            this.handlers.trigger("updateSheetViewSettings");
         }
     };
 
