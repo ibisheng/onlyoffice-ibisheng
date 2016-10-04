@@ -7613,20 +7613,10 @@ ParaFootnoteReference.prototype.Draw = function(X, Y, Context, PDSE)
 		_X += g_oTextMeasurer.Measure(Char).Width;
 	}
 
-	// TODO: Надо переделать в отдельную функцию отрисовщика
-	if (editor && editor.ShowParaMarks)
+	if (editor && editor.ShowParaMarks && Context.DrawFootnoteRect)
 	{
-		if (Context.m_oContext && Context.m_oContext.setLineDash)
-			Context.m_oContext.setLineDash([1, 1]);
-
-		var l = X, t = PDSE.LineTop, r = X + this.Get_Width(), b = PDSE.BaseLine;
-		Context.drawHorLineExt(c_oAscLineDrawingRule.Top, t, l, r, 0, 0, 0);
-		Context.drawVerLine(c_oAscLineDrawingRule.Right, l, t, b, 0);
-		Context.drawVerLine(c_oAscLineDrawingRule.Left, r, t, b, 0);
-		Context.drawHorLineExt(c_oAscLineDrawingRule.Top, b, l, r, 0, 0, 0);
-
-		if (Context.m_oContext && Context.m_oContext.setLineDash)
-			Context.m_oContext.setLineDash([]);
+	    Context.p_color(0, 0, 0, 255);
+	    Context.DrawFootnoteRect(X, PDSE.LineTop, this.Get_Width(), PDSE.BaseLine - PDSE.LineTop);
 	}
 };
 ParaFootnoteReference.prototype.Measure = function(Context, TextPr, MathInfo, Run)
@@ -7814,22 +7804,13 @@ ParaSeparator.prototype.Draw     = function(X, Y, Context, PDSE)
 {
 	var l = X, t = PDSE.LineTop, r = X + this.Get_Width(), b = PDSE.BaseLine;
 
+    Context.p_color(0, 0, 0, 255);
 	Context.drawHorLineExt(c_oAscLineDrawingRule.Center, (t + b) / 2, l, r, this.LineW, 0, 0);
 
-	// TODO: Надо переделать в отдельную функцию отрисовщика
-	if (editor && editor.ShowParaMarks)
-	{
-		if (Context.m_oContext && Context.m_oContext.setLineDash)
-			Context.m_oContext.setLineDash([1, 1]);
-
-		Context.drawHorLineExt(c_oAscLineDrawingRule.Top, t, l, r, 0, 0, 0);
-		Context.drawVerLine(c_oAscLineDrawingRule.Right, l, t, b, 0);
-		Context.drawVerLine(c_oAscLineDrawingRule.Left, r, t, b, 0);
-		Context.drawHorLineExt(c_oAscLineDrawingRule.Top, b, l, r, 0, 0, 0);
-
-		if (Context.m_oContext && Context.m_oContext.setLineDash)
-			Context.m_oContext.setLineDash([]);
-	}
+	if (editor && editor.ShowParaMarks && Context.DrawFootnoteRect)
+    {
+        Context.DrawFootnoteRect(X, PDSE.LineTop, this.Get_Width(), PDSE.BaseLine - PDSE.LineTop);
+    }
 };
 ParaSeparator.prototype.Measure  = function(Context, TextPr)
 {
@@ -7863,22 +7844,13 @@ ParaContinuationSeparator.prototype.Draw         = function(X, Y, Context, PDSE)
 {
 	var l = X, t = PDSE.LineTop, r = X + this.Get_Width(), b = PDSE.BaseLine;
 
+    Context.p_color(0, 0, 0, 255);
 	Context.drawHorLineExt(c_oAscLineDrawingRule.Center, (t + b) / 2, l, r, this.LineW, 0, 0);
 
-	// TODO: Надо переделать в отдельную функцию отрисовщика
-	if (editor && editor.ShowParaMarks)
-	{
-		if (Context.m_oContext && Context.m_oContext.setLineDash)
-			Context.m_oContext.setLineDash([1, 1]);
-
-		Context.drawHorLineExt(c_oAscLineDrawingRule.Top, t, l, r, 0, 0, 0);
-		Context.drawVerLine(c_oAscLineDrawingRule.Right, l, t, b, 0);
-		Context.drawVerLine(c_oAscLineDrawingRule.Left, r, t, b, 0);
-		Context.drawHorLineExt(c_oAscLineDrawingRule.Top, b, l, r, 0, 0, 0);
-
-		if (Context.m_oContext && Context.m_oContext.setLineDash)
-			Context.m_oContext.setLineDash([]);
-	}
+	if (editor && editor.ShowParaMarks && Context.DrawFootnoteRect)
+    {
+        Context.DrawFootnoteRect(X, PDSE.LineTop, this.Get_Width(), PDSE.BaseLine - PDSE.LineTop);
+    }
 };
 ParaContinuationSeparator.prototype.Measure      = function(Context, TextPr)
 {
