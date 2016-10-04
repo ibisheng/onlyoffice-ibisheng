@@ -199,6 +199,7 @@ window["NativeCorrectImageUrlOnPaste"] = function(url)
 window["UpdateInstallPlugins"] = function()
 {
 	var _plugins = JSON.parse(window["AscDesktopEditor"]["GetInstallPlugins"]());
+	_plugins["url"] = _plugins["url"].replace(" ", "%20");
 	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 	_editor.sendEvent("asc_onPluginsInit", _plugins);
 };
