@@ -1584,12 +1584,12 @@ CChartsDrawer.prototype =
 				
 		}
 		
-		if(this.calcProp.subType == 'stackedPer')
+		/*if(this.calcProp.subType == 'stackedPer')
 		{
 			//TODO пересмотреть все ситуации, когда заданы фиксированные максимальные и минимальные значение выше 100%
 			if(step > axisMax)
 				arrayValues = [axisMin, axisMax];
-		}
+		}*/
 		
 		if(!arrayValues.length)
 			arrayValues = [0.2, 0.4, 0.6, 0.8, 1, 1.2];
@@ -4772,7 +4772,7 @@ drawAreaChart.prototype =
 		gdLst["w"] = 1;
 		gdLst["h"] = 1;
 		
-		var drawVerge = function(number, isReverse, isFirstPoint)
+		var calculateFace = function(number, isReverse, isFirstPoint)
 		{
 			if(!isReverse)
 			{
@@ -4812,7 +4812,7 @@ drawAreaChart.prototype =
 			return path;
 		};
 		
-		var drawUpDownFace = function(isDown)
+		var calculateUpDownFace = function(isDown)
 		{
 			var arrayPaths = [];
 			for(var i = 0; i < pointsIn3D[0].length - 1; i++)
@@ -4903,8 +4903,8 @@ drawAreaChart.prototype =
 			path.pathH = pathH;
 			path.pathW = pathW;
 			
-			drawVerge(upNear, false, true);
-			drawVerge(downNear, true);
+			calculateFace(upNear, false, true);
+			calculateFace(downNear, true);
 			path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
 			
 			path.recalculate(gdLst);
@@ -4913,11 +4913,11 @@ drawAreaChart.prototype =
 		
 		//down
 		paths[1] = null;
-		if(this.darkFaces[seriaNum]["down"])
-		{
-			var arrayPaths = drawUpDownFace(true);
+		//if(this.darkFaces[seriaNum]["down"])
+		//{
+			var arrayPaths = calculateUpDownFace(true);
 			paths[1] = arrayPaths;
-		}
+		//}
 		
 		//left
 		paths[2] = null;
@@ -4937,11 +4937,11 @@ drawAreaChart.prototype =
 		
 		//up
 		paths[4] = null;
-		if(this.darkFaces[seriaNum]["up"])
-		{
-			var arrayPaths = drawUpDownFace();	
+		//if(this.darkFaces[seriaNum]["up"])
+		//{
+			var arrayPaths = calculateUpDownFace();	
 			paths[4] = arrayPaths;
-		}
+		//}
 		
 		//unfront
 		paths[5] = null;
@@ -4951,8 +4951,8 @@ drawAreaChart.prototype =
 			path.pathH = pathH;
 			path.pathW = pathW;
 			
-			drawVerge(upFar, false, true);
-			drawVerge(downFar, true);
+			calculateFace(upFar, false, true);
+			calculateFace(downFar, true);
 			path.lnTo(pointsIn3D[upFar][0].x / pxToMm * pathW, pointsIn3D[upFar][0].y / pxToMm * pathH);
 			
 			path.recalculate(gdLst);
@@ -5508,6 +5508,8 @@ drawAreaChart.prototype =
 	
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
+		var pxToMm = this.chartProp.pxToMM;
+		
 		var numCache = this.chartProp.series[ser].val.numRef ? this.chartProp.series[ser].val.numRef.numCache : this.chartProp.series[ser].val.numLit;
 		var point = this.cChartDrawer.getIdxPoint(this.chartProp.series[ser], val);
 		var path;
@@ -5520,7 +5522,20 @@ drawAreaChart.prototype =
 		var x = path.x;
 		var y = path.y;
 		
-		var pxToMm = this.chartProp.pxToMM;
+		if(this.cChartDrawer.nDimensionCount === 3)
+		{
+			var gapDepth = this.gapDepth;
+			if(this.chartProp.subType === "normal")
+			{
+				gapDepth = this.gapDepth[ser];
+			}
+			
+			var turnPoint = this.cChartDrawer._convertAndTurnPoint(x * pxToMm, y * pxToMm, gapDepth);
+			x = turnPoint.x / pxToMm;
+			y = turnPoint.y / pxToMm;
+		}
+		
+		
 		var constMargin = 5 / pxToMm;
 		
 		var width = point.compiledDlb.extX;
@@ -5701,7 +5716,7 @@ drawAreaChart.prototype =
 		//в excel всегда темные боковые стороны, лицевая и задняя стороны светлые
 		//pen = this.cChartSpace.chart.plotArea.valAx.compiledMajorGridLines;
 		//pen.setFill(brush);
-		pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
+		pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.2);
 		if(k != 5 && k != 0)
 		{
 			var  props = this.cChartSpace.getParentObjects();
@@ -5746,36 +5761,6 @@ drawAreaChart.prototype =
 		}
 	},
 	
-	_getIntersectionLines: function(line1Point1, line1Point2, line2Point1, line2Point2)
-	{
-		var chartHeight = this.chartProp.trueHeight;
-		var chartWidth = this.chartProp.trueWidth;
-		var left = this.chartProp.chartGutter._left;
-		var top = this.chartProp.chartGutter._top;
-		
-		var x1 = line1Point1.x;
-		var x2 = line1Point2.x;
-		var y1 = line1Point1.y;
-		var y2 = line1Point2.y;
-		
-		var x3 = line2Point1.x;
-		var x4 = line2Point2.x;
-		var y3 = line2Point1.y;
-		var y4 = line2Point2.y;
-		
-		var x = ((x1 * y2 - x2 * y1) * (x4 - x3) - (x3 * y4 - x4 * y3) * (x2 - x1)) / ((y1 - y2) * (x4 - x3) - (y3 - y4) * (x2 - x1));
-		var y = ((y3 - y4) * x - (x3 * y4 - x4 * y3)) / (x4 - x3);
-		
-		x = -x;
-		
-		var res = null; 
-		
-		if(y < top + chartHeight && y > top && x > line1Point1.x && x < line1Point2.x)
-			res = {x: x, y: y}
-		
-		return res;
-	},
-	
 	_drawBars3D: function()
 	{
 		var t = this;
@@ -5785,7 +5770,7 @@ drawAreaChart.prototype =
 		if(!isStacked)
 		{
 			var angle = Math.abs(this.cChartDrawer.processor3D.angleOy);
-			if(angle > Math.PI / 2 && angle < 3 * Math.PI / 2)
+			if(!this.cChartDrawer.processor3D.view3D.rAngAx && angle > Math.PI / 2 && angle < 3 * Math.PI / 2)
 			{
 				for (var j = 0; j < this.paths.series.length; j++) 
 				{
@@ -5885,6 +5870,36 @@ drawAreaChart.prototype =
 		var visible = aX + bY + cZ;
 		
 		return visible < 0 ? true : false
+	},
+	
+	_getIntersectionLines: function(line1Point1, line1Point2, line2Point1, line2Point2)
+	{
+		var chartHeight = this.chartProp.trueHeight;
+		var chartWidth = this.chartProp.trueWidth;
+		var left = this.chartProp.chartGutter._left;
+		var top = this.chartProp.chartGutter._top;
+		
+		var x1 = line1Point1.x;
+		var x2 = line1Point2.x;
+		var y1 = line1Point1.y;
+		var y2 = line1Point2.y;
+		
+		var x3 = line2Point1.x;
+		var x4 = line2Point2.x;
+		var y3 = line2Point1.y;
+		var y4 = line2Point2.y;
+		
+		var x = ((x1 * y2 - x2 * y1) * (x4 - x3) - (x3 * y4 - x4 * y3) * (x2 - x1)) / ((y1 - y2) * (x4 - x3) - (y3 - y4) * (x2 - x1));
+		var y = ((y3 - y4) * x - (x3 * y4 - x4 * y3)) / (x4 - x3);
+		
+		x = -x;
+		
+		var res = null; 
+		
+		if(y < top + chartHeight && y > top && x > line1Point1.x && x < line1Point2.x)
+			res = {x: x, y: y}
+		
+		return res;
 	}
 };
 
