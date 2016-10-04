@@ -588,7 +588,8 @@
 			res.ranges = this.ranges.map(function (range) {
 				return range.clone();
 			});
-			res.cell = this.activeCell.clone();
+			res.activeCell = this.activeCell.clone();
+			res.worksheet = this.worksheet;
 			return res;
 		};
 		SelectionRange.prototype.isEqual = function (range) {
