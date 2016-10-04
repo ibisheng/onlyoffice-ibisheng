@@ -1641,7 +1641,8 @@
         var maxCols = this.model.getColsCount();
         var maxRows = this.model.getRowsCount();
         var lastC = -1, lastR = -1;
-        var activeRange = printOnlySelection ? this.activeRange : null;
+        // ToDo print each range on new page (now only last)
+        var activeRange = printOnlySelection ? this.model.selectionRange.getLast() : null;
         var bFitToWidth = false;
         var bFitToHeight = false;
 
