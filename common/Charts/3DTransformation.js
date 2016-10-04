@@ -163,7 +163,7 @@ Processor3D.prototype._recalculateScaleWithMaxWidth = function()
 	{
 		this.widthCanvas = optimalWidth + (this.left + this.right);
 		this._calculateScaleNStandard();
-		optimalWidthLine = this.depthPerspective * Math.sin(-this.angleOy) + ((this.widthCanvas - (this.left + this.right)) / this.aspectRatioX) / this.scaleX;
+		optimalWidthLine = Math.abs(this.depthPerspective * Math.sin(-this.angleOy)) + ((this.widthCanvas - (this.left + this.right)) / this.aspectRatioX) / this.scaleX;
 		kF = optimalWidthLine / widthLine;
 		
 		if(optimalWidthLine < widthLine)
@@ -173,7 +173,7 @@ Processor3D.prototype._recalculateScaleWithMaxWidth = function()
 		}
 		else
 		{
-			this.aspectRatioX = widthLine / ((optimalWidthLine - this.depthPerspective*Math.sin(-this.angleOy))/kF);
+			this.aspectRatioX = widthLine / ((optimalWidthLine - Math.abs(this.depthPerspective * Math.sin(-this.angleOy))) / kF);
 			this.scaleY = this.scaleY * kF;
 			this.scaleZ = this.scaleZ * kF;
 			
@@ -181,70 +181,71 @@ Processor3D.prototype._recalculateScaleWithMaxWidth = function()
 		}
 
 		this._recalculateCameraDiff();
-		return;
-	}
-	
-	//TODO протестировать, и если не будет проблем, то убрать if-else
-	if(this.angleOy != 0)
-	{
-		//if(this.depthPerspective * Math.sin(-this.angleOy) + ((this.widthCanvas - (this.left + this.right)) / this.aspectRatioX) / this.scaleX <= widthLine)
-			//return;
-		
-		//рассчитываем параметры диаграммы при оптимальной ширине
-		this.widthCanvas = optimalWidth + (this.left + this.right);
-		this.calaculate3DProperties(null, null, true);
-		
-		var newDepth = Math.abs(this.depthPerspective * Math.sin(-this.angleOy));
-		optimalWidthLine =  newDepth + ((this.widthCanvas - (this.left + this.right)) / this.aspectRatioX) / this.scaleX;
-		kF = optimalWidthLine / widthLine;
-		
-		this.aspectRatioX = widthLine / ((optimalWidthLine - newDepth) / kF);
-		this.scaleY = this.scaleY * kF;
-		this.scaleZ = this.scaleZ * kF;
-		
-		this.widthCanvas = widthCanvas;
-		
-		this._recalculateCameraDiff();
 	}
 	else
 	{
-		//рассчитываем параметры диаграммы при оптимальной ширине
-		this.widthCanvas = optimalWidth + (this.left + this.right);
-		var scaleX = this.scaleX;
-		var scaleY = this.scaleY;
-		var scaleZ = this.scaleZ;
-		
-		var aspectRatioX = this.aspectRatioX;
-		var aspectRatioY = this.aspectRatioY;
-		var aspectRatioZ = this.aspectRatioZ;
-		
-		this.calaculate3DProperties(null, null, true);
-		optimalWidthLine = this.depthPerspective * Math.sin(-this.angleOy) + ((this.widthCanvas - (this.left + this.right)) / this.aspectRatioX) / this.scaleX;
-		
-		
-		if(optimalWidthLine < widthLine)
+		//TODO протестировать, и если не будет проблем, то убрать if-else
+		if(this.angleOy != 0)
 		{
+			//if(this.depthPerspective * Math.sin(-this.angleOy) + ((this.widthCanvas - (this.left + this.right)) / this.aspectRatioX) / this.scaleX <= widthLine)
+				//return;
+			
+			//рассчитываем параметры диаграммы при оптимальной ширине
+			this.widthCanvas = optimalWidth + (this.left + this.right);
+			this.calaculate3DProperties(null, null, true);
+			
+			var newDepth = Math.abs(this.depthPerspective * Math.sin(-this.angleOy));
+			optimalWidthLine =  newDepth + ((this.widthCanvas - (this.left + this.right)) / this.aspectRatioX) / this.scaleX;
+			kF = optimalWidthLine / widthLine;
+			
+			this.aspectRatioX = widthLine / ((optimalWidthLine - newDepth) / kF);
+			this.scaleY = this.scaleY * kF;
+			this.scaleZ = this.scaleZ * kF;
+			
 			this.widthCanvas = widthCanvas;
-			this.scaleX = scaleX;
-			this.scaleY = scaleY;
-			this.scaleZ = scaleZ;
 			
-			this.aspectRatioX = aspectRatioX;
-			this.aspectRatioY = aspectRatioY;
-			this.aspectRatioZ = aspectRatioZ;
-			
-			return;
+			this._recalculateCameraDiff();
 		}
-		
-		
-		kF = optimalWidthLine / widthLine;
-		this.aspectRatioX = widthLine / ((optimalWidthLine - this.depthPerspective*Math.sin(-this.angleOy))/kF);
-		this.scaleY = this.scaleY * kF;
-		this.scaleZ = this.scaleZ * kF;
-		
-		this.widthCanvas = widthCanvas;
-		
-		this._recalculateCameraDiff();
+		else
+		{
+			//рассчитываем параметры диаграммы при оптимальной ширине
+			this.widthCanvas = optimalWidth + (this.left + this.right);
+			var scaleX = this.scaleX;
+			var scaleY = this.scaleY;
+			var scaleZ = this.scaleZ;
+			
+			var aspectRatioX = this.aspectRatioX;
+			var aspectRatioY = this.aspectRatioY;
+			var aspectRatioZ = this.aspectRatioZ;
+			
+			this.calaculate3DProperties(null, null, true);
+			optimalWidthLine = this.depthPerspective * Math.sin(-this.angleOy) + ((this.widthCanvas - (this.left + this.right)) / this.aspectRatioX) / this.scaleX;
+			
+			
+			if(optimalWidthLine < widthLine)
+			{
+				this.widthCanvas = widthCanvas;
+				this.scaleX = scaleX;
+				this.scaleY = scaleY;
+				this.scaleZ = scaleZ;
+				
+				this.aspectRatioX = aspectRatioX;
+				this.aspectRatioY = aspectRatioY;
+				this.aspectRatioZ = aspectRatioZ;
+				
+				return;
+			}
+			
+			
+			kF = optimalWidthLine / widthLine;
+			this.aspectRatioX = widthLine / ((optimalWidthLine - this.depthPerspective*Math.sin(-this.angleOy))/kF);
+			this.scaleY = this.scaleY * kF;
+			this.scaleZ = this.scaleZ * kF;
+			
+			this.widthCanvas = widthCanvas;
+			
+			this._recalculateCameraDiff();
+		}
 	}
 };
 
