@@ -10787,12 +10787,30 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
         }
 		else if (c_oSer_OMathContentType.Den === type)
         {
+			if (undefined == oElemDen.content)
+			{
+				var oFraction = new CFraction(props);
+				initMathRevisions(oFraction, props);
+				if (oParent)
+					oParent.addElementToContent(oFraction);
+				oElemDen.content = oFraction.getDenominator();
+				oElemNum.content = oFraction.getNumerator();
+			}
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElemDen.content);
             });
         }
 		else if (c_oSer_OMathContentType.Num === type)
         {
+			if (undefined == oElemNum.content)
+			{
+				var oFraction = new CFraction(props);
+				initMathRevisions(oFraction, props);
+				if (oParent)
+					oParent.addElementToContent(oFraction);
+				oElemDen.content = oFraction.getDenominator();
+				oElemNum.content = oFraction.getNumerator();
+			}
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElemNum.content);
             });			
@@ -12093,12 +12111,34 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
         }
 		else if (c_oSer_OMathContentType.Sup === type)
         {
+			if (undefined == oSup.content)
+			{
+				props.type = DEGREE_SUPERSCRIPT;
+				var oSSup = new CDegree(props);
+				initMathRevisions(oSSup, props);
+				if (oParent)
+					oParent.addElementToContent(oSSup);
+				oSup.conten = oSSup.getUpperIterator();
+				oContent.content = oSSup.getBase();
+			}
+
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oSup.conten);
             });			
         }
 		else if (c_oSer_OMathContentType.Element === type)
         {
+			if (undefined == oContent.content)
+			{
+				props.type = DEGREE_SUPERSCRIPT;
+				var oSSup = new CDegree(props);
+				initMathRevisions(oSSup, props);
+				if (oParent)
+					oParent.addElementToContent(oSSup);
+				oSup.conten = oSSup.getUpperIterator();
+				oContent.content = oSSup.getBase();
+			}
+
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oContent.content);
             });			
