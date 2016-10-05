@@ -851,7 +851,8 @@
     // Автодополняет формулу диапазоном, если это возможно
     WorksheetView.prototype.autoCompleteFormula = function (functionName) {
         var t = this;
-        var ar = this.activeRange;
+        // ToDo autoComplete with multiselect
+        var ar = this.model.selectionRange.getLast();
         var arCopy = null;
         var arHistorySelect = ar.clone(true);
         var vr = this.visibleRange;
