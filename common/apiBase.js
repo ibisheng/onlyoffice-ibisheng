@@ -806,6 +806,9 @@
 
 	baseEditorsApi.prototype.asc_addOleObject = function(oPluginData)
 	{
+		if(this.isViewMode){
+			return;
+		}
 		Asc.CPluginData_wrap(oPluginData);
 		var oThis      = this;
 		var sImgSrc    = oPluginData.getAttribute("imgSrc");
@@ -829,6 +832,9 @@
 
 	baseEditorsApi.prototype.asc_editOleObject = function(oPluginData)
 	{
+		if(this.isViewMode){
+			return;
+		}
 		Asc.CPluginData_wrap(oPluginData);
 		var oThis      = this;
 		var bResize    = oPluginData.getAttribute("resize");
