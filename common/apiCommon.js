@@ -128,6 +128,7 @@
 		this.isAutosaveEnable = true;
 		this.AutosaveMinInterval = 300;
 		this.isAnalyticsEnable = false;
+		this.buildVersion = null;
 		return this;
 	}
 
@@ -158,6 +159,9 @@
 	asc_CAscEditorPermissions.prototype.asc_getTrial = function () {
 		return this.trial;
 	};
+	asc_CAscEditorPermissions.prototype.asc_getBuildVersion = function () {
+		return this.buildVersion;
+	};
 
 	asc_CAscEditorPermissions.prototype.setLicenseType = function (v) {
 		this.licenseType = v;
@@ -170,6 +174,9 @@
 	};
 	asc_CAscEditorPermissions.prototype.setIsTrial = function (v) {
 		this.trial = v;
+	};
+	asc_CAscEditorPermissions.prototype.setBuildVersion = function (v) {
+		this.buildVersion = v;
 	};
 
 	/** @constructor */
@@ -2694,6 +2701,7 @@
 	prot["asc_getIsAnalyticsEnable"] = prot.asc_getIsAnalyticsEnable;
 	prot["asc_getIsLight"] = prot.asc_getIsLight;
 	prot["asc_getTrial"] = prot.asc_getTrial;
+	prot["asc_getBuildVersion"] = prot.asc_getBuildVersion;
 
 	window["AscCommon"].asc_ValAxisSettings = asc_ValAxisSettings;
 	prot = asc_ValAxisSettings.prototype;
