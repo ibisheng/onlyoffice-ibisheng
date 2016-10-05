@@ -185,11 +185,8 @@ Processor3D.prototype._recalculateScaleWithMaxWidth = function()
 	else
 	{
 		//TODO протестировать, и если не будет проблем, то убрать if-else
-		if(this.angleOy != 0)
+		if(Math.abs(this.angleOy) > Math.PI)
 		{
-			//if(this.depthPerspective * Math.sin(-this.angleOy) + ((this.widthCanvas - (this.left + this.right)) / this.aspectRatioX) / this.scaleX <= widthLine)
-				//return;
-			
 			//рассчитываем параметры диаграммы при оптимальной ширине
 			this.widthCanvas = optimalWidth + (this.left + this.right);
 			this.calaculate3DProperties(null, null, true);
