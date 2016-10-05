@@ -159,6 +159,18 @@ RgbColor.prototype =
 	{
 		return this.Properties;
 	},
+
+    isEqual: function(oColor)
+    {
+        if(!oColor){
+            return false;
+        }
+        if(this.rgb !== oColor.rgb){
+            return false;
+        }
+        return true;
+    },
+
 	getProperty : function(nType)
 	{
 		switch(nType)
@@ -240,6 +252,21 @@ ThemeColor.prototype =
 		case this.Properties.tint:return this.tint;break;
 		}
 	},
+
+    isEqual: function(oColor)
+    {
+        if(!oColor){
+            return false;
+        }
+        if(this.theme !== oColor.theme){
+            return false;
+        }
+        if(this.tint  !==  oColor.tint){
+            return false;
+        }
+        return true;
+    },
+
 	setProperty : function(nType, value)
 	{
 		switch(nType)
@@ -4820,15 +4847,63 @@ CellArea.prototype = {
 		return this.canvas.toDataURL("image/png");
 	};
 
+	sparklineGroup.prototype.isEqualColors = function(oSparklineGroup){
+		if(this.colorSeries && !this.colorSeries.isEqual(oSparklineGroup.colorSeries) || oSparklineGroup.colorSeries){
+			return false;
+		}
+        if(this.colorNegative && !this.colorNegative.isEqual(oSparklineGroup.colorNegative) || oSparklineGroup.colorNegative){
+            return false;
+        }
+        if(this.colorAxis && !this.colorAxis.isEqual(oSparklineGroup.colorAxis) || oSparklineGroup.colorAxis){
+            return false;
+        }
+        if(this.colorMarkers && !this.colorMarkers.isEqual(oSparklineGroup.colorMarkers) || oSparklineGroup.colorMarkers){
+            return false;
+        }
+        if(this.colorFirst && !this.colorFirst.isEqual(oSparklineGroup.colorFirst) || oSparklineGroup.colorFirst){
+            return false;
+        }
+        if(this.colorLast && !this.colorLast.isEqual(oSparklineGroup.colorLast) || oSparklineGroup.colorLast){
+            return false;
+        }
+        if(this.colorHigh && !this.colorHigh.isEqual(oSparklineGroup.colorHigh) || oSparklineGroup.colorHigh){
+            return false;
+        }
+        if(this.colorLow && !this.colorLow.isEqual(oSparklineGroup.colorLow) || oSparklineGroup.colorLow){
+            return false;
+        }
+        return true;
+    };
+
 	sparklineGroup.prototype.asc_getStyles = function()
 	{
 		var aRet = [];
+        var nStyleIndex = -1;
 		for(var i = 0; i < 35; ++i){
 			var oSparklineGroup = this.asc_createSparklineGroupByStyle(i);
-			aRet.push([oSparklineGroup, this.asc_getThumbBySparklineGroup(oSparklineGroup)]);
+            if(nStyleIndex === -1 && this.isEqualColors(oSparklineGroup)){
+                nStyleIndex = i;
+            }
+			aRet.push(this.asc_getThumbBySparklineGroup(oSparklineGroup));
 		}
+        aRet.push(nStyleIndex);
 		return aRet;
 	};
+
+
+    sparklineGroup.prototype.asc_setStyle = function(nStyleIndex){
+        var oStyle = AscFormat.aSparklinesStyles[nStyleIndex];
+        if(oStyle) {
+            this.colorSeries = this.createExcellColor(oStyle[0]);
+            this.colorNegative = this.createExcellColor(oStyle[1]);
+            this.colorAxis = this.createExcellColor(0xff000000);
+            this.colorMarkers = this.createExcellColor(oStyle[2]);
+            this.colorFirst = this.createExcellColor(oStyle[3]);
+            this.colorLast = this.createExcellColor(oStyle[4]);
+            this.colorHigh = this.createExcellColor(oStyle[5]);
+            this.colorLow = this.createExcellColor(oStyle[6]);
+        }
+    };
 	/** @constructor */
 	function sparkline() {
 		this.sqref = null;
@@ -7055,6 +7130,7 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	prot["asc_createSparklineGroupByStyle"]				= prot.asc_createSparklineGroupByStyle;
 	prot["asc_getThumbBySparklineGroup"]				= prot.asc_getThumbBySparklineGroup;
 	prot["asc_getStyles"]				= prot.asc_getStyles;
+	prot["asc_setStyle"]				= prot.asc_setStyle;
 	window['AscCommonExcel'].sparkline = sparkline;
 	window['AscCommonExcel'].TablePart = TablePart;
 	window['AscCommonExcel'].AutoFilter = AutoFilter;
