@@ -3958,6 +3958,17 @@ background-repeat: no-repeat;\
 			else
 			{
 				this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+
+				if (window["AscDesktopEditor"])
+                {
+                    var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](sImageUrl);
+                    _url     = g_oDocumentUrls.getImageUrl(_url);
+                    ImagePr.ImageUrl = _url;
+                    fApplyCallback();
+                    this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+                    return;
+                }
+
 				this.fCurCallback = function(input)
 				{
 					if (null != input && "imgurl" == input["type"])
