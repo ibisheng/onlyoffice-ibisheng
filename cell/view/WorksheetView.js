@@ -1576,63 +1576,63 @@
         }
     };
 
-    WorksheetView.prototype._shiftVisibleRange = function ( range ) {
+    WorksheetView.prototype._shiftVisibleRange = function (range) {
         var t = this;
         var vr = t.visibleRange;
-        var arn = range ? range : t.activeRange.clone( true );
+        var arn = range ? range : this.model.selectionRange.getLast();
         var i;
 
         var cFrozen = 0, rFrozen = 0;
-        if ( this.topLeftFrozenCell ) {
+        if (this.topLeftFrozenCell) {
             cFrozen = this.topLeftFrozenCell.getCol0();
             rFrozen = this.topLeftFrozenCell.getRow0();
         }
 
         do {
-            if ( arn.r2 > vr.r2 ) {
+            if (arn.r2 > vr.r2) {
                 i = arn.r2 - vr.r2;
                 vr.r1 += i;
                 vr.r2 += i;
                 t._calcVisibleRows();
                 continue;
             }
-            if ( t._isRowDrawnPartially( arn.r2, vr.r1 ) ) {
+            if (t._isRowDrawnPartially(arn.r2, vr.r1)) {
                 vr.r1 += 1;
                 t._calcVisibleRows();
             }
-            if ( arn.r1 < vr.r1 && arn.r1 >= rFrozen ) {
+            if (arn.r1 < vr.r1 && arn.r1 >= rFrozen) {
                 i = arn.r1 - vr.r1;
                 vr.r1 += i;
                 vr.r2 += i;
                 t._calcVisibleRows();
             }
             break;
-        } while ( 1 );
+        } while (1);
 
         do {
-            if ( arn.c2 > vr.c2 ) {
+            if (arn.c2 > vr.c2) {
                 i = arn.c2 - vr.c2;
                 vr.c1 += i;
                 vr.c2 += i;
                 t._calcVisibleColumns();
                 continue;
             }
-            if ( t._isColDrawnPartially( arn.c2, vr.c1 ) ) {
+            if (t._isColDrawnPartially(arn.c2, vr.c1)) {
                 vr.c1 += 1;
                 t._calcVisibleColumns();
             }
-            if ( arn.c1 < vr.c1 && arn.c1 >= cFrozen ) {
+            if (arn.c1 < vr.c1 && arn.c1 >= cFrozen) {
                 i = arn.c1 - vr.c1;
                 vr.c1 += i;
                 vr.c2 += i;
-                if ( vr.c1 < 0 ) {
+                if (vr.c1 < 0) {
                     vr.c1 = 0;
                     vr.c2 -= vr.c1;
                 }
                 t._calcVisibleColumns();
             }
             break;
-        } while ( 1 );
+        } while (1);
     };
 
     // ----- Drawing for print -----
