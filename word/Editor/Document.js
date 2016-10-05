@@ -2014,25 +2014,29 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
 		}
 	}
 
-	if (ChangeIndex < 0)
-	{
-		this.DrawingDocument.ClearCachePages();
-		this.DrawingDocument.FirePaint();
-		return;
-	}
-
 	// Найдем начальную страницу, с которой мы начнем пересчет
 	var StartPage  = 0;
 	var StartIndex = 0;
 
-	if (ChangeIndex >= this.Content.length)
+	if (ChangeIndex < 0 && true === RecalcData.NotesEnd)
 	{
 		// Сюда мы попадаем при рассчете сносок, которые выходят за пределы самого документа
 		StartIndex = this.Content.length;
-		StartPage  = RecalcData.Inline.PageNum;
+		StartPage  = RecalcData.NotesEndPage;
+		MainChange = true;
 	}
 	else
 	{
+		if (ChangeIndex < 0)
+		{
+			this.DrawingDocument.ClearCachePages();
+			this.DrawingDocument.FirePaint();
+			return;
+		}
+		else if (ChangeIndex >= this.Content.length)
+		{
+			ChangeIndex = this.Content.length - 1;
+		}
 
 		// Здсь мы должны проверить предыдущие элементы на наличие параматра KeepNext
 		while (ChangeIndex > 0)
@@ -2041,7 +2045,11 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
 			if (type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Get_CompiledPr2(false).ParaPr.KeepNext)
 			{
 				ChangeIndex--;
-				RecalcData.Inline.PageNum = PrevElement.Get_StartPage_Absolute() + (PrevElement.Pages.length - 1); // считаем, что изменилась последняя страница
+				RecalcData.Inline.PageNum = PrevElement.Get_StartPage_Absolute() + (PrevElement.Pages.length - 1); // считаем,
+																												   // что
+																												   // изменилась
+																												   // последняя
+																												   // страница
 			}
 			else
 			{
@@ -6786,11 +6794,6 @@ CDocument.prototype.OnKeyDown = function(e)
         bUpdateSelection = false;
         bRetValue        = keydownresult_PreventAll;
     }
-	// else if (e.KeyCode === 113)
-	// {
-	// 	this.AddFootnote();
-	// 	bRetValue = keydownresult_PreventAll;
-	// }
     else if (e.KeyCode == 121 && true === e.ShiftKey) // Shift + F10 - контекстное меню
     {
         var X_abs, Y_abs, oPosition, ConvertedPos;

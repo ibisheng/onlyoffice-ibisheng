@@ -46,22 +46,25 @@ function CHistory(Document)
     this.CollaborativeEditing = null;
     this.CanNotAddChanges = false;//флаг для отслеживания ошибок добавления изменений без точки:Create_NewPoint->Add->Save_Changes->Add
 
-    this.RecalculateData =
-    {
-        Inline   : {Pos : -1, PageNum : 0},
-        Flow     : [],
-        HdrFtr   : [],
-        Drawings : {
-            All       : false,
-            Map       : {},
-            ThemeInfo : null
-        },
-
-        Tables : [],
-        NumPr  : [],
-
-        Update : true
-    };
+	this.RecalculateData =
+	{
+		Inline       : {
+			Pos     : -1,
+			PageNum : 0
+		},
+		Flow         : [],
+		HdrFtr       : [],
+		Drawings     : {
+			All       : false,
+			Map       : {},
+			ThemeInfo : null
+		},
+		Tables       : [],
+		NumPr        : [],
+		NotesEnd     : false,
+		NotesEndPage : 0,
+		Update       : true
+	};
 
 	this.TurnOffHistory = 0;
     this.MinorChanges   = false; // Данный параметр нужен, чтобы определить влияют ли добавленные изменения на пересчет
@@ -479,23 +482,27 @@ CHistory.prototype =
     {
         // NumPr здесь не обнуляем
         var NumPr = this.RecalculateData.NumPr;
-        this.RecalculateData =
-        {
-            Inline   : {Pos : -1, PageNum : 0},
-            Flow     : [],
-            HdrFtr   : [],
-            Drawings : {
-                All       : false,
-                Map       : {},
-                ThemeInfo : null
-            },
+		this.RecalculateData =
+		{
+			Inline   : {
+				Pos     : -1,
+				PageNum : 0
+			},
+			Flow     : [],
+			HdrFtr   : [],
+			Drawings : {
+				All       : false,
+				Map       : {},
+				ThemeInfo : null
+			},
 
-            Tables : [],
-            NumPr  : NumPr,
-
-            Update : true
-        };
-    },
+			Tables       : [],
+			NumPr        : NumPr,
+			NotesEnd     : false,
+			NotesEndPage : 0,
+			Update       : true
+		};
+	},
 
     RecalcData_Add : function(Data)
     {
@@ -590,6 +597,13 @@ CHistory.prototype =
                 }
                 break;
             }
+
+			case AscDFH.historyitem_recalctype_NotesEnd:
+			{
+				this.RecalculateData.NotesEnd     = true;
+				this.RecalculateData.NotesEndPage = Data.PageNum;
+				break;
+			}
         }
     },
 
