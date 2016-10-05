@@ -4216,30 +4216,29 @@
     };
 
     // --- Cache ---
-
-    WorksheetView.prototype._cleanCache = function ( range ) {
+    WorksheetView.prototype._cleanCache = function (range) {
         var r, c, row;
 
-        if ( range === undefined ) {
-            range = this.activeRange.clone( true );
+        if (range === undefined) {
+            range = this.activeRange.clone(true);
         }
 
-        for ( r = range.r1; r <= range.r2; ++r ) {
+        for (r = range.r1; r <= range.r2; ++r) {
             row = this.cache.rows[r];
-            if ( row !== undefined ) {
+            if (row !== undefined) {
                 // Должны еще крайнюю удалить
                 c = range.c1;
-                if ( row.erased[c - 1] ) {
+                if (row.erased[c - 1]) {
                     delete row.erased[c - 1];
                 }
-                for ( ; c <= range.c2; ++c ) {
-                    if ( row.columns[c] ) {
+                for (; c <= range.c2; ++c) {
+                    if (row.columns[c]) {
                         delete row.columns[c];
                     }
-                    if ( row.columnsWithText[c] ) {
+                    if (row.columnsWithText[c]) {
                         delete row.columnsWithText[c];
                     }
-                    if ( row.erased[c] ) {
+                    if (row.erased[c]) {
                         delete row.erased[c];
                     }
                 }
@@ -4256,14 +4255,14 @@
         var vr = this.visibleRange;
         var h = vr.r2 + 1 - vr.r1;
         var rl = this.rows.length;
-        var rc = asc_floor( rl / h ) + (rl % h > 0 ? 1 : 0);
-        var range = new asc_Range( 0, 0, this.cols.length - 1, h - 1 );
+        var rc = asc_floor(rl / h) + (rl % h > 0 ? 1 : 0);
+        var range = new asc_Range(0, 0, this.cols.length - 1, h - 1);
         var j;
-        for ( j = rc; j > 0; --j, range.r1 += h, range.r2 += h ) {
-            if ( j === 1 && rl % h > 0 ) {
+        for (j = rc; j > 0; --j, range.r1 += h, range.r2 += h) {
+            if (j === 1 && rl % h > 0) {
                 range.r2 = rl - 1;
             }
-            s.push( range.clone() );
+            s.push(range.clone());
         }
     };
 
