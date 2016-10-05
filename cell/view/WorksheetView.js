@@ -1645,11 +1645,11 @@
         var maxRows = this.model.getRowsCount();
         var lastC = -1, lastR = -1;
         // ToDo print each range on new page (now only last)
-        var activeRange = printOnlySelection ? this.model.selectionRange.getLast() : null;
+        var selectionRange = printOnlySelection ? this.model.selectionRange.getLast() : null;
         var bFitToWidth = false;
         var bFitToHeight = false;
 
-        if (null === activeRange) {
+        if (null === selectionRange) {
             range = new asc_Range(0, 0, maxCols, maxRows);
             this._prepareCellTextMetricsCache(range);
             for (var c = 0; c < maxCols; ++c) {
@@ -1678,8 +1678,8 @@
                 maxRows = Math.max(maxRows, maxObjectsCoord.maxRow);
             }
         } else {
-            maxCols = activeRange.c2 + 1;
-            maxRows = activeRange.r2 + 1;
+            maxCols = selectionRange.c2 + 1;
+            maxRows = selectionRange.r2 + 1;
             range = new asc_Range(0, 0, maxCols, maxRows);
             this._prepareCellTextMetricsCache(range);
         }
@@ -1766,9 +1766,9 @@
             var pageWidthWithFieldsHeadings = (pageWidth - pageRightField) / vector_koef - leftFieldInPt;
             var pageHeightWithFieldsHeadings = (pageHeight - pageBottomField) / vector_koef - topFieldInPt;
 
-            var currentColIndex = (null !== activeRange) ? activeRange.c1 : 0;
+            var currentColIndex = (null !== selectionRange) ? selectionRange.c1 : 0;
             var currentWidth = 0;
-            var currentRowIndex = (null !== activeRange) ? activeRange.r1 : 0;
+            var currentRowIndex = (null !== selectionRange) ? selectionRange.r1 : 0;
             var currentHeight = 0;
             var isCalcColumnsWidth = true;
 
@@ -1882,7 +1882,7 @@
                     currentHeight = 0;
                 } else {
                     // Мы дорисовали все колонки, нужна новая строка и стартовая колонка
-                    currentColIndex = (null !== activeRange) ? activeRange.c1 : 0;
+                    currentColIndex = (null !== selectionRange) ? selectionRange.c1 : 0;
                     currentRowIndex = rowIndex;
                     currentHeight = 0;
                 }
