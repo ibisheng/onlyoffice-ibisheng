@@ -814,18 +814,20 @@
     // Проверяет, есть ли числовые значения в диапазоне
     WorksheetView.prototype._hasNumberValueInActiveRange = function () {
         var cell, cellType, isNumberFormat, arrCols = [], arrRows = [];
-        if (this.activeRange.isOneCell()) {
+        // ToDo multiselect
+        var selectionRange = this.model.selectionRange.getLast();
+        if (selectionRange.isOneCell()) {
             // Для одной ячейки не стоит ничего делать
             return null;
         }
-        var mergedRange = this.model.getMergedByCell(this.activeRange.r1, this.activeRange.c1);
-        if (mergedRange && mergedRange.isEqual(this.activeRange)) {
+        var mergedRange = this.model.getMergedByCell(selectionRange.r1, selectionRange.c1);
+        if (mergedRange && mergedRange.isEqual(selectionRange)) {
             // Для одной ячейки не стоит ничего делать
             return null;
         }
 
-        for (var c = this.activeRange.c1; c <= this.activeRange.c2; ++c) {
-            for (var r = this.activeRange.r1; r <= this.activeRange.r2; ++r) {
+        for (var c = selectionRange.c1; c <= selectionRange.c2; ++c) {
+            for (var r = selectionRange.r1; r <= selectionRange.r2; ++r) {
                 cell = this._getCellTextCache(c, r);
                 if (cell) {
                     // Нашли не пустую ячейку, проверим формат
