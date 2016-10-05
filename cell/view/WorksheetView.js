@@ -11954,9 +11954,9 @@
     };
 
     WorksheetView.prototype.getAddFormatTableOptions = function (range) {
-        var ar = this.activeRange.clone(true);
+        var selectionRange = this.model.selectionRange.getLast();
         //TODO возможно стоит перенести getAddFormatTableOptions во view
-        return this.model.autoFilters.getAddFormatTableOptions(ar, range);
+        return this.model.autoFilters.getAddFormatTableOptions(selectionRange, range);
     };
 
     WorksheetView.prototype.clearFilter = function () {
