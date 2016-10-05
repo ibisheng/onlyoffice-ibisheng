@@ -772,8 +772,11 @@
 
 	baseEditorsApi.prototype.asc_loadLocalImageAndAction = function(sLocalImage, fCallback)
 	{
-		this.ImageLoader.LoadImage(AscCommon.getFullImageSrc2(sLocalImage), 1);
-		this.asc_replaceLoadImageCallback(fCallback);
+		var _loadedUrl = this.ImageLoader.LoadImage(AscCommon.getFullImageSrc2(sLocalImage), 1);
+		if (_loadedUrl != null)
+		    fCallback();
+        else
+        	this.asc_replaceLoadImageCallback(fCallback);
 	};
 
 	baseEditorsApi.prototype.asc_checkImageUrlAndAction = function(sImageUrl, fCallback)

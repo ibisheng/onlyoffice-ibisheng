@@ -42,6 +42,8 @@ Asc['asc_docs_api'].prototype._OfflineAppDocumentStartLoad = function()
 {
 	this.asc_registerCallback('asc_onDocumentContentReady', function(){
 		DesktopOfflineUpdateLocalName(editor);
+
+		setTimeout(function(){window["UpdateInstallPlugins"]();}, 10);
 	});
 
 	AscCommon.History.UserSaveMode = true;
