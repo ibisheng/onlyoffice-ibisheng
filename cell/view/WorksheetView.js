@@ -5450,8 +5450,8 @@
         this._fixSelectionOfHiddenCells(0, delta >= 0 ? +1 : -1, fixStartRow);
         this._fixVisibleRange(fixStartRow);
         var reinitScrollY = start !== fixStartRow.r1;
-        if (reinitScrollY && 0 > delta) // Для скролла вверх обычный сдвиг + дорисовка
-        {
+        // Для скролла вверх обычный сдвиг + дорисовка
+        if (reinitScrollY && 0 > delta) {
             delta += fixStartRow.r1 - start;
         }
         start = fixStartRow.r1;
@@ -5652,8 +5652,8 @@
         this._fixSelectionOfHiddenCells(delta >= 0 ? +1 : -1, 0, fixStartCol);
         this._fixVisibleRange(fixStartCol);
         var reinitScrollX = start !== fixStartCol.c1;
-        if (reinitScrollX && 0 > delta) // Для скролла влево обычный сдвиг + дорисовка
-        {
+        // Для скролла влево обычный сдвиг + дорисовка
+        if (reinitScrollX && 0 > delta) {
             delta += fixStartCol.c1 - start;
         }
         start = fixStartCol.c1;
@@ -6441,7 +6441,7 @@
     };
 
     WorksheetView.prototype._fixSelectionOfHiddenCells = function (dc, dr, range) {
-        var ar = (range) ? range : this.activeRange, c1, c2, r1, r2, mc, i, arn = ar.clone(true);
+        var ar = (range) ? range : this.model.selectionRange.getLast(), c1, c2, r1, r2, mc, i, arn = ar.clone(true);
 
         if (dc === undefined) {
             dc = +1;
@@ -6496,27 +6496,6 @@
 
         ar.assign(c1 !== undefined ? c1 : ar.c1, r1 !== undefined ? r1 : ar.r1, c2 !== undefined ? c2 : ar.c2,
           r2 !== undefined ? r2 : ar.r2);
-
-        // ToDo возможно это избыточные проверки
-        if (c1 >= 0) {
-            ar.startCol = c1;
-        }
-        if (r1 >= 0) {
-            ar.startRow = r1;
-        }
-
-        if (0 !== dc && this.cols[ar.startCol].width < this.width_1px) {
-            c1 = this._findVisibleCol(ar.startCol, dc);
-            if (c1 >= 0) {
-                ar.startCol = c1;
-            }
-        }
-        if (0 !== dr && this.rows[ar.startRow].height < this.height_1px) {
-            r1 = this._findVisibleRow(ar.startRow, dr);
-            if (r1 >= 0) {
-                ar.startRow = r1;
-            }
-        }
     };
 
     WorksheetView.prototype._moveActiveCellToXY = function (x, y) {
@@ -9798,32 +9777,36 @@
     };
 
     // Залочен ли весь лист
-    WorksheetView.prototype._isLockedAll = function ( callback ) {
+    WorksheetView.prototype._isLockedAll = function (callback) {
         var sheetId = this.model.getId();
         var subType = c_oAscLockTypeElemSubType.ChangeProperties;
-        var ar = this.activeRange;
+        var ar = this.model.selectionRange.getLast();
 
-        var lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Range, /*subType*/subType, sheetId, new AscCommonExcel.asc_CCollaborativeRange( ar.c1, ar.r1, ar.c2, ar.r2 ) );
+        var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/subType, sheetId,
+          new AscCommonExcel.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
 
-        if ( false === this.collaborativeEditing.getCollaborativeEditing() ) {
+        if (false === this.collaborativeEditing.getCollaborativeEditing()) {
             // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-            asc_applyFunction( callback, true );
+            asc_applyFunction(callback, true);
             callback = undefined;
         }
-        if ( false !== this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/true ) ) {
+        if (false !==
+          this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/
+            true)) {
             // Редактируем сами
-            asc_applyFunction( callback, true );
+            asc_applyFunction(callback, true);
             return;
-        }
-        else if ( false !== this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/true ) ) {
+        } else if (false !==
+          this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/
+            true)) {
             // Уже ячейку кто-то редактирует
-            asc_applyFunction( callback, false );
+            asc_applyFunction(callback, false);
             return;
         }
 
         this.collaborativeEditing.onStartCheckLock();
-        this.collaborativeEditing.addCheckLock( lockInfo );
-        this.collaborativeEditing.onEndCheckLock( callback );
+        this.collaborativeEditing.addCheckLock(lockInfo);
+        this.collaborativeEditing.onEndCheckLock(callback);
     };
     // Пересчет для входящих ячеек в добавленные строки/столбцы
     WorksheetView.prototype._recalcRangeByInsertRowsAndColumns = function ( sheetId, ar ) {
@@ -9979,7 +9962,7 @@
         }
 
         var t = this;
-        var arn = t.activeRange.clone(true);
+        var arn = this.model.selectionRange.getLast().clone();
         var checkRange = arn.getAllRange();
 
         var range;
