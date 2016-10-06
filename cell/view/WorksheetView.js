@@ -604,7 +604,7 @@
 
     WorksheetView.prototype.getSelectedColumnWidthInSymbols = function () {
         var c, res = null;
-        var range = this.selection.getLast();
+        var range = this.model.selectionRange.getLast();
         for (c = range.c1; c <= range.c2 && c < this.cols.length; ++c) {
             if (null === res) {
                 res = this.cols[c].charCount;
@@ -618,7 +618,7 @@
 
     WorksheetView.prototype.getSelectedRowHeight = function () {
         var r, res = null;
-        var range = this.selection.getLast();
+        var range = this.model.selectionRange.getLast();
         for (r = range.r1; r <= range.r2 && r < this.rows.length; ++r) {
             if (null === res) {
                 res = this.rows[r].heightReal;
@@ -10847,7 +10847,7 @@
                 }
 
                 // ToDo multiselect defined names
-                var selectionLast = this.model.selection.getLast();
+                var selectionLast = this.model.selectionRange.getLast();
                 mc = selectionLast.isOneCell() ? this.model.getMergedByCell(selectionLast.r1, selectionLast.c1) : null;
                 defName = this.model.workbook.editDefinesNames(null,
                   new Asc.asc_CDefName(reference, parserHelp.get3DRef(this.model.getName(),
