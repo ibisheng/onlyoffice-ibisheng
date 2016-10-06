@@ -4467,7 +4467,7 @@ CStyles.prototype =
         }
 
         // Рассчитываем стиль
-        this.Internal_Get_Pr(Pr, StyleId, Type, ( null === TableStyle && null == ShapeStyle ? true : false ), []);
+        this.Internal_Get_Pr(Pr, StyleId, Type, ( null === TableStyle && null == ShapeStyle ? true : false ), [], StyleId);
 
         if (styletype_Table === Type)
         {
@@ -4576,7 +4576,7 @@ CStyles.prototype =
         return null;
     },
 
-    Internal_Get_Pr : function(Pr, StyleId, Type, bUseDefault, PassedStyles)
+    Internal_Get_Pr : function(Pr, StyleId, Type, bUseDefault, PassedStyles, StartStyleId)
     {
         // Делаем проверку от зацикливания, среди уже пройденных стилей ищем текущий стриль.
         for (var nIndex = 0, nCount = PassedStyles.length; nIndex < nCount; nIndex++)
@@ -4750,22 +4750,22 @@ CStyles.prototype =
         else
         {
             // Копируем свойства родительского стиля
-            this.Internal_Get_Pr( Pr, Style.BasedOn, Type, false, PassedStyles );
+			this.Internal_Get_Pr(Pr, Style.BasedOn, Type, false, PassedStyles, StartStyleId);
 
-            // Копируем свойства из стиля нумерации, если она задана
-            if ( (styletype_Paragraph === Type || styletype_Table === Type) && ( undefined != Style.ParaPr.NumPr ) )
-            {
-                var Numbering = editor.WordControl.m_oLogicDocument.Get_Numbering();
-                if ( undefined != Style.ParaPr.NumPr.NumId && 0 != Style.ParaPr.NumPr.NumId )
-                {
-                    var AbstractNum = Numbering.Get_AbstractNum( Style.ParaPr.NumPr.NumId );
-                    var Lvl = AbstractNum.Get_LvlByStyle( StyleId );
-                    if ( -1 != Lvl )
-                        Pr.ParaPr.Merge( Numbering.Get_ParaPr( Style.ParaPr.NumPr.NumId, Lvl ) );
-                    else
-                        Pr.ParaPr.NumPr = undefined;
-                }
-            }
+            // Копируем свойства из стиля нумерации, если она задана, но только для самого стиля, а не для базовых
+			if ((styletype_Paragraph === Type || styletype_Table === Type) && ( undefined != Style.ParaPr.NumPr ) && StyleId === StartStyleId)
+			{
+				var Numbering = editor.WordControl.m_oLogicDocument.Get_Numbering();
+				if (undefined != Style.ParaPr.NumPr.NumId && 0 != Style.ParaPr.NumPr.NumId)
+				{
+					var AbstractNum = Numbering.Get_AbstractNum(Style.ParaPr.NumPr.NumId);
+					var Lvl         = AbstractNum.Get_LvlByStyle(StyleId);
+					if (-1 != Lvl)
+						Pr.ParaPr.Merge(Numbering.Get_ParaPr(Style.ParaPr.NumPr.NumId, Lvl));
+					else
+						Pr.ParaPr.NumPr = undefined;
+				}
+			}
 
             // Копируем свойства текущего стиля
             switch ( Type )
