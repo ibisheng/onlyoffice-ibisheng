@@ -3638,7 +3638,7 @@
         // draw active cell in selection
         var isActive = AscCommonExcel.selectionLineType.ActiveCell & selectionLineType;
         if (isActive) {
-            var cell = this.model.selectionRange.activeCell;
+            var cell = (this.isSelectionDialogMode ? this.copyActiveRange : this.model.selectionRange).activeCell;
             var fs = this.model.getMergedByCell(cell.row, cell.col);
             fs = range.intersectionSimple(
               fs ? fs : new asc_Range(cell.col, cell.row, cell.col, cell.row));
@@ -3753,7 +3753,7 @@
         var isOtherSelectionMode = this.isSelectionDialogMode || this.isFormulaEditMode;
         if (isOtherSelectionMode && !this.handlers.trigger('isActive')) {
             if (this.isSelectionDialogMode) {
-                this._drawSelectRange(this.activeRange.clone(true));
+                this._drawSelectRange();
             } else if (this.isFormulaEditMode) {
                 this._drawFormulaRanges(this.arrActiveFormulaRanges);
             }
@@ -3777,7 +3777,7 @@
                     this._drawFormulaRanges(this.arrActiveChartsRanges);
                 }
                 if (this.isSelectionDialogMode) {
-                    this._drawSelectRange(this.activeRange.clone(true));
+                    this._drawSelectRange();
                 }
                 if (this.stateFormatPainter && this.handlers.trigger('isActive')) {
                     this._drawFormatPainterRange();
@@ -3798,9 +3798,10 @@
     };
 
     WorksheetView.prototype._drawSelectionRange = function () {
+        var ranges = (this.isSelectionDialogMode ? this.copyActiveRange : this.model.selectionRange).ranges;
         var range, selectionLineType;
-        for (var i = 0, l = this.model.selectionRange.ranges.length; i < l; ++i) {
-            range = this.model.selectionRange.ranges[i];
+        for (var i = 0, l = ranges.length; i < l; ++i) {
+            range = ranges[i];
             if (c_oAscSelectionType.RangeMax === range.type) {
                 range.c2 = this.cols.length - 1;
                 range.r2 = this.rows.length - 1;
@@ -3845,9 +3846,12 @@
         }
     };
 
-    WorksheetView.prototype._drawSelectRange = function (oSelectRange) {
-        this._drawElements(this._drawSelectionElement, oSelectRange, AscCommonExcel.selectionLineType.Dash,
-          AscCommonExcel.c_oAscCoAuthoringOtherBorderColor);
+    WorksheetView.prototype._drawSelectRange = function () {
+        var ranges = this.model.selectionRange.ranges;
+        for (var i = 0, l = ranges.length; i < l; ++i) {
+            this._drawElements(this._drawSelectionElement, ranges[i], AscCommonExcel.selectionLineType.Dash,
+              AscCommonExcel.c_oAscCoAuthoringOtherBorderColor);
+        }
     };
 
     WorksheetView.prototype._drawCollaborativeElements = function () {
@@ -4119,19 +4123,22 @@
         }
 
         if (null !== this.copyActiveRange) {
-            // Координаты для перемещения диапазона
-            _x1 = this.cols[this.copyActiveRange.c1].left - offsetX - this.width_2px;
-            _x2 = this.cols[this.copyActiveRange.c2].left + this.cols[this.copyActiveRange.c2].width - offsetX +
-              this.width_1px + this.width_2px;
-            _y1 = this.rows[this.copyActiveRange.r1].top - offsetY - this.height_2px;
-            _y2 = this.rows[this.copyActiveRange.r2].top + this.rows[this.copyActiveRange.r2].height - offsetY +
-              this.height_1px + this.height_2px;
+            this.copyActiveRange.ranges.forEach(function (item) {
+                var arnIntersection = item.intersectionSimple(range);
+                if (arnIntersection) {
+                    _x1 = t.cols[arnIntersection.c1].left - offsetX - t.width_2px;
+                    _x2 = t.cols[arnIntersection.c2].left + t.cols[arnIntersection.c2].width - offsetX +
+                      t.width_1px + /* Это ширина "квадрата" для автофильтра от границы ячейки */t.width_2px;
+                    _y1 = t.rows[arnIntersection.r1].top - offsetY - t.height_2px;
+                    _y2 = t.rows[arnIntersection.r2].top + t.rows[arnIntersection.r2].height - offsetY +
+                      t.height_1px + /* Это высота "квадрата" для автофильтра от границы ячейки */t.height_2px;
 
-            // Выбираем наибольший range для очистки
-            x1 = Math.min(x1, _x1);
-            x2 = Math.max(x2, _x2);
-            y1 = Math.min(y1, _y1);
-            y2 = Math.max(y2, _y2);
+                    x1 = Math.min(x1, _x1);
+                    x2 = Math.max(x2, _x2);
+                    y1 = Math.min(y1, _y1);
+                    y2 = Math.max(y2, _y2);
+                }
+            });
         }
 
         if (!(Number.MAX_VALUE === x1 && -Number.MAX_VALUE === x2 && Number.MAX_VALUE === y1 &&
@@ -10986,15 +10993,14 @@
 
         if (false === this.isSelectionDialogMode) {
             if (null !== this.copyActiveRange) {
-                this.activeRange = this.copyActiveRange.clone(true);
+                this.model.selectionRange = this.copyActiveRange.clone();
             }
             this.copyActiveRange = null;
             if (oldSelectionDialogType === c_oAscSelectionDialogType.Chart) {
                 this.objectRender.controller.checkChartForProps(false);
             }
         } else {
-
-            this.copyActiveRange = this.activeRange.clone(true);
+            this.copyActiveRange = this.model.selectionRange.clone();
             if (selectRange) {
                 if (typeof selectRange === 'string') {
                     selectRange = this.model.getRange2(selectRange);
@@ -11004,7 +11010,7 @@
                 }
 
                 if (null != selectRange) {
-                    this.activeRange.assign(selectRange.c1, selectRange.r1, selectRange.c2, selectRange.r2);
+                    this.model.selectionRange.assign2(selectRange);
                 }
             }
             if (selectionDialogType === c_oAscSelectionDialogType.Chart) {

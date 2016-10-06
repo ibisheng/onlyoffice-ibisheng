@@ -601,6 +601,11 @@
 			this.activeCellId = -1;
 			this.activeCell.clean();
 		};
+		SelectionRange.prototype.assign2 = function (range) {
+			this.clean();
+			this.getLast().assign2(range);
+			this.update();
+		};
 		SelectionRange.prototype.offsetCell = function (dr, dc, fCheckSize) {
 			var done, curRange, mc;
 			var lastRow = this.activeCell.row;
