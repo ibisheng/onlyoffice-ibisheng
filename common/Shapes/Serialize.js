@@ -8800,6 +8800,12 @@ function CPres()
                         var bodyPr = new AscFormat.CBodyPr();
                         this.Reader.CorrectBodyPr(bodyPr);
                         shape.setBodyPr(bodyPr);
+                        break;
+                    }
+                    case 6:
+                    {
+                        var oXFRM = this.Reader.ReadXfrm();
+                        break;
                     }
                     default:
                     {
