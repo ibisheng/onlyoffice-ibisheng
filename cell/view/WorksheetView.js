@@ -7973,64 +7973,61 @@
     };
 
     /* Функция для применения автозаполнения */
-    WorksheetView.prototype.applyFillHandle = function ( x, y, ctrlPress ) {
+    WorksheetView.prototype.applyFillHandle = function (x, y, ctrlPress) {
         var t = this;
 
         // Текущее выделение (к нему применится автозаполнение)
-        var arn = t.activeRange.clone( true );
+        var arn = t.activeRange.clone(true);
         arn.normalize();
-        var range = t.model.getRange3( arn.r1, arn.c1, arn.r2, arn.c2 );
+        var range = t.model.getRange3(arn.r1, arn.c1, arn.r2, arn.c2);
 
         // Были ли изменения
         var bIsHaveChanges = false;
         // Вычисляем индекс сдвига
         var nIndex = 0;
         /*nIndex*/
-        if ( 0 === this.fillHandleDirection ) {
+        if (0 === this.fillHandleDirection) {
             // Горизонтальное движение
             nIndex = this.activeFillHandle.c2 - arn.c1;
-            if ( 2 === this.fillHandleArea ) {
+            if (2 === this.fillHandleArea) {
                 // Для внутренности нужно вычесть 1 из значения
                 bIsHaveChanges = arn.c2 !== (this.activeFillHandle.c2 - 1);
-            }
-            else {
+            } else {
                 bIsHaveChanges = arn.c2 !== this.activeFillHandle.c2;
             }
-        }
-        else {
+        } else {
             // Вертикальное движение
             nIndex = this.activeFillHandle.r2 - arn.r1;
-            if ( 2 === this.fillHandleArea ) {
+            if (2 === this.fillHandleArea) {
                 // Для внутренности нужно вычесть 1 из значения
                 bIsHaveChanges = arn.r2 !== (this.activeFillHandle.r2 - 1);
-            }
-            else {
+            } else {
                 bIsHaveChanges = arn.r2 !== this.activeFillHandle.r2;
             }
         }
 
         // Меняли ли что-то
-        if ( bIsHaveChanges && (this.activeFillHandle.r1 !== this.activeFillHandle.r2 || this.activeFillHandle.c1 !== this.activeFillHandle.c2) ) {
+        if (bIsHaveChanges && (this.activeFillHandle.r1 !== this.activeFillHandle.r2 ||
+          this.activeFillHandle.c1 !== this.activeFillHandle.c2)) {
 
             // Диапазон ячеек, который мы будем менять
-            var changedRange = this.activeRange.clone( true );
+            var changedRange = this.activeRange.clone(true);
 
             // Очищаем выделение
             this.cleanSelection();
-            if ( 2 === this.fillHandleArea ) {
+            if (2 === this.fillHandleArea) {
                 // Мы внутри, будет удаление, нормируем и cбрасываем первую ячейку
                 this.activeRange.normalize();
                 // Проверяем, удалили ли мы все (если да, то область не меняется)
-                if ( arn.c1 !== this.activeFillHandle.c2 || arn.r1 !== this.activeFillHandle.r2 ) {
+                if (arn.c1 !== this.activeFillHandle.c2 || arn.r1 !== this.activeFillHandle.r2) {
                     // Уменьшаем диапазон (мы удалили не все)
-                    if ( 0 === this.fillHandleDirection ) {
+                    if (0 === this.fillHandleDirection) {
                         // Горизонтальное движение (для внутренности необходимо вычесть 1)
                         this.activeRange.c2 = this.activeFillHandle.c2 - 1;
 
                         changedRange.c1 = changedRange.c2;
                         changedRange.c2 = this.activeFillHandle.c2;
-                    }
-                    else {
+                    } else {
                         // Вертикальное движение (для внутренности необходимо вычесть 1)
                         this.activeRange.r2 = this.activeFillHandle.r2 - 1;
 
@@ -8038,33 +8035,29 @@
                         changedRange.r2 = this.activeFillHandle.r2;
                     }
                 }
-            }
-            else {
+            } else {
                 // Мы вне выделения. Увеличиваем диапазон
-                if ( 0 === this.fillHandleDirection ) {
+                if (0 === this.fillHandleDirection) {
                     // Горизонтальное движение
-                    if ( 1 === this.fillHandleArea ) {
+                    if (1 === this.fillHandleArea) {
                         this.activeRange.c1 = this.activeFillHandle.c2;
 
                         changedRange.c2 = changedRange.c1 - 1;
                         changedRange.c1 = this.activeFillHandle.c2;
-                    }
-                    else {
+                    } else {
                         this.activeRange.c2 = this.activeFillHandle.c2;
 
                         changedRange.c1 = changedRange.c2 + 1;
                         changedRange.c2 = this.activeFillHandle.c2;
                     }
-                }
-                else {
+                } else {
                     // Вертикальное движение
-                    if ( 1 === this.fillHandleArea ) {
+                    if (1 === this.fillHandleArea) {
                         this.activeRange.r1 = this.activeFillHandle.r2;
 
                         changedRange.r2 = changedRange.r1 - 1;
                         changedRange.r1 = this.activeFillHandle.r2;
-                    }
-                    else {
+                    } else {
                         this.activeRange.r2 = this.activeFillHandle.r2;
 
                         changedRange.r1 = changedRange.r2 + 1;
@@ -8073,21 +8066,21 @@
                 }
 
                 // После увеличения, нужно обновить больший range
-                arn = this.activeRange.clone( true );
+                arn = this.activeRange.clone(true);
             }
 
             changedRange.normalize();
 
-            var applyFillHandleCallback = function ( res ) {
-                if ( res ) {
+            var applyFillHandleCallback = function (res) {
+                if (res) {
                     // Автозаполняем ячейки
-                    if ( range.promote( /*bCtrl*/ctrlPress, /*bVertical*/(1 === t.fillHandleDirection), nIndex ) ) {
+                    if (range.promote(/*bCtrl*/ctrlPress, /*bVertical*/(1 === t.fillHandleDirection), nIndex)) {
                         // Вызываем функцию пересчета для заголовков форматированной таблицы
-                        t.model.autoFilters.renameTableColumn( arn );
-                    }
-                    else {
-                        t.handlers.trigger( "onErrorEvent", c_oAscError.ID.CannotFillRange, c_oAscError.Level.NoCritical );
-                        t.activeRange.assign2( range.bbox );
+                        t.model.autoFilters.renameTableColumn(arn);
+                    } else {
+                        t.handlers.trigger("onErrorEvent", c_oAscError.ID.CannotFillRange,
+                          c_oAscError.Level.NoCritical);
+                        t.activeRange.assign2(range.bbox);
                     }
                 }
 
@@ -8097,13 +8090,12 @@
 
                 // Обновляем выделенные ячейки
                 t.isChanged = true;
-                t._updateCellsRange( arn );
+                t._updateCellsRange(arn);
             };
 
             // Можно ли применять автозаполнение ?
-            this._isLockedCells( changedRange, /*subType*/null, applyFillHandleCallback );
-        }
-        else {
+            this._isLockedCells(changedRange, /*subType*/null, applyFillHandleCallback);
+        } else {
             // Ничего не менялось, сбрасываем выделение
             this.cleanSelection();
             // Сбрасываем параметры автозаполнения
@@ -8117,52 +8109,49 @@
     /* Функция для работы перемещения диапазона (selection). (x, y) - координаты точки мыши на области
      *  ToDo нужно переделать, чтобы moveRange появлялся только после сдвига от текущей ячейки
      */
-    WorksheetView.prototype.changeSelectionMoveRangeHandle = function ( x, y, ctrlKey ) {
+    WorksheetView.prototype.changeSelectionMoveRangeHandle = function (x, y, ctrlKey) {
         // Возвращаемый результат
         var ret = null;
         // Пересчитываем координаты
-        x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
-        y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
+        x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
+        y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
 
         //если выделена ячейка заголовка ф/т, меняем выделение с ячейки на столбец ф/т
         //если выделена вся видимая часть форматированной таблицы, но не выделены последние скрытые строчки
-        if ( null === this.startCellMoveRange ) {
-            this.af_changeSelectionTablePart(this.activeRange);
+        var selectionRange = this.model.selectionRange.getLast().clone();
+        if (null === this.startCellMoveRange) {
+            this.af_changeSelectionTablePart(selectionRange);
         }
-
-        var ar = this.activeRange.clone( true );
 
         // Колонка по X и строка по Y
-        var colByX = this._findColUnderCursor( x, /*canReturnNull*/false, /*dX*/false ).col;
-        var rowByY = this._findRowUnderCursor( y, /*canReturnNull*/false, /*dY*/false ).row;
+        var colByX = this._findColUnderCursor(x, /*canReturnNull*/false, /*dX*/false).col;
+        var rowByY = this._findRowUnderCursor(y, /*canReturnNull*/false, /*dY*/false).row;
 
-        if ( ar.type == c_oAscSelectionType.RangeRow ) {
+        if (selectionRange.type == c_oAscSelectionType.RangeRow) {
             colByX = 0;
         }
-        if ( ar.type == c_oAscSelectionType.RangeCol ) {
+        if (selectionRange.type == c_oAscSelectionType.RangeCol) {
             rowByY = 0;
         }
-        if ( ar.type == c_oAscSelectionType.RangeMax ) {
+        if (selectionRange.type == c_oAscSelectionType.RangeMax) {
             colByX = 0;
             rowByY = 0;
         }
 
         // Если мы только первый раз попали сюда, то копируем выделенную область
-        if ( null === this.startCellMoveRange ) {
+        if (null === this.startCellMoveRange) {
             // Учитываем погрешность (мы должны быть внутри диапазона при старте)
-            if ( colByX < ar.c1 ) {
-                colByX = ar.c1;
+            if (colByX < selectionRange.c1) {
+                colByX = selectionRange.c1;
+            } else if (colByX > selectionRange.c2) {
+                colByX = selectionRange.c2;
             }
-            else if ( colByX > ar.c2 ) {
-                colByX = ar.c2;
+            if (rowByY < selectionRange.r1) {
+                rowByY = selectionRange.r1;
+            } else if (rowByY > selectionRange.r2) {
+                rowByY = selectionRange.r2;
             }
-            if ( rowByY < ar.r1 ) {
-                rowByY = ar.r1;
-            }
-            else if ( rowByY > ar.r2 ) {
-                rowByY = ar.r2;
-            }
-            this.startCellMoveRange = new asc_Range( colByX, rowByY, colByX, rowByY );
+            this.startCellMoveRange = new asc_Range(colByX, rowByY, colByX, rowByY);
             this.startCellMoveRange.isChanged = false;	// Флаг, сдвигались ли мы от первоначального диапазона
             return ret;
         }
@@ -8172,7 +8161,7 @@
         var rowDelta = rowByY - this.startCellMoveRange.r1;
 
         // Проверяем, нужно ли отрисовывать перемещение (сдвигались или нет)
-        if ( false === this.startCellMoveRange.isChanged && 0 === colDelta && 0 === rowDelta ) {
+        if (false === this.startCellMoveRange.isChanged && 0 === colDelta && 0 === rowDelta) {
             return ret;
         }
         // Выставляем флаг
@@ -8181,34 +8170,33 @@
         // Очищаем выделение, будем рисовать заново
         this.cleanSelection();
 
-        this.activeMoveRange = ar;
+        this.activeMoveRange = selectionRange;
         // Для первого раза нормализуем (т.е. первая точка - это левый верхний угол)
         this.activeMoveRange.normalize();
 
         // Выставляем
         this.activeMoveRange.c1 += colDelta;
-        if ( 0 > this.activeMoveRange.c1 ) {
+        if (0 > this.activeMoveRange.c1) {
             colDelta -= this.activeMoveRange.c1;
             this.activeMoveRange.c1 = 0;
         }
         this.activeMoveRange.c2 += colDelta;
 
         this.activeMoveRange.r1 += rowDelta;
-        if ( 0 > this.activeMoveRange.r1 ) {
+        if (0 > this.activeMoveRange.r1) {
             rowDelta -= this.activeMoveRange.r1;
             this.activeMoveRange.r1 = 0;
         }
         this.activeMoveRange.r2 += rowDelta;
-        this.activeMoveRange._updateAdditionalData();
 
         // Увеличиваем, если выходим за область видимости // Critical Bug 17413
-        while ( !this.cols[this.activeMoveRange.c2] ) {
-            this.expandColsOnScroll( true );
-            this.handlers.trigger( "reinitializeScrollX" );
+        while (!this.cols[this.activeMoveRange.c2]) {
+            this.expandColsOnScroll(true);
+            this.handlers.trigger("reinitializeScrollX");
         }
-        while ( !this.rows[this.activeMoveRange.r2] ) {
-            this.expandRowsOnScroll( true );
-            this.handlers.trigger( "reinitializeScrollY" );
+        while (!this.rows[this.activeMoveRange.r2]) {
+            this.expandRowsOnScroll(true);
+            this.handlers.trigger("reinitializeScrollY");
         }
 
         // Перерисовываем
@@ -8223,29 +8211,25 @@
          while ( this._isColDrawnPartially( this.activeMoveRange.c2, this.visibleRange.c1 + d.deltaX) ) {++d.deltaX;}
          while ( this._isRowDrawnPartially( this.activeMoveRange.r2, this.visibleRange.r1 + d.deltaY) ) {++d.deltaY;}*/
 
-        if ( y <= this.cellsTop + this.height_2px ) {
+        if (y <= this.cellsTop + this.height_2px) {
             d.deltaY = -1;
-        }
-        else if ( y >= this.drawingCtx.getHeight() - this.height_2px ) {
+        } else if (y >= this.drawingCtx.getHeight() - this.height_2px) {
             d.deltaY = 1;
         }
 
-        if ( x <= this.cellsLeft + this.width_2px ) {
+        if (x <= this.cellsLeft + this.width_2px) {
             d.deltaX = -1;
-        }
-        else if ( x >= this.drawingCtx.getWidth() - this.width_2px ) {
+        } else if (x >= this.drawingCtx.getWidth() - this.width_2px) {
             d.deltaX = 1;
         }
 
-        this.model.workbook.handlers.trigger( "asc_onHideComment" );
+        this.model.workbook.handlers.trigger("asc_onHideComment");
 
-        if ( this.activeMoveRange.type === c_oAscSelectionType.RangeRow ) {
+        if (this.activeMoveRange.type === c_oAscSelectionType.RangeRow) {
             d.deltaX = 0;
-        }
-        else if ( this.activeMoveRange.type === c_oAscSelectionType.RangeCol ) {
+        } else if (this.activeMoveRange.type === c_oAscSelectionType.RangeCol) {
             d.deltaY = 0;
-        }
-        else if ( this.activeMoveRange.type === c_oAscSelectionType.RangeMax ) {
+        } else if (this.activeMoveRange.type === c_oAscSelectionType.RangeMax) {
             d.deltaX = 0;
             d.deltaY = 0;
         }
@@ -8394,38 +8378,36 @@
     };
 
     /* Функция для применения перемещения диапазона */
-    WorksheetView.prototype.applyMoveRangeHandle = function ( ctrlKey ) {
-        if ( null === this.activeMoveRange ) {
+    WorksheetView.prototype.applyMoveRangeHandle = function (ctrlKey) {
+        if (null === this.activeMoveRange) {
             // Сбрасываем параметры
             this.startCellMoveRange = null;
             return;
         }
 
-        var arnFrom = this.activeRange.clone( true );
-        var arnTo = this.activeMoveRange.clone( true );
-        if ( arnFrom.isEqual( arnTo ) ) {
+        var arnFrom = this.model.selectionRange.getLast();
+        var arnTo = this.activeMoveRange.clone(true);
+        if (arnFrom.isEqual(arnTo)) {
             this._cleanSelectionMoveRange();
             return;
         }
 
-        var resmove = this.model._prepareMoveRange( arnFrom, arnTo );
-        if ( resmove === -2 ) {
-            this.handlers.trigger( "onErrorEvent", c_oAscError.ID.CannotMoveRange, c_oAscError.Level.NoCritical );
+        var resmove = this.model._prepareMoveRange(arnFrom, arnTo);
+        if (resmove === -2) {
+            this.handlers.trigger("onErrorEvent", c_oAscError.ID.CannotMoveRange, c_oAscError.Level.NoCritical);
             this._cleanSelectionMoveRange();
-        }
-        else if (resmove === -1) {
+        } else if (resmove === -1) {
             var t = this;
-            this.model.workbook.handlers.trigger( "asc_onConfirmAction", Asc.c_oAscConfirm.ConfirmReplaceRange, function ( can ) {
-                if ( can ) {
-                    t.moveRangeHandle( arnFrom, arnTo, ctrlKey );
-                }
-                else {
-                    t._cleanSelectionMoveRange();
-                }
-            } );
-        }
-        else {
-            this.moveRangeHandle( arnFrom, arnTo, ctrlKey );
+            this.model.workbook.handlers.trigger("asc_onConfirmAction", Asc.c_oAscConfirm.ConfirmReplaceRange,
+              function (can) {
+                  if (can) {
+                      t.moveRangeHandle(arnFrom, arnTo, ctrlKey);
+                  } else {
+                      t._cleanSelectionMoveRange();
+                  }
+              });
+        } else {
+            this.moveRangeHandle(arnFrom, arnTo, ctrlKey);
         }
     };
 
@@ -8439,16 +8421,16 @@
         this.moveRangeDrawingObjectTo = null;
     };
 
-    WorksheetView.prototype.moveRangeHandle = function ( arnFrom, arnTo, copyRange ) {
+    WorksheetView.prototype.moveRangeHandle = function (arnFrom, arnTo, copyRange) {
         var t = this;
-        var onApplyMoveRangeHandleCallback = function ( isSuccess ) {
-            if ( false === isSuccess ) {
+        var onApplyMoveRangeHandleCallback = function (isSuccess) {
+            if (false === isSuccess) {
                 t._cleanSelectionMoveRange();
                 return;
             }
 
-            var onApplyMoveAutoFiltersCallback = function ( isSuccess ) {
-                if ( false === isSuccess ) {
+            var onApplyMoveAutoFiltersCallback = function (isSuccess) {
+                if (false === isSuccess) {
                     t._cleanSelectionMoveRange();
                     return;
                 }
@@ -8458,60 +8440,60 @@
 
                 //ToDo t.cleanDepCells();
                 History.Create_NewPoint();
-                History.SetSelection( arnFrom.clone() );
-                History.SetSelectionRedo( arnTo.clone() );
+                History.SetSelection(arnFrom.clone());
+                History.SetSelectionRedo(arnTo.clone());
                 History.StartTransaction();
 
-                t.model.autoFilters._preMoveAutoFilters( arnFrom, arnTo, copyRange );
+                t.model.autoFilters._preMoveAutoFilters(arnFrom, arnTo, copyRange);
 
-                t.model._moveRange( arnFrom, arnTo, copyRange );
-                t.cellCommentator.moveRangeComments( arnFrom, arnTo );
-                t.objectRender.moveRangeDrawingObject( arnFrom, arnTo );
-				
+                t.model._moveRange(arnFrom, arnTo, copyRange);
+                t.cellCommentator.moveRangeComments(arnFrom, arnTo);
+                t.objectRender.moveRangeDrawingObject(arnFrom, arnTo);
+
                 // Вызываем функцию пересчета для заголовков форматированной таблицы
-                t.model.autoFilters.renameTableColumn( arnFrom );
-                t.model.autoFilters.renameTableColumn( arnTo );
-                t.model.autoFilters.reDrawFilter( arnFrom );
-				
-				t.model.autoFilters.afterMoveAutoFilters( arnFrom, arnTo );
+                t.model.autoFilters.renameTableColumn(arnFrom);
+                t.model.autoFilters.renameTableColumn(arnTo);
+                t.model.autoFilters.reDrawFilter(arnFrom);
+
+                t.model.autoFilters.afterMoveAutoFilters(arnFrom, arnTo);
 
                 History.EndTransaction();
 
-                t._updateCellsRange( arnTo, false, true );
-                t.activeRange = arnTo.clone( true );
+                t._updateCellsRange(arnTo, false, true);
+                t.model.selectionRange.assign2(arnTo);
                 // Сбрасываем параметры
                 t.activeMoveRange = null;
                 t.startCellMoveRange = null;
-                t._updateCellsRange( arnFrom, false, true );
+                t._updateCellsRange(arnFrom, false, true);
                 // Тут будет отрисовка select-а
-                t._recalculateAfterUpdate( [arnFrom, arnTo] );
+                t._recalculateAfterUpdate([arnFrom, arnTo]);
 
                 // Вызовем на всякий случай, т.к. мы можем уже обновиться из-за формул ToDo возможно стоит убрать это в дальнейшем (но нужна переработка формул) - http://bugzilla.onlyoffice.com/show_bug.cgi?id=24505
                 t._updateSelectionNameAndInfo();
-				
-				if(null !== t.model.getRange3( arnTo.r1, arnTo.c1, arnTo.r2, arnTo.c2 ).hasMerged() && false !== t.model.autoFilters._intersectionRangeWithTableParts(arnTo))
-				{
-					t.model.autoFilters.unmergeTablesAfterMove( arnTo );
-					t._updateCellsRange( arnTo, false, true );
-					t._recalculateAfterUpdate( [arnFrom, arnTo] );
-					//не делаем действий в asc_onConfirmAction, потому что во время диалога может выполниться autosave и новые измения добавятся в точку, которую уже отправили
-					//тем более результат диалога ни на что не влияет
-					t.model.workbook.handlers.trigger( "asc_onConfirmAction", Asc.c_oAscConfirm.ConfirmPutMergeRange, function () {});
-				}
+
+                if (null !== t.model.getRange3(arnTo.r1, arnTo.c1, arnTo.r2, arnTo.c2).hasMerged() &&
+                  false !== t.model.autoFilters._intersectionRangeWithTableParts(arnTo)) {
+                    t.model.autoFilters.unmergeTablesAfterMove(arnTo);
+                    t._updateCellsRange(arnTo, false, true);
+                    t._recalculateAfterUpdate([arnFrom, arnTo]);
+                    //не делаем действий в asc_onConfirmAction, потому что во время диалога может выполниться autosave и новые измения добавятся в точку, которую уже отправили
+                    //тем более результат диалога ни на что не влияет
+                    t.model.workbook.handlers.trigger("asc_onConfirmAction", Asc.c_oAscConfirm.ConfirmPutMergeRange,
+                      function () {
+                      });
+                }
             };
 
-            if ( t.model.autoFilters._searchFiltersInRange( arnFrom ) ) {
-                t._isLockedAll( onApplyMoveAutoFiltersCallback );
-            }
-            else {
+            if (t.model.autoFilters._searchFiltersInRange(arnFrom)) {
+                t._isLockedAll(onApplyMoveAutoFiltersCallback);
+            } else {
                 onApplyMoveAutoFiltersCallback();
             }
         };
 
-        if ( this.af_isCheckMoveRange( arnFrom, arnTo ) ) {
-            this._isLockedCells( [arnFrom, arnTo], null, onApplyMoveRangeHandleCallback );
-        }
-        else {
+        if (this.af_isCheckMoveRange(arnFrom, arnTo)) {
+            this._isLockedCells([arnFrom, arnTo], null, onApplyMoveRangeHandleCallback);
+        } else {
             this._cleanSelectionMoveRange();
         }
     };
@@ -12756,9 +12738,7 @@
     };
 
     WorksheetView.prototype.af_isCheckMoveRange = function (arnFrom, arnTo) {
-        var t = this;
         var ws = this.model;
-
         var tableParts = ws.TableParts;
         var tablePart;
 
@@ -12796,7 +12776,7 @@
         //2)если затрагиваем перемещаемым диапазоном часть а/ф со скрытыми строчками
         if (!checkMoveRangeIntoApplyAutoFilter(arnTo)) {
             ws.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterMoveToHiddenRangeError,
-              c_oAscError.Level.NoCritical)
+              c_oAscError.Level.NoCritical);
             return false;
         }
 
