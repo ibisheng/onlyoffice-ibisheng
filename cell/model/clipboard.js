@@ -43,7 +43,6 @@
 		 * Import
 		 * -----------------------------------------------------------------------------
 		 */
-		var g_fontApplication = AscFonts.g_fontApplication;
 		var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
 		var c_oAscMaxCellOrCommentLength = Asc.c_oAscMaxCellOrCommentLength;
 		var doc = window.document;
@@ -1293,7 +1292,7 @@
 				if(node == undefined)
 					return;
 					
-				var binaryResult, pasteFragment = node, t = this, localStorageResult;
+				var binaryResult, t = this;
 				t.alreadyLoadImagesOnServer = false;
 				
 				//****binary****
@@ -1301,7 +1300,6 @@
 				{
 					onlyFromLocalStorage = null;
 					node = this.element;
-					pasteFragment = node;
 				}
 				
 				//если находимся внутри шейпа
@@ -1321,26 +1319,24 @@
 				//****binary****
 				if(copyPasteUseBinary)
 				{
-					this.activeRange = worksheet.activeRange.clone(true);
+					this.activeRange = worksheet.model.selectionRange.getLast().clone();
 					binaryResult = this._pasteFromBinaryClassHtml(worksheet, node, onlyFromLocalStorage, isIntoShape);
 					
 					if(binaryResult === true)
 						return;
 					else if(binaryResult !== false && binaryResult != undefined)
 					{
-						pasteFragment = binaryResult;
 						node = binaryResult;
 					}
 				}
 
-				this.activeRange = worksheet.activeRange.clone(true);
+				this.activeRange = worksheet.model.selectionRange.getLast().clone();
 				
 				
 				var callBackAfterLoadImages = function()
 				{
 					History.TurnOff();
-				
-					var oPasteProcessor;
+
 					var oTempDrawingDocument = worksheet.model.DrawingDocument;
 					var newCDocument = new CDocument(oTempDrawingDocument, false);
 					newCDocument.bFromDocument = true;
@@ -1354,7 +1350,7 @@
 						oOldEditor = editor;
 					editor = {WordControl: oTempDrawingDocument, isDocumentEditor: true};
 					var oPasteProcessor = new AscCommon.PasteProcessor({WordControl:{m_oLogicDocument: newCDocument}, FontLoader: {}}, false, false);
-					oPasteProcessor._Prepeare_recursive(node, true, true)
+					oPasteProcessor._Prepeare_recursive(node, true, true);
 					oPasteProcessor._Execute(node, {}, true, true, false);
 					editor = oOldEditor;
 					
@@ -2382,7 +2378,7 @@
 			_paste : function(worksheet, pasteData)
 			{
 				var documentContent = pasteData.content;
-				var activeRange = worksheet.activeRange.clone(true);
+				var activeRange = worksheet.model.selectionRange.getLast().clone();
 				if(pasteData.images && pasteData.images.length)
 					this.isUsuallyPutImages = true;
 				
