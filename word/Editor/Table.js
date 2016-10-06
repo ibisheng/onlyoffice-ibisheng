@@ -12740,21 +12740,6 @@ CTable.prototype =
         return [];
     },
 
-    private_SetTableLayoutFixedAndUpdateCellsWidth : function(nExceptColNum)
-    {
-        if (tbllayout_AutoFit === this.Get_CompiledPr(false).TablePr.TableLayout)
-        {
-            this.Set_TableLayout(tbllayout_Fixed);
-
-            // Обновляем ширины ячеек
-            for (var nColIndex = 0; nColIndex < nColsCount; nColIndex++)
-            {
-                if (nColIndex != nExceptColNum)
-                    this.Internal_UpdateCellW(nColIndex);
-            }
-        }
-    },
-
     private_UpdateTableRulerOnBorderMove : function(Pos)
     {
         if (null != this.Selection.Data2.Min)
@@ -13558,6 +13543,21 @@ CTable.prototype.private_CorrectVerticalMerge = function()
 			}
 
 			nGridCol += nGridSpan;
+		}
+	}
+};
+CTable.prototype.private_SetTableLayoutFixedAndUpdateCellsWidth = function(nExceptColNum)
+{
+	if (tbllayout_AutoFit === this.Get_CompiledPr(false).TablePr.TableLayout)
+	{
+		this.Set_TableLayout(tbllayout_Fixed);
+
+		// Обновляем ширины ячеек
+		var nColsCount = this.TableGrid.length;
+		for (var nColIndex = 0; nColIndex < nColsCount; nColIndex++)
+		{
+			if (nColIndex != nExceptColNum)
+				this.Internal_UpdateCellW(nColIndex);
 		}
 	}
 };
