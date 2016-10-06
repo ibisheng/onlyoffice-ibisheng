@@ -165,7 +165,6 @@ function CHistory()
   // Параметры для специального сохранения для локальной версии редактора
   this.UserSaveMode   = false;
   this.UserSavedIndex = null;  // Номер точки, на которой произошло последнее сохранение пользователем (не автосохранение)
-	this.changesFormula = {};
 }
 CHistory.prototype.init = function(workbook) {
 	this.workbook = workbook;
@@ -901,37 +900,6 @@ CHistory.prototype._CheckCanNotAddChanges = function () {
     } catch (e) {
     }
 };
-	CHistory.prototype.changesFormulaAdd = function(formula) {
-		this.changesFormula[formula.getListenerId()] = formula;
-	};
-	CHistory.prototype.changesFormulaBuildDep = function() {
-		for (var listenerId in this.changesFormula) {
-			this.changesFormula[listenerId].buildDependencies();
-		}
-	};
-	CHistory.prototype.changesFormulaRemoveDep = function() {
-		for (var listenerId in this.changesFormula) {
-			this.changesFormula[listenerId].removeDependencies();
-		}
-		this.changesFormula = {};
-	};
-	CHistory.prototype.onFormulaEvent = function(type, eventData) {
-		if (AscCommon.c_oNotifyParentType.CanDo === type) {
-			return true;
-		} else if (AscCommon.c_oNotifyParentType.Change === type) {
-			eventData.formula.setIsDirty(false);
-		} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
-			if (eventData.isRebuild) {
-				delete this.changesFormula[eventData.formula.getListenerId()];
-				eventData.formula = new AscCommonExcel.parserFormula(eventData.assemble, this, eventData.formula.ws);
-				eventData.formula.parse();
-				this.addFormula(eventData.formula);
-			} else {
-				eventData.formula.Formula = eventData.assemble;
-			}
-			eventData.formula.buildDependencies();
-		}
-	};
 
 	//------------------------------------------------------------export--------------------------------------------------
 	window['AscCommon'] = window['AscCommon'] || {};

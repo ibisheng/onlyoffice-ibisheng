@@ -190,6 +190,9 @@ function getRangeType(oBBox){
 	}
 
 	DefName.prototype = {
+		clone: function(wb){
+			return new DefName(wb, this.name, this.ref, this.sheetId, this.hidden, this.isTable);
+		},
 		removeDependencies: function() {
 			if (this.parsedRef) {
 				this.parsedRef.removeDependencies();
@@ -592,19 +595,8 @@ function getRangeType(oBBox){
 					res.setAscCDefName(newAscName);
 				}
 			}
-			if(History.Is_On()){
-				var changesFormula = null;
-				if (!oldAscName) {
-					if (newAscName.Ref) {
-						changesFormula = new parserFormula(newAscName.Ref, History, AscCommonExcel.g_DefNameWorksheet);
-						changesFormula.parse();
-						History.changesFormulaAdd(changesFormula);
-					}
-				}
-				History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesChange, null, null,
-							new UndoRedoData_DefinedNamesChange(oldAscName, newAscName, changesFormula));
-			}
-
+			History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesChange, null, null,
+						new UndoRedoData_DefinedNamesChange(oldAscName, newAscName));
 			return res;
 		},
 		checkDefName: function (name, sheetIndex) {
@@ -896,6 +888,16 @@ function getRangeType(oBBox){
 			this._foreachDefName(function(defName) {
 				defName.setRef(defName.ref, true, true);
 			});
+		},
+		getSnapshot: function(wb) {
+			var res = new DependencyGraph(wb);
+			this._foreachDefName(function(defName){
+				//_addDefName because we don't need dependency
+				//include table defNames too.
+				res._addDefName(defName.clone(wb));
+			});
+			res.tableNameIndex = this.tableNameIndex;
+			return res;
 		},
 		//internal
 		_addDefName: function(defName) {
@@ -1363,6 +1365,7 @@ Workbook.prototype.init=function(tableCustomFunc, bNoBuildDep){
 		this.dependencyFormulas.initOpen();
 		this.dependencyFormulas.calcTree();
 	}
+	this.snapshot = this._getSnapshot();
 };
 Workbook.prototype.rebuildColors=function(){
   AscCommonExcel.g_oColorManager.rebuildColors();
@@ -1768,7 +1771,7 @@ Workbook.prototype._SerializeHistoryBase64 = function (oMemory, item, aPointChan
 Workbook.prototype.SerializeHistory = function(){
 	var aRes = [];
 	//соединяем изменения, которые были до приема данных с теми, что получились после.
-	History.changesFormulaRemoveDep();
+
     var worksheets = this.aWorksheets, t, j, length2;
     for(t = 0; t < worksheets.length; ++t)
     {
@@ -1808,12 +1811,184 @@ Workbook.prototype.SerializeHistory = function(){
 			this._SerializeHistoryBase64(oMemory, new UndoRedoItemSerializable(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_SheetPositions, null, null, oUndoRedoData_SheetPositions), aRes);
 		}
 		this.aCollaborativeActions = [];
+		this.snapshot = this._getSnapshot();
 	}
 	return aRes;
 };
+	Workbook.prototype._getSnapshot = function() {
+		var wb = new Workbook(new AscCommonExcel.asc_CHandlersList(), this.oApi);
+		wb.dependencyFormulas = this.dependencyFormulas.getSnapshot(wb);
+		for (var i = 0; i < this.aWorksheets.length; ++i) {
+			var ws = this.aWorksheets[i].getSnapshot(wb);
+			wb.aWorksheets.push(ws);
+			wb.aWorksheetsById[ws.getId()] = ws;
+		}
+		return wb;
+	};
+	Workbook.prototype._forwardTransformation = function(wbSnapshot, changesMine, changesTheir) {
+		History.TurnOff();
+		//first mine changes to resolve conflict sheet names
+		var res1 = this._forwardTransformationGetTransform(wbSnapshot, changesTheir, changesMine);
+		var res2 = this._forwardTransformationGetTransform(wbSnapshot, changesMine, changesTheir);
+		//modify formulas at the end - to prevent negative effect during tranformation
+		var i, elem, elemWrap;
+		for (i = 0; i < res1.modify.length; ++i) {
+			elemWrap = res1.modify[i];
+			elem = elemWrap.elem;
+			elem.oClass.forwardTransformationSet(elem.nActionType, elem.oData, elem.nSheetId, elemWrap);
+		}
+		for (i = 0; i < res2.modify.length; ++i) {
+			elemWrap = res2.modify[i];
+			elem = elemWrap.elem;
+			elem.oClass.forwardTransformationSet(elem.nActionType, elem.oData, elem.nSheetId, elemWrap);
+		}
+		//rename current wb
+		for (var oldName in res1.renameSheet) {
+			var ws = this.getWorksheetByName(oldName);
+			if (ws) {
+				ws.setName(res1.renameSheet[oldName]);
+			}
+		}
+		History.TurnOn();
+	};
+	Workbook.prototype._forwardTransformationGetTransform = function(wbSnapshot, changesMaster, changesModify) {
+		var res = {modify: [], renameSheet: {}};
+		var changesMasterSelected = [];
+		var i, elem;
+		if (changesModify.length > 0) {
+			//select useful master changes
+			for ( i = 0; i < changesMaster.length; ++i) {
+				elem = changesMaster[i];
+				if (elem.oClass && elem.oClass.forwardTransformationIsAffect &&
+					elem.oClass.forwardTransformationIsAffect(elem.nActionType)) {
+					changesMasterSelected.push(elem);
+				}
+			}
+		}
+		if (changesMasterSelected.length > 0 && changesModify.length > 0) {
+			var wbSnapshotCur = wbSnapshot._getSnapshot();
+			var formulas = [];
+			for (i = 0; i < changesModify.length; ++i) {
+				elem = changesModify[i];
+				var renameRes = null;
+				if (elem.oClass && elem.oClass.forwardTransformationGet) {
+					var getRes = elem.oClass.forwardTransformationGet(elem.nActionType, elem.oData, elem.nSheetId);
+					if (getRes && getRes.formula) {
+						//inserted formulas
+						formulas.push({elem: elem, formula: getRes.formula, parsed: null});
+					}
+					if (getRes && getRes.name) {
+						//add/rename sheet
+						//get getUniqueSheetNameFrom if need
+						renameRes = this._forwardTransformationRenameStart(wbSnapshotCur._getSnapshot(),
+																		   changesMasterSelected, getRes);
+					}
+				}
+				if (elem.oClass && elem.oClass.forwardTransformationIsAffect &&
+					elem.oClass.forwardTransformationIsAffect(elem.nActionType)) {
+					if (formulas.length > 0) {
+						//modify all formulas before apply next change
+						this._forwardTransformationFormula(wbSnapshotCur._getSnapshot(), formulas,
+														   changesMasterSelected, res);
+						formulas = [];
+					}
+					//apply useful mine change
+					elem.oClass.Redo(elem.nActionType, elem.oData, elem.nSheetId, wbSnapshotCur);
+				}
+				if (renameRes) {
+					this._forwardTransformationRenameEnd(renameRes, res.renameSheet, getRes, elem);
+				}
+			}
+			this._forwardTransformationFormula(wbSnapshotCur, formulas, changesMasterSelected, res);
+		}
+		return res;
+	};
+	Workbook.prototype._forwardTransformationRenameStart = function(wbSnapshot, changes, getRes) {
+		var res = {newName: null};
+		for (var i = 0; i < changes.length; ++i) {
+			var elem = changes[i];
+			elem.oClass.Redo(elem.nActionType, elem.oData, elem.nSheetId, wbSnapshot);
+		}
+		if (-1 != wbSnapshot.checkUniqueSheetName(getRes.name)) {
+			res.newName = wbSnapshot.getUniqueSheetNameFrom(getRes.name, true);
+		}
+		return res;
+	};
+	Workbook.prototype._forwardTransformationRenameEnd = function(renameRes, renameSheet, getRes, elemCur) {
+		var isChange = false;
+		if (getRes.from) {
+			var renameCur = renameSheet[getRes.from];
+			if (renameCur) {
+				//no need rename next formulas
+				delete renameSheet[getRes.from];
+				getRes.from = renameCur;
+				isChange = true;
+			}
+		}
+		if (renameRes && renameRes.newName) {
+			renameSheet[getRes.name] = renameRes.newName;
+			getRes.name = renameRes.newName;
+			isChange = true;
+		}
+		//apply immediately cause it is conflict
+		if (isChange && elemCur.oClass.forwardTransformationSet) {
+			elemCur.oClass.forwardTransformationSet(elemCur.nActionType, elemCur.oData, elemCur.nSheetId, getRes);
+		}
+	};
+	Workbook.prototype._forwardTransformationFormula = function(wbSnapshot, formulas, changes, res) {
+		if (formulas.length > 0) {
+			var i, elem, elemWrap, ws;
+			//parse formulas
+			for (i = 0; i < formulas.length; ++i) {
+				elemWrap = formulas[i];
+				ws = wbSnapshot.getWorksheetById(elemWrap.elem.nSheetId);
+				if (ws) {
+					elemWrap.parsed = new parserFormula(elemWrap.formula, wbSnapshot, ws);
+					elemWrap.parsed.parse();
+					elemWrap.parsed.buildDependencies();
+				}
+			}
+			//rename sheet first to prevent name conflict
+			for (var oldName in res.renameSheet) {
+				ws = wbSnapshot.getWorksheetByName(oldName);
+				if (ws) {
+					ws.setName(res.renameSheet[oldName]);
+				}
+			}
+			//apply useful theirs changes
+			for (i = 0; i < changes.length; ++i) {
+				elem = changes[i];
+				elem.oClass.Redo(elem.nActionType, elem.oData, elem.nSheetId, wbSnapshot);
+			}
+			//assemble
+			for (i = 0; i < formulas.length; ++i) {
+				elemWrap = formulas[i];
+				if (elemWrap.parsed) {
+					elem = elemWrap.elem;
+					elemWrap.parsed.removeDependencies();
+					elemWrap.formula = elemWrap.parsed.Formula;
+					res.modify.push(elemWrap);
+				}
+			}
+		}
+	};
+	Workbook.prototype.onFormulaEvent = function(type, eventData) {
+		if (AscCommon.c_oNotifyParentType.CanDo === type) {
+			return true;
+		} else if (AscCommon.c_oNotifyParentType.Change === type) {
+			eventData.formula.setIsDirty(false);
+		} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
+			if (eventData.isRebuild) {
+				eventData.formula = new AscCommonExcel.parserFormula(eventData.assemble, this, eventData.formula.ws);
+				eventData.formula.parse();
+			} else {
+				eventData.formula.Formula = eventData.assemble;
+			}
+			eventData.formula.buildDependencies();
+		}
+	};
 Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 	var oThis = this;
-	History.changesFormulaBuildDep();
 	//сохраняем те изменения, которые были до приема данных, потому что дальше undo/redo будет очищено
 	this.aCollaborativeActions = this.aCollaborativeActions.concat(History.GetSerializeArray());
 	if(aChanges.length > 0)
@@ -1888,6 +2063,8 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 				History.SetSelectionRedo(null);
 				var oRedoObjectParam = new AscCommonExcel.RedoObjectParam();
 				History.UndoRedoPrepare(oRedoObjectParam, false);
+				var changesMine = [].concat.apply([], oThis.aCollaborativeActions);
+				oThis._forwardTransformation(oThis.snapshot, changesMine, aUndoRedoElems);
 				for (var i = 0, length = aUndoRedoElems.length; i < length; ++i)
 				{
 				    var item = aUndoRedoElems[i];
@@ -1924,6 +2101,8 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 				History.UndoRedoEnd(null, oRedoObjectParam, false);
 
 				oThis.bCollaborativeChanges = false;
+				//make snapshot for faormulas
+				oThis.snapshot = oThis._getSnapshot();
 				History.Clear();
 				if(null != fCallback)
 					fCallback();
@@ -2141,7 +2320,18 @@ function Woorksheet(wb, _index, sId){
 	/*handlers*/
 	this.handlers = null;
 }
-
+	Woorksheet.prototype.getSnapshot = function(wb) {
+		var ws = new Woorksheet(wb, this.index, this.Id);
+		ws.sName = this.sName;
+		for (var i = 0; i < this.TableParts.length; ++i) {
+			var table = this.TableParts[i];
+			ws.TableParts.push(table.clone(null, table.Name));
+		}
+		for (i = 0; i < this.sheetViews.length; ++i) {
+			ws.sheetViews.push(this.sheetViews[i].clone());
+		}
+		return ws;
+	};
 Woorksheet.prototype.addContentChanges = function(changes)
 {
     this.contentChanges.Add(changes);
@@ -2694,51 +2884,6 @@ Woorksheet.prototype.rebuildTabColor = function() {
   if (this.sheetPr && this.sheetPr.TabColor) {
     this.workbook.handlers.trigger("asc_onUpdateTabColor", this.getIndex());
   }
-};
-Woorksheet.prototype.renameWsToCollaborate=function(name){
-    var lastname = this.getName();
-	//из-за особенностей реализации формул, сначала делаем parse со старым именем, потом преименовываем, потом assemble
-	var aFormulas = [];
-	//переименование для отправки изменений
-	for(var i = 0, length = this.workbook.aCollaborativeActions.length; i < length; ++i)
-	{
-	    var aPointActions = this.workbook.aCollaborativeActions[i];
-	    for (var j = 0, length2 = aPointActions.length; j < length2; ++j) {
-	        var action = aPointActions[j];
-	        if (AscCommonExcel.g_oUndoRedoWorkbook == action.oClass) {
-	            if (AscCH.historyitem_Workbook_SheetAdd == action.nActionType) {
-	                if (lastname == action.oData.name)
-	                    action.oData.name = name;
-	            }
-	        }
-	        else if (AscCommonExcel.g_oUndoRedoWorksheet == action.oClass) {
-	            if (AscCH.historyitem_Worksheet_Rename == action.nActionType) {
-	                if (lastname == action.oData.to)
-	                    action.oData.to = name;
-	            }
-	        }
-	        else if (AscCommonExcel.g_oUndoRedoCell == action.oClass) {
-	            if (action.oData instanceof UndoRedoData_CellSimpleData) {
-	                if (action.oData.oNewVal instanceof UndoRedoData_CellValueData) {
-	                    var oNewVal = action.oData.oNewVal;
-	                    if (null != oNewVal.formula && -1 != oNewVal.formula.indexOf(lastname)) {
-	                        var oParser = new parserFormula(oNewVal.formula, null, this);
-	                        oParser.parse();
-	                        aFormulas.push({ formula: oParser, value: oNewVal });
-
-	                    }
-	                }
-	            }
-	        }
-	    }
-	}
-	//переименование для локальной версии
-	this.setName(name);
-	for(var i = 0, length = aFormulas.length; i < length; ++i)
-	{
-		var item = aFormulas[i];
-		item.value.formula = item.formula.assemble();
-	}
 };
 Woorksheet.prototype.getHidden=function(){
 	if(null != this.bHidden)
@@ -4396,14 +4541,9 @@ Cell.prototype.setValue=function(val,callback, isCopyPaste) {
 		DataNew = this.getValueData();
 	}
 	if (History.Is_On() && false == DataOld.isEqual(DataNew)) {
-		var changesFormula = null;
-		if (this.formulaParsed) {
-			changesFormula = this.formulaParsed.clone(null, History, ws);
-			History.changesFormulaAdd(changesFormula);
-		}
 		History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValue, this.ws.getId(),
 			new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow),
-			new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew, changesFormula));
+			new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew));
 	}
 	//sortDependency вызывается ниже History.Add(AscCH.historyitem_Cell_ChangeValue, потому что в ней может быть выставлен формат ячейки(если это текстовый, то принимая изменения формула станет текстом)
 	this.ws.workbook.sortDependency();
@@ -4452,17 +4592,8 @@ Cell.prototype.setValue2=function(array){
 
 		if (History.Is_On()) {
 			DataNew = this.getValueData();
-			if (false == DataOld.isEqual(DataNew)) {
-				var changesFormula = null;
-				if (this.formulaParsed) {
-					changesFormula = new parserFormula(formula, History, this.ws);
-					changesFormula.parse();
-					History.changesFormulaAdd(changesFormula);
-				}
-				History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValue, this.ws.getId(),
-							new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow),
-							new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew, changesFormula));
-			}
+			if (false == DataOld.isEqual(DataNew))
+				History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew));
 		}
 	};
 	Cell.prototype.removeDependencies = function() {
