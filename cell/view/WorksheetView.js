@@ -4231,7 +4231,7 @@
         var r, c, row;
 
         if (range === undefined) {
-            range = this.activeRange.clone(true);
+            range = this.model.selectionRange.getLast();
         }
 
         for (r = range.r1; r <= range.r2; ++r) {
@@ -5136,7 +5136,7 @@
     };
 
     WorksheetView.prototype.prepareDepCells = function ( se ) {
-        var activeCell = this.activeRange, mc = this.model.getMergedByCell( activeCell.startRow, activeCell.startCol ), c1 = mc ? mc.c1 : activeCell.startCol, r1 = mc ? mc.r1 : activeCell.startRow, c = this._getVisibleCell( c1, r1 ), nodes = (se == AscCommonExcel.c_oAscDrawDepOptions.Master) ? this.model.workbook.dependencyFormulas.getMasterNodes( this.model.getId(), c.getName() ) : this.model.workbook.dependencyFormulas.getSlaveNodes( this.model.getId(), c.getName() );
+        var activeCell = this.model.selectionRange, mc = this.model.getMergedByCell( activeCell.startRow, activeCell.startCol ), c1 = mc ? mc.c1 : activeCell.startCol, r1 = mc ? mc.r1 : activeCell.startRow, c = this._getVisibleCell( c1, r1 ), nodes = (se == AscCommonExcel.c_oAscDrawDepOptions.Master) ? this.model.workbook.dependencyFormulas.getMasterNodes( this.model.getId(), c.getName() ) : this.model.workbook.dependencyFormulas.getSlaveNodes( this.model.getId(), c.getName() );
 
         if ( !nodes ) {
             return;
@@ -5441,24 +5441,24 @@
         return colsCount <= colsCountCurrent && this.model.isDefaultWidthHidden();
     };
 
-    WorksheetView.prototype.scrollVertical = function ( delta, editor ) {
+    WorksheetView.prototype.scrollVertical = function (delta, editor) {
         var vr = this.visibleRange;
-        var start = this._calcCellPosition( vr.c1, vr.r1, 0, delta ).row;
-        var fixStartRow = new asc_Range( vr.c1, start, vr.c2, start );
+        var start = this._calcCellPosition(vr.c1, vr.r1, 0, delta).row;
+        var fixStartRow = new asc_Range(vr.c1, start, vr.c2, start);
         fixStartRow.startCol = vr.c1;
         fixStartRow.startRow = start;
-        this._fixSelectionOfHiddenCells( 0, delta >= 0 ? +1 : -1, fixStartRow );
-        this._fixVisibleRange( fixStartRow );
+        this._fixSelectionOfHiddenCells(0, delta >= 0 ? +1 : -1, fixStartRow);
+        this._fixVisibleRange(fixStartRow);
         var reinitScrollY = start !== fixStartRow.r1;
-        if ( reinitScrollY && 0 > delta ) // Для скролла вверх обычный сдвиг + дорисовка
+        if (reinitScrollY && 0 > delta) // Для скролла вверх обычный сдвиг + дорисовка
         {
             delta += fixStartRow.r1 - start;
         }
         start = fixStartRow.r1;
 
-        if ( start === vr.r1 ) {
-            if ( reinitScrollY ) {
-                this.handlers.trigger( "reinitializeScrollY" );
+        if (start === vr.r1) {
+            if (reinitScrollY) {
+                this.handlers.trigger("reinitializeScrollY");
             }
             return this;
         }
@@ -5470,13 +5470,13 @@
         var ctxW = ctx.getWidth();
         var ctxH = ctx.getHeight();
         var offsetX, offsetY, diffWidth = 0, diffHeight = 0, cFrozen = 0, rFrozen = 0;
-        if ( this.topLeftFrozenCell ) {
+        if (this.topLeftFrozenCell) {
             cFrozen = this.topLeftFrozenCell.getCol0();
             rFrozen = this.topLeftFrozenCell.getRow0();
             diffWidth = this.cols[cFrozen].left - this.cols[0].left;
             diffHeight = this.rows[rFrozen].top - this.rows[0].top;
         }
-        var oldVRE_isPartial = this._isRowDrawnPartially( vr.r2, vr.r1, diffHeight );
+        var oldVRE_isPartial = this._isRowDrawnPartially(vr.r2, vr.r1, diffHeight);
         var oldVR = vr.clone();
         var oldStart = vr.r1;
         var oldEnd = vr.r2;
@@ -5485,53 +5485,53 @@
         vr.r1 = start;
         this._updateVisibleRowsCount();
         // Это необходимо для того, чтобы строки, у которых высота по тексту, рассчитались
-        if ( !oldVR.intersectionSimple( vr ) ) {
+        if (!oldVR.intersectionSimple(vr)) {
             // Полностью обновилась область
-            this._prepareCellTextMetricsCache( vr );
-        }
-        else {
-            if ( 0 > delta ) {
+            this._prepareCellTextMetricsCache(vr);
+        } else {
+            if (0 > delta) {
                 // Идем вверх
-                this._prepareCellTextMetricsCache( new asc_Range( vr.c1, start, vr.c2, oldStart - 1 ) );
-            }
-            else {
+                this._prepareCellTextMetricsCache(new asc_Range(vr.c1, start, vr.c2, oldStart - 1));
+            } else {
                 // Идем вниз
-                this._prepareCellTextMetricsCache( new asc_Range( vr.c1, oldEnd + 1, vr.c2, vr.r2 ) );
+                this._prepareCellTextMetricsCache(new asc_Range(vr.c1, oldEnd + 1, vr.c2, vr.r2));
             }
         }
 
-        var oldDec = Math.max( calcDecades( oldEnd + 1 ), 3 );
+        var oldDec = Math.max(calcDecades(oldEnd + 1), 3);
         var oldW, x, dx;
         var dy = this.rows[start].top - this.rows[oldStart].top;
-        var oldH = ctxH - this.cellsTop - Math.abs( dy ) - diffHeight;
+        var oldH = ctxH - this.cellsTop - Math.abs(dy) - diffHeight;
         var scrollDown = (dy > 0 && oldH > 0);
         var y = this.cellsTop + (scrollDown ? dy : 0) + diffHeight;
-        var lastRowHeight = (scrollDown && oldVRE_isPartial) ? ctxH - (this.rows[oldEnd].top - this.rows[oldStart].top + this.cellsTop + diffHeight) : 0;
+        var lastRowHeight = (scrollDown && oldVRE_isPartial) ?
+        ctxH - (this.rows[oldEnd].top - this.rows[oldStart].top + this.cellsTop + diffHeight) : 0;
 
-        if ( this.isCellEditMode && editor && this.activeRange.r1 >= rFrozen ) {
-            editor.move( this.cellsLeft + (this.activeRange.c1 >= cFrozen ? diffWidth : 0), this.cellsTop + diffHeight, ctxW, ctxH );
+        if (this.isCellEditMode && editor && this.model.selectionRange.activeCell.row >= rFrozen) {
+            editor.move(this.cellsLeft + (this.model.selectionRange.activeCell.col >= cFrozen ? diffWidth : 0), this.cellsTop + diffHeight,
+              ctxW, ctxH);
         }
 
-        var widthChanged = Math.max( calcDecades( vr.r2 + 1 ), 3 ) !== oldDec;
-        if ( widthChanged ) {
+        var widthChanged = Math.max(calcDecades(vr.r2 + 1), 3) !== oldDec;
+        if (widthChanged) {
             x = this.cellsLeft;
             this._calcHeaderColumnWidth();
             this._updateColumnPositions();
             this._calcVisibleColumns();
             this._drawCorner();
             this._cleanColumnHeadersRect();
-            this._drawColumnHeaders( /*drawingCtx*/ undefined );
+            this._drawColumnHeaders(/*drawingCtx*/ undefined);
 
             dx = this.cellsLeft - x;
-            oldW = ctxW - x - Math.abs( dx );
+            oldW = ctxW - x - Math.abs(dx);
 
-            if ( rFrozen ) {
-                ctx.drawImage( ctx.getCanvas(), x, this.cellsTop, oldW, diffHeight, x + dx, this.cellsTop, oldW, diffHeight );
+            if (rFrozen) {
+                ctx.drawImage(ctx.getCanvas(), x, this.cellsTop, oldW, diffHeight, x + dx, this.cellsTop, oldW,
+                  diffHeight);
                 // ToDo Посмотреть с объектами!!!
             }
-            this._drawFrozenPane( true );
-        }
-        else {
+            this._drawFrozenPane(true);
+        } else {
             dx = 0;
             x = this.headersLeft;
             oldW = ctxW;
@@ -5539,89 +5539,87 @@
 
         // Перемещаем область
         var moveHeight = oldH - lastRowHeight;
-        if ( moveHeight > 0 ) {
-            ctx.drawImage( ctx.getCanvas(), x, y, oldW, moveHeight, x + dx, y - dy, oldW, moveHeight );
+        if (moveHeight > 0) {
+            ctx.drawImage(ctx.getCanvas(), x, y, oldW, moveHeight, x + dx, y - dy, oldW, moveHeight);
 
             // Заглушка для safari (http://bugzilla.onlyoffice.com/show_bug.cgi?id=25546). Режим 'copy' сначала затирает, а
             // потом рисует (а т.к. мы рисуем сами на себе, то уже картинка будет пустой)
-            if ( AscBrowser.isSafari ) {
-                this.drawingGraphicCtx.moveImageDataSafari( x, y, oldW, moveHeight, x + dx, y - dy );
-            }
-            else {
-                this.drawingGraphicCtx.moveImageData( x, y, oldW, moveHeight, x + dx, y - dy );
+            if (AscBrowser.isSafari) {
+                this.drawingGraphicCtx.moveImageDataSafari(x, y, oldW, moveHeight, x + dx, y - dy);
+            } else {
+                this.drawingGraphicCtx.moveImageData(x, y, oldW, moveHeight, x + dx, y - dy);
             }
         }
         // Очищаем область
         var clearTop = this.cellsTop + diffHeight + (scrollDown && moveHeight > 0 ? moveHeight : 0);
-        var clearHeight = (moveHeight > 0) ? Math.abs( dy ) + lastRowHeight : ctxH - (this.cellsTop + diffHeight);
-        ctx.setFillStyle( this.settings.cells.defaultState.background )
-            .fillRect( this.headersLeft, clearTop, ctxW, clearHeight );
-        this.drawingGraphicCtx.clearRect( this.headersLeft, clearTop, ctxW, clearHeight );
+        var clearHeight = (moveHeight > 0) ? Math.abs(dy) + lastRowHeight : ctxH - (this.cellsTop + diffHeight);
+        ctx.setFillStyle(this.settings.cells.defaultState.background)
+          .fillRect(this.headersLeft, clearTop, ctxW, clearHeight);
+        this.drawingGraphicCtx.clearRect(this.headersLeft, clearTop, ctxW, clearHeight);
 
-        if ( this.objectRender && this.objectRender.drawingArea ) {
+        if (this.objectRender && this.objectRender.drawingArea) {
             this.objectRender.drawingArea.reinitRanges();
         }
 
         // Дорисовываем необходимое
-        if ( dy < 0 || vr.r2 !== oldEnd || oldVRE_isPartial || dx !== 0 ) {
+        if (dy < 0 || vr.r2 !== oldEnd || oldVRE_isPartial || dx !== 0) {
             var r1, r2;
-            if ( moveHeight > 0 ) {
-                if ( scrollDown ) {
+            if (moveHeight > 0) {
+                if (scrollDown) {
                     r1 = oldEnd + (oldVRE_isPartial ? 0 : 1);
                     r2 = vr.r2;
-                }
-                else {
+                } else {
                     r1 = vr.r1;
                     r2 = vr.r1 - 1 - delta;
                 }
-            }
-            else {
+            } else {
                 r1 = vr.r1;
                 r2 = vr.r2;
             }
-            var range = new asc_Range( vr.c1, r1, vr.c2, r2 );
-            if ( dx === 0 ) {
-                this._drawRowHeaders( /*drawingCtx*/ undefined, r1, r2 );
-            }
-            else {
+            var range = new asc_Range(vr.c1, r1, vr.c2, r2);
+            if (dx === 0) {
+                this._drawRowHeaders(/*drawingCtx*/ undefined, r1, r2);
+            } else {
                 // redraw all headres, because number of decades in row index has been changed
-                this._drawRowHeaders( /*drawingCtx*/ undefined );
-                if ( dx < 0 ) {
+                this._drawRowHeaders(/*drawingCtx*/ undefined);
+                if (dx < 0) {
                     // draw last column
                     var r_;
                     var r1_ = r2 + 1;
                     var r2_ = vr.r2;
-                    if ( r2_ >= r1_ ) {
-                        r_ = new asc_Range( vr.c2, r1_, vr.c2, r2_ );
-                        this._drawGrid( /*drawingCtx*/ undefined, r_ );
-                        this._drawCellsAndBorders( /*drawingCtx*/undefined, r_ );
+                    if (r2_ >= r1_) {
+                        r_ = new asc_Range(vr.c2, r1_, vr.c2, r2_);
+                        this._drawGrid(/*drawingCtx*/ undefined, r_);
+                        this._drawCellsAndBorders(/*drawingCtx*/undefined, r_);
                     }
-                    if ( 0 < rFrozen ) {
-                        r_ = new asc_Range( vr.c2, 0, vr.c2, rFrozen - 1 );
+                    if (0 < rFrozen) {
+                        r_ = new asc_Range(vr.c2, 0, vr.c2, rFrozen - 1);
                         offsetY = this.rows[0].top - this.cellsTop;
-                        this._drawGrid( /*drawingCtx*/ undefined, r_, /*offsetXForDraw*/undefined, offsetY );
-                        this._drawCellsAndBorders( /*drawingCtx*/undefined, r_, /*offsetXForDraw*/undefined, offsetY );
+                        this._drawGrid(/*drawingCtx*/ undefined, r_, /*offsetXForDraw*/undefined, offsetY);
+                        this._drawCellsAndBorders(/*drawingCtx*/undefined, r_, /*offsetXForDraw*/undefined, offsetY);
                     }
                 }
             }
             offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft - diffWidth;
             offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
-            this._drawGrid( /*drawingCtx*/ undefined, range );
-            this._drawCellsAndBorders( /*drawingCtx*/undefined, range );
+            this._drawGrid(/*drawingCtx*/ undefined, range);
+            this._drawCellsAndBorders(/*drawingCtx*/undefined, range);
             this.af_drawButtons(range, offsetX, offsetY);
-            this.objectRender.showDrawingObjectsEx( false, new AscFormat.GraphicOption( this, c_oAscGraphicOption.ScrollVertical, range, {
-                offsetX: offsetX, offsetY: offsetY
-            } ) );
-            if ( 0 < cFrozen ) {
+            this.objectRender.showDrawingObjectsEx(false,
+              new AscFormat.GraphicOption(this, c_oAscGraphicOption.ScrollVertical, range, {
+                  offsetX: offsetX, offsetY: offsetY
+              }));
+            if (0 < cFrozen) {
                 range.c1 = 0;
                 range.c2 = cFrozen - 1;
                 offsetX = this.cols[0].left - this.cellsLeft;
-                this._drawGrid( /*drawingCtx*/ undefined, range, offsetX );
-                this._drawCellsAndBorders( /*drawingCtx*/undefined, range, offsetX );
+                this._drawGrid(/*drawingCtx*/ undefined, range, offsetX);
+                this._drawCellsAndBorders(/*drawingCtx*/undefined, range, offsetX);
                 this.af_drawButtons(range, offsetX, offsetY);
-                this.objectRender.showDrawingObjectsEx( false, new AscFormat.GraphicOption( this, c_oAscGraphicOption.ScrollVertical, range, {
-                    offsetX: offsetX, offsetY: offsetY
-                } ) );
+                this.objectRender.showDrawingObjectsEx(false,
+                  new AscFormat.GraphicOption(this, c_oAscGraphicOption.ScrollVertical, range, {
+                      offsetX: offsetX, offsetY: offsetY
+                  }));
             }
         }
         // Отрисовывать нужно всегда, вдруг бордеры
@@ -5634,35 +5632,35 @@
         }
 
 
-        if ( reinitScrollY ) {
-            this.handlers.trigger( "reinitializeScrollY" );
+        if (reinitScrollY) {
+            this.handlers.trigger("reinitializeScrollY");
         }
 
-        this.handlers.trigger( "onDocumentPlaceChanged" );
+        this.handlers.trigger("onDocumentPlaceChanged");
         //ToDo this.drawDepCells();
         this.cellCommentator.updateCommentPosition();
         this.cellCommentator.drawCommentCells();
         return this;
     };
 
-    WorksheetView.prototype.scrollHorizontal = function ( delta, editor ) {
+    WorksheetView.prototype.scrollHorizontal = function (delta, editor) {
         var vr = this.visibleRange;
-        var start = this._calcCellPosition( vr.c1, vr.r1, delta, 0 ).col;
-        var fixStartCol = new asc_Range( start, vr.r1, start, vr.r2 );
+        var start = this._calcCellPosition(vr.c1, vr.r1, delta, 0).col;
+        var fixStartCol = new asc_Range(start, vr.r1, start, vr.r2);
         fixStartCol.startCol = start;
         fixStartCol.startRow = vr.r1;
-        this._fixSelectionOfHiddenCells( delta >= 0 ? +1 : -1, 0, fixStartCol );
-        this._fixVisibleRange( fixStartCol );
+        this._fixSelectionOfHiddenCells(delta >= 0 ? +1 : -1, 0, fixStartCol);
+        this._fixVisibleRange(fixStartCol);
         var reinitScrollX = start !== fixStartCol.c1;
-        if ( reinitScrollX && 0 > delta ) // Для скролла влево обычный сдвиг + дорисовка
+        if (reinitScrollX && 0 > delta) // Для скролла влево обычный сдвиг + дорисовка
         {
             delta += fixStartCol.c1 - start;
         }
         start = fixStartCol.c1;
 
-        if ( start === vr.c1 ) {
-            if ( reinitScrollX ) {
-                this.handlers.trigger( "reinitializeScrollX" );
+        if (start === vr.c1) {
+            if (reinitScrollX) {
+                this.handlers.trigger("reinitializeScrollX");
             }
             return this;
         }
@@ -5677,12 +5675,12 @@
         var oldStart = vr.c1;
         var oldEnd = vr.c2;
         var offsetX, offsetY, diffWidth = 0, diffHeight = 0;
-        var oldW = ctxW - this.cellsLeft - Math.abs( dx );
+        var oldW = ctxW - this.cellsLeft - Math.abs(dx);
         var scrollRight = (dx > 0 && oldW > 0);
         var x = this.cellsLeft + (scrollRight ? dx : 0);
         var y = this.headersTop;
         var cFrozen = 0, rFrozen = 0;
-        if ( this.topLeftFrozenCell ) {
+        if (this.topLeftFrozenCell) {
             rFrozen = this.topLeftFrozenCell.getRow0();
             cFrozen = this.topLeftFrozenCell.getCol0();
             diffWidth = this.cols[cFrozen].left - this.cols[0].left;
@@ -5690,96 +5688,95 @@
             x += diffWidth;
             oldW -= diffWidth;
         }
-        var oldVCE_isPartial = this._isColDrawnPartially( vr.c2, vr.c1, diffWidth );
+        var oldVCE_isPartial = this._isColDrawnPartially(vr.c2, vr.c1, diffWidth);
         var oldVR = vr.clone();
 
         // ToDo стоит тут переделать весь scroll
         vr.c1 = start;
         this._updateVisibleColsCount();
         // Это необходимо для того, чтобы строки, у которых высота по тексту, рассчитались
-        if ( !oldVR.intersectionSimple( vr ) ) {
+        if (!oldVR.intersectionSimple(vr)) {
             // Полностью обновилась область
-            this._prepareCellTextMetricsCache( vr );
-        }
-        else {
-            if ( 0 > delta ) {
+            this._prepareCellTextMetricsCache(vr);
+        } else {
+            if (0 > delta) {
                 // Идем влево
-                this._prepareCellTextMetricsCache( new asc_Range( start, vr.r1, oldStart - 1, vr.r2 ) );
-            }
-            else {
+                this._prepareCellTextMetricsCache(new asc_Range(start, vr.r1, oldStart - 1, vr.r2));
+            } else {
                 // Идем вправо
-                this._prepareCellTextMetricsCache( new asc_Range( oldEnd + 1, vr.r1, vr.c2, vr.r2 ) );
+                this._prepareCellTextMetricsCache(new asc_Range(oldEnd + 1, vr.r1, vr.c2, vr.r2));
             }
         }
 
-        var lastColWidth = (scrollRight && oldVCE_isPartial) ? ctxW - (this.cols[oldEnd].left - this.cols[oldStart].left + this.cellsLeft + diffWidth) : 0;
+        var lastColWidth = (scrollRight && oldVCE_isPartial) ?
+        ctxW - (this.cols[oldEnd].left - this.cols[oldStart].left + this.cellsLeft + diffWidth) : 0;
 
-        if ( this.isCellEditMode && editor && this.activeRange.c1 >= cFrozen ) {
-            editor.move( this.cellsLeft + diffWidth, this.cellsTop + (this.activeRange.r1 >= rFrozen ? diffHeight : 0), ctxW, ctxH );
+        if (this.isCellEditMode && editor && this.model.selectionRange.activeCell.col >= cFrozen) {
+            editor.move(this.cellsLeft + diffWidth, this.cellsTop + (this.model.selectionRange.activeCell.row >= rFrozen ? diffHeight : 0),
+              ctxW, ctxH);
         }
 
         // Перемещаем область
         var moveWidth = oldW - lastColWidth;
-        if ( moveWidth > 0 ) {
-            ctx.drawImage( ctx.getCanvas(), x, y, moveWidth, ctxH, x - dx, y, moveWidth, ctxH );
+        if (moveWidth > 0) {
+            ctx.drawImage(ctx.getCanvas(), x, y, moveWidth, ctxH, x - dx, y, moveWidth, ctxH);
 
             // Заглушка для safari (http://bugzilla.onlyoffice.com/show_bug.cgi?id=25546). Режим 'copy' сначала затирает, а
             // потом рисует (а т.к. мы рисуем сами на себе, то уже картинка будет пустой)
-            if ( AscBrowser.isSafari ) {
-                this.drawingGraphicCtx.moveImageDataSafari( x, y, moveWidth, ctxH, x - dx, y );
-            }
-            else {
-                this.drawingGraphicCtx.moveImageData( x, y, moveWidth, ctxH, x - dx, y );
+            if (AscBrowser.isSafari) {
+                this.drawingGraphicCtx.moveImageDataSafari(x, y, moveWidth, ctxH, x - dx, y);
+            } else {
+                this.drawingGraphicCtx.moveImageData(x, y, moveWidth, ctxH, x - dx, y);
             }
         }
         // Очищаем область
         var clearLeft = this.cellsLeft + diffWidth + (scrollRight && moveWidth > 0 ? moveWidth : 0);
-        var clearWidth = (moveWidth > 0) ? Math.abs( dx ) + lastColWidth : ctxW - (this.cellsLeft + diffWidth);
-        ctx.setFillStyle( this.settings.cells.defaultState.background )
-            .fillRect( clearLeft, y, clearWidth, ctxH );
-        this.drawingGraphicCtx.clearRect( clearLeft, y, clearWidth, ctxH );
+        var clearWidth = (moveWidth > 0) ? Math.abs(dx) + lastColWidth : ctxW - (this.cellsLeft + diffWidth);
+        ctx.setFillStyle(this.settings.cells.defaultState.background)
+          .fillRect(clearLeft, y, clearWidth, ctxH);
+        this.drawingGraphicCtx.clearRect(clearLeft, y, clearWidth, ctxH);
 
-        if ( this.objectRender && this.objectRender.drawingArea ) {
+        if (this.objectRender && this.objectRender.drawingArea) {
             this.objectRender.drawingArea.reinitRanges();
         }
 
         // Дорисовываем необходимое
-        if ( dx < 0 || vr.c2 !== oldEnd || oldVCE_isPartial ) {
+        if (dx < 0 || vr.c2 !== oldEnd || oldVCE_isPartial) {
             var c1, c2;
-            if ( moveWidth > 0 ) {
-                if ( scrollRight ) {
+            if (moveWidth > 0) {
+                if (scrollRight) {
                     c1 = oldEnd + (oldVCE_isPartial ? 0 : 1);
                     c2 = vr.c2;
-                }
-                else {
+                } else {
                     c1 = vr.c1;
                     c2 = vr.c1 - 1 - delta;
                 }
-            }
-            else {
+            } else {
                 c1 = vr.c1;
                 c2 = vr.c2;
             }
-            var range = new asc_Range( c1, vr.r1, c2, vr.r2 );
+            var range = new asc_Range(c1, vr.r1, c2, vr.r2);
             offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft - diffWidth;
             offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
-            this._drawColumnHeaders( /*drawingCtx*/ undefined, c1, c2 );
-            this._drawGrid( /*drawingCtx*/ undefined, range );
-            this._drawCellsAndBorders( /*drawingCtx*/undefined, range );
+            this._drawColumnHeaders(/*drawingCtx*/ undefined, c1, c2);
+            this._drawGrid(/*drawingCtx*/ undefined, range);
+            this._drawCellsAndBorders(/*drawingCtx*/undefined, range);
             this.af_drawButtons(range, offsetX, offsetY);
-            this.objectRender.showDrawingObjectsEx( false, new AscFormat.GraphicOption( this, c_oAscGraphicOption.ScrollHorizontal, range, {
-                offsetX: offsetX, offsetY: offsetY
-            } ) );
-            if ( rFrozen ) {
+            this.objectRender.showDrawingObjectsEx(false,
+              new AscFormat.GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, range, {
+                  offsetX: offsetX, offsetY: offsetY
+              }));
+            if (rFrozen) {
                 range.r1 = 0;
                 range.r2 = rFrozen - 1;
                 offsetY = this.rows[0].top - this.cellsTop;
-                this._drawGrid( /*drawingCtx*/ undefined, range, undefined, offsetY );
-                this._drawCellsAndBorders( /*drawingCtx*/undefined, range, undefined, offsetY );
+                this._drawGrid(/*drawingCtx*/ undefined, range, undefined, offsetY);
+                this._drawCellsAndBorders(/*drawingCtx*/undefined, range, undefined, offsetY);
                 this.af_drawButtons(range, offsetX, offsetY);
-                this.objectRender.showDrawingObjectsEx( false, new AscFormat.GraphicOption( this, c_oAscGraphicOption.ScrollHorizontal, range, {
-                    offsetX: offsetX, offsetY: offsetY
-                } ) );
+                this.objectRender.showDrawingObjectsEx(false,
+                  new AscFormat.GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, range, {
+                      offsetX: offsetX, offsetY: offsetY
+                  }));
             }
         }
 
@@ -5792,7 +5789,7 @@
             this.handlers.trigger("reinitializeScrollX");
         }
 
-        this.handlers.trigger( "onDocumentPlaceChanged" );
+        this.handlers.trigger("onDocumentPlaceChanged");
         //ToDo this.drawDepCells();
         this.cellCommentator.updateCommentPosition();
         this.cellCommentator.drawCommentCells();
@@ -6087,7 +6084,9 @@
     };
 
     WorksheetView.prototype.getCursorTypeFromXY = function (x, y, isViewerMode) {
-        var res, c, r, f, i, offsetX, offsetY, cellCursor, sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink, widthDiff = 0, heightDiff = 0, isLocked = false, ar = this.activeRange, target = c_oTargetType.Cells, row = -1, col = -1, isSelGraphicObject, isNotFirst;
+        var res, c, r, f, i, offsetX, offsetY, cellCursor;
+        var sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink;
+        var widthDiff = 0, heightDiff = 0, isLocked = false, target = c_oTargetType.Cells, row = -1, col = -1, isSelGraphicObject, isNotFirst;
 
         var frozenCursor = this._isFrozenAnchor(x, y);
         if (!isViewerMode && frozenCursor.result) {
