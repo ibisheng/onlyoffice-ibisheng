@@ -3824,8 +3824,10 @@
     };
 
     WorksheetView.prototype._drawFormatPainterRange = function () {
-        this._drawElements(this._drawSelectionElement, this.copyActiveRange, AscCommonExcel.selectionLineType.Dash,
-          new CColor(0, 0, 0));
+        var t = this, color = new CColor(0, 0, 0);
+        this.copyActiveRange.ranges.forEach(function (item) {
+            t._drawElements(t._drawSelectionElement, item, AscCommonExcel.selectionLineType.Dash, color);
+        });
     };
 
     WorksheetView.prototype._drawFormulaRanges = function (arrRanges) {
@@ -7542,7 +7544,7 @@
 
     // Окончание выделения
     WorksheetView.prototype.changeSelectionDone = function () {
-        if ( this.stateFormatPainter ) {
+        if (this.stateFormatPainter) {
             this.applyFormatPainter();
         }
     };
@@ -7574,42 +7576,44 @@
 
     WorksheetView.prototype.applyFormatPainter = function () {
         var t = this;
-        var from = t.handlers.trigger('getRangeFormatPainter'), to = t.activeRange.getAllRange();
-        var onApplyFormatPainterCallback = function ( isSuccess ) {
+        var from = t.handlers.trigger('getRangeFormatPainter').getLast(), to = this.model.selectionRange.getLast().getAllRange();
+        var onApplyFormatPainterCallback = function (isSuccess) {
             // Очищаем выделение
             t.cleanSelection();
 
-            if ( true === isSuccess ) {
+            if (true === isSuccess) {
                 AscCommonExcel.promoteFromTo(from, t.model, to, t.model);
             }
 
-            t.expandColsOnScroll( false, true, to.c2 + 1 );
-            t.expandRowsOnScroll( false, true, to.r2 + 1 );
+            t.expandColsOnScroll(false, true, to.c2 + 1);
+            t.expandRowsOnScroll(false, true, to.r2 + 1);
 
             // Сбрасываем параметры
-            t._updateCellsRange( to, /*canChangeColWidth*/c_oAscCanChangeColWidth.none, /*lockDraw*/true );
-            if ( c_oAscFormatPainterState.kMultiple !== t.stateFormatPainter ) {
+            t._updateCellsRange(to, /*canChangeColWidth*/c_oAscCanChangeColWidth.none, /*lockDraw*/true);
+            if (c_oAscFormatPainterState.kMultiple !== t.stateFormatPainter) {
                 t.handlers.trigger('onStopFormatPainter');
             }
             // Перерисовываем
-            t._recalculateAfterUpdate( [to] );
+            t._recalculateAfterUpdate([to]);
         };
 
-        var result = AscCommonExcel.preparePromoteFromTo( from, to );
-        if ( !result ) {
+        var result = AscCommonExcel.preparePromoteFromTo(from, to);
+        if (!result) {
             // ToDo вывести ошибку
-            onApplyFormatPainterCallback( false );
+            onApplyFormatPainterCallback(false);
             return;
         }
 
-        this._isLockedCells( to, null, onApplyFormatPainterCallback );
+        this._isLockedCells(to, null, onApplyFormatPainterCallback);
     };
-    WorksheetView.prototype.formatPainter = function(stateFormatPainter) {
+    WorksheetView.prototype.formatPainter = function (stateFormatPainter) {
         // Если передали состояние, то выставляем его. Если нет - то меняем на противоположное.
-        this.stateFormatPainter = (null != stateFormatPainter) ? stateFormatPainter : ((c_oAscFormatPainterState.kOff !== this.stateFormatPainter) ? c_oAscFormatPainterState.kOff : c_oAscFormatPainterState.kOn);
+        this.stateFormatPainter = (null != stateFormatPainter) ? stateFormatPainter :
+          ((c_oAscFormatPainterState.kOff !== this.stateFormatPainter) ? c_oAscFormatPainterState.kOff :
+            c_oAscFormatPainterState.kOn);
 
         if (this.stateFormatPainter) {
-            this.copyActiveRange = this.activeRange.clone(true);
+            this.copyActiveRange = this.model.selectionRange.clone();
             this._drawFormatPainterRange();
         } else {
             this.cleanSelection();
