@@ -246,26 +246,10 @@
 				else
 				{
 					pptx_content_writer.Start_UseFullUrl();
-				
-					//TODO стоит убрать заглушку при правке бага с activeRange
-					var cloneActiveRange = worksheet.activeRange.clone();
-					var temp;
-					if(cloneActiveRange.c1 > cloneActiveRange.c2)
-					{
-						temp = cloneActiveRange.c1;
-						cloneActiveRange.c1 = cloneActiveRange.c2;
-						cloneActiveRange.c2 = temp;
-					};
-					
-					if(cloneActiveRange.r1 > cloneActiveRange.r2)
-					{
-						temp = cloneActiveRange.r1;
-						cloneActiveRange.r1 = cloneActiveRange.r2;
-						cloneActiveRange.r2 = temp;
-					};
-					
-					var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(worksheet.model.workbook, cloneActiveRange);
-					var sBase64 = "xslData;" + oBinaryFileWriter.Write();
+
+					// ToDo multiselect ?
+					var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(worksheet.model.workbook, worksheet.model.selectionRange.getLast());
+					sBase64 = "xslData;" + oBinaryFileWriter.Write();
 					
 					pptx_content_writer.End_UseFullUrl();
 				}
@@ -278,7 +262,7 @@
 				var sBase64;
 				
 				var selectedContent = new CSelectedContent();
-				isIntoShape.Get_SelectedContent(selectedContent)
+				isIntoShape.Get_SelectedContent(selectedContent);
 				
 				var oPresentationWriter = new AscCommon.CBinaryFileWriter();
 				
@@ -1897,8 +1881,9 @@
 			_checkPasteFromBinaryExcel: function(worksheet, isWriteError, insertWorksheet)
 			{
 				var activeCellsPasteFragment = AscCommonExcel.g_oRangeCache.getAscRange(this.activeRange);
-				var rMax = (activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1) + worksheet.activeRange.r1;
-				var cMax = (activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1) + worksheet.activeRange.c1;
+				var lastRange = worksheet.model.selectionRange.getLast();
+				var rMax = (activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1) + lastRange.r1;
+				var cMax = (activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1) + lastRange.c1;
 				var res = true;
 				
 				//если область вставки выходит за пределы доступной области
