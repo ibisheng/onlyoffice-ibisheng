@@ -9345,14 +9345,13 @@
         var rMax2 = rMax;
         var cMax2 = cMax;
         //var rMax = values.length;
-        var trueArn = t.activeRange;
         if (isCheckSelection) {
             var newArr = arn.clone(true);
             newArr.r2 = rMax2 - 1;
             newArr.c2 = cMax2 - 1;
             if (isMultiple || isOneMerge) {
-                newArr.r2 = trueArn.r2;
-                newArr.c2 = trueArn.c2;
+                newArr.r2 = arn.r2;
+                newArr.c2 = arn.c2;
             }
             return newArr;
         }
@@ -9368,7 +9367,7 @@
         var n = 0;
         if (isMultiple)//случай автозаполнения сложных форм
         {
-            t.model.getRange3(trueArn.r1, trueArn.c1, trueArn.r2, trueArn.c2).unmerge();
+            t.model.getRange3(arn.r1, arn.c1, arn.r2, arn.c2).unmerge();
             var maxARow = heightArea / heightPasteFr;
             var maxACol = widthArea / widthPasteFr;
             var plRow = (rMax2 - arn.r1);
@@ -9616,10 +9615,6 @@
                     }
                 }
             }
-        }
-        if (isMultiple) {
-            arn.r2 = trueArn.r2;
-            arn.c2 = trueArn.c2;
         }
 
         t.isChanged = true;
