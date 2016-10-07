@@ -12719,7 +12719,6 @@
         var startRow = this.activeRange.r1;
         var endRow = this.activeRange.r2;
 
-        var newActiveRange;
         switch (optionType) {
             case c_oAscChangeSelectionFormatTable.all:
             {
@@ -12876,7 +12875,6 @@
     WorksheetView.prototype.af_insertCellsInTable = function (tableName, optionType) {
         var t = this;
         var ws = this.model;
-        var activeRange = this.activeRange;
 
         var tablePart = ws.autoFilters._getFilterByDisplayName(tableName);
 
@@ -12911,11 +12909,6 @@
             var changedRange = new asc_Range(tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2, tablePart.Ref.r2);
             t._isLockedCells(changedRange, null, callback);
         };
-
-        var startCol = this.activeRange.c1;
-        var endCol = this.activeRange.c2;
-        var startRow = this.activeRange.r1;
-        var endRow = this.activeRange.r2;
 
         var newActiveRange = this.activeRange.clone();
         var displayName = null;
@@ -12967,7 +12960,6 @@
     WorksheetView.prototype.af_deleteCellsInTable = function (tableName, optionType) {
         var t = this;
         var ws = this.model;
-        var acitveRange = this.activeRange;
 
         var tablePart = ws.autoFilters._getFilterByDisplayName(tableName);
 
@@ -13038,15 +13030,10 @@
                 t._onUpdateFormatTable(ref, false, true);
 
                 History.EndTransaction();
-            }
+            };
 
             t._isLockedCells(ref, null, callback);
         };
-
-        var startCol = this.activeRange.c1;
-        var endCol = this.activeRange.c2;
-        var startRow = this.activeRange.r1;
-        var endRow = this.activeRange.r2;
 
         var newActiveRange = this.activeRange.clone();
         var val = null;
@@ -13080,15 +13067,10 @@
     };
 
     WorksheetView.prototype.af_changeDisplayNameTable = function (tableName, newName) {
-        var t = this;
-        var ws = this.model;
-        var acitveRange = this.activeRange.clone();
-
         this.model.autoFilters.changeDisplayNameTable(tableName, newName);
     };
 
     WorksheetView.prototype.af_checkInsDelCells = function (activeRange, val, prop, isFromFormatTable) {
-        var t = this;
         var ws = this.model;
         var res = true;
 
