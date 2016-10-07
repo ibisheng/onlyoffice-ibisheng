@@ -10367,8 +10367,9 @@
                 return;
             }
             if (null === col1) {
-                col1 = t.activeRange.c1;
-                col2 = t.activeRange.c2;
+                var lastSelection = t.model.selectionRange.getLast();
+                col1 = lastSelection.c1;
+                col2 = lastSelection.c2;
             }
 
             var w, bUpdate = false;
@@ -10400,8 +10401,9 @@
                 return;
             }
             if (null === row1) {
-                row1 = t.activeRange.r1;
-                row2 = t.activeRange.r2;
+                var lastSelection = t.model.selectionRange.getLast();
+                row1 = lastSelection.r1;
+                row2 = lastSelection.r2;
             }
 
             History.Create_NewPoint();
