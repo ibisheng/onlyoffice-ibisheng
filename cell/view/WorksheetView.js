@@ -7310,23 +7310,24 @@
         return this._calcActiveCellOffset();
     };
 
-    WorksheetView.prototype.setSelectionUndoRedo = function ( range, validRange ) {
-        var ar = (range instanceof asc_ActiveRange) ? range.clone() : new asc_ActiveRange( range );
+    WorksheetView.prototype.setSelectionUndoRedo = function (range, validRange) {
+        var ar = (range instanceof asc_ActiveRange) ? range.clone() : new asc_ActiveRange(range);
 
         // Проверка на валидность range.
-        if ( validRange && (ar.c2 >= this.nColsCount || ar.r2 >= this.nRowsCount) ) {
-            if ( ar.c2 >= this.nColsCount ) {
-                this.expandColsOnScroll( false, true, ar.c2 + 1 );
+        if (validRange && (ar.c2 >= this.nColsCount || ar.r2 >= this.nRowsCount)) {
+            if (ar.c2 >= this.nColsCount) {
+                this.expandColsOnScroll(false, true, ar.c2 + 1);
             }
-            if ( ar.r2 >= this.nRowsCount ) {
-                this.expandRowsOnScroll( false, true, ar.r2 + 1 );
+            if (ar.r2 >= this.nRowsCount) {
+                this.expandRowsOnScroll(false, true, ar.r2 + 1);
             }
         }
         var oRes = null;
         var type = ar.type;
-        if ( type == c_oAscSelectionType.RangeCells || type == c_oAscSelectionType.RangeCol || type == c_oAscSelectionType.RangeRow || type == c_oAscSelectionType.RangeMax ) {
+        if (type == c_oAscSelectionType.RangeCells || type == c_oAscSelectionType.RangeCol ||
+          type == c_oAscSelectionType.RangeRow || type == c_oAscSelectionType.RangeMax) {
             this.cleanSelection();
-            this.activeRange = ar;
+            this.model.selectionRange.assign2(ar);
             this._drawSelection();
 
             this._updateSelectionNameAndInfo();
