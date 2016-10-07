@@ -8144,11 +8144,15 @@
             var applyFillHandleCallback = function ( res ) {
                 if ( res ) {
                     // Автозаполняем ячейки
-                    if ( range.promote( /*bCtrl*/ctrlPress, /*bVertical*/(1 === t.fillHandleDirection), nIndex ) ) {
+                    var oCanPromote = range.canPromote(/*bCtrl*/ctrlPress, /*bVertical*/(1 === t.fillHandleDirection), nIndex);
+                    if (null != oCanPromote) {
+                        History.Create_NewPoint();
+                        History.StartTransaction();
+                        range.promote(/*bCtrl*/ctrlPress, /*bVertical*/(1 === t.fillHandleDirection), nIndex, oCanPromote);
                         // Вызываем функцию пересчета для заголовков форматированной таблицы
                         t.model.autoFilters.renameTableColumn( arn );
-                    }
-                    else {
+                        History.EndTransaction();
+                    } else {
                         t.handlers.trigger( "onErrorEvent", c_oAscError.ID.CannotFillRange, c_oAscError.Level.NoCritical );
                         t.activeRange.assign2( range.bbox );
                     }
