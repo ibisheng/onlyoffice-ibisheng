@@ -5886,7 +5886,7 @@ CTablePr.prototype =
         if ( undefined != TablePr.TableCellMar.Top )
             this.TableCellMar.Top = TablePr.TableCellMar.Top.Copy();
 
-        if ( undefined != TablePr.TableCellMar )
+        if ( undefined != TablePr.TableCellSpacing )
             this.TableCellSpacing = TablePr.TableCellSpacing;
 
         if ( undefined != TablePr.TableInd )
