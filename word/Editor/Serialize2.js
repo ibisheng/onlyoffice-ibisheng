@@ -6960,13 +6960,23 @@ function Binary_pPrReader(doc, oReadResult, stream)
 			}
 			oFramePr.Wrap = nEditorWrap;
 		}
-		else if(c_oSer_FramePrType.X == type)
-            oFramePr.X = g_dKoef_twips_to_mm * this.stream.GetULongLE();
-		else if(c_oSer_FramePrType.XAlign == type)
+		else if(c_oSer_FramePrType.X == type) {
+			var xTw = this.stream.GetULongLE();
+			if (-4 === xTw) {
+				oFramePr.XAlign = c_oAscXAlign.Center;
+			} else {
+				oFramePr.X = g_dKoef_twips_to_mm * xTw;
+			}
+		} else if(c_oSer_FramePrType.XAlign == type)
             oFramePr.XAlign = this.stream.GetUChar();
-		else if(c_oSer_FramePrType.Y == type)
-            oFramePr.Y = g_dKoef_twips_to_mm * this.stream.GetULongLE();
-		else if(c_oSer_FramePrType.YAlign == type)
+		else if(c_oSer_FramePrType.Y == type) {
+			var yTw = this.stream.GetULongLE();
+			if (-4 === yTw) {
+				oFramePr.YAlign = c_oAscYAlign.Top;
+			} else {
+				oFramePr.Y = g_dKoef_twips_to_mm * yTw;
+			}
+		} else if(c_oSer_FramePrType.YAlign == type)
             oFramePr.YAlign = this.stream.GetUChar();
         else
             res = c_oSerConstants.ReadUnknown;
