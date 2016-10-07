@@ -6440,9 +6440,11 @@ background-repeat: no-repeat;\
 		return this.WordControl.m_oDrawingDocument.SlidesCount;
 	};
 
-	window["asc_docs_api"].prototype["asc_nativeGetPDF"] = function()
+	window["asc_docs_api"].prototype["asc_nativeGetPDF"] = function(_param)
 	{
 		var pagescount = this["asc_nativePrintPagesCount"]();
+		if (0x0100 & _param)
+		    pagescount = 1;
 
 		var _renderer                         = new AscCommon.CDocumentRenderer();
 		_renderer.VectorMemoryForPrint        = new AscCommon.CMemory();
