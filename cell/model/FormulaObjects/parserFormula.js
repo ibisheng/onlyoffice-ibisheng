@@ -1557,6 +1557,13 @@ cName.prototype.Calculate = function () {
 	cName.prototype.getDefName = function () {
 		return this.wb.getDefinesNames( this.value, this.ws ? this.ws.getId() : null );
 	};
+	cName.prototype.changeDefName = function (from, to) {
+		var LocalSheetId = this.ws ? this.ws.getIndex() : null;
+		if (AscCommonExcel.getDefNameIndex(this.value) == AscCommonExcel.getDefNameIndex(from.Name) &&
+			(null == from.LocalSheetId || LocalSheetId == from.LocalSheetId )) {
+			this.value = to.Name;
+		}
+	};
 
 /** @constructor */
 function cStrucTable( val, wb, ws ) {
@@ -4730,10 +4737,7 @@ parserFormula.prototype.calculate = function(opt_defName, opt_range) {
 		for (i = 0; i < this.outStack.length; i++) {
 			elem = this.outStack[i];
 			if (elem.type == cElementType.name || elem.type == cElementType.name3D) {
-				LocalSheetId = elem.ws ? elem.ws.getIndex() : null;
-				if (elem.value == from.Name && (null == from.LocalSheetId || LocalSheetId == from.LocalSheetId )) {
-					elem.value = to.Name;
-				}
+				elem.changeDefName(from, to);
 			} else if (elem.type == cElementType.table) {
 				LocalSheetId = elem.ws ? elem.ws.getIndex() : null;
 				if (elem.tableName == from.Name && (null == from.LocalSheetId || LocalSheetId == from.LocalSheetId )) {

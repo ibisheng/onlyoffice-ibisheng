@@ -59,7 +59,6 @@ var UndoRedoData_IndexSimpleProp = AscCommonExcel.UndoRedoData_IndexSimpleProp;
 var UndoRedoData_BBox = AscCommonExcel.UndoRedoData_BBox;
 var UndoRedoData_SheetAdd = AscCommonExcel.UndoRedoData_SheetAdd;
 var UndoRedoData_SheetPositions = AscCommonExcel.UndoRedoData_SheetPositions;
-var UndoRedoData_DefinedNames = AscCommonExcel.UndoRedoData_DefinedNames;
 var UndoRedoData_DefinedNamesChange = AscCommonExcel.UndoRedoData_DefinedNamesChange;
 var g_oDefaultFormat = AscCommonExcel.g_oDefaultFormat;
 var Border = AscCommonExcel.Border;
@@ -67,8 +66,6 @@ var RangeDataManagerElem = AscCommonExcel.RangeDataManagerElem;
 var RangeDataManager = AscCommonExcel.RangeDataManager;
 
 var cElementType = AscCommonExcel.cElementType;
-var cArea3D = AscCommonExcel.cArea3D;
-var cRef3D = AscCommonExcel.cRef3D;
 
 var parserFormula = AscCommonExcel.parserFormula;
 
@@ -90,7 +87,6 @@ var g_nAllColIndex = -1;
 var g_nAllRowIndex = -1;
 var aStandartNumFormats = [];
 var aStandartNumFormatsId = {};
-var arrRecalc = {}, arrDefNameRecalc = {};
 var oFormulaLocaleInfo = {
   Parse: true,
   DigitSep: true
@@ -152,7 +148,7 @@ function getRangeType(oBBox){
 }
 
 	function getDefNameIndex(name) {
-		//можно создавать имена в разном регистре, но уникальность проверяется независимо от регистра
+		//uniqueness is checked without capitalization
 		return name ? name.toLowerCase() : name;
 	}
 
@@ -1249,10 +1245,6 @@ function getRangeType(oBBox){
 			}
 		}
 	};
-
-function getVertexId(sheetId, cellId){
-	return sheetId + AscCommon.g_cCharDelimiter + cellId;
-}
 
 function angleFormatToInterface(val)
 {
@@ -8929,7 +8921,7 @@ DrawingObjectsManager.prototype.rebuildCharts = function(data)
   window['AscCommonExcel'].aStandartNumFormats = aStandartNumFormats;
   window['AscCommonExcel'].aStandartNumFormatsId = aStandartNumFormatsId;
   window['AscCommonExcel'].oFormulaLocaleInfo = oFormulaLocaleInfo;
-  window['AscCommonExcel'].getVertexId = getVertexId;
+  window['AscCommonExcel'].getDefNameIndex = getDefNameIndex;
   window['AscCommonExcel'].angleFormatToInterface2 = angleFormatToInterface2;
   window['AscCommonExcel'].angleInterfaceToFormat = angleInterfaceToFormat;
   window['AscCommonExcel'].Workbook = Workbook;
