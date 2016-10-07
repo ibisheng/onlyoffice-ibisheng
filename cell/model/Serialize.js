@@ -3063,45 +3063,43 @@
             this.memory.WriteByte(c_oSerPropLenType.Variable);
             this.bs.WriteItemWithLength(function(){oThis.WriteCells(oRow);});
         };
-        this.WriteCells = function(row)
-        {
+        this.WriteCells = function (row) {
             var oThis = this;
             var aIndexes = [];
-			var bIsTablePartContainActiveRange;
-            if(oThis.isCopyPaste)
-            {
-                for(var i = oThis.isCopyPaste.c1; i <= oThis.isCopyPaste.c2; i++)
+            var bIsTablePartContainActiveRange;
+            if (oThis.isCopyPaste) {
+                for (var i = oThis.isCopyPaste.c1; i <= oThis.isCopyPaste.c2; i++) {
                     aIndexes.push(i);
-					
-				var api = window["Asc"]["editor"];
-				var ws = api.wb.getWorksheet();
-				bIsTablePartContainActiveRange = ws.model.autoFilters.isTablePartContainActiveRange(ws.activeRange);
-            }
-            else
-            {
-                for(var i in row.c)
+                }
+
+                var api = window["Asc"]["editor"];
+                var ws = api.wb.getWorksheet();
+                bIsTablePartContainActiveRange = ws.model.autoFilters.isTablePartContainActiveRange(ws.model.selectionRange.getLast());
+            } else {
+                for (var i in row.c) {
                     aIndexes.push(i - 0);
+                }
             }
             aIndexes.sort(AscCommon.fSortAscending);
-            for(var i = 0, length = aIndexes.length; i < length; ++i)
-            {
+            for (var i = 0, length = aIndexes.length; i < length; ++i) {
                 var cell = row.c[aIndexes[i]];
                 //готовим ячейку к записи
-                if(!oThis.isCopyPaste || (oThis.isCopyPaste && cell))
-                {	
-					var nXfsId;
-					var cellXfs = cell.xfs;
-					if(oThis.isCopyPaste && bIsTablePartContainActiveRange)
-					{
-						nXfsId = this.prepareXfs(cell.compiledXfs);
-						cellXfs = cell.compiledXfs;
-					}
-					else
-						nXfsId  = this.prepareXfs(cell.xfs);
-					
+                if (!oThis.isCopyPaste || (oThis.isCopyPaste && cell)) {
+                    var nXfsId;
+                    var cellXfs = cell.xfs;
+                    if (oThis.isCopyPaste && bIsTablePartContainActiveRange) {
+                        nXfsId = this.prepareXfs(cell.compiledXfs);
+                        cellXfs = cell.compiledXfs;
+                    } else {
+                        nXfsId = this.prepareXfs(cell.xfs);
+                    }
+
                     //сохраняем как и Excel даже пустой стиль(нужно чтобы убрать стиль строки/колонки)
-                    if(null != cellXfs || false == cell.isEmptyText())
-                        this.bs.WriteItem(c_oSerRowTypes.Cell, function(){oThis.WriteCell(cell, nXfsId, row.index);});
+                    if (null != cellXfs || false == cell.isEmptyText()) {
+                        this.bs.WriteItem(c_oSerRowTypes.Cell, function () {
+                            oThis.WriteCell(cell, nXfsId, row.index);
+                        });
+                    }
                 }
             }
         };
