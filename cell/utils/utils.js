@@ -1753,7 +1753,7 @@
 			this.isReplaceAll = false;					// заменить все (если у нас замена)
 
 			// внутренние переменные
-			this.activeRange = null;
+			this.activeCell = null;
 			this.indexInArray = 0;
 			this.countFind = 0;
 			this.countReplace = 0;
@@ -1774,7 +1774,7 @@
 			result.replaceWith = this.replaceWith;
 			result.isReplaceAll = this.isReplaceAll;
 
-			result.activeRange = this.activeRange ? this.activeRange.clone() : null;
+			result.activeCell = this.activeCell ? this.activeCell.clone() : null;
 			result.indexInArray = this.indexInArray;
 			result.countFind = this.countFind;
 			result.countReplace = this.countReplace;

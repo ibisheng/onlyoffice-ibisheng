@@ -10453,53 +10453,29 @@
 
 
     // ----- Search -----
-
-    WorksheetView.prototype._setActiveCell = function ( col, row ) {
-        var ar = this.activeRange, sc = ar.startCol, sr = ar.startRow, offs;
-
-        this.cleanSelection();
-
-        ar.assign( col, row, col, row );
-        ar.type = c_oAscSelectionType.RangeCells;
-        ar.startCol = col;
-        ar.startRow = row;
-
-        this._fixSelectionOfMergedCells();
-        this._fixSelectionOfHiddenCells();
-        this._drawSelection();
-
-        var x1 = this.getCellLeftRelative( this.activeRange.c1, /*pt*/0 ), y1 = this.getCellTopRelative( this.activeRange.r1, /*pt*/0 );
-
-        offs = this._calcActiveRangeOffset( x1, y1 );
-        if ( sc !== ar.startCol || sr !== ar.startRow ) {
-            this.handlers.trigger( "selectionNameChanged", this.getSelectionName( /*bRangeText*/false ) );
-            this.handlers.trigger( "selectionChanged", this.getSelectionInfo() );
-        }
-        return offs;
-    };
-
-    WorksheetView.prototype._isCellEqual = function ( c, r, options ) {
+    WorksheetView.prototype._isCellEqual = function (c, r, options) {
         var cell, cellText;
         // Не пользуемся RegExp, чтобы не возиться со спец.символами
-        var mc = this.model.getMergedByCell( r, c );
-        cell = mc ? this._getVisibleCell( mc.c1, mc.r1 ) : this._getVisibleCell( c, r );
+        var mc = this.model.getMergedByCell(r, c);
+        cell = mc ? this._getVisibleCell(mc.c1, mc.r1) : this._getVisibleCell(c, r);
         cellText = (options.lookIn === Asc.c_oAscFindLookIn.Formulas) ? cell.getValueForEdit() : cell.getValue();
-        if ( true !== options.isMatchCase ) {
+        if (true !== options.isMatchCase) {
             cellText = cellText.toLowerCase();
         }
-        if ( (cellText.indexOf( options.findWhat ) >= 0) && (true !== options.isWholeCell || options.findWhat.length === cellText.length) ) {
-            return (mc ? new asc_Range( mc.c1, mc.r1, mc.c1, mc.r1 ) : new asc_Range( c, r, c, r ));
+        if ((cellText.indexOf(options.findWhat) >= 0) &&
+          (true !== options.isWholeCell || options.findWhat.length === cellText.length)) {
+            return (mc ? new asc_Range(mc.c1, mc.r1, mc.c1, mc.r1) : new asc_Range(c, r, c, r));
         }
         return null;
     };
-    WorksheetView.prototype.findCellText = function ( options ) {
+    WorksheetView.prototype.findCellText = function (options) {
         var self = this;
-        if ( true !== options.isMatchCase ) {
+        if (true !== options.isMatchCase) {
             options.findWhat = options.findWhat.toLowerCase();
         }
-        var ar = options.activeRange ? options.activeRange : this.activeRange;
-        var c = ar.startCol;
-        var r = ar.startRow;
+        var ar = options.activeCell ? options.activeCell : this.model.selectionRange.activeCell;
+        var c = ar.col;
+        var r = ar.row;
         var minC = 0;
         var minR = 0;
         var maxC = this.cols.length - 1;
@@ -10508,86 +10484,82 @@
         var isEqual;
 
         // ToDo стоит переделать это место, т.к. для поиска не нужны измерения, а нужен только сам текст (http://bugzilla.onlyoffice.com/show_bug.cgi?id=26136)
-        this._prepareCellTextMetricsCache( new Asc.Range( 0, 0, this.model.getColsCount(), this.model.getRowsCount() ) );
+        this._prepareCellTextMetricsCache(new Asc.Range(0, 0, this.model.getColsCount(), this.model.getRowsCount()));
 
         function findNextCell() {
             var ct = undefined;
             do {
-                if ( options.scanByRows ) {
+                if (options.scanByRows) {
                     c += inc;
-                    if ( c < minC || c > maxC ) {
+                    if (c < minC || c > maxC) {
                         c = options.scanForward ? minC : maxC;
                         r += inc;
                     }
-                }
-                else {
+                } else {
                     r += inc;
-                    if ( r < minR || r > maxR ) {
+                    if (r < minR || r > maxR) {
                         r = options.scanForward ? minR : maxR;
                         c += inc;
                     }
                 }
-                if ( c < minC || c > maxC || r < minR || r > maxR ) {
+                if (c < minC || c > maxC || r < minR || r > maxR) {
                     return undefined;
                 }
-                ct = self._getCellTextCache( c, r, true );
-            } while ( !ct );
+                ct = self._getCellTextCache(c, r, true);
+            } while (!ct);
             return ct;
         }
 
-        while ( findNextCell() ) {
-            isEqual = this._isCellEqual( c, r, options );
-            if ( null !== isEqual ) {
+        while (findNextCell()) {
+            isEqual = this._isCellEqual(c, r, options);
+            if (null !== isEqual) {
                 return isEqual;
             }
         }
 
         // Продолжаем циклический поиск
-        if ( options.scanForward ) {
+        if (options.scanForward) {
             // Идем вперед с первой ячейки
             minC = 0;
             minR = 0;
-            if ( options.scanByRows ) {
+            if (options.scanByRows) {
                 c = -1;
                 r = 0;
 
                 maxC = this.cols.length - 1;
-                maxR = ar.startRow;
-            }
-            else {
+                maxR = ar.row;
+            } else {
                 c = 0;
                 r = -1;
 
-                maxC = ar.startCol;
+                maxC = ar.col;
                 maxR = this.rows.length - 1;
             }
-        }
-        else {
+        } else {
             // Идем назад с последней
             c = this.cols.length - 1;
             r = this.rows.length - 1;
-            if ( options.scanByRows ) {
+            if (options.scanByRows) {
                 minC = 0;
-                minR = ar.startRow;
-            }
-            else {
-                minC = ar.startCol;
+                minR = ar.row;
+            } else {
+                minC = ar.col;
                 minR = 0;
             }
             maxC = this.cols.length - 1;
             maxR = this.rows.length - 1;
         }
-        while ( findNextCell() ) {
-            isEqual = this._isCellEqual( c, r, options );
-            if ( null !== isEqual ) {
+        while (findNextCell()) {
+            isEqual = this._isCellEqual(c, r, options);
+            if (null !== isEqual) {
                 return isEqual;
             }
         }
         return null;
     };
 
-    WorksheetView.prototype.replaceCellText = function ( options, lockDraw, callback ) {
-        if ( true !== options.isMatchCase ) {
+    WorksheetView.prototype.replaceCellText = function (options, lockDraw, callback) {
+        if (true !== options.isMatchCase) {
             options.findWhat = options.findWhat.toLowerCase();
         }
 
@@ -10596,42 +10568,41 @@
         options.countReplace = 0;
 
         var t = this;
-        var ar = this.activeRange.clone();
+        var activeCell = this.model.selectionRange.activeCell.clone();
         var aReplaceCells = [];
-        if ( options.isReplaceAll ) {
+        if (options.isReplaceAll) {
             var aReplaceCellsIndex = {};
-            options.activeRange = ar;
+            options.activeCell = activeCell;
             var findResult, index;
-            while ( true ) {
-                findResult = t.findCellText( options );
-                if ( null === findResult ) {
+            while (true) {
+                findResult = t.findCellText(options);
+                if (null === findResult) {
                     break;
                 }
                 index = findResult.c1 + '-' + findResult.r1;
-                if ( aReplaceCellsIndex[index] ) {
+                if (aReplaceCellsIndex[index]) {
                     break;
                 }
                 aReplaceCellsIndex[index] = true;
-                aReplaceCells.push( findResult );
-                ar.startCol = findResult.c1;
-                ar.startRow = findResult.r1;
+                aReplaceCells.push(findResult);
+                activeCell.col = findResult.c1;
+                activeCell.row = findResult.r1;
             }
-        }
-        else {
+        } else {
             // Попробуем сначала найти
-            var isEqual = this._isCellEqual( ar.startCol, ar.startRow, options );
-            if ( null === isEqual ) {
-                return callback( options );
+            var isEqual = this._isCellEqual(activeCell.col, activeCell.row, options);
+            if (null === isEqual) {
+                return callback(options);
             }
 
-            aReplaceCells.push( isEqual );
+            aReplaceCells.push(isEqual);
         }
 
-        if ( 0 > aReplaceCells.length ) {
-            return callback( options );
+        if (0 > aReplaceCells.length) {
+            return callback(options);
         }
 
-        return this._replaceCellsText( aReplaceCells, options, lockDraw, callback );
+        return this._replaceCellsText(aReplaceCells, options, lockDraw, callback);
     };
 
     WorksheetView.prototype._replaceCellsText = function (aReplaceCells, options, lockDraw, callback) {
@@ -10668,47 +10639,49 @@
         }
     };
 
-    WorksheetView.prototype._replaceCellText = function ( aReplaceCells, valueForSearching, options, lockDraw, callback, oneUser ) {
-        var t = this;
-        if ( options.indexInArray >= aReplaceCells.length ) {
-            this.draw( lockDraw );
-            return callback( options );
-        }
+    WorksheetView.prototype._replaceCellText =
+      function (aReplaceCells, valueForSearching, options, lockDraw, callback, oneUser) {
+          var t = this;
+          if (options.indexInArray >= aReplaceCells.length) {
+              this.draw(lockDraw);
+              return callback(options);
+          }
 
-        var onReplaceCallback = function ( isSuccess ) {
-            var cell = aReplaceCells[options.indexInArray];
-            ++options.indexInArray;
-            if ( false !== isSuccess ) {
-                ++options.countReplace;
+          var onReplaceCallback = function (isSuccess) {
+              var cell = aReplaceCells[options.indexInArray];
+              ++options.indexInArray;
+              if (false !== isSuccess) {
+                  ++options.countReplace;
 
-                var c = t._getVisibleCell( cell.c1, cell.r1 );
+                  var c = t._getVisibleCell(cell.c1, cell.r1);
 
-                if ( c === undefined ) {
-                    asc_debug( "log", "Unknown cell's info: col = " + cell.c1 + ", row = " + cell.r1 );
-                }
-                else {
-                    var cellValue = c.getValueForEdit();
-                    cellValue = cellValue.replace( valueForSearching, options.replaceWith );
+                  if (c === undefined) {
+                      asc_debug("log", "Unknown cell's info: col = " + cell.c1 + ", row = " + cell.r1);
+                  } else {
+                      var cellValue = c.getValueForEdit();
+                      cellValue = cellValue.replace(valueForSearching, options.replaceWith);
 
-                    var oCellEdit = new asc_Range( cell.c1, cell.r1, cell.c1, cell.r1 );
-                    var v, newValue;
-                    // get first fragment and change its text
-                    v = c.getValueForEdit2().slice( 0, 1 );
-                    // Создаем новый массив, т.к. getValueForEdit2 возвращает ссылку
-                    newValue = [];
-                    newValue[0] = new AscCommonExcel.Fragment( {text: cellValue, format: v[0].format.clone()} );
+                      var oCellEdit = new asc_Range(cell.c1, cell.r1, cell.c1, cell.r1);
+                      var v, newValue;
+                      // get first fragment and change its text
+                      v = c.getValueForEdit2().slice(0, 1);
+                      // Создаем новый массив, т.к. getValueForEdit2 возвращает ссылку
+                      newValue = [];
+                      newValue[0] = new AscCommonExcel.Fragment({text: cellValue, format: v[0].format.clone()});
 
-                    t._saveCellValueAfterEdit( oCellEdit, c, newValue, /*flags*/undefined, /*skipNLCheck*/false, /*isNotHistory*/true, /*lockDraw*/true );
-                }
-            }
+                      t._saveCellValueAfterEdit(oCellEdit, c, newValue, /*flags*/undefined, /*skipNLCheck*/false,
+                        /*isNotHistory*/true, /*lockDraw*/true);
+                  }
+              }
 
-            window.setTimeout( function () {
-                t._replaceCellText( aReplaceCells, valueForSearching, options, lockDraw, callback, oneUser );
-            }, 1 );
-        };
+              window.setTimeout(function () {
+                  t._replaceCellText(aReplaceCells, valueForSearching, options, lockDraw, callback, oneUser);
+              }, 1);
+          };
 
-        return oneUser ? onReplaceCallback( true ) : this._isLockedCells( aReplaceCells[options.indexInArray], /*subType*/null, onReplaceCallback );
-    };
+          return oneUser ? onReplaceCallback(true) :
+            this._isLockedCells(aReplaceCells[options.indexInArray], /*subType*/null, onReplaceCallback);
+      };
 
     WorksheetView.prototype.findCell = function (reference, isViewerMode) {
         var mc, bNew = false;
