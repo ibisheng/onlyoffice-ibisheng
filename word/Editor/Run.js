@@ -11195,6 +11195,16 @@ ParaRun.prototype.Is_UseInDocument = function()
 {
 	return (this.Paragraph && true === this.Paragraph.Is_UseInDocument() && true === this.Is_UseInParagraph() ? true : false);
 };
+ParaRun.prototype.GetParaEnd = function()
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Content[nIndex].Type === para_End)
+			return this.Content[nIndex];
+	}
+
+	return null;
+};
 
 function CParaRunStartState(Run)
 {

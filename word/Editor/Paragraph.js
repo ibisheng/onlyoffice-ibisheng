@@ -14009,6 +14009,28 @@ Paragraph.prototype.Get_FootnotesList = function(oEngine)
 			return;
 	}
 };
+Paragraph.prototype.GetAutoWidthForDropCap = function()
+{
+	if (this.Is_Empty())
+	{
+		var oEndRun = this.Content[this.Content.length - 1];
+		if (!oEndRun || oEndRun.Type !== para_Run)
+			return 0;
+
+		var oParaEnd = oEndRun.GetParaEnd();
+		if (!oParaEnd)
+			return 0;
+
+		return oParaEnd.Get_WidthVisible();
+	}
+	else
+	{
+		if (this.Lines.length <= 0 || this.Lines[0].Ranges.length <= 0)
+			return 0;
+
+		return this.Lines[0].Ranges[0].W;
+	}
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;

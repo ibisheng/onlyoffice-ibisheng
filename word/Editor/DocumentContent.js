@@ -788,7 +788,7 @@ CDocumentContent.prototype.Recalculate_Page               = function(PageIndex, 
                 // отсутствует, когда, у нас ровно 1 параграф, с 1 строкой.
                 if (-1 === FrameW && 1 === FlowCount && 1 === Element.Lines.length && undefined === FramePr.Get_W())
                 {
-                    FrameW     = Element.Lines[0].Ranges[0].W;
+                    FrameW     = Element.GetAutoWidthForDropCap();
                     var ParaPr = Element.Get_CompiledPr2(false).ParaPr;
                     FrameW += ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
 

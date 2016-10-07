@@ -3065,9 +3065,9 @@ CDocument.prototype.private_RecalculateFlowParagraph         = function(RecalcIn
 
         if (-1 === FrameW && 1 === FlowCount && 1 === Element.Lines.length && undefined === FramePr.Get_W())
         {
-            FrameW     = Element.Lines[0].Ranges[0].W;
-            var ParaPr = Element.Get_CompiledPr2(false).ParaPr;
-            FrameW += ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
+			FrameW     = Element.GetAutoWidthForDropCap();
+			var ParaPr = Element.Get_CompiledPr2(false).ParaPr;
+			FrameW += ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
 
             // Если прилегание в данном случае не к левой стороне, тогда пересчитываем параграф,
             // с учетом того, что ширина буквицы должна быть FrameW
