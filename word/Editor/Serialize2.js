@@ -12116,7 +12116,7 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
             initMathRevisions(oSSup, props);
 			if (oParent)
 				oParent.addElementToContent(oSSup);
-			oSup.conten = oSSup.getUpperIterator();
+			oSup.content = oSSup.getUpperIterator();
 			oContent.content = oSSup.getBase();
         }
 		else if (c_oSer_OMathContentType.Sup === type)
@@ -12128,12 +12128,12 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
 				initMathRevisions(oSSup, props);
 				if (oParent)
 					oParent.addElementToContent(oSSup);
-				oSup.conten = oSSup.getUpperIterator();
+				oSup.content = oSSup.getUpperIterator();
 				oContent.content = oSSup.getBase();
 			}
 
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadMathArg(t,l,oSup.conten);
+                return oThis.ReadMathArg(t,l,oSup.content);
             });			
         }
 		else if (c_oSer_OMathContentType.Element === type)
@@ -12145,7 +12145,7 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
 				initMathRevisions(oSSup, props);
 				if (oParent)
 					oParent.addElementToContent(oSSup);
-				oSup.conten = oSSup.getUpperIterator();
+				oSup.content = oSSup.getUpperIterator();
 				oContent.content = oSSup.getBase();
 			}
 
