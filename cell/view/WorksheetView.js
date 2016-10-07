@@ -1263,6 +1263,11 @@
         }
     };
 
+    WorksheetView.prototype._getSelection = function () {
+        return (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
+          this.model.selectionRange;
+    };
+
     WorksheetView.prototype._fixVisibleRange = function ( range ) {
         var tmp;
         if ( null !== this.topLeftFrozenCell ) {
@@ -3833,20 +3838,22 @@
     };
 
     WorksheetView.prototype._drawFormulaRanges = function (arrRanges) {
-        var i, length = AscCommonExcel.c_oAscFormulaRangeBorderColor.length;
+        var i, ranges, length = AscCommonExcel.c_oAscFormulaRangeBorderColor.length;
         var strokeColor, colorIndex, uniqueColorIndex = 0, tmpColors = [];
         for (i = 0; i < arrRanges.length; ++i) {
-            var oFormulaRange = arrRanges[i].clone(true);
-            colorIndex = asc.getUniqueRangeColor(arrRanges, i, tmpColors);
-            if (null == colorIndex) {
-                colorIndex = uniqueColorIndex++;
-            }
-            tmpColors.push(colorIndex);
+            ranges = arrRanges[i].ranges;
+            for (var j = 0, l = ranges.length; j < l; ++j) {
+                colorIndex = asc.getUniqueRangeColor(ranges, j, tmpColors);
+                if (null == colorIndex) {
+                    colorIndex = uniqueColorIndex++;
+                }
+                tmpColors.push(colorIndex);
+                strokeColor = AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % length];
 
-            strokeColor = AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % length];
-            this._drawElements(this._drawSelectionElement, oFormulaRange,
-              AscCommonExcel.selectionLineType.Selection | (arrRanges[i].isName ? AscCommonExcel.selectionLineType.None :
-                AscCommonExcel.selectionLineType.Resize), strokeColor);
+                this._drawElements(this._drawSelectionElement, ranges[j],
+                  AscCommonExcel.selectionLineType.Selection | (ranges[j].isName ? AscCommonExcel.selectionLineType.None :
+                    AscCommonExcel.selectionLineType.Resize), strokeColor);
+            }
         }
     };
 
@@ -4042,27 +4049,23 @@
 
         if (0 < this.arrActiveFormulaRanges.length) {
             for (i = 0; i < this.arrActiveFormulaRanges.length; ++i) {
-                var activeFormula = this.arrActiveFormulaRanges[i].clone(true);
+                this.arrActiveFormulaRanges[i].ranges.forEach(function (item) {
+                    var arnIntersection = item.intersectionSimple(range);
+                    if (arnIntersection) {
+                        _x1 = t.cols[arnIntersection.c1].left - offsetX - t.width_3px;
+                        _x2 = arnIntersection.c2 > t.cols.length ? width :
+                        t.cols[arnIntersection.c2].left + t.cols[arnIntersection.c2].width - offsetX + t.width_1px +
+                        t.width_2px;
+                        _y1 = t.rows[arnIntersection.r1].top - offsetY - t.height_3px;
+                        _y2 = arnIntersection.r2 > t.rows.length ? height : t.rows[arnIntersection.r2].top + t.rows[arnIntersection.r2].height - offsetY +
+                          t.height_1px + t.height_2px;
 
-                activeFormula = activeFormula.intersection(range);
-                if (null === activeFormula) {
-                    // это ссылка из формулы на еще не добавленный рэндж
-                    continue;
-                }
-
-                // Координаты для range формулы
-                _x1 = this.cols[activeFormula.c1].left - offsetX - this.width_3px;
-                _x2 = activeFormula.c2 > this.cols.length ? width :
-                this.cols[activeFormula.c2].left + this.cols[activeFormula.c2].width - offsetX + this.width_3px;
-                _y1 = this.rows[activeFormula.r1].top - offsetY - this.height_3px;
-                _y2 = activeFormula.r2 > this.rows.length ? height :
-                this.rows[activeFormula.r2].top + this.rows[activeFormula.r2].height - offsetY + this.height_3px;
-
-                // Выбираем наибольший range для очистки
-                x1 = Math.min(x1, _x1);
-                x2 = Math.max(x2, _x2);
-                y1 = Math.min(y1, _y1);
-                y2 = Math.max(y2, _y2);
+                        x1 = Math.min(x1, _x1);
+                        x2 = Math.max(x2, _x2);
+                        y1 = Math.min(y1, _y1);
+                        y2 = Math.max(y2, _y2);
+                    }
+                });
             }
 
             // Вышли из редактора, очистим массив
@@ -6044,8 +6047,7 @@
         var targetArr = this.isFormulaEditMode ? 0 : -1;
 
         for (i = 0, l = arrRanges.length; i < l; ++i) {
-            oFormulaRange = arrRanges[i].clone(true);
-            oFormulaRange.isName = arrRanges[i].isName;
+            oFormulaRange = arrRanges[i].getLast();
             res = !oFormulaRange.isName &&
               this._hitInRange(oFormulaRange, AscCommonExcel.selectionLineType.Resize, vr, x, y, offsetX, offsetY);
             if (res) {
@@ -6396,10 +6398,8 @@
     };
 
     WorksheetView.prototype._fixSelectionOfMergedCells = function (fixedRange) {
-        var ar = fixedRange ? fixedRange :
-          ((this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
-            this.model.selectionRange.getLast());
-
+        var tmpSelection = this._getSelection();
+        var ar = fixedRange ? fixedRange : tmpSelection.getLast();
         if (!ar) {
             return;
         }
@@ -6420,7 +6420,9 @@
         }
         ar.r2 = ar.r1 === res.r1 ? res.r2 : res.r1;
         ar.normalize();
-        this.model.selectionRange.update();
+        if (!fixedRange) {
+            tmpSelection.update();
+        }
     };
 
     WorksheetView.prototype._findVisibleCol = function (from, dc, flag) {
@@ -6502,8 +6504,7 @@
 
     WorksheetView.prototype._moveActiveCellToXY = function (x, y) {
         var c, r;
-        var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
-          this.model.selectionRange.getLast();
+        var ar = this._getSelection().getLast();
 
         x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
         y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
@@ -6544,9 +6545,9 @@
     };
 
     WorksheetView.prototype._moveActiveCellToOffset = function (dc, dr) {
-        var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
-          this.model.selectionRange.getLast();
-        var activeCell = this.model.selectionRange.activeCell;
+        var tmpSelection = this._getSelection();
+        var ar = tmpSelection.getLast();
+        var activeCell = tmpSelection.activeCell;
         var mc = this.model.getMergedByCell(activeCell.row, activeCell.col);
         var c = mc ? (dc < 0 ? mc.c1 : dc > 0 ? Math.min(mc.c2, this.nColsCount - 1 - dc) : activeCell.col) :
           activeCell.col;
@@ -6574,12 +6575,12 @@
     };
 
     WorksheetView.prototype._calcSelectionEndPointByXY = function (x, y) {
-        var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
-          this.model.selectionRange.getLast();
+        var tmpSelection = this._getSelection();
+        var ar = tmpSelection.getLast();
         x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
         y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
 
-        var res = new asc_Range(this.model.selectionRange.activeCell.col, this.model.selectionRange.activeCell.row, this._findColUnderCursor(
+        var res = new asc_Range(tmpSelection.activeCell.col, tmpSelection.activeCell.row, this._findColUnderCursor(
           x).col, this._findRowUnderCursor(y).row, true);
         if (ar.type === c_oAscSelectionType.RangeCells) {
             this._fixSelectionOfMergedCells(res);
@@ -6588,14 +6589,13 @@
     };
 
     WorksheetView.prototype._calcSelectionEndPointByOffset = function (dc, dr) {
-        var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
-          this.model.selectionRange.getLast();
-        var startCol = this.model.selectionRange.activeCell.col, startRow = this.model.selectionRange.activeCell.row;
+        var tmpSelection = this._getSelection();
+        var ar = tmpSelection.getLast();
         var c1, r1, c2, r2, tmp;
-        tmp = asc.getEndValueRange(dc, startCol, ar.c1, ar.c2);
+        tmp = asc.getEndValueRange(dc, tmpSelection.activeCell.col, ar.c1, ar.c2);
         c1 = tmp.x1;
         c2 = tmp.x2;
-        tmp = asc.getEndValueRange(dr, startRow, ar.r1, ar.r2);
+        tmp = asc.getEndValueRange(dr, tmpSelection.activeCell.row, ar.r1, ar.r2);
         r1 = tmp.x1;
         r2 = tmp.x2;
 
@@ -6631,8 +6631,7 @@
     };
 
     WorksheetView.prototype._calcActiveRangeOffsetIsCoord = function (x, y) {
-        var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
-          this.model.selectionRange.getLast();
+        var ar = this._getSelection().getLast();
         if (this.isFormulaEditMode) {
             // Для формул нужно сделать ограничение по range (у нас хранится полный диапазон)
             if (ar.c2 >= this.nColsCount || ar.r2 >= this.nRowsCount) {
@@ -6673,8 +6672,7 @@
 
     WorksheetView.prototype._calcActiveRangeOffset = function () {
         var vr = this.visibleRange;
-        var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
-          this.model.selectionRange.getLast();
+        var ar = this._getSelection().getLast();
         if (this.isFormulaEditMode) {
             // Для формул нужно сделать ограничение по range (у нас хранится полный диапазон)
             if (ar.c2 >= this.nColsCount || ar.r2 >= this.nRowsCount) {
@@ -7346,8 +7344,7 @@
                 this.model.selectionRange.clean();
             }
         }
-        var ar = ((this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
-          this.model.selectionRange.getLast()).clone();
+        var ar = this._getSelection().getLast().clone();
         var ret = {};
         var isChangeSelectionShape = false;
 
@@ -7486,9 +7483,7 @@
         if (isCoord) {
             isChangeSelectionShape = this._checkSelectionShape();
         }
-        var lastActiveRange = this.model.selectionRange.getLast();
-        var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition] :
-          lastActiveRange;
+        var ar = this._getSelection().getLast();
 
         var newRange = isCoord ? this._calcSelectionEndPointByXY(x, y) : this._calcSelectionEndPointByOffset(x, y);
         var isEqual = newRange.isEqual(ar);
@@ -7519,8 +7514,8 @@
         this.model.workbook.handlers.trigger("asc_onHideComment");
 
         return isCoord ? this._calcActiveRangeOffsetIsCoord(x, y) : this._calcActiveRangeOffset(
-          this.getCellLeftRelative(x < 0 ? lastActiveRange.c1 : lastActiveRange.c2, /*pt*/0),
-          this.getCellTopRelative(y < 0 ? lastActiveRange.r1 : lastActiveRange.r2, /*pt*/0));
+          this.getCellLeftRelative(x < 0 ? ar.c1 : ar.c2, /*pt*/0),
+          this.getCellTopRelative(y < 0 ? ar.r1 : ar.r2, /*pt*/0));
     };
 
     // Окончание выделения
@@ -11335,41 +11330,53 @@
         this.draw( lockDraw );
     };
 
-    WorksheetView.prototype.enterCellRange = function ( editor ) {
-        if ( !this.isFormulaEditMode ) {
+    WorksheetView.prototype.enterCellRange = function (editor) {
+        if (!this.isFormulaEditMode) {
             return;
         }
 
-        var currentRange = this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition].clone();
-        var startCol = currentRange.startCol, startRow = currentRange.startRow;
+        var currentFormula = this.arrActiveFormulaRanges[this.arrActiveFormulaRangesPosition];
+        var currentRange = currentFormula.getLast().clone();
+        var activeCellId = currentFormula.activeCellId;
+        var activeCell = currentFormula.activeCell.clone();
         // Замерженную ячейку должны отдать только левую верхнюю.
-        var mergedRange = this.model.getMergedByCell( currentRange.r1, currentRange.c1 );
-        if ( mergedRange && currentRange.isEqual( mergedRange ) ) {
+        var mergedRange = this.model.getMergedByCell(currentRange.r1, currentRange.c1);
+        if (mergedRange && currentRange.isEqual(mergedRange)) {
             currentRange.r2 = currentRange.r1;
             currentRange.c2 = currentRange.c1;
         }
 
         /*            var defName = this.model.workbook.findDefinesNames(this.model.getName()+"!"+currentRange.getAbsName(),this.model.getId());
          console.log("defName #2 " + defName);*/
-        var sheetName = "", cFEWSO = editor.handlers.trigger( "getCellFormulaEnterWSOpen" );
-        if( editor.formulaIsOperator() && cFEWSO && cFEWSO.model.getId() != this.model.getId() ){
-            sheetName = parserHelp.getEscapeSheetName(this.model.getName())+"!";
+        var sheetName = "", cFEWSO = editor.handlers.trigger("getCellFormulaEnterWSOpen");
+        if (editor.formulaIsOperator() && cFEWSO && cFEWSO.model.getId() != this.model.getId()) {
+            sheetName = parserHelp.getEscapeSheetName(this.model.getName()) + "!";
         }
-        editor.enterCellRange( /*defName || */sheetName + currentRange.getAllRange().getName() );
+        editor.enterCellRange(/*defName || */sheetName + currentRange.getAllRange().getName());
 
-        for ( var tmpRange, i = 0; i < this.arrActiveFormulaRanges.length; ++i ) {
+        for (var tmpRange, i = 0; i < this.arrActiveFormulaRanges.length; ++i) {
             tmpRange = this.arrActiveFormulaRanges[i];
-            if ( tmpRange.isEqual( currentRange ) ) {
-                tmpRange.startCol = startCol;
-                tmpRange.startRow = startRow;
+            if (tmpRange.getLast().isEqual(currentRange)) {
+                tmpRange.activeCellId = activeCellId;
+                tmpRange.activeCell.col = activeCell.col;
+                tmpRange.activeCell.row = activeCell.row;
                 break;
             }
         }
     };
 
-    WorksheetView.prototype.addFormulaRange = function ( range ) {
-        var r = range !== undefined ? range : new asc_ActiveRange( this.activeRange.c1, this.activeRange.r1, this.activeRange.c2, this.activeRange.r2 );
-        this.arrActiveFormulaRanges.push( r );
+    WorksheetView.prototype.addFormulaRange = function (range) {
+        var r = this.model.selectionRange.clone();
+        if (range) {
+            r.assign2(range);
+            var lastSelection = r.getLast();
+            lastSelection.cursorePos = range.cursorePos;
+            lastSelection.formulaRangeLength = range.formulaRangeLength;
+            lastSelection.colorRangePos = range.colorRangePos;
+            lastSelection.colorRangeLength = range.colorRangeLength;
+            lastSelection.isName = range.isName;
+        }
+        this.arrActiveFormulaRanges.push(r);
         this.arrActiveFormulaRangesPosition = this.arrActiveFormulaRanges.length - 1;
         this._fixSelectionOfMergedCells();
     };
@@ -11377,7 +11384,7 @@
     WorksheetView.prototype.activeFormulaRange = function (range) {
         this.arrActiveFormulaRangesPosition = -1;
         for (var i = 0; i < this.arrActiveFormulaRanges.length; ++i) {
-            if (this.arrActiveFormulaRanges[i].isEqual(range)) {
+            if (this.arrActiveFormulaRanges[i].getLast().isEqual(range)) {
                 this.arrActiveFormulaRangesPosition = i;
                 return;
             }
@@ -11386,7 +11393,7 @@
     WorksheetView.prototype.removeFormulaRange = function (range) {
         this.arrActiveFormulaRangesPosition = -1;
         for (var i = 0; i < this.arrActiveFormulaRanges.length; ++i) {
-            if (this.arrActiveFormulaRanges[i].isEqual(range)) {
+            if (this.arrActiveFormulaRanges[i].getLast().isEqual(range)) {
                 this.arrActiveFormulaRanges.splice(i, 1);
                 return;
             }

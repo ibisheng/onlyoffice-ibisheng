@@ -211,6 +211,7 @@
 			this.r2 = r2;
 			this.refType1 = referenceType.R;
 			this.refType2 = referenceType.R;
+			this.type = c_oAscSelectionType.RangeCells;
 
 			return normalize ? this.normalize() : this;
 		}
@@ -233,6 +234,7 @@
 			var oRes = new Range(this.c1, this.r1, this.c2, this.r2, normalize);
 			oRes.refType1 = this.refType1;
 			oRes.refType2 = this.refType2;
+			oRes.type = this.type;
 			return oRes;
 		};
 
