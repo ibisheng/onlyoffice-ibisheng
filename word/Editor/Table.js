@@ -9172,7 +9172,9 @@ CTable.prototype =
         this.Set_TableBorder_InsideH(undefined);
         this.Set_TableCellMar(undefined, undefined, undefined, undefined);
         this.Set_TableInd(undefined);
-        this.Set_TableW(undefined, undefined);
+
+		if (false !== bClearMerge)
+			this.Set_TableW(undefined, undefined);
 
         var Count = this.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
