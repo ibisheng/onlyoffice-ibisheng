@@ -10697,7 +10697,7 @@
                 mc = selectionLast.isOneCell() ? this.model.getMergedByCell(selectionLast.r1, selectionLast.c1) : null;
                 defName = this.model.workbook.editDefinesNames(null,
                   new Asc.asc_CDefName(reference, parserHelp.get3DRef(this.model.getName(),
-                    (mc || ascRange).getAbsName())));
+                    (mc || selectionLast).getAbsName())));
                 bNew = true;
             }
 
