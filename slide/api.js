@@ -1824,7 +1824,7 @@ background-repeat: no-repeat;\
 	{
 		if (window["AscDesktopEditor"])
 		{
-			window["AscDesktopEditor"]["Copy"]();
+		    window["asc_desktop_copypaste"](this, "Copy");
 			return true;
 		}
 		return AscCommon.g_clipboardBase.Button_Copy();
@@ -1837,7 +1837,7 @@ background-repeat: no-repeat;\
 	{
 		if (window["AscDesktopEditor"])
 		{
-			window["AscDesktopEditor"]["Cut"]();
+		    window["asc_desktop_copypaste"](this, "Cut");
 			return true;
 		}
 		return AscCommon.g_clipboardBase.Button_Cut();
@@ -1846,7 +1846,7 @@ background-repeat: no-repeat;\
 	{
 		if (window["AscDesktopEditor"])
 		{
-			window["AscDesktopEditor"]["Paste"]();
+		    window["asc_desktop_copypaste"](this, "Paste");
 			return true;
 		}
 		
