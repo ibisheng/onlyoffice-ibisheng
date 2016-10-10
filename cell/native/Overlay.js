@@ -677,10 +677,10 @@ CAutoshapeTrack.prototype =
     {
         this.Native["PD_reset"]();
     },
-    transform3 : function(m)
+    transform3 : function(m, isNeedInvert, funcName)
     {
         var isNeedInvert = false;
-        this.Native["PD_transform3"](m.sx,m.shy,m.shx,m.sy,m.tx,m.ty,isNeedInvert);
+        this.Native[funcName ? funcName : "PD_transform3"](m.sx,m.shy,m.shx,m.sy,m.tx,m.ty,isNeedInvert);
     },
     transform : function(sx,shy,shx,sy,tx,ty)
     {

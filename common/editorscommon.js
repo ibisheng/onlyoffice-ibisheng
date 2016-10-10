@@ -269,24 +269,7 @@ function openFileCommand(binUrl, changesUrl, Signature, callback) {
   var sFileUrl = binUrl;
   sFileUrl = sFileUrl.replace(/\\/g, "/");
  
-  if (window['IS_NATIVE_EDITOR']) {
-    result = window["native"]["openFileCommand"](sFileUrl, changesUrl, Signature);
- 
-    var url;
-    var nIndex = sFileUrl.lastIndexOf("/");
-    url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
-    if (0 < result.length) {
-        oResult.bSerFormat = Signature === result.substring(0, Signature.length);
-        oResult.data = result;
-        oResult.url = url;
-    } else {
-        bError = true;
-    }
- 
-    bEndLoadFile = true;
-    onEndOpen();
- } else {
- 
+  if (!window['IS_NATIVE_EDITOR']) {
     asc_ajax({
     url: sFileUrl,
     dataType: "text",
@@ -335,8 +318,27 @@ function openFileCommand(binUrl, changesUrl, Signature, callback) {
   } else {
     bEndLoadChanges = true;
   }
-}
-function sendCommand(editor, fCallback, rdata, dataContainer) {
+ 
+    if (window['IS_NATIVE_EDITOR']) {
+        result = window["native"]["openFileCommand"](sFileUrl, changesUrl, Signature);
+ 
+        var url;
+        var nIndex = sFileUrl.lastIndexOf("/");
+        url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
+        if (0 < result.length) {
+            oResult.bSerFormat = Signature === result.substring(0, Signature.length);
+            oResult.data = result;
+            oResult.url = url;
+        } else {
+            bError = true;
+        }
+ 
+        bEndLoadFile = true;
+        onEndOpen();
+    }
+ 
+ }
+ function sendCommand(editor, fCallback, rdata, dataContainer) {
   //json не должен превышать размера 2097152, иначе при его чтении будет exception
   var docConnectionId = editor.CoAuthoringApi.getDocId();
   if (docConnectionId && docConnectionId !== rdata["id"]) {

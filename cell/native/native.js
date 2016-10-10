@@ -2709,7 +2709,7 @@ function OfflineEditor () {
     this.beforeOpen = function() {
 
         var offlineEditor = this;
-
+        
         function __selectDrawingObjectRange(drawing, worksheet) {
             worksheet.cleanSelection();
             worksheet.arrActiveChartsRanges = [];
@@ -3758,6 +3758,17 @@ function OfflineEditor () {
     };
 
     this.openFile = function(settings) {
+     
+        window["NativeSupportTimeouts"] = true;
+        
+        try
+        {
+        throw "OpenFile";
+        }
+        catch (e)
+        {
+            
+        }
 
         this.initSettings = settings;
         
@@ -3787,42 +3798,34 @@ function OfflineEditor () {
 
         this.registerEventsHandlers();
         
-        _api.asc_setAutoSaveGap(1);
-        
-        _api.asc_nativeOpenFile(window.native["GetFileString"](), undefined, true);
-
-        _api.asc_SetFastCollaborative(true);
-
-        this.asc_WriteAllWorksheets(true);
-
-        _api.asc_SendThemeColorScheme();
-        _api.asc_ApplyColorScheme(false);
-        _api._applyFirstLoadChanges();
-
-        window["NativeSupportTimeouts"] = true;
-
-        var ws = _api.wb.getWorksheet();
-
-        _api.wb.showWorksheet(undefined, false, true);
-        ws._fixSelectionOfMergedCells();
-
-        if (ws.topLeftFrozenCell) {
-            this.row0 = ws.topLeftFrozenCell.getRow0();
-            this.col0 = ws.topLeftFrozenCell.getCol0();
+        if (this.initSettings.iscoauthoring) {
+            _api.asc_setAutoSaveGap(1);
+            _api._coAuthoringInit();
+            _api.asc_SetFastCollaborative(true);
+        } else {
+            _api.asc_nativeOpenFile(window.native["GetFileString"](), undefined, true);
+            
+            this.asc_WriteAllWorksheets(true);
+            
+            _api.asc_SendThemeColorScheme();
+            _api.asc_ApplyColorScheme(false);
+            _api._applyFirstLoadChanges();
+            
+            var ws = _api.wb.getWorksheet();
+            
+            _api.wb.showWorksheet(undefined, false, true);
+            ws._fixSelectionOfMergedCells();
+            
+            if (ws.topLeftFrozenCell) {
+                this.row0 = ws.topLeftFrozenCell.getRow0();
+                this.col0 = ws.topLeftFrozenCell.getCol0();
+            }
+            
+            // TODO: Implement frozen places
+            // TODO: Implement Text Art Styles
         }
-
-        // TODO: Implement frozen places
-        // TODO: Implement Text Art Styles
-
-        this.offline_afteInit();
         
-        setInterval(function() {
-                    
-                    //checkAUtoSave();
-                    //console.log("autosave");
-                    
-                    _api._autoSave();
-                    }, 100);
+        this.offline_afteInit();
     };
     this.registerEventsHandlers = function () {
 
@@ -3930,6 +3933,12 @@ function OfflineEditor () {
                          _api.CoAuthoringApi.auth(false, // this.getViewMode()
                                                            rData);
         });
+        
+        _api.asc_registerCallback('asc_onDocumentUpdateVersion', function(callback) {
+                                  var me = this;
+                                  me.needToUpdateVersion = true;
+                                  if (callback) callback.call(me);
+                                  });
     };
     this.updateFrozen = function () {
         var ws = _api.wb.getWorksheet();
@@ -5848,9 +5857,11 @@ function offline_cell_editor_close(x, y, width, height, ratio) {
 
     if (cellEditor.close(true)) {
         _api.wb.getWorksheet().handlers.trigger('applyCloseEvent', e);
+        console.log("_api.wb.getWorksheet().handlers.trigger('applyCloseEvent', e);");
     } else {
         cellEditor.close();
         length = 0;
+        console.log("cellEditor.close();");
     }
 
     _api.wb._onWSSelectionChanged(null);
@@ -7203,7 +7214,7 @@ function offline_apply_event(type,params) {
 
             var dataObject = JSON.parse(params);
             
-           // console.log(params + " : " + dataObject['type']);
+            console.log("JS - " + dataObject['type']);
             
             switch (dataObject['type']) {
                 case 'auth'        :
@@ -7264,3 +7275,125 @@ function offline_apply_event(type,params) {
 
     return _return;
 }
+
+function testLockedObjects () {
+    var worksheet = _api.wb.getWorksheet();
+    var objectRender = worksheet.objectRender;
+    var aObjects = worksheet.model.Drawings;
+    
+    var overlay = objectRender.getDrawingCanvas().autoShapeTrack;
+    if (!overlay)
+        return;
+    
+    overlay.Native["PD_DrawLockedObjectsBegin"]();
+    
+    for (var i = 0; i < aObjects.length; i++) {
+        var drawingObject = aObjects[i];
+        
+        if (drawingObject.isGraphicObject()) {
+            var drawingArea = objectRender.drawingArea;
+            objectRender.drawingArea.reinitRanges();
+            for (var j = 0; j < drawingArea.frozenPlaces.length; ++j) {
+                if (drawingArea.frozenPlaces[j].isObjectInside(drawingObject)) {
+                    
+                    //var canvas = _this.worksheet.objectRender.getDrawingCanvas();
+                   // _this.setTransform(canvas.shapeCtx, canvas.shapeOverlayCtx, canvas.autoShapeTrack);
+                    
+                   // _this.clip(canvas.shapeCtx);
+                    //object.graphicObject.draw(canvas.shapeCtx);
+                    
+                    // Lock
+                    if ( (drawingObject.graphicObject.lockType != undefined) && (drawingObject.graphicObject.lockType != AscCommon.c_oAscLockTypes.kLockTypeNone) ) {
+                        //canvas.shapeCtx.SetIntegerGrid(false);
+                        //canvas.shapeCtx.transform3(object.graphicObject.transform, false);
+                        //canvas.shapeCtx.DrawLockObjectRect(object.graphicObject.lockType, 0, 0, object.graphicObject.extX, object.graphicObject.extY );
+                        //canvas.shapeCtx.reset();
+                        //canvas.shapeCtx.SetIntegerGrid(true);
+                        
+                        overlay.transform3(drawingObject.graphicObject.transform, false, "PD_LockObjectTransform");
+                        overlay.Native["PD_DrawLockObjectRect"](drawingObject.graphicObject.lockType, 0, 0, drawingObject.graphicObject.extX, drawingObject.graphicObject.extY);
+                        console.log("lockType : " + drawingObject.graphicObject.lockType);
+                    }
+                    else
+                    {
+                        
+                    }
+                    
+                    //_this.restore(canvas.shapeCtx);
+                    
+                }
+            }
+        }
+    }
+    
+    overlay.Native["PD_DrawLockedObjectsEnd"]();
+}
+
+window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
+    //asc["editor"] = this;
+    
+    var t = this;
+    
+    setTimeout(function() {
+               
+               console.log("JS - openDocument()");
+               
+               t.wbModel = t._openDocument(sData);
+               t.wb = new AscCommonExcel.WorkbookView(t.wbModel, t.controller, t.handlers,
+                                                      window["_null_object"], window["_null_object"], t,
+                                                      t.collaborativeEditing, t.fontRenderingMode);
+               t.DocumentLoadComplete = true;
+               
+               t.asc_CheckGuiControlColors();
+               t.asc_SendThemeColorScheme();
+               t.asc_ApplyColorScheme(false);
+               
+               t.sendStandartTextures();
+               
+               console.log("JS - applyFirstLoadChanges() before");
+               
+               // Применяем пришедшие при открытии изменения
+               t._applyFirstLoadChanges();
+               // Применяем все lock-и (ToDo возможно стоит пересмотреть вообще Lock-и)
+               for (var i = 0; i < t.arrPreOpenLocksObjects.length; ++i) {
+                    t.arrPreOpenLocksObjects[i]();
+               }
+               t.arrPreOpenLocksObjects = [];
+               
+               // Меняем тип состояния (на никакое)
+               t.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.None
+               
+               // Были ошибки при открытии, посылаем предупреждение
+               if (0 < t.wbModel.openErrors.length) {
+                    t.sendEvent('asc_onError', c_oAscError.ID.OpenWarning, c_oAscError.Level.NoCritical);
+               }
+               
+               console.log("JS - applyFirstLoadChanges() after");
+               
+               setTimeout(function() {
+                          
+                          t.wb.showWorksheet(undefined, false, true);
+                          console.log("JS - showWorksheet()");
+                         
+                          var ws = t.wb.getWorksheet();
+                          console.log("JS - getWorksheet()");
+                         
+                          window.native["onEndLoadingFile"](ws.headersWidth, ws.headersHeight);
+                          console.log("JS - onEndLoadingFile()");
+                          
+                          _s.asc_WriteAllWorksheets(true);
+                          
+                          setInterval(function() {                                      
+                                      
+                                      _api._autoSave();
+                                      
+                                      testLockedObjects();
+                                      
+                                      }, 100);
+                          
+                          console.log("JS - openDocument()");
+                          
+                          }, 5);
+               
+               }, 5);
+};
