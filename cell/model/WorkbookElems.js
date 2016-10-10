@@ -261,7 +261,7 @@ ThemeColor.prototype =
         if(this.theme !== oColor.theme){
             return false;
         }
-        if(this.tint  !==  oColor.tint){
+        if(!AscFormat.fApproxEqual(this.tint, oColor.tint)){
             return false;
         }
         return true;
@@ -1387,7 +1387,7 @@ Align.prototype =
 {
 	_mergeProperty : function(first, second, def)
 	{
-		if(false == def.isEqual(first))
+		if (def != first)
 			return first;
 		else
 			return second;
@@ -4848,28 +4848,28 @@ CellArea.prototype = {
 	};
 
 	sparklineGroup.prototype.isEqualColors = function(oSparklineGroup){
-		if(this.colorSeries && !this.colorSeries.isEqual(oSparklineGroup.colorSeries) || oSparklineGroup.colorSeries){
+		if(this.colorSeries && !this.colorSeries.isEqual(oSparklineGroup.colorSeries) || !this.colorSeries && oSparklineGroup.colorSeries){
 			return false;
 		}
-        if(this.colorNegative && !this.colorNegative.isEqual(oSparklineGroup.colorNegative) || oSparklineGroup.colorNegative){
+        if(this.colorNegative && !this.colorNegative.isEqual(oSparklineGroup.colorNegative) || !this.colorNegative && oSparklineGroup.colorNegative){
             return false;
         }
-        if(this.colorAxis && !this.colorAxis.isEqual(oSparklineGroup.colorAxis) || oSparklineGroup.colorAxis){
+        /*if(this.colorAxis && !this.colorAxis.isEqual(oSparklineGroup.colorAxis) || !this.colorAxis && oSparklineGroup.colorAxis){
+            return false;
+        }*/
+        if(this.colorMarkers && !this.colorMarkers.isEqual(oSparklineGroup.colorMarkers) || !this.colorMarkers && oSparklineGroup.colorMarkers){
             return false;
         }
-        if(this.colorMarkers && !this.colorMarkers.isEqual(oSparklineGroup.colorMarkers) || oSparklineGroup.colorMarkers){
+        if(this.colorFirst && !this.colorFirst.isEqual(oSparklineGroup.colorFirst) || !this.colorFirst && oSparklineGroup.colorFirst){
             return false;
         }
-        if(this.colorFirst && !this.colorFirst.isEqual(oSparklineGroup.colorFirst) || oSparklineGroup.colorFirst){
+        if(this.colorLast && !this.colorLast.isEqual(oSparklineGroup.colorLast) || !this.colorLast && oSparklineGroup.colorLast){
             return false;
         }
-        if(this.colorLast && !this.colorLast.isEqual(oSparklineGroup.colorLast) || oSparklineGroup.colorLast){
+        if(this.colorHigh && !this.colorHigh.isEqual(oSparklineGroup.colorHigh) || !this.colorHigh && oSparklineGroup.colorHigh){
             return false;
         }
-        if(this.colorHigh && !this.colorHigh.isEqual(oSparklineGroup.colorHigh) || oSparklineGroup.colorHigh){
-            return false;
-        }
-        if(this.colorLow && !this.colorLow.isEqual(oSparklineGroup.colorLow) || oSparklineGroup.colorLow){
+        if(this.colorLow && !this.colorLow.isEqual(oSparklineGroup.colorLow) || !this.colorLow && oSparklineGroup.colorLow){
             return false;
         }
         return true;
@@ -4879,7 +4879,7 @@ CellArea.prototype = {
 	{
 		var aRet = [];
         var nStyleIndex = -1;
-		for(var i = 0; i < 35; ++i){
+		for(var i = 0; i < 36; ++i){
 			var oSparklineGroup = this.asc_createSparklineGroupByStyle(i);
             if(nStyleIndex === -1 && this.isEqualColors(oSparklineGroup)){
                 nStyleIndex = i;

@@ -53,6 +53,8 @@ var c_oAscError = Asc.c_oAscError;
 	{
 		this.asc_registerCallback('asc_onDocumentContentReady', function(){
 			DesktopOfflineUpdateLocalName(window["Asc"]["editor"]);
+
+			setTimeout(function(){window["UpdateInstallPlugins"]();}, 10);
 		});
 	
 		window["AscDesktopEditor"]["LocalStartOpen"]();

@@ -285,9 +285,9 @@ CLimit.prototype.ApplyProperties = function(RPI)
 };
 CLimit.prototype.Apply_MenuProps = function(Props)
 {
-    if(Props.Type == c_oAscMathInterfaceType.Limit && Props.Pos !== undefined)
+    if(Props.Type == Asc.c_oAscMathInterfaceType.Limit && Props.Pos !== undefined)
     {
-        var Type = Props.Pos == c_oAscMathInterfaceLimitPos.Bottom ? LIMIT_LOW : LIMIT_UP;
+        var Type = Props.Pos == Asc.c_oAscMathInterfaceLimitPos.Bottom ? LIMIT_LOW : LIMIT_UP;
 
         if(this.Pr.type !== Type)
         {
@@ -324,11 +324,11 @@ function CMathMenuLimit(Limit)
 {
     CMathMenuLimit.superclass.constructor.call(this, Limit);
 
-    this.Type = c_oAscMathInterfaceType.Limit;
+    this.Type = Asc.c_oAscMathInterfaceType.Limit;
 
     if (undefined !== Limit)
     {
-        this.Pos  = (LIMIT_LOW === Limit.Pr.type) ? c_oAscMathInterfaceLimitPos.Bottom : c_oAscMathInterfaceLimitPos.Top;
+        this.Pos  = (LIMIT_LOW === Limit.Pr.type) ? Asc.c_oAscMathInterfaceLimitPos.Bottom : Asc.c_oAscMathInterfaceLimitPos.Top;
     }
     else
     {

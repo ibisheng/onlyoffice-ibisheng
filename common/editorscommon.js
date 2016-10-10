@@ -268,7 +268,7 @@ function openFileCommand(binUrl, changesUrl, Signature, callback) {
   };
   var sFileUrl = binUrl;
   sFileUrl = sFileUrl.replace(/\\/g, "/");
- 
+
   if (!window['IS_NATIVE_EDITOR']) {
     asc_ajax({
     url: sFileUrl,

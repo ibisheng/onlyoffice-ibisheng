@@ -8443,15 +8443,23 @@ CChartSpace.prototype.recalculatePlotAreaChartBrush = function()
         }
         else
         {
-            var tint = 0.20000;
-            if(this.style >=1 && this.style <=32)
-                default_brush = CreateUnifillSolidFillSchemeColor(6, tint);
-            else if(this.style >=33 && this.style <= 34)
-                default_brush = CreateUnifillSolidFillSchemeColor(8, 0.20000);
-            else if(this.style >=35 && this.style <=40)
-                default_brush = CreateUnifillSolidFillSchemeColor(this.style - 35, 0 + tint);
-            else
-                default_brush = CreateUnifillSolidFillSchemeColor(8, 0.95000);
+            if(this.chart.plotArea && this.chart.plotArea.charts[0] &&
+                (this.chart.plotArea.charts[0].getObjectType() === AscDFH.historyitem_type_PieChart
+                || this.chart.plotArea.charts[0].getObjectType() === AscDFH.historyitem_type_DoughnutChart))
+            {
+                default_brush = CreateNoFillUniFill();
+            }
+            else {
+                var tint = 0.20000;
+                if(this.style >=1 && this.style <=32)
+                    default_brush = CreateUnifillSolidFillSchemeColor(6, tint);
+                else if(this.style >=33 && this.style <= 34)
+                    default_brush = CreateUnifillSolidFillSchemeColor(8, 0.20000);
+                else if(this.style >=35 && this.style <=40)
+                    default_brush = CreateUnifillSolidFillSchemeColor(this.style - 35, tint);
+                else
+                    default_brush = CreateUnifillSolidFillSchemeColor(8, 0.95000);
+            }
         }
         if(plot_area.spPr && plot_area.spPr.Fill)
         {

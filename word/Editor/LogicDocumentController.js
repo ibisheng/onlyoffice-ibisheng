@@ -369,3 +369,7 @@ CLogicDocumentController.prototype.GetColumnSize = function()
 {
 	return this.LogicDocument.controller_GetColumnSize();
 };
+CLogicDocumentController.prototype.GetCurrentSectionPr = function()
+{
+	return this.LogicDocument.controller_GetCurrentSectionPr();
+};

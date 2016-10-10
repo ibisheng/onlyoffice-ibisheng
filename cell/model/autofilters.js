@@ -796,36 +796,62 @@
 			
 			getAddFormatTableOptions: function(activeCells, userRange)
 			{
-				var objOptions = new AddFormatTableOptions();
+				var res;
 				
 				if(userRange)
-					activeCells = AscCommonExcel.g_oRangeCache.getAscRange(userRange);
-				
-				var alreadyAddFilter = this._searchFilters(activeCells, false);
-				//в случае если меняем стиль фильтра
-				if((alreadyAddFilter && alreadyAddFilter.changeStyle) ||(alreadyAddFilter && !alreadyAddFilter.containsFilter && !alreadyAddFilter.all))
-					return false;
-				
-				var mainAdjacentCells;
-				if(alreadyAddFilter && alreadyAddFilter.all && activeCells && alreadyAddFilter.range && !activeCells.containsRange(alreadyAddFilter.range) && !alreadyAddFilter.changeAllFOnTable)
-					mainAdjacentCells = activeCells;
-				else if(alreadyAddFilter && alreadyAddFilter.changeAllFOnTable && alreadyAddFilter.range)//если к фильтру применяем форматированную таблицу
-					mainAdjacentCells = alreadyAddFilter.range;
-				else if(activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2)//если ячейка выделенная одна
-					mainAdjacentCells = this._getAdjacentCellsAF(activeCells);
-				else//выделено > 1 ячейки
 				{
-					//TODO если выделен весь столбец - нужно посмотреть, нет ли пересекающих его объедененных строчек
-					mainAdjacentCells = activeCells;
+					activeCells = AscCommonExcel.g_oRangeCache.getAscRange(userRange);
 				}
+				
+				//данная функция возвращает false в двух случаях - при смене стиля ф/т или при поптыке добавить ф/т к части а/ф
+				
+				//TODO переделать взаимодействие с меню. если находимся внутри ф/т - вызывать сразу из меню смену стиля ф/т. 
+				//для проверки возможности добавить ф/т - попробовать использовать parserHelper.checkDataRange
+				var bIsInFilter = this._searchRangeInFilters(activeCells);
+				var addRange;
+				if(false === bIsInFilter)
+				{
+					res = false;
+				}
+				else
+				{
+					if(null === bIsInFilter)
+					{
+						if(activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2)//если ячейка выделенная одна
+						{
+							addRange = this._getAdjacentCellsAF(activeCells);
+						}
+						else
+						{
+							addRange = activeCells;
+						}
+					}
+					else//range внутри а/ф или ф/т
+					{
+						if(bIsInFilter.isAutoFilter())
+						{
+							addRange = bIsInFilter.Ref;
+						}
+						else
+						{
+							res = false;
+						}
+					}
 					
-				//имеется ввиду то, что при выставленном флаге title используется первая строка в качестве заголовка, в противном случае - добавлются заголовки
-				var isTitle = this._isAddNameColumn(mainAdjacentCells);
-				objOptions.asc_setIsTitle(isTitle);
-				var tmpRange = mainAdjacentCells.clone();
-				tmpRange.setAbs(true, true, true, true);
-				objOptions.asc_setRange(tmpRange.getName());
-				return objOptions;
+					if(false !== res)
+					{
+						res = new AddFormatTableOptions();
+
+						var bIsTitle = this._isAddNameColumn(addRange);
+						var range = addRange.clone();
+						
+						addRange.setAbs(true, true, true, true);
+						res.asc_setIsTitle(bIsTitle);
+						res.asc_setRange(range.getName());
+					}
+				}
+				
+				return res;
 			},
 			
 			
@@ -4011,166 +4037,6 @@
 				}
 			},
 			
-			//TODO CHANGE!!!
-			_searchFilters: function(activeCells, isAll)
-			{
-				// ToDo по хорошему стоит порефакторить код. ws.model легко можно заменить на aWs (хотя aWs как мне кажется не совсем хорошее название)
-				// Условие на вхождение диапазона заменить на containsRange. Возвращаемое значение привести к одному типу
-				// После правки поправить функцию parserHelper.checkDataRange
-				var worksheet = this.worksheet;
-				var allF =[];
-				
-				if(worksheet.AutoFilter)
-				{
-					allF[0] = worksheet.AutoFilter
-				}
-				
-				if(worksheet.TableParts)
-				{
-					var s = 1;
-					if(!allF[0])
-						s = 0;
-					for(var k = 0; k < worksheet.TableParts.length; k++)
-					{
-						if(worksheet.TableParts[k])
-						{
-							allF[s] = worksheet.TableParts[k];
-							s++;
-						}
-					}
-				}
-				
-				var num = -1;
-				var numAll = -1;
-				if(typeof activeCells == 'string')
-				{
-					var newCell = worksheet.getCell(new CellAddress(activeCells));
-					if(newCell)
-					{
-						activeCells = 
-						{
-							c1: newCell.first.col -1,
-							c2: newCell.first.col -1,
-							r1: newCell.first.row -1,
-							r2: newCell.first.row -1
-						};
-					}
-					
-				}
-				for(var i = 0; i < allF.length; i++)
-				{
-					if(!allF[i].Ref || allF[i].Ref == "")
-						continue;
-
-					var range = allF[i].Ref;
-					
-					if(!allF[i].AutoFilter && !allF[i].TableStyleInfo)
-					{
-						numAll = 
-						{
-							num: i,
-							range: range,
-							all: true
-						}
-					}
-					if(activeCells.c1 >= range.c1 && activeCells.c2 <= range.c2 && activeCells.r1 >= range.r1 && activeCells.r2 <= range.r2)
-					{
-						var curRange = range.clone();
-						if(allF[i].TableStyleInfo)
-						{
-							if(!allF[i].AutoFilter)
-							{
-								num = 
-								{
-									num: i,
-									range: range,
-									all: false,
-									containsFilter: false
-								}
-							}
-							else
-							{
-								if(isAll)
-								{
-									num = 
-									{
-										num: i,
-										range: range,
-										all: false,
-										containsFilter: true
-									}
-								}
-								else
-								{
-									num = 
-									{
-										num: i,
-										range: range,
-										all: false,
-										changeStyle: true
-									}
-								}
-								
-							}
-						}
-						else
-						{
-							if(allF[i].isAutoFilter())
-							{
-								if(isAll === false && activeCells && range && !activeCells.containsRange(range) && !(range.containsRange(activeCells) && activeCells.c1 == activeCells.c2 && activeCells.r1 == activeCells.r2))//если задеваем часть примененного фильтра и добавляем форматированную таблицу
-								{
-									num = 'error';
-								}
-								else
-								{
-									num = 
-									{
-										num: i,
-										range: range,
-										all: true
-									}
-								}
-							}
-							else
-							{
-								num = 
-								{
-									num: i,
-									range: range,
-									all: false
-								}
-							}
-						}
-					}
-					else if(num == -1)
-					{
-						if(this._crossRange(activeCells,range))
-						{
-							//если мы находимся в общем фильтре и нажали на кнопку общего фильтра - тогда нет ошибки
-							if(!(allF[i].isAutoFilter() && allF[i].Ref.r1 === activeCells.r1))
-							{
-								if(!(worksheet.AutoFilter && i == 0 && isAll == true)/* && allF[i].AutoFilter !== undefined*/)
-									num = 'error';
-							}
-							
-						}
-					}
-				}
-				
-				if(!isAll && num != -1 && curRange && activeCells.c1 >= curRange.c1 && activeCells.c2 <= curRange.c2 && activeCells.r1 >= curRange.r1 && activeCells.r2 <= curRange.r2 && num.all == true)
-					num.changeAllFOnTable = true;
-				
-				if(isAll && num == -1 && numAll == -1)//значит в этом случае общий фильтр отключен
-				{
-					return false;
-				}
-				else if(isAll && num == -1)//в зоне общего фильтра
-					return numAll;
-				else if(num != -1)//внутри локального фильтра
-					return num;
-					
-			},
-			
 			_isAddNameColumn: function(range)
 			{
 				//если в трёх первых строчках любых столбцов содержится текстовые данные
@@ -4599,6 +4465,41 @@
 				
 				if(!result.length)
 					result = false;
+				
+				return result;
+			},
+			
+			_searchRangeInFilters: function(range)//find filters in this range
+			{
+				var result = null;
+				var worksheet = this.worksheet;
+				
+				if(worksheet.AutoFilter)
+				{
+					if(worksheet.AutoFilter.Ref.containsRange(range))
+					{
+						result = worksheet.AutoFilter;
+					}
+					else if(worksheet.AutoFilter.Ref.intersection(range))
+					{
+						result = false;
+					}
+				}
+				
+				if(worksheet.TableParts && null === result)
+				{
+					for(var i = 0; i < worksheet.TableParts.length; i++)
+					{
+						if(worksheet.TableParts[i])
+						{
+							if(worksheet.TableParts[i].Ref.containsRange(range))
+							{
+								result = worksheet.TableParts[i];
+								break;
+							}
+						}
+					}
+				}
 				
 				return result;
 			},

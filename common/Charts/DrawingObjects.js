@@ -308,7 +308,6 @@ var aSparklinesStyles =
     [
         [0xFF000000],
         [0xFF0070C0],
-        [0xFF000000],
         [0xFF0070C0],
         [0xFF0070C0],
         [0xFF0070C0],
@@ -318,7 +317,6 @@ var aSparklinesStyles =
     [
         [0xFF376092],
         [0xFFD00000],
-        [0xFF000000],
         [0xFFD00000],
         [0xFFD00000],
         [0xFFD00000],
@@ -326,8 +324,7 @@ var aSparklinesStyles =
         [0xFFD00000]
     ],
     [
-    [0xFF0070C0],
-        [0xFF000000],
+        [0xFF0070C0],
         [0xFF000000],
         [0xFF000000],
         [0xFF000000],
@@ -338,7 +335,6 @@ var aSparklinesStyles =
     [
         [0xFF5F5F5F],
         [0xFFFFB620],
-        [0xFF000000],
         [0xFFD70077],
         [0xFF5687C2],
         [0xFF359CEB],
@@ -348,7 +344,6 @@ var aSparklinesStyles =
     [
         [0xFF5687C2],
         [0xFFFFB620],
-        [0xFF000000],
         [0xFFD70077],
         [0xFF777777],
         [0xFF359CEB],
@@ -358,7 +353,6 @@ var aSparklinesStyles =
     [
         [0xFFC6EFCE],
         [0xFFFFC7CE],
-        [0xFF000000],
         [0xFF8CADD6],
         [0xFFFFDC47],
         [0xFFFFEB9C],
@@ -368,7 +362,6 @@ var aSparklinesStyles =
     [
         [0xFF00B050],
         [0xFFFF0000],
-        [0xFF000000],
         [0xFF0070C0],
         [0xFFFFC000],
         [0xFFFFC000],
@@ -378,7 +371,6 @@ var aSparklinesStyles =
     [
         [3, 0],
         [9, 0],
-        [0xFF000000],
         [8, 0],
         [4, 0],
         [5, 0],
@@ -388,7 +380,6 @@ var aSparklinesStyles =
     [
         [1, 0],
         [9, 0],
-        [0xFF000000],
         [8, 0],
         [4, 0],
         [5, 0],

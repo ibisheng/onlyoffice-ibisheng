@@ -352,7 +352,8 @@ CFootnotesController.prototype.ContinueElementsFromPreviousColumn = function(nPa
  * @param {number} nColumnAbs
  * @param {number} dY
  * @param {Array.CFootEndnote} arrFootnotes
- * @returns {boolean} true - расчиталось нормально, и перенос делать не надо, false - данные сноски перенеслись на следующую страницу
+ * @returns {boolean} true - расчиталось нормально, и перенос делать не надо, false - данные сноски перенеслись на
+ *     следующую страницу
  */
 CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumnAbs, dY, arrFootnotes)
 {
@@ -559,7 +560,7 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nCol
 		nNumStart   = oSectPr.GetFootnoteNumStart();
 	}
 
-	// NumStart никак не влияет в случаях RestartEachPage и RestartEachSect. Влияет только на случай RestartContinious:
+	// NumStart никак не влияет в случаях RestartEachPage и RestartEachSect. Влияет только на случай RestartContinuous:
 	// к общему количеству сносок добавляется данное значение, взятое для текущей секции, этоже значение из предыдущих
 	// секций не учитывается.
 
@@ -581,8 +582,11 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nCol
 			if (nColumnIndex === nColumnAbs)
 			{
 				var arrContinuesElements = oColumn.GetContinuesElements();
-				if (arrContinuesElements.length > 0)
-					nAdditional = arrContinuesElements.length - 1;
+				for (var nTempIndex = 1; nTempIndex < arrContinuesElements.length; ++nTempIndex)
+				{
+					if (!arrContinuesElements[nTempIndex].IsCustomMarkFollows())
+						nAdditional++;
+				}
 			}
 
 			if (oColumn.Elements.length > 0)
@@ -610,10 +614,17 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nCol
 				if (oFootnote.GetReferenceSectPr() !== oSectPr)
 					return 1;
 
+				var nAdditional = 0;
+				for (var nTempIndex = 0; nTempIndex < arrContinuesElements.length; ++nTempIndex)
+				{
+					if (!arrContinuesElements[nTempIndex].IsCustomMarkFollows())
+						nAdditional++;
+				}
+
 				// Второе условие не нужно, потому что если arrContinuesElements.length > 0, то на такой колонке
 				// пусть и пустая но должна быть хоть одна сноска рассчитана
 
-				return oColumn.Elements[oColumn.Elements.length - 1].GetNumber() + 1 + arrContinuesElements.length;
+				return oColumn.Elements[oColumn.Elements.length - 1].GetNumber() + 1 + nAdditional;
 			}
 		}
 
@@ -636,7 +647,7 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nCol
 			}
 		}
 	}
-	else// if (section_footnote_RestartContinious === nNumRestart)
+	else// if (section_footnote_RestartContinuous === nNumRestart)
 	{
 		// Здесь нам надо считать, сколько сносок всего в документе до данного момента, отталкиваться от предыдущей мы
 		// не можем, потому что Word считает общее количество сносок, а не продолжает нумерацию с предыдущей секции,
@@ -650,11 +661,16 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nCol
 				oColumn = this.private_GetPageColumn(nPageIndex, nColumnIndex);
 				if (oColumn && oColumn.Elements.length > 0)
 				{
-					var oFirstFootnote = oColumn.Elements[0];
-					if (oFirstFootnote.Pages.length > 1)
-						nFootnotesCount += oColumn.Elements.length - 1;
-					else
-						nFootnotesCount += oColumn.Elements.length;
+					for (var nFootnoteIndex = 0, nTempCount = oColumn.Elements.length; nFootnoteIndex < nTempCount; ++nFootnoteIndex)
+					{
+						var oFootnote = oColumn.Elements[nFootnoteIndex];
+						if (oFootnote
+							&& true !== oFootnote.IsCustomMarkFollows()
+							&& (0 !== nFootnoteIndex
+							|| oFootnote.Pages.length <= 1
+							|| (0 === nFootnoteIndex && 1 === oColumn.Elements.length && nPageIndex === oFootnote.Get_StartPage_Absolute() && nColumnIndex === oFootnote.Get_StartColumn_Absolute())))
+							nFootnotesCount++;
+					}
 				}
 			}
 		}
@@ -769,7 +785,18 @@ CFootnotesController.prototype.Refresh_RecalcData2 = function(nRelPageIndex)
 	if (this.LogicDocument.Pages[nAbsPageIndex])
 	{
 		var nIndex = this.LogicDocument.Pages[nAbsPageIndex].Pos;
-		this.LogicDocument.Refresh_RecalcData2(nIndex, nAbsPageIndex);
+
+		if (nIndex >= this.LogicDocument.Content.length)
+		{
+			History.RecalcData_Add({
+				Type    : AscDFH.historyitem_recalctype_NotesEnd,
+				PageNum : nAbsPageIndex
+			});
+		}
+		else
+		{
+			this.LogicDocument.Refresh_RecalcData2(nIndex, nAbsPageIndex);
+		}
 	}
 };
 CFootnotesController.prototype.Get_PageContentStartPos = function(nPageAbs, nColumnAbs)
@@ -1262,6 +1289,16 @@ CFootnotesController.prototype.AddFootnoteRef = function()
 	oRun.Add_ToContent(0, new ParaFootnoteRef(oFootnote), false);
 	oRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
 	oParagraph.Add_ToContent(0, oRun);
+};
+CFootnotesController.prototype.GotoPage = function(nPageAbs)
+{
+	var oColumn = this.private_GetPageColumn(nPageAbs, 0);
+	if (!oColumn || oColumn.Elements.length <= 0)
+		return;
+
+	var oFootnote = oColumn.Elements[0];
+	this.private_SetCurrentFootnoteNoSelection(oFootnote);
+	oFootnote.Cursor_MoveToStartPos(false);
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private area
@@ -3325,6 +3362,10 @@ CFootnotesController.prototype.GetColumnSize = function()
 		W : AscCommon.Page_Width - (AscCommon.X_Left_Margin + AscCommon.X_Right_Margin),
 		H : AscCommon.Page_Height - (AscCommon.Y_Top_Margin + AscCommon.Y_Bottom_Margin)
 	};
+};
+CFootnotesController.prototype.GetCurrentSectionPr = function()
+{
+	return null;
 };
 
 

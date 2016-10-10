@@ -577,22 +577,22 @@ CFraction.prototype.fillContent = function()
 };
 CFraction.prototype.Apply_MenuProps = function(Props)
 {
-    if(Props.Type == c_oAscMathInterfaceType.Fraction && Props.FractionType !== undefined)
+    if(Props.Type == Asc.c_oAscMathInterfaceType.Fraction && Props.FractionType !== undefined)
     {
         var FractionType = this.Pr.type;
 
         switch (Props.FractionType)
         {
-            case c_oAscMathInterfaceFraction.Bar:
+            case Asc.c_oAscMathInterfaceFraction.Bar:
                 FractionType = BAR_FRACTION;
                 break;
-            case c_oAscMathInterfaceFraction.Skewed:
+            case Asc.c_oAscMathInterfaceFraction.Skewed:
                 FractionType = SKEWED_FRACTION;
                 break;
-            case c_oAscMathInterfaceFraction.Linear:
+            case Asc.c_oAscMathInterfaceFraction.Linear:
                 FractionType = LINEAR_FRACTION;
                 break;
-            case c_oAscMathInterfaceFraction.NoBar:
+            case Asc.c_oAscMathInterfaceFraction.NoBar:
                 FractionType = NO_BAR_FRACTION;
                 break;
         }
@@ -624,25 +624,25 @@ function CMathMenuFraction(Fraction)
 {
     CMathMenuFraction.superclass.constructor.call(this, Fraction);
 
-    this.Type         = c_oAscMathInterfaceType.Fraction;
+    this.Type         = Asc.c_oAscMathInterfaceType.Fraction;
 
     if (undefined !== Fraction)
     {
-        this.FractionType = c_oAscMathInterfaceFraction.Bar;
+        this.FractionType = Asc.c_oAscMathInterfaceFraction.Bar;
 
         switch (Fraction.Pr.type)
         {
             case BAR_FRACTION:
-                this.FractionType = c_oAscMathInterfaceFraction.Bar;
+                this.FractionType = Asc.c_oAscMathInterfaceFraction.Bar;
                 break;
             case SKEWED_FRACTION:
-                this.FractionType = c_oAscMathInterfaceFraction.Skewed;
+                this.FractionType = Asc.c_oAscMathInterfaceFraction.Skewed;
                 break;
             case LINEAR_FRACTION:
-                this.FractionType = c_oAscMathInterfaceFraction.Linear;
+                this.FractionType = Asc.c_oAscMathInterfaceFraction.Linear;
                 break;
             case NO_BAR_FRACTION:
-                this.FractionType = c_oAscMathInterfaceFraction.NoBar;
+                this.FractionType = Asc.c_oAscMathInterfaceFraction.NoBar;
                 break;
         }
     }

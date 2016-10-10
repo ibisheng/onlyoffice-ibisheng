@@ -5111,6 +5111,7 @@ CPresentation.prototype =
                     return true;
                 }
             }
+            this.Document_UpdateInterfaceState();
         }
     },
 

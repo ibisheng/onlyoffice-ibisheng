@@ -42,8 +42,9 @@ function CFootEndnote(DocumentController)
 {
 	CFootEndnote.superclass.constructor.call(this, DocumentController, DocumentController ? DocumentController.Get_DrawingDocument() : undefined, 0, 0, 0, 0, true, false, false);
 
-	this.Number = 1;
-	this.SectPr = null;
+	this.Number            = 1;
+	this.SectPr            = null;
+	this.CurtomMarkFollows = false;
 }
 
 AscCommon.extendClass(CFootEndnote, CDocumentContent);
@@ -77,10 +78,11 @@ CFootEndnote.prototype.Read_FromBinary2 = function(Reader)
 	Reader.GetLong(); // Должен вернуть historyitem_type_DocumentContent
 	CFootEndnote.superclass.Read_FromBinary2.call(this, Reader);
 };
-CFootEndnote.prototype.SetNumber = function(nNumber, oSectPr)
+CFootEndnote.prototype.SetNumber = function(nNumber, oSectPr, bCustomMarkFollows)
 {
-	this.Number = nNumber;
-	this.SectPr = oSectPr;
+	this.Number            = nNumber;
+	this.SectPr            = oSectPr;
+	this.CurtomMarkFollows = bCustomMarkFollows;
 };
 CFootEndnote.prototype.GetNumber = function()
 {
@@ -89,6 +91,42 @@ CFootEndnote.prototype.GetNumber = function()
 CFootEndnote.prototype.GetReferenceSectPr = function()
 {
 	return this.SectPr;
+};
+CFootEndnote.prototype.IsCustomMarkFollows = function()
+{
+	return this.CurtomMarkFollows;
+};
+CFootEndnote.prototype.AddDefaultFootnoteContent = function(sText)
+{
+	var oStyles    = this.LogicDocument.Get_Styles();
+	var oParagraph = this.Get_ElementByIndex(0);
+
+	oParagraph.Style_Add(oStyles.GetDefaultFootnoteText());
+	var oRun = new ParaRun(oParagraph, false);
+	oRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
+	if (sText)
+	{
+		for (var nIndex = 0, nLen = sText.length; nIndex < nLen; ++nIndex)
+		{
+			var nChar = sText.charAt(nIndex);
+
+			if (" " === nChar)
+				oRun.Add_ToContent(nIndex, new ParaSpace(), true);
+			else
+				oRun.Add_ToContent(nIndex, new ParaText(nChar), true);
+		}
+	}
+	else
+	{
+		oRun.Add_ToContent(0, new ParaFootnoteRef(this));
+	}
+
+	oParagraph.Add_ToContent(0, oRun);
+	oRun = new ParaRun(oParagraph, false);
+	oRun.Add_ToContent(0, new ParaSpace());
+	oParagraph.Add_ToContent(1, oRun);
+
+	this.Cursor_MoveToEndPos(false);
 };
 
 //--------------------------------------------------------export----------------------------------------------------

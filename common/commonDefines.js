@@ -810,6 +810,99 @@
 		sysDot        : 10
 	};
 
+
+    /** @enum {number} */
+    var c_oAscMathInterfaceType = {
+        Common        : 0x00,
+        Fraction      : 0x01,
+        Script        : 0x02,
+        Radical       : 0x03,
+        LargeOperator : 0x04,
+        Delimiter     : 0x05,
+        Function      : 0x06,
+        Accent        : 0x07,
+        BorderBox     : 0x08,
+        Bar           : 0x09,
+        Box           : 0x0a,
+        Limit         : 0x0b,
+        GroupChar     : 0x0c,
+        Matrix        : 0x0d,
+        EqArray       : 0x0e,
+        Phantom       : 0x0f
+    };
+
+
+
+
+
+	/** @enum {number} */
+	var c_oAscMathInterfaceBarPos = {
+		Top    : 0,
+		Bottom : 1
+	};
+
+	/** @enum {number} */
+	var c_oAscMathInterfaceScript = {
+		None      : 0x000,  // Удаление скрипта
+		Sup       : 0x001,
+		Sub       : 0x002,
+		SubSup    : 0x003,
+		PreSubSup : 0x004
+	};
+
+	/** @enum {number} */
+	var c_oAscMathInterfaceFraction = {
+		Bar    : 0x001,
+		Skewed : 0x002,
+		Linear : 0x003,
+		NoBar  : 0x004
+	};
+
+	/** @enum {number} */
+	var c_oAscMathInterfaceLimitPos = {
+		None   : -1,  // Удаление предела
+		Top    : 0,
+		Bottom : 1
+	};
+
+	/** @enum {number} */
+	var c_oAscMathInterfaceMatrixMatrixAlign = {
+		Top    : 0,
+		Center : 1,
+		Bottom : 2
+	};
+
+	/** @enum {number} */
+	var c_oAscMathInterfaceMatrixColumnAlign = {
+		Left   : 0,
+		Center : 1,
+		Right  : 2
+	};
+
+
+
+	/** @enum {number} */
+	var c_oAscMathInterfaceEqArrayAlign = {
+		Top    : 0,
+		Center : 1,
+		Bottom : 2
+	};
+
+
+	/** @enum {number} */
+	var c_oAscMathInterfaceNaryLimitLocation = {
+		UndOvr : 0,
+		SubSup : 1
+	};
+
+	/** @enum {number} */
+	var c_oAscMathInterfaceGroupCharPos = {
+		None   : -1,  // Удаление GroupChar
+		Top    : 0,
+		Bottom : 1
+	};
+
+
 	var c_oAscEncodings    = [
 		[0, 28596, "ISO-8859-6", "Arabic (ISO 8859-6)"],
 		[1, 720, "DOS-720", "Arabic (OEM 720)"],
@@ -1417,7 +1510,75 @@
 	prot['sysDashDotDot'] = prot.sysDashDotDot;
 	prot['sysDot']        = prot.sysDot;
 
-	window['AscCommon']                             = window['AscCommon'] || {};
+
+    window['Asc']['c_oAscMathInterfaceType'] = window['Asc'].c_oAscMathInterfaceType = c_oAscMathInterfaceType;
+    prot                  = c_oAscMathInterfaceType;
+    prot['Common'] = prot.Common;
+    prot['Fraction'] = prot.Fraction;
+    prot['Script'] = prot.Script;
+    prot['Radical'] = prot.Radical;
+    prot['LargeOperator'] = prot.LargeOperator;
+    prot['Delimiter'] = prot.Delimiter;
+    prot['Function'] = prot.Function;
+    prot['Accent'] = prot.Accent;
+    prot['BorderBox'] = prot.BorderBox;
+    prot['Bar'] = prot.Bar;
+    prot['Box'] = prot.Box;
+    prot['Limit'] = prot.Limit;
+    prot['GroupChar'] = prot.GroupChar;
+    prot['Matrix'] = prot.Matrix;
+    prot['EqArray'] = prot.EqArray;
+    prot['Phantom'] = prot.Phantom;
+
+
+
+	prot = window['Asc']['c_oAscMathInterfaceBarPos'] = window['Asc'].c_oAscMathInterfaceBarPos = c_oAscMathInterfaceBarPos;
+	prot['Top']    = c_oAscMathInterfaceBarPos.Top;
+	prot['Bottom'] = c_oAscMathInterfaceBarPos.Bottom;
+
+	prot = window['Asc']['c_oAscMathInterfaceScript'] = window['Asc'].c_oAscMathInterfaceScript = c_oAscMathInterfaceScript;
+	prot['None']      = c_oAscMathInterfaceScript.None;
+	prot['Sup']       = c_oAscMathInterfaceScript.Sup;
+	prot['Sub']       = c_oAscMathInterfaceScript.Sub;
+	prot['SubSup']    = c_oAscMathInterfaceScript.SubSup;
+	prot['PreSubSup'] = c_oAscMathInterfaceScript.PreSubSup;
+
+	prot = window['Asc']['c_oAscMathInterfaceFraction'] = window['Asc'].c_oAscMathInterfaceFraction = c_oAscMathInterfaceFraction;
+	prot['None']   = c_oAscMathInterfaceFraction.Bar;
+	prot['Skewed'] = c_oAscMathInterfaceFraction.Skewed;
+	prot['Linear'] = c_oAscMathInterfaceFraction.Linear;
+	prot['NoBar']  = c_oAscMathInterfaceFraction.NoBar;
+
+	prot = window['Asc']['c_oAscMathInterfaceLimitPos'] = window['Asc'].c_oAscMathInterfaceLimitPos = c_oAscMathInterfaceLimitPos;
+	prot['None']   = c_oAscMathInterfaceLimitPos.None;
+	prot['Top']    = c_oAscMathInterfaceLimitPos.Top;
+	prot['Bottom'] = c_oAscMathInterfaceLimitPos.Bottom;
+
+	prot = window['Asc']['c_oAscMathInterfaceMatrixMatrixAlign'] = window['Asc'].c_oAscMathInterfaceMatrixMatrixAlign = c_oAscMathInterfaceMatrixMatrixAlign;
+	prot['Top']    = c_oAscMathInterfaceMatrixMatrixAlign.Top;
+	prot['Center'] = c_oAscMathInterfaceMatrixMatrixAlign.Center;
+	prot['Bottom'] = c_oAscMathInterfaceMatrixMatrixAlign.Bottom;
+
+	prot = window['Asc']['c_oAscMathInterfaceMatrixColumnAlign'] = window['Asc'].c_oAscMathInterfaceMatrixColumnAlign = c_oAscMathInterfaceMatrixColumnAlign;
+	prot['Left']   = c_oAscMathInterfaceMatrixColumnAlign.Left;
+	prot['Center'] = c_oAscMathInterfaceMatrixColumnAlign.Center;
+	prot['Right']  = c_oAscMathInterfaceMatrixColumnAlign.Right;
+
+	prot = window['Asc']['c_oAscMathInterfaceEqArrayAlign'] = window['Asc'].c_oAscMathInterfaceEqArrayAlign = c_oAscMathInterfaceEqArrayAlign;
+	prot['Top']    = c_oAscMathInterfaceEqArrayAlign.Top;
+	prot['Center'] = c_oAscMathInterfaceEqArrayAlign.Center;
+	prot['Bottom'] = c_oAscMathInterfaceEqArrayAlign.Bottom;
+
+	prot = window['Asc']['c_oAscMathInterfaceNaryLimitLocation'] = window['Asc'].c_oAscMathInterfaceNaryLimitLocation = c_oAscMathInterfaceNaryLimitLocation;
+	prot['UndOvr'] = c_oAscMathInterfaceNaryLimitLocation.UndOvr;
+	prot['SubSup'] = c_oAscMathInterfaceNaryLimitLocation.SubSup;
+
+	prot = window['Asc']['c_oAscMathInterfaceGroupCharPos'] = window['Asc'].c_oAscMathInterfaceGroupCharPos = c_oAscMathInterfaceGroupCharPos;
+	prot['None']   = c_oAscMathInterfaceGroupCharPos.None;
+	prot['Top']    = c_oAscMathInterfaceGroupCharPos.Top;
+	prot['Bottom'] = c_oAscMathInterfaceGroupCharPos.Bottom;
+
+    window['AscCommon']                             = window['AscCommon'] || {};
 	window["AscCommon"].g_cCharDelimiter            = g_cCharDelimiter;
 	window["AscCommon"].g_cGeneralFormat            = g_cGeneralFormat;
 	window["AscCommon"].bDate1904                   = false;

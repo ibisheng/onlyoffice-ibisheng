@@ -9209,7 +9209,7 @@ function _isSameSizeMerged(bbox, aMerged) {
 	return oRes;
 }
 function _canPromote(from, wsFrom, to, wsTo, bIsPromote, nWidth, nHeight, bVertical, nIndex) {
-	var oRes = {oMergedFrom: null, oMergedTo: null};
+	var oRes = {oMergedFrom: null, oMergedTo: null, to: to};
 	//если надо только удалить внутреннее содержимое не смотрим на замерженость
 	if(!bIsPromote || !((true == bVertical && nIndex >= 0 && nIndex < nHeight) || (false == bVertical && nIndex >= 0 && nIndex < nWidth)))
 	{
@@ -9285,52 +9285,55 @@ function promoteFromTo(from, wsFrom, to, wsTo) {
 		_promoteFromTo(from, wsFrom, to, wsTo, false, oCanPromote, false, bVertical, nIndex);
 	}
 }
-Range.prototype.promote=function(bCtrl, bVertical, nIndex){
+	Range.prototype.canPromote=function(bCtrl, bVertical, nIndex){
+		var oBBox = this.bbox;
+		var nWidth = oBBox.c2 - oBBox.c1 + 1;
+		var nHeight = oBBox.r2 - oBBox.r1 + 1;
+		var bWholeCol = false;	var bWholeRow = false;
+		if(0 == oBBox.r1 && gc_nMaxRow0 == oBBox.r2)
+			bWholeCol = true;
+		if(0 == oBBox.c1 && gc_nMaxCol0 == oBBox.c2)
+			bWholeRow = true;
+		if((bWholeCol && bWholeRow) || (true == bVertical && bWholeCol) || (false == bVertical && bWholeRow))
+			return null;
+		var oPromoteAscRange = null;
+		if(0 == nIndex)
+			oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2);
+		else
+		{
+			if(bVertical)
+			{
+				if(nIndex > 0)
+				{
+					if(nIndex >= nHeight)
+						oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r2 + 1, oBBox.c2, oBBox.r1 + nIndex);
+					else
+						oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r1 + nIndex, oBBox.c2, oBBox.r2);
+				}
+				else
+					oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r1 + nIndex, oBBox.c2, oBBox.r1 - 1);
+			}
+			else
+			{
+				if(nIndex > 0)
+				{
+					if(nIndex >= nWidth)
+						oPromoteAscRange = Asc.Range(oBBox.c2 + 1, oBBox.r1, oBBox.c1 + nIndex, oBBox.r2);
+					else
+						oPromoteAscRange = Asc.Range(oBBox.c1 + nIndex, oBBox.r1, oBBox.c2, oBBox.r2);
+				}
+				else
+					oPromoteAscRange = Asc.Range(oBBox.c1 + nIndex, oBBox.r1, oBBox.c1 - 1, oBBox.r2);
+			}
+		}
+		//проверяем можно ли осуществить promote
+		return _canPromote(oBBox, this.worksheet, oPromoteAscRange, this.worksheet, true, nWidth, nHeight, bVertical, nIndex);
+	};
+Range.prototype.promote=function(bCtrl, bVertical, nIndex, oCanPromote){
 	//todo отдельный метод для promote в таблицах и merge в таблицах
 	var oBBox = this.bbox;
 	var nWidth = oBBox.c2 - oBBox.c1 + 1;
-    var nHeight = oBBox.r2 - oBBox.r1 + 1;
-	var bWholeCol = false;	var bWholeRow = false;
-	if(0 == oBBox.r1 && gc_nMaxRow0 == oBBox.r2)
-		bWholeCol = true;
- 	if(0 == oBBox.c1 && gc_nMaxCol0 == oBBox.c2)
-		bWholeRow = true;
-	if((bWholeCol && bWholeRow) || (true == bVertical && bWholeCol) || (false == bVertical && bWholeRow))
-		return false;
-	var oPromoteAscRange = null;
-	if(0 == nIndex)
-		oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2);
-	else
-	{
-		if(bVertical)
-		{
-			if(nIndex > 0)
-			{
-				if(nIndex >= nHeight)
-					oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r2 + 1, oBBox.c2, oBBox.r1 + nIndex);
-				else
-					oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r1 + nIndex, oBBox.c2, oBBox.r2);
-			}
-			else
-				oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r1 + nIndex, oBBox.c2, oBBox.r1 - 1);
-		}
-		else
-		{
-			if(nIndex > 0)
-			{
-				if(nIndex >= nWidth)
-					oPromoteAscRange = Asc.Range(oBBox.c2 + 1, oBBox.r1, oBBox.c1 + nIndex, oBBox.r2);
-				else
-					oPromoteAscRange = Asc.Range(oBBox.c1 + nIndex, oBBox.r1, oBBox.c2, oBBox.r2);
-			}
-			else
-				oPromoteAscRange = Asc.Range(oBBox.c1 + nIndex, oBBox.r1, oBBox.c1 - 1, oBBox.r2);
-		}
-	}
-	//проверяем можно ли осуществить promote
-	var oCanPromote = _canPromote(oBBox, this.worksheet, oPromoteAscRange, this.worksheet, true, nWidth, nHeight, bVertical, nIndex);
-	if(null == oCanPromote)
-		return false;
+	var nHeight = oBBox.r2 - oBBox.r1 + 1;
 
 	History.Create_NewPoint();
 	var oSelection = History.GetSelection();
@@ -9377,10 +9380,9 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 	}
   oFormulaLocaleInfo.Parse = false;
   oFormulaLocaleInfo.DigitSep = false;
-	_promoteFromTo(oBBox, this.worksheet, oPromoteAscRange, this.worksheet, true, oCanPromote, bCtrl, bVertical, nIndex);
+	_promoteFromTo(oBBox, this.worksheet, oCanPromote.to, this.worksheet, true, oCanPromote, bCtrl, bVertical, nIndex);
   oFormulaLocaleInfo.Parse = true;
   oFormulaLocaleInfo.DigitSep = true;
-	return true;
 };
 function _promoteFromTo(from, wsFrom, to, wsTo, bIsPromote, oCanPromote, bCtrl, bVertical, nIndex) {
 	var wb = wsFrom.workbook;

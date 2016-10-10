@@ -53,7 +53,7 @@ var section_borders_OffsetFromText = 0x01;
 var section_borders_ZOrderBack  = 0x00;
 var section_borders_ZOrderFront = 0x01;
 
-var section_footnote_RestartContinious = 0x00;
+var section_footnote_RestartContinuous = 0x00;
 var section_footnote_RestartEachSect   = 0x01;
 var section_footnote_RestartEachPage   = 0x02;
 
@@ -1856,6 +1856,10 @@ CSectionPr.prototype =
 		this.FootnotePr.ReadFromBinary(Reader);
     }
 };
+CSectionPr.prototype.GetFootnotePr = function()
+{
+	return this.FootnotePr;
+};
 CSectionPr.prototype.SetFootnotePos = function(nPos)
 {
 	if (this.FootnotePr.Pos !== nPos)
@@ -2282,7 +2286,7 @@ function CFootnotePr()
 CFootnotePr.prototype.InitDefault = function()
 {
 	this.NumFormat  = numbering_numfmt_Decimal;
-	this.NumRestart = section_footnote_RestartContinious;
+	this.NumRestart = section_footnote_RestartContinuous;
 	this.NumStart   = 1;
 	this.Pos        = section_footnote_PosPageBottom;
 };
@@ -2350,3 +2354,12 @@ CFootnotePr.prototype.ReadFromBinary = function(Reader)
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CSectionPr = CSectionPr;
+
+window['AscCommonWord']['section_footnote_RestartContinuous'] = section_footnote_RestartContinuous;
+window['AscCommonWord']['section_footnote_RestartEachSect']   = section_footnote_RestartEachSect;
+window['AscCommonWord']['section_footnote_RestartEachPage']   = section_footnote_RestartEachPage;
+
+window['AscCommonWord']['section_footnote_PosBeneathText'] = section_footnote_PosBeneathText;
+window['AscCommonWord']['section_footnote_PosDocEnd']      = section_footnote_PosDocEnd;
+window['AscCommonWord']['section_footnote_PosPageBottom']  = section_footnote_PosPageBottom;
+window['AscCommonWord']['section_footnote_PosSectEnd']     = section_footnote_PosSectEnd;

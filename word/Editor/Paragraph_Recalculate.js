@@ -2011,13 +2011,14 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
     var NewX = 0;
 
     // Если табов нет, либо их позиции левее текущей позиции ставим таб по умолчанию
+    var DefTab = ParaPr.DefaultTabSize != null ? ParaPr.DefaultTabSize : Default_Tab_Stop;
     if ( null === Tab )
     {
         if ( X < PageStart.X + ParaPr.Ind.Left )
         {
             NewX = PageStart.X + ParaPr.Ind.Left;
         }
-        else if (Default_Tab_Stop < 0.001)
+        else if (DefTab < 0.001)
         {
             NewX = X;
         }
@@ -2025,7 +2026,7 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
         {
             NewX = PageStart.X;
             while ( X >= NewX - 0.001 )
-                NewX += Default_Tab_Stop;
+                NewX += DefTab;
         }
     }
     else
@@ -2989,15 +2990,19 @@ CParagraphRecalculateStateWrap.prototype.AddFootnoteReference = function(oFootno
 CParagraphRecalculateStateWrap.prototype.GetFootnoteReferencesCount = function(oFootnoteReference)
 {
 	// Если данную ссылку мы добавляли уже в строке, тогда ищем сколько было элементов до нее, если не добавляли,
-	// тогда возвращаем просто количество ссылок.
+	// тогда возвращаем просто количество ссылок. Ссылки с флагом CustomMarkFollows не учитываются
 
+	var nRefsCount = 0;
 	for (var nIndex = 0, nCount = this.Footnotes.length; nIndex < nCount; ++nIndex)
 	{
 		if (this.Footnotes[nIndex].FootnoteReference === oFootnoteReference)
-			return nIndex;
+			return nRefsCount;
+
+		if (true !== this.Footnotes[nIndex].FootnoteReference.IsCustomMarkFollows())
+			nRefsCount++;
 	}
 
-	return this.Footnotes.length;
+	return nRefsCount;
 };
 CParagraphRecalculateStateWrap.prototype.SetFast = function(bValue)
 {

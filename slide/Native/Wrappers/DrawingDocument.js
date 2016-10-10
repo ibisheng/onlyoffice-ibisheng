@@ -483,6 +483,61 @@ function CDrawingDocument()
     };
 }
 
+
+function DrawBackground(graphics, unifill, w, h)
+{
+    // первым делом рисуем белый рект!
+    if (true)
+    {
+        // ну какой-то бэкграунд должен быть
+        graphics.SetIntegerGrid(false);
+
+        var _l = 0;
+        var _t = 0;
+        var _r = (0 + w);
+        var _b = (0 + h);
+
+        graphics._s();
+        graphics._m(_l, _t);
+        graphics._l(_r, _t);
+        graphics._l(_r, _b);
+        graphics._l(_l, _b);
+        graphics._z();
+
+        graphics.b_color1(255, 255, 255, 255);
+        graphics.df();
+        graphics._e();
+    }
+
+    if (unifill == null || unifill.fill == null)
+        return;
+
+    graphics.SetIntegerGrid(false);
+
+    var _shape = {};
+
+    _shape.brush           = unifill;
+    _shape.pen             = null;
+    _shape.TransformMatrix = new AscCommon.CMatrix();
+    _shape.extX            = w;
+    _shape.extY            = h;
+    _shape.check_bounds    = function(checker)
+    {
+        checker._s();
+        checker._m(0, 0);
+        checker._l(this.extX, 0);
+        checker._l(this.extX, this.extY);
+        checker._l(0, this.extY);
+        checker._z();
+        checker._e();
+    }
+
+    var shape_drawer = new AscCommon.CShapeDrawer();
+    shape_drawer.fromShape2(_shape, graphics, null);
+    shape_drawer.draw(null);
+}
+
+
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommon'] = window['AscCommon'] || {};
 window['AscCommon'].CDrawingDocument = CDrawingDocument;

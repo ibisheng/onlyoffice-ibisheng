@@ -36,6 +36,7 @@
 {
 
 	// Import
+	var c_oAscAdvancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction;
 	var DownloadType                = AscCommon.DownloadType;
 	var locktype_None               = AscCommon.locktype_None;
 	var locktype_Mine               = AscCommon.locktype_Mine;
@@ -56,6 +57,7 @@
 	var c_oAscError             = Asc.c_oAscError;
 	var c_oAscFileType          = Asc.c_oAscFileType;
 	var c_oAscAsyncAction       = Asc.c_oAscAsyncAction;
+	var c_oAscAdvancedOptionsID = Asc.c_oAscAdvancedOptionsID;
 	var c_oAscAsyncActionType   = Asc.c_oAscAsyncActionType;
 	var c_oAscTypeSelectElement = Asc.c_oAscTypeSelectElement;
 	var c_oAscFill              = Asc.c_oAscFill;
@@ -3958,6 +3960,17 @@ background-repeat: no-repeat;\
 			else
 			{
 				this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+
+				if (window["AscDesktopEditor"])
+                {
+                    var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](sImageUrl);
+                    _url     = g_oDocumentUrls.getImageUrl(_url);
+                    ImagePr.ImageUrl = _url;
+                    fApplyCallback();
+                    this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+                    return;
+                }
+
 				this.fCurCallback = function(input)
 				{
 					if (null != input && "imgurl" == input["type"])
@@ -4090,6 +4103,9 @@ background-repeat: no-repeat;\
 			objects = new Asc.asc_CImgProperty(imgProp);
 		}
 		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(type, objects);
+	};
+	asc_docs_api.prototype.sync_MathPropCallback  = function(mathProp)
+	{
 	};
 
 	asc_docs_api.prototype.SetDrawingFreeze = function(bIsFreeze)
@@ -6424,9 +6440,11 @@ background-repeat: no-repeat;\
 		return this.WordControl.m_oDrawingDocument.SlidesCount;
 	};
 
-	window["asc_docs_api"].prototype["asc_nativeGetPDF"] = function()
+	window["asc_docs_api"].prototype["asc_nativeGetPDF"] = function(_param)
 	{
 		var pagescount = this["asc_nativePrintPagesCount"]();
+		if (0x0100 & _param)
+		    pagescount = 1;
 
 		var _renderer                         = new AscCommon.CDocumentRenderer();
 		_renderer.VectorMemoryForPrint        = new AscCommon.CMemory();

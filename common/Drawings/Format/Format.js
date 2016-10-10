@@ -12647,7 +12647,8 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].PARRUN_TYPE_RUN		  = 1;
     window['AscFormat'].PARRUN_TYPE_FLD		  = 2;
     window['AscFormat'].PARRUN_TYPE_BR		  = 3;
-    window['AscFormat'].PARRUN_TYPE_TEXT_MATH = 4;
+	window['AscFormat'].PARRUN_TYPE_MATH	  = 4;
+	window['AscFormat'].PARRUN_TYPE_MATHPARA  = 5;
 
     window['AscFormat']._weight_body = _weight_body;
     window['AscFormat']._weight_chart = _weight_chart;
