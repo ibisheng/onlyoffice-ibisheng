@@ -591,6 +591,7 @@
 				return range.clone();
 			});
 			res.activeCell = this.activeCell.clone();
+			res.activeCellId = this.activeCellId;
 			res.worksheet = this.worksheet;
 			return res;
 		};
