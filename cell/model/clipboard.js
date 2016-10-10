@@ -1095,7 +1095,7 @@
 			
 			_insertImagesFromBinary: function(ws, data, isIntoShape)
 			{
-				var activeRange = ws.activeRange;
+				var activeCell = ws.model.selectionRange.activeCell;
 				var curCol, drawingObject, curRow, startCol, startRow, xfrm, aImagesSync = [], activeRow, activeCol, tempArr, offX, offY, rot;
 
 				//отдельная обработка для вставки одной таблички из презентаций
@@ -1188,8 +1188,8 @@
 					AscFormat.CheckSpPrXfrm(drawingObject.graphicObject);
 					xfrm = drawingObject.graphicObject.spPr.xfrm;
 					
-					activeRow = activeRange.r1;
-					activeCol = activeRange.c1;
+					activeRow = activeCell.row;
+					activeCol = activeCell.col;
 					if(isIntoShape && isIntoShape.Parent &&  isIntoShape.Parent.parent && isIntoShape.Parent.parent.drawingBase && isIntoShape.Parent.parent.drawingBase.from)
 					{
 						activeRow = isIntoShape.Parent.parent.drawingBase.from.row;
