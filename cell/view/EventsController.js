@@ -607,7 +607,7 @@
 					if (!d) return;
 					t.scroll(d);
 					asc_applyFunction(callback);
-				}, event.metaKey || event.ctrlKey);
+				});
 		};
 
 		/**

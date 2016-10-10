@@ -405,7 +405,7 @@
         // Массив ячеек для текущей формулы
         this.arrActiveFormulaRanges = [];
         this.arrActiveFormulaRangesPosition = -1;
-        this.arrActiveChartsRanges = [];
+        this.arrActiveChartRanges = [new AscCommonExcel.SelectionRange(this.model)];
         //------------------------
 
         this.collaborativeEditing = collaborativeEditing;
@@ -3768,7 +3768,7 @@
             isShapeSelect = (asc["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists());
             if (isShapeSelect) {
                 if (this.isChartAreaEditMode) {
-                    this._drawFormulaRanges(this.arrActiveChartsRanges);
+                    this._drawFormulaRanges(this.arrActiveChartRanges);
                 }
             } else {
                 this._drawSelectionRange();
@@ -3781,7 +3781,7 @@
                     this._drawFormulaRanges(this.arrActiveFormulaRanges);
                 }
                 if (this.isChartAreaEditMode) {
-                    this._drawFormulaRanges(this.arrActiveChartsRanges);
+                    this._drawFormulaRanges(this.arrActiveChartRanges);
                 }
                 if (this.isSelectionDialogMode) {
                     this._drawSelectRange();
@@ -4047,58 +4047,44 @@
             }
         }
 
-        if (0 < this.arrActiveFormulaRanges.length) {
-            for (i = 0; i < this.arrActiveFormulaRanges.length; ++i) {
-                this.arrActiveFormulaRanges[i].ranges.forEach(function (item) {
-                    var arnIntersection = item.intersectionSimple(range);
-                    if (arnIntersection) {
-                        _x1 = t.cols[arnIntersection.c1].left - offsetX - t.width_3px;
-                        _x2 = arnIntersection.c2 > t.cols.length ? width :
-                        t.cols[arnIntersection.c2].left + t.cols[arnIntersection.c2].width - offsetX + t.width_1px +
-                        t.width_2px;
-                        _y1 = t.rows[arnIntersection.r1].top - offsetY - t.height_3px;
-                        _y2 = arnIntersection.r2 > t.rows.length ? height : t.rows[arnIntersection.r2].top + t.rows[arnIntersection.r2].height - offsetY +
-                          t.height_1px + t.height_2px;
+        for (i = 0; i < this.arrActiveFormulaRanges.length; ++i) {
+            this.arrActiveFormulaRanges[i].ranges.forEach(function (item) {
+                var arnIntersection = item.intersectionSimple(range);
+                if (arnIntersection) {
+                    _x1 = t.cols[arnIntersection.c1].left - offsetX - t.width_3px;
+                    _x2 = arnIntersection.c2 > t.cols.length ? width :
+                    t.cols[arnIntersection.c2].left + t.cols[arnIntersection.c2].width - offsetX + t.width_1px +
+                    t.width_2px;
+                    _y1 = t.rows[arnIntersection.r1].top - offsetY - t.height_3px;
+                    _y2 = arnIntersection.r2 > t.rows.length ? height : t.rows[arnIntersection.r2].top + t.rows[arnIntersection.r2].height - offsetY +
+                    t.height_1px + t.height_2px;
 
-                        x1 = Math.min(x1, _x1);
-                        x2 = Math.max(x2, _x2);
-                        y1 = Math.min(y1, _y1);
-                        y2 = Math.max(y2, _y2);
-                    }
-                });
-            }
-
-            // Вышли из редактора, очистим массив
-            //TODO: Нужно ли очищать массив ячеек из формулы в отрисовке???
-            /*if ( false === this.isFormulaEditMode && !isFrozen ) {
-             this.arrActiveFormulaRanges = [];
-             }*/
-        }
-
-        if (0 < this.arrActiveChartsRanges.length) {
-            for (i = 0; i < this.arrActiveChartsRanges.length; ++i) {
-                var activeFormula = this.arrActiveChartsRanges[i].clone(true);
-
-                activeFormula = activeFormula.intersection(range);
-                if (null === activeFormula) {
-                    // это ссылка из формулы на еще не добавленный рэндж
-                    continue;
+                    x1 = Math.min(x1, _x1);
+                    x2 = Math.max(x2, _x2);
+                    y1 = Math.min(y1, _y1);
+                    y2 = Math.max(y2, _y2);
                 }
+            });
+        }
+        for (i = 0; i < this.arrActiveChartRanges.length; ++i) {
+            this.arrActiveChartRanges[i].ranges.forEach(function (item) {
+                var arnIntersection = item.intersectionSimple(range);
+                if (arnIntersection) {
+                    _x1 = t.cols[arnIntersection.c1].left - offsetX - t.width_3px;
+                    _x2 = arnIntersection.c2 > t.cols.length ? width :
+                    t.cols[arnIntersection.c2].left + t.cols[arnIntersection.c2].width - offsetX + t.width_1px +
+                    t.width_2px;
+                    _y1 = t.rows[arnIntersection.r1].top - offsetY - t.height_3px;
+                    _y2 = arnIntersection.r2 > t.rows.length ? height :
+                    t.rows[arnIntersection.r2].top + t.rows[arnIntersection.r2].height - offsetY + t.height_1px +
+                    t.height_2px;
 
-                // Координаты для range формулы
-                _x1 = this.cols[activeFormula.c1].left - offsetX - this.width_2px;
-                _x2 = activeFormula.c2 > this.cols.length ? width :
-                this.cols[activeFormula.c2].left + this.cols[activeFormula.c2].width - offsetX + this.width_1px;
-                _y1 = this.rows[activeFormula.r1].top - offsetY - this.height_2px;
-                _y2 = activeFormula.r2 > this.rows.length ? height :
-                this.rows[activeFormula.r2].top + this.rows[activeFormula.r2].height - offsetY + this.height_1px;
-
-                // Выбираем наибольший range для очистки
-                x1 = Math.min(x1, _x1);
-                x2 = Math.max(x2, _x2);
-                y1 = Math.min(y1, _y1);
-                y2 = Math.max(y2, _y2);
-            }
+                    x1 = Math.min(x1, _x1);
+                    x2 = Math.max(x2, _x2);
+                    y1 = Math.min(y1, _y1);
+                    y2 = Math.max(y2, _y2);
+                }
+            });
         }
 
         if (null !== this.activeMoveRange) {
@@ -6043,7 +6029,7 @@
     WorksheetView.prototype._hitCursorFormulaOrChart = function (vr, x, y, offsetX, offsetY) {
         var i, l, res;
         var oFormulaRange;
-        var arrRanges = this.isFormulaEditMode ? this.arrActiveFormulaRanges : this.arrActiveChartsRanges;
+        var arrRanges = this.isFormulaEditMode ? this.arrActiveFormulaRanges : this.arrActiveChartRanges;
         var targetArr = this.isFormulaEditMode ? 0 : -1;
 
         for (i = 0, l = arrRanges.length; i < l; ++i) {
@@ -8085,7 +8071,7 @@
     /* Функция для работы перемещения диапазона (selection). (x, y) - координаты точки мыши на области
      *  ToDo нужно переделать, чтобы moveRange появлялся только после сдвига от текущей ячейки
      */
-    WorksheetView.prototype.changeSelectionMoveRangeHandle = function (x, y, ctrlKey) {
+    WorksheetView.prototype.changeSelectionMoveRangeHandle = function (x, y) {
         // Возвращаемый результат
         var ret = null;
         // Пересчитываем координаты
@@ -8222,8 +8208,8 @@
         // Пересчитываем координаты
         x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
         y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
-        var ar = 0 == targetInfo.targetArr ? this.arrActiveFormulaRanges[indexFormulaRange].clone(true) :
-          this.arrActiveChartsRanges[indexFormulaRange].clone(true);
+        var ar = (0 == targetInfo.targetArr ? this.arrActiveFormulaRanges[indexFormulaRange] :
+          this.arrActiveChartRanges[indexFormulaRange]).getLast().clone();
 
         // Колонка по X и строка по Y
         var colByX = this._findColUnderCursor(x, /*canReturnNull*/false, /*dX*/false).col;
@@ -8328,13 +8314,13 @@
 
         if (0 == targetInfo.targetArr) {
             var _p = this.arrActiveFormulaRanges[indexFormulaRange].cursorePos, _l = this.arrActiveFormulaRanges[indexFormulaRange].formulaRangeLength;
-            this.arrActiveFormulaRanges[indexFormulaRange] = ar.clone(true);
+            this.arrActiveFormulaRanges[indexFormulaRange].getLast().assign2(ar.clone(true));
             this.arrActiveFormulaRanges[indexFormulaRange].cursorePos = _p;
             this.arrActiveFormulaRanges[indexFormulaRange].formulaRangeLength = _l;
-            newFormulaRange = this.arrActiveFormulaRanges[indexFormulaRange];
+            newFormulaRange = this.arrActiveFormulaRanges[indexFormulaRange].getLast();
         } else {
-            this.arrActiveChartsRanges[indexFormulaRange] = ar.clone(true);
-            this.moveRangeDrawingObjectTo = ar;
+            this.arrActiveChartRanges[indexFormulaRange].getLast().assign2(ar.clone(true));
+            this.moveRangeDrawingObjectTo = ar.clone();
         }
         this._drawSelection();
 
@@ -11330,6 +11316,17 @@
         this.draw( lockDraw );
     };
 
+    WorksheetView.prototype.setChartRange = function (range) {
+        this.isChartAreaEditMode = true;
+        this.arrActiveChartRanges[0].assign2(range);
+    };
+    WorksheetView.prototype.endEditChart = function () {
+        if (this.isChartAreaEditMode) {
+            this.isChartAreaEditMode = false;
+            this.arrActiveChartRanges[0].clean();
+        }
+    };
+
     WorksheetView.prototype.enterCellRange = function (editor) {
         if (!this.isFormulaEditMode) {
             return;
@@ -11402,7 +11399,7 @@
 
     WorksheetView.prototype.cleanFormulaRanges = function () {
         // Очищаем массив ячеек для текущей формулы
-		this.arrActiveFormulaRangesPosition = -1;
+        this.arrActiveFormulaRangesPosition = -1;
         this.arrActiveFormulaRanges = [];
     };
 

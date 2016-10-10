@@ -239,15 +239,14 @@ CHistory.prototype.UndoRedoPrepare = function (oRedoObjectParam, bUndo) {
 	else
 		this.workbook.bRedoChanges = true;
 
-	if(!window["NATIVE_EDITOR_ENJINE"]) {
+	if (!window["NATIVE_EDITOR_ENJINE"]) {
 		var wsViews = Asc["editor"].wb.wsViews;
 		for (var i = 0; i < wsViews.length; ++i) {
-			if (wsViews[i] && wsViews[i].objectRender && wsViews[i].objectRender.controller) {
-				wsViews[i].objectRender.controller.resetSelection(undefined, true);
-			}
-			if (wsViews[i] && wsViews[i].isChartAreaEditMode ) {
-				wsViews[i].isChartAreaEditMode = false;
-				wsViews[i].arrActiveChartsRanges = [];
+			if (wsViews[i]) {
+				if (wsViews[i].objectRender && wsViews[i].objectRender.controller) {
+					wsViews[i].objectRender.controller.resetSelection(undefined, true);
+				}
+				wsViews[i].endEditChart();
 			}
 		}
 	}

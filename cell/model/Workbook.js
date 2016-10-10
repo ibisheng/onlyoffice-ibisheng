@@ -2927,28 +2927,27 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
                 if(oThis.oApi.collaborativeEditing.getFast()){
                   AscCommon.CollaborativeEditing.Clear_DocumentPositions();
                 }
-                for(var i in wsViews)
-                {
-                    if(isRealObject(wsViews[i]) && isRealObject(wsViews[i].objectRender) && isRealObject(wsViews[i].objectRender.controller))
-                    {
-                        if ( wsViews[i].isChartAreaEditMode ) {
-                            wsViews[i].isChartAreaEditMode = false;
-                            wsViews[i].arrActiveChartsRanges = [];
-                        }
-                        if(oThis.oApi.collaborativeEditing.getFast()){
-                            var oState = wsViews[i].objectRender.saveStateBeforeLoadChanges();
-                            if(oState){
-                                if (oState.Pos)
-                                  AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.Pos);
-                                if (oState.StartPos)
-                                  AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.StartPos);
-                                if (oState.EndPos)
-                                  AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.EndPos);
-                            }
-                        }
-                        wsViews[i].objectRender.controller.resetSelection();
-                    }
-                }
+			for (var i in wsViews) {
+				if (isRealObject(wsViews[i]) && isRealObject(wsViews[i].objectRender) &&
+					isRealObject(wsViews[i].objectRender.controller)) {
+					wsViews[i].endEditChart();
+					if (oThis.oApi.collaborativeEditing.getFast()) {
+						var oState = wsViews[i].objectRender.saveStateBeforeLoadChanges();
+						if (oState) {
+							if (oState.Pos) {
+								AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.Pos);
+							}
+							if (oState.StartPos) {
+								AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.StartPos);
+							}
+							if (oState.EndPos) {
+								AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.EndPos);
+							}
+						}
+					}
+					wsViews[i].objectRender.controller.resetSelection();
+				}
+			}
       oFormulaLocaleInfo.Parse = false;
       oFormulaLocaleInfo.DigitSep = false;
                 History.Clear();
@@ -3008,14 +3007,10 @@ Workbook.prototype.DeserializeHistoryNative = function(oRedoObjectParam, data, i
 		if(null == oRedoObjectParam)
 		{
 			var wsViews = window["Asc"]["editor"].wb.wsViews;
-			for(var i in wsViews)
-			{
-				if(isRealObject(wsViews[i]) && isRealObject(wsViews[i].objectRender) && isRealObject(wsViews[i].objectRender.controller))
-				{
-					if ( wsViews[i].isChartAreaEditMode ) {
-						wsViews[i].isChartAreaEditMode = false;
-						wsViews[i].arrActiveChartsRanges = [];
-					}
+			for (var i in wsViews) {
+				if (isRealObject(wsViews[i]) && isRealObject(wsViews[i].objectRender) &&
+					isRealObject(wsViews[i].objectRender.controller)) {
+					wsViews[i].endEditChart();
 					wsViews[i].objectRender.controller.resetSelection();
 				}
 			}

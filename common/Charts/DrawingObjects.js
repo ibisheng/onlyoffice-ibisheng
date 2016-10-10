@@ -2494,10 +2494,7 @@ function DrawingObjects() {
             aObjects.length = 0;
             var listRange = new AscCommonExcel.Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
             listRange.cleanAll();
-            if ( worksheet.isChartAreaEditMode ) {
-                worksheet.isChartAreaEditMode = false;
-                worksheet.arrActiveChartsRanges = [];
-            }
+            worksheet.endEditChart();
             var asc_chart_binary = new Asc.asc_CChartBinary();
             asc_chart_binary.asc_setBinary(chart["binary"]);
             asc_chart_binary.asc_setThemeBinary(chart["themeBinary"]);
@@ -3515,7 +3512,7 @@ function DrawingObjects() {
             if ( aObjects[i].graphicObject.Id == graphicId ) {
                 aObjects[i].graphicObject.deselect(_this.controller);
                 if ( aObjects[i].isChart() )
-                    worksheet.arrActiveChartsRanges = [];
+                    worksheet.endEditChart();
                 aObjects.splice(i, 1);
                 bRedraw = true;
                 position = i;
@@ -3940,7 +3937,7 @@ function DrawingObjects() {
     _this.selectDrawingObjectRange = function(drawing) {
 
 		worksheet.cleanSelection();
-        worksheet.arrActiveChartsRanges = [];
+        worksheet.endEditChart();
 
         if(!drawing.bbox || drawing.bbox.worksheet !== worksheet.model)
             return;
@@ -3961,17 +3958,13 @@ function DrawingObjects() {
         }
         var BB = drawing.bbox.seriesBBox;
         var range = asc.Range(BB.c1, BB.r1, BB.c2, BB.r2, true);
-        worksheet.arrActiveChartsRanges.push(range);
-        worksheet.isChartAreaEditMode = true;
-		worksheet._drawSelection();
+        worksheet.setChartRange(range);
+        worksheet._drawSelection();
     };
 
     _this.unselectDrawingObjects = function() {
 
-        if ( worksheet.isChartAreaEditMode ) {
-            worksheet.isChartAreaEditMode = false;
-            worksheet.arrActiveChartsRanges = [];
-        }
+        worksheet.endEditChart();
         _this.controller.resetSelectionState();
         _this.OnUpdateOverlay();
     };

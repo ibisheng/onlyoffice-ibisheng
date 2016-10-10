@@ -1154,9 +1154,9 @@
   };
 
   // Обработка перемещения диапазона
-  WorkbookView.prototype._onMoveRangeHandle = function(x, y, callback, ctrlKey) {
+  WorkbookView.prototype._onMoveRangeHandle = function(x, y, callback) {
     var ws = this.getWorksheet();
-    var d = ws.changeSelectionMoveRangeHandle(x, y, ctrlKey);
+    var d = ws.changeSelectionMoveRangeHandle(x, y);
     asc_applyFunction(callback, d);
   };
 
