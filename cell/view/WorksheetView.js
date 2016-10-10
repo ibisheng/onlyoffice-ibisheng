@@ -11195,56 +11195,55 @@
         this._updateCellsRange( range, canChangeColWidth, lockDraw );
     };
 
-    WorksheetView.prototype._updateCellsRange = function ( range, canChangeColWidth, lockDraw ) {
+    WorksheetView.prototype._updateCellsRange = function (range, canChangeColWidth, lockDraw) {
         var r, c, h, d, ct, isMerged;
         var mergedRange, bUpdateRowHeight;
 
-        if ( range === undefined ) {
-            range = this.activeRange.clone( true );
-        }
-        else {
+        if (range === undefined) {
+            range = this.model.selectionRange.getLast().clone();
+        } else {
             // ToDo заглушка..пора уже переделать обновление данных
-            if ( range.r1 >= this.nRowsCount || range.c1 >= this.nColsCount ) {
+            if (range.r1 >= this.nRowsCount || range.c1 >= this.nColsCount) {
                 return;
             }
-            range.r2 = Math.min( range.r2, this.nRowsCount - 1 );
-            range.c2 = Math.min( range.c2, this.nColsCount - 1 );
+            range.r2 = Math.min(range.r2, this.nRowsCount - 1);
+            range.c2 = Math.min(range.c2, this.nColsCount - 1);
         }
 
-        if ( gc_nMaxCol0 === range.c2 || gc_nMaxRow0 === range.r2 ) {
+        if (gc_nMaxCol0 === range.c2 || gc_nMaxRow0 === range.r2) {
             range = range.clone();
-            if ( gc_nMaxCol0 === range.c2 ) {
+            if (gc_nMaxCol0 === range.c2) {
                 range.c2 = this.cols.length - 1;
             }
-            if ( gc_nMaxRow0 === range.r2 ) {
+            if (gc_nMaxRow0 === range.r2) {
                 range.r2 = this.rows.length - 1;
             }
         }
 
-        this._cleanCache( range );
+        this._cleanCache(range);
 
         // Если размер диапазона превышает размер видимой области больше чем в 3 раза, то очищаем весь кэш
-        if ( this._isLargeRange( range ) ) {
-            this.changeWorksheet( "update", {lockDraw: lockDraw} );
+        if (this._isLargeRange(range)) {
+            this.changeWorksheet("update", {lockDraw: lockDraw});
 
             this._updateSelectionNameAndInfo();
             return;
         }
 
         var cto;
-        for ( r = range.r1; r <= range.r2; ++r ) {
-            if ( this.height_1px > this.rows[r].height ) {
+        for (r = range.r1; r <= range.r2; ++r) {
+            if (this.height_1px > this.rows[r].height) {
                 continue;
             }
-            for ( c = range.c1; c <= range.c2; ++c ) {
-                if ( this.width_1px > this.cols[c].width ) {
+            for (c = range.c1; c <= range.c2; ++c) {
+                if (this.width_1px > this.cols[c].width) {
                     continue;
                 }
-                c = this._addCellTextToCache( c, r, canChangeColWidth ); // may change member 'this.isChanged'
+                c = this._addCellTextToCache(c, r, canChangeColWidth); // may change member 'this.isChanged'
             }
-            for ( h = this.defaultRowHeight, d = this.defaultRowDescender, c = 0; c < this.cols.length; ++c ) {
-                ct = this._getCellTextCache( c, r, true );
-                if ( !ct ) {
+            for (h = this.defaultRowHeight, d = this.defaultRowDescender, c = 0; c < this.cols.length; ++c) {
+                ct = this._getCellTextCache(c, r, true);
+                if (!ct) {
                     continue;
                 }
 
@@ -11252,8 +11251,8 @@
                  * Пробегаемся по строке и смотрим не продолжается ли ячейка на соседние.
                  * С помощью этой правки уйдем от обновления всей строки при каких-либо действиях
                  */
-                if ( (c < range.c1 || c > range.c2) && (0 !== ct.sideL || 0 !== ct.sideR) ) {
-                    cto = this._calcCellTextOffset( c, r, ct.cellHA, ct.metrics.width );
+                if ((c < range.c1 || c > range.c2) && (0 !== ct.sideL || 0 !== ct.sideR)) {
+                    cto = this._calcCellTextOffset(c, r, ct.cellHA, ct.metrics.width);
                     ct.cellW = cto.maxWidth;
                     ct.sideL = cto.leftSide;
                     ct.sideR = cto.rightSide;
@@ -11261,37 +11260,36 @@
 
                 // Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
                 isMerged = ct.flags.isMerged();
-                if ( !isMerged ) {
+                if (!isMerged) {
                     bUpdateRowHeight = true;
-                }
-                else {
+                } else {
                     mergedRange = ct.flags.merged;
                     // Для замерженных ячеек (с 2-мя или более строками) оптимизировать не нужно
                     bUpdateRowHeight = mergedRange.r1 === mergedRange.r2;
                 }
-                if ( bUpdateRowHeight ) {
-                    h = Math.max( h, ct.metrics.height );
+                if (bUpdateRowHeight) {
+                    h = Math.max(h, ct.metrics.height);
                 }
 
-                if ( ct.cellVA !== kvaTop && ct.cellVA !== kvaCenter && !isMerged ) {
-                    d = Math.max( d, ct.metrics.height - ct.metrics.baseline );
+                if (ct.cellVA !== kvaTop && ct.cellVA !== kvaCenter && !isMerged) {
+                    d = Math.max(d, ct.metrics.height - ct.metrics.baseline);
                 }
             }
-            if ( Math.abs( h - this.rows[r].height ) > 0.000001 && !this.rows[r].isCustomHeight ) {
-                if ( !this.rows[r].isDefaultHeight ) {
-                    this.rows[r].heightReal = this.rows[r].height = Math.min( h, this.maxRowHeight );
-                    this.model.setRowHeight( this.rows[r].height + this.height_1px, r, r, false );
+            if (Math.abs(h - this.rows[r].height) > 0.000001 && !this.rows[r].isCustomHeight) {
+                if (!this.rows[r].isDefaultHeight) {
+                    this.rows[r].heightReal = this.rows[r].height = Math.min(h, this.maxRowHeight);
+                    this.model.setRowHeight(this.rows[r].height + this.height_1px, r, r, false);
                 }
                 this.isChanged = true;
             }
-            if ( Math.abs( d - this.rows[r].descender ) > 0.000001 ) {
+            if (Math.abs(d - this.rows[r].descender) > 0.000001) {
                 this.rows[r].descender = d;
                 this.isChanged = true;
             }
         }
 
-        if ( !lockDraw ) {
-            this._recalculateAfterUpdate( [range] );
+        if (!lockDraw) {
+            this._recalculateAfterUpdate([range]);
         }
     };
 
@@ -11403,104 +11401,102 @@
         this.arrActiveFormulaRanges = [];
     };
 
-    WorksheetView.prototype.addAutoFilter = function ( styleName, addFormatTableOptionsObj ) {
+    WorksheetView.prototype.addAutoFilter = function (styleName, addFormatTableOptionsObj) {
         // Проверка глобального лока
-        if ( this.collaborativeEditing.getGlobalLock() ) {
+        if (this.collaborativeEditing.getGlobalLock()) {
             return;
         }
 
-        if ( !this.handlers.trigger( "getLockDefNameManagerStatus" ) ) {
-            this.handlers.trigger( "onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical );
+        if (!this.handlers.trigger("getLockDefNameManagerStatus")) {
+            this.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
             return;
         }
 
         var t = this;
-        var ar = t.activeRange.clone( true );
-			
-		var isChangeAutoFilterToTablePart = function(addFormatTableOptionsObj)
-		{
-			var res = false;
-			var worksheet = t.model;
+        var ar = this.model.selectionRange.getLast().clone();
 
-			var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(addFormatTableOptionsObj.asc_getRange());
-			if(activeRange && worksheet.AutoFilter && activeRange.containsRange(worksheet.AutoFilter.Ref) && activeRange.r1 === worksheet.AutoFilter.Ref.r1)
-				res = true;
-				
-			return res;
-		};
-		
-        var onChangeAutoFilterCallback = function ( isSuccess ) {
-            if ( false === isSuccess ) {
-                t.model.workbook.handlers.trigger( "asc_onError", c_oAscError.ID.LockedAllError, c_oAscError.Level.NoCritical );
-                t.handlers.trigger( "selectionChanged", t.getSelectionInfo() );
+        var isChangeAutoFilterToTablePart = function (addFormatTableOptionsObj) {
+            var res = false;
+            var worksheet = t.model;
+
+            var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(addFormatTableOptionsObj.asc_getRange());
+            if (activeRange && worksheet.AutoFilter && activeRange.containsRange(worksheet.AutoFilter.Ref) &&
+              activeRange.r1 === worksheet.AutoFilter.Ref.r1) {
+                res = true;
+            }
+
+            return res;
+        };
+
+        var onChangeAutoFilterCallback = function (isSuccess) {
+            if (false === isSuccess) {
+                t.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedAllError,
+                  c_oAscError.Level.NoCritical);
+                t.handlers.trigger("selectionChanged", t.getSelectionInfo());
                 return;
             }
 
-            if ( addFormatTableOptionsObj && isChangeAutoFilterToTablePart( addFormatTableOptionsObj ) === true )//CHANGE FILTER TO TABLEPART
-			{
+            if (addFormatTableOptionsObj && isChangeAutoFilterToTablePart(addFormatTableOptionsObj) === true)//CHANGE FILTER TO TABLEPART
+            {
                 var filterRange = t.model.AutoFilter.Ref.clone();
-				
-				var addFilterCallBack = function()
-				{
-					History.Create_NewPoint();
-					History.StartTransaction();
-					
-					t.model.autoFilters.changeAutoFilterToTablePart( styleName, ar, addFormatTableOptionsObj );
-					t._onUpdateFormatTable(filterRange, !!(styleName), true);
-					
-					History.EndTransaction();
-				};
-				
-				var addNameColumn = false;
-				if(addFormatTableOptionsObj === false)
-					addNameColumn = true;
-				else if(typeof addFormatTableOptionsObj == 'object')
+
+                var addFilterCallBack = function () {
+                    History.Create_NewPoint();
+                    History.StartTransaction();
+
+                    t.model.autoFilters.changeAutoFilterToTablePart(styleName, ar, addFormatTableOptionsObj);
+                    t._onUpdateFormatTable(filterRange, !!(styleName), true);
+
+                    History.EndTransaction();
+                };
+
+                var addNameColumn = false;
+                if (addFormatTableOptionsObj === false) {
+                    addNameColumn = true;
+                } else if (typeof addFormatTableOptionsObj == 'object') {
                     addNameColumn = !addFormatTableOptionsObj.asc_getIsTitle();
-				if(addNameColumn)
-					filterRange.r2 = filterRange.r2 + 1;
-				
-				t._isLockedCells(filterRange, /*subType*/null, addFilterCallBack);
-            }
-            else//ADD
-			{
-				var addNameColumn;
-				var addFilterCallBack = function()
-				{
-					History.Create_NewPoint();
-					History.StartTransaction();
-					
-					t.model.autoFilters.addAutoFilter(styleName, ar, addFormatTableOptionsObj);
+                }
+                if (addNameColumn) {
+                    filterRange.r2 = filterRange.r2 + 1;
+                }
+
+                t._isLockedCells(filterRange, /*subType*/null, addFilterCallBack);
+            } else//ADD
+            {
+                var addNameColumn;
+                var addFilterCallBack = function () {
+                    History.Create_NewPoint();
+                    History.StartTransaction();
+
+                    t.model.autoFilters.addAutoFilter(styleName, ar, addFormatTableOptionsObj);
 
                     //updates
-                    if(styleName && addNameColumn)
+                    if (styleName && addNameColumn) {
                         t.setSelection(filterRange);
+                    }
                     t._onUpdateFormatTable(filterRange, !!(styleName), true);
-					
-					History.EndTransaction();
-				};
-				
-				if(styleName === null)
-				{
-					addFilterCallBack();
-				}
-				else
-				{
-					var filterInfo = t.model.autoFilters._getFilterInfoByAddTableProps(ar, addFormatTableOptionsObj);
-					var filterRange = filterInfo.filterRange
-					var addNameColumn = filterInfo.addNameColumn;
-					
+
+                    History.EndTransaction();
+                };
+
+                if (styleName === null) {
+                    addFilterCallBack();
+                } else {
+                    var filterInfo = t.model.autoFilters._getFilterInfoByAddTableProps(ar, addFormatTableOptionsObj);
+                    var filterRange = filterInfo.filterRange
+                    var addNameColumn = filterInfo.addNameColumn;
+
                     t._isLockedCells(filterRange, null, addFilterCallBack)
-				}
+                }
             }
         };
 
-        if ( t._checkAddAutoFilter( ar, styleName, addFormatTableOptionsObj ) === true ) {
-            this._isLockedAll( onChangeAutoFilterCallback );
-            this._isLockedDefNames( null, null );
-        }
-        else//для того, чтобы в случае ошибки кнопка отжималась!
+        if (t._checkAddAutoFilter(ar, styleName, addFormatTableOptionsObj) === true) {
+            this._isLockedAll(onChangeAutoFilterCallback);
+            this._isLockedDefNames(null, null);
+        } else//для того, чтобы в случае ошибки кнопка отжималась!
         {
-            t.handlers.trigger( "selectionChanged", t.getSelectionInfo() );
+            t.handlers.trigger("selectionChanged", t.getSelectionInfo());
         }
     };
 
@@ -11511,7 +11507,7 @@
         }
 
         var t = this;
-        var ar = t.activeRange.clone(true);
+        var ar = this.model.selectionRange.getLast().clone();
 
         var onChangeAutoFilterCallback = function (isSuccess) {
             if (false === isSuccess) {
@@ -11598,7 +11594,7 @@
 
     WorksheetView.prototype.applyAutoFilter = function (autoFilterObject) {
         var t = this;
-        var ar = t.activeRange.clone(true);
+        var ar = this.model.selectionRange.getLast().clone();
         var onChangeAutoFilterCallback = function (isSuccess) {
             if (false === isSuccess) {
                 return;
@@ -11621,7 +11617,7 @@
 
     WorksheetView.prototype.reapplyAutoFilter = function (tableName) {
         var t = this;
-        var ar = t.activeRange.clone(true);
+        var ar = this.model.selectionRange.getLast().clone();
         var onChangeAutoFilterCallback = function (isSuccess) {
             if (false === isSuccess) {
                 return;
@@ -11686,7 +11682,7 @@
 
     WorksheetView.prototype.applyAutoFilterByType = function (autoFilterObject) {
         var t = this;
-        var ar = t.activeRange.clone(true);
+        var ar = this.model.selectionRange.getLast().clone();
 
         var isStartRangeIntoFilterOrTable = t.model.autoFilters.isStartRangeContainIntoTableOrFilter(ar);
         var isApplyAutoFilter = null, isAddAutoFilter = null, cellId = null, isFromatTable = null;
@@ -11789,7 +11785,7 @@
 
     WorksheetView.prototype.sortColFilter = function (type, cellId, displayName, color) {
         var t = this;
-        var ar = this.activeRange.clone(true);
+        var ar = this.model.selectionRange.getLast().clone();
         var onChangeAutoFilterCallback = function (isSuccess) {
             if (false === isSuccess) {
                 return;
@@ -11832,7 +11828,7 @@
 
     WorksheetView.prototype.clearFilter = function () {
         var t = this;
-        var ar = this.activeRange.clone(true);
+        var ar = this.model.selectionRange.getLast().clone();
         var onChangeAutoFilterCallback = function (isSuccess) {
             if (false === isSuccess) {
                 return;
@@ -11888,7 +11884,7 @@
             return;
         }
 
-        if (!this.activeRange.isEqual(range)) {
+        if (!this.model.selectionRange.getLast().isEqual(range)) {
             this.setSelection(range);
         }
 
@@ -12692,10 +12688,11 @@
 
         var refTablePart = tablePart.Ref;
 
-        var startCol = this.activeRange.c1;
-        var endCol = this.activeRange.c2;
-        var startRow = this.activeRange.r1;
-        var endRow = this.activeRange.r2;
+        var lastSelection = this.model.selectionRange.getLast();
+        var startCol = lastSelection.c1;
+        var endCol = lastSelection.c2;
+        var startRow = lastSelection.r1;
+        var endRow = lastSelection.r2;
 
         switch (optionType) {
             case c_oAscChangeSelectionFormatTable.all:
@@ -12721,15 +12718,15 @@
             {
                 startCol = refTablePart.c1;
                 endCol = refTablePart.c2;
-                startRow = this.activeRange.r1 < refTablePart.r1 ? refTablePart.r1 : this.activeRange.r1;
-                endRow = this.activeRange.r2 > refTablePart.r2 ? refTablePart.r2 : this.activeRange.r2;
+                startRow = lastSelection.r1 < refTablePart.r1 ? refTablePart.r1 : lastSelection.r1;
+                endRow = lastSelection.r2 > refTablePart.r2 ? refTablePart.r2 : lastSelection.r2;
 
                 break;
             }
             case c_oAscChangeSelectionFormatTable.column:
             {
-                startCol = this.activeRange.c1 < refTablePart.c1 ? refTablePart.c1 : this.activeRange.c1;
-                endCol = this.activeRange.c2 > refTablePart.c2 ? refTablePart.c2 : this.activeRange.c2;
+                startCol = lastSelection.c1 < refTablePart.c1 ? refTablePart.c1 : lastSelection.c1;
+                endCol = lastSelection.c2 > refTablePart.c2 ? refTablePart.c2 : lastSelection.c2;
                 startRow = refTablePart.r1;
                 endRow = refTablePart.r2;
 
@@ -12743,7 +12740,7 @@
     WorksheetView.prototype.af_changeFormatTableInfo = function (tableName, optionType, val) {
         var tablePart = this.model.autoFilters._getFilterByDisplayName(tableName);
         var t = this;
-        var ar = this.activeRange;
+        var ar = this.model.selectionRange.getLast();
 
         if (!tablePart || (tablePart && !tablePart.TableStyleInfo)) {
             return false;
@@ -12888,7 +12885,7 @@
             t._isLockedCells(changedRange, null, callback);
         };
 
-        var newActiveRange = this.activeRange.clone();
+        var newActiveRange = this.model.selectionRange.getLast().clone();
         var displayName = null;
         var type = null;
         switch (optionType) {
@@ -13013,7 +13010,7 @@
             t._isLockedCells(ref, null, callback);
         };
 
-        var newActiveRange = this.activeRange.clone();
+        var newActiveRange = this.model.selectionRange.getLast().clone();
         var val = null;
         switch (optionType) {
             case c_oAscDeleteOptions.DeleteColumns:
