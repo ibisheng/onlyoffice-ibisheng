@@ -789,16 +789,17 @@
 	};
 
 	CellEditor.prototype._parseRangeStr = function (s) {
-		var range = AscCommonExcel.g_oRangeCache.getActiveRange(s);
+		//var range = AscCommonExcel.g_oRangeCache.getActiveRange(s);
+		var range = AscCommonExcel.g_oRangeCache.getAscRange(s);
 		return range ? range.clone() : null;
 	};
 
 	CellEditor.prototype._parseFormulaRanges = function () {
-		var s = this._getFragmentsText( this.options.fragments ), t = this, ret = false, range,
-			wsOPEN = this.handlers.trigger( "getCellFormulaEnterWSOpen" ),
-			ws = wsOPEN ? wsOPEN.model : this.handlers.trigger( "getActiveWS" );
+		var s = this._getFragmentsText(
+			this.options.fragments), t = this, ret = false, range, wsOPEN = this.handlers.trigger(
+			"getCellFormulaEnterWSOpen"), ws = wsOPEN ? wsOPEN.model : this.handlers.trigger("getActiveWS");
 
-		if ( s.length < 1 || s.charAt( 0 ) !== "=" || this.options.cellNumFormat == Asc.c_oAscNumFormatType.Text ) {
+		if (s.length < 1 || s.charAt(0) !== "=" || this.options.cellNumFormat == Asc.c_oAscNumFormatType.Text) {
 			return ret;
 		}
 
@@ -822,14 +823,13 @@
 //             var __e__ = new Date().getTime();
 //             console.log("e-s "+ (__e__ - __s__));
 
-		this._formula = new AscCommonExcel.parserFormula( s.substr( 1 ), this.options.cellName, ws );
+		this._formula = new AscCommonExcel.parserFormula(s.substr(1), this.options.cellName, ws);
 		this._formula.parse();
 
-		var r, offset, _e, _s, wsName = null, refStr, isName = false,
-			_sColorPos;
+		var r, offset, _e, _s, wsName = null, refStr, isName = false, _sColorPos;
 
-		if ( this._formula.RefPos && this._formula.RefPos.length > 0 ) {
-			for ( var index = 0; index < this._formula.RefPos.length; index++ ) {
+		if (this._formula.RefPos && this._formula.RefPos.length > 0) {
+			for (var index = 0; index < this._formula.RefPos.length; index++) {
 				wsName = null;
 				isName = false;
 				r = this._formula.RefPos[index];
@@ -839,18 +839,16 @@
 				_sColorPos = _s = r.start;
 
 
-				switch ( r.oper.type ) {
-					case cElementType.cell          :
-					{
-						if ( wsOPEN ) {
+				switch (r.oper.type) {
+					case cElementType.cell          : {
+						if (wsOPEN) {
 							wsName = wsOPEN.model.getName();
 						}
 						ret = true;
 						refStr = r.oper.value;
 						break;
 					}
-					case cElementType.cell3D        :
-					{
+					case cElementType.cell3D        : {
 						ret = true;
 						wsName = r.oper.ws.getName();
 						_s = _e - r.oper.value.length;
@@ -858,18 +856,16 @@
 						refStr = r.oper.value;
 						break;
 					}
-					case cElementType.cellsRange    :
-					{
-						if ( wsOPEN ) {
+					case cElementType.cellsRange    : {
+						if (wsOPEN) {
 							wsName = wsOPEN.model.getName();
 						}
 						ret = true;
 						refStr = r.oper.value;
 						break;
 					}
-					case cElementType.cellsRange3D  :
-					{
-						if ( !r.oper.isSingleSheet() ) {
+					case cElementType.cellsRange3D  : {
+						if (!r.oper.isSingleSheet()) {
 							continue;
 						}
 						ret = true;
@@ -880,20 +876,20 @@
 						break;
 					}
 					case cElementType.table          :
-					case cElementType.name          :
-					{
+					case cElementType.name          : {
 						var nameRef = r.oper.toRef();
-						if( nameRef instanceof AscCommonExcel.cError ) continue;
-						switch ( nameRef.type ) {
+						if (nameRef instanceof AscCommonExcel.cError) {
+							continue;
+						}
+						switch (nameRef.type) {
 
-							case cElementType.cellsRange3D          :{
-								if ( !nameRef.isSingleSheet() ) {
+							case cElementType.cellsRange3D          : {
+								if (!nameRef.isSingleSheet()) {
 									continue;
 								}
 							}
 							case cElementType.cellsRange          :
-							case cElementType.cell3D        :
-							{
+							case cElementType.cell3D        : {
 								ret = true;
 								refStr = nameRef.value;
 								wsName = nameRef.getWS().getName();
@@ -908,15 +904,19 @@
 						continue;
 				}
 
-				if ( ret ) {
-					range = t._parseRangeStr( refStr );
-					if(!range) return false;
+				if (ret) {
+					range = t._parseRangeStr(refStr);
+					if (!range) {
+						return false;
+					}
 					range.cursorePos = offset - (_e - _s) + 1;
 					range.formulaRangeLength = _e - _s;
 					range.colorRangePos = offset - (_e - _sColorPos) + 1;
 					range.colorRangeLength = _e - _sColorPos;
-					if ( isName )range.isName = isName;
-					t.handlers.trigger( "newRange", range, wsName );
+					if (isName) {
+						range.isName = isName;
+					}
+					t.handlers.trigger("newRange", range, wsName);
 				}
 			}
 		}
@@ -924,7 +924,7 @@
 	};
 
 	CellEditor.prototype._findRangeUnderCursor = function () {
-		var t = this, s = t.textRender.getChars(0, t.textRender.getCharsCount()), range, arrFR = this.handlers.trigger(
+		var ranges, t = this, s = t.textRender.getChars(0, t.textRender.getCharsCount()), range, arrFR = this.handlers.trigger(
 			"getFormulaRanges"), a;
 
 		for (var id = 0; id < arrFR.length; id++) {
@@ -932,11 +932,14 @@
 			 * находится ли курсор в позиции над этим диапазоном, дабы не парсить всю формулу заново
 			 * необходимо чтобы парсить случаи когда используется что-то такое sumnas2:K2 - sumnas2 невалидная ссылка.
 			 * */
-			a = arrFR[id];
-			if (t.cursorPos >= a.cursorePos && t.cursorPos <= a.cursorePos + a.formulaRangeLength) {
-				range = a.clone(true);
-				range.isName = a.isName;
-				return {index: a.cursorePos, length: a.formulaRangeLength, range: range};
+			ranges = arrFR[id].ranges;
+			for (var i = 0, l = ranges.length; i < l; ++i) {
+				a = ranges[i];
+				if (t.cursorPos >= a.cursorePos && t.cursorPos <= a.cursorePos + a.formulaRangeLength) {
+					range = a.clone(true);
+					range.isName = a.isName;
+					return {index: a.cursorePos, length: a.formulaRangeLength, range: range};
+				}
 			}
 		}
 
@@ -1026,7 +1029,7 @@
 						if (this.handlers.trigger("getActiveWS") && this.handlers.trigger("getActiveWS").getName() != wsName) {
 							return {index: -1, length: 0, range: null};
 						}
-						range.isName = isName
+						range.isName = isName;
 						return {index: _s, length: r.oper.value.length, range: range, wsName: wsName};
 					}
 				}
@@ -1070,33 +1073,36 @@
 	};
 
 	CellEditor.prototype._getRenderFragments = function () {
-		var opt = this.options, fragments = opt.fragments, i, j, first, last, val, lengthColors, tmpColors, colorIndex, uniqueColorIndex;
-		if ( this.isFormula() ) {
-			var arrRanges = this.handlers.trigger( "getFormulaRanges" );
-			if ( 0 < arrRanges.length ) {
+		var opt = this.options, fragments = opt.fragments, ranges, i, j, k, l, first, last, val, lengthColors, tmpColors, colorIndex, uniqueColorIndex;
+		if (this.isFormula()) {
+			var arrRanges = this.handlers.trigger("getFormulaRanges");
+			if (0 < arrRanges.length) {
 				fragments = [];
-				for ( i = 0; i < opt.fragments.length; ++i )
-					fragments.push( opt.fragments[i].clone() );
+				for (i = 0; i < opt.fragments.length; ++i) {
+					fragments.push(opt.fragments[i].clone());
+				}
 
 				lengthColors = AscCommonExcel.c_oAscFormulaRangeBorderColor.length;
 				tmpColors = [];
 				uniqueColorIndex = 0;
-				for ( i = 0; i < arrRanges.length; ++i ) {
-					val = arrRanges[i];
+				for (i = 0; i < arrRanges.length; ++i) {
+					ranges = arrRanges[i].ranges;
+					for (j = 0, l = ranges.length; j < l; ++j) {
+						val = ranges[j];
+						colorIndex = asc.getUniqueRangeColor(ranges, j, tmpColors);
+						if (null == colorIndex) {
+							colorIndex = uniqueColorIndex++;
+						}
+						tmpColors.push(colorIndex);
 
-					colorIndex = asc.getUniqueRangeColor( arrRanges, i, tmpColors );
-					if ( null == colorIndex ) {
-						colorIndex = uniqueColorIndex++;
-					}
-					tmpColors.push( colorIndex );
-
-					this._extractFragments( val.colorRangePos, val.colorRangeLength, fragments );
-
-					first = this._findFragment( val.cursorePos, fragments );
-					last = this._findFragment( val.cursorePos + val.formulaRangeLength - 1, fragments );
-					if ( first && last ) {
-						for ( j = first.index; j <= last.index; ++j )
-							fragments[j].format.c = AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % lengthColors];
+						this._extractFragments(val.colorRangePos, val.colorRangeLength, fragments);
+						first = this._findFragment(val.cursorePos, fragments);
+						last = this._findFragment(val.cursorePos + val.formulaRangeLength - 1, fragments);
+						if (first && last) {
+							for (k = first.index; k <= last.index; ++k) {
+								fragments[k].format.c = AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % lengthColors];
+							}
+						}
 					}
 				}
 			}
@@ -1835,18 +1841,18 @@
 		}
 	};
 
-	CellEditor.prototype._findFragment = function ( pos, fragments ) {
+	CellEditor.prototype._findFragment = function (pos, fragments) {
 		var i, begin, end;
-		if ( !fragments ) {
+		if (!fragments) {
 			fragments = this.options.fragments;
 		}
 
-		for ( i = 0, begin = 0; i < fragments.length; ++i ) {
+		for (i = 0, begin = 0; i < fragments.length; ++i) {
 			end = begin + fragments[i].text.length;
-			if ( pos >= begin && pos < end ) {
+			if (pos >= begin && pos < end) {
 				return {index: i, begin: begin, end: end};
 			}
-			if ( i < fragments.length - 1 ) {
+			if (i < fragments.length - 1) {
 				begin = end;
 			}
 		}
@@ -1917,20 +1923,20 @@
 		return res;
 	};
 
-	CellEditor.prototype._extractFragments = function ( startPos, length, fragments ) {
+	CellEditor.prototype._extractFragments = function (startPos, length, fragments) {
 		var fr;
 
-		fr = this._findFragment( startPos, fragments );
-		if ( !fr ) {
+		fr = this._findFragment(startPos, fragments);
+		if (!fr) {
 			throw "Can not extract fragment of text";
 		}
-		this._splitFragment( fr, startPos, fragments );
+		this._splitFragment(fr, startPos, fragments);
 
-		fr = this._findFragment( startPos + length, fragments );
-		if ( !fr ) {
+		fr = this._findFragment(startPos + length, fragments);
+		if (!fr) {
 			throw "Can not extract fragment of text";
 		}
-		this._splitFragment( fr, startPos + length, fragments );
+		this._splitFragment(fr, startPos + length, fragments);
 	};
 
 	CellEditor.prototype._addFragments = function ( f, pos ) {

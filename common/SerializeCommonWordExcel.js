@@ -40,6 +40,14 @@
 //todo
 //BinaryCommonWriter
 
+	function extendClass (Child, Parent) {
+		var F = function() { };
+		F.prototype = Parent.prototype;
+		Child.prototype = new F();
+		Child.prototype.constructor = Child;
+		Child.superclass = Parent.prototype;
+	}
+
 var c_oSerConstants = {
     ErrorFormat: -2,
     ErrorUnknown: -1,
@@ -761,6 +769,21 @@ function CellAddressUtils(){
 	};
 }
 var g_oCellAddressUtils = new CellAddressUtils();
+
+	function CellBase(r, c) {
+		this.row = r;
+		this.col = c;
+	}
+	CellBase.prototype.clean = function() {
+		this.row = 0;
+		this.col = 0;
+	};
+	CellBase.prototype.clone = function() {
+		return new CellBase(this.row, this.col);
+	};
+	CellBase.prototype.isEqual = function(cell) {
+		return this.row === cell.row && this.col === cell.col;
+	};
 /**
  * @constructor
  */
@@ -798,6 +821,7 @@ function CellAddress(){
 		this._invalidId = true;
 	}
 }
+extendClass(CellAddress, CellBase);
 CellAddress.prototype._isDigit=function(symbol){
 	return '0' <= symbol && symbol <= '9';
 };
@@ -1141,6 +1165,7 @@ function isRealObject(obj)
 
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommon'] = window['AscCommon'] || {};
+	window["AscCommon"].extendClass = extendClass;
   window['AscCommon'].c_oSerConstants = c_oSerConstants;
   window['AscCommon'].c_oSerPropLenType = c_oSerPropLenType;
   window['AscCommon'].c_oSer_ColorType = c_oSer_ColorType;
@@ -1159,6 +1184,7 @@ function isRealObject(obj)
   window['AscCommon'].gc_nMaxRow0 = gc_nMaxRow0;
   window['AscCommon'].gc_nMaxCol0 = gc_nMaxCol0;
   window['AscCommon'].g_oCellAddressUtils = g_oCellAddressUtils;
+	window['AscCommon'].CellBase = CellBase;
   window['AscCommon'].CellAddress = CellAddress;
   window['AscCommon'].isRealObject = isRealObject;
   window['AscCommon'].FileStream = FileStream;

@@ -43,7 +43,6 @@
 		 * Import
 		 * -----------------------------------------------------------------------------
 		 */
-		var g_fontApplication = AscFonts.g_fontApplication;
 		var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
 		var c_oAscMaxCellOrCommentLength = Asc.c_oAscMaxCellOrCommentLength;
 		var doc = window.document;
@@ -246,26 +245,10 @@
 				else
 				{
 					pptx_content_writer.Start_UseFullUrl();
-				
-					//TODO стоит убрать заглушку при правке бага с activeRange
-					var cloneActiveRange = worksheet.activeRange.clone();
-					var temp;
-					if(cloneActiveRange.c1 > cloneActiveRange.c2)
-					{
-						temp = cloneActiveRange.c1;
-						cloneActiveRange.c1 = cloneActiveRange.c2;
-						cloneActiveRange.c2 = temp;
-					};
-					
-					if(cloneActiveRange.r1 > cloneActiveRange.r2)
-					{
-						temp = cloneActiveRange.r1;
-						cloneActiveRange.r1 = cloneActiveRange.r2;
-						cloneActiveRange.r2 = temp;
-					};
-					
-					var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(worksheet.model.workbook, cloneActiveRange);
-					var sBase64 = "xslData;" + oBinaryFileWriter.Write();
+
+					// ToDo multiselect ?
+					var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(worksheet.model.workbook, worksheet.model.selectionRange.getLast());
+					sBase64 = "xslData;" + oBinaryFileWriter.Write();
 					
 					pptx_content_writer.End_UseFullUrl();
 				}
@@ -278,7 +261,7 @@
 				var sBase64;
 				
 				var selectedContent = new CSelectedContent();
-				isIntoShape.Get_SelectedContent(selectedContent)
+				isIntoShape.Get_SelectedContent(selectedContent);
 				
 				var oPresentationWriter = new AscCommon.CBinaryFileWriter();
 				
@@ -355,7 +338,6 @@
 					return false;
 				
 				var worksheetView = api.wb.getWorksheet();
-				var activeRange = worksheetView.getSelectedRange();
 				
 				var objectRender = worksheetView.objectRender;
 				var isIntoShape = objectRender.controller.getTargetDocContent();
@@ -365,8 +347,7 @@
 				if(!isIntoShape)
 					sBase64 = this.getBinaryForCopy(worksheetView);
 				History.TurnOn();
-				
-				var objectRender = worksheetView.objectRender;
+
 				var selectedImages = objectRender.getSelectedGraphicObjects();
 
                 var drawingUrls = [];
@@ -1311,7 +1292,7 @@
 				if(node == undefined)
 					return;
 					
-				var binaryResult, pasteFragment = node, t = this, localStorageResult;
+				var binaryResult, t = this;
 				t.alreadyLoadImagesOnServer = false;
 				
 				//****binary****
@@ -1319,7 +1300,6 @@
 				{
 					onlyFromLocalStorage = null;
 					node = this.element;
-					pasteFragment = node;
 				}
 				
 				//если находимся внутри шейпа
@@ -1339,26 +1319,24 @@
 				//****binary****
 				if(copyPasteUseBinary)
 				{
-					this.activeRange = worksheet.activeRange.clone(true);
+					this.activeRange = worksheet.model.selectionRange.getLast().clone();
 					binaryResult = this._pasteFromBinaryClassHtml(worksheet, node, onlyFromLocalStorage, isIntoShape);
 					
 					if(binaryResult === true)
 						return;
 					else if(binaryResult !== false && binaryResult != undefined)
 					{
-						pasteFragment = binaryResult;
 						node = binaryResult;
 					}
 				}
 
-				this.activeRange = worksheet.activeRange.clone(true);
+				this.activeRange = worksheet.model.selectionRange.getLast().clone();
 				
 				
 				var callBackAfterLoadImages = function()
 				{
 					History.TurnOff();
-				
-					var oPasteProcessor;
+
 					var oTempDrawingDocument = worksheet.model.DrawingDocument;
 					var newCDocument = new CDocument(oTempDrawingDocument, false);
 					newCDocument.bFromDocument = true;
@@ -1372,7 +1350,7 @@
 						oOldEditor = editor;
 					editor = {WordControl: oTempDrawingDocument, isDocumentEditor: true};
 					var oPasteProcessor = new AscCommon.PasteProcessor({WordControl:{m_oLogicDocument: newCDocument}, FontLoader: {}}, false, false);
-					oPasteProcessor._Prepeare_recursive(node, true, true)
+					oPasteProcessor._Prepeare_recursive(node, true, true);
 					oPasteProcessor._Execute(node, {}, true, true, false);
 					editor = oOldEditor;
 					
@@ -1899,8 +1877,9 @@
 			_checkPasteFromBinaryExcel: function(worksheet, isWriteError, insertWorksheet)
 			{
 				var activeCellsPasteFragment = AscCommonExcel.g_oRangeCache.getAscRange(this.activeRange);
-				var rMax = (activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1) + worksheet.activeRange.r1;
-				var cMax = (activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1) + worksheet.activeRange.c1;
+				var lastRange = worksheet.model.selectionRange.getLast();
+				var rMax = (activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1) + lastRange.r1;
+				var cMax = (activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1) + lastRange.c1;
 				var res = true;
 				
 				//если область вставки выходит за пределы доступной области
@@ -2399,7 +2378,7 @@
 			_paste : function(worksheet, pasteData)
 			{
 				var documentContent = pasteData.content;
-				var activeRange = worksheet.activeRange.clone(true);
+				var activeRange = worksheet.model.selectionRange.getLast().clone();
 				if(pasteData.images && pasteData.images.length)
 					this.isUsuallyPutImages = true;
 				

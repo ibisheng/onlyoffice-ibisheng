@@ -712,9 +712,6 @@
     this.model.handlers.add("setSelection", function() {
       self._onSetSelection.apply(self, arguments);
     });
-    this.model.handlers.add("getSelection", function() {
-      return self._onGetSelection.apply(self);
-    });
     this.model.handlers.add("getSelectionState", function() {
       return self._onGetSelectionState.apply(self);
     });
@@ -850,14 +847,8 @@
   };
 
   WorkbookView.prototype._onWSSelectionChanged = function(info) {
-    var ws = this.getWorksheet();
-
-    if (this.cellFormulaEnterWSOpen) {
-      ws = this.cellFormulaEnterWSOpen;
-    }
-
-    var ar = ws.activeRange;
-    this.lastSendInfoRange = ar.clone(true);
+    var ws = this.cellFormulaEnterWSOpen ? this.cellFormulaEnterWSOpen : this.getWorksheet();
+    this.lastSendInfoRange = ws.model.selectionRange.getLast().clone(true);
     this.lastSendInfoRangeIsSelectOnShape = ws.getSelectionShape();
 
     if (null === info) {
@@ -915,11 +906,6 @@
     this.controller.scroll(d);
   };
 
-  WorkbookView.prototype._onGetSelection = function() {
-    var ws = this.getWorksheet(null, true);
-    return ws ? ws.getActiveRangeObj() : null;
-  };
-
   WorkbookView.prototype._onGetSelectionState = function() {
     var res = null;
     var ws = this.getWorksheet(null, true);
@@ -945,9 +931,10 @@
     }
   };
 
-  WorkbookView.prototype._onChangeSelection = function(isStartPoint, dc, dr, isCoord, isSelectMode, callback) {
+  WorkbookView.prototype._onChangeSelection = function (isStartPoint, dc, dr, isCoord, isSelectMode, isCtrl, callback) {
     var ws = this.getWorksheet();
-    var d = isStartPoint ? ws.changeSelectionStartPoint(dc, dr, isCoord, isSelectMode) : ws.changeSelectionEndPoint(dc, dr, isCoord, isSelectMode);
+    var d = isStartPoint ? ws.changeSelectionStartPoint(dc, dr, isCoord, isSelectMode, isCtrl) :
+      ws.changeSelectionEndPoint(dc, dr, isCoord, isSelectMode);
     if (!isCoord && !isStartPoint && !isSelectMode) {
       // Выделение с зажатым shift
       this.canUpdateAfterShiftUp = true;
@@ -964,7 +951,7 @@
     ws.changeSelectionDone();
     this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
     // Проверим, нужно ли отсылать информацию о ячейке
-    var ar = ws.activeRange;
+    var ar = ws.model.selectionRange.getLast();
     var isSelectOnShape = ws.getSelectionShape();
     if (!this._isEqualRange(ar, isSelectOnShape)) {
       this._onWSSelectionChanged(ws.getSelectionInfo());
@@ -979,7 +966,7 @@
     if (c_oTargetType.Hyperlink === ct.target) {
       // Проверим замерженность
       var isHyperlinkClick = false;
-      if ((ar.c1 === ar.c2 && ar.r1 === ar.r2) || isSelectOnShape) {
+      if (ar.isOneCell() || isSelectOnShape) {
         isHyperlinkClick = true;
       } else {
         var mergedRange = ws.model.getMergedByCell(ar.r1, ar.c1);
@@ -1167,9 +1154,9 @@
   };
 
   // Обработка перемещения диапазона
-  WorkbookView.prototype._onMoveRangeHandle = function(x, y, callback, ctrlKey) {
+  WorkbookView.prototype._onMoveRangeHandle = function(x, y, callback) {
     var ws = this.getWorksheet();
-    var d = ws.changeSelectionMoveRangeHandle(x, y, ctrlKey);
+    var d = ws.changeSelectionMoveRangeHandle(x, y);
     asc_applyFunction(callback, d);
   };
 
@@ -1204,7 +1191,7 @@
 
   WorkbookView.prototype._onShowAutoComplete = function() {
     var ws = this.getWorksheet();
-    var arrValues = ws.getCellAutoCompleteValues(ws.activeRange.startCol, ws.activeRange.startRow);
+    var arrValues = ws.getCellAutoCompleteValues(ws.model.selectionRange.activeCell);
     this.handlers.trigger('asc_onEntriesListMenu', arrValues);
   };
 
@@ -1314,13 +1301,13 @@
 
     var ws = t.getWorksheet();
     var activeCellRange = ws.getActiveCell(0, 0, false);
-    var arn = ws.activeRange.clone(true);
+    var selectionRange = ws.model.selectionRange.clone();
 
     var editFunction = function() {
       t.setCellEditMode(true);
       ws.setCellEditMode(true);
       ws.openCellEditor(t.cellEditor, /*fragments*/undefined, /*cursorPos*/undefined, isFocus, isClearCell,
-        /*isHideCursor*/isHideCursor, /*isQuickInput*/isQuickInput, /*activeRange*/arn);
+        /*isHideCursor*/isHideCursor, /*isQuickInput*/isQuickInput, selectionRange);
       t.input.disabled = false;
       t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
 
@@ -1562,7 +1549,7 @@
     if (c_oAscSelectionDialogType.Chart === this.selectionDialogType) {
       // Когда идет выбор диапазона, то должны на закрываемом листе отменить выбор диапазона
       tmpWorksheet = this.getWorksheet();
-      selectionRange = tmpWorksheet.activeRange.clone(true);
+      selectionRange = tmpWorksheet.model.selectionRange.getLast().clone(true);
       tmpWorksheet.setSelectionDialogMode(c_oAscSelectionDialogType.None);
     }
     if (this.stateFormatPainter) {
@@ -1970,7 +1957,7 @@
         cursorPos = name.length - 1;
       }
 
-      var arn = ws.activeRange.clone(true);
+      var selectionRange = ws.model.selectionRange.clone();
 
       var openEditor = function(res) {
         if (res) {
@@ -1983,7 +1970,7 @@
             t.skipHelpSelector = true;
           }
           // Открываем, с выставлением позиции курсора
-          if (!ws.openCellEditorWithText(t.cellEditor, name, cursorPos, /*isFocus*/false, /*activeRange*/arn)) {
+          if (!ws.openCellEditorWithText(t.cellEditor, name, cursorPos, /*isFocus*/false, selectionRange)) {
             t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
             t.setCellEditMode(false);
             t.controller.setStrictClose(false);
@@ -2149,7 +2136,7 @@
   // Поиск текста в листе
   WorkbookView.prototype.findCellText = function(options) {
     // Для поиска эта переменная не нужна (но она может остаться от replace)
-    options.activeRange = null;
+    options.activeCell = null;
 
     var ws = this.getWorksheet();
     // Останавливаем ввод данных в редакторе ввода
@@ -2211,7 +2198,7 @@
     }
 
     if (result) {
-      return ws._setActiveCell(result.c1, result.r1);
+      return ws.setSelection(result);
     }
     this._cleanFindResults();
     return null;

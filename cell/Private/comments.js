@@ -52,13 +52,14 @@
   var t = this;
   var oComment = comment;
   var bChange = false;
-  oComment.wsId = this.worksheet.model.getId();
+  oComment.wsId = this.model.getId();
   oComment.setId();
 
   if (!oComment.bDocument) {
     if (!bIsNotUpdate) {
-      oComment.asc_putCol(this.worksheet.getSelectedColumnIndex());
-      oComment.asc_putRow(this.worksheet.getSelectedRowIndex());
+      var activeCell = this.model.selectionRange.activeCell;
+      oComment.asc_putCol(activeCell.col);
+      oComment.asc_putRow(activeCell.row);
     }
 
     var existComments = this.getComments(oComment.nCol, oComment.nRow);

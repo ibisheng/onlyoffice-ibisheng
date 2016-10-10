@@ -1165,10 +1165,9 @@ CCellCommentator.prototype.getComments = function(col, row) {
 
 	if (0 < length) {
 		if (null == _col || null == _row) {
-			var selectedCell = this.worksheet.getSelectedRange();
-			var oFirst = selectedCell.getFirst();
-			_col = oFirst.col - 1;
-			_row = oFirst.row - 1;
+			var activeCell = this.model.selectionRange.activeCell;
+			_col = activeCell.col;
+			_row = activeCell.row;
 		} else
 			mergedRange = this.model.getMergedByCell(row, col);
 

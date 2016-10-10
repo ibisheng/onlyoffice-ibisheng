@@ -239,15 +239,14 @@ CHistory.prototype.UndoRedoPrepare = function (oRedoObjectParam, bUndo) {
 	else
 		this.workbook.bRedoChanges = true;
 
-	if(!window["NATIVE_EDITOR_ENJINE"]) {
+	if (!window["NATIVE_EDITOR_ENJINE"]) {
 		var wsViews = Asc["editor"].wb.wsViews;
 		for (var i = 0; i < wsViews.length; ++i) {
-			if (wsViews[i] && wsViews[i].objectRender && wsViews[i].objectRender.controller) {
-				wsViews[i].objectRender.controller.resetSelection(undefined, true);
-			}
-			if (wsViews[i] && wsViews[i].isChartAreaEditMode ) {
-				wsViews[i].isChartAreaEditMode = false;
-				wsViews[i].arrActiveChartsRanges = [];
+			if (wsViews[i]) {
+				if (wsViews[i].objectRender && wsViews[i].objectRender.controller) {
+					wsViews[i].objectRender.controller.resetSelection(undefined, true);
+				}
+				wsViews[i].endEditChart();
 			}
 		}
 	}
@@ -619,12 +618,13 @@ CHistory.prototype.Create_NewPoint = function()
 	var UpdateRigions = {};
 	var Time  = new Date().getTime();
 	var UndoSheetId = null, oSelectionState = this.workbook.handlers.trigger("getSelectionState");
-
-	// ToDo Берем всегда, т.к. в случае с LastState мы можем не попасть на нужный лист и не заселектить нужный диапазон!
-	var oSelectRange = this.workbook.handlers.trigger("getSelection");
+	var oSelectRange = null;
 	var wsActive = this.workbook.getWorksheet(this.workbook.getActive());
-	if (wsActive)
+	if (wsActive) {
 		UndoSheetId = wsActive.getId();
+		// ToDo Берем всегда, т.к. в случае с LastState мы можем не попасть на нужный лист и не заселектить нужный диапазон!
+		oSelectRange = wsActive.selectionRange.getLast(); // ToDo get only last selection range
+	}
 
     // Создаем новую точку
     this.Points[++this.Index] = {

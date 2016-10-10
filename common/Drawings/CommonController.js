@@ -813,7 +813,7 @@ DrawingObjectsController.prototype =
             }
             this.chartForProps = this.getSelectionState();
             this.resetSelection();
-            this.drawingObjects.getWorksheet().arrActiveChartsRanges = [];
+            this.drawingObjects.getWorksheet().endEditChart();
             var oldIsStartAdd = window["Asc"]["editor"].isStartAddShape;
             window["Asc"]["editor"].isStartAddShape = true;
             this.updateOverlay();
@@ -4620,7 +4620,7 @@ DrawingObjectsController.prototype =
             var worksheet = this.drawingObjects.getWorksheet();
             if(worksheet)
             {
-                worksheet.arrActiveChartsRanges = [];
+                worksheet.endEditChart();
             }
             if(this.selection.groupSelection)
             {
