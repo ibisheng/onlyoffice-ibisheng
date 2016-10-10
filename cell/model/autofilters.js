@@ -3020,6 +3020,7 @@
 						else
 						{
 							tableColumn.setTotalsRowLabel(label);
+							cell.setType(CellValueType.String);
 						}
 						
 						this._addHistoryObj({nCol: cell.bbox.c1, nRow: cell.bbox.r1, formula: oldFormula, val: oldLabel}, AscCH.historyitem_AutoFilter_ChangeTotalRow, {activeCells: range, nCol: cell.bbox.c1, nRow: cell.bbox.r1, formula: formula, val: label});

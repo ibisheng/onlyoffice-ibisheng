@@ -5654,7 +5654,7 @@ TableColumn.prototype.generateTotalsRowLabel = function(){
 };
 TableColumn.prototype.generateTotalsRowFunction = function(ws, tablePart){
 	//TODO добавить в перевод
-	if(this.TotalsRowFunction === null)
+	if(null === this.TotalsRowFunction && null === this.TotalsRowLabel)
 	{	
 		this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
 		this.setTotalsRowFormula("SUBTOTAL(109," + tablePart.DisplayName + "[" + this.Name + "])", ws);
