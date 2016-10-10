@@ -896,6 +896,9 @@
 					case AscCH.historyitem_AutoFilter_ClearFilterColumn:
 						this.clearFilterColumn(data.cellId, data.displayName);
 						break;
+					case AscCH.historyitem_AutoFilter_ChangeColumnName:
+						this.renameTableColumn(null, null, data);
+						break;
 				}
 				History.TurnOn();
 			},
@@ -923,7 +926,11 @@
 					delete cloneData.insCells;
 
 				//TODO переделать undo, по типам
-				if(type === AscCH.historyitem_AutoFilter_Move)//перемещение
+				if(type === AscCH.historyitem_AutoFilter_ChangeColumnName)//перемещение
+				{
+					this.renameTableColumn(null, null, undoData);
+				}
+				else if(type === AscCH.historyitem_AutoFilter_Move)//перемещение
 				{
 					this._moveAutoFilters(null, null, data);
 				}
@@ -2829,6 +2836,8 @@
 					oHistoryObject.val                  = redoObject.val;
 					oHistoryObject.color                = redoObject.color;
 					oHistoryObject.tablePart       	    = redoObject.tablePart;
+					oHistoryObject.nCol       	        = redoObject.nCol;
+					oHistoryObject.nRow         	    = redoObject.nRow;
 				}
 				else
 				{
@@ -2850,7 +2859,7 @@
 				return ws.model;
 			},
 
-			renameTableColumn: function(range, bUndo)
+			renameTableColumn: function(range, bUndo, props)
 			{
 				var worksheet = this.worksheet;
 				var val;
@@ -2876,6 +2885,11 @@
 					return res;
 				};
 				
+				if(props)
+				{
+					range = new Asc.Range(props.nCol, props.nRow, props.nCol, props.nRow);
+				}
+				
 				if(worksheet.TableParts)
 				{
 					worksheet.workbook.dependencyFormulas.buildDependency();
@@ -2898,7 +2912,7 @@
 									continue;	
 									
 								cell = worksheet.getCell3(ref.r1, j);
-								val = cell.getValue();
+								val = props ? props.val : cell.getValue();
 								
 								//проверка на повторение уже существующих заголовков
 								if(checkRepeateColumnName(val, filter.TableColumns, j - tableRange.c1))
@@ -2907,11 +2921,16 @@
 								}
 								
 								//если не пустая изменяем TableColumns
+								var oldVal = filter.TableColumns[j - tableRange.c1].Name;
+								var newVal = null;
 								if(val != "" && intersection.c1 <= j && intersection.c2 >= j )
 								{
 									filter.TableColumns[j - tableRange.c1].Name = val;
 									if(!bUndo)
+									{
 										cell.setType(CellValueType.String);
+									}
+									newVal = val;
 								}	
 								else if(val == "")//если пустая изменяем генерируем имя и добавляем его в TableColumns  
 								{
@@ -2923,6 +2942,12 @@
 										cell.setType(CellValueType.String);
 									}									
 									filter.TableColumns[j - tableRange.c1].Name = generateName;
+									newVal = generateName;
+								}
+								
+								if(null !== newVal)
+								{
+									this._addHistoryObj({nCol: cell.bbox.c1, nRow: cell.bbox.r1, val: oldVal}, AscCH.historyitem_AutoFilter_ChangeColumnName, {activeCells: range, nCol: cell.bbox.c1, nRow: cell.bbox.r1, val: newVal});
 								}
 							}
 							

@@ -1763,8 +1763,10 @@ var g_oUndoRedoData_AutoFilterProperties = {
 		HeaderRowCount      : 15,
 		TotalsRowCount      : 16,
 		color               : 17,
-		tablePart        : 18
-	};
+		tablePart           : 18,
+		nCol                : 19,
+		nRow                : 20
+};
 function UndoRedoData_AutoFilter() {
 	this.Properties = g_oUndoRedoData_AutoFilterProperties;
 
@@ -1790,7 +1792,9 @@ function UndoRedoData_AutoFilter() {
     this.HeaderRowCount     = null;
     this.TotalsRowCount     = null;
 	this.color              = null;
-	this.tablePart       = null;
+	this.tablePart          = null;
+	this.nCol               = null;
+	this.nRow               = null;
 }
 UndoRedoData_AutoFilter.prototype = {
 	getType : function ()
@@ -1836,6 +1840,8 @@ UndoRedoData_AutoFilter.prototype = {
 
 				return tablePart; break;
 			}
+			case this.Properties.nCol: return this.nCol; break;
+			case this.Properties.nRow: return this.nRow; break;
 		}
 
 		return null;
@@ -1897,6 +1903,8 @@ UndoRedoData_AutoFilter.prototype = {
 				}
 				break;
 			}
+			case this.Properties.nCol: this.nCol = value;break;
+			case this.Properties.nRow: this.nRow = value;break;
 		}
 		return null;
 	},
@@ -3136,8 +3144,6 @@ UndoRedoCell.prototype = {
 		{
 			if (bUndo || AscCH.historyitem_Cell_ChangeValueUndo !== Type) {
 				cell.setValueData(Val);
-				// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
-				ws.autoFilters.renameTableColumn(new Asc.Range(nCol, nRow, nCol, nRow), bUndo);
 			}
 		}
 		else if(AscCH.historyitem_Cell_SetStyle == Type)
@@ -3872,12 +3878,23 @@ UndoRedoAutoFilters.prototype = {
 		var ws = wb.getWorksheetById(nSheetId);
 		if(ws){
 			var autoFilters = ws.autoFilters;
-			if (bUndo == true)
+			if (bUndo === true)
 			{
 				autoFilters.Undo(Type, Data);
 			}
 			else
+			{
+				if(AscCH.historyitem_AutoFilter_ChangeColumnName === Type)
+				{
+					if(false != this.wb.bCollaborativeChanges)
+					{
+						var collaborativeEditing = this.wb.oApi.collaborativeEditing;
+						Data.nRow = collaborativeEditing.getLockOtherRow2(nSheetId, Data.nRow);
+						Data.nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, Data.nCol);
+					}
+				}
 				autoFilters.Redo(Type, Data);
+			}
 		}
 	},
 	forwardTransformationIsAffect : function(Type) {
