@@ -11109,12 +11109,12 @@
     WorksheetView.prototype.openCellEditorWithText = function (editor, text, cursorPos, isFocus, selectionRange) {
         var t = this;
         selectionRange = (selectionRange) ? selectionRange : this.model.selectionRange;
-        var cell = selectionRange.cell;
-        var c = t._getVisibleCell(cell.col, cell.row);
+        var activeCell = selectionRange.activeCell;
+        var c = t._getVisibleCell(activeCell.col, activeCell.row);
         var v, copyValue;
 
         if (!c) {
-            throw "Can not get cell data (col=" + cell.col + ", row=" + cell.row + ")";
+            throw "Can not get cell data (col=" + activeCell.col + ", row=" + activeCell.row + ")";
         }
 
         // get first fragment and change its text
