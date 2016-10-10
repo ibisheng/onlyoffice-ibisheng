@@ -899,6 +899,9 @@
 					case AscCH.historyitem_AutoFilter_ChangeColumnName:
 						this.renameTableColumn(null, null, data);
 						break;
+					case AscCH.historyitem_AutoFilter_ChangeTotalRow:
+						this.renameTableColumn(null, null, data);
+						break;
 				}
 				History.TurnOn();
 			},
@@ -926,7 +929,7 @@
 					delete cloneData.insCells;
 
 				//TODO переделать undo, по типам
-				if(type === AscCH.historyitem_AutoFilter_ChangeColumnName)//перемещение
+				if(type === AscCH.historyitem_AutoFilter_ChangeColumnName || type === AscCH.historyitem_AutoFilter_ChangeTotalRow)//перемещение
 				{
 					this.renameTableColumn(null, null, undoData);
 				}
@@ -2838,6 +2841,7 @@
 					oHistoryObject.tablePart       	    = redoObject.tablePart;
 					oHistoryObject.nCol       	        = redoObject.nCol;
 					oHistoryObject.nRow         	    = redoObject.nRow;
+					oHistoryObject.formula         	    = redoObject.formula;
 				}
 				else
 				{
@@ -2955,13 +2959,13 @@
 						}
 						else
 						{
-							this._changeTotalsRowData(filter, range);
+							this._changeTotalsRowData(filter, range, props);
 						}
 					}
 				}
 			},
 			
-			_changeTotalsRowData: function(tablePart, range)
+			_changeTotalsRowData: function(tablePart, range, props)
 			{
 				if(!tablePart || !range || !tablePart.TotalsRowCount)
 				{
@@ -2981,16 +2985,44 @@
 						var cell = worksheet.getCell3(tableRange.r2, j);
 						var tableColumn = tablePart.TableColumns[j - tableRange.c1];
 						
-						if(cell.isFormula())
+						var formula = null;
+						var label = null;
+						if(props)
 						{
-							var val = cell.getFormula();
-							tableColumn.setTotalsRowFormula(val, worksheet);
+							if(props.formula)
+							{
+								formula = props.formula;
+							}
+							else
+							{
+								label = props.val;
+							}
 						}
 						else
 						{
-							var val = cell.getValue();
-							tableColumn.setTotalsRowLabel(val);
+							if(cell.isFormula())
+							{
+								formula = cell.getFormula();
+							}
+							else
+							{
+								label = cell.getValue();
+							}
 						}
+						
+						var oldLabel = tableColumn.TotalsRowLabel;
+						var oldFormula = tableColumn.TotalsRowFormula ? tableColumn.TotalsRowFormula.Formula : null;
+						
+						if(null !== formula)
+						{
+							tableColumn.setTotalsRowFormula(formula, worksheet);
+						}
+						else
+						{
+							tableColumn.setTotalsRowLabel(label);
+						}
+						
+						this._addHistoryObj({nCol: cell.bbox.c1, nRow: cell.bbox.r1, formula: oldFormula, val: oldLabel}, AscCH.historyitem_AutoFilter_ChangeTotalRow, {activeCells: range, nCol: cell.bbox.c1, nRow: cell.bbox.r1, formula: formula, val: label});
 					}
 				}
 			},

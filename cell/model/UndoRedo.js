@@ -1765,7 +1765,8 @@ var g_oUndoRedoData_AutoFilterProperties = {
 		color               : 17,
 		tablePart           : 18,
 		nCol                : 19,
-		nRow                : 20
+		nRow                : 20,
+		formula             : 21
 };
 function UndoRedoData_AutoFilter() {
 	this.Properties = g_oUndoRedoData_AutoFilterProperties;
@@ -1795,6 +1796,7 @@ function UndoRedoData_AutoFilter() {
 	this.tablePart          = null;
 	this.nCol               = null;
 	this.nRow               = null;
+	this.formula            = null;
 }
 UndoRedoData_AutoFilter.prototype = {
 	getType : function ()
@@ -1842,6 +1844,7 @@ UndoRedoData_AutoFilter.prototype = {
 			}
 			case this.Properties.nCol: return this.nCol; break;
 			case this.Properties.nRow: return this.nRow; break;
+			case this.Properties.formula: return this.formula; break;
 		}
 
 		return null;
@@ -1905,6 +1908,7 @@ UndoRedoData_AutoFilter.prototype = {
 			}
 			case this.Properties.nCol: this.nCol = value;break;
 			case this.Properties.nRow: this.nRow = value;break;
+			case this.Properties.formula: this.formula = value;break;
 		}
 		return null;
 	},
@@ -3884,7 +3888,7 @@ UndoRedoAutoFilters.prototype = {
 			}
 			else
 			{
-				if(AscCH.historyitem_AutoFilter_ChangeColumnName === Type)
+				if(AscCH.historyitem_AutoFilter_ChangeColumnName === Type || AscCH.historyitem_AutoFilter_ChangeTotalRow === Type)
 				{
 					if(false != this.wb.bCollaborativeChanges)
 					{

@@ -143,6 +143,7 @@ function (window, undefined) {
 	window['AscCH'].historyitem_AutoFilter_ChangeTableName = 14;
 	window['AscCH'].historyitem_AutoFilter_ClearFilterColumn = 15;
 	window['AscCH'].historyitem_AutoFilter_ChangeColumnName = 16;
+	window['AscCH'].historyitem_AutoFilter_ChangeTotalRow = 17;
 
 
 function CHistory()
