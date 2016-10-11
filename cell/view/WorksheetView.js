@@ -856,6 +856,7 @@
     WorksheetView.prototype.autoCompleteFormula = function (functionName) {
         var t = this;
         // ToDo autoComplete with multiselect
+        var activeCell = this.model.selectionRange.activeCell;
         var ar = this.model.selectionRange.getLast();
         var arCopy = null;
         var arHistorySelect = ar.clone(true);
@@ -866,8 +867,8 @@
         // Первая левая не числовая ячейка
         var leftCell = null;
 
-        var r = ar.cell.row - 1;
-        var c = ar.cell.col - 1;
+        var r = activeCell.row - 1;
+        var c = activeCell.col - 1;
         var cell, cellType, isNumberFormat;
         var result = {};
         // Проверим, есть ли числовые значения в диапазоне
