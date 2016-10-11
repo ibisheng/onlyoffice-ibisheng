@@ -8500,23 +8500,9 @@
             if (false === isSuccess) {
                 return;
             }
-            var range;
+            var range = t.model.getRange3(checkRange.r1, checkRange.c1, checkRange.r2, checkRange.c2);
             var canChangeColWidth = c_oAscCanChangeColWidth.none;
             var bIsUpdate = true;
-
-            if (onlyActive) {
-                range = t.model.getRange3(activeCell.row, activeCell.col, activeCell.row, activeCell.col);
-            } else {
-                if (c_oAscSelectionType.RangeMax === arn.type) {
-                    range = t.model.getRange3(/*arn.r1*/0, /*arn.c1*/0, gc_nMaxRow0, gc_nMaxCol0);
-                } else if (c_oAscSelectionType.RangeCol === arn.type) {
-                    range = t.model.getRange3(/*arn.r1*/0, arn.c1, gc_nMaxRow0, arn.c2);
-                } else if (c_oAscSelectionType.RangeRow === arn.type) {
-                    range = t.model.getRange3(arn.r1, /*arn.c1*/0, arn.r2, gc_nMaxCol0);
-                } else {
-                    range = t.model.getRange3(arn.r1, arn.c1, arn.r2, arn.c2);
-                }
-            }
 
             var isLargeRange = t._isLargeRange(range.bbox), callTrigger = false;
             var res;
