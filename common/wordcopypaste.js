@@ -1301,7 +1301,7 @@ CopyProcessor.prototype =
 			if(selectedContent && selectedContent.Elements && selectedContent.Elements[0] && selectedContent.Elements[0].Element)
 				elementsContent = selectedContent.Elements;
 			else 
-				return;
+				return "";
 				
 			//TODO заглушка для презентационных параграфов(выделен текст внутри диаграммы) - пока не пишем в бинарник
 			if(selectedContent.Elements[0].Element && selectedContent.Elements[0].Element.bFromDocument === false)
@@ -2249,7 +2249,12 @@ PasteProcessor.prototype =
             }
             if(PasteElementsId.copyPasteUseBinary)
             {
-                if(onlyBinary)
+                if(null === node && "" === onlyBinary)
+				{
+					return;
+				}
+				
+				if(onlyBinary)
 				{
 					if(onlyBinary.indexOf("xslData;") > -1)
 					{
