@@ -207,6 +207,7 @@
 			_style += "overflow:hidden;padding:0px;margin:0px;font-family:arial;font-size:12pt;resize:none;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;";
 			this.HtmlArea.setAttribute("style", _style);
 			this.HtmlArea.setAttribute("spellcheck", false);
+			this.HtmlArea.setAttribute("autocapitalize", "none");
 
 			this.HtmlDiv.appendChild(this.HtmlArea);
 
@@ -334,6 +335,29 @@
 				_elem.style.width  = _width;
 				_elem.style.height = _elemSrc.style.height;
 			}
+
+			if (this.Api.isMobileVersion)
+			{
+			    var _elem1 = document.getElementById("area_id_parent");
+			    var _elem2 = document.getElementById("area_id");
+
+			    _elem1.parentNode.style.pointerEvents = "";
+
+
+                _elem1.style.left = "-100px";
+			    _elem1.style.top = "-100px";
+			    _elem1.style.right = "-100px";
+			    _elem1.style.bottom = "-100px";
+			    _elem1.style.width = "auto";
+                _elem1.style.height = "auto";
+
+			    _elem2.style.left = "0px";
+                _elem2.style.top = "0px";
+                _elem2.style.right = "0px";
+                _elem2.style.bottom = "0px";
+                _elem2.style.width = "100%";
+                _elem2.style.height = "100%";
+			}
 		},
 
 		checkFocus : function()
@@ -347,6 +371,9 @@
 
 		move : function(x, y)
 		{
+		    if (this.Api.isMobileVersion)
+		        return;
+
 			var oTarget = document.getElementById(this.TargetId);
 			var xPos    = x ? x : parseInt(oTarget.style.left);
 			var yPos    = (y ? y : parseInt(oTarget.style.top)) + parseInt(oTarget.style.height);
@@ -1486,6 +1513,10 @@
 
 			ti_console_log("ti: onCompositionEnd -> onCompositionUpdate");
 			this.onCompositionUpdate(e, false, _data, true);
+
+			//if (AscCommon.AscBrowser.isAndroid)
+			//    this.onCompositionUpdate(e, false, "", true);
+
 			var _max = this.Api.Get_MaxCursorPosInCompositeText();
 			this.Api.Set_CursorPosInCompositeText(_max); // max
 
@@ -1733,7 +1764,6 @@
 			t.HtmlArea.focus();
 			t.nativeFocusElement = _elem;
 			t.Api.asc_enableKeyEvents(true, true);
-
 		}, true);
 
 		// send focus
