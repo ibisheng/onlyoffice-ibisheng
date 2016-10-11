@@ -6808,35 +6808,42 @@
     };
 
     WorksheetView.prototype.getSelectionMathInfo = function () {
-        var ar = this.model.selectionRange.getLast();
-        var range = this.model.getRange3(ar.r1, ar.c1, ar.r2, ar.c2);
-        var tmp;
         var oSelectionMathInfo = new asc_CSelectionMathInfo();
         var sum = 0;
+        var oExistCells = {};
+
         var t = this;
-        range._setPropertyNoEmpty(null, null, function (cell, r) {
-            if (!cell.isEmptyTextString() && t.height_1px <= t.rows[r].height) {
-                ++oSelectionMathInfo.count;
-                if (CellValueType.Number === cell.getType()) {
-                    tmp = parseFloat(cell.getValueWithoutFormat());
-                    if (isNaN(tmp)) {
-                        return;
+        this.model.selectionRange.ranges.forEach(function (item) {
+            var tmp;
+            var range = t.model.getRange3(item.r1, item.c1, item.r2, item.c2);
+            range._setPropertyNoEmpty(null, null, function (cell, r) {
+                var idCell = cell.nCol + '-' + cell.nRow;
+                if (!oExistCells[idCell] && !cell.isEmptyTextString() && t.height_1px <= t.rows[r].height) {
+                    oExistCells[idCell] = true;
+                    ++oSelectionMathInfo.count;
+                    if (CellValueType.Number === cell.getType()) {
+                        tmp = parseFloat(cell.getValueWithoutFormat());
+                        if (isNaN(tmp)) {
+                            return;
+                        }
+                        if (0 === oSelectionMathInfo.countNumbers) {
+                            oSelectionMathInfo.min = oSelectionMathInfo.max = tmp;
+                        } else {
+                            oSelectionMathInfo.min = Math.min(oSelectionMathInfo.min, tmp);
+                            oSelectionMathInfo.max = Math.max(oSelectionMathInfo.max, tmp);
+                        }
+                        ++oSelectionMathInfo.countNumbers;
+                        sum += tmp;
                     }
-                    if (0 === oSelectionMathInfo.countNumbers) {
-                        oSelectionMathInfo.min = oSelectionMathInfo.max = tmp;
-                    } else {
-                        oSelectionMathInfo.min = Math.min(oSelectionMathInfo.min, tmp);
-                        oSelectionMathInfo.max = Math.max(oSelectionMathInfo.max, tmp);
-                    }
-                    ++oSelectionMathInfo.countNumbers;
-                    sum += tmp;
                 }
-            }
+            });
         });
+
         // Показываем только данные для 2-х или более ячеек (http://bugzilla.onlyoffice.com/show_bug.cgi?id=24115)
         if (1 < oSelectionMathInfo.countNumbers) {
             // Мы должны отдавать в формате активной ячейки
-            var numFormat = range.getNumFormat();
+            var numFormat = this.model.getRange3(this.model.selectionRange.row, this.model.selectionRange.cell,
+              this.model.selectionRange.row, this.model.selectionRange.cell).getNumFormat();
             if (Asc.c_oAscNumFormatType.Time === numFormat.getType()) {
                 // Для времени нужно отдавать в формате [h]:mm:ss (http://bugzilla.onlyoffice.com/show_bug.cgi?id=26271)
                 numFormat = AscCommon.oNumFormatCache.get('[h]:mm:ss');
