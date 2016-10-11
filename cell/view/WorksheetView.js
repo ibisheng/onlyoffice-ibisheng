@@ -6698,10 +6698,11 @@
      */
     WorksheetView.prototype._calcActiveCellOffset = function (range) {
         var vr = this.visibleRange;
+        var activeCell = this.model.selectionRange.activeCell;
         var ar = range ? range : this.model.selectionRange.getLast();
-        var mc = this.model.getMergedByCell(ar.startRow, ar.startCol);
-        var startCol = mc ? mc.c1 : ar.startCol;
-        var startRow = mc ? mc.r1 : ar.startRow;
+        var mc = this.model.getMergedByCell(activeCell.row, activeCell.col);
+        var startCol = mc ? mc.c1 : activeCell.col;
+        var startRow = mc ? mc.r1 : activeCell.row;
         var incX = startCol < vr.c1 ? startCol - vr.c1 : 0;
         var incY = startRow < vr.r1 ? startRow - vr.r1 : 0;
 
@@ -8650,7 +8651,7 @@
                         callTrigger = true;
                         t.handlers.trigger("slowOperation", true);
                     }
-                    t.cellCommentator.sortComments(range.sort(val, arn.startCol, sortColor, true));
+                    t.cellCommentator.sortComments(range.sort(val, activeCell.col, sortColor, true));
                     break;
 
                 case "empty":
@@ -11679,6 +11680,7 @@
 
     WorksheetView.prototype.applyAutoFilterByType = function (autoFilterObject) {
         var t = this;
+        var activeCell = this.model.selectionRange.activeCell.clone();
         var ar = this.model.selectionRange.getLast().clone();
 
         var isStartRangeIntoFilterOrTable = t.model.autoFilters.isStartRangeContainIntoTableOrFilter(ar);
@@ -11721,7 +11723,7 @@
                 //generate cellId
                 if (null === cellId) {
                     cellId = t.model.autoFilters._rangeToId(
-                      Asc.Range(ar.startCol, t.model.AutoFilter.Ref.r1, ar.startCol, t.model.AutoFilter.Ref.r1));
+                      Asc.Range(activeCell.col, t.model.AutoFilter.Ref.r1, activeCell.col, t.model.AutoFilter.Ref.r1));
                 }
             }
 
@@ -11730,11 +11732,11 @@
 
                 var filter = autoFilterObject.filter;
                 if (c_oAscAutoFilterTypes.CustomFilters === filter.type) {
-                    var cell = t.model._getCell(ar.startRow, ar.startCol);
+                    var cell = t.model._getCell(activeCell.row, activeCell.col);
                     var val = cell.getValueWithoutFormat();
                     filter.filter.CustomFilters[0].Val = val;
                 } else if (c_oAscAutoFilterTypes.ColorFilter === filter.type) {
-                    var cell = t.model._getCell(ar.startRow, ar.startCol);
+                    var cell = t.model._getCell(activeCell.row, activeCell.col);
                     if (filter.filter && filter.filter.dxf && filter.filter.dxf.fill) {
                         if (false === filter.filter.CellColor) {
                             var fontColor = cell.xfs && cell.xfs.font ? cell.xfs.font.c : null;
