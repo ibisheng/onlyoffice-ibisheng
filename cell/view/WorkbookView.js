@@ -689,10 +689,10 @@
 		}
     });
 
-    this.model.handlers.add("cleanCellCache", function(wsId, oRanges, canChangeColWidth, bLockDraw, updateHeight) {
+    this.model.handlers.add("cleanCellCache", function(wsId, oRanges, bLockDraw, updateHeight) {
       var ws = self.getWorksheetById(wsId, true);
       if (ws) {
-        ws.updateRanges(oRanges, canChangeColWidth, bLockDraw || wsId != self.getWorksheet(self.wsActive).model.getId(), updateHeight);
+        ws.updateRanges(oRanges, bLockDraw || wsId != self.getWorksheet(self.wsActive).model.getId(), updateHeight);
       }
     });
     this.model.handlers.add("changeWorksheetUpdate", function(wsId, val) {

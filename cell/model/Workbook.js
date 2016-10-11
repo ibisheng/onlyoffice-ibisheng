@@ -3179,7 +3179,7 @@ Workbook.prototype.getTableNameColumnByIndex = function(tableName, columnIndex){
 				}
 			}
 			for (i in oCleanCellCacheArea) {
-				this.handlers.trigger("cleanCellCache", i, oCleanCellCacheArea[i], AscCommonExcel.c_oAscCanChangeColWidth.none);
+				this.handlers.trigger("cleanCellCache", i, oCleanCellCacheArea[i]);
 			}
 
 			AscCommonExcel.g_oVLOOKUPCache.clean();
