@@ -899,10 +899,10 @@
                 this.cleanSelection();
                 ar.c1 = startCol;
                 ar.r1 = startRow;
-                if (false === ar.contains(ar.startCol, ar.startRow)) {
+                if (false === ar.contains(activeCell.col, activeCell.row)) {
                     // Передвинуть первую ячейку в выделении
-                    ar.startCol = startCol;
-                    ar.startRow = startRow;
+                    activeCell.col = startCol;
+                    activeCell.row = startRow;
                 }
                 if (true === hasNumberInLastRow && true === hasNumberInLastColumn) {
                     // Мы расширяем диапазон
@@ -1038,7 +1038,7 @@
 
         // Ищем первую ячейку с числом
         for (; r >= vr.r1; --r) {
-            cell = this._getCellTextCache(ar.startCol, r);
+            cell = this._getCellTextCache(activeCell.col, r);
             if (cell) {
                 // Нашли не пустую ячейку, проверим формат
                 cellType = cell.cellType;
@@ -1046,11 +1046,11 @@
                 if (isNumberFormat) {
                     // Это число, мы нашли то, что искали
                     topCell = {
-                        c: ar.startCol, r: r, isFormula: cell.isFormula
+                        c: activeCell.col, r: r, isFormula: cell.isFormula
                     };
                     // смотрим вторую ячейку
                     if (topCell.isFormula && r - 1 >= vr.r1) {
-                        cell = this._getCellTextCache(ar.startCol, r - 1);
+                        cell = this._getCellTextCache(activeCell.col, r - 1);
                         if (cell && cell.isFormula) {
                             topCell.isFormulaSeq = true;
                         }
@@ -1060,9 +1060,9 @@
             }
         }
         // Проверим, первой все равно должна быть колонка
-        if (null === topCell || topCell.r !== ar.startRow - 1 || topCell.isFormula && !topCell.isFormulaSeq) {
+        if (null === topCell || topCell.r !== activeCell.row - 1 || topCell.isFormula && !topCell.isFormulaSeq) {
             for (; c >= vr.c1; --c) {
-                cell = this._getCellTextCache(c, ar.startRow);
+                cell = this._getCellTextCache(c, activeCell.row);
                 if (cell) {
                     // Нашли не пустую ячейку, проверим формат
                     cellType = cell.cellType;
@@ -1070,7 +1070,7 @@
                     if (isNumberFormat) {
                         // Это число, мы нашли то, что искали
                         leftCell = {
-                            r: ar.startRow, c: c
+                            r: activeCell.row, c: c
                         };
                         break;
                     }
@@ -1086,11 +1086,11 @@
             // Идем влево до первой не числовой ячейки
             --c;
             for (; c >= 0; --c) {
-                cell = this._getCellTextCache(c, ar.startRow);
+                cell = this._getCellTextCache(c, activeCell.row);
                 if (!cell) {
                     // Могут быть еще не закешированные данные
-                    this._addCellTextToCache(c, ar.startRow);
-                    cell = this._getCellTextCache(c, ar.startRow);
+                    this._addCellTextToCache(c, activeCell.row);
+                    cell = this._getCellTextCache(c, activeCell.row);
                     if (!cell) {
                         break;
                     }
@@ -1104,9 +1104,9 @@
             // Мы ушли чуть дальше
             ++c;
             // Диапазон или только 1 ячейка
-            if (ar.startCol - 1 !== c) {
+            if (activeCell.col - 1 !== c) {
                 // Диапазон
-                result = new asc_Range(c, leftCell.r, ar.startCol - 1, leftCell.r);
+                result = new asc_Range(c, leftCell.r, activeCell.col - 1, leftCell.r);
             } else {
                 // Одна ячейка
                 result = new asc_Range(c, leftCell.r, c, leftCell.r);
@@ -1125,11 +1125,11 @@
             // Идем вверх до первой не числовой ячейки
             --r;
             for (; r >= 0; --r) {
-                cell = this._getCellTextCache(ar.startCol, r);
+                cell = this._getCellTextCache(activeCell.col, r);
                 if (!cell) {
                     // Могут быть еще не закешированные данные
-                    this._addCellTextToCache(ar.startCol, r);
-                    cell = this._getCellTextCache(ar.startCol, r);
+                    this._addCellTextToCache(activeCell.col, r);
+                    cell = this._getCellTextCache(activeCell.col, r);
                     if (!cell) {
                         break;
                     }
@@ -1143,9 +1143,9 @@
             // Мы ушли чуть дальше
             ++r;
             // Диапазон или только 1 ячейка
-            if (ar.startRow - 1 !== r) {
+            if (activeCell.row - 1 !== r) {
                 // Диапазон
-                result = new asc_Range(topCell.c, r, topCell.c, ar.startRow - 1);
+                result = new asc_Range(topCell.c, r, topCell.c, activeCell.row - 1);
             } else {
                 // Одна ячейка
                 result = new asc_Range(topCell.c, r, topCell.c, r);
@@ -6386,7 +6386,7 @@
 
     WorksheetView.prototype._fixSelectionOfMergedCells = function (fixedRange) {
         var tmpSelection = this._getSelection();
-        var ar = fixedRange ? fixedRange : tmpSelection.getLast();
+        var ar = fixedRange ? fixedRange : (tmpSelection ? tmpSelection.getLast() : null);
         if (!ar) {
             return;
         }
