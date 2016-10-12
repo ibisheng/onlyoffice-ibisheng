@@ -774,7 +774,7 @@
 				} 
 				else if (base64FromWord)//from word
 				{
-					this.activeRange = worksheet.activeRange.clone(true);
+					this.activeRange = worksheet.model.selectionRange.getLast().clone(true);
 					result = this._pasteFromBinaryWord(worksheet, base64FromWord, isIntoShape, isCellEditMode);
 				}
 				else if(base64FromPresentation)
@@ -1994,7 +1994,7 @@
 			pasteTextOnSheet: function(worksheet, text)
 			{
 				//TODO сделать вставку текста всегда через эту функцию
-				this.activeRange = worksheet.activeRange.clone(true);
+				this.activeRange = worksheet.model.selectionRange.getLast().clone(true);
 				
 				//если находимся внутри шейпа
 				var isIntoShape = worksheet.objectRender.controller.getTargetDocContent();
