@@ -1610,12 +1610,21 @@ var editor;
     this.collaborativeEditing.onEndCheckLock(callback);
   };
 
-  spreadsheet_api.prototype._addWorksheet = function(name, i) {
-    this.wbModel.createWorksheet(i, name);
-    this.wb.spliceWorksheet(i, 0, null);
-    this.asc_showWorksheet(i);
-    // Посылаем callback об изменении списка листов
-    this.sheetsChanged();
+  spreadsheet_api.prototype._addWorksheet = function (name, i) {
+    var t = this;
+    var addWorksheetCallback = function(res) {
+      if (res) {
+        t.wbModel.createWorksheet(i, name);
+        t.wb.spliceWorksheet(i, 0, null);
+        t.asc_showWorksheet(i);
+        // Посылаем callback об изменении списка листов
+        t.sheetsChanged();
+      }
+    };
+
+    var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null,
+      AscCommonExcel.c_oAscLockAddSheet, AscCommonExcel.c_oAscLockAddSheet);
+    this._getIsLockObjectSheet(lockInfo, addWorksheetCallback);
   };
 
   // Workbook interface
