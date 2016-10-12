@@ -3596,7 +3596,7 @@ function OfflineEditor () {
                     if (!this.isSelectionDialogMode) {
                         this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/true));
                         if (!isSelectMode) {
-                            this.handlers.trigger("selectionChanged", this.getSelectionInfo(false));
+                            this.handlers.trigger("selectionChanged", this.getSelectionInfo());
                             this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
                         }
                     } else {
