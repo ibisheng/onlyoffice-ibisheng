@@ -6002,6 +6002,8 @@ Paragraph.prototype =
                 // Если у нас в выделение попадает начало или конец гиперссылки, или конец параграфа, или
                 // у нас все выделение находится внутри гиперссылки, тогда мы не можем добавить новую. Во
                 // всех остальных случаях разрешаем добавить.
+				// Также, если начало или конец выделения попадает в элемент, который нельзя разделить, тогда мы тоже
+				// запрещаем добавление гиперссылки.
 
                 var StartPos = this.Selection.StartPos;
                 var EndPos   = this.Selection.EndPos;
@@ -6011,8 +6013,10 @@ Paragraph.prototype =
                     EndPos   = this.Selection.StartPos;
                 }
 
-                // Проверяем не находимся ли мы внутри гиперссылки
+                if (false === this.Content[StartPos].CanSplit() || false === this.Content[EndPos].CanSplit())
+					return false;
 
+                // Проверяем не находимся ли мы внутри гиперссылки
                 for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
                 {
                     var Element = this.Content[CurPos];
@@ -6038,6 +6042,8 @@ Paragraph.prototype =
             {
                 // Если у нас в выделение попадает несколько гиперссылок или конец параграфа, тогда
                 // возвращаем false, во всех остальных случаях true
+				// Также, если начало или конец выделения попадает в элемент, который нельзя разделить, тогда мы тоже
+				// запрещаем добавление гиперссылки.
 
                 var StartPos = this.Selection.StartPos;
                 var EndPos   = this.Selection.EndPos;
@@ -6046,6 +6052,9 @@ Paragraph.prototype =
                     StartPos = this.Selection.EndPos;
                     EndPos   = this.Selection.StartPos;
                 }
+
+				if (false === this.Content[StartPos].CanSplit() || false === this.Content[EndPos].CanSplit())
+					return false;
 
                 var bHyper = false;
 

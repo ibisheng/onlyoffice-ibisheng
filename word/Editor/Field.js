@@ -209,6 +209,10 @@ ParaField.prototype.Split = function (ContentPos, Depth)
     // Не даем разделять поле
     return null;
 };
+ParaField.prototype.CanSplit = function()
+{
+	return false;
+};
 ParaField.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange, _CurPage)
 {
     var CurLine  = _CurLine - this.StartLine;
