@@ -1719,17 +1719,17 @@ Paragraph.prototype =
                     if ( 0 === CurRange )
                     {
                         if ( Pr.ParaPr.Brd.Left.Value === border_Single )
-                            TempX0 -= 1 + Pr.ParaPr.Brd.Left.Size + Pr.ParaPr.Brd.Left.Space;
+                            TempX0 -= 0.5 + Pr.ParaPr.Brd.Left.Size + Pr.ParaPr.Brd.Left.Space;
                         else
-                            TempX0 -= 1;
+                            TempX0 -= 0.5;
                     }
 
                     if ( this.Lines[CurLine].Ranges.length - 1 === CurRange )
                     {
                         if ( Pr.ParaPr.Brd.Right.Value === border_Single )
-                            TempX1 += 1 + Pr.ParaPr.Brd.Right.Size + Pr.ParaPr.Brd.Right.Space;
+                            TempX1 += 0.5 + Pr.ParaPr.Brd.Right.Size + Pr.ParaPr.Brd.Right.Space;
                         else
-                            TempX1 += 1;
+                            TempX1 += 0.5;
                     }
 
                     if(Pr.ParaPr.Shd.Unifill)
@@ -1913,7 +1913,7 @@ Paragraph.prototype =
                     {
                         pGraphics.SetBorder(Pr.ParaPr.Brd.Right);
                     }
-                    pGraphics.drawVerLine( c_oAscLineDrawingRule.Right, TempX1 + 1 + Pr.ParaPr.Brd.Right.Size + Pr.ParaPr.Brd.Right.Space, this.Pages[CurPage].Y + TempTop, this.Pages[CurPage].Y + TempBottom, Pr.ParaPr.Brd.Right.Size );
+                    pGraphics.drawVerLine( c_oAscLineDrawingRule.Right, TempX1 + 0.5 + Pr.ParaPr.Brd.Right.Size + Pr.ParaPr.Brd.Right.Space, this.Pages[CurPage].Y + TempTop, this.Pages[CurPage].Y + TempBottom, Pr.ParaPr.Brd.Right.Size );
                 }
 
                 if ( Pr.ParaPr.Brd.Left.Value === border_Single )
@@ -1924,7 +1924,7 @@ Paragraph.prototype =
                     {
                         pGraphics.SetBorder(Pr.ParaPr.Brd.Left);
                     }
-                    pGraphics.drawVerLine( c_oAscLineDrawingRule.Left, TempX0 - 1 - Pr.ParaPr.Brd.Left.Size - Pr.ParaPr.Brd.Left.Space, this.Pages[CurPage].Y + TempTop, this.Pages[CurPage].Y + TempBottom, Pr.ParaPr.Brd.Left.Size );
+                    pGraphics.drawVerLine( c_oAscLineDrawingRule.Left, TempX0 - 0.5 - Pr.ParaPr.Brd.Left.Size - Pr.ParaPr.Brd.Left.Space, this.Pages[CurPage].Y + TempTop, this.Pages[CurPage].Y + TempBottom, Pr.ParaPr.Brd.Left.Size );
                 }
             }
 
@@ -2316,14 +2316,14 @@ Paragraph.prototype =
             X_right = X_left + this.Get_LineDropCapWidth();
 
         if ( Pr.ParaPr.Brd.Left.Value === border_Single )
-            X_left -= 1 + Pr.ParaPr.Brd.Left.Space;
+            X_left -= 0.5 + Pr.ParaPr.Brd.Left.Space;
         else
-            X_left -= 1;
+            X_left -= 0.5;
 
         if ( Pr.ParaPr.Brd.Right.Value === border_Single )
-            X_right += 1 + Pr.ParaPr.Brd.Right.Space;
+            X_right += 0.5 + Pr.ParaPr.Brd.Right.Space;
         else
-            X_right += 1;
+            X_right += 0.5;
 
         var LeftMW  = -( border_Single === Pr.ParaPr.Brd.Left.Value  ? Pr.ParaPr.Brd.Left.Size  : 0 );
         var RightMW =  ( border_Single === Pr.ParaPr.Brd.Right.Value ? Pr.ParaPr.Brd.Right.Size : 0 );
