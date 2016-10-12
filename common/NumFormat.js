@@ -2016,6 +2016,7 @@ NumFormat.prototype =
 			nType = c_oAscNumFormatType.Number;
 		else if(this.bInteger)
 			nType = c_oAscNumFormatType.Integer;
+		return nType;
 	},
 	isGeneral: function() {
 		return 1 == this.aRawFormat.length && numFormat_General == this.aRawFormat[0].type;
