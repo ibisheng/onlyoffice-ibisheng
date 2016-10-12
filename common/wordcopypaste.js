@@ -2517,7 +2517,7 @@ PasteProcessor.prototype =
 			var oObjectsForDownload = GetObjectsForImageDownload(aContent.aPastedImages);
 			if(oObjectsForDownload.aUrls.length > 0)
 			{
-				if(onlyBinary && window["NativeCorrectImageUrlOnPaste"])
+				if(bIsOnlyFromBinary && window["NativeCorrectImageUrlOnPaste"])
 				{
 					var url;
 					for(var i = 0, length = aContent.aPastedImages.length; i < length; ++i)
