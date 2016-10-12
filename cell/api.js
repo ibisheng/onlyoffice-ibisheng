@@ -2591,8 +2591,8 @@ var editor;
   };
 
   // Cell interface
-  spreadsheet_api.prototype.asc_getCellInfo = function(bExt) {
-    return this.wb.getWorksheet().getSelectionInfo(!!bExt);
+  spreadsheet_api.prototype.asc_getCellInfo = function() {
+    return this.wb.getWorksheet().getSelectionInfo();
   };
 
   // Получить координаты активной ячейки

@@ -6911,12 +6911,12 @@
           parserHelp.get3DRef(this.model.getName(), sName);
     };
 
-    WorksheetView.prototype.getSelectionInfo = function (bExt) {
-        return this.objectRender.selectedGraphicObjectsExists() ? this._getSelectionInfoObject(bExt) :
-          this._getSelectionInfoCell(bExt);
+    WorksheetView.prototype.getSelectionInfo = function () {
+        return this.objectRender.selectedGraphicObjectsExists() ? this._getSelectionInfoObject() :
+          this._getSelectionInfoCell();
     };
 
-    WorksheetView.prototype._getSelectionInfoCell = function (bExt) {
+    WorksheetView.prototype._getSelectionInfoCell = function () {
         var c_opt = this.settings.cells;
         var selectionRange = this.model.selectionRange;
         var cell = selectionRange.activeCell;
@@ -7025,11 +7025,6 @@
         cell_info.comments = this.cellCommentator.getComments(ar.c1, ar.r1);
         cell_info.flags.merge = null !== range.hasMerged();
 
-        if (bExt) {
-            cell_info.innertext = c.getValue();
-            cell_info.numFormat = c.getNumFormatStr();
-        }
-
         var sheetId = this.model.getId();
         // Пересчет для входящих ячеек в добавленные строки/столбцы
         var isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, ar);
@@ -7054,42 +7049,41 @@
 
         objectInfo.flags = new asc_CCellFlag();
         var graphicObjects = this.objectRender.getSelectedGraphicObjects();
-        if ( graphicObjects.length ) {
-            objectInfo.flags.selectionType = this.objectRender.getGraphicSelectionType( graphicObjects[0].Id );
+        if (graphicObjects.length) {
+            objectInfo.flags.selectionType = this.objectRender.getGraphicSelectionType(graphicObjects[0].Id);
         }
 
         var textPr = this.objectRender.controller.getParagraphTextPr();
         var theme = this.objectRender.controller.getTheme();
-        if ( textPr && theme && theme.themeElements && theme.themeElements.fontScheme ) {
-            if ( textPr.FontFamily ) {
-                textPr.FontFamily.Name = theme.themeElements.fontScheme.checkFont( textPr.FontFamily.Name );
+        if (textPr && theme && theme.themeElements && theme.themeElements.fontScheme) {
+            if (textPr.FontFamily) {
+                textPr.FontFamily.Name = theme.themeElements.fontScheme.checkFont(textPr.FontFamily.Name);
             }
-            if ( textPr.RFonts ) {
-                if ( textPr.RFonts.Ascii ) {
-                    textPr.RFonts.Ascii.Name = theme.themeElements.fontScheme.checkFont( textPr.RFonts.Ascii.Name );
+            if (textPr.RFonts) {
+                if (textPr.RFonts.Ascii) {
+                    textPr.RFonts.Ascii.Name = theme.themeElements.fontScheme.checkFont(textPr.RFonts.Ascii.Name);
                 }
-                if ( textPr.RFonts.EastAsia ) {
-                    textPr.RFonts.EastAsia.Name = theme.themeElements.fontScheme.checkFont( textPr.RFonts.EastAsia.Name );
+                if (textPr.RFonts.EastAsia) {
+                    textPr.RFonts.EastAsia.Name = theme.themeElements.fontScheme.checkFont(textPr.RFonts.EastAsia.Name);
                 }
-                if ( textPr.RFonts.HAnsi ) {
-                    textPr.RFonts.HAnsi.Name = theme.themeElements.fontScheme.checkFont( textPr.RFonts.HAnsi.Name );
+                if (textPr.RFonts.HAnsi) {
+                    textPr.RFonts.HAnsi.Name = theme.themeElements.fontScheme.checkFont(textPr.RFonts.HAnsi.Name);
                 }
-                if ( textPr.RFonts.CS ) {
-                    textPr.RFonts.CS.Name = theme.themeElements.fontScheme.checkFont( textPr.RFonts.CS.Name );
+                if (textPr.RFonts.CS) {
+                    textPr.RFonts.CS.Name = theme.themeElements.fontScheme.checkFont(textPr.RFonts.CS.Name);
                 }
             }
         }
 
         var paraPr = this.objectRender.controller.getParagraphParaPr();
-        if(!paraPr && textPr)
-        {
+        if (!paraPr && textPr) {
             paraPr = new CParaPr();
         }
-        if ( textPr && paraPr ) {
-            objectInfo.text = this.objectRender.controller.Get_SelectedText( true );
+        if (textPr && paraPr) {
+            objectInfo.text = this.objectRender.controller.Get_SelectedText(true);
 
             var horAlign = "center";
-            switch ( paraPr.Jc ) {
+            switch (paraPr.Jc) {
                 case AscCommon.align_Left    :
                     horAlign = "left";
                     break;
@@ -7106,8 +7100,8 @@
             var vertAlign = "center";
             var shape_props = this.objectRender.controller.getDrawingProps().shapeProps;
             var angle = null;
-            if ( shape_props ) {
-                switch ( shape_props.verticalTextAlign ) {
+            if (shape_props) {
+                switch (shape_props.verticalTextAlign) {
                     case AscFormat.VERTICAL_ANCHOR_TYPE_BOTTOM:
                         vertAlign = "bottom";
                         break;
@@ -7121,7 +7115,7 @@
                         vertAlign = "top";
                         break;
                 }
-                switch ( shape_props.vert ) {
+                switch (shape_props.vert) {
                     case AscFormat.nVertTTvert:
                         angle = 90;
                         break;
@@ -7148,29 +7142,27 @@
             objectInfo.font.strikeout = textPr.Strikeout;
             objectInfo.font.subscript = textPr.VertAlign == AscCommon.vertalign_SubScript;
             objectInfo.font.superscript = textPr.VertAlign == AscCommon.vertalign_SuperScript;
-            if ( textPr.Color ) {
-                objectInfo.font.color = AscCommon.CreateAscColorCustom( textPr.Color.r, textPr.Color.g, textPr.Color.b );
+            if (textPr.Color) {
+                objectInfo.font.color = AscCommon.CreateAscColorCustom(textPr.Color.r, textPr.Color.g, textPr.Color.b);
             }
 
             var shapeHyperlink = this.objectRender.controller.getHyperlinkInfo();
-            if ( shapeHyperlink && (shapeHyperlink instanceof ParaHyperlink) ) {
+            if (shapeHyperlink && (shapeHyperlink instanceof ParaHyperlink)) {
 
                 var hyperlink = new AscCommonExcel.Hyperlink();
                 hyperlink.Tooltip = shapeHyperlink.ToolTip;
 
-                var spl = shapeHyperlink.Value.split( "!" );
-                if ( spl.length === 2 ) {
-                    hyperlink.setLocation( shapeHyperlink.Value );
-                }
-                else {
+                var spl = shapeHyperlink.Value.split("!");
+                if (spl.length === 2) {
+                    hyperlink.setLocation(shapeHyperlink.Value);
+                } else {
                     hyperlink.Hyperlink = shapeHyperlink.Value;
                 }
 
-                objectInfo.hyperlink = new asc_CHyperlink( hyperlink );
-                objectInfo.hyperlink.asc_setText( shapeHyperlink.Get_SelectedText( true, true ) );
+                objectInfo.hyperlink = new asc_CHyperlink(hyperlink);
+                objectInfo.hyperlink.asc_setText(shapeHyperlink.Get_SelectedText(true, true));
             }
-        }
-        else {
+        } else {
             // Может быть не задано текста, поэтому выставим по умолчанию
             objectInfo.font = new asc_CFont();
             objectInfo.font.name = this.model.getDefaultFontName();
@@ -7178,7 +7170,7 @@
         }
 
         // Заливка не нужна как таковая
-        objectInfo.fill = new asc_CFill( null );
+        objectInfo.fill = new asc_CFill(null);
 
         // ToDo locks
 
