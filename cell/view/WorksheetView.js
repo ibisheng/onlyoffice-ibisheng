@@ -7239,9 +7239,9 @@
     };
 
     WorksheetView.prototype._updateSelectionNameAndInfo = function () {
-        this.handlers.trigger( "selectionNameChanged", this.getSelectionName( /*bRangeText*/false ) );
-        this.handlers.trigger( "selectionChanged", this.getSelectionInfo() );
-        this.handlers.trigger( "selectionMathInfoChanged", this.getSelectionMathInfo() );
+        this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
+        this.handlers.trigger("selectionChanged");
+        this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
     };
 
     WorksheetView.prototype.getSelectionShape = function () {
@@ -7368,7 +7368,7 @@
             if (isChangeSelectionShape || !this.model.selectionRange.isEqual(ar)) {
                 this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
                 if (!isSelectMode) {
-                    this.handlers.trigger("selectionChanged", this.getSelectionInfo());
+                    this.handlers.trigger("selectionChanged");
                     this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
                 }
             }
@@ -7489,7 +7489,7 @@
                 if (!this.isSelectionDialogMode) {
                     this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/true));
                     if (!isSelectMode) {
-                        this.handlers.trigger("selectionChanged", this.getSelectionInfo());
+                        this.handlers.trigger("selectionChanged");
                         this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
                     }
                 } else {
@@ -7530,7 +7530,7 @@
 
         // Эвент обновления
         this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
-        this.handlers.trigger("selectionChanged", this.getSelectionInfo());
+        this.handlers.trigger("selectionChanged");
 
         return ret;
     };
@@ -9893,7 +9893,7 @@
                 t._updateVisibleRowsCount();
             }
 
-            t.handlers.trigger("selectionChanged", t.getSelectionInfo());
+            t.handlers.trigger("selectionChanged");
             t.handlers.trigger("selectionMathInfoChanged", t.getSelectionMathInfo());
         };
 
@@ -11429,7 +11429,7 @@
             if (false === isSuccess) {
                 t.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedAllError,
                   c_oAscError.Level.NoCritical);
-                t.handlers.trigger("selectionChanged", t.getSelectionInfo());
+                t.handlers.trigger("selectionChanged");
                 return;
             }
 
@@ -11493,7 +11493,7 @@
             this._isLockedDefNames(null, null);
         } else//для того, чтобы в случае ошибки кнопка отжималась!
         {
-            t.handlers.trigger("selectionChanged", t.getSelectionInfo());
+            t.handlers.trigger("selectionChanged");
         }
     };
 
@@ -11508,7 +11508,7 @@
 
         var onChangeAutoFilterCallback = function (isSuccess) {
             if (false === isSuccess) {
-                t.handlers.trigger("selectionChanged", t.getSelectionInfo());
+                t.handlers.trigger("selectionChanged");
                 return;
             }
 
@@ -12748,7 +12748,7 @@
         if (isChangeTableInfo !== false) {
             var callback = function (isSuccess) {
                 if (false === isSuccess) {
-                    t.handlers.trigger("selectionChanged", t.getSelectionInfo());
+                    t.handlers.trigger("selectionChanged");
                     return;
                 }
 

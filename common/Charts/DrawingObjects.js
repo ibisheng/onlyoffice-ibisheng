@@ -3689,9 +3689,10 @@ function DrawingObjects() {
         return new AscCommon.asc_CImageSize( 50, 50, false );
     };
 
-    _this.sendGraphicObjectProps = function() {
-        if ( worksheet )
-            worksheet.handlers.trigger("selectionChanged", worksheet.getSelectionInfo());
+    _this.sendGraphicObjectProps = function () {
+        if (worksheet) {
+            worksheet.handlers.trigger("selectionChanged");
+        }
     };
 
     _this.setGraphicObjectProps = function(props) {

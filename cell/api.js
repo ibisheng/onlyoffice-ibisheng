@@ -1155,7 +1155,7 @@ var editor;
 
         if (t.wb) {
           // Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
-          t.wb._onWSSelectionChanged(/*info*/null);
+          t.wb._onWSSelectionChanged();
 
           // Шлем update для листов
           t._onUpdateSheetsLock(lockElem);
@@ -1245,7 +1245,7 @@ var editor;
 
       if (t.wb) {
         // Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно сбросить блокировку toolbar
-        t.wb._onWSSelectionChanged(/*info*/null);
+        t.wb._onWSSelectionChanged();
 
         var worksheet = t.wb.getWorksheet();
         worksheet.cleanSelection();
@@ -1334,7 +1334,7 @@ var editor;
       // Нужно послать 'обновить свойства' (иначе для удаления данных не обновится строка формул).
       // ToDo Возможно стоит обновлять только строку формул
       AscCommon.CollaborativeEditing.Load_Images();
-      this.wb._onWSSelectionChanged(null);
+      this.wb._onWSSelectionChanged();
       this.wb.getWorksheet().updateVisibleRange();
     }
   };
@@ -1521,7 +1521,7 @@ var editor;
 
         if (t.collaborativeEditing.getCollaborativeEditing()) {
           // Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
-          t.wb._onWSSelectionChanged(/*info*/null);
+          t.wb._onWSSelectionChanged();
         }
 
         t.canSave = true;
@@ -3023,7 +3023,7 @@ var editor;
         // Пересылаем свои изменения (просто стираем чужие lock-и, т.к. своих изменений нет)
         this.collaborativeEditing.sendChanges();
         // Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
-        this.wb._onWSSelectionChanged(/*info*/null);
+        this.wb._onWSSelectionChanged();
       }
       return;
     }

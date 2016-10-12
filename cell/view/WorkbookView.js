@@ -655,7 +655,7 @@
       }, "reinitializeScrollX": function() {
         self.controller.reinitializeScroll(/*horizontal*/2);
       }, "selectionChanged": function() {
-        self._onWSSelectionChanged.apply(self, arguments);
+        self._onWSSelectionChanged();
       }, "selectionNameChanged": function() {
         self._onSelectionNameChanged.apply(self, arguments);
       }, "selectionMathInfoChanged": function() {
@@ -847,18 +847,14 @@
     return this.lastSendInfoRange.isEqual(range) && this.lastSendInfoRangeIsSelectOnShape === isSelectOnShape;
   };
 
-  WorkbookView.prototype._updateSelectionInfo = function (info) {
+  WorkbookView.prototype._updateSelectionInfo = function () {
     var ws = this.cellFormulaEnterWSOpen ? this.cellFormulaEnterWSOpen : this.getWorksheet();
+    this.oSelectionInfo = ws.getSelectionInfo();
     this.lastSendInfoRange = ws.model.selectionRange.getLast().clone(true);
     this.lastSendInfoRangeIsSelectOnShape = ws.getSelectionShape();
-
-    if (null === info) {
-      info = ws.getSelectionInfo();
-    }
-    this.oSelectionInfo = info;
   };
-  WorkbookView.prototype._onWSSelectionChanged = function(info) {
-    this._updateSelectionInfo(info);
+  WorkbookView.prototype._onWSSelectionChanged = function() {
+    this._updateSelectionInfo();
 
     // При редактировании ячейки не нужно пересылать изменения
     if (this.input && false === this.getCellEditMode() && c_oAscSelectionDialogType.None === this.selectionDialogType) {
@@ -960,7 +956,7 @@
     var ar = ws.model.selectionRange.getLast();
     var isSelectOnShape = ws.getSelectionShape();
     if (!this._isEqualRange(ar, isSelectOnShape)) {
-      this._onWSSelectionChanged(ws.getSelectionInfo());
+      this._onWSSelectionChanged();
       this._onSelectionMathInfoChanged(ws.getSelectionMathInfo());
     }
 
@@ -1334,7 +1330,7 @@
         // Выключаем lock для редактирования ячейки
         t.collaborativeEditing.onStopEditCell();
         t.cellEditor.close(false);
-        t._onWSSelectionChanged(null);
+        t._onWSSelectionChanged();
       }
     };
 
@@ -1385,7 +1381,7 @@
     // Обновляем состояние Undo/Redo
     History._sendCanUndoRedo();
     // Обновляем состояние информации
-    this._onWSSelectionChanged(null);
+    this._onWSSelectionChanged();
 
     // Закрываем подбор формулы
     if (-1 !== this.lastFormulaPos) {
@@ -1617,7 +1613,7 @@
 
     if (isSendInfo) {
       this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
-      this._onWSSelectionChanged(ws.getSelectionInfo());
+      this._onWSSelectionChanged();
       this._onSelectionMathInfoChanged(ws.getSelectionMathInfo());
     }
     this.controller.reinitializeScroll();
