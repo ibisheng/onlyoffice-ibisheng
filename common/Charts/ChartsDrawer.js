@@ -5125,7 +5125,7 @@ drawAreaChart.prototype =
 		return [];
 	}, 
 	
-	_calculateAllIntersection()
+	_calculateAllIntersection: function()
 	{
 		var allPoints = this.points;
 		var prevPoints;
@@ -5353,7 +5353,7 @@ drawAreaChart.prototype =
 		this.prevUp[pointIndex][seriaIndex] = curUp;
 	},
 	
-	_calculateSimpleRect(arrPoints, arrPointsProject, point, seria, props)
+	_calculateSimpleRect: function(arrPoints, arrPointsProject, point, seria, props)
 	{
 		var path, pxToMm = this.chartProp.pxToMM, t = this, paths = [];
 		var pathH = this.chartProp.pathH;
