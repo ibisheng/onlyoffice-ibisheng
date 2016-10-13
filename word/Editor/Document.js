@@ -3667,10 +3667,10 @@ CDocument.prototype.Draw                                     = function(nPageInd
         var RepF = ( null === Footer || null !== SectPr.Get_HdrFtrInfo(Footer) ? false : true );
 
         var HeaderInfo = undefined;
-        if (null !== Header && undefined !== Header.RecalcInfo.NeedRecalc[nPageIndex])
+        if (null !== Header && undefined !== Header.RecalcInfo.PageNumInfo[nPageIndex])
         {
-            var bFirst = Header.RecalcInfo.NeedRecalc[nPageIndex].bFirst;
-            var bEven  = Header.RecalcInfo.NeedRecalc[nPageIndex].bEven;
+            var bFirst = Header.RecalcInfo.PageNumInfo[nPageIndex].bFirst;
+            var bEven  = Header.RecalcInfo.PageNumInfo[nPageIndex].bEven;
 
             var HeaderSectPr = Header.RecalcInfo.SectPr[nPageIndex];
 
@@ -3681,10 +3681,10 @@ CDocument.prototype.Draw                                     = function(nPageInd
         }
 
         var FooterInfo = undefined;
-        if (null !== Footer && undefined !== Footer.RecalcInfo.NeedRecalc[nPageIndex])
+        if (null !== Footer && undefined !== Footer.RecalcInfo.PageNumInfo[nPageIndex])
         {
-            var bFirst = Footer.RecalcInfo.NeedRecalc[nPageIndex].bFirst;
-            var bEven  = Footer.RecalcInfo.NeedRecalc[nPageIndex].bEven;
+            var bFirst = Footer.RecalcInfo.PageNumInfo[nPageIndex].bFirst;
+            var bEven  = Footer.RecalcInfo.PageNumInfo[nPageIndex].bEven;
 
             var FooterSectPr = Footer.RecalcInfo.SectPr[nPageIndex];
 
