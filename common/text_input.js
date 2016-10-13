@@ -160,6 +160,8 @@
 		// еще один режим для ie & edge
 		this.IsUseInputEventOnlyWithCtx = (AscCommon.AscBrowser.isIE) ? true : false;
 		this.IsInitialInputContext = false;
+
+		this.IsDisableKeyPress = false;
 	}
 
 	CTextInput.prototype =
@@ -234,14 +236,32 @@
 			var oThis                   = this;
 			this.HtmlArea["onkeydown"]  = function(e)
 			{
+			    if (AscCommon.AscBrowser.isSafariMacOs)
+                {
+                    var cmdButton = (e.ctrlKey || e.metaKey) ? true : false;
+                    var buttonCode = ((e.keyCode == 67) || (e.keyCode == 88) || (e.keyCode == 86));
+                    if (cmdButton && buttonCode)
+                        oThis.IsDisableKeyPress = true;
+                    else
+                        oThis.IsDisableKeyPress = false;
+                }
 				return oThis.onKeyDown(e);
 			};
 			this.HtmlArea["onkeypress"] = function(e)
 			{
+			    if (oThis.IsDisableKeyPress == true)
+			    {
+			        // macOS Sierra send keypress before copy event
+			        oThis.IsDisableKeyPress = false;
+			        var cmdButton = (e.ctrlKey || e.metaKey) ? true : false;
+			        if (cmdButton)
+                        return;
+			    }
 				return oThis.onKeyPress(e);
 			};
 			this.HtmlArea["onkeyup"]    = function(e)
 			{
+			    oThis.IsDisableKeyPress = false;
 				return oThis.onKeyUp(e);
 			};
 
@@ -1529,6 +1549,13 @@
 			this.InterfaceEnableKeyEvents = value;
 			if (true == this.InterfaceEnableKeyEvents)
 			{
+			    if (document.activeElement)
+			    {
+			        var _id = document.activeElement.id;
+			        if (_id == "area_id" || _id == "plugin_iframe")
+			            return;
+			    }
+
 				this.HtmlArea.focus();
 			}
 		},

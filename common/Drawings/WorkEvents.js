@@ -2021,7 +2021,7 @@
 				if (this.HtmlPage.m_oApi.isMobileVersion)
 				{
 					var _w = this.HtmlPage.m_oEditor.HtmlElement.width;
-					if (this.bIsRetinaSupport)
+					if (this.HtmlPage.bIsRetinaSupport)
 					{
 						_w >>= 1;
 					}

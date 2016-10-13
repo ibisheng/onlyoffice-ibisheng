@@ -1824,7 +1824,7 @@ background-repeat: no-repeat;\
 	{
 		if (window["AscDesktopEditor"])
 		{
-			window["AscDesktopEditor"]["Copy"]();
+		    window["asc_desktop_copypaste"](this, "Copy");
 			return true;
 		}
 		return AscCommon.g_clipboardBase.Button_Copy();
@@ -1837,7 +1837,7 @@ background-repeat: no-repeat;\
 	{
 		if (window["AscDesktopEditor"])
 		{
-			window["AscDesktopEditor"]["Cut"]();
+		    window["asc_desktop_copypaste"](this, "Cut");
 			return true;
 		}
 		return AscCommon.g_clipboardBase.Button_Cut();
@@ -1846,7 +1846,7 @@ background-repeat: no-repeat;\
 	{
 		if (window["AscDesktopEditor"])
 		{
-			window["AscDesktopEditor"]["Paste"]();
+		    window["asc_desktop_copypaste"](this, "Paste");
 			return true;
 		}
 		
@@ -3958,6 +3958,17 @@ background-repeat: no-repeat;\
 			else
 			{
 				this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+
+				if (window["AscDesktopEditor"])
+                {
+                    var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](sImageUrl);
+                    _url     = g_oDocumentUrls.getImageUrl(_url);
+                    ImagePr.ImageUrl = _url;
+                    fApplyCallback();
+                    this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+                    return;
+                }
+
 				this.fCurCallback = function(input)
 				{
 					if (null != input && "imgurl" == input["type"])

@@ -772,8 +772,11 @@
 
 	baseEditorsApi.prototype.asc_loadLocalImageAndAction = function(sLocalImage, fCallback)
 	{
-		this.ImageLoader.LoadImage(AscCommon.getFullImageSrc2(sLocalImage), 1);
-		this.asc_replaceLoadImageCallback(fCallback);
+		var _loadedUrl = this.ImageLoader.LoadImage(AscCommon.getFullImageSrc2(sLocalImage), 1);
+		if (_loadedUrl != null)
+		    fCallback(_loadedUrl);
+        else
+        	this.asc_replaceLoadImageCallback(fCallback);
 	};
 
 	baseEditorsApi.prototype.asc_checkImageUrlAndAction = function(sImageUrl, fCallback)
@@ -803,6 +806,9 @@
 
 	baseEditorsApi.prototype.asc_addOleObject = function(oPluginData)
 	{
+		if(this.isViewMode){
+			return;
+		}
 		Asc.CPluginData_wrap(oPluginData);
 		var oThis      = this;
 		var sImgSrc    = oPluginData.getAttribute("imgSrc");
@@ -826,6 +832,9 @@
 
 	baseEditorsApi.prototype.asc_editOleObject = function(oPluginData)
 	{
+		if(this.isViewMode){
+			return;
+		}
 		Asc.CPluginData_wrap(oPluginData);
 		var oThis      = this;
 		var bResize    = oPluginData.getAttribute("resize");
