@@ -716,7 +716,7 @@ RotateState.prototype =
                             bounds = aBounds[i];
                             this.drawingObjects.arrTrackObjects[i].trackEnd(true);
                             var original = aDrawings[i];
-                            if(!bMoveState)
+                            if(!bMoveState && !this.drawingObjects.arrTrackObjects[i].view3D)
                             {
                                 original.CheckWH();
                             }
