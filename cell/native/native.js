@@ -3302,7 +3302,7 @@ function OfflineEditor () {
                     if (!this.isSelectionDialogMode) {
                         this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/true));
                         if (!isSelectMode) {
-                            this.handlers.trigger("selectionChanged", this.getSelectionInfo(false));
+                            this.handlers.trigger("selectionChanged");
                             this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
                         }
                     } else {
@@ -5721,7 +5721,7 @@ function offline_cell_editor_close(x, y, width, height, ratio) {
         length = 0;
     }
 
-    _api.wb._onWSSelectionChanged(null);
+    _api.wb._onWSSelectionChanged();
 
     return {'undo': length};
 }
@@ -6831,7 +6831,7 @@ function offline_apply_event(type,params) {
         {
             var filter = asc_ReadAutoFilter(params, _current);
             _api.asc_addAutoFilter(filter.styleName, filter.format);
-            _api.wb.getWorksheet().handlers.trigger('selectionChanged', _api.wb.getWorksheet().getSelectionInfo());
+            _api.wb.getWorksheet().handlers.trigger('selectionChanged');
             break;
         }
 
@@ -6844,7 +6844,7 @@ function offline_apply_event(type,params) {
             }
             
             _api.asc_changeAutoFilter(changeFilter.tableName, changeFilter.optionType, changeFilter.styleName);
-            _api.wb.getWorksheet().handlers.trigger('selectionChanged', _api.wb.getWorksheet().getSelectionInfo());
+            _api.wb.getWorksheet().handlers.trigger('selectionChanged');
             break;
         }
         

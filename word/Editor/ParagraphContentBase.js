@@ -34,6 +34,10 @@
 function CParagraphContentBase()
 {
 }
+CParagraphContentBase.prototype.CanSplit = function()
+{
+	return false;
+};
 
 /**
  * Это базовый класс для элементов содержимого(контент) параграфа, у которых есть свое содержимое.
@@ -194,6 +198,10 @@ CParagraphContentWithContentBase.prototype.private_UpdateTrackRevisions = functi
         var RevisionsManager = this.Paragraph.LogicDocument.Get_TrackRevisionsManager();
         RevisionsManager.Check_Paragraph(this.Paragraph);
     }
+};
+CParagraphContentWithContentBase.prototype.CanSplit = function()
+{
+	return true;
 };
 /**
  * Это базовый класс для элементов параграфа, которые сами по себе могут содержать элементы параграфа.
@@ -1092,7 +1100,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Document_UpdateInterfaceStat
             Element.Document_UpdateInterfaceState();
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Split = function (ContentPos, Depth)
+CParagraphContentWithParagraphLikeContent.prototype.Split = function(ContentPos, Depth)
 {
     var Element = new this.constructor();
 

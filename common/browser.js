@@ -113,6 +113,9 @@ AscBrowser.zoom = 1;
 
 AscBrowser.checkZoom = function()
 {
+    if (AscBrowser.isAndroid)
+        return;
+
     if (AscBrowser.isChrome && !AscBrowser.isOpera && document && document.firstElementChild && document.body)
     {
         document.firstElementChild.style.zoom = "reset";

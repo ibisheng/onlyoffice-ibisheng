@@ -38,6 +38,7 @@ var History = AscCommon.History;
 var fieldtype_UNKNOWN    = 0x0000;
 var fieldtype_MERGEFIELD = 0x0001;
 var fieldtype_PAGENUM    = 0x0002;
+var fieldtype_PAGECOUNT  = 0x0003;
 
 /**
  *
@@ -208,6 +209,10 @@ ParaField.prototype.Split = function (ContentPos, Depth)
 {
     // Не даем разделять поле
     return null;
+};
+ParaField.prototype.CanSplit = function()
+{
+	return false;
 };
 ParaField.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange, _CurPage)
 {

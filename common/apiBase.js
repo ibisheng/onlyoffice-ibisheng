@@ -785,7 +785,7 @@
 	{
 		var _loadedUrl = this.ImageLoader.LoadImage(AscCommon.getFullImageSrc2(sLocalImage), 1);
 		if (_loadedUrl != null)
-		    fCallback();
+		    fCallback(_loadedUrl);
         else
         	this.asc_replaceLoadImageCallback(fCallback);
 	};

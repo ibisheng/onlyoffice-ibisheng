@@ -268,8 +268,9 @@ var c_oAscCanChangeColWidth = {
 };
 
 var c_oAscPaneState = {
-  Frozen: "frozen",
-  FrozenSplit: "frozenSplit"
+  Frozen: 0,
+  FrozenSplit: 1,
+  Split: 2
 };
 
 var c_oAscFindLookIn = {
@@ -330,8 +331,9 @@ var c_oAscFormulaRangeBorderColor = [
     Dash        : 16
   };
 
-var c_oAscLockNameFrozenPane = "frozenPane";
-var c_oAscLockNameTabColor = "tabColor";
+  var c_oAscLockNameFrozenPane = "frozenPane";
+  var c_oAscLockNameTabColor = "tabColor";
+  var c_oAscLockAddSheet = "addSheet";
 
 var c_oAscGetDefinedNamesList = {
   Worksheet: 0,
@@ -397,6 +399,7 @@ var c_oAscPopUpSelectorType = {
   window['AscCommonExcel'].selectionLineType = selectionLineType;
   window['AscCommonExcel'].c_oAscLockNameFrozenPane = c_oAscLockNameFrozenPane;
   window['AscCommonExcel'].c_oAscLockNameTabColor = c_oAscLockNameTabColor;
+  window['AscCommonExcel'].c_oAscLockAddSheet = c_oAscLockAddSheet;
 
   window['AscCommon'] = window['AscCommon'] || {};
   window['AscCommon'].c_oSerFormat = c_oSerFormat;

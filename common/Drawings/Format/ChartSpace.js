@@ -552,6 +552,7 @@ function CChartSpace()
         dataLbls:      null,
         dataLbl:       null,
         plotArea:      null,
+        rotatePlotArea: null,
         gridLines:     null,
         series:        null,
         datPoint:      null,
@@ -638,6 +639,31 @@ CChartSpace.prototype.drawSelect = function(drawingDocument, nPageIndex)
                 var oLabels = this.selection.axisLbls.labels;
                 drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, this.transform, oLabels.x, oLabels.y, oLabels.extX, oLabels.extY, false, false);
             }
+            else if(this.selection.plotArea)
+            {
+
+                var oChartSize = this.getChartSizes();
+                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, this.transform, oChartSize.startX, oChartSize.startY, oChartSize.w, oChartSize.h, false, false);
+                /*if(!this.selection.rotatePlotArea)
+                {
+                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, this.transform, oChartSize.startX, oChartSize.startY, oChartSize.w, oChartSize.h, false, false);
+                }
+                else
+                {
+                    var arr = [
+                        {x: oChartSize.startX, y: oChartSize.startY},
+                        {x: oChartSize.startX + oChartSize.w/2, y: oChartSize.startY},
+                        {x: oChartSize.startX + oChartSize.w, y: oChartSize.startY},
+                        {x: oChartSize.startX + oChartSize.w, y: oChartSize.startY + oChartSize.h/2},
+                        {x: oChartSize.startX + oChartSize.w, y: oChartSize.startY + oChartSize.h},
+                        {x: oChartSize.startX + oChartSize.w/2, y: oChartSize.startY + oChartSize.h},
+                        {x: oChartSize.startX, y: oChartSize.startY + oChartSize.h},
+                        {x: oChartSize.startX, y: oChartSize.startY + oChartSize.h/2},
+                        {x: oChartSize.startX, y: oChartSize.startY}
+                    ];
+                    drawingDocument.AutoShapesTrack.DrawEditWrapPointsPolygon(arr, this.transform);
+                }*/
+            }
         }
     };
 CChartSpace.prototype.recalculateTextPr = function()
@@ -666,6 +692,7 @@ CChartSpace.prototype.getSelectionState = function()
         dataLbl:          this.selection.dataLbl,
         textSelection:    this.selection.textSelection,
         plotArea:         this.selection.plotArea,
+        rotatePlotArea:         this.selection.rotatePlotArea,
         contentSelection: content_selection,
         recalcTitle: this.recalcInfo.recalcTitle,
         bRecalculatedTitle: this.recalcInfo.bRecalculatedTitle
@@ -679,6 +706,7 @@ CChartSpace.prototype.setSelectionState = function(state)
    this.selection.axisLbls       = state.axisLbls;
    this.selection.dataLbls       = state.dataLbls;
    this.selection.dataLbl        = state.dataLbl;
+   this.selection.rotatePlotArea        = state.rotatePlotArea;
    this.selection.textSelection  = state.textSelection;
    this.selection.plotArea       = state.plotArea;
    if(isRealObject(state.recalcTitle))
@@ -705,6 +733,7 @@ CChartSpace.prototype.loadDocumentStateAfterLoadChanges = function(state)
      this.selection.dataLbls =      null;
      this.selection.dataLbl =       null;
      this.selection.plotArea =      null;
+     this.selection.rotatePlotArea =  null;
      this.selection.gridLine =     null;
      this.selection.series =        null;
      this.selection.datPoint =      null;
@@ -742,6 +771,7 @@ CChartSpace.prototype.resetSelection = function(noResetContentSelect)
     this.selection.dataLbl = null;
     this.selection.textSelection = null;
     this.selection.plotArea = null;
+    this.selection.rotatePlotArea = null;
 };
 CChartSpace.prototype.getStyles = function()
 {
@@ -1075,6 +1105,7 @@ CChartSpace.prototype.selectTitle = function(title, pageIndex)
     this.selection.dataLbl = null;
     this.selection.textSelection = null;
     this.selection.plotArea = null;
+    this.selection.rotatePlotArea = null;
 };
 CChartSpace.prototype.recalculateCurPos = AscFormat.DrawingObjectsController.prototype.recalculateCurPos;
 CChartSpace.prototype.documentUpdateSelectionState = function()
@@ -1683,6 +1714,7 @@ CChartSpace.prototype.clearFormatting = function(bNoClearShapeProps)
         this.selection.dataLbls =      null;
         this.selection.dataLbl =       null;
         this.selection.plotArea =      null;
+        this.selection.rotatePlotArea = null;
         this.selection.gridLine =     null;
         this.selection.series =        null;
         this.selection.datPoint =      null;

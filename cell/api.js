@@ -456,7 +456,7 @@ var editor;
   spreadsheet_api.prototype.asc_Copy = function() {
     if (window["AscDesktopEditor"])
     {
-      window["AscDesktopEditor"]["Copy"]();
+      window["asc_desktop_copypaste"](this, "Copy");
       return true;
     }
     return AscCommon.g_clipboardBase.Button_Copy();
@@ -465,7 +465,7 @@ var editor;
   spreadsheet_api.prototype.asc_Paste = function() {
     if (window["AscDesktopEditor"])
     {
-      window["AscDesktopEditor"]["Paste"]();
+      window["asc_desktop_copypaste"](this, "Paste");
       return true;
     }
     if (!AscCommon.g_clipboardBase.IsWorking()) {
@@ -477,7 +477,7 @@ var editor;
   spreadsheet_api.prototype.asc_Cut = function() {
     if (window["AscDesktopEditor"])
     {
-      window["AscDesktopEditor"]["Cut"]();
+      window["asc_desktop_copypaste"](this, "Cut");
       return true;
     }
     return AscCommon.g_clipboardBase.Button_Cut();
@@ -1155,7 +1155,7 @@ var editor;
 
         if (t.wb) {
           // Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
-          t.wb._onWSSelectionChanged(/*info*/null);
+          t.wb._onWSSelectionChanged();
 
           // Шлем update для листов
           t._onUpdateSheetsLock(lockElem);
@@ -1245,7 +1245,7 @@ var editor;
 
       if (t.wb) {
         // Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно сбросить блокировку toolbar
-        t.wb._onWSSelectionChanged(/*info*/null);
+        t.wb._onWSSelectionChanged();
 
         var worksheet = t.wb.getWorksheet();
         worksheet.cleanSelection();
@@ -1334,7 +1334,7 @@ var editor;
       // Нужно послать 'обновить свойства' (иначе для удаления данных не обновится строка формул).
       // ToDo Возможно стоит обновлять только строку формул
       AscCommon.CollaborativeEditing.Load_Images();
-      this.wb._onWSSelectionChanged(null);
+      this.wb._onWSSelectionChanged();
       this.wb.getWorksheet().updateVisibleRange();
     }
   };
@@ -1521,7 +1521,7 @@ var editor;
 
         if (t.collaborativeEditing.getCollaborativeEditing()) {
           // Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
-          t.wb._onWSSelectionChanged(/*info*/null);
+          t.wb._onWSSelectionChanged();
         }
 
         t.canSave = true;
@@ -1610,12 +1610,21 @@ var editor;
     this.collaborativeEditing.onEndCheckLock(callback);
   };
 
-  spreadsheet_api.prototype._addWorksheet = function(name, i) {
-    this.wbModel.createWorksheet(i, name);
-    this.wb.spliceWorksheet(i, 0, null);
-    this.asc_showWorksheet(i);
-    // Посылаем callback об изменении списка листов
-    this.sheetsChanged();
+  spreadsheet_api.prototype._addWorksheet = function (name, i) {
+    var t = this;
+    var addWorksheetCallback = function(res) {
+      if (res) {
+        t.wbModel.createWorksheet(i, name);
+        t.wb.spliceWorksheet(i, 0, null);
+        t.asc_showWorksheet(i);
+        // Посылаем callback об изменении списка листов
+        t.sheetsChanged();
+      }
+    };
+
+    var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null,
+      AscCommonExcel.c_oAscLockAddSheet, AscCommonExcel.c_oAscLockAddSheet);
+    this._getIsLockObjectSheet(lockInfo, addWorksheetCallback);
   };
 
   // Workbook interface
@@ -2582,8 +2591,8 @@ var editor;
   };
 
   // Cell interface
-  spreadsheet_api.prototype.asc_getCellInfo = function(bExt) {
-    return this.wb.getWorksheet().getSelectionInfo(!!bExt);
+  spreadsheet_api.prototype.asc_getCellInfo = function() {
+    return this.wb.getSelectionInfo();
   };
 
   // Получить координаты активной ячейки
@@ -3014,7 +3023,7 @@ var editor;
         // Пересылаем свои изменения (просто стираем чужие lock-и, т.к. своих изменений нет)
         this.collaborativeEditing.sendChanges();
         // Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
-        this.wb._onWSSelectionChanged(/*info*/null);
+        this.wb._onWSSelectionChanged();
       }
       return;
     }

@@ -90,6 +90,17 @@
 				}
 				else
 				{	
+					//если мультиселект, то запрещаем копирование
+					if(1 !== ws.model.selectionRange.ranges.length)
+					{
+						var selectedDrawings = ws.objectRender.getSelectedGraphicObjects();
+						if(0 === selectedDrawings.length)
+						{
+							ws.handlers.trigger ("onErrorEvent", Asc.c_oAscError.ID.CopyMultiselectAreaError, Asc.c_oAscError.Level.NoCritical);
+							return;
+						}
+					}
+					
 					//TEXT
 					if (AscCommon.c_oAscClipboardDataFormat.Text & _formats)
 					{
@@ -774,7 +785,7 @@
 				} 
 				else if (base64FromWord)//from word
 				{
-					this.activeRange = worksheet.activeRange.clone(true);
+					this.activeRange = worksheet.model.selectionRange.getLast().clone(true);
 					result = this._pasteFromBinaryWord(worksheet, base64FromWord, isIntoShape, isCellEditMode);
 				}
 				else if(base64FromPresentation)
@@ -1994,7 +2005,7 @@
 			pasteTextOnSheet: function(worksheet, text)
 			{
 				//TODO сделать вставку текста всегда через эту функцию
-				this.activeRange = worksheet.activeRange.clone(true);
+				this.activeRange = worksheet.model.selectionRange.getLast().clone(true);
 				
 				//если находимся внутри шейпа
 				var isIntoShape = worksheet.objectRender.controller.getTargetDocContent();

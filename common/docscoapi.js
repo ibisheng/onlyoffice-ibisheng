@@ -500,6 +500,7 @@
     this.saveCallbackErrorTimeOutId = null;
     this.unSaveLockCallbackErrorTimeOutId = null;
     this._id = null;
+	this._timeConnect = null;
     this._indexUser = -1;
     // Если пользователей больше 1, то совместно редактируем
     this.isCoAuthoring = false;
@@ -1182,6 +1183,7 @@
       //TODO: add checks
       this._state = ConnectionState.Authorized;
       this._id = data['sessionId'];
+	  this._timeConnect = data['timeConnect'];
 
       this._onAuthParticipantsChanged(data['participants']);
 
@@ -1266,6 +1268,7 @@
       'lastOtherSaveTime': this.lastOtherSaveTime,
       'block': this.ownedLockBlocks,
       'sessionId': this._id,
+	  'timeConnect': this._timeConnect,
       'documentFormatSave': this._documentFormatSave,
       'view': this._isViewer,
       'isCloseCoAuthoring': this.isCloseCoAuthoring,
@@ -1364,7 +1367,7 @@
         }
       }
       t._state = ConnectionState.Reconnect;
-      var bIsDisconnectAtAll = (4001 === evt.code || t.attemptCount >= t.maxAttemptCount);
+      var bIsDisconnectAtAll = (4001 === evt.code || 4002 === evt.code || 4003 === evt.code || t.attemptCount >= t.maxAttemptCount);
       if (bIsDisconnectAtAll) {
         t._state = ConnectionState.ClosedAll;
       }

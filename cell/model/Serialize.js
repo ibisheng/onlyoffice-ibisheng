@@ -610,7 +610,8 @@
         ZoomScalePageLayoutView		: 17,
         ZoomScaleSheetLayoutView	: 18,
 
-        Pane						: 19
+		Pane						: 19,
+		Selection					: 20
     };
     var c_oSer_DrawingType =
     {
@@ -629,11 +630,19 @@
     /** @enum */
     var c_oSer_Pane = {
         ActivePane	: 0,
-        State		: 1,
+		//State		: 1,
         TopLeftCell	: 2,
         XSplit		: 3,
-        YSplit		: 4
+		YSplit		: 4,
+		State		: 5
     };
+	/** @enum */
+	 var c_oSer_Selection = {
+		ActiveCell: 0,
+		ActiveCellId: 1,
+		Sqref: 2,
+		Pane: 3
+	};
     /** @enum */
     var c_oSer_CellStyle = {
         BuiltinId		: 0,
@@ -2626,10 +2635,10 @@
         this.WriteSheetViews = function (ws) {
             var oThis = this;
             for (var i = 0, length = ws.sheetViews.length; i < length; ++i) {
-                this.bs.WriteItem(c_oSerWorksheetsTypes.SheetView, function(){oThis.WriteSheetView(ws.sheetViews[i]);});
+				this.bs.WriteItem(c_oSerWorksheetsTypes.SheetView, function(){oThis.WriteSheetView(ws, ws.sheetViews[i]);});
             }
         };
-        this.WriteSheetView = function (oSheetView) {
+		this.WriteSheetView = function (ws, oSheetView) {
             var oThis = this;
             if (null !== oSheetView.showGridLines)
                 this.bs.WriteItem(c_oSer_SheetView.ShowGridLines, function(){oThis.memory.WriteBool(oSheetView.showGridLines);});
@@ -2637,11 +2646,14 @@
                 this.bs.WriteItem(c_oSer_SheetView.ShowRowColHeaders, function(){oThis.memory.WriteBool(oSheetView.showRowColHeaders);});
             if (null !== oSheetView.pane && oSheetView.pane.isInit())
                 this.bs.WriteItem(c_oSer_SheetView.Pane, function(){oThis.WriteSheetViewPane(oSheetView.pane);});
+			if (null !== ws.selectionRange)
+				this.bs.WriteItem(c_oSer_SheetView.Selection, function(){oThis.WriteSheetViewSelection(ws.selectionRange);});
         };
         this.WriteSheetViewPane = function (oPane) {
             var oThis = this;
+			//this.bs.WriteItem(c_oSer_Pane.ActivePane, function(){oThis.memory.WriteByte();});
             // Всегда пишем Frozen
-            this.bs.WriteItem(c_oSer_Pane.State, function(){oThis.memory.WriteString3(AscCommonExcel.c_oAscPaneState.Frozen);});
+            this.bs.WriteItem(c_oSer_Pane.State, function(){oThis.memory.WriteByte(AscCommonExcel.c_oAscPaneState.Frozen);});
             this.bs.WriteItem(c_oSer_Pane.TopLeftCell, function(){oThis.memory.WriteString3(oPane.topLeftFrozenCell.getID());});
 
             var col = oPane.topLeftFrozenCell.getCol0();
@@ -2651,6 +2663,24 @@
             if (0 < row)
                 this.bs.WriteItem(c_oSer_Pane.YSplit, function(){oThis.memory.WriteDouble2(row);});
         };
+		this.WriteSheetViewSelection = function (selectionRange) {
+			var oThis = this;
+			if (null != selectionRange.activeCell) {
+				this.bs.WriteItem(c_oSer_Selection.ActiveCell, function(){oThis.memory.WriteString3(selectionRange.activeCell.getName());});
+			}
+			if (null != selectionRange.activeCellId) {
+				this.bs.WriteItem(c_oSer_Selection.ActiveCellId, function(){oThis.memory.WriteLong(selectionRange.activeCellId);});
+			}
+			//this.bs.WriteItem(c_oSer_Selection.Pane, function(){oThis.memory.WriteByte();});
+			if (null != selectionRange.ranges) {
+				var refs = [];
+				for (var i = 0; i < selectionRange.ranges.length; ++i) {
+					refs.push(selectionRange.ranges[i].getName());
+				}
+				var sqref = refs.join(' ');
+				this.bs.WriteItem(c_oSer_Selection.Sqref, function(){oThis.memory.WriteString3(sqref);});
+			}
+		};
         this.WriteSheetPr = function (sheetPr) {
             var oThis = this;
             if (null !== sheetPr.CodeName)
@@ -6500,24 +6530,65 @@
         this.ReadSheetView = function (type, length, oSheetView) {
             var oThis = this;
             var res = c_oSerConstants.ReadOk;
-            if (c_oSer_SheetView.ShowGridLines === type) {
-                oSheetView.showGridLines = this.stream.GetBool();
-            } else if (c_oSer_SheetView.ShowRowColHeaders === type) {
-                oSheetView.showRowColHeaders = this.stream.GetBool();
+			if (c_oSer_SheetView.ColorId === type) {
+				this.stream.GetLong();
+			} else if (c_oSer_SheetView.DefaultGridColor === type) {
+				this.stream.GetBool();
+			} else if (c_oSer_SheetView.RightToLeft === type) {
+				this.stream.GetBool();
+			} else if (c_oSer_SheetView.ShowFormulas === type) {
+				this.stream.GetBool();
+			} else if (c_oSer_SheetView.ShowGridLines === type) {
+				oSheetView.showGridLines = this.stream.GetBool();
+			} else if (c_oSer_SheetView.ShowOutlineSymbols === type) {
+				this.stream.GetBool();
+			} else if (c_oSer_SheetView.ShowRowColHeaders === type) {
+				oSheetView.showRowColHeaders = this.stream.GetBool();
+			} else if (c_oSer_SheetView.ShowRuler === type) {
+				this.stream.GetBool();
+			} else if (c_oSer_SheetView.ShowWhiteSpace === type) {
+				this.stream.GetBool();
+			} else if (c_oSer_SheetView.ShowZeros === type) {
+				this.stream.GetBool();
+			} else if (c_oSer_SheetView.TabSelected === type) {
+				this.stream.GetBool();
+			} else if (c_oSer_SheetView.TopLeftCell === type) {
+				this.stream.GetString2LE(length);
+			} else if (c_oSer_SheetView.View === type) {
+				this.stream.GetUChar();
+			} else if (c_oSer_SheetView.WindowProtection === type) {
+				this.stream.GetBool();
+			} else if (c_oSer_SheetView.WorkbookViewId === type) {
+				this.stream.GetLong();
+			} else if (c_oSer_SheetView.ZoomScale === type) {
+				this.stream.GetLong();
+			} else if (c_oSer_SheetView.ZoomScaleNormal === type) {
+				this.stream.GetLong();
+			} else if (c_oSer_SheetView.ZoomScalePageLayoutView === type) {
+				this.stream.GetLong();
+			} else if (c_oSer_SheetView.ZoomScaleSheetLayoutView === type) {
+				this.stream.GetLong();
             } else if (c_oSer_SheetView.Pane === type) {
                 oSheetView.pane = new AscCommonExcel.asc_CPane();
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadPane(t, l, oSheetView.pane);
                 });
                 oSheetView.pane.init();
+			} else if (c_oSer_SheetView.Selection === type) {
+				this.curWorksheet.selectionRange.clean();
+				res = this.bcr.Read1(length, function (t, l) {
+					return oThis.ReadSelection(t, l, oThis.curWorksheet.selectionRange);
+				});
             } else
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
         this.ReadPane = function (type, length, oPane) {
             var res = c_oSerConstants.ReadOk;
-            if (c_oSer_Pane.State === type)
-                oPane.state = this.stream.GetString2LE(length);
+			if (c_oSer_Pane.ActivePane === type)
+				this.stream.GetUChar();
+			else if (c_oSer_Pane.State === type)
+				oPane.state = this.stream.GetUChar();
             else if (c_oSer_Pane.TopLeftCell === type)
 				oPane.topLeftCell = this.stream.GetString2LE(length);
 			else if (c_oSer_Pane.XSplit === type)
@@ -6528,6 +6599,31 @@
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
+		this.ReadSelection = function (type, length, selectionRange) {
+			var res = c_oSerConstants.ReadOk;
+			if (c_oSer_Selection.ActiveCell === type) {
+				var activeCell = AscCommonExcel.g_oRangeCache.getAscRange(this.stream.GetString2LE(length));
+				if (activeCell) {
+					selectionRange.activeCell = new AscCommon.CellBase(activeCell.r1, activeCell.c1);
+				}
+			} else if (c_oSer_Selection.ActiveCellId === type) {
+				selectionRange.activeCellId = this.stream.GetLong();
+			} else if (c_oSer_Selection.Sqref === type) {
+				var sqref = this.stream.GetString2LE(length);
+				var refs = sqref.split(' ');
+				selectionRange.ranges = [];
+				for (var i = 0; i < refs.length; ++i) {
+					var ref = AscCommonExcel.g_oRangeCache.getAscRange(refs[i]);
+					if (ref) {
+						selectionRange.ranges.push(ref.clone());
+					}
+				}
+			} else if (c_oSer_Selection.Pane === type) {
+				this.stream.GetUChar();
+			} else
+				res = c_oSerConstants.ReadUnknown;
+			return res;
+		};
         this.ReadSheetPr = function (type, length, oSheetPr) {
             var oThis = this;
             var res = c_oSerConstants.ReadOk;

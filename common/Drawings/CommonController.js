@@ -2241,12 +2241,24 @@ DrawingObjectsController.prototype =
                     }
                 }
                 return result_pr;
-            }
+            };
 
             if(this.selection.groupSelection)
             {
                 result = getPropsFromArr(this.selection.groupSelection.selectedObjects);
             }
+            else if (this.selectedObjects
+				&& 1 === this.selectedObjects.length
+				&& this.selectedObjects[0].getObjectType() === AscDFH.historyitem_type_ImageShape
+				&& this.selectedObjects[0].parent
+				&& this.selectedObjects[0].parent.Parent
+				&& this.selectedObjects[0].parent.Parent.Get_Paragraph_TextPr)
+			{
+				var oParaDrawing = this.selectedObjects[0].parent;
+				var oParagraph   = oParaDrawing.Parent;
+				oParagraph.Cursor_MoveTo_Drawing(oParaDrawing.Get_Id(), true);
+				result = oParagraph.Get_Paragraph_TextPr();
+			}
             else
             {
                 result = getPropsFromArr(this.selectedObjects);

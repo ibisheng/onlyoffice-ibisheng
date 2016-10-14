@@ -4332,7 +4332,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
         var aRunRanges = [];
         for (var i = ParaStart; i < ParaEnd && i < oRun.Content.length; i++) {
             var item = oRun.Content[i];
-            if (item.Type == para_PageNum) {
+            if (item.Type == para_PageNum || item.Type == para_PageCount) {
                 var elem;
                 if (nPrevIndex < i)
                     elem = { nStart: nPrevIndex, nEnd: i, pageNum: item };
@@ -4358,7 +4358,12 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                 });
             }
             if (null != elem.pageNum) {
-				var Instr = "PAGE \\* MERGEFORMAT";
+				var Instr;
+				if (elem.pageNum.Type == para_PageCount) {
+					Instr = "NUMPAGES \\* MERGEFORMAT";
+				} else {
+					Instr = "PAGE \\* MERGEFORMAT";
+				}
 				this.bs.WriteItem(c_oSerParType.FldSimple, function(){oThis.WriteFldSimple(Instr, function(){
                     oThis.WriteRun2(function () {
                         //всегда что-то пишем, потому что если ничего нет в w:t, то и не применяются настройки
@@ -4366,7 +4371,9 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                         var numText = '1';
                         if (null != elem.pageNum.String && "string" == typeof(elem.pageNum.String)) {
                             numText = elem.pageNum.String;
-                        }
+						} else if (elem.pageNum.Type == para_PageCount && null != elem.pageNum.PageCount) {
+							numText = elem.pageNum.PageCount.toString();
+						}
                         oThis.WriteText(numText, delText);
                     }, oRun);
 				});});
@@ -9179,6 +9186,9 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 		else if("PAGE" == sFieldType){
             oRes = new ParaField(fieldtype_PAGENUM, aArguments, aSwitches);
 		}
+		else if("NUMPAGES" == sFieldType){
+			oRes = new ParaField(fieldtype_PAGECOUNT, aArguments, aSwitches);
+		}
 		else if("MERGEFIELD" == sFieldType){
 			oRes = new ParaField(fieldtype_MERGEFIELD, aArguments, aSwitches);
             if (editor)
@@ -13277,13 +13287,18 @@ OpenParStruct.prototype = {
             this.cur = this.stack[this.stack.length - 1];
             var elem = oPrevElem.elem;
             if (null != elem && elem.Content) {
-                if (para_Field == elem.Get_Type() && fieldtype_PAGENUM == elem.Get_FieldType()) {
+                if (para_Field == elem.Get_Type() && (fieldtype_PAGENUM == elem.Get_FieldType() || fieldtype_PAGECOUNT == elem.Get_FieldType())) {
                     var oNewRun = new ParaRun(this.paragraph);
                     var rPr = getStyleFirstRun(elem);
                     if (rPr) {
                         oNewRun.Set_Pr(rPr);
                     }
-                    oNewRun.Add_ToContent(0, new ParaPageNum());
+					if (fieldtype_PAGENUM == elem.Get_FieldType()) {
+						oNewRun.Add_ToContent(0, new ParaPageNum());
+					} else {
+						var pageCount = parseInt(elem.Get_SelectedText(true));
+						oNewRun.Add_ToContent(0, new ParaPageCount(isNaN(pageCount) ? undefined : pageCount));
+					}
                     this.addToContent(oNewRun);
                 } else if(elem.Content.length > 0) {
                     this.addToContent(elem);

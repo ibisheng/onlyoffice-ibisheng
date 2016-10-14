@@ -129,6 +129,7 @@
 
 			PasteMaxRangeError   : -64,
 			PastInMergeAreaError : -65,
+			CopyMultiselectAreaError : -66,
 
 			DataRangeError  : -72,
 			CannotMoveRange : -71,
@@ -1112,6 +1113,7 @@
 	prot['FTRangeIncludedOtherTables']       = prot.FTRangeIncludedOtherTables;
 	prot['PasteMaxRangeError']               = prot.PasteMaxRangeError;
 	prot['PastInMergeAreaError']             = prot.PastInMergeAreaError;
+	prot['CopyMultiselectAreaError']         = prot.CopyMultiselectAreaError;
 	prot['DataRangeError']                   = prot.DataRangeError;
 	prot['CannotMoveRange']                  = prot.CannotMoveRange;
 	prot['MaxDataSeriesError']               = prot.MaxDataSeriesError;

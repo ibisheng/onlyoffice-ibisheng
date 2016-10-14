@@ -429,40 +429,6 @@ function CEditorPage(api)
 		this.m_oMainView.Anchor = (g_anchor_left | g_anchor_right | g_anchor_top | g_anchor_bottom);
 		this.m_oMainContent.AddControl(this.m_oMainView);
 
-		if (this.m_oApi.isMobileVersion)
-		{
-			var _tag_background = "textarea";
-			if (AscBrowser.isAndroid)
-				_tag_background = "input";
-
-			var _text_bx_back = document.createElement(_tag_background);
-			_text_bx_back.id  = "id_text_box_background";
-			_text_bx_back.setAttribute("style", "background:transparent;border-style:none;border-color:transparent;overflow:hidden;z-index:4;font-family:arial;font-size:12pt;position:absolute;resize:none;padding:0px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
-			_text_bx_back.setAttribute("spellcheck", "false");
-
-			if (AscBrowser.isAndroid)
-			{
-				_text_bx_back.setAttribute("autocomplete", "off");
-				_text_bx_back.setAttribute("type", "password");
-			}
-
-			// в некоторых браузерах - readonly
-			try
-			{
-				_text_bx_back.willValidate = false;
-			} catch (err)
-			{
-			}
-			this.m_oMainView.HtmlElement.appendChild(_text_bx_back);
-
-			this.TextBoxBackground = CreateControl("id_text_box_background");
-			this.TextBoxBackground.Bounds.SetParams(-100, 0, 1100, 1000, false, false, false, false, -1, -1);
-			this.TextBoxBackground.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right | g_anchor_bottom);
-			this.m_oMainView.AddControl(this.TextBoxBackground);
-
-			this.TextBoxBackground.HtmlElement.value = "a";
-		}
-
 		this.m_oEditor = CreateControl("id_viewer");
 		this.m_oEditor.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
 		this.m_oEditor.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right | g_anchor_bottom);
@@ -817,9 +783,15 @@ function CEditorPage(api)
 				return _ret;
 			};
 		}
+	};
 
-		if (this.m_oApi.isMobileVersion)
+	this.initEventsMobile = function()
+	{
+        if (this.m_oApi.isMobileVersion)
 		{
+		    this.TextBoxBackground = CreateControl(AscCommon.g_inputContext.HtmlArea.id);
+            this.TextBoxBackground.HtmlElement.parentNode.parentNode.style.zIndex = 10;
+
 			var __hasTouch = 'ontouchstart' in window;
 
 			if (__hasTouch)
@@ -836,6 +808,9 @@ function CEditorPage(api)
 
 				this.TextBoxBackground.HtmlElement["ontouchstart"] = function(e)
 				{
+				    if (AscCommon.g_inputContext)
+				        AscCommon.g_inputContext.externalChangeFocus();
+
 				    if (!oThis.IsFocus)
 				        oThis.m_oApi.asc_enableKeyEvents(true);
 
@@ -869,6 +844,9 @@ function CEditorPage(api)
 			{
 				this.TextBoxBackground.HtmlElement["onmousedown"] = function(e)
 				{
+				    if (AscCommon.g_inputContext)
+                        AscCommon.g_inputContext.externalChangeFocus();
+
 					oThis.IsUpdateOverlayOnlyEndReturn = true;
 					oThis.StartUpdateOverlay();
 					var ret                            = oThis.MobileTouchManager.onTouchStart(e);
@@ -917,108 +895,10 @@ function CEditorPage(api)
 					e.returnValue = false;
 					return false;
 				};
-
-				this.TextBoxBackground.HtmlElement["oninput"] = function(e)
-				{
-					var val                                   = oThis.TextBoxBackground.HtmlElement.value;
-					oThis.TextBoxBackground.HtmlElement.value = "a";
-
-					if (val.length == 2)
-					{
-						var _e = {
-							altKey   : global_keyboardEvent.AltKey,
-							ctrlKey  : global_keyboardEvent.CtrlKey,
-							shiftKey : global_keyboardEvent.ShiftKey,
-
-							srcElement : global_keyboardEvent.Sender,
-
-							charCode : global_keyboardEvent.CharCode,
-							keyCode  : global_keyboardEvent.KeyCode,
-							which    : val.charCodeAt(1)
-						};
-
-						_e.preventDefault = function()
-						{
-						};
-
-						if (_e.which == 32)
-						{
-							_e.keyCode = 32;
-							oThis.onKeyDown(_e);
-						}
-						else
-						{
-							oThis.onKeyPress(_e);
-						}
-					}
-					else if (0 == val.length)
-					{
-						// пришла пустая. следом ждем "aa"
-						//window.IS_USE_INPUT = false;
-
-						var _e = {
-							altKey   : global_keyboardEvent.AltKey,
-							ctrlKey  : global_keyboardEvent.CtrlKey,
-							shiftKey : global_keyboardEvent.ShiftKey,
-
-							srcElement : global_keyboardEvent.Sender,
-
-							charCode : global_keyboardEvent.CharCode,
-							keyCode  : global_keyboardEvent.KeyCode,
-							which    : 8
-						};
-
-						_e.preventDefault = function()
-						{
-						};
-
-						if (_e.which == 8)
-						{
-							_e.keyCode = 8;
-							oThis.onKeyDown(_e);
-						}
-					}
-					else
-					{
-						var _len = val.length;
-						for (var i = 1; i < _len; i++)
-						{
-							var _e = {
-								altKey   : global_keyboardEvent.AltKey,
-								ctrlKey  : global_keyboardEvent.CtrlKey,
-								shiftKey : global_keyboardEvent.ShiftKey,
-
-								srcElement : global_keyboardEvent.Sender,
-
-								charCode : global_keyboardEvent.CharCode,
-								keyCode  : global_keyboardEvent.KeyCode,
-								which    : val.charCodeAt(i)
-							};
-
-							_e.preventDefault = function()
-							{
-							};
-
-							if (_e.which == 32)
-							{
-								_e.keyCode = 32;
-								oThis.onKeyDown(_e);
-							}
-							else
-							{
-								oThis.onKeyPress(_e);
-							}
-						}
-					}
-
-					if (e.preventDefault)
-						e.preventDefault();
-
-					e.returnValue = false;
-				}
 			}
 		}
-	};
+	}
+
 	this.onButtonRulersClick       = function()
 	{
 		if (false === oThis.m_oApi.bInit_word_control || true === oThis.m_oApi.isViewMode)
@@ -3679,19 +3559,14 @@ function CEditorPage(api)
 			window["AutoTester"]["RunTest"]();
 		}
 
-        if (!this.m_oApi.isMobileVersion)
+        if (true)
         {
             AscCommon.InitBrowserInputContext(this.m_oApi, "id_target_cursor");
             if (AscCommon.g_inputContext)
                 AscCommon.g_inputContext.onResize("id_main_view");
-        }
-        else
-        {
-            window.onkeydown = this.onKeyDown;
-            window.onkeypress = this.onKeyPress;
-            window.onkeyup = this.onKeyUp;
 
-            window['AscCommon'].g_clipboardBase.Init(api);
+            if (this.m_oApi.isMobileVersion)
+                this.initEventsMobile();
         }
 
 		//this.m_oDrawingDocument.CheckFontCache();
