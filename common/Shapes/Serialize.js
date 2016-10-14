@@ -4902,6 +4902,11 @@ function BinaryPPTYLoader()
                     shape.txBody.setParent(shape);
                     break;
                 }
+				case 6:
+				{
+					s.SkipRecord();
+					break;
+				}
                 default:
                 {
                     break;
