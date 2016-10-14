@@ -6579,6 +6579,7 @@
 				res = this.bcr.Read1(length, function (t, l) {
 					return oThis.ReadSelection(t, l, oThis.curWorksheet.selectionRange);
 				});
+				this.curWorksheet.selectionRange.update();
             } else
                 res = c_oSerConstants.ReadUnknown;
             return res;
@@ -6611,12 +6612,16 @@
 			} else if (c_oSer_Selection.Sqref === type) {
 				var sqref = this.stream.GetString2LE(length);
 				var refs = sqref.split(' ');
+				var selectionOld = selectionRange.ranges;
 				selectionRange.ranges = [];
 				for (var i = 0; i < refs.length; ++i) {
 					var ref = AscCommonExcel.g_oRangeCache.getAscRange(refs[i]);
 					if (ref) {
 						selectionRange.ranges.push(ref.clone());
 					}
+				}
+				if (selectionRange.ranges.length === 0) {
+					selectionRange.ranges = selectionOld;
 				}
 			} else if (c_oSer_Selection.Pane === type) {
 				this.stream.GetUChar();
