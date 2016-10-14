@@ -7102,7 +7102,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.SetMobileVersion = function(val)
 	{
 		this.isMobileVersion = val;
-		if (this.isMobileVersion)
+		if (/*this.isMobileVersion*/false)
 		{
 			this.WordControl.bIsRetinaSupport         = false; // ipad имеет проблемы с большими картинками
 			this.WordControl.bIsRetinaNoSupportAttack = true;
