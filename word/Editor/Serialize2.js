@@ -4359,10 +4359,10 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
             }
             if (null != elem.pageNum) {
 				var Instr;
-				if (elem.pageNum.Type == para_PageNum) {
-					Instr = "PAGE \\* MERGEFORMAT";
-				} else {
+				if (elem.pageNum.Type == para_PageCount) {
 					Instr = "NUMPAGES \\* MERGEFORMAT";
+				} else {
+					Instr = "PAGE \\* MERGEFORMAT";
 				}
 				this.bs.WriteItem(c_oSerParType.FldSimple, function(){oThis.WriteFldSimple(Instr, function(){
                     oThis.WriteRun2(function () {
@@ -4371,7 +4371,9 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                         var numText = '1';
                         if (null != elem.pageNum.String && "string" == typeof(elem.pageNum.String)) {
                             numText = elem.pageNum.String;
-                        }
+						} else if (elem.pageNum.Type == para_PageCount && null != elem.pageNum.PageCount) {
+							numText = elem.pageNum.PageCount.toString();
+						}
                         oThis.WriteText(numText, delText);
                     }, oRun);
 				});});
@@ -13294,7 +13296,8 @@ OpenParStruct.prototype = {
 					if (fieldtype_PAGENUM == elem.Get_FieldType()) {
 						oNewRun.Add_ToContent(0, new ParaPageNum());
 					} else {
-						oNewRun.Add_ToContent(0, new ParaPageCount());
+						var pageCount = parseInt(elem.Get_SelectedText(true));
+						oNewRun.Add_ToContent(0, new ParaPageCount(isNaN(pageCount) ? undefined : pageCount));
 					}
                     this.addToContent(oNewRun);
                 } else if(elem.Content.length > 0) {
