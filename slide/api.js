@@ -4766,7 +4766,11 @@ background-repeat: no-repeat;\
 				this.WordControl.m_oLayoutDrawer.HeightMM = presentation.Height;
 				this.WordControl.m_oMasterDrawer.WidthMM  = presentation.Width;
 				this.WordControl.m_oMasterDrawer.HeightMM = presentation.Height;
-				this.WordControl.m_oLogicDocument.GenerateThumbnails(this.WordControl.m_oMasterDrawer, this.WordControl.m_oLayoutDrawer);
+
+				if(!window['native'])
+				{
+					this.WordControl.m_oLogicDocument.GenerateThumbnails(this.WordControl.m_oMasterDrawer, this.WordControl.m_oLayoutDrawer);
+				}
 
 				var _masters = this.WordControl.m_oLogicDocument.slideMasters;
 				for (var i = 0; i < _masters.length; i++)
