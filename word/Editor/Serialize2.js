@@ -6330,7 +6330,19 @@ function BinaryFileReader(doc, openParams)
 		for (var i = 0, length = this.oReadResult.aTableCorrect.length; i < length; ++i) {
 			var table = this.oReadResult.aTableCorrect[i];
 			table.ReIndexing(0);
-			table.Correct_BadTable();
+			
+			//при вставке вложенных таблиц из документов в презентации и создании cDocumentContent не проставляется CStyles
+			if(editor && !editor.isDocumentEditor && !table.Parent.Styles)
+			{
+				var oldStyles = table.Parent.Styles;
+				table.Parent.Styles = this.Document.Styles;
+				table.Correct_BadTable();
+				table.Parent.Styles = oldStyles;
+			}
+			else
+			{
+				table.Correct_BadTable();
+			}
 		}
 		//чтобы удалялся stream с бинарником
 		pptx_content_loader.Clear(true);
