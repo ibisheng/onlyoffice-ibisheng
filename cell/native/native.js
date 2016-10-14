@@ -3180,7 +3180,7 @@ function OfflineEditor () {
 
         AscCommonExcel.WorksheetView.prototype.__selection = function (c1, r1, c2, r2, isFrozen) {
 
-            var native_selection = [];
+            var selection = [];
 
             var range = undefined;
 
@@ -3198,15 +3198,15 @@ function OfflineEditor () {
             
             var activeCell = this.model.selectionRange.activeCell;
             
-            native_selection.push(activeCell.col);
-            native_selection.push(activeCell.col);
-            native_selection.push(activeCell.row);
-            native_selection.push(activeCell.row);
+            selection.push(activeCell.col);
+            selection.push(activeCell.col);
+            selection.push(activeCell.row);
+            selection.push(activeCell.row);
             
-            native_selection.push(this.cols[activeCell.col].left - offsetX);
-            native_selection.push(this.rows[activeCell.row].top  - offsetY);
-            native_selection.push(this.cols[activeCell.col].left + this.cols[activeCell.col].width  - this.cols[activeCell.col].left);
-            native_selection.push(this.rows[activeCell.row].top  + this.rows[activeCell.row].height - this.rows[activeCell.row].top);
+            selection.push(this.cols[activeCell.col].left - offsetX);
+            selection.push(this.rows[activeCell.row].top  - offsetY);
+            selection.push(this.cols[activeCell.col].left + this.cols[activeCell.col].width  - this.cols[activeCell.col].left);
+            selection.push(this.rows[activeCell.row].top  + this.rows[activeCell.row].height - this.rows[activeCell.row].top);
             
             var ranges = (this.isSelectionDialogMode ? this.copyActiveRange : this.model.selectionRange).ranges;
             var range, selectionLineType;
@@ -3221,79 +3221,83 @@ function OfflineEditor () {
                     range.c2 = this.cols.length - 1;
                 }
                 
-                native_selection.push(range.type);
+                selection.push(range.type);
                 
-                native_selection.push(range.c1);
-                native_selection.push(range.c2);
-                native_selection.push(range.r1);
-                native_selection.push(range.r2);
+                selection.push(range.c1);
+                selection.push(range.c2);
+                selection.push(range.r1);
+                selection.push(range.r2);
                 
-                native_selection.push(this.cols[range.c1].left - offsetX);
-                native_selection.push(this.rows[range.r1].top  - offsetY);
-                native_selection.push(this.cols[range.c2].left + this.cols[range.c2].width  - this.cols[range.c1].left);
-                native_selection.push(this.rows[range.r2].top  + this.rows[range.r2].height - this.rows[range.r1].top);
+                selection.push(this.cols[range.c1].left - offsetX);
+                selection.push(this.rows[range.r1].top  - offsetY);
+                selection.push(this.cols[range.c2].left + this.cols[range.c2].width  - this.cols[range.c1].left);
+                selection.push(this.rows[range.r2].top  + this.rows[range.r2].height - this.rows[range.r1].top);
             }
             
-            var formulaRanges = [];
+            var formularanges = [];
             
             if (!isFrozen && this.isFormulaEditMode) {
                 if (this.arrActiveFormulaRanges.length) {
-                    formulaRanges = this.__selectedCellRanges(this.arrActiveFormulaRanges, offsetX, offsetY);
+                    formularanges = this.__selectedCellRanges(this.arrActiveFormulaRanges, offsetX, offsetY);
                 }
             }
             
-            return {'selection': native_selection, 'formulaRanges': formulaRanges};
+            return {'selection': selection, 'formularanges': formularanges};
         };
 
-        AscCommonExcel.WorksheetView.prototype.__changeSelectionTopLeft = function (x, y, isCoord, isSelectMode, isTopLeft) {
-            //var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange;
-
+        AscCommonExcel.WorksheetView.prototype.__changeSelectionPoint = function (x, y, isCoord, isSelectMode, isReverse) {
+            
+            var isChangeSelectionShape = false;
+            if (isCoord) {
+                isChangeSelectionShape = this._checkSelectionShape();
+            }
+           
             var isMoveActiveCellToLeftTop = false;
             
-            //var ar = this.activeRange;
-            //var copy = this.activeRange.clone();
+            var selection = this._getSelection();
+            var lastRange = selection.getLast();
             
-            var ar = this.model.selectionRange.ranges[0];
-            var copy = this.model.selectionRange.ranges[0].clone();
+            var col = selection.activeCell.col;
+            var row = selection.activeCell.row;
             
-            var col = ar.startCol;
-            var row = ar.startRow;
-
-            if (isTopLeft) {
-                this.model.selectionRange.ranges[0].startCol = this.leftTopRange.c2;
-                this.model.selectionRange.ranges[0].startRow = this.leftTopRange.r2;
+            if (isReverse) {
+                selection.activeCell.col = this.leftTopRange.c2;
+                selection.activeCell.row = this.leftTopRange.r2;
             } else {
-                this.model.selectionRange.ranges[0].startCol = this.leftTopRange.c1;
-                this.model.selectionRange.ranges[0].startRow = this.leftTopRange.r1;
+                selection.activeCell.col = this.leftTopRange.c1;
+                selection.activeCell.row = this.leftTopRange.r1;
             }
-
-            var newRange = isCoord ? this._calcSelectionEndPointByXY(x, y) : this._calcSelectionEndPointByOffset(x, y);
+            
+            var ar = this._getSelection().getLast();
+            
+            var newRange = isCoord ? this._calcSelectionEndPointByXY(x, y) :
+                                     this._calcSelectionEndPointByOffset(x, y);
             var isEqual = newRange.isEqual(ar);
-
-            if (!isEqual) {
-
-                if (newRange.c1 > col) {
+            if (isEqual && !isCoord) {
+                // При движении стрелками можем попасть на замерженную ячейку
+            }
+            if (!isEqual || isChangeSelectionShape) {
+                
+                if (newRange.c1 > col || newRange.c2 < col)  {
                     col = newRange.c1;
                     isMoveActiveCellToLeftTop = true;
                 }
-
-                if (newRange.r1 > row) {
+                
+                if (newRange.r1 > row || newRange.r2 < row) {
                     row = newRange.r1;
                     isMoveActiveCellToLeftTop = true;
                 }
-
+                
                 ar.assign2(newRange);
-
-                this.model.selectionRange.ranges[0].startCol = col;
-                this.model.selectionRange.ranges[0].startRow = row;
-
+                
+                selection.activeCell.col = col;
+                selection.activeCell.row = row;
+                
                 if (isMoveActiveCellToLeftTop) {
-                    this.model.selectionRange.ranges[0].startCol = newRange.c1;
-                    this.model.selectionRange.ranges[0].startRow = newRange.r1;
+                    selection.activeCell.col = newRange.c1;
+                    selection.activeCell.row = newRange.r1;
                 }
-
-                //ToDo this.drawDepCells();
-
+                
                 if (!this.isCellEditMode) {
                     if (!this.isSelectionDialogMode) {
                         this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/true));
@@ -3307,13 +3311,16 @@ function OfflineEditor () {
                     }
                 }
             } else {
-                this.model.selectionRange.ranges[0].startCol = col;
-                this.model.selectionRange.ranges[0].startRow = row;
+                selection.activeCell.col = col;
+                selection.activeCell.row = row;
             }
-
+        
             this.model.workbook.handlers.trigger("asc_onHideComment");
-
-            return this._calcActiveRangeOffset(x,y);
+            
+            return isCoord ? this._calcActiveRangeOffsetIsCoord(x, y) :
+            this._calcActiveRangeOffset(
+                                        this.getCellLeftRelative(x < 0 ? ar.c1 : ar.c2, /*pt*/0),
+                                        this.getCellTopRelative(y < 0 ? ar.r1 : ar.r2, /*pt*/0));
         };
 
         AscCommonExcel.WorksheetView.prototype.__chartsRanges = function(ranges) {
@@ -5232,7 +5239,12 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
     } else {
 
         if (0 != _s.cellPin) {
-            ws.leftTopRange = ws.model.selectionRange.clone();
+            
+            var selection = ws._getSelection();
+            var lastRange = selection.getLast();
+            
+            ws.leftTopRange = lastRange.clone();
+            
         } else {
 
             var ret = false;
@@ -5316,9 +5328,9 @@ function offline_mouse_move(x, y, isViewerMode, isRangeResize, isChartRange, ind
                 ws.enterCellRange(wb.cellEditor);
             } else {
                 if (-1 == _s.cellPin)
-                    ws.__changeSelectionTopLeft(x, y, true, true, true);
+                    ws.__changeSelectionPoint(x, y, true, true, true);
                 else if (1 === _s.cellPin)
-                    ws.__changeSelectionTopLeft(x, y, true, true, false);
+                    ws.__changeSelectionPoint(x, y, true, true, false);
                 else {
                     ws.changeSelectionEndPoint(x, y, true, true);
                 }
