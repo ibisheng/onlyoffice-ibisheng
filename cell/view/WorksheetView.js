@@ -8771,11 +8771,13 @@
         };
         if ("paste" === prop && val.onlyImages !== true) {
             // Для past свой диапазон
+			var newRange;
             if (isLocal === "binary") {
-                checkRange.push(this._pasteFromBinary(val, true));
+                newRange = this._pasteFromBinary(val, true);
             } else {
-                checkRange.push(this._pasteFromHTML(val, true));
+                newRange = this._pasteFromHTML(val, true);
             }
+			checkRange = [newRange];
         }
         if ("paste" === prop && val.onlyImages === true) {
             onSelectionCallback();
