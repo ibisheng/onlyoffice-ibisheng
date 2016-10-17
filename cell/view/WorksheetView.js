@@ -4311,14 +4311,14 @@
      * Обновляет общий кэш и кэширует метрики текста ячеек для указанного диапазона (сама реализация, напрямую не вызывать, только из _prepareCellTextMetricsCache)
      * @param {Asc.Range} [range]  Диапазон кэширования текта
      */
-    WorksheetView.prototype._prepareCellTextMetricsCache2 = function ( range ) {
+    WorksheetView.prototype._prepareCellTextMetricsCache2 = function (range) {
         var firstUpdateRow = null;
         var s = this.cache.sectors;
-        for ( var i = 0; i < s.length; ) {
-            if ( s[i].isIntersect( range ) ) {
-                this._calcCellsTextMetrics( s[i] );
-                s.splice( i, 1 );
-                firstUpdateRow = null !== firstUpdateRow ? Math.min( range.r1, firstUpdateRow ) : range.r1;
+        for (var i = 0; i < s.length;) {
+            if (s[i].isIntersect(range)) {
+                this._calcCellsTextMetrics(s[i]);
+                s.splice(i, 1);
+                firstUpdateRow = null !== firstUpdateRow ? Math.min(range.r1, firstUpdateRow) : range.r1;
                 continue;
             }
             ++i;
@@ -4330,53 +4330,53 @@
      * Кэширует метрики текста для диапазона ячеек
      * @param {Asc.Range} range  description
      */
-    WorksheetView.prototype._calcCellsTextMetrics = function ( range ) {
+    WorksheetView.prototype._calcCellsTextMetrics = function (range) {
         var colsLength = this.cols.length;
-        if ( range === undefined ) {
-            range = new Asc.Range( 0, 0, colsLength - 1, this.rows.length - 1 );
+        if (range === undefined) {
+            range = new Asc.Range(0, 0, colsLength - 1, this.rows.length - 1);
         }
         var rowModel, rowCells, cellColl;
-        for ( var row = range.r1; row <= range.r2; ++row ) {
-            if ( this.height_1px > this.rows[row].height ) {
+        for (var row = range.r1; row <= range.r2; ++row) {
+            if (this.height_1px > this.rows[row].height) {
                 continue;
             }
             // Теперь получаем только не пустые ячейки для строки
-            rowModel = this.model._getRowNoEmpty( row );
-            if ( null === rowModel ) {
+            rowModel = this.model._getRowNoEmpty(row);
+            if (null === rowModel) {
                 continue;
             }
             rowCells = rowModel.getCells();
-            for ( cellColl in rowCells ) {
+            for (cellColl in rowCells) {
                 cellColl = cellColl - 0;
-                if ( colsLength <= cellColl || this.width_1px > this.cols[cellColl].width ) {
+                if (colsLength <= cellColl || this.width_1px > this.cols[cellColl].width) {
                     continue;
                 }
 
-                this._addCellTextToCache( cellColl, row );
+                this._addCellTextToCache(cellColl, row);
             }
         }
         this.isChanged = false;
     };
 
-    WorksheetView.prototype._fetchRowCache = function ( row ) {
+    WorksheetView.prototype._fetchRowCache = function (row) {
         return (this.cache.rows[row] = ( this.cache.rows[row] || new CacheElement() ));
     };
 
-    WorksheetView.prototype._fetchCellCache = function ( col, row ) {
-        var r = this._fetchRowCache( row );
+    WorksheetView.prototype._fetchCellCache = function (col, row) {
+        var r = this._fetchRowCache(row);
         return (r.columns[col] = ( r.columns[col] || {} ));
     };
 
-    WorksheetView.prototype._fetchCellCacheText = function ( col, row ) {
-        var r = this._fetchRowCache( row );
+    WorksheetView.prototype._fetchCellCacheText = function (col, row) {
+        var r = this._fetchRowCache(row);
         return (r.columnsWithText[col] = ( r.columnsWithText[col] || {} ));
     };
 
-    WorksheetView.prototype._getRowCache = function ( row ) {
+    WorksheetView.prototype._getRowCache = function (row) {
         return this.cache.rows[row];
     };
 
-    WorksheetView.prototype._getCellCache = function ( col, row ) {
+    WorksheetView.prototype._getCellCache = function (col, row) {
         var r = this.cache.rows[row];
         return r ? r.columns[col] : undefined;
     };
@@ -4393,12 +4393,12 @@
         return undefined;
     };
 
-    WorksheetView.prototype._changeColWidth = function ( col, width, pad ) {
-        var cc = Math.min( this._colWidthToCharCount( width + pad ), Asc.c_oAscMaxColumnWidth );
-        var modelw = this.model.charCountToModelColWidth( cc );
-        var colw = this._calcColWidth( modelw );
+    WorksheetView.prototype._changeColWidth = function (col, width, pad) {
+        var cc = Math.min(this._colWidthToCharCount(width + pad), Asc.c_oAscMaxColumnWidth);
+        var modelw = this.model.charCountToModelColWidth(cc);
+        var colw = this._calcColWidth(modelw);
 
-        if ( colw.width > this.cols[col].width ) {
+        if (colw.width > this.cols[col].width) {
             this.cols[col].width = colw.width;
             this.cols[col].innerWidth = colw.innerWidth;
             this.cols[col].charCount = colw.charCount;
@@ -4406,7 +4406,7 @@
             History.Create_NewPoint();
             History.StartTransaction();
             // Выставляем, что это bestFit
-            this.model.setColBestFit( true, modelw, col, col );
+            this.model.setColBestFit(true, modelw, col, col);
             History.EndTransaction();
 
             this._updateColumnPositions();
@@ -5465,6 +5465,7 @@
             return this;
         }
 
+        History.TurnOff();
         this.cleanSelection();
         this.cellCommentator.cleanSelectedComment();
 
@@ -5642,6 +5643,7 @@
         //ToDo this.drawDepCells();
         this.cellCommentator.updateCommentPosition();
         this.cellCommentator.drawCommentCells();
+        History.TurnOn();
         return this;
     };
 
@@ -5667,6 +5669,7 @@
             return this;
         }
 
+        History.TurnOff();
         this.cleanSelection();
         this.cellCommentator.cleanSelectedComment();
 
@@ -5795,6 +5798,7 @@
         //ToDo this.drawDepCells();
         this.cellCommentator.updateCommentPosition();
         this.cellCommentator.drawCommentCells();
+        History.TurnOn();
         return this;
     };
 
