@@ -2232,6 +2232,11 @@ PasteProcessor.prototype =
 		//PASTE
 		var bInsertFromBinary = false;
 		
+		if(!node && "" === fromBinary)
+		{
+			return;
+		}
+		
 		if(PasteElementsId.copyPasteUseBinary)
 		{
 			//get binary
