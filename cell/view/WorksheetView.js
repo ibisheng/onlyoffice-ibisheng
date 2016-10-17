@@ -332,6 +332,9 @@
 
         this.stringRender = stringRender;
 
+        // true if now init worksheet
+        this.initialized = false;
+
         // Флаг, сигнализирует о том, что мы сделали resize, но это не активный лист (поэтому как только будем показывать, нужно перерисовать и пересчитать кеш)
         this.updateResize = false;
         // Флаг, сигнализирует о том, что мы сменили zoom, но это не активный лист (поэтому как только будем показывать, нужно перерисовать и пересчитать кеш)
@@ -662,55 +665,58 @@
         return this.drawingCtx.getZoom();
     };
 
-    WorksheetView.prototype.changeZoom = function ( isUpdate ) {
-        if ( isUpdate ) {
+    WorksheetView.prototype.changeZoom = function (isUpdate) {
+        if (isUpdate) {
+            History.TurnOff();
             this.notUpdateRowHeight = true;
             this.cleanSelection();
-            this._initCellsArea( false );
+            this._initCellsArea(false);
             this._normalizeViewRange();
             this._cleanCellsTextMetricsCache();
             this._shiftVisibleRange();
             this._prepareCellTextMetricsCache();
             this._shiftVisibleRange();
             this.cellCommentator.updateCommentPosition();
-            this.handlers.trigger( "onDocumentPlaceChanged" );
+            this.handlers.trigger("onDocumentPlaceChanged");
             this.objectRender.drawingArea.reinitRanges();
             this.updateZoom = false;
             this.notUpdateRowHeight = false;
-        }
-        else {
+            History.TurnOn();
+        } else {
             this.updateZoom = true;
         }
         return this;
     };
     WorksheetView.prototype.changeZoomResize = function () {
+        History.TurnOff();
         this.cleanSelection();
-        this._initCellsArea( true );
+        this._initCellsArea(true);
         this._normalizeViewRange();
         this._cleanCellsTextMetricsCache();
         this._shiftVisibleRange();
         this._prepareCellTextMetricsCache();
         this._shiftVisibleRange();
         this.cellCommentator.updateCommentPosition();
-        this.handlers.trigger( "onDocumentPlaceChanged" );
+        this.handlers.trigger("onDocumentPlaceChanged");
         this.objectRender.drawingArea.reinitRanges();
 
         this.updateResize = false;
         this.updateZoom = false;
+        History.TurnOn();
     };
 
     WorksheetView.prototype.getSheetViewSettings = function () {
         return this.model.getSheetViewSettings();
     };
 
-    WorksheetView.prototype.getFrozenPaneOffset = function ( noX, noY ) {
+    WorksheetView.prototype.getFrozenPaneOffset = function (noX, noY) {
         var offsetX = 0, offsetY = 0, c = this.cols, r = this.rows;
-        if ( this.topLeftFrozenCell ) {
-            if ( !noX ) {
+        if (this.topLeftFrozenCell) {
+            if (!noX) {
                 var cFrozen = this.topLeftFrozenCell.getCol0();
                 offsetX = c[cFrozen].left - c[0].left;
             }
-            if ( !noY ) {
+            if (!noY) {
                 var rFrozen = this.topLeftFrozenCell.getRow0();
                 offsetY = r[rFrozen].top - r[0].top;
             }
@@ -1162,18 +1168,20 @@
     };
 
     // ----- Initialization -----
-
     WorksheetView.prototype._init = function () {
+        History.TurnOff();
         this._initConstValues();
         this._initWorksheetDefaultWidth();
         this._initPane();
-        this._initCellsArea( true );
+        this._initCellsArea(true);
         this.af_setStyleAfterOpen();
         this._cleanCellsTextMetricsCache();
         this._prepareCellTextMetricsCache();
+        History.TurnOn();
 
         // initializing is completed
-        this.handlers.trigger( "initialized" );
+        this.initialized = true;
+        this.handlers.trigger("initialized");
     };
 
     WorksheetView.prototype._prepareComments = function () {
@@ -1185,74 +1193,75 @@
 
     WorksheetView.prototype._prepareDrawingObjects = function () {
         this.objectRender = new AscFormat.DrawingObjects();
-        if ( !window["NATIVE_EDITOR_ENJINE"] || window['IS_NATIVE_EDITOR'] || window['DoctRendererMode'] ) {
-            this.objectRender.init( this );
+        if (!window["NATIVE_EDITOR_ENJINE"] || window['IS_NATIVE_EDITOR'] || window['DoctRendererMode']) {
+            this.objectRender.init(this);
         }
     };
 
     WorksheetView.prototype._initWorksheetDefaultWidth = function () {
         this.nBaseColWidth = this.model.oSheetFormatPr.nBaseColWidth || this.nBaseColWidth;
         // Теперь рассчитываем число px
-        var defaultColWidthChars = this.model.charCountToModelColWidth( this.nBaseColWidth );
-        this.defaultColWidthPx = this._modelColWidthToColWidth( defaultColWidthChars ) * asc_getcvt( 1/*pt*/, 0/*px*/, 96 );
+        var defaultColWidthChars = this.model.charCountToModelColWidth(this.nBaseColWidth);
+        this.defaultColWidthPx = this._modelColWidthToColWidth(defaultColWidthChars) * asc_getcvt(1/*pt*/, 0/*px*/, 96);
         // Делаем кратным 8 (http://support.microsoft.com/kb/214123)
-        this.defaultColWidthPx = asc_ceil( this.defaultColWidthPx / 8 ) * 8;
-        this.defaultColWidthChars = this._colWidthToCharCount( this.defaultColWidthPx * asc_getcvt( 0/*px*/, 1/*pt*/, 96 ) );
+        this.defaultColWidthPx = asc_ceil(this.defaultColWidthPx / 8) * 8;
+        this.defaultColWidthChars =
+          this._colWidthToCharCount(this.defaultColWidthPx * asc_getcvt(0/*px*/, 1/*pt*/, 96));
 
         AscCommonExcel.oDefaultMetrics.ColWidthChars = this.model.charCountToModelColWidth(this.defaultColWidthChars);
         this.defaultColWidth = this._modelColWidthToColWidth(AscCommonExcel.oDefaultMetrics.ColWidthChars);
 
         var defaultFontSize = this.model.getDefaultFontSize();
         // ToDo разобраться со значениями
-        this._setFont( undefined, this.model.getDefaultFontName(), defaultFontSize );
-        var tm = this._roundTextMetrics( this.stringRender.measureString( "A" ) );
+        this._setFont(undefined, this.model.getDefaultFontName(), defaultFontSize);
+        var tm = this._roundTextMetrics(this.stringRender.measureString("A"));
         this.headersHeightByFont = tm.height;
 
         this.maxRowHeight = asc_calcnpt(Asc.c_oAscMaxRowHeight, this._getPPIY());
-        this.defaultRowDescender = this._calcRowDescender( defaultFontSize );
+        this.defaultRowDescender = this._calcRowDescender(defaultFontSize);
         AscCommonExcel.oDefaultMetrics.RowHeight = this.defaultRowHeight = this.model.getDefaultHeight() ||
           Math.max(asc_calcnpt(defaultFontSize * this.vspRatio, this._getPPIY()) + this.height_1px,
             this.headersHeightByFont);
 
         // Инициализируем число колонок и строк (при открытии). Причем нужно поставить на 1 больше,
         // чтобы могли показать последнюю строку/столбец (http://bugzilla.onlyoffice.com/show_bug.cgi?id=23513)
-        this.nColsCount = Math.min( this.model.getColsCount() + 1, gc_nMaxCol );
-        this.nRowsCount = Math.min( this.model.getRowsCount() + 1, gc_nMaxRow );
+        this.nColsCount = Math.min(this.model.getColsCount() + 1, gc_nMaxCol);
+        this.nRowsCount = Math.min(this.model.getRowsCount() + 1, gc_nMaxRow);
     };
 
     WorksheetView.prototype._initConstValues = function () {
         var ppiX = this._getPPIX();
         var ppiY = this._getPPIY();
-        this.width_1px = asc_calcnpt( 0, ppiX, 1/*px*/ );
-        this.width_2px = asc_calcnpt( 0, ppiX, 2/*px*/ );
-        this.width_3px = asc_calcnpt( 0, ppiX, 3/*px*/ );
-        this.width_4px = asc_calcnpt( 0, ppiX, 4/*px*/ );
-        this.width_padding = asc_calcnpt( 0, ppiX, this.settings.cells.padding/*px*/ );
+        this.width_1px = asc_calcnpt(0, ppiX, 1/*px*/);
+        this.width_2px = asc_calcnpt(0, ppiX, 2/*px*/);
+        this.width_3px = asc_calcnpt(0, ppiX, 3/*px*/);
+        this.width_4px = asc_calcnpt(0, ppiX, 4/*px*/);
+        this.width_padding = asc_calcnpt(0, ppiX, this.settings.cells.padding/*px*/);
 
-        this.height_1px = asc_calcnpt( 0, ppiY, 1/*px*/ );
-        this.height_2px = asc_calcnpt( 0, ppiY, 2/*px*/ );
-        this.height_3px = asc_calcnpt( 0, ppiY, 3/*px*/ );
-        this.height_4px = asc_calcnpt( 0, ppiY, 4/*px*/ );
+        this.height_1px = asc_calcnpt(0, ppiY, 1/*px*/);
+        this.height_2px = asc_calcnpt(0, ppiY, 2/*px*/);
+        this.height_3px = asc_calcnpt(0, ppiY, 3/*px*/);
+        this.height_4px = asc_calcnpt(0, ppiY, 4/*px*/);
     };
 
-    WorksheetView.prototype._initCellsArea = function ( fullRecalc ) {
+    WorksheetView.prototype._initCellsArea = function (fullRecalc) {
         // calculate rows heights and visible rows
-        if ( !(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight) ) {
+        if (!(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight)) {
             this._calcHeaderRowHeight();
-            this._calcHeightRows( fullRecalc ? 1 : 0 );
+            this._calcHeightRows(fullRecalc ? 1 : 0);
         }
         this.visibleRange.r2 = 0;
         this._calcVisibleRows();
-        this._updateVisibleRowsCount( /*skipScrolReinit*/true );
+        this._updateVisibleRowsCount(/*skipScrolReinit*/true);
 
         // calculate columns widths and visible columns
-        if ( !(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight) ) {
+        if (!(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight)) {
             this._calcHeaderColumnWidth();
-            this._calcWidthColumns( fullRecalc ? 1 : 0 );
+            this._calcWidthColumns(fullRecalc ? 1 : 0);
         }
         this.visibleRange.c2 = 0;
         this._calcVisibleColumns();
-        this._updateVisibleColsCount( /*skipScrolReinit*/true );
+        this._updateVisibleColsCount(/*skipScrolReinit*/true);
     };
 
     WorksheetView.prototype._initPane = function () {
@@ -1374,104 +1383,97 @@
      * Вычисляет ширину и позицию колонок (в pt)
      * @param {Number} fullRecalc  0 - без пересчета; 1 - пересчитываем все; 2 - пересчитываем новые строки
      */
-    WorksheetView.prototype._calcWidthColumns = function ( fullRecalc ) {
+    WorksheetView.prototype._calcWidthColumns = function (fullRecalc) {
         var x = this.cellsLeft;
         var visibleW = this.drawingCtx.getWidth();
         var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
-        var l = Math.max( this.model.getColsCount() + 1, this.nColsCount, obr.maxCol );
+        var l = Math.max(this.model.getColsCount() + 1, this.nColsCount, obr.maxCol);
         var i = 0, w, column, isBestFit, hiddenW = 0;
 
         // Берем дефалтовую ширину документа
         var defaultWidth = this.model.getDefaultWidth();
         defaultWidth = (typeof defaultWidth === "number" && defaultWidth >= 0) ? defaultWidth : -1;
 
-        if ( 1 === fullRecalc ) {
+        if (1 === fullRecalc) {
             this.cols = [];
-        }
-        else if ( 2 === fullRecalc ) {
+        } else if (2 === fullRecalc) {
             i = this.cols.length;
             x = this.cols[i - 1].left + this.cols[i - 1].width;
         }
-        for ( ; ((0 !== fullRecalc) ? i < l || x + hiddenW < visibleW : i < this.cols.length) && i < gc_nMaxCol; ++i ) {
+        for (; ((0 !== fullRecalc) ? i < l || x + hiddenW < visibleW : i < this.cols.length) && i < gc_nMaxCol; ++i) {
             // Получаем свойства колонки
-            column = this.model._getColNoEmptyWithAll( i );
-            if ( !column ) {
+            column = this.model._getColNoEmptyWithAll(i);
+            if (!column) {
                 w = defaultWidth; // Используем дефолтное значение
                 isBestFit = true; // Это уже оптимальная ширина
-            }
-            else if ( column.hd ) {
+            } else if (column.hd) {
                 w = 0;            // Если столбец скрытый, ширину выставляем 0
                 isBestFit = false;
-                hiddenW += this._calcColWidth( column.width ).width;
-            }
-            else {
+                hiddenW += this._calcColWidth(column.width).width;
+            } else {
                 w = column.width || defaultWidth;
                 isBestFit = !!(column.BestFit || (null === column.BestFit && null === column.CustomWidth));
             }
-            this.cols[i] = this._calcColWidth( w );
+            this.cols[i] = this._calcColWidth(w);
             this.cols[i].isCustomWidth = !isBestFit;
             this.cols[i].left = x;
             x += this.cols[i].width;
         }
 
-        this.nColsCount = Math.min( Math.max( this.nColsCount, i ), gc_nMaxCol );
+        this.nColsCount = Math.min(Math.max(this.nColsCount, i), gc_nMaxCol);
     };
 
     /**
      * Вычисляет высоту и позицию строк (в pt)
      * @param {Number} fullRecalc  0 - без пересчета; 1 - пересчитываем все; 2 - пересчитываем новые строки
      */
-    WorksheetView.prototype._calcHeightRows = function ( fullRecalc ) {
+    WorksheetView.prototype._calcHeightRows = function (fullRecalc) {
         var y = this.cellsTop;
         var visibleH = this.drawingCtx.getHeight();
         var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
-        var l = Math.max( this.model.getRowsCount() + 1, this.nRowsCount, obr.maxRow );
+        var l = Math.max(this.model.getRowsCount() + 1, this.nRowsCount, obr.maxRow);
         var defaultH = this.defaultRowHeight;
         var i = 0, h, hR, isCustomHeight, row, hiddenH = 0;
 
-        if ( 1 === fullRecalc ) {
+        if (1 === fullRecalc) {
             this.rows = [];
-        }
-        else if ( 2 === fullRecalc ) {
+        } else if (2 === fullRecalc) {
             i = this.rows.length;
             y = this.rows[i - 1].top + this.rows[i - 1].height;
         }
-        for ( ; ((0 !== fullRecalc) ? i < l || y + hiddenH < visibleH : i < this.rows.length) && i < gc_nMaxRow; ++i ) {
-            row = this.model._getRowNoEmptyWithAll( i );
-            if ( !row ) {
+        // ToDo calc all rows (not visible)
+        for (; ((0 !== fullRecalc) ? i < l || y + hiddenH < visibleH : i < this.rows.length) && i < gc_nMaxRow; ++i) {
+            row = this.model._getRowNoEmptyWithAll(i);
+            if (!row) {
                 h = -1; // Будет использоваться дефолтная высота строки
                 isCustomHeight = false;
-            }
-            else if ( 0 != (AscCommonExcel.g_nRowFlag_hd & row.flags) ) {
+            } else if (0 != (AscCommonExcel.g_nRowFlag_hd & row.flags)) {
                 hR = h = 0;  // Скрытая строка, высоту выставляем 0
                 isCustomHeight = true;
                 hiddenH += row.h > 0 ? row.h - this.height_1px : defaultH;
-            }
-            else {
+            } else {
                 isCustomHeight = 0 != (AscCommonExcel.g_nRowFlag_CustomHeight & row.flags);
                 // Берем высоту из модели, если она custom(баг 15618), либо дефолтную
-                if ( row.h > 0 && isCustomHeight ) {
+                if (row.h > 0 && (this.initialized || isCustomHeight)) {
                     hR = row.h;
                     h = hR / 0.75;
                     h = (h | h) * 0.75;			// 0.75 - это размер 1px в pt (можно было 96/72)
-                }
-                else {
+                } else {
                     h = -1;
                 }
             }
             h = h < 0 ? (hR = defaultH) : h;
             this.rows[i] = {
-                top            : y,
-                height         : h,												// Высота с точностью до 1 px
-                heightReal     : hR,											// Реальная высота из файла (может быть не кратна 1 px, в Excel можно выставить через меню строки)
-                descender      : this.defaultRowDescender,
-                isCustomHeight : isCustomHeight,
-                isDefaultHeight: !(row && row.h > 0 && isCustomHeight)  // Высота строки, вычисленная на основе текста
+                top: y,
+                height: h,												// Высота с точностью до 1 px
+                heightReal: hR,											// Реальная высота из файла (может быть не кратна 1 px, в Excel можно выставить через меню строки)
+                descender: this.defaultRowDescender,
+                isCustomHeight: isCustomHeight
             };
             y += this.rows[i].height;
         }
 
-        this.nRowsCount = Math.min( Math.max( this.nRowsCount, i ), gc_nMaxRow );
+        this.nRowsCount = Math.min(Math.max(this.nRowsCount, i), gc_nMaxRow);
     };
 
     /** Вычисляет диапазон индексов видимых колонок */
@@ -1479,7 +1481,7 @@
         var l = this.cols.length;
         var w = this.drawingCtx.getWidth();
         var sumW = this.topLeftFrozenCell ? this.cols[this.topLeftFrozenCell.getCol0()].left : this.cellsLeft;
-        for ( var i = this.visibleRange.c1, f = false; i < l && sumW < w; ++i ) {
+        for (var i = this.visibleRange.c1, f = false; i < l && sumW < w; ++i) {
             sumW += this.cols[i].width;
             f = true;
         }
@@ -1491,7 +1493,7 @@
         var l = this.rows.length;
         var h = this.drawingCtx.getHeight();
         var sumH = this.topLeftFrozenCell ? this.rows[this.topLeftFrozenCell.getRow0()].top : this.cellsTop;
-        for ( var i = this.visibleRange.r1, f = false; i < l && sumH < h; ++i ) {
+        for (var i = this.visibleRange.r1, f = false; i < l && sumH < h; ++i) {
             sumH += this.rows[i].height;
             f = true;
         }
@@ -1501,7 +1503,7 @@
     /** Обновляет позицию колонок (в pt) */
     WorksheetView.prototype._updateColumnPositions = function () {
         var x = this.cellsLeft;
-        for ( var l = this.cols.length, i = 0; i < l; ++i ) {
+        for (var l = this.cols.length, i = 0; i < l; ++i) {
             this.cols[i].left = x;
             x += this.cols[i].width;
         }
@@ -1510,7 +1512,7 @@
     /** Обновляет позицию строк (в pt) */
     WorksheetView.prototype._updateRowPositions = function () {
         var y = this.cellsTop;
-        for ( var l = this.rows.length, i = 0; i < l; ++i ) {
+        for (var l = this.rows.length, i = 0; i < l; ++i) {
             this.rows[i].top = y;
             y += this.rows[i].height;
         }
@@ -1520,22 +1522,22 @@
      * Добавляет колонки, пока общая ширина листа не превысит rightSide
      * @param {Number} rightSide Правая граница
      */
-    WorksheetView.prototype._appendColumns = function ( rightSide ) {
+    WorksheetView.prototype._appendColumns = function (rightSide) {
         var i = this.cols.length;
         var lc = this.cols[i - 1];
         var done = false;
 
-        for ( var x = lc.left + lc.width; i < gc_nMaxCol && (x < rightSide || !done); ++i ) {
-            if ( x >= rightSide ) {
+        for (var x = lc.left + lc.width; i < gc_nMaxCol && (x < rightSide || !done); ++i) {
+            if (x >= rightSide) {
                 // add +1 column at the end and exit cycle
                 done = true;
             }
-            this.cols[i] = this._calcColWidth( this.model.getColWidth( i ) );
+            this.cols[i] = this._calcColWidth(this.model.getColWidth(i));
             this.cols[i].left = x;
             x += this.cols[i].width;
             this.isChanged = true;
         }
-        this.nColsCount = Math.min( Math.max( this.nColsCount, i ), gc_nMaxCol );
+        this.nColsCount = Math.min(Math.max(this.nColsCount, i), gc_nMaxCol);
     };
 
     /** Устанаваливает видимый диапазон ячеек максимально возможным */
@@ -4647,87 +4649,87 @@
         return mc ? mc.c2 : col;
     };
 
-    WorksheetView.prototype._updateRowHeight = function ( tm, col, row, flags, isMerged, fMergedRows, va, ha, angle, maxW, colWidth, textBound ) {
-        var rowInfo = this.rows[row], rowHeight;
-        // update row's descender
-        if ( va !== kvaTop && va !== kvaCenter && !isMerged ) {
-            rowInfo.descender = Math.max( rowInfo.descender, tm.height - tm.baseline );
-        }
+    WorksheetView.prototype._updateRowHeight =
+      function (tm, col, row, flags, isMerged, fMergedRows, va, ha, angle, maxW, colWidth, textBound) {
+          var rowInfo = this.rows[row], rowHeight;
+          // update row's descender
+          if (va !== kvaTop && va !== kvaCenter && !isMerged) {
+              rowInfo.descender = Math.max(rowInfo.descender, tm.height - tm.baseline);
+          }
 
-        rowHeight = rowInfo.height;
+          rowHeight = rowInfo.height;
 
-        // update row's height
-        if ( !rowInfo.isCustomHeight && !(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight) ) {
-            // Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
-            if ( !fMergedRows ) {
-                var newHeight = tm.height;
-                if ( angle && textBound ) {
-                    newHeight = Math.max(rowInfo.height,textBound.height);
-                }
+          // update row's height
+          if (!rowInfo.isCustomHeight && !(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight)) {
+              // Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
+              if (!fMergedRows) {
+                  var newHeight = tm.height;
+                  if (angle && textBound) {
+                      newHeight = Math.max(rowInfo.height, textBound.height);
+                  }
 
-                rowInfo.heightReal = rowInfo.height = Math.min( this.maxRowHeight, Math.max( rowInfo.height, newHeight ) );
-                if ( rowHeight !== rowInfo.height ) {
-                    // ToDo нужно по идее всегда выставлять, но тут проблема с тем, что не всегда можно это в историю заносить (открытие, например). А если не заносить в историю, то при сборке ничего не изменится...
-                    if ( !rowInfo.isDefaultHeight ) {
-                        this.model.setRowHeight( rowInfo.height + this.height_1px, row, row, false );
-                    }
+                  rowInfo.heightReal =
+                    rowInfo.height = Math.min(this.maxRowHeight, Math.max(rowInfo.height, newHeight));
+                  if (rowHeight !== rowInfo.height) {
+                      this.model.setRowHeight(rowInfo.height, row, row, false);
 
-                    if ( angle ) {
+                      if (angle) {
 
-                        if (flags.wrapText && !rowInfo.isCustomHeight) {
-                            maxW = tm.width;
-                        }
+                          if (flags.wrapText && !rowInfo.isCustomHeight) {
+                              maxW = tm.width;
+                          }
 
-                        textBound = this.stringRender.getTransformBound( angle, colWidth, rowInfo.height, tm.width, ha, va, maxW);
+                          textBound =
+                            this.stringRender.getTransformBound(angle, colWidth, rowInfo.height, tm.width, ha, va,
+                              maxW);
 
-                        this._fetchCellCache( col, row ).text.textBound = textBound;
-                    }
+                          this._fetchCellCache(col, row).text.textBound = textBound;
+                      }
 
-                    this.isChanged = true;
-                }
-            }
-        }
-    };
+                      this.isChanged = true;
+                  }
+              }
+          }
+      };
 
-    WorksheetView.prototype._calcMaxWidth = function ( col, row, mc ) {
-        if ( null === mc ) {
+    WorksheetView.prototype._calcMaxWidth = function (col, row, mc) {
+        if (null === mc) {
             return this.cols[col].innerWidth;
         }
 
         var width = this.cols[mc.c1].innerWidth;
-        for ( var c = mc.c1 + 1; c <= mc.c2 && c < this.cols.length; ++c ) {
+        for (var c = mc.c1 + 1; c <= mc.c2 && c < this.cols.length; ++c) {
             width += this.cols[c].width;
         }
         return width;
     };
 
-    WorksheetView.prototype._calcCellTextOffset = function ( col, row, textAlign, textWidth ) {
+    WorksheetView.prototype._calcCellTextOffset = function (col, row, textAlign, textWidth) {
         var sideL = [0], sideR = [0], i;
         var maxWidth = this.cols[col].width;
         var ls = 0, rs = 0;
-        var pad = this.settings.cells.padding * asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
+        var pad = this.settings.cells.padding * asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
         var textW = textAlign === khaCenter ? (textWidth + maxWidth) * 0.5 : textWidth + pad;
 
-        if ( textAlign === khaRight || textAlign === khaCenter ) {
-            sideL = this._calcCellsWidth( col, 0, row );
+        if (textAlign === khaRight || textAlign === khaCenter) {
+            sideL = this._calcCellsWidth(col, 0, row);
             // condition (sideL.lenght >= 1) is always true
-            for ( i = 0; i < sideL.length && textW > sideL[i]; ++i ) {/* do nothing */
+            for (i = 0; i < sideL.length && textW > sideL[i]; ++i) {/* do nothing */
             }
             ls = i !== sideL.length ? i : i - 1;
         }
 
-        if ( textAlign !== khaRight ) {
-            sideR = this._calcCellsWidth( col, this.cols.length - 1, row );
+        if (textAlign !== khaRight) {
+            sideR = this._calcCellsWidth(col, this.cols.length - 1, row);
             // condition (sideR.lenght >= 1) is always true
-            for ( i = 0; i < sideR.length && textW > sideR[i]; ++i ) {/* do nothing */
+            for (i = 0; i < sideR.length && textW > sideR[i]; ++i) {/* do nothing */
             }
             rs = i !== sideR.length ? i : i - 1;
         }
 
-        if ( textAlign === khaCenter ) {
+        if (textAlign === khaCenter) {
             maxWidth = (sideL[ls] - sideL[0]) + sideR[rs];
-        }
-        else {
+        } else {
             maxWidth = textAlign === khaRight ? sideL[ls] : sideR[rs];
         }
 
@@ -4736,14 +4738,14 @@
         };
     };
 
-    WorksheetView.prototype._calcCellsWidth = function ( colBeg, colEnd, row ) {
+    WorksheetView.prototype._calcCellsWidth = function (colBeg, colEnd, row) {
         var inc = colBeg <= colEnd ? 1 : -1, res = [];
-        for ( var i = colBeg; (colEnd - i) * inc >= 0; i += inc ) {
-            if ( i !== colBeg && !this._isCellEmptyOrMerged( i, row ) ) {
+        for (var i = colBeg; (colEnd - i) * inc >= 0; i += inc) {
+            if (i !== colBeg && !this._isCellEmptyOrMerged(i, row)) {
                 break;
             }
-            res.push( this.cols[i].width );
-            if ( res.length > 1 ) {
+            res.push(this.cols[i].width);
+            if (res.length > 1) {
                 res[res.length - 1] += res[res.length - 2];
             }
         }
@@ -4751,20 +4753,20 @@
     };
 
     // Ищет текст в строке (columnsWithText - это колонки, в которых есть текст)
-    WorksheetView.prototype._findSourceOfCellText = function ( col, row ) {
-        var r = this._getRowCache( row );
-        if ( r ) {
-            for ( var i in r.columnsWithText ) {
-                if ( !r.columns[i] || 0 === this.cols[i].width ) {
+    WorksheetView.prototype._findSourceOfCellText = function (col, row) {
+        var r = this._getRowCache(row);
+        if (r) {
+            for (var i in r.columnsWithText) {
+                if (!r.columns[i] || 0 === this.cols[i].width) {
                     continue;
                 }
                 var ct = r.columns[i].text;
-                if ( !ct ) {
+                if (!ct) {
                     continue;
                 }
                 i >>= 0;
                 var lc = i - ct.sideL, rc = i + ct.sideR;
-                if ( col >= lc && col <= rc ) {
+                if (col >= lc && col <= rc) {
                     return i;
                 }
             }
@@ -4775,29 +4777,29 @@
 
     // ----- Merged cells cache -----
 
-    WorksheetView.prototype._isMergedCells = function ( range ) {
-        return range.isEqual( this.model.getMergedByCell( range.r1, range.c1 ) );
+    WorksheetView.prototype._isMergedCells = function (range) {
+        return range.isEqual(this.model.getMergedByCell(range.r1, range.c1));
     };
 
     // ----- Cell borders cache -----
 
-    WorksheetView.prototype._addErasedBordersToCache = function ( colBeg, colEnd, row ) {
-        var rc = this._fetchRowCache( row );
-        for ( var col = colBeg; col < colEnd; ++col ) {
+    WorksheetView.prototype._addErasedBordersToCache = function (colBeg, colEnd, row) {
+        var rc = this._fetchRowCache(row);
+        for (var col = colBeg; col < colEnd; ++col) {
             rc.erased[col] = true;
         }
     };
 
-    WorksheetView.prototype._isLeftBorderErased = function ( col, rowCache ) {
+    WorksheetView.prototype._isLeftBorderErased = function (col, rowCache) {
         return rowCache.erased[col - 1] === true;
     };
-    WorksheetView.prototype._isRightBorderErased = function ( col, rowCache ) {
+    WorksheetView.prototype._isRightBorderErased = function (col, rowCache) {
         return rowCache.erased[col] === true;
     };
 
-    WorksheetView.prototype._calcMaxBorderWidth = function ( b1, b2 ) {
+    WorksheetView.prototype._calcMaxBorderWidth = function (b1, b2) {
         // ToDo пересмотреть
-        return Math.max( b1 && b1.w, b2 && b2.w );
+        return Math.max(b1 && b1.w, b2 && b2.w);
     };
 
 
@@ -4808,8 +4810,8 @@
      * @param {Number} col  Индекс колонки
      * @return {String}
      */
-    WorksheetView.prototype._getColumnTitle = function ( col ) {
-        return AscCommon.g_oCellAddressUtils.colnumToColstrFromWsView( col + 1 );
+    WorksheetView.prototype._getColumnTitle = function (col) {
+        return AscCommon.g_oCellAddressUtils.colnumToColstrFromWsView(col + 1);
     };
 
     /**
@@ -4817,7 +4819,7 @@
      * @param {Number} row  Индекс строки
      * @return {String}
      */
-    WorksheetView.prototype._getRowTitle = function ( row ) {
+    WorksheetView.prototype._getRowTitle = function (row) {
         return "" + (row + 1);
     };
 
@@ -4827,8 +4829,8 @@
      * @param {Number} row  Индекс строки
      * @return {String}
      */
-    WorksheetView.prototype._getCellTitle = function ( col, row ) {
-        return this._getColumnTitle( col ) + this._getRowTitle( row );
+    WorksheetView.prototype._getCellTitle = function (col, row) {
+        return this._getColumnTitle(col) + this._getRowTitle(row);
     };
 
     /**
@@ -4837,29 +4839,29 @@
      * @param {Number} row  Индекс строки
      * @return {Range}
      */
-    WorksheetView.prototype._getCell = function ( col, row ) {
-        if ( this.nRowsCount < this.model.getRowsCount() + 1 ) {
-            this.expandRowsOnScroll( false, true, 0 );
+    WorksheetView.prototype._getCell = function (col, row) {
+        if (this.nRowsCount < this.model.getRowsCount() + 1) {
+            this.expandRowsOnScroll(false, true, 0);
         } // Передаем 0, чтобы увеличить размеры
-        if ( this.nColsCount < this.model.getColsCount() + 1 ) {
-            this.expandColsOnScroll( false, true, 0 );
+        if (this.nColsCount < this.model.getColsCount() + 1) {
+            this.expandColsOnScroll(false, true, 0);
         } // Передаем 0, чтобы увеличить размеры
 
-        if ( col < 0 || col >= this.nColsCount || row < 0 || row >= this.nRowsCount ) {
+        if (col < 0 || col >= this.nColsCount || row < 0 || row >= this.nRowsCount) {
             return null;
         }
 
-        return this.model.getCell3( row, col );
+        return this.model.getCell3(row, col);
     };
 
-    WorksheetView.prototype._getVisibleCell = function ( col, row ) {
-        return this.model.getCell3( row, col );
+    WorksheetView.prototype._getVisibleCell = function (col, row) {
+        return this.model.getCell3(row, col);
     };
 
-    WorksheetView.prototype._getCellFlags = function ( col, row ) {
-        var c = row !== undefined ? this._getCell( col, row ) : col;
+    WorksheetView.prototype._getCellFlags = function (col, row) {
+        var c = row !== undefined ? this._getCell(col, row) : col;
         var fl = new CellFlags();
-        if ( null !== c ) {
+        if (null !== c) {
             fl.wrapText = c.getWrap();
             fl.shrinkToFit = c.getShrinkToFit();
             fl.merged = c.hasMerged();
@@ -4868,21 +4870,21 @@
         return fl;
     };
 
-    WorksheetView.prototype._isCellEmptyText = function ( col, row ) {
-        var c = row !== undefined ? this._getCell( col, row ) : col;
+    WorksheetView.prototype._isCellEmptyText = function (col, row) {
+        var c = row !== undefined ? this._getCell(col, row) : col;
         return null === c || c.isEmptyText();
     };
-    WorksheetView.prototype._isCellEmptyTextString = function ( col, row ) {
-        var c = row !== undefined ? this._getCell( col, row ) : col;
+    WorksheetView.prototype._isCellEmptyTextString = function (col, row) {
+        var c = row !== undefined ? this._getCell(col, row) : col;
         return null === c || c.isEmptyTextString();
     };
 
-    WorksheetView.prototype._isCellEmptyOrMerged = function ( col, row ) {
-        var c = row !== undefined ? this._getCell( col, row ) : col;
-        if ( null === c ) {
+    WorksheetView.prototype._isCellEmptyOrMerged = function (col, row) {
+        var c = row !== undefined ? this._getCell(col, row) : col;
+        if (null === c) {
             return true;
         }
-        if ( !c.isEmptyText() ) {
+        if (!c.isEmptyText()) {
             return false;
         }
         return (null === c.hasMerged());
@@ -4950,7 +4952,7 @@
      * @param {Asc.Range} range  Диапазон для проверки
      * @returns {Boolean}
      */
-    WorksheetView.prototype._isLargeRange = function ( range ) {
+    WorksheetView.prototype._isLargeRange = function (range) {
         var vr = this.visibleRange;
         return range.c2 - range.c1 + 1 > (vr.c2 - vr.c1 + 1) * 3 || range.r2 - range.r1 + 1 > (vr.r2 - vr.r1 + 1) * 3;
     };
@@ -4961,199 +4963,206 @@
         ctx.clear();
         this._drawSelection();
 
-        var color = new CColor( 0, 0, 255 );
+        var color = new CColor(0, 0, 255);
 
-        function draw_arrow( context, fromx, fromy, tox, toy ) {
-            var headlen = 9, showArrow = tox > that.getCellLeft( 0, 0 ) && toy > that.getCellTop( 0, 0 ), dx = tox - fromx, dy = toy - fromy, tox = tox > that.getCellLeft( 0, 0 ) ? tox : that.getCellLeft( 0, 0 ), toy = toy > that.getCellTop( 0, 0 ) ? toy : that.getCellTop( 0, 0 ), angle = Math.atan2( dy, dx ), _a = Math.PI / 18;
+        function draw_arrow(context, fromx, fromy, tox, toy) {
+            var headlen = 9, showArrow = tox > that.getCellLeft(0, 0) && toy > that.getCellTop(0, 0), dx = tox -
+              fromx, dy = toy - fromy, tox = tox > that.getCellLeft(0, 0) ? tox : that.getCellLeft(0, 0), toy = toy >
+            that.getCellTop(0, 0) ? toy : that.getCellTop(0, 0), angle = Math.atan2(dy, dx), _a = Math.PI / 18;
 
             // ToDo посмотреть на четкость moveTo, lineTo
             context.save()
-                .setLineWidth( 1 )
-                .beginPath()
-                .lineDiag
-                .moveTo( _cc.pxToPt( fromx ), _cc.pxToPt( fromy ) )
-                .lineTo( _cc.pxToPt( tox ), _cc.pxToPt( toy ) );
+              .setLineWidth(1)
+              .beginPath()
+              .lineDiag
+              .moveTo(_cc.pxToPt(fromx), _cc.pxToPt(fromy))
+              .lineTo(_cc.pxToPt(tox), _cc.pxToPt(toy));
             // .dashLine(_cc.pxToPt(fromx-.5), _cc.pxToPt(fromy-.5), _cc.pxToPt(tox-.5), _cc.pxToPt(toy-.5), 15, 5)
-            if ( showArrow ) {
+            if (showArrow) {
                 context
-                    .moveTo( _cc.pxToPt( tox - headlen * Math.cos( angle - _a ) ), _cc.pxToPt( toy - headlen * Math.sin( angle - _a ) ) )
-                    .lineTo( _cc.pxToPt( tox ), _cc.pxToPt( toy ) )
-                    .lineTo( _cc.pxToPt( tox - headlen * Math.cos( angle + _a ) ), _cc.pxToPt( toy - headlen * Math.sin( angle + _a ) ) )
-                    .lineTo( _cc.pxToPt( tox - headlen * Math.cos( angle - _a ) ), _cc.pxToPt( toy - headlen * Math.sin( angle - _a ) ) );
+                  .moveTo(_cc.pxToPt(tox - headlen * Math.cos(angle - _a)),
+                    _cc.pxToPt(toy - headlen * Math.sin(angle - _a)))
+                  .lineTo(_cc.pxToPt(tox), _cc.pxToPt(toy))
+                  .lineTo(_cc.pxToPt(tox - headlen * Math.cos(angle + _a)),
+                    _cc.pxToPt(toy - headlen * Math.sin(angle + _a)))
+                  .lineTo(_cc.pxToPt(tox - headlen * Math.cos(angle - _a)),
+                    _cc.pxToPt(toy - headlen * Math.sin(angle - _a)));
             }
 
             context
-                .setStrokeStyle( color )
-                .setFillStyle( color )
-                .stroke()
-                .fill()
-                .closePath()
-                .restore();
+              .setStrokeStyle(color)
+              .setFillStyle(color)
+              .stroke()
+              .fill()
+              .closePath()
+              .restore();
         }
 
-        function gCM( _this, col, row ) {
+        function gCM(_this, col, row) {
             var metrics = {top: 0, left: 0, width: 0, height: 0, result: false}; 	// px
 
             var fvr = _this.getFirstVisibleRow();
             var fvc = _this.getFirstVisibleCol();
-            var mergedRange = _this.model.getMergedByCell( row, col );
+            var mergedRange = _this.model.getMergedByCell(row, col);
 
-            if ( mergedRange && (fvc < mergedRange.c2) && (fvr < mergedRange.r2) ) {
+            if (mergedRange && (fvc < mergedRange.c2) && (fvr < mergedRange.r2)) {
 
                 var startCol = (mergedRange.c1 > fvc) ? mergedRange.c1 : fvc;
                 var startRow = (mergedRange.r1 > fvr) ? mergedRange.r1 : fvr;
 
-                metrics.top = _this.getCellTop( startRow, 0 ) - _this.getCellTop( fvr, 0 ) + _this.getCellTop( 0, 0 );
-                metrics.left = _this.getCellLeft( startCol, 0 ) - _this.getCellLeft( fvc, 0 ) + _this.getCellLeft( 0, 0 );
+                metrics.top = _this.getCellTop(startRow, 0) - _this.getCellTop(fvr, 0) + _this.getCellTop(0, 0);
+                metrics.left = _this.getCellLeft(startCol, 0) - _this.getCellLeft(fvc, 0) + _this.getCellLeft(0, 0);
 
-                for ( var i = startCol; i <= mergedRange.c2; i++ ) {
-                    metrics.width += _this.getColumnWidth( i, 0 )
+                for (var i = startCol; i <= mergedRange.c2; i++) {
+                    metrics.width += _this.getColumnWidth(i, 0)
                 }
-                for ( var i = startRow; i <= mergedRange.r2; i++ ) {
-                    metrics.height += _this.getRowHeight( i, 0 )
+                for (var i = startRow; i <= mergedRange.r2; i++) {
+                    metrics.height += _this.getRowHeight(i, 0)
                 }
                 metrics.result = true;
-            }
-            else {
+            } else {
 
-                metrics.top = _this.getCellTop( row, 0 ) - _this.getCellTop( fvr, 0 ) + _this.getCellTop( 0, 0 );
-                metrics.left = _this.getCellLeft( col, 0 ) - _this.getCellLeft( fvc, 0 ) + _this.getCellLeft( 0, 0 );
-                metrics.width = _this.getColumnWidth( col, 0 );
-                metrics.height = _this.getRowHeight( row, 0 );
+                metrics.top = _this.getCellTop(row, 0) - _this.getCellTop(fvr, 0) + _this.getCellTop(0, 0);
+                metrics.left = _this.getCellLeft(col, 0) - _this.getCellLeft(fvc, 0) + _this.getCellLeft(0, 0);
+                metrics.width = _this.getColumnWidth(col, 0);
+                metrics.height = _this.getRowHeight(row, 0);
                 metrics.result = true;
             }
 
             return metrics
         }
 
-        for ( var id in this.depDrawCells ) {
+        for (var id in this.depDrawCells) {
             c = this.depDrawCells[id].from;
             node = this.depDrawCells[id].to;
-            var mainCellMetrics = gCM( this, c.nCol, c.nRow ), nodeCellMetrics, _t1, _t2;
-            for ( var id in node ) {
-                if ( !node[id].isArea ) {
-                    _t1 = gCM( this, node[id].returnCell().nCol, node[id].returnCell().nRow )
+            var mainCellMetrics = gCM(this, c.nCol, c.nRow), nodeCellMetrics, _t1, _t2;
+            for (var id in node) {
+                if (!node[id].isArea) {
+                    _t1 = gCM(this, node[id].returnCell().nCol, node[id].returnCell().nRow)
                     nodeCellMetrics = {
-                        t  : _t1.top,
-                        l  : _t1.left,
-                        w  : _t1.width,
-                        h  : _t1.height,
+                        t: _t1.top,
+                        l: _t1.left,
+                        w: _t1.width,
+                        h: _t1.height,
+                        apt: _t1.top + _t1.height / 2,
+                        apl: _t1.left + _t1.width / 4
+                    };
+                } else {
+                    var _t1 = gCM(_wsV, me[id].getBBox().c1, me[id].getBBox().r1), _t2 = gCM(_wsV, me[id].getBBox().c2,
+                      me[id].getBBox().r2);
+
+                    nodeCellMetrics = {
+                        t: _t1.top,
+                        l: _t1.left,
+                        w: _t2.left + _t2.width - _t1.left,
+                        h: _t2.top + _t2.height - _t1.top,
                         apt: _t1.top + _t1.height / 2,
                         apl: _t1.left + _t1.width / 4
                     };
                 }
-                else {
-                    var _t1 = gCM( _wsV, me[id].getBBox().c1, me[id].getBBox().r1 ), _t2 = gCM( _wsV, me[id].getBBox().c2, me[id].getBBox().r2 );
 
-                    nodeCellMetrics = {
-                        t  : _t1.top,
-                        l  : _t1.left,
-                        w  : _t2.left + _t2.width - _t1.left,
-                        h  : _t2.top + _t2.height - _t1.top,
-                        apt: _t1.top + _t1.height / 2,
-                        apl: _t1.left + _t1.width / 4
-                    };
-                }
+                var x1 = Math.floor(nodeCellMetrics.apl), y1 = Math.floor(nodeCellMetrics.apt), x2 = Math.floor(
+                  mainCellMetrics.left + mainCellMetrics.width / 4), y2 = Math.floor(
+                  mainCellMetrics.top + mainCellMetrics.height / 2);
 
-                var x1 = Math.floor( nodeCellMetrics.apl ), y1 = Math.floor( nodeCellMetrics.apt ), x2 = Math.floor( mainCellMetrics.left + mainCellMetrics.width / 4 ), y2 = Math.floor( mainCellMetrics.top + mainCellMetrics.height / 2 );
-
-                if ( x1 < 0 && x2 < 0 || y1 < 0 && y2 < 0 ) {
+                if (x1 < 0 && x2 < 0 || y1 < 0 && y2 < 0) {
                     continue;
                 }
 
-                if ( y1 < this.getCellTop( 0, 0 ) ) {
-                    y1 -= this.getCellTop( 0, 0 );
+                if (y1 < this.getCellTop(0, 0)) {
+                    y1 -= this.getCellTop(0, 0);
                 }
 
-                if ( y1 < 0 && y2 > 0 ) {
-                    var _x1 = Math.floor( Math.sqrt( (x1 - x2) * (x1 - x2) * y1 * y1 / ((y2 - y1) * (y2 - y1)) ) );
+                if (y1 < 0 && y2 > 0) {
+                    var _x1 = Math.floor(Math.sqrt((x1 - x2) * (x1 - x2) * y1 * y1 / ((y2 - y1) * (y2 - y1))));
                     // x1 -= (x1-x2>0?1:-1)*_x1;
-                    if ( x1 > x2 ) {
+                    if (x1 > x2) {
                         x1 -= _x1;
-                    }
-                    else if ( x1 < x2 ) {
+                    } else if (x1 < x2) {
                         x1 += _x1;
                     }
-                }
-                else if ( y1 > 0 && y2 < 0 ) {
-                    var _x2 = Math.floor( Math.sqrt( (x1 - x2) * (x1 - x2) * y2 * y2 / ((y2 - y1) * (y2 - y1)) ) );
+                } else if (y1 > 0 && y2 < 0) {
+                    var _x2 = Math.floor(Math.sqrt((x1 - x2) * (x1 - x2) * y2 * y2 / ((y2 - y1) * (y2 - y1))));
                     // x2 -= (x2-x1>0?1:-1)*_x2;
-                    if ( x2 > x1 ) {
+                    if (x2 > x1) {
                         x2 -= _x2;
-                    }
-                    else if ( x2 < x1 ) {
+                    } else if (x2 < x1) {
                         x2 += _x2;
                     }
                 }
 
-                if ( x1 < 0 && x2 > 0 ) {
-                    var _y1 = Math.floor( Math.sqrt( (y1 - y2) * (y1 - y2) * x1 * x1 / ((x2 - x1) * (x2 - x1)) ) )
+                if (x1 < 0 && x2 > 0) {
+                    var _y1 = Math.floor(Math.sqrt((y1 - y2) * (y1 - y2) * x1 * x1 / ((x2 - x1) * (x2 - x1))))
                     // y1 -= (y1-y2>0?1:-1)*_y1;
-                    if ( y1 > y2 ) {
+                    if (y1 > y2) {
                         y1 -= _y1;
-                    }
-                    else if ( y1 < y2 ) {
+                    } else if (y1 < y2) {
                         y1 += _y1;
                     }
-                }
-                else if ( x1 > 0 && x2 < 0 ) {
-                    var _y2 = Math.floor( Math.sqrt( (y1 - y2) * (y1 - y2) * x2 * x2 / ((x2 - x1) * (x2 - x1)) ) )
+                } else if (x1 > 0 && x2 < 0) {
+                    var _y2 = Math.floor(Math.sqrt((y1 - y2) * (y1 - y2) * x2 * x2 / ((x2 - x1) * (x2 - x1))))
                     // y2 -= (y2-y1>0?1:-1)*_y2;
-                    if ( y2 > y1 ) {
+                    if (y2 > y1) {
                         y2 -= _y2;
-                    }
-                    else if ( y2 < y1 ) {
+                    } else if (y2 < y1) {
                         y2 += _y2;
                     }
                 }
 
-                draw_arrow( ctx, x1 < this.getCellLeft( 0, 0 ) ? this.getCellLeft( 0, 0 ) : x1, y1 < this.getCellTop( 0, 0 ) ? this.getCellTop( 0, 0 ) : y1, x2, y2 );
+                draw_arrow(ctx, x1 < this.getCellLeft(0, 0) ? this.getCellLeft(0, 0) : x1,
+                  y1 < this.getCellTop(0, 0) ? this.getCellTop(0, 0) : y1, x2, y2);
                 // draw_arrow(ctx, x1, y1, x2, y2);
 
                 // ToDo посмотреть на четкость rect
-                if ( nodeCellMetrics.apl > this.getCellLeft( 0, 0 ) && nodeCellMetrics.apt > this.getCellTop( 0, 0 ) ) {
+                if (nodeCellMetrics.apl > this.getCellLeft(0, 0) && nodeCellMetrics.apt > this.getCellTop(0, 0)) {
                     ctx.save()
-                        .beginPath()
-                        .arc( _cc.pxToPt( Math.floor( nodeCellMetrics.apl ) ), _cc.pxToPt( Math.floor( nodeCellMetrics.apt ) ), 3, 0, 2 * Math.PI, false, -0.5, -0.5 )
-                        .setFillStyle( color )
-                        .fill()
-                        .closePath()
-                        .setLineWidth( 1 )
-                        .setStrokeStyle( color )
-                        .rect( _cc.pxToPt( nodeCellMetrics.l ), _cc.pxToPt( nodeCellMetrics.t ), _cc.pxToPt( nodeCellMetrics.w - 1 ), _cc.pxToPt( nodeCellMetrics.h - 1 ) )
-                        .stroke()
-                        .restore();
+                      .beginPath()
+                      .arc(_cc.pxToPt(Math.floor(nodeCellMetrics.apl)), _cc.pxToPt(Math.floor(nodeCellMetrics.apt)), 3,
+                        0, 2 * Math.PI, false, -0.5, -0.5)
+                      .setFillStyle(color)
+                      .fill()
+                      .closePath()
+                      .setLineWidth(1)
+                      .setStrokeStyle(color)
+                      .rect(_cc.pxToPt(nodeCellMetrics.l), _cc.pxToPt(nodeCellMetrics.t),
+                        _cc.pxToPt(nodeCellMetrics.w - 1), _cc.pxToPt(nodeCellMetrics.h - 1))
+                      .stroke()
+                      .restore();
                 }
             }
         }
     };
 
-    WorksheetView.prototype.prepareDepCells = function ( se ) {
-        var activeCell = this.model.selectionRange, mc = this.model.getMergedByCell( activeCell.startRow, activeCell.startCol ), c1 = mc ? mc.c1 : activeCell.startCol, r1 = mc ? mc.r1 : activeCell.startRow, c = this._getVisibleCell( c1, r1 ), nodes = (se == AscCommonExcel.c_oAscDrawDepOptions.Master) ? this.model.workbook.dependencyFormulas.getMasterNodes( this.model.getId(), c.getName() ) : this.model.workbook.dependencyFormulas.getSlaveNodes( this.model.getId(), c.getName() );
+    WorksheetView.prototype.prepareDepCells = function (se) {
+        var activeCell = this.model.selectionRange, mc = this.model.getMergedByCell(activeCell.startRow,
+          activeCell.startCol), c1 = mc ? mc.c1 : activeCell.startCol, r1 = mc ? mc.r1 :
+          activeCell.startRow, c = this._getVisibleCell(c1, r1), nodes = (se ==
+        AscCommonExcel.c_oAscDrawDepOptions.Master) ?
+          this.model.workbook.dependencyFormulas.getMasterNodes(this.model.getId(), c.getName()) :
+          this.model.workbook.dependencyFormulas.getSlaveNodes(this.model.getId(), c.getName());
 
-        if ( !nodes ) {
+        if (!nodes) {
             return;
         }
 
-        if ( !this.depDrawCells ) {
+        if (!this.depDrawCells) {
             this.depDrawCells = {};
         }
 
-        if ( se == AscCommonExcel.c_oAscDrawDepOptions.Master ) {
+        if (se == AscCommonExcel.c_oAscDrawDepOptions.Master) {
             c = c.getCells()[0];
-            var id = AscCommonExcel.getVertexId( this.model.getId(), c.getName() );
+            var id = AscCommonExcel.getVertexId(this.model.getId(), c.getName());
             this.depDrawCells[id] = {from: c, to: nodes};
-        }
-        else {
-            var to = {}, to1, id = AscCommonExcel.getVertexId( this.model.getId(), c.getName() );
-            to[AscCommonExcel.getVertexId( this.model.getId(), c.getName() )] = this.model.workbook.dependencyFormulas.getNode( this.model.getId(), c.getName() );
-            to1 = this.model.workbook.dependencyFormulas.getNode( this.model.getId(), c.getName() );
-            for ( var id2 in nodes ) {
-                if ( this.depDrawCells[id2] ) {
+        } else {
+            var to = {}, to1, id = AscCommonExcel.getVertexId(this.model.getId(), c.getName());
+            to[AscCommonExcel.getVertexId(this.model.getId(), c.getName())] =
+              this.model.workbook.dependencyFormulas.getNode(this.model.getId(), c.getName());
+            to1 = this.model.workbook.dependencyFormulas.getNode(this.model.getId(), c.getName());
+            for (var id2 in nodes) {
+                if (this.depDrawCells[id2]) {
                     // remove extend
                     //$.extend( this.depDrawCells[id2].to, to )
-                }
-                else {
+                } else {
                     this.depDrawCells[id2] = {};
                     this.depDrawCells[id2].from = nodes[id2].returnCell();
                     this.depDrawCells[id2].to = {};
@@ -5189,21 +5198,21 @@
      * @param {Asc.TextMetrics} tm
      * @return {Asc.TextMetrics}
      */
-    WorksheetView.prototype._roundTextMetrics = function ( tm ) {
-        tm.width = asc_calcnpt( tm.width, this._getPPIX() );
-        tm.height = asc_calcnpt( tm.height, 96 );
-        tm.baseline = asc_calcnpt( tm.baseline, 96 );
+    WorksheetView.prototype._roundTextMetrics = function (tm) {
+        tm.width = asc_calcnpt(tm.width, this._getPPIX());
+        tm.height = asc_calcnpt(tm.height, 96);
+        tm.baseline = asc_calcnpt(tm.baseline, 96);
 
-        if ( tm.centerline !== undefined ) {
-            tm.centerline = asc_calcnpt( tm.centerline, 96 );
+        if (tm.centerline !== undefined) {
+            tm.centerline = asc_calcnpt(tm.centerline, 96);
         }
         return tm;
     };
 
-    WorksheetView.prototype._calcTextHorizPos = function ( x1, x2, tm, halign ) {
-        switch ( halign ) {
+    WorksheetView.prototype._calcTextHorizPos = function (x1, x2, tm, halign) {
+        switch (halign) {
             case khaCenter:
-                return asc_calcnpt( 0.5 * (x1 + x2 + this.width_1px - tm.width), this._getPPIX() );
+                return asc_calcnpt(0.5 * (x1 + x2 + this.width_1px - tm.width), this._getPPIX());
             case khaRight:
                 return x2 + this.width_1px - this.width_padding - tm.width;
             case khaJustify:
@@ -5212,10 +5221,10 @@
         }
     };
 
-    WorksheetView.prototype._calcTextVertPos = function ( y1, y2, baseline, tm, valign ) {
-        switch ( valign ) {
+    WorksheetView.prototype._calcTextVertPos = function (y1, y2, baseline, tm, valign) {
+        switch (valign) {
             case kvaCenter:
-                return asc_calcnpt( 0.5 * (y1 + y2 - tm.height), this._getPPIY() ) - this.height_1px; // ToDo возможно стоит тоже использовать 96
+                return asc_calcnpt(0.5 * (y1 + y2 - tm.height), this._getPPIY()) - this.height_1px; // ToDo возможно стоит тоже использовать 96
             case kvaTop:
                 return y1 - this.height_1px;
             default:
@@ -5223,8 +5232,8 @@
         }
     };
 
-    WorksheetView.prototype._calcTextWidth = function ( x1, x2, tm, halign ) {
-        switch ( halign ) {
+    WorksheetView.prototype._calcTextWidth = function (x1, x2, tm, halign) {
+        switch (halign) {
             case khaJustify:
                 return x2 + this.width_1px - this.width_padding * 2 - x1;
             default:
@@ -5234,21 +5243,21 @@
 
     // ----- Scrolling -----
 
-    WorksheetView.prototype._calcCellPosition = function ( c, r, dc, dr ) {
+    WorksheetView.prototype._calcCellPosition = function (c, r, dc, dr) {
         var t = this;
         var vr = t.visibleRange;
 
-        function findNextCell( col, row, dx, dy ) {
-            var state = t._isCellEmptyText( col, row );
+        function findNextCell(col, row, dx, dy) {
+            var state = t._isCellEmptyText(col, row);
             var i = col + dx;
             var j = row + dy;
-            while ( i >= 0 && i < t.cols.length && j >= 0 && j < t.rows.length ) {
-                var newState = t._isCellEmptyText( i, j );
-                if ( newState !== state ) {
+            while (i >= 0 && i < t.cols.length && j >= 0 && j < t.rows.length) {
+                var newState = t._isCellEmptyText(i, j);
+                if (newState !== state) {
                     var ret = {};
                     ret.col = state ? i : i - dx;
                     ret.row = state ? j : j - dy;
-                    if ( ret.col !== col || ret.row !== row || state ) {
+                    if (ret.col !== col || ret.row !== row || state) {
                         return ret;
                     }
                     state = newState;
@@ -5264,12 +5273,12 @@
             return {col: i - dx, row: j - dy};
         }
 
-        function findEnd( col, row ) {
+        function findEnd(col, row) {
             var nc1, nc2 = col;
             do {
                 nc1 = nc2;
-                nc2 = findNextCell( nc1, row, +1, 0 ).col;
-            } while ( nc1 !== nc2 );
+                nc2 = findNextCell(nc1, row, +1, 0).col;
+            } while (nc1 !== nc2);
             return nc2;
         }
 
@@ -5279,79 +5288,79 @@
             var maxRows = t.model.getRowsCount();
             var lastC = -1, lastR = -1;
 
-            for ( var col = 0; col < maxCols; ++col ) {
-                for ( var row = 0; row < maxRows; ++row ) {
-                    if ( !t._isCellEmptyText( col, row ) ) {
-                        lastC = Math.max( lastC, col );
-                        lastR = Math.max( lastR, row );
+            for (var col = 0; col < maxCols; ++col) {
+                for (var row = 0; row < maxRows; ++row) {
+                    if (!t._isCellEmptyText(col, row)) {
+                        lastC = Math.max(lastC, col);
+                        lastR = Math.max(lastR, row);
                     }
                 }
             }
-            return {col: Math.max( lastC, obr.maxCol ), row: Math.max( lastR, obr.maxRow )};
+            return {col: Math.max(lastC, obr.maxCol), row: Math.max(lastR, obr.maxRow)};
         }
 
         var eot = dc > +2.0001 && dc < +2.9999 && dr > +2.0001 && dr < +2.9999 ? findEOT() : null;
 
         var newCol = (function () {
-            if ( dc > +0.0001 && dc < +0.9999 ) {
+            if (dc > +0.0001 && dc < +0.9999) {
                 return c + (vr.c2 - vr.c1 + 1);
             }        // PageDown
-            if ( dc < -0.0001 && dc > -0.9999 ) {
+            if (dc < -0.0001 && dc > -0.9999) {
                 return c - (vr.c2 - vr.c1 + 1);
             }        // PageUp
-            if ( dc > +1.0001 && dc < +1.9999 ) {
-                return findNextCell( c, r, +1, 0 ).col;
+            if (dc > +1.0001 && dc < +1.9999) {
+                return findNextCell(c, r, +1, 0).col;
             }  // Ctrl + ->
-            if ( dc < -1.0001 && dc > -1.9999 ) {
-                return findNextCell( c, r, -1, 0 ).col;
+            if (dc < -1.0001 && dc > -1.9999) {
+                return findNextCell(c, r, -1, 0).col;
             }  // Ctrl + <-
-            if ( dc > +2.0001 && dc < +2.9999 ) {
-                return !eot ? findEnd( c, r ) : eot.col;
+            if (dc > +2.0001 && dc < +2.9999) {
+                return !eot ? findEnd(c, r) : eot.col;
             }  // End
-            if ( dc < -2.0001 && dc > -2.9999 ) {
+            if (dc < -2.0001 && dc > -2.9999) {
                 return 0;
             }                              // Home
             return c + dc;
         })();
         var newRow = (function () {
-            if ( dr > +0.0001 && dr < +0.9999 ) {
+            if (dr > +0.0001 && dr < +0.9999) {
                 return r + (vr.r2 - vr.r1 + 1);
             }
-            if ( dr < -0.0001 && dr > -0.9999 ) {
+            if (dr < -0.0001 && dr > -0.9999) {
                 return r - (vr.r2 - vr.r1 + 1);
             }
-            if ( dr > +1.0001 && dr < +1.9999 ) {
-                return findNextCell( c, r, 0, +1 ).row;
+            if (dr > +1.0001 && dr < +1.9999) {
+                return findNextCell(c, r, 0, +1).row;
             }
-            if ( dr < -1.0001 && dr > -1.9999 ) {
-                return findNextCell( c, r, 0, -1 ).row;
+            if (dr < -1.0001 && dr > -1.9999) {
+                return findNextCell(c, r, 0, -1).row;
             }
-            if ( dr > +2.0001 && dr < +2.9999 ) {
+            if (dr > +2.0001 && dr < +2.9999) {
                 return !eot ? 0 : eot.row;
             }
-            if ( dr < -2.0001 && dr > -2.9999 ) {
+            if (dr < -2.0001 && dr > -2.9999) {
                 return 0;
             }
             return r + dr;
         })();
 
-        if ( newCol >= t.cols.length && newCol <= gc_nMaxCol0 ) {
+        if (newCol >= t.cols.length && newCol <= gc_nMaxCol0) {
             t.nColsCount = newCol + 1;
-            t._calcWidthColumns( /*fullRecalc*/2 );
+            t._calcWidthColumns(/*fullRecalc*/2);
         }
-        if ( newRow >= t.rows.length && newRow <= gc_nMaxRow0 ) {
+        if (newRow >= t.rows.length && newRow <= gc_nMaxRow0) {
             t.nRowsCount = newRow + 1;
-            t._calcHeightRows( /*fullRecalc*/2 );
+            t._calcHeightRows(/*fullRecalc*/2);
         }
 
         return {
-            col: newCol < 0 ? 0 : Math.min( newCol, t.cols.length - 1 ),
-            row: newRow < 0 ? 0 : Math.min( newRow, t.rows.length - 1 )
+            col: newCol < 0 ? 0 : Math.min(newCol, t.cols.length - 1),
+            row: newRow < 0 ? 0 : Math.min(newRow, t.rows.length - 1)
         };
     };
 
-    WorksheetView.prototype._isColDrawnPartially = function ( col, leftCol, diffWidth ) {
-        if ( col <= leftCol || col >= this.nColsCount ) {
+    WorksheetView.prototype._isColDrawnPartially = function (col, leftCol, diffWidth) {
+        if (col <= leftCol || col >= this.nColsCount) {
             return false;
         }
         diffWidth = diffWidth ? diffWidth : 0;
@@ -5359,8 +5368,8 @@
         return c[col].left + c[col].width - c[leftCol].left + this.cellsLeft + diffWidth > this.drawingCtx.getWidth();
     };
 
-    WorksheetView.prototype._isRowDrawnPartially = function ( row, topRow, diffHeight ) {
-        if ( row <= topRow || row >= this.nRowsCount ) {
+    WorksheetView.prototype._isRowDrawnPartially = function (row, topRow, diffHeight) {
+        if (row <= topRow || row >= this.nRowsCount) {
             return false;
         }
         diffHeight = diffHeight ? diffHeight : 0;
@@ -5372,7 +5381,7 @@
         var vr = this.visibleRange;
         var c = this.cols;
         var x = c[vr.c2].left + c[vr.c2].width;
-        var offsetFrozen = this.getFrozenPaneOffset( false, true );
+        var offsetFrozen = this.getFrozenPaneOffset(false, true);
         x += offsetFrozen.offsetX;
         return x - c[vr.c1].left + this.cellsLeft < this.drawingCtx.getWidth();
     };
@@ -5381,42 +5390,42 @@
         var vr = this.visibleRange;
         var r = this.rows;
         var y = r[vr.r2].top + r[vr.r2].height;
-        var offsetFrozen = this.getFrozenPaneOffset( true, false );
+        var offsetFrozen = this.getFrozenPaneOffset(true, false);
         y += offsetFrozen.offsetY;
         return y - r[vr.r1].top + this.cellsTop < this.drawingCtx.getHeight();
     };
 
-    WorksheetView.prototype._updateVisibleRowsCount = function ( skipScrollReinit ) {
+    WorksheetView.prototype._updateVisibleRowsCount = function (skipScrollReinit) {
         var isUpdate = false;
         this._calcVisibleRows();
-        while ( this._isVisibleY() && !this.isMaxRow() ) {
+        while (this._isVisibleY() && !this.isMaxRow()) {
             // Добавим еще строки, чтоб не было видно фон под таблицей
-            this.expandRowsOnScroll( true );
+            this.expandRowsOnScroll(true);
             this._calcVisibleRows();
             isUpdate = true;
         }
-        if ( !skipScrollReinit && isUpdate ) {
-            this.handlers.trigger( "reinitializeScrollY" );
+        if (!skipScrollReinit && isUpdate) {
+            this.handlers.trigger("reinitializeScrollY");
         }
     };
 
-    WorksheetView.prototype._updateVisibleColsCount = function ( skipScrollReinit ) {
+    WorksheetView.prototype._updateVisibleColsCount = function (skipScrollReinit) {
         var isUpdate = false;
         this._calcVisibleColumns();
-        while ( this._isVisibleX() && !this.isMaxCol() ) {
+        while (this._isVisibleX() && !this.isMaxCol()) {
             // Добавим еще столбцы, чтоб не было видно фон под таблицей
-            this.expandColsOnScroll( true );
+            this.expandColsOnScroll(true);
             this._calcVisibleColumns();
             isUpdate = true;
         }
-        if ( !skipScrollReinit && isUpdate ) {
-            this.handlers.trigger( "reinitializeScrollX" );
+        if (!skipScrollReinit && isUpdate) {
+            this.handlers.trigger("reinitializeScrollX");
         }
     };
 
     WorksheetView.prototype.isMaxRow = function () {
         var rowsCountCurrent = this.rows.length;
-        if ( gc_nMaxRow === rowsCountCurrent ) {
+        if (gc_nMaxRow === rowsCountCurrent) {
             return true;
         }
 
@@ -5426,7 +5435,7 @@
 
     WorksheetView.prototype.isMaxCol = function () {
         var colsCountCurrent = this.cols.length;
-        if ( gc_nMaxCol === colsCountCurrent ) {
+        if (gc_nMaxCol === colsCountCurrent) {
             return true;
         }
 
@@ -5501,8 +5510,8 @@
         ctxH - (this.rows[oldEnd].top - this.rows[oldStart].top + this.cellsTop + diffHeight) : 0;
 
         if (this.isCellEditMode && editor && this.model.selectionRange.activeCell.row >= rFrozen) {
-            editor.move(this.cellsLeft + (this.model.selectionRange.activeCell.col >= cFrozen ? diffWidth : 0), this.cellsTop + diffHeight,
-              ctxW, ctxH);
+            editor.move(this.cellsLeft + (this.model.selectionRange.activeCell.col >= cFrozen ? diffWidth : 0),
+              this.cellsTop + diffHeight, ctxW, ctxH);
         }
 
         var widthChanged = Math.max(calcDecades(vr.r2 + 1), 3) !== oldDec;
@@ -5705,8 +5714,8 @@
         ctxW - (this.cols[oldEnd].left - this.cols[oldStart].left + this.cellsLeft + diffWidth) : 0;
 
         if (this.isCellEditMode && editor && this.model.selectionRange.activeCell.col >= cFrozen) {
-            editor.move(this.cellsLeft + diffWidth, this.cellsTop + (this.model.selectionRange.activeCell.row >= rFrozen ? diffHeight : 0),
-              ctxW, ctxH);
+            editor.move(this.cellsLeft + diffWidth,
+              this.cellsTop + (this.model.selectionRange.activeCell.row >= rFrozen ? diffHeight : 0), ctxW, ctxH);
         }
 
         // Перемещаем область
@@ -5792,39 +5801,39 @@
     // ----- Selection -----
 
     // x,y - абсолютные координаты относительно листа (без учета заголовков)
-    WorksheetView.prototype.findCellByXY = function ( x, y, canReturnNull, skipCol, skipRow ) {
+    WorksheetView.prototype.findCellByXY = function (x, y, canReturnNull, skipCol, skipRow) {
         var r = 0, c = 0, tmpRow, tmpCol, result = new AscFormat.CCellObjectInfo();
-        if ( canReturnNull ) {
+        if (canReturnNull) {
             result.col = result.row = null;
         }
 
         x += this.cellsLeft;
         y += this.cellsTop;
-        if ( !skipCol ) {
-            while ( c < this.cols.length ) {
+        if (!skipCol) {
+            while (c < this.cols.length) {
                 tmpCol = this.cols[c];
-                if ( x <= tmpCol.left + tmpCol.width ) {
+                if (x <= tmpCol.left + tmpCol.width) {
                     result.col = c;
                     break;
                 }
                 ++c;
             }
 
-            if ( null !== result.col ) {
+            if (null !== result.col) {
                 result.colOff = x - this.cols[result.col].left;
             }
         }
-        if ( !skipRow ) {
-            while ( r < this.rows.length ) {
+        if (!skipRow) {
+            while (r < this.rows.length) {
                 tmpRow = this.rows[r];
-                if ( y <= tmpRow.top + tmpRow.height ) {
+                if (y <= tmpRow.top + tmpRow.height) {
                     result.row = r;
                     break;
                 }
                 ++r;
             }
 
-            if ( null !== result.row ) {
+            if (null !== result.row) {
                 result.rowOff = y - this.rows[result.row].top;
             }
         }
@@ -5833,23 +5842,23 @@
     };
 
     // dX = true - считать с половиной следующей ячейки
-    WorksheetView.prototype._findColUnderCursor = function ( x, canReturnNull, dX ) {
+    WorksheetView.prototype._findColUnderCursor = function (x, canReturnNull, dX) {
         var c = this.visibleRange.c1, offset = this.cols[c].left - this.cellsLeft, c2, x1, x2, cFrozen, widthDiff = 0;
-        if ( x >= this.cellsLeft ) {
-            if ( this.topLeftFrozenCell ) {
+        if (x >= this.cellsLeft) {
+            if (this.topLeftFrozenCell) {
                 cFrozen = this.topLeftFrozenCell.getCol0();
                 widthDiff = this.cols[cFrozen].left - this.cols[0].left;
-                if ( x < this.cellsLeft + widthDiff && 0 !== widthDiff ) {
+                if (x < this.cellsLeft + widthDiff && 0 !== widthDiff) {
                     c = 0;
                     widthDiff = 0;
                 }
             }
-            for ( x1 = this.cellsLeft + widthDiff, c2 = this.cols.length - 1; c <= c2; ++c, x1 = x2 ) {
+            for (x1 = this.cellsLeft + widthDiff, c2 = this.cols.length - 1; c <= c2; ++c, x1 = x2) {
                 x2 = x1 + this.cols[c].width;
-                if ( x1 <= x && x < x2 ) {
-                    if ( dX ) {
+                if (x1 <= x && x < x2) {
+                    if (dX) {
                         // Учитываем половину ячейки
-                        if ( x1 <= x && x < x1 + this.cols[c].width / 2.0 ) {
+                        if (x1 <= x && x < x1 + this.cols[c].width / 2.0) {
                             // Это предыдущая ячейка
                             --c;
                             // Можем вернуть и -1 (но это только для fillHandle)
@@ -5858,24 +5867,23 @@
                     return {col: c, left: x1, right: x2};
                 }
             }
-            if ( !canReturnNull ) {
+            if (!canReturnNull) {
                 return {col: c2, left: this.cols[c2].left - offset, right: x2};
             }
-        }
-        else {
-            if ( this.topLeftFrozenCell ) {
+        } else {
+            if (this.topLeftFrozenCell) {
                 cFrozen = this.topLeftFrozenCell.getCol0();
-                if ( 0 !== cFrozen ) {
+                if (0 !== cFrozen) {
                     c = 0;
                     offset = this.cols[c].left - this.cellsLeft;
                 }
             }
-            for ( x2 = this.cellsLeft + this.cols[c].width, c2 = 0; c >= c2; --c, x2 = x1 ) {
+            for (x2 = this.cellsLeft + this.cols[c].width, c2 = 0; c >= c2; --c, x2 = x1) {
                 x1 = this.cols[c].left - offset;
-                if ( x1 <= x && x < x2 ) {
-                    if ( dX ) {
+                if (x1 <= x && x < x2) {
+                    if (dX) {
                         // Учитываем половину ячейки
-                        if ( x1 <= x && x < x1 + this.cols[c].width / 2.0 ) {
+                        if (x1 <= x && x < x1 + this.cols[c].width / 2.0) {
                             // Это предыдущая ячейка
                             --c;
                             // Можем вернуть и -1 (но это только для fillHandle)
@@ -5884,8 +5892,8 @@
                     return {col: c, left: x1, right: x2};
                 }
             }
-            if ( !canReturnNull ) {
-                if ( dX ) {
+            if (!canReturnNull) {
+                if (dX) {
                     // Это предыдущая ячейка
                     --c2;
                     // Можем вернуть и -1 (но это только для fillHandle)
@@ -5898,23 +5906,23 @@
     };
 
     // dY = true - считать с половиной следующей ячейки
-    WorksheetView.prototype._findRowUnderCursor = function ( y, canReturnNull, dY ) {
+    WorksheetView.prototype._findRowUnderCursor = function (y, canReturnNull, dY) {
         var r = this.visibleRange.r1, offset = this.rows[r].top - this.cellsTop, r2, y1, y2, rFrozen, heightDiff = 0;
-        if ( y >= this.cellsTop ) {
-            if ( this.topLeftFrozenCell ) {
+        if (y >= this.cellsTop) {
+            if (this.topLeftFrozenCell) {
                 rFrozen = this.topLeftFrozenCell.getRow0();
                 heightDiff = this.rows[rFrozen].top - this.rows[0].top;
-                if ( y < this.cellsTop + heightDiff && 0 !== heightDiff ) {
+                if (y < this.cellsTop + heightDiff && 0 !== heightDiff) {
                     r = 0;
                     heightDiff = 0;
                 }
             }
-            for ( y1 = this.cellsTop + heightDiff, r2 = this.rows.length - 1; r <= r2; ++r, y1 = y2 ) {
+            for (y1 = this.cellsTop + heightDiff, r2 = this.rows.length - 1; r <= r2; ++r, y1 = y2) {
                 y2 = y1 + this.rows[r].height;
-                if ( y1 <= y && y < y2 ) {
-                    if ( dY ) {
+                if (y1 <= y && y < y2) {
+                    if (dY) {
                         // Учитываем половину ячейки
-                        if ( y1 <= y && y < y1 + this.rows[r].height / 2.0 ) {
+                        if (y1 <= y && y < y1 + this.rows[r].height / 2.0) {
                             // Это предыдущая ячейка
                             --r;
                             // Можем вернуть и -1 (но это только для fillHandle)
@@ -5923,24 +5931,23 @@
                     return {row: r, top: y1, bottom: y2};
                 }
             }
-            if ( !canReturnNull ) {
+            if (!canReturnNull) {
                 return {row: r2, top: this.rows[r2].top - offset, bottom: y2};
             }
-        }
-        else {
-            if ( this.topLeftFrozenCell ) {
+        } else {
+            if (this.topLeftFrozenCell) {
                 rFrozen = this.topLeftFrozenCell.getRow0();
-                if ( 0 !== rFrozen ) {
+                if (0 !== rFrozen) {
                     r = 0;
                     offset = this.rows[r].top - this.cellsTop;
                 }
             }
-            for ( y2 = this.cellsTop + this.rows[r].height, r2 = 0; r >= r2; --r, y2 = y1 ) {
+            for (y2 = this.cellsTop + this.rows[r].height, r2 = 0; r >= r2; --r, y2 = y1) {
                 y1 = this.rows[r].top - offset;
-                if ( y1 <= y && y < y2 ) {
-                    if ( dY ) {
+                if (y1 <= y && y < y2) {
+                    if (dY) {
                         // Учитываем половину ячейки
-                        if ( y1 <= y && y < y1 + this.rows[r].height / 2.0 ) {
+                        if (y1 <= y && y < y1 + this.rows[r].height / 2.0) {
                             // Это предыдущая ячейка
                             --r;
                             // Можем вернуть и -1 (но это только для fillHandle)
@@ -5949,8 +5956,8 @@
                     return {row: r, top: y1, bottom: y2};
                 }
             }
-            if ( !canReturnNull ) {
-                if ( dY ) {
+            if (!canReturnNull) {
+                if (dY) {
                     // Это предыдущая ячейка
                     --r2;
                     // Можем вернуть и -1 (но это только для fillHandle)
@@ -6001,18 +6008,15 @@
                 col = range.c1;
                 row = range.r1;
             } else if ((((range.c1 === oFormulaRangeIn.c1 && Math.abs(x - x1) <= wEps) ||
-              (range.c2 === oFormulaRangeIn.c2 && Math.abs(x - x2) <= wEps)) && hEps <= y - y1 &&
-              y - y2 <= hEps) || (((range.r1 === oFormulaRangeIn.r1 && Math.abs(y - y1) <= hEps) ||
-              (range.r2 === oFormulaRangeIn.r2 && Math.abs(y - y2) <= hEps)) && wEps <= x - x1 &&
-              x - x2 <= wEps)) {
+              (range.c2 === oFormulaRangeIn.c2 && Math.abs(x - x2) <= wEps)) && hEps <= y - y1 && y - y2 <= hEps) ||
+              (((range.r1 === oFormulaRangeIn.r1 && Math.abs(y - y1) <= hEps) ||
+              (range.r2 === oFormulaRangeIn.r2 && Math.abs(y - y2) <= hEps)) && wEps <= x - x1 && x - x2 <= wEps)) {
                 cursor = kCurMove;
             }
         }
 
         return cursor ? {
-            cursor: cursor,
-            col: col,
-            row: row
+            cursor: cursor, col: col, row: row
         } : null;
     };
 
@@ -6557,7 +6561,7 @@
         if (this.width_1px > this.cols[cell.col].width || this.height_1px > this.rows[cell.row].height) {
             return;
         }
-        return this.model.selectionRange.offsetCell(dr, dc, function(row, col) {
+        return this.model.selectionRange.offsetCell(dr, dc, function (row, col) {
             return (0 <= row) ? (t.rows[row].height < t.height_1px) : (t.cols[col].width < t.width_1px);
         });
     };
@@ -6727,11 +6731,11 @@
         };
     };
 
-    WorksheetView.prototype._calcFillHandleOffset = function ( range ) {
+    WorksheetView.prototype._calcFillHandleOffset = function (range) {
         var vr = this.visibleRange;
         var ar = range ? range : this.activeFillHandle;
-        var arn = ar.clone( true );
-        var isMC = this._isMergedCells( arn );
+        var arn = ar.clone(true);
+        var isMC = this._isMergedCells(arn);
         var adjustRight = ar.c2 >= vr.c2 || ar.c1 >= vr.c2 && isMC;
         var adjustBottom = ar.r2 >= vr.r2 || ar.r1 >= vr.r2 && isMC;
         var incX = ar.c1 < vr.c1 && isMC ? arn.c1 - vr.c1 : ar.c2 < vr.c1 ? ar.c2 - vr.c1 : 0;
@@ -6739,24 +6743,24 @@
 
         var offsetFrozen = this.getFrozenPaneOffset();
 
-        if ( adjustRight ) {
+        if (adjustRight) {
             try {
-                while ( this._isColDrawnPartially( isMC ? arn.c2 : ar.c2, vr.c1 + incX, offsetFrozen.offsetX ) ) {
+                while (this._isColDrawnPartially(isMC ? arn.c2 : ar.c2, vr.c1 + incX, offsetFrozen.offsetX)) {
                     ++incX;
                 }
-            } catch( e ) {
-                this.expandColsOnScroll( true );
-                this.handlers.trigger( "reinitializeScrollX" );
+            } catch (e) {
+                this.expandColsOnScroll(true);
+                this.handlers.trigger("reinitializeScrollX");
             }
         }
-        if ( adjustBottom ) {
+        if (adjustBottom) {
             try {
-                while ( this._isRowDrawnPartially( isMC ? arn.r2 : ar.r2, vr.r1 + incY, offsetFrozen.offsetY ) ) {
+                while (this._isRowDrawnPartially(isMC ? arn.r2 : ar.r2, vr.r1 + incY, offsetFrozen.offsetY)) {
                     ++incY;
                 }
-            } catch( e ) {
-                this.expandRowsOnScroll( true );
-                this.handlers.trigger( "reinitializeScrollY" );
+            } catch (e) {
+                this.expandRowsOnScroll(true);
+                this.handlers.trigger("reinitializeScrollY");
             }
         }
         return {
@@ -10182,7 +10186,7 @@
         }
     };
 
-    WorksheetView.prototype.expandColsOnScroll = function(isNotActive, updateColsCount, newColsCount) {
+    WorksheetView.prototype.expandColsOnScroll = function (isNotActive, updateColsCount, newColsCount) {
         var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
         var maxc = Math.max(this.model.getColsCount() + 1, this.cols.length, obr.maxCol);
         if (newColsCount) {
@@ -10213,7 +10217,7 @@
         return nLastCols !== this.nColsCount;
     };
 
-    WorksheetView.prototype.expandRowsOnScroll = function(isNotActive, updateRowsCount, newRowsCount) {
+    WorksheetView.prototype.expandRowsOnScroll = function (isNotActive, updateRowsCount, newRowsCount) {
         var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
         var maxr = Math.max(this.model.getRowsCount() + 1, this.rows.length, obr.maxRow);
         if (newRowsCount) {
@@ -11274,10 +11278,8 @@
                 }
             }
             if (Math.abs(h - this.rows[r].height) > 0.000001 && !this.rows[r].isCustomHeight) {
-                if (!this.rows[r].isDefaultHeight) {
-                    this.rows[r].heightReal = this.rows[r].height = Math.min(h, this.maxRowHeight);
-                    this.model.setRowHeight(this.rows[r].height + this.height_1px, r, r, false);
-                }
+                this.rows[r].heightReal = this.rows[r].height = Math.min(h, this.maxRowHeight);
+                this.model.setRowHeight(this.rows[r].height + this.height_1px, r, r, false);
                 this.isChanged = true;
             }
             if (Math.abs(d - this.rows[r].descender) > 0.000001) {
