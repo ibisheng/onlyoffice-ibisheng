@@ -1563,12 +1563,20 @@ CChartsDrawer.prototype =
 		var arrayValues = [];
 		var stackedPerMax = null !== manualMax ? manualMax : 100;
 		
+		if(this.calcProp.subType === 'stackedPer' && step > stackedPerMax)
+		{
+			stackedPerMax = step;
+		}
+		
 		for(var i = 0; i < 20; i++)
 		{
 			if(this.calcProp.subType == 'stackedPer' && (minUnit + step * i) > stackedPerMax)
+			{
 				break;
+			}
 			
 			arrayValues[i] = minUnit + step * i;
+			
 			if(axisMax == 0 && axisMin < 0 && arrayValues[i] == axisMax)
 			{
 				break;
@@ -1576,12 +1584,16 @@ CChartsDrawer.prototype =
 			else if((manualMax != null && arrayValues[i] >= axisMax) || (manualMax == null && arrayValues[i] > axisMax))
 			{
 				if(this.calcProp.subType == 'stackedPer')
+				{
 					arrayValues[i] = arrayValues[i] / 100;
+				}
+				
 				break;
 			}
 			else if(this.calcProp.subType == 'stackedPer')
+			{
 				arrayValues[i] = arrayValues[i] / 100;
-				
+			}	
 		}
 		
 		/*if(this.calcProp.subType == 'stackedPer')
@@ -1592,7 +1604,9 @@ CChartsDrawer.prototype =
 		}*/
 		
 		if(!arrayValues.length)
+		{
 			arrayValues = [0.2, 0.4, 0.6, 0.8, 1, 1.2];
+		}
 			
 		return arrayValues;
 	},
@@ -2062,7 +2076,11 @@ CChartsDrawer.prototype =
 		var diffVal;
 		var plotArea = this.cChartSpace.chart.plotArea;
 		
-		if(val < yPoints[0].val)
+		if(!yPoints[1] && val === yPoints[0].val)
+		{
+			result = yPoints[0].pos;
+		}
+		else if(val < yPoints[0].val)
 		{
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
@@ -2074,8 +2092,9 @@ CChartsDrawer.prototype =
 		}
 		else if(val > yPoints[yPoints.length - 1].val)
 		{	
-			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
-			resVal = yPoints[1].val - yPoints[0].val;
+			var test = yPoints[1] ? yPoints[1] : yPoints[0];
+			resPos = Math.abs(test.pos - yPoints[0].pos);
+			resVal = test.val - yPoints[0].val;
 			diffVal = Math.abs(yPoints[yPoints.length - 1].val - val);
 			
 			if(plotArea.valAx.scaling.orientation == ORIENTATION_MIN_MAX)
