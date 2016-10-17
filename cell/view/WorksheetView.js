@@ -4269,34 +4269,38 @@
      * Обновляет общий кэш и кэширует метрики текста ячеек для указанного диапазона
      * @param {Asc.Range} [range]  Диапазон кэширования текта
      */
-    WorksheetView.prototype._prepareCellTextMetricsCache = function ( range ) {
+    WorksheetView.prototype._prepareCellTextMetricsCache = function (range) {
         var firstUpdateRow = null;
-        if ( !range ) {
+        if (!range) {
             range = this.visibleRange;
-            if ( this.topLeftFrozenCell ) {
+            if (this.topLeftFrozenCell) {
                 var row = this.topLeftFrozenCell.getRow0();
                 var col = this.topLeftFrozenCell.getCol0();
-                if ( 0 < row && 0 < col ) {
-                    firstUpdateRow = asc.getMinValueOrNull( firstUpdateRow, this._prepareCellTextMetricsCache2( new Asc.Range( 0, 0, col - 1, row - 1 ) ) );
+                if (0 < row && 0 < col) {
+                    firstUpdateRow = asc.getMinValueOrNull(firstUpdateRow,
+                      this._prepareCellTextMetricsCache2(new Asc.Range(0, 0, col - 1, row - 1)));
                 }
-                if ( 0 < row ) {
-                    firstUpdateRow = asc.getMinValueOrNull( firstUpdateRow, this._prepareCellTextMetricsCache2( new Asc.Range( this.visibleRange.c1, 0, this.visibleRange.c2, row - 1 ) ) );
+                if (0 < row) {
+                    firstUpdateRow = asc.getMinValueOrNull(firstUpdateRow, this._prepareCellTextMetricsCache2(
+                      new Asc.Range(this.visibleRange.c1, 0, this.visibleRange.c2, row - 1)));
                 }
-                if ( 0 < col ) {
-                    firstUpdateRow = asc.getMinValueOrNull( firstUpdateRow, this._prepareCellTextMetricsCache2( new Asc.Range( 0, this.visibleRange.r1, col - 1, this.visibleRange.r2 ) ) );
+                if (0 < col) {
+                    firstUpdateRow = asc.getMinValueOrNull(firstUpdateRow, this._prepareCellTextMetricsCache2(
+                      new Asc.Range(0, this.visibleRange.r1, col - 1, this.visibleRange.r2)));
                 }
             }
         }
 
-        firstUpdateRow = asc.getMinValueOrNull( firstUpdateRow, this._prepareCellTextMetricsCache2( range ) );
-        if ( null !== firstUpdateRow || this.isChanged ) {
+        firstUpdateRow = asc.getMinValueOrNull(firstUpdateRow, this._prepareCellTextMetricsCache2(range));
+        if (null !== firstUpdateRow || this.isChanged) {
             // Убрал это из _calcCellsTextMetrics, т.к. вызов был для каждого сектора(добавляло тормоза: баг 20388)
             // Код нужен для бага http://bugzilla.onlyoffice.com/show_bug.cgi?id=13875
             this._updateRowPositions();
             this._calcVisibleRows();
 
-            if ( this.objectRender ) {
-                this.objectRender.updateSizeDrawingObjects( {target: c_oTargetType.RowResize, row: firstUpdateRow}, true );
+            if (this.objectRender) {
+                this.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: firstUpdateRow},
+                  true);
             }
         }
     };
@@ -4638,7 +4642,9 @@
             this._addErasedBordersToCache(col - cto.leftSide, col + cto.rightSide, row);
         }
 
-        this._updateRowHeight(tm, col, row, fl, isMerged, fMergedRows, va, ha, angle, maxW, colWidth, textBound);
+        fMergedRows = fMergedRows || (isMerged && fl.wrapText);
+        this._updateRowHeight(tm, col, row, fl, isMerged, fMergedRows, va, ha, angle, maxW,
+          colWidth, textBound);
 
         return mc ? mc.c2 : col;
     };
@@ -4654,34 +4660,30 @@
           rowHeight = rowInfo.height;
 
           // update row's height
-          if (!rowInfo.isCustomHeight && !(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight)) {
-              // Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
-              if (!fMergedRows) {
-                  var newHeight = tm.height;
-                  if (angle && textBound) {
-                      newHeight = Math.max(rowInfo.height, textBound.height);
-                  }
+          // Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
+          if (!rowInfo.isCustomHeight && !(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight) && !fMergedRows) {
+              var newHeight = tm.height;
+              if (angle && textBound) {
+                  newHeight = Math.max(rowInfo.height, textBound.height);
+              }
 
-                  rowInfo.heightReal =
-                    rowInfo.height = Math.min(this.maxRowHeight, Math.max(rowInfo.height, newHeight));
-                  if (rowHeight !== rowInfo.height) {
-                      this.model.setRowHeight(rowInfo.height, row, row, false);
+              rowInfo.heightReal = rowInfo.height = Math.min(this.maxRowHeight, Math.max(rowInfo.height, newHeight));
+              if (rowHeight !== rowInfo.height) {
+                  this.model.setRowHeight(rowInfo.height, row, row, false);
 
-                      if (angle) {
+                  if (angle) {
 
-                          if (flags.wrapText && !rowInfo.isCustomHeight) {
-                              maxW = tm.width;
-                          }
-
-                          textBound =
-                            this.stringRender.getTransformBound(angle, colWidth, rowInfo.height, tm.width, ha, va,
-                              maxW);
-
-                          this._fetchCellCache(col, row).text.textBound = textBound;
+                      if (flags.wrapText && !rowInfo.isCustomHeight) {
+                          maxW = tm.width;
                       }
 
-                      this.isChanged = true;
+                      textBound =
+                        this.stringRender.getTransformBound(angle, colWidth, rowInfo.height, tm.width, ha, va, maxW);
+
+                      this._fetchCellCache(col, row).text.textBound = textBound;
                   }
+
+                  this.isChanged = true;
               }
           }
       };
