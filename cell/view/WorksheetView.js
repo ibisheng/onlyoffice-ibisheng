@@ -181,12 +181,12 @@
 
     var kMaxAutoCompleteCellEdit = 20000;
 
-    function calcDecades( num ) {
-        return Math.abs( num ) < 10 ? 1 : 1 + calcDecades( asc_floor( num * 0.1 ) );
+    function calcDecades(num) {
+        return Math.abs(num) < 10 ? 1 : 1 + calcDecades(asc_floor(num * 0.1));
     }
 
     function CacheElement() {
-        if ( !(this instanceof CacheElement) ) {
+        if (!(this instanceof CacheElement)) {
             return new CacheElement();
         }
         this.columnsWithText = {};							// Колонки, в которых есть текст
@@ -196,7 +196,7 @@
     }
 
     function Cache() {
-        if ( !(this instanceof Cache) ) {
+        if (!(this instanceof Cache)) {
             return new Cache();
         }
 
@@ -260,7 +260,7 @@
         return null !== this.merged;
     };
 
-    function CellBorderObject( borders, mergeInfo, col, row ) {
+    function CellBorderObject(borders, mergeInfo, col, row) {
         this.borders = borders;
         this.mergeInfo = mergeInfo;
 
@@ -272,26 +272,30 @@
         return null != this.mergeInfo;
     };
     CellBorderObject.prototype.getLeftBorder = function () {
-        if ( !this.borders || (this.isMerge() && (this.col !== this.mergeInfo.c1 || this.col - 1 !== this.mergeInfo.c2)) ) {
+        if (!this.borders ||
+          (this.isMerge() && (this.col !== this.mergeInfo.c1 || this.col - 1 !== this.mergeInfo.c2))) {
             return null;
         }
         return this.borders.l;
     };
     CellBorderObject.prototype.getRightBorder = function () {
-        if ( !this.borders || (this.isMerge() && (this.col - 1 !== this.mergeInfo.c1 || this.col !== this.mergeInfo.c2)) ) {
+        if (!this.borders ||
+          (this.isMerge() && (this.col - 1 !== this.mergeInfo.c1 || this.col !== this.mergeInfo.c2))) {
             return null;
         }
         return this.borders.r;
     };
 
     CellBorderObject.prototype.getTopBorder = function () {
-        if ( !this.borders || (this.isMerge() && (this.row !== this.mergeInfo.r1 || this.row - 1 !== this.mergeInfo.r2)) ) {
+        if (!this.borders ||
+          (this.isMerge() && (this.row !== this.mergeInfo.r1 || this.row - 1 !== this.mergeInfo.r2))) {
             return null;
         }
         return this.borders.t;
     };
     CellBorderObject.prototype.getBottomBorder = function () {
-        if ( !this.borders || (this.isMerge() && (this.row - 1 !== this.mergeInfo.r1 || this.row !== this.mergeInfo.r2)) ) {
+        if (!this.borders ||
+          (this.isMerge() && (this.row - 1 !== this.mergeInfo.r1 || this.row !== this.mergeInfo.r2))) {
             return null;
         }
         return this.borders.b;
@@ -331,9 +335,6 @@
         this.shapeOverlayCtx = this.buffers.shapeOverlayCtx;
 
         this.stringRender = stringRender;
-
-        // true if now init worksheet
-        this.initialized = false;
 
         // Флаг, сигнализирует о том, что мы сделали resize, но это не активный лист (поэтому как только будем показывать, нужно перерисовать и пересчитать кеш)
         this.updateResize = false;
@@ -422,48 +423,44 @@
         return this;
     }
 
-    WorksheetView.prototype.getCellVisibleRange = function ( col, row ) {
+    WorksheetView.prototype.getCellVisibleRange = function (col, row) {
         var vr, offsetX = 0, offsetY = 0, cFrozen, rFrozen;
-        if ( this.topLeftFrozenCell ) {
+        if (this.topLeftFrozenCell) {
             cFrozen = this.topLeftFrozenCell.getCol0() - 1;
             rFrozen = this.topLeftFrozenCell.getRow0() - 1;
-            if ( col <= cFrozen && row <= rFrozen ) {
-                vr = new asc_Range( 0, 0, cFrozen, rFrozen );
-            }
-            else if ( col <= cFrozen ) {
-                vr = new asc_Range( 0, this.visibleRange.r1, cFrozen, this.visibleRange.r2 );
+            if (col <= cFrozen && row <= rFrozen) {
+                vr = new asc_Range(0, 0, cFrozen, rFrozen);
+            } else if (col <= cFrozen) {
+                vr = new asc_Range(0, this.visibleRange.r1, cFrozen, this.visibleRange.r2);
                 offsetY -= this.rows[rFrozen + 1].top - this.cellsTop;
-            }
-            else if ( row <= rFrozen ) {
-                vr = new asc_Range( this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen );
+            } else if (row <= rFrozen) {
+                vr = new asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen);
                 offsetX -= this.cols[cFrozen + 1].left - this.cellsLeft;
-            }
-            else {
+            } else {
                 vr = this.visibleRange;
                 offsetX -= this.cols[cFrozen + 1].left - this.cellsLeft;
                 offsetY -= this.rows[rFrozen + 1].top - this.cellsTop;
             }
-        }
-        else {
+        } else {
             vr = this.visibleRange;
         }
 
         offsetX += this.cols[vr.c1].left - this.cellsLeft;
         offsetY += this.rows[vr.r1].top - this.cellsTop;
 
-        return vr.contains( col, row ) ? new asc_VR( vr, offsetX, offsetY ) : null;
+        return vr.contains(col, row) ? new asc_VR(vr, offsetX, offsetY) : null;
     };
 
-    WorksheetView.prototype.getCellMetrics = function ( col, row ) {
+    WorksheetView.prototype.getCellMetrics = function (col, row) {
         var vr, nColSize, nRowSize;
-        if ( vr = this.getCellVisibleRange( col, row ) ) {
-            nColSize = this.getColSize( col );
-            nRowSize = this.getRowSize( row );
-            if ( nColSize && nRowSize ) {
+        if (vr = this.getCellVisibleRange(col, row)) {
+            nColSize = this.getColSize(col);
+            nRowSize = this.getRowSize(row);
+            if (nColSize && nRowSize) {
                 return {
-                    left  : nColSize.left - vr.offsetX,
-                    top   : nRowSize.top - vr.offsetY,
-                    width : nColSize.width,
+                    left: nColSize.left - vr.offsetX,
+                    top: nRowSize.top - vr.offsetY,
+                    width: nColSize.width,
                     height: nRowSize.height
                 };
             }
@@ -471,11 +468,11 @@
         return null;
     };
 
-    WorksheetView.prototype.getColSize = function ( col ) {
+    WorksheetView.prototype.getColSize = function (col) {
         return (col >= 0 && col < this.cols.length) ? this.cols[col] : null;
     };
 
-    WorksheetView.prototype.getRowSize = function ( row ) {
+    WorksheetView.prototype.getRowSize = function (row) {
         return (row >= 0 && row < this.rows.length) ? this.rows[row] : null;
     };
 
@@ -488,12 +485,12 @@
     };
 
     WorksheetView.prototype.updateVisibleRange = function () {
-        return this._updateCellsRange( this.getVisibleRange() );
+        return this._updateCellsRange(this.getVisibleRange());
     };
 
-    WorksheetView.prototype.getFirstVisibleCol = function ( allowPane ) {
+    WorksheetView.prototype.getFirstVisibleCol = function (allowPane) {
         var tmp = 0;
-        if ( allowPane && this.topLeftFrozenCell ) {
+        if (allowPane && this.topLeftFrozenCell) {
             tmp = this.topLeftFrozenCell.getCol0();
         }
         return this.visibleRange.c1 - tmp;
@@ -503,9 +500,9 @@
         return this.visibleRange.c2;
     };
 
-    WorksheetView.prototype.getFirstVisibleRow = function ( allowPane ) {
+    WorksheetView.prototype.getFirstVisibleRow = function (allowPane) {
         var tmp = 0;
-        if ( allowPane && this.topLeftFrozenCell ) {
+        if (allowPane && this.topLeftFrozenCell) {
             tmp = this.topLeftFrozenCell.getRow0();
         }
         return this.visibleRange.r1 - tmp;
@@ -517,9 +514,9 @@
 
     WorksheetView.prototype.getHorizontalScrollRange = function () {
         var ctxW = this.drawingCtx.getWidth() - this.cellsLeft;
-        for ( var w = 0, i = this.cols.length - 1; i >= 0; --i ) {
+        for (var w = 0, i = this.cols.length - 1; i >= 0; --i) {
             w += this.cols[i].width;
-            if ( w > ctxW ) {
+            if (w > ctxW) {
                 break;
             }
         }
@@ -528,73 +525,71 @@
 
     WorksheetView.prototype.getVerticalScrollRange = function () {
         var ctxH = this.drawingCtx.getHeight() - this.cellsTop;
-        for ( var h = 0, i = this.rows.length - 1; i >= 0; --i ) {
+        for (var h = 0, i = this.rows.length - 1; i >= 0; --i) {
             h += this.rows[i].height;
-            if ( h > ctxH ) {
+            if (h > ctxH) {
                 break;
             }
         }
         return i; // Диапазон скрола должен быть меньше количества строк, чтобы не было прибавления строк при перетаскивании бегунка
     };
 
-    WorksheetView.prototype.getCellsOffset = function ( units ) {
+    WorksheetView.prototype.getCellsOffset = function (units) {
         var u = units >= 0 && units <= 3 ? units : 0;
         return {
-            left: this.cellsLeft * asc_getcvt( 1/*pt*/, u, this._getPPIX() ),
-            top : this.cellsTop * asc_getcvt( 1/*pt*/, u, this._getPPIY() )
+            left: this.cellsLeft * asc_getcvt(1/*pt*/, u, this._getPPIX()),
+            top: this.cellsTop * asc_getcvt(1/*pt*/, u, this._getPPIY())
         };
     };
 
-    WorksheetView.prototype.getCellLeft = function ( column, units ) {
-        if ( column >= 0 && column < this.cols.length ) {
+    WorksheetView.prototype.getCellLeft = function (column, units) {
+        if (column >= 0 && column < this.cols.length) {
             var u = units >= 0 && units <= 3 ? units : 0;
-            return this.cols[column].left * asc_getcvt( 1/*pt*/, u, this._getPPIX() );
+            return this.cols[column].left * asc_getcvt(1/*pt*/, u, this._getPPIX());
         }
         return null;
     };
 
-    WorksheetView.prototype.getCellTop = function ( row, units ) {
-        if ( row >= 0 && row < this.rows.length ) {
+    WorksheetView.prototype.getCellTop = function (row, units) {
+        if (row >= 0 && row < this.rows.length) {
             var u = units >= 0 && units <= 3 ? units : 0;
-            return this.rows[row].top * asc_getcvt( 1/*pt*/, u, this._getPPIY() );
+            return this.rows[row].top * asc_getcvt(1/*pt*/, u, this._getPPIY());
         }
         return null;
     };
 
-    WorksheetView.prototype.getCellLeftRelative = function ( col, units ) {
-        if ( col < 0 || col >= this.cols.length ) {
+    WorksheetView.prototype.getCellLeftRelative = function (col, units) {
+        if (col < 0 || col >= this.cols.length) {
             return null;
         }
         // С учетом видимой области
         var offsetX = 0;
-        if ( this.topLeftFrozenCell ) {
+        if (this.topLeftFrozenCell) {
             var cFrozen = this.topLeftFrozenCell.getCol0();
             offsetX = (col < cFrozen) ? 0 : this.cols[this.visibleRange.c1].left - this.cols[cFrozen].left;
-        }
-        else {
+        } else {
             offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
         }
 
         var u = units >= 0 && units <= 3 ? units : 0;
-        return (this.cols[col].left - offsetX) * asc_getcvt( 1/*pt*/, u, this._getPPIX() );
+        return (this.cols[col].left - offsetX) * asc_getcvt(1/*pt*/, u, this._getPPIX());
     };
 
-    WorksheetView.prototype.getCellTopRelative = function ( row, units ) {
-        if ( row < 0 || row >= this.rows.length ) {
+    WorksheetView.prototype.getCellTopRelative = function (row, units) {
+        if (row < 0 || row >= this.rows.length) {
             return null;
         }
         // С учетом видимой области
         var offsetY = 0;
-        if ( this.topLeftFrozenCell ) {
+        if (this.topLeftFrozenCell) {
             var rFrozen = this.topLeftFrozenCell.getRow0();
             offsetY = (row < rFrozen) ? 0 : this.rows[this.visibleRange.r1].top - this.rows[rFrozen].top;
-        }
-        else {
+        } else {
             offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
         }
 
         var u = units >= 0 && units <= 3 ? units : 0;
-        return (this.rows[row].top - offsetY) * asc_getcvt( 1/*pt*/, u, this._getPPIY() );
+        return (this.rows[row].top - offsetY) * asc_getcvt(1/*pt*/, u, this._getPPIY());
     };
 
     WorksheetView.prototype.getColumnWidth = function (index, units) {
@@ -1180,7 +1175,6 @@
         History.TurnOn();
 
         // initializing is completed
-        this.initialized = true;
         this.handlers.trigger("initialized");
     };
 
@@ -1454,7 +1448,7 @@
             } else {
                 isCustomHeight = 0 != (AscCommonExcel.g_nRowFlag_CustomHeight & row.flags);
                 // Берем высоту из модели, если она custom(баг 15618), либо дефолтную
-                if (row.h > 0 && (this.initialized || isCustomHeight)) {
+                if (row.h > 0) {
                     hR = row.h;
                     h = hR / 0.75;
                     h = (h | h) * 0.75;			// 0.75 - это размер 1px в pt (можно было 96/72)
