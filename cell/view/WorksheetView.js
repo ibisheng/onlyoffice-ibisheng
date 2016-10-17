@@ -6056,28 +6056,6 @@
             targetArr: targetArr
         } : null;
     };
-    WorksheetView.prototype._isCursorOnSelectionBorder = function (ar, vr, x, y) {
-        var arIntersection = ar.intersectionSimple(vr);
-        var left, top, right, bottom, wEps = this.width_2px, hEps = this.height_2px;
-        if (arIntersection) {
-            left = ar.c1 === arIntersection.c1 ? this.cols[ar.c1].left : null;
-            right = ar.c2 === arIntersection.c2 ? this.cols[ar.c2].left + this.cols[ar.c2].width : null;
-            top = ar.r1 === arIntersection.r1 ? this.rows[ar.r1].top : null;
-            bottom = ar.r2 === arIntersection.r2 ? this.rows[ar.r2].top + this.rows[ar.r2].height : null;
-            var isLeft = (null !== left && x >= left - wEps && x <= left + wEps), isRight = (null !== right &&
-            x >= right - wEps && x <= right + wEps), isTop = (null !== top && y >= top - hEps &&
-            y <= top + hEps), isBottom = (null !== bottom && y >= bottom - hEps &&
-            y <= bottom + hEps), isHorMiddle = ((null === left || x >= left - wEps) &&
-            (null === right || x <= right + wEps)), isVerMiddle = ((null === top || y >= top - hEps) &&
-            (null === bottom || y <= bottom + hEps));
-
-            if (((isLeft || isRight) && isVerMiddle) || ((isTop || isBottom) && isHorMiddle)) {
-                // Мы навели на границу выделения
-                return true;
-            }
-        }
-        return false;
-    };
 
     WorksheetView.prototype.getCursorTypeFromXY = function (x, y, isViewerMode) {
         var res, c, r, f, i, offsetX, offsetY, cellCursor;
