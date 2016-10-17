@@ -3426,9 +3426,29 @@ drawBarChart.prototype =
 			return;
 		
 		var path = this.paths.series[ser][val].ArrPathCommand;
-		if(this.cChartDrawer.nDimensionCount === 3 && this.paths.series[ser][val][0])
+		//ToDo пересмотреть для 3d диаграмм
+		if(this.cChartDrawer.nDimensionCount === 3)
 		{
-			path = this.paths.series[ser][val][0].ArrPathCommand;
+			if(this.paths.series[ser][val][2])
+			{
+				path = this.paths.series[ser][val][2].ArrPathCommand;
+			}
+			else if(this.paths.series[ser][val][3])
+			{
+				path = this.paths.series[ser][val][3].ArrPathCommand;
+			}
+			else if(this.paths.series[ser][val][4])
+			{
+				path = this.paths.series[ser][val][4].ArrPathCommand;
+			}
+			else if(this.paths.series[ser][val][5])
+			{
+				path = this.paths.series[ser][val][5].ArrPathCommand;
+			}
+			else if(this.paths.series[ser][val][1])
+			{
+				path = this.paths.series[ser][val][1].ArrPathCommand;
+			}
 		}
 		
 		if(!path)
