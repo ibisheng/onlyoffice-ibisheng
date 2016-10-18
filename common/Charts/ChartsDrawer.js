@@ -3203,7 +3203,7 @@ drawBarChart.prototype =
 		var hmargin            = (gapWidth / 100 * individualBarWidth) / 2;
 		
 		var height, startX, startY, diffYVal, val, paths, seriesHeight = [], tempValues = [], seria, startYColumnPosition, startXPosition, prevVal, idx, seriesCounter = 0;
-	
+		var cubeCount = 0;
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 			numCache        = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : this.chartProp.series[i].val.numLit;
 			seria           = numCache ? numCache.pts : [];
@@ -3300,6 +3300,9 @@ drawBarChart.prototype =
 					}
 					
 					paths = paths.paths;
+					
+					this.calculateParallalepiped(startX, startY, individualBarWidth, height, val, isValMoreZero, isValLessZero, i, idx, cubeCount);
+					cubeCount++;
 				}
 				else
 				{
@@ -3320,13 +3323,53 @@ drawBarChart.prototype =
 		
 		if(this.cChartDrawer.nDimensionCount === 3)
 		{
-			this.sortZIndexPaths.sort (function sortArr(a, b)
+			if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
 			{
-				if(b.zIndex == a.zIndex)
-					return  b.y - a.y;
+				if(this.cChartDrawer.processor3D.view3D.rAngAx)
+				{
+					var angle = this.cChartDrawer.processor3D.angleOx;
+					this.temp.sort (function sortArr(a, b)
+					{
+						if(angle > 0)
+						{
+							if(Math.abs(angle) < Math.PI)
+							{
+								return  a.y - b.y;
+							}
+							else
+							{
+								return  b.y - a.y;
+							}
+						}
+						else
+						{
+							if(Math.abs(angle) < Math.PI)
+							{
+								return  b.y - a.y;
+							}
+							else
+							{
+								return  a.y - b.y;
+							}
+						}
+					})
+				}
 				else
-					return  b.zIndex - a.zIndex;
-			});
+				{
+					var cSortFaces = new CSortFaces(this.cChartDrawer);
+					this.sortParallelepipeds = cSortFaces.sortParallelepipeds(this.temp);
+				}
+			}
+			else
+			{
+				this.sortZIndexPaths.sort (function sortArr(a, b)
+				{
+					if(b.zIndex == a.zIndex)
+						return  b.y - a.y;
+					else
+						return  b.zIndex - a.zIndex;
+				})
+			}
 		}
     },
 	
@@ -3380,6 +3423,95 @@ drawBarChart.prototype =
 		}	
 		
 		return {startY : startY, height: height};
+	},
+	
+	calculateParallalepiped: function(startX, startY, individualBarWidth, height, val, isValMoreZero, isValLessZero, i, idx, cubeCount)
+	{
+		//параметр r и глубина по OZ
+		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
+		
+		//сдвиг по OZ в глубину
+		var gapDepth = this.cChartSpace.chart.plotArea.chart.gapDepth != null ? this.cChartSpace.chart.plotArea.chart.gapDepth : globalGapDepth;
+		if(this.chartProp.subType === "standard")
+			perspectiveDepth = (perspectiveDepth / (gapDepth / 100 + 1)) / this.chartProp.seriesCount;
+		else	
+			perspectiveDepth = perspectiveDepth / (gapDepth / 100 + 1);
+		var DiffGapDepth = perspectiveDepth * (gapDepth / 2) / 100;
+		
+		if(this.chartProp.subType === "standard")
+			gapDepth = (perspectiveDepth + DiffGapDepth + DiffGapDepth) * i + DiffGapDepth;
+		else
+			gapDepth = DiffGapDepth;
+		
+		//рассчитываем 8 точек для каждого столбца
+		var x1 = startX, y1 = startY, z1 = 0 + gapDepth;
+		var x2 = startX, y2 = startY, z2 = perspectiveDepth + gapDepth;
+		var x3 = startX + individualBarWidth, y3 = startY, z3 = perspectiveDepth + gapDepth;
+		var x4 = startX + individualBarWidth, y4 = startY, z4 = 0 + gapDepth;
+		var x5 = startX, y5 = startY - height, z5 = 0 + gapDepth;
+		var x6 = startX, y6 = startY - height, z6 = perspectiveDepth + gapDepth;
+		var x7 = startX + individualBarWidth, y7 = startY - height, z7 = perspectiveDepth + gapDepth;
+		var x8 = startX + individualBarWidth, y8 = startY - height, z8 = 0 + gapDepth;
+		
+		
+		//поворот относительно осей
+		var point1 = this.cChartDrawer._convertAndTurnPoint(x1, y1, z1);
+		var point2 = this.cChartDrawer._convertAndTurnPoint(x2, y2, z2);
+		var point3 = this.cChartDrawer._convertAndTurnPoint(x3, y3, z3);
+		var point4 = this.cChartDrawer._convertAndTurnPoint(x4, y4, z4);
+		var point5 = this.cChartDrawer._convertAndTurnPoint(x5, y5, z5);
+		var point6 = this.cChartDrawer._convertAndTurnPoint(x6, y6, z6);
+		var point7 = this.cChartDrawer._convertAndTurnPoint(x7, y7, z7);
+		var point8 = this.cChartDrawer._convertAndTurnPoint(x8, y8, z8);
+		
+		var paths = this.cChartDrawer.calculateRect3D(point1, point2, point3, point4, point5, point6, point7, point8, val);
+		
+			
+		//не проецируем на плоскость
+		var point11 = this.cChartDrawer._convertAndTurnPoint(x1, y1, z1, null, null, true);
+		var point22 = this.cChartDrawer._convertAndTurnPoint(x2, y2, z2, null, null, true);
+		var point33 = this.cChartDrawer._convertAndTurnPoint(x3, y3, z3, null, null, true);
+		var point44 = this.cChartDrawer._convertAndTurnPoint(x4, y4, z4, null, null, true);
+		var point55 = this.cChartDrawer._convertAndTurnPoint(x5, y5, z5, null, null, true);
+		var point66 = this.cChartDrawer._convertAndTurnPoint(x6, y6, z6, null, null, true);
+		var point77 = this.cChartDrawer._convertAndTurnPoint(x7, y7, z7, null, null, true);
+		var point88 = this.cChartDrawer._convertAndTurnPoint(x8, y8, z8, null, null, true);
+		
+		
+		var arrPoints = [[point1, point4, point8, point5], [point1, point2, point3, point4], [point1, point2, point6, point5], [point4, point8, point7, point3], [point5, point6, point7, point8], [point6, point2, point3, point7]];
+		
+		var arrPoints2 = [[point11, point44, point88, point55], [point11, point22, point33, point44], [point11, point22, point66, point55], [point44, point88, point77, point33], [point55, point66, point77, point88], [point66, point22, point33, point77]];
+		
+	
+		if(!this.temp)
+		{
+			this.temp = [];
+		}
+		if(!this.temp[cubeCount])
+		{
+			this.temp[cubeCount] = {};
+		}
+		if(!this.temp[cubeCount].faces)
+		{
+			this.temp[cubeCount].faces = [];
+			this.temp[cubeCount].arrPoints = [point11, point22, point33, point44, point55, point66, point77, point88];
+			this.temp[cubeCount].z = point11.z;
+			this.temp[cubeCount].y = point11.y;
+		}
+		
+		for(var k = 0; k < paths.length; k++)
+		{
+			if(null === paths[k])
+				continue;
+			
+			//this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquation});
+			
+			var plainEquation = this.cChartDrawer.getPlainEquation(arrPoints2[k][0], arrPoints2[k][1], arrPoints2[k][2], arrPoints2[k][3]);
+			var plainArea = this.cChartDrawer.getAreaQuadrilateral(arrPoints[k][0], arrPoints[k][1], arrPoints[k][2], arrPoints[k][3]);
+			this.temp[cubeCount].faces.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquation, plainArea: plainArea});
+		}
+		
+		return paths;
 	},
 	
 	_calculateSummStacked : function(j)
@@ -3619,14 +3751,45 @@ drawBarChart.prototype =
 			}
 		};
 		
-		for(var i = 0; i < this.sortZIndexPaths.length; i++)
+		if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
 		{
-			drawVerges(this.sortZIndexPaths[i].seria, this.sortZIndexPaths[i].point, this.sortZIndexPaths[i].paths, true, this.sortZIndexPaths[i].verge);
+			if(this.cChartDrawer.processor3D.view3D.rAngAx)
+			{
+				for(var i = 0; i < this.temp.length; i++)
+				{
+					var faces = this.temp[i].faces;
+					for(var j = 0; j < faces.length; j++)
+					{
+						var face = faces[j];
+						drawVerges(face.seria, face.point, face.paths, null, face.verge);
+					}	
+				}
+			}
+			else
+			{
+				for(var i = 0; i < this.sortParallelepipeds.length; i++)
+				{
+					var index = this.sortParallelepipeds[i].nextIndex;
+					var faces = this.temp[index].faces;
+					for(var j = 0; j < faces.length; j++)
+					{
+						var face = faces[j];
+						drawVerges(face.seria, face.point, face.paths, null, face.verge);
+					}	
+				}
+			}
 		}
-		
-		for(var i = 0; i < this.sortZIndexPaths.length; i++)
+		else
 		{
-			drawVerges(this.sortZIndexPaths[i].seria, this.sortZIndexPaths[i].point, this.sortZIndexPaths[i].paths, false, this.sortZIndexPaths[i].verge);
+			for(var i = 0; i < this.sortZIndexPaths.length; i++)
+			{
+				drawVerges(this.sortZIndexPaths[i].seria, this.sortZIndexPaths[i].point, this.sortZIndexPaths[i].paths, true, this.sortZIndexPaths[i].verge);
+			}
+			
+			for(var i = 0; i < this.sortZIndexPaths.length; i++)
+			{
+				drawVerges(this.sortZIndexPaths[i].seria, this.sortZIndexPaths[i].point, this.sortZIndexPaths[i].paths, false, this.sortZIndexPaths[i].verge);
+			}
 		}
 	},
 	
