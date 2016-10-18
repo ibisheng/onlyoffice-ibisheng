@@ -11664,7 +11664,7 @@
         var activeCell = this.model.selectionRange.activeCell.clone();
         var ar = this.model.selectionRange.getLast().clone();
 
-        var isStartRangeIntoFilterOrTable = t.model.autoFilters.isStartRangeContainIntoTableOrFilter(ar);
+        var isStartRangeIntoFilterOrTable = t.model.autoFilters.isStartRangeContainIntoTableOrFilter(activeCell);
         var isApplyAutoFilter = null, isAddAutoFilter = null, cellId = null, isFromatTable = null;
         if (null !== isStartRangeIntoFilterOrTable)//into autofilter or format table
         {

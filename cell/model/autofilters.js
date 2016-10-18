@@ -1943,14 +1943,14 @@
 				return false;
 			},
 			
-			isStartRangeContainIntoTableOrFilter: function(range)
+			isStartRangeContainIntoTableOrFilter: function(activeCell)
 			{
 				var res = null;
 				
 				var worksheet = this.worksheet;
 				var tableParts = worksheet.TableParts;
 				
-				var startRange = new Asc.Range(range.startCol, range.startRow, range.startCol, range.startRow);
+				var startRange = new Asc.Range(activeCell.col, activeCell.row, activeCell.col, activeCell.row);
 				
 				for(var i = 0; i < tableParts.length; i++ )
 				{
