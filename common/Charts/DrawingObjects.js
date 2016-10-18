@@ -1496,6 +1496,7 @@ function DrawingObjects() {
 
         if ( _t.isGraphicObject() && _t.graphicObject.bounds) {
 
+
             var bounds = _t.graphicObject.bounds;
 
 
@@ -3192,14 +3193,28 @@ function DrawingObjects() {
                 for (i = 0; i < aObjects.length; i++) {
                     drawingObject = aObjects[i];
                     if (drawingObject.from.row >= target.row) {
-                        drawingObject.checkBoundsFromTo();
+                        if(drawingObject.graphicObject){
+                            if(drawingObject.graphicObject.recalculateTransform){
+                                drawingObject.graphicObject.recalculateTransform();
+                            }
+                            if(drawingObject.graphicObject.recalculateBounds){
+                                drawingObject.graphicObject.recalculateBounds();
+                            }
+                        }
                     }
                 }
             } else {
                 for (i = 0; i < aObjects.length; i++) {
                     drawingObject = aObjects[i];
                     if (drawingObject.from.col >= target.col) {
-                        drawingObject.checkBoundsFromTo();
+                        if(drawingObject.graphicObject){
+                            if(drawingObject.graphicObject.recalculateTransform){
+                                drawingObject.graphicObject.recalculateTransform();
+                            }
+                            if(drawingObject.graphicObject.recalculateBounds){
+                                drawingObject.graphicObject.recalculateBounds();
+                            }
+                        }
                     }
                 }
             }
