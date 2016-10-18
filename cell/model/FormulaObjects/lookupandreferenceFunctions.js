@@ -1231,10 +1231,9 @@
 		var arg0 = arg[0];
 		if (cElementType.cellsRange === arg0.type || cElementType.array === arg0.type) {
 			arg0 = arg0.getMatrix();
-		} else if (cElementType.number === arg0.type || cElementType.string === arg0.type ||
-			cElementType.bool === arg0.type || cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
+		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			return this.value = arg0.getValue();
-		} else if (cElementType.error === arg0.type) {
+		} else if (cElementType.number === arg0.type || cElementType.string === arg0.type || cElementType.bool === arg0.type || cElementType.error === arg0.type) {
 			return this.value = arg0;
 		} else {
 			return this.value = new cError(cErrorType.not_available);
