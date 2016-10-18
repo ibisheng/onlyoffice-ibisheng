@@ -6134,10 +6134,20 @@ drawHBarChart.prototype =
 		{
 			if(this.cChartDrawer.processor3D.view3D.rAngAx)
 			{
+				var angle = Math.abs(this.cChartDrawer.processor3D.angleOy);
 				this.sortZIndexPaths.sort (function sortArr(a, b)
 				{
 					if(b.zIndex == a.zIndex)
-						return  a.x - b.x;
+					{
+						if(angle < Math.PI)
+						{
+							return  a.x - b.x;
+						}
+						else
+						{
+							return  b.x - a.x;
+						}
+					}
 					else
 						return  b.zIndex - a.zIndex;
 				});
