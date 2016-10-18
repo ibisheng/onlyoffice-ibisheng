@@ -643,8 +643,16 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
         {
             overlay.SetCurrentPage(this.chartSpace.selectStartPage);
         }
+        var dOldAlpha = null;
+        if(AscFormat.isRealNumber(overlay.globalAlpha) && overlay.put_GlobalAlpha){
+            dOldAlpha = overlay.globalAlpha;
+            overlay.put_GlobalAlpha(false, 1);
+        }
         this.objectToDraw.draw(overlay, transform);
         this.objectToDraw2.draw(overlay, transform);
+        if(AscFormat.isRealNumber(dOldAlpha) && overlay.put_GlobalAlpha){
+            overlay.put_GlobalAlpha(true, dOldAlpha);
+        }
     };
 
 
@@ -752,17 +760,17 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
         deltaAng = 90*(ty - this.startY)/(this.chartSizes.h/2);
         this.view3D.rotX = StratRotX + deltaAng;
 
-        while(this.view3D.rotX < 0){
-            this.view3D.rotX += 360;
-        }
-        while(this.view3D.rotX > 360){
-            this.view3D.rotX -= 360;
+        if(this.view3D.rotX < -90){
+            this.view3D.rotX = -90;
         }
 
+        if(this.view3D.rotX > 90){
+            this.view3D.rotX = 90;
+        }
 
         this.processor3D.angleOx = this.view3D && this.view3D.rotX ? (- this.view3D.rotX / 360) * (Math.PI * 2) : 0;
         this.processor3D.angleOy = this.view3D && this.view3D.rotY ? (- this.view3D.rotY / 360) * (Math.PI * 2) : 0;
-        this.processor3D.angleOz = this.view3D && this.view3D.rotZ ? (- this.view3D.rotZ / 360) * (Math.PI * 2) : 0;
+        this.processor3D.angleOz = 0;
         this.calculateGeometry();
     };
 
