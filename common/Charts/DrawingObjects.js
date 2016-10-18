@@ -2524,10 +2524,30 @@ function DrawingObjects() {
                     var max_r = 0, max_c = 0;
 
                     var series = oNewChartSpace.chart.plotArea.charts[0].series, ser;
+					
+					function fFillCell(oCell, sNumFormat, value)
+					{
+						var oCellValue = new AscCommonExcel.CCellValue();
+						if(AscFormat.isRealNumber(value))
+						{
+							oCellValue.number = value;
+							oCellValue.type = AscCommon.CellValueType.Number;
+						}
+						else
+						{
+							oCellValue.text = value;
+							oCellValue.type = AscCommon.CellValueType.String;
+						}
+						oCell.setNumFormat(sNumFormat);
+						oCell.setValueData(new AscCommonExcel.UndoRedoData_CellValueData(null, oCellValue));
+					}
+					
                     function fillTableFromRef(ref)
                     {
                         var cache = ref.numCache ? ref.numCache : (ref.strCache ? ref.strCache : null);
                         var lit_format_code;
+                        var bNum = AscCommon.isRealObject(ref.numCache);
+                        var sValue = "";
                         if(cache)
                         {
 
@@ -2586,12 +2606,11 @@ function DrawingObjects() {
                                                     {
                                                         for(j = range.r1; j <= range.r2; ++j)
                                                         {
-                                                            cell = source_worksheet.getCell3(j, k);
+                                                            cell = source_worksheet._getCell(j, k);
                                                             pt = cache.getPtByIndex(pt_index + j - range.r1);
                                                             if(pt)
                                                             {
-                                                                cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code);
-                                                                cell.setValue(pt.val + "");
+																fFillCell(cell, typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code, pt.val);
                                                             }
                                                         }
                                                     }
@@ -2603,12 +2622,11 @@ function DrawingObjects() {
                                                     {
                                                         for(j = range.c1;  j <= range.c2; ++j)
                                                         {
-                                                            cell = source_worksheet.getCell3(k, j);
+                                                            cell = source_worksheet._getCell(k, j);
                                                             pt = cache.getPtByIndex(pt_index + j - range.c1);
                                                             if(pt)
                                                             {
-                                                                cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code);
-                                                                cell.setValue(pt.val + "");
+																fFillCell(cell, typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code, pt.val);																
                                                             }
                                                         }
                                                     }
@@ -2621,12 +2639,11 @@ function DrawingObjects() {
                                                 {
                                                     for(j = range.c1;  j <= range.c2; ++j)
                                                     {
-                                                        cell = source_worksheet.getCell3(range.r1, j);
+                                                        cell = source_worksheet._getCell(range.r1, j);
                                                         pt = cache.getPtByIndex(pt_index);
                                                         if(pt)
                                                         {
-                                                            cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code);
-                                                            cell.setValue(pt.val + "");
+															fFillCell(cell, typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code, pt.val);														
                                                         }
                                                         ++pt_index;
                                                     }
@@ -2635,12 +2652,11 @@ function DrawingObjects() {
                                                 {
                                                     for(j = range.r1; j <= range.r2; ++j)
                                                     {
-                                                        cell = source_worksheet.getCell3(j, range.c1);
+                                                        cell = source_worksheet._getCell(j, range.c1);
                                                         pt = cache.getPtByIndex(pt_index);
                                                         if(pt)
                                                         {
-                                                            cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code);
-                                                            cell.setValue(pt.val + "");
+															fFillCell(cell, typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code, pt.val);	
                                                         }
                                                         ++pt_index;
                                                     }
