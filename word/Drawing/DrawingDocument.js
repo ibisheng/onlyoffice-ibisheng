@@ -1097,6 +1097,7 @@ CDrawingPage.prototype =
 	}
 };
 
+var g_page_outline_inner = false;//AscCommon.AscBrowser.isChrome;
 function CPage()
 {
 	this.width_mm = 210;
@@ -1117,19 +1118,47 @@ function CPage()
 	{
 		if (null != this.drawingPage.cachedImage)
 		{
-			context.strokeStyle = GlobalSkin.PageOutline;
-			context.strokeRect(xDst, yDst, wDst, hDst);
-			// ����� ���������� �� �������� ���������
+			if (!g_page_outline_inner)
+			{
+				context.strokeStyle = GlobalSkin.PageOutline;
+				context.lineWidth = 1;
+
+				// ctx.strokeRect(x - 0.5, y - 0.5, w + 1, h + 1);
+				context.beginPath();
+				context.moveTo(xDst - 0.5, yDst - 0.5);
+				context.lineTo(xDst + wDst + 0.5, yDst - 0.5);
+				context.lineTo(xDst + wDst + 0.5, yDst + hDst + 0.5);
+				context.lineTo(xDst - 0.5, yDst + hDst + 0.5);
+				context.closePath();
+				context.stroke();
+				context.beginPath();
+			}
+
 			context.drawImage(this.drawingPage.cachedImage.image, xDst, yDst, wDst, hDst);
 		}
 		else
 		{
 			context.fillStyle = "#ffffff";
-			context.strokeStyle = GlobalSkin.PageOutline;
-			context.strokeRect(xDst, yDst, wDst, hDst);
+
+			if (!g_page_outline_inner)
+			{
+				context.strokeStyle = GlobalSkin.PageOutline;
+				context.lineWidth = 1;
+
+				// ctx.strokeRect(x - 0.5, y - 0.5, w + 1, h + 1);
+				context.beginPath();
+				context.moveTo(xDst - 0.5, yDst - 0.5);
+				context.lineTo(xDst + wDst + 0.5, yDst - 0.5);
+				context.lineTo(xDst + wDst + 0.5, yDst + hDst + 0.5);
+				context.lineTo(xDst - 0.5, yDst + hDst + 0.5);
+				context.closePath();
+				context.stroke();
+				context.beginPath();
+			}
+
 			context.fillRect(xDst, yDst, wDst, hDst);
 		}
-	}
+	};
 
 	this.DrawSelection = function (overlay, xDst, yDst, wDst, hDst, TextMatrix)
 	{
@@ -2404,6 +2433,23 @@ function CDrawingDocument()
 			this.m_oLogicDocument.DrawPage(pageIndex, g);
 		else
 			this.m_oDocumentRenderer.drawPage(pageIndex, g);
+
+		if (g_page_outline_inner)
+		{
+			var context = page.drawingPage.cachedImage.image.ctx;
+
+			context.strokeStyle = GlobalSkin.PageOutline;
+			context.lineWidth = 1;
+
+			context.beginPath();
+			context.moveTo(0.5, 0.5);
+			context.lineTo(w - 0.5, 0.5);
+			context.lineTo(w - 0.5, h - 0.5);
+			context.lineTo(0.5, h - 0.5);
+			context.closePath();
+			context.stroke();
+			context.beginPath();
+		}
 
 		//var EndTime = new Date().getTime();
 

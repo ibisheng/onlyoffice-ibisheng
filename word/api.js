@@ -2515,6 +2515,17 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_onClearPropObj", prop);
 	};
 
+	// mobile version methods:
+	asc_docs_api.prototype.asc_GetDefaultTableStyles = function()
+	{
+		if (!this.WordControl.m_oLogicDocument)
+			return;
+
+		this.WordControl.m_oDrawingDocument.StartTableStylesCheck();
+		this.WordControl.m_oDrawingDocument.TableStylesSheckLook = new CTableLook();
+		this.WordControl.m_oDrawingDocument.EndTableStylesCheck();
+	};
+
 	/*----------------------------------------------------------------*/
 	/*functions for working with headers*/
 	/*
@@ -7251,6 +7262,24 @@ background-repeat: no-repeat;\
 		}
 	};
 
+	asc_docs_api.prototype.AddShapeOnCurrentPage = function(_type)
+	{
+		if (!this.WordControl.m_oLogicDocument)
+			return;
+
+		var _pageNum = this.GetCurrentVisiblePage();
+		// получаем размеры страницы
+		var _sectionPr = this.WordControl.m_oLogicDocument.Get_PageLimits(_pageNum);
+
+		var _min = Math.min(_sectionPr.XLimit / 2, _sectionPr.YLimit / 2);
+
+		this.WordControl.m_oLogicDocument.DrawingObjects.addShapeOnPage(_type, _pageNum,
+			_sectionPr.X + _sectionPr.XLimit / 4,
+			_sectionPr.Y + _sectionPr.YLimit / 4,
+			_min,
+			_min);
+	};
+
 	asc_docs_api.prototype.AddTextArt = function(nStyle)
 	{
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
@@ -8896,6 +8925,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['SetMarkerFormat']                           = asc_docs_api.prototype.SetMarkerFormat;
 	asc_docs_api.prototype['sync_MarkerFormatCallback']                 = asc_docs_api.prototype.sync_MarkerFormatCallback;
 	asc_docs_api.prototype['StartAddShape']                             = asc_docs_api.prototype.StartAddShape;
+	asc_docs_api.prototype['AddShapeOnCurrentPage']                     = asc_docs_api.prototype.AddShapeOnCurrentPage;
 	asc_docs_api.prototype['AddTextArt']                                = asc_docs_api.prototype.AddTextArt;
 	asc_docs_api.prototype['sync_StartAddShapeCallback']                = asc_docs_api.prototype.sync_StartAddShapeCallback;
 	asc_docs_api.prototype['CanGroup']                                  = asc_docs_api.prototype.CanGroup;
@@ -8980,6 +9010,9 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_addOleObject"]                          = asc_docs_api.prototype.asc_addOleObject;
 	asc_docs_api.prototype["asc_editOleObject"]                         = asc_docs_api.prototype.asc_editOleObject;
 	asc_docs_api.prototype["asc_InputClearKeyboardElement"]             = asc_docs_api.prototype.asc_InputClearKeyboardElement;
+
+	// mobile
+	asc_docs_api.prototype["asc_GetDefaultTableStyles"]             	= asc_docs_api.prototype.asc_GetDefaultTableStyles;
 
 	CParagraphPropEx.prototype['get_ContextualSpacing'] = CParagraphPropEx.prototype.get_ContextualSpacing;
 	CParagraphPropEx.prototype['get_Ind']               = CParagraphPropEx.prototype.get_Ind;
