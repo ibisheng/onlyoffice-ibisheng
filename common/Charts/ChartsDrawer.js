@@ -3117,6 +3117,9 @@ function drawBarChart()
 	this.paths = {};
 	this.sortZIndexPaths = [];
 	this.summBarVal = [];
+	
+	this.temp = [];
+	this.temp2 = [];
 }
 
 drawBarChart.prototype =
@@ -3201,6 +3204,8 @@ drawBarChart.prototype =
 		var individualBarWidth = width / (this.chartProp.seriesCount - (this.chartProp.seriesCount - 1) * (overlap / 100) + gapWidth / 100);
 		var widthOverLap       = individualBarWidth * (overlap / 100);
 		var hmargin            = (gapWidth / 100 * individualBarWidth) / 2;
+		
+		var nullPositionOX = this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase ?  this.chartProp.nullPositionOXLog : this.cChartSpace.chart.plotArea.catAx.posY * this.chartProp.pxToMM;
 		
 		var height, startX, startY, diffYVal, val, paths, seriesHeight = [], tempValues = [], seria, startYColumnPosition, startXPosition, prevVal, idx, seriesCounter = 0;
 		var cubeCount = 0;
@@ -3301,7 +3306,30 @@ drawBarChart.prototype =
 					
 					paths = paths.paths;
 					
-					this.calculateParallalepiped(startX, startY, individualBarWidth, height, val, isValMoreZero, isValLessZero, i, idx, cubeCount);
+					var testHeight;
+					if((this.cChartDrawer.calcProp.axisMax > 0 && this.cChartDrawer.calcProp.axisMin > 0) || (this.cChartDrawer.calcProp.axisMax < 0 && this.cChartDrawer.calcProp.axisMin < 0))
+					{
+						testHeight = Math.abs(yPoints[0].pos - yPoints[yPoints.length - 1].pos) * this.chartProp.pxToMM;
+					}
+					else
+					{
+						if(val > 0)
+						{
+							var endBlockPosition = this.cChartDrawer.getYPosition((this.cChartDrawer.calcProp.axisMax), yPoints) * this.chartProp.pxToMM;
+							var startBlockPosition = prevVal ? this.cChartDrawer.getYPosition((0), yPoints) * this.chartProp.pxToMM : nullPositionOX;
+							testHeight = startBlockPosition - endBlockPosition;
+						}
+						else
+						{
+							var endBlockPosition = this.cChartDrawer.getYPosition((this.cChartDrawer.calcProp.axisMin), yPoints) * this.chartProp.pxToMM;
+							var startBlockPosition = prevVal ? this.cChartDrawer.getYPosition((0), yPoints) * this.chartProp.pxToMM : nullPositionOX;
+							testHeight = startBlockPosition - endBlockPosition;
+						}
+					}
+					
+					this.calculateParallalepiped(startX, startY, individualBarWidth, testHeight, val, isValMoreZero, isValLessZero, i, idx, cubeCount, this.temp2);
+					this.calculateParallalepiped(startX, startY, individualBarWidth, height, val, isValMoreZero, isValLessZero, i, idx, cubeCount, this.temp);
+					
 					cubeCount++;
 				}
 				else
@@ -3360,6 +3388,11 @@ drawBarChart.prototype =
 					this.sortParallelepipeds = cSortFaces.sortParallelepipeds(this.temp);
 				}
 			}
+			else if("normal" === this.chartProp.subType)
+			{
+				var cSortFaces = new CSortFaces(this.cChartDrawer);
+				this.sortParallelepipeds = cSortFaces.sortParallelepipeds(this.temp2);
+			}
 			else
 			{
 				this.sortZIndexPaths.sort (function sortArr(a, b)
@@ -3368,7 +3401,7 @@ drawBarChart.prototype =
 						return  b.y - a.y;
 					else
 						return  b.zIndex - a.zIndex;
-				})
+				});
 			}
 		}
     },
@@ -3425,7 +3458,7 @@ drawBarChart.prototype =
 		return {startY : startY, height: height};
 	},
 	
-	calculateParallalepiped: function(startX, startY, individualBarWidth, height, val, isValMoreZero, isValLessZero, i, idx, cubeCount)
+	calculateParallalepiped: function(startX, startY, individualBarWidth, height, val, isValMoreZero, isValLessZero, i, idx, cubeCount, arr)
 	{
 		//параметр r и глубина по OZ
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
@@ -3483,20 +3516,20 @@ drawBarChart.prototype =
 		var arrPoints2 = [[point11, point44, point88, point55], [point11, point22, point33, point44], [point11, point22, point66, point55], [point44, point88, point77, point33], [point55, point66, point77, point88], [point66, point22, point33, point77]];
 		
 	
-		if(!this.temp)
+		if(!arr)
 		{
-			this.temp = [];
+			arr = [];
 		}
-		if(!this.temp[cubeCount])
+		if(!arr[cubeCount])
 		{
-			this.temp[cubeCount] = {};
+			arr[cubeCount] = {};
 		}
-		if(!this.temp[cubeCount].faces)
+		if(!arr[cubeCount].faces)
 		{
-			this.temp[cubeCount].faces = [];
-			this.temp[cubeCount].arrPoints = [point11, point22, point33, point44, point55, point66, point77, point88];
-			this.temp[cubeCount].z = point11.z;
-			this.temp[cubeCount].y = point11.y;
+			arr[cubeCount].faces = [];
+			arr[cubeCount].arrPoints = [point11, point22, point33, point44, point55, point66, point77, point88];
+			arr[cubeCount].z = point11.z;
+			arr[cubeCount].y = point11.y;
 		}
 		
 		for(var k = 0; k < paths.length; k++)
@@ -3508,7 +3541,7 @@ drawBarChart.prototype =
 			
 			var plainEquation = this.cChartDrawer.getPlainEquation(arrPoints2[k][0], arrPoints2[k][1], arrPoints2[k][2], arrPoints2[k][3]);
 			var plainArea = this.cChartDrawer.getAreaQuadrilateral(arrPoints[k][0], arrPoints[k][1], arrPoints[k][2], arrPoints[k][3]);
-			this.temp[cubeCount].faces.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquation, plainArea: plainArea});
+			arr[cubeCount].faces.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquation, plainArea: plainArea});
 		}
 		
 		return paths;
@@ -3777,6 +3810,19 @@ drawBarChart.prototype =
 						drawVerges(face.seria, face.point, face.paths, null, face.verge);
 					}	
 				}
+			}
+		}
+		else if("normal" === this.chartProp.subType && !this.cChartDrawer.processor3D.view3D.rAngAx)
+		{
+			for(var i = 0; i < this.sortParallelepipeds.length; i++)
+			{
+				var index = this.sortParallelepipeds[i].nextIndex;
+				var faces = this.temp[index].faces;
+				for(var j = 0; j < faces.length; j++)
+				{
+					var face = faces[j];
+					drawVerges(face.seria, face.point, face.paths, null, face.verge);
+				}	
 			}
 		}
 		else
@@ -11824,9 +11870,9 @@ CSortFaces.prototype =
 			var centerChartY = top + heightChart / 2;
 			var centerChartX = left + widthChart / 2;
 			
-			var diffX = (this.cChartDrawer.processor3D.widthCanvas / 2) / this.cChartDrawer.processor3D.aspectRatioX - this.cChartDrawer.processor3D.cameraDiffX;
-			var diffY = (this.cChartDrawer.processor3D.heightCanvas / 2) / this.cChartDrawer.processor3D.aspectRatioY - this.cChartDrawer.processor3D.cameraDiffY;
-			var diffZ = -1 / this.cChartDrawer.processor3D.rPerspective - this.cChartDrawer.processor3D.cameraDiffZ;
+			var diffX = centerChartX;
+			var diffY = centerChartY;
+			var diffZ = -1 / this.cChartDrawer.processor3D.rPerspective;
 			
 			this.centralViewPoint = {x: diffX, y: diffY, z: diffZ};
 		}
