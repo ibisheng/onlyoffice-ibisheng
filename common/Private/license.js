@@ -42,6 +42,7 @@ AscCommon.baseEditorsApi.prototype._onEndPermissions = function () {
       oResult.setIsLight(this.licenseResult['light']);
       oResult.setTrial(this.licenseResult['trial']);
       oResult.setRights(this.licenseResult['rights']);
+      oResult.setBuildVersion(this.licenseResult['buildVersion']);
     }
     this.sendEvent('asc_onGetEditorPermissions', oResult);
   }
