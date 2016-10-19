@@ -2600,7 +2600,7 @@ function DrawingObjects() {
                                             if(i === arr_f.length - 1)
                                             {
                                                 nPtCount = cache.getPtCount();
-                                                if((range.r2 - range.r1 + 1) === (nPtCount - pt_index))
+                                                if((nPtCount - pt_index) <=(range.r2 - range.r1 + 1))
                                                 {
                                                     for(k = range.c1; k <= range.c2; ++k)
                                                     {
@@ -2616,7 +2616,7 @@ function DrawingObjects() {
                                                     }
                                                     pt_index += (range.r2 - range.r1 + 1);
                                                 }
-                                                else if((range.c2 - range.c1 + 1) === (nPtCount - pt_index))
+                                                else if((nPtCount - pt_index) <= (range.c2 - range.c1 + 1))
                                                 {
                                                     for(k = range.r1; k <= range.r2; ++k)
                                                     {
@@ -2726,6 +2726,7 @@ function DrawingObjects() {
                     oNewChartSpace.setBDeleted(false);
                     oNewChartSpace.setWorksheet(worksheet.model);
                     oNewChartSpace.addToDrawingObjects();
+                    oNewChartSpace.recalcInfo.recalculateReferences = false;
                     oNewChartSpace.recalculate();
                     AscFormat.CheckSpPrXfrm(oNewChartSpace);
 

@@ -1796,12 +1796,30 @@ CChartSpace.prototype.rebuildSeriesFromAsc = function(asc_chart)
         var  asc_series = asc_chart.series;
         var chart_type = this.chart.plotArea.charts[0];
         var first_series = chart_type.series[0] ? chart_type.series[0] : chart_type.getSeriesConstructor();
-        removeAllSeriesFromChart(chart_type);
+        if(first_series.spPr){
+            first_series.spPr.setFill(null);
+            first_series.spPr.setLn(null);
+        }
+        if(asc_series.length < chart_type.series.length){
+            for(var i = chart_type.series.length - 1; i >= asc_series.length; --i){
+                chart_type.removeSeries(i);
+            }
+        }
         if(chart_type.getObjectType() !== AscDFH.historyitem_type_ScatterChart)
         {
             for(var i = 0; i < asc_series.length; ++i)
             {
-                var series = first_series.createDuplicate();
+                var series = null, bNeedAdd = false;
+                if(chart_type.series[i])
+                {
+                    series = chart_type.series[i];
+                }
+                else
+                {
+                    bNeedAdd = true;
+                    series = first_series.createDuplicate();
+                }
+
                 series.setIdx(i);
                 series.setOrder(i);
                 series.setVal(new AscFormat.CYVal());
@@ -1823,13 +1841,16 @@ CChartSpace.prototype.rebuildSeriesFromAsc = function(asc_chart)
                 {
                     series.setTx(null);
                 }
-                chart_type.addSer(series);
+                if(bNeedAdd)
+                {
+                    chart_type.addSer(series);
+                }
+
             }
         }
         else
         {
             var oXVal;
-            var first_series = null;
             var start_index = 0;
             var minus = 0;
             if(asc_series[0].xVal && asc_series[0].xVal.NumCache && typeof asc_series[0].xVal.Formula === "string" && asc_series[0].xVal.Formula.length > 0)
