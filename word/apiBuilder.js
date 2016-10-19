@@ -3872,6 +3872,30 @@
     };
 
 
+	
+	
+    /**
+     * Set text paddings
+     * @param {?EMU} nLeft
+     * @param {?EMU} nTop
+     * @param {?EMU} nRight
+     * @param {?EMU} nBottom
+     */
+    ApiShape.prototype.SetPaddings = function(nLeft, nTop, nRight, nBottom)
+    {
+        if(this.Shape)
+        {
+            this.Shape.setPaddings({
+                Left: AscFormat.isRealNumber(nLeft) ? private_EMU2MM(nLeft) : null,
+                Top: AscFormat.isRealNumber(nTop) ? private_EMU2MM(nTop) : null,
+                Right: AscFormat.isRealNumber(nRight) ? private_EMU2MM(nRight) : null,
+                Bottom: AscFormat.isRealNumber(nBottom) ? private_EMU2MM(nBottom) : null
+            });
+        }
+    };
+
+
+	
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiChart
@@ -4410,6 +4434,7 @@
     ApiShape.prototype["GetClassType"]               = ApiShape.prototype.GetClassType;
     ApiShape.prototype["GetDocContent"]              = ApiShape.prototype.GetDocContent;
     ApiShape.prototype["SetVerticalTextAlign"]       = ApiShape.prototype.SetVerticalTextAlign;
+    ApiShape.prototype["SetPaddings"]                = ApiShape.prototype.SetPaddings;
 
     ApiChart.prototype["GetClassType"]               = ApiChart.prototype.GetClassType;
     ApiChart.prototype["SetTitle"]                   = ApiChart.prototype.SetTitle;
