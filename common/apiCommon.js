@@ -111,6 +111,14 @@
 		ExpiredTrial: 6
 	};
 
+	var c_oRights = {
+		None    : 0,
+		Edit    : 1,
+		Review  : 2,
+		Comment : 3,
+		View    : 4
+	};
+
 	/**
 	 * Класс asc_CAscEditorPermissions для прав редакторов
 	 * -----------------------------------------------------------------------------
@@ -122,6 +130,8 @@
 		this.licenseType = c_oLicenseResult.Error;
 		this.isLight = false;
 		this.trial = false;
+		this.rights = c_oRights.None;
+
 		this.canCoAuthoring = true;
 		this.canReaderMode = true;
 		this.canBranding = false;
@@ -158,6 +168,9 @@
 	asc_CAscEditorPermissions.prototype.asc_getTrial = function () {
 		return this.trial;
 	};
+	asc_CAscEditorPermissions.prototype.asc_getRights = function () {
+		return this.rights;
+	};
 
 	asc_CAscEditorPermissions.prototype.setLicenseType = function (v) {
 		this.licenseType = v;
@@ -168,8 +181,11 @@
 	asc_CAscEditorPermissions.prototype.setIsLight = function (v) {
 		this.isLight = v;
 	};
-	asc_CAscEditorPermissions.prototype.setIsTrial = function (v) {
+	asc_CAscEditorPermissions.prototype.setTrial = function (v) {
 		this.trial = v;
+	};
+	asc_CAscEditorPermissions.prototype.setRights = function (v) {
+		this.rights = v;
 	};
 
 	/** @constructor */
@@ -2683,6 +2699,14 @@
 	prot['Connections'] = prot.Connections;
 	prot['ExpiredTrial'] = prot.ExpiredTrial;
 
+	window['Asc']['c_oRights'] = window['Asc'].c_oRights = c_oRights;
+	prot = c_oRights;
+	prot['None'] = prot.None;
+	prot['Edit'] = prot.Edit;
+	prot['Review'] = prot.Review;
+	prot['Comment'] = prot.Comment;
+	prot['View'] = prot.View;
+
 	window["AscCommon"].asc_CAscEditorPermissions = asc_CAscEditorPermissions;
 	prot = asc_CAscEditorPermissions.prototype;
 	prot["asc_getLicenseType"] = prot.asc_getLicenseType;
@@ -2694,6 +2718,7 @@
 	prot["asc_getIsAnalyticsEnable"] = prot.asc_getIsAnalyticsEnable;
 	prot["asc_getIsLight"] = prot.asc_getIsLight;
 	prot["asc_getTrial"] = prot.asc_getTrial;
+	prot["asc_getRights"] = prot.asc_getRights;
 
 	window["AscCommon"].asc_ValAxisSettings = asc_ValAxisSettings;
 	prot = asc_ValAxisSettings.prototype;
