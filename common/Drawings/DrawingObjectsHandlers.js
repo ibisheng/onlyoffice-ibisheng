@@ -544,7 +544,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
         {
             if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
             {
-                if(drawing.selection.plotArea == null || !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(drawing))
+                if(drawing.selection.plotArea == null || !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(drawing) || !drawing.chartObj  || !drawing.chartObj.processor3D)
                 {
                     drawingObjectsController.checkChartTextSelection();
                     selector.resetSelection();
