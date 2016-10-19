@@ -7142,9 +7142,7 @@ drawPieChart.prototype =
 					cColorMod.val = 35000;
 					cColorMod.name = "shade";
 					
-					if(duplicateBrush.fill.color)
-						duplicateBrush.fill.color.Mods.addMod(cColorMod);	
-					
+					duplicateBrush.addColorMod(cColorMod);
 					duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
 				}
 				
