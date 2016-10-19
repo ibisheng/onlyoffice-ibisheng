@@ -37,6 +37,7 @@
 	// Import
 	var offlineMode = AscCommon.offlineMode;
 	var c_oEditorId = AscCommon.c_oEditorId;
+	var c_oCloseCode = AscCommon.c_oCloseCode;
 
 	var c_oAscError           = Asc.c_oAscError;
 	var c_oAscAsyncAction     = Asc.c_oAscAsyncAction;
@@ -582,6 +583,33 @@
 				}
 			}
 			t.sendEvent('asc_onMeta', data);
+		};
+		this.CoAuthoringApi.onSession = function(data) {
+			var code = data["code"];
+			var reason = data["reason"];
+			var extendSession = true;
+			if (c_oCloseCode.sessionIdle == code) {
+				extendSession = false;
+			} else if (c_oCloseCode.sessionAbsolute == code) {
+				extendSession = false;
+			}
+			if (!extendSession) {
+				if (true != History.Is_Clear()) {
+					//enter view mode because save async
+					t.sendEvent('asc_onCoAuthoringDisconnect');
+					t.asc_setViewMode(true);
+
+					t.CoAuthoringApi.onUnSaveLock = function() {
+						t.CoAuthoringApi.onUnSaveLock = null;
+
+						t.CoAuthoringApi.disconnect(code, reason);
+					};
+					AscCommon.CollaborativeEditing.Apply_Changes();
+					AscCommon.CollaborativeEditing.Send_Changes();
+				} else {
+					t.CoAuthoringApi.disconnect(code, reason);
+				}
+			}
 		};
 		/**
 		 * Event об отсоединении от сервера
