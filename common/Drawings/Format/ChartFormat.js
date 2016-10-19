@@ -21333,7 +21333,7 @@ CTx.prototype =
             }
             case AscDFH.historyitem_Tx_SetVal:
             {
-                this.val = AscFormat.writeString(w, data.newPr);
+                AscFormat.writeString(w, data.newPr);
                 break;
             }
         }
@@ -25479,7 +25479,7 @@ CView3d.prototype =
         var c = new CView3d();
         AscFormat.isRealNumber(this.depthPercent) && c.setDepthPercent(this.depthPercent);
         AscFormat.isRealNumber(this.hPercent) && c.setHPercent(this.hPercent);
-        AscFormat.isRealNumber(this.perspective) && this.setPerspective(this.perspective);
+        AscFormat.isRealNumber(this.perspective) && c.setPerspective(this.perspective);
         AscFormat.isRealBool(this.rAngAx) && c.setRAngAx(this.rAngAx);
         AscFormat.isRealNumber(this.rotX) && c.setRotX(this.rotX);
         AscFormat.isRealNumber(this.rotY) && c.setRotY(this.rotY);
