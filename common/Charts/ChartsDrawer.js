@@ -1178,6 +1178,7 @@ CChartsDrawer.prototype =
 		
 		var generateArrValues = function()
 		{	
+			var isEn = false;
 			var numSeries = 0;
 			for(var l = 0; l < series.length; l++)
 			{
@@ -1207,16 +1208,20 @@ CChartsDrawer.prototype =
 					
 					var val = curPoint.val;
 					var value =  parseFloat(val);
-					if(!isNaN(value))
+					
+					if(!isEn && !isNaN(value))
 					{
-						if(value > max)
-						{
-							max = value;
-						}
-						if(value  < min)
-						{
-							min = value;
-						}
+						min = value;
+						max = value;
+						isEn = true;
+					}
+					if(!isNaN(value) && value > max)
+					{
+						max = value;
+					}
+					if(!isNaN(value) && value < min)
+					{
+						min = value;
 					}
 						
 					if(isNaN(value) && val == '' && (((t.calcProp.type == c_oChartTypes.Line ) && t.calcProp.type == 'normal')))
