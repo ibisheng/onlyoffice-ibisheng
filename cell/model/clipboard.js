@@ -1073,14 +1073,22 @@
 					selectedElement = new CSelectedElement();
 					element = content[i];
 					
-					if(type_Paragraph == element.GetType())//paragraph
+					if(type_Paragraph === element.GetType())//paragraph
 					{
 						selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element, worksheet.model.DrawingDocument, target_doc_content);
 						elements.push(selectedElement);
 					}
-					else if(type_Table == element.GetType())//table
+					else if(type_Table === element.GetType())//table
 					{
-						//TODO вырезать из таблицы параграфы
+						//excel (извне и из word) вставляет в шейпы аналогично, а вот из excel в excel вставляет в одну строку(?). мы сделаем для всех случаев одинаково. 
+						var paragraphs = [];
+						element.Get_AllParagraphs({All: true}, paragraphs);
+						for(var j = 0; j < paragraphs.length; j++)
+						{
+							selectedElement = new CSelectedElement();
+							selectedElement.Element = AscFormat.ConvertParagraphToPPTX(paragraphs[j], worksheet.model.DrawingDocument, target_doc_content);
+							elements.push(selectedElement);
+						}
 					}
 				}
 				
