@@ -4627,7 +4627,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         continue;
       }
 
-      if (found_operand != null && found_operand != undefined) {
+      if (null !== found_operand) {
         this.outStack.push(found_operand);
         this.f.push(found_operand);
         this.operand_expected = false;
