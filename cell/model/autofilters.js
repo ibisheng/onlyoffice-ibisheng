@@ -809,46 +809,45 @@
 				//для проверки возможности добавить ф/т - попробовать использовать parserHelper.checkDataRange
 				var bIsInFilter = this._searchRangeInFilters(activeCells);
 				var addRange;
+				
 				if(false === bIsInFilter)
 				{
-					res = false;
+					bIsInFilter = null;
 				}
-				else
+				
+				if(null === bIsInFilter)
 				{
-					if(null === bIsInFilter)
+					if(activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2)//если ячейка выделенная одна
 					{
-						if(activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2)//если ячейка выделенная одна
-						{
-							addRange = this._getAdjacentCellsAF(activeCells);
-						}
-						else
-						{
-							addRange = activeCells;
-						}
+						addRange = this._getAdjacentCellsAF(activeCells);
 					}
-					else//range внутри а/ф или ф/т
+					else
 					{
-						if(bIsInFilter.isAutoFilter())
-						{
-							addRange = bIsInFilter.Ref;
-						}
-						else
-						{
-							res = false;
-						}
+						addRange = activeCells;
 					}
-					
-					if(false !== res)
+				}
+				else//range внутри а/ф или ф/т
+				{
+					if(bIsInFilter.isAutoFilter())
 					{
-						res = new AddFormatTableOptions();
+						addRange = bIsInFilter.Ref;
+					}
+					else
+					{
+						res = false;
+					}
+				}
+				
+				if(false !== res)
+				{
+					res = new AddFormatTableOptions();
 
-						var bIsTitle = this._isAddNameColumn(addRange);
-						var range = addRange.clone();
-						
-						addRange.setAbs(true, true, true, true);
-						res.asc_setIsTitle(bIsTitle);
-						res.asc_setRange(range.getName());
-					}
+					var bIsTitle = this._isAddNameColumn(addRange);
+					var range = addRange.clone();
+					
+					addRange.setAbs(true, true, true, true);
+					res.asc_setIsTitle(bIsTitle);
+					res.asc_setRange(range.getName());
 				}
 				
 				return res;
