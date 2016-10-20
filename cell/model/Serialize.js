@@ -630,11 +630,10 @@
     /** @enum */
     var c_oSer_Pane = {
         ActivePane	: 0,
-		//State		: 1,
+		State		: 1,
         TopLeftCell	: 2,
         XSplit		: 3,
-		YSplit		: 4,
-		State		: 5
+		YSplit		: 4
     };
 	/** @enum */
 	 var c_oSer_Selection = {
@@ -2653,7 +2652,7 @@
             var oThis = this;
 			//this.bs.WriteItem(c_oSer_Pane.ActivePane, function(){oThis.memory.WriteByte();});
             // Всегда пишем Frozen
-            this.bs.WriteItem(c_oSer_Pane.State, function(){oThis.memory.WriteByte(AscCommonExcel.c_oAscPaneState.Frozen);});
+            this.bs.WriteItem(c_oSer_Pane.State, function(){oThis.memory.WriteString3(AscCommonExcel.c_oAscPaneState.Frozen);});
             this.bs.WriteItem(c_oSer_Pane.TopLeftCell, function(){oThis.memory.WriteString3(oPane.topLeftFrozenCell.getID());});
 
             var col = oPane.topLeftFrozenCell.getCol0();
@@ -6589,7 +6588,7 @@
 			if (c_oSer_Pane.ActivePane === type)
 				this.stream.GetUChar();
 			else if (c_oSer_Pane.State === type)
-				oPane.state = this.stream.GetUChar();
+				oPane.state = this.stream.GetString2LE(length);
             else if (c_oSer_Pane.TopLeftCell === type)
 				oPane.topLeftCell = this.stream.GetString2LE(length);
 			else if (c_oSer_Pane.XSplit === type)

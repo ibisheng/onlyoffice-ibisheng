@@ -268,9 +268,9 @@ var c_oAscCanChangeColWidth = {
 };
 
 var c_oAscPaneState = {
-  Frozen: 0,
-  FrozenSplit: 1,
-  Split: 2
+  Frozen: "frozen",
+  FrozenSplit: "frozenSplit",
+  Split: "split"
 };
 
 var c_oAscFindLookIn = {
