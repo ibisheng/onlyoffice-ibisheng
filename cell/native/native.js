@@ -2740,7 +2740,7 @@ function OfflineEditor () {
 
             this.worksheet.overlayCtx.clear();
             this.worksheet.overlayGraphicCtx.clear();
-            this.worksheet._drawCollaborativeElements();
+            this.worksheet._drawCollaborativeElements(autoShapeTrack);
 
             if (!this.worksheet.objectRender.controller.selectedObjects.length && !this.api.isStartAddShape)
                 this.worksheet._drawSelection();
@@ -7076,7 +7076,7 @@ function offline_apply_event(type,params) {
 
             var dataObject = JSON.parse(params);
             
-            console.log("JS - " + dataObject['type']);
+            //console.log("JS - " + dataObject['type']);
             
             switch (dataObject['type']) {
                 case 'auth'        :
@@ -7139,9 +7139,10 @@ function offline_apply_event(type,params) {
 }
 
 function testLockedObjects () {
-    var worksheet = _api.wb.getWorksheet();
-    var objectRender = worksheet.objectRender;
-    var aObjects = worksheet.model.Drawings;
+    
+    var ws = _api.wb.getWorksheet();
+    var objectRender = ws.objectRender;
+    var aObjects = ws.model.Drawings;
     
     var overlay = objectRender.getDrawingCanvas().autoShapeTrack;
     if (!overlay)
@@ -7153,12 +7154,14 @@ function testLockedObjects () {
         var drawingObject = aObjects[i];
         
         if (drawingObject.isGraphicObject()) {
+           
             var drawingArea = objectRender.drawingArea;
             objectRender.drawingArea.reinitRanges();
+            
             for (var j = 0; j < drawingArea.frozenPlaces.length; ++j) {
                 if (drawingArea.frozenPlaces[j].isObjectInside(drawingObject)) {
                     
-                    //var canvas = _this.worksheet.objectRender.getDrawingCanvas();
+                    //var canvas = _this.ws.objectRender.getDrawingCanvas();
                    // _this.setTransform(canvas.shapeCtx, canvas.shapeOverlayCtx, canvas.autoShapeTrack);
                     
                    // _this.clip(canvas.shapeCtx);
@@ -7174,7 +7177,7 @@ function testLockedObjects () {
                         
                         overlay.transform3(drawingObject.graphicObject.transform, false, "PD_LockObjectTransform");
                         overlay.Native["PD_DrawLockObjectRect"](drawingObject.graphicObject.lockType, 0, 0, drawingObject.graphicObject.extX, drawingObject.graphicObject.extY);
-                        console.log("lockType : " + drawingObject.graphicObject.lockType);
+                       // console.log("lockType : " + drawingObject.graphicObject.lockType);
                     }
                     else
                     {
@@ -7188,8 +7191,72 @@ function testLockedObjects () {
         }
     }
     
+    if ( ws.collaborativeEditing.getCollaborativeEditing() ) {
+        ws._drawCollaborativeElementsMeOther(AscCommon.c_oAscLockTypes.kLockTypeMine, overlay);
+        ws._drawCollaborativeElementsMeOther(AscCommon.c_oAscLockTypes.kLockTypeOther, overlay);
+        ws._drawCollaborativeElementsAllLock(overlay);
+    }
+    
     overlay.Native["PD_DrawLockedObjectsEnd"]();
 }
+
+window["AscCommonExcel"].WorksheetView.prototype._drawCollaborativeElementsMeOther = function (type, overlay) {
+    var currentSheetId = this.model.getId(), i, strokeColor, arrayCells, oCellTmp;
+    if (AscCommon.c_oAscLockTypes.kLockTypeMine === type) {
+        strokeColor = AscCommonExcel.c_oAscCoAuthoringMeBorderColor;
+        arrayCells = this.collaborativeEditing.getLockCellsMe(currentSheetId);
+        
+        arrayCells = arrayCells.concat(this.collaborativeEditing.getArrayInsertColumnsBySheetId(currentSheetId));
+        arrayCells = arrayCells.concat(this.collaborativeEditing.getArrayInsertRowsBySheetId(currentSheetId));
+    } else {
+        strokeColor = AscCommonExcel.c_oAscCoAuthoringOtherBorderColor;
+        arrayCells = this.collaborativeEditing.getLockCellsOther(currentSheetId);
+    }
+    
+    for (i = 0; i < arrayCells.length; ++i) {
+        //oCellTmp = new asc_Range(arrayCells[i].c1, arrayCells[i].r1, arrayCells[i].c2, arrayCells[i].r2);
+        
+        overlay.Native["PD_DrawLockCell"](arrayCells[i].c1, arrayCells[i].r1, arrayCells[i].c2, arrayCells[i].r2,
+                                          this.cols[arrayCells[i].c1].left,
+                                          this.rows[arrayCells[i].r1].top,
+                                          this.cols[arrayCells[i].c2].width,
+                                          this.rows[arrayCells[i].r1].height,
+                                          strokeColor.r,
+                                          strokeColor.g,
+                                          strokeColor.b,
+                                          strokeColor.a);
+        //this.__drawElements(this._drawSelectionElement, oCellTmp, AscCommonExcel.selectionLineType.Dash, strokeColor);
+    }
+};
+
+window["AscCommonExcel"].WorksheetView.prototype._drawCollaborativeElementsAllLock = function (overlay) {
+    var currentSheetId = this.model.getId();
+    var nLockAllType = this.collaborativeEditing.isLockAllOther(currentSheetId);
+    if (Asc.c_oAscMouseMoveLockedObjectType.None !== nLockAllType) {
+        var isAllRange = true, strokeColor = (Asc.c_oAscMouseMoveLockedObjectType.TableProperties ===
+                                              nLockAllType) ? AscCommonExcel.c_oAscCoAuthoringLockTablePropertiesBorderColor :
+        AscCommonExcel.c_oAscCoAuthoringOtherBorderColor, oAllRange = new window["Asc"].Range(0, 0, AscCommon.gc_nMaxCol0, AscCommon.gc_nMaxRow0);
+       
+        overlay.Native["PD_DrawLockCell"](oAllRange.c1, oAllRange.r1, oAllRange.c2, oAllRange.r2,
+                                          this.cols[oAllRange.c1].left,
+                                          this.rows[oAllRange.r1].top,
+                                          this.cols[oAllRange.c2].width,
+                                          this.rows[oAllRange.r1].height,
+                                          strokeColor.r,
+                                          strokeColor.g,
+                                          strokeColor.b,
+                                          strokeColor.a);
+        //this.__drawElements(this._drawSelectionElement, oAllRange, AscCommonExcel.selectionLineType.Dash, strokeColor, isAllRange);
+    }
+};
+
+window["AscCommonExcel"].WorksheetView.prototype._drawCollaborativeElements = function(overlay) {
+    if (this.collaborativeEditing.getCollaborativeEditing()) {
+        this._drawCollaborativeElementsMeOther(AscCommon.c_oAscLockTypes.kLockTypeMine, overlay);
+        this._drawCollaborativeElementsMeOther(AscCommon.c_oAscLockTypes.kLockTypeOther, overlay);
+        this._drawCollaborativeElementsAllLock(AscCommon.overlay);
+    }
+};
 
 window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
     //asc["editor"] = this;
@@ -7198,7 +7265,7 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
     
     setTimeout(function() {
                
-               console.log("JS - openDocument()");
+               //console.log("JS - openDocument()");
                
                t.wbModel = t._openDocument(sData);
                t.wb = new AscCommonExcel.WorkbookView(t.wbModel, t.controller, t.handlers,
@@ -7212,7 +7279,7 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
                
                t.sendStandartTextures();
                
-               console.log("JS - applyFirstLoadChanges() before");
+               //console.log("JS - applyFirstLoadChanges() before");
                
                // Применяем пришедшие при открытии изменения
                t._applyFirstLoadChanges();
@@ -7230,18 +7297,18 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
                     t.sendEvent('asc_onError', c_oAscError.ID.OpenWarning, c_oAscError.Level.NoCritical);
                }
                
-               console.log("JS - applyFirstLoadChanges() after");
+               //console.log("JS - applyFirstLoadChanges() after");
                
                setTimeout(function() {
                           
                           t.wb.showWorksheet(undefined, false, true);
-                          console.log("JS - showWorksheet()");
+                          //console.log("JS - showWorksheet()");
                          
                           var ws = t.wb.getWorksheet();
-                          console.log("JS - getWorksheet()");
+                          //console.log("JS - getWorksheet()");
                          
                           window.native["onEndLoadingFile"](ws.headersWidth, ws.headersHeight);
-                          console.log("JS - onEndLoadingFile()");
+                          //console.log("JS - onEndLoadingFile()");
                           
                           _s.asc_WriteAllWorksheets(true);
                           
@@ -7251,10 +7318,10 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
                                       
                                       testLockedObjects();
                                       
-                                      }, 100);
+                                      }, 50);
+       }, 50);
                           
-                          console.log("JS - openDocument()");
-                          
+                          //console.log("JS - ope                          
                           }, 5);
                
                }, 5);
