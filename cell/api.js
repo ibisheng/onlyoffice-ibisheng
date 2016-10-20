@@ -2181,12 +2181,16 @@ var editor;
 
   spreadsheet_api.prototype.asc_addChartDrawingObject = function(chart) {
     var ws = this.wb.getWorksheet();
-    return ws.objectRender.addChartDrawingObject(chart);
+    var ret = ws.objectRender.addChartDrawingObject(chart);
+    this.asc_onCloseChartFrame();
+    return ret;
   };
 
   spreadsheet_api.prototype.asc_editChartDrawingObject = function(chart) {
     var ws = this.wb.getWorksheet();
-    return ws.objectRender.editChartDrawingObject(chart);
+    var ret = ws.objectRender.editChartDrawingObject(chart);
+    this.asc_onCloseChartFrame();
+    return ret;
   };
 
   spreadsheet_api.prototype.asc_addImageDrawingObject = function(imageUrl) {
