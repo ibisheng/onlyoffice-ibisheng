@@ -1072,7 +1072,7 @@ cArea.prototype.foreach = function ( action ) {
 		}
 	};
 	cArea.prototype.getMatrix = function () {
-		var t = this, arr = [], r = this.getRange();
+		var arr = [], r = this.getRange();
 		r._foreach2(function (cell, i, j, r1, c1) {
 			if (!arr[i - r1]) {
 				arr[i - r1] = [];
@@ -1082,7 +1082,7 @@ cArea.prototype.foreach = function ( action ) {
 		return arr;
 	};
 	cArea.prototype.getValuesNoEmpty = function () {
-		var t = this, arr = [], r = this.getRange();
+		var arr = [], r = this.getRange();
 		r._foreachNoEmpty(function (cell) {
 			arr.push(checkTypeCell(cell));
 		});
@@ -2943,28 +2943,28 @@ var cFormulaOperators = {
  В методе Calculate необходимо отслеживать тип принимаемых аргументов. Для примера, если мы обращаемся к ячейке A1, в которой лежит 123, то этот аргумент будет числом. Если же там лежит "123", то это уже строка. Для более подробной информации смотреть спецификацию.
  Метод getInfo является обязательным, ибо через этот метод в интерфейс передается информация о реализованных функциях.
  */
-var cFormulaFunctionGroup = {};
-var cFormulaFunction = {};
-var cAllFormulaFunction = {};
+	var cFormulaFunctionGroup = {};
+	var cFormulaFunction = {};
+	var cAllFormulaFunction = {};
 
-function getFormulasInfo() {
+	function getFormulasInfo() {
 
-    var list = [], a, b, f;
-    for ( var type in cFormulaFunctionGroup ) {
-    b = new AscCommon.asc_CFormulaGroup(type);
-        for ( var i = 0; i < cFormulaFunctionGroup[type].length; ++i ) {
-            a = new cFormulaFunctionGroup[type][i]();
-            if ( a.getInfo ) {
-        f = new AscCommon.asc_CFormula(a.getInfo());
-                b.asc_addFormulaElement( f );
-                cFormulaFunction[f.asc_getName()] = cFormulaFunctionGroup[type][i];
-            }
-            cAllFormulaFunction[a.name] = cFormulaFunctionGroup[type][i];
-        }
-        list.push( b );
-    }
-    return list;
-}
+		var list = [], a, b, f;
+		for (var type in cFormulaFunctionGroup) {
+			b = new AscCommon.asc_CFormulaGroup(type);
+			for (var i = 0; i < cFormulaFunctionGroup[type].length; ++i) {
+				a = new cFormulaFunctionGroup[type][i]();
+				if (a.getInfo) {
+					f = new AscCommon.asc_CFormula(a.getInfo());
+					b.asc_addFormulaElement(f);
+					cFormulaFunction[f.asc_getName()] = cFormulaFunctionGroup[type][i];
+				}
+				cAllFormulaFunction[a.name] = cFormulaFunctionGroup[type][i];
+			}
+			list.push(b);
+		}
+		return list;
+	}
 
 /*--------------------------------------------------------------------------*/
 
