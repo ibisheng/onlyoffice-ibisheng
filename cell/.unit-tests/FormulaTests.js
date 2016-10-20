@@ -1266,6 +1266,45 @@ $( function () {
 
     } );
 
+    test( "Test: \"SUMIFS\"", function () {
+
+        ws.getRange2( "A2" ).setValue( "5" );
+        ws.getRange2( "A3" ).setValue( "4" );
+        ws.getRange2( "A4" ).setValue( "15" );
+        ws.getRange2( "A5" ).setValue( "3" );
+        ws.getRange2( "A6" ).setValue( "22" );
+        ws.getRange2( "A7" ).setValue( "12" );
+        ws.getRange2( "A8" ).setValue( "10" );
+        ws.getRange2( "A9" ).setValue( "33" );
+
+        ws.getRange2( "B2" ).setValue( "Apples" );
+        ws.getRange2( "B3" ).setValue( "Apples" );
+        ws.getRange2( "B4" ).setValue( "Artichokes" );
+        ws.getRange2( "B5" ).setValue( "Artichokes" );
+        ws.getRange2( "B6" ).setValue( "Bananas" );
+        ws.getRange2( "B7" ).setValue( "Bananas" );
+        ws.getRange2( "B8" ).setValue( "Carrots" );
+        ws.getRange2( "B9" ).setValue( "Carrots" );
+
+        ws.getRange2( "C2" ).setValue( "Tom" );
+        ws.getRange2( "C3" ).setValue( "Sarah" );
+        ws.getRange2( "C4" ).setValue( "Tom" );
+        ws.getRange2( "C5" ).setValue( "Sarah" );
+        ws.getRange2( "C6" ).setValue( "Tom" );
+        ws.getRange2( "C7" ).setValue( "Sarah" );
+        ws.getRange2( "C8" ).setValue( "Tom" );
+        ws.getRange2( "C9" ).setValue( "Sarah" );
+
+        oParser = new parserFormula( "SUMIFS(A2:A9, B2:B9, \"=A*\", C2:C9, \"Tom\")", "A10", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 20 );
+
+        oParser = new parserFormula( "SUMIFS(A2:A9, B2:B9, \"<>Bananas\", C2:C9, \"Tom\")", "A11", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 30 );
+
+    } );
+
     test( "Test: \"TEXT\"", function () {
 
         wb.dependencyFormulas = new AscCommonExcel.DependencyGraph( wb );
