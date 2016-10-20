@@ -7303,10 +7303,10 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
                           
                           t.wb.showWorksheet(undefined, false, true);
                           //console.log("JS - showWorksheet()");
-                         
+                          
                           var ws = t.wb.getWorksheet();
                           //console.log("JS - getWorksheet()");
-                         
+                          
                           window.native["onEndLoadingFile"](ws.headersWidth, ws.headersHeight);
                           //console.log("JS - onEndLoadingFile()");
                           
@@ -7318,10 +7318,10 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
                                       
                                       testLockedObjects();
                                       
-                                      }, 50);
-       }, 50);
+                                      }, 100);
                           
-                          //console.log("JS - ope                          
+                          //console.log("JS - openDocument()");
+                          
                           }, 5);
                
                }, 5);
