@@ -2478,7 +2478,7 @@ PasteProcessor.prototype =
 					}
 				}
 				
-				oThis.api.pre_Paste(aContent.content.fonts, null, paste_callback);
+				oThis.api.pre_Paste(aContent.fonts, null, paste_callback);
 			}
 		}
 	},
