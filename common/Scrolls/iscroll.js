@@ -1005,6 +1005,12 @@ CTouchScroll.prototype = {
 
         that.wrapperW = ((that.api.m_oEditor.HtmlElement.width) || 1) >> 0;
         that.wrapperH = ((that.api.m_oEditor.HtmlElement.height) || 1) >> 0;
+
+		if (that.api.bIsRetinaSupport)
+		{
+			that.wrapperW >>= 1;
+			that.wrapperH >>= 1;
+		}
 			
 		that.minScrollY = 0;
 		that.scrollerW = that.api.m_dDocumentWidth;

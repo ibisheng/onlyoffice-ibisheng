@@ -200,7 +200,7 @@ var FT_Get_Charmap_Index = AscFonts.FT_Get_Charmap_Index;
       if ((r == this.R) && (g == this.G) && (b == this.B))
         return;
 
-      if (!AscBrowser.isAppleDevices)
+      if (/*!AscBrowser.isAppleDevices*/true)
       {
         this.R = r;
         this.G = g;

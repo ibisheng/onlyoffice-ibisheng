@@ -1057,7 +1057,7 @@ function GetUploadInput(onchange) {
     input.setAttribute('name', inputName);
     input.setAttribute('type', 'file');
     input.setAttribute('accept', 'image/*');
-    input.setAttribute('style', 'position:absolute;left:-2px;top:-2px;width:1px;height:1px;z-index:-1000;');
+    input.setAttribute('style', 'position:absolute;left:-2px;top:-2px;width:1px;height:1px;z-index:-1000;cursor:pointer;');
     input.onchange = onchange;
     document.body.appendChild( input );
     return input;
