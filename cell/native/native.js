@@ -5524,12 +5524,23 @@ function offline_cell_editor_open(x, y, width, height, ratio, isSelectAll, isFor
     ws.visibleRange.r1 = r1;
     ws.visibleRange.c2 = c2;
     ws.visibleRange.r2 = r2;
-
+    
     wb.cellEditor.isSelectAll = isSelectAll;
-    if (!isFormulaInsertMode) {
-        wb._onEditCell(undefined, undefined, true, false);
+    
+    var canEditCell = false;
+    
+    if (ws._isLockedCells(ws.getActiveCell(0, 0, false), false)) {
+        
+        canEditCell = true;
+        
+        if (!isFormulaInsertMode) {
+            wb._onEditCell(undefined, undefined, true, false);
+        }
     }
+
     ws.visibleRange = range;
+    
+    return canEditCell;
 }
 function offline_cell_editor_process_input_commands(commands, width, height, ratio) {
     _null_object.width = width * ratio;
