@@ -4633,7 +4633,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         this.operand_expected = false;
         found_operand = null
         } else {
-        if (this.operand_str == null || this.operand_str == "'") {
+        if (this.operand_str == null || this.operand_str === "'" || this.operand_str === '"') {
           this.outStack.push(new cError(cErrorType.wrong_name));
           this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
           return this.isParsed = false;
@@ -4644,9 +4644,6 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 
         this.operand_expected = false;
         if (this.operand_str != null) {
-          if (this.operand_str == '"') {
-            continue;
-          }
           this.pCurrPos += this.operand_str.length;
         }
       }
