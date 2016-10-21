@@ -3781,7 +3781,7 @@ drawBarChart.prototype =
 				pen = options.pen;
 				brush = options.brush;
 				
-				t._drawBar3D(paths, pen, brush, k);
+				t._drawBar3D(paths, pen, brush, k, options.val);
 			}
 		};
 		
@@ -3859,25 +3859,66 @@ drawBarChart.prototype =
 		if(pt.brush)
 			brush = pt.brush;
 			
-		return {pen: pen, brush: brush}
+		return {pen: pen, brush: brush, val: pt.val}
 	},
 	
-	_drawBar3D: function(path, pen, brush, k)
+	_drawBar3D: function(path, pen, brush, k, val)
 	{
 		//затемнение боковых сторон
 		//в excel всегда темные боковые стороны, лицевая и задняя стороны светлые
-		//pen = this.cChartSpace.chart.plotArea.valAx.compiledMajorGridLines;
-		//pen.setFill(brush);
 		pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
-		if(k != 5 && k != 0)
+		
+		if(k !== 5 && k !== 0)
 		{
 			var  props = this.cChartSpace.getParentObjects();
 			var duplicateBrush = brush.createDuplicate();
 			var cColorMod = new AscFormat.CColorMod;
-			if(k == 1 || k == 4)
+			
+			if(k === 1 || k === 4)
+			{
+				//для градиентной заливки верхнюю и нижнюю грань закрашиываем первым и последним цветом соотвенственно
+				if(duplicateBrush.fill && AscDFH.historyitem_type_GradFill === duplicateBrush.fill.getObjectType())
+				{
+					var colors = duplicateBrush.fill.colors;
+					//ToDo проверить stacked charts!
+					var color;
+					var valAxOrientation = this.cChartSpace.chart.plotArea.valAx.scaling.orientation;
+					if((val > 0 && valAxOrientation === ORIENTATION_MIN_MAX) || (val < 0 && valAxOrientation !== ORIENTATION_MIN_MAX))
+					{
+						if(k === 4 && colors && colors[0] && colors[0].color)
+						{
+							color = colors[0].color;
+						}
+						else if(k === 1 && colors[colors.length - 1] && colors[colors.length - 1].color)
+						{
+							color = colors[colors.length - 1].color;
+						}
+					}
+					else
+					{
+						if(k === 4 && colors && colors[0] && colors[0].color)
+						{
+							color = colors[colors.length - 1].color;
+						}
+						else if(k === 1 && colors[colors.length - 1] && colors[colors.length - 1].color)
+						{
+							color = colors[0].color;
+						}
+					}
+					
+					var tempColor = new AscFormat.CUniFill();
+					tempColor.setFill(new AscFormat.CSolidFill());
+					tempColor.fill.setColor(color);
+					duplicateBrush = tempColor;
+				}
+
 				cColorMod.val = 45000;
+			}	
 			else
+			{
 				cColorMod.val = 35000;
+			}
+			
 			cColorMod.name = "shade";
 			duplicateBrush.addColorMod(cColorMod);
 			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
@@ -3886,7 +3927,9 @@ drawBarChart.prototype =
 			this.cChartDrawer.drawPath(path, pen, duplicateBrush);
 		}
 		else
+		{
 			this.cChartDrawer.drawPath(path, pen, brush);
+		}
 	},
 	
 	_calculateRect3D: function(startX, startY, individualBarWidth, height, val, isValMoreZero, isValLessZero, serNum)
@@ -7036,10 +7079,36 @@ drawHBarChart.prototype =
 			var  props = this.cChartSpace.getParentObjects();
 			var duplicateBrush = brush.createDuplicate();
 			var cColorMod = new AscFormat.CColorMod;
-			if(k == 1 || k == 4)
+
+			if(k === 1 || k === 4)
+			{
+				//для градиентной заливки верхнюю и нижнюю грань закрашиываем первым и последним цветом соотвенственно
+				if(duplicateBrush.fill && AscDFH.historyitem_type_GradFill === duplicateBrush.fill.getObjectType())
+				{
+					var colors = duplicateBrush.fill.colors;
+					if(k === 1 && colors && colors[0] && colors[0].color)
+					{
+						var tempColor = new AscFormat.CUniFill();
+						tempColor.setFill(new AscFormat.CSolidFill());
+						tempColor.fill.setColor(colors[0].color);
+						duplicateBrush = tempColor;
+					}
+					else if(k === 4 && colors[colors.length - 1] && colors[colors.length - 1].color)
+					{
+						var tempColor = new AscFormat.CUniFill();
+						tempColor.setFill(new AscFormat.CSolidFill());
+						tempColor.fill.setColor(colors[colors.length - 1].color);
+						duplicateBrush = tempColor;
+					}
+				}
+
 				cColorMod.val = 45000;
+			}	
 			else
+			{
 				cColorMod.val = 35000;
+			}
+			
 			cColorMod.name = "shade";
 			duplicateBrush.addColorMod(cColorMod);
 			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
