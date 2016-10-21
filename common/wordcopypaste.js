@@ -2276,7 +2276,7 @@ PasteProcessor.prototype =
 			}
 			else if(base64FromPresentation)//вставка из редактора презентаций
 			{
-				this._pasteBinaryFromPresentation(base64FromPresentation);
+				this._pasteBinaryFromPresentation(base64FromPresentation, bDuplicate);
 				bInsertFromBinary = true;
 			}
 			
@@ -2704,7 +2704,7 @@ PasteProcessor.prototype =
 	
 	},
 	
-	_pasteBinaryFromPresentation: function(base64)
+	_pasteBinaryFromPresentation: function(base64, bDuplicate)
 	{
 		var oThis = this;
 		
