@@ -3478,7 +3478,7 @@ function DrawingObjects() {
         drawingObject.worksheet = worksheet;
 
         var activeCell = worksheet.model.selectionRange.activeCell;
-        drawingObject.from.col = activeCell.ccol;
+        drawingObject.from.col = activeCell.col;
         drawingObject.from.row = activeCell.row;
 
         // Проверяем начальные координаты при вставке
