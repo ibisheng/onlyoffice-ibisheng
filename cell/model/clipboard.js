@@ -855,12 +855,14 @@
 					{	
 						if(isIntoShape)
 						{
-							var tempHtml = this._getHtmlFromWorksheet(pasteData);
+							var docContent = this._convertTableFromExcelToDocument(worksheet, pasteData, isIntoShape);
 							
 							var callback = function(isSuccess)
 							{
 								if(isSuccess)
-									t._pasteInShape(worksheet, tempHtml, null, isIntoShape);
+								{
+									t._insertBinaryIntoShapeContent(worksheet, [docContent]);
+								}
 							};
 							
 							worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
@@ -1982,6 +1984,158 @@
 					newFonts[fontName] = 1;
 				};
 				return newFonts;
+			},
+			
+			_convertTableFromExcelToDocument: function(worksheet, aContentExcel, documentContent)
+			{
+				var oCurPar = new Paragraph(worksheet.model.DrawingDocument, documentContent, 0, 0, 0, 0, 0);
+				
+				var getElem = function(text, format, isAddSpace, isHyperLink)
+				{
+					var result = null;
+					var value = "";
+					if(null != cell)
+					{
+						value += text;
+					}
+					if(isAddSpace)
+					{
+						value += " ";
+					}
+					if("" === value)
+					{
+						return result;
+					}
+					
+					
+					if(isHyperLink)
+					{
+						var oCurHyperlink = new ParaHyperlink();
+						oCurHyperlink.Set_Paragraph(oCurPar);
+						oCurHyperlink.Set_Value( isHyperLink.Hyperlink );
+						if(isHyperLink.Tooltip)
+						{
+							oCurHyperlink.Set_ToolTip(isHyperLink.Tooltip);
+						}
+					}
+					
+					var oCurRun = new ParaRun(oCurPar);
+					//***text property***
+					if(format)
+					{
+						oCurRun.Pr.Bold = format.b;
+						oCurRun.Pr.Italic = format.i;
+						oCurRun.Pr.Strikeout = format.s;
+						oCurRun.Pr.Underline = format.u === 3 ? true : false;
+					}
+				
+					for(var k = 0, length = value.length; k < length; k++)
+					{
+						var nUnicode = null;
+						var nCharCode = value.charCodeAt(k);
+						if (AscCommon.isLeadingSurrogateChar(nCharCode)) 
+						{
+							if (k + 1 < length) 
+							{
+								k++;
+								var nTrailingChar = value.charCodeAt(k);
+								nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
+							}
+						}
+						else
+						{
+							nUnicode = nCharCode;
+						}
+							
+						if (null != nUnicode) 
+						{
+							var Item;
+							if (0x20 != nUnicode && 0xA0 != nUnicode && 0x2009 != nUnicode) 
+							{
+								Item = new ParaText();
+								Item.Set_CharCode(nUnicode);
+							}
+							else
+							{
+								Item = new ParaSpace();
+							}
+							
+							//add text
+							oCurRun.Add_ToContent(k, Item, false);
+						}
+					}
+					
+					//add run
+					if(oCurHyperlink)
+					{
+						oCurHyperlink.Add_ToContent(0, oCurRun, false);
+						result = oCurHyperlink;
+					}	
+					else
+					{
+						result = oCurRun;
+					}
+					
+					return result;
+				};
+				
+				var n = 0;
+				for(var i in aContentExcel.aGCells)
+				{
+					var row = aContentExcel.aGCells[i];
+					for(var j in row.c)
+					{
+						var cell = row.c[j];
+						
+						var isHyperlink = aContentExcel.getCell3( i, j ).getHyperlink();
+						var isAddSpace = row.c[parseInt(j) + 1] || (!row.c[parseInt(j) + 1] && aContentExcel.aGCells[parseInt(i) + 1]) ? true : false;
+						
+						if(cell.oValue && cell.oValue.multiText)
+						{
+							for(var m = 0; m < cell.oValue.multiText.length; m++)
+							{
+								var curMultiText = cell.oValue.multiText[m];
+								var format = curMultiText.format;
+								
+								var elem = getElem(curMultiText.text, format);
+								if(null !== elem)
+								{
+									oCurPar.Internal_Content_Add(n, elem, false);
+									n++;
+								}
+							}
+							
+							if(isAddSpace)
+							{
+								elem = getElem("", null, true);
+								oCurPar.Internal_Content_Add(n, elem, false);
+								n++;
+							}
+							
+						}
+						else
+						{
+							var format = cell.xfs && cell.xfs.font ? cell.xfs.font : null;
+							
+							var elem = getElem(cell.getValue(), format, null, isHyperlink);
+							if(null !== elem)
+							{	
+								oCurPar.Internal_Content_Add(n, elem, false);
+								n++;
+								
+								//add space
+								if(isAddSpace)
+								{
+									elem = getElem("", null, true);
+									oCurPar.Internal_Content_Add(n, elem, false);
+									n++;
+								}
+							}
+						}
+					}
+				}
+				
+				return oCurPar;
 			},
 			
 			//TODO сделать при получаении структуры. игнорировать размер шрифта и тп
