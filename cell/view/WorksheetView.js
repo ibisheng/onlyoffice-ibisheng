@@ -7367,74 +7367,43 @@
 
     // Смена селекта по нажатию правой кнопки мыши
     WorksheetView.prototype.changeSelectionStartPointRightClick = function (x, y) {
-        var ar = this.model.selectionRange.getLast();
         var isChangeSelectionShape = this._checkSelectionShape();
         this.model.workbook.handlers.trigger("asc_onHideComment");
 
-        // Получаем координаты левого верхнего угла выделения
-        var xL = this.getCellLeft(ar.c1, /*pt*/1);
-        var yL = this.getCellTop(ar.r1, /*pt*/1);
-        // Получаем координаты правого нижнего угла выделения
-        var xR = this.getCellLeft(ar.c2, /*pt*/1) + this.cols[ar.c2].width;
-        var yR = this.getCellTop(ar.r2, /*pt*/1) + this.rows[ar.r2].height;
-
-        // Пересчитываем координаты
         var _x = x * asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
         var _y = y * asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
 
-        var isInSelection = false;
-        var offsetX = this.cols[this.visibleRange.c1].left -
-          this.cellsLeft, offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
-        var offsetFrozen = this.getFrozenPaneOffset();
-        offsetX -= offsetFrozen.offsetX;
-        offsetY -= offsetFrozen.offsetY;
-
-        // Проверяем попали ли мы в выделение
-        if ((_x < this.cellsLeft || _y < this.cellsTop) && c_oAscSelectionType.RangeMax === ar.type) {
-            // Выделено все
-            isInSelection = true;
-        } else if (_x > this.cellsLeft && _y > this.cellsTop) {
-            // Пересчитываем X и Y относительно видимой области
-            _x += offsetX;
-            _y += offsetY;
-
-            if (xL <= _x && _x <= xR && yL <= _y && _y <= yR) {
-                // Попали в выделение ячеек
-                isInSelection = true;
-            }
-        } else if (_x <= this.cellsLeft && _y >= this.cellsTop && c_oAscSelectionType.RangeRow === ar.type) {
-            // Выделены строки
-            // Пересчитываем Y относительно видимой области
-            _y += offsetY;
-
-            if (yL <= _y && _y <= yR) {
-                // Попали в выделение ячеек
-                isInSelection = true;
-            }
-        } else if (_y <= this.cellsTop && _x >= this.cellsLeft && c_oAscSelectionType.RangeCol === ar.type) {
-            // Выделены столбцы
-            // Пересчитываем X относительно видимой области
-            _x += offsetX;
-            if (xL <= _x && _x <= xR) {
-                // Попали в выделение ячеек
-                isInSelection = true;
-            }
+        var val, c1, c2, r1, r2;
+        val = this._findColUnderCursor(_x, true);
+        if (val) {
+            c1 = c2 = val.col;
+        } else {
+            c1 = 0;
+            c2 = gc_nMaxCol0;
+        }
+        val = this._findRowUnderCursor(_y, true);
+        if (val) {
+            r1 = r2 = val.row;
+        } else {
+            r1 = 0;
+            r2 = gc_nMaxRow0;
         }
 
-        if (!isInSelection) {
-            // Не попали в выделение (меняем первую точку)
-            this.cleanSelection();
-            this._moveActiveCellToXY(x, y);
-            this._drawSelection();
-
-            this._updateSelectionNameAndInfo();
-            return false;
-        } else if (isChangeSelectionShape) {
+        if (isChangeSelectionShape) {
             // Попали в выделение, но были в объекте
             this.cleanSelection();
             this._drawSelection();
 
             this._updateSelectionNameAndInfo();
+        } else if (!this.model.selectionRange.containsRange(new asc_Range(c1, r1, c2, r2))) {
+            // Не попали в выделение (меняем первую точку)
+            this.cleanSelection();
+            this.model.selectionRange.clean();
+            this._moveActiveCellToXY(x, y);
+            this._drawSelection();
+
+            this._updateSelectionNameAndInfo();
+            return false;
         }
 
         return true;

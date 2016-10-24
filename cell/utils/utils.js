@@ -269,7 +269,8 @@
 		};
 
 		Range.prototype.containsRange = function (range) {
-			return this.contains(range.c1, range.r1) && this.contains(range.c2, range.r2);
+			var allRange = this.getAllRange();
+			return allRange.contains(range.c1, range.r1) && allRange.contains(range.c2, range.r2);
 		};
 
 		Range.prototype.containsFirstLineRange = function (range) {
@@ -584,6 +585,11 @@
 		};
 		SelectionRange.prototype.contains2 = function (cell) {
 			return this.contains(cell.col, cell.row);
+		};
+		SelectionRange.prototype.containsRange = function (range) {
+			return this.ranges.some(function (item) {
+				return item.containsRange(range);
+			});
 		};
 		SelectionRange.prototype.clone = function () {
 			var res = new SelectionRange();
