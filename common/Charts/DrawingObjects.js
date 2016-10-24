@@ -2396,6 +2396,72 @@ function DrawingObjects() {
 
     };
 
+    _this.addMath = function(Type){
+        if (!_this.isViewerMode() && _this.controller) {
+
+            var oTargetContent = _this.controller.getTargetDocContent();
+            if(oTargetContent){
+
+                _this.controller.checkSelectedObjectsAndCallback(function(){
+                    var MathElement = new AscCommonWord.MathMenu(Type);
+                    _this.controller.paragraphAdd(MathElement, false);
+                }, [], false, AscDFH.historydescription_Spreadsheet_CreateGroup);
+                return;
+            }
+            var oVisibleRange = worksheet.getVisibleRange();
+
+            _this.objectLocker.reset();
+            _this.objectLocker.addObjectId(AscCommon.g_oIdCounter.Get_NewId());
+            _this.objectLocker.checkObjects(function (bLock) {
+                if (bLock !== true)
+                    return;
+                _this.controller.resetSelection();
+
+                var activeCell = worksheet.model.selectionRange.activeCell;
+                var dLeft = worksheet.getCellLeft(activeCell.col, 3);
+                var dTop = worksheet.getCellTop(activeCell.row, 3);
+                var dRight = worksheet.getCellLeft(oVisibleRange.c2, 3) + worksheet.getColumnWidth(oVisibleRange.c2, 3);
+                var dBottom = worksheet.getCellTop(oVisibleRange.r2, 3) + worksheet.getRowHeight(oVisibleRange.r2, 3);
+
+
+
+                var coordsFrom = _this.coordsManager.calculateCoords({col: activeCell.col, row: activeCell.row, colOff: 0, rowOff: 0});
+
+
+                History.Create_NewPoint();
+                var oTextArt = _this.controller.createTextArt(0, false, worksheet.model, "");
+                _this.controller.resetSelection();
+                oTextArt.setWorksheet(_this.controller.drawingObjects.getWorksheetModel());
+                oTextArt.setDrawingObjects(_this.controller.drawingObjects);
+                oTextArt.addToDrawingObjects();
+
+                var oContent = oTextArt.getDocContent();
+                if(oContent){
+                    oContent.Cursor_MoveToStartPos(false);
+                    oContent.Paragraph_Add(new AscCommonWord.MathMenu(Type), false);
+                }
+                oTextArt.checkExtentsByDocContent();
+                oTextArt.spPr.xfrm.setOffX(pxToMm(coordsFrom.x) + MOVE_DELTA);
+                oTextArt.spPr.xfrm.setOffY(pxToMm(coordsFrom.y) + MOVE_DELTA);
+
+                oTextArt.checkDrawingBaseCoords();
+                _this.controller.selectObject(oTextArt, 0);
+                var oContent = oTextArt.getDocContent();
+                _this.controller.selection.textSelection = oTextArt;
+                oContent.Select_All();
+                oTextArt.addToRecalculate();
+                _this.controller.startRecalculate();
+                worksheet.setSelectionShape(true);
+            });
+        }
+    };
+
+
+    _this.setMathProps = function(MathProps)
+    {
+        _this.controller.setMathProps(MathProps);
+    }
+
     _this.editImageDrawingObject = function(imageUrl) {
 
         if ( imageUrl ) {

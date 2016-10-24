@@ -1750,6 +1750,24 @@ DrawingObjectsController.prototype =
         this.applyTextFunction(CDocumentContent.prototype.Paragraph_Add, CTable.prototype.Paragraph_Add, [paraItem, bRecalculate]);
     },
 
+
+    setMathProps: function(oMathProps)
+    {
+        var oContent = this.getTargetDocContent(false);
+            if(oContent){
+                this.checkSelectedObjectsAndCallback(function(){
+                    var oContent2 = this.getTargetDocContent(true);
+                    if(oContent2){
+                        var SelectedInfo = oContent2.Get_SelectedElementsInfo();
+                        if (null !== SelectedInfo.Get_Math()){
+                            var ParaMath = SelectedInfo.Get_Math();
+                            ParaMath.Set_MenuProps(oMathProps);
+                        }
+                    }
+            }, [], false, AscDFH.historydescription_Spreadsheet_SetCellFontName);
+        }
+    },
+
     paragraphIncDecFontSize: function(bIncrease)
     {
         this.applyDocContentFunction(CDocumentContent.prototype.Paragraph_IncDecFontSize, [bIncrease], CTable.prototype.Paragraph_IncDecFontSize);
@@ -7316,7 +7334,7 @@ DrawingObjectsController.prototype =
         return oleObject;
     },
 
-    createTextArt: function(nStyle, bWord, wsModel)
+    createTextArt: function(nStyle, bWord, wsModel, sStartString)
     {
         var MainLogicDocument = (editor && editor.WordControl && editor.WordControl.m_oLogicDocument ? editor && editor.WordControl && editor.WordControl.m_oLogicDocument : null);
         var TrackRevisions = (MainLogicDocument ? MainLogicDocument.Is_TrackRevisions() : false);
@@ -7340,6 +7358,10 @@ DrawingObjectsController.prototype =
             nFontSize = 54;
             oShape.createTextBody();
         }
+		if(typeof sStartString === "string")
+		{
+			nFontSize = undefined;
+		}
         var oSpPr = new AscFormat.CSpPr();
         var oXfrm = new AscFormat.CXfrm();
         oXfrm.setOffX(0);
@@ -7414,22 +7436,35 @@ DrawingObjectsController.prototype =
             else
             {
                 oShape.bSelectedText = false;
-                sText = oShape.getTextArtTranslate().DefaultText;
+                sText = (typeof sStartString === "string") ? sStartString : oShape.getTextArtTranslate().DefaultText;
                 AscFormat.AddToContentFromString(oContent, sText);
             }
         }
         else
         {
-            sText = oShape.getTextArtTranslate().DefaultText;
+            sText = (typeof sStartString === "string") ? sStartString : oShape.getTextArtTranslate().DefaultText;
             AscFormat.AddToContentFromString(oContent, sText);
         }
-        var oTextPr = oShape.getTextArtPreviewManager().getStylesToApply()[nStyle].Copy();
-        oTextPr.FontSize = nFontSize;
-        oTextPr.RFonts.Ascii = undefined;
-        if(!((typeof CGraphicObjects !== "undefined") && (this instanceof CGraphicObjects)))
+        var oTextPr;
+        if(!(typeof sStartString === "string"))
         {
-            oTextPr.Unifill = oTextPr.TextFill;
-            oTextPr.TextFill = undefined;
+            oTextPr = oShape.getTextArtPreviewManager().getStylesToApply()[nStyle].Copy();
+            oTextPr.FontSize = nFontSize;
+            oTextPr.RFonts.Ascii = undefined;
+            if(!((typeof CGraphicObjects !== "undefined") && (this instanceof CGraphicObjects)))
+            {
+                oTextPr.Unifill = oTextPr.TextFill;
+                oTextPr.TextFill = undefined;
+            }
+        }
+        else
+        {
+            oTextPr = new CTextPr();
+            oTextPr.FontSize = nFontSize;
+            oTextPr.RFonts.Ascii = {Name: "Cambria Math", Index: -1};
+            oTextPr.RFonts.HAnsi = {Name: "Cambria Math", Index: -1};
+            oTextPr.RFonts.CS = {Name: "Cambria Math", Index: -1};
+            oTextPr.RFonts.EastAsia = {Name: "Cambria Math", Index: -1};
         }
         oContent.Set_ApplyToAll(true);
         oContent.Paragraph_Add(new ParaTextPr(oTextPr));
@@ -9003,6 +9038,168 @@ function CalcLiterByLength(aAlphaBet, nLength)
     return sResultLiter;
 }
 
+
+function CollectUniColor(oUniColor)
+{
+    if(!oUniColor || !oUniColor.color)
+    {
+        return 0;
+    }
+    var ret = [];
+    var oColor = oUniColor.color;
+    var oColorTypes = window['Asc'].c_oAscColor;
+    ret.push(oColor.type);
+    if(!oUniColor.Mods)
+    {
+        ret.push(0);
+    }
+    else
+    {
+        var aMods = oUniColor.Mods.Mods;
+        for(var i = 0; i < aMods.length; ++ i)
+        {
+            ret.push([aMods[i].name, aMods[i].val]);
+        }
+    }
+    switch(oColor.type)
+    {
+        case oColorTypes.COLOR_TYPE_NONE:
+        {
+            break;
+        }
+        case oColorTypes.COLOR_TYPE_SRGB:
+        {
+            ret.push(((oColor.RGBA.R << 16) & 0xFF0000) + ((oColor.RGBA.G << 8) & 0xFF00) + oColor.RGBA.B);
+            break;
+        }
+        case oColorTypes.COLOR_TYPE_PRST:
+        case oColorTypes.COLOR_TYPE_SCHEME:
+        case oColorTypes.COLOR_TYPE_SYS:
+        {
+            ret.push(oColor.id);
+            break;
+        }
+    }
+}
+
+
+function CollectGs(oGs)
+{
+    if(!oGs)
+    {
+        return 0;
+    }
+    return [oGs.pos, CollectUniColor(oGs.color)];
+}
+
+function CollectSettingsUniFill(oUniFill)
+{
+    if(!oUniFill || !oUniFill.fill){
+        return 0;
+    }
+    var ret = [];
+    var oFill = oUniFill.fill;
+    ret.push(oFill.type);
+    ret.push(oFill.transparent);
+    var oFillTypes = window['Asc'].c_oAscFill;
+    switch(oFill.type)
+    {
+        case oFillTypes.FILL_TYPE_NONE:{
+            break;
+        }
+        case oFillTypes.FILL_TYPE_BLIP:{
+            ret.push(oFill.RasterImageId);
+            break;
+        }
+        case oFillTypes.FILL_TYPE_NOFILL:{
+            break;
+        }
+        case oFillTypes.FILL_TYPE_SOLID:{
+            ret.push(CollectUniColor());
+            break;
+        }
+        case oFillTypes.FILL_TYPE_GRAD:{
+            ret.push(oFill.lin ? [oFill.lin.angle, oFill.lin.scale] : 0);
+            ret.push(oFill.path ? [] : 0);
+            ret.push(oFill.rotateWithShape ? [] : 0);
+            for(var i = 0; i < oFill.colors.length; ++i)
+            {
+                ret.push(CollectGs(oFill.colors[i]));
+            }
+            break;
+        }
+        case oFillTypes.FILL_TYPE_PATT:{
+            ret.push(oFill.ftype);
+            ret.push(CollectUniColor(oFill.fgClr));
+            ret.push(CollectUniColor(oFill.bgClr));
+            break;
+        }
+        case oFillTypes.FILL_TYPE_GRP:{
+            break;
+        }
+    }
+    return ret;
+}
+
+
+function CollectSettingsLn(oLn)
+{
+    if(!oLn)
+    {
+        return 0;
+    }
+    var ret = [];
+    ret.push(CollectSettingsUniFill(oLn.Fill));
+    ret.push(oLn.prstDash);
+
+    if(!oLn.Join)
+    {
+        ret.push(0);
+    }
+    else
+    {
+        ret.push([oLn.Join.type, oLn.Join.limit]);
+    }
+
+    if(oLn.headEnd)
+    {
+        ret.push([oLn.headEnd.type, oLn.headEnd.len, oLn.headEnd.w]);
+    }
+    else
+    {
+        ret.push(0);
+    }
+
+    if(oLn.tailEnd)
+    {
+        ret.push([oLn.tailEnd.type, oLn.tailEnd.len, oLn.tailEnd.w]);
+    }
+    else
+    {
+        ret.push(0);
+    }
+    ret.push(oLn.algn);
+    ret.push(oLn.cap);
+    ret.push(oLn.cmpd);
+    ret.push(oLn.w);
+    return ret;
+}
+
+
+function CollectSettingsSpPr(oSpPr)
+{
+    if(!oSpPr)
+    {
+        return 0;
+    }
+    return [CollectSettingsUniFill(oSpPr.Fill), CollectSettingsLn(oSpPr.ln)];
+
+}
+
+function CollectSettingsFromChart(oChartSpace)
+{
+
+}
 
 
 

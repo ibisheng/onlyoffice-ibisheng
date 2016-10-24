@@ -4104,8 +4104,10 @@ background-repeat: no-repeat;\
 		}
 		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(type, objects);
 	};
-	asc_docs_api.prototype.sync_MathPropCallback  = function(mathProp)
+
+	asc_docs_api.prototype.sync_MathPropCallback = function(MathProp)
 	{
+		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(c_oAscTypeSelectElement.Math, MathProp);
 	};
 
 	asc_docs_api.prototype.SetDrawingFreeze = function(bIsFreeze)
@@ -4855,6 +4857,45 @@ background-repeat: no-repeat;\
 		// Меняем тип состояния (на никакое)
 		this.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.None;
 	};
+
+
+	asc_docs_api.prototype.asc_AddMath = function(Type)
+	{
+		var loader   = AscCommon.g_font_loader;
+		var fontinfo = g_fontApplication.GetFontInfo("Cambria Math");
+		var isasync  = loader.LoadFont(fontinfo);
+		if (false === isasync)
+		{
+			return this.asc_AddMath2(Type);
+		}
+		else
+		{
+			this.asyncMethodCallback = function()
+			{
+				return this.asc_AddMath2(Type);
+			}
+		}
+	};
+
+	asc_docs_api.prototype.asc_AddMath2 = function(Type)
+	{
+		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+		{
+			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddMath);
+			var MathElement = new AscCommonWord.MathMenu(Type);
+			this.WordControl.m_oLogicDocument.Paragraph_Add(MathElement, false);
+		}
+	};
+
+	//----------------------------------------------------------------------------------------------------------------------
+	// Работаем с формулами
+	//----------------------------------------------------------------------------------------------------------------------
+	asc_docs_api.prototype.asc_SetMathProps = function(MathProps)
+	{
+		this.WordControl.m_oLogicDocument.Set_MathProps(MathProps);
+	};
+
+
 
 	asc_docs_api.prototype.asyncFontEndLoaded = function(fontinfo)
 	{
@@ -6878,6 +6919,10 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_InputClearKeyboardElement"]       = asc_docs_api.prototype.asc_InputClearKeyboardElement;
 
 	asc_docs_api.prototype["asc_getCurrentFocusObject"]           = asc_docs_api.prototype.asc_getCurrentFocusObject;
+	asc_docs_api.prototype["asc_AddMath"]           			  = asc_docs_api.prototype.asc_AddMath;
+	asc_docs_api.prototype["asc_SetMathProps"]           		  = asc_docs_api.prototype.asc_SetMathProps;
+
+
 
 
 	window['Asc']['asc_CCommentData'] = window['Asc'].asc_CCommentData = asc_CCommentData;

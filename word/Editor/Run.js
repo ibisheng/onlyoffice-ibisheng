@@ -6115,13 +6115,18 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
             var StyleId = this.Paragraph.Style_Get();
             // скопируем текстовые настройки прежде чем подменим на пустые
 
+			var MathFont = {Name : "Cambria Math", Index : -1};
+			var oShapeStyle = null, oShapeTextPr = null;;
             if(Styles && typeof Styles.lastId === "string")
             {
                 StyleId = Styles.lastId;
                 Styles = Styles.styles;
+				oShapeStyle = Styles.Get(StyleId);
+				oShapeTextPr = oShapeStyle.TextPr.Copy();
+				oShapeStyle.TextPr.RFonts.Merge({Ascii: MathFont});
             }
             var StyleDefaultTextPr = Styles.Default.TextPr.Copy();
-            var MathFont = {Name : "Cambria Math", Index : -1};
+            
 
             // Ascii - по умолчанию шрифт Cambria Math
             // hAnsi, eastAsia, cs - по умолчанию шрифты не Cambria Math, а те, которые компилируются в документе
@@ -6134,6 +6139,10 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
 
             // подменяем обратно
             Styles.Default.TextPr = StyleDefaultTextPr;
+			if(oShapeStyle && oShapeTextPr)
+			{
+				oShapeStyle.TextPr = oShapeTextPr;
+			}
         }
 
 

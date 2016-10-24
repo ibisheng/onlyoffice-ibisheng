@@ -2237,6 +2237,26 @@ var editor;
     sendCommand(this, null, rData);
   };
 
+
+  spreadsheet_api.prototype.asc_AddMath = function(Type)
+  {
+    var t = this, fonts = {};
+    fonts["Cambria Math"] = 1;
+    t._loadFonts(fonts, function() {t.asc_AddMath2(Type);});
+  };
+
+  spreadsheet_api.prototype.asc_AddMath2 = function(Type)
+  {
+    var ws = this.wb.getWorksheet();
+    var ret = ws.objectRender.addMath(Type);
+  };
+
+  spreadsheet_api.prototype.asc_SetMathProps = function(MathProps)
+  {
+    var ws = this.wb.getWorksheet();
+    var ret = ws.objectRender.setMathProps(MathProps);
+  };
+
   spreadsheet_api.prototype.asc_showImageFileDialog = function() {
     // ToDo заменить на общую функцию для всех
     this.asc_addImage();
@@ -3499,6 +3519,9 @@ var editor;
   prot["asc_putLineSpacingBeforeAfter"] = prot.asc_putLineSpacingBeforeAfter;
   prot["asc_setDrawImagePlaceParagraph"] = prot.asc_setDrawImagePlaceParagraph;
   prot["asc_changeShapeImageFromFile"] = prot.asc_changeShapeImageFromFile;
+  prot["asc_AddMath"] = prot.asc_AddMath;
+  prot["asc_SetMathProps"] = prot.asc_SetMathProps;
+  //----------------------------------------------------------------------------------------------------------------------
 
   // Frozen pane
   prot["asc_freezePane"] = prot.asc_freezePane;
