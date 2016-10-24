@@ -1758,7 +1758,8 @@ DrawingObjectsController.prototype =
                 this.checkSelectedObjectsAndCallback(function(){
                     var oContent2 = this.getTargetDocContent(true);
                     if(oContent2){
-                        var SelectedInfo = oContent2.Get_SelectedElementsInfo();
+                        var SelectedInfo = new CSelectedElementsInfo();
+                        oContent2.Get_SelectedElementsInfo(SelectedInfo);
                         if (null !== SelectedInfo.Get_Math()){
                             var ParaMath = SelectedInfo.Get_Math();
                             ParaMath.Set_MenuProps(oMathProps);
