@@ -340,7 +340,7 @@
 			}
 		};
 
-		Range.prototype.forShift = function(bbox, offset) {
+		Range.prototype.forShift = function(bbox, offset, bUndo) {
 			var isNoDelete = true;
 			var isHor = 0 != offset.offsetCol;
 			var toDelete = offset.offsetCol < 0 || offset.offsetRow < 0;
@@ -355,14 +355,16 @@
 						}
 					} else if (this.c1 <= bbox.c2) {
 						if (this.c2 <= bbox.c2) {
-							var topIn = bbox.r1 <= this.r1 && this.r1 <= bbox.r2;
-							var bottomIn = bbox.r1 <= this.r2 && this.r2 <= bbox.r2;
-							if (topIn && bottomIn) {
-								isNoDelete = false;
-							} else if (topIn) {
-								this.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r2 - this.r1 + 1});
-							} else if (bottomIn) {
-								this.setOffsetLast({offsetCol: 0, offsetRow: bbox.r1 - this.r2 - 1});
+							if(!bUndo){
+								var topIn = bbox.r1 <= this.r1 && this.r1 <= bbox.r2;
+								var bottomIn = bbox.r1 <= this.r2 && this.r2 <= bbox.r2;
+								if (topIn && bottomIn) {
+									isNoDelete = false;
+								} else if (topIn) {
+									this.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r2 - this.r1 + 1});
+								} else if (bottomIn) {
+									this.setOffsetLast({offsetCol: 0, offsetRow: bbox.r1 - this.r2 - 1});
+								}
 							}
 						} else {
 							this.setOffsetFirst({offsetCol: bbox.c1 - this.c1, offsetRow: 0});
@@ -388,14 +390,16 @@
 						}
 					} else if (this.r1 <= bbox.r2) {
 						if (this.r2 <= bbox.r2) {
-							var leftIn = bbox.c1 <= this.c1 && this.c1 <= bbox.c2;
-							var rightIn = bbox.c1 <= this.c2 && this.c2 <= bbox.c2;
-							if (leftIn && rightIn) {
-								isNoDelete = false;
-							} else if (leftIn) {
-								this.setOffsetFirst({offsetCol: bbox.c2 - this.c1 + 1, offsetRow: 0});
-							} else if (rightIn) {
-								this.setOffsetLast({offsetCol: bbox.c1 - this.c2 - 1, offsetRow: 0});
+							if(!bUndo) {
+								var leftIn = bbox.c1 <= this.c1 && this.c1 <= bbox.c2;
+								var rightIn = bbox.c1 <= this.c2 && this.c2 <= bbox.c2;
+								if (leftIn && rightIn) {
+									isNoDelete = false;
+								} else if (leftIn) {
+									this.setOffsetFirst({offsetCol: bbox.c2 - this.c1 + 1, offsetRow: 0});
+								} else if (rightIn) {
+									this.setOffsetLast({offsetCol: bbox.c1 - this.c2 - 1, offsetRow: 0});
+								}
 							}
 						} else {
 							this.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r1 - this.r1});

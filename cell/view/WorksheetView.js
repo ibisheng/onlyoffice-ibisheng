@@ -1171,7 +1171,7 @@
         this._initWorksheetDefaultWidth();
         this._initPane();
         this._initCellsArea( true );
-        this.af_setStyleAfterOpen();
+        this.model.setTableStyleAfterOpen();
         this._cleanCellsTextMetricsCache();
         this._prepareCellTextMetricsCache();
 

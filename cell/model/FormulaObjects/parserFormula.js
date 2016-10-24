@@ -1716,20 +1716,20 @@ cStrucTable.prototype._createArea = function ( val, opt_bbox ) {
 			this.colStartIndex = this.wb.getTableIndexColumnByName( this.tableName, this.colStart );
 			this.colEndIndex = this.wb.getTableIndexColumnByName( this.tableName, this.colEnd );
 			if( !this.colStartIndex && !this.colEndIndex ){
-				return this.area =  new cError( cErrorType.bad_reference );
+				return this._createAreaError(paramObj);
 			}
     } else {
             paramObj.startCol = this.oneColumn = val['oneColumn'].replace(/'#/g,"#");
 			this.oneColumnIndex = this.wb.getTableIndexColumnByName( this.tableName, this.oneColumn );
 			if( !this.oneColumnIndex ){
-				return this.area = new cError( cErrorType.bad_reference );
+				return this._createAreaError(paramObj);
 			}
         }
 
         var tableData = this.wb.getTableRangeForFormula( this.tableName, paramObj );
 
         if ( !tableData ) {
-            return this.area = new cError( cErrorType.bad_reference );
+			return this._createAreaError(paramObj);
         }
 		if( tableData.range ){
 			this.area = tableData.range.isOneCell() ?
@@ -1747,7 +1747,7 @@ cStrucTable.prototype._createArea = function ( val, opt_bbox ) {
 
         tableData = this.wb.getTableRangeForFormula( this.tableName, paramObj );
         if ( !tableData ) {
-			return this.area = new cError( cErrorType.bad_reference );
+			return this._createAreaError(paramObj);
         }
 		if( tableData.range ){
 			this.area = tableData.range.isOneCell() ?
@@ -1771,7 +1771,7 @@ cStrucTable.prototype._createArea = function ( val, opt_bbox ) {
             data = this.wb.getTableRangeForFormula( this.tableName, paramObj );
 
             if ( !data ) {
-				return this.area = new cError( cErrorType.bad_reference );
+				return this._createAreaError(paramObj);
             }
 
             if ( range ) {
@@ -1789,7 +1789,7 @@ cStrucTable.prototype._createArea = function ( val, opt_bbox ) {
 			this.hdtcstartIndex = this.wb.getTableIndexColumnByName( this.tableName, this.hdtcstart );
 
 			if( !this.hdtcstartIndex ){
-				return this.area =  new cError( cErrorType.bad_reference );
+				return this._createAreaError(paramObj);
 			}
 
             if ( this.hdtcend ) {
@@ -1798,7 +1798,7 @@ cStrucTable.prototype._createArea = function ( val, opt_bbox ) {
 				this.hdtcendIndex = this.wb.getTableIndexColumnByName( this.tableName, this.hdtcend );
 
 				if( !this.hdtcendIndex ){
-					return this.area =  new cError( cErrorType.bad_reference );
+					return this._createAreaError(paramObj);
 				}
 
             }
@@ -1811,7 +1811,7 @@ cStrucTable.prototype._createArea = function ( val, opt_bbox ) {
             data = this.wb.getTableRangeForFormula( this.tableName, paramObj );
 
             if ( !data ) {
-              return this.area = new cError( cErrorType.bad_reference );
+				return this._createAreaError(paramObj);
             }
             range = data.range;
           }
@@ -1830,6 +1830,13 @@ cStrucTable.prototype._createArea = function ( val, opt_bbox ) {
     !this.area ? this.area = new cError( cErrorType.bad_reference ) : null;
 	return this.area;
 };
+	cStrucTable.prototype._createAreaError = function (paramObj) {
+		if(AscCommon.FormulaTablePartInfo.thisRow == paramObj.param){
+			return this.area = new cError( cErrorType.wrong_value_type );
+		} else {
+			return this.area = new cError( cErrorType.bad_reference );
+		}
+	};
 cStrucTable.prototype._buildLocalTableString = function (reservedColumn,local) {
   return parserHelp.getColumnNameByType(reservedColumn, local);
 };
@@ -4790,7 +4797,7 @@ parserFormula.prototype.calculate = function(opt_defName, opt_range) {
 					_cellsBbox = elem.getBBox0();
 				}
 			}
-			if (_cellsRange) {
+			if (_cellsRange || _cellsBbox) {
 				var isIntersect;
 				if (AscCommon.c_oNotifyType.Shift == notifyType) {
 					isIntersect = bbox.isIntersectForShift(_cellsBbox, offset);
@@ -4802,7 +4809,7 @@ parserFormula.prototype.calculate = function(opt_defName, opt_range) {
 				if (isIntersect) {
 					var isNoDelete;
 					if (AscCommon.c_oNotifyType.Shift == notifyType) {
-						isNoDelete = _cellsBbox.forShift(bbox, offset);
+						isNoDelete = _cellsBbox.forShift(bbox, offset, this.wb.bUndoChanges);
 					} else if (AscCommon.c_oNotifyType.Move == notifyType) {
 						_cellsBbox.setOffset(offset);
 						isNoDelete = true;
@@ -4811,18 +4818,20 @@ parserFormula.prototype.calculate = function(opt_defName, opt_range) {
 							isNoDelete = false;
 						} else {
 							isNoDelete = true;
-							var ltIn = bbox.contains(_cellsBbox.c1, _cellsBbox.r1);
-							var rtIn = bbox.contains(_cellsBbox.c2, _cellsBbox.r1);
-							var lbIn = bbox.contains(_cellsBbox.c1, _cellsBbox.r2);
-							var rbIn = bbox.contains(_cellsBbox.c2, _cellsBbox.r2);
-							if (ltIn && rtIn && bbox.r1 != _cellsBbox.r1) {
-								_cellsBbox.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r2 - _cellsBbox.r1 + 1});
-							} else if (rtIn && rbIn && bbox.c2 != _cellsBbox.c2) {
-								_cellsBbox.setOffsetLast({offsetCol: bbox.c1 - _cellsBbox.c2 - 1, offsetRow: 0});
-							} else if (rbIn && lbIn && bbox.r2 != _cellsBbox.r2) {
-								_cellsBbox.setOffsetLast({offsetCol: 0, offsetRow: bbox.r1 - _cellsBbox.r2 - 1});
-							} else if (lbIn && ltIn && bbox.c1 != _cellsBbox.c1) {
-								_cellsBbox.setOffsetFirst({offsetCol: bbox.c2 - _cellsBbox.c1 + 1, offsetRow: 0});
+							if (!this.wb.bUndoChanges) {
+								var ltIn = bbox.contains(_cellsBbox.c1, _cellsBbox.r1);
+								var rtIn = bbox.contains(_cellsBbox.c2, _cellsBbox.r1);
+								var lbIn = bbox.contains(_cellsBbox.c1, _cellsBbox.r2);
+								var rbIn = bbox.contains(_cellsBbox.c2, _cellsBbox.r2);
+								if (ltIn && rtIn && bbox.r1 != _cellsBbox.r1) {
+									_cellsBbox.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r2 - _cellsBbox.r1 + 1});
+								} else if (rtIn && rbIn && bbox.c2 != _cellsBbox.c2) {
+									_cellsBbox.setOffsetLast({offsetCol: bbox.c1 - _cellsBbox.c2 - 1, offsetRow: 0});
+								} else if (rbIn && lbIn && bbox.r2 != _cellsBbox.r2) {
+									_cellsBbox.setOffsetLast({offsetCol: 0, offsetRow: bbox.r1 - _cellsBbox.r2 - 1});
+								} else if (lbIn && ltIn && bbox.c1 != _cellsBbox.c1) {
+									_cellsBbox.setOffsetFirst({offsetCol: bbox.c2 - _cellsBbox.c1 + 1, offsetRow: 0});
+								}
 							}
 						}
 					}
@@ -5074,8 +5083,10 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
 				continue;
 			}
 
-			if (ref.type == cElementType.name || ref.type == cElementType.name3D) {
+			if (ref.type == cElementType.name) {
 				this.wb.dependencyFormulas.startListeningDefName(ref.value, this);
+			} else if (ref.type == cElementType.name3D) {
+				this.wb.dependencyFormulas.startListeningDefName(ref.value, this, ref.ws.getId());
 			} else if ((cElementType.cell === ref.type || cElementType.cell3D === ref.type ||
 				cElementType.cellsRange === ref.type) && ref.isValid()) {
 				this.wb.dependencyFormulas.startListeningRange(ref.getWsId(), ref.getRange().getBBox0(), this);
@@ -5114,8 +5125,10 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
 				continue;
 			}
 
-			if (ref.type == cElementType.name || ref.type == cElementType.name3D) {
+			if (ref.type == cElementType.name) {
 				this.wb.dependencyFormulas.endListeningDefName(ref.value, this);
+			} else if (ref.type == cElementType.name3D) {
+				this.wb.dependencyFormulas.endListeningDefName(ref.value, this, ref.ws.getId());
 			} else if ((cElementType.cell === ref.type || cElementType.cell3D === ref.type ||
 				cElementType.cellsRange === ref.type) && ref.isValid()) {
 				this.wb.dependencyFormulas.endListeningRange(ref.getWsId(), ref.getRange().getBBox0(), this);

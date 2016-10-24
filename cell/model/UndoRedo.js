@@ -417,8 +417,6 @@ var UndoRedoDataTypes = new function() {
     this.ColorFilter = 38;
 
     this.DefinedName = 39;
-    this.DefinedNamesChange = 40;
-
 
 	this.SheetViewSettings = 43;
     this.GlobalTableIdAdd = 44;
@@ -521,8 +519,6 @@ var UndoRedoDataTypes = new function() {
             case this.ParagraphParaItemAdd: return new UndoRedoData_historyitem_Paragraph_AddItem();
 
             case this.DefinedName: return new UndoRedoData_DefinedNames();
-            case this.DefinedNamesChange: return new UndoRedoData_DefinedNamesChange();
-
         }
 		return null;
 	};
@@ -1640,19 +1636,17 @@ UndoRedoData_SheetPositions.prototype = {
 };
 
 var g_oUndoRedoData_DefinedNamesProperties = {
-    Name: 0,
-    Ref:1,
-    LocalSheetId:2,
-    slaveEdge:3,
+    name: 0,
+    ref:1,
+    sheetId:2,
     isTable:4
 };
-function UndoRedoData_DefinedNames(name, ref, scope, isTable, slaveEdge){
+function UndoRedoData_DefinedNames(name, ref, sheetId, isTable){
     this.Properties = g_oUndoRedoData_DefinedNamesProperties;
-    this.Name = name;
-    this.Ref = ref;
-    this.LocalSheetId = scope;
+    this.name = name;
+    this.ref = ref;
+    this.sheetId = sheetId;
     this.isTable = isTable;
-    this.slaveEdge = slaveEdge;
 }
 UndoRedoData_DefinedNames.prototype = {
     getType : function()
@@ -1667,11 +1661,10 @@ UndoRedoData_DefinedNames.prototype = {
     {
         switch(nType)
         {
-            case this.Properties.Name: return this.Name;break;
-            case this.Properties.Ref: return this.Ref;break;
-            case this.Properties.LocalSheetId: return this.LocalSheetId;break;
+            case this.Properties.name: return this.name;break;
+            case this.Properties.ref: return this.ref;break;
+            case this.Properties.sheetId: return this.sheetId;break;
             case this.Properties.isTable: return this.isTable;break;
-            case this.Properties.slaveEdge: return this.slaveEdge;break;
         }
         return null;
     },
@@ -1679,48 +1672,10 @@ UndoRedoData_DefinedNames.prototype = {
     {
         switch(nType)
         {
-            case this.Properties.Name: this.Name = value;break;
-            case this.Properties.Ref: this.Ref = value;break;
-            case this.Properties.LocalSheetId: this.LocalSheetId = value;break;
+            case this.Properties.name: this.name = value;break;
+            case this.Properties.ref: this.ref = value;break;
+            case this.Properties.sheetId: this.sheetId = value;break;
             case this.Properties.isTable: this.isTable = value;break;
-            case this.Properties.slaveEdge: this.slaveEdge = value;break;
-        }
-    }
-};
-
-var g_oUndoRedoData_DefinedNamesChangeProperties = {
-    oldName: 0,
-    newName:1
-};
-function UndoRedoData_DefinedNamesChange(oldName, newName){
-    this.Properties = g_oUndoRedoData_DefinedNamesChangeProperties;
-    this.oldName = oldName?new UndoRedoData_DefinedNames(oldName.Name, oldName.Ref, oldName.LocalSheetId, oldName.isTable, null):undefined;
-    this.newName = newName?new UndoRedoData_DefinedNames(newName.Name, newName.Ref, newName.LocalSheetId, newName.isTable, null):undefined;
-}
-UndoRedoData_DefinedNamesChange.prototype = {
-    getType : function()
-    {
-        return UndoRedoDataTypes.DefinedNamesChange;
-    },
-    getProperties : function()
-    {
-        return this.Properties;
-    },
-    getProperty : function(nType)
-    {
-        switch(nType)
-        {
-            case this.Properties.oldName: return this.oldName;break;
-            case this.Properties.newName: return this.newName;break;
-        }
-        return null;
-    },
-    setProperty : function(nType, value)
-    {
-        switch(nType)
-        {
-            case this.Properties.oldName: this.oldName = value;break;
-            case this.Properties.newName: this.newName = value;break;
         }
     }
 };
@@ -3013,21 +2968,21 @@ UndoRedoWorkbook.prototype = {
 		else if (AscCH.historyitem_Workbook_DefinedNamesChange === Type || AscCH.historyitem_Workbook_DefinedNamesChangeUndo === Type) {
 			var oldName, newName;
 			if (bUndo) {
-				oldName = Data.newName;
-				newName = Data.oldName;
+				oldName = Data.to;
+				newName = Data.from;
 			} else {
 				if (wb.bCollaborativeChanges) {
 					wb.handlers.trigger("asc_onLockDefNameManager", Asc.c_oAscDefinedNameReason.OK);
 				}
-				oldName = Data.oldName;
-				newName = Data.newName;
+				oldName = Data.from;
+				newName = Data.to;
 			}
 			if (bUndo || AscCH.historyitem_Workbook_DefinedNamesChangeUndo !== Type) {
 				if (null == newName) {
-					wb.delDefinesNames(oldName);
+					wb.delDefinesNamesUndoRedo(oldName);
 					wb.handlers.trigger("asc_onDelDefName")
 				} else {
-					wb.editDefinesNames(oldName, newName);
+					wb.editDefinesNamesUndoRedo(oldName, newName);
 					wb.handlers.trigger("asc_onEditDefName", oldName, newName);
 				}
 			}
@@ -3926,7 +3881,6 @@ UndoRedoAutoFilters.prototype = {
 	window['AscCommonExcel'].UndoRedoData_SheetRemove = UndoRedoData_SheetRemove;
 	window['AscCommonExcel'].UndoRedoData_SheetPositions = UndoRedoData_SheetPositions;
 	window['AscCommonExcel'].UndoRedoData_DefinedNames = UndoRedoData_DefinedNames;
-	window['AscCommonExcel'].UndoRedoData_DefinedNamesChange = UndoRedoData_DefinedNamesChange;
 	window['AscCommonExcel'].UndoRedoData_ClrScheme = UndoRedoData_ClrScheme;
 	window['AscCommonExcel'].UndoRedoData_AutoFilter = UndoRedoData_AutoFilter;
 	window['AscCommonExcel'].UndoRedoData_SingleProperty = UndoRedoData_SingleProperty;
