@@ -1005,10 +1005,15 @@
 		}
 		return sString;
 	}
+	function GetHistoryClassTypeByChangeType(nChangeType)
+	{
+		return (nChangeType >> 16) & 0x0000FFFF;
+	}
 
 	//------------------------------------------------------------export--------------------------------------------------
-	window['AscDFH']                                   = window['AscDFH'] || {};
+	window['AscDFH']                                  = window['AscDFH'] || {};
 	window['AscDFH'].GetHistoryPointStringDescription = GetHistoryPointStringDescription;
+	window['AscDFH'].GetHistoryClassTypeByChangeType  = GetHistoryClassTypeByChangeType;
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -2843,4 +2848,122 @@
 	window['AscDFH'].historydescription_Document_AddPageCount                       = 0x013b;
 	window['AscDFH'].historydescription_Document_AddFootnote                        = 0x013c;
 	window['AscDFH'].historydescription_Document_SetFootnotePr                      = 0x013d;
+
+	/**
+	 * Базовый класс для всех изменений совместного редактирования.
+	 * @constructor
+	 */
+	function CChangesBase(Class)
+	{
+		this.Class = Class;
+	}
+	CChangesBase.prototype.Type = window['AscDFH'].historyitem_Unknown_Unknown;
+	CChangesBase.prototype.Undo = function()
+	{
+		if (this.Class && this.Class.Undo)
+			this.Class.Undo(this);
+	};
+	CChangesBase.prototype.Redo = function()
+	{
+		if (this.Class && this.Class.Redo)
+			this.Class.Redo(this);
+	};
+	CChangesBase.prototype.WriteToBinary = function(Writer)
+	{
+		if (this.Class && this.Class.Save_Changes)
+			this.Class.Save_Changes(this, Writer);
+	};
+	CChangesBase.prototype.ReadFromBinary = function(Reader)
+	{
+
+	};
+	CChangesBase.prototype.Load = function()
+	{
+		// В большинстве случаев загрузка чужого изменения работает как простое Redo
+		this.Redo();
+	};
+	window['AscDFH'].CChangesBase = CChangesBase;
+	/**
+	 * Базовый класс для изменения булевых свойств.
+	 * @constructor
+	 * @extends {AscDFH.CChangesBase}
+	 */
+	function CChangesBaseBoolProperty(Class, Old, New)
+	{
+		CChangesBaseBoolProperty.superclass.constructor.call(this, Class);
+
+		this.Color = false;
+		this.Old   = Old;
+		this.New   = New;
+	}
+	AscCommon.extendClass(CChangesBase, CChangesBaseBoolProperty);
+	CChangesBaseBoolProperty.prototype.Undo = function()
+	{
+		this.private_SetValue(this.Old);
+	};
+	CChangesBaseBoolProperty.prototype.Redo = function()
+	{
+		this.private_SetValue(this.New);
+	};
+	CChangesBaseBoolProperty.prototype.WriteToBinary = function(Writer)
+	{
+		// Long  : Flag
+		// 1-bit : Подсвечивать ли данные изменения
+		// 2-bit : IsUndefined New
+		// 3-bit : New value
+		// 4-bit : IsUndefined Old
+		// 5-bit : Old value
+
+		var nFlags = 0;
+
+		if (false !== this.Color)
+			nFlags |= 1;
+
+		if (undefined === this.New)
+			nFlags |= 2;
+		else if (true === this.New)
+			nFlags |= 4;
+
+		if (undefined === this.Old)
+			nFlags |= 8;
+		else if (true === this.Old)
+			nFlags |= 16;
+
+		Writer.WriteLong(nFlags);
+	};
+	CChangesBaseBoolProperty.prototype.ReadFromBinary = function(Reader)
+	{
+		// Long  : Flag
+		// 1-bit : Подсвечивать ли данные изменения
+		// 2-bit : IsUndefined New
+		// 3-bit : New value
+		// 4-bit : IsUndefined Old
+		// 5-bit : Old value
+
+		var nFlags = Reader.GetLong();
+
+		if (nFlags & 1)
+			this.Color = true;
+		else
+			this.Color = false;
+
+		if (nFlags & 2)
+			this.New = undefined;
+		else if (nFlags & 4)
+			this.New = true;
+		else
+			this.New = false;
+
+		if (nFlags & 8)
+			this.Old = undefined;
+		else if (nFlags & 16)
+			this.Old = true;
+		else
+			this.Old = false;
+	};
+	CChangesBaseBoolProperty.prototype.private_SetValue = function(Value)
+	{
+		// Эту функцию нужно переопределить в дочернем классе
+	};
+	window['AscDFH'].CChangesBaseBoolProperty = CChangesBaseBoolProperty;
 })(window);

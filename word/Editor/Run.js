@@ -7300,32 +7300,6 @@ ParaRun.prototype.Undo = function(Data)
 
     switch ( Type )
     {
-        case AscDFH.historyitem_ParaRun_AddItem :
-        {
-            this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
-
-            this.RecalcInfo.Measure = true;
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeContent(false);
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RemoveItem :
-        {
-            var Pos = Data.Pos;
-
-            var Array_start = this.Content.slice( 0, Pos );
-            var Array_end   = this.Content.slice( Pos );
-
-            this.Content = Array_start.concat( Data.Items, Array_end );
-
-            this.RecalcInfo.Measure = true;
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeContent(false);
-
-            break;
-        }
 
         case AscDFH.historyitem_ParaRun_TextPr:
         {
@@ -7747,31 +7721,6 @@ ParaRun.prototype.Redo = function(Data)
 
     switch ( Type )
     {
-        case  AscDFH.historyitem_ParaRun_AddItem:
-        {
-            var Pos = Data.Pos;
-
-            var Array_start = this.Content.slice( 0, Pos );
-            var Array_end   = this.Content.slice( Pos );
-
-            this.Content = Array_start.concat( Data.Items, Array_end );
-
-            this.RecalcInfo.Measure = true;
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeContent(false);
-            break;
-
-        }
-
-        case AscDFH.historyitem_ParaRun_RemoveItem:
-        {
-            this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
-
-            this.RecalcInfo.Measure = true;
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeContent(false);
-            break;
-        }
 
         case AscDFH.historyitem_ParaRun_TextPr:
         {
@@ -8212,77 +8161,6 @@ ParaRun.prototype.Save_Changes = function(Data, Writer)
 
     switch ( Type )
     {
-        case AscDFH.historyitem_ParaRun_AddItem:
-        {
-            // Bool     : Подсвечивать ли данные изменения
-            // Long     : Количество элементов
-            // Array of :
-            //  {
-            //    Long     : Позиция
-            //    Variable : Элемент
-            //  }
-
-            var bArray = Data.UseArray;
-            var Count  = Data.Items.length;
-
-            if (false === Data.Color)
-                Writer.WriteBool(false);
-            else
-                Writer.WriteBool(true);
-
-            Writer.WriteLong( Count );
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                if ( true === bArray )
-                    Writer.WriteLong( Data.PosArray[Index] );
-                else
-                    Writer.WriteLong( Data.Pos + Index );
-
-                Data.Items[Index].Write_ToBinary(Writer);
-            }
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RemoveItem:
-        {
-            // Long          : Количество удаляемых элементов
-            // Array of Long : позиции удаляемых элементов
-
-            var bArray = Data.UseArray;
-            var Count  = Data.Items.length;
-
-            var StartPos = Writer.GetCurPosition();
-            Writer.Skip(4);
-            var RealCount = Count;
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                if ( true === bArray )
-                {
-                    if ( false === Data.PosArray[Index] )
-                    {
-                        RealCount--;
-                    }
-                    else
-                    {
-                        Writer.WriteLong(Data.PosArray[Index]);
-                    }
-                }
-                else
-                {
-                    Writer.WriteLong(Data.Pos);
-                }
-            }
-
-            var EndPos = Writer.GetCurPosition();
-            Writer.Seek( StartPos );
-            Writer.WriteLong( RealCount );
-            Writer.Seek( EndPos );
-
-            break;
-        }
-
         case AscDFH.historyitem_ParaRun_TextPr:
         {
             // Bool     : Подсвечивать ли данные изменения
@@ -8822,73 +8700,6 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
     var bColorPrChange = false;
     switch ( Type )
     {
-        case AscDFH.historyitem_ParaRun_AddItem :
-        {
-            // Bool     : Подсвечивать ли данные изменения
-            // Long     : Количество элементов
-            // Array of :
-            //  {
-            //    Long     : Позиция
-            //    Variable : Id Элемента
-            //  }
-
-            var bColorChanges = Reader.GetBool();
-            var Count = Reader.GetLong();
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var Pos     = this.m_oContentChanges.Check( AscCommon.contentchanges_Add, Reader.GetLong() );
-                var Element = ParagraphContent_Read_FromBinary(Reader);
-
-                if ( null != Element )
-                {
-                    if (true === bColorChanges && null !== Color)
-                    {
-                        this.CollaborativeMarks.Update_OnAdd( Pos );
-                        this.CollaborativeMarks.Add( Pos, Pos + 1, Color );
-                        AscCommon.CollaborativeEditing.Add_ChangedClass(this);
-                    }
-
-                    this.Content.splice(Pos, 0, Element);
-                    this.private_UpdatePositionsOnAdd(Pos);
-					this.private_UpdateCompositeInputPositionsOnAdd(Pos);
-                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
-                }
-            }
-
-            this.RecalcInfo.Measure = true;
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeContent(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RemoveItem:
-        {
-            // Long          : Количество удаляемых элементов
-            // Array of Long : позиции удаляемых элементов
-
-            var Count = Reader.GetLong();
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var ChangesPos = this.m_oContentChanges.Check(AscCommon.contentchanges_Remove, Reader.GetLong());
-
-                // действие совпало, не делаем его
-                if (false === ChangesPos)
-                    continue;
-
-                this.CollaborativeMarks.Update_OnRemove(ChangesPos, 1);
-                this.Content.splice(ChangesPos, 1);
-                this.private_UpdatePositionsOnRemove(ChangesPos, 1);
-				this.private_UpdateCompositeInputPositionsOnRemove(ChangesPos, 1);
-                AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
-            }
-
-            this.RecalcInfo.Measure = true;
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeContent(false);
-            break;
-        }
-
         case AscDFH.historyitem_ParaRun_TextPr:
         {
             // CTextPr
