@@ -1411,15 +1411,7 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.asyncFontEndLoaded_MathDraw = function(Obj)
-	{
-		this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
-		Obj.Generate2();
-	};
-	asc_docs_api.prototype.sendMathTypesToMenu         = function(_math)
-	{
-		this.sendEvent("asc_onMathTypes", _math);
-	};
+
 
 	asc_docs_api.prototype.asyncFontEndLoaded_DropCap = function(Obj)
 	{
@@ -6823,7 +6815,7 @@ background-repeat: no-repeat;\
 		if (!this.isViewMode)
 		{
 			this.sendStandartTextures();
-			this.WordControl.m_oDrawingDocument.SendMathToMenu();
+			this.sendMathToMenu();
 
 			if (this.shapeElementId)
 			{

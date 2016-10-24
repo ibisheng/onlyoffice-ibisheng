@@ -7262,6 +7262,46 @@ DrawingObjectsController.prototype =
             }
             this.prepareParagraphProperties(ParaPr, TextPr, ascSelectedObjects);
         }
+        var oTargetDocContent = this.getTargetDocContent(false, false);
+        if(oTargetDocContent)
+        {
+            if (( true === oTargetDocContent.Selection.Use && oTargetDocContent.Selection.StartPos == oTargetDocContent.Selection.EndPos && type_Paragraph == oTargetDocContent.Content[oTargetDocContent.Selection.StartPos].GetType() ) || ( false == oTargetDocContent.Selection.Use && type_Paragraph == oTargetDocContent.Content[oTargetDocContent.CurPos.ContentPos].GetType() ))
+            {
+                var oParagraph;
+                if (true == oTargetDocContent.Selection.Use)
+                    oParagraph = oTargetDocContent.Content[oTargetDocContent.Selection.StartPos];
+                else
+                    oParagraph = oTargetDocContent.Content[oTargetDocContent.CurPos.ContentPos];
+                if ( true === oParagraph.Selection.Use )
+                {
+                    var StartPos = oParagraph.Selection.StartPos;
+                    var EndPos   = oParagraph.Selection.EndPos;
+                    if ( StartPos > EndPos )
+                    {
+                        StartPos = oParagraph.Selection.EndPos;
+                        EndPos   = oParagraph.Selection.StartPos;
+                    }
+
+                    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+                    {
+                        var Element = oParagraph.Content[CurPos];
+
+                        if (true !== Element.Selection_IsEmpty() && (para_Math === Element.Type))
+                        {
+                            ascSelectedObjects.push(new AscCommon.asc_CSelectedObject(Asc.c_oAscTypeSelectElement.Math, Element.Get_MenuProps()));
+                        }
+                    }
+                }
+                else
+                {
+                    var CurType = oParagraph.Content[oParagraph.CurPos.ContentPos].Type;
+                    if (para_Math === CurType)
+                    {
+                        ascSelectedObjects.push(new AscCommon.asc_CSelectedObject(Asc.c_oAscTypeSelectElement.Math, oParagraph.Content[oParagraph.CurPos.ContentPos].Get_MenuProps()));
+                    }
+                }
+            }
+        }
 
         return ascSelectedObjects;
     },
@@ -9201,7 +9241,208 @@ function CollectSettingsFromChart(oChartSpace)
 
 }
 
+    function CMathPainter(_api)
+    {
+        this.Api = _api;
 
+        this.StartLoad = function ()
+        {
+            var loader = AscCommon.g_font_loader;
+            var fontinfo = g_fontApplication.GetFontInfo("Cambria Math");
+            if (undefined === fontinfo)
+            {
+                // нет Cambria Math - нет и формул
+                return;
+            }
+
+            var isasync = loader.LoadFont(fontinfo, this.Api.asyncFontEndLoaded_MathDraw, this);
+
+            if (false === isasync)
+            {
+                this.Generate();
+            }
+        };
+
+        this.Generate2 = function ()
+        {
+            // GENERATE IMAGES & JSON
+            var bTurnOnId = false;
+            if (false === g_oTableId.m_bTurnOff)
+            {
+                g_oTableId.m_bTurnOff = true;
+                bTurnOnId = true;
+            }
+
+            History.TurnOff();
+
+            var _math = new AscCommon.CAscMathCategory();
+
+            var _canvas = document.createElement('canvas');
+
+            var _sizes =
+                [
+                    {w: 25, h: 25}, // Symbols
+                    {w: 50, h: 50}, // Fraction
+                    {w: 50, h: 50}, // Script
+                    {w: 115, h: 55}, // Radical
+                    {w: 60, h: 60}, // Integral
+                    {w: 100, h: 75}, // LargeOperator
+                    {w: 80, h: 75}, // Bracket, //{ w : 150, h : 75 }
+                    {w: 100, h: 50}, // Function
+                    {w: 100, h: 40}, // Accent
+                    {w: 100, h: 60}, // LimitLog
+                    {w: 60, h: 40}, // Operator
+                    {w: 100, h: 70} // Matrix
+                ];
+
+            var _excluded_arr = [c_oAscMathType.Bracket_Custom_5];
+            var _excluded_obj = {};
+            for (var k = 0; k < _excluded_arr.length; k++)
+            {
+                _excluded_obj["" + _excluded_arr[k]] = true;
+            }
+
+            var _types = [];
+            for (var _name in c_oAscMathType)
+            {
+                if (_excluded_obj["" + c_oAscMathType[_name]] !== undefined)
+                    continue;
+
+                _types.push(c_oAscMathType[_name]);
+            }
+            _types.sort(function (a, b)
+            {
+                return a - b;
+            });
+
+            var raster_koef = 1;
+
+            // retina
+            //raster_koef = 2;
+
+            // CREATE image!!!
+            var _total_image = new AscFonts.CRasterHeapTotal();
+            _total_image.CreateFirstChuck(1500 * raster_koef, 5000 * raster_koef);
+
+            _total_image.Chunks[0].FindOnlyEqualHeight = true;
+            _total_image.Chunks[0].CanvasCtx.globalCompositeOperation = "source-over";
+
+            var _types_len = _types.length;
+            for (var t = 0; t < _types_len; t++)
+            {
+                var _type = _types[t];
+                var _category1 = (_type >> 24) & 0xFF;
+                var _category2 = (_type >> 16) & 0xFF;
+                _type &= 0xFFFF;
+
+                if (undefined == _math.Data[_category1])
+                {
+                    _math.Data[_category1] = new AscCommon.CAscMathCategory();
+                    _math.Data[_category1].Id = _category1;
+
+                    _math.Data[_category1].W = _sizes[_category1].w;
+                    _math.Data[_category1].H = _sizes[_category1].h;
+                }
+
+                if (undefined == _math.Data[_category1].Data[_category2])
+                {
+                    _math.Data[_category1].Data[_category2] = new AscCommon.CAscMathCategory();
+                    _math.Data[_category1].Data[_category2].Id = _category2;
+
+                    _math.Data[_category1].Data[_category2].W = _sizes[_category1].w;
+                    _math.Data[_category1].Data[_category2].H = _sizes[_category1].h;
+                }
+
+                var _menuType = new AscCommon.CAscMathType();
+                _menuType.Id = _types[t];
+
+                var _paraMath = new ParaMath();
+                _paraMath.Root.Load_FromMenu(_menuType.Id);
+                _paraMath.Root.Correct_Content(true);
+
+                _paraMath.MathToImageConverter(false, _canvas, _sizes[_category1].w, _sizes[_category1].h, raster_koef);
+
+                var _place = _total_image.Alloc(_canvas.width, _canvas.height);
+                var _x = _place.Line.Height * _place.Index;
+                var _y = _place.Line.Y;
+
+                _menuType.X = _x;
+                _menuType.Y = _y;
+
+                _math.Data[_category1].Data[_category2].Data.push(_menuType);
+
+                _total_image.Chunks[0].CanvasCtx.drawImage(_canvas, _x, _y);
+            }
+
+            var _total_w = _total_image.Chunks[0].CanvasImage.width;
+            var _total_h = _total_image.Chunks[0].LinesFree[0].Y;
+
+            var _total_canvas = document.createElement('canvas');
+            _total_canvas.width = _total_w;
+            _total_canvas.height = _total_h;
+            _total_canvas.getContext('2d').drawImage(_total_image.Chunks[0].CanvasImage, 0, 0);
+
+            var _url_total = _total_canvas.toDataURL("image/png");
+            var _json_formulas = JSON.stringify(_math);
+
+            _canvas = null;
+
+            if (true === bTurnOnId)
+                g_oTableId.m_bTurnOff = false;
+
+            History.TurnOn();
+
+            this.Api.sendMathTypesToMenu(_math);
+        };
+
+        this.Generate = function ()
+        {
+            var _math_json = JSON.parse('{"Id":0,"Data":[{"Id":0,"Data":[{"Id":0,"Data":[{"Id":0,"X":0,"Y":0},{"Id":1,"X":25,"Y":0},{"Id":2,"X":50,"Y":0},{"Id":3,"X":75,"Y":0},{"Id":4,"X":100,"Y":0},{"Id":5,"X":125,"Y":0},{"Id":6,"X":150,"Y":0},{"Id":7,"X":175,"Y":0},{"Id":8,"X":200,"Y":0},{"Id":9,"X":225,"Y":0},{"Id":10,"X":250,"Y":0},{"Id":11,"X":275,"Y":0},{"Id":12,"X":300,"Y":0},{"Id":13,"X":325,"Y":0},{"Id":14,"X":350,"Y":0},{"Id":15,"X":375,"Y":0},{"Id":16,"X":400,"Y":0},{"Id":17,"X":425,"Y":0},{"Id":18,"X":450,"Y":0},{"Id":19,"X":475,"Y":0},{"Id":20,"X":500,"Y":0},{"Id":21,"X":525,"Y":0},{"Id":22,"X":550,"Y":0},{"Id":23,"X":575,"Y":0},{"Id":24,"X":600,"Y":0},{"Id":25,"X":625,"Y":0},{"Id":26,"X":650,"Y":0},{"Id":27,"X":675,"Y":0},{"Id":28,"X":700,"Y":0},{"Id":29,"X":725,"Y":0},{"Id":30,"X":750,"Y":0},{"Id":31,"X":775,"Y":0},{"Id":32,"X":800,"Y":0},{"Id":33,"X":825,"Y":0},{"Id":34,"X":850,"Y":0},{"Id":35,"X":875,"Y":0},{"Id":36,"X":900,"Y":0},{"Id":37,"X":925,"Y":0},{"Id":38,"X":950,"Y":0},{"Id":39,"X":975,"Y":0},{"Id":40,"X":1000,"Y":0},{"Id":41,"X":1025,"Y":0},{"Id":42,"X":1050,"Y":0},{"Id":43,"X":1075,"Y":0},{"Id":44,"X":1100,"Y":0},{"Id":45,"X":1125,"Y":0},{"Id":46,"X":1150,"Y":0},{"Id":47,"X":1175,"Y":0},{"Id":48,"X":1200,"Y":0},{"Id":49,"X":1225,"Y":0},{"Id":50,"X":1250,"Y":0},{"Id":51,"X":1275,"Y":0},{"Id":52,"X":1300,"Y":0},{"Id":53,"X":1325,"Y":0},{"Id":54,"X":1350,"Y":0},{"Id":55,"X":1375,"Y":0}],"W":25,"H":25},{"Id":1,"Data":[{"Id":65536,"X":1400,"Y":0},{"Id":65537,"X":1425,"Y":0},{"Id":65538,"X":1450,"Y":0},{"Id":65539,"X":1475,"Y":0},{"Id":65540,"X":0,"Y":25},{"Id":65541,"X":25,"Y":25},{"Id":65542,"X":50,"Y":25},{"Id":65543,"X":75,"Y":25},{"Id":65544,"X":100,"Y":25},{"Id":65545,"X":125,"Y":25},{"Id":65546,"X":150,"Y":25},{"Id":65547,"X":175,"Y":25},{"Id":65548,"X":200,"Y":25},{"Id":65549,"X":225,"Y":25},{"Id":65550,"X":250,"Y":25},{"Id":65551,"X":275,"Y":25},{"Id":65552,"X":300,"Y":25},{"Id":65553,"X":325,"Y":25},{"Id":65554,"X":350,"Y":25},{"Id":65555,"X":375,"Y":25},{"Id":65556,"X":400,"Y":25},{"Id":65557,"X":425,"Y":25},{"Id":65558,"X":450,"Y":25},{"Id":65559,"X":475,"Y":25},{"Id":65560,"X":500,"Y":25},{"Id":65561,"X":525,"Y":25},{"Id":65562,"X":550,"Y":25},{"Id":65563,"X":575,"Y":25},{"Id":65564,"X":600,"Y":25},{"Id":65565,"X":625,"Y":25}],"W":25,"H":25},{"Id":2,"Data":[{"Id":131072,"X":650,"Y":25},{"Id":131073,"X":675,"Y":25},{"Id":131074,"X":700,"Y":25},{"Id":131075,"X":725,"Y":25},{"Id":131076,"X":750,"Y":25},{"Id":131077,"X":775,"Y":25},{"Id":131078,"X":800,"Y":25},{"Id":131079,"X":825,"Y":25},{"Id":131080,"X":850,"Y":25},{"Id":131081,"X":875,"Y":25},{"Id":131082,"X":900,"Y":25},{"Id":131083,"X":925,"Y":25},{"Id":131084,"X":950,"Y":25},{"Id":131085,"X":975,"Y":25},{"Id":131086,"X":1000,"Y":25},{"Id":131087,"X":1025,"Y":25},{"Id":131088,"X":1050,"Y":25},{"Id":131089,"X":1075,"Y":25},{"Id":131090,"X":1100,"Y":25},{"Id":131091,"X":1125,"Y":25},{"Id":131092,"X":1150,"Y":25},{"Id":131093,"X":1175,"Y":25},{"Id":131094,"X":1200,"Y":25},{"Id":131095,"X":1225,"Y":25}],"W":25,"H":25}],"W":25,"H":25},{"Id":1,"Data":[{"Id":0,"Data":[{"Id":16777216,"X":0,"Y":50},{"Id":16777217,"X":50,"Y":50},{"Id":16777218,"X":100,"Y":50},{"Id":16777219,"X":150,"Y":50}],"W":50,"H":50},{"Id":1,"Data":[{"Id":16842752,"X":200,"Y":50},{"Id":16842753,"X":250,"Y":50},{"Id":16842754,"X":300,"Y":50},{"Id":16842755,"X":350,"Y":50},{"Id":16842756,"X":400,"Y":50}],"W":50,"H":50}],"W":50,"H":50},{"Id":2,"Data":[{"Id":0,"Data":[{"Id":33554432,"X":450,"Y":50},{"Id":33554433,"X":500,"Y":50},{"Id":33554434,"X":550,"Y":50},{"Id":33554435,"X":600,"Y":50}],"W":50,"H":50},{"Id":1,"Data":[{"Id":33619968,"X":650,"Y":50},{"Id":33619969,"X":700,"Y":50},{"Id":33619970,"X":750,"Y":50},{"Id":33619971,"X":800,"Y":50}],"W":50,"H":50}],"W":50,"H":50},{"Id":3,"Data":[{"Id":0,"Data":[{"Id":50331648,"X":0,"Y":100},{"Id":50331649,"X":115,"Y":100},{"Id":50331650,"X":230,"Y":100},{"Id":50331651,"X":345,"Y":100}],"W":115,"H":55},{"Id":1,"Data":[{"Id":50397184,"X":460,"Y":100},{"Id":50397185,"X":575,"Y":100}],"W":115,"H":55}],"W":115,"H":55},{"Id":4,"Data":[{"Id":0,"Data":[{"Id":67108864,"X":690,"Y":100},{"Id":67108865,"X":805,"Y":100},{"Id":67108866,"X":920,"Y":100},{"Id":67108867,"X":1035,"Y":100},{"Id":67108868,"X":1150,"Y":100},{"Id":67108869,"X":1265,"Y":100},{"Id":67108870,"X":1380,"Y":100},{"Id":67108871,"X":0,"Y":215},{"Id":67108872,"X":60,"Y":215}],"W":60,"H":60},{"Id":1,"Data":[{"Id":67174400,"X":120,"Y":215},{"Id":67174401,"X":180,"Y":215},{"Id":67174402,"X":240,"Y":215},{"Id":67174403,"X":300,"Y":215},{"Id":67174404,"X":360,"Y":215},{"Id":67174405,"X":420,"Y":215},{"Id":67174406,"X":480,"Y":215},{"Id":67174407,"X":540,"Y":215},{"Id":67174408,"X":600,"Y":215}],"W":60,"H":60},{"Id":2,"Data":[{"Id":67239936,"X":660,"Y":215},{"Id":67239937,"X":720,"Y":215},{"Id":67239938,"X":780,"Y":215}],"W":60,"H":60}],"W":60,"H":60},{"Id":5,"Data":[{"Id":0,"Data":[{"Id":83886080,"X":0,"Y":275},{"Id":83886081,"X":100,"Y":275},{"Id":83886082,"X":200,"Y":275},{"Id":83886083,"X":300,"Y":275},{"Id":83886084,"X":400,"Y":275}],"W":100,"H":75},{"Id":1,"Data":[{"Id":83951616,"X":500,"Y":275},{"Id":83951617,"X":600,"Y":275},{"Id":83951618,"X":700,"Y":275},{"Id":83951619,"X":800,"Y":275},{"Id":83951620,"X":900,"Y":275},{"Id":83951621,"X":1000,"Y":275},{"Id":83951622,"X":1100,"Y":275},{"Id":83951623,"X":1200,"Y":275},{"Id":83951624,"X":1300,"Y":275},{"Id":83951625,"X":1400,"Y":275}],"W":100,"H":75},{"Id":2,"Data":[{"Id":84017152,"X":0,"Y":375},{"Id":84017153,"X":100,"Y":375},{"Id":84017154,"X":200,"Y":375},{"Id":84017155,"X":300,"Y":375},{"Id":84017156,"X":400,"Y":375},{"Id":84017157,"X":500,"Y":375},{"Id":84017158,"X":600,"Y":375},{"Id":84017159,"X":700,"Y":375},{"Id":84017160,"X":800,"Y":375},{"Id":84017161,"X":900,"Y":375}],"W":100,"H":75},{"Id":3,"Data":[{"Id":84082688,"X":1000,"Y":375},{"Id":84082689,"X":1100,"Y":375},{"Id":84082690,"X":1200,"Y":375},{"Id":84082691,"X":1300,"Y":375},{"Id":84082692,"X":1400,"Y":375},{"Id":84082693,"X":0,"Y":475},{"Id":84082694,"X":100,"Y":475},{"Id":84082695,"X":200,"Y":475},{"Id":84082696,"X":300,"Y":475},{"Id":84082697,"X":400,"Y":475}],"W":100,"H":75},{"Id":4,"Data":[{"Id":84148224,"X":500,"Y":475},{"Id":84148225,"X":600,"Y":475},{"Id":84148226,"X":700,"Y":475},{"Id":84148227,"X":800,"Y":475},{"Id":84148228,"X":900,"Y":475}],"W":100,"H":75}],"W":100,"H":75},{"Id":6,"Data":[{"Id":0,"Data":[{"Id":100663296,"X":1000,"Y":475},{"Id":100663297,"X":1100,"Y":475},{"Id":100663298,"X":1200,"Y":475},{"Id":100663299,"X":1300,"Y":475},{"Id":100663300,"X":1400,"Y":475},{"Id":100663301,"X":0,"Y":575},{"Id":100663302,"X":80,"Y":575},{"Id":100663303,"X":160,"Y":575},{"Id":100663304,"X":240,"Y":575},{"Id":100663305,"X":320,"Y":575},{"Id":100663306,"X":400,"Y":575},{"Id":100663307,"X":480,"Y":575}],"W":80,"H":75},{"Id":1,"Data":[{"Id":100728832,"X":560,"Y":575},{"Id":100728833,"X":640,"Y":575},{"Id":100728834,"X":720,"Y":575},{"Id":100728835,"X":800,"Y":575}],"W":80,"H":75},{"Id":2,"Data":[{"Id":100794368,"X":880,"Y":575},{"Id":100794369,"X":960,"Y":575},{"Id":100794370,"X":1040,"Y":575},{"Id":100794371,"X":1120,"Y":575},{"Id":100794372,"X":1200,"Y":575},{"Id":100794373,"X":1280,"Y":575},{"Id":100794374,"X":1360,"Y":575},{"Id":100794375,"X":0,"Y":655},{"Id":100794376,"X":80,"Y":655},{"Id":100794377,"X":160,"Y":655},{"Id":100794378,"X":240,"Y":655},{"Id":100794379,"X":320,"Y":655},{"Id":100794380,"X":400,"Y":655},{"Id":100794381,"X":480,"Y":655},{"Id":100794382,"X":560,"Y":655},{"Id":100794383,"X":640,"Y":655},{"Id":100794384,"X":720,"Y":655},{"Id":100794385,"X":800,"Y":655}],"W":80,"H":75},{"Id":3,"Data":[{"Id":100859904,"X":880,"Y":655},{"Id":100859905,"X":960,"Y":655},{"Id":100859906,"X":1040,"Y":655},{"Id":100859907,"X":1120,"Y":655}],"W":80,"H":75},{"Id":4,"Data":[{"Id":100925441,"X":1200,"Y":655},{"Id":100925442,"X":1280,"Y":655}],"W":80,"H":75}],"W":80,"H":75},{"Id":7,"Data":[{"Id":0,"Data":[{"Id":117440512,"X":0,"Y":735},{"Id":117440513,"X":100,"Y":735},{"Id":117440514,"X":200,"Y":735},{"Id":117440515,"X":300,"Y":735},{"Id":117440516,"X":400,"Y":735},{"Id":117440517,"X":500,"Y":735}],"W":100,"H":50},{"Id":1,"Data":[{"Id":117506048,"X":600,"Y":735},{"Id":117506049,"X":700,"Y":735},{"Id":117506050,"X":800,"Y":735},{"Id":117506051,"X":900,"Y":735},{"Id":117506052,"X":1000,"Y":735},{"Id":117506053,"X":1100,"Y":735}],"W":100,"H":50},{"Id":2,"Data":[{"Id":117571584,"X":1200,"Y":735},{"Id":117571585,"X":1300,"Y":735},{"Id":117571586,"X":1400,"Y":735},{"Id":117571587,"X":0,"Y":835},{"Id":117571588,"X":100,"Y":835},{"Id":117571589,"X":200,"Y":835}],"W":100,"H":50},{"Id":3,"Data":[{"Id":117637120,"X":300,"Y":835},{"Id":117637121,"X":400,"Y":835},{"Id":117637122,"X":500,"Y":835},{"Id":117637123,"X":600,"Y":835},{"Id":117637124,"X":700,"Y":835},{"Id":117637125,"X":800,"Y":835}],"W":100,"H":50},{"Id":4,"Data":[{"Id":117702656,"X":900,"Y":835},{"Id":117702657,"X":1000,"Y":835},{"Id":117702658,"X":1100,"Y":835}],"W":100,"H":50}],"W":100,"H":50},{"Id":8,"Data":[{"Id":0,"Data":[{"Id":134217728,"X":1200,"Y":835},{"Id":134217729,"X":1300,"Y":835},{"Id":134217730,"X":1400,"Y":835},{"Id":134217731,"X":0,"Y":935},{"Id":134217732,"X":100,"Y":935},{"Id":134217733,"X":200,"Y":935},{"Id":134217734,"X":300,"Y":935},{"Id":134217735,"X":400,"Y":935},{"Id":134217736,"X":500,"Y":935},{"Id":134217737,"X":600,"Y":935},{"Id":134217738,"X":700,"Y":935},{"Id":134217739,"X":800,"Y":935},{"Id":134217740,"X":900,"Y":935},{"Id":134217741,"X":1000,"Y":935},{"Id":134217742,"X":1100,"Y":935},{"Id":134217743,"X":1200,"Y":935},{"Id":134217744,"X":1300,"Y":935},{"Id":134217745,"X":1400,"Y":935},{"Id":134217746,"X":0,"Y":1035},{"Id":134217747,"X":100,"Y":1035}],"W":100,"H":40},{"Id":1,"Data":[{"Id":134283264,"X":200,"Y":1035},{"Id":134283265,"X":300,"Y":1035}],"W":100,"H":40},{"Id":2,"Data":[{"Id":134348800,"X":400,"Y":1035},{"Id":134348801,"X":500,"Y":1035}],"W":100,"H":40},{"Id":3,"Data":[{"Id":134414336,"X":600,"Y":1035},{"Id":134414337,"X":700,"Y":1035},{"Id":134414338,"X":800,"Y":1035}],"W":100,"H":40}],"W":100,"H":40},{"Id":9,"Data":[{"Id":0,"Data":[{"Id":150994944,"X":900,"Y":1035},{"Id":150994945,"X":1000,"Y":1035},{"Id":150994946,"X":1100,"Y":1035},{"Id":150994947,"X":1200,"Y":1035},{"Id":150994948,"X":1300,"Y":1035},{"Id":150994949,"X":1400,"Y":1035}],"W":100,"H":60},{"Id":1,"Data":[{"Id":151060480,"X":0,"Y":1135},{"Id":151060481,"X":100,"Y":1135}],"W":100,"H":60}],"W":100,"H":60},{"Id":10,"Data":[{"Id":0,"Data":[{"Id":167772160,"X":840,"Y":215},{"Id":167772161,"X":900,"Y":215},{"Id":167772162,"X":960,"Y":215},{"Id":167772163,"X":1020,"Y":215},{"Id":167772164,"X":1080,"Y":215},{"Id":167772165,"X":1140,"Y":215},{"Id":167772166,"X":1200,"Y":215}],"W":60,"H":40},{"Id":1,"Data":[{"Id":167837696,"X":1260,"Y":215},{"Id":167837697,"X":1320,"Y":215},{"Id":167837698,"X":1380,"Y":215},{"Id":167837699,"X":1440,"Y":215},{"Id":167837700,"X":1360,"Y":655},{"Id":167837701,"X":200,"Y":1135},{"Id":167837702,"X":300,"Y":1135},{"Id":167837703,"X":400,"Y":1135},{"Id":167837704,"X":500,"Y":1135},{"Id":167837705,"X":600,"Y":1135},{"Id":167837706,"X":700,"Y":1135},{"Id":167837707,"X":800,"Y":1135}],"W":60,"H":40},{"Id":2,"Data":[{"Id":167903232,"X":900,"Y":1135},{"Id":167903233,"X":1000,"Y":1135}],"W":60,"H":40}],"W":60,"H":40},{"Id":11,"Data":[{"Id":0,"Data":[{"Id":184549376,"X":1100,"Y":1135},{"Id":184549377,"X":1200,"Y":1135},{"Id":184549378,"X":1300,"Y":1135},{"Id":184549379,"X":1400,"Y":1135},{"Id":184549380,"X":0,"Y":1235},{"Id":184549381,"X":100,"Y":1235},{"Id":184549382,"X":200,"Y":1235},{"Id":184549383,"X":300,"Y":1235}],"W":100,"H":70},{"Id":1,"Data":[{"Id":184614912,"X":400,"Y":1235},{"Id":184614913,"X":500,"Y":1235},{"Id":184614914,"X":600,"Y":1235},{"Id":184614915,"X":700,"Y":1235}],"W":100,"H":70},{"Id":2,"Data":[{"Id":184680448,"X":800,"Y":1235},{"Id":184680449,"X":900,"Y":1235},{"Id":184680450,"X":1000,"Y":1235},{"Id":184680451,"X":1100,"Y":1235}],"W":100,"H":70},{"Id":3,"Data":[{"Id":184745984,"X":1200,"Y":1235},{"Id":184745985,"X":1300,"Y":1235},{"Id":184745986,"X":1400,"Y":1235},{"Id":184745987,"X":0,"Y":1335}],"W":100,"H":70},{"Id":4,"Data":[{"Id":184811520,"X":100,"Y":1335},{"Id":184811521,"X":200,"Y":1335}],"W":100,"H":70}],"W":100,"H":70}],"W":0,"H":0}');
+
+            var _math = new AscCommon.CAscMathCategory();
+
+            var _len1 = _math_json["Data"].length;
+            for (var i1 = 0; i1 < _len1; i1++)
+            {
+                var _catJS1 = _math_json["Data"][i1];
+                var _cat1 = new AscCommon.CAscMathCategory();
+
+                _cat1.Id = _catJS1["Id"];
+                _cat1.W = _catJS1["W"];
+                _cat1.H = _catJS1["H"];
+
+                var _len2 = _catJS1["Data"].length;
+                for (var i2 = 0; i2 < _len2; i2++)
+                {
+                    var _catJS2 = _catJS1["Data"][i2];
+                    var _cat2 = new AscCommon.CAscMathCategory();
+
+                    _cat2.Id = _catJS2["Id"];
+                    _cat2.W = _catJS2["W"];
+                    _cat2.H = _catJS2["H"];
+
+                    var _len3 = _catJS2["Data"].length;
+                    for (var i3 = 0; i3 < _len3; i3++)
+                    {
+                        var _typeJS = _catJS2["Data"][i3];
+                        var _type = new AscCommon.CAscMathType();
+
+                        _type.Id = _typeJS["Id"];
+                        _type.X = _typeJS["X"];
+                        _type.Y = _typeJS["Y"];
+
+                        _cat2.Data.push(_type);
+                    }
+
+                    _cat1.Data.push(_cat2);
+                }
+
+                _math.Data.push(_cat1);
+            }
+
+            this.Api.sendMathTypesToMenu(_math);
+        }
+    }
 
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
@@ -9254,4 +9495,5 @@ function CollectSettingsFromChart(oChartSpace)
 	window['AscFormat'].fSolveQuadraticEquation = fSolveQuadraticEquation;
 	window['AscFormat'].fApproxEqual = fApproxEqual;
 	window['AscFormat'].fCheckBoxIntersectionSegment = fCheckBoxIntersectionSegment;
+	window['AscFormat'].CMathPainter = CMathPainter;
 })(window);

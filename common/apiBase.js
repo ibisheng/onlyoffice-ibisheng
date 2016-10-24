@@ -109,6 +109,8 @@
 		this.isChartEditor         = false;
 		this.isOpenedChartFrame    = false;
 
+		this.MathMenuLoad          = false;
+
 		// CoAuthoring and Chat
 		this.User                   = undefined;
 		this.CoAuthoringApi         = new AscCommon.CDocsCoApi();
@@ -989,6 +991,30 @@
 		}
 
 		this.sendEvent('asc_onInitStandartTextures', arr);
+	};
+
+	baseEditorsApi.prototype.sendMathToMenu = function ()
+	{
+		if (this.MathMenuLoad)
+			return;
+		// GENERATE_IMAGES
+		//var _MathPainter = new CMathPainter(this.m_oWordControl.m_oApi);
+		//_MathPainter.StartLoad();
+		//return;
+		var _MathPainter = new AscFormat.CMathPainter(this);
+		_MathPainter.Generate();
+		this.MathMenuLoad = true;
+	};
+
+	baseEditorsApi.prototype.sendMathTypesToMenu         = function(_math)
+	{
+		this.sendEvent("asc_onMathTypes", _math);
+	};
+
+	baseEditorsApi.prototype.asyncFontEndLoaded_MathDraw = function(Obj)
+	{
+		this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
+		Obj.Generate2();
 	};
 
 	// plugins

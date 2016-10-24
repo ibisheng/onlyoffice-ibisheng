@@ -1447,6 +1447,7 @@ var editor;
     this.asc_ApplyColorScheme(false);
 
     this.sendStandartTextures();
+    this.sendMathToMenu();
 
     // Применяем пришедшие при открытии изменения
     this._applyFirstLoadChanges();

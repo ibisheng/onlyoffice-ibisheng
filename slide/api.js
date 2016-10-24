@@ -4845,6 +4845,7 @@ background-repeat: no-repeat;\
 		if (!this.isViewMode)
 		{
 			this.sendStandartTextures();
+			this.sendMathToMenu();
 			if (this.shapeElementId)
 			{
 				this.WordControl.m_oDrawingDocument.InitGuiCanvasShape(this.shapeElementId);
