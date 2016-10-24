@@ -7197,9 +7197,13 @@ drawPieChart.prototype =
 				brush = val.brush;
 				
 				if(n === 0 || n === this.paths.series.length - 1)
+				{
 					pen = val.pen;
+				}
 				else
+				{
 					pen = null;
+				}
 				
 				path = this.paths.series[n][i];
 				
@@ -7427,7 +7431,6 @@ drawPieChart.prototype =
 				x0 = (xCenter + radiusSpec*Math.cos(stAng));
 				y0 = (yCenter - radiusSpec*Math.sin(stAng));
 			}
-			
 		};
 		
 		var path  = new Path();

@@ -601,6 +601,12 @@ Processor3D.prototype.calculatePropertiesForPieCharts = function()
 		depth = depth / kF;
 	}
 	
+	//ToDo временная правка для круговой диграммы с углом поворота 0 градусов
+	if(0 === radius2)
+	{
+		radius2 = 1;
+	}
+	
 	return {radius1: radius1, radius2: radius2, depth: depth};
 };
 
