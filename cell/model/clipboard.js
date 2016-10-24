@@ -187,7 +187,7 @@
 					{
 						if(ws.getCellEditMode() === true)
 						{
-							if(text)
+							if(data1)
 							{
 								window["Asc"]["editor"].wb.cellEditor.pasteText(data1);
 							}
