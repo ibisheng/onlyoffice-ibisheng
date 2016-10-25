@@ -126,6 +126,7 @@
         "../word/Editor/Hyperlink.js",
         "../word/Editor/Field.js",
         "../word/Editor/Run.js",
+        "../word/Editor/RunChanges.js",
         "../word/Math/mathTypes.js",
         "../word/Math/mathText.js",
         "../word/Math/mathContent.js",

@@ -85,6 +85,7 @@
                 "../word/Editor/Hyperlink.js",
                 "../word/Editor/Field.js",
                 "../word/Editor/Run.js",
+                "../word/Editor/RunChanges.js",
                 "../word/Editor/Math.js",
                 "../word/Editor/Paragraph.js",
                 "../word/Editor/Paragraph_Recalculate.js",
