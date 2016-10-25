@@ -2466,6 +2466,98 @@ function asc_WriteAutoFilterInfo(i, c, s) {
 
     s['WriteByte'](255);
 }
+function asc_WriteFormatTableInfo(i, c, s) {
+    
+    if (i !== -1) s['WriteByte'](i);
+    
+    if (c.asc_getTableName()) {
+        s['WriteByte'](0);
+        s['WriteString2'](c.asc_getTableName());
+    }
+    
+    if (c.asc_getTableRange()) {
+        s['WriteByte'](1);
+        s['WriteString2'](c.asc_getTableRange());
+    }
+    
+    if (c.asc_getTableStyleName()) {
+        s['WriteByte'](2);
+        s['WriteString2'](c.asc_getTableStyleName());
+    }
+    
+    if (null !== c.asc_getBandHor()) {
+        s['WriteByte'](3);
+        s['WriteBool'](c.asc_getBandHor());
+    }
+    
+    if (null !== c.asc_getBandVer()) {
+        s['WriteByte'](4);
+        s['WriteBool'](c.asc_getBandVer());
+    }
+    
+    if (null !== c.asc_getFilterButton()) {
+        s['WriteByte'](5);
+        s['WriteBool'](c.asc_getFilterButton());
+    }
+    
+    if (null !== c.asc_getFirstCol()) {
+        s['WriteByte'](6);
+        s['WriteBool'](c.asc_getFirstCol());
+    }
+    
+    if (null !== c.asc_getFirstRow()) {
+        s['WriteByte'](7);
+        s['WriteBool'](c.asc_getFirstRow());
+    }
+    
+    if (null !== c.asc_getIsDeleteColumn()) {
+        s['WriteByte'](8);
+        s['WriteBool'](c.asc_getIsDeleteColumn());
+    }
+    
+    if (null !== c.asc_getIsDeleteRow()) {
+        s['WriteByte'](9);
+        s['WriteBool'](c.asc_getIsDeleteRow());
+    }
+    
+    if (null !== c.asc_getIsDeleteTable()) {
+        s['WriteByte'](10);
+        s['WriteBool'](c.asc_getIsDeleteTable());
+    }
+    
+    if (null !== c.asc_getIsInsertColumnLeft()) {
+        s['WriteByte'](11);
+        s['WriteBool'](c.asc_getIsInsertColumnLeft());
+    }
+    
+    if (null !== c.asc_getIsInsertColumnRight()) {
+        s['WriteByte'](12);
+        s['WriteBool'](c.asc_getIsInsertColumnRight());
+    }
+    
+    if (null !== c.asc_getIsInsertRowAbove()) {
+        s['WriteByte'](13);
+        s['WriteBool'](c.asc_getIsInsertRowAbove());
+    }
+    
+    if (null !== c.asc_getIsInsertRowBelow()) {
+        s['WriteByte'](14);
+        s['WriteBool'](c.asc_getIsInsertRowBelow());
+    }
+    
+    if (null !== c.asc_getLastCol()) {
+        s['WriteByte'](15);
+        s['WriteBool'](c.asc_getLastCol());
+    }
+    
+    if (null !== c.asc_getLastRow()) {
+        s['WriteByte'](16);
+        s['WriteBool'](c.asc_getLastRow());
+    }
+    
+    s['WriteByte'](255);
+}
+
 function asc_WriteCCelInfo(c, s) {
     if (!c) return;
 
@@ -2537,7 +2629,8 @@ function asc_WriteCCelInfo(c, s) {
     }
 
     if (c.asc_getAutoFilterInfo()) { asc_WriteAutoFilterInfo(30, c.asc_getAutoFilterInfo(), s); }
-
+    if (c.asc_getFormatTableInfo()) { asc_WriteFormatTableInfo(31, c.asc_getFormatTableInfo(), s); }
+    
     s['WriteByte'](255);
 }
 function asc_WriteColorSchemes(schemas, s) {
@@ -7225,18 +7318,19 @@ window["AscCommonExcel"].WorksheetView.prototype._drawCollaborativeElementsMeOth
     }
     
     for (i = 0; i < arrayCells.length; ++i) {
-        //oCellTmp = new asc_Range(arrayCells[i].c1, arrayCells[i].r1, arrayCells[i].c2, arrayCells[i].r2);
         
-        overlay.Native["PD_DrawLockCell"](arrayCells[i].c1, arrayCells[i].r1, arrayCells[i].c2, arrayCells[i].r2,
+        overlay.Native["PD_DrawLockCell"](arrayCells[i].c1,
+                                          arrayCells[i].r1,
+                                          Math.min(arrayCells[i].c2, this.cols.length - 1),
+                                          Math.min(arrayCells[i].r2, this.rows.length - 1),
                                           this.cols[arrayCells[i].c1].left,
                                           this.rows[arrayCells[i].r1].top,
-                                          this.cols[arrayCells[i].c2].width,
-                                          this.rows[arrayCells[i].r1].height,
+                                          this.cols[Math.min(arrayCells[i].c2, this.cols.length - 1)].width,
+                                          this.rows[Math.min(arrayCells[i].r2, this.rows.length - 1)].height,
                                           strokeColor.r,
                                           strokeColor.g,
                                           strokeColor.b,
                                           strokeColor.a);
-        //this.__drawElements(this._drawSelectionElement, oCellTmp, AscCommonExcel.selectionLineType.Dash, strokeColor);
     }
 };
 
@@ -7248,16 +7342,18 @@ window["AscCommonExcel"].WorksheetView.prototype._drawCollaborativeElementsAllLo
                                               nLockAllType) ? AscCommonExcel.c_oAscCoAuthoringLockTablePropertiesBorderColor :
         AscCommonExcel.c_oAscCoAuthoringOtherBorderColor, oAllRange = new window["Asc"].Range(0, 0, AscCommon.gc_nMaxCol0, AscCommon.gc_nMaxRow0);
        
-        overlay.Native["PD_DrawLockCell"](oAllRange.c1, oAllRange.r1, oAllRange.c2, oAllRange.r2,
+        overlay.Native["PD_DrawLockCell"](oAllRange.c1,
+                                          oAllRange.r1,
+                                          Math.min(oAllRange.c2, this.cols.length - 1),
+                                          Math.min(oAllRange.r2, this.rows.length - 1),
                                           this.cols[oAllRange.c1].left,
                                           this.rows[oAllRange.r1].top,
-                                          this.cols[oAllRange.c2].width,
-                                          this.rows[oAllRange.r1].height,
+                                          this.cols[Math.min(oAllRange.c2, this.cols.length - 1)].width,
+                                          this.rows[Math.min(oAllRange.r2, this.rows.length - 1)].height,
                                           strokeColor.r,
                                           strokeColor.g,
                                           strokeColor.b,
                                           strokeColor.a);
-        //this.__drawElements(this._drawSelectionElement, oAllRange, AscCommonExcel.selectionLineType.Dash, strokeColor, isAllRange);
     }
 };
 
