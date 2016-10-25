@@ -4922,7 +4922,9 @@
                 ar.type = c_oAscSelectionType.RangeCol;
                 ar.assign(ar.c1, 0, ar.c2, this.rows.length - 1);
             }
+
             this._drawSelection();
+            this._updateSelectionNameAndInfo();
         }
     };
 
@@ -4940,6 +4942,7 @@
             }
 
             this._drawSelection();
+            this._updateSelectionNameAndInfo();
         }
     };
 
