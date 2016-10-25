@@ -2857,6 +2857,10 @@ var editor;
     }
   };
 
+  spreadsheet_api.prototype.asc_showAutoComplete = function() {
+    this.wb.showAutoComplete();
+  };
+
   spreadsheet_api.prototype.asc_onMouseUp = function(event, x, y) {
     this.controller._onWindowMouseUpExternal(event, x, y);
   };
@@ -3554,6 +3558,7 @@ var editor;
   prot["asc_increaseFontSize"] = prot.asc_increaseFontSize;
   prot["asc_decreaseFontSize"] = prot.asc_decreaseFontSize;
   prot["asc_formatPainter"] = prot.asc_formatPainter;
+  prot["asc_showAutoComplete"] = prot.asc_showAutoComplete;
 
   prot["asc_onMouseUp"] = prot.asc_onMouseUp;
 

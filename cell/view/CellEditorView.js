@@ -2599,62 +2599,61 @@
 	};
 
 	/** @param event {MouseEvent} */
-	CellEditor.prototype._onWindowMouseMove = function ( event ) {
-		if ( c_oAscCellEditorSelectState.no !== this.isSelectMode && !this.hasCursor ) {
-			this._changeSelection( this._getCoordinates( event ) );
+	CellEditor.prototype._onWindowMouseMove = function (event) {
+		if (c_oAscCellEditorSelectState.no !== this.isSelectMode && !this.hasCursor) {
+			this._changeSelection(this._getCoordinates(event));
 		}
 		return true;
 	};
 
 	/** @param event {MouseEvent} */
-	CellEditor.prototype._onMouseDown = function ( event ) {
-		if (AscCommon.g_inputContext)
+	CellEditor.prototype._onMouseDown = function (event) {
+		if (AscCommon.g_inputContext) {
 			AscCommon.g_inputContext.externalChangeFocus();
-
-		var pos;
-		var coord = this._getCoordinates( event );
-		if ( !window['IS_NATIVE_EDITOR'] ) {
-			this.clickCounter.mouseDownEvent( coord.x, coord.y, event.button );
 		}
 
-		this.setFocus( true );
+		var pos;
+		var coord = this._getCoordinates(event);
+		if (!window['IS_NATIVE_EDITOR']) {
+			this.clickCounter.mouseDownEvent(coord.x, coord.y, event.button);
+		}
+
+		this.setFocus(true);
 
 		this.isTopLineActive = false;
 		this.input.isFocused = false;
 
-		if ( 0 === event.button ) {
-			if ( 1 === this.clickCounter.getClickCount() % 2 ) {
+		if (0 === event.button) {
+			if (1 === this.clickCounter.getClickCount() % 2) {
 				this.isSelectMode = c_oAscCellEditorSelectState.char;
-				if ( !event.shiftKey ) {
+				if (!event.shiftKey) {
 					this._showCursor();
-					pos = this._findCursorPosition( coord );
-					if ( pos !== undefined ) {
-						pos >= 0 ? this._moveCursor( kPosition, pos ) : this._moveCursor( pos );
+					pos = this._findCursorPosition(coord);
+					if (pos !== undefined) {
+						pos >= 0 ? this._moveCursor(kPosition, pos) : this._moveCursor(pos);
 					}
+				} else {
+					this._changeSelection(coord);
 				}
-				else {
-					this._changeSelection( coord );
-				}
-			}
-			else {
+			} else {
 				// Dbl click
 				this.isSelectMode = c_oAscCellEditorSelectState.word;
 				// Окончание слова
-				var endWord = this.textRender.getNextWord( this.cursorPos );
+				var endWord = this.textRender.getNextWord(this.cursorPos);
 				// Начало слова (ищем по окончанию, т.к. могли попасть в пробел)
-				var startWord = this.textRender.getPrevWord( endWord );
+				var startWord = this.textRender.getPrevWord(endWord);
 
-				this._moveCursor( kPosition, startWord );
-				this._selectChars( kPosition, endWord );
+				this._moveCursor(kPosition, startWord);
+				this._selectChars(kPosition, endWord);
 			}
 		}
 		return true;
 	};
 
 	/** @param event {MouseEvent} */
-	CellEditor.prototype._onMouseUp = function ( event ) {
-		if ( 2 === event.button ) {
-			this.handlers.trigger( 'onContextMenu', event );
+	CellEditor.prototype._onMouseUp = function (event) {
+		if (2 === event.button) {
+			this.handlers.trigger('onContextMenu', event);
 			return true;
 		}
 		this.isSelectMode = c_oAscCellEditorSelectState.no;

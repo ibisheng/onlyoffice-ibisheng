@@ -68,7 +68,7 @@
   var c_oAscAsyncAction = asc.c_oAscAsyncAction;
   var c_oAscFontRenderingModeType = asc.c_oAscFontRenderingModeType;
   var c_oAscAsyncActionType = asc.c_oAscAsyncActionType;
-  
+
 
   function WorkbookCommentsModel(handlers, aComments) {
     this.workbook = {handlers: handlers};
@@ -443,7 +443,7 @@
 
         // AutoComplete
         "showAutoComplete": function () {
-          self._onShowAutoComplete.apply(self, arguments);
+          self.showAutoComplete.apply(self, arguments);
         }, "onContextMenu": function (event) {
           self.handlers.trigger("asc_onContextMenu", event);
         },
@@ -806,7 +806,7 @@
     }
 
     this.clipboard.Api = this.Api;
-    
+
     this.initFormulasList();
 
     this.fReplaceCallback = function() {
@@ -1191,7 +1191,7 @@
     ws.applyFrozenAnchor(x, y, target);
   };
 
-  WorkbookView.prototype._onShowAutoComplete = function() {
+  WorkbookView.prototype.showAutoComplete = function() {
     var ws = this.getWorksheet();
     var arrValues = ws.getCellAutoCompleteValues(ws.model.selectionRange.activeCell);
     this.handlers.trigger('asc_onEntriesListMenu', arrValues);
@@ -2005,7 +2005,7 @@
   WorkbookView.prototype.bIsEmptyClipboard = function() {
     return this.clipboard.bIsEmptyClipboard(this.getCellEditMode());
   };
-  
+
    WorkbookView.prototype.checkCopyToClipboard = function(_clipboard, _formats) {
     var t = this, ws;
     ws = t.getWorksheet();
