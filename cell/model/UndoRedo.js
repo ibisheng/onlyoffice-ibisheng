@@ -3854,6 +3854,25 @@ UndoRedoAutoFilters.prototype = {
 	}
 };
 
+	function UndoRedoSparklines(wb) {
+		this.wb = wb;
+		this.nType = UndoRedoClassTypes.Add(function () {
+			return AscCommonExcel.g_oUndoRedoSparklines;
+		});
+	}
+
+	UndoRedoSparklines.prototype.getClassType = function () {
+		return this.nType;
+	};
+	UndoRedoSparklines.prototype.Undo = function (Type, Data, nSheetId) {
+		this.UndoRedo(Type, Data, nSheetId, true);
+	};
+	UndoRedoSparklines.prototype.Redo = function (Type, Data, nSheetId) {
+		this.UndoRedo(Type, Data, nSheetId, false);
+	};
+	UndoRedoSparklines.prototype.UndoRedo = function (Type, Data, nSheetId, bUndo) {
+	};
+
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 	window['AscCommonExcel'].UndoRedoItemSerializable = UndoRedoItemSerializable;
@@ -3883,6 +3902,7 @@ UndoRedoAutoFilters.prototype = {
 	window['AscCommonExcel'].UndoRedoRowCol = UndoRedoRowCol;
 	window['AscCommonExcel'].UndoRedoComment = UndoRedoComment;
 	window['AscCommonExcel'].UndoRedoAutoFilters = UndoRedoAutoFilters;
+	window['AscCommonExcel'].UndoRedoSparklines = UndoRedoSparklines;
 
 	window['AscCommonExcel'].g_oUndoRedoWorkbook = null;
 	window['AscCommonExcel'].g_oUndoRedoCell = null;
@@ -3891,4 +3911,5 @@ UndoRedoAutoFilters.prototype = {
 	window['AscCommonExcel'].g_oUndoRedoCol = null;
 	window['AscCommonExcel'].g_oUndoRedoComment = null;
 	window['AscCommonExcel'].g_oUndoRedoAutoFilters = null;
+	window['AscCommonExcel'].g_oUndoRedoSparklines = null;
 })(window);
