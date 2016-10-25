@@ -250,8 +250,17 @@ CHistory.prototype =
                 for (var Index = Point.Items.length - 1; Index >= 0; Index--)
                 {
                     var Item = Point.Items[Index];
-                    Item.Class.Undo(Item.Data);
-                    Item.Class.Refresh_RecalcData(Item.Data);
+
+					if (Item.Data && Item.Data.IsChangesClass && Item.Data.IsChangesClass())
+					{
+						Item.Data.Undo();
+						Item.Data.RefreshRecalcData();
+					}
+					else
+					{
+						Item.Class.Undo(Item.Data);
+						Item.Class.Refresh_RecalcData(Item.Data);
+					}
                 }
             }
         }
@@ -263,8 +272,16 @@ CHistory.prototype =
             for (var Index = Point.Items.length - 1; Index >= 0; Index--)
             {
                 var Item = Point.Items[Index];
-                Item.Class.Undo(Item.Data);
-                Item.Class.Refresh_RecalcData(Item.Data);
+				if (Item.Data && Item.Data.IsChangesClass && Item.Data.IsChangesClass())
+				{
+					Item.Data.Undo();
+					Item.Data.RefreshRecalcData();
+				}
+				else
+				{
+					Item.Class.Undo(Item.Data);
+					Item.Class.Refresh_RecalcData(Item.Data);
+				}
             }
         }
 
@@ -290,8 +307,17 @@ CHistory.prototype =
         for ( var Index = 0; Index < Point.Items.length; Index++ )
         {
             var Item = Point.Items[Index];
-            Item.Class.Redo( Item.Data );
-            Item.Class.Refresh_RecalcData( Item.Data );
+
+			if (Item.Data && Item.Data.IsChangesClass && Item.Data.IsChangesClass())
+			{
+				Item.Data.Redo();
+				Item.Data.RefreshRecalcData();
+			}
+			else
+			{
+				Item.Class.Redo(Item.Data);
+				Item.Class.Refresh_RecalcData(Item.Data);
+			}
         }
 
         // Восстанавливаем состояние на следующую точку

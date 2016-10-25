@@ -2891,6 +2891,11 @@
 	{
 		return this.Class;
 	};
+	CChangesBase.prototype.RefreshRecalcData = function()
+	{
+		if (this.Class && this.Class.Refresh_RecalcData)
+			this.Class.Refresh_RecalcData(this);
+	};
 	window['AscDFH'].CChangesBase = CChangesBase;
 	/**
 	 * Базовый класс для изменения свойств.

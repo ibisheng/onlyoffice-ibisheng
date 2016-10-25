@@ -190,6 +190,7 @@ CChangesRunRemoveItem.prototype.Undo = function()
 };
 CChangesRunRemoveItem.prototype.Redo = function()
 {
+	var oRun = this.Class;
 	oRun.Content.splice(this.Pos, this.EndPos - this.Pos + 1);
 
 	oRun.RecalcInfo.Measure = true;
