@@ -1238,6 +1238,7 @@ function DrawingObjects() {
 
         // При скролах нужно выполнить все задачи
 
+        _this.drawingDocument.CheckTargetShow();
         var taskLen = aDrawTasks.length;
         if ( taskLen ) {
             var lastTask = aDrawTasks[taskLen - 1];
@@ -1973,6 +1974,7 @@ function DrawingObjects() {
             if ( (currTime - lastTask.time < 40) )
                 return;
         }
+
         aDrawTasks.push({ time: currTime, params: { clearCanvas: clearCanvas, graphicOption: graphicOption, printOptions: printOptions} });
     };
 
@@ -2064,7 +2066,6 @@ function DrawingObjects() {
                 if ( _this.controller.selectedObjects.length )
                 {
                     _this.OnUpdateOverlay();
-                    _this.drawingDocument.CheckTargetShow();
                     _this.controller.updateSelectionState(true);
                 }
             }
