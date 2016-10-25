@@ -461,7 +461,7 @@ CCollaborativeEditingBase.prototype.Apply_OtherChanges = function()
         //this.m_nErrorLog_PointChangesCount++;
     }
 
-    this.m_aChanges = [];
+    this.private_ClearChanges();
 
     // У новых элементов выставляем указатели на другие классы
     this.Apply_LinkData();
@@ -752,6 +752,13 @@ CCollaborativeEditingBase.prototype.InitMemory = function() {
         this.m_oMemory = new AscCommon.CMemory();
     }
 };
+//----------------------------------------------------------------------------------------------------------------------
+// Private area
+//----------------------------------------------------------------------------------------------------------------------
+	CCollaborativeEditingBase.prototype.private_ClearChanges = function()
+	{
+		this.m_aChanges = [];
+	};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -903,7 +910,6 @@ CDocumentPositionsManager.prototype.Remove_DocumentPosition = function(DocPos)
         }
     }
 };
-
     //--------------------------------------------------------export----------------------------------------------------
     window['AscCommon'] = window['AscCommon'] || {};
     window['AscCommon'].FOREIGN_CURSOR_LABEL_HIDETIME = FOREIGN_CURSOR_LABEL_HIDETIME;

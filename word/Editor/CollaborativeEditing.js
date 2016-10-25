@@ -47,6 +47,9 @@ function CWordCollaborativeEditing()
     this.m_aForeignCursors       = {};
     this.m_aForeignCursorsXY     = {};
     this.m_aForeignCursorsToShow = {};
+
+    this.m_aAllChanges        = []; // Список всех изменений
+	this.m_aOwnChangesIndexes = []; // Список номеров своих изменений в общем списке, которые мы можем откатить
 }
 
 AscCommon.extendClass(CWordCollaborativeEditing, AscCommon.CCollaborativeEditingBase);
@@ -81,7 +84,7 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
     }
     var deleteIndex = ( null === AscCommon.History.SavedIndex ? null : SumIndex );
 
-    var aChanges = [];
+    var aChanges = [], aChanges2 = [];
     for (var PointIndex = StartPoint; PointIndex <= LastPoint; PointIndex++)
     {
         var Point = AscCommon.History.Points[PointIndex];
@@ -92,6 +95,7 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
             var Item = Point.Items[Index];
             var oChanges = new AscCommon.CCollaborativeChanges();
             oChanges.Set_FromUndoRedo(Item.Class, Item.Data, Item.Binary);
+			aChanges2.push(oChanges);
             aChanges.push(oChanges.m_pData);
         }
     }
@@ -110,12 +114,17 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
     this.m_aNeedUnlock.length = 0;
     this.m_aNeedUnlock2.length = 0;
 
-    var deleteIndex = ( null === AscCommon.History.SavedIndex ? null : SumIndex );
-    if (0 < aChanges.length || null !== deleteIndex) {
-        editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo);
-        AscCommon.History.CanNotAddChanges = true;
-    } else
-        editor.CoAuthoringApi.unLockDocument(true);
+	var deleteIndex = ( null === AscCommon.History.SavedIndex ? null : SumIndex );
+	if (0 < aChanges.length || null !== deleteIndex)
+	{
+		this.private_OnSendOwnChanges(aChanges2, deleteIndex);
+		editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo);
+		AscCommon.History.CanNotAddChanges = true;
+	}
+	else
+	{
+		editor.CoAuthoringApi.unLockDocument(true);
+	}
 
     if (-1 === this.m_nUseType)
     {
@@ -576,6 +585,99 @@ CWordCollaborativeEditing.prototype.Update_ForeignCursorLabelPosition = function
 
     var Api = this.m_oLogicDocument.Get_Api();
     Api.sync_ShowForeignCursorLabel(UserId, X, Y, Color);
+};
+//----------------------------------------------------------------------------------------------------------------------
+//
+//----------------------------------------------------------------------------------------------------------------------
+CWordCollaborativeEditing.prototype.private_ClearChanges = function()
+{
+	this.m_aAllChanges = this.m_aAllChanges.concat(this.m_aChanges);
+	this.m_aChanges = [];
+};
+CWordCollaborativeEditing.prototype.private_OnSendOwnChanges = function(arrChanges, nDeleteIndex)
+{
+	this.m_aOwnChangesIndexes.push({
+		Position : this.m_aAllChanges.length,
+		Count    : arrChanges.length
+	});
+
+	this.m_aAllChanges = this.m_aAllChanges.concat(arrChanges);
+
+	// TODO: Пока nDeleteIndex не учитывается, исправить.
+
+	// TODO: Тут возможен случай, когда arrChanges пустой. Возможно необходимо убрать несколько последних записей
+	//       в массиве this.m_aOwnChangesIndexes
+
+	// TODO: Пока мы делаем это как одну точку, которую надо откатить. Надо пробежаться по массиву и разбить его
+	//       по отдельным действиям.
+};
+CWordCollaborativeEditing.prototype.Undo = function()
+{
+	if (this.m_aOwnChangesIndexes.length <= 0)
+		return false;
+
+	// Формируем новую пачку действий, которые будут откатывать нужные нам действия.
+
+	var oIndexes = this.m_aOwnChangesIndexes[this.m_aOwnChangesIndexes.length - 1];
+	var nPosition = oIndexes.Position;
+	var nCount    = oIndexes.Count;
+	for (var nIndex = 0; nIndex < nCount; ++nIndex)
+	{
+		var oChange = this.m_aAllChanges[nPosition + nIndex];
+
+		if (this.private_IsChangeContentChange(oChange))
+		{
+			var bAdd = this.private_IsChangeAddToContent(oChange);
+			console.log(bAdd);
+		}
+	}
+
+	// Удаляем запись о последнем изменении
+	this.m_aOwnChangesIndexes.length = this.m_aOwnChangesIndexes.length - 1;
+};
+CWordCollaborativeEditing.prototype.CanUndo = function()
+{
+	return this.m_aOwnChangesIndexes.length <= 0 ? false : true;
+};
+
+CWordCollaborativeEditing.prototype.private_IsChangeContentChange = function(Data)
+{
+	if (AscDFH.historyitem_Document_AddItem === Data.Type
+		|| AscDFH.historyitem_Document_RemoveItem === Data.Type
+		|| AscDFH.historyitem_DocumentContent_AddItem === Data.Type
+		|| AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type
+		|| AscDFH.historyitem_Table_AddRow === Data.Type
+		|| AscDFH.historyitem_Table_RemoveRow === Data.Type
+		|| AscDFH.historyitem_TableRow_AddCell === Data.Type
+		|| AscDFH.historyitem_TableRow_RemoveCell === Data.Type
+		|| AscDFH.historyitem_Paragraph_AddItem === Data.Type
+		|| AscDFH.historyitem_Paragraph_RemoveItem === Data.Type
+		|| AscDFH.historyitem_Hyperlink_AddItem === Data.Type
+		|| AscDFH.historyitem_Hyperlink_RemoveItem === Data.Type
+		|| AscDFH.historyitem_ParaRun_AddItem === Data.Type
+		|| AscDFH.historyitem_ParaRun_RemoveItem === Data.Type
+		|| AscDFH.historyitem_Presentation_AddSlide === Data.Type
+		|| AscDFH.historyitem_Presentation_RemoveSlide === Data.Type
+		|| AscDFH.historyitem_SlideAddToSpTree === Data.Type
+		|| AscDFH.historyitem_SlideRemoveFromSpTree === Data.Type)
+		return true;
+
+	return false;
+};
+CWordCollaborativeEditing.prototype.private_IsChangeAddToContent = function(Data)
+{
+	if (AscDFH.historyitem_Document_AddItem === Data.Type
+		|| AscDFH.historyitem_DocumentContent_AddItem === Data.Type
+		|| AscDFH.historyitem_Table_AddRow === Data.Type
+		|| AscDFH.historyitem_TableRow_AddCell === Data.Type
+		|| AscDFH.historyitem_Paragraph_AddItem === Data.Type
+		|| AscDFH.historyitem_Hyperlink_AddItem === Data.Type
+		|| AscDFH.historyitem_ParaRun_AddItem === Data.Type
+		|| AscDFH.historyitem_Presentation_AddSlide === Data.Type
+		|| AscDFH.historyitem_SlideAddToSpTree === Data.Type)
+		return true;
+
+	return false;
 };
 
 //--------------------------------------------------------export----------------------------------------------------

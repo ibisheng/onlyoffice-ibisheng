@@ -1110,6 +1110,73 @@ CMPrp.prototype =
         this.brk = undefined;
     }
 };
+CMPrp.prototype.Write_ToBinary = function(Writer)
+{
+	var StartPos = Writer.GetCurPosition();
+	Writer.Skip(4);
+
+	var Flags = 0;
+	if (undefined != this.aln)
+	{
+		Writer.WriteBool(this.aln);
+		Flags |= 1;
+	}
+	if (undefined != this.brk)
+	{
+		this.brk.Write_ToBinary(Writer);
+		Flags |= 2;
+	}
+	if (undefined != this.lit)
+	{
+		Writer.WriteBool(this.lit);
+		Flags |= 4;
+	}
+	if (undefined != this.nor)
+	{
+		Writer.WriteBool(this.nor);
+		Flags |= 8;
+	}
+	if (undefined != this.scr)
+	{
+		Writer.WriteLong(this.scr);
+		Flags |= 16;
+	}
+	if (undefined != this.sty)
+	{
+		Writer.WriteLong(this.sty);
+		Flags |= 32;
+	}
+
+	var EndPos = Writer.GetCurPosition();
+	Writer.Seek(StartPos);
+	Writer.WriteLong(Flags);
+	Writer.Seek(EndPos);
+};
+CMPrp.prototype.Read_FromBinary = function(Reader)
+{
+	var Flags = Reader.GetLong();
+
+	if (Flags & 1)
+		this.aln = Reader.GetBool();
+
+	if (Flags & 2)
+	{
+		this.brk = new CMathBreak();
+		this.brk.Read_FromBinary(Reader);
+	}
+
+	if (Flags & 4)
+		this.lit = Reader.GetBool();
+
+	if (Flags & 8)
+		this.nor = Reader.GetBool();
+
+	if (Flags & 16)
+		this.scr = Reader.GetLong();
+
+	if (Flags & 32)
+		this.sty = Reader.GetLong();
+};
 
 /**
  *

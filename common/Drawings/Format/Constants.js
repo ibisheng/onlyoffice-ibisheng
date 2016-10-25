@@ -1579,7 +1579,7 @@
 	window['AscDFH'].historyitem_ParaRun_Italic            = window['AscDFH'].historyitem_type_ParaRun | 4;
 	window['AscDFH'].historyitem_ParaRun_Strikeout         = window['AscDFH'].historyitem_type_ParaRun | 5;
 	window['AscDFH'].historyitem_ParaRun_Underline         = window['AscDFH'].historyitem_type_ParaRun | 6;
-	window['AscDFH'].historyitem_ParaRun_FontFamily        = window['AscDFH'].historyitem_type_ParaRun | 7;
+	window['AscDFH'].historyitem_ParaRun_FontFamily        = window['AscDFH'].historyitem_type_ParaRun | 7; // obsolete
 	window['AscDFH'].historyitem_ParaRun_FontSize          = window['AscDFH'].historyitem_type_ParaRun | 8;
 	window['AscDFH'].historyitem_ParaRun_Color             = window['AscDFH'].historyitem_type_ParaRun | 9;
 	window['AscDFH'].historyitem_ParaRun_VertAlign         = window['AscDFH'].historyitem_type_ParaRun | 10;
@@ -1590,7 +1590,7 @@
 	window['AscDFH'].historyitem_ParaRun_Caps              = window['AscDFH'].historyitem_type_ParaRun | 15;
 	window['AscDFH'].historyitem_ParaRun_SmallCaps         = window['AscDFH'].historyitem_type_ParaRun | 16;
 	window['AscDFH'].historyitem_ParaRun_Position          = window['AscDFH'].historyitem_type_ParaRun | 17;
-	window['AscDFH'].historyitem_ParaRun_Value             = window['AscDFH'].historyitem_type_ParaRun | 18;
+	window['AscDFH'].historyitem_ParaRun_Value             = window['AscDFH'].historyitem_type_ParaRun | 18; // obsolete
 	window['AscDFH'].historyitem_ParaRun_RFonts            = window['AscDFH'].historyitem_type_ParaRun | 19;
 	window['AscDFH'].historyitem_ParaRun_Lang              = window['AscDFH'].historyitem_type_ParaRun | 20;
 	window['AscDFH'].historyitem_ParaRun_RFonts_Ascii      = window['AscDFH'].historyitem_type_ParaRun | 21;
@@ -2884,27 +2884,42 @@
 	};
 	window['AscDFH'].CChangesBase = CChangesBase;
 	/**
-	 * Базовый класс для изменения булевых свойств.
+	 * Базовый класс для изменения свойств.
 	 * @constructor
 	 * @extends {AscDFH.CChangesBase}
 	 */
-	function CChangesBaseBoolProperty(Class, Old, New)
+	function CChangesBaseProperty(Class, Old, New, Color)
 	{
-		CChangesBaseBoolProperty.superclass.constructor.call(this, Class);
+		CChangesBaseProperty.superclass.constructor.call(this, Class);
 
-		this.Color = false;
+		this.Color = true === Color ? true : false;
 		this.Old   = Old;
 		this.New   = New;
 	}
-	AscCommon.extendClass(CChangesBase, CChangesBaseBoolProperty);
-	CChangesBaseBoolProperty.prototype.Undo = function()
+	AscCommon.extendClass(CChangesBase, CChangesBaseProperty);
+	CChangesBaseProperty.prototype.Undo = function()
 	{
 		this.private_SetValue(this.Old);
 	};
-	CChangesBaseBoolProperty.prototype.Redo = function()
+	CChangesBaseProperty.prototype.Redo = function()
 	{
 		this.private_SetValue(this.New);
 	};
+	CChangesBaseProperty.prototype.private_SetValue = function(Value)
+	{
+		// Эту функцию нужно переопределить в дочернем классе
+	};
+	window['AscDFH'].CChangesBaseProperty = CChangesBaseProperty;
+	/**
+	 * Базовый класс для изменения булевых свойств.
+	 * @constructor
+	 * @extends {AscDFH.CChangesBaseProperty}
+	 */
+	function CChangesBaseBoolProperty(Class, Old, New, Color)
+	{
+		CChangesBaseBoolProperty.superclass.constructor.call(this, Class, Old, New, Color);
+	}
+	AscCommon.extendClass(CChangesBaseProperty, CChangesBaseBoolProperty);
 	CChangesBaseBoolProperty.prototype.WriteToBinary = function(Writer)
 	{
 		// Long  : Flag
@@ -2961,9 +2976,295 @@
 		else
 			this.Old = false;
 	};
-	CChangesBaseBoolProperty.prototype.private_SetValue = function(Value)
+	window['AscDFH'].CChangesBaseBoolProperty = CChangesBaseBoolProperty;
+	/**
+	 * Базовый класс для изменения числовых (double) свойств.
+	 * @constructor
+	 * @extends {AscDFH.CChangesBaseProperty}
+	 */
+	function CChangesBaseDoubleProperty(Class, Old, New, Color)
+	{
+		CChangesBaseDoubleProperty.superclass.constructor.call(this, Class, Old, New, Color);
+	}
+	AscCommon.extendClass(CChangesBaseProperty, CChangesBaseDoubleProperty);
+	CChangesBaseDoubleProperty.prototype.WriteToBinary = function(Writer)
+	{
+		// Long  : Flag
+		// 1-bit : Подсвечивать ли данные изменения
+		// 2-bit : IsUndefined New
+		// 3-bit : IsUndefined Old
+		// double : New
+		// double : Old
+
+		var nFlags = 0;
+
+		if (false !== this.Color)
+			nFlags |= 1;
+
+		if (undefined === this.New)
+			nFlags |= 2;
+
+		if (undefined === this.Old)
+			nFlags |= 4;
+
+		Writer.WriteLong(nFlags);
+
+		if (undefined !== this.New)
+			Writer.WriteDouble(this.New);
+
+		if (undefined !== this.Old)
+			Writer.WriteDouble(this.Old);
+	};
+	CChangesBaseDoubleProperty.prototype.ReadFromBinary = function(Reader)
+	{
+		// Long  : Flag
+		// 1-bit : Подсвечивать ли данные изменения
+		// 2-bit : IsUndefined New
+		// 3-bit : IsUndefined Old
+		// double : New
+		// double : Old
+
+
+		var nFlags = Reader.GetLong();
+
+		if (nFlags & 1)
+			this.Color = true;
+		else
+			this.Color = false;
+
+		if (nFlags & 2)
+			this.New = undefined;
+		else
+			this.New = Reader.GetDouble();
+
+		if (nFlags & 4)
+			this.Old = undefined;
+		else
+			this.Old = Reader.GetDouble();
+	};
+	window['AscDFH'].CChangesBaseDoubleProperty = CChangesBaseDoubleProperty;
+	/**
+	 * Базовый класс для изменения объектных свойств, т.е. если свойство задано объектом.
+	 * @constructor
+	 * @extends {AscDFH.CChangesBaseProperty}
+	 */
+	function CChangesBaseObjectProperty(Class, Old, New, Color)
+	{
+		CChangesBaseObjectProperty.superclass.constructor.call(this, Class, Old, New, Color);
+	}
+	AscCommon.extendClass(CChangesBaseProperty, CChangesBaseObjectProperty);
+	CChangesBaseObjectProperty.prototype.WriteToBinary = function(Writer)
+	{
+		// Long  : Flag
+		// 1-bit : Подсвечивать ли данные изменения
+		// 2-bit : IsUndefined New
+		// 3-bit : IsUndefined Old
+		// Variable : New
+		// Variable : Old
+
+		var nFlags = 0;
+
+		if (false !== this.Color)
+			nFlags |= 1;
+
+		if (undefined === this.New)
+			nFlags |= 2;
+
+		if (undefined === this.Old)
+			nFlags |= 4;
+
+		Writer.WriteLong(nFlags);
+
+		if (undefined !== this.New && this.New.Write_ToBinary)
+			this.New.Write_ToBinary(Writer);
+
+		if (undefined !== this.Old && this.Old.Write_ToBinary)
+			this.Old.Write_ToBinary(Writer);
+	};
+	CChangesBaseObjectProperty.prototype.ReadFromBinary = function(Reader)
+	{
+		// Long  : Flag
+		// 1-bit : Подсвечивать ли данные изменения
+		// 2-bit : IsUndefined New
+		// 3-bit : IsUndefined Old
+		// Variable : New
+		// Variable : Old
+
+		var nFlags = Reader.GetLong();
+
+		if (nFlags & 1)
+			this.Color = true;
+		else
+			this.Color = false;
+
+		if (nFlags & 2)
+		{
+			if (true === this.private_IsCreateEmptyObject())
+				this.New = this.private_CreateObject();
+			else
+				this.New = undefined;
+		}
+		else
+		{
+			this.New = this.private_CreateObject();
+			if (this.New && this.New.Read_FromBinary)
+				this.New.Read_FromBinary(Reader);
+		}
+
+		if (nFlags & 4)
+		{
+			if (true === this.private_IsCreateEmptyObject())
+				this.Old = this.private_CreateObject();
+			else
+				this.Old = undefined;
+		}
+		else
+		{
+			this.Old = this.private_CreateObject();
+			if (this.Old && this.Old.Read_FromBinary)
+				this.Old.Read_FromBinary(Reader);
+		}
+	};
+	CChangesBaseObjectProperty.prototype.private_CreateObject = function()
 	{
 		// Эту функцию нужно переопределить в дочернем классе
+		return null;
 	};
-	window['AscDFH'].CChangesBaseBoolProperty = CChangesBaseBoolProperty;
+	CChangesBaseObjectProperty.prototype.private_IsCreateEmptyObject = function()
+	{
+		return false;
+	};
+	window['AscDFH'].CChangesBaseObjectProperty = CChangesBaseObjectProperty;
+	/**
+	 * Базовый класс для изменения числовых (long) свойств.
+	 * @constructor
+	 * @extends {AscDFH.CChangesBaseProperty}
+	 */
+	function CChangesBaseLongProperty(Class, Old, New, Color)
+	{
+		CChangesBaseLongProperty.superclass.constructor.call(this, Class, Old, New, Color);
+	}
+	AscCommon.extendClass(CChangesBaseProperty, CChangesBaseLongProperty);
+	CChangesBaseLongProperty.prototype.WriteToBinary = function(Writer)
+	{
+		// Long  : Flag
+		// 1-bit : Подсвечивать ли данные изменения
+		// 2-bit : IsUndefined New
+		// 3-bit : IsUndefined Old
+		// long : New
+		// long : Old
+
+		var nFlags = 0;
+
+		if (false !== this.Color)
+			nFlags |= 1;
+
+		if (undefined === this.New)
+			nFlags |= 2;
+
+		if (undefined === this.Old)
+			nFlags |= 4;
+
+		Writer.WriteLong(nFlags);
+
+		if (undefined !== this.New)
+			Writer.WriteLong(this.New);
+
+		if (undefined !== this.Old)
+			Writer.WriteLong(this.Old);
+	};
+	CChangesBaseLongProperty.prototype.ReadFromBinary = function(Reader)
+	{
+		// Long  : Flag
+		// 1-bit : Подсвечивать ли данные изменения
+		// 2-bit : IsUndefined New
+		// 3-bit : IsUndefined Old
+		// double : New
+		// double : Old
+
+
+		var nFlags = Reader.GetLong();
+
+		if (nFlags & 1)
+			this.Color = true;
+		else
+			this.Color = false;
+
+		if (nFlags & 2)
+			this.New = undefined;
+		else
+			this.New = Reader.GetLong();
+
+		if (nFlags & 4)
+			this.Old = undefined;
+		else
+			this.Old = Reader.GetLong();
+	};
+	window['AscDFH'].CChangesBaseLongProperty = CChangesBaseLongProperty;
+	/**
+	 * Базовый класс для изменения строковых свойств.
+	 * @constructor
+	 * @extends {AscDFH.CChangesBaseProperty}
+	 */
+	function CChangesBaseStringProperty(Class, Old, New, Color)
+	{
+		CChangesBaseStringProperty.superclass.constructor.call(this, Class, Old, New, Color);
+	}
+	AscCommon.extendClass(CChangesBaseProperty, CChangesBaseStringProperty);
+	CChangesBaseStringProperty.prototype.WriteToBinary = function(Writer)
+	{
+		// Long  : Flag
+		// 1-bit : Подсвечивать ли данные изменения
+		// 2-bit : IsUndefined New
+		// 3-bit : IsUndefined Old
+		// string : New
+		// string : Old
+
+		var nFlags = 0;
+
+		if (false !== this.Color)
+			nFlags |= 1;
+
+		if (undefined === this.New)
+			nFlags |= 2;
+
+		if (undefined === this.Old)
+			nFlags |= 4;
+
+		Writer.WriteLong(nFlags);
+
+		if (undefined !== this.New)
+			Writer.WriteString2(this.New);
+
+		if (undefined !== this.Old)
+			Writer.WriteString2(this.Old);
+	};
+	CChangesBaseStringProperty.prototype.ReadFromBinary = function(Reader)
+	{
+		// Long  : Flag
+		// 1-bit : Подсвечивать ли данные изменения
+		// 2-bit : IsUndefined New
+		// 3-bit : IsUndefined Old
+		// string : New
+		// string : Old
+
+
+		var nFlags = Reader.GetLong();
+
+		if (nFlags & 1)
+			this.Color = true;
+		else
+			this.Color = false;
+
+		if (nFlags & 2)
+			this.New = undefined;
+		else
+			this.New = Reader.GetString2();
+
+		if (nFlags & 4)
+			this.Old = undefined;
+		else
+			this.Old = Reader.GetString2();
+	};
+	window['AscDFH'].CChangesBaseStringProperty = CChangesBaseStringProperty;
 })(window);

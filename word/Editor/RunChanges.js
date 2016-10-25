@@ -38,44 +38,6 @@
  * Time: 12:56
  */
 
-// window['AscDFH'].historyitem_ParaRun_FontFamily        = window['AscDFH'].historyitem_type_ParaRun | 7;
-// window['AscDFH'].historyitem_ParaRun_FontSize          = window['AscDFH'].historyitem_type_ParaRun | 8;
-// window['AscDFH'].historyitem_ParaRun_Color             = window['AscDFH'].historyitem_type_ParaRun | 9;
-// window['AscDFH'].historyitem_ParaRun_VertAlign         = window['AscDFH'].historyitem_type_ParaRun | 10;
-// window['AscDFH'].historyitem_ParaRun_HighLight         = window['AscDFH'].historyitem_type_ParaRun | 11;
-// window['AscDFH'].historyitem_ParaRun_RStyle            = window['AscDFH'].historyitem_type_ParaRun | 12;
-// window['AscDFH'].historyitem_ParaRun_Spacing           = window['AscDFH'].historyitem_type_ParaRun | 13;
-// window['AscDFH'].historyitem_ParaRun_DStrikeout        = window['AscDFH'].historyitem_type_ParaRun | 14;
-// window['AscDFH'].historyitem_ParaRun_Caps              = window['AscDFH'].historyitem_type_ParaRun | 15;
-// window['AscDFH'].historyitem_ParaRun_SmallCaps         = window['AscDFH'].historyitem_type_ParaRun | 16;
-// window['AscDFH'].historyitem_ParaRun_Position          = window['AscDFH'].historyitem_type_ParaRun | 17;
-// window['AscDFH'].historyitem_ParaRun_Value             = window['AscDFH'].historyitem_type_ParaRun | 18;
-// window['AscDFH'].historyitem_ParaRun_RFonts            = window['AscDFH'].historyitem_type_ParaRun | 19;
-// window['AscDFH'].historyitem_ParaRun_Lang              = window['AscDFH'].historyitem_type_ParaRun | 20;
-// window['AscDFH'].historyitem_ParaRun_RFonts_Ascii      = window['AscDFH'].historyitem_type_ParaRun | 21;
-// window['AscDFH'].historyitem_ParaRun_RFonts_HAnsi      = window['AscDFH'].historyitem_type_ParaRun | 22;
-// window['AscDFH'].historyitem_ParaRun_RFonts_CS         = window['AscDFH'].historyitem_type_ParaRun | 23;
-// window['AscDFH'].historyitem_ParaRun_RFonts_EastAsia   = window['AscDFH'].historyitem_type_ParaRun | 24;
-// window['AscDFH'].historyitem_ParaRun_RFonts_Hint       = window['AscDFH'].historyitem_type_ParaRun | 25;
-// window['AscDFH'].historyitem_ParaRun_Lang_Bidi         = window['AscDFH'].historyitem_type_ParaRun | 26;
-// window['AscDFH'].historyitem_ParaRun_Lang_EastAsia     = window['AscDFH'].historyitem_type_ParaRun | 27;
-// window['AscDFH'].historyitem_ParaRun_Lang_Val          = window['AscDFH'].historyitem_type_ParaRun | 28;
-// window['AscDFH'].historyitem_ParaRun_TextPr            = window['AscDFH'].historyitem_type_ParaRun | 29;
-// window['AscDFH'].historyitem_ParaRun_Unifill           = window['AscDFH'].historyitem_type_ParaRun | 30;
-// window['AscDFH'].historyitem_ParaRun_Shd               = window['AscDFH'].historyitem_type_ParaRun | 31;
-// window['AscDFH'].historyitem_ParaRun_MathStyle         = window['AscDFH'].historyitem_type_ParaRun | 32;
-// window['AscDFH'].historyitem_ParaRun_MathPrp           = window['AscDFH'].historyitem_type_ParaRun | 33;
-// window['AscDFH'].historyitem_ParaRun_ReviewType        = window['AscDFH'].historyitem_type_ParaRun | 34;
-// window['AscDFH'].historyitem_ParaRun_PrChange          = window['AscDFH'].historyitem_type_ParaRun | 35;
-// window['AscDFH'].historyitem_ParaRun_TextFill          = window['AscDFH'].historyitem_type_ParaRun | 36;
-// window['AscDFH'].historyitem_ParaRun_TextOutline       = window['AscDFH'].historyitem_type_ParaRun | 37;
-// window['AscDFH'].historyitem_ParaRun_PrReviewInfo      = window['AscDFH'].historyitem_type_ParaRun | 38;
-// window['AscDFH'].historyitem_ParaRun_ContentReviewInfo = window['AscDFH'].historyitem_type_ParaRun | 39;
-// window['AscDFH'].historyitem_ParaRun_OnStartSplit      = window['AscDFH'].historyitem_type_ParaRun | 40;
-// window['AscDFH'].historyitem_ParaRun_OnEndSplit        = window['AscDFH'].historyitem_type_ParaRun | 41;
-// window['AscDFH'].historyitem_ParaRun_MathAlnAt         = window['AscDFH'].historyitem_type_ParaRun | 42;
-// window['AscDFH'].historyitem_ParaRun_MathForcedBreak   = window['AscDFH'].historyitem_type_ParaRun | 43;
-
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -338,6 +300,13 @@ CChangesRunBold.prototype.private_SetValue = function(Value)
 	oRun.Recalc_CompiledPr(true);
 	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
 };
+CChangesRunBold.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseBoolProperty}
@@ -356,6 +325,13 @@ CChangesRunItalic.prototype.private_SetValue = function(Value)
 	oRun.Recalc_CompiledPr(true);
 	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
 };
+CChangesRunItalic.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseBoolProperty}
@@ -371,8 +347,15 @@ CChangesRunStrikeout.prototype.private_SetValue = function(Value)
 	var oRun = this.Class;
 	oRun.Pr.Strikeout = Value;
 
-	oRun.Recalc_CompiledPr(true);
+	oRun.Recalc_CompiledPr(false);
 	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunStrikeout.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
 };
 /**
  * @constructor
@@ -389,7 +372,1513 @@ CChangesRunUnderline.prototype.private_SetValue = function(Value)
 	var oRun = this.Class;
 	oRun.Pr.Underline = Value;
 
+	oRun.Recalc_CompiledPr(false);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunUnderline.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseDoubleProperty}
+ */
+function CChangesRunFontSize(Class, Old, New)
+{
+	CChangesRunFontSize.superclass.constructor.call(this, Class, Old, New);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseDoubleProperty, CChangesRunFontSize);
+CChangesRunFontSize.Type = AscDFH.historyitem_ParaRun_FontSize;
+CChangesRunFontSize.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.FontSize = Value;
+
 	oRun.Recalc_CompiledPr(true);
 	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
 };
+CChangesRunFontSize.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseObjectProperty}
+ */
+function CChangesRunColor(Class, Old, New)
+{
+	CChangesRunColor.superclass.constructor.call(this, Class, Old, New);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseObjectProperty, CChangesRunColor);
+CChangesRunColor.Type = AscDFH.historyitem_ParaRun_Color;
+CChangesRunColor.prototype.private_CreateObject = function()
+{
+	return new CDocumentColor(0, 0, 0, false);
+};
+CChangesRunColor.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.Color = Value;
+
+	oRun.Recalc_CompiledPr(false);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunColor.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseLongProperty}
+ */
+function CChangesRunVertAlign(Class, Old, New)
+{
+	CChangesRunVertAlign.superclass.constructor.call(this, Class, Old, New);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseLongProperty, CChangesRunVertAlign);
+CChangesRunVertAlign.Type = AscDFH.historyitem_ParaRun_VertAlign;
+CChangesRunVertAlign.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.VertAlign = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunVertAlign.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseProperty}
+ */
+function CChangesRunHighLight(Class, Old, New, Color)
+{
+	CChangesRunHighLight.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseProperty, CChangesRunHighLight);
+CChangesRunHighLight.Type = AscDFH.historyitem_ParaRun_HighLight;
+CChangesRunHighLight.prototype.WriteToBinary = function(Writer)
+{
+	// Long  : Flag
+	// 1-bit : Подсвечивать ли данные изменения
+	// 2-bit : Is undefined New ?
+	// 3-bit : Is "none" New ?
+	// 4-bit : Is undefined New ?
+	// 5-bit : Is "none" New ?
+	// Variable(?CDocumentColor) : New (если 2 и 3 биты нулевые)
+	// Variable(?CDocumentColor) : Old (если 4 и 5 биты нулевые)
+
+	var nFlags = 0;
+
+	if (false !== this.Color)
+		nFlags |= 1;
+
+	if (undefined === this.New)
+		nFlags |= 2;
+	else if (highlight_None === this.New)
+		nFlags |= 4;
+
+	if (undefined === this.Old)
+		nFlags |= 8;
+	else if (highlight_None === this.Old)
+		nFlags |= 16;
+
+	Writer.WriteLong(nFlags);
+
+	if (undefined !== this.New && highlight_None !== this.New)
+		this.New.Write_ToBinary(Writer);
+
+	if (undefined !== this.Old && highlight_None !== this.Old)
+		this.Old.Write_ToBinary(Writer);
+};
+CChangesRunHighLight.prototype.ReadFromBinary = function(Reader)
+{
+	// Long  : Flag
+	// 1-bit : Подсвечивать ли данные изменения
+	// 2-bit : Is undefined New ?
+	// 3-bit : Is "none" New ?
+	// 4-bit : Is undefined New ?
+	// 5-bit : Is "none" New ?
+	// Variable(?CDocumentColor) : New (если 2 и 3 биты нулевые)
+	// Variable(?CDocumentColor) : Old (если 4 и 5 биты нулевые)
+
+	var nFlags = Reader.GetLong();
+
+	if (nFlags & 1)
+		this.Color = true;
+	else
+		this.Color = false;
+
+	if (nFlags & 2)
+	{
+		this.New = undefined;
+	}
+	else if (nFlags & 4)
+	{
+		this.New = highlight_None;
+	}
+	else
+	{
+		this.New = new CDocumentColor(0, 0, 0);
+		this.New.Read_FromBinary(Reader);
+	}
+
+	if (nFlags & 8)
+	{
+		this.Old = undefined;
+	}
+	else if (nFlags & 16)
+	{
+		this.Old = highlight_None;
+	}
+	else
+	{
+		this.Old = new CDocumentColor(0, 0, 0);
+		this.Old.Read_FromBinary(Reader);
+	}
+};
+CChangesRunHighLight.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.HighLight = Value;
+
+	oRun.Recalc_CompiledPr(false);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunHighLight.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseStringProperty}
+ */
+function CChangesRunRStyle(Class, Old, New, Color)
+{
+	CChangesRunRStyle.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseStringProperty, CChangesRunRStyle);
+CChangesRunRStyle.Type = AscDFH.historyitem_ParaRun_RStyle;
+CChangesRunRStyle.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.RStyle = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunRStyle.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseDoubleProperty}
+ */
+function CChangesRunSpacing(Class, Old, New, Color)
+{
+	CChangesRunSpacing.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseDoubleProperty, CChangesRunSpacing);
+CChangesRunSpacing.Type = AscDFH.historyitem_ParaRun_Spacing;
+CChangesRunSpacing.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.Spacing = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunSpacing.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseBoolProperty}
+ */
+function CChangesRunDStrikeout(Class, Old, New, Color)
+{
+	CChangesRunDStrikeout.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseBoolProperty, CChangesRunDStrikeout);
+CChangesRunDStrikeout.Type = AscDFH.historyitem_ParaRun_DStrikeout;
+CChangesRunDStrikeout.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.DStrikeout = Value;
+
+	oRun.Recalc_CompiledPr(false);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunDStrikeout.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseBoolProperty}
+ */
+function CChangesRunCaps(Class, Old, New, Color)
+{
+	CChangesRunCaps.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseBoolProperty, CChangesRunCaps);
+CChangesRunCaps.Type = AscDFH.historyitem_ParaRun_Caps;
+CChangesRunCaps.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.Caps = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunCaps.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseBoolProperty}
+ */
+function CChangesRunSmallCaps(Class, Old, New, Color)
+{
+	CChangesRunSmallCaps.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseBoolProperty, CChangesRunSmallCaps);
+CChangesRunSmallCaps.Type = AscDFH.historyitem_ParaRun_SmallCaps;
+CChangesRunSmallCaps.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.SmallCaps = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunSmallCaps.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseDoubleProperty}
+ */
+function CChangesRunPosition(Class, Old, New, Color)
+{
+	CChangesRunPosition.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseDoubleProperty, CChangesRunPosition);
+CChangesRunPosition.Type = AscDFH.historyitem_ParaRun_Position;
+CChangesRunPosition.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.Position = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunPosition.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseObjectProperty}
+ */
+function CChangesRunRFonts(Class, Old, New, Color)
+{
+	CChangesRunRFonts.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseObjectProperty, CChangesRunRFonts);
+CChangesRunRFonts.Type = AscDFH.historyitem_ParaRun_RFonts;
+CChangesRunRFonts.prototype.private_CreateObject = function()
+{
+	return new CRFonts();
+};
+CChangesRunRFonts.prototype.private_IsCreateEmptyObject = function()
+{
+	return true;
+};
+CChangesRunRFonts.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.RFonts = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunRFonts.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseObjectProperty}
+ */
+function CChangesRunLang(Class, Old, New, Color)
+{
+	CChangesRunLang.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseObjectProperty, CChangesRunLang);
+CChangesRunLang.Type = AscDFH.historyitem_ParaRun_Lang;
+CChangesRunLang.prototype.private_CreateObject = function()
+{
+	return new CLang();
+};
+CChangesRunLang.prototype.private_IsCreateEmptyObject = function()
+{
+	return true;
+};
+CChangesRunLang.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.Lang = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.protected_UpdateSpellChecking();
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunLang.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseProperty}
+ */
+function CChangesRunRFontsAscii(Class, Old, New, Color)
+{
+	CChangesRunRFontsAscii.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseProperty, CChangesRunRFontsAscii);
+CChangesRunRFontsAscii.Type = AscDFH.historyitem_ParaRun_RFonts_Ascii;
+CChangesRunRFontsAscii.prototype.WriteToBinary = function(Writer)
+{
+	// Long  : Flag
+	// 1-bit : Подсвечивать ли данные изменения
+	// 2-bit : Is undefined New ?
+	// 3-bit : Is undefined Old ?
+	// String : New
+	// String : Old
+
+	var nFlags = 0;
+
+	if (false !== this.Color)
+		nFlags |= 1;
+
+	if (undefined === this.New)
+		nFlags |= 2;
+
+	if (undefined === this.Old)
+		nFlags |= 4;
+
+	Writer.WriteLong(nFlags);
+
+	if (undefined !== this.New)
+		Writer.WriteString2(this.New.Name);
+
+	if (undefined !== this.Old)
+		Writer.WriteString2(this.Old.Name);
+};
+CChangesRunRFontsAscii.prototype.ReadFromBinary = function(Reader)
+{
+	// Long  : Flag
+	// 1-bit : Подсвечивать ли данные изменения
+	// 2-bit : Is undefined New ?
+	// 3-bit : Is undefined Old ?
+	// String : New
+	// String : Old
+
+	var nFlags = Reader.GetLong();
+
+	if (nFlags & 1)
+		this.Color = true;
+	else
+		this.Color = false;
+
+	if (nFlags & 2)
+	{
+		this.New = undefined;
+	}
+	else
+	{
+		this.New = {
+			Name  : Reader.GetString2(),
+			Index : -1
+		};
+	}
+
+	if (nFlags & 4)
+	{
+		this.Old = undefined;
+	}
+	else
+	{
+		this.Old = {
+			Name  : Reader.GetString2(),
+			Index : -1
+		};
+	}
+};
+CChangesRunRFontsAscii.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.RFonts.Ascii = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunRFontsAscii.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseProperty}
+ */
+function CChangesRunRFontsHAnsi(Class, Old, New, Color)
+{
+	CChangesRunRFontsHAnsi.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseProperty, CChangesRunRFontsHAnsi);
+CChangesRunRFontsHAnsi.Type = AscDFH.historyitem_ParaRun_RFonts_HAnsi;
+CChangesRunRFontsHAnsi.prototype.WriteToBinary = function(Writer)
+{
+	// Long  : Flag
+	// 1-bit : Подсвечивать ли данные изменения
+	// 2-bit : Is undefined New ?
+	// 3-bit : Is undefined Old ?
+	// String : New
+	// String : Old
+
+	var nFlags = 0;
+
+	if (false !== this.Color)
+		nFlags |= 1;
+
+	if (undefined === this.New)
+		nFlags |= 2;
+
+	if (undefined === this.Old)
+		nFlags |= 4;
+
+	Writer.WriteLong(nFlags);
+
+	if (undefined !== this.New)
+		Writer.WriteString2(this.New.Name);
+
+	if (undefined !== this.Old)
+		Writer.WriteString2(this.Old.Name);
+};
+CChangesRunRFontsHAnsi.prototype.ReadFromBinary = function(Reader)
+{
+	// Long  : Flag
+	// 1-bit : Подсвечивать ли данные изменения
+	// 2-bit : Is undefined New ?
+	// 3-bit : Is undefined Old ?
+	// String : New
+	// String : Old
+
+	var nFlags = Reader.GetLong();
+
+	if (nFlags & 1)
+		this.Color = true;
+	else
+		this.Color = false;
+
+	if (nFlags & 2)
+	{
+		this.New = undefined;
+	}
+	else
+	{
+		this.New = {
+			Name  : Reader.GetString2(),
+			Index : -1
+		};
+	}
+
+	if (nFlags & 4)
+	{
+		this.Old = undefined;
+	}
+	else
+	{
+		this.Old = {
+			Name  : Reader.GetString2(),
+			Index : -1
+		};
+	}
+};
+CChangesRunRFontsHAnsi.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.RFonts.HAnsi = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunRFontsHAnsi.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseProperty}
+ */
+function CChangesRunRFontsCS(Class, Old, New, Color)
+{
+	CChangesRunRFontsCS.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseProperty, CChangesRunRFontsCS);
+CChangesRunRFontsCS.Type = AscDFH.historyitem_ParaRun_RFonts_CS;
+CChangesRunRFontsCS.prototype.WriteToBinary = function(Writer)
+{
+	// Long  : Flag
+	// 1-bit : Подсвечивать ли данные изменения
+	// 2-bit : Is undefined New ?
+	// 3-bit : Is undefined Old ?
+	// String : New
+	// String : Old
+
+	var nFlags = 0;
+
+	if (false !== this.Color)
+		nFlags |= 1;
+
+	if (undefined === this.New)
+		nFlags |= 2;
+
+	if (undefined === this.Old)
+		nFlags |= 4;
+
+	Writer.WriteLong(nFlags);
+
+	if (undefined !== this.New)
+		Writer.WriteString2(this.New.Name);
+
+	if (undefined !== this.Old)
+		Writer.WriteString2(this.Old.Name);
+};
+CChangesRunRFontsCS.prototype.ReadFromBinary = function(Reader)
+{
+	// Long  : Flag
+	// 1-bit : Подсвечивать ли данные изменения
+	// 2-bit : Is undefined New ?
+	// 3-bit : Is undefined Old ?
+	// String : New
+	// String : Old
+
+	var nFlags = Reader.GetLong();
+
+	if (nFlags & 1)
+		this.Color = true;
+	else
+		this.Color = false;
+
+	if (nFlags & 2)
+	{
+		this.New = undefined;
+	}
+	else
+	{
+		this.New = {
+			Name  : Reader.GetString2(),
+			Index : -1
+		};
+	}
+
+	if (nFlags & 4)
+	{
+		this.Old = undefined;
+	}
+	else
+	{
+		this.Old = {
+			Name  : Reader.GetString2(),
+			Index : -1
+		};
+	}
+};
+CChangesRunRFontsCS.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.RFonts.CS = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunRFontsCS.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseProperty}
+ */
+function CChangesRunRFontsEastAsia(Class, Old, New, Color)
+{
+	CChangesRunRFontsEastAsia.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseProperty, CChangesRunRFontsEastAsia);
+CChangesRunRFontsEastAsia.Type = AscDFH.historyitem_ParaRun_RFonts_EastAsia;
+CChangesRunRFontsEastAsia.prototype.WriteToBinary = function(Writer)
+{
+	// Long  : Flag
+	// 1-bit : Подсвечивать ли данные изменения
+	// 2-bit : Is undefined New ?
+	// 3-bit : Is undefined Old ?
+	// String : New
+	// String : Old
+
+	var nFlags = 0;
+
+	if (false !== this.Color)
+		nFlags |= 1;
+
+	if (undefined === this.New)
+		nFlags |= 2;
+
+	if (undefined === this.Old)
+		nFlags |= 4;
+
+	Writer.WriteLong(nFlags);
+
+	if (undefined !== this.New)
+		Writer.WriteString2(this.New.Name);
+
+	if (undefined !== this.Old)
+		Writer.WriteString2(this.Old.Name);
+};
+CChangesRunRFontsEastAsia.prototype.ReadFromBinary = function(Reader)
+{
+	// Long  : Flag
+	// 1-bit : Подсвечивать ли данные изменения
+	// 2-bit : Is undefined New ?
+	// 3-bit : Is undefined Old ?
+	// String : New
+	// String : Old
+
+	var nFlags = Reader.GetLong();
+
+	if (nFlags & 1)
+		this.Color = true;
+	else
+		this.Color = false;
+
+	if (nFlags & 2)
+	{
+		this.New = undefined;
+	}
+	else
+	{
+		this.New = {
+			Name  : Reader.GetString2(),
+			Index : -1
+		};
+	}
+
+	if (nFlags & 4)
+	{
+		this.Old = undefined;
+	}
+	else
+	{
+		this.Old = {
+			Name  : Reader.GetString2(),
+			Index : -1
+		};
+	}
+};
+CChangesRunRFontsEastAsia.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.RFonts.EastAsia = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunRFontsEastAsia.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseLongProperty}
+ */
+function CChangesRunRFontsHint(Class, Old, New, Color)
+{
+	CChangesRunRFontsHint.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseLongProperty, CChangesRunRFontsHint);
+CChangesRunRFontsHint.Type = AscDFH.historyitem_ParaRun_RFonts_Hint;
+CChangesRunRFontsHint.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.RFonts.Hint = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunRFontsHint.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseLongProperty}
+ */
+function CChangesRunLangBidi(Class, Old, New, Color)
+{
+	CChangesRunLangBidi.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseLongProperty, CChangesRunLangBidi);
+CChangesRunLangBidi.Type = AscDFH.historyitem_ParaRun_Lang_Bidi;
+CChangesRunLangBidi.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.Lang.Bidi = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.protected_UpdateSpellChecking();
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunLangBidi.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseLongProperty}
+ */
+function CChangesRunLangEastAsia(Class, Old, New, Color)
+{
+	CChangesRunLangEastAsia.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseLongProperty, CChangesRunLangEastAsia);
+CChangesRunLangEastAsia.Type = AscDFH.historyitem_ParaRun_Lang_EastAsia;
+CChangesRunLangEastAsia.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.Lang.EastAsia = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.protected_UpdateSpellChecking();
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunLangEastAsia.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseLongProperty}
+ */
+function CChangesRunLangVal(Class, Old, New, Color)
+{
+	CChangesRunLangVal.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseLongProperty, CChangesRunLangVal);
+CChangesRunLangVal.Type = AscDFH.historyitem_ParaRun_Lang_Val;
+CChangesRunLangVal.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.Lang.Val = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.protected_UpdateSpellChecking();
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunLangVal.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseObjectProperty}
+ */
+function CChangesRunTextPr(Class, Old, New, Color)
+{
+	CChangesRunTextPr.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseObjectProperty, CChangesRunTextPr);
+CChangesRunTextPr.Type = AscDFH.historyitem_ParaRun_TextPr;
+CChangesRunTextPr.prototype.private_CreateObject = function()
+{
+	return new CTextPr();
+};
+CChangesRunTextPr.prototype.private_IsCreateEmptyObject = function()
+{
+	return true;
+};
+CChangesRunTextPr.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunTextPr.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	var Unifill = this.Class.Pr.Unifill;
+	if (AscCommon.CollaborativeEditing
+		&& Unifill
+		&& Unifill.fill
+		&& Unifill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP
+		&& typeof Unifill.fill.RasterImageId === "string"
+		&& Unifill.fill.RasterImageId.length > 0)
+	{
+		AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(Unifill.fill.RasterImageId));
+	}
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseObjectProperty}
+ */
+function CChangesRunUnifill(Class, Old, New, Color)
+{
+	CChangesRunUnifill.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseObjectProperty, CChangesRunUnifill);
+CChangesRunUnifill.Type = AscDFH.historyitem_ParaRun_Unifill;
+CChangesRunUnifill.prototype.private_CreateObject = function()
+{
+	return new AscFormat.CUniFill();
+};
+CChangesRunUnifill.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.Unifill = Value;
+
+	oRun.Recalc_CompiledPr(false);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunUnifill.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	var Unifill = this.Class.Pr.Unifill;
+	if (AscCommon.CollaborativeEditing
+		&& Unifill
+		&& Unifill.fill
+		&& Unifill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP
+		&& typeof Unifill.fill.RasterImageId === "string"
+		&& Unifill.fill.RasterImageId.length > 0)
+	{
+		AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(Unifill.fill.RasterImageId));
+	}
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseObjectProperty}
+ */
+function CChangesRunShd(Class, Old, New, Color)
+{
+	CChangesRunShd.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseObjectProperty, CChangesRunShd);
+CChangesRunShd.Type = AscDFH.historyitem_ParaRun_Shd;
+CChangesRunShd.prototype.private_CreateObject = function()
+{
+	return new CDocumentShd();
+};
+CChangesRunShd.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.Shd = Value;
+
+	oRun.Recalc_CompiledPr(false);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunShd.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	var Unifill = this.Class.Pr.Unifill;
+	if (AscCommon.CollaborativeEditing
+		&& Unifill
+		&& Unifill.fill
+		&& Unifill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP
+		&& typeof Unifill.fill.RasterImageId === "string"
+		&& Unifill.fill.RasterImageId.length > 0)
+	{
+		AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(Unifill.fill.RasterImageId));
+	}
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseLongProperty}
+ */
+function CChangesRunMathStyle(Class, Old, New)
+{
+	CChangesRunMathStyle.superclass.constructor.call(this, Class, Old, New);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseLongProperty, CChangesRunMathStyle);
+CChangesRunMathStyle.Type = AscDFH.historyitem_ParaRun_MathStyle;
+CChangesRunMathStyle.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.MathPrp.sty = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseObjectProperty}
+ */
+function CChangesRunMathPrp(Class, Old, New, Color)
+{
+	CChangesRunMathPrp.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseObjectProperty, CChangesRunMathPrp);
+CChangesRunMathPrp.Type = AscDFH.historyitem_ParaRun_MathPrp;
+CChangesRunMathPrp.prototype.private_CreateObject = function()
+{
+	return new CMPrp();
+};
+CChangesRunMathPrp.prototype.private_IsCreateEmptyObject = function()
+{
+	return true;
+};
+CChangesRunMathPrp.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.MathPrp = Value;
+
+	oRun.Recalc_CompiledPr(true);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseProperty}
+ */
+function CChangesRunReviewType(Class, Old, New, Color)
+{
+	CChangesRunMathPrp.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseProperty, CChangesRunReviewType);
+CChangesRunReviewType.Type = AscDFH.historyitem_ParaRun_ReviewType;
+CChangesRunReviewType.prototype.WriteToBinary = function(Writer)
+{
+	// Long        : New ReviewType
+	// CReviewInfo : New ReviewInfo
+	// Long        : Old ReviewType
+	// CReviewInfo : Old ReviewInfo
+	Writer.WriteLong(this.New.ReviewType);
+	this.New.ReviewInfo.Write_ToBinary(Writer);
+	Writer.WriteLong(this.Old.ReviewType);
+	this.Old.ReviewInfo.Write_ToBinary(Writer);
+};
+CChangesRunReviewType.prototype.ReadFromBinary = function(Reader)
+{
+	// Long        : New ReviewType
+	// CReviewInfo : New ReviewInfo
+	// Long        : Old ReviewType
+	// CReviewInfo : Old ReviewInfo
+
+	this.New = {
+		ReviewType : reviewtype_Common,
+		ReviewInfo : new CReviewInfo()
+	};
+
+	this.Old = {
+		ReviewType : reviewtype_Common,
+		ReviewInfo : new CReviewInfo()
+	};
+
+	this.New.ReviewType = Reader.GetLong();
+	this.New.ReviewInfo.Read_FromBinary(Reader);
+	this.Old.ReviewType = Reader.GetLong();
+	this.Old.ReviewInfo.Read_FromBinary(Reader);
+};
+CChangesRunReviewType.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+
+	oRun.ReviewType = Value.ReviewType;
+	oRun.ReviewInfo = Value.ReviewInfo;
+	oRun.private_UpdateTrackRevisions();
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseProperty}
+ */
+function CChangesRunPrChange(Class, Old, New, Color)
+{
+	CChangesRunPrChange.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseProperty, CChangesRunPrChange);
+CChangesRunPrChange.Type = AscDFH.historyitem_ParaRun_PrChange;
+CChangesRunPrChange.prototype.WriteToBinary = function(Writer)
+{
+	// Long : Flags
+	// 1-bit : is New.PrChange undefined ?
+	// 2-bit : is New.ReviewInfo undefined ?
+	// 3-bit : is Old.PrChange undefined ?
+	// 4-bit : is Old.ReviewInfo undefined ?
+	// Variable(CTextPr)     : New.PrChange   (1bit = 0)
+	// Variable(CReviewInfo) : New.ReviewInfo (2bit = 0)
+	// Variable(CTextPr)     : Old.PrChange   (3bit = 0)
+	// Variable(CReviewInfo) : Old.ReviewInfo (4bit = 0)
+	var nFlags = 0;
+	if (undefined === this.New.PrChange)
+		nFlags |= 1;
+
+	if (undefined === this.New.ReviewInfo)
+		nFlags |= 2;
+
+	if (undefined === this.Old.PrChange)
+		nFlags |= 4;
+
+	if (undefined === this.Old.ReviewInfo)
+		nFlags |= 8;
+
+	Writer.WriteLong(nFlags);
+
+	if (undefined !== this.New.PrChange)
+		this.New.PrChange.Write_ToBinary(Writer);
+
+	if (undefined !== this.New.ReviewInfo)
+		this.New.ReviewInfo.Write_ToBinary(Writer);
+
+	if (undefined !== this.Old.PrChange)
+		this.Old.PrChange.Write_ToBinary(Writer);
+
+	if (undefined !== this.Old.ReviewInfo)
+		this.Old.ReviewInfo.Write_ToBinary(Writer);
+};
+CChangesRunPrChange.prototype.ReadFromBinary = function(Reader)
+{
+	// Long : Flags
+	// 1-bit : is New.PrChange undefined ?
+	// 2-bit : is New.ReviewInfo undefined ?
+	// 3-bit : is Old.PrChange undefined ?
+	// 4-bit : is Old.ReviewInfo undefined ?
+	// Variable(CTextPr)     : New.PrChange   (1bit = 0)
+	// Variable(CReviewInfo) : New.ReviewInfo (2bit = 0)
+	// Variable(CTextPr)     : Old.PrChange   (3bit = 0)
+	// Variable(CReviewInfo) : Old.ReviewInfo (4bit = 0)
+	var nFlags = Reader.GetLong();
+
+	if (nFlags & 1)
+	{
+		this.New.PrChange = undefined;
+	}
+	else
+	{
+		this.New.PrChange = new CTextPr();
+		this.New.PrChange.Read_FromBinary(Reader);
+	}
+
+	if (nFlags & 2)
+	{
+		this.New.ReviewInfo = undefined;
+	}
+	else
+	{
+		this.New.ReviewInfo = new CReviewInfo();
+		this.New.ReviewInfo.Read_FromBinary(Reader);
+	}
+
+	if (nFlags & 4)
+	{
+		this.Old.PrChange = undefined;
+	}
+	else
+	{
+		this.Old.PrChange = new CTextPr();
+		this.Old.PrChange.Read_FromBinary(Reader);
+	}
+
+	if (nFlags & 8)
+	{
+		this.Old.ReviewInfo = undefined;
+	}
+	else
+	{
+		this.Old.ReviewInfo = new CReviewInfo();
+		this.Old.ReviewInfo.Read_FromBinary(Reader);
+	}
+};
+CChangesRunPrChange.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+
+	oRun.Pr.PrChange   = Value.PrChange;
+	oRun.Pr.ReviewInfo = Value.ReviewInfo;
+	oRun.private_UpdateTrackRevisions();
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseObjectProperty}
+ */
+function CChangesRunTextFill(Class, Old, New, Color)
+{
+	CChangesRunTextFill.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseObjectProperty, CChangesRunTextFill);
+CChangesRunTextFill.Type = AscDFH.historyitem_ParaRun_TextFill;
+CChangesRunTextFill.prototype.private_CreateObject = function()
+{
+	return new AscFormat.CUniFill();
+};
+CChangesRunTextFill.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.TextFill = Value;
+
+	oRun.Recalc_CompiledPr(false);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunTextFill.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseObjectProperty}
+ */
+function CChangesRunTextOutline(Class, Old, New, Color)
+{
+	CChangesRunTextOutline.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseObjectProperty, CChangesRunTextOutline);
+CChangesRunTextOutline.Type = AscDFH.historyitem_ParaRun_TextOutline;
+CChangesRunTextOutline.prototype.private_CreateObject = function()
+{
+	return new AscFormat.CLn();
+};
+CChangesRunTextOutline.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.TextOutline = Value;
+
+	oRun.Recalc_CompiledPr(false);
+	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunTextOutline.prototype.Load = function(Color)
+{
+	this.Redo();
+
+	if (this.Color && Color)
+		this.Class.private_AddCollPrChangeOther(Color);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseObjectProperty}
+ */
+function CChangesRunPrReviewInfo(Class, Old, New, Color)
+{
+	CChangesRunPrReviewInfo.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseObjectProperty, CChangesRunPrReviewInfo);
+CChangesRunPrReviewInfo.Type = AscDFH.historyitem_ParaRun_PrReviewInfo;
+CChangesRunPrReviewInfo.prototype.private_CreateObject = function()
+{
+	return new CReviewInfo();
+};
+CChangesRunPrReviewInfo.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.Pr.ReviewInfo = Value;
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseObjectProperty}
+ */
+function CChangesRunContentReviewInfo(Class, Old, New, Color)
+{
+	CChangesRunContentReviewInfo.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(AscDFH.CChangesBaseObjectProperty, CChangesRunContentReviewInfo);
+CChangesRunContentReviewInfo.Type = AscDFH.historyitem_ParaRun_ContentReviewInfo;
+CChangesRunContentReviewInfo.prototype.private_CreateObject = function()
+{
+	return new CReviewInfo();
+};
+CChangesRunContentReviewInfo.prototype.private_IsCreateEmptyObject = function()
+{
+	return true;
+};
+CChangesRunContentReviewInfo.prototype.private_SetValue = function(Value)
+{
+	var oRun = this.Class;
+	oRun.ReviewInfo = Value;
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBase}
+ */
+function CChangesRunOnStartSplit(Class, Pos)
+{
+	CChangesRunOnStartSplit.superclass.constructor.call(this, Class);
+	this.Pos = Pos;
+}
+AscCommon.extendClass(AscDFH.CChangesBase, CChangesRunOnStartSplit);
+CChangesRunOnStartSplit.prototype.Type = AscDFH.historyitem_ParaRun_OnStartSplit;
+CChangesRunOnStartSplit.prototype.Undo = function()
+{
+};
+CChangesRunOnStartSplit.prototype.Redo = function()
+{
+};
+CChangesRunOnStartSplit.prototype.WriteToBinary = function(Writer)
+{
+	Writer.WriteLong(this.Pos);
+};
+CChangesRunOnStartSplit.prototype.ReadFromBinary = function(Reader)
+{
+	this.Pos = Reader.GetLong();
+};
+CChangesRunOnStartSplit.prototype.Load = function()
+{
+	if (AscCommon.CollaborativeEditing)
+		AscCommon.CollaborativeEditing.OnStart_SplitRun(this.Class, this.Pos);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBase}
+ */
+function CChangesRunOnEndSplit(Class, NewRun)
+{
+	CChangesRunOnEndSplit.superclass.constructor.call(this, Class);
+	this.NewRun = NewRun;
+}
+AscCommon.extendClass(AscDFH.CChangesBase, CChangesRunOnEndSplit);
+CChangesRunOnEndSplit.prototype.Type = AscDFH.historyitem_ParaRun_OnEndSplit;
+CChangesRunOnEndSplit.prototype.Undo = function()
+{
+};
+CChangesRunOnEndSplit.prototype.Redo = function()
+{
+};
+CChangesRunOnEndSplit.prototype.WriteToBinary = function(Writer)
+{
+	Writer.WriteString2(this.NewRun.Get_Id());
+};
+CChangesRunOnEndSplit.prototype.ReadFromBinary = function(Reader)
+{
+	var RunId = Reader.GetString2();
+	this.NewRun = g_oTableId.Get_ById(RunId);
+};
+CChangesRunOnEndSplit.prototype.Load = function()
+{
+	if (AscCommon.CollaborativeEditing)
+		AscCommon.CollaborativeEditing.OnEnd_SplitRun(this.NewRun);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBase}
+ */
+function CChangesRunMathAlnAt(Class, Old, New)
+{
+	CChangesRunMathAlnAt.superclass.constructor.call(this, Class);
+
+	this.Old = Old;
+	this.New = New;
+}
+AscCommon.extendClass(AscDFH.CChangesBase, CChangesRunMathAlnAt);
+CChangesRunMathAlnAt.prototype.Type = AscDFH.historyitem_ParaRun_MathAlnAt;
+CChangesRunMathAlnAt.prototype.Undo = function()
+{
+	this.Class.MathPrp.Apply_AlnAt(this.Old);
+};
+CChangesRunMathAlnAt.prototype.Redo = function()
+{
+	this.Class.MathPrp.Apply_AlnAt(this.Old);
+};
+CChangesRunMathAlnAt.prototype.WriteToBinary = function(Writer)
+{
+	// Long : Flags
+	// 1-bit : New is undefined ?
+	// 2-bit : Old is undefined ?
+	// 1bit = 0 long : this.New
+	// 2bit = 0 long : this.Old
+
+	var nFlags = 0;
+	if (undefined === this.New)
+		nFlags |= 1;
+
+	if (undefined === this.Old)
+		nFlags |= 2;
+
+	Writer.WriteLong(nFlags);
+
+	if (undefined !== this.New)
+		Writer.WriteLong(this.New);
+
+	if (undefined !== this.Old)
+		Writer.WriteLong(this.Old);
+};
+CChangesRunMathAlnAt.prototype.ReadFromBinary = function(Reader)
+{
+	// Long : Flags
+	// 1-bit : New is undefined ?
+	// 2-bit : Old is undefined ?
+	// 1bit = 0 long : this.New
+	// 2bit = 0 long : this.Old
+
+	var nFlags = Reader.GetLong();
+
+	if (nFlags & 1)
+		this.New = undefined;
+	else
+		this.New = Reader.GetLong();
+
+	if (nFlags & 2)
+		this.Old = undefined;
+	else
+		this.Old = Reader.GetLong();
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBase}
+ */
+function CChangesRunMathForcedBreak(Class, bInsert, alnAt)
+{
+	CChangesRunMathForcedBreak.superclass.constructor.call(this, Class);
+
+	this.bInsert = bInsert;
+	this.alnAt   = alnAt;
+}
+AscCommon.extendClass(AscDFH.CChangesBase, CChangesRunMathForcedBreak);
+CChangesRunMathForcedBreak.prototype.Type = AscDFH.historyitem_ParaRun_MathForcedBreak;
+CChangesRunMathForcedBreak.prototype.Undo = function()
+{
+	var oRun = this.Class;
+
+	if(this.bInsert)
+		oRun.MathPrp.Delete_ForcedBreak();
+	else
+		oRun.MathPrp.Insert_ForcedBreak(this.alnAt);
+};
+CChangesRunMathForcedBreak.prototype.Redo = function()
+{
+	var oRun = this.Class;
+
+	if(this.bInsert)
+		oRun.MathPrp.Insert_ForcedBreak(this.alnAt);
+	else
+		oRun.MathPrp.Delete_ForcedBreak();
+};
+CChangesRunMathForcedBreak.prototype.WriteToBinary = function(Writer)
+{
+	// Long : Flags
+	// 1-bit : bInsert ?
+	// 2-bit : alnAt is undefined ?
+	// 2bit = 0 long : this.alnAt
+
+	var nFlags = 0;
+	if (true === this.bInsert)
+		nFlags |= 1;
+
+	if (undefined === this.alnAt)
+		nFlags |= 2;
+
+	Writer.WriteLong(nFlags);
+
+	if (undefined !== this.alnAt)
+		Writer.WriteLong(this.alnAt);
+};
+CChangesRunMathForcedBreak.prototype.ReadFromBinary = function(Reader)
+{
+	// Long : Flags
+	// 1-bit : bInsert ?
+	// 2-bit : alnAt is undefined ?
+	// 2bit = 0 long : this.alnAt
+
+	var nFlags = Reader.GetLong();
+
+	if (nFlags & 1)
+		this.bInsert = true;
+	else
+		this.bInsert = false;
+
+	if (nFlags & 2)
+		this.alnAt = undefined;
+	else
+		this.alnAt = Reader.GetLong();
+};
+
 
