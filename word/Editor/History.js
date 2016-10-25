@@ -381,7 +381,7 @@ CHistory.prototype =
     // Регистрируем новое изменение:
     // Class - объект, в котором оно произошло
     // Data  - сами изменения
-    Add : function(Class, Data)
+    Add : function(_Class, Data)
     {
 		if (0 !== this.TurnOffHistory || this.Index < 0)
             return;
@@ -393,25 +393,35 @@ CHistory.prototype =
         if ( this.RecIndex >= this.Index )
             this.RecIndex = this.Index - 1;
 
-        var Binary_Pos = this.BinaryWriter.GetCurPosition();
+		var Binary_Pos = this.BinaryWriter.GetCurPosition();
 
-        this.BinaryWriter.WriteString2(Class.Get_Id());
-        Class.Save_Changes( Data, this.BinaryWriter );
+		var Class;
+		if (_Class && _Class.IsChangesClass && _Class.IsChangesClass())
+		{
+			Class = _Class.GetClass();
+			Data  = _Class;
 
-        var Binary_Len = this.BinaryWriter.GetCurPosition() - Binary_Pos;
+			this.BinaryWriter.WriteString2(Class.Get_Id());
+			_Class.WriteToBinary(this.BinaryWriter);
+		}
+		else
+		{
+			Class = _Class;
+			this.BinaryWriter.WriteString2(Class.Get_Id());
+			Class.Save_Changes(Data, this.BinaryWriter);
+		}
 
-        var Item =
-        {
-            Class : Class,
-            Data  : Data,
-            Binary:
-            {
-                Pos : Binary_Pos,
-                Len : Binary_Len
-            },
-            
-            NeedRecalc : !this.MinorChanges
-        };
+		var Binary_Len = this.BinaryWriter.GetCurPosition() - Binary_Pos;
+		var Item = {
+			Class  : Class,
+			Data   : Data,
+			Binary : {
+				Pos : Binary_Pos,
+				Len : Binary_Len
+			},
+
+			NeedRecalc : !this.MinorChanges
+		};
 
         this.Points[this.Index].Items.push( Item );
 

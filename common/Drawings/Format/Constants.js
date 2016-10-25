@@ -2882,6 +2882,15 @@
 		// В большинстве случаев загрузка чужого изменения работает как простое Redo
 		this.Redo();
 	};
+	CChangesBase.prototype.IsChangesClass = function()
+	{
+		// TODO: Эта функция добавлена пока все изменения не переделаны на классы
+		return true;
+	};
+	CChangesBase.prototype.GetClass = function()
+	{
+		return this.Class;
+	};
 	window['AscDFH'].CChangesBase = CChangesBase;
 	/**
 	 * Базовый класс для изменения свойств.
@@ -2896,7 +2905,7 @@
 		this.Old   = Old;
 		this.New   = New;
 	}
-	AscCommon.extendClass(CChangesBase, CChangesBaseProperty);
+	AscCommon.extendClass(CChangesBaseProperty, CChangesBase);
 	CChangesBaseProperty.prototype.Undo = function()
 	{
 		this.private_SetValue(this.Old);
@@ -2919,7 +2928,7 @@
 	{
 		CChangesBaseBoolProperty.superclass.constructor.call(this, Class, Old, New, Color);
 	}
-	AscCommon.extendClass(CChangesBaseProperty, CChangesBaseBoolProperty);
+	AscCommon.extendClass(CChangesBaseBoolProperty, CChangesBaseProperty);
 	CChangesBaseBoolProperty.prototype.WriteToBinary = function(Writer)
 	{
 		// Long  : Flag
@@ -2986,7 +2995,7 @@
 	{
 		CChangesBaseDoubleProperty.superclass.constructor.call(this, Class, Old, New, Color);
 	}
-	AscCommon.extendClass(CChangesBaseProperty, CChangesBaseDoubleProperty);
+	AscCommon.extendClass(CChangesBaseDoubleProperty, CChangesBaseProperty);
 	CChangesBaseDoubleProperty.prototype.WriteToBinary = function(Writer)
 	{
 		// Long  : Flag
@@ -3052,7 +3061,7 @@
 	{
 		CChangesBaseObjectProperty.superclass.constructor.call(this, Class, Old, New, Color);
 	}
-	AscCommon.extendClass(CChangesBaseProperty, CChangesBaseObjectProperty);
+	AscCommon.extendClass(CChangesBaseObjectProperty, CChangesBaseProperty);
 	CChangesBaseObjectProperty.prototype.WriteToBinary = function(Writer)
 	{
 		// Long  : Flag
@@ -3144,7 +3153,7 @@
 	{
 		CChangesBaseLongProperty.superclass.constructor.call(this, Class, Old, New, Color);
 	}
-	AscCommon.extendClass(CChangesBaseProperty, CChangesBaseLongProperty);
+	AscCommon.extendClass(CChangesBaseLongProperty, CChangesBaseProperty);
 	CChangesBaseLongProperty.prototype.WriteToBinary = function(Writer)
 	{
 		// Long  : Flag
@@ -3210,7 +3219,7 @@
 	{
 		CChangesBaseStringProperty.superclass.constructor.call(this, Class, Old, New, Color);
 	}
-	AscCommon.extendClass(CChangesBaseProperty, CChangesBaseStringProperty);
+	AscCommon.extendClass(CChangesBaseStringProperty, CChangesBaseProperty);
 	CChangesBaseStringProperty.prototype.WriteToBinary = function(Writer)
 	{
 		// Long  : Flag

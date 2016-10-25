@@ -1034,7 +1034,7 @@ ParaRun.prototype.private_UpdateCompositeInputPositionsOnRemove = function(Pos, 
 // Добавляем элемент в позицию с сохранием в историю
 ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 {
-    History.Add( this, { Type : AscDFH.historyitem_ParaRun_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
+	History.Add(new CChangesRunAddItem(this, Pos, [Item], Pos));
     this.Content.splice( Pos, 0, Item );
 
     if (true === UpdatePosition)
@@ -1090,7 +1090,7 @@ ParaRun.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
 {
     // Получим массив удаляемых элементов
     var DeletedItems = this.Content.slice( Pos, Pos + Count );
-    History.Add( this, { Type : AscDFH.historyitem_Paragraph_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+	History.Add(new CChangesRunRemoveItem(this, Pos, DeletedItems, Pos + Count - 1));
 
     this.Content.splice( Pos, Count );
 
@@ -1154,7 +1154,7 @@ ParaRun.prototype.Concat_ToContent = function(NewItems)
     var StartPos = this.Content.length;
     this.Content = this.Content.concat( NewItems );
 
-    History.Add( this, { Type : AscDFH.historyitem_ParaRun_AddItem, Pos : StartPos, EndPos : this.Content.length - 1, Items : NewItems, Color : false } );
+    History.Add(new CChangesRunAddItem(this, StartPos, NewItems, this.Content.length - 1, false));
 
     this.private_UpdateTrackRevisionOnChangeContent(true);
 
@@ -1597,7 +1597,7 @@ ParaRun.prototype.Split = function (ContentPos, Depth)
 
 ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
 {
-    History.Add(this, {Type : AscDFH.historyitem_ParaRun_OnStartSplit, Pos : CurPos});
+    History.Add(new CChangesRunOnStartSplit(this, CurPos));
     AscCommon.CollaborativeEditing.OnStart_SplitRun(this, CurPos);
 
     // Если задается Parent и ParentPos, тогда ран автоматически добавляется в родительский класс
@@ -1735,7 +1735,7 @@ ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
         }
     }
 
-    History.Add(this, {Type : AscDFH.historyitem_ParaRun_OnEndSplit, NewRun : NewRun});
+    History.Add(new CChangesRunOnEndSplit(this, NewRun));
     AscCommon.CollaborativeEditing.OnEnd_SplitRun(NewRun);
     return NewRun;
 };
@@ -6176,7 +6176,7 @@ ParaRun.prototype.Set_Pr = function(TextPr)
     var OldValue = this.Pr;
     this.Pr = TextPr;
 
-    History.Add( this, { Type : AscDFH.historyitem_ParaRun_TextPr, New : TextPr, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+	History.Add(new CChangesRunTextPr(this, OldValue, TextPr, this.private_IsCollPrChangeMine()));
     this.Recalc_CompiledPr(true);
 
     this.protected_UpdateSpellChecking();
@@ -6444,7 +6444,7 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 
 ParaRun.prototype.Split_Run = function(Pos)
 {
-    History.Add(this, {Type : AscDFH.historyitem_ParaRun_OnStartSplit, Pos : Pos});
+    History.Add(new CChangesRunOnStartSplit(this, Pos));
     AscCommon.CollaborativeEditing.OnStart_SplitRun(this, Pos);
 
     // Создаем новый ран
@@ -6526,7 +6526,7 @@ ParaRun.prototype.Split_Run = function(Pos)
         }
     }
 
-    History.Add(this, {Type : AscDFH.historyitem_ParaRun_OnEndSplit, NewRun : NewRun});
+    History.Add(new CChangesRunOnEndSplit(this, NewRun));
     AscCommon.CollaborativeEditing.OnEnd_SplitRun(NewRun);
     return NewRun;
 };
@@ -6741,26 +6741,50 @@ ParaRun.prototype.Add_PrChange = function()
     if (false === this.Have_PrChange())
     {
         this.Pr.Add_PrChange();
-        History.Add(this, {Type : AscDFH.historyitem_ParaRun_PrChange, New : {PrChange : this.Pr.PrChange, ReviewInfo : this.Pr.ReviewInfo}, Old : {PrChange : undefined, ReviewInfo : undefined}});
-        this.private_UpdateTrackRevisions();
+		History.Add(new CChangesRunPrChange(this,
+			{
+				PrChange   : undefined,
+				ReviewInfo : undefined
+			},
+			{
+				PrChange   : this.Pr.PrChange,
+				ReviewInfo : this.Pr.ReviewInfo
+			}));
+		this.private_UpdateTrackRevisions();
     }
 };
 
 ParaRun.prototype.Set_PrChange = function(PrChange, ReviewInfo)
 {
-    History.Add(this, {Type : AscDFH.historyitem_ParaRun_PrChange, New : {PrChange : PrChange, ReviewInfo : ReviewInfo ? ReviewInfo.Copy() : undefined}, Old : {PrChange : this.Pr.PrChange, ReviewInfo : this.Pr.ReviewInfo ? this.Pr.ReviewInfo.Copy() : undefined}});
-    this.Pr.Set_PrChange(PrChange, ReviewInfo);
+	History.Add(new CChangesRunPrChange(this,
+		{
+			PrChange   : this.Pr.PrChange,
+			ReviewInfo : this.Pr.ReviewInfo ? this.Pr.ReviewInfo.Copy() : undefined
+		},
+		{
+			PrChange   : PrChange,
+			ReviewInfo : ReviewInfo ? ReviewInfo.Copy() : undefined
+		}));
+	this.Pr.Set_PrChange(PrChange, ReviewInfo);
     this.private_UpdateTrackRevisions();
 };
 
 ParaRun.prototype.Remove_PrChange = function()
 {
-    if (true === this.Have_PrChange())
-    {
-        History.Add(this, {Type : AscDFH.historyitem_ParaRun_PrChange, New : {PrChange : undefined, ReviewInfo : undefined}, Old : {PrChange : this.Pr.PrChange, ReviewInfo : this.Pr.ReviewInfo}});
-        this.Pr.Remove_PrChange();
-        this.private_UpdateTrackRevisions();
-    }
+	if (true === this.Have_PrChange())
+	{
+		History.Add(new CChangesRunPrChange(this,
+			{
+				PrChange   : this.Pr.PrChange,
+				ReviewInfo : this.Pr.ReviewInfo
+			},
+			{
+				PrChange   : undefined,
+				ReviewInfo : undefined
+			}));
+		this.Pr.Remove_PrChange();
+		this.private_UpdateTrackRevisions();
+	}
 };
 
 ParaRun.prototype.Reject_PrChange = function()
@@ -6789,7 +6813,7 @@ ParaRun.prototype.Set_Bold = function(Value)
         var OldValue = this.Pr.Bold;
         this.Pr.Bold = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Bold, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunBold(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6808,7 +6832,7 @@ ParaRun.prototype.Set_Italic = function(Value)
         var OldValue = this.Pr.Italic;
         this.Pr.Italic = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Italic, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunItalic(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6827,7 +6851,7 @@ ParaRun.prototype.Set_Strikeout = function(Value)
         var OldValue = this.Pr.Strikeout;
         this.Pr.Strikeout = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Strikeout, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunStrikeout(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6846,7 +6870,7 @@ ParaRun.prototype.Set_Underline = function(Value)
         var OldValue = this.Pr.Underline;
         this.Pr.Underline = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Underline, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunUnderline(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6865,7 +6889,7 @@ ParaRun.prototype.Set_FontSize = function(Value)
         var OldValue = this.Pr.FontSize;
         this.Pr.FontSize = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_FontSize, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunFontSize(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6884,7 +6908,7 @@ ParaRun.prototype.Set_Color = function(Value)
         var OldValue = this.Pr.Color;
         this.Pr.Color = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Color, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunColor(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6898,7 +6922,7 @@ ParaRun.prototype.Set_Unifill = function(Value, bForce)
         var OldValue = this.Pr.Unifill;
         this.Pr.Unifill = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Unifill, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunUnifill(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6911,7 +6935,7 @@ ParaRun.prototype.Set_TextFill = function(Value, bForce)
         var OldValue = this.Pr.TextFill;
         this.Pr.TextFill = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_TextFill, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunTextFill(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6925,7 +6949,7 @@ ParaRun.prototype.Set_TextOutline = function(Value)
         var OldValue = this.Pr.TextOutline;
         this.Pr.TextOutline = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_TextOutline, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunTextOutline(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6944,7 +6968,7 @@ ParaRun.prototype.Set_VertAlign = function(Value)
         var OldValue = this.Pr.VertAlign;
         this.Pr.VertAlign = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_VertAlign, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunVertAlign(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6962,7 +6986,7 @@ ParaRun.prototype.Set_HighLight = function(Value)
     if ( (undefined === Value && undefined !== OldValue) || ( highlight_None === Value && highlight_None !== OldValue ) || ( Value instanceof CDocumentColor && ( undefined === OldValue || highlight_None === OldValue || false === Value.Compare(OldValue) ) ) )
     {
         this.Pr.HighLight = Value;
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_HighLight, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunHighLight(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6981,7 +7005,7 @@ ParaRun.prototype.Set_RStyle = function(Value)
         var OldValue = this.Pr.RStyle;
         this.Pr.RStyle = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_RStyle, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunRStyle(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6999,7 +7023,7 @@ ParaRun.prototype.Set_Spacing = function(Value)
         var OldValue = this.Pr.Spacing;
         this.Pr.Spacing = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Spacing, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunSpacing(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -7018,7 +7042,7 @@ ParaRun.prototype.Set_DStrikeout = function(Value)
         var OldValue = this.Pr.DStrikeout;
         this.Pr.DStrikeout = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_DStrikeout, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunDStrikeout(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -7037,7 +7061,7 @@ ParaRun.prototype.Set_Caps = function(Value)
         var OldValue = this.Pr.Caps;
         this.Pr.Caps = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Caps, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunCaps(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7055,7 +7079,7 @@ ParaRun.prototype.Set_SmallCaps = function(Value)
         var OldValue = this.Pr.SmallCaps;
         this.Pr.SmallCaps = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_SmallCaps, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunSmallCaps(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7073,7 +7097,7 @@ ParaRun.prototype.Set_Position = function(Value)
         var OldValue = this.Pr.Position;
         this.Pr.Position = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Position, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunPosition(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
 
@@ -7091,7 +7115,7 @@ ParaRun.prototype.Set_RFonts = function(Value)
     var OldValue = this.Pr.RFonts;
     this.Pr.RFonts = Value;
 
-    History.Add( this, { Type : AscDFH.historyitem_ParaRun_RFonts, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+    History.Add(new CChangesRunRFonts(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
     this.Recalc_CompiledPr(true);
     this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -7144,7 +7168,7 @@ ParaRun.prototype.Set_RFonts_Ascii = function(Value)
         var OldValue = this.Pr.RFonts.Ascii;
         this.Pr.RFonts.Ascii = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_RFonts_Ascii, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunRFontsAscii(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7157,7 +7181,7 @@ ParaRun.prototype.Set_RFonts_HAnsi = function(Value)
         var OldValue = this.Pr.RFonts.HAnsi;
         this.Pr.RFonts.HAnsi = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_RFonts_HAnsi, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunRFontsHAnsi(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7170,7 +7194,7 @@ ParaRun.prototype.Set_RFonts_CS = function(Value)
         var OldValue = this.Pr.RFonts.CS;
         this.Pr.RFonts.CS = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_RFonts_CS, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunRFontsCS(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7183,7 +7207,7 @@ ParaRun.prototype.Set_RFonts_EastAsia = function(Value)
         var OldValue = this.Pr.RFonts.EastAsia;
         this.Pr.RFonts.EastAsia = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_RFonts_EastAsia, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunRFontsEastAsia(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7196,7 +7220,7 @@ ParaRun.prototype.Set_RFonts_Hint = function(Value)
         var OldValue = this.Pr.RFonts.Hint;
         this.Pr.RFonts.Hint = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_RFonts_Hint, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunRFontsHint(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7210,7 +7234,7 @@ ParaRun.prototype.Set_Lang = function(Value)
     if ( undefined != Value )
         this.Pr.Lang.Set_FromObject( Value );
 
-    History.Add( this, { Type : AscDFH.historyitem_ParaRun_Lang, New : this.Pr.Lang, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+    History.Add(new CChangesRunLang(this, OldValue, this.Pr.Lang, this.private_IsCollPrChangeMine()));
     this.Recalc_CompiledPr(false);
     this.private_UpdateTrackRevisionOnChangeTextPr(true);
 };
@@ -7239,7 +7263,7 @@ ParaRun.prototype.Set_Lang_Bidi = function(Value)
         var OldValue = this.Pr.Lang.Bidi;
         this.Pr.Lang.Bidi = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Lang_Bidi, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+		History.Add(new CChangesRunLangBidi(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7252,7 +7276,7 @@ ParaRun.prototype.Set_Lang_EastAsia = function(Value)
         var OldValue = this.Pr.Lang.EastAsia;
         this.Pr.Lang.EastAsia = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Lang_EastAsia, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunLangEastAsia(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7265,7 +7289,7 @@ ParaRun.prototype.Set_Lang_Val = function(Value)
         var OldValue = this.Pr.Lang.Val;
         this.Pr.Lang.Val = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Lang_Val, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunLangVal(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7286,7 +7310,7 @@ ParaRun.prototype.Set_Shd = function(Shd)
     else
         this.Pr.Shd = undefined;
 
-    History.Add( this, { Type : AscDFH.historyitem_ParaRun_Shd, New : this.Pr.Shd, Old : OldShd, Color : this.private_IsCollPrChangeMine() } );
+    History.Add(new CChangesRunShd(this, OldShd, this.Pr.Shd, this.private_IsCollPrChangeMine()));
     this.Recalc_CompiledPr(false);
     this.private_UpdateTrackRevisionOnChangeTextPr(true);
 };
@@ -8037,7 +8061,7 @@ ParaRun.prototype.Math_Apply_Style = function(Value)
         var OldValue     = this.MathPrp.sty;
         this.MathPrp.sty = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_MathStyle, New : Value, Old : OldValue } );
+        History.Add(new CChangesRunMathStyle(this, OldValue, Value));
 
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -8266,16 +8290,16 @@ ParaRun.prototype.Check_ForcedBreak = function(bStart, bEnd)
 };
 ParaRun.prototype.Set_MathForcedBreak = function(bInsert)
 {
-    if(bInsert == true && false == this.MathPrp.IsBreak())
-    {
-        History.Add(this, {Type: AscDFH.historyitem_ParaRun_MathForcedBreak, bInsert: true, alnAt: undefined });
-        this.MathPrp.Insert_ForcedBreak();
-    }
-    else if(bInsert == false && true == this.MathPrp.IsBreak())
-    {
-        History.Add(this, {Type: AscDFH.historyitem_ParaRun_MathForcedBreak, bInsert: false, alnAt: this.MathPrp.Get_AlnAt()});
-        this.MathPrp.Delete_ForcedBreak();
-    }
+	if (bInsert == true && false == this.MathPrp.IsBreak())
+	{
+		History.Add(new CChangesRunMathForcedBreak(this, true, undefined));
+		this.MathPrp.Insert_ForcedBreak();
+	}
+	else if (bInsert == false && true == this.MathPrp.IsBreak())
+	{
+		History.Add(new CChangesRunMathForcedBreak(this, false, this.MathPrp.Get_AlnAt()));
+		this.MathPrp.Delete_ForcedBreak();
+	}
 };
 ParaRun.prototype.Math_SplitRunForcedBreak = function()
 {
@@ -8329,7 +8353,7 @@ ParaRun.prototype.Set_MathPr = function(MPrp)
     var OldValue = this.MathPrp;
     this.MathPrp.Set_Pr(MPrp);
 
-    History.Add( this, { Type : AscDFH.historyitem_ParaRun_MathPrp, New : this.MathPrp, Old : OldValue } );
+    History.Add(new CChangesRunMathPrp(this, OldValue, this.MathPrp));
     this.Recalc_CompiledPr(true);
     this.private_UpdateTrackRevisionOnChangeTextPr(true);
 };
@@ -8535,18 +8559,34 @@ ParaRun.prototype.Set_ReviewType = function(Value)
         this.ReviewType = Value;
         this.ReviewInfo.Update();
 
-        History.Add(this, {Type : AscDFH.historyitem_ParaRun_ReviewType, New : {ReviewType :  this.ReviewType, ReviewInfo : this.ReviewInfo.Copy()}, Old : {ReviewType :  OldReviewType, ReviewInfo : OldReviewInfo}});
-        this.private_UpdateTrackRevisions();
-    }
+		History.Add(new CChangesRunReviewType(this,
+			{
+				ReviewType : OldReviewType,
+				ReviewInfo : OldReviewInfo
+			},
+			{
+				ReviewType : this.ReviewType,
+				ReviewInfo : this.ReviewInfo.Copy()
+			}));
+		this.private_UpdateTrackRevisions();
+	}
 };
 ParaRun.prototype.Set_ReviewTypeWithInfo = function(ReviewType, ReviewInfo)
 {
-    History.Add(this, {Type : AscDFH.historyitem_ParaRun_ReviewType, Old : {ReviewType :  this.ReviewType, ReviewInfo : this.ReviewInfo ? this.ReviewInfo.Copy() : undefined}, New : {ReviewType :  ReviewType, ReviewInfo : ReviewInfo ? ReviewInfo.Copy() : undefined}});
+	History.Add(new CChangesRunReviewType(this,
+		{
+			ReviewType : this.ReviewType,
+			ReviewInfo : this.ReviewInfo ? this.ReviewInfo.Copy() : undefined
+		},
+		{
+			ReviewType : ReviewType,
+			ReviewInfo : ReviewInfo ? ReviewInfo.Copy() : undefined
+		}));
 
-    this.ReviewType = ReviewType;
-    this.ReviewInfo = ReviewInfo;
+	this.ReviewType = ReviewType;
+	this.ReviewInfo = ReviewInfo;
 
-    this.private_UpdateTrackRevisions();
+	this.private_UpdateTrackRevisions();
 };
 ParaRun.prototype.Get_Parent = function()
 {
@@ -8686,7 +8726,7 @@ ParaRun.prototype.private_UpdateTrackRevisionOnChangeContent = function(bUpdateI
         {
             var OldReviewInfo = this.ReviewInfo.Copy();
             this.ReviewInfo.Update();
-            History.Add(this, {Type : AscDFH.historyitem_ParaRun_ContentReviewInfo, Old : OldReviewInfo, New : this.ReviewInfo.Copy()});
+            History.Add(new CChangesRunContentReviewInfo(this, OldReviewInfo, this.ReviewInfo.Copy()));
         }
     }
 };
@@ -8700,7 +8740,7 @@ ParaRun.prototype.private_UpdateTrackRevisionOnChangeTextPr = function(bUpdateIn
         {
             var OldReviewInfo = this.Pr.ReviewInfo.Copy();
             this.Pr.ReviewInfo.Update();
-            History.Add(this, {Type : AscDFH.historyitem_ParaRun_PrReviewInfo, Old : OldReviewInfo, New : this.Pr.ReviewInfo.Copy()});
+            History.Add(new CChangesRunPrReviewInfo(this, OldReviewInfo, this.Pr.ReviewInfo.Copy()));
         }
     }
 };
@@ -8946,7 +8986,7 @@ ParaRun.prototype.Displace_BreakOperator = function(isForward, bBrkBefore, Count
 
             if(AlnAt !== NewAlnAt)
             {
-                History.Add(this, {Type: AscDFH.historyitem_ParaRun_MathAlnAt, New: NewAlnAt, Old: AlnAt});
+                History.Add(new CChangesRunMathAlnAt(this, AlnAt, NewAlnAt));
             }
         }
     }
