@@ -443,6 +443,9 @@ var UndoRedoDataTypes = new function() {
     this.DynamicFilter = 75;
     this.Top10 = 76;
 
+	this.PropertyChanges = 79;
+	this.SparklineProps = 80;
+
     this.Create = function(nType)
 	{
 		switch(nType)

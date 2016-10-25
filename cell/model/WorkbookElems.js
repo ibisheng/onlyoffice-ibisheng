@@ -4580,13 +4580,75 @@ CellArea.prototype = {
 };
 
 	/** @constructor */
+	function propertyChanges() {
+		this.propertyObj = {};
+	}
+	propertyChanges.prototype.getType = function () {
+		return AscCommonExcel.UndoRedoDataTypes.PropertyChanges;
+	};
+	propertyChanges.prototype.getProperties = function () {
+		var res = {};
+		for (var i in this.propertyObj) {
+			res[i] = i;
+		}
+		return res;
+	};
+	propertyChanges.prototype.getProperty = function (nType) {
+		return this.propertyObj[nType];
+	};
+	propertyChanges.prototype.setProperty = function (nType, value) {
+		this.propertyObj[nType] = value;
+	};
+
+	/** @constructor */
+	function sparklineChanges() {
+		this.Properties = {
+			attributes: 0,
+			colors: 1
+		};
+
+		this.attributes = new propertyChanges();
+		this.colors = new propertyChanges();
+	}
+	sparklineChanges.prototype.getType = function () {
+		return AscCommonExcel.UndoRedoDataTypes.SparklineProps;
+	};
+	sparklineChanges.prototype.getProperties = function () {
+		return this.Properties;
+	};
+	sparklineChanges.prototype.getProperty = function (nType) {
+		switch (nType) {
+			case this.Properties.attributes:
+				return this.attributes;
+				break;
+			case this.Properties.colors:
+				return this.colors;
+				break;
+		}
+		return null;
+	};
+	sparklineChanges.prototype.setProperty = function (nType, value) {
+		switch (nType) {
+			case this.Properties.attributes:
+				this.attributes = value;
+				break;
+			case this.Properties.colors:
+				this.colors = value;
+				break;
+		}
+	};
+	sparklineChanges.prototype.setAttribute = function (type, value) {
+		this.attributes.setProperty(type, value);
+	};
+	sparklineChanges.prototype.setColor = function (type, value) {
+		this.colors.setProperty(type, value);
+	};
+
+	/** @constructor */
 	function sparklineGroup() {
 		// attributes
-		this.manualMax = undefined;
-		this.manualMin = undefined;
-		this.lineWeight = 0.75;
 		this.type = Asc.c_oAscSparklineType.Line;
-		this.dateAxis = false;
+		this.lineWeight = 0.75;
 		this.displayEmptyCellsAs = Asc.c_oAscEDispBlanksAs.Zero;
 		this.markers = false;
 		this.high = false;
@@ -4600,6 +4662,10 @@ CellArea.prototype = {
 		this.maxAxisType = Asc.c_oAscSparklineAxisMinMax.Individual;
 		this.rightToLeft = false;
 
+		this.manualMax = undefined;
+		this.manualMin = undefined;
+		this.dateAxis = false;
+
 		// elements
 		this.colorSeries = null;
 		this.colorNegative = null;
@@ -4609,6 +4675,7 @@ CellArea.prototype = {
 		this.colorLast = null;
 		this.colorHigh = null;
 		this.colorLow = null;
+
 		this.f = null;
 		this.arrSparklines = [];
 		this.arrCachedSparklines = [];
@@ -4616,6 +4683,9 @@ CellArea.prototype = {
 		//for drawing preview
 		this.canvas = null;
 		this.sparklineView = null;
+
+		// for changes
+		this.sparklineChanges = null;
 	}
 
 	sparklineGroup.prototype.clone = function (onlyProps) {
@@ -4691,6 +4761,20 @@ CellArea.prototype = {
 			}
 		}
 		return -1;
+	};
+	sparklineGroup.prototype.asc_setAttribute = function (type, value) {
+		if (!this.sparklineChanges) {
+			this.sparklineChanges = new sparklineChanges();
+		}
+
+		this.sparklineChanges.setAttribute(type, value);
+	};
+	sparklineGroup.prototype.asc_setColor = function (type, value) {
+		if (!this.sparklineChanges) {
+			this.sparklineChanges = new sparklineChanges();
+		}
+
+		this.sparklineChanges.setColor(type, value);
 	};
 	sparklineGroup.prototype.asc_getType = function () {
 		return this.type;
@@ -4890,20 +4974,19 @@ CellArea.prototype = {
 		return aRet;
 	};
 
-
-    sparklineGroup.prototype.asc_setStyle = function(nStyleIndex){
-        var oStyle = AscFormat.aSparklinesStyles[nStyleIndex];
-        if(oStyle) {
-            this.colorSeries = this.createExcellColor(oStyle[0]);
-            this.colorNegative = this.createExcellColor(oStyle[1]);
-            this.colorAxis = this.createExcellColor(0xff000000);
-            this.colorMarkers = this.createExcellColor(oStyle[2]);
-            this.colorFirst = this.createExcellColor(oStyle[3]);
-            this.colorLast = this.createExcellColor(oStyle[4]);
-            this.colorHigh = this.createExcellColor(oStyle[5]);
-            this.colorLow = this.createExcellColor(oStyle[6]);
-        }
-    };
+	sparklineGroup.prototype.asc_setStyle = function (nStyleIndex) {
+		var oStyle = AscFormat.aSparklinesStyles[nStyleIndex];
+		if (oStyle) {
+			this.colorSeries = this.createExcellColor(oStyle[0]);
+			this.colorNegative = this.createExcellColor(oStyle[1]);
+			this.colorAxis = this.createExcellColor(0xff000000);
+			this.colorMarkers = this.createExcellColor(oStyle[2]);
+			this.colorFirst = this.createExcellColor(oStyle[3]);
+			this.colorLast = this.createExcellColor(oStyle[4]);
+			this.colorHigh = this.createExcellColor(oStyle[5]);
+			this.colorLow = this.createExcellColor(oStyle[6]);
+		}
+	};
 	/** @constructor */
 	function sparkline() {
 		this.sqref = null;
@@ -7102,8 +7185,11 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].RangeDataManagerElem = RangeDataManagerElem;
 	window['AscCommonExcel'].RangeDataManager = RangeDataManager;
 	window['AscCommonExcel'].CellArea = CellArea;
+	window["AscCommonExcel"].sparklineChanges = sparklineChanges;
 	window['AscCommonExcel'].sparklineGroup = sparklineGroup;
 	prot = sparklineGroup.prototype;
+	prot["asc_setAttribute"]			= prot.asc_setAttribute;
+	prot["asc_setColor"]					= prot.asc_setColor;
 	prot["asc_getType"]						= prot.asc_getType;
 	prot["asc_getLineWeight"]			= prot.asc_getLineWeight;
 	prot["asc_getDisplayEmpty"]		= prot.asc_getDisplayEmpty;
@@ -7145,7 +7231,7 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].getShortDateFormat = getShortDateFormat;
   window['AscCommonExcel'].getCurrencyFormatSimple = getCurrencyFormatSimple;
   window['AscCommonExcel'].getCurrencyFormat = getCurrencyFormat;
-	
+
 window["Asc"]["CustomFilters"]			= window["Asc"].CustomFilters = CustomFilters;
 prot									= CustomFilters.prototype;
 prot["asc_getAnd"]						= prot.asc_getAnd;
