@@ -5696,7 +5696,7 @@ Woorksheet.prototype.updateSparklineCache = function(sheet, ranges) {
 	Woorksheet.prototype.getSparklineGroup = function(c, r) {
 		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
 			if (-1 !== this.aSparklineGroups[i].contains(c, r)) {
-				return this.aSparklineGroups[i];
+				return this.aSparklineGroups[i].clone(true);
 			}
 		}
 		return null;
