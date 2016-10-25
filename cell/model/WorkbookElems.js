@@ -4618,7 +4618,7 @@ CellArea.prototype = {
 		this.sparklineView = null;
 	}
 
-	sparklineGroup.prototype.clone = function (bNoCloneSparklines) {
+	sparklineGroup.prototype.clone = function (onlyProps) {
 		var res = new sparklineGroup();
 		res.manualMax = this.manualMax;
 		res.manualMin = this.manualMin;
@@ -4648,12 +4648,12 @@ CellArea.prototype = {
 		res.colorLow = this.colorLow ? this.colorLow : null;
 		res.f = this.f;
 
-		if(bNoCloneSparklines) {
-			return res;
+		if (!onlyProps) {
+			for (var i = 0; i < this.arrSparklines.length; ++i) {
+				res.arrSparklines.push(this.arrSparklines[i].clone());
+			}
 		}
-		for (var i = 0; i < this.arrSparklines.length; ++i) {
-			res.arrSparklines.push(this.arrSparklines[i].clone());
-		}
+
 		return res;
 	};
 	sparklineGroup.prototype.addView = function (oSparklineView, index) {
