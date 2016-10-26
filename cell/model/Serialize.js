@@ -6663,7 +6663,7 @@
             var oThis = this;
             var res = c_oSerConstants.ReadOk;
             if (c_oSer_Sparkline.SparklineGroup === type) {
-				var newSparklineGroup = new AscCommonExcel.sparklineGroup();
+				var newSparklineGroup = new AscCommonExcel.sparklineGroup(true);
 				res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadSparklineGroup(t, l, newSparklineGroup);
                 });

@@ -74,7 +74,7 @@ var c_oAscError = Asc.c_oAscError;
 		
 		DesktopOfflineUpdateLocalName(this);
 		
-		this.onUpdateDocumentModified(AscCommon.History.Is_Modified());
+		this.onUpdateDocumentModified(AscCommon.History.Have_Changes());
 	};
 	
 	asc['spreadsheet_api'].prototype._onNeedParams = function(data, opt_isPassword)
@@ -162,7 +162,7 @@ AscCommon.CHistory.prototype.Reset_SavedIndex = function(IsUserSave)
 	}
 };
 
-AscCommon.CHistory.prototype.Is_Modified = function(IsNotUserSave, IsNoSavedNoModifyed) 
+AscCommon.CHistory.prototype.Have_Changes = function(IsNotUserSave, IsNoSavedNoModifyed) 
 {
 	var checkIndex = (this.Is_UserSaveMode() && !IsNotUserSave) ? this.UserSavedIndex : this.SavedIndex;
 	if (-1 === this.Index && null === checkIndex && false === this.ForceSave) 
@@ -198,7 +198,7 @@ window["Asc"]['spreadsheet_api'].prototype.onUpdateDocumentModified = function(b
       this._onUpdateDocumentCanSave();
 
       if (undefined !== window["AscDesktopEditor"]) {
-        window["AscDesktopEditor"]["onDocumentModifiedChanged"](AscCommon.History ? AscCommon.History.Is_Modified(undefined, true) : bValue);
+        window["AscDesktopEditor"]["onDocumentModifiedChanged"](AscCommon.History ? AscCommon.History.Have_Changes(undefined, true) : bValue);
       }
     }
 };
@@ -260,7 +260,7 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error)
 	else
 		AscCommon.History.UserSavedIndex = window["Asc"]["editor"].LastUserSavedIndex;		
 	
-	window["Asc"]["editor"].onUpdateDocumentModified(AscCommon.History.Is_Modified());
+	window["Asc"]["editor"].onUpdateDocumentModified(AscCommon.History.Have_Changes());
 	window["Asc"]["editor"].LastUserSavedIndex = undefined;
 	
 	if (2 == error)

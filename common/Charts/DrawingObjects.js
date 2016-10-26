@@ -691,7 +691,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         var val_ax_props = new AscCommon.asc_ValAxisSettings();
         if(settings.type !== c_oAscChartTypeSettings.barStackedPer)
         {
-            if(oSparklineGroup.minAxisType === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.manualMin != null)
+            if(oSparklineGroup.minAxisType === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.manualMin !== null)
             {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
                 val_ax_props.putMinVal(oSparklineGroup.manualMin);
@@ -700,7 +700,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.auto);
             }
-            if(oSparklineGroup.maxAxisType === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.manualMax != null)
+            if(oSparklineGroup.maxAxisType === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.manualMax !== null)
             {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
                 val_ax_props.putMinVal(oSparklineGroup.manualMax);
