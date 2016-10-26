@@ -4676,14 +4676,17 @@ CellArea.prototype = {
 		this.maxAxisType = null !== val.maxAxisType ? val.maxAxisType : this.maxAxisType;
 		this.rightToLeft = null !== val.rightToLeft ? val.rightToLeft : this.rightToLeft;
 
-		this.colorSeries = null !== val.colorSeries ? AscCommonExcel.CorrectAscColor(val.colorSeries) : this.colorSeries;
-		this.colorNegative = null !== val.colorNegative ? AscCommonExcel.CorrectAscColor(val.colorNegative) : this.colorNegative;
-		this.colorAxis = null !== val.colorAxis ? AscCommonExcel.CorrectAscColor(val.colorAxis) : this.colorAxis;
-		this.colorMarkers = null !== val.colorMarkers ? AscCommonExcel.CorrectAscColor(val.colorMarkers) : this.colorMarkers;
-		this.colorFirst = null !== val.colorFirst ? AscCommonExcel.CorrectAscColor(val.colorFirst) : this.colorFirst;
-		this.colorLast = null !== val.colorLast ? AscCommonExcel.CorrectAscColor(val.colorLast) : this.colorLast;
-		this.colorHigh = null !== val.colorHigh ? AscCommonExcel.CorrectAscColor(val.colorHigh) : this.colorHigh;
-		this.colorLow = null !== val.colorLow ? AscCommonExcel.CorrectAscColor(val.colorLow) : this.colorLow;
+		var getColor = function (color) {
+			return color instanceof Asc.asc_CColor ? AscCommonExcel.CorrectAscColor(color) : color;
+		};
+		this.colorSeries = null !== val.colorSeries ? getColor(val.colorSeries) : this.colorSeries;
+		this.colorNegative = null !== val.colorNegative ? getColor(val.colorNegative) : this.colorNegative;
+		this.colorAxis = null !== val.colorAxis ? getColor(val.colorAxis) : this.colorAxis;
+		this.colorMarkers = null !== val.colorMarkers ? getColor(val.colorMarkers) : this.colorMarkers;
+		this.colorFirst = null !== val.colorFirst ? getColor(val.colorFirst) : this.colorFirst;
+		this.colorLast = null !== val.colorLast ? getColor(val.colorLast) : this.colorLast;
+		this.colorHigh = null !== val.colorHigh ? getColor(val.colorHigh) : this.colorHigh;
+		this.colorLow = null !== val.colorLow ? getColor(val.colorLow) : this.colorLow;
 
 		this.cleanCache();
 	};
