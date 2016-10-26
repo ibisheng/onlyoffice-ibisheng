@@ -589,14 +589,21 @@
 		this.CoAuthoringApi.onSession = function(data) {
 			var code = data["code"];
 			var reason = data["reason"];
+			var interval = data["interval"];
 			var extendSession = true;
 			if (c_oCloseCode.sessionIdle == code) {
-				extendSession = false;
+				var lastTime = new Date().getTime();
+				var idleTime = new Date().getTime() - lastTime;
+				if (idleTime < interval) {
+					t.CoAuthoringApi.extendSession(idleTime);
+				} else {
+					extendSession = false;
+				}
 			} else if (c_oCloseCode.sessionAbsolute == code) {
 				extendSession = false;
 			}
 			if (!extendSession) {
-				if (true != History.Is_Clear()) {
+				if (History.Have_Changes()) {
 					//enter view mode because save async
 					t.sendEvent('asc_onCoAuthoringDisconnect');
 					t.asc_setViewMode(true);
@@ -606,8 +613,13 @@
 
 						t.CoAuthoringApi.disconnect(code, reason);
 					};
-					AscCommon.CollaborativeEditing.Apply_Changes();
-					AscCommon.CollaborativeEditing.Send_Changes();
+					if (t.collaborativeEditing.applyChanges) {
+						t.collaborativeEditing.applyChanges();
+						t.collaborativeEditing.sendChanges();
+					} else {
+						AscCommon.CollaborativeEditing.Apply_Changes();
+						AscCommon.CollaborativeEditing.Send_Changes();
+					}
 				} else {
 					t.CoAuthoringApi.disconnect(code, reason);
 				}
@@ -619,19 +631,19 @@
 		 * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
 		 * @param {Bool} isCloseCoAuthoring
 		 */
-		this.CoAuthoringApi.onDisconnect = function(e, isDisconnectAtAll, isCloseCoAuthoring)
+		this.CoAuthoringApi.onDisconnect = function(e, errorCode)
 		{
 			if (AscCommon.ConnectionState.None === t.CoAuthoringApi.get_state())
 			{
 				t.asyncServerIdEndLoaded();
 			}
-			if (isDisconnectAtAll)
+			if (null != errorCode)
 			{
 				// Посылаем наверх эвент об отключении от сервера
 				t.sendEvent('asc_onCoAuthoringDisconnect');
 				// И переходим в режим просмотра т.к. мы не можем сохранить файл
 				t.asc_setViewMode(true);
-				t.sendEvent('asc_onError', isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
+				t.sendEvent('asc_onError', errorCode, c_oAscError.Level.NoCritical);
 			}
 		};
 		this.CoAuthoringApi.onDocumentOpen = function(inputWrap)

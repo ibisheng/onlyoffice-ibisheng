@@ -173,6 +173,12 @@ CHistory.prototype.init = function(workbook) {
 CHistory.prototype.Is_UserSaveMode = function() {
   return this.UserSaveMode;
 };
+CHistory.prototype.Is_Clear = function() {
+    if ( this.Points.length <= 0 )
+        return true;
+
+    return false;
+};
 CHistory.prototype.Clear = function()
 {
 	this.Index         = -1;
@@ -709,7 +715,7 @@ CHistory.prototype._sendCanUndoRedo = function()
 {
 	this.workbook.handlers.trigger("setCanUndo", this.Can_Undo());
 	this.workbook.handlers.trigger("setCanRedo", this.Can_Redo());
-	this.workbook.handlers.trigger("setDocumentModified", this.Is_Modified());
+	this.workbook.handlers.trigger("setDocumentModified", this.Have_Changes());
 };
 CHistory.prototype.SetSelection = function(range)
 {
@@ -835,7 +841,7 @@ CHistory.prototype.Get_DeleteIndex = function () {
 	return DeleteIndex;
 };
 /** @returns {boolean} */
-CHistory.prototype.Is_Modified = function(IsNotUserSave) {
+CHistory.prototype.Have_Changes = function(IsNotUserSave) {
   var checkIndex = (this.Is_UserSaveMode() && !IsNotUserSave) ? this.UserSavedIndex : this.SavedIndex;
   if (-1 === this.Index && null === checkIndex && false === this.ForceSave) {
     return false;
