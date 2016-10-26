@@ -7182,7 +7182,7 @@ drawPieChart.prototype =
         }
     },
 	
-	_drawPie3D: function ()
+	_drawPie3D_Slow: function ()
     {
 		var numCache = this._getFirstRealNumCache();
 		var  props = this.cChartSpace.getParentObjects();
@@ -7224,7 +7224,7 @@ drawPieChart.prototype =
         
     },
 	
-	_reCalculatePie3D: function ()
+	_reCalculatePie3D_Slow: function ()
     {
 		var trueWidth = this.chartProp.trueWidth;
 		var trueHeight = this.chartProp.trueHeight;
@@ -7326,7 +7326,7 @@ drawPieChart.prototype =
 		return path;
     },
 	
-	_calculateSegment3D: function (angle, radius, xCenter, yCenter, depth, i)
+	_calculateSegment3D_Slow: function (angle, radius, xCenter, yCenter, depth, i)
 	{
 		if(isNaN(angle))
 			return null;
@@ -7396,7 +7396,7 @@ drawPieChart.prototype =
 		return path;	
 	},
 	
-	_calculateArc3D : function(radius, stAng, swAng, xCenter, yCenter, depth, seriaNum)
+	_calculateArc3D_Slow : function(radius, stAng, swAng, xCenter, yCenter, depth, seriaNum)
 	{	
 		var radius1 = this.properties3d.radius1;
 		var radius2 = this.properties3d.radius2;
@@ -7548,7 +7548,7 @@ drawPieChart.prototype =
 			cosNewAngle = - 1;
 		
 		var res;
-		if(swAng > Math.PI)
+		if(Math.abs(swAng) > Math.PI)
 			res = 2*Math.PI - Math.acos(cosNewAngle);
 		else
 			res = Math.acos(cosNewAngle);
@@ -8035,13 +8035,21 @@ drawPieChart.prototype =
 			return;
 		
 		var path;
-		if(this.cChartDrawer.nDimensionCount === 3 && this.paths.series[this.paths.series.length - 1][val])
+		if(this.cChartDrawer.nDimensionCount === 3)
 		{
-			path = this.paths.series[this.paths.series.length - 1][val].ArrPathCommand;
+			if(this.paths.series[val][ser] && this.paths.series[val][ser].upPath)
+			{
+				path = this.paths.series[val][ser].upPath.ArrPathCommand;
+			}
 		}	
 		else
 		{
 			path = this.paths.series[val].ArrPathCommand;
+		}
+		
+		if(!path)
+		{
+			return;
 		}
 		
 		var getEllipseRadius = function(radius1, radius2, alpha)
@@ -8182,89 +8190,8 @@ drawPieChart.prototype =
 	
 	
 	
-	//****fast calulate and drawing
-	
-	_drawPie3DNew: function ()
-    {
-		var numCache = this._getFirstRealNumCache();
-		var brush, pen, val;
-		var path;
-        for (var i = 0,len = numCache.length; i < len; i++) {
-			val = numCache[i];
-			brush = val.brush;
-			pen = val.pen;
-			path = this.paths.series[i];
-			
-			if(path)
-			{
-				for(var j = path.length - 1; j >= 0; j--)
-				{
-					if(path[j] && path[j].frontPath)
-					{
-						var  props = this.cChartSpace.getParentObjects();
-						var duplicateBrush = brush.createDuplicate();
-						var cColorMod = new AscFormat.CColorMod;
-						
-						cColorMod.val = 35000;
-						cColorMod.name = "shade";
-						
-						if(duplicateBrush.fill.color)
-							duplicateBrush.fill.color.Mods.addMod(cColorMod);	
-						
-						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
-						var upPen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0);
-						var frontPen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0);
-						//pen.setFill(duplicateBrush);
-						//if(!(i === numCache.length - 1 && j === path.length - 1))
-							this.cChartDrawer.drawPath(path[j].frontPath, frontPen, duplicateBrush);
-					}
-					//if(path[j] && path[j].upPath)
-						//this.cChartDrawer.drawPath(path[j].upPath, upPen, brush);
-				}
-			}
-			
-			
-        }
-		
-		for (var i = 0,len = numCache.length; i < len; i++) {
-			val = numCache[i];
-			brush = val.brush;
-			pen = val.pen;
-			path = this.paths.series[i];
-			
-			if(path)
-			{
-				for(var j = path.length - 1; j >= 0; j--)
-				{
-					if(path[j] && path[j].frontPath)
-					{
-						var  props = this.cChartSpace.getParentObjects();
-						var duplicateBrush = brush.createDuplicate();
-						var cColorMod = new AscFormat.CColorMod;
-						
-						cColorMod.val = 35000;
-						cColorMod.name = "shade";
-						
-						if(duplicateBrush.fill.color)
-							duplicateBrush.fill.color.Mods.addMod(cColorMod);	
-						
-						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
-						var upPen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0);
-						var frontPen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0);
-						//pen.setFill(duplicateBrush);
-						//if(!(i === numCache.length - 1 && j === path.length - 1))
-							//this.cChartDrawer.drawPath(path[j].frontPath, frontPen, duplicateBrush);
-					}
-					if(path[j] && path[j].upPath)
-						this.cChartDrawer.drawPath(path[j].upPath, upPen, brush);
-				}
-			}
-			
-			
-        }
-    },
-	
-	_reCalculatePie3DNew: function ()
+	//****fast calulate and drawing(for switch on slow drawing: change name function _Slow)
+	_reCalculatePie3D: function ()
     {
 		var trueWidth = this.chartProp.trueWidth;
 		var trueHeight = this.chartProp.trueHeight;
@@ -8273,44 +8200,54 @@ drawPieChart.prototype =
 		var sumData = this.cChartDrawer._getSumArray(numCache, true);
 		
         var radius = Math.min(trueHeight, trueWidth)/2;
+		var radius = Math.min(trueHeight, trueWidth) / 2;
+		if(radius < 0)
+		{
+			radius = 0;
+		}
+		
 		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
 		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
 		
-		this.tempAngle = Math.PI/2;
-		this.angleFor3D = Math.PI/2;
+		var startAngle = this.cChartDrawer.processor3D.angleOy ? this.cChartDrawer.processor3D.angleOy : 0;
+		var startAngle3D = startAngle !== 0 && startAngle !== undefined ? this._changeAngle(radius, Math.PI/2, startAngle, xCenter, yCenter, this.properties3d) : 0;
 		
-		//рисуем против часовой стрелки, поэтому цикл с конца
-		var angle;
-        for (var i = numCache.length - 1; i >= 0; i--) {
-			angle = Math.abs((parseFloat(numCache[i].val / sumData)) * (Math.PI * 2));
+		this.angleFor3D = Math.PI/2 - startAngle3D;
+		startAngle = startAngle + Math.PI / 2;
+		//this.angleFor3D = this.angleFor3D + Math.PI / 2;
+		for (var i = numCache.length - 1; i >= 0; i--) 
+		{
+			var val = numCache[i].val;
+			var partOfSum = numCache[i].val / sumData;
+			var swapAngle = Math.abs((parseFloat(partOfSum)) * (Math.PI * 2));
+			
+	
 			if(!this.paths.series)
 				this.paths.series = [];
 			if(sumData === 0)//TODO стоит пересмотреть
+			{
 				this.paths.series[i] = this._calculateEmptySegment(radius, xCenter, yCenter);
+			}
 			else
-				this.paths.series[i] = this._calculateSegment3D(angle, radius, xCenter, yCenter);
-        };
+			{
+				this.paths.series[i] = this._calculateSegment3D(startAngle, swapAngle, radius, xCenter, yCenter);
+			}
+			startAngle += swapAngle;
+        }
     },
 	
-	_calculateArc3DNew : function(radius, stAng, swAng, xCenter, yCenter)
+	_calculateArc3D : function(radius, stAng, swAng, xCenter, yCenter, bIsNotDrawFrontFace)
 	{	
 		var properties = this.cChartDrawer.processor3D.calculatePropertiesForPieCharts();
 		var depth = properties.depth;
 		var radius1 = properties.radius1;
 		var radius2 = properties.radius2;
 		var pxToMm = this.chartProp.pxToMM;
-		
-		
-		var path  = new Path();
-		
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
-		var gdLst = [];
+		var t = this;
 		
-		path.pathH = pathH;
-		path.pathW = pathW;
-		gdLst["w"] = 1;
-		gdLst["h"] = 1;
+		//FRONT FACES
 		
 		swAng = this._changeAngle(radius, stAng, swAng, xCenter, yCenter, properties);
 		
@@ -8318,7 +8255,151 @@ drawPieChart.prototype =
 		
 		//корректируем центр
 		yCenter = yCenter - depth / 2;
+		
+		
+		var calculateInsideFaces = function(startAng, swapAng)
+		{
+			var endAng = startAng + swapAng;
+			var path  = new Path();
+		
+			var gdLst = [];
 			
+			path.pathH = pathH;
+			path.pathW = pathW;
+			gdLst["w"] = 1;
+			gdLst["h"] = 1;
+			
+			var radiusSpec = (radius1 * radius2) /  Math.sqrt(Math.pow(radius2, 2) * Math.pow((Math.cos(startAng)), 2) + Math.pow(radius1, 2) * Math.pow(Math.sin(startAng),2));
+			var radiusSpec2 = (radius1 * radius2) /  Math.sqrt(Math.pow(radius2, 2) * Math.pow((Math.cos(endAng)), 2) + Math.pow(radius1, 2) * Math.pow(Math.sin(endAng),2));
+			
+			var x0 = (xCenter + radiusSpec*Math.cos(startAng));
+			var y0 = (yCenter - radiusSpec*Math.sin(startAng));
+			
+			var x1 = (xCenter + radiusSpec*Math.cos(startAng));
+			var y1 = ((yCenter + depth) - radiusSpec*Math.sin(startAng));
+			
+			var x2 = (xCenter + radiusSpec2*Math.cos(endAng));
+			var y2 = (yCenter - radiusSpec2*Math.sin(endAng));
+			
+			var x3 = (xCenter + radiusSpec2 * Math.cos(endAng));
+			var y3 = ((yCenter + depth) - radiusSpec2 * Math.sin(endAng));
+			
+			path.moveTo(xCenter  /pxToMm * pathW, yCenter / pxToMm * pathH);
+			path.lnTo(x0  /pxToMm * pathW, y0 / pxToMm * pathH);
+			path.lnTo(x1  /pxToMm * pathW, y1 / pxToMm * pathH);
+			path.lnTo(xCenter / pxToMm * pathW, (yCenter + depth) / pxToMm * pathH);
+			
+			path.moveTo(xCenter  /pxToMm * pathW, yCenter / pxToMm * pathH);
+			path.lnTo(x2  /pxToMm * pathW, y2 / pxToMm * pathH);
+			path.lnTo(x3  /pxToMm * pathW, y3 / pxToMm * pathH);
+			path.lnTo(xCenter / pxToMm * pathW, (yCenter + depth) / pxToMm * pathH);
+			
+			path.recalculate(gdLst);
+			
+			return path;
+		};
+		
+		var calculateFrontFace = function(startAng, swapAng)
+		{
+			var endAng = startAng + swapAng;
+			var path  = new Path();
+		
+			var gdLst = [];
+			
+			path.pathH = pathH;
+			path.pathW = pathW;
+			gdLst["w"] = 1;
+			gdLst["h"] = 1;
+			
+			var radiusSpec = (radius1 * radius2) /  Math.sqrt(Math.pow(radius2, 2) * Math.pow((Math.cos(startAng)), 2) + Math.pow(radius1, 2) * Math.pow(Math.sin(startAng),2));
+			var radiusSpec2 = (radius1 * radius2) /  Math.sqrt(Math.pow(radius2, 2) * Math.pow((Math.cos(endAng)), 2) + Math.pow(radius1, 2) * Math.pow(Math.sin(endAng),2));
+			
+			var x0 = (xCenter + radiusSpec*Math.cos(startAng));
+			var y0 = (yCenter - radiusSpec*Math.sin(startAng));
+			
+			var x1 = (xCenter + radiusSpec*Math.cos(startAng));
+			var y1 = ((yCenter + depth) - radiusSpec*Math.sin(startAng));
+			
+			var x2 = (xCenter + radiusSpec2*Math.cos(endAng));
+			var y2 = (yCenter - radiusSpec2*Math.sin(endAng));
+			
+			var x3 = (xCenter + radiusSpec2 * Math.cos(endAng));
+			var y3 = ((yCenter + depth) - radiusSpec2 * Math.sin(endAng));
+			
+			path.moveTo(x0  /pxToMm * pathW, y0 / pxToMm * pathH);
+			path.arcTo(radius1 / pxToMm * pathW, radius2 / pxToMm * pathH, -1 * startAng*cToDeg, -1 * swapAng*cToDeg);
+			path.lnTo(x3  /pxToMm * pathW, y3 / pxToMm * pathH);
+			path.arcTo(radius1 / pxToMm * pathW, radius2 / pxToMm * pathH, -1 * startAng*cToDeg - 1 * swapAng*cToDeg, 1 * swapAng*cToDeg);
+			path.lnTo(x0 / pxToMm * pathW, y0 / pxToMm * pathH);
+			path.recalculate(gdLst);
+			
+			return path;
+		}
+		
+		//break front faces
+		var arrAngles = [];
+		var endAng = stAng + swAng;
+		arrAngles.push({angle: stAng});
+		if(stAng < -2*Math.PI && endAng > -2*Math.PI)
+		{
+			arrAngles.push({angle: -2*Math.PI});
+		}
+		/*if(stAng < -3/2*Math.PI && endAng > -3/2*Math.PI)
+		{
+			arrAngles.push({angle: -3/2*Math.PI});
+		}*/
+		if(stAng < -Math.PI && endAng > -Math.PI)
+		{
+			arrAngles.push({angle: -Math.PI});
+		}
+		/*if(stAng < -Math.PI/2 && endAng > -Math.PI/2)
+		{
+			arrAngles.push({angle: -Math.PI/2});
+		}*/
+		if(stAng < 0 && endAng > 0)
+		{
+			arrAngles.push({angle: 0});
+		}
+		/*if(stAng < Math.PI/2 && endAng > Math.PI/2)
+		{
+			arrAngles.push({angle: Math.PI/2});
+		}*/
+		if(stAng < Math.PI && endAng > Math.PI)
+		{
+			arrAngles.push({angle: Math.PI});
+		}
+		/*if(stAng < 3/2*Math.PI && endAng > 3/2*Math.PI)
+		{
+			arrAngles.push({angle: 3/2*Math.PI});
+		}*/
+		if(stAng < 2*Math.PI && endAng > 2*Math.PI)
+		{
+			arrAngles.push({angle: 2*Math.PI});
+		}
+		arrAngles.push({angle: endAng});
+		
+		var frontPath = [];
+		for(var i = 1; i < arrAngles.length; i++)
+		{
+			var start = arrAngles[i - 1].angle;
+			var end = arrAngles[i].angle;
+			var swap = end - start;
+			
+			if((start >= 0 && start >= Math.PI && start <= 2 * Math.PI) || (start < 0 && start >= -Math.PI && start <= 0))
+			{
+				frontPath.push(calculateFrontFace(start, swap));
+			}
+		}
+		
+		//INSIDE FACES
+		var insidePath = [];
+		insidePath.push(calculateInsideFaces(stAng, swAng));
+		
+		
+		//UP FACE
+		var path  = new Path();
+		var gdLst = [];
+		
 		var radiusSpec = (radius1 * radius2) /  Math.sqrt(Math.pow(radius2, 2) * Math.pow((Math.cos(stAng)), 2) + Math.pow(radius1, 2) * Math.pow(Math.sin(stAng),2));
 		var radiusSpec2 = (radius1 * radius2) /  Math.sqrt(Math.pow(radius2, 2) * Math.pow((Math.cos(stAng + swAng)), 2) + Math.pow(radius1, 2) * Math.pow(Math.sin(stAng + swAng),2));
 		
@@ -8337,20 +8418,6 @@ drawPieChart.prototype =
 		var x3 = (xCenter + radiusSpec2 * Math.cos(stAng + swAng)) * kFX;
 		var y3 = ((yCenter + depth) - radiusSpec2 * Math.sin(stAng + swAng)) * kFY;
 		
-		
-		path.moveTo(x0  /pxToMm * pathW, y0 / pxToMm * pathH);
-		path.arcTo(radius1 / pxToMm * pathW, radius2 / pxToMm * pathH, -1 * stAng*cToDeg, -1 * swAng*cToDeg);
-		path.lnTo(x3  /pxToMm * pathW, y3 / pxToMm * pathH);
-		path.arcTo(radius1 / pxToMm * pathW, radius2 / pxToMm * pathH, -1 * stAng*cToDeg - 1 * swAng*cToDeg, 1 * swAng*cToDeg);
-		path.lnTo(x0 / pxToMm * pathW, y0 / pxToMm * pathH);
-		
-		path.recalculate(gdLst);
-		var frontPath = path;
-		
-		
-		var path  = new Path();
-		var gdLst = [];
-		
 		path.pathH = pathH;
 		path.pathW = pathW;
 		gdLst["w"] = 1;
@@ -8366,23 +8433,89 @@ drawPieChart.prototype =
 		
 		this.angleFor3D += swAng;
 		
-		return {frontPath: frontPath, upPath: upPath};	
+		return {frontPath: frontPath, upPath: upPath, insidePath: insidePath};	
 	},
 	
-	_calculateSegment3DNew: function (angle, radius, xCenter, yCenter)
+	_calculateSegment3D: function (startAngle, swapAngle, radius, xCenter, yCenter)
 	{
-		if(isNaN(angle))
+		if(isNaN(swapAngle))
+		{
 			return null;
+		}
 		
-		var startAngle = (this.tempAngle);
-		var swapAngle   = angle;
-		var endAngle   = startAngle + angle;
+		var endAngle   = startAngle + swapAngle;
 		
 		if(radius < 0)
+		{
 			radius = 0;
+		}
 		
-		var path = [];		
+		
+		var path = [];
+		var arrAngles = [];
+		
+		arrAngles.push({angle: startAngle});
+		/*if(startAngle < -2*Math.PI && endAngle > -2*Math.PI)
+		{
+			arrAngles.push({angle: -2*Math.PI});
+		}
+		if(startAngle < -3/2*Math.PI && endAngle > -3/2*Math.PI)
+		{
+			arrAngles.push({angle: -3/2*Math.PI});
+		}
+		if(startAngle < -Math.PI && endAngle > -Math.PI)
+		{
+			arrAngles.push({angle: -Math.PI});
+		}
+		if(startAngle < -Math.PI/2 && endAngle > -Math.PI/2)
+		{
+			arrAngles.push({angle: -Math.PI/2});
+		}
+		if(startAngle < 0 && endAngle > 0)
+		{
+			arrAngles.push({angle: 0});
+		}
+		if(startAngle < Math.PI/2 && endAngle > Math.PI/2)
+		{
+			arrAngles.push({angle: Math.PI/2});
+		}
+		if(startAngle < Math.PI && endAngle > Math.PI)
+		{
+			arrAngles.push({angle: Math.PI});
+		}
+		if(startAngle < 3/2*Math.PI && endAngle > 3/2*Math.PI)
+		{
+			arrAngles.push({angle: 3/2*Math.PI});
+		}
+		if(startAngle < 2*Math.PI && endAngle > 2*Math.PI)
+		{
+			arrAngles.push({angle: 2*Math.PI});
+		}*/
+		arrAngles.push({angle: endAngle});
+		
+		
+		for(var i = 1; i < arrAngles.length; i++)
+		{
+			var start = arrAngles[i - 1].angle;
+			var end = arrAngles[i].angle;
+			var swap = end - start;
+			
+			var bIsNotDrawFrontFace;
+			/*if(start + swap/2 > Math.PI && start + swap/2 < 2*Math.PI)
+			{
+				bIsNotDrawFrontFace = true;
+			}*/
+			
+			path.push(this._calculateArc3D(radius, start, swap, xCenter, yCenter, bIsNotDrawFrontFace));
+		}
+		
+		
 		//если сегмент проходит 180 или 360 градусов, разбиваем его на два, чтобы боковая грань рисовалась корректно
+		/*if(startAngle < 0 && endAngle > 0)
+		{
+			path.push(this._calculateArc3D(radius, startAngle, 0, xCenter, yCenter));
+			path.push(this._calculateArc3D(radius, 0, endAngle, xCenter, yCenter));
+		}
 		if(startAngle < Math.PI && endAngle > Math.PI)
 		{
 			path.push(this._calculateArc3D(radius, startAngle, Math.PI - startAngle, xCenter, yCenter));
@@ -8393,14 +8526,154 @@ drawPieChart.prototype =
 			path.push(this._calculateArc3D(radius, startAngle, 2*Math.PI - startAngle, xCenter, yCenter));
 			path.push(this._calculateArc3D(radius, 2*Math.PI, endAngle - 2*Math.PI, xCenter, yCenter));
 		}
+		else if(startAngle < -Math.PI && endAngle > -Math.PI)
+		{
+			path.push(this._calculateArc3D(radius, startAngle, - Math.PI - startAngle, xCenter, yCenter));
+			path.push(this._calculateArc3D(radius, Math.PI, endAngle + Math.PI, xCenter, yCenter));
+		}
+		else if(startAngle < -2*Math.PI && endAngle > -2*Math.PI)
+		{
+			path.push(this._calculateArc3D(radius, startAngle, -2*Math.PI - startAngle, xCenter, yCenter));
+			path.push(this._calculateArc3D(radius, 2*Math.PI, endAngle + 2*Math.PI, xCenter, yCenter));
+		}
 		else
+		{	
 			path.push(this._calculateArc3D(radius, startAngle, swapAngle, xCenter, yCenter));
-			
-
-        this.tempAngle += angle;
+		}*/
 		
 		return path;
-	}
+	},
+	
+	
+	_drawPie3D: function ()
+    {
+		var numCache = this._getFirstRealNumCache();
+		var brush, pen, val;
+		var path;
+		
+		for (var i = 0,len = numCache.length; i < len; i++) 
+		{
+			val = numCache[i];
+			brush = val.brush;
+			pen = val.pen;
+			path = this.paths.series[i];
+			
+			if(path)
+			{
+				for(var j = path.length - 1; j >= 0; j--)
+				{
+					if(path[j] && path[j].insidePath)
+					{
+						var  props = this.cChartSpace.getParentObjects();
+						var duplicateBrush = brush.createDuplicate();
+						var cColorMod = new AscFormat.CColorMod;
+						
+						cColorMod.val = 35000;
+						cColorMod.name = "shade";
+						
+						if(duplicateBrush.fill.color)
+							duplicateBrush.fill.color.Mods.addMod(cColorMod);	
+						
+						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
+						//var upPen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0);
+						var frontPen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0);
+						//pen.setFill(duplicateBrush);
+						//if(!(i === numCache.length - 1 && j === path.length - 1))
+						for(var k = 0; k < path[j].insidePath.length;k++)
+						{
+							this.cChartDrawer.drawPath(path[j].insidePath[k], pen, duplicateBrush);
+						}
+						
+					}
+					//if(path[j] && path[j].upPath)
+						//this.cChartDrawer.drawPath(path[j].upPath, upPen, brush);
+				}
+			}
+        }
+		
+        for (var i = 0,len = numCache.length; i < len; i++) 
+		{
+			val = numCache[i];
+			brush = val.brush;
+			pen = val.pen;
+			path = this.paths.series[i];
+			
+			if(path)
+			{
+				for(var j = path.length - 1; j >= 0; j--)
+				{
+					if(path[j] && path[j].frontPath)
+					{
+						var  props = this.cChartSpace.getParentObjects();
+						var duplicateBrush = brush.createDuplicate();
+						var cColorMod = new AscFormat.CColorMod;
+						
+						cColorMod.val = 35000;
+						cColorMod.name = "shade";
+						
+						if(duplicateBrush.fill.color)
+							duplicateBrush.fill.color.Mods.addMod(cColorMod);	
+						
+						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
+						//var upPen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0);
+						var frontPen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0);
+						//pen.setFill(duplicateBrush);
+						//if(!(i === numCache.length - 1 && j === path.length - 1))
+						for(var k = 0; k < path[j].frontPath.length;k++)
+						{
+							this.cChartDrawer.drawPath(path[j].frontPath[k], frontPen, duplicateBrush);
+						}
+						
+					}
+					//if(path[j] && path[j].upPath)
+						//this.cChartDrawer.drawPath(path[j].upPath, upPen, brush);
+				}
+			}
+        }
+		
+		for (var i = 0,len = numCache.length; i < len; i++) 
+		{
+			val = numCache[i];
+			brush = val.brush;
+			pen = val.pen;
+			path = this.paths.series[i];
+			
+			if(path)
+			{
+				for(var j = path.length - 1; j >= 0; j--)
+				{
+					if(path[j] && path[j].upPath)
+					{
+						var  props = this.cChartSpace.getParentObjects();
+						var duplicateBrush = brush.createDuplicate();
+						var cColorMod = new AscFormat.CColorMod;
+						
+						cColorMod.val = 35000;
+						cColorMod.name = "shade";
+						
+						if(duplicateBrush.fill.color)
+							duplicateBrush.fill.color.Mods.addMod(cColorMod);	
+						
+						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
+						//var upPen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0);
+						//var frontPen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0);
+						
+						if(null === pen)
+						{
+							pen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0);
+						}
+						
+						//pen.setFill(duplicateBrush);
+						//if(!(i === numCache.length - 1 && j === path.length - 1))
+							//this.cChartDrawer.drawPath(path[j].frontPath, frontPen, duplicateBrush);
+						this.cChartDrawer.drawPath(path[j].upPath, pen, brush);
+					}	
+				}
+			}
+			
+			
+        }
+    }
 };
 
 
