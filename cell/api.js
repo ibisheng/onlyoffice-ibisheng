@@ -2620,6 +2620,7 @@ var editor;
     var changedSparkline = AscCommon.g_oTableId.Get_ById(id);
     if (changedSparkline) {
       changedSparkline.set(oSparklineGroup);
+      this.wb.getWorksheet().draw();
     }
   };
 
