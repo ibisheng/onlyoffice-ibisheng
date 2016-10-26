@@ -4828,48 +4828,6 @@ CTable.prototype =
         return Writer;
     },
 
-    Save_Changes2 : function(Data, Writer)
-    {
-        var bRetValue = false;
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Table_DocNext:
-            case AscDFH.historyitem_Table_DocPrev:
-            case AscDFH.historyitem_Table_Parent:
-            case AscDFH.historyitem_Table_TableW:
-            case AscDFH.historyitem_Table_TableLayout:
-            case AscDFH.historyitem_Table_TableCellMar:
-            case AscDFH.historyitem_Table_TableAlign:
-            case AscDFH.historyitem_Table_TableInd:
-            case AscDFH.historyitem_Table_TableBorder_Left:
-            case AscDFH.historyitem_Table_TableBorder_Right:
-            case AscDFH.historyitem_Table_TableBorder_Top:
-            case AscDFH.historyitem_Table_TableBorder_Bottom:
-            case AscDFH.historyitem_Table_TableBorder_InsideH:
-            case AscDFH.historyitem_Table_TableBorder_InsideV:
-            case AscDFH.historyitem_Table_TableShd:
-            case AscDFH.historyitem_Table_Inline:
-            {
-                break;
-            }
-
-            case AscDFH.historyitem_Table_AddRow:
-            {
-                break;
-            }
-
-            case AscDFH.historyitem_Table_RemoveRow:
-            case AscDFH.historyitem_Table_TableGrid:
-            {
-                break;
-            }
-        }
-
-        return bRetValue;
-    },
-
     Load_Changes : function(Reader, Reader2)
     {
         // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.

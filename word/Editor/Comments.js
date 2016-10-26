@@ -425,26 +425,6 @@ function CComment(Parent, Data)
         return Writer;
     };
 
-    this.Save_Changes2 = function(Data, Writer)
-    {
-        var bRetValue = false;
-        var Type = Data.Type;
-        switch ( Type )
-        {
-            case  AscDFH.historyitem_Comment_Change:
-            {
-                break;
-            }
-
-            case  AscDFH.historyitem_Comment_TypeInfo:
-            {
-                break;
-            }
-        }
-
-        return bRetValue;
-    };
-
     this.Load_Changes = function(Reader, Reader2)
     {
         // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
@@ -801,26 +781,6 @@ function CComments()
         }
 
         return Writer;
-    };
-
-    this.Save_Changes2 = function(Data, Writer)
-    {
-        var bRetValue = false;
-        var Type = Data.Type;
-        switch ( Type )
-        {
-            case  AscDFH.historyitem_Comments_Add:
-            {
-                break;
-            }
-
-            case AscDFH.historyitem_Comments_Remove:
-            {
-                break;
-            }
-        }
-
-        return bRetValue;
     };
 
     this.Load_Changes = function(Reader, Reader2)

@@ -8802,25 +8802,6 @@ CDocument.prototype.Save_Changes = function(Data, Writer)
 
 	return Writer;
 };
-CDocument.prototype.Save_Changes2 = function(Data, Writer)
-{
-	var bRetValue = false;
-	var Type      = Data.Type;
-	switch (Type)
-	{
-		case AscDFH.historyitem_Document_AddItem:
-		{
-			break;
-		}
-
-		case AscDFH.historyitem_Document_RemoveItem:
-		{
-			break;
-		}
-	}
-
-	return bRetValue;
-};
 CDocument.prototype.Load_Changes = function(Reader, Reader2)
 {
 	// Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
@@ -10655,7 +10636,7 @@ CDocument.prototype.Update_ForeignCursor = function(CursorInfo, UserId, Show, Us
 	}
 
 	var Changes = new AscCommon.CCollaborativeChanges();
-	var Reader  = Changes.Internal_Load_Data2(CursorInfo, 0, CursorInfo.length);
+	var Reader  = Changes.GetStream(CursorInfo, 0, CursorInfo.length);
 
 	var RunId    = Reader.GetString2();
 	var InRunPos = Reader.GetLong();

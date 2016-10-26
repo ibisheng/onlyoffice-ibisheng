@@ -8903,25 +8903,6 @@ CDocumentContent.prototype.Save_Changes        = function(Data, Writer)
 
     return Writer;
 };
-CDocumentContent.prototype.Save_Changes2       = function(Data, Writer)
-{
-    var bRetValue = false;
-    var Type      = Data.Type;
-    switch (Type)
-    {
-        case AscDFH.historyitem_DocumentContent_AddItem:
-        {
-            break;
-        }
-
-        case AscDFH.historyitem_DocumentContent_RemoveItem:
-        {
-            break;
-        }
-    }
-
-    return bRetValue;
-};
 CDocumentContent.prototype.Load_Changes        = function(Reader, Reader2)
 {
     // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.

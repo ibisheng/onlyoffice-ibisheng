@@ -1121,7 +1121,7 @@ CPresentation.prototype =
         }
 
         var Changes = new AscCommon.CCollaborativeChanges();
-        var Reader = Changes.Internal_Load_Data2(CursorInfo, 0, CursorInfo.length);
+        var Reader = Changes.GetStream(CursorInfo, 0, CursorInfo.length);
 
         var RunId    = Reader.GetString2();
         var InRunPos = Reader.GetLong();

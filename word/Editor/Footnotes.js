@@ -1147,9 +1147,6 @@ CFootnotesController.prototype.Save_Changes = function(Data, Writer)
 
 	return Writer;
 };
-CFootnotesController.prototype.Save_Changes2 = function(Data, Writer)
-{
-};
 CFootnotesController.prototype.Load_Changes = function(Reader, Reader2)
 {
 	// Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.

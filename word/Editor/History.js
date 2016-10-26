@@ -428,6 +428,7 @@ CHistory.prototype =
 			Data  = _Class;
 
 			this.BinaryWriter.WriteString2(Class.Get_Id());
+			this.BinaryWriter.WriteLong(_Class.Type);
 			_Class.WriteToBinary(this.BinaryWriter);
 		}
 		else

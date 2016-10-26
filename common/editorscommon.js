@@ -2244,10 +2244,6 @@ CTableId.prototype.Save_Changes = function(Data, Writer)
         }
     }
 };
-CTableId.prototype.Save_Changes2 = function(Data, Writer)
-{
-    return false;
-};
 CTableId.prototype.Load_Changes = function(Reader, Reader2)
 {
     // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
@@ -2524,25 +2520,38 @@ CContentChanges.prototype.Refresh = function()
 	}
 };
 
-function CContentChangesElement(Type, Pos, Count, Data) {
-	this.m_nType	= Type;  // Тип изменений (удаление или добавление)
-	this.m_nCount	= Count; // Количество добавленных/удаленных элементов
-	this.m_pData	= Data;  // Связанные с данным изменением данные из истории
+function CContentChangesElement(Type, Pos, Count, Data)
+{
+	this.m_nType  = Type;  // Тип изменений (удаление или добавление)
+	this.m_nCount = Count; // Количество добавленных/удаленных элементов
+	this.m_pData  = Data;  // Связанные с данным изменением данные из истории
 
 	// Разбиваем сложное действие на простейшие
-	this.m_aPositions = this.Make_ArrayOfSimpleActions( Type, Pos, Count );
+	this.m_aPositions = this.Make_ArrayOfSimpleActions(Type, Pos, Count);
 }
 
 CContentChangesElement.prototype.Refresh_BinaryData = function()
 {
 	var Binary_Writer = AscCommon.History.BinaryWriter;
-	var Binary_Pos = Binary_Writer.GetCurPosition();
+	var Binary_Pos    = Binary_Writer.GetCurPosition();
 
-	this.m_pData.Data.UseArray = true;
-	this.m_pData.Data.PosArray = this.m_aPositions;
+	if (this.m_pData.Data && this.m_pData.Data.IsChangesClass && this.m_pData.Data.IsChangesClass())
+	{
+		this.m_pData.Data.UseArray = true;
+		this.m_pData.Data.PosArray = this.m_aPositions;
 
-	Binary_Writer.WriteString2(this.m_pData.Class.Get_Id());
-	this.m_pData.Class.Save_Changes( this.m_pData.Data, Binary_Writer );
+		Binary_Writer.WriteString2(this.m_pData.Class.Get_Id());
+		Binary_Writer.WriteLong(this.m_pData.Data.Type);
+		this.m_pData.Data.WriteToBinary(Binary_Writer);
+	}
+	else
+	{
+		this.m_pData.Data.UseArray = true;
+		this.m_pData.Data.PosArray = this.m_aPositions;
+
+		Binary_Writer.WriteString2(this.m_pData.Class.Get_Id());
+		this.m_pData.Class.Save_Changes(this.m_pData.Data, Binary_Writer);
+	}
 
 	var Binary_Len = Binary_Writer.GetCurPosition() - Binary_Pos;
 

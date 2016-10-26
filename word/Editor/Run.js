@@ -1034,7 +1034,7 @@ ParaRun.prototype.private_UpdateCompositeInputPositionsOnRemove = function(Pos, 
 // Добавляем элемент в позицию с сохранием в историю
 ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 {
-	History.Add(new CChangesRunAddItem(this, Pos, [Item], Pos));
+	History.Add(new CChangesRunAddItem(this, Pos, [Item], Pos, true));
     this.Content.splice( Pos, 0, Item );
 
     if (true === UpdatePosition)
@@ -7318,23 +7318,6 @@ ParaRun.prototype.Set_Shd = function(Shd)
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-ParaRun.prototype.Undo = function(Data)
-{
-    var Type = Data.Type;
-
-    switch ( Type )
-    {
-    }
-};
-
-ParaRun.prototype.Redo = function(Data)
-{
-    var Type = Data.Type;
-
-    switch ( Type )
-    {
-    }
-};
 ParaRun.prototype.Check_HistoryUninon = function(Data1, Data2)
 {
     var Type1 = Data1.Type;
@@ -7351,50 +7334,6 @@ ParaRun.prototype.Check_HistoryUninon = function(Data1, Data2)
 //-----------------------------------------------------------------------------------
 // Функции для совместного редактирования
 //-----------------------------------------------------------------------------------
-ParaRun.prototype.Save_Changes = function(Data, Writer)
-{
-    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-    // Long : тип класса
-    // Long : тип изменений
-
-    Writer.WriteLong( AscDFH.historyitem_type_ParaRun );
-
-    var Type = Data.Type;
-
-    // Пишем тип
-    Writer.WriteLong( Type );
-
-    switch ( Type )
-    {
-
-    }
-
-    return Writer;
-};
-
-ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
-{
-    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-    // Long : тип класса
-    // Long : тип изменений
-
-    var ClassType = Reader.GetLong();
-    if ( AscDFH.historyitem_type_ParaRun != ClassType )
-        return;
-
-    var Type = Reader.GetLong();
-
-    var bColorPrChange = false;
-    switch ( Type )
-    {
-    }
-
-    if (bColorPrChange && Color)
-    {
-        this.private_AddCollPrChangeOther(Color);
-    }
-};
-
 ParaRun.prototype.Write_ToBinary2 = function(Writer)
 {
     Writer.WriteLong( AscDFH.historyitem_type_ParaRun );

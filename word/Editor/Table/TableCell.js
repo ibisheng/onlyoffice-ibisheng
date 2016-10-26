@@ -2273,11 +2273,6 @@ CTableCell.prototype =
         return Writer;
     },
 
-    Save_Changes2 : function(Data, Writer)
-    {
-        return false;
-    },
-
     Load_Changes : function(Reader, Reader2)
     {
         // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.

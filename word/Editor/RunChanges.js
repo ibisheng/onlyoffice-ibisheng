@@ -38,11 +38,55 @@
  * Time: 12:56
  */
 
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_AddItem]           = CChangesRunAddItem;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_RemoveItem]        = CChangesRunRemoveItem;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_Bold]              = CChangesRunBold;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_Italic]            = CChangesRunItalic;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_Strikeout]         = CChangesRunStrikeout;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_Underline]         = CChangesRunUnderline;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_FontFamily]        = undefined; // obsolete
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_FontSize]          = CChangesRunFontSize;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_Color]             = CChangesRunColor;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_VertAlign]         = CChangesRunVertAlign;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_HighLight]         = CChangesRunHighLight;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_RStyle]            = CChangesRunRStyle;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_Spacing]           = CChangesRunSpacing;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_DStrikeout]        = CChangesRunDStrikeout;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_Caps]              = CChangesRunCaps;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_SmallCaps]         = CChangesRunSmallCaps;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_Position]          = CChangesRunPosition;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_Value]             = undefined; // obsolete
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_RFonts]            = CChangesRunRFonts;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_Lang]              = CChangesRunLang;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_RFonts_Ascii]      = CChangesRunRFontsAscii;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_RFonts_HAnsi]      = CChangesRunRFontsHAnsi;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_RFonts_CS]         = CChangesRunRFontsCS;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_RFonts_EastAsia]   = CChangesRunRFontsEastAsia;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_RFonts_Hint]       = CChangesRunRFontsHint;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_Lang_Bidi]         = CChangesRunLangBidi;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_Lang_EastAsia]     = CChangesRunLangEastAsia;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_Lang_Val]          = CChangesRunLangVal;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_TextPr]            = CChangesRunTextPr;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_Unifill]           = CChangesRunUnifill;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_Shd]               = CChangesRunShd;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_MathStyle]         = CChangesRunMathStyle;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_MathPrp]           = CChangesRunMathPrp;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_ReviewType]        = CChangesRunReviewType;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_PrChange]          = CChangesRunPrChange;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_TextFill]          = CChangesRunTextFill;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_TextOutline]       = CChangesRunTextOutline;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_PrReviewInfo]      = CChangesRunPrReviewInfo;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_ContentReviewInfo] = CChangesRunContentReviewInfo;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_OnStartSplit]      = CChangesRunOnStartSplit;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_OnEndSplit]        = CChangesRunOnEndSplit;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_MathAlnAt]         = CChangesRunMathAlnAt;
+AscDFH.changesFactory[AscDFH.historyitem_ParaRun_MathForcedBreak]   = CChangesRunMathForcedBreak;
+
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
  */
-function CChangesRunAddItem(Class, Pos, Items, EndPos)
+function CChangesRunAddItem(Class, Pos, Items, EndPos, Color)
 {
 	CChangesRunAddItem.superclass.constructor.call(this, Class);
 
@@ -50,7 +94,7 @@ function CChangesRunAddItem(Class, Pos, Items, EndPos)
 	this.Items  = Items;
 	this.EndPos = EndPos;
 
-	this.Color    = undefined;
+	this.Color    = true === Color ? true : false;
 	this.UseArray = false;
 	this.PosArray = [];
 }
@@ -144,13 +188,13 @@ CChangesRunAddItem.prototype.Load = function(Color)
 			{
 				oRun.CollaborativeMarks.Update_OnAdd(Pos);
 				oRun.CollaborativeMarks.Add(Pos, Pos + 1, Color);
-				AscCommon.CollaborativeEditing.Add_ChangedClass(this);
+				AscCommon.CollaborativeEditing.Add_ChangedClass(oRun);
 			}
 
 			oRun.Content.splice(Pos, 0, Element);
 			oRun.private_UpdatePositionsOnAdd(Pos);
 			oRun.private_UpdateCompositeInputPositionsOnAdd(Pos);
-			AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
+			AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(oRun, Pos);
 		}
 	}
 
@@ -264,7 +308,7 @@ CChangesRunRemoveItem.prototype.Load = function()
 {
 	var oRun = this.Class;
 
-	for (var Index = 0; Index < Count; Index++)
+	for (var Index = 0, Count = this.PosArray.length; Index < Count; Index++)
 	{
 		var ChangesPos = oRun.m_oContentChanges.Check(AscCommon.contentchanges_Remove, this.PosArray[Index]);
 
@@ -276,7 +320,7 @@ CChangesRunRemoveItem.prototype.Load = function()
 		oRun.Content.splice(ChangesPos, 1);
 		oRun.private_UpdatePositionsOnRemove(ChangesPos, 1);
 		oRun.private_UpdateCompositeInputPositionsOnRemove(ChangesPos, 1);
-		AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
+		AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(oRun, ChangesPos, 1);
 	}
 
 	oRun.RecalcInfo.Measure = true;
@@ -292,7 +336,7 @@ function CChangesRunBold(Class, Old, New, Color)
 	CChangesRunBold.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunBold, AscDFH.CChangesBaseBoolProperty);
-CChangesRunBold.Type = AscDFH.historyitem_ParaRun_Bold;
+CChangesRunBold.prototype.Type = AscDFH.historyitem_ParaRun_Bold;
 CChangesRunBold.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
@@ -317,7 +361,7 @@ function CChangesRunItalic(Class, Old, New, Color)
 	CChangesRunItalic.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunItalic, AscDFH.CChangesBaseBoolProperty);
-CChangesRunItalic.Type = AscDFH.historyitem_ParaRun_Italic;
+CChangesRunItalic.prototype.Type = AscDFH.historyitem_ParaRun_Italic;
 CChangesRunItalic.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
@@ -342,7 +386,7 @@ function CChangesRunStrikeout(Class, Old, New, Color)
 	CChangesRunStrikeout.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunStrikeout, AscDFH.CChangesBaseBoolProperty);
-CChangesRunStrikeout.Type = AscDFH.historyitem_ParaRun_Strikeout;
+CChangesRunStrikeout.prototype.Type = AscDFH.historyitem_ParaRun_Strikeout;
 CChangesRunStrikeout.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
@@ -367,7 +411,7 @@ function CChangesRunUnderline(Class, Old, New, Color)
 	CChangesRunUnderline.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunUnderline, AscDFH.CChangesBaseBoolProperty);
-CChangesRunUnderline.Type = AscDFH.historyitem_ParaRun_Underline;
+CChangesRunUnderline.prototype.Type = AscDFH.historyitem_ParaRun_Underline;
 CChangesRunUnderline.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
@@ -392,7 +436,7 @@ function CChangesRunFontSize(Class, Old, New, Color)
 	CChangesRunFontSize.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunFontSize, AscDFH.CChangesBaseDoubleProperty);
-CChangesRunFontSize.Type = AscDFH.historyitem_ParaRun_FontSize;
+CChangesRunFontSize.prototype.Type = AscDFH.historyitem_ParaRun_FontSize;
 CChangesRunFontSize.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
@@ -417,7 +461,7 @@ function CChangesRunColor(Class, Old, New, Color)
 	CChangesRunColor.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunColor, AscDFH.CChangesBaseObjectProperty);
-CChangesRunColor.Type = AscDFH.historyitem_ParaRun_Color;
+CChangesRunColor.prototype.Type = AscDFH.historyitem_ParaRun_Color;
 CChangesRunColor.prototype.private_CreateObject = function()
 {
 	return new CDocumentColor(0, 0, 0, false);
@@ -446,7 +490,7 @@ function CChangesRunVertAlign(Class, Old, New, Color)
 	CChangesRunVertAlign.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunVertAlign, AscDFH.CChangesBaseLongProperty);
-CChangesRunVertAlign.Type = AscDFH.historyitem_ParaRun_VertAlign;
+CChangesRunVertAlign.prototype.Type = AscDFH.historyitem_ParaRun_VertAlign;
 CChangesRunVertAlign.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
@@ -471,7 +515,7 @@ function CChangesRunHighLight(Class, Old, New, Color)
 	CChangesRunHighLight.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunHighLight, AscDFH.CChangesBaseProperty);
-CChangesRunHighLight.Type = AscDFH.historyitem_ParaRun_HighLight;
+CChangesRunHighLight.prototype.Type = AscDFH.historyitem_ParaRun_HighLight;
 CChangesRunHighLight.prototype.WriteToBinary = function(Writer)
 {
 	// Long  : Flag
@@ -576,7 +620,7 @@ function CChangesRunRStyle(Class, Old, New, Color)
 	CChangesRunRStyle.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunRStyle, AscDFH.CChangesBaseStringProperty);
-CChangesRunRStyle.Type = AscDFH.historyitem_ParaRun_RStyle;
+CChangesRunRStyle.prototype.Type = AscDFH.historyitem_ParaRun_RStyle;
 CChangesRunRStyle.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
@@ -601,7 +645,7 @@ function CChangesRunSpacing(Class, Old, New, Color)
 	CChangesRunSpacing.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunSpacing, AscDFH.CChangesBaseDoubleProperty);
-CChangesRunSpacing.Type = AscDFH.historyitem_ParaRun_Spacing;
+CChangesRunSpacing.prototype.Type = AscDFH.historyitem_ParaRun_Spacing;
 CChangesRunSpacing.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
@@ -626,7 +670,7 @@ function CChangesRunDStrikeout(Class, Old, New, Color)
 	CChangesRunDStrikeout.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunDStrikeout, AscDFH.CChangesBaseBoolProperty);
-CChangesRunDStrikeout.Type = AscDFH.historyitem_ParaRun_DStrikeout;
+CChangesRunDStrikeout.prototype.Type = AscDFH.historyitem_ParaRun_DStrikeout;
 CChangesRunDStrikeout.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
@@ -651,7 +695,7 @@ function CChangesRunCaps(Class, Old, New, Color)
 	CChangesRunCaps.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunCaps, AscDFH.CChangesBaseBoolProperty);
-CChangesRunCaps.Type = AscDFH.historyitem_ParaRun_Caps;
+CChangesRunCaps.prototype.Type = AscDFH.historyitem_ParaRun_Caps;
 CChangesRunCaps.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
@@ -676,7 +720,7 @@ function CChangesRunSmallCaps(Class, Old, New, Color)
 	CChangesRunSmallCaps.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunSmallCaps, AscDFH.CChangesBaseBoolProperty);
-CChangesRunSmallCaps.Type = AscDFH.historyitem_ParaRun_SmallCaps;
+CChangesRunSmallCaps.prototype.Type = AscDFH.historyitem_ParaRun_SmallCaps;
 CChangesRunSmallCaps.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
@@ -701,7 +745,7 @@ function CChangesRunPosition(Class, Old, New, Color)
 	CChangesRunPosition.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunPosition, AscDFH.CChangesBaseDoubleProperty);
-CChangesRunPosition.Type = AscDFH.historyitem_ParaRun_Position;
+CChangesRunPosition.prototype.Type = AscDFH.historyitem_ParaRun_Position;
 CChangesRunPosition.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
@@ -726,7 +770,7 @@ function CChangesRunRFonts(Class, Old, New, Color)
 	CChangesRunRFonts.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunRFonts, AscDFH.CChangesBaseObjectProperty);
-CChangesRunRFonts.Type = AscDFH.historyitem_ParaRun_RFonts;
+CChangesRunRFonts.prototype.Type = AscDFH.historyitem_ParaRun_RFonts;
 CChangesRunRFonts.prototype.private_CreateObject = function()
 {
 	return new CRFonts();
@@ -759,7 +803,7 @@ function CChangesRunLang(Class, Old, New, Color)
 	CChangesRunLang.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunLang, AscDFH.CChangesBaseObjectProperty);
-CChangesRunLang.Type = AscDFH.historyitem_ParaRun_Lang;
+CChangesRunLang.prototype.Type = AscDFH.historyitem_ParaRun_Lang;
 CChangesRunLang.prototype.private_CreateObject = function()
 {
 	return new CLang();
@@ -793,7 +837,7 @@ function CChangesRunRFontsAscii(Class, Old, New, Color)
 	CChangesRunRFontsAscii.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunRFontsAscii, AscDFH.CChangesBaseProperty);
-CChangesRunRFontsAscii.Type = AscDFH.historyitem_ParaRun_RFonts_Ascii;
+CChangesRunRFontsAscii.prototype.Type = AscDFH.historyitem_ParaRun_RFonts_Ascii;
 CChangesRunRFontsAscii.prototype.WriteToBinary = function(Writer)
 {
 	// Long  : Flag
@@ -886,7 +930,7 @@ function CChangesRunRFontsHAnsi(Class, Old, New, Color)
 	CChangesRunRFontsHAnsi.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunRFontsHAnsi, AscDFH.CChangesBaseProperty);
-CChangesRunRFontsHAnsi.Type = AscDFH.historyitem_ParaRun_RFonts_HAnsi;
+CChangesRunRFontsHAnsi.prototype.Type = AscDFH.historyitem_ParaRun_RFonts_HAnsi;
 CChangesRunRFontsHAnsi.prototype.WriteToBinary = function(Writer)
 {
 	// Long  : Flag
@@ -979,7 +1023,7 @@ function CChangesRunRFontsCS(Class, Old, New, Color)
 	CChangesRunRFontsCS.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunRFontsCS, AscDFH.CChangesBaseProperty);
-CChangesRunRFontsCS.Type = AscDFH.historyitem_ParaRun_RFonts_CS;
+CChangesRunRFontsCS.prototype.Type = AscDFH.historyitem_ParaRun_RFonts_CS;
 CChangesRunRFontsCS.prototype.WriteToBinary = function(Writer)
 {
 	// Long  : Flag
@@ -1072,7 +1116,7 @@ function CChangesRunRFontsEastAsia(Class, Old, New, Color)
 	CChangesRunRFontsEastAsia.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunRFontsEastAsia, AscDFH.CChangesBaseProperty);
-CChangesRunRFontsEastAsia.Type = AscDFH.historyitem_ParaRun_RFonts_EastAsia;
+CChangesRunRFontsEastAsia.prototype.Type = AscDFH.historyitem_ParaRun_RFonts_EastAsia;
 CChangesRunRFontsEastAsia.prototype.WriteToBinary = function(Writer)
 {
 	// Long  : Flag
@@ -1165,7 +1209,7 @@ function CChangesRunRFontsHint(Class, Old, New, Color)
 	CChangesRunRFontsHint.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunRFontsHint, AscDFH.CChangesBaseLongProperty);
-CChangesRunRFontsHint.Type = AscDFH.historyitem_ParaRun_RFonts_Hint;
+CChangesRunRFontsHint.prototype.Type = AscDFH.historyitem_ParaRun_RFonts_Hint;
 CChangesRunRFontsHint.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
@@ -1190,7 +1234,7 @@ function CChangesRunLangBidi(Class, Old, New, Color)
 	CChangesRunLangBidi.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunLangBidi, AscDFH.CChangesBaseLongProperty);
-CChangesRunLangBidi.Type = AscDFH.historyitem_ParaRun_Lang_Bidi;
+CChangesRunLangBidi.prototype.Type = AscDFH.historyitem_ParaRun_Lang_Bidi;
 CChangesRunLangBidi.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
@@ -1216,7 +1260,7 @@ function CChangesRunLangEastAsia(Class, Old, New, Color)
 	CChangesRunLangEastAsia.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunLangEastAsia, AscDFH.CChangesBaseLongProperty);
-CChangesRunLangEastAsia.Type = AscDFH.historyitem_ParaRun_Lang_EastAsia;
+CChangesRunLangEastAsia.prototype.Type = AscDFH.historyitem_ParaRun_Lang_EastAsia;
 CChangesRunLangEastAsia.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
@@ -1242,7 +1286,7 @@ function CChangesRunLangVal(Class, Old, New, Color)
 	CChangesRunLangVal.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunLangVal, AscDFH.CChangesBaseLongProperty);
-CChangesRunLangVal.Type = AscDFH.historyitem_ParaRun_Lang_Val;
+CChangesRunLangVal.prototype.Type = AscDFH.historyitem_ParaRun_Lang_Val;
 CChangesRunLangVal.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
@@ -1268,7 +1312,7 @@ function CChangesRunTextPr(Class, Old, New, Color)
 	CChangesRunTextPr.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunTextPr, AscDFH.CChangesBaseObjectProperty);
-CChangesRunTextPr.Type = AscDFH.historyitem_ParaRun_TextPr;
+CChangesRunTextPr.prototype.Type = AscDFH.historyitem_ParaRun_TextPr;
 CChangesRunTextPr.prototype.private_CreateObject = function()
 {
 	return new CTextPr();
@@ -1312,7 +1356,7 @@ function CChangesRunUnifill(Class, Old, New, Color)
 	CChangesRunUnifill.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunUnifill, AscDFH.CChangesBaseObjectProperty);
-CChangesRunUnifill.Type = AscDFH.historyitem_ParaRun_Unifill;
+CChangesRunUnifill.prototype.Type = AscDFH.historyitem_ParaRun_Unifill;
 CChangesRunUnifill.prototype.private_CreateObject = function()
 {
 	return new AscFormat.CUniFill();
@@ -1352,7 +1396,7 @@ function CChangesRunShd(Class, Old, New, Color)
 	CChangesRunShd.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunShd, AscDFH.CChangesBaseObjectProperty);
-CChangesRunShd.Type = AscDFH.historyitem_ParaRun_Shd;
+CChangesRunShd.prototype.Type = AscDFH.historyitem_ParaRun_Shd;
 CChangesRunShd.prototype.private_CreateObject = function()
 {
 	return new CDocumentShd();
@@ -1392,7 +1436,7 @@ function CChangesRunMathStyle(Class, Old, New)
 	CChangesRunMathStyle.superclass.constructor.call(this, Class, Old, New);
 }
 AscCommon.extendClass(CChangesRunMathStyle, AscDFH.CChangesBaseLongProperty);
-CChangesRunMathStyle.Type = AscDFH.historyitem_ParaRun_MathStyle;
+CChangesRunMathStyle.prototype.Type = AscDFH.historyitem_ParaRun_MathStyle;
 CChangesRunMathStyle.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
@@ -1410,7 +1454,7 @@ function CChangesRunMathPrp(Class, Old, New, Color)
 	CChangesRunMathPrp.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunMathPrp, AscDFH.CChangesBaseObjectProperty);
-CChangesRunMathPrp.Type = AscDFH.historyitem_ParaRun_MathPrp;
+CChangesRunMathPrp.prototype.Type = AscDFH.historyitem_ParaRun_MathPrp;
 CChangesRunMathPrp.prototype.private_CreateObject = function()
 {
 	return new CMPrp();
@@ -1436,7 +1480,7 @@ function CChangesRunReviewType(Class, Old, New, Color)
 	CChangesRunMathPrp.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunReviewType, AscDFH.CChangesBaseProperty);
-CChangesRunReviewType.Type = AscDFH.historyitem_ParaRun_ReviewType;
+CChangesRunReviewType.prototype.Type = AscDFH.historyitem_ParaRun_ReviewType;
 CChangesRunReviewType.prototype.WriteToBinary = function(Writer)
 {
 	// Long        : New ReviewType
@@ -1487,7 +1531,7 @@ function CChangesRunPrChange(Class, Old, New, Color)
 	CChangesRunPrChange.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunPrChange, AscDFH.CChangesBaseProperty);
-CChangesRunPrChange.Type = AscDFH.historyitem_ParaRun_PrChange;
+CChangesRunPrChange.prototype.Type = AscDFH.historyitem_ParaRun_PrChange;
 CChangesRunPrChange.prototype.WriteToBinary = function(Writer)
 {
 	// Long : Flags
@@ -1596,7 +1640,7 @@ function CChangesRunTextFill(Class, Old, New, Color)
 	CChangesRunTextFill.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunTextFill, AscDFH.CChangesBaseObjectProperty);
-CChangesRunTextFill.Type = AscDFH.historyitem_ParaRun_TextFill;
+CChangesRunTextFill.prototype.Type = AscDFH.historyitem_ParaRun_TextFill;
 CChangesRunTextFill.prototype.private_CreateObject = function()
 {
 	return new AscFormat.CUniFill();
@@ -1625,7 +1669,7 @@ function CChangesRunTextOutline(Class, Old, New, Color)
 	CChangesRunTextOutline.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunTextOutline, AscDFH.CChangesBaseObjectProperty);
-CChangesRunTextOutline.Type = AscDFH.historyitem_ParaRun_TextOutline;
+CChangesRunTextOutline.prototype.Type = AscDFH.historyitem_ParaRun_TextOutline;
 CChangesRunTextOutline.prototype.private_CreateObject = function()
 {
 	return new AscFormat.CLn();
@@ -1654,7 +1698,7 @@ function CChangesRunPrReviewInfo(Class, Old, New, Color)
 	CChangesRunPrReviewInfo.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunPrReviewInfo, AscDFH.CChangesBaseObjectProperty);
-CChangesRunPrReviewInfo.Type = AscDFH.historyitem_ParaRun_PrReviewInfo;
+CChangesRunPrReviewInfo.prototype.Type = AscDFH.historyitem_ParaRun_PrReviewInfo;
 CChangesRunPrReviewInfo.prototype.private_CreateObject = function()
 {
 	return new CReviewInfo();
@@ -1673,7 +1717,7 @@ function CChangesRunContentReviewInfo(Class, Old, New, Color)
 	CChangesRunContentReviewInfo.superclass.constructor.call(this, Class, Old, New, Color);
 }
 AscCommon.extendClass(CChangesRunContentReviewInfo, AscDFH.CChangesBaseObjectProperty);
-CChangesRunContentReviewInfo.Type = AscDFH.historyitem_ParaRun_ContentReviewInfo;
+CChangesRunContentReviewInfo.prototype.Type = AscDFH.historyitem_ParaRun_ContentReviewInfo;
 CChangesRunContentReviewInfo.prototype.private_CreateObject = function()
 {
 	return new CReviewInfo();

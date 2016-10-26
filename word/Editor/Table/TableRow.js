@@ -1156,35 +1156,6 @@ CTableRow.prototype =
         return Writer;
     },
 
-    Save_Changes2 : function(Data, Writer)
-    {
-        var bRetValue = false;
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_TableRow_Before:
-            case AscDFH.historyitem_TableRow_After:
-            case AscDFH.historyitem_TableRow_CellSpacing:
-            case AscDFH.historyitem_TableRow_Height:
-            {
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_AddCell:
-            {
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_RemoveCell:
-            {
-                break;
-            }
-        }
-
-        return bRetValue;
-    },
-
     Load_Changes : function(Reader, Reader2)
     {
         // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
