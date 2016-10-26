@@ -2707,7 +2707,12 @@ CUserCacheColor.prototype.init = function(nColor) {
     script.type = 'text/javascript';
     script.src = url;
 
-    script.onreadystatechange = callback;
+    script.onreadystatechange = function () {
+			if (this.readyState === 'complete' || this.readyState === 'loaded') {
+				script.onreadystatechange = null;
+				setTimeout(callback, 0);
+			}
+		};
     script.onload = callback;
 
     // Fire the loading
