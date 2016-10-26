@@ -4596,9 +4596,9 @@ CellArea.prototype = {
 		this.minAxisType = null;
 		this.maxAxisType = null;
 		this.rightToLeft = null;
+		this.manualMax = null;
+		this.manualMin = null;
 
-		this.manualMax = undefined;
-		this.manualMin = undefined;
 		this.dateAxis = false;
 
 		// elements
@@ -4643,6 +4643,8 @@ CellArea.prototype = {
 		this.minAxisType = Asc.c_oAscSparklineAxisMinMax.Individual;
 		this.maxAxisType = Asc.c_oAscSparklineAxisMinMax.Individual;
 		this.rightToLeft = false;
+		this.manualMax = null;
+		this.manualMin = null;
 
 		// elements
 		var defaultSeriesColor = 3629202;
@@ -4658,8 +4660,6 @@ CellArea.prototype = {
 		this.colorLow = new AscCommonExcel.RgbColor(defaultOtherColor);
 	};
 	sparklineGroup.prototype.set = function (val) {
-		this.manualMax = null !== val.manualMax ? val.manualMax : this.manualMax;
-		this.manualMin = null !== val.manualMin ? val.manualMin : this.manualMin;
 		this.lineWeight = null !== val.lineWeight ? val.lineWeight : this.lineWeight;
 		this.type = null !== val.type ? val.type : this.type;
 		this.dateAxis = null !== val.dateAxis ? val.dateAxis : this.dateAxis;
@@ -4675,6 +4675,8 @@ CellArea.prototype = {
 		this.minAxisType = null !== val.minAxisType ? val.minAxisType : this.minAxisType;
 		this.maxAxisType = null !== val.maxAxisType ? val.maxAxisType : this.maxAxisType;
 		this.rightToLeft = null !== val.rightToLeft ? val.rightToLeft : this.rightToLeft;
+		this.manualMax = null !== val.manualMax ? val.manualMax : this.manualMax;
+		this.manualMin = null !== val.manualMin ? val.manualMin : this.manualMin;
 
 		var getColor = function (color) {
 			return color instanceof Asc.asc_CColor ? AscCommonExcel.CorrectAscColor(color) : color;
@@ -4693,8 +4695,6 @@ CellArea.prototype = {
 	sparklineGroup.prototype.clone = function (onlyProps) {
 		var res = new sparklineGroup(!onlyProps);
 		res.Id = this.Id;
-		res.manualMax = this.manualMax;
-		res.manualMin = this.manualMin;
 		res.lineWeight = this.lineWeight;
 		res.type = this.type;
 		res.dateAxis = this.dateAxis;
@@ -4710,6 +4710,8 @@ CellArea.prototype = {
 		res.minAxisType = this.minAxisType;
 		res.maxAxisType = this.maxAxisType;
 		res.rightToLeft = this.rightToLeft;
+		res.manualMax = this.manualMax;
+		res.manualMin = this.manualMin;
 
 		res.colorSeries = this.colorSeries ? this.colorSeries.clone() : null;
 		res.colorNegative = this.colorNegative ? this.colorNegative.clone() : null;
@@ -4810,6 +4812,12 @@ CellArea.prototype = {
 	sparklineGroup.prototype.asc_getRightToLeft = function () {
 		return this.rightToLeft;
 	};
+	sparklineGroup.prototype.asc_getManualMax = function () {
+		return this.manualMax;
+	};
+	sparklineGroup.prototype.asc_getManualMin = function () {
+		return this.manualMin;
+	};
 	sparklineGroup.prototype.asc_getColorSeries = function () {
 		return this.colorSeries ? Asc.colorObjToAscColor(this.colorSeries) : this.colorSeries;
 	};
@@ -4875,6 +4883,12 @@ CellArea.prototype = {
 	};
 	sparklineGroup.prototype.asc_setRightToLeft = function (val) {
 		this.rightToLeft = val;
+	};
+	sparklineGroup.prototype.asc_setManualMax = function (val) {
+		this.manualMax = val;
+	};
+	sparklineGroup.prototype.asc_setManualMin = function (val) {
+		this.manualMin = val;
 	};
 	sparklineGroup.prototype.asc_setColorSeries = function (val) {
 		this.colorSeries = val;
@@ -7259,6 +7273,8 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	prot["asc_getMinAxisType"]		= prot.asc_getMinAxisType;
 	prot["asc_getMaxAxisType"]		= prot.asc_getMaxAxisType;
 	prot["asc_getRightToLeft"]		= prot.asc_getRightToLeft;
+	prot["asc_getManualMax"]			= prot.asc_getManualMax;
+	prot["asc_getManualMin"]			= prot.asc_getManualMin;
 	prot["asc_getColorSeries"]		= prot.asc_getColorSeries;
 	prot["asc_getColorNegative"]	= prot.asc_getColorNegative;
 	prot["asc_getColorAxis"]			= prot.asc_getColorAxis;
@@ -7281,6 +7297,8 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	prot["asc_setMinAxisType"]		= prot.asc_setMinAxisType;
 	prot["asc_setMaxAxisType"]		= prot.asc_setMaxAxisType;
 	prot["asc_setRightToLeft"]		= prot.asc_setRightToLeft;
+	prot["asc_setManualMax"]			= prot.asc_setManualMax;
+	prot["asc_setManualMin"]			= prot.asc_setManualMin;
 	prot["asc_setColorSeries"]		= prot.asc_setColorSeries;
 	prot["asc_setColorNegative"]	= prot.asc_setColorNegative;
 	prot["asc_setColorAxis"]			= prot.asc_setColorAxis;
