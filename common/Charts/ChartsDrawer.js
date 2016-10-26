@@ -3358,7 +3358,8 @@ drawBarChart.prototype =
 		{
 			if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
 			{
-				if(this.cChartDrawer.processor3D.view3D.rAngAx)
+				//если будут найдены проблемы при отрисовке stacked rAngAx - раскомментировать ветку
+				/*if(this.cChartDrawer.processor3D.view3D.rAngAx)
 				{
 					var angle = this.cChartDrawer.processor3D.angleOx;
 					this.temp.sort (function sortArr(a, b)
@@ -3386,12 +3387,10 @@ drawBarChart.prototype =
 							}
 						}
 					})
-				}
-				else
-				{
-					var cSortFaces = new CSortFaces(this.cChartDrawer);
-					this.sortParallelepipeds = cSortFaces.sortParallelepipeds(this.temp);
-				}
+				}*/
+				
+				var cSortFaces = new CSortFaces(this.cChartDrawer);
+				this.sortParallelepipeds = cSortFaces.sortParallelepipeds(this.temp);
 			}
 			else if("normal" === this.chartProp.subType)
 			{
@@ -3787,7 +3786,8 @@ drawBarChart.prototype =
 		
 		if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
 		{
-			if(this.cChartDrawer.processor3D.view3D.rAngAx)
+			//если будут найдены проблемы при отрисовке stacked rAngAx - раскомментировать ветку
+			/*if(this.cChartDrawer.processor3D.view3D.rAngAx)
 			{
 				for(var i = 0; i < this.temp.length; i++)
 				{
@@ -3798,22 +3798,20 @@ drawBarChart.prototype =
 						drawVerges(face.seria, face.point, face.paths, null, face.verge);
 					}	
 				}
-			}
-			else
+			}*/
+			
+			for(var i = 0; i < this.sortParallelepipeds.length; i++)
 			{
-				for(var i = 0; i < this.sortParallelepipeds.length; i++)
+				var index = this.sortParallelepipeds[i].nextIndex;
+				var faces = this.temp[index].faces;
+				for(var j = 0; j < faces.length; j++)
 				{
-					var index = this.sortParallelepipeds[i].nextIndex;
-					var faces = this.temp[index].faces;
-					for(var j = 0; j < faces.length; j++)
-					{
-						var face = faces[j];
-						drawVerges(face.seria, face.point, face.paths, null, face.verge);
-					}	
-				}
+					var face = faces[j];
+					drawVerges(face.seria, face.point, face.paths, null, face.verge);
+				}	
 			}
 		}
-		else if("normal" === this.chartProp.subType && !this.cChartDrawer.processor3D.view3D.rAngAx)
+		else if("normal" === this.chartProp.subType)
 		{
 			for(var i = 0; i < this.sortParallelepipeds.length; i++)
 			{
@@ -12248,7 +12246,12 @@ CSortFaces.prototype =
 				var point2 = plain.points2[2];
 				var point3 = plain.points2[3];
 				
-				var projectIntersection = t.cChartDrawer._convertAndTurnPoint(nIntersectionPlainAndLine.x, nIntersectionPlainAndLine.y, nIntersectionPlainAndLine.z, true, true);
+				var projectIntersection = nIntersectionPlainAndLine;
+				if(!this.cChartDrawer.processor3D.view3D.rAngAx)
+				{
+					projectIntersection = t.cChartDrawer._convertAndTurnPoint(nIntersectionPlainAndLine.x, nIntersectionPlainAndLine.y, nIntersectionPlainAndLine.z, true, true);
+				}
+				
 				var areaQuadrilateral = plain.plainArea;
 				var areaTriangle1 = t.cChartDrawer.getAreaTriangle(point0, projectIntersection, point1);
 				var areaTriangle2 = t.cChartDrawer.getAreaTriangle(point1, projectIntersection, point2);
