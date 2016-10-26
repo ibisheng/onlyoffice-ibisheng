@@ -4657,6 +4657,36 @@ CellArea.prototype = {
 		this.colorHigh = new AscCommonExcel.RgbColor(defaultOtherColor);
 		this.colorLow = new AscCommonExcel.RgbColor(defaultOtherColor);
 	};
+	sparklineGroup.prototype.set = function (val) {
+		this.manualMax = null !== val.manualMax ? val.manualMax : this.manualMax;
+		this.manualMin = null !== val.manualMin ? val.manualMin : this.manualMin;
+		this.lineWeight = null !== val.lineWeight ? val.lineWeight : this.lineWeight;
+		this.type = null !== val.type ? val.type : this.type;
+		this.dateAxis = null !== val.dateAxis ? val.dateAxis : this.dateAxis;
+		this.displayEmptyCellsAs = null !== val.displayEmptyCellsAs ? val.displayEmptyCellsAs : this.displayEmptyCellsAs;
+		this.markers = null !== val.markers ? val.markers : this.markers;
+		this.high = null !== val.high ? val.high : this.high;
+		this.low = null !== val.low ? val.low : this.low;
+		this.first = null !== val.first ? val.first : this.first;
+		this.last = null !== val.last ? val.last : this.last;
+		this.negative = null !== val.negative ? val.negative : this.negative;
+		this.displayXAxis = null !== val.displayXAxis ? val.displayXAxis : this.displayXAxis;
+		this.displayHidden = null !== val.displayHidden ? val.displayHidden : this.displayHidden;
+		this.minAxisType = null !== val.minAxisType ? val.minAxisType : this.minAxisType;
+		this.maxAxisType = null !== val.maxAxisType ? val.maxAxisType : this.maxAxisType;
+		this.rightToLeft = null !== val.rightToLeft ? val.rightToLeft : this.rightToLeft;
+
+		this.colorSeries = null !== val.colorSeries ? val.colorSeries : this.colorSeries;
+		this.colorNegative = null !== val.colorNegative ? val.colorNegative : this.colorNegative;
+		this.colorAxis = null !== val.colorAxis ? val.colorAxis : this.colorAxis;
+		this.colorMarkers = null !== val.colorMarkers ? val.colorMarkers : this.colorMarkers;
+		this.colorFirst = null !== val.colorFirst ? val.colorFirst : this.colorFirst;
+		this.colorLast = null !== val.colorLast ? val.colorLast : this.colorLast;
+		this.colorHigh = null !== val.colorHigh ? val.colorHigh : this.colorHigh;
+		this.colorLow = null !== val.colorLow ? val.colorLow : this.colorLow;
+
+		this.cleanCache();
+	};
 	sparklineGroup.prototype.clone = function (onlyProps) {
 		var res = new sparklineGroup(!onlyProps);
 		res.manualMax = this.manualMax;
@@ -4730,6 +4760,9 @@ CellArea.prototype = {
 			}
 		}
 		return -1;
+	};
+	sparklineGroup.prototype.asc_getId = function () {
+		return this.Id;
 	};
 	sparklineGroup.prototype.asc_getType = function () {
 		return this.type;
@@ -7208,6 +7241,7 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].CellArea = CellArea;
 	window["Asc"]["sparklineGroup"] = window['AscCommonExcel'].sparklineGroup = sparklineGroup;
 	prot = sparklineGroup.prototype;
+	prot["asc_getId"]							= prot.asc_getId;
 	prot["asc_getType"]						= prot.asc_getType;
 	prot["asc_getLineWeight"]			= prot.asc_getLineWeight;
 	prot["asc_getDisplayEmpty"]		= prot.asc_getDisplayEmpty;

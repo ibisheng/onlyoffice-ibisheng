@@ -2612,8 +2612,15 @@ var editor;
   };
 
   // Frozen pane
-  spreadsheet_api.prototype.asc_freezePane = function() {
+  spreadsheet_api.prototype.asc_freezePane = function () {
     this.wb.getWorksheet().freezePane();
+  };
+
+  spreadsheet_api.prototype.asc_setSparklineGroup = function (id, oSparklineGroup) {
+    var changedSparkline = AscCommon.g_oTableId.Get_ById(id);
+    if (changedSparkline) {
+      changedSparkline.set(oSparklineGroup);
+    }
   };
 
   // Cell interface
@@ -3531,6 +3538,9 @@ var editor;
 
   // Frozen pane
   prot["asc_freezePane"] = prot.asc_freezePane;
+
+  // Sparklines
+  prot["asc_setSparklineGroup"] = prot.asc_setSparklineGroup;
 
   // Cell interface
   prot["asc_getCellInfo"] = prot.asc_getCellInfo;
