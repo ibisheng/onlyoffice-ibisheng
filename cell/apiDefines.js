@@ -378,34 +378,6 @@ var c_oAscPopUpSelectorType = {
     Custom: 2
   };
 
-  var c_oAscSparklineAttributes = {
-    type: 1,
-    lineWeight: 2,
-    displayEmptyCellsAs: 4,
-    markers: 8,
-    high: 16,
-    low: 32,
-    first: 64,
-    last: 128,
-    negative: 256,
-    displayXAxis: 512,
-    displayHidden: 1024,
-    minAxisType: 2048,
-    maxAxisType: 4096,
-    rightToLeft: 8192
-  };
-
-  var c_oAscSparklineColors = {
-    Series: 1,
-    Negative: 2,
-    Axis: 4,
-    Markers: 8,
-    First: 16,
-    Last: 32,
-    High: 64,
-    Low: 128
-  };
-
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommonExcel'] = window['AscCommonExcel'] || {};
   window['AscCommonExcel'].c_oAscAlignType = c_oAscAlignType;
@@ -593,30 +565,4 @@ var c_oAscPopUpSelectorType = {
   prot['Individual'] = prot.Individual;
   prot['Group'] = prot.Group;
   prot['Custom'] = prot.Custom;
-  window['Asc']['c_oAscSparklineAttributes'] = window['Asc'].c_oAscSparklineAttributes = c_oAscSparklineAttributes;
-  prot = c_oAscSparklineAttributes;
-  prot['type'] = prot.type;
-  prot['lineWeight'] = prot.lineWeight;
-  prot['displayEmptyCellsAs'] = prot.displayEmptyCellsAs;
-  prot['markers'] = prot.markers;
-  prot['high'] = prot.high;
-  prot['low'] = prot.low;
-  prot['first'] = prot.first;
-  prot['last'] = prot.last;
-  prot['negative'] = prot.negative;
-  prot['displayXAxis'] = prot.displayXAxis;
-  prot['displayHidden'] = prot.displayHidden;
-  prot['minAxisType'] = prot.minAxisType;
-  prot['maxAxisType'] = prot.maxAxisType;
-  prot['rightToLeft'] = prot.rightToLeft;
-  window['Asc']['c_oAscSparklineColors'] = window['Asc'].c_oAscSparklineColors = c_oAscSparklineColors;
-  prot = c_oAscSparklineColors;
-  prot['Series'] = prot.Series;
-  prot['Negative'] = prot.Negative;
-  prot['Axis'] = prot.Axis;
-  prot['Markers'] = prot.Markers;
-  prot['First'] = prot.First;
-  prot['Last'] = prot.Last;
-  prot['High'] = prot.High;
-  prot['Low'] = prot.Low;
 })(window);
