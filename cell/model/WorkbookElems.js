@@ -7206,7 +7206,7 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].RangeDataManagerElem = RangeDataManagerElem;
 	window['AscCommonExcel'].RangeDataManager = RangeDataManager;
 	window['AscCommonExcel'].CellArea = CellArea;
-	window['AscCommonExcel'].sparklineGroup = sparklineGroup;
+	window["Asc"]["sparklineGroup"] = window['AscCommonExcel'].sparklineGroup = sparklineGroup;
 	prot = sparklineGroup.prototype;
 	prot["asc_getType"]						= prot.asc_getType;
 	prot["asc_getLineWeight"]			= prot.asc_getLineWeight;
