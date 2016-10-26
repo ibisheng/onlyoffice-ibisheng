@@ -5013,18 +5013,17 @@ CellArea.prototype = {
         return true;
     };
 
-	sparklineGroup.prototype.asc_getStyles = function()
-	{
+	sparklineGroup.prototype.asc_getStyles = function () {
 		var aRet = [];
-        var nStyleIndex = -1;
-		for(var i = 0; i < 36; ++i){
+		var nStyleIndex = -1;
+		for (var i = 0; i < 36; ++i) {
 			var oSparklineGroup = this.asc_createSparklineGroupByStyle(i);
-            if(nStyleIndex === -1 && this.isEqualColors(oSparklineGroup)){
-                nStyleIndex = i;
-            }
+			if (nStyleIndex === -1 && this.isEqualColors(oSparklineGroup)) {
+				nStyleIndex = i;
+			}
 			aRet.push(this.asc_getThumbBySparklineGroup(oSparklineGroup));
 		}
-        aRet.push(nStyleIndex);
+		aRet.push(nStyleIndex);
 		return aRet;
 	};
 
