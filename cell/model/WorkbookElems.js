@@ -4692,6 +4692,7 @@ CellArea.prototype = {
 	};
 	sparklineGroup.prototype.clone = function (onlyProps) {
 		var res = new sparklineGroup(!onlyProps);
+		res.Id = this.Id;
 		res.manualMax = this.manualMax;
 		res.manualMin = this.manualMin;
 		res.lineWeight = this.lineWeight;
