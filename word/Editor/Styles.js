@@ -5717,6 +5717,10 @@ CDocumentBorder.prototype =
         }
     }
 };
+CDocumentBorder.prototype.IsNone = function()
+{
+	return this.Value === border_None ? true : false;
+};
 
 function CTableMeasurement(Type, W)
 {
