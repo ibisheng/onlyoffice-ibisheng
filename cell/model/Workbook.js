@@ -1263,6 +1263,29 @@ function getRangeType(oBBox){
 		}
 	};
 
+	function ForwardTransformationFormula(elem, formula, parsed) {
+		this.elem = elem;
+		this.formula = formula;
+		this.parsed = parsed;
+	}
+	ForwardTransformationFormula.prototype = {
+		onFormulaEvent: function(type, eventData) {
+			if (AscCommon.c_oNotifyParentType.CanDo === type) {
+				return true;
+			} else if (AscCommon.c_oNotifyParentType.Change === type) {
+				this.parsed.setIsDirty(false);
+			} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
+				if (eventData.isRebuild) {
+					this.parsed = new AscCommonExcel.parserFormula(eventData.assemble, this, this.parsed.ws);
+					this.parsed.parse();
+				} else {
+					this.parsed.Formula = eventData.assemble;
+				}
+				this.formula = eventData.assemble;
+				this.parsed.buildDependencies();
+			}
+		}
+	};
 function angleFormatToInterface(val)
 {
 	var nRes = 0;
@@ -1329,7 +1352,7 @@ function Workbook(eventsHandlers, oApi){
 	this.maxDigitWidth = 0;
 	this.paddingPlusBorder = 0;
 }
-Workbook.prototype.init=function(tableCustomFunc, bNoBuildDep){
+Workbook.prototype.init=function(tableCustomFunc, bNoBuildDep, bSnapshot){
 	if(this.nActive < 0)
 		this.nActive = 0;
 	if(this.nActive >= this.aWorksheets.length)
@@ -1374,7 +1397,9 @@ Workbook.prototype.init=function(tableCustomFunc, bNoBuildDep){
 		this.dependencyFormulas.initOpen();
 		this.dependencyFormulas.calcTree();
 	}
-	this.snapshot = this._getSnapshot();
+	if (bSnapshot) {
+		this.snapshot = this._getSnapshot();
+	}
 };
 Workbook.prototype.rebuildColors=function(){
   AscCommonExcel.g_oColorManager.rebuildColors();
@@ -1838,6 +1863,8 @@ Workbook.prototype.SerializeHistory = function(){
 			wb.aWorksheets.push(ws);
 			wb.aWorksheetsById[ws.getId()] = ws;
 		}
+		//init trigger
+		wb.init({}, true, false);
 		return wb;
 	};
 	Workbook.prototype._forwardTransformation = function(wbSnapshot, changesMine, changesTheir) {
@@ -1890,7 +1917,7 @@ Workbook.prototype.SerializeHistory = function(){
 					var getRes = elem.oClass.forwardTransformationGet(elem.nActionType, elem.oData, elem.nSheetId);
 					if (getRes && getRes.formula) {
 						//inserted formulas
-						formulas.push({elem: elem, formula: getRes.formula, parsed: null});
+						formulas.push(new ForwardTransformationFormula(elem, getRes.formula, null));
 					}
 					if (getRes && getRes.name) {
 						//add/rename sheet
@@ -1952,15 +1979,15 @@ Workbook.prototype.SerializeHistory = function(){
 	};
 	Workbook.prototype._forwardTransformationFormula = function(wbSnapshot, formulas, changes, res) {
 		if (formulas.length > 0) {
-			var i, elem, elemWrap, ws;
+			var i, elem, ftFormula, ws;
 			//parse formulas
 			for (i = 0; i < formulas.length; ++i) {
-				elemWrap = formulas[i];
-				ws = wbSnapshot.getWorksheetById(elemWrap.elem.nSheetId);
+				ftFormula = formulas[i];
+				ws = wbSnapshot.getWorksheetById(ftFormula.elem.nSheetId);
 				if (ws) {
-					elemWrap.parsed = new parserFormula(elemWrap.formula, wbSnapshot, ws);
-					elemWrap.parsed.parse();
-					elemWrap.parsed.buildDependencies();
+					ftFormula.parsed = new parserFormula(ftFormula.formula, ftFormula, ws);
+					ftFormula.parsed.parse();
+					ftFormula.parsed.buildDependencies();
 				}
 			}
 			//rename sheet first to prevent name conflict
@@ -1977,29 +2004,12 @@ Workbook.prototype.SerializeHistory = function(){
 			}
 			//assemble
 			for (i = 0; i < formulas.length; ++i) {
-				elemWrap = formulas[i];
-				if (elemWrap.parsed) {
-					elem = elemWrap.elem;
-					elemWrap.parsed.removeDependencies();
-					elemWrap.formula = elemWrap.parsed.Formula;
-					res.modify.push(elemWrap);
+				ftFormula = formulas[i];
+				if (ftFormula.parsed) {
+					ftFormula.parsed.removeDependencies();
+					res.modify.push(ftFormula);
 				}
 			}
-		}
-	};
-	Workbook.prototype.onFormulaEvent = function(type, eventData) {
-		if (AscCommon.c_oNotifyParentType.CanDo === type) {
-			return true;
-		} else if (AscCommon.c_oNotifyParentType.Change === type) {
-			eventData.formula.setIsDirty(false);
-		} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
-			if (eventData.isRebuild) {
-				eventData.formula = new AscCommonExcel.parserFormula(eventData.assemble, this, eventData.formula.ws);
-				eventData.formula.parse();
-			} else {
-				eventData.formula.Formula = eventData.assemble;
-			}
-			eventData.formula.buildDependencies();
 		}
 	};
 Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){

@@ -7204,7 +7204,7 @@
                     if(c_oSerConstants.ReadOk == res)
                         res = (new Binary_WorkbookTableReader(this.stream, wb)).Read();
                 }
-                wb.init(this.oReadResult.tableCustomFunc);
+                wb.init(this.oReadResult.tableCustomFunc, false, true);
             } else if(window["Asc"] && window["Asc"]["editor"] !== undefined){
                 wb.init(this.oReadResult.tableCustomFunc, true);
             }

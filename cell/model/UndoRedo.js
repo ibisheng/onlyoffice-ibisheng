@@ -3858,7 +3858,7 @@ UndoRedoAutoFilters.prototype = {
 	},
 	forwardTransformationIsAffect : function(Type) {
 		return AscCH.historyitem_AutoFilter_Add === Type || AscCH.historyitem_AutoFilter_ChangeTableName === Type ||
-			AscCH.historyitem_AutoFilter_Empty === Type;
+			AscCH.historyitem_AutoFilter_Empty === Type || AscCH.historyitem_AutoFilter_ChangeColumnName === Type;
 	}
 };
 
