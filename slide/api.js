@@ -2059,8 +2059,8 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.Resize                       = function()
 	{
-		if (false === this.bInit_word_control)
-			return;
+		//if (false === this.bInit_word_control)
+		//	return;
 		this.WordControl.OnResize(false);
 	};
 	asc_docs_api.prototype.AddURL                       = function(url)
