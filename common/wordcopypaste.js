@@ -4557,11 +4557,27 @@ PasteProcessor.prototype =
             //Ind
             var Ind = new CParaInd();
             var margin_left = computedStyle.getPropertyValue( "margin-left" );
+			
+			//TODO перепроверить правку с pageColumn
+			var curIndexColumn = this.oLogicDocument.Content[this.oLogicDocument.CurPos.ContentPos].Get_CurrentColumn(this.oLogicDocument.CurPage);
+			var curPage = this.oLogicDocument.Pages[this.oLogicDocument.CurPage];
+			var pageColumn = curPage && curPage.Sections && curPage.Sections[0] && curPage.Sections[0].Columns ? curPage.Sections[0].Columns[curIndexColumn] : null;
             if(margin_left && null != (margin_left = this._ValueToMm(margin_left)))
-                Ind.Left = margin_left;
+			{
+				if(!pageColumn || (pageColumn && pageColumn.X + margin_left < pageColumn.XLimit))
+				{
+					Ind.Left = margin_left;
+				}
+			}
             var margin_right = computedStyle.getPropertyValue( "margin-right" );
             if(margin_right && null != (margin_right = this._ValueToMm(margin_right)))
-                Ind.Right = margin_right;
+			{
+				if(!pageColumn || (pageColumn && pageColumn.XLimit - margin_right > pageColumn.X))
+				{
+					Ind.Right = margin_right;
+				}
+			}
+               
             //scale
             // if(null != pPr.Ind.Left && true == this.bUseScaleKoef)
             // pPr.Ind.Left = pPr.Ind.Left * this.dScaleKoef;
