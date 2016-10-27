@@ -3777,21 +3777,25 @@ function OfflineEditor () {
             stream["WriteBool"](bCanUndo);
             window["native"]["OnCallMenuEvent"](60, stream); // ASC_MENU_EVENT_TYPE_CAN_UNDO
         });
+      
         _api.asc_registerCallback('asc_onCanRedoChanged', function (bCanRedo) {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
             stream["WriteBool"](bCanRedo);
             window["native"]["OnCallMenuEvent"](61, stream); // ASC_MENU_EVENT_TYPE_CAN_REDO
         });
+      
         _api.asc_registerCallback('asc_onDocumentModifiedChanged', function(change) {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
             stream["WriteBool"](change);
             window["native"]["OnCallMenuEvent"](66, stream); // ASC_MENU_EVENT_TYPE_DOCUMETN_MODIFITY
         });
+       
         _api.asc_registerCallback("asc_onActiveSheetChanged", function(index) {
             t.asc_WriteAllWorksheets(true, true);
         });
+      
         _api.asc_registerCallback('asc_onRenameCellTextEnd', function(found, replaced) {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
@@ -3799,6 +3803,7 @@ function OfflineEditor () {
             stream["WriteLong"](replaced);
             window["native"]["OnCallMenuEvent"](63, stream); // ASC_MENU_EVENT_TYPE_SEARCH_REPLACETEXT
         });
+      
         _api.asc_registerCallback('asc_onSelectionChanged', function(cellInfo) {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
@@ -3806,34 +3811,40 @@ function OfflineEditor () {
             window["native"]["OnCallMenuEvent"](2402, stream); // ASC_SPREADSHEETS_EVENT_TYPE_SELECTION_CHANGED
             t.onSelectionChanged(cellInfo);
         });
+       
         _api.asc_registerCallback('asc_onSelectionNameChanged', function(name) {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
             stream['WriteString2'](name);
             window["native"]["OnCallMenuEvent"](2310, stream); // ASC_SPREADSHEETS_EVENT_TYPE_EDITOR_SELECTION_NAME_CHANGED
         });
+      
         _api.asc_registerCallback('asc_onEditorSelectionChanged', function(font) {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
             asc_WriteCFont(-1, font, stream);
             window["native"]["OnCallMenuEvent"](2403, stream); // ASC_SPREADSHEETS_EVENT_TYPE_EDITOR_SELECTION_CHANGED
         });
+      
         _api.asc_registerCallback('asc_onSendThemeColorSchemes', function(schemes) {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
             asc_WriteColorSchemes(schemes, stream);
             window["native"]["OnCallMenuEvent"](2404, stream); // ASC_SPREADSHEETS_EVENT_TYPE_COLOR_SCHEMES
         });
+      
         _api.asc_registerCallback('asc_onInitTablePictures',   function () {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
             window["native"]["OnCallMenuEvent"](12, stream); // ASC_MENU_EVENT_TYPE_TABLE_STYLES
         });
+      
         _api.asc_registerCallback('asc_onInitEditorStyles', function () {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
             window["native"]["OnCallMenuEvent"](2405, stream); // ASC_SPREADSHEETS_EVENT_TYPE_TABLE_STYLES
         });
+      
         _api.asc_registerCallback('asc_onError', function(id, level, errData) {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
@@ -3841,6 +3852,7 @@ function OfflineEditor () {
             stream['WriteLong'](level);
             window["native"]["OnCallMenuEvent"](500, stream); // ASC_MENU_EVENT_TYPE_ON_ERROR
         });
+      
         _api.asc_registerCallback('asc_onEditCell', function(state) {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
@@ -3854,6 +3866,10 @@ function OfflineEditor () {
             asc_WriteAutoFiltersOptions(state, stream);
             window["native"]["OnCallMenuEvent"](3060, stream); // ASC_SPREADSHEETS_EVENT_TYPE_FILTER_DIALOG
         });
+        
+        _api.asc_registerCallback('asc_onSheetsChanged', function () {
+                                  t.asc_WriteAllWorksheets(true, true);
+                                  });
         
         _api.asc_registerCallback('asc_onGetEditorPermissions', function(state) {
             //console.log("asc_onGetEditorPermissions");
