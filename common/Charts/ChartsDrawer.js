@@ -8081,15 +8081,12 @@ drawPieChart.prototype =
 			var swapAngle = Math.abs((parseFloat(partOfSum)) * (Math.PI * 2));
 			
 			if(!this.paths.series)
+			{
 				this.paths.series = [];
-			if(sumData === 0)//TODO стоит пересмотреть
-			{
-				this.paths.series[i] = this._calculateEmptySegment(radius, xCenter, yCenter);
 			}
-			else
-			{
-				this.paths.series[i] = this._calculateSegment3D(startAngle, swapAngle, radius, xCenter, yCenter);
-			}
+		
+			this.paths.series[i] = this._calculateSegment3D(startAngle, swapAngle, radius, xCenter, yCenter);
+			
 			startAngle += swapAngle;
         }
     },
@@ -8244,6 +8241,23 @@ drawPieChart.prototype =
 			path.recalculate(gdLst);
 			
 			return path;
+		};
+		
+		var calculateDownFace = function(startAng, swapAng)
+		{
+			var path = getNewPath();
+			
+			var endAng = startAng + swapAng;
+			var p = getSegmentPoints(startAng, endAng);
+			
+			path.moveTo(xCenter  / pxToMm * pathW, (yCenter + depth) / pxToMm * pathH);
+			path.lnTo(p.x0 / pxToMm * pathW, (p.y0 + depth) / pxToMm * pathH);
+			path.arcTo(radius1 / pxToMm * pathW, radius2 / pxToMm * pathH, -1 * stAng*cToDeg, -1 * swapAng*cToDeg);
+			path.lnTo(xCenter  /pxToMm * pathW, (yCenter + depth) / pxToMm * pathH);
+			
+			path.recalculate(gdLst);
+			
+			return path;
 		}
 		
 		//FRONT FACES
@@ -8268,9 +8282,12 @@ drawPieChart.prototype =
 		//UP FACE
 		var upPath = calculateUpFace(stAng, swAng);
 		
+		//DOWN FACE
+		var downPath = calculateDownFace(stAng, swAng);
+		
 		this.angleFor3D += swAng;
 		
-		return {frontPath: frontPath, upPath: upPath, insidePath: insidePath};	
+		return {frontPath: frontPath, upPath: upPath, insidePath: insidePath, downPath: downPath};	
 	},
 	
 	_calculateSegment3D: function (startAngle, swapAngle, radius, xCenter, yCenter)
@@ -8303,31 +8320,51 @@ drawPieChart.prototype =
 		{
 			if(path)
 			{
-				var  props = t.cChartSpace.getParentObjects();
-				var duplicateBrush = brush.createDuplicate();
-				var cColorMod = new AscFormat.CColorMod;
-				
-				cColorMod.val = shadeValue;
-				cColorMod.name = shade;
-				
-				if(duplicateBrush.fill.color)
+				if(brush)
 				{
-					duplicateBrush.fill.color.Mods.addMod(cColorMod);
-					duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
-				}
-				if(isShadePen)
-				{
-					pen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0);
-				}
-				if(isShadeBrush)
-				{
-					brush = duplicateBrush;
+					var  props = t.cChartSpace.getParentObjects();
+					var duplicateBrush = brush.createDuplicate();
+					var cColorMod = new AscFormat.CColorMod;
+					
+					cColorMod.val = shadeValue;
+					cColorMod.name = shade;
+					
+					if(duplicateBrush)
+					{
+						duplicateBrush.addColorMod(cColorMod);
+						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
+					}
+					if(isShadePen)
+					{
+						pen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0);
+					}
+					if(isShadeBrush)
+					{
+						brush = duplicateBrush;
+					}
 				}
 				
 				t.cChartDrawer.drawPath(path, pen, brush);
 			}
 
 		};
+		
+		//DOWN
+		for (var i = 0,len = numCache.length; i < len; i++) 
+		{
+			var val = numCache[i];
+			var brush = val.brush;
+			var pen = val.pen;
+			var path = this.paths.series[i];
+			
+			if(path)
+			{
+				for(var j = path.length - 1; j >= 0; j--)
+				{
+					drawPath(path[j].downPath, pen, null);
+				}
+			}
+		}
 		
 		//INSIDE
 		for (var i = 0,len = numCache.length; i < len; i++) 
