@@ -105,58 +105,55 @@ CHistory.prototype =
         this.FileSize     = nSize;
     },
 
-    Update_PointInfoItem : function(PointIndex, StartPoint, LastPoint, SumIndex, DeletedIndex)
-    {
-        var Point = this.Points[PointIndex];
-        if (Point)
-        {
-            // Проверяем первое изменение. Если оно уже нужного типа, тогда мы его удаляем. Добавляем специфическое
-            // первое изменение с описанием.
-            var Class = AscCommon.g_oTableId;
+	Update_PointInfoItem : function(PointIndex, StartPoint, LastPoint, SumIndex, DeletedIndex)
+	{
+		var Point = this.Points[PointIndex];
+		if (Point)
+		{
+			// Проверяем первое изменение. Если оно уже нужного типа, тогда мы его удаляем. Добавляем специфическое
+			// первое изменение с описанием.
+			var Class = AscCommon.g_oTableId;
 
-            if (Point.Items.length > 0)
-            {
-                var FirstItem = Point.Items[0];
-                if (FirstItem.Class === Class && AscDFH.historyitem_TableId_Description === FirstItem.Data.Type)
-                    Point.Items.splice(0, 1);
-            }
+			if (Point.Items.length > 0)
+			{
+				var FirstItem = Point.Items[0];
+				if (FirstItem.Class === Class && AscDFH.historyitem_TableId_Description === FirstItem.Data.Type)
+					Point.Items.splice(0, 1);
+			}
 
-            var Data =
-            {
-                Type         : AscDFH.historyitem_TableId_Description,
-                FileCheckSum : this.FileCheckSum,
-                FileSize     : this.FileSize,
-                Description  : Point.Description,
-                ItemsCount   : Point.Items.length,
-                PointIndex   : PointIndex,
-                StartPoint   : StartPoint,
-                LastPoint    : LastPoint,
-                SumIndex     : SumIndex,
-                DeletedIndex : DeletedIndex
-            };
+			var Data = new AscCommon.CChangesTableIdDescription(Class,
+				this.FileCheckSum,
+				this.FileSize,
+				Point.Description,
+				Point.Items.length,
+				PointIndex,
+				StartPoint,
+				LastPoint,
+				SumIndex,
+				DeletedIndex
+			);
 
-            var Binary_Pos = this.BinaryWriter.GetCurPosition();
-            this.BinaryWriter.WriteString2(Class.Get_Id());
-            Class.Save_Changes(Data, this.BinaryWriter);
+			var Binary_Pos = this.BinaryWriter.GetCurPosition();
+			this.BinaryWriter.WriteString2(Class.Get_Id());
+			this.BinaryWriter.WriteLong(Data.Type);
+			Data.WriteToBinary(this.BinaryWriter);
 
-            var Binary_Len = this.BinaryWriter.GetCurPosition() - Binary_Pos;
+			var Binary_Len = this.BinaryWriter.GetCurPosition() - Binary_Pos;
 
-            var Item =
-            {
-                Class : Class,
-                Data  : Data,
-                Binary:
-                {
-                    Pos : Binary_Pos,
-                    Len : Binary_Len
-                },
+			var Item = {
+				Class  : Class,
+				Data   : Data,
+				Binary : {
+					Pos : Binary_Pos,
+					Len : Binary_Len
+				},
 
-                NeedRecalc : false
-            };
+				NeedRecalc : false
+			};
 
-            Point.Items.splice(0, 0, Item);
-        }
-    },
+			Point.Items.splice(0, 0, Item);
+		}
+	},
 
     Is_Clear : function()
     {

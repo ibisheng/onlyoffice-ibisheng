@@ -1,4 +1,4 @@
-﻿/*
+/*
  * (c) Copyright Ascensio System SIA 2010-2016
  *
  * This program is a free software product. You can redistribute it and/or
@@ -31,6 +31,12 @@
  */
 
 "use strict";
+
+/**
+ * User: Ilja.Kirillov
+ * Date: 27.10.2016
+ * Time: 12:11
+ */
 
 (/**
  * @param {Window} window
