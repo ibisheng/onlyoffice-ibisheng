@@ -573,11 +573,14 @@ function CSparklineView()
     this.chartSpace = null;
 }
 
-function CreateSparklineMarker(oUniFill)
+function CreateSparklineMarker(oUniFill, bPreview)
 {
     var oMarker = new AscFormat.CMarker();
     oMarker.symbol = AscFormat.SYMBOL_DIAMOND;
     oMarker.size = 10;
+    if(bPreview){
+        oMarker.size = 30;
+    }
     oMarker.spPr = new AscFormat.CSpPr();
     oMarker.spPr.Fill = oUniFill;
     oMarker.spPr.ln = AscFormat.CreateNoFillLine();
@@ -587,7 +590,7 @@ function CreateSparklineMarker(oUniFill)
 function CreateUniFillFromExcelColor(oExcelColor)
 {
     var oUnifill;
-    if(oExcelColor instanceof AscCommonExcel.ThemeColor)
+    /*if(oExcelColor instanceof AscCommonExcel.ThemeColor)
     {
 
         oUnifill = AscFormat.CreateUnifillSolidFillSchemeColorByIndex(AscCommonExcel.map_themeExcel_to_themePresentation[oExcelColor.theme]);
@@ -612,14 +615,14 @@ function CreateUniFillFromExcelColor(oExcelColor)
 
         //oUnifill = AscFormat.CreateUniFillSchemeColorWidthTint(map_themeExcel_to_themePresentation[oExcelColor.theme], oExcelColor.tint != null ? oExcelColor.tint : 0);
     }
-    else
+    else*/
     {
         oUnifill = AscFormat.CreateUnfilFromRGB(oExcelColor.getR(), oExcelColor.getG(), oExcelColor.getB())
     }
     return oUnifill;
 }
 
-CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGroup, worksheetView, bNoLine)
+CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGroup, worksheetView, bForPreview)
 {
     AscFormat.ExecuteNoHistory(function(){
         this.ws = worksheetView;
@@ -779,7 +782,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             oSerie.spPr.setLn(oLn);
             if(oSparklineGroup.markers && oSparklineGroup.colorMarkers)
             {
-                oSerie.marker = CreateSparklineMarker(CreateUniFillFromExcelColor(oSparklineGroup.colorMarkers));
+                oSerie.marker = CreateSparklineMarker(CreateUniFillFromExcelColor(oSparklineGroup.colorMarkers), bForPreview);
             }
 
             fCallbackSeries = function(oSeries, nIdx, oExcelColor)
@@ -797,7 +800,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
                 }
                 var oDPt = new AscFormat.CDPt();
                 oDPt.idx = nIdx;
-                oDPt.marker = CreateSparklineMarker(CreateUniFillFromExcelColor(oExcelColor));
+                oDPt.marker = CreateSparklineMarker(CreateUniFillFromExcelColor(oExcelColor), bForPreview);
                 oSeries.addDPt(oDPt);
             }
         }
@@ -813,7 +816,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
                     {
                         if(oSeries.dPt[t].spPr)
                         {
-                            if(oExcelColor && !(bNoLine === true)){
+                            if(oExcelColor){
                                 oSeries.dPt[t].spPr.Fill = CreateUniFillFromExcelColor(oExcelColor);
                                 oSeries.dPt[t].spPr.ln = new AscFormat.CLn();
                                 oSeries.dPt[t].spPr.ln.Fill = oSeries.dPt[t].spPr.Fill.createDuplicate();
@@ -831,7 +834,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
                 var oDPt = new AscFormat.CDPt();
                 oDPt.idx = nIdx;
                 oDPt.spPr = new AscFormat.CSpPr();
-                if(oExcelColor && !(bNoLine === true)) {
+                if(oExcelColor ) {
                     oDPt.spPr.Fill = CreateUniFillFromExcelColor(oExcelColor);
                     oDPt.spPr.ln = new AscFormat.CLn();
                     oDPt.spPr.ln.Fill = oDPt.spPr.Fill.createDuplicate();
@@ -987,13 +990,10 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             }
             else
             {
-                if(!(bNoLine === true))
-                {
                     oSerie.spPr.setFill(oUnifill);
                     oSerie.spPr.ln = new AscFormat.CLn();
                     oSerie.spPr.ln.Fill = oSerie.spPr.Fill.createDuplicate();
                     oSerie.spPr.ln.w = dLineWidthSpaces;
-                }
             }
         }
 
