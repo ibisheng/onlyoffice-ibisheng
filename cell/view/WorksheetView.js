@@ -70,7 +70,6 @@
     var asc_incDecFonSize = asc.incDecFonSize;
     var asc_debug = asc.outputDebugStr;
     var asc_Range = asc.Range;
-    var asc_ActiveRange = AscCommonExcel.ActiveRange;
     var asc_CMM = AscCommonExcel.asc_CMouseMoveData;
     var asc_VR = AscCommonExcel.VisibleRange;
 
@@ -6680,7 +6679,7 @@
     };
 
     /**
-     * @param {ActiveRange} [range]
+     * @param {Range} [range]
      * @returns {{deltaX: number, deltaY: number}}
      */
     WorksheetView.prototype._calcActiveCellOffset = function (range) {
@@ -7282,23 +7281,21 @@
     };
 
     WorksheetView.prototype.setSelectionUndoRedo = function (range, validRange) {
-        var ar = (range instanceof asc_ActiveRange) ? range.clone() : new asc_ActiveRange(range);
-
         // Проверка на валидность range.
-        if (validRange && (ar.c2 >= this.nColsCount || ar.r2 >= this.nRowsCount)) {
-            if (ar.c2 >= this.nColsCount) {
-                this.expandColsOnScroll(false, true, ar.c2 + 1);
+        if (validRange && (range.c2 >= this.nColsCount || range.r2 >= this.nRowsCount)) {
+            if (range.c2 >= this.nColsCount) {
+                this.expandColsOnScroll(false, true, range.c2 + 1);
             }
-            if (ar.r2 >= this.nRowsCount) {
-                this.expandRowsOnScroll(false, true, ar.r2 + 1);
+            if (range.r2 >= this.nRowsCount) {
+                this.expandRowsOnScroll(false, true, range.r2 + 1);
             }
         }
         var oRes = null;
-        var type = ar.type;
+        var type = range.type;
         if (type == c_oAscSelectionType.RangeCells || type == c_oAscSelectionType.RangeCol ||
           type == c_oAscSelectionType.RangeRow || type == c_oAscSelectionType.RangeMax) {
             this.cleanSelection();
-            this.model.selectionRange.assign2(ar);
+            this.model.selectionRange.assign2(range);
             this._drawSelection();
 
             this._updateSelectionNameAndInfo();

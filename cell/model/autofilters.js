@@ -1206,7 +1206,7 @@
 			{
 				var worksheet = this.worksheet;
 				var t = this, selectedTableParts;
-				//if first row AF in ActiveRange  - delete AF
+				//if first row AF in Range  - delete AF
 				if(worksheet.AutoFilter && worksheet.AutoFilter.Ref && range.containsFirstLineRange(worksheet.AutoFilter.Ref))
 					this.isEmptyAutoFilters(worksheet.AutoFilter.Ref);
 				else
