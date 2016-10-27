@@ -432,7 +432,7 @@
 								}
 							}
 							
-							var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + value + "})();";
+							var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + value + "\n})();";
 							eval(_script);
 
 							if (pluginData.getAttribute("recalculate") == true)

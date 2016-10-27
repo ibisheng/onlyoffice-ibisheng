@@ -874,8 +874,8 @@ var editor;
     if (!this.canSave || this.asc_getCellEditMode()) {
       // Пока идет сохранение или редактирование ячейки, мы не закрываем документ
       return true;
-    } else if (History && History.Is_Modified) {
-      return History.Is_Modified();
+    } else if (History && History.Have_Changes) {
+      return History.Have_Changes();
     }
     return false;
   };
@@ -1532,7 +1532,7 @@ var editor;
 
         t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
         // Обновляем состояние возможности сохранения документа
-        t.onUpdateDocumentModified(History.Is_Modified());
+        t.onUpdateDocumentModified(History.Have_Changes());
 
         if (undefined !== window["AscDesktopEditor"]) {
           window["AscDesktopEditor"]["OnSave"]();
@@ -2612,8 +2612,17 @@ var editor;
   };
 
   // Frozen pane
-  spreadsheet_api.prototype.asc_freezePane = function() {
+  spreadsheet_api.prototype.asc_freezePane = function () {
     this.wb.getWorksheet().freezePane();
+  };
+
+  spreadsheet_api.prototype.asc_setSparklineGroup = function (id, oSparklineGroup) {
+    var changedSparkline = AscCommon.g_oTableId.Get_ById(id);
+    if (changedSparkline) {
+      changedSparkline.set(oSparklineGroup);
+      this.wb._onWSSelectionChanged();
+      this.wb.getWorksheet().draw();
+    }
   };
 
   // Cell interface
@@ -3044,7 +3053,7 @@ var editor;
       !History.IsEndTransaction() || !this.canSave) {
       return;
     }
-    if (!History.Is_Modified(true) && !(this.collaborativeEditing.getCollaborativeEditing() && 0 !== this.collaborativeEditing.getOwnLocksLength())) {
+    if (!History.Have_Changes(true) && !(this.collaborativeEditing.getCollaborativeEditing() && 0 !== this.collaborativeEditing.getOwnLocksLength())) {
       if (this.collaborativeEditing.getFast() && this.collaborativeEditing.haveOtherChanges()) {
         AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
 
@@ -3071,7 +3080,7 @@ var editor;
 
   spreadsheet_api.prototype._onUpdateDocumentCanSave = function() {
     // Можно модифицировать это условие на более быстрое (менять самим состояние в аргументах, а не запрашивать каждый раз)
-    var tmp = History.Is_Modified() || (this.collaborativeEditing.getCollaborativeEditing() && 0 !== this.collaborativeEditing.getOwnLocksLength());
+    var tmp = History.Have_Changes() || (this.collaborativeEditing.getCollaborativeEditing() && 0 !== this.collaborativeEditing.getOwnLocksLength());
     if (tmp !== this.isDocumentCanSave) {
       this.isDocumentCanSave = tmp;
       this.handlers.trigger('asc_onDocumentCanSaveChanged', this.isDocumentCanSave);
@@ -3531,6 +3540,9 @@ var editor;
 
   // Frozen pane
   prot["asc_freezePane"] = prot.asc_freezePane;
+
+  // Sparklines
+  prot["asc_setSparklineGroup"] = prot.asc_setSparklineGroup;
 
   // Cell interface
   prot["asc_getCellInfo"] = prot.asc_getCellInfo;

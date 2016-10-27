@@ -2528,7 +2528,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
     Default_Tab_Stop = 1;
 
     var oApi = Asc['editor'] || editor;
-    if(!oApi){
+    if(!oApi || !oApi.textArtPreviewManager){
         return null;
     }
     var oShape = oApi.textArtPreviewManager.getShape();

@@ -619,7 +619,7 @@ function CreateUniFillFromExcelColor(oExcelColor)
     return oUnifill;
 }
 
-CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGroup, worksheetView)
+CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGroup, worksheetView, bNoLine)
 {
     AscFormat.ExecuteNoHistory(function(){
         this.ws = worksheetView;
@@ -691,7 +691,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         var val_ax_props = new AscCommon.asc_ValAxisSettings();
         if(settings.type !== c_oAscChartTypeSettings.barStackedPer)
         {
-            if(oSparklineGroup.minAxisType === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.manualMin != null)
+            if(oSparklineGroup.minAxisType === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.manualMin !== null)
             {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
                 val_ax_props.putMinVal(oSparklineGroup.manualMin);
@@ -700,7 +700,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.auto);
             }
-            if(oSparklineGroup.maxAxisType === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.manualMax != null)
+            if(oSparklineGroup.maxAxisType === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.manualMax !== null)
             {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
                 val_ax_props.putMinVal(oSparklineGroup.manualMax);
@@ -813,7 +813,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
                     {
                         if(oSeries.dPt[t].spPr)
                         {
-                            if(oExcelColor){
+                            if(oExcelColor && !(bNoLine === true)){
                                 oSeries.dPt[t].spPr.Fill = CreateUniFillFromExcelColor(oExcelColor);
                                 oSeries.dPt[t].spPr.ln = new AscFormat.CLn();
                                 oSeries.dPt[t].spPr.ln.Fill = oSeries.dPt[t].spPr.Fill.createDuplicate();
@@ -831,7 +831,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
                 var oDPt = new AscFormat.CDPt();
                 oDPt.idx = nIdx;
                 oDPt.spPr = new AscFormat.CSpPr();
-                if(oExcelColor) {
+                if(oExcelColor && !(bNoLine === true)) {
                     oDPt.spPr.Fill = CreateUniFillFromExcelColor(oExcelColor);
                     oDPt.spPr.ln = new AscFormat.CLn();
                     oDPt.spPr.ln.Fill = oDPt.spPr.Fill.createDuplicate();
@@ -987,10 +987,13 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             }
             else
             {
-                oSerie.spPr.setFill(oUnifill);
-                oSerie.spPr.ln = new AscFormat.CLn();
-                oSerie.spPr.ln.Fill = oSerie.spPr.Fill.createDuplicate();
-                oSerie.spPr.ln.w = dLineWidthSpaces;
+                if(!(bNoLine === true))
+                {
+                    oSerie.spPr.setFill(oUnifill);
+                    oSerie.spPr.ln = new AscFormat.CLn();
+                    oSerie.spPr.ln.Fill = oSerie.spPr.Fill.createDuplicate();
+                    oSerie.spPr.ln.w = dLineWidthSpaces;
+                }
             }
         }
 
@@ -1832,7 +1835,7 @@ function DrawingObjects() {
                 }
             }
         }
-        return new AscCommonExcel.ActiveRange(cmin, rmin, cmax, rmax, true);
+        return new Asc.Range(cmin, rmin, cmax, rmax, true);
     };
 
     _this.recalculate =  function(all)

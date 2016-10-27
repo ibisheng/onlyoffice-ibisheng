@@ -318,25 +318,24 @@ function openFileCommand(binUrl, changesUrl, Signature, callback) {
   } else {
     bEndLoadChanges = true;
   }
- 
-    if (window['IS_NATIVE_EDITOR']) {
-        result = window["native"]["openFileCommand"](sFileUrl, changesUrl, Signature);
- 
-        var url;
-        var nIndex = sFileUrl.lastIndexOf("/");
-        url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
-        if (0 < result.length) {
-            oResult.bSerFormat = Signature === result.substring(0, Signature.length);
-            oResult.data = result;
-            oResult.url = url;
-        } else {
-            bError = true;
-        }
- 
-        bEndLoadFile = true;
-        onEndOpen();
-    }
- 
+
+	if (window['IS_NATIVE_EDITOR']) {
+		var result = window["native"]["openFileCommand"](sFileUrl, changesUrl, Signature);
+
+		var url;
+		var nIndex = sFileUrl.lastIndexOf("/");
+		url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
+		if (0 < result.length) {
+			oResult.bSerFormat = Signature === result.substring(0, Signature.length);
+			oResult.data = result;
+			oResult.url = url;
+		} else {
+			bError = true;
+		}
+
+		bEndLoadFile = true;
+		onEndOpen();
+	}
  }
  function sendCommand(editor, fCallback, rdata, dataContainer) {
   //json не должен превышать размера 2097152, иначе при его чтении будет exception
@@ -2708,7 +2707,12 @@ CUserCacheColor.prototype.init = function(nColor) {
     script.type = 'text/javascript';
     script.src = url;
 
-    script.onreadystatechange = callback;
+    script.onreadystatechange = function () {
+			if (this.readyState === 'complete' || this.readyState === 'loaded') {
+				script.onreadystatechange = null;
+				setTimeout(callback, 0);
+			}
+		};
     script.onload = callback;
 
     // Fire the loading

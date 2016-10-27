@@ -1900,7 +1900,7 @@ Paragraph.prototype =
                     var NextEl = this.Get_DocumentNext();
                     if ( null != NextEl && type_Paragraph === NextEl.GetType() && true === NextEl.Is_StartFromNewPage() )
                         TempBottom = this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent + this.Lines[CurLine].Metrics.LineGap;
-                    else if ( (true === Pr.ParaPr.Brd.Last || type_Table === NextEl.Get_Type() || true === NextEl.private_IsEmptyPageWithBreak(0)) &&  ( Pr.ParaPr.Brd.Bottom.Value === border_Single || Asc.c_oAscShdClear === Pr.ParaPr.Shd.Value ) )
+                    else if ( (true === Pr.ParaPr.Brd.Last || (null !== NextEl && (type_Table === NextEl.Get_Type() || true === NextEl.private_IsEmptyPageWithBreak(0)))) &&  ( Pr.ParaPr.Brd.Bottom.Value === border_Single || Asc.c_oAscShdClear === Pr.ParaPr.Shd.Value ) )
                         TempBottom -= Pr.ParaPr.Spacing.After;
                 }
 

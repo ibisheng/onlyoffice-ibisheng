@@ -4367,7 +4367,8 @@ CStyles.prototype =
     Set_DefaultParaPr : function(ParaPr)
     {
         History.Add(this, {Type : AscDFH.historyitem_Styles_ChangeDefaultParaPr, Old : this.Default.ParaPr, New : ParaPr});
-        this.Default.ParaPr = ParaPr;
+		this.Default.ParaPr.Init_Default();
+		this.Default.ParaPr.Merge(ParaPr);
 
         // TODO: Пока данная функция используется только в билдере, как только будет использоваться в самом редакторе,
         //       надо будет сделать, чтобы происходил пересчет всех стилей.
@@ -4381,7 +4382,8 @@ CStyles.prototype =
     Set_DefaultTextPr : function(TextPr)
     {
         History.Add(this, {Type : AscDFH.historyitem_Styles_ChangeDefaultTextPr, Old : this.Default.TextPr, New : TextPr});
-        this.Default.TextPr = TextPr;
+        this.Default.TextPr.Init_Default();
+		this.Default.TextPr.Merge(TextPr);
 
         // TODO: Пока данная функция используется только в билдере, как только будет использоваться в самом редакторе,
         //       надо будет сделать, чтобы происходил пересчет всех стилей.
@@ -4958,13 +4960,15 @@ CStyles.prototype =
 
             case AscDFH.historyitem_Styles_ChangeDefaultParaPr:
             {
-                this.Default.ParaPr = Data.Old;
+				this.Default.ParaPr.Init_Default();
+				this.Default.ParaPr.Merge(Data.Old);
                 break;
             }
 
             case AscDFH.historyitem_Styles_ChangeDefaultTextPr:
             {
-                this.Default.TextPr = Data.Old;
+				this.Default.TextPr.Init_Default();
+				this.Default.TextPr.Merge(Data.Old);
                 break;
             }
         }
@@ -4992,13 +4996,15 @@ CStyles.prototype =
 
             case AscDFH.historyitem_Styles_ChangeDefaultParaPr:
             {
-                this.Default.ParaPr = Data.New;
+				this.Default.ParaPr.Init_Default();
+				this.Default.ParaPr.Merge(Data.New);
                 break;
             }
 
             case AscDFH.historyitem_Styles_ChangeDefaultTextPr:
             {
-                this.Default.TextPr = Data.New;
+				this.Default.TextPr.Init_Default();
+				this.Default.TextPr.Merge(Data.New);
                 break;
             }
         }
@@ -5148,7 +5154,8 @@ CStyles.prototype =
                 // Variable : ParaPr
                 var oParaPr = new CParaPr();
                 oParaPr.Read_FromBinary(Reader);
-                this.Default.ParaPr = oParaPr;
+                this.Default.ParaPr.Init_Default();
+				this.Default.ParaPr.Merge(oParaPr);
                 break;
             }
             case AscDFH.historyitem_Styles_ChangeDefaultTextPr:
@@ -5156,7 +5163,8 @@ CStyles.prototype =
                 // Variable : TextPr
                 var oTextPr = new CTextPr();
                 oTextPr.Read_FromBinary(Reader);
-                this.Default.TextPr = oTextPr;
+				this.Default.TextPr.Init_Default();
+                this.Default.TextPr.Merge(oTextPr);
                 break;
             }
         }
