@@ -8233,6 +8233,7 @@ FmtScheme.prototype =
     {
         var oCopy = new FmtScheme();
         oCopy.name = this.name;
+        var i;
         for(i = 0; i < this.fillStyleLst.length; ++i)
         {
             oCopy.fillStyleLst[i] = this.fillStyleLst[i].createDuplicate();

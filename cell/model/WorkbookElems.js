@@ -4963,6 +4963,17 @@ CellArea.prototype = {
 	};
 
 	sparklineGroup.prototype.asc_getThumbBySparklineGroup = function(oSparklineGroup){
+		if(!this.canvas) {
+			this.canvas = document.createElement('canvas');
+			if(AscCommon.AscBrowser.isRetina) {
+				this.canvas.width = 100;
+				this.canvas.height = 100;
+			}
+			else{
+				this.canvas.width = 50;
+				this.canvas.height = 50;
+			}
+		}
 	//	if(!this.sparklineView){
 			this.sparklineView = new AscFormat.CSparklineView();
 			var oSparkline = new sparkline();
@@ -4978,23 +4989,29 @@ CellArea.prototype = {
 			this.sparklineView.chartSpace.extX = 100;
 			this.sparklineView.chartSpace.extY = 100;
 			this.sparklineView.chartSpace.x = 0;
-			this.sparklineView.chartSpace.x = 0;
+			this.sparklineView.chartSpace.y = 0;
+			if(oSparklineGroup.type === Asc.c_oAscSparklineType.Stacked){
+				AscFormat.ExecuteNoHistory(function(){
+					var oPlotArea = this.sparklineView.chartSpace.chart.plotArea;
+					if(!oPlotArea.layout){
+						oPlotArea.setLayout(new AscFormat.CLayout());
+					}
+					var fPos = 0.32;
+					oPlotArea.layout.setWMode(AscFormat.LAYOUT_MODE_FACTOR);
+					oPlotArea.layout.setW(1.0);
+					oPlotArea.layout.setHMode(AscFormat.LAYOUT_MODE_FACTOR);
+					oPlotArea.layout.setH(1 - 2*fPos);
+					oPlotArea.layout.setYMode(AscFormat.LAYOUT_MODE_EDGE);
+					oPlotArea.layout.setY(fPos);
+				}, this, []);
+			}
 			AscFormat.ExecuteNoHistory(function () {
 				AscFormat.CheckSpPrXfrm(this.sparklineView.chartSpace);
 			}, this, []);
 			this.sparklineView.chartSpace.recalculate();
+			this.sparklineView.chartSpace.brush = AscFormat.CreateSolidFillRGBA(0xFF, 0xFF, 0xFF, 0xFF);
 	//	}
-		if(!this.canvas) {
-			this.canvas = document.createElement('canvas');
-			if(AscCommon.AscBrowser.isRetina) {
-				this.canvas.width = 100;
-				this.canvas.height = 100;
-			}
-			else{
-				this.canvas.width = 50;
-				this.canvas.height = 50;
-			}
-		}
+
 		var oGraphics = new AscCommon.CGraphics();
 		oGraphics.init(this.canvas.getContext('2d'), this.canvas.width, this.canvas.height, this.sparklineView.chartSpace.extX, this.sparklineView.chartSpace.extY);
 		oGraphics.m_oFontManager = AscCommon.g_fontManager;
