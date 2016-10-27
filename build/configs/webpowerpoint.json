@@ -147,6 +147,7 @@
         "../word/Editor/Paragraph_Recalculate.js",
 		"../word/Editor/DocumentContentBase.js",
         "../word/Editor/Document.js",
+        "../word/Editor/DocumentChanges.js",
         "../word/Editor/DocumentContent.js",
 		"../word/Editor/DocumentControllerBase.js",
 		"../word/Editor/LogicDocumentController.js",

@@ -1245,13 +1245,10 @@
 	//------------------------------------------------------------------------------------------------------------------
 	window['AscDFH'].historyitem_Document_AddItem           = window['AscDFH'].historyitem_type_Document | 1;
 	window['AscDFH'].historyitem_Document_RemoveItem        = window['AscDFH'].historyitem_type_Document | 2;
-	window['AscDFH'].historyitem_Document_Margin            = window['AscDFH'].historyitem_type_Document | 3;
-	window['AscDFH'].historyitem_Document_PageSize          = window['AscDFH'].historyitem_type_Document | 4;
-	window['AscDFH'].historyitem_Document_Orientation       = window['AscDFH'].historyitem_type_Document | 5;
-	window['AscDFH'].historyitem_Document_DefaultTab        = window['AscDFH'].historyitem_type_Document | 6;
-	window['AscDFH'].historyitem_Document_EvenAndOddHeaders = window['AscDFH'].historyitem_type_Document | 7;
-	window['AscDFH'].historyitem_Document_DefaultLanguage   = window['AscDFH'].historyitem_type_Document | 8;
-	window['AscDFH'].historyitem_Document_MathSettings      = window['AscDFH'].historyitem_type_Document | 9;
+	window['AscDFH'].historyitem_Document_DefaultTab        = window['AscDFH'].historyitem_type_Document | 3;
+	window['AscDFH'].historyitem_Document_EvenAndOddHeaders = window['AscDFH'].historyitem_type_Document | 4;
+	window['AscDFH'].historyitem_Document_DefaultLanguage   = window['AscDFH'].historyitem_type_Document | 5;
+	window['AscDFH'].historyitem_Document_MathSettings      = window['AscDFH'].historyitem_type_Document | 6;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе Paragraph
 	//------------------------------------------------------------------------------------------------------------------
