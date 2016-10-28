@@ -3290,16 +3290,16 @@ function OfflineEditor () {
             offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
             
             var activeCell = this.model.selectionRange.activeCell;
+
+            selection.push(0);
+            selection.push(0);
+            selection.push(0);
+            selection.push(0);
             
-            selection.push(activeCell.col);
-            selection.push(activeCell.col);
-            selection.push(activeCell.row);
-            selection.push(activeCell.row);
-            
-            selection.push(this.cols[activeCell.col].left - offsetX);
-            selection.push(this.rows[activeCell.row].top  - offsetY);
-            selection.push(this.cols[activeCell.col].left + this.cols[activeCell.col].width  - this.cols[activeCell.col].left);
-            selection.push(this.rows[activeCell.row].top  + this.rows[activeCell.row].height - this.rows[activeCell.row].top);
+            selection.push(0);
+            selection.push(0);
+            selection.push(0);
+            selection.push(0);
             
             var ranges = (this.isSelectionDialogMode ? this.copyActiveRange : this.model.selectionRange).ranges;
             var range, selectionLineType;
@@ -3325,6 +3325,33 @@ function OfflineEditor () {
                 selection.push(this.rows[range.r1].top  - offsetY);
                 selection.push(this.cols[range.c2].left + this.cols[range.c2].width  - this.cols[range.c1].left);
                 selection.push(this.rows[range.r2].top  + this.rows[range.r2].height - this.rows[range.r1].top);
+                
+                selectionLineType = AscCommonExcel.selectionLineType.Selection;
+                if (1 === l) {
+                    selectionLineType |=
+                    AscCommonExcel.selectionLineType.ActiveCell | AscCommonExcel.selectionLineType.Promote;
+                } else if (i === this.model.selectionRange.activeCellId) {
+                    selectionLineType |= AscCommonExcel.selectionLineType.ActiveCell;
+                }
+                
+                var isActive = AscCommonExcel.selectionLineType.ActiveCell & selectionLineType;
+                if (isActive) {
+                    var cell = (this.isSelectionDialogMode ? this.copyActiveRange : this.model.selectionRange).activeCell;
+                    var fs = this.model.getMergedByCell(cell.row, cell.col);
+                    fs = range.intersectionSimple(fs ? fs : new asc_Range(cell.col, cell.row, cell.col, cell.row));
+                    if (fs) {
+                        
+                        selection[0] = fs.c1;
+                        selection[1] = fs.c2;
+                        selection[2] = fs.r1;
+                        selection[3] = fs.r2;
+                        
+                        selection[4] = this.cols[fs.c1].left - offsetX;
+                        selection[5] = this.rows[fs.r1].top  - offsetY;
+                        selection[6] = this.cols[fs.c2].left + this.cols[fs.c2].width  - this.cols[fs.c1].left;
+                        selection[7] = this.rows[fs.r2].top  + this.rows[fs.r2].height - this.rows[fs.r1].top;
+                    }
+                }
             }
             
             var formularanges = [];
@@ -3872,7 +3899,6 @@ function OfflineEditor () {
                                   });
         
         _api.asc_registerCallback('asc_onGetEditorPermissions', function(state) {
-            //console.log("asc_onGetEditorPermissions");
                                   
             var rData = {
                          "c"             : 'open',
@@ -3883,11 +3909,9 @@ function OfflineEditor () {
                          "url"           : this.documentUrl,
                          "title"         : this.documentTitle,
                          "embeddedfonts" : false,
-                         "viewmode"      : false// this.getViewMode()
-                          };
+                         "viewmode"      : t.initSettings.viewmode};
                             
-                         _api.CoAuthoringApi.auth(false, // this.getViewMode()
-                                                           rData);
+                         _api.CoAuthoringApi.auth(t.initSettings.viewmode, rData);
         });
         
         _api.asc_registerCallback('asc_onDocumentUpdateVersion', function(callback) {
@@ -7184,7 +7208,7 @@ function offline_apply_event(type,params) {
             break;
         }
             
-        case 10010: // ASC_SOCKET_EVENT_TYPE_CLOSE
+        case 10010: // ASC_SOCKET_EVENT_TYPE_ON_CLOSE
         {
             
             break;
@@ -7249,6 +7273,12 @@ function offline_apply_event(type,params) {
             }
             
             break;
+        }
+            
+        case 11010: // ASC_SOCKET_EVENT_TYPE_ON_DISCONNECT
+        {
+            var t = _api.CoAuthoringApi._CoAuthoringApi;
+            t.onDisconnect("", false, false);
         }
             
         default:
@@ -7335,14 +7365,16 @@ window["AscCommonExcel"].WorksheetView.prototype._drawCollaborativeElementsMeOth
     
     for (i = 0; i < arrayCells.length; ++i) {
         
+        var left = this.cols[arrayCells[i].c1].left, top = this.rows[arrayCells[i].r1].top;
+        
         overlay.Native["PD_DrawLockCell"](arrayCells[i].c1,
                                           arrayCells[i].r1,
                                           Math.min(arrayCells[i].c2, this.cols.length - 1),
                                           Math.min(arrayCells[i].r2, this.rows.length - 1),
-                                          this.cols[arrayCells[i].c1].left,
-                                          this.rows[arrayCells[i].r1].top,
-                                          this.cols[Math.min(arrayCells[i].c2, this.cols.length - 1)].width,
-                                          this.rows[Math.min(arrayCells[i].r2, this.rows.length - 1)].height,
+                                          left,
+                                          top,
+                                          this.cols[Math.min(arrayCells[i].c2, this.cols.length - 1)].width + this.cols[Math.min(arrayCells[i].c2, this.cols.length - 1)].left - left,
+                                          this.rows[Math.min(arrayCells[i].r2, this.rows.length - 1)].height + this.rows[Math.min(arrayCells[i].r2, this.rows.length - 1)].top - top,
                                           strokeColor.r,
                                           strokeColor.g,
                                           strokeColor.b,
@@ -7354,18 +7386,20 @@ window["AscCommonExcel"].WorksheetView.prototype._drawCollaborativeElementsAllLo
     var currentSheetId = this.model.getId();
     var nLockAllType = this.collaborativeEditing.isLockAllOther(currentSheetId);
     if (Asc.c_oAscMouseMoveLockedObjectType.None !== nLockAllType) {
-        var isAllRange = true, strokeColor = (Asc.c_oAscMouseMoveLockedObjectType.TableProperties ===
-                                              nLockAllType) ? AscCommonExcel.c_oAscCoAuthoringLockTablePropertiesBorderColor :
+        var isAllRange = true, strokeColor = (Asc.c_oAscMouseMoveLockedObjectType.TableProperties === nLockAllType) ?
+        AscCommonExcel.c_oAscCoAuthoringLockTablePropertiesBorderColor :
         AscCommonExcel.c_oAscCoAuthoringOtherBorderColor, oAllRange = new window["Asc"].Range(0, 0, AscCommon.gc_nMaxCol0, AscCommon.gc_nMaxRow0);
-       
+        
+        var left = this.cols[oAllRange.c1].left, top = this.rows[oAllRange.r1].top;
+        
         overlay.Native["PD_DrawLockCell"](oAllRange.c1,
                                           oAllRange.r1,
                                           Math.min(oAllRange.c2, this.cols.length - 1),
                                           Math.min(oAllRange.r2, this.rows.length - 1),
-                                          this.cols[oAllRange.c1].left,
-                                          this.rows[oAllRange.r1].top,
-                                          this.cols[Math.min(oAllRange.c2, this.cols.length - 1)].width,
-                                          this.rows[Math.min(oAllRange.r2, this.rows.length - 1)].height,
+                                          left,
+                                          top,
+                                          this.cols[Math.min(oAllRange.c2, this.cols.length - 1)].width + this.cols[Math.min(oAllRange.c2, this.cols.length - 1)].left - left,
+                                          this.rows[Math.min(oAllRange.r2, this.rows.length - 1)].height + this.rows[Math.min(oAllRange.r2, this.rows.length - 1)].top - top,
                                           strokeColor.r,
                                           strokeColor.g,
                                           strokeColor.b,
