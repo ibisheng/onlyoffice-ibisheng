@@ -11962,6 +11962,12 @@ CSortFaces.prototype =
 			var diffY = centerChartY;
 			var diffZ = -1 / this.cChartDrawer.processor3D.rPerspective;
 			
+			//TODO пересмотреть правку!
+			if(diffZ > 0 && this.chartProp.type === AscFormat.c_oChartTypes.Bar && this.cChartDrawer.processor3D.view3D.rAngAx && (this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked"))
+			{
+				diffZ -= 500;
+			}
+			
 			this.centralViewPoint = {x: diffX, y: diffY, z: diffZ};
 		}
 		else
