@@ -5247,6 +5247,7 @@ DrawingObjectsController.prototype =
             {
                 this.selectNextObject(!e.shiftKey ? 1 : -1);
             }
+            bRetValue = true;
         }
         else if ( e.keyCode == 13 && false === isViewMode ) // Enter
         {
