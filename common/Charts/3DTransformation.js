@@ -809,7 +809,7 @@ Processor3D.prototype._calculatePerspective = function(view3D)
 	var perspective = view3D && view3D.perspective ? view3D.perspective : global3DPersperctive;
 	var alpha = perspective / 4;//в xml проиходит двойной угол(в параметрах ms стоит 40, приходит в xml 80)
 	//TODO this.top - this.bottom пересмотреть
-	var catt = ((heightLine / 2 + (this.top - this.bottom))) / Math.tan((alpha / 360) * (Math.PI * 2));
+	var catt = ((heightLine / 2 + (Math.abs(this.top - this.bottom)))) / Math.tan((alpha / 360) * (Math.PI * 2));
 	var rPerspective;
 	if(catt === 0)
 		rPerspective = 0;
