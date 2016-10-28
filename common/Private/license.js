@@ -38,7 +38,7 @@ AscCommon.baseEditorsApi.prototype._onEndPermissions = function () {
     if (null !== this.licenseResult) {
       var type = this.licenseResult['type'];
       oResult.setLicenseType(type);
-      oResult.setCanBranding(Asc.c_oLicenseResult.Error !== type); // Для тех, у кого есть лицензия, branding доступен
+      oResult.setCanBranding(this.licenseResult['branding']);
       oResult.setIsLight(this.licenseResult['light']);
       oResult.setIsTrial(this.licenseResult['trial']);
     }
