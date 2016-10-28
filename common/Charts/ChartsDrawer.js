@@ -2892,8 +2892,73 @@ CChartsDrawer.prototype =
 	
 	
 	//******calculate graphic objects for 3d*******
-	calculateRect3D : function(point1, point2, point3, point4, point5, point6, point7, point8, val, isNotDrawDownVerge)
+	calculateRect3D : function(point1, point2, point3, point4, point5, point6, point7, point8, val, isNotDrawDownVerge, isNotOnlyFrontFaces)
 	{
+		var res;
+		
+		var frontPaths = [];
+		var darkPaths = [];
+		
+		var addPathToArr = function(isFront, face, index)
+		{
+			frontPaths[index] = null;
+			darkPaths[index] = null;
+			
+			if(isFront)
+			{
+				frontPaths[index] = face;
+			}
+			else
+			{
+				darkPaths[index] = face;
+			}
+		};
+		
+		var face;
+		//front
+		face = this._calculatePathFace(point1, point5, point8, point4, true);
+		addPathToArr(this._isVisibleVerge3D(point5, point1, point4, val), face, 0);
+		
+		//down
+		face = this._calculatePathFace(point1, point2, point3, point4, true);
+		addPathToArr(this._isVisibleVerge3D(point4, point1, point2, val), face, 1);
+		
+		//left
+		face = this._calculatePathFace(point1, point5, point6, point2, true);
+		addPathToArr((!isNotDrawDownVerge && this._isVisibleVerge3D(point2, point1, point5, val)), face, 2);
+		
+		//right
+		face = this._calculatePathFace(point4, point8, point7, point3, true);
+		addPathToArr(this._isVisibleVerge3D(point8, point4, point3, val), face, 3);
+		
+		//up
+		face = this._calculatePathFace(point5, point6, point7, point8, true);
+		addPathToArr(this._isVisibleVerge3D(point6, point5, point8, val), face, 4);
+		
+		//unfront
+		face = this._calculatePathFace(point2, point6, point7, point3, true);
+		addPathToArr(this._isVisibleVerge3D(point3, point2, point6, val), face, 5);
+		
+		if(!isNotOnlyFrontFaces)
+		{
+			res = frontPaths;
+		}
+		else
+		{
+			res = {frontPaths: frontPaths, darkPaths: darkPaths};
+		}
+		
+		return res;
+	},
+	
+	_calculatePathFace: function(point1, point2, point3, point4, isConvertPxToMM)
+	{
+		var pxToMm = 1;
+		if(isConvertPxToMM)
+		{
+			pxToMm = this.calcProp.pxToMM;
+		} 
+		
 		var path  = new Path();
 		
 		var pathH = this.calcProp.pathH;
@@ -2905,109 +2970,16 @@ CChartsDrawer.prototype =
 		gdLst["w"] = 1;
 		gdLst["h"] = 1;
 		
-		var pxToMm = this.calcProp.pxToMM;
+		path.pathH = pathH;
+		path.pathW = pathW;
+		path.moveTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
+		path.lnTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
+		path.lnTo(point3.x / pxToMm * pathW, point3.y / pxToMm * pathH);
+		path.lnTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
+		path.lnTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
+		path.recalculate(gdLst);
 		
-		var paths = [];
-		
-		//front
-		paths[0] = null;
-		if(this._isVisibleVerge3D(point5, point1, point4, val))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			path.moveTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-			path.lnTo(point8.x / pxToMm * pathW, point8.y / pxToMm * pathH);
-			path.lnTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
-			path.lnTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			path.recalculate(gdLst);
-			paths[0] = path;
-		}
-		
-		//down
-		paths[1] = null;
-		if(this._isVisibleVerge3D(point4, point1, point2, val))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			path.moveTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			path.lnTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
-			path.lnTo(point3.x / pxToMm * pathW, point3.y / pxToMm * pathH);
-			path.lnTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
-			path.lnTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			path.recalculate(gdLst);
-			paths[1] = path;
-		}
-		
-		
-		//left
-		paths[2] = null;
-		if(!isNotDrawDownVerge && this._isVisibleVerge3D(point2, point1, point5, val))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			path.moveTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-			path.lnTo(point6.x / pxToMm * pathW, point6.y / pxToMm * pathH);
-			path.lnTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
-			path.lnTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-			path.recalculate(gdLst);
-			paths[2] = path;
-		}
-		
-		//right
-		paths[3] = null;
-		if(this._isVisibleVerge3D(point8, point4, point3, val))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			path.moveTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
-			path.lnTo(point8.x / pxToMm * pathW, point8.y / pxToMm * pathH);
-			path.lnTo(point7.x / pxToMm * pathW, point7.y / pxToMm * pathH);
-			path.lnTo(point3.x / pxToMm * pathW, point3.y / pxToMm * pathH);
-			path.lnTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
-			path.recalculate(gdLst);
-			paths[3] = path;
-		}
-		
-		//up
-		paths[4] = null;
-		if(this._isVisibleVerge3D(point6, point5, point8, val))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			path.moveTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-			path.lnTo(point6.x / pxToMm * pathW, point6.y / pxToMm * pathH);
-			path.lnTo(point7.x / pxToMm * pathW, point7.y / pxToMm * pathH);
-			path.lnTo(point8.x / pxToMm * pathW, point8.y / pxToMm * pathH);
-			path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-			path.recalculate(gdLst);
-			paths[4] = path;
-		}
-		
-		
-		//unfront
-		paths[5] = null;
-		if(this._isVisibleVerge3D(point3, point2, point6, val))
-		{
-			path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			path.moveTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
-			path.lnTo(point6.x / pxToMm * pathW, point6.y / pxToMm * pathH);
-			path.lnTo(point7.x / pxToMm * pathW, point7.y / pxToMm * pathH);
-			path.lnTo(point3.x / pxToMm * pathW, point3.y / pxToMm * pathH);
-			path.lnTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
-			path.recalculate(gdLst);
-			paths[5] = path;
-		}
-			
-		return paths;
+		return path;
 	},
 	
 	_isVisibleVerge3D: function(k, n, m, val)
@@ -3142,7 +3114,7 @@ drawBarChart.prototype =
 		
 		this.sortZIndexPaths = [];
 		
-		this._reCalculateBars();
+		this._recalculateBars();
 	},
 	
 	draw : function(chartsDrawer)
@@ -3156,8 +3128,9 @@ drawBarChart.prototype =
 			this._DrawBars3D();
 		}
 		else
+		{
 			this._DrawBars();
-		
+		}
 	},
 	
 	_DrawBars: function()
@@ -3188,7 +3161,7 @@ drawBarChart.prototype =
 		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
 	},
 	
-	_reCalculateBars: function (/*isSkip*/)
+	_recalculateBars: function (/*isSkip*/)
     {
         //соответствует подписям оси категорий(OX)
 		var xPoints     = this.cChartSpace.chart.plotArea.catAx.xPoints;
@@ -3501,7 +3474,7 @@ drawBarChart.prototype =
 		var point7 = this.cChartDrawer._convertAndTurnPoint(x7, y7, z7);
 		var point8 = this.cChartDrawer._convertAndTurnPoint(x8, y8, z8);
 		
-		var paths = this.cChartDrawer.calculateRect3D(point1, point2, point3, point4, point5, point6, point7, point8, val);
+		var paths = this.cChartDrawer.calculateRect3D(point1, point2, point3, point4, point5, point6, point7, point8, val, null, true);
 		
 			
 		//не проецируем на плоскость
@@ -3536,16 +3509,16 @@ drawBarChart.prototype =
 			arr[cubeCount].y = point11.y;
 		}
 		
-		for(var k = 0; k < paths.length; k++)
+		for(var k = 0; k < paths.frontPaths.length; k++)
 		{
-			if(null === paths[k])
+			if(null === paths.frontPaths[k] && null === paths.darkPaths[k])
 				continue;
 			
 			//this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquation});
 			
 			var plainEquation = this.cChartDrawer.getPlainEquation(arrPoints2[k][0], arrPoints2[k][1], arrPoints2[k][2], arrPoints2[k][3]);
 			var plainArea = this.cChartDrawer.getAreaQuadrilateral(arrPoints[k][0], arrPoints[k][1], arrPoints[k][2], arrPoints[k][3]);
-			arr[cubeCount].faces.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquation, plainArea: plainArea});
+			arr[cubeCount].faces.push({seria: i, point: idx, verge: k, frontPaths: paths.frontPaths[k], darkPaths: paths.darkPaths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquation, plainArea: plainArea});
 		}
 		
 		return paths;
@@ -3771,14 +3744,20 @@ drawBarChart.prototype =
 		var t = this;
 		var processor3D = this.cChartDrawer.processor3D;
 		
-		var drawVerges = function(i, j, paths, onlyLessNull, k)
+		var drawVerges = function(i, j, paths, onlyLessNull, k, isNotPen, isNotBrush)
 		{
-			var brush, pen, options;
+			var brush = null, pen = null, options;
 			options = t._getOptionsForDrawing(i, j, onlyLessNull);
 			if(paths !== null && options !== null)
 			{
-				pen = options.pen;
-				brush = options.brush;
+				if(!isNotPen)
+				{
+					pen = options.pen;
+				}
+				if(!isNotBrush)
+				{
+					brush = options.brush;
+				}
 				
 				t._drawBar3D(paths, pen, brush, k, options.val);
 			}
@@ -3807,7 +3786,18 @@ drawBarChart.prototype =
 				for(var j = 0; j < faces.length; j++)
 				{
 					var face = faces[j];
-					drawVerges(face.seria, face.point, face.paths, null, face.verge);
+					drawVerges(face.seria, face.point, face.darkPaths, null, face.verge, null, true);
+				}	
+			}
+			
+			for(var i = 0; i < this.sortParallelepipeds.length; i++)
+			{
+				var index = this.sortParallelepipeds[i].nextIndex;
+				var faces = this.temp[index].faces;
+				for(var j = 0; j < faces.length; j++)
+				{
+					var face = faces[j];
+					drawVerges(face.seria, face.point, face.frontPaths, null, face.verge);
 				}	
 			}
 		}
@@ -3820,7 +3810,18 @@ drawBarChart.prototype =
 				for(var j = 0; j < faces.length; j++)
 				{
 					var face = faces[j];
-					drawVerges(face.seria, face.point, face.paths, null, face.verge);
+					drawVerges(face.seria, face.point, face.darkPaths, null, face.verge, null, true);
+				}	
+			}
+			
+			for(var i = 0; i < this.sortParallelepipeds.length; i++)
+			{
+				var index = this.sortParallelepipeds[i].nextIndex;
+				var faces = this.temp[index].faces;
+				for(var j = 0; j < faces.length; j++)
+				{
+					var face = faces[j];
+					drawVerges(face.seria, face.point, face.frontPaths, null, face.verge);
 				}	
 			}
 		}
@@ -3864,64 +3865,76 @@ drawBarChart.prototype =
 	{
 		//затемнение боковых сторон
 		//в excel всегда темные боковые стороны, лицевая и задняя стороны светлые
-		pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
+		//TODO пересмотреть получения pen
+		if(null === pen || (null !== pen && null === pen.Fill) || (null !== pen && null !== pen.Fill && null === pen.Fill.fill))
+		{
+			pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
+		}
 		
 		if(k !== 5 && k !== 0)
 		{
 			var  props = this.cChartSpace.getParentObjects();
-			var duplicateBrush = brush.createDuplicate();
-			var cColorMod = new AscFormat.CColorMod;
-			
-			if(k === 1 || k === 4)
+			var duplicateBrush = brush;
+			if(null !== brush)
 			{
-				//для градиентной заливки верхнюю и нижнюю грань закрашиываем первым и последним цветом соотвенственно
-				if(duplicateBrush.fill && AscDFH.historyitem_type_GradFill === duplicateBrush.fill.getObjectType())
+				duplicateBrush = brush.createDuplicate();
+				var cColorMod = new AscFormat.CColorMod;
+				
+				if(k === 1 || k === 4)
 				{
-					var colors = duplicateBrush.fill.colors;
-					//ToDo проверить stacked charts!
-					var color;
-					var valAxOrientation = this.cChartSpace.chart.plotArea.valAx.scaling.orientation;
-					if((val > 0 && valAxOrientation === ORIENTATION_MIN_MAX) || (val < 0 && valAxOrientation !== ORIENTATION_MIN_MAX))
+					//для градиентной заливки верхнюю и нижнюю грань закрашиываем первым и последним цветом соотвенственно
+					if(duplicateBrush.fill && AscDFH.historyitem_type_GradFill === duplicateBrush.fill.getObjectType())
 					{
-						if(k === 4 && colors && colors[0] && colors[0].color)
+						var colors = duplicateBrush.fill.colors;
+						//ToDo проверить stacked charts!
+						var color;
+						var valAxOrientation = this.cChartSpace.chart.plotArea.valAx.scaling.orientation;
+						if((val > 0 && valAxOrientation === ORIENTATION_MIN_MAX) || (val < 0 && valAxOrientation !== ORIENTATION_MIN_MAX))
 						{
-							color = colors[0].color;
+							if(k === 4 && colors && colors[0] && colors[0].color)
+							{
+								color = colors[0].color;
+							}
+							else if(k === 1 && colors[colors.length - 1] && colors[colors.length - 1].color)
+							{
+								color = colors[colors.length - 1].color;
+							}
 						}
-						else if(k === 1 && colors[colors.length - 1] && colors[colors.length - 1].color)
+						else
 						{
-							color = colors[colors.length - 1].color;
+							if(k === 4 && colors && colors[0] && colors[0].color)
+							{
+								color = colors[colors.length - 1].color;
+							}
+							else if(k === 1 && colors[colors.length - 1] && colors[colors.length - 1].color)
+							{
+								color = colors[0].color;
+							}
 						}
+						
+						var tempColor = new AscFormat.CUniFill();
+						tempColor.setFill(new AscFormat.CSolidFill());
+						tempColor.fill.setColor(color);
+						duplicateBrush = tempColor;
 					}
-					else
-					{
-						if(k === 4 && colors && colors[0] && colors[0].color)
-						{
-							color = colors[colors.length - 1].color;
-						}
-						else if(k === 1 && colors[colors.length - 1] && colors[colors.length - 1].color)
-						{
-							color = colors[0].color;
-						}
-					}
-					
-					var tempColor = new AscFormat.CUniFill();
-					tempColor.setFill(new AscFormat.CSolidFill());
-					tempColor.fill.setColor(color);
-					duplicateBrush = tempColor;
-				}
 
-				cColorMod.val = 45000;
-			}	
-			else
-			{
-				cColorMod.val = 35000;
+					cColorMod.val = 45000;
+				}	
+				else
+				{
+					cColorMod.val = 35000;
+				}
+				
+				cColorMod.name = "shade";
+				duplicateBrush.addColorMod(cColorMod);
+				duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
+				
+				if(null === pen)
+				{
+					pen.setFill(duplicateBrush);
+				}
 			}
-			
-			cColorMod.name = "shade";
-			duplicateBrush.addColorMod(cColorMod);
-			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
-			
-			pen.setFill(duplicateBrush);
+
 			this.cChartDrawer.drawPath(path, pen, duplicateBrush);
 		}
 		else
@@ -11961,6 +11974,12 @@ CSortFaces.prototype =
 			var diffX = centerChartX;
 			var diffY = centerChartY;
 			var diffZ = -1 / this.cChartDrawer.processor3D.rPerspective;
+			
+			//TODO пересмотреть правку!
+			if(diffZ > 0 && this.chartProp.type === AscFormat.c_oChartTypes.Bar && this.cChartDrawer.processor3D.view3D.rAngAx && (this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked"))
+			{
+				diffZ -= 500;
+			}
 			
 			this.centralViewPoint = {x: diffX, y: diffY, z: diffZ};
 		}

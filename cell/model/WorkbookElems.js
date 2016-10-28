@@ -4978,7 +4978,7 @@ CellArea.prototype = {
 			this.sparklineView = new AscFormat.CSparklineView();
 			var oSparkline = new sparkline();
 			oSparkline.oCache = this.generateCache();
-			this.sparklineView.initFromSparkline(oSparkline, oSparklineGroup, null);
+			this.sparklineView.initFromSparkline(oSparkline, oSparklineGroup, null, true);
 			var api_sheet = Asc['editor'];
 
 			AscFormat.ExecuteNoHistory(
@@ -5005,6 +5005,19 @@ CellArea.prototype = {
 					oPlotArea.layout.setY(fPos);
 				}, this, []);
 			}
+		if(oSparklineGroup.type === Asc.c_oAscSparklineType.Line){
+			AscFormat.ExecuteNoHistory(function(){
+				var oPlotArea = this.sparklineView.chartSpace.chart.plotArea;
+				if(!oPlotArea.layout){
+					oPlotArea.setLayout(new AscFormat.CLayout());
+				}
+				var fPos = 0.16;
+				oPlotArea.layout.setWMode(AscFormat.LAYOUT_MODE_FACTOR);
+				oPlotArea.layout.setW(1 - fPos);
+				oPlotArea.layout.setHMode(AscFormat.LAYOUT_MODE_FACTOR);
+				oPlotArea.layout.setH(1 - fPos);
+			}, this, []);
+		}
 			AscFormat.ExecuteNoHistory(function () {
 				AscFormat.CheckSpPrXfrm(this.sparklineView.chartSpace);
 			}, this, []);

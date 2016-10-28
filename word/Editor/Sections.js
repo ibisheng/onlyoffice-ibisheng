@@ -2078,6 +2078,13 @@ CSectionBorders.prototype =
         this.ZOrder     = Reader.GetByte();
     }
 };
+CSectionBorders.prototype.IsEmptyBorders = function()
+{
+	if (this.Top.IsNone() && this.Bottom.IsNone() && this.Left.IsNone() && this.Right.IsNone())
+		return true;
+
+	return false;
+};
 
 function CSectionPageNumType()
 {

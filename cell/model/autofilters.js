@@ -4164,6 +4164,7 @@
 					return "Column" + index;
 				}
 			},
+			
 			//TODO убрать начеркивание
 			_setColorStyleTable: function(range, options, isOpenFilter, isSetVal, isSetTotalRowType)
 			{
@@ -4288,6 +4289,30 @@
 						}
 					}
 				}
+			},
+			
+			getTableCellStyle: function(row, col)
+			{
+				var worksheet = this.worksheet;
+				var res = null;
+				
+				var tableIndex = this.searchRangeInTableParts(Asc.Range(col, row, col, row));
+				if(tableIndex > -1)
+				{
+					var table = worksheet.TableParts[tableIndex];
+					var style = table.TableStyleInfo;
+					var styleForCurTable = worksheet.workbook.TableStyles.AllStyles[style.Name];
+					
+					if(styleForCurTable)
+					{
+						var startCol = table.Ref.c1 - col;
+						var startRow = table.Ref.r1 - row;
+						var bbox = Asc.Range(startCol, startRow, startCol, startRow);
+						res = styleForCurTable.getStyle(bbox, startRow, startCol, style, /*headerRowCount*/0, /*totalsRowCount*/0);
+					}
+				}
+				
+				return res;
 			},
 			
 			_getFormatTableColumnRange: function(table, columnName)
