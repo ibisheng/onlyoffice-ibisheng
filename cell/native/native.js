@@ -5689,7 +5689,9 @@ function offline_cell_editor_process_input_commands(commands, width, height, rat
         value2 = commands[i][2];
 
         var event = {which:value,metaKey:undefined,ctrlKey:undefined};
-
+        event.stopPropagation = function() {};
+        event.preventDefault = function() {};
+        
         switch (operationCode) {
 
             // KEY_DOWN
