@@ -292,14 +292,17 @@ document.createComment = function() { return undefined; };
 document.documentElement = _null_object;
 document.body = _null_object;
 
-var native;
-if(typeof NativeEngine === "undefined")
+var native = (typeof native === undefined) ? undefined : native;
+if (!native)
 {
-	native = CreateNativeEngine();
-}
-else
-{
-	native = NativeEngine;
+    if (typeof NativeEngine === "undefined")
+    {
+        native = CreateNativeEngine();
+    }
+    else
+    {
+        native = NativeEngine;
+    }
 }
 
 window.native = native;
@@ -379,7 +382,7 @@ function NativeOpenFile2(_params)
             if (schemes) {
                 var st = global_memory_stream_menu;
                 st["ClearNoAttack"]();
-                asc_WriteColorSchemes(schemes, st);
+                AscCommon.asc_WriteColorSchemes(schemes, st);
                 window["native"]["OnCallMenuEvent"](2404, st); // ASC_MENU_EVENT_TYPE_COLOR_SCHEMES
             }
         }

@@ -1149,6 +1149,11 @@ CDrawingDocument.prototype =
         this.Native["DD_Set_RulerState_HdrFtr"](bHeader, Y0, Y1);
     },
 
+    Set_RulerState_Columns : function(markup)
+    {
+        // TODO:
+    },
+
     Update_ParaInd : function(Ind)
     {
         var FirstLine = 0,
