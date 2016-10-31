@@ -63,6 +63,17 @@ var c_oChartTypes =
 	BubbleChart: 9
 };
 
+var c_oChartBar3dFaces =
+{
+	front: 0,
+	up: 1,
+	left: 2,
+	right: 3,
+	down: 4,
+	back: 5
+};
+
+
 var globalGapDepth = 150;
 var isTurnOn3DCharts = true;
 var standartMarginForCharts = 13;
@@ -7102,67 +7113,133 @@ drawHBarChart.prototype =
 	_drawBar3D: function(path, pen, brush, k)
 	{
 		//затемнение боковых сторон
-		//в excel всегда темные боковые стороны, лицевая и задняя стороны светлые
-		//pen = this.cChartSpace.chart.plotArea.valAx.compiledMajorGridLines;
-		//pen.setFill(brush);
+		var fill = this._getFill(pen, brush, k);
+		var newBrush = fill.brush;
+		var newPen = fill.pen;
+		this.cChartDrawer.drawPath(path, newPen, newBrush);
+	},
+	
+	_getFill: function(pen, brush, face)
+	{
+		//k: 0 - передняя, 1 - верхняя, 2 - левая, 3 - правая, 4 - нижняя, 5 - задняя
+		var shade = "shade";
+		var shadeValue1 = 35000;
+		var shadeValue2 = 45000;
+		var angleKf = 60000;
+		
+		var newBrush = brush;
+		var newPen = pen;
+		var t = this;
+		
+		var applyColorModeByBrush = function(brushFill, val)
+		{
+			var props = t.cChartSpace.getParentObjects();
+			var duplicateBrush = brushFill.createDuplicate();
+			var cColorMod = new AscFormat.CColorMod;
+			cColorMod.val = val;
+			
+			cColorMod.name = shade;
+			duplicateBrush.addColorMod(cColorMod);
+			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
+			
+			return duplicateBrush;
+		};
+		
+		/*var colors = duplicateBrush.fill.colors;
+		if(k === 3 && colors && colors[0] && colors[0].color)
+		{
+			var tempColor = new AscFormat.CUniFill();
+			tempColor.setFill(new AscFormat.CSolidFill());
+			tempColor.fill.setColor(colors[0].color);
+			duplicateBrush = tempColor;
+		}
+		else if(k === 2 && colors[colors.length - 1] && colors[colors.length - 1].color)
+		{
+			var tempColor = new AscFormat.CUniFill();
+			tempColor.setFill(new AscFormat.CSolidFill());
+			tempColor.fill.setColor(colors[colors.length - 1].color);
+			duplicateBrush = tempColor;
+		}*/
+		
+		var getGradientFill = function(brushFill, faceIndex)
+		{
+			if(brushFill.fill.lin && null !== brushFill.fill.lin.angle)
+			{
+				var angle = brushFill.fill.lin.angle / angleKf;
+				
+				
+			}
+		};
 		
 		if(null === pen || (null !== pen && null === pen.Fill) || (null !== pen && null !== pen.Fill && null === pen.Fill.fill))
 		{
 			pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
 		}
-		
-		if(k != 5 && k != 0)
+		//TODO сделать для градиентной заливики в зависимости от угла
+		if(brush && brush.fill && AscDFH.historyitem_type_GradFill === brush.fill.getObjectType())
 		{
-			var duplicateBrush = brush;
-			if(brush)
+			switch ( face )
 			{
-				var  props = this.cChartSpace.getParentObjects();
-				var duplicateBrush = brush.createDuplicate();
-				var cColorMod = new AscFormat.CColorMod;
-
-				if(k === 1 || k === 4)
+				case c_oChartBar3dFaces.front:
+				case c_oChartBar3dFaces.back:
 				{
-					//для градиентной заливки верхнюю и нижнюю грань закрашиываем первым и последним цветом соотвенственно
-					if(duplicateBrush.fill && AscDFH.historyitem_type_GradFill === duplicateBrush.fill.getObjectType())
-					{
-						var colors = duplicateBrush.fill.colors;
-						if(k === 1 && colors && colors[0] && colors[0].color)
-						{
-							var tempColor = new AscFormat.CUniFill();
-							tempColor.setFill(new AscFormat.CSolidFill());
-							tempColor.fill.setColor(colors[0].color);
-							duplicateBrush = tempColor;
-						}
-						else if(k === 4 && colors[colors.length - 1] && colors[colors.length - 1].color)
-						{
-							var tempColor = new AscFormat.CUniFill();
-							tempColor.setFill(new AscFormat.CSolidFill());
-							tempColor.fill.setColor(colors[colors.length - 1].color);
-							duplicateBrush = tempColor;
-						}
-					}
-
-					cColorMod.val = 45000;
-				}	
-				else
-				{
-					cColorMod.val = 35000;
+					break;
 				}
-				
-				cColorMod.name = "shade";
-				duplicateBrush.addColorMod(cColorMod);
-				duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
-				
-				if(null === pen)
+				case c_oChartBar3dFaces.up:
 				{
-					pen.setFill(duplicateBrush);
+					
+					break;
+				}
+				case c_oChartBar3dFaces.left:
+				{
+					
+					break;
+				}
+				case c_oChartBar3dFaces.right:
+				{
+					
+					break;
+				}
+				case c_oChartBar3dFaces.down:
+				{
+					
+					break;
 				}
 			}
-			
-			this.cChartDrawer.drawPath(path, pen, duplicateBrush);
 		}
-		else
-			this.cChartDrawer.drawPath(path, pen, brush);
+		else if(brush && brush.fill)
+		{
+			switch ( face )
+			{
+				case c_oChartBar3dFaces.front:
+				case c_oChartBar3dFaces.back:
+				{
+					break;
+				}
+				case c_oChartBar3dFaces.up:
+				case c_oChartBar3dFaces.down:
+				{	
+					newBrush = applyColorModeByBrush(brush, shadeValue1);
+					if(null === pen)
+					{
+						newPen = pen.setFill(newBrush);
+					}
+					break;
+				}
+				case c_oChartBar3dFaces.left:
+				case c_oChartBar3dFaces.right:
+				{
+					newBrush = applyColorModeByBrush(brush, shadeValue2);
+					if(null === pen)
+					{
+						newPen = pen.setFill(newBrush);
+					}
+					break;
+				}
+			}
+		}
+		
+		return {brush: newBrush, pen: newPen};
 	}
 };
 
