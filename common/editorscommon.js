@@ -268,25 +268,8 @@ function openFileCommand(binUrl, changesUrl, Signature, callback) {
   };
   var sFileUrl = binUrl;
   sFileUrl = sFileUrl.replace(/\\/g, "/");
- 
-  if (window['IS_NATIVE_EDITOR']) {
-    var result = window["native"]["openFileCommand"](sFileUrl, changesUrl, Signature);
- 
-    var url;
-    var nIndex = sFileUrl.lastIndexOf("/");
-    url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
-    if (0 < result.length) {
-        oResult.bSerFormat = Signature === result.substring(0, Signature.length);
-        oResult.data = result;
-        oResult.url = url;
-    } else {
-        bError = true;
-    }
- 
-    bEndLoadFile = true;
-    onEndOpen();
- } else {
- 
+
+  if (!window['IS_NATIVE_EDITOR']) {
     asc_ajax({
     url: sFileUrl,
     dataType: "text",
@@ -335,8 +318,26 @@ function openFileCommand(binUrl, changesUrl, Signature, callback) {
   } else {
     bEndLoadChanges = true;
   }
-}
-function sendCommand(editor, fCallback, rdata, dataContainer) {
+
+	if (window['IS_NATIVE_EDITOR']) {
+		var result = window["native"]["openFileCommand"](sFileUrl, changesUrl, Signature);
+
+		var url;
+		var nIndex = sFileUrl.lastIndexOf("/");
+		url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
+		if (0 < result.length) {
+			oResult.bSerFormat = Signature === result.substring(0, Signature.length);
+			oResult.data = result;
+			oResult.url = url;
+		} else {
+			bError = true;
+		}
+
+		bEndLoadFile = true;
+		onEndOpen();
+	}
+ }
+ function sendCommand(editor, fCallback, rdata, dataContainer) {
   //json не должен превышать размера 2097152, иначе при его чтении будет exception
   var docConnectionId = editor.CoAuthoringApi.getDocId();
   if (docConnectionId && docConnectionId !== rdata["id"]) {
@@ -1055,7 +1056,7 @@ function GetUploadInput(onchange) {
     input.setAttribute('name', inputName);
     input.setAttribute('type', 'file');
     input.setAttribute('accept', 'image/*');
-    input.setAttribute('style', 'position:absolute;left:-2px;top:-2px;width:1px;height:1px;z-index:-1000;');
+    input.setAttribute('style', 'position:absolute;left:-2px;top:-2px;width:1px;height:1px;z-index:-1000;cursor:pointer;');
     input.onchange = onchange;
     document.body.appendChild( input );
     return input;
@@ -1778,14 +1779,6 @@ else if (AscBrowser.isOpera)
 	kCurFormatPainterWord = 'pointer';
 else
 	kCurFormatPainterWord = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAATCAYAAACdkl3yAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJxJREFUeNrslGEOwBAMhVtxM5yauxnColWJzt+9pFkl9vWlBeac4VINYG4h3vueFUeKIHLOjRTsp+pdKaX6QY2jufripobpzRoB0ro6qdW5I+q3qGxowXONI9LACcBBBMYhA/RuFJxA+WnXK1CBJJg0kKMD2cc8hNKe25P9gxSy01VY3pjdhHYgCCG0RYyR5Bphpk8kMofHjh4BBgA9UXIXw7elTAAAAABJRU5ErkJggg==') 2 11, pointer";
-
-  function extendClass (Child, Parent) {
-    var F = function() { };
-    F.prototype = Parent.prototype;
-    Child.prototype = new F();
-    Child.prototype.constructor = Child;
-    Child.superclass = Parent.prototype;
-  }
 
 function asc_ajax (obj) {
 	var url = "", type = "GET",
@@ -2714,7 +2707,12 @@ CUserCacheColor.prototype.init = function(nColor) {
     script.type = 'text/javascript';
     script.src = url;
 
-    script.onreadystatechange = callback;
+    script.onreadystatechange = function () {
+			if (this.readyState === 'complete' || this.readyState === 'loaded') {
+				script.onreadystatechange = null;
+				setTimeout(callback, 0);
+			}
+		};
     script.onload = callback;
 
     // Fire the loading
@@ -2767,7 +2765,6 @@ window["SetDoctRendererParams"] = function(_params)
   window["AscCommon"].CanDropFiles = CanDropFiles;
   window["AscCommon"].getUrlType = getUrlType;
   window["AscCommon"].prepareUrl = prepareUrl;
-  window["AscCommon"].extendClass = extendClass;
   window["AscCommon"].getUserColorById = getUserColorById;
   window["AscCommon"].isNullOrEmptyString = isNullOrEmptyString;
 

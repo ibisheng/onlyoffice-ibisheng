@@ -188,13 +188,6 @@
       this.tableStyleName = null;
       this.tableName = null;
 
-      this.isShowColumnStripes = null;
-      this.isShowFirstColumn = null;
-      this.isShowLastColumn = null;
-      this.isShowRowStripes = null;
-      this.isShowTotalRow = null;
-      this.isShowHeaderRow = null;
-
       this.tableRange = null;
 
       this.isInsertRowAbove = null;

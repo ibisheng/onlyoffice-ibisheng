@@ -891,12 +891,12 @@ function CLayoutThumbnailDrawer()
         for (var i = 0; i < _layout.cSld.spTree.length; i++)
         {
             var _sp_elem = _layout.cSld.spTree[i];
-            if (!_sp_elem.isPlaceholder())
+            /*if (!_sp_elem.isPlaceholder())
             {
                 if (use_layout_shapes !== false)
                     _sp_elem.draw(g);
             }
-            else
+            else*/
             {
                 var _ph_type = _sp_elem.getPlaceholderType();
                 var _usePH = true;

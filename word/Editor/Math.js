@@ -2527,17 +2527,22 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
     var oldDefTabStop = Default_Tab_Stop;
     Default_Tab_Stop = 1;
 
-    var hdr = new CHeaderFooter(editor.WordControl.m_oLogicDocument.HdrFtr, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
-    var _dc = hdr.Content;
+    var oApi = Asc['editor'] || editor;
+    if(!oApi || !oApi.textArtPreviewManager){
+        return null;
+    }
+    var oShape = oApi.textArtPreviewManager.getShape();
+    //var hdr = new CHeaderFooter(editor.WordControl.m_oLogicDocument.HdrFtr, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
+    var _dc = oShape.getDocContent();
 
-    var par = new Paragraph(editor.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
+    var par = _dc.Content[0];
 
     if (bCopy)
         par.Internal_Content_Add(0, this.Copy(false), false);
     else
         par.Internal_Content_Add(0, this, false);
 
-    _dc.Internal_Content_Add(0, par, false);
+   // _dc.Internal_Content_Add(0, par, false);
 
     par.Set_Align(align_Left);
     par.Set_Tabs(new CParaTabs());
@@ -2620,17 +2625,20 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
 
     g.transform(1,0,0,1,0,0);
 
-    var isShowParaMarks = par.LogicDocument.Is_ShowParagraphMarks();
 
-    if(true == isShowParaMarks)
+    var bNeedSetParaMarks = false;
+    if(AscCommon.isRealObject(editor) && editor.ShowParaMarks)
     {
-        par.LogicDocument.Set_ShowParagraphMarks(false, false);
+        bNeedSetParaMarks = true;
+        editor.ShowParaMarks = false;
     }
 
     par.Draw(0, g);
 
-    if (true === isShowParaMarks)
-        par.LogicDocument.Set_ShowParagraphMarks(true, false);
+    if(bNeedSetParaMarks)
+    {
+        editor.ShowParaMarks = true;
+    }
 
     AscCommon.IsShapeToImageConverter = false;
 

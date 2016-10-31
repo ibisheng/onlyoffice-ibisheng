@@ -158,7 +158,7 @@ UndoRedoItemSerializable.prototype = {
 			if(oData.Write_ToBinary2)
 				oBinaryCommonWriter.WriteItemWithLength(function(){oData.Write_ToBinary2(oBinaryWriter)});
 			else
-				oBinaryCommonWriter.WriteItemWithLength(function(){oThis.SerializeDataInner(oBinaryWriter, oData, false, nSheetId, collaborativeEditing);});
+				oBinaryCommonWriter.WriteItemWithLength(function(){oThis.SerializeDataInnerObject(oBinaryWriter, oData, nSheetId, collaborativeEditing);});
 		}
 		else
 		{
@@ -166,92 +166,84 @@ UndoRedoItemSerializable.prototype = {
 			oBinaryWriter.WriteLong(0);
 		}
 	},
-	SerializeDataInner : function(oBinaryWriter, oData, bIsArray, nSheetId, collaborativeEditing)
-	{
+	SerializeDataInnerObject: function(oBinaryWriter, oData, nSheetId, collaborativeEditing) {
+		var oProperties = oData.getProperties();
+		for (var i in oProperties) {
+			var nItemType = oProperties[i];
+			var oItem = oData.getProperty(nItemType);
+			this.SerializeDataInner(oBinaryWriter, nItemType, oItem, nSheetId, collaborativeEditing);
+		}
+	},
+	SerializeDataInnerArray: function(oBinaryWriter, oData, nSheetId, collaborativeEditing) {
+		for (var i = 0; i < oData.length; ++i) {
+			this.SerializeDataInner(oBinaryWriter, 0, oData[i], nSheetId, collaborativeEditing);
+		}
+	},
+	SerializeDataInner: function(oBinaryWriter, nItemType, oItem, nSheetId, collaborativeEditing) {
 		var oThis = this;
-		var oProperties;
-		if(bIsArray)
-			oProperties = oData;
+		var sTypeOf;
+		if(null == oItem)
+			sTypeOf = "null";
+		else if(oItem instanceof Array)
+			sTypeOf = "array";
 		else
-			oProperties = oData.getProperties();
-		for(var i in oProperties)
+			sTypeOf = typeof(oItem);
+		switch(sTypeOf)
 		{
-			var oItem;
-			var nItemType;
-			if(bIsArray)
-			{
-				nItemType = i - 0;
-				oItem = oProperties[i];
-			}
-			else
-			{
-				nItemType = oProperties[i];
-				oItem = oData.getProperty(nItemType);
-			}
-			var sTypeOf;
-			if(null == oItem)
-				sTypeOf = "null";
-			else if(oItem instanceof Array)
-				sTypeOf = "array";
-			else
-				sTypeOf = typeof(oItem);
-			switch(sTypeOf)
-			{
-				case "object":
-					oBinaryWriter.WriteByte(nItemType);
-					oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Object);
-					this.SerializeDataObject(oBinaryWriter, oItem, nSheetId, collaborativeEditing);
-				break;
-				case "array":
-					oBinaryWriter.WriteByte(nItemType);
-					oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Array);
-					var oBinaryCommonWriter = new AscCommon.BinaryCommonWriter(oBinaryWriter);
-					oBinaryCommonWriter.WriteItemWithLength(function(){oThis.SerializeDataInner(oBinaryWriter, oItem, true, nSheetId, collaborativeEditing);});
-				break;
-				case "number":
-					oBinaryWriter.WriteByte(nItemType);
-					var nFlorItem = Math.floor(oItem);
-					if(nFlorItem == oItem)
+			case "object":
+				oBinaryWriter.WriteByte(nItemType);
+				oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Object);
+				this.SerializeDataObject(oBinaryWriter, oItem, nSheetId, collaborativeEditing);
+			break;
+			case "array":
+				oBinaryWriter.WriteByte(nItemType);
+				oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Array);
+				var oBinaryCommonWriter = new AscCommon.BinaryCommonWriter(oBinaryWriter);
+				oBinaryCommonWriter.WriteItemWithLength(function(){oThis.SerializeDataInnerArray(oBinaryWriter, oItem, nSheetId, collaborativeEditing);});
+			break;
+			case "number":
+				oBinaryWriter.WriteByte(nItemType);
+				var nFlorItem = Math.floor(oItem);
+				if(nFlorItem == oItem)
+				{
+					if(oItem >= 0 && oItem <= 255)
 					{
-						if(oItem >= 0 && oItem <= 255)
-						{
-							oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Byte);
-							oBinaryWriter.WriteByte(oItem);
-						}
-						else if(oItem <= 0xffffffff)
-						{
-							oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Long);
-							oBinaryWriter.WriteLong(oItem);
-						}
-						else
-						{
-							oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Double);
-							oBinaryWriter.WriteDouble2(oItem);
-						}
+						oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Byte);
+						oBinaryWriter.WriteByte(oItem);
+					}
+					else if(oItem <= 0xffffffff)
+					{
+						oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Long);
+						oBinaryWriter.WriteLong(oItem);
 					}
 					else
 					{
 						oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Double);
 						oBinaryWriter.WriteDouble2(oItem);
 					}
+				}
+				else
+				{
+					oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Double);
+					oBinaryWriter.WriteDouble2(oItem);
+				}
+			break;
+			case "boolean":
+				oBinaryWriter.WriteByte(nItemType);
+				oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Bool);
+				oBinaryWriter.WriteBool(oItem);
+			break;
+			case "string":
+				oBinaryWriter.WriteByte(nItemType);
+				oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.String);
+				oBinaryWriter.WriteString2(oItem);
+			break;
+			case "null":
+			case "undefined":
+				oBinaryWriter.WriteByte(nItemType);
+				oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Null);
+			default:
 				break;
-				case "boolean":
-					oBinaryWriter.WriteByte(nItemType);
-					oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Bool);
-					oBinaryWriter.WriteBool(oItem);
-				break;
-				case "string":
-					oBinaryWriter.WriteByte(nItemType);
-					oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.String);
-					oBinaryWriter.WriteString2(oItem);
-				break;
-				case "null":
-				case "undefined":
-					oBinaryWriter.WriteByte(nItemType);
-					oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Null);
-				default:
-					break;
-			}
 		}
 	},
 
@@ -363,7 +355,7 @@ UndoRedoItemSerializable.prototype = {
 			if(false == nUnknownType)
 			{
 				if(bIsArray)
-					oDataObject[nMemeberType] = oNewValue;
+					oDataObject.push(oNewValue);
 				else
 					oDataObject.setProperty(nMemeberType, oNewValue);
 			}
@@ -448,6 +440,9 @@ var UndoRedoDataTypes = new function() {
 
     this.DynamicFilter = 75;
     this.Top10 = 76;
+
+	this.PropertyChanges = 79;
+	this.SparklineProps = 80;
 
     this.Create = function(nType)
 	{
@@ -3862,6 +3857,25 @@ UndoRedoAutoFilters.prototype = {
 	}
 };
 
+	function UndoRedoSparklines(wb) {
+		this.wb = wb;
+		this.nType = UndoRedoClassTypes.Add(function () {
+			return AscCommonExcel.g_oUndoRedoSparklines;
+		});
+	}
+
+	UndoRedoSparklines.prototype.getClassType = function () {
+		return this.nType;
+	};
+	UndoRedoSparklines.prototype.Undo = function (Type, Data, nSheetId) {
+		this.UndoRedo(Type, Data, nSheetId, true);
+	};
+	UndoRedoSparklines.prototype.Redo = function (Type, Data, nSheetId) {
+		this.UndoRedo(Type, Data, nSheetId, false);
+	};
+	UndoRedoSparklines.prototype.UndoRedo = function (Type, Data, nSheetId, bUndo) {
+	};
+
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 	window['AscCommonExcel'].UndoRedoItemSerializable = UndoRedoItemSerializable;
@@ -3890,6 +3904,7 @@ UndoRedoAutoFilters.prototype = {
 	window['AscCommonExcel'].UndoRedoRowCol = UndoRedoRowCol;
 	window['AscCommonExcel'].UndoRedoComment = UndoRedoComment;
 	window['AscCommonExcel'].UndoRedoAutoFilters = UndoRedoAutoFilters;
+	window['AscCommonExcel'].UndoRedoSparklines = UndoRedoSparklines;
 
 	window['AscCommonExcel'].g_oUndoRedoWorkbook = null;
 	window['AscCommonExcel'].g_oUndoRedoCell = null;
@@ -3898,4 +3913,5 @@ UndoRedoAutoFilters.prototype = {
 	window['AscCommonExcel'].g_oUndoRedoCol = null;
 	window['AscCommonExcel'].g_oUndoRedoComment = null;
 	window['AscCommonExcel'].g_oUndoRedoAutoFilters = null;
+	window['AscCommonExcel'].g_oUndoRedoSparklines = null;
 })(window);

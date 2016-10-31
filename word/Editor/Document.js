@@ -2014,25 +2014,29 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
 		}
 	}
 
-	if (ChangeIndex < 0)
-	{
-		this.DrawingDocument.ClearCachePages();
-		this.DrawingDocument.FirePaint();
-		return;
-	}
-
 	// Найдем начальную страницу, с которой мы начнем пересчет
 	var StartPage  = 0;
 	var StartIndex = 0;
 
-	if (ChangeIndex >= this.Content.length)
+	if (ChangeIndex < 0 && true === RecalcData.NotesEnd)
 	{
 		// Сюда мы попадаем при рассчете сносок, которые выходят за пределы самого документа
 		StartIndex = this.Content.length;
-		StartPage  = RecalcData.Inline.PageNum;
+		StartPage  = RecalcData.NotesEndPage;
+		MainChange = true;
 	}
 	else
 	{
+		if (ChangeIndex < 0)
+		{
+			this.DrawingDocument.ClearCachePages();
+			this.DrawingDocument.FirePaint();
+			return;
+		}
+		else if (ChangeIndex >= this.Content.length)
+		{
+			ChangeIndex = this.Content.length - 1;
+		}
 
 		// Здсь мы должны проверить предыдущие элементы на наличие параматра KeepNext
 		while (ChangeIndex > 0)
@@ -2041,7 +2045,11 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
 			if (type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Get_CompiledPr2(false).ParaPr.KeepNext)
 			{
 				ChangeIndex--;
-				RecalcData.Inline.PageNum = PrevElement.Get_StartPage_Absolute() + (PrevElement.Pages.length - 1); // считаем, что изменилась последняя страница
+				RecalcData.Inline.PageNum = PrevElement.Get_StartPage_Absolute() + (PrevElement.Pages.length - 1); // считаем,
+																												   // что
+																												   // изменилась
+																												   // последняя
+																												   // страница
 			}
 			else
 			{
@@ -3057,9 +3065,9 @@ CDocument.prototype.private_RecalculateFlowParagraph         = function(RecalcIn
 
         if (-1 === FrameW && 1 === FlowCount && 1 === Element.Lines.length && undefined === FramePr.Get_W())
         {
-            FrameW     = Element.Lines[0].Ranges[0].W;
-            var ParaPr = Element.Get_CompiledPr2(false).ParaPr;
-            FrameW += ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
+			FrameW     = Element.GetAutoWidthForDropCap();
+			var ParaPr = Element.Get_CompiledPr2(false).ParaPr;
+			FrameW += ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
 
             // Если прилегание в данном случае не к левой стороне, тогда пересчитываем параграф,
             // с учетом того, что ширина буквицы должна быть FrameW
@@ -3659,10 +3667,10 @@ CDocument.prototype.Draw                                     = function(nPageInd
         var RepF = ( null === Footer || null !== SectPr.Get_HdrFtrInfo(Footer) ? false : true );
 
         var HeaderInfo = undefined;
-        if (null !== Header && undefined !== Header.RecalcInfo.NeedRecalc[nPageIndex])
+        if (null !== Header && undefined !== Header.RecalcInfo.PageNumInfo[nPageIndex])
         {
-            var bFirst = Header.RecalcInfo.NeedRecalc[nPageIndex].bFirst;
-            var bEven  = Header.RecalcInfo.NeedRecalc[nPageIndex].bEven;
+            var bFirst = Header.RecalcInfo.PageNumInfo[nPageIndex].bFirst;
+            var bEven  = Header.RecalcInfo.PageNumInfo[nPageIndex].bEven;
 
             var HeaderSectPr = Header.RecalcInfo.SectPr[nPageIndex];
 
@@ -3673,10 +3681,10 @@ CDocument.prototype.Draw                                     = function(nPageInd
         }
 
         var FooterInfo = undefined;
-        if (null !== Footer && undefined !== Footer.RecalcInfo.NeedRecalc[nPageIndex])
+        if (null !== Footer && undefined !== Footer.RecalcInfo.PageNumInfo[nPageIndex])
         {
-            var bFirst = Footer.RecalcInfo.NeedRecalc[nPageIndex].bFirst;
-            var bEven  = Footer.RecalcInfo.NeedRecalc[nPageIndex].bEven;
+            var bFirst = Footer.RecalcInfo.PageNumInfo[nPageIndex].bFirst;
+            var bEven  = Footer.RecalcInfo.PageNumInfo[nPageIndex].bEven;
 
             var FooterSectPr = Footer.RecalcInfo.SectPr[nPageIndex];
 
@@ -6786,11 +6794,6 @@ CDocument.prototype.OnKeyDown = function(e)
         bUpdateSelection = false;
         bRetValue        = keydownresult_PreventAll;
     }
-	// else if (e.KeyCode === 113)
-	// {
-	// 	this.AddFootnote();
-	// 	bRetValue = keydownresult_PreventAll;
-	// }
     else if (e.KeyCode == 121 && true === e.ShiftKey) // Shift + F10 - контекстное меню
     {
         var X_abs, Y_abs, oPosition, ConvertedPos;

@@ -871,6 +871,8 @@ function getRangeType(oBBox){
 										 AscCommonExcel.c_oAscCanChangeColWidth.none);
 			}
 			this.cleanCellCache = {};
+			AscCommonExcel.g_oVLOOKUPCache.clean();
+			AscCommonExcel.g_oHLOOKUPCache.clean();
 			console.timeEnd('cleanCellCache');
 			console.timeEnd('all');
 		},
@@ -2057,28 +2059,27 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
                 if(oThis.oApi.collaborativeEditing.getFast()){
                   AscCommon.CollaborativeEditing.Clear_DocumentPositions();
                 }
-                for(var i in wsViews)
-                {
-                    if(isRealObject(wsViews[i]) && isRealObject(wsViews[i].objectRender) && isRealObject(wsViews[i].objectRender.controller))
-                    {
-                        if ( wsViews[i].isChartAreaEditMode ) {
-                            wsViews[i].isChartAreaEditMode = false;
-                            wsViews[i].arrActiveChartsRanges = [];
-                        }
-                        if(oThis.oApi.collaborativeEditing.getFast()){
-                            var oState = wsViews[i].objectRender.saveStateBeforeLoadChanges();
-                            if(oState){
-                                if (oState.Pos)
-                                  AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.Pos);
-                                if (oState.StartPos)
-                                  AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.StartPos);
-                                if (oState.EndPos)
-                                  AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.EndPos);
-                            }
-                        }
-                        wsViews[i].objectRender.controller.resetSelection();
-                    }
-                }
+			for (var i in wsViews) {
+				if (isRealObject(wsViews[i]) && isRealObject(wsViews[i].objectRender) &&
+					isRealObject(wsViews[i].objectRender.controller)) {
+					wsViews[i].endEditChart();
+					if (oThis.oApi.collaborativeEditing.getFast()) {
+						var oState = wsViews[i].objectRender.saveStateBeforeLoadChanges();
+						if (oState) {
+							if (oState.Pos) {
+								AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.Pos);
+							}
+							if (oState.StartPos) {
+								AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.StartPos);
+							}
+							if (oState.EndPos) {
+								AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.EndPos);
+							}
+						}
+					}
+					wsViews[i].objectRender.controller.resetSelection();
+				}
+			}
       oFormulaLocaleInfo.Parse = false;
       oFormulaLocaleInfo.DigitSep = false;
                 History.Clear();
@@ -2142,14 +2143,10 @@ Workbook.prototype.DeserializeHistoryNative = function(oRedoObjectParam, data, i
 		if(null == oRedoObjectParam)
 		{
 			var wsViews = window["Asc"]["editor"].wb.wsViews;
-			for(var i in wsViews)
-			{
-				if(isRealObject(wsViews[i]) && isRealObject(wsViews[i].objectRender) && isRealObject(wsViews[i].objectRender.controller))
-				{
-					if ( wsViews[i].isChartAreaEditMode ) {
-						wsViews[i].isChartAreaEditMode = false;
-						wsViews[i].arrActiveChartsRanges = [];
-					}
+			for (var i in wsViews) {
+				if (isRealObject(wsViews[i]) && isRealObject(wsViews[i].objectRender) &&
+					isRealObject(wsViews[i].objectRender.controller)) {
+					wsViews[i].endEditChart();
 					wsViews[i].objectRender.controller.resetSelection();
 				}
 			}
@@ -2338,13 +2335,15 @@ function Woorksheet(wb, _index, sId){
 	this.aConditionalFormatting = [];
 	this.sheetPr = null;
 	this.aFormulaExt = null;
-	
+
 	this.autoFilters = AscCommonExcel.AutoFilters !== undefined ? new AscCommonExcel.AutoFilters(this) : null;
 
-    this.oDrawingOjectsManager = new DrawingObjectsManager(this);
-    this.contentChanges = new AscCommon.CContentChanges();
+	this.oDrawingOjectsManager = new DrawingObjectsManager(this);
+	this.contentChanges = new AscCommon.CContentChanges();
 
-    this.aSparklineGroups = [];
+	this.aSparklineGroups = [];
+
+	this.selectionRange = new AscCommonExcel.SelectionRange(this);
 
 	/*handlers*/
 	this.handlers = null;
@@ -2508,6 +2507,9 @@ Woorksheet.prototype.copyFrom=function(wsFrom, sName, tableNames){	var i, elem, 
   }
 	if (wsFrom.sheetPr)
 		this.sheetPr = wsFrom.sheetPr.clone();
+
+	oNewWs.selectionRange = this.selectionRange.clone(oNewWs);
+
 	return renameParams;
 };
 Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
@@ -4375,7 +4377,7 @@ Woorksheet.prototype.updateSparklineCache = function(sheet, ranges) {
 	Woorksheet.prototype.getSparklineGroup = function(c, r) {
 		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
 			if (-1 !== this.aSparklineGroups[i].contains(c, r)) {
-				return this.aSparklineGroups[i];
+				return this.aSparklineGroups[i].clone(true);
 			}
 		}
 		return null;
@@ -8025,7 +8027,7 @@ function _isSameSizeMerged(bbox, aMerged) {
 	return oRes;
 }
 function _canPromote(from, wsFrom, to, wsTo, bIsPromote, nWidth, nHeight, bVertical, nIndex) {
-	var oRes = {oMergedFrom: null, oMergedTo: null};
+	var oRes = {oMergedFrom: null, oMergedTo: null, to: to};
 	//если надо только удалить внутреннее содержимое не смотрим на замерженость
 	if(!bIsPromote || !((true == bVertical && nIndex >= 0 && nIndex < nHeight) || (false == bVertical && nIndex >= 0 && nIndex < nWidth)))
 	{
@@ -8101,52 +8103,55 @@ function promoteFromTo(from, wsFrom, to, wsTo) {
 		_promoteFromTo(from, wsFrom, to, wsTo, false, oCanPromote, false, bVertical, nIndex);
 	}
 }
-Range.prototype.promote=function(bCtrl, bVertical, nIndex){
+	Range.prototype.canPromote=function(bCtrl, bVertical, nIndex){
+		var oBBox = this.bbox;
+		var nWidth = oBBox.c2 - oBBox.c1 + 1;
+		var nHeight = oBBox.r2 - oBBox.r1 + 1;
+		var bWholeCol = false;	var bWholeRow = false;
+		if(0 == oBBox.r1 && gc_nMaxRow0 == oBBox.r2)
+			bWholeCol = true;
+		if(0 == oBBox.c1 && gc_nMaxCol0 == oBBox.c2)
+			bWholeRow = true;
+		if((bWholeCol && bWholeRow) || (true == bVertical && bWholeCol) || (false == bVertical && bWholeRow))
+			return null;
+		var oPromoteAscRange = null;
+		if(0 == nIndex)
+			oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2);
+		else
+		{
+			if(bVertical)
+			{
+				if(nIndex > 0)
+				{
+					if(nIndex >= nHeight)
+						oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r2 + 1, oBBox.c2, oBBox.r1 + nIndex);
+					else
+						oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r1 + nIndex, oBBox.c2, oBBox.r2);
+				}
+				else
+					oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r1 + nIndex, oBBox.c2, oBBox.r1 - 1);
+			}
+			else
+			{
+				if(nIndex > 0)
+				{
+					if(nIndex >= nWidth)
+						oPromoteAscRange = Asc.Range(oBBox.c2 + 1, oBBox.r1, oBBox.c1 + nIndex, oBBox.r2);
+					else
+						oPromoteAscRange = Asc.Range(oBBox.c1 + nIndex, oBBox.r1, oBBox.c2, oBBox.r2);
+				}
+				else
+					oPromoteAscRange = Asc.Range(oBBox.c1 + nIndex, oBBox.r1, oBBox.c1 - 1, oBBox.r2);
+			}
+		}
+		//проверяем можно ли осуществить promote
+		return _canPromote(oBBox, this.worksheet, oPromoteAscRange, this.worksheet, true, nWidth, nHeight, bVertical, nIndex);
+	};
+Range.prototype.promote=function(bCtrl, bVertical, nIndex, oCanPromote){
 	//todo отдельный метод для promote в таблицах и merge в таблицах
 	var oBBox = this.bbox;
 	var nWidth = oBBox.c2 - oBBox.c1 + 1;
-    var nHeight = oBBox.r2 - oBBox.r1 + 1;
-	var bWholeCol = false;	var bWholeRow = false;
-	if(0 == oBBox.r1 && gc_nMaxRow0 == oBBox.r2)
-		bWholeCol = true;
- 	if(0 == oBBox.c1 && gc_nMaxCol0 == oBBox.c2)
-		bWholeRow = true;
-	if((bWholeCol && bWholeRow) || (true == bVertical && bWholeCol) || (false == bVertical && bWholeRow))
-		return false;
-	var oPromoteAscRange = null;
-	if(0 == nIndex)
-		oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2);
-	else
-	{
-		if(bVertical)
-		{
-			if(nIndex > 0)
-			{
-				if(nIndex >= nHeight)
-					oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r2 + 1, oBBox.c2, oBBox.r1 + nIndex);
-				else
-					oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r1 + nIndex, oBBox.c2, oBBox.r2);
-			}
-			else
-				oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r1 + nIndex, oBBox.c2, oBBox.r1 - 1);
-		}
-		else
-		{
-			if(nIndex > 0)
-			{
-				if(nIndex >= nWidth)
-					oPromoteAscRange = Asc.Range(oBBox.c2 + 1, oBBox.r1, oBBox.c1 + nIndex, oBBox.r2);
-				else
-					oPromoteAscRange = Asc.Range(oBBox.c1 + nIndex, oBBox.r1, oBBox.c2, oBBox.r2);
-			}
-			else
-				oPromoteAscRange = Asc.Range(oBBox.c1 + nIndex, oBBox.r1, oBBox.c1 - 1, oBBox.r2);
-		}
-	}
-	//проверяем можно ли осуществить promote
-	var oCanPromote = _canPromote(oBBox, this.worksheet, oPromoteAscRange, this.worksheet, true, nWidth, nHeight, bVertical, nIndex);
-	if(null == oCanPromote)
-		return false;
+	var nHeight = oBBox.r2 - oBBox.r1 + 1;
 
 	History.Create_NewPoint();
 	var oSelection = History.GetSelection();
@@ -8191,8 +8196,7 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 		}
 		History.SetSelectionRedo(oSelectionRedo);
 	}
-	_promoteFromTo(oBBox, this.worksheet, oPromoteAscRange, this.worksheet, true, oCanPromote, bCtrl, bVertical, nIndex);
-	return true;
+	_promoteFromTo(oBBox, this.worksheet, oCanPromote.to, this.worksheet, true, oCanPromote, bCtrl, bVertical, nIndex);
 };
 function _promoteFromTo(from, wsFrom, to, wsTo, bIsPromote, oCanPromote, bCtrl, bVertical, nIndex) {
 	var wb = wsFrom.workbook;

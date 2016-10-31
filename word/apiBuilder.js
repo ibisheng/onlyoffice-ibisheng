@@ -460,7 +460,9 @@
      * <b>"bandedRow"</b> - Specifies that the table formatting applies to odd numbered groupings of columns.<br/>
      * <b>"bandedRowEven"</b> - Specifies that the table formatting applies to even numbered groupings of columns.<br/>
      * <b>"wholeTable"</b> - Specifies that the conditional formatting applies to the whole table.<br/>
-     * @typedef {("topLeftCell" | "topRightCell" | "bottomLeftCell" | "bottomRightCell" | "firstRow" | "lastRow" | "firstColumn" | "lastColumn" | "bandedColumn" | "bandedColumnEven" | "bandedRow" | "bandedRowEven" | "wholeTable")} TableStyleOverrideType
+     * @typedef {("topLeftCell" | "topRightCell" | "bottomLeftCell" | "bottomRightCell" | "firstRow" | "lastRow" |
+     *     "firstColumn" | "lastColumn" | "bandedColumn" | "bandedColumnEven" | "bandedRow" | "bandedRowEven" |
+     *     "wholeTable")} TableStyleOverrideType
      */
 
     /**
@@ -485,12 +487,26 @@
 
     /**
      * This type specifies the preset shape geometry that is to be used for a shape
-     * @typedef {("accentBorderCallout1" | "accentBorderCallout2" | "accentBorderCallout3" | "accentCallout1" | "accentCallout2" | "accentCallout3" | "actionButtonBackPrevious" | "actionButtonBeginning" | "actionButtonBlank" | "actionButtonDocument" | "actionButtonEnd" | "actionButtonForwardNext" | "actionButtonHelp" | "actionButtonHome" | "actionButtonInformation" | "actionButtonMovie" | "actionButtonReturn" | "actionButtonSound" | "arc" | "bentArrow" | "bentConnector2" | "bentConnector3" | "bentConnector4" | "bentConnector5" | "bentUpArrow" | "bevel" | "blockArc" | "borderCallout1" | "borderCallout2" | "borderCallout3" | "bracePair" | "bracketPair" | "callout1" | "callout2" | "callout3" | "can" | "chartPlus" | "chartStar" | "chartX" | "chevron" | "chord" | "circularArrow" | "cloud" | "cloudCallout" | "corner" | "cornerTabs" | "cube" | "curvedConnector2" | "curvedConnector3" | "curvedConnector4" | "curvedConnector5" | "curvedDownArrow" | "curvedLeftArrow" | "curvedRightArrow" | "curvedUpArrow" | "decagon" | "diagStripe" | "diamond" | "dodecagon" | "donut" | "doubleWave" | "downArrow" | "downArrowCallout" | "ellipse" | "ellipseRibbon" | "ellipseRibbon2" | "flowChartAlternateProcess" | "flowChartCollate" | "flowChartConnector" | "flowChartDecision" | "flowChartDelay" | "flowChartDisplay" | "flowChartDocument" | "flowChartExtract" | "flowChartInputOutput" | "flowChartInternalStorage" | "flowChartMagneticDisk" | "flowChartMagneticDrum" | "flowChartMagneticTape" | "flowChartManualInput" | "flowChartManualOperation" | "flowChartMerge" | "flowChartMultidocument" | "flowChartOfflineStorage" | "flowChartOffpageConnector" | "flowChartOnlineStorage" | "flowChartOr" | "flowChartPredefinedProcess" | "flowChartPreparation" | "flowChartProcess" | "flowChartPunchedCard" | "flowChartPunchedTape" | "flowChartSort" | "flowChartSummingJunction" | "flowChartTerminator" | "foldedCorner" | "frame" | "funnel" | "gear6" | "gear9" | "halfFrame" | "heart" | "heptagon" | "hexagon" | "homePlate" | "horizontalScroll" | "irregularSeal1" | "irregularSeal2" | "leftArrow" | "leftArrowCallout" | "leftBrace" | "leftBracket" | "leftCircularArrow" | "leftRightArrow" | "leftRightArrowCallout" | "leftRightCircularArrow" | "leftRightRibbon" | "leftRightUpArrow" | "leftUpArrow" | "lightningBolt" | "line" | "lineInv" | "mathDivide" | "mathEqual" | "mathMinus" | "mathMultiply" | "mathNotEqual" | "mathPlus" | "moon" | "nonIsoscelesTrapezoid" | "noSmoking" | "notchedRightArrow" | "octagon" | "parallelogram" | "pentagon" | "pie" | "pieWedge" | "plaque" | "plaqueTabs" | "plus" | "quadArrow" | "quadArrowCallout" | "rect" | "ribbon" | "ribbon2" | "rightArrow" | "rightArrowCallout" | "rightBrace" | "rightBracket" | "round1Rect" | "round2DiagRect" | "round2SameRect" | "roundRect" | "rtTriangle" | "smileyFace" | "snip1Rect" | "snip2DiagRect" | "snip2SameRect" | "snipRoundRect" | "squareTabs" | "star10" | "star12" | "star16" | "star24" | "star32" | "star4" | "star5" | "star6" | "star7" | "star8" | "straightConnector1" | "stripedRightArrow" | "sun" | "swooshArrow" | "teardrop" | "trapezoid" | "triangle" | "upArrowCallout" | "upDownArrow" | "upDownArrow" | "upDownArrowCallout" | "uturnArrow" | "verticalScroll" | "wave" | "wedgeEllipseCallout" | "wedgeRectCallout" | "wedgeRoundRectCallout")} ShapeType
+     * @typedef {("accentBorderCallout1" | "accentBorderCallout2" | "accentBorderCallout3" | "accentCallout1" |
+     *     "accentCallout2" | "accentCallout3" | "actionButtonBackPrevious" | "actionButtonBeginning" |
+     *     "actionButtonBlank" | "actionButtonDocument" | "actionButtonEnd" | "actionButtonForwardNext" |
+     *     "actionButtonHelp" | "actionButtonHome" | "actionButtonInformation" | "actionButtonMovie" |
+     *     "actionButtonReturn" | "actionButtonSound" | "arc" | "bentArrow" | "bentConnector2" | "bentConnector3" |
+     *     "bentConnector4" | "bentConnector5" | "bentUpArrow" | "bevel" | "blockArc" | "borderCallout1" |
+     *     "borderCallout2" | "borderCallout3" | "bracePair" | "bracketPair" | "callout1" | "callout2" | "callout3" |
+     *     "can" | "chartPlus" | "chartStar" | "chartX" | "chevron" | "chord" | "circularArrow" | "cloud" |
+     *     "cloudCallout" | "corner" | "cornerTabs" | "cube" | "curvedConnector2" | "curvedConnector3" |
+     *     "curvedConnector4" | "curvedConnector5" | "curvedDownArrow" | "curvedLeftArrow" | "curvedRightArrow" |
+     *     "curvedUpArrow" | "decagon" | "diagStripe" | "diamond" | "dodecagon" | "donut" | "doubleWave" | "downArrow" | "downArrowCallout" | "ellipse" | "ellipseRibbon" | "ellipseRibbon2" | "flowChartAlternateProcess" | "flowChartCollate" | "flowChartConnector" | "flowChartDecision" | "flowChartDelay" | "flowChartDisplay" | "flowChartDocument" | "flowChartExtract" | "flowChartInputOutput" | "flowChartInternalStorage" | "flowChartMagneticDisk" | "flowChartMagneticDrum" | "flowChartMagneticTape" | "flowChartManualInput" | "flowChartManualOperation" | "flowChartMerge" | "flowChartMultidocument" | "flowChartOfflineStorage" | "flowChartOffpageConnector" | "flowChartOnlineStorage" | "flowChartOr" | "flowChartPredefinedProcess" | "flowChartPreparation" | "flowChartProcess" | "flowChartPunchedCard" | "flowChartPunchedTape" | "flowChartSort" | "flowChartSummingJunction" | "flowChartTerminator" | "foldedCorner" | "frame" | "funnel" | "gear6" | "gear9" | "halfFrame" | "heart" | "heptagon" | "hexagon" | "homePlate" | "horizontalScroll" | "irregularSeal1" | "irregularSeal2" | "leftArrow" | "leftArrowCallout" | "leftBrace" | "leftBracket" | "leftCircularArrow" | "leftRightArrow" | "leftRightArrowCallout" | "leftRightCircularArrow" | "leftRightRibbon" | "leftRightUpArrow" | "leftUpArrow" | "lightningBolt" | "line" | "lineInv" | "mathDivide" | "mathEqual" | "mathMinus" | "mathMultiply" | "mathNotEqual" | "mathPlus" | "moon" | "nonIsoscelesTrapezoid" | "noSmoking" | "notchedRightArrow" | "octagon" | "parallelogram" | "pentagon" | "pie" | "pieWedge" | "plaque" | "plaqueTabs" | "plus" | "quadArrow" | "quadArrowCallout" | "rect" | "ribbon" | "ribbon2" | "rightArrow" | "rightArrowCallout" | "rightBrace" | "rightBracket" | "round1Rect" | "round2DiagRect" | "round2SameRect" | "roundRect" | "rtTriangle" | "smileyFace" | "snip1Rect" | "snip2DiagRect" | "snip2SameRect" | "snipRoundRect" | "squareTabs" | "star10" | "star12" | "star16" | "star24" | "star32" | "star4" | "star5" | "star6" | "star7" | "star8" | "straightConnector1" | "stripedRightArrow" | "sun" | "swooshArrow" | "teardrop" | "trapezoid" | "triangle" | "upArrowCallout" | "upDownArrow" | "upDownArrow" | "upDownArrowCallout" | "uturnArrow" | "verticalScroll" | "wave" | "wedgeEllipseCallout" | "wedgeRectCallout" | "wedgeRoundRectCallout")} ShapeType
      */
 
     /**
      * This type specifies the types, create charts
-     * @typedef {("bar" | "barStacked" | "barStackedPercent" | "bar3D" | "barStacked3D" | "barStackedPercent3D" | "barStackedPercent3DPerspective" | "horizontalBar" | "horizontalBarStacked" | "horizontalBarStackedPercent" | "horizontalBar3D" | "horizontalBarStacked3D" | "horizontalBarStackedPercent3D" | "lineNormal" | "lineStacked" | "lineStackedPercent" | "line3D" | "pie" | "pie3D" | "doughnut" | "scatter" | "stock" | "area" | "areaStacked" | "areaStackedPercent")} ChartType
+     * @typedef {("bar" | "barStacked" | "barStackedPercent" | "bar3D" | "barStacked3D" | "barStackedPercent3D" |
+     *     "barStackedPercent3DPerspective" | "horizontalBar" | "horizontalBarStacked" | "horizontalBarStackedPercent"
+     *     | "horizontalBar3D" | "horizontalBarStacked3D" | "horizontalBarStackedPercent3D" | "lineNormal" |
+     *     "lineStacked" | "lineStackedPercent" | "line3D" | "pie" | "pie3D" | "doughnut" | "scatter" | "stock" |
+     *     "area" | "areaStacked" | "areaStackedPercent")} ChartType
      */
 
     /**
@@ -498,11 +514,22 @@
      * */
 
     /**
-     * @typedef {("accent1" | "accent2" | "accent3" | "accent4" | "accent5" | "accent6" | "bg1" | "bg2" | "dk1" | "dk2" | "lt1" | "lt2" | "tx1" | "tx2")} SchemeColorId
+     * @typedef {("accent1" | "accent2" | "accent3" | "accent4" | "accent5" | "accent6" | "bg1" | "bg2" | "dk1" | "dk2"
+     *     | "lt1" | "lt2" | "tx1" | "tx2")} SchemeColorId
      * */
 
     /**
-     * @typedef {("aliceBlue" | "antiqueWhite" | "aqua" | "aquamarine" | "azure" | "beige" | "bisque" | "black" | "blanchedAlmond" | "blue" | "blueViolet" | "brown" | "burlyWood" | "cadetBlue" | "chartreuse" | "chocolate" | "coral" | "cornflowerBlue" | "cornsilk" | "crimson" | "cyan" | "darkBlue" | "darkCyan" | "darkGoldenrod" | "darkGray" | "darkGreen" | "darkGrey" | "darkKhaki" | "darkMagenta" | "darkOliveGreen" | "darkOrange" | "darkOrchid" | "darkRed" | "darkSalmon" | "darkSeaGreen" | "darkSlateBlue" | "darkSlateGray" | "darkSlateGrey" | "darkTurquoise" | "darkViolet" | "deepPink" | "deepSkyBlue" | "dimGray" | "dimGrey" | "dkBlue" | "dkCyan" | "dkGoldenrod" | "dkGray" | "dkGreen" | "dkGrey" | "dkKhaki" | "dkMagenta" | "dkOliveGreen" | "dkOrange" | "dkOrchid" | "dkRed" | "dkSalmon" | "dkSeaGreen" | "dkSlateBlue" | "dkSlateGray" | "dkSlateGrey" | "dkTurquoise" | "dkViolet" | "dodgerBlue" | "firebrick" | "floralWhite" | "forestGreen" | "fuchsia" | "gainsboro" | "ghostWhite" | "gold" | "goldenrod" | "gray" | "green" | "greenYellow" | "grey" | "honeydew" | "hotPink" | "indianRed" | "indigo" | "ivory" | "khaki" | "lavender" | "lavenderBlush" | "lawnGreen" | "lemonChiffon" | "lightBlue" | "lightCoral" | "lightCyan" | "lightGoldenrodYellow" | "lightGray" | "lightGreen" | "lightGrey" | "lightPink" | "lightSalmon" | "lightSeaGreen" | "lightSkyBlue" | "lightSlateGray" | "lightSlateGrey" | "lightSteelBlue" | "lightYellow" | "lime" | "limeGreen" | "linen" | "ltBlue" | "ltCoral" | "ltCyan" | "ltGoldenrodYellow" | "ltGray" | "ltGreen" | "ltGrey" | "ltPink" | "ltSalmon" | "ltSeaGreen" | "ltSkyBlue" | "ltSlateGray" | "ltSlateGrey" | "ltSteelBlue" | "ltYellow" | "magenta" | "maroon" | "medAquamarine" | "medBlue" | "mediumAquamarine" | "mediumBlue" | "mediumOrchid" | "mediumPurple" | "mediumSeaGreen" | "mediumSlateBlue" | "mediumSpringGreen" | "mediumTurquoise" | "mediumVioletRed" | "medOrchid" | "medPurple" | "medSeaGreen" | "medSlateBlue" | "medSpringGreen" | "medTurquoise" | "medVioletRed" | "midnightBlue" | "mintCream" | "mistyRose" | "moccasin" | "navajoWhite" | "navy" | "oldLace" | "olive" | "oliveDrab" | "orange" | "orangeRed" | "orchid" | "paleGoldenrod" | "paleGreen" | "paleTurquoise" | "paleVioletRed" | "papayaWhip" | "peachPuff" | "peru" | "pink" | "plum" | "powderBlue" | "purple" | "red" | "rosyBrown" | "royalBlue" | "saddleBrown" | "salmon" | "sandyBrown" | "seaGreen" | "seaShell" | "sienna" | "silver" | "skyBlue" | "slateBlue" | "slateGray" | "slateGrey" | "snow" | "springGreen" | "steelBlue" | "tan" | "teal" | "thistle" | "tomato" | "turquoise" | "violet" | "wheat" | "white" | "whiteSmoke" | "yellow" | "yellowGreen")} PresetColor
+     * @typedef {("aliceBlue" | "antiqueWhite" | "aqua" | "aquamarine" | "azure" | "beige" | "bisque" | "black" |
+     *     "blanchedAlmond" | "blue" | "blueViolet" | "brown" | "burlyWood" | "cadetBlue" | "chartreuse" | "chocolate"
+     *     | "coral" | "cornflowerBlue" | "cornsilk" | "crimson" | "cyan" | "darkBlue" | "darkCyan" | "darkGoldenrod" |
+     *     "darkGray" | "darkGreen" | "darkGrey" | "darkKhaki" | "darkMagenta" | "darkOliveGreen" | "darkOrange" |
+     *     "darkOrchid" | "darkRed" | "darkSalmon" | "darkSeaGreen" | "darkSlateBlue" | "darkSlateGray" |
+     *     "darkSlateGrey" | "darkTurquoise" | "darkViolet" | "deepPink" | "deepSkyBlue" | "dimGray" | "dimGrey" |
+     *     "dkBlue" | "dkCyan" | "dkGoldenrod" | "dkGray" | "dkGreen" | "dkGrey" | "dkKhaki" | "dkMagenta" |
+     *     "dkOliveGreen" | "dkOrange" | "dkOrchid" | "dkRed" | "dkSalmon" | "dkSeaGreen" | "dkSlateBlue" |
+     *     "dkSlateGray" | "dkSlateGrey" | "dkTurquoise" | "dkViolet" | "dodgerBlue" | "firebrick" | "floralWhite" |
+     *     "forestGreen" | "fuchsia" | "gainsboro" | "ghostWhite" | "gold" | "goldenrod" | "gray" | "green" |
+     *     "greenYellow" | "grey" | "honeydew" | "hotPink" | "indianRed" | "indigo" | "ivory" | "khaki" | "lavender" | "lavenderBlush" | "lawnGreen" | "lemonChiffon" | "lightBlue" | "lightCoral" | "lightCyan" | "lightGoldenrodYellow" | "lightGray" | "lightGreen" | "lightGrey" | "lightPink" | "lightSalmon" | "lightSeaGreen" | "lightSkyBlue" | "lightSlateGray" | "lightSlateGrey" | "lightSteelBlue" | "lightYellow" | "lime" | "limeGreen" | "linen" | "ltBlue" | "ltCoral" | "ltCyan" | "ltGoldenrodYellow" | "ltGray" | "ltGreen" | "ltGrey" | "ltPink" | "ltSalmon" | "ltSeaGreen" | "ltSkyBlue" | "ltSlateGray" | "ltSlateGrey" | "ltSteelBlue" | "ltYellow" | "magenta" | "maroon" | "medAquamarine" | "medBlue" | "mediumAquamarine" | "mediumBlue" | "mediumOrchid" | "mediumPurple" | "mediumSeaGreen" | "mediumSlateBlue" | "mediumSpringGreen" | "mediumTurquoise" | "mediumVioletRed" | "medOrchid" | "medPurple" | "medSeaGreen" | "medSlateBlue" | "medSpringGreen" | "medTurquoise" | "medVioletRed" | "midnightBlue" | "mintCream" | "mistyRose" | "moccasin" | "navajoWhite" | "navy" | "oldLace" | "olive" | "oliveDrab" | "orange" | "orangeRed" | "orchid" | "paleGoldenrod" | "paleGreen" | "paleTurquoise" | "paleVioletRed" | "papayaWhip" | "peachPuff" | "peru" | "pink" | "plum" | "powderBlue" | "purple" | "red" | "rosyBrown" | "royalBlue" | "saddleBrown" | "salmon" | "sandyBrown" | "seaGreen" | "seaShell" | "sienna" | "silver" | "skyBlue" | "slateBlue" | "slateGray" | "slateGrey" | "snow" | "springGreen" | "steelBlue" | "tan" | "teal" | "thistle" | "tomato" | "turquoise" | "violet" | "wheat" | "white" | "whiteSmoke" | "yellow" | "yellowGreen")} PresetColor
      * */
 
     /**
@@ -510,7 +537,13 @@
      * */
 
     /**
-     * @typedef {"cross" | "dashDnDiag" | "dashHorz" | "dashUpDiag" | "dashVert" | "diagBrick" | "diagCross" | "divot" | "dkDnDiag" | "dkHorz" | "dkUpDiag" | "dkVert" | "dnDiag" | "dotDmnd" | "dotGrid" | "horz" | "horzBrick" | "lgCheck" | "lgConfetti" | "lgGrid" | "ltDnDiag" | "ltHorz" | "ltUpDiag" | "ltVert" | "narHorz" | "narVert" | "openDmnd" | "pct10" | "pct20" | "pct25" | "pct30" | "pct40" | "pct5" | "pct50" | "pct60" | "pct70" | "pct75" | "pct80" | "pct90" | "plaid" | "shingle" | "smCheck" | "smConfetti" | "smGrid" | "solidDmnd" | "sphere" | "trellis" | "upDiag" | "vert" | "wave" | "wdDnDiag" | "wdUpDiag" | "weave" | "zigZag"} PatternType
+     * @typedef {"cross" | "dashDnDiag" | "dashHorz" | "dashUpDiag" | "dashVert" | "diagBrick" | "diagCross" | "divot"
+     *     | "dkDnDiag" | "dkHorz" | "dkUpDiag" | "dkVert" | "dnDiag" | "dotDmnd" | "dotGrid" | "horz" | "horzBrick" |
+     *     "lgCheck" | "lgConfetti" | "lgGrid" | "ltDnDiag" | "ltHorz" | "ltUpDiag" | "ltVert" | "narHorz" | "narVert"
+     *     | "openDmnd" | "pct10" | "pct20" | "pct25" | "pct30" | "pct40" | "pct5" | "pct50" | "pct60" | "pct70" |
+     *     "pct75" | "pct80" | "pct90" | "plaid" | "shingle" | "smCheck" | "smConfetti" | "smGrid" | "solidDmnd" |
+     *     "sphere" | "trellis" | "upDiag" | "vert" | "wave" | "wdDnDiag" | "wdUpDiag" | "weave" | "zigZag"}
+     *     PatternType
      * */
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -1397,6 +1430,28 @@
         private_PushElementToParagraph(this.Paragraph, oRun);
         return new ApiRun(oRun);
     };
+	/**
+	 * Add a page number field to this paragraph.
+	 * @returns {ApiRun}
+	 */
+	ApiParagraph.prototype.AddPageNumber = function()
+	{
+		var oRun = new ParaRun(this.Paragraph, false);
+		oRun.Add_ToContent(0, new ParaPageNum());
+		private_PushElementToParagraph(this.Paragraph, oRun);
+		return new ApiRun(oRun);
+	};
+	/**
+	 * Add a pages count field to this paragraph.
+	 * @returns {ApiRun}
+	 */
+	ApiParagraph.prototype.AddPagesCount = function()
+	{
+		var oRun = new ParaRun(this.Paragraph, false);
+		oRun.Add_ToContent(0, new ParaPageCount());
+		private_PushElementToParagraph(this.Paragraph, oRun);
+		return new ApiRun(oRun);
+	};
     /**
      * Get text properties of the paragraph mark.
      * @returns {ApiTextPr}
@@ -1685,8 +1740,9 @@
         this.Section.Set_Columns_Space(private_Twips2MM(nSpace));
     };
     /**
-     * Set all columns of this section are of different widths. Count of columns are equal length of <code>aWidth</code> array.
-     * The length of <code>aSpaces</code> array <b>MUST BE</b> (<code>aWidth.length - 1</code>).
+     * Set all columns of this section are of different widths. Count of columns are equal length of
+     * <code>aWidth</code> array. The length of <code>aSpaces</code> array <b>MUST BE</b> (<code>aWidth.length -
+     * 1</code>).
      * @param {twips[]} aWidths - An array of column width
      * @param {twips[]} aSpaces - An array of distances between the columns
      */
@@ -1739,7 +1795,8 @@
         this.Section.Set_PageMargins_Header(private_Twips2MM(nDistance));
     };
     /**
-     * Specifies the distance (in twentieths of a point) from the bottom edge of the page to the bottom edge of the footer.
+     * Specifies the distance (in twentieths of a point) from the bottom edge of the page to the bottom edge of the
+     * footer.
      * @param {twips} nDistance
      */
     ApiSection.prototype.SetFooterDistance = function(nDistance)
@@ -1749,7 +1806,8 @@
     /**
      * Get the content for the specified type of header.
      * @param {HdrFtrType} sType - Type of header.
-     * @param {boolean} [isCreate=false] - Create a header or not if there is no header with specified type in the current section.
+     * @param {boolean} [isCreate=false] - Create a header or not if there is no header with specified type in the
+     *     current section.
      * @returns {?ApiDocumentContent}
      */
     ApiSection.prototype.GetHeader = function(sType, isCreate)
@@ -1797,7 +1855,8 @@
     /**
      * Get the content for the specified type of footer.
      * @param {HdrFtrType} sType - Type of footer.
-     * @param {boolean} [isCreate=false] - Create a footer or not if there is no footer with specified type in the current section.
+     * @param {boolean} [isCreate=false] - Create a footer or not if there is no footer with specified type in the
+     *     current section.
      * @returns {?ApiDocumentContent}
      */
     ApiSection.prototype.GetFooter = function(sType, isCreate)
@@ -1955,18 +2014,22 @@
     };
     /**
      * Specify the components of the conditional formatting of the referenced table style (if one exists)
-     * which shall be applied to the set of table rows with the current table-level property exceptions. A table style can
-     * specify up to six different optional conditional formats [Example: Different formatting for first column. end
-     * example], which then can be applied or omitted from individual table rows in the parent table.
+     * which shall be applied to the set of table rows with the current table-level property exceptions. A table style
+     * can specify up to six different optional conditional formats [Example: Different formatting for first column.
+     * end example], which then can be applied or omitted from individual table rows in the parent table.
      *
      * The default setting is to apply the row and column banding formatting, but not the first row, last row, first
      * column, or last column formatting.
-     * @param {boolean} isFirstColumn - Specifies that the first column conditional formatting shall be applied to the table.
+     * @param {boolean} isFirstColumn - Specifies that the first column conditional formatting shall be applied to the
+     *     table.
      * @param {boolean} isFirstRow - Specifies that the first row conditional formatting shall be applied to the table.
-     * @param {boolean} isLastColumn - Specifies that the last column conditional formatting shall be applied to the table.
+     * @param {boolean} isLastColumn - Specifies that the last column conditional formatting shall be applied to the
+     *     table.
      * @param {boolean} isLastRow - Specifies that the last row conditional formatting shall be applied to the table.
-     * @param {boolean} isHorBand - Specifies that the horizontal banding conditional formatting shall not be applied to the table.
-     * @param {boolean} isVerBand - Specifies that the vertical banding conditional formatting shall not be applied to the table.
+     * @param {boolean} isHorBand - Specifies that the horizontal banding conditional formatting shall not be applied
+     *     to the table.
+     * @param {boolean} isVerBand - Specifies that the vertical banding conditional formatting shall not be applied to
+     *     the table.
      */
     ApiTable.prototype.SetTableLook = function(isFirstColumn, isFirstRow, isLastColumn, isLastRow, isHorBand, isVerBand)
     {
@@ -2204,7 +2267,8 @@
     };
     /**
      * Get the table properties of the current style.
-     * @returns {?ApiTablePr} If the type of this style is not a <code>"table"</code> then it will return <code>null</code>.
+     * @returns {?ApiTablePr} If the type of this style is not a <code>"table"</code> then it will return
+     *     <code>null</code>.
      */
     ApiStyle.prototype.GetTablePr = function()
     {
@@ -2215,7 +2279,8 @@
     };
     /**
      * Get the table row properties of the current style.
-     * @returns {?ApiTableRowPr} If the type of this style is not a <code>"table"</code> then it will return <code>null</code>.
+     * @returns {?ApiTableRowPr} If the type of this style is not a <code>"table"</code> then it will return
+     *     <code>null</code>.
      */
     ApiStyle.prototype.GetTableRowPr = function()
     {
@@ -2466,7 +2531,8 @@
     /**
      * Specifies the languages which shall be used to check spelling and grammar (if requested) when processing the
      * contents of this run.
-     * @param {string} sLangId - The possible values for this parameter is a language identifier as defined by RFC 4646/BCP 47. Example: "en-CA".
+     * @param {string} sLangId - The possible values for this parameter is a language identifier as defined by RFC
+     *     4646/BCP 47. Example: "en-CA".
      */
     ApiTextPr.prototype.SetLanguage = function(sLangId)
     {
@@ -2606,10 +2672,11 @@
         this.private_OnChange();
     };
     /**
-     * Set paragraph line spacing. If the value of the <code>sLineRule</code> parameter is either <code>"atLeast"</code>
+     * Set paragraph line spacing. If the value of the <code>sLineRule</code> parameter is either
+     * <code>"atLeast"</code>
      * or <code>"exact"</code>, then the value of <code>nLine</code> shall be interpreted as twentieths of a point. If
-     * the value of the <code>sLineRule</code> parameter is <code>"auto"</code>, then the value of the <code>nLine</code>
-     * attribute shall be interpreted as 240ths of a line.
+     * the value of the <code>sLineRule</code> parameter is <code>"auto"</code>, then the value of the
+     * <code>nLine</code> attribute shall be interpreted as 240ths of a line.
      * @param {(twips | line240)} nLine
      * @param {("auto" | "atLeast" | "exact")} sLineRule
      */
@@ -2639,8 +2706,8 @@
     };
     /**
      * Set paragraph spacing before. If the value of the <code>isBeforeAuto</code> parameter is <code>true</code>, then
-     * any value of the <code>nBefore</code> is ignored. If <code>isBeforeAuto</code> parameter is not specified, then it
-     * will be interpreted as <code>false</code>.
+     * any value of the <code>nBefore</code> is ignored. If <code>isBeforeAuto</code> parameter is not specified, then
+     * it will be interpreted as <code>false</code>.
      * @param {twips} nBefore
      * @param {boolean} [isBeforeAuto=false]
      */
@@ -2685,7 +2752,8 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the border which shall be displayed below a set of paragraphs which have the same paragraph border settings.
+     * Specifies the border which shall be displayed below a set of paragraphs which have the same paragraph border
+     * settings.
      * @param {BorderType} sType - The style of border.
      * @param {pt_8} nSize - The width of the current border.
      * @param {pt} nSpace - The spacing offset that shall be used to place this border.
@@ -2770,8 +2838,8 @@
      * Specifies a sequence of custom tab stops which shall be used for any tab characters in the current paragraph.
      * <b>Warning</b>: The lengths of aPos array and aVal array <b>MUST BE</b> equal.
      * @param {twips[]} aPos - An array of the positions of custom tab stops with respect to the current page margins.
-     * @param {TabJc[]} aVal - An array of the styles of custom tab stops, which determines the behavior of the tab stop and
-     * the alignment which shall be applied to text entered at the current custom tab stop.
+     * @param {TabJc[]} aVal - An array of the styles of custom tab stops, which determines the behavior of the tab
+     *     stop and the alignment which shall be applied to text entered at the current custom tab stop.
      */
     ApiParaPr.prototype.SetTabs = function(aPos, aVal)
     {
@@ -2789,9 +2857,9 @@
     /**
      * Specifies that the current paragraph references a numbering definition instance in the current document.
      * @param {ApiNumbering} oNumPr - Specifies a numbering definition.
-     * @param {number} [nLvl=0] - Specifies a numbering level reference. If the current instance of the class ApiParaPr is
-     * direct formatting of a paragraph, then this parameter <b>MUST BE</b> specified. Otherwise if the current instance
-     * of the class ApiParaPr is the part of ApiStyle properties, then this parameter will be ignored.
+     * @param {number} [nLvl=0] - Specifies a numbering level reference. If the current instance of the class ApiParaPr
+     *     is direct formatting of a paragraph, then this parameter <b>MUST BE</b> specified. Otherwise if the current
+     *     instance of the class ApiParaPr is the part of ApiStyle properties, then this parameter will be ignored.
      */
     ApiParaPr.prototype.SetNumPr = function(oNumPr, nLvl)
     {
@@ -2936,10 +3004,12 @@
     };
     /**
      * Set the custom type of the numbering.
-     * @param {("none" | "bullet" | "decimal" | "lowerRoman" | "upperRoman" | "lowerLetter" | "upperLetter" | "decimalZero")} sType
+     * @param {("none" | "bullet" | "decimal" | "lowerRoman" | "upperRoman" | "lowerLetter" | "upperLetter" |
+     *     "decimalZero")} sType
      * @param {string} sTextFormatString - All text in this parameter shall be taken as literal text to be repeated in
      * each instance of this numbering level, except for any use of the percent symbol (%) followed by a number,
-     * which shall be used to indicate the one-based index of the number to be used at this level. Any number of a level
+     * which shall be used to indicate the one-based index of the number to be used at this level. Any number of a
+     *     level
      * higher than this level shall be ignored.
      * @param {("left" | "right" | "center")} sAlign - Type of justification used on a numbering level's text.
      */
@@ -3802,6 +3872,30 @@
     };
 
 
+	
+	
+    /**
+     * Set text paddings
+     * @param {?EMU} nLeft
+     * @param {?EMU} nTop
+     * @param {?EMU} nRight
+     * @param {?EMU} nBottom
+     */
+    ApiShape.prototype.SetPaddings = function(nLeft, nTop, nRight, nBottom)
+    {
+        if(this.Shape)
+        {
+            this.Shape.setPaddings({
+                Left: AscFormat.isRealNumber(nLeft) ? private_EMU2MM(nLeft) : null,
+                Top: AscFormat.isRealNumber(nTop) ? private_EMU2MM(nTop) : null,
+                Right: AscFormat.isRealNumber(nRight) ? private_EMU2MM(nRight) : null,
+                Bottom: AscFormat.isRealNumber(nBottom) ? private_EMU2MM(nBottom) : null
+            });
+        }
+    };
+
+
+	
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiChart
@@ -4152,6 +4246,8 @@
     ApiParagraph.prototype["AddPageBreak"]           = ApiParagraph.prototype.AddPageBreak;
     ApiParagraph.prototype["AddLineBreak"]           = ApiParagraph.prototype.AddLineBreak;
     ApiParagraph.prototype["AddColumnBreak"]         = ApiParagraph.prototype.AddColumnBreak;
+	ApiParagraph.prototype["AddPageNumber"]          = ApiParagraph.prototype.AddPageNumber;
+	ApiParagraph.prototype["AddPagesCount"]          = ApiParagraph.prototype.AddPagesCount;
     ApiParagraph.prototype["GetParagraphMarkTextPr"] = ApiParagraph.prototype.GetParagraphMarkTextPr;
     ApiParagraph.prototype["GetParaPr"]              = ApiParagraph.prototype.GetParaPr;
     ApiParagraph.prototype["GetNumbering"]           = ApiParagraph.prototype.GetNumbering;
@@ -4338,6 +4434,7 @@
     ApiShape.prototype["GetClassType"]               = ApiShape.prototype.GetClassType;
     ApiShape.prototype["GetDocContent"]              = ApiShape.prototype.GetDocContent;
     ApiShape.prototype["SetVerticalTextAlign"]       = ApiShape.prototype.SetVerticalTextAlign;
+    ApiShape.prototype["SetPaddings"]                = ApiShape.prototype.SetPaddings;
 
     ApiChart.prototype["GetClassType"]               = ApiChart.prototype.GetClassType;
     ApiChart.prototype["SetTitle"]                   = ApiChart.prototype.SetTitle;

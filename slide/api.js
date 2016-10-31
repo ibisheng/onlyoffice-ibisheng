@@ -1826,7 +1826,7 @@ background-repeat: no-repeat;\
 	{
 		if (window["AscDesktopEditor"])
 		{
-			window["AscDesktopEditor"]["Copy"]();
+		    window["asc_desktop_copypaste"](this, "Copy");
 			return true;
 		}
 		return AscCommon.g_clipboardBase.Button_Copy();
@@ -1839,7 +1839,7 @@ background-repeat: no-repeat;\
 	{
 		if (window["AscDesktopEditor"])
 		{
-			window["AscDesktopEditor"]["Cut"]();
+		    window["asc_desktop_copypaste"](this, "Cut");
 			return true;
 		}
 		return AscCommon.g_clipboardBase.Button_Cut();
@@ -1848,7 +1848,7 @@ background-repeat: no-repeat;\
 	{
 		if (window["AscDesktopEditor"])
 		{
-			window["AscDesktopEditor"]["Paste"]();
+		    window["asc_desktop_copypaste"](this, "Paste");
 			return true;
 		}
 		
@@ -2059,8 +2059,8 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.Resize                       = function()
 	{
-		if (false === this.bInit_word_control)
-			return;
+		//if (false === this.bInit_word_control)
+		//	return;
 		this.WordControl.OnResize(false);
 	};
 	asc_docs_api.prototype.AddURL                       = function(url)
@@ -3960,6 +3960,17 @@ background-repeat: no-repeat;\
 			else
 			{
 				this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+
+				if (window["AscDesktopEditor"])
+                {
+                    var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](sImageUrl);
+                    _url     = g_oDocumentUrls.getImageUrl(_url);
+                    ImagePr.ImageUrl = _url;
+                    fApplyCallback();
+                    this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+                    return;
+                }
+
 				this.fCurCallback = function(input)
 				{
 					if (null != input && "imgurl" == input["type"])
@@ -4093,8 +4104,10 @@ background-repeat: no-repeat;\
 		}
 		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(type, objects);
 	};
-	asc_docs_api.prototype.sync_MathPropCallback  = function(mathProp)
+
+	asc_docs_api.prototype.sync_MathPropCallback = function(MathProp)
 	{
+		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(c_oAscTypeSelectElement.Math, MathProp);
 	};
 
 	asc_docs_api.prototype.SetDrawingFreeze = function(bIsFreeze)
@@ -4755,7 +4768,11 @@ background-repeat: no-repeat;\
 				this.WordControl.m_oLayoutDrawer.HeightMM = presentation.Height;
 				this.WordControl.m_oMasterDrawer.WidthMM  = presentation.Width;
 				this.WordControl.m_oMasterDrawer.HeightMM = presentation.Height;
-				this.WordControl.m_oLogicDocument.GenerateThumbnails(this.WordControl.m_oMasterDrawer, this.WordControl.m_oLayoutDrawer);
+
+				if(!window['native'])
+				{
+					this.WordControl.m_oLogicDocument.GenerateThumbnails(this.WordControl.m_oMasterDrawer, this.WordControl.m_oLayoutDrawer);
+				}
 
 				var _masters = this.WordControl.m_oLogicDocument.slideMasters;
 				for (var i = 0; i < _masters.length; i++)
@@ -4828,6 +4845,7 @@ background-repeat: no-repeat;\
 		if (!this.isViewMode)
 		{
 			this.sendStandartTextures();
+			this.sendMathToMenu();
 			if (this.shapeElementId)
 			{
 				this.WordControl.m_oDrawingDocument.InitGuiCanvasShape(this.shapeElementId);
@@ -4840,6 +4858,45 @@ background-repeat: no-repeat;\
 		// Меняем тип состояния (на никакое)
 		this.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.None;
 	};
+
+
+	asc_docs_api.prototype.asc_AddMath = function(Type)
+	{
+		var loader   = AscCommon.g_font_loader;
+		var fontinfo = g_fontApplication.GetFontInfo("Cambria Math");
+		var isasync  = loader.LoadFont(fontinfo);
+		if (false === isasync)
+		{
+			return this.asc_AddMath2(Type);
+		}
+		else
+		{
+			this.asyncMethodCallback = function()
+			{
+				return this.asc_AddMath2(Type);
+			}
+		}
+	};
+
+	asc_docs_api.prototype.asc_AddMath2 = function(Type)
+	{
+		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+		{
+			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddMath);
+			var MathElement = new AscCommonWord.MathMenu(Type);
+			this.WordControl.m_oLogicDocument.Paragraph_Add(MathElement, false);
+		}
+	};
+
+	//----------------------------------------------------------------------------------------------------------------------
+	// Работаем с формулами
+	//----------------------------------------------------------------------------------------------------------------------
+	asc_docs_api.prototype.asc_SetMathProps = function(MathProps)
+	{
+		this.WordControl.m_oLogicDocument.Set_MathProps(MathProps);
+	};
+
+
 
 	asc_docs_api.prototype.asyncFontEndLoaded = function(fontinfo)
 	{
@@ -5017,7 +5074,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.SetMobileVersion = function(val)
 	{
 		this.isMobileVersion = val;
-		if (this.isMobileVersion)
+		if (/*this.isMobileVersion*/false)
 		{
 			this.WordControl.bIsRetinaSupport         = false; // ipad имеет проблемы с большими картинками
 			this.WordControl.bIsRetinaNoSupportAttack = true;
@@ -6429,9 +6486,11 @@ background-repeat: no-repeat;\
 		return this.WordControl.m_oDrawingDocument.SlidesCount;
 	};
 
-	window["asc_docs_api"].prototype["asc_nativeGetPDF"] = function()
+	window["asc_docs_api"].prototype["asc_nativeGetPDF"] = function(_param)
 	{
 		var pagescount = this["asc_nativePrintPagesCount"]();
+		if (0x0100 & _param)
+		    pagescount = 1;
 
 		var _renderer                         = new AscCommon.CDocumentRenderer();
 		_renderer.VectorMemoryForPrint        = new AscCommon.CMemory();
@@ -6861,6 +6920,10 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_InputClearKeyboardElement"]       = asc_docs_api.prototype.asc_InputClearKeyboardElement;
 
 	asc_docs_api.prototype["asc_getCurrentFocusObject"]           = asc_docs_api.prototype.asc_getCurrentFocusObject;
+	asc_docs_api.prototype["asc_AddMath"]           			  = asc_docs_api.prototype.asc_AddMath;
+	asc_docs_api.prototype["asc_SetMathProps"]           		  = asc_docs_api.prototype.asc_SetMathProps;
+
+
 
 
 	window['Asc']['asc_CCommentData'] = window['Asc'].asc_CCommentData = asc_CCommentData;

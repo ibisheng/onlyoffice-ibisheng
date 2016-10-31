@@ -4581,13 +4581,57 @@ CellArea.prototype = {
 };
 
 	/** @constructor */
-	function sparklineGroup() {
+	function sparklineGroup(addId) {
 		// attributes
-		this.manualMax = undefined;
-		this.manualMin = undefined;
-		this.lineWeight = 0.75;
-		this.type = Asc.c_oAscSparklineType.Line;
+		this.type = null;
+		this.lineWeight = null;
+		this.displayEmptyCellsAs = null;
+		this.markers = null;
+		this.high = null;
+		this.low = null;
+		this.first = null;
+		this.last = null;
+		this.negative = null;
+		this.displayXAxis = null;
+		this.displayHidden = null;
+		this.minAxisType = null;
+		this.maxAxisType = null;
+		this.rightToLeft = null;
+		this.manualMax = null;
+		this.manualMin = null;
+
 		this.dateAxis = false;
+
+		// elements
+		this.colorSeries = null;
+		this.colorNegative = null;
+		this.colorAxis = null;
+		this.colorMarkers = null;
+		this.colorFirst = null;
+		this.colorLast = null;
+		this.colorHigh = null;
+		this.colorLow = null;
+
+		this.f = null;
+		this.arrSparklines = [];
+		this.arrCachedSparklines = [];
+
+		//for drawing preview
+		this.canvas = null;
+		this.sparklineView = null;
+
+		this.Id = null;
+		if (addId) {
+			this.Id = AscCommon.g_oIdCounter.Get_NewId();
+			AscCommon.g_oTableId.Add(this, this.Id);
+		}
+	}
+	sparklineGroup.prototype.Get_Id = function () {
+		return this.Id;
+	};
+	sparklineGroup.prototype.default = function () {
+		this.type = Asc.c_oAscSparklineType.Line;
+		this.lineWeight = 0.75;
 		this.displayEmptyCellsAs = Asc.c_oAscEDispBlanksAs.Zero;
 		this.markers = false;
 		this.high = false;
@@ -4600,29 +4644,58 @@ CellArea.prototype = {
 		this.minAxisType = Asc.c_oAscSparklineAxisMinMax.Individual;
 		this.maxAxisType = Asc.c_oAscSparklineAxisMinMax.Individual;
 		this.rightToLeft = false;
+		this.manualMax = null;
+		this.manualMin = null;
 
 		// elements
-		this.colorSeries = null;
-		this.colorNegative = null;
-		this.colorAxis = null;
-		this.colorMarkers = null;
-		this.colorFirst = null;
-		this.colorLast = null;
-		this.colorHigh = null;
-		this.colorLow = null;
-		this.f = null;
-		this.arrSparklines = [];
-		this.arrCachedSparklines = [];
+		var defaultSeriesColor = 3629202;
+		var defaultOtherColor = 13631488;
 
-		//for drawing preview
-		this.canvas = null;
-		this.sparklineView = null;
-	}
+		this.colorSeries = new AscCommonExcel.RgbColor(defaultSeriesColor);
+		this.colorNegative = new AscCommonExcel.RgbColor(defaultOtherColor);
+		this.colorAxis = new AscCommonExcel.RgbColor(defaultOtherColor);
+		this.colorMarkers = new AscCommonExcel.RgbColor(defaultOtherColor);
+		this.colorFirst = new AscCommonExcel.RgbColor(defaultOtherColor);
+		this.colorLast = new AscCommonExcel.RgbColor(defaultOtherColor);
+		this.colorHigh = new AscCommonExcel.RgbColor(defaultOtherColor);
+		this.colorLow = new AscCommonExcel.RgbColor(defaultOtherColor);
+	};
+	sparklineGroup.prototype.set = function (val) {
+		this.lineWeight = null !== val.lineWeight ? val.lineWeight : this.lineWeight;
+		this.type = null !== val.type ? val.type : this.type;
+		this.dateAxis = null !== val.dateAxis ? val.dateAxis : this.dateAxis;
+		this.displayEmptyCellsAs = null !== val.displayEmptyCellsAs ? val.displayEmptyCellsAs : this.displayEmptyCellsAs;
+		this.markers = null !== val.markers ? val.markers : this.markers;
+		this.high = null !== val.high ? val.high : this.high;
+		this.low = null !== val.low ? val.low : this.low;
+		this.first = null !== val.first ? val.first : this.first;
+		this.last = null !== val.last ? val.last : this.last;
+		this.negative = null !== val.negative ? val.negative : this.negative;
+		this.displayXAxis = null !== val.displayXAxis ? val.displayXAxis : this.displayXAxis;
+		this.displayHidden = null !== val.displayHidden ? val.displayHidden : this.displayHidden;
+		this.minAxisType = null !== val.minAxisType ? val.minAxisType : this.minAxisType;
+		this.maxAxisType = null !== val.maxAxisType ? val.maxAxisType : this.maxAxisType;
+		this.rightToLeft = null !== val.rightToLeft ? val.rightToLeft : this.rightToLeft;
+		this.manualMax = null !== val.manualMax ? val.manualMax : this.manualMax;
+		this.manualMin = null !== val.manualMin ? val.manualMin : this.manualMin;
 
-	sparklineGroup.prototype.clone = function (bNoCloneSparklines) {
-		var res = new sparklineGroup();
-		res.manualMax = this.manualMax;
-		res.manualMin = this.manualMin;
+		var getColor = function (color) {
+			return color instanceof Asc.asc_CColor ? AscCommonExcel.CorrectAscColor(color) : color;
+		};
+		this.colorSeries = null !== val.colorSeries ? getColor(val.colorSeries) : this.colorSeries;
+		this.colorNegative = null !== val.colorNegative ? getColor(val.colorNegative) : this.colorNegative;
+		this.colorAxis = null !== val.colorAxis ? getColor(val.colorAxis) : this.colorAxis;
+		this.colorMarkers = null !== val.colorMarkers ? getColor(val.colorMarkers) : this.colorMarkers;
+		this.colorFirst = null !== val.colorFirst ? getColor(val.colorFirst) : this.colorFirst;
+		this.colorLast = null !== val.colorLast ? getColor(val.colorLast) : this.colorLast;
+		this.colorHigh = null !== val.colorHigh ? getColor(val.colorHigh) : this.colorHigh;
+		this.colorLow = null !== val.colorLow ? getColor(val.colorLow) : this.colorLow;
+
+		this.cleanCache();
+	};
+	sparklineGroup.prototype.clone = function (onlyProps) {
+		var res = new sparklineGroup(!onlyProps);
+		res.Id = this.Id;
 		res.lineWeight = this.lineWeight;
 		res.type = this.type;
 		res.dateAxis = this.dateAxis;
@@ -4638,23 +4711,25 @@ CellArea.prototype = {
 		res.minAxisType = this.minAxisType;
 		res.maxAxisType = this.maxAxisType;
 		res.rightToLeft = this.rightToLeft;
+		res.manualMax = this.manualMax;
+		res.manualMin = this.manualMin;
 
 		res.colorSeries = this.colorSeries ? this.colorSeries.clone() : null;
 		res.colorNegative = this.colorNegative ? this.colorNegative.clone() : null;
-		res.colorAxis = this.colorAxis ? this.colorAxis : null;
-		res.colorMarkers = this.colorMarkers ? this.colorMarkers : null;
-		res.colorFirst = this.colorFirst ? this.colorFirst : null;
-		res.colorLast = this.colorLast ? this.colorLast : null;
-		res.colorHigh = this.colorHigh ? this.colorHigh : null;
-		res.colorLow = this.colorLow ? this.colorLow : null;
+		res.colorAxis = this.colorAxis ? this.colorAxis.clone() : null;
+		res.colorMarkers = this.colorMarkers ? this.colorMarkers.clone() : null;
+		res.colorFirst = this.colorFirst ? this.colorFirst.clone() : null;
+		res.colorLast = this.colorLast ? this.colorLast.clone() : null;
+		res.colorHigh = this.colorHigh ? this.colorHigh.clone() : null;
+		res.colorLow = this.colorLow ? this.colorLow.clone() : null;
 		res.f = this.f;
 
-		if(bNoCloneSparklines) {
-			return res;
+		if (!onlyProps) {
+			for (var i = 0; i < this.arrSparklines.length; ++i) {
+				res.arrSparklines.push(this.arrSparklines[i].clone());
+			}
 		}
-		for (var i = 0; i < this.arrSparklines.length; ++i) {
-			res.arrSparklines.push(this.arrSparklines[i].clone());
-		}
+
 		return res;
 	};
 	sparklineGroup.prototype.addView = function (oSparklineView, index) {
@@ -4692,6 +4767,9 @@ CellArea.prototype = {
 			}
 		}
 		return -1;
+	};
+	sparklineGroup.prototype.asc_getId = function () {
+		return this.Id;
 	};
 	sparklineGroup.prototype.asc_getType = function () {
 		return this.type;
@@ -4735,6 +4813,12 @@ CellArea.prototype = {
 	sparklineGroup.prototype.asc_getRightToLeft = function () {
 		return this.rightToLeft;
 	};
+	sparklineGroup.prototype.asc_getManualMax = function () {
+		return this.manualMax;
+	};
+	sparklineGroup.prototype.asc_getManualMin = function () {
+		return this.manualMin;
+	};
 	sparklineGroup.prototype.asc_getColorSeries = function () {
 		return this.colorSeries ? Asc.colorObjToAscColor(this.colorSeries) : this.colorSeries;
 	};
@@ -4759,6 +4843,78 @@ CellArea.prototype = {
 	sparklineGroup.prototype.asc_getColorLow = function () {
 		return this.colorLow ? Asc.colorObjToAscColor(this.colorLow) : this.colorLow;
 	};
+	sparklineGroup.prototype.asc_setType = function (val) {
+		this.type = val;
+	};
+	sparklineGroup.prototype.asc_setLineWeight = function (val) {
+		this.lineWeight = val;
+	};
+	sparklineGroup.prototype.asc_setDisplayEmpty = function (val) {
+		this.displayEmptyCellsAs = val;
+	};
+	sparklineGroup.prototype.asc_setMarkersPoint = function (val) {
+		this.markers = val;
+	};
+	sparklineGroup.prototype.asc_setHighPoint = function (val) {
+		this.high = val;
+	};
+	sparklineGroup.prototype.asc_setLowPoint = function (val) {
+		this.low = val;
+	};
+	sparklineGroup.prototype.asc_setFirstPoint = function (val) {
+		this.first = val;
+	};
+	sparklineGroup.prototype.asc_setLastPoint = function (val) {
+		this.last = val;
+	};
+	sparklineGroup.prototype.asc_setNegativePoint = function (val) {
+		this.negative = val;
+	};
+	sparklineGroup.prototype.asc_setDisplayXAxis = function (val) {
+		this.displayXAxis = val;
+	};
+	sparklineGroup.prototype.asc_setDisplayHidden = function (val) {
+		this.displayHidden = val;
+	};
+	sparklineGroup.prototype.asc_setMinAxisType = function (val) {
+		this.minAxisType = val;
+	};
+	sparklineGroup.prototype.asc_setMaxAxisType = function (val) {
+		this.maxAxisType = val;
+	};
+	sparklineGroup.prototype.asc_setRightToLeft = function (val) {
+		this.rightToLeft = val;
+	};
+	sparklineGroup.prototype.asc_setManualMax = function (val) {
+		this.manualMax = val;
+	};
+	sparklineGroup.prototype.asc_setManualMin = function (val) {
+		this.manualMin = val;
+	};
+	sparklineGroup.prototype.asc_setColorSeries = function (val) {
+		this.colorSeries = val;
+	};
+	sparklineGroup.prototype.asc_setColorNegative = function (val) {
+		this.colorNegative = val;
+	};
+	sparklineGroup.prototype.asc_setColorAxis = function (val) {
+		this.colorAxis = val;
+	};
+	sparklineGroup.prototype.asc_setColorMarkers = function (val) {
+		this.colorMarkers = val;
+	};
+	sparklineGroup.prototype.asc_setColorFirst = function (val) {
+		this.colorFirst = val;
+	};
+	sparklineGroup.prototype.asc_setColorLast = function (val) {
+		this.colorLast = val;
+	};
+	sparklineGroup.prototype.asc_setColorHigh = function (val) {
+		this.colorHigh = val;
+	};
+	sparklineGroup.prototype.asc_setColorLow = function (val) {
+		this.colorLow = val;
+	};
 
 	sparklineGroup.prototype.createExcellColor = function(aColor) {
 		var oExcellColor = null;
@@ -4773,10 +4929,10 @@ CellArea.prototype = {
 		return oExcellColor;
 	};
 
-	sparklineGroup.prototype.asc_createSparklineGroupByStyle = function(nStyleIndex){
+	sparklineGroup.prototype.asc_createSparklineGroupByStyle = function (nStyleIndex) {
 		var oSparklineGroup = this.clone(true);
 		var oStyle = AscFormat.aSparklinesStyles[nStyleIndex];
-		if(oStyle) {
+		if (oStyle) {
 			oSparklineGroup.colorSeries = this.createExcellColor(oStyle[0]);
 			oSparklineGroup.colorNegative = this.createExcellColor(oStyle[1]);
 			oSparklineGroup.colorAxis = this.createExcellColor(0xff000000);
@@ -4808,27 +4964,6 @@ CellArea.prototype = {
 	};
 
 	sparklineGroup.prototype.asc_getThumbBySparklineGroup = function(oSparklineGroup){
-	//	if(!this.sparklineView){
-			this.sparklineView = new AscFormat.CSparklineView();
-			var oSparkline = new sparkline();
-			oSparkline.oCache = this.generateCache();
-			this.sparklineView.initFromSparkline(oSparkline, oSparklineGroup, null);
-			var api_sheet = Asc['editor'];
-
-			AscFormat.ExecuteNoHistory(
-				function () {
-					this.sparklineView.chartSpace.setWorksheet(api_sheet.wb.getWorksheet().model);
-				}, this, []);
-
-			this.sparklineView.chartSpace.extX = 100;
-			this.sparklineView.chartSpace.extY = 100;
-			this.sparklineView.chartSpace.x = 0;
-			this.sparklineView.chartSpace.x = 0;
-			AscFormat.ExecuteNoHistory(function () {
-				AscFormat.CheckSpPrXfrm(this.sparklineView.chartSpace);
-			}, this, []);
-			this.sparklineView.chartSpace.recalculate();
-	//	}
 		if(!this.canvas) {
 			this.canvas = document.createElement('canvas');
 			if(AscCommon.AscBrowser.isRetina) {
@@ -4840,6 +4975,57 @@ CellArea.prototype = {
 				this.canvas.height = 50;
 			}
 		}
+	//	if(!this.sparklineView){
+			this.sparklineView = new AscFormat.CSparklineView();
+			var oSparkline = new sparkline();
+			oSparkline.oCache = this.generateCache();
+			this.sparklineView.initFromSparkline(oSparkline, oSparklineGroup, null, true);
+			var api_sheet = Asc['editor'];
+
+			AscFormat.ExecuteNoHistory(
+				function () {
+					this.sparklineView.chartSpace.setWorksheet(api_sheet.wb.getWorksheet().model);
+				}, this, []);
+
+			this.sparklineView.chartSpace.extX = 100;
+			this.sparklineView.chartSpace.extY = 100;
+			this.sparklineView.chartSpace.x = 0;
+			this.sparklineView.chartSpace.y = 0;
+			if(oSparklineGroup.type === Asc.c_oAscSparklineType.Stacked){
+				AscFormat.ExecuteNoHistory(function(){
+					var oPlotArea = this.sparklineView.chartSpace.chart.plotArea;
+					if(!oPlotArea.layout){
+						oPlotArea.setLayout(new AscFormat.CLayout());
+					}
+					var fPos = 0.32;
+					oPlotArea.layout.setWMode(AscFormat.LAYOUT_MODE_FACTOR);
+					oPlotArea.layout.setW(1.0);
+					oPlotArea.layout.setHMode(AscFormat.LAYOUT_MODE_FACTOR);
+					oPlotArea.layout.setH(1 - 2*fPos);
+					oPlotArea.layout.setYMode(AscFormat.LAYOUT_MODE_EDGE);
+					oPlotArea.layout.setY(fPos);
+				}, this, []);
+			}
+		if(oSparklineGroup.type === Asc.c_oAscSparklineType.Line){
+			AscFormat.ExecuteNoHistory(function(){
+				var oPlotArea = this.sparklineView.chartSpace.chart.plotArea;
+				if(!oPlotArea.layout){
+					oPlotArea.setLayout(new AscFormat.CLayout());
+				}
+				var fPos = 0.16;
+				oPlotArea.layout.setWMode(AscFormat.LAYOUT_MODE_FACTOR);
+				oPlotArea.layout.setW(1 - fPos);
+				oPlotArea.layout.setHMode(AscFormat.LAYOUT_MODE_FACTOR);
+				oPlotArea.layout.setH(1 - fPos);
+			}, this, []);
+		}
+			AscFormat.ExecuteNoHistory(function () {
+				AscFormat.CheckSpPrXfrm(this.sparklineView.chartSpace);
+			}, this, []);
+			this.sparklineView.chartSpace.recalculate();
+			this.sparklineView.chartSpace.brush = AscFormat.CreateSolidFillRGBA(0xFF, 0xFF, 0xFF, 0xFF);
+	//	}
+
 		var oGraphics = new AscCommon.CGraphics();
 		oGraphics.init(this.canvas.getContext('2d'), this.canvas.width, this.canvas.height, this.sparklineView.chartSpace.extX, this.sparklineView.chartSpace.extY);
 		oGraphics.m_oFontManager = AscCommon.g_fontManager;
@@ -4876,35 +5062,33 @@ CellArea.prototype = {
         return true;
     };
 
-	sparklineGroup.prototype.asc_getStyles = function()
-	{
+	sparklineGroup.prototype.asc_getStyles = function () {
 		var aRet = [];
-        var nStyleIndex = -1;
-		for(var i = 0; i < 36; ++i){
+		var nStyleIndex = -1;
+		for (var i = 0; i < 36; ++i) {
 			var oSparklineGroup = this.asc_createSparklineGroupByStyle(i);
-            if(nStyleIndex === -1 && this.isEqualColors(oSparklineGroup)){
-                nStyleIndex = i;
-            }
+			if (nStyleIndex === -1 && this.isEqualColors(oSparklineGroup)) {
+				nStyleIndex = i;
+			}
 			aRet.push(this.asc_getThumbBySparklineGroup(oSparklineGroup));
 		}
-        aRet.push(nStyleIndex);
+		aRet.push(nStyleIndex);
 		return aRet;
 	};
 
-
-    sparklineGroup.prototype.asc_setStyle = function(nStyleIndex){
-        var oStyle = AscFormat.aSparklinesStyles[nStyleIndex];
-        if(oStyle) {
-            this.colorSeries = this.createExcellColor(oStyle[0]);
-            this.colorNegative = this.createExcellColor(oStyle[1]);
-            this.colorAxis = this.createExcellColor(0xff000000);
-            this.colorMarkers = this.createExcellColor(oStyle[2]);
-            this.colorFirst = this.createExcellColor(oStyle[3]);
-            this.colorLast = this.createExcellColor(oStyle[4]);
-            this.colorHigh = this.createExcellColor(oStyle[5]);
-            this.colorLow = this.createExcellColor(oStyle[6]);
-        }
-    };
+	sparklineGroup.prototype.asc_setStyle = function (nStyleIndex) {
+		var oStyle = AscFormat.aSparklinesStyles[nStyleIndex];
+		if (oStyle) {
+			this.colorSeries = this.createExcellColor(oStyle[0]);
+			this.colorNegative = this.createExcellColor(oStyle[1]);
+			this.colorAxis = this.createExcellColor(0xff000000);
+			this.colorMarkers = this.createExcellColor(oStyle[2]);
+			this.colorFirst = this.createExcellColor(oStyle[3]);
+			this.colorLast = this.createExcellColor(oStyle[4]);
+			this.colorHigh = this.createExcellColor(oStyle[5]);
+			this.colorLow = this.createExcellColor(oStyle[6]);
+		}
+	};
 	/** @constructor */
 	function sparkline() {
 		this.sqref = null;
@@ -6281,7 +6465,6 @@ CustomFilter.prototype.isHideValue = function(val) {
 	{
 		var isNumberFilter = this.Operator == c_oAscCustomAutoFilter.isGreaterThan || this.Operator == c_oAscCustomAutoFilter.isGreaterThanOrEqualTo || this.Operator == c_oAscCustomAutoFilter.isLessThan || this.Operator == c_oAscCustomAutoFilter.isLessThanOrEqualTo;
 		
-		
 		if(c_oAscCustomAutoFilter.equals === this.Operator || c_oAscCustomAutoFilter.doesNotEqual === this.Operator)
 		{
 			filterVal = isNaN(this.Val) ? this.Val.toLowerCase() : this.Val;
@@ -6290,10 +6473,10 @@ CustomFilter.prototype.isHideValue = function(val) {
 		{
 			if(isNaN(this.Val))
 			{
-				return !result;
+				filterVal =  this.Val;
 			}
 			else
-			{	
+			{
 				filterVal =  parseFloat(this.Val);
 				val = parseFloat(val);
 			}
@@ -7194,8 +7377,9 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].RangeDataManagerElem = RangeDataManagerElem;
 	window['AscCommonExcel'].RangeDataManager = RangeDataManager;
 	window['AscCommonExcel'].CellArea = CellArea;
-	window['AscCommonExcel'].sparklineGroup = sparklineGroup;
+	window["Asc"]["sparklineGroup"] = window['AscCommonExcel'].sparklineGroup = sparklineGroup;
 	prot = sparklineGroup.prototype;
+	prot["asc_getId"]							= prot.asc_getId;
 	prot["asc_getType"]						= prot.asc_getType;
 	prot["asc_getLineWeight"]			= prot.asc_getLineWeight;
 	prot["asc_getDisplayEmpty"]		= prot.asc_getDisplayEmpty;
@@ -7210,6 +7394,8 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	prot["asc_getMinAxisType"]		= prot.asc_getMinAxisType;
 	prot["asc_getMaxAxisType"]		= prot.asc_getMaxAxisType;
 	prot["asc_getRightToLeft"]		= prot.asc_getRightToLeft;
+	prot["asc_getManualMax"]			= prot.asc_getManualMax;
+	prot["asc_getManualMin"]			= prot.asc_getManualMin;
 	prot["asc_getColorSeries"]		= prot.asc_getColorSeries;
 	prot["asc_getColorNegative"]	= prot.asc_getColorNegative;
 	prot["asc_getColorAxis"]			= prot.asc_getColorAxis;
@@ -7218,6 +7404,30 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	prot["asc_getColorLast"]			= prot.asc_getColorLast;
 	prot["asc_getColorHigh"]			= prot.asc_getColorHigh;
 	prot["asc_getColorLow"]				= prot.asc_getColorLow;
+	prot["asc_setType"]						= prot.asc_setType;
+	prot["asc_setLineWeight"]			= prot.asc_setLineWeight;
+	prot["asc_setDisplayEmpty"]		= prot.asc_setDisplayEmpty;
+	prot["asc_setMarkersPoint"]		= prot.asc_setMarkersPoint;
+	prot["asc_setHighPoint"]			= prot.asc_setHighPoint;
+	prot["asc_setLowPoint"]				= prot.asc_setLowPoint;
+	prot["asc_setFirstPoint"]			= prot.asc_setFirstPoint;
+	prot["asc_setLastPoint"]			= prot.asc_setLastPoint;
+	prot["asc_setNegativePoint"]	= prot.asc_setNegativePoint;
+	prot["asc_setDisplayXAxis"]		= prot.asc_setDisplayXAxis;
+	prot["asc_setDisplayHidden"]	= prot.asc_setDisplayHidden;
+	prot["asc_setMinAxisType"]		= prot.asc_setMinAxisType;
+	prot["asc_setMaxAxisType"]		= prot.asc_setMaxAxisType;
+	prot["asc_setRightToLeft"]		= prot.asc_setRightToLeft;
+	prot["asc_setManualMax"]			= prot.asc_setManualMax;
+	prot["asc_setManualMin"]			= prot.asc_setManualMin;
+	prot["asc_setColorSeries"]		= prot.asc_setColorSeries;
+	prot["asc_setColorNegative"]	= prot.asc_setColorNegative;
+	prot["asc_setColorAxis"]			= prot.asc_setColorAxis;
+	prot["asc_setColorMarkers"]		= prot.asc_setColorMarkers;
+	prot["asc_setColorFirst"]			= prot.asc_setColorFirst;
+	prot["asc_setColorLast"]			= prot.asc_setColorLast;
+	prot["asc_setColorHigh"]			= prot.asc_setColorHigh;
+	prot["asc_setColorLow"]				= prot.asc_setColorLow;
 	prot["asc_createSparklineGroupByStyle"]				= prot.asc_createSparklineGroupByStyle;
 	prot["asc_getThumbBySparklineGroup"]				= prot.asc_getThumbBySparklineGroup;
 	prot["asc_getStyles"]				= prot.asc_getStyles;
@@ -7237,7 +7447,7 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].getShortDateFormat = getShortDateFormat;
   window['AscCommonExcel'].getCurrencyFormatSimple = getCurrencyFormatSimple;
   window['AscCommonExcel'].getCurrencyFormat = getCurrencyFormat;
-	
+
 window["Asc"]["CustomFilters"]			= window["Asc"].CustomFilters = CustomFilters;
 prot									= CustomFilters.prototype;
 prot["asc_getAnd"]						= prot.asc_getAnd;

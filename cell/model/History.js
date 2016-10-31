@@ -174,6 +174,12 @@ CHistory.prototype.init = function(workbook) {
 CHistory.prototype.Is_UserSaveMode = function() {
   return this.UserSaveMode;
 };
+CHistory.prototype.Is_Clear = function() {
+    if ( this.Points.length <= 0 )
+        return true;
+
+    return false;
+};
 CHistory.prototype.Clear = function()
 {
 	this.Index         = -1;
@@ -240,15 +246,14 @@ CHistory.prototype.UndoRedoPrepare = function (oRedoObjectParam, bUndo) {
 	else
 		this.workbook.bRedoChanges = true;
 
-	if(!window["NATIVE_EDITOR_ENJINE"]) {
+	if (!window["NATIVE_EDITOR_ENJINE"]) {
 		var wsViews = Asc["editor"].wb.wsViews;
 		for (var i = 0; i < wsViews.length; ++i) {
-			if (wsViews[i] && wsViews[i].objectRender && wsViews[i].objectRender.controller) {
-				wsViews[i].objectRender.controller.resetSelection(undefined, true);
-			}
-			if (wsViews[i] && wsViews[i].isChartAreaEditMode ) {
-				wsViews[i].isChartAreaEditMode = false;
-				wsViews[i].arrActiveChartsRanges = [];
+			if (wsViews[i]) {
+				if (wsViews[i].objectRender && wsViews[i].objectRender.controller) {
+					wsViews[i].objectRender.controller.resetSelection(undefined, true);
+				}
+				wsViews[i].endEditChart();
 			}
 		}
 	}
@@ -373,7 +378,7 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 		}
 
 		for (i in Point.UpdateRigions)
-			this.workbook.handlers.trigger("cleanCellCache", i, {'0': Point.UpdateRigions[i]}, false, true, oRedoObjectParam.bAddRemoveRowCol);
+			this.workbook.handlers.trigger("cleanCellCache", i, {'0': Point.UpdateRigions[i]}, true, oRedoObjectParam.bAddRemoveRowCol);
 
 		for (i in oRedoObjectParam.oChangeWorksheetUpdate)
 			this.workbook.handlers.trigger("changeWorksheetUpdate",
@@ -619,12 +624,13 @@ CHistory.prototype.Create_NewPoint = function()
 	var UpdateRigions = {};
 	var Time  = new Date().getTime();
 	var UndoSheetId = null, oSelectionState = this.workbook.handlers.trigger("getSelectionState");
-
-	// ToDo Берем всегда, т.к. в случае с LastState мы можем не попасть на нужный лист и не заселектить нужный диапазон!
-	var oSelectRange = this.workbook.handlers.trigger("getSelection");
+	var oSelectRange = null;
 	var wsActive = this.workbook.getWorksheet(this.workbook.getActive());
-	if (wsActive)
+	if (wsActive) {
 		UndoSheetId = wsActive.getId();
+		// ToDo Берем всегда, т.к. в случае с LastState мы можем не попасть на нужный лист и не заселектить нужный диапазон!
+		oSelectRange = wsActive.selectionRange.getLast(); // ToDo get only last selection range
+	}
 
     // Создаем новую точку
     this.Points[++this.Index] = {
@@ -709,7 +715,7 @@ CHistory.prototype._sendCanUndoRedo = function()
 {
 	this.workbook.handlers.trigger("setCanUndo", this.Can_Undo());
 	this.workbook.handlers.trigger("setCanRedo", this.Can_Redo());
-	this.workbook.handlers.trigger("setDocumentModified", this.Is_Modified());
+	this.workbook.handlers.trigger("setDocumentModified", this.Have_Changes());
 };
 CHistory.prototype.SetSelection = function(range)
 {
@@ -835,7 +841,7 @@ CHistory.prototype.Get_DeleteIndex = function () {
 	return DeleteIndex;
 };
 /** @returns {boolean} */
-CHistory.prototype.Is_Modified = function(IsNotUserSave) {
+CHistory.prototype.Have_Changes = function(IsNotUserSave) {
   var checkIndex = (this.Is_UserSaveMode() && !IsNotUserSave) ? this.UserSavedIndex : this.SavedIndex;
   if (-1 === this.Index && null === checkIndex && false === this.ForceSave) {
     return false;

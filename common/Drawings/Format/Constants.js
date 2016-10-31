@@ -2251,10 +2251,11 @@
 	window['AscDFH'].historyitem_State_Table           = 4;
 
 	// Типы произошедших изменений
-	window['AscDFH'].historyitem_recalctype_Inline  = 0; // Изменения произошли в обычном тексте (с верхним классом CDocument)
-	window['AscDFH'].historyitem_recalctype_Flow    = 1; // Изменения произошли в "плавающем" объекте
-	window['AscDFH'].historyitem_recalctype_HdrFtr  = 2; // Изменения произошли в колонтитуле
-	window['AscDFH'].historyitem_recalctype_Drawing = 3; // Изменения произошли в drawing'е
+	window['AscDFH'].historyitem_recalctype_Inline   = 0; // Изменения произошли в обычном тексте (с верхним классом CDocument)
+	window['AscDFH'].historyitem_recalctype_Flow     = 1; // Изменения произошли в "плавающем" объекте
+	window['AscDFH'].historyitem_recalctype_HdrFtr   = 2; // Изменения произошли в колонтитуле
+	window['AscDFH'].historyitem_recalctype_Drawing  = 3; // Изменения произошли в drawing'е
+	window['AscDFH'].historyitem_recalctype_NotesEnd = 4; // Изменение произошли в сносках, которые идут в конце документа
 
 	// Типы классов, в которых происходили изменения (типы нужны для совместного редактирования)
 	window['AscDFH'].historyitem_type_Unknown          = 0;

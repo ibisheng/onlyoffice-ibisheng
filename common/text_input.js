@@ -160,6 +160,8 @@
 		// еще один режим для ie & edge
 		this.IsUseInputEventOnlyWithCtx = (AscCommon.AscBrowser.isIE) ? true : false;
 		this.IsInitialInputContext = false;
+
+		this.IsDisableKeyPress = false;
 	}
 
 	CTextInput.prototype =
@@ -206,6 +208,10 @@
 			this.HtmlArea.setAttribute("style", _style);
 			this.HtmlArea.setAttribute("spellcheck", false);
 
+			this.HtmlArea.setAttribute("autocapitalize", "none");
+            this.HtmlArea.setAttribute("autocomplete", "off");
+            this.HtmlArea.setAttribute("autocorrect", "off");
+
 			this.HtmlDiv.appendChild(this.HtmlArea);
 
 			if (true)
@@ -234,14 +240,32 @@
 			var oThis                   = this;
 			this.HtmlArea["onkeydown"]  = function(e)
 			{
+			    if (AscCommon.AscBrowser.isSafariMacOs)
+                {
+                    var cmdButton = (e.ctrlKey || e.metaKey) ? true : false;
+                    var buttonCode = ((e.keyCode == 67) || (e.keyCode == 88) || (e.keyCode == 86));
+                    if (cmdButton && buttonCode)
+                        oThis.IsDisableKeyPress = true;
+                    else
+                        oThis.IsDisableKeyPress = false;
+                }
 				return oThis.onKeyDown(e);
 			};
 			this.HtmlArea["onkeypress"] = function(e)
 			{
+			    if (oThis.IsDisableKeyPress == true)
+			    {
+			        // macOS Sierra send keypress before copy event
+			        oThis.IsDisableKeyPress = false;
+			        var cmdButton = (e.ctrlKey || e.metaKey) ? true : false;
+			        if (cmdButton)
+                        return;
+			    }
 				return oThis.onKeyPress(e);
 			};
 			this.HtmlArea["onkeyup"]    = function(e)
 			{
+			    oThis.IsDisableKeyPress = false;
 				return oThis.onKeyUp(e);
 			};
 
@@ -314,6 +338,29 @@
 				_elem.style.width  = _width;
 				_elem.style.height = _elemSrc.style.height;
 			}
+
+			if (this.Api.isMobileVersion)
+			{
+			    var _elem1 = document.getElementById("area_id_parent");
+			    var _elem2 = document.getElementById("area_id");
+
+			    _elem1.parentNode.style.pointerEvents = "";
+
+
+                _elem1.style.left = "-100px";
+			    _elem1.style.top = "-100px";
+			    _elem1.style.right = "-100px";
+			    _elem1.style.bottom = "-100px";
+			    _elem1.style.width = "auto";
+                _elem1.style.height = "auto";
+
+			    _elem2.style.left = "0px";
+                _elem2.style.top = "0px";
+                _elem2.style.right = "0px";
+                _elem2.style.bottom = "0px";
+                _elem2.style.width = "100%";
+                _elem2.style.height = "100%";
+			}
 		},
 
 		checkFocus : function()
@@ -327,6 +374,9 @@
 
 		move : function(x, y)
 		{
+		    if (this.Api.isMobileVersion)
+		        return;
+
 			var oTarget = document.getElementById(this.TargetId);
 			var xPos    = x ? x : parseInt(oTarget.style.left);
 			var yPos    = (y ? y : parseInt(oTarget.style.top)) + parseInt(oTarget.style.height);
@@ -1466,6 +1516,7 @@
 
 			ti_console_log("ti: onCompositionEnd -> onCompositionUpdate");
 			this.onCompositionUpdate(e, false, _data, true);
+
 			var _max = this.Api.Get_MaxCursorPosInCompositeText();
 			this.Api.Set_CursorPosInCompositeText(_max); // max
 
@@ -1713,7 +1764,6 @@
 			t.HtmlArea.focus();
 			t.nativeFocusElement = _elem;
 			t.Api.asc_enableKeyEvents(true, true);
-
 		}, true);
 
 		// send focus

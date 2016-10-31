@@ -552,6 +552,7 @@ function CChartSpace()
         dataLbls:      null,
         dataLbl:       null,
         plotArea:      null,
+        rotatePlotArea: null,
         gridLines:     null,
         series:        null,
         datPoint:      null,
@@ -638,6 +639,31 @@ CChartSpace.prototype.drawSelect = function(drawingDocument, nPageIndex)
                 var oLabels = this.selection.axisLbls.labels;
                 drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, this.transform, oLabels.x, oLabels.y, oLabels.extX, oLabels.extY, false, false);
             }
+            else if(this.selection.plotArea)
+            {
+
+                var oChartSize = this.getChartSizes();
+                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, this.transform, oChartSize.startX, oChartSize.startY, oChartSize.w, oChartSize.h, false, false);
+                /*if(!this.selection.rotatePlotArea)
+                {
+                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, this.transform, oChartSize.startX, oChartSize.startY, oChartSize.w, oChartSize.h, false, false);
+                }
+                else
+                {
+                    var arr = [
+                        {x: oChartSize.startX, y: oChartSize.startY},
+                        {x: oChartSize.startX + oChartSize.w/2, y: oChartSize.startY},
+                        {x: oChartSize.startX + oChartSize.w, y: oChartSize.startY},
+                        {x: oChartSize.startX + oChartSize.w, y: oChartSize.startY + oChartSize.h/2},
+                        {x: oChartSize.startX + oChartSize.w, y: oChartSize.startY + oChartSize.h},
+                        {x: oChartSize.startX + oChartSize.w/2, y: oChartSize.startY + oChartSize.h},
+                        {x: oChartSize.startX, y: oChartSize.startY + oChartSize.h},
+                        {x: oChartSize.startX, y: oChartSize.startY + oChartSize.h/2},
+                        {x: oChartSize.startX, y: oChartSize.startY}
+                    ];
+                    drawingDocument.AutoShapesTrack.DrawEditWrapPointsPolygon(arr, this.transform);
+                }*/
+            }
         }
     };
 CChartSpace.prototype.recalculateTextPr = function()
@@ -666,6 +692,7 @@ CChartSpace.prototype.getSelectionState = function()
         dataLbl:          this.selection.dataLbl,
         textSelection:    this.selection.textSelection,
         plotArea:         this.selection.plotArea,
+        rotatePlotArea:         this.selection.rotatePlotArea,
         contentSelection: content_selection,
         recalcTitle: this.recalcInfo.recalcTitle,
         bRecalculatedTitle: this.recalcInfo.bRecalculatedTitle
@@ -679,6 +706,7 @@ CChartSpace.prototype.setSelectionState = function(state)
    this.selection.axisLbls       = state.axisLbls;
    this.selection.dataLbls       = state.dataLbls;
    this.selection.dataLbl        = state.dataLbl;
+   this.selection.rotatePlotArea        = state.rotatePlotArea;
    this.selection.textSelection  = state.textSelection;
    this.selection.plotArea       = state.plotArea;
    if(isRealObject(state.recalcTitle))
@@ -705,6 +733,7 @@ CChartSpace.prototype.loadDocumentStateAfterLoadChanges = function(state)
      this.selection.dataLbls =      null;
      this.selection.dataLbl =       null;
      this.selection.plotArea =      null;
+     this.selection.rotatePlotArea =  null;
      this.selection.gridLine =     null;
      this.selection.series =        null;
      this.selection.datPoint =      null;
@@ -742,6 +771,7 @@ CChartSpace.prototype.resetSelection = function(noResetContentSelect)
     this.selection.dataLbl = null;
     this.selection.textSelection = null;
     this.selection.plotArea = null;
+    this.selection.rotatePlotArea = null;
 };
 CChartSpace.prototype.getStyles = function()
 {
@@ -1075,6 +1105,7 @@ CChartSpace.prototype.selectTitle = function(title, pageIndex)
     this.selection.dataLbl = null;
     this.selection.textSelection = null;
     this.selection.plotArea = null;
+    this.selection.rotatePlotArea = null;
 };
 CChartSpace.prototype.recalculateCurPos = AscFormat.DrawingObjectsController.prototype.recalculateCurPos;
 CChartSpace.prototype.documentUpdateSelectionState = function()
@@ -1683,6 +1714,7 @@ CChartSpace.prototype.clearFormatting = function(bNoClearShapeProps)
         this.selection.dataLbls =      null;
         this.selection.dataLbl =       null;
         this.selection.plotArea =      null;
+        this.selection.rotatePlotArea = null;
         this.selection.gridLine =     null;
         this.selection.series =        null;
         this.selection.datPoint =      null;
@@ -1764,12 +1796,30 @@ CChartSpace.prototype.rebuildSeriesFromAsc = function(asc_chart)
         var  asc_series = asc_chart.series;
         var chart_type = this.chart.plotArea.charts[0];
         var first_series = chart_type.series[0] ? chart_type.series[0] : chart_type.getSeriesConstructor();
-        removeAllSeriesFromChart(chart_type);
+        if(first_series.spPr){
+            first_series.spPr.setFill(null);
+            first_series.spPr.setLn(null);
+        }
+        if(asc_series.length < chart_type.series.length){
+            for(var i = chart_type.series.length - 1; i >= asc_series.length; --i){
+                chart_type.removeSeries(i);
+            }
+        }
         if(chart_type.getObjectType() !== AscDFH.historyitem_type_ScatterChart)
         {
             for(var i = 0; i < asc_series.length; ++i)
             {
-                var series = first_series.createDuplicate();
+                var series = null, bNeedAdd = false;
+                if(chart_type.series[i])
+                {
+                    series = chart_type.series[i];
+                }
+                else
+                {
+                    bNeedAdd = true;
+                    series = first_series.createDuplicate();
+                }
+
                 series.setIdx(i);
                 series.setOrder(i);
                 series.setVal(new AscFormat.CYVal());
@@ -1791,13 +1841,16 @@ CChartSpace.prototype.rebuildSeriesFromAsc = function(asc_chart)
                 {
                     series.setTx(null);
                 }
-                chart_type.addSer(series);
+                if(bNeedAdd)
+                {
+                    chart_type.addSer(series);
+                }
+
             }
         }
         else
         {
             var oXVal;
-            var first_series = null;
             var start_index = 0;
             var minus = 0;
             if(asc_series[0].xVal && asc_series[0].xVal.NumCache && typeof asc_series[0].xVal.Formula === "string" && asc_series[0].xVal.Formula.length > 0)
@@ -8443,15 +8496,23 @@ CChartSpace.prototype.recalculatePlotAreaChartBrush = function()
         }
         else
         {
-            var tint = 0.20000;
-            if(this.style >=1 && this.style <=32)
-                default_brush = CreateUnifillSolidFillSchemeColor(6, tint);
-            else if(this.style >=33 && this.style <= 34)
-                default_brush = CreateUnifillSolidFillSchemeColor(8, 0.20000);
-            else if(this.style >=35 && this.style <=40)
-                default_brush = CreateUnifillSolidFillSchemeColor(this.style - 35, 0 + tint);
-            else
-                default_brush = CreateUnifillSolidFillSchemeColor(8, 0.95000);
+            if(this.chart.plotArea && this.chart.plotArea.charts[0] &&
+                (this.chart.plotArea.charts[0].getObjectType() === AscDFH.historyitem_type_PieChart
+                || this.chart.plotArea.charts[0].getObjectType() === AscDFH.historyitem_type_DoughnutChart))
+            {
+                default_brush = CreateNoFillUniFill();
+            }
+            else {
+                var tint = 0.20000;
+                if(this.style >=1 && this.style <=32)
+                    default_brush = CreateUnifillSolidFillSchemeColor(6, tint);
+                else if(this.style >=33 && this.style <= 34)
+                    default_brush = CreateUnifillSolidFillSchemeColor(8, 0.20000);
+                else if(this.style >=35 && this.style <=40)
+                    default_brush = CreateUnifillSolidFillSchemeColor(this.style - 35, tint);
+                else
+                    default_brush = CreateUnifillSolidFillSchemeColor(8, 0.95000);
+            }
         }
         if(plot_area.spPr && plot_area.spPr.Fill)
         {

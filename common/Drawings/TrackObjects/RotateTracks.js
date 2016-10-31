@@ -596,10 +596,203 @@ function RotateTrackGroup(originalObject)
     }
 }
 
+function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
+{
+    this.chartSpace = oChartSpace;
+    this.numHandle = numHandle;
+
+
+    this.originalObject = oChartSpace;
+    this.originalShape = oChartSpace;
+
+    this.transform = this.originalObject.transform;
+    this.processor3D = oChartSpace.chartObj.processor3D;
+    this.depthPerspective = oChartSpace.chartObj.processor3D.depthPerspective;
+
+    this.startX = oChartSpace.invertTransform.TransformPointX(startX, startY);
+    this.startY = oChartSpace.invertTransform.TransformPointY(startX, startY);
+
+    AscFormat.ExecuteNoHistory(function(){
+        this.view3D = oChartSpace.chart.view3D.createDuplicate();
+        this.chartSizes = this.chartSpace.getChartSizes();
+
+        this.cX = this.chartSizes.startX + this.chartSizes.w/2;
+        this.cY = this.chartSizes.startY + this.chartSizes.h/2;
+        this.geometry = new AscFormat.Geometry();
+        var oPen = new AscFormat.CLn();
+        oPen.w = 50000;
+        oPen.Fill = AscFormat.CreateSolidFillRGBA(0xcc, 0xe5, 0xff, 255);
+        this.objectToDraw = new OverlayObject(this.geometry, oChartSpace.extX, oChartSpace.extY, null, oPen, oChartSpace.transform );
+
+        var oPen2 = new AscFormat.CLn();
+        oPen2.w = 12400;
+        oPen2.Fill = AscFormat.CreateSolidFillRGBA(0, 0, 0, 255);
+        oPen2.prstDash = 0;
+        this.objectToDraw2 = new OverlayObject(this.geometry, oChartSpace.extX, oChartSpace.extY, null, oPen2, oChartSpace.transform );
+
+
+        var pxToMM = this.chartSpace.chartObj.calcProp.pxToMM;
+        var oChSz = this.chartSizes;
+        this.centerPoint = this.processor3D.convertAndTurnPoint((oChSz.startX + oChSz.w/2)*pxToMM, (oChSz.startY + oChSz.h/2)*pxToMM, this.depthPerspective/2);
+    }, this, []);
+
+
+    this.draw = function(overlay, transform)
+    {
+        if(AscFormat.isRealNumber(this.chartSpace.selectStartPage) && overlay.SetCurrentPage)
+        {
+            overlay.SetCurrentPage(this.chartSpace.selectStartPage);
+        }
+        var dOldAlpha = null;
+        var oGraphics = overlay.Graphics ? overlay.Graphics : overlay;
+        if(AscFormat.isRealNumber(oGraphics.globalAlpha) && oGraphics.put_GlobalAlpha){
+            dOldAlpha = oGraphics.globalAlpha;
+            oGraphics.put_GlobalAlpha(false, 1);
+        }
+        this.objectToDraw.draw(overlay, transform);
+        this.objectToDraw2.draw(overlay, transform);
+        if(AscFormat.isRealNumber(dOldAlpha) && oGraphics.put_GlobalAlpha){
+            oGraphics.put_GlobalAlpha(true, dOldAlpha);
+        }
+    };
+
+
+    this.calculateGeometry = function()
+    {
+        AscFormat.ExecuteNoHistory(function(){
+
+            this.geometry.pathLst.length = 0;
+            var path = new AscFormat.Path();
+            path.pathW = this.chartSpace.extX;
+            path.pathH = this.chartSpace.extY;
+            path.stroke  = true;
+            var pxToMM = this.chartSpace.chartObj.calcProp.pxToMM;
+            this.geometry.pathLst.push(path);
+            var oChSz = this.chartSizes;
+
+            var centerPoint2 = this.processor3D.convertAndTurnPoint((oChSz.startX + oChSz.w/2)*pxToMM, (oChSz.startY + oChSz.h/2)*pxToMM, this.depthPerspective/2);
+
+            var deltaX = (this.centerPoint.x - centerPoint2.x)/pxToMM;
+            var deltaY = (this.centerPoint.y - centerPoint2.y)/pxToMM;
+
+            var point1 = this.processor3D.convertAndTurnPoint(oChSz.startX*pxToMM, oChSz.startY*pxToMM, 0);
+            path.moveTo(point1.x/pxToMM + deltaX, point1.y/pxToMM + deltaY);
+            var point2 = this.processor3D.convertAndTurnPoint((oChSz.startX + oChSz.w) *pxToMM, oChSz.startY*pxToMM, 0);
+            path.lnTo(point2.x/pxToMM + deltaX, point2.y/pxToMM + deltaY);
+            var point3 = this.processor3D.convertAndTurnPoint((oChSz.startX + oChSz.w)*pxToMM, (oChSz.startY + oChSz.h)*pxToMM, 0);
+            path.lnTo(point3.x/pxToMM + deltaX, point3.y/pxToMM + deltaY);
+            var point4 = this.processor3D.convertAndTurnPoint((oChSz.startX)*pxToMM, (oChSz.startY + oChSz.h)*pxToMM, 0);
+            path.lnTo(point4.x/pxToMM + deltaX, point4.y/pxToMM + deltaY);
+            path.close();
+
+            var point1d = this.processor3D.convertAndTurnPoint(oChSz.startX*pxToMM, oChSz.startY*pxToMM, this.depthPerspective);
+            path.moveTo(point1d.x/pxToMM + deltaX, point1d.y/pxToMM + deltaY);
+            var point2d = this.processor3D.convertAndTurnPoint((oChSz.startX + oChSz.w) *pxToMM, oChSz.startY*pxToMM, this.depthPerspective);
+            path.lnTo(point2d.x/pxToMM + deltaX, point2d.y/pxToMM + deltaY);
+            var point3d = this.processor3D.convertAndTurnPoint((oChSz.startX + oChSz.w)*pxToMM, (oChSz.startY + oChSz.h)*pxToMM, this.depthPerspective);
+            path.lnTo(point3d.x/pxToMM + deltaX, point3d.y/pxToMM + deltaY);
+            var point4d = this.processor3D.convertAndTurnPoint((oChSz.startX)*pxToMM, (oChSz.startY + oChSz.h)*pxToMM, this.depthPerspective);
+            path.lnTo(point4d.x/pxToMM + deltaX, point4d.y/pxToMM + deltaY);
+            path.close();
+
+            path.moveTo(point1.x/pxToMM + deltaX, point1.y/pxToMM + deltaY);
+            path.lnTo(point1d.x/pxToMM + deltaX, point1d.y/pxToMM + deltaY);
+            path.moveTo(point2.x/pxToMM + deltaX, point2.y/pxToMM + deltaY);
+            path.lnTo(point2d.x/pxToMM + deltaX, point2d.y/pxToMM + deltaY);
+            path.moveTo(point3.x/pxToMM + deltaX, point3.y/pxToMM + deltaY);
+            path.lnTo(point3d.x/pxToMM + deltaX, point3d.y/pxToMM + deltaY);
+            path.moveTo(point4.x/pxToMM + deltaX, point4.y/pxToMM + deltaY);
+            path.lnTo(point4d.x/pxToMM + deltaX, point4d.y/pxToMM + deltaY);
+
+            this.geometry.Recalculate(this.chartSpace.extX, this.chartSpace.extY);
+        }, this, []);
+
+    };
+
+    this.getBounds = function()
+    {
+        var boundsChecker = new  AscFormat.CSlideBoundsChecker();
+        this.draw(boundsChecker);
+        var tr = this.transform;
+        var arr_p_x = [];
+        var arr_p_y = [];
+        arr_p_x.push(tr.TransformPointX(0,0));
+        arr_p_y.push(tr.TransformPointY(0,0));
+        arr_p_x.push(tr.TransformPointX(this.originalObject.extX,0));
+        arr_p_y.push(tr.TransformPointY(this.originalObject.extX,0));
+        arr_p_x.push(tr.TransformPointX(this.originalObject.extX,this.originalObject.extY));
+        arr_p_y.push(tr.TransformPointY(this.originalObject.extX,this.originalObject.extY));
+        arr_p_x.push(tr.TransformPointX(0,this.originalObject.extY));
+        arr_p_y.push(tr.TransformPointY(0,this.originalObject.extY));
+
+        arr_p_x.push(boundsChecker.Bounds.min_x);
+        arr_p_x.push(boundsChecker.Bounds.max_x);
+        arr_p_y.push(boundsChecker.Bounds.min_y);
+        arr_p_y.push(boundsChecker.Bounds.max_y);
+
+        boundsChecker.Bounds.min_x = Math.min.apply(Math, arr_p_x);
+        boundsChecker.Bounds.max_x = Math.max.apply(Math, arr_p_x);
+        boundsChecker.Bounds.min_y = Math.min.apply(Math, arr_p_y);
+        boundsChecker.Bounds.max_y = Math.max.apply(Math, arr_p_y);
+        boundsChecker.Bounds.posX = this.originalObject.x;
+        boundsChecker.Bounds.posY = this.originalObject.y;
+        boundsChecker.Bounds.extX = this.originalObject.extX;
+        boundsChecker.Bounds.extY = this.originalObject.extY;
+        return boundsChecker.Bounds;
+    };
+
+    this.track = function(x, y)
+    {
+
+        var tx = this.chartSpace.invertTransform.TransformPointX(x, y);
+        var ty = this.chartSpace.invertTransform.TransformPointY(x, y);
+        var deltaAng = 0;
+        var StratRotY = oChartSpace.chart.view3D && oChartSpace.chart.view3D.rotY ? oChartSpace.chart.view3D.rotY : 0;
+        deltaAng = -90*(tx - this.startX)/(this.chartSizes.w/2);
+        this.view3D.rotY = StratRotY + deltaAng;
+        while(this.view3D.rotY < 0){
+            this.view3D.rotY += 360;
+        }
+        while(this.view3D.rotY > 360){
+            this.view3D.rotY -= 360;
+        }
+
+        var StratRotX = oChartSpace.chart.view3D && oChartSpace.chart.view3D.rotX ? oChartSpace.chart.view3D.rotX : 0;
+        deltaAng = 90*(ty - this.startY)/(this.chartSizes.h/2);
+        this.view3D.rotX = StratRotX + deltaAng;
+
+		if(oChartSpace.chart.plotArea && oChartSpace.chart.plotArea.chart && oChartSpace.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart){
+			if(this.view3D.rotX < 0){
+            this.view3D.rotX = 0;
+        }
+		}
+		
+        if(this.view3D.rotX < -90){
+            this.view3D.rotX = -90;
+        }
+
+        if(this.view3D.rotX > 90){
+            this.view3D.rotX = 90;
+        }
+
+        this.processor3D.angleOx = this.view3D && this.view3D.rotX ? (- this.view3D.rotX / 360) * (Math.PI * 2) : 0;
+        this.processor3D.angleOy = this.view3D && this.view3D.rotY ? (- this.view3D.rotY / 360) * (Math.PI * 2) : 0;
+        this.processor3D.angleOz = 0;
+        this.calculateGeometry();
+    };
+
+    this.trackEnd = function()
+    {
+        oChartSpace.chart.setView3D(this.view3D.createDuplicate());
+        oChartSpace.setRecalculateInfo();
+    }
+}
+
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].OverlayObject = OverlayObject;
     window['AscFormat'].ObjectToDraw = ObjectToDraw;
     window['AscFormat'].RotateTrackShapeImage = RotateTrackShapeImage;
     window['AscFormat'].RotateTrackGroup = RotateTrackGroup;
+    window['AscFormat'].Chart3dAdjustTrack = Chart3dAdjustTrack;
 })(window);

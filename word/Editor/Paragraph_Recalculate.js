@@ -2677,6 +2677,7 @@ CParagraphRecalculateStateWrap.prototype =
 		this.InTable     = Paragraph.Parent.Is_TableCellContent();
         this.SectPr      = null;
 
+		this.Page               = CurPage;
 		this.RunRecalcInfoLast  = (0 === CurPage ? null : Paragraph.Pages[CurPage - 1].EndInfo.RunRecalcInfo);
 		this.RunRecalcInfoBreak = this.RunRecalcInfoLast;
 	},

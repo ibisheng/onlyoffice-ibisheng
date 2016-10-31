@@ -2751,6 +2751,35 @@ CGraphics.prototype =
         this.m_oContext.closePath();
         this.m_oContext.stroke();
         this.m_oContext.beginPath();
+    },
+
+    DrawFootnoteRect : function(x, y, w, h)
+    {
+        var _old = this.m_bIntegerGrid;
+        if (!_old)
+            this.SetIntegerGrid(true);
+
+        this.p_dash([1, 1]);
+
+        this._s();
+
+        var l = x;
+        var t = y;
+        var r = x + w;
+        var b = y + h;
+
+        this.drawHorLineExt(c_oAscLineDrawingRule.Top, t, l, r, 0, 0, 0);
+        this.drawVerLine(c_oAscLineDrawingRule.Right, l, t, b, 0);
+        this.drawVerLine(c_oAscLineDrawingRule.Left, r, t, b, 0);
+        this.drawHorLineExt(c_oAscLineDrawingRule.Top, b, l, r, 0, 0, 0);
+
+        this.ds();
+        this._s();
+
+        this.p_dash(null);
+
+        if (!_old)
+            this.SetIntegerGrid(false);
     }
 };
 

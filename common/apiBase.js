@@ -37,6 +37,7 @@
 	// Import
 	var offlineMode = AscCommon.offlineMode;
 	var c_oEditorId = AscCommon.c_oEditorId;
+	var c_oCloseCode = AscCommon.c_oCloseCode;
 
 	var c_oAscError           = Asc.c_oAscError;
 	var c_oAscAsyncAction     = Asc.c_oAscAsyncAction;
@@ -107,6 +108,8 @@
 		// Режим вставки диаграмм в редакторе документов
 		this.isChartEditor         = false;
 		this.isOpenedChartFrame    = false;
+
+		this.MathMenuLoad          = false;
 
 		// CoAuthoring and Chat
 		this.User                   = undefined;
@@ -583,25 +586,64 @@
 			}
 			t.sendEvent('asc_onMeta', data);
 		};
+		this.CoAuthoringApi.onSession = function(data) {
+			var code = data["code"];
+			var reason = data["reason"];
+			var interval = data["interval"];
+			var extendSession = true;
+			if (c_oCloseCode.sessionIdle == code) {
+				var lastTime = new Date().getTime();
+				var idleTime = new Date().getTime() - lastTime;
+				if (idleTime < interval) {
+					t.CoAuthoringApi.extendSession(idleTime);
+				} else {
+					extendSession = false;
+				}
+			} else if (c_oCloseCode.sessionAbsolute == code) {
+				extendSession = false;
+			}
+			if (!extendSession) {
+				if (History.Have_Changes()) {
+					//enter view mode because save async
+					t.sendEvent('asc_onCoAuthoringDisconnect');
+					t.asc_setViewMode(true);
+
+					t.CoAuthoringApi.onUnSaveLock = function() {
+						t.CoAuthoringApi.onUnSaveLock = null;
+
+						t.CoAuthoringApi.disconnect(code, reason);
+					};
+					if (t.collaborativeEditing.applyChanges) {
+						t.collaborativeEditing.applyChanges();
+						t.collaborativeEditing.sendChanges();
+					} else {
+						AscCommon.CollaborativeEditing.Apply_Changes();
+						AscCommon.CollaborativeEditing.Send_Changes();
+					}
+				} else {
+					t.CoAuthoringApi.disconnect(code, reason);
+				}
+			}
+		};
 		/**
 		 * Event об отсоединении от сервера
 		 * @param {jQuery} e  event об отсоединении с причиной
 		 * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
 		 * @param {Bool} isCloseCoAuthoring
 		 */
-		this.CoAuthoringApi.onDisconnect = function(e, isDisconnectAtAll, isCloseCoAuthoring)
+		this.CoAuthoringApi.onDisconnect = function(e, errorCode)
 		{
 			if (AscCommon.ConnectionState.None === t.CoAuthoringApi.get_state())
 			{
 				t.asyncServerIdEndLoaded();
 			}
-			if (isDisconnectAtAll)
+			if (null != errorCode)
 			{
 				// Посылаем наверх эвент об отключении от сервера
 				t.sendEvent('asc_onCoAuthoringDisconnect');
 				// И переходим в режим просмотра т.к. мы не можем сохранить файл
 				t.asc_setViewMode(true);
-				t.sendEvent('asc_onError', isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
+				t.sendEvent('asc_onError', errorCode, c_oAscError.Level.NoCritical);
 			}
 		};
 		this.CoAuthoringApi.onDocumentOpen = function(inputWrap)
@@ -783,8 +825,11 @@
 
 	baseEditorsApi.prototype.asc_loadLocalImageAndAction = function(sLocalImage, fCallback)
 	{
-		this.ImageLoader.LoadImage(AscCommon.getFullImageSrc2(sLocalImage), 1);
-		this.asc_replaceLoadImageCallback(fCallback);
+		var _loadedUrl = this.ImageLoader.LoadImage(AscCommon.getFullImageSrc2(sLocalImage), 1);
+		if (_loadedUrl != null)
+		    fCallback(_loadedUrl);
+        else
+        	this.asc_replaceLoadImageCallback(fCallback);
 	};
 
 	baseEditorsApi.prototype.asc_checkImageUrlAndAction = function(sImageUrl, fCallback)
@@ -814,6 +859,9 @@
 
 	baseEditorsApi.prototype.asc_addOleObject = function(oPluginData)
 	{
+		if(this.isViewMode){
+			return;
+		}
 		Asc.CPluginData_wrap(oPluginData);
 		var oThis      = this;
 		var sImgSrc    = oPluginData.getAttribute("imgSrc");
@@ -837,6 +885,9 @@
 
 	baseEditorsApi.prototype.asc_editOleObject = function(oPluginData)
 	{
+		if(this.isViewMode){
+			return;
+		}
 		Asc.CPluginData_wrap(oPluginData);
 		var oThis      = this;
 		var bResize    = oPluginData.getAttribute("resize");
@@ -952,6 +1003,30 @@
 		}
 
 		this.sendEvent('asc_onInitStandartTextures', arr);
+	};
+
+	baseEditorsApi.prototype.sendMathToMenu = function ()
+	{
+		if (this.MathMenuLoad)
+			return;
+		// GENERATE_IMAGES
+		//var _MathPainter = new CMathPainter(this.m_oWordControl.m_oApi);
+		//_MathPainter.StartLoad();
+		//return;
+		var _MathPainter = new AscFormat.CMathPainter(this);
+		_MathPainter.Generate();
+		this.MathMenuLoad = true;
+	};
+
+	baseEditorsApi.prototype.sendMathTypesToMenu         = function(_math)
+	{
+		this.sendEvent("asc_onMathTypes", _math);
+	};
+
+	baseEditorsApi.prototype.asyncFontEndLoaded_MathDraw = function(Obj)
+	{
+		this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
+		Obj.Generate2();
 	};
 
 	// plugins

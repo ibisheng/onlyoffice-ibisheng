@@ -532,6 +532,59 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
             }
         }
 
+        //todo gridlines
+
+        //plotArea
+        var oChartSizes = drawing.getChartSizes();
+        var oInvertTransform = drawing.invertTransform;
+        var dTx = oInvertTransform.TransformPointX(x, y);
+        var dTy = oInvertTransform.TransformPointY(x, y);
+        if(dTx >= oChartSizes.startX && dTx <= oChartSizes.startX + oChartSizes.w
+            && dTy >= oChartSizes.startY && dTy <= oChartSizes.startY + oChartSizes.h)
+        {
+            if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+            {
+                if(drawing.selection.plotArea == null || !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(drawing) || !drawing.chartObj  || !drawing.chartObj.processor3D)
+                {
+                    drawingObjectsController.checkChartTextSelection();
+                    selector.resetSelection();
+                    selector.selectObject(drawing, pageIndex);
+                    selector.selection.chartSelection = drawing;
+                    drawing.selection.plotArea = drawing.chart.plotArea;
+                }
+                else
+                {
+                    drawing.selection.plotArea = drawing.chart.plotArea;
+                    drawing.selection.rotatePlotArea = true;
+
+                    drawingObjectsController.updateSelectionState();
+                    drawingObjectsController.updateOverlay();
+
+                    drawingObjectsController.arrPreTrackObjects.length = 0;
+                    drawingObjectsController.arrPreTrackObjects.push(new AscFormat.Chart3dAdjustTrack(drawing, 0, x, y));
+                    if(!isRealObject(group))
+                    {
+                        drawingObjectsController.changeCurrentState(new AscFormat.PreChangeAdjState(drawingObjectsController, drawing));
+                    }
+                    else
+                    {
+                        drawingObjectsController.changeCurrentState(new AscFormat.PreChangeAdjInGroupState(drawingObjectsController, group));
+                    }
+                    return true;
+                }
+
+
+
+                drawingObjectsController.updateSelectionState();
+                drawingObjectsController.updateOverlay();
+                return true;
+            }
+            else
+            {
+                return {objectId: drawing.Get_Id(), cursorType: "default", bMarker: false};
+            }
+        }
+
     }
     return ret;
 }

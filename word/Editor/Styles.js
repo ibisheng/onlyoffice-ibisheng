@@ -4367,7 +4367,8 @@ CStyles.prototype =
     Set_DefaultParaPr : function(ParaPr)
     {
         History.Add(this, {Type : AscDFH.historyitem_Styles_ChangeDefaultParaPr, Old : this.Default.ParaPr, New : ParaPr});
-        this.Default.ParaPr = ParaPr;
+		this.Default.ParaPr.Init_Default();
+		this.Default.ParaPr.Merge(ParaPr);
 
         // TODO: Пока данная функция используется только в билдере, как только будет использоваться в самом редакторе,
         //       надо будет сделать, чтобы происходил пересчет всех стилей.
@@ -4381,7 +4382,8 @@ CStyles.prototype =
     Set_DefaultTextPr : function(TextPr)
     {
         History.Add(this, {Type : AscDFH.historyitem_Styles_ChangeDefaultTextPr, Old : this.Default.TextPr, New : TextPr});
-        this.Default.TextPr = TextPr;
+        this.Default.TextPr.Init_Default();
+		this.Default.TextPr.Merge(TextPr);
 
         // TODO: Пока данная функция используется только в билдере, как только будет использоваться в самом редакторе,
         //       надо будет сделать, чтобы происходил пересчет всех стилей.
@@ -4467,7 +4469,7 @@ CStyles.prototype =
         }
 
         // Рассчитываем стиль
-        this.Internal_Get_Pr(Pr, StyleId, Type, ( null === TableStyle && null == ShapeStyle ? true : false ), []);
+        this.Internal_Get_Pr(Pr, StyleId, Type, ( null === TableStyle && null == ShapeStyle ? true : false ), [], StyleId);
 
         if (styletype_Table === Type)
         {
@@ -4576,7 +4578,7 @@ CStyles.prototype =
         return null;
     },
 
-    Internal_Get_Pr : function(Pr, StyleId, Type, bUseDefault, PassedStyles)
+    Internal_Get_Pr : function(Pr, StyleId, Type, bUseDefault, PassedStyles, StartStyleId)
     {
         // Делаем проверку от зацикливания, среди уже пройденных стилей ищем текущий стриль.
         for (var nIndex = 0, nCount = PassedStyles.length; nIndex < nCount; nIndex++)
@@ -4750,22 +4752,22 @@ CStyles.prototype =
         else
         {
             // Копируем свойства родительского стиля
-            this.Internal_Get_Pr( Pr, Style.BasedOn, Type, false, PassedStyles );
+			this.Internal_Get_Pr(Pr, Style.BasedOn, Type, false, PassedStyles, StartStyleId);
 
-            // Копируем свойства из стиля нумерации, если она задана
-            if ( (styletype_Paragraph === Type || styletype_Table === Type) && ( undefined != Style.ParaPr.NumPr ) )
-            {
-                var Numbering = editor.WordControl.m_oLogicDocument.Get_Numbering();
-                if ( undefined != Style.ParaPr.NumPr.NumId && 0 != Style.ParaPr.NumPr.NumId )
-                {
-                    var AbstractNum = Numbering.Get_AbstractNum( Style.ParaPr.NumPr.NumId );
-                    var Lvl = AbstractNum.Get_LvlByStyle( StyleId );
-                    if ( -1 != Lvl )
-                        Pr.ParaPr.Merge( Numbering.Get_ParaPr( Style.ParaPr.NumPr.NumId, Lvl ) );
-                    else
-                        Pr.ParaPr.NumPr = undefined;
-                }
-            }
+            // Копируем свойства из стиля нумерации, если она задана, но только для самого стиля, а не для базовых
+			if ((styletype_Paragraph === Type || styletype_Table === Type) && ( undefined != Style.ParaPr.NumPr ) && StyleId === StartStyleId)
+			{
+				var Numbering = editor.WordControl.m_oLogicDocument.Get_Numbering();
+				if (undefined != Style.ParaPr.NumPr.NumId && 0 != Style.ParaPr.NumPr.NumId)
+				{
+					var AbstractNum = Numbering.Get_AbstractNum(Style.ParaPr.NumPr.NumId);
+					var Lvl         = AbstractNum.Get_LvlByStyle(StyleId);
+					if (-1 != Lvl)
+						Pr.ParaPr.Merge(Numbering.Get_ParaPr(Style.ParaPr.NumPr.NumId, Lvl));
+					else
+						Pr.ParaPr.NumPr = undefined;
+				}
+			}
 
             // Копируем свойства текущего стиля
             switch ( Type )
@@ -4958,13 +4960,15 @@ CStyles.prototype =
 
             case AscDFH.historyitem_Styles_ChangeDefaultParaPr:
             {
-                this.Default.ParaPr = Data.Old;
+				this.Default.ParaPr.Init_Default();
+				this.Default.ParaPr.Merge(Data.Old);
                 break;
             }
 
             case AscDFH.historyitem_Styles_ChangeDefaultTextPr:
             {
-                this.Default.TextPr = Data.Old;
+				this.Default.TextPr.Init_Default();
+				this.Default.TextPr.Merge(Data.Old);
                 break;
             }
         }
@@ -4992,13 +4996,15 @@ CStyles.prototype =
 
             case AscDFH.historyitem_Styles_ChangeDefaultParaPr:
             {
-                this.Default.ParaPr = Data.New;
+				this.Default.ParaPr.Init_Default();
+				this.Default.ParaPr.Merge(Data.New);
                 break;
             }
 
             case AscDFH.historyitem_Styles_ChangeDefaultTextPr:
             {
-                this.Default.TextPr = Data.New;
+				this.Default.TextPr.Init_Default();
+				this.Default.TextPr.Merge(Data.New);
                 break;
             }
         }
@@ -5148,7 +5154,8 @@ CStyles.prototype =
                 // Variable : ParaPr
                 var oParaPr = new CParaPr();
                 oParaPr.Read_FromBinary(Reader);
-                this.Default.ParaPr = oParaPr;
+                this.Default.ParaPr.Init_Default();
+				this.Default.ParaPr.Merge(oParaPr);
                 break;
             }
             case AscDFH.historyitem_Styles_ChangeDefaultTextPr:
@@ -5156,7 +5163,8 @@ CStyles.prototype =
                 // Variable : TextPr
                 var oTextPr = new CTextPr();
                 oTextPr.Read_FromBinary(Reader);
-                this.Default.TextPr = oTextPr;
+				this.Default.TextPr.Init_Default();
+                this.Default.TextPr.Merge(oTextPr);
                 break;
             }
         }
@@ -5709,6 +5717,10 @@ CDocumentBorder.prototype =
         }
     }
 };
+CDocumentBorder.prototype.IsNone = function()
+{
+	return this.Value === border_None ? true : false;
+};
 
 function CTableMeasurement(Type, W)
 {
@@ -5886,7 +5898,7 @@ CTablePr.prototype =
         if ( undefined != TablePr.TableCellMar.Top )
             this.TableCellMar.Top = TablePr.TableCellMar.Top.Copy();
 
-        if ( undefined != TablePr.TableCellMar )
+        if ( undefined != TablePr.TableCellSpacing )
             this.TableCellSpacing = TablePr.TableCellSpacing;
 
         if ( undefined != TablePr.TableInd )

@@ -1411,15 +1411,7 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.asyncFontEndLoaded_MathDraw = function(Obj)
-	{
-		this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
-		Obj.Generate2();
-	};
-	asc_docs_api.prototype.sendMathTypesToMenu         = function(_math)
-	{
-		this.sendEvent("asc_onMathTypes", _math);
-	};
+
 
 	asc_docs_api.prototype.asyncFontEndLoaded_DropCap = function(Obj)
 	{
@@ -1901,7 +1893,7 @@ background-repeat: no-repeat;\
 	{
 		if (window["AscDesktopEditor"])
 		{
-			window["AscDesktopEditor"]["Copy"]();
+		    window["asc_desktop_copypaste"](this, "Copy");
 			return true;
 		}
 		return AscCommon.g_clipboardBase.Button_Copy();
@@ -1914,7 +1906,7 @@ background-repeat: no-repeat;\
 	{
 		if (window["AscDesktopEditor"])
 		{
-			window["AscDesktopEditor"]["Cut"]();
+		    window["asc_desktop_copypaste"](this, "Cut");
 			return true;
 		}
 		return AscCommon.g_clipboardBase.Button_Cut();
@@ -1923,7 +1915,7 @@ background-repeat: no-repeat;\
 	{
 		if (window["AscDesktopEditor"])
 		{
-			window["AscDesktopEditor"]["Paste"]();
+		    window["asc_desktop_copypaste"](this, "Paste");
 			return true;
 		}
 		if (!this.WordControl.m_oLogicDocument)
@@ -2183,8 +2175,8 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.Resize             = function()
 	{
-		if (false === this.bInit_word_control)
-			return;
+		//if (false === this.bInit_word_control)
+		//	return;
 		this.WordControl.OnResize(false);
 	};
 	asc_docs_api.prototype.AddURL             = function(url)
@@ -2513,6 +2505,17 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.ClearPropObjCallback = function(prop)
 	{//колбэк предшествующий приходу свойств объекта, prop а всякий случай
 		this.sendEvent("asc_onClearPropObj", prop);
+	};
+
+	// mobile version methods:
+	asc_docs_api.prototype.asc_GetDefaultTableStyles = function()
+	{
+		if (!this.WordControl.m_oLogicDocument)
+			return;
+
+		this.WordControl.m_oDrawingDocument.StartTableStylesCheck();
+		this.WordControl.m_oDrawingDocument.TableStylesSheckLook = new CTableLook();
+		this.WordControl.m_oDrawingDocument.EndTableStylesCheck();
 	};
 
 	/*----------------------------------------------------------------*/
@@ -6812,7 +6815,7 @@ background-repeat: no-repeat;\
 		if (!this.isViewMode)
 		{
 			this.sendStandartTextures();
-			this.WordControl.m_oDrawingDocument.SendMathToMenu();
+			this.sendMathToMenu();
 
 			if (this.shapeElementId)
 			{
@@ -7102,7 +7105,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.SetMobileVersion = function(val)
 	{
 		this.isMobileVersion = val;
-		if (this.isMobileVersion)
+		if (/*this.isMobileVersion*/false)
 		{
 			this.WordControl.bIsRetinaSupport         = false; // ipad имеет проблемы с большими картинками
 			this.WordControl.bIsRetinaNoSupportAttack = true;
@@ -7249,6 +7252,24 @@ background-repeat: no-repeat;\
 			editor.sync_EndAddShape();
 			editor.sync_StartAddShapeCallback(false);
 		}
+	};
+
+	asc_docs_api.prototype.AddShapeOnCurrentPage = function(_type)
+	{
+		if (!this.WordControl.m_oLogicDocument)
+			return;
+
+		var _pageNum = this.GetCurrentVisiblePage();
+		// получаем размеры страницы
+		var _sectionPr = this.WordControl.m_oLogicDocument.Get_PageLimits(_pageNum);
+
+		var _min = Math.min(_sectionPr.XLimit / 2, _sectionPr.YLimit / 2);
+
+		this.WordControl.m_oLogicDocument.DrawingObjects.addShapeOnPage(_type, _pageNum,
+			_sectionPr.X + _sectionPr.XLimit / 4,
+			_sectionPr.Y + _sectionPr.YLimit / 4,
+			_min,
+			_min);
 	};
 
 	asc_docs_api.prototype.AddTextArt = function(nStyle)
@@ -8377,9 +8398,11 @@ background-repeat: no-repeat;\
 		return this.WordControl.m_oDrawingDocument.m_lPagesCount;
 	};
 
-	window["asc_docs_api"].prototype["asc_nativeGetPDF"] = function()
+	window["asc_docs_api"].prototype["asc_nativeGetPDF"] = function(_param)
 	{
 		var pagescount = this["asc_nativePrintPagesCount"]();
+		if (0x0100 & _param)
+            pagescount = 1;
 
 		var _renderer                  = new AscCommon.CDocumentRenderer();
 		_renderer.VectorMemoryForPrint = new AscCommon.CMemory();
@@ -8894,6 +8917,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['SetMarkerFormat']                           = asc_docs_api.prototype.SetMarkerFormat;
 	asc_docs_api.prototype['sync_MarkerFormatCallback']                 = asc_docs_api.prototype.sync_MarkerFormatCallback;
 	asc_docs_api.prototype['StartAddShape']                             = asc_docs_api.prototype.StartAddShape;
+	asc_docs_api.prototype['AddShapeOnCurrentPage']                     = asc_docs_api.prototype.AddShapeOnCurrentPage;
 	asc_docs_api.prototype['AddTextArt']                                = asc_docs_api.prototype.AddTextArt;
 	asc_docs_api.prototype['sync_StartAddShapeCallback']                = asc_docs_api.prototype.sync_StartAddShapeCallback;
 	asc_docs_api.prototype['CanGroup']                                  = asc_docs_api.prototype.CanGroup;
@@ -8978,6 +9002,9 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_addOleObject"]                          = asc_docs_api.prototype.asc_addOleObject;
 	asc_docs_api.prototype["asc_editOleObject"]                         = asc_docs_api.prototype.asc_editOleObject;
 	asc_docs_api.prototype["asc_InputClearKeyboardElement"]             = asc_docs_api.prototype.asc_InputClearKeyboardElement;
+
+	// mobile
+	asc_docs_api.prototype["asc_GetDefaultTableStyles"]             	= asc_docs_api.prototype.asc_GetDefaultTableStyles;
 
 	CParagraphPropEx.prototype['get_ContextualSpacing'] = CParagraphPropEx.prototype.get_ContextualSpacing;
 	CParagraphPropEx.prototype['get_Ind']               = CParagraphPropEx.prototype.get_Ind;

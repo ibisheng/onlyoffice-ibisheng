@@ -4902,6 +4902,11 @@ function BinaryPPTYLoader()
                     shape.txBody.setParent(shape);
                     break;
                 }
+				case 6:
+				{
+					s.SkipRecord();
+					break;
+				}
                 default:
                 {
                     break;
@@ -8730,6 +8735,7 @@ function CPres()
                 }
             }
 
+            var oXFRM = null;
             while (s.cur < _end_rec)
             {
                 var _at = s.GetUChar();
@@ -8800,6 +8806,12 @@ function CPres()
                         var bodyPr = new AscFormat.CBodyPr();
                         this.Reader.CorrectBodyPr(bodyPr);
                         shape.setBodyPr(bodyPr);
+                        break;
+                    }
+                    case 6:
+                    {
+                        oXFRM = this.Reader.ReadXfrm();
+                        break;
                     }
                     default:
                     {
@@ -8808,6 +8820,68 @@ function CPres()
                 }
             }
 
+            if(oXFRM)
+            {
+                var oRet = new AscFormat.CGroupShape();
+                shape.setParent(null);
+                oRet.setParent(this.TempMainObject == null ? this.ParaDrawing : null);
+                oRet.setBDeleted(false);
+                var oSpPr = new AscFormat.CSpPr();
+                var oXfrm = new AscFormat.CXfrm();
+                oXfrm.setOffX(shape.spPr.xfrm.offX);
+                oXfrm.setOffY(shape.spPr.xfrm.offY);
+                oXfrm.setExtX(shape.spPr.xfrm.extX);
+                oXfrm.setExtY(shape.spPr.xfrm.extY);
+                oXfrm.setChExtX(shape.spPr.xfrm.extX);
+                oXfrm.setChExtY(shape.spPr.xfrm.extY);
+                oXfrm.setChOffX(0);
+                oXfrm.setChOffY(0);
+                oSpPr.setXfrm(oXfrm);
+                oXfrm.setParent(oSpPr);
+                shape.spPr.xfrm.setOffX(0);
+                shape.spPr.xfrm.setOffY(0);
+                oRet.setSpPr(oSpPr);
+                oSpPr.setParent(oRet);
+                oRet.addToSpTree(0, shape);
+                var oShape2 = new AscFormat.CShape();
+                var oSpPr2 = new AscFormat.CSpPr();
+                oShape2.setSpPr(oSpPr2);
+                oSpPr2.setParent(oShape2);
+                var oXfrm2 = oXFRM;
+                oXfrm2.setParent(oSpPr2);
+                oSpPr2.setXfrm(oXfrm2);
+                oXfrm2.setOffX(oXfrm2.offX - oXfrm.offX);
+                oXfrm2.setOffY(oXfrm2.offY - oXfrm.offY);
+                oSpPr2.setFill(AscFormat.CreateNoFillUniFill());
+                oSpPr2.setLn(AscFormat.CreateNoFillLine());
+                oShape2.setTxBody(shape.txBody);
+                shape.setTxBody(null);
+                shape.setGroup(oRet);
+                oShape2.setBDeleted(false);
+                oShape2.setWordShape(true);
+                if(shape.spPr.xfrm && AscFormat.isRealNumber(shape.spPr.xfrm.rot))
+                {
+                    oXfrm2.setRot((AscFormat.isRealNumber(oXfrm2.rot) ? oXfrm2.rot : 0) + shape.spPr.xfrm.rot);
+                }
+                if(oShape2.txBody)
+                {
+                    oShape2.txBody.setParent(oShape2);
+                }
+                if(shape.textBoxContent)
+                {
+                    oShape2.setTextBoxContent(shape.textBoxContent.Copy(oShape2, shape.textBoxContent.DrawingDocument));
+                    shape.setTextBoxContent(null);
+                }
+                if(shape.bodyPr)
+                {
+                    oShape2.setBodyPr(shape.bodyPr);
+                    shape.setBodyPr(null);
+                }
+                oRet.addToSpTree(1, oShape2);
+                oShape2.setGroup(oRet);
+                s.Seek2(_end_rec);
+                return oRet;
+            }
             s.Seek2(_end_rec);
             return shape;
 

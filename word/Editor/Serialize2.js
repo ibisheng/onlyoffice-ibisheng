@@ -1804,7 +1804,7 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter, sav
 			this.bs.WriteItem(c_oSerProp_secPrType.pageNumType, function(){oThis.WritePageNumType(PageNumType);});
 		if(null != sectPr.Columns)
 			this.bs.WriteItem(c_oSerProp_secPrType.cols, function(){oThis.WriteColumns(sectPr.Columns);});
-		if(null != sectPr.Borders)
+		if(null != sectPr.Borders && !sectPr.Borders.IsEmptyBorders())
 			this.bs.WriteItem(c_oSerProp_secPrType.pgBorders, function(){oThis.WritePgBorders(sectPr.Borders);});
 		if(null != sectPr.FootnotePr)
 			this.bs.WriteItem(c_oSerProp_secPrType.footnotePr, function(){oThis.WriteFootnotePr(sectPr.FootnotePr);});
@@ -4332,7 +4332,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
         var aRunRanges = [];
         for (var i = ParaStart; i < ParaEnd && i < oRun.Content.length; i++) {
             var item = oRun.Content[i];
-            if (item.Type == para_PageNum) {
+            if (item.Type == para_PageNum || item.Type == para_PageCount) {
                 var elem;
                 if (nPrevIndex < i)
                     elem = { nStart: nPrevIndex, nEnd: i, pageNum: item };
@@ -4358,7 +4358,12 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                 });
             }
             if (null != elem.pageNum) {
-				var Instr = "PAGE \\* MERGEFORMAT";
+				var Instr;
+				if (elem.pageNum.Type == para_PageCount) {
+					Instr = "NUMPAGES \\* MERGEFORMAT";
+				} else {
+					Instr = "PAGE \\* MERGEFORMAT";
+				}
 				this.bs.WriteItem(c_oSerParType.FldSimple, function(){oThis.WriteFldSimple(Instr, function(){
                     oThis.WriteRun2(function () {
                         //всегда что-то пишем, потому что если ничего нет в w:t, то и не применяются настройки
@@ -4366,7 +4371,9 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                         var numText = '1';
                         if (null != elem.pageNum.String && "string" == typeof(elem.pageNum.String)) {
                             numText = elem.pageNum.String;
-                        }
+						} else if (elem.pageNum.Type == para_PageCount && null != elem.pageNum.PageCount) {
+							numText = elem.pageNum.PageCount.toString();
+						}
                         oThis.WriteText(numText, delText);
                     }, oRun);
 				});});
@@ -6323,7 +6330,19 @@ function BinaryFileReader(doc, openParams)
 		for (var i = 0, length = this.oReadResult.aTableCorrect.length; i < length; ++i) {
 			var table = this.oReadResult.aTableCorrect[i];
 			table.ReIndexing(0);
-			table.Correct_BadTable();
+			
+			//при вставке вложенных таблиц из документов в презентации и создании cDocumentContent не проставляется CStyles
+			if(editor && !editor.isDocumentEditor && !table.Parent.Styles)
+			{
+				var oldStyles = table.Parent.Styles;
+				table.Parent.Styles = this.Document.Styles;
+				table.Correct_BadTable();
+				table.Parent.Styles = oldStyles;
+			}
+			else
+			{
+				table.Correct_BadTable();
+			}
 		}
 		//чтобы удалялся stream с бинарником
 		pptx_content_loader.Clear(true);
@@ -6960,13 +6979,23 @@ function Binary_pPrReader(doc, oReadResult, stream)
 			}
 			oFramePr.Wrap = nEditorWrap;
 		}
-		else if(c_oSer_FramePrType.X == type)
-            oFramePr.X = g_dKoef_twips_to_mm * this.stream.GetULongLE();
-		else if(c_oSer_FramePrType.XAlign == type)
+		else if(c_oSer_FramePrType.X == type) {
+			var xTw = this.stream.GetULongLE();
+			if (-4 === xTw) {
+				oFramePr.XAlign = c_oAscXAlign.Center;
+			} else {
+				oFramePr.X = g_dKoef_twips_to_mm * xTw;
+			}
+		} else if(c_oSer_FramePrType.XAlign == type)
             oFramePr.XAlign = this.stream.GetUChar();
-		else if(c_oSer_FramePrType.Y == type)
-            oFramePr.Y = g_dKoef_twips_to_mm * this.stream.GetULongLE();
-		else if(c_oSer_FramePrType.YAlign == type)
+		else if(c_oSer_FramePrType.Y == type) {
+			var yTw = this.stream.GetULongLE();
+			if (-4 === yTw) {
+				oFramePr.YAlign = c_oAscYAlign.Top;
+			} else {
+				oFramePr.Y = g_dKoef_twips_to_mm * yTw;
+			}
+		} else if(c_oSer_FramePrType.YAlign == type)
             oFramePr.YAlign = this.stream.GetUChar();
         else
             res = c_oSerConstants.ReadUnknown;
@@ -9169,6 +9198,9 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 		else if("PAGE" == sFieldType){
             oRes = new ParaField(fieldtype_PAGENUM, aArguments, aSwitches);
 		}
+		else if("NUMPAGES" == sFieldType){
+			oRes = new ParaField(fieldtype_PAGECOUNT, aArguments, aSwitches);
+		}
 		else if("MERGEFIELD" == sFieldType){
 			oRes = new ParaField(fieldtype_MERGEFIELD, aArguments, aSwitches);
             if (editor)
@@ -10787,12 +10819,30 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
         }
 		else if (c_oSer_OMathContentType.Den === type)
         {
+			if (undefined == oElemDen.content)
+			{
+				var oFraction = new CFraction(props);
+				initMathRevisions(oFraction, props);
+				if (oParent)
+					oParent.addElementToContent(oFraction);
+				oElemDen.content = oFraction.getDenominator();
+				oElemNum.content = oFraction.getNumerator();
+			}
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElemDen.content);
             });
         }
 		else if (c_oSer_OMathContentType.Num === type)
         {
+			if (undefined == oElemNum.content)
+			{
+				var oFraction = new CFraction(props);
+				initMathRevisions(oFraction, props);
+				if (oParent)
+					oParent.addElementToContent(oFraction);
+				oElemDen.content = oFraction.getDenominator();
+				oElemNum.content = oFraction.getNumerator();
+			}
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElemNum.content);
             });			
@@ -12088,17 +12138,39 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
             initMathRevisions(oSSup, props);
 			if (oParent)
 				oParent.addElementToContent(oSSup);
-			oSup.conten = oSSup.getUpperIterator();
+			oSup.content = oSSup.getUpperIterator();
 			oContent.content = oSSup.getBase();
         }
 		else if (c_oSer_OMathContentType.Sup === type)
         {
+			if (undefined == oSup.content)
+			{
+				props.type = DEGREE_SUPERSCRIPT;
+				var oSSup = new CDegree(props);
+				initMathRevisions(oSSup, props);
+				if (oParent)
+					oParent.addElementToContent(oSSup);
+				oSup.content = oSSup.getUpperIterator();
+				oContent.content = oSSup.getBase();
+			}
+
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadMathArg(t,l,oSup.conten);
+                return oThis.ReadMathArg(t,l,oSup.content);
             });			
         }
 		else if (c_oSer_OMathContentType.Element === type)
         {
+			if (undefined == oContent.content)
+			{
+				props.type = DEGREE_SUPERSCRIPT;
+				var oSSup = new CDegree(props);
+				initMathRevisions(oSSup, props);
+				if (oParent)
+					oParent.addElementToContent(oSSup);
+				oSup.content = oSSup.getUpperIterator();
+				oContent.content = oSSup.getBase();
+			}
+
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oContent.content);
             });			
@@ -13227,13 +13299,18 @@ OpenParStruct.prototype = {
             this.cur = this.stack[this.stack.length - 1];
             var elem = oPrevElem.elem;
             if (null != elem && elem.Content) {
-                if (para_Field == elem.Get_Type() && fieldtype_PAGENUM == elem.Get_FieldType()) {
+                if (para_Field == elem.Get_Type() && (fieldtype_PAGENUM == elem.Get_FieldType() || fieldtype_PAGECOUNT == elem.Get_FieldType())) {
                     var oNewRun = new ParaRun(this.paragraph);
                     var rPr = getStyleFirstRun(elem);
                     if (rPr) {
                         oNewRun.Set_Pr(rPr);
                     }
-                    oNewRun.Add_ToContent(0, new ParaPageNum());
+					if (fieldtype_PAGENUM == elem.Get_FieldType()) {
+						oNewRun.Add_ToContent(0, new ParaPageNum());
+					} else {
+						var pageCount = parseInt(elem.Get_SelectedText(true));
+						oNewRun.Add_ToContent(0, new ParaPageCount(isNaN(pageCount) ? undefined : pageCount));
+					}
                     this.addToContent(oNewRun);
                 } else if(elem.Content.length > 0) {
                     this.addToContent(elem);

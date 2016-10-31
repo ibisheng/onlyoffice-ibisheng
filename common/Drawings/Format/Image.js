@@ -575,7 +575,7 @@ CImageShape.prototype.draw = function(graphics, transform)
     graphics.SetIntegerGrid(false);
     graphics.transform3(_transform, false);
     var shape_drawer = new AscCommon.CShapeDrawer();
-    if(this.pen || this.brush)
+    if(this.getObjectType() !== AscDFH.historyitem_type_OleObject && (this.pen || this.brush))
     {
         shape_drawer.fromShape2(this, graphics, this.spPr.geometry);
         shape_drawer.draw(this.spPr.geometry);

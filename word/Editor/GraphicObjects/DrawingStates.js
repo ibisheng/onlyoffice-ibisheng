@@ -643,7 +643,10 @@ RotateState.prototype =
                 {
                     History.Create_NewPoint(AscDFH.historydescription_Document_RotateInlineDrawing);
                     this.drawingObjects.arrTrackObjects[0].trackEnd(true);
-                    this.majorObject.parent.CheckWH();
+                    if(!this.drawingObjects.arrTrackObjects[0].view3D)
+                    {
+                        this.majorObject.parent.CheckWH();
+                    }
                     this.drawingObjects.document.Recalculate();
                 }
             }
@@ -716,7 +719,7 @@ RotateState.prototype =
                             bounds = aBounds[i];
                             this.drawingObjects.arrTrackObjects[i].trackEnd(true);
                             var original = aDrawings[i];
-                            if(!bMoveState)
+                            if(!bMoveState && !this.drawingObjects.arrTrackObjects[i].view3D)
                             {
                                 original.CheckWH();
                             }

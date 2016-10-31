@@ -38,6 +38,7 @@
   var asc_coAuthV = '3.0.9';
   var ConnectionState = AscCommon.ConnectionState;
   var c_oEditorId = AscCommon.c_oEditorId;
+  var c_oCloseCode = AscCommon.c_oCloseCode;
 
   // Класс надстройка, для online и offline работы
   function CDocsCoApi(options) {
@@ -50,6 +51,7 @@
       this.onMessage = options.onMessage;
       this.onCursor =  options.onCursor;
       this.onMeta =  options.onMeta;
+      this.onSession =  options.onSession;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
@@ -88,6 +90,9 @@
       this._CoAuthoringApi.onMeta = function(e) {
         t.callback_OnMeta(e);
       };
+      this._CoAuthoringApi.onSession = function(e) {
+        t.callback_OnSession(e);
+      };
       this._CoAuthoringApi.onLocksAcquired = function(e) {
         t.callback_OnLocksAcquired(e);
       };
@@ -97,8 +102,8 @@
       this._CoAuthoringApi.onLocksReleasedEnd = function() {
         t.callback_OnLocksReleasedEnd();
       };
-      this._CoAuthoringApi.onDisconnect = function(e, isDisconnectAtAll, isCloseCoAuthoring) {
-        t.callback_OnDisconnect(e, isDisconnectAtAll, isCloseCoAuthoring);
+      this._CoAuthoringApi.onDisconnect = function(e, errorCode) {
+        t.callback_OnDisconnect(e, errorCode);
       };
       this._CoAuthoringApi.onWarning = function(e) {
         t.callback_OnWarning(e);
@@ -317,9 +322,15 @@
     }
   };
 
-  CDocsCoApi.prototype.disconnect = function() {
+  CDocsCoApi.prototype.disconnect = function(opt_code, opt_reason) {
     if (this._CoAuthoringApi && this._onlineWork) {
-      this._CoAuthoringApi.disconnect();
+      this._CoAuthoringApi.disconnect(opt_code, opt_reason);
+    }
+  };
+
+  CDocsCoApi.prototype.extendSession = function(idleTime) {
+    if (this._CoAuthoringApi && this._onlineWork) {
+      this._CoAuthoringApi.extendSession(idleTime);
     }
   };
 
@@ -353,6 +364,12 @@
     }
   };
 
+  CDocsCoApi.prototype.callback_OnSession = function(e) {
+    if (this.onSession) {
+      this.onSession(e);
+    }
+  };
+
   CDocsCoApi.prototype.callback_OnLocksAcquired = function(e) {
     if (this.onLocksAcquired) {
       this.onLocksAcquired(e);
@@ -377,9 +394,9 @@
    * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
    * @param {Bool} isCloseCoAuthoring
    */
-  CDocsCoApi.prototype.callback_OnDisconnect = function(e, isDisconnectAtAll, isCloseCoAuthoring) {
+  CDocsCoApi.prototype.callback_OnDisconnect = function(e, errorCode) {
     if (this.onDisconnect) {
-      this.onDisconnect(e, isDisconnectAtAll, isCloseCoAuthoring);
+      this.onDisconnect(e, errorCode);
     }
   };
 
@@ -467,6 +484,7 @@
       this.onMessage = options.onMessage;
       this.onCursor = options.onCursor;
       this.onMeta = options.onMeta;
+      this.onSession =  options.onSession;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
@@ -500,6 +518,7 @@
     this.saveCallbackErrorTimeOutId = null;
     this.unSaveLockCallbackErrorTimeOutId = null;
     this._id = null;
+    this._sessionTimeConnect = null;
     this._indexUser = -1;
     // Если пользователей больше 1, то совместно редактируем
     this.isCoAuthoring = false;
@@ -756,11 +775,19 @@
     }
   };
 
-  DocsCoApi.prototype.disconnect = function() {
+  DocsCoApi.prototype.disconnect = function(opt_code, opt_reason) {
     // Отключаемся сами
     this.isCloseCoAuthoring = true;
-    this._send({"type": "close"});
-    this._state = ConnectionState.ClosedCoAuth;
+    if (opt_code) {
+      this.sockjs.close(opt_code, opt_reason);
+    } else {
+      this._send({"type": "close"});
+      this._state = ConnectionState.ClosedCoAuth;
+    }
+  };
+
+  DocsCoApi.prototype.extendSession = function(idleTime) {
+    this._send({'type': 'extendSession', 'idletime': idleTime});
   };
 
   DocsCoApi.prototype.openDocument = function(data) {
@@ -835,6 +862,12 @@
   DocsCoApi.prototype._onMeta = function(data) {
     if (data["messages"] && this.onMeta) {
       this.onMeta(data["messages"]);
+    }
+  };
+
+  DocsCoApi.prototype._onSession = function(data) {
+    if (data["messages"] && this.onSession) {
+      this.onSession(data["messages"]);
     }
   };
 
@@ -1129,7 +1162,7 @@
 
   DocsCoApi.prototype._onDrop = function(data) {
     this.disconnect();
-    this.onDisconnect(data ? data['description'] : '', true, this.isCloseCoAuthoring);
+    this.onDisconnect(data ? data['description'] : '', this._getDisconnectErrorCode());
   };
 
   DocsCoApi.prototype._onWarning = function(data) {
@@ -1182,6 +1215,7 @@
       //TODO: add checks
       this._state = ConnectionState.Authorized;
       this._id = data['sessionId'];
+      this._sessionTimeConnect = data['sessionTimeConnect'];
 
       this._onAuthParticipantsChanged(data['participants']);
 
@@ -1266,6 +1300,8 @@
       'lastOtherSaveTime': this.lastOtherSaveTime,
       'block': this.ownedLockBlocks,
       'sessionId': this._id,
+	  'sessionTimeConnect': this._sessionTimeConnect,
+      'sessionTimeIdle': 0,
       'documentFormatSave': this._documentFormatSave,
       'view': this._isViewer,
       'isCloseCoAuthoring': this.isCloseCoAuthoring,
@@ -1352,6 +1388,9 @@
         case 'license':
           t._onLicense(dataObject);
           break;
+        case 'session' :
+          t._onSession(dataObject);
+          break;
       }
     };
     sockjs.onclose = function(evt) {
@@ -1364,12 +1403,15 @@
         }
       }
       t._state = ConnectionState.Reconnect;
-      var bIsDisconnectAtAll = (4001 === evt.code || t.attemptCount >= t.maxAttemptCount);
+      var bIsDisconnectAtAll = (c_oCloseCode.serverShutdown === evt.code || c_oCloseCode.sessionIdle === evt.code ||
+      c_oCloseCode.sessionAbsolute === evt.code || t.attemptCount >= t.maxAttemptCount);
+      var errorCode = null;
       if (bIsDisconnectAtAll) {
         t._state = ConnectionState.ClosedAll;
+        errorCode = t._getDisconnectErrorCode(evt.code);
       }
       if (t.onDisconnect) {
-        t.onDisconnect(evt.reason, bIsDisconnectAtAll, t.isCloseCoAuthoring);
+        t.onDisconnect(evt.reason, errorCode);
       }
       //Try reconect
       if (!bIsDisconnectAtAll) {
@@ -1396,6 +1438,17 @@
 
   DocsCoApi.prototype._getSockJs = function() {
     return window['SockJS'] ? window['SockJS'] : require('sockjs');
+  };
+
+  DocsCoApi.prototype._getDisconnectErrorCode = function(opt_closeCode) {
+    if(c_oCloseCode.serverShutdown === opt_closeCode) {
+      return Asc.c_oAscError.ID.CoAuthoringDisconnect;
+    } else if(c_oCloseCode.sessionIdle === opt_closeCode){
+      return Asc.c_oAscError.ID.CoAuthoringDisconnect;
+    } else if(c_oCloseCode.sessionAbsolute === opt_closeCode){
+      return Asc.c_oAscError.ID.CoAuthoringDisconnect;
+    }
+    return this.isCloseCoAuthoring ? Asc.c_oAscError.ID.UserDrop : Asc.c_oAscError.ID.CoAuthoringDisconnect;
   };
 
   //----------------------------------------------------------export----------------------------------------------------

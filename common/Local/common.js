@@ -199,6 +199,7 @@ window["NativeCorrectImageUrlOnPaste"] = function(url)
 window["UpdateInstallPlugins"] = function()
 {
 	var _plugins = JSON.parse(window["AscDesktopEditor"]["GetInstallPlugins"]());
+	_plugins["url"] = _plugins["url"].replace(" ", "%20");
 	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 	_editor.sendEvent("asc_onPluginsInit", _plugins);
 };
@@ -231,6 +232,17 @@ window["asc_initAdvancedOptions"] = function(_code)
     var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 	_editor._onNeedParams(undefined, (_code == 90 || _code == 91) ? true : undefined);
 };
+
+// copy/paste focus error!!!
+window["asc_desktop_copypaste"] = function(_api, _method)
+{
+    var bIsFocus = _api.asc_IsFocus();
+    if (!bIsFocus)
+        _api.asc_enableKeyEvents(true);
+    window["AscDesktopEditor"][_method]();
+    if (!bIsFocus)
+        _api.asc_enableKeyEvents(false);
+}
 
 // меняем среду
 //AscBrowser.isSafari = false;

@@ -785,7 +785,18 @@ CFootnotesController.prototype.Refresh_RecalcData2 = function(nRelPageIndex)
 	if (this.LogicDocument.Pages[nAbsPageIndex])
 	{
 		var nIndex = this.LogicDocument.Pages[nAbsPageIndex].Pos;
-		this.LogicDocument.Refresh_RecalcData2(nIndex, nAbsPageIndex);
+
+		if (nIndex >= this.LogicDocument.Content.length)
+		{
+			History.RecalcData_Add({
+				Type    : AscDFH.historyitem_recalctype_NotesEnd,
+				PageNum : nAbsPageIndex
+			});
+		}
+		else
+		{
+			this.LogicDocument.Refresh_RecalcData2(nIndex, nAbsPageIndex);
+		}
 	}
 };
 CFootnotesController.prototype.Get_PageContentStartPos = function(nPageAbs, nColumnAbs)
