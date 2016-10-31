@@ -2011,16 +2011,16 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter, sav
 		if (null != pageBorders.ZOrder) {
 			this.bs.WriteItem(c_oSerPageBorders.ZOrder, function(){oThis.memory.WriteByte(pageBorders.ZOrder);});
 		}
-		if (null != pageBorders.Bottom) {
+		if (null != pageBorders.Bottom && !pageBorders.Bottom.IsNone()) {
 			this.bs.WriteItem(c_oSerPageBorders.Bottom, function(){oThis.WritePgBorder(pageBorders.Bottom);});
 		}
-		if (null != pageBorders.Left) {
+		if (null != pageBorders.Left && !pageBorders.Left.IsNone()) {
 			this.bs.WriteItem(c_oSerPageBorders.Left, function(){oThis.WritePgBorder(pageBorders.Left);});
 		}
-		if (null != pageBorders.Right) {
+		if (null != pageBorders.Right && !pageBorders.Right.IsNone()) {
 			this.bs.WriteItem(c_oSerPageBorders.Right, function(){oThis.WritePgBorder(pageBorders.Right);});
 		}
-		if (null != pageBorders.Top) {
+		if (null != pageBorders.Top && !pageBorders.Top.IsNone()) {
 			this.bs.WriteItem(c_oSerPageBorders.Top, function(){oThis.WritePgBorder(pageBorders.Top);});
 		}
 	}
