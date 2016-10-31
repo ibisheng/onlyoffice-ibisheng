@@ -184,8 +184,9 @@ Processor3D.prototype._recalculateScaleWithMaxWidth = function()
 	}
 	else
 	{
+		//если будут проблемы с поворотом standard диграмм, раскомментровать!
 		//TODO протестировать, и если не будет проблем, то убрать if-else
-		if(Math.abs(this.angleOy) > Math.PI)
+		/*if(Math.abs(this.angleOy) > Math.PI)
 		{
 			//рассчитываем параметры диаграммы при оптимальной ширине
 			this.widthCanvas = optimalWidth + (this.left + this.right);
@@ -204,7 +205,7 @@ Processor3D.prototype._recalculateScaleWithMaxWidth = function()
 			this._recalculateCameraDiff();
 		}
 		else
-		{
+		{*/
 			//рассчитываем параметры диаграммы при оптимальной ширине
 			this.widthCanvas = optimalWidth + (this.left + this.right);
 			var scaleX = this.scaleX;
@@ -242,7 +243,7 @@ Processor3D.prototype._recalculateScaleWithMaxWidth = function()
 			this.widthCanvas = widthCanvas;
 			
 			this._recalculateCameraDiff();
-		}
+		//}
 	}
 };
 
