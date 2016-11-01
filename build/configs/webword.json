@@ -185,11 +185,7 @@
       },
 	  "mobile_banners": {
 		  "min": [
-          "../../web-apps/vendor/xregexp/xregexp-all-min.js",
-          "../../web-apps/vendor/underscore/underscore-min.js",
-          "../common/Native/native.js",
-          "../common/Native/Wrappers/memory.js",
-          "../common/Native/jquery_native.js"
+			"../common/Native/Wrappers/memory.js"
           ],
 		  "common": []
 	  },
