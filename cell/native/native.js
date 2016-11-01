@@ -3909,8 +3909,7 @@ function OfflineEditor () {
                          "vkey"          : undefined,
                          "url"           : this.documentUrl,
                          "title"         : this.documentTitle,
-                         "embeddedfonts" : false,
-                         "viewmode"      : t.initSettings.viewmode};
+                         "embeddedfonts" : false};
                             
                          _api.CoAuthoringApi.auth(t.initSettings.viewmode, rData);
         });

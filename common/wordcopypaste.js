@@ -1796,7 +1796,7 @@ function sendImgUrls(api, images, callback, bExcel) {
     }
   }
 
-  var rData = {"id": api.documentId, "c": "imgurls", "vkey": api.documentVKey, "userid":  api.documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": images};
+  var rData = {"id": api.documentId, "c": "imgurls", "userid":  api.documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": images};
   api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.LoadImage);
 
   api.fCurCallback = function (input) {
