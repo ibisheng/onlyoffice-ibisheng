@@ -7223,9 +7223,24 @@ drawHBarChart.prototype =
 		var shade = "shade";
 		var shadeValue1 = 35000;
 		var shadeValue2 = 45000;
+		var t = this;
 		
 		if(brushFill.fill.lin && null !== brushFill.fill.lin.angle)
 		{
+			var getCSolidColor = function(color, colorMod)
+			{
+				var duplicateBrush = brushFill.createDuplicate();
+				var tempColor = new AscFormat.CUniFill();
+				tempColor.setFill(new AscFormat.CSolidFill());
+				tempColor.fill.setColor(color);
+				if(colorMod)
+				{
+					tempColor = t._applyColorModeByBrush(tempColor, colorMod);
+				}
+				
+				return tempColor;
+			};
+			
 			var angle = brushFill.fill.lin.angle / angleKf;
 			var colors = brushFill.fill.colors;
 			
@@ -7241,30 +7256,18 @@ drawHBarChart.prototype =
 				}
 				else if(faceIndex === c_oChartBar3dFaces.left)
 				{
-					var duplicateBrush = brushFill.createDuplicate();
-					var tempColor = new AscFormat.CUniFill();
-					tempColor.setFill(new AscFormat.CSolidFill());
-					tempColor.fill.setColor(colors[0].color);
-					gradientBrush = tempColor;
+					gradientBrush = getCSolidColor(colors[0].color);
 				}
 				else if(faceIndex === c_oChartBar3dFaces.right)
 				{
-					var duplicateBrush = brushFill.createDuplicate();
-					var tempColor = new AscFormat.CUniFill();
-					tempColor.setFill(new AscFormat.CSolidFill());
-					tempColor.fill.setColor(colors[colors.length - 1].color);
-					gradientBrush = tempColor;
+					gradientBrush = getCSolidColor(colors[colors.length - 1].color);
 				}
 			}
 			else if(angle >= 45 && angle < 90)
 			{
 				if(faceIndex === c_oChartBar3dFaces.up || faceIndex === c_oChartBar3dFaces.left)
 				{
-					var duplicateBrush = brushFill.createDuplicate();
-					var tempColor = new AscFormat.CUniFill();
-					tempColor.setFill(new AscFormat.CSolidFill());
-					tempColor.fill.setColor(colors[0].color);
-					gradientBrush = this._applyColorModeByBrush(tempColor, shadeValue1);
+					gradientBrush = getCSolidColor(colors[0].color, shadeValue1);
 				}
 				else if(faceIndex === c_oChartBar3dFaces.right)
 				{
@@ -7276,22 +7279,14 @@ drawHBarChart.prototype =
 				}
 				else if(faceIndex === c_oChartBar3dFaces.down)
 				{
-					var duplicateBrush = brushFill.createDuplicate();
-					var tempColor = new AscFormat.CUniFill();
-					tempColor.setFill(new AscFormat.CSolidFill());
-					tempColor.fill.setColor(colors[colors.length - 1].color);
-					gradientBrush = tempColor;
+					gradientBrush = getCSolidColor(colors[colors.length - 1].color);
 				}
 			}
 			else if(angle >= 90 && angle < 135)
 			{
 				if(faceIndex === c_oChartBar3dFaces.up || faceIndex === c_oChartBar3dFaces.left)
 				{
-					var duplicateBrush = brushFill.createDuplicate();
-					var tempColor = new AscFormat.CUniFill();
-					tempColor.setFill(new AscFormat.CSolidFill());
-					tempColor.fill.setColor(colors[0].color);
-					gradientBrush = this._applyColorModeByBrush(tempColor, shadeValue1);
+					gradientBrush = getCSolidColor(colors[0].color, shadeValue1);
 				}
 				else if(faceIndex === c_oChartBar3dFaces.right)
 				{
@@ -7303,22 +7298,14 @@ drawHBarChart.prototype =
 				}
 				else if(faceIndex === c_oChartBar3dFaces.down)
 				{
-					var duplicateBrush = brushFill.createDuplicate();
-					var tempColor = new AscFormat.CUniFill();
-					tempColor.setFill(new AscFormat.CSolidFill());
-					tempColor.fill.setColor(colors[colors.length - 1].color);
-					gradientBrush = tempColor;
+					gradientBrush = getCSolidColor(colors[colors.length - 1].color);
 				}
 			}
 			else if(angle >= 135 && angle < 180)
 			{
 				if(faceIndex === c_oChartBar3dFaces.up || faceIndex === c_oChartBar3dFaces.left || faceIndex === c_oChartBar3dFaces.right)
 				{
-					var duplicateBrush = brushFill.createDuplicate();
-					var tempColor = new AscFormat.CUniFill();
-					tempColor.setFill(new AscFormat.CSolidFill());
-					tempColor.fill.setColor(colors[0].color);
-					gradientBrush = this._applyColorModeByBrush(tempColor, shadeValue1);
+					gradientBrush = getCSolidColor(colors[0].color, shadeValue1);
 				}
 				else if(faceIndex === c_oChartBar3dFaces.down)
 				{
@@ -7341,19 +7328,11 @@ drawHBarChart.prototype =
 				}
 				else if(faceIndex === c_oChartBar3dFaces.right)
 				{
-					var duplicateBrush = brushFill.createDuplicate();
-					var tempColor = new AscFormat.CUniFill();
-					tempColor.setFill(new AscFormat.CSolidFill());
-					tempColor.fill.setColor(colors[0].color);
-					gradientBrush = this._applyColorModeByBrush(tempColor, shadeValue1);
+					gradientBrush = getCSolidColor(colors[0].color, shadeValue1);
 				}
 				else if(faceIndex === c_oChartBar3dFaces.left)
 				{
-					var duplicateBrush = brushFill.createDuplicate();
-					var tempColor = new AscFormat.CUniFill();
-					tempColor.setFill(new AscFormat.CSolidFill());
-					tempColor.fill.setColor(colors[colors.length - 1].color);
-					gradientBrush = tempColor;
+					gradientBrush = getCSolidColor(colors[colors.length - 1].color, shadeValue1);
 				}
 			}
 			else if(angle >= 225 && angle < 270)
@@ -7368,30 +7347,18 @@ drawHBarChart.prototype =
 				}
 				else if(faceIndex === c_oChartBar3dFaces.left || faceIndex === c_oChartBar3dFaces.down || faceIndex === c_oChartBar3dFaces.right)
 				{
-					var duplicateBrush = brushFill.createDuplicate();
-					var tempColor = new AscFormat.CUniFill();
-					tempColor.setFill(new AscFormat.CSolidFill());
-					tempColor.fill.setColor(colors[0].color);
-					gradientBrush = this._applyColorModeByBrush(tempColor, shadeValue1);
+					gradientBrush = getCSolidColor(colors[0].color, shadeValue1);
 				}
 			}
 			else if(angle >= 270 && angle < 315)
 			{
 				if(faceIndex === c_oChartBar3dFaces.up)
 				{
-					var duplicateBrush = brushFill.createDuplicate();
-					var tempColor = new AscFormat.CUniFill();
-					tempColor.setFill(new AscFormat.CSolidFill());
-					tempColor.fill.setColor(colors[colors.length - 1].color);
-					gradientBrush = tempColor;
+					gradientBrush = getCSolidColor(colors[colors.length - 1].color);
 				}
 				else if(faceIndex === c_oChartBar3dFaces.left || faceIndex === c_oChartBar3dFaces.down)
 				{
-					var duplicateBrush = brushFill.createDuplicate();
-					var tempColor = new AscFormat.CUniFill();
-					tempColor.setFill(new AscFormat.CSolidFill());
-					tempColor.fill.setColor(colors[0].color);
-					gradientBrush = this._applyColorModeByBrush(tempColor, shadeValue1);
+					gradientBrush = getCSolidColor(colors[0].color, shadeValue1);
 				}
 				else if(faceIndex === c_oChartBar3dFaces.right)
 				{
@@ -7414,11 +7381,7 @@ drawHBarChart.prototype =
 				}
 				else if(faceIndex === c_oChartBar3dFaces.left || faceIndex === c_oChartBar3dFaces.down)
 				{
-					var duplicateBrush = brushFill.createDuplicate();
-					var tempColor = new AscFormat.CUniFill();
-					tempColor.setFill(new AscFormat.CSolidFill());
-					tempColor.fill.setColor(colors[0].color);
-					gradientBrush = applyColorModeByBrush(tempColor, shadeValue1);
+					gradientBrush = getCSolidColor(colors[0].color, shadeValue1);
 				}
 			}
 		}
