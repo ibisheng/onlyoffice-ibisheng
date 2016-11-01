@@ -1045,15 +1045,15 @@
 	window['AscDFH'].historyitem_type_Paragraph        = 3 << 16;
 	window['AscDFH'].historyitem_type_TextPr           = 4 << 16;
 	window['AscDFH'].historyitem_type_Drawing          = 5 << 16;
-	window['AscDFH'].historyitem_type_DrawingObjects   = 6 << 16;
-	window['AscDFH'].historyitem_type_FlowObjects      = 7 << 16;
-	window['AscDFH'].historyitem_type_FlowImage        = 8 << 16;
+	window['AscDFH'].historyitem_type_DrawingObjects   = 6 << 16; // obsolete
+	window['AscDFH'].historyitem_type_FlowObjects      = 7 << 16; // obsolete
+	window['AscDFH'].historyitem_type_FlowImage        = 8 << 16; // obsolete
 	window['AscDFH'].historyitem_type_Table            = 9 << 16;
 	window['AscDFH'].historyitem_type_TableRow         = 10 << 16;
 	window['AscDFH'].historyitem_type_TableCell        = 11 << 16;
 	window['AscDFH'].historyitem_type_DocumentContent  = 12 << 16;
-	window['AscDFH'].historyitem_type_FlowTable        = 13 << 16;
-	window['AscDFH'].historyitem_type_HdrFtrController = 14 << 16;
+	window['AscDFH'].historyitem_type_FlowTable        = 13 << 16; // obsolete
+	window['AscDFH'].historyitem_type_HdrFtrController = 14 << 16; // obsolete
 	window['AscDFH'].historyitem_type_HdrFtr           = 15 << 16;
 	window['AscDFH'].historyitem_type_AbstractNum      = 16 << 16;
 	window['AscDFH'].historyitem_type_Comment          = 17 << 16;
@@ -1272,25 +1272,22 @@
 	window['AscDFH'].historyitem_Paragraph_Shd_Value                 = window['AscDFH'].historyitem_type_Paragraph | 18;
 	window['AscDFH'].historyitem_Paragraph_Shd_Color                 = window['AscDFH'].historyitem_type_Paragraph | 19;
 	window['AscDFH'].historyitem_Paragraph_Shd_Unifill               = window['AscDFH'].historyitem_type_Paragraph | 20;
-	window['AscDFH'].historyitem_Paragraph_WidowControl              = window['AscDFH'].historyitem_type_Paragraph | 21;
-	window['AscDFH'].historyitem_Paragraph_Tabs                      = window['AscDFH'].historyitem_type_Paragraph | 22;
-	window['AscDFH'].historyitem_Paragraph_PStyle                    = window['AscDFH'].historyitem_type_Paragraph | 23;
-	window['AscDFH'].historyitem_Paragraph_DocNext                   = window['AscDFH'].historyitem_type_Paragraph | 24;
-	window['AscDFH'].historyitem_Paragraph_DocPrev                   = window['AscDFH'].historyitem_type_Paragraph | 25;
-	window['AscDFH'].historyitem_Paragraph_Parent                    = window['AscDFH'].historyitem_type_Paragraph | 26;
-	window['AscDFH'].historyitem_Paragraph_Borders_Between           = window['AscDFH'].historyitem_type_Paragraph | 27;
-	window['AscDFH'].historyitem_Paragraph_Borders_Bottom            = window['AscDFH'].historyitem_type_Paragraph | 28;
-	window['AscDFH'].historyitem_Paragraph_Borders_Left              = window['AscDFH'].historyitem_type_Paragraph | 29;
-	window['AscDFH'].historyitem_Paragraph_Borders_Right             = window['AscDFH'].historyitem_type_Paragraph | 30;
-	window['AscDFH'].historyitem_Paragraph_Borders_Top               = window['AscDFH'].historyitem_type_Paragraph | 31;
-	window['AscDFH'].historyitem_Paragraph_Pr                        = window['AscDFH'].historyitem_type_Paragraph | 32;
-	window['AscDFH'].historyitem_Paragraph_PresentationPr_Bullet     = window['AscDFH'].historyitem_type_Paragraph | 33;
-	window['AscDFH'].historyitem_Paragraph_PresentationPr_Level      = window['AscDFH'].historyitem_type_Paragraph | 34;
-	window['AscDFH'].historyitem_Paragraph_FramePr                   = window['AscDFH'].historyitem_type_Paragraph | 35;
-	window['AscDFH'].historyitem_Paragraph_Shd                       = window['AscDFH'].historyitem_type_Paragraph | 36;
-	window['AscDFH'].historyitem_Paragraph_SectionPr                 = window['AscDFH'].historyitem_type_Paragraph | 37;
-	window['AscDFH'].historyitem_Paragraph_PrChange                  = window['AscDFH'].historyitem_type_Paragraph | 38;
-	window['AscDFH'].historyitem_Paragraph_PrReviewInfo              = window['AscDFH'].historyitem_type_Paragraph | 39;
+	window['AscDFH'].historyitem_Paragraph_Shd                       = window['AscDFH'].historyitem_type_Paragraph | 21;
+	window['AscDFH'].historyitem_Paragraph_WidowControl              = window['AscDFH'].historyitem_type_Paragraph | 22;
+	window['AscDFH'].historyitem_Paragraph_Tabs                      = window['AscDFH'].historyitem_type_Paragraph | 23;
+	window['AscDFH'].historyitem_Paragraph_PStyle                    = window['AscDFH'].historyitem_type_Paragraph | 24;
+	window['AscDFH'].historyitem_Paragraph_Borders_Between           = window['AscDFH'].historyitem_type_Paragraph | 25;
+	window['AscDFH'].historyitem_Paragraph_Borders_Bottom            = window['AscDFH'].historyitem_type_Paragraph | 26;
+	window['AscDFH'].historyitem_Paragraph_Borders_Left              = window['AscDFH'].historyitem_type_Paragraph | 27;
+	window['AscDFH'].historyitem_Paragraph_Borders_Right             = window['AscDFH'].historyitem_type_Paragraph | 28;
+	window['AscDFH'].historyitem_Paragraph_Borders_Top               = window['AscDFH'].historyitem_type_Paragraph | 29;
+	window['AscDFH'].historyitem_Paragraph_Pr                        = window['AscDFH'].historyitem_type_Paragraph | 30;
+	window['AscDFH'].historyitem_Paragraph_PresentationPr_Bullet     = window['AscDFH'].historyitem_type_Paragraph | 31;
+	window['AscDFH'].historyitem_Paragraph_PresentationPr_Level      = window['AscDFH'].historyitem_type_Paragraph | 32;
+	window['AscDFH'].historyitem_Paragraph_FramePr                   = window['AscDFH'].historyitem_type_Paragraph | 33;
+	window['AscDFH'].historyitem_Paragraph_SectionPr                 = window['AscDFH'].historyitem_type_Paragraph | 34;
+	window['AscDFH'].historyitem_Paragraph_PrChange                  = window['AscDFH'].historyitem_type_Paragraph | 35;
+	window['AscDFH'].historyitem_Paragraph_PrReviewInfo              = window['AscDFH'].historyitem_type_Paragraph | 36;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе ParaTextPr
 	//------------------------------------------------------------------------------------------------------------------
@@ -1349,25 +1346,6 @@
 	window['AscDFH'].historyitem_Drawing_LayoutInCell      = window['AscDFH'].historyitem_type_Drawing | 20;
 	window['AscDFH'].historyitem_Drawing_SetSizeRelH       = window['AscDFH'].historyitem_type_Drawing | 21;
 	window['AscDFH'].historyitem_Drawing_SetSizeRelV       = window['AscDFH'].historyitem_type_Drawing | 22;
-	//------------------------------------------------------------------------------------------------------------------
-	// Типы изменений в классе CDrawingObjects
-	//------------------------------------------------------------------------------------------------------------------
-	window['AscDFH'].historyitem_DrawingObjects_AddItem    = window['AscDFH'].historyitem_type_DrawingObjects | 1;
-	window['AscDFH'].historyitem_DrawingObjects_RemoveItem = window['AscDFH'].historyitem_type_DrawingObjects | 2;
-	//------------------------------------------------------------------------------------------------------------------
-	// Типы изменений в классе FlowObjects
-	//------------------------------------------------------------------------------------------------------------------
-	window['AscDFH'].historyitem_FlowObjects_AddItem    = window['AscDFH'].historyitem_type_FlowObjects | 1;
-	window['AscDFH'].historyitem_FlowObjects_RemoveItem = window['AscDFH'].historyitem_type_FlowObjects | 2;
-	//------------------------------------------------------------------------------------------------------------------
-	// Типы изменений в классе FlowImage
-	//------------------------------------------------------------------------------------------------------------------
-	window['AscDFH'].historyitem_FlowImage_Position = window['AscDFH'].historyitem_type_FlowImage | 1;
-	window['AscDFH'].historyitem_FlowImage_Size     = window['AscDFH'].historyitem_type_FlowImage | 2;
-	window['AscDFH'].historyitem_FlowImage_Paddings = window['AscDFH'].historyitem_type_FlowImage | 3;
-	window['AscDFH'].historyitem_FlowImage_PageNum  = window['AscDFH'].historyitem_type_FlowImage | 4;
-	window['AscDFH'].historyitem_FlowImage_Url      = window['AscDFH'].historyitem_type_FlowImage | 5;
-	window['AscDFH'].historyitem_FlowImage_Parent   = window['AscDFH'].historyitem_type_FlowImage | 6;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе CTable
 	//------------------------------------------------------------------------------------------------------------------
@@ -1431,22 +1409,6 @@
 	//------------------------------------------------------------------------------------------------------------------
 	window['AscDFH'].historyitem_DocumentContent_AddItem    = window['AscDFH'].historyitem_type_DocumentContent | 1;
 	window['AscDFH'].historyitem_DocumentContent_RemoveItem = window['AscDFH'].historyitem_type_DocumentContent | 2;
-	//------------------------------------------------------------------------------------------------------------------
-	// Типы изменений в классе CFlowTable
-	//------------------------------------------------------------------------------------------------------------------
-	window['AscDFH'].historyitem_FlowTable_Position = window['AscDFH'].historyitem_type_FlowTable | 1;
-	window['AscDFH'].historyitem_FlowTable_Paddings = window['AscDFH'].historyitem_type_FlowTable | 2;
-	window['AscDFH'].historyitem_FlowTable_PageNum  = window['AscDFH'].historyitem_type_FlowTable | 3;
-	window['AscDFH'].historyitem_FlowTable_Parent   = window['AscDFH'].historyitem_type_FlowTable | 4;
-	//------------------------------------------------------------------------------------------------------------------
-	// Типы изменений в классе CHeaderFooterController
-	//------------------------------------------------------------------------------------------------------------------
-	window['AscDFH'].historyitem_HdrFtrController_AddItem    = window['AscDFH'].historyitem_type_HdrFtrController | 1;
-	window['AscDFH'].historyitem_HdrFtrController_RemoveItem = window['AscDFH'].historyitem_type_HdrFtrController | 2;
-	//------------------------------------------------------------------------------------------------------------------
-	// Типы изменений в классе CHeaderFooter
-	//------------------------------------------------------------------------------------------------------------------
-	window['AscDFH'].historyitem_HdrFtr_BoundY2 = window['AscDFH'].historyitem_type_HdrFtr | 1;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе CAbstractNum
 	//------------------------------------------------------------------------------------------------------------------
@@ -3299,4 +3261,70 @@
 			this.Old = Reader.GetString2();
 	};
 	window['AscDFH'].CChangesBaseStringProperty = CChangesBaseStringProperty;
+	/**
+	 * Базовый класс для изменения числовых (byte) свойств.
+	 * @constructor
+	 * @extends {AscDFH.CChangesBaseProperty}
+	 */
+	function CChangesBaseByteProperty(Class, Old, New, Color)
+	{
+		CChangesBaseByteProperty.superclass.constructor.call(this, Class, Old, New, Color);
+	}
+	AscCommon.extendClass(CChangesBaseByteProperty, CChangesBaseProperty);
+	CChangesBaseByteProperty.prototype.WriteToBinary = function(Writer)
+	{
+		// Long  : Flag
+		// 1-bit : Подсвечивать ли данные изменения
+		// 2-bit : IsUndefined New
+		// 3-bit : IsUndefined Old
+		// byte  : New
+		// byte  : Old
+
+		var nFlags = 0;
+
+		if (false !== this.Color)
+			nFlags |= 1;
+
+		if (undefined === this.New)
+			nFlags |= 2;
+
+		if (undefined === this.Old)
+			nFlags |= 4;
+
+		Writer.WriteLong(nFlags);
+
+		if (undefined !== this.New)
+			Writer.WriteByte(this.New);
+
+		if (undefined !== this.Old)
+			Writer.WriteByte(this.Old);
+	};
+	CChangesBaseByteProperty.prototype.ReadFromBinary = function(Reader)
+	{
+		// Long  : Flag
+		// 1-bit : Подсвечивать ли данные изменения
+		// 2-bit : IsUndefined New
+		// 3-bit : IsUndefined Old
+		// byte  : New
+		// byte  : Old
+
+
+		var nFlags = Reader.GetLong();
+
+		if (nFlags & 1)
+			this.Color = true;
+		else
+			this.Color = false;
+
+		if (nFlags & 2)
+			this.New = undefined;
+		else
+			this.New = Reader.GetByte();
+
+		if (nFlags & 4)
+			this.Old = undefined;
+		else
+			this.Old = Reader.GetByte();
+	};
+	window['AscDFH'].CChangesBaseByteProperty = CChangesBaseByteProperty;
 })(window);

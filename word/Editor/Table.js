@@ -5361,6 +5361,9 @@ CTable.prototype =
         // Long               : количество строк
         // Array of Strings   : массив Id строк
 
+		this.Prev = null;
+		this.Next = null;
+
         Reader.GetLong();
         this.Id = Reader.GetString2();
 

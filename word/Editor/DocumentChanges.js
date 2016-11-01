@@ -66,6 +66,24 @@ CChangesDocumentAddItem.prototype.Undo = function()
 	var Elements  = oDocument.Content.splice(this.Pos, 1);
 	oDocument.private_RecalculateNumbering(Elements);
 	oDocument.SectionsInfo.Update_OnRemove(this.Pos, 1);
+
+	var Pos = this.Pos;
+	if (Pos > 0)
+	{
+		if (Pos <= oDocument.Content.length - 1)
+		{
+			oDocument.Content[Pos - 1].Next = oDocument.Content[Pos];
+			oDocument.Content[Pos].Prev     = oDocument.Content[Pos - 1];
+		}
+		else
+		{
+			oDocument.Content[Pos - 1].Next = null;
+		}
+	}
+	else if (Pos <= oDocument.Content.length - 1)
+	{
+		oDocument.Content[Pos].Prev = null;
+	}
 };
 CChangesDocumentAddItem.prototype.Redo = function()
 {
@@ -73,6 +91,30 @@ CChangesDocumentAddItem.prototype.Redo = function()
 	oDocument.Content.splice(this.Pos, 0, this.Item);
 	oDocument.private_RecalculateNumbering([this.Item]);
 	oDocument.SectionsInfo.Update_OnAdd(this.Pos, [this.Item]);
+
+	var Element = this.Item;
+	var Pos     = this.Pos;
+	if (Pos > 0)
+	{
+		oDocument.Content[Pos - 1].Next = Element;
+		Element.Prev                    = oDocument.Content[Pos - 1];
+	}
+	else
+	{
+		Element.Prev = null;
+	}
+
+	if (Pos <= oDocument.Content.length - 1)
+	{
+		oDocument.Content[Pos].Prev = Element;
+		Element.Next                = oDocument.Content[Pos];
+	}
+	else
+	{
+		Element.Next = null;
+	}
+
+	Element.Parent = oDocument;
 };
 CChangesDocumentAddItem.prototype.WriteToBinary = function(Writer)
 {
@@ -163,6 +205,24 @@ CChangesDocumentRemoveItem.prototype.Undo = function()
 	oDocument.Content = Array_start.concat(this.Items, Array_end);
 
 	oDocument.SectionsInfo.Update_OnAdd(this.Pos, this.Items);
+
+	var nStartIndex = Math.max(this.Pos - 1, 0);
+	var nEndIndex   = Math.min(oDocument.Content.length - 1, this.Pos + this.Items.length + 1);
+	for (var nIndex = nStartIndex; nIndex <= nEndIndex; ++nIndex)
+	{
+		var oElement = oDocument.Content[nIndex];
+		if (nIndex > 0)
+			oElement.Prev = oDocument.Content[nIndex - 1];
+		else
+			oElement.Prev = null;
+
+		if (nIndex < oDocument.Content.length - 1)
+			oElement.Next = oDocument.Content[nIndex + 1];
+		else
+			oElement.Next = null;
+
+		oElement.Parent = oDocument;
+	}
 };
 CChangesDocumentRemoveItem.prototype.Redo = function()
 {
@@ -170,6 +230,24 @@ CChangesDocumentRemoveItem.prototype.Redo = function()
 	var Elements = oDocument.Content.splice(this.Pos, this.Items.length);
 	oDocument.private_RecalculateNumbering(Elements);
 	oDocument.SectionsInfo.Update_OnRemove(this.Pos, this.Items.length);
+
+	var Pos = this.Pos;
+	if (Pos > 0)
+	{
+		if (Pos <= oDocument.Content.length - 1)
+		{
+			oDocument.Content[Pos - 1].Next = oDocument.Content[Pos];
+			oDocument.Content[Pos].Prev     = oDocument.Content[Pos - 1];
+		}
+		else
+		{
+			oDocument.Content[Pos - 1].Next = null;
+		}
+	}
+	else if (Pos <= oDocument.Content.length - 1)
+	{
+		oDocument.Content[Pos].Prev = null;
+	}
 };
 CChangesDocumentRemoveItem.prototype.WriteToBinary = function(Writer)
 {
