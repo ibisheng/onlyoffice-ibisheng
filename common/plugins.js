@@ -418,7 +418,12 @@
 				{
 					try
 					{
-						if (pluginData.privateData.resize || window.g_asc_plugins.api.asc_canPaste())
+						if (pluginData.getAttribute("interface"))
+						{
+							var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + value + "\n})();";
+							eval(_script);
+						}
+						else if (pluginData.getAttribute("resize") || window.g_asc_plugins.api.asc_canPaste())
 						{
 							var oLogicDocument, i;
 							var editorId = window.g_asc_plugins.api.getEditorId();
