@@ -1585,14 +1585,15 @@ CTextDrawer.prototype =
         {
             this.Get_PathToDraw(false, true, x, y);
         }
-        g_oTextMeasurer.SetFontInternal(this.m_oFont.Name, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0));
+        AscCommon.g_oTextMeasurer.SetFontInternal(this.m_oFont.Name, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0));
 
         if (null != this.LastFontOriginInfo.Replace)
         {
             code = g_fontApplication.GetReplaceGlyph(code, this.LastFontOriginInfo.Replace);
         }
 
-        g_oTextMeasurer.m_oManager.LoadStringPathCode(code, false, x, y, this);
+        if (AscCommon.g_oTextMeasurer.m_oManager)
+            AscCommon.g_oTextMeasurer.m_oManager.LoadStringPathCode(code, false, x, y, this);
     },
     tg : function(gid,x,y)
     {

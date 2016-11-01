@@ -2607,6 +2607,8 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                     var oParaDrawing = getParaDrawing(this);
                     if(oParaDrawing)
                     {
+                        this.x = 0;
+                        this.y = 0;
                         if(oParaDrawing.SizeRelH || oParaDrawing.SizeRelV)
                         {
                             this.m_oSectPr = null;

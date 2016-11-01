@@ -33,34 +33,41 @@
 "use strict";
 
 (/**
-   * @param {Window} window
-   * @param {undefined} undefined
-   */
-    function(window, undefined) {
-    // Import
-    var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+ * @param {Window} window
+ * @param {undefined} undefined
+ */
+  function (window, undefined) {
+  // Import
+  var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
 
-    /** @constructor */
-    function asc_CCellFlag(m, s, w, t, l) {
-      this.merge = !!m;
-      this.shrinkToFit = !!s;
-      this.wrapText = !!w;
-      this.selectionType = t;
-      this.lockText = !!l;
-    }
-    asc_CCellFlag.prototype = {
-      asc_getMerge: function() {
-        return this.merge;
-      }, asc_getShrinkToFit: function() {
-        return this.shrinkToFit;
-      }, asc_getWrapText: function() {
-        return this.wrapText;
-      }, asc_getSelectionType: function() {
-        return this.selectionType;
-      }, asc_getLockText: function() {
-        return this.lockText;
-      }
-    };
+  /** @constructor */
+  function asc_CCellFlag(m, s, w, t, l) {
+    this.merge = !!m;
+    this.shrinkToFit = !!s;
+    this.wrapText = !!w;
+    this.selectionType = t;
+    this.lockText = !!l;
+    this.multiselect = false;
+  }
+
+  asc_CCellFlag.prototype.asc_getMerge = function () {
+    return this.merge;
+  };
+  asc_CCellFlag.prototype.asc_getShrinkToFit = function () {
+    return this.shrinkToFit;
+  };
+  asc_CCellFlag.prototype.asc_getWrapText = function () {
+    return this.wrapText;
+  };
+  asc_CCellFlag.prototype.asc_getSelectionType = function () {
+    return this.selectionType;
+  };
+  asc_CCellFlag.prototype.asc_getMultiselect = function () {
+    return this.multiselect;
+  };
+  asc_CCellFlag.prototype.asc_getLockText = function () {
+    return this.lockText;
+  };
 
     /** @constructor */
     function asc_CFont(name, size, color, b, i, u, s, sub, sup) {
@@ -373,6 +380,7 @@
   prot["asc_getShrinkToFit"] = prot.asc_getShrinkToFit;
   prot["asc_getWrapText"] = prot.asc_getWrapText;
   prot["asc_getSelectionType"] = prot.asc_getSelectionType;
+  prot["asc_getMultiselect"] = prot.asc_getMultiselect;
   prot["asc_getLockText"] = prot.asc_getLockText;
 
   window["AscCommonExcel"].asc_CFont = asc_CFont;

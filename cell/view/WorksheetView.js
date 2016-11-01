@@ -73,7 +73,6 @@
     var asc_CMM = AscCommonExcel.asc_CMouseMoveData;
     var asc_VR = AscCommonExcel.VisibleRange;
 
-    var asc_CCellFlag = AscCommonExcel.asc_CCellFlag;
     var asc_CFont = AscCommonExcel.asc_CFont;
     var asc_CFill = AscCommonExcel.asc_CFill;
     var asc_CCellInfo = AscCommonExcel.asc_CCellInfo;
@@ -6968,12 +6967,13 @@
         cell_info.styleName = c.getStyleName();
         cell_info.angle = c.getAngle();
 
-        cell_info.flags = new asc_CCellFlag();
+        cell_info.flags = new AscCommonExcel.asc_CCellFlag();
         cell_info.flags.shrinkToFit = c.getShrinkToFit();
         cell_info.flags.wrapText = c.getWrap();
 
         // ToDo activeRange type
         cell_info.flags.selectionType = selectionRange.getLast().type;
+        cell_info.flags.multiselect = !selectionRange.isSingleRange();
 
         cell_info.flags.lockText = ("" !== cell_info.text && (isNumberFormat || "" !== cell_info.formula));
 
@@ -7031,7 +7031,7 @@
     WorksheetView.prototype._getSelectionInfoObject = function () {
         var objectInfo = new asc_CCellInfo();
 
-        objectInfo.flags = new asc_CCellFlag();
+        objectInfo.flags = new AscCommonExcel.asc_CCellFlag();
         var graphicObjects = this.objectRender.getSelectedGraphicObjects();
         if (graphicObjects.length) {
             objectInfo.flags.selectionType = this.objectRender.getGraphicSelectionType(graphicObjects[0].Id);
@@ -8722,13 +8722,13 @@
         };
         if ("paste" === prop && val.onlyImages !== true) {
             // Для past свой диапазон
-			var newRange;
+            var newRange;
             if (isLocal === "binary") {
                 newRange = this._pasteFromBinary(val, true);
             } else {
                 newRange = this._pasteFromHTML(val, true);
             }
-			checkRange = [newRange];
+            checkRange = [newRange];
         }
         if ("paste" === prop && val.onlyImages === true) {
             onSelectionCallback();
