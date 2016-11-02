@@ -591,14 +591,14 @@
 				return item.containsRange(range);
 			});
 		};
-		SelectionRange.prototype.clone = function () {
+		SelectionRange.prototype.clone = function (worksheet) {
 			var res = new SelectionRange();
 			res.ranges = this.ranges.map(function (range) {
 				return range.clone();
 			});
 			res.activeCell = this.activeCell.clone();
 			res.activeCellId = this.activeCellId;
-			res.worksheet = this.worksheet;
+			res.worksheet = worksheet || this.worksheet;
 			return res;
 		};
 		SelectionRange.prototype.isEqual = function (range) {
