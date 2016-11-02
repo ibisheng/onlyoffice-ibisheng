@@ -8626,6 +8626,9 @@ CTextPr.prototype =
         if (this.Underline !== TextPr.Underline)
             return false;
 
+		if ((undefined === this.FontFamily && undefined !== TextPr.FontFamily) || (undefined !== this.FontFamily && (undefined === TextPr.FontFamily || this.FontFamily.Name !== TextPr.FontFamily.Name)))
+			return false;
+
         if (false
             || (undefined === this.FontSize
                 && undefined !== TextPr.FontSize)
