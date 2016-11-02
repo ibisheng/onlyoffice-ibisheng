@@ -492,29 +492,28 @@ var g_oFontProperties = {
 		c: 7,
 		va: 8
 	};
-/** @constructor */
-function Font(val)
-{
-	if(null == val)
-		val = g_oDefaultFormat.FontAbs;
-	this.Properties = g_oFontProperties;
-	this.fn = val.fn;
-	this.scheme = val.scheme;
-	this.fs = val.fs;
-	this.b = val.b;
-	this.i = val.i;
-	this.u = val.u;
-	this.s = val.s;
-	this.c = val.c;
-	this.va = val.va;
-    //skip и repeat не сохраняются в файл нужны здесь только чтобы класс Font можно было использовать в комплексных строках
-    this.skip = val.skip;
-    this.repeat = val.repeat;
-}
-Font.prototype =
-{
-	clean : function()
-	{
+
+	/** @constructor */
+	function Font(val) {
+		if (null == val) {
+			val = g_oDefaultFormat.FontAbs;
+		}
+		this.Properties = g_oFontProperties;
+		this.fn = val.fn;
+		this.scheme = val.scheme;
+		this.fs = val.fs;
+		this.b = val.b;
+		this.i = val.i;
+		this.u = val.u;
+		this.s = val.s;
+		this.c = val.c;
+		this.va = val.va;
+		//skip и repeat не сохраняются в файл нужны здесь только чтобы класс Font можно было использовать в комплексных строках
+		this.skip = val.skip;
+		this.repeat = val.repeat;
+	}
+
+	Font.prototype.clean = function () {
 		this.fn = null;
 		this.scheme = null;
 		this.fs = null;
@@ -526,16 +525,15 @@ Font.prototype =
 		this.va = null;
 		this.skip = null;
 		this.repeat = null;
-	},
-	_mergeProperty : function(first, second, def)
-	{
-		if(def != first)
+	};
+	Font.prototype._mergeProperty = function (first, second, def) {
+		if (def != first) {
 			return first;
-		else
+		} else {
 			return second;
-	},
-	merge : function(font)
-	{
+		}
+	};
+	Font.prototype.merge = function (font) {
 		var defaultFontAbs = g_oDefaultFormat.FontAbs;
 		var oRes = new Font();
 		oRes.fn = this._mergeProperty(this.fn, font.fn, defaultFontAbs.fn);
@@ -546,184 +544,244 @@ Font.prototype =
 		oRes.u = this._mergeProperty(this.u, font.u, defaultFontAbs.u);
 		oRes.s = this._mergeProperty(this.s, font.s, defaultFontAbs.s);
 		//заглушка excel при merge стилей игнорирует default цвет
-		if(this.c instanceof ThemeColor && g_nColorTextDefault == this.c.theme && null == this.c.tint)
+		if (this.c instanceof ThemeColor && g_nColorTextDefault == this.c.theme && null == this.c.tint) {
 			oRes.c = this._mergeProperty(font.c, this.c, defaultFontAbs.c);
-		else
+		} else {
 			oRes.c = this._mergeProperty(this.c, font.c, defaultFontAbs.c);
+		}
 		oRes.va = this._mergeProperty(this.va, font.va, defaultFontAbs.va);
 		oRes.skip = this._mergeProperty(this.skip, font.skip, defaultFontAbs.skip);
 		oRes.repeat = this._mergeProperty(this.repeat, font.repeat, defaultFontAbs.repeat);
 		return oRes;
-	},
-	getRgbOrNull : function()
-	{
+	};
+	Font.prototype.getRgbOrNull = function () {
 		var nRes = null;
-		if(null != this.c)
+		if (null != this.c) {
 			nRes = this.c.getRgb();
+		}
 		return nRes;
-	},
-	getDif : function(val)
-	{
+	};
+	Font.prototype.getDif = function (val) {
 		var oRes = new Font(this);
 		var bEmpty = true;
-		if(this.fn == val.fn)
-			oRes.fn =  null;
-		else
+		if (this.fn == val.fn) {
+			oRes.fn = null;
+		} else {
 			bEmpty = false;
-		if(this.scheme == val.scheme)
-			oRes.scheme =  null;
-		else
+		}
+		if (this.scheme == val.scheme) {
+			oRes.scheme = null;
+		} else {
 			bEmpty = false;
-		if(this.fs == val.fs)
-			oRes.fs =  null;
-		else
+		}
+		if (this.fs == val.fs) {
+			oRes.fs = null;
+		} else {
 			bEmpty = false;
-		if(this.b == val.b)
-			oRes.b =  null;
-		else
+		}
+		if (this.b == val.b) {
+			oRes.b = null;
+		} else {
 			bEmpty = false;
-		if(this.i == val.i)
-			oRes.i =  null;
-		else
+		}
+		if (this.i == val.i) {
+			oRes.i = null;
+		} else {
 			bEmpty = false;
-		if(this.u == val.u)
-			oRes.u =  null;
-		else
+		}
+		if (this.u == val.u) {
+			oRes.u = null;
+		} else {
 			bEmpty = false;
-		if(this.s == val.s)
-			oRes.s =  null;
-		else
+		}
+		if (this.s == val.s) {
+			oRes.s = null;
+		} else {
 			bEmpty = false;
-		if(g_oColorManager.isEqual(this.c, val.c))
-			oRes.c =  null;
-		else
+		}
+		if (g_oColorManager.isEqual(this.c, val.c)) {
+			oRes.c = null;
+		} else {
 			bEmpty = false;
-		if(this.va == val.va)
-			oRes.va =  null;
-		else
+		}
+		if (this.va == val.va) {
+			oRes.va = null;
+		} else {
 			bEmpty = false;
-		if(this.skip == val.skip)
-			oRes.skip =  null;
-		else
+		}
+		if (this.skip == val.skip) {
+			oRes.skip = null;
+		} else {
 			bEmpty = false;
-		if(this.repeat == val.repeat)
-			oRes.repeat =  null;
-		else
+		}
+		if (this.repeat == val.repeat) {
+			oRes.repeat = null;
+		} else {
 			bEmpty = false;
-		if(bEmpty)
+		}
+		if (bEmpty) {
 			oRes = null;
+		}
 		return oRes;
-	},
-	isEqual : function(font)
-	{
+	};
+	Font.prototype.isEqual = function (font) {
 		var bRes = this.fs == font.fs && this.b == font.b && this.i == font.i && this.u == font.u && this.s == font.s &&
-				g_oColorManager.isEqual(this.c, font.c) && this.va == font.va && this.skip == font.skip && this.repeat == font.repeat;
-		if(bRes)
-		{
-		    if (Asc.EFontScheme.fontschemeNone == this.scheme && Asc.EFontScheme.fontschemeNone == font.scheme)
+			g_oColorManager.isEqual(this.c, font.c) && this.va == font.va && this.skip == font.skip &&
+			this.repeat == font.repeat;
+		if (bRes) {
+			if (Asc.EFontScheme.fontschemeNone == this.scheme && Asc.EFontScheme.fontschemeNone == font.scheme) {
 				bRes = this.fn == font.fn;
-		    else if (Asc.EFontScheme.fontschemeNone != this.scheme && Asc.EFontScheme.fontschemeNone != font.scheme)
+			} else if (Asc.EFontScheme.fontschemeNone != this.scheme &&
+				Asc.EFontScheme.fontschemeNone != font.scheme) {
 				bRes = this.scheme == font.scheme;
-			else
+			} else {
 				bRes = false;
+			}
 		}
 		return bRes;
-	},
-    clone : function()
-    {
+	};
+	Font.prototype.clone = function () {
 		return new Font(this);
-    },
-	set : function(oVal)
-	{
-	    if (null != oVal.fn) {
-	        this.fn = oVal.fn;
-	        this.scheme = Asc.EFontScheme.fontschemeNone;
-	    }
-		if(null != oVal.scheme)
-            this.scheme = oVal.scheme;
-        if(null != oVal.fs)
-            this.fs = oVal.fs;
-        if(null != oVal.b)
-            this.b = oVal.b;
-        if(null != oVal.i)
-            this.i = oVal.i;
-        if(null != oVal.u)
-            this.u = oVal.u;
-        if(null != oVal.s)
-            this.s = oVal.s;
-        if(null != oVal.c)
-            this.c = oVal.c;
-		if(null != oVal.va)
-            this.va = oVal.va;
-        if(null != oVal.skip)
-            this.skip = oVal.skip;
-		if(null != oVal.repeat)
-            this.repeat = oVal.repeat;
-	},
-	intersect : function(oFont, oDefVal)
-	{
-		if(this.fn != oFont.fn)
-            this.fn = oDefVal.fn;
-		if(this.scheme != oFont.scheme)
-            this.scheme = oDefVal.scheme;
-        if(this.fs != oFont.fs)
-            this.fs = oDefVal.fs;
-		if(this.b != oFont.b)
-            this.b = oDefVal.b;
-		if(this.i != oFont.i)
-            this.i = oDefVal.i;
-		if(this.u != oFont.u)
-            this.u = oDefVal.u;
-		if(this.s != oFont.s)
-            this.s = oDefVal.s;
-		if(false == g_oColorManager.isEqual(this.c, oFont.c))
-            this.c = oDefVal.c;
-		if(this.va != oFont.va)
-            this.va = oDefVal.va;
-		if(this.skip != oFont.skip)
-            this.skip = oDefVal.skip;
-		if(this.repeat != oFont.repeat)
-            this.repeat = oDefVal.repeat;
-	},
-	getType : function()
-	{
+	};
+	Font.prototype.set = function (oVal) {
+		if (null != oVal.fn) {
+			this.fn = oVal.fn;
+			this.scheme = Asc.EFontScheme.fontschemeNone;
+		}
+		if (null != oVal.scheme) {
+			this.scheme = oVal.scheme;
+		}
+		if (null != oVal.fs) {
+			this.fs = oVal.fs;
+		}
+		if (null != oVal.b) {
+			this.b = oVal.b;
+		}
+		if (null != oVal.i) {
+			this.i = oVal.i;
+		}
+		if (null != oVal.u) {
+			this.u = oVal.u;
+		}
+		if (null != oVal.s) {
+			this.s = oVal.s;
+		}
+		if (null != oVal.c) {
+			this.c = oVal.c;
+		}
+		if (null != oVal.va) {
+			this.va = oVal.va;
+		}
+		if (null != oVal.skip) {
+			this.skip = oVal.skip;
+		}
+		if (null != oVal.repeat) {
+			this.repeat = oVal.repeat;
+		}
+	};
+	Font.prototype.intersect = function (oFont, oDefVal) {
+		if (this.fn != oFont.fn) {
+			this.fn = oDefVal.fn;
+		}
+		if (this.scheme != oFont.scheme) {
+			this.scheme = oDefVal.scheme;
+		}
+		if (this.fs != oFont.fs) {
+			this.fs = oDefVal.fs;
+		}
+		if (this.b != oFont.b) {
+			this.b = oDefVal.b;
+		}
+		if (this.i != oFont.i) {
+			this.i = oDefVal.i;
+		}
+		if (this.u != oFont.u) {
+			this.u = oDefVal.u;
+		}
+		if (this.s != oFont.s) {
+			this.s = oDefVal.s;
+		}
+		if (false == g_oColorManager.isEqual(this.c, oFont.c)) {
+			this.c = oDefVal.c;
+		}
+		if (this.va != oFont.va) {
+			this.va = oDefVal.va;
+		}
+		if (this.skip != oFont.skip) {
+			this.skip = oDefVal.skip;
+		}
+		if (this.repeat != oFont.repeat) {
+			this.repeat = oDefVal.repeat;
+		}
+	};
+	Font.prototype.getType = function () {
 		return UndoRedoDataTypes.StyleFont;
-	},
-	getProperties : function()
-	{
+	};
+	Font.prototype.getProperties = function () {
 		return this.Properties;
-	},
-	getProperty : function(nType)
-	{
-		switch(nType)
-		{
-			case this.Properties.fn: return this.fn;break;
-			case this.Properties.scheme: return this.scheme;break;
-			case this.Properties.fs: return this.fs;break;
-			case this.Properties.b: return this.b;break;
-			case this.Properties.i: return this.i;break;
-			case this.Properties.u: return this.u;break;
-			case this.Properties.s: return this.s;break;
-			case this.Properties.c: return this.c;break;
-			case this.Properties.va: return this.va;break;
+	};
+	Font.prototype.getProperty = function (nType) {
+		switch (nType) {
+			case this.Properties.fn:
+				return this.fn;
+				break;
+			case this.Properties.scheme:
+				return this.scheme;
+				break;
+			case this.Properties.fs:
+				return this.fs;
+				break;
+			case this.Properties.b:
+				return this.b;
+				break;
+			case this.Properties.i:
+				return this.i;
+				break;
+			case this.Properties.u:
+				return this.u;
+				break;
+			case this.Properties.s:
+				return this.s;
+				break;
+			case this.Properties.c:
+				return this.c;
+				break;
+			case this.Properties.va:
+				return this.va;
+				break;
 		}
-	},
-	setProperty : function(nType, value)
-	{
-		switch(nType)
-		{
-			case this.Properties.fn: this.fn = value;break;
-			case this.Properties.scheme: this.scheme = value;break;
-			case this.Properties.fs: this.fs = value;break;
-			case this.Properties.b: this.b = value;break;
-			case this.Properties.i: this.i = value;break;
-			case this.Properties.u: this.u = value;break;
-			case this.Properties.s: this.s = value;break;
-			case this.Properties.c: this.c = value;break;
-			case this.Properties.va: this.va = value;break;
+	};
+	Font.prototype.setProperty = function (nType, value) {
+		switch (nType) {
+			case this.Properties.fn:
+				this.fn = value;
+				break;
+			case this.Properties.scheme:
+				this.scheme = value;
+				break;
+			case this.Properties.fs:
+				this.fs = value;
+				break;
+			case this.Properties.b:
+				this.b = value;
+				break;
+			case this.Properties.i:
+				this.i = value;
+				break;
+			case this.Properties.u:
+				this.u = value;
+				break;
+			case this.Properties.s:
+				this.s = value;
+				break;
+			case this.Properties.c:
+				this.c = value;
+				break;
+			case this.Properties.va:
+				this.va = value;
+				break;
 		}
-	}
-};
+	};
 var g_oFillProperties = {
 		bg: 0
 	};
