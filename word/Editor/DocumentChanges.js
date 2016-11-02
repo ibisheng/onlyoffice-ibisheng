@@ -104,10 +104,10 @@ CChangesDocumentAddItem.prototype.Redo = function()
 		Element.Prev = null;
 	}
 
-	if (Pos <= oDocument.Content.length - 1)
+	if (Pos < oDocument.Content.length - 1)
 	{
-		oDocument.Content[Pos].Prev = Element;
-		Element.Next                = oDocument.Content[Pos];
+		oDocument.Content[Pos + 1].Prev = Element;
+		Element.Next                    = oDocument.Content[Pos + 1];
 	}
 	else
 	{

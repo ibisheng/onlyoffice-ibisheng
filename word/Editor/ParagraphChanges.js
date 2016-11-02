@@ -37,6 +37,43 @@
  * Time: 18:01
  */
 
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_AddItem]                   = CChangesParagraphAddItem;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_RemoveItem]                = CChangesParagraphRemoveItem;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Numbering]                 = CChangesParagraphNumbering;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Align]                     = CChangesParagraphAlign;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Ind_First]                 = CChangesParagraphIndFirst;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Ind_Right]                 = CChangesParagraphIndRight;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Ind_Left]                  = CChangesParagraphIndLeft;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_ContextualSpacing]         = CChangesParagraphContextualSpacing;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_KeepLines]                 = CChangesParagraphKeepLines;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_KeepNext]                  = CChangesParagraphKeepNext;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_PageBreakBefore]           = CChangesParagraphPageBreakBefore;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Spacing_Line]              = CChangesParagraphSpacingLine;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Spacing_LineRule]          = CChangesParagraphSpacingLineRule;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Spacing_Before]            = CChangesParagraphSpacingBefore;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Spacing_After]             = CChangesParagraphSpacingAfter;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Spacing_AfterAutoSpacing]  = CChangesParagraphSpacingAfterAutoSpacing;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Spacing_BeforeAutoSpacing] = CChangesParagraphSpacingBeforeAutoSpacing;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Shd_Value]                 = CChangesParagraphShdValue;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Shd_Color]                 = CChangesParagraphShdColor;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Shd_Unifill]               = CChangesParagraphShdUnifill;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Shd]                       = CChangesParagraphShd;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_WidowControl]              = CChangesParagraphWidowControl;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Tabs]                      = CChangesParagraphTabs;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_PStyle]                    = CChangesParagraphPStyle;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Borders_Between]           = CChangesParagraphBordersBetween;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Borders_Bottom]            = CChangesParagraphBordersBottom;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Borders_Left]              = CChangesParagraphBordersLeft;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Borders_Right]             = CChangesParagraphBordersRight;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Borders_Top]               = CChangesParagraphBordersTop;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_Pr]                        = CChangesParagraphPr;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_PresentationPr_Bullet]     = CChangesParagraphPresentationPrBullet;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_PresentationPr_Level]      = CChangesParagraphPresentationPrLevel;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_FramePr]                   = CChangesParagraphFramePr;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_SectionPr]                 = CChangesParagraphSectPr;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_PrChange]                  = CChangesParagraphPrChange;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_PrReviewInfo]              = CChangesParagraphPrReviewInfo;
+
 function private_ParagraphChangesOnLoadPr(oColor)
 {
 	this.Redo();
@@ -55,13 +92,12 @@ function private_ParagraphChangesOnSetValue(oParagraph)
  * @constructor
  * @extends {AscDFH.CChangesBase}
  */
-function CChangesParagraphAddItem(Class, Pos, Items, EndPos)
+function CChangesParagraphAddItem(Class, Pos, Items)
 {
 	CChangesParagraphAddItem.superclass.constructor.call(this, Class);
 
 	this.Pos    = Pos;
 	this.Items  = Items;
-	this.EndPos = EndPos;
 
 	this.UseArray = false;
 	this.PosArray = [];
@@ -71,15 +107,15 @@ CChangesParagraphAddItem.prototype.Type = AscDFH.historyitem_Paragraph_AddItem;
 CChangesParagraphAddItem.prototype.Undo = function()
 {
 	var oParagraph = this.Class;
-	oParagraph.Content.splice(this.Pos, this.EndPos - this.Pos + 1);
+	oParagraph.Content.splice(this.Pos, this.Items.length);
 	oParagraph.private_UpdateTrackRevisions();
 	private_ParagraphChangesOnSetValue(this.Class);
 };
 CChangesParagraphAddItem.prototype.Redo = function()
 {
 	var oParagraph  = this.Class;
-	var Array_start = this.Content.slice(0, this.Pos);
-	var Array_end   = this.Content.slice(this.Pos);
+	var Array_start = oParagraph.Content.slice(0, this.Pos);
+	var Array_end   = oParagraph.Content.slice(this.Pos);
 
 	oParagraph.Content = Array_start.concat(this.Items, Array_end);
 	oParagraph.private_UpdateTrackRevisions();
@@ -133,7 +169,7 @@ CChangesParagraphAddItem.prototype.Load = function(Color)
 	var oParagraph = this.Class;
 	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
 	{
-		var Pos     = this.m_oContentChanges.Check(AscCommon.contentchanges_Add, this.PosArray[nIndex]);
+		var Pos     = oParagraph.m_oContentChanges.Check(AscCommon.contentchanges_Add, this.PosArray[nIndex]);
 		var Element = this.Items[nIndex];
 
 		if (null != Element)
@@ -172,13 +208,12 @@ CChangesParagraphAddItem.prototype.Load = function(Color)
  * @constructor
  * @extends {AscDFH.CChangesBase}
  */
-function CChangesParagraphRemoveItem(Class, Pos, Items, EndPos)
+function CChangesParagraphRemoveItem(Class, Pos, Items)
 {
 	CChangesParagraphRemoveItem.superclass.constructor.call(this, Class);
 
 	this.Pos    = Pos;
 	this.Items  = Items;
-	this.EndPos = EndPos;
 
 	this.UseArray = false;
 	this.PosArray = [];
@@ -188,8 +223,8 @@ CChangesParagraphRemoveItem.prototype.Type = AscDFH.historyitem_Paragraph_Remove
 CChangesParagraphRemoveItem.prototype.Undo = function()
 {
 	var oParagraph  = this.Class;
-	var Array_start = this.Content.slice(0, this.Pos);
-	var Array_end   = this.Content.slice(this.Pos);
+	var Array_start = oParagraph.Content.slice(0, this.Pos);
+	var Array_end   = oParagraph.Content.slice(this.Pos);
 
 	oParagraph.Content = Array_start.concat(this.Items, Array_end);
 	oParagraph.private_UpdateTrackRevisions();
@@ -198,7 +233,7 @@ CChangesParagraphRemoveItem.prototype.Undo = function()
 CChangesParagraphRemoveItem.prototype.Redo = function()
 {
 	var oParagraph  = this.Class;
-	oParagraph.Content.splice(this.Pos, this.EndPos - this.Pos + 1);
+	oParagraph.Content.splice(this.Pos, this.Items.length);
 	oParagraph.private_UpdateTrackRevisions();
 	private_ParagraphChangesOnSetValue(this.Class);
 };
@@ -269,7 +304,7 @@ CChangesParagraphRemoveItem.prototype.Load = function(Color)
 	var oParagraph = this.Class;
 	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
 	{
-		var ChangesPos = this.m_oContentChanges.Check(AscCommon.contentchanges_Remove, this.PosArray[nIndex]);
+		var ChangesPos = oParagraph.m_oContentChanges.Check(AscCommon.contentchanges_Remove, this.PosArray[nIndex]);
 
 		if (false === ChangesPos)
 			continue;
