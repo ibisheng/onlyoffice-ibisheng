@@ -2175,8 +2175,8 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.Resize             = function()
 	{
-		//if (false === this.bInit_word_control)
-		//	return;
+		if (false === this.bInit_word_control)
+			return;
 		this.WordControl.OnResize(false);
 	};
 	asc_docs_api.prototype.AddURL             = function(url)
@@ -2204,7 +2204,6 @@ background-repeat: no-repeat;\
 						"id"            : this.documentId,
 						"userid"        : this.documentUserId,
 						"format"        : this.documentFormat,
-						"vkey"          : this.documentVKey,
 						"c"             : "reopen",
 						"url"           : this.documentUrl,
 						"title"         : this.documentTitle,
@@ -2226,7 +2225,6 @@ background-repeat: no-repeat;\
 						"id": this.documentId,
 						"userid": this.documentUserId,
 						"format": this.documentFormat,
-						"vkey": this.documentVKey,
 						"c": "reopen",
 						"url": this.documentUrl,
 						"title": this.documentTitle,
@@ -5045,7 +5043,6 @@ background-repeat: no-repeat;\
 			var rData = {
 				"id"        : this.documentId,
 				"userid"    : this.documentUserId,
-				"vkey"      : this.documentVKey,
 				"c"         : "imgurl",
 				"saveindex" : g_oDocumentUrls.getMaxIndex(),
 				"data"      : url
@@ -5408,7 +5405,6 @@ background-repeat: no-repeat;\
 					var rData = {
 						"id"        : this.documentId,
 						"userid"    : this.documentUserId,
-						"vkey"      : this.documentVKey,
 						"c"         : "imgurl",
 						"saveindex" : g_oDocumentUrls.getMaxIndex(),
 						"data"      : sImageToDownLoad
@@ -7514,7 +7510,7 @@ background-repeat: no-repeat;\
 		oAdditionalData["c"]            = command;
 		oAdditionalData["id"]           = this.documentId;
 		oAdditionalData["userid"]       = this.documentUserId;
-		oAdditionalData["vkey"]         = this.documentVKey;
+		oAdditionalData["jwt"]         = this.CoAuthoringApi.get_jwt();
 		oAdditionalData["outputformat"] = filetype;
 		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype));
 		oAdditionalData["savetype"]     = AscCommon.c_oAscSaveTypes.CompleteAll;

@@ -63,6 +63,17 @@ var c_oChartTypes =
 	BubbleChart: 9
 };
 
+var c_oChartBar3dFaces =
+{
+	front: 0,
+	up: 1,
+	left: 2,
+	right: 3,
+	down: 4,
+	back: 5
+};
+
+
 var globalGapDepth = 150;
 var isTurnOn3DCharts = true;
 var standartMarginForCharts = 13;
@@ -1127,8 +1138,8 @@ CChartsDrawer.prototype =
 						if(!this.calcProp.data[j + 1])
 							this.calcProp.data[j + 1] = [];
 						this.calcProp.data[j + 1][i] = this.calcProp.data[j + 1][i] + this.calcProp.data[j][i];
-					};
-				};
+					}
+				}
 				
 				maxMinObj = this._getMaxMinValueArray(this.calcProp.data);
 				this.calcProp.max = maxMinObj.max;
@@ -1142,14 +1153,14 @@ CChartsDrawer.prototype =
 					summValue[j] = 0;
 					for (var i = 0; i < firstData.length; i++) {
 						summValue[j] += Math.abs(firstData[i][j])
-					};
-				};
+					}
+				}
 				
 				for (var j = 0; j < (this.calcProp.data.length - 1); j++) {
 					for (var i = 0; i < this.calcProp.data[j].length; i++) {
 						this.calcProp.data[j + 1][i] = this.calcProp.data[j + 1][i] + this.calcProp.data[j][i]
-					};
-				};
+					}
+				}
 				
 				var tempData = this.calcProp.data;
 
@@ -1159,8 +1170,8 @@ CChartsDrawer.prototype =
 							tempData[i][j] = 0;
 						else
 							tempData[i][j] = (100 * tempData[i][j]) / (summValue[j]);
-					};
-				};
+					}
+				}
 				
 				maxMinObj = this._getMaxMinValueArray(tempData);
 				this.calcProp.max = maxMinObj.max;
@@ -2319,7 +2330,7 @@ CChartsDrawer.prototype =
 				{
 					min =  array[i][j];
 					max =  array[i][j];
-				};
+				}
 				
 				if(array[i][j] > max)
 					max = array[i][j];
@@ -2583,7 +2594,7 @@ CChartsDrawer.prototype =
 		
 		var x = (x10 * m0 * l1 - x11 * m1 * l0 - y10 * l0 * l1 + y11 * l0 * l1) / (m0 * l1 - m1 * l0);
 		var y = (y10 * l0 *m1 - y11 * l1 * m0 - x10 * m0 * m1 + x11 * m0 * m1) / (l0 * m1 - l1 * m0);
-		var z = (z10 * m0 * n1 - z11 * m1 * n0 - y10 * n0 * n1 + y11 * n0 * n1) / (m0 * n1 - m1 * n0)
+		var z = (z10 * m0 * n1 - z11 * m1 * n0 - y10 * n0 * n1 + y11 * n0 * n1) / (m0 * n1 - m1 * n0);
 		
 		
 		var xo = equation1.x1;
@@ -2600,9 +2611,9 @@ CChartsDrawer.prototype =
 		var q1 = equation2.m;
 		var r1 = equation2.n;
 		
-		var x=(xo*q*p1-x1*q1*p-yo*p*p1+y1*p*p1)/(q*p1-q1*p)
-		var y=(yo*p*q1-y1*p1*q-xo*q*q1+x1*q*q1)/(p*q1-p1*q)
-		var z=(zo*q*r1-z1*q1*r-yo*r*r1+y1*r*r1)/(q*r1-q1*r)
+		var x = (xo*q*p1-x1*q1*p-yo*p*p1+y1*p*p1) / (q*p1-q1*p);
+		var y = (yo*p*q1-y1*p1*q-xo*q*q1+x1*q*q1) / (p*q1-p1*q);
+		var z = (zo*q*r1-z1*q1*r-yo*r*r1+y1*r*r1) / (q*r1-q1*r);
 		
 		return {x: x, y: y, z: z};
 	},
@@ -2750,13 +2761,13 @@ CChartsDrawer.prototype =
 			var m = 0;
 			var k = 0;
 			var len = oldmat.length;
-			var retmat = new Array();
+			var retmat = [];
 
 			if ((len <= row) || (len <= col)) return 0;
 
 			for (j = 0; j < len; j++) {
 				if (j != row) {
-					retmat[k] = new Array();
+					retmat[k] = [];
 					for (i = 0; i < len; i++) {
 						if (i != col) {
 							retmat[k][m] = oldmat[j][i];
@@ -2775,8 +2786,8 @@ CChartsDrawer.prototype =
 			var i;
 			var tmpVal = 0;
 			var row = mat.length;
-			var newDet = new Array();
-			newDet[0] = new Array();
+			var newDet = [];
+			newDet[0] = [];
 
 			switch (row) {
 				case 1:
@@ -2800,10 +2811,10 @@ CChartsDrawer.prototype =
 		{
 			var i = 0;
 			var j = 0;
-			var tmp = new Array();
+			var tmp = [];
 
 			for (i = 0; i < mat.length; i++) {
-				tmp[i] = new Array();
+				tmp[i] = [];
 
 				for (j = 0; j < mat.length; j++) {
 					if (col == j)
@@ -2826,7 +2837,7 @@ CChartsDrawer.prototype =
 		var b3 = point3.y;
 		var c3 = point3.z;
 
-		var mat = new Array();
+		var mat = [];
 		mat[0] = []; mat[1] = []; mat[2] = [];
 		mat[0][0] = a1; mat[0][1] = b1; mat[0][2] = c1;
 		mat[1][0] = a2; mat[1][1] = b2; mat[1][2] = c2;
@@ -6777,7 +6788,7 @@ drawHBarChart.prototype =
 		point7 = this.cChartDrawer._convertAndTurnPoint(x7, y7, z7);
 		point8 = this.cChartDrawer._convertAndTurnPoint(x8, y8, z8);
 		
-		paths = this.cChartDrawer.calculateRect3D(point1, point2, point3, point4, point5, point6, point7, point8, val);
+		paths = this.cChartDrawer.calculateRect3D(point1, point2, point3, point4, point5, point6, point7, point8, val, null, true);
 		
 		if(this.cChartDrawer.processor3D.view3D.rAngAx)
 		{
@@ -6790,9 +6801,9 @@ drawHBarChart.prototype =
 			
 			var sortPaths = [controlPoint1, controlPoint2, controlPoint3, controlPoint4, controlPoint5, controlPoint6];
 			
-			for(var k = 0; k < paths.length; k++)
+			for(var k = 0; k < paths.frontPaths.length; k++)
 			{
-				this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], x: sortPaths[k].x, y: sortPaths[k].y, zIndex: sortPaths[k].z});
+				this.sortZIndexPaths.push({seria: i, point: idx, verge: k, frontPaths: paths.frontPaths[k], darkPaths: paths.darkPaths[k], x: sortPaths[k].x, y: sortPaths[k].y, zIndex: sortPaths[k].z});
 			}
 		}
 		else
@@ -6845,16 +6856,16 @@ drawHBarChart.prototype =
 				this.temp[cubeCount].z = point11.z;
 			}
 			
-			for(var k = 0; k < paths.length; k++)
+			for(var k = 0; k < paths.frontPaths.length; k++)
 			{
-				if(null === paths[k])
+				if(null === paths.frontPaths[k] && null === paths.darkPaths[k])
 					continue;
 				
 				//this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquation});
 				
 				var plainEquation = this.cChartDrawer.getPlainEquation(arrPoints2[k][0], arrPoints2[k][1], arrPoints2[k][2], arrPoints2[k][3]);
 				var plainArea = this.cChartDrawer.getAreaQuadrilateral(arrPoints[k][0], arrPoints[k][1], arrPoints[k][2], arrPoints[k][3]);
-				this.temp[cubeCount].faces.push({seria: i, point: idx, verge: k, paths: paths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquation, plainArea: plainArea});
+				this.temp[cubeCount].faces.push({seria: i, point: idx, verge: k, frontPaths: paths.frontPaths[k], darkPaths: paths.darkPaths[k], points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquation, plainArea: plainArea});
 			}
 		}
 		
@@ -6925,7 +6936,6 @@ drawHBarChart.prototype =
 			{
 				drawReverse(true);
 				draw(false);
-				
 			}
 			else
 			{
@@ -7043,14 +7053,20 @@ drawHBarChart.prototype =
 		var t = this;
 		var processor3D = this.cChartDrawer.processor3D;
 		
-		var drawVerges = function(i, j, paths, onlyLessNull, k)
+		var drawVerges = function(i, j, paths, onlyLessNull, k, isNotPen, isNotBrush)
 		{
 			var brush, pen, options;
 			options = t._getOptionsForDrawing(i, j, onlyLessNull);
 			if(paths !== null && options !== null)
 			{
-				pen = options.pen;
-				brush = options.brush;
+				if(!isNotPen)
+				{
+					pen = options.pen;
+				}
+				if(!isNotBrush)
+				{
+					brush = options.brush;
+				}
 				
 				t._drawBar3D(paths, pen, brush, k);
 			}
@@ -7060,7 +7076,12 @@ drawHBarChart.prototype =
 		{
 			for(var i = 0; i < this.sortZIndexPaths.length; i++)
 			{
-				drawVerges(this.sortZIndexPaths[i].seria, this.sortZIndexPaths[i].point, this.sortZIndexPaths[i].paths, null, this.sortZIndexPaths[i].verge);
+				drawVerges(this.sortZIndexPaths[i].seria, this.sortZIndexPaths[i].point, this.sortZIndexPaths[i].darkPaths, null, this.sortZIndexPaths[i].verge, null, true);
+			}
+			
+			for(var i = 0; i < this.sortZIndexPaths.length; i++)
+			{
+				drawVerges(this.sortZIndexPaths[i].seria, this.sortZIndexPaths[i].point, this.sortZIndexPaths[i].frontPaths, null, this.sortZIndexPaths[i].verge);
 			}
 		}
 		else
@@ -7072,7 +7093,18 @@ drawHBarChart.prototype =
 				for(var j = 0; j < faces.length; j++)
 				{
 					var face = faces[j];
-					drawVerges(face.seria, face.point, face.paths, null, face.verge);
+					drawVerges(face.seria, face.point, face.darkPaths, null, face.verge, null, true);
+				}	
+			}
+			
+			for(var i = 0; i < this.sortParallelepipeds.length; i++)
+			{
+				var index = this.sortParallelepipeds[i].nextIndex;
+				var faces = this.temp[index].faces;
+				for(var j = 0; j < faces.length; j++)
+				{
+					var face = faces[j];
+					drawVerges(face.seria, face.point, face.frontPaths, null, face.verge);
 				}	
 			}
 		}
@@ -7081,55 +7113,296 @@ drawHBarChart.prototype =
 	_drawBar3D: function(path, pen, brush, k)
 	{
 		//затемнение боковых сторон
-		//в excel всегда темные боковые стороны, лицевая и задняя стороны светлые
-		//pen = this.cChartSpace.chart.plotArea.valAx.compiledMajorGridLines;
-		//pen.setFill(brush);
-		pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
-		if(k != 5 && k != 0)
+		var fill = this._getFill(pen, brush, k);
+		var newBrush = fill.brush;
+		var newPen = fill.pen;
+		this.cChartDrawer.drawPath(path, newPen, newBrush);
+	},
+	
+	_getFill: function(pen, brush, face)
+	{
+		//k: 0 - передняя, 1 - верхняя, 2 - левая, 3 - правая, 4 - нижняя, 5 - задняя
+		var shade = "shade";
+		var shadeValue1 = 35000;
+		var shadeValue2 = 45000;
+		
+		var newBrush = brush;
+		var newPen = pen;
+		var t = this;
+		
+		/*if(null === pen || (null !== pen && null === pen.Fill) || (null !== pen && null !== pen.Fill && null === pen.Fill.fill))
 		{
-			var  props = this.cChartSpace.getParentObjects();
-			var duplicateBrush = brush.createDuplicate();
-			var cColorMod = new AscFormat.CColorMod;
-
-			if(k === 1 || k === 4)
+			pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
+		}*/
+		
+		//TODO будет время - сделать градиентную заливку в зависимости от угла!!!!
+		if(brush && brush.fill && AscDFH.historyitem_type_GradFill === brush.fill.getObjectType())
+		{
+			switch ( face )
 			{
-				//для градиентной заливки верхнюю и нижнюю грань закрашиываем первым и последним цветом соотвенственно
-				if(duplicateBrush.fill && AscDFH.historyitem_type_GradFill === duplicateBrush.fill.getObjectType())
+				case c_oChartBar3dFaces.front:
+				case c_oChartBar3dFaces.back:
 				{
-					var colors = duplicateBrush.fill.colors;
-					if(k === 1 && colors && colors[0] && colors[0].color)
+					break;
+				}
+				case c_oChartBar3dFaces.up:
+				{
+					var color = this._getGradFill(brush, pen, c_oChartBar3dFaces.up);
+					newBrush = color.brush;
+					newPen = color.pen;
+					
+					break;
+				}
+				case c_oChartBar3dFaces.left:
+				{
+					var color = this._getGradFill(brush, pen, c_oChartBar3dFaces.left);
+					newBrush = color.brush;
+					newPen = color.pen;
+					
+					break;
+				}
+				case c_oChartBar3dFaces.right:
+				{
+					var color = this._getGradFill(brush, pen, c_oChartBar3dFaces.right);
+					newBrush = color.brush;
+					newPen = color.pen;
+					
+					break;
+				}
+				case c_oChartBar3dFaces.down:
+				{
+					var color = this._getGradFill(brush, pen, c_oChartBar3dFaces.down);
+					newBrush = color.brush;
+					newPen = color.pen;
+					
+					break;
+				}
+			}
+		}
+		else if(brush && brush.fill)
+		{
+			switch ( face )
+			{
+				case c_oChartBar3dFaces.front:
+				case c_oChartBar3dFaces.back:
+				{
+					break;
+				}
+				case c_oChartBar3dFaces.up:
+				case c_oChartBar3dFaces.down:
+				{	
+					newBrush = this._applyColorModeByBrush(brush, shadeValue1);
+					if(null === pen)
 					{
-						var tempColor = new AscFormat.CUniFill();
-						tempColor.setFill(new AscFormat.CSolidFill());
-						tempColor.fill.setColor(colors[0].color);
-						duplicateBrush = tempColor;
+						newPen = pen.setFill(newBrush);
 					}
-					else if(k === 4 && colors[colors.length - 1] && colors[colors.length - 1].color)
+					break;
+				}
+				case c_oChartBar3dFaces.left:
+				case c_oChartBar3dFaces.right:
+				{
+					newBrush = this._applyColorModeByBrush(brush, shadeValue2);
+					if(null === pen)
 					{
-						var tempColor = new AscFormat.CUniFill();
-						tempColor.setFill(new AscFormat.CSolidFill());
-						tempColor.fill.setColor(colors[colors.length - 1].color);
-						duplicateBrush = tempColor;
+						newPen = pen.setFill(newBrush);
+					}
+					break;
+				}
+			}
+		}
+		
+		return {brush: newBrush, pen: newPen};
+	},
+	
+	_getGradFill: function(brushFill, penFill, faceIndex)
+	{
+		var gradientPen = penFill;
+		var gradientBrush = brushFill;
+		
+		var angleKf = 60000;
+		var shade = "shade";
+		var shadeValue1 = 35000;
+		var shadeValue2 = 45000;
+		var t = this;
+		
+		if(brushFill.fill.lin && null !== brushFill.fill.lin.angle)
+		{
+			var getCSolidColor = function(color, colorMod)
+			{
+				var duplicateBrush = brushFill.createDuplicate();
+				var tempColor = new AscFormat.CUniFill();
+				tempColor.setFill(new AscFormat.CSolidFill());
+				tempColor.fill.setColor(color);
+				if(colorMod)
+				{
+					tempColor = t._applyColorModeByBrush(tempColor, colorMod);
+				}
+				
+				return tempColor;
+			};
+			
+			var angle = brushFill.fill.lin.angle / angleKf;
+			var colors = brushFill.fill.colors;
+			
+			if(angle >= 0 && angle < 45)
+			{
+				if(faceIndex === c_oChartBar3dFaces.up || faceIndex === c_oChartBar3dFaces.down)
+				{
+					gradientBrush = this._applyColorModeByBrush(brushFill, shadeValue1);
+					if(null === gradientPen)
+					{
+						gradientPen = gradientPen.setFill(newBrush);
 					}
 				}
-
-				cColorMod.val = 45000;
-			}	
-			else
-			{
-				cColorMod.val = 35000;
+				else if(faceIndex === c_oChartBar3dFaces.left)
+				{
+					gradientBrush = getCSolidColor(colors[0].color);
+				}
+				else if(faceIndex === c_oChartBar3dFaces.right)
+				{
+					gradientBrush = getCSolidColor(colors[colors.length - 1].color);
+				}
 			}
-			
-			cColorMod.name = "shade";
-			duplicateBrush.addColorMod(cColorMod);
-			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
-			
-			pen.setFill(duplicateBrush);
-			this.cChartDrawer.drawPath(path, pen, duplicateBrush);
+			else if(angle >= 45 && angle < 90)
+			{
+				if(faceIndex === c_oChartBar3dFaces.up || faceIndex === c_oChartBar3dFaces.left)
+				{
+					gradientBrush = getCSolidColor(colors[0].color, shadeValue1);
+				}
+				else if(faceIndex === c_oChartBar3dFaces.right)
+				{
+					gradientBrush = this._applyColorModeByBrush(brushFill, shadeValue1);
+					if(null === gradientPen)
+					{
+						gradientPen = gradientPen.setFill(newBrush);
+					}
+				}
+				else if(faceIndex === c_oChartBar3dFaces.down)
+				{
+					gradientBrush = getCSolidColor(colors[colors.length - 1].color);
+				}
+			}
+			else if(angle >= 90 && angle < 135)
+			{
+				if(faceIndex === c_oChartBar3dFaces.up || faceIndex === c_oChartBar3dFaces.left)
+				{
+					gradientBrush = getCSolidColor(colors[0].color, shadeValue1);
+				}
+				else if(faceIndex === c_oChartBar3dFaces.right)
+				{
+					gradientBrush = this._applyColorModeByBrush(brushFill, shadeValue1);
+					if(null === gradientPen)
+					{
+						gradientPen = gradientPen.setFill(newBrush);
+					}
+				}
+				else if(faceIndex === c_oChartBar3dFaces.down)
+				{
+					gradientBrush = getCSolidColor(colors[colors.length - 1].color);
+				}
+			}
+			else if(angle >= 135 && angle < 180)
+			{
+				if(faceIndex === c_oChartBar3dFaces.up || faceIndex === c_oChartBar3dFaces.left || faceIndex === c_oChartBar3dFaces.right)
+				{
+					gradientBrush = getCSolidColor(colors[0].color, shadeValue1);
+				}
+				else if(faceIndex === c_oChartBar3dFaces.down)
+				{
+					gradientBrush = this._applyColorModeByBrush(brushFill, shadeValue1);
+					if(null === gradientPen)
+					{
+						gradientPen = gradientPen.setFill(newBrush);
+					}
+				}
+			}
+			else if(angle >= 180 && angle < 225)
+			{
+				if(faceIndex === c_oChartBar3dFaces.up || faceIndex === c_oChartBar3dFaces.down)
+				{
+					gradientBrush = this._applyColorModeByBrush(brushFill, shadeValue1);
+					if(null === gradientPen)
+					{
+						gradientPen = gradientPen.setFill(newBrush);
+					}
+				}
+				else if(faceIndex === c_oChartBar3dFaces.right)
+				{
+					gradientBrush = getCSolidColor(colors[0].color, shadeValue1);
+				}
+				else if(faceIndex === c_oChartBar3dFaces.left)
+				{
+					gradientBrush = getCSolidColor(colors[colors.length - 1].color, shadeValue1);
+				}
+			}
+			else if(angle >= 225 && angle < 270)
+			{
+				if(faceIndex === c_oChartBar3dFaces.up)
+				{
+					gradientBrush = this._applyColorModeByBrush(brushFill, shadeValue1);
+					if(null === gradientPen)
+					{
+						gradientPen = gradientPen.setFill(newBrush);
+					}
+				}
+				else if(faceIndex === c_oChartBar3dFaces.left || faceIndex === c_oChartBar3dFaces.down || faceIndex === c_oChartBar3dFaces.right)
+				{
+					gradientBrush = getCSolidColor(colors[0].color, shadeValue1);
+				}
+			}
+			else if(angle >= 270 && angle < 315)
+			{
+				if(faceIndex === c_oChartBar3dFaces.up)
+				{
+					gradientBrush = getCSolidColor(colors[colors.length - 1].color);
+				}
+				else if(faceIndex === c_oChartBar3dFaces.left || faceIndex === c_oChartBar3dFaces.down)
+				{
+					gradientBrush = getCSolidColor(colors[0].color, shadeValue1);
+				}
+				else if(faceIndex === c_oChartBar3dFaces.right)
+				{
+					gradientBrush = this._applyColorModeByBrush(brushFill, shadeValue1);
+					if(null === gradientPen)
+					{
+						gradientPen = gradientPen.setFill(newBrush);
+					}
+				}
+			}
+			else if(angle >= 315 && angle <= 360)
+			{
+				if(faceIndex === c_oChartBar3dFaces.up || faceIndex === c_oChartBar3dFaces.right)
+				{
+					gradientBrush = this._applyColorModeByBrush(brushFill, shadeValue1);
+					if(null === gradientPen)
+					{
+						gradientPen = gradientPen.setFill(newBrush);
+					}
+				}
+				else if(faceIndex === c_oChartBar3dFaces.left || faceIndex === c_oChartBar3dFaces.down)
+				{
+					gradientBrush = getCSolidColor(colors[0].color, shadeValue1);
+				}
+			}
 		}
-		else
-			this.cChartDrawer.drawPath(path, pen, brush);
+		
+		return {pen: gradientPen, brush: gradientBrush};
+	},
+	
+	_applyColorModeByBrush: function(brushFill, val)
+	{
+		var props = this.cChartSpace.getParentObjects();
+		var duplicateBrush = brushFill.createDuplicate();
+		var cColorMod = new AscFormat.CColorMod;
+		cColorMod.val = val;
+		
+		cColorMod.name = "shade";
+		duplicateBrush.addColorMod(cColorMod);
+		duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
+		
+		return duplicateBrush;
 	}
+	
 };
 
 /** @constructor */

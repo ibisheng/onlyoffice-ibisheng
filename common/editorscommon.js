@@ -886,7 +886,7 @@ function InitOnMessage (callback) {
 		}, false);
 	}
 }
-function ShowImageFileDialog (documentId, documentUserId, callback, callbackOld) {
+function ShowImageFileDialog (documentId, documentUserId, jwt, callback, callbackOld) {
 	var fileName;
 	if ("undefined" != typeof(FileReader)) {
 		fileName = GetUploadInput(function (e) {
@@ -899,7 +899,11 @@ function ShowImageFileDialog (documentId, documentUserId, callback, callbackOld)
 		});
 	} else {
 		var frameWindow = GetUploadIFrame();
-		var content = '<html><head></head><body><form action="'+sUploadServiceLocalUrlOld+'/'+documentId+'/'+documentUserId+'/'+g_oDocumentUrls.getMaxIndex()+'" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" accept="image/*" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
+		var url = sUploadServiceLocalUrlOld+'/'+documentId+'/'+documentUserId+'/'+g_oDocumentUrls.getMaxIndex();
+		if (jwt) {
+			url += '/' + jwt;
+		}
+		var content = '<html><head></head><body><form action="'+url+'" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" accept="image/*" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
 		frameWindow.document.open();
 		frameWindow.document.write(content);
 		frameWindow.document.close();
@@ -941,11 +945,15 @@ function InitDragAndDrop (oHtmlElement, callback) {
 		};
 	}
 }
-function UploadImageFiles (files, documentId, documentUserId, callback) {
+function UploadImageFiles (files, documentId, documentUserId, jwt, callback) {
 	if (files.length > 0) {
 		var file = files[0];
+		var url = sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex();
+		if (jwt) {
+			url += '/' + jwt;
+		}
 		var xhr = new XMLHttpRequest();
-		xhr.open('POST', sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex(), true);
+		xhr.open('POST', url, true);
 		xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
 		xhr.onreadystatechange = function() {
 			if (4 == this.readyState) {

@@ -2563,6 +2563,12 @@
 	asc_CDocInfo.prototype.get_UserName = asc_CDocInfo.prototype.asc_getUserName = function () {
 		return (this.UserInfo ? this.UserInfo.get_FullName() : null );
 	};
+	asc_CDocInfo.prototype.get_FirstName = asc_CDocInfo.prototype.asc_getFirstName = function () {
+		return (this.UserInfo ? this.UserInfo.get_FirstName() : null );
+	};
+	asc_CDocInfo.prototype.get_LastName = asc_CDocInfo.prototype.asc_getLastName = function () {
+		return (this.UserInfo ? this.UserInfo.get_LastName() : null );
+	};
 	asc_CDocInfo.prototype.get_Options = asc_CDocInfo.prototype.asc_getOptions = function () {
 		return this.Options;
 	};
@@ -2586,6 +2592,24 @@
 	};
 	asc_CDocInfo.prototype.put_UserInfo = asc_CDocInfo.prototype.asc_putUserInfo = function (v) {
 		this.UserInfo = v;
+	};
+	asc_CDocInfo.prototype.get_Mode = asc_CDocInfo.prototype.asc_getMode = function () {
+		return this.Mode;
+	};
+	asc_CDocInfo.prototype.put_Mode = asc_CDocInfo.prototype.asc_putMode = function (v) {
+		this.Mode = v;
+	};
+	asc_CDocInfo.prototype.get_Permissions = asc_CDocInfo.prototype.asc_getPermissions = function () {
+		return this.Permissions;
+	};
+	asc_CDocInfo.prototype.put_Permissions = asc_CDocInfo.prototype.asc_putPermissions = function (v) {
+		this.Permissions = v;
+	};
+	asc_CDocInfo.prototype.get_Lang = asc_CDocInfo.prototype.asc_getLang = function () {
+		return this.Lang;
+	};
+	asc_CDocInfo.prototype.put_Lang = asc_CDocInfo.prototype.asc_putLang = function (v) {
+		this.Lang = v;
 	};
 
 	function COpenProgress() {

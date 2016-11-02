@@ -666,7 +666,6 @@ var editor;
             "id": this.documentId,
             "userid": this.documentUserId,
             "format": this.documentFormat,
-            "vkey": this.documentVKey,
             "c": "reopen",
             "url": this.documentUrl,
             "title": this.documentTitle,
@@ -688,7 +687,6 @@ var editor;
             "id": this.documentId,
             "userid": this.documentUserId,
             "format": this.documentFormat,
-            "vkey": this.documentVKey,
             "c": "reopen",
             "url": this.documentUrl,
             "title": this.documentTitle,
@@ -768,7 +766,7 @@ var editor;
     oAdditionalData["c"] = "sfct";
     oAdditionalData["id"] = this.documentId;
     oAdditionalData["userid"] = this.documentUserId;
-    oAdditionalData["vkey"] = this.documentVKey;
+    oAdditionalData["jwt"] = this.CoAuthoringApi.get_jwt();
     oAdditionalData["outputformat"] = filetype;
     oAdditionalData["title"] = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype));
     oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.CompleteAll;
@@ -812,7 +810,7 @@ var editor;
     oAdditionalData["c"] = command;
     oAdditionalData["id"] = this.documentId;
     oAdditionalData["userid"] = this.documentUserId;
-    oAdditionalData["vkey"] = this.documentVKey;
+    oAdditionalData["jwt"] = this.CoAuthoringApi.get_jwt();
     oAdditionalData["outputformat"] = sFormat;
     oAdditionalData["title"] = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(sFormat));
     if (DownloadType.Print === options.downloadType) {
@@ -2201,7 +2199,6 @@ var editor;
     var rData = {
       "id": this.documentId,
       "userid": this.documentUserId,
-      "vkey": this.documentVKey,
       "c": "imgurl",
       "saveindex": g_oDocumentUrls.getMaxIndex(),
       "data": imageUrl};
@@ -2491,7 +2488,6 @@ var editor;
       var rData = {
         "id": this.documentId,
         "userid": this.documentUserId,
-        "vkey": this.documentVKey,
         "c": "imgurl",
         "saveindex": g_oDocumentUrls.getMaxIndex(),
         "data": sImageUrl};

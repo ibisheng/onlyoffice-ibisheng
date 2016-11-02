@@ -2648,6 +2648,7 @@ function asc_WriteColorSchemes(schemas, s) {
         }
     }
 }
+AscCommon.asc_WriteColorSchemes = asc_WriteColorSchemes;
 function asc_WriteAddFormatTableOptions(c, s) {
     if (!c) return;
 
@@ -3908,8 +3909,7 @@ function OfflineEditor () {
                          "vkey"          : undefined,
                          "url"           : this.documentUrl,
                          "title"         : this.documentTitle,
-                         "embeddedfonts" : false,
-                         "viewmode"      : t.initSettings.viewmode};
+                         "embeddedfonts" : false};
                             
                          _api.CoAuthoringApi.auth(t.initSettings.viewmode, rData);
         });
@@ -5689,7 +5689,9 @@ function offline_cell_editor_process_input_commands(commands, width, height, rat
         value2 = commands[i][2];
 
         var event = {which:value,metaKey:undefined,ctrlKey:undefined};
-
+        event.stopPropagation = function() {};
+        event.preventDefault = function() {};
+        
         switch (operationCode) {
 
             // KEY_DOWN

@@ -65,7 +65,6 @@
 		this.LoadedObject        = null;
 		this.DocumentType        = 0; // 0 - empty, 1 - test, 2 - document (from json)
 		this.DocInfo             = null;
-		this.documentVKey        = null;
 		this.documentId          = undefined;
 		this.documentUserId      = undefined;
 		this.documentUrl         = "null";
@@ -237,13 +236,14 @@
 			this.documentTitle       = this.DocInfo.get_Title();
 			this.documentFormat      = this.DocInfo.get_Format();
 			this.documentCallbackUrl = this.DocInfo.get_CallbackUrl();
-			this.documentVKey        = this.DocInfo.get_VKey();
 
 			this.documentOpenOptions = this.DocInfo.asc_getOptions();
 
 			this.User = new AscCommon.asc_CUser();
 			this.User.setId(this.DocInfo.get_UserId());
 			this.User.setUserName(this.DocInfo.get_UserName());
+			this.User.setFirstName(this.DocInfo.get_FirstName());
+			this.User.setLastName(this.DocInfo.get_LastName());
 
 			//чтобы в versionHistory был один documentId для auth и open
 			this.CoAuthoringApi.setDocId(this.documentId);
@@ -396,11 +396,9 @@
 				"id"            : this.documentId,
 				"userid"        : this.documentUserId,
 				"format"        : this.documentFormat,
-				"vkey"          : this.documentVKey,
 				"url"           : this.documentUrl,
 				"title"         : this.documentTitle,
-				"embeddedfonts" : this.isUseEmbeddedCutFonts,
-				"viewmode"      : this.getViewMode()
+				"embeddedfonts" : this.isUseEmbeddedCutFonts
 			};
 			if (isVersionHistory)
 			{
@@ -711,7 +709,7 @@
 		};
 
 		this._coAuthoringInitEnd();
-		this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', this.editorId, this.documentFormatSave);
+		this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', this.editorId, this.documentFormatSave, this.DocInfo);
 	};
 	baseEditorsApi.prototype._coAuthoringInitEnd                 = function()
 	{
@@ -781,7 +779,7 @@
 	baseEditorsApi.prototype.asc_addImage                        = function()
 	{
 		var t = this;
-		AscCommon.ShowImageFileDialog(this.documentId, this.documentUserId, function(error, files)
+		AscCommon.ShowImageFileDialog(this.documentId, this.documentUserId, this.CoAuthoringApi.get_jwt(), function(error, files)
 		{
 			t._uploadCallback(error, files);
 		}, function(error)
@@ -803,7 +801,7 @@
 		else
 		{
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-			AscCommon.UploadImageFiles(files, this.documentId, this.documentUserId, function(error, url)
+			AscCommon.UploadImageFiles(files, this.documentId, this.documentUserId, this.CoAuthoringApi.get_jwt(), function(error, url)
 			{
 				if (c_oAscError.ID.No !== error)
 				{
