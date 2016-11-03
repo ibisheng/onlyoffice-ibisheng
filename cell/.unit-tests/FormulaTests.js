@@ -800,6 +800,33 @@ $( function () {
         oParser = new parserFormula( "MAX(S5:S8)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 1 );
+
+		ws.getRange2( "S5" ).setValue( "#DIV/0!" );
+		ws.getRange2( "S6" ).setValue( "TRUE" );
+		ws.getRange2( "S7" ).setValue( "qwe" );
+		ws.getRange2( "S8" ).setValue( "" );
+		ws.getRange2( "S9" ).setValue( "-1" );
+		oParser = new parserFormula( "MAX(S5)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#DIV/0!" );
+		oParser = new parserFormula( "MAX(S6)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+		oParser = new parserFormula( "MAX(S7)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+		oParser = new parserFormula( "MAX(S8)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+		oParser = new parserFormula( "MAX(S5:S9)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#DIV/0!" );
+		oParser = new parserFormula( "MAX(S6:S9)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), -1 );
+		oParser = new parserFormula( "MAX(-1, TRUE)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
     } );
 
     test( "Test: \"MAXA\"", function () {
@@ -812,6 +839,33 @@ $( function () {
         oParser = new parserFormula( "MAXA(S5:S8)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 1 );
+
+		ws.getRange2( "S5" ).setValue( "#DIV/0!" );
+		ws.getRange2( "S6" ).setValue( "TRUE" );
+		ws.getRange2( "S7" ).setValue( "qwe" );
+		ws.getRange2( "S8" ).setValue( "" );
+		ws.getRange2( "S9" ).setValue( "-1" );
+		oParser = new parserFormula( "MAXA(S5)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#DIV/0!" );
+		oParser = new parserFormula( "MAXA(S6)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+		oParser = new parserFormula( "MAXA(S7)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+		oParser = new parserFormula( "MAXA(S8)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+		oParser = new parserFormula( "MAXA(S5:S9)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#DIV/0!" );
+		oParser = new parserFormula( "MAXA(S6:S9)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+		oParser = new parserFormula( "MAXA(-1, TRUE)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
     } );
 
     test( "Test: \"MIN\"", function () {
@@ -824,6 +878,33 @@ $( function () {
         oParser = new parserFormula( "MIN(S5:S8)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), -1 / Math.fact( 2 ) );
+
+		ws.getRange2( "S5" ).setValue( "#DIV/0!" );
+		ws.getRange2( "S6" ).setValue( "TRUE" );
+		ws.getRange2( "S7" ).setValue( "qwe" );
+		ws.getRange2( "S8" ).setValue( "" );
+		ws.getRange2( "S9" ).setValue( "2" );
+		oParser = new parserFormula( "MIN(S5)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#DIV/0!" );
+		oParser = new parserFormula( "MIN(S6)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+		oParser = new parserFormula( "MIN(S7)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+		oParser = new parserFormula( "MIN(S8)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+		oParser = new parserFormula( "MIN(S5:S9)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#DIV/0!" );
+		oParser = new parserFormula( "MIN(S6:S9)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2 );
+		oParser = new parserFormula( "MIN(2, TRUE)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
     } );
 
     test( "Test: \"MINA\"", function () {
@@ -836,6 +917,33 @@ $( function () {
         oParser = new parserFormula( "MINA(S5:S8)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), -1 / Math.fact( 2 ) );
+
+		ws.getRange2( "S5" ).setValue( "#DIV/0!" );
+		ws.getRange2( "S6" ).setValue( "TRUE" );
+		ws.getRange2( "S7" ).setValue( "qwe" );
+		ws.getRange2( "S8" ).setValue( "" );
+		ws.getRange2( "S9" ).setValue( "2" );
+		oParser = new parserFormula( "MINA(S5)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#DIV/0!" );
+		oParser = new parserFormula( "MINA(S6)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+		oParser = new parserFormula( "MINA(S7)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+		oParser = new parserFormula( "MINA(S8)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+		oParser = new parserFormula( "MINA(S5:S9)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#DIV/0!" );
+		oParser = new parserFormula( "MINA(S6:S9)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+		oParser = new parserFormula( "MINA(2, TRUE)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
     } );
 
     test( "Test: SUM(S7:S9,{1,2,3})", function () {
@@ -2051,7 +2159,29 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 1 );
 
-
+		ws.getRange2( "S5" ).setValue( "#DIV/0!" );
+		ws.getRange2( "S6" ).setValue( "TRUE" );
+		ws.getRange2( "S7" ).setValue( "qwe" );
+		ws.getRange2( "S8" ).setValue( "" );
+		ws.getRange2( "S9" ).setValue( "2" );
+		oParser = new parserFormula( "COUNT(S5)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+		oParser = new parserFormula( "COUNT(S6)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+		oParser = new parserFormula( "COUNT(S7)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+		oParser = new parserFormula( "COUNT(S8)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+		oParser = new parserFormula( "COUNT(S5:S9)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+		oParser = new parserFormula( "COUNT(S6:S9)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
     } );
 
     test( "Test: \"COUNTA\"", function () {
@@ -2078,7 +2208,29 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 2 );
 
-
+		ws.getRange2( "S5" ).setValue( "#DIV/0!" );
+		ws.getRange2( "S6" ).setValue( "TRUE" );
+		ws.getRange2( "S7" ).setValue( "qwe" );
+		ws.getRange2( "S8" ).setValue( "" );
+		ws.getRange2( "S9" ).setValue( "2" );
+		oParser = new parserFormula( "COUNTA(S5)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+		oParser = new parserFormula( "COUNTA(S6)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+		oParser = new parserFormula( "COUNTA(S7)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+		oParser = new parserFormula( "COUNTA(S8)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+		oParser = new parserFormula( "COUNTA(S5:S9)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 4 );
+		oParser = new parserFormula( "COUNTA(S6:S9)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 3 );
     } );
 
     test( "Test: \"COUNTIF\"", function () {
