@@ -4832,7 +4832,7 @@ CellArea.prototype = {
 		return null !== this.type ? this.type : Asc.c_oAscSparklineType.Line;
 	};
 	sparklineGroup.prototype.asc_getLineWeight = function () {
-		return this.lineWeight;
+		return null !== this.lineWeight ? this.lineWeight : 0.75;
 	};
 	sparklineGroup.prototype.asc_getDisplayEmpty = function () {
 		return null !== this.displayEmptyCellsAs ? this.displayEmptyCellsAs : Asc.c_oAscEDispBlanksAs.Zero;
