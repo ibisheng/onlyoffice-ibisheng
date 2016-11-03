@@ -4835,7 +4835,7 @@ CellArea.prototype = {
 		return this.lineWeight;
 	};
 	sparklineGroup.prototype.asc_getDisplayEmpty = function () {
-		return this.displayEmptyCellsAs;
+		return null !== this.displayEmptyCellsAs ? this.displayEmptyCellsAs : Asc.c_oAscEDispBlanksAs.Zero;
 	};
 	sparklineGroup.prototype.asc_getMarkersPoint = function () {
 		return this.markers;

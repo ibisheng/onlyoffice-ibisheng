@@ -662,27 +662,22 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         chart_space.displayHidden = oSparklineGroup.displayHidden;
         chart_space.displayEmptyCellsAs = oSparklineGroup.displayEmptyCellsAs;
 
-        var nDisplayEmptyCellsAs = AscFormat.isRealNumber(oSparklineGroup.displayEmptyCellsAs) ? oSparklineGroup.displayEmptyCellsAs : Asc.c_oAscEDispBlanksAs.Zero;
-
-        if(AscFormat.isRealNumber(nDisplayEmptyCellsAs))
+        switch(oSparklineGroup.asc_getDisplayEmpty())
         {
-            switch(oSparklineGroup.displayEmptyCellsAs)
+            case Asc.c_oAscEDispBlanksAs.Span:
             {
-                case Asc.c_oAscEDispBlanksAs.Span:
-                {
-                    chart_space.displayEmptyCellsAs = 0;
-                    break;
-                }
-                case Asc.c_oAscEDispBlanksAs.Gap:
-                {
-                    chart_space.displayEmptyCellsAs = 1;
-                    break;
-                }
-                case Asc.c_oAscEDispBlanksAs.Zero:
-                {
-                    chart_space.displayEmptyCellsAs = 2;
-                    break;
-                }
+                chart_space.displayEmptyCellsAs = 0;
+                break;
+            }
+            case Asc.c_oAscEDispBlanksAs.Gap:
+            {
+                chart_space.displayEmptyCellsAs = 1;
+                break;
+            }
+            case Asc.c_oAscEDispBlanksAs.Zero:
+            {
+                chart_space.displayEmptyCellsAs = 2;
+                break;
             }
         }
         chart_space.displayHidden = oSparklineGroup.displayHidden;
