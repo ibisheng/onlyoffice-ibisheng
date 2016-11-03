@@ -1825,6 +1825,19 @@
 		asc_CCompleteMenu.prototype.asc_getName = function () {return this.name;};
 		asc_CCompleteMenu.prototype.asc_getType = function () {return this.type;};
 
+		function CCacheMeasureEmpty() {
+			this.cache = {};
+		}
+		CCacheMeasureEmpty.prototype.add = function (elem, val) {
+			var font = (this.cache[elem.fn] || (this.cache[elem.fn] = {}));
+			font[elem.fs] = val;
+		};
+		CCacheMeasureEmpty.prototype.get = function (elem) {
+			var font = this.cache[elem.fn];
+			return font ? font[elem.fs] : null;
+		};
+		var g_oCacheMeasureEmpty = new CCacheMeasureEmpty();
+
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
@@ -1987,4 +2000,6 @@
 		prot = asc_CCompleteMenu.prototype;
 		prot["asc_getName"] = prot.asc_getName;
 		prot["asc_getType"] = prot.asc_getType;
+
+		window["AscCommonExcel"].g_oCacheMeasureEmpty = g_oCacheMeasureEmpty;
 })(window);
