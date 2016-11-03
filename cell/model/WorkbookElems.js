@@ -4829,7 +4829,7 @@ CellArea.prototype = {
 		return this.Id;
 	};
 	sparklineGroup.prototype.asc_getType = function () {
-		return this.type;
+		return null !== this.type ? this.type : Asc.c_oAscSparklineType.Line;
 	};
 	sparklineGroup.prototype.asc_getLineWeight = function () {
 		return this.lineWeight;

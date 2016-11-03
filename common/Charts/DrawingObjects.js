@@ -627,7 +627,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
     AscFormat.ExecuteNoHistory(function(){
         this.ws = worksheetView;
         var settings = new AscCommon.asc_ChartSettings();
-        var nSparklineType = AscFormat.isRealNumber(oSparklineGroup.type) ? oSparklineGroup.type : Asc.c_oAscSparklineType.Line;
+        var nSparklineType = oSparklineGroup.asc_getType();
         switch(nSparklineType)
         {
             case Asc.c_oAscSparklineType.Column:
