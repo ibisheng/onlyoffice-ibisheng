@@ -4472,10 +4472,14 @@
                 // Пустая ячейка с измененной гарнитурой или размером, учитвается в высоте
                 str = c.getValue2();
                 if (0 < str.length) {
-                    // Без текста не будет толка
-                    strCopy = [str[0].clone()];
-                    strCopy[0].text = 'A';
-                    tm = this._roundTextMetrics(this.stringRender.measureString(strCopy, fl));
+                    strCopy = str[0];
+                    if (!(tm = AscCommonExcel.g_oCacheMeasureEmpty.get(strCopy))) {
+                        // Без текста не будет толка
+                        strCopy = strCopy.clone();
+                        strCopy.text = 'A';
+                        tm = this._roundTextMetrics(this.stringRender.measureString([strCopy], fl));
+                        AscCommonExcel.g_oCacheMeasureEmpty.add(strCopy, tm);
+                    }
                     this._updateRowHeight(tm, col, row, isMerged, fMergedRows);
                 }
             }
