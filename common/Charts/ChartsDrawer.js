@@ -12247,6 +12247,13 @@ CSortFaces.prototype =
 			var diffX = centerChartX;
 			var diffY = centerChartY;
 			var diffZ = -1 / this.cChartDrawer.processor3D.rPerspective;
+			//TODO протестировать на bar и затем сделать для всех перспективных диаграмм данный сдвиг
+			if(!this.cChartDrawer.processor3D.view3D.rAngAx && this.chartProp.type === AscFormat.c_oChartTypes.Bar)
+			{	
+				diffX -= this.cChartDrawer.processor3D.cameraDiffX;
+				diffY -= this.cChartDrawer.processor3D.cameraDiffY;
+				diffZ -= this.cChartDrawer.processor3D.cameraDiffZ;
+			}
 			
 			//TODO пересмотреть правку!
 			if(diffZ > 0 && this.chartProp.type === AscFormat.c_oChartTypes.Bar && this.cChartDrawer.processor3D.view3D.rAngAx && (this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked"))

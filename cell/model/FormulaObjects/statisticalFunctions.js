@@ -2690,7 +2690,7 @@ cMAX.prototype.Calculate = function ( arg ) {
         if ( argI instanceof cRef || argI instanceof cRef3D ) {
             if ( argIVal instanceof cError )
                 return this.value = argIVal;
-            if ( argIVal instanceof cNumber || argIVal instanceof cBool || argIVal instanceof cEmpty ) {
+            if ( argIVal instanceof cNumber ) {
                 var v = argIVal.tocNumber();
                 if ( v.getValue() > max )
                     max = v.getValue();
@@ -2699,7 +2699,7 @@ cMAX.prototype.Calculate = function ( arg ) {
         else if ( argI instanceof cArea || argI instanceof cArea3D ) {
             var argArr = argI.getValue();
             for ( var j = 0; j < argArr.length; j++ ) {
-                if ( argArr[j] instanceof cNumber || argArr[j] instanceof cBool || argArr[j] instanceof cEmpty ) {
+                if ( argArr[j] instanceof cNumber ) {
                     var v = argArr[j].tocNumber();
                     if ( v.getValue() > max )
                         max = v.getValue();
@@ -2742,7 +2742,7 @@ cMAX.prototype.Calculate = function ( arg ) {
                 max = argI.getValue();
         }
     }
-    return this.value = ( max.value === Number.NEGATIVE_INFINITY ? new cNumber( 0 ) : new cNumber( max ) );
+    return this.value = ( max === Number.NEGATIVE_INFINITY ? new cNumber( 0 ) : new cNumber( max ) );
 };
 cMAX.prototype.getInfo = function () {
     return {
@@ -2832,7 +2832,7 @@ cMAXA.prototype.Calculate = function ( arg ) {
                 max = argI.getValue();
         }
     }
-    return this.value = ( max.value === Number.NEGATIVE_INFINITY ? new cNumber( 0 ) : new cNumber( max ) )
+    return this.value = ( max === Number.NEGATIVE_INFINITY ? new cNumber( 0 ) : new cNumber( max ) )
 };
 cMAXA.prototype.getInfo = function () {
     return {
@@ -2954,7 +2954,7 @@ cMIN.prototype.Calculate = function ( arg ) {
         if ( argI instanceof cRef || argI instanceof cRef3D ) {
             if ( argIVal instanceof cError )
                 return this.value = argIVal;
-            if ( argIVal instanceof cNumber || argIVal instanceof cBool || argIVal instanceof cEmpty ) {
+            if ( argIVal instanceof cNumber ) {
                 var v = argIVal.tocNumber();
                 if ( v.getValue() < min )
                     min = v.getValue();
@@ -2963,7 +2963,7 @@ cMIN.prototype.Calculate = function ( arg ) {
         else if ( argI instanceof cArea || argI instanceof cArea3D ) {
             var argArr = argI.getValue();
             for ( var j = 0; j < argArr.length; j++ ) {
-                if ( argArr[j] instanceof cNumber || argArr[j] instanceof cBool || argArr[j] instanceof cEmpty ) {
+                if ( argArr[j] instanceof cNumber ) {
                     var v = argArr[j].tocNumber();
                     if ( v.getValue() < min )
                         min = v.getValue();
@@ -3007,7 +3007,7 @@ cMIN.prototype.Calculate = function ( arg ) {
                 min = argI.getValue();
         }
     }
-    return this.value = ( min.value === Number.POSITIVE_INFINITY ? new cNumber( 0 ) : new cNumber( min ) );
+    return this.value = ( min === Number.POSITIVE_INFINITY ? new cNumber( 0 ) : new cNumber( min ) );
 };
 cMIN.prototype.getInfo = function () {
     return {
@@ -3099,7 +3099,7 @@ cMINA.prototype.Calculate = function ( arg ) {
                 min = argI.getValue();
         }
     }
-    return this.value = ( min.value === Number.POSITIVE_INFINITY ? new cNumber( 0 ) : new cNumber( min ) );
+    return this.value = ( min === Number.POSITIVE_INFINITY ? new cNumber( 0 ) : new cNumber( min ) );
 };
 cMINA.prototype.getInfo = function () {
     return {

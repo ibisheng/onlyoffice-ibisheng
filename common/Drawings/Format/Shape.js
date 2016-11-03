@@ -4279,8 +4279,14 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
         }
         if(oLock && AscCommon.locktype_None != oLock.Get_Type())
         {
-            graphics.transform3(_transform);
-            graphics.DrawLockObjectRect(oLock.Get_Type(), 0, 0, this.extX, this.extY);
+            var bCoMarksDraw = true;
+            if(typeof editor !== "undefined" && editor && AscFormat.isRealBool(editor.isCoMarksDraw)){
+                bCoMarksDraw = editor.isCoMarksDraw;
+            }
+            if(bCoMarksDraw){
+                graphics.transform3(_transform);
+                graphics.DrawLockObjectRect(oLock.Get_Type(), 0, 0, this.extX, this.extY);
+            }
         }
     }
     graphics.SetIntegerGrid(true);

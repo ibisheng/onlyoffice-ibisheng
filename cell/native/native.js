@@ -2757,6 +2757,34 @@ function asc_WriteAutoFiltersOptions(c, s) {
     s['WriteByte'](255);
 }
 
+function asc_WriteUsers(c, s) {
+    if (!c) return;
+    
+    var len = 0, name, user;
+    for (name in c) {
+        if (undefined !== name) {
+            len++;
+        }
+    }
+    
+    s["WriteLong"](len);
+    
+    for (name in c) {
+        if (undefined !== name) {
+            user = c[name];
+            if (user) {
+                s['WriteString2'](user.asc_getId());
+                s['WriteString2'](user.asc_getFirstName());
+                s['WriteString2'](user.asc_getLastName());
+                s['WriteString2'](user.asc_getUserName());
+                s['WriteBool'](user.asc_getView());
+                
+                asc_menu_WriteColor(0, user.asc_getColor(), s);
+            }
+        }
+    }
+}
+
 //--------------------------------------------------------------------------------
 // defines
 //--------------------------------------------------------------------------------
@@ -3893,6 +3921,13 @@ function OfflineEditor () {
             stream["ClearNoAttack"]();
             asc_WriteAutoFiltersOptions(state, stream);
             window["native"]["OnCallMenuEvent"](3060, stream); // ASC_SPREADSHEETS_EVENT_TYPE_FILTER_DIALOG
+        });
+        
+        _api.asc_registerCallback('asc_onAuthParticipantsChanged', function(users) {
+            var stream = global_memory_stream_menu;
+            stream["ClearNoAttack"]();
+            asc_WriteUsers(users, stream);
+            window["native"]["OnCallMenuEvent"](2416, stream); // ASC_MENU_EVENT_TYPE_AUTH_PARTICIPANTS_CHANGED
         });
         
         _api.asc_registerCallback('asc_onSheetsChanged', function () {
