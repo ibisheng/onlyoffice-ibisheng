@@ -9986,8 +9986,14 @@ CChartSpace.prototype.draw = function(graphics)
         if(oLock && AscCommon.locktype_None != oLock.Get_Type())
         {
             graphics.SaveGrState();
-            graphics.transform3(this.transform);
-            graphics.DrawLockObjectRect(oLock.Get_Type(), 0, 0, this.extX, this.extY);
+            var bCoMarksDraw = true;
+            if(typeof editor !== "undefined" && editor && AscFormat.isRealBool(editor.isCoMarksDraw)){
+                bCoMarksDraw = editor.isCoMarksDraw;
+            }
+            if(bCoMarksDraw){
+                graphics.transform3(this.transform);
+                graphics.DrawLockObjectRect(oLock.Get_Type(), 0, 0, this.extX, this.extY);
+            }
             graphics.RestoreGrState();
         }
     }
@@ -13908,4 +13914,7 @@ function checkBlipFillRasterImages(sp)
     window['AscFormat'].CHART_STYLE_MANAGER = CHART_STYLE_MANAGER;
     window['AscFormat'].CheckParagraphTextPr = CheckParagraphTextPr;
     window['AscFormat'].CheckObjectTextPr = CheckObjectTextPr;
+    window['AscFormat'].CreateColorMapByIndex = CreateColorMapByIndex;
+    window['AscFormat'].getArrayFillsFromBase = getArrayFillsFromBase;
+    window['AscFormat'].getMaxIdx = getMaxIdx;
 })(window);
