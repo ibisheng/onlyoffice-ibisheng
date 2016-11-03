@@ -627,7 +627,8 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
     AscFormat.ExecuteNoHistory(function(){
         this.ws = worksheetView;
         var settings = new AscCommon.asc_ChartSettings();
-        switch(oSparklineGroup.type)
+        var nSparklineType = AscFormat.isRealNumber(oSparklineGroup.type) ? oSparklineGroup.type : Asc.c_oAscSparklineType.Line;
+        switch(nSparklineType)
         {
             case Asc.c_oAscSparklineType.Column:
             {
@@ -661,8 +662,9 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         chart_space.displayHidden = oSparklineGroup.displayHidden;
         chart_space.displayEmptyCellsAs = oSparklineGroup.displayEmptyCellsAs;
 
+        var nDisplayEmptyCellsAs = AscFormat.isRealNumber(oSparklineGroup.displayEmptyCellsAs) ? oSparklineGroup.displayEmptyCellsAs : Asc.c_oAscEDispBlanksAs.Zero;
 
-        if(AscFormat.isRealNumber(oSparklineGroup.displayEmptyCellsAs))
+        if(AscFormat.isRealNumber(nDisplayEmptyCellsAs))
         {
             switch(oSparklineGroup.displayEmptyCellsAs)
             {
@@ -775,7 +777,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         chart_space.recalculateReferences();
         chart_space.recalcInfo.recalculateReferences = false;
         var fCallbackSeries = null;
-        if(oSparklineGroup.type === Asc.c_oAscSparklineType.Line)
+        if(nSparklineType === Asc.c_oAscSparklineType.Line)
         {
             var oLn = new AscFormat.CLn();
             oLn.setW(36000*nSparklineMultiplier*25.4*(oSparklineGroup.lineWidth != null ? oSparklineGroup.lineWidth : 0.75)/72);
@@ -854,7 +856,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             if(fCallbackSeries)
             {
 
-                if(oSparklineGroup.type !== Asc.c_oAscSparklineType.Line){
+                if(nSparklineType !== Asc.c_oAscSparklineType.Line){
                     for(i = 0; i < aSeriesPoints.length; ++i)
                     {
                         if(AscFormat.fApproxEqual(aSeriesPoints[i].val,  0))
@@ -982,7 +984,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         {
             var oUnifill = CreateUniFillFromExcelColor(oSparklineGroup.colorSeries);
             var oSerie = chart_space.chart.plotArea.charts[0].series[0];
-            if(oSparklineGroup.type === Asc.c_oAscSparklineType.Line)
+            if(nSparklineType === Asc.c_oAscSparklineType.Line)
             {
                 var oLn = oSerie.spPr.ln;
                 oLn.setFill(oUnifill);
