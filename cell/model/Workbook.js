@@ -425,7 +425,7 @@ function getRangeType(oBBox){
 			this._shiftMoveDelete(AscCommon.c_oNotifyType.Move, sheetId, bboxFrom, offset);
 			this.addToChangedRange(sheetId, bboxFrom);
 		},
-		changeSheet: function(sheetId, data) {
+		changeSheet: function(sheetId, data, tableNamesMap) {
 			this.buildDependency();
 			var listeners = {};
 			var sheetContainer = this.sheetListeners[sheetId];
@@ -444,6 +444,17 @@ function getRangeType(oBBox){
 				}
 				for (var listenerId in sheetContainer.defName3d) {
 					listeners[listenerId] = sheetContainer.defName3d[listenerId];
+				}
+			}
+			if(tableNamesMap){
+				for (var tableName in tableNamesMap) {
+					var nameIndex = getDefNameIndex(tableName);
+					var container = this.defNameListeners[nameIndex];
+					if (container) {
+						for (var listenerId in container.listeners) {
+							listeners[listenerId] = container.listeners[listenerId];
+						}
+					}
 				}
 			}
 			var notifyData = {type: AscCommon.c_oNotifyType.ChangeSheet, data: data};
@@ -471,11 +482,17 @@ function getRangeType(oBBox){
 				}
 			}
 			//tables
+			var tableNamesMap = {};
 			for (var i = 0; i < tableNames.length; ++i) {
-				this._delDefName(tableNames[i], null);
+				var tableName = tableNames[i];
+				var defName = this._delDefName(tableName, null);
+				if (defName) {
+					defName.removeDependencies();
+				}
+				tableNamesMap[tableName] = 1;
 			}
 			//dependence
-			this.changeSheet(sheetId, {remove: sheetId});
+			this.changeSheet(sheetId, {remove: sheetId, tableNamesMap: tableNamesMap}, tableNamesMap);
 		},
 		//lock
 		lockRecal: function() {

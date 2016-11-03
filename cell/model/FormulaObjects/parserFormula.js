@@ -3772,17 +3772,17 @@ function parserFormula( formula, parent, _ws ) {
 				eventData.isRebuild = true;
 			} else if (AscCommon.c_oNotifyType.ChangeSheet === data.type) {
 				needAssemble = false;
-				if (this.is3D) {
-					var changeData = data.data;
+				var changeData = data.data;
+				if (this.is3D || changeData.remove) {
 					if (changeData.insert) {
 						eventData.isRebuild = this.insertSheet(changeData.insert);
 					} else if (changeData.replace || changeData.remove) {
 						eventData.isRebuild = true;
 						var moveSheetRes = 0;
-						if (changeData.replace) {
-							moveSheetRes = this.moveSheet(changeData.replace);
+						if (changeData.remove) {
+							moveSheetRes = this.removeSheet(changeData.remove, changeData.tableNamesMap);
 						} else {
-							moveSheetRes = this.removeSheet(changeData.remove);
+							moveSheetRes = this.moveSheet(changeData.replace);
 						}
 						if (2 === moveSheetRes) {
 							needAssemble = true;
@@ -4887,7 +4887,7 @@ parserFormula.prototype.calculate = function(opt_defName, opt_range) {
 		}
 		return this;
 	};
-	parserFormula.prototype.removeSheet = function(sheetId) {
+	parserFormula.prototype.removeSheet = function(sheetId, tableNamesMap) {
 		var nRes = 0;
 		var ws = this.wb.getWorksheetById(sheetId);
 		if (ws) {
@@ -4932,6 +4932,11 @@ parserFormula.prototype.calculate = function(opt_defName, opt_range) {
 					}
 				} else if (cElementType.name3D === elem.type) {
 					if (elem.ws.getId() == sheetId) {
+						this.outStack[i] = new cError(cErrorType.bad_reference);
+						nRes = 2;
+					}
+				} else if (cElementType.table === elem.type) {
+					if (tableNamesMap[elem.tableName]) {
 						this.outStack[i] = new cError(cErrorType.bad_reference);
 						nRes = 2;
 					}
