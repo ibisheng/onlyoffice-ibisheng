@@ -393,7 +393,6 @@ var UndoRedoDataTypes = new function() {
 	this.ChartSeriesData = 24;
 	this.SheetAdd = 25;
 	this.SheetRemove = 26;
-	this.SheetPositions = 27;
 	this.ClrScheme = 28;
 	this.AutoFilter = 29;
 	this.AutoFiltersOptions = 30;
@@ -474,7 +473,6 @@ var UndoRedoDataTypes = new function() {
 			case this.ChartSeriesData: return new AscFormat.asc_CChartSeria();break;
 			case this.SheetAdd: return new UndoRedoData_SheetAdd();break;
 			case this.SheetRemove: return new UndoRedoData_SheetRemove();break;
-			case this.SheetPositions: return new UndoRedoData_SheetPositions();break;
 			case this.ClrScheme: return new UndoRedoData_ClrScheme();break;
 			case this.AutoFilter: return new UndoRedoData_AutoFilter(); break;
 			case this.AutoFiltersOptions: return new Asc.AutoFiltersOptions(); break;
@@ -1516,7 +1514,8 @@ var g_oUndoRedoData_SheetAddProperties = {
 		name: 0,
 		sheetidfrom: 1,
 		sheetid: 2,
-        tableNames: 3
+        tableNames: 3,
+		insertBefore: 4
 	};
 function UndoRedoData_SheetAdd(insertBefore, name, sheetidfrom, sheetid, tableNames){
 	this.Properties = g_oUndoRedoData_SheetAddProperties;
@@ -1546,6 +1545,7 @@ UndoRedoData_SheetAdd.prototype = {
 			case this.Properties.sheetidfrom: return this.sheetidfrom;break;
 			case this.Properties.sheetid: return this.sheetid;break;
             case this.Properties.tableNames: return this.tableNames;break;
+			case this.Properties.insertBefore: return this.insertBefore;break;
 		}
 		return null;
 	},
@@ -1557,6 +1557,7 @@ UndoRedoData_SheetAdd.prototype = {
 			case this.Properties.sheetidfrom: this.sheetidfrom = value;break;
 			case this.Properties.sheetid: this.sheetid = value;break;
             case this.Properties.tableNames: this.tableNames = value;break;
+			case this.Properties.insertBefore: this.insertBefore = value;break;
 		}
 	}
 };
@@ -1594,38 +1595,6 @@ UndoRedoData_SheetRemove.prototype = {
 		{
 			case this.Properties.sheetId: this.sheetId = value;break;
 			case this.Properties.sheet: this.sheet = value;break;
-		}
-	}
-};
-var g_oUndoRedoData_SheetPositionsProperties = {
-		positions: 0
-	};
-function UndoRedoData_SheetPositions(positions){
-	this.Properties = g_oUndoRedoData_SheetPositionsProperties;
-	this.positions = positions;
-}
-UndoRedoData_SheetPositions.prototype = {
-	getType : function()
-	{
-		return UndoRedoDataTypes.SheetPositions;
-	},
-	getProperties : function()
-	{
-		return this.Properties;
-	},
-	getProperty : function(nType)
-	{
-		switch(nType)
-		{
-			case this.Properties.positions: return this.positions;break;
-		}
-		return null;
-	},
-	setProperty : function(nType, value)
-	{
-		switch(nType)
-		{
-			case this.Properties.positions: this.positions = value;break;
 		}
 	}
 };
@@ -2885,72 +2854,6 @@ UndoRedoWorkbook.prototype = {
 			}
 			wb.handlers.trigger("updateWorksheetByModel");
 		}
-		else if(AscCH.historyitem_Workbook_SheetPositions == Type)
-		{
-			if(Data.positions){
-				var wsActive = wb.getActiveWs();
-				//делаем вспомогательным map из sheetid
-				var oTempSheetMap = {};
-				for(var i = 0, length = Data.positions.length; i < length; ++i)
-					oTempSheetMap[Data.positions[i]] = 1;
-				//находим sheet уникальные для данного пользователя и запоминаем перед каким sheetid они идут
-				var oUniqueSheetId = {};
-				var nLastId = null;
-				for(var i = 0, length = wb.aWorksheets.length; i < length; ++i)
-				{
-					var ws = wb.aWorksheets[i];
-					var id = ws.getId();
-					if(null == oTempSheetMap[id])
-					{
-						if(i < length - 1)
-							oUniqueSheetId[wb.aWorksheets[i + 1].getId()] = id;
-						else
-							nLastId = id;
-					}
-				}
-				//расставляем в соответствии с изменениями
-				wb.aWorksheets = [];
-				for(var i = 0, length = Data.positions.length; i < length; ++i)
-				{
-					var sheetId = Data.positions[i];
-					var ws = wb.aWorksheetsById[sheetId];
-					if(null != ws)
-						wb.aWorksheets.push(ws);
-				}
-				if(null != nLastId)
-				{
-					var ws = wb.aWorksheetsById[nLastId];
-					if(null != ws)
-						wb.aWorksheets.push(ws);
-				}
-				//не стал оптимизировать по скорости, потому что много добавленых sheet быть не может
-				while(true)
-				{
-					for(var i = 0, length = wb.aWorksheets.length; i < length; ++i)
-					{
-						var ws = wb.aWorksheets[i];
-						var insertId = oUniqueSheetId[ws.getId()];
-						if(null != insertId)
-						{
-							var insertWs = wb.aWorksheetsById[insertId];
-							if(null != insertWs)
-								wb.aWorksheets.splice(i, 0, insertWs);
-							delete oUniqueSheetId[ws.getId()];
-						}
-					}
-					var bEmpty = true;
-					for(var i in oUniqueSheetId)
-					{
-						bEmpty = false;
-						break;
-					}
-					if(bEmpty)
-						break;
-				}
-				wb._updateWorksheetIndexes(wsActive);
-				wb.handlers.trigger("updateWorksheetByModel");
-			}
-		}
 		else if(AscCH.historyitem_Workbook_ChangeColorScheme == Type)
 		{
 			bNeedTrigger = false;
@@ -3893,7 +3796,6 @@ UndoRedoAutoFilters.prototype = {
 	window['AscCommonExcel'].UndoRedoData_SortData = UndoRedoData_SortData;
 	window['AscCommonExcel'].UndoRedoData_SheetAdd = UndoRedoData_SheetAdd;
 	window['AscCommonExcel'].UndoRedoData_SheetRemove = UndoRedoData_SheetRemove;
-	window['AscCommonExcel'].UndoRedoData_SheetPositions = UndoRedoData_SheetPositions;
 	window['AscCommonExcel'].UndoRedoData_DefinedNames = UndoRedoData_DefinedNames;
 	window['AscCommonExcel'].UndoRedoData_ClrScheme = UndoRedoData_ClrScheme;
 	window['AscCommonExcel'].UndoRedoData_AutoFilter = UndoRedoData_AutoFilter;

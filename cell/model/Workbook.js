@@ -58,7 +58,6 @@ var UndoRedoData_FromTo = AscCommonExcel.UndoRedoData_FromTo;
 var UndoRedoData_IndexSimpleProp = AscCommonExcel.UndoRedoData_IndexSimpleProp;
 var UndoRedoData_BBox = AscCommonExcel.UndoRedoData_BBox;
 var UndoRedoData_SheetAdd = AscCommonExcel.UndoRedoData_SheetAdd;
-var UndoRedoData_SheetPositions = AscCommonExcel.UndoRedoData_SheetPositions;
 var UndoRedoData_DefinedNames = AscCommonExcel.UndoRedoData_DefinedNames;
 var g_oDefaultFormat = AscCommonExcel.g_oDefaultFormat;
 var Border = AscCommonExcel.Border;
@@ -1582,7 +1581,7 @@ Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 		
 		this._insertWorksheetFormula(indexTo);
 		
-		History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_SheetMove, null, null, new UndoRedoData_FromTo(indexFrom, indexTo), true);
+		History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_SheetMove, null, null, new UndoRedoData_FromTo(indexFrom, indexTo));
 		this.dependencyFormulas.unlockRecal();
 	}
 };
@@ -1823,34 +1822,13 @@ Workbook.prototype.SerializeHistory = function(){
 	if(aActions.length > 0)
 	{
 		var oMemory = new AscCommon.CMemory();
-		var bChangeSheetPlace = false;
 		for(var i = 0, length = aActions.length; i < length; ++i)
 		{
 		    var aPointChanges = aActions[i];
-		    bChangeSheetPlace = false;
 		    for (j = 0, length2 = aPointChanges.length; j < length2; ++j) {
 		        var item = aPointChanges[j];
-		        if (AscCommonExcel.g_oUndoRedoWorkbook == item.oClass) {
-		            if (AscCH.historyitem_Workbook_SheetAdd == item.nActionType || AscCH.historyitem_Workbook_SheetRemove == item.nActionType || AscCH.historyitem_Workbook_SheetMove == item.nActionType)
-		                bChangeSheetPlace = true;
-		        }
-		        else if (AscCommonExcel.g_oUndoRedoWorksheet === item.oClass && AscCH.historyitem_Worksheet_Hide === item.nActionType) {
-		            bChangeSheetPlace = true;
-		        }
 		        this._SerializeHistoryBase64(oMemory, item, aRes);
 		    }
-			var oUndoRedoData_SheetPositions;
-		    if (bChangeSheetPlace) {
-		        //создаем еще один элемент в undo/redo - взаимное расположение Sheet, чтобы не запутываться в add, move событиях
-		        //добавляем не после конца aActions, чтобы можно было делать undo/redo и просто удалять хвост изменений.
-		        var oSheetPlaceData = [];
-		        for (j = 0, length2 = this.aWorksheets.length; j < length2; ++j)
-		            oSheetPlaceData.push(this.aWorksheets[j].getId());
-		        oUndoRedoData_SheetPositions = new UndoRedoData_SheetPositions(oSheetPlaceData);
-		    }
-			else
-				oUndoRedoData_SheetPositions = new UndoRedoData_SheetPositions();
-			this._SerializeHistoryBase64(oMemory, new UndoRedoItemSerializable(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_SheetPositions, null, null, oUndoRedoData_SheetPositions), aRes);
 		}
 		this.aCollaborativeActions = [];
 		this.snapshot = this._getSnapshot();
@@ -2508,7 +2486,7 @@ Woorksheet.prototype.copyFrom=function(wsFrom, sName, tableNames){	var i, elem, 
 	if (wsFrom.sheetPr)
 		this.sheetPr = wsFrom.sheetPr.clone();
 
-	oNewWs.selectionRange = this.selectionRange.clone(oNewWs);
+	this.selectionRange = wsFrom.selectionRange.clone(this);
 
 	return renameParams;
 };
@@ -8149,6 +8127,9 @@ function promoteFromTo(from, wsFrom, to, wsTo) {
 	};
 Range.prototype.promote=function(bCtrl, bVertical, nIndex, oCanPromote){
 	//todo отдельный метод для promote в таблицах и merge в таблицах
+	if (!oCanPromote) {
+		oCanPromote = this.canPromote(bCtrl, bVertical, nIndex);
+	}
 	var oBBox = this.bbox;
 	var nWidth = oBBox.c2 - oBBox.c1 + 1;
 	var nHeight = oBBox.r2 - oBBox.r1 + 1;
