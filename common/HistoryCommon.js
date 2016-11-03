@@ -1323,27 +1323,25 @@
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе ParaDrawing
 	//------------------------------------------------------------------------------------------------------------------
-	window['AscDFH'].historyitem_Drawing_Size              = window['AscDFH'].historyitem_type_Drawing | 1;
-	window['AscDFH'].historyitem_Drawing_Url               = window['AscDFH'].historyitem_type_Drawing | 2;
-	window['AscDFH'].historyitem_Drawing_DrawingType       = window['AscDFH'].historyitem_type_Drawing | 3;
-	window['AscDFH'].historyitem_Drawing_WrappingType      = window['AscDFH'].historyitem_type_Drawing | 4;
-	window['AscDFH'].historyitem_Drawing_Distance          = window['AscDFH'].historyitem_type_Drawing | 5;
-	window['AscDFH'].historyitem_Drawing_AllowOverlap      = window['AscDFH'].historyitem_type_Drawing | 6;
-	window['AscDFH'].historyitem_Drawing_PositionH         = window['AscDFH'].historyitem_type_Drawing | 7;
-	window['AscDFH'].historyitem_Drawing_PositionV         = window['AscDFH'].historyitem_type_Drawing | 8;
-	window['AscDFH'].historyitem_Drawing_BehindDoc         = window['AscDFH'].historyitem_type_Drawing | 10;
-	window['AscDFH'].historyitem_Drawing_SetGraphicObject  = window['AscDFH'].historyitem_type_Drawing | 11;
-	window['AscDFH'].historyitem_SetSimplePos              = window['AscDFH'].historyitem_type_Drawing | 12;
-	window['AscDFH'].historyitem_SetExtent                 = window['AscDFH'].historyitem_type_Drawing | 13;
-	window['AscDFH'].historyitem_SetWrapPolygon            = window['AscDFH'].historyitem_type_Drawing | 14;
-	window['AscDFH'].historyitem_Drawing_SetLocked         = window['AscDFH'].historyitem_type_Drawing | 15;
-	window['AscDFH'].historyitem_Drawing_SetRelativeHeight = window['AscDFH'].historyitem_type_Drawing | 16;
-	window['AscDFH'].historyitem_Drawing_SetEffectExtent   = window['AscDFH'].historyitem_type_Drawing | 17;
-	window['AscDFH'].historyitem_Drawing_SetParent         = window['AscDFH'].historyitem_type_Drawing | 18;
-	window['AscDFH'].historyitem_Drawing_SetParaMath       = window['AscDFH'].historyitem_type_Drawing | 19;
-	window['AscDFH'].historyitem_Drawing_LayoutInCell      = window['AscDFH'].historyitem_type_Drawing | 20;
-	window['AscDFH'].historyitem_Drawing_SetSizeRelH       = window['AscDFH'].historyitem_type_Drawing | 21;
-	window['AscDFH'].historyitem_Drawing_SetSizeRelV       = window['AscDFH'].historyitem_type_Drawing | 22;
+	window['AscDFH'].historyitem_Drawing_DrawingType       = window['AscDFH'].historyitem_type_Drawing | 1;
+	window['AscDFH'].historyitem_Drawing_WrappingType      = window['AscDFH'].historyitem_type_Drawing | 2;
+	window['AscDFH'].historyitem_Drawing_Distance          = window['AscDFH'].historyitem_type_Drawing | 3;
+	window['AscDFH'].historyitem_Drawing_AllowOverlap      = window['AscDFH'].historyitem_type_Drawing | 4;
+	window['AscDFH'].historyitem_Drawing_PositionH         = window['AscDFH'].historyitem_type_Drawing | 5;
+	window['AscDFH'].historyitem_Drawing_PositionV         = window['AscDFH'].historyitem_type_Drawing | 6;
+	window['AscDFH'].historyitem_Drawing_BehindDoc         = window['AscDFH'].historyitem_type_Drawing | 7;
+	window['AscDFH'].historyitem_Drawing_SetGraphicObject  = window['AscDFH'].historyitem_type_Drawing | 8;
+	window['AscDFH'].historyitem_Drawing_SetSimplePos      = window['AscDFH'].historyitem_type_Drawing | 9;
+	window['AscDFH'].historyitem_Drawing_SetExtent         = window['AscDFH'].historyitem_type_Drawing | 10;
+	window['AscDFH'].historyitem_Drawing_SetWrapPolygon    = window['AscDFH'].historyitem_type_Drawing | 11;
+	window['AscDFH'].historyitem_Drawing_SetLocked         = window['AscDFH'].historyitem_type_Drawing | 12;
+	window['AscDFH'].historyitem_Drawing_SetRelativeHeight = window['AscDFH'].historyitem_type_Drawing | 13;
+	window['AscDFH'].historyitem_Drawing_SetEffectExtent   = window['AscDFH'].historyitem_type_Drawing | 14;
+	window['AscDFH'].historyitem_Drawing_SetParent         = window['AscDFH'].historyitem_type_Drawing | 15;
+	window['AscDFH'].historyitem_Drawing_SetParaMath       = window['AscDFH'].historyitem_type_Drawing | 16;
+	window['AscDFH'].historyitem_Drawing_LayoutInCell      = window['AscDFH'].historyitem_type_Drawing | 17;
+	window['AscDFH'].historyitem_Drawing_SetSizeRelH       = window['AscDFH'].historyitem_type_Drawing | 18;
+	window['AscDFH'].historyitem_Drawing_SetSizeRelV       = window['AscDFH'].historyitem_type_Drawing | 19;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе CTable
 	//------------------------------------------------------------------------------------------------------------------
@@ -2825,6 +2823,8 @@
 	//
 	// Базовые классы для изменений
 	//
+	// Разница между классами Property и Value в том, что Property могут быть undefined, а Value всегда значение
+	// заданного типа.
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/**
@@ -3325,4 +3325,58 @@
 			this.Old = Reader.GetByte();
 	};
 	window['AscDFH'].CChangesBaseByteProperty = CChangesBaseByteProperty;
+	/**
+	 * Базовый класс для изменения числовых(long) значений.
+	 * @constructor
+	 * @extends {AscDFH.CChangesBaseProperty}
+	 */
+	function CChangesBaseLongValue(Class, Old, New, Color)
+	{
+		CChangesBaseLongValue.superclass.constructor.call(this, Class, Old, New, Color);
+	}
+	AscCommon.extendClass(CChangesBaseLongValue, CChangesBaseProperty);
+	CChangesBaseLongValue.prototype.WriteToBinary = function(Writer)
+	{
+		// Long  : New
+		// Long  : Old
+
+		Writer.WriteLong(this.New);
+		Writer.WriteLong(this.Old);
+	};
+	CChangesBaseLongValue.prototype.ReadFromBinary = function(Reader)
+	{
+		// Long  : New
+		// Long  : Old
+
+		this.New = Reader.GetLong();
+		this.Old = Reader.GetLong();
+	};
+	window['AscDFH'].CChangesBaseLongValue = CChangesBaseLongValue;
+	/**
+	 * Базовый класс для изменения числовых(long) значений.
+	 * @constructor
+	 * @extends {AscDFH.CChangesBaseProperty}
+	 */
+	function CChangesBaseBoolValue(Class, Old, New, Color)
+	{
+		CChangesBaseBoolValue.superclass.constructor.call(this, Class, Old, New, Color);
+	}
+	AscCommon.extendClass(CChangesBaseBoolValue, CChangesBaseProperty);
+	CChangesBaseBoolValue.prototype.WriteToBinary = function(Writer)
+	{
+		// Bool  : New
+		// Bool  : Old
+
+		Writer.WriteBool(this.New);
+		Writer.WriteBool(this.Old);
+	};
+	CChangesBaseBoolValue.prototype.ReadFromBinary = function(Reader)
+	{
+		// Bool  : New
+		// Bool  : Old
+
+		this.New = Reader.GetBool();
+		this.Old = Reader.GetBool();
+	};
+	window['AscDFH'].CChangesBaseBoolValue = CChangesBaseBoolValue;
 })(window);

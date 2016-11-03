@@ -135,6 +135,8 @@
         "../word/Editor/ParagraphContentBase.js",
         "../word/Editor/Paragraph/ParaTextPr.js",
         "../word/Editor/Paragraph/ParaTextPrChanges.js",
+        "../word/Editor/Paragraph/ParaDrawing.js",
+        "../word/Editor/Paragraph/ParaDrawingChanges.js",
         "../word/Editor/Hyperlink.js",
         "../word/Editor/Field.js",
         "../word/Editor/Run.js",
