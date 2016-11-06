@@ -3721,6 +3721,7 @@ function parserFormula( formula, parent, _ws ) {
 	this.ca = false;
 	this.isDirty = false;
 	this.isCalculate = false;
+	this.isTable = false;
 	this.parent = parent;
 }
   parserFormula.prototype.getWs = function() {
@@ -3735,6 +3736,9 @@ function parserFormula( formula, parent, _ws ) {
   parserFormula.prototype.setIsDirty = function(isDirty) {
     this.isDirty = isDirty;
   };
+	parserFormula.prototype.setIsTable = function(isTable){
+		this.isTable = isTable;
+	};
 	parserFormula.prototype.notify = function(data) {
 		var eventData = {notifyData: data, assemble: null, isRebuild: false, formula: this};
 		if (this.parent && this.parent.onFormulaEvent) {
@@ -5060,8 +5064,9 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
 };
 	parserFormula.prototype.buildDependencies = function() {
 
-		var ref, nTo, wsR;
-
+		var ref, wsR;
+		var isTable = this.isTable;
+		var bbox;
 		if (this.ca) {
 			this.wb.dependencyFormulas.startListeningVolatile(this);
 		}
@@ -5088,14 +5093,30 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
 				this.wb.dependencyFormulas.startListeningDefName(ref.value, this, ref.ws.getId());
 			} else if ((cElementType.cell === ref.type || cElementType.cell3D === ref.type ||
 				cElementType.cellsRange === ref.type) && ref.isValid()) {
-				this.wb.dependencyFormulas.startListeningRange(ref.getWsId(), ref.getRange().getBBox0(), this);
+				bbox = ref.getRange().getBBox0();
+				if(isTable){
+					//extend table formula with header/total. This allows us not to follow their change,
+					//but sometimes leads to recalculate of the table although changed cells near table (it's not a problem)
+					bbox = bbox.clone();
+					bbox.setOffsetFirst({offsetRow: -1, offsetCol: 0});
+					bbox.setOffsetLast({offsetRow: 1, offsetCol: 0});
+				}
+				this.wb.dependencyFormulas.startListeningRange(ref.getWsId(), bbox, this);
 			} else if (cElementType.cellsRange3D === ref.type && ref.isValid()) {
 				wsR = ref.range(ref.wsRange());
 				for (var j = 0; j < wsR.length; j++) {
 					var range = wsR[j];
 					if (range) {
 						var wsId = range.getWorksheet().getId();
-						this.wb.dependencyFormulas.startListeningRange(wsId, range.getBBox0(), this);
+						bbox = range.getBBox0();
+						if(isTable){
+							//extend table formula with header/total. This allows us not to follow their change,
+							//but sometimes leads to recalculate of the table although changed cells near table (it's not a problem)
+							bbox = bbox.clone();
+							bbox.setOffsetFirst({offsetRow: -1, offsetCol: 0});
+							bbox.setOffsetLast({offsetRow: 1, offsetCol: 0});
+						}
+						this.wb.dependencyFormulas.startListeningRange(wsId, bbox, this);
 					}
 				}
 			}
@@ -5104,6 +5125,8 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
 	parserFormula.prototype.removeDependencies = function() {
 		var ref;
 		var wsR;
+		var isTable = this.isTable;
+		var bbox;
 		if (this.ca) {
 			this.wb.dependencyFormulas.endListeningVolatile(this);
 		}
@@ -5130,14 +5153,26 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
 				this.wb.dependencyFormulas.endListeningDefName(ref.value, this, ref.ws.getId());
 			} else if ((cElementType.cell === ref.type || cElementType.cell3D === ref.type ||
 				cElementType.cellsRange === ref.type) && ref.isValid()) {
-				this.wb.dependencyFormulas.endListeningRange(ref.getWsId(), ref.getRange().getBBox0(), this);
+				bbox = ref.getRange().getBBox0();
+				if(isTable){
+					bbox = bbox.clone();
+					bbox.setOffsetFirst({offsetRow: -1, offsetCol: 0});
+					bbox.setOffsetLast({offsetRow: 1, offsetCol: 0});
+				}
+				this.wb.dependencyFormulas.endListeningRange(ref.getWsId(), bbox, this);
 			} else if (cElementType.cellsRange3D === ref.type && ref.isValid()) {
 				wsR = ref.range(ref.wsRange());
 				for (var j = 0; j < wsR.length; j++) {
 					var range = wsR[j];
 					if (range) {
 						var wsId = range.getWorksheet().getId();
-						this.wb.dependencyFormulas.endListeningRange(wsId, range.getBBox0(), this);
+						bbox = range.getBBox0();
+						if(isTable){
+							bbox = bbox.clone();
+							bbox.setOffsetFirst({offsetRow: -1, offsetCol: 0});
+							bbox.setOffsetLast({offsetRow: 1, offsetCol: 0});
+						}
+						this.wb.dependencyFormulas.endListeningRange(wsId, bbox, this);
 					}
 				}
 			}

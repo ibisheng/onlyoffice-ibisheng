@@ -997,8 +997,7 @@
 								this._setStyleTables(cloneData.newFilterRef);
 								
 								//event
-								//todo
-								worksheet.handlers.trigger("changeRefTablePart", cloneData.oldFilter.DisplayName, cloneData.oldFilter.Ref);
+								worksheet.handlers.trigger("changeRefTablePart", cloneData.oldFilter);
 								
 								break;
 							}	

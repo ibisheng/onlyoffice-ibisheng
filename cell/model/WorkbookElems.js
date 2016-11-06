@@ -5254,7 +5254,7 @@ TablePart.prototype.moveRef = function(col, row) {
 
 	this.Ref = ref;
 	//event
-	this.handlers.trigger("changeRefTablePart", this.DisplayName, this.getRangeWithoutHeaderFooter());
+	this.handlers.trigger("changeRefTablePart", this);
 
 	if(this.AutoFilter)
 		this.AutoFilter.moveRef(col, row);
@@ -5269,7 +5269,7 @@ TablePart.prototype.changeRef = function(col, row, bIsFirst) {
 	this.Ref = ref;
 	
 	//event
-	this.handlers.trigger("changeRefTablePart", this.DisplayName, this.getRangeWithoutHeaderFooter());
+	this.handlers.trigger("changeRefTablePart", this);
 	
 	if(this.AutoFilter)
 		this.AutoFilter.changeRef(col, row, bIsFirst);
@@ -5316,7 +5316,7 @@ TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewT
 	}
 	this.Ref = Asc.Range(range.c1, range.r1, range.c2, range.r2);
 	//event
-	this.handlers.trigger("changeRefTablePart", this.DisplayName, this.getRangeWithoutHeaderFooter());
+	this.handlers.trigger("changeRefTablePart", this);
 	
 	if(this.AutoFilter)
 		this.AutoFilter.changeRefOnRange(range);

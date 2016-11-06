@@ -201,6 +201,7 @@ function getRangeType(oBBox){
 			this.ref = ref;
 			//all ref should be 3d, so worksheet can be anyone
 			this.parsedRef = new parserFormula(ref, this, AscCommonExcel.g_DefNameWorksheet);
+			this.parsedRef.setIsTable(true);
 			if (opt_forceBuild) {
 				this.parsedRef.parse();
 				this.parsedRef.buildDependencies();
@@ -721,13 +722,14 @@ function getRangeType(oBBox){
 				defName.setRef(defNameRef);
 			}
 		},
-		changeTableRef: function(tableName, newRef) {
-			var defName = this.getDefNameByName(tableName, null);
+		changeTableRef: function(table) {
+			var defName = this.getDefNameByName(table.DisplayName, null);
 			if (defName) {
 				this.buildDependency();
 				var oldUndoName = defName.getUndoDefName();
 				var newUndoName = defName.getUndoDefName();
-				newUndoName.ref = defName.ref.split('!')[0] + '!' + newRef.getAbsName();
+				var ref = table.getRangeWithoutHeaderFooter();
+				newUndoName.ref = defName.ref.split('!')[0] + '!' + ref.getAbsName();
 				History.TurnOff();
 				this.editDefinesNames(oldUndoName, newUndoName);
 				var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: oldUndoName, to: newUndoName};
@@ -1379,8 +1381,8 @@ Workbook.prototype.init=function(tableCustomFunc, bNoBuildDep, bSnapshot){
 	var self = this;
 
 	this.wsHandlers = new AscCommonExcel.asc_CHandlersList( /*handlers*/{
-		"changeRefTablePart"   : function ( displayName, ref ) {
-			self.dependencyFormulas.changeTableRef( displayName, ref );
+		"changeRefTablePart"   : function (table) {
+			self.dependencyFormulas.changeTableRef(table);
 		},
 		"changeColumnTablePart": function ( tableName ) {
 			self.dependencyFormulas.rebuildTable( tableName );
