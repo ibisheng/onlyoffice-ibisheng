@@ -4630,9 +4630,7 @@ drawAreaChart.prototype =
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		this._calculateProps();
 		
-		console.time("recalc");
 		this._calculate();
-		console.timeEnd("recalc");
 	},
 	
 	_calculateProps: function()
@@ -11071,7 +11069,7 @@ catAxisChart.prototype =
 		var posX, posMinorX, k;
 		
 		var firstDiff = 0, posXtemp;
-		if(this.cChartSpace.getValAxisCrossType() == AscFormat.CROSS_BETWEEN_BETWEEN && this.chartProp.type != "Scatter")
+		if(this.cChartSpace.getValAxisCrossType() == AscFormat.CROSS_BETWEEN_BETWEEN && this.chartProp.type !== c_oChartTypes.Scatter)
 		{
 			if(xPoints[1])
 				firstDiff = Math.abs(xPoints[1].pos - xPoints[0].pos);
@@ -12033,7 +12031,7 @@ areaChart.prototype =
 		
 		this.paths = null;
 		
-		if(this.cChartDrawer.nDimensionCount === 3 && this.chartProp.type != "Pie")
+		if(this.cChartDrawer.nDimensionCount === 3 && this.chartProp.type !== c_oChartTypes.Pie)
 			this._calculateArea3D();
 		else
 			this._calculateArea();
@@ -12066,7 +12064,7 @@ areaChart.prototype =
 		path.lnTo((widthGraph - rightMargin)  / pxToMm * pathW, (heightGraph - bottomMargin) / pxToMm * pathH);
 		path.lnTo((widthGraph - rightMargin) / pxToMm * pathW, topMargin / pxToMm * pathH);
 		path.lnTo(leftMargin / pxToMm * pathW, topMargin / pxToMm * pathH);
-		path.moveTo(leftMargin / pxToMm * pathW, (heightGraph - bottomMargin) / pxToMm * pathH);
+		path.lnTo(leftMargin / pxToMm * pathW, (heightGraph - bottomMargin) / pxToMm * pathH);
 		
 		path.recalculate(gdLst);
 		this.paths = path;
