@@ -213,14 +213,8 @@ RgbColor.prototype =
 		return 1;
 	}
 };
-var g_oThemeColorProperties = {
-		rgb: 0,
-		theme: 1,
-		tint: 2
-	};
 function ThemeColor()
 {
-	this.Properties = g_oThemeColorProperties;
 	this.rgb = null;
 	this.theme = null;
 	this.tint = null;
@@ -229,30 +223,14 @@ ThemeColor.prototype =
 {
 	clone : function()
 	{
-		var res = new ThemeColor();
-		res.rgb = this.rgb;
-		res.theme = this.theme;
-		res.tint = this.tint;
-		return res;
+		//ThemeColor must be created by g_oColorManager for correct rebuild
+		//no need getThemeColor because it return same object
+		return this;
 	},
 	getType : function()
 	{
 		return UndoRedoDataTypes.ThemeColor;
 	},
-	getProperties : function()
-	{
-		return this.Properties;
-	},
-	getProperty : function(nType)
-	{
-		switch(nType)
-		{
-		case this.Properties.rgb:return this.rgb;break;
-		case this.Properties.theme:return this.theme;break;
-		case this.Properties.tint:return this.tint;break;
-		}
-	},
-
     isEqual: function(oColor)
     {
         if(!oColor){
@@ -266,16 +244,6 @@ ThemeColor.prototype =
         }
         return true;
     },
-
-	setProperty : function(nType, value)
-	{
-		switch(nType)
-		{
-		case this.Properties.rgb: this.rgb = value;break;
-		case this.Properties.theme: this.theme= value;break;
-		case this.Properties.tint: this.tint = value;break;
-		}
-	},
 	Write_ToBinary2 : function(oBinaryWriter)
 	{
 		oBinaryWriter.WriteByte(this.theme);
