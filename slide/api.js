@@ -4859,7 +4859,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.asc_AddMath = function(Type)
 	{
 		var loader   = AscCommon.g_font_loader;
-		var fontinfo = g_fontApplication.GetFontInfo("Cambria Math");
+		var fontinfo = AscFonts.g_fontApplication.GetFontInfo("Cambria Math");
 		var isasync  = loader.LoadFont(fontinfo);
 		if (false === isasync)
 		{
