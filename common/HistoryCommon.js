@@ -1345,34 +1345,31 @@
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе CTable
 	//------------------------------------------------------------------------------------------------------------------
-	window['AscDFH'].historyitem_Table_DocNext               = window['AscDFH'].historyitem_type_Table | 1;
-	window['AscDFH'].historyitem_Table_DocPrev               = window['AscDFH'].historyitem_type_Table | 2;
-	window['AscDFH'].historyitem_Table_Parent                = window['AscDFH'].historyitem_type_Table | 3;
-	window['AscDFH'].historyitem_Table_TableW                = window['AscDFH'].historyitem_type_Table | 4;
-	window['AscDFH'].historyitem_Table_TableCellMar          = window['AscDFH'].historyitem_type_Table | 5;
-	window['AscDFH'].historyitem_Table_TableAlign            = window['AscDFH'].historyitem_type_Table | 6;
-	window['AscDFH'].historyitem_Table_TableInd              = window['AscDFH'].historyitem_type_Table | 7;
-	window['AscDFH'].historyitem_Table_TableBorder_Left      = window['AscDFH'].historyitem_type_Table | 8;
-	window['AscDFH'].historyitem_Table_TableBorder_Top       = window['AscDFH'].historyitem_type_Table | 9;
-	window['AscDFH'].historyitem_Table_TableBorder_Right     = window['AscDFH'].historyitem_type_Table | 10;
-	window['AscDFH'].historyitem_Table_TableBorder_Bottom    = window['AscDFH'].historyitem_type_Table | 11;
-	window['AscDFH'].historyitem_Table_TableBorder_InsideH   = window['AscDFH'].historyitem_type_Table | 12;
-	window['AscDFH'].historyitem_Table_TableBorder_InsideV   = window['AscDFH'].historyitem_type_Table | 13;
-	window['AscDFH'].historyitem_Table_TableShd              = window['AscDFH'].historyitem_type_Table | 14;
-	window['AscDFH'].historyitem_Table_Inline                = window['AscDFH'].historyitem_type_Table | 15;
-	window['AscDFH'].historyitem_Table_AddRow                = window['AscDFH'].historyitem_type_Table | 16;
-	window['AscDFH'].historyitem_Table_RemoveRow             = window['AscDFH'].historyitem_type_Table | 17;
-	window['AscDFH'].historyitem_Table_TableGrid             = window['AscDFH'].historyitem_type_Table | 18;
-	window['AscDFH'].historyitem_Table_TableLook             = window['AscDFH'].historyitem_type_Table | 19;
-	window['AscDFH'].historyitem_Table_TableStyleRowBandSize = window['AscDFH'].historyitem_type_Table | 20;
-	window['AscDFH'].historyitem_Table_TableStyleColBandSize = window['AscDFH'].historyitem_type_Table | 21;
-	window['AscDFH'].historyitem_Table_TableStyle            = window['AscDFH'].historyitem_type_Table | 22;
-	window['AscDFH'].historyitem_Table_AllowOverlap          = window['AscDFH'].historyitem_type_Table | 23;
-	window['AscDFH'].historyitem_Table_PositionH             = window['AscDFH'].historyitem_type_Table | 24;
-	window['AscDFH'].historyitem_Table_PositionV             = window['AscDFH'].historyitem_type_Table | 25;
-	window['AscDFH'].historyitem_Table_Distance              = window['AscDFH'].historyitem_type_Table | 26;
-	window['AscDFH'].historyitem_Table_Pr                    = window['AscDFH'].historyitem_type_Table | 27;
-	window['AscDFH'].historyitem_Table_TableLayout           = window['AscDFH'].historyitem_type_Table | 28;
+	window['AscDFH'].historyitem_Table_TableW                = window['AscDFH'].historyitem_type_Table | 1;
+	window['AscDFH'].historyitem_Table_TableCellMar          = window['AscDFH'].historyitem_type_Table | 2;
+	window['AscDFH'].historyitem_Table_TableAlign            = window['AscDFH'].historyitem_type_Table | 3;
+	window['AscDFH'].historyitem_Table_TableInd              = window['AscDFH'].historyitem_type_Table | 4;
+	window['AscDFH'].historyitem_Table_TableBorder_Left      = window['AscDFH'].historyitem_type_Table | 5;
+	window['AscDFH'].historyitem_Table_TableBorder_Top       = window['AscDFH'].historyitem_type_Table | 6;
+	window['AscDFH'].historyitem_Table_TableBorder_Right     = window['AscDFH'].historyitem_type_Table | 7;
+	window['AscDFH'].historyitem_Table_TableBorder_Bottom    = window['AscDFH'].historyitem_type_Table | 8;
+	window['AscDFH'].historyitem_Table_TableBorder_InsideH   = window['AscDFH'].historyitem_type_Table | 9;
+	window['AscDFH'].historyitem_Table_TableBorder_InsideV   = window['AscDFH'].historyitem_type_Table | 10;
+	window['AscDFH'].historyitem_Table_TableShd              = window['AscDFH'].historyitem_type_Table | 11;
+	window['AscDFH'].historyitem_Table_Inline                = window['AscDFH'].historyitem_type_Table | 12;
+	window['AscDFH'].historyitem_Table_AddRow                = window['AscDFH'].historyitem_type_Table | 13;
+	window['AscDFH'].historyitem_Table_RemoveRow             = window['AscDFH'].historyitem_type_Table | 14;
+	window['AscDFH'].historyitem_Table_TableGrid             = window['AscDFH'].historyitem_type_Table | 15;
+	window['AscDFH'].historyitem_Table_TableLook             = window['AscDFH'].historyitem_type_Table | 16;
+	window['AscDFH'].historyitem_Table_TableStyleRowBandSize = window['AscDFH'].historyitem_type_Table | 17;
+	window['AscDFH'].historyitem_Table_TableStyleColBandSize = window['AscDFH'].historyitem_type_Table | 18;
+	window['AscDFH'].historyitem_Table_TableStyle            = window['AscDFH'].historyitem_type_Table | 19;
+	window['AscDFH'].historyitem_Table_AllowOverlap          = window['AscDFH'].historyitem_type_Table | 20;
+	window['AscDFH'].historyitem_Table_PositionH             = window['AscDFH'].historyitem_type_Table | 21;
+	window['AscDFH'].historyitem_Table_PositionV             = window['AscDFH'].historyitem_type_Table | 22;
+	window['AscDFH'].historyitem_Table_Distance              = window['AscDFH'].historyitem_type_Table | 23;
+	window['AscDFH'].historyitem_Table_Pr                    = window['AscDFH'].historyitem_type_Table | 24;
+	window['AscDFH'].historyitem_Table_TableLayout           = window['AscDFH'].historyitem_type_Table | 25;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе CTableRow
 	//------------------------------------------------------------------------------------------------------------------
@@ -3379,4 +3376,19 @@
 		this.Old = Reader.GetBool();
 	};
 	window['AscDFH'].CChangesBaseBoolValue = CChangesBaseBoolValue;
+	/**
+	 * Базовый класс для изменения объектных значений.
+	 * @constructor
+	 * @extends {AscDFH.CChangesBaseObjectProperty}
+	 */
+	function CChangesBaseObjectValue(Class, Old, New, Color)
+	{
+		CChangesBaseObjectValue.superclass.constructor.call(this, Class, Old, New, Color);
+	}
+	AscCommon.extendClass(CChangesBaseObjectValue, CChangesBaseObjectProperty);
+	CChangesBaseObjectValue.prototype.private_IsCreateEmptyObject = function()
+	{
+		return true;
+	};
+	window['AscDFH'].CChangesBaseObjectValue = CChangesBaseObjectValue;
 })(window);

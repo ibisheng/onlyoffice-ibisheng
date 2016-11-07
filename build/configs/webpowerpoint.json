@@ -102,10 +102,13 @@
         "../word/Drawing/GraphicsEvents.js",
         "../word/Drawing/Rulers.js",
         "../word/Editor/Table.js",
+        "../word/Editor/Table/TableChanges.js",
         "../word/Editor/Table/TableRecalculate.js",
         "../word/Editor/Table/TableDraw.js",
         "../word/Editor/Table/TableRow.js",
+        "../word/Editor/Table/TableRowChanges.js",
         "../word/Editor/Table/TableCell.js",
+        "../word/Editor/Table/TableCellChanges.js",
         "../word/Editor/Common.js",
         "../word/Editor/Sections.js",
 		

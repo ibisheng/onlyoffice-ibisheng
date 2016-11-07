@@ -632,6 +632,10 @@ CChangesParaDrawingEffectExtent.prototype.ReadFromBinary = function(Reader)
 	// Double : Old.T
 	// Double : Old.R
 	// Double : Old.B
+
+	this.New = {};
+	this.Old = {};
+
 	this.New.L = Reader.GetDouble();
 	this.New.T = Reader.GetDouble();
 	this.New.R = Reader.GetDouble();
