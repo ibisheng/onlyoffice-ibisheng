@@ -4986,12 +4986,12 @@ CellArea.prototype = {
 		return oExcellColor;
 	};
 
-	sparklineGroup.prototype.generateCache = function () {
+	sparklineGroup.prototype._generateThumbCache = function () {
 		function createItem(value) {
 			return {numFormatStr: "General", isDateTimeFormat: false, val: value, isHidden: false};
 		}
 
-		switch (this.type) {
+		switch (this.asc_getType()) {
 			case Asc.c_oAscSparklineType.Line: {
 				return [createItem(128), createItem(56), createItem(175), createItem(0), createItem(248), createItem(184)];
 			}
@@ -5009,35 +5009,22 @@ CellArea.prototype = {
 		return [];
 	};
 
-	sparklineGroup.prototype.getThumbBySparklineGroup = function (oSparklineGroup) {
-		if (!this.canvas) {
-			this.canvas = document.createElement('canvas');
-			if (AscCommon.AscBrowser.isRetina) {
-				this.canvas.width = 100;
-				this.canvas.height = 100;
-			} else {
-				this.canvas.width = 50;
-				this.canvas.height = 50;
-			}
-		}
-		//	if(!this.sparklineView){
-		this.sparklineView = new AscFormat.CSparklineView();
-		var oSparkline = new sparkline();
-		oSparkline.oCache = this.generateCache();
-		this.sparklineView.initFromSparkline(oSparkline, oSparklineGroup, null, true);
+	sparklineGroup.prototype._drawThumbBySparklineGroup = function (oSparkline, oSparklineGroup, oSparklineView, oGraphics) {
+		oSparklineView.initFromSparkline(oSparkline, oSparklineGroup, null, true);
 		var api_sheet = Asc['editor'];
 
 		AscFormat.ExecuteNoHistory(function () {
-			this.sparklineView.chartSpace.setWorksheet(api_sheet.wb.getWorksheet().model);
+			oSparklineView.chartSpace.setWorksheet(api_sheet.wb.getWorksheet().model);
 		}, this, []);
 
-		this.sparklineView.chartSpace.extX = 100;
-		this.sparklineView.chartSpace.extY = 100;
-		this.sparklineView.chartSpace.x = 0;
-		this.sparklineView.chartSpace.y = 0;
-		if (oSparklineGroup.type === Asc.c_oAscSparklineType.Stacked) {
+		oSparklineView.chartSpace.extX = 100;
+		oSparklineView.chartSpace.extY = 100;
+		oSparklineView.chartSpace.x = 0;
+		oSparklineView.chartSpace.y = 0;
+		var type = oSparklineGroup.asc_getType();
+		if (type === Asc.c_oAscSparklineType.Stacked) {
 			AscFormat.ExecuteNoHistory(function () {
-				var oPlotArea = this.sparklineView.chartSpace.chart.plotArea;
+				var oPlotArea = oSparklineView.chartSpace.chart.plotArea;
 				if (!oPlotArea.layout) {
 					oPlotArea.setLayout(new AscFormat.CLayout());
 				}
@@ -5050,9 +5037,9 @@ CellArea.prototype = {
 				oPlotArea.layout.setY(fPos);
 			}, this, []);
 		}
-		if (oSparklineGroup.type === Asc.c_oAscSparklineType.Line) {
+		if (type === Asc.c_oAscSparklineType.Line) {
 			AscFormat.ExecuteNoHistory(function () {
-				var oPlotArea = this.sparklineView.chartSpace.chart.plotArea;
+				var oPlotArea = oSparklineView.chartSpace.chart.plotArea;
 				if (!oPlotArea.layout) {
 					oPlotArea.setLayout(new AscFormat.CLayout());
 				}
@@ -5064,66 +5051,54 @@ CellArea.prototype = {
 			}, this, []);
 		}
 		AscFormat.ExecuteNoHistory(function () {
-			AscFormat.CheckSpPrXfrm(this.sparklineView.chartSpace);
+			AscFormat.CheckSpPrXfrm(oSparklineView.chartSpace);
 		}, this, []);
-		this.sparklineView.chartSpace.recalculate();
-		this.sparklineView.chartSpace.brush = AscFormat.CreateSolidFillRGBA(0xFF, 0xFF, 0xFF, 0xFF);
-		//	}
+		oSparklineView.chartSpace.recalculate();
+		oSparklineView.chartSpace.brush = AscFormat.CreateSolidFillRGBA(0xFF, 0xFF, 0xFF, 0xFF);
 
-		var oGraphics = new AscCommon.CGraphics();
-		oGraphics.init(this.canvas.getContext('2d'), this.canvas.width, this.canvas.height,
-			this.sparklineView.chartSpace.extX, this.sparklineView.chartSpace.extY);
-		oGraphics.m_oFontManager = AscCommon.g_fontManager;
-		oGraphics.transform(1, 0, 0, 1, 0, 0);
-		this.sparklineView.chartSpace.draw(oGraphics);
-		return this.canvas.toDataURL("image/png");
+		oSparklineView.chartSpace.draw(oGraphics);
 	};
 
-	sparklineGroup.prototype.isEqualColors = function (oSparklineGroup) {
-		if (this.colorSeries && !this.colorSeries.isEqual(oSparklineGroup.colorSeries) ||
-			!this.colorSeries && oSparklineGroup.colorSeries) {
-			return false;
-		}
-		if (this.colorNegative && !this.colorNegative.isEqual(oSparklineGroup.colorNegative) ||
-			!this.colorNegative && oSparklineGroup.colorNegative) {
-			return false;
-		}
-		/*if(this.colorAxis && !this.colorAxis.isEqual(oSparklineGroup.colorAxis) || !this.colorAxis && oSparklineGroup.colorAxis){
-		 return false;
-		 }*/
-		if (this.colorMarkers && !this.colorMarkers.isEqual(oSparklineGroup.colorMarkers) ||
-			!this.colorMarkers && oSparklineGroup.colorMarkers) {
-			return false;
-		}
-		if (this.colorFirst && !this.colorFirst.isEqual(oSparklineGroup.colorFirst) ||
-			!this.colorFirst && oSparklineGroup.colorFirst) {
-			return false;
-		}
-		if (this.colorLast && !this.colorLast.isEqual(oSparklineGroup.colorLast) ||
-			!this.colorLast && oSparklineGroup.colorLast) {
-			return false;
-		}
-		if (this.colorHigh && !this.colorHigh.isEqual(oSparklineGroup.colorHigh) ||
-			!this.colorHigh && oSparklineGroup.colorHigh) {
-			return false;
-		}
-		if (this.colorLow && !this.colorLow.isEqual(oSparklineGroup.colorLow) ||
-			!this.colorLow && oSparklineGroup.colorLow) {
-			return false;
-		}
-		return true;
+	sparklineGroup.prototype._isEqualStyle = function (oSparklineGroup) {
+		var equalColors = function (color1, color2) {
+			return color1 ? color1.isEqual(color2) : color1 === color2;
+		};
+		return equalColors(this.colorSeries, oSparklineGroup.colorSeries) &&
+			equalColors(this.colorNegative, oSparklineGroup.colorNegative) &&
+			equalColors(this.colorMarkers, oSparklineGroup.colorMarkers) &&
+			equalColors(this.colorFirst, oSparklineGroup.colorFirst) &&
+			equalColors(this.colorLast, oSparklineGroup.colorLast) &&
+			equalColors(this.colorHigh, oSparklineGroup.colorHigh) && equalColors(this.colorLow, oSparklineGroup.colorLow);
 	};
 
 	sparklineGroup.prototype.asc_getStyles = function () {
 		var aRet = [];
 		var nStyleIndex = -1;
 		var oSparklineGroup = this.clone(true);
+
+		var canvas = document.createElement('canvas');
+		canvas.width = 50;
+		canvas.height = 50;
+		if (AscCommon.AscBrowser.isRetina) {
+			canvas.width >>= 1;
+			canvas.height >>= 1;
+		}
+		var oSparklineView = new AscFormat.CSparklineView();
+		var oSparkline = new sparkline();
+		oSparkline.oCache = this._generateThumbCache();
+		var oGraphics = new AscCommon.CGraphics();
+		oGraphics.init(canvas.getContext('2d'), canvas.width, canvas.height, 100, 100);
+		oGraphics.m_oFontManager = AscCommon.g_fontManager;
+		oGraphics.transform(1, 0, 0, 1, 0, 0);
+
 		for (var i = 0; i < 36; ++i) {
 			oSparklineGroup.asc_setStyle(i);
-			if (nStyleIndex === -1 && this.isEqualColors(oSparklineGroup)) {
+			if (nStyleIndex === -1 && this._isEqualStyle(oSparklineGroup)) {
 				nStyleIndex = i;
 			}
-			aRet.push(this.getThumbBySparklineGroup(oSparklineGroup));
+
+			this._drawThumbBySparklineGroup(oSparkline, oSparklineGroup, oSparklineView, oGraphics);
+			aRet.push(canvas.toDataURL("image/png"));
 		}
 		aRet.push(nStyleIndex);
 		return aRet;
