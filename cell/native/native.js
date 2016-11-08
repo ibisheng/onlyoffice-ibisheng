@@ -3929,6 +3929,13 @@ function OfflineEditor () {
             asc_WriteUsers(users, stream);
             window["native"]["OnCallMenuEvent"](2416, stream); // ASC_MENU_EVENT_TYPE_AUTH_PARTICIPANTS_CHANGED
         });
+     
+        _api.asc_registerCallback('asc_onParticipantsChanged', function(users) {
+                                  var stream = global_memory_stream_menu;
+                                  stream["ClearNoAttack"]();
+                                  asc_WriteUsers(users, stream);
+                                  window["native"]["OnCallMenuEvent"](2416, stream); // ASC_MENU_EVENT_TYPE_AUTH_PARTICIPANTS_CHANGED
+                                  });
         
         _api.asc_registerCallback('asc_onSheetsChanged', function () {
                                   t.asc_WriteAllWorksheets(true, true);
@@ -5695,21 +5702,97 @@ function offline_cell_editor_open(x, y, width, height, ratio, isSelectAll, isFor
     
     wb.cellEditor.isSelectAll = isSelectAll;
     
+    //var canEditCell = false;
+    
+    //if (ws._isLockedCells(ws.getActiveCell(0, 0, false), null)) {
+    
+    //     canEditCell = true;
+    
+    if (!isFormulaInsertMode) {
+        wb._onEditCell(undefined, undefined, true, false);
+    }
+    //}
+    
+    ws.visibleRange = range;
+    
+    return true;// canEditCell;
+}
+function offline_cell_editor_test_cells(x, y, width, height, ratio, isSelectAll, isFormulaInsertMode, c1, r1, c2, r2)  {
+    _null_object.width = width * ratio;
+    _null_object.height = height * ratio;
+    
+    var wb = _api.wb;
+    var ws = _api.wb.getWorksheet();
+    
+    var range = ws.visibleRange.clone();
+    ws.visibleRange.c1 = c1;
+    ws.visibleRange.r1 = r1;
+    ws.visibleRange.c2 = c2;
+    ws.visibleRange.r2 = r2;
+    
+    wb.cellEditor.isSelectAll = isSelectAll;
+    
     var canEditCell = false;
     
-    if (ws._isLockedCells(ws.getActiveCell(0, 0, false), false)) {
+    var editFunction = function() {
         
-        canEditCell = true;
+        //console.log("editFunction");
         
-        if (!isFormulaInsertMode) {
-            wb._onEditCell(undefined, undefined, true, false);
+        window["native"]["openCellEditor"]();
+        
+        // t.setCellEditMode(true);
+        // ws.setCellEditMode(true);
+        // ws.openCellEditor(t.cellEditor, /*fragments*/undefined, /*cursorPos*/undefined, isFocus, isClearCell,
+        //                   /*isHideCursor*/isHideCursor, /*isQuickInput*/isQuickInput, selectionRange);
+        // t.input.disabled = false;
+        // t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
+        
+        // Эвент на обновление состояния редактора
+        // t.cellEditor._updateEditorState();
+        // asc_applyFunction(callback, true);
+    };
+    
+    var editLockCallback = function(res) {
+        
+        //console.log("editLockCallback: " + res);
+        
+        if (!res) {
+            
+            window["native"]["closeCellEditor"]();
+            
+            //t.setCellEditMode(false);
+            //t.controller.setStrictClose(false);
+            //t.controller.setFormulaEditMode(false);
+            //ws.setCellEditMode(false);
+            //ws.setFormulaEditMode(false);
+            //t.input.disabled = true;
+            
+            // Выключаем lock для редактирования ячейки
+            wb.collaborativeEditing.onStopEditCell();
+            //t.cellEditor.close(false);
+            wb._onWSSelectionChanged();
         }
+    };
+    
+    // Стартуем редактировать ячейку
+    wb.collaborativeEditing.onStartEditCell();
+    if (ws._isLockedCells(ws.getActiveCell(0, 0, false), /*subType*/null, editLockCallback)) {
+        editFunction();
     }
-
-    ws.visibleRange = range;
+    
+    //if (ws._isLockedCells(ws.getActiveCell(0, 0, false), null)) {
+    //    canEditCell = true;
+    //
+    //    if (!isFormulaInsertMode) {
+    //        wb._onEditCell(undefined, undefined, true, false);
+    //    }
+    // }
+    
+    wb.visibleRange = range;
     
     return canEditCell;
 }
+
 function offline_cell_editor_process_input_commands(commands, width, height, ratio) {
     _null_object.width = width * ratio;
     _null_object.height = height * ratio;
@@ -5889,20 +5972,24 @@ function offline_cell_editor_mouse_event(events) {
 }
 function offline_cell_editor_close(x, y, width, height, ratio) {
     var e = {which: 13, shiftKey: false, metaKey: false, ctrlKey: false};
-    var cellEditor =  _api.wb.cellEditor;
-
+  
+    var wb = _api.wb;
+    var ws = _api.wb.getWorksheet();
+    var cellEditor = wb.cellEditor;
+   
     // TODO: SHOW POPUP
 
     var length = cellEditor.undoList.length;
 
     if (cellEditor.close(true)) {
-        _api.wb.getWorksheet().handlers.trigger('applyCloseEvent', e);
+        wb.getWorksheet().handlers.trigger('applyCloseEvent', e);
     } else {
         cellEditor.close();
         length = 0;
     }
 
-    _api.wb._onWSSelectionChanged();
+    wb.collaborativeEditing.onStopEditCell();
+    wb._onWSSelectionChanged()
 
     return {'undo': length};
 }
@@ -7400,9 +7487,23 @@ window["AscCommonExcel"].WorksheetView.prototype._drawCollaborativeElementsMeOth
         arrayCells = this.collaborativeEditing.getLockCellsOther(currentSheetId);
     }
     
+    var sheetId = this.model.getId();
+    
     for (i = 0; i < arrayCells.length; ++i) {
         
         var left = this.cols[arrayCells[i].c1].left, top = this.rows[arrayCells[i].r1].top;
+       
+        var userId = "";
+        if (AscCommon.c_oAscLockTypes.kLockTypeMine !== type) {
+            var lockInfo = this.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Range,
+                                                                 null,
+                                                                 sheetId,
+                                                                 new AscCommonExcel.asc_CCollaborativeRange(arrayCells[i].c1, arrayCells[i].c2, arrayCells[i].c2, arrayCells[i].r2));
+            var isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, AscCommon.c_oAscLockTypes, AscCommon.c_oAscLockTypes.kLockTypeOther, false);
+            if (false !== isLocked) {
+                userId = isLocked.UserId;
+            }
+        }
         
         overlay.Native["PD_DrawLockCell"](arrayCells[i].c1,
                                           arrayCells[i].r1,
@@ -7415,7 +7516,8 @@ window["AscCommonExcel"].WorksheetView.prototype._drawCollaborativeElementsMeOth
                                           strokeColor.r,
                                           strokeColor.g,
                                           strokeColor.b,
-                                          strokeColor.a);
+                                          strokeColor.a,
+                                          userId);
     }
 };
 
@@ -7429,6 +7531,16 @@ window["AscCommonExcel"].WorksheetView.prototype._drawCollaborativeElementsAllLo
         
         var left = this.cols[oAllRange.c1].left, top = this.rows[oAllRange.r1].top;
         
+        var userId = "";
+        var lockInfo = this.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Range,
+                                                             null,
+                                                             sheetId,
+                                                             new AscCommonExcel.asc_CCollaborativeRange(oAllRange.c1, oAllRange.c2, oAllRange.c2, oAllRange.r2));
+        var isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, AscCommon.c_oAscLockTypes, AscCommon.c_oAscLockTypes.kLockTypeOther, false);
+        if (false !== isLocked) {
+            userId = isLocked.UserId;
+        }
+        
         overlay.Native["PD_DrawLockCell"](oAllRange.c1,
                                           oAllRange.r1,
                                           Math.min(oAllRange.c2, this.cols.length - 1),
@@ -7440,7 +7552,8 @@ window["AscCommonExcel"].WorksheetView.prototype._drawCollaborativeElementsAllLo
                                           strokeColor.r,
                                           strokeColor.g,
                                           strokeColor.b,
-                                          strokeColor.a);
+                                          strokeColor.a,
+                                          userId);
     }
 };
 
