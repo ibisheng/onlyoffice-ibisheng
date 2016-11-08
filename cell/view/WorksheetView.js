@@ -1297,9 +1297,9 @@
      * @param {Number} mcw  Количество символов
      * @returns {Number}    Ширина столбца в пунктах (pt)
      */
-    WorksheetView.prototype._modelColWidthToColWidth = function ( mcw ) {
-        var px = asc_floor( ((256 * mcw + asc_floor( 128 / this.maxDigitWidth )) / 256) * this.maxDigitWidth );
-        return px * asc_getcvt( 0/*px*/, 1/*pt*/, 96 );
+    WorksheetView.prototype._modelColWidthToColWidth = function (mcw) {
+        var px = asc_floor(((256 * mcw + asc_floor(128 / this.maxDigitWidth)) / 256) * this.maxDigitWidth);
+        return px * asc_getcvt(0/*px*/, 1/*pt*/, 96);
     };
 
     /**
@@ -1319,14 +1319,15 @@
      * @param {Number} w  Ширина столбца в символах
      * @returns {Number}  Ширина столбца в пунктах (pt)
      */
-    WorksheetView.prototype._calcColWidth = function ( w ) {
+    WorksheetView.prototype._calcColWidth = function (w) {
         var t = this;
         var res = {};
         var useDefault = w === undefined || w === null || w === -1;
         var width;
-        res.width = useDefault ? t.defaultColWidth : (width = t._modelColWidthToColWidth( w ), (width < t.width_1px ? 0 : width));
-        res.innerWidth = Math.max( res.width - this.width_padding * 2 - this.width_1px, 0 );
-        res.charCount = t._colWidthToCharCount( res.width );
+        res.width =
+          useDefault ? t.defaultColWidth : (width = t._modelColWidthToColWidth(w), (width < t.width_1px ? 0 : width));
+        res.innerWidth = Math.max(res.width - this.width_padding * 2 - this.width_1px, 0);
+        res.charCount = t._colWidthToCharCount(res.width);
         return res;
     };
 
@@ -1654,19 +1655,41 @@
         if (null === selectionRange) {
             range = new asc_Range(0, 0, maxCols, maxRows);
             this._prepareCellTextMetricsCache(range);
-            for (var c = 0; c < maxCols; ++c) {
-                for (var r = 0; r < maxRows; ++r) {
-                    if (!this._isCellEmptyOrMergedOrBackgroundColorOrBorders(c, r)) {
-                        var rightSide = 0;
+
+            var rowModel, rowCells, rowCache, rightSide, c;
+            for (var r = 0; r <= maxRows; ++r) {
+                if (this.height_1px > this.rows[r].height) {
+                    continue;
+                }
+                // Теперь получаем только не пустые ячейки для строки
+                rowModel = this.model._getRowNoEmpty(r);
+                if (null === rowModel) {
+                    continue;
+                }
+                rowCache = this._getRowCache(r);
+                rowCells = rowModel.getCells();
+                for (c in rowCells) {
+                    c = c - 0;
+                    if (this.width_1px > this.cols[c].width) {
+                        continue;
+                    }
+
+                    var style = rowCells[c].getStyle();
+                    if (style && (null !== style.fill || (null !== style.border && style.border.notEmpty()))) {
+                        lastC = Math.max(lastC, c);
+                        lastR = Math.max(lastR, r);
+                    }
+                    if (rowCache && rowCache.columnsWithText[c]) {
+                        rightSide = 0;
                         var ct = this._getCellTextCache(c, r);
                         if (ct !== undefined) {
                             if (!ct.flags.isMerged() && !ct.flags.wrapText) {
                                 rightSide = ct.sideR;
                             }
-                        }
 
-                        lastC = Math.max(lastC, c + rightSide);
-                        lastR = Math.max(lastR, r);
+                            lastC = Math.max(lastC, c + rightSide);
+                            lastR = Math.max(lastR, r);
+                        }
                     }
                 }
             }

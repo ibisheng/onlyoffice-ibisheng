@@ -932,33 +932,32 @@ var g_oBorderProperties = {
 		dd: 7,
 		du: 8
 	};
-/** @constructor */
-function Border(val)
-{
-	if(null == val)
-		val = g_oDefaultFormat.BorderAbs;
-	this.Properties = g_oBorderProperties;
-	this.l = val.l.clone();
-	this.t = val.t.clone();
-	this.r = val.r.clone();
-	this.b = val.b.clone();
-	this.d = val.d.clone();
-	this.ih = val.ih.clone();
-	this.iv = val.iv.clone();
-	this.dd = val.dd;
-	this.du = val.du;
-}
-Border.prototype =
-{
-	_mergeProperty : function(first, second, def)
-	{
-		if((null != def.isEqual && false == def.isEqual(first)) || (null == def.isEqual && def != first))
+
+	/** @constructor */
+	function Border(val) {
+		if (null == val) {
+			val = g_oDefaultFormat.BorderAbs;
+		}
+		this.Properties = g_oBorderProperties;
+		this.l = val.l.clone();
+		this.t = val.t.clone();
+		this.r = val.r.clone();
+		this.b = val.b.clone();
+		this.d = val.d.clone();
+		this.ih = val.ih.clone();
+		this.iv = val.iv.clone();
+		this.dd = val.dd;
+		this.du = val.du;
+	}
+
+	Border.prototype._mergeProperty = function (first, second, def) {
+		if ((null != def.isEqual && false == def.isEqual(first)) || (null == def.isEqual && def != first)) {
 			return first;
-		else
+		} else {
 			return second;
-	},
-	merge : function(border)
-	{
+		}
+	};
+	Border.prototype.merge = function (border) {
 		var defaultBorder = g_oDefaultFormat.Border;
 		var oRes = new Border();
 		oRes.l = this._mergeProperty(this.l, border.l, defaultBorder.l).clone();
@@ -971,60 +970,67 @@ Border.prototype =
 		oRes.dd = this._mergeProperty(this.dd, border.dd, defaultBorder.dd);
 		oRes.du = this._mergeProperty(this.du, border.du, defaultBorder.du);
 		return oRes;
-	},
-	getDif : function(val)
-	{
+	};
+	Border.prototype.getDif = function (val) {
 		var oRes = new Border(this);
 		var bEmpty = true;
-		if(true == this.l.isEqual(val.l))
-			oRes.l =  null;
-		else
+		if (true == this.l.isEqual(val.l)) {
+			oRes.l = null;
+		} else {
 			bEmpty = false;
-		if(true == this.t.isEqual(val.t))
-			oRes.t =  null;
-		else
+		}
+		if (true == this.t.isEqual(val.t)) {
+			oRes.t = null;
+		} else {
 			bEmpty = false;
-		if(true == this.r.isEqual(val.r))
-			oRes.r =  null;
-		else
+		}
+		if (true == this.r.isEqual(val.r)) {
+			oRes.r = null;
+		} else {
 			bEmpty = false;
-		if(true == this.b.isEqual(val.b))
-			oRes.b =  null;
-		else
+		}
+		if (true == this.b.isEqual(val.b)) {
+			oRes.b = null;
+		} else {
 			bEmpty = false;
-		if(true == this.d.isEqual(val.d))
-			oRes.d =  null;
-		if(true == this.ih.isEqual(val.ih))
-			oRes.ih =  null;
-		else
+		}
+		if (true == this.d.isEqual(val.d)) {
+			oRes.d = null;
+		}
+		if (true == this.ih.isEqual(val.ih)) {
+			oRes.ih = null;
+		} else {
 			bEmpty = false;
-		if(true == this.iv.isEqual(val.iv))
-			oRes.iv =  null;
-		else
+		}
+		if (true == this.iv.isEqual(val.iv)) {
+			oRes.iv = null;
+		} else {
 			bEmpty = false;
-		if(this.dd == val.dd)
-			oRes.dd =  null;
-		else
+		}
+		if (this.dd == val.dd) {
+			oRes.dd = null;
+		} else {
 			bEmpty = false;
-		if(this.du == val.du)
-			oRes.du =  null;
-		else
+		}
+		if (this.du == val.du) {
+			oRes.du = null;
+		} else {
 			bEmpty = false;
-		if(bEmpty)
+		}
+		if (bEmpty) {
 			oRes = null;
+		}
 		return oRes;
-	},
-	isEqual : function(val)
-	{
-		return this.l.isEqual(val.l) && this.t.isEqual(val.t) && this.r.isEqual(val.r) && this.b.isEqual(val.b) && this.d.isEqual(val.d) &&
-				this.ih.isEqual(val.ih) && this.iv.isEqual(val.iv) && this.dd == val.dd && this.du == val.du;
-	},
-    clone : function()
-    {
-        return new Border(this);
-    },
-	clean : function()
-	{
+	};
+	Border.prototype.isEqual = function (val) {
+		return this.l.isEqual(val.l) && this.t.isEqual(val.t) && this.r.isEqual(val.r) && this.b.isEqual(val.b) &&
+			this.d.isEqual(val.d) && this.ih.isEqual(val.ih) && this.iv.isEqual(val.iv) && this.dd == val.dd &&
+			this.du == val.du;
+	};
+	Border.prototype.clone = function () {
+		return new Border(this);
+	};
+	Border.prototype.clean = function () {
 		var defaultBorder = g_oDefaultFormat.Border;
 		this.l = defaultBorder.l.clone();
 		this.t = defaultBorder.t.clone();
@@ -1035,68 +1041,111 @@ Border.prototype =
 		this.iv = defaultBorder.iv.clone();
 		this.dd = defaultBorder.dd;
 		this.du = defaultBorder.du;
-	},
-    mergeInner : function(border){
-        if(border){
-            if(border.l)
+	};
+	Border.prototype.mergeInner = function (border) {
+		if (border) {
+			if (border.l) {
 				this.l.merge(border.l);
-            if(border.t)
-                this.t.merge(border.t);
-            if(border.r)
-                this.r.merge(border.r);
-            if(border.b)
-                this.b.merge(border.b);
-            if(border.d)
-                this.d.merge(border.d);
-            if(border.ih)
+			}
+			if (border.t) {
+				this.t.merge(border.t);
+			}
+			if (border.r) {
+				this.r.merge(border.r);
+			}
+			if (border.b) {
+				this.b.merge(border.b);
+			}
+			if (border.d) {
+				this.d.merge(border.d);
+			}
+			if (border.ih) {
 				this.ih.merge(border.ih);
-            if(border.iv)
-                this.iv.merge(border.iv);
-            if(null != border.dd)
-                this.dd = this.dd || border.dd;
-            if(null != border.du)
-                this.du = this.du || border.du;
-        }
-    },
-	getType : function()
-	{
+			}
+			if (border.iv) {
+				this.iv.merge(border.iv);
+			}
+			if (null != border.dd) {
+				this.dd = this.dd || border.dd;
+			}
+			if (null != border.du) {
+				this.du = this.du || border.du;
+			}
+		}
+	};
+	Border.prototype.getType = function () {
 		return UndoRedoDataTypes.StyleBorder;
-	},
-	getProperties : function()
-	{
+	};
+	Border.prototype.getProperties = function () {
 		return this.Properties;
-	},
-	getProperty : function(nType)
-	{
-		switch(nType)
-		{
-			case this.Properties.l: return this.l;break;
-			case this.Properties.t: return this.t;break;
-			case this.Properties.r: return this.r;break;
-			case this.Properties.b: return this.b;break;
-			case this.Properties.d: return this.d;break;
-			case this.Properties.ih: return this.ih;break;
-			case this.Properties.iv: return this.iv;break;
-			case this.Properties.dd: return this.dd;break;
-			case this.Properties.du: return this.du;break;
+	};
+	Border.prototype.getProperty = function (nType) {
+		switch (nType) {
+			case this.Properties.l:
+				return this.l;
+				break;
+			case this.Properties.t:
+				return this.t;
+				break;
+			case this.Properties.r:
+				return this.r;
+				break;
+			case this.Properties.b:
+				return this.b;
+				break;
+			case this.Properties.d:
+				return this.d;
+				break;
+			case this.Properties.ih:
+				return this.ih;
+				break;
+			case this.Properties.iv:
+				return this.iv;
+				break;
+			case this.Properties.dd:
+				return this.dd;
+				break;
+			case this.Properties.du:
+				return this.du;
+				break;
 		}
-	},
-	setProperty : function(nType, value)
-	{
-		switch(nType)
-		{
-			case this.Properties.l: this.l = value;break;
-			case this.Properties.t: this.t = value;break;
-			case this.Properties.r: this.r = value;break;
-			case this.Properties.b: this.b = value;break;
-			case this.Properties.d: this.d = value;break;
-			case this.Properties.ih: this.ih = value;break;
-			case this.Properties.iv: this.iv = value;break;
-			case this.Properties.dd: this.dd = value;break;
-			case this.Properties.du: this.du = value;break;
+	};
+	Border.prototype.setProperty = function (nType, value) {
+		switch (nType) {
+			case this.Properties.l:
+				this.l = value;
+				break;
+			case this.Properties.t:
+				this.t = value;
+				break;
+			case this.Properties.r:
+				this.r = value;
+				break;
+			case this.Properties.b:
+				this.b = value;
+				break;
+			case this.Properties.d:
+				this.d = value;
+				break;
+			case this.Properties.ih:
+				this.ih = value;
+				break;
+			case this.Properties.iv:
+				this.iv = value;
+				break;
+			case this.Properties.dd:
+				this.dd = value;
+				break;
+			case this.Properties.du:
+				this.du = value;
+				break;
 		}
-	}
-};
+	};
+	Border.prototype.notEmpty = function () {
+		return (this.l && c_oAscBorderStyles.None !== this.l.s) || (this.r && c_oAscBorderStyles.None !== this.r.s) ||
+			(this.t && c_oAscBorderStyles.None !== this.t.s) || (this.b && c_oAscBorderStyles.None !== this.b.s) ||
+			(this.dd && c_oAscBorderStyles.None !== this.dd.s) || (this.du && c_oAscBorderStyles.None !== this.du.s);
+	};
 var g_oNumProperties = {
 		f: 0
 	};
