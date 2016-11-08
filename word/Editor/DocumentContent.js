@@ -8330,7 +8330,7 @@ CDocumentContent.prototype.Internal_Content_Add       = function(Position, NewOb
         NextObj = null;
 
     this.private_RecalculateNumbering([NewObject]);
-    History.Add(this, {Type : AscDFH.historyitem_DocumentContent_AddItem, Pos : Position, Item : NewObject});
+    History.Add(new CChangesDocumentContentAddItem(this, Position, NewObject));
     this.Content.splice(Position, 0, NewObject);
     NewObject.Set_Parent(this);
     NewObject.Set_DocumentNext(NextObj);
@@ -8368,11 +8368,7 @@ CDocumentContent.prototype.Internal_Content_Remove    = function(Position, Count
     for (var Index = 0; Index < Count; Index++)
         this.Content[Position + Index].PreDelete();
 
-    History.Add(this, {
-        Type  : AscDFH.historyitem_DocumentContent_RemoveItem,
-        Pos   : Position,
-        Items : this.Content.slice(Position, Position + Count)
-    });
+    History.Add(new CChangesDocumentContentRemoveItem(this, Position, this.Content.slice(Position, Position + Count)));
     var Elements = this.Content.splice(Position, Count);
     this.private_RecalculateNumbering(Elements);
 
@@ -8406,11 +8402,7 @@ CDocumentContent.prototype.Internal_Content_RemoveAll = function()
     for (var Index = 0; Index < Count; Index++)
         this.Content[Index].PreDelete();
 
-    History.Add(this, {
-        Type  : AscDFH.historyitem_DocumentContent_RemoveItem,
-        Pos   : 0,
-        Items : this.Content.slice(0, this.Content.length)
-    });
+    History.Add(new CChangesDocumentRemoveItem(this, 0, this.Content.slice(0, this.Content.length)));
     this.Content = [];
 };
 //-----------------------------------------------------------------------------------
@@ -8473,58 +8465,6 @@ CDocumentContent.prototype.private_GetColumnIndex = function(CurPage)
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-CDocumentContent.prototype.Undo                            = function(Data)
-{
-    var Type = Data.Type;
-
-    switch (Type)
-    {
-        case AscDFH.historyitem_DocumentContent_AddItem:
-        {
-            var Elements = this.Content.splice(Data.Pos, 1);
-            this.private_RecalculateNumbering(Elements);
-
-            break;
-        }
-
-        case AscDFH.historyitem_DocumentContent_RemoveItem:
-        {
-            var Pos = Data.Pos;
-
-            var Array_start = this.Content.slice(0, Pos);
-            var Array_end   = this.Content.slice(Pos);
-
-            this.Content = Array_start.concat(Data.Items, Array_end);
-            this.private_RecalculateNumbering(Data.Items);
-
-            break;
-        }
-    }
-};
-CDocumentContent.prototype.Redo                            = function(Data)
-{
-    var Type = Data.Type;
-
-    switch (Type)
-    {
-        case AscDFH.historyitem_DocumentContent_AddItem:
-        {
-            var Pos = Data.Pos;
-            this.Content.splice(Pos, 0, Data.Item);
-            this.private_RecalculateNumbering([Data.Item]);
-
-            break;
-        }
-
-        case AscDFH.historyitem_DocumentContent_RemoveItem:
-        {
-            var Elements = this.Content.splice(Data.Pos, Data.Items.length);
-            this.private_RecalculateNumbering(Elements);
-
-            break;
-        }
-    }
-};
 CDocumentContent.prototype.Get_SelectionState              = function()
 {
     var DocState    = {};
@@ -8825,184 +8765,6 @@ CDocumentContent.prototype.Hyperlink_Check  = function(bCheckEnd)
 //-----------------------------------------------------------------------------------
 // Функции для работы с совместным редактирования
 //-----------------------------------------------------------------------------------
-CDocumentContent.prototype.Save_Changes        = function(Data, Writer)
-{
-    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-    // Long : тип класса
-    // Long : тип изменений
-
-    Writer.WriteLong(AscDFH.historyitem_type_DocumentContent);
-
-    var Type = Data.Type;
-
-    // Пишем тип
-    Writer.WriteLong(Type);
-
-    switch (Type)
-    {
-        case  AscDFH.historyitem_DocumentContent_AddItem:
-        {
-            // Long     : Количество элементов
-            // Array of :
-            //  {
-            //    Long   : Позиция
-            //    String : Id элемента
-            //  }
-
-            var bArray = Data.UseArray;
-            var Count  = 1;
-
-            Writer.WriteLong(Count);
-
-            for (var Index = 0; Index < Count; Index++)
-            {
-                if (true === bArray)
-                    Writer.WriteLong(Data.PosArray[Index]);
-                else
-                    Writer.WriteLong(Data.Pos + Index);
-
-                Writer.WriteString2(Data.Item.Get_Id());
-            }
-
-            break;
-        }
-
-        case AscDFH.historyitem_DocumentContent_RemoveItem:
-        {
-            // Long          : Количество удаляемых элементов
-            // Array of Long : позиции удаляемых элементов
-
-            var bArray = Data.UseArray;
-            var Count  = Data.Items.length;
-
-            var StartPos = Writer.GetCurPosition();
-            Writer.Skip(4);
-            var RealCount = Count;
-
-            for (var Index = 0; Index < Count; Index++)
-            {
-                if (true === bArray)
-                {
-                    if (false === Data.PosArray[Index])
-                        RealCount--;
-                    else
-                        Writer.WriteLong(Data.PosArray[Index]);
-                }
-                else
-                    Writer.WriteLong(Data.Pos);
-            }
-
-            var EndPos = Writer.GetCurPosition();
-            Writer.Seek(StartPos);
-            Writer.WriteLong(RealCount);
-            Writer.Seek(EndPos);
-
-            break;
-        }
-    }
-
-    return Writer;
-};
-CDocumentContent.prototype.Load_Changes        = function(Reader, Reader2)
-{
-    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-    // Long : тип класса
-    // Long : тип изменений
-
-    var ClassType = Reader.GetLong();
-    if (AscDFH.historyitem_type_DocumentContent != ClassType)
-        return;
-
-    var Type = Reader.GetLong();
-
-    switch (Type)
-    {
-        case AscDFH.historyitem_DocumentContent_AddItem:
-        {
-            // Long     : Количество элементов
-            // Array of :
-            //  {
-            //    Long   : Позиция
-            //    String : Id элемента
-            //  }
-
-            var Count = Reader.GetLong();
-
-            for (var Index = 0; Index < Count; Index++)
-            {
-                var Pos     = this.m_oContentChanges.Check(AscCommon.contentchanges_Add, Reader.GetLong());
-                var Element = g_oTableId.Get_ById(Reader.GetString2());
-
-                if (null != Element)
-                {
-                    if (Pos > 0)
-                    {
-                        this.Content[Pos - 1].Next = Element;
-                        Element.Prev               = this.Content[Pos - 1];
-                    }
-
-                    if (Pos <= this.Content.length - 1)
-                    {
-                        this.Content[Pos].Prev = Element;
-                        Element.Next           = this.Content[Pos];
-                    }
-
-                    Element.Parent = this;
-
-                    this.Content.splice(Pos, 0, Element);
-                    this.private_RecalculateNumbering([Element]);
-                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
-                    this.private_ReindexContent(Pos);
-                }
-            }
-
-            break;
-        }
-
-        case AscDFH.historyitem_DocumentContent_RemoveItem:
-        {
-            // Long          : Количество удаляемых элементов
-            // Array of Long : позиции удаляемых элементов
-
-            var Count = Reader.GetLong();
-
-            for (var Index = 0; Index < Count; Index++)
-            {
-                var Pos = this.m_oContentChanges.Check(AscCommon.contentchanges_Remove, Reader.GetLong());
-
-                // действие совпало, не делаем его
-                if (false === Pos)
-                    continue;
-
-                var Elements = this.Content.splice(Pos, 1);
-                this.private_RecalculateNumbering(Elements);
-                AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, Pos, 1);
-                this.private_ReindexContent(Pos);
-
-                if (Pos > 0)
-                {
-                    if (Pos <= this.Content.length - 1)
-                    {
-                        this.Content[Pos - 1].Next = this.Content[Pos];
-                        this.Content[Pos].Prev     = this.Content[Pos - 1];
-                    }
-                    else
-                    {
-                        this.Content[Pos - 1].Next = null;
-                    }
-                }
-                else if (Pos <= this.Content.length - 1)
-                {
-                    this.Content[Pos].Prev = null;
-                }
-            }
-
-            break;
-        }
-    }
-
-    return true;
-};
 CDocumentContent.prototype.Write_ToBinary2     = function(Writer)
 {
     Writer.WriteLong(AscDFH.historyitem_type_DocumentContent);

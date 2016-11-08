@@ -277,12 +277,12 @@ function CComment(Parent, Data)
         this.m_oStartInfo.H       = H;
         this.m_oStartInfo.PageNum = PageNum;        
     };
-    
-    this.Set_Data = function(Data)
-    {
-        History.Add( this, { Type : AscDFH.historyitem_Comment_Change, New : Data, Old : this.Data } );
-        this.Data = Data;
-    };
+
+	this.Set_Data = function(Data)
+	{
+		History.Add(new CChangesCommentChange(this, this.Data, Data));
+		this.Data = Data;
+	};
 
     this.Remove_Marks = function()
     {
@@ -331,48 +331,6 @@ function CComment(Parent, Data)
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    this.Undo = function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Comment_Change:
-            {
-                this.Data = Data.Old;
-                editor.sync_ChangeCommentData( this.Id, this.Data );
-                break;
-            }
-
-            case AscDFH.historyitem_Comment_TypeInfo:
-            {
-                this.m_oTypeInfo = Data.Old;
-                break;
-            }
-        }
-    };
-
-    this.Redo = function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Comment_Change:
-            {
-                this.Data = Data.New;
-                editor.sync_ChangeCommentData( this.Id, this.Data );
-                break;
-            }
-
-            case AscDFH.historyitem_Comment_TypeInfo:
-            {
-                this.m_oTypeInfo = Data.New;
-                break;
-            }
-        }
-    };
-
     this.Refresh_RecalcData = function(Data)
     {
         // Ничего не делаем (если что просто будет перерисовка)
@@ -380,94 +338,6 @@ function CComment(Parent, Data)
 //-----------------------------------------------------------------------------------
 // Функции для работы с совместным редактированием
 //-----------------------------------------------------------------------------------
-    this.Save_Changes = function(Data, Writer)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        Writer.WriteLong( AscDFH.historyitem_type_Comment );
-
-        var Type = Data.Type;
-
-        // Пишем тип
-        Writer.WriteLong( Type );
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Comment_Change:
-            {
-                // Variable : Data
-                Data.New.Write_ToBinary2( Writer );
-                break;
-            }
-
-            case AscDFH.historyitem_Comment_TypeInfo:
-            {
-                // Long : тип
-                //  Если comment_type_HdrFtr
-                //  String : Id колонтитула
-
-                var Type = Data.New.Type;
-
-                Writer.WriteLong( Type );
-
-                if ( comment_type_HdrFtr === Type )
-                {
-                    var HdrFtr = Data.New.Data;
-                    Writer.WriteString2( HdrFtr.Get_Id() );
-                }
-
-                break;
-            }
-        }
-
-        return Writer;
-    };
-
-    this.Load_Changes = function(Reader, Reader2)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        var ClassType = Reader.GetLong();
-        if ( AscDFH.historyitem_type_Comment != ClassType )
-            return;
-
-        var Type = Reader.GetLong();
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Comment_Change:
-            {
-                // Variable : Data
-                this.Data.Read_FromBinary2( Reader );
-                editor.sync_ChangeCommentData( this.Id, this.Data );
-                break;
-            }
-
-            case AscDFH.historyitem_Comment_TypeInfo:
-            {
-                // Long : тип
-                //  Если comment_type_HdrFtr
-                //  String : Id колонтитула
-
-                this.m_oTypeInfo.Type = Reader.GetLong()
-
-                if ( comment_type_HdrFtr === this.m_oTypeInfo.Type )
-                {
-                    var HdrFtrId = Reader.GetString2();
-                    this.m_oTypeInfo.Data = g_oTableId.Get_ById( HdrFtrId );
-                }
-
-                break;
-            }
-        }
-
-        return true;
-    };
-
     this.Get_Id = function()
     {
         return this.Id;
@@ -583,13 +453,13 @@ function CComments()
         return this.m_bUse;
     };
 
-    this.Add = function(Comment)
-    {
-        var Id = Comment.Get_Id();
+	this.Add = function(Comment)
+	{
+		var Id = Comment.Get_Id();
 
-        History.Add( this, { Type : AscDFH.historyitem_Comments_Add, Id : Id, Comment : Comment } );
-        this.m_aComments[Id] = Comment;
-    };
+		History.Add(new CChangesCommentsAdd(this, Id, Comment));
+		this.m_aComments[Id] = Comment;
+	};
 
     this.Get_ById = function(Id)
     {
@@ -603,7 +473,7 @@ function CComments()
     {
         if ( "undefined" != typeof(this.m_aComments[Id]) )
         {
-            History.Add( this, { Type : AscDFH.historyitem_Comments_Remove, Id : Id, Comment : this.m_aComments[Id] } );
+            History.Add(new CChangesCommentsRemove(this, Id, this.m_aComments[Id]));
 
             // Сначала удаляем комментарий из списка комментариев, чтобы данная функция не зацикливалась на вызове Remove_Marks
             var Comment = this.m_aComments[Id];
@@ -695,135 +565,10 @@ function CComments()
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    this.Undo = function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Comments_Add:
-            {
-                delete this.m_aComments[Data.Id];
-                editor.sync_RemoveComment( Data.Id );
-                break;
-            }
-
-            case AscDFH.historyitem_Comments_Remove:
-            {
-                this.m_aComments[Data.Id] = Data.Comment;
-                editor.sync_AddComment( Data.Id, Data.Comment.Data );
-                break;
-            }
-        }
-    };
-
-    this.Redo = function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Comments_Add:
-            {
-                this.m_aComments[Data.Id] = Data.Comment;
-                editor.sync_AddComment( Data.Id, Data.Comment.Data );
-                break;
-            }
-
-            case AscDFH.historyitem_Comments_Remove:
-            {
-                delete this.m_aComments[Data.Id];
-                editor.sync_RemoveComment( Data.Id );
-                break;
-            }
-        }
-    };
-
     this.Refresh_RecalcData = function(Data)
     {
         // Ничего не делаем, т.к. изменение комментариев не влияет на пересчет
     };
-//-----------------------------------------------------------------------------------
-// Функции для работы с совместным редактированием
-//-----------------------------------------------------------------------------------
-    this.Save_Changes = function(Data, Writer)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        Writer.WriteLong( AscDFH.historyitem_type_Comments );
-
-        var Type = Data.Type;
-
-        // Пишем тип
-        Writer.WriteLong( Type );
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Comments_Add:
-            {
-                // String : Id комментария
-
-                Writer.WriteString2( Data.Id );
-
-                break;
-            }
-
-            case AscDFH.historyitem_Comments_Remove:
-            {
-                // String : Id комментария
-
-                Writer.WriteString2( Data.Id );
-
-                break;
-            }
-        }
-
-        return Writer;
-    };
-
-    this.Load_Changes = function(Reader, Reader2)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        var ClassType = Reader.GetLong();
-        if ( AscDFH.historyitem_type_Comments != ClassType )
-            return;
-
-        var Type = Reader.GetLong();
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Comments_Add:
-            {
-                // String : Id комментария
-
-                var CommentId = Reader.GetString2();
-                var Comment = g_oTableId.Get_ById( CommentId );
-                this.m_aComments[CommentId] = Comment;
-                editor.sync_AddComment( CommentId, Comment.Data );
-
-                break;
-            }
-
-            case AscDFH.historyitem_Comments_Remove:
-            {
-                // String : Id комментария
-
-                var CommentId = Reader.GetString2();
-                delete this.m_aComments[CommentId];
-                editor.sync_RemoveComment( CommentId );
-
-                break;
-            }
-        }
-
-        return true;
-    };
-
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -860,15 +605,15 @@ ParaComment.prototype =
     {
         return this.Id;
     },
-    
-    Set_CommentId : function(NewCommentId)
-    {
-        if (this.CommentId !== NewCommentId)
-        {
-            History.Add(this, { Type : AscDFH.historyitem_ParaComment_CommentId, Old : this.CommentId, New : NewCommentId });
-            this.CommentId = NewCommentId;
-        }
-    },
+
+	Set_CommentId : function(NewCommentId)
+	{
+		if (this.CommentId !== NewCommentId)
+		{
+			History.Add(new CChangesParaCommentCommentId(this, this.CommentId, NewCommentId));
+			this.CommentId = NewCommentId;
+		}
+	},
 
     Set_Paragraph : function(Paragraph)
     {
@@ -1315,90 +1060,6 @@ ParaComment.prototype =
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------
-    Undo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case  AscDFH.historyitem_ParaComment_CommentId:
-            {
-                this.CommentId = Data.Old;
-                break;
-            }
-        }
-    },
-
-    Redo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case  AscDFH.historyitem_ParaComment_CommentId:
-            {
-                this.CommentId = Data.New;
-                break;
-            }
-        }
-    },
-
-    Save_Changes : function(Data, Writer)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        Writer.WriteLong( AscDFH.historyitem_type_ParaComment );
-
-        var Type = Data.Type;
-
-        // Пишем тип
-        Writer.WriteLong( Type );
-
-        switch ( Type )
-        {
-            case  AscDFH.historyitem_ParaComment_CommentId:
-            {
-                // String : CommentId
-                Writer.WriteString2(Data.New);
-                break;
-            }
-        }
-    },
-    
-    Load_Changes : function(Reader)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        var ClassType = Reader.GetLong();
-        if ( AscDFH.historyitem_type_ParaComment != ClassType )
-            return;
-
-        var Type = Reader.GetLong();
-
-        switch ( Type )
-        {
-            case  AscDFH.historyitem_ParaComment_CommentId:
-            {
-                // String : CommentId
-                this.CommentId = Reader.GetString2();
-                var Comment = g_oTableId.Get_ById(this.CommentId);
-                if (null !== this.Paragraph && null !== Comment && Comment instanceof CComment)
-                {
-                    if (true === this.Start)
-                        Comment.Set_StartId(this.Paragraph.Get_Id());
-                    else
-                        Comment.Set_EndId(this.Paragraph.Get_Id());
-                }
-
-                break;
-            }
-        }
-    },
-    
     Refresh_RecalcData : function()
     {
     },

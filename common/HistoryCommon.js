@@ -1420,10 +1420,6 @@
 	window['AscDFH'].historyitem_Comments_Add    = window['AscDFH'].historyitem_type_Comments | 1;
 	window['AscDFH'].historyitem_Comments_Remove = window['AscDFH'].historyitem_type_Comments | 2;
 	//------------------------------------------------------------------------------------------------------------------
-	// Типы изменений в классе CGraphicObjects
-	//------------------------------------------------------------------------------------------------------------------
-	window['AscDFH'].historyitem_ChangeColorScheme = window['AscDFH'].historyitem_type_GrObjects | 1;
-	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе ParaHyperlink
 	//------------------------------------------------------------------------------------------------------------------
 	window['AscDFH'].historyitem_Hyperlink_Value      = window['AscDFH'].historyitem_type_Hyperlink | 1;
@@ -1628,6 +1624,10 @@
 	window['AscDFH'].historyitem_Footnotes_SetFootnotePrNumStart    = window['AscDFH'].historyitem_type_Footnotes | 6;
 	window['AscDFH'].historyitem_Footnotes_SetFootnotePrNumRestart  = window['AscDFH'].historyitem_type_Footnotes | 7;
 	window['AscDFH'].historyitem_Footnotes_SetFootnotePrNumFormat   = window['AscDFH'].historyitem_type_Footnotes | 8;
+	//------------------------------------------------------------------------------------------------------------------
+	// Типы изменений в классе CGraphicObjects
+	//------------------------------------------------------------------------------------------------------------------
+	window['AscDFH'].historyitem_ChangeColorScheme = window['AscDFH'].historyitem_type_GrObjects | 1;
 	//------------------------------------------------------------------------------------------------------------------
 	// Графические классы общего назначение (без привязки к конкретному классу)
 	//------------------------------------------------------------------------------------------------------------------

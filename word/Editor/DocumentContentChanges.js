@@ -33,24 +33,20 @@
 "use strict";
 /**
  * User: Ilja.Kirillov
- * Date: 27.10.2016
- * Time: 13:02
+ * Date: 08.11.2016
+ * Time: 14:03
  */
 
-AscDFH.changesFactory[AscDFH.historyitem_Document_AddItem]           = CChangesDocumentAddItem;
-AscDFH.changesFactory[AscDFH.historyitem_Document_RemoveItem]        = CChangesDocumentRemoveItem;
-AscDFH.changesFactory[AscDFH.historyitem_Document_DefaultTab]        = CChangesDocumentDefaultTab;
-AscDFH.changesFactory[AscDFH.historyitem_Document_EvenAndOddHeaders] = CChangesDocumentEvenAndOddHeaders;
-AscDFH.changesFactory[AscDFH.historyitem_Document_DefaultLanguage]   = CChangesDocumentDefaultLanguage;
-AscDFH.changesFactory[AscDFH.historyitem_Document_MathSettings]      = CChangesDocumentMathSettings;
+AscDFH.changesFactory[AscDFH.historyitem_DocumentContent_AddItem]    = CChangesDocumentContentAddItem;
+AscDFH.changesFactory[AscDFH.historyitem_DocumentContent_RemoveItem] = CChangesDocumentContentRemoveItem;
 
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
  */
-function CChangesDocumentAddItem(Class, Pos, Item)
+function CChangesDocumentContentAddItem(Class, Pos, Item)
 {
-	CChangesDocumentAddItem.superclass.constructor.call(this, Class);
+	CChangesDocumentContentAddItem.superclass.constructor.call(this, Class);
 
 	this.Pos  = Pos;
 	this.Item = Item;
@@ -58,14 +54,13 @@ function CChangesDocumentAddItem(Class, Pos, Item)
 	this.UseArray = false;
 	this.PosArray = [];
 }
-AscCommon.extendClass(CChangesDocumentAddItem, AscDFH.CChangesBase);
-CChangesDocumentAddItem.prototype.Type = AscDFH.historyitem_Document_AddItem;
-CChangesDocumentAddItem.prototype.Undo = function()
+AscCommon.extendClass(CChangesDocumentContentAddItem, AscDFH.CChangesBase);
+CChangesDocumentContentAddItem.prototype.Type = AscDFH.historyitem_DocumentContent_AddItem;
+CChangesDocumentContentAddItem.prototype.Undo = function()
 {
 	var oDocument = this.Class;
 	var Elements  = oDocument.Content.splice(this.Pos, 1);
 	oDocument.private_RecalculateNumbering(Elements);
-	oDocument.SectionsInfo.Update_OnRemove(this.Pos, 1);
 
 	var Pos = this.Pos;
 	if (Pos > 0)
@@ -85,12 +80,11 @@ CChangesDocumentAddItem.prototype.Undo = function()
 		oDocument.Content[Pos].Prev = null;
 	}
 };
-CChangesDocumentAddItem.prototype.Redo = function()
+CChangesDocumentContentAddItem.prototype.Redo = function()
 {
 	var oDocument = this.Class;
 	oDocument.Content.splice(this.Pos, 0, this.Item);
 	oDocument.private_RecalculateNumbering([this.Item]);
-	oDocument.SectionsInfo.Update_OnAdd(this.Pos, [this.Item]);
 
 	var Element = this.Item;
 	var Pos     = this.Pos;
@@ -116,7 +110,7 @@ CChangesDocumentAddItem.prototype.Redo = function()
 
 	Element.Parent = oDocument;
 };
-CChangesDocumentAddItem.prototype.WriteToBinary = function(Writer)
+CChangesDocumentContentAddItem.prototype.WriteToBinary = function(Writer)
 {
 	// Long   : Pos
 	// String : Id элемента
@@ -127,7 +121,7 @@ CChangesDocumentAddItem.prototype.WriteToBinary = function(Writer)
 
 	Writer.WriteString2(this.Item.Get_Id());
 };
-CChangesDocumentAddItem.prototype.ReadFromBinary = function(Reader)
+CChangesDocumentContentAddItem.prototype.ReadFromBinary = function(Reader)
 {
 	// Long   : Pos
 	// String : Id элемента
@@ -137,7 +131,7 @@ CChangesDocumentAddItem.prototype.ReadFromBinary = function(Reader)
 	this.PosArray = [this.Pos];
 	this.Item     = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 };
-CChangesDocumentAddItem.prototype.Load = function(Color)
+CChangesDocumentContentAddItem.prototype.Load = function(Color)
 {
 	var oDocument = this.Class;
 
@@ -172,7 +166,6 @@ CChangesDocumentAddItem.prototype.Load = function(Color)
 
 		oDocument.Content.splice(Pos, 0, Element);
 		oDocument.private_RecalculateNumbering([Element]);
-		oDocument.SectionsInfo.Update_OnAdd(Pos, [Element]);
 		oDocument.private_ReindexContent(Pos);
 
 		AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(oDocument, Pos);
@@ -182,9 +175,9 @@ CChangesDocumentAddItem.prototype.Load = function(Color)
  * @constructor
  * @extends {AscDFH.CChangesBase}
  */
-function CChangesDocumentRemoveItem(Class, Pos, Items)
+function CChangesDocumentContentRemoveItem(Class, Pos, Items)
 {
-	CChangesDocumentRemoveItem.superclass.constructor.call(this, Class);
+	CChangesDocumentContentRemoveItem.superclass.constructor.call(this, Class);
 
 	this.Pos   = Pos;
 	this.Items = Items;
@@ -192,10 +185,13 @@ function CChangesDocumentRemoveItem(Class, Pos, Items)
 	this.UseArray = false;
 	this.PosArray = [];
 }
-AscCommon.extendClass(CChangesDocumentRemoveItem, AscDFH.CChangesBase);
-CChangesDocumentRemoveItem.prototype.Type = AscDFH.historyitem_Document_RemoveItem;
-CChangesDocumentRemoveItem.prototype.Undo = function()
+AscCommon.extendClass(CChangesDocumentContentRemoveItem, AscDFH.CChangesBase);
+CChangesDocumentContentRemoveItem.prototype.Type = AscDFH.historyitem_DocumentContent_RemoveItem;
+CChangesDocumentContentRemoveItem.prototype.Undo = function()
 {
+	if (!this.Items || this.Items.length <= 0)
+		return;
+
 	var oDocument = this.Class;
 
 	var Array_start = oDocument.Content.slice(0, this.Pos);
@@ -203,8 +199,6 @@ CChangesDocumentRemoveItem.prototype.Undo = function()
 
 	oDocument.private_RecalculateNumbering(this.Items);
 	oDocument.Content = Array_start.concat(this.Items, Array_end);
-
-	oDocument.SectionsInfo.Update_OnAdd(this.Pos, this.Items);
 
 	var nStartIndex = Math.max(this.Pos - 1, 0);
 	var nEndIndex   = Math.min(oDocument.Content.length - 1, this.Pos + this.Items.length + 1);
@@ -224,12 +218,14 @@ CChangesDocumentRemoveItem.prototype.Undo = function()
 		oElement.Parent = oDocument;
 	}
 };
-CChangesDocumentRemoveItem.prototype.Redo = function()
+CChangesDocumentContentRemoveItem.prototype.Redo = function()
 {
+	if (!this.Items || this.Items.length <= 0)
+		return;
+
 	var oDocument = this.Class;
 	var Elements = oDocument.Content.splice(this.Pos, this.Items.length);
 	oDocument.private_RecalculateNumbering(Elements);
-	oDocument.SectionsInfo.Update_OnRemove(this.Pos, this.Items.length);
 
 	var Pos = this.Pos;
 	if (Pos > 0)
@@ -249,7 +245,7 @@ CChangesDocumentRemoveItem.prototype.Redo = function()
 		oDocument.Content[Pos].Prev = null;
 	}
 };
-CChangesDocumentRemoveItem.prototype.WriteToBinary = function(Writer)
+CChangesDocumentContentRemoveItem.prototype.WriteToBinary = function(Writer)
 {
 	// Long          : Количество удаляемых элементов
 	// Array of
@@ -291,7 +287,7 @@ CChangesDocumentRemoveItem.prototype.WriteToBinary = function(Writer)
 	Writer.WriteLong(RealCount);
 	Writer.Seek(EndPos);
 };
-CChangesDocumentRemoveItem.prototype.ReadFromBinary = function(Reader)
+CChangesDocumentContentRemoveItem.prototype.ReadFromBinary = function(Reader)
 {
 	// Long          : Количество удаляемых элементов
 	// Array of
@@ -311,7 +307,7 @@ CChangesDocumentRemoveItem.prototype.ReadFromBinary = function(Reader)
 		this.Items[nIndex]    = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 	}
 };
-CChangesDocumentRemoveItem.prototype.Load = function(Color)
+CChangesDocumentContentRemoveItem.prototype.Load = function(Color)
 {
 	var oDocument = this.Class;
 	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
@@ -343,155 +339,6 @@ CChangesDocumentRemoveItem.prototype.Load = function(Color)
 			oDocument.Content[Pos].Prev = null;
 		}
 
-		oDocument.SectionsInfo.Update_OnRemove(Pos, 1);
 		oDocument.private_ReindexContent(Pos);
 	}
-};
-/**
- * @constructor
- * @extends {AscDFH.CChangesBase}
- */
-function CChangesDocumentDefaultTab(Class, Old, New)
-{
-	CChangesDocumentDefaultTab.superclass.constructor.call(this, Class);
-
-	this.Old = Old;
-	this.New = New;
-}
-AscCommon.extendClass(CChangesDocumentDefaultTab, AscDFH.CChangesBase);
-CChangesDocumentDefaultTab.prototype.Type = AscDFH.historyitem_Document_DefaultTab;
-CChangesDocumentDefaultTab.prototype.Undo = function()
-{
-	Default_Tab_Stop = this.Old;
-};
-CChangesDocumentDefaultTab.prototype.Redo = function()
-{
-	Default_Tab_Stop = this.New;
-};
-CChangesDocumentDefaultTab.prototype.WriteToBinary = function(Writer)
-{
-	// Double : New
-	// Double : Old
-	Writer.WriteDouble(this.New);
-	Writer.WriteDouble(this.Old);
-};
-CChangesDocumentDefaultTab.prototype.ReadFromBinary = function(Reader)
-{
-	// Double : New
-	// Double : Old
-	this.New = Reader.GetDouble();
-	this.Old = Reader.GetDouble();
-};
-/**
- * @constructor
- * @extends {AscDFH.CChangesBase}
- */
-function CChangesDocumentEvenAndOddHeaders(Class, Old, New)
-{
-	CChangesDocumentEvenAndOddHeaders.superclass.constructor.call(this, Class);
-
-	this.Old = Old;
-	this.New = New;
-}
-AscCommon.extendClass(CChangesDocumentEvenAndOddHeaders, AscDFH.CChangesBase);
-CChangesDocumentEvenAndOddHeaders.prototype.Type = AscDFH.historyitem_Document_EvenAndOddHeaders;
-CChangesDocumentEvenAndOddHeaders.prototype.Undo = function()
-{
-	EvenAndOddHeaders = this.Old;
-};
-CChangesDocumentEvenAndOddHeaders.prototype.Redo = function()
-{
-	EvenAndOddHeaders = this.New;
-};
-CChangesDocumentEvenAndOddHeaders.prototype.WriteToBinary = function(Writer)
-{
-	// Bool : New
-	// Bool : Old
-	Writer.WriteBool(this.New);
-	Writer.WriteBool(this.Old);
-};
-CChangesDocumentEvenAndOddHeaders.prototype.ReadFromBinary = function(Reader)
-{
-	// Bool : New
-	// Bool : Old
-	this.New = Reader.GetBool();
-	this.Old = Reader.GetBool();
-};
-/**
- * @constructor
- * @extends {AscDFH.CChangesBase}
- */
-function CChangesDocumentDefaultLanguage(Class, Old, New)
-{
-	CChangesDocumentDefaultLanguage.superclass.constructor.call(this, Class);
-
-	this.Old = Old;
-	this.New = New;
-}
-AscCommon.extendClass(CChangesDocumentDefaultLanguage, AscDFH.CChangesBase);
-CChangesDocumentDefaultLanguage.prototype.Type = AscDFH.historyitem_Document_DefaultLanguage;
-CChangesDocumentDefaultLanguage.prototype.Undo = function()
-{
-	var oDocument = this.Class;
-	oDocument.Styles.Default.TextPr.Lang.Val = this.Old;
-	oDocument.Restart_CheckSpelling();
-};
-CChangesDocumentDefaultLanguage.prototype.Redo = function()
-{
-	var oDocument = this.Class;
-	oDocument.Styles.Default.TextPr.Lang.Val = this.New;
-	oDocument.Restart_CheckSpelling();
-};
-CChangesDocumentDefaultLanguage.prototype.WriteToBinary = function(Writer)
-{
-	// Long : New
-	// Long : Old
-	Writer.WriteBool(this.New);
-	Writer.WriteBool(this.Old);
-};
-CChangesDocumentDefaultLanguage.prototype.ReadFromBinary = function(Reader)
-{
-	// Long : New
-	// Long : Old
-	this.New = Reader.GetBool();
-	this.Old = Reader.GetBool();
-};
-/**
- * @constructor
- * @extends {AscDFH.CChangesBase}
- */
-function CChangesDocumentMathSettings(Class, Old, New)
-{
-	CChangesDocumentMathSettings.superclass.constructor.call(this, Class);
-
-	this.Old = Old;
-	this.New = New;
-}
-AscCommon.extendClass(CChangesDocumentMathSettings, AscDFH.CChangesBase);
-CChangesDocumentMathSettings.prototype.Type = AscDFH.historyitem_Document_MathSettings;
-CChangesDocumentMathSettings.prototype.Undo = function()
-{
-	var oDocument = this.Class;
-	oDocument.Settings.MathSettings.SetPr(this.Old);
-};
-CChangesDocumentMathSettings.prototype.Redo = function()
-{
-	var oDocument = this.Class;
-	oDocument.Settings.MathSettings.SetPr(this.New);
-};
-CChangesDocumentMathSettings.prototype.WriteToBinary = function(Writer)
-{
-	// Variable : New
-	// Variable : Old
-	this.New.Write_ToBinary(Writer);
-	this.Old.Write_ToBinary(Writer);
-};
-CChangesDocumentMathSettings.prototype.ReadFromBinary = function(Reader)
-{
-	// Variable : New
-	// Variable : Old
-	this.New = new CMathSettings();
-	this.New.Read_FromBinary(Reader);
-	this.Old = new CMathSettings();
-	this.Old.Read_FromBinary(Reader);
 };
