@@ -1984,6 +1984,23 @@
 				}
 			},
 			
+			getLastTablesCell: function()
+			{
+				var worksheet = this.worksheet;
+				var tableParts = worksheet.TableParts; 
+				var oResult = null;
+				
+				for(var i = 0; i < tableParts.length; i++ )
+				{
+					if(null === oResult || tableParts[i].Ref.r2 > oResult.row)
+					{
+						oResult = {row: tableParts[i].Ref.r2, col: tableParts[i].Ref.c2};
+					}
+				}
+				
+				return oResult;
+			},
+			
 			_setStyleTablePartsAfterOpenRows: function(ref)
 			{
 				var worksheet = this.worksheet;
