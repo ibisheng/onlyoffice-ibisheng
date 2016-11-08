@@ -7145,7 +7145,7 @@
             objectInfo.angle = angle;
 
             objectInfo.font = new asc_CFont();
-            objectInfo.font.name = textPr.FontFamily ? textPr.FontFamily.Name : "";
+            objectInfo.font.name = textPr.FontFamily ? textPr.FontFamily.Name : null;
             objectInfo.font.size = textPr.FontSize;
             objectInfo.font.bold = textPr.Bold;
             objectInfo.font.italic = textPr.Italic;
@@ -7176,8 +7176,8 @@
         } else {
             // Может быть не задано текста, поэтому выставим по умолчанию
             objectInfo.font = new asc_CFont();
-            objectInfo.font.name = this.model.getDefaultFontName();
-            objectInfo.font.size = this.model.getDefaultFontSize();
+            objectInfo.font.name = null;
+            objectInfo.font.size = null;
         }
 
         // Заливка не нужна как таковая
