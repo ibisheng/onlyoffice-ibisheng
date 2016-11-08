@@ -8015,7 +8015,6 @@
             changedRange.normalize();
 
             var applyFillHandleCallback = function (res) {
-                var bIsEndTransaction = false;
                 if (res) {
                     // Автозаполняем ячейки
                     var oCanPromote = range.canPromote(/*bCtrl*/ctrlPress, /*bVertical*/(1 === t.fillHandleDirection),
@@ -8027,23 +8026,28 @@
                           oCanPromote);
                         // Вызываем функцию пересчета для заголовков форматированной таблицы
                         t.model.autoFilters.renameTableColumn(arn);
-                        bIsEndTransaction = true;
+
+                        // Сбрасываем параметры автозаполнения
+                        t.activeFillHandle = null;
+                        t.fillHandleDirection = -1;
+
+                        // Обновляем выделенные ячейки
+                        t.isChanged = true;
+                        t._updateCellsRange(arn);
+                        History.SetSelection(range.bbox.clone());
+                        History.SetSelectionRedo(oCanPromote.to.clone());
+                        History.EndTransaction();
                     } else {
                         t.handlers.trigger("onErrorEvent", c_oAscError.ID.CannotFillRange,
                           c_oAscError.Level.NoCritical);
                         t.model.selectionRange.assign2(range.bbox);
+
+                        // Сбрасываем параметры автозаполнения
+                        t.activeFillHandle = null;
+                        t.fillHandleDirection = -1;
+
+                        t.updateSelection();
                     }
-                }
-
-                // Сбрасываем параметры автозаполнения
-                t.activeFillHandle = null;
-                t.fillHandleDirection = -1;
-
-                // Обновляем выделенные ячейки
-                t.isChanged = true;
-                t._updateCellsRange(arn);
-                if(bIsEndTransaction){
-                   History.EndTransaction();
                 }
             };
 
