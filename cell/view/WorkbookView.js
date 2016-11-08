@@ -2454,7 +2454,7 @@
 
   WorkbookView.prototype.reInit = function() {
     var ws = this.getWorksheet();
-    ws._initCellsArea(/*fullRecalc*/true);
+    ws._initCellsArea(AscCommonExcel.recalcType.full);
     ws._updateVisibleColsCount();
     ws._updateVisibleRowsCount();
   };

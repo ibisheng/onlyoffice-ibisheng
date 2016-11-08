@@ -134,8 +134,6 @@ var c_oAscMouseMoveLockedObjectType = {
   Sheet: 2
 };
 
-
-
 var c_oAscLockTypeElem = {
   Range: 1,
   Object: 2,
