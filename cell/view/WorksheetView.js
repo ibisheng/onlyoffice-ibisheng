@@ -1693,14 +1693,18 @@
                     }
                 }
             }
+            var maxCell = this.model.autoFilters.getMaxColRow();
+            lastC = Math.max(lastC, maxCell.col);
+            lastR = Math.max(lastR, maxCell.row);
+
             maxCols = lastC + 1;
             maxRows = lastR + 1;
 
             // Получаем максимальную колонку/строку для изображений/чатов
-            var maxObjectsCoord = this.objectRender.getDrawingAreaMetrics();
-            if (maxObjectsCoord) {
-                maxCols = Math.max(maxCols, maxObjectsCoord.maxCol);
-                maxRows = Math.max(maxRows, maxObjectsCoord.maxRow);
+            maxCell = this.objectRender.getDrawingAreaMetrics();
+            if (maxCell) {
+                maxCols = Math.max(maxCols, maxCell.maxCol);
+                maxRows = Math.max(maxRows, maxCell.maxRow);
             }
         } else {
             maxCols = selectionRange.c2 + 1;

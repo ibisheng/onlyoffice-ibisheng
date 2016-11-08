@@ -1984,21 +1984,15 @@
 				}
 			},
 			
-			getLastTablesCell: function()
+			getMaxColRow: function()
 			{
-				var worksheet = this.worksheet;
-				var tableParts = worksheet.TableParts; 
-				var oResult = null;
+				var r = -1, c = -1;
+				this.worksheet.TableParts.forEach(function (item) {
+					r = Math.max(r, item.Ref.r2);
+					c = Math.max(c, item.Ref.c2);
+				});
 				
-				for(var i = 0; i < tableParts.length; i++ )
-				{
-					if(null === oResult || tableParts[i].Ref.r2 > oResult.row)
-					{
-						oResult = {row: tableParts[i].Ref.r2, col: tableParts[i].Ref.c2};
-					}
-				}
-				
-				return oResult;
+				return new AscCommon.CellBase(r, c);
 			},
 			
 			_setStyleTablePartsAfterOpenRows: function(ref)
