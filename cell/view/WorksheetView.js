@@ -1642,7 +1642,7 @@
     };
 
     // ----- Drawing for print -----
-    WorksheetView.prototype.calcPagesPrint = function(pageOptions, printOnlySelection, indexWorksheet) {
+    WorksheetView.prototype.calcPagesPrint = function(pageOptions, printOnlySelection, indexWorksheet, arrPages) {
         var range;
         var maxCols = this.model.getColsCount();
         var maxRows = this.model.getRowsCount();
@@ -1774,7 +1774,6 @@
             pageHeight = tmp;
         }
 
-        var arrResult = [];
         if (0 === maxCols || 0 === maxRows) {
             // Ничего нет, возвращаем пустой массив
             return null;
@@ -1804,7 +1803,7 @@
             var bIsAddOffset = false;
             var nCountOffset = 0;
 
-            while (true) {
+            while (AscCommonExcel.c_kMaxPrintPages > arrPages.length) {
                 if (currentColIndex === maxCols && currentRowIndex === maxRows) {
                     break;
                 }
@@ -1928,11 +1927,9 @@
                     }
                 }
 
-                arrResult.push(newPagePrint);
+                arrPages.push(newPagePrint);
             }
         }
-
-        return arrResult;
     };
     WorksheetView.prototype.drawForPrint = function(drawingCtx, printPagesData) {
         var isAppBridge = (undefined != window['appBridge']);

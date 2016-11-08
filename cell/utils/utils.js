@@ -1427,7 +1427,7 @@
 			return this;
 		}
 		function CPrintPagesData () {
-			this.arrPages = null;
+			this.arrPages = [];
 			this.currentIndex = 0;
 
 			return this;

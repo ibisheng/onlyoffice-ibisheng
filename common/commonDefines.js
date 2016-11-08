@@ -143,6 +143,8 @@
 			UserDrop : -100,
 			Warning  : -101,
 
+			PrintMaxPagesCount					: 110,
+
 			/* для формул */
 			FrmlWrongCountParentheses   : -300,
 			FrmlWrongOperator           : -301,
