@@ -4496,12 +4496,12 @@
                 str = c.getValue2();
                 if (0 < str.length) {
                     strCopy = str[0];
-                    if (!(tm = AscCommonExcel.g_oCacheMeasureEmpty.get(strCopy))) {
+                    if (!(tm = AscCommonExcel.g_oCacheMeasureEmpty.get(strCopy.format))) {
                         // Без текста не будет толка
                         strCopy = strCopy.clone();
                         strCopy.text = 'A';
                         tm = this._roundTextMetrics(this.stringRender.measureString([strCopy], fl));
-                        AscCommonExcel.g_oCacheMeasureEmpty.add(strCopy, tm);
+                        AscCommonExcel.g_oCacheMeasureEmpty.add(strCopy.format, tm);
                     }
                     this._updateRowHeight(tm, col, row, isMerged, fMergedRows);
                 }
