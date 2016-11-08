@@ -4490,6 +4490,7 @@
         }
 
         var angle = c.getAngle();
+        var va = c.getAlignVertical().toLowerCase();
         if (this._isCellEmptyTextString(c)) {
             if (!angle && c.isNotDefaultFont()) {
                 // Пустая ячейка с измененной гарнитурой или размером, учитвается в высоте
@@ -4503,7 +4504,7 @@
                         tm = this._roundTextMetrics(this.stringRender.measureString([strCopy], fl));
                         AscCommonExcel.g_oCacheMeasureEmpty.add(strCopy.format, tm);
                     }
-                    this._updateRowHeight(tm, col, row, isMerged, fMergedRows);
+                    this._updateRowHeight(tm, col, row, fl, isMerged, fMergedRows, va);
                 }
             }
 
@@ -4576,7 +4577,6 @@
         // ToDo dDigitsCount нужно рассчитывать исходя не из дефалтового шрифта и размера, а исходя из текущего шрифта и размера ячейки
         str = c.getValue2(dDigitsCount, makeFnIsGoodNumFormat(fl, colWidth));
         var ha = c.getAlignHorizontalByValue().toLowerCase();
-        var va = c.getAlignVertical().toLowerCase();
         var maxW = fl.wrapText || fl.shrinkToFit || isMerged || asc.isFixedWidthCell(str) ?
           this._calcMaxWidth(col, row, mc) : undefined;
         tm = this._roundTextMetrics(this.stringRender.measureString(str, fl, maxW));
