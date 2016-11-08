@@ -201,7 +201,7 @@ function getRangeType(oBBox){
 			this.ref = ref;
 			//all ref should be 3d, so worksheet can be anyone
 			this.parsedRef = new parserFormula(ref, this, AscCommonExcel.g_DefNameWorksheet);
-			this.parsedRef.setIsTable(true);
+			this.parsedRef.setIsTable(this.isTable);
 			if (opt_forceBuild) {
 				this.parsedRef.parse();
 				this.parsedRef.buildDependencies();
@@ -588,12 +588,14 @@ function getRangeType(oBBox){
 		addDefNameOpen: function(name, ref, sheetIndex, hidden, isTable) {
 			var sheetId = this.wb.getSheetIdByIndex(sheetIndex);
 			var defName = new DefName(this.wb, name, ref, sheetId, hidden, isTable);
-			return this._addDefName(defName);
+			this._addDefName(defName);
+			return defName;
 		},
 		addDefName: function(name, ref, sheetId, hidden, isTable) {
 			var defName = new DefName(this.wb, name, ref, sheetId, hidden, isTable);
 			defName.setRef(defName.ref, true);
-			return this._addDefName(defName);
+			this._addDefName(defName);
+			return defName;
 		},
 		removeDefName: function(sheetId, name) {
 			this._removeDefName(sheetId, name, AscCH.historyitem_Workbook_DefinedNamesChange);
@@ -869,13 +871,19 @@ function getRangeType(oBBox){
 			console.timeEnd('broadscastVolatile');
 			console.time('broadcastCells');
 			var calcTrack = [];
+			var noCalcTrack = [];
 			while (this.changedCell || this.changedDefName) {
-				this._broadcastDefNames(notifyData);
+				this._broadcastDefNames(notifyData, noCalcTrack);
 				this._broadcastCells(notifyData, calcTrack);
 			}
 			this._broadcastCellsEnd();
 			console.timeEnd('broadcastCells');
 			console.time('calculate');
+			for (var i = 0; i < noCalcTrack.length; ++i) {
+				var formula = noCalcTrack[i];
+				//defName recalc when calc formula containing it. no need calc it
+				formula.setIsDirty(false);
+			}
 			for (var i = 0; i < calcTrack.length; ++i) {
 				var formula = calcTrack[i];
 				if (formula.getIsDirty()) {
@@ -1038,15 +1046,15 @@ function getRangeType(oBBox){
 				}
 			}
 		},
-		_broadcastDefNames: function(notifyData) {
+		_broadcastDefNames: function(notifyData, noCalcTrack) {
 			if (this.changedDefName) {
 				var changedDefName = this.changedDefName;
 				this.changedDefName = null;
 				for (var nodeId in changedDefName) {
 					var defName = this.getDefNameByNodeId(nodeId);
 					if (defName && defName.parsedRef) {
-						//defName recalc when calc formula containing it. no need calc it
-						defName.parsedRef.setIsDirty(false);
+						defName.parsedRef.setIsDirty(true);
+						noCalcTrack.push(defName.parsedRef);
 					}
 					getFromDefNameId(nodeId);
 					this._broadcastDefName(g_FDNI.name, notifyData);
@@ -2254,6 +2262,9 @@ Workbook.prototype.getTableNameColumnByIndex = function(tableName, columnIndex){
 		return Asc.floor((count * this.maxDigitWidth + this.paddingPlusBorder) / this.maxDigitWidth * 256) / 256;
 	};
 	Workbook.prototype.getUndoDefName = function(ascName) {
+		if (!ascName) {
+			return ascName;
+		}
 		var sheetId = this.getSheetIdByIndex(ascName.LocalSheetId);
 		return new UndoRedoData_DefinedNames(ascName.Name, ascName.Ref, sheetId, ascName.isTable);
 	};

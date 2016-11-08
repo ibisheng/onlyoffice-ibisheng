@@ -1840,6 +1840,11 @@ cStrucTable.prototype._createArea = function ( val, opt_bbox ) {
 cStrucTable.prototype._buildLocalTableString = function (reservedColumn,local) {
   return parserHelp.getColumnNameByType(reservedColumn, local);
 };
+	cStrucTable.prototype.changeDefName = function (from, to) {
+		if (this.tableName == from.name) {
+			this.tableName = to.name;
+		}
+	};
 
 /** @constructor */
 function cName3D(val, wb, ws) {
@@ -4733,16 +4738,11 @@ parserFormula.prototype.calculate = function(opt_defName, opt_range) {
 		return elem;
 	};
 	parserFormula.prototype.changeDefName = function(from, to) {
-		var i, elem, sheetId;
+		var i, elem;
 		for (i = 0; i < this.outStack.length; i++) {
 			elem = this.outStack[i];
-			if (elem.type == cElementType.name || elem.type == cElementType.name3D) {
+			if (elem.type == cElementType.name || elem.type == cElementType.name3D || elem.type == cElementType.table) {
 				elem.changeDefName(from, to);
-			} else if (elem.type == cElementType.table) {
-				sheetId = elem.ws ? elem.ws.getId() : null;
-				if (elem.tableName == from.name && (null == from.sheetId || sheetId == from.sheetId )) {
-					elem.tableName = to.name;
-				}
 			}
 		}
 	};
