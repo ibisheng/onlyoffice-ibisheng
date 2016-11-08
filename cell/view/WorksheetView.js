@@ -1379,8 +1379,8 @@
     WorksheetView.prototype._calcWidthColumns = function (fullRecalc) {
         var x = this.cellsLeft;
         var visibleW = this.drawingCtx.getWidth();
-        var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
-        var l = Math.max(this.model.getColsCount() + 1, this.nColsCount, obr.maxCol);
+        var maxColObjects = this.objectRender ? this.objectRender.getMaxColRow().col : -1;
+        var l = Math.max(this.model.getColsCount() + 1, this.nColsCount, maxColObjects);
         var i = 0, w, column, isBestFit, hiddenW = 0;
 
         // Берем дефалтовую ширину документа
@@ -1423,8 +1423,8 @@
     WorksheetView.prototype._calcHeightRows = function (fullRecalc) {
         var y = this.cellsTop;
         var visibleH = this.drawingCtx.getHeight();
-        var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
-        var l = Math.max(this.model.getRowsCount() + 1, this.nRowsCount, obr.maxRow);
+        var maxRowObjects = this.objectRender ? this.objectRender.getMaxColRow().row : -1;
+        var l = Math.max(this.model.getRowsCount() + 1, this.nRowsCount, maxRowObjects);
         var defaultH = this.defaultRowHeight;
         var i = 0, h, hR, isCustomHeight, row, hiddenH = 0;
 
@@ -1701,11 +1701,10 @@
             maxRows = lastR + 1;
 
             // Получаем максимальную колонку/строку для изображений/чатов
-            maxCell = this.objectRender.getDrawingAreaMetrics();
-            if (maxCell) {
-                maxCols = Math.max(maxCols, maxCell.maxCol);
-                maxRows = Math.max(maxRows, maxCell.maxRow);
-            }
+            maxCell = this.objectRender.getMaxColRow();
+            maxCols = Math.max(maxCols, maxCell.col);
+            maxRows = Math.max(maxRows, maxCell.row);
+
         } else {
             maxCols = selectionRange.c2 + 1;
             maxRows = selectionRange.r2 + 1;
@@ -5308,7 +5307,7 @@
         }
 
         function findEOT() {
-            var obr = t.objectRender ? t.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
+            var obr = t.objectRender ? t.objectRender.getMaxColRow() : new AscCommon.CellBase(-1, -1);
             var maxCols = t.model.getColsCount();
             var maxRows = t.model.getRowsCount();
             var lastC = -1, lastR = -1;
@@ -5321,7 +5320,7 @@
                     }
                 }
             }
-            return {col: Math.max(lastC, obr.maxCol), row: Math.max(lastR, obr.maxRow)};
+            return {col: Math.max(lastC, obr.col), row: Math.max(lastR, obr.row)};
         }
 
         var eot = dc > +2.0001 && dc < +2.9999 && dr > +2.0001 && dr < +2.9999 ? findEOT() : null;
@@ -10166,8 +10165,8 @@
     };
 
     WorksheetView.prototype.expandColsOnScroll = function (isNotActive, updateColsCount, newColsCount) {
-        var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
-        var maxc = Math.max(this.model.getColsCount() + 1, this.cols.length, obr.maxCol);
+        var maxColObjects = this.objectRender ? this.objectRender.getMaxColRow().col : -1;
+        var maxc = Math.max(this.model.getColsCount() + 1, this.cols.length, maxColObjects);
         if (newColsCount) {
             maxc = Math.max(maxc, newColsCount);
         }
@@ -10197,8 +10196,8 @@
     };
 
     WorksheetView.prototype.expandRowsOnScroll = function (isNotActive, updateRowsCount, newRowsCount) {
-        var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
-        var maxr = Math.max(this.model.getRowsCount() + 1, this.rows.length, obr.maxRow);
+        var maxRowObjects = this.objectRender ? this.objectRender.getMaxColRow().row : -1;
+        var maxr = Math.max(this.model.getRowsCount() + 1, this.rows.length, maxRowObjects);
         if (newRowsCount) {
             maxr = Math.max(maxr, newRowsCount);
         }
