@@ -2189,26 +2189,14 @@ function DrawingObjects() {
         }
     };
 
-    _this.getDrawingAreaMetrics = function() {
+    _this.getMaxColRow = function() {
+        var r = -1, c = -1;
+        aObjects.forEach(function (item) {
+            r = Math.max(r, item.to.row + 1);
+            c = Math.max(c, item.to.col + 1);
+        });
 
-        /*
-         *	Объект, определяющий max колонку и строчку для отрисовки объектов листа
-         */
-
-        var metrics = {
-            maxCol: 0,
-            maxRow: 0
-        };
-
-        for (var i = 0; aObjects && (i < aObjects.length); i++) {
-
-            var drawingObject = aObjects[i];
-            if ( drawingObject.to.col >= metrics.maxCol )
-                metrics.maxCol = drawingObject.to.col + 1; // учитываем colOff
-            if ( drawingObject.to.row >= metrics.maxRow )
-                metrics.maxRow = drawingObject.to.row + 1; // учитываем rowOff
-        }
-        return metrics;
+        return new AscCommon.CellBase(r, c);
     };
 
     _this.clipGraphicsCanvas = function(canvas, graphicOption) {

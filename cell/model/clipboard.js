@@ -1217,6 +1217,16 @@
 						activeCol = isIntoShape.Parent.parent.drawingBase.from.col;
 					}
 					
+					//TODO пересмотреть вставку графических объектов. возможно, не стоит привязываться к положению активной ячейки.
+					if(!ws.cols[activeCol])
+					{
+						ws.expandColsOnScroll(true);
+					}
+					if(!ws.rows[activeCol])
+					{
+						ws.expandRowsOnScroll(true);
+					}
+					
 					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[activeCol].left - ws.getCellLeft(0, 1), 1, 3);
 					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[activeRow].top  - ws.getCellTop(0, 1), 1, 3);
 

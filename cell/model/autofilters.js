@@ -1984,6 +1984,17 @@
 				}
 			},
 			
+			getMaxColRow: function()
+			{
+				var r = -1, c = -1;
+				this.worksheet.TableParts.forEach(function (item) {
+					r = Math.max(r, item.Ref.r2);
+					c = Math.max(c, item.Ref.c2);
+				});
+				
+				return new AscCommon.CellBase(r, c);
+			},
+			
 			_setStyleTablePartsAfterOpenRows: function(ref)
 			{
 				var worksheet = this.worksheet;

@@ -45,6 +45,15 @@ var ORIENTATION_MIN_MAX = AscFormat.ORIENTATION_MIN_MAX;
 var globalBasePercent = 100;
 var global3DPersperctive = 30; // ToDo а нужна ли она в ChartsDrawer ?
 
+var c_oChartFloorPosition =
+{
+	None: 0,
+	Left: 1,
+	Right: 2,
+	Bottom: 3,
+	Top: 4
+};
+
 /** @constructor */
 function Processor3D(width, height, left, right, bottom, top, chartSpace, chartsDrawer) {
 	this.widthCanvas = width;
@@ -342,7 +351,54 @@ Processor3D.prototype.calculateZPositionCatAxis = function()
 	return result;
 };
 
-
+Processor3D.prototype.calculateFloorPosition = function()
+{
+	var res;
+	
+	if(this.view3D.rAngAx)
+	{
+		if(this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar)
+		{	
+			var absOy = Math.abs(this.angleOy);
+			res = c_oChartFloorPosition.Left;
+			if(absOy > Math.PI)
+			{
+				res = c_oChartFloorPosition.Right;
+			}
+		}
+		else
+		{
+			res = c_oChartFloorPosition.Bottom;
+			if(this.angleOx > 0)
+			{
+				res = c_oChartFloorPosition.None;
+			}
+		}
+		
+	}
+	else
+	{
+		if(this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar)
+		{	
+			var absOy = Math.abs(this.angleOy);
+			res = c_oChartFloorPosition.Left;
+			if(absOy > Math.PI)
+			{
+				res = c_oChartFloorPosition.Right;
+			}
+		}
+		else
+		{
+			res = c_oChartFloorPosition.Bottom;
+			if(this.angleOx > 0)
+			{
+				res = c_oChartFloorPosition.None;
+			}
+		}
+	}
+	
+	return res;
+};
 
 //***functions for complete transformation point***
 Processor3D.prototype.convertAndTurnPoint = function(x, y, z, isNScale, isNRotate, isNProject)
@@ -2393,4 +2449,5 @@ Point3D.prototype =
 	window['AscFormat'] = window['AscFormat'] || {};
 	window['AscFormat'].Processor3D = Processor3D;
 	window['AscFormat'].Point3D = Point3D;
+	window['AscCommon'].c_oChartFloorPosition = c_oChartFloorPosition;
 })(window);

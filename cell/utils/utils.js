@@ -64,9 +64,17 @@
 		/** @const */
 		var kArrayL = "array";
 
+		var recalcType = {
+			recalc	: 0, // без пересчета
+			full		: 1, // пересчитываем все
+			newLines: 2  // пересчитываем новые строки
+
+		};
+
 		function applyFunction(callback) {
-			if (kFunctionL === typeof callback)
+			if (kFunctionL === typeof callback) {
 				callback.apply(null, Array.prototype.slice.call(arguments, 1));
+			}
 		}
 
 		function typeOf(obj) {
@@ -1427,7 +1435,7 @@
 			return this;
 		}
 		function CPrintPagesData () {
-			this.arrPages = null;
+			this.arrPages = [];
 			this.currentIndex = 0;
 
 			return this;
@@ -1845,6 +1853,7 @@
 		var prot;
 		window['Asc'] = window['Asc'] || {};
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+		window["AscCommonExcel"].recalcType = recalcType;
 		window["AscCommonExcel"].applyFunction = applyFunction;
 		window["Asc"].typeOf = typeOf;
 		window["Asc"].lastIndexOf = lastIndexOf;

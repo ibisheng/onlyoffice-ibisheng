@@ -134,8 +134,6 @@ var c_oAscMouseMoveLockedObjectType = {
   Sheet: 2
 };
 
-
-
 var c_oAscLockTypeElem = {
   Range: 1,
   Object: 2,
@@ -378,6 +376,8 @@ var c_oAscPopUpSelectorType = {
     Custom: 2
   };
 
+  var c_kMaxPrintPages = 1500;
+
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommonExcel'] = window['AscCommonExcel'] || {};
   window['AscCommonExcel'].c_oAscAlignType = c_oAscAlignType;
@@ -400,6 +400,7 @@ var c_oAscPopUpSelectorType = {
   window['AscCommonExcel'].c_oAscLockNameFrozenPane = c_oAscLockNameFrozenPane;
   window['AscCommonExcel'].c_oAscLockNameTabColor = c_oAscLockNameTabColor;
   window['AscCommonExcel'].c_oAscLockAddSheet = c_oAscLockAddSheet;
+  window['AscCommonExcel'].c_kMaxPrintPages = c_kMaxPrintPages;
 
   window['AscCommon'] = window['AscCommon'] || {};
   window['AscCommon'].c_oSerFormat = c_oSerFormat;

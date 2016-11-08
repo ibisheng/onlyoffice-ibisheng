@@ -2163,6 +2163,8 @@ function CellFormat(format)
 			this.oNegativeFormat = aParsedFormats[1];
 			this.oNullFormat = aParsedFormats[2];
 			this.oTextFormat = aParsedFormats[3];
+			//for ';;;' format, if 4 formats exist fourth always used for text
+			this.oTextFormat.bTextFormat = true;
 		}
 		else if(3 == nFormatsLength)
 		{

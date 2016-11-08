@@ -4204,7 +4204,7 @@ function OfflineEditor () {
 
             do {
                 worksheet.nColsCount = worksheet.cols.length + 1;
-                worksheet._calcWidthColumns(2); // fullRecalc
+                worksheet._calcWidthColumns(AscCommonExcel.recalcType.newLines);
 
                 if (logicToXMAX < worksheet.cols[worksheet.cols.length - 1].left) {
                     break
@@ -4238,7 +4238,7 @@ function OfflineEditor () {
 
             do {
                 worksheet.nRowsCount = worksheet.rows.length + 1;
-                worksheet._calcHeightRows(2); // fullRecalc
+                worksheet._calcHeightRows(AscCommonExcel.recalcType.newLines);
 
                 if (logicToYMAX < worksheet.rows[worksheet.rows.length - 1].top) {
                     break
@@ -4281,7 +4281,7 @@ function OfflineEditor () {
 
                 do {
                     worksheet.nColsCount = worksheet.cols.length + 1;
-                    worksheet._calcWidthColumns(2); // fullRecalc
+                    worksheet._calcWidthColumns(AscCommonExcel.recalcType.newLines);
 
                     if (col < worksheet.cols[worksheet.cols.length - 1].left) {
                         break
@@ -4293,7 +4293,7 @@ function OfflineEditor () {
 
                 do {
                     worksheet.nRowsCount = worksheet.rows.length + 1;
-                    worksheet._calcHeightRows(2); // fullRecalc
+                    worksheet._calcHeightRows(AscCommonExcel.recalcType.newLines);
 
                     if (row < worksheet.rows[worksheet.rows.length - 1].top) {
                         break
@@ -4306,7 +4306,7 @@ function OfflineEditor () {
             if (col >= worksheet.cols.length) {
                 do {
                     worksheet.nColsCount = worksheet.cols.length + 1;
-                    worksheet._calcWidthColumns(2); // fullRecalc
+                    worksheet._calcWidthColumns(AscCommonExcel.recalcType.newLines);
 
                     if (col < worksheet.cols.length)
                         break
@@ -4316,7 +4316,7 @@ function OfflineEditor () {
             if (row >= worksheet.rows.length) {
                 do {
                     worksheet.nRowsCount = worksheet.rows.length + 1;
-                    worksheet._calcHeightRows(2); // fullRecalc
+                    worksheet._calcHeightRows(AscCommonExcel.recalcType.newLines);
 
                     if (row < worksheet.rows.length)
                         break

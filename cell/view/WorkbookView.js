@@ -2371,7 +2371,7 @@
   // Печать
   WorkbookView.prototype.printSheets = function(pdf_writer, printPagesData) {
     var ws;
-    if (null === printPagesData.arrPages || 0 === printPagesData.arrPages.length) {
+    if (0 === printPagesData.arrPages.length) {
       // Печать пустой страницы
       ws = this.getWorksheet();
       ws.drawForPrint(pdf_writer, null);
@@ -2398,31 +2398,23 @@
     if (printType === Asc.c_oAscPrintType.ActiveSheets) {
       activeWs = wb.getActive();
       ws = this.getWorksheet(activeWs);
-      printPagesData.arrPages =
-        ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/false, /*indexWorksheet*/
-          activeWs);
+      ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, false, activeWs, printPagesData.arrPages);
     } else if (printType === Asc.c_oAscPrintType.EntireWorkbook) {
       // Колличество листов
       var countWorksheets = this.model.getWorksheetCount();
       for (var i = 0; i < countWorksheets; ++i) {
         ws = this.getWorksheet(i);
-        var arrPages = ws.calcPagesPrint(wb.getWorksheet(i).PagePrintOptions, /*printOnlySelection*/false,
-          /*indexWorksheet*/i);
-        if (null !== arrPages) {
-          if (null === printPagesData.arrPages) {
-            printPagesData.arrPages = [];
-          }
-          printPagesData.arrPages = printPagesData.arrPages.concat(arrPages);
-        }
+        ws.calcPagesPrint(wb.getWorksheet(i).PagePrintOptions, false, i, printPagesData.arrPages);
       }
     } else if (printType === Asc.c_oAscPrintType.Selection) {
       activeWs = wb.getActive();
       ws = this.getWorksheet(activeWs);
-      printPagesData.arrPages =
-        ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/true, /*indexWorksheet*/
-          activeWs);
+      ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, true, activeWs, printPagesData.arrPages);
     }
 
+    if (AscCommonExcel.c_kMaxPrintPages === printPagesData.arrPages.length) {
+      this.handlers.trigger("asc_onError", c_oAscError.ID.PrintMaxPagesCount, c_oAscError.Level.NoCritical);
+    }
     return printPagesData;
   };
 
@@ -2462,7 +2454,7 @@
 
   WorkbookView.prototype.reInit = function() {
     var ws = this.getWorksheet();
-    ws._initCellsArea(/*fullRecalc*/true);
+    ws._initCellsArea(AscCommonExcel.recalcType.full);
     ws._updateVisibleColsCount();
     ws._updateVisibleRowsCount();
   };

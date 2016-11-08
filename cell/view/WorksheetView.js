@@ -642,7 +642,7 @@
 
     WorksheetView.prototype.resize = function (isUpdate) {
         if (isUpdate) {
-            this._initCellsArea(true);
+            this._initCellsArea(AscCommonExcel.recalcType.newLines);
             this._normalizeViewRange();
             this._prepareCellTextMetricsCache();
             this.updateResize = false;
@@ -663,7 +663,7 @@
             History.TurnOff();
             this.notUpdateRowHeight = true;
             this.cleanSelection();
-            this._initCellsArea(false);
+            this._initCellsArea(AscCommonExcel.recalcType.recalc);
             this._normalizeViewRange();
             this._cleanCellsTextMetricsCache();
             this._shiftVisibleRange();
@@ -683,7 +683,7 @@
     WorksheetView.prototype.changeZoomResize = function () {
         History.TurnOff();
         this.cleanSelection();
-        this._initCellsArea(true);
+        this._initCellsArea(AscCommonExcel.recalcType.full);
         this._normalizeViewRange();
         this._cleanCellsTextMetricsCache();
         this._shiftVisibleRange();
@@ -1166,7 +1166,7 @@
         this._initConstValues();
         this._initWorksheetDefaultWidth();
         this._initPane();
-        this._initCellsArea(true);
+        this._initCellsArea(AscCommonExcel.recalcType.full);
         this.af_setStyleAfterOpen();
         this._cleanCellsTextMetricsCache();
         this._prepareCellTextMetricsCache();
@@ -1236,11 +1236,11 @@
         this.height_4px = asc_calcnpt(0, ppiY, 4/*px*/);
     };
 
-    WorksheetView.prototype._initCellsArea = function (fullRecalc) {
+    WorksheetView.prototype._initCellsArea = function (type) {
         // calculate rows heights and visible rows
         if (!(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight)) {
             this._calcHeaderRowHeight();
-            this._calcHeightRows(fullRecalc ? 1 : 0);
+            this._calcHeightRows(type);
         }
         this.visibleRange.r2 = 0;
         this._calcVisibleRows();
@@ -1249,7 +1249,7 @@
         // calculate columns widths and visible columns
         if (!(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight)) {
             this._calcHeaderColumnWidth();
-            this._calcWidthColumns(fullRecalc ? 1 : 0);
+            this._calcWidthColumns(type);
         }
         this.visibleRange.c2 = 0;
         this._calcVisibleColumns();
@@ -1297,9 +1297,9 @@
      * @param {Number} mcw  Количество символов
      * @returns {Number}    Ширина столбца в пунктах (pt)
      */
-    WorksheetView.prototype._modelColWidthToColWidth = function ( mcw ) {
-        var px = asc_floor( ((256 * mcw + asc_floor( 128 / this.maxDigitWidth )) / 256) * this.maxDigitWidth );
-        return px * asc_getcvt( 0/*px*/, 1/*pt*/, 96 );
+    WorksheetView.prototype._modelColWidthToColWidth = function (mcw) {
+        var px = asc_floor(((256 * mcw + asc_floor(128 / this.maxDigitWidth)) / 256) * this.maxDigitWidth);
+        return px * asc_getcvt(0/*px*/, 1/*pt*/, 96);
     };
 
     /**
@@ -1319,14 +1319,15 @@
      * @param {Number} w  Ширина столбца в символах
      * @returns {Number}  Ширина столбца в пунктах (pt)
      */
-    WorksheetView.prototype._calcColWidth = function ( w ) {
+    WorksheetView.prototype._calcColWidth = function (w) {
         var t = this;
         var res = {};
         var useDefault = w === undefined || w === null || w === -1;
         var width;
-        res.width = useDefault ? t.defaultColWidth : (width = t._modelColWidthToColWidth( w ), (width < t.width_1px ? 0 : width));
-        res.innerWidth = Math.max( res.width - this.width_padding * 2 - this.width_1px, 0 );
-        res.charCount = t._colWidthToCharCount( res.width );
+        res.width =
+          useDefault ? t.defaultColWidth : (width = t._modelColWidthToColWidth(w), (width < t.width_1px ? 0 : width));
+        res.innerWidth = Math.max(res.width - this.width_padding * 2 - this.width_1px, 0);
+        res.charCount = t._colWidthToCharCount(res.width);
         return res;
     };
 
@@ -1373,26 +1374,26 @@
 
     /**
      * Вычисляет ширину и позицию колонок (в pt)
-     * @param {Number} fullRecalc  0 - без пересчета; 1 - пересчитываем все; 2 - пересчитываем новые строки
+     * @param {AscCommonExcel.recalcType} type
      */
-    WorksheetView.prototype._calcWidthColumns = function (fullRecalc) {
+    WorksheetView.prototype._calcWidthColumns = function (type) {
         var x = this.cellsLeft;
         var visibleW = this.drawingCtx.getWidth();
-        var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
-        var l = Math.max(this.model.getColsCount() + 1, this.nColsCount, obr.maxCol);
+        var maxColObjects = this.objectRender ? this.objectRender.getMaxColRow().col : -1;
+        var l = Math.max(this.model.getColsCount() + 1, this.nColsCount, maxColObjects);
         var i = 0, w, column, isBestFit, hiddenW = 0;
 
         // Берем дефалтовую ширину документа
         var defaultWidth = this.model.getDefaultWidth();
         defaultWidth = (typeof defaultWidth === "number" && defaultWidth >= 0) ? defaultWidth : -1;
 
-        if (1 === fullRecalc) {
+        if (AscCommonExcel.recalcType.full === type) {
             this.cols = [];
-        } else if (2 === fullRecalc) {
+        } else if (AscCommonExcel.recalcType.newLines === type) {
             i = this.cols.length;
             x = this.cols[i - 1].left + this.cols[i - 1].width;
         }
-        for (; ((0 !== fullRecalc) ? i < l || x + hiddenW < visibleW : i < this.cols.length) && i < gc_nMaxCol; ++i) {
+        for (; ((AscCommonExcel.recalcType.recalc !== type) ? i < l || x + hiddenW < visibleW : i < this.cols.length) && i < gc_nMaxCol; ++i) {
             // Получаем свойства колонки
             column = this.model._getColNoEmptyWithAll(i);
             if (!column) {
@@ -1417,24 +1418,25 @@
 
     /**
      * Вычисляет высоту и позицию строк (в pt)
-     * @param {Number} fullRecalc  0 - без пересчета; 1 - пересчитываем все; 2 - пересчитываем новые строки
+     * @param {AscCommonExcel.recalcType} type
      */
-    WorksheetView.prototype._calcHeightRows = function (fullRecalc) {
+    WorksheetView.prototype._calcHeightRows = function (type) {
         var y = this.cellsTop;
         var visibleH = this.drawingCtx.getHeight();
-        var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
-        var l = Math.max(this.model.getRowsCount() + 1, this.nRowsCount, obr.maxRow);
+        var maxRowObjects = this.objectRender ? this.objectRender.getMaxColRow().row : -1;
+        var l = Math.max(this.model.getRowsCount() + 1, this.nRowsCount, maxRowObjects);
         var defaultH = this.defaultRowHeight;
         var i = 0, h, hR, isCustomHeight, row, hiddenH = 0;
 
-        if (1 === fullRecalc) {
+        if (AscCommonExcel.recalcType.full === type) {
             this.rows = [];
-        } else if (2 === fullRecalc) {
+        } else if (AscCommonExcel.recalcType.newLines === type) {
             i = this.rows.length;
             y = this.rows[i - 1].top + this.rows[i - 1].height;
         }
         // ToDo calc all rows (not visible)
-        for (; ((0 !== fullRecalc) ? i < l || y + hiddenH < visibleH : i < this.rows.length) && i < gc_nMaxRow; ++i) {
+        for (; ((AscCommonExcel.recalcType.recalc !== type) ? i < l || y + hiddenH < visibleH : i < this.rows.length) &&
+               i < gc_nMaxRow; ++i) {
             row = this.model._getRowNoEmptyWithAll(i);
             if (!row) {
                 h = -1; // Будет использоваться дефолтная высота строки
@@ -1458,7 +1460,7 @@
             this.rows[i] = {
                 top: y,
                 height: h,												// Высота с точностью до 1 px
-                heightReal: hR,											// Реальная высота из файла (может быть не кратна 1 px, в Excel можно выставить через меню строки)
+                heightReal: hR,										// Реальная высота из файла (может быть не кратна 1 px, в Excel можно выставить через меню строки)
                 descender: this.defaultRowDescender,
                 isCustomHeight: isCustomHeight
             };
@@ -1641,7 +1643,7 @@
     };
 
     // ----- Drawing for print -----
-    WorksheetView.prototype.calcPagesPrint = function(pageOptions, printOnlySelection, indexWorksheet) {
+    WorksheetView.prototype.calcPagesPrint = function(pageOptions, printOnlySelection, indexWorksheet, arrPages) {
         var range;
         var maxCols = this.model.getColsCount();
         var maxRows = this.model.getRowsCount();
@@ -1654,31 +1656,56 @@
         if (null === selectionRange) {
             range = new asc_Range(0, 0, maxCols, maxRows);
             this._prepareCellTextMetricsCache(range);
-            for (var c = 0; c < maxCols; ++c) {
-                for (var r = 0; r < maxRows; ++r) {
-                    if (!this._isCellEmptyOrMergedOrBackgroundColorOrBorders(c, r)) {
-                        var rightSide = 0;
+
+            var rowModel, rowCells, rowCache, rightSide, c;
+            for (var r = 0; r <= maxRows; ++r) {
+                if (this.height_1px > this.rows[r].height) {
+                    continue;
+                }
+                // Теперь получаем только не пустые ячейки для строки
+                rowModel = this.model._getRowNoEmpty(r);
+                if (null === rowModel) {
+                    continue;
+                }
+                rowCache = this._getRowCache(r);
+                rowCells = rowModel.getCells();
+                for (c in rowCells) {
+                    c = c - 0;
+                    if (this.width_1px > this.cols[c].width) {
+                        continue;
+                    }
+
+                    var style = rowCells[c].getStyle();
+                    if (style && (null !== style.fill || (null !== style.border && style.border.notEmpty()))) {
+                        lastC = Math.max(lastC, c);
+                        lastR = Math.max(lastR, r);
+                    }
+                    if (rowCache && rowCache.columnsWithText[c]) {
+                        rightSide = 0;
                         var ct = this._getCellTextCache(c, r);
                         if (ct !== undefined) {
                             if (!ct.flags.isMerged() && !ct.flags.wrapText) {
                                 rightSide = ct.sideR;
                             }
-                        }
 
-                        lastC = Math.max(lastC, c + rightSide);
-                        lastR = Math.max(lastR, r);
+                            lastC = Math.max(lastC, c + rightSide);
+                            lastR = Math.max(lastR, r);
+                        }
                     }
                 }
             }
+            var maxCell = this.model.autoFilters.getMaxColRow();
+            lastC = Math.max(lastC, maxCell.col);
+            lastR = Math.max(lastR, maxCell.row);
+
             maxCols = lastC + 1;
             maxRows = lastR + 1;
 
             // Получаем максимальную колонку/строку для изображений/чатов
-            var maxObjectsCoord = this.objectRender.getDrawingAreaMetrics();
-            if (maxObjectsCoord) {
-                maxCols = Math.max(maxCols, maxObjectsCoord.maxCol);
-                maxRows = Math.max(maxRows, maxObjectsCoord.maxRow);
-            }
+            maxCell = this.objectRender.getMaxColRow();
+            maxCols = Math.max(maxCols, maxCell.col);
+            maxRows = Math.max(maxRows, maxCell.row);
+
         } else {
             maxCols = selectionRange.c2 + 1;
             maxRows = selectionRange.r2 + 1;
@@ -1747,7 +1774,6 @@
             pageHeight = tmp;
         }
 
-        var arrResult = [];
         if (0 === maxCols || 0 === maxRows) {
             // Ничего нет, возвращаем пустой массив
             return null;
@@ -1777,7 +1803,7 @@
             var bIsAddOffset = false;
             var nCountOffset = 0;
 
-            while (true) {
+            while (AscCommonExcel.c_kMaxPrintPages > arrPages.length) {
                 if (currentColIndex === maxCols && currentRowIndex === maxRows) {
                     break;
                 }
@@ -1901,11 +1927,9 @@
                     }
                 }
 
-                arrResult.push(newPagePrint);
+                arrPages.push(newPagePrint);
             }
         }
-
-        return arrResult;
     };
     WorksheetView.prototype.drawForPrint = function(drawingCtx, printPagesData) {
         var isAppBridge = (undefined != window['appBridge']);
@@ -4467,20 +4491,21 @@
         }
 
         var angle = c.getAngle();
+        var va = c.getAlignVertical().toLowerCase();
         if (this._isCellEmptyTextString(c)) {
             if (!angle && c.isNotDefaultFont()) {
                 // Пустая ячейка с измененной гарнитурой или размером, учитвается в высоте
                 str = c.getValue2();
                 if (0 < str.length) {
                     strCopy = str[0];
-                    if (!(tm = AscCommonExcel.g_oCacheMeasureEmpty.get(strCopy))) {
+                    if (!(tm = AscCommonExcel.g_oCacheMeasureEmpty.get(strCopy.format))) {
                         // Без текста не будет толка
                         strCopy = strCopy.clone();
                         strCopy.text = 'A';
                         tm = this._roundTextMetrics(this.stringRender.measureString([strCopy], fl));
-                        AscCommonExcel.g_oCacheMeasureEmpty.add(strCopy, tm);
+                        AscCommonExcel.g_oCacheMeasureEmpty.add(strCopy.format, tm);
                     }
-                    this._updateRowHeight(tm, col, row, isMerged, fMergedRows);
+                    this._updateRowHeight(tm, col, row, fl, isMerged, fMergedRows, va);
                 }
             }
 
@@ -4553,7 +4578,6 @@
         // ToDo dDigitsCount нужно рассчитывать исходя не из дефалтового шрифта и размера, а исходя из текущего шрифта и размера ячейки
         str = c.getValue2(dDigitsCount, makeFnIsGoodNumFormat(fl, colWidth));
         var ha = c.getAlignHorizontalByValue().toLowerCase();
-        var va = c.getAlignVertical().toLowerCase();
         var maxW = fl.wrapText || fl.shrinkToFit || isMerged || asc.isFixedWidthCell(str) ?
           this._calcMaxWidth(col, row, mc) : undefined;
         tm = this._roundTextMetrics(this.stringRender.measureString(str, fl, maxW));
@@ -5284,7 +5308,7 @@
         }
 
         function findEOT() {
-            var obr = t.objectRender ? t.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
+            var obr = t.objectRender ? t.objectRender.getMaxColRow() : new AscCommon.CellBase(-1, -1);
             var maxCols = t.model.getColsCount();
             var maxRows = t.model.getRowsCount();
             var lastC = -1, lastR = -1;
@@ -5297,7 +5321,7 @@
                     }
                 }
             }
-            return {col: Math.max(lastC, obr.maxCol), row: Math.max(lastR, obr.maxRow)};
+            return {col: Math.max(lastC, obr.col), row: Math.max(lastR, obr.row)};
         }
 
         var eot = dc > +2.0001 && dc < +2.9999 && dr > +2.0001 && dr < +2.9999 ? findEOT() : null;
@@ -5347,11 +5371,11 @@
 
         if (newCol >= t.cols.length && newCol <= gc_nMaxCol0) {
             t.nColsCount = newCol + 1;
-            t._calcWidthColumns(/*fullRecalc*/2);
+            t._calcWidthColumns(AscCommonExcel.recalcType.newLines);
         }
         if (newRow >= t.rows.length && newRow <= gc_nMaxRow0) {
             t.nRowsCount = newRow + 1;
-            t._calcHeightRows(/*fullRecalc*/2);
+            t._calcHeightRows(AscCommonExcel.recalcType.newLines);
         }
 
         return {
@@ -7122,7 +7146,7 @@
             objectInfo.angle = angle;
 
             objectInfo.font = new asc_CFont();
-            objectInfo.font.name = textPr.FontFamily ? textPr.FontFamily.Name : "";
+            objectInfo.font.name = textPr.FontFamily ? textPr.FontFamily.Name : null;
             objectInfo.font.size = textPr.FontSize;
             objectInfo.font.bold = textPr.Bold;
             objectInfo.font.italic = textPr.Italic;
@@ -7153,8 +7177,8 @@
         } else {
             // Может быть не задано текста, поэтому выставим по умолчанию
             objectInfo.font = new asc_CFont();
-            objectInfo.font.name = this.model.getDefaultFontName();
-            objectInfo.font.size = this.model.getDefaultFontSize();
+            objectInfo.font.name = null;
+            objectInfo.font.size = null;
         }
 
         // Заливка не нужна как таковая
@@ -8002,21 +8026,29 @@
                           oCanPromote);
                         // Вызываем функцию пересчета для заголовков форматированной таблицы
                         t.model.autoFilters.renameTableColumn(arn);
+
+                        // Сбрасываем параметры автозаполнения
+                        t.activeFillHandle = null;
+                        t.fillHandleDirection = -1;
+
+                        // Обновляем выделенные ячейки
+                        t.isChanged = true;
+                        t._updateCellsRange(arn);
+                        History.SetSelection(range.bbox.clone());
+                        History.SetSelectionRedo(oCanPromote.to.clone());
                         History.EndTransaction();
                     } else {
                         t.handlers.trigger("onErrorEvent", c_oAscError.ID.CannotFillRange,
                           c_oAscError.Level.NoCritical);
                         t.model.selectionRange.assign2(range.bbox);
+
+                        // Сбрасываем параметры автозаполнения
+                        t.activeFillHandle = null;
+                        t.fillHandleDirection = -1;
+
+                        t.updateSelection();
                     }
                 }
-
-                // Сбрасываем параметры автозаполнения
-                t.activeFillHandle = null;
-                t.fillHandleDirection = -1;
-
-                // Обновляем выделенные ячейки
-                t.isChanged = true;
-                t._updateCellsRange(arn);
             };
 
             // Можно ли применять автозаполнение ?
@@ -9802,7 +9834,7 @@
         var checkRange = arn.getAllRange();
 
         var range;
-        var fullRecalc = false;
+        var oRecalcType = AscCommonExcel.recalcType.recalc;
         var reinitRanges = false;
         var updateDrawingObjectsInfo = null;
         var updateDrawingObjectsInfo2 = null;//{bInsert: false, operType: c_oAscInsertOptions.InsertColumns, updateRange: arn}
@@ -9819,8 +9851,8 @@
 
             asc_applyFunction(functionModelAction);
 
-            t._initCellsArea(fullRecalc);
-            if (fullRecalc) {
+            t._initCellsArea(oRecalcType);
+            if (oRecalcType) {
                 t.cache.reset();
             }
             t._cleanCellsTextMetricsCache();
@@ -9859,7 +9891,7 @@
                 functionModelAction = function () {
                     t.model.setColWidth(val, checkRange.c1, checkRange.c2);
                     isUpdateCols = true;
-                    fullRecalc = true;
+                    oRecalcType = AscCommonExcel.recalcType.full;
                     reinitRanges = true;
                     updateDrawingObjectsInfo = {target: c_oTargetType.ColumnResize, col: checkRange.c1};
                 };
@@ -9868,7 +9900,7 @@
             case "showCols":
                 functionModelAction = function () {
                     t.model.setColHidden(/*bHidden*/false, arn.c1, arn.c2);
-                    fullRecalc = true;
+                    oRecalcType = AscCommonExcel.recalcType.full;
                     reinitRanges = true;
                     updateDrawingObjectsInfo = {target: c_oTargetType.ColumnResize, col: arn.c1};
                 };
@@ -9878,7 +9910,7 @@
             case "hideCols":
                 functionModelAction = function () {
                     t.model.setColHidden(/*bHidden*/true, arn.c1, arn.c2);
-                    fullRecalc = true;
+                    oRecalcType = AscCommonExcel.recalcType.full;
                     reinitRanges = true;
                     updateDrawingObjectsInfo = {target: c_oTargetType.ColumnResize, col: arn.c1};
                 };
@@ -9892,7 +9924,7 @@
                     val = (val | val) * 0.75;		// 0.75 - это размер 1px в pt (можно было 96/72)
                     t.model.setRowHeight(Math.min(val, t.maxRowHeight), checkRange.r1, checkRange.r2, true);
                     isUpdateRows = true;
-                    fullRecalc = true;
+                    oRecalcType = AscCommonExcel.recalcType.full;
                     reinitRanges = true;
                     updateDrawingObjectsInfo = {target: c_oTargetType.RowResize, row: checkRange.r1};
                 };
@@ -9901,7 +9933,7 @@
                 functionModelAction = function () {
                     t.model.setRowHidden(/*bHidden*/false, arn.r1, arn.r2);
                     t.model.autoFilters.reDrawFilter(arn);
-                    fullRecalc = true;
+                    oRecalcType = AscCommonExcel.recalcType.full;
                     reinitRanges = true;
                     updateDrawingObjectsInfo = {target: c_oTargetType.RowResize, row: arn.r1};
                 };
@@ -9912,7 +9944,7 @@
                 functionModelAction = function () {
                     t.model.setRowHidden(/*bHidden*/true, arn.r1, arn.r2);
                     t.model.autoFilters.reDrawFilter(arn);
-                    fullRecalc = true;
+                    oRecalcType = AscCommonExcel.recalcType.full;
                     reinitRanges = true;
                     updateDrawingObjectsInfo = {target: c_oTargetType.RowResize, row: arn.r1};
                 };
@@ -9933,7 +9965,7 @@
                             History.Create_NewPoint();
                             History.StartTransaction();
                             if (range.addCellsShiftRight()) {
-                                fullRecalc = true;
+                                oRecalcType = AscCommonExcel.recalcType.full;
                                 reinitRanges = true;
                                 t.cellCommentator.updateCommentsDependencies(true, val, arn);
                                 updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
@@ -9955,7 +9987,7 @@
                             History.Create_NewPoint();
                             History.StartTransaction();
                             if (range.addCellsShiftBottom()) {
-                                fullRecalc = true;
+                                oRecalcType = AscCommonExcel.recalcType.full;
                                 reinitRanges = true;
                                 t.cellCommentator.updateCommentsDependencies(true, val, arn);
                                 updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
@@ -9977,7 +10009,7 @@
                         functionModelAction = function () {
                             History.Create_NewPoint();
                             History.StartTransaction();
-                            fullRecalc = true;
+                            oRecalcType = AscCommonExcel.recalcType.full;
                             reinitRanges = true;
                             t.model.insertColsBefore(arn.c1, arn.c2 - arn.c1 + 1);
                             updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
@@ -9991,7 +10023,7 @@
                         break;
                     case c_oAscInsertOptions.InsertRows:
                         functionModelAction = function () {
-                            fullRecalc = true;
+                            oRecalcType = AscCommonExcel.recalcType.full;
                             reinitRanges = true;
                             t.model.insertRowsBefore(arn.r1, arn.r2 - arn.r1 + 1);
                             updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
@@ -10071,7 +10103,7 @@
                         }
 
                         functionModelAction = function () {
-                            fullRecalc = true;
+                            oRecalcType = AscCommonExcel.recalcType.full;
                             reinitRanges = true;
                             History.Create_NewPoint();
                             History.StartTransaction();
@@ -10095,7 +10127,7 @@
                         }
 
                         functionModelAction = function () {
-                            fullRecalc = true;
+                            oRecalcType = AscCommonExcel.recalcType.full;
                             reinitRanges = true;
                             History.Create_NewPoint();
                             History.StartTransaction();
@@ -10120,7 +10152,7 @@
 
                     isUpdateCols = true;
                     isUpdateRows = true;
-                    fullRecalc = true;
+                    oRecalcType = AscCommonExcel.recalcType.full;
                     reinitRanges = true;
                 };
 
@@ -10128,7 +10160,6 @@
                 break;
             case "update":
                 if (val !== undefined) {
-                    fullRecalc = !!val.fullRecalc;
                     lockDraw = true === val.lockDraw;
                     reinitRanges = !!val.reinitRanges;
                 }
@@ -10138,8 +10169,8 @@
     };
 
     WorksheetView.prototype.expandColsOnScroll = function (isNotActive, updateColsCount, newColsCount) {
-        var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
-        var maxc = Math.max(this.model.getColsCount() + 1, this.cols.length, obr.maxCol);
+        var maxColObjects = this.objectRender ? this.objectRender.getMaxColRow().col : -1;
+        var maxc = Math.max(this.model.getColsCount() + 1, this.cols.length, maxColObjects);
         if (newColsCount) {
             maxc = Math.max(maxc, newColsCount);
         }
@@ -10159,7 +10190,7 @@
             this.nColsCount = gc_nMaxCol;
         }
 
-        this._calcWidthColumns(/*fullRecalc*/2);
+        this._calcWidthColumns(AscCommonExcel.recalcType.newLines);
 
         if (this.objectRender && this.objectRender.drawingArea) {
             this.objectRender.drawingArea.reinitRanges();
@@ -10169,8 +10200,8 @@
     };
 
     WorksheetView.prototype.expandRowsOnScroll = function (isNotActive, updateRowsCount, newRowsCount) {
-        var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
-        var maxr = Math.max(this.model.getRowsCount() + 1, this.rows.length, obr.maxRow);
+        var maxRowObjects = this.objectRender ? this.objectRender.getMaxColRow().row : -1;
+        var maxr = Math.max(this.model.getRowsCount() + 1, this.rows.length, maxRowObjects);
         if (newRowsCount) {
             maxr = Math.max(maxr, newRowsCount);
         }
@@ -10190,7 +10221,7 @@
             this.nRowsCount = gc_nMaxRow;
         }
 
-        this._calcHeightRows(/*fullRecalc*/2);
+        this._calcHeightRows(AscCommonExcel.recalcType.newLines);
         if (this.objectRender && this.objectRender.drawingArea) {
             this.objectRender.drawingArea.reinitRanges();
         }
@@ -10379,7 +10410,7 @@
             History.EndTransaction();
 
             t.nRowsCount = 0;
-            t._calcHeightRows(/*fullRecalc*/0);
+            t._calcHeightRows(AscCommonExcel.recalcType.recalc);
             t._updateVisibleRowsCount();
             t._cleanCache(new asc_Range(0, row1, t.cols.length - 1, row2));
             t.changeWorksheet("update");
@@ -11247,7 +11278,7 @@
     WorksheetView.prototype._recalculateAfterUpdate = function (arrChanged, lockDraw) {
         if (this.isChanged) {
             this.isChanged = false;
-            this._initCellsArea(true);
+            this._initCellsArea(AscCommonExcel.recalcType.full);
             this.cache.reset();
             this._cleanCellsTextMetricsCache();
             this._prepareCellTextMetricsCache();
@@ -11857,7 +11888,7 @@
             this.changeWorksheet("update");
         } else if (changeRowsOrMerge) {
             // Был merge, нужно обновить (ToDo)
-            this._initCellsArea(true);
+            this._initCellsArea(AscCommonExcel.recalcType.full);
             this.cache.reset();
             this._cleanCellsTextMetricsCache();
             this._prepareCellTextMetricsCache();
