@@ -161,7 +161,7 @@ CChangesParagraphAddItem.prototype.ReadFromBinary = function(Reader)
 	for (var nIndex = 0; nIndex < nCount; ++nIndex)
 	{
 		this.PosArray[nIndex] = Reader.GetLong();
-		this.Items[nIndex]    = g_oTableId.Get_ById(Reader.GetString2());
+		this.Items[nIndex]    = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 	}
 };
 CChangesParagraphAddItem.prototype.Load = function(Color)
@@ -176,7 +176,7 @@ CChangesParagraphAddItem.prototype.Load = function(Color)
 		{
 			if (para_Comment === Element.Type)
 			{
-				var Comment = g_oTableId.Get_ById(Element.CommentId);
+				var Comment = AscCommon.g_oTableId.Get_ById(Element.CommentId);
 
 				// При копировании не всегда сразу заполняется правильно CommentId
 				if (null != Comment && Comment instanceof CComment)
@@ -296,7 +296,7 @@ CChangesParagraphRemoveItem.prototype.ReadFromBinary = function(Reader)
 	for (var nIndex = 0; nIndex < nCount; ++nIndex)
 	{
 		this.PosArray[nIndex] = Reader.GetLong();
-		this.Items[nIndex]    = g_oTableId.Get_ById(Reader.GetString2());
+		this.Items[nIndex]    = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 	}
 };
 CChangesParagraphRemoveItem.prototype.Load = function(Color)
@@ -1101,12 +1101,12 @@ CChangesParagraphSectPr.prototype.ReadFromBinary = function(Reader)
 	var nFlags = Reader.GetLong();
 
 	if (nFlags & 1)
-		this.New = g_oTableId.Get_ById(Reader.GetString2());
+		this.New = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 	else
 		this.New = undefined;
 
 	if (nFlags & 2)
-		this.Old = g_oTableId.Get_ById(Reader.GetString2());
+		this.Old = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 	else
 		this.Old = undefined;
 };

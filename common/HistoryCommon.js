@@ -3391,4 +3391,31 @@
 		return true;
 	};
 	window['AscDFH'].CChangesBaseObjectValue = CChangesBaseObjectValue;
+	/**
+	 * Базовый класс для изменения числовых(long) значений.
+	 * @constructor
+	 * @extends {AscDFH.CChangesBaseProperty}
+	 */
+	function CChangesBaseStringValue(Class, Old, New, Color)
+	{
+		CChangesBaseStringValue.superclass.constructor.call(this, Class, Old, New, Color);
+	}
+	AscCommon.extendClass(CChangesBaseStringValue, CChangesBaseProperty);
+	CChangesBaseStringValue.prototype.WriteToBinary = function(Writer)
+	{
+		// String : New
+		// String : Old
+
+		Writer.WriteString2(this.New);
+		Writer.WriteString2(this.Old);
+	};
+	CChangesBaseStringValue.prototype.ReadFromBinary = function(Reader)
+	{
+		// String : New
+		// String : Old
+
+		this.New = Reader.WriteString2();
+		this.Old = Reader.WriteString2();
+	};
+	window['AscDFH'].CChangesBaseStringValue = CChangesBaseStringValue;
 })(window);
