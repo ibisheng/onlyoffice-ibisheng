@@ -2566,7 +2566,7 @@
     this.buffers.main.setFont(this.defaultFont);
     // Измеряем в pt
     this.stringRender.measureString("0123456789", {
-      wrapText: false, shrinkToFit: false, isMerged: false, textAlign: /*khaLeft*/"left"
+      wrapText: false, shrinkToFit: false, isMerged: false, textAlign: /*khaLeft*/AscCommon.align_Left
     });
 
     var ppiX = 96; // Мерить только с 96

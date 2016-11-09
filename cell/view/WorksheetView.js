@@ -116,20 +116,6 @@
     var kHeaderHighlighted = 2;
 
     /**
-     * text alignment style
-     * @const
-     */
-    var khaLeft = "left";
-    var khaCenter = "center";
-    var khaRight = "right";
-    var khaJustify = "justify";
-    var kvaTop = "top";
-    var kvaCenter = "center";
-    var kvaBottom = "bottom";
-
-    var kNone = "none";
-
-    /**
      * cursor styles
      * @const
      */
@@ -243,7 +229,7 @@
         this.wrapText = false;
         this.shrinkToFit = false;
         this.merged = null;
-        this.textAlign = kNone;
+        this.textAlign = null;
     }
 
     CellFlags.prototype.clone = function () {
@@ -2326,8 +2312,8 @@
         var sr = this.stringRender;
         var tm = this._roundTextMetrics(sr.measureString(text));
         var bl = y2WithoutBorder - (isColHeader ? this.defaultRowDescender : this.rows[index].descender);
-        var textX = this._calcTextHorizPos(x, x2WithoutBorder, tm, tm.width < w ? khaCenter : khaLeft);
-        var textY = this._calcTextVertPos(y, y2WithoutBorder, bl, tm, kvaBottom);
+        var textX = this._calcTextHorizPos(x, x2WithoutBorder, tm, tm.width < w ? AscCommon.align_Center : AscCommon.align_Left);
+        var textY = this._calcTextVertPos(y, y2WithoutBorder, bl, tm, Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM);
         if (drawingCtx) {
             ctx.AddClipRect(x, y, w, h);
             ctx.setFillStyle(st.color)
@@ -2791,20 +2777,20 @@
                 textAlign = this.stringRender.flags.textAlign;
                 if (isWrapped) {
                     if (ct.angle < 0) {
-                        if ('top' === ct.cellVA)
-                            this.stringRender.flags.textAlign = 'left';
-                        else if ('center' === ct.cellVA)
-                            this.stringRender.flags.textAlign = 'center';
-                        else if ('bottom' === ct.cellVA)
-                            this.stringRender.flags.textAlign = 'right';
+                        if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP === ct.cellVA)
+                            this.stringRender.flags.textAlign = AscCommon.align_Left;
+                        else if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR === ct.cellVA)
+                            this.stringRender.flags.textAlign = AscCommon.align_Center;
+                        else if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM === ct.cellVA)
+                            this.stringRender.flags.textAlign = AscCommon.align_Right;
                     }
                     else {
-                        if ('top' === ct.cellVA)
-                            this.stringRender.flags.textAlign = 'right';
-                        else if ('center' === ct.cellVA)
-                            this.stringRender.flags.textAlign = 'center';
-                        else if ('bottom' === ct.cellVA)
-                            this.stringRender.flags.textAlign = 'left';
+                        if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP === ct.cellVA)
+                            this.stringRender.flags.textAlign = AscCommon.align_Right;
+                        else if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR === ct.cellVA)
+                            this.stringRender.flags.textAlign = AscCommon.align_Center;
+                        else if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM === ct.cellVA)
+                            this.stringRender.flags.textAlign = AscCommon.align_Left;
                     }
                 }
 
@@ -2911,20 +2897,20 @@
                 textAlign = this.stringRender.flags.textAlign;
                 if (isWrapped) {
                     if (ct.angle < 0) {
-                        if ('top' === ct.cellVA)
-                            this.stringRender.flags.textAlign = 'left';
-                        else if ('center' === ct.cellVA)
-                            this.stringRender.flags.textAlign = 'center';
-                        else if ('bottom' === ct.cellVA)
-                            this.stringRender.flags.textAlign = 'right';
+                        if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP === ct.cellVA)
+                            this.stringRender.flags.textAlign = AscCommon.align_Left;
+                        else if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR === ct.cellVA)
+                            this.stringRender.flags.textAlign = AscCommon.align_Center;
+                        else if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM === ct.cellVA)
+                            this.stringRender.flags.textAlign = AscCommon.align_Right;
                     }
                     else {
-                        if ('top' === ct.cellVA)
-                            this.stringRender.flags.textAlign = 'right';
-                        else if ('center' === ct.cellVA)
-                            this.stringRender.flags.textAlign = 'center';
-                        else if ('bottom' === ct.cellVA)
-                            this.stringRender.flags.textAlign = 'left';
+                        if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP === ct.cellVA)
+                            this.stringRender.flags.textAlign = AscCommon.align_Right;
+                        else if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR === ct.cellVA)
+                            this.stringRender.flags.textAlign = AscCommon.align_Center;
+                        else if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM === ct.cellVA)
+                            this.stringRender.flags.textAlign = AscCommon.align_Left;
                     }
                 }
 
@@ -4491,7 +4477,7 @@
         }
 
         var angle = c.getAngle();
-        var va = c.getAlignVertical().toLowerCase();
+        var va = c.getAlignVertical();
         if (this._isCellEmptyTextString(c)) {
             if (!angle && c.isNotDefaultFont()) {
                 // Пустая ячейка с измененной гарнитурой или размером, учитвается в высоте
@@ -4577,7 +4563,7 @@
 
         // ToDo dDigitsCount нужно рассчитывать исходя не из дефалтового шрифта и размера, а исходя из текущего шрифта и размера ячейки
         str = c.getValue2(dDigitsCount, makeFnIsGoodNumFormat(fl, colWidth));
-        var ha = c.getAlignHorizontalByValue().toLowerCase();
+        var ha = c.getAlignHorizontalByValue();
         var maxW = fl.wrapText || fl.shrinkToFit || isMerged || asc.isFixedWidthCell(str) ?
           this._calcMaxWidth(col, row, mc) : undefined;
         tm = this._roundTextMetrics(this.stringRender.measureString(str, fl, maxW));
@@ -4679,7 +4665,7 @@
       function (tm, col, row, flags, isMerged, fMergedRows, va, ha, angle, maxW, colWidth, textBound) {
           var rowInfo = this.rows[row], rowHeight;
           // update row's descender
-          if (va !== kvaTop && va !== kvaCenter && !isMerged) {
+          if (va !== Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP && va !== Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR && !isMerged) {
               rowInfo.descender = Math.max(rowInfo.descender, tm.height - tm.baseline);
           }
 
@@ -4731,9 +4717,9 @@
         var maxWidth = this.cols[col].width;
         var ls = 0, rs = 0;
         var pad = this.settings.cells.padding * asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
-        var textW = textAlign === khaCenter ? (textWidth + maxWidth) * 0.5 : textWidth + pad;
+        var textW = textAlign === AscCommon.align_Center ? (textWidth + maxWidth) * 0.5 : textWidth + pad;
 
-        if (textAlign === khaRight || textAlign === khaCenter) {
+        if (textAlign === AscCommon.align_Right || textAlign === AscCommon.align_Center) {
             sideL = this._calcCellsWidth(col, 0, row);
             // condition (sideL.lenght >= 1) is always true
             for (i = 0; i < sideL.length && textW > sideL[i]; ++i) {/* do nothing */
@@ -4741,7 +4727,7 @@
             ls = i !== sideL.length ? i : i - 1;
         }
 
-        if (textAlign !== khaRight) {
+        if (textAlign !== AscCommon.align_Right) {
             sideR = this._calcCellsWidth(col, this.cols.length - 1, row);
             // condition (sideR.lenght >= 1) is always true
             for (i = 0; i < sideR.length && textW > sideR[i]; ++i) {/* do nothing */
@@ -4749,10 +4735,10 @@
             rs = i !== sideR.length ? i : i - 1;
         }
 
-        if (textAlign === khaCenter) {
+        if (textAlign === AscCommon.align_Center) {
             maxWidth = (sideL[ls] - sideL[0]) + sideR[rs];
         } else {
-            maxWidth = textAlign === khaRight ? sideL[ls] : sideR[rs];
+            maxWidth = textAlign === AscCommon.align_Right ? sideL[ls] : sideR[rs];
         }
 
         return {
@@ -4887,7 +4873,7 @@
             fl.wrapText = c.getWrap();
             fl.shrinkToFit = c.getShrinkToFit();
             fl.merged = c.hasMerged();
-            fl.textAlign = c.getAlignHorizontalByValue().toLowerCase();
+            fl.textAlign = c.getAlignHorizontalByValue();
         }
         return fl;
     };
@@ -5236,11 +5222,11 @@
 
     WorksheetView.prototype._calcTextHorizPos = function (x1, x2, tm, halign) {
         switch (halign) {
-            case khaCenter:
+            case AscCommon.align_Center:
                 return asc_calcnpt(0.5 * (x1 + x2 + this.width_1px - tm.width), this._getPPIX());
-            case khaRight:
+            case AscCommon.align_Right:
                 return x2 + this.width_1px - this.width_padding - tm.width;
-            case khaJustify:
+            case AscCommon.align_Justify:
             default:
                 return x1 + this.width_padding;
         }
@@ -5248,9 +5234,9 @@
 
     WorksheetView.prototype._calcTextVertPos = function (y1, y2, baseline, tm, valign) {
         switch (valign) {
-            case kvaCenter:
+            case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR:
                 return asc_calcnpt(0.5 * (y1 + y2 - tm.height), this._getPPIY()) - this.height_1px; // ToDo возможно стоит тоже использовать 96
-            case kvaTop:
+            case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP:
                 return y1 - this.height_1px;
             default:
                 return baseline - tm.baseline;
@@ -5259,7 +5245,7 @@
 
     WorksheetView.prototype._calcTextWidth = function (x1, x2, tm, halign) {
         switch (halign) {
-            case khaJustify:
+            case AscCommon.align_Justify:
                 return x2 + this.width_1px - this.width_padding * 2 - x1;
             default:
                 return tm.width;
@@ -6943,7 +6929,7 @@
 
         var fc = c.getFontcolor();
         var bg = c.getFill();
-        var fa = c.getFontAlign().toLowerCase();
+        var fa = c.getFontAlign();
         var cellType = c.getType();
         var isNumberFormat = (!cellType || CellValueType.Number === cellType);
 
@@ -6953,8 +6939,8 @@
 
         cell_info.text = c.getValueForEdit();
 
-        cell_info.halign = c.getAlignHorizontal().toLowerCase();
-        cell_info.valign = c.getAlignVertical().toLowerCase();
+        cell_info.halign = AscCommonExcel.horizontalAlignToString(c.getAlignHorizontal());
+        cell_info.valign = AscCommonExcel.verticalAlignToString(c.getAlignVertical());
 
         var tablePartsOptions = selectionRange.isSingleRange() ?
           this.model.autoFilters.searchRangeInTableParts(selectionRange.getLast()) : -2;
@@ -7012,8 +6998,8 @@
         cell_info.font.italic = c.getItalic();
         cell_info.font.underline = (Asc.EUnderline.underlineNone !== c.getUnderline()); // ToDo убрать, когда будет реализовано двойное подчеркивание
         cell_info.font.strikeout = c.getStrikeout();
-        cell_info.font.subscript = fa === "subscript";
-        cell_info.font.superscript = fa === "superscript";
+        cell_info.font.subscript = fa === AscCommon.vertalign_SubScript;
+        cell_info.font.superscript = fa === AscCommon.vertalign_SuperScript;
         cell_info.font.color = (fc ? asc_obj2Color(fc) : new Asc.asc_CColor(c_opt.defaultState.color));
 
         cell_info.fill = new asc_CFill((null != bg) ? asc_obj2Color(bg) : bg);
@@ -7094,37 +7080,23 @@
         if (textPr && paraPr) {
             objectInfo.text = this.objectRender.controller.Get_SelectedText(true);
 
-            var horAlign = "center";
-            switch (paraPr.Jc) {
-                case AscCommon.align_Left    :
-                    horAlign = "left";
-                    break;
-                case AscCommon.align_Right  :
-                    horAlign = "right";
-                    break;
-                case AscCommon.align_Center  :
-                    horAlign = "center";
-                    break;
-                case AscCommon.align_Justify  :
-                    horAlign = "justify";
-                    break;
-            }
-            var vertAlign = "center";
+            var horAlign = paraPr.Jc;
+            var vertAlign = Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR;
             var shape_props = this.objectRender.controller.getDrawingProps().shapeProps;
             var angle = null;
             if (shape_props) {
                 switch (shape_props.verticalTextAlign) {
                     case AscFormat.VERTICAL_ANCHOR_TYPE_BOTTOM:
-                        vertAlign = "bottom";
+                        vertAlign = Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM;
                         break;
                     case AscFormat.VERTICAL_ANCHOR_TYPE_CENTER:
-                        vertAlign = "center";
+                        vertAlign = Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR;
                         break;
 
                     case AscFormat.VERTICAL_ANCHOR_TYPE_TOP:
                     case AscFormat.VERTICAL_ANCHOR_TYPE_DISTRIBUTED:
                     case AscFormat.VERTICAL_ANCHOR_TYPE_JUSTIFIED:
-                        vertAlign = "top";
+                        vertAlign = Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP;
                         break;
                 }
                 switch (shape_props.vert) {
@@ -7141,8 +7113,8 @@
 
             }
 
-            objectInfo.halign = horAlign;
-            objectInfo.valign = vertAlign;
+            objectInfo.halign = AscCommonExcel.horizontalAlignToString(horAlign);
+            objectInfo.valign = AscCommonExcel.verticalAlignToString(vertAlign);
             objectInfo.angle = angle;
 
             objectInfo.font = new asc_CFont();
@@ -11246,7 +11218,7 @@
                     h = Math.max(h, ct.metrics.height);
                 }
 
-                if (ct.cellVA !== kvaTop && ct.cellVA !== kvaCenter && !isMerged) {
+                if (ct.cellVA !== Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP && ct.cellVA !== Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR && !isMerged) {
                     d = Math.max(d, ct.metrics.height - ct.metrics.baseline);
                 }
             }

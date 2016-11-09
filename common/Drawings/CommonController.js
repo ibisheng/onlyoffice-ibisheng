@@ -1882,30 +1882,7 @@ DrawingObjectsController.prototype =
     },
 
     setCellAlign: function (align) {
-        var align_;
-        switch (align.toLowerCase())
-        {
-            case "left":
-            {
-                align_ = AscCommon.align_Left;
-                break;
-            }
-            case "right":
-            {
-                align_ = AscCommon.align_Right;
-                break;
-            }
-            case "center":
-            {
-                align_ = AscCommon.align_Center;
-                break;
-            }
-            case "justify":
-            {
-                align_ = AscCommon.align_Justify;
-            }
-        }
-        this.checkSelectedObjectsAndCallback(this.setParagraphAlign, [align_], false, AscDFH.historydescription_Spreadsheet_SetCellAlign);
+        this.checkSelectedObjectsAndCallback(this.setParagraphAlign, [align], false, AscDFH.historydescription_Spreadsheet_SetCellAlign);
     },
 
     setCellVertAlign: function (align) {
@@ -1913,27 +1890,27 @@ DrawingObjectsController.prototype =
         var vert_align;
         switch (align)
         {
-            case "bottom" :
+            case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM :
             {
                 vert_align = 0;
                 break;
             }
-            case "center" :
+            case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR :
             {
                 vert_align = 1;
                 break;
             }
-            case "distributed":
+            case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_DIST:
             {
                 vert_align = 1;
                 break;
             }
-            case "justify" :
+            case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_JUST :
             {
                 vert_align = 1;
                 break;
             }
-            case "top" :
+            case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP :
             {
                 vert_align = 4
             }
@@ -5501,7 +5478,7 @@ DrawingObjectsController.prototype =
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
             {
-                this.setCellAlign(ParaPr.Jc === AscCommon.align_Center ? "left" : "center" );
+                this.setCellAlign(ParaPr.Jc === AscCommon.align_Center ? AscCommon.align_Left : AscCommon.align_Center );
                 bRetValue = true;
             }
         }
@@ -5519,7 +5496,7 @@ DrawingObjectsController.prototype =
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
             {
-                drawingObjectsController.setCellAlign(ParaPr.Jc === AscCommon.align_Justify ? "left" : "justify" );
+                drawingObjectsController.setCellAlign(ParaPr.Jc === AscCommon.align_Justify ? AscCommon.align_Left : AscCommon.align_Justify );
                 bRetValue = true;
             }
         }
@@ -5534,7 +5511,7 @@ DrawingObjectsController.prototype =
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
             {
-                drawingObjectsController.setCellAlign(ParaPr.Jc === AscCommon.align_Left ? "justify" : "left");
+                drawingObjectsController.setCellAlign(ParaPr.Jc === AscCommon.align_Left ? AscCommon.align_Justify : AscCommon.align_Left);
                 bRetValue = true;
             }
 
@@ -5554,7 +5531,7 @@ DrawingObjectsController.prototype =
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
             {
-                drawingObjectsController.setCellAlign(ParaPr.Jc === AscCommon.align_Right ? "left" : "right");
+                drawingObjectsController.setCellAlign(ParaPr.Jc === AscCommon.align_Right ? AscCommon.align_Left : AscCommon.align_Right);
                 bRetValue = true;
             }
         }

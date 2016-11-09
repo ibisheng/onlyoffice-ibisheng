@@ -538,12 +538,20 @@
 							}
 
 							if (!cell.getWrap()) {td.style.whiteSpace = "nowrap";}else {td.style.whiteSpace = "normal";} 
-
-							if(cell.getAlignHorizontal() != 'none')
-								td.style.textAlign = cell.getAlignHorizontal();
-							td.style.verticalAlign = cell.getAlignVertical();
-							if(cell.getAlignVertical() == 'center')
-								td.style.verticalAlign = 'middle';
+							
+							switch (cell.getAlignHorizontal()) {
+								case AscCommon.align_Left: td.style.textAlign = "left"; break;
+								case AscCommon.align_Right: td.style.textAlign = "right"; break;
+								case AscCommon.align_Center: td.style.textAlign = "center"; break;
+								case AscCommon.align_Justify: td.style.textAlign = "justify"; break;
+							}
+							switch (cell.getAlignVertical()) {
+								case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM: td.style.verticalAlign = "bottom"; break;
+								case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR:
+								case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_DIST:
+								case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_JUST: td.style.verticalAlign = "middle"; break;
+								case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP: td.style.verticalAlign = "top"; break;
+							}
 
 							b = cell.getBorderFull();
 							if(mbbox)
@@ -663,7 +671,7 @@
 					if (f.b) {span.style.fontWeight = 'bold';}
 					if (f.i) {span.style.fontStyle = 'italic';}
 					span.style.textDecoration = getTextDecoration(f);
-					span.style.verticalAlign = f.va === 'subscript' ? 'sub' : f.va === 'superscript' ? 'super' : 'baseline';
+					span.style.verticalAlign = f.va === AscCommon.vertalign_SubScript ? 'sub' : f.va === AscCommon.vertalign_SuperScript ? 'super' : 'baseline';
 					span.innerHTML = span.innerHTML.replace(/\n/g,'<br>');
 					res.push(span);
 				}
@@ -2533,7 +2541,7 @@
 						i: false,
 						u: Asc.EUnderline.underlineNone,
 						s: false,
-						va: 'none'
+						va: null
 					},
 					text: ''});
 			}
@@ -2698,12 +2706,12 @@
 				//горизонтальное выравнивание
 				var horisonalAlign = this._getAlignHorisontal(paraPr);
 				if(horisonalAlign)
-					oNewItem.a = this._getAlignHorisontal(paraPr);
+					oNewItem.a = horisonalAlign;
 				else if(horisonalAlign == null)
 					oNewItem.wrap = true;
 					
 				//вертикальное выравнивание
-				oNewItem.va = "center";
+				oNewItem.va = Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR;
 					
 				//так же wrap выставляем у параграфа, чьим родителем является ячейка таблицы	
 				if(this._getParentByTag(paragraph, c_oAscBoundsElementType.Cell) != null)
@@ -2993,17 +3001,17 @@
 				{
 					case 0:
 					{
-						result = "right";
+						result = AscCommon.align_Right;
 						break;
 					}
 					case 1:
 					{
-						result = "left";
+						result = AscCommon.align_Left;
 						break;
 					}
 					case 2:
 					{
-						result = "center";
+						result = AscCommon.align_Center;
 						break;
 					}
 					case 3:
@@ -3011,7 +3019,7 @@
 						result = null;
 						break;
 					}
-				};
+				}
 				
 				return result;
 			},
@@ -3315,11 +3323,11 @@
 				var paragraphItalic = paraPr.TextPr.Italic;
 				var paragraphStrikeout = paraPr.TextPr.Strikeout;
 				var paragraphUnderline = paraPr.TextPr.Underline ? Asc.EUnderline.underlineSingle : Asc.EUnderline.underlineNone;
-				var paragraphVertAlign = "none";
+				var paragraphVertAlign = null;
 				if(paraPr.TextPr.VertAlign == 1)
-					paragraphVertAlign = "superscript";
+					paragraphVertAlign = AscCommon.vertalign_SuperScript;
 				else if(paraPr.TextPr.VertAlign == 2)
-					paragraphVertAlign = "subscript";
+					paragraphVertAlign = AscCommon.vertalign_SubScript;
 
 				var colorParagraph = new AscCommonExcel.RgbColor(this.clipboard._getBinaryColor("rgb(" + paraPr.TextPr.Color.r + "," + paraPr.TextPr.Color.g + "," + paraPr.TextPr.Color.b + ")"));
 				
@@ -3333,9 +3341,9 @@
 				
 				var verticalAlign;
 				if(cTextPr.VertAlign == 2)
-					verticalAlign = "subscript";
+					verticalAlign = AscCommon.vertalign_SubScript;
 				else if(cTextPr.VertAlign == 1)
-					verticalAlign = "superscript";
+					verticalAlign = AscCommon.vertalign_SuperScript;
 					
 				formatText = {
 					format: {

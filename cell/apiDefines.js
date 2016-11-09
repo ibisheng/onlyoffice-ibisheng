@@ -49,17 +49,6 @@ var c_oAscConfirm = {
   ConfirmPutMergeRange: 1
 };
 
-var c_oAscAlignType = {
-  NONE: "none",
-  LEFT: "left",
-  CENTER: "center",
-  RIGHT: "right",
-  JUSTIFY: "justify",
-  TOP: "top",
-  MIDDLE: "center",
-  BOTTOM: "bottom"
-};
-
 var c_oAscMergeOptions = {
   Unmerge: 0,
   Merge: 1,
@@ -380,7 +369,6 @@ var c_oAscPopUpSelectorType = {
 
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommonExcel'] = window['AscCommonExcel'] || {};
-  window['AscCommonExcel'].c_oAscAlignType = c_oAscAlignType;
   window['AscCommonExcel'].c_oAscDrawDepOptions = c_oAscDrawDepOptions;
   window['AscCommonExcel'].c_oAscGraphicOption = c_oAscGraphicOption;
   window['AscCommonExcel'].c_oAscLockTypeElem = c_oAscLockTypeElem;

@@ -2714,7 +2714,7 @@ var editor;
     if (ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellSubscript) {
       ws.objectRender.controller.setCellSubscript(isSubscript);
     } else {
-      this.wb.setFontAttributes("fa", isSubscript ? "subscript" : "none");
+      this.wb.setFontAttributes("fa", isSubscript ? AscCommon.vertalign_SubScript : null);
       this.wb.restoreFocus();
     }
   };
@@ -2724,27 +2724,29 @@ var editor;
     if (ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellSuperscript) {
       ws.objectRender.controller.setCellSuperscript(isSuperscript);
     } else {
-      this.wb.setFontAttributes("fa", isSuperscript ? "superscript" : "none");
+      this.wb.setFontAttributes("fa", isSuperscript ? AscCommon.vertalign_SuperScript : null);
       this.wb.restoreFocus();
     }
   };
 
   spreadsheet_api.prototype.asc_setCellAlign = function(align) {
+    var ha = AscCommonExcel.horizontalAlignFromString(align);
     var ws = this.wb.getWorksheet();
     if (ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellAlign) {
-      ws.objectRender.controller.setCellAlign(align);
+      ws.objectRender.controller.setCellAlign(ha);
     } else {
-      this.wb.getWorksheet().setSelectionInfo("a", align);
+      this.wb.getWorksheet().setSelectionInfo("a", ha);
       this.wb.restoreFocus();
     }
   };
 
   spreadsheet_api.prototype.asc_setCellVertAlign = function(align) {
+    var va = AscCommonExcel.verticalAlignFromString(align);
     var ws = this.wb.getWorksheet();
     if (ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellVertAlign) {
-      ws.objectRender.controller.setCellVertAlign(align);
+      ws.objectRender.controller.setCellVertAlign(va);
     } else {
-      this.wb.getWorksheet().setSelectionInfo("va", align);
+      this.wb.getWorksheet().setSelectionInfo("va", va);
       this.wb.restoreFocus();
     }
   };
