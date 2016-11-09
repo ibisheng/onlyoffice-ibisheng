@@ -118,6 +118,7 @@
         "../word/Editor/Run.js",
         "../word/Editor/RunChanges.js",
         "../word/Editor/Math.js",
+        "../word/Editor/MathChanges.js",
         "../word/Editor/Paragraph.js",
         "../word/Editor/ParagraphChanges.js",
         "../word/Editor/Paragraph_Recalculate.js",

@@ -167,6 +167,7 @@
 		"../word/Editor/HeaderFooterController.js",		
         "../word/Editor/HeaderFooter.js",
         "../word/Editor/Math.js",
+        "../word/Editor/MathChanges.js",
         "../word/Editor/Spelling.js",
 		"../word/Editor/Footnotes.js",
 		"../word/Editor/FootEndNote.js",								

@@ -1161,20 +1161,20 @@ CDegreeSubSup.prototype.protected_GetRangeEndPos = function(CurLine, CurRange)
 };
 CDegreeSubSup.prototype.Apply_MenuProps = function(Props)
 {
-    if(Props.Type == Asc.c_oAscMathInterfaceType.Script)
-    {
-        if(Props.ScriptType == Asc.c_oAscMathInterfaceScript.PreSubSup && this.Pr.type == DEGREE_SubSup)
-        {
-            AscCommon.History.Add(this, new CChangesMathDegreeSubSupType(DEGREE_PreSubSup, this.Pr.type));
-            this.raw_SetType(DEGREE_PreSubSup);
-        }
+	if (Props.Type == Asc.c_oAscMathInterfaceType.Script)
+	{
+		if (Props.ScriptType == Asc.c_oAscMathInterfaceScript.PreSubSup && this.Pr.type == DEGREE_SubSup)
+		{
+			AscCommon.History.Add(new CChangesMathDegreeSubSupType(this, this.Pr.type, DEGREE_PreSubSup));
+			this.raw_SetType(DEGREE_PreSubSup);
+		}
 
-        if(Props.ScriptType == Asc.c_oAscMathInterfaceScript.SubSup && this.Pr.type == DEGREE_PreSubSup)
-        {
-            AscCommon.History.Add(this, new CChangesMathDegreeSubSupType(DEGREE_SubSup, this.Pr.type));
-            this.raw_SetType(DEGREE_SubSup);
-        }
-    }
+		if (Props.ScriptType == Asc.c_oAscMathInterfaceScript.SubSup && this.Pr.type == DEGREE_PreSubSup)
+		{
+			AscCommon.History.Add(new CChangesMathDegreeSubSupType(this, this.Pr.type, DEGREE_SubSup));
+			this.raw_SetType(DEGREE_SubSup);
+		}
+	}
 };
 CDegreeSubSup.prototype.raw_SetType = function(type)
 {

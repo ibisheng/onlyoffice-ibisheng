@@ -1467,63 +1467,62 @@
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе ParaMath
 	//------------------------------------------------------------------------------------------------------------------
-	window['AscDFH'].historyitem_Math_AddItem               = window['AscDFH'].historyitem_type_Math | 1;
-	window['AscDFH'].historyitem_Math_RemoveItem            = window['AscDFH'].historyitem_type_Math | 2;
-	window['AscDFH'].historyitem_Math_CtrPrpFSize           = window['AscDFH'].historyitem_type_Math | 3;
-	window['AscDFH'].historyitem_Math_ParaJc                = window['AscDFH'].historyitem_type_Math | 4;
-	window['AscDFH'].historyitem_Math_CtrPrpShd             = window['AscDFH'].historyitem_type_Math | 5;
-	window['AscDFH'].historyitem_Math_AddItems_ToMathBase   = window['AscDFH'].historyitem_type_Math | 6;
-	window['AscDFH'].historyitem_Math_CtrPrpColor           = window['AscDFH'].historyitem_type_Math | 7;
-	window['AscDFH'].historyitem_Math_CtrPrpUnifill         = window['AscDFH'].historyitem_type_Math | 8;
-	window['AscDFH'].historyitem_Math_CtrPrpUnderline       = window['AscDFH'].historyitem_type_Math | 9;
-	window['AscDFH'].historyitem_Math_CtrPrpStrikeout       = window['AscDFH'].historyitem_type_Math | 10;
-	window['AscDFH'].historyitem_Math_CtrPrpDoubleStrikeout = window['AscDFH'].historyitem_type_Math | 11;
-	window['AscDFH'].historyitem_Math_CtrPrpItalic          = window['AscDFH'].historyitem_type_Math | 12;
-	window['AscDFH'].historyitem_Math_CtrPrpBold            = window['AscDFH'].historyitem_type_Math | 13;
-	window['AscDFH'].historyitem_Math_RFontsAscii           = window['AscDFH'].historyitem_type_Math | 14;
-	window['AscDFH'].historyitem_Math_RFontsHAnsi           = window['AscDFH'].historyitem_type_Math | 15;
-	window['AscDFH'].historyitem_Math_RFontsCS              = window['AscDFH'].historyitem_type_Math | 16;
-	window['AscDFH'].historyitem_Math_RFontsEastAsia        = window['AscDFH'].historyitem_type_Math | 17;
-	window['AscDFH'].historyitem_Math_RFontsHint            = window['AscDFH'].historyitem_type_Math | 18;
-	window['AscDFH'].historyitem_Math_CtrPrpHighLight       = window['AscDFH'].historyitem_type_Math | 19;
-	window['AscDFH'].historyitem_Math_ArgSize               = window['AscDFH'].historyitem_type_Math | 20;
-	window['AscDFH'].historyitem_Math_ReviewType            = window['AscDFH'].historyitem_type_Math | 21;
-	window['AscDFH'].historyitem_Math_CtrPrpTextFill        = window['AscDFH'].historyitem_type_Math | 22;
-	window['AscDFH'].historyitem_Math_CtrPrpTextOutline     = window['AscDFH'].historyitem_type_Math | 23;
-	window['AscDFH'].historyitem_Math_BoxAlnAt              = window['AscDFH'].historyitem_type_Math | 24;
-	window['AscDFH'].historyitem_Math_FractionType          = window['AscDFH'].historyitem_type_Math | 25;
-	window['AscDFH'].historyitem_Math_RadicalHideDegree     = window['AscDFH'].historyitem_type_Math | 26;
-	window['AscDFH'].historyitem_Math_NaryLimLoc            = window['AscDFH'].historyitem_type_Math | 27;
-	window['AscDFH'].historyitem_Math_NaryUpperLimit        = window['AscDFH'].historyitem_type_Math | 28;
-	window['AscDFH'].historyitem_Math_NaryLowerLimit        = window['AscDFH'].historyitem_type_Math | 29;
-	window['AscDFH'].historyitem_Math_DelimBegOper          = window['AscDFH'].historyitem_type_Math | 30;
-	window['AscDFH'].historyitem_Math_DelimEndOper          = window['AscDFH'].historyitem_type_Math | 31;
-	window['AscDFH'].historyitem_Math_BaseSetColumn         = window['AscDFH'].historyitem_type_Math | 32;
-	window['AscDFH'].historyitem_Math_BaseRemoveItems       = window['AscDFH'].historyitem_type_Math | 33;
-	window['AscDFH'].historyitem_Math_DelimiterGrow         = window['AscDFH'].historyitem_type_Math | 34;
-	window['AscDFH'].historyitem_Math_DelimiterShape        = window['AscDFH'].historyitem_type_Math | 35;
-	window['AscDFH'].historyitem_Math_GroupCharPr           = window['AscDFH'].historyitem_type_Math | 36;
-	window['AscDFH'].historyitem_Math_LimitType             = window['AscDFH'].historyitem_type_Math | 37;
-	window['AscDFH'].historyitem_Math_BorderBoxTop          = window['AscDFH'].historyitem_type_Math | 38;
-	window['AscDFH'].historyitem_Math_BorderBoxBot          = window['AscDFH'].historyitem_type_Math | 39;
-	window['AscDFH'].historyitem_Math_BorderBoxLeft         = window['AscDFH'].historyitem_type_Math | 40;
-	window['AscDFH'].historyitem_Math_BorderBoxRight        = window['AscDFH'].historyitem_type_Math | 41;
-	window['AscDFH'].historyitem_Math_BorderBoxHor          = window['AscDFH'].historyitem_type_Math | 42;
-	window['AscDFH'].historyitem_Math_BorderBoxVer          = window['AscDFH'].historyitem_type_Math | 43;
-	window['AscDFH'].historyitem_Math_BorderBoxTopLTR       = window['AscDFH'].historyitem_type_Math | 44;
-	window['AscDFH'].historyitem_Math_BorderBoxTopRTL       = window['AscDFH'].historyitem_type_Math | 45;
-	window['AscDFH'].historyitem_Math_MatrixAddRow          = window['AscDFH'].historyitem_type_Math | 46;
-	window['AscDFH'].historyitem_Math_MatrixRemoveRow       = window['AscDFH'].historyitem_type_Math | 47;
-	window['AscDFH'].historyitem_Math_MatrixAddColumn       = window['AscDFH'].historyitem_type_Math | 48;
-	window['AscDFH'].historyitem_Math_MatrixRemoveColumn    = window['AscDFH'].historyitem_type_Math | 49;
-	window['AscDFH'].historyitem_Math_MatrixBaseJc          = window['AscDFH'].historyitem_type_Math | 50;
-	window['AscDFH'].historyitem_Math_MatrixColumnJc        = window['AscDFH'].historyitem_type_Math | 51;
-	window['AscDFH'].historyitem_Math_MatrixInterval        = window['AscDFH'].historyitem_type_Math | 52;
-	window['AscDFH'].historyitem_Math_MatrixPlh             = window['AscDFH'].historyitem_type_Math | 53;
-	window['AscDFH'].historyitem_Math_MatrixMinColumnWidth  = window['AscDFH'].historyitem_type_Math | 54;
-	window['AscDFH'].historyitem_Math_BarLinePos            = window['AscDFH'].historyitem_type_Math | 55;
-	window['AscDFH'].historyitem_Math_BoxForcedBreak        = window['AscDFH'].historyitem_type_Math | 56;
-	window['AscDFH'].historyitem_Math_DegreeSubSupType      = window['AscDFH'].historyitem_type_Math | 57;
+	window['AscDFH'].historyitem_MathContent_AddItem      = window['AscDFH'].historyitem_type_Math | 101;
+	window['AscDFH'].historyitem_MathContent_RemoveItem   = window['AscDFH'].historyitem_type_Math | 102;
+	window['AscDFH'].historyitem_MathContent_ArgSize      = window['AscDFH'].historyitem_type_Math | 103;
+	window['AscDFH'].historyitem_MathPara_Jc              = window['AscDFH'].historyitem_type_Math | 201;
+	window['AscDFH'].historyitem_MathBase_AddItems        = window['AscDFH'].historyitem_type_Math | 301;
+	window['AscDFH'].historyitem_MathBase_RemoveItems     = window['AscDFH'].historyitem_type_Math | 302;
+	window['AscDFH'].historyitem_MathBase_FontSize        = window['AscDFH'].historyitem_type_Math | 303;
+	window['AscDFH'].historyitem_MathBase_Shd             = window['AscDFH'].historyitem_type_Math | 304;
+	window['AscDFH'].historyitem_MathBase_Color           = window['AscDFH'].historyitem_type_Math | 305;
+	window['AscDFH'].historyitem_MathBase_Unifill         = window['AscDFH'].historyitem_type_Math | 306;
+	window['AscDFH'].historyitem_MathBase_Underline       = window['AscDFH'].historyitem_type_Math | 307;
+	window['AscDFH'].historyitem_MathBase_Strikeout       = window['AscDFH'].historyitem_type_Math | 308;
+	window['AscDFH'].historyitem_MathBase_DoubleStrikeout = window['AscDFH'].historyitem_type_Math | 309;
+	window['AscDFH'].historyitem_MathBase_Italic          = window['AscDFH'].historyitem_type_Math | 310;
+	window['AscDFH'].historyitem_MathBase_Bold            = window['AscDFH'].historyitem_type_Math | 311;
+	window['AscDFH'].historyitem_MathBase_RFontsAscii     = window['AscDFH'].historyitem_type_Math | 312;
+	window['AscDFH'].historyitem_MathBase_RFontsHAnsi     = window['AscDFH'].historyitem_type_Math | 313;
+	window['AscDFH'].historyitem_MathBase_RFontsCS        = window['AscDFH'].historyitem_type_Math | 314;
+	window['AscDFH'].historyitem_MathBase_RFontsEastAsia  = window['AscDFH'].historyitem_type_Math | 315;
+	window['AscDFH'].historyitem_MathBase_RFontsHint      = window['AscDFH'].historyitem_type_Math | 316;
+	window['AscDFH'].historyitem_MathBase_HighLight       = window['AscDFH'].historyitem_type_Math | 317;
+	window['AscDFH'].historyitem_MathBase_ReviewType      = window['AscDFH'].historyitem_type_Math | 318;
+	window['AscDFH'].historyitem_MathBase_TextFill        = window['AscDFH'].historyitem_type_Math | 319;
+	window['AscDFH'].historyitem_MathBase_TextOutline     = window['AscDFH'].historyitem_type_Math | 320;
+	window['AscDFH'].historyitem_MathBox_AlnAt            = window['AscDFH'].historyitem_type_Math | 401;
+	window['AscDFH'].historyitem_MathBox_ForcedBreak      = window['AscDFH'].historyitem_type_Math | 402;
+	window['AscDFH'].historyitem_MathFraction_Type        = window['AscDFH'].historyitem_type_Math | 501;
+	window['AscDFH'].historyitem_MathRadical_HideDegree   = window['AscDFH'].historyitem_type_Math | 601;
+	window['AscDFH'].historyitem_MathNary_LimLoc          = window['AscDFH'].historyitem_type_Math | 701;
+	window['AscDFH'].historyitem_MathNary_UpperLimit      = window['AscDFH'].historyitem_type_Math | 702;
+	window['AscDFH'].historyitem_MathNary_LowerLimit      = window['AscDFH'].historyitem_type_Math | 703;
+	window['AscDFH'].historyitem_MathDelimiter_BegOper    = window['AscDFH'].historyitem_type_Math | 801;
+	window['AscDFH'].historyitem_MathDelimiter_EndOper    = window['AscDFH'].historyitem_type_Math | 802;
+	window['AscDFH'].historyitem_MathDelimiter_Grow       = window['AscDFH'].historyitem_type_Math | 803;
+	window['AscDFH'].historyitem_MathDelimiter_Shape      = window['AscDFH'].historyitem_type_Math | 804;
+	window['AscDFH'].historyitem_MathDelimiter_SetColumn  = window['AscDFH'].historyitem_type_Math | 805;
+	window['AscDFH'].historyitem_MathGroupChar_Pr         = window['AscDFH'].historyitem_type_Math | 901;
+	window['AscDFH'].historyitem_MathLimit_Type           = window['AscDFH'].historyitem_type_Math | 1001;
+	window['AscDFH'].historyitem_MathBorderBox_Top        = window['AscDFH'].historyitem_type_Math | 1101;
+	window['AscDFH'].historyitem_MathBorderBox_Bot        = window['AscDFH'].historyitem_type_Math | 1102;
+	window['AscDFH'].historyitem_MathBorderBox_Left       = window['AscDFH'].historyitem_type_Math | 1103;
+	window['AscDFH'].historyitem_MathBorderBox_Right      = window['AscDFH'].historyitem_type_Math | 1104;
+	window['AscDFH'].historyitem_MathBorderBox_Hor        = window['AscDFH'].historyitem_type_Math | 1105;
+	window['AscDFH'].historyitem_MathBorderBox_Ver        = window['AscDFH'].historyitem_type_Math | 1106;
+	window['AscDFH'].historyitem_MathBorderBox_TopLTR     = window['AscDFH'].historyitem_type_Math | 1107;
+	window['AscDFH'].historyitem_MathBorderBox_TopRTL     = window['AscDFH'].historyitem_type_Math | 1108;
+	window['AscDFH'].historyitem_MathBar_LinePos          = window['AscDFH'].historyitem_type_Math | 1201;
+	window['AscDFH'].historyitem_MathMatrix_AddRow        = window['AscDFH'].historyitem_type_Math | 1301;
+	window['AscDFH'].historyitem_MathMatrix_RemoveRow     = window['AscDFH'].historyitem_type_Math | 1302;
+	window['AscDFH'].historyitem_MathMatrix_AddColumn     = window['AscDFH'].historyitem_type_Math | 1303;
+	window['AscDFH'].historyitem_MathMatrix_RemoveColumn  = window['AscDFH'].historyitem_type_Math | 1304;
+	window['AscDFH'].historyitem_MathMatrix_BaseJc        = window['AscDFH'].historyitem_type_Math | 1305;
+	window['AscDFH'].historyitem_MathMatrix_ColumnJc      = window['AscDFH'].historyitem_type_Math | 1306;
+	window['AscDFH'].historyitem_MathMatrix_Interval      = window['AscDFH'].historyitem_type_Math | 1307;
+	window['AscDFH'].historyitem_MathMatrix_Plh           = window['AscDFH'].historyitem_type_Math | 1308;
+	window['AscDFH'].historyitem_MathDegree_SubSupType    = window['AscDFH'].historyitem_type_Math | 1401;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе ParaRun
 	//------------------------------------------------------------------------------------------------------------------
@@ -3168,8 +3167,8 @@
 		// 1-bit : Подсвечивать ли данные изменения
 		// 2-bit : IsUndefined New
 		// 3-bit : IsUndefined Old
-		// double : New
-		// double : Old
+		// long : New
+		// long : Old
 
 
 		var nFlags = Reader.GetLong();

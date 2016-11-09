@@ -1600,8 +1600,8 @@ CMathContent.prototype.GetParent = function()
 };
 CMathContent.prototype.SetArgSize = function(val)
 {
-    History.Add( this, { Type : AscDFH.historyitem_Math_ArgSize, New: val, Old: this.ArgSize.GetValue()});
-    this.ArgSize.SetValue(val);
+	History.Add(new CChangesMathContentArgSize(this, this.ArgSize.GetValue(), val));
+	this.ArgSize.SetValue(val);
 };
 CMathContent.prototype.GetArgSize = function()
 {
@@ -2117,14 +2117,14 @@ CMathContent.prototype.IsNormalTextInRuns = function()
 };
 CMathContent.prototype.Internal_Content_Add = function(Pos, Item, bUpdatePosition)
 {
-    Item.Set_ParaMath(this.ParaMath);
-    Item.Parent = this;
-    Item.Recalc_RunsCompiledPr();
+	Item.Set_ParaMath(this.ParaMath);
+	Item.Parent = this;
+	Item.Recalc_RunsCompiledPr();
 
-    History.Add( this, { Type : AscDFH.historyitem_Math_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
-    this.Content.splice( Pos, 0, Item );
+	History.Add(new CChangesMathContentAddItem(this, Pos, [Item]));
+	this.Content.splice(Pos, 0, Item);
 
-    this.private_UpdatePosOnAdd(Pos, bUpdatePosition);
+	this.private_UpdatePosOnAdd(Pos, bUpdatePosition);
 };
 CMathContent.prototype.private_UpdatePosOnAdd = function(Pos, bUpdatePosition)
 {
@@ -2229,38 +2229,38 @@ CMathContent.prototype.Concat_ToEnd = function(NewItems)
 };
 CMathContent.prototype.Concat_ToContent = function(Pos, NewItems)
 {
-    if(NewItems != undefined && NewItems.length > 0)
-    {
-        var Count = NewItems.length;
+	if (NewItems != undefined && NewItems.length > 0)
+	{
+		var Count = NewItems.length;
 
-        for(var i = 0; i < Count; i++)
-        {
-            NewItems[i].Set_ParaMath(this.ParaMath);
-            NewItems[i].Parent = this;
-            NewItems[i].Recalc_RunsCompiledPr();
-        }
+		for (var i = 0; i < Count; i++)
+		{
+			NewItems[i].Set_ParaMath(this.ParaMath);
+			NewItems[i].Parent = this;
+			NewItems[i].Recalc_RunsCompiledPr();
+		}
 
-        History.Add( this, { Type : AscDFH.historyitem_Math_AddItem, Pos : Pos, EndPos : Pos + Count - 1, Items : NewItems } );
+		History.Add(new CChangesMathContentAddItem(this, Pos, NewItems));
 
-        var Array_start = this.Content.slice(0, Pos);
-        var Array_end   = this.Content.slice(Pos);
+		var Array_start = this.Content.slice(0, Pos);
+		var Array_end   = this.Content.slice(Pos);
 
-        this.Content = Array_start.concat(NewItems, Array_end);
-    }
+		this.Content = Array_start.concat(NewItems, Array_end);
+	}
 };
 CMathContent.prototype.Remove_FromContent = function(Pos, Count)
 {
-    var DeletedItems = this.Content.splice(Pos, Count);
-    History.Add( this, { Type : AscDFH.historyitem_Math_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+	var DeletedItems = this.Content.splice(Pos, Count);
+	History.Add(new CChangesMathContentRemoveItem(this, Pos, DeletedItems));
 
-    // Обновим текущую позицию
-    if (this.CurPos > Pos + Count)
-        this.CurPos -= Count;
-    else if (this.CurPos > Pos )
-        this.CurPos = Pos;
+	// Обновим текущую позицию
+	if (this.CurPos > Pos + Count)
+		this.CurPos -= Count;
+	else if (this.CurPos > Pos)
+		this.CurPos = Pos;
 
-    this.private_CorrectCurPos();
-    this.private_UpdatePosOnRemove(Pos, Count);
+	this.private_CorrectCurPos();
+	this.private_UpdatePosOnRemove(Pos, Count);
 };
 CMathContent.prototype.private_UpdatePosOnRemove = function(Pos, Count)
 {
@@ -2392,212 +2392,7 @@ CMathContent.prototype.GetFirstElement = function()
 
     return first;
 };
-
 ////////////////////////////////////////////////////////////////
-
-CMathContent.prototype.Undo = function(Data)
-{
-    var type = Data.Type;
-
-    switch(type)
-    {
-        case AscDFH.historyitem_Math_AddItem:
-        {
-            this.Content.splice(Data.Pos, Data.EndPos - Data.Pos + 1);
-
-            break;
-        }
-        case AscDFH.historyitem_Math_RemoveItem:
-        {
-            var Pos = Data.Pos;
-
-            var Array_start = this.Content.slice(0, Pos);
-            var Array_end   = this.Content.slice(Pos);
-
-            this.Content = Array_start.concat(Data.Items, Array_end);
-
-            for(var i = 0; i < Data.Items.length; i++)
-                Data.Items[i].Recalc_RunsCompiledPr();
-
-            break;
-        }
-        case AscDFH.historyitem_Math_ArgSize:
-        {
-            this.ArgSize.SetValue(Data.Old);
-            this.Recalc_RunsCompiledPr();
-            break;
-        }
-    }
-};
-CMathContent.prototype.Redo = function(Data)
-{
-    var type = Data.Type;
-
-    switch(type)
-    {
-        case AscDFH.historyitem_Math_AddItem:
-        {
-            var Pos = Data.Pos;
-
-            var Array_start = this.Content.slice(0, Pos);
-            var Array_end   = this.Content.slice(Pos);
-
-            this.Content = Array_start.concat(Data.Items, Array_end);
-
-            for(var i = 0; i < Data.Items.length; i++)
-                Data.Items[i].Recalc_RunsCompiledPr();
-
-            break;
-        }
-        case AscDFH.historyitem_Math_RemoveItem:
-        {
-            this.Content.splice(Data.Pos, Data.EndPos - Data.Pos + 1);
-
-            break;
-        }
-        case AscDFH.historyitem_Math_ArgSize:
-        {
-            this.ArgSize.SetValue(Data.New);
-            this.Recalc_RunsCompiledPr();
-            break;
-        }
-    }
-};
-CMathContent.prototype.Save_Changes = function(Data, Writer)
-{
-    Writer.WriteLong(AscDFH.historyitem_type_MathContent);
-
-    var Type = Data.Type;
-    // Пишем тип
-    Writer.WriteLong(Type);
-
-    switch (Type)
-    {
-        case AscDFH.historyitem_Math_AddItem:
-        {
-            // Long     : Количество элементов
-            // Array of :
-            //  {
-            //    Long     : Позиция
-            //    Variable : Id элемента
-            //  }
-
-            var Count = Data.Items.length;
-
-            Writer.WriteLong(Count);
-
-            for (var Index = 0; Index < Count; Index++)
-            {
-                Writer.WriteLong(Data.Pos + Index);
-                Writer.WriteString2(Data.Items[Index].Get_Id());
-            }
-
-            break;
-        }
-        case AscDFH.historyitem_Math_RemoveItem:
-        {
-            // Long          : Количество удаляемых элементов
-            // Array of Long : позиции удаляемых элементов
-
-            var Count = Data.Items.length;
-
-            Writer.WriteLong(Count);
-            for (var Index = 0; Index < Count; Index++)
-            {
-                Writer.WriteLong(Data.Pos);
-            }
-
-            break;
-        }
-        case AscDFH.historyitem_Math_ArgSize:
-        {
-            if(undefined !== Data.New)
-            {
-                Writer.WriteBool( false );
-                Writer.WriteLong( Data.New );
-            }
-            else
-            {
-                Writer.WriteBool( true );
-            }
-
-            break;
-        }
-    }
-};
-CMathContent.prototype.Load_Changes = function(Reader)
-{
-    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-    // Long : тип класса
-    // Long : тип изменений
-
-    var ClassType = Reader.GetLong();
-    if ( AscDFH.historyitem_type_MathContent != ClassType )
-        return;
-
-    var Type = Reader.GetLong();
-
-    switch ( Type )
-    {
-        case  AscDFH.historyitem_Math_AddItem:
-        {
-            // Long     : Количество элементов
-            // Array of :
-            //  {
-            //    Long     : Позиция
-            //    Variable : Id Элемента
-            //  }
-
-            var Count = Reader.GetLong();
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var Pos     = Reader.GetLong();
-                var Element = AscCommon.g_oTableId.Get_ById( Reader.GetString2() );
-
-                if ( null != Element )
-                {
-                    this.Content.splice(Pos, 0, Element);
-                    Element.Recalc_RunsCompiledPr();
-                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
-                }
-            }
-
-            break;
-        }
-        case AscDFH.historyitem_Math_RemoveItem:
-        {
-            // Long          : Количество удаляемых элементов
-            // Array of Long : позиции удаляемых элементов
-
-            var Count = Reader.GetLong();
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var ChangesPos = Reader.GetLong();
-                this.Content.splice(ChangesPos, 1);
-                AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
-            }
-
-            break;
-        }
-        case AscDFH.historyitem_Math_ArgSize:
-        {
-            if(false === Reader.GetBool())
-            {
-                this.ArgSize.SetValue(Reader.GetLong())
-            }
-            else
-            {
-                this.ArgSize.SetValue(undefined);
-            }
-
-            this.Recalc_RunsCompiledPr();
-
-            break;
-        }
-    }
-};
 CMathContent.prototype.Write_ToBinary2 = function(Writer)
 {
     Writer.WriteLong(AscDFH.historyitem_type_MathContent);
@@ -5308,46 +5103,44 @@ CMathContent.prototype.Set_MenuProps = function(Props)
 };
 CMathContent.prototype.Apply_MenuProps = function(Props, Pos)
 {
-    var ArgSize, NewArgSize;
+	var ArgSize, NewArgSize;
 
-    if(Props.Action & c_oMathMenuAction.IncreaseArgumentSize)
-    {
-        if(true === this.Parent.Can_ModifyArgSize() && true == this.Compiled_ArgSz.Can_Increase() && true == this.ArgSize.Can_SimpleIncrease())
-        {
-            ArgSize = this.ArgSize.GetValue();
-            NewArgSize = this.ArgSize.Increase();
+	if (Props.Action & c_oMathMenuAction.IncreaseArgumentSize)
+	{
+		if (true === this.Parent.Can_ModifyArgSize() && true == this.Compiled_ArgSz.Can_Increase() && true == this.ArgSize.Can_SimpleIncrease())
+		{
+			ArgSize    = this.ArgSize.GetValue();
+			NewArgSize = this.ArgSize.Increase();
 
-            History.Add( this, { Type : AscDFH.historyitem_Math_ArgSize, New: NewArgSize, Old: ArgSize});
-            this.Recalc_RunsCompiledPr();
-        }
-    }
-    else if(Props.Action & c_oMathMenuAction.DecreaseArgumentSize)
-    {
-        if(true === this.Parent.Can_ModifyArgSize() && true == this.Compiled_ArgSz.Can_Decrease() && true == this.ArgSize.Can_Decrease())
-        {
-            ArgSize = this.ArgSize.GetValue();
-            NewArgSize = this.ArgSize.Decrease();
+			History.Add(new CChangesMathContentArgSize(this, ArgSize, NewArgSize));
+			this.Recalc_RunsCompiledPr();
+		}
+	}
+	else if (Props.Action & c_oMathMenuAction.DecreaseArgumentSize)
+	{
+		if (true === this.Parent.Can_ModifyArgSize() && true == this.Compiled_ArgSz.Can_Decrease() && true == this.ArgSize.Can_Decrease())
+		{
+			ArgSize    = this.ArgSize.GetValue();
+			NewArgSize = this.ArgSize.Decrease();
 
-            History.Add( this, { Type : AscDFH.historyitem_Math_ArgSize, New: NewArgSize, Old: ArgSize});
-            this.Recalc_RunsCompiledPr();
+			History.Add(new CChangesMathContentArgSize(this, ArgSize, NewArgSize));
+			this.Recalc_RunsCompiledPr();
+		}
+	}
 
-        }
-    }
+	var Run;
 
-    var Run;
+	if (Pos !== null && Props.Action & c_oMathMenuAction.InsertForcedBreak)
+	{
+		Run = this.private_Get_RunForForcedBreak(Pos);
+		Run.Set_MathForcedBreak(true);
 
-    if(Pos !== null && Props.Action & c_oMathMenuAction.InsertForcedBreak)
-    {
-        Run = this.private_Get_RunForForcedBreak(Pos);
-        Run.Set_MathForcedBreak(true);
-
-    }
-    else if(Pos !== null && Props.Action & c_oMathMenuAction.DeleteForcedBreak)
-    {
-        Run = this.private_Get_RunForForcedBreak(Pos);
-        Run.Set_MathForcedBreak(false);
-    }
-
+	}
+	else if (Pos !== null && Props.Action & c_oMathMenuAction.DeleteForcedBreak)
+	{
+		Run = this.private_Get_RunForForcedBreak(Pos);
+		Run.Set_MathForcedBreak(false);
+	}
 };
 CMathContent.prototype.private_Get_RunForForcedBreak = function(Pos)
 {
