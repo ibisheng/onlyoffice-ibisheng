@@ -7359,14 +7359,7 @@
         } else {
             // move active range to offset x,y
             this._moveActiveCellToOffset(x, y);
-            var x1 = this.getCellLeftRelative(this.model.selectionRange.activeCell.col, /*pt*/0), y1 = this.getCellTopRelative(
-              this.model.selectionRange.activeCell.row, /*pt*/0);
-            if (isCoord) {
-                ret = this._calcActiveRangeOffsetIsCoord(x1, y1);
-            } else {
-                ret = this._calcActiveRangeOffset();
-            }
-
+            ret = this._calcActiveRangeOffset();
         }
 
         if (this.isSelectionDialogMode) {
