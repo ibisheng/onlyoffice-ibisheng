@@ -7665,17 +7665,17 @@ ParaFootnoteReference.prototype.Get_Footnote = function()
 };
 ParaFootnoteReference.prototype.UpdateNumber = function(PRS)
 {
-	if (this.Footnote && true !== PRS.IsFastRecalculate())
+	if (this.Footnote && true !== PRS.IsFastRecalculate() && PRS.TopDocument instanceof CDocument)
 	{
 		var nPageAbs    = PRS.GetPageAbs();
 		var nColumnAbs  = PRS.GetColumnAbs();
 		var nAdditional = PRS.GetFootnoteReferencesCount(this);
-        var oSectPr     = PRS.GetSectPr();
-        var nNumFormat  = oSectPr.GetFootnoteNumFormat();
+		var oSectPr     = PRS.GetSectPr();
+		var nNumFormat  = oSectPr.GetFootnoteNumFormat();
 
 		var oLogicDocument       = this.Footnote.Get_LogicDocument();
 		var oFootnotesController = oLogicDocument.GetFootnotesController();
-		
+
 		this.NumFormat = nNumFormat;
 		this.Number    = oFootnotesController.GetFootnoteNumberOnPage(nPageAbs, nColumnAbs, oSectPr) + nAdditional;
 
@@ -7685,6 +7685,12 @@ ParaFootnoteReference.prototype.UpdateNumber = function(PRS)
 
 		this.private_Measure();
 		this.Footnote.SetNumber(this.Number, oSectPr, this.IsCustomMarkFollows());
+	}
+	else
+	{
+		this.Number    = 1;
+		this.NumFormat = numbering_numfmt_Decimal;
+		this.private_Measure();
 	}
 };
 ParaFootnoteReference.prototype.private_Measure = function()

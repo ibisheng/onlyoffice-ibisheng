@@ -7012,8 +7012,6 @@ Range.prototype.setFontAlign=function(val){
 };
 Range.prototype.setAlignVertical=function(val){
 	History.Create_NewPoint();
-	if("none" == val)
-		val = null;
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -7649,16 +7647,16 @@ Range.prototype.getAlignHorizontalByValue=function(){
 	//возвращает Align в зависимости от значния в ячейке
 	//values:  none, center, justify, left , right, null
 	var align = this.getAlignHorizontal();
-	if("none" == align){
+	if(null == align){
 		//пытаемся определить по значению
 		var nRow = this.bbox.r1;
 		var nCol = this.bbox.c1;
 		var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 		if(cell){
 			switch(cell.getType()){
-				case CellValueType.String:align = "left";break;
+				case CellValueType.String:align = AscCommon.align_Left;break;
 				case CellValueType.Bool:
-				case CellValueType.Error:align = "center";break;
+				case CellValueType.Error:align = AscCommon.align_Center;break;
 				default:
 				//Если есть value и не проставлен тип значит это число, у всех остальных типов значение не null
 				if(this.getValueWithoutFormat())
@@ -7666,17 +7664,17 @@ Range.prototype.getAlignHorizontalByValue=function(){
 					//смотрим 
 					var oNumFmt = this.getNumFormat();
 					if(true == oNumFmt.isTextFormat())
-						align = "left";
+						align = AscCommon.align_Left;
 					else
-						align = "right";
+						align = AscCommon.align_Right;
 				}
 				else
-					align = "left";
+					align = AscCommon.align_Left;
 				break;
 			}
 		}
-		if("none" == align)
-			align = "left";
+		if(null == align)
+			align = AscCommon.align_Left;
 	}
 	return align;
 };
@@ -7812,7 +7810,7 @@ Range.prototype.getShrinkToFit=function(){
 };
 Range.prototype.getWrapByAlign = function (align) {
 	// Для justify wrap всегда true
-	return "justify" === align.hor ? true : align.wrap;
+	return AscCommon.align_Justify === align.hor ? true : align.wrap;
 };
 Range.prototype.getWrap=function(){
 	var nRow = this.bbox.r1;
@@ -7909,7 +7907,7 @@ Range.prototype.merge=function(type){
 	History.StartTransaction();	
 	if(oBBox.r1 == oBBox.r2 && oBBox.c1 == oBBox.c2){
 		if(type == Asc.c_oAscMergeOptions.MergeCenter)
-			this.setAlignHorizontal("center");
+			this.setAlignHorizontal(AscCommon.align_Center);
 		History.EndTransaction();
 		return;
 	}
@@ -7919,7 +7917,7 @@ Range.prototype.merge=function(type){
 		if(type == Asc.c_oAscMergeOptions.MergeCenter)
 		{
 			//сбрасываем AlignHorizontal
-			this.setAlignHorizontal("none");
+			this.setAlignHorizontal(null);
 			History.EndTransaction();
 			return;
 		}
@@ -8219,7 +8217,7 @@ Range.prototype.merge=function(type){
 		}
 	});
 	if(type == Asc.c_oAscMergeOptions.MergeCenter)
-		this.setAlignHorizontal("center");
+		this.setAlignHorizontal(AscCommon.align_Center);
 	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
 		this.worksheet.mergeManager.add(this.bbox, 1);
 	History.EndTransaction();

@@ -3072,20 +3072,6 @@ function OfflineEditor () {
         var kHeaderActive = 1;
         var kHeaderHighlighted = 2;
 
-        /**
-         * text alignment style
-         * @const
-         */
-        var khaLeft = "left";
-        var khaCenter = "center";
-        var khaRight = "right";
-        var khaJustify = "justify";
-        var kvaTop = "top";
-        var kvaCenter = "center";
-        var kvaBottom = "bottom";
-
-        var kNone = "none";
-
         AscCommonExcel.WorksheetView.prototype.__drawColumnHeaders = function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
             if (undefined === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders())
                 return;
@@ -3204,8 +3190,8 @@ function OfflineEditor () {
             var sr    = this.stringRender;
             var tm    = this._roundTextMetrics( sr.measureString(text) );
             var bl    = y2WithoutBorder - (isColHeader ? this.defaultRowDescender : this.rows[index].descender);
-            var textX = this._calcTextHorizPos(x, x2WithoutBorder, tm, tm.width < w ? khaCenter : khaLeft);
-            var textY = this._calcTextVertPos(y, y2WithoutBorder, bl, tm, kvaBottom);
+            var textX = this._calcTextHorizPos(x, x2WithoutBorder, tm, tm.width < w ? AscCommon.align_Center : AscCommon.align_Left);
+            var textY = this._calcTextVertPos(y, y2WithoutBorder, bl, tm, Asc.c_oAscVAlign.Bottom);
             if (drawingCtx) {
                 ctx.AddClipRect(x, y, w, h);
                 ctx.setFillStyle(st.color)
@@ -3467,9 +3453,7 @@ function OfflineEditor () {
             this.model.workbook.handlers.trigger("asc_onHideComment");
             
             return isCoord ? this._calcActiveRangeOffsetIsCoord(x, y) :
-            this._calcActiveRangeOffset(
-                                        this.getCellLeftRelative(x < 0 ? ar.c1 : ar.c2, /*pt*/0),
-                                        this.getCellTopRelative(y < 0 ? ar.r1 : ar.r2, /*pt*/0));
+            this._calcActiveRangeOffset();
         };
 
         AscCommonExcel.WorksheetView.prototype.__chartsRanges = function(ranges) {

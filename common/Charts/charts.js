@@ -46,6 +46,7 @@ function (window, undefined) {
 var c_oAscChartTypeSettings = Asc.c_oAscChartTypeSettings;
 var c_oAscTickMark = Asc.c_oAscTickMark;
 var c_oAscTickLabelsPos = Asc.c_oAscTickLabelsPos;
+var fChartSize = 75;
 
 function ChartPreviewManager() {
 	this.previewGroups = [];
@@ -313,20 +314,20 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		AscFormat.CheckSpPrXfrm(chart_space);
 		chart_space.spPr.xfrm.setOffX(0);
 		chart_space.spPr.xfrm.setOffY(0);
-		chart_space.spPr.xfrm.setExtX(50);
-		chart_space.spPr.xfrm.setExtY(50);
-		settings.putTitle(Asc.c_oAscChartTitleShowSettings.none);
-		settings.putHorAxisLabel(Asc.c_oAscChartTitleShowSettings.none);
-		settings.putVertAxisLabel(Asc.c_oAscChartTitleShowSettings.none);
-		settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.none);
-		settings.putHorGridLines(Asc.c_oAscGridLinesSettings.none);
-		settings.putVertGridLines(Asc.c_oAscGridLinesSettings.none);
+		chart_space.spPr.xfrm.setExtX(fChartSize);
+		chart_space.spPr.xfrm.setExtY(fChartSize);
+		settings.putTitle(Asc.c_oAscChartTitleShowSettings.noOverlay);
+		//settings.putHorAxisLabel(Asc.c_oAscChartTitleShowSettings.none);
+		//settings.putVertAxisLabel(Asc.c_oAscChartTitleShowSettings.none);
+		//settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.none);
+		//settings.putHorGridLines(Asc.c_oAscGridLinesSettings.none);
+		//settings.putVertGridLines(Asc.c_oAscGridLinesSettings.none);
 
 
 		var val_ax_props = new AscCommon.asc_ValAxisSettings();
 		val_ax_props.putMinValRule(Asc.c_oAscValAxisRule.auto);
 		val_ax_props.putMaxValRule(Asc.c_oAscValAxisRule.auto);
-		val_ax_props.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+		val_ax_props.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
 		val_ax_props.putInvertValOrder(false);
 		val_ax_props.putDispUnitsRule(Asc.c_oAscValAxUnits.none);
 		val_ax_props.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
@@ -337,7 +338,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		var cat_ax_props = new AscCommon.asc_CatAxisSettings();
 		cat_ax_props.putIntervalBetweenLabelsRule(Asc.c_oAscBetweenLabelsRule.auto);
 		cat_ax_props.putLabelsPosition(Asc.c_oAscLabelsPosition.betweenDivisions);
-		cat_ax_props.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+		cat_ax_props.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
 		cat_ax_props.putLabelsAxisDistance(100);
 		cat_ax_props.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
 		cat_ax_props.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
@@ -377,6 +378,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
                 cat_ax_props.putLabelsPosition(AscFormat.CROSS_BETWEEN_BETWEEN);
                 vert_axis_settings = val_ax_props;
                 hor_axis_settings = cat_ax_props;
+
                 break;
             }
 
@@ -423,6 +425,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		new_line.setFill(new AscFormat.CUniFill());
 		new_line.Fill.setFill(new AscFormat.CNoFill());
 		chart_space.spPr.setLn(new_line);
+
         chart_space.recalcInfo.recalculateReferences = false;
 		chart_space.recalculate();
 
@@ -439,20 +442,9 @@ ChartPreviewManager.prototype.createChartPreview = function(type, styleIndex) {
         if(!this.chartsByTypes[type])
             this.chartsByTypes[type] = this.getChartByType(type);
         var chart_space = this.chartsByTypes[type];
-        if(chart_space.style !== styleIndex)
-        {
-            chart_space.style = styleIndex;
-            chart_space.recalculateMarkers();
-            chart_space.recalculateSeriesColors();
-            chart_space.recalculatePlotAreaChartBrush();
-            chart_space.recalculatePlotAreaChartPen();
-            chart_space.recalculateWalls();
-            chart_space.recalculateChartBrush();
-            chart_space.recalculateChartPen();
-            chart_space.recalculateUpDownBars();
-        }
-        chart_space.recalculatePenBrush();
-
+		AscFormat.ApplyPresetToChartSpace(chart_space, AscCommon.g_oChartPresets[type][styleIndex]);
+		chart_space.recalcInfo.recalculateReferences = false;
+		chart_space.recalculate();
 
         if (null === this._canvas_charts) {
             this._canvas_charts = document.createElement('canvas');
@@ -468,7 +460,7 @@ ChartPreviewManager.prototype.createChartPreview = function(type, styleIndex) {
         var _canvas = this._canvas_charts;
         var ctx = _canvas.getContext('2d');
         var graphics = new AscCommon.CGraphics();
-        graphics.init(ctx, _canvas.width, _canvas.height, 50, 50);
+        graphics.init(ctx, _canvas.width, _canvas.height, fChartSize, fChartSize);
         graphics.m_oFontManager = AscCommon.g_fontManager;
         graphics.transform(1,0,0,1,0,0);
         chart_space.draw(graphics);
@@ -482,8 +474,11 @@ ChartPreviewManager.prototype.getChartPreviews = function(chartType) {
 		if (!this.previewGroups.hasOwnProperty(chartType)) {
 			this.previewGroups[chartType] = [];
 			var arr = this.previewGroups[chartType];
-			for(var i = 1; i < 49; ++i)
-				arr.push(this.createChartPreview(chartType, i));
+			if(AscCommon.g_oChartPresets[chartType]){
+				var nStylesCount = AscCommon.g_oChartPresets[chartType].length;
+				for(var i = 0; i < nStylesCount; ++i)
+					arr.push(this.createChartPreview(chartType, i));
+			}
 		}
 		var group = this.previewGroups[chartType];
 		var objectGroup = [];

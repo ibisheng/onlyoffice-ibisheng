@@ -62,13 +62,6 @@
 
 
 	/** @const */
-	var kLeftAlign = "left";
-	/** @const */
-	var kRightAlign = "right";
-	/** @const */
-	var kCenterAlign = "center";
-
-	/** @const */
 	var kBeginOfLine = -1;
 	/** @const */
 	var kBeginOfText = -2;
@@ -752,8 +745,8 @@
 		var u = ctx.getUnits();
 
 		this.textFlags = opt.flags.clone();
-		if ( this.textFlags.textAlign.toLowerCase() === "justify" || this.isFormula() ) {
-			this.textFlags.textAlign = "left";
+		if ( this.textFlags.textAlign === AscCommon.align_Justify || this.isFormula() ) {
+			this.textFlags.textAlign = AscCommon.align_Left;
 		}
 
 		this._cleanFragments( opt.fragments );
@@ -1263,14 +1256,14 @@
 		}
 
 		switch ( t.textFlags.textAlign ) {
-			case kRightAlign:
+			case AscCommon.align_Right:
 				r = expandLeftSide();
 				break;
-			case kCenterAlign:
+			case AscCommon.align_Center:
 				l = expandLeftSide();
 				r = expandRightSide();
 				break;
-			case kLeftAlign:
+			case AscCommon.align_Left:
 			default:
 				r = expandRightSide();
 		}
@@ -1448,7 +1441,7 @@
 		var cur = this.textRender.calcCharOffset(this.cursorPos);
 		var charsCount = this.textRender.getCharsCount();
 		var curLeft = asc_round(
-			((kRightAlign !== this.textFlags.textAlign || this.cursorPos !== charsCount) && cur !== null &&
+			((AscCommon.align_Right !== this.textFlags.textAlign || this.cursorPos !== charsCount) && cur !== null &&
 			cur.left !== null ? cur.left : this._getContentPosition()) * this.kx);
 		var curTop = asc_round(((cur !== null ? cur.top : 0) + y) * this.ky);
 		var curHeight = asc_round((cur !== null ? cur.height : this._getContentHeight()) * this.ky);
@@ -1660,9 +1653,9 @@
 		var ppix = this.drawingCtx.getPPIX();
 
 		switch ( this.textFlags.textAlign ) {
-			case kRightAlign:
+			case AscCommon.align_Right:
 				return asc_calcnpt( this.right - this.left, ppix, -this.defaults.padding - 1 );
-			case kCenterAlign:
+			case AscCommon.align_Center:
 				return asc_calcnpt( 0.5 * (this.right - this.left), ppix, 0 );
 		}
 		return asc_calcnpt( 0, ppix, this.defaults.padding );
@@ -2135,8 +2128,8 @@
 		result.italic = tmp.i;
 		result.underline = (Asc.EUnderline.underlineNone !== tmp.u); // ToDo убрать, когда будет реализовано двойное подчеркивание
 		result.strikeout = tmp.s;
-		result.subscript = tmp.va === "subscript";
-		result.superscript = tmp.va === "superscript";
+		result.subscript = tmp.va === AscCommon.vertalign_SubScript;
+		result.superscript = tmp.va === AscCommon.vertalign_SuperScript;
 		result.color = (tmp.c ? asc.colorObjToAscColor( tmp.c ) : new Asc.asc_CColor( this.options.textColor ));
 
 		this.handlers.trigger( "updateEditorSelectionInfo", result );

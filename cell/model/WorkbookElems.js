@@ -213,6 +213,11 @@ RgbColor.prototype =
 		return 1;
 	}
 };
+var g_oThemeColorProperties = {
+		rgb: 0,
+		theme: 1,
+		tint: 2
+	};
 function ThemeColor()
 {
 	this.rgb = null;
@@ -221,6 +226,7 @@ function ThemeColor()
 }
 ThemeColor.prototype =
 {
+	Properties: g_oThemeColorProperties,
 	clone : function()
 	{
 		//ThemeColor must be created by g_oColorManager for correct rebuild
@@ -230,6 +236,28 @@ ThemeColor.prototype =
 	getType : function()
 	{
 		return UndoRedoDataTypes.ThemeColor;
+	},
+	getProperties : function()
+	{
+		return this.Properties;
+	},
+	getProperty : function(nType)
+	{
+		switch(nType)
+		{
+		case this.Properties.rgb:return this.rgb;break;
+		case this.Properties.theme:return this.theme;break;
+		case this.Properties.tint:return this.tint;break;
+		}
+	},
+	setProperty : function(nType, value)
+	{
+		switch(nType)
+		{
+		case this.Properties.rgb: this.rgb = value;break;
+		case this.Properties.theme: this.theme= value;break;
+		case this.Properties.tint: this.tint = value;break;
+		}
 	},
     isEqual: function(oColor)
     {

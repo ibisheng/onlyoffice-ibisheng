@@ -430,7 +430,24 @@
 	 * @param {'center' | 'bottom' | 'top'} value
 	 */
 	ApiRange.prototype.SetAlignVertical = function (value) {
-		this.range.setAlignVertical(value);
+		switch(value)
+		{
+			case "center":
+			{
+				this.range.setAlignVertical(Asc.c_oAscVAlign.Center);
+				break;
+			}
+			case "bottom":
+			{
+				this.range.setAlignVertical(Asc.c_oAscVAlign.Bottom);
+				break;
+			}
+			case "top":
+			{
+				this.range.setAlignVertical(Asc.c_oAscVAlign.Top);
+				break;
+			}
+		}
 	};
 
 	/**
@@ -438,7 +455,29 @@
 	 * @param {'left' | 'right' | 'center' | 'justify'} value
 	 */
 	ApiRange.prototype.SetAlignHorizontal = function (value) {
-		this.range.setAlignHorizontal(value);
+		switch(value)
+		{
+			case "left":
+			{
+				this.range.setAlignHorizontal(AscCommon.align_Left);
+				break;
+			}
+			case "right":
+			{
+				this.range.setAlignHorizontal(AscCommon.align_Right);
+				break;
+			}
+			case "justify":
+			{
+				this.range.setAlignHorizontal(AscCommon.align_Justify);
+				break;
+			}
+			case "center":
+			{
+				this.range.setAlignHorizontal(AscCommon.align_Center);
+				break;
+			}
+		}
 	};
 
 
