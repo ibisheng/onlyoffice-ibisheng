@@ -46,6 +46,7 @@ function (window, undefined) {
 var c_oAscChartTypeSettings = Asc.c_oAscChartTypeSettings;
 var c_oAscTickMark = Asc.c_oAscTickMark;
 var c_oAscTickLabelsPos = Asc.c_oAscTickLabelsPos;
+var fChartSize = 75;
 
 function ChartPreviewManager() {
 	this.previewGroups = [];
@@ -313,8 +314,8 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		AscFormat.CheckSpPrXfrm(chart_space);
 		chart_space.spPr.xfrm.setOffX(0);
 		chart_space.spPr.xfrm.setOffY(0);
-		chart_space.spPr.xfrm.setExtX(50);
-		chart_space.spPr.xfrm.setExtY(50);
+		chart_space.spPr.xfrm.setExtX(fChartSize);
+		chart_space.spPr.xfrm.setExtY(fChartSize);
 		settings.putTitle(Asc.c_oAscChartTitleShowSettings.noOverlay);
 		//settings.putHorAxisLabel(Asc.c_oAscChartTitleShowSettings.none);
 		//settings.putVertAxisLabel(Asc.c_oAscChartTitleShowSettings.none);
@@ -442,6 +443,7 @@ ChartPreviewManager.prototype.createChartPreview = function(type, styleIndex) {
             this.chartsByTypes[type] = this.getChartByType(type);
         var chart_space = this.chartsByTypes[type];
 		AscFormat.ApplyPresetToChartSpace(chart_space, AscCommon.g_oChartPresets[type][styleIndex]);
+		chart_space.recalcInfo.recalculateReferences = false;
 		chart_space.recalculate();
 
         if (null === this._canvas_charts) {
@@ -458,7 +460,7 @@ ChartPreviewManager.prototype.createChartPreview = function(type, styleIndex) {
         var _canvas = this._canvas_charts;
         var ctx = _canvas.getContext('2d');
         var graphics = new AscCommon.CGraphics();
-        graphics.init(ctx, _canvas.width, _canvas.height, 50, 50);
+        graphics.init(ctx, _canvas.width, _canvas.height, fChartSize, fChartSize);
         graphics.m_oFontManager = AscCommon.g_fontManager;
         graphics.transform(1,0,0,1,0,0);
         chart_space.draw(graphics);
