@@ -2313,7 +2313,7 @@
         var tm = this._roundTextMetrics(sr.measureString(text));
         var bl = y2WithoutBorder - (isColHeader ? this.defaultRowDescender : this.rows[index].descender);
         var textX = this._calcTextHorizPos(x, x2WithoutBorder, tm, tm.width < w ? AscCommon.align_Center : AscCommon.align_Left);
-        var textY = this._calcTextVertPos(y, y2WithoutBorder, bl, tm, Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM);
+        var textY = this._calcTextVertPos(y, y2WithoutBorder, bl, tm, Asc.c_oAscVAlign.Bottom);
         if (drawingCtx) {
             ctx.AddClipRect(x, y, w, h);
             ctx.setFillStyle(st.color)
@@ -2777,19 +2777,19 @@
                 textAlign = this.stringRender.flags.textAlign;
                 if (isWrapped) {
                     if (ct.angle < 0) {
-                        if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP === ct.cellVA)
+                        if (Asc.c_oAscVAlign.Top === ct.cellVA)
                             this.stringRender.flags.textAlign = AscCommon.align_Left;
-                        else if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR === ct.cellVA)
+                        else if (Asc.c_oAscVAlign.Center === ct.cellVA)
                             this.stringRender.flags.textAlign = AscCommon.align_Center;
-                        else if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM === ct.cellVA)
+                        else if (Asc.c_oAscVAlign.Bottom === ct.cellVA)
                             this.stringRender.flags.textAlign = AscCommon.align_Right;
                     }
                     else {
-                        if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP === ct.cellVA)
+                        if (Asc.c_oAscVAlign.Top === ct.cellVA)
                             this.stringRender.flags.textAlign = AscCommon.align_Right;
-                        else if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR === ct.cellVA)
+                        else if (Asc.c_oAscVAlign.Center === ct.cellVA)
                             this.stringRender.flags.textAlign = AscCommon.align_Center;
-                        else if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM === ct.cellVA)
+                        else if (Asc.c_oAscVAlign.Bottom === ct.cellVA)
                             this.stringRender.flags.textAlign = AscCommon.align_Left;
                     }
                 }
@@ -2897,19 +2897,19 @@
                 textAlign = this.stringRender.flags.textAlign;
                 if (isWrapped) {
                     if (ct.angle < 0) {
-                        if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP === ct.cellVA)
+                        if (Asc.c_oAscVAlign.Top === ct.cellVA)
                             this.stringRender.flags.textAlign = AscCommon.align_Left;
-                        else if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR === ct.cellVA)
+                        else if (Asc.c_oAscVAlign.Center === ct.cellVA)
                             this.stringRender.flags.textAlign = AscCommon.align_Center;
-                        else if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM === ct.cellVA)
+                        else if (Asc.c_oAscVAlign.Bottom === ct.cellVA)
                             this.stringRender.flags.textAlign = AscCommon.align_Right;
                     }
                     else {
-                        if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP === ct.cellVA)
+                        if (Asc.c_oAscVAlign.Top === ct.cellVA)
                             this.stringRender.flags.textAlign = AscCommon.align_Right;
-                        else if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR === ct.cellVA)
+                        else if (Asc.c_oAscVAlign.Center === ct.cellVA)
                             this.stringRender.flags.textAlign = AscCommon.align_Center;
-                        else if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM === ct.cellVA)
+                        else if (Asc.c_oAscVAlign.Bottom === ct.cellVA)
                             this.stringRender.flags.textAlign = AscCommon.align_Left;
                     }
                 }
@@ -4665,7 +4665,7 @@
       function (tm, col, row, flags, isMerged, fMergedRows, va, ha, angle, maxW, colWidth, textBound) {
           var rowInfo = this.rows[row], rowHeight;
           // update row's descender
-          if (va !== Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP && va !== Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR && !isMerged) {
+          if (va !== Asc.c_oAscVAlign.Top && va !== Asc.c_oAscVAlign.Center && !isMerged) {
               rowInfo.descender = Math.max(rowInfo.descender, tm.height - tm.baseline);
           }
 
@@ -5234,9 +5234,9 @@
 
     WorksheetView.prototype._calcTextVertPos = function (y1, y2, baseline, tm, valign) {
         switch (valign) {
-            case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR:
+            case Asc.c_oAscVAlign.Center:
                 return asc_calcnpt(0.5 * (y1 + y2 - tm.height), this._getPPIY()) - this.height_1px; // ToDo возможно стоит тоже использовать 96
-            case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP:
+            case Asc.c_oAscVAlign.Top:
                 return y1 - this.height_1px;
             default:
                 return baseline - tm.baseline;
@@ -7081,22 +7081,22 @@
             objectInfo.text = this.objectRender.controller.Get_SelectedText(true);
 
             var horAlign = paraPr.Jc;
-            var vertAlign = Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR;
+            var vertAlign = Asc.c_oAscVAlign.Center;
             var shape_props = this.objectRender.controller.getDrawingProps().shapeProps;
             var angle = null;
             if (shape_props) {
                 switch (shape_props.verticalTextAlign) {
                     case AscFormat.VERTICAL_ANCHOR_TYPE_BOTTOM:
-                        vertAlign = Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM;
+                        vertAlign = Asc.c_oAscVAlign.Bottom;
                         break;
                     case AscFormat.VERTICAL_ANCHOR_TYPE_CENTER:
-                        vertAlign = Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR;
+                        vertAlign = Asc.c_oAscVAlign.Center;
                         break;
 
                     case AscFormat.VERTICAL_ANCHOR_TYPE_TOP:
                     case AscFormat.VERTICAL_ANCHOR_TYPE_DISTRIBUTED:
                     case AscFormat.VERTICAL_ANCHOR_TYPE_JUSTIFIED:
-                        vertAlign = Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP;
+                        vertAlign = Asc.c_oAscVAlign.Top;
                         break;
                 }
                 switch (shape_props.vert) {
@@ -11218,7 +11218,7 @@
                     h = Math.max(h, ct.metrics.height);
                 }
 
-                if (ct.cellVA !== Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP && ct.cellVA !== Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR && !isMerged) {
+                if (ct.cellVA !== Asc.c_oAscVAlign.Top && ct.cellVA !== Asc.c_oAscVAlign.Center && !isMerged) {
                     d = Math.max(d, ct.metrics.height - ct.metrics.baseline);
                 }
             }

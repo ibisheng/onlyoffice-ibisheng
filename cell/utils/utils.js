@@ -94,22 +94,22 @@
 		function verticalAlignFromString(val) {
 			var va = null;
 			switch (val) {
-				case "bottom": va = Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM;break;
-				case "center": va = Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR;break;
-				case "distributed": va = Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_DIST;break;
-				case "justify": va = Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_JUST;break;
-				case "top": va = Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP;break;
+				case "bottom": va = Asc.c_oAscVAlign.Bottom;break;
+				case "center": va = Asc.c_oAscVAlign.Center;break;
+				case "distributed": va = Asc.c_oAscVAlign.Dist;break;
+				case "justify": va = Asc.c_oAscVAlign.Just;break;
+				case "top": va = Asc.c_oAscVAlign.Top;break;
 			}
 			return va;
 		}
 		function verticalAlignToString(val) {
 			var va = "none";
 			switch (val) {
-				case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM: va = "bottom";break;
-				case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR: va = "center";break;
-				case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_DIST: va = "distributed";break;
-				case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_JUST: va = "justify";break;
-				case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP: va = "top";break;
+				case Asc.c_oAscVAlign.Bottom: va = "bottom";break;
+				case Asc.c_oAscVAlign.Center: va = "center";break;
+				case Asc.c_oAscVAlign.Dist: va = "distributed";break;
+				case Asc.c_oAscVAlign.Just: va = "justify";break;
+				case Asc.c_oAscVAlign.Top: va = "top";break;
 			}
 			return va;
 		}

@@ -1890,27 +1890,27 @@ DrawingObjectsController.prototype =
         var vert_align;
         switch (align)
         {
-            case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM :
+            case Asc.c_oAscVAlign.Bottom :
             {
                 vert_align = 0;
                 break;
             }
-            case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR :
+            case Asc.c_oAscVAlign.Center :
             {
                 vert_align = 1;
                 break;
             }
-            case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_DIST:
+            case Asc.c_oAscVAlign.Dist:
             {
                 vert_align = 1;
                 break;
             }
-            case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_JUST :
+            case Asc.c_oAscVAlign.Just :
             {
                 vert_align = 1;
                 break;
             }
-            case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP :
+            case Asc.c_oAscVAlign.Top :
             {
                 vert_align = 4
             }

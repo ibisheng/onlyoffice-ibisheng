@@ -3191,7 +3191,7 @@ function OfflineEditor () {
             var tm    = this._roundTextMetrics( sr.measureString(text) );
             var bl    = y2WithoutBorder - (isColHeader ? this.defaultRowDescender : this.rows[index].descender);
             var textX = this._calcTextHorizPos(x, x2WithoutBorder, tm, tm.width < w ? AscCommon.align_Center : AscCommon.align_Left);
-            var textY = this._calcTextVertPos(y, y2WithoutBorder, bl, tm, Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM);
+            var textY = this._calcTextVertPos(y, y2WithoutBorder, bl, tm, Asc.c_oAscVAlign.Bottom);
             if (drawingCtx) {
                 ctx.AddClipRect(x, y, w, h);
                 ctx.setFillStyle(st.color)

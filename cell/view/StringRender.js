@@ -291,9 +291,9 @@
                 isHorzCenter    = (AscCommon.align_Center === alignHorizontal),
                 isHorzRight     = (AscCommon.align_Right  === alignHorizontal),
 
-                isVertBottom    = (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM === alignVertical),
-                isVertCenter    = (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR === alignVertical),
-                isVertTop       = (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP    === alignVertical);
+                isVertBottom    = (Asc.c_oAscVAlign.Bottom === alignVertical),
+                isVertCenter    = (Asc.c_oAscVAlign.Center === alignVertical),
+                isVertTop       = (Asc.c_oAscVAlign.Top    === alignVertical);
 
             if (isVertBottom) {
                 if (angle < 0) {

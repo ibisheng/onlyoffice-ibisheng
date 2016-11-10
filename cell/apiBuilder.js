@@ -434,17 +434,17 @@
 		{
 			case "center":
 			{
-				this.range.setAlignVertical(Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR);
+				this.range.setAlignVertical(Asc.c_oAscVAlign.Center);
 				break;
 			}
 			case "bottom":
 			{
-				this.range.setAlignVertical(Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM);
+				this.range.setAlignVertical(Asc.c_oAscVAlign.Bottom);
 				break;
 			}
 			case "top":
 			{
-				this.range.setAlignVertical(Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP);
+				this.range.setAlignVertical(Asc.c_oAscVAlign.Top);
 				break;
 			}
 		}

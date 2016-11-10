@@ -546,11 +546,11 @@
 								case AscCommon.align_Justify: td.style.textAlign = "justify"; break;
 							}
 							switch (cell.getAlignVertical()) {
-								case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM: td.style.verticalAlign = "bottom"; break;
-								case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR:
-								case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_DIST:
-								case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_JUST: td.style.verticalAlign = "middle"; break;
-								case Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_TOP: td.style.verticalAlign = "top"; break;
+								case Asc.c_oAscVAlign.Bottom: td.style.verticalAlign = "bottom"; break;
+								case Asc.c_oAscVAlign.Center:
+								case Asc.c_oAscVAlign.Dist:
+								case Asc.c_oAscVAlign.Just: td.style.verticalAlign = "middle"; break;
+								case Asc.c_oAscVAlign.Top: td.style.verticalAlign = "top"; break;
 							}
 
 							b = cell.getBorderFull();
@@ -2711,7 +2711,7 @@
 					oNewItem.wrap = true;
 					
 				//вертикальное выравнивание
-				oNewItem.va = Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR;
+				oNewItem.va = Asc.c_oAscVAlign.Center;
 					
 				//так же wrap выставляем у параграфа, чьим родителем является ячейка таблицы	
 				if(this._getParentByTag(paragraph, c_oAscBoundsElementType.Cell) != null)

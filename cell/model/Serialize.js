@@ -4961,9 +4961,9 @@
             else if ( c_oSerAligmentTypes.Vertical == type )
             {
                 oAligment.ver = this.stream.GetUChar();
-                if (Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_DIST == oAligment.ver ||
-                    Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_JUST == oAligment.ver) {
-                    oAligment.ver = Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_CTR;
+                if (Asc.c_oAscVAlign.Dist == oAligment.ver ||
+                    Asc.c_oAscVAlign.Just == oAligment.ver) {
+                    oAligment.ver = Asc.c_oAscVAlign.Center;
                 }
             }
             else if ( c_oSerAligmentTypes.WrapText == type )
@@ -6986,7 +6986,7 @@
             RelativeIndent : 0,
             shrink : false,
             angle : 0,
-            ver : Asc.c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM,
+            ver : Asc.c_oAscVAlign.Bottom,
             wrap : false
         });
     }
