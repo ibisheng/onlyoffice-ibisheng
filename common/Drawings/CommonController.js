@@ -9620,10 +9620,17 @@ function CreateLnFromPreset(aPreset, index, aBaseColors){
 
 function ApplySpPr(aSpPrPr, oObject, index, aBaseColors){
     if(!aSpPrPr){
+        if(oObject.spPr && oObject.spPr.xfrm){
+            oObject.spPr.setFill(null);
+            oObject.spPr.setLn(null);
+            return
+        }
         oObject.setSpPr(null);
         return;
     }
-    oObject.setSpPr(new AscFormat.CSpPr());
+    if(!oObject.spPr){
+        oObject.setSpPr(new AscFormat.CSpPr());
+    }
     oObject.spPr.setParent(oObject);
     oObject.spPr.setFill(CreateUnifillFromPreset(aSpPrPr[0], index, aBaseColors));
     oObject.spPr.setLn(CreateLnFromPreset(aSpPrPr[1], index, aBaseColors));
