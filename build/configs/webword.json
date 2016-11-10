@@ -123,6 +123,7 @@
         "../word/Editor/ParagraphChanges.js",
         "../word/Editor/Paragraph_Recalculate.js",
         "../word/Editor/Sections.js",
+        "../word/Editor/SectionsChanges.js",
         "../word/Editor/Numbering.js",
         "../word/Editor/NumberingChanges.js",
         "../word/Editor/HeaderFooter.js",

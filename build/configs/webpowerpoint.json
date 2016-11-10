@@ -111,6 +111,7 @@
         "../word/Editor/Table/TableCellChanges.js",
         "../word/Editor/Common.js",
         "../word/Editor/Sections.js",
+        "../word/Editor/SectionsChanges.js",
 		
         "../word/Drawing/Graphics.js",
         "../word/Drawing/ShapeDrawer.js",

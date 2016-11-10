@@ -3349,7 +3349,7 @@
 	};
 	window['AscDFH'].CChangesBaseLongValue = CChangesBaseLongValue;
 	/**
-	 * Базовый класс для изменения числовых(long) значений.
+	 * Базовый класс для изменения булевых значений.
 	 * @constructor
 	 * @extends {AscDFH.CChangesBaseProperty}
 	 */
@@ -3413,8 +3413,62 @@
 		// String : New
 		// String : Old
 
-		this.New = Reader.WriteString2();
-		this.Old = Reader.WriteString2();
+		this.New = Reader.GetString2();
+		this.Old = Reader.GetString2();
 	};
 	window['AscDFH'].CChangesBaseStringValue = CChangesBaseStringValue;
+	/**
+	 * Базовый класс для изменения числовых(byte) значений.
+	 * @constructor
+	 * @extends {AscDFH.CChangesBaseProperty}
+	 */
+	function CChangesBaseByteValue(Class, Old, New, Color)
+	{
+		CChangesBaseByteValue.superclass.constructor.call(this, Class, Old, New, Color);
+	}
+	AscCommon.extendClass(CChangesBaseByteValue, CChangesBaseProperty);
+	CChangesBaseByteValue.prototype.WriteToBinary = function(Writer)
+	{
+		// Byte  : New
+		// Byte  : Old
+
+		Writer.WriteByte(this.New);
+		Writer.WriteByte(this.Old);
+	};
+	CChangesBaseByteValue.prototype.ReadFromBinary = function(Reader)
+	{
+		// Byte  : New
+		// Byte  : Old
+
+		this.New = Reader.GetByte();
+		this.Old = Reader.GetByte();
+	};
+	window['AscDFH'].CChangesBaseByteValue = CChangesBaseByteValue;
+	/**
+	 * Базовый класс для изменения числовых(double) значений.
+	 * @constructor
+	 * @extends {AscDFH.CChangesBaseProperty}
+	 */
+	function CChangesBaseDoubleValue(Class, Old, New, Color)
+	{
+		CChangesBaseDoubleValue.superclass.constructor.call(this, Class, Old, New, Color);
+	}
+	AscCommon.extendClass(CChangesBaseDoubleValue, CChangesBaseProperty);
+	CChangesBaseDoubleValue.prototype.WriteToBinary = function(Writer)
+	{
+		// Double : New
+		// Double : Old
+
+		Writer.WriteDouble(this.New);
+		Writer.WriteDouble(this.Old);
+	};
+	CChangesBaseDoubleValue.prototype.ReadFromBinary = function(Reader)
+	{
+		// Double : New
+		// Double : Old
+
+		this.New = Reader.GetDouble();
+		this.Old = Reader.GetDouble();
+	};
+	window['AscDFH'].CChangesBaseDoubleValue = CChangesBaseDoubleValue;
 })(window);
