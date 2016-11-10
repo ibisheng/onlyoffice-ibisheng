@@ -5690,10 +5690,10 @@ function offline_cell_editor_draw(width, height, ratio) {
 function offline_cell_editor_open(x, y, width, height, ratio, isSelectAll, isFormulaInsertMode, c1, r1, c2, r2)  {
     _null_object.width = width * ratio;
     _null_object.height = height * ratio;
-
+    
     var wb = _api.wb;
     var ws = _api.wb.getWorksheet();
-
+    
     var range =  ws.visibleRange.clone();
     ws.visibleRange.c1 = c1;
     ws.visibleRange.r1 = r1;
@@ -5702,20 +5702,28 @@ function offline_cell_editor_open(x, y, width, height, ratio, isSelectAll, isFor
     
     wb.cellEditor.isSelectAll = isSelectAll;
     
-    //var canEditCell = false;
-    
-    //if (ws._isLockedCells(ws.getActiveCell(0, 0, false), null)) {
-    
-    //     canEditCell = true;
-    
     if (!isFormulaInsertMode) {
-        wb._onEditCell(undefined, undefined, true, false);
+        
+        var isFocus = undefined, isClearCell = undefined, isHideCursor = true, isQuickInput = false;
+        
+        var t = wb;
+        
+        var ws = t.getWorksheet();
+        var activeCellRange = ws.getActiveCell(0, 0, false);
+        var selectionRange = ws.model.selectionRange.clone();
+        
+        t.setCellEditMode(true);
+        ws.setCellEditMode(true);
+        ws.openCellEditor(t.cellEditor, /*fragments*/undefined, /*cursorPos*/undefined, isFocus, isClearCell,
+                          /*isHideCursor*/isHideCursor, /*isQuickInput*/isQuickInput, selectionRange);
+        //t.input.disabled = false;
+        t.handlers.trigger("asc_onEditCell", Asc.c_oAscCellEditorState.editStart);
+        
+        // Эвент на обновление состояния редактора
+        t.cellEditor._updateEditorState();
     }
-    //}
     
     ws.visibleRange = range;
-    
-    return true;// canEditCell;
 }
 function offline_cell_editor_test_cells(x, y, width, height, ratio, isSelectAll, isFormulaInsertMode, c1, r1, c2, r2)  {
     _null_object.width = width * ratio;
@@ -5732,29 +5740,11 @@ function offline_cell_editor_test_cells(x, y, width, height, ratio, isSelectAll,
     
     wb.cellEditor.isSelectAll = isSelectAll;
     
-    var canEditCell = false;
-    
     var editFunction = function() {
-        
-        //console.log("editFunction");
-        
         window["native"]["openCellEditor"]();
-        
-        // t.setCellEditMode(true);
-        // ws.setCellEditMode(true);
-        // ws.openCellEditor(t.cellEditor, /*fragments*/undefined, /*cursorPos*/undefined, isFocus, isClearCell,
-        //                   /*isHideCursor*/isHideCursor, /*isQuickInput*/isQuickInput, selectionRange);
-        // t.input.disabled = false;
-        // t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
-        
-        // Эвент на обновление состояния редактора
-        // t.cellEditor._updateEditorState();
-        // asc_applyFunction(callback, true);
     };
     
     var editLockCallback = function(res) {
-        
-        //console.log("editLockCallback: " + res);
         
         if (!res) {
             
@@ -5779,18 +5769,8 @@ function offline_cell_editor_test_cells(x, y, width, height, ratio, isSelectAll,
     if (ws._isLockedCells(ws.getActiveCell(0, 0, false), /*subType*/null, editLockCallback)) {
         editFunction();
     }
-    
-    //if (ws._isLockedCells(ws.getActiveCell(0, 0, false), null)) {
-    //    canEditCell = true;
-    //
-    //    if (!isFormulaInsertMode) {
-    //        wb._onEditCell(undefined, undefined, true, false);
-    //    }
-    // }
-    
+
     wb.visibleRange = range;
-    
-    return canEditCell;
 }
 
 function offline_cell_editor_process_input_commands(commands, width, height, ratio) {
