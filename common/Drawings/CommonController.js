@@ -5739,6 +5739,7 @@ DrawingObjectsController.prototype =
             {
                 var options = new AscCommon.asc_ChartSettings();
                 options.type = type;
+                options.style = 1;
                 options.putTitle(c_oAscChartTitleShowSettings.noOverlay);
                 var chartSeries = {series: DrawingObjectsController.prototype.getSeriesDefault.call(this, type),
                     parsedHeaders: {bLeft: true, bTop: true}};
@@ -9125,13 +9126,13 @@ function CollectGs(oGs)
     return [oGs.pos, CollectUniColor(oGs.color)];
 }
 
-function CreateGsFromParams(aParams, index, aBaseColors){
+function CreateGsFromParams(aParams, index, aBaseColors, bAccent1Background){
     if(!aParams){
         return null;
     }
     var oRet = new AscFormat.CGs();
     oRet.pos = aParams[0];
-    oRet.color = CreateUniColorFromPreset(aParams[1], index, aBaseColors);
+    oRet.color = CreateUniColorFromPreset(aParams[1], index, aBaseColors, bAccent1Background);
     return oRet;
 }
 
@@ -9186,7 +9187,7 @@ function CollectSettingsUniFill(oUniFill)
 }
 
 
-    function CreateUniColorFromPreset(aPreset, index, aBaseColors){
+    function CreateUniColorFromPreset(aPreset, index, aBaseColors, bAccent1Background){
         if(!aPreset){
             return null;
         }
@@ -9218,7 +9219,7 @@ function CollectSettingsUniFill(oUniFill)
                 if(AscFormat.isRealNumber(index) && Array.isArray(aBaseColors) && aBaseColors[index]){
                     if(aBaseColors[index].fill && aBaseColors[index].fill.color && aBaseColors[index].fill.color.color
                         && aBaseColors[index].fill.color.color.type === oColorTypes.COLOR_TYPE_SCHEME
-                    &&  oRet.color.id === 0){
+                    &&  oRet.color.id === 0 && !bAccent1Background){
                         oRet.color.id = aBaseColors[index].fill.color.color.id;
                         if(aBaseColors[index].fill.color.Mods){
                             oRet.Mods = aBaseColors[index].fill.color.Mods.createDuplicate();
@@ -9250,7 +9251,7 @@ function CollectSettingsUniFill(oUniFill)
     }
 
 
-    function CreateUnifillFromPreset(aPreset, index, aBaseColors){
+    function CreateUnifillFromPreset(aPreset, index, aBaseColors, bAccent1Background){
         var oRet = null;
         if(!aPreset){
             return oRet;
@@ -9275,7 +9276,7 @@ function CollectSettingsUniFill(oUniFill)
             }
             case oFillTypes.FILL_TYPE_SOLID:{
                 oUnifill.fill =  new AscFormat.CSolidFill();
-                oUnifill.fill.color = CreateUniColorFromPreset(aPreset[2], index, aBaseColors);
+                oUnifill.fill.color = CreateUniColorFromPreset(aPreset[2], index, aBaseColors, bAccent1Background);
                 break;
             }
             case oFillTypes.FILL_TYPE_GRAD:{
@@ -9293,15 +9294,15 @@ function CollectSettingsUniFill(oUniFill)
                 }
                 for(var i = 0; i < aPreset[5]; ++i)
                 {
-                    oUnifill.fill.colors.push(CreateGsFromParams(aPreset[6+i], index, aBaseColors));
+                    oUnifill.fill.colors.push(CreateGsFromParams(aPreset[6+i], index, aBaseColors, bAccent1Background));
                 }
                 break;
             }
             case oFillTypes.FILL_TYPE_PATT:{
                 oUnifill.fill = new AscFormat.CPattFill();
                 oUnifill.fill.ftype = aPreset[2];
-                oUnifill.fill.fgClr = CreateUniColorFromPreset(aPreset[3], index, aBaseColors);
-                oUnifill.fill.bgClr = CreateUniColorFromPreset(aPreset[4], index, aBaseColors);
+                oUnifill.fill.fgClr = CreateUniColorFromPreset(aPreset[3], index, aBaseColors, bAccent1Background);
+                oUnifill.fill.bgClr = CreateUniColorFromPreset(aPreset[4], index, aBaseColors, bAccent1Background);
                 break;
             }
             case oFillTypes.FILL_TYPE_GRP:{
@@ -9588,13 +9589,13 @@ function CollectSettingsFromChart(oChartSpace)
     return oRet;
 }
 
-function CreateLnFromPreset(aPreset, index, aBaseColors){
+function CreateLnFromPreset(aPreset, index, aBaseColors, bAccent1Background){
     var oRet = null;
     if(!aPreset){
         return oRet;
     }
     var oLn = new AscFormat.CLn();
-    oLn.Fill = CreateUnifillFromPreset(aPreset[0], index, aBaseColors);
+    oLn.Fill = CreateUnifillFromPreset(aPreset[0], index, aBaseColors, bAccent1Background);
     oLn.prstDash = aPreset[1];
     if(aPreset[2]){
         oLn.Join = new AscFormat.LineJoin();
@@ -9620,7 +9621,7 @@ function CreateLnFromPreset(aPreset, index, aBaseColors){
     return oLn;
 }
 
-function ApplySpPr(aSpPrPr, oObject, index, aBaseColors){
+function ApplySpPr(aSpPrPr, oObject, index, aBaseColors, bAccent1Background){
     if(!aSpPrPr){
         if(oObject.spPr && oObject.spPr.xfrm){
             oObject.spPr.setFill(null);
@@ -9634,11 +9635,11 @@ function ApplySpPr(aSpPrPr, oObject, index, aBaseColors){
         oObject.setSpPr(new AscFormat.CSpPr());
     }
     oObject.spPr.setParent(oObject);
-    oObject.spPr.setFill(CreateUnifillFromPreset(aSpPrPr[0], index, aBaseColors));
-    oObject.spPr.setLn(CreateLnFromPreset(aSpPrPr[1], index, aBaseColors));
+    oObject.spPr.setFill(CreateUnifillFromPreset(aSpPrPr[0], index, aBaseColors, bAccent1Background));
+    oObject.spPr.setLn(CreateLnFromPreset(aSpPrPr[1], index, aBaseColors, bAccent1Background));
 }
 
-function ApplyTxPr(aTextPr, oObject, oDrawingDocument, i, baseFills){
+function ApplyTxPr(aTextPr, oObject, oDrawingDocument, i, baseFills, bAccent1Background){
     if(!aTextPr){
         return;
     }
@@ -9650,7 +9651,7 @@ function ApplyTxPr(aTextPr, oObject, oDrawingDocument, i, baseFills){
     Pr.DefaultRunPr.FontSize = aTextPr[0];
     Pr.DefaultRunPr.Bold = aTextPr[1];
     Pr.DefaultRunPr.Italic = aTextPr[2];
-    Pr.DefaultRunPr.Unifill = CreateUnifillFromPreset(aTextPr[3], i, baseFills);
+    Pr.DefaultRunPr.Unifill = CreateUnifillFromPreset(aTextPr[3], i, baseFills, bAccent1Background);
     Pr.DefaultRunPr.Caps = aTextPr[4];
     oObject.txPr.content.Content[0].Set_Pr(Pr);
     if(aTextPr[5]){
@@ -9769,6 +9770,11 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
     oChartSpace.setStyle(aPreset[0]);
     ApplySpPr(aPreset[1], oChartSpace);
     ApplyTxPr(aPreset[2], oChartSpace, oDrawingDocument);
+    var bAccent1Background = false;
+    if(oChartSpace.spPr && oChartSpace.spPr.Fill && oChartSpace.spPr.Fill.fill && oChartSpace.spPr.Fill.fill.color && oChartSpace.spPr.Fill.fill.color.color
+        && oChartSpace.spPr.Fill.fill.color.color.type === window['Asc'].c_oAscColor.COLOR_TYPE_SCHEME &&  oChartSpace.spPr.Fill.fill.color.color.id === 0){
+        bAccent1Background = true;
+    }
     if(!bCreate && !oChartSpace.chart.title){
         oChartSpace.chart.setTitle(new AscFormat.CTitle());
         oChartSpace.chart.title.setOverlay(false);
@@ -9817,21 +9823,21 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
                 var oDPt = new AscFormat.CDPt();
                 oDPt.setBubble3D(false);
                 oDPt.setIdx(j);
-                ApplySpPr(aPreset[11], oDPt, j, base_fills);
+                ApplySpPr(aPreset[11], oDPt, j, base_fills, bAccent1Background);
                 oChart.series[i].addDPt(oDPt);
             }
         }
         else{
             base_fills = AscFormat.getArrayFillsFromBase(style.fill2, oChart.series.length);
-            ApplySpPr(aPreset[11], oChart.series[i], i, base_fills);
+            ApplySpPr(aPreset[11], oChart.series[i], i, base_fills, bAccent1Background);
         }
         if(oChart.getObjectType() === AscDFH.historyitem_type_PieChart || oChart.getObjectType() === AscDFH.historyitem_type_DoughnutChart){
             ApplyDLblsProps(aPreset[12], oChart.series[i], oDrawingDocument, i, base_fills);
             if(oChart.series[i].dLbls){
                 for(var j = 0; j < pts.length; ++j){
                     var oDLbl = new AscFormat.CDLbl();
-                    ApplyTxPr(aPreset[12][0], oDLbl, oDrawingDocument, j, base_fills);
-                    ApplySpPr(aPreset[12][1], oDLbl, j, base_fills);
+                    ApplyTxPr(aPreset[12][0], oDLbl, oDrawingDocument, j, base_fills, bAccent1Background);
+                    ApplySpPr(aPreset[12][1], oDLbl, j, base_fills, bAccent1Background);
                     oDLbl.setDLblPos(aPreset[12][2]);
                     oDLbl.setSeparator(aPreset[12][3]);
                     oDLbl.setShowBubbleSize(aPreset[12][4]);
