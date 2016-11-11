@@ -3067,7 +3067,7 @@ CChartsDrawer.prototype =
 		var res = false;
 		
 		var excelApi = window["Asc"] && window["Asc"]["editor"];
-		var chart = chartSpace && chartSpace.chart ? chartSpace.chart.plotArea.chart: null;
+		var chart = chartSpace && chartSpace.chart ? chartSpace.chart.plotArea.charts[0]: null;
 		var typeChart = chart ? chart.getObjectType() : null;
 		
 		if(isTurnOn3DCharts && chartSpace && chartSpace.chart.view3D)

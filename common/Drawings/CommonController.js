@@ -2982,21 +2982,21 @@ DrawingObjectsController.prototype =
                         }
 
                         var oView3d = chart.view3D;
-                        if(15 !== oView3d.rotX)
+                        if(!AscFormat.isRealNumber(oView3d.rotX))
                         {
                             oView3d.setRotX(15);
                         }
-                        if(20 !== oView3d.rotY)
+                        if(!AscFormat.isRealNumber(oView3d.rotY))
                         {
                             oView3d.setRotY(20);
                         }
-                        if(true !== oView3d.rAngAx)
+                        if(!AscFormat.isRealBool(oView3d.rAngAx))
                         {
                             oView3d.setRAngAx(true);
                         }
                         if(c_oAscChartTypeSettings.barNormal3dPerspective === type)
                         {
-                            if(100 !== oView3d.depthPercent)
+                            if(!AscFormat.isRealNumber(oView3d.depthPercent))
                             {
                                 oView3d.setDepthPercent(100);
                             }
