@@ -4386,7 +4386,7 @@ Woorksheet.prototype.setColHidden=function(bHidden, start, stop){
 			else
 			{
 				col.hd = null;
-				if(0 == col.width)
+				if(0 >= col.width)
 					col.width = null;
 			}
 			var oNewProps = col.getWidthProp();

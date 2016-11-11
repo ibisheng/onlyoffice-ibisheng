@@ -5665,6 +5665,9 @@
             else if ( c_oSerWorksheetColTypes.Width == type )
             {
                 oCol.width = this.stream.GetDoubleLE();
+				if (oCol.width < 0) {
+					oCol.width = 0;
+				}
                 if(AscCommon.CurFileVersion < 2)
                     oCol.CustomWidth = 1;
             }
