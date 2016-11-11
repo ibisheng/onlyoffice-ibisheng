@@ -2744,8 +2744,10 @@ DrawingObjectsController.prototype =
         var type = chartSettings.getType();
         if(AscFormat.isRealNumber(style_index)){
             --style_index;
-            if(AscCommon.g_oChartPresets[type] && AscCommon.g_oChartPresets[type][style_index]){
-                AscFormat.ApplyPresetToChartSpace(chartSpace, AscCommon.g_oChartPresets[type][style_index]);
+            var oCurChartSettings = this.getPropsFromChart(chartSpace);
+            var _cur_type = oCurChartSettings.type;
+            if(AscCommon.g_oChartPresets[_cur_type] && AscCommon.g_oChartPresets[_cur_type][style_index]){
+                AscFormat.ApplyPresetToChartSpace(chartSpace, AscCommon.g_oChartPresets[_cur_type][style_index]);
                 return;
             }
         }
@@ -9762,23 +9764,34 @@ function ApplyDLblsProps(aPr, oObj, oDrawingDocument, i, baseFills){
     lbls.setShowVal(aPr[10]);
 
 }
-function ApplyPresetToChartSpace(oChartSpace, aPreset){
+function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
     var oDrawingDocument = oChartSpace.getDrawingDocument();
     oChartSpace.setStyle(aPreset[0]);
     ApplySpPr(aPreset[1], oChartSpace);
     ApplyTxPr(aPreset[2], oChartSpace, oDrawingDocument);
+    if(!bCreate && !oChartSpace.chart.title){
+        oChartSpace.chart.setTitle(new AscFormat.CTitle());
+        oChartSpace.chart.title.setOverlay(false);
+    }
     if(oChartSpace.chart.title){
         ApplySpPr(aPreset[3], oChartSpace.chart.title);
         ApplyTxPr(aPreset[4], oChartSpace.chart.title, oDrawingDocument);
     }
 
 
-    var style = AscFormat.CHART_STYLE_MANAGER.getStyleByIndex(this.style);
+    var style = AscFormat.CHART_STYLE_MANAGER.getStyleByIndex(aPreset[0]);
 
-    ApplyLegendProps(aPreset[5], oChartSpace.chart.legend, oDrawingDocument);
-    if(!aPreset[5]){
+    if(!aPreset[5] && !bCreate){
         oChartSpace.chart.setLegend(null);
     }
+    else{
+        if(!bCreate && aPreset[5]){
+            oChartSpace.chart.setLegend(new AscFormat.CLegend());
+            oChartSpace.chart.legend.setOverlay(false);
+        }
+    }
+    ApplyLegendProps(aPreset[5], oChartSpace.chart.legend, oDrawingDocument);
+
     var oPlotArea = oChartSpace.chart.plotArea;
     ApplySpPr(aPreset[6], oPlotArea);
     ApplyTxPr(aPreset[7], oPlotArea, oDrawingDocument);
@@ -9790,15 +9803,16 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset){
         ApplyPropsToValAxis(aPreset[9], oAxisByTypes.valAx[i], oDrawingDocument);
     }
 
-    var oChart = oPlotArea.charts[0];
+    var oChart = oPlotArea.charts[0], base_fills;
     ApplyDLblsProps(aPreset[10], oChart, oDrawingDocument);
     for(i = 0; i < oChart.series.length; ++i){
         var pts = AscFormat.getPtsFromSeries(oChart.series[i]);
-        var base_fills = AscFormat.getArrayFillsFromBase(style.fill2, AscFormat.getMaxIdx(pts));
+
+        for(var j = oChart.series[i].dPt.length; j > -1; --j){
+            oChart.series[i].removeDPt(j);
+        }
         if(oChart.getObjectType() === AscDFH.historyitem_type_PieChart || oChart.getObjectType() === AscDFH.historyitem_type_DoughnutChart){
-            for(var j = oChart.series[i].dPt.length; j > -1; --j){
-                oChart.series[i].removeDPt(j);
-            }
+            base_fills = AscFormat.getArrayFillsFromBase(style.fill2, AscFormat.getMaxIdx(pts));
             for(j = 0; j < pts.length; ++j){
                 var oDPt = new AscFormat.CDPt();
                 oDPt.setBubble3D(false);
@@ -9808,6 +9822,7 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset){
             }
         }
         else{
+            base_fills = AscFormat.getArrayFillsFromBase(style.fill2, oChart.series.length);
             ApplySpPr(aPreset[11], oChart.series[i], i, base_fills);
         }
         if(oChart.getObjectType() === AscDFH.historyitem_type_PieChart || oChart.getObjectType() === AscDFH.historyitem_type_DoughnutChart){
@@ -9832,6 +9847,16 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset){
         }
         else{
             ApplyDLblsProps(aPreset[12], oChart.series[i], oDrawingDocument, i, base_fills);
+        }
+    }
+
+
+    if(oChart.getObjectType() === AscDFH.historyitem_type_PieChart || oChart.getObjectType() === AscDFH.historyitem_type_DoughnutChart){
+        oChart.setVaryColors(true);
+    }
+    else{
+        if(oChart.setVaryColors){
+            oChart.setVaryColors(false);
         }
     }
 
@@ -9892,26 +9917,26 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset){
     }
 
 
-    if(oChart.setHiLowLines){
-        var oOlDSpPr = oChartSpace.spPr;
+    if(oChart.getObjectType() === AscDFH.historyitem_type_StockChart){
+        var oOlDSpPr = oChartSpace.spPr && oChartSpace.spPr.createDuplicate();
+        oChartSpace.setSpPr(null);
         ApplySpPr(aPreset[23], oChartSpace);
         oChart.setHiLowLines(oChartSpace.spPr);
-        oChartSpace.setSpPr(oOlDSpPr);
-    }
-    if(oChart.setUpDownBars){
+
         if(!aPreset[24]){
             oChart.setUpDownBars(null);
         }
         else{
             oChart.setUpDownBars(new AscFormat.CUpDownBars());
-            var oOlDSpPr = oChartSpace.spPr;
+            oChartSpace.setSpPr(null);
             ApplySpPr(aPreset[24][0], oChartSpace);
             oChart.upDownBars.setDownBars(oChartSpace.spPr);
             oChart.upDownBars.setGapWidth(aPreset[24][1]);
+            oChartSpace.setSpPr(null);
             ApplySpPr(aPreset[24][2], oChartSpace);
             oChart.upDownBars.setUpBars(oChartSpace.spPr);
-            oChartSpace.setSpPr(oOlDSpPr);
         }
+        oChartSpace.setSpPr(oOlDSpPr);
     }
 }
     function CMathPainter(_api)
