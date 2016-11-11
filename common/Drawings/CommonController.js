@@ -3384,6 +3384,7 @@ DrawingObjectsController.prototype =
                     }
                     new_chart_type.setGrouping(need_groupping);
                 }
+                chart_space.chart.setView3D(null);
                 break;
             }
             case c_oAscChartTypeSettings.scatter:
