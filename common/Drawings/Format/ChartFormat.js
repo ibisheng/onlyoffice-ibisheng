@@ -3697,8 +3697,14 @@ CAreaSeries.prototype =
             this.setOrder(o.order);
         if(o.pictureOptions)
             this.setPictureOptions(o.pictureOptions);
-        if(o.spPr)
+        if(o.spPr){
             this.setSpPr(o.spPr);
+            if(o instanceof AscFormat.CLineSeries){
+                if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_NOFILL){
+                    this.spPr.setFill(null);
+                }
+            }
+        }
         if(o.trendline)
             this.setTrendline(o.trendline);
         if(o.tx)
@@ -9346,6 +9352,11 @@ CBarSeries.prototype =
             this.setShape(o.shape);
         if(o.spPr){
             this.setSpPr(o.spPr);
+            if(o instanceof AscFormat.CLineSeries){
+                if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_NOFILL){
+                    this.spPr.setFill(null);
+                }
+            }
         }
 
         if(o.trendline)
@@ -18437,8 +18448,14 @@ CPieSeries.prototype =
             this.setIdx(o.idx);
         if(o.order)
             this.setOrder(o.order);
-        if(o.spPr)
+        if(o.spPr){
             this.setSpPr(o.spPr);
+            if(o instanceof AscFormat.CLineSeries){
+                if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_NOFILL){
+                    this.spPr.setFill(null);
+                }
+            }
+        }
         if(o.tx)
             this.setTx(o.tx);
         if(o.val)
