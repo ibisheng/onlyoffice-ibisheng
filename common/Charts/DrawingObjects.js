@@ -476,7 +476,10 @@ asc_CChartBinary.prototype = {
         AscCommon.pptx_content_loader.Clear();
         var oNewChartSpace = new AscFormat.CChartSpace();
         var oBinaryChartReader = new AscCommon.BinaryChartReader(stream);
+        var bOldVal = AscCommon.g_oIdCounter.m_bLoad
+        AscCommon.g_oIdCounter.m_bLoad = true;
         oBinaryChartReader.ExternalReadCT_ChartSpace(stream.size , oNewChartSpace, workSheet);
+        AscCommon.g_oIdCounter.m_bLoad = bOldVal;
         return oNewChartSpace;
     },
 
