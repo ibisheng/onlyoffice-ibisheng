@@ -325,6 +325,9 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
 
 function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord)
 {
+    if(e.CtrlKey){
+        return false;
+    }
     var ret = false, i, title;
     if(drawing.hit(x, y))
     {
