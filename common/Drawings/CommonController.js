@@ -3059,9 +3059,14 @@ DrawingObjectsController.prototype =
 
                     if(bNeed3D)
                     {
-                        chart.setView3D(AscFormat.CreateView3d(15, 20, true, c_oAscChartTypeSettings.barNormal3dPerspective === type ? 100 : undefined));
-                        chart.setDefaultWalls();
-                        new_chart_type.set3D(true);
+                        if(!chart.view3D){
+                            chart.setView3D(AscFormat.CreateView3d(15, 20, true, c_oAscChartTypeSettings.barNormal3dPerspective === type ? 100 : undefined));
+                            chart.setDefaultWalls();
+                        }
+                        if(!new_chart_type.b3D){
+                            new_chart_type.set3D(true);
+                        }
+
                     }
                     else
                     {
@@ -3153,19 +3158,19 @@ DrawingObjectsController.prototype =
                         }
 
                         var oView3d = chart.view3D;
-                        if(15 !== oView3d.rotX)
+                        if(!AscFormat.isRealNumber(oView3d.rotX))
                         {
                             oView3d.setRotX(15);
                         }
-                        if(20 !== oView3d.rotY)
+                        if(!AscFormat.isRealNumber(oView3d.rotY))
                         {
                             oView3d.setRotY(20);
                         }
-                        if(true !== oView3d.rAngAx)
+                        if(!AscFormat.isRealBool(oView3d.rAngAx))
                         {
                             oView3d.setRAngAx(true);
                         }
-                        if(100 !== oView3d.depthPercent)
+                        if(!AscFormat.isRealNumber(oView3d.depthPercent))
                         {
                             oView3d.setDepthPercent(100);
                         }
@@ -3213,8 +3218,10 @@ DrawingObjectsController.prototype =
                     }
                     if(type === c_oAscChartTypeSettings.line3d)
                     {
-                        chart.setView3D(AscFormat.CreateView3d(15, 20, true, 100));
-                        chart.setDefaultWalls();
+                        if(!chart.view3D){
+                            chart.setView3D(AscFormat.CreateView3d(15, 20, true, 100));
+                            chart.setDefaultWalls();
+                        }
                     }
                     else
                     {
@@ -3250,8 +3257,10 @@ DrawingObjectsController.prototype =
                     new_chart_type.setVaryColors(true);
                     if(type === c_oAscChartTypeSettings.pie3d)
                     {
-                        chart.setView3D(AscFormat.CreateView3d(30, 0, true, 100));
-                        chart.setDefaultWalls();
+                        if(!chart.view3D){
+                            chart.setView3D(AscFormat.CreateView3d(30, 0, true, 100));
+                            chart.setDefaultWalls();
+                        }
                     }
                     else
                     {
@@ -3277,25 +3286,25 @@ DrawingObjectsController.prototype =
                 {
                     if(type === c_oAscChartTypeSettings.pie3d)
                     {
-                        //if(!chart.view3D)
+                        if(!chart.view3D)
                         {
                             chart.setView3D(new AscFormat.CView3d());
                         }
 
                         var oView3d = chart.view3D;
-                        if(30 !== oView3d.rotX)
+                        if(!AscFormat.isRealNumber(oView3d.rotX))
                         {
                             oView3d.setRotX(30);
                         }
-                        if(0 !== oView3d.rotY)
+                        if(!AscFormat.isRealNumber(oView3d.rotY))
                         {
                             oView3d.setRotY(0);
                         }
-                        if(true !== oView3d.rAngAx)
+                        if(!AscFormat.isRealBool(oView3d.rAngAx))
                         {
                             oView3d.setRAngAx(true);
                         }
-                        if(100 !== oView3d.depthPercent)
+                        if(!AscFormat.isRealNumber(oView3d.depthPercent))
                         {
                             oView3d.setDepthPercent(100);
                         }
