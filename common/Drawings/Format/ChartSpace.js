@@ -1800,13 +1800,14 @@ CChartSpace.prototype.rebuildSeriesFromAsc = function(asc_chart)
             first_series.spPr.setFill(null);
             first_series.spPr.setLn(null);
         }
-        if(asc_series.length < chart_type.series.length){
-            for(var i = chart_type.series.length - 1; i >= asc_series.length; --i){
-                chart_type.removeSeries(i);
-            }
-        }
         if(chart_type.getObjectType() !== AscDFH.historyitem_type_ScatterChart)
         {
+
+            if(asc_series.length < chart_type.series.length){
+                for(var i = chart_type.series.length - 1; i >= asc_series.length; --i){
+                    chart_type.removeSeries(i);
+                }
+            }
             for(var i = 0; i < asc_series.length; ++i)
             {
                 var series = null, bNeedAdd = false;
@@ -1850,6 +1851,9 @@ CChartSpace.prototype.rebuildSeriesFromAsc = function(asc_chart)
         }
         else
         {
+            for(var i = chart_type.series.length - 1; i > -1; --i){
+                chart_type.removeSeries(i);
+            }
             var oXVal;
             var start_index = 0;
             var minus = 0;
