@@ -9344,8 +9344,10 @@ CBarSeries.prototype =
             this.setPictureOptions(o.pictureOptions);
         if(o.shape)
             this.setShape(o.shape);
-        if(o.spPr)
+        if(o.spPr){
             this.setSpPr(o.spPr);
+        }
+
         if(o.trendline)
             this.setTrendline(o.trendline);
         if(o.tx)
@@ -23095,7 +23097,8 @@ function CTitle()
         recalculateBrush: true,
         recalculatePen: true,
         recalcStyle: true,
-        recalculateContent: true
+        recalculateContent: true,
+        recalculateGeometry: true
     };
 
 
@@ -23143,6 +23146,7 @@ CTitle.prototype =
         this.recalcInfo.recalcTransformText = true;
         this.recalcInfo.recalcContent = true;
         this.recalcInfo.recalculateContent = true;
+        this.recalcInfo.recalculateGeometry = true;
 
         this.parent && this.parent.Refresh_RecalcData2 && this.parent.Refresh_RecalcData2(pageIndex, this);
     },
@@ -23154,6 +23158,7 @@ CTitle.prototype =
         this.recalcInfo.recalcTransformText = true;
         this.recalcInfo.recalcContent = true;
         this.recalcInfo.recalculateContent = true;
+        this.recalcInfo.recalculateGeometry = true;
         if(this.tx && this.tx.rich && this.tx.rich.content)
         {
             this.tx.rich.content.Recalc_AllParagraphs_CompiledPr();
@@ -23320,6 +23325,8 @@ CTitle.prototype =
     hitInBoundingRect:  CShape.prototype.hitInBoundingRect,
 
     hitInTextRect: CShape.prototype.hitInTextRect,
+    recalculateGeometry: CShape.prototype.recalculateGeometry,
+    getTransform : CShape.prototype.getTransform ,
 
     checkHitToBounds: function(x, y)
     {
@@ -23586,6 +23593,10 @@ CTitle.prototype =
             {
                 this.recalculateTransformText();
                 this.recalcInfo.recalcTransformText = false;
+            }
+            if(this.recalcInfo.recalculateGeometry){
+                this.recalculateGeometry && this.recalculateGeometry();
+                this.recalcInfo.recalculateGeometry = false;
             }
             if(this.chart)
             {
