@@ -15338,8 +15338,12 @@ CLineSeries.prototype =
             this.setOrder(other.order);
         if(AscFormat.isRealBool(other.smooth))
             this.setSmooth(other.smooth);
-        if(other.spPr)
+        if(other.spPr){
             this.setSpPr(other.spPr);
+            if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_NOFILL){
+                this.spPr.setFill(null);
+            }
+        }
         if(other.trendline)
             this.setTrendline(other.trendline);
         if(other.tx)
