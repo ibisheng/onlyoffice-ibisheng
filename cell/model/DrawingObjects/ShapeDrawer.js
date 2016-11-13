@@ -339,6 +339,17 @@ CShapeDrawer.prototype =
             this.max_y = y;
     },
 
+    CheckDash : function()
+    {
+        if (this.Ln.prstDash != null && AscCommon.DashPatternPresets[this.Ln.prstDash])
+        {
+            var _arr = AscCommon.DashPatternPresets[this.Ln.prstDash].slice();
+            for (var indexD = 0; indexD < _arr.length; indexD++)
+                _arr[indexD] *= this.StrokeWidth;
+            this.Graphics.p_dash(_arr);
+        }
+    },
+
     fromShape2 : function(shape, graphics, geom)
     {
         this.fromShape(shape, graphics);
@@ -492,14 +503,8 @@ CShapeDrawer.prototype =
             this.StrokeWidth /= 36000.0;
 
             this.p_width(1000 * this.StrokeWidth);
-
-            if (this.Ln.prstDash != null && AscCommon.DashPatternPresets[this.Ln.prstDash])
-            {
-                var _arr = AscCommon.DashPatternPresets[this.Ln.prstDash].slice();;
-                for (var indexD = 0; indexD < _arr.length; indexD++)
-                    _arr[indexD] *= this.StrokeWidth;
-                this.Graphics.p_dash(_arr);
-            }
+            
+            this.CheckDash();
 
             if (graphics.IsSlideBoundsCheckerType && !this.bIsNoStrokeAttack)
                 graphics.LineWidth = this.StrokeWidth;
@@ -1063,6 +1068,7 @@ CShapeDrawer.prototype =
         if (arr != null && arr.length > 1 && this.IsCurrentPathCanArrows === true)
         {
             this.IsArrowsDrawing = true;
+            this.Graphics.p_dash(null);
             // значит стрелки есть. теперь:
             // определяем толщину линии "как есть"
             // трансформируем точки в окончательные.
@@ -1153,6 +1159,7 @@ CShapeDrawer.prototype =
                 }
             }
             this.IsArrowsDrawing = false;
+            this.CheckDash();
         }
     },
 
@@ -1356,6 +1363,7 @@ CShapeDrawer.prototype =
             if (arr != null && arr.length > 1 && this.IsCurrentPathCanArrows === true)
             {
                 this.IsArrowsDrawing = true;
+                this.Graphics.p_dash(null);
                 // значит стрелки есть. теперь:
                 // определяем толщину линии "как есть"
                 // трансформируем точки в окончательные.
@@ -1424,6 +1432,7 @@ CShapeDrawer.prototype =
                     }
                 }
                 this.IsArrowsDrawing = false;
+                this.CheckDash();
             }
         }
     },
