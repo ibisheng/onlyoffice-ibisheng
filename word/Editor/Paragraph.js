@@ -265,7 +265,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
 
     this.Lock = new AscCommon.CLock(); // Зажат ли данный параграф другим пользователем
     // TODO: Когда у g_oIdCounter будет тоже проверка на TurnOff заменить здесь
-    if (false === AscCommon.g_oIdCounter.m_bLoad && true === History.Is_On())
+    if (this.bFromDocument && false === AscCommon.g_oIdCounter.m_bLoad && true === History.Is_On())
     {
         this.Lock.Set_Type(AscCommon.locktype_Mine, false);
         if (AscCommon.CollaborativeEditing)
