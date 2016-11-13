@@ -571,6 +571,12 @@ CDocMeta.prototype =
         }
 
         var bIsFromPaint = (this.Pages[obj.Page].start == obj.StreamPos) ? 1 : 0;
+        if (bIsFromPaint)
+        {
+            // default colors: black!!!
+            g.b_color1(0, 0, 0, 255);
+            g.p_color(0, 0, 0, 255);
+        }
 
         if (obj.CheckOnScroll() && 0 == bIsFromPaint)
             editor.WordControl.OnScroll();
