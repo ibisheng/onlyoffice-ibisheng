@@ -3261,6 +3261,12 @@ DrawingObjectsController.prototype =
                             chart.setView3D(AscFormat.CreateView3d(30, 0, true, 100));
                             chart.setDefaultWalls();
                         }
+                        if(!chart.view3D.rAngAx){
+                            chart.view3D.setRAngAx(true);
+                        }
+                        if(chart.view3D.rotX < 0){
+                            chart.view3D.rotX = 30;
+                        }
                     }
                     else
                     {
@@ -9749,6 +9755,7 @@ function ApplyLegendProps(aPr, oLegend, oDrawingDocument){
     ApplyTxPr(aPr[0], oLegend, oDrawingDocument);
     ApplySpPr(aPr[1], oLegend);
     oLegend.setLegendPos(aPr[2]);
+    oLegend.setLayout(null);
 }
 
 function ApplyDLblsProps(aPr, oObj, oDrawingDocument, i, baseFills){
@@ -9792,6 +9799,9 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
     if(oChartSpace.chart.title){
         ApplySpPr(aPreset[3], oChartSpace.chart.title);
         ApplyTxPr(aPreset[4], oChartSpace.chart.title, oDrawingDocument);
+        if(oChartSpace.chart.title.layout){
+            oChartSpace.chart.title.setLayout(null);
+        }
     }
 
 
@@ -9809,6 +9819,9 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
     ApplyLegendProps(aPreset[5], oChartSpace.chart.legend, oDrawingDocument);
 
     var oPlotArea = oChartSpace.chart.plotArea;
+    if(oPlotArea.layout){
+        oPlotArea.setLayout(null);
+    }
     ApplySpPr(aPreset[6], oPlotArea);
     ApplyTxPr(aPreset[7], oPlotArea, oDrawingDocument);
     var oAxisByTypes = oPlotArea.getAxisByTypes();

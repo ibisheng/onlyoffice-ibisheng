@@ -1892,13 +1892,50 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
                     }
                 }
                 else {
-                    _vertical_shift = _text_rect_height - _content_height;
-                    if (oBodyPr.anchor === 0) {
+
+
+                    if((!this.bWordShape && oBodyPr.vertOverflow === AscFormat.nOTClip)
+                        && oContent.Content[0] && oContent.Content[0].Lines[0]  && oContent.Content[0].Lines[0].Bottom > _text_rect_height )
+                    {
+                        var _content_first_line = oContent.Content[0].Lines[0].Bottom;
+                        switch (oBodyPr.anchor) {
+                            case 0: //b
+                            { // (Text Anchor Enum ( Bottom ))
+                                _vertical_shift = _text_rect_height - _content_first_line;
+                                break;
+                            }
+                            case 1:    //ctr
+                            {// (Text Anchor Enum ( Center ))
+                                _vertical_shift = (_text_rect_height - _content_first_line) * 0.5;
+                                break;
+                            }
+                            case 2: //dist
+                            {// (Text Anchor Enum ( Distributed ))
+                                _vertical_shift = (_text_rect_height - _content_first_line) * 0.5;
+                                break;
+                            }
+                            case 3: //just
+                            {// (Text Anchor Enum ( Justified ))
+                                _vertical_shift = (_text_rect_height - _content_first_line) * 0.5;
+                                break;
+                            }
+                            case 4: //t
+                            {//Top
+                                _vertical_shift = 0;
+                                break;
+                            }
+                        }
+                    }
+                    else{
                         _vertical_shift = _text_rect_height - _content_height;
+                        if (oBodyPr.anchor === 0) {
+                            _vertical_shift = _text_rect_height - _content_height;
+                        }
+                        else {
+                            _vertical_shift = 0;
+                        }
                     }
-                    else {
-                        _vertical_shift = 0;
-                    }
+
                 }
             }
             global_MatrixTransformer.TranslateAppend(oMatrix, 0, _vertical_shift);
@@ -1918,7 +1955,7 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
                 _vertical_shift = 0;
             }
             else {
-                if ((!this.bWordShape && oBodyPr.vertOverflow === AscFormat.nOTOwerflow) || _content_height < _text_rect_width) {
+                if ((!this.bWordShape && oBodyPr.vertOverflow === AscFormat.nOTOwerflow) || _content_height <= _text_rect_width) {
                     switch (oBodyPr.anchor) {
                         case 0: //b
                         { // (Text Anchor Enum ( Bottom ))
@@ -1948,6 +1985,8 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
                     }
                 }
                 else {
+
+
                     if (oBodyPr.anchor === 0) {
                         _vertical_shift = _text_rect_width - _content_height;
                     }
