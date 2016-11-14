@@ -1335,7 +1335,9 @@ var editor;
       // ToDo Возможно стоит обновлять только строку формул
       AscCommon.CollaborativeEditing.Load_Images();
       this.wb._onWSSelectionChanged();
+      History.TurnOff();
       this.wb.getWorksheet().updateVisibleRange();
+      History.TurnOn();
     }
   };
 
