@@ -1650,7 +1650,7 @@
                 }
                 // Теперь получаем только не пустые ячейки для строки
                 rowModel = this.model._getRowNoEmpty(r);
-                if (null === rowModel) {
+                if (!rowModel) {
                     continue;
                 }
                 rowCache = this._getRowCache(r);
@@ -4348,7 +4348,7 @@
             }
             // Теперь получаем только не пустые ячейки для строки
             rowModel = this.model._getRowNoEmpty(row);
-            if (null === rowModel) {
+            if (!rowModel) {
                 continue;
             }
             rowCells = rowModel.getCells();
