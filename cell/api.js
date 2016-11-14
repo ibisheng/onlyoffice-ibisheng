@@ -368,14 +368,15 @@ var editor;
     if (null === val) {
       return;
     }
-    AscCommon.setCurrentCultureInfo(val);
-    parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator);
-	  if (this.wbModel) {
-      AscCommon.oGeneralEditFormatCache.cleanCache();
-      AscCommon.oNumFormatCache.cleanCache();
-      this.wbModel.rebuildColors();
-      if (this.IsSendDocumentLoadCompleate) {
-        this._onUpdateAfterApplyChanges();
+    if (AscCommon.setCurrentCultureInfo(val)) {
+      parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator);
+      if (this.wbModel) {
+        AscCommon.oGeneralEditFormatCache.cleanCache();
+        AscCommon.oNumFormatCache.cleanCache();
+        this.wbModel.rebuildColors();
+        if (this.IsSendDocumentLoadCompleate) {
+          this._onUpdateAfterApplyChanges();
+        }
       }
     }
   };
