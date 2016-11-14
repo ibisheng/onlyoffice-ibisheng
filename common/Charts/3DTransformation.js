@@ -151,6 +151,13 @@ Processor3D.prototype._calculateAutoHPercent = function()
 		this.hPercent = this.view3D.hPercent === null ? (heightLine / widthLine) : this.view3D.hPercent / 100;
 		if(this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar && ((this.view3D.hPercent === null && this.view3D.rAngAx) || (this.view3D.hPercent !== null && !this.view3D.rAngAx)))
 			this.hPercent = 1 / this.hPercent;
+			
+		if(AscFormat.c_oChartTypes.Pie === this.chartsDrawer.calcProp.type)
+		{
+			this.hPercent = this.hPercent / 6.8;
+			this.view3D.depthPercent = 680;
+		}
+		
 	}
 };
 
