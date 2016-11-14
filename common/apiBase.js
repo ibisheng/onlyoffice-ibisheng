@@ -56,6 +56,7 @@
 		this.HtmlElement     = null;
 
 		this.isMobileVersion = (config['mobile'] === true);
+		this.isEmbedVersion = (config['embedded'] === true);
 
 		this.isViewMode = false;
 

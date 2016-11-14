@@ -750,6 +750,8 @@
 
 		this.EndShowMessage = undefined;
 
+		this.isOnlyDemonstration = false;
+
 		if (window.editor == undefined)
 		{
 			window.editor = this;
@@ -5861,6 +5863,11 @@ background-repeat: no-repeat;\
 		this.WordControl.DemonstrationManager.GoToSlide(slideNum);
 	};
 
+	asc_docs_api.prototype.SetDemonstrationModeOnly = function()
+	{
+		this.isOnlyDemonstration = true;
+	};
+
 	asc_docs_api.prototype.ApplySlideTiming      = function(oTiming)
 	{
 		if (this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_SlideTiming) === false)
@@ -6882,6 +6889,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['DemonstrationNextSlide']              = asc_docs_api.prototype.DemonstrationNextSlide;
 	asc_docs_api.prototype['DemonstrationPrevSlide']              = asc_docs_api.prototype.DemonstrationPrevSlide;
 	asc_docs_api.prototype['DemonstrationGoToSlide']              = asc_docs_api.prototype.DemonstrationGoToSlide;
+	asc_docs_api.prototype['SetDemonstrationModeOnly']            = asc_docs_api.prototype.SetDemonstrationModeOnly;
 	asc_docs_api.prototype['ApplySlideTiming']                    = asc_docs_api.prototype.ApplySlideTiming;
 	asc_docs_api.prototype['SlideTimingApplyToAll']               = asc_docs_api.prototype.SlideTimingApplyToAll;
 	asc_docs_api.prototype['SlideTransitionPlay']                 = asc_docs_api.prototype.SlideTransitionPlay;

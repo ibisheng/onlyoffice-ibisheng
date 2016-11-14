@@ -3095,7 +3095,7 @@ function CDemonstrationManager(htmlpage)
                 if (oThis.IsPlayMode)
                 {
                     oThis.SlideNum++;
-                    if(oThis.SlideNum === oThis.SlidesCount && oThis.HtmlPage.m_oApi.WordControl.m_oLogicDocument.isLoopShowMode())
+                    if(oThis.SlideNum === oThis.SlidesCount && oThis.isLoop())
                     {
                         oThis.SlideNum = 0;
                     }
@@ -3109,6 +3109,9 @@ function CDemonstrationManager(htmlpage)
 
     this.End = function(isNoUseFullScreen)
     {
+        if (this.HtmlPage.m_oApi.isOnlyDemonstration)
+            return;
+
 		if (true !== isNoUseFullScreen)
 		{
 			if (undefined !== window["AscDesktopEditor"])
@@ -3156,7 +3159,7 @@ function CDemonstrationManager(htmlpage)
         if (!_is_transition)
             this.SlideNum++;
 
-        if (this.HtmlPage.m_oApi.WordControl.m_oLogicDocument.isLoopShowMode() && (this.SlideNum >= this.SlidesCount))
+        if (this.isLoop() && (this.SlideNum >= this.SlidesCount))
             this.SlideNum = 0;
 
         if (this.SlideNum > this.SlidesCount)
@@ -3166,6 +3169,11 @@ function CDemonstrationManager(htmlpage)
             this.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(this.SlideNum);
             this.StartSlide(!_is_transition, false);
         }
+    }
+
+    this.isLoop = function()
+    {
+        return (this.HtmlPage.m_oApi.WordControl.m_oLogicDocument.isLoopShowMode() || this.HtmlPage.m_oApi.isEmbedVersion);
     }
 
     this.PrevSlide = function()
@@ -3181,7 +3189,7 @@ function CDemonstrationManager(htmlpage)
             this.StartSlideBackward();
             this.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(this.SlideNum);
         }
-        else if(this.HtmlPage.m_oApi.WordControl.m_oLogicDocument.isLoopShowMode())
+        else if (this.isLoop())
         {
             this.CorrectSlideNum();
             this.SlideNum = this.SlidesCount;
