@@ -2747,7 +2747,7 @@ DrawingObjectsController.prototype =
             var oCurChartSettings = this.getPropsFromChart(chartSpace);
             var _cur_type = oCurChartSettings.type;
             if(AscCommon.g_oChartPresets[_cur_type] && AscCommon.g_oChartPresets[_cur_type][style_index]){
-                AscFormat.ApplyPresetToChartSpace(chartSpace, AscCommon.g_oChartPresets[_cur_type][style_index]);
+                AscFormat.ApplyPresetToChartSpace(chartSpace, AscCommon.g_oChartPresets[_cur_type][style_index], chartSettings.bCreate);
                 return;
             }
         }
@@ -9684,14 +9684,16 @@ function ApplyTxPr(aTextPr, oObject, oDrawingDocument, i, baseFills, bAccent1Bac
     }
 }
 
-function ApplyPropsToCatAxis(aPr, oAxis, oDrawingDocument){
+function ApplyPropsToCatAxis(aPr, oAxis, oDrawingDocument, bCreate){
     if(!aPr){
         return;
     }
     ApplyTxPr(aPr[0], oAxis, oDrawingDocument);
     ApplySpPr(aPr[2], oAxis);
     if(oAxis.spPr){
-        oAxis.setMajorGridlines(oAxis.spPr);
+        if(!bCreate || oAxis.majorGridlines){
+            oAxis.setMajorGridlines(oAxis.spPr);
+        }
         oAxis.setSpPr(null);
     }
     else
@@ -9700,7 +9702,9 @@ function ApplyPropsToCatAxis(aPr, oAxis, oDrawingDocument){
     }
     ApplySpPr(aPr[3], oAxis);
     if(oAxis.spPr){
-        oAxis.setMinorGridlines(oAxis.spPr);
+        if(!bCreate || oAxis.minorGridlines){
+            oAxis.setMinorGridlines(oAxis.spPr);
+        }
         oAxis.setSpPr(null);
     }
     else{
@@ -9708,22 +9712,26 @@ function ApplyPropsToCatAxis(aPr, oAxis, oDrawingDocument){
     }
     ApplySpPr(aPr[1], oAxis);
 
-    oAxis.setMajorTickMark(aPr[4]);
-    oAxis.setMinorTickMark(aPr[5]);
-    oAxis.setDelete(aPr[6]);
-    if(aPr.length > 7){
-        oAxis.setCrossBetween && oAxis.setCrossBetween(aPr[7]);
-        oAxis.setCrosses && oAxis.setCrosses(aPr[8]);
+    if(!bCreate){
+        oAxis.setMajorTickMark(aPr[4]);
+        oAxis.setMinorTickMark(aPr[5]);
+        oAxis.setDelete(aPr[6]);
+        if(aPr.length > 7){
+            oAxis.setCrossBetween && oAxis.setCrossBetween(aPr[7]);
+            oAxis.setCrosses && oAxis.setCrosses(aPr[8]);
+        }
     }
 }
-function ApplyPropsToValAxis(aPr, oAxis, oDrawingDocument){
+function ApplyPropsToValAxis(aPr, oAxis, oDrawingDocument, bCreate){
     if(!aPr){
         return;
     }
     ApplyTxPr(aPr[0], oAxis, oDrawingDocument);
     ApplySpPr(aPr[2], oAxis);
     if(oAxis.spPr){
-        oAxis.setMajorGridlines(oAxis.spPr);
+        if(!bCreate || oAxis.majorGridlines){
+            oAxis.setMajorGridlines(oAxis.spPr);
+        }
         oAxis.setSpPr(null);
     }
     else
@@ -9732,55 +9740,66 @@ function ApplyPropsToValAxis(aPr, oAxis, oDrawingDocument){
     }
     ApplySpPr(aPr[3], oAxis);
     if(oAxis.spPr){
-        oAxis.setMinorGridlines(oAxis.spPr);
+        if(!bCreate || oAxis.minorGridlines){
+            oAxis.setMinorGridlines(oAxis.spPr);
+        }
         oAxis.setSpPr(null);
     }
     else {
         oAxis.setMinorGridlines(null);
     }
     ApplySpPr(aPr[1], oAxis);
-    oAxis.setMajorTickMark(aPr[4]);
-    oAxis.setMinorTickMark(aPr[5]);
-    oAxis.setDelete(aPr[6]);
-    if(aPr.length > 7){
-        oAxis.setCrossBetween && oAxis.setCrossBetween(aPr[7]);
-        oAxis.setCrosses && oAxis.setCrosses(aPr[8]);
+    if(!bCreate){
+        oAxis.setMajorTickMark(aPr[4]);
+        oAxis.setMinorTickMark(aPr[5]);
+        oAxis.setDelete(aPr[6]);
+        if(aPr.length > 7){
+            oAxis.setCrossBetween && oAxis.setCrossBetween(aPr[7]);
+            oAxis.setCrosses && oAxis.setCrosses(aPr[8]);
+        }
     }
 }
 
-function ApplyLegendProps(aPr, oLegend, oDrawingDocument){
+function ApplyLegendProps(aPr, oLegend, oDrawingDocument, bCreate){
     if(!aPr || !oLegend){
         return;
     }
     ApplyTxPr(aPr[0], oLegend, oDrawingDocument);
     ApplySpPr(aPr[1], oLegend);
-    oLegend.setLegendPos(aPr[2]);
+    if(!bCreate){
+        oLegend.setLegendPos(aPr[2]);
+    }
     oLegend.setLayout(null);
 }
 
-function ApplyDLblsProps(aPr, oObj, oDrawingDocument, i, baseFills){
+function ApplyDLblsProps(aPr, oObj, oDrawingDocument, i, baseFills, bCreate){
     if(!aPr || !oObj){
         if(oObj){
-            oObj.setDLbls(null);
+            !bCreate && oObj.setDLbls(null);
         }
         return;
     }
-    oObj.setDLbls(new AscFormat.CDLbls());
-    var lbls = oObj.dLbls;
-    lbls.setParent(oObj);
+    if(!bCreate) {
+        oObj.setDLbls(new AscFormat.CDLbls());
+    }
+    if(oObj.dLbls){
+        var lbls = oObj.dLbls;
+        lbls.setParent(oObj);
 
-    ApplyTxPr(aPr[0], lbls, oDrawingDocument, i, baseFills);
-    ApplySpPr(aPr[1], lbls, i, baseFills);
-    lbls.setDLblPos(aPr[2]);
-    lbls.setSeparator(aPr[3]);
-    lbls.setShowBubbleSize(aPr[4]);
-    lbls.setShowCatName(aPr[5]);
-    lbls.setShowLeaderLines(aPr[6]);
-    lbls.setShowLegendKey(aPr[7]);
-    lbls.setShowPercent(aPr[8]);
-    lbls.setShowSerName(aPr[9]);
-    lbls.setShowVal(aPr[10]);
-
+        ApplyTxPr(aPr[0], lbls, oDrawingDocument, i, baseFills);
+        ApplySpPr(aPr[1], lbls, i, baseFills);
+        if(!bCreate){
+            lbls.setDLblPos(aPr[2]);
+            lbls.setSeparator(aPr[3]);
+            lbls.setShowBubbleSize(aPr[4]);
+            lbls.setShowCatName(aPr[5]);
+            lbls.setShowLeaderLines(aPr[6]);
+            lbls.setShowLegendKey(aPr[7]);
+            lbls.setShowPercent(aPr[8]);
+            lbls.setShowSerName(aPr[9]);
+            lbls.setShowVal(aPr[10]);
+        }
+    }
 }
 function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
     var oDrawingDocument = oChartSpace.getDrawingDocument();
@@ -9816,7 +9835,7 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
             oChartSpace.chart.legend.setOverlay(false);
         }
     }
-    ApplyLegendProps(aPreset[5], oChartSpace.chart.legend, oDrawingDocument);
+    ApplyLegendProps(aPreset[5], oChartSpace.chart.legend, oDrawingDocument, bCreate);
 
     var oPlotArea = oChartSpace.chart.plotArea;
     if(oPlotArea.layout){
@@ -9826,14 +9845,14 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
     ApplyTxPr(aPreset[7], oPlotArea, oDrawingDocument);
     var oAxisByTypes = oPlotArea.getAxisByTypes();
     for(var i = 0; i < oAxisByTypes.catAx.length; ++i){
-        ApplyPropsToCatAxis(aPreset[8], oAxisByTypes.catAx[i], oDrawingDocument);
+        ApplyPropsToCatAxis(aPreset[8], oAxisByTypes.catAx[i], oDrawingDocument, bCreate);
     }
     for(i = 0; i < oAxisByTypes.valAx.length; ++i){
-        ApplyPropsToValAxis(aPreset[9], oAxisByTypes.valAx[i], oDrawingDocument);
+        ApplyPropsToValAxis(aPreset[9], oAxisByTypes.valAx[i], oDrawingDocument, bCreate);
     }
 
     var oChart = oPlotArea.charts[0], base_fills;
-    ApplyDLblsProps(aPreset[10], oChart, oDrawingDocument);
+    ApplyDLblsProps(aPreset[10], oChart, oDrawingDocument, undefined, undefined, bCreate);
     for(i = 0; i < oChart.series.length; ++i){
         var pts = AscFormat.getPtsFromSeries(oChart.series[i]);
 
@@ -9855,7 +9874,7 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
             ApplySpPr(aPreset[11], oChart.series[i], i, base_fills, bAccent1Background);
         }
         if(oChart.getObjectType() === AscDFH.historyitem_type_PieChart || oChart.getObjectType() === AscDFH.historyitem_type_DoughnutChart){
-            ApplyDLblsProps(aPreset[12], oChart.series[i], oDrawingDocument, i, base_fills);
+            ApplyDLblsProps(aPreset[12], oChart.series[i], oDrawingDocument, i, base_fills, bCreate);
             if(oChart.series[i].dLbls){
                 for(var j = 0; j < pts.length; ++j){
                     var oDLbl = new AscFormat.CDLbl();
@@ -9875,7 +9894,7 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
             }
         }
         else{
-            ApplyDLblsProps(aPreset[12], oChart.series[i], oDrawingDocument, i, base_fills);
+            ApplyDLblsProps(aPreset[12], oChart.series[i], oDrawingDocument, i, base_fills, bCreate);
         }
     }
 
@@ -9942,7 +9961,7 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
     }
     ApplyMarker(aPreset[21], oChart);
     for(var i = 0; i < oChart.series.length; ++i){
-        ApplyMarker(aPreset[22], oChart.series[i], i, base_fills);
+        ApplyMarker(aPreset[22], oChart.series[i], i, base_fills, bCreate);
     }
 
 
@@ -10225,4 +10244,8 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
 	window['AscFormat'].CMathPainter = CMathPainter;
 	window['AscFormat'].CollectSettingsFromChart = CollectSettingsFromChart;
 	window['AscFormat'].ApplyPresetToChartSpace = ApplyPresetToChartSpace;
+	window['AscFormat'].ApplySpPr = ApplySpPr;
+	window['AscFormat'].ApplyDLblsProps = ApplyDLblsProps;
+	window['AscFormat'].CollectDLbls = CollectDLbls;
+	window['AscFormat'].CollectSettingsSpPr = CollectSettingsSpPr;
 })(window);
