@@ -3802,14 +3802,11 @@ DrawingObjectsController.prototype =
                 {
                     if(!chart_type.series[j].marker)
                     {
-                        if(!chart_type.series[j].marker)
-                        {
-                            chart_type.series[j].setMarker(new AscFormat.CMarker());
-                        }
-                        if(chart_type.series[j].marker.symbol !== AscFormat.SYMBOL_NONE)
-                        {
-                            chart_type.series[j].marker.setSymbol(AscFormat.SYMBOL_NONE);
-                        }
+                        chart_type.series[j].setMarker(new AscFormat.CMarker());
+                    }
+                    if(chart_type.series[j].marker.symbol !== AscFormat.SYMBOL_NONE)
+                    {
+                        chart_type.series[j].marker.setSymbol(AscFormat.SYMBOL_NONE);
                     }
                 }
             }
