@@ -18454,10 +18454,8 @@ CPieSeries.prototype =
             this.setOrder(o.order);
         if(o.spPr){
             this.setSpPr(o.spPr);
-            if(o instanceof AscFormat.CLineSeries){
-                if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_NOFILL){
-                    this.spPr.setFill(null);
-                }
+            if(!(o instanceof AscFormat.CPieSeries)){
+                this.spPr.setFill(null);
             }
         }
         if(o.tx)
