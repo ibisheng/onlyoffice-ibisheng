@@ -1234,7 +1234,7 @@ CCellCommentator.prototype._addComment = function (oComment, bChange, bIsNotUpda
 		if (!bIsNotUpdate)
 			this.drawCommentCells();
 	}
-	this.model.workbook.handlers.trigger("asc_onAddComment", oComment.asc_getId(), oComment);
+	this.model.workbook.handlers.trigger('addComment', oComment.asc_getId(), oComment);
 };
 
 CCellCommentator.prototype._removeComment = function (comment, bNoEvent, isDraw) {
@@ -1276,7 +1276,7 @@ CCellCommentator.prototype._removeComment = function (comment, bNoEvent, isDraw)
 	if (isDraw)
 		this.drawCommentCells();
 	if (!bNoEvent)
-		this.model.workbook.handlers.trigger("asc_onRemoveComment", id);
+		this.model.workbook.handlers.trigger('removeComment', id);
 };
 
 CCellCommentator.prototype.isMissComments = function (range) {
@@ -1343,7 +1343,7 @@ CCellCommentator.prototype.Undo = function(type, data) {
 				for (i = 0; i < aComments.length; i++) {
 					if (aComments[i].asc_getId() == data.asc_getId()) {
 						aComments.splice(i, 1);
-						this.model.workbook.handlers.trigger("asc_onRemoveComment", data.asc_getId());
+						this.model.workbook.handlers.trigger('removeComment', data.asc_getId());
 						break;
 					}
 				}
@@ -1356,7 +1356,7 @@ CCellCommentator.prototype.Undo = function(type, data) {
 				parentComment.aReplies.push(data);
 			} else {
 				aComments.push(data);
-				this.model.workbook.handlers.trigger("asc_onAddComment", data.asc_getId(), data);
+				this.model.workbook.handlers.trigger('addComment', data.asc_getId(), data);
 			}
 			break;
 
@@ -1395,7 +1395,7 @@ CCellCommentator.prototype.Redo = function(type, data) {
 				parentComment.aReplies.push(data);
 			} else {
 				aComments.push(data);
-				this.model.workbook.handlers.trigger("asc_onAddComment", data.asc_getId(), data);
+				this.model.workbook.handlers.trigger('addComment', data.asc_getId(), data);
 			}
 			break;
 
@@ -1412,7 +1412,7 @@ CCellCommentator.prototype.Redo = function(type, data) {
 				for (i = 0; i < aComments.length; i++) {
 					if (aComments[i].asc_getId() == data.asc_getId()) {
 						aComments.splice(i, 1);
-						this.model.workbook.handlers.trigger("asc_onRemoveComment", data.asc_getId());
+						this.model.workbook.handlers.trigger('removeComment', data.asc_getId());
 						break;
 					}
 				}

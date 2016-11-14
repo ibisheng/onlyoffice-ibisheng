@@ -789,6 +789,14 @@
     this.handlers.add("asc_onLockDefNameManager", function(reason) {
       self.defNameAllowCreate = !(reason == Asc.c_oAscDefinedNameReason.LockDefNameManager);
     });
+    this.handlers.add('addComment', function(id, data) {
+      self._onWSSelectionChanged();
+      self.handlers.trigger('asc_onAddComment', id, data);
+    });
+    this.handlers.add('removeComment', function(id) {
+      self._onWSSelectionChanged();
+      self.handlers.trigger('asc_onRemoveComment', id);
+    });
 
     this.cellCommentator = new AscCommonExcel.CCellCommentator({
       model: new WorkbookCommentsModel(this.handlers, this.model.aComments),
