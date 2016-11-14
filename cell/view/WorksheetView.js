@@ -1193,13 +1193,12 @@
         // ToDo разобраться со значениями
         this._setFont(undefined, this.model.getDefaultFontName(), defaultFontSize);
         var tm = this._roundTextMetrics(this.stringRender.measureString("A"));
-        this.headersHeightByFont = tm.height;
+        this.headersHeightByFont = tm.height + this.height_1px;
 
         this.maxRowHeight = asc_calcnpt(Asc.c_oAscMaxRowHeight, this._getPPIY());
         this.defaultRowDescender = this._calcRowDescender(defaultFontSize);
-        AscCommonExcel.oDefaultMetrics.RowHeight = this.defaultRowHeight = this.model.getDefaultHeight() ||
-          Math.max(asc_calcnpt(defaultFontSize * this.vspRatio, this._getPPIY()) + this.height_1px,
-            this.headersHeightByFont);
+        AscCommonExcel.oDefaultMetrics.RowHeight = this.defaultRowHeight =
+          Math.min(this.maxRowHeight, this.model.getDefaultHeight() || this.headersHeightByFont);
 
         // Инициализируем число колонок и строк (при открытии). Причем нужно поставить на 1 больше,
         // чтобы могли показать последнюю строку/столбец (http://bugzilla.onlyoffice.com/show_bug.cgi?id=23513)
@@ -1351,7 +1350,7 @@
         else
         //this.headersHeight = this.model.getDefaultHeight() || this.defaultRowHeight;
         {
-            this.headersHeight = this.headersHeightByFont + this.height_1px;
+            this.headersHeight = this.headersHeightByFont;
         }
 
         //this.headersHeight = asc_calcnpt( this.settings.header.fontSize * this.vspRatio, this._getPPIY() );
