@@ -10364,10 +10364,10 @@
                         }
                     }
 
-                    height = Math.max(height, ct.metrics.height);
+                    height = Math.max(height, ct.metrics.height + t.height_1px);
                 }
 
-                t.model.setRowBestFit(true, Math.min(height + t.height_1px, t.maxRowHeight), r, r);
+                t.model.setRowBestFit(true, Math.min(height, t.maxRowHeight), r, r);
             }
             History.EndTransaction();
 
