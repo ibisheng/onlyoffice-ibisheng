@@ -3278,10 +3278,14 @@ PasteProcessor.prototype =
 			for(var i = 0; i < arrShapes.length; ++i)
 			{
 				shape = arrShapes[i];
-		
-				if(shape.txBody.content.Content.length > 1 && (shape.txBody.content.Content[0].Content && shape.txBody.content.Content[0].Content.length === 1))
+				
+				var txBobyContent = shape.txBody.content.Content;
+				if(txBobyContent.length > 1 && txBobyContent[0].Content)
 				{
-					shape.txBody.content.Internal_Content_Remove(0, 1);
+					if(txBobyContent[0].Content.length === 1 || (txBobyContent[0].Content.length === 2 && txBobyContent[0].Content[0].Content && txBobyContent[0].Content[0].Content.length === 0))
+					{
+						shape.txBody.content.Internal_Content_Remove(0, 1);
+					}
 				}
 				
 				var w =  shape.txBody.getRectWidth(presentation.Width*2/3);
