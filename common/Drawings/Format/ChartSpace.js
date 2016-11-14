@@ -1445,6 +1445,7 @@ CChartSpace.prototype.rebuildSeries = function(data)
         AscFormat.ExecuteNoHistory(function(){
             this.checkRemoveCache();
             this.recalculateReferences();
+            this.recalcInfo.recalculateReferences = false;
             // this.recalculate();
         }, this, [])
 
@@ -1796,6 +1797,13 @@ CChartSpace.prototype.rebuildSeriesFromAsc = function(asc_chart)
         var  asc_series = asc_chart.series;
         var chart_type = this.chart.plotArea.charts[0];
         var first_series = chart_type.series[0] ? chart_type.series[0] : chart_type.getSeriesConstructor();
+
+        var bAccent1Background = false;
+        if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.color && this.spPr.Fill.fill.color.color
+            && this.spPr.Fill.fill.color.color.type === window['Asc'].c_oAscColor.COLOR_TYPE_SCHEME &&  this.spPr.Fill.fill.color.color.id === 0){
+            bAccent1Background = true;
+        }
+
         if(first_series.spPr){
             first_series.spPr.setFill(null);
             first_series.spPr.setLn(null);

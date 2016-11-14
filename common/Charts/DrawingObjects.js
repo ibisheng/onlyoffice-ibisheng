@@ -1701,6 +1701,16 @@ function DrawingObjects() {
         copyObject.to.row = object.to.row;
         copyObject.to.rowOff = object.to.rowOff;
 
+
+        copyObject.boundsFromTo.from.col =  object.boundsFromTo.from.col;
+        copyObject.boundsFromTo.from.colOff = object.boundsFromTo.from.colOff;
+        copyObject.boundsFromTo.from.row =  object.boundsFromTo.from.row;
+        copyObject.boundsFromTo.from.rowOff = object.boundsFromTo.from.rowOff;
+        copyObject.boundsFromTo.to.col =  object.boundsFromTo.to.col;
+        copyObject.boundsFromTo.to.colOff = object.boundsFromTo.to.colOff;
+        copyObject.boundsFromTo.to.row =  object.boundsFromTo.to.row;
+        copyObject.boundsFromTo.to.rowOff = object.boundsFromTo.to.rowOff;
+
         copyObject.graphicObject = object.graphicObject;
         return copyObject;
     };
