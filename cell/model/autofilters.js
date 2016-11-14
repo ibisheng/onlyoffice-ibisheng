@@ -4272,7 +4272,6 @@
 					var aNoHiddenRow = [];
 					for(var i = bbox.r1; i <= bbox.r2; i++)
 					{
-						var row = worksheet._getRowNoEmpty(i);
 						if (!worksheet.getRowHidden(i))
 							aNoHiddenRow.push(i);
 					}
