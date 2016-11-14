@@ -325,7 +325,7 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
 
 function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord)
 {
-    if(e.CtrlKey){
+    if(e.CtrlKey || e.Button === AscCommon.g_mouse_button_right){
         return false;
     }
     var ret = false, i, title;
