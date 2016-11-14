@@ -1423,7 +1423,7 @@
         // ToDo calc all rows (not visible)
         for (; ((AscCommonExcel.recalcType.recalc !== type) ? i < l || y + hiddenH < visibleH : i < this.rows.length) &&
                i < gc_nMaxRow; ++i) {
-            row = this.model._getRowNoEmptyWithAll(i);
+            row = this.model._getRowNoEmpty(i);
             if (!row) {
                 h = -1; // Будет использоваться дефолтная высота строки
                 isCustomHeight = false;
