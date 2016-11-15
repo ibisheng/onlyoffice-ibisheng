@@ -10315,12 +10315,13 @@
                     t._cleanCache(new asc_Range(c, 0, c, t.rows.length - 1));
                 }
             }
-            History.EndTransaction();
             if (bUpdate) {
                 t._updateColumnPositions();
                 t._updateVisibleColsCount();
                 t.changeWorksheet("update");
+                t.objectRender.drawingArea.reinitRanges();
             }
+            History.EndTransaction();
         });
     };
 
@@ -10369,13 +10370,14 @@
 
                 t.model.setRowBestFit(true, Math.min(height, t.maxRowHeight), r, r);
             }
-            History.EndTransaction();
 
             t.nRowsCount = 0;
             t._calcHeightRows(AscCommonExcel.recalcType.recalc);
             t._updateVisibleRowsCount();
             t._cleanCache(new asc_Range(0, row1, t.cols.length - 1, row2));
             t.changeWorksheet("update");
+            t.objectRender.drawingArea.reinitRanges();
+            History.EndTransaction();
         };
         return this._isLockedAll(onChangeHeightCallback);
     };
