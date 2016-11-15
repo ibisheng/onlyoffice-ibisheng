@@ -2361,14 +2361,11 @@ var editor;
     return this.wb.cellCommentator.getDocumentComments();
   };
 
-  spreadsheet_api.prototype.asc_showComments = function() {
-    var ws = this.wb.getWorksheet();
-    return ws.cellCommentator.showComments();
+  spreadsheet_api.prototype.asc_showComments = function () {
+    this.wb.showComments(true);
   };
-
-  spreadsheet_api.prototype.asc_hideComments = function() {
-    var ws = this.wb.getWorksheet();
-    return ws.cellCommentator.hideComments();
+  spreadsheet_api.prototype.asc_hideComments = function () {
+    this.wb.showComments(false);
   };
 
   // Shapes

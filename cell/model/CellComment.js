@@ -405,7 +405,6 @@ function CCellCommentator(currentSheet) {
 	this.drawingCtx = currentSheet.drawingCtx;
 
 	// Drawing settings
-	this.bShow = true;
 	this.commentIconColor = new AscCommon.CColor(255, 144, 0);
 	this.commentFillColor = new AscCommon.CColor(255, 255, 0);
 	this.commentPadding = 4; 	// px
@@ -521,37 +520,39 @@ CCellCommentator.prototype.getCommentsXY = function(x, y) {
 	return (findCol && findRow) ? this.getComments(findCol.col, findRow.row) : [];
 };
 
-CCellCommentator.prototype.drawCommentCells = function() {
+	CCellCommentator.prototype.drawCommentCells = function () {
 
-	if ( this.isViewerMode() || !this.bShow )
-		return;
-
-	this.drawingCtx.setFillStyle(this.commentIconColor);
-	var commentCell, mergedRange, nCol, nRow, x, y, metrics;
-	var aComments = this.model.aComments;
-	for (var i = 0; i < aComments.length; ++i) {
-		commentCell = aComments[i];
-		if (commentCell.asc_getDocumentFlag() || commentCell.asc_getHiddenFlag() || commentCell.asc_getSolved())
-			continue;
-
-		mergedRange = this.model.getMergedByCell(commentCell.nRow, commentCell.nCol);
-		nCol = mergedRange ? mergedRange.c2 : commentCell.nCol;
-		nRow = mergedRange ? mergedRange.r1 : commentCell.nRow;
-
-		if (metrics = this.worksheet.getCellMetrics(nCol, nRow)) {
-      if (0 === metrics.width || 0 === metrics.height) {
-        continue;
-      }
-			x = metrics.left + metrics.width;
-			y = metrics.top;
-			this.drawingCtx.beginPath();
-			this.drawingCtx.moveTo(x - this.pxToPt(7), y);
-			this.drawingCtx.lineTo(x - this.pxToPt(1), y);
-			this.drawingCtx.lineTo(x - this.pxToPt(1), y + this.pxToPt(6));
-			this.drawingCtx.fill();
+		if (this.isViewerMode() || this.model.workbook.handlers.trigger('hiddenComments')) {
+			return;
 		}
-	}
-};
+
+		this.drawingCtx.setFillStyle(this.commentIconColor);
+		var commentCell, mergedRange, nCol, nRow, x, y, metrics;
+		var aComments = this.model.aComments;
+		for (var i = 0; i < aComments.length; ++i) {
+			commentCell = aComments[i];
+			if (commentCell.asc_getDocumentFlag() || commentCell.asc_getHiddenFlag() || commentCell.asc_getSolved()) {
+				continue;
+			}
+
+			mergedRange = this.model.getMergedByCell(commentCell.nRow, commentCell.nCol);
+			nCol = mergedRange ? mergedRange.c2 : commentCell.nCol;
+			nRow = mergedRange ? mergedRange.r1 : commentCell.nRow;
+
+			if (metrics = this.worksheet.getCellMetrics(nCol, nRow)) {
+				if (0 === metrics.width || 0 === metrics.height) {
+					continue;
+				}
+				x = metrics.left + metrics.width;
+				y = metrics.top;
+				this.drawingCtx.beginPath();
+				this.drawingCtx.moveTo(x - this.pxToPt(7), y);
+				this.drawingCtx.lineTo(x - this.pxToPt(1), y);
+				this.drawingCtx.lineTo(x - this.pxToPt(1), y + this.pxToPt(6));
+				this.drawingCtx.fill();
+			}
+		}
+	};
 
 CCellCommentator.prototype.getTextMetrics = function(text, units) {
 	var metrics = { width: 0, height: 0 };
@@ -977,20 +978,6 @@ CCellCommentator.prototype.ascCvtRatio = function(fromUnits, toUnits) {
 	return Asc.getCvtRatio(fromUnits, toUnits, this.overlayCtx.getPPIX());
 };
 
-// Show/Hide
-CCellCommentator.prototype.showComments = function() {
-	if ( !this.bShow ) {
-		this.bShow = true;
-		this.drawCommentCells();
-	}
-};
-
-CCellCommentator.prototype.hideComments = function() {
-	this.bShow = false;
-	this.drawCommentCells();
-	this.model.workbook.handlers.trigger("asc_onHideComment");
-};
-
 // Main
 
 CCellCommentator.prototype.showComment = function(id, bNew) {
@@ -1162,62 +1149,68 @@ CCellCommentator.prototype.removeComment = function(id, bNoEvent, bNoAscLock, bN
 
 // Extra functions
 
-CCellCommentator.prototype.getComments = function(col, row) {
+	CCellCommentator.prototype.getComments = function (col, row) {
 
-	// Array of root items
-	var comments = [];
-	var _col = col, _row = row, mergedRange = null;
-	var aComments = this.model.aComments;
-	var length = aComments.length;
+		// Array of root items
+		var comments = [];
+		var _col = col, _row = row, mergedRange = null;
+		var aComments = this.model.aComments;
+		var length = aComments.length;
 
-	if (!this.bShow)
-		return comments;
+		if (this.model.workbook.handlers.trigger('hiddenComments')) {
+			return comments;
+		}
 
-	if (0 < length) {
-		if (null == _col || null == _row) {
-			var activeCell = this.model.selectionRange.activeCell;
-			_col = activeCell.col;
-			_row = activeCell.row;
-		} else
-			mergedRange = this.model.getMergedByCell(row, col);
+		if (0 < length) {
+			if (null == _col || null == _row) {
+				var activeCell = this.model.selectionRange.activeCell;
+				_col = activeCell.col;
+				_row = activeCell.row;
+			} else {
+				mergedRange = this.model.getMergedByCell(row, col);
+			}
 
-		for (var i = 0; i < length; i++) {
-			var commentCell = aComments[i];
+			for (var i = 0; i < length; i++) {
+				var commentCell = aComments[i];
 
-			if ( !commentCell.asc_getDocumentFlag() /*&& !commentCell.asc_getSolved()*/ && !commentCell.asc_getHiddenFlag() && (commentCell.nLevel == 0) ) {
-				if ( !mergedRange ) {
-					if ( (_col == commentCell.nCol) && (_row == commentCell.nRow) )
-						comments.push(commentCell);
-				}
-				else {
-					if (mergedRange.contains(commentCell.nCol, commentCell.nRow))
-						comments.push(commentCell);
+				if (!commentCell.asc_getDocumentFlag() /*&& !commentCell.asc_getSolved()*/ &&
+					!commentCell.asc_getHiddenFlag() && (commentCell.nLevel == 0)) {
+					if (!mergedRange) {
+						if ((_col == commentCell.nCol) && (_row == commentCell.nRow)) {
+							comments.push(commentCell);
+						}
+					} else {
+						if (mergedRange.contains(commentCell.nCol, commentCell.nRow)) {
+							comments.push(commentCell);
+						}
+					}
 				}
 			}
 		}
-	}
-	return comments;
-};
+		return comments;
+	};
 
-CCellCommentator.prototype.getRangeComments = function(range) {
-	var oComments = {};
-	if (!this.bShow)
-		return null;
-
-	var aComments = this.model.aComments;
-	var i, length, comment, bEmpty = true;
-	for (i = 0, length = aComments.length; i < length; ++i) {
-		comment = aComments[i];
-		if (range.contains(comment.nCol, comment.nRow)) {
-			bEmpty = false;
-			if (!oComments.hasOwnProperty(comment.nRow))
-				oComments[comment.nRow] = [];
-			oComments[comment.nRow].push(comment);
+	CCellCommentator.prototype.getRangeComments = function (range) {
+		var oComments = {};
+		if (this.model.workbook.handlers.trigger('hiddenComments')) {
+			return null;
 		}
-	}
 
-	return bEmpty ? null : oComments;
-};
+		var aComments = this.model.aComments;
+		var i, length, comment, bEmpty = true;
+		for (i = 0, length = aComments.length; i < length; ++i) {
+			comment = aComments[i];
+			if (range.contains(comment.nCol, comment.nRow)) {
+				bEmpty = false;
+				if (!oComments.hasOwnProperty(comment.nRow)) {
+					oComments[comment.nRow] = [];
+				}
+				oComments[comment.nRow].push(comment);
+			}
+		}
+
+		return bEmpty ? null : oComments;
+	};
 
 CCellCommentator.prototype.getDocumentComments = function() {
 
