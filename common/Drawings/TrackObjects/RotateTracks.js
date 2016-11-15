@@ -621,7 +621,7 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
         this.geometry = new AscFormat.Geometry();
         var oPen = new AscFormat.CLn();
         oPen.w = 15000;
-        oPen.Fill = AscFormat.CreateSolidFillRGBA(255, 255, 255, 128);
+        oPen.Fill = AscFormat.CreateSolidFillRGBA(255, 255, 255, 255);
         this.objectToDraw = new OverlayObject(this.geometry, oChartSpace.extX, oChartSpace.extY, null, oPen, oChartSpace.transform );
 
         var oPen2 = new AscFormat.CLn();
