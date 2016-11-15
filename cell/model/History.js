@@ -379,13 +379,14 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 		    if (null !== nSheetId)
 		        this.workbook.handlers.trigger('showWorksheet', nSheetId);
 		}
+		//changeWorksheetUpdate before cleanCellCache to call _calcHeightRows
+		for (i in oRedoObjectParam.oChangeWorksheetUpdate)
+			this.workbook.handlers.trigger("changeWorksheetUpdate",
+				oRedoObjectParam.oChangeWorksheetUpdate[i],{lockDraw: true, reinitRanges: true});
 
 		for (i in Point.UpdateRigions)
 			this.workbook.handlers.trigger("cleanCellCache", i, {'0': Point.UpdateRigions[i]}, true, oRedoObjectParam.bAddRemoveRowCol);
 
-		for (i in oRedoObjectParam.oChangeWorksheetUpdate)
-			this.workbook.handlers.trigger("changeWorksheetUpdate",
-				oRedoObjectParam.oChangeWorksheetUpdate[i],{lockDraw: true, reinitRanges: true});
 		if (oRedoObjectParam.bOnSheetsChanged)
 			this.workbook.handlers.trigger("asc_onSheetsChanged");
 		for (i in oRedoObjectParam.oOnUpdateTabColor) {
