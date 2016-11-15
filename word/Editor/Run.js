@@ -1034,7 +1034,7 @@ ParaRun.prototype.private_UpdateCompositeInputPositionsOnRemove = function(Pos, 
 // Добавляем элемент в позицию с сохранием в историю
 ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 {
-	History.Add(new CChangesRunAddItem(this, Pos, [Item], Pos, true));
+	History.Add(new CChangesRunAddItem(this, Pos, [Item], true));
     this.Content.splice( Pos, 0, Item );
 
     if (true === UpdatePosition)
@@ -1090,7 +1090,7 @@ ParaRun.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
 {
     // Получим массив удаляемых элементов
     var DeletedItems = this.Content.slice( Pos, Pos + Count );
-	History.Add(new CChangesRunRemoveItem(this, Pos, DeletedItems, Pos + Count - 1));
+	History.Add(new CChangesRunRemoveItem(this, Pos, DeletedItems));
 
     this.Content.splice( Pos, Count );
 
@@ -1154,7 +1154,7 @@ ParaRun.prototype.Concat_ToContent = function(NewItems)
     var StartPos = this.Content.length;
     this.Content = this.Content.concat( NewItems );
 
-    History.Add(new CChangesRunAddItem(this, StartPos, NewItems, this.Content.length - 1, false));
+    History.Add(new CChangesRunAddItem(this, StartPos, NewItems, false));
 
     this.private_UpdateTrackRevisionOnChangeContent(true);
 

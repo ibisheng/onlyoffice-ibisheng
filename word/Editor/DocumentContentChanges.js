@@ -42,27 +42,22 @@ AscDFH.changesFactory[AscDFH.historyitem_DocumentContent_RemoveItem] = CChangesD
 
 /**
  * @constructor
- * @extends {AscDFH.CChangesBase}
+ * @extends {AscDFH.CChangesBaseContentChange}
  */
 function CChangesDocumentContentAddItem(Class, Pos, Item)
 {
-	CChangesDocumentContentAddItem.superclass.constructor.call(this, Class);
-
-	this.Pos  = Pos;
-	this.Item = Item;
-
-	this.UseArray = false;
-	this.PosArray = [];
+	CChangesDocumentContentAddItem.superclass.constructor.call(this, Class, Pos, [Item], true);
 }
-AscCommon.extendClass(CChangesDocumentContentAddItem, AscDFH.CChangesBase);
+AscCommon.extendClass(CChangesDocumentContentAddItem, AscDFH.CChangesBaseContentChange);
 CChangesDocumentContentAddItem.prototype.Type = AscDFH.historyitem_DocumentContent_AddItem;
 CChangesDocumentContentAddItem.prototype.Undo = function()
 {
+	var Pos = this.Pos;
+
 	var oDocument = this.Class;
-	var Elements  = oDocument.Content.splice(this.Pos, 1);
+	var Elements  = oDocument.Content.splice(Pos, 1);
 	oDocument.private_RecalculateNumbering(Elements);
 
-	var Pos = this.Pos;
 	if (Pos > 0)
 	{
 		if (Pos <= oDocument.Content.length - 1)
@@ -82,12 +77,16 @@ CChangesDocumentContentAddItem.prototype.Undo = function()
 };
 CChangesDocumentContentAddItem.prototype.Redo = function()
 {
-	var oDocument = this.Class;
-	oDocument.Content.splice(this.Pos, 0, this.Item);
-	oDocument.private_RecalculateNumbering([this.Item]);
+	if (this.Items.length <= 0)
+		return;
 
-	var Element = this.Item;
+	var Element = this.Items[0];
 	var Pos     = this.Pos;
+
+	var oDocument = this.Class;
+	oDocument.Content.splice(Pos, 0, Element);
+	oDocument.private_RecalculateNumbering([Element]);
+
 	if (Pos > 0)
 	{
 		oDocument.Content[Pos - 1].Next = Element;
@@ -110,33 +109,23 @@ CChangesDocumentContentAddItem.prototype.Redo = function()
 
 	Element.Parent = oDocument;
 };
-CChangesDocumentContentAddItem.prototype.WriteToBinary = function(Writer)
+CChangesDocumentContentAddItem.prototype.private_WriteItem = function(Writer, Item)
 {
-	// Long   : Pos
-	// String : Id элемента
-	if (true === this.UseArray)
-		Writer.WriteLong(this.PosArray[0]);
-	else
-		Writer.WriteLong(this.Pos);
-
-	Writer.WriteString2(this.Item.Get_Id());
+	Writer.WriteString2(Item.Get_Id());
 };
-CChangesDocumentContentAddItem.prototype.ReadFromBinary = function(Reader)
+CChangesDocumentContentAddItem.prototype.private_ReadItem = function(Reader)
 {
-	// Long   : Pos
-	// String : Id элемента
-
-	this.UseArray = false;
-	this.Pos      = Reader.GetLong();
-	this.PosArray = [this.Pos];
-	this.Item     = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
+	return AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 };
 CChangesDocumentContentAddItem.prototype.Load = function(Color)
 {
+	if (this.PosArray.length <= 0 || this.Items.length <= 0)
+		return;
+
 	var oDocument = this.Class;
 
-	var Pos     = oDocument.m_oContentChanges.Check(AscCommon.contentchanges_Add, this.Pos);
-	var Element = this.Item;
+	var Pos     = oDocument.m_oContentChanges.Check(AscCommon.contentchanges_Add, this.PosArray[0]);
+	var Element = this.Items[0];
 
 	Pos = Math.min(Pos, oDocument.Content.length);
 
@@ -173,19 +162,13 @@ CChangesDocumentContentAddItem.prototype.Load = function(Color)
 };
 /**
  * @constructor
- * @extends {AscDFH.CChangesBase}
+ * @extends {AscDFH.CChangesBaseContentChange}
  */
 function CChangesDocumentContentRemoveItem(Class, Pos, Items)
 {
-	CChangesDocumentContentRemoveItem.superclass.constructor.call(this, Class);
-
-	this.Pos   = Pos;
-	this.Items = Items;
-
-	this.UseArray = false;
-	this.PosArray = [];
+	CChangesDocumentContentRemoveItem.superclass.constructor.call(this, Class, Pos, Items, false);
 }
-AscCommon.extendClass(CChangesDocumentContentRemoveItem, AscDFH.CChangesBase);
+AscCommon.extendClass(CChangesDocumentContentRemoveItem, AscDFH.CChangesBaseContentChange);
 CChangesDocumentContentRemoveItem.prototype.Type = AscDFH.historyitem_DocumentContent_RemoveItem;
 CChangesDocumentContentRemoveItem.prototype.Undo = function()
 {
@@ -245,67 +228,13 @@ CChangesDocumentContentRemoveItem.prototype.Redo = function()
 		oDocument.Content[Pos].Prev = null;
 	}
 };
-CChangesDocumentContentRemoveItem.prototype.WriteToBinary = function(Writer)
+CChangesDocumentContentRemoveItem.prototype.private_WriteItem = function(Writer, Item)
 {
-	// Long          : Количество удаляемых элементов
-	// Array of
-	// {
-	//   Long   : позиции удаляемых элементов
-	//   String : id удаляемого элемента
-	// }
-
-	var bArray = this.UseArray;
-	var Count  = this.Items.length;
-
-	var StartPos = Writer.GetCurPosition();
-	Writer.Skip(4);
-	var RealCount = Count;
-
-	for (var Index = 0; Index < Count; Index++)
-	{
-		if (true === bArray)
-		{
-			if (false === this.PosArray[Index])
-			{
-				RealCount--;
-			}
-			else
-			{
-				Writer.WriteLong(this.PosArray[Index]);
-				Writer.WriteString2(this.Items[Index]);
-			}
-		}
-		else
-		{
-			Writer.WriteLong(this.Pos);
-			Writer.WriteString2(this.Items[Index]);
-		}
-	}
-
-	var EndPos = Writer.GetCurPosition();
-	Writer.Seek(StartPos);
-	Writer.WriteLong(RealCount);
-	Writer.Seek(EndPos);
+	Writer.WriteString2(Item.Get_Id());
 };
-CChangesDocumentContentRemoveItem.prototype.ReadFromBinary = function(Reader)
+CChangesDocumentContentRemoveItem.prototype.private_ReadItem = function(Reader)
 {
-	// Long          : Количество удаляемых элементов
-	// Array of
-	// {
-	//   Long   : позиции удаляемых элементов
-	//   String : id удаляемого элемента
-	// }
-
-	this.UseArray = true;
-	this.PosArray = [];
-	this.Items    = [];
-
-	var nCount = Reader.GetLong();
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-	{
-		this.PosArray[nIndex] = Reader.GetLong();
-		this.Items[nIndex]    = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
-	}
+	return AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 };
 CChangesDocumentContentRemoveItem.prototype.Load = function(Color)
 {

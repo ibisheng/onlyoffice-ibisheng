@@ -348,22 +348,19 @@ CChangesTableRowHeight.prototype.private_SetValue = function(Value)
 };
 /**
  * @constructor
- * @extends {AscDFH.CChangesBase}
+ * @extends {AscDFH.CChangesBaseContentChange}
  */
 function CChangesTableRowAddCell(Class, Pos, Cell)
 {
-	CChangesTableRowAddCell.superclass.constructor.call(this, Class);
-
-	this.Pos  = Pos;
-	this.Item = Cell;
-
-	this.UseArray = false;
-	this.PosArray = [];
+	CChangesTableRowAddCell.superclass.constructor.call(this, Class, Pos, [Cell], true);
 }
-AscCommon.extendClass(CChangesTableRowAddCell, AscDFH.CChangesBase);
+AscCommon.extendClass(CChangesTableRowAddCell, AscDFH.CChangesBaseContentChange);
 CChangesTableRowAddCell.prototype.Type = AscDFH.historyitem_TableRow_AddCell;
 CChangesTableRowAddCell.prototype.Undo = function()
 {
+	if (this.Items.length <= 0)
+		return;
+
 	var oRow = this.Class;
 	oRow.Content.splice(this.Pos, 1);
 	oRow.CellsInfo.splice(this.Pos, 1);
@@ -371,40 +368,31 @@ CChangesTableRowAddCell.prototype.Undo = function()
 };
 CChangesTableRowAddCell.prototype.Redo = function()
 {
+	if (this.Items.length <= 0)
+		return;
+
 	var oRow = this.Class;
-	oRow.Content.splice(this.Pos, 0, this.Item);
+	oRow.Content.splice(this.Pos, 0, this.Items[0]);
 	oRow.CellsInfo.splice(this.Pos, 0, {});
 	oRow.Internal_ReIndexing(this.Pos);
 };
-CChangesTableRowAddCell.prototype.WriteToBinary = function(Writer)
+CChangesTableRowAddCell.prototype.private_WriteItem = function(Writer, Item)
 {
-	// Long   : Позиция
-	// String : Id элемента
-
-	if (true === this.UseArray)
-		Writer.WriteLong(this.PosArray[0]);
-	else
-		Writer.WriteLong(this.Pos);
-
-	Writer.WriteString2(this.Item.Get_Id());
+	Writer.WriteString2(Item.Get_Id());
 };
-CChangesTableRowAddCell.prototype.ReadFromBinary = function(Reader)
+CChangesTableRowAddCell.prototype.private_ReadItem = function(Reader)
 {
-	// Long   : Позиция
-	// String : Id элемента
-
-	this.UseArray = false;
-	this.PosArray = [];
-
-	this.Pos  = Reader.GetLong();
-	this.Item = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
+	return AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 };
 CChangesTableRowAddCell.prototype.Load = function(Color)
 {
+	if (this.Items.length <= 0 || this.PosArray <= 0)
+		return;
+
 	var oRow = this.Class;
 
-	var Pos     = oRow.m_oContentChanges.Check(AscCommon.contentchanges_Add, this.Pos);
-	var Element = this.Item;
+	var Pos     = oRow.m_oContentChanges.Check(AscCommon.contentchanges_Add, this.PosArray[0]);
+	var Element = this.Items[0];
 
 	if (null != Element)
 	{
@@ -416,33 +404,27 @@ CChangesTableRowAddCell.prototype.Load = function(Color)
 };
 /**
  * @constructor
- * @extends {AscDFH.CChangesBase}
+ * @extends {AscDFH.CChangesBaseContentChange}
  */
-function CChangesTableRowRemoveCell(Class, Pos, Row)
+function CChangesTableRowRemoveCell(Class, Pos, Cell)
 {
-	CChangesTableRowRemoveCell.superclass.constructor.call(this, Class);
-
-	this.Pos  = Pos;
-	this.Item = Row;
-
-	this.UseArray = false;
-	this.PosArray = [];
+	CChangesTableRowRemoveCell.superclass.constructor.call(this, Class, Pos, [Cell], false);
 }
-AscCommon.extendClass(CChangesTableRowRemoveCell, AscDFH.CChangesBase);
+AscCommon.extendClass(CChangesTableRowRemoveCell, AscDFH.CChangesBaseContentChange);
 CChangesTableRowRemoveCell.prototype.Type = AscDFH.historyitem_TableRow_RemoveCell;
 CChangesTableRowRemoveCell.prototype.Undo = function()
 {
-	if (!this.Item)
+	if (this.Items.length <= 0)
 		return;
 
 	var oRow = this.Class;
-	oRow.Content.splice(this.Pos, 0, this.Item);
+	oRow.Content.splice(this.Pos, 0, this.Items[0]);
 	oRow.CellsInfo.splice(this.Pos, 0, {});
 	oRow.Internal_ReIndexing(this.Pos);
 };
 CChangesTableRowRemoveCell.prototype.Redo = function()
 {
-	if (!this.Item)
+	if (this.Items.length <= 0)
 		return;
 
 	var oRow = this.Class;
@@ -450,52 +432,22 @@ CChangesTableRowRemoveCell.prototype.Redo = function()
 	oRow.CellsInfo.splice(this.Pos, 1);
 	oRow.Internal_ReIndexing(this.Pos);
 };
-CChangesTableRowRemoveCell.prototype.WriteToBinary = function(Writer)
+CChangesTableRowRemoveCell.prototype.private_WriteItem = function(Writer, Item)
 {
-	// Bool : Is already deleted?
-	// false ->
-	//     Long   : позиция
-	//     String : Id удаляемой строки
-
-
-	if (this.UseArray && false === this.PosArray[0])
-	{
-		Writer.WriteBool(true);
-	}
-	else
-	{
-		Writer.WriteBool(false);
-		Writer.WriteLong(this.UseArray ? this.PosArray[0] : this.Pos);
-		Writer.WriteString2(this.Item.Get_Id());
-	}
+	Writer.WriteString2(Item.Get_Id());
 };
-CChangesTableRowRemoveCell.prototype.ReadFromBinary = function(Reader)
+CChangesTableRowRemoveCell.prototype.private_ReadItem = function(Reader)
 {
-	// Bool : Is already deleted?
-	// false ->
-	//     Long   : позиция
-	//     String : Id удаляемой строки
-
-	if (false === Reader.GetBool())
-	{
-		this.UseArray = false;
-		this.Pos      = Reader.GetLong();
-		this.Item     = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
-	}
-	else
-	{
-		this.Item = undefined;
-		this.Pos  = -1;
-	}
+	return AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 };
 CChangesTableRowRemoveCell.prototype.Load = function(Color)
 {
-	if (!this.Item)
+	if (this.Items.length <= 0 || this.PosArray.length <= 0)
 		return;
 
 	var oRow = this.Class;
 
-	var Pos = oRow.m_oContentChanges.Check(AscCommon.contentchanges_Remove, this.Pos);
+	var Pos = oRow.m_oContentChanges.Check(AscCommon.contentchanges_Remove, this.PosArray[0]);
 	if (false === Pos)
 		return;
 

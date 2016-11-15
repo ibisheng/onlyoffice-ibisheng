@@ -72,19 +72,13 @@ CChangesHyperlinkToolTip.prototype.private_SetValue = function(Value)
 };
 /**
  * @constructor
- * @extends {AscDFH.CChangesBase}
+ * @extends {AscDFH.CChangesBaseContentChange}
  */
 function CChangesHyperlinkAddItem(Class, Pos, Items)
 {
-	CChangesHyperlinkAddItem.superclass.constructor.call(this, Class);
-
-	this.Pos    = Pos;
-	this.Items  = Items;
-
-	this.UseArray = false;
-	this.PosArray = [];
+	CChangesHyperlinkAddItem.superclass.constructor.call(this, Class, Pos, Items, true);
 }
-AscCommon.extendClass(CChangesHyperlinkAddItem, AscDFH.CChangesBase);
+AscCommon.extendClass(CChangesHyperlinkAddItem, AscDFH.CChangesBaseContentChange);
 CChangesHyperlinkAddItem.prototype.Type = AscDFH.historyitem_Hyperlink_AddItem;
 CChangesHyperlinkAddItem.prototype.Undo = function()
 {
@@ -103,48 +97,13 @@ CChangesHyperlinkAddItem.prototype.Redo = function()
 	oHyperlink.private_UpdateTrackRevisions();
 	oHyperlink.protected_UpdateSpellChecking();
 };
-CChangesHyperlinkAddItem.prototype.WriteToBinary = function(Writer)
+CChangesHyperlinkAddItem.prototype.private_WriteItem = function(Writer, Item)
 {
-	// Long     : Количество элементов
-	// Array of :
-	//  {
-	//    Long     : Позиция
-	//    Variable : Id элемента
-	//  }
-
-	var bArray = this.UseArray;
-	var nCount = this.Items.length;
-
-	Writer.WriteLong(nCount);
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-	{
-		if (true === bArray)
-			Writer.WriteLong(this.PosArray[nIndex]);
-		else
-			Writer.WriteLong(this.Pos + nIndex);
-
-		Writer.WriteString2(this.Items[nIndex].Get_Id());
-	}
+	Writer.WriteString2(Item.Get_Id());
 };
-CChangesHyperlinkAddItem.prototype.ReadFromBinary = function(Reader)
+CChangesHyperlinkAddItem.prototype.private_ReadItem = function(Reader)
 {
-	// Long     : Количество элементов
-	// Array of :
-	//  {
-	//    Long     : Позиция
-	//    Variable : Id Элемента
-	//  }
-
-	this.UseArray = true;
-	this.Items    = [];
-	this.PosArray = [];
-
-	var nCount = Reader.GetLong();
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-	{
-		this.PosArray[nIndex] = Reader.GetLong();
-		this.Items[nIndex]    = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
-	}
+	return AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 };
 CChangesHyperlinkAddItem.prototype.Load = function(Color)
 {
@@ -166,19 +125,13 @@ CChangesHyperlinkAddItem.prototype.Load = function(Color)
 };
 /**
  * @constructor
- * @extends {AscDFH.CChangesBase}
+ * @extends {AscDFH.CChangesBaseContentChange}
  */
 function CChangesHyperlinkRemoveItem(Class, Pos, Items)
 {
-	CChangesHyperlinkRemoveItem.superclass.constructor.call(this, Class);
-
-	this.Pos    = Pos;
-	this.Items  = Items;
-
-	this.UseArray = false;
-	this.PosArray = [];
+	CChangesHyperlinkRemoveItem.superclass.constructor.call(this, Class, Pos, Items, false);
 }
-AscCommon.extendClass(CChangesHyperlinkRemoveItem, AscDFH.CChangesBase);
+AscCommon.extendClass(CChangesHyperlinkRemoveItem, AscDFH.CChangesBaseContentChange);
 CChangesHyperlinkRemoveItem.prototype.Type = AscDFH.historyitem_Hyperlink_RemoveItem;
 CChangesHyperlinkRemoveItem.prototype.Undo = function()
 {
@@ -197,67 +150,13 @@ CChangesHyperlinkRemoveItem.prototype.Redo = function()
 	oHyperlink.private_UpdateTrackRevisions();
 	oHyperlink.protected_UpdateSpellChecking();
 };
-CChangesHyperlinkRemoveItem.prototype.WriteToBinary = function(Writer)
+CChangesHyperlinkRemoveItem.prototype.private_WriteItem = function(Writer, Item)
 {
-	// Long          : Количество удаляемых элементов
-	// Array of
-	// {
-	//    Long : позиции удаляемых элементов
-	//    String : id удаляемых элементов
-	// }
-
-	var bArray = this.UseArray;
-	var nCount = this.Items.length;
-
-	var nStartPos = Writer.GetCurPosition();
-	Writer.Skip(4);
-	var nRealCount = nCount;
-
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-	{
-		if (true === bArray)
-		{
-			if (false === this.PosArray[nIndex])
-			{
-				nRealCount--;
-			}
-			else
-			{
-				Writer.WriteLong(this.PosArray[nIndex]);
-				Writer.WriteString2(this.Items[nIndex]);
-			}
-		}
-		else
-		{
-			Writer.WriteLong(this.Pos);
-			Writer.WriteString2(this.Items[nIndex]);
-		}
-	}
-
-	var nEndPos = Writer.GetCurPosition();
-	Writer.Seek(nStartPos);
-	Writer.WriteLong(nRealCount);
-	Writer.Seek(nEndPos);
+	Writer.WriteString2(Item.Get_Id());
 };
-CChangesHyperlinkRemoveItem.prototype.ReadFromBinary = function(Reader)
+CChangesHyperlinkRemoveItem.prototype.private_ReadItem = function(Reader)
 {
-	// Long          : Количество удаляемых элементов
-	// Array of
-	// {
-	//    Long : позиции удаляемых элементов
-	//    String : id удаляемых элементов
-	// }
-
-	this.UseArray = true;
-	this.Items    = [];
-	this.PosArray = [];
-
-	var nCount = Reader.GetLong();
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-	{
-		this.PosArray[nIndex] = Reader.GetLong();
-		this.Items[nIndex]    = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
-	}
+	return AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 };
 CChangesHyperlinkRemoveItem.prototype.Load = function(Color)
 {

@@ -59,6 +59,8 @@ CCollaborativeChanges.prototype.Set_FromUndoRedo = function(Class, Data, Binary)
 };
 CCollaborativeChanges.prototype.Apply_Data = function()
 {
+	var CollaborativeEditing = AscCommon.CollaborativeEditing;
+
 	var Reader  = this.private_LoadData(this.m_pData);
 	var ClassId = Reader.GetString2();
 	var Class   = AscCommon.g_oTableId.Get_ById(ClassId);
@@ -77,18 +79,24 @@ CCollaborativeChanges.prototype.Apply_Data = function()
 		var oChange = new fChangesClass(Class);
 		oChange.ReadFromBinary(Reader);
 		oChange.Load(this.m_oColor);
+
+		CollaborativeEditing.private_AddOverallChange(oChange);
 		return true;
 	}
-	// Сюда мы попадаем, когда у данного изменения нет класса и он все еще работает по старой схеме через объект
+	else
+	{
+		CollaborativeEditing.private_AddOverallChange(this.m_pData);
+		// Сюда мы попадаем, когда у данного изменения нет класса и он все еще работает по старой схеме через объект
 
-	Reader.Seek2(nReaderPos);
-	//\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-	// Старая схема
+		Reader.Seek2(nReaderPos);
+		//\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+		// Старая схема
 
-	if (!Class.Load_Changes)
-		return false;
+		if (!Class.Load_Changes)
+			return false;
 
-	return Class.Load_Changes(Reader, null, this.m_oColor);
+		return Class.Load_Changes(Reader, null, this.m_oColor);
+	}
 };
 CCollaborativeChanges.prototype.private_LoadData = function(szSrc)
 {
@@ -725,6 +733,9 @@ CCollaborativeEditingBase.prototype.InitMemory = function() {
 	CCollaborativeEditingBase.prototype.private_ClearChanges = function()
 	{
 		this.m_aChanges = [];
+	};
+	CCollaborativeEditingBase.prototype.private_AddOverallChange = function(oChange)
+	{
 	};
 
 

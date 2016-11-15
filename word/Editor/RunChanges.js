@@ -84,27 +84,21 @@ AscDFH.changesFactory[AscDFH.historyitem_ParaRun_MathForcedBreak]   = CChangesRu
 
 /**
  * @constructor
- * @extends {AscDFH.CChangesBase}
+ * @extends {AscDFH.CChangesBaseContentChange}
  */
-function CChangesRunAddItem(Class, Pos, Items, EndPos, Color)
+function CChangesRunAddItem(Class, Pos, Items, Color)
 {
-	CChangesRunAddItem.superclass.constructor.call(this, Class);
+	CChangesRunAddItem.superclass.constructor.call(this, Class, Pos, Items, true);
 
-	this.Pos    = Pos;
-	this.Items  = Items;
-	this.EndPos = EndPos;
-
-	this.Color    = true === Color ? true : false;
-	this.UseArray = false;
-	this.PosArray = [];
+	this.Color = true === Color ? true : false;
 }
-AscCommon.extendClass(CChangesRunAddItem, AscDFH.CChangesBase);
+AscCommon.extendClass(CChangesRunAddItem, AscDFH.CChangesBaseContentChange);
 CChangesRunAddItem.prototype.Type = AscDFH.historyitem_ParaRun_AddItem;
 CChangesRunAddItem.prototype.Undo = function()
 {
 	var oRun = this.Class;
 
-	oRun.Content.splice(this.Pos, this.EndPos - this.Pos + 1);
+	oRun.Content.splice(this.Pos, this.Items.length);
 
 	oRun.RecalcInfo.Measure = true;
 	oRun.protected_UpdateSpellChecking();
@@ -123,57 +117,13 @@ CChangesRunAddItem.prototype.Redo = function()
 	oRun.protected_UpdateSpellChecking();
 	oRun.private_UpdateTrackRevisionOnChangeContent(false);
 };
-CChangesRunAddItem.prototype.WriteToBinary = function(Writer)
+CChangesRunAddItem.prototype.private_WriteItem = function(Writer, Item)
 {
-	// Bool     : Подсвечивать ли данные изменения
-	// Long     : Количество элементов
-	// Array of :
-	//  {
-	//    Long     : Позиция
-	//    Variable : Элемент
-	//  }
-
-	var bArray = this.UseArray;
-	var Count  = this.Items.length;
-
-	if (false === this.Color)
-		Writer.WriteBool(false);
-	else
-		Writer.WriteBool(true);
-
-	Writer.WriteLong(Count);
-
-	for (var Index = 0; Index < Count; Index++)
-	{
-		if (true === bArray)
-			Writer.WriteLong(this.PosArray[Index]);
-		else
-			Writer.WriteLong(this.Pos + Index);
-
-		this.Items[Index].Write_ToBinary(Writer);
-	}
+	Item.Write_ToBinary(Writer);
 };
-CChangesRunAddItem.prototype.ReadFromBinary = function(Reader)
+CChangesRunAddItem.prototype.private_ReadItem = function(Reader)
 {
-	// Bool     : Подсвечивать ли данные изменения
-	// Long     : Количество элементов
-	// Array of :
-	//  {
-	//    Long     : Позиция
-	//    Variable : Id Элемента
-	//  }
-
-	this.UseArray = true;
-	this.PosArray = [];
-	this.Items    = [];
-
-	this.Color = Reader.GetBool();
-	var Count  = Reader.GetLong();
-	for (var Index = 0; Index < Count; Index++)
-	{
-		this.PosArray[Index] = Reader.GetLong();
-		this.Items[Index]    = ParagraphContent_Read_FromBinary(Reader);
-	}
+	return ParagraphContent_Read_FromBinary(Reader);
 };
 CChangesRunAddItem.prototype.Load = function(Color)
 {
@@ -204,20 +154,13 @@ CChangesRunAddItem.prototype.Load = function(Color)
 };
 /**
  * @constructor
- * @extends {AscDFH.CChangesBase}
+ * @extends {AscDFH.CChangesBaseContentChange}
  */
-function CChangesRunRemoveItem(Class, Pos, Items, EndPos)
+function CChangesRunRemoveItem(Class, Pos, Items)
 {
-	CChangesRunRemoveItem.superclass.constructor.call(this, Class);
-
-	this.Pos    = Pos;
-	this.Items  = Items;
-	this.EndPos = EndPos;
-
-	this.UseArray = false;
-	this.PosArray = [];
+	CChangesRunRemoveItem.superclass.constructor.call(this, Class, Pos, Items, false);
 }
-AscCommon.extendClass(CChangesRunRemoveItem, AscDFH.CChangesBase);
+AscCommon.extendClass(CChangesRunRemoveItem, AscDFH.CChangesBaseContentChange);
 CChangesRunRemoveItem.prototype.Type = AscDFH.historyitem_ParaRun_RemoveItem;
 CChangesRunRemoveItem.prototype.Undo = function()
 {
@@ -235,74 +178,19 @@ CChangesRunRemoveItem.prototype.Undo = function()
 CChangesRunRemoveItem.prototype.Redo = function()
 {
 	var oRun = this.Class;
-	oRun.Content.splice(this.Pos, this.EndPos - this.Pos + 1);
+	oRun.Content.splice(this.Pos, this.Items.length);
 
 	oRun.RecalcInfo.Measure = true;
 	oRun.protected_UpdateSpellChecking();
 	oRun.private_UpdateTrackRevisionOnChangeContent(false);
 };
-CChangesRunRemoveItem.prototype.WriteToBinary = function(Writer)
+CChangesRunRemoveItem.prototype.private_WriteItem = function(Writer, Item)
 {
-	// Long     : Количество элементов
-	// Array of :
-	//  {
-	//    Long     : Позиция
-	//    Variable : Элемент
-	//  }
-
-	var bArray = this.UseArray;
-	var Count  = this.Items.length;
-
-	var StartPos = Writer.GetCurPosition();
-	Writer.Skip(4);
-
-	var RealCount = Count;
-	for (var Index = 0; Index < Count; Index++)
-	{
-		if (true === bArray)
-		{
-			if (false === this.PosArray[Index])
-			{
-				RealCount--;
-			}
-			else
-			{
-				Writer.WriteLong(this.PosArray[Index]);
-				this.Items[Index].Write_ToBinary(Writer);
-			}
-		}
-		else
-		{
-			Writer.WriteLong(this.Pos);
-			this.Items[Index].Write_ToBinary(Writer);
-		}
-	}
-
-	var EndPos = Writer.GetCurPosition();
-	Writer.Seek(StartPos);
-	Writer.WriteLong(RealCount);
-	Writer.Seek(EndPos);
+	Item.Write_ToBinary(Writer);
 };
-CChangesRunRemoveItem.prototype.ReadFromBinary = function(Reader)
+CChangesRunRemoveItem.prototype.private_ReadItem = function(Reader)
 {
-	// Long     : Количество элементов
-	// Array of :
-	//  {
-	//    Long     : Позиция
-	//    Variable : Элемент
-	//  }
-
-
-	this.UseArray = true;
-	this.PosArray = [];
-	this.Items    = [];
-
-	var Count  = Reader.GetLong();
-	for (var Index = 0; Index < Count; Index++)
-	{
-		this.PosArray[Index] = Reader.GetLong();
-		this.Items[Index]    = ParagraphContent_Read_FromBinary(Reader);
-	}
+	return ParagraphContent_Read_FromBinary(Reader);
 };
 CChangesRunRemoveItem.prototype.Load = function()
 {

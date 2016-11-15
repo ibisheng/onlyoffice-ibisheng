@@ -2870,7 +2870,105 @@
 		if (this.Class && this.Class.Refresh_RecalcData)
 			this.Class.Refresh_RecalcData(this);
 	};
+	CChangesBase.prototype.IsContentChange = function()
+	{
+		return false;
+	};
 	window['AscDFH'].CChangesBase = CChangesBase;
+	/**
+	 * Базовый класс для изменений, которые меняют содержимое родительского класса.*
+	 * @constructor
+	 * @extends {AscDFH.CChangesBase}
+	 */
+	function CChangesBaseContentChange(Class, Pos, Items, isAdd)
+	{
+		CChangesBaseContentChange.superclass.constructor.call(this, Class);
+
+		this.Pos      = Pos;
+		this.Items    = Items;
+		this.UseArray = false;
+		this.PosArray = [];
+		this.Add      = isAdd;
+	}
+	AscCommon.extendClass(CChangesBaseContentChange, CChangesBase);
+	CChangesBaseContentChange.prototype.IsContentChange = function()
+	{
+		return true;
+	};
+	CChangesBaseContentChange.prototype.IsAdd = function()
+	{
+		return this.Add;
+	};
+	CChangesBaseContentChange.prototype.WriteToBinary = function(Writer)
+	{
+		// Long : Количество элементов
+		// Array of
+		// {
+		//    Long     : позиции элементов
+		//    Variable : Item
+		// }
+
+		var bArray = this.UseArray;
+		var nCount = this.Items.length;
+
+		var nStartPos = Writer.GetCurPosition();
+		Writer.Skip(4);
+		var nRealCount = nCount;
+
+		for (var nIndex = 0; nIndex < nCount; ++nIndex)
+		{
+			if (true === bArray)
+			{
+				if (false === this.PosArray[nIndex])
+				{
+					nRealCount--;
+				}
+				else
+				{
+					Writer.WriteLong(this.PosArray[nIndex]);
+					this.private_WriteItem(Writer, this.Items[nIndex]);
+				}
+			}
+			else
+			{
+				Writer.WriteLong(this.Pos);
+				this.private_WriteItem(Writer, this.Items[nIndex]);
+			}
+		}
+
+		var nEndPos = Writer.GetCurPosition();
+		Writer.Seek(nStartPos);
+		Writer.WriteLong(nRealCount);
+		Writer.Seek(nEndPos);
+	};
+	CChangesBaseContentChange.prototype.ReadFromBinary = function(Reader)
+	{
+		// Long : Количество элементов
+		// Array of
+		// {
+		//    Long     : позиции элементов
+		//    Variable : Item
+		// }
+
+		this.UseArray = true;
+		this.Items    = [];
+		this.PosArray = [];
+
+		var nCount = Reader.GetLong();
+		for (var nIndex = 0; nIndex < nCount; ++nIndex)
+		{
+			this.PosArray[nIndex] = Reader.GetLong();
+			this.Items[nIndex]    = this.private_ReadItem(Reader);
+		}
+	};
+	CChangesBaseContentChange.prototype.private_WriteItem = function(Writer, Item)
+	{
+	};
+	CChangesBaseContentChange.prototype.private_ReadItem = function(Reader)
+	{
+		return null;
+	};
+	window['AscDFH'].CChangesBaseContentChange = CChangesBaseContentChange;
 	/**
 	 * Базовый класс для изменения свойств.
 	 * @constructor

@@ -95,7 +95,12 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
             var Item = Point.Items[Index];
             var oChanges = new AscCommon.CCollaborativeChanges();
             oChanges.Set_FromUndoRedo(Item.Class, Item.Data, Item.Binary);
-			aChanges2.push(oChanges);
+
+			if (Item.Data.IsChangesClass && Item.Data.IsChangesClass())
+				aChanges2.push(Item.Data);
+			else
+				aChanges2.push(oChanges.m_pDatay);
+
             aChanges.push(oChanges.m_pData);
         }
     }
@@ -591,8 +596,11 @@ CWordCollaborativeEditing.prototype.Update_ForeignCursorLabelPosition = function
 //----------------------------------------------------------------------------------------------------------------------
 CWordCollaborativeEditing.prototype.private_ClearChanges = function()
 {
-	this.m_aAllChanges = this.m_aAllChanges.concat(this.m_aChanges);
 	this.m_aChanges = [];
+};
+CWordCollaborativeEditing.prototype.private_AddOverallChange = function(oChange)
+{
+	this.m_aAllChanges.push(oChange);
 };
 CWordCollaborativeEditing.prototype.private_OnSendOwnChanges = function(arrChanges, nDeleteIndex)
 {
@@ -625,10 +633,19 @@ CWordCollaborativeEditing.prototype.Undo = function()
 	{
 		var oChange = this.m_aAllChanges[nPosition + nIndex];
 
-		if (this.private_IsChangeContentChange(oChange))
+		if (oChange && oChange.IsChangesClass && oChange.IsChangesClass())
 		{
-			var bAdd = this.private_IsChangeAddToContent(oChange);
-			console.log(bAdd);
+			if (oChange.IsContentChange())
+			{
+				var bAdd = oChange.IsAdd();
+				console.log(bAdd);
+			}
+
+		}
+		else
+		{
+			console.log("Old change:");
+			console.log(oChange);
 		}
 	}
 
@@ -638,46 +655,6 @@ CWordCollaborativeEditing.prototype.Undo = function()
 CWordCollaborativeEditing.prototype.CanUndo = function()
 {
 	return this.m_aOwnChangesIndexes.length <= 0 ? false : true;
-};
-
-CWordCollaborativeEditing.prototype.private_IsChangeContentChange = function(Data)
-{
-	if (AscDFH.historyitem_Document_AddItem === Data.Type
-		|| AscDFH.historyitem_Document_RemoveItem === Data.Type
-		|| AscDFH.historyitem_DocumentContent_AddItem === Data.Type
-		|| AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type
-		|| AscDFH.historyitem_Table_AddRow === Data.Type
-		|| AscDFH.historyitem_Table_RemoveRow === Data.Type
-		|| AscDFH.historyitem_TableRow_AddCell === Data.Type
-		|| AscDFH.historyitem_TableRow_RemoveCell === Data.Type
-		|| AscDFH.historyitem_Paragraph_AddItem === Data.Type
-		|| AscDFH.historyitem_Paragraph_RemoveItem === Data.Type
-		|| AscDFH.historyitem_Hyperlink_AddItem === Data.Type
-		|| AscDFH.historyitem_Hyperlink_RemoveItem === Data.Type
-		|| AscDFH.historyitem_ParaRun_AddItem === Data.Type
-		|| AscDFH.historyitem_ParaRun_RemoveItem === Data.Type
-		|| AscDFH.historyitem_Presentation_AddSlide === Data.Type
-		|| AscDFH.historyitem_Presentation_RemoveSlide === Data.Type
-		|| AscDFH.historyitem_SlideAddToSpTree === Data.Type
-		|| AscDFH.historyitem_SlideRemoveFromSpTree === Data.Type)
-		return true;
-
-	return false;
-};
-CWordCollaborativeEditing.prototype.private_IsChangeAddToContent = function(Data)
-{
-	if (AscDFH.historyitem_Document_AddItem === Data.Type
-		|| AscDFH.historyitem_DocumentContent_AddItem === Data.Type
-		|| AscDFH.historyitem_Table_AddRow === Data.Type
-		|| AscDFH.historyitem_TableRow_AddCell === Data.Type
-		|| AscDFH.historyitem_Paragraph_AddItem === Data.Type
-		|| AscDFH.historyitem_Hyperlink_AddItem === Data.Type
-		|| AscDFH.historyitem_ParaRun_AddItem === Data.Type
-		|| AscDFH.historyitem_Presentation_AddSlide === Data.Type
-		|| AscDFH.historyitem_SlideAddToSpTree === Data.Type)
-		return true;
-
-	return false;
 };
 
 //--------------------------------------------------------export----------------------------------------------------
