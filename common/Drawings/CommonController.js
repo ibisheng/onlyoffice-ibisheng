@@ -9693,9 +9693,10 @@ function ApplyPropsToCatAxis(aPr, oAxis, oDrawingDocument, bCreate){
         }
         oAxis.setSpPr(null);
     }
-    else
-    {
-        oAxis.setMajorGridlines(null);
+    else{
+        if(!bCreate){
+            oAxis.setMajorGridlines(null);
+        }
     }
     ApplySpPr(aPr[3], oAxis);
     if(oAxis.spPr){
@@ -9705,7 +9706,9 @@ function ApplyPropsToCatAxis(aPr, oAxis, oDrawingDocument, bCreate){
         oAxis.setSpPr(null);
     }
     else{
-        oAxis.setMinorGridlines(null);
+        if(!bCreate){
+            oAxis.setMinorGridlines(null);
+        }
     }
     ApplySpPr(aPr[1], oAxis);
 
@@ -9731,9 +9734,10 @@ function ApplyPropsToValAxis(aPr, oAxis, oDrawingDocument, bCreate){
         }
         oAxis.setSpPr(null);
     }
-    else
-    {
-        oAxis.setMajorGridlines(null);
+    else{
+        if(!bCreate){
+            oAxis.setMajorGridlines(null);
+        }
     }
     ApplySpPr(aPr[3], oAxis);
     if(oAxis.spPr){
@@ -9743,7 +9747,9 @@ function ApplyPropsToValAxis(aPr, oAxis, oDrawingDocument, bCreate){
         oAxis.setSpPr(null);
     }
     else {
-        oAxis.setMinorGridlines(null);
+        if(!bCreate){
+            oAxis.setMinorGridlines(null);
+        }
     }
     ApplySpPr(aPr[1], oAxis);
     if(!bCreate){
