@@ -96,19 +96,13 @@ AscDFH.changesFactory[AscDFH.historyitem_MathDegree_SubSupType]    = CChangesMat
 
 /**
  * @constructor
- * @extends {AscDFH.CChangesBase}
+ * @extends {AscDFH.CChangesBaseContentChange}
  */
 function CChangesMathContentAddItem(Class, Pos, Items)
 {
-	CChangesMathContentAddItem.superclass.constructor.call(this, Class);
-
-	this.Pos    = Pos;
-	this.Items  = Items;
-
-	this.UseArray = false;
-	this.PosArray = [];
+	CChangesMathContentAddItem.superclass.constructor.call(this, Class, Pos, Items, true);
 }
-AscCommon.extendClass(CChangesMathContentAddItem, AscDFH.CChangesBase);
+AscCommon.extendClass(CChangesMathContentAddItem, AscDFH.CChangesBaseContentChange);
 CChangesMathContentAddItem.prototype.Type = AscDFH.historyitem_MathContent_AddItem;
 CChangesMathContentAddItem.prototype.Undo = function()
 {
@@ -127,55 +121,20 @@ CChangesMathContentAddItem.prototype.Redo = function()
 	for (var nIndex = 0; nIndex < this.Items.length; ++nIndex)
 		this.Items[nIndex].Recalc_RunsCompiledPr();
 };
-CChangesMathContentAddItem.prototype.WriteToBinary = function(Writer)
+CChangesMathContentAddItem.prototype.private_WriteItem = function(Writer, Item)
 {
-	// Long     : Количество элементов
-	// Array of :
-	//  {
-	//    Long     : Позиция
-	//    Variable : Id элемента
-	//  }
-
-	var bArray = this.UseArray;
-	var nCount = this.Items.length;
-
-	Writer.WriteLong(nCount);
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-	{
-		if (true === bArray)
-			Writer.WriteLong(this.PosArray[nIndex]);
-		else
-			Writer.WriteLong(this.Pos + nIndex);
-
-		Writer.WriteString2(this.Items[nIndex].Get_Id());
-	}
+	Writer.WriteString2(Item.Get_Id());
 };
-CChangesMathContentAddItem.prototype.ReadFromBinary = function(Reader)
+CChangesMathContentAddItem.prototype.private_ReadItem = function(Reader)
 {
-	// Long     : Количество элементов
-	// Array of :
-	//  {
-	//    Long     : Позиция
-	//    Variable : Id Элемента
-	//  }
-
-	this.UseArray = true;
-	this.Items    = [];
-	this.PosArray = [];
-
-	var nCount = Reader.GetLong();
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-	{
-		this.PosArray[nIndex] = Reader.GetLong();
-		this.Items[nIndex]    = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
-	}
+	return AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 };
 CChangesMathContentAddItem.prototype.Load = function(Color)
 {
 	var oMathContent = this.Class;
 	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
 	{
-		var Pos     = this.PosArray[nIndex];
+		var Pos     = oMathContent.m_oContentChanges.Check(AscCommon.contentchanges_Add, this.PosArray[nIndex]);
 		var Element = this.Items[nIndex];
 
 		if (null != Element)
@@ -188,19 +147,13 @@ CChangesMathContentAddItem.prototype.Load = function(Color)
 };
 /**
  * @constructor
- * @extends {AscDFH.CChangesBase}
+ * @extends {AscDFH.CChangesBaseContentChange}
  */
 function CChangesMathContentRemoveItem(Class, Pos, Items)
 {
-	CChangesMathContentRemoveItem.superclass.constructor.call(this, Class);
-
-	this.Pos    = Pos;
-	this.Items  = Items;
-
-	this.UseArray = false;
-	this.PosArray = [];
+	CChangesMathContentRemoveItem.superclass.constructor.call(this, Class, Pos, Items, false);
 }
-AscCommon.extendClass(CChangesMathContentRemoveItem, AscDFH.CChangesBase);
+AscCommon.extendClass(CChangesMathContentRemoveItem, AscDFH.CChangesBaseContentChange);
 CChangesMathContentRemoveItem.prototype.Type = AscDFH.historyitem_MathContent_RemoveItem;
 CChangesMathContentRemoveItem.prototype.Undo = function()
 {
@@ -219,74 +172,20 @@ CChangesMathContentRemoveItem.prototype.Redo = function()
 	var oMathContent = this.Class;
 	oMathContent.Content.splice(this.Pos, this.Items.length);
 };
-CChangesMathContentRemoveItem.prototype.WriteToBinary = function(Writer)
+CChangesMathContentRemoveItem.prototype.private_WriteItem = function(Writer, Item)
 {
-	// Long          : Количество удаляемых элементов
-	// Array of
-	// {
-	//    Long : позиции удаляемых элементов
-	//    String : id удаляемых элементов
-	// }
-
-	var bArray = this.UseArray;
-	var nCount = this.Items.length;
-
-	var nStartPos = Writer.GetCurPosition();
-	Writer.Skip(4);
-	var nRealCount = nCount;
-
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-	{
-		if (true === bArray)
-		{
-			if (false === this.PosArray[nIndex])
-			{
-				nRealCount--;
-			}
-			else
-			{
-				Writer.WriteLong(this.PosArray[nIndex]);
-				Writer.WriteString2(this.Items[nIndex]);
-			}
-		}
-		else
-		{
-			Writer.WriteLong(this.Pos);
-			Writer.WriteString2(this.Items[nIndex]);
-		}
-	}
-
-	var nEndPos = Writer.GetCurPosition();
-	Writer.Seek(nStartPos);
-	Writer.WriteLong(nRealCount);
-	Writer.Seek(nEndPos);
+	Writer.WriteString2(Item.Get_Id());
 };
-CChangesMathContentRemoveItem.prototype.ReadFromBinary = function(Reader)
+CChangesMathContentRemoveItem.prototype.private_ReadItem = function(Reader)
 {
-	// Long          : Количество удаляемых элементов
-	// Array of
-	// {
-	//    Long : позиции удаляемых элементов
-	//    String : id удаляемых элементов
-	// }
-
-	this.UseArray = true;
-	this.Items    = [];
-	this.PosArray = [];
-
-	var nCount = Reader.GetLong();
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-	{
-		this.PosArray[nIndex] = Reader.GetLong();
-		this.Items[nIndex]    = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
-	}
+	return AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 };
 CChangesMathContentRemoveItem.prototype.Load = function(Color)
 {
 	var oMathContent = this.Class;
 	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
 	{
-		var ChangesPos = this.PosArray[nIndex];
+		var ChangesPos = oMathContent.m_oContentChanges.Check(AscCommon.contentchanges_Remove, this.PosArray[nIndex]);
 
 		if (false === ChangesPos)
 			continue;
@@ -332,19 +231,13 @@ CChangesMathParaJc.prototype.private_SetValue = function(Value)
 
 /**
  * @constructor
- * @extends {AscDFH.CChangesBase}
+ * @extends {AscDFH.CChangesBaseContentChange}
  */
 function CChangesMathBaseAddItems(Class, Pos, Items)
 {
-	CChangesMathBaseAddItems.superclass.constructor.call(this, Class);
-
-	this.Pos    = Pos;
-	this.Items  = Items;
-
-	this.UseArray = false;
-	this.PosArray = [];
+	CChangesMathBaseAddItems.superclass.constructor.call(this, Class, Pos, Items, true);
 }
-AscCommon.extendClass(CChangesMathBaseAddItems, AscDFH.CChangesBase);
+AscCommon.extendClass(CChangesMathBaseAddItems, AscDFH.CChangesBaseContentChange);
 CChangesMathBaseAddItems.prototype.Type = AscDFH.historyitem_MathBase_AddItems;
 CChangesMathBaseAddItems.prototype.Undo = function()
 {
@@ -354,64 +247,41 @@ CChangesMathBaseAddItems.prototype.Redo = function()
 {
 	this.Class.raw_AddToContent(this.Pos, this.Items, false);
 };
-CChangesMathBaseAddItems.prototype.WriteToBinary = function(Writer)
+CChangesMathBaseAddItems.prototype.private_WriteItem = function(Writer, Item)
 {
-	// Long     : Количество элементов
-	// Array of :
-	//  {
-	//    Long     : Позиция
-	//    Variable : Id элемента
-	//  }
-
-	var bArray = this.UseArray;
-	var nCount = this.Items.length;
-
-	Writer.WriteLong(nCount);
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-	{
-		if (true === bArray)
-			Writer.WriteLong(this.PosArray[nIndex]);
-		else
-			Writer.WriteLong(this.Pos + nIndex);
-
-		Writer.WriteString2(this.Items[nIndex].Get_Id());
-	}
+	Writer.WriteString2(Item.Get_Id());
 };
-CChangesMathBaseAddItems.prototype.ReadFromBinary = function(Reader)
+CChangesMathBaseAddItems.prototype.private_ReadItem = function(Reader)
 {
-	// Long     : Количество элементов
-	// Array of :
-	//  {
-	//    Long     : Позиция
-	//    Variable : Id Элемента
-	//  }
-
-	this.UseArray = true;
-	this.Items    = [];
-	this.PosArray = [];
-
-	var nCount = Reader.GetLong();
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
+	return AscCommon.g_oTableId.Get_ById(Reader.GetString2());
+};
+CChangesMathBaseAddItems.prototype.Load = function(Color)
+{
+	var oMathBase = this.Class;
+	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
 	{
-		this.PosArray[nIndex] = Reader.GetLong();
-		this.Items[nIndex]    = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
+		var Pos     = oMathBase.m_oContentChanges.Check(AscCommon.contentchanges_Add, this.PosArray[nIndex]);
+		var Element = this.Items[nIndex];
+
+		if (null !== Element)
+		{
+			oMathBase.Content.splice(Pos, 0, Element);
+			Element.ParentElement = oMathBase;
+			AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(oMathBase, Pos);
+		}
 	}
+
+	oMathBase.fillContent();
 };
 /**
  * @constructor
- * @extends {AscDFH.CChangesBase}
+ * @extends {AscDFH.CChangesBaseContentChange}
  */
 function CChangesMathBaseRemoveItems(Class, Pos, Items)
 {
-	CChangesMathBaseRemoveItems.superclass.constructor.call(this, Class);
-
-	this.Pos    = Pos;
-	this.Items  = Items;
-
-	this.UseArray = false;
-	this.PosArray = [];
+	CChangesMathBaseRemoveItems.superclass.constructor.call(this, Class, Pos, Items, false);
 }
-AscCommon.extendClass(CChangesMathBaseRemoveItems, AscDFH.CChangesBase);
+AscCommon.extendClass(CChangesMathBaseRemoveItems, AscDFH.CChangesBaseContentChange);
 CChangesMathBaseRemoveItems.prototype.Type = AscDFH.historyitem_MathBase_RemoveItems;
 CChangesMathBaseRemoveItems.prototype.Undo = function()
 {
@@ -421,72 +291,27 @@ CChangesMathBaseRemoveItems.prototype.Redo = function()
 {
 	this.Class.raw_RemoveFromContent(this.Pos, this.Items.length);
 };
-CChangesMathBaseRemoveItems.prototype.WriteToBinary = function(Writer)
+CChangesMathBaseRemoveItems.prototype.private_WriteItem = function(Writer, Item)
 {
-	// Long          : Количество удаляемых элементов
-	// Array of
-	// {
-	//    Long : позиции удаляемых элементов
-	//    String : id удаляемых элементов
-	// }
-
-	var bArray = this.UseArray;
-	var nCount = this.Items.length;
-
-	var nStartPos = Writer.GetCurPosition();
-	Writer.Skip(4);
-	var nRealCount = nCount;
-
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-	{
-		if (true === bArray)
-		{
-			if (false === this.PosArray[nIndex])
-			{
-				nRealCount--;
-			}
-			else
-			{
-				Writer.WriteLong(this.PosArray[nIndex]);
-				Writer.WriteString2(this.Items[nIndex]);
-			}
-		}
-		else
-		{
-			Writer.WriteLong(this.Pos);
-			Writer.WriteString2(this.Items[nIndex]);
-		}
-	}
-
-	var nEndPos = Writer.GetCurPosition();
-	Writer.Seek(nStartPos);
-	Writer.WriteLong(nRealCount);
-	Writer.Seek(nEndPos);
+	Writer.WriteString2(Item.Get_Id());
 };
-CChangesMathBaseRemoveItems.prototype.ReadFromBinary = function(Reader)
+CChangesMathBaseRemoveItems.prototype.private_ReadItem = function(Reader)
 {
-	// Long          : Количество удаляемых элементов
-	// Array of
-	// {
-	//    Long : позиции удаляемых элементов
-	//    String : id удаляемых элементов
-	// }
-
-	this.UseArray = true;
-	this.Items    = [];
-	this.PosArray = [];
-
-	var nCount = Reader.GetLong();
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-	{
-		this.PosArray[nIndex] = Reader.GetLong();
-		this.Items[nIndex]    = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
-	}
+	return AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 };
 CChangesMathBaseRemoveItems.prototype.Load = function()
 {
-	this.Redo();
-	AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this.Class, this.Pos, this.Items.length);
+	var oMathBase = this.Class;
+	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
+	{
+		var ChangesPos = oMathBase.m_oContentChanges.Check(AscCommon.contentchanges_Remove, this.PosArray[nIndex]);
+		if (false === ChangesPos)
+			continue;
+
+		oMathBase.Content.splice(ChangesPos, 1);
+		AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(oMathBase, ChangesPos, 1);
+	}
+	oMathBase.fillContent();
 };
 /**
  * @constructor
@@ -1470,11 +1295,6 @@ CChangesMathMatrixRemoveRow.prototype.ReadFromBinary = function(Reader)
 		this.PosArray[nIndex] = Reader.GetLong();
 		this.Items[nIndex]    = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 	}
-};
-CChangesMathMatrixRemoveRow.prototype.Load = function(Color)
-{
-	this.Redo();
-	AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this.Class, this.Pos, this.Items.length);
 };
 /**
  * @constructor

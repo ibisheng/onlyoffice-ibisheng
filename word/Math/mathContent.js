@@ -1231,6 +1231,8 @@ function CMathContent()
     this.ParentElement = null;
 
     this.size = new CMathSize();
+
+	this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
 	
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     AscCommon.g_oTableId.Add( this, this.Id );
@@ -5643,6 +5645,18 @@ CMathContent.prototype.private_CanAutoCorrectTextFunc = function( AutoCorrection
     }
 
     return Result;
+};
+CMathContent.prototype.Clear_ContentChanges = function()
+{
+	this.m_oContentChanges.Clear();
+};
+CMathContent.prototype.Add_ContentChanges = function(Changes)
+{
+	this.m_oContentChanges.Add(Changes);
+};
+CMathContent.prototype.Refresh_ContentChanges = function()
+{
+	this.m_oContentChanges.Refresh();
 };
 
 function AutoCorrectionControl (AutoCorrectionEngine, ParaMath)

@@ -2899,6 +2899,10 @@
 	{
 		return this.Add;
 	};
+	CChangesBaseContentChange.prototype.GetItemsCount = function()
+	{
+		return this.Items.length;
+	};
 	CChangesBaseContentChange.prototype.WriteToBinary = function(Writer)
 	{
 		// Long : Количество элементов

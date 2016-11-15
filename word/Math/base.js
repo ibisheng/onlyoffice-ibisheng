@@ -183,6 +183,8 @@ function CMathBase(bInside)
         this.ReviewInfo.Update();
     }
 
+	this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
+
     return this;
 }
 AscCommon.extendClass(CMathBase, CParagraphContentWithParagraphLikeContent);
@@ -2853,6 +2855,18 @@ CMathBase.prototype.Is_ContentUse = function(MathContent)
     }
 
     return false;
+};
+CMathBase.prototype.Clear_ContentChanges = function()
+{
+	this.m_oContentChanges.Clear();
+};
+CMathBase.prototype.Add_ContentChanges = function(Changes)
+{
+	this.m_oContentChanges.Add(Changes);
+};
+CMathBase.prototype.Refresh_ContentChanges = function()
+{
+	this.m_oContentChanges.Refresh();
 };
 
 function CMathBasePr()

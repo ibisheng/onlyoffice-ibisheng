@@ -42,19 +42,13 @@ AscDFH.changesFactory[AscDFH.historyitem_Field_RemoveItem] = CChangesParaFieldRe
 
 /**
  * @constructor
- * @extends {AscDFH.CChangesBase}
+ * @extends {AscDFH.CChangesBaseContentChange}
  */
 function CChangesParaFieldAddItem(Class, Pos, Items)
 {
-	CChangesParaFieldAddItem.superclass.constructor.call(this, Class);
-
-	this.Pos    = Pos;
-	this.Items  = Items;
-
-	this.UseArray = false;
-	this.PosArray = [];
+	CChangesParaFieldAddItem.superclass.constructor.call(this, Class, Pos, Items, true);
 }
-AscCommon.extendClass(CChangesParaFieldAddItem, AscDFH.CChangesBase);
+AscCommon.extendClass(CChangesParaFieldAddItem, AscDFH.CChangesBaseContentChange);
 CChangesParaFieldAddItem.prototype.Type = AscDFH.historyitem_Field_AddItem;
 CChangesParaFieldAddItem.prototype.Undo = function()
 {
@@ -74,48 +68,13 @@ CChangesParaFieldAddItem.prototype.Redo = function()
 	oField.private_UpdateTrackRevisions();
 	oField.protected_UpdateSpellChecking();
 };
-CChangesParaFieldAddItem.prototype.WriteToBinary = function(Writer)
+CChangesParaFieldAddItem.prototype.private_WriteItem = function(Writer, Item)
 {
-	// Long     : Количество элементов
-	// Array of :
-	//  {
-	//    Long     : Позиция
-	//    Variable : Id элемента
-	//  }
-
-	var bArray = this.UseArray;
-	var nCount = this.Items.length;
-
-	Writer.WriteLong(nCount);
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-	{
-		if (true === bArray)
-			Writer.WriteLong(this.PosArray[nIndex]);
-		else
-			Writer.WriteLong(this.Pos + nIndex);
-
-		Writer.WriteString2(this.Items[nIndex].Get_Id());
-	}
+	Writer.WriteString2(Item.Get_Id());
 };
-CChangesParaFieldAddItem.prototype.ReadFromBinary = function(Reader)
+CChangesParaFieldAddItem.prototype.private_ReadItem = function(Reader)
 {
-	// Long     : Количество элементов
-	// Array of :
-	//  {
-	//    Long     : Позиция
-	//    Variable : Id Элемента
-	//  }
-
-	this.UseArray = true;
-	this.Items    = [];
-	this.PosArray = [];
-
-	var nCount = Reader.GetLong();
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-	{
-		this.PosArray[nIndex] = Reader.GetLong();
-		this.Items[nIndex]    = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
-	}
+	return AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 };
 CChangesParaFieldAddItem.prototype.Load = function(Color)
 {
@@ -137,19 +96,13 @@ CChangesParaFieldAddItem.prototype.Load = function(Color)
 };
 /**
  * @constructor
- * @extends {AscDFH.CChangesBase}
+ * @extends {AscDFH.CChangesBaseContentChange}
  */
 function CChangesParaFieldRemoveItem(Class, Pos, Items)
 {
-	CChangesParaFieldRemoveItem.superclass.constructor.call(this, Class);
-
-	this.Pos    = Pos;
-	this.Items  = Items;
-
-	this.UseArray = false;
-	this.PosArray = [];
+	CChangesParaFieldRemoveItem.superclass.constructor.call(this, Class, Pos, Items, false);
 }
-AscCommon.extendClass(CChangesParaFieldRemoveItem, AscDFH.CChangesBase);
+AscCommon.extendClass(CChangesParaFieldRemoveItem, AscDFH.CChangesBaseContentChange);
 CChangesParaFieldRemoveItem.prototype.Type = AscDFH.historyitem_Field_RemoveItem;
 CChangesParaFieldRemoveItem.prototype.Undo = function()
 {
@@ -169,67 +122,13 @@ CChangesParaFieldRemoveItem.prototype.Redo = function()
 	oField.private_UpdateTrackRevisions();
 	oField.protected_UpdateSpellChecking();
 };
-CChangesParaFieldRemoveItem.prototype.WriteToBinary = function(Writer)
+CChangesParaFieldRemoveItem.prototype.private_WriteItem = function(Writer, Item)
 {
-	// Long          : Количество удаляемых элементов
-	// Array of
-	// {
-	//    Long : позиции удаляемых элементов
-	//    String : id удаляемых элементов
-	// }
-
-	var bArray = this.UseArray;
-	var nCount = this.Items.length;
-
-	var nStartPos = Writer.GetCurPosition();
-	Writer.Skip(4);
-	var nRealCount = nCount;
-
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-	{
-		if (true === bArray)
-		{
-			if (false === this.PosArray[nIndex])
-			{
-				nRealCount--;
-			}
-			else
-			{
-				Writer.WriteLong(this.PosArray[nIndex]);
-				Writer.WriteString2(this.Items[nIndex]);
-			}
-		}
-		else
-		{
-			Writer.WriteLong(this.Pos);
-			Writer.WriteString2(this.Items[nIndex]);
-		}
-	}
-
-	var nEndPos = Writer.GetCurPosition();
-	Writer.Seek(nStartPos);
-	Writer.WriteLong(nRealCount);
-	Writer.Seek(nEndPos);
+	Writer.WriteString2(Item.Get_Id());
 };
-CChangesParaFieldRemoveItem.prototype.ReadFromBinary = function(Reader)
+CChangesParaFieldRemoveItem.prototype.private_ReadItem = function(Reader)
 {
-	// Long          : Количество удаляемых элементов
-	// Array of
-	// {
-	//    Long : позиции удаляемых элементов
-	//    String : id удаляемых элементов
-	// }
-
-	this.UseArray = true;
-	this.Items    = [];
-	this.PosArray = [];
-
-	var nCount = Reader.GetLong();
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-	{
-		this.PosArray[nIndex] = Reader.GetLong();
-		this.Items[nIndex]    = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
-	}
+	return AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 };
 CChangesParaFieldRemoveItem.prototype.Load = function(Color)
 {

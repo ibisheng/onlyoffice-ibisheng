@@ -404,17 +404,17 @@ CHistory.prototype =
     // Регистрируем новое изменение:
     // Class - объект, в котором оно произошло
     // Data  - сами изменения
-    Add : function(_Class, Data)
-    {
+	Add : function(_Class, Data)
+	{
 		if (0 !== this.TurnOffHistory || this.Index < 0)
-            return;
+			return;
 
-        this._CheckCanNotAddChanges();
+		this._CheckCanNotAddChanges();
 
-        // Заглушка на случай, если у нас во время создания одной точки в истории, после нескольких изменений идет
-        // пересчет, потом снова добавляются изменения и снова запускается пересчет и т.д.
-        if ( this.RecIndex >= this.Index )
-            this.RecIndex = this.Index - 1;
+		// Заглушка на случай, если у нас во время создания одной точки в истории, после нескольких изменений идет
+		// пересчет, потом снова добавляются изменения и снова запускается пересчет и т.д.
+		if (this.RecIndex >= this.Index)
+			this.RecIndex = this.Index - 1;
 
 		var Binary_Pos = this.BinaryWriter.GetCurPosition();
 
@@ -436,7 +436,7 @@ CHistory.prototype =
 		}
 
 		var Binary_Len = this.BinaryWriter.GetCurPosition() - Binary_Pos;
-		var Item = {
+		var Item       = {
 			Class  : Class,
 			Data   : Data,
 			Binary : {
@@ -447,70 +447,78 @@ CHistory.prototype =
 			NeedRecalc : !this.MinorChanges
 		};
 
-        this.Points[this.Index].Items.push( Item );
+		this.Points[this.Index].Items.push(Item);
 
-        if (!this.CollaborativeEditing)
-            return;
+		if (!this.CollaborativeEditing)
+			return;
 
-        var bPresentation = !(typeof CPresentation === "undefined");
-        var bSlide = !(typeof Slide === "undefined");
-        if ( ( Class instanceof CDocument        && ( AscDFH.historyitem_Document_AddItem        === Data.Type || AscDFH.historyitem_Document_RemoveItem        === Data.Type ) ) ||
-            (((Class instanceof CDocumentContent || Class instanceof AscFormat.CDrawingDocContent)) && ( AscDFH.historyitem_DocumentContent_AddItem === Data.Type || AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
-            ( Class instanceof CTable           && ( AscDFH.historyitem_Table_AddRow            === Data.Type || AscDFH.historyitem_Table_RemoveRow            === Data.Type ) ) ||
-            ( Class instanceof CTableRow        && ( AscDFH.historyitem_TableRow_AddCell        === Data.Type || AscDFH.historyitem_TableRow_RemoveCell        === Data.Type ) ) ||
-            ( Class instanceof Paragraph        && ( AscDFH.historyitem_Paragraph_AddItem       === Data.Type || AscDFH.historyitem_Paragraph_RemoveItem       === Data.Type ) ) ||
-            ( Class instanceof ParaHyperlink    && ( AscDFH.historyitem_Hyperlink_AddItem       === Data.Type || AscDFH.historyitem_Hyperlink_RemoveItem       === Data.Type ) ) ||
-            ( Class instanceof ParaRun          && ( AscDFH.historyitem_ParaRun_AddItem         === Data.Type || AscDFH.historyitem_ParaRun_RemoveItem         === Data.Type ) ) ||
-            ( bPresentation && Class instanceof CPresentation && (AscDFH.historyitem_Presentation_AddSlide === Data.Type || AscDFH.historyitem_Presentation_RemoveSlide === Data.Type)) ||
-            ( bSlide && Class instanceof Slide && (AscDFH.historyitem_SlideAddToSpTree === Data.Type || AscDFH.historyitem_SlideRemoveFromSpTree === Data.Type))
-            )
-        {
-            var bAdd = ( ( Class instanceof CDocument        && AscDFH.historyitem_Document_AddItem        === Data.Type ) ||
-                ( ((Class instanceof CDocumentContent || Class instanceof AscFormat.CDrawingDocContent)) && AscDFH.historyitem_DocumentContent_AddItem === Data.Type ) ||
-                ( Class instanceof CTable           && AscDFH.historyitem_Table_AddRow            === Data.Type ) ||
-                ( Class instanceof CTableRow        && AscDFH.historyitem_TableRow_AddCell        === Data.Type ) ||
-                ( Class instanceof Paragraph        && AscDFH.historyitem_Paragraph_AddItem       === Data.Type ) ||
-                ( Class instanceof ParaHyperlink    && AscDFH.historyitem_Hyperlink_AddItem       === Data.Type ) ||
-                ( Class instanceof ParaRun          && AscDFH.historyitem_ParaRun_AddItem         === Data.Type ) ||
-                ( bPresentation && Class instanceof CPresentation && (AscDFH.historyitem_Presentation_AddSlide === Data.Type )) ||
-                ( bSlide && Class instanceof Slide && (AscDFH.historyitem_SlideAddToSpTree === Data.Type))
-                ) ? true : false;
+		if (_Class && _Class.IsChangesClass && _Class.IsChangesClass())
+		{
+			if (_Class.IsContentChange())
+			{
+				var bAdd  = _Class.IsAdd();
+				var Count = _Class.GetItemsCount();
 
-            var Count = 1;
+				var ContentChanges = new AscCommon.CContentChangesElement(bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove, Data.Pos, Count, Item);
+				Class.Add_ContentChanges(ContentChanges);
+				this.CollaborativeEditing.Add_NewDC(Class);
 
-            if ( ( Class instanceof Paragraph ) ||  ( Class instanceof ParaHyperlink) || ( Class instanceof ParaRun ) ||
-                ( Class instanceof CDocument        && AscDFH.historyitem_Document_RemoveItem        === Data.Type ) ||
-                ( ((Class instanceof CDocumentContent || Class instanceof AscFormat.CDrawingDocContent)) && AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) )
-                Count = Data.Items.length;
+				if (true === bAdd)
+					this.CollaborativeEditing.Update_DocumentPositionsOnAdd(Class, Data.Pos);
+				else
+					this.CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, Data.Pos, Count);
+			}
+		}
+		else
+		{
 
-            var ContentChanges = new AscCommon.CContentChangesElement( ( bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove ), Data.Pos, Count, Item );
-            Class.Add_ContentChanges( ContentChanges );
-            this.CollaborativeEditing.Add_NewDC( Class );
+			var bPresentation = !(typeof CPresentation === "undefined");
+			var bSlide        = !(typeof Slide === "undefined");
+			if (( Class instanceof AscFormat.CDrawingDocContent && ( AscDFH.historyitem_DocumentContent_AddItem === Data.Type || AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
+				( bPresentation && Class instanceof CPresentation && (AscDFH.historyitem_Presentation_AddSlide === Data.Type || AscDFH.historyitem_Presentation_RemoveSlide === Data.Type)) ||
+				( bSlide && Class instanceof Slide && (AscDFH.historyitem_SlideAddToSpTree === Data.Type || AscDFH.historyitem_SlideRemoveFromSpTree === Data.Type))
+			)
+			{
+				var bAdd = ( ( Class instanceof AscFormat.CDrawingDocContent && AscDFH.historyitem_DocumentContent_AddItem === Data.Type ) ||
+					( bPresentation && Class instanceof CPresentation && (AscDFH.historyitem_Presentation_AddSlide === Data.Type )) ||
+					( bSlide && Class instanceof Slide && (AscDFH.historyitem_SlideAddToSpTree === Data.Type))
+				) ? true : false;
 
-            if (true === bAdd)
-                this.CollaborativeEditing.Update_DocumentPositionsOnAdd(Class, Data.Pos);
-            else
-                this.CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, Data.Pos, Count);
-        }
-        if(this.CollaborativeEditing.AddPosExtChanges && Class instanceof AscFormat.CXfrm)
-        {
-            if(AscDFH.historyitem_Xfrm_SetOffX  === Data.Type ||
-                AscDFH.historyitem_Xfrm_SetOffY === Data.Type ||
-                AscDFH.historyitem_Xfrm_SetExtX === Data.Type ||
-                AscDFH.historyitem_Xfrm_SetExtY === Data.Type ||
-                AscDFH.historyitem_Xfrm_SetChOffX === Data.Type ||
-                AscDFH.historyitem_Xfrm_SetChOffY === Data.Type ||
-                AscDFH.historyitem_Xfrm_SetChExtX === Data.Type ||
-                AscDFH.historyitem_Xfrm_SetChExtY  === Data.Type)
-            {
-                this.CollaborativeEditing.AddPosExtChanges(Item,
-                    AscDFH.historyitem_Xfrm_SetOffX  === Data.Type ||
-                    AscDFH.historyitem_Xfrm_SetExtX === Data.Type ||
-                        AscDFH.historyitem_Xfrm_SetChOffX === Data.Type ||
-                        AscDFH.historyitem_Xfrm_SetChExtX === Data.Type );
-            }
-        }
-    },
+				var Count = 1;
+
+				if (Class instanceof AscFormat.CDrawingDocContent && AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type)
+					Count = Data.Items.length;
+
+				var ContentChanges = new AscCommon.CContentChangesElement(( bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove ), Data.Pos, Count, Item);
+				Class.Add_ContentChanges(ContentChanges);
+				this.CollaborativeEditing.Add_NewDC(Class);
+
+				if (true === bAdd)
+					this.CollaborativeEditing.Update_DocumentPositionsOnAdd(Class, Data.Pos);
+				else
+					this.CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, Data.Pos, Count);
+			}
+		}
+
+		if (this.CollaborativeEditing.AddPosExtChanges && Class instanceof AscFormat.CXfrm)
+		{
+			if (AscDFH.historyitem_Xfrm_SetOffX === Data.Type ||
+				AscDFH.historyitem_Xfrm_SetOffY === Data.Type ||
+				AscDFH.historyitem_Xfrm_SetExtX === Data.Type ||
+				AscDFH.historyitem_Xfrm_SetExtY === Data.Type ||
+				AscDFH.historyitem_Xfrm_SetChOffX === Data.Type ||
+				AscDFH.historyitem_Xfrm_SetChOffY === Data.Type ||
+				AscDFH.historyitem_Xfrm_SetChExtX === Data.Type ||
+				AscDFH.historyitem_Xfrm_SetChExtY === Data.Type)
+			{
+				this.CollaborativeEditing.AddPosExtChanges(Item,
+					AscDFH.historyitem_Xfrm_SetOffX === Data.Type ||
+					AscDFH.historyitem_Xfrm_SetExtX === Data.Type ||
+					AscDFH.historyitem_Xfrm_SetChOffX === Data.Type ||
+					AscDFH.historyitem_Xfrm_SetChExtX === Data.Type);
+			}
+		}
+	},
 
     Internal_RecalcData_Clear : function()
     {
