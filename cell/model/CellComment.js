@@ -357,40 +357,45 @@ asc_CCommentData.prototype = {
 	}
 };
 
-function CompositeCommentData() {
-	this.commentBefore = null;
-	this.commentAfter = null;
+	function CompositeCommentData() {
+		this.commentBefore = null;
+		this.commentAfter = null;
 
-	this.Properties = {
-		commentBefore: 0,
-		commentAfter: 1
-	};
-}
-CompositeCommentData.prototype = {
-	//	For collaborative editing
-	getType: function() {
+		this.Properties = {
+			commentBefore: 0, commentAfter: 1
+		};
+	}
+
+	CompositeCommentData.prototype.getType = function () {
 		return AscCommonExcel.UndoRedoDataTypes.CompositeCommentData;
-	},
+	};
 
-	getProperties: function() {
+	CompositeCommentData.prototype.getProperties = function () {
 		return this.Properties;
-	},
+	};
 
-	getProperty: function(nType) {
+	CompositeCommentData.prototype.getProperty = function (nType) {
 		switch (nType) {
-			case this.Properties.commentBefore: return this.commentBefore; break;
-			case this.Properties.commentAfter: return this.commentAfter; break;
+			case this.Properties.commentBefore:
+				return this.commentBefore;
+				break;
+			case this.Properties.commentAfter:
+				return this.commentAfter;
+				break;
 		}
 		return null;
-	},
+	};
 
-	setProperty: function(nType, value) {
+	CompositeCommentData.prototype.setProperty = function (nType, value) {
 		switch (nType) {
-			case this.Properties.commentBefore: this.commentBefore = value; break;
-			case this.Properties.commentAfter: this.commentAfter = value; break;
+			case this.Properties.commentBefore:
+				this.commentBefore = value;
+				break;
+			case this.Properties.commentAfter:
+				this.commentAfter = value;
+				break;
 		}
-	}
-};
+	};
 
 /** @constructor */
 function CCellCommentator(currentSheet) {
@@ -419,7 +424,6 @@ CCellCommentator.sStartCommentId = 'comment_';
 CCellCommentator.prototype.isViewerMode = function () {
 	return this.worksheet.handlers.trigger("getViewerMode");
 };
-
 CCellCommentator.prototype.isLockedComment = function(oComment, callbackFunc) {
 	var objectGuid = oComment.asc_getId();
 	if (objectGuid) {
@@ -454,37 +458,43 @@ CCellCommentator.prototype.isLockedComment = function(oComment, callbackFunc) {
 	}
 };
 
-CCellCommentator.prototype.moveRangeComments = function(rangeFrom, rangeTo) {
-	if ( rangeFrom && rangeTo ) {
-		var colOffset = rangeTo.c1 - rangeFrom.c1;
-		var rowOffset = rangeTo.r1 - rangeFrom.r1;
+	CCellCommentator.prototype.moveRangeComments = function (rangeFrom, rangeTo, copy) {
+		if (rangeFrom && rangeTo) {
+			var colOffset = rangeTo.c1 - rangeFrom.c1;
+			var rowOffset = rangeTo.r1 - rangeFrom.r1;
 
-		this.model.workbook.handlers.trigger("asc_onHideComment");
-		var aComments = this.model.aComments;
+			this.model.workbook.handlers.trigger("asc_onHideComment");
+			var aComments = this.model.aComments;
 
-		for (var i = 0; i < aComments.length; i++) {
-			var comment = aComments[i];
+			for (var i = 0; i < aComments.length; i++) {
+				var comment = aComments[i];
+				if (rangeFrom.contains(comment.nCol, comment.nRow)) {
+					if (copy) {
+						var newComment = new asc_CCommentData(comment);
+						newComment.nCol += colOffset;
+						newComment.nRow += rowOffset;
+						newComment.setId();
+						this.addComment(newComment, true);
+					} else {
+						var commentBefore = new asc_CCommentData(comment);
+						comment.nCol += colOffset;
+						comment.nRow += rowOffset;
+						this.model.workbook.handlers.trigger("asc_onChangeCommentData", comment.asc_getId(), comment);
 
-			if (rangeFrom.contains(comment.nCol, comment.nRow)) {
+						var commentAfter = new asc_CCommentData(comment);
 
-				var commentBefore = new asc_CCommentData(comment);
+						var compositeComment = new CompositeCommentData();
+						compositeComment.commentBefore = commentBefore;
+						compositeComment.commentAfter = commentAfter;
 
-				comment.nCol += colOffset;
-				comment.nRow += rowOffset;
-				this.model.workbook.handlers.trigger("asc_onChangeCommentData", comment.asc_getId(), comment);
-
-				var commentAfter = new asc_CCommentData(comment);
-
-				var compositeComment = new CompositeCommentData();
-				compositeComment.commentBefore = commentBefore;
-				compositeComment.commentAfter = commentAfter;
-
-				History.Create_NewPoint();
-				History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Change, this.model.getId(), null, compositeComment);
+						History.Create_NewPoint();
+						History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Change, this.model.getId(),
+							null, compositeComment);
+					}
+				}
 			}
 		}
-	}
-};
+	};
 
 CCellCommentator.prototype.deleteCommentsRange = function(range) {
 	if ( range ) {

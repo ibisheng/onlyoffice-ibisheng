@@ -8167,7 +8167,7 @@
         x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
         y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
         var ar = (0 == targetInfo.targetArr ? this.arrActiveFormulaRanges[indexFormulaRange] :
-          this.arrActiveChartRanges[indexFormulaRange]).getLast().clone();
+            this.arrActiveChartRanges[indexFormulaRange]).getLast().clone();
 
         // Колонка по X и строка по Y
         var colByX = this._findColUnderCursor(x, /*canReturnNull*/false, /*dX*/false).col;
@@ -8178,7 +8178,7 @@
             if ((targetInfo.cursor == kCurNEResize || targetInfo.cursor == kCurSEResize)) {
                 this.startCellMoveResizeRange = ar.clone(true);
                 this.startCellMoveResizeRange2 =
-                  new asc_Range(targetInfo.col, targetInfo.row, targetInfo.col, targetInfo.row, true);
+                    new asc_Range(targetInfo.col, targetInfo.row, targetInfo.col, targetInfo.row, true);
             } else {
                 this.startCellMoveResizeRange = ar.clone(true);
                 if (colByX < ar.c1) {
@@ -8319,21 +8319,21 @@
         } else if (resmove === -1) {
             var t = this;
             this.model.workbook.handlers.trigger("asc_onConfirmAction", Asc.c_oAscConfirm.ConfirmReplaceRange,
-              function (can) {
-                  if (can) {
-                      t.moveRangeHandle(arnFrom, arnTo, ctrlKey);
-                  } else {
-                      t._cleanSelectionMoveRange();
-                  }
-              });
+                function (can) {
+                    if (can) {
+                        t.moveRangeHandle(arnFrom, arnTo, ctrlKey);
+                    } else {
+                        t._cleanSelectionMoveRange();
+                    }
+                });
         } else {
             this.moveRangeHandle(arnFrom, arnTo, ctrlKey);
         }
     };
 
-    WorksheetView.prototype.applyMoveResizeRangeHandle = function ( target ) {
-        if ( -1 == target.targetArr && !this.startCellMoveResizeRange.isEqual( this.moveRangeDrawingObjectTo ) ) {
-            this.objectRender.moveRangeDrawingObject( this.startCellMoveResizeRange, this.moveRangeDrawingObjectTo );
+    WorksheetView.prototype.applyMoveResizeRangeHandle = function (target) {
+        if (-1 == target.targetArr && !this.startCellMoveResizeRange.isEqual(this.moveRangeDrawingObjectTo)) {
+            this.objectRender.moveRangeDrawingObject(this.startCellMoveResizeRange, this.moveRangeDrawingObjectTo);
         }
 
         this.startCellMoveResizeRange = null;
@@ -8367,7 +8367,7 @@
                 t.model.autoFilters._preMoveAutoFilters(arnFrom, arnTo, copyRange);
 
                 t.model._moveRange(arnFrom, arnTo, copyRange);
-                t.cellCommentator.moveRangeComments(arnFrom, arnTo);
+                t.cellCommentator.moveRangeComments(arnFrom, arnTo, copyRange);
                 t.objectRender.moveRangeDrawingObject(arnFrom, arnTo);
 
                 // Вызываем функцию пересчета для заголовков форматированной таблицы
@@ -8392,15 +8392,15 @@
                 t._updateSelectionNameAndInfo();
 
                 if (null !== t.model.getRange3(arnTo.r1, arnTo.c1, arnTo.r2, arnTo.c2).hasMerged() &&
-                  false !== t.model.autoFilters._intersectionRangeWithTableParts(arnTo)) {
+                    false !== t.model.autoFilters._intersectionRangeWithTableParts(arnTo)) {
                     t.model.autoFilters.unmergeTablesAfterMove(arnTo);
                     t._updateCellsRange(arnTo, false, true);
                     t._recalculateAfterUpdate([arnFrom, arnTo]);
                     //не делаем действий в asc_onConfirmAction, потому что во время диалога может выполниться autosave и новые измения добавятся в точку, которую уже отправили
                     //тем более результат диалога ни на что не влияет
                     t.model.workbook.handlers.trigger("asc_onConfirmAction", Asc.c_oAscConfirm.ConfirmPutMergeRange,
-                      function () {
-                      });
+                        function () {
+                        });
                 }
             };
 
