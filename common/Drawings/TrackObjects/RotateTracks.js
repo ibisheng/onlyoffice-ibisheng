@@ -620,13 +620,13 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
         this.cY = this.chartSizes.startY + this.chartSizes.h/2;
         this.geometry = new AscFormat.Geometry();
         var oPen = new AscFormat.CLn();
-        oPen.w = 50000;
-        oPen.Fill = AscFormat.CreateSolidFillRGBA(0xcc, 0xe5, 0xff, 255);
+        oPen.w = 15000;
+        oPen.Fill = AscFormat.CreateSolidFillRGBA(255, 255, 255, 128);
         this.objectToDraw = new OverlayObject(this.geometry, oChartSpace.extX, oChartSpace.extY, null, oPen, oChartSpace.transform );
 
         var oPen2 = new AscFormat.CLn();
-        oPen2.w = 12400;
-        oPen2.Fill = AscFormat.CreateSolidFillRGBA(0, 0, 0, 255);
+        oPen2.w = 15000;
+        oPen2.Fill = AscFormat.CreateSolidFillRGBA(0x61, 0x9e, 0xde, 255);
         oPen2.prstDash = 0;
         this.objectToDraw2 = new OverlayObject(this.geometry, oChartSpace.extX, oChartSpace.extY, null, oPen2, oChartSpace.transform );
 
@@ -750,11 +750,11 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
         var StratRotY = oChartSpace.chart.view3D && oChartSpace.chart.view3D.rotY ? oChartSpace.chart.view3D.rotY : 0;
         deltaAng = -90*(tx - this.startX)/(this.chartSizes.w/2);
         this.view3D.rotY = StratRotY + deltaAng;
-        while(this.view3D.rotY < 0){
-            this.view3D.rotY += 360;
+        if(this.view3D.rotY < 0){
+            this.view3D.rotY = 0;
         }
-        while(this.view3D.rotY > 360){
-            this.view3D.rotY -= 360;
+        if(this.view3D.rotY >= 360){
+            this.view3D.rotY = 359;
         }
 
         var StratRotX = oChartSpace.chart.view3D && oChartSpace.chart.view3D.rotX ? oChartSpace.chart.view3D.rotX : 0;
@@ -763,8 +763,8 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
 
 		if(oChartSpace.chart.plotArea && oChartSpace.chart.plotArea.chart && oChartSpace.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart){
 			if(this.view3D.rotX < 0){
-            this.view3D.rotX = 0;
-        }
+                this.view3D.rotX = 0;
+            }
 		}
 		
         if(this.view3D.rotX < -90){
