@@ -367,43 +367,73 @@ function openFileCommand(binUrl, changesUrl, Signature, callback) {
   });
 }
 
-function mapAscServerErrorToAscError(nServerError) {
-	var nRes = Asc.c_oAscError.ID.Unknown;
-	switch (nServerError) {
-		case c_oAscServerError.NoError : nRes = Asc.c_oAscError.ID.No; break;
-		case c_oAscServerError.TaskQueue :
-		case c_oAscServerError.TaskResult : nRes = Asc.c_oAscError.ID.Database; break;
-		case c_oAscServerError.ConvertDownload : nRes = Asc.c_oAscError.ID.DownloadError; break;
-		case c_oAscServerError.ConvertTimeout : nRes = Asc.c_oAscError.ID.ConvertationTimeout; break;
-		case c_oAscServerError.ConvertDRM :
-		case c_oAscServerError.ConvertPASSWORD : nRes = Asc.c_oAscError.ID.ConvertationPassword; break;
-		case c_oAscServerError.ConvertCONVERT_CORRUPTED :
-		case c_oAscServerError.ConvertLIBREOFFICE :
-		case c_oAscServerError.ConvertPARAMS :
-		case c_oAscServerError.ConvertNEED_PARAMS :
-		case c_oAscServerError.ConvertUnknownFormat :
-		case c_oAscServerError.ConvertReadFile :
-		case c_oAscServerError.Convert : nRes = Asc.c_oAscError.ID.ConvertationError; break;
-		case c_oAscServerError.UploadContentLength : nRes = Asc.c_oAscError.ID.UplImageSize; break;
-		case c_oAscServerError.UploadExtension : nRes = Asc.c_oAscError.ID.UplImageExt; break;
-		case c_oAscServerError.UploadCountFiles : nRes = Asc.c_oAscError.ID.UplImageFileCount; break;
-		case c_oAscServerError.VKey : nRes = Asc.c_oAscError.ID.FileVKey; break;
-		case c_oAscServerError.VKeyEncrypt : nRes = Asc.c_oAscError.ID.VKeyEncrypt; break;
-		case c_oAscServerError.VKeyKeyExpire : nRes = Asc.c_oAscError.ID.KeyExpire; break;
-		case c_oAscServerError.VKeyUserCountExceed : nRes = Asc.c_oAscError.ID.UserCountExceed; break;
-		case c_oAscServerError.Storage :
-		case c_oAscServerError.StorageFileNoFound :
-		case c_oAscServerError.StorageRead :
-		case c_oAscServerError.StorageWrite :
-		case c_oAscServerError.StorageRemoveDir :
-		case c_oAscServerError.StorageCreateDir :
-		case c_oAscServerError.StorageGetInfo :
-		case c_oAscServerError.Upload :
-		case c_oAscServerError.ReadRequestStream :
-		case c_oAscServerError.Unknown : nRes = Asc.c_oAscError.ID.Unknown; break;
+	function mapAscServerErrorToAscError(nServerError, nAction) {
+		var nRes = Asc.c_oAscError.ID.Unknown;
+		switch (nServerError) {
+			case c_oAscServerError.NoError :
+				nRes = Asc.c_oAscError.ID.No;
+				break;
+			case c_oAscServerError.TaskQueue :
+			case c_oAscServerError.TaskResult :
+				nRes = Asc.c_oAscError.ID.Database;
+				break;
+			case c_oAscServerError.ConvertDownload :
+				nRes = Asc.c_oAscError.ID.DownloadError;
+				break;
+			case c_oAscServerError.ConvertTimeout :
+				nRes = Asc.c_oAscError.ID.ConvertationTimeout;
+				break;
+			case c_oAscServerError.ConvertDRM :
+			case c_oAscServerError.ConvertPASSWORD :
+				nRes = Asc.c_oAscError.ID.ConvertationPassword;
+				break;
+			case c_oAscServerError.ConvertCONVERT_CORRUPTED :
+			case c_oAscServerError.ConvertLIBREOFFICE :
+			case c_oAscServerError.ConvertPARAMS :
+			case c_oAscServerError.ConvertNEED_PARAMS :
+			case c_oAscServerError.ConvertUnknownFormat :
+			case c_oAscServerError.ConvertReadFile :
+			case c_oAscServerError.Convert :
+				nRes =
+					AscCommon.c_oAscAdvancedOptionsAction.Save === nAction ? Asc.c_oAscError.ID.ConvertationSaveError :
+						Asc.c_oAscError.ID.ConvertationOpenError;
+				break;
+			case c_oAscServerError.UploadContentLength :
+				nRes = Asc.c_oAscError.ID.UplImageSize;
+				break;
+			case c_oAscServerError.UploadExtension :
+				nRes = Asc.c_oAscError.ID.UplImageExt;
+				break;
+			case c_oAscServerError.UploadCountFiles :
+				nRes = Asc.c_oAscError.ID.UplImageFileCount;
+				break;
+			case c_oAscServerError.VKey :
+				nRes = Asc.c_oAscError.ID.FileVKey;
+				break;
+			case c_oAscServerError.VKeyEncrypt :
+				nRes = Asc.c_oAscError.ID.VKeyEncrypt;
+				break;
+			case c_oAscServerError.VKeyKeyExpire :
+				nRes = Asc.c_oAscError.ID.KeyExpire;
+				break;
+			case c_oAscServerError.VKeyUserCountExceed :
+				nRes = Asc.c_oAscError.ID.UserCountExceed;
+				break;
+			case c_oAscServerError.Storage :
+			case c_oAscServerError.StorageFileNoFound :
+			case c_oAscServerError.StorageRead :
+			case c_oAscServerError.StorageWrite :
+			case c_oAscServerError.StorageRemoveDir :
+			case c_oAscServerError.StorageCreateDir :
+			case c_oAscServerError.StorageGetInfo :
+			case c_oAscServerError.Upload :
+			case c_oAscServerError.ReadRequestStream :
+			case c_oAscServerError.Unknown :
+				nRes = Asc.c_oAscError.ID.Unknown;
+				break;
+		}
+		return nRes;
 	}
-	return nRes;
-}
 
 function joinUrls(base, relative) {
     //http://stackoverflow.com/questions/14780350/convert-relative-path-to-absolute-using-javascript

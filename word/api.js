@@ -7634,7 +7634,8 @@ background-repeat: no-repeat;\
 					}
 					else
 					{
-						error = mapAscServerErrorToAscError(parseInt(input["data"]));
+						error = mapAscServerErrorToAscError(parseInt(input["data"]),
+							AscCommon.c_oAscAdvancedOptionsAction.Save);
 					}
 				}
 				if (c_oAscError.ID.No != error)
