@@ -8377,8 +8377,6 @@
 
                 t.model.autoFilters.afterMoveAutoFilters(arnFrom, arnTo);
 
-                History.EndTransaction();
-
                 t._updateCellsRange(arnTo, false, true);
                 t.model.selectionRange.assign2(arnTo);
                 // Сбрасываем параметры
@@ -8402,6 +8400,8 @@
                         function () {
                         });
                 }
+
+                History.EndTransaction();
             };
 
             if (t.model.autoFilters._searchFiltersInRange(arnFrom)) {
