@@ -407,7 +407,11 @@
 				rData["userconnectionid"] = this.CoAuthoringApi.getUserConnectionId();
 			}
 		}
-		this.CoAuthoringApi.auth(this.getViewMode(), rData);
+		if (isVersionHistory) {
+			this.CoAuthoringApi.versionHistory(rData);
+		} else {
+			this.CoAuthoringApi.auth(this.getViewMode(), rData);
+		}
 
 		if (!isRepeat) {
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
