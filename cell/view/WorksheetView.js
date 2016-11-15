@@ -1255,22 +1255,22 @@
           this.model.selectionRange;
     };
 
-    WorksheetView.prototype._fixVisibleRange = function ( range ) {
+    WorksheetView.prototype._fixVisibleRange = function (range) {
         var tmp;
-        if ( null !== this.topLeftFrozenCell ) {
+        if (null !== this.topLeftFrozenCell) {
             tmp = this.topLeftFrozenCell.getRow0();
-            if ( range.r1 < tmp ) {
+            if (range.r1 < tmp) {
                 range.r1 = tmp;
-                tmp = this._findVisibleRow( range.r1, +1 );
-                if ( 0 < tmp ) {
+                tmp = this._findVisibleRow(range.r1, +1);
+                if (0 < tmp) {
                     range.r1 = tmp;
                 }
             }
             tmp = this.topLeftFrozenCell.getCol0();
-            if ( range.c1 < tmp ) {
+            if (range.c1 < tmp) {
                 range.c1 = tmp;
-                tmp = this._findVisibleCol( range.c1, +1 );
-                if ( 0 < tmp ) {
+                tmp = this._findVisibleCol(range.c1, +1);
+                if (0 < tmp) {
                     range.c1 = tmp;
                 }
             }
@@ -5455,10 +5455,10 @@
 
     WorksheetView.prototype.scrollVertical = function (delta, editor) {
         var vr = this.visibleRange;
-        var start = this._calcCellPosition(vr.c1, vr.r1, 0, delta).row;
-        var fixStartRow = new asc_Range(vr.c1, start, vr.c2, start);
-        fixStartRow.startCol = vr.c1;
-        fixStartRow.startRow = start;
+        var fixStartRow = new asc_Range(vr.c1, vr.r1, vr.c2, vr.r1);
+        this._fixSelectionOfHiddenCells(0, delta >= 0 ? +1 : -1, fixStartRow);
+        var start = this._calcCellPosition(vr.c1, fixStartRow.r1, 0, delta).row;
+        fixStartRow.assign(vr.c1, start, vr.c2, start);
         this._fixSelectionOfHiddenCells(0, delta >= 0 ? +1 : -1, fixStartRow);
         this._fixVisibleRange(fixStartRow);
         var reinitScrollY = start !== fixStartRow.r1;
@@ -5659,10 +5659,10 @@
 
     WorksheetView.prototype.scrollHorizontal = function (delta, editor) {
         var vr = this.visibleRange;
-        var start = this._calcCellPosition(vr.c1, vr.r1, delta, 0).col;
-        var fixStartCol = new asc_Range(start, vr.r1, start, vr.r2);
-        fixStartCol.startCol = start;
-        fixStartCol.startRow = vr.r1;
+        var fixStartCol = new asc_Range(vr.c1, vr.r1, vr.c1, vr.r2);
+        this._fixSelectionOfHiddenCells(delta >= 0 ? +1 : -1, 0, fixStartCol);
+        var start = this._calcCellPosition(fixStartCol.c1, vr.r1, delta, 0).col;
+        fixStartCol.assign(start, vr.r1, start, vr.r2);
         this._fixSelectionOfHiddenCells(delta >= 0 ? +1 : -1, 0, fixStartCol);
         this._fixVisibleRange(fixStartCol);
         var reinitScrollX = start !== fixStartCol.c1;
@@ -5728,7 +5728,7 @@
 
         if (this.isCellEditMode && editor && this.model.selectionRange.activeCell.col >= cFrozen) {
             editor.move(this.cellsLeft + diffWidth,
-              this.cellsTop + (this.model.selectionRange.activeCell.row >= rFrozen ? diffHeight : 0), ctxW, ctxH);
+                this.cellsTop + (this.model.selectionRange.activeCell.row >= rFrozen ? diffHeight : 0), ctxW, ctxH);
         }
 
         // Перемещаем область
@@ -5748,7 +5748,7 @@
         var clearLeft = this.cellsLeft + diffWidth + (scrollRight && moveWidth > 0 ? moveWidth : 0);
         var clearWidth = (moveWidth > 0) ? Math.abs(dx) + lastColWidth : ctxW - (this.cellsLeft + diffWidth);
         ctx.setFillStyle(this.settings.cells.defaultState.background)
-          .fillRect(clearLeft, y, clearWidth, ctxH);
+            .fillRect(clearLeft, y, clearWidth, ctxH);
         this.drawingGraphicCtx.clearRect(clearLeft, y, clearWidth, ctxH);
 
         if (this.objectRender && this.objectRender.drawingArea) {
@@ -5778,9 +5778,9 @@
             this._drawCellsAndBorders(/*drawingCtx*/undefined, range);
             this.af_drawButtons(range, offsetX, offsetY);
             this.objectRender.showDrawingObjectsEx(false,
-              new AscFormat.GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, range, {
-                  offsetX: offsetX, offsetY: offsetY
-              }));
+                new AscFormat.GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, range, {
+                    offsetX: offsetX, offsetY: offsetY
+                }));
             if (rFrozen) {
                 range.r1 = 0;
                 range.r2 = rFrozen - 1;
@@ -5789,9 +5789,9 @@
                 this._drawCellsAndBorders(/*drawingCtx*/undefined, range, undefined, offsetY);
                 this.af_drawButtons(range, offsetX, offsetY);
                 this.objectRender.showDrawingObjectsEx(false,
-                  new AscFormat.GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, range, {
-                      offsetX: offsetX, offsetY: offsetY
-                  }));
+                    new AscFormat.GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, range, {
+                        offsetX: offsetX, offsetY: offsetY
+                    }));
             }
         }
 
