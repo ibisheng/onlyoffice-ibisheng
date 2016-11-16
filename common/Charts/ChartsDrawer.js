@@ -7446,11 +7446,17 @@ drawPieChart.prototype =
 		
 		if(this.cChartDrawer.nDimensionCount === 3)
 		{
-			this.properties3d = this.cChartDrawer.processor3D.calculatePropertiesForPieCharts();
-			this._reсalculatePie3D();
+			if(this.cChartDrawer.processor3D.view3D.rAngAx)
+			{
+				this._reсalculatePie3D();
+			}
+			else
+			{
+				this._reсalculatePie3DPerspective();
+			}
 		}
 		else
-		{	
+		{
 			this._reсalculatePie();
 		}
 	},	
@@ -8332,13 +8338,6 @@ drawPieChart.prototype =
 	//****fast calulate and drawing(for switch on slow drawing: change name function _Slow)
 	_reсalculatePie3D: function ()
     {
-		if(!this.cChartDrawer.processor3D.view3D.rAngAx)
-		{
-			this._reсalculatePie3D2();
-			return;
-		}
-		
-		
 		var trueWidth = this.chartProp.trueWidth;
 		var trueHeight = this.chartProp.trueHeight;
 
@@ -8378,7 +8377,7 @@ drawPieChart.prototype =
     },
 	
 	
-	_reсalculatePie3D2: function ()
+	_reсalculatePie3DPerspective: function ()
     {
 		var numCache = this._getFirstRealNumCache();
 		var sumData = this.cChartDrawer._getSumArray(numCache, true);
@@ -8391,11 +8390,12 @@ drawPieChart.prototype =
 		var widthCanvas = this.chartProp.widthCanvas;
 		var heightCanvas = this.chartProp.heightCanvas;
 		
-		var height = heightCanvas - (top + bottom)/*this.properties3d.depth*/;
+		var height = heightCanvas - (top + bottom);
 		var width = widthCanvas - (left + right);
-		
-		
+
+		var angle = this.cChartDrawer.processor3D.angleOy;
 		var tempDepth = this.cChartDrawer.processor3D.depthPerspective;
+		
 		
 		var x1 = left, y1 = top + height, z1 = 0;
 		var x2 = left, y2 = top, z2 = 0;
@@ -8406,9 +8406,6 @@ drawPieChart.prototype =
 		var x6 = left, y6 = top, z6 = tempDepth;
 		var x7 = left + width, y7 = top, z7 = tempDepth;
 		var x8 = left + width, y8 = top + height, z8 = tempDepth;
-		
-		var angle = this.cChartDrawer.processor3D.angleOy;
-		//this.cChartDrawer.processor3D.angleOy = 0;
 		
 		var point1 = this.cChartDrawer._convertAndTurnPoint(x1, y1, z1);
 		var point2 = this.cChartDrawer._convertAndTurnPoint(x2, y2, z2);
@@ -8426,53 +8423,11 @@ drawPieChart.prototype =
 		var center3D1 = new Point3D(x2 + ((x3 - x2) / 2), y2, z2 + (radius3D1));
 		var center3D2 = new Point3D(x1 + ((x4 - x1) / 2), y1, z1 + (radius3D2));
 		
-		
-		
-		
-		
 		var pointCenter1 = this.cChartDrawer._convertAndTurnPoint(center3D1.x, center3D1.y, center3D1.z);
 		var pointCenter2 = this.cChartDrawer._convertAndTurnPoint(center3D2.x, center3D2.y, center3D2.z);
 		
-		
-
-		var pxToMm = this.chartProp.pxToMM;
-		var pathH = this.chartProp.pathH;
-		var pathW = this.chartProp.pathW;
-		/*var path  = new Path();
-		path.pathH = pathH;
-		path.pathW = pathW;
-		
-		var gdLst = [];
-		gdLst["w"] = 1;
-		gdLst["h"] = 1;
-		
-		path.moveTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-		path.lnTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
-		path.lnTo(point3.x / pxToMm * pathW, point3.y / pxToMm * pathH);
-		path.lnTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
-		path.lnTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-		
-		path.moveTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-		path.lnTo(point6.x / pxToMm * pathW, point6.y / pxToMm * pathH);
-		path.lnTo(point7.x / pxToMm * pathW, point7.y / pxToMm * pathH);
-		path.lnTo(point8.x / pxToMm * pathW, point8.y / pxToMm * pathH);
-		path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-		
-		path.moveTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-		path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-		
-		path.moveTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
-		path.lnTo(point6.x / pxToMm * pathW, point6.y / pxToMm * pathH);
-		
-		path.moveTo(point3.x / pxToMm * pathW, point3.y / pxToMm * pathH);
-		path.lnTo(point7.x / pxToMm * pathW, point7.y / pxToMm * pathH);
-		
-		path.moveTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
-		path.lnTo(point8.x / pxToMm * pathW, point8.y / pxToMm * pathH);
-		
-		path.recalculate(gdLst);
-		
-		this.paths.test = path;*/
+		//TEST DRAW FRAME
+		//this._calculateTestFrame(point1, point2, point3, point4, point5, point6, point7, point8);
 		
 		var radius11 = Math.abs((point3.x - point2.x) / 2);
 		var radius12 = Math.abs((point6.y - point2.y) / 2);
@@ -8483,98 +8438,45 @@ drawPieChart.prototype =
 		
 		var trueWidth = this.chartProp.trueWidth;
 		var trueHeight = this.chartProp.trueHeight;
-
-		var numCache = this._getFirstRealNumCache();
-		var sumData = this.cChartDrawer._getSumArray(numCache, true);
 		
-        var radius = Math.min(trueHeight, trueWidth) / 2;
-		if(radius < 0)
-		{
-			radius = 0;
-		}
+		var xCenter1 = this.chartProp.chartGutter._left + trueWidth/2;
+		var yCenter1 = Math.abs(point6.y - point2.y) / 2 + point6.y;
 		
-		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
-		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
+		var center1 = {x: this.chartProp.chartGutter._left + trueWidth/2, y: Math.abs(point6.y - point2.y) / 2 + point6.y};
+		var center2 = {x: this.chartProp.chartGutter._left + trueWidth/2, y: Math.abs(point5.y - point1.y) / 2 + point5.y};
 		
-		var startAngle = this.cChartDrawer.processor3D.angleOy ? this.cChartDrawer.processor3D.angleOy : 0;
-		
-		
-		//var startAngle3D = startAngle !== 0 && startAngle !== undefined ? this._changeAngle(radius, Math.PI/2, startAngle, pointCenter1.x, pointCenter1.y, depth, radius11, radius12) : 0;
-		//var startAngle3D2 = startAngle !== 0 && startAngle !== undefined ? this._changeAngle(radius, Math.PI/2, startAngle, pointCenter2.x, pointCenter2.y, depth, radius21, radius22) : 0;
-		
-		
-		startAngle = startAngle + Math.PI / 2;
-		var newStartAngle = startAngle;
-		
-		var xC3D = pointCenter1.x;
-		var yC3D = pointCenter1.y;
-		
-		
-		var angles = this._calculateAngles3D(xCenter, (Math.abs(point6.y - point2.y) / 2 + point6.y), radius11, radius12, radius3D1, center3D1);
-		var angles1 = this._calculateAngles3D(xCenter, (Math.abs(point5.y - point1.y) / 2 + point5.y), radius21, radius22, radius3D2, center3D2);
-		
-		//radiusUp1, radiusUp2, radiusDown1, radiusDown2, startAngle1, swapAngle1, startAngle2, swapAngle2, depth, xCenter, yCenter
-		
+		var angles1 = this._calculateAngles3D(center1.x, center1.y, radius11, radius12, radius3D1, center3D1);
+		var angles2 = this._calculateAngles3D(center2.x, center2.y, radius21, radius22, radius3D2, center3D2);
 		
 		if(!this.paths.series)
 		{
 			this.paths.series = [];
 		}
 		
-		for(var i = 0; i < angles.length; i++)
+		for(var i = 0; i < angles1.length; i++)
 		{
-			var path  = new Path();
-			path.pathH = pathH;
-			path.pathW = pathW;
-			
-			var start = angles[i].start;
-			var swap = angles[i].swap;
-			
-			if(i === angles.length - 1)
-			{
-				var end = angles[0].start + 2 * Math.PI;
-				swap = end - start;
-			}
-			
-			var start1 = angles1[i].start;
-			var swap1 = angles1[i].swap;
+			var start = angles1[i].start;
+			var swap = angles1[i].swap;
+			var start1 = angles2[i].start;
+			var swap1 = angles2[i].swap;
 			
 			if(i === angles1.length - 1)
 			{
-				var end1 = angles1[0].start + 2 * Math.PI;
-				swap1 = end1 - start1;
+				var end = angles1[0].start + 2 * Math.PI;
+				angles1[i].swap = end - start;
+				
+				var end1 = angles2[0].start + 2 * Math.PI;
+				angles2[i].swap = end1 - start1;
 			}
 			
-			var xC = pointCenter1.x;
-			var yC = pointCenter1.y;
+			var paths = this._calculateSegment3D2(radius11, radius12, radius21, radius22, angles1[i], angles2[i], center1, center2, pointCenter1, pointCenter2);
 			
-			var xC1 = pointCenter2.x;
-			var yC1 = pointCenter2.y;
-			
-			var paths = this._calculateSegment3D2(radius11, radius12, radius21, radius22, start, swap, start1, swap1, depth, xCenter, (Math.abs(point6.y - point2.y) / 2 + point6.y), xCenter, (Math.abs(point5.y - point1.y) / 2 + point5.y), pointCenter1, pointCenter2);
-			
-			/*var radiusSpec = (radius11 * radius12) /  Math.sqrt(Math.pow(radius12, 2) * Math.pow((Math.cos(start)), 2) + Math.pow(radius11, 2) * Math.pow(Math.sin(start),2));
-			//var radiusSpec2 = (radius11 * radius2) /  Math.sqrt(Math.pow(radius2, 2) * Math.pow((Math.cos(endAng)), 2) + Math.pow(radius11, 2) * Math.pow(Math.sin(endAng),2));
-			
-			var xC = xCenter;
-			var yC = yCenter + depth/2;
-			
-			var x1 = (xC + radiusSpec*Math.cos(start));
-			var y1 = (yC - radiusSpec*Math.sin(start));
-			
-			path.moveTo(xC3D  / pxToMm * pathW, yC3D / pxToMm * pathH);
-			path.lnTo(x1 / pxToMm * pathW, y1 / pxToMm * pathH);
-			path.arcTo(Math.abs(radius11) / pxToMm * pathW, Math.abs(radius12) / pxToMm * pathH, -1 * start*cToDeg, -1 * swap*cToDeg);
-			path.lnTo(xC3D  / pxToMm * pathW, yC3D / pxToMm * pathH);
-			
-			path.recalculate(gdLst);*/
-			
-			if(!this.paths.series[angles.length - i - 1])
+			if(!this.paths.series[angles1.length - i - 1])
 			{
-				this.paths.series[angles.length - i - 1] = [];
+				this.paths.series[angles1.length - i - 1] = [];
 			}
 			
-			this.paths.series[angles.length - i - 1].push(paths);
+			this.paths.series[angles1.length - i - 1].push(paths);
 		}
     },
 	
@@ -9173,8 +9075,11 @@ drawPieChart.prototype =
 		return path;
 	},
 	
-	_calculateSegment3D2: function(radiusUp1, radiusUp2, radiusDown1, radiusDown2, startAngle1, swapAngle1, startAngle2, swapAngle2, depth, xCenter, yCenter, xCenter1, yCenter1, pointCenter1, pointCenter2)
+	_calculateSegment3D2: function(radiusUp1, radiusUp2, radiusDown1, radiusDown2, angles1, angles2, center1, center2, pointCenter1, pointCenter2)
 	{	
+		var xCenter = center1.x, yCenter = center1.y, xCenter1 = center2.x, yCenter1 = center2.y;
+		var startAngle1 = angles1.start, swapAngle1 = angles1.swap, startAngle2 = angles2.start, swapAngle2 = angles2.swap;
+		
 		var pxToMm = this.chartProp.pxToMM;
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
@@ -9183,7 +9088,6 @@ drawPieChart.prototype =
 		var gdLst = [];
 		gdLst["w"] = 1;
 		gdLst["h"] = 1;
-		
 		
 		var getNewPath = function()
 		{
@@ -9227,6 +9131,7 @@ drawPieChart.prototype =
 			var tempStartAng = Math.round(startAng * 100) / 100;
 			var tempEndAng = Math.round(endAng * 100) / 100;
 			var tempPI = Math.round(Math.PI * 100) / 100;
+			
 			if(tempStartAng < -2*tempPI && tempEndAng > -2*tempPI)
 			{
 				res.push({angle: -2*Math.PI});
@@ -9316,7 +9221,7 @@ drawPieChart.prototype =
 			var path = getNewPath();
 			
 			var endAng = startAng + swapAng;
-			//var p = getSegmentPoints(startAng, endAng);
+			var p = getSegmentPoints(startAng, endAng);
 			
 			var radiusSpec = (radiusDown1 * radiusDown2) /  Math.sqrt(Math.pow(radiusDown2, 2) * Math.pow((Math.cos(startAng)), 2) + Math.pow(radiusDown1, 2) * Math.pow(Math.sin(startAng),2));
 			//var radiusSpec2 = (radius11 * radius2) /  Math.sqrt(Math.pow(radius2, 2) * Math.pow((Math.cos(endAng)), 2) + Math.pow(radius11, 2) * Math.pow(Math.sin(endAng),2))
@@ -9339,7 +9244,6 @@ drawPieChart.prototype =
 		var arrAngles = breakAng(startAngle1, swapAngle1);
 		var arrAngles2 = breakAng(startAngle2, swapAngle2);
 		var frontPath = [];
-		//frontPath.push(calculateFrontFace(startAngle1, swapAngle1, startAngle2, swapAngle2));
 		for(var i = 1; i < arrAngles.length; i++)
 		{
 			var start = arrAngles[i - 1].angle;
@@ -9368,11 +9272,8 @@ drawPieChart.prototype =
 		var downPath = null;
 		var downPath = calculateDownFace(startAngle2, swapAngle2);
 		
-		//this.angleFor3D += swAng;
 		
-		return {frontPath: frontPath, upPath: upPath, insidePath: insidePath, downPath: downPath};	
-		
-		
+		return {frontPath: frontPath, upPath: upPath, insidePath: insidePath, downPath: downPath};
 	},
 	
 	
@@ -9490,7 +9391,49 @@ drawPieChart.prototype =
 				}
 			}
         }
-    }
+    },
+	
+	_calculateTestFrame: function(point1, point2, point3, point4, point5, point6, point7, point8)
+	{
+		var pxToMm = this.chartProp.pxToMM;
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var path  = new Path();
+		path.pathH = pathH;
+		path.pathW = pathW;
+		
+		var gdLst = [];
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
+		path.moveTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
+		path.lnTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
+		path.lnTo(point3.x / pxToMm * pathW, point3.y / pxToMm * pathH);
+		path.lnTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
+		path.lnTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
+		
+		path.moveTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
+		path.lnTo(point6.x / pxToMm * pathW, point6.y / pxToMm * pathH);
+		path.lnTo(point7.x / pxToMm * pathW, point7.y / pxToMm * pathH);
+		path.lnTo(point8.x / pxToMm * pathW, point8.y / pxToMm * pathH);
+		path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
+		
+		path.moveTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
+		path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
+		
+		path.moveTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
+		path.lnTo(point6.x / pxToMm * pathW, point6.y / pxToMm * pathH);
+		
+		path.moveTo(point3.x / pxToMm * pathW, point3.y / pxToMm * pathH);
+		path.lnTo(point7.x / pxToMm * pathW, point7.y / pxToMm * pathH);
+		
+		path.moveTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
+		path.lnTo(point8.x / pxToMm * pathW, point8.y / pxToMm * pathH);
+		
+		path.recalculate(gdLst);
+		
+		this.paths.test = path;
+	}
 };
 
 
