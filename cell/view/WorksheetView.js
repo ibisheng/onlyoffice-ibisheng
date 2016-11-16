@@ -7252,6 +7252,7 @@
           type == c_oAscSelectionType.RangeRow || type == c_oAscSelectionType.RangeMax) {
             this.cleanSelection();
             this.model.selectionRange.assign2(range);
+            this._fixSelectionOfMergedCells();
             this._drawSelection();
 
             this._updateSelectionNameAndInfo();
