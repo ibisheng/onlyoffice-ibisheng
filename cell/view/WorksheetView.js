@@ -10318,6 +10318,8 @@
             if (bUpdate) {
                 t._updateColumnPositions();
                 t._updateVisibleColsCount();
+                t._calcHeightRows(AscCommonExcel.recalcType.recalc);
+                t._updateVisibleRowsCount();
                 t.objectRender.drawingArea.reinitRanges();
                 t.changeWorksheet("update");
             }
