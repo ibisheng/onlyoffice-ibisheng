@@ -337,14 +337,14 @@
 		} else if (cElementType.cellsRange === arg0.type || cElementType.cell === arg0.type ||
 			cElementType.cell3D === arg0.type) {
 			var range = arg0.getRange();
-			return this.value = new cNumber(Math.abs(range.getBBox().c1 - range.getBBox().c2) + 1);
+			return this.value = new cNumber(Math.abs(range.getBBox0().c1 - range.getBBox0().c2) + 1);
 		} else if (cElementType.cellsRange3D === arg0.type) {
 			var range = arg0.getRange();
 			if (range.length > 1) {
 				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 
-			return this.value = new cNumber(Math.abs(range[0].getBBox().c1 - range[0].getBBox().c2) + 1);
+			return this.value = new cNumber(Math.abs(range[0].getBBox0().c1 - range[0].getBBox0().c2) + 1);
 		} else {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
