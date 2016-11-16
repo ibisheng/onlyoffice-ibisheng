@@ -2268,11 +2268,6 @@
     }
   };
 
-  // Поиск ячейки по ссылке
-  WorkbookView.prototype.findCell = function(reference) {
-    return this.getWorksheet().findCell(reference, this.controller.settings.isViewerMode);
-  };
-
   WorkbookView.prototype.getDefinedNames = function(defNameListId) {
     return this.model.getDefinedNamesWB(defNameListId);
   };

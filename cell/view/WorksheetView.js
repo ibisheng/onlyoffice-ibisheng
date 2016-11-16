@@ -9548,29 +9548,31 @@
         this.collaborativeEditing.onEndCheckLock( callback );
     };
 
-    WorksheetView.prototype._isLockedDefNames = function ( callback, defNameId ) {
-        var sheetId = this.model.getId();
-        var lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Object, null/*c_oAscLockTypeElemSubType.DefinedNames*/, -1, defNameId );
+    WorksheetView.prototype._isLockedDefNames = function (callback, defNameId) {
+        var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null
+            /*c_oAscLockTypeElemSubType.DefinedNames*/, -1, defNameId);
 
-        if ( false === this.collaborativeEditing.getCollaborativeEditing() ) {
+        if (false === this.collaborativeEditing.getCollaborativeEditing()) {
             // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-            asc_applyFunction( callback, true );
+            asc_applyFunction(callback, true);
             callback = undefined;
         }
-        if ( false !== this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false ) ) {
+        if (false !==
+            this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/
+                false)) {
             // Редактируем сами
-            asc_applyFunction( callback, true );
+            asc_applyFunction(callback, true);
             return;
-        }
-        else if ( false !== this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false ) ) {
+        } else if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
+                /*bCheckOnlyLockAll*/false)) {
             // Уже ячейку кто-то редактирует
-            asc_applyFunction( callback, false );
+            asc_applyFunction(callback, false);
             return;
         }
 
         this.collaborativeEditing.onStartCheckLock();
-        this.collaborativeEditing.addCheckLock( lockInfo );
-        this.collaborativeEditing.onEndCheckLock( callback );
+        this.collaborativeEditing.addCheckLock(lockInfo);
+        this.collaborativeEditing.onEndCheckLock(callback);
     };
 
     // Залочен ли весь лист
@@ -10574,71 +10576,30 @@
             this._isLockedCells(aReplaceCells[options.indexInArray], /*subType*/null, onReplaceCallback);
       };
 
-    WorksheetView.prototype.findCell = function (reference, isViewerMode) {
-        var mc, bNew = false;
-        var range = AscCommonExcel.g_oRangeCache.getRange3D(reference) ||
-          AscCommonExcel.g_oRangeCache.getAscRange(reference);
-        if (!range) {
-            if (isViewerMode) {
-                return range;
-            }
+    WorksheetView.prototype.findCell = function (reference, isViewMode) {
+        var mc, range = AscCommonExcel.getRangeByRef(reference, this.model);
 
+        if (!range && !isViewMode) {
             /*TODO: сделать поиск по названиям автофигур, должен искать до того как вызвать поиск по именованным диапазонам*/
-            var defName = this.model.workbook.getDefinesNames(reference,
-              this.model.workbook.getActiveWs().getId()), sheetName, ref;
-            if (!defName) {
-                if (this.collaborativeEditing.getGlobalLock() ||
-                  !this.handlers.trigger("getLockDefNameManagerStatus")) {
-                    this.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName,
-                      c_oAscError.Level.NoCritical);
-                    this._updateSelectionNameAndInfo();
-                    return true;
-                }
-
-                // ToDo multiselect defined names
-                var selectionLast = this.model.selectionRange.getLast();
-                mc = selectionLast.isOneCell() ? this.model.getMergedByCell(selectionLast.r1, selectionLast.c1) : null;
-                defName = this.model.workbook.editDefinesNames(null,
-                  new Asc.asc_CDefName(reference, parserHelp.get3DRef(this.model.getName(),
-                    (mc || selectionLast).getAbsName())));
-                bNew = true;
+            if (this.collaborativeEditing.getGlobalLock() || !this.handlers.trigger("getLockDefNameManagerStatus")) {
+                this.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
+                this._updateSelectionNameAndInfo();
+                return true;
             }
+
+            // ToDo multiselect defined names
+            var selectionLast = this.model.selectionRange.getLast();
+            mc = selectionLast.isOneCell() ? this.model.getMergedByCell(selectionLast.r1, selectionLast.c1) : null;
+            var defName = this.model.workbook.editDefinesNames(null,
+                new Asc.asc_CDefName(reference, parserHelp.get3DRef(this.model.getName(),
+                    (mc || selectionLast).getAbsName())));
 
             if (defName) {
-                range = true;
                 this._isLockedDefNames(null, defName.nodeId);
-
-                if (defName.isTable) {
-                    sheetName = defName.Ref.split("!");
-                    ref = sheetName[1];
-                    sheetName = sheetName[0];
-                    if (sheetName[0] == "'" && sheetName[sheetName.length - 1] == "'") {
-                        sheetName = sheetName.substring(1, sheetName.length - 1);
-                    }
-                    range = AscCommonExcel.g_oRangeCache.getAscRange(ref);
-                    sheetName = this.model.workbook.getWorksheetByName(sheetName);
-                } else if (defName.parsedRef.RefPos.length == 1 && defName.parsedRef.outStack.length == 1) {
-                    ref = defName.parsedRef.outStack[0];
-                    if (ref.type == AscCommonExcel.cElementType.cell3D) {
-                        range = ref.range.getBBox0().clone(true);
-                        sheetName = ref.getWS();
-                    } else if (ref.type == AscCommonExcel.cElementType.cellsRange3D && ref.wsFrom == ref.wsTo) {
-                        range = ref.getRange()[0].getBBox0().clone(true);
-                        sheetName = this.model.workbook.getWorksheetById(ref.wsFrom);
-                    }
-
-                }
-
-                if (range && sheetName) {
-                    range = range.normalize();
-                    mc = range.isOneCell() ? sheetName.getMergedByCell(range.r1, range.c1) : null;
-                    range = {range: mc ? mc : range, sheet: sheetName.getName(), new: bNew};
-                }
+            } else {
+                this.handlers.trigger("asc_onError", c_oAscError.ID.InvalidReferenceOrName,
+                    c_oAscError.Level.NoCritical);
             }
-        } else {
-            range = range.normalize();
-            mc = range.isOneCell() ? this.model.getMergedByCell(range.r1, range.c1) : null;
-            range = {range: mc ? mc : range, sheet: this.model.getName()};
         }
         return range;
     };

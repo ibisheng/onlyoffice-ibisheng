@@ -2038,19 +2038,14 @@ var editor;
     if (this.asc_getCellEditMode()) {
       return;
     }
-    var d = this.wb.findCell(reference);
+    var ws = this.wb.getWorksheet();
+    var d = ws.findCell(reference, this.isViewMode);
     if (!d) {
-      if (!this.isViewMode) {
-        this.handlers.trigger("asc_onError", c_oAscError.ID.InvalidReferenceOrName, c_oAscError.Level.NoCritical);
-      }
-      return;
-    }
-    if (d.new) {
       return;
     }
 
     // Получаем sheet по имени
-    var ws = this.wbModel.getWorksheetByName(d.sheet);
+    ws = d.getWorksheet();
     if (!ws || ws.getHidden()) {
       return;
     }
@@ -2065,17 +2060,12 @@ var editor;
     }
 
     ws = this.wb.getWorksheet();
-    d = d.range ? ws.setSelectionUndoRedo(d.range, true) : null;
-
-    if (d) {
-      if (d.deltaX) {
-        this.controller.scrollHorizontal(d.deltaX);
-      }
-      if (d.deltaY) {
-        this.controller.scrollVertical(d.deltaY);
-      }
-    } else {
-      this.handlers.trigger("asc_onError", c_oAscError.ID.InvalidReferenceOrName, c_oAscError.Level.NoCritical);
+    d = ws.setSelectionUndoRedo(d.getBBox0(), true);
+    if (d.deltaX) {
+      this.controller.scrollHorizontal(d.deltaX);
+    }
+    if (d.deltaY) {
+      this.controller.scrollVertical(d.deltaY);
     }
   };
 
