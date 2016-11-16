@@ -2218,7 +2218,7 @@
     }
 
     if (result) {
-      return ws.setSelection(result);
+      return ws.setSelectionUndoRedo(result);
     }
     this._cleanFindResults();
     return null;

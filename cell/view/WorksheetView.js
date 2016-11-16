@@ -7236,49 +7236,6 @@
         this.model.workbook.handlers.trigger( "asc_onHideComment" );
         this._updateSelectionNameAndInfo();
     };
-    WorksheetView.prototype.setSelection = function (range, validRange) {
-        var selectionRange, tmpRange;
-        // Проверка на валидность range.
-        if (validRange && (range.c2 >= this.nColsCount || range.r2 >= this.nRowsCount)) {
-            if (range.c2 >= this.nColsCount) {
-                this.expandColsOnScroll(false, true, range.c2 + 1);
-            }
-            if (range.r2 >= this.nRowsCount) {
-                this.expandRowsOnScroll(false, true, range.r2 + 1);
-            }
-        }
-
-        this.cleanSelection();
-        // Проверка на всякий случай
-        if (!(range instanceof asc_Range)) {
-            range = new asc_Range(range.c1, range.r1, range.c2, range.r2);
-        }
-        if (gc_nMaxCol0 === range.c2 || gc_nMaxRow0 === range.r2) {
-            range = range.clone();
-            if (gc_nMaxCol0 === range.c2) {
-                range.c2 = this.cols.length - 1;
-            }
-            if (gc_nMaxRow0 === range.r2) {
-                range.r2 = this.rows.length - 1;
-            }
-        }
-
-        selectionRange = this.model.selectionRange;
-        selectionRange.clean();
-        tmpRange = selectionRange.getLast();
-        tmpRange.type = c_oAscSelectionType.RangeCells;
-        tmpRange.c1 = range.c1;
-        tmpRange.c2 = range.c2;
-        tmpRange.r1 = range.r1;
-        tmpRange.r2 = range.r2;
-        tmpRange.normalize();
-        selectionRange.update();
-
-        this._drawSelection();
-        this._updateSelectionNameAndInfo();
-        return this._calcActiveCellOffset();
-    };
-
     WorksheetView.prototype.setSelectionUndoRedo = function (range, validRange) {
         // Проверка на валидность range.
         if (validRange && (range.c2 >= this.nColsCount || range.r2 >= this.nRowsCount)) {
@@ -11421,7 +11378,7 @@
 
                     //updates
                     if (styleName && addNameColumn) {
-                        t.setSelection(filterRange);
+                        t.setSelectionUndoRedo(filterRange);
                     }
                     t._onUpdateFormatTable(filterRange, !!(styleName), true);
 
@@ -11835,7 +11792,7 @@
         }
 
         if (!this.model.selectionRange.getLast().isEqual(range)) {
-            this.setSelection(range);
+            this.setSelectionUndoRedo(range);
         }
 
         var i, r = range.r1, bIsUpdate = false, w;
@@ -12551,7 +12508,7 @@
                 if (tablePart.Ref.intersection(activeRange)) {
                     if (t.model.autoFilters._activeRangeContainsTablePart(activeRange, tablePart.Ref)) {
                         var newActiveRange = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2, tablePart.Ref.r2);
-                        t.setSelection(newActiveRange);
+                        t.setSelectionUndoRedo(newActiveRange);
                     }
 
                     break;
@@ -12565,7 +12522,7 @@
                     if (tableParts[i].Ref.containsFirstLineRange(activeRange)) {
                         var newActiveRange = new Asc.Range(activeRange.c1, activeRange.r1, activeRange.c1, tableParts[i].Ref.r2);
                         if (!activeRange.isEqual(newActiveRange)) {
-                            t.setSelection(newActiveRange);
+                            t.setSelectionUndoRedo(newActiveRange);
                         }
                         break;
                     }
@@ -12684,7 +12641,7 @@
             }
         }
 
-        t.setSelection(new Asc.Range(startCol, startRow, endCol, endRow));
+        t.setSelectionUndoRedo(new Asc.Range(startCol, startRow, endCol, endRow));
     };
 
     WorksheetView.prototype.af_changeFormatTableInfo = function (tableName, optionType, val) {
@@ -12713,7 +12670,7 @@
                     var endRow = newTableRef.r2 < ar.r2 ? newTableRef.r2 : ar.r2;
                     var newActiveRange = new Asc.Range(ar.c1, startRow, ar.c2, endRow);
 
-                    t.setSelection(newActiveRange);
+                    t.setSelectionUndoRedo(newActiveRange);
                     History.SetSelectionRedo(newActiveRange);
                 }
 

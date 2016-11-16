@@ -2065,7 +2065,7 @@ var editor;
     }
 
     ws = this.wb.getWorksheet();
-    d = d.range ? ws.setSelection(d.range, true) : null;
+    d = d.range ? ws.setSelectionUndoRedo(d.range, true) : null;
 
     if (d) {
       if (d.deltaX) {
