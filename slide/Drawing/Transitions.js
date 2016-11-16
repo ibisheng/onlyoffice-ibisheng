@@ -2758,13 +2758,15 @@ function CDemonstrationManager(htmlpage)
 
         if (this.SlideIndexes[0] != -1 && this.SlideIndexes[0] != _slide1 && this.SlideIndexes[0] != _slide2)
         {
-            this.CacheImagesManager.UnLock(this.SlideImages[0]);
+            if (this.SlideImages[0])
+                this.CacheImagesManager.UnLock(this.SlideImages[0].Image);
             this.SlideImages[0] = null;
             this.SlideIndexes[0] = -1;
         }
         if (this.SlideIndexes[1] != -1 && this.SlideIndexes[1] != _slide1 && this.SlideIndexes[1] != _slide2)
         {
-            this.CacheImagesManager.UnLock(this.SlideImages[1]);
+            if (this.SlideImages[1])
+                this.CacheImagesManager.UnLock(this.SlideImages[1].Image);
             this.SlideImages[1] = null;
             this.SlideIndexes[1] = -1;
         }
@@ -2839,13 +2841,15 @@ function CDemonstrationManager(htmlpage)
         {
             if (this.SlideNum != this.SlideIndexes[0])
             {
-                this.CacheImagesManager.UnLock(this.SlideImages[0]);
+                if (this.SlideImages[0])
+                    this.CacheImagesManager.UnLock(this.SlideImages[0].Image);
                 this.SlideImages[0] = null;
                 this.SlideIndexes[0] = -1;
             }
             if (this.SlideNum != this.SlideIndexes[1])
             {
-                this.CacheImagesManager.UnLock(this.SlideImages[1]);
+                if (this.SlideImages[1])
+                    this.CacheImagesManager.UnLock(this.SlideImages[1].Image);
                 this.SlideImages[1] = null;
                 this.SlideIndexes[1] = -1;
             }
