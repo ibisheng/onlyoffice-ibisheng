@@ -2611,8 +2611,6 @@ function DrawingObjects() {
                     {
                         var cache = ref.numCache ? ref.numCache : (ref.strCache ? ref.strCache : null);
                         var lit_format_code;
-                        var bNum = AscCommon.isRealObject(ref.numCache);
-                        var sValue = "";
                         if(cache)
                         {
 
@@ -2733,8 +2731,6 @@ function DrawingObjects() {
                                 }
                             }
                         }
-
-
                     }
 
                     var first_num_ref;

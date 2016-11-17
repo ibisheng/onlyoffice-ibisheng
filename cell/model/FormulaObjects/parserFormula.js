@@ -2966,30 +2966,39 @@ var cFormulaOperators = {
 		return list;
 	}
 	function getRangeByRef(ref, ws) {
-		var range = null;
-		var _f = new AscCommonExcel.parserFormula(ref, '', ws);
-		_f.parse();
-		_f.RefPos.some(function (item) {
-			var ref;
-			switch (item.oper.type) {
-				case cElementType.table:
-				case cElementType.name:
-					ref = item.oper.toRef();
-					break;
-				case cElementType.cell:
-				case cElementType.cell3D:
-				case cElementType.cellsRange:
-				case cElementType.cellsRange3D:
-					ref = item.oper;
-					break;
-			}
-			if (ref && cElementType.error !== ref.type) {
-				range = ref.getRange();
-				return true;
-			}
-			return false;
+		// ToDo in parser formula
+		if (ref[0] === '(') {
+			ref = ref.slice(1);
+		}
+		if (ref[ref.length - 1] === ')') {
+			ref = ref.slice(0, -1);
+		}
+		// ToDo in parser formula
+		var ranges = [];
+		var arrRefs = ref.split(',');
+		arrRefs.forEach(function (refItem) {
+			var _f = new AscCommonExcel.parserFormula(refItem, '', ws);
+			_f.parse();
+			_f.RefPos.forEach(function (item) {
+				var ref;
+				switch (item.oper.type) {
+					case cElementType.table:
+					case cElementType.name:
+						ref = item.oper.toRef();
+						break;
+					case cElementType.cell:
+					case cElementType.cell3D:
+					case cElementType.cellsRange:
+					case cElementType.cellsRange3D:
+						ref = item.oper;
+						break;
+				}
+				if (ref && cElementType.error !== ref.type) {
+					ranges.push(ref.getRange());
+				}
+			});
 		});
-		return range;
+		return ranges;
 	}
 
 /*--------------------------------------------------------------------------*/

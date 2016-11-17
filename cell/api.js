@@ -2040,12 +2040,12 @@ var editor;
     }
     var ws = this.wb.getWorksheet();
     var d = ws.findCell(reference, this.isViewMode);
-    if (!d) {
+    if (0 === d.length) {
       return;
     }
 
     // Получаем sheet по имени
-    ws = d.getWorksheet();
+    ws = d[0].getWorksheet();
     if (!ws || ws.getHidden()) {
       return;
     }
@@ -2060,7 +2060,7 @@ var editor;
     }
 
     ws = this.wb.getWorksheet();
-    d = ws.setSelectionUndoRedo(d.getBBox0(), true);
+    d = ws.setSelectionUndoRedo(d[0].getBBox0(), true);
     if (d.deltaX) {
       this.controller.scrollHorizontal(d.deltaX);
     }

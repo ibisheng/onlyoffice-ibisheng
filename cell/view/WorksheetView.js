@@ -10577,9 +10577,9 @@
       };
 
     WorksheetView.prototype.findCell = function (reference, isViewMode) {
-        var mc, range = AscCommonExcel.getRangeByRef(reference, this.model);
+        var mc, ranges = AscCommonExcel.getRangeByRef(reference, this.model);
 
-        if (!range && !isViewMode) {
+        if (0 < ranges.length && !isViewMode) {
             /*TODO: сделать поиск по названиям автофигур, должен искать до того как вызвать поиск по именованным диапазонам*/
             if (this.collaborativeEditing.getGlobalLock() || !this.handlers.trigger("getLockDefNameManagerStatus")) {
                 this.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
@@ -10601,7 +10601,7 @@
                     c_oAscError.Level.NoCritical);
             }
         }
-        return range;
+        return ranges;
     };
 
     /* Ищет дополнение для ячейки */
