@@ -2965,6 +2965,32 @@ var cFormulaOperators = {
 		}
 		return list;
 	}
+	function getRangeByRef(ref, ws) {
+		var range = null;
+		var _f = new AscCommonExcel.parserFormula(ref, '', ws);
+		_f.parse();
+		_f.RefPos.some(function (item) {
+			var ref;
+			switch (item.oper.type) {
+				case cElementType.table:
+				case cElementType.name:
+					ref = item.oper.toRef();
+					break;
+				case cElementType.cell:
+				case cElementType.cell3D:
+				case cElementType.cellsRange:
+				case cElementType.cellsRange3D:
+					ref = item.oper;
+					break;
+			}
+			if (ref && cElementType.error !== ref.type) {
+				range = ref.getRange();
+				return true;
+			}
+			return false;
+		});
+		return range;
+	}
 
 /*--------------------------------------------------------------------------*/
 
@@ -5569,6 +5595,7 @@ function rtl_math_erfc( x ) {
   window['AscCommonExcel'].cFormulaFunctionToLocale = null;
 
   window['AscCommonExcel'].getFormulasInfo = getFormulasInfo;
+	window['AscCommonExcel'].getRangeByRef = getRangeByRef;
 
   window['AscCommonExcel']._func = _func;
 

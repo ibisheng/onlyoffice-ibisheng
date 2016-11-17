@@ -965,6 +965,7 @@ DrawingObjectsController.prototype =
                 if(!isRealObject(group))
                 {
                     this.resetInternalSelection();
+                    this.updateOverlay();
                     if(!b_is_inline)
                         this.changeCurrentState(new AscFormat.PreMoveState(this, x, y, e.ShiftKey, e.CtrlKey,  object, is_selected, /*true*/!bInSelect));
                     else
@@ -975,6 +976,7 @@ DrawingObjectsController.prototype =
                 else
                 {
                     group.resetInternalSelection();
+                    this.updateOverlay();
                     this.changeCurrentState(new AscFormat.PreMoveInGroupState(this, group, x, y, e.ShiftKey, e.CtrlKey, object,  is_selected));
                 }
                 if(e.ClickCount > 1 && !e.ShiftKey && !e.CtrlKey && ((this.selection.groupSelection && this.selection.groupSelection.selectedObjects.length === 1) || this.selectedObjects.length === 1))
@@ -2726,7 +2728,7 @@ DrawingObjectsController.prototype =
 								c1: chart_space.bbox.serBBox.c1, c2: chart_space.bbox.serBBox.c2};
                     }
 					var chartSeries = AscFormat.getChartSeries(ws_view.model, chartSettings, catHeadersBBox, serHeadersBBox);
-                    chart_space.clearFormatting(true);
+                    //chart_space.clearFormatting(true);
                     b_clear_formatting = true;
                     chart_space.rebuildSeriesFromAsc(chartSeries);
                 }
@@ -9693,9 +9695,10 @@ function ApplyPropsToCatAxis(aPr, oAxis, oDrawingDocument, bCreate){
         }
         oAxis.setSpPr(null);
     }
-    else
-    {
-        oAxis.setMajorGridlines(null);
+    else{
+        if(!bCreate){
+            oAxis.setMajorGridlines(null);
+        }
     }
     ApplySpPr(aPr[3], oAxis);
     if(oAxis.spPr){
@@ -9705,7 +9708,9 @@ function ApplyPropsToCatAxis(aPr, oAxis, oDrawingDocument, bCreate){
         oAxis.setSpPr(null);
     }
     else{
-        oAxis.setMinorGridlines(null);
+        if(!bCreate){
+            oAxis.setMinorGridlines(null);
+        }
     }
     ApplySpPr(aPr[1], oAxis);
 
@@ -9731,9 +9736,10 @@ function ApplyPropsToValAxis(aPr, oAxis, oDrawingDocument, bCreate){
         }
         oAxis.setSpPr(null);
     }
-    else
-    {
-        oAxis.setMajorGridlines(null);
+    else{
+        if(!bCreate){
+            oAxis.setMajorGridlines(null);
+        }
     }
     ApplySpPr(aPr[3], oAxis);
     if(oAxis.spPr){
@@ -9743,7 +9749,9 @@ function ApplyPropsToValAxis(aPr, oAxis, oDrawingDocument, bCreate){
         oAxis.setSpPr(null);
     }
     else {
-        oAxis.setMinorGridlines(null);
+        if(!bCreate){
+            oAxis.setMinorGridlines(null);
+        }
     }
     ApplySpPr(aPr[1], oAxis);
     if(!bCreate){

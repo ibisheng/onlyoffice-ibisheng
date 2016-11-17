@@ -331,9 +331,10 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
     var ret = false, i, title;
     if(drawing.hit(x, y))
     {
+        var bClickFlag = drawingObjectsController.handleEventMode === AscFormat.HANDLE_EVENT_MODE_CURSOR || e.ClickCount < 2;
         var selector = group ? group : drawingObjectsController;
         var legend = drawing.getLegend();
-        if(legend && !window["NATIVE_EDITOR_ENJINE"] && legend.hit(x, y))
+        if(legend && !window["NATIVE_EDITOR_ENJINE"] && legend.hit(x, y) && bClickFlag)
         {
             if(drawing.selection.legend != legend)
             {
@@ -397,11 +398,11 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
 
         var oLabels;
         var arrLabels = [];
-        if(drawing.chart.plotArea.catAx && drawing.chart.plotArea.catAx.labels && !window["NATIVE_EDITOR_ENJINE"])
+        if(drawing.chart.plotArea.catAx && drawing.chart.plotArea.catAx.labels && !window["NATIVE_EDITOR_ENJINE"] && bClickFlag)
         {
             arrLabels.push(drawing.chart.plotArea.catAx.labels);
         }
-        if(drawing.chart.plotArea.valAx && drawing.chart.plotArea.valAx.labels && !window["NATIVE_EDITOR_ENJINE"])
+        if(drawing.chart.plotArea.valAx && drawing.chart.plotArea.valAx.labels && !window["NATIVE_EDITOR_ENJINE"] && bClickFlag)
         {
             arrLabels.push(drawing.chart.plotArea.valAx.labels);
         }
@@ -428,7 +429,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
             }
         }
 
-        if(drawing.chart.plotArea.chart && drawing.chart.plotArea.chart.series && !window["NATIVE_EDITOR_ENJINE"])
+        if(drawing.chart.plotArea.chart && drawing.chart.plotArea.chart.series && !window["NATIVE_EDITOR_ENJINE"] && bClickFlag)
         {
             var series = drawing.chart.plotArea.chart.series;
             var _len = drawing.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart ? 1 : series.length;
@@ -538,56 +539,62 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
         //todo gridlines
 
         //plotArea
-        var oChartSizes = drawing.getChartSizes();
-        var oInvertTransform = drawing.invertTransform;
-        var dTx = oInvertTransform.TransformPointX(x, y);
-        var dTy = oInvertTransform.TransformPointY(x, y);
-        if(dTx >= oChartSizes.startX && dTx <= oChartSizes.startX + oChartSizes.w
-            && dTy >= oChartSizes.startY && dTy <= oChartSizes.startY + oChartSizes.h)
-        {
-            if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        if(bClickFlag){
+            var oChartSizes = drawing.getChartSizes();
+            var oInvertTransform = drawing.invertTransform;
+            var dTx = oInvertTransform.TransformPointX(x, y);
+            var dTy = oInvertTransform.TransformPointY(x, y);
+            if(dTx >= oChartSizes.startX && dTx <= oChartSizes.startX + oChartSizes.w
+                && dTy >= oChartSizes.startY && dTy <= oChartSizes.startY + oChartSizes.h)
             {
-                if(drawing.selection.plotArea == null || !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(drawing) || !drawing.chartObj  || !drawing.chartObj.processor3D)
+                if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
                 {
-                    drawingObjectsController.checkChartTextSelection();
-                    selector.resetSelection();
-                    selector.selectObject(drawing, pageIndex);
-                    selector.selection.chartSelection = drawing;
-                    drawing.selection.plotArea = drawing.chart.plotArea;
-                }
-                else
-                {
-                    drawing.selection.plotArea = drawing.chart.plotArea;
-                    drawing.selection.rotatePlotArea = true;
-
-                    drawingObjectsController.updateSelectionState();
-                    drawingObjectsController.updateOverlay();
-
-                    drawingObjectsController.arrPreTrackObjects.length = 0;
-                    drawingObjectsController.arrPreTrackObjects.push(new AscFormat.Chart3dAdjustTrack(drawing, 0, x, y));
-                    if(!isRealObject(group))
+                    if(drawing.selection.plotArea == null || !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(drawing) || !drawing.chartObj  || !drawing.chartObj.processor3D)
                     {
-                        drawingObjectsController.changeCurrentState(new AscFormat.PreChangeAdjState(drawingObjectsController, drawing));
+                        drawingObjectsController.checkChartTextSelection();
+                        selector.resetSelection();
+                        selector.selectObject(drawing, pageIndex);
+                        selector.selection.chartSelection = drawing;
+                        drawing.selection.plotArea = drawing.chart.plotArea;
                     }
                     else
                     {
-                        drawingObjectsController.changeCurrentState(new AscFormat.PreChangeAdjInGroupState(drawingObjectsController, group));
+                        drawing.selection.plotArea = drawing.chart.plotArea;
+                        drawing.selection.rotatePlotArea = true;
+
+                        drawingObjectsController.updateSelectionState();
+                        drawingObjectsController.updateOverlay();
+
+                        drawingObjectsController.arrPreTrackObjects.length = 0;
+                        drawingObjectsController.arrPreTrackObjects.push(new AscFormat.Chart3dAdjustTrack(drawing, 0, x, y));
+                        if(!isRealObject(group))
+                        {
+                            drawingObjectsController.changeCurrentState(new AscFormat.PreChangeAdjState(drawingObjectsController, drawing));
+                        }
+                        else
+                        {
+                            drawingObjectsController.changeCurrentState(new AscFormat.PreChangeAdjInGroupState(drawingObjectsController, group));
+                        }
+                        var bOldIsLocked = e.IsLocked;
+                        e.IsLocked = true;
+                        drawingObjectsController.OnMouseMove(e, x, y, pageIndex);
+                        e.IsLocked = bOldIsLocked;
+                        return true;
                     }
+
+
+
+                    drawingObjectsController.updateSelectionState();
+                    drawingObjectsController.updateOverlay();
                     return true;
                 }
-
-
-
-                drawingObjectsController.updateSelectionState();
-                drawingObjectsController.updateOverlay();
-                return true;
+                else
+                {
+                    return {objectId: drawing.Get_Id(), cursorType: "default", bMarker: false};
+                }
             }
-            else
-            {
-                return {objectId: drawing.Get_Id(), cursorType: "default", bMarker: false};
-            }
+
         }
-
     }
     return ret;
 }

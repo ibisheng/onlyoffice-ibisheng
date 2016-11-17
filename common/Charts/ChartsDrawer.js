@@ -4521,25 +4521,28 @@ drawLineChart.prototype =
 		
 		//todo возможно стоит проверить fill.type на FILL_TYPE_NOFILL и рисовать отдельно границы, если они заданы!
 		//brush = pen.Fill;
-		if(brush.fill.color === undefined && brush.fill.colors === undefined)
-			return;
 		
 		if(k !== 2)
 		{
 			var props = this.cChartSpace.getParentObjects();
 			var duplicateBrush = brush.createDuplicate();
 			var cColorMod = new AscFormat.CColorMod;
-			if(k == 1 || k == 4)
-				cColorMod.val = 45000;
-			else
-				cColorMod.val = 35000;
+			
 			cColorMod.name = "shade";
+			if(k == 1 || k == 4)
+			{
+				cColorMod.val = 45000;
+			}
+			else
+			{
+				cColorMod.val = 35000;
+			}
 			
 			this._addColorMods(cColorMod, duplicateBrush)
 			
 			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
 			pen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0.1);
-			//pen.setFill(duplicateBrush);
+			
 			this.cChartDrawer.drawPath(path, pen, duplicateBrush);
 		}
 		else
@@ -4551,21 +4554,9 @@ drawLineChart.prototype =
 	
 	_addColorMods: function(cColorMod, duplicateBrush)
 	{
-		if(duplicateBrush.fill.color)
+		if(duplicateBrush)
 		{
-			duplicateBrush.fill.color.Mods.addMod(cColorMod);
-		}
-		else
-		{
-			for(var i = 0; i < duplicateBrush.fill.colors.length; i++)
-			{
-				if(duplicateBrush.fill.colors[i].color.Mods === null)
-				{
-					duplicateBrush.fill.colors[i].color.Mods = new AscFormat.CColorModifiers();
-				}	
-				
-				duplicateBrush.fill.colors[i].color.Mods.addMod(cColorMod);
-			}
+			duplicateBrush.addColorMod(cColorMod);
 		}
 	}
 };

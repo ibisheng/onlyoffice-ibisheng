@@ -88,7 +88,7 @@
 			No                   : 0,
 			Unknown              : -1,
 			ConvertationTimeout  : -2,
-			ConvertationError    : -3,
+
 			DownloadError        : -4,
 			UnexpectedGuid       : -5,
 			Database             : -6,
@@ -1080,7 +1080,6 @@
 	prot['No']                               = prot.No;
 	prot['Unknown']                          = prot.Unknown;
 	prot['ConvertationTimeout']              = prot.ConvertationTimeout;
-	prot['ConvertationError']                = prot.ConvertationError;
 	prot['ConvertationOpenError']            = prot.ConvertationOpenError;
 	prot['ConvertationSaveError']            = prot.ConvertationSaveError;
 	prot['DownloadError']                    = prot.DownloadError;

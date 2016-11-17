@@ -3699,7 +3699,7 @@ CAreaSeries.prototype =
             this.setPictureOptions(o.pictureOptions);
         if(o.spPr){
             this.setSpPr(o.spPr);
-            if(o instanceof AscFormat.CLineSeries){
+            if((o instanceof AscFormat.CLineSeries) || (o instanceof AscFormat.CScatterSeries)){
                 if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_NOFILL){
                     this.spPr.setFill(null);
                 }
@@ -9352,7 +9352,7 @@ CBarSeries.prototype =
             this.setShape(o.shape);
         if(o.spPr){
             this.setSpPr(o.spPr);
-            if(o instanceof AscFormat.CLineSeries){
+            if((o instanceof AscFormat.CLineSeries) || (o instanceof AscFormat.CScatterSeries)){
                 if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_NOFILL){
                     this.spPr.setFill(null);
                 }

@@ -337,14 +337,14 @@
 		} else if (cElementType.cellsRange === arg0.type || cElementType.cell === arg0.type ||
 			cElementType.cell3D === arg0.type) {
 			var range = arg0.getRange();
-			return this.value = new cNumber(Math.abs(range.getBBox().c1 - range.getBBox().c2) + 1);
+			return this.value = new cNumber(Math.abs(range.getBBox0().c1 - range.getBBox0().c2) + 1);
 		} else if (cElementType.cellsRange3D === arg0.type) {
 			var range = arg0.getRange();
 			if (range.length > 1) {
 				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 
-			return this.value = new cNumber(Math.abs(range[0].getBBox().c1 - range[0].getBBox().c2) + 1);
+			return this.value = new cNumber(Math.abs(range[0].getBBox0().c1 - range[0].getBBox0().c2) + 1);
 		} else {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
@@ -761,7 +761,7 @@
 
 			_arg2 = cElementType.array === arg2.type ? arg1 : arg2;
 
-			var BBox = _arg2.getBBox();
+			var BBox = _arg2.getBBox0();
 
 			if (_arg1.getRowCount() != (BBox.r2 - BBox.r1) && _arg1.getCountElementInRow() != (BBox.c2 - BBox.c1)) {
 				return this.value = new cError(cErrorType.not_available);
@@ -773,7 +773,7 @@
 				return this.value = new cError(cErrorType.not_available);
 			}
 
-			var c = new CellAddress(BBox.r1 + resR, BBox.c1 + resC);
+			var c = new CellAddress(BBox.r1 + resR, BBox.c1 + resC, 0);
 			return this.value = checkTypeCell(_arg2.getWS()._getCellNoEmpty(c.getRow0(), c.getCol0()));
 		} else {
 			var arg1Range = arg1.getRange(), arg2Range = arg2.getRange();
@@ -822,19 +822,18 @@
 				return this.value = new cError(cErrorType.bad_reference);
 			}
 
+			var b = arg2.getBBox0();
 			if (this.argumentsCurrent == 2) {
-				var b = arg2.getBBox();
 				if (arg1Range[0].length >= 2) {
-					return this.value = new cRef(ws.getCell3((b.r1 - 1) + index, (b.c2 - 1) + 0).getName(), ws);
+					return this.value = new cRef(ws.getCell3(b.r1 + index, b.c2 + 0).getName(), ws);
 				} else {
-					return this.value = new cRef(ws.getCell3((b.r1 - 1) + 0, (b.c1 - 1) + index).getName(), ws);
+					return this.value = new cRef(ws.getCell3(b.r1 + 0, b.c1 + index).getName(), ws);
 				}
 			} else {
-				var b = arg2.getBBox();
 				if (arg2Range.length == 1) {
-					return this.value = new cRef(ws.getCell3((b.r1 - 1) + 0, (b.c1 - 1) + index).getName(), ws);
+					return this.value = new cRef(ws.getCell3(b.r1 + 0, b.c1 + index).getName(), ws);
 				} else {
-					return this.value = new cRef(ws.getCell3((b.r1 - 1) + index, (b.c1 - 1) + 0).getName(), ws);
+					return this.value = new cRef(ws.getCell3(b.r1 + index, b.c1 + 0).getName(), ws);
 				}
 			}
 		}
@@ -1167,14 +1166,14 @@
 		} else if (cElementType.cellsRange === arg0.type || cElementType.cell === arg0.type ||
 			cElementType.cell3D === arg0.type) {
 			var range = arg0.getRange();
-			return this.value = new cNumber(Math.abs(range.getBBox().r1 - range.getBBox().r2) + 1);
+			return this.value = new cNumber(Math.abs(range.getBBox0().r1 - range.getBBox0().r2) + 1);
 		} else if (cElementType.cellsRange3D === arg0.type) {
 			var range = arg0.getRange();
 			if (range.length > 1) {
 				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 
-			return this.value = new cNumber(Math.abs(range[0].getBBox().r1 - range[0].getBBox().r2) + 1);
+			return this.value = new cNumber(Math.abs(range[0].getBBox0().r1 - range[0].getBBox0().r2) + 1);
 		} else {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}

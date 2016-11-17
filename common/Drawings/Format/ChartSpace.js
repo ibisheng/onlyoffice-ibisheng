@@ -1804,10 +1804,23 @@ CChartSpace.prototype.rebuildSeriesFromAsc = function(asc_chart)
             bAccent1Background = true;
         }
 
+        var oFirstSpPrPreset = 0;
+        if(chart_type.getObjectType() === AscDFH.historyitem_type_PieChart || chart_type.getObjectType() === AscDFH.historyitem_type_DoughnutChart){
+            if(chart_type.series[0].dPt[0] && chart_type.series[0].dPt[0].spPr){
+                oFirstSpPrPreset = AscFormat.CollectSettingsSpPr(chart_type.series[0].dPt[0].spPr);
+            }
+        }
+        else{
+            oFirstSpPrPreset = AscFormat.CollectSettingsSpPr(chart_type.series[0].spPr);
+        }
+
         if(first_series.spPr){
             first_series.spPr.setFill(null);
             first_series.spPr.setLn(null);
         }
+
+        var style = AscFormat.CHART_STYLE_MANAGER.getStyleByIndex(this.style);
+        var base_fills = AscFormat.getArrayFillsFromBase(style.fill2, asc_series.length);
         if(chart_type.getObjectType() !== AscDFH.historyitem_type_ScatterChart)
         {
 
@@ -1832,6 +1845,7 @@ CChartSpace.prototype.rebuildSeriesFromAsc = function(asc_chart)
                 series.setIdx(i);
                 series.setOrder(i);
                 series.setVal(new AscFormat.CYVal());
+                AscFormat.ApplySpPr(oFirstSpPrPreset, series, i, base_fills, bAccent1Background);
                 FillValNum(series.val, asc_series[i].Val, true, false);
                 if(asc_series[i].Cat && asc_series[i].Cat.NumCache && typeof asc_series[i].Cat.Formula === "string" && asc_series[i].Cat.Formula.length > 0)
                 {
