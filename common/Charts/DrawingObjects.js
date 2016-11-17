@@ -1715,6 +1715,25 @@ function DrawingObjects() {
         return copyObject;
     };
 
+
+    _this.createShapeAndInsertContent = function(oParaContent){
+        var track_object = new AscFormat.NewShapeTrack("textRect", 0, 0, Asc['editor'].wbModel.theme, null, null, null, 0);
+        track_object.track({}, 0, 0);
+        var shape = track_object.getShape(false, _this.drawingDocument, this);
+        shape.spPr.setFill(AscFormat.CreateNoFillUniFill());
+        shape.setParent(this);
+        shape.txBody.content.Content[0].Add_ToContent(0, oParaContent);
+        var body_pr = shape.getBodyPr();
+        var w = shape.txBody.getMaxContentWidth(150, true) + body_pr.lIns + body_pr.rIns;
+        var h = shape.txBody.content.Get_SummaryHeight() + body_pr.tIns + body_pr.bIns;
+        shape.spPr.xfrm.setExtX(w);
+        shape.spPr.xfrm.setExtY(h);
+        shape.spPr.xfrm.setOffX(0);
+        shape.spPr.xfrm.setOffY(0);
+        shape.setWorksheet(worksheet.model);
+        shape.addToDrawingObjects();
+        return shape;
+    };
     //-----------------------------------------------------------------------------------
     // Public methods
     //-----------------------------------------------------------------------------------
