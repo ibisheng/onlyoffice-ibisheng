@@ -847,16 +847,25 @@
                         }
                         else if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
                         {
-                            if(aPastedImages && aPastedImages.length)
-                            {
-                                t._loadImagesOnServer(aPastedImages, function() {
-                                    t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
-                                });
-                            }
-                            else
-                            {
-                                t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
-                            }
+                            
+							var newFonts = {};
+							for(var i = 0; i < pasteData.Drawings.length; i++)
+							{
+								pasteData.Drawings[i].graphicObject.getAllFonts(newFonts);
+							}
+							
+							worksheet._loadFonts(newFonts, function() {
+								if(aPastedImages && aPastedImages.length)
+								{
+									t._loadImagesOnServer(aPastedImages, function() {
+										t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
+									});
+								}
+								else
+								{
+									t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
+								}
+							});	
                         }
 					}
 					else 
@@ -988,11 +997,16 @@
 						var objects = this.ReadPresentationShapes(stream, worksheet);
 						var arr_shapes = objects.arrShapes;
 						
-						if(arr_shapes && arr_shapes.length)
+						if(arr_shapes && arr_shapes.length && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 						{
-							var aPastedImages = objects.arrImages;
-							if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
+							var newFonts = {};
+							for(var i = 0; i < arr_shapes.length; i++)
 							{
+								arr_shapes[i].graphicObject.getAllFonts(newFonts);
+							}
+							
+							var aPastedImages = objects.arrImages;
+							worksheet._loadFonts(newFonts, function() {
 								if(aPastedImages && aPastedImages.length)
 								{
 									t._loadImagesOnServer(aPastedImages, function() {
@@ -1000,8 +1014,10 @@
 									});
 								}
 								else
+								{
 									t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape);
-							}
+								}
+							});
 						}
 						
 						return true;
@@ -1664,18 +1680,26 @@
 				//определяем стартовую позицию, если изображений несколько вставляется
 				for(var i = 0; i < addImagesFromWord.length; i++)
 				{
-					graphicObject = addImagesFromWord[i].image.GraphicObj;
+					if(para_Math === addImagesFromWord[i].image.Type)
+					{
+						graphicObject = ws.objectRender.createShapeAndInsertContent(addImagesFromWord[i].image);
+					}
+					else
+					{
+						graphicObject = addImagesFromWord[i].image.GraphicObj;
 					
-					//convert from word
-                    if(graphicObject.setBDeleted2)
-                    {
-                        graphicObject.setBDeleted2(true);
-                    }
-                    else
-                    {
-                        graphicObject.bDeleted = true;
-                    }
-					graphicObject = graphicObject.convertToPPTX(ws.model.DrawingDocument, ws.model);
+						//convert from word
+						if(graphicObject.setBDeleted2)
+						{
+							graphicObject.setBDeleted2(true);
+						}
+						else
+						{
+							graphicObject.bDeleted = true;
+						}
+						graphicObject = graphicObject.convertToPPTX(ws.model.DrawingDocument, ws.model);
+					}
+					
 					
 					//create new drawingBase
 					drawingObject = ws.objectRender.createDrawingObject();
@@ -2584,8 +2608,8 @@
 				this.aResult.props.fontsNew = this.fontsNew;
 				this.aResult.props.rowSpanSpCount = 0;
 				this.aResult.props.cellCount = coverDocument.width;
-				this.aResult.props._images = pasteData.images ? pasteData.images : this.aResult.props._images;
-				this.aResult.props._aPastedImages = pasteData.aPastedImages ? pasteData.aPastedImages : this.aResult.props._aPastedImages;
+				this.aResult.props._images = pasteData.images && pasteData.images.length ? pasteData.images : this.aResult.props._images;
+				this.aResult.props._aPastedImages = pasteData.aPastedImages && pasteData.aPastedImages.length ? pasteData.aPastedImages : this.aResult.props._aPastedImages;
 				
 				worksheet.setSelectionInfo('paste', this.aResult, this);
 			},
@@ -2766,7 +2790,7 @@
 						{
 							s = this._parseParaRun(content[n], oNewItem, paraPr, s, row, c1, text);
 							break;
-						};
+						}
 						case para_Hyperlink://*hyperLink*
 						{	
 							//если несколько ссылок в одном параграфе, то отменяем ссылки
@@ -2793,13 +2817,36 @@
 									{
 										s = this._parseParaRun(content[n].Content[h], oNewItem, paraPr, s, row, c1, text);
 										break;
-									};
-								};
-							};
+									}
+								}
+							}
 							break;
-						};
-					};
-				};
+						}
+						case para_Math://*para_Math*
+						{
+							var tempFonts = [];
+							content[n].Get_AllFontNames(tempFonts);
+							
+							for(var i in tempFonts)
+							{
+								this.fontsNew[i] = 1;
+							}
+							
+							if(!aResult.props.addImagesFromWord)
+							{
+								aResult.props.addImagesFromWord = [];
+							}
+							aResult.props.addImagesFromWord.push({image: content[n], col: s + c1, row: row});
+							
+							if(null === this.isUsuallyPutImages)
+							{
+								this._addImageToMap(content[n]);
+							}
+							
+							break;
+						}
+					}
+				}
 				
 			},
 			
@@ -2826,14 +2873,12 @@
 						{
 							text += String.fromCharCode(paraRunContent[pR].Value);
 							break;
-						};
-						
+						}
 						case para_Space://*paraSpace*
 						{
 							text += " ";
 							break;
-						};
-						
+						}
 						case para_Tab://*paraEnd / paraTab*
 						{
 							this.fontsNew[paragraphFontFamily] = 1;	
@@ -2853,8 +2898,7 @@
 							s++;
 							
 							break;
-						};
-						
+						}
 						case para_Drawing:
 						{
 							if(!aResult.props.addImagesFromWord)
@@ -2863,8 +2907,9 @@
 							
 							if(null === this.isUsuallyPutImages)
 								this._addImageToMap(paraRunContent[pR]);
-						};
-						
+								
+							break;
+						}
 						case para_End:
 						{	
 							var cell = aResult.getCell(row, s + c1);
@@ -2876,9 +2921,11 @@
 								aResult.content = checkMaxTextLength.aResult.content;
 								this.maxLengthRowCount += checkMaxTextLength.r - row;
 							}
-						};
+							
+							break;
+						}
 					}
-				};
+				}
 				
 				if(text != "")
 				{	
@@ -2893,7 +2940,7 @@
 					cloneNewItem  = oNewItem.clone();
 					
 					text = "";
-				};
+				}
 				
 				return s;
 			},

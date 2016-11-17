@@ -260,7 +260,7 @@ function CopyRunToPPTX(Run, Paragraph, bHyper)
     return NewRun;
 }
 
-function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent)
+function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent, bIsAddMath)
 {
     var _drawing_document = isRealObject(drawingDocument) ? drawingDocument : paragraph.DrawingDocument;
     var _new_parent = isRealObject(newParent) ? newParent : paragraph.Parent;
@@ -309,6 +309,10 @@ function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent)
         else if(Item.Type === para_Hyperlink)
         {
             new_paragraph.Internal_Content_Add(new_paragraph.Content.length, ConvertHyperlinkToPPTX(Item, new_paragraph), false);
+        }
+        else if(true === bIsAddMath && Item.Type === para_Math)
+        {
+            new_paragraph.Internal_Content_Add(new_paragraph.Content.length, Item, false);
         }
     }
     var EndRun = new ParaRun(new_paragraph);

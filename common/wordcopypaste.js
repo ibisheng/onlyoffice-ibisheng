@@ -2585,7 +2585,7 @@ PasteProcessor.prototype =
 				element.Get_AllDrawingObjects(drawings);
 				if(type_Paragraph == element.GetType())//paragraph
 				{
-					selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element);
+					selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element, null, null, true);
 					elements.push(selectedElement);
 				}
 				else if(type_Table == element.GetType())//table
@@ -2738,6 +2738,11 @@ PasteProcessor.prototype =
 				case "Content":
 				{
 					var docContent = this.ReadPresentationText(stream);
+					for(var i in this.oFonts)
+					{
+						fonts.push(new CFont(i, 0, "", 0));
+					}
+					
 					var aContent = [];
 					for(var i = 0; i < docContent.length; i++)
 					{
@@ -2745,7 +2750,7 @@ PasteProcessor.prototype =
 					}						
 					this.aContent = aContent;
 
-					oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
+					oThis.api.pre_Paste(fonts, aContent.images, fPrepasteCallback);
 					return;
 				}
 				case "Drawings":
@@ -2754,6 +2759,8 @@ PasteProcessor.prototype =
 					History.TurnOff();
 					var objects = this.ReadPresentationShapes(stream);
 					History.TurnOn();
+					
+					var font_map = {};
 					
 					var arr_shapes = objects.arrShapes;
 					//****если записана одна табличка, то вставляем html и поддерживаем все цвета и стили****
@@ -2765,13 +2772,20 @@ PasteProcessor.prototype =
 						{
 							var aContent = [];
 							var table = AscFormat.ConvertGraphicFrameToWordTable(drawing, this.oLogicDocument);
+							table.Document_Get_AllFontNames(font_map);
+							
+							//перебираем шрифты
+							for(var i in font_map)
+							{
+								fonts.push(new CFont(i, 0, "", 0));
+							}
+							
 							//TODO стиль не прокидывается. в будущем нужно реализовать
 							table.TableStyle = null;
 							aContent.push(table);
 							
 							this.aContent = aContent;
-							
-							oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
+							oThis.api.pre_Paste(fonts, aContent.images, fPrepasteCallback);
 							
 							return;
 						}
@@ -2796,6 +2810,24 @@ PasteProcessor.prototype =
 							}
 						}
 					}
+					
+					//get fonts from shapes
+					var images = [];
+					for(var i = 0; i < objects.arrShapes.length; ++i)
+					{
+						if(objects.arrShapes[i].Drawing.getAllFonts)
+						{
+							objects.arrShapes[i].Drawing.getAllFonts(font_map);
+						}	
+						/*if(objects.arrShapes[i].Drawing.getAllImages)
+							objects.arrShapes[i].Drawing.getAllImages(images);*/
+					}
+					//перебираем шрифты
+					for(var i in font_map)
+					{
+						fonts.push(new CFont(i, 0, "", 0));
+					}
+					
 					//в конце добавляем ссылки на wmf, ole
 					for(var i = 0; i < objects.arrImages.length; ++i)
 					{
@@ -2840,7 +2872,7 @@ PasteProcessor.prototype =
 						
 						aContent = oThis._convertExcelBinary(null, arr_shapes);
 						oThis.aContent = aContent.content;
-						oThis.api.pre_Paste(aContent.fonts, image_map, fPrepasteCallback);
+						oThis.api.pre_Paste(fonts, image_map, fPrepasteCallback);
 					});
 					
 					return;
@@ -2932,9 +2964,10 @@ PasteProcessor.prototype =
 					//shape.getAllFonts(font_map);
 					
 					//перебираем шрифты
-					var fonts = []; 
-					for(var i in font_map)
+					for(var i in this.oFonts)
+					{
 						fonts.push(new CFont(i, 0, "", 0));
+					}
 					
 					//вставка
 					var paste_callback = function()
@@ -3516,6 +3549,7 @@ PasteProcessor.prototype =
 			
 			aContent = [];
 			
+			var font_map = {};
 			//из excel в word они вставляются в один параграф
 			for(var i = 0; i < drawings.length; i++)
 			{
@@ -3552,6 +3586,8 @@ PasteProcessor.prototype =
 					copyObj.Set_Parent(this.oDocument);
 					aContent[aContent.length] = copyObj;
                     drawing.setWordFlag(true);
+					
+					drawing.getAllFonts(font_map);
 				}
 				else
 				{
@@ -3561,7 +3597,8 @@ PasteProcessor.prototype =
 					extX = drawings[i].ExtX;
 					extY = drawings[i].ExtY;
 					
-					graphicObj = drawing.graphicObject ? drawing.graphicObject.convertToWord(this.oLogicDocument) : drawing.convertToWord(this.oLogicDocument) ;
+					drawing.getAllFonts(font_map);
+					graphicObj = drawing.graphicObject ? drawing.graphicObject.convertToWord(this.oLogicDocument) : drawing.convertToWord(this.oLogicDocument);
 					
 					tempParaRun = new ParaRun();
 					tempParaRun.Paragraph = null;
@@ -3579,6 +3616,12 @@ PasteProcessor.prototype =
 					
 					tempParagraph.Content.splice(tempParagraph.Content.length - 1, 0, tempParaRun);
 				}		
+			}
+			
+			fonts = [];
+			for(var i in font_map)
+			{
+				fonts.push(new CFont(i, 0, "", 0));
 			}
 			
 			if(tempParagraph)
@@ -4036,12 +4079,13 @@ PasteProcessor.prototype =
         {
             loader.stream.Skip2(1); // must be 0
 			paragraph = loader.ReadParagraph(newDocContent);
+			
+			//FONTS
+			paragraph.Document_Get_AllFontNames(this.oFonts)
+			
 			selectedElement = new CSelectedElement();
-			
 			selectedElement.Element = paragraph;
-			
 			elements.push(selectedElement);
-            //shape.txBody.content.Internal_Content_Add(shape.txBody.content.Content.length, _paragraph);
         }
         return elements;
     },
