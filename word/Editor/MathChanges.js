@@ -145,6 +145,13 @@ CChangesMathContentAddItem.prototype.Load = function(Color)
 		}
 	}
 };
+CChangesMathContentAddItem.prototype.IsRelated = function(oChanges)
+{
+	if (this.Class === oChanges.Class && (AscDFH.historyitem_MathContent_AddItem === oChanges.Type || AscDFH.historyitem_MathContent_RemoveItem === oChanges.Type))
+		return true;
+
+	return false;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -193,6 +200,13 @@ CChangesMathContentRemoveItem.prototype.Load = function(Color)
 		oMathContent.Content.splice(ChangesPos, 1);
 		AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(oMathContent, ChangesPos, 1);
 	}
+};
+CChangesMathContentRemoveItem.prototype.IsRelated = function(oChanges)
+{
+	if (this.Class === oChanges.Class && (AscDFH.historyitem_MathContent_AddItem === oChanges.Type || AscDFH.historyitem_MathContent_RemoveItem === oChanges.Type))
+		return true;
+
+	return false;
 };
 /**
  * Изменение настроек ArgSize в классе CMathContent
@@ -273,6 +287,13 @@ CChangesMathBaseAddItems.prototype.Load = function(Color)
 
 	oMathBase.fillContent();
 };
+CChangesMathBaseAddItems.prototype.IsRelated = function(oChanges)
+{
+	if (this.Class === oChanges.Class && (AscDFH.historyitem_MathBase_AddItems === oChanges.Type || AscDFH.historyitem_MathBase_RemoveItems === oChanges.Type))
+		return true;
+
+	return false;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -312,6 +333,13 @@ CChangesMathBaseRemoveItems.prototype.Load = function()
 		AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(oMathBase, ChangesPos, 1);
 	}
 	oMathBase.fillContent();
+};
+CChangesMathBaseRemoveItems.prototype.IsRelated = function(oChanges)
+{
+	if (this.Class === oChanges.Class && (AscDFH.historyitem_MathBase_AddItems === oChanges.Type || AscDFH.historyitem_MathBase_RemoveItems === oChanges.Type))
+		return true;
+
+	return false;
 };
 /**
  * @constructor

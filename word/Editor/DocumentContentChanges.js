@@ -160,6 +160,13 @@ CChangesDocumentContentAddItem.prototype.Load = function(Color)
 		AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(oDocument, Pos);
 	}
 };
+CChangesDocumentContentAddItem.prototype.IsRelated = function(oChanges)
+{
+	if (this.Class === oChanges.Class && (AscDFH.historyitem_DocumentContent_AddItem === oChanges.Type || AscDFH.historyitem_DocumentContent_RemoveItem === oChanges.Type))
+		return true;
+
+	return false;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -270,4 +277,11 @@ CChangesDocumentContentRemoveItem.prototype.Load = function(Color)
 
 		oDocument.private_ReindexContent(Pos);
 	}
+};
+CChangesDocumentContentRemoveItem.prototype.IsRelated = function(oChanges)
+{
+	if (this.Class === oChanges.Class && (AscDFH.historyitem_DocumentContent_AddItem === oChanges.Type || AscDFH.historyitem_DocumentContent_RemoveItem === oChanges.Type))
+		return true;
+
+	return false;
 };

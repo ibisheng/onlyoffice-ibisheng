@@ -152,6 +152,13 @@ CChangesRunAddItem.prototype.Load = function(Color)
 	oRun.protected_UpdateSpellChecking();
 	oRun.private_UpdateTrackRevisionOnChangeContent(false);
 };
+CChangesRunAddItem.prototype.IsRelated = function(oChanges)
+{
+	if (this.Class === oChanges.Class && (AscDFH.historyitem_ParaRun_AddItem === oChanges.Type || AscDFH.historyitem_ParaRun_RemoveItem === oChanges.Type))
+		return true;
+
+	return false;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -214,6 +221,13 @@ CChangesRunRemoveItem.prototype.Load = function()
 	oRun.RecalcInfo.Measure = true;
 	oRun.protected_UpdateSpellChecking();
 	oRun.private_UpdateTrackRevisionOnChangeContent(false);
+};
+CChangesRunRemoveItem.prototype.IsRelated = function(oChanges)
+{
+	if (this.Class === oChanges.Class && (AscDFH.historyitem_ParaRun_AddItem === oChanges.Type || AscDFH.historyitem_ParaRun_RemoveItem === oChanges.Type))
+		return true;
+
+	return false;
 };
 /**
  * @constructor

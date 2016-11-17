@@ -94,6 +94,13 @@ CChangesParaFieldAddItem.prototype.Load = function(Color)
 	oField.private_UpdateTrackRevisions();
 	oField.protected_UpdateSpellChecking();
 };
+CChangesParaFieldAddItem.prototype.IsRelated = function(oChanges)
+{
+	if (this.Class === oChanges.Class && (AscDFH.historyitem_Field_AddItem === oChanges.Type || AscDFH.historyitem_Field_RemoveItem === oChanges.Type))
+		return true;
+
+	return false;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -145,4 +152,11 @@ CChangesParaFieldRemoveItem.prototype.Load = function(Color)
 	}
 	oField.private_UpdateTrackRevisions();
 	oField.protected_UpdateSpellChecking();
+};
+CChangesParaFieldRemoveItem.prototype.IsRelated = function(oChanges)
+{
+	if (this.Class === oChanges.Class && (AscDFH.historyitem_Field_AddItem === oChanges.Type || AscDFH.historyitem_Field_RemoveItem === oChanges.Type))
+		return true;
+
+	return false;
 };

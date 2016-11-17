@@ -163,6 +163,13 @@ CChangesParagraphAddItem.prototype.Load = function(Color)
 
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphAddItem.prototype.IsRelated = function(oChanges)
+{
+	if (this.Class === oChanges.Class && (AscDFH.historyitem_Paragraph_AddItem === oChanges.Type || AscDFH.historyitem_Paragraph_RemoveItem === oChanges.Type))
+		return true;
+
+	return false;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -215,6 +222,13 @@ CChangesParagraphRemoveItem.prototype.Load = function(Color)
 	oParagraph.private_UpdateTrackRevisions();
 
 	private_ParagraphChangesOnSetValue(this.Class);
+};
+CChangesParagraphRemoveItem.prototype.IsRelated = function(oChanges)
+{
+	if (this.Class === oChanges.Class && (AscDFH.historyitem_Paragraph_AddItem === oChanges.Type || AscDFH.historyitem_Paragraph_RemoveItem === oChanges.Type))
+		return true;
+
+	return false;
 };
 /**
  * @constructor

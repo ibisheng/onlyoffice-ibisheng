@@ -515,6 +515,13 @@ CChangesTableAddRow.prototype.Load = function(Color)
 	oTable.Internal_ReIndexing();
 	oTable.Recalc_CompiledPr2();
 };
+CChangesTableAddRow.prototype.IsRelated = function(oChanges)
+{
+	if (this.Class === oChanges.Class && (AscDFH.historyitem_Table_AddRow === oChanges.Type || AscDFH.historyitem_Table_RemoveRow === oChanges.Type))
+		return true;
+
+	return false;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -577,6 +584,13 @@ CChangesTableRemoveRow.prototype.Load = function(Color)
 
 	oTable.Internal_ReIndexing();
 	oTable.Recalc_CompiledPr2();
+};
+CChangesTableRemoveRow.prototype.IsRelated = function(oChanges)
+{
+	if (this.Class === oChanges.Class && (AscDFH.historyitem_Table_AddRow === oChanges.Type || AscDFH.historyitem_Table_RemoveRow === oChanges.Type))
+		return true;
+
+	return false;
 };
 /**
  * @constructor

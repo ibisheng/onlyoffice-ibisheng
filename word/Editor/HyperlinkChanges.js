@@ -123,6 +123,13 @@ CChangesHyperlinkAddItem.prototype.Load = function(Color)
 	oHyperlink.private_UpdateTrackRevisions();
 	oHyperlink.protected_UpdateSpellChecking();
 };
+CChangesHyperlinkAddItem.prototype.IsRelated = function(oChanges)
+{
+	if (this.Class === oChanges.Class && (AscDFH.historyitem_Hyperlink_AddItem === oChanges.Type || AscDFH.historyitem_Hyperlink_RemoveItem === oChanges.Type))
+		return true;
+
+	return false;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -173,4 +180,11 @@ CChangesHyperlinkRemoveItem.prototype.Load = function(Color)
 	}
 	oHyperlink.private_UpdateTrackRevisions();
 	oHyperlink.protected_UpdateSpellChecking();
+};
+CChangesHyperlinkRemoveItem.prototype.IsRelated = function(oChanges)
+{
+	if (this.Class === oChanges.Class && (AscDFH.historyitem_Hyperlink_AddItem === oChanges.Type || AscDFH.historyitem_Hyperlink_RemoveItem === oChanges.Type))
+		return true;
+
+	return false;
 };

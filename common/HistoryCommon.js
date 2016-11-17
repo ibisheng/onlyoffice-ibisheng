@@ -2899,6 +2899,17 @@
 	{
 		return this.Add;
 	};
+	CChangesBaseContentChange.prototype.Copy = function()
+	{
+		var oChanges = new this.constructor(this.Class, this.Pos, this.Items, this.Add);
+
+		oChanges.UseArray = this.UseArray;
+
+		for (var nIndex = 0, nCount = this.PosArray.length; nIndex < nCount; ++nIndex)
+			oChanges.PosArray[nIndex] = this.PosArray[nIndex];
+
+		return oChanges;
+	};
 	CChangesBaseContentChange.prototype.GetItemsCount = function()
 	{
 		return this.Items.length;
@@ -2971,6 +2982,56 @@
 	CChangesBaseContentChange.prototype.private_ReadItem = function(Reader)
 	{
 		return null;
+	};
+	CChangesBaseContentChange.prototype.ConvertToSimpleActions = function()
+	{
+		var arrActions = [];
+
+		if (this.UseArray)
+		{
+			for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
+			{
+				arrActions.push({
+					Item : this.Items[nIndex],
+					Pos  : this.PosArray[nIndex],
+					Add  : this.Add
+				});
+			}
+		}
+		else
+		{
+			var Pos = this.Pos;
+			for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
+			{
+				arrActions.push({
+					Item : this.Items[nIndex],
+					Pos  : Pos + nIndex,
+					Add  : this.Add
+				});
+			}
+		}
+
+		return arrActions;
+	};
+	CChangesBaseContentChange.prototype.ConvertFromSimpleActions = function(arrActions)
+	{
+		this.UseArray = true;
+		this.Pos      = 0;
+		this.Items    = [];
+		this.PosArray = [];
+
+		for (var nIndex = 0, nCount = arrActions.length; nIndex < nCount; ++nIndex)
+		{
+			this.PosArray[nIndex] = arrActions[nIndex].Pos;
+			this.Items[nIndex]    = arrActions[nIndex].Item;
+		}
+	};
+	CChangesBaseContentChange.prototype.IsRelated = function(oChanges)
+	{
+		if (this.Class !== oChanges.GetClass() || this.Type !== oChanges.Type)
+			return false;
+
+		return true;
 	};
 	window['AscDFH'].CChangesBaseContentChange = CChangesBaseContentChange;
 	/**

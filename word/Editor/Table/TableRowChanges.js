@@ -402,6 +402,13 @@ CChangesTableRowAddCell.prototype.Load = function(Color)
 
 	oRow.Internal_ReIndexing();
 };
+CChangesTableRowAddCell.prototype.IsRelated = function(oChanges)
+{
+	if (this.Class === oChanges.Class && (AscDFH.historyitem_TableRow_AddCell === oChanges.Type || AscDFH.historyitem_TableRow_RemoveCell === oChanges.Type))
+		return true;
+
+	return false;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -455,6 +462,13 @@ CChangesTableRowRemoveCell.prototype.Load = function(Color)
 	AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(oRow, Pos, 1);
 
 	oRow.Internal_ReIndexing();
+};
+CChangesTableRowRemoveCell.prototype.IsRelated = function(oChanges)
+{
+	if (this.Class === oChanges.Class && (AscDFH.historyitem_TableRow_AddCell === oChanges.Type || AscDFH.historyitem_TableRow_RemoveCell === oChanges.Type))
+		return true;
+
+	return false;
 };
 /**
  * @constructor
