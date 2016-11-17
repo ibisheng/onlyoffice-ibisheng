@@ -2774,12 +2774,18 @@ function asc_WriteUsers(c, s) {
             user = c[name];
             if (user) {
                 s['WriteString2'](user.asc_getId());
-                s['WriteString2'](user.asc_getFirstName());
-                s['WriteString2'](user.asc_getLastName());
-                s['WriteString2'](user.asc_getUserName());
+                s['WriteString2'](user.asc_getFirstName() === undefined ? "" : user.asc_getFirstName());
+                s['WriteString2'](user.asc_getLastName() === undefined ? "" : user.asc_getLastName());
+                s['WriteString2'](user.asc_getUserName() === undefined ? "" : user.asc_getUserName());
                 s['WriteBool'](user.asc_getView());
                 
-                asc_menu_WriteColor(0, user.asc_getColor(), s);
+                var color = new Asc.asc_CColor();
+               
+                color.r = (user.color >> 16) & 255;
+                color.g = (user.color >> 8 ) & 255;
+                color.b = (user.color      ) & 255;
+               
+                asc_menu_WriteColor(0, color, s);
             }
         }
     }
