@@ -2977,6 +2977,12 @@ var cFormulaOperators = {
 		var ranges = [];
 		var arrRefs = ref.split(',');
 		arrRefs.forEach(function (refItem) {
+			// ToDo in parser formula
+			var currentWorkbook = '[0]!';
+			if (0 === refItem.indexOf(currentWorkbook)) {
+				refItem = refItem.slice(currentWorkbook.length);
+			}
+
 			var _f = new AscCommonExcel.parserFormula(refItem, '', ws);
 			_f.parse();
 			_f.RefPos.forEach(function (item) {
