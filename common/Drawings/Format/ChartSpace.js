@@ -1194,30 +1194,13 @@ CChartSpace.prototype.parseChartFormula = function(sFormula)
 {
     if(this.worksheet && typeof sFormula === "string" && sFormula.length > 0)
     {
+
+        var aParsedRef = AscCommonExcel.getRangeByRef(sFormula, this.worksheet);
         var ret = [];
-        if(sFormula[0] === '(')
-            sFormula = sFormula.slice(1);
-        if(sFormula[sFormula.length-1] === ')')
-            sFormula = sFormula.slice(0, -1);
-        var f1 = sFormula;
-        var arr_f = f1.split(",");
-        var i, j;
-        for(i = 0; i < arr_f.length; ++i)
+        for(var i = 0; i < aParsedRef.length; ++i)
         {
-            var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
-            if(parsed_ref)
-            {
-                var source_worksheet = this.worksheet.workbook.getWorksheetByName(parsed_ref.sheet);
-                if(source_worksheet)
-                {
-                    var range1 = source_worksheet.getRange2(parsed_ref.range);
-                    if(range1)
-                    {
-                        var range = range1.bbox;
-                        ret.push({worksheet: source_worksheet, bbox: range});
-                    }
-                }
-            }
+            var oCurRef = aParsedRef[i];
+            ret.push({worksheet: oCurRef.worksheet, bbox: oCurRef.bbox});
         }
         return ret;
     }
