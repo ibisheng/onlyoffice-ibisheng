@@ -2237,6 +2237,7 @@
 					return;
 				}
 				
+				//var aResult = this._getTableFromText(text);
 				var aResult = new excelPasteContent();
 				aResult = aResult.getDefaultPasteContent(worksheet, this.activeRange.r1, this.activeRange.c1, text);
 				
@@ -2444,7 +2445,117 @@
 				}
 				
 				return res;
-			}
+			},
+			
+			_getTableFromText: function (sText)
+			{
+				var t = this;
+				
+				var aResult = new excelPasteContent();
+				var width = 0;
+				var colCounter = 0;
+				var rowCounter = 0;
+				var sCurPar = "";
+				var sCurChar = "";
+				for ( var i = 0, length = sText.length; i < length; i++ )
+				{
+					var Char = sText.charAt(i);
+					var Code = sText.charCodeAt(i);
+					var Item = null;
+					
+					if(colCounter > width)
+					{
+						width = colCounter;
+					}
+					
+					if ( '\n' === Char )
+					{
+						if("" == sCurChar)
+						{
+							var cell = aResult.getCell(rowCounter, colCounter);
+							cell.content[0] = {text: "", format: {}};
+							colCounter = 0;
+							rowCounter++;
+							//sHtml += "<tr><td style='font-family:Calibri'>&nbsp;</td></tr>";
+						}
+						else
+						{
+							var cell = aResult.getCell(rowCounter, colCounter);
+							cell.content[0] = {text: sCurChar, format: {}};
+							colCounter = 0;
+							rowCounter++;
+							
+							//sHtml += "<tr><td><span style='font-family:Calibri;font-size:11pt;white-space:nowrap'>" + sCurChar + "</span></td></tr>";
+							sCurChar = "";
+						}
+						/*else if(sCurPar != '')
+						{
+							var cell = aResult.getCell(rowCounter, colCounter);
+							cell.content[0] = {text: sCurChar, format: {}};
+							colCounter = 0;
+							rowCounter++;
+							
+							//sCurPar += "<td><span style='font-family:Calibri;font-size:11pt;white-space:nowrap'>" + sCurChar + "</span></td>";
+							//sHtml += "<tr>" + sCurPar + "</tr>";
+							
+							sCurChar = "";
+							sCurPar = "";
+						}*/
+					}
+					else if ( 13 === Code )
+					{
+						continue;
+					}
+					else
+					{
+						if(32 == Code || 160 == Code) //160 - nbsp
+						{
+							sCurChar += " ";
+						}
+						else if ( 9 === Code )//tab
+						{
+							var cell = aResult.getCell(rowCounter, colCounter);
+							cell.content[0] = {text: sCurChar, format: {}};
+							colCounter++;
+							/*sCurPar += "<td><span style='font-family:Calibri;font-size:11pt;white-space:nowrap'>" +  sCurChar + "</span></td>";
+							if(i == length - 1)
+							{
+								sHtml += "<tr>" + sCurPar + "</tr>";
+							}*/
+							sCurChar = '';
+						}
+						else
+						{
+							sCurChar += t._copyPasteCorrectString(Char);
+							if(i == length - 1)
+							{
+								var cell = aResult.getCell(rowCounter, colCounter);
+								cell.content[0] = {text: sCurChar, format: {}};
+								
+								//sCurPar += "<td><span style='font-family:Calibri;font-size:11pt;white-space:nowrap'>" +  sCurChar + "</span></td>";
+								//sHtml += "<tr>" + sCurPar + "</tr>";
+							}
+						}
+							
+					}
+				}
+				
+				aResult.props.cellCount = width + 1;
+				aResult.props.rowSpanSpCount = 0;
+				
+				return aResult;
+			},
+			
+			_copyPasteCorrectString: function (str)
+			{
+				var res = str;
+				res = res.replace(/&/g,'&amp;');
+				res = res.replace(/</g,'&lt;');
+				res = res.replace(/>/g,'&gt;');
+				res = res.replace(/'/g,'&apos;');
+				res = res.replace(/"/g,'&quot;');
+				return res;
+			},
 		};
 		
 		/** @constructor */
