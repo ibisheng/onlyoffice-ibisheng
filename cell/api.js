@@ -1615,6 +1615,29 @@ var editor;
     this.collaborativeEditing.addCheckLock(lockInfo);
     this.collaborativeEditing.onEndCheckLock(callback);
   };
+  spreadsheet_api.prototype._isLockedSparkline = function (id, callback) {
+    var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null,
+        this.asc_getActiveWorksheetId(), id);
+    if (false === this.collaborativeEditing.getCollaborativeEditing()) {
+      // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
+      AscCommonExcel.applyFunction(callback, true);
+      callback = undefined;
+    }
+    if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, false)) {
+      // Редактируем сами
+      AscCommonExcel.applyFunction(callback, true);
+      return;
+    } else if (false !==
+        this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false)) {
+      // Уже ячейку кто-то редактирует
+      AscCommonExcel.applyFunction(callback, false);
+      return;
+    }
+
+    this.collaborativeEditing.onStartCheckLock();
+    this.collaborativeEditing.addCheckLock(lockInfo);
+    this.collaborativeEditing.onEndCheckLock(callback);
+  };
 
   spreadsheet_api.prototype._addWorksheet = function (name, i) {
     var t = this;
@@ -2608,12 +2631,18 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_setSparklineGroup = function (id, oSparklineGroup) {
-    var changedSparkline = AscCommon.g_oTableId.Get_ById(id);
-    if (changedSparkline) {
-      changedSparkline.set(oSparklineGroup);
-      this.wb._onWSSelectionChanged();
-      this.wb.getWorksheet().draw();
-    }
+    var t = this;
+    var changeSparkline = function(res) {
+      if (res) {
+        var changedSparkline = AscCommon.g_oTableId.Get_ById(id);
+        if (changedSparkline) {
+          changedSparkline.set(oSparklineGroup);
+          t.wb._onWSSelectionChanged();
+          t.wb.getWorksheet().draw();
+        }
+      }
+    };
+    this._isLockedSparkline(id, changeSparkline);
   };
 
   // Cell interface

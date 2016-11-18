@@ -4720,7 +4720,6 @@ CellArea.prototype = {
 
 		//for drawing preview
 		this.canvas = null;
-		this.sparklineView = null;
 
 		this.Id = null;
 		if (addId) {
@@ -4730,6 +4729,173 @@ CellArea.prototype = {
 	}
 	sparklineGroup.prototype.Get_Id = function () {
 		return this.Id;
+	};
+	sparklineGroup.prototype.Save_Changes = function (data, w) {
+
+	};
+	sparklineGroup.prototype.Load_Changes = function (r) {
+
+	};
+	sparklineGroup.prototype.Undo = function (type, data) {
+		switch (type) {
+			case AscCH.historyitem_Sparkline_LineWeight:
+				this.lineWeight = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_Type:
+				this.type = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_DateAxis:
+				this.dateAxis = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_DisplayEmptyCellsAs:
+				this.displayEmptyCellsAs = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_Markers:
+				this.markers = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_High:
+				this.high = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_Low:
+				this.low = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_First:
+				this.first = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_Last:
+				this.last = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_Negative:
+				this.negative = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_DisplayXAxis:
+				this.displayXAxis = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_DisplayHidden:
+				this.displayHidden = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_MinAxisType:
+				this.minAxisType = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_MaxAxisType:
+				this.maxAxisType = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_RightToLeft:
+				this.rightToLeft = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ManualMax:
+				this.manualMax = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ManualMin:
+				this.manualMin = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorSeries:
+				this.colorSeries = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorNegative:
+				this.colorNegative = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorAxis:
+				this.colorAxis = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorMarkers:
+				this.colorMarkers = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorFirst:
+				this.colorFirst = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_colorLast:
+				this.colorLast = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorHigh:
+				this.colorHigh = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorLow:
+				this.colorLow = data.oldPr;
+				break;
+		}
+
+		this.cleanCache();
+	};
+	sparklineGroup.prototype.Redo = function (data) {
+		switch (data.Type) {
+			case AscCH.historyitem_Sparkline_LineWeight:
+				this.lineWeight = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_Type:
+				this.type = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_DateAxis:
+				this.dateAxis = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_DisplayEmptyCellsAs:
+				this.displayEmptyCellsAs = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_Markers:
+				this.markers = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_High:
+				this.high = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_Low:
+				this.low = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_First:
+				this.first = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_Last:
+				this.last = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_Negative:
+				this.negative = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_DisplayXAxis:
+				this.displayXAxis = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_DisplayHidden:
+				this.displayHidden = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_MinAxisType:
+				this.minAxisType = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_MaxAxisType:
+				this.maxAxisType = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_RightToLeft:
+				this.rightToLeft = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ManualMax:
+				this.manualMax = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ManualMin:
+				this.manualMin = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorSeries:
+				this.colorSeries = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorNegative:
+				this.colorNegative = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorAxis:
+				this.colorAxis = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorMarkers:
+				this.colorMarkers = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorFirst:
+				this.colorFirst = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_colorLast:
+				this.colorLast = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorHigh:
+				this.colorHigh = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorLow:
+				this.colorLow = data.newPr;
+				break;
+		}
+		this.cleanCache();
 	};
 	sparklineGroup.prototype.default = function () {
 		this.type = Asc.c_oAscSparklineType.Line;
@@ -4763,37 +4929,51 @@ CellArea.prototype = {
 		this.colorLow = new AscCommonExcel.RgbColor(defaultOtherColor);
 	};
 	sparklineGroup.prototype.set = function (val) {
-		this.lineWeight = null !== val.lineWeight ? val.lineWeight : this.lineWeight;
-		this.type = null !== val.type ? val.type : this.type;
-		this.dateAxis = null !== val.dateAxis ? val.dateAxis : this.dateAxis;
-		this.displayEmptyCellsAs = null !== val.displayEmptyCellsAs ? val.displayEmptyCellsAs : this.displayEmptyCellsAs;
-		this.markers = null !== val.markers ? val.markers : this.markers;
-		this.high = null !== val.high ? val.high : this.high;
-		this.low = null !== val.low ? val.low : this.low;
-		this.first = null !== val.first ? val.first : this.first;
-		this.last = null !== val.last ? val.last : this.last;
-		this.negative = null !== val.negative ? val.negative : this.negative;
-		this.displayXAxis = null !== val.displayXAxis ? val.displayXAxis : this.displayXAxis;
-		this.displayHidden = null !== val.displayHidden ? val.displayHidden : this.displayHidden;
-		this.minAxisType = null !== val.minAxisType ? val.minAxisType : this.minAxisType;
-		this.maxAxisType = null !== val.maxAxisType ? val.maxAxisType : this.maxAxisType;
-		this.rightToLeft = null !== val.rightToLeft ? val.rightToLeft : this.rightToLeft;
-		this.manualMax = null !== val.manualMax ? val.manualMax : this.manualMax;
-		this.manualMin = null !== val.manualMin ? val.manualMin : this.manualMin;
-
+		var t = this;
+		var checkProperty = function(propOld, propNew, type) {
+			if (null !== propNew && propOld !== propNew) {
+				History.Add(t, {Type: type, oldPr: propOld, newPr: propNew});
+				return propNew;
+			}
+			return propOld;
+		};
 		var getColor = function (color) {
 			return color instanceof Asc.asc_CColor ? AscCommonExcel.CorrectAscColor(color) : color;
 		};
-		this.colorSeries = null !== val.colorSeries ? getColor(val.colorSeries) : this.colorSeries;
-		this.colorNegative = null !== val.colorNegative ? getColor(val.colorNegative) : this.colorNegative;
-		this.colorAxis = null !== val.colorAxis ? getColor(val.colorAxis) : this.colorAxis;
-		this.colorMarkers = null !== val.colorMarkers ? getColor(val.colorMarkers) : this.colorMarkers;
-		this.colorFirst = null !== val.colorFirst ? getColor(val.colorFirst) : this.colorFirst;
-		this.colorLast = null !== val.colorLast ? getColor(val.colorLast) : this.colorLast;
-		this.colorHigh = null !== val.colorHigh ? getColor(val.colorHigh) : this.colorHigh;
-		this.colorLow = null !== val.colorLow ? getColor(val.colorLow) : this.colorLow;
+
+		History.Create_NewPoint();
+		History.StartTransaction();
+
+		this.lineWeight = checkProperty(this.lineWeight, val.lineWeight, AscCH.historyitem_Sparkline_LineWeight);
+		this.type = checkProperty(this.type, val.type, AscCH.historyitem_Sparkline_Type);
+		this.dateAxis = checkProperty(this.dateAxis, val.dateAxis, AscCH.historyitem_Sparkline_DateAxis);
+		this.displayEmptyCellsAs = checkProperty(this.displayEmptyCellsAs, val.displayEmptyCellsAs, AscCH.historyitem_Sparkline_DisplayEmptyCellsAs);
+		this.markers = checkProperty(this.markers, val.markers, AscCH.historyitem_Sparkline_Markers);
+		this.high = checkProperty(this.high, val.high, AscCH.historyitem_Sparkline_High);
+		this.low = checkProperty(this.low, val.low, AscCH.historyitem_Sparkline_Low);
+		this.first = checkProperty(this.first, val.first, AscCH.historyitem_Sparkline_First);
+		this.last = checkProperty(this.last, val.last, AscCH.historyitem_Sparkline_Last);
+		this.negative = checkProperty(this.negative, val.negative, AscCH.historyitem_Sparkline_Negative);
+		this.displayXAxis = checkProperty(this.displayXAxis, val.displayXAxis, AscCH.historyitem_Sparkline_DisplayXAxis);
+		this.displayHidden = checkProperty(this.displayHidden, val.displayHidden, AscCH.historyitem_Sparkline_DisplayHidden);
+		this.minAxisType = checkProperty(this.minAxisType, val.minAxisType, AscCH.historyitem_Sparkline_MinAxisType);
+		this.maxAxisType = checkProperty(this.maxAxisType, val.maxAxisType, AscCH.historyitem_Sparkline_MaxAxisType);
+		this.rightToLeft = checkProperty(this.rightToLeft, val.rightToLeft, AscCH.historyitem_Sparkline_RightToLeft);
+		this.manualMax = checkProperty(this.manualMax, val.manualMax, AscCH.historyitem_Sparkline_ManualMax);
+		this.manualMin = checkProperty(this.manualMin, val.manualMin, AscCH.historyitem_Sparkline_ManualMin);
+
+		this.colorSeries = checkProperty(this.colorSeries, getColor(val.colorSeries), AscCH.historyitem_Sparkline_ColorSeries);
+		this.colorNegative = checkProperty(this.colorNegative, getColor(val.colorNegative), AscCH.historyitem_Sparkline_ColorNegative);
+		this.colorAxis = checkProperty(this.colorAxis, getColor(val.colorAxis), AscCH.historyitem_Sparkline_ColorAxis);
+		this.colorMarkers = checkProperty(this.colorMarkers, getColor(val.colorMarkers), AscCH.historyitem_Sparkline_ColorMarkers);
+		this.colorFirst = checkProperty(this.colorFirst, getColor(val.colorFirst), AscCH.historyitem_Sparkline_ColorFirst);
+		this.colorLast = checkProperty(this.colorLast, getColor(val.colorLast), AscCH.historyitem_Sparkline_colorLast);
+		this.colorHigh = checkProperty(this.colorHigh, getColor(val.colorHigh), AscCH.historyitem_Sparkline_ColorHigh);
+		this.colorLow = checkProperty(this.colorLow, getColor(val.colorLow), AscCH.historyitem_Sparkline_ColorLow);
 
 		this.cleanCache();
+
+		History.EndTransaction();
 	};
 	sparklineGroup.prototype.clone = function (onlyProps) {
 		var res = new sparklineGroup(!onlyProps);
