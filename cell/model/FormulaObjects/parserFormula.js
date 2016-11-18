@@ -1064,7 +1064,7 @@ cArea.prototype.foreach = function ( action ) {
     }
 };
 	cArea.prototype.foreach2 = function (action) {
-		var t = this, r = this.getRange();
+		var r = this.getRange();
 		if (r) {
 			r._foreach2(function (cell) {
 				action(checkTypeCell(cell), cell);
@@ -1165,9 +1165,12 @@ cArea3D.prototype.wsRange = function () {
 		}
 		return r;
 	};
-cArea3D.prototype.getRange = function () {
-    return this.range( this.wsRange() );
-};
+	cArea3D.prototype.getRange = function () {
+		if (!this.isSingleSheet()) {
+			return null;
+		}
+		return (this.range(this.wsRange()))[0];
+	};
 	cArea3D.prototype.getValue = function () {
 		var i, _wsA = this.wsRange();
 		var _val = [];
