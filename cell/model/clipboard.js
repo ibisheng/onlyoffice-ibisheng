@@ -1101,7 +1101,7 @@
 					
 					if(type_Paragraph === element.GetType())//paragraph
 					{
-						selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element, worksheet.model.DrawingDocument, target_doc_content);
+						selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element, worksheet.model.DrawingDocument, target_doc_content, true);
 						elements.push(selectedElement);
 					}
 					else if(type_Table === element.GetType())//table
