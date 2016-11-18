@@ -6472,7 +6472,7 @@ drawHBarChart.prototype =
 	{
 		var startY, diffYVal, width, numCache, dVal, curVal, prevVal, endBlockPosition, startBlockPosition;
 		var catAx = this.cChartSpace.chart.plotArea.catAx;
-		var nullPositionOX = (catAx.posX !== undefined && catAx.posX !== null) ? catAx.posX * this.chartProp.pxToMM : catAx.xPos * this.chartProp.pxToMM;
+		var nullPositionOX = catAx.posX !== null ? catAx.posX * this.chartProp.pxToMM : 0;
 		
 		if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
 		{
@@ -10884,13 +10884,13 @@ catAxisChart.prototype =
 		var axisPos;
 		if(this.chartProp.type == c_oChartTypes.HBar)
 		{	
-			axisPos = this.cChartSpace.chart.plotArea.catAx.posX ? this.cChartSpace.chart.plotArea.catAx.posX : this.cChartSpace.chart.plotArea.catAx.xPos;
+			axisPos = this.cChartSpace.chart.plotArea.catAx.posX;
 			this.paths.axisLine = this._calculateLine( axisPos, this.chartProp.chartGutter._top / this.chartProp.pxToMM, axisPos, (this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom) / this.chartProp.pxToMM);
 		}
 		else
 		{
 			//TODO сделать по аналогии с HBAR
-			axisPos = this.cChartSpace.chart.plotArea.catAx.posY ? this.cChartSpace.chart.plotArea.catAx.posY : this.cChartSpace.chart.plotArea.catAx.yPos;
+			axisPos = this.cChartSpace.chart.plotArea.catAx.posY;
 			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left / this.chartProp.pxToMM, axisPos, (this.chartProp.widthCanvas - this.chartProp.chartGutter._right) / this.chartProp.pxToMM, axisPos);
 		}
 	},
@@ -10990,7 +10990,7 @@ catAxisChart.prototype =
 		var stepY = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
 		var minorStep = stepY / this.chartProp.numhMinorlines;
 		
-		var posX = this.cChartSpace.chart.plotArea.catAx.posX ? this.cChartSpace.chart.plotArea.catAx.posX : this.cChartSpace.chart.plotArea.catAx.xPos;
+		var posX = this.cChartSpace.chart.plotArea.catAx.posX;
 
 		var posY, posMinorY, k;
 		
@@ -11056,7 +11056,7 @@ catAxisChart.prototype =
 		var stepX = xPoints[1] ? Math.abs(xPoints[1].pos - xPoints[0].pos) : Math.abs(xPoints[0].pos - this.cChartSpace.chart.plotArea.catAx.posX) * 2;
 		var minorStep = stepX / this.chartProp.numvMinorlines;
 		
-		var posY = this.cChartSpace.chart.plotArea.catAx.posY ? this.cChartSpace.chart.plotArea.catAx.posY : this.cChartSpace.chart.plotArea.catAx.yPos;
+		var posY = this.cChartSpace.chart.plotArea.catAx.posY;
 		var posX, posMinorX, k;
 		
 		var firstDiff = 0, posXtemp;
@@ -11233,7 +11233,7 @@ valAxisChart.prototype =
 	
 	_calculateAxis : function()
 	{
-		var nullPoisition = this.cChartSpace.chart.plotArea.valAx.posX != undefined ? this.cChartSpace.chart.plotArea.valAx.posX : this.cChartSpace.chart.plotArea.valAx.xPos;
+		var nullPoisition = this.cChartSpace.chart.plotArea.valAx.posX;
 
 		if(this.chartProp.type == c_oChartTypes.HBar)
 		{	
@@ -11360,7 +11360,7 @@ valAxisChart.prototype =
 				var stepY = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
 				var minorStep = stepY / this.chartProp.numhMinorlines;
 				
-				var posX = this.cChartSpace.chart.plotArea.valAx.posX ? this.cChartSpace.chart.plotArea.valAx.posX : this.cChartSpace.chart.plotArea.valAx.xPos;
+				var posX = this.cChartSpace.chart.plotArea.valAx.posX;
 
 				var posY;
 				var posMinorY;
@@ -11501,7 +11501,7 @@ serAxisChart.prototype =
 	
 	_calculateAxis : function()
 	{
-		var nullPoisition = this.cChartSpace.chart.plotArea.valAx.posX != undefined ? this.cChartSpace.chart.plotArea.valAx.posX : this.cChartSpace.chart.plotArea.valAx.xPos;
+		var nullPoisition = this.cChartSpace.chart.plotArea.valAx.posX;
 		var nullPositionOx = this.chartProp.nullPositionOX;
 		
 		var view3DProp = this.cChartSpace.chart.view3D;

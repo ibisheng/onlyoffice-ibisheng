@@ -745,7 +745,7 @@ Processor3D.prototype.correctPointsPosition = function(chartSpace)
 	if(!xPoints)
 		xPoints = chartSpace.chart.plotArea && chartSpace.chart.plotArea.valAx ? chartSpace.chart.plotArea.valAx.xPoints : null;
 	
-	var coordYAxisOx = chartSpace.chart.plotArea.catAx.posY ? chartSpace.chart.plotArea.catAx.posY : chartSpace.chart.plotArea.catAx.yPos;
+	var coordYAxisOx = chartSpace.chart.plotArea.catAx.posY;
 	if(!coordYAxisOx)
 		coordYAxisOx = chartSpace.chart.plotArea.valAx.posY != undefined ? chartSpace.chart.plotArea.valAx.posY : chartSpace.chart.plotArea.valAx.posY;
 	
