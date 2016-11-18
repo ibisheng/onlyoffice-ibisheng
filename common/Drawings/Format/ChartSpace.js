@@ -2876,10 +2876,7 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
 {
     if(val && val.numRef && typeof val.numRef.f === "string"/*(!val.numRef.numCache || val.numRef.numCache.pts.length === 0)*/)
     {
-        var aParsedRef = AscCommonExcel.getRangeByRef(val.numRef.f, this.worksheet)[0];
-        if(!aParsedRef){
-            aParsedRef = [];
-        }
+        var aParsedRef = AscCommonExcel.getRangeByRef(val.numRef.f, this.worksheet);
         var num_cache;
         if(!val.numRef.numCache )
         {
@@ -3006,10 +3003,7 @@ CChartSpace.prototype.checkCatByNumRef = function(oThis, ser, cat, bVertical)
 {
     if(cat && cat.strRef && typeof cat.strRef.f === "string" /*(!cat.strRef.strCache || cat.strRef.strCache.pt.length === 0)*/)
     {
-        var aParsedRef = AscCommonExcel.getRangeByRef(cat.strRef.f, this.worksheet)[0];
-        if(!aParsedRef){
-            aParsedRef = [];
-        }
+        var aParsedRef = AscCommonExcel.getRangeByRef(cat.strRef.f, this.worksheet);
         var str_cache = new AscFormat.CStrCache();
         //str_cache.setFormatCode("General");
         var pt_index = 0, i, j, cell, pt, value_width_format, row_hidden, col_hidden;
