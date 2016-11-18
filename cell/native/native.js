@@ -3281,7 +3281,7 @@ function OfflineEditor () {
                 this.drawingArea.frozenPlaces[0].range = range;
             }
 
-            window.native["SwitchMemoryLayer"]();
+            window["native"]["SwitchMemoryLayer"]();
 
             offlineEditor.flushTextMeasurer();
 
@@ -3747,14 +3747,14 @@ function OfflineEditor () {
         
         window["NativeSupportTimeouts"] = true;
         
-        try
-        {
-        throw "OpenFile";
-        }
-        catch (e)
-        {
-            
-        }
+//        try
+//        {
+//            throw "OpenFile";
+//        }
+//        catch (e)
+//        {
+//            
+//        }
 
         this.initSettings = settings;
         
@@ -3762,10 +3762,10 @@ function OfflineEditor () {
 
         window["CreateMainTextMeasurerWrapper"]();
 
-        deviceScale = window.native["GetDeviceScale"]();
+        deviceScale = window["native"]["GetDeviceScale"]();
 
         window.g_file_path = "native_open_file";
-        window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
+        window.NATIVE_DOCUMENT_TYPE = window["native"]["GetEditorType"]();
         _api = new window["Asc"]["spreadsheet_api"]({});
 
         var userInfo = new Asc.asc_CUserInfo();
@@ -3789,7 +3789,7 @@ function OfflineEditor () {
             _api._coAuthoringInit();
             _api.asc_SetFastCollaborative(true);
         } else {
-            _api.asc_nativeOpenFile(window.native["GetFileString"](), undefined, true);
+            _api.asc_nativeOpenFile(window["native"]["GetFileString"](), undefined, true);
             
             this.asc_WriteAllWorksheets(true);
             
@@ -4658,7 +4658,7 @@ function OfflineEditor () {
             this.styleThumbnailHeightWithRetina	= this.styleThumbnailHeight;
 
 
-            window['native'].SetStylesType(0);
+            window["native"]["SetStylesType"](0);
 
             this.generateDefaultStyles(cellStylesAll, fmgrGraphics, oFont, stringRenderer);
             this.generateDocumentStyles(cellStylesAll, fmgrGraphics, oFont, stringRenderer);
@@ -4677,9 +4677,9 @@ function OfflineEditor () {
                 // ToDo Возможно стоит переписать немного, чтобы не пробегать каждый раз по массиву custom-стилей (нужно генерировать AllStyles)
                 oCustomStyle = cellStylesAll.getCustomStyleByBuiltinId(oStyle.BuiltinId);
 
-                window['native'].BeginDrawDefaultStyle(oStyle.Name, styleIndex);
+                window["native"]["BeginDrawDefaultStyle"](oStyle.Name, styleIndex);
                 this.drawStyle(oGraphics, stringRenderer, oCustomStyle || oStyle, oStyle.Name, styleIndex);
-                window['native'].EndDrawStyle();
+                window["native"]["EndDrawStyle"]();
                 ++styleIndex;
             }
         };
@@ -4694,9 +4694,9 @@ function OfflineEditor () {
                     continue;
                 }
 
-                window['native'].BeginDrawDocumentStyle(oStyle.Name, styleIndex);
+                window["native"]["BeginDrawDocumentStyle"](oStyle.Name, styleIndex);
                 this.drawStyle(oGraphics, stringRenderer, oStyle, oStyle.Name, styleIndex);
-                window['native'].EndDrawStyle();
+                window["native"]["EndDrawStyle"]();
                 ++styleIndex;
             }
         };
@@ -4755,7 +4755,7 @@ function OfflineEditor () {
 
         AscCommonExcel.WorkbookView.prototype.af_getTablePictures =  function(wb, fmgrGraphics, oFont) {
 
-            window['native'].SetStylesType(1);
+            window["native"]["SetStylesType"](1);
 
             if (AscCommon.AscBrowser.isRetina) {
                 styleThumbnailWidth <<= 1;
@@ -4775,7 +4775,7 @@ function OfflineEditor () {
                 {
                     if(customStyles[i].table)
                     {
-                        window['native'].BeginDrawDocumentStyle(customStyles[i].name, n);
+                        window["native"]["BeginDrawDocumentStyle"](customStyles[i].name, n);
                         this.af_getSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont);
 
 //                        options =
@@ -4789,7 +4789,7 @@ function OfflineEditor () {
                         // result[n] = new formatTablePictures(options);
                         n++;
 
-                        window['native'].EndDrawStyle();
+                        window["native"]["EndDrawStyle"]();
                     }
                 }
             }
@@ -4800,7 +4800,7 @@ function OfflineEditor () {
                 {
                     if(defaultStyles[i].table)
                     {
-                        window['native'].BeginDrawDefaultStyle(defaultStyles[i].name, n);
+                        window["native"]["BeginDrawDefaultStyle"](defaultStyles[i].name, n);
                         this.af_getSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont);
 
 //                        options =
@@ -4813,7 +4813,7 @@ function OfflineEditor () {
                         //result[n] = new formatTablePictures(options);
                         n++;
 
-                        window['native'].EndDrawStyle();
+                        window["native"]["EndDrawStyle"]();
                     }
                 }
             }
@@ -4825,8 +4825,6 @@ function OfflineEditor () {
             var styleOptions = style;
             //по умолчанию ставим строку заголовка и чередующиеся строки, позже нужно будет получать параметр
             var styleInfo = false;
-
-            var nativeRender = window["native"];
 
             if(!styleInfo)
             {
@@ -5061,8 +5059,8 @@ function OfflineEditor () {
                         ctx.setStrokeStyle(borders.b.c);
                         // ctx.lineHor(0, ySize-0.5, xSize);
 
-                        nativeRender["PD_PathMoveTo"](0, ySize-0.5);
-                        nativeRender["PD_PathLineTo"](xSize, ySize-0.5);
+                        window["native"]["PD_PathMoveTo"](0, ySize-0.5);
+                        window["native"]["PD_PathLineTo"](xSize, ySize-0.5);
                     }
                     if(borders.l.s !== AscCommon.c_oAscBorderStyles.None)
                     {
@@ -5074,8 +5072,8 @@ function OfflineEditor () {
                         ctx.setStrokeStyle(borders.r.c);
                         //ctx.lineVer(xSize-0.5, 0, ySize);
 
-                        nativeRender["PD_PathMoveTo"](xSize-0.5, 0);
-                        nativeRender["PD_PathLineTo"](xSize-0.5, ySize);
+                        window["native"]["PD_PathMoveTo"](xSize-0.5, 0);
+                        window["native"]["PD_PathLineTo"](xSize-0.5, ySize);
                     }
                     if(borders.ih.s !== AscCommon.c_oAscBorderStyles.None)
                     {
@@ -5184,8 +5182,8 @@ function OfflineEditor () {
                 {
                     //ctx.lineHor(k*stepX + 3 * pxToMM, strY, (k + 1)*stepX - 2 * pxToMM);
 
-                    nativeRender["PD_PathMoveTo"](k*stepX + stepX * 0.25, strY);
-                    nativeRender["PD_PathLineTo"]((k + 1)*stepX - stepX * 0.25, strY);
+                    window["native"]["PD_PathMoveTo"](k*stepX + stepX * 0.25, strY);
+                    window["native"]["PD_PathLineTo"]((k + 1)*stepX - stepX * 0.25, strY);
                     k++;
                 }
                 ctx.stroke();
@@ -5221,7 +5219,7 @@ function OfflineEditor () {
                     _height_px <<= 1;
                 }
 
-                window['native'].BeginDrawDefaultStyle(type + '', styleIndex);
+                window["native"]["BeginDrawDefaultStyle"](type + '', styleIndex);
 
                 //window["native"]["DD_StartNativeDraw"](_width_px, _height_px, 50, 50);
 
@@ -5232,7 +5230,7 @@ function OfflineEditor () {
                 chart_space.draw(_graphics);
                 _graphics.ClearParams();
 
-                window['native'].EndDrawStyle();
+                window["native"]["EndDrawStyle"]();
 
 //               var _stream = global_memory_stream_menu;
 //               _stream["ClearNoAttack"]();
@@ -5253,7 +5251,7 @@ function OfflineEditor () {
                 {
                     // window["native"]["DD_PrepareNativeDraw"]();
 
-                    window['native'].SetStylesType(2);
+                    window["native"]["SetStylesType"](2);
 
                     var _graphics = new CDrawingStream();
 
@@ -5293,12 +5291,12 @@ function OfflineEditor () {
 }
 var _s = new OfflineEditor();
 
-function offline_of(arg) {_s.openFile(arg);}
-function offline_stz(v) {_s.zoom = v; _api.asc_setZoom(v);}
-function offline_ds(x, y, width, height, ratio, istoplayer) {_s.drawSheet(x, y, width, height, ratio, istoplayer);}
-function offline_dh(x, y, width, height, type, ratio) {_s.drawHeader(x, y, width, height, type, ratio);}
+window["native"]["offline_of"] = function(arg) {_s.openFile(arg);}
+window["native"]["offline_stz"] = function(v) {_s.zoom = v; _api.asc_setZoom(v);}
+window["native"]["offline_ds"] = function(x, y, width, height, ratio, istoplayer) {_s.drawSheet(x, y, width, height, ratio, istoplayer);}
+window["native"]["offline_dh"] = function(x, y, width, height, type, ratio) {_s.drawHeader(x, y, width, height, type, ratio);}
 
-function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeResize, isChartRange, indexRange, resizeRange, targetCol, targetRow, select) {
+window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFormulaEditMode, isRangeResize, isChartRange, indexRange, resizeRange, targetCol, targetRow, select) {
     _s.isShapeAction = false;
 
     var ws = _api.wb.getWorksheet();
@@ -5437,7 +5435,7 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
 
     return null;
 }
-function offline_mouse_move(x, y, isViewerMode, isRangeResize, isChartRange, indexRange, resizeRange, targetCol, targetRow, textPin) {
+window["native"]["offline_mouse_move"] = function(x, y, isViewerMode, isRangeResize, isChartRange, indexRange, resizeRange, targetCol, targetRow, textPin) {
     var ws = _api.wb.getWorksheet();
     var wb = _api.wb;
 
@@ -5507,7 +5505,7 @@ function offline_mouse_move(x, y, isViewerMode, isRangeResize, isChartRange, ind
 
     return null;
 }
-function offline_mouse_up(x, y, isViewerMode, isRangeResize, isChartRange, indexRange, resizeRange, targetCol, targetRow) {
+window["native"]["offline_mouse_up"] = function(x, y, isViewerMode, isRangeResize, isChartRange, indexRange, resizeRange, targetCol, targetRow) {
     var ret = null;
     var ws = _api.wb.getWorksheet();
     var wb = _api.wb;
@@ -5560,14 +5558,14 @@ function offline_mouse_up(x, y, isViewerMode, isRangeResize, isChartRange, index
 
     return ret;
 }
-function offline_mouse_double_tap(x, y) {
+window["native"]["offline_mouse_double_tap"] = function(x, y) {
     var ws = _api.wb.getWorksheet();
     var e = {isLocked:true, Button:0, ClickCount:2, shiftKey:false, metaKey:false, ctrlKey:false};
 
     ws.objectRender.graphicObjectMouseDown(e, x, y);
     ws.objectRender.graphicObjectMouseUp(e, x, y);
 }
-function offline_shape_text_select() {
+window["native"]["offline_shape_text_select"] = function() {
     var ws = _api.wb.getWorksheet();
 
     var controller = ws.objectRender.controller;
@@ -5578,8 +5576,8 @@ function offline_shape_text_select() {
     _s.enableTextSelection = true;
 }
 
-function offline_get_selection(x, y, width, height, autocorrection) {return _s.getSelection(x, y, width, height, autocorrection);}
-function offline_get_charts_ranges() {
+window["native"]["offline_get_selection"] = function(x, y, width, height, autocorrection) {return _s.getSelection(x, y, width, height, autocorrection);}
+window["native"]["offline_get_charts_ranges"] = function() {
     var ws = _api.wb.getWorksheet();
 
     var ranges = _api.wb.getWorksheet().__chartsRanges();
@@ -5598,9 +5596,9 @@ function offline_get_charts_ranges() {
 
     return {'ranges':ranges, 'cattbbox':cattbbox, 'serbbox':serbbox};
 }
-function offline_get_worksheet_bounds() {return _s.getMaxBounds();}
-function offline_complete_cell(x, y) {return _s.getNearCellCoord(x, y);}
-function offline_keyboard_down(keys) {
+window["native"]["offline_get_worksheet_bounds"] = function() {return _s.getMaxBounds();}
+window["native"]["offline_complete_cell"] = function(x, y) {return _s.getNearCellCoord(x, y);}
+window["native"]["offline_keyboard_down"] = function(keys) {
     var wb = _api.wb;
     var ws = _api.wb.getWorksheet();
 
@@ -5665,7 +5663,7 @@ function offline_keyboard_down(keys) {
     ws.isFormulaEditMode = isFormulaEditMode;
 }
 
-function offline_cell_editor_draw(width, height, ratio) {
+window["native"]["offline_cell_editor_draw"] = function(width, height, ratio) {
     _null_object.width = width * ratio;
     _null_object.height = height * ratio;
 
@@ -5677,7 +5675,7 @@ function offline_cell_editor_draw(width, height, ratio) {
         wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight,
         cellEditor.textRender.chars.length];
 }
-function offline_cell_editor_open(x, y, width, height, ratio, isSelectAll, isFormulaInsertMode, c1, r1, c2, r2)  {
+window["native"]["offline_cell_editor_open"] = function(x, y, width, height, ratio, isSelectAll, isFormulaInsertMode, c1, r1, c2, r2)  {
     _null_object.width = width * ratio;
     _null_object.height = height * ratio;
     
@@ -5715,7 +5713,7 @@ function offline_cell_editor_open(x, y, width, height, ratio, isSelectAll, isFor
     
     ws.visibleRange = range;
 }
-function offline_cell_editor_test_cells(x, y, width, height, ratio, isSelectAll, isFormulaInsertMode, c1, r1, c2, r2)  {
+window["native"]["offline_cell_editor_test_cells"] = function(x, y, width, height, ratio, isSelectAll, isFormulaInsertMode, c1, r1, c2, r2)  {
     _null_object.width = width * ratio;
     _null_object.height = height * ratio;
     
@@ -5763,7 +5761,7 @@ function offline_cell_editor_test_cells(x, y, width, height, ratio, isSelectAll,
     wb.visibleRange = range;
 }
 
-function offline_cell_editor_process_input_commands(commands, width, height, ratio) {
+window["native"]["offline_cell_editor_process_input_commands"] = function(commands, width, height, ratio) {
     _null_object.width = width * ratio;
     _null_object.height = height * ratio;
 
@@ -5863,7 +5861,7 @@ function offline_cell_editor_process_input_commands(commands, width, height, rat
         cellEditor.textRender.chars.length];
 }
 
-function offline_cell_editor_mouse_event(events) {
+window["native"]["offline_cell_editor_mouse_event"] = function(events) {
 
     var left, right;
     var cellEditor =  _api.wb.cellEditor;
@@ -5940,7 +5938,7 @@ function offline_cell_editor_mouse_event(events) {
         cellEditor.curLeft, cellEditor.curTop, cellEditor.curHeight,
         cellEditor.textRender.chars.length];
 }
-function offline_cell_editor_close(x, y, width, height, ratio) {
+window["native"]["offline_cell_editor_close"] = function(x, y, width, height, ratio) {
     var e = {which: 13, shiftKey: false, metaKey: false, ctrlKey: false};
   
     var wb = _api.wb;
@@ -5963,9 +5961,9 @@ function offline_cell_editor_close(x, y, width, height, ratio) {
 
     return {'undo': length};
 }
-function offline_cell_editor_selection() {return _api.wb.cellEditor._drawSelection();}
-function offline_cell_editor_move_select(position) {_api.wb.cellEditor._moveCursor(kPosition, Math.min(position,cellEditor.textRender.chars.length));}
-function offline_cell_editor_select_range(from, to) {
+window["native"]["offline_cell_editor_selection"] = function() {return _api.wb.cellEditor._drawSelection();}
+window["native"]["offline_cell_editor_move_select"] = function(position) {_api.wb.cellEditor._moveCursor(kPosition, Math.min(position,cellEditor.textRender.chars.length));}
+window["native"]["offline_cell_editor_select_range"] = function(from, to) {
     var cellEditor = _api.wb.cellEditor;
 
     cellEditor.cursorPos = from;
@@ -5973,7 +5971,7 @@ function offline_cell_editor_select_range(from, to) {
     cellEditor.selectionEnd = to;
 }
 
-function offline_get_cell_in_coord (x, y) {
+window["native"]["offline_get_cell_in_coord"] = function(x, y) {
     var worksheet = _api.wb.getWorksheet(),
         activeCell = worksheet.getActiveCell(x, y, true);
 
@@ -5987,7 +5985,7 @@ function offline_get_cell_in_coord (x, y) {
         worksheet.cols[activeCell.c1].width,
         worksheet.rows[activeCell.r1].height];
 }
-function offline_get_cell_coord (c, r) {
+window["native"]["offline_get_cell_coord"] = function(c, r) {
     var worksheet = _api.wb.getWorksheet();
 
     return [
@@ -5996,11 +5994,11 @@ function offline_get_cell_coord (c, r) {
         worksheet.cols[c].width,
         worksheet.rows[r].height];
 }
-function offline_get_header_sizes() {
+window["native"]["offline_get_header_sizes"] = function() {
     var worksheet = _api.wb.getWorksheet();
     return [worksheet.headersWidth, worksheet.headersHeight];
 }
-function offline_get_graphics_object(x, y) {
+window["native"]["offline_get_graphics_object"] = function(x, y) {
     var ws = _api.wb.getWorksheet();
     ws.objectRender.drawingArea.reinitRanges();
 
@@ -6011,7 +6009,7 @@ function offline_get_graphics_object(x, y) {
 
     return null;
 }
-function offline_get_selected_object() {
+window["native"]["offline_get_selected_object"] = function() {
     var ws = _api.wb.getWorksheet();
     var selectedImages = ws.objectRender.getSelectedGraphicObjects();
     if (selectedImages && selectedImages.length)
@@ -6019,8 +6017,8 @@ function offline_get_selected_object() {
 
     return null;
 }
-function offline_can_enter_cell_range() {return _api.wb.cellEditor.canEnterCellRange();}
-function offline_insertFormula(functionName, autoComplete, isDefName) {
+window["native"]["offline_can_enter_cell_range"] = function() {return _api.wb.cellEditor.canEnterCellRange();}
+window["native"]["offline_insertFormula"] = function(functionName, autoComplete, isDefName) {
     var ws = _api.wb.getWorksheet();
     var wb = _api.wb;
     var t = ws, cursorPos;
@@ -6088,7 +6086,7 @@ function offline_insertFormula(functionName, autoComplete, isDefName) {
     return openEditor(true);
 }
 
-function offline_copy() {
+window["native"]["offline_copy"] = function() {
     var worksheet = _api.wb.getWorksheet();
     var sBase64 = {};
     
@@ -6143,7 +6141,7 @@ function offline_copy() {
     
     return _stream;
 }
-function offline_paste(params) {
+window["native"]["offline_paste"] = function(params) {
     var type = params[0];
     var worksheet = _api.wb.getWorksheet();
 
@@ -6160,7 +6158,7 @@ function offline_paste(params) {
         _api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, params[1]);
     }
 }
-function offline_cut() {
+window["native"]["offline_cut"] = function() {
     var worksheet = _api.wb.getWorksheet();
     
     var dataBuffer = {};
@@ -6218,7 +6216,7 @@ function offline_cut() {
     
     return _stream;
 }
-function offline_delete() {
+window["native"]["offline_delete"] = function() {
     var e = {altKey: false,
         bubbles: true,
         cancelBubble: false,
@@ -6253,7 +6251,7 @@ function offline_delete() {
 
     return stream;
 }
-function offline_calculate_range(x, y, w, h) {
+window["native"]["offline_calculate_range"] = function(x, y, w, h) {
     var ws = _api.wb.getWorksheet();
     var range = _s._updateRegion(ws, x, y, w, h);
 
@@ -6268,7 +6266,7 @@ function offline_calculate_range(x, y, w, h) {
         ws.cols[range.c2].left + ws.cols[range.c2].width,
         ws.rows[range.r2].top  + ws.rows[range.r1].height];
 }
-function offline_calculate_complete_range(x, y, w, h) {
+window["native"]["offline_calculate_complete_range"] = function(x, y, w, h) {
     var ws = _api.wb.getWorksheet();
     var range = _s._updateRegion(ws, x, y, w, h);
 
@@ -6298,9 +6296,9 @@ function offline_calculate_complete_range(x, y, w, h) {
         ws.rows[range.r2].top  + ws.rows[range.r1].height];
 }
 
-function offline_set_translate(translate) {_s.translate = translate;}
+window["native"]["offline_set_translate"] = function(translate) {_s.translate = translate;}
 
-function offline_apply_event(type,params) {
+window["native"]["offline_apply_event"] = function(type,params) {
     var _borderOptions = Asc.c_oAscBorderOptions;
     var _stream = null;
     var _return = undefined;
@@ -6458,8 +6456,8 @@ function offline_apply_event(type,params) {
                                 if (bIsNeed)
                                 {
                                     var _originSize = window["native"]["GetOriginalImageSize"](urlSource);
-                                    var _w = _originSize[0] * 25.4 / 96.0 / window.native["GetDeviceScale"]();
-                                    var _h = _originSize[1] * 25.4 / 96.0 / window.native["GetDeviceScale"]();
+                                    var _w = _originSize[0] * 25.4 / 96.0 / window["native"]["GetDeviceScale"]();
+                                    var _h = _originSize[1] * 25.4 / 96.0 / window["native"]["GetDeviceScale"]();
 
                                     _imagePr.ImageUrl = undefined;
 
@@ -6604,22 +6602,22 @@ function offline_apply_event(type,params) {
 
         case 110: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_COPY
         {
-            _return = offline_copy();
+            _return = window["native"]["offline_copy"]();
             break;
         }
         case 111 : // ASC_MENU_EVENT_TYPE_CONTEXTMENU_CUT
         {
-            _return = this.offline_cut();
+            _return = window["native"]["offline_cut"]();
             break;
         }
         case 112: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_PASTE
         {
-            offline_paste(params);
+            window["native"]["offline_paste"](params);
             break;
         }
         case 113: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_DELETE
         {
-            _return = offline_delete();
+            _return = window["native"]["offline_delete"]();
             break;
         }
         case 114: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_SELECT
@@ -7112,7 +7110,7 @@ function offline_apply_event(type,params) {
         case 4010: // ASC_SPREADSHEETS_EVENT_TYPE_INSERT_FORMULA
         {
             if (params && params.length && params[0]) {
-                _return = offline_insertFormula(params[0], params[1] ? true : undefined, params[2] ? true : undefined);
+                _return = window["native"]["offline_insertFormula"](params[0], params[1] ? true : undefined, params[2] ? true : undefined);
             }
             break;
         }
@@ -7584,7 +7582,7 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
                           var ws = t.wb.getWorksheet();
                           //console.log("JS - getWorksheet()");
                           
-                          window.native["onEndLoadingFile"](ws.headersWidth, ws.headersHeight);
+                          window["native"]["onEndLoadingFile"](ws.headersWidth, ws.headersHeight);
                           //console.log("JS - onEndLoadingFile()");
                           
                           _s.asc_WriteAllWorksheets(true);
