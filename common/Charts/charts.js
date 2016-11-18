@@ -479,6 +479,14 @@ ChartPreviewManager.prototype.getChartPreviews = function(chartType) {
 				for(var i = 0; i < nStylesCount; ++i)
 					arr.push(this.createChartPreview(chartType, i));
 			}
+
+			if (Asc['editor'] && AscCommon.c_oEditorId.Spreadsheet === Asc['editor'].getEditorId()) {
+				var api_sheet = Asc['editor'];
+				var _graphics = api_sheet.wb.getWorksheet().shapeCtx;
+				if (_graphics.ClearLastFont)
+					_graphics.ClearLastFont();
+			}
+
 		}
 		var group = this.previewGroups[chartType];
 		var objectGroup = [];
