@@ -1845,8 +1845,27 @@ CChartSpace.prototype.rebuildSeriesFromAsc = function(asc_chart)
                 series.setIdx(i);
                 series.setOrder(i);
                 series.setVal(new AscFormat.CYVal());
-                AscFormat.ApplySpPr(oFirstSpPrPreset, series, i, base_fills, bAccent1Background);
+
+
+
+
                 FillValNum(series.val, asc_series[i].Val, true, false);
+
+                if(chart_type.getObjectType() === AscDFH.historyitem_type_PieChart || chart_type.getObjectType() === AscDFH.historyitem_type_DoughnutChart){
+                    if(oFirstSpPrPreset){
+                        var pts = AscFormat.getPtsFromSeries(series);
+                        for(var j = 0; j < pts.length; ++j){
+                            var oDPt = new AscFormat.CDPt();
+                            oDPt.setBubble3D(false);
+                            oDPt.setIdx(j);
+                            ApplySpPr(oFirstSpPrPreset, oDPt, j, base_fills, bAccent1Background);
+                            series.series[i].addDPt(oDPt);
+                        }
+                    }
+                }
+                else{
+                    AscFormat.ApplySpPr(oFirstSpPrPreset, series, i, base_fills, bAccent1Background);
+                }
                 if(asc_series[i].Cat && asc_series[i].Cat.NumCache && typeof asc_series[i].Cat.Formula === "string" && asc_series[i].Cat.Formula.length > 0)
                 {
                     series.setCat(new AscFormat.CCat());

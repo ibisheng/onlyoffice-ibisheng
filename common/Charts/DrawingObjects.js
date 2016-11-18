@@ -3389,7 +3389,13 @@ function DrawingObjects() {
 					var options = new AscCommon.asc_ChartSettings();
 					var catHeadersBBox, serHeadersBBox;
                     var final_bbox = oBBoxTo.clone();
-                    if(chart.bbox.seriesBBox.bVert)
+                    var bOneCell = false;
+                    if(!chart.bbox.catBBox && !chart.bbox.serBBox){
+                        if(chart.bbox.seriesBBox.r1 === chart.bbox.seriesBBox.r2 && chart.bbox.seriesBBox.c1 === chart.bbox.seriesBBox.c2){
+                            bOneCell = true;
+                        }
+                    }
+                    if((!bOneCell && chart.bbox.seriesBBox.bVert) || (bOneCell && (final_bbox.r1 === final_bbox.r2)))
                     {
 						options.putInColumns(false);
                         if(chart.bbox.catBBox && chart.bbox.catBBox.r1 === chart.bbox.catBBox.r2 && oBBoxTo.r1 > chart.bbox.catBBox.r1)
