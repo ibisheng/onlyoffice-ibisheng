@@ -539,7 +539,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
         //todo gridlines
 
         //plotArea
-        if(bClickFlag){
+        if(bClickFlag ){
             var oChartSizes = drawing.getChartSizes();
             var oInvertTransform = drawing.invertTransform;
             var dTx = oInvertTransform.TransformPointX(x, y);
@@ -549,7 +549,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
             {
                 if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
                 {
-                    if(drawing.selection.plotArea == null || !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(drawing) || !drawing.chartObj  || !drawing.chartObj.processor3D)
+                    if(drawing.selection.plotArea == null || !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(drawing) || !drawing.chartObj  || !drawing.chartObj.processor3D || drawingObjectsController.isViewMode())
                     {
                         drawingObjectsController.checkChartTextSelection();
                         selector.resetSelection();
