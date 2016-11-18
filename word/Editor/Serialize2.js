@@ -2349,7 +2349,7 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
     this.bs = new BinaryCommonWriter(this.memory);
 	this.brPrs = new Binary_rPrWriter(this.memory, saveParams);
 	
-	this.WriteMathElem = function(item)
+	this.WriteMathElem = function(item, isSingle)
 	{
 		var oThis = this;
 		switch ( item.Type )
@@ -2379,7 +2379,7 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
 						case "OMath"			: this.bs.WriteItem(c_oSer_OMathContentType.OMath, function(){oThis.WriteArgNodes(item);});			break;
 						case "OMathPara"		: this.bs.WriteItem(c_oSer_OMathContentType.OMathPara, function(){oThis.WriteOMathPara(item);});break;
 						case MATH_PHANTOM		: this.bs.WriteItem(c_oSer_OMathContentType.Phant, function(){oThis.WritePhant(item);});		break;
-						case MATH_RUN			: this.bs.WriteItem(c_oSer_OMathContentType.MRun, function(){oThis.WriteMRun(item);});			break;
+						case MATH_RUN			: this.WriteMRunWrap(item, isSingle);break;
 						case MATH_RADICAL		: this.bs.WriteItem(c_oSer_OMathContentType.Rad, function(){oThis.WriteRad(item);});			break;
 						case MATH_DEGREESubSup	: 
 							if (DEGREE_PreSubSup == item.Pr.type)
@@ -2401,7 +2401,7 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
 				this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(AscCommon.convertUnicodeToUTF16([item.value]));}); //m:t
 				break;
 			case para_Math_Run:
-				this.bs.WriteItem(c_oSer_OMathContentType.MRun, function(){oThis.WriteMRun(item);});
+				this.WriteMRunWrap(item, isSingle);
 				break;
 			default:		
 				break;
@@ -2419,14 +2419,23 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
 			if (argSz)
 				this.bs.WriteItem(c_oSer_OMathContentType.ArgPr, function(){oThis.WriteArgPr(argSz);});
 			
-
+			var isSingle = (nStart === nEnd - 1);
 			for(var i = nStart; i <= nEnd - 1; i++)
 			{
 				var item = oElem.Content[i];
-				this.WriteMathElem(item);
+				this.WriteMathElem(item, isSingle);
 			}
 		}
 		
+	}
+	this.WriteMRunWrap = function(oMRun, isSingle)
+	{
+		var oThis = this;
+		if (!isSingle && oMRun.Is_Empty()) {
+			//don't write empty run(in Excel empty run is editable and has size).Write only if it is single single in Content
+			return;
+		}
+		this.bs.WriteItem(c_oSer_OMathContentType.MRun, function(){oThis.WriteMRun(oMRun);});
 	}
 	this.WriteMRun = function(oMRun)
 	{
