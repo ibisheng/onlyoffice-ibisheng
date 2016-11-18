@@ -1538,23 +1538,7 @@ cName.prototype.toRef = function () {
     if ( !this.defName || !this.defName.Ref ) {
         return new cError( cErrorType.wrong_name );
     }
-
-    var _3DRefTmp, ref = this.defName.Ref, _wsFrom, _wsTo;
-
-    if ( ref && (_3DRefTmp = parserHelp.is3DRef( ref, 0 ))[0] ) {
-        _wsFrom = _3DRefTmp[1];
-        _wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) ) ? _3DRefTmp[2] : _wsFrom;
-        if ( parserHelp.isArea( ref, ref.indexOf( "!" ) + 1 ) ) {
-            if ( _wsFrom === _wsTo ) {
-                return new cArea( parserHelp.operand_str, this.wb.getWorksheetByName( _wsFrom ) );
-      } else {
-                return new cArea3D( parserHelp.operand_str, _wsFrom, _wsTo, this.wb );
-            }
-    } else if (parserHelp.isRef(ref, ref.indexOf("!") + 1)) {
-            return new cRef3D( parserHelp.operand_str, _wsFrom, this.wb );
-        }
-    }
-    return new cError( cErrorType.wrong_name );
+    return this.Calculate();
 };
 cName.prototype.toString = function () {
     if ( this.defName ) {
