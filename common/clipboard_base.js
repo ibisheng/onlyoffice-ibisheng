@@ -216,7 +216,7 @@
 				var _text_format = this.ClosureParams.getData("text/plain");
 				if (_text_format && _text_format != "")
 				{
-					var sHtml     = "<html><body>";
+					var sHtml     = "<html><body simpletext='true'>";
 					var sCurPar   = "";
 					var nParCount = 0;
 					for (var i = 0, length = _text_format.length; i < length; i++)
