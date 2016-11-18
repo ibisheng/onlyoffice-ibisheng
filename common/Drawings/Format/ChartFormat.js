@@ -3946,13 +3946,13 @@ CAreaSeries.prototype =
     },
     setTx: function(pr)
     {
-        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetTx, oldPr: this.trendline, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetTx, oldPr: this.tx, newPr: pr});
         this.tx = pr;
     },
 
     setVal: function(pr)
     {
-        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetVal, oldPr: this.trendline, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetVal, oldPr: this.val, newPr: pr});
         this.val = pr;
         if(this.val && this.val.setParent)
         {
