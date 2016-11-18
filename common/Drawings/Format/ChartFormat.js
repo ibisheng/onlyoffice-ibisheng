@@ -3869,7 +3869,7 @@ CAreaSeries.prototype =
                     for(i = 0; i < pts.length; ++i)
                     {
                         if(AscFormat.isRealNumber(pts[i].val))
-                            summ += pts[i].val;
+                            summ += Math.abs(pts[i].val);
 
                         if(pts[i].idx === idx)
                         {
