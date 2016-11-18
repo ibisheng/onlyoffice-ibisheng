@@ -216,7 +216,7 @@
 				var _text_format = this.ClosureParams.getData("text/plain");
 				if (_text_format && _text_format != "")
 				{
-					var sHtml     = "<html><body simpletext='true'>";
+					var sHtml     = "<html><body>";
 					var sCurPar   = "";
 					var nParCount = 0;
 					for (var i = 0, length = _text_format.length; i < length; i++)
@@ -273,7 +273,7 @@
 					}
 					sHtml += "</body></html>";
 
-					this.CommonIframe_PasteStart(sHtml);
+					this.CommonIframe_PasteStart(sHtml, text_data);
 					return false;
 				}
 
@@ -764,7 +764,7 @@
 			}
 		},
 
-		CommonIframe_PasteStart : function(_html_data)
+		CommonIframe_PasteStart : function(_html_data, text_data)
 		{
 			var ifr = document.getElementById(this.CommonIframeId);
 			if (!ifr)
@@ -797,7 +797,7 @@
 				{
 					ifr.style.display = "block";
 
-					this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, frameWindow.document.body, ifr);
+					this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, frameWindow.document.body, ifr, text_data);
 				}
 			}
 

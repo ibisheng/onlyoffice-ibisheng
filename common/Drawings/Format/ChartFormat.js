@@ -4290,7 +4290,8 @@ function CCatAx()
     this.txPr            = null;
 
     this.parent = null;
-
+    this.posX = null;
+    this.posY = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -5647,6 +5648,8 @@ function CDateAx()
     this.txPr           = null;
 
     this.parent = null;
+    this.posX = null;
+    this.posY = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -6794,6 +6797,8 @@ function CSerAx()
     this.txPr           = null;
 
     this.parent = null;
+    this.posX = null;
+    this.posY = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -7722,6 +7727,8 @@ function CValAx()
     this.txPr           = null;
 
     this.parent = null;
+    this.posX = null;
+    this.posY = null;
 
 
     this.Id = g_oIdCounter.Get_NewId();

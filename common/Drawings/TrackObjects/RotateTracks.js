@@ -778,6 +778,7 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
         this.processor3D.angleOx = this.view3D && this.view3D.rotX ? (- this.view3D.rotX / 360) * (Math.PI * 2) : 0;
         this.processor3D.angleOy = this.view3D && this.view3D.rotY ? (- this.view3D.rotY / 360) * (Math.PI * 2) : 0;
         this.processor3D.angleOz = 0;
+        this.processor3D.calaculate3DProperties();
         this.calculateGeometry();
     };
 
