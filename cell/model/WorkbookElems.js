@@ -4731,21 +4731,155 @@ CellArea.prototype = {
 		return this.Id;
 	};
 	sparklineGroup.prototype.Save_Changes = function (data, w) {
-
+		w.WriteLong(data.Type);
+		switch (data.Type) {
+			case AscCH.historyitem_Sparkline_Type:
+			case AscCH.historyitem_Sparkline_LineWeight:
+			case AscCH.historyitem_Sparkline_DisplayEmptyCellsAs:
+			case AscCH.historyitem_Sparkline_MinAxisType:
+			case AscCH.historyitem_Sparkline_MaxAxisType:
+				w.WriteLong(data.newPr);
+				break;
+			case AscCH.historyitem_Sparkline_Markers:
+			case AscCH.historyitem_Sparkline_High:
+			case AscCH.historyitem_Sparkline_Low:
+			case AscCH.historyitem_Sparkline_First:
+			case AscCH.historyitem_Sparkline_Last:
+			case AscCH.historyitem_Sparkline_Negative:
+			case AscCH.historyitem_Sparkline_DisplayXAxis:
+			case AscCH.historyitem_Sparkline_DisplayHidden:
+			case AscCH.historyitem_Sparkline_RightToLeft:
+			case AscCH.historyitem_Sparkline_DateAxis:
+				w.WriteBool(data.newPr);
+				break;
+			case AscCH.historyitem_Sparkline_ManualMax:
+			case AscCH.historyitem_Sparkline_ManualMin:
+				w.WriteBool(null !== data.newPr);
+				if (null !== data.newPr) {
+					w.WriteLong(data.newPr);
+				}
+				break;
+			case AscCH.historyitem_Sparkline_ColorSeries:
+			case AscCH.historyitem_Sparkline_ColorNegative:
+			case AscCH.historyitem_Sparkline_ColorAxis:
+			case AscCH.historyitem_Sparkline_ColorMarkers:
+			case AscCH.historyitem_Sparkline_ColorFirst:
+			case AscCH.historyitem_Sparkline_colorLast:
+			case AscCH.historyitem_Sparkline_ColorHigh:
+			case AscCH.historyitem_Sparkline_ColorLow:
+				w.WriteBool(null !== data.newPr);
+				if (null !== data.newPr) {
+					w.WriteLong(data.newPr.getType());
+					data.newPr.Write_ToBinary2(w);
+				}
+				break;
+		}
 	};
 	sparklineGroup.prototype.Load_Changes = function (r) {
+		var readColor = function(r) {
+			var color = null;
+			if (r.GetBool()) {
+				switch (r.GetLong()) {
+					case UndoRedoDataTypes.RgbColor:
+						color = new RgbColor();
+						color.Read_FromBinary2(r);
+						break;
+					case UndoRedoDataTypes.ThemeColor:
+						color = new ThemeColor();
+						color = color.Read_FromBinary2AndReplace(r);
+						break;
+				}
+			}
+			return color;
+		};
 
+		var type = r.GetLong();
+		switch (type) {
+			case AscCH.historyitem_Sparkline_Type:
+				this.type = r.GetLong();
+				break;
+			case AscCH.historyitem_Sparkline_LineWeight:
+				this.lineWeight = r.GetLong();
+				break;
+			case AscCH.historyitem_Sparkline_DisplayEmptyCellsAs:
+				this.displayEmptyCellsAs = r.GetLong();
+				break;
+			case AscCH.historyitem_Sparkline_MinAxisType:
+				this.minAxisType = r.GetLong();
+				break;
+			case AscCH.historyitem_Sparkline_MaxAxisType:
+				this.lineWeight = r.GetLong();
+				break;
+			case AscCH.historyitem_Sparkline_Markers:
+				this.markers = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_High:
+				this.high = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_Low:
+				this.low = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_First:
+				this.first = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_Last:
+				this.last = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_Negative:
+				this.negative = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_DisplayXAxis:
+				this.displayXAxis = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_DisplayHidden:
+				this.displayHidden = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_RightToLeft:
+				this.rightToLeft = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_DateAxis:
+				this.dateAxis = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_ManualMax:
+				this.manualMax = r.GetBool() ? r.GetLong() : null;
+				break;
+			case AscCH.historyitem_Sparkline_ManualMin:
+				this.manualMin = r.GetBool() ? r.GetLong() : null;
+				break;
+			case AscCH.historyitem_Sparkline_ColorSeries:
+				this.colorSeries = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_ColorNegative:
+				this.colorNegative = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_ColorAxis:
+				this.colorAxis = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_ColorMarkers:
+				this.colorMarkers = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_ColorFirst:
+				this.colorFirst = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_colorLast:
+				this.colorLast = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_ColorHigh:
+				this.colorHigh = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_ColorLow:
+				this.colorLow = readColor(r);
+				break;
+		}
+		this.cleanCache();
 	};
 	sparklineGroup.prototype.Undo = function (type, data) {
 		switch (type) {
-			case AscCH.historyitem_Sparkline_LineWeight:
-				this.lineWeight = data.oldPr;
-				break;
 			case AscCH.historyitem_Sparkline_Type:
 				this.type = data.oldPr;
 				break;
-			case AscCH.historyitem_Sparkline_DateAxis:
-				this.dateAxis = data.oldPr;
+			case AscCH.historyitem_Sparkline_LineWeight:
+				this.lineWeight = data.oldPr;
 				break;
 			case AscCH.historyitem_Sparkline_DisplayEmptyCellsAs:
 				this.displayEmptyCellsAs = data.oldPr;
@@ -4789,6 +4923,9 @@ CellArea.prototype = {
 			case AscCH.historyitem_Sparkline_ManualMin:
 				this.manualMin = data.oldPr;
 				break;
+			case AscCH.historyitem_Sparkline_DateAxis:
+				this.dateAxis = data.oldPr;
+				break;
 			case AscCH.historyitem_Sparkline_ColorSeries:
 				this.colorSeries = data.oldPr;
 				break;
@@ -4819,14 +4956,11 @@ CellArea.prototype = {
 	};
 	sparklineGroup.prototype.Redo = function (data) {
 		switch (data.Type) {
-			case AscCH.historyitem_Sparkline_LineWeight:
-				this.lineWeight = data.newPr;
-				break;
 			case AscCH.historyitem_Sparkline_Type:
 				this.type = data.newPr;
 				break;
-			case AscCH.historyitem_Sparkline_DateAxis:
-				this.dateAxis = data.newPr;
+			case AscCH.historyitem_Sparkline_LineWeight:
+				this.lineWeight = data.newPr;
 				break;
 			case AscCH.historyitem_Sparkline_DisplayEmptyCellsAs:
 				this.displayEmptyCellsAs = data.newPr;
@@ -4869,6 +5003,9 @@ CellArea.prototype = {
 				break;
 			case AscCH.historyitem_Sparkline_ManualMin:
 				this.manualMin = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_DateAxis:
+				this.dateAxis = data.newPr;
 				break;
 			case AscCH.historyitem_Sparkline_ColorSeries:
 				this.colorSeries = data.newPr;
@@ -4919,14 +5056,14 @@ CellArea.prototype = {
 		var defaultSeriesColor = 3629202;
 		var defaultOtherColor = 13631488;
 
-		this.colorSeries = new AscCommonExcel.RgbColor(defaultSeriesColor);
-		this.colorNegative = new AscCommonExcel.RgbColor(defaultOtherColor);
-		this.colorAxis = new AscCommonExcel.RgbColor(defaultOtherColor);
-		this.colorMarkers = new AscCommonExcel.RgbColor(defaultOtherColor);
-		this.colorFirst = new AscCommonExcel.RgbColor(defaultOtherColor);
-		this.colorLast = new AscCommonExcel.RgbColor(defaultOtherColor);
-		this.colorHigh = new AscCommonExcel.RgbColor(defaultOtherColor);
-		this.colorLow = new AscCommonExcel.RgbColor(defaultOtherColor);
+		this.colorSeries = new RgbColor(defaultSeriesColor);
+		this.colorNegative = new RgbColor(defaultOtherColor);
+		this.colorAxis = new RgbColor(defaultOtherColor);
+		this.colorMarkers = new RgbColor(defaultOtherColor);
+		this.colorFirst = new RgbColor(defaultOtherColor);
+		this.colorLast = new RgbColor(defaultOtherColor);
+		this.colorHigh = new RgbColor(defaultOtherColor);
+		this.colorLow = new RgbColor(defaultOtherColor);
 	};
 	sparklineGroup.prototype.set = function (val) {
 		var t = this;
@@ -4938,15 +5075,14 @@ CellArea.prototype = {
 			return propOld;
 		};
 		var getColor = function (color) {
-			return color instanceof Asc.asc_CColor ? AscCommonExcel.CorrectAscColor(color) : color;
+			return color instanceof Asc.asc_CColor ? CorrectAscColor(color) : color;
 		};
 
 		History.Create_NewPoint();
 		History.StartTransaction();
 
-		this.lineWeight = checkProperty(this.lineWeight, val.lineWeight, AscCH.historyitem_Sparkline_LineWeight);
 		this.type = checkProperty(this.type, val.type, AscCH.historyitem_Sparkline_Type);
-		this.dateAxis = checkProperty(this.dateAxis, val.dateAxis, AscCH.historyitem_Sparkline_DateAxis);
+		this.lineWeight = checkProperty(this.lineWeight, val.lineWeight, AscCH.historyitem_Sparkline_LineWeight);
 		this.displayEmptyCellsAs = checkProperty(this.displayEmptyCellsAs, val.displayEmptyCellsAs, AscCH.historyitem_Sparkline_DisplayEmptyCellsAs);
 		this.markers = checkProperty(this.markers, val.markers, AscCH.historyitem_Sparkline_Markers);
 		this.high = checkProperty(this.high, val.high, AscCH.historyitem_Sparkline_High);
@@ -4961,6 +5097,7 @@ CellArea.prototype = {
 		this.rightToLeft = checkProperty(this.rightToLeft, val.rightToLeft, AscCH.historyitem_Sparkline_RightToLeft);
 		this.manualMax = checkProperty(this.manualMax, val.manualMax, AscCH.historyitem_Sparkline_ManualMax);
 		this.manualMin = checkProperty(this.manualMin, val.manualMin, AscCH.historyitem_Sparkline_ManualMin);
+		this.dateAxis = checkProperty(this.dateAxis, val.dateAxis, AscCH.historyitem_Sparkline_DateAxis);
 
 		this.colorSeries = checkProperty(this.colorSeries, getColor(val.colorSeries), AscCH.historyitem_Sparkline_ColorSeries);
 		this.colorNegative = checkProperty(this.colorNegative, getColor(val.colorNegative), AscCH.historyitem_Sparkline_ColorNegative);
