@@ -143,7 +143,7 @@
 			UserDrop : -100,
 			Warning  : -101,
 
-			PrintMaxPagesCount					: 110,
+			PrintMaxPagesCount					: -110,
 
 			/* для формул */
 			FrmlWrongCountParentheses   : -300,
@@ -1121,6 +1121,7 @@
 	prot['CannotFillRange']                  = prot.CannotFillRange;
 	prot['UserDrop']                         = prot.UserDrop;
 	prot['Warning']                          = prot.Warning;
+	prot['PrintMaxPagesCount']               = prot.PrintMaxPagesCount;
 	prot['FrmlWrongCountParentheses']        = prot.FrmlWrongCountParentheses;
 	prot['FrmlWrongOperator']                = prot.FrmlWrongOperator;
 	prot['FrmlWrongMaxArgument']             = prot.FrmlWrongMaxArgument;
