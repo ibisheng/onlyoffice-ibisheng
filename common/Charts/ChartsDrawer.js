@@ -6472,7 +6472,7 @@ drawHBarChart.prototype =
 	{
 		var startY, diffYVal, width, numCache, dVal, curVal, prevVal, endBlockPosition, startBlockPosition;
 		var catAx = this.cChartSpace.chart.plotArea.catAx;
-		var nullPositionOX = catAx.posX ? catAx.posX * this.chartProp.pxToMM : catAx.xPos * this.chartProp.pxToMM;
+		var nullPositionOX = (catAx.posX !== undefined && catAx.posX !== null) ? catAx.posX * this.chartProp.pxToMM : catAx.xPos * this.chartProp.pxToMM;
 		
 		if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
 		{
