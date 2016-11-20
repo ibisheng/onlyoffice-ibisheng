@@ -5355,7 +5355,7 @@ CellArea.prototype = {
 
 		switch (this.asc_getType()) {
 			case Asc.c_oAscSparklineType.Line: {
-				return [createItem(128), createItem(56), createItem(175), createItem(0), createItem(248), createItem(184)];
+				return [createItem(4), createItem(-58), createItem(51), createItem(-124), createItem(124), createItem(60)];
 			}
 			case Asc.c_oAscSparklineType.Column: {
 				return [createItem(88), createItem(56), createItem(144), createItem(64), createItem(-56), createItem(-104),
