@@ -4869,6 +4869,22 @@ CCatAx.prototype =
         }
     },
 
+    handleUpdateFill: function()
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
+    },
+
+    handleUpdateLn: function()
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
+    },
+
     Undo: function(data)
     {
         switch(data.Type)
@@ -8043,6 +8059,22 @@ CValAx.prototype =
         this.parent = pr;
     },
 
+    handleUpdateFill: function()
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
+    },
+
+    handleUpdateLn: function()
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
+    },
+
     Undo: function(data)
     {
         switch(data.Type)
@@ -8203,7 +8235,7 @@ CValAx.prototype =
             }
             case AscDFH.historyitem_ValAxSetSpPr:
             {
-                this.axId = data.oldPr;
+                this.spPr = data.oldPr;
                 break;
             }
             case AscDFH.historyitem_ValAxSetTickLblPos:
@@ -8392,7 +8424,7 @@ CValAx.prototype =
             }
             case AscDFH.historyitem_ValAxSetSpPr:
             {
-                this.axId = data.newPr;
+                this.spPr = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
                     this.parent.parent.parent.handleUpdateInternalChart();

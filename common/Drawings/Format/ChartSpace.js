@@ -1959,6 +1959,7 @@ CChartSpace.prototype.handleUpdateInternalChart = function()
     this.recalcInfo.recalculateMarkers = true;
     this.recalcInfo.recalculatePlotAreaBrush = true;
     this.recalcInfo.recalculatePlotAreaPen   = true;
+    this.recalcInfo.recalculateAxisTickMark  = true;
     //this.recalcInfo.dataLbls.length = 0;
     //this.recalcInfo.axisLabels.length = 0;
     this.recalcInfo.recalculateAxisVal = true;
