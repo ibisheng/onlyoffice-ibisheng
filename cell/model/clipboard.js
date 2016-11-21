@@ -879,7 +879,9 @@
 					{	
 						if(isIntoShape)
 						{
+							History.TurnOff();
 							var docContent = this._convertTableFromExcelToDocument(worksheet, pasteData, isIntoShape);
+							History.TurnOn();
 							
 							var callback = function(isSuccess)
 							{
