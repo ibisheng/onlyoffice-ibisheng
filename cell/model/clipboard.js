@@ -2808,9 +2808,6 @@
 					this.aResult.deleteCell(row + this.maxLengthRowCount, col)
 				};
 	
-				//if(!aResult[row])
-					//aResult[row] = [];
-					
 				var s = 0;
 				var c1 = col !== undefined ? col : activeRange.c1;
 				
@@ -2826,9 +2823,9 @@
 				
 				//горизонтальное выравнивание
 				var horisonalAlign = this._getAlignHorisontal(paraPr);
-				if(horisonalAlign)
+				/*if(horisonalAlign)
 					oNewItem.a = horisonalAlign;
-				else if(horisonalAlign == null)
+				else*/ if(horisonalAlign == null)
 					oNewItem.wrap = true;
 					
 				//вертикальное выравнивание
