@@ -775,7 +775,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         if(nSparklineType === Asc.c_oAscSparklineType.Line)
         {
             var oLn = new AscFormat.CLn();
-            oLn.setW(36000*nSparklineMultiplier*25.4*((!bForPreview && oSparklineGroup.lineWeight != null) ? oSparklineGroup.lineWeight : (!bForPreview ? 0.75 : 2.25))/72);
+            oLn.setW(36000*nSparklineMultiplier*25.4*(bForPreview ? 2.25 : oSparklineGroup.asc_getLineWeight())/72);
             oSerie.spPr.setLn(oLn);
             if(oSparklineGroup.markers && oSparklineGroup.colorMarkers)
             {
