@@ -396,6 +396,26 @@
 			}
 		},
 
+		emulateKeyDownApi : function(code)
+		{
+			var _e = {
+				altKey : false,
+				ctrlKey : false,
+				shiftKey : false,
+				target : null,
+				charCode : 0,
+				which : 0,
+				keyCode : code,
+				code : "",
+
+				preventDefault : function() {},
+				stopPropagation : function() {}
+			};
+
+			this.Api.onKeyDown(_e);
+			this.Api.onKeyUp(_e);
+		},
+
 		putAreaValue : function(val)
 		{
 			this.DisableCompositeInput = true;

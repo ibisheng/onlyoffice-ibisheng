@@ -1117,6 +1117,12 @@
 	{
 	};
 
+	baseEditorsApi.prototype.asc_Remove = function()
+	{
+		if (AscCommon.g_inputContext)
+			AscCommon.g_inputContext.emulateKeyDownApi(46);
+	};
+
 	// System input
 	baseEditorsApi.prototype.SetTextBoxInputMode = function(bIsEnable)
 	{

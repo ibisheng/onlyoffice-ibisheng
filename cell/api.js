@@ -3657,4 +3657,7 @@ var editor;
   prot["GetTextBoxInputMode"]       = prot.GetTextBoxInputMode;
 
   prot["asc_InputClearKeyboardElement"] = prot.asc_InputClearKeyboardElement;
+
+  // mobile
+  prot["asc_Remove"] = prot.asc_Remove;
 })(window);
