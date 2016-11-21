@@ -1259,45 +1259,41 @@ cArea3D.prototype.tocArea = function () {
 cArea3D.prototype.getWS = function () {
     return this.wsRange()[0];
 };
-cArea3D.prototype.cross = function ( arg, wsID ) {
-    if ( this.wsFrom !== this.wsTo ) {
-        return new cError( cErrorType.wrong_value_type );
-    }
-    /*if ( this.wsFrom !== wsID ) {
-        return new cError( cErrorType.wrong_value_type );
-    }*/
-    var r = this.getRange();
-    if ( !r ) {
-        return new cError( cErrorType.wrong_name );
-    }
-    var cross = r[0].cross( arg );
-    if ( cross ) {
-        if ( cross.r != undefined ) {
-            return this.getValue2( new CellAddress( cross.r, this.getBBox().c1 ) );
-    } else if (cross.c != undefined) {
-            return this.getValue2( new CellAddress( this.getBBox().r1, cross.c ) );
-    } else {
-            return new cError( cErrorType.wrong_value_type );
-        }
-  } else {
-        return new cError( cErrorType.wrong_value_type );
-    }
-};
-cArea3D.prototype.getBBox = function () {
-    return this.getRange()[0].getBBox();
-};
-cArea3D.prototype.getBBox0 = function () {
-    return this.getRange()[0].getBBox0();
-};
-cArea3D.prototype.isValid = function () {
-    var r = this.getRange();
-    for ( var i = 0; i < r.length; i++ ) {
-        if ( !r[i] ) {
-            return false;
-        }
-    }
-    return true;
-};
+	cArea3D.prototype.cross = function (arg, wsID) {
+		if (!this.isSingleSheet()) {
+			return new cError(cErrorType.wrong_value_type);
+		}
+		/*if ( this.wsFrom !== wsID ) {
+		 return new cError( cErrorType.wrong_value_type );
+		 }*/
+		var r = this.getRange();
+		if (!r) {
+			return new cError(cErrorType.wrong_name);
+		}
+		var cross = r.cross(arg);
+		if (cross) {
+			if (cross.r != undefined) {
+				return this.getValue2(new CellAddress(cross.r, this.getBBox().c1));
+			} else if (cross.c != undefined) {
+				return this.getValue2(new CellAddress(this.getBBox().r1, cross.c));
+			} else {
+				return new cError(cErrorType.wrong_value_type);
+			}
+		} else {
+			return new cError(cErrorType.wrong_value_type);
+		}
+	};
+	cArea3D.prototype.getBBox = function () {
+		var range = this.getRange();
+		return range ? range.getBBox() : range;
+	};
+	cArea3D.prototype.getBBox0 = function () {
+		var range = this.getRange();
+		return range ? range.getBBox0() : range;
+	};
+	cArea3D.prototype.isValid = function () {
+		return !!this.getRange();
+	};
 	cArea3D.prototype.countCells = function () {
 		var _wsA = this.wsRange();
 		var _val = [];
@@ -1354,7 +1350,7 @@ cArea3D.prototype.isValid = function () {
 		}
 	};
 	cArea3D.prototype.isSingleSheet = function () {
-		return this.wsFrom == this.wsTo;
+		return this.wsFrom === this.wsTo;
 	};
 
 /** @constructor */
