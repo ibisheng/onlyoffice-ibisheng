@@ -273,7 +273,7 @@
 					}
 					sHtml += "</body></html>";
 
-					this.CommonIframe_PasteStart(sHtml, text_data);
+					this.CommonIframe_PasteStart(sHtml, _text_format);
 					return false;
 				}
 

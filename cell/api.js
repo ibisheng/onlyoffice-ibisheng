@@ -485,9 +485,9 @@ var editor;
     return AscCommon.g_clipboardBase.Button_Cut();
   };
 
-  spreadsheet_api.prototype.asc_PasteData = function (_format, data1, data2) {
+  spreadsheet_api.prototype.asc_PasteData = function (_format, data1, data2, text_data) {
     if (!this.getViewMode()) {
-      this.wb.pasteData(_format, data1, data2);
+      this.wb.pasteData(_format, data1, data2, text_data);
     }
   };
 
