@@ -1171,6 +1171,9 @@ cArea3D.prototype.wsRange = function () {
 		}
 		return (this.range(this.wsRange()))[0];
 	};
+	cArea3D.prototype.getRanges = function () {
+		return (this.range(this.wsRange()));
+	};
 	cArea3D.prototype.getValue = function () {
 		var i, _wsA = this.wsRange();
 		var _val = [];
@@ -1322,7 +1325,7 @@ cArea3D.prototype.getWS = function () {
 		return new cNumber(count);
 	};
 	cArea3D.prototype.getMatrix = function () {
-		var arr = [], r = this.getRange(), res;
+		var arr = [], r = this.getRanges(), res;
 		for (var k = 0; k < r.length; k++) {
 			arr[k] = [];
 			r[k]._foreach2(function (cell, i, j, r1, c1) {
