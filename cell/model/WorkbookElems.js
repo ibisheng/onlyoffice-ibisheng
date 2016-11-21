@@ -5237,10 +5237,10 @@ CellArea.prototype = {
 		return this.displayHidden;
 	};
 	sparklineGroup.prototype.asc_getMinAxisType = function () {
-		return this.minAxisType;
+		return null !== this.minAxisType ? this.minAxisType : Asc.c_oAscSparklineAxisMinMax.Individual;
 	};
 	sparklineGroup.prototype.asc_getMaxAxisType = function () {
-		return this.maxAxisType;
+		return null !== this.maxAxisType ? this.minAxisType : Asc.c_oAscSparklineAxisMinMax.Individual;
 	};
 	sparklineGroup.prototype.asc_getRightToLeft = function () {
 		return this.rightToLeft;
