@@ -10576,7 +10576,7 @@
       };
 
     WorksheetView.prototype.findCell = function (reference, isViewMode) {
-        var mc, ranges = AscCommonExcel.getRangeByRef(reference, this.model);
+        var mc, ranges = AscCommonExcel.getRangeByRef(reference, this.model, true);
 
         if (0 === ranges.length && !isViewMode) {
             /*TODO: сделать поиск по названиям автофигур, должен искать до того как вызвать поиск по именованным диапазонам*/

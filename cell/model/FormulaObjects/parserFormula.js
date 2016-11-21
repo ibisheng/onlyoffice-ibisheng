@@ -2951,7 +2951,7 @@ var cFormulaOperators = {
 		}
 		return list;
 	}
-	function getRangeByRef(ref, ws) {
+	function getRangeByRef(ref, ws, onlyRanges) {
 		// ToDo in parser formula
 		if (ref[0] === '(') {
 			ref = ref.slice(1);
@@ -2970,25 +2970,38 @@ var cFormulaOperators = {
 			}
 
 			var _f = new AscCommonExcel.parserFormula(refItem, '', ws);
-			_f.parse();
-			_f.RefPos.forEach(function (item) {
-				var ref;
-				switch (item.oper.type) {
-					case cElementType.table:
-					case cElementType.name:
-						ref = item.oper.toRef();
-						break;
-					case cElementType.cell:
-					case cElementType.cell3D:
-					case cElementType.cellsRange:
-					case cElementType.cellsRange3D:
-						ref = item.oper;
-						break;
-				}
-				if (ref && cElementType.error !== ref.type) {
-					ranges.push(ref.getRange());
-				}
-			});
+			if (_f.parse()) {
+				_f.RefPos.forEach(function (item) {
+					var ref;
+					switch (item.oper.type) {
+						case cElementType.table:
+						case cElementType.name:
+							ref = item.oper.toRef();
+							break;
+						case cElementType.cell:
+						case cElementType.cell3D:
+						case cElementType.cellsRange:
+						case cElementType.cellsRange3D:
+							ref = item.oper;
+							break;
+					}
+					if (ref) {
+						switch(ref.type) {
+							case cElementType.cell:
+							case cElementType.cell3D:
+							case cElementType.cellsRange:
+							case cElementType.cellsRange3D:
+								ranges.push(ref.getRange());
+								break;
+							case cElementType.array:
+								if (!onlyRanges) {
+									ranges = ref.getMatrix();
+								}
+								break;
+						}
+					}
+				});
+			}
 		});
 		return ranges;
 	}
