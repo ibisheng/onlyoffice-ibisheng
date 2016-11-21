@@ -164,6 +164,10 @@ CChangesCommentsAdd.prototype.ReadFromBinary = function(Reader)
 	this.Id      = Reader.GetString2();
 	this.Comment = AscCommon.g_oTableId.Get_ById(this.Id);
 };
+CChangesCommentsAdd.prototype.CreateReverseChange = function()
+{
+	return new CChangesCommentsRemove(this.Class, this.Id, this.Comment);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -197,6 +201,10 @@ CChangesCommentsRemove.prototype.ReadFromBinary = function(Reader)
 	// String : Id комментария
 	this.Id      = Reader.GetString2();
 	this.Comment = AscCommon.g_oTableId.Get_ById(this.Id);
+};
+CChangesCommentsRemove.prototype.CreateReverseChange = function()
+{
+	return new CChangesCommentsAdd(this.Class, this.Id, this.Comment);
 };
 /**
  * @constructor

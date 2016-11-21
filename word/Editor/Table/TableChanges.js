@@ -522,6 +522,10 @@ CChangesTableAddRow.prototype.IsRelated = function(oChanges)
 
 	return false;
 };
+CChangesTableAddRow.prototype.CreateReverseChange = function()
+{
+	return this.private_CreateReverseChange(CChangesTableRemoveRow);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -591,6 +595,10 @@ CChangesTableRemoveRow.prototype.IsRelated = function(oChanges)
 		return true;
 
 	return false;
+};
+CChangesTableRemoveRow.prototype.CreateReverseChange = function()
+{
+	return this.private_CreateReverseChange(CChangesTableAddRow);
 };
 /**
  * @constructor

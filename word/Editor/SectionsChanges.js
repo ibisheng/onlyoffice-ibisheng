@@ -642,6 +642,10 @@ CChangesSectionColumnsCol.prototype.ReadFromBinary = function(Reader)
 		this.Old.Read_FromBinary(Reader);
 	}
 };
+CChangesSectionColumnsCol.prototype.CreateReverseChange = function()
+{
+	return new CChangesSectionColumnsCol(this.Class, this.New, this.Old, this.Index);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}

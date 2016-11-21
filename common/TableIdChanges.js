@@ -102,6 +102,10 @@
 
 		return Element;
 	};
+	CChangesTableIdAdd.prototype.CreateReverseChange = function()
+	{
+		return null;
+	};
 	window["AscCommon"].CChangesTableIdAdd = CChangesTableIdAdd;
 	/**
 	 * @constructor
@@ -152,6 +156,10 @@
 	};
 	CChangesTableIdReset.prototype.RefreshRecalcData = function()
 	{
+	};
+	CChangesTableIdReset.prototype.CreateReverseChange = function()
+	{
+		return new CChangesTableIdReset(this.Class, this.NewId, this.OldId);
 	};
 	window["AscCommon"].CChangesTableIdReset = CChangesTableIdReset;
 	/**
@@ -277,6 +285,10 @@
 	CChangesTableIdDescription.prototype.RefreshRecalcData = function()
 	{
 	};
+	CChangesTableIdDescription.prototype.CreateReverseChange = function()
+	{
+		return null;
+	};
 	window["AscCommon"].CChangesTableIdDescription = CChangesTableIdDescription;
 	/**
 	 * @constructor
@@ -351,6 +363,10 @@
 	};
 	CChangesCommonAddWaterMark.prototype.RefreshRecalcData = function()
 	{
+	};
+	CChangesCommonAddWaterMark.prototype.CreateReverseChange = function()
+	{
+		return null;
 	};
 	window["AscCommon"].CChangesCommonAddWaterMark = CChangesCommonAddWaterMark;
 })(window);

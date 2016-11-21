@@ -170,6 +170,10 @@ CChangesParagraphAddItem.prototype.IsRelated = function(oChanges)
 
 	return false;
 };
+CChangesParagraphAddItem.prototype.CreateReverseChange = function()
+{
+	return this.private_CreateReverseChange(CChangesParagraphRemoveItem);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -229,6 +233,10 @@ CChangesParagraphRemoveItem.prototype.IsRelated = function(oChanges)
 		return true;
 
 	return false;
+};
+CChangesParagraphRemoveItem.prototype.CreateReverseChange = function()
+{
+	return this.private_CreateReverseChange(CChangesParagraphAddItem);
 };
 /**
  * @constructor
@@ -1023,6 +1031,10 @@ CChangesParagraphSectPr.prototype.ReadFromBinary = function(Reader)
 	else
 		this.Old = undefined;
 };
+CChangesParagraphSectPr.prototype.CreateReverseChange = function()
+{
+	return new CChangesParagraphSectPr(this.Class, this.New, this.Old);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -1142,6 +1154,10 @@ CChangesParagraphPrChange.prototype.ReadFromBinary = function(Reader)
 		this.Old.ReviewInfo = new CReviewInfo();
 		this.Old.ReviewInfo.Read_FromBinary(Reader);
 	}
+};
+CChangesParagraphPrChange.prototype.CreateReverseChange = function()
+{
+	return new CChangesParagraphPrChange(this.Class, this.New, this.Old);
 };
 /**
  * @constructor

@@ -811,6 +811,10 @@ CChangesStylesAdd.prototype.Load = function()
 	this.Redo();
 	AscCommon.CollaborativeEditing.Add_LinkData(this.Class, {UpdateStyleId : this.Id});
 };
+CChangesStylesAdd.prototype.CreateReverseChange = function()
+{
+	return new CChangesStylesRemove(this.Class, this.Id, this.Style);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -849,6 +853,10 @@ CChangesStylesRemove.prototype.Load = function()
 {
 	this.Redo();
 	AscCommon.CollaborativeEditing.Add_LinkData(this.Class, {UpdateStyleId : this.Id});
+};
+CChangesStylesRemove.prototype.CreateReverseChange = function()
+{
+	return new CChangesStylesAdd(this.Class, this.Id, this.Style);
 };
 /**
  * @constructor

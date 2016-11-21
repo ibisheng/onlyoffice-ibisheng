@@ -159,6 +159,10 @@ CChangesRunAddItem.prototype.IsRelated = function(oChanges)
 
 	return false;
 };
+CChangesRunAddItem.prototype.CreateReverseChange = function()
+{
+	return this.private_CreateReverseChange(CChangesRunRemoveItem);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -228,6 +232,10 @@ CChangesRunRemoveItem.prototype.IsRelated = function(oChanges)
 		return true;
 
 	return false;
+};
+CChangesRunRemoveItem.prototype.CreateReverseChange = function()
+{
+	return this.private_CreateReverseChange(CChangesRunAddItem);
 };
 /**
  * @constructor
@@ -1663,6 +1671,10 @@ CChangesRunOnStartSplit.prototype.Load = function()
 	if (AscCommon.CollaborativeEditing)
 		AscCommon.CollaborativeEditing.OnStart_SplitRun(this.Class, this.Pos);
 };
+CChangesRunOnStartSplit.prototype.CreateReverseChange = function()
+{
+	return null;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -1694,26 +1706,23 @@ CChangesRunOnEndSplit.prototype.Load = function()
 	if (AscCommon.CollaborativeEditing)
 		AscCommon.CollaborativeEditing.OnEnd_SplitRun(this.NewRun);
 };
+CChangesRunOnEndSplit.prototype.CreateReverseChange = function()
+{
+	return null;
+};
 /**
  * @constructor
- * @extends {AscDFH.CChangesBase}
+ * @extends {AscDFH.CChangesBaseProperty}
  */
 function CChangesRunMathAlnAt(Class, Old, New)
 {
-	CChangesRunMathAlnAt.superclass.constructor.call(this, Class);
-
-	this.Old = Old;
-	this.New = New;
+	CChangesRunMathAlnAt.superclass.constructor.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesRunMathAlnAt, AscDFH.CChangesBase);
+AscCommon.extendClass(CChangesRunMathAlnAt, AscDFH.CChangesBaseProperty);
 CChangesRunMathAlnAt.prototype.Type = AscDFH.historyitem_ParaRun_MathAlnAt;
-CChangesRunMathAlnAt.prototype.Undo = function()
+CChangesRunMathAlnAt.prototype.private_SetValue = function(Value)
 {
-	this.Class.MathPrp.Apply_AlnAt(this.Old);
-};
-CChangesRunMathAlnAt.prototype.Redo = function()
-{
-	this.Class.MathPrp.Apply_AlnAt(this.Old);
+	this.Class.MathPrp.Apply_AlnAt(Value);
 };
 CChangesRunMathAlnAt.prototype.WriteToBinary = function(Writer)
 {
@@ -1826,6 +1835,10 @@ CChangesRunMathForcedBreak.prototype.ReadFromBinary = function(Reader)
 		this.alnAt = undefined;
 	else
 		this.alnAt = Reader.GetLong();
+};
+CChangesRunMathForcedBreak.prototype.CreateReverseChange = function()
+{
+	return new CChangesRunMathForcedBreak(this.Class, !this.bInsert, this.alnAt);
 };
 
 

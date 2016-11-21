@@ -130,6 +130,10 @@ CChangesHyperlinkAddItem.prototype.IsRelated = function(oChanges)
 
 	return false;
 };
+CChangesHyperlinkAddItem.prototype.CreateReverseChange = function()
+{
+	return this.private_CreateReverseChange(CChangesHyperlinkRemoveItem);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -187,4 +191,8 @@ CChangesHyperlinkRemoveItem.prototype.IsRelated = function(oChanges)
 		return true;
 
 	return false;
+};
+CChangesHyperlinkRemoveItem.prototype.CreateReverseChange = function()
+{
+	return this.private_CreateReverseChange(CChangesHyperlinkAddItem);
 };

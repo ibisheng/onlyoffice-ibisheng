@@ -76,6 +76,10 @@ CChangesParaFieldAddItem.prototype.ReadFromBinary = function(Reader)
 	// String : Id
 	this.Id = Reader.GetString2();
 };
+CChangesParaFieldAddItem.prototype.CreateReverseChange = function()
+{
+	return null;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}

@@ -101,6 +101,10 @@ CChangesParaFieldAddItem.prototype.IsRelated = function(oChanges)
 
 	return false;
 };
+CChangesParaFieldAddItem.prototype.CreateReverseChange = function()
+{
+	return this.private_CreateReverseChange(CChangesParaFieldRemoveItem);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -159,4 +163,8 @@ CChangesParaFieldRemoveItem.prototype.IsRelated = function(oChanges)
 		return true;
 
 	return false;
+};
+CChangesParaFieldRemoveItem.prototype.CreateReverseChange = function()
+{
+	return this.private_CreateReverseChange(CChangesParaFieldAddItem);
 };

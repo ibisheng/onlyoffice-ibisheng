@@ -167,6 +167,10 @@ CChangesDocumentContentAddItem.prototype.IsRelated = function(oChanges)
 
 	return false;
 };
+CChangesDocumentContentAddItem.prototype.CreateReverseChange = function()
+{
+	return this.private_CreateReverseChange(CChangesDocumentContentRemoveItem);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -284,4 +288,8 @@ CChangesDocumentContentRemoveItem.prototype.IsRelated = function(oChanges)
 		return true;
 
 	return false;
+};
+CChangesDocumentContentRemoveItem.prototype.CreateReverseChange = function()
+{
+	return this.private_CreateReverseChange(CChangesDocumentContentAddItem);
 };

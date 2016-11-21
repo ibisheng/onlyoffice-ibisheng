@@ -174,6 +174,10 @@ CChangesDocumentAddItem.prototype.IsRelated = function(oChanges)
 
 	return false;
 };
+CChangesDocumentAddItem.prototype.CreateReverseChange = function()
+{
+	return this.private_CreateReverseChange(CChangesDocumentRemoveItem);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -290,6 +294,10 @@ CChangesDocumentRemoveItem.prototype.IsRelated = function(oChanges)
 
 	return false;
 };
+CChangesDocumentRemoveItem.prototype.CreateReverseChange = function()
+{
+	return this.private_CreateReverseChange(CChangesDocumentAddItem);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -325,6 +333,10 @@ CChangesDocumentDefaultTab.prototype.ReadFromBinary = function(Reader)
 	this.New = Reader.GetDouble();
 	this.Old = Reader.GetDouble();
 };
+CChangesDocumentDefaultTab.prototype.CreateReverseChange = function()
+{
+	return new CChangesDocumentDefaultTab(this.Class, this.New, this.Old);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -359,6 +371,10 @@ CChangesDocumentEvenAndOddHeaders.prototype.ReadFromBinary = function(Reader)
 	// Bool : Old
 	this.New = Reader.GetBool();
 	this.Old = Reader.GetBool();
+};
+CChangesDocumentEvenAndOddHeaders.prototype.CreateReverseChange = function()
+{
+	return new CChangesDocumentEvenAndOddHeaders(this.Class, this.New, this.Old);
 };
 /**
  * @constructor
@@ -399,6 +415,10 @@ CChangesDocumentDefaultLanguage.prototype.ReadFromBinary = function(Reader)
 	this.New = Reader.GetBool();
 	this.Old = Reader.GetBool();
 };
+CChangesDocumentDefaultLanguage.prototype.CreateReverseChange = function()
+{
+	return new CChangesDocumentDefaultLanguage(this.Class, this.New, this.Old);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -437,4 +457,8 @@ CChangesDocumentMathSettings.prototype.ReadFromBinary = function(Reader)
 	this.New.Read_FromBinary(Reader);
 	this.Old = new CMathSettings();
 	this.Old.Read_FromBinary(Reader);
+};
+CChangesDocumentMathSettings.prototype.CreateReverseChange = function()
+{
+	return new CChangesDocumentMathSettings(this.Class, this.New, this.Old);
 };

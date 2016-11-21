@@ -94,6 +94,10 @@ CChangesAbstractNumLvlChange.prototype.Load = function(Color)
 	// Сразу нельзя запускать пересчет, т.к. возможно еще не все ссылки проставлены
 	AscCommon.CollaborativeEditing.Add_EndActions(this.Class, {iLvl : this.Index});
 };
+CChangesAbstractNumLvlChange.prototype.CreateReverseChange = function()
+{
+	return new CChangesAbstractNumLvlChange(this.Class, this.New, this.Old, this.Index);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -143,6 +147,10 @@ CChangesAbstractNumTextPrChange.prototype.Load = function(Color)
 	// Сразу нельзя запускать пересчет, т.к. возможно еще не все ссылки проставлены
 	AscCommon.CollaborativeEditing.Add_EndActions(this.Class, {iLvl : this.Index});
 };
+CChangesAbstractNumTextPrChange.prototype.CreateReverseChange = function()
+{
+	return new CChangesAbstractNumTextPrChange(this.Class, this.New, this.Old, this.Index);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -191,4 +199,8 @@ CChangesAbstractNumParaPrChange.prototype.Load = function(Color)
 
 	// Сразу нельзя запускать пересчет, т.к. возможно еще не все ссылки проставлены
 	AscCommon.CollaborativeEditing.Add_EndActions(this.Class, {iLvl : this.Index});
+};
+CChangesAbstractNumParaPrChange.prototype.CreateReverseChange = function()
+{
+	return new CChangesAbstractNumParaPrChange(this.Class, this.New, this.Old, this.Index);
 };

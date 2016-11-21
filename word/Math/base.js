@@ -2560,7 +2560,7 @@ CMathBase.prototype.Set_ReviewType = function(Type, isSetToContent)
 		var NewInfo = new CReviewInfo();
 		NewInfo.Update();
 
-		History.Add(new CChangesMathBaseReviewType(this, this.ReviewType, this.ReviewInfo, Type, NewInfo));
+		History.Add(new CChangesMathBaseReviewType(this, {Type : this.ReviewType, Info : this.ReviewInfo}, {Type : Type, Info : NewInfo}));
 		this.raw_SetReviewType(Type, NewInfo);
 	}
 };
@@ -2571,7 +2571,7 @@ CMathBase.prototype.Set_ReviewTypeWithInfo = function(ReviewType, ReviewInfo)
 
 	CMathBase.superclass.Set_ReviewTypeWithInfo.apply(this, arguments);
 
-	History.Add(new CChangesMathBaseReviewType(this, this.ReviewType, this.ReviewInfo, ReviewType, ReviewInfo));
+	History.Add(new CChangesMathBaseReviewType(this, {Type : this.ReviewType, Info : this.ReviewInfo}, {Type : ReviewType, Info : ReviewInfo}));
 	this.raw_SetReviewType(ReviewType, ReviewInfo);
 };
 CMathBase.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)

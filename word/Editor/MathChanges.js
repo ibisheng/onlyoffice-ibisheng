@@ -152,6 +152,10 @@ CChangesMathContentAddItem.prototype.IsRelated = function(oChanges)
 
 	return false;
 };
+CChangesMathContentAddItem.prototype.CreateReverseChange = function()
+{
+	return this.private_CreateReverseChange(CChangesMathContentRemoveItem);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -207,6 +211,10 @@ CChangesMathContentRemoveItem.prototype.IsRelated = function(oChanges)
 		return true;
 
 	return false;
+};
+CChangesMathContentRemoveItem.prototype.CreateReverseChange = function()
+{
+	return this.private_CreateReverseChange(CChangesMathContentAddItem);
 };
 /**
  * Изменение настроек ArgSize в классе CMathContent
@@ -294,6 +302,10 @@ CChangesMathBaseAddItems.prototype.IsRelated = function(oChanges)
 
 	return false;
 };
+CChangesMathBaseAddItems.prototype.CreateReverseChange = function()
+{
+	return this.private_CreateReverseChange(CChangesMathBaseRemoveItems);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -340,6 +352,10 @@ CChangesMathBaseRemoveItems.prototype.IsRelated = function(oChanges)
 		return true;
 
 	return false;
+};
+CChangesMathBaseRemoveItems.prototype.CreateReverseChange = function()
+{
+	return this.private_CreateReverseChange(CChangesMathBaseAddItems);
 };
 /**
  * @constructor
@@ -721,9 +737,9 @@ CChangesMathBaseHighLight.prototype.ReadFromBinary = function(Reader)
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
  */
-function CChangesMathBaseReviewType(Class, OldType, OldInfo, NewType, NewInfo)
+function CChangesMathBaseReviewType(Class, Old, New)
 {
-	CChangesMathBaseReviewType.superclass.constructor.call(this, Class, {Type : OldType, Info : OldInfo}, {Type : NewType, Info : NewInfo});
+	CChangesMathBaseReviewType.superclass.constructor.call(this, Class, Old, New);
 }
 AscCommon.extendClass(CChangesMathBaseReviewType, AscDFH.CChangesBaseProperty);
 CChangesMathBaseReviewType.prototype.Type = AscDFH.historyitem_MathBase_ReviewType;
@@ -1238,6 +1254,11 @@ CChangesMathMatrixAddRow.prototype.ReadFromBinary = function(Reader)
 		this.Items[nIndex]    = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 	}
 };
+CChangesMathMatrixAddRow.prototype.CreateReverseChange = function()
+{
+	// TODO: Это изменение надо целиком переделать
+	return new CChangesMathMatrixRemoveRow(this.Class, this.Pos, this.Items);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -1324,6 +1345,11 @@ CChangesMathMatrixRemoveRow.prototype.ReadFromBinary = function(Reader)
 		this.Items[nIndex]    = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 	}
 };
+CChangesMathMatrixRemoveRow.prototype.CreateReverseChange = function()
+{
+	// TODO: Это изменение надо целиком переделать
+	return new CChangesMathMatrixAddRow(this.Class, this.Pos, this.Items);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -1350,6 +1376,11 @@ CChangesMathMatrixAddColumn.prototype.Redo = function()
 };
 CChangesMathMatrixAddColumn.prototype.WriteToBinary  = CChangesMathMatrixAddRow.prototype.WriteToBinary;
 CChangesMathMatrixAddColumn.prototype.ReadFromBinary = CChangesMathMatrixAddRow.prototype.ReadFromBinary;
+CChangesMathMatrixAddColumn.prototype.CreateReverseChange = function()
+{
+	// TODO: Это изменение надо целиком переделать
+	return new CChangesMathMatrixRemoveColumn(this.Class, this.Pos, this.Items);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -1376,6 +1407,11 @@ CChangesMathMatrixRemoveColumn.prototype.Redo = function()
 };
 CChangesMathMatrixRemoveColumn.prototype.WriteToBinary  = CChangesMathMatrixRemoveRow.prototype.WriteToBinary;
 CChangesMathMatrixRemoveColumn.prototype.ReadFromBinary = CChangesMathMatrixRemoveRow.prototype.ReadFromBinary;
+CChangesMathMatrixRemoveColumn.prototype.CreateReverseChange = function()
+{
+	// TODO: Это изменение надо целиком переделать
+	return new CChangesMathMatrixAddColumn(this.Class, this.Pos, this.Items);
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseLongProperty}
@@ -1465,6 +1501,10 @@ CChangesMathMatrixColumnJc.prototype.ReadFromBinary = function(Reader)
 		this.Old = Reader.GetLong();
 
 	this.ColumnIndex = Reader.GetLong();
+};
+CChangesMathMatrixColumnJc.prototype.CreateReverseChange = function()
+{
+	return new CChangesMathMatrixColumnJc(this.Class, this.New, this.Old, this.ColumnIndex);
 };
 
 /**
@@ -1557,6 +1597,10 @@ CChangesMathMatrixInterval.prototype.ReadFromBinary = function(Reader)
 
 	if (!(nFlags & 8))
 		this.Old.Gap = Reader.GetLong();
+};
+CChangesMathMatrixInterval.prototype.CreateReverseChange = function()
+{
+	return new CChangesMathMatrixInterval(this.Class, this.ItemType, this.New.Rule, this.New.Gap, this.Old.Rule, this.Old.Gap);
 };
 /**
  * @constructor

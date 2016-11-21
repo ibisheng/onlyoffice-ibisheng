@@ -2874,6 +2874,10 @@
 	{
 		return false;
 	};
+	CChangesBase.prototype.CreateReverseChange = function()
+	{
+		return null;
+	};
 	window['AscDFH'].CChangesBase = CChangesBase;
 	/**
 	 * Базовый класс для изменений, которые меняют содержимое родительского класса.*
@@ -3033,6 +3037,21 @@
 
 		return true;
 	};
+	CChangesBaseContentChange.prototype.private_CreateReverseChange = function(fConstructor)
+	{
+		var oChange = new fConstructor();
+
+		oChange.Pos      = this.Pos;
+		oChange.Items    = this.Items;
+		oChange.Add      = !this.Add;
+		oChange.UseArray = this.UseArray;
+		oChange.PosArray = [];
+
+		for (var nIndex = 0, nCount = this.PosArray.length; nIndex < nCount; ++nIndex)
+			oChange.PosArray[nIndex] = this.PosArray[nIndex];
+
+		return oChange;
+	};
 	window['AscDFH'].CChangesBaseContentChange = CChangesBaseContentChange;
 	/**
 	 * Базовый класс для изменения свойств.
@@ -3059,6 +3078,10 @@
 	CChangesBaseProperty.prototype.private_SetValue = function(Value)
 	{
 		// Эту функцию нужно переопределить в дочернем классе
+	};
+	CChangesBaseProperty.prototype.CreateReverseChange = function()
+	{
+		return new this.constructor(this.Class, this.New, this.Old, this.Color);
 	};
 	window['AscDFH'].CChangesBaseProperty = CChangesBaseProperty;
 	/**
