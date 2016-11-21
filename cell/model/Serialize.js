@@ -6829,7 +6829,7 @@
             });
             this.wb.clrSchemeMap = AscFormat.GenerateDefaultColorMap();
             if(null == this.wb.theme)
-                this.wb.theme = AscFormat.GenerateDefaultTheme(this.wb);
+                this.wb.theme = AscFormat.GenerateDefaultTheme(this.wb, 'Calibri');
 
             Asc.getBinaryOtherTableGVar(this.wb);
 
