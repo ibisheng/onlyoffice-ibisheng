@@ -5087,7 +5087,7 @@ CellArea.prototype = {
 			return propOld;
 		};
 		var getColor = function (color) {
-			return color instanceof Asc.asc_CColor ? CorrectAscColor(color) : color;
+			return color instanceof Asc.asc_CColor ? CorrectAscColor(color) : color ? color.clone(): color;
 		};
 
 		History.Create_NewPoint();
