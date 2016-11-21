@@ -1869,7 +1869,7 @@ CDocMeta.prototype =
                 Line1 = sel.Line1;
                 Line2 = sel.Line2;
 
-                if (sel.Glyph1 < sel.Glyph2 || -1 == sel.Glyph2)
+                if (((sel.Glyph1 != -1) && (sel.Glyph1 < sel.Glyph2)) || (-1 == sel.Glyph2))
                 {
                     Glyph1 = sel.Glyph1;
                     Glyph2 = sel.Glyph2;
