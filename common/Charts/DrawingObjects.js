@@ -1721,7 +1721,7 @@ function DrawingObjects() {
         track_object.track({}, 0, 0);
         var shape = track_object.getShape(false, _this.drawingDocument, this);
         shape.spPr.setFill(AscFormat.CreateNoFillUniFill());
-        shape.setParent(this);
+        //shape.setParent(this);
         shape.txBody.content.Content[0].Add_ToContent(0, oParaContent);
         var body_pr = shape.getBodyPr();
         var w = shape.txBody.getMaxContentWidth(150, true) + body_pr.lIns + body_pr.rIns;
@@ -1731,7 +1731,7 @@ function DrawingObjects() {
         shape.spPr.xfrm.setOffX(0);
         shape.spPr.xfrm.setOffY(0);
         shape.setWorksheet(worksheet.model);
-        shape.addToDrawingObjects();
+        //shape.addToDrawingObjects();
         return shape;
     };
     //-----------------------------------------------------------------------------------

@@ -2980,7 +2980,7 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                                 pt.setVal(value);
                                 if(cell.getNumFormatStr() !== lit_format_code)
                                 {
-                                    pt.setFormatCode(cell.getNumFormatStr())
+                                    pt.setFormatCode(cell.getNumFormatStr());
                                 }
                                 num_cache.addPt(pt);
 
