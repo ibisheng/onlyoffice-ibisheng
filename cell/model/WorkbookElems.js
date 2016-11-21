@@ -4728,6 +4728,9 @@ CellArea.prototype = {
 			AscCommon.g_oTableId.Add(this, this.Id);
 		}
 	}
+	sparklineGroup.prototype.getObjectType = function () {
+		return AscDFH.historyitem_type_Sparkline;
+	};
 	sparklineGroup.prototype.Get_Id = function () {
 		return this.Id;
 	};
@@ -4877,11 +4880,29 @@ CellArea.prototype = {
 			case AscCH.historyitem_Sparkline_ColorLow:
 				this.colorLow = readColor(r);
 				break;
+			case AscCH.historyitem_Sparkline_F:
+				this.f = r.GetBool() ? r.GetString2() : null;
+				break;
 		}
 		this.cleanCache();
 	};
-	sparklineGroup.prototype.Undo = function (type, data) {
-		switch (type) {
+	sparklineGroup.prototype.Write_ToBinary2 = function (w) {
+		w.WriteLong(this.getObjectType());
+		w.WriteString2(this.Id);
+		w.WriteString2(this.worksheet ? this.worksheet.getId() : '-1');
+	};
+	sparklineGroup.prototype.Read_FromBinary2 = function (r) {
+		this.Id = r.GetString2();
+
+		// ToDDo не самая лучшая схема добавления на лист...
+		var api_sheet = Asc['editor'];
+		this.worksheet = api_sheet.wbModel.getWorksheetById(r.GetString2());
+		if (this.worksheet) {
+			this.worksheet.insertSparkline(this);
+		}
+	};
+	sparklineGroup.prototype.Undo = function (data) {
+		switch (data.Type) {
 			case AscCH.historyitem_Sparkline_Type:
 				this.type = data.oldPr;
 				break;
