@@ -2512,7 +2512,10 @@ background-repeat: no-repeat;\
 			return;
 
 		this.WordControl.m_oDrawingDocument.StartTableStylesCheck();
-		this.WordControl.m_oDrawingDocument.TableStylesSheckLook = new CTableLook();
+		this.WordControl.m_oDrawingDocument.TableStylesSheckLook = new Asc.CTablePropLook();
+		this.WordControl.m_oDrawingDocument.TableStylesSheckLook.FirstCol = true;
+		this.WordControl.m_oDrawingDocument.TableStylesSheckLook.FirstRow = true;
+		this.WordControl.m_oDrawingDocument.TableStylesSheckLook.BandHor  = true;
 		this.WordControl.m_oDrawingDocument.EndTableStylesCheck();
 	};
 
