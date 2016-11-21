@@ -4773,6 +4773,12 @@ CellArea.prototype = {
 					data.newPr.Write_ToBinary2(w);
 				}
 				break;
+			case AscCH.historyitem_Sparkline_F:
+				w.WriteBool(null !== data.newPr);
+				if (null !== data.newPr) {
+					w.WriteString2(data.newPr);
+				}
+				break;
 		}
 	};
 	sparklineGroup.prototype.Load_Changes = function (r) {
@@ -4950,6 +4956,9 @@ CellArea.prototype = {
 			case AscCH.historyitem_Sparkline_ColorLow:
 				this.colorLow = data.oldPr;
 				break;
+			case AscCH.historyitem_Sparkline_F:
+				this.f = data.oldPr;
+				break;
 		}
 
 		this.cleanCache();
@@ -5031,6 +5040,9 @@ CellArea.prototype = {
 			case AscCH.historyitem_Sparkline_ColorLow:
 				this.colorLow = data.newPr;
 				break;
+			case AscCH.historyitem_Sparkline_F:
+				this.f = data.newPr;
+				break;
 		}
 		this.cleanCache();
 	};
@@ -5108,39 +5120,15 @@ CellArea.prototype = {
 		this.colorHigh = checkProperty(this.colorHigh, getColor(val.colorHigh), AscCH.historyitem_Sparkline_ColorHigh);
 		this.colorLow = checkProperty(this.colorLow, getColor(val.colorLow), AscCH.historyitem_Sparkline_ColorLow);
 
+		this.colorLow = checkProperty(this.f, val.f, AscCH.historyitem_Sparkline_F);
+
 		this.cleanCache();
 
 		History.EndTransaction();
 	};
 	sparklineGroup.prototype.clone = function (onlyProps) {
 		var res = new sparklineGroup(!onlyProps);
-		res.Id = this.Id;
-		res.lineWeight = this.lineWeight;
-		res.type = this.type;
-		res.dateAxis = this.dateAxis;
-		res.displayEmptyCellsAs = this.displayEmptyCellsAs;
-		res.markers = this.markers;
-		res.high = this.high;
-		res.low = this.low;
-		res.first = this.first;
-		res.last = this.last;
-		res.negative = this.negative;
-		res.displayXAxis = this.displayXAxis;
-		res.displayHidden = this.displayHidden;
-		res.minAxisType = this.minAxisType;
-		res.maxAxisType = this.maxAxisType;
-		res.rightToLeft = this.rightToLeft;
-		res.manualMax = this.manualMax;
-		res.manualMin = this.manualMin;
-
-		res.colorSeries = this.colorSeries ? this.colorSeries.clone() : null;
-		res.colorNegative = this.colorNegative ? this.colorNegative.clone() : null;
-		res.colorAxis = this.colorAxis ? this.colorAxis.clone() : null;
-		res.colorMarkers = this.colorMarkers ? this.colorMarkers.clone() : null;
-		res.colorFirst = this.colorFirst ? this.colorFirst.clone() : null;
-		res.colorLast = this.colorLast ? this.colorLast.clone() : null;
-		res.colorHigh = this.colorHigh ? this.colorHigh.clone() : null;
-		res.colorLow = this.colorLow ? this.colorLow.clone() : null;
+		res.set(this);
 		res.f = this.f;
 
 		if (!onlyProps) {
