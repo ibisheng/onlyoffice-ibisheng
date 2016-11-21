@@ -3062,6 +3062,7 @@ var editor;
 
     if (bRedraw) {
       this.handlers.trigger("asc_onUpdateChartStyles");
+      this.handlers.trigger("asc_onSelectionChanged", this.asc_getCellInfo());
       this.wb.drawWS();
     }
   };
