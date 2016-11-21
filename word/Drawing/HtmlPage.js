@@ -2232,7 +2232,7 @@ function CEditorPage(api)
 		}
 
 		this.ReaderModeDivWrapper = document.createElement('div');
-		this.ReaderModeDivWrapper.setAttribute("style", "z-index:8;font-family:arial;font-size:12pt;position:absolute;\
+		this.ReaderModeDivWrapper.setAttribute("style", "z-index:11;font-family:arial;font-size:12pt;position:absolute;\
             resize:none;padding:0px;display:block;\
             margin:0px;left:0px;top:0px;background-color:#FFFFFF");
 
