@@ -5213,22 +5213,22 @@ CellArea.prototype = {
 		return null !== this.displayEmptyCellsAs ? this.displayEmptyCellsAs : Asc.c_oAscEDispBlanksAs.Zero;
 	};
 	sparklineGroup.prototype.asc_getMarkersPoint = function () {
-		return this.markers;
+		return !!this.markers;
 	};
 	sparklineGroup.prototype.asc_getHighPoint = function () {
-		return this.high;
+		return !!this.high;
 	};
 	sparklineGroup.prototype.asc_getLowPoint = function () {
-		return this.low;
+		return !!this.low;
 	};
 	sparklineGroup.prototype.asc_getFirstPoint = function () {
-		return this.first;
+		return !!this.first;
 	};
 	sparklineGroup.prototype.asc_getLastPoint = function () {
-		return this.last;
+		return !!this.last;
 	};
 	sparklineGroup.prototype.asc_getNegativePoint = function () {
-		return this.negative;
+		return !!this.negative;
 	};
 	sparklineGroup.prototype.asc_getDisplayXAxis = function () {
 		return this.displayXAxis;
