@@ -169,6 +169,7 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Sparkline_colorLast = 23;
 	window['AscCH'].historyitem_Sparkline_ColorHigh = 24;
 	window['AscCH'].historyitem_Sparkline_ColorLow = 25;
+	window['AscCH'].historyitem_Sparkline_F = 26;
 
 function CHistory()
 {

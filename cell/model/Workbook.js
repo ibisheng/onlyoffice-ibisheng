@@ -3479,9 +3479,6 @@ Woorksheet.prototype.clone=function(sNewId, sName, tableNames){
 	for (i = 0; i < this.aConditionalFormatting.length; ++i) {
 		oNewWs.aConditionalFormatting.push(this.aConditionalFormatting[i].clone());
 	}
-  for (i = 0; i < this.aSparklineGroups.length; ++i) {
-    oNewWs.aSparklineGroups.push(this.aSparklineGroups[i].clone());
-  }
 	if (this.sheetPr)
 		oNewWs.sheetPr = this.sheetPr.clone();
 
@@ -3489,28 +3486,37 @@ Woorksheet.prototype.clone=function(sNewId, sName, tableNames){
 
 	return oNewWs;
 };
-Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
-{
-    if(null != this.Drawings && this.Drawings.length > 0)
-    {
-        var drawingObjects = new AscFormat.DrawingObjects();
-        oNewWs.Drawings = [];
-      AscFormat.NEW_WORKSHEET_DRAWING_DOCUMENT = oNewWs.DrawingDocument;
-        for(var i = 0; i < this.Drawings.length; ++i)
-        {
-            var drawingObject = drawingObjects.cloneDrawingObject(this.Drawings[i]);
-            drawingObject.graphicObject = this.Drawings[i].graphicObject.copy();
-            drawingObject.graphicObject.setWorksheet(oNewWs);
-            drawingObject.graphicObject.addToDrawingObjects();
-            var drawingBase = this.Drawings[i];
-            drawingObject.graphicObject.setDrawingBaseCoords(drawingBase.from.col, drawingBase.from.colOff, drawingBase.from.row, drawingBase.from.rowOff, drawingBase.to.col, drawingBase.to.colOff, drawingBase.to.row, drawingBase.to.rowOff, drawingBase.Pos.X, drawingBase.Pos.Y, drawingBase.ext.cx, drawingBase.ext.cy);
-            oNewWs.Drawings[oNewWs.Drawings.length - 1] = drawingObject;
-        }
-      AscFormat.NEW_WORKSHEET_DRAWING_DOCUMENT = null;
-        drawingObjects.pushToAObjects(oNewWs.Drawings);
-        drawingObjects.updateChartReferences2(parserHelp.getEscapeSheetName(wsFrom.sName), parserHelp.getEscapeSheetName(oNewWs.sName));
-    }
-};
+	Woorksheet.prototype.copyDrawingObjects = function (oNewWs, wsFrom) {
+		var i;
+		if (null != this.Drawings && this.Drawings.length > 0) {
+			var drawingObjects = new AscFormat.DrawingObjects();
+			oNewWs.Drawings = [];
+			AscFormat.NEW_WORKSHEET_DRAWING_DOCUMENT = oNewWs.DrawingDocument;
+			for (i = 0; i < this.Drawings.length; ++i) {
+				var drawingObject = drawingObjects.cloneDrawingObject(this.Drawings[i]);
+				drawingObject.graphicObject = this.Drawings[i].graphicObject.copy();
+				drawingObject.graphicObject.setWorksheet(oNewWs);
+				drawingObject.graphicObject.addToDrawingObjects();
+				var drawingBase = this.Drawings[i];
+				drawingObject.graphicObject.setDrawingBaseCoords(drawingBase.from.col, drawingBase.from.colOff,
+					drawingBase.from.row, drawingBase.from.rowOff, drawingBase.to.col, drawingBase.to.colOff,
+					drawingBase.to.row, drawingBase.to.rowOff, drawingBase.Pos.X, drawingBase.Pos.Y, drawingBase.ext.cx,
+					drawingBase.ext.cy);
+				oNewWs.Drawings[oNewWs.Drawings.length - 1] = drawingObject;
+			}
+			AscFormat.NEW_WORKSHEET_DRAWING_DOCUMENT = null;
+			drawingObjects.pushToAObjects(oNewWs.Drawings);
+			drawingObjects.updateChartReferences2(parserHelp.getEscapeSheetName(wsFrom.sName),
+				parserHelp.getEscapeSheetName(oNewWs.sName));
+		}
+
+		var newSparkline;
+		for (i = 0; i < this.aSparklineGroups.length; ++i) {
+			newSparkline = this.aSparklineGroups[i].clone();
+			newSparkline.setWorksheet(oNewWs);
+			oNewWs.aSparklineGroups.push(newSparkline);
+		}
+	};
 	Woorksheet.prototype.initPostOpen = function (handlers) {
 		var cwf = this.workbook.cwf[this.Id] = {};
 		if (this.aFormulaExt) {
@@ -5693,10 +5699,13 @@ Woorksheet.prototype.updateSparklineCache = function(sheet, ranges) {
 	Woorksheet.prototype.getSparklineGroup = function(c, r) {
 		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
 			if (-1 !== this.aSparklineGroups[i].contains(c, r)) {
-				return this.aSparklineGroups[i].clone(true);
+				return this.aSparklineGroups[i];
 			}
 		}
 		return null;
+	};
+	Woorksheet.prototype.insertSparkline = function (sparkline) {
+		this.aSparklineGroups.push(sparkline);
 	};
 //-------------------------------------------------------------------------------------------------
 /**

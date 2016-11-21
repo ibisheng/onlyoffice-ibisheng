@@ -2025,10 +2025,10 @@
     t.clipboard.checkCopyToClipboard(ws, _clipboard, _formats);
   };
 
-  WorkbookView.prototype.pasteData = function(_format, data1, data2) {
+  WorkbookView.prototype.pasteData = function(_format, data1, data2, text_data) {
     var t = this, ws;
     ws = t.getWorksheet();
-    t.clipboard.pasteData(ws, _format, data1, data2);
+    t.clipboard.pasteData(ws, _format, data1, data2, text_data);
   };
 
   WorkbookView.prototype.selectionCut = function() {

@@ -9002,6 +9002,7 @@ background-repeat: no-repeat;\
 
 	// mobile
 	asc_docs_api.prototype["asc_GetDefaultTableStyles"]             	= asc_docs_api.prototype.asc_GetDefaultTableStyles;
+	asc_docs_api.prototype["asc_Remove"]             					= asc_docs_api.prototype.asc_Remove;
 
 	CParagraphPropEx.prototype['get_ContextualSpacing'] = CParagraphPropEx.prototype.get_ContextualSpacing;
 	CParagraphPropEx.prototype['get_Ind']               = CParagraphPropEx.prototype.get_Ind;

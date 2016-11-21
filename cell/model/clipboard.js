@@ -142,7 +142,7 @@
 				}
 			},
 
-			pasteData: function(ws, _format, data1, data2)
+			pasteData: function(ws, _format, data1, data2, text_data)
 			{
 				var t = this;
 				t.pasteProcessor.clean();
@@ -161,7 +161,14 @@
 						}
 						else
 						{
-							t.pasteProcessor.editorPasteExec(ws, data1);
+							if(text_data)
+							{
+								t.pasteProcessor.pasteTextOnSheet(ws, text_data);
+							}
+							else
+							{
+								t.pasteProcessor.editorPasteExec(ws, data1);
+							}
 						}
 
 						break;
@@ -872,7 +879,9 @@
 					{	
 						if(isIntoShape)
 						{
+							History.TurnOff();
 							var docContent = this._convertTableFromExcelToDocument(worksheet, pasteData, isIntoShape);
+							History.TurnOn();
 							
 							var callback = function(isSuccess)
 							{
@@ -2237,10 +2246,7 @@
 					return;
 				}
 				
-				//var aResult = this._getTableFromText(text);
-				var aResult = new excelPasteContent();
-				aResult = aResult.getDefaultPasteContent(worksheet, this.activeRange.r1, this.activeRange.c1, text);
-				
+				var aResult = this._getTableFromText(worksheet, text);
 				if(aResult && !(aResult.onlyImages && window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 				{
 					worksheet.setSelectionInfo('paste', aResult, this);
@@ -2447,15 +2453,23 @@
 				return res;
 			},
 			
-			_getTableFromText: function (sText)
+			_getTableFromText: function (worksheet, sText)
 			{
+				var activeRange = worksheet.model.selectionRange.getLast().clone(true);
 				var t = this;
+				
+				var addTextIntoCell = function(row, col, text)
+				{
+					var cell = aResult.getCell(rowCounter, colCounter);
+					cell.content[0] = {text: text, format: {}};
+					
+					return cell;
+				};
 				
 				var aResult = new excelPasteContent();
 				var width = 0;
-				var colCounter = 0;
-				var rowCounter = 0;
-				var sCurPar = "";
+				var colCounter = activeRange.c1;
+				var rowCounter = activeRange.r1;
 				var sCurChar = "";
 				for ( var i = 0, length = sText.length; i < length; i++ )
 				{
@@ -2463,44 +2477,27 @@
 					var Code = sText.charCodeAt(i);
 					var Item = null;
 					
-					if(colCounter > width)
+					if(colCounter - activeRange.c1 > width)
 					{
-						width = colCounter;
+						width = colCounter - activeRange.c1;
 					}
 					
 					if ( '\n' === Char )
 					{
 						if("" == sCurChar)
 						{
-							var cell = aResult.getCell(rowCounter, colCounter);
-							cell.content[0] = {text: "", format: {}};
-							colCounter = 0;
+							addTextIntoCell(rowCounter, colCounter, sCurChar);
+							colCounter = activeRange.c1;
 							rowCounter++;
-							//sHtml += "<tr><td style='font-family:Calibri'>&nbsp;</td></tr>";
 						}
 						else
 						{
-							var cell = aResult.getCell(rowCounter, colCounter);
-							cell.content[0] = {text: sCurChar, format: {}};
-							colCounter = 0;
-							rowCounter++;
+							addTextIntoCell(rowCounter, colCounter, sCurChar);
+							colCounter = activeRange.c1;
 							
-							//sHtml += "<tr><td><span style='font-family:Calibri;font-size:11pt;white-space:nowrap'>" + sCurChar + "</span></td></tr>";
+							rowCounter++;
 							sCurChar = "";
 						}
-						/*else if(sCurPar != '')
-						{
-							var cell = aResult.getCell(rowCounter, colCounter);
-							cell.content[0] = {text: sCurChar, format: {}};
-							colCounter = 0;
-							rowCounter++;
-							
-							//sCurPar += "<td><span style='font-family:Calibri;font-size:11pt;white-space:nowrap'>" + sCurChar + "</span></td>";
-							//sHtml += "<tr>" + sCurPar + "</tr>";
-							
-							sCurChar = "";
-							sCurPar = "";
-						}*/
 					}
 					else if ( 13 === Code )
 					{
@@ -2514,29 +2511,20 @@
 						}
 						else if ( 9 === Code )//tab
 						{
-							var cell = aResult.getCell(rowCounter, colCounter);
-							cell.content[0] = {text: sCurChar, format: {}};
+							addTextIntoCell(rowCounter, colCounter, sCurChar);
+							
 							colCounter++;
-							/*sCurPar += "<td><span style='font-family:Calibri;font-size:11pt;white-space:nowrap'>" +  sCurChar + "</span></td>";
-							if(i == length - 1)
-							{
-								sHtml += "<tr>" + sCurPar + "</tr>";
-							}*/
-							sCurChar = '';
+							sCurChar = "";
 						}
 						else
 						{
 							sCurChar += t._copyPasteCorrectString(Char);
-							if(i == length - 1)
-							{
-								var cell = aResult.getCell(rowCounter, colCounter);
-								cell.content[0] = {text: sCurChar, format: {}};
-								
-								//sCurPar += "<td><span style='font-family:Calibri;font-size:11pt;white-space:nowrap'>" +  sCurChar + "</span></td>";
-								//sHtml += "<tr>" + sCurPar + "</tr>";
-							}
 						}
-							
+						
+						if(i == length - 1)
+						{
+							addTextIntoCell(rowCounter, colCounter, sCurChar);
+						}	
 					}
 				}
 				
@@ -2822,9 +2810,6 @@
 					this.aResult.deleteCell(row + this.maxLengthRowCount, col)
 				};
 	
-				//if(!aResult[row])
-					//aResult[row] = [];
-					
 				var s = 0;
 				var c1 = col !== undefined ? col : activeRange.c1;
 				
@@ -2840,9 +2825,9 @@
 				
 				//горизонтальное выравнивание
 				var horisonalAlign = this._getAlignHorisontal(paraPr);
-				if(horisonalAlign)
+				/*if(horisonalAlign)
 					oNewItem.a = horisonalAlign;
-				else if(horisonalAlign == null)
+				else*/ if(horisonalAlign == null)
 					oNewItem.wrap = true;
 					
 				//вертикальное выравнивание

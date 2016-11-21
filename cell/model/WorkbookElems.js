@@ -4721,12 +4721,16 @@ CellArea.prototype = {
 		//for drawing preview
 		this.canvas = null;
 
+		this.worksheet = null;
 		this.Id = null;
 		if (addId) {
 			this.Id = AscCommon.g_oIdCounter.Get_NewId();
 			AscCommon.g_oTableId.Add(this, this.Id);
 		}
 	}
+	sparklineGroup.prototype.getObjectType = function () {
+		return AscDFH.historyitem_type_Sparkline;
+	};
 	sparklineGroup.prototype.Get_Id = function () {
 		return this.Id;
 	};
@@ -4771,6 +4775,12 @@ CellArea.prototype = {
 				if (null !== data.newPr) {
 					w.WriteLong(data.newPr.getType());
 					data.newPr.Write_ToBinary2(w);
+				}
+				break;
+			case AscCH.historyitem_Sparkline_F:
+				w.WriteBool(null !== data.newPr);
+				if (null !== data.newPr) {
+					w.WriteString2(data.newPr);
 				}
 				break;
 		}
@@ -4870,11 +4880,29 @@ CellArea.prototype = {
 			case AscCH.historyitem_Sparkline_ColorLow:
 				this.colorLow = readColor(r);
 				break;
+			case AscCH.historyitem_Sparkline_F:
+				this.f = r.GetBool() ? r.GetString2() : null;
+				break;
 		}
 		this.cleanCache();
 	};
-	sparklineGroup.prototype.Undo = function (type, data) {
-		switch (type) {
+	sparklineGroup.prototype.Write_ToBinary2 = function (w) {
+		w.WriteLong(this.getObjectType());
+		w.WriteString2(this.Id);
+		w.WriteString2(this.worksheet ? this.worksheet.getId() : '-1');
+	};
+	sparklineGroup.prototype.Read_FromBinary2 = function (r) {
+		this.Id = r.GetString2();
+
+		// ToDDo не самая лучшая схема добавления на лист...
+		var api_sheet = Asc['editor'];
+		this.worksheet = api_sheet.wbModel.getWorksheetById(r.GetString2());
+		if (this.worksheet) {
+			this.worksheet.insertSparkline(this);
+		}
+	};
+	sparklineGroup.prototype.Undo = function (data) {
+		switch (data.Type) {
 			case AscCH.historyitem_Sparkline_Type:
 				this.type = data.oldPr;
 				break;
@@ -4949,6 +4977,9 @@ CellArea.prototype = {
 				break;
 			case AscCH.historyitem_Sparkline_ColorLow:
 				this.colorLow = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_F:
+				this.f = data.oldPr;
 				break;
 		}
 
@@ -5031,6 +5062,9 @@ CellArea.prototype = {
 			case AscCH.historyitem_Sparkline_ColorLow:
 				this.colorLow = data.newPr;
 				break;
+			case AscCH.historyitem_Sparkline_F:
+				this.f = data.newPr;
+				break;
 		}
 		this.cleanCache();
 	};
@@ -5065,6 +5099,9 @@ CellArea.prototype = {
 		this.colorHigh = new RgbColor(defaultOtherColor);
 		this.colorLow = new RgbColor(defaultOtherColor);
 	};
+	sparklineGroup.prototype.setWorksheet = function (worksheet) {
+		this.worksheet = worksheet;
+	};
 	sparklineGroup.prototype.set = function (val) {
 		var t = this;
 		var checkProperty = function(propOld, propNew, type) {
@@ -5075,7 +5112,7 @@ CellArea.prototype = {
 			return propOld;
 		};
 		var getColor = function (color) {
-			return color instanceof Asc.asc_CColor ? CorrectAscColor(color) : color;
+			return color instanceof Asc.asc_CColor ? CorrectAscColor(color) : color ? color.clone(): color;
 		};
 
 		History.Create_NewPoint();
@@ -5108,39 +5145,15 @@ CellArea.prototype = {
 		this.colorHigh = checkProperty(this.colorHigh, getColor(val.colorHigh), AscCH.historyitem_Sparkline_ColorHigh);
 		this.colorLow = checkProperty(this.colorLow, getColor(val.colorLow), AscCH.historyitem_Sparkline_ColorLow);
 
+		this.colorLow = checkProperty(this.f, val.f, AscCH.historyitem_Sparkline_F);
+
 		this.cleanCache();
 
 		History.EndTransaction();
 	};
 	sparklineGroup.prototype.clone = function (onlyProps) {
 		var res = new sparklineGroup(!onlyProps);
-		res.Id = this.Id;
-		res.lineWeight = this.lineWeight;
-		res.type = this.type;
-		res.dateAxis = this.dateAxis;
-		res.displayEmptyCellsAs = this.displayEmptyCellsAs;
-		res.markers = this.markers;
-		res.high = this.high;
-		res.low = this.low;
-		res.first = this.first;
-		res.last = this.last;
-		res.negative = this.negative;
-		res.displayXAxis = this.displayXAxis;
-		res.displayHidden = this.displayHidden;
-		res.minAxisType = this.minAxisType;
-		res.maxAxisType = this.maxAxisType;
-		res.rightToLeft = this.rightToLeft;
-		res.manualMax = this.manualMax;
-		res.manualMin = this.manualMin;
-
-		res.colorSeries = this.colorSeries ? this.colorSeries.clone() : null;
-		res.colorNegative = this.colorNegative ? this.colorNegative.clone() : null;
-		res.colorAxis = this.colorAxis ? this.colorAxis.clone() : null;
-		res.colorMarkers = this.colorMarkers ? this.colorMarkers.clone() : null;
-		res.colorFirst = this.colorFirst ? this.colorFirst.clone() : null;
-		res.colorLast = this.colorLast ? this.colorLast.clone() : null;
-		res.colorHigh = this.colorHigh ? this.colorHigh.clone() : null;
-		res.colorLow = this.colorLow ? this.colorLow.clone() : null;
+		res.set(this);
 		res.f = this.f;
 
 		if (!onlyProps) {
@@ -5200,22 +5213,22 @@ CellArea.prototype = {
 		return null !== this.displayEmptyCellsAs ? this.displayEmptyCellsAs : Asc.c_oAscEDispBlanksAs.Zero;
 	};
 	sparklineGroup.prototype.asc_getMarkersPoint = function () {
-		return this.markers;
+		return !!this.markers;
 	};
 	sparklineGroup.prototype.asc_getHighPoint = function () {
-		return this.high;
+		return !!this.high;
 	};
 	sparklineGroup.prototype.asc_getLowPoint = function () {
-		return this.low;
+		return !!this.low;
 	};
 	sparklineGroup.prototype.asc_getFirstPoint = function () {
-		return this.first;
+		return !!this.first;
 	};
 	sparklineGroup.prototype.asc_getLastPoint = function () {
-		return this.last;
+		return !!this.last;
 	};
 	sparklineGroup.prototype.asc_getNegativePoint = function () {
-		return this.negative;
+		return !!this.negative;
 	};
 	sparklineGroup.prototype.asc_getDisplayXAxis = function () {
 		return this.displayXAxis;
@@ -5224,10 +5237,10 @@ CellArea.prototype = {
 		return this.displayHidden;
 	};
 	sparklineGroup.prototype.asc_getMinAxisType = function () {
-		return this.minAxisType;
+		return null !== this.minAxisType ? this.minAxisType : Asc.c_oAscSparklineAxisMinMax.Individual;
 	};
 	sparklineGroup.prototype.asc_getMaxAxisType = function () {
-		return this.maxAxisType;
+		return null !== this.maxAxisType ? this.minAxisType : Asc.c_oAscSparklineAxisMinMax.Individual;
 	};
 	sparklineGroup.prototype.asc_getRightToLeft = function () {
 		return this.rightToLeft;

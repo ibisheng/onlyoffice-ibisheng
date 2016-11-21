@@ -2207,6 +2207,7 @@ CTableId.prototype.Read_Class_FromBinary = function(Reader)
         case AscDFH.historyitem_type_PropLocker               : Element = new AscCommonSlide.PropLocker(); break;
         case AscDFH.historyitem_type_Theme                    : Element = new AscFormat.CTheme(); break;
         case AscDFH.historyitem_type_GraphicFrame             : Element = new AscFormat.CGraphicFrame(); break;
+		case AscDFH.historyitem_type_Sparkline                : Element = new AscCommonExcel.sparklineGroup(false); break;
     }
 
     if ( null !== Element )

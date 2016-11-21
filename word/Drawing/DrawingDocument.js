@@ -2354,12 +2354,45 @@ function CDrawingDocument()
 		this.m_oWordControl.OnScroll();
 	}
 
+	this.CheckPagesSizeMaximum = function(_w, _h)
+	{
+		var w = _w;
+		var h = _h;
+
+		// заглушка под мобильную версию (iPad не рисует большие картинки (наверное страховка по памяти))
+		if (g_bIsMobile)
+		{
+			var _mobile_max = 2500;
+			if (w > _mobile_max || h > _mobile_max)
+			{
+				if (w > h)
+				{
+					h = (h * _mobile_max / w) >> 0;
+					w = _mobile_max;
+				}
+				else
+				{
+					w = (w * _mobile_max / h) >> 0;
+					h = _mobile_max;
+				}
+			}
+		}
+
+		return [w, h];
+	}
+
 	this.CheckRecalculatePage = function (width, height, pageIndex)
 	{
 		var _drawingPage = this.m_arrPages[pageIndex].drawingPage;
 		var isUnlock = false;
 		if (_drawingPage.cachedImage != null && _drawingPage.cachedImage.image != null && (width != _drawingPage.cachedImage.image.width || height != _drawingPage.cachedImage.image.height))
 			isUnlock = true;
+		if (_drawingPage.cachedImage != null && _drawingPage.cachedImage.image != null)
+		{
+			var _check = this.CheckPagesSizeMaximum(width, height);
+			if (_check[0] != _drawingPage.cachedImage.image.width || _check[1] != _drawingPage.cachedImage.image.height)
+				isUnlock = true;
+		}
 
 		if (_drawingPage.IsRecalculate)
 		{
@@ -2398,24 +2431,9 @@ function CDrawingDocument()
 			h *= 2;
 		}
 
-		// заглушка под мобильную версию (iPad не рисует большие картинки (наверное страховка по памяти))
-		if (g_bIsMobile)
-		{
-			var _mobile_max = 2000;
-			if (w > _mobile_max || h > _mobile_max)
-			{
-				if (w > h)
-				{
-					h = (h * _mobile_max / w) >> 0;
-					w = _mobile_max;
-				}
-				else
-				{
-					w = (w * _mobile_max / h) >> 0;
-					h = _mobile_max;
-				}
-			}
-		}
+		var _check = this.CheckPagesSizeMaximum(w, h);
+		w = _check[0];
+		h = _check[1];
 
 		page.drawingPage.UnLock(this.m_oCacheManager);
 		page.drawingPage.cachedImage = this.m_oCacheManager.Lock(w, h);
