@@ -4721,6 +4721,7 @@ CellArea.prototype = {
 		//for drawing preview
 		this.canvas = null;
 
+		this.worksheet = null;
 		this.Id = null;
 		if (addId) {
 			this.Id = AscCommon.g_oIdCounter.Get_NewId();
@@ -5076,6 +5077,9 @@ CellArea.prototype = {
 		this.colorLast = new RgbColor(defaultOtherColor);
 		this.colorHigh = new RgbColor(defaultOtherColor);
 		this.colorLow = new RgbColor(defaultOtherColor);
+	};
+	sparklineGroup.prototype.setWorksheet = function (worksheet) {
+		this.worksheet = worksheet;
 	};
 	sparklineGroup.prototype.set = function (val) {
 		var t = this;
