@@ -8376,15 +8376,14 @@
         }
     };
 
-    WorksheetView.prototype.emptySelection = function ( options ) {
-        // Удаляем выделенные графичекие объекты
-        if ( this.objectRender.selectedGraphicObjectsExists() ) {
-            this.objectRender.controller.deleteSelectedObjects();
-        }
-        else {
-            this.setSelectionInfo( "empty", options );
-        }
-    };
+	WorksheetView.prototype.emptySelection = function (options) {
+		// Удаляем выделенные графичекие объекты
+		if (this.objectRender.selectedGraphicObjectsExists()) {
+			this.objectRender.controller.deleteSelectedObjects();
+		} else {
+			this.setSelectionInfo("empty", options);
+		}
+	};
 
     WorksheetView.prototype.setSelectionInfo = function (prop, val, onlyActive, isLocal, sortColor) {
         // Проверка глобального лока
@@ -8496,7 +8495,7 @@
                         range.removeHyperlink(null, true);
                         break;
                     case "border":
-                        if (isLargeRange) {
+                        if (isLargeRange && !callTrigger) {
                             callTrigger = true;
                             t.handlers.trigger("slowOperation", true);
                         }
@@ -8522,7 +8521,7 @@
                         range.setBorder(res);
                         break;
                     case "merge":
-                        if (isLargeRange) {
+                        if (isLargeRange && !callTrigger) {
                             callTrigger = true;
                             t.handlers.trigger("slowOperation", true);
                         }
@@ -8546,7 +8545,7 @@
                         break;
 
                     case "sort":
-                        if (isLargeRange) {
+                        if (isLargeRange && !callTrigger) {
                             callTrigger = true;
                             t.handlers.trigger("slowOperation", true);
                         }
@@ -8554,7 +8553,7 @@
                         break;
 
                     case "empty":
-                        if (isLargeRange) {
+                        if (isLargeRange && !callTrigger) {
                             callTrigger = true;
                             t.handlers.trigger("slowOperation", true);
                         }
