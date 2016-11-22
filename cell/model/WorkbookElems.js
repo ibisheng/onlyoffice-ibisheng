@@ -4702,7 +4702,7 @@ CellArea.prototype = {
 		this.manualMax = null;
 		this.manualMin = null;
 
-		this.dateAxis = false;
+		this.dateAxis = null;
 
 		// elements
 		this.colorSeries = null;
@@ -5085,6 +5085,7 @@ CellArea.prototype = {
 		this.rightToLeft = false;
 		this.manualMax = null;
 		this.manualMin = null;
+		this.dateAxis = false;
 
 		// elements
 		var defaultSeriesColor = 3629202;
