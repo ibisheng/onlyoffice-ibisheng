@@ -1233,7 +1233,7 @@
 
 					var dKoef                     = (100 * AscCommon.g_dKoef_pix_to_mm / this.HtmlPage.m_nZoomValue);
 					global_mouseEvent.KoefPixToMM = 5;
-					if (this.LogicDocument.DrawingObjects.isPointInDrawingObjects2(pos.X, pos.Y, pos.Page))
+					if (this.LogicDocument.DrawingObjects.isPointInDrawingObjects3(pos.X, pos.Y, pos.Page))
 					{
 						bIsKoefPixToMM = true;
 						this.Mode      = MobileTouchMode.FlowObj;
