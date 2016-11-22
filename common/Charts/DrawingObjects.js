@@ -1722,7 +1722,7 @@ function DrawingObjects() {
         var shape = track_object.getShape(false, _this.drawingDocument, this);
         shape.spPr.setFill(AscFormat.CreateNoFillUniFill());
         //shape.setParent(this);
-        shape.txBody.content.Content[0].Add_ToContent(0, oParaContent);
+        shape.txBody.content.Content[0].Add_ToContent(0, oParaContent.Copy());
         var body_pr = shape.getBodyPr();
         var w = shape.txBody.getMaxContentWidth(150, true) + body_pr.lIns + body_pr.rIns;
         var h = shape.txBody.content.Get_SummaryHeight() + body_pr.tIns + body_pr.bIns;
