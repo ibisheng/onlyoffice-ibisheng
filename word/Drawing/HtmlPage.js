@@ -3121,6 +3121,9 @@ function CEditorPage(api)
 
 	this.OnCalculatePagesPlace = function()
 	{
+		if (this.MobileTouchManager && !this.MobileTouchManager.IsWorkedPosition())
+			this.MobileTouchManager.ClearContextMenu();
+
 		var canvas = this.m_oEditor.HtmlElement;
 		if (null == canvas)
 			return;

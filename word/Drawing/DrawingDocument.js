@@ -2179,6 +2179,9 @@ function CDrawingDocument()
 	{
 		this.m_lCountCalculatePages = pageCount;
 		//console.log("start " + this.m_lCountCalculatePages);
+
+		if (this.m_oWordControl && this.m_oWordControl.MobileTouchManager)
+			this.m_oWordControl.MobileTouchManager.ClearContextMenu();
 	}
 
 	this.OnRepaintPage = function (index)
@@ -6067,7 +6070,7 @@ function CDrawingDocument()
 	this.OnSelectEnd = function ()
 	{
 		if (this.m_oWordControl && this.m_oWordControl.MobileTouchManager)
-			this.m_oWordControl.MobileTouchManager.CheckSelectEnd(false);
+			this.m_oWordControl.MobileTouchManager.CheckSelectRects();
 	}
 
 	// mouse events

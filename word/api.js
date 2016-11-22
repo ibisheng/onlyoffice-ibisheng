@@ -1739,6 +1739,9 @@ background-repeat: no-repeat;\
 			this.sync_TextPosition(TextPr.Position);
 			this.sync_TextLangCallBack(TextPr.Lang);
 			this.sync_TextColor(TextPr);
+
+			if (this.isMobileVersion)
+				this.sendEvent("asc_onTextShd", new Asc.asc_CParagraphShd(TextPr.Shd));
 		}
 	};
 	asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
