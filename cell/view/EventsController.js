@@ -1537,7 +1537,8 @@
 
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseWheel = function (event) {
-			if (this.isFillHandleMode || this.isMoveRangeMode || this.isMoveResizeRange) {
+			var ctrlKey = event.metaKey || event.ctrlKey;
+			if (this.isFillHandleMode || this.isMoveRangeMode || this.isMoveResizeRange || ctrlKey) {
 				return true;
 			}
 

@@ -5297,7 +5297,9 @@ PasteProcessor.prototype =
         var dMaxSum = 0;
         var nCurColWidth = 0;
         var nCurSum = 0;
+		var nAllSum = 0;
         var oRowSpans = {};
+		var columnSize = this.oLogicDocument ? this.oLogicDocument.GetColumnSize() : null;
         var fParseSpans = function()
         {
             var spans = oRowSpans[nCurColWidth];
@@ -5361,6 +5363,7 @@ PasteProcessor.prototype =
                         nCurColWidth += nColSpan;
                     }
                 }
+				nAllSum += nCurSum;
                 fParseSpans();
                 //������� ������ rowspan
                 if(nMinRowSpanCount > 1)
@@ -5426,7 +5429,16 @@ PasteProcessor.prototype =
                 {
                     var nDif = nCurIndex - nPrevIndex;
                     if(1 == nDif)
-                        aGrid.push(nCurWidth);
+					{
+						if(!nCurWidth && !nAllSum && columnSize)
+						{
+							aGrid.push(columnSize.W / nMaxColCount);
+						}
+						else
+						{
+							aGrid.push(nCurWidth);
+						}
+					} 
                     else
                     {
                         var nPartVal = nCurWidth / nDif;

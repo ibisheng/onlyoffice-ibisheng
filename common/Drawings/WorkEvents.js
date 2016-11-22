@@ -841,6 +841,7 @@
 		this.HtmlPage        = null;
 
 		this.Mode = 0;
+		this.IsTouching		= false;
 
 		this.ReadingGlassTime  = 750;
 		this.TimeDown          = 0;
@@ -884,7 +885,9 @@
 		this.TableCurrentMoveValueMin = null;
 		this.TableCurrentMoveValueMax = null;
 
-		this.ShowMenuTimerId = -1;
+		this.ContextMenuLastMode 		= 0; // 0 - none, 1 - target, 2 - select (text), 3 - object(s)
+		this.ContextMenuLastModeCounter = 0;
+		this.ContextMenuShowTimerId = -1;
 
 		this.Init = function(ctrl)
 		{
@@ -900,7 +903,7 @@
 			});
 
 			LoadMobileImages();
-		}
+		};
 
 		this.MoveCursorToPoint = function(e)
 		{
@@ -918,10 +921,23 @@
 			this.DrawingDocument.NeedScrollToTargetFlag = false;
 
 			global_mouseEvent.ClickCount = old_click_count;
-		}
+		};
+
+		this.IsWorkedPosition = function()
+		{
+			if (this.IsTouching)
+				return true;
+
+			if (this.iScroll && this.iScroll.animating)
+				return true;
+
+			return false;
+		};
 
 		this.onTouchStart = function(e)
 		{
+			this.IsTouching = true;
+
 			if (null != this.DrawingDocument.m_oDocumentRenderer)
 				return this.onTouchStart_renderer(e);
 
@@ -1387,7 +1403,7 @@
 					e.returnValue = false;
 				return false;
 			}
-		}
+		};
 		this.onTouchMove  = function(e)
 		{
 			if (null != this.DrawingDocument.m_oDocumentRenderer)
@@ -1585,20 +1601,23 @@
 				default:
 					break;
 			}
-		}
+		};
 		this.onTouchEnd   = function(e)
 		{
+			this.IsTouching = false;
+
 			if (null != this.DrawingDocument.m_oDocumentRenderer)
 				return this.onTouchEnd_renderer(e);
 
 			if (this.Mode != MobileTouchMode.FlowObj && this.Mode != MobileTouchMode.TableMove)
             {
-
 				check_MouseUpEvent(e.changedTouches ? e.changedTouches[0] : e);
             }
 
 			this.ScrollH = this.HtmlPage.m_dScrollX;
 			this.ScrollV = this.HtmlPage.m_dScrollY;
+
+			var isCheckContextMenuMode = true;
 
 			switch (this.Mode)
 			{
@@ -1636,6 +1655,7 @@
 					{
 						// нужно запускать анимацию скролла, если она есть
 						// TODO:
+						isCheckContextMenuMode = false;
 						this.iScroll._end(e);
 					}
 
@@ -1650,6 +1670,7 @@
 					this.HtmlPage.OnScroll();
 
 					this.Mode = MobileTouchMode.None;
+					isCheckContextMenuMode = false;
 					break;
 				}
 				case MobileTouchMode.InlineObj:
@@ -1786,9 +1807,9 @@
 				return false;
 			}
 
-			// если есть селект - то показать меню
-			this.CheckSelectEnd(true);
-		}
+			if (!this.iScroll.animating)
+				this.CheckContextMenuTouchEnd(isCheckContextMenuMode);
+		};
 
 		this.onTouchStart_renderer = function(e)
 		{
@@ -1851,7 +1872,7 @@
 				e.preventDefault();
 			else
 				e.returnValue = false;
-		}
+		};
 		this.onTouchMove_renderer  = function(e)
 		{
 			check_MouseMoveEvent(e.touches ? e.touches[0] : e);
@@ -1915,7 +1936,7 @@
 				e.preventDefault();
 			else
 				e.returnValue = false;
-		}
+		};
 		this.onTouchEnd_renderer   = function(e)
 		{
 			check_MouseUpEvent(e.changedTouches ? e.changedTouches[0] : e);
@@ -1957,48 +1978,7 @@
 				e.preventDefault();
 			else
 				e.returnValue = false;
-		}
-
-		this.CheckSelectEnd = function(bIsAttack)
-		{
-			var _bIsRet = false;
-			if (!bIsAttack)
-				_bIsRet = this.IsTrackingCurrent;
-
-			if (_bIsRet)
-				return;
-
-			if (null != this.RectSelect1 && null != this.RectSelect2 && !this.HtmlPage.m_oApi.isViewMode)
-			{
-				var _matrix = this.DrawingDocument.SelectionMatrix;
-
-				var pos1 = null;
-				var pos4 = null;
-
-				if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
-				{
-					pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1);
-					pos4 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h, this.PageSelect2);
-				}
-				else
-				{
-					var _x1 = _matrix.TransformPointX(this.RectSelect1.x, this.RectSelect1.y);
-					var _y1 = _matrix.TransformPointY(this.RectSelect1.x, this.RectSelect1.y);
-
-					var _x2 = _matrix.TransformPointX(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h);
-					var _y2 = _matrix.TransformPointY(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h);
-
-					pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(_x1, _y1, this.PageSelect1);
-					pos4 = this.DrawingDocument.ConvertCoordsToCursorWR(_x2, _y2, this.PageSelect2);
-				}
-
-				var _x = (pos1.X + pos4.X) >> 1;
-				var _y = pos1.Y;
-
-				if (!this.iScroll.animating)
-					this.SendShowMenu(_x, _y);
-			}
-		}
+		};
 
 		this.CheckZoomCriticalValues = function(zoomMin)
 		{
@@ -2036,64 +2016,211 @@
 				this.ZoomValue = this.ZoomValueMin;
 				this.HtmlPage.m_oApi.zoom(this.ZoomValue);
 			}
-		}
+		};
 
 		this.Resize = function()
 		{
 			if (this.iScroll != null)
 				this.iScroll.refresh(true);
-		}
+		};
 
-		this.SendShowMenu = function(x, y)
+		this.SendShowContextMenu = function()
 		{
-			if (-1 != this.ShowMenuTimerId)
+			if (-1 != this.ContextMenuShowTimerId)
 			{
-				clearTimeout(this.ShowMenuTimerId);
+				clearTimeout(this.ContextMenuShowTimerId);
 			}
 			var that             = this;
-			that.ShowMenuTimerId = setTimeout(function()
+			this.ContextMenuShowTimerId = setTimeout(function()
 			{
-				that.HtmlPage.m_oApi.sendEvent("asc_onShowPopMenu", x, y);
+				var _pos = that.GetContextMenuPosition();
+				that.HtmlPage.m_oApi.sendEvent("asc_onShowPopMenu", _pos.X, _pos.Y, (_pos.Mode > 1) ? true : false);
 			}, 500);
-		}
+		};
+
+		this.GetContextMenuPosition = function()
+		{
+			var _posX = 0;
+			var _posY = 0;
+			var _page = 0;
+			var _transform = null;
+			var tmpX, tmpY, tmpX2, tmpY2;
+			var _pos = null;
+
+			var _mode = 0;
+
+			var _target = this.LogicDocument.Is_SelectionUse();
+			if (_target === false)
+			{
+				_posX = this.DrawingDocument.m_dTargetX;
+				_posY = this.DrawingDocument.m_dTargetY;
+				_page = this.DrawingDocument.m_lTargetPage;
+				_transform = this.DrawingDocument.TextMatrix;
+
+				if (_transform)
+				{
+					tmpX = _transform.TransformPointX(_posX, _posY);
+					tmpY = _transform.TransformPointY(_posX, _posY);
+				}
+				else
+				{
+					tmpX = _posX;
+					tmpY = _posY;
+				}
+
+				_pos = this.DrawingDocument.ConvertCoordsToCursorWR(tmpX, tmpY, _page);
+				_posX = _pos.X;
+				_posY = _pos.Y;
+
+				_mode = 1;
+			}
+
+			var _select = this.LogicDocument.Get_SelectionBounds();
+			if (_select)
+			{
+				var _rect1 = _select.Start;
+				var _rect2 = _select.End;
+
+				tmpX = _rect1.X;
+				tmpY = _rect1.Y;
+				tmpX2 = _rect2.X + _rect2.W;
+				tmpY2 = _rect2.Y + _rect2.H;
+
+				_transform = this.DrawingDocument.SelectionMatrix;
+
+				if (_transform)
+				{
+					_posX = _transform.TransformPointX(tmpX, tmpY);
+					_posY = _transform.TransformPointY(tmpX, tmpY);
+
+					tmpX = _posX;
+					tmpY = _posY;
+
+					_posX = _transform.TransformPointX(tmpX2, tmpY2);
+					_posY = _transform.TransformPointY(tmpX2, tmpY2);
+
+					tmpX2 = _posX;
+					tmpY2 = _posY;
+				}
+
+				_pos = this.DrawingDocument.ConvertCoordsToCursorWR(tmpX, tmpY, _rect1.Page);
+				_posX = _pos.X;
+				_posY = _pos.Y;
+
+				_pos = this.DrawingDocument.ConvertCoordsToCursorWR(tmpX2, tmpY2, _rect2.Page);
+				_posX += _pos.X;
+				_posX = _posX >> 1;
+
+				_mode = 2;
+			}
+
+			var _object_bounds = this.LogicDocument.DrawingObjects.getSelectedObjectsBounds();
+			if ((0 == _mode) && _object_bounds)
+			{
+				_pos = this.DrawingDocument.ConvertCoordsToCursorWR(_object_bounds.minX, _object_bounds.minY, _object_bounds.pageIndex);
+				_posX = _pos.X;
+				_posY = _pos.Y;
+
+				_pos = this.DrawingDocument.ConvertCoordsToCursorWR(_object_bounds.maxX, _object_bounds.maxY, _object_bounds.pageIndex);
+				_posX += _pos.X;
+				_posX = _posX >> 1;
+
+				_mode = 3;
+			}
+
+			return { X : _posX, Y : _posY, Mode : _mode };
+		};
+
+		this.GetContextMenuType = function()
+		{
+			var _mode = 0;
+
+			if (!this.LogicDocument.Is_SelectionUse())
+				_mode = 1; // target
+
+			if (this.LogicDocument.Get_SelectionBounds())
+				_mode = 2; // select
+
+			if (_mode == 0 && this.LogicDocument.DrawingObjects.getSelectedObjectsBounds())
+				_mode = 3; // object
+
+			return _mode;
+		};
+
+		this.CheckContextMenuTouchEnd = function(isCheck)
+		{
+			// isCheck: если пришли сюда после скролла или зума (или их анимации) - то не нужно проверять состояние редактора.
+			// Нужно проверять последнее сохраненной состояние
+
+			if (isCheck)
+			{
+				var _mode = this.GetContextMenuType();
+				if (_mode == this.ContextMenuLastMode)
+				{
+					this.ContextMenuLastModeCounter++;
+					this.ContextMenuLastModeCounter &= 0x01;
+				}
+				else
+					this.ContextMenuLastModeCounter = 0;
+
+				this.ContextMenuLastMode = _mode;
+			}
+
+			if (this.ContextMenuLastMode > 0 && 1 == this.ContextMenuLastModeCounter)
+				this.SendShowContextMenu();
+		};
+
+		this.ClearContextMenu = function()
+		{
+			this.ContextMenuLastMode 		= 0;
+			this.ContextMenuLastModeCounter = 0;
+			this.HtmlPage.m_oApi.sendEvent("asc_onHidePopMenu");
+		};
 
 		this.OnScrollAnimationEnd = function()
 		{
 			if (this.HtmlPage.m_oApi.isViewMode)
 				return;
 
-			if (null != this.RectSelect1 && null != this.RectSelect2)
-			{
-				var pos1 = null;
-				var pos4 = null;
+			this.CheckContextMenuTouchEnd(false);
+		};
 
-				var _matrix = this.DrawingDocument.SelectionMatrix;
-				if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
-				{
-					pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1);
-					pos4 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h, this.PageSelect2);
-				}
-				else
-				{
-					var _x1 = _matrix.TransformPointX(this.RectSelect1.x, this.RectSelect1.y);
-					var _y1 = _matrix.TransformPointY(this.RectSelect1.x, this.RectSelect1.y);
+		this.CheckSelectRects = function()
+		{
+			this.RectSelect1 = null;
+			this.RectSelect2 = null;
 
-					var _x2 = _matrix.TransformPointX(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h);
-					var _y2 = _matrix.TransformPointY(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h);
+			if (!this.LogicDocument)
+				return;
 
-					pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(_x1, _y1, this.PageSelect1);
-					pos4 = this.DrawingDocument.ConvertCoordsToCursorWR(_x2, _y2, this.PageSelect2);
-				}
+			var _select = this.LogicDocument.Get_SelectionBounds();
+			if (!_select)
+				return;
 
-				var _x = (pos1.X + pos4.X) >> 1;
-				var _y = pos1.Y;
+			var _rect1 = _select.Start;
+			var _rect2 = _select.End;
 
-				this.SendShowMenu(_x, _y);
-			}
-		}
+			if (!_rect1 || !_rect2)
+				return;
+
+			this.RectSelect1 	= new AscCommon._rect();
+			this.RectSelect1.x 	= _rect1.X;
+			this.RectSelect1.y 	= _rect1.Y;
+			this.RectSelect1.w 	= _rect1.W;
+			this.RectSelect1.h 	= _rect1.H;
+			this.PageSelect1 	= _rect1.Page;
+
+			this.RectSelect2 	= new AscCommon._rect();
+			this.RectSelect2.x 	= _rect2.X;
+			this.RectSelect2.y 	= _rect2.Y;
+			this.RectSelect2.w 	= _rect2.W;
+			this.RectSelect2.h 	= _rect2.H;
+			this.PageSelect2 	= _rect2.Page;
+		};
 
 		this.CheckSelect = function(overlay)
 		{
+			this.CheckSelectRects();
 			if (null == this.RectSelect1 || null == this.RectSelect2)
 				return;
 
@@ -2201,10 +2328,11 @@
 				overlay.AddEllipse(pos4.X, pos4.Y + 5, 5);
 				ctx.fill();
 			}
-		}
+		};
 
 		this.CheckSelect2 = function(overlay)
 		{
+			this.CheckSelectRects();
 			if (null == this.RectSelect1 || null == this.RectSelect2)
 				return;
 
@@ -2315,7 +2443,7 @@
 				overlay.CheckRect(_x1, _y1, _w, _h);
 				overlay.CheckRect(_x2, _y2, _w, _h);
 			}
-		}
+		};
 
 		this.CheckTableRules = function(overlay)
 		{
@@ -2562,7 +2690,7 @@
 					}
 				}
 			}
-		}
+		};
 
 		this.CheckTableRules2 = function(overlay)
 		{
@@ -2855,7 +2983,7 @@
 					}
 				}
 			}
-		}
+		};
 	}
 
 	function CReaderTouchManager()

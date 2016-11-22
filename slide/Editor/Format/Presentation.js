@@ -4050,6 +4050,38 @@ CPresentation.prototype =
                         {
                             NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
                             paragraph.Check_NearestPos(NearPos);
+
+
+                            var ParaNearPos = NearPos.Paragraph.Get_ParaNearestPos(NearPos);
+                            if (null === ParaNearPos || ParaNearPos.Classes.length < 2)
+                                return;
+
+                            var LastClass = ParaNearPos.Classes[ParaNearPos.Classes.length - 1];
+                            if (para_Math_Run === LastClass.Type)
+                            {
+                                // Проверяем, что вставляемый контент тоже формула
+                                var Element = Content.DocContent.Elements[0].Element;
+                                if (1 !== Content.DocContent.Elements.length || type_Paragraph !== Element.Get_Type() || null === LastClass.Parent)
+                                    return;
+
+                                var Math  = null;
+                                var Count = Element.Content.length;
+                                for (var Index = 0; Index < Count; Index++)
+                                {
+                                    var Item = Element.Content[Index];
+                                    if (para_Math === Item.Type && null === Math)
+                                        Math = Element.Content[Index];
+                                    else if (true !== Item.Is_Empty({SkipEnd : true}))
+                                        return;
+                                }
+                            }
+                            else if (para_Run !== LastClass.Type)
+                                return;
+
+                            if (null === paragraph.Parent || undefined === paragraph.Parent)
+                                return;
+
+
                             target_doc_content.Insert_Content(Content.DocContent, NearPos);
                         }
                         var oTargetTextObject = AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects);

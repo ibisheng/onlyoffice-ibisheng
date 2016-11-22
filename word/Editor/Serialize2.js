@@ -400,7 +400,8 @@ var c_oSerRunType = {
 	footnoteRef: 24,
 	endnoteRef: 25,
 	footnoteReference: 26,
-	endnoteReference: 27
+	endnoteReference: 27,
+	arPr: 28
 };
 var c_oSerImageType = {
     MediaId:0,
@@ -2032,7 +2033,7 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter, sav
 			var color = null;
 			if (null != border.Color)
 				color = border.Color;
-			else if (null != border.Unifill) {
+			else if (null != border.Unifill && editor && editor.WordControl && editor.WordControl.m_oLogicDocument) {
 				var doc = editor.WordControl.m_oLogicDocument;
 				border.Unifill.check(doc.Get_Theme(), doc.Get_ColorMap());
 				var RGBA = border.Unifill.getRGBAColor();
@@ -2157,7 +2158,7 @@ function Binary_rPrWriter(memory, saveParams)
         var color = null;
         if (null != rPr.Color )
             color = rPr.Color;
-        else if (null != rPr.Unifill) {
+		else if (null != rPr.Unifill && editor && editor.WordControl && editor.WordControl.m_oLogicDocument) {
             var doc = editor.WordControl.m_oLogicDocument;
             rPr.Unifill.check(doc.Get_Theme(), doc.Get_ColorMap());
             var RGBA = rPr.Unifill.getRGBAColor();
@@ -2670,13 +2671,19 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
         if (oElem.Get_ReviewType) {
             ReviewType = oElem.Get_ReviewType();
         }
-        if (reviewtype_Remove == ReviewType || reviewtype_Add == ReviewType && oElem.ReviewInfo) {
-            var brPrs = new Binary_rPrWriter(this.memory, this.saveParams);
-            var recordType = reviewtype_Remove == ReviewType ? c_oSerRunType.del : c_oSerRunType.ins;
-            this.bs.WriteItem(recordType, function(){WriteTrackRevision(oThis.bs, oThis.saveParams.trackRevisionId++, oElem.ReviewInfo, {brPrs: brPrs, rPr: oElem.CtrPrp});});
-        } else {
-            this.bs.WriteItem(c_oSerRunType.rPr, function(){oThis.brPrs.Write_rPr(oElem.CtrPrp, null, null);});
-        }
+		if (oElem.Is_FromDocument()) {
+			if (reviewtype_Remove == ReviewType || reviewtype_Add == ReviewType && oElem.ReviewInfo) {
+				var brPrs = new Binary_rPrWriter(this.memory, this.saveParams);
+				var recordType = reviewtype_Remove == ReviewType ? c_oSerRunType.del : c_oSerRunType.ins;
+				this.bs.WriteItem(recordType, function(){WriteTrackRevision(oThis.bs, oThis.saveParams.trackRevisionId++, oElem.ReviewInfo, {brPrs: brPrs, rPr: oElem.CtrPrp});});
+			} else {
+				this.bs.WriteItem(c_oSerRunType.rPr, function(){oThis.brPrs.Write_rPr(oElem.CtrPrp, null, null);});
+			}
+		} else {
+			this.bs.WriteItem(c_oSerRunType.arPr, function() {
+				pptx_content_writer.WriteRunProperties(oThis.memory, oElem.CtrPrp);
+			});
+		}
 	}
 	this.WriteDegHide = function(DegHide)
 	{
@@ -10598,6 +10605,8 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
 			var MathTextRPr = new CTextPr();
 			res = this.brPrr.Read(length, MathTextRPr, null);
 			props.ctrPrp = MathTextRPr;
+		} else if (c_oSerRunType.arPr === type) {
+			props.ctrPrp = pptx_content_loader.ReadRunProperties(this.stream);
 		} else if (c_oSerRunType.del === type) {
             var rPrChange = new CTextPr();
             var reviewInfo = new CReviewInfo();
