@@ -4738,11 +4738,13 @@ CellArea.prototype = {
 		w.WriteLong(data.Type);
 		switch (data.Type) {
 			case AscCH.historyitem_Sparkline_Type:
-			case AscCH.historyitem_Sparkline_LineWeight:
 			case AscCH.historyitem_Sparkline_DisplayEmptyCellsAs:
 			case AscCH.historyitem_Sparkline_MinAxisType:
 			case AscCH.historyitem_Sparkline_MaxAxisType:
 				w.WriteLong(data.newPr);
+				break;
+			case AscCH.historyitem_Sparkline_LineWeight:
+				w.WriteDouble2(data.newPr);
 				break;
 			case AscCH.historyitem_Sparkline_Markers:
 			case AscCH.historyitem_Sparkline_High:
@@ -4760,7 +4762,7 @@ CellArea.prototype = {
 			case AscCH.historyitem_Sparkline_ManualMin:
 				w.WriteBool(null !== data.newPr);
 				if (null !== data.newPr) {
-					w.WriteLong(data.newPr);
+					w.WriteDouble2(data.newPr);
 				}
 				break;
 			case AscCH.historyitem_Sparkline_ColorSeries:
@@ -4809,7 +4811,7 @@ CellArea.prototype = {
 				this.type = r.GetLong();
 				break;
 			case AscCH.historyitem_Sparkline_LineWeight:
-				this.lineWeight = r.GetLong();
+				this.lineWeight = r.GetDoubleLE();
 				break;
 			case AscCH.historyitem_Sparkline_DisplayEmptyCellsAs:
 				this.displayEmptyCellsAs = r.GetLong();
@@ -4851,10 +4853,10 @@ CellArea.prototype = {
 				this.dateAxis = r.GetBool();
 				break;
 			case AscCH.historyitem_Sparkline_ManualMax:
-				this.manualMax = r.GetBool() ? r.GetLong() : null;
+				this.manualMax = r.GetBool() ? r.GetDoubleLE() : null;
 				break;
 			case AscCH.historyitem_Sparkline_ManualMin:
-				this.manualMin = r.GetBool() ? r.GetLong() : null;
+				this.manualMin = r.GetBool() ? r.GetDoubleLE() : null;
 				break;
 			case AscCH.historyitem_Sparkline_ColorSeries:
 				this.colorSeries = readColor(r);
