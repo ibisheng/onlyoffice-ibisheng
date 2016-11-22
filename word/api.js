@@ -8463,6 +8463,11 @@ background-repeat: no-repeat;\
 	{
 		this.IsSpellCheckCurrentWord = value;
 	};
+	window["asc_docs_api"].prototype["asc_setParagraphStylesSizes"] = function(width, height)
+	{
+		GlobalSkin.STYLE_THUMBNAIL_WIDTH = width;
+		GlobalSkin.STYLE_THUMBNAIL_HEIGHT = height;
+	};
 
 	// desktop editor spellcheck
 	function CSpellCheckApi_desktop()
