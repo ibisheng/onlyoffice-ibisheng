@@ -5146,7 +5146,7 @@ CellArea.prototype = {
 		this.colorHigh = checkProperty(this.colorHigh, getColor(val.colorHigh), AscCH.historyitem_Sparkline_ColorHigh);
 		this.colorLow = checkProperty(this.colorLow, getColor(val.colorLow), AscCH.historyitem_Sparkline_ColorLow);
 
-		this.colorLow = checkProperty(this.f, val.f, AscCH.historyitem_Sparkline_F);
+		this.f = checkProperty(this.f, val.f, AscCH.historyitem_Sparkline_F);
 
 		this.cleanCache();
 
