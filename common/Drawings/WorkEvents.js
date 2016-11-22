@@ -1961,6 +1961,8 @@
 
 		this.CheckSelectEnd = function(bIsAttack)
 		{
+			this.CheckSelectRects();
+
 			var _bIsRet = false;
 			if (!bIsAttack)
 				_bIsRet = this.IsTrackingCurrent;
@@ -2092,8 +2094,42 @@
 			}
 		}
 
+		this.CheckSelectRects = function()
+		{
+			this.RectSelect1 = null;
+			this.RectSelect2 = null;
+
+			if (!this.LogicDocument)
+				return;
+
+			var _select = this.LogicDocument.Get_SelectionBounds();
+			if (!_select)
+				return;
+
+			var _rect1 = _select.Start;
+			var _rect2 = _select.End;
+
+			if (!_rect1 || !_rect2)
+				return;
+
+			this.RectSelect1 	= new AscCommon._rect();
+			this.RectSelect1.x 	= _rect1.X;
+			this.RectSelect1.y 	= _rect1.Y;
+			this.RectSelect1.w 	= _rect1.W;
+			this.RectSelect1.h 	= _rect1.H;
+			this.PageSelect1 	= _rect1.Page;
+
+			this.RectSelect2 	= new AscCommon._rect();
+			this.RectSelect2.x 	= _rect2.X;
+			this.RectSelect2.y 	= _rect2.Y;
+			this.RectSelect2.w 	= _rect2.W;
+			this.RectSelect2.h 	= _rect2.H;
+			this.PageSelect2 	= _rect2.Page;
+		}
+
 		this.CheckSelect = function(overlay)
 		{
+			this.CheckSelectRects();
 			if (null == this.RectSelect1 || null == this.RectSelect2)
 				return;
 
@@ -2205,6 +2241,7 @@
 
 		this.CheckSelect2 = function(overlay)
 		{
+			this.CheckSelectRects();
 			if (null == this.RectSelect1 || null == this.RectSelect2)
 				return;
 
