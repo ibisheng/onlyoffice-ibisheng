@@ -658,29 +658,8 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             chart_space.setWorksheet(worksheetView.model);
         }
 
-
         chart_space.displayHidden = oSparklineGroup.displayHidden;
-        chart_space.displayEmptyCellsAs = oSparklineGroup.displayEmptyCellsAs;
-
-        switch(oSparklineGroup.asc_getDisplayEmpty())
-        {
-            case Asc.c_oAscEDispBlanksAs.Span:
-            {
-                chart_space.displayEmptyCellsAs = 0;
-                break;
-            }
-            case Asc.c_oAscEDispBlanksAs.Gap:
-            {
-                chart_space.displayEmptyCellsAs = 1;
-                break;
-            }
-            case Asc.c_oAscEDispBlanksAs.Zero:
-            {
-                chart_space.displayEmptyCellsAs = 2;
-                break;
-            }
-        }
-        chart_space.displayHidden = oSparklineGroup.displayHidden;
+        chart_space.displayEmptyCellsAs = oSparklineGroup.asc_getDisplayEmpty();
         settings.putTitle(c_oAscChartTitleShowSettings.none);
         settings.putHorAxisLabel(c_oAscChartTitleShowSettings.none);
         settings.putVertAxisLabel(c_oAscChartTitleShowSettings.none);
