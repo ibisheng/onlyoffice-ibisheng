@@ -1730,6 +1730,7 @@ function DrawingObjects() {
         shape.spPr.xfrm.setExtY(h);
         shape.spPr.xfrm.setOffX(0);
         shape.spPr.xfrm.setOffY(0);
+        shape.spPr.setLn(AscFormat.CreateNoFillLine());
         shape.setWorksheet(worksheet.model);
         //shape.addToDrawingObjects();
         return shape;
