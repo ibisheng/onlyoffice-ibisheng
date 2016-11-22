@@ -631,7 +631,7 @@ CChartsDrawer.prototype =
 		this.calcProp.chartGutter._top = calculateTop ? calculateTop * pxToMM : top * pxToMM;
 		this.calcProp.chartGutter._bottom = calculateBottom ? calculateBottom * pxToMM : bottom * pxToMM;
 
-        if(chartSpace.chart.plotArea.chart.getObjectType() == AscDFH.historyitem_type_PieChart){
+        if(chartSpace.chart.plotArea.chart.getObjectType() == AscDFH.historyitem_type_PieChart || chartSpace.chart.plotArea.chart.getObjectType() == AscDFH.historyitem_type_DoughnutChart){
             if(chartSpace.chart.plotArea.layout){
                 var oLayout = chartSpace.chart.plotArea.layout;
                 this.calcProp.chartGutter._left = chartSpace.calculatePosByLayout(this.calcProp.chartGutter._left/pxToMM, oLayout.xMode, oLayout.x,
