@@ -3769,13 +3769,13 @@ function OfflineEditor () {
         _api = new window["Asc"]["spreadsheet_api"]({});
 
         var userInfo = new Asc.asc_CUserInfo();
-        userInfo.asc_putId(this.initSettings["userId"]);
-        userInfo.asc_putFullName(this.initSettings["fullName"]);
-        userInfo.asc_putFirstName(this.initSettings["firstName"]);
-        userInfo.asc_putLastName(this.initSettings["lastName"]);
+        userInfo.asc_putId(this.initSettings["docUserId"]);
+        userInfo.asc_putFullName(this.initSettings["docUserName"]);
+        userInfo.asc_putFirstName(this.initSettings["docUserFirstName"]);
+        userInfo.asc_putLastName(this.initSettings["docUserLastName"]);
 
         var docInfo = new Asc.asc_CDocInfo();
-        docInfo.put_Id(this.initSettings["documentId"]);
+        docInfo.put_Id(this.initSettings["docKey"]);
         docInfo.put_UserInfo(userInfo);
        
         _api.asc_setDocInfo(docInfo);
@@ -3935,11 +3935,11 @@ function OfflineEditor () {
                                   
             var rData = {
                          "c"             : "open",
-                         "id"            : t.initSettings["documentId"],
-                         "userid"        : t.initSettings["userId"],
+                         "id"            : t.initSettings["docKey"],
+                         "userid"        : t.initSettings["docUserId"],
                          "format"        : "xlsx",
                          "vkey"          : undefined,
-                         "url"           : this.documentUrl,
+                         "url"           : t.initSettings["docURL"],
                          "title"         : this.documentTitle,
                          "embeddedfonts" : false};
                             
