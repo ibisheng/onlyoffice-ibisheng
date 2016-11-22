@@ -5450,6 +5450,7 @@ CellArea.prototype = {
 	};
 
 	sparklineGroup.prototype.asc_getStyles = function () {
+		History.TurnOff();
 		var aRet = [];
 		var nStyleIndex = -1;
 		var oSparklineGroup = this.clone(true);
@@ -5479,6 +5480,7 @@ CellArea.prototype = {
 			aRet.push(canvas.toDataURL("image/png"));
 		}
 		aRet.push(nStyleIndex);
+		History.TurnOn();
 		return aRet;
 	};
 
