@@ -2963,33 +2963,10 @@ function DrawingObjects() {
         if(!worksheet)
             return;
         AscFormat.ExecuteNoHistory(function(){
-            var i;
             var wsViews = Asc["editor"].wb.wsViews;
             var changedArr = [];
-            if(data.changedRange)
-            {
-                changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.changedRange.c1, data.changedRange.r1, data.changedRange.c2, data.changedRange.r2)))
-            }
-            if(data.added)
-            {
-                changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.added.c1, data.added.r1, gc_nMaxCol, gc_nMaxRow)))
-            }
-
-            if(data.hided)
-            {
-                changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.hided.c1, data.hided.r1, data.hided.c2, data.hided.r2)))
-            }
-
-            if(data.removed)
-            {
-                changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.removed.c1, data.removed.r1, gc_nMaxCol, gc_nMaxRow)))
-            }
-            if(Array.isArray(data.arrChanged))
-            {
-                for(i = 0; i < data.arrChanged.length; ++i)
-                {
-                    changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.arrChanged[i].c1, data.arrChanged[i].r1, data.arrChanged[i].c2, data.arrChanged[i].r2)))
-                }
+            for (var i = 0; i < data.length; ++i) {
+                changedArr.push(new BBoxInfo(worksheet.model, data[i]));
             }
 
             for(i = 0; i < wsViews.length; ++i)
