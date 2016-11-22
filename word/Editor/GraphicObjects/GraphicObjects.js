@@ -2867,11 +2867,11 @@ CGraphicObjects.prototype =
         return this.isPointInDrawingObjects(x, y, pageIndex, bSelected, true) > -1;
     },
 
-    isPointInDrawingObjects3: function(x, y, pageIndex, bSelected)
+    isPointInDrawingObjects3: function(x, y, pageIndex)
     {
         var oOldState = this.curState;
         this.changeCurrentState(new AscFormat.NullState(this));
-        var bRet = this.isPointInDrawingObjects(x, y, pageIndex, bSelected, true) > -1;
+        var bRet = this.isPointInDrawingObjects(x, y, pageIndex, true, true) > -1;
         this.changeCurrentState(oOldState);
         return bRet;
     },
