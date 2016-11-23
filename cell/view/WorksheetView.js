@@ -7035,6 +7035,21 @@
                 cell_info.isLocked = true;
             }
         }
+		
+		if(null !== curTablePart){
+			var tableAr = curTablePart.Ref.clone();
+			var isTableIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, tableAr);
+			if (false === isTableIntersection) {
+				var tableLockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId,
+				new AscCommonExcel.asc_CCollaborativeRange(tableAr.c1, tableAr.r1, tableAr.c2, tableAr.r2));
+				
+				if (false !== this.collaborativeEditing.getLockIntersection(tableLockInfo, c_oAscLockTypes.kLockTypeOther,
+					/*bCheckOnlyLockAll*/false)){
+					// Уже таблицу кто-то редактирует
+					cell_info.isLockedTable = true;
+				}
+			}
+		}
 
         cell_info.sparklineInfo = this.model.getSparklineGroup(c1, r1);
 

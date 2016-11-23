@@ -263,6 +263,7 @@
     this.hyperlink = null;
     this.comments = [];
     this.isLocked = false;
+    this.isLockedTable = null;
     this.styleName = null;
     this.numFormatType = null;
     this.angle = null;
@@ -312,6 +313,9 @@
   };
   asc_CCellInfo.prototype.asc_getLocked = function () {
     return this.isLocked;
+  };
+  asc_CCellInfo.prototype.asc_getLockedTable = function () {
+    return this.isLockedTable;
   };
   asc_CCellInfo.prototype.asc_getStyleName = function () {
     return this.styleName;
@@ -456,6 +460,7 @@
   prot["asc_getHyperlink"] = prot.asc_getHyperlink;
   prot["asc_getComments"] = prot.asc_getComments;
   prot["asc_getLocked"] = prot.asc_getLocked;
+  prot["asc_getLockedTable"] = prot.asc_getLockedTable;
   prot["asc_getStyleName"] = prot.asc_getStyleName;
   prot["asc_getNumFormatType"] = prot.asc_getNumFormatType;
   prot["asc_getAngle"] = prot.asc_getAngle;
