@@ -1811,6 +1811,19 @@ DrawingObjectsController.prototype =
 
     setParagraphAlign: function(align)
     {
+        if(!this.document){
+            var oContent = this.getTargetDocContent(true, false);
+            if(oContent){
+                var oInfo = new CSelectedElementsInfo();
+                oContent.Get_SelectedElementsInfo(oInfo);
+                var Math         = oInfo.Get_Math();
+                if (null !== Math && true !== Math.Is_Inline())
+                {
+                    Math.Set_Align(align);
+                    return;
+                }
+            }
+        }
         this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphAlign, [align], CTable.prototype.Set_ParagraphAlign);
     },
 
