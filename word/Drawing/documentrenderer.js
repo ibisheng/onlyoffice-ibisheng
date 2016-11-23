@@ -504,13 +504,16 @@ CDocMeta.prototype =
 
     drawPage : function(pageIndex, g)
     {
+        // если пришла отрисовка - то точно надо перерисовать (изменился размер)
+		this.stopRenderingPage(pageIndex);
+
         var drObject = new CDrawingObject(this);
         drObject.Page = pageIndex;
         drObject.StreamPos = this.Pages[pageIndex].start;
         drObject.Graphics = g;
 
         this.Drawings[this.Drawings.length] = drObject;
-        this.OnImageLoad(drObject);
+		this.OnImageLoad(drObject);
     },
 
     stopRenderingPage : function(pageIndex)
