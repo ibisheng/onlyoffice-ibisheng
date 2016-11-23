@@ -2955,11 +2955,11 @@ function CEditorPage(api)
 				drDoc.private_EndDrawSelection();
 
 				if (this.MobileTouchManager)
-					this.MobileTouchManager.CheckSelect2(overlay);
+					this.MobileTouchManager.CheckSelect(overlay);
 			}
 
 			if (this.MobileTouchManager)
-				this.MobileTouchManager.CheckTableRules2(overlay);
+				this.MobileTouchManager.CheckTableRules(overlay);
 
 			ctx.globalAlpha = 1.0;
 
