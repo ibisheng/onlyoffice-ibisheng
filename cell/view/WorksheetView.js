@@ -8311,18 +8311,14 @@
 		var oTables = t.model.autoFilters._searchFiltersInRange(arnFrom, true);
         var onApplyMoveRangeHandleCallback = function (isSuccess) {
             if (false === isSuccess) {
-                if (copyRange && oTables && !t.handlers.trigger("getLockDefNameManagerStatus")) {
-					t.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
-				}
+				t.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedAllError, c_oAscError.Level.NoCritical);
 				t._cleanSelectionMoveRange();
                 return;
             }
 
             var onApplyMoveAutoFiltersCallback = function (isSuccess) {
                 if (false === isSuccess) {
-					if (copyRange && oTables && !t.handlers.trigger("getLockDefNameManagerStatus")) {
-						t.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
-					}
+					t.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedAllError, c_oAscError.Level.NoCritical);
 					t._cleanSelectionMoveRange();
                     return;
                 }
