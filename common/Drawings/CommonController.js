@@ -1008,6 +1008,34 @@ DrawingObjectsController.prototype =
         }
     },
 
+    startEditCurrentOleObject: function(){
+        var oSelector = this.selection.groupSelection ? this.selection.groupSelection : this;
+        var oThis = this;
+        if(oSelector.selectedObjects.length === 1 && oSelector.selectedObjects[0].getObjectType() === AscDFH.historyitem_type_OleObject){
+            var oleObject = oSelector.selectedObjects[0];
+            this.checkSelectedObjectsAndFireCallback(function(){
+                var pluginData = new Asc.CPluginData();
+                pluginData.setAttribute("data", oleObject.m_sData);
+                pluginData.setAttribute("guid", oleObject.m_sApplicationId);
+                pluginData.setAttribute("width", oleObject.extX);
+                pluginData.setAttribute("height", oleObject.extY);
+                pluginData.setAttribute("widthPix", oleObject.m_nPixWidth);
+                pluginData.setAttribute("heightPix", oleObject.m_nPixHeight);
+                pluginData.setAttribute("objectId", oleObject.Id);
+
+                if (window["Asc"]["editor"]) {
+                    window["Asc"]["editor"].asc_pluginRun(oleObject.m_sApplicationId, 0, pluginData);
+                }
+                else {
+                    if (editor){
+                        editor.asc_pluginRun(oleObject.m_sApplicationId, 0, pluginData);
+                    }
+                }
+            }, []);
+        }
+    },
+
+
     checkSelectedObjectsForMove: function(group, pageIndex)
     {
         var selected_object = group ? group.selectedObjects : this.selectedObjects;

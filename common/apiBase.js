@@ -905,6 +905,10 @@
 	{
 	};
 
+
+	baseEditorsApi.prototype.asc_startEditCurrentOleObject = function(){
+
+	};
 	// Version History
 	baseEditorsApi.prototype.asc_showRevision   = function(newObj)
 	{

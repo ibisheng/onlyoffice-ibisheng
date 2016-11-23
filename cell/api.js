@@ -2428,6 +2428,13 @@ var editor;
   };
 
 
+    spreadsheet_api.prototype.asc_startEditCurrentOleObject = function(){
+        var ws = this.wb.getWorksheet();
+        if(ws && ws.objectRender){
+            ws.objectRender.startEditCurrentOleObject();
+        }
+    };
+
   spreadsheet_api.prototype.asc_isAddAutoshape = function() {
     return this.isStartAddShape;
   };

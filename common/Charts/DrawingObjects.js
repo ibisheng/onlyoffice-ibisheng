@@ -3554,6 +3554,10 @@ function DrawingObjects() {
         this.controller.editOleObjectFromParams(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight, bResize);
     };
 
+    _this.startEditCurrentOleObject = function(){
+        this.controller.startEditCurrentOleObject();
+    };
+
     _this.groupGraphicObjects = function() {
 
         if ( _this.controller.canGroup() ) {

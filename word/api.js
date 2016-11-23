@@ -5656,6 +5656,10 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 		}
 	};
+
+    asc_docs_api.prototype.asc_startEditCurrentOleObject = function(){
+		this.WordControl.m_oLogicDocument.DrawingObjects.startEditCurrentOleObject();
+    };
 	//-----------------------------------------------------------------
 	// События контекстного меню
 	//-----------------------------------------------------------------
