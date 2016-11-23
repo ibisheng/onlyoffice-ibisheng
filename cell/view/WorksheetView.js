@@ -8316,15 +8316,22 @@
 
     WorksheetView.prototype.moveRangeHandle = function (arnFrom, arnTo, copyRange) {
         var t = this;
+		var oTables = t.model.autoFilters._searchFiltersInRange(arnFrom, true);
         var onApplyMoveRangeHandleCallback = function (isSuccess) {
             if (false === isSuccess) {
-                t._cleanSelectionMoveRange();
+                if (copyRange && oTables && !t.handlers.trigger("getLockDefNameManagerStatus")) {
+					t.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
+				}
+				t._cleanSelectionMoveRange();
                 return;
             }
 
             var onApplyMoveAutoFiltersCallback = function (isSuccess) {
                 if (false === isSuccess) {
-                    t._cleanSelectionMoveRange();
+					if (copyRange && oTables && !t.handlers.trigger("getLockDefNameManagerStatus")) {
+						t.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
+					}
+					t._cleanSelectionMoveRange();
                     return;
                 }
 
