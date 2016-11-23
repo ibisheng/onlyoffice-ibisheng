@@ -11467,8 +11467,15 @@
                 }
             }
         };
-
-        this._isLockedAll(onChangeAutoFilterCallback);
+		
+		if(Asc.c_oAscChangeFilterOptions.style === optionType)
+		{
+			onChangeAutoFilterCallback(true);
+		}
+		else
+		{
+			this._isLockedAll(onChangeAutoFilterCallback);
+		}
     };
 
     WorksheetView.prototype.applyAutoFilter = function (autoFilterObject) {
