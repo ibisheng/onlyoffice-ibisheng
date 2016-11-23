@@ -2377,7 +2377,10 @@ background-repeat: no-repeat;\
 		if (editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
 		{
 			History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-			this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr({Strikeout : value}));
+			this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr({
+                Strikeout  : value,
+                DStrikeout : false
+            }));
 		}
 	};
 	asc_docs_api.prototype.put_PrLineSpacing          = function(Type, Value)
