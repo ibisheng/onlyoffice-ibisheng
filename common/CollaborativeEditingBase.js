@@ -738,7 +738,7 @@ CCollaborativeEditingBase.prototype.InitMemory = function() {
 	{
 		this.m_aChanges = [];
 	};
-	CCollaborativeEditingBase.prorotype.private_CollectOwnChanges = function()
+	CCollaborativeEditingBase.prototype.private_CollectOwnChanges = function()
 	{
 	};
 	CCollaborativeEditingBase.prototype.private_AddOverallChange = function(oChange)
