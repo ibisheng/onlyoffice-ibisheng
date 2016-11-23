@@ -2687,6 +2687,7 @@ Col.prototype =
 var g_nRowFlag_empty = 0;
 var g_nRowFlag_hd = 1;
 var g_nRowFlag_CustomHeight = 2;
+var g_nRowFlag_СalcHeight = 4;
 /**
  * @constructor
  */
@@ -7689,6 +7690,7 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].g_nRowFlag_empty = g_nRowFlag_empty;
 	window['AscCommonExcel'].g_nRowFlag_hd = g_nRowFlag_hd;
 	window['AscCommonExcel'].g_nRowFlag_CustomHeight = g_nRowFlag_CustomHeight;
+	window['AscCommonExcel'].g_nRowFlag_СalcHeight = g_nRowFlag_СalcHeight;
 	window['AscCommonExcel'].Row = Row;
 	window['AscCommonExcel'].CCellValueMultiText = CCellValueMultiText;
 	window['AscCommonExcel'].CCellValue = CCellValue;

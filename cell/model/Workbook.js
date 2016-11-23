@@ -4531,6 +4531,7 @@ Woorksheet.prototype.setRowHeight=function(height, start, stop, isCustom){
             if (isCustom) {
               row.flags |= AscCommonExcel.g_nRowFlag_CustomHeight;
             }
+			row.flags |= AscCommonExcel.g_nRowFlag_СalcHeight;
 			row.flags &= ~AscCommonExcel.g_nRowFlag_hd;
 			var oNewProps = row.getHeightProp();
 			if(false === oOldProps.isEqual(oNewProps))
@@ -4622,6 +4623,7 @@ Woorksheet.prototype.setRowBestFit=function(bBestFit, height, start, stop){
 				row.flags &= ~AscCommonExcel.g_nRowFlag_CustomHeight;
 			else
 				row.flags |= AscCommonExcel.g_nRowFlag_CustomHeight;
+			row.flags |= AscCommonExcel.g_nRowFlag_СalcHeight;
 			row.h = height;
 			var oNewProps = row.getHeightProp();
 			if(false == oOldProps.isEqual(oNewProps))
