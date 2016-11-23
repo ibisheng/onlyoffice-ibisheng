@@ -5299,7 +5299,7 @@ PasteProcessor.prototype =
         var nCurSum = 0;
 		var nAllSum = 0;
         var oRowSpans = {};
-		var columnSize = this.oLogicDocument ? this.oLogicDocument.GetColumnSize() : null;
+		var columnSize = ((!window["Asc"] || (window["Asc"] && window["Asc"]["editor"] === undefined))) && this.oLogicDocument ? this.oLogicDocument.GetColumnSize() : null;
         var fParseSpans = function()
         {
             var spans = oRowSpans[nCurColWidth];
