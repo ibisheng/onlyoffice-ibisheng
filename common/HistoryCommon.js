@@ -2878,6 +2878,10 @@
 	{
 		return null;
 	};
+	CChangesBase.prototype.Merge = function(oChange)
+	{
+		return true;
+	};
 	window['AscDFH'].CChangesBase = CChangesBase;
 	/**
 	 * Базовый класс для изменений, которые меняют содержимое родительского класса.*
@@ -3041,6 +3045,7 @@
 	{
 		var oChange = new fConstructor();
 
+		oChange.Class    = this.Class;
 		oChange.Pos      = this.Pos;
 		oChange.Items    = this.Items;
 		oChange.Add      = !this.Add;
@@ -3051,6 +3056,11 @@
 			oChange.PosArray[nIndex] = this.PosArray[nIndex];
 
 		return oChange;
+	};
+	CChangesBaseContentChange.prototype.Merge = function(oChange)
+	{
+		// TODO: Сюда надо бы перенести работу с ContentChanges
+		return true;
 	};
 	window['AscDFH'].CChangesBaseContentChange = CChangesBaseContentChange;
 	/**
@@ -3083,6 +3093,17 @@
 	{
 		return new this.constructor(this.Class, this.New, this.Old, this.Color);
 	};
+	CChangesBaseProperty.prototype.Merge = function(oChange)
+	{
+		if (oChange.Class === this.Class && oChange.Type === this.Type)
+		{
+			this.New = oChange.New;
+			return false;
+		}
+
+		return true;
+	};
+
 	window['AscDFH'].CChangesBaseProperty = CChangesBaseProperty;
 	/**
 	 * Базовый класс для изменения булевых свойств.

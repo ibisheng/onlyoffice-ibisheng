@@ -88,6 +88,79 @@ function private_ParagraphChangesOnSetValue(oParagraph)
 	oParagraph.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// Карта зависимости изменений
+//----------------------------------------------------------------------------------------------------------------------
+// AscDFH.paragraphChangesRelationMap = {};
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_AddItem]                   = [AscDFH.historyitem_Paragraph_AddItem, AscDFH.historyitem_Paragraph_RemoveItem];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_RemoveItem]                = [AscDFH.historyitem_Paragraph_AddItem, AscDFH.historyitem_Paragraph_RemoveItem];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Numbering]                 = [AscDFH.historyitem_Paragraph_Numbering, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Align]                     = [AscDFH.historyitem_Paragraph_Align, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Ind_First]                 = [AscDFH.historyitem_Paragraph_Ind_First, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Ind_Right]                 = [AscDFH.historyitem_Paragraph_Ind_Right, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Ind_Left]                  = [AscDFH.historyitem_Paragraph_Ind_Left, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_ContextualSpacing]         = [AscDFH.historyitem_Paragraph_ContextualSpacing, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_KeepLines]                 = [AscDFH.historyitem_Paragraph_KeepLines, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_KeepNext]                  = [AscDFH.historyitem_Paragraph_KeepNext, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_PageBreakBefore]           = [AscDFH.historyitem_Paragraph_PageBreakBefore, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Spacing_Line]              = [AscDFH.historyitem_Paragraph_Spacing_Line, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Spacing_LineRule]          = [AscDFH.historyitem_Paragraph_Spacing_LineRule, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Spacing_Before]            = [AscDFH.historyitem_Paragraph_Spacing_Before, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Spacing_After]             = [AscDFH.historyitem_Paragraph_Spacing_After, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Spacing_AfterAutoSpacing]  = [AscDFH.historyitem_Paragraph_Spacing_AfterAutoSpacing, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Spacing_BeforeAutoSpacing] = [AscDFH.historyitem_Paragraph_Spacing_BeforeAutoSpacing, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Shd_Value]                 = [AscDFH.historyitem_Paragraph_Shd_Value, AscDFH.historyitem_Paragraph_Shd, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Shd_Color]                 = [AscDFH.historyitem_Paragraph_Shd_Color, AscDFH.historyitem_Paragraph_Shd, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Shd_Unifill]               = [AscDFH.historyitem_Paragraph_Shd_Unifill, AscDFH.historyitem_Paragraph_Shd, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Shd]                       = [AscDFH.historyitem_Paragraph_Shd_Value, AscDFH.historyitem_Paragraph_Shd_Color, AscDFH.historyitem_Paragraph_Shd_Unifill, AscDFH.historyitem_Paragraph_Shd, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_WidowControl]              = [AscDFH.historyitem_Paragraph_WidowControl, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Tabs]                      = [AscDFH.historyitem_Paragraph_Tabs, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_PStyle]                    = [AscDFH.historyitem_Paragraph_PStyle, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Borders_Between]           = [AscDFH.historyitem_Paragraph_Borders_Between, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Borders_Bottom]            = [AscDFH.historyitem_Paragraph_Borders_Bottom, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Borders_Left]              = [AscDFH.historyitem_Paragraph_Borders_Left, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Borders_Right]             = [AscDFH.historyitem_Paragraph_Borders_Right, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Borders_Top]               = [AscDFH.historyitem_Paragraph_Borders_Top, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Pr]                        = [AscDFH.historyitem_Paragraph_Pr,
+// 	AscDFH.historyitem_Paragraph_Numbering, AscDFH.historyitem_Paragraph_Align, AscDFH.historyitem_Paragraph_Ind_First, AscDFH.historyitem_Paragraph_Ind_Right,
+// 	AscDFH.historyitem_Paragraph_Ind_Left, AscDFH.historyitem_Paragraph_ContextualSpacing, AscDFH.historyitem_Paragraph_KeepLines, AscDFH.historyitem_Paragraph_KeepNext,
+// 	AscDFH.historyitem_Paragraph_PageBreakBefore, AscDFH.historyitem_Paragraph_Spacing_Line, AscDFH.historyitem_Paragraph_Spacing_LineRule, AscDFH.historyitem_Paragraph_Spacing_Before,
+// 	AscDFH.historyitem_Paragraph_Spacing_After, AscDFH.historyitem_Paragraph_Spacing_AfterAutoSpacing, AscDFH.historyitem_Paragraph_Spacing_BeforeAutoSpacing, AscDFH.historyitem_Paragraph_Shd_Value,
+// 	AscDFH.historyitem_Paragraph_Shd_Color, AscDFH.historyitem_Paragraph_Shd_Unifill, AscDFH.historyitem_Paragraph_Shd, AscDFH.historyitem_Paragraph_WidowControl, AscDFH.historyitem_Paragraph_Tabs,
+// 	AscDFH.historyitem_Paragraph_PStyle, AscDFH.historyitem_Paragraph_Borders_Between, AscDFH.historyitem_Paragraph_Borders_Bottom, AscDFH.historyitem_Paragraph_Borders_Left,
+// 	AscDFH.historyitem_Paragraph_Borders_Right, AscDFH.historyitem_Paragraph_Borders_Top, AscDFH.historyitem_Paragraph_PresentationPr_Bullet, AscDFH.historyitem_Paragraph_PresentationPr_Level,
+// 		AscDFH.historyitem_Paragraph_FramePr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_PresentationPr_Bullet]     = [AscDFH.historyitem_Paragraph_PresentationPr_Bullet, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_PresentationPr_Level]      = [AscDFH.historyitem_Paragraph_PresentationPr_Level, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_FramePr]                   = [AscDFH.historyitem_Paragraph_FramePr, AscDFH.historyitem_Paragraph_Pr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_SectionPr]                 = [AscDFH.historyitem_Paragraph_SectionPr];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_PrChange]                  = [AscDFH.historyitem_Paragraph_PrChange];
+// AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_PrReviewInfo]              = [AscDFH.historyitem_Paragraph_PrReviewInfo];
+
+// Общая функция Merge для изменений, которые зависят только от себя и AscDFH.historyitem_Paragraph_Pr
+function private_ParagraphChangesOnMergePr(oChange)
+{
+	if (oChange.Class !== this.Class)
+		return true;
+
+	if (oChange.Type === this.Type || oChange.Type === AscDFH.historyitem_Paragraph_Pr)
+		return false;
+
+	return true;
+}
+// Общая функция Merge для изменений, которые зависят от себя, AscDFH.historyitem_Paragraph_Shd, AscDFH.historyitem_Paragraph_Pr
+function private_ParagraphChangesOnMergeShdPr(oChange)
+{
+	if (oChange.Class !== this.Class)
+		return true;
+
+	if (oChange.Type === this.Type || oChange.Type === AscDFH.historyitem_Paragraph_Pr || oChange.Type === AscDFH.historyitem_Paragraph_Shd)
+		return false;
+
+	return true;
+}
+//----------------------------------------------------------------------------------------------------------------------
+
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -263,6 +336,7 @@ CChangesParagraphNumbering.prototype.private_SetValue = function(Value)
 
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphNumbering.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphNumbering.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -283,6 +357,7 @@ CChangesParagraphAlign.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphAlign.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphAlign.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -307,6 +382,7 @@ CChangesParagraphIndFirst.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphIndFirst.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphIndFirst.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -331,6 +407,7 @@ CChangesParagraphIndLeft.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphIndLeft.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphIndLeft.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -355,6 +432,7 @@ CChangesParagraphIndRight.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphIndRight.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphIndRight.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -375,6 +453,7 @@ CChangesParagraphContextualSpacing.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphContextualSpacing.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphContextualSpacing.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -395,6 +474,7 @@ CChangesParagraphKeepLines.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphKeepLines.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphKeepLines.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -415,6 +495,7 @@ CChangesParagraphKeepNext.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphKeepNext.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphKeepNext.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -435,6 +516,7 @@ CChangesParagraphPageBreakBefore.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphPageBreakBefore.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphPageBreakBefore.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -459,6 +541,7 @@ CChangesParagraphSpacingLine.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphSpacingLine.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphSpacingLine.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -483,6 +566,7 @@ CChangesParagraphSpacingLineRule.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphSpacingLineRule.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphSpacingLineRule.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -507,6 +591,7 @@ CChangesParagraphSpacingBefore.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphSpacingBefore.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphSpacingBefore.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -531,6 +616,7 @@ CChangesParagraphSpacingAfter.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphSpacingAfter.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphSpacingAfter.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -555,6 +641,7 @@ CChangesParagraphSpacingAfterAutoSpacing.prototype.private_SetValue = function(V
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphSpacingAfterAutoSpacing.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphSpacingAfterAutoSpacing.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -579,6 +666,7 @@ CChangesParagraphSpacingBeforeAutoSpacing.prototype.private_SetValue = function(
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphSpacingBeforeAutoSpacing.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphSpacingBeforeAutoSpacing.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -603,6 +691,7 @@ CChangesParagraphShdValue.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphShdValue.prototype.Merge = private_ParagraphChangesOnMergeShdPr;
 CChangesParagraphShdValue.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -631,6 +720,7 @@ CChangesParagraphShdColor.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphShdColor.prototype.Merge = private_ParagraphChangesOnMergeShdPr;
 CChangesParagraphShdColor.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -659,6 +749,7 @@ CChangesParagraphShdUnifill.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphShdUnifill.prototype.Merge = private_ParagraphChangesOnMergeShdPr;
 CChangesParagraphShdUnifill.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -683,6 +774,38 @@ CChangesParagraphShd.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphShd.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type || oChange.Type === AscDFH.historyitem_Paragraph_Pr)
+		return false;
+
+	if (AscDFH.historyitem_Paragraph_Shd_Value === oChange.Type)
+	{
+		if (!this.New)
+			this.New = new CDocumentShd();
+
+		this.New.Value = oChange.New;
+	}
+	else if (AscDFH.historyitem_Paragraph_Shd_Color === oChange.Type)
+	{
+		if (!this.New)
+			this.New = new CDocumentShd();
+
+		this.New.Color = oChange.New;
+	}
+	else if (AscDFH.historyitem_Paragraph_Shd_Unifill === oChange.Type)
+	{
+		if (!this.New)
+			this.New = new CDocumentShd();
+
+		this.New.Unifill = oChange.New;
+	}
+
+	return true;
+};
 CChangesParagraphShd.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -703,6 +826,7 @@ CChangesParagraphWidowControl.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphWidowControl.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphWidowControl.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -727,6 +851,7 @@ CChangesParagraphTabs.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphTabs.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphTabs.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -747,6 +872,7 @@ CChangesParagraphPStyle.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphPStyle.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphPStyle.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -771,6 +897,7 @@ CChangesParagraphBordersBetween.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphBordersBetween.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphBordersBetween.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -795,6 +922,7 @@ CChangesParagraphBordersBottom.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphBordersBottom.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphBordersBottom.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -819,6 +947,7 @@ CChangesParagraphBordersLeft.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphBordersLeft.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphBordersLeft.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -843,6 +972,7 @@ CChangesParagraphBordersRight.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphBordersRight.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphBordersRight.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -867,6 +997,7 @@ CChangesParagraphBordersTop.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphBordersTop.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphBordersTop.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -895,6 +1026,209 @@ CChangesParagraphPr.prototype.private_IsCreateEmptyObject = function()
 {
 	return true;
 };
+CChangesParagraphPr.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return;
+
+	if (AscDFH.historyitem_Paragraph_Pr === oChange.Type)
+		return false;
+
+	if (!this.New)
+		this.New = new CParaPr();
+
+	switch (oChange.Type)
+	{
+		case AscDFH.historyitem_Paragraph_Numbering:
+		{
+			this.New.NumPr = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Align:
+		{
+			this.New.Jc = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Ind_First:
+		{
+			if (!this.New.Ind)
+				this.New.Ind = new CParaInd();
+
+			this.New.Ind.FirstLine = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Ind_Right:
+		{
+			if (!this.New.Ind)
+				this.New.Ind = new CParaInd();
+
+			this.New.Ind.Right = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Ind_Left:
+		{
+			if (!this.New.Ind)
+				this.New.Ind = new CParaInd();
+
+			this.New.Ind.Left = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_ContextualSpacing:
+		{
+			this.New.ContextualSpacing = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_KeepLines:
+		{
+			this.New.KeepLines = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_KeepNext:
+		{
+			this.New.KeepNext = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_PageBreakBefore:
+		{
+			this.New.PageBreakBefore = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Spacing_Line:
+		{
+			if (!this.New.Spacing)
+				this.New.Spacing = new CParaSpacing();
+
+			this.New.Spacing.Line = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Spacing_LineRule:
+		{
+			if (!this.New.Spacing)
+				this.New.Spacing = new CParaSpacing();
+
+			this.New.Spacing.LineRule = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Spacing_Before:
+		{
+			if (!this.New.Spacing)
+				this.New.Spacing = new CParaSpacing();
+
+			this.New.Spacing.Before = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Spacing_After:
+		{
+			if (!this.New.Spacing)
+				this.New.Spacing = new CParaSpacing();
+
+			this.New.Spacing.After = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Spacing_AfterAutoSpacing:
+		{
+			if (!this.New.Spacing)
+				this.New.Spacing = new CParaSpacing();
+
+			this.New.Spacing.AfterAutoSpacing = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Spacing_BeforeAutoSpacing:
+		{
+			if (!this.New.Spacing)
+				this.New.Spacing = new CParaSpacing();
+
+			this.New.Spacing.BeforeAutoSpacing = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Shd_Value:
+		{
+			if (!this.New.Shd)
+				this.New.Shd = new CDocumentShd();
+
+			this.New.Shd.Value = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Shd_Color:
+		{
+			if (!this.New.Shd)
+				this.New.Shd = new CDocumentShd();
+
+			this.New.Shd.Color = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Shd_Unifill:
+		{
+			if (!this.New.Shd)
+				this.New.Shd = new CDocumentShd();
+
+			this.New.Shd.Unifill = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Shd:
+		{
+			this.New.Shd = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_WidowControl:
+		{
+			this.New.WidowControl = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Tabs:
+		{
+			this.New.Tabs = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_PStyle:
+		{
+			this.New.PStyle = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Borders_Between:
+		{
+			this.New.Brd.Between = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Borders_Bottom:
+		{
+			this.New.Brd.Bottom = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Borders_Left:
+		{
+			this.New.Brd.Left = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Borders_Right:
+		{
+			this.New.Brd.Right = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_Borders_Top:
+		{
+			this.New.Brd.Top = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_PresentationPr_Bullet:
+		{
+			this.New.Bullet = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_PresentationPr_Level:
+		{
+			this.New.Lvl = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_FramePr:
+		{
+			this.New.FramePr = oChange.New;
+			break;
+		}
+	}
+
+	return true;
+};
 CChangesParagraphPr.prototype.Load = private_ParagraphChangesOnLoadPr;
 /**
  * @constructor
@@ -910,6 +1244,7 @@ CChangesParagraphPresentationPrBullet.prototype.private_CreateObject = function(
 {
 	return new AscFormat.CBullet();
 };
+CChangesParagraphPresentationPrBullet.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphPresentationPrBullet.prototype.private_SetValue = function(Value)
 {
 	var oParagraph = this.Class;
@@ -929,6 +1264,7 @@ function CChangesParagraphPresentationPrLevel(Class, Old, New, Color)
 }
 AscCommon.extendClass(CChangesParagraphPresentationPrLevel, AscDFH.CChangesBaseLongProperty);
 CChangesParagraphPresentationPrLevel.prototype.Type = AscDFH.historyitem_Paragraph_PresentationPr_Level;
+CChangesParagraphPresentationPrLevel.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphPresentationPrLevel.prototype.private_SetValue = function(Value)
 {
 	var oParagraph = this.Class;
@@ -960,6 +1296,7 @@ CChangesParagraphFramePr.prototype.private_SetValue = function(Value)
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
+CChangesParagraphFramePr.prototype.Merge = private_ParagraphChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -1034,6 +1371,13 @@ CChangesParagraphSectPr.prototype.ReadFromBinary = function(Reader)
 CChangesParagraphSectPr.prototype.CreateReverseChange = function()
 {
 	return new CChangesParagraphSectPr(this.Class, this.New, this.Old);
+};
+CChangesParagraphSectPr.prototype.Merge = function(oChange)
+{
+	if (oChange.Class === this.Class && oChange.Type === this.Type)
+		return false;
+
+	return true;
 };
 /**
  * @constructor
@@ -1158,6 +1502,13 @@ CChangesParagraphPrChange.prototype.ReadFromBinary = function(Reader)
 CChangesParagraphPrChange.prototype.CreateReverseChange = function()
 {
 	return new CChangesParagraphPrChange(this.Class, this.New, this.Old);
+};
+CChangesParagraphPrChange.prototype.Merge = function(oChange)
+{
+	if (oChange.Class === this.Class && oChange.Type === this.Type)
+		return false;
+
+	return true;
 };
 /**
  * @constructor

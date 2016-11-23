@@ -78,9 +78,10 @@ CCollaborativeChanges.prototype.Apply_Data = function()
 	{
 		var oChange = new fChangesClass(Class);
 		oChange.ReadFromBinary(Reader);
-		oChange.Load(this.m_oColor);
 
-		CollaborativeEditing.private_AddOverallChange(oChange);
+		if (true === CollaborativeEditing.private_AddOverallChange(oChange))
+			oChange.Load(this.m_oColor);
+
 		return true;
 	}
 	else
@@ -420,6 +421,9 @@ CCollaborativeEditingBase.prototype.Apply_OtherChanges = function()
     // Чтобы заново созданные параграфы не отображались залоченными
     AscCommon.g_oIdCounter.Set_Load( true );
 
+    if (this.m_aChanges.length > 0)
+    	this.private_CollectOwnChanges();
+
     // Применяем изменения, пока они есть
     var _count = this.m_aChanges.length;
     for (var i = 0; i < _count; i++)
@@ -733,6 +737,9 @@ CCollaborativeEditingBase.prototype.InitMemory = function() {
 	CCollaborativeEditingBase.prototype.private_ClearChanges = function()
 	{
 		this.m_aChanges = [];
+	};
+	CCollaborativeEditingBase.prorotype.private_CollectOwnChanges = function()
+	{
 	};
 	CCollaborativeEditingBase.prototype.private_AddOverallChange = function(oChange)
 	{

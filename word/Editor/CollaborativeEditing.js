@@ -50,6 +50,8 @@ function CWordCollaborativeEditing()
 
     this.m_aAllChanges        = []; // Список всех изменений
 	this.m_aOwnChangesIndexes = []; // Список номеров своих изменений в общем списке, которые мы можем откатить
+
+	this.m_oOwnChanges        = [];
 }
 
 AscCommon.extendClass(CWordCollaborativeEditing, AscCommon.CCollaborativeEditingBase);
@@ -598,9 +600,38 @@ CWordCollaborativeEditing.prototype.private_ClearChanges = function()
 {
 	this.m_aChanges = [];
 };
+CWordCollaborativeEditing.prototype.private_CollectOwnChanges = function()
+{
+	var StartPoint = ( null === AscCommon.History.SavedIndex ? 0 : AscCommon.History.SavedIndex + 1 );
+	var LastPoint  = -1;
+
+	if (this.m_nUseType <= 0)
+		LastPoint = AscCommon.History.Points.length - 1;
+	else
+		LastPoint = AscCommon.History.Index;
+
+	for (var PointIndex = StartPoint; PointIndex <= LastPoint; PointIndex++)
+	{
+		var Point = AscCommon.History.Points[PointIndex];
+		for (var Index = 0; Index < Point.Items.length; Index++)
+		{
+			var Item = Point.Items[Index];
+			if (Item.Data.IsChangesClass && Item.Data.IsChangesClass())
+				this.m_oOwnChanges.push(Item.Data);
+		}
+	}
+};
 CWordCollaborativeEditing.prototype.private_AddOverallChange = function(oChange)
 {
+	// Здесь мы должны смержить пришедшее изменение с одним из наших изменений
+	for (var nIndex = 0, nCount = this.m_oOwnChanges.length; nIndex < nCount; ++nIndex)
+	{
+		if (false === oChange.Merge(this.m_oOwnChanges[nIndex]))
+			return false;
+	}
+
 	this.m_aAllChanges.push(oChange);
+	return true;
 };
 CWordCollaborativeEditing.prototype.private_OnSendOwnChanges = function(arrChanges, nDeleteIndex)
 {
@@ -621,6 +652,9 @@ CWordCollaborativeEditing.prototype.private_OnSendOwnChanges = function(arrChang
 };
 CWordCollaborativeEditing.prototype.Undo = function()
 {
+	if (true === this.Get_GlobalLock())
+		return;
+
 	if (this.m_aOwnChangesIndexes.length <= 0)
 		return false;
 
@@ -667,6 +701,35 @@ CWordCollaborativeEditing.prototype.Undo = function()
 
 	// Удаляем запись о последнем изменении
 	this.m_aOwnChangesIndexes.length = this.m_aOwnChangesIndexes.length - 1;
+
+	var arrReverseChanges = [];
+	for (var nIndex = 0, nCount = arrChanges.length; nIndex < nCount; ++nIndex)
+	{
+		var oReverseChange = arrChanges[nIndex].CreateReverseChange();
+		if (oReverseChange)
+			arrReverseChanges.splice(0, 0, oReverseChange);
+	}
+
+
+
+
+
+	var oLogicDocument = this.m_oLogicDocument;
+
+	oLogicDocument.DrawingDocument.EndTrackTable(null, true);
+	oLogicDocument.DrawingObjects.TurnOffCheckChartSelection();
+
+	for (var nIndex = arrReverseChanges.length - 1; nIndex >= 0; --nIndex)
+	{
+		arrReverseChanges[nIndex].Load();
+	}
+
+	oLogicDocument.DrawingObjects.TurnOnCheckChartSelection();
+	oLogicDocument.Recalculate(false, false, AscCommon.History.Get_RecalcData(null, arrReverseChanges));
+
+	oLogicDocument.Document_UpdateSelectionState();
+	oLogicDocument.Document_UpdateInterfaceState();
+	oLogicDocument.Document_UpdateRulersState();
 };
 CWordCollaborativeEditing.prototype.CanUndo = function()
 {

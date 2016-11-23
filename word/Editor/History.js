@@ -857,12 +857,21 @@ CHistory.prototype =
       return false;
     },
 
-    Get_RecalcData : function(RecalcData)
+    Get_RecalcData : function(RecalcData, arrChanges)
     {
         if (RecalcData)
         {
             this.RecalculateData = RecalcData;
         }
+        else if (arrChanges)
+		{
+			this.Internal_RecalcData_Clear();
+			for (var nIndex = 0, nCount = arrChanges.length; nIndex < nCount; ++nIndex)
+			{
+				var oChange = arrChanges[nIndex];
+				oChange.RefreshRecalcData();
+			}
+		}
         else
         {
             if (this.Index >= 0)
