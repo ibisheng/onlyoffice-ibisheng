@@ -13574,7 +13574,7 @@ function parseSeriesHeaders (ws, rangeBBox) {
             {
                 for(j = nColStart; j <= rangeBBox.c2; ++j)
                 {
-                    cell = ws.getCell3(rangeBBox.r1, i);
+                    cell = ws.getCell3(i, j);
                     value = cell.getValue();
                     numFormatType= cell.getNumFormatType();
                     if (numFormatType !== c_oAscNumFormatType.Time && numFormatType !== c_oAscNumFormatType.Date && value !== "")
