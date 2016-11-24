@@ -2679,7 +2679,7 @@ PasteProcessor.prototype =
 									presentationSelectedContent.Drawings[i].Drawing.setBDeleted(true);
 								}
 							}, this, []);
-							presentationSelectedContent.Drawings[i].Drawing = presentationSelectedContent.Drawings[i].Drawing.convertToPPTX(oThis.oDocument.DrawingDocument);
+							presentationSelectedContent.Drawings[i].Drawing = presentationSelectedContent.Drawings[i].Drawing.convertToPPTX(oThis.oDocument.DrawingDocument, undefined, true);
 						  AscFormat.checkBlipFillRasterImages(presentationSelectedContent.Drawings[i].Drawing);
 						}
 					}
@@ -2693,7 +2693,7 @@ PasteProcessor.prototype =
 				{
 					if(!(presentationSelectedContent.Drawings[i].Drawing instanceof CGraphicFrame))
 					{
-						presentationSelectedContent.Drawings[i].Drawing = presentationSelectedContent.Drawings[i].Drawing.convertToPPTX(oThis.oDocument.DrawingDocument);
+						presentationSelectedContent.Drawings[i].Drawing = presentationSelectedContent.Drawings[i].Drawing.convertToPPTX(oThis.oDocument.DrawingDocument, undefined, true);
 						AscFormat.checkBlipFillRasterImages(presentationSelectedContent.Drawings[i].Drawing);
 					}
 				}

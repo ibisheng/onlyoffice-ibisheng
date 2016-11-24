@@ -1740,7 +1740,7 @@
 						{
 							graphicObject.bDeleted = true;
 						}
-						graphicObject = graphicObject.convertToPPTX(ws.model.DrawingDocument, ws.model);
+						graphicObject = graphicObject.convertToPPTX(ws.model.DrawingDocument, ws.model, true);
 					}
 					
 					
