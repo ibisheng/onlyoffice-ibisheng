@@ -8380,8 +8380,11 @@
                 History.EndTransaction();
             };
 
-            if (t.model.autoFilters._searchFiltersInRange(arnFrom)) {
+            if (t.model.autoFilters._searchFiltersInRange(arnFrom, true)) {
                 t._isLockedAll(onApplyMoveAutoFiltersCallback);
+				if(copyRange){
+					t._isLockedDefNames(null, null);
+				}
             } else {
                 onApplyMoveAutoFiltersCallback();
             }
