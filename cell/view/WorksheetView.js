@@ -8763,13 +8763,10 @@
 
         //добавляем автофильтры и форматированные таблицы
         if (isLocal === 'binary' && val.TableParts && val.TableParts.length) {
-            var aFilters = val.TableParts;
-            var range;
-            var tablePartRange;
             var activeRange = window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange;
             var refInsertBinary = AscCommonExcel.g_oRangeCache.getAscRange(activeRange);
-            var diffRow;
-            var diffCol;
+            var diffRow, range, tablePartRange, diffCol, bIsAddTable, aFilters = val.TableParts;
+			
             for (var aF = 0; aF < aFilters.length; aF++) {
                 tablePartRange = aFilters[aF].Ref;
                 diffRow = tablePartRange.r1 - refInsertBinary.r1;
@@ -8805,7 +8802,14 @@
 
                 t.model.autoFilters.addAutoFilter(aFilters[aF].TableStyleInfo.Name, range.bbox, true, true,
                   bWithoutFilter, null, stylePasteObj);
+				bIsAddTable = true;
             }
+			
+			//лочим именованные диапазоны если вставили новую ф/т
+			if(bIsAddTable)
+			{
+				t._isLockedDefNames(null, null);
+			}
         }
 
         //делаем unmerge ф/т
