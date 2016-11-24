@@ -5706,8 +5706,23 @@ Woorksheet.prototype.updateSparklineCache = function(sheet, ranges) {
 		}
 		return null;
 	};
-	Woorksheet.prototype.insertSparkline = function (sparkline) {
-		this.aSparklineGroups.push(sparkline);
+	Woorksheet.prototype.removeSparkline = function (range) {
+		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
+			if (this.aSparklineGroups[i].remove(range)) {
+				this.aSparklineGroups.splice(i--, 1);
+			}
+		}
+	};
+	Woorksheet.prototype.insertSparklineGroup = function (sparklineGroup) {
+		this.aSparklineGroups.push(sparklineGroup);
+	};
+	Woorksheet.prototype.removeSparklineGroup = function (id) {
+		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
+			if (id === this.aSparklineGroups[i].Get_Id()) {
+				this.aSparklineGroups.splice(i, 1);
+				break;
+			}
+		}
 	};
 //-------------------------------------------------------------------------------------------------
 /**

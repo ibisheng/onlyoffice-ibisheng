@@ -8590,6 +8590,7 @@
 
                         if (val === c_oAscCleanOptions.All) {
                             range.cleanAll();
+                            t.model.removeSparkline(arn);
                             // Удаляем комментарии
                             t.cellCommentator.deleteCommentsRange(arn);
                         } else if (val === c_oAscCleanOptions.Text || val === c_oAscCleanOptions.Formula) {

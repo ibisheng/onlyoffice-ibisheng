@@ -4717,7 +4717,7 @@ CellArea.prototype = {
 
 		this.f = null;
 		this.arrSparklines = [];
-		this.arrCachedSparklines = [];
+		this.arrCachedSparklines = {};
 
 		//for drawing preview
 		this.canvas = null;
@@ -4922,7 +4922,7 @@ CellArea.prototype = {
 		var api_sheet = Asc['editor'];
 		this.worksheet = api_sheet.wbModel.getWorksheetById(r.GetString2());
 		if (this.worksheet) {
-			this.worksheet.insertSparkline(this);
+			this.worksheet.insertSparklineGroup(this);
 		}
 	};
 	sparklineGroup.prototype.Undo = function (data) {
@@ -5195,13 +5195,13 @@ CellArea.prototype = {
 		graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
 			oDrawingContext.getWidth(3), oDrawingContext.getHeight(3));
 		graphics.m_oFontManager = AscCommon.g_fontManager;
-		for (var i = 0; i < this.arrCachedSparklines.length; ++i) {
+		for (var i in this.arrCachedSparklines) {
 			this.arrCachedSparklines[i].draw(graphics);
 		}
 	};
 	sparklineGroup.prototype.cleanCache = function () {
 		// ToDo clean only colors (for color scheme)
-		this.arrCachedSparklines = [];
+		this.arrCachedSparklines = {};
 	};
 	sparklineGroup.prototype.updateCache = function (sheet, ranges) {
 		var sparklineRange;
@@ -5209,7 +5209,7 @@ CellArea.prototype = {
 			sparklineRange = this.arrSparklines[i]._f;
 			for (var j = 0; j < ranges.length; ++j) {
 				if (sparklineRange.isIntersect(ranges[j], sheet)) {
-					this.arrCachedSparklines[i] = null;
+					delete this.arrCachedSparklines[i];
 					break;
 				}
 			}
@@ -5222,6 +5222,17 @@ CellArea.prototype = {
 			}
 		}
 		return -1;
+	};
+	sparklineGroup.prototype.remove = function (range) {
+		for (var i = 0; i < this.arrSparklines.length; ++i) {
+			if (this.arrSparklines[i].checkInRange(range)) {
+				this.arrSparklines.splice(i, 1);
+				delete this.arrCachedSparklines[i];
+				--i;
+			}
+		}
+
+		return 0 === this.arrSparklines.length;
 	};
 	sparklineGroup.prototype.asc_getId = function () {
 		return this.Id;
