@@ -7047,7 +7047,7 @@
 		cell_info.sparklineInfo = this.model.getSparklineGroup(c1, r1);
 		if (cell_info.sparklineInfo) {
 			lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId,
-				sparklineInfo.Get_Id());
+				cell_info.sparklineInfo.Get_Id());
 			if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
 					/*bCheckOnlyLockAll*/false)) {
 				cell_info.isLockedSparkline = true;
