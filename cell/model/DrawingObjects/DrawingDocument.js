@@ -1465,11 +1465,6 @@ function CDrawingDocument(drawingObjects)
     this.TableStylesLastLook = null;
     this.LastParagraphMargins = null;
 
-    // параметры для SelectShow
-    this.min_PageAddSelection = 100000;
-    this.max_PageAddSelection = -1;
-    this.IsShowSelectAttack = false;
-
     this.AutoShapesTrack = null;
     this.AutoShapesTrackLockPageNum = -1;
 
@@ -3208,87 +3203,6 @@ function CDrawingDocument(drawingObjects)
         }
     }
 
-    this.AddPageSelection2 = function(pageIndex, x, y, width, height)
-    {
-        //if (pageIndex < 0 || pageIndex >= Math.max(this.m_lPagesCount, this.m_lCountCalculatePages) || Math.abs(width) < 0.001 || Math.abs(height) < 0.001)
-        //    return;
-        if (Math.abs(width) < 0.001 || Math.abs(height) < 0.001)
-            return;
-
-        if (undefined === this.m_arrPages[pageIndex])
-            this.m_arrPages[pageIndex] = new CPage();
-
-        if (this.min_PageAddSelection > pageIndex)
-            this.min_PageAddSelection = pageIndex;
-        if (this.max_PageAddSelection < pageIndex)
-            this.max_PageAddSelection = pageIndex;
-
-        if (this.m_bIsSelection && (this.m_oWordControl.m_oOverlay.HtmlElement.style.display == "none"))
-        {
-            this.m_oWordControl.ShowOverlay();
-            this.m_oWordControl.m_oOverlayApi.m_oContext.globalAlpha = 0.2;
-        }
-
-        var r = new AscCommon._rect();
-        r.x = x;
-        r.y = y;
-        r.w = width;
-        r.h = height;
-        this.m_arrPages[pageIndex].selectionArray[this.m_arrPages[pageIndex].selectionArray.length] = r;
-
-        if (this.m_oWordControl.MobileTouchManager)
-        {
-            if (null == this.m_oWordControl.MobileTouchManager.RectSelect1)
-            {
-                this.m_oWordControl.MobileTouchManager.RectSelect1 = r;
-                this.m_oWordControl.MobileTouchManager.PageSelect1 = pageIndex;
-            }
-
-            this.m_oWordControl.MobileTouchManager.RectSelect2 = r;
-            this.m_oWordControl.MobileTouchManager.PageSelect2 = pageIndex;
-        }
-    }
-
-    this.AddPageSelection2 = function(pageIndex, x, y, width, height)
-    {
-        //if (pageIndex < 0 || pageIndex >= Math.max(this.m_lPagesCount, this.m_lCountCalculatePages) || Math.abs(width) < 0.001 || Math.abs(height) < 0.001)
-        //    return;
-        if (Math.abs(width) < 0.001 || Math.abs(height) < 0.001)
-            return;
-
-        if (undefined === this.m_arrPages[pageIndex])
-            this.m_arrPages[pageIndex] = new CPage();
-
-        if (this.min_PageAddSelection > pageIndex)
-            this.min_PageAddSelection = pageIndex;
-        if (this.max_PageAddSelection < pageIndex)
-            this.max_PageAddSelection = pageIndex;
-
-        if (this.m_bIsSelection && (this.m_oWordControl.m_oOverlay.HtmlElement.style.display == "none"))
-        {
-            this.m_oWordControl.ShowOverlay();
-            this.m_oWordControl.m_oOverlayApi.m_oContext.globalAlpha = 0.2;
-        }
-
-        var r = new AscCommon._rect();
-        r.x = x;
-        r.y = y;
-        r.w = width;
-        r.h = height;
-        this.m_arrPages[pageIndex].selectionArray[this.m_arrPages[pageIndex].selectionArray.length] = r;
-
-        if (this.m_oWordControl.MobileTouchManager)
-        {
-            if (null == this.m_oWordControl.MobileTouchManager.RectSelect1)
-            {
-                this.m_oWordControl.MobileTouchManager.RectSelect1 = r;
-                this.m_oWordControl.MobileTouchManager.PageSelect1 = pageIndex;
-            }
-
-            this.m_oWordControl.MobileTouchManager.RectSelect2 = r;
-            this.m_oWordControl.MobileTouchManager.PageSelect2 = pageIndex;
-        }
-    }
     this.SelectShow = function()
     {
         this.drawingObjects.OnUpdateOverlay();

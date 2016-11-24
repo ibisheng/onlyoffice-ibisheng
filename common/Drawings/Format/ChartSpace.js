@@ -1192,34 +1192,8 @@ CChartSpace.prototype.changeLine = function (line)
 };
 CChartSpace.prototype.parseChartFormula = function(sFormula)
 {
-    if(this.worksheet && typeof sFormula === "string" && sFormula.length > 0)
-    {
-        var ret = [];
-        if(sFormula[0] === '(')
-            sFormula = sFormula.slice(1);
-        if(sFormula[sFormula.length-1] === ')')
-            sFormula = sFormula.slice(0, -1);
-        var f1 = sFormula;
-        var arr_f = f1.split(",");
-        var i, j;
-        for(i = 0; i < arr_f.length; ++i)
-        {
-            var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
-            if(parsed_ref)
-            {
-                var source_worksheet = this.worksheet.workbook.getWorksheetByName(parsed_ref.sheet);
-                if(source_worksheet)
-                {
-                    var range1 = source_worksheet.getRange2(parsed_ref.range);
-                    if(range1)
-                    {
-                        var range = range1.bbox;
-                        ret.push({worksheet: source_worksheet, bbox: range});
-                    }
-                }
-            }
-        }
-        return ret;
+    if(this.worksheet && typeof sFormula === "string" && sFormula.length > 0){
+        return AscCommonExcel.getRangeByRef(sFormula, this.worksheet);
     }
     return null;
 };
@@ -1445,6 +1419,7 @@ CChartSpace.prototype.rebuildSeries = function(data)
         AscFormat.ExecuteNoHistory(function(){
             this.checkRemoveCache();
             this.recalculateReferences();
+            this.recalcInfo.recalculateReferences = false;
             // this.recalculate();
         }, this, [])
 
@@ -1796,10 +1771,30 @@ CChartSpace.prototype.rebuildSeriesFromAsc = function(asc_chart)
         var  asc_series = asc_chart.series;
         var chart_type = this.chart.plotArea.charts[0];
         var first_series = chart_type.series[0] ? chart_type.series[0] : chart_type.getSeriesConstructor();
+
+        var bAccent1Background = false;
+        if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.color && this.spPr.Fill.fill.color.color
+            && this.spPr.Fill.fill.color.color.type === window['Asc'].c_oAscColor.COLOR_TYPE_SCHEME &&  this.spPr.Fill.fill.color.color.id === 0){
+            bAccent1Background = true;
+        }
+
+        var oFirstSpPrPreset = 0;
+        if(chart_type.getObjectType() === AscDFH.historyitem_type_PieChart || chart_type.getObjectType() === AscDFH.historyitem_type_DoughnutChart){
+            if(chart_type.series[0].dPt[0] && chart_type.series[0].dPt[0].spPr){
+                oFirstSpPrPreset = AscFormat.CollectSettingsSpPr(chart_type.series[0].dPt[0].spPr);
+            }
+        }
+        else{
+            oFirstSpPrPreset = AscFormat.CollectSettingsSpPr(chart_type.series[0].spPr);
+        }
+
         if(first_series.spPr){
             first_series.spPr.setFill(null);
             first_series.spPr.setLn(null);
         }
+
+        var style = AscFormat.CHART_STYLE_MANAGER.getStyleByIndex(this.style);
+        var base_fills = AscFormat.getArrayFillsFromBase(style.fill2, asc_series.length);
         if(chart_type.getObjectType() !== AscDFH.historyitem_type_ScatterChart)
         {
 
@@ -1824,7 +1819,27 @@ CChartSpace.prototype.rebuildSeriesFromAsc = function(asc_chart)
                 series.setIdx(i);
                 series.setOrder(i);
                 series.setVal(new AscFormat.CYVal());
+
+
+
+
                 FillValNum(series.val, asc_series[i].Val, true, false);
+
+                if(chart_type.getObjectType() === AscDFH.historyitem_type_PieChart || chart_type.getObjectType() === AscDFH.historyitem_type_DoughnutChart){
+                    if(oFirstSpPrPreset){
+                        var pts = AscFormat.getPtsFromSeries(series);
+                        for(var j = 0; j < pts.length; ++j){
+                            var oDPt = new AscFormat.CDPt();
+                            oDPt.setBubble3D(false);
+                            oDPt.setIdx(j);
+                            ApplySpPr(oFirstSpPrPreset, oDPt, j, base_fills, bAccent1Background);
+                            series.series[i].addDPt(oDPt);
+                        }
+                    }
+                }
+                else{
+                    AscFormat.ApplySpPr(oFirstSpPrPreset, series, i, base_fills, bAccent1Background);
+                }
                 if(asc_series[i].Cat && asc_series[i].Cat.NumCache && typeof asc_series[i].Cat.Formula === "string" && asc_series[i].Cat.Formula.length > 0)
                 {
                     series.setCat(new AscFormat.CCat());
@@ -1935,6 +1950,7 @@ CChartSpace.prototype.handleUpdateInternalChart = function()
     this.recalcInfo.recalculateMarkers = true;
     this.recalcInfo.recalculatePlotAreaBrush = true;
     this.recalcInfo.recalculatePlotAreaPen   = true;
+    this.recalcInfo.recalculateAxisTickMark  = true;
     //this.recalcInfo.dataLbls.length = 0;
     //this.recalcInfo.axisLabels.length = 0;
     this.recalcInfo.recalculateAxisVal = true;
@@ -2464,7 +2480,7 @@ CChartSpace.prototype.recalculateBBox = function()
                 if(numRef)
                 {
                     parsed_formulas = this.parseChartFormula(numRef.f);
-                    if(parsed_formulas)
+                    if(parsed_formulas && parsed_formulas.length > 0 && parsed_formulas[0].worksheet)
                     {
                         series_bboxes = series_bboxes.concat(parsed_formulas);
                         if(series_f !== null && parsed_formulas.length === 1)
@@ -2540,13 +2556,13 @@ CChartSpace.prototype.recalculateBBox = function()
                 if(series[i].tx && series[i].tx.strRef)
                 {
                     parsed_formulas = this.parseChartFormula(series[i].tx.strRef.f);
-                    if(parsed_formulas)
+                    if(parsed_formulas && parsed_formulas[0].worksheet)
                     {
                         ser_titles_bboxes = ser_titles_bboxes.concat(parsed_formulas);
                     }
                     if(series_title_f !== null)
                     {
-                        if(!parsed_formulas || parsed_formulas.length !== 1)
+                        if(!parsed_formulas || parsed_formulas.length !== 1 || !parsed_formulas[0].worksheet)
                         {
                             series_title_f = null;
                             continue;
@@ -2639,7 +2655,7 @@ CChartSpace.prototype.recalculateBBox = function()
             if(ref)
             {
                 parsed_formulas = this.parseChartFormula(ref.f);
-                if(parsed_formulas)
+                if(parsed_formulas && parsed_formulas.length === 1 && parsed_formulas[0].worksheet)
                 {
                     cat_bboxes = cat_bboxes.concat(parsed_formulas);
                     if(parsed_formulas.length === 1)
@@ -2854,22 +2870,7 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
 {
     if(val && val.numRef && typeof val.numRef.f === "string"/*(!val.numRef.numCache || val.numRef.numCache.pts.length === 0)*/)
     {
-        var first_slice = 0, last_slice = 0;
-        if(val.numRef.f[0] === "(")
-        {
-            first_slice = 1;
-        }
-        if(val.numRef.f[val.numRef.f.length - 1] === ")")
-        {
-            last_slice = -1;
-        }
-        else
-        {
-            last_slice = val.numRef.f.length;
-        }
-        var f1 = val.numRef.f.slice(first_slice, last_slice);
-        var arr_f = f1.split(",");
-
+        var aParsedRef = this.parseChartFormula(val.numRef.f);
         var num_cache;
         if(!val.numRef.numCache )
         {
@@ -2882,110 +2883,137 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
             removePtsFromLit(num_cache);
         }
         var lit_format_code = typeof num_cache.formatCode === "string" && num_cache.formatCode.length > 0 ? num_cache.formatCode : "General";
-        var pt_index = 0, i, j, cell, pt, worksheet_id, hidden = true, row_hidden, col_hidden, nPtCount, t;
-        for(i = 0; i < arr_f.length; ++i)
+        var pt_index = 0, i, j, cell, pt,  hidden = true, row_hidden, col_hidden, nPtCount, t;
+        for(i = 0; i < aParsedRef.length; ++i)
         {
-            var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
-            if(parsed_ref)
+            var oCurRef = aParsedRef[i];
+            var source_worksheet = oCurRef.worksheet;
+            if(source_worksheet)
             {
-                var source_worksheet = workbook.getWorksheetByName(parsed_ref.sheet);
-                if(source_worksheet)
+                var range = oCurRef.bbox;
+                var nLastNoEmptyIndex = null, dLastNoEmptyVal = null, aSpanPoints = [], nSpliceIndex = null;
+                if(range.r1 === range.r2 || bVertical === true)
                 {
-                    worksheet_id = source_worksheet.getId() + "";
-                    var range1 = source_worksheet.getRange2(parsed_ref.range);
-                    if(range1)
+                    row_hidden = source_worksheet.getRowHidden(range.r1);
+                    for(j = range.c1;  j <= range.c2; ++j)
                     {
-                        var range = range1.bbox;
-
-                        var nLastNoEmptyIndex = null, dLastNoEmptyVal = null, aSpanPoints = [], nSpliceIndex = null;
-                        if(range.r1 === range.r2 || bVertical === true)
+                        if(!row_hidden && !source_worksheet.getColHidden(j) || (this.displayHidden === true))
                         {
-                            row_hidden = source_worksheet.getRowHidden(range.r1);
-                            for(j = range.c1;  j <= range.c2; ++j)
+                            cell = source_worksheet.getCell3(range.r1, j);
+                            var value = parseFloat(cell.getValue());
+                            if(AscFormat.isRealNumber(value))
                             {
-                                if(!row_hidden && !source_worksheet.getColHidden(j) || (this.displayHidden === true))
+                                hidden = false;
+                                pt = new AscFormat.CNumericPoint();
+                                pt.setIdx(pt_index);
+                                pt.setVal(value);
+                                if(cell.getNumFormatStr() !== lit_format_code)
                                 {
-                                    cell = source_worksheet.getCell3(range.r1, j);
-                                    var value = parseFloat(cell.getValue());
-                                    if(AscFormat.isRealNumber(value))
+                                    pt.setFormatCode(cell.getNumFormatStr())
+                                }
+                                num_cache.addPt(pt);
+
+                                if(aSpanPoints.length > 0 )
+                                {
+                                    if(AscFormat.isRealNumber(nLastNoEmptyIndex))
                                     {
-                                        hidden = false;
+                                        var oStartPoint = num_cache.getPtByIndex(nLastNoEmptyIndex);
+                                        for(t = 0; t < aSpanPoints.length; ++t)
+                                        {
+                                            aSpanPoints[t].val = oStartPoint.val + ((pt.val - oStartPoint.val)/(aSpanPoints.length + 1))*(t+1);
+                                            num_cache.pts.splice(nSpliceIndex + t, 0, aSpanPoints[t]);
+                                        }
+                                    }
+                                    aSpanPoints.length = 0;
+                                }
+                                nLastNoEmptyIndex = pt_index;
+                                nSpliceIndex = num_cache.pts.length;
+                                dLastNoEmptyVal = pt.val;
+                            }
+                            else
+                            {
+                                if(AscFormat.isRealNumber(this.displayEmptyCellsAs) && this.displayEmptyCellsAs !== 1)
+                                {
+                                    if(this.displayEmptyCellsAs === 2)
+                                    {
                                         pt = new AscFormat.CNumericPoint();
                                         pt.setIdx(pt_index);
-                                        pt.setVal(value);
-                                        if(cell.getNumFormatStr() !== lit_format_code)
-                                        {
-                                            pt.setFormatCode(cell.getNumFormatStr())
-                                        }
+                                        pt.setVal(0);
                                         num_cache.addPt(pt);
-
-                                        if(aSpanPoints.length > 0 )
-                                        {
-                                            if(AscFormat.isRealNumber(nLastNoEmptyIndex))
-                                            {
-                                                var oStartPoint = num_cache.getPtByIndex(nLastNoEmptyIndex);
-                                                for(t = 0; t < aSpanPoints.length; ++t)
-                                                {
-                                                    aSpanPoints[t].val = oStartPoint.val + ((pt.val - oStartPoint.val)/(aSpanPoints.length + 1))*(t+1);
-                                                    num_cache.pts.splice(nSpliceIndex + t, 0, aSpanPoints[t]);
-                                                }
-                                            }
-                                            aSpanPoints.length = 0;
-                                        }
-                                        nLastNoEmptyIndex = pt_index;
-                                        nSpliceIndex = num_cache.pts.length;
-                                        dLastNoEmptyVal = pt.val;
                                     }
-                                    else
+                                    if(this.displayEmptyCellsAs === 0)
                                     {
-                                        if(AscFormat.isRealNumber(this.displayEmptyCellsAs) && this.displayEmptyCellsAs !== 1)
-                                        {
-                                            if(this.displayEmptyCellsAs === 2)
-                                            {
-                                                pt = new AscFormat.CNumericPoint();
-                                                pt.setIdx(pt_index);
-                                                pt.setVal(0);
-                                                num_cache.addPt(pt);
-                                            }
-                                            if(this.displayEmptyCellsAs === 0)
-                                            {
-                                                pt = new AscFormat.CNumericPoint();
-                                                pt.setIdx(pt_index);
-                                                pt.setVal(0);
-                                                aSpanPoints.push(pt);
-                                            }
-                                        }
-                                    }
-                                }
-                                pt_index++;
-                            }
-                        }
-                        else
-                        {
-                            col_hidden = source_worksheet.getColHidden(range.c1);
-                            for(j = range.r1; j <= range.r2; ++j)
-                            {
-                                if(!col_hidden && !source_worksheet.getRowHidden(j) || (this.displayHidden === true))
-                                {
-                                    cell = source_worksheet.getCell3(j, range.c1);
-                                    var value = parseFloat(cell.getValue());
-                                    if(AscFormat.isRealNumber(value))
-                                    {
-                                        hidden = false;
                                         pt = new AscFormat.CNumericPoint();
                                         pt.setIdx(pt_index);
-                                        pt.setVal(value);
-                                        if(cell.getNumFormatStr() !== lit_format_code)
-                                        {
-                                            pt.setFormatCode(cell.getNumFormatStr())
-                                        }
-                                        num_cache.addPt(pt);
-                                        
+                                        pt.setVal(0);
+                                        aSpanPoints.push(pt);
                                     }
                                 }
-                                pt_index++;
                             }
                         }
+                        pt_index++;
+                    }
+                }
+                else
+                {
+                    col_hidden = source_worksheet.getColHidden(range.c1);
+                    for(j = range.r1; j <= range.r2; ++j)
+                    {
+                        if(!col_hidden && !source_worksheet.getRowHidden(j) || (this.displayHidden === true))
+                        {
+                            cell = source_worksheet.getCell3(j, range.c1);
+                            var value = parseFloat(cell.getValue());
+                            if(AscFormat.isRealNumber(value))
+                            {
+                                hidden = false;
+                                pt = new AscFormat.CNumericPoint();
+                                pt.setIdx(pt_index);
+                                pt.setVal(value);
+                                if(cell.getNumFormatStr() !== lit_format_code)
+                                {
+                                    pt.setFormatCode(cell.getNumFormatStr());
+                                }
+                                num_cache.addPt(pt);
+
+                            }
+                        }
+                        pt_index++;
+                    }
+                }
+
+            }
+            else{
+                pt_index = 0;
+                var fCollectArray = function(oRef, oNumCache){
+                    if(Array.isArray(oRef)){
+                        for(var i = 0; i < oRef.length; ++i){
+                            if(Array.isArray(oRef[i])){
+                                fCollectArray(oRef[i], oNumCache);
+                            }
+                            else{
+                                cell = source_worksheet.getCell3(j, range.c1);
+                                var value = parseFloat(cell.getValue());
+                                if(AscFormat.isRealNumber(value))
+                                {
+                                    hidden = false;
+                                    pt = new AscFormat.CNumericPoint();
+                                    pt.setIdx(pt_index);
+                                    pt.setVal(value);
+                                    if(cell.getNumFormatStr() !== lit_format_code)
+                                    {
+                                        pt.setFormatCode(cell.getNumFormatStr());
+                                    }
+                                    num_cache.addPt(pt);
+
+                                }
+                            }
+                        }
+                    }
+
+                }
+                for(j = 0; j < oCurRef.length; ++j){
+                    for(var k = 0; k < oCurRef[j].length; ++k){
+
                     }
                 }
             }
@@ -2997,6 +3025,101 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
             ser.isHidden = hidden;
             ser.isHiddenForLegend = hidden;
         }
+    }
+};
+
+
+CChartSpace.prototype.parseTableDataString = function(oRefArray){
+
+};
+
+CChartSpace.prototype.parseTableDataNumber = function(){
+
+};
+
+CChartSpace.prototype.checkCatByNumRef = function(oThis, ser, cat, bVertical)
+{
+
+    if(cat && cat.strRef && typeof cat.strRef.f === "string" /*(!cat.strRef.strCache || cat.strRef.strCache.pt.length === 0)*/)
+    {
+        var aParsedRef = this.parseChartFormula(cat.strRef.f);
+        var str_cache = new AscFormat.CStrCache();
+        //str_cache.setFormatCode("General");
+        var pt_index = 0, i, j, cell, pt, value_width_format, row_hidden, col_hidden;
+
+        var fParseTableDataString = function(oRef, oCache){
+            if(Array.isArray(oRef)){
+                for(var i = 0; i < oRef.length; ++i){
+                    if(Array.isArray(oRef[i])){
+                        fParseTableDataString(oRef, oCache);
+                    }
+                    else{
+                        pt = new AscFormat.CStringPoint();
+                        pt.setIdx(pt_index);
+                        pt.setVal(oRef[i].value);
+                        str_cache.addPt(pt);
+                        ++pt_index;
+                    }
+                }
+            }
+        };
+        for(i = 0; i < aParsedRef.length; ++i)
+        {
+            var oCurRef = aParsedRef[i];
+            var source_worksheet = oCurRef.worksheet;
+            if(source_worksheet)
+            {
+                var range = oCurRef.bbox;
+                if(range.r1 === range.r2 || bVertical === true)
+                {
+                    row_hidden = source_worksheet.getRowHidden(range.r1);
+                    for(j = range.c1;  j <= range.c2; ++j)
+                    {
+                        if(!row_hidden && !source_worksheet.getColHidden(j))
+                        {
+                            cell = source_worksheet.getCell3(range.r1, j);
+                            value_width_format = cell.getValueWithFormat();
+                            if(typeof value_width_format === "string" && value_width_format.length > 0)
+                            {
+                                pt = new AscFormat.CStringPoint();
+                                pt.setIdx(pt_index);
+                                pt.setVal(value_width_format);
+
+                                str_cache.addPt(pt);
+                                //addPointToMap(oThis.pointsMap, source_worksheet, range.r1, j, pt);
+                            }
+                        }
+                        pt_index++;
+                    }
+                }
+                else
+                {
+                    col_hidden = source_worksheet.getColHidden(range.c1);
+                    for(j = range.r1;  j <= range.r2; ++j)
+                    {
+                        if(!col_hidden && !source_worksheet.getRowHidden(j))
+                        {
+                            cell = source_worksheet.getCell3(j, range.c1);
+                            value_width_format = cell.getValueWithFormat();
+                            if(typeof value_width_format === "string" && value_width_format.length > 0)
+                            {
+                                pt = new AscFormat.CStringPoint();
+                                pt.setIdx(pt_index);
+                                pt.setVal(cell.getValueWithFormat());
+                                str_cache.addPt(pt);
+                                //addPointToMap(oThis.pointsMap, source_worksheet, j, range.c1,  pt);
+                            }
+                        }
+                        pt_index++;
+                    }
+                }
+            }
+            else{
+                fParseTableDataString(oCurRef);
+            }
+        }
+        str_cache.setPtCount(pt_index);
+        cat.strRef.setStrCache(str_cache);
     }
 };
 
@@ -3012,93 +3135,8 @@ CChartSpace.prototype.recalculateReferences = function()
         this.recalculateBBox();
         this.recalcInfo.recalculateBBox = false;
     }
-   
 
-    var checkCatByNumRef = function(oThis, ser, cat, bVertical)
-    {
-        if(cat && cat.strRef && typeof cat.strRef.f === "string" /*(!cat.strRef.strCache || cat.strRef.strCache.pt.length === 0)*/)
-        {
-            var first_slice = 0, last_slice = 0;
-            if(cat.strRef.f[0] === "(")
-            {
-                first_slice = 1;
-            }
-            if(cat.strRef.f[cat.strRef.f.length - 1] === ")")
-            {
-                last_slice = -1;
-            }
-            else
-            {
-                last_slice = cat.strRef.f.length;
-            }
-            var f1 = cat.strRef.f.slice(first_slice, last_slice);
-            var arr_f = f1.split(",");
-            var str_cache = new AscFormat.CStrCache();
-            //str_cache.setFormatCode("General");
-            var pt_index = 0, i, j, cell, pt, value_width_format, row_hidden, col_hidden;
-            for(i = 0; i < arr_f.length; ++i)
-            {
-                var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
-                if(parsed_ref)
-                {
-                    var source_worksheet = oThis.worksheet.workbook.getWorksheetByName(parsed_ref.sheet);
-                    if(source_worksheet)
-                    {
-                        var range1 = source_worksheet.getRange2(parsed_ref.range);
-                        if(range1)
-                        {
-                            var range = range1.bbox;
-                            if(range.r1 === range.r2 || bVertical === true)
-                            {
-                                row_hidden = source_worksheet.getRowHidden(range.r1);
-                                for(j = range.c1;  j <= range.c2; ++j)
-                                {
-                                    if(!row_hidden && !source_worksheet.getColHidden(j))
-                                    {
-                                        cell = source_worksheet.getCell3(range.r1, j);
-                                        value_width_format = cell.getValueWithFormat();
-                                        if(typeof value_width_format === "string" && value_width_format.length > 0)
-                                        {
-                                            pt = new AscFormat.CStringPoint();
-                                            pt.setIdx(pt_index);
-                                            pt.setVal(value_width_format);
 
-                                            str_cache.addPt(pt);
-                                            //addPointToMap(oThis.pointsMap, source_worksheet, range.r1, j, pt);
-                                        }
-                                    }
-                                    pt_index++;
-                                }
-                            }
-                            else
-                            {
-                                col_hidden = source_worksheet.getColHidden(range.c1);
-                                for(j = range.r1;  j <= range.r2; ++j)
-                                {
-                                    if(!col_hidden && !source_worksheet.getRowHidden(j))
-                                    {
-                                        cell = source_worksheet.getCell3(j, range.c1);
-                                        value_width_format = cell.getValueWithFormat();
-                                        if(typeof value_width_format === "string" && value_width_format.length > 0)
-                                        {
-                                            pt = new AscFormat.CStringPoint();
-                                            pt.setIdx(pt_index);
-                                            pt.setVal(cell.getValueWithFormat());
-                                            str_cache.addPt(pt);
-                                            //addPointToMap(oThis.pointsMap, source_worksheet, j, range.c1,  pt);
-                                        }
-                                    }
-                                    pt_index++;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            str_cache.setPtCount(pt_index);
-            cat.strRef.setStrCache(str_cache);
-        }
-    };
 
     var charts, series, i, j, ser;
     charts = this.chart.plotArea.charts;
@@ -3120,9 +3158,9 @@ CChartSpace.prototype.recalculateReferences = function()
                 this.checkValByNumRef(this.worksheet.workbook, ser, ser.val);
                 //cat
                 this.checkValByNumRef(this.worksheet.workbook, ser, ser.cat, bVert);
-                checkCatByNumRef(this, ser, ser.cat, bVert);
+                this.checkCatByNumRef(this, ser, ser.cat, bVert);
                 //tx
-                checkCatByNumRef(this, ser, ser.tx, AscFormat.isRealBool(bVert) ? !bVert : undefined);
+                this.checkCatByNumRef(this, ser, ser.tx, AscFormat.isRealBool(bVert) ? !bVert : undefined);
 
                 if(ser.isHidden)
                 {
@@ -3142,7 +3180,7 @@ CChartSpace.prototype.recalculateReferences = function()
                 ser = series[j];
                 this.checkValByNumRef(this.worksheet.workbook, ser, ser.xVal, bVert);
                 this.checkValByNumRef(this.worksheet.workbook, ser, ser.yVal);
-                checkCatByNumRef(this, ser, ser.tx, AscFormat.isRealBool(bVert) ? !bVert : undefined);
+                this.checkCatByNumRef(this, ser, ser.tx, AscFormat.isRealBool(bVert) ? !bVert : undefined);
 
                 if(ser.isHidden)
                 {
@@ -3407,6 +3445,8 @@ CChartSpace.prototype.recalculateAxis = function()
             bWithoutLabels = true;
         }
 
+        this.plotAreaRect = null;
+        var rect;
         var bCorrectedLayoutRect = false;
         if(b_checkEmpty)
         {
@@ -3505,7 +3545,7 @@ CChartSpace.prototype.recalculateAxis = function()
                 y_ax.yPoints  = null;
                 x_ax.xPoints  = null;
                 var sizes = this.getChartSizes();
-                var rect = {x: sizes.startX, y:sizes.startY, w:sizes.w, h: sizes.h};
+                rect = {x: sizes.startX, y:sizes.startY, w:sizes.w, h: sizes.h};
                 var arr_val =  this.getValAxisValues();
                 var arr_strings = [];
                 var multiplier;
@@ -3682,7 +3722,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                     arr_x_points[i] = rect.x + first_hor_label_half_width + hor_interval_width*(arr_x_val[i] - arr_x_val[0]);
                                 }
                                 y_ax.labels.x = rect.x + first_hor_label_half_width + hor_interval_width*(arr_x_val[arr_x_val.length-1] - arr_x_val[0]);
-                                y_ax.xPos = rect.x + first_hor_label_half_width + (crosses-arr_x_val[0])*hor_interval_width;
+                                y_ax.posX = rect.x + first_hor_label_half_width + (crosses-arr_x_val[0])*hor_interval_width;
                             }
                             else{
                                 hor_interval_width = checkFiniteNumber(rect.w/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
@@ -3691,7 +3731,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                     arr_x_points[i] = rect.x + hor_interval_width*(arr_x_val[i] - arr_x_val[0]);
                                 }
                                 y_ax.labels.x = rect.x + hor_interval_width*(arr_x_val[arr_x_val.length-1] - arr_x_val[0]);
-                                y_ax.xPos = rect.x + (crosses-arr_x_val[0])*hor_interval_width;
+                                y_ax.posX = rect.x + (crosses-arr_x_val[0])*hor_interval_width;
                             }
                             break;
                         }
@@ -3713,7 +3753,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                     arr_x_points[i] = rect.x + left_gap + hor_interval_width*(arr_x_val[i] - arr_x_val[0]);
                                 }
                                 y_ax.labels.x = rect.x - y_ax.labels.extX;
-                                y_ax.xPos = rect.x + (crosses-arr_x_val[0])*hor_interval_width;
+                                y_ax.posX = rect.x + (crosses-arr_x_val[0])*hor_interval_width;
                             }
                             else{
                                 hor_interval_width = checkFiniteNumber(rect.w/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
@@ -3722,7 +3762,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                     arr_x_points[i] = rect.x + hor_interval_width*(arr_x_val[i] - arr_x_val[0]);
                                 }
                                 y_ax.labels.x = rect.x - y_ax.labels.extX;
-                                y_ax.xPos = rect.x + (crosses-arr_x_val[0])*hor_interval_width;
+                                y_ax.posX = rect.x + (crosses-arr_x_val[0])*hor_interval_width;
                             }
 
                             break;
@@ -3735,7 +3775,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 for (i = 0; i < arr_x_val.length; ++i) {
                                     arr_x_points[i] = rect.x + first_hor_label_half_width + hor_interval_width * (arr_x_val[i] - arr_x_val[0]);
                                 }
-                                y_ax.xPos = rect.x + first_hor_label_half_width + hor_interval_width * (crosses - arr_x_val[0]);
+                                y_ax.posX = rect.x + first_hor_label_half_width + hor_interval_width * (crosses - arr_x_val[0]);
                             }
                             else{
                                 y_ax.labels = null;
@@ -3743,7 +3783,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 for (i = 0; i < arr_x_val.length; ++i) {
                                     arr_x_points[i] = rect.x + first_hor_label_half_width + hor_interval_width * (arr_x_val[i] - arr_x_val[0]);
                                 }
-                                y_ax.xPos = rect.x + hor_interval_width * (crosses - arr_x_val[0]);
+                                y_ax.posX = rect.x + hor_interval_width * (crosses - arr_x_val[0]);
                             }
                             break;
                         }
@@ -3763,7 +3803,7 @@ CChartSpace.prototype.recalculateAxis = function()
 
                                 if(!bWithoutLabels){
                                     y_ax.labels.x = rect.x + rect.w - right_gap;
-                                    y_ax.xPos = rect.x + rect.w - right_gap;
+                                    y_ax.posX = rect.x + rect.w - right_gap;
                                     hor_interval_width = checkFiniteNumber((rect.w - right_gap - first_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
                                     for(i = 0; i < arr_x_val.length; ++i)
                                     {
@@ -3773,7 +3813,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 else{
 
                                     y_ax.labels.x = rect.x + rect.w;
-                                    y_ax.xPos = rect.x + rect.w;
+                                    y_ax.posX = rect.x + rect.w;
                                     hor_interval_width = checkFiniteNumber(rect.w/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
                                     for(i = 0; i < arr_x_val.length; ++i)
                                     {
@@ -3789,19 +3829,19 @@ CChartSpace.prototype.recalculateAxis = function()
                                     if (!bNeedReflect && first_hor_label_half_width + (crosses - arr_x_val[0]) * hor_interval_width < y_ax.labels.extX) {
                                         hor_interval_width = checkFiniteNumber((rect.w - y_ax.labels.extX - last_hor_label_half_width) / (arr_x_val[arr_x_val.length - 1] - crosses));
                                     }
-                                    y_ax.xPos = rect.x + rect.w - last_hor_label_half_width - (arr_x_val[arr_x_val.length - 1] - crosses) * hor_interval_width;
+                                    y_ax.posX = rect.x + rect.w - last_hor_label_half_width - (arr_x_val[arr_x_val.length - 1] - crosses) * hor_interval_width;
                                     for (i = 0; i < arr_x_val.length; ++i) {
-                                        arr_x_points[i] = y_ax.xPos + (arr_x_val[i] - crosses) * hor_interval_width;
+                                        arr_x_points[i] = y_ax.posX + (arr_x_val[i] - crosses) * hor_interval_width;
                                     }
-                                    y_ax.labels.x = y_ax.xPos - y_ax.labels.extX;
+                                    y_ax.labels.x = y_ax.posX - y_ax.labels.extX;
                                 }
                                 else{
                                     hor_interval_width = checkFiniteNumber(rect.w/ (arr_x_val[arr_x_val.length - 1] - arr_x_val[0]));
-                                    y_ax.xPos = rect.x + rect.w - (arr_x_val[arr_x_val.length - 1] - crosses) * hor_interval_width;
+                                    y_ax.posX = rect.x + rect.w - (arr_x_val[arr_x_val.length - 1] - crosses) * hor_interval_width;
                                     for (i = 0; i < arr_x_val.length; ++i) {
-                                        arr_x_points[i] = y_ax.xPos + (arr_x_val[i] - crosses) * hor_interval_width;
+                                        arr_x_points[i] = y_ax.posX + (arr_x_val[i] - crosses) * hor_interval_width;
                                     }
-                                    y_ax.labels.x = y_ax.xPos - y_ax.labels.extX;
+                                    y_ax.labels.x = y_ax.posX - y_ax.labels.extX;
                                 }
                             }
                             break;
@@ -3825,22 +3865,22 @@ CChartSpace.prototype.recalculateAxis = function()
                             if(!bWithoutLabels){
                                 hor_interval_width = checkFiniteNumber((rect.w - left_gap - first_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
 
-                                y_ax.xPos = rect.x + rect.w - (crosses - arr_x_val[0])*hor_interval_width - first_hor_label_half_width;
+                                y_ax.posX = rect.x + rect.w - (crosses - arr_x_val[0])*hor_interval_width - first_hor_label_half_width;
                                 for(i = 0; i < arr_x_val.length; ++i)
                                 {
-                                    arr_x_points[i] = y_ax.xPos - (arr_x_val[i]-crosses)*hor_interval_width;
+                                    arr_x_points[i] = y_ax.posX - (arr_x_val[i]-crosses)*hor_interval_width;
                                 }
-                                y_ax.labels.x = y_ax.xPos - (arr_x_val[arr_x_val.length-1]-crosses)*hor_interval_width - y_ax.labels.extX;
+                                y_ax.labels.x = y_ax.posX - (arr_x_val[arr_x_val.length-1]-crosses)*hor_interval_width - y_ax.labels.extX;
                             }
                             else{
                                 hor_interval_width = checkFiniteNumber(rect.w/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
 
-                                y_ax.xPos = rect.x + rect.w - (crosses - arr_x_val[0])*hor_interval_width;
+                                y_ax.posX = rect.x + rect.w - (crosses - arr_x_val[0])*hor_interval_width;
                                 for(i = 0; i < arr_x_val.length; ++i)
                                 {
-                                    arr_x_points[i] = y_ax.xPos - (arr_x_val[i]-crosses)*hor_interval_width;
+                                    arr_x_points[i] = y_ax.posX - (arr_x_val[i]-crosses)*hor_interval_width;
                                 }
-                                y_ax.labels.x = y_ax.xPos - (arr_x_val[arr_x_val.length-1]-crosses)*hor_interval_width - y_ax.labels.extX;
+                                y_ax.labels.x = y_ax.posX - (arr_x_val[arr_x_val.length-1]-crosses)*hor_interval_width - y_ax.labels.extX;
                             }
                             break;
                         }
@@ -3859,19 +3899,19 @@ CChartSpace.prototype.recalculateAxis = function()
 
                             if(!bWithoutLabels){
                                 hor_interval_width = checkFiniteNumber((rect.w - right_gap - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
-                                y_ax.xPos = rect.x + rect.w - right_gap - (crosses - arr_x_val[0])*hor_interval_width;
+                                y_ax.posX = rect.x + rect.w - right_gap - (crosses - arr_x_val[0])*hor_interval_width;
                                 for(i = 0; i < arr_x_val.length; ++i)
                                 {
-                                    arr_x_points[i] = y_ax.xPos - (arr_x_val[i]-crosses)*hor_interval_width;
+                                    arr_x_points[i] = y_ax.posX - (arr_x_val[i]-crosses)*hor_interval_width;
                                 }
                                 y_ax.labels.x = rect.x + rect.w - right_gap;
                             }
                             else{
                                 hor_interval_width = checkFiniteNumber(rect.w/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
-                                y_ax.xPos = rect.x + rect.w - (crosses - arr_x_val[0])*hor_interval_width;
+                                y_ax.posX = rect.x + rect.w - (crosses - arr_x_val[0])*hor_interval_width;
                                 for(i = 0; i < arr_x_val.length; ++i)
                                 {
-                                    arr_x_points[i] = y_ax.xPos - (arr_x_val[i]-crosses)*hor_interval_width;
+                                    arr_x_points[i] = y_ax.posX - (arr_x_val[i]-crosses)*hor_interval_width;
                                 }
                                 y_ax.labels.x = rect.x + rect.w;
                             }
@@ -3883,16 +3923,16 @@ CChartSpace.prototype.recalculateAxis = function()
 
                             if(!bWithoutLabels) {
                                 hor_interval_width = checkFiniteNumber((rect.w - first_hor_label_half_width - last_hor_label_half_width) / (arr_x_val[arr_x_val.length - 1] - arr_x_val[0]));
-                                y_ax.xPos = rect.x + rect.w - first_hor_label_half_width - (crosses - arr_x_val[0]) * hor_interval_width;
+                                y_ax.posX = rect.x + rect.w - first_hor_label_half_width - (crosses - arr_x_val[0]) * hor_interval_width;
                                 for (i = 0; i < arr_x_val.length; ++i) {
-                                    arr_x_points[i] = y_ax.xPos - (arr_x_val[i] - crosses) * hor_interval_width;
+                                    arr_x_points[i] = y_ax.posX - (arr_x_val[i] - crosses) * hor_interval_width;
                                 }
                             }
                             else{
                                 hor_interval_width = checkFiniteNumber(rect.w / (arr_x_val[arr_x_val.length - 1] - arr_x_val[0]));
-                                y_ax.xPos = rect.x + rect.w - (crosses - arr_x_val[0]) * hor_interval_width;
+                                y_ax.posX = rect.x + rect.w - (crosses - arr_x_val[0]) * hor_interval_width;
                                 for (i = 0; i < arr_x_val.length; ++i) {
-                                    arr_x_points[i] = y_ax.xPos - (arr_x_val[i] - crosses) * hor_interval_width;
+                                    arr_x_points[i] = y_ax.posX - (arr_x_val[i] - crosses) * hor_interval_width;
                                 }
                             }
                             break;
@@ -3912,13 +3952,13 @@ CChartSpace.prototype.recalculateAxis = function()
                                 }
                                 if(!bWithoutLabels) {
                                     hor_interval_width = checkFiniteNumber((rect.w - left_gap - first_hor_label_half_width) / (arr_x_val[arr_x_val.length - 1] - arr_x_val[0]));
-                                    y_ax.xPos = rect.x + rect.w - first_hor_label_half_width - (crosses - arr_x_val[0]) * hor_interval_width;
-                                    y_ax.labels.x = y_ax.xPos - ((arr_x_val[arr_x_val.length - 1] - crosses) * hor_interval_width) - y_ax.labels.extX;
+                                    y_ax.posX = rect.x + rect.w - first_hor_label_half_width - (crosses - arr_x_val[0]) * hor_interval_width;
+                                    y_ax.labels.x = y_ax.posX - ((arr_x_val[arr_x_val.length - 1] - crosses) * hor_interval_width) - y_ax.labels.extX;
                                 }
                                 else{
                                     hor_interval_width = checkFiniteNumber(rect.w/ (arr_x_val[arr_x_val.length - 1] - arr_x_val[0]));
-                                    y_ax.xPos = rect.x + rect.w  - (crosses - arr_x_val[0]) * hor_interval_width;
-                                    y_ax.labels.x = y_ax.xPos - ((arr_x_val[arr_x_val.length - 1] - crosses) * hor_interval_width) - y_ax.labels.extX;
+                                    y_ax.posX = rect.x + rect.w  - (crosses - arr_x_val[0]) * hor_interval_width;
+                                    y_ax.labels.x = y_ax.posX - ((arr_x_val[arr_x_val.length - 1] - crosses) * hor_interval_width) - y_ax.labels.extX;
                                 }
                             }
                             else
@@ -3930,19 +3970,19 @@ CChartSpace.prototype.recalculateAxis = function()
                                         hor_interval_width = checkFiniteNumber((rect.w - y_ax.labels.extX - last_hor_label_half_width) / (arr_x_val[arr_x_val.length - 1] - crosses));
                                     }
                                     left_align_labels = false;
-                                    y_ax.xPos = rect.x + last_hor_label_half_width + hor_interval_width * (arr_x_val[arr_x_val.length - 1] - crosses);
-                                    y_ax.labels.x = y_ax.xPos;
+                                    y_ax.posX = rect.x + last_hor_label_half_width + hor_interval_width * (arr_x_val[arr_x_val.length - 1] - crosses);
+                                    y_ax.labels.x = y_ax.posX;
                                 }
                                 else{
                                     hor_interval_width = checkFiniteNumber(rect.w / (arr_x_val[arr_x_val.length - 1] - arr_x_val[0]));
                                     left_align_labels = false;
-                                    y_ax.xPos = rect.x + hor_interval_width * (arr_x_val[arr_x_val.length - 1] - crosses);
-                                    y_ax.labels.x = y_ax.xPos;
+                                    y_ax.posX = rect.x + hor_interval_width * (arr_x_val[arr_x_val.length - 1] - crosses);
+                                    y_ax.labels.x = y_ax.posX;
                                 }
                             }
                             for(i = 0;  i < arr_x_val.length; ++i)
                             {
-                                arr_x_points[i] = y_ax.xPos - (arr_x_val[i] - crosses)*hor_interval_width;
+                                arr_x_points[i] = y_ax.posX - (arr_x_val[i] - crosses)*hor_interval_width;
                             }
                             break;
                         }
@@ -4014,7 +4054,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 {
                                     arr_y_points[i] = bottom_start_point - (arr_val[i] - arr_val[0])*vert_interval_height;
                                 }
-                                x_ax.yPos = bottom_start_point - (crosses_x - arr_val[0])*vert_interval_height;
+                                x_ax.posY = bottom_start_point - (crosses_x - arr_val[0])*vert_interval_height;
                             }
                             else{
                                 vert_interval_height = checkFiniteNumber(rect.h/(arr_val[arr_val.length-1] - arr_val[0]));
@@ -4025,7 +4065,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 {
                                     arr_y_points[i] = rect.y + rect.h - (arr_val[i] - arr_val[0])*vert_interval_height;
                                 }
-                                x_ax.yPos = rect.y + rect.h - (crosses_x - arr_val[0])*vert_interval_height;
+                                x_ax.posY = rect.y + rect.h - (crosses_x - arr_val[0])*vert_interval_height;
                             }
                             break;
                         }
@@ -4040,7 +4080,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 {
                                     arr_y_points[i] = rect.y + rect.h - bottom_gap -  (arr_val[i] - arr_val[0])*vert_interval_height;
                                 }
-                                x_ax.yPos = rect.y + rect.h - bottom_gap - (crosses_x - arr_val[0])*vert_interval_height;
+                                x_ax.posY = rect.y + rect.h - bottom_gap - (crosses_x - arr_val[0])*vert_interval_height;
                             }
                             else{
                                 x_ax.labels.y = rect.y + rect.h;
@@ -4050,7 +4090,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 {
                                     arr_y_points[i] = rect.y + rect.h - (arr_val[i] - arr_val[0])*vert_interval_height;
                                 }
-                                x_ax.yPos = rect.y + rect.h - (crosses_x - arr_val[0])*vert_interval_height;
+                                x_ax.posY = rect.y + rect.h - (crosses_x - arr_val[0])*vert_interval_height;
                             }
                             break;
                         }
@@ -4063,7 +4103,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 {
                                     arr_y_points[i] = rect.y + rect.h - first_vert_label_half_height - (arr_val[i] - arr_val[0])*vert_interval_height;
                                 }
-                                x_ax.yPos = rect.y + rect.h - first_vert_label_half_height - (crosses_x - arr_val[0])*vert_interval_height;
+                                x_ax.posY = rect.y + rect.h - first_vert_label_half_height - (crosses_x - arr_val[0])*vert_interval_height;
                             }
                             else{
                                 vert_interval_height = checkFiniteNumber(rect.h/(arr_val[arr_val.length-1] - arr_val[0]));
@@ -4071,7 +4111,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 {
                                     arr_y_points[i] = rect.y + rect.h - (arr_val[i] - arr_val[0])*vert_interval_height;
                                 }
-                                x_ax.yPos = rect.y + rect.h - (crosses_x - arr_val[0])*vert_interval_height;
+                                x_ax.posY = rect.y + rect.h - (crosses_x - arr_val[0])*vert_interval_height;
                             }
                             break;
                         }
@@ -4088,16 +4128,16 @@ CChartSpace.prototype.recalculateAxis = function()
                                     for (i = 0; i < arr_val.length; ++i) {
                                         arr_y_points[i] = rect.y + rect.h - first_vert_label_half_height - (arr_val[i] - arr_val[0]) * vert_interval_height;
                                     }
-                                    x_ax.yPos = rect.y + rect.h - first_vert_label_half_height - (arr_val[arr_val.length - 1] - arr_val[0]) * vert_interval_height;
-                                    x_ax.labels.y = x_ax.yPos - x_ax.labels.extY;
+                                    x_ax.posY = rect.y + rect.h - first_vert_label_half_height - (arr_val[arr_val.length - 1] - arr_val[0]) * vert_interval_height;
+                                    x_ax.labels.y = x_ax.posY - x_ax.labels.extY;
                                 }
                                 else{
                                     vert_interval_height = checkFiniteNumber(rect.h / (arr_val[arr_val.length - 1] - arr_val[0]));
                                     for (i = 0; i < arr_val.length; ++i) {
                                         arr_y_points[i] = rect.y + rect.h - (arr_val[i] - arr_val[0]) * vert_interval_height;
                                     }
-                                    x_ax.yPos = rect.y + rect.h - (arr_val[arr_val.length - 1] - arr_val[0]) * vert_interval_height;
-                                    x_ax.labels.y = x_ax.yPos - x_ax.labels.extY;
+                                    x_ax.posY = rect.y + rect.h - (arr_val[arr_val.length - 1] - arr_val[0]) * vert_interval_height;
+                                    x_ax.labels.y = x_ax.posY - x_ax.labels.extY;
                                 }
                             }
                             else
@@ -4108,20 +4148,20 @@ CChartSpace.prototype.recalculateAxis = function()
                                         vert_interval_height = checkFiniteNumber((rect.h - x_ax.labels.extY - last_vert_label_half_height) / (arr_val[arr_val.length - 1] - crosses_x));
                                     }
 
-                                    x_ax.yPos = rect.y + last_vert_label_half_height + (arr_val[arr_val.length - 1] - crosses_x) * vert_interval_height;
-                                    x_ax.labels.y = x_ax.yPos;
+                                    x_ax.posY = rect.y + last_vert_label_half_height + (arr_val[arr_val.length - 1] - crosses_x) * vert_interval_height;
+                                    x_ax.labels.y = x_ax.posY;
                                     for (i = 0; i < arr_val.length; ++i) {
-                                        arr_y_points[i] = x_ax.yPos - (arr_val[i] - crosses_x) * vert_interval_height;
+                                        arr_y_points[i] = x_ax.posY - (arr_val[i] - crosses_x) * vert_interval_height;
                                     }
                                 }
                                 else{
                                     vert_interval_height = checkFiniteNumber(rect.h / (arr_val[arr_val.length - 1] - arr_val[0]));
 
 
-                                    x_ax.yPos = rect.y + (arr_val[arr_val.length - 1] - crosses_x) * vert_interval_height;
-                                    x_ax.labels.y = x_ax.yPos;
+                                    x_ax.posY = rect.y + (arr_val[arr_val.length - 1] - crosses_x) * vert_interval_height;
+                                    x_ax.labels.y = x_ax.posY;
                                     for (i = 0; i < arr_val.length; ++i) {
-                                        arr_y_points[i] = x_ax.yPos - (arr_val[i] - crosses_x) * vert_interval_height;
+                                        arr_y_points[i] = x_ax.posY - (arr_val[i] - crosses_x) * vert_interval_height;
                                     }
                                 }
                             }
@@ -4138,19 +4178,19 @@ CChartSpace.prototype.recalculateAxis = function()
                             bottom_gap = Math.max(last_vert_label_half_height, x_ax.labels.extY);
                             if(!bWithoutLabels) {
                                 vert_interval_height = checkFiniteNumber((rect.h - bottom_gap - first_vert_label_half_height) / (arr_val[arr_val.length - 1] - arr_val[0]));
-                                x_ax.yPos = rect.y + first_vert_label_half_height + (crosses_x - arr_val[0]) * vert_interval_height;
+                                x_ax.posY = rect.y + first_vert_label_half_height + (crosses_x - arr_val[0]) * vert_interval_height;
                                 for (i = 0; i < arr_val.length; ++i) {
-                                    arr_y_points[i] = x_ax.yPos + vert_interval_height * (arr_val[i] - crosses_x);
+                                    arr_y_points[i] = x_ax.posY + vert_interval_height * (arr_val[i] - crosses_x);
                                 }
-                                x_ax.labels.y = x_ax.yPos + vert_interval_height * (arr_val[arr_val.length - 1] - crosses_x);
+                                x_ax.labels.y = x_ax.posY + vert_interval_height * (arr_val[arr_val.length - 1] - crosses_x);
                             }
                             else{
                                 vert_interval_height = checkFiniteNumber(rect.h / (arr_val[arr_val.length - 1] - arr_val[0]));
-                                x_ax.yPos = rect.y + (crosses_x - arr_val[0]) * vert_interval_height;
+                                x_ax.posY = rect.y + (crosses_x - arr_val[0]) * vert_interval_height;
                                 for (i = 0; i < arr_val.length; ++i) {
-                                    arr_y_points[i] = x_ax.yPos + vert_interval_height * (arr_val[i] - crosses_x);
+                                    arr_y_points[i] = x_ax.posY + vert_interval_height * (arr_val[i] - crosses_x);
                                 }
-                                x_ax.labels.y = x_ax.yPos + vert_interval_height * (arr_val[arr_val.length - 1] - crosses_x);
+                                x_ax.labels.y = x_ax.posY + vert_interval_height * (arr_val[arr_val.length - 1] - crosses_x);
                             }
                             break;
                         }
@@ -4161,7 +4201,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             bottom_align_labels = false;
                             if(!bWithoutLabels) {
                                 vert_interval_height = checkFiniteNumber((rect.h - top_height - last_vert_label_half_height) / (arr_val[arr_val.length - 1] - arr_val[0]));
-                                x_ax.yPos = rect.y + top_height + (crosses_x - arr_val[0]) * vert_interval_height;
+                                x_ax.posY = rect.y + top_height + (crosses_x - arr_val[0]) * vert_interval_height;
                                 for (i = 0; i < arr_val.length; ++i) {
                                     arr_y_points[i] = rect.y + top_height + vert_interval_height * (arr_val[i] - arr_val[0]);
                                 }
@@ -4169,7 +4209,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             }
                             else{
                                 vert_interval_height = checkFiniteNumber(rect.h / (arr_val[arr_val.length - 1] - arr_val[0]));
-                                x_ax.yPos = rect.y + (crosses_x - arr_val[0]) * vert_interval_height;
+                                x_ax.posY = rect.y + (crosses_x - arr_val[0]) * vert_interval_height;
                                 for (i = 0; i < arr_val.length; ++i) {
                                     arr_y_points[i] = rect.y + vert_interval_height * (arr_val[i] - arr_val[0]);
                                 }
@@ -4182,7 +4222,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             x_ax.labels = null;
                             if(!bWithoutLabels){
                                 vert_interval_height = checkFiniteNumber((rect.h - first_vert_label_half_height - last_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]));
-                                x_ax.yPos = rect.y + first_vert_label_half_height + (crosses_x-arr_val[0])*vert_interval_height;
+                                x_ax.posY = rect.y + first_vert_label_half_height + (crosses_x-arr_val[0])*vert_interval_height;
                                 for(i = 0; i < arr_val.length;++i)
                                 {
                                     arr_y_points[i] = rect.y + first_vert_label_half_height + vert_interval_height*(arr_val[i] - arr_val[0]);
@@ -4190,7 +4230,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             }
                             else{
                                 vert_interval_height = checkFiniteNumber(rect.h/(arr_val[arr_val.length-1] - arr_val[0]));
-                                x_ax.yPos = rect.y + (crosses_x-arr_val[0])*vert_interval_height;
+                                x_ax.posY = rect.y + (crosses_x-arr_val[0])*vert_interval_height;
                                 for(i = 0; i < arr_val.length;++i)
                                 {
                                     arr_y_points[i] = rect.y + vert_interval_height*(arr_val[i] - arr_val[0]);
@@ -4207,7 +4247,7 @@ CChartSpace.prototype.recalculateAxis = function()
 
                                 if(!bWithoutLabels) {
                                     vert_interval_height = checkFiniteNumber((rect.h - bottom_gap - first_vert_label_half_height) / (arr_val[arr_val.length - 1] - arr_val[0]));
-                                    x_ax.yPos = rect.y + first_vert_label_half_height + (crosses_x - arr_val[0]) * vert_interval_height;
+                                    x_ax.posY = rect.y + first_vert_label_half_height + (crosses_x - arr_val[0]) * vert_interval_height;
                                     for (i = 0; i < arr_val.length; ++i) {
                                         arr_y_points[i] = rect.y + first_vert_label_half_height + vert_interval_height * (arr_val[i] - arr_val[0]);
                                     }
@@ -4215,7 +4255,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 }
                                 else{
                                     vert_interval_height = checkFiniteNumber(rect.h / (arr_val[arr_val.length - 1] - arr_val[0]));
-                                    x_ax.yPos = rect.y + (crosses_x - arr_val[0]) * vert_interval_height;
+                                    x_ax.posY = rect.y + (crosses_x - arr_val[0]) * vert_interval_height;
                                     for (i = 0; i < arr_val.length; ++i) {
                                         arr_y_points[i] = rect.y + vert_interval_height * (arr_val[i] - arr_val[0]);
                                     }
@@ -4230,23 +4270,23 @@ CChartSpace.prototype.recalculateAxis = function()
 
                                     vert_interval_height = checkFiniteNumber((rect.h - last_vert_label_half_height - first_vert_label_half_height) / (arr_val[arr_val.length - 1] - arr_val[0]));
                                     if (first_vert_label_half_height + (crosses_x - arr_val[0]) * vert_interval_height < x_ax.labels.extY) {
-                                        x_ax.yPos = rect.y + x_ax.labels.extY;
+                                        x_ax.posY = rect.y + x_ax.labels.extY;
                                         vert_interval_height = checkFiniteNumber((rect.h - x_ax.labels.extY - last_vert_label_half_height) / (arr_val[arr_val.length - 1] - crosses_x));
                                     }
                                     else {
-                                        x_ax.yPos = rect.y + rect.h - vert_interval_height * (arr_val[arr_val.length - 1] - crosses_x) - last_vert_label_half_height;
+                                        x_ax.posY = rect.y + rect.h - vert_interval_height * (arr_val[arr_val.length - 1] - crosses_x) - last_vert_label_half_height;
                                     }
-                                    x_ax.labels.y = x_ax.yPos - x_ax.labels.extY;
+                                    x_ax.labels.y = x_ax.posY - x_ax.labels.extY;
                                     for (i = 0; i < arr_val.length; ++i) {
-                                        arr_y_points[i] = x_ax.yPos + vert_interval_height * (arr_val[i] - crosses_x);
+                                        arr_y_points[i] = x_ax.posY + vert_interval_height * (arr_val[i] - crosses_x);
                                     }
                                 }
                                 else{
                                     vert_interval_height = checkFiniteNumber(rect.h / (arr_val[arr_val.length - 1] - arr_val[0]));
-                                    x_ax.yPos = rect.y + rect.h - vert_interval_height * (arr_val[arr_val.length - 1] - crosses_x);
-                                    x_ax.labels.y = x_ax.yPos - x_ax.labels.extY;
+                                    x_ax.posY = rect.y + rect.h - vert_interval_height * (arr_val[arr_val.length - 1] - crosses_x);
+                                    x_ax.labels.y = x_ax.posY - x_ax.labels.extY;
                                     for (i = 0; i < arr_val.length; ++i) {
-                                        arr_y_points[i] = x_ax.yPos + vert_interval_height * (arr_val[i] - crosses_x);
+                                        arr_y_points[i] = x_ax.posY + vert_interval_height * (arr_val[i] - crosses_x);
                                     }
                                 }
                             }
@@ -4439,7 +4479,7 @@ CChartSpace.prototype.recalculateAxis = function()
                 val_ax.yPoints = null;
                 cat_ax.xPoints = null;
                 var sizes = this.getChartSizes();
-                var rect = {x: sizes.startX, y:sizes.startY, w:sizes.w, h: sizes.h};
+                rect = {x: sizes.startX, y:sizes.startY, w:sizes.w, h: sizes.h};
                 var arr_val =  this.getValAxisValues();
                 //Получим строки для оси значений с учетом формата и единиц
                 var arr_strings = [];
@@ -5458,7 +5498,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 if(cat_ax.labels){
                                     cat_ax.labels.y = cat_ax.posY - cat_ax_ext_y;
 
-                                    if(bCorrectedLayoutRect){
+                                    if(true){
                                         var bCorrectedCat = false;
                                         if(cat_ax.labels.y < 0){
                                             rect.y -= cat_ax.labels.y;
@@ -5497,7 +5537,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 if(cat_ax.labels){
                                     cat_ax.labels.y = cat_ax.posY;
 
-                                    if(bCorrectedLayoutRect){
+                                    if(true){
                                         var bCorrectedCat = false;
                                         if(cat_ax.labels.y < 0){
                                             rect.y -= cat_ax.labels.y;
@@ -5537,7 +5577,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             cat_ax.posY = rect.y + (arr_val[arr_val.length-1] - crosses_val_ax)*unit_height;
                             if(cat_ax.labels){
                                 cat_ax.labels.y = rect.y + rect.h;
-                                if(bCorrectedLayoutRect){
+                                if(true){
                                     var bCorrectedCat = false;
                                     if(cat_ax.labels.y < 0){
                                         rect.y -= cat_ax.labels.y;
@@ -5578,7 +5618,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             cat_ax.posY = rect.y + rect.h - (crosses_val_ax - arr_val[0])*unit_height;
                             if(cat_ax.labels){
                                 cat_ax.labels.y = rect.y - cat_ax_ext_y;
-                                if(bCorrectedLayoutRect){
+                                if(true){
                                     var bCorrectedCat = false;
                                     if(cat_ax.labels.y < 0){
                                         rect.y -= cat_ax.labels.y;
@@ -5637,7 +5677,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 cat_ax.posY = rect.y + (crosses_val_ax - arr_val[0])*unit_height;
                                 if(cat_ax.labels){
                                     cat_ax.labels.y = rect.y + rect.h;
-                                    if(bCorrectedLayoutRect){
+                                    if(true){
                                         var bCorrectedCat = false;
                                         if(cat_ax.labels.y < 0){
                                             rect.y -= cat_ax.labels.y;
@@ -5676,7 +5716,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 cat_ax.posY = rect.y + rect.h - (arr_val[arr_val.length-1] - crosses_val_ax)*unit_height;
                                 if(cat_ax.labels){
                                     cat_ax.labels.y = cat_ax.posY - cat_ax_ext_y;
-                                    if(bCorrectedLayoutRect){
+                                    if(true){
                                         var bCorrectedCat = false;
                                         if(cat_ax.labels.y < 0){
                                             rect.y -= cat_ax.labels.y;
@@ -5707,7 +5747,7 @@ CChartSpace.prototype.recalculateAxis = function()
                         if(!bWithoutLabels){
                             top_val_axis_gap = Math.max(first_val_axis_label_half_height, cat_ax_ext_y);
                             unit_height = checkFiniteNumber((rect.h  - top_val_axis_gap - last_val_axis_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]));
-                            cat_ax.yPos = rect.y + rect.h - last_val_axis_label_half_height - (arr_val[arr_val.length-1] - crosses_val_ax)*unit_height;
+                            cat_ax.posY = rect.y + rect.h - last_val_axis_label_half_height - (arr_val[arr_val.length-1] - crosses_val_ax)*unit_height;
 
 
                             for(i = 0; i < arr_val.length; ++i)
@@ -5717,7 +5757,7 @@ CChartSpace.prototype.recalculateAxis = function()
                         }
                         else{
                             unit_height = checkFiniteNumber(rect.h/(arr_val[arr_val.length-1] - arr_val[0]));
-                            cat_ax.yPos = rect.y + rect.h - (arr_val[arr_val.length-1] - crosses_val_ax)*unit_height;
+                            cat_ax.posY = rect.y + rect.h - (arr_val[arr_val.length-1] - crosses_val_ax)*unit_height;
 
 
                             for(i = 0; i < arr_val.length; ++i)
@@ -5725,7 +5765,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             if(cat_ax.labels)
                             {
                                 cat_ax.labels.y = cat_ax.posY + (arr_val[0] - crosses_val_ax)*unit_height - cat_ax_ext_y;
-                                if(bCorrectedLayoutRect){
+                                if(true){
                                     var bCorrectedCat = false;
                                     if(cat_ax.labels.y < 0){
                                         rect.y -= cat_ax.labels.y;
@@ -5739,7 +5779,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                     }
                                     if(bCorrectedCat){
                                         unit_height = checkFiniteNumber(rect.h/(arr_val[arr_val.length-1] - arr_val[0]));
-                                        cat_ax.yPos = rect.y + rect.h - (arr_val[arr_val.length-1] - crosses_val_ax)*unit_height;
+                                        cat_ax.posY = rect.y + rect.h - (arr_val[arr_val.length-1] - crosses_val_ax)*unit_height;
 
                                         for(i = 0; i < arr_val.length; ++i)
                                             arr_val_labels_points[i] = cat_ax.posY + (arr_val[i] - crosses_val_ax)*unit_height;
@@ -5756,7 +5796,7 @@ CChartSpace.prototype.recalculateAxis = function()
                         if(!bWithoutLabels){
                             bottom_val_axis_gap = Math.max(cat_ax_ext_y, last_val_axis_label_half_height);
                             unit_height = checkFiniteNumber((rect.h  - bottom_val_axis_gap - first_val_axis_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]));
-                            cat_ax.yPos = rect.y + first_val_axis_label_half_height + (crosses_val_ax - arr_val[0])*unit_height;
+                            cat_ax.posY = rect.y + first_val_axis_label_half_height + (crosses_val_ax - arr_val[0])*unit_height;
                             for(i = 0; i < arr_val.length; ++i)
                                 arr_val_labels_points[i] = cat_ax.posY + (arr_val[i] - crosses_val_ax)*unit_height;
                             if(cat_ax.labels)
@@ -5765,12 +5805,12 @@ CChartSpace.prototype.recalculateAxis = function()
                         else{
 
                             unit_height = checkFiniteNumber(rect.h/(arr_val[arr_val.length-1] - arr_val[0]));
-                            cat_ax.yPos = rect.y + (crosses_val_ax - arr_val[0])*unit_height;
+                            cat_ax.posY = rect.y + (crosses_val_ax - arr_val[0])*unit_height;
                             for(i = 0; i < arr_val.length; ++i)
                                 arr_val_labels_points[i] = cat_ax.posY + (arr_val[i] - crosses_val_ax)*unit_height;
                             if(cat_ax.labels){
                                 cat_ax.labels.y = rect.y + rect.h;
-                                if(bCorrectedLayoutRect){
+                                if(true){
                                     var bCorrectedCat = false;
                                     if(cat_ax.labels.y < 0){
                                         rect.y -= cat_ax.labels.y;
@@ -5784,7 +5824,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                     }
                                     if(bCorrectedCat){
                                         unit_height = checkFiniteNumber(rect.h/(arr_val[arr_val.length-1] - arr_val[0]));
-                                        cat_ax.yPos = rect.y + (crosses_val_ax - arr_val[0])*unit_height;
+                                        cat_ax.posY = rect.y + (crosses_val_ax - arr_val[0])*unit_height;
                                         for(i = 0; i < arr_val.length; ++i)
                                             arr_val_labels_points[i] = cat_ax.posY + (arr_val[i] - crosses_val_ax)*unit_height;
                                         cat_ax.labels.y = rect.y + rect.h;
@@ -6059,7 +6099,7 @@ CChartSpace.prototype.recalculateAxis = function()
                 val_ax.transformXPoints  = null;
                 cat_ax.transformYPoints  = null;
                 var sizes = this.getChartSizes();
-                var rect = {x: sizes.startX, y:sizes.startY, w:sizes.w, h: sizes.h};
+                rect = {x: sizes.startX, y:sizes.startY, w:sizes.w, h: sizes.h};
                 var arr_val =  this.getValAxisValues();
                 //Получим строки для оси значений с учетом формата и единиц
                 var arr_strings = [];
@@ -6762,9 +6802,9 @@ CChartSpace.prototype.recalculateAxis = function()
                                 left_gap = Math.max(0, last_val_lbl_half_width);
                             }
                             unit_width = checkFiniteNumber((rect.w - left_gap - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]));
-                            cat_ax.xPos = rect.x + rect.w - first_val_lbl_half_width - (crosses_val_ax - arr_val[0])*unit_width;
+                            cat_ax.posX = rect.x + rect.w - first_val_lbl_half_width - (crosses_val_ax - arr_val[0])*unit_width;
                             if(cat_ax.labels)
-                                cat_ax.labels.x = cat_ax.xPos - cat_ax.labels.extX;
+                                cat_ax.labels.x = cat_ax.posX - cat_ax.labels.extX;
                         }
                         else
                         {
@@ -6773,12 +6813,12 @@ CChartSpace.prototype.recalculateAxis = function()
                             {
                                 unit_width = checkFiniteNumber((rect.w - cat_ax_ext_x - last_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]));
                             }
-                            cat_ax.xPos = rect.x + last_val_lbl_half_width + (arr_val[arr_val.length-1] - crosses_val_ax)*unit_width;
+                            cat_ax.posX = rect.x + last_val_lbl_half_width + (arr_val[arr_val.length-1] - crosses_val_ax)*unit_width;
                             if(cat_ax.labels)
-                                cat_ax.labels.x = cat_ax.xPos;
+                                cat_ax.labels.x = cat_ax.posX;
                         }
                         for(i = 0; i < arr_val.length; ++i)
-                            arr_val_labels_points[i] = cat_ax.xPos - (arr_val[i] - crosses_val_ax)*unit_width;
+                            arr_val_labels_points[i] = cat_ax.posX - (arr_val[i] - crosses_val_ax)*unit_width;
                     }
                     else if(hor_labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_LOW)
                     {
@@ -6793,11 +6833,11 @@ CChartSpace.prototype.recalculateAxis = function()
                         }
 
                         unit_width = checkFiniteNumber((rect.w - last_val_lbl_half_width - right_gap)/(arr_val[arr_val.length-1] - arr_val[0]));
-                        cat_ax.xPos = rect.x + last_val_lbl_half_width + (arr_val[arr_val.length-1] - crosses_val_ax)*crosses_val_ax;
+                        cat_ax.posX = rect.x + last_val_lbl_half_width + (arr_val[arr_val.length-1] - crosses_val_ax)*crosses_val_ax;
                         if(cat_ax.labels)
-                            cat_ax.labels.x = cat_ax.xPos - (arr_val[0] - crosses_val_ax)*unit_width;
+                            cat_ax.labels.x = cat_ax.posX - (arr_val[0] - crosses_val_ax)*unit_width;
                         for(i = 0; i < arr_val.length; ++i)
-                            arr_val_labels_points[i] = cat_ax.xPos - (arr_val[i] - crosses_val_ax)*unit_width;
+                            arr_val_labels_points[i] = cat_ax.posX - (arr_val[i] - crosses_val_ax)*unit_width;
 
                     }
                     else if(hor_labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_HIGH)
@@ -6812,19 +6852,19 @@ CChartSpace.prototype.recalculateAxis = function()
                         }
 
                         unit_width = checkFiniteNumber((rect.w - left_gap - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]));
-                        cat_ax.xPos = rect.x + rect.w - first_val_lbl_half_width - (crosses_val_ax - arr_val[0])*unit_width;
+                        cat_ax.posX = rect.x + rect.w - first_val_lbl_half_width - (crosses_val_ax - arr_val[0])*unit_width;
                         if(cat_ax.labels)
-                            cat_ax.labels.x = cat_ax.xPos - (arr_val[arr_val.length-1] - crosses_val_ax)*unit_width - cat_ax.labels.extX;
+                            cat_ax.labels.x = cat_ax.posX - (arr_val[arr_val.length-1] - crosses_val_ax)*unit_width - cat_ax.labels.extX;
                         for(i = 0; i < arr_val.length; ++i)
-                            arr_val_labels_points[i] = cat_ax.xPos - (arr_val[i] - crosses_val_ax)*unit_width;
+                            arr_val_labels_points[i] = cat_ax.posX - (arr_val[i] - crosses_val_ax)*unit_width;
                     }
                     else
                     {//подписей осей нет
                         cat_ax.labels = null;
                         unit_width = checkFiniteNumber((rect.w - last_val_lbl_half_width - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]));
-                        cat_ax.xPos = rect.x + rect.w - first_val_lbl_half_width - (crosses_val_ax - arr_val[0])*unit_width;
+                        cat_ax.posX = rect.x + rect.w - first_val_lbl_half_width - (crosses_val_ax - arr_val[0])*unit_width;
                         for(i = 0; i < arr_val.length; ++i)
-                            arr_val_labels_points[i] = cat_ax.xPos - (arr_val[i] - crosses_val_ax)*unit_width;
+                            arr_val_labels_points[i] = cat_ax.posX - (arr_val[i] - crosses_val_ax)*unit_width;
                     }
                 }
                 val_ax.interval = unit_width;
@@ -7046,6 +7086,7 @@ CChartSpace.prototype.recalculateAxis = function()
                 val_ax.xPoints.sort(function(a, b){return a.val - b.val});
             }
         }
+        this.plotAreaRect = rect;
     }
 };
 
@@ -8706,6 +8747,9 @@ CChartSpace.prototype.recalculatePenBrush = function()
 
 CChartSpace.prototype.getChartSizes = function()
 {
+    if(this.plotAreaRect && !this.recalcInfo.recalculateAxisVal){
+        return {startX: this.plotAreaRect.x, startY: this.plotAreaRect.y, w : this.plotAreaRect.w, h: this.plotAreaRect.h};
+    }
     if(!this.chartObj)
         this.chartObj = new AscFormat.CChartsDrawer();
     var oChartSize = this.chartObj.calculateSizePlotArea(this);

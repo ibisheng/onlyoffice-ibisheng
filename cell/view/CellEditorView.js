@@ -1191,7 +1191,7 @@
 		this._updateUndoRedoChanged();
 
 		if ( window['IS_NATIVE_EDITOR'] && !this.dontUpdateText ) {
-			window['native'].onCellEditorChangeText( this._getFragmentsText( this.options.fragments ) );
+			window['native']['onCellEditorChangeText']( this._getFragmentsText( this.options.fragments ) );
 		}
 	};
 

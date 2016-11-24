@@ -3699,7 +3699,7 @@ CAreaSeries.prototype =
             this.setPictureOptions(o.pictureOptions);
         if(o.spPr){
             this.setSpPr(o.spPr);
-            if(o instanceof AscFormat.CLineSeries){
+            if((o instanceof AscFormat.CLineSeries) || (o instanceof AscFormat.CScatterSeries)){
                 if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_NOFILL){
                     this.spPr.setFill(null);
                 }
@@ -3869,7 +3869,7 @@ CAreaSeries.prototype =
                     for(i = 0; i < pts.length; ++i)
                     {
                         if(AscFormat.isRealNumber(pts[i].val))
-                            summ += pts[i].val;
+                            summ += Math.abs(pts[i].val);
 
                         if(pts[i].idx === idx)
                         {
@@ -3946,13 +3946,13 @@ CAreaSeries.prototype =
     },
     setTx: function(pr)
     {
-        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetTx, oldPr: this.trendline, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetTx, oldPr: this.tx, newPr: pr});
         this.tx = pr;
     },
 
     setVal: function(pr)
     {
-        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetVal, oldPr: this.trendline, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetVal, oldPr: this.val, newPr: pr});
         this.val = pr;
         if(this.val && this.val.setParent)
         {
@@ -4290,7 +4290,8 @@ function CCatAx()
     this.txPr            = null;
 
     this.parent = null;
-
+    this.posX = null;
+    this.posY = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -4863,6 +4864,22 @@ CCatAx.prototype =
             this.txPr.setParent(this);
         }
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.handleUpdateInternalChart)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
+    },
+
+    handleUpdateFill: function()
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
+    },
+
+    handleUpdateLn: function()
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
             this.parent.parent.parent.handleUpdateInternalChart();
         }
@@ -5647,6 +5664,8 @@ function CDateAx()
     this.txPr           = null;
 
     this.parent = null;
+    this.posX = null;
+    this.posY = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -6794,6 +6813,8 @@ function CSerAx()
     this.txPr           = null;
 
     this.parent = null;
+    this.posX = null;
+    this.posY = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -7722,6 +7743,8 @@ function CValAx()
     this.txPr           = null;
 
     this.parent = null;
+    this.posX = null;
+    this.posY = null;
 
 
     this.Id = g_oIdCounter.Get_NewId();
@@ -8036,6 +8059,22 @@ CValAx.prototype =
         this.parent = pr;
     },
 
+    handleUpdateFill: function()
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
+    },
+
+    handleUpdateLn: function()
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
+    },
+
     Undo: function(data)
     {
         switch(data.Type)
@@ -8196,7 +8235,7 @@ CValAx.prototype =
             }
             case AscDFH.historyitem_ValAxSetSpPr:
             {
-                this.axId = data.oldPr;
+                this.spPr = data.oldPr;
                 break;
             }
             case AscDFH.historyitem_ValAxSetTickLblPos:
@@ -8385,7 +8424,7 @@ CValAx.prototype =
             }
             case AscDFH.historyitem_ValAxSetSpPr:
             {
-                this.axId = data.newPr;
+                this.spPr = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
                     this.parent.parent.parent.handleUpdateInternalChart();
@@ -9352,7 +9391,7 @@ CBarSeries.prototype =
             this.setShape(o.shape);
         if(o.spPr){
             this.setSpPr(o.spPr);
-            if(o instanceof AscFormat.CLineSeries){
+            if((o instanceof AscFormat.CLineSeries) || (o instanceof AscFormat.CScatterSeries)){
                 if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_NOFILL){
                     this.spPr.setFill(null);
                 }
@@ -18454,10 +18493,8 @@ CPieSeries.prototype =
             this.setOrder(o.order);
         if(o.spPr){
             this.setSpPr(o.spPr);
-            if(o instanceof AscFormat.CLineSeries){
-                if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_NOFILL){
-                    this.spPr.setFill(null);
-                }
+            if(!(o instanceof AscFormat.CPieSeries)){
+                this.spPr.setFill(null);
             }
         }
         if(o.tx)

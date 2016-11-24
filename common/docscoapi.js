@@ -341,6 +341,12 @@
     }
   };
 
+  CDocsCoApi.prototype.versionHistory = function(data) {
+    if (this._CoAuthoringApi && this._onlineWork) {
+      this._CoAuthoringApi.versionHistory(data);
+    }
+  };
+
   CDocsCoApi.prototype.callback_OnAuthParticipantsChanged = function(e, count) {
     if (this.onAuthParticipantsChanged) {
       this.onAuthParticipantsChanged(e, count);
@@ -804,6 +810,10 @@
 
   DocsCoApi.prototype.extendSession = function(idleTime) {
     this._send({'type': 'extendSession', 'idletime': idleTime});
+  };
+
+  DocsCoApi.prototype.versionHistory = function(data) {
+    this._send({'type': 'versionHistory', 'cmd': data});
   };
 
   DocsCoApi.prototype.openDocument = function(data) {
@@ -1295,7 +1305,7 @@
 	this.mode = docInfo.get_Mode();
 	this.permissions = docInfo.get_Permissions();
 	this.lang = docInfo.get_Lang();
-	this.jwt = docInfo.get_VKey();
+	this.jwt = docInfo.get_Token();
 
     this.setDocId(docid);
     this._initSocksJs();
@@ -1494,12 +1504,10 @@
       return Asc.c_oAscError.ID.CoAuthoringDisconnect;
     } else if(c_oCloseCode.accessDeny === opt_closeCode) {
       return Asc.c_oAscError.ID.CoAuthoringDisconnect;
-    } else if(c_oCloseCode.jwtEmptySecret === opt_closeCode) {
-      return Asc.c_oAscError.ID.CoAuthoringDisconnect;
     } else if(c_oCloseCode.jwtExpired === opt_closeCode) {
-      return Asc.c_oAscError.ID.CoAuthoringDisconnect;
+      return Asc.c_oAscError.ID.KeyExpire;
     } else if(c_oCloseCode.jwtError === opt_closeCode) {
-      return Asc.c_oAscError.ID.CoAuthoringDisconnect;
+      return Asc.c_oAscError.ID.VKeyEncrypt;
     }
     return this.isCloseCoAuthoring ? Asc.c_oAscError.ID.UserDrop : Asc.c_oAscError.ID.CoAuthoringDisconnect;
   };

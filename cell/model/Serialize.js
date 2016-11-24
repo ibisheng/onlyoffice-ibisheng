@@ -5605,7 +5605,7 @@
                 });
 			} else if (c_oSerWorksheetsTypes.SparklineGroups === type) {
                 res = this.bcr.Read1(length, function (t, l) {
-                    return oThis.ReadSparklineGroups(t, l, oWorksheet.aSparklineGroups);
+                    return oThis.ReadSparklineGroups(t, l, oWorksheet);
                 });
             } else
                 res = c_oSerConstants.ReadUnknown;
@@ -6620,15 +6620,16 @@
 
             return res;
         };
-		this.ReadSparklineGroups = function (type, length, aSparklineGroups) {
+		this.ReadSparklineGroups = function (type, length, oWorksheet) {
             var oThis = this;
             var res = c_oSerConstants.ReadOk;
             if (c_oSer_Sparkline.SparklineGroup === type) {
 				var newSparklineGroup = new AscCommonExcel.sparklineGroup(true);
+                newSparklineGroup.setWorksheet(oWorksheet);
 				res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadSparklineGroup(t, l, newSparklineGroup);
                 });
-                aSparklineGroups.push(newSparklineGroup);
+                oWorksheet.aSparklineGroups.push(newSparklineGroup);
 			} else
                 res = c_oSerConstants.ReadUnknown;
             return res;
@@ -6828,7 +6829,7 @@
             });
             this.wb.clrSchemeMap = AscFormat.GenerateDefaultColorMap();
             if(null == this.wb.theme)
-                this.wb.theme = AscFormat.GenerateDefaultTheme(this.wb);
+                this.wb.theme = AscFormat.GenerateDefaultTheme(this.wb, 'Calibri');
 
             Asc.getBinaryOtherTableGVar(this.wb);
 

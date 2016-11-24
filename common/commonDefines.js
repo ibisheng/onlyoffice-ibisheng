@@ -88,7 +88,7 @@
 			No                   : 0,
 			Unknown              : -1,
 			ConvertationTimeout  : -2,
-			ConvertationError    : -3,
+
 			DownloadError        : -4,
 			UnexpectedGuid       : -5,
 			Database             : -6,
@@ -143,7 +143,7 @@
 			UserDrop : -100,
 			Warning  : -101,
 
-			PrintMaxPagesCount					: 110,
+			PrintMaxPagesCount					: -110,
 
 			/* для формул */
 			FrmlWrongCountParentheses   : -300,
@@ -1080,7 +1080,6 @@
 	prot['No']                               = prot.No;
 	prot['Unknown']                          = prot.Unknown;
 	prot['ConvertationTimeout']              = prot.ConvertationTimeout;
-	prot['ConvertationError']                = prot.ConvertationError;
 	prot['ConvertationOpenError']            = prot.ConvertationOpenError;
 	prot['ConvertationSaveError']            = prot.ConvertationSaveError;
 	prot['DownloadError']                    = prot.DownloadError;
@@ -1122,6 +1121,7 @@
 	prot['CannotFillRange']                  = prot.CannotFillRange;
 	prot['UserDrop']                         = prot.UserDrop;
 	prot['Warning']                          = prot.Warning;
+	prot['PrintMaxPagesCount']               = prot.PrintMaxPagesCount;
 	prot['FrmlWrongCountParentheses']        = prot.FrmlWrongCountParentheses;
 	prot['FrmlWrongOperator']                = prot.FrmlWrongOperator;
 	prot['FrmlWrongMaxArgument']             = prot.FrmlWrongMaxArgument;

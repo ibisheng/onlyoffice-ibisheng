@@ -631,7 +631,7 @@ CChartsDrawer.prototype =
 		this.calcProp.chartGutter._top = calculateTop ? calculateTop * pxToMM : top * pxToMM;
 		this.calcProp.chartGutter._bottom = calculateBottom ? calculateBottom * pxToMM : bottom * pxToMM;
 
-        if(chartSpace.chart.plotArea.chart.getObjectType() == AscDFH.historyitem_type_PieChart){
+        if(chartSpace.chart.plotArea.chart.getObjectType() == AscDFH.historyitem_type_PieChart || chartSpace.chart.plotArea.chart.getObjectType() == AscDFH.historyitem_type_DoughnutChart){
             if(chartSpace.chart.plotArea.layout){
                 var oLayout = chartSpace.chart.plotArea.layout;
                 this.calcProp.chartGutter._left = chartSpace.calculatePosByLayout(this.calcProp.chartGutter._left/pxToMM, oLayout.xMode, oLayout.x,
@@ -4521,25 +4521,28 @@ drawLineChart.prototype =
 		
 		//todo возможно стоит проверить fill.type на FILL_TYPE_NOFILL и рисовать отдельно границы, если они заданы!
 		//brush = pen.Fill;
-		if(brush.fill.color === undefined && brush.fill.colors === undefined)
-			return;
 		
 		if(k !== 2)
 		{
 			var props = this.cChartSpace.getParentObjects();
 			var duplicateBrush = brush.createDuplicate();
 			var cColorMod = new AscFormat.CColorMod;
-			if(k == 1 || k == 4)
-				cColorMod.val = 45000;
-			else
-				cColorMod.val = 35000;
+			
 			cColorMod.name = "shade";
+			if(k == 1 || k == 4)
+			{
+				cColorMod.val = 45000;
+			}
+			else
+			{
+				cColorMod.val = 35000;
+			}
 			
 			this._addColorMods(cColorMod, duplicateBrush)
 			
 			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
 			pen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0.1);
-			//pen.setFill(duplicateBrush);
+			
 			this.cChartDrawer.drawPath(path, pen, duplicateBrush);
 		}
 		else
@@ -4551,21 +4554,9 @@ drawLineChart.prototype =
 	
 	_addColorMods: function(cColorMod, duplicateBrush)
 	{
-		if(duplicateBrush.fill.color)
+		if(duplicateBrush)
 		{
-			duplicateBrush.fill.color.Mods.addMod(cColorMod);
-		}
-		else
-		{
-			for(var i = 0; i < duplicateBrush.fill.colors.length; i++)
-			{
-				if(duplicateBrush.fill.colors[i].color.Mods === null)
-				{
-					duplicateBrush.fill.colors[i].color.Mods = new AscFormat.CColorModifiers();
-				}	
-				
-				duplicateBrush.fill.colors[i].color.Mods.addMod(cColorMod);
-			}
+			duplicateBrush.addColorMod(cColorMod);
 		}
 	}
 };
@@ -6481,7 +6472,7 @@ drawHBarChart.prototype =
 	{
 		var startY, diffYVal, width, numCache, dVal, curVal, prevVal, endBlockPosition, startBlockPosition;
 		var catAx = this.cChartSpace.chart.plotArea.catAx;
-		var nullPositionOX = catAx.posX ? catAx.posX * this.chartProp.pxToMM : catAx.xPos * this.chartProp.pxToMM;
+		var nullPositionOX = catAx.posX !== null ? catAx.posX * this.chartProp.pxToMM : 0;
 		
 		if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
 		{
@@ -11623,13 +11614,13 @@ catAxisChart.prototype =
 		var axisPos;
 		if(this.chartProp.type == c_oChartTypes.HBar)
 		{	
-			axisPos = this.cChartSpace.chart.plotArea.catAx.posX ? this.cChartSpace.chart.plotArea.catAx.posX : this.cChartSpace.chart.plotArea.catAx.xPos;
+			axisPos = this.cChartSpace.chart.plotArea.catAx.posX;
 			this.paths.axisLine = this._calculateLine( axisPos, this.chartProp.chartGutter._top / this.chartProp.pxToMM, axisPos, (this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom) / this.chartProp.pxToMM);
 		}
 		else
 		{
 			//TODO сделать по аналогии с HBAR
-			axisPos = this.cChartSpace.chart.plotArea.catAx.posY ? this.cChartSpace.chart.plotArea.catAx.posY : this.cChartSpace.chart.plotArea.catAx.yPos;
+			axisPos = this.cChartSpace.chart.plotArea.catAx.posY;
 			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left / this.chartProp.pxToMM, axisPos, (this.chartProp.widthCanvas - this.chartProp.chartGutter._right) / this.chartProp.pxToMM, axisPos);
 		}
 	},
@@ -11729,7 +11720,7 @@ catAxisChart.prototype =
 		var stepY = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
 		var minorStep = stepY / this.chartProp.numhMinorlines;
 		
-		var posX = this.cChartSpace.chart.plotArea.catAx.posX ? this.cChartSpace.chart.plotArea.catAx.posX : this.cChartSpace.chart.plotArea.catAx.xPos;
+		var posX = this.cChartSpace.chart.plotArea.catAx.posX;
 
 		var posY, posMinorY, k;
 		
@@ -11795,7 +11786,7 @@ catAxisChart.prototype =
 		var stepX = xPoints[1] ? Math.abs(xPoints[1].pos - xPoints[0].pos) : Math.abs(xPoints[0].pos - this.cChartSpace.chart.plotArea.catAx.posX) * 2;
 		var minorStep = stepX / this.chartProp.numvMinorlines;
 		
-		var posY = this.cChartSpace.chart.plotArea.catAx.posY ? this.cChartSpace.chart.plotArea.catAx.posY : this.cChartSpace.chart.plotArea.catAx.yPos;
+		var posY = this.cChartSpace.chart.plotArea.catAx.posY;
 		var posX, posMinorX, k;
 		
 		var firstDiff = 0, posXtemp;
@@ -11972,7 +11963,7 @@ valAxisChart.prototype =
 	
 	_calculateAxis : function()
 	{
-		var nullPoisition = this.cChartSpace.chart.plotArea.valAx.posX != undefined ? this.cChartSpace.chart.plotArea.valAx.posX : this.cChartSpace.chart.plotArea.valAx.xPos;
+		var nullPoisition = this.cChartSpace.chart.plotArea.valAx.posX;
 
 		if(this.chartProp.type == c_oChartTypes.HBar)
 		{	
@@ -12099,7 +12090,7 @@ valAxisChart.prototype =
 				var stepY = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
 				var minorStep = stepY / this.chartProp.numhMinorlines;
 				
-				var posX = this.cChartSpace.chart.plotArea.valAx.posX ? this.cChartSpace.chart.plotArea.valAx.posX : this.cChartSpace.chart.plotArea.valAx.xPos;
+				var posX = this.cChartSpace.chart.plotArea.valAx.posX;
 
 				var posY;
 				var posMinorY;
@@ -12240,7 +12231,7 @@ serAxisChart.prototype =
 	
 	_calculateAxis : function()
 	{
-		var nullPoisition = this.cChartSpace.chart.plotArea.valAx.posX != undefined ? this.cChartSpace.chart.plotArea.valAx.posX : this.cChartSpace.chart.plotArea.valAx.xPos;
+		var nullPoisition = this.cChartSpace.chart.plotArea.valAx.posX;
 		var nullPositionOx = this.chartProp.nullPositionOX;
 		
 		var view3DProp = this.cChartSpace.chart.view3D;

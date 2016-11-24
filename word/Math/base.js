@@ -2854,6 +2854,10 @@ CMathBase.prototype.Is_ContentUse = function(MathContent)
 
     return false;
 };
+CMathBase.prototype.Is_FromDocument = function(MathContent)
+{
+	return this.Paragraph && this.Paragraph.bFromDocument
+};
 
 function CMathBasePr()
 {

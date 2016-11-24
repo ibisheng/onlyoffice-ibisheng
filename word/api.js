@@ -1739,6 +1739,9 @@ background-repeat: no-repeat;\
 			this.sync_TextPosition(TextPr.Position);
 			this.sync_TextLangCallBack(TextPr.Lang);
 			this.sync_TextColor(TextPr);
+
+			if (this.isMobileVersion)
+				this.sendEvent("asc_onTextShd", new Asc.asc_CParagraphShd(TextPr.Shd));
 		}
 	};
 	asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
@@ -2512,7 +2515,10 @@ background-repeat: no-repeat;\
 			return;
 
 		this.WordControl.m_oDrawingDocument.StartTableStylesCheck();
-		this.WordControl.m_oDrawingDocument.TableStylesSheckLook = new CTableLook();
+		this.WordControl.m_oDrawingDocument.TableStylesSheckLook = new Asc.CTablePropLook();
+		this.WordControl.m_oDrawingDocument.TableStylesSheckLook.FirstCol = true;
+		this.WordControl.m_oDrawingDocument.TableStylesSheckLook.FirstRow = true;
+		this.WordControl.m_oDrawingDocument.TableStylesSheckLook.BandHor  = true;
 		this.WordControl.m_oDrawingDocument.EndTableStylesCheck();
 	};
 
@@ -5650,6 +5656,10 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 		}
 	};
+
+    asc_docs_api.prototype.asc_startEditCurrentOleObject = function(){
+		this.WordControl.m_oLogicDocument.DrawingObjects.startEditCurrentOleObject();
+    };
 	//-----------------------------------------------------------------
 	// События контекстного меню
 	//-----------------------------------------------------------------
@@ -7634,7 +7644,8 @@ background-repeat: no-repeat;\
 					}
 					else
 					{
-						error = mapAscServerErrorToAscError(parseInt(input["data"]));
+						error = mapAscServerErrorToAscError(parseInt(input["data"]),
+							AscCommon.c_oAscAdvancedOptionsAction.Save);
 					}
 				}
 				if (c_oAscError.ID.No != error)
@@ -8459,6 +8470,11 @@ background-repeat: no-repeat;\
 	{
 		this.IsSpellCheckCurrentWord = value;
 	};
+	window["asc_docs_api"].prototype["asc_setParagraphStylesSizes"] = function(width, height)
+	{
+		GlobalSkin.STYLE_THUMBNAIL_WIDTH = width;
+		GlobalSkin.STYLE_THUMBNAIL_HEIGHT = height;
+	};
 
 	// desktop editor spellcheck
 	function CSpellCheckApi_desktop()
@@ -9001,6 +9017,7 @@ background-repeat: no-repeat;\
 
 	// mobile
 	asc_docs_api.prototype["asc_GetDefaultTableStyles"]             	= asc_docs_api.prototype.asc_GetDefaultTableStyles;
+	asc_docs_api.prototype["asc_Remove"]             					= asc_docs_api.prototype.asc_Remove;
 
 	CParagraphPropEx.prototype['get_ContextualSpacing'] = CParagraphPropEx.prototype.get_ContextualSpacing;
 	CParagraphPropEx.prototype['get_Ind']               = CParagraphPropEx.prototype.get_Ind;

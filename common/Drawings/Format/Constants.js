@@ -1877,6 +1877,7 @@
 	window['AscDFH'].historyitem_type_GrpFill                = 1123;
 	window['AscDFH'].historyitem_type_OleObject              = 1124;
 	window['AscDFH'].historyitem_type_DrawingContent         = 1125;
+	window['AscDFH'].historyitem_type_Sparkline              = 1126;
 
 
 	// Типы изменений в классе CDocument

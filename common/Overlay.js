@@ -511,6 +511,19 @@ COverlay.prototype =
         //this.m_oContext.closePath();
     },
 
+	AddDiamond : function(x,y,r)
+	{
+		this.CheckPoint1(x-r,y-r);
+		this.CheckPoint2(x+r,y+r);
+
+		this.m_oContext.moveTo(x-r,y);
+		this.m_oContext.lineTo(x, y-r);
+		this.m_oContext.lineTo(x+r, y);
+		this.m_oContext.lineTo(x, y+r);
+		this.m_oContext.lineTo(x-r, y);
+		//this.m_oContext.closePath();
+	},
+
     AddRoundRect : function(x, y, w, h, r)
     {
         if (w < (2 * r) || h < (2 * r))

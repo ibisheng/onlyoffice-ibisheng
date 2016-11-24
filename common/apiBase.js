@@ -56,6 +56,7 @@
 		this.HtmlElement     = null;
 
 		this.isMobileVersion = (config['mobile'] === true);
+		this.isEmbedVersion = (config['embedded'] === true);
 
 		this.isViewMode = false;
 
@@ -406,7 +407,11 @@
 				rData["userconnectionid"] = this.CoAuthoringApi.getUserConnectionId();
 			}
 		}
-		this.CoAuthoringApi.auth(this.getViewMode(), rData);
+		if (isVersionHistory) {
+			this.CoAuthoringApi.versionHistory(rData);
+		} else {
+			this.CoAuthoringApi.auth(this.getViewMode(), rData);
+		}
 
 		if (!isRepeat) {
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
@@ -644,42 +649,31 @@
 				t.sendEvent('asc_onError', errorCode, c_oAscError.Level.NoCritical);
 			}
 		};
-		this.CoAuthoringApi.onDocumentOpen = function(inputWrap)
-		{
-			if (inputWrap["data"])
-			{
+		this.CoAuthoringApi.onDocumentOpen = function (inputWrap) {
+			if (inputWrap["data"]) {
 				var input = inputWrap["data"];
-				switch (input["type"])
-				{
+				switch (input["type"]) {
 					case 'reopen':
 					case 'open':
-						switch (input["status"])
-						{
+						switch (input["status"]) {
 							case "updateversion":
 							case "ok":
 								var urls = input["data"];
 								AscCommon.g_oDocumentUrls.init(urls);
-								if (null != urls['Editor.bin'])
-								{
-									if ('ok' === input["status"] || t.getViewMode())
-									{
+								if (null != urls['Editor.bin']) {
+									if ('ok' === input["status"] || t.getViewMode()) {
 										t._onOpenCommand(urls['Editor.bin']);
-									}
-									else
-									{
-										t.sendEvent("asc_onDocumentUpdateVersion", function()
-										{
-											if (t.isCoAuthoringEnable)
-											{
+									} else {
+										t.sendEvent("asc_onDocumentUpdateVersion", function () {
+											if (t.isCoAuthoringEnable) {
 												t.asc_coAuthoringDisconnect();
 											}
 											t._onOpenCommand(urls['Editor.bin']);
 										})
 									}
-								}
-								else
-								{
-									t.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
+								} else {
+									t.sendEvent("asc_onError", c_oAscError.ID.ConvertationOpenError,
+										c_oAscError.Level.Critical);
 								}
 								break;
 							case "needparams":
@@ -689,18 +683,17 @@
 								t._onNeedParams(null, true);
 								break;
 							case "err":
-								t.sendEvent("asc_onError", AscCommon.mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
+								t.sendEvent("asc_onError",
+									AscCommon.mapAscServerErrorToAscError(parseInt(input["data"]),
+										Asc.c_oAscError.ID.ConvertationOpenError), c_oAscError.Level.Critical);
 								break;
 						}
 						break;
 					default:
-						if (t.fCurCallback)
-						{
+						if (t.fCurCallback) {
 							t.fCurCallback(input);
 							t.fCurCallback = null;
-						}
-						else
-						{
+						} else {
 							t.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 						}
 						break;
@@ -912,6 +905,10 @@
 	{
 	};
 
+
+	baseEditorsApi.prototype.asc_startEditCurrentOleObject = function(){
+
+	};
 	// Version History
 	baseEditorsApi.prototype.asc_showRevision   = function(newObj)
 	{
@@ -1122,6 +1119,12 @@
 	};
 	baseEditorsApi.prototype.pre_Paste = function(_fonts, _images, callback)
 	{
+	};
+
+	baseEditorsApi.prototype.asc_Remove = function()
+	{
+		if (AscCommon.g_inputContext)
+			AscCommon.g_inputContext.emulateKeyDownApi(46);
 	};
 
 	// System input

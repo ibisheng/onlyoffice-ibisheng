@@ -400,7 +400,8 @@ var c_oSerRunType = {
 	footnoteRef: 24,
 	endnoteRef: 25,
 	footnoteReference: 26,
-	endnoteReference: 27
+	endnoteReference: 27,
+	arPr: 28
 };
 var c_oSerImageType = {
     MediaId:0,
@@ -2032,7 +2033,7 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter, sav
 			var color = null;
 			if (null != border.Color)
 				color = border.Color;
-			else if (null != border.Unifill) {
+			else if (null != border.Unifill && editor && editor.WordControl && editor.WordControl.m_oLogicDocument) {
 				var doc = editor.WordControl.m_oLogicDocument;
 				border.Unifill.check(doc.Get_Theme(), doc.Get_ColorMap());
 				var RGBA = border.Unifill.getRGBAColor();
@@ -2157,7 +2158,7 @@ function Binary_rPrWriter(memory, saveParams)
         var color = null;
         if (null != rPr.Color )
             color = rPr.Color;
-        else if (null != rPr.Unifill) {
+		else if (null != rPr.Unifill && editor && editor.WordControl && editor.WordControl.m_oLogicDocument) {
             var doc = editor.WordControl.m_oLogicDocument;
             rPr.Unifill.check(doc.Get_Theme(), doc.Get_ColorMap());
             var RGBA = rPr.Unifill.getRGBAColor();
@@ -2349,7 +2350,7 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
     this.bs = new BinaryCommonWriter(this.memory);
 	this.brPrs = new Binary_rPrWriter(this.memory, saveParams);
 	
-	this.WriteMathElem = function(item)
+	this.WriteMathElem = function(item, isSingle)
 	{
 		var oThis = this;
 		switch ( item.Type )
@@ -2379,7 +2380,7 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
 						case "OMath"			: this.bs.WriteItem(c_oSer_OMathContentType.OMath, function(){oThis.WriteArgNodes(item);});			break;
 						case "OMathPara"		: this.bs.WriteItem(c_oSer_OMathContentType.OMathPara, function(){oThis.WriteOMathPara(item);});break;
 						case MATH_PHANTOM		: this.bs.WriteItem(c_oSer_OMathContentType.Phant, function(){oThis.WritePhant(item);});		break;
-						case MATH_RUN			: this.bs.WriteItem(c_oSer_OMathContentType.MRun, function(){oThis.WriteMRun(item);});			break;
+						case MATH_RUN			: this.WriteMRunWrap(item, isSingle);break;
 						case MATH_RADICAL		: this.bs.WriteItem(c_oSer_OMathContentType.Rad, function(){oThis.WriteRad(item);});			break;
 						case MATH_DEGREESubSup	: 
 							if (DEGREE_PreSubSup == item.Pr.type)
@@ -2401,7 +2402,7 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
 				this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(AscCommon.convertUnicodeToUTF16([item.value]));}); //m:t
 				break;
 			case para_Math_Run:
-				this.bs.WriteItem(c_oSer_OMathContentType.MRun, function(){oThis.WriteMRun(item);});
+				this.WriteMRunWrap(item, isSingle);
 				break;
 			default:		
 				break;
@@ -2419,14 +2420,23 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
 			if (argSz)
 				this.bs.WriteItem(c_oSer_OMathContentType.ArgPr, function(){oThis.WriteArgPr(argSz);});
 			
-
+			var isSingle = (nStart === nEnd - 1);
 			for(var i = nStart; i <= nEnd - 1; i++)
 			{
 				var item = oElem.Content[i];
-				this.WriteMathElem(item);
+				this.WriteMathElem(item, isSingle);
 			}
 		}
 		
+	}
+	this.WriteMRunWrap = function(oMRun, isSingle)
+	{
+		var oThis = this;
+		if (!isSingle && oMRun.Is_Empty()) {
+			//don't write empty run(in Excel empty run is editable and has size).Write only if it is single single in Content
+			return;
+		}
+		this.bs.WriteItem(c_oSer_OMathContentType.MRun, function(){oThis.WriteMRun(oMRun);});
 	}
 	this.WriteMRun = function(oMRun)
 	{
@@ -2661,13 +2671,19 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
         if (oElem.Get_ReviewType) {
             ReviewType = oElem.Get_ReviewType();
         }
-        if (reviewtype_Remove == ReviewType || reviewtype_Add == ReviewType && oElem.ReviewInfo) {
-            var brPrs = new Binary_rPrWriter(this.memory, this.saveParams);
-            var recordType = reviewtype_Remove == ReviewType ? c_oSerRunType.del : c_oSerRunType.ins;
-            this.bs.WriteItem(recordType, function(){WriteTrackRevision(oThis.bs, oThis.saveParams.trackRevisionId++, oElem.ReviewInfo, {brPrs: brPrs, rPr: oElem.CtrPrp});});
-        } else {
-            this.bs.WriteItem(c_oSerRunType.rPr, function(){oThis.brPrs.Write_rPr(oElem.CtrPrp, null, null);});
-        }
+		if (oElem.Is_FromDocument()) {
+			if (reviewtype_Remove == ReviewType || reviewtype_Add == ReviewType && oElem.ReviewInfo) {
+				var brPrs = new Binary_rPrWriter(this.memory, this.saveParams);
+				var recordType = reviewtype_Remove == ReviewType ? c_oSerRunType.del : c_oSerRunType.ins;
+				this.bs.WriteItem(recordType, function(){WriteTrackRevision(oThis.bs, oThis.saveParams.trackRevisionId++, oElem.ReviewInfo, {brPrs: brPrs, rPr: oElem.CtrPrp});});
+			} else {
+				this.bs.WriteItem(c_oSerRunType.rPr, function(){oThis.brPrs.Write_rPr(oElem.CtrPrp, null, null);});
+			}
+		} else {
+			this.bs.WriteItem(c_oSerRunType.arPr, function() {
+				pptx_content_writer.WriteRunProperties(oThis.memory, oElem.CtrPrp);
+			});
+		}
 	}
 	this.WriteDegHide = function(DegHide)
 	{
@@ -10589,6 +10605,8 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
 			var MathTextRPr = new CTextPr();
 			res = this.brPrr.Read(length, MathTextRPr, null);
 			props.ctrPrp = MathTextRPr;
+		} else if (c_oSerRunType.arPr === type) {
+			props.ctrPrp = pptx_content_loader.ReadRunProperties(this.stream);
 		} else if (c_oSerRunType.del === type) {
             var rPrChange = new CTextPr();
             var reviewInfo = new CReviewInfo();

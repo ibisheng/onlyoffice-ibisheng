@@ -260,7 +260,7 @@ function CopyRunToPPTX(Run, Paragraph, bHyper)
     return NewRun;
 }
 
-function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent)
+function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent, bIsAddMath)
 {
     var _drawing_document = isRealObject(drawingDocument) ? drawingDocument : paragraph.DrawingDocument;
     var _new_parent = isRealObject(newParent) ? newParent : paragraph.Parent;
@@ -309,6 +309,10 @@ function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent)
         else if(Item.Type === para_Hyperlink)
         {
             new_paragraph.Internal_Content_Add(new_paragraph.Content.length, ConvertHyperlinkToPPTX(Item, new_paragraph), false);
+        }
+        else if(true === bIsAddMath && Item.Type === para_Math)
+        {
+            new_paragraph.Internal_Content_Add(new_paragraph.Content.length, Item, false);
         }
     }
     var EndRun = new ParaRun(new_paragraph);
@@ -722,7 +726,7 @@ CShape.prototype.convertToWord = function (document) {
     return c;
 };
 
-CShape.prototype.convertToPPTX = function (drawingDocument, worksheet) {
+CShape.prototype.convertToPPTX = function (drawingDocument, worksheet, bIsAddMath) {
     var c = new CShape();
     c.setWordShape(false);
     c.setBDeleted(false);
@@ -751,7 +755,7 @@ CShape.prototype.convertToPPTX = function (drawingDocument, worksheet) {
         for (var i = 0; i < paragraphs.length; ++i) {
             var cur_par = paragraphs[i];
             if (cur_par instanceof Paragraph) {
-                var new_paragraph = ConvertParagraphToPPTX(cur_par, drawingDocument, new_content);
+                var new_paragraph = ConvertParagraphToPPTX(cur_par, drawingDocument, new_content, bIsAddMath);
                 new_content.Internal_Content_Add(index++, new_paragraph, false);
             }
         }

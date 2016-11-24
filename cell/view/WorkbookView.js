@@ -174,6 +174,8 @@
 
     this.isCellEditMode = false;
 
+    this.isShowComments = true;
+
     this.formulasList = [];		// Список всех формул
     this.lastFormulaPos = -1; 		// Последняя позиция формулы
     this.lastFormulaNameLength = '';		// Последний кусок формулы
@@ -788,6 +790,17 @@
 
     this.handlers.add("asc_onLockDefNameManager", function(reason) {
       self.defNameAllowCreate = !(reason == Asc.c_oAscDefinedNameReason.LockDefNameManager);
+    });
+    this.handlers.add('addComment', function (id, data) {
+      self._onWSSelectionChanged();
+      self.handlers.trigger('asc_onAddComment', id, data);
+    });
+    this.handlers.add('removeComment', function (id) {
+      self._onWSSelectionChanged();
+      self.handlers.trigger('asc_onRemoveComment', id);
+    });
+    this.handlers.add('hiddenComments', function () {
+      return !self.isShowComments;
     });
 
     this.cellCommentator = new AscCommonExcel.CCellCommentator({
@@ -2012,10 +2025,10 @@
     t.clipboard.checkCopyToClipboard(ws, _clipboard, _formats);
   };
 
-  WorkbookView.prototype.pasteData = function(_format, data1, data2) {
+  WorkbookView.prototype.pasteData = function(_format, data1, data2, text_data) {
     var t = this, ws;
     ws = t.getWorksheet();
-    t.clipboard.pasteData(ws, _format, data1, data2);
+    t.clipboard.pasteData(ws, _format, data1, data2, text_data);
   };
 
   WorkbookView.prototype.selectionCut = function() {
@@ -2205,7 +2218,7 @@
     }
 
     if (result) {
-      return ws.setSelection(result);
+      return ws.setSelectionUndoRedo(result);
     }
     this._cleanFindResults();
     return null;
@@ -2253,11 +2266,6 @@
       // Заканчиваем медленную операцию
       this.Api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);
     }
-  };
-
-  // Поиск ячейки по ссылке
-  WorkbookView.prototype.findCell = function(reference) {
-    return this.getWorksheet().findCell(reference, this.controller.settings.isViewerMode);
   };
 
   WorkbookView.prototype.getDefinedNames = function(defNameListId) {
@@ -2492,12 +2500,18 @@
     this.isDocumentPlaceChangedEnabled = val;
   };
 
+  WorkbookView.prototype.showComments = function (val) {
+    if (this.isShowComments !== val) {
+      this.isShowComments = val;
+      this.drawWS();
+    }
+  };
+
   /*
    * @param {c_oAscRenderingModeType} mode Режим отрисовки
    * @param {Boolean} isInit инициализация или нет
    */
   WorkbookView.prototype.setFontRenderingMode = function(mode, isInit) {
-    var ws;
     if (mode !== this.fontRenderingMode) {
       this.fontRenderingMode = mode;
       if (c_oAscFontRenderingModeType.noHinting === mode) {
@@ -2509,8 +2523,7 @@
       }
 
       if (!isInit) {
-        ws = this.getWorksheet();
-        ws.draw();
+        this.drawWS();
         this.cellEditor.setFontRenderingMode(mode);
       }
     }

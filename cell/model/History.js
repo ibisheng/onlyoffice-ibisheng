@@ -144,6 +144,32 @@ function (window, undefined) {
 	window['AscCH'].historyitem_AutoFilter_ChangeTableName = 14;
 	window['AscCH'].historyitem_AutoFilter_ClearFilterColumn = 15;
 
+	window['AscCH'].historyitem_Sparkline_Type = 1;
+	window['AscCH'].historyitem_Sparkline_LineWeight = 2;
+	window['AscCH'].historyitem_Sparkline_DisplayEmptyCellsAs = 3;
+	window['AscCH'].historyitem_Sparkline_Markers = 4;
+	window['AscCH'].historyitem_Sparkline_High = 5;
+	window['AscCH'].historyitem_Sparkline_Low = 6;
+	window['AscCH'].historyitem_Sparkline_First = 7;
+	window['AscCH'].historyitem_Sparkline_Last = 8;
+	window['AscCH'].historyitem_Sparkline_Negative = 9;
+	window['AscCH'].historyitem_Sparkline_DisplayXAxis = 10;
+	window['AscCH'].historyitem_Sparkline_DisplayHidden = 11;
+	window['AscCH'].historyitem_Sparkline_MinAxisType = 12;
+	window['AscCH'].historyitem_Sparkline_MaxAxisType = 13;
+	window['AscCH'].historyitem_Sparkline_RightToLeft = 14;
+	window['AscCH'].historyitem_Sparkline_ManualMax = 15;
+	window['AscCH'].historyitem_Sparkline_ManualMin = 16;
+	window['AscCH'].historyitem_Sparkline_DateAxis = 17;
+	window['AscCH'].historyitem_Sparkline_ColorSeries = 18;
+	window['AscCH'].historyitem_Sparkline_ColorNegative = 19;
+	window['AscCH'].historyitem_Sparkline_ColorAxis = 20;
+	window['AscCH'].historyitem_Sparkline_ColorMarkers = 21;
+	window['AscCH'].historyitem_Sparkline_ColorFirst = 22;
+	window['AscCH'].historyitem_Sparkline_colorLast = 23;
+	window['AscCH'].historyitem_Sparkline_ColorHigh = 24;
+	window['AscCH'].historyitem_Sparkline_ColorLow = 25;
+	window['AscCH'].historyitem_Sparkline_F = 26;
 
 function CHistory()
 {
@@ -353,6 +379,10 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
         }
 	}
 
+	/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
+	this.workbook.unLockDraw();
+	this.workbook.buildRecalc();
+
 	if (null != Point) {
 		//синхронизация index и id worksheet
 		if (oRedoObjectParam.bUpdateWorksheetByModel)
@@ -375,13 +405,14 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 		    if (null !== nSheetId)
 		        this.workbook.handlers.trigger('showWorksheet', nSheetId);
 		}
+		//changeWorksheetUpdate before cleanCellCache to call _calcHeightRows
+		for (i in oRedoObjectParam.oChangeWorksheetUpdate)
+			this.workbook.handlers.trigger("changeWorksheetUpdate",
+				oRedoObjectParam.oChangeWorksheetUpdate[i],{lockDraw: true, reinitRanges: true});
 
 		for (i in Point.UpdateRigions)
 			this.workbook.handlers.trigger("cleanCellCache", i, {'0': Point.UpdateRigions[i]}, true, oRedoObjectParam.bAddRemoveRowCol);
 
-		for (i in oRedoObjectParam.oChangeWorksheetUpdate)
-			this.workbook.handlers.trigger("changeWorksheetUpdate",
-				oRedoObjectParam.oChangeWorksheetUpdate[i],{lockDraw: true, reinitRanges: true});
 		if (oRedoObjectParam.bOnSheetsChanged)
 			this.workbook.handlers.trigger("asc_onSheetsChanged");
 		for (i in oRedoObjectParam.oOnUpdateTabColor) {
@@ -450,9 +481,6 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
         }
     }
 
-	/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
-	this.workbook.unLockDraw();
-	this.workbook.buildRecalc();
 	if (oRedoObjectParam.bIsOn)
 		this.TurnOn();
 };
