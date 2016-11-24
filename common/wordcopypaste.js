@@ -6228,6 +6228,13 @@ PasteProcessor.prototype =
 					}
                 }
             }
+			
+			//TODO временная правка. пересмотреть обработку тега math
+			if(!child.style && Node.TEXT_NODE !== child.nodeType)
+			{
+				child.style = {};
+			}
+			
             bAddParagraph = this._Execute(child, Common_CopyObj(pPr), false, bAddParagraph, bIsBlockChild || bInBlock);
             if(bIsBlockChild)
                 bAddParagraph = true;
