@@ -6904,149 +6904,158 @@
           this._getSelectionInfoCell();
     };
 
-    WorksheetView.prototype._getSelectionInfoCell = function () {
-        var c_opt = this.settings.cells;
-        var selectionRange = this.model.selectionRange;
-        var cell = selectionRange.activeCell;
-        var mc = this.model.getMergedByCell(cell.row, cell.col);
-        var c1 = mc ? mc.c1 : cell.col;
-        var r1 = mc ? mc.r1 : cell.row;
-        var c = this._getVisibleCell(c1, r1);
+	WorksheetView.prototype._getSelectionInfoCell = function () {
+		var c_opt = this.settings.cells;
+		var selectionRange = this.model.selectionRange;
+		var cell = selectionRange.activeCell;
+		var mc = this.model.getMergedByCell(cell.row, cell.col);
+		var c1 = mc ? mc.c1 : cell.col;
+		var r1 = mc ? mc.r1 : cell.row;
+		var c = this._getVisibleCell(c1, r1);
 
-        if (c === undefined) {
-            asc_debug("log", "Unknown cell's info: col = " + c1 + ", row = " + r1);
-            return {};
-        }
+		if (c === undefined) {
+			asc_debug("log", "Unknown cell's info: col = " + c1 + ", row = " + r1);
+			return {};
+		}
 
-        var fc = c.getFontcolor();
-        var bg = c.getFill();
-        var fa = c.getFontAlign();
-        var cellType = c.getType();
-        var isNumberFormat = (!cellType || CellValueType.Number === cellType);
+		var fc = c.getFontcolor();
+		var bg = c.getFill();
+		var fa = c.getFontAlign();
+		var cellType = c.getType();
+		var isNumberFormat = (!cellType || CellValueType.Number === cellType);
 
-        var cell_info = new asc_CCellInfo();
-        cell_info.name = this._getColumnTitle(c1) + this._getRowTitle(r1);
-        cell_info.formula = c.getFormula();
+		var cell_info = new asc_CCellInfo();
+		cell_info.name = this._getColumnTitle(c1) + this._getRowTitle(r1);
+		cell_info.formula = c.getFormula();
 
-        cell_info.text = c.getValueForEdit();
+		cell_info.text = c.getValueForEdit();
 
-        cell_info.halign = AscCommonExcel.horizontalAlignToString(c.getAlignHorizontal());
-        cell_info.valign = AscCommonExcel.verticalAlignToString(c.getAlignVertical());
+		cell_info.halign = AscCommonExcel.horizontalAlignToString(c.getAlignHorizontal());
+		cell_info.valign = AscCommonExcel.verticalAlignToString(c.getAlignVertical());
 
-        var tablePartsOptions = selectionRange.isSingleRange() ?
-          this.model.autoFilters.searchRangeInTableParts(selectionRange.getLast()) : -2;
-        var curTablePart = tablePartsOptions >= 0 ? this.model.TableParts[tablePartsOptions] : null;
-        var tableStyleInfo = curTablePart && curTablePart.TableStyleInfo ? curTablePart.TableStyleInfo : null;
+		var tablePartsOptions = selectionRange.isSingleRange() ?
+			this.model.autoFilters.searchRangeInTableParts(selectionRange.getLast()) : -2;
+		var curTablePart = tablePartsOptions >= 0 ? this.model.TableParts[tablePartsOptions] : null;
+		var tableStyleInfo = curTablePart && curTablePart.TableStyleInfo ? curTablePart.TableStyleInfo : null;
 
-        cell_info.autoFilterInfo = new asc_CAutoFilterInfo();
-        if (-2 === tablePartsOptions) {
-            cell_info.autoFilterInfo.isAutoFilter = null;
-            cell_info.autoFilterInfo.isApplyAutoFilter = false;
-        } else {
-            var checkApplyFilterOrSort = this.model.autoFilters.checkApplyFilterOrSort(tablePartsOptions);
-            cell_info.autoFilterInfo.isAutoFilter = checkApplyFilterOrSort.isAutoFilter;
-            cell_info.autoFilterInfo.isApplyAutoFilter = checkApplyFilterOrSort.isFilterColumns;
-        }
+		cell_info.autoFilterInfo = new asc_CAutoFilterInfo();
+		if (-2 === tablePartsOptions) {
+			cell_info.autoFilterInfo.isAutoFilter = null;
+			cell_info.autoFilterInfo.isApplyAutoFilter = false;
+		} else {
+			var checkApplyFilterOrSort = this.model.autoFilters.checkApplyFilterOrSort(tablePartsOptions);
+			cell_info.autoFilterInfo.isAutoFilter = checkApplyFilterOrSort.isAutoFilter;
+			cell_info.autoFilterInfo.isApplyAutoFilter = checkApplyFilterOrSort.isFilterColumns;
+		}
 
-        if (curTablePart !== null) {
-            cell_info.formatTableInfo = new AscCommonExcel.asc_CFormatTableInfo();
-            cell_info.formatTableInfo.tableName = curTablePart.DisplayName;
+		if (curTablePart !== null) {
+			cell_info.formatTableInfo = new AscCommonExcel.asc_CFormatTableInfo();
+			cell_info.formatTableInfo.tableName = curTablePart.DisplayName;
 
-            if (tableStyleInfo) {
-                cell_info.formatTableInfo.tableStyleName = tableStyleInfo.Name;
+			if (tableStyleInfo) {
+				cell_info.formatTableInfo.tableStyleName = tableStyleInfo.Name;
 
-                cell_info.formatTableInfo.bandVer = tableStyleInfo.ShowColumnStripes;
-                cell_info.formatTableInfo.firstCol = tableStyleInfo.ShowFirstColumn;
-                cell_info.formatTableInfo.lastCol = tableStyleInfo.ShowLastColumn;
+				cell_info.formatTableInfo.bandVer = tableStyleInfo.ShowColumnStripes;
+				cell_info.formatTableInfo.firstCol = tableStyleInfo.ShowFirstColumn;
+				cell_info.formatTableInfo.lastCol = tableStyleInfo.ShowLastColumn;
 
-                cell_info.formatTableInfo.bandHor = tableStyleInfo.ShowRowStripes;
-            }
-            cell_info.formatTableInfo.lastRow = curTablePart.TotalsRowCount !== null;
-            cell_info.formatTableInfo.firstRow = curTablePart.HeaderRowCount === null;
-            cell_info.formatTableInfo.tableRange = curTablePart.Ref.getAbsName();
-            cell_info.formatTableInfo.filterButton = curTablePart.isShowButton();
+				cell_info.formatTableInfo.bandHor = tableStyleInfo.ShowRowStripes;
+			}
+			cell_info.formatTableInfo.lastRow = curTablePart.TotalsRowCount !== null;
+			cell_info.formatTableInfo.firstRow = curTablePart.HeaderRowCount === null;
+			cell_info.formatTableInfo.tableRange = curTablePart.Ref.getAbsName();
+			cell_info.formatTableInfo.filterButton = curTablePart.isShowButton();
 
-            this.af_setDisableProps(curTablePart, cell_info.formatTableInfo);
-        }
+			this.af_setDisableProps(curTablePart, cell_info.formatTableInfo);
+		}
 
-        cell_info.styleName = c.getStyleName();
-        cell_info.angle = c.getAngle();
+		cell_info.styleName = c.getStyleName();
+		cell_info.angle = c.getAngle();
 
-        cell_info.flags = new AscCommonExcel.asc_CCellFlag();
-        cell_info.flags.shrinkToFit = c.getShrinkToFit();
-        cell_info.flags.wrapText = c.getWrap();
+		cell_info.flags = new AscCommonExcel.asc_CCellFlag();
+		cell_info.flags.shrinkToFit = c.getShrinkToFit();
+		cell_info.flags.wrapText = c.getWrap();
 
-        // ToDo activeRange type
-        cell_info.flags.selectionType = selectionRange.getLast().type;
-        cell_info.flags.multiselect = !selectionRange.isSingleRange();
+		// ToDo activeRange type
+		cell_info.flags.selectionType = selectionRange.getLast().type;
+		cell_info.flags.multiselect = !selectionRange.isSingleRange();
 
-        cell_info.flags.lockText = ("" !== cell_info.text && (isNumberFormat || "" !== cell_info.formula));
+		cell_info.flags.lockText = ("" !== cell_info.text && (isNumberFormat || "" !== cell_info.formula));
 
-        cell_info.font = new asc_CFont();
-        cell_info.font.name = c.getFontname();
-        cell_info.font.size = c.getFontsize();
-        cell_info.font.bold = c.getBold();
-        cell_info.font.italic = c.getItalic();
-        cell_info.font.underline = (Asc.EUnderline.underlineNone !== c.getUnderline()); // ToDo убрать, когда будет реализовано двойное подчеркивание
-        cell_info.font.strikeout = c.getStrikeout();
-        cell_info.font.subscript = fa === AscCommon.vertalign_SubScript;
-        cell_info.font.superscript = fa === AscCommon.vertalign_SuperScript;
-        cell_info.font.color = (fc ? asc_obj2Color(fc) : new Asc.asc_CColor(c_opt.defaultState.color));
+		cell_info.font = new asc_CFont();
+		cell_info.font.name = c.getFontname();
+		cell_info.font.size = c.getFontsize();
+		cell_info.font.bold = c.getBold();
+		cell_info.font.italic = c.getItalic();
+		cell_info.font.underline = (Asc.EUnderline.underlineNone !== c.getUnderline()); // ToDo убрать, когда будет реализовано двойное подчеркивание
+		cell_info.font.strikeout = c.getStrikeout();
+		cell_info.font.subscript = fa === AscCommon.vertalign_SubScript;
+		cell_info.font.superscript = fa === AscCommon.vertalign_SuperScript;
+		cell_info.font.color = (fc ? asc_obj2Color(fc) : new Asc.asc_CColor(c_opt.defaultState.color));
 
-        cell_info.fill = new asc_CFill((null != bg) ? asc_obj2Color(bg) : bg);
+		cell_info.fill = new asc_CFill((null != bg) ? asc_obj2Color(bg) : bg);
 
-        cell_info.numFormatType = c.getNumFormatType();
+		cell_info.numFormatType = c.getNumFormatType();
 
-        // Получаем гиперссылку (//ToDo)
-        var ar = selectionRange.getLast().clone();
-        var range = this.model.getRange3(ar.r1, ar.c1, ar.r2, ar.c2);
-        var hyperlink = range.getHyperlink();
-        var oHyperlink;
-        if (null !== hyperlink) {
-            // Гиперлинк
-            oHyperlink = new asc_CHyperlink(hyperlink);
-            oHyperlink.asc_setText(cell_info.text);
-            cell_info.hyperlink = oHyperlink;
-        } else {
-            cell_info.hyperlink = null;
-        }
+		// Получаем гиперссылку (//ToDo)
+		var ar = selectionRange.getLast().clone();
+		var range = this.model.getRange3(ar.r1, ar.c1, ar.r2, ar.c2);
+		var hyperlink = range.getHyperlink();
+		var oHyperlink;
+		if (null !== hyperlink) {
+			// Гиперлинк
+			oHyperlink = new asc_CHyperlink(hyperlink);
+			oHyperlink.asc_setText(cell_info.text);
+			cell_info.hyperlink = oHyperlink;
+		} else {
+			cell_info.hyperlink = null;
+		}
 
-        cell_info.comments = this.cellCommentator.getComments(ar.c1, ar.r1);
-        cell_info.flags.merge = null !== range.hasMerged();
+		cell_info.comments = this.cellCommentator.getComments(ar.c1, ar.r1);
+		cell_info.flags.merge = null !== range.hasMerged();
 
-        var sheetId = this.model.getId();
-        // Пересчет для входящих ячеек в добавленные строки/столбцы
-        var isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, ar);
-        if (false === isIntersection) {
-            var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId,
-              new AscCommonExcel.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
+		var sheetId = this.model.getId();
+		var lockInfo;
+		// Пересчет для входящих ячеек в добавленные строки/столбцы
+		var isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, ar);
+		if (false === isIntersection) {
+			lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId,
+				new AscCommonExcel.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
 
-            if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
-                /*bCheckOnlyLockAll*/false)) {
-                // Уже ячейку кто-то редактирует
-                cell_info.isLocked = true;
-            }
-        }
-		
-		if(null !== curTablePart){
+			if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
+					/*bCheckOnlyLockAll*/false)) {
+				// Уже ячейку кто-то редактирует
+				cell_info.isLocked = true;
+			}
+		}
+
+		if (null !== curTablePart) {
 			var tableAr = curTablePart.Ref.clone();
-			var isTableIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, tableAr);
-			if (false === isTableIntersection) {
-				var tableLockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId,
-				new AscCommonExcel.asc_CCollaborativeRange(tableAr.c1, tableAr.r1, tableAr.c2, tableAr.r2));
-				
-				if (false !== this.collaborativeEditing.getLockIntersection(tableLockInfo, c_oAscLockTypes.kLockTypeOther,
-					/*bCheckOnlyLockAll*/false)){
+			isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, tableAr);
+			if (false === isIntersection) {
+				lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId,
+					new AscCommonExcel.asc_CCollaborativeRange(tableAr.c1, tableAr.r1, tableAr.c2, tableAr.r2));
+
+				if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
+						/*bCheckOnlyLockAll*/false)) {
 					// Уже таблицу кто-то редактирует
 					cell_info.isLockedTable = true;
 				}
 			}
 		}
 
-        cell_info.sparklineInfo = this.model.getSparklineGroup(c1, r1);
+		cell_info.sparklineInfo = this.model.getSparklineGroup(c1, r1);
+		if (sparklineInfo) {
+			lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId,
+				sparklineInfo.Get_Id());
+			if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
+					/*bCheckOnlyLockAll*/false)) {
+				cell_info.isLockedSparkline = true;
+			}
+		}
 
-        return cell_info;
-    };
+		return cell_info;
+	};
 
     WorksheetView.prototype._getSelectionInfoObject = function () {
         var objectInfo = new asc_CCellInfo();
