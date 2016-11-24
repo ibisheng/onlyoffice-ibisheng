@@ -667,26 +667,65 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         settings.putHorGridLines(c_oAscGridLinesSettings.none);
         settings.putVertGridLines(c_oAscGridLinesSettings.none);
 
+
+        chart_space.recalculateReferences();
+        chart_space.recalcInfo.recalculateReferences = false;
+        var oSerie = chart_space.chart.plotArea.charts[0].series[0];
+        var aSeriesPoints = AscFormat.getPtsFromSeries(oSerie);
+
         var val_ax_props = new AscCommon.asc_ValAxisSettings();
-        if(settings.type !== c_oAscChartTypeSettings.barStackedPer)
-        {
-            if(oSparklineGroup.minAxisType === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.manualMin !== null)
-            {
+        var fMinVal = null, fMaxVal = null;
+        if(settings.type !== c_oAscChartTypeSettings.barStackedPer) {
+
+            if (oSparklineGroup.minAxisType === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.manualMin !== null) {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
                 val_ax_props.putMinVal(oSparklineGroup.manualMin);
             }
-            else
-            {
+            else {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.auto);
+                for (var i = 0; i < aSeriesPoints.length; ++i) {
+                    if (fMinVal === null) {
+                        fMinVal = aSeriesPoints[i].val;
+                    }
+                    else {
+                        if (fMinVal > aSeriesPoints[i].val) {
+                            fMinVal = aSeriesPoints[i].val;
+                        }
+                    }
+                }
             }
-            if(oSparklineGroup.maxAxisType === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.manualMax !== null)
-            {
+            if (oSparklineGroup.maxAxisType === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.manualMax !== null) {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
                 val_ax_props.putMinVal(oSparklineGroup.manualMax);
             }
-            else
-            {
+            else {
                 val_ax_props.putMaxValRule(c_oAscValAxisRule.auto);
+                for (var i = 0; i < aSeriesPoints.length; ++i) {
+                    if (fMaxVal === null) {
+                        fMaxVal = aSeriesPoints[i].val;
+                    }
+                    else {
+                        if (fMaxVal < aSeriesPoints[i].val) {
+                            fMaxVal = aSeriesPoints[i].val;
+                        }
+                    }
+                }
+            }
+            if (fMinVal !== null && fMaxVal !== null) {
+                if (fMinVal !== fMaxVal) {
+                    val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
+                    val_ax_props.putMinVal(fMinVal);
+                    val_ax_props.putMaxValRule(c_oAscValAxisRule.fixed);
+                    val_ax_props.putMaxVal(fMaxVal);
+                }
+            }
+            else if (fMinVal !== null) {
+                val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
+                val_ax_props.putMinVal(fMinVal);
+            }
+            else if (fMaxVal !== null) {
+                val_ax_props.putMaxValRule(c_oAscValAxisRule.fixed);
+                val_ax_props.putMaxVal(fMaxVal);
             }
         }
         else
@@ -743,13 +782,10 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         var oAxis = chart_space.chart.plotArea.getAxisByTypes();
         oAxis.valAx[0].setDelete(true);
 
-        var oSerie = chart_space.chart.plotArea.charts[0].series[0];
         if(!oSerie.spPr)
         {
             oSerie.setSpPr(new AscFormat.CSpPr());
         }
-        chart_space.recalculateReferences();
-        chart_space.recalcInfo.recalculateReferences = false;
         var fCallbackSeries = null;
         if(nSparklineType === Asc.c_oAscSparklineType.Line)
         {
@@ -823,7 +859,6 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
                 oSeries.addDPt(oDPt);
             }
         }
-        var aSeriesPoints = AscFormat.getPtsFromSeries(oSerie);
         var aMaxPoints = null, aMinPoints = null;
         if(aSeriesPoints.length > 0)
         {
@@ -949,7 +984,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             {
                 dMaxVal = val_ax_props.maxVal;
             }
-            if(dMaxVal < 0 || dMinVal > 0)
+            if((dMaxVal !== dMinVal) && (dMaxVal < 0 || dMinVal > 0))
             {
                 oAxis.catAx[0].setDelete(true);
             }
