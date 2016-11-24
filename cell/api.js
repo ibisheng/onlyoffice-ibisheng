@@ -2637,20 +2637,23 @@ var editor;
     this.wb.getWorksheet().freezePane();
   };
 
-  spreadsheet_api.prototype.asc_setSparklineGroup = function (id, oSparklineGroup) {
-    var t = this;
-    var changeSparkline = function(res) {
-      if (res) {
-        var changedSparkline = AscCommon.g_oTableId.Get_ById(id);
-        if (changedSparkline) {
-          changedSparkline.set(oSparklineGroup);
-          t.wb._onWSSelectionChanged();
-          t.wb.getWorksheet().draw();
-        }
-      }
-    };
-    this._isLockedSparkline(id, changeSparkline);
-  };
+	spreadsheet_api.prototype.asc_setSparklineGroup = function (id, oSparklineGroup) {
+		var t = this;
+		var changeSparkline = function (res) {
+			if (res) {
+				var changedSparkline = AscCommon.g_oTableId.Get_ById(id);
+				if (changedSparkline) {
+					History.Create_NewPoint();
+					History.StartTransaction();
+					changedSparkline.set(oSparklineGroup);
+					History.EndTransaction();
+					t.wb._onWSSelectionChanged();
+					t.wb.getWorksheet().draw();
+				}
+			}
+		};
+		this._isLockedSparkline(id, changeSparkline);
+	};
 
   // Cell interface
   spreadsheet_api.prototype.asc_getCellInfo = function() {

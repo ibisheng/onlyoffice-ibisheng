@@ -4786,6 +4786,16 @@ CellArea.prototype = {
 					w.WriteString2(data.newPr);
 				}
 				break;
+			case AscCH.historyitem_Sparkline_Clone_Sparklines:
+				if (data.newPr) {
+					w.WriteLong(data.newPr.length);
+					data.newPr.forEach(function (item) {
+						w.WriteLong(item.sqref.c1);
+						w.WriteLong(item.sqref.r1);
+						w.WriteString2(item.f);
+					});
+				}
+				break;
 		}
 	};
 	sparklineGroup.prototype.Load_Changes = function (r) {
@@ -4885,6 +4895,17 @@ CellArea.prototype = {
 				break;
 			case AscCH.historyitem_Sparkline_F:
 				this.f = r.GetBool() ? r.GetString2() : null;
+				break;
+			case AscCH.historyitem_Sparkline_Clone_Sparklines:
+				var count = r.GetLong(), oSparkline, col, row;
+				for (var i = 0; i < count; ++i) {
+					oSparkline = new sparkline();
+					col = r.GetLong();
+					row = r.GetLong();
+					oSparkline.sqref = Asc.Range(col, row, col, row);
+					oSparkline.setF(r.GetString2());
+					this.arrSparklines.push(oSparkline);
+				}
 				break;
 		}
 		this.cleanCache();
@@ -5119,9 +5140,6 @@ CellArea.prototype = {
 			return color instanceof Asc.asc_CColor ? CorrectAscColor(color) : color ? color.clone(): color;
 		};
 
-		History.Create_NewPoint();
-		History.StartTransaction();
-
 		this.type = checkProperty(this.type, val.type, AscCH.historyitem_Sparkline_Type);
 		this.lineWeight = checkProperty(this.lineWeight, val.lineWeight, AscCH.historyitem_Sparkline_LineWeight);
 		this.displayEmptyCellsAs = checkProperty(this.displayEmptyCellsAs, val.displayEmptyCellsAs, AscCH.historyitem_Sparkline_DisplayEmptyCellsAs);
@@ -5152,8 +5170,6 @@ CellArea.prototype = {
 		this.f = checkProperty(this.f, val.f, AscCH.historyitem_Sparkline_F);
 
 		this.cleanCache();
-
-		History.EndTransaction();
 	};
 	sparklineGroup.prototype.clone = function (onlyProps) {
 		var res = new sparklineGroup(!onlyProps);
@@ -5161,9 +5177,12 @@ CellArea.prototype = {
 		res.f = this.f;
 
 		if (!onlyProps) {
+			var newSparklines = [];
 			for (var i = 0; i < this.arrSparklines.length; ++i) {
 				res.arrSparklines.push(this.arrSparklines[i].clone());
+				newSparklines.push(this.arrSparklines[i].clone());
 			}
+			History.Add(res, {Type: AscCH.historyitem_Sparkline_Clone_Sparklines, oldPr: null, newPr: newSparklines});
 		}
 
 		return res;
