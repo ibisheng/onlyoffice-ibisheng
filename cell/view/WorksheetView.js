@@ -7047,7 +7047,7 @@
 		cell_info.sparklineInfo = this.model.getSparklineGroup(c1, r1);
 		if (cell_info.sparklineInfo) {
 			lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId,
-				sparklineInfo.Get_Id());
+				cell_info.sparklineInfo.Get_Id());
 			if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
 					/*bCheckOnlyLockAll*/false)) {
 				cell_info.isLockedSparkline = true;
@@ -8380,8 +8380,11 @@
                 History.EndTransaction();
             };
 
-            if (t.model.autoFilters._searchFiltersInRange(arnFrom)) {
+            if (t.model.autoFilters._searchFiltersInRange(arnFrom, true)) {
                 t._isLockedAll(onApplyMoveAutoFiltersCallback);
+				if(copyRange){
+					t._isLockedDefNames(null, null);
+				}
             } else {
                 onApplyMoveAutoFiltersCallback();
             }
@@ -8760,13 +8763,10 @@
 
         //добавляем автофильтры и форматированные таблицы
         if (isLocal === 'binary' && val.TableParts && val.TableParts.length) {
-            var aFilters = val.TableParts;
-            var range;
-            var tablePartRange;
             var activeRange = window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange;
             var refInsertBinary = AscCommonExcel.g_oRangeCache.getAscRange(activeRange);
-            var diffRow;
-            var diffCol;
+            var diffRow, range, tablePartRange, diffCol, bIsAddTable, aFilters = val.TableParts;
+			
             for (var aF = 0; aF < aFilters.length; aF++) {
                 tablePartRange = aFilters[aF].Ref;
                 diffRow = tablePartRange.r1 - refInsertBinary.r1;
@@ -8802,7 +8802,14 @@
 
                 t.model.autoFilters.addAutoFilter(aFilters[aF].TableStyleInfo.Name, range.bbox, true, true,
                   bWithoutFilter, null, stylePasteObj);
+				bIsAddTable = true;
             }
+			
+			//лочим именованные диапазоны если вставили новую ф/т
+			if(bIsAddTable)
+			{
+				t._isLockedDefNames(null, null);
+			}
         }
 
         //делаем unmerge ф/т

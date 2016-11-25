@@ -726,7 +726,7 @@ CShape.prototype.convertToWord = function (document) {
     return c;
 };
 
-CShape.prototype.convertToPPTX = function (drawingDocument, worksheet) {
+CShape.prototype.convertToPPTX = function (drawingDocument, worksheet, bIsAddMath) {
     var c = new CShape();
     c.setWordShape(false);
     c.setBDeleted(false);
@@ -755,7 +755,7 @@ CShape.prototype.convertToPPTX = function (drawingDocument, worksheet) {
         for (var i = 0; i < paragraphs.length; ++i) {
             var cur_par = paragraphs[i];
             if (cur_par instanceof Paragraph) {
-                var new_paragraph = ConvertParagraphToPPTX(cur_par, drawingDocument, new_content);
+                var new_paragraph = ConvertParagraphToPPTX(cur_par, drawingDocument, new_content, bIsAddMath);
                 new_content.Internal_Content_Add(index++, new_paragraph, false);
             }
         }

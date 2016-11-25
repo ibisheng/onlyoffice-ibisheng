@@ -170,6 +170,7 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Sparkline_ColorHigh = 24;
 	window['AscCH'].historyitem_Sparkline_ColorLow = 25;
 	window['AscCH'].historyitem_Sparkline_F = 26;
+	window['AscCH'].historyitem_Sparkline_Clone_Sparklines = 27;
 
 function CHistory()
 {
