@@ -41,6 +41,26 @@ AscDFH.changesFactory[AscDFH.historyitem_AbstractNum_LvlChange]    = CChangesAbs
 AscDFH.changesFactory[AscDFH.historyitem_AbstractNum_TextPrChange] = CChangesAbstractNumTextPrChange;
 AscDFH.changesFactory[AscDFH.historyitem_AbstractNum_ParaPrChange] = CChangesAbstractNumParaPrChange;
 
+//----------------------------------------------------------------------------------------------------------------------
+// Карта зависимости изменений
+//----------------------------------------------------------------------------------------------------------------------
+AscDFH.abstractnumRelationMap                                              = {};
+AscDFH.abstractnumRelationMap[AscDFH.historyitem_AbstractNum_LvlChange]    = [
+	AscDFH.historyitem_AbstractNum_LvlChange,
+	AscDFH.historyitem_AbstractNum_TextPrChange,
+	AscDFH.historyitem_AbstractNum_ParaPrChange
+];
+AscDFH.abstractnumRelationMap[AscDFH.historyitem_AbstractNum_TextPrChange] = [
+	AscDFH.historyitem_AbstractNum_LvlChange,
+	AscDFH.historyitem_AbstractNum_TextPrChange
+];
+AscDFH.abstractnumRelationMap[AscDFH.historyitem_AbstractNum_ParaPrChange] = [
+	AscDFH.historyitem_AbstractNum_LvlChange,
+	AscDFH.historyitem_AbstractNum_ParaPrChange
+];
+//----------------------------------------------------------------------------------------------------------------------
+
+
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -98,6 +118,25 @@ CChangesAbstractNumLvlChange.prototype.CreateReverseChange = function()
 {
 	return new CChangesAbstractNumLvlChange(this.Class, this.New, this.Old, this.Index);
 };
+CChangesAbstractNumLvlChange.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type)
+		return false;
+
+	if (AscDFH.historyitem_AbstractNum_TextPrChange === oChange.Type)
+	{
+		this.New.TextPr = oChange.New;
+	}
+	else if (AscDFH.historyitem_AbstractNum_ParaPrChange === oChange.Type)
+	{
+		this.New.ParaPr = oChange.New;
+	}
+
+	return true;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -151,6 +190,16 @@ CChangesAbstractNumTextPrChange.prototype.CreateReverseChange = function()
 {
 	return new CChangesAbstractNumTextPrChange(this.Class, this.New, this.Old, this.Index);
 };
+CChangesAbstractNumTextPrChange.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type || oChange.Type === AscDFH.historyitem_AbstractNum_LvlChange)
+		return false;
+
+	return true;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -203,4 +252,14 @@ CChangesAbstractNumParaPrChange.prototype.Load = function(Color)
 CChangesAbstractNumParaPrChange.prototype.CreateReverseChange = function()
 {
 	return new CChangesAbstractNumParaPrChange(this.Class, this.New, this.Old, this.Index);
+};
+CChangesAbstractNumParaPrChange.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type || oChange.Type === AscDFH.historyitem_AbstractNum_LvlChange)
+		return false;
+
+	return true;
 };

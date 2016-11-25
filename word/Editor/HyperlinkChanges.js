@@ -42,6 +42,22 @@ AscDFH.changesFactory[AscDFH.historyitem_Hyperlink_ToolTip]    = CChangesHyperli
 AscDFH.changesFactory[AscDFH.historyitem_Hyperlink_AddItem]    = CChangesHyperlinkAddItem;
 AscDFH.changesFactory[AscDFH.historyitem_Hyperlink_RemoveItem] = CChangesHyperlinkRemoveItem;
 
+//----------------------------------------------------------------------------------------------------------------------
+// Карта зависимости изменений
+//----------------------------------------------------------------------------------------------------------------------
+AscDFH.hyperlinkChangesRelationMap                                          = {};
+AscDFH.hyperlinkChangesRelationMap[AscDFH.historyitem_Hyperlink_Value]      = [AscDFH.historyitem_Hyperlink_Value];
+AscDFH.hyperlinkChangesRelationMap[AscDFH.historyitem_Hyperlink_ToolTip]    = [AscDFH.historyitem_Hyperlink_ToolTip];
+AscDFH.hyperlinkChangesRelationMap[AscDFH.historyitem_Hyperlink_AddItem]    = [
+	AscDFH.historyitem_Hyperlink_AddItem,
+	AscDFH.historyitem_Hyperlink_RemoveItem
+];
+AscDFH.hyperlinkChangesRelationMap[AscDFH.historyitem_Hyperlink_RemoveItem] = [
+	AscDFH.historyitem_Hyperlink_AddItem,
+	AscDFH.historyitem_Hyperlink_RemoveItem
+];
+//----------------------------------------------------------------------------------------------------------------------
+
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseStringValue}

@@ -371,8 +371,22 @@
 	window["AscCommon"].CChangesCommonAddWaterMark = CChangesCommonAddWaterMark;
 })(window);
 
+
+
 AscDFH.changesFactory[AscDFH.historyitem_TableId_Add]         = AscCommon.CChangesTableIdAdd;
 AscDFH.changesFactory[AscDFH.historyitem_TableId_Reset]       = AscCommon.CChangesTableIdReset;
 AscDFH.changesFactory[AscDFH.historyitem_TableId_Description] = AscCommon.CChangesTableIdDescription;
 
 AscDFH.changesFactory[AscDFH.historyitem_Common_AddWatermark] = AscCommon.CChangesCommonAddWaterMark;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Карта зависимости изменений
+//----------------------------------------------------------------------------------------------------------------------
+AscDFH.tableidRelationMap                                         = {};
+AscDFH.tableidRelationMap[AscDFH.historyitem_TableId_Add]         = [AscDFH.historyitem_TableId_Add];
+AscDFH.tableidRelationMap[AscDFH.historyitem_TableId_Reset]       = [AscDFH.historyitem_TableId_Reset];
+AscDFH.tableidRelationMap[AscDFH.historyitem_TableId_Description] = [AscDFH.historyitem_TableId_Description];
+
+AscDFH.tableidRelationMap[AscDFH.historyitem_Common_AddWatermark] = [AscDFH.historyitem_Common_AddWatermark];
+//----------------------------------------------------------------------------------------------------------------------

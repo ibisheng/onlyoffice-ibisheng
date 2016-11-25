@@ -45,6 +45,26 @@ AscDFH.changesFactory[AscDFH.historyitem_Comments_Remove] = CChangesCommentsRemo
 
 AscDFH.changesFactory[AscDFH.historyitem_ParaComment_CommentId] = CChangesParaCommentCommentId;
 
+//----------------------------------------------------------------------------------------------------------------------
+// Карта зависимости изменений
+//----------------------------------------------------------------------------------------------------------------------
+AscDFH.commentRelationMap                                      = {};
+AscDFH.commentRelationMap[AscDFH.historyitem_Comment_Change]   = [AscDFH.historyitem_Comment_Change];
+AscDFH.commentRelationMap[AscDFH.historyitem_Comment_TypeInfo] = [AscDFH.historyitem_Comment_TypeInfo];
+
+AscDFH.commentsRelationMap                                     = {};
+AscDFH.commentsRelationMap[AscDFH.historyitem_Comments_Add]    = [
+	AscDFH.historyitem_Comments_Add,
+	AscDFH.historyitem_Comments_Remove
+];
+AscDFH.commentsRelationMap[AscDFH.historyitem_Comments_Remove] = [
+	AscDFH.historyitem_Comments_Add,
+	AscDFH.historyitem_Comments_Remove
+];
+
+AscDFH.paracommentRelationMap                                   = {};
+AscDFH.changesFactory[AscDFH.historyitem_ParaComment_CommentId] = [AscDFH.historyitem_ParaComment_CommentId];
+//----------------------------------------------------------------------------------------------------------------------
 
 /**
  * @constructor
@@ -168,6 +188,16 @@ CChangesCommentsAdd.prototype.CreateReverseChange = function()
 {
 	return new CChangesCommentsRemove(this.Class, this.Id, this.Comment);
 };
+CChangesCommentsAdd.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if ((AscDFH.historyitem_Comments_Add === oChange.Type || AscDFH.historyitem_Comments_Remove === oChange.Type) && this.Id === oChange.Id)
+		return false;
+
+	return true;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -205,6 +235,16 @@ CChangesCommentsRemove.prototype.ReadFromBinary = function(Reader)
 CChangesCommentsRemove.prototype.CreateReverseChange = function()
 {
 	return new CChangesCommentsAdd(this.Class, this.Id, this.Comment);
+};
+CChangesCommentsRemove.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if ((AscDFH.historyitem_Comments_Add === oChange.Type || AscDFH.historyitem_Comments_Remove === oChange.Type) && this.Id === oChange.Id)
+		return false;
+
+	return true;
 };
 /**
  * @constructor

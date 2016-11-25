@@ -44,6 +44,24 @@ AscDFH.changesFactory[AscDFH.historyitem_Document_EvenAndOddHeaders] = CChangesD
 AscDFH.changesFactory[AscDFH.historyitem_Document_DefaultLanguage]   = CChangesDocumentDefaultLanguage;
 AscDFH.changesFactory[AscDFH.historyitem_Document_MathSettings]      = CChangesDocumentMathSettings;
 
+//----------------------------------------------------------------------------------------------------------------------
+// Карта зависимости изменений
+//----------------------------------------------------------------------------------------------------------------------
+AscDFH.documentChangesRelationMap                                                = {};
+AscDFH.documentChangesRelationMap[AscDFH.historyitem_Document_AddItem]           = [
+	AscDFH.historyitem_Document_AddItem,
+	AscDFH.historyitem_Document_RemoveItem
+];
+AscDFH.documentChangesRelationMap[AscDFH.historyitem_Document_RemoveItem]        = [
+	AscDFH.historyitem_Document_AddItem,
+	AscDFH.historyitem_Document_RemoveItem
+];
+AscDFH.documentChangesRelationMap[AscDFH.historyitem_Document_DefaultTab]        = [AscDFH.historyitem_Document_DefaultTab];
+AscDFH.documentChangesRelationMap[AscDFH.historyitem_Document_EvenAndOddHeaders] = [AscDFH.historyitem_Document_EvenAndOddHeaders];
+AscDFH.documentChangesRelationMap[AscDFH.historyitem_Document_DefaultLanguage]   = [AscDFH.historyitem_Document_DefaultLanguage];
+AscDFH.documentChangesRelationMap[AscDFH.historyitem_Document_MathSettings]      = [AscDFH.historyitem_Document_MathSettings];
+//----------------------------------------------------------------------------------------------------------------------
+
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
