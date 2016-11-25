@@ -3917,14 +3917,14 @@ function OfflineEditor () {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
             asc_WriteUsers(users, stream);
-            window["native"]["OnCallMenuEvent"](2416, stream); // ASC_MENU_EVENT_TYPE_AUTH_PARTICIPANTS_CHANGED
+            window["native"]["OnCallMenuEvent"](20101, stream); // ASC_COAUTH_EVENT_TYPE_PARTICIPANTS_CHANGED
         });
      
         _api.asc_registerCallback("asc_onParticipantsChanged", function(users) {
                                   var stream = global_memory_stream_menu;
                                   stream["ClearNoAttack"]();
                                   asc_WriteUsers(users, stream);
-                                  window["native"]["OnCallMenuEvent"](2416, stream); // ASC_MENU_EVENT_TYPE_AUTH_PARTICIPANTS_CHANGED
+                                  window["native"]["OnCallMenuEvent"](20101, stream); // ASC_COAUTH_EVENT_TYPE_PARTICIPANTS_CHANGED
                                   });
         
         _api.asc_registerCallback("asc_onSheetsChanged", function () {
@@ -7367,32 +7367,12 @@ function testLockedObjects () {
             
             for (var j = 0; j < drawingArea.frozenPlaces.length; ++j) {
                 if (drawingArea.frozenPlaces[j].isObjectInside(drawingObject)) {
-                    
-                    //var canvas = _this.ws.objectRender.getDrawingCanvas();
-                   // _this.setTransform(canvas.shapeCtx, canvas.shapeOverlayCtx, canvas.autoShapeTrack);
-                    
-                   // _this.clip(canvas.shapeCtx);
-                    //object.graphicObject.draw(canvas.shapeCtx);
-                    
+
                     // Lock
                     if ( (drawingObject.graphicObject.lockType != undefined) && (drawingObject.graphicObject.lockType != AscCommon.c_oAscLockTypes.kLockTypeNone) ) {
-                        //canvas.shapeCtx.SetIntegerGrid(false);
-                        //canvas.shapeCtx.transform3(object.graphicObject.transform, false);
-                        //canvas.shapeCtx.DrawLockObjectRect(object.graphicObject.lockType, 0, 0, object.graphicObject.extX, object.graphicObject.extY );
-                        //canvas.shapeCtx.reset();
-                        //canvas.shapeCtx.SetIntegerGrid(true);
-                        
                         overlay.transform3(drawingObject.graphicObject.transform, false, "PD_LockObjectTransform");
                         overlay.Native["PD_DrawLockObjectRect"](drawingObject.graphicObject.lockType, 0, 0, drawingObject.graphicObject.extX, drawingObject.graphicObject.extY);
-                       // console.log("lockType : " + drawingObject.graphicObject.lockType);
                     }
-                    else
-                    {
-                        
-                    }
-                    
-                    //_this.restore(canvas.shapeCtx);
-                    
                 }
             }
         }
