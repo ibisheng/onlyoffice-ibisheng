@@ -4664,13 +4664,13 @@ PasteProcessor.prototype =
             //Spacing
 			var Spacing = new CParaSpacing();
             var margin_top = computedStyle.getPropertyValue( "margin-top" );
-            if(margin_top && null != (margin_top = this._ValueToMm(margin_top)))
+            if(margin_top && null != (margin_top = this._ValueToMm(margin_top)) && margin_top >= 0)
                 Spacing.Before = margin_top;
             var margin_bottom = computedStyle.getPropertyValue( "margin-bottom" );
-            if(margin_bottom && null != (margin_bottom = this._ValueToMm(margin_bottom)))
+            if(margin_bottom && null != (margin_bottom = this._ValueToMm(margin_bottom)) && margin_bottom >= 0)
                 Spacing.After = margin_bottom;
 			var line_height = computedStyle.getPropertyValue( "line-height" );
-			if(line_height && null != (line_height = this._ValueToMm(line_height)))
+			if(line_height && null != (line_height = this._ValueToMm(line_height)) && line_height >= 0)
                 Spacing.After = line_height;
             if(false == this._isEmptyProperty(Spacing))
                 Para.Set_Spacing(Spacing);
