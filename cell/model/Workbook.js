@@ -3502,6 +3502,9 @@ Woorksheet.prototype.clone=function(sNewId, sName, tableNames){
 					drawingBase.from.row, drawingBase.from.rowOff, drawingBase.to.col, drawingBase.to.colOff,
 					drawingBase.to.row, drawingBase.to.rowOff, drawingBase.Pos.X, drawingBase.Pos.Y, drawingBase.ext.cx,
 					drawingBase.ext.cy);
+				if(drawingObject.graphicObject.setDrawingBaseType){
+                    drawingObject.graphicObject.setDrawingBaseType(drawingBase.Type);
+                }
 				oNewWs.Drawings[oNewWs.Drawings.length - 1] = drawingObject;
 			}
 			AscFormat.NEW_WORKSHEET_DRAWING_DOCUMENT = null;
