@@ -4607,9 +4607,10 @@ PasteProcessor.prototype =
             var margin_left = computedStyle.getPropertyValue( "margin-left" );
 			
 			//TODO перепроверить правку с pageColumn
-			var curIndexColumn = this.oLogicDocument.Content[this.oLogicDocument.CurPos.ContentPos].Get_CurrentColumn(this.oLogicDocument.CurPage);
+			var curContent = this.oLogicDocument.Content[this.oLogicDocument.CurPos.ContentPos];
+			var curIndexColumn = curContent && curContent.Get_CurrentColumn ? curContent.Get_CurrentColumn(this.oLogicDocument.CurPage) : null;
 			var curPage = this.oLogicDocument.Pages[this.oLogicDocument.CurPage];
-			var pageColumn = curPage && curPage.Sections && curPage.Sections[0] && curPage.Sections[0].Columns ? curPage.Sections[0].Columns[curIndexColumn] : null;
+			var pageColumn = null !== curIndexColumn && curPage && curPage.Sections && curPage.Sections[0] && curPage.Sections[0].Columns ? curPage.Sections[0].Columns[curIndexColumn] : null;
             if(margin_left && null != (margin_left = this._ValueToMm(margin_left)))
 			{
 				if(!pageColumn || (pageColumn && pageColumn.X + margin_left < pageColumn.XLimit))
