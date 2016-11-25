@@ -63,6 +63,132 @@ AscDFH.changesFactory[AscDFH.historyitem_Table_Distance]              = CChanges
 AscDFH.changesFactory[AscDFH.historyitem_Table_Pr]                    = CChangesTablePr;
 AscDFH.changesFactory[AscDFH.historyitem_Table_TableLayout]           = CChangesTableTableLayout;
 
+//----------------------------------------------------------------------------------------------------------------------
+// Карта зависимости изменений
+//----------------------------------------------------------------------------------------------------------------------
+AscDFH.tableChangesRelationMap                                                 = {};
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_TableW]                = [
+	AscDFH.historyitem_Table_TableW,
+	AscDFH.historyitem_Table_Pr
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_TableCellMar]          = [
+	AscDFH.historyitem_Table_TableCellMar,
+	AscDFH.historyitem_Table_Pr
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_TableAlign]            = [
+	AscDFH.historyitem_Table_TableAlign,
+	AscDFH.historyitem_Table_Pr
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_TableInd]              = [
+	AscDFH.historyitem_Table_TableInd,
+	AscDFH.historyitem_Table_Pr
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_TableBorder_Left]      = [
+	AscDFH.historyitem_Table_TableBorder_Left,
+	AscDFH.historyitem_Table_Pr
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_TableBorder_Top]       = [
+	AscDFH.historyitem_Table_TableBorder_Top,
+	AscDFH.historyitem_Table_Pr
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_TableBorder_Right]     = [
+	AscDFH.historyitem_Table_TableBorder_Right,
+	AscDFH.historyitem_Table_Pr
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_TableBorder_Bottom]    = [
+	AscDFH.historyitem_Table_TableBorder_Bottom,
+	AscDFH.historyitem_Table_Pr
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_TableBorder_InsideH]   = [
+	AscDFH.historyitem_Table_TableBorder_InsideH,
+	AscDFH.historyitem_Table_Pr
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_TableBorder_InsideV]   = [
+	AscDFH.historyitem_Table_TableBorder_InsideV,
+	AscDFH.historyitem_Table_Pr
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_TableShd]              = [
+	AscDFH.historyitem_Table_TableShd,
+	AscDFH.historyitem_Table_Pr
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_Inline]                = [
+	AscDFH.historyitem_Table_Inline
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_AddRow]                = [
+	AscDFH.historyitem_Table_AddRow,
+	AscDFH.historyitem_Table_RemoveRow
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_RemoveRow]             = [
+	AscDFH.historyitem_Table_AddRow,
+	AscDFH.historyitem_Table_RemoveRow
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_TableGrid]             = [
+	AscDFH.historyitem_Table_TableGrid
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_TableLook]             = [
+	AscDFH.historyitem_Table_TableLook
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_TableStyleRowBandSize] = [
+	AscDFH.historyitem_Table_TableStyleRowBandSize,
+	AscDFH.historyitem_Table_Pr
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_TableStyleColBandSize] = [
+	AscDFH.historyitem_Table_TableStyleColBandSize,
+	AscDFH.historyitem_Table_Pr
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_TableStyle]            = [
+	AscDFH.historyitem_Table_TableStyle
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_AllowOverlap]          = [
+	AscDFH.historyitem_Table_AllowOverlap
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_PositionH]             = [
+	AscDFH.historyitem_Table_PositionH
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_PositionV]             = [
+	AscDFH.historyitem_Table_PositionV
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_Distance]              = [
+	AscDFH.historyitem_Table_Distance
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_Pr]                    = [
+	AscDFH.historyitem_Table_TableW,
+	AscDFH.historyitem_Table_TableCellMar,
+	AscDFH.historyitem_Table_TableAlign,
+	AscDFH.historyitem_Table_TableInd,
+	AscDFH.historyitem_Table_TableBorder_Left,
+	AscDFH.historyitem_Table_TableBorder_Top,
+	AscDFH.historyitem_Table_TableBorder_Right,
+	AscDFH.historyitem_Table_TableBorder_Bottom,
+	AscDFH.historyitem_Table_TableBorder_InsideH,
+	AscDFH.historyitem_Table_TableBorder_InsideV,
+	AscDFH.historyitem_Table_TableShd,
+	AscDFH.historyitem_Table_TableStyleRowBandSize,
+	AscDFH.historyitem_Table_TableStyleColBandSize,
+	AscDFH.historyitem_Table_Pr,
+	AscDFH.historyitem_Table_TableLayout
+];
+AscDFH.tableChangesRelationMap[AscDFH.historyitem_Table_TableLayout]           = [
+	AscDFH.historyitem_Table_TableLayout,
+	AscDFH.historyitem_Table_Pr
+];
+/**
+ * Общая функция объединения изменений, которые зависят только от себя и AscDFH.historyitem_Table_Pr
+ * @param oChange
+ * @returns {boolean}
+ */
+function private_TableChangesOnMergePr(oChange)
+{
+	if (oChange.Class !== this.Class)
+		return true;
+
+	if (oChange.Type === this.Type || oChange.Type === AscDFH.historyitem_Table_Pr)
+		return false;
+
+	return true;
+}
+//----------------------------------------------------------------------------------------------------------------------
+
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectProperty}
@@ -83,6 +209,7 @@ CChangesTableTableW.prototype.private_SetValue = function(Value)
 	oTable.Pr.TableW = Value;
 	oTable.Recalc_CompiledPr();
 };
+CChangesTableTableW.prototype.Merge = private_TableChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -266,6 +393,7 @@ CChangesTableTableCellMar.prototype.private_SetValue = function(Value)
 
 	oTable.Recalc_CompiledPr();
 };
+CChangesTableTableCellMar.prototype.Merge = private_TableChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseLongProperty}
@@ -282,6 +410,7 @@ CChangesTableTableAlign.prototype.private_SetValue = function(Value)
 	oTable.Pr.Jc = Value;
 	oTable.Recalc_CompiledPr();
 };
+CChangesTableTableAlign.prototype.Merge = private_TableChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseDoubleProperty}
@@ -298,6 +427,7 @@ CChangesTableTableInd.prototype.private_SetValue = function(Value)
 	oTable.Pr.TableInd = Value;
 	oTable.Recalc_CompiledPr();
 };
+CChangesTableTableInd.prototype.Merge = private_TableChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectProperty}
@@ -318,6 +448,7 @@ CChangesTableTableBorderLeft.prototype.private_SetValue = function(Value)
 	oTable.Pr.TableBorders.Left = Value;
 	oTable.Recalc_CompiledPr2();
 };
+CChangesTableTableBorderLeft.prototype.Merge = private_TableChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectProperty}
@@ -338,6 +469,7 @@ CChangesTableTableBorderTop.prototype.private_SetValue = function(Value)
 	oTable.Pr.TableBorders.Top = Value;
 	oTable.Recalc_CompiledPr2();
 };
+CChangesTableTableBorderTop.prototype.Merge = private_TableChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectProperty}
@@ -358,6 +490,7 @@ CChangesTableTableBorderRight.prototype.private_SetValue = function(Value)
 	oTable.Pr.TableBorders.Right = Value;
 	oTable.Recalc_CompiledPr2();
 };
+CChangesTableTableBorderRight.prototype.Merge = private_TableChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectProperty}
@@ -378,6 +511,7 @@ CChangesTableTableBorderBottom.prototype.private_SetValue = function(Value)
 	oTable.Pr.TableBorders.Bottom = Value;
 	oTable.Recalc_CompiledPr2();
 };
+CChangesTableTableBorderBottom.prototype.Merge = private_TableChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectProperty}
@@ -398,6 +532,7 @@ CChangesTableTableBorderInsideH.prototype.private_SetValue = function(Value)
 	oTable.Pr.TableBorders.InsideH = Value;
 	oTable.Recalc_CompiledPr2();
 };
+CChangesTableTableBorderInsideH.prototype.Merge = private_TableChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectProperty}
@@ -418,6 +553,7 @@ CChangesTableTableBorderInsideV.prototype.private_SetValue = function(Value)
 	oTable.Pr.TableBorders.InsideV = Value;
 	oTable.Recalc_CompiledPr2();
 };
+CChangesTableTableBorderInsideV.prototype.Merge = private_TableChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectProperty}
@@ -438,6 +574,7 @@ CChangesTableTableShd.prototype.private_SetValue = function(Value)
 	oTable.Pr.Shd = Value;
 	oTable.Recalc_CompiledPr2();
 };
+CChangesTableTableShd.prototype.Merge = private_TableChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseBoolValue}
@@ -685,6 +822,7 @@ CChangesTableTableStyleRowBandSize.prototype.private_SetValue = function(Value)
 	oTable.Pr.TableStyleRowBandSize = Value;
 	oTable.Recalc_CompiledPr();
 };
+CChangesTableTableStyleRowBandSize.prototype.Merge = private_TableChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseLongProperty}
@@ -701,6 +839,7 @@ CChangesTableTableStyleColBandSize.prototype.private_SetValue = function(Value)
 	oTable.Pr.TableStyleColBandSize = Value;
 	oTable.Recalc_CompiledPr();
 };
+CChangesTableTableStyleColBandSize.prototype.Merge = private_TableChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -1013,6 +1152,96 @@ CChangesTablePr.prototype.private_SetValue = function(Value)
 	oTable.Pr = Value;
 	oTable.Recalc_CompiledPr2();
 };
+CChangesTablePr.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type)
+		return false;
+
+	if (!this.New)
+		this.New = new CTablePr();
+
+	switch (oChange.Type)
+	{
+		case AscDFH.historyitem_Table_TableW:
+		{
+			this.New.TableW = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Table_TableCellMar:
+		{
+			this.New.TableCellMar.Left   = oChange.New.Left;
+			this.New.TableCellMar.Right  = oChange.New.Right;
+			this.New.TableCellMar.Top    = oChange.New.Top;
+			this.New.TableCellMar.Bottom = oChange.New.Bottom;
+			break;
+		}
+		case AscDFH.historyitem_Table_TableAlign:
+		{
+			this.New.Jc = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Table_TableInd:
+		{
+			this.New.TableInd = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Table_TableBorder_Left:
+		{
+			this.New.TableBorders.Left = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Table_TableBorder_Top:
+		{
+			this.New.TableBorders.Top = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Table_TableBorder_Right:
+		{
+			this.New.TableBorders.Right = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Table_TableBorder_Bottom:
+		{
+			this.New.TableBorders.Bottom = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Table_TableBorder_InsideH:
+		{
+			this.New.TableBorders.InsideH = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Table_TableBorder_InsideV:
+		{
+			this.New.TableBorders.InsideV = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Table_TableShd:
+		{
+			this.New.Shd = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Table_TableStyleRowBandSize:
+		{
+			this.New.TableStyleRowBandSize = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Table_TableStyleColBandSize:
+		{
+			this.New.TableStyleColBandSize = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Table_TableLayout:
+		{
+			this.New.TableLayout = oChange.New;
+			break;
+		}
+	}
+
+	return true;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseLongProperty}
@@ -1029,3 +1258,4 @@ CChangesTableTableLayout.prototype.private_SetValue = function(Value)
 	oTable.Pr.TableLayout = Value;
 	oTable.Recalc_CompiledPr2();
 };
+CChangesTableTableLayout.prototype.Merge = private_TableChangesOnMergePr;

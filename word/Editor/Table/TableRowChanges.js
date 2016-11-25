@@ -46,6 +46,63 @@ AscDFH.changesFactory[AscDFH.historyitem_TableRow_RemoveCell]  = CChangesTableRo
 AscDFH.changesFactory[AscDFH.historyitem_TableRow_TableHeader] = CChangesTableRowTableHeader;
 AscDFH.changesFactory[AscDFH.historyitem_TableRow_Pr]          = CChangesTableRowPr;
 
+//----------------------------------------------------------------------------------------------------------------------
+// Карта зависимости изменений
+//----------------------------------------------------------------------------------------------------------------------
+AscDFH.tablerowChangesRelationMap                                          = {};
+AscDFH.tablerowChangesRelationMap[AscDFH.historyitem_TableRow_Before]      = [
+	AscDFH.historyitem_TableRow_Before,
+	AscDFH.historyitem_TableRow_Pr
+];
+AscDFH.tablerowChangesRelationMap[AscDFH.historyitem_TableRow_After]       = [
+	AscDFH.historyitem_TableRow_After,
+	AscDFH.historyitem_TableRow_Pr
+];
+AscDFH.tablerowChangesRelationMap[AscDFH.historyitem_TableRow_CellSpacing] = [
+	AscDFH.historyitem_TableRow_CellSpacing,
+	AscDFH.historyitem_TableRow_Pr
+];
+AscDFH.tablerowChangesRelationMap[AscDFH.historyitem_TableRow_Height]      = [
+	AscDFH.historyitem_TableRow_Height,
+	AscDFH.historyitem_TableRow_Pr
+];
+AscDFH.tablerowChangesRelationMap[AscDFH.historyitem_TableRow_AddCell]     = [
+	AscDFH.historyitem_TableRow_AddCell,
+	AscDFH.historyitem_TableRow_RemoveCell
+];
+AscDFH.tablerowChangesRelationMap[AscDFH.historyitem_TableRow_RemoveCell]  = [
+	AscDFH.historyitem_TableRow_AddCell,
+	AscDFH.historyitem_TableRow_RemoveCell
+];
+AscDFH.tablerowChangesRelationMap[AscDFH.historyitem_TableRow_TableHeader] = [
+	AscDFH.historyitem_TableRow_TableHeader,
+	AscDFH.historyitem_TableRow_Pr
+];
+AscDFH.tablerowChangesRelationMap[AscDFH.historyitem_TableRow_Pr]          = [
+	AscDFH.historyitem_TableRow_Before,
+	AscDFH.historyitem_TableRow_After,
+	AscDFH.historyitem_TableRow_CellSpacing,
+	AscDFH.historyitem_TableRow_Height,
+	AscDFH.historyitem_TableRow_TableHeader,
+	AscDFH.historyitem_TableRow_Pr
+];
+/**
+ * Общая функция объединения изменений, которые зависят только от себя и AscDFH.historyitem_TableRow_Pr
+ * @param oChange
+ * @returns {boolean}
+ */
+function private_TableRowChangesOnMergePr(oChange)
+{
+	if (oChange.Class !== this.Class)
+		return true;
+
+	if (oChange.Type === this.Type || oChange.Type === AscDFH.historyitem_TableRow_Pr)
+		return false;
+
+	return true;
+}
+//----------------------------------------------------------------------------------------------------------------------
+
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -151,6 +208,7 @@ CChangesTableRowBefore.prototype.private_SetValue = function(Value)
 	oTableRow.Pr.WBefore    = Value.WBefore;
 	oTableRow.Recalc_CompiledPr();
 };
+CChangesTableRowBefore.prototype.Merge = private_TableRowChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -256,6 +314,7 @@ CChangesTableRowAfter.prototype.private_SetValue = function(Value)
 	oTableRow.Pr.WAfter    = Value.WBefore;
 	oTableRow.Recalc_CompiledPr();
 };
+CChangesTableRowAfter.prototype.Merge = private_TableRowChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -326,6 +385,7 @@ CChangesTableRowCellSpacing.prototype.private_SetValue = function(Value)
 	oTableRow.Pr.TableCellSpacing = Value;
 	oTableRow.Recalc_CompiledPr();
 };
+CChangesTableRowCellSpacing.prototype.Merge = private_TableRowChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectProperty}
@@ -346,6 +406,7 @@ CChangesTableRowHeight.prototype.private_SetValue = function(Value)
 	oTable.Pr.Height = Value;
 	oTable.Recalc_CompiledPr();
 };
+CChangesTableRowHeight.prototype.Merge = private_TableRowChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -494,6 +555,7 @@ CChangesTableRowTableHeader.prototype.private_SetValue = function(Value)
 	oRow.Pr.TableHeader = Value;
 	oRow.Recalc_CompiledPr();
 };
+CChangesTableRowTableHeader.prototype.Merge = private_TableRowChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectValue}
@@ -513,4 +575,48 @@ CChangesTableRowPr.prototype.private_SetValue = function(Value)
 	var oRow = this.Class;
 	oRow.Pr = Value;
 	oRow.Recalc_CompiledPr();
+};
+CChangesTableRowPr.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type)
+		return false;
+
+	if (!this.New)
+		this.New = new CTableRowPr();
+
+	switch (oChange.Type)
+	{
+		case AscDFH.historyitem_TableRow_Before:
+		{
+			this.New.GridBefore = oChange.New.GridBefore;
+			this.New.WBefore    = oChange.New.WBefore;
+			break;
+		}
+		case AscDFH.historyitem_TableRow_After:
+		{
+			this.New.GridAfter = oChange.New.GridAfter;
+			this.New.WAfter    = oChange.New.WAfter;
+			break;
+		}
+		case AscDFH.historyitem_TableRow_CellSpacing:
+		{
+			this.New.TableCellSpacing = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_TableRow_Height:
+		{
+			this.New.Height = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_TableRow_TableHeader:
+		{
+			this.New.TableHeader = oChange.New;
+			break;
+		}
+	}
+
+	return true;
 };

@@ -51,6 +51,90 @@ AscDFH.changesFactory[AscDFH.historyitem_TableCell_Pr]            = CChangesTabl
 AscDFH.changesFactory[AscDFH.historyitem_TableCell_TextDirection] = CChangesTableCellTextDirection;
 AscDFH.changesFactory[AscDFH.historyitem_TableCell_NoWrap]        = CChangesTableCellNoWrap;
 
+//----------------------------------------------------------------------------------------------------------------------
+// Карта зависимости изменений
+//----------------------------------------------------------------------------------------------------------------------
+AscDFH.tablecellChangesRelationMap                                             = {};
+AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_GridSpan]      = [
+	AscDFH.historyitem_TableCell_GridSpan,
+	AscDFH.historyitem_TableCell_Pr
+];
+AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_Margins]       = [
+	AscDFH.historyitem_TableCell_Margins,
+	AscDFH.historyitem_TableCell_Pr
+];
+AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_Shd]           = [
+	AscDFH.historyitem_TableCell_Shd,
+	AscDFH.historyitem_TableCell_Pr
+];
+AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_VMerge]        = [
+	AscDFH.historyitem_TableCell_VMerge,
+	AscDFH.historyitem_TableCell_Pr
+];
+AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_Border_Left]   = [
+	AscDFH.historyitem_TableCell_Border_Left,
+	AscDFH.historyitem_TableCell_Pr
+];
+AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_Border_Right]  = [
+	AscDFH.historyitem_TableCell_Border_Right,
+	AscDFH.historyitem_TableCell_Pr
+];
+AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_Border_Top]    = [
+	AscDFH.historyitem_TableCell_Border_Top,
+	AscDFH.historyitem_TableCell_Pr
+];
+AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_Border_Bottom] = [
+	AscDFH.historyitem_TableCell_Border_Bottom,
+	AscDFH.historyitem_TableCell_Pr
+];
+AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_VAlign]        = [
+	AscDFH.historyitem_TableCell_VAlign,
+	AscDFH.historyitem_TableCell_Pr
+];
+AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_W]             = [
+	AscDFH.historyitem_TableCell_W,
+	AscDFH.historyitem_TableCell_Pr
+];
+AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_Pr]            = [
+	AscDFH.historyitem_TableCell_GridSpan,
+	AscDFH.historyitem_TableCell_Margins,
+	AscDFH.historyitem_TableCell_Shd,
+	AscDFH.historyitem_TableCell_VMerge,
+	AscDFH.historyitem_TableCell_Border_Left,
+	AscDFH.historyitem_TableCell_Border_Right,
+	AscDFH.historyitem_TableCell_Border_Top,
+	AscDFH.historyitem_TableCell_Border_Bottom,
+	AscDFH.historyitem_TableCell_VAlign,
+	AscDFH.historyitem_TableCell_W,
+	AscDFH.historyitem_TableCell_Pr,
+	AscDFH.historyitem_TableCell_TextDirection,
+	AscDFH.historyitem_TableCell_NoWrap
+];
+AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_TextDirection] = [
+	AscDFH.historyitem_TableCell_TextDirection,
+	AscDFH.historyitem_TableCell_Pr
+];
+AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_NoWrap]        = [
+	AscDFH.historyitem_TableCell_NoWrap,
+	AscDFH.historyitem_TableCell_Pr
+];
+/**
+ * Общая функция объединения изменений, которые зависят только от себя и AscDFH.historyitem_TableCell_Pr
+ * @param oChange
+ * @returns {boolean}
+ */
+function private_TableCellChangesOnMergePr(oChange)
+{
+	if (oChange.Class !== this.Class)
+		return true;
+
+	if (oChange.Type === this.Type || oChange.Type === AscDFH.historyitem_TableCell_Pr)
+		return false;
+
+	return true;
+}
+//----------------------------------------------------------------------------------------------------------------------
+
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseLongProperty}
@@ -67,6 +151,7 @@ CChangesTableCellGridSpan.prototype.private_SetValue = function(Value)
 	oCell.Pr.GridSpan = Value;
 	oCell.Recalc_CompiledPr();
 };
+CChangesTableCellGridSpan.prototype.Merge = private_TableCellChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -194,6 +279,7 @@ CChangesTableCellMargins.prototype.private_SetValue = function(Value)
 	oCell.Pr.TableCellMar = Value;
 	oCell.Recalc_CompiledPr();
 };
+CChangesTableCellMargins.prototype.Merge = private_TableCellChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectProperty}
@@ -214,6 +300,7 @@ CChangesTableCellShd.prototype.private_SetValue = function(Value)
 	oCell.Pr.Shd = Value;
 	oCell.Recalc_CompiledPr();
 };
+CChangesTableCellShd.prototype.Merge = private_TableCellChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseLongProperty}
@@ -230,6 +317,7 @@ CChangesTableCellVMerge.prototype.private_SetValue = function(Value)
 	oCell.Pr.VMerge = Value;
 	oCell.Recalc_CompiledPr();
 };
+CChangesTableCellVMerge.prototype.Merge = private_TableCellChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -347,6 +435,7 @@ CChangesTableCellBorderLeft.prototype.private_SetValue = function(Value)
 	oCell.Pr.TableCellBorders.Left = Value;
 	oCell.Recalc_CompiledPr();
 };
+CChangesTableCellBorderLeft.prototype.Merge = private_TableCellChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -464,6 +553,7 @@ CChangesTableCellBorderTop.prototype.private_SetValue = function(Value)
 	oCell.Pr.TableCellBorders.Top = Value;
 	oCell.Recalc_CompiledPr();
 };
+CChangesTableCellBorderTop.prototype.Merge = private_TableCellChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -581,6 +671,7 @@ CChangesTableCellBorderRight.prototype.private_SetValue = function(Value)
 	oCell.Pr.TableCellBorders.Right = Value;
 	oCell.Recalc_CompiledPr();
 };
+CChangesTableCellBorderRight.prototype.Merge = private_TableCellChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -698,6 +789,7 @@ CChangesTableCellBorderBottom.prototype.private_SetValue = function(Value)
 	oCell.Pr.TableCellBorders.Bottom = Value;
 	oCell.Recalc_CompiledPr();
 };
+CChangesTableCellBorderBottom.prototype.Merge = private_TableCellChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseLongProperty}
@@ -714,6 +806,7 @@ CChangesTableCellVAlign.prototype.private_SetValue = function(Value)
 	oCell.Pr.VAlign = Value;
 	oCell.Recalc_CompiledPr();
 };
+CChangesTableCellVAlign.prototype.Merge = private_TableCellChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectValue}
@@ -734,6 +827,7 @@ CChangesTableCellW.prototype.private_SetValue = function(Value)
 	oCell.Pr.TableCellW = Value;
 	oCell.Recalc_CompiledPr();
 };
+CChangesTableCellW.prototype.Merge = private_TableCellChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectValue}
@@ -754,6 +848,83 @@ CChangesTableCellPr.prototype.private_SetValue = function(Value)
 	oCell.Pr = Value;
 	oCell.Recalc_CompiledPr();
 };
+CChangesTableCellPr.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type)
+		return false;
+
+	if (!this.New)
+		this.New = new CTableCellPr();
+
+	switch(oChange.Type)
+	{
+		case AscDFH.historyitem_TableCell_GridSpan:
+		{
+			this.New.GridSpan = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_TableCell_Margins:
+		{
+			this.New.TableCellMar = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_TableCell_Shd:
+		{
+			this.New.Shd = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_TableCell_VMerge:
+		{
+			this.New.VMerge = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_TableCell_Border_Left:
+		{
+			this.New.TableCellBorders.Left = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_TableCell_Border_Right:
+		{
+			this.New.TableCellBorders.Right = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_TableCell_Border_Top:
+		{
+			this.New.TableCellBorders.Top = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_TableCell_Border_Bottom:
+		{
+			this.New.TableCellBorders.Bottom = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_TableCell_VAlign:
+		{
+			this.New.VAlign = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_TableCell_W:
+		{
+			this.New.TableCellW = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_TableCell_TextDirection:
+		{
+			this.New.TextDirection = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_TableCell_NoWrap:
+		{
+			this.New.NoWrap = oChange.New;
+			break;
+		}
+	}
+
+	return true;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseLongProperty}
@@ -770,6 +941,7 @@ CChangesTableCellTextDirection.prototype.private_SetValue = function(Value)
 	oCell.Pr.TextDirection = Value;
 	oCell.Recalc_CompiledPr();
 };
+CChangesTableCellTextDirection.prototype.Merge = private_TableCellChangesOnMergePr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseBoolProperty}
@@ -786,3 +958,4 @@ CChangesTableCellNoWrap.prototype.private_SetValue = function(Value)
 	oCell.Pr.NoWrap = Value;
 	oCell.Recalc_CompiledPr();
 };
+CChangesTableCellNoWrap.prototype.Merge = private_TableCellChangesOnMergePr;
