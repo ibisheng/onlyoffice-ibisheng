@@ -80,7 +80,9 @@ var c_oAscCleanOptions = {
   Format: 2,
   Formula: 4,
   Comments: 5,
-  Hyperlinks: 6
+  Hyperlinks: 6,
+  Sparklines: 7,
+  SparklineGroups: 8
 };
 
 var c_oAscDrawDepOptions = {
