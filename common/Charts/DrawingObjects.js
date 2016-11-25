@@ -2875,18 +2875,18 @@ function DrawingObjects() {
 
     _this.checkSparklineGroupMinMaxVal = function(oSparklineGroup)
     {
-        var maxVal = null, minVal = null, i, j;
+        var maxVal = null, minVal = null, i, j, sparkline;
         if(oSparklineGroup.type !== Asc.c_oAscSparklineType.Stacked &&
             (Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.minAxisType || Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.maxAxisType))
         {
             for(i = 0; i < oSparklineGroup.arrSparklines.length; ++i)
             {
-                if (!oSparklineGroup.arrCachedSparklines[i]) {
-                    var oSparklineView = new CSparklineView();
-                    oSparklineView.initFromSparkline(oSparklineGroup.arrSparklines[i], oSparklineGroup, worksheet);
-                    oSparklineGroup.addView(oSparklineView, i);
+				sparkline = oSparklineGroup.arrSparklines[i];
+                if (!sparkline.oCacheView) {
+					sparkline.oCacheView = new CSparklineView();
+					sparkline.oCacheView.initFromSparkline(sparkline, oSparklineGroup, worksheet);
                 }
-                var aPoints = AscFormat.getPtsFromSeries(oSparklineGroup.arrCachedSparklines[i].chartSpace.chart.plotArea.charts[0].series[0]);
+                var aPoints = AscFormat.getPtsFromSeries(sparkline.oCacheView.chartSpace.chart.plotArea.charts[0].series[0]);
                 for(j = 0; j < aPoints.length; ++j)
                 {
                     if(Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.maxAxisType)
@@ -2923,7 +2923,7 @@ function DrawingObjects() {
             {
                 for(i = 0; i < oSparklineGroup.arrSparklines.length; ++i)
                 {
-                    oSparklineGroup.arrCachedSparklines[i].setMinMaxValAx(minVal, maxVal, oSparklineGroup);
+					oSparklineGroup.arrSparklines[i].oCacheView.setMinMaxValAx(minVal, maxVal, oSparklineGroup);
                 }
             }
         }
@@ -2932,7 +2932,7 @@ function DrawingObjects() {
     _this.drawSparkLineGroups = function(oDrawingContext, aSparklineGroups, range, offsetX, offsetY)
     {
 
-        var graphics, i, j;
+        var graphics, i, j, sparkline;
         if(oDrawingContext instanceof AscCommonExcel.CPdfPrinter)
         {
             graphics = oDrawingContext.DocumentRenderer;
@@ -2956,13 +2956,14 @@ function DrawingObjects() {
                 _this.checkSparklineGroupMinMaxVal(oSparklineGroup);
             }
             for(j = 0; j < oSparklineGroup.arrSparklines.length; ++j) {
-                if (!oSparklineGroup.arrCachedSparklines[j]) {
-                    var oSparklineView = new CSparklineView();
-                    oSparklineView.initFromSparkline(oSparklineGroup.arrSparklines[j], oSparklineGroup, worksheet);
-                    oSparklineGroup.addView(oSparklineView, j);
-                }
-                if (!oSparklineGroup.arrSparklines[j].checkInRange(range)) {
-                    continue;
+				sparkline = oSparklineGroup.arrSparklines[j];
+				if (!sparkline.checkInRange(range)) {
+					continue;
+				}
+
+                if (!sparkline.oCacheView) {
+					sparkline.oCacheView = new CSparklineView();
+					sparkline.oCacheView.initFromSparkline(sparkline, oSparklineGroup, worksheet);
                 }
 
                 if(oDrawingContext instanceof AscCommonExcel.CPdfPrinter)
@@ -2975,7 +2976,7 @@ function DrawingObjects() {
                     graphics.SetBaseTransform(_baseTransform);
                 }
 
-                oSparklineGroup.arrCachedSparklines[j].draw(graphics, _offX, _offY);
+				sparkline.oCacheView.draw(graphics, _offX, _offY);
 
                 if(oDrawingContext instanceof AscCommonExcel.CPdfPrinter)
                 {

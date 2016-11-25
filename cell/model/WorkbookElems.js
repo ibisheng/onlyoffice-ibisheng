@@ -4717,7 +4717,6 @@ CellArea.prototype = {
 
 		this.f = null;
 		this.arrSparklines = [];
-		this.arrCachedSparklines = {};
 
 		//for drawing preview
 		this.canvas = null;
@@ -5187,21 +5186,23 @@ CellArea.prototype = {
 
 		return res;
 	};
-	sparklineGroup.prototype.addView = function (oSparklineView, index) {
-		this.arrCachedSparklines[index] = oSparklineView;
-	};
 	sparklineGroup.prototype.draw = function (oDrawingContext) {
+		var oCacheView;
 		var graphics = new AscCommon.CGraphics();
 		graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
 			oDrawingContext.getWidth(3), oDrawingContext.getHeight(3));
 		graphics.m_oFontManager = AscCommon.g_fontManager;
-		for (var i in this.arrCachedSparklines) {
-			this.arrCachedSparklines[i].draw(graphics);
+		for (var i = 0; i < this.arrSparklines.length; ++i) {
+			if (oCacheView = this.arrSparklines[i].oCacheView) {
+				oCacheView.draw(graphics);
+			}
 		}
 	};
 	sparklineGroup.prototype.cleanCache = function () {
 		// ToDo clean only colors (for color scheme)
-		this.arrCachedSparklines = {};
+		for (var i = 0; i < this.arrSparklines.length; ++i) {
+			this.arrSparklines[i].oCacheView = null;
+		}
 	};
 	sparklineGroup.prototype.updateCache = function (sheet, ranges) {
 		var sparklineRange;
@@ -5209,7 +5210,7 @@ CellArea.prototype = {
 			sparklineRange = this.arrSparklines[i]._f;
 			for (var j = 0; j < ranges.length; ++j) {
 				if (sparklineRange.isIntersect(ranges[j], sheet)) {
-					delete this.arrCachedSparklines[i];
+					this.arrSparklines[i].oChacheView = null;
 					break;
 				}
 			}
@@ -5227,7 +5228,6 @@ CellArea.prototype = {
 		for (var i = 0; i < this.arrSparklines.length; ++i) {
 			if (this.arrSparklines[i].checkInRange(range)) {
 				this.arrSparklines.splice(i, 1);
-				delete this.arrCachedSparklines[i];
 				--i;
 			}
 		}
@@ -5536,6 +5536,7 @@ CellArea.prototype = {
 
 		//for preview
 		this.oCache = null;
+		this.oCacheView = null;
 	}
 
 	sparkline.prototype.clone = function () {
