@@ -1083,6 +1083,10 @@
 			
 			_insertBinaryIntoShapeContent: function(worksheet, content, isConvertToPPTX)
 			{
+
+				if(!content || !content.length){
+					return;
+				}
 				History.Create_NewPoint();
 				History.StartTransaction();
 				
