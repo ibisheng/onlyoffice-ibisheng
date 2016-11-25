@@ -5243,7 +5243,7 @@ CellArea.prototype = {
 			sparklineRange = this.arrSparklines[i]._f;
 			for (var j = 0; j < ranges.length; ++j) {
 				if (sparklineRange.isIntersect(ranges[j], sheet)) {
-					this.arrSparklines[i].oChacheView = null;
+					this.arrSparklines[i].oCacheView = null;
 					break;
 				}
 			}
