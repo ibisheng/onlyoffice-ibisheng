@@ -8411,6 +8411,10 @@ drawPieChart.prototype =
 		
 		var radius3D1 = (z6 - z2) / 2;
 		var radius3D2 = (z5 - z1) / 2;
+		
+		//var test1 = this.cChartDrawer._convertAndTurnPoint(x5, y5, z5);
+		//var test2 = this.cChartDrawer._convertAndTurnPoint(x5, y5, z5);
+		
 		var center3D1 = new Point3D(x2 + ((x3 - x2) / 2), y2, z2 + (radius3D1));
 		var center3D2 = new Point3D(x1 + ((x4 - x1) / 2), y1, z1 + (radius3D2));
 		
@@ -8420,10 +8424,39 @@ drawPieChart.prototype =
 		//TEST DRAW FRAME
 		//this._calculateTestFrame(point1, point2, point3, point4, point5, point6, point7, point8);
 		
-		var radius11 = Math.abs((point3.x - point2.x) / 2);
+		var test1 = this.cChartDrawer._convertAndTurnPoint(x2, y2, center3D1.z);
+		var test2 = this.cChartDrawer._convertAndTurnPoint(x3, y3, center3D1.z);
+		
+		
+		
+		
+		var test11 = this.cChartDrawer._convertAndTurnPoint(x4, y4, center3D2.z);
+		var test22 = this.cChartDrawer._convertAndTurnPoint(x1, y1, center3D2.z);
+		
+		var radius11 = Math.abs((test2.x - test1.x) / 2);
 		var radius12 = Math.abs((point6.y - point2.y) / 2);
-		var radius21 = Math.abs((point4.x - point1.x) / 2);
+		var radius21 = Math.abs((test22.x - test11.x) / 2);
 		var radius22 = Math.abs((point5.y - point1.y) / 2);
+		
+		var kF1 = radius11 / radius12;
+		var kF2 = radius11 / radius21;
+		var kF3 = radius11 / radius22;
+		
+		/*if(radius11 < width / 2)
+		{
+			radius11 = width / 2;
+			radius12 = radius11 / kF1;
+			
+			radius21 = radius11 / kF2;
+			radius22 = radius11 / kF3;
+			
+		}*/
+		
+		
+		
+		
+		//var radius11 = pointCenter1.x - (point6.x + point2.x) / 2;
+		
 		
 		var depth = point2.y - point1.y;
 		
@@ -8435,6 +8468,13 @@ drawPieChart.prototype =
 		
 		var center1 = {x: this.chartProp.chartGutter._left + trueWidth/2, y: Math.abs(point6.y - point2.y) / 2 + point6.y};
 		var center2 = {x: this.chartProp.chartGutter._left + trueWidth/2, y: Math.abs(point5.y - point1.y) / 2 + point5.y};
+		
+		
+		/*var x = test22.x - center1.x;
+		var y = pointCenter1.y - center1.y;
+		var b = radius12;
+		
+		var radius11 = Math.sqrt(Math.abs(Math.pow(x, 2) / (1 - (Math.pow(y, 2) / Math.pow(b, 2)))));*/
 		
 		var angles1 = this._calculateAngles3D(center1.x, center1.y, radius11, radius12, radius3D1, center3D1);
 		var angles2 = this._calculateAngles3D(center2.x, center2.y, radius21, radius22, radius3D2, center3D2);
@@ -9242,7 +9282,16 @@ drawPieChart.prototype =
 			var swap = end - start;
 			
 			var start2 = arrAngles2[i - 1].angle;
-			var end2 = arrAngles2[i].angle;
+			var end2;
+			if(!arrAngles2[i])
+			{
+				end2 = arrAngles2[i - 1].angle;
+			}
+			else
+			{
+				end2 = arrAngles2[i].angle;
+			}
+			
 			var swap2 = end2 - start2;
 			
 			if((start >= 0 && start >= Math.PI && start <= 2 * Math.PI) || (start < 0 && start >= -Math.PI && start <= 0))
