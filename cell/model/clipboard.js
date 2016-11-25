@@ -279,7 +279,8 @@
 				var sBase64;
 				
 				var selectedContent = new CSelectedContent();
-				isIntoShape.Get_SelectedContent(selectedContent);
+                AscFormat.ExecuteNoHistory(function(){isIntoShape.Get_SelectedContent(selectedContent);}, this, []);
+
 				
 				var oPresentationWriter = new AscCommon.CBinaryFileWriter();
 				
