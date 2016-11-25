@@ -5706,10 +5706,18 @@ Woorksheet.prototype.updateSparklineCache = function(sheet, ranges) {
 		}
 		return null;
 	};
-	Woorksheet.prototype.removeSparkline = function (range) {
+	Woorksheet.prototype.removeSparklines = function (range) {
 		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
 			if (this.aSparklineGroups[i].remove(range)) {
-				History.Add(this.aSparklineGroups[i], AscCH.historyitem_Sparkline_Remove_Sparkline, this.getId(), null, null);
+				History.Add(this.aSparklineGroups[i], {Type: AscCH.historyitem_Sparkline_Remove_Sparkline, oldPr: null, newPr: null});
+				this.aSparklineGroups.splice(i--, 1);
+			}
+		}
+	};
+	Woorksheet.prototype.removeSparklineGroups = function (range) {
+		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
+			if (-1 !== this.aSparklineGroups[i].intersectionSimple(range)) {
+				History.Add(this.aSparklineGroups[i], {Type: AscCH.historyitem_Sparkline_Remove_Sparkline, oldPr: null, newPr: null});
 				this.aSparklineGroups.splice(i--, 1);
 			}
 		}

@@ -5257,6 +5257,14 @@ CellArea.prototype = {
 		}
 		return -1;
 	};
+	sparklineGroup.prototype.intersectionSimple = function (range) {
+		for (var j = 0; j < this.arrSparklines.length; ++j) {
+			if (this.arrSparklines[j].intersectionSimple(range)) {
+				return j;
+			}
+		}
+		return -1;
+	};
 	sparklineGroup.prototype.remove = function (range) {
 		for (var i = 0; i < this.arrSparklines.length; ++i) {
 			if (this.arrSparklines[i].checkInRange(range)) {
@@ -5598,6 +5606,9 @@ CellArea.prototype = {
 	};
 	sparkline.prototype.contains = function (c, r) {
 		return this.sqref ? this.sqref.contains(c, r) : false;
+	};
+	sparkline.prototype.intersectionSimple = function (range) {
+		return this.sqref ? this.sqref.intersectionSimple(range) : false;
 	};
 
 // For Auto Filters
