@@ -5004,6 +5004,14 @@ CellArea.prototype = {
 			case AscCH.historyitem_Sparkline_F:
 				this.f = data.oldPr;
 				break;
+			case AscCH.historyitem_Sparkline_Remove_Data:
+				this.arrSparklines.push(data.oldPr);
+				break;
+			case AscCH.historyitem_Sparkline_Remove_Sparkline:
+				if (this.worksheet) {
+					this.worksheet.insertSparklineGroup(this);
+				}
+				break;
 		}
 
 		this.cleanCache();
@@ -5087,6 +5095,14 @@ CellArea.prototype = {
 				break;
 			case AscCH.historyitem_Sparkline_F:
 				this.f = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_Remove_Data:
+				this.remove(data.oldPr.sqref);
+				break;
+			case AscCH.historyitem_Sparkline_Remove_Sparkline:
+				if (this.worksheet) {
+					this.worksheet.removeSparklineGroup(this.Get_Id());
+				}
 				break;
 		}
 		this.cleanCache();
@@ -5227,12 +5243,17 @@ CellArea.prototype = {
 	sparklineGroup.prototype.remove = function (range) {
 		for (var i = 0; i < this.arrSparklines.length; ++i) {
 			if (this.arrSparklines[i].checkInRange(range)) {
+				History.Add(this, {Type: AscCH.historyitem_Sparkline_Remove_Data, oldPr: this.arrSparklines[i], newPr: null});
 				this.arrSparklines.splice(i, 1);
 				--i;
 			}
 		}
 
-		return 0 === this.arrSparklines.length;
+		var bRemove = 0 === this.arrSparklines.length;
+		if (bRemove) {
+			History.Add(this, {Type: AscCH.historyitem_Sparkline_Remove_Sparkline, oldPr: this, newPr: null});
+		}
+		return bRemove;
 	};
 	sparklineGroup.prototype.asc_getId = function () {
 		return this.Id;

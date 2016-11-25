@@ -4583,7 +4583,7 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 				{
 					updateRange = new Asc.Range(0, startIndex, gc_nMaxCol0, endIndex);
 					History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RowHide, oThis.getId(), updateRange, new UndoRedoData_FromToRowCol(bHidden, startIndex, endIndex));
-				}	
+				}
 				
 				startIndex = row.index;
 				endIndex = row.index;
@@ -5709,6 +5709,7 @@ Woorksheet.prototype.updateSparklineCache = function(sheet, ranges) {
 	Woorksheet.prototype.removeSparkline = function (range) {
 		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
 			if (this.aSparklineGroups[i].remove(range)) {
+				History.Add(this.aSparklineGroups[i], AscCH.historyitem_Sparkline_Remove_Sparkline, this.getId(), null, null);
 				this.aSparklineGroups.splice(i--, 1);
 			}
 		}
