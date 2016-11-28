@@ -2296,7 +2296,7 @@ PasteProcessor.prototype =
 				oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
 			}
 		}
-		else
+		else if(node)
 		{
 			this._pasteFromHtml(node, bTurnOffTrackRevisions);
 		}
@@ -3476,7 +3476,7 @@ PasteProcessor.prototype =
 				base64FromExcel = onlyBinary.split('xslData;')[1];
 			}
 		}
-		else
+		else if(node)
 		{
 			//todo переделать получения класса
 			if(node.children[0] && node.children[0].getAttribute("class") != null && (node.children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].getAttribute("class").indexOf("docData;") > -1 || node.children[0].getAttribute("class").indexOf("pptData;") > -1))
