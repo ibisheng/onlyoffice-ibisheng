@@ -2556,7 +2556,7 @@ CChartSpace.prototype.recalculateBBox = function()
                 if(series[i].tx && series[i].tx.strRef)
                 {
                     parsed_formulas = this.parseChartFormula(series[i].tx.strRef.f);
-                    if(parsed_formulas && parsed_formulas[0].worksheet)
+                    if(parsed_formulas && parsed_formulas.length > 0 && parsed_formulas[0].worksheet)
                     {
                         ser_titles_bboxes = ser_titles_bboxes.concat(parsed_formulas);
                     }
