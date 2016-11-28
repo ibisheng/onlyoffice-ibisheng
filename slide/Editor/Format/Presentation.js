@@ -2157,10 +2157,12 @@ CPresentation.prototype =
 
     Set_TableProps : function(Props)
     {
-        this.Slides[this.CurPage].graphicObjects.setTableProps(Props);
-        this.Recalculate();
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateSelectionState();
+        if(this.Slides[this.CurPage]){
+            this.Slides[this.CurPage].graphicObjects.setTableProps(Props);
+            this.Recalculate();
+            this.Document_UpdateInterfaceState();
+            this.Document_UpdateSelectionState();
+        }
     },
 
     Get_Paragraph_ParaPr : function()
