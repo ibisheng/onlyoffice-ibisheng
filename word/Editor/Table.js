@@ -6627,32 +6627,39 @@ CTable.prototype =
         }
     },
 
-    Selection_Remove : function()
-    {
-        if ( false === this.Selection.Use )
-            return;
+	Selection_Remove : function()
+	{
+		if (false === this.Selection.Use)
+			return;
 
-        if ( table_Selection_Text === this.Selection.Type )
-        {
-            this.CurCell = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell(this.Selection.StartPos.Pos.Cell);
-            this.CurCell.Content.Selection_Remove();
-        }
-        else if ( this.Content.length > 0 && this.Content[0].Get_CellsCount() > 0 )
-        {
-            this.CurCell = this.Content[0].Get_Cell(0);
-            this.CurCell.Content.Selection_Remove();
-        }
+		if (this.Content.length <= 0)
+		{
+			this.CurCell = null;
+		}
+		else
+		{
+			if (table_Selection_Text === this.Selection.Type)
+			{
+				this.CurCell = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell(this.Selection.StartPos.Pos.Cell);
+				this.CurCell.Content.Selection_Remove();
+			}
+			else if (this.Content.length > 0 && this.Content[0].Get_CellsCount() > 0)
+			{
+				this.CurCell = this.Content[0].Get_Cell(0);
+				this.CurCell.Content.Selection_Remove();
+			}
+		}
 
-        this.Selection.Use   = false;
-        this.Selection.Start = false;
+		this.Selection.Use   = false;
+		this.Selection.Start = false;
 
-        this.Selection.StartPos.Pos = { Row : 0, Cell : 0 };
-        this.Selection.EndPos.Pos   = { Row : 0, Cell : 0 };        
+		this.Selection.StartPos.Pos = {Row : 0, Cell : 0};
+		this.Selection.EndPos.Pos   = {Row : 0, Cell : 0};
 
-        this.Markup.Internal.RowIndex  = 0;
-        this.Markup.Internal.CellIndex = 0;
-        this.Markup.Internal.PageNum   = 0;
-    },
+		this.Markup.Internal.RowIndex  = 0;
+		this.Markup.Internal.CellIndex = 0;
+		this.Markup.Internal.PageNum   = 0;
+	},
 
     Selection_Check : function(X, Y, CurPage, NearPos)
     {
