@@ -466,56 +466,61 @@ CBorderBox.prototype.setPosition = function(pos, PosInfo)
 };
 CBorderBox.prototype.Apply_MenuProps = function(Props)
 {
-    if(Props.Type == Asc.c_oAscMathInterfaceType.BorderBox)
-    {
-        if(Props.HideTop !== undefined && Props.HideTop !== this.Pr.hideTop)
-        {
-            History.Add(this, new CChangesMathBorderBoxTop(Props.HideTop, this.Pr.hideTop));
-            this.raw_SetTop(Props.HideTop);
-        }
+	if (Props.Type == Asc.c_oAscMathInterfaceType.BorderBox)
+	{
+		if (Props.HideTop !== undefined && Props.HideTop !== this.Pr.hideTop)
+		{
+			History.Add(new CChangesMathBorderBoxTop(this, this.Pr.hideTop, Props.HideTop));
+			this.raw_SetTop(Props.HideTop);
+		}
 
-        if(Props.HideBottom !== undefined && Props.HideBottom !== this.Pr.hideBot)
-        {
-            History.Add(this, new CChangesMathBorderBoxBot(Props.HideBottom, this.Pr.hideBot));
-            this.raw_SetBot(Props.HideBottom);
-        }
+		if (Props.HideBottom !== undefined && Props.HideBottom !== this.Pr.hideBot)
+		{
+			History.Add(new CChangesMathBorderBoxBot(this, this.Pr.hideBot, Props.HideBottom));
+			this.raw_SetBot(Props.HideBottom);
+		}
 
-        if(Props.HideLeft !== undefined && Props.HideLeft !== this.Pr.hideLeft)
-        {
-            History.Add(this, new CChangesMathBorderBoxLeft(Props.HideLeft, this.Pr.hideLeft));
-            this.raw_SetLeft(Props.HideLeft);
-        }
+		if (Props.HideLeft !== undefined && Props.HideLeft !== this.Pr.hideLeft)
+		{
+			History.Add(new CChangesMathBorderBoxLeft(this, this.Pr.hideLeft, Props.HideLeft));
+			this.raw_SetLeft(Props.HideLeft);
+		}
 
-        if(Props.HideRight !== undefined && Props.HideRight !== this.Pr.hideRight)
-        {
-            History.Add(this, new CChangesMathBorderBoxRight(Props.HideRight, this.Pr.hideRight));
-            this.raw_SetRight(Props.HideRight);
-        }
+		if (Props.HideRight !== undefined && Props.HideRight !== this.Pr.hideRight)
+		{
+			History.Add(new CChangesMathBorderBoxRight(this, this.Pr.hideRight, Props.HideRight));
+			this.raw_SetRight(Props.HideRight);
+		}
 
-        if(Props.HideHor !== undefined && Props.HideHor == this.Pr.strikeH) // strikeH - нарисовать горизонтальную линию
-        {
-            History.Add(this, new CChangesMathBorderBoxHor(!Props.HideHor, this.Pr.strikeH));
-            this.raw_SetHor(!Props.HideHor);
-        }
+		if (Props.HideHor !== undefined && Props.HideHor == this.Pr.strikeH) // strikeH - нарисовать горизонтальную линию
+		{
+			History.Add(new CChangesMathBorderBoxHor(this, this.Pr.strikeH, !Props.HideHor));
+			this.raw_SetHor(!Props.HideHor);
+		}
 
-        if(Props.HideVer !== undefined && Props.HideVer == this.Pr.strikeV) // strikeV - нарисовать вертикальную линию
-        {
-            History.Add(this, new CChangesMathBorderBoxVer(!Props.HideVer, this.Pr.strikeV));
-            this.raw_SetVer(!Props.HideVer);
-        }
+		if (Props.HideVer !== undefined && Props.HideVer == this.Pr.strikeV) // strikeV - нарисовать вертикальную линию
+		{
+			History.Add(new CChangesMathBorderBoxVer(this, this.Pr.strikeV, !Props.HideVer));
+			this.raw_SetVer(!Props.HideVer);
+		}
 
-        if(Props.HideTopLTR !== undefined && Props.HideTopLTR == this.Pr.strikeTLBR) // strikeTLBR - нарисовать диагональ из верхнего угла слева направо
-        {
-            History.Add(this, new CChangesMathBorderBoxTopLTR(!Props.HideTopLTR, this.Pr.strikeTLBR));
-            this.raw_SetTopLTR(!Props.HideTopLTR );
-        }
+		if (Props.HideTopLTR !== undefined && Props.HideTopLTR == this.Pr.strikeTLBR) // strikeTLBR - нарисовать диагональ из
+																			  // верхнего угла слева направо
+		{
+			History.Add(new CChangesMathBorderBoxTopLTR(this, this.Pr.strikeTLBR, !Props.HideTopLTR));
+			this.raw_SetTopLTR(!Props.HideTopLTR);
+		}
 
-        if(Props.HideTopRTL !== undefined && Props.HideTopRTL == this.Pr.strikeBLTR)
-        {
-            History.Add(this, new CChangesMathBorderBoxTopRTL(!Props.HideTopRTL, this.Pr.strikeBLTR)); // strikeBLTR - нарисовать диагональ из нижнего угла слева направо
-            this.raw_SetTopRTL(!Props.HideTopRTL);
-        }
-    }
+		if (Props.HideTopRTL !== undefined && Props.HideTopRTL == this.Pr.strikeBLTR)
+		{
+			History.Add(new CChangesMathBorderBoxTopRTL(this, this.Pr.strikeBLTR, !Props.HideTopRTL)); // strikeBLTR -
+																									   // нарисовать
+																									   // диагональ из
+																									   // нижнего угла
+																									   // слева направо
+			this.raw_SetTopRTL(!Props.HideTopRTL);
+		}
+	}
 };
 CBorderBox.prototype.raw_SetTop = function(Value)
 {
@@ -842,24 +847,24 @@ CBox.prototype.Get_AlignBrk = function()
 };
 CBox.prototype.Displace_BreakOperator = function(isForward, bBrkBefore, CountOperators)
 {
-    if(this.Pr.brk !== undefined)
-    {
-        var AlnAt = this.Pr.Get_AlnAt();
+	if (this.Pr.brk !== undefined)
+	{
+		var AlnAt = this.Pr.Get_AlnAt();
 
-        var NotIncrease = AlnAt == CountOperators && isForward == true;
+		var NotIncrease = AlnAt == CountOperators && isForward == true;
 
-        if(NotIncrease == false)
-        {
-            this.Pr.Displace_Break(isForward);
+		if (NotIncrease == false)
+		{
+			this.Pr.Displace_Break(isForward);
 
-            var NewAlnAt = this.Pr.Get_AlnAt();
+			var NewAlnAt = this.Pr.Get_AlnAt();
 
-            if(AlnAt !== NewAlnAt)
-            {
-                History.Add(this, new CChangesMathBoxAlnAt(NewAlnAt, AlnAt));
-            }
-        }
-    }
+			if (AlnAt !== NewAlnAt)
+			{
+				History.Add(new CChangesMathBoxAlnAt(this, AlnAt, NewAlnAt));
+			}
+		}
+	}
 };
 CBox.prototype.raw_setAlnAt = function(Value)
 {
@@ -876,14 +881,13 @@ CBox.prototype.Apply_MenuProps = function(Props)
 
     if(Props.Action & c_oMathMenuAction.InsertForcedBreak && true == this.Can_InsertForcedBreak())
     {
-        History.Add(this, new CChangesMathBoxForcedBreak(true, false));
+        History.Add(new CChangesMathBoxForcedBreak(this, false, true));
         this.raw_ForcedBreak(true);
     }
 
     if(Props.Action & c_oMathMenuAction.DeleteForcedBreak && true == this.Can_DeleteForcedBreak())
     {
-        var AlnAt = this.Pr.Get_AlnAt();
-        History.Add(this, new CChangesMathBoxForcedBreak(false, true, AlnAt));
+        History.Add(new CChangesMathBoxForcedBreak(this, true, false));
         this.raw_ForcedBreak(false);
     }
 };
@@ -1052,16 +1056,16 @@ CBar.prototype.getAscent = function()
 };
 CBar.prototype.Apply_MenuProps = function(Props)
 {
-    if(Props.Type == Asc.c_oAscMathInterfaceType.Bar && Props.Pos !== undefined)
-    {
-        var Pos = Props.Pos == Asc.c_oAscMathInterfaceBarPos.Bottom ? LOCATION_BOT : LOCATION_TOP;
+	if (Props.Type == Asc.c_oAscMathInterfaceType.Bar && Props.Pos !== undefined)
+	{
+		var Pos = Props.Pos == Asc.c_oAscMathInterfaceBarPos.Bottom ? LOCATION_BOT : LOCATION_TOP;
 
-        if(Pos !== this.Pr.pos)
-        {
-            History.Add(this, new CChangesMathBarLinePos(Pos, this.Pr.pos));
-            this.raw_SetLinePos(Pos);
-        }
-    }
+		if (Pos !== this.Pr.pos)
+		{
+			History.Add(new CChangesMathBarLinePos(this, this.Pr.pos, Pos));
+			this.raw_SetLinePos(Pos);
+		}
+	}
 };
 CBar.prototype.Get_InterfaceProps = function()
 {
