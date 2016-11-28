@@ -71,6 +71,52 @@ AscDFH.changesFactory[AscDFH.historyitem_Styles_Remove]              = CChangesS
 AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultTextPr] = CChangesStylesChangeDefaultTextPr;
 AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultParaPr] = CChangesStylesChangeDefaultParaPr;
 
+//----------------------------------------------------------------------------------------------------------------------
+// Карта зависимости изменений
+//----------------------------------------------------------------------------------------------------------------------
+AscDFH.styleChangesRelationMap                                           = {};
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_TextPr]          = [AscDFH.historyitem_Style_TextPr];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_ParaPr]          = [AscDFH.historyitem_Style_ParaPr];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_TablePr]         = [AscDFH.historyitem_Style_TablePr];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_TableRowPr]      = [AscDFH.historyitem_Style_TableRowPr];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_TableCellPr]     = [AscDFH.historyitem_Style_TableCellPr];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_TableBand1Horz]  = [AscDFH.historyitem_Style_TableBand1Horz];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_TableBand1Vert]  = [AscDFH.historyitem_Style_TableBand1Vert];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_TableBand2Horz]  = [AscDFH.historyitem_Style_TableBand2Horz];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_TableBand2Vert]  = [AscDFH.historyitem_Style_TableBand2Vert];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_TableFirstCol]   = [AscDFH.historyitem_Style_TableFirstCol];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_TableFirstRow]   = [AscDFH.historyitem_Style_TableFirstRow];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_TableLastCol]    = [AscDFH.historyitem_Style_TableLastCol];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_TableLastRow]    = [AscDFH.historyitem_Style_TableLastRow];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_TableTLCell]     = [AscDFH.historyitem_Style_TableTLCell];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_TableTRCell]     = [AscDFH.historyitem_Style_TableTRCell];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_TableBLCell]     = [AscDFH.historyitem_Style_TableBLCell];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_TableBRCell]     = [AscDFH.historyitem_Style_TableBRCell];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_TableWholeTable] = [AscDFH.historyitem_Style_TableWholeTable];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_Name]            = [AscDFH.historyitem_Style_Name];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_BasedOn]         = [AscDFH.historyitem_Style_BasedOn];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_Next]            = [AscDFH.historyitem_Style_Next];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_Type]            = [AscDFH.historyitem_Style_Type];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_QFormat]         = [AscDFH.historyitem_Style_QFormat];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_UiPriority]      = [AscDFH.historyitem_Style_UiPriority];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_Hidden]          = [AscDFH.historyitem_Style_Hidden];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_SemiHidden]      = [AscDFH.historyitem_Style_SemiHidden];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_UnhideWhenUsed]  = [AscDFH.historyitem_Style_UnhideWhenUsed];
+AscDFH.styleChangesRelationMap[AscDFH.historyitem_Style_Link]            = [AscDFH.historyitem_Style_Link];
+
+AscDFH.stylesChangesRelationMap                                                = {};
+AscDFH.stylesChangesRelationMap[AscDFH.historyitem_Styles_Add]                 = [
+	AscDFH.historyitem_Styles_Add,
+	AscDFH.historyitem_Styles_Remove
+];
+AscDFH.stylesChangesRelationMap[AscDFH.historyitem_Styles_Remove]              = [
+	AscDFH.historyitem_Styles_Add,
+	AscDFH.historyitem_Styles_Remove
+];
+AscDFH.stylesChangesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultTextPr] = [AscDFH.historyitem_Styles_ChangeDefaultTextPr];
+AscDFH.stylesChangesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultParaPr] = [AscDFH.historyitem_Styles_ChangeDefaultParaPr];
+//----------------------------------------------------------------------------------------------------------------------
+
 
 /**
  * @constructor
@@ -815,6 +861,16 @@ CChangesStylesAdd.prototype.CreateReverseChange = function()
 {
 	return new CChangesStylesRemove(this.Class, this.Id, this.Style);
 };
+CChangesStylesAdd.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if ((AscDFH.historyitem_Styles_Add === oChange.Type || AscDFH.historyitem_Styles_Remove === oChange.Type) && this.Id === oChange.Id)
+		return false;
+
+	return true;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -857,6 +913,16 @@ CChangesStylesRemove.prototype.Load = function()
 CChangesStylesRemove.prototype.CreateReverseChange = function()
 {
 	return new CChangesStylesAdd(this.Class, this.Id, this.Style);
+};
+CChangesStylesRemove.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if ((AscDFH.historyitem_Styles_Add === oChange.Type || AscDFH.historyitem_Styles_Remove === oChange.Type) && this.Id === oChange.Id)
+		return false;
+
+	return true;
 };
 /**
  * @constructor
