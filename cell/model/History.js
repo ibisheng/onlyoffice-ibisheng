@@ -170,9 +170,9 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Sparkline_ColorHigh = 24;
 	window['AscCH'].historyitem_Sparkline_ColorLow = 25;
 	window['AscCH'].historyitem_Sparkline_F = 26;
-	window['AscCH'].historyitem_Sparkline_Clone_Sparklines = 27;
-	window['AscCH'].historyitem_Sparkline_Remove_Data = 28;
-	window['AscCH'].historyitem_Sparkline_Remove_Sparkline = 29;
+	window['AscCH'].historyitem_Sparkline_CloneSparklines = 27;
+	window['AscCH'].historyitem_Sparkline_RemoveData = 28;
+	window['AscCH'].historyitem_Sparkline_RemoveSparkline = 29;
 
 function CHistory()
 {

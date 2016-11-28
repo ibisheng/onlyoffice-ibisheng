@@ -610,7 +610,7 @@
 			}
 			return oRes && Range3D.superclass.isIntersect.apply(this, arguments);
 		};
-		Range3D.prototype.clone = function(){
+		Range3D.prototype.clone = function () {
 			return new Range3D(ActiveRange.superclass.clone.apply(this, arguments), this.sheet, this.sheet2);
 		};
 

@@ -4785,7 +4785,7 @@ CellArea.prototype = {
 					w.WriteString2(data.newPr);
 				}
 				break;
-			case AscCH.historyitem_Sparkline_Clone_Sparklines:
+			case AscCH.historyitem_Sparkline_CloneSparklines:
 				if (data.newPr) {
 					w.WriteLong(data.newPr.length);
 					data.newPr.forEach(function (item) {
@@ -4795,11 +4795,11 @@ CellArea.prototype = {
 					});
 				}
 				break;
-			case AscCH.historyitem_Sparkline_Remove_Data:
+			case AscCH.historyitem_Sparkline_RemoveData:
 				w.WriteLong(data.oldPr.sqref.c1);
 				w.WriteLong(data.oldPr.sqref.r1);
 				break;
-			case AscCH.historyitem_Sparkline_Remove_Sparkline:
+			case AscCH.historyitem_Sparkline_RemoveSparkline:
 				break;
 		}
 	};
@@ -4902,7 +4902,7 @@ CellArea.prototype = {
 			case AscCH.historyitem_Sparkline_F:
 				this.f = r.GetBool() ? r.GetString2() : null;
 				break;
-			case AscCH.historyitem_Sparkline_Clone_Sparklines:
+			case AscCH.historyitem_Sparkline_CloneSparklines:
 				var count = r.GetLong(), oSparkline;
 				for (var i = 0; i < count; ++i) {
 					oSparkline = new sparkline();
@@ -4913,12 +4913,12 @@ CellArea.prototype = {
 					this.arrSparklines.push(oSparkline);
 				}
 				break;
-			case AscCH.historyitem_Sparkline_Remove_Data:
+			case AscCH.historyitem_Sparkline_RemoveData:
 				col = r.GetLong();
 				row = r.GetLong();
 				this.remove(new Asc.Range(col, row, col, row));
 				break;
-			case AscCH.historyitem_Sparkline_Remove_Sparkline:
+			case AscCH.historyitem_Sparkline_RemoveSparkline:
 				if (this.worksheet) {
 					this.worksheet.removeSparklineGroup(this.Get_Id());
 				}
@@ -5021,10 +5021,10 @@ CellArea.prototype = {
 			case AscCH.historyitem_Sparkline_F:
 				this.f = data.oldPr;
 				break;
-			case AscCH.historyitem_Sparkline_Remove_Data:
+			case AscCH.historyitem_Sparkline_RemoveData:
 				this.arrSparklines.push(data.oldPr);
 				break;
-			case AscCH.historyitem_Sparkline_Remove_Sparkline:
+			case AscCH.historyitem_Sparkline_RemoveSparkline:
 				if (this.worksheet) {
 					this.worksheet.insertSparklineGroup(this);
 				}
@@ -5113,10 +5113,10 @@ CellArea.prototype = {
 			case AscCH.historyitem_Sparkline_F:
 				this.f = data.newPr;
 				break;
-			case AscCH.historyitem_Sparkline_Remove_Data:
+			case AscCH.historyitem_Sparkline_RemoveData:
 				this.remove(data.oldPr.sqref);
 				break;
-			case AscCH.historyitem_Sparkline_Remove_Sparkline:
+			case AscCH.historyitem_Sparkline_RemoveSparkline:
 				if (this.worksheet) {
 					this.worksheet.removeSparklineGroup(this.Get_Id());
 				}
@@ -5214,7 +5214,7 @@ CellArea.prototype = {
 				res.arrSparklines.push(this.arrSparklines[i].clone());
 				newSparklines.push(this.arrSparklines[i].clone());
 			}
-			History.Add(res, {Type: AscCH.historyitem_Sparkline_Clone_Sparklines, oldPr: null, newPr: newSparklines});
+			History.Add(res, {Type: AscCH.historyitem_Sparkline_CloneSparklines, oldPr: null, newPr: newSparklines});
 		}
 
 		return res;
@@ -5268,7 +5268,7 @@ CellArea.prototype = {
 	sparklineGroup.prototype.remove = function (range) {
 		for (var i = 0; i < this.arrSparklines.length; ++i) {
 			if (this.arrSparklines[i].checkInRange(range)) {
-				History.Add(this, {Type: AscCH.historyitem_Sparkline_Remove_Data, oldPr: this.arrSparklines[i], newPr: null});
+				History.Add(this, {Type: AscCH.historyitem_Sparkline_RemoveData, oldPr: this.arrSparklines[i], newPr: null});
 				this.arrSparklines.splice(i, 1);
 				--i;
 			}
@@ -5276,7 +5276,7 @@ CellArea.prototype = {
 
 		var bRemove = 0 === this.arrSparklines.length;
 		if (bRemove) {
-			History.Add(this, {Type: AscCH.historyitem_Sparkline_Remove_Sparkline, oldPr: this, newPr: null});
+			History.Add(this, {Type: AscCH.historyitem_Sparkline_RemoveSparkline, oldPr: this, newPr: null});
 		}
 		return bRemove;
 	};
