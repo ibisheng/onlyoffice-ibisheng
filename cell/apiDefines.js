@@ -432,6 +432,8 @@ var c_oAscPopUpSelectorType = {
   prot['Formula'] = prot.Formula;
   prot['Comments'] = prot.Comments;
   prot['Hyperlinks'] = prot.Hyperlinks;
+  prot['Sparklines'] = prot.Sparklines;
+  prot['SparklineGroups'] = prot.SparklineGroups;
   window['Asc']['c_oAscSelectionDialogType'] = window['Asc'].c_oAscSelectionDialogType = c_oAscSelectionDialogType;
   prot = c_oAscSelectionDialogType;
   prot['None'] = prot.None;
