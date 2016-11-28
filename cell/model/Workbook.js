@@ -3516,7 +3516,7 @@ Woorksheet.prototype.clone=function(sNewId, sName, tableNames){
 		var newSparkline;
 		for (i = 0; i < this.aSparklineGroups.length; ++i) {
 			newSparkline = this.aSparklineGroups[i].clone();
-			newSparkline.setWorksheet(oNewWs);
+			newSparkline.setWorksheet(oNewWs, wsFrom);
 			oNewWs.aSparklineGroups.push(newSparkline);
 		}
 	};

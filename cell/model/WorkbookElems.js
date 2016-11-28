@@ -4785,7 +4785,7 @@ CellArea.prototype = {
 					w.WriteString2(data.newPr);
 				}
 				break;
-			case AscCH.historyitem_Sparkline_CloneSparklines:
+			case AscCH.historyitem_Sparkline_ChangeData:
 				if (data.newPr) {
 					w.WriteLong(data.newPr.length);
 					data.newPr.forEach(function (item) {
@@ -4902,7 +4902,8 @@ CellArea.prototype = {
 			case AscCH.historyitem_Sparkline_F:
 				this.f = r.GetBool() ? r.GetString2() : null;
 				break;
-			case AscCH.historyitem_Sparkline_CloneSparklines:
+			case AscCH.historyitem_Sparkline_ChangeData:
+				this.arrSparklines = [];
 				var count = r.GetLong(), oSparkline;
 				for (var i = 0; i < count; ++i) {
 					oSparkline = new sparkline();
@@ -4942,6 +4943,7 @@ CellArea.prototype = {
 		}
 	};
 	sparklineGroup.prototype.Undo = function (data) {
+		var t = this;
 		switch (data.Type) {
 			case AscCH.historyitem_Sparkline_Type:
 				this.type = data.oldPr;
@@ -5021,6 +5023,14 @@ CellArea.prototype = {
 			case AscCH.historyitem_Sparkline_F:
 				this.f = data.oldPr;
 				break;
+			case AscCH.historyitem_Sparkline_ChangeData:
+				this.arrSparklines = [];
+				if (data.oldPr) {
+					data.oldPr.forEach(function (item) {
+						t.arrSparklines.push(item.clone());
+					});
+				}
+				break;
 			case AscCH.historyitem_Sparkline_RemoveData:
 				this.arrSparklines.push(data.oldPr);
 				break;
@@ -5034,6 +5044,7 @@ CellArea.prototype = {
 		this.cleanCache();
 	};
 	sparklineGroup.prototype.Redo = function (data) {
+		var t = this;
 		switch (data.Type) {
 			case AscCH.historyitem_Sparkline_Type:
 				this.type = data.newPr;
@@ -5113,6 +5124,14 @@ CellArea.prototype = {
 			case AscCH.historyitem_Sparkline_F:
 				this.f = data.newPr;
 				break;
+			case AscCH.historyitem_Sparkline_ChangeData:
+				this.arrSparklines = [];
+				if (data.newPr) {
+					data.newPr.forEach(function (item) {
+						t.arrSparklines.push(item.clone());
+					});
+				}
+				break;
 			case AscCH.historyitem_Sparkline_RemoveData:
 				this.remove(data.oldPr.sqref);
 				break;
@@ -5156,8 +5175,18 @@ CellArea.prototype = {
 		this.colorHigh = new RgbColor(defaultOtherColor);
 		this.colorLow = new RgbColor(defaultOtherColor);
 	};
-	sparklineGroup.prototype.setWorksheet = function (worksheet) {
+	sparklineGroup.prototype.setWorksheet = function (worksheet, oldWorksheet) {
 		this.worksheet = worksheet;
+		if (oldWorksheet) {
+			var oldSparklines = [];
+			var newSparklines = [];
+			for (var i = 0; i < this.arrSparklines.length; ++i) {
+				oldSparklines.push(this.arrSparklines[i].clone());
+				this.arrSparklines[i].updateWorksheet(worksheet.sName, oldWorksheet.sName);
+				newSparklines.push(this.arrSparklines[i].clone());
+			}
+			History.Add(this, {Type: AscCH.historyitem_Sparkline_ChangeData, oldPr: oldSparklines, newPr: newSparklines});
+		}
 	};
 	sparklineGroup.prototype.set = function (val) {
 		var t = this;
@@ -5214,7 +5243,7 @@ CellArea.prototype = {
 				res.arrSparklines.push(this.arrSparklines[i].clone());
 				newSparklines.push(this.arrSparklines[i].clone());
 			}
-			History.Add(res, {Type: AscCH.historyitem_Sparkline_CloneSparklines, oldPr: null, newPr: newSparklines});
+			History.Add(res, {Type: AscCH.historyitem_Sparkline_ChangeData, oldPr: null, newPr: newSparklines});
 		}
 
 		return res;
@@ -5600,6 +5629,12 @@ CellArea.prototype = {
 	sparkline.prototype.setF = function (f) {
 		this.f = f;
 		this._f = AscCommonExcel.g_oRangeCache.getRange3D(this.f);
+	};
+	sparkline.prototype.updateWorksheet = function (sheet, oldSheet) {
+		if (this._f && oldSheet === this._f.sheet && (null === this._f.sheet2 || oldSheet === this._f.sheet2)) {
+			this._f.setSheet(sheet);
+			this.f = this._f.getName();
+		}
 	};
 	sparkline.prototype.checkInRange = function (range) {
 		return this.sqref ? range.isIntersect(this.sqref) : false;
