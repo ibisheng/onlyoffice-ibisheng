@@ -106,6 +106,7 @@
 			VKeyEncrypt           : -20,
 			KeyExpire             : -21,
 			UserCountExceed       : -22,
+			AccessDeny            : -23,
 
 			SplitCellMaxRows     : -30,
 			SplitCellMaxCols     : -31,
@@ -144,6 +145,10 @@
 			Warning  : -101,
 
 			PrintMaxPagesCount					: -110,
+
+			SessionAbsolute: -120,
+			SessionIdle: -121,
+			SessionToken: -122,
 
 			/* для формул */
 			FrmlWrongCountParentheses   : -300,
@@ -1098,6 +1103,7 @@
 	prot['VKeyEncrypt']                      = prot.VKeyEncrypt;
 	prot['KeyExpire']                        = prot.KeyExpire;
 	prot['UserCountExceed']                  = prot.UserCountExceed;
+	prot['AccessDeny']                       = prot.AccessDeny;
 	prot['SplitCellMaxRows']                 = prot.SplitCellMaxRows;
 	prot['SplitCellMaxCols']                 = prot.SplitCellMaxCols;
 	prot['SplitCellRowsDivider']             = prot.SplitCellRowsDivider;
@@ -1122,6 +1128,9 @@
 	prot['UserDrop']                         = prot.UserDrop;
 	prot['Warning']                          = prot.Warning;
 	prot['PrintMaxPagesCount']               = prot.PrintMaxPagesCount;
+	prot['SessionAbsolute']                  = prot.SessionAbsolute;
+	prot['SessionIdle']                      = prot.SessionIdle;
+	prot['SessionToken']                     = prot.SessionToken;
 	prot['FrmlWrongCountParentheses']        = prot.FrmlWrongCountParentheses;
 	prot['FrmlWrongOperator']                = prot.FrmlWrongOperator;
 	prot['FrmlWrongMaxArgument']             = prot.FrmlWrongMaxArgument;

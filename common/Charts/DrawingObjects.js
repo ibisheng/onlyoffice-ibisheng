@@ -658,7 +658,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             chart_space.setWorksheet(worksheetView.model);
         }
 
-        chart_space.displayHidden = oSparklineGroup.displayHidden;
+        chart_space.displayHidden = oSparklineGroup.asc_getDisplayHidden();
         chart_space.displayEmptyCellsAs = oSparklineGroup.asc_getDisplayEmpty();
         settings.putTitle(c_oAscChartTitleShowSettings.none);
         settings.putHorAxisLabel(c_oAscChartTitleShowSettings.none);
@@ -676,9 +676,9 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         var val_ax_props = new AscCommon.asc_ValAxisSettings();
         var i, fMinVal = null, fMaxVal = null;
         if(settings.type !== c_oAscChartTypeSettings.barStackedPer) {
-            if (oSparklineGroup.minAxisType === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.manualMin !== null) {
+            if (oSparklineGroup.asc_getMinAxisType() === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.asc_getManualMin() !== null) {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
-                val_ax_props.putMinVal(oSparklineGroup.manualMin);
+                val_ax_props.putMinVal(oSparklineGroup.asc_getManualMin());
             }
             else {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.auto);
@@ -695,9 +695,9 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
 					}
                 }
             }
-            if (oSparklineGroup.maxAxisType === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.manualMax !== null) {
+            if (oSparklineGroup.asc_getMaxAxisType() === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.asc_getManualMax() !== null) {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
-                val_ax_props.putMinVal(oSparklineGroup.manualMax);
+                val_ax_props.putMinVal(oSparklineGroup.asc_getManualMax());
             }
             else {
                 val_ax_props.putMaxValRule(c_oAscValAxisRule.auto);

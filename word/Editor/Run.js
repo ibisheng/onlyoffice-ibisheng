@@ -175,7 +175,7 @@ ParaRun.prototype.Copy = function(Selected)
         NewRun.Set_ReviewType(reviewtype_Add);
 
     if(true === bMath)
-        NewRun.MathPrp = this.MathPrp.Copy();
+        NewRun.Set_MathPr(this.MathPrp.Copy());
 
     var StartPos = 0;
     var EndPos   = this.Content.length;

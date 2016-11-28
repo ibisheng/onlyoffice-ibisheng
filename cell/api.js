@@ -2093,7 +2093,9 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_closeCellEditor = function() {
-    this.wb.closeCellEditor();
+    if(this.wb){
+        this.wb.closeCellEditor();
+    }
   };
 
 

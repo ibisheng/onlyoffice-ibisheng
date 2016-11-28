@@ -1812,7 +1812,7 @@ var kCurFormatPainterWord = '';
 if (AscBrowser.isIE)
 // Пути указаны относительно html в меню, не надо их исправлять
 // и коммитить на пути относительно тестового меню
-	kCurFormatPainterWord = 'url(../../../sdk/Common/Images/text_copy.cur), pointer';
+	kCurFormatPainterWord = 'url(../../../../sdk/common/Images/text_copy.cur), pointer';
 else if (AscBrowser.isOpera)
 	kCurFormatPainterWord = 'pointer';
 else

@@ -1499,17 +1499,21 @@
   };
 
   DocsCoApi.prototype._getDisconnectErrorCode = function(opt_closeCode) {
-    if(c_oCloseCode.serverShutdown === opt_closeCode) {
+    if (c_oCloseCode.serverShutdown === opt_closeCode) {
       return Asc.c_oAscError.ID.CoAuthoringDisconnect;
-    } else if(c_oCloseCode.sessionIdle === opt_closeCode) {
-      return Asc.c_oAscError.ID.CoAuthoringDisconnect;
-    } else if(c_oCloseCode.sessionAbsolute === opt_closeCode) {
-      return Asc.c_oAscError.ID.CoAuthoringDisconnect;
-    } else if(c_oCloseCode.accessDeny === opt_closeCode) {
-      return Asc.c_oAscError.ID.CoAuthoringDisconnect;
-    } else if(c_oCloseCode.jwtExpired === opt_closeCode) {
-      return Asc.c_oAscError.ID.KeyExpire;
-    } else if(c_oCloseCode.jwtError === opt_closeCode) {
+    } else if (c_oCloseCode.sessionIdle === opt_closeCode) {
+      return Asc.c_oAscError.ID.SessionIdle;
+    } else if (c_oCloseCode.sessionAbsolute === opt_closeCode) {
+      return Asc.c_oAscError.ID.SessionAbsolute;
+    } else if (c_oCloseCode.accessDeny === opt_closeCode) {
+      return Asc.c_oAscError.ID.AccessDeny;
+    } else if (c_oCloseCode.jwtExpired === opt_closeCode) {
+      if (this.jwtSession) {
+        return Asc.c_oAscError.ID.SessionToken;
+      } else {
+        return Asc.c_oAscError.ID.KeyExpire;
+      }
+    } else if (c_oCloseCode.jwtError === opt_closeCode) {
       return Asc.c_oAscError.ID.VKeyEncrypt;
     }
     return this.isCloseCoAuthoring ? Asc.c_oAscError.ID.UserDrop : Asc.c_oAscError.ID.CoAuthoringDisconnect;
