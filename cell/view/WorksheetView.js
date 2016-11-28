@@ -8588,19 +8588,33 @@
                             t.model.autoFilters.cleanFormat(arn);
                         }
 
-                        if (val === c_oAscCleanOptions.All) {
-                            range.cleanAll();
-                            // Удаляем комментарии
-                            t.cellCommentator.deleteCommentsRange(arn);
-                        } else if (val === c_oAscCleanOptions.Text || val === c_oAscCleanOptions.Formula) {
-                            range.cleanText();
-                        } else if (val === c_oAscCleanOptions.Format) {
-                            range.cleanFormat();
-                        } else if (val === c_oAscCleanOptions.Comments) {
-                            t.cellCommentator.deleteCommentsRange(arn);
-                        } else if (val === c_oAscCleanOptions.Hyperlinks) {
-                            range.cleanHyperlinks();
-                        }
+                        switch(val) {
+							case c_oAscCleanOptions.All:
+								range.cleanAll();
+								t.model.removeSparklines(arn);
+								// Удаляем комментарии
+								t.cellCommentator.deleteCommentsRange(arn);
+								break;
+							case c_oAscCleanOptions.Text:
+							case c_oAscCleanOptions.Formula:
+								range.cleanText();
+								break;
+							case c_oAscCleanOptions.Format:
+								range.cleanFormat();
+								break;
+							case c_oAscCleanOptions.Comments:
+								t.cellCommentator.deleteCommentsRange(arn);
+								break;
+							case c_oAscCleanOptions.Hyperlinks:
+								range.cleanHyperlinks();
+								break;
+							case c_oAscCleanOptions.Sparklines:
+								t.model.removeSparklines(arn);
+								break;
+							case c_oAscCleanOptions.SparklineGroups:
+								t.model.removeSparklineGroups(arn);
+								break;
+						}
 
                         // Вызываем функцию пересчета для заголовков форматированной таблицы
                         if (val === c_oAscCleanOptions.All || val === c_oAscCleanOptions.Text) {

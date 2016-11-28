@@ -166,7 +166,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
             ( (this.pen && this.pen.Fill && this.pen.Fill.fill
                 && this.pen.Fill.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.pen.Fill.fill.type != c_oAscFill.FILL_TYPE_NONE)
                 || (this.brush && this.brush.fill && this.brush.fill
-                && this.brush.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.brush.fill.type != c_oAscFill.FILL_TYPE_NONE) )
+                && this.brush.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.brush.fill.type != c_oAscFill.FILL_TYPE_NONE) );
     }
 
 
@@ -750,11 +750,11 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
         var StratRotY = oChartSpace.chart.view3D && oChartSpace.chart.view3D.rotY ? oChartSpace.chart.view3D.rotY : 0;
         deltaAng = -90*(tx - this.startX)/(this.chartSizes.w/2);
         this.view3D.rotY = StratRotY + deltaAng;
-        if(this.view3D.rotY < 0){
-            this.view3D.rotY = 0;
+        while(this.view3D.rotY < 0){
+            this.view3D.rotY += 360;
         }
-        if(this.view3D.rotY >= 360){
-            this.view3D.rotY = 359;
+        while(this.view3D.rotY >= 360){
+            this.view3D.rotY -= 360;
         }
 
         var StratRotX = oChartSpace.chart.view3D && oChartSpace.chart.view3D.rotX ? oChartSpace.chart.view3D.rotX : 0;

@@ -4717,7 +4717,6 @@ CellArea.prototype = {
 
 		this.f = null;
 		this.arrSparklines = [];
-		this.arrCachedSparklines = [];
 
 		//for drawing preview
 		this.canvas = null;
@@ -4786,7 +4785,7 @@ CellArea.prototype = {
 					w.WriteString2(data.newPr);
 				}
 				break;
-			case AscCH.historyitem_Sparkline_Clone_Sparklines:
+			case AscCH.historyitem_Sparkline_ChangeData:
 				if (data.newPr) {
 					w.WriteLong(data.newPr.length);
 					data.newPr.forEach(function (item) {
@@ -4795,6 +4794,12 @@ CellArea.prototype = {
 						w.WriteString2(item.f);
 					});
 				}
+				break;
+			case AscCH.historyitem_Sparkline_RemoveData:
+				w.WriteLong(data.oldPr.sqref.c1);
+				w.WriteLong(data.oldPr.sqref.r1);
+				break;
+			case AscCH.historyitem_Sparkline_RemoveSparkline:
 				break;
 		}
 	};
@@ -4816,6 +4821,7 @@ CellArea.prototype = {
 			return color;
 		};
 
+		var col, row;
 		var type = r.GetLong();
 		switch (type) {
 			case AscCH.historyitem_Sparkline_Type:
@@ -4896,15 +4902,26 @@ CellArea.prototype = {
 			case AscCH.historyitem_Sparkline_F:
 				this.f = r.GetBool() ? r.GetString2() : null;
 				break;
-			case AscCH.historyitem_Sparkline_Clone_Sparklines:
-				var count = r.GetLong(), oSparkline, col, row;
+			case AscCH.historyitem_Sparkline_ChangeData:
+				this.arrSparklines = [];
+				var count = r.GetLong(), oSparkline;
 				for (var i = 0; i < count; ++i) {
 					oSparkline = new sparkline();
 					col = r.GetLong();
 					row = r.GetLong();
-					oSparkline.sqref = Asc.Range(col, row, col, row);
+					oSparkline.sqref = new Asc.Range(col, row, col, row);
 					oSparkline.setF(r.GetString2());
 					this.arrSparklines.push(oSparkline);
+				}
+				break;
+			case AscCH.historyitem_Sparkline_RemoveData:
+				col = r.GetLong();
+				row = r.GetLong();
+				this.remove(new Asc.Range(col, row, col, row));
+				break;
+			case AscCH.historyitem_Sparkline_RemoveSparkline:
+				if (this.worksheet) {
+					this.worksheet.removeSparklineGroup(this.Get_Id());
 				}
 				break;
 		}
@@ -4922,10 +4939,11 @@ CellArea.prototype = {
 		var api_sheet = Asc['editor'];
 		this.worksheet = api_sheet.wbModel.getWorksheetById(r.GetString2());
 		if (this.worksheet) {
-			this.worksheet.insertSparkline(this);
+			this.worksheet.insertSparklineGroup(this);
 		}
 	};
 	sparklineGroup.prototype.Undo = function (data) {
+		var t = this;
 		switch (data.Type) {
 			case AscCH.historyitem_Sparkline_Type:
 				this.type = data.oldPr;
@@ -5005,11 +5023,28 @@ CellArea.prototype = {
 			case AscCH.historyitem_Sparkline_F:
 				this.f = data.oldPr;
 				break;
+			case AscCH.historyitem_Sparkline_ChangeData:
+				this.arrSparklines = [];
+				if (data.oldPr) {
+					data.oldPr.forEach(function (item) {
+						t.arrSparklines.push(item.clone());
+					});
+				}
+				break;
+			case AscCH.historyitem_Sparkline_RemoveData:
+				this.arrSparklines.push(data.oldPr);
+				break;
+			case AscCH.historyitem_Sparkline_RemoveSparkline:
+				if (this.worksheet) {
+					this.worksheet.insertSparklineGroup(this);
+				}
+				break;
 		}
 
 		this.cleanCache();
 	};
 	sparklineGroup.prototype.Redo = function (data) {
+		var t = this;
 		switch (data.Type) {
 			case AscCH.historyitem_Sparkline_Type:
 				this.type = data.newPr;
@@ -5089,6 +5124,22 @@ CellArea.prototype = {
 			case AscCH.historyitem_Sparkline_F:
 				this.f = data.newPr;
 				break;
+			case AscCH.historyitem_Sparkline_ChangeData:
+				this.arrSparklines = [];
+				if (data.newPr) {
+					data.newPr.forEach(function (item) {
+						t.arrSparklines.push(item.clone());
+					});
+				}
+				break;
+			case AscCH.historyitem_Sparkline_RemoveData:
+				this.remove(data.oldPr.sqref);
+				break;
+			case AscCH.historyitem_Sparkline_RemoveSparkline:
+				if (this.worksheet) {
+					this.worksheet.removeSparklineGroup(this.Get_Id());
+				}
+				break;
 		}
 		this.cleanCache();
 	};
@@ -5124,8 +5175,18 @@ CellArea.prototype = {
 		this.colorHigh = new RgbColor(defaultOtherColor);
 		this.colorLow = new RgbColor(defaultOtherColor);
 	};
-	sparklineGroup.prototype.setWorksheet = function (worksheet) {
+	sparklineGroup.prototype.setWorksheet = function (worksheet, oldWorksheet) {
 		this.worksheet = worksheet;
+		if (oldWorksheet) {
+			var oldSparklines = [];
+			var newSparklines = [];
+			for (var i = 0; i < this.arrSparklines.length; ++i) {
+				oldSparklines.push(this.arrSparklines[i].clone());
+				this.arrSparklines[i].updateWorksheet(worksheet.sName, oldWorksheet.sName);
+				newSparklines.push(this.arrSparklines[i].clone());
+			}
+			History.Add(this, {Type: AscCH.historyitem_Sparkline_ChangeData, oldPr: oldSparklines, newPr: newSparklines});
+		}
 	};
 	sparklineGroup.prototype.set = function (val) {
 		var t = this;
@@ -5182,26 +5243,28 @@ CellArea.prototype = {
 				res.arrSparklines.push(this.arrSparklines[i].clone());
 				newSparklines.push(this.arrSparklines[i].clone());
 			}
-			History.Add(res, {Type: AscCH.historyitem_Sparkline_Clone_Sparklines, oldPr: null, newPr: newSparklines});
+			History.Add(res, {Type: AscCH.historyitem_Sparkline_ChangeData, oldPr: null, newPr: newSparklines});
 		}
 
 		return res;
 	};
-	sparklineGroup.prototype.addView = function (oSparklineView, index) {
-		this.arrCachedSparklines[index] = oSparklineView;
-	};
 	sparklineGroup.prototype.draw = function (oDrawingContext) {
+		var oCacheView;
 		var graphics = new AscCommon.CGraphics();
 		graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
 			oDrawingContext.getWidth(3), oDrawingContext.getHeight(3));
 		graphics.m_oFontManager = AscCommon.g_fontManager;
-		for (var i = 0; i < this.arrCachedSparklines.length; ++i) {
-			this.arrCachedSparklines[i].draw(graphics);
+		for (var i = 0; i < this.arrSparklines.length; ++i) {
+			if (oCacheView = this.arrSparklines[i].oCacheView) {
+				oCacheView.draw(graphics);
+			}
 		}
 	};
 	sparklineGroup.prototype.cleanCache = function () {
 		// ToDo clean only colors (for color scheme)
-		this.arrCachedSparklines = [];
+		for (var i = 0; i < this.arrSparklines.length; ++i) {
+			this.arrSparklines[i].oCacheView = null;
+		}
 	};
 	sparklineGroup.prototype.updateCache = function (sheet, ranges) {
 		var sparklineRange;
@@ -5209,7 +5272,7 @@ CellArea.prototype = {
 			sparklineRange = this.arrSparklines[i]._f;
 			for (var j = 0; j < ranges.length; ++j) {
 				if (sparklineRange.isIntersect(ranges[j], sheet)) {
-					this.arrCachedSparklines[i] = null;
+					this.arrSparklines[i].oCacheView = null;
 					break;
 				}
 			}
@@ -5222,6 +5285,29 @@ CellArea.prototype = {
 			}
 		}
 		return -1;
+	};
+	sparklineGroup.prototype.intersectionSimple = function (range) {
+		for (var j = 0; j < this.arrSparklines.length; ++j) {
+			if (this.arrSparklines[j].intersectionSimple(range)) {
+				return j;
+			}
+		}
+		return -1;
+	};
+	sparklineGroup.prototype.remove = function (range) {
+		for (var i = 0; i < this.arrSparklines.length; ++i) {
+			if (this.arrSparklines[i].checkInRange(range)) {
+				History.Add(this, {Type: AscCH.historyitem_Sparkline_RemoveData, oldPr: this.arrSparklines[i], newPr: null});
+				this.arrSparklines.splice(i, 1);
+				--i;
+			}
+		}
+
+		var bRemove = 0 === this.arrSparklines.length;
+		if (bRemove) {
+			History.Add(this, {Type: AscCH.historyitem_Sparkline_RemoveSparkline, oldPr: this, newPr: null});
+		}
+		return bRemove;
 	};
 	sparklineGroup.prototype.asc_getId = function () {
 		return this.Id;
@@ -5525,6 +5611,7 @@ CellArea.prototype = {
 
 		//for preview
 		this.oCache = null;
+		this.oCacheView = null;
 	}
 
 	sparkline.prototype.clone = function () {
@@ -5543,11 +5630,20 @@ CellArea.prototype = {
 		this.f = f;
 		this._f = AscCommonExcel.g_oRangeCache.getRange3D(this.f);
 	};
+	sparkline.prototype.updateWorksheet = function (sheet, oldSheet) {
+		if (this._f && oldSheet === this._f.sheet && (null === this._f.sheet2 || oldSheet === this._f.sheet2)) {
+			this._f.setSheet(sheet);
+			this.f = this._f.getName();
+		}
+	};
 	sparkline.prototype.checkInRange = function (range) {
 		return this.sqref ? range.isIntersect(this.sqref) : false;
 	};
 	sparkline.prototype.contains = function (c, r) {
 		return this.sqref ? this.sqref.contains(c, r) : false;
+	};
+	sparkline.prototype.intersectionSimple = function (range) {
+		return this.sqref ? this.sqref.intersectionSimple(range) : false;
 	};
 
 // For Auto Filters

@@ -3502,6 +3502,9 @@ Woorksheet.prototype.clone=function(sNewId, sName, tableNames){
 					drawingBase.from.row, drawingBase.from.rowOff, drawingBase.to.col, drawingBase.to.colOff,
 					drawingBase.to.row, drawingBase.to.rowOff, drawingBase.Pos.X, drawingBase.Pos.Y, drawingBase.ext.cx,
 					drawingBase.ext.cy);
+				if(drawingObject.graphicObject.setDrawingBaseType){
+                    drawingObject.graphicObject.setDrawingBaseType(drawingBase.Type);
+                }
 				oNewWs.Drawings[oNewWs.Drawings.length - 1] = drawingObject;
 			}
 			AscFormat.NEW_WORKSHEET_DRAWING_DOCUMENT = null;
@@ -3513,7 +3516,7 @@ Woorksheet.prototype.clone=function(sNewId, sName, tableNames){
 		var newSparkline;
 		for (i = 0; i < this.aSparklineGroups.length; ++i) {
 			newSparkline = this.aSparklineGroups[i].clone();
-			newSparkline.setWorksheet(oNewWs);
+			newSparkline.setWorksheet(oNewWs, wsFrom);
 			oNewWs.aSparklineGroups.push(newSparkline);
 		}
 	};
@@ -4583,7 +4586,7 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 				{
 					updateRange = new Asc.Range(0, startIndex, gc_nMaxCol0, endIndex);
 					History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RowHide, oThis.getId(), updateRange, new UndoRedoData_FromToRowCol(bHidden, startIndex, endIndex));
-				}	
+				}
 				
 				startIndex = row.index;
 				endIndex = row.index;
@@ -5706,8 +5709,32 @@ Woorksheet.prototype.updateSparklineCache = function(sheet, ranges) {
 		}
 		return null;
 	};
-	Woorksheet.prototype.insertSparkline = function (sparkline) {
-		this.aSparklineGroups.push(sparkline);
+	Woorksheet.prototype.removeSparklines = function (range) {
+		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
+			if (this.aSparklineGroups[i].remove(range)) {
+				History.Add(this.aSparklineGroups[i], {Type: AscCH.historyitem_Sparkline_RemoveSparkline, oldPr: null, newPr: null});
+				this.aSparklineGroups.splice(i--, 1);
+			}
+		}
+	};
+	Woorksheet.prototype.removeSparklineGroups = function (range) {
+		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
+			if (-1 !== this.aSparklineGroups[i].intersectionSimple(range)) {
+				History.Add(this.aSparklineGroups[i], {Type: AscCH.historyitem_Sparkline_RemoveSparkline, oldPr: null, newPr: null});
+				this.aSparklineGroups.splice(i--, 1);
+			}
+		}
+	};
+	Woorksheet.prototype.insertSparklineGroup = function (sparklineGroup) {
+		this.aSparklineGroups.push(sparklineGroup);
+	};
+	Woorksheet.prototype.removeSparklineGroup = function (id) {
+		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
+			if (id === this.aSparklineGroups[i].Get_Id()) {
+				this.aSparklineGroups.splice(i, 1);
+				break;
+			}
+		}
 	};
 //-------------------------------------------------------------------------------------------------
 /**

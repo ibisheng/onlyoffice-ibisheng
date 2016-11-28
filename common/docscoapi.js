@@ -579,7 +579,8 @@
     this.mode = undefined;
     this.permissions = undefined;
     this.lang = undefined;
-    this.jwt = undefined;
+    this.jwtOpen = undefined;
+    this.jwtSession = undefined;
     this._isViewer = false;
     this._isReSaveAfterAuth = false;	// Флаг для сохранения после повторной авторизации (для разрыва соединения во время сохранения)
     this._lockBuffer = [];
@@ -606,7 +607,7 @@
   };
 
   DocsCoApi.prototype.get_jwt = function() {
-    return this.jwt;
+    return this.jwtSession || this.jwtOpen;
   };
 
   DocsCoApi.prototype.getSessionId = function() {
@@ -900,7 +901,8 @@
   DocsCoApi.prototype._onRefreshToken = function(jwt) {
     var t = this;
     if (jwt) {
-      t.jwt = jwt.token;
+      t.jwtOpen = undefined;
+      t.jwtSession = jwt.token;
       if (null !== t.jwtTimeOutId) {
         clearTimeout(t.jwtTimeOutId);
         t.jwtTimeOutId = null;
@@ -908,7 +910,7 @@
       var timeout = Math.max(0, jwt.expires - t.maxAttemptCount * t.reconnectInterval);
       t.jwtTimeOutId = setTimeout(function(){
         t.jwtTimeOutId = null;
-        t._send({'type': 'refreshToken', 'jwt': t.jwt});
+        t._send({'type': 'refreshToken', 'jwtSession': t.jwtSession});
       }, timeout);
     }
   };
@@ -1305,7 +1307,7 @@
 	this.mode = docInfo.get_Mode();
 	this.permissions = docInfo.get_Permissions();
 	this.lang = docInfo.get_Lang();
-	this.jwt = docInfo.get_Token();
+	this.jwtOpen = docInfo.get_Token();
 
     this.setDocId(docid);
     this._initSocksJs();
@@ -1358,7 +1360,8 @@
       'lang': this.lang,
       'mode': this.mode,
       'permissions': this.permissions,
-      'jwt': this.jwt,
+      'jwtOpen': this.jwtOpen,
+      'jwtSession': this.jwtSession,
       'version': asc_coAuthV
     });
   };
