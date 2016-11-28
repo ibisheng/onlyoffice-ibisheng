@@ -1898,31 +1898,35 @@ PasteProcessor.prototype =
         if(PasteElementsId.g_bIsDocumentCopyPaste)
         {
 			var nDocPosType = oDocument.Get_DocPosType();
-            if(docpostype_HdrFtr === nDocPosType)
-            {
-                if(null != oDocument.HdrFtr && null != oDocument.HdrFtr.CurHdrFtr && null != oDocument.HdrFtr.CurHdrFtr.Content)
-                {
-                    oDocument = oDocument.HdrFtr.CurHdrFtr.Content;
-                    this.oRecalcDocument = oDocument;
-                }
-            }
+			if (docpostype_HdrFtr === nDocPosType)
+			{
+				if (null != oDocument.HdrFtr && null != oDocument.HdrFtr.CurHdrFtr && null != oDocument.HdrFtr.CurHdrFtr.Content)
+				{
+					oDocument  = oDocument.HdrFtr.CurHdrFtr.Content;
+					this.oRecalcDocument = oDocument;
+				}
+			}
+			else if (nDocPosType === docpostype_DrawingObjects)
+			{
+				var content = oDocument.DrawingObjects.getTargetDocContent(true);
+				if (content)
+				{
+					oDocument = content;
+				}
+			}
+			else if (nDocPosType === docpostype_Footnotes)
+			{
+				if (oDocument.Footnotes && oDocument.Footnotes.CurFootnote)
+					oDocument = oDocument.Footnotes.CurFootnote
+			}
 
-            if(nDocPosType === docpostype_DrawingObjects)
-            {
-                var content = oDocument.DrawingObjects.getTargetDocContent(true);
-                if(content)
-                {
-                    oDocument = content;
-                }
-            }
-
-            //��� ��������� ������
-            var Item = oDocument.Content[oDocument.CurPos.ContentPos];
-            if( type_Table == Item.GetType() && null != Item.CurCell)
-            {
-                this.dMaxWidth = this._CalcMaxWidthByCell(Item.CurCell);
-                oDocument = this._GetTargetDocument(Item.CurCell.Content);
-            }
+			// Отдельно обрабатываем случай, когда курсор находится внутри таблицы
+			var Item = oDocument.Content[oDocument.CurPos.ContentPos];
+			if (type_Table == Item.GetType() && null != Item.CurCell)
+			{
+				this.dMaxWidth = this._CalcMaxWidthByCell(Item.CurCell);
+				oDocument = this._GetTargetDocument(Item.CurCell.Content);
+			}
         }
         else
         {
