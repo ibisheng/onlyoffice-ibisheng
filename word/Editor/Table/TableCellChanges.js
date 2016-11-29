@@ -54,48 +54,47 @@ AscDFH.changesFactory[AscDFH.historyitem_TableCell_NoWrap]        = CChangesTabl
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
 //----------------------------------------------------------------------------------------------------------------------
-AscDFH.tablecellChangesRelationMap                                             = {};
-AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_GridSpan]      = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableCell_GridSpan]      = [
 	AscDFH.historyitem_TableCell_GridSpan,
 	AscDFH.historyitem_TableCell_Pr
 ];
-AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_Margins]       = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableCell_Margins]       = [
 	AscDFH.historyitem_TableCell_Margins,
 	AscDFH.historyitem_TableCell_Pr
 ];
-AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_Shd]           = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableCell_Shd]           = [
 	AscDFH.historyitem_TableCell_Shd,
 	AscDFH.historyitem_TableCell_Pr
 ];
-AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_VMerge]        = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableCell_VMerge]        = [
 	AscDFH.historyitem_TableCell_VMerge,
 	AscDFH.historyitem_TableCell_Pr
 ];
-AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_Border_Left]   = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableCell_Border_Left]   = [
 	AscDFH.historyitem_TableCell_Border_Left,
 	AscDFH.historyitem_TableCell_Pr
 ];
-AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_Border_Right]  = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableCell_Border_Right]  = [
 	AscDFH.historyitem_TableCell_Border_Right,
 	AscDFH.historyitem_TableCell_Pr
 ];
-AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_Border_Top]    = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableCell_Border_Top]    = [
 	AscDFH.historyitem_TableCell_Border_Top,
 	AscDFH.historyitem_TableCell_Pr
 ];
-AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_Border_Bottom] = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableCell_Border_Bottom] = [
 	AscDFH.historyitem_TableCell_Border_Bottom,
 	AscDFH.historyitem_TableCell_Pr
 ];
-AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_VAlign]        = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableCell_VAlign]        = [
 	AscDFH.historyitem_TableCell_VAlign,
 	AscDFH.historyitem_TableCell_Pr
 ];
-AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_W]             = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableCell_W]             = [
 	AscDFH.historyitem_TableCell_W,
 	AscDFH.historyitem_TableCell_Pr
 ];
-AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_Pr]            = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableCell_Pr]            = [
 	AscDFH.historyitem_TableCell_GridSpan,
 	AscDFH.historyitem_TableCell_Margins,
 	AscDFH.historyitem_TableCell_Shd,
@@ -110,11 +109,11 @@ AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_Pr]            =
 	AscDFH.historyitem_TableCell_TextDirection,
 	AscDFH.historyitem_TableCell_NoWrap
 ];
-AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_TextDirection] = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableCell_TextDirection] = [
 	AscDFH.historyitem_TableCell_TextDirection,
 	AscDFH.historyitem_TableCell_Pr
 ];
-AscDFH.tablecellChangesRelationMap[AscDFH.historyitem_TableCell_NoWrap]        = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableCell_NoWrap]        = [
 	AscDFH.historyitem_TableCell_NoWrap,
 	AscDFH.historyitem_TableCell_Pr
 ];

@@ -43,12 +43,11 @@ AscDFH.changesFactory[AscDFH.historyitem_DocumentContent_RemoveItem] = CChangesD
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
 //----------------------------------------------------------------------------------------------------------------------
-AscDFH.documentcontentChangesRelationMap                                                = {};
-AscDFH.documentcontentChangesRelationMap[AscDFH.historyitem_DocumentContent_AddItem]    = [
+AscDFH.changesRelationMap[AscDFH.historyitem_DocumentContent_AddItem]    = [
 	AscDFH.historyitem_DocumentContent_AddItem,
 	AscDFH.historyitem_DocumentContent_RemoveItem
 ];
-AscDFH.documentcontentChangesRelationMap[AscDFH.historyitem_DocumentContent_RemoveItem] = [
+AscDFH.changesRelationMap[AscDFH.historyitem_DocumentContent_RemoveItem] = [
 	AscDFH.historyitem_DocumentContent_AddItem,
 	AscDFH.historyitem_DocumentContent_RemoveItem
 ];

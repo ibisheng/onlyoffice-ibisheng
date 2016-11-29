@@ -49,36 +49,35 @@ AscDFH.changesFactory[AscDFH.historyitem_TableRow_Pr]          = CChangesTableRo
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
 //----------------------------------------------------------------------------------------------------------------------
-AscDFH.tablerowChangesRelationMap                                          = {};
-AscDFH.tablerowChangesRelationMap[AscDFH.historyitem_TableRow_Before]      = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableRow_Before]      = [
 	AscDFH.historyitem_TableRow_Before,
 	AscDFH.historyitem_TableRow_Pr
 ];
-AscDFH.tablerowChangesRelationMap[AscDFH.historyitem_TableRow_After]       = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableRow_After]       = [
 	AscDFH.historyitem_TableRow_After,
 	AscDFH.historyitem_TableRow_Pr
 ];
-AscDFH.tablerowChangesRelationMap[AscDFH.historyitem_TableRow_CellSpacing] = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableRow_CellSpacing] = [
 	AscDFH.historyitem_TableRow_CellSpacing,
 	AscDFH.historyitem_TableRow_Pr
 ];
-AscDFH.tablerowChangesRelationMap[AscDFH.historyitem_TableRow_Height]      = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableRow_Height]      = [
 	AscDFH.historyitem_TableRow_Height,
 	AscDFH.historyitem_TableRow_Pr
 ];
-AscDFH.tablerowChangesRelationMap[AscDFH.historyitem_TableRow_AddCell]     = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableRow_AddCell]     = [
 	AscDFH.historyitem_TableRow_AddCell,
 	AscDFH.historyitem_TableRow_RemoveCell
 ];
-AscDFH.tablerowChangesRelationMap[AscDFH.historyitem_TableRow_RemoveCell]  = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableRow_RemoveCell]  = [
 	AscDFH.historyitem_TableRow_AddCell,
 	AscDFH.historyitem_TableRow_RemoveCell
 ];
-AscDFH.tablerowChangesRelationMap[AscDFH.historyitem_TableRow_TableHeader] = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableRow_TableHeader] = [
 	AscDFH.historyitem_TableRow_TableHeader,
 	AscDFH.historyitem_TableRow_Pr
 ];
-AscDFH.tablerowChangesRelationMap[AscDFH.historyitem_TableRow_Pr]          = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TableRow_Pr]          = [
 	AscDFH.historyitem_TableRow_Before,
 	AscDFH.historyitem_TableRow_After,
 	AscDFH.historyitem_TableRow_CellSpacing,

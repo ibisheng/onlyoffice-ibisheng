@@ -48,22 +48,17 @@ AscDFH.changesFactory[AscDFH.historyitem_ParaComment_CommentId] = CChangesParaCo
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
 //----------------------------------------------------------------------------------------------------------------------
-AscDFH.commentRelationMap                                      = {};
-AscDFH.commentRelationMap[AscDFH.historyitem_Comment_Change]   = [AscDFH.historyitem_Comment_Change];
-AscDFH.commentRelationMap[AscDFH.historyitem_Comment_TypeInfo] = [AscDFH.historyitem_Comment_TypeInfo];
-
-AscDFH.commentsRelationMap                                     = {};
-AscDFH.commentsRelationMap[AscDFH.historyitem_Comments_Add]    = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Comment_Change]        = [AscDFH.historyitem_Comment_Change];
+AscDFH.changesRelationMap[AscDFH.historyitem_Comment_TypeInfo]      = [AscDFH.historyitem_Comment_TypeInfo];
+AscDFH.changesRelationMap[AscDFH.historyitem_Comments_Add]          = [
 	AscDFH.historyitem_Comments_Add,
 	AscDFH.historyitem_Comments_Remove
 ];
-AscDFH.commentsRelationMap[AscDFH.historyitem_Comments_Remove] = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Comments_Remove]       = [
 	AscDFH.historyitem_Comments_Add,
 	AscDFH.historyitem_Comments_Remove
 ];
-
-AscDFH.paracommentRelationMap                                   = {};
-AscDFH.changesFactory[AscDFH.historyitem_ParaComment_CommentId] = [AscDFH.historyitem_ParaComment_CommentId];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaComment_CommentId] = [AscDFH.historyitem_ParaComment_CommentId];
 //----------------------------------------------------------------------------------------------------------------------
 
 /**

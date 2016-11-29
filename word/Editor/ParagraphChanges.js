@@ -91,130 +91,129 @@ function private_ParagraphChangesOnSetValue(oParagraph)
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
 //----------------------------------------------------------------------------------------------------------------------
-AscDFH.paragraphChangesRelationMap                                                         = {};
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_AddItem]                   = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_AddItem]                   = [
 	AscDFH.historyitem_Paragraph_AddItem,
 	AscDFH.historyitem_Paragraph_RemoveItem
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_RemoveItem]                = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_RemoveItem]                = [
 	AscDFH.historyitem_Paragraph_AddItem,
 	AscDFH.historyitem_Paragraph_RemoveItem
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Numbering]                 = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Numbering]                 = [
 	AscDFH.historyitem_Paragraph_Numbering,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Align]                     = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Align]                     = [
 	AscDFH.historyitem_Paragraph_Align,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Ind_First]                 = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Ind_First]                 = [
 	AscDFH.historyitem_Paragraph_Ind_First,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Ind_Right]                 = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Ind_Right]                 = [
 	AscDFH.historyitem_Paragraph_Ind_Right,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Ind_Left]                  = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Ind_Left]                  = [
 	AscDFH.historyitem_Paragraph_Ind_Left,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_ContextualSpacing]         = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_ContextualSpacing]         = [
 	AscDFH.historyitem_Paragraph_ContextualSpacing,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_KeepLines]                 = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_KeepLines]                 = [
 	AscDFH.historyitem_Paragraph_KeepLines,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_KeepNext]                  = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_KeepNext]                  = [
 	AscDFH.historyitem_Paragraph_KeepNext,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_PageBreakBefore]           = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_PageBreakBefore]           = [
 	AscDFH.historyitem_Paragraph_PageBreakBefore,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Spacing_Line]              = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Spacing_Line]              = [
 	AscDFH.historyitem_Paragraph_Spacing_Line,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Spacing_LineRule]          = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Spacing_LineRule]          = [
 	AscDFH.historyitem_Paragraph_Spacing_LineRule,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Spacing_Before]            = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Spacing_Before]            = [
 	AscDFH.historyitem_Paragraph_Spacing_Before,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Spacing_After]             = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Spacing_After]             = [
 	AscDFH.historyitem_Paragraph_Spacing_After,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Spacing_AfterAutoSpacing]  = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Spacing_AfterAutoSpacing]  = [
 	AscDFH.historyitem_Paragraph_Spacing_AfterAutoSpacing,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Spacing_BeforeAutoSpacing] = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Spacing_BeforeAutoSpacing] = [
 	AscDFH.historyitem_Paragraph_Spacing_BeforeAutoSpacing,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Shd_Value]                 = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Shd_Value]                 = [
 	AscDFH.historyitem_Paragraph_Shd_Value,
 	AscDFH.historyitem_Paragraph_Shd,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Shd_Color]                 = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Shd_Color]                 = [
 	AscDFH.historyitem_Paragraph_Shd_Color,
 	AscDFH.historyitem_Paragraph_Shd,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Shd_Unifill]               = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Shd_Unifill]               = [
 	AscDFH.historyitem_Paragraph_Shd_Unifill,
 	AscDFH.historyitem_Paragraph_Shd,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Shd]                       = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Shd]                       = [
 	AscDFH.historyitem_Paragraph_Shd_Value,
 	AscDFH.historyitem_Paragraph_Shd_Color,
 	AscDFH.historyitem_Paragraph_Shd_Unifill,
 	AscDFH.historyitem_Paragraph_Shd,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_WidowControl]              = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_WidowControl]              = [
 	AscDFH.historyitem_Paragraph_WidowControl,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Tabs]                      = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Tabs]                      = [
 	AscDFH.historyitem_Paragraph_Tabs,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_PStyle]                    = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_PStyle]                    = [
 	AscDFH.historyitem_Paragraph_PStyle,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Borders_Between]           = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Borders_Between]           = [
 	AscDFH.historyitem_Paragraph_Borders_Between,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Borders_Bottom]            = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Borders_Bottom]            = [
 	AscDFH.historyitem_Paragraph_Borders_Bottom,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Borders_Left]              = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Borders_Left]              = [
 	AscDFH.historyitem_Paragraph_Borders_Left,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Borders_Right]             = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Borders_Right]             = [
 	AscDFH.historyitem_Paragraph_Borders_Right,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Borders_Top]               = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Borders_Top]               = [
 	AscDFH.historyitem_Paragraph_Borders_Top,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Pr]                        = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Pr]                        = [
 	AscDFH.historyitem_Paragraph_Pr,
 	AscDFH.historyitem_Paragraph_Numbering,
 	AscDFH.historyitem_Paragraph_Align,
@@ -247,25 +246,25 @@ AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_Pr]             
 	AscDFH.historyitem_Paragraph_PresentationPr_Level,
 	AscDFH.historyitem_Paragraph_FramePr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_PresentationPr_Bullet]     = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_PresentationPr_Bullet]     = [
 	AscDFH.historyitem_Paragraph_PresentationPr_Bullet,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_PresentationPr_Level]      = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_PresentationPr_Level]      = [
 	AscDFH.historyitem_Paragraph_PresentationPr_Level,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_FramePr]                   = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_FramePr]                   = [
 	AscDFH.historyitem_Paragraph_FramePr,
 	AscDFH.historyitem_Paragraph_Pr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_SectionPr]                 = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_SectionPr]                 = [
 	AscDFH.historyitem_Paragraph_SectionPr
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_PrChange]                  = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_PrChange]                  = [
 	AscDFH.historyitem_Paragraph_PrChange
 ];
-AscDFH.paragraphChangesRelationMap[AscDFH.historyitem_Paragraph_PrReviewInfo]              = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_PrReviewInfo]              = [
 	AscDFH.historyitem_Paragraph_PrReviewInfo
 ];
 

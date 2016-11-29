@@ -70,64 +70,63 @@ AscDFH.changesFactory[AscDFH.historyitem_TextPr_Fill]            = CChangesParaT
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
 //----------------------------------------------------------------------------------------------------------------------
-AscDFH.paratextprChangesRelationMap                                            = {};
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_Bold]            = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_Bold]            = [
 	AscDFH.historyitem_TextPr_Bold,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_Italic]          = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_Italic]          = [
 	AscDFH.historyitem_TextPr_Italic,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_Strikeout]       = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_Strikeout]       = [
 	AscDFH.historyitem_TextPr_Strikeout,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_Underline]       = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_Underline]       = [
 	AscDFH.historyitem_TextPr_Underline,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_FontSize]        = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_FontSize]        = [
 	AscDFH.historyitem_TextPr_FontSize,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_Color]           = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_Color]           = [
 	AscDFH.historyitem_TextPr_Color,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_VertAlign]       = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_VertAlign]       = [
 	AscDFH.historyitem_TextPr_VertAlign,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_HighLight]       = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_HighLight]       = [
 	AscDFH.historyitem_TextPr_HighLight,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_RStyle]          = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_RStyle]          = [
 	AscDFH.historyitem_TextPr_RStyle,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_Spacing]         = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_Spacing]         = [
 	AscDFH.historyitem_TextPr_Spacing,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_DStrikeout]      = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_DStrikeout]      = [
 	AscDFH.historyitem_TextPr_DStrikeout,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_Caps]            = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_Caps]            = [
 	AscDFH.historyitem_TextPr_Caps,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_SmallCaps]       = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_SmallCaps]       = [
 	AscDFH.historyitem_TextPr_SmallCaps,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_Position]        = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_Position]        = [
 	AscDFH.historyitem_TextPr_Position,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_Value]           = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_Value]           = [
 	AscDFH.historyitem_TextPr_Bold,
 	AscDFH.historyitem_TextPr_Italic,
 	AscDFH.historyitem_TextPr_Strikeout,
@@ -158,7 +157,7 @@ AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_Value]           =
 	AscDFH.historyitem_TextPr_Outline,
 	AscDFH.historyitem_TextPr_Fill
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_RFonts]          = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_RFonts]          = [
 	AscDFH.historyitem_TextPr_RFonts,
 	AscDFH.historyitem_TextPr_RFonts_Ascii,
 	AscDFH.historyitem_TextPr_RFonts_HAnsi,
@@ -167,66 +166,66 @@ AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_RFonts]          =
 	AscDFH.historyitem_TextPr_RFonts_Hint,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_RFonts_Ascii]    = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_RFonts_Ascii]    = [
 	AscDFH.historyitem_TextPr_RFonts_Ascii,
 	AscDFH.historyitem_TextPr_RFonts,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_RFonts_HAnsi]    = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_RFonts_HAnsi]    = [
 	AscDFH.historyitem_TextPr_RFonts_HAnsi,
 	AscDFH.historyitem_TextPr_RFonts,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_RFonts_CS]       = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_RFonts_CS]       = [
 	AscDFH.historyitem_TextPr_RFonts_CS,
 	AscDFH.historyitem_TextPr_RFonts,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_RFonts_EastAsia] = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_RFonts_EastAsia] = [
 	AscDFH.historyitem_TextPr_RFonts_EastAsia,
 	AscDFH.historyitem_TextPr_RFonts,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_RFonts_Hint]     = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_RFonts_Hint]     = [
 	AscDFH.historyitem_TextPr_RFonts_Hint,
 	AscDFH.historyitem_TextPr_RFonts,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_Lang]            = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_Lang]            = [
 	AscDFH.historyitem_TextPr_Lang,
 	AscDFH.historyitem_TextPr_Lang_Bidi,
 	AscDFH.historyitem_TextPr_Lang_EastAsia,
 	AscDFH.historyitem_TextPr_Lang_Val,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_Lang_Bidi]       = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_Lang_Bidi]       = [
 	AscDFH.historyitem_TextPr_Lang_Bidi,
 	AscDFH.historyitem_TextPr_Lang,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_Lang_EastAsia]   = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_Lang_EastAsia]   = [
 	AscDFH.historyitem_TextPr_Lang_EastAsia,
 	AscDFH.historyitem_TextPr_Lang,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_Lang_Val]        = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_Lang_Val]        = [
 	AscDFH.historyitem_TextPr_Lang_Val,
 	AscDFH.historyitem_TextPr_Lang,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_Unifill]         = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_Unifill]         = [
 	AscDFH.historyitem_TextPr_Unifill,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_FontSizeCS]      = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_FontSizeCS]      = [
 	AscDFH.historyitem_TextPr_FontSizeCS,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_Outline]         = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_Outline]         = [
 	AscDFH.historyitem_TextPr_Outline,
 	AscDFH.historyitem_TextPr_Value
 ];
-AscDFH.paratextprChangesRelationMap[AscDFH.historyitem_TextPr_Fill]            = [
+AscDFH.changesRelationMap[AscDFH.historyitem_TextPr_Fill]            = [
 	AscDFH.historyitem_TextPr_Fill,
 	AscDFH.historyitem_TextPr_Value
 ];

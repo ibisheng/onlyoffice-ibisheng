@@ -60,26 +60,25 @@ AscDFH.changesFactory[AscDFH.historyitem_Drawing_SetSizeRelV]       = CChangesPa
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
 //----------------------------------------------------------------------------------------------------------------------
-AscDFH.paradrawingChangesRelationMap                                               = {};
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_DrawingType]       = [AscDFH.historyitem_Drawing_DrawingType];
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_WrappingType]      = [AscDFH.historyitem_Drawing_WrappingType];
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_Distance]          = [AscDFH.historyitem_Drawing_Distance];
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_AllowOverlap]      = [AscDFH.historyitem_Drawing_AllowOverlap];
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_PositionH]         = [AscDFH.historyitem_Drawing_PositionH];
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_PositionV]         = [AscDFH.historyitem_Drawing_PositionV];
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_BehindDoc]         = [AscDFH.historyitem_Drawing_BehindDoc];
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_SetGraphicObject]  = [AscDFH.historyitem_Drawing_SetGraphicObject];
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_SetSimplePos]      = [AscDFH.historyitem_Drawing_SetSimplePos];
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_SetExtent]         = [AscDFH.historyitem_Drawing_SetExtent];
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_SetWrapPolygon]    = [AscDFH.historyitem_Drawing_SetWrapPolygon];
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_SetLocked]         = [AscDFH.historyitem_Drawing_SetLocked];
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_SetRelativeHeight] = [AscDFH.historyitem_Drawing_SetRelativeHeight];
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_SetEffectExtent]   = [AscDFH.historyitem_Drawing_SetEffectExtent];
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_SetParent]         = [AscDFH.historyitem_Drawing_SetParent];
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_SetParaMath]       = [AscDFH.historyitem_Drawing_SetParaMath];
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_LayoutInCell]      = [AscDFH.historyitem_Drawing_LayoutInCell];
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_SetSizeRelH]       = [AscDFH.historyitem_Drawing_SetSizeRelH];
-AscDFH.paradrawingChangesRelationMap[AscDFH.historyitem_Drawing_SetSizeRelV]       = [AscDFH.historyitem_Drawing_SetSizeRelV];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_DrawingType]       = [AscDFH.historyitem_Drawing_DrawingType];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_WrappingType]      = [AscDFH.historyitem_Drawing_WrappingType];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_Distance]          = [AscDFH.historyitem_Drawing_Distance];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_AllowOverlap]      = [AscDFH.historyitem_Drawing_AllowOverlap];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_PositionH]         = [AscDFH.historyitem_Drawing_PositionH];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_PositionV]         = [AscDFH.historyitem_Drawing_PositionV];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_BehindDoc]         = [AscDFH.historyitem_Drawing_BehindDoc];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_SetGraphicObject]  = [AscDFH.historyitem_Drawing_SetGraphicObject];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_SetSimplePos]      = [AscDFH.historyitem_Drawing_SetSimplePos];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_SetExtent]         = [AscDFH.historyitem_Drawing_SetExtent];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_SetWrapPolygon]    = [AscDFH.historyitem_Drawing_SetWrapPolygon];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_SetLocked]         = [AscDFH.historyitem_Drawing_SetLocked];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_SetRelativeHeight] = [AscDFH.historyitem_Drawing_SetRelativeHeight];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_SetEffectExtent]   = [AscDFH.historyitem_Drawing_SetEffectExtent];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_SetParent]         = [AscDFH.historyitem_Drawing_SetParent];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_SetParaMath]       = [AscDFH.historyitem_Drawing_SetParaMath];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_LayoutInCell]      = [AscDFH.historyitem_Drawing_LayoutInCell];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_SetSizeRelH]       = [AscDFH.historyitem_Drawing_SetSizeRelH];
+AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_SetSizeRelV]       = [AscDFH.historyitem_Drawing_SetSizeRelV];
 //----------------------------------------------------------------------------------------------------------------------
 
 /**

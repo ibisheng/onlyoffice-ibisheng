@@ -94,6 +94,100 @@ AscDFH.changesFactory[AscDFH.historyitem_MathMatrix_Interval]      = CChangesMat
 AscDFH.changesFactory[AscDFH.historyitem_MathMatrix_Plh]           = CChangesMathMatrixPlh;
 AscDFH.changesFactory[AscDFH.historyitem_MathDegree_SubSupType]    = CChangesMathDegreeSubSupType;
 
+//----------------------------------------------------------------------------------------------------------------------
+// Карта зависимости изменений
+//----------------------------------------------------------------------------------------------------------------------
+AscDFH.changesRelationMap[AscDFH.historyitem_MathContent_AddItem]      = [
+	AscDFH.historyitem_MathContent_AddItem,
+	AscDFH.historyitem_MathContent_RemoveItem
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathContent_RemoveItem]   = [
+	AscDFH.historyitem_MathContent_AddItem,
+	AscDFH.historyitem_MathContent_RemoveItem
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathContent_ArgSize]      = [AscDFH.historyitem_MathContent_ArgSize];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathPara_Jc]              = [AscDFH.historyitem_MathPara_Jc];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_AddItems]        = [
+	AscDFH.historyitem_MathBase_AddItems,
+	AscDFH.historyitem_MathBase_RemoveItems
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_RemoveItems]     = [
+	AscDFH.historyitem_MathBase_AddItems,
+	AscDFH.historyitem_MathBase_RemoveItems
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_FontSize]        = [AscDFH.historyitem_MathBase_FontSize];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_Shd]             = [AscDFH.historyitem_MathBase_Shd];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_Color]           = [AscDFH.historyitem_MathBase_Color];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_Unifill]         = [AscDFH.historyitem_MathBase_Unifill];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_Underline]       = [AscDFH.historyitem_MathBase_Underline];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_Strikeout]       = [AscDFH.historyitem_MathBase_Strikeout];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_DoubleStrikeout] = [AscDFH.historyitem_MathBase_DoubleStrikeout];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_Italic]          = [AscDFH.historyitem_MathBase_Italic];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_Bold]            = [AscDFH.historyitem_MathBase_Bold];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_RFontsAscii]     = [AscDFH.historyitem_MathBase_RFontsAscii];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_RFontsHAnsi]     = [AscDFH.historyitem_MathBase_RFontsHAnsi];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_RFontsCS]        = [AscDFH.historyitem_MathBase_RFontsCS];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_RFontsEastAsia]  = [AscDFH.historyitem_MathBase_RFontsEastAsia];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_RFontsHint]      = [AscDFH.historyitem_MathBase_RFontsHint];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_HighLight]       = [AscDFH.historyitem_MathBase_HighLight];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_ReviewType]      = [AscDFH.historyitem_MathBase_ReviewType];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_TextFill]        = [AscDFH.historyitem_MathBase_TextFill];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_TextOutline]     = [AscDFH.historyitem_MathBase_TextOutline];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBox_AlnAt]            = [AscDFH.historyitem_MathBox_AlnAt];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBox_ForcedBreak]      = [AscDFH.historyitem_MathBox_ForcedBreak];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathFraction_Type]        = [AscDFH.historyitem_MathFraction_Type];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathRadical_HideDegree]   = [AscDFH.historyitem_MathRadical_HideDegree];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathNary_LimLoc]          = [AscDFH.historyitem_MathNary_LimLoc];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathNary_UpperLimit]      = [AscDFH.historyitem_MathNary_UpperLimit];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathNary_LowerLimit]      = [AscDFH.historyitem_MathNary_LowerLimit];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathDelimiter_BegOper]    = [AscDFH.historyitem_MathDelimiter_BegOper];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathDelimiter_EndOper]    = [AscDFH.historyitem_MathDelimiter_EndOper];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathDelimiter_Grow]       = [AscDFH.historyitem_MathDelimiter_Grow];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathDelimiter_Shape]      = [AscDFH.historyitem_MathDelimiter_Shape];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathDelimiter_SetColumn]  = [AscDFH.historyitem_MathDelimiter_SetColumn];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathGroupChar_Pr]         = [AscDFH.historyitem_MathGroupChar_Pr];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathLimit_Type]           = [AscDFH.historyitem_MathLimit_Type];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBorderBox_Top]        = [AscDFH.historyitem_MathBorderBox_Top];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBorderBox_Bot]        = [AscDFH.historyitem_MathBorderBox_Bot];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBorderBox_Left]       = [AscDFH.historyitem_MathBorderBox_Left];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBorderBox_Right]      = [AscDFH.historyitem_MathBorderBox_Right];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBorderBox_Hor]        = [AscDFH.historyitem_MathBorderBox_Hor];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBorderBox_Ver]        = [AscDFH.historyitem_MathBorderBox_Ver];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBorderBox_TopLTR]     = [AscDFH.historyitem_MathBorderBox_TopLTR];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBorderBox_TopRTL]     = [AscDFH.historyitem_MathBorderBox_TopRTL];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBar_LinePos]          = [AscDFH.historyitem_MathBar_LinePos];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathMatrix_AddRow]        = [
+	AscDFH.historyitem_MathMatrix_AddRow,
+	AscDFH.historyitem_MathMatrix_RemoveRow,
+	AscDFH.historyitem_MathMatrix_AddColumn,
+	AscDFH.historyitem_MathMatrix_RemoveColumn
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathMatrix_RemoveRow]     = [
+	AscDFH.historyitem_MathMatrix_AddRow,
+	AscDFH.historyitem_MathMatrix_RemoveRow,
+	AscDFH.historyitem_MathMatrix_AddColumn,
+	AscDFH.historyitem_MathMatrix_RemoveColumn
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathMatrix_AddColumn]     = [
+	AscDFH.historyitem_MathMatrix_AddRow,
+	AscDFH.historyitem_MathMatrix_RemoveRow,
+	AscDFH.historyitem_MathMatrix_AddColumn,
+	AscDFH.historyitem_MathMatrix_RemoveColumn
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathMatrix_RemoveColumn]  = [
+	AscDFH.historyitem_MathMatrix_AddRow,
+	AscDFH.historyitem_MathMatrix_RemoveRow,
+	AscDFH.historyitem_MathMatrix_AddColumn,
+	AscDFH.historyitem_MathMatrix_RemoveColumn
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathMatrix_BaseJc]        = [AscDFH.historyitem_MathMatrix_BaseJc];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathMatrix_ColumnJc]      = [AscDFH.historyitem_MathMatrix_ColumnJc];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathMatrix_Interval]      = [AscDFH.historyitem_MathMatrix_Interval];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathMatrix_Plh]           = [AscDFH.historyitem_MathMatrix_Plh];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathDegree_SubSupType]    = [AscDFH.historyitem_MathDegree_SubSupType];
+//----------------------------------------------------------------------------------------------------------------------
+
+
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -1259,6 +1353,11 @@ CChangesMathMatrixAddRow.prototype.CreateReverseChange = function()
 	// TODO: Это изменение надо целиком переделать
 	return new CChangesMathMatrixRemoveRow(this.Class, this.Pos, this.Items);
 };
+CChangesMathMatrixAddRow.prototype.Merge = function(oChange)
+{
+	// TODO: Это изменение надо целиком переделать
+	return true;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -1350,6 +1449,11 @@ CChangesMathMatrixRemoveRow.prototype.CreateReverseChange = function()
 	// TODO: Это изменение надо целиком переделать
 	return new CChangesMathMatrixAddRow(this.Class, this.Pos, this.Items);
 };
+CChangesMathMatrixRemoveRow.prototype.Merge = function(oChange)
+{
+	// TODO: Это изменение надо целиком переделать
+	return true;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -1381,6 +1485,11 @@ CChangesMathMatrixAddColumn.prototype.CreateReverseChange = function()
 	// TODO: Это изменение надо целиком переделать
 	return new CChangesMathMatrixRemoveColumn(this.Class, this.Pos, this.Items);
 };
+CChangesMathMatrixAddColumn.prototype.Merge = function(oChange)
+{
+	// TODO: Это изменение надо целиком переделать
+	return true;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -1411,6 +1520,11 @@ CChangesMathMatrixRemoveColumn.prototype.CreateReverseChange = function()
 {
 	// TODO: Это изменение надо целиком переделать
 	return new CChangesMathMatrixAddColumn(this.Class, this.Pos, this.Items);
+};
+CChangesMathMatrixRemoveColumn.prototype.Merge = function(oChange)
+{
+	// TODO: Это изменение надо целиком переделать
+	return true;
 };
 /**
  * @constructor
@@ -1506,7 +1620,6 @@ CChangesMathMatrixColumnJc.prototype.CreateReverseChange = function()
 {
 	return new CChangesMathMatrixColumnJc(this.Class, this.New, this.Old, this.ColumnIndex);
 };
-
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}

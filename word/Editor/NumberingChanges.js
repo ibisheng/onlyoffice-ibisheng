@@ -44,17 +44,16 @@ AscDFH.changesFactory[AscDFH.historyitem_AbstractNum_ParaPrChange] = CChangesAbs
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
 //----------------------------------------------------------------------------------------------------------------------
-AscDFH.abstractnumRelationMap                                              = {};
-AscDFH.abstractnumRelationMap[AscDFH.historyitem_AbstractNum_LvlChange]    = [
+AscDFH.changesRelationMap[AscDFH.historyitem_AbstractNum_LvlChange]    = [
 	AscDFH.historyitem_AbstractNum_LvlChange,
 	AscDFH.historyitem_AbstractNum_TextPrChange,
 	AscDFH.historyitem_AbstractNum_ParaPrChange
 ];
-AscDFH.abstractnumRelationMap[AscDFH.historyitem_AbstractNum_TextPrChange] = [
+AscDFH.changesRelationMap[AscDFH.historyitem_AbstractNum_TextPrChange] = [
 	AscDFH.historyitem_AbstractNum_LvlChange,
 	AscDFH.historyitem_AbstractNum_TextPrChange
 ];
-AscDFH.abstractnumRelationMap[AscDFH.historyitem_AbstractNum_ParaPrChange] = [
+AscDFH.changesRelationMap[AscDFH.historyitem_AbstractNum_ParaPrChange] = [
 	AscDFH.historyitem_AbstractNum_LvlChange,
 	AscDFH.historyitem_AbstractNum_ParaPrChange
 ];

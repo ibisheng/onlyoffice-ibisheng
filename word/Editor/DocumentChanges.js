@@ -47,19 +47,18 @@ AscDFH.changesFactory[AscDFH.historyitem_Document_MathSettings]      = CChangesD
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
 //----------------------------------------------------------------------------------------------------------------------
-AscDFH.documentChangesRelationMap                                                = {};
-AscDFH.documentChangesRelationMap[AscDFH.historyitem_Document_AddItem]           = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Document_AddItem]           = [
 	AscDFH.historyitem_Document_AddItem,
 	AscDFH.historyitem_Document_RemoveItem
 ];
-AscDFH.documentChangesRelationMap[AscDFH.historyitem_Document_RemoveItem]        = [
+AscDFH.changesRelationMap[AscDFH.historyitem_Document_RemoveItem]        = [
 	AscDFH.historyitem_Document_AddItem,
 	AscDFH.historyitem_Document_RemoveItem
 ];
-AscDFH.documentChangesRelationMap[AscDFH.historyitem_Document_DefaultTab]        = [AscDFH.historyitem_Document_DefaultTab];
-AscDFH.documentChangesRelationMap[AscDFH.historyitem_Document_EvenAndOddHeaders] = [AscDFH.historyitem_Document_EvenAndOddHeaders];
-AscDFH.documentChangesRelationMap[AscDFH.historyitem_Document_DefaultLanguage]   = [AscDFH.historyitem_Document_DefaultLanguage];
-AscDFH.documentChangesRelationMap[AscDFH.historyitem_Document_MathSettings]      = [AscDFH.historyitem_Document_MathSettings];
+AscDFH.changesRelationMap[AscDFH.historyitem_Document_DefaultTab]        = [AscDFH.historyitem_Document_DefaultTab];
+AscDFH.changesRelationMap[AscDFH.historyitem_Document_EvenAndOddHeaders] = [AscDFH.historyitem_Document_EvenAndOddHeaders];
+AscDFH.changesRelationMap[AscDFH.historyitem_Document_DefaultLanguage]   = [AscDFH.historyitem_Document_DefaultLanguage];
+AscDFH.changesRelationMap[AscDFH.historyitem_Document_MathSettings]      = [AscDFH.historyitem_Document_MathSettings];
 //----------------------------------------------------------------------------------------------------------------------
 
 /**
