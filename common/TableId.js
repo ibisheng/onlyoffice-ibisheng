@@ -286,6 +286,11 @@
 
 		this.m_oFactoryClass[AscDFH.historyitem_type_Theme]                  = AscFormat.CTheme;
 		this.m_oFactoryClass[AscDFH.historyitem_type_GraphicFrame]           = AscFormat.CGraphicFrame;
+
+		if (window.AscCommonExcel)
+		{
+			this.m_oFactoryClass[AscDFH.historyitem_type_Sparkline] = AscCommonExcel.sparklineGroup;
+		}
 	};
 	CTableId.prototype.GetClassFromFactory = function(nType)
 	{
