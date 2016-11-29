@@ -3392,6 +3392,12 @@
 	prot["put_TemplateReplacement"] = prot["asc_putTemplateReplacement"] = prot.asc_putTemplateReplacement;
 	prot["get_UserInfo"] = prot["asc_getUserInfo"] = prot.asc_getUserInfo;
 	prot["put_UserInfo"] = prot["asc_putUserInfo"] = prot.asc_putUserInfo;
+	prot["get_Token"] = prot["asc_getToken"] = prot.asc_getToken;
+	prot["put_Token"] = prot["asc_putToken"] = prot.asc_putToken;
+	prot["get_Mode"] = prot["asc_getMode"] = prot.asc_getMode;
+	prot["put_Mode"] = prot["asc_putMode"] = prot.asc_putMode;
+	prot["get_Permissions"] = prot["asc_getPermissions"] = prot.asc_getPermissions;
+	prot["put_Permissions"] = prot["asc_putPermissions"] = prot.asc_putPermissions;
 
 	window["AscCommon"].COpenProgress = COpenProgress;
 	prot = COpenProgress.prototype;

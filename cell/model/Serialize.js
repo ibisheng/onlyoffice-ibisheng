@@ -5191,7 +5191,7 @@
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadTableCustomStyle(t,l, oNewStyle, aElements);
                 });
-                if(null != oNewStyle.name && aElements.length > 0) {
+                if(null != oNewStyle.name) {
                     if (null === oNewStyle.displayName)
                         oNewStyle.displayName = oNewStyle.name;
                     oCustomStyles[oNewStyle.name] = {style : oNewStyle, elements: aElements};

@@ -3917,14 +3917,14 @@ function OfflineEditor () {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
             asc_WriteUsers(users, stream);
-            window["native"]["OnCallMenuEvent"](2416, stream); // ASC_MENU_EVENT_TYPE_AUTH_PARTICIPANTS_CHANGED
+            window["native"]["OnCallMenuEvent"](20101, stream); // ASC_COAUTH_EVENT_TYPE_PARTICIPANTS_CHANGED
         });
      
         _api.asc_registerCallback("asc_onParticipantsChanged", function(users) {
                                   var stream = global_memory_stream_menu;
                                   stream["ClearNoAttack"]();
                                   asc_WriteUsers(users, stream);
-                                  window["native"]["OnCallMenuEvent"](2416, stream); // ASC_MENU_EVENT_TYPE_AUTH_PARTICIPANTS_CHANGED
+                                  window["native"]["OnCallMenuEvent"](20101, stream); // ASC_COAUTH_EVENT_TYPE_PARTICIPANTS_CHANGED
                                   });
         
         _api.asc_registerCallback("asc_onSheetsChanged", function () {
@@ -4374,21 +4374,18 @@ function OfflineEditor () {
                     {
                         stream["WriteLong"](Asc.c_oAscTypeSelectElement.Paragraph);
                         asc_menu_WriteParagraphPr(SelectedObjects[i].Value, stream);
-                        //console.log('c_oAscTypeSelectElement.Paragraph');
                         break;
                     }
                     case Asc.c_oAscTypeSelectElement.Image:
                     {
                         stream["WriteLong"](Asc.c_oAscTypeSelectElement.Image);
                         asc_menu_WriteImagePr(SelectedObjects[i].Value, stream);
-                        //console.log('c_oAscTypeSelectElement.Image');
                         break;
                     }
                     case Asc.c_oAscTypeSelectElement.Hyperlink:
                     {
                         stream["WriteLong"](Asc.c_oAscTypeSelectElement.Hyperlink);
                         asc_menu_WriteHyperPr(SelectedObjects[i].Value, stream);
-                        //console.log('c_oAscTypeSelectElement.Hyperlink');
                         break;
                     }
                     default:
@@ -5380,16 +5377,14 @@ window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFor
         if (!isViewerMode) {
     
             var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
-           
-             //console.log(JSON.stringify(ct));
 
             ws.startCellMoveResizeRange = null;
 
             var rangeChange = new window["Asc"].Range(resizeRange[0], resizeRange[1], resizeRange[2], resizeRange[3]);
             var target = {
                 formulaRange: rangeChange,
-                row: ct.row, //isChartRange ? ct.row : targetRow,
-                col: ct.col, //isChartRange ? ct.col : targetCol,
+                row: ct.row,
+                col: ct.col,
                 target: ct.target,
                 targetArr: isChartRange ? -1 : 0,
                 cursor: "se-resize",
@@ -7289,6 +7284,9 @@ window["native"]["offline_apply_event"] = function(type,params) {
                 case 'cursor'       :
                     t._onCursor(dataObject);
                     break;
+                case 'meta' :
+                    t._onMeta(dataObject);
+                    break;
                 case 'getLock'      :
                     t._onGetLock(dataObject);
                     break;
@@ -7327,6 +7325,9 @@ window["native"]["offline_apply_event"] = function(type,params) {
                 case 'license':
                     t._onLicense(dataObject);
                     break;
+                case 'session' :
+                    t._onSession(dataObject);
+                    break;
             }
             
             break;
@@ -7334,8 +7335,14 @@ window["native"]["offline_apply_event"] = function(type,params) {
             
         case 11010: // ASC_SOCKET_EVENT_TYPE_ON_DISCONNECT
         {
+
+        }
+            
+        case 11020: // ASC_SOCKET_EVENT_TYPE_TRY_RECONNECT
+        {
             var t = _api.CoAuthoringApi._CoAuthoringApi;
-            t.onDisconnect("", false, false);
+            delete t.sockjs;
+            t._initSocksJs();
         }
             
         default:
@@ -7367,32 +7374,12 @@ function testLockedObjects () {
             
             for (var j = 0; j < drawingArea.frozenPlaces.length; ++j) {
                 if (drawingArea.frozenPlaces[j].isObjectInside(drawingObject)) {
-                    
-                    //var canvas = _this.ws.objectRender.getDrawingCanvas();
-                   // _this.setTransform(canvas.shapeCtx, canvas.shapeOverlayCtx, canvas.autoShapeTrack);
-                    
-                   // _this.clip(canvas.shapeCtx);
-                    //object.graphicObject.draw(canvas.shapeCtx);
-                    
+
                     // Lock
                     if ( (drawingObject.graphicObject.lockType != undefined) && (drawingObject.graphicObject.lockType != AscCommon.c_oAscLockTypes.kLockTypeNone) ) {
-                        //canvas.shapeCtx.SetIntegerGrid(false);
-                        //canvas.shapeCtx.transform3(object.graphicObject.transform, false);
-                        //canvas.shapeCtx.DrawLockObjectRect(object.graphicObject.lockType, 0, 0, object.graphicObject.extX, object.graphicObject.extY );
-                        //canvas.shapeCtx.reset();
-                        //canvas.shapeCtx.SetIntegerGrid(true);
-                        
                         overlay.transform3(drawingObject.graphicObject.transform, false, "PD_LockObjectTransform");
                         overlay.Native["PD_DrawLockObjectRect"](drawingObject.graphicObject.lockType, 0, 0, drawingObject.graphicObject.extX, drawingObject.graphicObject.extY);
-                       // console.log("lockType : " + drawingObject.graphicObject.lockType);
                     }
-                    else
-                    {
-                        
-                    }
-                    
-                    //_this.restore(canvas.shapeCtx);
-                    
                 }
             }
         }
@@ -7499,8 +7486,7 @@ window["AscCommonExcel"].WorksheetView.prototype._drawCollaborativeElements = fu
 };
 
 window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
-    //asc["editor"] = this;
-    
+
     var t = this;
     
     setTimeout(function() {

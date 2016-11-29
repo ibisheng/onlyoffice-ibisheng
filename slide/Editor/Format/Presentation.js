@@ -1121,7 +1121,7 @@ CPresentation.prototype =
         }
 
         var Changes = new AscCommon.CCollaborativeChanges();
-        var Reader = Changes.Internal_Load_Data2(CursorInfo, 0, CursorInfo.length);
+        var Reader = Changes.GetStream(CursorInfo, 0, CursorInfo.length);
 
         var RunId    = Reader.GetString2();
         var InRunPos = Reader.GetLong();
@@ -2157,10 +2157,12 @@ CPresentation.prototype =
 
     Set_TableProps : function(Props)
     {
-        this.Slides[this.CurPage].graphicObjects.setTableProps(Props);
-        this.Recalculate();
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateSelectionState();
+        if(this.Slides[this.CurPage]){
+            this.Slides[this.CurPage].graphicObjects.setTableProps(Props);
+            this.Recalculate();
+            this.Document_UpdateInterfaceState();
+            this.Document_UpdateSelectionState();
+        }
     },
 
     Get_Paragraph_ParaPr : function()

@@ -312,7 +312,7 @@ function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent, bIsAddMat
         }
         else if(true === bIsAddMath && Item.Type === para_Math)
         {
-            new_paragraph.Internal_Content_Add(new_paragraph.Content.length, Item, false);
+            new_paragraph.Internal_Content_Add(new_paragraph.Content.length, Item.Copy(), false);
         }
     }
     var EndRun = new ParaRun(new_paragraph);

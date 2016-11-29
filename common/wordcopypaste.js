@@ -1898,31 +1898,35 @@ PasteProcessor.prototype =
         if(PasteElementsId.g_bIsDocumentCopyPaste)
         {
 			var nDocPosType = oDocument.Get_DocPosType();
-            if(docpostype_HdrFtr === nDocPosType)
-            {
-                if(null != oDocument.HdrFtr && null != oDocument.HdrFtr.CurHdrFtr && null != oDocument.HdrFtr.CurHdrFtr.Content)
-                {
-                    oDocument = oDocument.HdrFtr.CurHdrFtr.Content;
-                    this.oRecalcDocument = oDocument;
-                }
-            }
+			if (docpostype_HdrFtr === nDocPosType)
+			{
+				if (null != oDocument.HdrFtr && null != oDocument.HdrFtr.CurHdrFtr && null != oDocument.HdrFtr.CurHdrFtr.Content)
+				{
+					oDocument  = oDocument.HdrFtr.CurHdrFtr.Content;
+					this.oRecalcDocument = oDocument;
+				}
+			}
+			else if (nDocPosType === docpostype_DrawingObjects)
+			{
+				var content = oDocument.DrawingObjects.getTargetDocContent(true);
+				if (content)
+				{
+					oDocument = content;
+				}
+			}
+			else if (nDocPosType === docpostype_Footnotes)
+			{
+				if (oDocument.Footnotes && oDocument.Footnotes.CurFootnote)
+					oDocument = oDocument.Footnotes.CurFootnote
+			}
 
-            if(nDocPosType === docpostype_DrawingObjects)
-            {
-                var content = oDocument.DrawingObjects.getTargetDocContent(true);
-                if(content)
-                {
-                    oDocument = content;
-                }
-            }
-
-            //��� ��������� ������
-            var Item = oDocument.Content[oDocument.CurPos.ContentPos];
-            if( type_Table == Item.GetType() && null != Item.CurCell)
-            {
-                this.dMaxWidth = this._CalcMaxWidthByCell(Item.CurCell);
-                oDocument = this._GetTargetDocument(Item.CurCell.Content);
-            }
+			// Отдельно обрабатываем случай, когда курсор находится внутри таблицы
+			var Item = oDocument.Content[oDocument.CurPos.ContentPos];
+			if (type_Table == Item.GetType() && null != Item.CurCell)
+			{
+				this.dMaxWidth = this._CalcMaxWidthByCell(Item.CurCell);
+				oDocument = this._GetTargetDocument(Item.CurCell.Content);
+			}
         }
         else
         {
@@ -2292,7 +2296,7 @@ PasteProcessor.prototype =
 				oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
 			}
 		}
-		else
+		else if(node)
 		{
 			this._pasteFromHtml(node, bTurnOffTrackRevisions);
 		}
@@ -3472,7 +3476,7 @@ PasteProcessor.prototype =
 				base64FromExcel = onlyBinary.split('xslData;')[1];
 			}
 		}
-		else
+		else if(node)
 		{
 			//todo переделать получения класса
 			if(node.children[0] && node.children[0].getAttribute("class") != null && (node.children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].getAttribute("class").indexOf("docData;") > -1 || node.children[0].getAttribute("class").indexOf("pptData;") > -1))
@@ -4607,9 +4611,10 @@ PasteProcessor.prototype =
             var margin_left = computedStyle.getPropertyValue( "margin-left" );
 			
 			//TODO перепроверить правку с pageColumn
-			var curIndexColumn = this.oLogicDocument.Content[this.oLogicDocument.CurPos.ContentPos].Get_CurrentColumn(this.oLogicDocument.CurPage);
+			var curContent = this.oLogicDocument.Content[this.oLogicDocument.CurPos.ContentPos];
+			var curIndexColumn = curContent && curContent.Get_CurrentColumn ? curContent.Get_CurrentColumn(this.oLogicDocument.CurPage) : null;
 			var curPage = this.oLogicDocument.Pages[this.oLogicDocument.CurPage];
-			var pageColumn = curPage && curPage.Sections && curPage.Sections[0] && curPage.Sections[0].Columns ? curPage.Sections[0].Columns[curIndexColumn] : null;
+			var pageColumn = null !== curIndexColumn && curPage && curPage.Sections && curPage.Sections[0] && curPage.Sections[0].Columns ? curPage.Sections[0].Columns[curIndexColumn] : null;
             if(margin_left && null != (margin_left = this._ValueToMm(margin_left)))
 			{
 				if(!pageColumn || (pageColumn && pageColumn.X + margin_left < pageColumn.XLimit))
@@ -4664,13 +4669,13 @@ PasteProcessor.prototype =
             //Spacing
 			var Spacing = new CParaSpacing();
             var margin_top = computedStyle.getPropertyValue( "margin-top" );
-            if(margin_top && null != (margin_top = this._ValueToMm(margin_top)))
+            if(margin_top && null != (margin_top = this._ValueToMm(margin_top)) && margin_top >= 0)
                 Spacing.Before = margin_top;
             var margin_bottom = computedStyle.getPropertyValue( "margin-bottom" );
-            if(margin_bottom && null != (margin_bottom = this._ValueToMm(margin_bottom)))
+            if(margin_bottom && null != (margin_bottom = this._ValueToMm(margin_bottom)) && margin_bottom >= 0)
                 Spacing.After = margin_bottom;
 			var line_height = computedStyle.getPropertyValue( "line-height" );
-			if(line_height && null != (line_height = this._ValueToMm(line_height)))
+			if(line_height && null != (line_height = this._ValueToMm(line_height)) && line_height >= 0)
                 Spacing.After = line_height;
             if(false == this._isEmptyProperty(Spacing))
                 Para.Set_Spacing(Spacing);

@@ -279,7 +279,8 @@
 				var sBase64;
 				
 				var selectedContent = new CSelectedContent();
-				isIntoShape.Get_SelectedContent(selectedContent);
+                AscFormat.ExecuteNoHistory(function(){isIntoShape.Get_SelectedContent(selectedContent);}, this, []);
+
 				
 				var oPresentationWriter = new AscCommon.CBinaryFileWriter();
 				
@@ -912,6 +913,7 @@
 			_pasteFromBinaryWord: function(worksheet, base64, isIntoShape, isCellEditMode)
 			{
 				var res = true;
+				var t = this;
 				var pasteData = this.ReadFromBinaryWord(base64, worksheet);
 				
 				if(isCellEditMode)
@@ -921,7 +923,15 @@
 				//insert binary from word into SHAPE
 				else if(isIntoShape)
 				{
-					this._insertBinaryIntoShapeContent(worksheet, pasteData.content, true);
+					var callback = function(isSuccess)
+					{
+						if(isSuccess)
+						{
+							t._insertBinaryIntoShapeContent(worksheet, pasteData.content, true);
+						}
+					};
+							
+					worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
 				}
 				else
 				{
@@ -959,8 +969,15 @@
 						}
 						else if(isIntoShape)
 						{
-							this._insertBinaryIntoShapeContent(worksheet, docContent)
-							
+							var callback = function(isSuccess)
+							{
+								if(isSuccess)
+								{
+									t._insertBinaryIntoShapeContent(worksheet, docContent)
+								}
+							};
+									
+							worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
 							return true;
 						}
 						else
@@ -1083,6 +1100,11 @@
 			
 			_insertBinaryIntoShapeContent: function(worksheet, content, isConvertToPPTX)
 			{
+				if(!content || !content.length)
+				{
+					return;
+				}
+				
 				History.Create_NewPoint();
 				History.StartTransaction();
 				

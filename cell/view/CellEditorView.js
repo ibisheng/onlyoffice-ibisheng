@@ -2690,6 +2690,11 @@
 		var x = (((event.pageX * AscBrowser.zoom) >> 0) - offs.left) / this.kx;
 		var y = (((event.pageY * AscBrowser.zoom) >> 0) - offs.top) / this.ky;
 
+		if (AscBrowser.isRetina) {
+			x <<= 1;
+			y <<= 1;
+		}
+
 		return {x: x, y: y};
 	};
 

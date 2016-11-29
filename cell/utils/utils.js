@@ -585,6 +585,7 @@
      */
 		function Range3D() {
 			this.sheet = '';
+			this.sheet2 = '';
 
 			if (3 == arguments.length) {
 				var range = arguments[0];
@@ -610,8 +611,15 @@
 			}
 			return oRes && Range3D.superclass.isIntersect.apply(this, arguments);
 		};
-		Range3D.prototype.clone = function(){
+		Range3D.prototype.clone = function () {
 			return new Range3D(ActiveRange.superclass.clone.apply(this, arguments), this.sheet, this.sheet2);
+		};
+		Range3D.prototype.setSheet = function (sheet, sheet2) {
+			this.sheet = sheet;
+			this.sheet2 = sheet2 ? sheet2 : sheet;
+		};
+		Range3D.prototype.getName = function () {
+			return AscCommon.parserHelp.get3DRef(this.sheet, Range3D.superclass.getName.apply(this));
 		};
 
 		/**

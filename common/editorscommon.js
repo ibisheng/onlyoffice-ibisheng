@@ -1812,7 +1812,7 @@ var kCurFormatPainterWord = '';
 if (AscBrowser.isIE)
 // Пути указаны относительно html в меню, не надо их исправлять
 // и коммитить на пути относительно тестового меню
-	kCurFormatPainterWord = 'url(../../../sdk/Common/Images/text_copy.cur), pointer';
+	kCurFormatPainterWord = 'url(../../../../sdk/common/Images/text_copy.cur), pointer';
 else if (AscBrowser.isOpera)
 	kCurFormatPainterWord = 'pointer';
 else
@@ -1949,514 +1949,6 @@ CIdCounter.prototype.Clear = function()
     this.m_nIdCounterEdit = 0; // Счетчик Id для работы
 };
 
-function CTableId()
-{
-    this.m_aPairs = null;
-    this.m_bTurnOff = false;
-    this.Id = null;
-    this.isInit = false;
-}
-CTableId.prototype.checkInit = function()
-{
-  return this.isInit;
-};
-CTableId.prototype.init = function()
-{
-  this.m_aPairs   = {};
-  this.m_bTurnOff = false;
-  this.Id         = g_oIdCounter.Get_NewId();
-  this.Add(this, this.Id);
-  this.isInit = true;
-};
-CTableId.prototype.Add = function(Class, Id)
-{
-    if (false === this.m_bTurnOff)
-    {
-        Class.Id = Id;
-        this.m_aPairs[Id] = Class;
-
-      AscCommon.History.Add(this, { Type : AscDFH.historyitem_TableId_Add, Id : Id, Class : Class  });
-    }
-};
-CTableId.prototype.TurnOff = function()
-{
-    this.m_bTurnOff = true;
-};
-CTableId.prototype.TurnOn = function()
-{
-    this.m_bTurnOff = false;
-};
-/*
- Получаем указатель на класс по Id
- */
-CTableId.prototype.Get_ById = function(Id)
-{
-    if ("" === Id)
-        return null;
-
-    if ("undefined" != typeof(this.m_aPairs[Id]))
-        return this.m_aPairs[Id];
-
-    return null;
-};
-/*
- Получаем Id, по классу (вообще, данную функцию лучше не использовать)
- */
-CTableId.prototype.Get_ByClass = function(Class)
-{
-    if ("undefined" != typeof( Class.Get_Id ))
-        return Class.Get_Id();
-
-    if ("undefined" != typeof( Class.GetId() ))
-        return Class.GetId();
-
-    return null;
-};
-CTableId.prototype.Reset_Id = function(Class, Id_new, Id_old)
-{
-    if (Class === this.m_aPairs[Id_old])
-    {
-        delete this.m_aPairs[Id_old];
-        this.m_aPairs[Id_new] = Class;
-
-      AscCommon.History.Add(this, { Type : AscDFH.historyitem_TableId_Reset, Id_new : Id_new, Id_old : Id_old  });
-    }
-    else
-    {
-        this.Add(Class, Id_new);
-    }
-};
-CTableId.prototype.Get_Id = function()
-{
-    return this.Id;
-};
-CTableId.prototype.Clear = function()
-{
-    this.m_aPairs = {};
-    this.m_bTurnOff = false;
-    this.Add(this, g_oIdCounter.Get_NewId());
-};
-//-----------------------------------------------------------------------------------
-// Функции для работы с Undo/Redo
-//-----------------------------------------------------------------------------------
-CTableId.prototype.Undo = function(Data)
-{
-    // Ничего не делаем (можно удалять/добавлять ссылки на классы в данном классе
-    // но это не обяательно, т.к. Id всегда уникальные)
-};
-CTableId.prototype.Redo = function(Redo)
-{
-    // Ничего не делаем (можно удалять/добавлять ссылки на классы в данном классе
-    // но это не обяательно, т.к. Id всегда уникальные)
-};
-CTableId.prototype.Refresh_RecalcData = function(Data)
-{
-    // Ничего не делаем, добавление/удаление классов не влияет на пересчет
-};
-//-----------------------------------------------------------------------------------
-// Функции для работы с совместным редактирования
-//-----------------------------------------------------------------------------------
-CTableId.prototype.Read_Class_FromBinary = function(Reader)
-{
-    var ElementType = Reader.GetLong();
-    var Element = null;
-
-    // Временно отключаем регистрацию новых классов
-    this.m_bTurnOff = true;
-
-    switch( ElementType )
-    {
-        case AscDFH.historyitem_type_Paragraph                : Element = new AscCommonWord.Paragraph(); break;
-        case AscDFH.historyitem_type_TextPr                   : Element = new AscCommonWord.ParaTextPr(); break;
-        case AscDFH.historyitem_type_Hyperlink                : Element = new AscCommonWord.ParaHyperlink(); break;
-        case AscDFH.historyitem_type_Drawing                  : Element = new AscCommonWord.ParaDrawing(); break;
-        case AscDFH.historyitem_type_Table                    : Element = new AscCommonWord.CTable(); break;
-        case AscDFH.historyitem_type_TableRow                 : Element = new AscCommonWord.CTableRow(); break;
-        case AscDFH.historyitem_type_TableCell                : Element = new AscCommonWord.CTableCell(); break;
-        case AscDFH.historyitem_type_DocumentContent          : Element = new AscCommonWord.CDocumentContent(); break;
-        case AscDFH.historyitem_type_HdrFtr                   : Element = new AscCommonWord.CHeaderFooter(); break;
-        case AscDFH.historyitem_type_AbstractNum              : Element = new AscCommonWord.CAbstractNum(); break;
-        case AscDFH.historyitem_type_Comment                  : Element = new AscCommon.CComment(); break;
-        case AscDFH.historyitem_type_Style                    : Element = new AscCommonWord.CStyle(); break;
-        case AscDFH.historyitem_type_CommentMark              : Element = new AscCommon.ParaComment(); break;
-        case AscDFH.historyitem_type_ParaRun                  : Element = new AscCommonWord.ParaRun(); break;
-        case AscDFH.historyitem_type_Section                  : Element = new AscCommonWord.CSectionPr(); break;
-        case AscDFH.historyitem_type_Field                    : Element = new AscCommonWord.ParaField(); break;
-		case AscDFH.historyitem_type_FootEndNote              : Element = new AscCommonWord.CFootEndnote(); break;
-
-        case AscDFH.historyitem_type_DefaultShapeDefinition   : Element = new AscFormat.DefaultShapeDefinition(); break;
-        case AscDFH.historyitem_type_CNvPr                    : Element = new AscFormat.CNvPr(); break;
-        case AscDFH.historyitem_type_NvPr                     : Element = new AscFormat.NvPr(); break;
-        case AscDFH.historyitem_type_Ph                       : Element = new AscFormat.Ph(); break;
-        case AscDFH.historyitem_type_UniNvPr                  : Element = new AscFormat.UniNvPr(); break;
-        case AscDFH.historyitem_type_StyleRef                 : Element = new AscFormat.StyleRef(); break;
-        case AscDFH.historyitem_type_FontRef                  : Element = new AscFormat.FontRef(); break;
-        case AscDFH.historyitem_type_Chart                    : Element = new AscFormat.CChart(); break;
-        case AscDFH.historyitem_type_ChartSpace               : Element = new AscFormat.CChartSpace(); break;
-        case AscDFH.historyitem_type_Legend                   : Element = new AscFormat.CLegend(); break;
-        case AscDFH.historyitem_type_Layout                   : Element = new AscFormat.CLayout(); break;
-        case AscDFH.historyitem_type_LegendEntry              : Element = new AscFormat.CLegendEntry(); break;
-        case AscDFH.historyitem_type_PivotFmt                 : Element = new AscFormat.CPivotFmt(); break;
-        case AscDFH.historyitem_type_DLbl                     : Element = new AscFormat.CDLbl(); break;
-        case AscDFH.historyitem_type_Marker                   : Element = new AscFormat.CMarker(); break;
-        case AscDFH.historyitem_type_PlotArea                 : Element = new AscFormat.CPlotArea(); break;
-        case AscDFH.historyitem_type_NumFmt                   : Element = new AscFormat.CNumFmt(); break;
-        case AscDFH.historyitem_type_Scaling                  : Element = new AscFormat.CScaling(); break;
-        case AscDFH.historyitem_type_DTable                   : Element = new AscFormat.CDTable(); break;
-        case AscDFH.historyitem_type_LineChart                : Element = new AscFormat.CLineChart(); break;
-        case AscDFH.historyitem_type_DLbls                    : Element = new AscFormat.CDLbls(); break;
-        case AscDFH.historyitem_type_UpDownBars               : Element = new AscFormat.CUpDownBars(); break;
-        case AscDFH.historyitem_type_BarChart                 : Element = new AscFormat.CBarChart(); break;
-        case AscDFH.historyitem_type_BubbleChart              : Element = new AscFormat.CBubbleChart(); break;
-        case AscDFH.historyitem_type_DoughnutChart            : Element = new AscFormat.CDoughnutChart(); break;
-        case AscDFH.historyitem_type_OfPieChart               : Element = new AscFormat.COfPieChart(); break;
-        case AscDFH.historyitem_type_PieChart                 : Element = new AscFormat.CPieChart(); break;
-        case AscDFH.historyitem_type_RadarChart               : Element = new AscFormat.CRadarChart(); break;
-        case AscDFH.historyitem_type_ScatterChart             : Element = new AscFormat.CScatterChart(); break;
-        case AscDFH.historyitem_type_StockChart               : Element = new AscFormat.CStockChart(); break;
-        case AscDFH.historyitem_type_SurfaceChart             : Element = new AscFormat.CSurfaceChart(); break;
-        case AscDFH.historyitem_type_BandFmt                  : Element = new AscFormat.CBandFmt(); break;
-        case AscDFH.historyitem_type_AreaChart                : Element = new AscFormat.CAreaChart(); break;
-        case AscDFH.historyitem_type_ScatterSer               : Element = new AscFormat.CScatterSeries(); break;
-        case AscDFH.historyitem_type_DPt                      : Element = new AscFormat.CDPt(); break;
-        case AscDFH.historyitem_type_ErrBars                  : Element = new AscFormat.CErrBars(); break;
-        case AscDFH.historyitem_type_MinusPlus                : Element = new AscFormat.CMinusPlus(); break;
-        case AscDFH.historyitem_type_NumLit                   : Element = new AscFormat.CNumLit(); break;
-        case AscDFH.historyitem_type_NumericPoint             : Element = new AscFormat.CNumericPoint(); break;
-        case AscDFH.historyitem_type_NumRef                   : Element = new AscFormat.CNumRef(); break;
-        case AscDFH.historyitem_type_TrendLine                : Element = new AscFormat.CTrendLine(); break;
-        case AscDFH.historyitem_type_Tx                       : Element = new AscFormat.CTx(); break;
-        case AscDFH.historyitem_type_StrRef                   : Element = new AscFormat.CStrRef(); break;
-        case AscDFH.historyitem_type_StrCache                 : Element = new AscFormat.CStrCache(); break;
-        case AscDFH.historyitem_type_StrPoint                 : Element = new AscFormat.CStringPoint(); break;
-        case AscDFH.historyitem_type_XVal                     : Element = new AscFormat.CXVal(); break;
-        case AscDFH.historyitem_type_MultiLvlStrRef           : Element = new AscFormat.CMultiLvlStrRef(); break;
-        case AscDFH.historyitem_type_MultiLvlStrCache         : Element = new AscFormat.CMultiLvlStrCache(); break;
-        case AscDFH.historyitem_type_StringLiteral            : Element = new AscFormat.CStringLiteral(); break;
-        case AscDFH.historyitem_type_YVal                     : Element = new AscFormat.CYVal(); break;
-        case AscDFH.historyitem_type_AreaSeries               : Element = new AscFormat.CAreaSeries(); break;
-        case AscDFH.historyitem_type_Cat                      : Element = new AscFormat.CCat(); break;
-        case AscDFH.historyitem_type_PictureOptions           : Element = new AscFormat.CPictureOptions(); break;
-        case AscDFH.historyitem_type_RadarSeries              : Element = new AscFormat.CRadarSeries(); break;
-        case AscDFH.historyitem_type_BarSeries                : Element = new AscFormat.CBarSeries(); break;
-        case AscDFH.historyitem_type_LineSeries               : Element = new AscFormat.CLineSeries(); break;
-        case AscDFH.historyitem_type_PieSeries                : Element = new AscFormat.CPieSeries(); break;
-        case AscDFH.historyitem_type_SurfaceSeries            : Element = new AscFormat.CSurfaceSeries(); break;
-        case AscDFH.historyitem_type_BubbleSeries             : Element = new AscFormat.CBubbleSeries(); break;
-        case AscDFH.historyitem_type_ExternalData             : Element = new AscFormat.CExternalData(); break;
-        case AscDFH.historyitem_type_PivotSource              : Element = new AscFormat.CPivotSource(); break;
-        case AscDFH.historyitem_type_Protection               : Element = new AscFormat.CProtection(); break;
-        case AscDFH.historyitem_type_ChartWall                : Element = new AscFormat.CChartWall(); break;
-        case AscDFH.historyitem_type_View3d                   : Element = new AscFormat.CView3d(); break;
-        case AscDFH.historyitem_type_ChartText                : Element = new AscFormat.CChartText(); break;
-        case AscDFH.historyitem_type_ShapeStyle               : Element = new AscFormat.CShapeStyle(); break;
-        case AscDFH.historyitem_type_Xfrm                     : Element = new AscFormat.CXfrm(); break;
-        case AscDFH.historyitem_type_SpPr                     : Element = new AscFormat.CSpPr(); break;
-        case AscDFH.historyitem_type_ClrScheme                : Element = new AscFormat.ClrScheme(); break;
-        case AscDFH.historyitem_type_ClrMap                   : Element = new AscFormat.ClrMap(); break;
-        case AscDFH.historyitem_type_ExtraClrScheme           : Element = new AscFormat.ExtraClrScheme(); break;
-        case AscDFH.historyitem_type_FontCollection           : Element = new AscFormat.FontCollection(); break;
-        case AscDFH.historyitem_type_FontScheme               : Element = new AscFormat.FontScheme(); break;
-        case AscDFH.historyitem_type_FormatScheme             : Element = new AscFormat.FmtScheme(); break;
-        case AscDFH.historyitem_type_ThemeElements            : Element = new AscFormat.ThemeElements(); break;
-        case AscDFH.historyitem_type_HF                       : Element = new AscFormat.HF(); break;
-        case AscDFH.historyitem_type_BgPr                     : Element = new AscFormat.CBgPr(); break;
-        case AscDFH.historyitem_type_Bg                       : Element = new AscFormat.CBg(); break;
-        case AscDFH.historyitem_type_PrintSettings            : Element = new AscFormat.CPrintSettings(); break;
-        case AscDFH.historyitem_type_HeaderFooterChart        : Element = new AscFormat.CHeaderFooterChart(); break;
-        case AscDFH.historyitem_type_PageMarginsChart         : Element = new AscFormat.CPageMarginsChart(); break;
-        case AscDFH.historyitem_type_PageSetup                : Element = new AscFormat.CPageSetup(); break;
-        case AscDFH.historyitem_type_Shape                    : Element = new AscFormat.CShape(); break;
-        case AscDFH.historyitem_type_DispUnits                : Element = new AscFormat.CDispUnits(); break;
-        case AscDFH.historyitem_type_GroupShape               : Element = new AscFormat.CGroupShape(); break;
-        case AscDFH.historyitem_type_ImageShape               : Element = new AscFormat.CImageShape(); break;
-        case AscDFH.historyitem_type_Geometry                 : Element = new AscFormat.Geometry(); break;
-        case AscDFH.historyitem_type_Path                     : Element = new AscFormat.Path(); break;
-        case AscDFH.historyitem_type_TextBody                 : Element = new AscFormat.CTextBody(); break;
-        case AscDFH.historyitem_type_CatAx                    : Element = new AscFormat.CCatAx(); break;
-        case AscDFH.historyitem_type_ValAx                    : Element = new AscFormat.CValAx(); break;
-        case AscDFH.historyitem_type_WrapPolygon              : Element = new AscCommonWord.CWrapPolygon(); break;
-        case AscDFH.historyitem_type_DateAx                   : Element = new AscFormat.CDateAx(); break;
-        case AscDFH.historyitem_type_SerAx                    : Element = new AscFormat.CSerAx(); break;
-        case AscDFH.historyitem_type_Title                    : Element = new AscFormat.CTitle(); break;
-        case AscDFH.historyitem_type_OleObject                : Element = new AscFormat.COleObject(); break;
-        case AscDFH.historyitem_type_DrawingContent           : Element = new AscFormat.CDrawingDocContent(); break;
-
-        case AscDFH.historyitem_type_Math                     : Element = new AscCommonWord.ParaMath(false); break;
-        case AscDFH.historyitem_type_MathContent              : Element = new AscCommonWord.CMathContent(); break;
-        case AscDFH.historyitem_type_acc                      : Element = new AscCommonWord.CAccent(); break;
-        case AscDFH.historyitem_type_bar                      : Element = new AscCommonWord.CBar(); break;
-        case AscDFH.historyitem_type_box                      : Element = new AscCommonWord.CBox(); break;
-        case AscDFH.historyitem_type_borderBox                : Element = new AscCommonWord.CBorderBox(); break;
-        case AscDFH.historyitem_type_delimiter                : Element = new AscCommonWord.CDelimiter(); break;
-        case AscDFH.historyitem_type_eqArr	                  : Element = new AscCommonWord.CEqArray(); break;
-        case AscDFH.historyitem_type_frac                     : Element = new AscCommonWord.CFraction(); break;
-        case AscDFH.historyitem_type_mathFunc                 : Element = new AscCommonWord.CMathFunc(); break;
-        case AscDFH.historyitem_type_groupChr                 : Element = new AscCommonWord.CGroupCharacter(); break;
-        case AscDFH.historyitem_type_lim                      : Element = new AscCommonWord.CLimit(); break;
-        case AscDFH.historyitem_type_matrix                   : Element = new AscCommonWord.CMathMatrix(); break;
-        case AscDFH.historyitem_type_nary                     : Element = new AscCommonWord.CNary(); break;
-        case AscDFH.historyitem_type_phant                    : Element = new AscCommonWord.CPhantom(); break;
-        case AscDFH.historyitem_type_rad                      : Element = new AscCommonWord.CRadical(); break;
-        case AscDFH.historyitem_type_deg_subsup               : Element = new AscCommonWord.CDegreeSubSup(); break;
-        case AscDFH.historyitem_type_deg                      : Element = new AscCommonWord.CDegree(); break;
-        case AscDFH.historyitem_type_Slide                    : Element = new AscCommonSlide.Slide(); break;
-        case AscDFH.historyitem_type_SlideLayout              : Element = new AscCommonSlide.SlideLayout(); break;
-        case AscDFH.historyitem_type_SlideMaster              : Element = new AscCommonSlide.MasterSlide(); break;
-        case AscDFH.historyitem_type_SlideComments            : Element = new AscCommonSlide.SlideComments(); break;
-        case AscDFH.historyitem_type_PropLocker               : Element = new AscCommonSlide.PropLocker(); break;
-        case AscDFH.historyitem_type_Theme                    : Element = new AscFormat.CTheme(); break;
-        case AscDFH.historyitem_type_GraphicFrame             : Element = new AscFormat.CGraphicFrame(); break;
-		case AscDFH.historyitem_type_Sparkline                : Element = new AscCommonExcel.sparklineGroup(false); break;
-    }
-
-    if ( null !== Element )
-        Element.Read_FromBinary2(Reader);
-
-    // Включаем назад регистрацию новых классов
-    this.m_bTurnOff = false;
-
-    return Element;
-};
-CTableId.prototype.Save_Changes = function(Data, Writer)
-{
-    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-    // Long : тип класса
-    // Long : тип изменений
-
-    Writer.WriteLong( AscDFH.historyitem_type_TableId );
-
-    var Type = Data.Type;
-
-    // Пишем тип
-    Writer.WriteLong( Type );
-    switch ( Type )
-    {
-        case AscDFH.historyitem_TableId_Add :
-        {
-            // String   : Id элемента
-            // Varibale : сам элемент
-
-            Writer.WriteString2( Data.Id );
-            Data.Class.Write_ToBinary2( Writer );
-
-            break;
-        }
-
-        case AscDFH.historyitem_TableId_Reset:
-        {
-            // String : Id_new
-            // String : Id_old
-
-            Writer.WriteString2( Data.Id_new );
-            Writer.WriteString2( Data.Id_old );
-
-            break;
-        }
-
-        case AscDFH.historyitem_TableId_Description:
-        {
-            // Long : FileCheckSum
-            // Long : FileSize
-            // Long : Description
-            // Long : ItemsCount
-            // Long : PointIndex
-            // Long : StartPoint
-            // Long : LastPoint
-            // Long : SumIndex
-            // Long : DeletedIndex
-            // String : Версия SDK
-
-            Writer.WriteLong(Data.FileCheckSum);
-            Writer.WriteLong(Data.FileSize);
-            Writer.WriteLong(Data.Description);
-            Writer.WriteLong(Data.ItemsCount);
-            Writer.WriteLong(Data.PointIndex);
-            Writer.WriteLong(Data.StartPoint);
-            Writer.WriteLong(Data.LastPoint);
-            Writer.WriteLong(Data.SumIndex);
-            Writer.WriteLong(null === Data.DeletedIndex ? -10 : Data.DeletedIndex);
-            Writer.WriteString2("@@Version.@@Build.@@Rev");
-
-            break;
-        }
-    }
-};
-CTableId.prototype.Save_Changes2 = function(Data, Writer)
-{
-    return false;
-};
-CTableId.prototype.Load_Changes = function(Reader, Reader2)
-{
-    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-    // Long : тип класса
-    // Long : тип изменений
-
-    var ClassType = Reader.GetLong();
-    if ( AscDFH.historyitem_type_TableId != ClassType )
-        return;
-
-    var Type = Reader.GetLong();
-
-    switch ( Type )
-    {
-        case AscDFH.historyitem_Common_AddWatermark:
-        {
-            var sUrl = Reader.GetString2();
-            if('undefined' != typeof editor && editor.WordControl && editor.WordControl.m_oLogicDocument)
-            {
-                var oLogicDocument = editor.WordControl.m_oLogicDocument;
-                if(oLogicDocument instanceof AscCommonWord.CDocument)
-                {
-                    var oParaDrawing = oLogicDocument.DrawingObjects.getTrialImage(sUrl);
-                    var oFirstParagraph = oLogicDocument.Get_FirstParagraph();
-                    AscFormat.ExecuteNoHistory(function(){
-                        var oRun = new AscCommonWord.ParaRun();
-                        oRun.Content.splice(0, 0, oParaDrawing);
-                        oFirstParagraph.Content.splice(0, 0, oRun);
-						oLogicDocument.DrawingObjects.addGraphicObject(oParaDrawing);
-                    }, this, []);
-                }
-                else if(oLogicDocument instanceof AscCommonSlide.CPresentation)
-                {
-                    if(oLogicDocument.Slides[0])
-                    {
-                        var oDrawing = oLogicDocument.Slides[0].graphicObjects.createWatermarkImage(sUrl);
-                        oDrawing.spPr.xfrm.offX = (oLogicDocument.Width - oDrawing.spPr.xfrm.extX)/2;
-                        oDrawing.spPr.xfrm.offY = (oLogicDocument.Height - oDrawing.spPr.xfrm.extY)/2;
-						oDrawing.parent = oLogicDocument.Slides[0];
-                        oLogicDocument.Slides[0].cSld.spTree.push(oDrawing);
-                    }
-                }
-            }
-            else
-            {
-                var oWsModel = window["Asc"]["editor"].wbModel.aWorksheets[0];
-                if(oWsModel)
-                {
-                    var objectRender = new AscFormat.DrawingObjects();
-                    var oNewDrawing = objectRender.createDrawingObject(AscCommon.c_oAscCellAnchorType.cellanchorAbsolute);
-                    var oImage = AscFormat.DrawingObjectsController.prototype.createWatermarkImage(sUrl);
-                    oNewDrawing.ext.cx = oImage.spPr.xfrm.extX;
-                    oNewDrawing.ext.cy = oImage.spPr.xfrm.extY;
-                    oNewDrawing.graphicObject = oImage;
-                    oWsModel.Drawings.push(oNewDrawing);
-                }
-            }
-            break;
-        }
-        case AscDFH.historyitem_TableId_Add:
-        {
-            // String   : Id элемента
-            // Varibale : сам элемент
-
-            var Id    = Reader.GetString2();
-            var Class = this.Read_Class_FromBinary( Reader );
-
-            this.m_aPairs[Id] = Class;
-
-            break;
-        }
-
-        case AscDFH.historyitem_TableId_Reset:
-        {
-            // String : Id_new
-            // String : Id_old
-
-            var Id_new = Reader.GetString2();
-            var Id_old = Reader.GetString2();
-
-            if ( "undefined" != this.m_aPairs[Id_old] )
-            {
-                var Class = this.m_aPairs[Id_old];
-                delete this.m_aPairs[Id_old];
-                this.m_aPairs[Id_new] = Class;
-                Class.Id = Id_new;
-            }
-
-            break;
-        }
-
-        case AscDFH.historyitem_TableId_Description:
-        {
-            // Long : FileCheckSum
-            // Long : FileSize
-            // Long : Description
-            // Long : ItemsCount
-            // Long : PointIndex
-            // Long : StartPoint
-            // Long : LastPoint
-            // Long : SumIndex
-            // Long : DeletedIndex
-            // String : Версия SDK
-
-            var FileCheckSum = Reader.GetLong();
-            var FileSize     = Reader.GetLong();
-            var Description  = Reader.GetLong();
-            var ItemsCount   = Reader.GetLong();
-            var PointIndex   = Reader.GetLong();
-            var StartPoint   = Reader.GetLong();
-            var LastPoint    = Reader.GetLong();
-            var SumIndex     = Reader.GetLong();
-            var DeletedIndex = Reader.GetLong();
-            var VersionString= Reader.GetString2();
-
-            //                // CollaborativeEditing LOG
-            //                console.log("ItemsCount2  " + CollaborativeEditing.m_nErrorLog_PointChangesCount);
-            //                if (CollaborativeEditing.m_nErrorLog_PointChangesCount !== CollaborativeEditing.m_nErrorLog_SavedPCC)
-            //                    console.log("========================= BAD Changes Count in Point =============================");
-            //
-            //                if (CollaborativeEditing.m_nErrorLog_CurPointIndex + 1 !== PointIndex && 0 !== PointIndex)
-            //                    console.log("========================= BAD Point index ========================================");
-            //
-            //                var bBadSumIndex = false;
-            //                if (0 === PointIndex)
-            //                {
-            //                    CollaborativeEditing.m_nErrorLog_SumIndex = 0;
-            //                }
-            //                else
-            //                {
-            //                    CollaborativeEditing.m_nErrorLog_SumIndex += CollaborativeEditing.m_nErrorLog_SavedPCC + 1; // Потому что мы не учитываем данное изменение
-            //                    if (PointIndex === StartPoint)
-            //                    {
-            //                        if (CollaborativeEditing.m_nErrorLog_SumIndex !== SumIndex)
-            //                            bBadSumIndex = true;
-            //
-            //                        console.log("SumIndex2    " + CollaborativeEditing.m_nErrorLog_SumIndex);
-            //                        CollaborativeEditing.m_nErrorLog_SumIndex = SumIndex;
-            //                    }
-            //                }
-            //
-            //                console.log("----------------------------");
-            //                console.log("FileCheckSum " + FileCheckSum);
-            //                console.log("FileSize     " + FileSize);
-            //                console.log("Description  " + Description + " " + AscDFH.Get_HistoryPointStringDescription(Description));
-            //                console.log("PointIndex   " + PointIndex);
-            //                console.log("StartPoint   " + StartPoint);
-            //                console.log("LastPoint    " + LastPoint);
-            //                console.log("ItemsCount   " + ItemsCount);
-            //                console.log("SumIndex     " + SumIndex);
-            //                console.log("DeletedIndex " + (-10 === DeletedIndex ? null : DeletedIndex));
-            //
-            //                // -1 Чтобы не учитывалось данное изменение
-            //                CollaborativeEditing.m_nErrorLog_SavedPCC          = ItemsCount;
-            //                CollaborativeEditing.m_nErrorLog_PointChangesCount = -1;
-            //                CollaborativeEditing.m_nErrorLog_CurPointIndex     = PointIndex;
-            //
-            //                if (bBadSumIndex)
-            //                    console.log("========================= BAD Sum index ==========================================");
-
-            break;
-        }
-    }
-
-    return true;
-};
-CTableId.prototype.Unlock = function(Data)
-{
-    // Ничего не делаем
-};
-
 function CLock()
 {
     this.Type   = locktype_None;
@@ -2562,25 +2054,38 @@ CContentChanges.prototype.Refresh = function()
 	}
 };
 
-function CContentChangesElement(Type, Pos, Count, Data) {
-	this.m_nType	= Type;  // Тип изменений (удаление или добавление)
-	this.m_nCount	= Count; // Количество добавленных/удаленных элементов
-	this.m_pData	= Data;  // Связанные с данным изменением данные из истории
+function CContentChangesElement(Type, Pos, Count, Data)
+{
+	this.m_nType  = Type;  // Тип изменений (удаление или добавление)
+	this.m_nCount = Count; // Количество добавленных/удаленных элементов
+	this.m_pData  = Data;  // Связанные с данным изменением данные из истории
 
 	// Разбиваем сложное действие на простейшие
-	this.m_aPositions = this.Make_ArrayOfSimpleActions( Type, Pos, Count );
+	this.m_aPositions = this.Make_ArrayOfSimpleActions(Type, Pos, Count);
 }
 
 CContentChangesElement.prototype.Refresh_BinaryData = function()
 {
 	var Binary_Writer = AscCommon.History.BinaryWriter;
-	var Binary_Pos = Binary_Writer.GetCurPosition();
+	var Binary_Pos    = Binary_Writer.GetCurPosition();
 
-	this.m_pData.Data.UseArray = true;
-	this.m_pData.Data.PosArray = this.m_aPositions;
+	if (this.m_pData.Data && this.m_pData.Data.IsChangesClass && this.m_pData.Data.IsChangesClass())
+	{
+		this.m_pData.Data.UseArray = true;
+		this.m_pData.Data.PosArray = this.m_aPositions;
 
-	Binary_Writer.WriteString2(this.m_pData.Class.Get_Id());
-	this.m_pData.Class.Save_Changes( this.m_pData.Data, Binary_Writer );
+		Binary_Writer.WriteString2(this.m_pData.Class.Get_Id());
+		Binary_Writer.WriteLong(this.m_pData.Data.Type);
+		this.m_pData.Data.WriteToBinary(Binary_Writer);
+	}
+	else
+	{
+		this.m_pData.Data.UseArray = true;
+		this.m_pData.Data.PosArray = this.m_aPositions;
+
+		Binary_Writer.WriteString2(this.m_pData.Class.Get_Id());
+		this.m_pData.Class.Save_Changes(this.m_pData.Data, Binary_Writer);
+	}
 
 	var Binary_Len = Binary_Writer.GetCurPosition() - Binary_Pos;
 
@@ -2766,7 +2271,6 @@ CUserCacheColor.prototype.init = function(nColor) {
   }
 
 var g_oIdCounter = new CIdCounter();
-var g_oTableId = new CTableId();
 
 window["SetDoctRendererParams"] = function(_params)
 {
@@ -2827,5 +2331,4 @@ window["SetDoctRendererParams"] = function(_params)
   window["AscCommon"].kCurFormatPainterWord = kCurFormatPainterWord;
   window["AscCommon"].parserHelp = parserHelp;
   window["AscCommon"].g_oIdCounter = g_oIdCounter;
-  window["AscCommon"].g_oTableId = g_oTableId;
 })(window);
