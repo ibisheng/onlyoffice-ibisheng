@@ -154,8 +154,8 @@ Processor3D.prototype._calculateAutoHPercent = function()
 			
 		if(AscFormat.c_oChartTypes.Pie === this.chartsDrawer.calcProp.type)
 		{
-			this.hPercent = this.hPercent / 6.8;
-			this.view3D.depthPercent = 680;
+			this.hPercent = 0.12;
+			//this.view3D.depthPercent = 180;
 		}
 		
 	}
@@ -1000,6 +1000,12 @@ Processor3D.prototype._calculateDepthPerspective = function()
 	var gapWidth = this.chartSpace.chart.plotArea.chart.gapWidth != null ? (this.chartSpace.chart.plotArea.chart.gapWidth / 100) : (150 / 100);
 	var gapDepth = this.chartSpace.chart.plotArea.chart.gapDepth != null ? (this.chartSpace.chart.plotArea.chart.gapDepth / 100) : (150 / 100);
 	
+	if(AscFormat.c_oChartTypes.Area === this.chartsDrawer.calcProp.type)
+	{
+		gapWidth = 0;
+		gapDepth = 0;
+	}
+	
 	var baseDepth = width / (seriesCount - (seriesCount - 1) * overlap + gapWidth);
 	if(this.chartsDrawer.calcProp.subType == "standard" || this.chartsDrawer.calcProp.type == AscFormat.c_oChartTypes.Line || isNormalArea)
 		baseDepth = (width / (seriesCount - (seriesCount - 1) * overlap + gapWidth)) * seriesCount;
@@ -1080,14 +1086,30 @@ Processor3D.prototype._calculateCameraDiff = function (/*isSkip*/)
 	//add test points for parallelepiped rect
 	var points = [];
 	var faces = [];
-	points.push(new Point3D(this.left, this.top, perspectiveDepth, this));
-	points.push(new Point3D(this.left, heightChart + this.top, perspectiveDepth, this));
-	points.push(new Point3D(originalWidthChart + this.left, heightChart + this.top, perspectiveDepth, this));
-	points.push(new Point3D(originalWidthChart + this.left, this.top, perspectiveDepth, this));
-	points.push(new Point3D(originalWidthChart + this.left, this.top, 0, this));
-	points.push(new Point3D(originalWidthChart + this.left, heightChart + this.top, 0, this));
-	points.push(new Point3D(this.left, heightChart + this.top, 0, this));
-	points.push(new Point3D(this.left, this.top, 0, this));
+	
+	if(AscFormat.c_oChartTypes.Pie === this.chartsDrawer.calcProp.type)
+	{
+		points.push(new Point3D(this.left + originalWidthChart / 2, this.top, perspectiveDepth, this));
+		points.push(new Point3D(this.left, this.top, perspectiveDepth / 2, this));
+		points.push(new Point3D(this.left + originalWidthChart, this.top, perspectiveDepth / 2, this));
+		points.push(new Point3D(this.left + originalWidthChart / 2, this.top, 0, this));
+		
+		points.push(new Point3D(this.left + originalWidthChart / 2, this.top + heightChart, perspectiveDepth, this));
+		points.push(new Point3D(this.left, this.top + heightChart, perspectiveDepth / 2, this));
+		points.push(new Point3D(this.left + originalWidthChart, this.top + heightChart, perspectiveDepth / 2, this));
+		points.push(new Point3D(this.left + originalWidthChart / 2, this.top + heightChart, 0, this));
+	}
+	else
+	{
+		points.push(new Point3D(this.left, this.top, perspectiveDepth, this));
+		points.push(new Point3D(this.left, heightChart + this.top, perspectiveDepth, this));
+		points.push(new Point3D(originalWidthChart + this.left, heightChart + this.top, perspectiveDepth, this));
+		points.push(new Point3D(originalWidthChart + this.left, this.top, perspectiveDepth, this));
+		points.push(new Point3D(originalWidthChart + this.left, this.top, 0, this));
+		points.push(new Point3D(originalWidthChart + this.left, heightChart + this.top, 0, this));
+		points.push(new Point3D(this.left, heightChart + this.top, 0, this));
+		points.push(new Point3D(this.left, this.top, 0, this));
+	}
 	
 	faces.push([0,1,2,3]);
 	faces.push([2,5,4,3]);
@@ -1342,6 +1364,7 @@ Processor3D.prototype.checkOutSideArea = function(newPoints)
 		}
 	};
 	
+	calculateZ(100);
 	calculateZ(10);
 	calculateZ(1);
 	

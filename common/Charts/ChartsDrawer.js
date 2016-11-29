@@ -2532,7 +2532,16 @@ CChartsDrawer.prototype =
 			if(numCache != null && numCache.pts && numCache.pts.length)
 			{
 				if(!this.calcProp.ptCount)
-					this.calcProp.ptCount = numCache.ptCount;
+				{
+					if(AscFormat.c_oChartTypes.Pie === this.calcProp.type)
+					{
+						this.calcProp.ptCount = 1;
+					}
+					else
+					{
+						this.calcProp.ptCount = numCache.ptCount;
+					}
+				}
 				
 				//TODO возможно нужно будет проверку добавить на isHidden
 				counter++;
@@ -2541,6 +2550,11 @@ CChartsDrawer.prototype =
 			{
 				counter++;
 			}
+		}
+		
+		if(AscFormat.c_oChartTypes.Pie === this.calcProp.type)
+		{
+			counter = 1;
 		}
 		
 		return counter;
@@ -7439,6 +7453,7 @@ drawPieChart.prototype =
 		{
 			if(this.cChartDrawer.processor3D.view3D.rAngAx)
 			{
+				this.properties3d = this.cChartDrawer.processor3D.calculatePropertiesForPieCharts();
 				this._reсalculatePie3D();
 			}
 			else
