@@ -244,7 +244,9 @@ AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Pr]                      
 	AscDFH.historyitem_Paragraph_Borders_Top,
 	AscDFH.historyitem_Paragraph_PresentationPr_Bullet,
 	AscDFH.historyitem_Paragraph_PresentationPr_Level,
-	AscDFH.historyitem_Paragraph_FramePr
+	AscDFH.historyitem_Paragraph_FramePr,
+	AscDFH.historyitem_Paragraph_PrChange,
+	AscDFH.historyitem_Paragraph_PrReviewInfo
 ];
 AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_PresentationPr_Bullet]     = [
 	AscDFH.historyitem_Paragraph_PresentationPr_Bullet,
@@ -262,9 +264,13 @@ AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_SectionPr]               
 	AscDFH.historyitem_Paragraph_SectionPr
 ];
 AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_PrChange]                  = [
-	AscDFH.historyitem_Paragraph_PrChange
+	AscDFH.historyitem_Paragraph_Pr,
+	AscDFH.historyitem_Paragraph_PrChange,
+	AscDFH.historyitem_Paragraph_PrReviewInfo
 ];
 AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_PrReviewInfo]              = [
+	AscDFH.historyitem_Paragraph_Pr,
+	AscDFH.historyitem_Paragraph_PrChange,
 	AscDFH.historyitem_Paragraph_PrReviewInfo
 ];
 
@@ -1356,6 +1362,17 @@ CChangesParagraphPr.prototype.Merge = function(oChange)
 			this.New.FramePr = oChange.New;
 			break;
 		}
+		case AscDFH.historyitem_Paragraph_PrChange:
+		{
+			this.New.PrChange   = oChange.New.PrChange;
+			this.New.ReviewInfo = oChange.New.ReviewInfo;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_PrReviewInfo:
+		{
+			this.New.ReviewInfo = oChange.New;
+			break;
+		}
 	}
 
 	return true;
@@ -1636,8 +1653,14 @@ CChangesParagraphPrChange.prototype.CreateReverseChange = function()
 };
 CChangesParagraphPrChange.prototype.Merge = function(oChange)
 {
-	if (oChange.Class === this.Class && oChange.Type === this.Type)
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (oChange.Type === this.Type || AscDFH.historyitem_Paragraph_Pr === oChange.Type)
 		return false;
+
+	if (AscDFH.historyitem_Paragraph_PrReviewInfo === oChange.Type)
+		this.New.ReviewInfo = oChange.New;
 
 	return true;
 };
@@ -1661,4 +1684,14 @@ CChangesParagraphPrReviewInfo.prototype.private_SetValue = function(Value)
 	oParagraph.Pr.ReviewInfo = Value;
 	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
 	private_ParagraphChangesOnSetValue(this.Class);
+};
+CChangesParagraphPrReviewInfo.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (oChange.Type === this.Type || AscDFH.historyitem_Paragraph_Pr === oChange.Type || AscDFH.historyitem_Paragraph_PrChange === oChange.Type)
+		return false;
+
+	return true;
 };

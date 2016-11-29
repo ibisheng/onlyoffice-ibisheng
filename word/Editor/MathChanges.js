@@ -133,8 +133,8 @@ AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_HighLight]       = [AscDFH
 AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_ReviewType]      = [AscDFH.historyitem_MathBase_ReviewType];
 AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_TextFill]        = [AscDFH.historyitem_MathBase_TextFill];
 AscDFH.changesRelationMap[AscDFH.historyitem_MathBase_TextOutline]     = [AscDFH.historyitem_MathBase_TextOutline];
-AscDFH.changesRelationMap[AscDFH.historyitem_MathBox_AlnAt]            = [AscDFH.historyitem_MathBox_AlnAt];
-AscDFH.changesRelationMap[AscDFH.historyitem_MathBox_ForcedBreak]      = [AscDFH.historyitem_MathBox_ForcedBreak];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBox_AlnAt]            = [AscDFH.historyitem_MathBox_AlnAt, AscDFH.historyitem_MathBox_ForcedBreak];
+AscDFH.changesRelationMap[AscDFH.historyitem_MathBox_ForcedBreak]      = [AscDFH.historyitem_MathBox_AlnAt, AscDFH.historyitem_MathBox_ForcedBreak];
 AscDFH.changesRelationMap[AscDFH.historyitem_MathFraction_Type]        = [AscDFH.historyitem_MathFraction_Type];
 AscDFH.changesRelationMap[AscDFH.historyitem_MathRadical_HideDegree]   = [AscDFH.historyitem_MathRadical_HideDegree];
 AscDFH.changesRelationMap[AscDFH.historyitem_MathNary_LimLoc]          = [AscDFH.historyitem_MathNary_LimLoc];
@@ -951,6 +951,16 @@ CChangesMathBoxAlnAt.prototype.private_SetValue = function(Value)
 {
 	this.Class.raw_setAlnAt(Value);
 };
+CChangesMathBoxAlnAt.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type || AscDFH.historyitem_MathBox_ForcedBreak === oChange.Type)
+		return false;
+
+	return true;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseBoolProperty}
@@ -964,6 +974,16 @@ CChangesMathBoxForcedBreak.prototype.Type = AscDFH.historyitem_MathBox_ForcedBre
 CChangesMathBoxForcedBreak.prototype.private_SetValue = function(Value)
 {
 	this.Class.raw_ForcedBreak(Value, this.Class.Pr.Get_AlnAt());
+};
+CChangesMathBoxForcedBreak.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type)
+		return false;
+
+	return true;
 };
 
 

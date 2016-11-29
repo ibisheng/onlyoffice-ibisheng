@@ -40,6 +40,13 @@
 AscDFH.changesFactory[AscDFH.historyitem_Field_AddItem]    = CChangesParaFieldAddItem;
 AscDFH.changesFactory[AscDFH.historyitem_Field_RemoveItem] = CChangesParaFieldRemoveItem;
 
+//----------------------------------------------------------------------------------------------------------------------
+// Карта зависимости изменений
+//----------------------------------------------------------------------------------------------------------------------
+AscDFH.changesRelationMap[AscDFH.historyitem_Field_AddItem]    = [AscDFH.historyitem_Field_AddItem, AscDFH.historyitem_Field_RemoveItem];
+AscDFH.changesRelationMap[AscDFH.historyitem_Field_RemoveItem] = [AscDFH.historyitem_Field_AddItem, AscDFH.historyitem_Field_RemoveItem];
+//----------------------------------------------------------------------------------------------------------------------
+
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}

@@ -82,6 +82,182 @@ AscDFH.changesFactory[AscDFH.historyitem_ParaRun_OnEndSplit]        = CChangesRu
 AscDFH.changesFactory[AscDFH.historyitem_ParaRun_MathAlnAt]         = CChangesRunMathAlnAt;
 AscDFH.changesFactory[AscDFH.historyitem_ParaRun_MathForcedBreak]   = CChangesRunMathForcedBreak;
 
+//----------------------------------------------------------------------------------------------------------------------
+// Карта зависимости изменений
+//----------------------------------------------------------------------------------------------------------------------
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_AddItem]           = [
+	AscDFH.historyitem_ParaRun_AddItem,
+	AscDFH.historyitem_ParaRun_RemoveItem
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_RemoveItem]        = [
+	AscDFH.historyitem_ParaRun_AddItem,
+	AscDFH.historyitem_ParaRun_RemoveItem
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_Bold]              = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_Bold];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_Italic]            = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_Italic];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_Strikeout]         = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_Strikeout];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_Underline]         = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_Underline];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_FontSize]          = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_FontSize];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_Color]             = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_Color];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_VertAlign]         = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_VertAlign];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_HighLight]         = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_HighLight];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_RStyle]            = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_RStyle];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_Spacing]           = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_Spacing];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_DStrikeout]        = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_DStrikeout];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_Caps]              = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_Caps];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_SmallCaps]         = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_SmallCaps];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_Position]          = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_Position];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_RFonts]            = [
+	AscDFH.historyitem_ParaRun_TextPr,
+	AscDFH.historyitem_ParaRun_RFonts,
+	AscDFH.historyitem_ParaRun_RFonts_Ascii,
+	AscDFH.historyitem_ParaRun_RFonts_HAnsi,
+	AscDFH.historyitem_ParaRun_RFonts_CS,
+	AscDFH.historyitem_ParaRun_RFonts_EastAsia,
+	AscDFH.historyitem_ParaRun_RFonts_Hint
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_Lang]              = [
+	AscDFH.historyitem_ParaRun_TextPr,
+	AscDFH.historyitem_ParaRun_Lang,
+	AscDFH.historyitem_ParaRun_Lang_Bidi,
+	AscDFH.historyitem_ParaRun_Lang_EastAsia,
+	AscDFH.historyitem_ParaRun_Lang_Val
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_RFonts_Ascii]      = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_RFonts, AscDFH.historyitem_ParaRun_RFonts_Ascii];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_RFonts_HAnsi]      = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_RFonts, AscDFH.historyitem_ParaRun_RFonts_HAnsi];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_RFonts_CS]         = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_RFonts, AscDFH.historyitem_ParaRun_RFonts_CS];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_RFonts_EastAsia]   = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_RFonts, AscDFH.historyitem_ParaRun_RFonts_EastAsia];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_RFonts_Hint]       = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_RFonts, AscDFH.historyitem_ParaRun_RFonts_Hint];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_Lang_Bidi]         = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_Lang, AscDFH.historyitem_ParaRun_Lang_Bidi];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_Lang_EastAsia]     = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_Lang, AscDFH.historyitem_ParaRun_Lang_EastAsia];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_Lang_Val]          = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_Lang, AscDFH.historyitem_ParaRun_Lang_Val];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_TextPr]            = [
+	AscDFH.historyitem_ParaRun_Bold,
+	AscDFH.historyitem_ParaRun_Italic,
+	AscDFH.historyitem_ParaRun_Strikeout,
+	AscDFH.historyitem_ParaRun_Underline,
+	AscDFH.historyitem_ParaRun_FontSize,
+	AscDFH.historyitem_ParaRun_Color,
+	AscDFH.historyitem_ParaRun_VertAlign,
+	AscDFH.historyitem_ParaRun_HighLight,
+	AscDFH.historyitem_ParaRun_RStyle,
+	AscDFH.historyitem_ParaRun_Spacing,
+	AscDFH.historyitem_ParaRun_DStrikeout,
+	AscDFH.historyitem_ParaRun_Caps,
+	AscDFH.historyitem_ParaRun_SmallCaps,
+	AscDFH.historyitem_ParaRun_Position,
+	AscDFH.historyitem_ParaRun_RFonts,
+	AscDFH.historyitem_ParaRun_Lang,
+	AscDFH.historyitem_ParaRun_RFonts_Ascii,
+	AscDFH.historyitem_ParaRun_RFonts_HAnsi,
+	AscDFH.historyitem_ParaRun_RFonts_CS,
+	AscDFH.historyitem_ParaRun_RFonts_EastAsia,
+	AscDFH.historyitem_ParaRun_RFonts_Hint,
+	AscDFH.historyitem_ParaRun_Lang_Bidi,
+	AscDFH.historyitem_ParaRun_Lang_EastAsia,
+	AscDFH.historyitem_ParaRun_Lang_Val,
+	AscDFH.historyitem_ParaRun_TextPr,
+	AscDFH.historyitem_ParaRun_Unifill,
+	AscDFH.historyitem_ParaRun_Shd,
+	AscDFH.historyitem_ParaRun_PrChange,
+	AscDFH.historyitem_ParaRun_TextFill,
+	AscDFH.historyitem_ParaRun_TextOutline,
+	AscDFH.historyitem_ParaRun_PrReviewInfo
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_Unifill]           = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_Unifill];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_Shd]               = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_Shd];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_MathStyle]         = [
+	AscDFH.historyitem_ParaRun_MathStyle,
+	AscDFH.historyitem_ParaRun_MathPrp
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_MathPrp]           = [
+	AscDFH.historyitem_ParaRun_MathStyle,
+	AscDFH.historyitem_ParaRun_MathPrp,
+	AscDFH.historyitem_ParaRun_MathAlnAt,
+	AscDFH.historyitem_ParaRun_MathForcedBreak
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_ReviewType]        = [
+	AscDFH.historyitem_ParaRun_ReviewType,
+	AscDFH.historyitem_ParaRun_ContentReviewInfo
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_PrChange]          = [
+	AscDFH.historyitem_ParaRun_TextPr,
+	AscDFH.historyitem_ParaRun_PrChange,
+	AscDFH.historyitem_ParaRun_PrReviewInfo
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_TextFill]          = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_TextFill];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_TextOutline]       = [AscDFH.historyitem_ParaRun_TextPr, AscDFH.historyitem_ParaRun_TextOutline];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_PrReviewInfo]      = [
+	AscDFH.historyitem_ParaRun_TextPr,
+	AscDFH.historyitem_ParaRun_PrChange,
+	AscDFH.historyitem_ParaRun_PrReviewInfo
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_ContentReviewInfo] = [
+	AscDFH.historyitem_ParaRun_ReviewType,
+	AscDFH.historyitem_ParaRun_ContentReviewInfo
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_OnStartSplit]      = [];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_OnEndSplit]        = [];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_MathAlnAt]         = [
+	AscDFH.historyitem_ParaRun_MathPrp,
+	AscDFH.historyitem_ParaRun_MathAlnAt,
+	AscDFH.historyitem_ParaRun_MathForcedBreak
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_ParaRun_MathForcedBreak]   = [
+	AscDFH.historyitem_ParaRun_MathPrp,
+	AscDFH.historyitem_ParaRun_MathAlnAt,
+	AscDFH.historyitem_ParaRun_MathForcedBreak
+];
+
+/**
+ * Общая функция объединения изменений, которые зависят только от себя и AscDFH.historyitem_ParaRun_TextPr
+ * @param oChange
+ * @returns {boolean}
+ */
+function private_ParaRunChangesOnMergeTextPr(oChange)
+{
+	if (oChange.Class !== this.Class)
+		return true;
+
+	if (oChange.Type === this.Type || oChange.Type === AscDFH.historyitem_ParaRun_TextPr)
+		return false;
+
+	return true;
+}
+/**
+ * Общая функция объединения изменений, которые зависят от себя, AscDFH.historyitem_ParaRun_TextPr,
+ * AscDFH.historyitem_ParaRun_RFonts
+ * @param oChange
+ * @returns {boolean}
+ */
+function private_ParaRunChangesOnMergeRFontsTextPr(oChange)
+{
+	if (oChange.Class !== this.Class)
+		return true;
+
+	if (oChange.Type === this.Type || oChange.Type === AscDFH.historyitem_ParaRun_TextPr || oChange.Type === AscDFH.historyitem_ParaRun_RFonts)
+		return false;
+
+	return true;
+}
+/**
+ * Общая функция объединения изменений, которые зависят от себя, AscDFH.historyitem_ParaRun_TextPr,
+ * AscDFH.historyitem_ParaRun_Lang
+ * @param oChange
+ * @returns {boolean}
+ */
+function private_ParaRunChangesOnMergeLangTextPr(oChange)
+{
+	if (oChange.Class !== this.Class)
+		return true;
+
+	if (oChange.Type === this.Type || oChange.Type === AscDFH.historyitem_ParaRun_TextPr || oChange.Type === AscDFH.historyitem_ParaRun_Lang)
+		return false;
+
+	return true;
+}
+//----------------------------------------------------------------------------------------------------------------------
+
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -262,6 +438,7 @@ CChangesRunBold.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunBold.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseBoolProperty}
@@ -287,6 +464,7 @@ CChangesRunItalic.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunItalic.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseBoolProperty}
@@ -312,6 +490,7 @@ CChangesRunStrikeout.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunStrikeout.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseBoolProperty}
@@ -337,6 +516,7 @@ CChangesRunUnderline.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunUnderline.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseDoubleProperty}
@@ -362,6 +542,7 @@ CChangesRunFontSize.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunFontSize.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectProperty}
@@ -391,6 +572,7 @@ CChangesRunColor.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunColor.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseLongProperty}
@@ -416,6 +598,7 @@ CChangesRunVertAlign.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunVertAlign.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -521,6 +704,7 @@ CChangesRunHighLight.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunHighLight.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseStringProperty}
@@ -546,6 +730,7 @@ CChangesRunRStyle.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunRStyle.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseDoubleProperty}
@@ -571,6 +756,7 @@ CChangesRunSpacing.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunSpacing.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseBoolProperty}
@@ -596,6 +782,7 @@ CChangesRunDStrikeout.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunDStrikeout.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseBoolProperty}
@@ -621,6 +808,7 @@ CChangesRunCaps.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunCaps.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseBoolProperty}
@@ -646,6 +834,7 @@ CChangesRunSmallCaps.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunSmallCaps.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseDoubleProperty}
@@ -671,6 +860,7 @@ CChangesRunPosition.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunPosition.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectProperty}
@@ -703,6 +893,48 @@ CChangesRunRFonts.prototype.Load = function(Color)
 
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
+};
+CChangesRunRFonts.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type || AscDFH.historyitem_ParaRun_TextPr === oChange.Type)
+		return false;
+
+	if (!this.New)
+		this.New = new CRFonts();
+
+	switch (oChange.Type)
+	{
+		case AscDFH.historyitem_ParaRun_RFonts_Ascii:
+		{
+			this.New.Ascii = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_RFonts_HAnsi:
+		{
+			this.New.HAnsi = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_RFonts_CS:
+		{
+			this.New.CS = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_RFonts_EastAsia:
+		{
+			this.New.EastAsia = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_RFonts_Hint:
+		{
+			this.New.Hint = oChange.New;
+			break;
+		}
+	}
+
+	return true;
 };
 /**
  * @constructor
@@ -737,6 +969,38 @@ CChangesRunLang.prototype.Load = function(Color)
 
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
+};
+CChangesRunLang.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type || AscDFH.historyitem_ParaRun_TextPr === oChange.Type)
+		return false;
+
+	if (!this.New)
+		this.New = new CLang();
+
+	switch (oChange.Type)
+	{
+		case AscDFH.historyitem_ParaRun_Lang_Bidi:
+		{
+			this.New.Bidi = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_Lang_EastAsia:
+		{
+			this.New.EastAsia = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_Lang_Val:
+		{
+			this.New.Val = oChange.New;
+			break;
+		}
+	}
+
+	return true;
 };
 /**
  * @constructor
@@ -831,6 +1095,7 @@ CChangesRunRFontsAscii.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunRFontsAscii.prototype.Merge = private_ParaRunChangesOnMergeRFontsTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -924,6 +1189,7 @@ CChangesRunRFontsHAnsi.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunRFontsHAnsi.prototype.Merge = private_ParaRunChangesOnMergeRFontsTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -1017,6 +1283,7 @@ CChangesRunRFontsCS.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunRFontsCS.prototype.Merge = private_ParaRunChangesOnMergeRFontsTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -1110,6 +1377,7 @@ CChangesRunRFontsEastAsia.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunRFontsEastAsia.prototype.Merge = private_ParaRunChangesOnMergeRFontsTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseLongProperty}
@@ -1135,6 +1403,7 @@ CChangesRunRFontsHint.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunRFontsHint.prototype.Merge = private_ParaRunChangesOnMergeRFontsTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseLongProperty}
@@ -1161,6 +1430,7 @@ CChangesRunLangBidi.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunLangBidi.prototype.Merge = private_ParaRunChangesOnMergeLangTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseLongProperty}
@@ -1187,6 +1457,7 @@ CChangesRunLangEastAsia.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunLangEastAsia.prototype.Merge = private_ParaRunChangesOnMergeLangTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseLongProperty}
@@ -1213,6 +1484,7 @@ CChangesRunLangVal.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunLangVal.prototype.Merge = private_ParaRunChangesOnMergeLangTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectProperty}
@@ -1257,6 +1529,198 @@ CChangesRunTextPr.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunTextPr.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type)
+		return false;
+
+	if (!this.New)
+		this.New = new CTextPr();
+
+	switch (oChange.Type)
+	{
+		case AscDFH.historyitem_ParaRun_Bold:
+		{
+			this.New.Bold = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_Italic:
+		{
+			this.New.Italic = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_Strikeout:
+		{
+			this.New.Strikeout = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_Underline:
+		{
+			this.New.Underline = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_FontSize:
+		{
+			this.New.FontSize = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_Color:
+		{
+			this.New.Color = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_VertAlign:
+		{
+			this.New.VertAlign = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_HighLight:
+		{
+			this.New.HighLight = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_RStyle:
+		{
+			this.New.RStyle = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_Spacing:
+		{
+			this.New.Spacing = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_DStrikeout:
+		{
+			this.New.DStrikeout = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_Caps:
+		{
+			this.New.Caps = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_SmallCaps:
+		{
+			this.New.SmallCaps = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_Position:
+		{
+			this.New.Position = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_RFonts:
+		{
+			this.New.RFonts = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_Lang:
+		{
+			this.New.Lang = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_RFonts_Ascii:
+		{
+			if (!this.New.RFonts)
+				this.New.RFonts = new CRFonts();
+
+			this.New.RFonts.Ascii = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_RFonts_HAnsi:
+		{
+			if (!this.New.RFonts)
+				this.New.RFonts = new CRFonts();
+
+			this.New.RFonts.HAnsi = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_RFonts_CS:
+		{
+			if (!this.New.RFonts)
+				this.New.RFonts = new CRFonts();
+
+			this.New.RFonts.CS = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_RFonts_EastAsia:
+		{
+			if (!this.New.RFonts)
+				this.New.RFonts = new CRFonts();
+
+			this.New.RFonts.EastAsia = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_RFonts_Hint:
+		{
+			if (!this.New.RFonts)
+				this.New.RFonts = new CRFonts();
+
+			this.New.RFonts.Hint = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_Lang_Bidi:
+		{
+			if (!this.New.Lang)
+				this.New.Lang = new CLang();
+
+			this.New.Lang.Bidi = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_Lang_EastAsia:
+		{
+			if (!this.New.Lang)
+				this.New.Lang = new CLang();
+
+			this.New.Lang.EastAsia = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_Lang_Val:
+		{
+			if (!this.New.Lang)
+				this.New.Lang = new CLang();
+
+			this.New.Lang.Val = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_Unifill:
+		{
+			this.New.Unifill = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_Shd:
+		{
+			this.New.Shd = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_PrChange:
+		{
+			this.New.PrChange   = oChange.New.PrChange;
+			this.New.ReviewInfo = oChange.New.ReviewInfo;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_TextFill:
+		{
+			this.New.TextFil = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_TextOutline:
+		{
+			this.New.TextOutline = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_ParaRun_PrReviewInfo:
+		{
+			this.New.ReviewInfo = oChange.New;
+			break;
+		}
+	}
+
+	return true;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectProperty}
@@ -1297,6 +1761,7 @@ CChangesRunUnifill.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunUnifill.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectProperty}
@@ -1337,6 +1802,7 @@ CChangesRunShd.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunShd.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseLongProperty}
@@ -1354,6 +1820,16 @@ CChangesRunMathStyle.prototype.private_SetValue = function(Value)
 
 	oRun.Recalc_CompiledPr(true);
 	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunMathStyle.prototype.Merge = function(oChange)
+{
+	if (oChange.Class !== this.Class)
+		return true;
+
+	if (this.Type === oChange.Type || AscDFH.historyitem_ParaRun_MathPrp === oChange.Type)
+		return false;
+
+	return true;
 };
 /**
  * @constructor
@@ -1380,6 +1856,37 @@ CChangesRunMathPrp.prototype.private_SetValue = function(Value)
 
 	oRun.Recalc_CompiledPr(true);
 	oRun.private_UpdateTrackRevisionOnChangeTextPr(false);
+};
+CChangesRunMathPrp.prototype.Merge = function(oChange)
+{
+	if (oChange.Class !== this.Class)
+		return true;
+
+	if (this.Type === oChange.Type)
+		return false;
+
+	if (!this.New)
+		this.New = new CMPrp();
+
+	if (AscDFH.historyitem_ParaRun_MathStyle === oChange.Type)
+	{
+		this.New.sty = oChange.New;
+	}
+	else if (AscDFH.historyitem_ParaRun_MathAlnAt === oChange.Type)
+	{
+		if (undefined !== this.New.brk)
+			this.New.brk.Apply_AlnAt(oChange.New);
+	}
+	else if (AscDFH.historyitem_ParaRun_MathForcedBreak === oChange.Type)
+	{
+		if(oChange.bInsert)
+			this.New.Insert_ForcedBreak(oChange.alnAt);
+		else
+			this.New.Delete_ForcedBreak();
+	}
+
+
+	return true;
 };
 /**
  * @constructor
@@ -1431,6 +1938,19 @@ CChangesRunReviewType.prototype.private_SetValue = function(Value)
 	oRun.ReviewType = Value.ReviewType;
 	oRun.ReviewInfo = Value.ReviewInfo;
 	oRun.private_UpdateTrackRevisions();
+};
+CChangesRunReviewType.prototype.Merge = function(oChange)
+{
+	if (oChange.Class !== this.Class)
+		return true;
+
+	if (this.Type === oChange.Type)
+		return false;
+
+	if (AscDFH.historyitem_ParaRun_ContentReviewInfo === oChange.Type)
+		this.New.ReviewInfo = oChange.New;
+
+	return true;
 };
 /**
  * @constructor
@@ -1541,6 +2061,19 @@ CChangesRunPrChange.prototype.private_SetValue = function(Value)
 	oRun.Pr.ReviewInfo = Value.ReviewInfo;
 	oRun.private_UpdateTrackRevisions();
 };
+CChangesRunPrChange.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type || AscDFH.historyitem_ParaRun_TextPr === oChange.Type)
+		return false;
+
+	if (AscDFH.historyitem_ParaRun_PrReviewInfo === oChange.Type)
+		this.New.ReviewInfo = oChange.New;
+
+	return true;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectProperty}
@@ -1570,6 +2103,7 @@ CChangesRunTextFill.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunTextFill.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectProperty}
@@ -1599,6 +2133,7 @@ CChangesRunTextOutline.prototype.Load = function(Color)
 	if (this.Color && Color)
 		this.Class.private_AddCollPrChangeOther(Color);
 };
+CChangesRunTextOutline.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseObjectProperty}
@@ -1617,6 +2152,16 @@ CChangesRunPrReviewInfo.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
 	oRun.Pr.ReviewInfo = Value;
+};
+CChangesRunPrReviewInfo.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type || AscDFH.historyitem_ParaRun_TextPr === oChange.Type || AscDFH.historyitem_ParaRun_PrChange === oChange.Type)
+		return false;
+
+	return true;
 };
 /**
  * @constructor
@@ -1640,6 +2185,16 @@ CChangesRunContentReviewInfo.prototype.private_SetValue = function(Value)
 {
 	var oRun = this.Class;
 	oRun.ReviewInfo = Value;
+};
+CChangesRunContentReviewInfo.prototype.Merge = function(oChange)
+{
+	if (oChange.Class !== this.Class)
+		return true;
+
+	if (this.Type === oChange.Type || AscDFH.historyitem_ParaRun_ReviewType === oChange.Type)
+		return false;
+
+	return true;
 };
 /**
  * @constructor
@@ -1675,6 +2230,10 @@ CChangesRunOnStartSplit.prototype.CreateReverseChange = function()
 {
 	return null;
 };
+CChangesRunOnStartSplit.prototype.Merge = function(oChange)
+{
+	return true;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -1709,6 +2268,10 @@ CChangesRunOnEndSplit.prototype.Load = function()
 CChangesRunOnEndSplit.prototype.CreateReverseChange = function()
 {
 	return null;
+};
+CChangesRunOnEndSplit.prototype.Merge = function(oChange)
+{
+	return true;
 };
 /**
  * @constructor
@@ -1766,6 +2329,16 @@ CChangesRunMathAlnAt.prototype.ReadFromBinary = function(Reader)
 		this.Old = undefined;
 	else
 		this.Old = Reader.GetLong();
+};
+CChangesRunMathAlnAt.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type || AscDFH.historyitem_ParaRun_MathPrp === oChange.Type || AscDFH.historyitem_ParaRun_MathForcedBreak === oChange.Type)
+		return false;
+
+	return true;
 };
 /**
  * @constructor
@@ -1839,6 +2412,19 @@ CChangesRunMathForcedBreak.prototype.ReadFromBinary = function(Reader)
 CChangesRunMathForcedBreak.prototype.CreateReverseChange = function()
 {
 	return new CChangesRunMathForcedBreak(this.Class, !this.bInsert, this.alnAt);
+};
+CChangesRunMathForcedBreak.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type || AscDFH.historyitem_ParaRun_MathPrp === oChange.Type)
+		return false;
+
+	if (AscDFH.historyitem_ParaRun_MathAlnAt === oChange.Type)
+		this.alnAt = oChange.New;
+
+	return true;
 };
 
 
