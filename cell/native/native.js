@@ -3992,6 +3992,10 @@ function OfflineEditor () {
             range = range.intersection(ranges[i]);
         }
         
+        if ((null === range) && (ranges.length > 0)) {
+            range = ranges[0];
+        }
+        
         if (autocorrection) {
             this._resizeWorkRegion(ws, range.c2, range.r2);
             region = {columnBeg:0, columnEnd:ws.cols.length - 1, columnOff:0, rowBeg:0, rowEnd: ws.rows.length - 1, rowOff:0};
@@ -4773,16 +4777,6 @@ function OfflineEditor () {
                     {
                         window["native"]["BeginDrawDocumentStyle"](customStyles[i].name, n);
                         this.af_getSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont);
-
-//                        options =
-//                        {
-//                            name: i,
-//                            displayName: customStyles[i].displayName,
-//                            type: 'custom',
-//                            image: this.af_getSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont)
-//                        };
-
-                        // result[n] = new formatTablePictures(options);
                         n++;
 
                         window["native"]["EndDrawStyle"]();
@@ -4798,15 +4792,6 @@ function OfflineEditor () {
                     {
                         window["native"]["BeginDrawDefaultStyle"](defaultStyles[i].name, n);
                         this.af_getSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont);
-
-//                        options =
-//                        {
-//                            name: i,
-//                            displayName: defaultStyles[i].displayName,
-//                            type: 'default',
-//                            image: this.af_getSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont)
-//                        };
-                        //result[n] = new formatTablePictures(options);
                         n++;
 
                         window["native"]["EndDrawStyle"]();
@@ -5190,75 +5175,55 @@ function OfflineEditor () {
         // chat styles
         AscCommon.ChartPreviewManager.prototype.clearPreviews = function() {window["native"]["ClearCacheChartStyles"]();};
         AscCommon.ChartPreviewManager.prototype.createChartPreview = function(_graphics, type, styleIndex) {
-            return AscFormat.ExecuteNoHistory(function(){
-                if(!this.chartsByTypes[type])
-                    this.chartsByTypes[type] = this.getChartByType(type);
-                var chart_space = this.chartsByTypes[type];
-                if(chart_space.style !== styleIndex)
-                {
-                    chart_space.style = styleIndex;
-                    chart_space.recalculateMarkers();
-                    chart_space.recalculateSeriesColors();
-                    chart_space.recalculatePlotAreaChartBrush();
-                    chart_space.recalculatePlotAreaChartPen();
-                    chart_space.recalculateChartBrush();
-                    chart_space.recalculateChartPen();
-                    chart_space.recalculateUpDownBars();
-                }
-                chart_space.recalculatePenBrush();
-
-                var _width_px = this.CHART_PREVIEW_WIDTH_PIX;
-                var _height_px = this.CHART_PREVIEW_WIDTH_PIX;
-                if (AscCommon.AscBrowser.isRetina)
-                {
-                    _width_px <<= 1;
-                    _height_px <<= 1;
-                }
-
-                window["native"]["BeginDrawDefaultStyle"](type + '', styleIndex);
-
-                //window["native"]["DD_StartNativeDraw"](_width_px, _height_px, 50, 50);
-
-                var dKoefToMM = AscCommon.g_dKoef_pix_to_mm;
-                if (this.IsRetinaEnabled)
-                    dKoefToMM /= 2;
-
-                chart_space.draw(_graphics);
-                _graphics.ClearParams();
-
-                window["native"]["EndDrawStyle"]();
-
-//               var _stream = global_memory_stream_menu;
-//               _stream["ClearNoAttack"]();
-//               _stream["WriteByte"](4);
-//               _stream["WriteLong"](type);
-//               _stream["WriteLong"](styleIndex);
-//                window["native"]["DD_EndNativeDraw"](_stream);
+             return AscFormat.ExecuteNoHistory(function(){
+          chart_space.recalculatePenBrush();
+            
+            if(!this.chartsByTypes[type])
+                this.chartsByTypes[type] = this.getChartByType(type);
+            
+            var chart_space = this.chartsByTypes[type];
+            AscFormat.ApplyPresetToChartSpace(chart_space, AscCommon.g_oChartPresets[type][styleIndex]);
+            chart_space.recalcInfo.recalculateReferences = false;
+            chart_space.recalculate();
+            
+            var _width_px = this.CHART_PREVIEW_WIDTH_PIX;
+            var _height_px = this.CHART_PREVIEW_HEIGHT_PIX;
+            if (AscCommon.AscBrowser.isRetina)
+            {
+                _width_px <<= 1;
+                _height_px <<= 1;
+            }
+            
+            window["native"]["BeginDrawDefaultStyle"](type + '', styleIndex);
+            
+            var dKoefToMM = AscCommon.g_dKoef_pix_to_mm;
+            if (this.IsRetinaEnabled)
+                dKoefToMM /= 2;
+            
+            chart_space.draw(_graphics);
+            _graphics.ClearParams();
+            
+            window["native"]["EndDrawStyle"]();
 
             }, this, []);
-
         };
+        
         AscCommon.ChartPreviewManager.prototype.getChartPreviews = function(chartType) {
-
-            if (AscFormat.isRealNumber(chartType))
-            {
+            
+            if (AscFormat.isRealNumber(chartType)) {
+                
                 var bIsCached = window["native"]["IsCachedChartStyles"](chartType);
-                if (!bIsCached)
-                {
-                    // window["native"]["DD_PrepareNativeDraw"]();
-
+                if (!bIsCached) {
+                    
                     window["native"]["SetStylesType"](2);
-
+                    
                     var _graphics = new CDrawingStream();
-
-                    for (var i = 1; i < 49; ++i) {
-                        this.createChartPreview(_graphics, chartType, i);
+                    
+                    if(AscCommon.g_oChartPresets[chartType]){
+                        var nStylesCount = AscCommon.g_oChartPresets[chartType].length;
+                        for(var i = 0; i < nStylesCount; ++i)
+                            this.createChartPreview(_graphics, chartType, i);
                     }
-
-                    // var _stream = global_memory_stream_menu;
-                    // _stream["ClearNoAttack"]();
-                    // _stream["WriteByte"](5);
-                    // _api.WordControl.m_oDrawingDocument.Native["DD_EndNativeDraw"](_stream);
                 }
             }
         };
