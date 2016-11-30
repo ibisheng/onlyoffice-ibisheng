@@ -300,7 +300,10 @@ CChangesDocumentRemoveItem.prototype.Load = function(Color)
 			oDocument.Content[Pos].Prev = null;
 		}
 
-		oDocument.SectionsInfo.Update_OnRemove(Pos, 1);
+		if(oDocument.SectionsInfo)
+		{
+            oDocument.SectionsInfo.Update_OnRemove(Pos, 1);
+		}
 		oDocument.private_ReindexContent(Pos);
 	}
 };
