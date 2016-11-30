@@ -249,7 +249,7 @@
 		"../common/FontsFreeType/TextMeasurer.js",
 		"../cell/model/DrawingObjects/Graphics.js",
         	"../common/Drawings/TextDrawer.js",
-		"../common/Scrolls/iscroll.js",
+		"../common/Scrolls/iscroll.js"
 	  ],
       "dst": "../cell",
       "externs": [
