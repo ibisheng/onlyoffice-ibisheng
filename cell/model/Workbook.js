@@ -3146,6 +3146,9 @@ Workbook.prototype.getTableNameColumnByIndex = function(tableName, columnIndex){
 		}
 	};
 	Workbook.prototype.sortDependency = function (setCellFormat) {
+		if (this.lockCounter > 0) {
+			return;
+		}
 		this.buildRecalc(true);
 
 		var i;

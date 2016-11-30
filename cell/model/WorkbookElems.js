@@ -5384,6 +5384,25 @@ CellArea.prototype = {
 	sparklineGroup.prototype.asc_getColorLow = function () {
 		return this.colorLow ? Asc.colorObjToAscColor(this.colorLow) : this.colorLow;
 	};
+	sparklineGroup.prototype.asc_getDataRanges = function () {
+		var oDataRange = new AscCommonExcel.SelectionRange();
+		var oLocationRange = new AscCommonExcel.SelectionRange();
+		//var bInit = false;
+		var arrResultData = [];
+		var arrResultLocation = [];
+		this.arrSparklines.forEach(function (item) {
+			/*if (bInit) {
+			} else {
+				bInit = true;
+				oDataRange.assign2(item.sqref);
+				oLocationRange.assign2();
+			}*/
+			arrResultData.push(item.sqref.getAbsName());
+			arrResultLocation.push(item.f);
+		});
+		return [arrResultData.join(AscCommon.FormulaSeparators.functionArgumentSeparator),
+			arrResultLocation.join(AscCommon.FormulaSeparators.functionArgumentSeparator)];
+	};
 	sparklineGroup.prototype.asc_setType = function (val) {
 		this.type = val;
 	};
@@ -5624,7 +5643,8 @@ CellArea.prototype = {
 		return res;
 	};
 	sparkline.prototype.setSqref = function (sqref) {
-		this.sqref = AscCommonExcel.g_oRangeCache.getAscRange(sqref);
+		this.sqref = AscCommonExcel.g_oRangeCache.getAscRange(sqref).clone();
+		this.sqref.setAbs(true, true, true. true);
 	};
 	sparkline.prototype.setF = function (f) {
 		this.f = f;
@@ -7839,7 +7859,8 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	prot["asc_getColorLast"]			= prot.asc_getColorLast;
 	prot["asc_getColorHigh"]			= prot.asc_getColorHigh;
 	prot["asc_getColorLow"]				= prot.asc_getColorLow;
-	prot["asc_setType"]						= prot.asc_setType;
+	prot["asc_getDataRanges"]			= prot.asc_getDataRanges;
+	prot["asc_setType"]					= prot.asc_setType;
 	prot["asc_setLineWeight"]			= prot.asc_setLineWeight;
 	prot["asc_setDisplayEmpty"]		= prot.asc_setDisplayEmpty;
 	prot["asc_setMarkersPoint"]		= prot.asc_setMarkersPoint;
