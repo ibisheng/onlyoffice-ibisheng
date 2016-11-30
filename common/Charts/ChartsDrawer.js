@@ -8531,170 +8531,86 @@ drawPieChart.prototype =
 		var numCache = this._getFirstRealNumCache();
 		var sumData = this.cChartDrawer._getSumArray(numCache, true);
 		
-		
 		var startAngle = this.cChartDrawer.processor3D.angleOy ? this.cChartDrawer.processor3D.angleOy : 0;
+		//startAngle = this.cChartSpace.chart.view3D && this.cChartSpace.chart.view3D.rotY ? (- this.cChartSpace.chart.view3D.rotY / 360) * (Math.PI * 2) : 0
 		startAngle = startAngle + Math.PI / 2;
 		var newStartAngle = startAngle;
+		
+		var tStartAngle = this.cChartSpace.chart.view3D && this.cChartSpace.chart.view3D.rotY ? (- this.cChartSpace.chart.view3D.rotY / 360) * (Math.PI * 2) : 0;
+		tStartAngle += Math.PI / 2;
 		
 		var widthCanvas = this.chartProp.widthCanvas;
 		var heightCanvas = this.chartProp.heightCanvas;
 		
 		var angles = [];
-		var x22, y22;
 		for (var i = numCache.length - 1; i >= 0; i--) 
 		{
 			var val = numCache[i].val;
 			var partOfSum = numCache[i].val / sumData;
 			var swapAngle = Math.abs((parseFloat(partOfSum)) * (Math.PI * 2));
 			
-			
-			var point1 = this.cChartDrawer._convertAndTurnPoint(center3D1.x + radius3D1 * Math.cos(startAngle), center3D1.y, center3D1.z + radius3D1 * Math.sin(startAngle));
-			var point2 = this.cChartDrawer._convertAndTurnPoint(center3D1.x + radius3D1 * Math.cos(startAngle + swapAngle), center3D1.y, center3D1.z + radius3D1 * Math.sin(startAngle + swapAngle));
-			
-			
-			if(x22 !== undefined)
-			{
-				x1 = x22;
-				y1 = y22;
-			}
-			else
-			{
-				var y1 = point1.y;
-				var x1 = Math.sqrt(Math.abs(Math.pow(radius1, 2)*(1 - (Math.pow(y1 - (yCenter), 2) / Math.pow(radius2, 2)))));
-				
-				if(newStartAngle <= 3*Math.PI/2)
-				{
-					x1 = xCenter - x1;
-				}
-				else
-				{
-					x1 = widthCanvas - (xCenter - x1)
-				}
-			}
-			
-			
-			var y2 = point2.y;
-			var x2 = Math.sqrt(Math.abs(Math.pow(radius1, 2)*(1 - (Math.pow(y2 - (yCenter), 2) / Math.pow(radius2, 2)))));
-			
-			if(newStartAngle + swapAngle <= 3*Math.PI/2)
-			{
-				x2 = xCenter - x2;
-			}
-			else
-			{
-				x2 = widthCanvas - (xCenter - x2)
-			}
-			
-			var a = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-			var b = Math.sqrt(Math.pow(xCenter - x1, 2) + Math.pow(yCenter - y1, 2));
-			var c = Math.sqrt(Math.pow(xCenter - x2, 2) + Math.pow(yCenter - y2, 2));
-			
-			//var newSwapAngle1 = Math.acos((Math.pow(a, 2) + Math.pow(b, 2) - Math.pow(c, 2)) / (2 * a * b));
-			//var newSwapAngle2 = Math.acos((Math.pow(a, 2) + Math.pow(c, 2) - Math.pow(b, 2)) / (2 * a * c));
-			var tempSwap = Math.acos((Math.pow(b, 2) + Math.pow(c, 2) - Math.pow(a, 2)) / (2 * b * c));
-			
-			
-			
-			
 			//рассчитываем угол
 			var tempSwapAngle = 0;
 			var tempStartAngle = startAngle;
-			var tempAngle3d;
-			var newSwapAngle3 = 0;
+			var newSwapAngle = 0;
 			while(true)
 			{
 				if(tempStartAngle + Math.PI / 2 < startAngle + swapAngle)
 				{
 					tempSwapAngle = Math.PI / 2;
-					
-					var point1 = this.cChartDrawer._convertAndTurnPoint(center3D1.x + radius3D1 * Math.cos(tempStartAngle), center3D1.y, center3D1.z + radius3D1 * Math.sin(tempStartAngle));
-					var point2 = this.cChartDrawer._convertAndTurnPoint(center3D1.x + radius3D1 * Math.cos(tempStartAngle + tempSwapAngle), center3D1.y, center3D1.z + radius3D1 * Math.sin(tempStartAngle + tempSwapAngle));
-					
-					
-					var y11 = point1.y;
-					var x11 = Math.sqrt(Math.abs(Math.pow(radius1, 2)*(1 - (Math.pow(y11 - (yCenter), 2) / Math.pow(radius2, 2)))));
-					
-					if(newStartAngle <= 3*Math.PI/2)
-					{
-						x11 = xCenter - x11;
-					}
-					else
-					{
-						x11 = widthCanvas - (xCenter - x11)
-					}
-					
-					y22 = point2.y;
-					x22 = Math.sqrt(Math.abs(Math.pow(radius1, 2)*(1 - (Math.pow(y22 - (yCenter), 2) / Math.pow(radius2, 2)))));
-					
-					if(tempStartAngle + tempSwapAngle <= 3*Math.PI/2)
-					{
-						x22 = xCenter - x22;
-					}
-					else
-					{
-						x22 = widthCanvas - (xCenter - x22)
-					}
-					
-					var a = Math.sqrt(Math.pow(x22 - x11, 2) + Math.pow(y22 - y11, 2));
-					var b = Math.sqrt(Math.pow(xCenter - x11, 2) + Math.pow(yCenter - y11, 2));
-					var c = Math.sqrt(Math.pow(xCenter - x22, 2) + Math.pow(yCenter - y22, 2));
-					
-					//var newSwapAngle1 = Math.acos((Math.pow(a, 2) + Math.pow(b, 2) - Math.pow(c, 2)) / (2 * a * b));
-					//var newSwapAngle2 = Math.acos((Math.pow(a, 2) + Math.pow(c, 2) - Math.pow(b, 2)) / (2 * a * c));
-					tempStartAngle += Math.PI / 2;
-					newSwapAngle3 += Math.acos((Math.pow(b, 2) + Math.pow(c, 2) - Math.pow(a, 2)) / (2 * b * c));
-					
-					
 				}
 				else
 				{
 					tempSwapAngle = (startAngle + swapAngle) - tempStartAngle;
-					
-					var point1 = this.cChartDrawer._convertAndTurnPoint(center3D1.x + radius3D1 * Math.cos(tempStartAngle), center3D1.y, center3D1.z + radius3D1 * Math.sin(tempStartAngle));
-					var point2 = this.cChartDrawer._convertAndTurnPoint(center3D1.x + radius3D1 * Math.cos(tempStartAngle + tempSwapAngle), center3D1.y, center3D1.z + radius3D1 * Math.sin(tempStartAngle + tempSwapAngle));
-					
-					
-					var y11 = point1.y;
-					var x11 = Math.sqrt(Math.abs(Math.pow(radius1, 2)*(1 - (Math.pow(y11 - (yCenter), 2) / Math.pow(radius2, 2)))));
-					
-					if(tempStartAngle <= 3*Math.PI/2)
-					{
-						x11 = xCenter - x11;
-					}
-					else
-					{
-						x11 = widthCanvas - (xCenter - x11)
-					}
-					
-					y22 = point2.y;
-					x22 = Math.sqrt(Math.abs(Math.pow(radius1, 2)*(1 - (Math.pow(y22 - (yCenter), 2) / Math.pow(radius2, 2)))));
-					
-					if(tempStartAngle + tempSwapAngle <= 3*Math.PI/2)
-					{
-						x22 = xCenter - x22;
-					}
-					else
-					{
-						x22 = widthCanvas - (xCenter - x22)
-					}
-					
-					var a = Math.sqrt(Math.pow(x22 - x11, 2) + Math.pow(y22 - y11, 2));
-					var b = Math.sqrt(Math.pow(xCenter - x11, 2) + Math.pow(yCenter - y11, 2));
-					var c = Math.sqrt(Math.pow(xCenter - x22, 2) + Math.pow(yCenter - y22, 2));
-					
-					//var newSwapAngle1 = Math.acos((Math.pow(a, 2) + Math.pow(b, 2) - Math.pow(c, 2)) / (2 * a * b));
-					//var newSwapAngle2 = Math.acos((Math.pow(a, 2) + Math.pow(c, 2) - Math.pow(b, 2)) / (2 * a * c));
-					newSwapAngle3 += Math.acos((Math.pow(b, 2) + Math.pow(c, 2) - Math.pow(a, 2)) / (2 * b * c));
-
-					
-					angles.push({start: newStartAngle, swap: newSwapAngle3, end: newStartAngle + newSwapAngle3});
+				}
+				
+				var point1 = this.cChartDrawer._convertAndTurnPoint(center3D1.x + radius3D1 * Math.cos(tempStartAngle), center3D1.y, center3D1.z + radius3D1 * Math.sin(tempStartAngle));
+				var point2 = this.cChartDrawer._convertAndTurnPoint(center3D1.x + radius3D1 * Math.cos(tempStartAngle + tempSwapAngle), center3D1.y, center3D1.z + radius3D1 * Math.sin(tempStartAngle + tempSwapAngle));
+				
+				var y11 = point1.y;
+				var x11 = Math.sqrt(Math.abs(Math.pow(radius1, 2)*(1 - (Math.pow(y11 - (yCenter), 2) / Math.pow(radius2, 2)))));
+				
+				if(tempStartAngle <= 3*Math.PI/2)
+				{
+					x11 = xCenter - x11;
+				}
+				else
+				{
+					x11 = widthCanvas - (xCenter - x11)
+				}
+				
+				var y22 = point2.y;
+				var x22 = Math.sqrt(Math.abs(Math.pow(radius1, 2)*(1 - (Math.pow(y22 - (yCenter), 2) / Math.pow(radius2, 2)))));
+				
+				if(tempStartAngle + tempSwapAngle <= 3*Math.PI/2)
+				{
+					x22 = xCenter - x22;
+				}
+				else
+				{
+					x22 = widthCanvas - (xCenter - x22)
+				}
+				
+				var a = Math.sqrt(Math.pow(x22 - x11, 2) + Math.pow(y22 - y11, 2));
+				var b = Math.sqrt(Math.pow(xCenter - x11, 2) + Math.pow(yCenter - y11, 2));
+				var c = Math.sqrt(Math.pow(xCenter - x22, 2) + Math.pow(yCenter - y22, 2));
+				
+				newSwapAngle += Math.acos((Math.pow(b, 2) + Math.pow(c, 2) - Math.pow(a, 2)) / (2 * b * c));
+				
+				if(tempStartAngle + Math.PI / 2 < startAngle + swapAngle)
+				{					
+					tempStartAngle += Math.PI / 2;
+				}
+				else
+				{
+					angles.push({start: newStartAngle, swap: newSwapAngle, end: newStartAngle + newSwapAngle});
 					
 					break;
 				}
 			}
 			
 			startAngle += swapAngle;
-			newStartAngle += newSwapAngle3;
+			newStartAngle += newSwapAngle;
         }
 		
 		return angles;
