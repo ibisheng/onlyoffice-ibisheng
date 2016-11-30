@@ -842,6 +842,7 @@
 		this.LogicDocument   = null;
 		this.DrawingDocument = null;
 		this.HtmlPage        = null;
+		this.Api 			 = null;
 
 		this.Mode = 0;
 		this.IsTouching		= false;
@@ -892,17 +893,62 @@
 		this.ContextMenuLastModeCounter = 0;
 		this.ContextMenuShowTimerId = -1;
 
+		this.CreateScrollerDiv = function(_wrapper, _id)
+		{
+			var _scroller = document.createElement('div');
+			var _style = "position: absolute; z-index: 0; margin: 0; padding: 0; -webkit-tap-highlight-color: rgba(0,0,0,0); width: 100%; heigth: 100%; display: block;";
+			_style += "-webkit-transform: translateZ(0); -moz-transform: translateZ(0); -ms-transform: translateZ(0); -o-transform: translateZ(0); transform: translateZ(0);";
+			_style += "-webkit-touch-callout: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;";
+			_style += "-webkit-text-size-adjust: none; -moz-text-size-adjust: none; -ms-text-size-adjust: none; -o-text-size-adjust: none; text-size-adjust: none;";
+			_scroller.style = _style;
+
+			_scroller.id = _id;
+			_wrapper.appendChild(_scroller);
+		};
+
 		this.Init = function(ctrl)
 		{
 			this.HtmlPage        = ctrl;
 			this.LogicDocument   = ctrl.m_oLogicDocument;
 			this.DrawingDocument = ctrl.m_oDrawingDocument;
+			this.Api			 = this.HtmlPage.m_oApi;
 
-			this.iScroll = new AscCommon.CTouchScroll(ctrl, {
-				onAnimationEnd : function(param)
+			this.CreateScrollerDiv(this.HtmlPage.m_oMainView.HtmlElement, "mobile_scroller_id");
+
+			this.iScroll = new window.IScroll(this.HtmlPage.m_oMainView.HtmlElement, {
+				scrollbars: true,
+				mouseWheel: true,
+				interactiveScrollbars: true,
+				shrinkScrollbars: 'scale',
+				fadeScrollbars: true,
+				scrollX : true,
+				scroller_id : "mobile_scroller_id",
+				bounce : false
+			});
+			this.iScroll.manager = this;
+
+			this.iScroll.on('scroll', function()
+			{
+				this.manager.HtmlPage.NoneRepaintPages = (true === this.isAnimating) ? true : false;
+				if (this.directionLocked == "v")
 				{
-					param.api.MobileTouchManager.OnScrollAnimationEnd();
+					this.manager.HtmlPage.m_oScrollVerApi.scrollToY(-this.y);
 				}
+				else if (this.directionLocked == "h")
+				{
+					this.manager.HtmlPage.m_oScrollHorApi.scrollToX(-this.x);
+				}
+				else if (this.directionLocked == "n")
+				{
+					this.manager.HtmlPage.m_oScrollHorApi.scrollToX(-this.x);
+					this.manager.HtmlPage.m_oScrollVerApi.scrollToY(-this.y);
+				}
+			});
+			this.iScroll.on('scrollEnd', function()
+			{
+				this.manager.HtmlPage.NoneRepaintPages = (true === this.isAnimating) ? true : false;
+				this.manager.OnScrollAnimationEnd();
+				this.manager.HtmlPage.OnScroll();
 			});
 
 			LoadMobileImages();
@@ -931,7 +977,7 @@
 			if (this.IsTouching)
 				return true;
 
-			if (this.iScroll && this.iScroll.animating)
+			if (this.iScroll && this.iScroll.isAnimating)
 				return true;
 
 			return false;
@@ -1798,9 +1844,6 @@
 					break;
 			}
 
-			this.iScroll._scrollbar('h');
-			this.iScroll._scrollbar('v');
-
 			if (this.HtmlPage.m_oApi.isViewMode)
 			{
 				if (e.preventDefault)
@@ -1810,7 +1853,7 @@
 				return false;
 			}
 
-			if (!this.iScroll.animating)
+			if (true !== this.iScroll.isAnimating)
 				this.CheckContextMenuTouchEnd(isCheckContextMenuMode);
 		};
 
@@ -1974,9 +2017,6 @@
 					break;
 			}
 
-			this.iScroll._scrollbar('h');
-			this.iScroll._scrollbar('v');
-
 			if (e.preventDefault)
 				e.preventDefault();
 			else
@@ -2024,7 +2064,12 @@
 		this.Resize = function()
 		{
 			if (this.iScroll != null)
+			{
+				this.iScroll.scroller.style.width = this.HtmlPage.m_dDocumentWidth + "px";
+				this.iScroll.scroller.style.height = this.HtmlPage.m_dDocumentHeight + "px";
+
 				this.iScroll.refresh(true);
+			}
 		};
 
 		this.SendShowContextMenu = function()
@@ -2627,6 +2672,15 @@
 				}
 			}
 		};
+
+		this.Destroy = function()
+		{
+			var _scroller = document.getElementById("mobile_scroller_id");
+			this.HtmlPage.m_oMainView.HtmlElement.removeChild(_scroller);
+
+			if (this.iScroll != null)
+				this.iScroll.destroy();
+		};
 	}
 
 	function CReaderTouchManager()
@@ -2643,23 +2697,34 @@
 			this.LogicDocument   = ctrl.m_oLogicDocument;
 			this.DrawingDocument = ctrl.m_oDrawingDocument;
 
-			this.iScroll = new AscCommon.CTouchScroll(ctrl, {bounce : true}, this.HtmlPage.ReaderModeDiv);
+			this.iScroll = new window.IScroll(this.HtmlPage.m_oMainView.HtmlElement, {
+				scrollbars: true,
+				mouseWheel: true,
+				interactiveScrollbars: true,
+				shrinkScrollbars: 'scale',
+				fadeScrollbars: true,
+				scrollX : true,
+				scroller_id : "reader_id",
+				bounce : false
+			});
+			this.iScroll.manager = this;
+
 			this.HtmlPage.m_oApi.sendEvent("asc_onHidePopMenu");
-		}
+		};
 
 		this.onTouchStart = function(e)
 		{
 			this.iScroll._start(e);
 			this.bIsLock          = true;
 			this.bIsMoveAfterDown = false;
-		}
+		};
 		this.onTouchMove  = function(e)
 		{
 			if (!this.bIsLock)
 				return;
 			this.iScroll._move(e);
 			this.bIsMoveAfterDown = true;
-		}
+		};
 		this.onTouchEnd   = function(e)
 		{
 			this.iScroll._end(e);
@@ -2669,7 +2734,7 @@
 			{
 				this.HtmlPage.m_oApi.sendEvent("asc_onTapEvent", e);
 			}
-		}
+		};
 
 		this.Resize = function()
 		{
@@ -2677,27 +2742,20 @@
 			this.HtmlPage.ReaderModeDivWrapper.style.height = this.HtmlPage.m_oMainView.HtmlElement.style.height;
 
 			if (this.iScroll != null)
-			{
 				this.iScroll.refresh();
-				this.iScroll._pos(this.iScroll.x, this.iScroll.y, false);
-			}
-		}
+		};
 
 		this.ChangeFontSize = function()
 		{
 			if (this.iScroll != null)
-			{
-				//this.ReaderTouchManager.iScroll._changeMaxes();
 				this.iScroll.refresh();
-				this.iScroll._pos(this.iScroll.x, this.iScroll.y, false);
-			}
-		}
+		};
 
 		this.Destroy = function()
 		{
 			if (this.iScroll != null)
 				this.iScroll.destroy();
-		}
+		};
 	}
 
 	function LoadMobileImages()
