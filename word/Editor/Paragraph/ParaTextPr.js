@@ -421,7 +421,7 @@ ParaTextPr.prototype.Set_RFonts_EastAsia = function(Value)
 };
 ParaTextPr.prototype.Set_RFonts_Hint = function(Value)
 {
-	History.Add(new CChangesParaTextPrRFontsHint(this, this.Value.RFonts, Hint, Value));
+	History.Add(new CChangesParaTextPrRFontsHint(this, this.Value.RFonts.Hint, Value));
 	this.Value.RFonts.Hint = Value;
 };
 ParaTextPr.prototype.Set_Lang = function(Value)
