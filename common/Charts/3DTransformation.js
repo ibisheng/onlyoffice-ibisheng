@@ -90,11 +90,10 @@ function Processor3D(width, height, left, right, bottom, top, chartSpace, charts
 	this.angleOy = this.view3D && this.view3D.rotY ? (- this.view3D.rotY / 360) * (Math.PI * 2) : 0;
 	this.angleOz = this.view3D && this.view3D.rotZ ? (- this.view3D.rotZ / 360) * (Math.PI * 2) : 0;
 	
-	/*if(this.view3D.rAngAx && this.view3D.rotX < 0)
+	if(!this.view3D.rAngAx && AscFormat.c_oChartTypes.Pie === this.chartsDrawer.calcProp.type)
 	{	
-		this.angleOx = - this.angleOx;
-		this.angleOy = - this.angleOy;
-	}*/
+		this.angleOy = 0;
+	}
 	
 	this.orientationCatAx = null;
 	this.orientationValAx = null;

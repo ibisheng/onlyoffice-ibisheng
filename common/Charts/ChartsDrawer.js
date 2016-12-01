@@ -8532,8 +8532,8 @@ drawPieChart.prototype =
 		var sumData = this.cChartDrawer._getSumArray(numCache, true);
 		
 		var startAngle = this.cChartDrawer.processor3D.angleOy ? this.cChartDrawer.processor3D.angleOy : 0;
-		//startAngle = this.cChartSpace.chart.view3D && this.cChartSpace.chart.view3D.rotY ? (- this.cChartSpace.chart.view3D.rotY / 360) * (Math.PI * 2) : 0
-		startAngle = startAngle + Math.PI / 2;
+		startAngle = this.cChartSpace.chart.view3D && this.cChartSpace.chart.view3D.rotY ? (- this.cChartSpace.chart.view3D.rotY / 360) * (Math.PI * 2) : 0
+		startAngle += Math.PI / 2;
 		var newStartAngle = startAngle;
 		
 		var tStartAngle = this.cChartSpace.chart.view3D && this.cChartSpace.chart.view3D.rotY ? (- this.cChartSpace.chart.view3D.rotY / 360) * (Math.PI * 2) : 0;
@@ -8570,7 +8570,7 @@ drawPieChart.prototype =
 				var y11 = point1.y;
 				var x11 = Math.sqrt(Math.abs(Math.pow(radius1, 2)*(1 - (Math.pow(y11 - (yCenter), 2) / Math.pow(radius2, 2)))));
 				
-				if(tempStartAngle <= 3*Math.PI/2)
+				if((tempStartAngle <= 3*Math.PI/2 && tempStartAngle >= Math.PI/2) || (tempStartAngle >= -3*Math.PI/2 && tempStartAngle <= -Math.PI/2))
 				{
 					x11 = xCenter - x11;
 				}
@@ -8582,7 +8582,7 @@ drawPieChart.prototype =
 				var y22 = point2.y;
 				var x22 = Math.sqrt(Math.abs(Math.pow(radius1, 2)*(1 - (Math.pow(y22 - (yCenter), 2) / Math.pow(radius2, 2)))));
 				
-				if(tempStartAngle + tempSwapAngle <= 3*Math.PI/2)
+				if((tempStartAngle + tempSwapAngle <= 3*Math.PI/2 && tempStartAngle + tempSwapAngle >= Math.PI/2) || (tempStartAngle + tempSwapAngle >= -3*Math.PI/2 && tempStartAngle + tempSwapAngle <= -Math.PI/2))
 				{
 					x22 = xCenter - x22;
 				}
