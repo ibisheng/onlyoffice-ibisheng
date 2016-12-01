@@ -3604,7 +3604,17 @@ Woorksheet.prototype.clone=function(sNewId, sName, tableNames){
 				this.sheetViews[j].pane = null;
 			}
 		}
-
+		
+		if (this.TableParts && this.TableParts.length) {
+			var tableParts = this.TableParts;
+			if (tableParts) {
+				for (var i = 0; i < tableParts.length; i++) {
+					//TODO пока заменяем при открытии на TotalsRowFormula
+					tableParts[i].checkTotalRowFormula();
+				}
+			}
+		}
+		
 		this._updateConditionalFormatting(null);
 
 		this.handlers = handlers;

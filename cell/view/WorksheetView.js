@@ -11897,8 +11897,6 @@
             if (tableParts) {
                 for (var i = 0; i < tableParts.length; i++) {
                     this.model.autoFilters._setColorStyleTable(tableParts[i].Ref, tableParts[i]);
-                    //TODO пока заменяем при открытии на TotalsRowFormula
-                    tableParts[i].checkTotalRowFormula();
                 }
             }
 
