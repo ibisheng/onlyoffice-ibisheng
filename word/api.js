@@ -4140,7 +4140,14 @@ background-repeat: no-repeat;\
 	{
 		if (obj)
 		{
-			this.Color = (undefined != obj.Color && null != obj.Color) ? AscCommon.CreateAscColorCustom(obj.Color.r, obj.Color.g, obj.Color.b) : null;
+            if (obj.Unifill && obj.Unifill.fill && obj.Unifill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_SOLID && obj.Unifill.fill.color)
+            {
+                this.Color = AscCommon.CreateAscColor(obj.Unifill.fill.color);
+            }
+            else
+            {
+                this.Color = (undefined != obj.Color && null != obj.Color) ? AscCommon.CreateAscColorCustom(obj.Color.r, obj.Color.g, obj.Color.b) : null;
+            }
 			this.Value = (undefined != obj.Value) ? obj.Value : null;
 		}
 		else
