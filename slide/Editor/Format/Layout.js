@@ -518,7 +518,7 @@ SlideLayout.prototype =
         var _shape_count = _shapes.length;
         for(_shape_index = 0; _shape_index < _shape_count; ++_shape_index)
         {
-            if(_shapes[_shape_index].isPlaceholder())
+            if(_shapes[_shape_index].isPlaceholder && _shapes[_shape_index].isPlaceholder())
                 _shapes[_shape_index].recalculate();
         }
     },
@@ -891,12 +891,7 @@ function CLayoutThumbnailDrawer()
         for (var i = 0; i < _layout.cSld.spTree.length; i++)
         {
             var _sp_elem = _layout.cSld.spTree[i];
-            /*if (!_sp_elem.isPlaceholder())
-            {
-                if (use_layout_shapes !== false)
-                    _sp_elem.draw(g);
-            }
-            else*/
+            if(_sp_elem.isPlaceholder && _sp_elem.isPlaceholder())
             {
                 var _ph_type = _sp_elem.getPlaceholderType();
                 var _usePH = true;
