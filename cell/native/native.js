@@ -5175,8 +5175,7 @@ function OfflineEditor () {
         // chat styles
         AscCommon.ChartPreviewManager.prototype.clearPreviews = function() {window["native"]["ClearCacheChartStyles"]();};
         AscCommon.ChartPreviewManager.prototype.createChartPreview = function(_graphics, type, styleIndex) {
-             return AscFormat.ExecuteNoHistory(function(){
-          chart_space.recalculatePenBrush();
+            return AscFormat.ExecuteNoHistory(function(){
             
             if(!this.chartsByTypes[type])
                 this.chartsByTypes[type] = this.getChartByType(type);
