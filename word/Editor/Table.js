@@ -10558,13 +10558,13 @@ CTable.prototype =
             }
         }
 
+		this.Selection_Remove();
+
         // Удаляем строки.
         for ( var Index = Rows_to_delete.length - 1; Index >= 0; Index-- )
         {
             this.Internal_Remove_Row( Rows_to_delete[Index] );
         }
-
-        this.Selection_Remove();
 
         // Возвращаем курсор
         this.DrawingDocument.TargetStart();
