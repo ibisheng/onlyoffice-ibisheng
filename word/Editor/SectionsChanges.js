@@ -70,6 +70,43 @@ AscDFH.changesFactory[AscDFH.historyitem_Section_Footnote_NumStart]   = CChanges
 AscDFH.changesFactory[AscDFH.historyitem_Section_Footnote_NumRestart] = CChangesSectionFootnoteNumRestart;
 AscDFH.changesFactory[AscDFH.historyitem_Section_Footnote_NumFormat]  = CChangesSectionFootnoteNumFormat;
 
+//----------------------------------------------------------------------------------------------------------------------
+// Карта зависимости изменений
+//----------------------------------------------------------------------------------------------------------------------
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_PageSize_Orient]     = [AscDFH.historyitem_Section_PageSize_Orient];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_PageSize_Size]       = [AscDFH.historyitem_Section_PageSize_Size];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_PageMargins]         = [AscDFH.historyitem_Section_PageMargins];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Type]                = [AscDFH.historyitem_Section_Type];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Borders_Left]        = [AscDFH.historyitem_Section_Borders_Left];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Borders_Top]         = [AscDFH.historyitem_Section_Borders_Top];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Borders_Right]       = [AscDFH.historyitem_Section_Borders_Right];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Borders_Bottom]      = [AscDFH.historyitem_Section_Borders_Bottom];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Borders_Display]     = [AscDFH.historyitem_Section_Borders_Display];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Borders_OffsetFrom]  = [AscDFH.historyitem_Section_Borders_OffsetFrom];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Borders_ZOrder]      = [AscDFH.historyitem_Section_Borders_ZOrder];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Header_First]        = [AscDFH.historyitem_Section_Header_First];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Header_Even]         = [AscDFH.historyitem_Section_Header_Even];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Header_Default]      = [AscDFH.historyitem_Section_Header_Default];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Footer_First]        = [AscDFH.historyitem_Section_Footer_First];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Footer_Even]         = [AscDFH.historyitem_Section_Footer_Even];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Footer_Default]      = [AscDFH.historyitem_Section_Footer_Default];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_TitlePage]           = [AscDFH.historyitem_Section_TitlePage];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_PageMargins_Header]  = [AscDFH.historyitem_Section_PageMargins_Header];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_PageMargins_Footer]  = [AscDFH.historyitem_Section_PageMargins_Footer];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_PageNumType_Start]   = [AscDFH.historyitem_Section_PageNumType_Start];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Columns_EqualWidth]  = [AscDFH.historyitem_Section_Columns_EqualWidth];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Columns_Space]       = [AscDFH.historyitem_Section_Columns_Space];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Columns_Num]         = [AscDFH.historyitem_Section_Columns_Num];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Columns_Sep]         = [AscDFH.historyitem_Section_Columns_Sep];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Columns_Col]         = [AscDFH.historyitem_Section_Columns_Col, AscDFH.historyitem_Section_Columns_SetCols];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Columns_SetCols]     = [AscDFH.historyitem_Section_Columns_Col, AscDFH.historyitem_Section_Columns_SetCols];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Footnote_Pos]        = [AscDFH.historyitem_Section_Footnote_Pos];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Footnote_NumStart]   = [AscDFH.historyitem_Section_Footnote_NumStart];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Footnote_NumRestart] = [AscDFH.historyitem_Section_Footnote_NumRestart];
+AscDFH.changesRelationMap[AscDFH.historyitem_Section_Footnote_NumFormat]  = [AscDFH.historyitem_Section_Footnote_NumFormat];
+//----------------------------------------------------------------------------------------------------------------------
+
+
 
 /**
  * Базовый класс для изменения колонтитулов
@@ -646,6 +683,25 @@ CChangesSectionColumnsCol.prototype.CreateReverseChange = function()
 {
 	return new CChangesSectionColumnsCol(this.Class, this.New, this.Old, this.Index);
 };
+CChangesSectionColumnsCol.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type)
+	{
+		if (this.Index !== oChange.Index)
+			return true;
+		else
+			return false;
+	}
+	else if (AscDFH.historyitem_Section_Columns_SetCols === oChange.Type)
+	{
+		return false
+	}
+
+	return true;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseProperty}
@@ -704,6 +760,24 @@ CChangesSectionColumnsSetCols.prototype.ReadFromBinary = function(Reader)
 		this.Old[nIndex] = new CSectionColumn();
 		this.Old[nIndex].Read_FromBinary(Reader);
 	}
+};
+CChangesSectionColumnsSetCols.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type)
+		return false;
+
+	if (AscDFH.historyitem_Section_Columns_Col === oChange.Type)
+	{
+		if (!this.New)
+			this.New = [];
+
+		this.New[oChange.Index] = oChange.New;
+	}
+
+	return true;
 };
 /**
  * @constructor
