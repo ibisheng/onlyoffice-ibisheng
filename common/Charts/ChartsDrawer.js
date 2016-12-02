@@ -8457,21 +8457,6 @@ drawPieChart.prototype =
 		var kF2 = radius11 / radius21;
 		var kF3 = radius11 / radius22;
 		
-		/*if(radius11 < width / 2)
-		{
-			radius11 = width / 2;
-			radius12 = radius11 / kF1;
-			
-			radius21 = radius11 / kF2;
-			radius22 = radius11 / kF3;
-			
-		}*/
-		
-		
-		
-		
-		//var radius11 = pointCenter1.x - (point6.x + point2.x) / 2;
-		
 		
 		var depth = point2.y - point1.y;
 		
@@ -8483,13 +8468,6 @@ drawPieChart.prototype =
 		
 		var center1 = {x: this.chartProp.chartGutter._left + trueWidth/2, y: Math.abs(point6.y - point2.y) / 2 + point6.y};
 		var center2 = {x: this.chartProp.chartGutter._left + trueWidth/2, y: Math.abs(point5.y - point1.y) / 2 + point5.y};
-		
-		
-		/*var x = test22.x - center1.x;
-		var y = pointCenter1.y - center1.y;
-		var b = radius12;
-		
-		var radius11 = Math.sqrt(Math.abs(Math.pow(x, 2) / (1 - (Math.pow(y, 2) / Math.pow(b, 2)))));*/
 		
 		var angles1 = this._calculateAngles3D(center1.x, center1.y, radius11, radius12, radius3D1, center3D1);
 		var angles2 = this._calculateAngles3D(center2.x, center2.y, radius21, radius22, radius3D2, center3D2);
@@ -8528,31 +8506,57 @@ drawPieChart.prototype =
 	
 	_calculateAngles3D: function(xCenter, yCenter, radius1, radius2, radius3D1, center3D1)
 	{
+		var t = this;
+		var widthCanvas = this.chartProp.widthCanvas;
+		var heightCanvas = this.chartProp.heightCanvas;
+		
 		var numCache = this._getFirstRealNumCache();
 		var sumData = this.cChartDrawer._getSumArray(numCache, true);
 		
-		var startAngle = this.cChartDrawer.processor3D.angleOy ? this.cChartDrawer.processor3D.angleOy : 0;
-		startAngle = this.cChartSpace.chart.view3D && this.cChartSpace.chart.view3D.rotY ? (- this.cChartSpace.chart.view3D.rotY / 360) * (Math.PI * 2) : 0
+		var startAngle = this.cChartSpace.chart.view3D && this.cChartSpace.chart.view3D.rotY ? (- this.cChartSpace.chart.view3D.rotY / 360) * (Math.PI * 2) : 0
 		startAngle += Math.PI / 2;
 		var newStartAngle = startAngle;
 		
-		var tStartAngle = this.cChartSpace.chart.view3D && this.cChartSpace.chart.view3D.rotY ? (- this.cChartSpace.chart.view3D.rotY / 360) * (Math.PI * 2) : 0;
-		tStartAngle += Math.PI / 2;
+		var getAngleByCoordsSidesTriangle = function(aC, bC, cC)
+		{
+			var res;
+			
+			var a = Math.sqrt(Math.pow(aC.x, 2) + Math.pow(aC.y, 2));
+			var b = Math.sqrt(Math.pow(bC.x, 2) + Math.pow(bC.y, 2));
+			var c = Math.sqrt(Math.pow(cC.x, 2) + Math.pow(cC.y, 2));
+			res = Math.acos((Math.pow(b, 2) + Math.pow(c, 2) - Math.pow(a, 2)) / (2 * b * c));
+			
+			return res;
+		};
 		
-		var widthCanvas = this.chartProp.widthCanvas;
-		var heightCanvas = this.chartProp.heightCanvas;
+		var getPointsByAngle = function(angle)
+		{
+			var point1 = t.cChartDrawer._convertAndTurnPoint(center3D1.x + radius3D1 * Math.cos(angle), center3D1.y, center3D1.z + radius3D1 * Math.sin(angle));
+			
+			var y11 = point1.y;
+			var x11 = Math.sqrt(Math.abs(Math.pow(radius1, 2)*(1 - (Math.pow(y11 - (yCenter), 2) / Math.pow(radius2, 2)))));
+			
+			var x111;
+			if((angle <= 3*Math.PI/2 && angle >= Math.PI/2) || (angle >= -3*Math.PI/2 && angle <= -Math.PI/2))
+			{
+				x111 = xCenter - x11;
+			}
+			else
+			{
+				x111 = widthCanvas - (xCenter - x11)
+			}
+			
+			return {x: x111, y: y11};
+		};
 		
 		var angles = [];
 		for (var i = numCache.length - 1; i >= 0; i--) 
 		{
-			var val = numCache[i].val;
+			//рассчитываем угол
 			var partOfSum = numCache[i].val / sumData;
 			var swapAngle = Math.abs((parseFloat(partOfSum)) * (Math.PI * 2));
 			
-			//рассчитываем угол
-			var tempSwapAngle = 0;
-			var tempStartAngle = startAngle;
-			var newSwapAngle = 0;
+			var tempSwapAngle = 0, newSwapAngle = 0, tempStartAngle = startAngle;
 			while(true)
 			{
 				if(tempStartAngle + Math.PI / 2 < startAngle + swapAngle)
@@ -8564,38 +8568,10 @@ drawPieChart.prototype =
 					tempSwapAngle = (startAngle + swapAngle) - tempStartAngle;
 				}
 				
-				var point1 = this.cChartDrawer._convertAndTurnPoint(center3D1.x + radius3D1 * Math.cos(tempStartAngle), center3D1.y, center3D1.z + radius3D1 * Math.sin(tempStartAngle));
-				var point2 = this.cChartDrawer._convertAndTurnPoint(center3D1.x + radius3D1 * Math.cos(tempStartAngle + tempSwapAngle), center3D1.y, center3D1.z + radius3D1 * Math.sin(tempStartAngle + tempSwapAngle));
+				var p1 = getPointsByAngle(tempStartAngle);
+				var p2 = getPointsByAngle(tempStartAngle + tempSwapAngle);
+				newSwapAngle += getAngleByCoordsSidesTriangle({x: p2.x - p1.x, y: p2.y - p1.y}, {x: xCenter - p1.x, y: yCenter - p1.y}, {x: xCenter - p2.x, y: yCenter - p2.y});
 				
-				var y11 = point1.y;
-				var x11 = Math.sqrt(Math.abs(Math.pow(radius1, 2)*(1 - (Math.pow(y11 - (yCenter), 2) / Math.pow(radius2, 2)))));
-				
-				if((tempStartAngle <= 3*Math.PI/2 && tempStartAngle >= Math.PI/2) || (tempStartAngle >= -3*Math.PI/2 && tempStartAngle <= -Math.PI/2))
-				{
-					x11 = xCenter - x11;
-				}
-				else
-				{
-					x11 = widthCanvas - (xCenter - x11)
-				}
-				
-				var y22 = point2.y;
-				var x22 = Math.sqrt(Math.abs(Math.pow(radius1, 2)*(1 - (Math.pow(y22 - (yCenter), 2) / Math.pow(radius2, 2)))));
-				
-				if((tempStartAngle + tempSwapAngle <= 3*Math.PI/2 && tempStartAngle + tempSwapAngle >= Math.PI/2) || (tempStartAngle + tempSwapAngle >= -3*Math.PI/2 && tempStartAngle + tempSwapAngle <= -Math.PI/2))
-				{
-					x22 = xCenter - x22;
-				}
-				else
-				{
-					x22 = widthCanvas - (xCenter - x22)
-				}
-				
-				var a = Math.sqrt(Math.pow(x22 - x11, 2) + Math.pow(y22 - y11, 2));
-				var b = Math.sqrt(Math.pow(xCenter - x11, 2) + Math.pow(yCenter - y11, 2));
-				var c = Math.sqrt(Math.pow(xCenter - x22, 2) + Math.pow(yCenter - y22, 2));
-				
-				newSwapAngle += Math.acos((Math.pow(b, 2) + Math.pow(c, 2) - Math.pow(a, 2)) / (2 * b * c));
 				
 				if(tempStartAngle + Math.PI / 2 < startAngle + swapAngle)
 				{					
@@ -8604,7 +8580,6 @@ drawPieChart.prototype =
 				else
 				{
 					angles.push({start: newStartAngle, swap: newSwapAngle, end: newStartAngle + newSwapAngle});
-					
 					break;
 				}
 			}
