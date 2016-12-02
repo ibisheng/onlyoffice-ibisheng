@@ -4174,7 +4174,13 @@ PasteProcessor.prototype =
 			if(style_index != null && arr_shapes[i].Drawing.graphicObject && arr_shapes[i].Drawing.graphicObject.Set_TableStyle)
 			{
 				if(!PasteElementsId.g_bIsDocumentCopyPaste)
-					arr_shapes[i].Drawing.graphicObject.Set_TableStyle(style_index, true);
+				{
+					//TODO продумать добавления нового стиля(ReadTableStyle->получуть id нового стиля, сравнить новый стиль со всеми присутвующими.если нет - добавить и сделать Set_TableStyle(id))
+					if(presentation.TableStylesIdMap[style_index])
+					{
+						arr_shapes[i].Drawing.graphicObject.Set_TableStyle(style_index, true);
+					}
+				}	
 				else if(cStyle)
 				{
 					//пока не применяем стили, посольку они отличаются
