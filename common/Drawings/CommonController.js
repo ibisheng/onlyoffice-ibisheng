@@ -8237,7 +8237,7 @@ DrawingObjectsController.prototype =
         {
             this.selection.groupSelection.bringToFront();
         }
-
+        this.drawingObjects.showDrawingObjects(true);
     },
 
     bringForward : function()
@@ -8284,7 +8284,7 @@ DrawingObjectsController.prototype =
         {
             this.selection.groupSelection.sendToBack();
         }
-
+        this.drawingObjects.showDrawingObjects(true);
     },
 
 
@@ -8307,6 +8307,7 @@ DrawingObjectsController.prototype =
         {
             this.selection.groupSelection.bringBackward();
         }
+        this.drawingObjects.showDrawingObjects(true);
     }
 };
 

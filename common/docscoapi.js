@@ -632,7 +632,7 @@
   };
 
   DocsCoApi.prototype.askLock = function(arrayBlockId, callback) {
-    if (ConnectionState.SaveChanges === this._state) {
+    if (ConnectionState.SaveChanges === this._state || ConnectionState.AskSaveChanges === this._state) {
       // Мы в режиме сохранения. Lock-и запросим после окончания.
       this._lockBuffer.push(new LockBufferElement(arrayBlockId, callback));
       return;
@@ -722,9 +722,13 @@
           t._saveCallback[indexCallback] = null;
           //Not signaled already
           oTmpCallback({error: "Timed out"});
+          t._state = ConnectionState.Authorized;
+          // Делаем отложенные lock-и
+          t._sendBufferedLocks();
         }
       }, this.errorTimeOut);
     }
+    this._state = ConnectionState.AskSaveChanges;
     this._send({"type": "isSaveLock"});
   };
 
@@ -1025,7 +1029,7 @@
   };
 
   DocsCoApi.prototype._onSaveLock = function(data) {
-    if (undefined != data["saveLock"] && null != data["saveLock"]) {
+    if (null != data["saveLock"]) {
       var indexCallback = this._saveCallback.length - 1;
       var oTmpCallback = this._saveCallback[indexCallback];
       if (oTmpCallback) {
@@ -1037,6 +1041,11 @@
 
         this._saveCallback[indexCallback] = null;
         oTmpCallback(data);
+        if (data['error']) {
+          this._state = ConnectionState.Authorized;
+			// Делаем отложенные lock-и
+			this._sendBufferedLocks();
+        }
       }
     }
   };

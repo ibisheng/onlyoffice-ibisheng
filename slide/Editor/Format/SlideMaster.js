@@ -352,7 +352,7 @@ MasterSlide.prototype =
     {
         for(var i=0; i < this.cSld.spTree.length; ++i)
         {
-            if(!this.cSld.spTree[i].isPlaceholder())
+            if(this.cSld.spTree[i].isPlaceholder && !this.cSld.spTree[i].isPlaceholder())
                 this.cSld.spTree[i].draw(graphics);
         }
     },
