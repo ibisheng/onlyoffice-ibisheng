@@ -674,6 +674,33 @@
 			this.getLast().assign2(range);
 			this.update();
 		};
+		SelectionRange.prototype.union = function (range) {
+			var res = this.ranges.some(function (item) {
+				var success = false;
+				if (item.c1 === range.c1 && item.c2 === range.c2) {
+					if (range.r1 === item.r2 + 1) {
+						item.r2 = range.r2;
+						success = true;
+					} else if (range.r2 === item.r1 - 1) {
+						item.r1 = range.r1;
+						success = true;
+					}
+				} else if (item.r1 === range.r1 && item.r2 === range.r2) {
+					if (range.c1 === item.c2 + 1) {
+						item.c2 = range.c2;
+						success = true;
+					} else if (range.c2 === item.c1 - 1) {
+						item.c1 = range.c1;
+						success = true;
+					}
+				}
+				return success;
+			});
+			if (!res) {
+				this.addRange();
+				this.getLast().assign2(range);
+			}
+		};
 		SelectionRange.prototype.offsetCell = function (dr, dc, fCheckSize) {
 			var done, curRange, mc;
 			var lastRow = this.activeCell.row;

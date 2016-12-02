@@ -5309,6 +5309,17 @@ CellArea.prototype = {
 		}
 		return bRemove;
 	};
+	sparklineGroup.prototype.getLocationRanges = function () {
+		var result = new AscCommonExcel.SelectionRange();
+		this.arrSparklines.forEach(function (item, i) {
+			if (0 === i) {
+				result.assign2(item.sqref);
+			} else {
+				result.union(item.sqref);
+			}
+		});
+		return result;
+	};
 	sparklineGroup.prototype.asc_getId = function () {
 		return this.Id;
 	};
