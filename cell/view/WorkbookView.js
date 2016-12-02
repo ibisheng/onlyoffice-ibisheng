@@ -1378,15 +1378,14 @@
 		  ws = this.getWorksheet(index);
      }
 
+	  ws.cleanSelection();
+
 	  for (var i in this.wsViews) {
 		  this.wsViews[i].setFormulaEditMode(false);
-	  }
-
-      ws.updateSelection();
-
-	  for (var i in this.wsViews) {
 		  this.wsViews[i].cleanFormulaRanges();
 	  }
+
+	  ws.updateSelectionWithSparklines();
 
     if (isCellEditMode) {
       this.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
