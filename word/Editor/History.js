@@ -1124,9 +1124,9 @@ CHistory.prototype.private_UpdateContentChangesOnRedo = function(Item)
 		var bAdd  = this.private_IsAddContentChange(Item.Class, Item.Data);
 		var Count = this.private_GetItemsCountInContentChange(Item.Class, Item.Data);
 
-		var ContentChanges = new AscCommon.CContentChangesElement( ( bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove ), Data.Pos, Count, Item );
-		Class.Add_ContentChanges( ContentChanges );
-		this.CollaborativeEditing.Add_NewDC( Class );
+		var ContentChanges = new AscCommon.CContentChangesElement(( bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove ), Item.Data.Pos, Count, Item);
+		Item.Class.Add_ContentChanges(ContentChanges);
+		this.CollaborativeEditing.Add_NewDC(Item.Class);
 	}
 };
 CHistory.prototype.private_IsContentChange = function(Class, Data)
@@ -1149,6 +1149,8 @@ CHistory.prototype.private_IsContentChange = function(Class, Data)
 };
 CHistory.prototype.private_IsAddContentChange = function(Class, Data)
 {
+	var bPresentation = !(typeof CPresentation === "undefined");
+	var bSlide = !(typeof Slide === "undefined");
 	return ( ( Class instanceof CDocument        && AscDFH.historyitem_Document_AddItem        === Data.Type ) ||
 		( ((Class instanceof CDocumentContent || Class instanceof AscFormat.CDrawingDocContent)) && AscDFH.historyitem_DocumentContent_AddItem === Data.Type ) ||
 		( Class instanceof CTable           && AscDFH.historyitem_Table_AddRow            === Data.Type ) ||
