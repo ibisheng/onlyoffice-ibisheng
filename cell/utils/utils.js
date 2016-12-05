@@ -278,6 +278,8 @@
 			return normalize ? this.normalize() : this;
 		};
 		Range.prototype.assign2 = function (range) {
+			this.refType1 = range.refType1;
+			this.refType2 = range.refType2;
 			return this.assign(range.c1, range.r1, range.c2, range.r2);
 		};
 
