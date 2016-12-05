@@ -486,7 +486,7 @@
   };
 
   function LockBufferElement(arrayBlockId, callback) {
-    this._arrayBlockId = arrayBlockId;
+    this._arrayBlockId = arrayBlockId ? arrayBlockId.slice() : null;
     this._callback = callback;
   }
 
