@@ -494,11 +494,11 @@ CNary.prototype.getSubMathContent = function()
 };
 CNary.prototype.Apply_MenuProps = function(Props)
 {
-    if(Props.Type == c_oAscMathInterfaceType.LargeOperator)
+    if(Props.Type == Asc.c_oAscMathInterfaceType.LargeOperator)
     {
         if(Props.LimLoc !== undefined && false == this.ParaMath.Is_Inline() && this.Pr.limLoc !== Props.LimLoc)
         {
-            var LimLoc = Props.LimLoc == c_oAscMathInterfaceNaryLimitLocation.SubSup ? NARY_SubSup : NARY_UndOvr;
+            var LimLoc = Props.LimLoc == Asc.c_oAscMathInterfaceNaryLimitLocation.SubSup ? NARY_SubSup : NARY_UndOvr;
             AscCommon.History.Add(this, new CChangesMathNaryLimLoc(LimLoc, this.Pr.limLoc));
             this.raw_SetLimLoc(LimLoc);
         }
@@ -826,7 +826,7 @@ function CMathMenuNary(Nary)
 {
     CMathMenuNary.superclass.constructor.call(this, Nary);
 
-    this.Type             = c_oAscMathInterfaceType.LargeOperator;
+    this.Type             = Asc.c_oAscMathInterfaceType.LargeOperator;
 
     if (undefined !== Nary)
     {
@@ -838,7 +838,7 @@ function CMathMenuNary(Nary)
             HideLower = Nary.Pr.subHide == true;
 
         this.bCanChangeLimLoc = false == Nary.ParaMath.Is_Inline();
-        this.LimLoc           = Nary.Pr.limLoc === NARY_SubSup ? c_oAscMathInterfaceNaryLimitLocation.SubSup : c_oAscMathInterfaceNaryLimitLocation.UndOvr;
+        this.LimLoc           = Nary.Pr.limLoc === NARY_SubSup ? Asc.c_oAscMathInterfaceNaryLimitLocation.SubSup : Asc.c_oAscMathInterfaceNaryLimitLocation.UndOvr;
         this.HideUpper        = HideUpper;
         this.HideLower        = HideLower;
     }

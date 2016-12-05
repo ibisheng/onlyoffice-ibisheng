@@ -36,6 +36,70 @@
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 var History = AscCommon.History;
 
+/** @enum {number} */
+var c_oAscMathInterfaceMatrixRowRule = {
+    Single     : 0x00,
+    OneAndHalf : 0x01,
+    Double     : 0x02,
+    Exactly    : 0x03,
+    Multiple   : 0x04
+
+};
+
+/** @enum {number} */
+var c_oAscMathInterfaceMatrixColumnRule = {
+    Single     : 0x00,
+    OneAndHalf : 0x01,
+    Double     : 0x02,
+    Exactly    : 0x03,
+    Multiple   : 0x04
+};
+
+
+
+/** @enum {number} */
+var c_oAscMathInterfaceEqArrayLineRule = {
+    Single     : 0x00,
+    OneAndHalf : 0x01,
+    Double     : 0x02,
+    Exactly    : 0x03,
+    Multiple   : 0x04
+};
+
+/** @enum {number} */
+var c_oAscMathInterfaceSettingsBrkBin = {
+    BreakRepeat : 0x00,
+    BreakBefore : 0x01,
+    BreakAfter  : 0x02
+};
+
+/** @enum {number} */
+var c_oAscMathInterfaceSettingsAlign = {
+    Left    : 0,
+    Center  : 1,
+    Right   : 2,
+    Justify : 3
+};
+
+
+
+/** @enum {number} */
+var c_oAscMathMainType = {
+    Symbol        : 0x00,
+    Fraction      : 0x01,
+    Script        : 0x02,
+    Radical       : 0x03,
+    Integral      : 0x04,
+    LargeOperator : 0x05,
+    Bracket       : 0x06,
+    Function      : 0x07,
+    Accent        : 0x08,
+    LimitLog      : 0x09,
+    Operator      : 0x0a,
+    Matrix        : 0x0b,
+    Empty_Content : 0x0c
+};
+
 /**
  *
  * @param bInside
@@ -2790,6 +2854,10 @@ CMathBase.prototype.Is_ContentUse = function(MathContent)
 
     return false;
 };
+CMathBase.prototype.Is_FromDocument = function(MathContent)
+{
+	return this.Paragraph && this.Paragraph.bFromDocument
+};
 
 function CMathBasePr()
 {
@@ -3068,7 +3136,7 @@ var c_oMathMenuAction = {
 
 function CMathMenuBase(oMath)
 {
-    this.Type   = c_oAscMathInterfaceType.Common;
+    this.Type   = Asc.c_oAscMathInterfaceType.Common;
     this.Action = c_oMathMenuAction.None;
 
     if(oMath == undefined)

@@ -372,6 +372,27 @@ function (window, undefined) {
         return getLogGammaHelper(fZ + 2) - Math.log(fZ + 1) - Math.log(fZ);
     }
 
+    function getPercentile(values, alpha) {
+        values.sort(fSortAscending);
+
+        var nSize = values.length;
+        if (nSize === 0) {
+            return new cError(cErrorType.not_available);
+        } else {
+            if (nSize === 1) {
+                return new cNumber(values[0]);
+            } else {
+                var nIndex = Math.floor(alpha * (nSize - 1));
+                var fDiff = alpha * (nSize - 1) - Math.floor(alpha * (nSize - 1));
+                if (fDiff == 0.0) {
+                    return new cNumber(values[nIndex]);
+                } else {
+                    return new cNumber(values[nIndex] + fDiff * (values[nIndex + 1] - values[nIndex]));
+                }
+            }
+        }
+    }
+
 function cAVEDEV() {
 //    cBaseFunction.call( this, "AVEDEV" );
 //    this.setArgumentsMin( 1 );
@@ -391,7 +412,7 @@ function cAVEDEV() {
 
 }
 
-cAVEDEV.prototype = Object.create( cBaseFunction.prototype )
+cAVEDEV.prototype = Object.create( cBaseFunction.prototype );
 cAVEDEV.prototype.Calculate = function ( arg ) {
     var count = 0, sum = new cNumber( 0 ), arrX = [];
     for ( var i = 0; i < arg.length; i++ ) {
@@ -446,7 +467,7 @@ cAVEDEV.prototype.getInfo = function () {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cAVERAGE() {
 //    cBaseFunction.call( this, "AVERAGE" );
@@ -2669,7 +2690,7 @@ cMAX.prototype.Calculate = function ( arg ) {
         if ( argI instanceof cRef || argI instanceof cRef3D ) {
             if ( argIVal instanceof cError )
                 return this.value = argIVal;
-            if ( argIVal instanceof cNumber || argIVal instanceof cBool || argIVal instanceof cEmpty ) {
+            if ( argIVal instanceof cNumber ) {
                 var v = argIVal.tocNumber();
                 if ( v.getValue() > max )
                     max = v.getValue();
@@ -2678,7 +2699,7 @@ cMAX.prototype.Calculate = function ( arg ) {
         else if ( argI instanceof cArea || argI instanceof cArea3D ) {
             var argArr = argI.getValue();
             for ( var j = 0; j < argArr.length; j++ ) {
-                if ( argArr[j] instanceof cNumber || argArr[j] instanceof cBool || argArr[j] instanceof cEmpty ) {
+                if ( argArr[j] instanceof cNumber ) {
                     var v = argArr[j].tocNumber();
                     if ( v.getValue() > max )
                         max = v.getValue();
@@ -2721,7 +2742,7 @@ cMAX.prototype.Calculate = function ( arg ) {
                 max = argI.getValue();
         }
     }
-    return this.value = ( max.value === Number.NEGATIVE_INFINITY ? new cNumber( 0 ) : new cNumber( max ) );
+    return this.value = ( max === Number.NEGATIVE_INFINITY ? new cNumber( 0 ) : new cNumber( max ) );
 };
 cMAX.prototype.getInfo = function () {
     return {
@@ -2811,7 +2832,7 @@ cMAXA.prototype.Calculate = function ( arg ) {
                 max = argI.getValue();
         }
     }
-    return this.value = ( max.value === Number.NEGATIVE_INFINITY ? new cNumber( 0 ) : new cNumber( max ) )
+    return this.value = ( max === Number.NEGATIVE_INFINITY ? new cNumber( 0 ) : new cNumber( max ) )
 };
 cMAXA.prototype.getInfo = function () {
     return {
@@ -2933,7 +2954,7 @@ cMIN.prototype.Calculate = function ( arg ) {
         if ( argI instanceof cRef || argI instanceof cRef3D ) {
             if ( argIVal instanceof cError )
                 return this.value = argIVal;
-            if ( argIVal instanceof cNumber || argIVal instanceof cBool || argIVal instanceof cEmpty ) {
+            if ( argIVal instanceof cNumber ) {
                 var v = argIVal.tocNumber();
                 if ( v.getValue() < min )
                     min = v.getValue();
@@ -2942,7 +2963,7 @@ cMIN.prototype.Calculate = function ( arg ) {
         else if ( argI instanceof cArea || argI instanceof cArea3D ) {
             var argArr = argI.getValue();
             for ( var j = 0; j < argArr.length; j++ ) {
-                if ( argArr[j] instanceof cNumber || argArr[j] instanceof cBool || argArr[j] instanceof cEmpty ) {
+                if ( argArr[j] instanceof cNumber ) {
                     var v = argArr[j].tocNumber();
                     if ( v.getValue() < min )
                         min = v.getValue();
@@ -2986,7 +3007,7 @@ cMIN.prototype.Calculate = function ( arg ) {
                 min = argI.getValue();
         }
     }
-    return this.value = ( min.value === Number.POSITIVE_INFINITY ? new cNumber( 0 ) : new cNumber( min ) );
+    return this.value = ( min === Number.POSITIVE_INFINITY ? new cNumber( 0 ) : new cNumber( min ) );
 };
 cMIN.prototype.getInfo = function () {
     return {
@@ -3078,7 +3099,7 @@ cMINA.prototype.Calculate = function ( arg ) {
                 min = argI.getValue();
         }
     }
-    return this.value = ( min.value === Number.POSITIVE_INFINITY ? new cNumber( 0 ) : new cNumber( min ) );
+    return this.value = ( min === Number.POSITIVE_INFINITY ? new cNumber( 0 ) : new cNumber( min ) );
 };
 cMINA.prototype.getInfo = function () {
     return {
@@ -3664,26 +3685,7 @@ cPERCENTILE.prototype.Calculate = function ( arg ) {
             }
         }
 
-        tA.sort(fSortAscending);
-
-        var nSize = tA.length;
-        if ( tA.length < 1 || nSize == 0 )
-            return new cError( cErrorType.not_available );
-        else {
-            if ( nSize == 1 )
-                return new cNumber( tA[0] );
-            else {
-                var nIndex = Math.floor( alpha * (nSize - 1) );
-                var fDiff = alpha * (nSize - 1) - Math.floor( alpha * (nSize - 1) );
-                if ( fDiff == 0.0 )
-                    return new cNumber( tA[nIndex] );
-                else {
-                    return new cNumber( tA[nIndex] +
-                        fDiff * (tA[nIndex + 1] - tA[nIndex]) );
-                }
-            }
-        }
-
+        return getPercentile(tA, alpha);
     }
 
     var arg0 = arg[0], arg1 = arg[1];
@@ -5665,6 +5667,7 @@ cZTEST.prototype = Object.create( cBaseFunction.prototype );
     window['AscCommonExcel'].phi = phi;
     window['AscCommonExcel'].gauss = gauss;
     window['AscCommonExcel'].gaussinv = gaussinv;
+    window['AscCommonExcel'].getPercentile = getPercentile;
 
     window['AscCommonExcel'].cAVERAGE = cAVERAGE;
     window['AscCommonExcel'].cCOUNT = cCOUNT;

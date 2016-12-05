@@ -265,7 +265,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
 
     this.Lock = new AscCommon.CLock(); // Зажат ли данный параграф другим пользователем
     // TODO: Когда у g_oIdCounter будет тоже проверка на TurnOff заменить здесь
-    if (false === AscCommon.g_oIdCounter.m_bLoad && true === History.Is_On())
+    if (this.bFromDocument && false === AscCommon.g_oIdCounter.m_bLoad && true === History.Is_On())
     {
         this.Lock.Set_Type(AscCommon.locktype_Mine, false);
         if (AscCommon.CollaborativeEditing)
@@ -1719,17 +1719,17 @@ Paragraph.prototype =
                     if ( 0 === CurRange )
                     {
                         if ( Pr.ParaPr.Brd.Left.Value === border_Single )
-                            TempX0 -= 1 + Pr.ParaPr.Brd.Left.Size + Pr.ParaPr.Brd.Left.Space;
+                            TempX0 -= 0.5 + Pr.ParaPr.Brd.Left.Size + Pr.ParaPr.Brd.Left.Space;
                         else
-                            TempX0 -= 1;
+                            TempX0 -= 0.5;
                     }
 
                     if ( this.Lines[CurLine].Ranges.length - 1 === CurRange )
                     {
                         if ( Pr.ParaPr.Brd.Right.Value === border_Single )
-                            TempX1 += 1 + Pr.ParaPr.Brd.Right.Size + Pr.ParaPr.Brd.Right.Space;
+                            TempX1 += 0.5 + Pr.ParaPr.Brd.Right.Size + Pr.ParaPr.Brd.Right.Space;
                         else
-                            TempX1 += 1;
+                            TempX1 += 0.5;
                     }
 
                     if(Pr.ParaPr.Shd.Unifill)
@@ -1900,7 +1900,7 @@ Paragraph.prototype =
                     var NextEl = this.Get_DocumentNext();
                     if ( null != NextEl && type_Paragraph === NextEl.GetType() && true === NextEl.Is_StartFromNewPage() )
                         TempBottom = this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent + this.Lines[CurLine].Metrics.LineGap;
-                    else if ( (true === Pr.ParaPr.Brd.Last || type_Table === NextEl.Get_Type() || true === NextEl.private_IsEmptyPageWithBreak(0)) &&  ( Pr.ParaPr.Brd.Bottom.Value === border_Single || Asc.c_oAscShdClear === Pr.ParaPr.Shd.Value ) )
+                    else if ( (true === Pr.ParaPr.Brd.Last || (null !== NextEl && (type_Table === NextEl.Get_Type() || true === NextEl.private_IsEmptyPageWithBreak(0)))) &&  ( Pr.ParaPr.Brd.Bottom.Value === border_Single || Asc.c_oAscShdClear === Pr.ParaPr.Shd.Value ) )
                         TempBottom -= Pr.ParaPr.Spacing.After;
                 }
 
@@ -1913,7 +1913,7 @@ Paragraph.prototype =
                     {
                         pGraphics.SetBorder(Pr.ParaPr.Brd.Right);
                     }
-                    pGraphics.drawVerLine( c_oAscLineDrawingRule.Right, TempX1 + 1 + Pr.ParaPr.Brd.Right.Size + Pr.ParaPr.Brd.Right.Space, this.Pages[CurPage].Y + TempTop, this.Pages[CurPage].Y + TempBottom, Pr.ParaPr.Brd.Right.Size );
+                    pGraphics.drawVerLine( c_oAscLineDrawingRule.Right, TempX1 + 0.5 + Pr.ParaPr.Brd.Right.Size + Pr.ParaPr.Brd.Right.Space, this.Pages[CurPage].Y + TempTop, this.Pages[CurPage].Y + TempBottom, Pr.ParaPr.Brd.Right.Size );
                 }
 
                 if ( Pr.ParaPr.Brd.Left.Value === border_Single )
@@ -1924,7 +1924,7 @@ Paragraph.prototype =
                     {
                         pGraphics.SetBorder(Pr.ParaPr.Brd.Left);
                     }
-                    pGraphics.drawVerLine( c_oAscLineDrawingRule.Left, TempX0 - 1 - Pr.ParaPr.Brd.Left.Size - Pr.ParaPr.Brd.Left.Space, this.Pages[CurPage].Y + TempTop, this.Pages[CurPage].Y + TempBottom, Pr.ParaPr.Brd.Left.Size );
+                    pGraphics.drawVerLine( c_oAscLineDrawingRule.Left, TempX0 - 0.5 - Pr.ParaPr.Brd.Left.Size - Pr.ParaPr.Brd.Left.Space, this.Pages[CurPage].Y + TempTop, this.Pages[CurPage].Y + TempBottom, Pr.ParaPr.Brd.Left.Size );
                 }
             }
 
@@ -2316,14 +2316,14 @@ Paragraph.prototype =
             X_right = X_left + this.Get_LineDropCapWidth();
 
         if ( Pr.ParaPr.Brd.Left.Value === border_Single )
-            X_left -= 1 + Pr.ParaPr.Brd.Left.Space;
+            X_left -= 0.5 + Pr.ParaPr.Brd.Left.Space;
         else
-            X_left -= 1;
+            X_left -= 0.5;
 
         if ( Pr.ParaPr.Brd.Right.Value === border_Single )
-            X_right += 1 + Pr.ParaPr.Brd.Right.Space;
+            X_right += 0.5 + Pr.ParaPr.Brd.Right.Space;
         else
-            X_right += 1;
+            X_right += 0.5;
 
         var LeftMW  = -( border_Single === Pr.ParaPr.Brd.Left.Value  ? Pr.ParaPr.Brd.Left.Size  : 0 );
         var RightMW =  ( border_Single === Pr.ParaPr.Brd.Right.Value ? Pr.ParaPr.Brd.Right.Size : 0 );
@@ -6002,6 +6002,8 @@ Paragraph.prototype =
                 // Если у нас в выделение попадает начало или конец гиперссылки, или конец параграфа, или
                 // у нас все выделение находится внутри гиперссылки, тогда мы не можем добавить новую. Во
                 // всех остальных случаях разрешаем добавить.
+				// Также, если начало или конец выделения попадает в элемент, который нельзя разделить, тогда мы тоже
+				// запрещаем добавление гиперссылки.
 
                 var StartPos = this.Selection.StartPos;
                 var EndPos   = this.Selection.EndPos;
@@ -6011,8 +6013,10 @@ Paragraph.prototype =
                     EndPos   = this.Selection.StartPos;
                 }
 
-                // Проверяем не находимся ли мы внутри гиперссылки
+                if (false === this.Content[StartPos].CanSplit() || false === this.Content[EndPos].CanSplit())
+					return false;
 
+                // Проверяем не находимся ли мы внутри гиперссылки
                 for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
                 {
                     var Element = this.Content[CurPos];
@@ -6038,6 +6042,8 @@ Paragraph.prototype =
             {
                 // Если у нас в выделение попадает несколько гиперссылок или конец параграфа, тогда
                 // возвращаем false, во всех остальных случаях true
+				// Также, если начало или конец выделения попадает в элемент, который нельзя разделить, тогда мы тоже
+				// запрещаем добавление гиперссылки.
 
                 var StartPos = this.Selection.StartPos;
                 var EndPos   = this.Selection.EndPos;
@@ -6046,6 +6052,9 @@ Paragraph.prototype =
                     StartPos = this.Selection.EndPos;
                     EndPos   = this.Selection.StartPos;
                 }
+
+				if (false === this.Content[StartPos].CanSplit() || false === this.Content[EndPos].CanSplit())
+					return false;
 
                 var bHyper = false;
 
@@ -13411,7 +13420,7 @@ Paragraph.prototype.Is_TrackRevisions = function()
 };
 /**
  * Отличие данной функции от Get_SectionPr в том, что здесь возвращаются настройки секции, к которой
- * принадлежит данный параграф, а там конкретно настройки секции, которыы лежат в данном параграфе.
+ * принадлежит данный параграф, а там конкретно настройки секции, которые лежат в данном параграфе.
  */
 Paragraph.prototype.Get_SectPr = function()
 {
@@ -14007,6 +14016,28 @@ Paragraph.prototype.Get_FootnotesList = function(oEngine)
 
 		if (oEngine.IsRangeFull())
 			return;
+	}
+};
+Paragraph.prototype.GetAutoWidthForDropCap = function()
+{
+	if (this.Is_Empty())
+	{
+		var oEndRun = this.Content[this.Content.length - 1];
+		if (!oEndRun || oEndRun.Type !== para_Run)
+			return 0;
+
+		var oParaEnd = oEndRun.GetParaEnd();
+		if (!oParaEnd)
+			return 0;
+
+		return oParaEnd.Get_WidthVisible();
+	}
+	else
+	{
+		if (this.Lines.length <= 0 || this.Lines[0].Ranges.length <= 0)
+			return 0;
+
+		return this.Lines[0].Ranges[0].W;
 	}
 };
 

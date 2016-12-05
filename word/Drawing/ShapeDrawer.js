@@ -257,203 +257,6 @@ function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
 }
 
 
-//рисуем конечную стрелку
-function DrawTailEnd(type, length, width, x, y, angle, graphics, array_points)
-{
-    var sin, cos;
-    sin=Math.sin(angle);
-    cos=Math.cos(angle);
-    switch(type)
-    {
-        case AscFormat.ar_arrow:
-        {
-            var xb, yb, xc, yc;
-            xb=-length;
-            yb=-width*0.5;
-
-            xc=xb;
-            yc=yb+width;
-
-            graphics._s();
-            graphics._m(xb*cos-yb*sin+x, xb*sin+yb*cos+y);
-            graphics._l(x, y);
-            graphics._l(xc*cos-yc*sin+x, xc*sin+yc*cos+y);
-            graphics.ds();
-
-            break;
-        }
-        case AscFormat.ar_diamond:
-        {
-            var xd, yd;
-            xb=-length*0.5;
-            yb=-width*0.5;
-
-            xc=-length;
-            yc=0;
-
-            xd=xb;
-            yd=yb+width;
-
-            graphics._s();
-            graphics._m(xb*cos-yb*sin+x, xb*sin+yb*cos+y);
-            graphics._l(x, y);
-            graphics._l(xd*cos-yd*sin+x, xd*sin+yd*cos+y);
-            graphics._l(xc*cos-yc*sin+x, xc*sin+yc*cos+y);
-            graphics._z();
-            graphics.ds();
-            graphics.df();
-
-            break;
-        }
-        case AscFormat.ar_none:
-        {
-            break;
-        }
-        case AscFormat.ar_oval:
-        {
-            EllipseN(graphics, x, y, length*0.5, width*0.5, angle);
-            break;
-        }
-        case AscFormat.ar_stealth:
-        {
-            xb=-length;
-            yb=-width*0.5;
-
-            xc=-length*0.5;
-            yc=0;
-
-            xd=xb;
-            yd=-yb;
-
-            graphics._s();
-            graphics._m(x, y);
-            graphics._l(xb*cos-yb*sin+x, xb*sin+yb*cos+y);
-            graphics._l(xc*cos-yc*sin+x, xc*sin+yc*cos+y);
-            graphics._l(xd*cos-yd*sin+x, xd*sin+yd*cos+y);
-            graphics._z();
-            graphics.ds();
-            graphics.df();
-            break;
-        }
-        case AscFormat.ar_triangle:
-        {
-            xb=-length;
-            yb=-width*0.5;
-
-            xc=xb;
-            yc=-yb;
-
-            graphics._s();
-            graphics._m(x, y);
-            graphics._l(xb*cos-yb*sin+x, xb*sin+yb*cos+y);
-            graphics._l(xc*cos-yc*sin+x, xc*sin+yc*cos+y);
-            graphics._z();
-            graphics.ds();
-            graphics.df();
-            break;
-        }
-    }
-}
-
-
-//рисуем начальную стрелку
-function DrawHeadEnd(type, length, width, x, y, angle, graphics)
-{
-    var sin, cos;
-    sin=Math.sin(angle);
-    cos=Math.cos(angle);
-    switch(type)
-    {
-        case AscFormat.ar_arrow:
-        {
-            var xb, yb, xc, yc;
-            xb=length;
-            yb=-width*0.5;
-
-            xc=xb;
-            yc=yb+width;
-
-            graphics._s();
-            graphics._m(xb*cos-yb*sin+x, xb*sin+yb*cos+y);
-            graphics._l(x, y);
-            graphics._l(xc*cos-yc*sin+x, xc*sin+yc*cos+y);
-            graphics.ds();
-
-            break;
-        }
-        case AscFormat.ar_diamond:
-        {
-            var xd, yd;
-            xb=length*0.5;
-            yb=-width*0.5;
-
-            xc=length;
-            yc=0;
-
-            xd=xb;
-            yd=yb+width;
-
-            graphics._s();
-            graphics._m(xb*cos-yb*sin+x, xb*sin+yb*cos+y);
-            graphics._l(x, y);
-            graphics._l(xd*cos-yd*sin+x, xd*sin+yd*cos+y);
-            graphics._l(xc*cos-yc*sin+x, xc*sin+yc*cos+y);
-            graphics._z();
-            graphics.ds();
-            graphics.df();
-
-            break;
-        }
-        case AscFormat.ar_none:
-        {
-            break;
-        }
-        case AscFormat.ar_oval:
-        {
-            Ellipse2(graphics, x, y, length*0.5, width*0.5, angle);
-            break;
-        }
-        case AscFormat.ar_stealth:
-        {
-            xb=length;
-            yb=-width*0.5;
-
-            xc=length*0.5;
-            yc=0;
-
-            xd=xb;
-            yd=-yb;
-
-            graphics._s();
-            graphics._m(x, y);
-            graphics._l(xb*cos-yb*sin+x, xb*sin+yb*cos+y);
-            graphics._l(xc*cos-yc*sin+x, xc*sin+yc*cos+y);
-            graphics._l(xd*cos-yd*sin+x, xd*sin+yd*cos+y);
-            graphics._z();
-            graphics.ds();
-            graphics.df();
-            break;
-        }
-        case AscFormat.ar_triangle:
-        {
-            xb=length;
-            yb=-width*0.5;
-
-            xc=xb;
-            yc=-yb;
-
-            graphics._s();
-            graphics._m(x, y);
-            graphics._l(xb*cos-yb*sin+x, xb*sin+yb*cos+y);
-            graphics._l(xc*cos-yc*sin+x, xc*sin+yc*cos+y);
-            graphics._z();
-            graphics.ds();
-            graphics.df();
-            break;
-        }
-    }
-}
-
 function CShapeDrawer()
 {
     this.Shape = null;
@@ -534,6 +337,17 @@ CShapeDrawer.prototype =
             this.max_x = x;
         if (y > this.max_y)
             this.max_y = y;
+    },
+
+    CheckDash : function()
+    {
+        if (this.Ln.prstDash != null && AscCommon.DashPatternPresets[this.Ln.prstDash])
+        {
+            var _arr = AscCommon.DashPatternPresets[this.Ln.prstDash].slice();
+            for (var indexD = 0; indexD < _arr.length; indexD++)
+                _arr[indexD] *= this.StrokeWidth;
+            this.Graphics.p_dash(_arr);
+        }
     },
 
     fromShape2 : function(shape, graphics, geom)
@@ -663,13 +477,7 @@ CShapeDrawer.prototype =
 
             this.p_width(1000 * this.StrokeWidth);
             
-            if (this.Ln.prstDash != null && AscCommon.DashPatternPresets[this.Ln.prstDash])
-            {
-                var _arr = AscCommon.DashPatternPresets[this.Ln.prstDash].slice();;
-                for (var indexD = 0; indexD < _arr.length; indexD++)
-                    _arr[indexD] *= this.StrokeWidth;
-                this.Graphics.p_dash(_arr);
-            }
+            this.CheckDash();
 
             if (graphics.IsSlideBoundsCheckerType && !this.bIsNoStrokeAttack)
                 graphics.LineWidth = this.StrokeWidth;
@@ -1249,6 +1057,7 @@ CShapeDrawer.prototype =
         if (arr != null && arr.length > 1 && this.IsCurrentPathCanArrows === true)
         {
             this.IsArrowsDrawing = true;
+            this.Graphics.p_dash(null);
             // значит стрелки есть. теперь:
             // определяем толщину линии "как есть"
             // трансформируем точки в окончательные.
@@ -1339,6 +1148,7 @@ CShapeDrawer.prototype =
                 }
             }
             this.IsArrowsDrawing = false;
+            this.CheckDash();
         }
     },
 
@@ -1553,6 +1363,7 @@ CShapeDrawer.prototype =
             if (arr != null && arr.length > 1 && this.IsCurrentPathCanArrows === true)
             {
                 this.IsArrowsDrawing = true;
+                this.Graphics.p_dash(null);
                 // значит стрелки есть. теперь:
                 // определяем толщину линии "как есть"
                 // трансформируем точки в окончательные.
@@ -1621,6 +1432,7 @@ CShapeDrawer.prototype =
                     }
                 }
                 this.IsArrowsDrawing = false;
+                this.CheckDash();
             }
         }
     },

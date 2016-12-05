@@ -696,7 +696,7 @@ function CMathMenuAccent(Accent)
 {
     CMathMenuAccent.superclass.constructor.call(this, Accent);
 
-    this.Type   = c_oAscMathInterfaceType.Accent;
+    this.Type   = Asc.c_oAscMathInterfaceType.Accent;
 }
 AscCommon.extendClass(CMathMenuAccent, CMathMenuBase);
 

@@ -742,6 +742,8 @@ CGraphicObjects.prototype =
             {
                 History.Create_NewPoint(AscDFH.historydescription_Document_GrObjectsBringForwardGroup);
                 this.selection.groupSelection.bringForward();
+                this.document.Recalculate();
+                this.document.Document_UpdateUndoRedoState();
             }
         }
         else
@@ -797,6 +799,8 @@ CGraphicObjects.prototype =
             {
                 History.Create_NewPoint(AscDFH.historydescription_Document_GrObjectsSendToBackGroup);
                 this.selection.groupSelection.sendToBack();
+                this.document.Recalculate();
+                this.document.Document_UpdateUndoRedoState();
             }
         }
         else
@@ -831,6 +835,8 @@ CGraphicObjects.prototype =
             {
                 History.Create_NewPoint(AscDFH.historydescription_Document_GrObjectsBringBackwardGroup);
                 this.selection.groupSelection.bringBackward();
+                this.document.Recalculate();
+                this.document.Document_UpdateUndoRedoState();
             }
         }
         else
@@ -1262,6 +1268,7 @@ CGraphicObjects.prototype =
         this.document.OnMouseUp(e, x, y, pageIndex);
     },
 
+
     handleOleObjectDoubleClick: function(drawing, oleObject, e, x, y, pageIndex)
     {
 		if(drawing && drawing.ParaMath){
@@ -1283,6 +1290,25 @@ CGraphicObjects.prototype =
         this.clearPreTrackObjects();
         this.changeCurrentState(new AscFormat.NullState(this));
         this.document.OnMouseUp(e, x, y, pageIndex);
+    },
+
+    startEditCurrentOleObject: function(){
+        var oSelector = this.selection.groupSelection ? this.selection.groupSelection : this;
+        var oThis = this;
+        if(oSelector.selectedObjects.length === 1 && oSelector.selectedObjects[0].getObjectType() === AscDFH.historyitem_type_OleObject){
+            var oleObject = oSelector.selectedObjects[0];
+            if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props)){
+                var pluginData = new Asc.CPluginData();
+                pluginData.setAttribute("data", oleObject.m_sData);
+                pluginData.setAttribute("guid", oleObject.m_sApplicationId);
+                pluginData.setAttribute("width", oleObject.extX);
+                pluginData.setAttribute("height", oleObject.extY);
+                pluginData.setAttribute("widthPix", oleObject.m_nPixWidth);
+                pluginData.setAttribute("heightPix", oleObject.m_nPixHeight);
+                pluginData.setAttribute("objectId", oleObject.Id);
+                editor.asc_pluginRun(oleObject.m_sApplicationId, 0, pluginData);
+            }
+        }
     },
 
     handleMathDrawingDoubleClick : function(drawing, e, x, y, pageIndex)
@@ -2865,6 +2891,15 @@ CGraphicObjects.prototype =
     isPointInDrawingObjects2: function(x, y, pageIndex, bSelected)
     {
         return this.isPointInDrawingObjects(x, y, pageIndex, bSelected, true) > -1;
+    },
+
+    isPointInDrawingObjects3: function(x, y, pageIndex)
+    {
+        var oOldState = this.curState;
+        this.changeCurrentState(new AscFormat.NullState(this));
+        var bRet = this.isPointInDrawingObjects(x, y, pageIndex, true, true) > -1;
+        this.changeCurrentState(oOldState);
+        return bRet;
     },
 
 

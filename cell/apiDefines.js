@@ -49,17 +49,6 @@ var c_oAscConfirm = {
   ConfirmPutMergeRange: 1
 };
 
-var c_oAscAlignType = {
-  NONE: "none",
-  LEFT: "left",
-  CENTER: "center",
-  RIGHT: "right",
-  JUSTIFY: "justify",
-  TOP: "top",
-  MIDDLE: "center",
-  BOTTOM: "bottom"
-};
-
 var c_oAscMergeOptions = {
   Unmerge: 0,
   Merge: 1,
@@ -91,7 +80,9 @@ var c_oAscCleanOptions = {
   Format: 2,
   Formula: 4,
   Comments: 5,
-  Hyperlinks: 6
+  Hyperlinks: 6,
+  Sparklines: 7,
+  SparklineGroups: 8
 };
 
 var c_oAscDrawDepOptions = {
@@ -133,8 +124,6 @@ var c_oAscMouseMoveLockedObjectType = {
   TableProperties: 1,
   Sheet: 2
 };
-
-
 
 var c_oAscLockTypeElem = {
   Range: 1,
@@ -269,7 +258,8 @@ var c_oAscCanChangeColWidth = {
 
 var c_oAscPaneState = {
   Frozen: "frozen",
-  FrozenSplit: "frozenSplit"
+  FrozenSplit: "frozenSplit",
+  Split: "split"
 };
 
 var c_oAscFindLookIn = {
@@ -321,8 +311,18 @@ var c_oAscFormulaRangeBorderColor = [
   new CColor(55, 127, 158)
 ];
 
-var c_oAscLockNameFrozenPane = "frozenPane";
-var c_oAscLockNameTabColor = "tabColor";
+  var selectionLineType = {
+    None        : 0,
+    Selection   : 1,
+    ActiveCell  : 2,
+    Resize      : 4,
+    Promote     : 8,
+    Dash        : 16
+  };
+
+  var c_oAscLockNameFrozenPane = "frozenPane";
+  var c_oAscLockNameTabColor = "tabColor";
+  var c_oAscLockAddSheet = "addSheet";
 
 var c_oAscGetDefinedNamesList = {
   Worksheet: 0,
@@ -351,9 +351,26 @@ var c_oAscPopUpSelectorType = {
     Signature	: "XLSY"
   };
 
+  var c_oAscSparklineType = {
+    Line: 0,
+    Column: 1,
+    Stacked: 2
+  };
+  var c_oAscEDispBlanksAs = {
+    Span: 0,
+    Gap: 1,
+    Zero: 2
+  };
+  var c_oAscSparklineAxisMinMax = {
+    Individual: 0,
+    Group: 1,
+    Custom: 2
+  };
+
+  var c_kMaxPrintPages = 1500;
+
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommonExcel'] = window['AscCommonExcel'] || {};
-  window['AscCommonExcel'].c_oAscAlignType = c_oAscAlignType;
   window['AscCommonExcel'].c_oAscDrawDepOptions = c_oAscDrawDepOptions;
   window['AscCommonExcel'].c_oAscGraphicOption = c_oAscGraphicOption;
   window['AscCommonExcel'].c_oAscLockTypeElem = c_oAscLockTypeElem;
@@ -369,8 +386,11 @@ var c_oAscPopUpSelectorType = {
   window['AscCommonExcel'].c_oAscCoAuthoringDottedWidth = c_oAscCoAuthoringDottedWidth;
   window['AscCommonExcel'].c_oAscCoAuthoringDottedDistance = c_oAscCoAuthoringDottedDistance;
   window['AscCommonExcel'].c_oAscFormulaRangeBorderColor = c_oAscFormulaRangeBorderColor;
+  window['AscCommonExcel'].selectionLineType = selectionLineType;
   window['AscCommonExcel'].c_oAscLockNameFrozenPane = c_oAscLockNameFrozenPane;
   window['AscCommonExcel'].c_oAscLockNameTabColor = c_oAscLockNameTabColor;
+  window['AscCommonExcel'].c_oAscLockAddSheet = c_oAscLockAddSheet;
+  window['AscCommonExcel'].c_kMaxPrintPages = c_kMaxPrintPages;
 
   window['AscCommon'] = window['AscCommon'] || {};
   window['AscCommon'].c_oSerFormat = c_oSerFormat;
@@ -412,6 +432,8 @@ var c_oAscPopUpSelectorType = {
   prot['Formula'] = prot.Formula;
   prot['Comments'] = prot.Comments;
   prot['Hyperlinks'] = prot.Hyperlinks;
+  prot['Sparklines'] = prot.Sparklines;
+  prot['SparklineGroups'] = prot.SparklineGroups;
   window['Asc']['c_oAscSelectionDialogType'] = window['Asc'].c_oAscSelectionDialogType = c_oAscSelectionDialogType;
   prot = c_oAscSelectionDialogType;
   prot['None'] = prot.None;
@@ -521,4 +543,19 @@ var c_oAscPopUpSelectorType = {
   prot['Func'] = prot.Func;
   prot['Range'] = prot.Range;
   prot['Table'] = prot.Table;
+  window['Asc']['c_oAscSparklineType'] = window['Asc'].c_oAscSparklineType = c_oAscSparklineType;
+  prot = c_oAscSparklineType;
+  prot['Line'] = prot.Line;
+  prot['Column'] = prot.Column;
+  prot['Stacked'] = prot.Stacked;
+  window['Asc']['c_oAscEDispBlanksAs'] = window['Asc'].c_oAscEDispBlanksAs = c_oAscEDispBlanksAs;
+  prot = c_oAscEDispBlanksAs;
+  prot['Span'] = prot.Span;
+  prot['Gap'] = prot.Gap;
+  prot['Zero'] = prot.Zero;
+  window['Asc']['c_oAscSparklineAxisMinMax'] = window['Asc'].c_oAscSparklineAxisMinMax = c_oAscSparklineAxisMinMax;
+  prot = c_oAscSparklineAxisMinMax;
+  prot['Individual'] = prot.Individual;
+  prot['Group'] = prot.Group;
+  prot['Custom'] = prot.Custom;
 })(window);

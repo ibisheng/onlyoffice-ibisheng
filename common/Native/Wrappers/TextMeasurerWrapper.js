@@ -405,7 +405,7 @@ function GetLoadInfoForMeasurer(info, lStyle)
     }
 
     return {
-        Path        : window.AscFonts.g_font_files[index].Id,
+        Path        : AscFonts.g_font_files[index].Id,
         FaceIndex   : faceIndex,
         NeedBold    : bNeedBold,
         NeedItalic  : bNeedItalic,
@@ -423,6 +423,7 @@ window["CreateTextMeasurerWrapper"] = function()
 window["CreateMainTextMeasurerWrapper"] = function()
 {
 	g_oTextMeasurer = new CTextMeasurerWrapper();
+    AscCommon.g_oTextMeasurer = g_oTextMeasurer;
 	g_oTextMeasurer.Init();
     window['AscCommon'].g_oTextMeasurer = g_oTextMeasurer;
 };

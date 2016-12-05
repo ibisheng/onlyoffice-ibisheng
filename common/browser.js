@@ -113,18 +113,72 @@ AscBrowser.zoom = 1;
 
 AscBrowser.checkZoom = function()
 {
+    if (AscBrowser.isAndroid)
+        return;
+
+	AscBrowser.zoom = 1.0;
+	AscBrowser.isRetina = false;
+
     if (AscBrowser.isChrome && !AscBrowser.isOpera && document && document.firstElementChild && document.body)
     {
-        document.firstElementChild.style.zoom = "reset";
-        AscBrowser.zoom = document.body.clientWidth / window.innerWidth;
-		
+        if (false)
+		{
+			// этот код - рабочий, но только если этот ифрейм открыт на весь размер браузера
+            // (window.outerWidth и window.innerWidth зависимы)
+			if (window.innerWidth > 300)
+				AscBrowser.zoom = window.outerWidth / window.innerWidth;
+
+			if (Math.abs(AscBrowser.zoom - 1) < 0.1)
+				AscBrowser.zoom = 1;
+
+			AscBrowser.zoom = window.outerWidth / window.innerWidth;
+
+			var _devicePixelRatio = window.devicePixelRatio / AscBrowser.zoom;
+
+			// device pixel ratio: кратно 0.5
+			_devicePixelRatio = (5 * (((2.5 + 10 * _devicePixelRatio) / 5) >> 0)) / 10;
+
+			AscBrowser.zoom = window.devicePixelRatio / _devicePixelRatio;
+			if (2 == _devicePixelRatio)
+				AscBrowser.isRetina = true;
+
+			// chrome 54.x: zoom = "reset" - clear retina zoom (windows)
+			//document.firstElementChild.style.zoom = "reset";
+			document.firstElementChild.style.zoom = 1.0 / AscBrowser.zoom;
+		}
+		else
+        {
+            // делаем простую проверку
+            // считаем: 0 < window.devicePixelRatio < 2 => _devicePixelRatio = 1; zoom = window.devicePixelRatio / _devicePixelRatio;
+			// считаем: window.devicePixelRatio >= 2 => _devicePixelRatio = 2; zoom = window.devicePixelRatio / _devicePixelRatio;
+            if (window.devicePixelRatio > 0.1)
+			{
+				if (window.devicePixelRatio < 1.99)
+				{
+					var _devicePixelRatio = 1;
+					AscBrowser.zoom = window.devicePixelRatio / _devicePixelRatio;
+				}
+				else
+				{
+					var _devicePixelRatio = 2;
+					AscBrowser.zoom = window.devicePixelRatio / _devicePixelRatio;
+					AscBrowser.isRetina = true;
+				}
+				// chrome 54.x: zoom = "reset" - clear retina zoom (windows)
+				//document.firstElementChild.style.zoom = "reset";
+				document.firstElementChild.style.zoom = 1.0 / AscBrowser.zoom;
+			}
+			else
+				document.firstElementChild.style.zoom = "normal";
+        }
+    }
+    else
+    {
 		AscBrowser.isRetina = (Math.abs(2 - (window.devicePixelRatio / AscBrowser.zoom)) < 0.01);
     }
 };
 
 AscBrowser.checkZoom();
-// detect retina (http://habrahabr.ru/post/159419/)
-AscBrowser.isRetina = (Math.abs(2 - (window.devicePixelRatio / AscBrowser.zoom)) < 0.01);
 
     //--------------------------------------------------------export----------------------------------------------------
     window['AscCommon'] = window['AscCommon'] || {};

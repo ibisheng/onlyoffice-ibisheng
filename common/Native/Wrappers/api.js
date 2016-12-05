@@ -4351,6 +4351,7 @@ function asc_WriteColorSchemes(schemas, s) {
         }
     }
 }
+AscCommon.asc_WriteColorSchemes = asc_WriteColorSchemes;
 
 ///////////////////////////////////////////////////////////////////////
 

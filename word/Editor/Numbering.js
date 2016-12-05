@@ -2520,3 +2520,13 @@ window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CAbstractNum = CAbstractNum;
 window['AscCommonWord'].getNumInfoLvl = getNumInfoLvl;
 window['AscCommonWord'].g_NumberingArr = g_NumberingArr;
+
+
+window['AscCommonWord']["numbering_numfmt_None"]        = numbering_numfmt_None;
+window['AscCommonWord']["numbering_numfmt_Bullet"]      = numbering_numfmt_Bullet;
+window['AscCommonWord']["numbering_numfmt_Decimal"]     = numbering_numfmt_Decimal;
+window['AscCommonWord']["numbering_numfmt_LowerRoman"]  = numbering_numfmt_LowerRoman;
+window['AscCommonWord']["numbering_numfmt_UpperRoman"]  = numbering_numfmt_UpperRoman;
+window['AscCommonWord']["numbering_numfmt_LowerLetter"] = numbering_numfmt_LowerLetter;
+window['AscCommonWord']["numbering_numfmt_UpperLetter"] = numbering_numfmt_UpperLetter;
+window['AscCommonWord']["numbering_numfmt_DecimalZero"] = numbering_numfmt_DecimalZero;

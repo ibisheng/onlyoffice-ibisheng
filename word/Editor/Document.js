@@ -104,6 +104,7 @@ var recalcresultflags_Footnotes         = 0x010000; // Сообщаем, что 
 // Типы которые возвращают классы CDocument и CDocumentContent после пересчета страницы
 var recalcresult2_End      = 0x00; // Документ рассчитан до конца
 var recalcresult2_NextPage = 0x01; // Рассчет нужно продолжить
+var recalcresult2_CurPage  = 0x02; // Нужно заново пересчитать данную страницу
 
 var document_EditingType_Common = 0x00; // Обычный режим редактирования
 var document_EditingType_Review = 0x01; // Режим рецензирования
@@ -1053,7 +1054,8 @@ CDocumentRecalcInfo.prototype =
     Set_FootnoteReference : function(oFootnoteReference, nPageAbs, nColumnAbs)
     {
         this.FootnoteReference = oFootnoteReference;
-        this.FlowObjectPage    = nPageAbs;
+        this.FootnotePage      = nPageAbs;
+		this.FootnoteColumn    = nColumnAbs;
     },
 
     Check_FootnoteReference : function(oFootnoteReference)
@@ -1547,8 +1549,6 @@ CDocument.prototype.On_EndLoad                     = function()
     {
         this.Set_FastCollaborativeEditing(true);
     }
-
-    //this.Footnotes.Init();
 };
 CDocument.prototype.Add_TestDocument               = function()
 {
@@ -1581,17 +1581,7 @@ CDocument.prototype.Add_TestDocument               = function()
         this.Internal_Content_Add(this.Content.length, Para);
     }
 
-    var RecalculateData =
-        {
-            Inline   : {Pos : 0, PageNum : 0},
-            Flow     : [],
-            HdrFtr   : [],
-            Drawings : {
-                All : true,
-                Map : {}
-            }
-        };
-    this.Recalculate(false, false, RecalculateData);
+	this.Recalculate_FromStart(true);
 };
 CDocument.prototype.LoadEmptyDocument              = function()
 {
@@ -1673,10 +1663,8 @@ CDocument.prototype.Get_PageContentStartPos2       = function(StartPageIndex, St
     var ColumnAbs    = (StartColumnIndex + ElementPageIndex) - ((StartColumnIndex + ElementPageIndex) / ColumnsCount | 0) * ColumnsCount;
     var PageAbs      = StartPageIndex + ((StartColumnIndex + ElementPageIndex) / ColumnsCount | 0);
 
-	var FootnotesHeight = this.Footnotes.GetHeight(StartPageIndex, ColumnAbs);
-
 	var Y      = SectPr.Get_PageMargin_Top();
-	var YLimit = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom() - FootnotesHeight;
+	var YLimit = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom();
 	var X      = SectPr.Get_PageMargin_Left();
 	var XLimit = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
 
@@ -1685,7 +1673,7 @@ CDocument.prototype.Get_PageContentStartPos2       = function(StartPageIndex, St
     if (this.Pages[PageAbs] && this.Pages[PageAbs].Sections[SectionIndex])
     {
         Y      = this.Pages[PageAbs].Sections[SectionIndex].Get_Y();
-        YLimit = this.Pages[PageAbs].Sections[SectionIndex].Get_YLimit() - FootnotesHeight;
+        YLimit = this.Pages[PageAbs].Sections[SectionIndex].Get_YLimit();
     }
 
     var HdrFtrLine = this.HdrFtr.Get_HdrFtrLines(PageAbs);
@@ -1987,122 +1975,136 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
         }
     }
 
-    if (-1 === RecalcData.Inline.Pos && -1 === SectPrIndex)
-    {
-        // Никаких изменений не было ни с самим документом, ни секциями
-        ChangeIndex               = -1;
-        RecalcData.Inline.PageNum = 0;
-    }
-    else if (-1 === RecalcData.Inline.Pos)
-    {
-        // Были изменения только внутри секций
-        MainChange = false;
-
-        // Выставляем начало изменений на начало секции
-        ChangeIndex               = ( 0 === SectPrIndex ? 0 : this.SectionsInfo.Get_SectPr2(SectPrIndex - 1).Index + 1 );
-        RecalcData.Inline.PageNum = 0;
-    }
-    else if (-1 === SectPrIndex)
-    {
-        // Изменения произошли только внутри основного документа
-        MainChange = true;
-
-        ChangeIndex = RecalcData.Inline.Pos;
-    }
-    else
-    {
-        // Изменения произошли и внутри документа, и внутри секций. Смотрим на более ранюю точку начала изменений
-        // для секций и основоной части документа.
-        MainChange = true;
-
-        ChangeIndex = RecalcData.Inline.Pos;
-
-        var ChangeIndex2 = ( 0 === SectPrIndex ? 0 : this.SectionsInfo.Get_SectPr2(SectPrIndex - 1).Index + 1 );
-
-        if (ChangeIndex2 <= ChangeIndex)
-        {
-            ChangeIndex               = ChangeIndex2;
-            RecalcData.Inline.PageNum = 0;
-        }
-    }
-
-    if (ChangeIndex < 0)
-    {
-        this.DrawingDocument.ClearCachePages();
-        this.DrawingDocument.FirePaint();
-        return;
-    }
-    else if (ChangeIndex >= this.Content.length)
-    {
-        ChangeIndex = this.Content.length - 1;
-    }
-
-    // Здсь мы должны проверить предыдущие элементы на наличие параматра KeepNext
-    while (ChangeIndex > 0)
-    {
-        var PrevElement = this.Content[ChangeIndex - 1];
-        if (type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Get_CompiledPr2(false).ParaPr.KeepNext)
-        {
-            ChangeIndex--;
-            RecalcData.Inline.PageNum = PrevElement.Get_StartPage_Absolute() + (PrevElement.Pages.length - 1); // считаем, что изменилась последняя страница
-        }
-        else
-        {
-            break;
-        }
-    }
-
-    // Найдем начальную страницу, с которой мы начнем пересчет
-    var StartPage  = 0;
-    var StartIndex = 0;
-
-    var ChangedElement = this.Content[ChangeIndex];
-    if (ChangedElement.Pages.length > 0 && -1 !== ChangedElement.Index && ChangedElement.Get_StartPage_Absolute() < RecalcData.Inline.PageNum - 1)
-    {
-        StartIndex = ChangeIndex;
-        StartPage  = RecalcData.Inline.PageNum - 1;
-    }
-    else
-    {
-        var PagesCount = this.Pages.length;
-        for (var PageIndex = 0; PageIndex < PagesCount; PageIndex++)
-        {
-            if (ChangeIndex > this.Pages[PageIndex].Pos)
-            {
-                StartPage  = PageIndex;
-                StartIndex = this.Pages[PageIndex].Pos;
-            }
-            else
-                break;
-        }
-
-        if (ChangeIndex === StartIndex && StartPage < RecalcData.Inline.PageNum)
-            StartPage = RecalcData.Inline.PageNum - 1;
-    }
-
-    // Если у нас уже начался долгий пересчет, тогда мы его останавливаем, и запускаем новый с текущими параметрами.
-    // Здесь возможен случай, когда мы долгий пересчет основной части документа останавливаем из-за пересчета
-    // колонтитулов, в этом случае параметр MainContentPos не меняется, и мы будем пересчитывать только колонтитулы
-    // либо до страницы, на которой они приводят к изменению основную часть документа, либо до страницы, где
-    // остановился предыдущий пересчет.
-
-    if (null != this.FullRecalc.Id)
-    {
-        clearTimeout(this.FullRecalc.Id);
-        this.FullRecalc.Id = null;
-        this.DrawingDocument.OnEndRecalculate(false);
-
-        if (this.FullRecalc.StartIndex < StartIndex)
-        {
-            StartIndex = this.FullRecalc.StartIndex;
-            StartPage  = this.FullRecalc.PageIndex;
-        }
-    }
-	else if (null !== this.HdrFtrRecalc.Id)
+	if (-1 === RecalcData.Inline.Pos && -1 === SectPrIndex)
 	{
-		clearTimeout(this.HdrFtrRecalc.Id);
-		this.HdrFtrRecalc.Id = null;
-		this.DrawingDocument.OnEndRecalculate(false);
+		// Никаких изменений не было ни с самим документом, ни секциями
+		ChangeIndex               = -1;
+		RecalcData.Inline.PageNum = 0;
+	}
+	else if (-1 === RecalcData.Inline.Pos)
+	{
+		// Были изменения только внутри секций
+		MainChange = false;
+
+		// Выставляем начало изменений на начало секции
+		ChangeIndex               = ( 0 === SectPrIndex ? 0 : this.SectionsInfo.Get_SectPr2(SectPrIndex - 1).Index + 1 );
+		RecalcData.Inline.PageNum = 0;
+	}
+	else if (-1 === SectPrIndex)
+	{
+		// Изменения произошли только внутри основного документа
+		MainChange = true;
+
+		ChangeIndex = RecalcData.Inline.Pos;
+	}
+	else
+	{
+		// Изменения произошли и внутри документа, и внутри секций. Смотрим на более ранюю точку начала изменений
+		// для секций и основоной части документа.
+		MainChange = true;
+
+		ChangeIndex = RecalcData.Inline.Pos;
+
+		var ChangeIndex2 = ( 0 === SectPrIndex ? 0 : this.SectionsInfo.Get_SectPr2(SectPrIndex - 1).Index + 1 );
+
+		if (ChangeIndex2 <= ChangeIndex)
+		{
+			ChangeIndex               = ChangeIndex2;
+			RecalcData.Inline.PageNum = 0;
+		}
+	}
+
+	// Найдем начальную страницу, с которой мы начнем пересчет
+	var StartPage  = 0;
+	var StartIndex = 0;
+
+	if (ChangeIndex < 0 && true === RecalcData.NotesEnd)
+	{
+		// Сюда мы попадаем при рассчете сносок, которые выходят за пределы самого документа
+		StartIndex = this.Content.length;
+		StartPage  = RecalcData.NotesEndPage;
+		MainChange = true;
+	}
+	else
+	{
+		if (ChangeIndex < 0)
+		{
+			this.DrawingDocument.ClearCachePages();
+			this.DrawingDocument.FirePaint();
+			return;
+		}
+		else if (ChangeIndex >= this.Content.length)
+		{
+			ChangeIndex = this.Content.length - 1;
+		}
+
+		// Здсь мы должны проверить предыдущие элементы на наличие параматра KeepNext
+		while (ChangeIndex > 0)
+		{
+			var PrevElement = this.Content[ChangeIndex - 1];
+			if (type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Get_CompiledPr2(false).ParaPr.KeepNext)
+			{
+				ChangeIndex--;
+				RecalcData.Inline.PageNum = PrevElement.Get_StartPage_Absolute() + (PrevElement.Pages.length - 1); // считаем,
+																												   // что
+																												   // изменилась
+																												   // последняя
+																												   // страница
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		var ChangedElement = this.Content[ChangeIndex];
+		if (ChangedElement.Pages.length > 0 && -1 !== ChangedElement.Index && ChangedElement.Get_StartPage_Absolute() < RecalcData.Inline.PageNum - 1)
+		{
+			StartIndex = ChangeIndex;
+			StartPage  = RecalcData.Inline.PageNum - 1;
+		}
+		else
+		{
+			var PagesCount = this.Pages.length;
+			for (var PageIndex = 0; PageIndex < PagesCount; PageIndex++)
+			{
+				if (ChangeIndex > this.Pages[PageIndex].Pos)
+				{
+					StartPage  = PageIndex;
+					StartIndex = this.Pages[PageIndex].Pos;
+				}
+				else
+					break;
+			}
+
+			if (ChangeIndex === StartIndex && StartPage < RecalcData.Inline.PageNum)
+				StartPage = RecalcData.Inline.PageNum - 1;
+		}
+
+		// Если у нас уже начался долгий пересчет, тогда мы его останавливаем, и запускаем новый с текущими параметрами.
+		// Здесь возможен случай, когда мы долгий пересчет основной части документа останавливаем из-за пересчета
+		// колонтитулов, в этом случае параметр MainContentPos не меняется, и мы будем пересчитывать только колонтитулы
+		// либо до страницы, на которой они приводят к изменению основную часть документа, либо до страницы, где
+		// остановился предыдущий пересчет.
+
+		if (null != this.FullRecalc.Id)
+		{
+			clearTimeout(this.FullRecalc.Id);
+			this.FullRecalc.Id = null;
+			this.DrawingDocument.OnEndRecalculate(false);
+
+			if (this.FullRecalc.StartIndex < StartIndex)
+			{
+				StartIndex = this.FullRecalc.StartIndex;
+				StartPage  = this.FullRecalc.PageIndex;
+			}
+		}
+		else if (null !== this.HdrFtrRecalc.Id)
+		{
+			clearTimeout(this.HdrFtrRecalc.Id);
+			this.HdrFtrRecalc.Id = null;
+			this.DrawingDocument.OnEndRecalculate(false);
+		}
 	}
 
 	this.HdrFtrRecalc.PageCount = -1;
@@ -2260,8 +2262,6 @@ CDocument.prototype.Recalculate_Page = function()
 
 		this.Footnotes.Reset(PageIndex, this.SectionsInfo.Get_SectPr(StartIndex).SectPr);
 
-		//this.private_RecalculatePageFootnotes(PageIndex);
-
         this.Pages[PageIndex].ResetStartElement = this.FullRecalc.ResetStartElement;
         this.Pages[PageIndex].X                 = StartPos.X;
         this.Pages[PageIndex].XLimit            = StartPos.XLimit;
@@ -2309,6 +2309,8 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
     PageColumn.Empty       = false;
     PageColumn.SpaceBefore = StartPos.ColumnSpaceBefore;
     PageColumn.SpaceAfter  = StartPos.ColumnSpaceAfter;
+
+    this.Footnotes.ContinueElementsFromPreviousColumn(PageIndex, ColumnIndex, Y, YLimit);
 
     var SectElement  = this.SectionsInfo.Get_SectPr(StartIndex);
     var SectPr       = SectElement.SectPr;
@@ -2465,11 +2467,6 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
                 _StartIndex  = this.Pages[_PageIndex].Sections[_SectionIndex].Columns[0].Pos;
             }
 
-            if (RecalcResult & recalcresultflags_Footnotes)
-            {
-                this.private_RecalculatePageFootnotes(PageIndex, ColumnIndex);
-            }
-
             break;
         }
         else if (RecalcResult & recalcresult_NextElement)
@@ -2484,7 +2481,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
                     PageSection.EndPos = Index;
                     Page.EndPos        = Index;
 
-                    if (c_oAscSectionBreakType.Continuous === NextSectInfo.SectPr.Get_Type() && true === CurSectInfo.SectPr.Compare_PageSize(NextSectInfo.SectPr))
+                    if (c_oAscSectionBreakType.Continuous === NextSectInfo.SectPr.Get_Type() && true === CurSectInfo.SectPr.Compare_PageSize(NextSectInfo.SectPr) && this.Footnotes.IsEmptyPage(PageIndex))
                     {
                         // Новая секция начинается на данной странице. Нам надо получить новые поля данной секции, но
                         // на данной странице мы будет использовать только новые горизонтальные поля, а поля по вертикали
@@ -2763,7 +2760,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
 
     if (Index >= Count || _PageIndex > PageIndex || _ColumnIndex > ColumnIndex)
     {
-        this.private_RecalculateShiftFootnotes(PageIndex, ColumnIndex);
+        this.private_RecalculateShiftFootnotes(PageIndex, ColumnIndex, Y, SectPr);
     }
 
     if (true === bReDraw)
@@ -2773,34 +2770,53 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
 
     if (Index >= Count)
     {
-        this.Internal_CheckCurPage();
-        this.DrawingDocument.OnEndRecalculate(true);
-        this.DrawingObjects.onEndRecalculateDocument(this.Pages.length);
-
-        if (true === this.Selection.UpdateOnRecalc)
-        {
-            this.Selection.UpdateOnRecalc = false;
-            this.DrawingDocument.OnSelectEnd();
-        }
-
-        this.FullRecalc.Id           = null;
-        this.FullRecalc.MainStartPos = -1;
-
-		// Основной пересчет окончен, если в колонтитулах есть элемент с количеством страниц, тогда нам надо
-		// запустить дополнительный пересчет колонтитулов.
-		// Если так случилось, что после повторного полного пересчета, вызванного изменением количества страниц и
-		// изменением метрик колонтитула, новое количество страниц стало меньше, чем раньше, тогда мы не пересчитываем
-		// дальше, чтобы избежать зацикливаний.
-
-		if (-1 === this.HdrFtrRecalc.PageCount || this.HdrFtrRecalc.PageCount < this.Pages.length)
+		// Пересчет основной части документа законечен. Возможна ситуация, при которой последние сноски с данной
+		// страницы переносятся на следующую (т.е. остались непересчитанные сноски). Эти сноски нужно пересчитать
+		if (this.Footnotes.HaveContinuesFootnotes(PageIndex, ColumnIndex))
 		{
-			this.HdrFtrRecalc.PageCount = this.Pages.length;
-			var nPageCountStartPage = this.HdrFtr.HavePageCountElement();
-			if (-1 !== nPageCountStartPage)
+			bContinue    = true;
+			_PageIndex   = PageIndex;
+			_ColumnIndex = ColumnIndex + 1;
+			if (_ColumnIndex >= ColumnsCount)
 			{
-				this.DrawingDocument.OnStartRecalculate(nPageCountStartPage);
-				this.HdrFtrRecalc.PageIndex = nPageCountStartPage;
-				this.private_RecalculateHdrFtrPageCountUpdate();
+				_ColumnIndex = 0;
+				_PageIndex   = PageIndex + 1;
+			}
+
+			_bStart     = true;
+			_StartIndex = Count;
+		}
+		else
+		{
+			this.Internal_CheckCurPage();
+			this.DrawingDocument.OnEndRecalculate(true);
+			this.DrawingObjects.onEndRecalculateDocument(this.Pages.length);
+
+			if (true === this.Selection.UpdateOnRecalc)
+			{
+				this.Selection.UpdateOnRecalc = false;
+				this.DrawingDocument.OnSelectEnd();
+			}
+
+			this.FullRecalc.Id           = null;
+			this.FullRecalc.MainStartPos = -1;
+
+			// Основной пересчет окончен, если в колонтитулах есть элемент с количеством страниц, тогда нам надо
+			// запустить дополнительный пересчет колонтитулов.
+			// Если так случилось, что после повторного полного пересчета, вызванного изменением количества страниц и
+			// изменением метрик колонтитула, новое количество страниц стало меньше, чем раньше, тогда мы не пересчитываем
+			// дальше, чтобы избежать зацикливаний.
+
+			if (-1 === this.HdrFtrRecalc.PageCount || this.HdrFtrRecalc.PageCount < this.Pages.length)
+			{
+				this.HdrFtrRecalc.PageCount = this.Pages.length;
+				var nPageCountStartPage     = this.HdrFtr.HavePageCountElement();
+				if (-1 !== nPageCountStartPage)
+				{
+					this.DrawingDocument.OnStartRecalculate(nPageCountStartPage);
+					this.HdrFtrRecalc.PageIndex = nPageCountStartPage;
+					this.private_RecalculateHdrFtrPageCountUpdate();
+				}
 			}
 		}
     }
@@ -2859,15 +2875,23 @@ CDocument.prototype.private_RecalculateIsNewSection = function(nPageAbs, nConten
 
 	return bNewSection;
 };
-CDocument.prototype.private_RecalculatePageFootnotes = function(nPageAbs, nColumnAbs)
+CDocument.prototype.private_RecalculateShiftFootnotes = function(nPageAbs, nColumnAbs, dY, oSectPr)
 {
-	this.Footnotes.Recalculate(nPageAbs, nColumnAbs, 0, 10000);
-};
-CDocument.prototype.private_RecalculateShiftFootnotes = function(nPageAbs, nColumnAbs)
-{
-	var dFootnotesHeight = this.Footnotes.GetHeight(nPageAbs, nColumnAbs);
-	var oPageMetrics     = this.Get_PageContentStartPos(nPageAbs);
-	this.Footnotes.Shift(nPageAbs, 0, oPageMetrics.YLimit - dFootnotesHeight);
+	var nPosType = oSectPr.GetFootnotePos();
+
+	// section_footnote_PosDocEnd, section_footnote_PosSectEnd ненужные константы по логике, но Word воспринимает их
+	// именно как section_footnote_PosBeneathText, в то время как все остальное (даже константа не по формату)
+	// воспринимает как  section_footnote_PosPageBottom.
+	if (section_footnote_PosBeneathText === nPosType || section_footnote_PosDocEnd === nPosType || section_footnote_PosSectEnd === nPosType)
+	{
+		this.Footnotes.Shift(nPageAbs, nColumnAbs, 0, dY);
+	}
+	else
+	{
+		var dFootnotesHeight = this.Footnotes.GetHeight(nPageAbs, nColumnAbs);
+		var oPageMetrics     = this.Get_PageContentStartPos(nPageAbs);
+		this.Footnotes.Shift(nPageAbs, nColumnAbs, 0, oPageMetrics.YLimit - dFootnotesHeight);
+	}
 };
 CDocument.prototype.private_RecalculateFlowTable             = function(RecalcInfo)
 {
@@ -3041,9 +3065,9 @@ CDocument.prototype.private_RecalculateFlowParagraph         = function(RecalcIn
 
         if (-1 === FrameW && 1 === FlowCount && 1 === Element.Lines.length && undefined === FramePr.Get_W())
         {
-            FrameW     = Element.Lines[0].Ranges[0].W;
-            var ParaPr = Element.Get_CompiledPr2(false).ParaPr;
-            FrameW += ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
+			FrameW     = Element.GetAutoWidthForDropCap();
+			var ParaPr = Element.Get_CompiledPr2(false).ParaPr;
+			FrameW += ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
 
             // Если прилегание в данном случае не к левой стороне, тогда пересчитываем параграф,
             // с учетом того, что ширина буквицы должна быть FrameW
@@ -3643,10 +3667,10 @@ CDocument.prototype.Draw                                     = function(nPageInd
         var RepF = ( null === Footer || null !== SectPr.Get_HdrFtrInfo(Footer) ? false : true );
 
         var HeaderInfo = undefined;
-        if (null !== Header && undefined !== Header.RecalcInfo.NeedRecalc[nPageIndex])
+        if (null !== Header && undefined !== Header.RecalcInfo.PageNumInfo[nPageIndex])
         {
-            var bFirst = Header.RecalcInfo.NeedRecalc[nPageIndex].bFirst;
-            var bEven  = Header.RecalcInfo.NeedRecalc[nPageIndex].bEven;
+            var bFirst = Header.RecalcInfo.PageNumInfo[nPageIndex].bFirst;
+            var bEven  = Header.RecalcInfo.PageNumInfo[nPageIndex].bEven;
 
             var HeaderSectPr = Header.RecalcInfo.SectPr[nPageIndex];
 
@@ -3657,10 +3681,10 @@ CDocument.prototype.Draw                                     = function(nPageInd
         }
 
         var FooterInfo = undefined;
-        if (null !== Footer && undefined !== Footer.RecalcInfo.NeedRecalc[nPageIndex])
+        if (null !== Footer && undefined !== Footer.RecalcInfo.PageNumInfo[nPageIndex])
         {
-            var bFirst = Footer.RecalcInfo.NeedRecalc[nPageIndex].bFirst;
-            var bEven  = Footer.RecalcInfo.NeedRecalc[nPageIndex].bEven;
+            var bFirst = Footer.RecalcInfo.PageNumInfo[nPageIndex].bFirst;
+            var bEven  = Footer.RecalcInfo.PageNumInfo[nPageIndex].bEven;
 
             var FooterSectPr = Footer.RecalcInfo.SectPr[nPageIndex];
 
@@ -6623,9 +6647,8 @@ CDocument.prototype.OnKeyDown = function(e)
             bRetValue = keydownresult_PreventAll;
         }
     }
-	else if (e.KeyCode == 70 && false === editor.isViewMode && true === e.CtrlKey)
+	else if (e.KeyCode == 70 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + F + ...
 	{
-		// TODO: Заменить хоткей для сноски, или проверить можно ли использовать Ctrl+Alt
 		if (true === e.AltKey)
 		{
 			this.AddFootnote();
@@ -6771,10 +6794,6 @@ CDocument.prototype.OnKeyDown = function(e)
         bUpdateSelection = false;
         bRetValue        = keydownresult_PreventAll;
     }
-    // else if (e.KeyCode === 113)
-    // {
-    //     this.AddFootnote();
-    // }
     else if (e.KeyCode == 121 && true === e.ShiftKey) // Shift + F10 - контекстное меню
     {
         var X_abs, Y_abs, oPosition, ConvertedPos;
@@ -9711,6 +9730,14 @@ CDocument.prototype.Create_HdrFtrWidthPageNum = function(PageIndex, AlignV, Alig
 
 	this.Recalculate();
 };
+CDocument.prototype.GetCurrentSectionPr = function()
+{
+	var oSectPr = this.Controller.GetCurrentSectionPr();
+	if (null === oSectPr)
+		return this.controller_GetCurrentSectionPr();
+
+	return oSectPr;
+};
 /**
  * Определяем использовать ли заливку текста в особых случаях, когда вызывается заливка параграфа.
  * @param bUse
@@ -9861,11 +9888,17 @@ CDocument.prototype.private_UpdateCursorXY = function(bUpdateX, bUpdateY)
 			{
 				NewCursorPos.X = SelectionBounds.Start.X;
 				NewCursorPos.Y = SelectionBounds.Start.Y;
+
+				if (this.CurPage < SelectionBounds.Start.Page)
+					NewCursorPos.Y = this.Pages[this.CurPage].Height;
 			}
 			else
 			{
 				NewCursorPos.X = SelectionBounds.End.X + SelectionBounds.End.W;
 				NewCursorPos.Y = SelectionBounds.End.Y + SelectionBounds.End.H;
+
+				if (this.CurPage > SelectionBounds.End.Page)
+					NewCursorPos.Y = 0;
 			}
 		}
 	}
@@ -10011,6 +10044,7 @@ CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
 				StartY = this.Pages[this.CurPage].Height;
 
 				var NewPage = this.CurPage;
+				var bBreak  = false;
 				while (true)
 				{
 					this.Cursor_MoveAt(StartX, StartY, AddToSelect);
@@ -10023,9 +10057,14 @@ CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
 					}
 					else
 					{
+						Result = true;
+						bBreak = true;
 						break;
 					}
 				}
+
+				if (false === Result || true === bBreak)
+					break;
 
 				CurY = StartY;
 			}
@@ -11386,59 +11425,37 @@ CDocument.prototype.Check_CompositeInputRun = function()
  * @param {number} nPageIndex
  * @returns {boolean}
  */
-CDocument.prototype.Goto_FootnotesOnPage = function(nPageIndex)
+CDocument.prototype.GotoFootnotesOnPage = function(nPageIndex)
 {
-	if (this.Footnotes.Is_EmptyPage(nPageIndex))
+	if (this.Footnotes.IsEmptyPage(nPageIndex))
 		return false;
 
 	this.Set_DocPosType(docpostype_Footnotes);
-	this.Footnotes.CurFootnote = this.Footnotes.Pages[nPageIndex].Elements[0];
+	this.Footnotes.GotoPage(nPageIndex);
 	this.Document_UpdateSelectionState();
-
 
 	return true;
 };
-/**
- * Находим отрезок сносок, заданный между сносками.
- * @param {?CFootEndnote} oFirstFootnote - если null, то иещм с начала документа
- * @param {?CFootEndnote} oLastFootnote - если null, то ищем до конца документа
- */
-CDocument.prototype.Get_FootnotesList = function(oFirstFootnote, oLastFootnote)
-{
-	var oEngine = new CDocumentFootnotesRangeEngine();
-	oEngine.Init(oFirstFootnote, oLastFootnote);
-
-	var arrFootnotes = [];
-
-	var arrParagraphs = this.Get_AllParagraphs({OnlyMainDocument : true, All : true});
-	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
-	{
-		var oParagraph = arrParagraphs[nIndex];
-
-		if (true === oParagraph.Get_FootnotesList(oEngine))
-			return arrFootnotes;
-	}
-
-	return oEngine.GetRange();
-};
-CDocument.prototype.AddFootnote = function()
+CDocument.prototype.AddFootnote = function(sText)
 {
 	var nDocPosType = this.Get_DocPosType();
 	if (docpostype_Content !== nDocPosType && docpostype_Footnotes !== nDocPosType)
 		return;
-	
+
 	if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 	{
-		this.History.Create_NewPoint();
+		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddFootnote);
 
 		var nDocPosType = this.Get_DocPosType();
 		if (docpostype_Content === nDocPosType)
 		{
-			var oFootnote = this.Footnotes.Create_Footnote();
-			oFootnote.Paragraph_Add(new ParaFootnoteRef(oFootnote));
-			oFootnote.Paragraph_Add(new ParaSpace());
-			oFootnote.Cursor_MoveToEndPos(false);
-			this.Paragraph_Add(new ParaFootnoteReference(oFootnote));
+			var oFootnote = this.Footnotes.CreateFootnote();
+			oFootnote.AddDefaultFootnoteContent(sText);
+
+			if (sText)
+				this.Paragraph_Add(new ParaFootnoteReference(oFootnote, true, sText));
+			else
+				this.Paragraph_Add(new ParaFootnoteReference(oFootnote));
 
 			this.Set_DocPosType(docpostype_Footnotes);
 			this.Footnotes.Set_CurrentElement(true, 0, oFootnote);
@@ -11453,6 +11470,63 @@ CDocument.prototype.AddFootnote = function()
 CDocument.prototype.GetFootnotesController = function()
 {
 	return this.Footnotes;
+};
+CDocument.prototype.SetFootnotePr = function(oFootnotePr, bApplyToAll)
+{
+	var nNumStart   = oFootnotePr.get_NumStart();
+	var nNumRestart = oFootnotePr.get_NumRestart();
+	var nNumFormat  = oFootnotePr.get_NumFormat();
+	var nPos        = oFootnotePr.get_Pos();
+	if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr))
+	{
+		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetFootnotePr);
+
+		if (bApplyToAll)
+		{
+			for (var nIndex = 0, nCount = this.SectionsInfo.Get_SectionsCount(); nIndex < nCount; ++nIndex)
+			{
+				var oSectPr = this.SectionsInfo.Get_SectPr2(nIndex).SectPr;
+				if (undefined !== nNumStart)
+					oSectPr.SetFootnoteNumStart(nNumStart);
+
+				if (undefined !== nNumRestart)
+					oSectPr.SetFootnoteNumRestart(nNumRestart);
+
+				if (undefined !== nNumFormat)
+					oSectPr.SetFootnoteNumFormat(nNumFormat);
+
+				if (undefined !== nPos)
+					oSectPr.SetFootnotePos(nPos);
+			}
+		}
+		else
+		{
+			var oSectPr = this.GetCurrentSectionPr();
+			if (undefined !== nNumStart)
+				oSectPr.SetFootnoteNumStart(nNumStart);
+
+			if (undefined !== nNumRestart)
+				oSectPr.SetFootnoteNumRestart(nNumRestart);
+
+			if (undefined !== nNumFormat)
+				oSectPr.SetFootnoteNumFormat(nNumFormat);
+
+			if (undefined !== nPos)
+				oSectPr.SetFootnotePos(nPos);
+		}
+
+		this.Recalculate();
+	}
+};
+CDocument.prototype.GetFootnotePr = function()
+{
+	var oSectPr     = this.GetCurrentSectionPr();
+	var oFootnotePr = new Asc.CAscFootnotePr();
+	oFootnotePr.put_Pos(oSectPr.GetFootnotePos());
+	oFootnotePr.put_NumStart(oSectPr.GetFootnoteNumStart());
+	oFootnotePr.put_NumRestart(oSectPr.GetFootnoteNumRestart());
+	oFootnotePr.put_NumFormat(oSectPr.GetFootnoteNumFormat());
+	return oFootnotePr;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые вызываются из CLogicDocumentController
@@ -15301,6 +15375,9 @@ CDocument.prototype.controller_IsMovingTableBorder = function()
 };
 CDocument.prototype.controller_CheckPosInSelection = function(X, Y, PageAbs, NearPos)
 {
+	if (true === this.Footnotes.CheckHitInFootnote(X, Y, PageAbs))
+		return false;
+
 	if (true === this.Selection.Use)
 	{
 		switch (this.Selection.Flag)
@@ -16119,6 +16196,11 @@ CDocument.prototype.controller_GetColumnSize = function()
 		W : XLimit - X,
 		H : YLimit - Y
 	};
+};
+CDocument.prototype.controller_GetCurrentSectionPr = function()
+{
+	var nContentPos = this.CurPos.ContentPos;
+	return this.SectionsInfo.Get_SectPr(nContentPos).SectPr;
 };
 //----------------------------------------------------------------------------------------------------------------------
 //

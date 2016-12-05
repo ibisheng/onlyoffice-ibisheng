@@ -1533,6 +1533,17 @@ CPresentation.prototype =
         oOleObject.setPixSizes(nPixWidth, nPixHeight);
     },
 
+    Get_AbsolutePage: function()
+    {
+        return 0;
+    },
+
+    Get_AbsoluteColumn: function()
+    {
+        return 0;
+    },
+
+
     addChart: function(binary)
     {
         var _this = this;
@@ -1711,12 +1722,49 @@ CPresentation.prototype =
         return graphic_frame;
     },
 
+    Set_MathProps: function (oMathProps) {
+        if(this.Slides[this.CurPage]){
+            this.Slides[this.CurPage].graphicObjects.setMathProps(oMathProps);
+        }
+    },
+
 
     Paragraph_Add : function( ParaItem, bRecalculate, noUpdateInterface )
     {
         if(this.Slides[this.CurPage])
         {
+            var oMathShape = null;
+            if(ParaItem.Type === para_Math)
+            {
+                var oController = this.Slides[this.CurPage].graphicObjects;
+                if(!(oController.selection.textSelection || (oController.selection.groupSelection && oController.selection.groupSelection.selection.textSelection)))
+                {
+					this.Slides[this.CurPage].graphicObjects.resetSelection();
+                    var oMathShape = oController.createTextArt(0, false, null, "");
+                    oMathShape.addToDrawingObjects();
+                    oMathShape.select(oController, this.CurPage);
+					oController.selection.textSelection = oMathShape;
+                    oMathShape.txBody.content.Cursor_MoveToStartPos(false);
+                }
+            }
             this.Slides[this.CurPage].graphicObjects.paragraphAdd(ParaItem, bRecalculate);
+            if(oMathShape)
+            {
+				//var  oContent = oMathShape.txBody.content;
+				//var oTextPr = new CTextPr();
+				//oTextPr.RFonts.Ascii = {Name: "Cambria Math", Index: -1};
+				//oTextPr.RFonts.HAnsi = {Name: "Cambria Math", Index: -1};
+				//oTextPr.RFonts.CS = {Name: "Cambria Math", Index: -1};
+				//oTextPr.RFonts.EastAsia = {Name: "Cambria Math", Index: -1};
+				//oContent.Set_ApplyToAll(true);
+				//oContent.Paragraph_Add(new ParaTextPr(oTextPr));
+				//oContent.Set_ApplyToAll(false);
+				
+                oMathShape.checkExtentsByDocContent();
+                oMathShape.spPr.xfrm.setOffX((this.Slides[this.CurPage].Width - oMathShape.spPr.xfrm.extX)/2);
+                oMathShape.spPr.xfrm.setOffY((this.Slides[this.CurPage].Height - oMathShape.spPr.xfrm.extY)/2);
+                
+            }
             this.Slides[this.CurPage].graphicObjects.startRecalculate();
             if(!(noUpdateInterface === true))
             {
@@ -2109,10 +2157,12 @@ CPresentation.prototype =
 
     Set_TableProps : function(Props)
     {
-        this.Slides[this.CurPage].graphicObjects.setTableProps(Props);
-        this.Recalculate();
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateSelectionState();
+        if(this.Slides[this.CurPage]){
+            this.Slides[this.CurPage].graphicObjects.setTableProps(Props);
+            this.Recalculate();
+            this.Document_UpdateInterfaceState();
+            this.Document_UpdateSelectionState();
+        }
     },
 
     Get_Paragraph_ParaPr : function()
@@ -4002,6 +4052,38 @@ CPresentation.prototype =
                         {
                             NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
                             paragraph.Check_NearestPos(NearPos);
+
+
+                            var ParaNearPos = NearPos.Paragraph.Get_ParaNearestPos(NearPos);
+                            if (null === ParaNearPos || ParaNearPos.Classes.length < 2)
+                                return;
+
+                            var LastClass = ParaNearPos.Classes[ParaNearPos.Classes.length - 1];
+                            if (para_Math_Run === LastClass.Type)
+                            {
+                                // Проверяем, что вставляемый контент тоже формула
+                                var Element = Content.DocContent.Elements[0].Element;
+                                if (1 !== Content.DocContent.Elements.length || type_Paragraph !== Element.Get_Type() || null === LastClass.Parent)
+                                    return;
+
+                                var Math  = null;
+                                var Count = Element.Content.length;
+                                for (var Index = 0; Index < Count; Index++)
+                                {
+                                    var Item = Element.Content[Index];
+                                    if (para_Math === Item.Type && null === Math)
+                                        Math = Element.Content[Index];
+                                    else if (true !== Item.Is_Empty({SkipEnd : true}))
+                                        return;
+                                }
+                            }
+                            else if (para_Run !== LastClass.Type)
+                                return;
+
+                            if (null === paragraph.Parent || undefined === paragraph.Parent)
+                                return;
+
+
                             target_doc_content.Insert_Content(Content.DocContent, NearPos);
                         }
                         var oTargetTextObject = AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects);

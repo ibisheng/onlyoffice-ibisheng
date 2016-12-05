@@ -66,6 +66,11 @@ CTable.prototype.Draw = function(CurPage, pGraphics)
     if (Row_last < Row_start)
         return -1;
 
+    // Данный случай добавлен из-за сносок. Когда у таблицы на данной страницы ничего не убирается.
+	// TODO: Надо улучшить данную проверку, т.к. она не учитывает ситуацию с вложенными таблицами.
+    if (Row_start === Row_last && Math.abs(this.RowsInfo[Row_last].H[CurPage] - this.RowsInfo[Row_last].TopDy[CurPage]) < 0.001)
+        return -1;
+
     pGraphics.SaveGrState();
 
     var bIsSmartGrForcing = false;

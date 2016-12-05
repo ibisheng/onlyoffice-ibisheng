@@ -38,6 +38,7 @@
   var asc_coAuthV = '3.0.9';
   var ConnectionState = AscCommon.ConnectionState;
   var c_oEditorId = AscCommon.c_oEditorId;
+  var c_oCloseCode = AscCommon.c_oCloseCode;
 
   // Класс надстройка, для online и offline работы
   function CDocsCoApi(options) {
@@ -49,6 +50,8 @@
       this.onParticipantsChanged = options.onParticipantsChanged;
       this.onMessage = options.onMessage;
       this.onCursor =  options.onCursor;
+      this.onMeta =  options.onMeta;
+      this.onSession =  options.onSession;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
@@ -69,7 +72,7 @@
     }
   }
 
-  CDocsCoApi.prototype.init = function(user, docid, documentCallbackUrl, token, editorType, documentFormatSave) {
+  CDocsCoApi.prototype.init = function(user, docid, documentCallbackUrl, token, editorType, documentFormatSave, docInfo) {
     if (this._CoAuthoringApi && this._CoAuthoringApi.isRightURL()) {
       var t = this;
       this._CoAuthoringApi.onAuthParticipantsChanged = function(e, count) {
@@ -84,6 +87,12 @@
       this._CoAuthoringApi.onCursor = function(e) {
         t.callback_OnCursor(e);
       };
+      this._CoAuthoringApi.onMeta = function(e) {
+        t.callback_OnMeta(e);
+      };
+      this._CoAuthoringApi.onSession = function(e) {
+        t.callback_OnSession(e);
+      };
       this._CoAuthoringApi.onLocksAcquired = function(e) {
         t.callback_OnLocksAcquired(e);
       };
@@ -93,8 +102,8 @@
       this._CoAuthoringApi.onLocksReleasedEnd = function() {
         t.callback_OnLocksReleasedEnd();
       };
-      this._CoAuthoringApi.onDisconnect = function(e, isDisconnectAtAll, isCloseCoAuthoring) {
-        t.callback_OnDisconnect(e, isDisconnectAtAll, isCloseCoAuthoring);
+      this._CoAuthoringApi.onDisconnect = function(e, errorCode) {
+        t.callback_OnDisconnect(e, errorCode);
       };
       this._CoAuthoringApi.onWarning = function(e) {
         t.callback_OnWarning(e);
@@ -137,7 +146,7 @@
         t.callback_OnLicense(res);
       };
 
-      this._CoAuthoringApi.init(user, docid, documentCallbackUrl, token, editorType, documentFormatSave);
+      this._CoAuthoringApi.init(user, docid, documentCallbackUrl, token, editorType, documentFormatSave, docInfo);
       this._onlineWork = true;
     } else {
       // Фиктивные вызовы
@@ -306,6 +315,13 @@
     }
     return null;
   };
+  
+  CDocsCoApi.prototype.get_jwt = function() {
+    if (this._CoAuthoringApi && this._onlineWork) {
+      return this._CoAuthoringApi.get_jwt();
+    }
+    return null;
+  };
 
   CDocsCoApi.prototype.releaseLocks = function(blockId) {
     if (this._CoAuthoringApi && this._onlineWork) {
@@ -313,9 +329,21 @@
     }
   };
 
-  CDocsCoApi.prototype.disconnect = function() {
+  CDocsCoApi.prototype.disconnect = function(opt_code, opt_reason) {
     if (this._CoAuthoringApi && this._onlineWork) {
-      this._CoAuthoringApi.disconnect();
+      this._CoAuthoringApi.disconnect(opt_code, opt_reason);
+    }
+  };
+
+  CDocsCoApi.prototype.extendSession = function(idleTime) {
+    if (this._CoAuthoringApi && this._onlineWork) {
+      this._CoAuthoringApi.extendSession(idleTime);
+    }
+  };
+
+  CDocsCoApi.prototype.versionHistory = function(data) {
+    if (this._CoAuthoringApi && this._onlineWork) {
+      this._CoAuthoringApi.versionHistory(data);
     }
   };
 
@@ -343,6 +371,18 @@
     }
   };
 
+  CDocsCoApi.prototype.callback_OnMeta = function(e) {
+    if (this.onMeta) {
+      this.onMeta(e);
+    }
+  };
+
+  CDocsCoApi.prototype.callback_OnSession = function(e) {
+    if (this.onSession) {
+      this.onSession(e);
+    }
+  };
+
   CDocsCoApi.prototype.callback_OnLocksAcquired = function(e) {
     if (this.onLocksAcquired) {
       this.onLocksAcquired(e);
@@ -367,9 +407,9 @@
    * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
    * @param {Bool} isCloseCoAuthoring
    */
-  CDocsCoApi.prototype.callback_OnDisconnect = function(e, isDisconnectAtAll, isCloseCoAuthoring) {
+  CDocsCoApi.prototype.callback_OnDisconnect = function(e, errorCode) {
     if (this.onDisconnect) {
-      this.onDisconnect(e, isDisconnectAtAll, isCloseCoAuthoring);
+      this.onDisconnect(e, errorCode);
     }
   };
 
@@ -446,7 +486,7 @@
   };
 
   function LockBufferElement(arrayBlockId, callback) {
-    this._arrayBlockId = arrayBlockId;
+    this._arrayBlockId = arrayBlockId ? arrayBlockId.slice() : null;
     this._callback = callback;
   }
 
@@ -456,6 +496,8 @@
       this.onParticipantsChanged = options.onParticipantsChanged;
       this.onMessage = options.onMessage;
       this.onCursor = options.onCursor;
+      this.onMeta = options.onMeta;
+      this.onSession =  options.onSession;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
@@ -488,7 +530,9 @@
     this.saveLockCallbackErrorTimeOutId = null;
     this.saveCallbackErrorTimeOutId = null;
     this.unSaveLockCallbackErrorTimeOutId = null;
+	this.jwtTimeOutId = null;
     this._id = null;
+    this._sessionTimeConnect = null;
     this._indexUser = -1;
     // Если пользователей больше 1, то совместно редактируем
     this.isCoAuthoring = false;
@@ -532,6 +576,11 @@
     this._isPresentation = false;
     this._isAuth = false;
     this._documentFormatSave = 0;
+    this.mode = undefined;
+    this.permissions = undefined;
+    this.lang = undefined;
+    this.jwtOpen = undefined;
+    this.jwtSession = undefined;
     this._isViewer = false;
     this._isReSaveAfterAuth = false;	// Флаг для сохранения после повторной авторизации (для разрыва соединения во время сохранения)
     this._lockBuffer = [];
@@ -554,7 +603,11 @@
   };
 
   DocsCoApi.prototype.get_isAuth = function() {
-    return this._isAuth
+    return this._isAuth;
+  };
+
+  DocsCoApi.prototype.get_jwt = function() {
+    return this.jwtSession || this.jwtOpen;
   };
 
   DocsCoApi.prototype.getSessionId = function() {
@@ -579,7 +632,7 @@
   };
 
   DocsCoApi.prototype.askLock = function(arrayBlockId, callback) {
-    if (ConnectionState.SaveChanges === this._state) {
+    if (ConnectionState.SaveChanges === this._state || ConnectionState.AskSaveChanges === this._state) {
       // Мы в режиме сохранения. Lock-и запросим после окончания.
       this._lockBuffer.push(new LockBufferElement(arrayBlockId, callback));
       return;
@@ -669,9 +722,13 @@
           t._saveCallback[indexCallback] = null;
           //Not signaled already
           oTmpCallback({error: "Timed out"});
+          t._state = ConnectionState.Authorized;
+          // Делаем отложенные lock-и
+          t._sendBufferedLocks();
         }
       }, this.errorTimeOut);
     }
+    this._state = ConnectionState.AskSaveChanges;
     this._send({"type": "isSaveLock"});
   };
 
@@ -745,11 +802,23 @@
     }
   };
 
-  DocsCoApi.prototype.disconnect = function() {
+  DocsCoApi.prototype.disconnect = function(opt_code, opt_reason) {
     // Отключаемся сами
     this.isCloseCoAuthoring = true;
-    this._send({"type": "close"});
-    this._state = ConnectionState.ClosedCoAuth;
+    if (opt_code) {
+      this.sockjs.close(opt_code, opt_reason);
+    } else {
+      this._send({"type": "close"});
+      this._state = ConnectionState.ClosedCoAuth;
+    }
+  };
+
+  DocsCoApi.prototype.extendSession = function(idleTime) {
+    this._send({'type': 'extendSession', 'idletime': idleTime});
+  };
+
+  DocsCoApi.prototype.versionHistory = function(data) {
+    this._send({'type': 'versionHistory', 'cmd': data});
   };
 
   DocsCoApi.prototype.openDocument = function(data) {
@@ -818,6 +887,35 @@
   DocsCoApi.prototype._onCursor = function(data) {
     if (data["messages"] && this.onCursor) {
       this.onCursor(data["messages"]);
+    }
+  };
+
+  DocsCoApi.prototype._onMeta = function(data) {
+    if (data["messages"] && this.onMeta) {
+      this.onMeta(data["messages"]);
+    }
+  };
+
+  DocsCoApi.prototype._onSession = function(data) {
+    if (data["messages"] && this.onSession) {
+      this.onSession(data["messages"]);
+    }
+  };
+
+  DocsCoApi.prototype._onRefreshToken = function(jwt) {
+    var t = this;
+    if (jwt) {
+      t.jwtOpen = undefined;
+      t.jwtSession = jwt.token;
+      if (null !== t.jwtTimeOutId) {
+        clearTimeout(t.jwtTimeOutId);
+        t.jwtTimeOutId = null;
+      }
+      var timeout = Math.max(0, jwt.expires - t.maxAttemptCount * t.reconnectInterval);
+      t.jwtTimeOutId = setTimeout(function(){
+        t.jwtTimeOutId = null;
+        t._send({'type': 'refreshToken', 'jwtSession': t.jwtSession});
+      }, timeout);
     }
   };
 
@@ -931,7 +1029,7 @@
   };
 
   DocsCoApi.prototype._onSaveLock = function(data) {
-    if (undefined != data["saveLock"] && null != data["saveLock"]) {
+    if (null != data["saveLock"]) {
       var indexCallback = this._saveCallback.length - 1;
       var oTmpCallback = this._saveCallback[indexCallback];
       if (oTmpCallback) {
@@ -943,6 +1041,11 @@
 
         this._saveCallback[indexCallback] = null;
         oTmpCallback(data);
+        if (data['error']) {
+          this._state = ConnectionState.Authorized;
+			// Делаем отложенные lock-и
+			this._sendBufferedLocks();
+        }
       }
     }
   };
@@ -1112,7 +1215,7 @@
 
   DocsCoApi.prototype._onDrop = function(data) {
     this.disconnect();
-    this.onDisconnect(data ? data['description'] : '', true, this.isCloseCoAuthoring);
+    this.onDisconnect(data ? data['description'] : '', this._getDisconnectErrorCode());
   };
 
   DocsCoApi.prototype._onWarning = function(data) {
@@ -1128,6 +1231,7 @@
 
   DocsCoApi.prototype._onAuth = function(data) {
     var t = this;
+    this._onRefreshToken(data.jwt);
     if (true === this._isAuth) {
       this._state = ConnectionState.Authorized;
       // Мы должны только соединиться для получения файла. Совместное редактирование уже было отключено.
@@ -1165,6 +1269,7 @@
       //TODO: add checks
       this._state = ConnectionState.Authorized;
       this._id = data['sessionId'];
+      this._sessionTimeConnect = data['sessionTimeConnect'];
 
       this._onAuthParticipantsChanged(data['participants']);
 
@@ -1196,7 +1301,7 @@
     //TODO: Add errors
   };
 
-  DocsCoApi.prototype.init = function(user, docid, documentCallbackUrl, token, editorType, documentFormatSave) {
+  DocsCoApi.prototype.init = function(user, docid, documentCallbackUrl, token, editorType, documentFormatSave, docInfo) {
     this._user = user;
     this._docid = null;
     this._documentCallbackUrl = documentCallbackUrl;
@@ -1208,6 +1313,10 @@
     this._isPresentation = c_oEditorId.Presentation === editorType;
     this._isAuth = false;
     this._documentFormatSave = documentFormatSave;
+	this.mode = docInfo.get_Mode();
+	this.permissions = docInfo.get_Permissions();
+	this.lang = docInfo.get_Lang();
+	this.jwtOpen = docInfo.get_Token();
 
     this.setDocId(docid);
     this._initSocksJs();
@@ -1243,25 +1352,41 @@
       'user': {
         'id': this._user.asc_getId(),
         'username': this._user.asc_getUserName(),
+        'firstname': this._user.asc_getFirstName(),
+        'lastname': this._user.asc_getLastName(),
         'indexUser': this._indexUser
       },
       'editorType': this.editorType,
       'lastOtherSaveTime': this.lastOtherSaveTime,
       'block': this.ownedLockBlocks,
       'sessionId': this._id,
+	  'sessionTimeConnect': this._sessionTimeConnect,
+      'sessionTimeIdle': 0,
       'documentFormatSave': this._documentFormatSave,
       'view': this._isViewer,
       'isCloseCoAuthoring': this.isCloseCoAuthoring,
       'openCmd': opt_openCmd,
+      'lang': this.lang,
+      'mode': this.mode,
+      'permissions': this.permissions,
+      'jwtOpen': this.jwtOpen,
+      'jwtSession': this.jwtSession,
       'version': asc_coAuthV
     });
   };
 
   DocsCoApi.prototype._initSocksJs = function() {
     var t = this;
-	//ограничиваем transports WebSocket и XHR / JSONP polling, как и engine.io https://github.com/socketio/engine.io
-	//при переборе streaming transports у клиента с wirewall происходило зацикливание(не повторялось в версии sock.js 0.3.4)
-	var sockjs = this.sockjs = new (this._getSockJs())(this.sockjs_url, null, {transports: ['websocket', 'xdr-polling', 'xhr-polling', 'iframe-xhr-polling', 'jsonp-polling']});
+ 
+    if (window['IS_NATIVE_EDITOR']) {
+        var sockjs = this.sockjs = window['SockJS'];
+        sockjs.open();
+        return sockjs;
+    } else {
+        //ограничиваем transports WebSocket и XHR / JSONP polling, как и engine.io https://github.com/socketio/engine.io
+        //при переборе streaming transports у клиента с wirewall происходило зацикливание(не повторялось в версии sock.js 0.3.4)
+        var sockjs = this.sockjs = new (this._getSockJs())(this.sockjs_url, null, {transports: ['websocket', 'xdr-polling', 'xhr-polling', 'iframe-xhr-polling', 'jsonp-polling']});
+    }
 
     sockjs.onopen = function() {
       if (t.reconnectTimeout) {
@@ -1286,6 +1411,9 @@
           break;
         case 'cursor'       :
           t._onCursor(dataObject);
+          break;
+        case 'meta' :
+          t._onMeta(dataObject);
           break;
         case 'getLock'      :
           t._onGetLock(dataObject);
@@ -1325,6 +1453,12 @@
         case 'license':
           t._onLicense(dataObject);
           break;
+        case 'session' :
+          t._onSession(dataObject);
+          break;
+        case 'refreshToken' :
+          t._onRefreshToken(dataObject["messages"]);
+          break;
       }
     };
     sockjs.onclose = function(evt) {
@@ -1337,12 +1471,14 @@
         }
       }
       t._state = ConnectionState.Reconnect;
-      var bIsDisconnectAtAll = (4001 === evt.code || t.attemptCount >= t.maxAttemptCount);
+      var bIsDisconnectAtAll = ((c_oCloseCode.serverShutdown <= evt.code && evt.code <= c_oCloseCode.jwtError) || t.attemptCount >= t.maxAttemptCount);
+      var errorCode = null;
       if (bIsDisconnectAtAll) {
         t._state = ConnectionState.ClosedAll;
+        errorCode = t._getDisconnectErrorCode(evt.code);
       }
       if (t.onDisconnect) {
-        t.onDisconnect(evt.reason, bIsDisconnectAtAll, t.isCloseCoAuthoring);
+        t.onDisconnect(evt.reason, errorCode);
       }
       //Try reconect
       if (!bIsDisconnectAtAll) {
@@ -1369,6 +1505,27 @@
 
   DocsCoApi.prototype._getSockJs = function() {
     return window['SockJS'] ? window['SockJS'] : require('sockjs');
+  };
+
+  DocsCoApi.prototype._getDisconnectErrorCode = function(opt_closeCode) {
+    if (c_oCloseCode.serverShutdown === opt_closeCode) {
+      return Asc.c_oAscError.ID.CoAuthoringDisconnect;
+    } else if (c_oCloseCode.sessionIdle === opt_closeCode) {
+      return Asc.c_oAscError.ID.SessionIdle;
+    } else if (c_oCloseCode.sessionAbsolute === opt_closeCode) {
+      return Asc.c_oAscError.ID.SessionAbsolute;
+    } else if (c_oCloseCode.accessDeny === opt_closeCode) {
+      return Asc.c_oAscError.ID.AccessDeny;
+    } else if (c_oCloseCode.jwtExpired === opt_closeCode) {
+      if (this.jwtSession) {
+        return Asc.c_oAscError.ID.SessionToken;
+      } else {
+        return Asc.c_oAscError.ID.KeyExpire;
+      }
+    } else if (c_oCloseCode.jwtError === opt_closeCode) {
+      return Asc.c_oAscError.ID.VKeyEncrypt;
+    }
+    return this.isCloseCoAuthoring ? Asc.c_oAscError.ID.UserDrop : Asc.c_oAscError.ID.CoAuthoringDisconnect;
   };
 
   //----------------------------------------------------------export----------------------------------------------------

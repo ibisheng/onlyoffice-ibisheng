@@ -59,6 +59,335 @@ var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
 var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
 var c_oAscSelectionType = Asc.c_oAscSelectionType;
 
+var aSparklinesStyles =
+[
+    [
+        [4, -0.499984740745262],
+        [5, 0],
+        [4, -0.499984740745262],
+        [4,  0.39997558519241921],
+        [4, 0.39997558519241921],
+        [4, 0],
+        [4, 0]
+    ],
+    [
+        [5, -0.499984740745262],
+        [6, 0],
+        [5,  -0.499984740745262],
+        [5, 0.39997558519241921],
+        [5, 0.39997558519241921],
+        [5, 0],
+        [5, 0]
+    ],
+    [
+        [6, -0.499984740745262],
+        [7, 0],
+        [6, -0.499984740745262],
+        [6, 0.39997558519241921],
+        [6, 0.39997558519241921],
+        [6, 0],
+        [6, 0]
+    ],
+    [
+        [7, -0.499984740745262],
+        [8, 0],
+        [7, -0.499984740745262],
+        [7, 0.39997558519241921],
+        [7, 0.39997558519241921],
+        [7, 0],
+        [7, 0]
+    ],
+    [
+        [8, -0.499984740745262],
+        [9, 0],
+        [8, -0.499984740745262],
+        [8, 0.39997558519241921],
+        [8, 0.39997558519241921],
+        [8, 0],
+        [8, 0]
+    ],
+    [
+        [9, -0.499984740745262],
+        [4, 0],
+
+        [9, -0.499984740745262],
+        [9, 0.39997558519241921],
+        [9, 0.39997558519241921],
+        [9, 0],
+        [9, 0]
+    ],
+    [
+        [4, -0.249977111117893],
+        [5, 0],
+        [5, -0.249977111117893],
+        [5, -0.249977111117893],
+        [5, -0.249977111117893],
+        [5, -0.249977111117893],
+        [5, -0.249977111117893]
+    ],
+    [
+        [5, -0.249977111117893],
+        [6, 0],
+        [6, -0.249977111117893],
+        [6, -0.249977111117893],
+        [6, -0.249977111117893],
+        [6, -0.249977111117893],
+        [6, -0.249977111117893]
+    ],
+    [
+        [6, -0.249977111117893],
+        [7, 0],
+        [7, -0.249977111117893],
+        [7, -0.249977111117893],
+        [7, -0.249977111117893],
+        [7, -0.249977111117893],
+        [7, -0.249977111117893]
+    ],
+    [
+        [7, -0.249977111117893],
+        [8, 0],
+        [8, -0.249977111117893],
+        [8, -0.249977111117893],
+        [8, -0.249977111117893],
+        [8, -0.249977111117893],
+        [8, -0.249977111117893]
+    ],
+    [
+        [8, -0.249977111117893],
+        [9, 0],
+        [9, -0.249977111117893],
+        [9, -0.249977111117893],
+        [9, -0.249977111117893],
+        [9, -0.249977111117893],
+        [9, -0.249977111117893]
+    ],
+    [
+        [9, -0.249977111117893],
+        [4, 0],
+        [4, -0.249977111117893],
+        [4, -0.249977111117893],
+        [4, -0.249977111117893],
+        [4, -0.249977111117893],
+        [4, -0.249977111117893]
+    ],
+    [
+        [4, 0],
+        [5, 0],
+        [4, -0.249977111117893],
+        [4, -0.249977111117893],
+        [4, -0.249977111117893],
+        [4, -0.249977111117893],
+        [4, -0.249977111117893]
+    ],
+    [
+        [5, 0],
+        [6, 0],
+        [5, -0.249977111117893],
+        [5, -0.249977111117893],
+        [5, -0.249977111117893],
+        [5, -0.249977111117893],
+        [5, -0.249977111117893]
+    ],
+    [
+        [6, 0],
+        [7, 0],
+        [6, -0.249977111117893],
+        [6, -0.249977111117893],
+        [6, -0.249977111117893],
+        [6, -0.249977111117893],
+        [6, -0.249977111117893]
+    ],
+    [
+        [7, 0],
+        [8, 0],
+        [7, -0.249977111117893],
+        [7, -0.249977111117893],
+        [7, -0.249977111117893],
+        [7, -0.249977111117893],
+        [7, -0.249977111117893]
+    ],
+    [
+        [8, 0],
+        [9, 0],
+        [8, -0.249977111117893],
+        [8, -0.249977111117893],
+        [8, -0.249977111117893],
+        [8, -0.249977111117893],
+        [8, -0.249977111117893]
+    ],
+    [
+        [9, 0],
+        [4, 0],
+        [9, -0.249977111117893],
+        [9, -0.249977111117893],
+        [9, -0.249977111117893],
+        [9, -0.249977111117893],
+        [9, -0.249977111117893]
+    ],
+    [
+        [4, 0.39997558519241921],
+        [0, -0.499984740745262],
+        [4, 0.79998168889431442],
+        [4, -0.249977111117893],
+        [4, -0.249977111117893],
+        [4, -0.499984740745262],
+        [4, -0.499984740745262]
+    ],
+    [
+        [5, 0.39997558519241921],
+        [0, -0.499984740745262],
+        [5, 0.79998168889431442],
+        [5, -0.249977111117893],
+        [5, -0.249977111117893],
+        [5, -0.499984740745262],
+        [5, -0.499984740745262]
+    ],
+    [
+        [6, 0.39997558519241921],
+        [0, -0.499984740745262],
+        [6, 0.79998168889431442],
+        [6, -0.249977111117893],
+        [6, -0.249977111117893],
+        [6, -0.499984740745262],
+        [6, -0.499984740745262]
+    ],
+    [
+        [7, 0.39997558519241921],
+        [0, -0.499984740745262],
+        [7, 0.79998168889431442],
+        [7, -0.249977111117893],
+        [7, -0.249977111117893],
+        [7, -0.499984740745262],
+        [7, -0.499984740745262]
+    ],
+    [
+        [8, 0.39997558519241921],
+        [0, -0.499984740745262],
+        [8, 0.79998168889431442],
+        [8, -0.249977111117893],
+        [8, -0.249977111117893],
+        [8, -0.499984740745262],
+        [8, -0.499984740745262]
+    ],
+    [
+        [9, 0.39997558519241921],
+        [0, -0.499984740745262],
+        [9, 0.79998168889431442],
+        [9, -0.249977111117893],
+        [9, -0.249977111117893],
+        [9, -0.499984740745262],
+        [9, -0.499984740745262]
+    ],
+    [
+        [1, 0.499984740745262],
+        [1, 0.249977111117893],
+        [1, 0.249977111117893],
+        [1, 0.249977111117893],
+        [1, 0.249977111117893],
+        [1, 0.249977111117893],
+        [1, 0.249977111117893]
+    ],
+    [
+        [1, 0.34998626667073579],
+        [0, -0.249977111117893],
+        [0, -0.249977111117893],
+        [0, -0.249977111117893],
+        [0, -0.249977111117893],
+        [0, -0.249977111117893],
+        [0, -0.249977111117893]
+    ],
+    [
+        [0xFF323232],
+        [0xFFD00000],
+        [0xFFD00000],
+        [0xFFD00000],
+        [0xFFD00000],
+        [0xFFD00000],
+        [0xFFD00000]
+    ],
+    [
+        [0xFF000000],
+        [0xFF0070C0],
+        [0xFF0070C0],
+        [0xFF0070C0],
+        [0xFF0070C0],
+        [0xFF0070C0],
+        [0xFF0070C0]
+    ],
+    [
+        [0xFF376092],
+        [0xFFD00000],
+        [0xFFD00000],
+        [0xFFD00000],
+        [0xFFD00000],
+        [0xFFD00000],
+        [0xFFD00000]
+    ],
+    [
+        [0xFF0070C0],
+        [0xFF000000],
+        [0xFF000000],
+        [0xFF000000],
+        [0xFF000000],
+        [0xFF000000],
+        [0xFF000000]
+    ],
+    [
+        [0xFF5F5F5F],
+        [0xFFFFB620],
+        [0xFFD70077],
+        [0xFF5687C2],
+        [0xFF359CEB],
+        [0xFF56BE79],
+        [0xFFFF5055]
+    ],
+    [
+        [0xFF5687C2],
+        [0xFFFFB620],
+        [0xFFD70077],
+        [0xFF777777],
+        [0xFF359CEB],
+        [0xFF56BE79],
+        [0xFFFF5055]
+    ],
+    [
+        [0xFFC6EFCE],
+        [0xFFFFC7CE],
+        [0xFF8CADD6],
+        [0xFFFFDC47],
+        [0xFFFFEB9C],
+        [0xFF60D276],
+        [0xFFFF5367]
+    ],
+    [
+        [0xFF00B050],
+        [0xFFFF0000],
+        [0xFF0070C0],
+        [0xFFFFC000],
+        [0xFFFFC000],
+        [0xFF00B050],
+        [0xFFFF0000]
+    ],
+    [
+        [3, 0],
+        [9, 0],
+        [8, 0],
+        [4, 0],
+        [5, 0],
+        [6, 0],
+        [7, 0]
+    ],
+    [
+        [1, 0],
+        [9, 0],
+        [8, 0],
+        [4, 0],
+        [5, 0],
+        [6, 0],
+        [7, 0]
+    ]
+];
+
 function isObject(what) {
     return ( (what != null) && (typeof(what) == "object") );
 }
@@ -244,11 +573,14 @@ function CSparklineView()
     this.chartSpace = null;
 }
 
-function CreateSparklineMarker(oUniFill)
+function CreateSparklineMarker(oUniFill, bPreview)
 {
     var oMarker = new AscFormat.CMarker();
     oMarker.symbol = AscFormat.SYMBOL_DIAMOND;
     oMarker.size = 10;
+    if(bPreview){
+        oMarker.size = 30;
+    }
     oMarker.spPr = new AscFormat.CSpPr();
     oMarker.spPr.Fill = oUniFill;
     oMarker.spPr.ln = AscFormat.CreateNoFillLine();
@@ -258,7 +590,7 @@ function CreateSparklineMarker(oUniFill)
 function CreateUniFillFromExcelColor(oExcelColor)
 {
     var oUnifill;
-    if(oExcelColor instanceof AscCommonExcel.ThemeColor)
+    /*if(oExcelColor instanceof AscCommonExcel.ThemeColor)
     {
 
         oUnifill = AscFormat.CreateUnifillSolidFillSchemeColorByIndex(AscCommonExcel.map_themeExcel_to_themePresentation[oExcelColor.theme]);
@@ -283,26 +615,27 @@ function CreateUniFillFromExcelColor(oExcelColor)
 
         //oUnifill = AscFormat.CreateUniFillSchemeColorWidthTint(map_themeExcel_to_themePresentation[oExcelColor.theme], oExcelColor.tint != null ? oExcelColor.tint : 0);
     }
-    else
+    else*/
     {
         oUnifill = AscFormat.CreateUnfilFromRGB(oExcelColor.getR(), oExcelColor.getG(), oExcelColor.getB())
     }
     return oUnifill;
 }
 
-CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGroup, worksheetView)
+CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGroup, worksheetView, bForPreview)
 {
     AscFormat.ExecuteNoHistory(function(){
         this.ws = worksheetView;
         var settings = new AscCommon.asc_ChartSettings();
-        switch(oSparklineGroup.type)
+        var nSparklineType = oSparklineGroup.asc_getType();
+        switch(nSparklineType)
         {
-            case Asc.ESparklineType.Column:
+            case Asc.c_oAscSparklineType.Column:
             {
                 settings.type = c_oAscChartTypeSettings.barNormal;
                 break;
             }
-            case Asc.ESparklineType.Stacked:
+            case Asc.c_oAscSparklineType.Stacked:
             {
                 settings.type = c_oAscChartTypeSettings.barStackedPer;
                 break;
@@ -315,37 +648,18 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         }
         var ser = new asc_CChartSeria();
         ser.Val.Formula = oSparkline.f;
+        if(oSparkline.oCache){
+            ser.Val.NumCache = oSparkline.oCache;
+        }
         var chartSeries = {series: [ser], parsedHeaders: {bLeft: false, bTop: false}};
         var chart_space = AscFormat.DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
         chart_space.setBDeleted(false);
-        chart_space.setWorksheet(worksheetView.model);
-
-        chart_space.displayHidden = oSparklineGroup.displayHidden;
-        chart_space.displayEmptyCellsAs = oSparklineGroup.displayEmptyCellsAs;
-
-
-        if(AscFormat.isRealNumber(oSparklineGroup.displayEmptyCellsAs))
-        {
-            switch(oSparklineGroup.displayEmptyCellsAs)
-            {
-                case Asc.EDispBlanksAs.Span:
-                {
-                    chart_space.displayEmptyCellsAs = 0;
-                    break;
-                }
-                case Asc.EDispBlanksAs.Gap:
-                {
-                    chart_space.displayEmptyCellsAs = 1;
-                    break;
-                }
-                case Asc.EDispBlanksAs.Zero:
-                {
-                    chart_space.displayEmptyCellsAs = 2;
-                    break;
-                }
-            }
+        if(worksheetView){
+            chart_space.setWorksheet(worksheetView.model);
         }
-        chart_space.displayHidden = oSparklineGroup.displayHidden;
+
+        chart_space.displayHidden = oSparklineGroup.asc_getDisplayHidden();
+        chart_space.displayEmptyCellsAs = oSparklineGroup.asc_getDisplayEmpty();
         settings.putTitle(c_oAscChartTitleShowSettings.none);
         settings.putHorAxisLabel(c_oAscChartTitleShowSettings.none);
         settings.putVertAxisLabel(c_oAscChartTitleShowSettings.none);
@@ -353,26 +667,67 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         settings.putHorGridLines(c_oAscGridLinesSettings.none);
         settings.putVertGridLines(c_oAscGridLinesSettings.none);
 
+
+        chart_space.recalculateReferences();
+        chart_space.recalcInfo.recalculateReferences = false;
+        var oSerie = chart_space.chart.plotArea.charts[0].series[0];
+        var aSeriesPoints = AscFormat.getPtsFromSeries(oSerie);
+
         var val_ax_props = new AscCommon.asc_ValAxisSettings();
-        if(settings.type !== c_oAscChartTypeSettings.barStackedPer)
-        {
-            if(oSparklineGroup.minAxisType === Asc.SparklineAxisMinMax.Custom && oSparklineGroup.manualMin != null)
-            {
+        var i, fMinVal = null, fMaxVal = null;
+        if(settings.type !== c_oAscChartTypeSettings.barStackedPer) {
+            if (oSparklineGroup.asc_getMinAxisType() === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.asc_getManualMin() !== null) {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
-                val_ax_props.putMinVal(oSparklineGroup.manualMin);
+                val_ax_props.putMinVal(oSparklineGroup.asc_getManualMin());
             }
-            else
-            {
+            else {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.auto);
+                if (c_oAscChartTypeSettings.lineNormal === settings.type) {
+					for (i = 0; i < aSeriesPoints.length; ++i) {
+						if (fMinVal === null) {
+							fMinVal = aSeriesPoints[i].val;
+						}
+						else {
+							if (fMinVal > aSeriesPoints[i].val) {
+								fMinVal = aSeriesPoints[i].val;
+							}
+						}
+					}
+                }
             }
-            if(oSparklineGroup.maxAxisType === Asc.SparklineAxisMinMax.Custom && oSparklineGroup.manualMax != null)
-            {
+            if (oSparklineGroup.asc_getMaxAxisType() === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.asc_getManualMax() !== null) {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
-                val_ax_props.putMinVal(oSparklineGroup.manualMax);
+                val_ax_props.putMinVal(oSparklineGroup.asc_getManualMax());
             }
-            else
-            {
+            else {
                 val_ax_props.putMaxValRule(c_oAscValAxisRule.auto);
+				if (c_oAscChartTypeSettings.lineNormal === settings.type) {
+					for (i = 0; i < aSeriesPoints.length; ++i) {
+						if (fMaxVal === null) {
+							fMaxVal = aSeriesPoints[i].val;
+						} else {
+							if (fMaxVal < aSeriesPoints[i].val) {
+								fMaxVal = aSeriesPoints[i].val;
+							}
+						}
+					}
+				}
+            }
+            if (fMinVal !== null && fMaxVal !== null) {
+                if (fMinVal !== fMaxVal) {
+                    val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
+                    val_ax_props.putMinVal(fMinVal);
+                    val_ax_props.putMaxValRule(c_oAscValAxisRule.fixed);
+                    val_ax_props.putMaxVal(fMaxVal);
+                }
+            }
+            else if (fMinVal !== null) {
+                val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
+                val_ax_props.putMinVal(fMinVal);
+            }
+            else if (fMaxVal !== null) {
+                val_ax_props.putMaxValRule(c_oAscValAxisRule.fixed);
+                val_ax_props.putMaxVal(fMaxVal);
             }
         }
         else
@@ -384,16 +739,12 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             val_ax_props.putMaxVal(1);
         }
 
-
-
         val_ax_props.putTickLabelsPos(Asc.c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
         val_ax_props.putInvertValOrder(false);
         val_ax_props.putDispUnitsRule(Asc.c_oAscValAxUnits.none);
         val_ax_props.putMajorTickMark(Asc.c_oAscTickMark.TICK_MARK_NONE);
         val_ax_props.putMinorTickMark(Asc.c_oAscTickMark.TICK_MARK_NONE);
         val_ax_props.putCrossesRule(Asc.c_oAscCrossesRule.auto);
-
-
 
         var cat_ax_props = new AscCommon.asc_CatAxisSettings();
         cat_ax_props.putIntervalBetweenLabelsRule(Asc.c_oAscBetweenLabelsRule.auto);
@@ -412,7 +763,6 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         settings.putHorAxisProps(cat_ax_props);
 
         AscFormat.DrawingObjectsController.prototype.applyPropsToChartSpace(settings, chart_space);
-        var i;
         if(!chart_space.spPr)
             chart_space.setSpPr(new AscFormat.CSpPr());
 
@@ -420,6 +770,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         new_line.setFill(AscFormat.CreateNoFillUniFill());
         chart_space.spPr.setLn(new_line);
         chart_space.spPr.setFill(AscFormat.CreateNoFillUniFill());
+        var dLineWidthSpaces = 500;
         if(!chart_space.chart.plotArea.spPr)
         {
             chart_space.chart.plotArea.setSpPr(new AscFormat.CSpPr());
@@ -428,22 +779,19 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         var oAxis = chart_space.chart.plotArea.getAxisByTypes();
         oAxis.valAx[0].setDelete(true);
 
-        var oSerie = chart_space.chart.plotArea.charts[0].series[0];
         if(!oSerie.spPr)
         {
             oSerie.setSpPr(new AscFormat.CSpPr());
         }
-        chart_space.recalculateReferences();
-        chart_space.recalcInfo.recalculateReferences = false;
         var fCallbackSeries = null;
-        if(oSparklineGroup.type === Asc.ESparklineType.Line)
+        if(nSparklineType === Asc.c_oAscSparklineType.Line)
         {
             var oLn = new AscFormat.CLn();
-            oLn.setW(36000*nSparklineMultiplier*25.4*(oSparklineGroup.lineWidth != null ? oSparklineGroup.lineWidth : 0.75)/72);
+            oLn.setW(36000*nSparklineMultiplier*25.4*(bForPreview ? 2.25 : oSparklineGroup.asc_getLineWeight())/72);
             oSerie.spPr.setLn(oLn);
             if(oSparklineGroup.markers && oSparklineGroup.colorMarkers)
             {
-                oSerie.marker = CreateSparklineMarker(CreateUniFillFromExcelColor(oSparklineGroup.colorMarkers));
+                oSerie.marker = CreateSparklineMarker(CreateUniFillFromExcelColor(oSparklineGroup.colorMarkers), bForPreview);
             }
 
             fCallbackSeries = function(oSeries, nIdx, oExcelColor)
@@ -461,7 +809,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
                 }
                 var oDPt = new AscFormat.CDPt();
                 oDPt.idx = nIdx;
-                oDPt.marker = CreateSparklineMarker(CreateUniFillFromExcelColor(oExcelColor));
+                oDPt.marker = CreateSparklineMarker(CreateUniFillFromExcelColor(oExcelColor), bForPreview);
                 oSeries.addDPt(oDPt);
             }
         }
@@ -477,24 +825,53 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
                     {
                         if(oSeries.dPt[t].spPr)
                         {
-                            oSeries.dPt[t].spPr.Fill = CreateUniFillFromExcelColor(oExcelColor);
+                            if(oExcelColor){
+                                oSeries.dPt[t].spPr.Fill = CreateUniFillFromExcelColor(oExcelColor);
+                                oSeries.dPt[t].spPr.ln = new AscFormat.CLn();
+                                oSeries.dPt[t].spPr.ln.Fill = oSeries.dPt[t].spPr.Fill.createDuplicate();
+                                oSeries.dPt[t].spPr.ln.w = dLineWidthSpaces;
+                            }
+                            else{
+                                oSeries.dPt[t].spPr.Fill = AscFormat.CreateNoFillUniFill();
+                                oSeries.dPt[t].spPr.ln = AscFormat.CreateNoFillLine();
+                            }
                         }
                         return;
                     }
                 }
+
                 var oDPt = new AscFormat.CDPt();
                 oDPt.idx = nIdx;
                 oDPt.spPr = new AscFormat.CSpPr();
-                oDPt.spPr.Fill = CreateUniFillFromExcelColor(oExcelColor);
+                if(oExcelColor ) {
+                    oDPt.spPr.Fill = CreateUniFillFromExcelColor(oExcelColor);
+                    oDPt.spPr.ln = new AscFormat.CLn();
+                    oDPt.spPr.ln.Fill = oDPt.spPr.Fill.createDuplicate();
+                    oDPt.spPr.ln.w = dLineWidthSpaces;
+                }
+                else{
+                    oDPt.spPr.Fill = AscFormat.CreateNoFillUniFill();
+                    oDPt.spPr.ln = AscFormat.CreateNoFillLine();
+                }
                 oSeries.addDPt(oDPt);
             }
         }
-        var aSeriesPoints = AscFormat.getPtsFromSeries(oSerie);
         var aMaxPoints = null, aMinPoints = null;
         if(aSeriesPoints.length > 0)
         {
             if(fCallbackSeries)
             {
+
+                if(nSparklineType !== Asc.c_oAscSparklineType.Line){
+                    for(i = 0; i < aSeriesPoints.length; ++i)
+                    {
+                        if(AscFormat.fApproxEqual(aSeriesPoints[i].val,  0))
+                        {
+                            fCallbackSeries(oSerie, aSeriesPoints[i].idx, null);
+                        }
+                    }
+                }
+
                 if(oSparklineGroup.negative && oSparklineGroup.colorNegative)
                 {
                     for(i = 0; i < aSeriesPoints.length; ++i)
@@ -604,7 +981,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             {
                 dMaxVal = val_ax_props.maxVal;
             }
-            if(dMaxVal < 0 || dMinVal > 0)
+            if((dMaxVal !== dMinVal) && (dMaxVal < 0 || dMinVal > 0))
             {
                 oAxis.catAx[0].setDelete(true);
             }
@@ -613,7 +990,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         {
             var oUnifill = CreateUniFillFromExcelColor(oSparklineGroup.colorSeries);
             var oSerie = chart_space.chart.plotArea.charts[0].series[0];
-            if(oSparklineGroup.type === Asc.ESparklineType.Line)
+            if(nSparklineType === Asc.c_oAscSparklineType.Line)
             {
                 var oLn = oSerie.spPr.ln;
                 oLn.setFill(oUnifill);
@@ -621,24 +998,30 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             }
             else
             {
-                oSerie.spPr.setFill(oUnifill);
+                    oSerie.spPr.setFill(oUnifill);
+                    oSerie.spPr.ln = new AscFormat.CLn();
+                    oSerie.spPr.ln.Fill = oSerie.spPr.Fill.createDuplicate();
+                    oSerie.spPr.ln.w = dLineWidthSpaces;
             }
         }
 
         this.chartSpace = chart_space;
-        var oBBox = oSparkline.sqref;
-        this.col = oBBox.c1;
-        this.row = oBBox.r1;
-        this.x = worksheetView.getCellLeft(oBBox.c1, 3);
-        this.y = worksheetView.getCellTop(oBBox.r1, 3);
-        this.extX = worksheetView.getColumnWidth(oBBox.c1, 3);
-        this.extY = worksheetView.getRowHeight(oBBox.r1, 3);
-        AscFormat.CheckSpPrXfrm(this.chartSpace);
-        this.chartSpace.spPr.xfrm.setOffX(this.x*nSparklineMultiplier);
-        this.chartSpace.spPr.xfrm.setOffY(this.y*nSparklineMultiplier);
-        this.chartSpace.spPr.xfrm.setExtX(this.extX*nSparklineMultiplier);
-        this.chartSpace.spPr.xfrm.setExtY(this.extY*nSparklineMultiplier);
-        this.chartSpace.recalculate();
+        if(worksheetView){
+
+            var oBBox = oSparkline.sqref;
+            this.col = oBBox.c1;
+            this.row = oBBox.r1;
+            this.x = worksheetView.getCellLeft(oBBox.c1, 3);
+            this.y = worksheetView.getCellTop(oBBox.r1, 3);
+            this.extX = worksheetView.getColumnWidth(oBBox.c1, 3);
+            this.extY = worksheetView.getRowHeight(oBBox.r1, 3);
+            AscFormat.CheckSpPrXfrm(this.chartSpace);
+            this.chartSpace.spPr.xfrm.setOffX(this.x*nSparklineMultiplier);
+            this.chartSpace.spPr.xfrm.setOffY(this.y*nSparklineMultiplier);
+            this.chartSpace.spPr.xfrm.setExtX(this.extX*nSparklineMultiplier);
+            this.chartSpace.spPr.xfrm.setExtY(this.extY*nSparklineMultiplier);
+            this.chartSpace.recalculate();
+        }
     }, this, []);
 };
 
@@ -866,6 +1249,7 @@ function DrawingObjects() {
 
         // При скролах нужно выполнить все задачи
 
+        _this.drawingDocument.CheckTargetShow();
         var taskLen = aDrawTasks.length;
         if ( taskLen ) {
             var lastTask = aDrawTasks[taskLen - 1];
@@ -1124,6 +1508,7 @@ function DrawingObjects() {
 
         if ( _t.isGraphicObject() && _t.graphicObject.bounds) {
 
+
             var bounds = _t.graphicObject.bounds;
 
 
@@ -1327,17 +1712,49 @@ function DrawingObjects() {
         copyObject.to.row = object.to.row;
         copyObject.to.rowOff = object.to.rowOff;
 
+
+        copyObject.boundsFromTo.from.col =  object.boundsFromTo.from.col;
+        copyObject.boundsFromTo.from.colOff = object.boundsFromTo.from.colOff;
+        copyObject.boundsFromTo.from.row =  object.boundsFromTo.from.row;
+        copyObject.boundsFromTo.from.rowOff = object.boundsFromTo.from.rowOff;
+        copyObject.boundsFromTo.to.col =  object.boundsFromTo.to.col;
+        copyObject.boundsFromTo.to.colOff = object.boundsFromTo.to.colOff;
+        copyObject.boundsFromTo.to.row =  object.boundsFromTo.to.row;
+        copyObject.boundsFromTo.to.rowOff = object.boundsFromTo.to.rowOff;
+
         copyObject.graphicObject = object.graphicObject;
         return copyObject;
     };
 
+
+    _this.createShapeAndInsertContent = function(oParaContent){
+        var track_object = new AscFormat.NewShapeTrack("textRect", 0, 0, Asc['editor'].wbModel.theme, null, null, null, 0);
+        track_object.track({}, 0, 0);
+        var shape = track_object.getShape(false, _this.drawingDocument, this);
+        shape.spPr.setFill(AscFormat.CreateNoFillUniFill());
+        //shape.setParent(this);
+        shape.txBody.content.Content[0].Add_ToContent(0, oParaContent.Copy());
+        var body_pr = shape.getBodyPr();
+        var w = shape.txBody.getMaxContentWidth(150, true) + body_pr.lIns + body_pr.rIns;
+        var h = shape.txBody.content.Get_SummaryHeight() + body_pr.tIns + body_pr.bIns;
+        shape.spPr.xfrm.setExtX(w);
+        shape.spPr.xfrm.setExtY(h);
+        shape.spPr.xfrm.setOffX(0);
+        shape.spPr.xfrm.setOffY(0);
+        shape.spPr.setLn(AscFormat.CreateNoFillLine());
+        shape.setWorksheet(worksheet.model);
+        //shape.addToDrawingObjects();
+        return shape;
+    };
     //-----------------------------------------------------------------------------------
     // Public methods
     //-----------------------------------------------------------------------------------
 
     _this.init = function(currentSheet) {
-
-        setInterval(drawTaskFunction, 5);
+ 
+        if (!window['IS_NATIVE_EDITOR']) {
+            setInterval(drawTaskFunction, 5);
+        }
 
         var api = window["Asc"]["editor"];
         worksheet = currentSheet;
@@ -1456,7 +1873,7 @@ function DrawingObjects() {
                 }
             }
         }
-        return new AscCommonExcel.ActiveRange(cmin, rmin, cmax, rmax, true);
+        return new Asc.Range(cmin, rmin, cmax, rmax, true);
     };
 
     _this.recalculate =  function(all)
@@ -1598,6 +2015,7 @@ function DrawingObjects() {
             if ( (currTime - lastTask.time < 40) )
                 return;
         }
+
         aDrawTasks.push({ time: currTime, params: { clearCanvas: clearCanvas, graphicOption: graphicOption, printOptions: printOptions} });
     };
 
@@ -1689,7 +2107,6 @@ function DrawingObjects() {
                 if ( _this.controller.selectedObjects.length )
                 {
                     _this.OnUpdateOverlay();
-                    _this.drawingDocument.CheckTargetShow();
                     _this.controller.updateSelectionState(true);
                 }
             }
@@ -1813,26 +2230,14 @@ function DrawingObjects() {
         }
     };
 
-    _this.getDrawingAreaMetrics = function() {
+    _this.getMaxColRow = function() {
+        var r = -1, c = -1;
+        aObjects.forEach(function (item) {
+            r = Math.max(r, item.to.row + 1);
+            c = Math.max(c, item.to.col + 1);
+        });
 
-        /*
-         *	Объект, определяющий max колонку и строчку для отрисовки объектов листа
-         */
-
-        var metrics = {
-            maxCol: 0,
-            maxRow: 0
-        };
-
-        for (var i = 0; aObjects && (i < aObjects.length); i++) {
-
-            var drawingObject = aObjects[i];
-            if ( drawingObject.to.col >= metrics.maxCol )
-                metrics.maxCol = drawingObject.to.col + 1; // учитываем colOff
-            if ( drawingObject.to.row >= metrics.maxRow )
-                metrics.maxRow = drawingObject.to.row + 1; // учитываем rowOff
-        }
-        return metrics;
+        return new AscCommon.CellBase(r, c);
     };
 
     _this.clipGraphicsCanvas = function(canvas, graphicOption) {
@@ -1953,8 +2358,9 @@ function DrawingObjects() {
                     var drawingObject = _this.createDrawingObject();
                     drawingObject.worksheet = worksheet;
 
-                    drawingObject.from.col = isOption ? options.cell.col : worksheet.getSelectedColumnIndex();
-                    drawingObject.from.row = isOption ? options.cell.row : worksheet.getSelectedRowIndex();
+                    var activeCell = worksheet.model.selectionRange.activeCell;
+                    drawingObject.from.col = isOption ? options.cell.col : activeCell.col;
+                    drawingObject.from.row = isOption ? options.cell.row : activeCell.row;
 
                     // Проверяем начальные координаты при вставке
                     while (!worksheet.cols[drawingObject.from.col]) {
@@ -2019,6 +2425,72 @@ function DrawingObjects() {
         }
 
     };
+
+    _this.addMath = function(Type){
+        if (!_this.isViewerMode() && _this.controller) {
+
+            var oTargetContent = _this.controller.getTargetDocContent();
+            if(oTargetContent){
+
+                _this.controller.checkSelectedObjectsAndCallback(function(){
+                    var MathElement = new AscCommonWord.MathMenu(Type);
+                    _this.controller.paragraphAdd(MathElement, false);
+                }, [], false, AscDFH.historydescription_Spreadsheet_CreateGroup);
+                return;
+            }
+            var oVisibleRange = worksheet.getVisibleRange();
+
+            _this.objectLocker.reset();
+            _this.objectLocker.addObjectId(AscCommon.g_oIdCounter.Get_NewId());
+            _this.objectLocker.checkObjects(function (bLock) {
+                if (bLock !== true)
+                    return;
+                _this.controller.resetSelection();
+
+                var activeCell = worksheet.model.selectionRange.activeCell;
+                var dLeft = worksheet.getCellLeft(activeCell.col, 3);
+                var dTop = worksheet.getCellTop(activeCell.row, 3);
+                var dRight = worksheet.getCellLeft(oVisibleRange.c2, 3) + worksheet.getColumnWidth(oVisibleRange.c2, 3);
+                var dBottom = worksheet.getCellTop(oVisibleRange.r2, 3) + worksheet.getRowHeight(oVisibleRange.r2, 3);
+
+
+
+                var coordsFrom = _this.coordsManager.calculateCoords({col: activeCell.col, row: activeCell.row, colOff: 0, rowOff: 0});
+
+
+                History.Create_NewPoint();
+                var oTextArt = _this.controller.createTextArt(0, false, worksheet.model, "");
+                _this.controller.resetSelection();
+                oTextArt.setWorksheet(_this.controller.drawingObjects.getWorksheetModel());
+                oTextArt.setDrawingObjects(_this.controller.drawingObjects);
+                oTextArt.addToDrawingObjects();
+
+                var oContent = oTextArt.getDocContent();
+                if(oContent){
+                    oContent.Cursor_MoveToStartPos(false);
+                    oContent.Paragraph_Add(new AscCommonWord.MathMenu(Type), false);
+                }
+                oTextArt.checkExtentsByDocContent();
+                oTextArt.spPr.xfrm.setOffX(pxToMm(coordsFrom.x) + MOVE_DELTA);
+                oTextArt.spPr.xfrm.setOffY(pxToMm(coordsFrom.y) + MOVE_DELTA);
+
+                oTextArt.checkDrawingBaseCoords();
+                _this.controller.selectObject(oTextArt, 0);
+                var oContent = oTextArt.getDocContent();
+                _this.controller.selection.textSelection = oTextArt;
+                oContent.Select_All();
+                oTextArt.addToRecalculate();
+                _this.controller.startRecalculate();
+                worksheet.setSelectionShape(true);
+            });
+        }
+    };
+
+
+    _this.setMathProps = function(MathProps)
+    {
+        _this.controller.setMathProps(MathProps);
+    }
 
     _this.editImageDrawingObject = function(imageUrl) {
 
@@ -2119,10 +2591,7 @@ function DrawingObjects() {
             aObjects.length = 0;
             var listRange = new AscCommonExcel.Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
             listRange.cleanAll();
-            if ( worksheet.isChartAreaEditMode ) {
-                worksheet.isChartAreaEditMode = false;
-                worksheet.arrActiveChartsRanges = [];
-            }
+            worksheet.endEditChart();
             var asc_chart_binary = new Asc.asc_CChartBinary();
             asc_chart_binary.asc_setBinary(chart["binary"]);
             asc_chart_binary.asc_setThemeBinary(chart["themeBinary"]);
@@ -2151,6 +2620,24 @@ function DrawingObjects() {
                     var max_r = 0, max_c = 0;
 
                     var series = oNewChartSpace.chart.plotArea.charts[0].series, ser;
+					
+					function fFillCell(oCell, sNumFormat, value)
+					{
+						var oCellValue = new AscCommonExcel.CCellValue();
+						if(AscFormat.isRealNumber(value))
+						{
+							oCellValue.number = value;
+							oCellValue.type = AscCommon.CellValueType.Number;
+						}
+						else
+						{
+							oCellValue.text = value;
+							oCellValue.type = AscCommon.CellValueType.String;
+						}
+						oCell.setNumFormat(sNumFormat);
+						oCell.setValueData(new AscCommonExcel.UndoRedoData_CellValueData(null, oCellValue));
+					}
+					
                     function fillTableFromRef(ref)
                     {
                         var cache = ref.numCache ? ref.numCache : (ref.strCache ? ref.strCache : null);
@@ -2207,35 +2694,33 @@ function DrawingObjects() {
                                             if(i === arr_f.length - 1)
                                             {
                                                 nPtCount = cache.getPtCount();
-                                                if((range.r2 - range.r1 + 1) === (nPtCount - pt_index))
+                                                if((nPtCount - pt_index) <=(range.r2 - range.r1 + 1))
                                                 {
                                                     for(k = range.c1; k <= range.c2; ++k)
                                                     {
                                                         for(j = range.r1; j <= range.r2; ++j)
                                                         {
-                                                            cell = source_worksheet.getCell3(j, k);
+                                                            cell = source_worksheet._getCell(j, k);
                                                             pt = cache.getPtByIndex(pt_index + j - range.r1);
                                                             if(pt)
                                                             {
-                                                                cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code);
-                                                                cell.setValue(pt.val + "");
+																fFillCell(cell, typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code, pt.val);
                                                             }
                                                         }
                                                     }
                                                     pt_index += (range.r2 - range.r1 + 1);
                                                 }
-                                                else if((range.c2 - range.c1 + 1) === (nPtCount - pt_index))
+                                                else if((nPtCount - pt_index) <= (range.c2 - range.c1 + 1))
                                                 {
                                                     for(k = range.r1; k <= range.r2; ++k)
                                                     {
                                                         for(j = range.c1;  j <= range.c2; ++j)
                                                         {
-                                                            cell = source_worksheet.getCell3(k, j);
+                                                            cell = source_worksheet._getCell(k, j);
                                                             pt = cache.getPtByIndex(pt_index + j - range.c1);
                                                             if(pt)
                                                             {
-                                                                cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code);
-                                                                cell.setValue(pt.val + "");
+																fFillCell(cell, typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code, pt.val);																
                                                             }
                                                         }
                                                     }
@@ -2248,12 +2733,11 @@ function DrawingObjects() {
                                                 {
                                                     for(j = range.c1;  j <= range.c2; ++j)
                                                     {
-                                                        cell = source_worksheet.getCell3(range.r1, j);
+                                                        cell = source_worksheet._getCell(range.r1, j);
                                                         pt = cache.getPtByIndex(pt_index);
                                                         if(pt)
                                                         {
-                                                            cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code);
-                                                            cell.setValue(pt.val + "");
+															fFillCell(cell, typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code, pt.val);														
                                                         }
                                                         ++pt_index;
                                                     }
@@ -2262,12 +2746,11 @@ function DrawingObjects() {
                                                 {
                                                     for(j = range.r1; j <= range.r2; ++j)
                                                     {
-                                                        cell = source_worksheet.getCell3(j, range.c1);
+                                                        cell = source_worksheet._getCell(j, range.c1);
                                                         pt = cache.getPtByIndex(pt_index);
                                                         if(pt)
                                                         {
-                                                            cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code);
-                                                            cell.setValue(pt.val + "");
+															fFillCell(cell, typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code, pt.val);	
                                                         }
                                                         ++pt_index;
                                                     }
@@ -2279,8 +2762,6 @@ function DrawingObjects() {
                                 }
                             }
                         }
-
-
                     }
 
                     var first_num_ref;
@@ -2337,6 +2818,7 @@ function DrawingObjects() {
                     oNewChartSpace.setBDeleted(false);
                     oNewChartSpace.setWorksheet(worksheet.model);
                     oNewChartSpace.addToDrawingObjects();
+                    oNewChartSpace.recalcInfo.recalculateReferences = false;
                     oNewChartSpace.recalculate();
                     AscFormat.CheckSpPrXfrm(oNewChartSpace);
 
@@ -2390,21 +2872,21 @@ function DrawingObjects() {
 
     _this.checkSparklineGroupMinMaxVal = function(oSparklineGroup)
     {
-        var maxVal = null, minVal = null, i, j;
-        if(oSparklineGroup.type !== Asc.ESparklineType.Stacked &&
-            (Asc.SparklineAxisMinMax.Group === oSparklineGroup.minAxisType || Asc.SparklineAxisMinMax.Group === oSparklineGroup.maxAxisType))
+        var maxVal = null, minVal = null, i, j, sparkline;
+        if(oSparklineGroup.type !== Asc.c_oAscSparklineType.Stacked &&
+            (Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.minAxisType || Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.maxAxisType))
         {
             for(i = 0; i < oSparklineGroup.arrSparklines.length; ++i)
             {
-                if (!oSparklineGroup.arrCachedSparklines[i]) {
-                    var oSparklineView = new CSparklineView();
-                    oSparklineView.initFromSparkline(oSparklineGroup.arrSparklines[i], oSparklineGroup, worksheet);
-                    oSparklineGroup.addView(oSparklineView, i);
+				sparkline = oSparklineGroup.arrSparklines[i];
+                if (!sparkline.oCacheView) {
+					sparkline.oCacheView = new CSparklineView();
+					sparkline.oCacheView.initFromSparkline(sparkline, oSparklineGroup, worksheet);
                 }
-                var aPoints = AscFormat.getPtsFromSeries(oSparklineGroup.arrCachedSparklines[i].chartSpace.chart.plotArea.charts[0].series[0]);
+                var aPoints = AscFormat.getPtsFromSeries(sparkline.oCacheView.chartSpace.chart.plotArea.charts[0].series[0]);
                 for(j = 0; j < aPoints.length; ++j)
                 {
-                    if(Asc.SparklineAxisMinMax.Group === oSparklineGroup.maxAxisType)
+                    if(Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.maxAxisType)
                     {
                         if(maxVal === null)
                         {
@@ -2418,7 +2900,7 @@ function DrawingObjects() {
                             }
                         }
                     }
-                    if(Asc.SparklineAxisMinMax.Group === oSparklineGroup.minAxisType)
+                    if(Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.minAxisType)
                     {
                         if(minVal === null)
                         {
@@ -2438,7 +2920,7 @@ function DrawingObjects() {
             {
                 for(i = 0; i < oSparklineGroup.arrSparklines.length; ++i)
                 {
-                    oSparklineGroup.arrCachedSparklines[i].setMinMaxValAx(minVal, maxVal, oSparklineGroup);
+					oSparklineGroup.arrSparklines[i].oCacheView.setMinMaxValAx(minVal, maxVal, oSparklineGroup);
                 }
             }
         }
@@ -2447,7 +2929,7 @@ function DrawingObjects() {
     _this.drawSparkLineGroups = function(oDrawingContext, aSparklineGroups, range, offsetX, offsetY)
     {
 
-        var graphics, i, j;
+        var graphics, i, j, sparkline;
         if(oDrawingContext instanceof AscCommonExcel.CPdfPrinter)
         {
             graphics = oDrawingContext.DocumentRenderer;
@@ -2465,19 +2947,20 @@ function DrawingObjects() {
         for(i = 0; i < aSparklineGroups.length; ++i) {
             var oSparklineGroup = aSparklineGroups[i];
 
-            if(oSparklineGroup.type !== Asc.ESparklineType.Stacked &&
-                (Asc.SparklineAxisMinMax.Group === oSparklineGroup.minAxisType || Asc.SparklineAxisMinMax.Group === oSparklineGroup.maxAxisType))
+            if(oSparklineGroup.type !== Asc.c_oAscSparklineType.Stacked &&
+                (Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.minAxisType || Asc.c_oAscSparklineAxisMinMax.Group === oSparklineGroup.maxAxisType))
             {
                 _this.checkSparklineGroupMinMaxVal(oSparklineGroup);
             }
             for(j = 0; j < oSparklineGroup.arrSparklines.length; ++j) {
-                if (!oSparklineGroup.arrCachedSparklines[j]) {
-                    var oSparklineView = new CSparklineView();
-                    oSparklineView.initFromSparkline(oSparklineGroup.arrSparklines[j], oSparklineGroup, worksheet);
-                    oSparklineGroup.addView(oSparklineView, j);
-                }
-                if (!oSparklineGroup.arrSparklines[j].checkInRange(range)) {
-                    continue;
+				sparkline = oSparklineGroup.arrSparklines[j];
+				if (!sparkline.checkInRange(range)) {
+					continue;
+				}
+
+                if (!sparkline.oCacheView) {
+					sparkline.oCacheView = new CSparklineView();
+					sparkline.oCacheView.initFromSparkline(sparkline, oSparklineGroup, worksheet);
                 }
 
                 if(oDrawingContext instanceof AscCommonExcel.CPdfPrinter)
@@ -2490,7 +2973,7 @@ function DrawingObjects() {
                     graphics.SetBaseTransform(_baseTransform);
                 }
 
-                oSparklineGroup.arrCachedSparklines[j].draw(graphics, _offX, _offY);
+				sparkline.oCacheView.draw(graphics, _offX, _offY);
 
                 if(oDrawingContext instanceof AscCommonExcel.CPdfPrinter)
                 {
@@ -2513,33 +2996,10 @@ function DrawingObjects() {
         if(!worksheet)
             return;
         AscFormat.ExecuteNoHistory(function(){
-            var i;
             var wsViews = Asc["editor"].wb.wsViews;
             var changedArr = [];
-            if(data.changedRange)
-            {
-                changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.changedRange.c1, data.changedRange.r1, data.changedRange.c2, data.changedRange.r2)))
-            }
-            if(data.added)
-            {
-                changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.added.c1, data.added.r1, gc_nMaxCol, gc_nMaxRow)))
-            }
-
-            if(data.hided)
-            {
-                changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.hided.c1, data.hided.r1, data.hided.c2, data.hided.r2)))
-            }
-
-            if(data.removed)
-            {
-                changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.removed.c1, data.removed.r1, gc_nMaxCol, gc_nMaxRow)))
-            }
-            if(Array.isArray(data.arrChanged))
-            {
-                for(i = 0; i < data.arrChanged.length; ++i)
-                {
-                    changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.arrChanged[i].c1, data.arrChanged[i].r1, data.arrChanged[i].c2, data.arrChanged[i].r2)))
-                }
+            for (var i = 0; i < data.length; ++i) {
+                changedArr.push(new BBoxInfo(worksheet.model, data[i]));
             }
 
             for(i = 0; i < wsViews.length; ++i)
@@ -2820,14 +3280,28 @@ function DrawingObjects() {
                 for (i = 0; i < aObjects.length; i++) {
                     drawingObject = aObjects[i];
                     if (drawingObject.from.row >= target.row) {
-                        drawingObject.checkBoundsFromTo();
+                        if(drawingObject.graphicObject){
+                            if(drawingObject.graphicObject.recalculateTransform){
+                                drawingObject.graphicObject.recalculateTransform();
+                            }
+                            if(drawingObject.graphicObject.recalculateBounds){
+                                drawingObject.graphicObject.recalculateBounds();
+                            }
+                        }
                     }
                 }
             } else {
                 for (i = 0; i < aObjects.length; i++) {
                     drawingObject = aObjects[i];
                     if (drawingObject.from.col >= target.col) {
-                        drawingObject.checkBoundsFromTo();
+                        if(drawingObject.graphicObject){
+                            if(drawingObject.graphicObject.recalculateTransform){
+                                drawingObject.graphicObject.recalculateTransform();
+                            }
+                            if(drawingObject.graphicObject.recalculateBounds){
+                                drawingObject.graphicObject.recalculateBounds();
+                            }
+                        }
                     }
                 }
             }
@@ -2905,7 +3379,13 @@ function DrawingObjects() {
 					var options = new AscCommon.asc_ChartSettings();
 					var catHeadersBBox, serHeadersBBox;
                     var final_bbox = oBBoxTo.clone();
-                    if(chart.bbox.seriesBBox.bVert)
+                    var bOneCell = false;
+                    if(!chart.bbox.catBBox && !chart.bbox.serBBox){
+                        if(chart.bbox.seriesBBox.r1 === chart.bbox.seriesBBox.r2 && chart.bbox.seriesBBox.c1 === chart.bbox.seriesBBox.c2){
+                            bOneCell = true;
+                        }
+                    }
+                    if((!bOneCell && chart.bbox.seriesBBox.bVert) || (bOneCell && (final_bbox.r1 === final_bbox.r2)))
                     {
 						options.putInColumns(false);
                         if(chart.bbox.catBBox && chart.bbox.catBBox.r1 === chart.bbox.catBBox.r2 && oBBoxTo.r1 > chart.bbox.catBBox.r1)
@@ -3073,8 +3553,9 @@ function DrawingObjects() {
         var drawingObject = _this.createDrawingObject();
         drawingObject.worksheet = worksheet;
 
-        drawingObject.from.col = worksheet.getSelectedColumnIndex();
-        drawingObject.from.row = worksheet.getSelectedRowIndex();
+        var activeCell = worksheet.model.selectionRange.activeCell;
+        drawingObject.from.col = activeCell.col;
+        drawingObject.from.row = activeCell.row;
 
         // Проверяем начальные координаты при вставке
         while (!worksheet.cols[drawingObject.from.col]) {
@@ -3104,6 +3585,10 @@ function DrawingObjects() {
 
     _this.editOleObject = function(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight, bResize){
         this.controller.editOleObjectFromParams(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight, bResize);
+    };
+
+    _this.startEditCurrentOleObject = function(){
+        this.controller.startEditCurrentOleObject();
     };
 
     _this.groupGraphicObjects = function() {
@@ -3139,7 +3624,7 @@ function DrawingObjects() {
             if ( aObjects[i].graphicObject.Id == graphicId ) {
                 aObjects[i].graphicObject.deselect(_this.controller);
                 if ( aObjects[i].isChart() )
-                    worksheet.arrActiveChartsRanges = [];
+                    worksheet.endEditChart();
                 aObjects.splice(i, 1);
                 bRedraw = true;
                 position = i;
@@ -3316,9 +3801,10 @@ function DrawingObjects() {
         return new AscCommon.asc_CImageSize( 50, 50, false );
     };
 
-    _this.sendGraphicObjectProps = function() {
-        if ( worksheet )
-            worksheet.handlers.trigger("selectionChanged", worksheet.getSelectionInfo());
+    _this.sendGraphicObjectProps = function () {
+        if (worksheet) {
+            worksheet.handlers.trigger("selectionChanged");
+        }
     };
 
     _this.setGraphicObjectProps = function(props) {
@@ -3564,41 +4050,34 @@ function DrawingObjects() {
     _this.selectDrawingObjectRange = function(drawing) {
 
 		worksheet.cleanSelection();
-        worksheet.arrActiveChartsRanges = [];
+        worksheet.endEditChart();
 
         if(!drawing.bbox || drawing.bbox.worksheet !== worksheet.model)
             return;
 
-        var stroke_color, fill_color;
         if(drawing.bbox.serBBox)
         {
-            stroke_color = fill_color = new AscCommon.CColor(0, 128, 0);
-            worksheet._drawElements(worksheet, worksheet._drawSelectionElement,
-                asc.Range(drawing.bbox.serBBox.c1, drawing.bbox.serBBox.r1, drawing.bbox.serBBox.c2, drawing.bbox.serBBox.r2, true),
-                false, 1,
-                stroke_color, fill_color);
+            worksheet._drawElements(worksheet._drawSelectionElement,
+              asc.Range(drawing.bbox.serBBox.c1, drawing.bbox.serBBox.r1, drawing.bbox.serBBox.c2,
+                drawing.bbox.serBBox.r2, true), AscCommonExcel.selectionLineType.Selection | AscCommonExcel.selectionLineType.Resize,
+              AscCommonExcel.c_oAscFormulaRangeBorderColor[1]);
         }
         if(drawing.bbox.catBBox)
         {
-            stroke_color = fill_color = new AscCommon.CColor(153, 0, 204);
-            worksheet._drawElements(worksheet, worksheet._drawSelectionElement,
-                asc.Range(drawing.bbox.catBBox.c1, drawing.bbox.catBBox.r1, drawing.bbox.catBBox.c2, drawing.bbox.catBBox.r2, true),
-                false, 1,
-                stroke_color, fill_color);
+            worksheet._drawElements(worksheet._drawSelectionElement,
+              asc.Range(drawing.bbox.catBBox.c1, drawing.bbox.catBBox.r1, drawing.bbox.catBBox.c2,
+                drawing.bbox.catBBox.r2, true), AscCommonExcel.selectionLineType.Selection | AscCommonExcel.selectionLineType.Resize,
+              AscCommonExcel.c_oAscFormulaRangeBorderColor[2]);
         }
         var BB = drawing.bbox.seriesBBox;
         var range = asc.Range(BB.c1, BB.r1, BB.c2, BB.r2, true);
-        worksheet.arrActiveChartsRanges.push(range);
-        worksheet.isChartAreaEditMode = true;
-		worksheet._drawSelection();
+        worksheet.setChartRange(range);
+        worksheet._drawSelection();
     };
 
     _this.unselectDrawingObjects = function() {
 
-        if ( worksheet.isChartAreaEditMode ) {
-            worksheet.isChartAreaEditMode = false;
-            worksheet.arrActiveChartsRanges = [];
-        }
+        worksheet.endEditChart();
         _this.controller.resetSelectionState();
         _this.OnUpdateOverlay();
     };
@@ -4091,7 +4570,9 @@ function CoordsManager(ws) {
     }
 }
 
-    //--------------------------------------------------------export----------------------------------------------------
+
+
+//--------------------------------------------------------export----------------------------------------------------
     var prot;
     window['AscFormat'] = window['AscFormat'] || {};
     window['Asc'] = window['Asc'] || {};
@@ -4137,4 +4618,6 @@ function CoordsManager(ws) {
     window["AscFormat"].GraphicOption = GraphicOption;
     window["AscFormat"].DrawingObjects = DrawingObjects;
     window["AscFormat"].ClickCounter = ClickCounter;
+    window["AscFormat"].aSparklinesStyles = aSparklinesStyles;
+    window["AscFormat"].CSparklineView = CSparklineView;
 })(window);

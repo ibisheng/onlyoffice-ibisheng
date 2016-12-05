@@ -160,6 +160,7 @@ function BinaryPPTYLoader()
     this.RebuildImages = [];
 
     this.textBodyTextFit = [];
+	this.DocReadResult = null;
 
     this.Start_UseFullUrl = function()
     {
@@ -2272,25 +2273,26 @@ function BinaryPPTYLoader()
                             }
                         }
 
-                        if (null != uni_fill.fill.lin && null != uni_fill.fill.path)
-                        {
-                            // ms office не открывает такие файлы.
-                            uni_fill.fill.setPath(null);
-                        }
 
-                        if(uni_fill.fill.colors.length < 2)
+                    }
+                    if (null != uni_fill.fill.lin && null != uni_fill.fill.path)
+                    {
+                        // ms office не открывает такие файлы.
+                        uni_fill.fill.setPath(null);
+                    }
+
+                    if(uni_fill.fill.colors.length < 2)
+                    {
+                        if(uni_fill.fill.colors.length === 1)
                         {
-                            if(uni_fill.fill.colors.length === 1)
-                            {
-                                var oUniColor = uni_fill.fill.colors[0].color;
-                                uni_fill.fill = new AscFormat.CSolidFill();
-                                uni_fill.fill.color = oUniColor;
-                            }
-                            else
-                            {
-                                uni_fill.fill = new AscFormat.CSolidFill();
-                                uni_fill.fill.color =  AscFormat.CreateUniColorRGB(0, 0, 0);
-                            }
+                            var oUniColor = uni_fill.fill.colors[0].color;
+                            uni_fill.fill = new AscFormat.CSolidFill();
+                            uni_fill.fill.color = oUniColor;
+                        }
+                        else
+                        {
+                            uni_fill.fill = new AscFormat.CSolidFill();
+                            uni_fill.fill.color =  AscFormat.CreateUniColorRGB(0, 0, 0);
                         }
                     }
 
@@ -4900,6 +4902,11 @@ function BinaryPPTYLoader()
                     shape.txBody.setParent(shape);
                     break;
                 }
+				case 6:
+				{
+					s.SkipRecord();
+					break;
+				}
                 default:
                 {
                     break;
@@ -6701,7 +6708,10 @@ function BinaryPPTYLoader()
                 }
                 case 1:
                 {
-                    rPr.Unifill = this.ReadUniFill();
+                    var oUniFill = this.ReadUniFill();
+                    if(oUniFill.fill){
+                        rPr.Unifill = oUniFill;
+                    }
                     break;
                 }
                 case 2:
@@ -7128,7 +7138,7 @@ function BinaryPPTYLoader()
                 }
                 case 1:
                 {
-                    var default_tab = s.GetLong()/36000;
+                    para_pr.DefaultTabSize = s.GetLong()/36000;
                     break;
                 }
                 case 2:
@@ -8061,6 +8071,43 @@ function BinaryPPTYLoader()
                                 }
                                 break;
                             }
+							case AscFormat.PARRUN_TYPE_MATHPARA:
+							case AscFormat.PARRUN_TYPE_MATH:
+							{
+								var _end = s.cur + s.GetULong() + 4;
+
+								var _stream = new AscCommon.FT_Stream2();
+								_stream.data = s.data;
+								_stream.pos = s.pos;
+								_stream.cur = s.cur;
+								_stream.size = s.size;
+								var parContentOld = par.Content.length;
+
+								var oParStruct = new OpenParStruct(par, par);
+                                oParStruct.cur.pos = par.Content.length - 1;
+								if (!this.DocReadResult) {
+									this.DocReadResult = new AscCommonWord.DocReadResult(null);
+								}
+								var boMathr = new Binary_oMathReader(_stream, this.DocReadResult, null);
+								var nDocLength = _stream.GetULongLE();
+								if (AscFormat.PARRUN_TYPE_MATHPARA == _type) {
+									var props = {};
+									boMathr.bcr.Read1(nDocLength, function(t, l){
+										return boMathr.ReadMathOMathPara(t,l,oParStruct, props);
+									});
+								} else {
+									var oMath = new ParaMath();
+									oParStruct.addToContent(oMath);
+									boMathr.bcr.Read1(nDocLength, function(t, l){
+										return boMathr.ReadMathArg(t,l,oMath.Root,oParStruct);
+									});
+									oMath.Root.Correct_Content(true);
+								}
+								s.Seek2(_end);
+
+								EndPos += par.Content.length - parContentOld;
+								break;
+							}
                             default:
                                 break;
                         }
@@ -8621,6 +8668,41 @@ function CPres()
             this.LogicDocument = oLogicDocument;
             return oNewSpPr;
         };
+		
+		this.ReadRunProperties = function(stream, type)
+		{
+			if (this.Reader == null)
+				this.Reader = new AscCommon.BinaryPPTYLoader();
+
+			var oLogicDocument = this.LogicDocument;
+			this.LogicDocument = null;
+
+			this.Reader.ImageMapChecker = this.ImageMapChecker;
+
+			if (null == this.stream)
+			{
+				this.stream = new AscCommon.FileStream();
+				this.stream.obj	= stream.obj;
+				this.stream.data   = stream.data;
+				this.stream.size   = stream.size;
+			}
+
+			this.stream.pos	= stream.pos;
+			this.stream.cur	= stream.cur;
+
+			this.Reader.stream = this.stream;
+
+			var s = this.stream;
+			var _main_type = s.GetUChar(); // 0!!!
+
+			var oNewrPr = this.Reader.ReadRunProperties();
+
+			stream.pos = s.pos;
+			stream.cur = s.cur;
+
+			this.LogicDocument = oLogicDocument;
+			return oNewrPr;
+		};
 
         this.ReadShape = function()
         {
@@ -8653,6 +8735,7 @@ function CPres()
                 }
             }
 
+            var oXFRM = null;
             while (s.cur < _end_rec)
             {
                 var _at = s.GetUChar();
@@ -8723,6 +8806,12 @@ function CPres()
                         var bodyPr = new AscFormat.CBodyPr();
                         this.Reader.CorrectBodyPr(bodyPr);
                         shape.setBodyPr(bodyPr);
+                        break;
+                    }
+                    case 6:
+                    {
+                        oXFRM = this.Reader.ReadXfrm();
+                        break;
                     }
                     default:
                     {
@@ -8731,6 +8820,68 @@ function CPres()
                 }
             }
 
+            if(oXFRM)
+            {
+                var oRet = new AscFormat.CGroupShape();
+                shape.setParent(null);
+                oRet.setParent(this.TempMainObject == null ? this.ParaDrawing : null);
+                oRet.setBDeleted(false);
+                var oSpPr = new AscFormat.CSpPr();
+                var oXfrm = new AscFormat.CXfrm();
+                oXfrm.setOffX(shape.spPr.xfrm.offX);
+                oXfrm.setOffY(shape.spPr.xfrm.offY);
+                oXfrm.setExtX(shape.spPr.xfrm.extX);
+                oXfrm.setExtY(shape.spPr.xfrm.extY);
+                oXfrm.setChExtX(shape.spPr.xfrm.extX);
+                oXfrm.setChExtY(shape.spPr.xfrm.extY);
+                oXfrm.setChOffX(0);
+                oXfrm.setChOffY(0);
+                oSpPr.setXfrm(oXfrm);
+                oXfrm.setParent(oSpPr);
+                shape.spPr.xfrm.setOffX(0);
+                shape.spPr.xfrm.setOffY(0);
+                oRet.setSpPr(oSpPr);
+                oSpPr.setParent(oRet);
+                oRet.addToSpTree(0, shape);
+                var oShape2 = new AscFormat.CShape();
+                var oSpPr2 = new AscFormat.CSpPr();
+                oShape2.setSpPr(oSpPr2);
+                oSpPr2.setParent(oShape2);
+                var oXfrm2 = oXFRM;
+                oXfrm2.setParent(oSpPr2);
+                oSpPr2.setXfrm(oXfrm2);
+                oXfrm2.setOffX(oXfrm2.offX - oXfrm.offX);
+                oXfrm2.setOffY(oXfrm2.offY - oXfrm.offY);
+                oSpPr2.setFill(AscFormat.CreateNoFillUniFill());
+                oSpPr2.setLn(AscFormat.CreateNoFillLine());
+                oShape2.setTxBody(shape.txBody);
+                shape.setTxBody(null);
+                shape.setGroup(oRet);
+                oShape2.setBDeleted(false);
+                oShape2.setWordShape(true);
+                if(shape.spPr.xfrm && AscFormat.isRealNumber(shape.spPr.xfrm.rot))
+                {
+                    oXfrm2.setRot((AscFormat.isRealNumber(oXfrm2.rot) ? oXfrm2.rot : 0) + shape.spPr.xfrm.rot);
+                }
+                if(oShape2.txBody)
+                {
+                    oShape2.txBody.setParent(oShape2);
+                }
+                if(shape.textBoxContent)
+                {
+                    oShape2.setTextBoxContent(shape.textBoxContent.Copy(oShape2, shape.textBoxContent.DrawingDocument));
+                    shape.setTextBoxContent(null);
+                }
+                if(shape.bodyPr)
+                {
+                    oShape2.setBodyPr(shape.bodyPr);
+                    shape.setBodyPr(null);
+                }
+                oRet.addToSpTree(1, oShape2);
+                oShape2.setGroup(oRet);
+                s.Seek2(_end_rec);
+                return oRet;
+            }
             s.Seek2(_end_rec);
             return shape;
 

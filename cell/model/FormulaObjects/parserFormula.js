@@ -1064,7 +1064,7 @@ cArea.prototype.foreach = function ( action ) {
     }
 };
 	cArea.prototype.foreach2 = function (action) {
-		var t = this, r = this.getRange();
+		var r = this.getRange();
 		if (r) {
 			r._foreach2(function (cell) {
 				action(checkTypeCell(cell), cell);
@@ -1072,7 +1072,7 @@ cArea.prototype.foreach = function ( action ) {
 		}
 	};
 	cArea.prototype.getMatrix = function () {
-		var t = this, arr = [], r = this.getRange();
+		var arr = [], r = this.getRange();
 		r._foreach2(function (cell, i, j, r1, c1) {
 			if (!arr[i - r1]) {
 				arr[i - r1] = [];
@@ -1082,7 +1082,7 @@ cArea.prototype.foreach = function ( action ) {
 		return arr;
 	};
 	cArea.prototype.getValuesNoEmpty = function () {
-		var t = this, arr = [], r = this.getRange();
+		var arr = [], r = this.getRange();
 		r._foreachNoEmpty(function (cell) {
 			arr.push(checkTypeCell(cell));
 		});
@@ -1165,9 +1165,15 @@ cArea3D.prototype.wsRange = function () {
 		}
 		return r;
 	};
-cArea3D.prototype.getRange = function () {
-    return this.range( this.wsRange() );
-};
+	cArea3D.prototype.getRange = function () {
+		if (!this.isSingleSheet()) {
+			return null;
+		}
+		return (this.range(this.wsRange()))[0];
+	};
+	cArea3D.prototype.getRanges = function () {
+		return (this.range(this.wsRange()));
+	};
 	cArea3D.prototype.getValue = function () {
 		var i, _wsA = this.wsRange();
 		var _val = [];
@@ -1256,45 +1262,41 @@ cArea3D.prototype.tocArea = function () {
 cArea3D.prototype.getWS = function () {
     return this.wsRange()[0];
 };
-cArea3D.prototype.cross = function ( arg, wsID ) {
-    if ( this.wsFrom !== this.wsTo ) {
-        return new cError( cErrorType.wrong_value_type );
-    }
-    /*if ( this.wsFrom !== wsID ) {
-        return new cError( cErrorType.wrong_value_type );
-    }*/
-    var r = this.getRange();
-    if ( !r ) {
-        return new cError( cErrorType.wrong_name );
-    }
-    var cross = r[0].cross( arg );
-    if ( cross ) {
-        if ( cross.r != undefined ) {
-            return this.getValue2( new CellAddress( cross.r, this.getBBox().c1 ) );
-    } else if (cross.c != undefined) {
-            return this.getValue2( new CellAddress( this.getBBox().r1, cross.c ) );
-    } else {
-            return new cError( cErrorType.wrong_value_type );
-        }
-  } else {
-        return new cError( cErrorType.wrong_value_type );
-    }
-};
-cArea3D.prototype.getBBox = function () {
-    return this.getRange()[0].getBBox();
-};
-cArea3D.prototype.getBBox0 = function () {
-    return this.getRange()[0].getBBox0();
-};
-cArea3D.prototype.isValid = function () {
-    var r = this.getRange();
-    for ( var i = 0; i < r.length; i++ ) {
-        if ( !r[i] ) {
-            return false;
-        }
-    }
-    return true;
-};
+	cArea3D.prototype.cross = function (arg, wsID) {
+		if (!this.isSingleSheet()) {
+			return new cError(cErrorType.wrong_value_type);
+		}
+		/*if ( this.wsFrom !== wsID ) {
+		 return new cError( cErrorType.wrong_value_type );
+		 }*/
+		var r = this.getRange();
+		if (!r) {
+			return new cError(cErrorType.wrong_name);
+		}
+		var cross = r.cross(arg);
+		if (cross) {
+			if (cross.r != undefined) {
+				return this.getValue2(new CellAddress(cross.r, this.getBBox().c1));
+			} else if (cross.c != undefined) {
+				return this.getValue2(new CellAddress(this.getBBox().r1, cross.c));
+			} else {
+				return new cError(cErrorType.wrong_value_type);
+			}
+		} else {
+			return new cError(cErrorType.wrong_value_type);
+		}
+	};
+	cArea3D.prototype.getBBox = function () {
+		var range = this.getRange();
+		return range ? range.getBBox() : range;
+	};
+	cArea3D.prototype.getBBox0 = function () {
+		var range = this.getRange();
+		return range ? range.getBBox0() : range;
+	};
+	cArea3D.prototype.isValid = function () {
+		return !!this.getRange();
+	};
 	cArea3D.prototype.countCells = function () {
 		var _wsA = this.wsRange();
 		var _val = [];
@@ -1323,7 +1325,7 @@ cArea3D.prototype.isValid = function () {
 		return new cNumber(count);
 	};
 	cArea3D.prototype.getMatrix = function () {
-		var arr = [], r = this.getRange(), res;
+		var arr = [], r = this.getRanges(), res;
 		for (var k = 0; k < r.length; k++) {
 			arr[k] = [];
 			r[k]._foreach2(function (cell, i, j, r1, c1) {
@@ -1351,7 +1353,7 @@ cArea3D.prototype.isValid = function () {
 		}
 	};
 	cArea3D.prototype.isSingleSheet = function () {
-		return this.wsFrom == this.wsTo;
+		return this.wsFrom === this.wsTo;
 	};
 
 /** @constructor */
@@ -1538,23 +1540,7 @@ cName.prototype.toRef = function () {
     if ( !this.defName || !this.defName.Ref ) {
         return new cError( cErrorType.wrong_name );
     }
-
-    var _3DRefTmp, ref = this.defName.Ref, _wsFrom, _wsTo;
-
-    if ( ref && (_3DRefTmp = parserHelp.is3DRef( ref, 0 ))[0] ) {
-        _wsFrom = _3DRefTmp[1];
-        _wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) ) ? _3DRefTmp[2] : _wsFrom;
-        if ( parserHelp.isArea( ref, ref.indexOf( "!" ) + 1 ) ) {
-            if ( _wsFrom === _wsTo ) {
-                return new cArea( parserHelp.operand_str, this.wb.getWorksheetByName( _wsFrom ) );
-      } else {
-                return new cArea3D( parserHelp.operand_str, _wsFrom, _wsTo, this.wb );
-            }
-    } else if (parserHelp.isRef(ref, ref.indexOf("!") + 1)) {
-            return new cRef3D( parserHelp.operand_str, _wsFrom, this.wb );
-        }
-    }
-    return new cError( cErrorType.wrong_name );
+    return this.Calculate();
 };
 cName.prototype.toString = function () {
     if ( this.defName ) {
@@ -2943,28 +2929,82 @@ var cFormulaOperators = {
  В методе Calculate необходимо отслеживать тип принимаемых аргументов. Для примера, если мы обращаемся к ячейке A1, в которой лежит 123, то этот аргумент будет числом. Если же там лежит "123", то это уже строка. Для более подробной информации смотреть спецификацию.
  Метод getInfo является обязательным, ибо через этот метод в интерфейс передается информация о реализованных функциях.
  */
-var cFormulaFunctionGroup = {};
-var cFormulaFunction = {};
-var cAllFormulaFunction = {};
+	var cFormulaFunctionGroup = {};
+	var cFormulaFunction = {};
+	var cAllFormulaFunction = {};
 
-function getFormulasInfo() {
+	function getFormulasInfo() {
 
-    var list = [], a, b, f;
-    for ( var type in cFormulaFunctionGroup ) {
-    b = new AscCommon.asc_CFormulaGroup(type);
-        for ( var i = 0; i < cFormulaFunctionGroup[type].length; ++i ) {
-            a = new cFormulaFunctionGroup[type][i]();
-            if ( a.getInfo ) {
-        f = new AscCommon.asc_CFormula(a.getInfo());
-                b.asc_addFormulaElement( f );
-                cFormulaFunction[f.asc_getName()] = cFormulaFunctionGroup[type][i];
-            }
-            cAllFormulaFunction[a.name] = cFormulaFunctionGroup[type][i];
-        }
-        list.push( b );
-    }
-    return list;
-}
+		var list = [], a, b, f;
+		for (var type in cFormulaFunctionGroup) {
+			b = new AscCommon.asc_CFormulaGroup(type);
+			for (var i = 0; i < cFormulaFunctionGroup[type].length; ++i) {
+				a = new cFormulaFunctionGroup[type][i]();
+				if (a.getInfo) {
+					f = new AscCommon.asc_CFormula(a.getInfo());
+					b.asc_addFormulaElement(f);
+					cFormulaFunction[f.asc_getName()] = cFormulaFunctionGroup[type][i];
+				}
+				cAllFormulaFunction[a.name] = cFormulaFunctionGroup[type][i];
+			}
+			list.push(b);
+		}
+		return list;
+	}
+	function getRangeByRef(ref, ws, onlyRanges) {
+		// ToDo in parser formula
+		if (ref[0] === '(') {
+			ref = ref.slice(1);
+		}
+		if (ref[ref.length - 1] === ')') {
+			ref = ref.slice(0, -1);
+		}
+		// ToDo in parser formula
+		var ranges = [];
+		var arrRefs = ref.split(',');
+		arrRefs.forEach(function (refItem) {
+			// ToDo in parser formula
+			var currentWorkbook = '[0]!';
+			if (0 === refItem.indexOf(currentWorkbook)) {
+				refItem = refItem.slice(currentWorkbook.length);
+			}
+
+			var _f = new AscCommonExcel.parserFormula(refItem, '', ws);
+			if (_f.parse()) {
+				_f.RefPos.forEach(function (item) {
+					var ref;
+					switch (item.oper.type) {
+						case cElementType.table:
+						case cElementType.name:
+							ref = item.oper.toRef();
+							break;
+						case cElementType.cell:
+						case cElementType.cell3D:
+						case cElementType.cellsRange:
+						case cElementType.cellsRange3D:
+							ref = item.oper;
+							break;
+					}
+					if (ref) {
+						switch(ref.type) {
+							case cElementType.cell:
+							case cElementType.cell3D:
+							case cElementType.cellsRange:
+							case cElementType.cellsRange3D:
+								ranges.push(ref.getRange());
+								break;
+							case cElementType.array:
+								if (!onlyRanges) {
+									ranges = ref.getMatrix();
+								}
+								break;
+						}
+					}
+				});
+			}
+		});
+		return ranges;
+	}
 
 /*--------------------------------------------------------------------------*/
 
@@ -4627,13 +4667,13 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         continue;
       }
 
-      if (found_operand != null && found_operand != undefined) {
+      if (null !== found_operand) {
         this.outStack.push(found_operand);
         this.f.push(found_operand);
         this.operand_expected = false;
         found_operand = null
         } else {
-        if (this.operand_str == null || this.operand_str == "'") {
+        if (this.operand_str == null || this.operand_str === "'" || this.operand_str === '"') {
           this.outStack.push(new cError(cErrorType.wrong_name));
           this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
           return this.isParsed = false;
@@ -4644,9 +4684,6 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 
         this.operand_expected = false;
         if (this.operand_str != null) {
-          if (this.operand_str == '"') {
-            continue;
-          }
           this.pCurrPos += this.operand_str.length;
         }
       }
@@ -5572,6 +5609,7 @@ function rtl_math_erfc( x ) {
   window['AscCommonExcel'].cFormulaFunctionToLocale = null;
 
   window['AscCommonExcel'].getFormulasInfo = getFormulasInfo;
+	window['AscCommonExcel'].getRangeByRef = getRangeByRef;
 
   window['AscCommonExcel']._func = _func;
 

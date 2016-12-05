@@ -828,6 +828,9 @@
 			TableRuler : 8
 		};
 
+	var MOBILE_SELECT_TRACK_ROUND = 14;
+	var MOBILE_TABLE_RULER_DIAMOND = 7;
+
 	function CMobileTouchManager()
 	{
 		this.AnimateScroll = false;
@@ -841,6 +844,7 @@
 		this.HtmlPage        = null;
 
 		this.Mode = 0;
+		this.IsTouching		= false;
 
 		this.ReadingGlassTime  = 750;
 		this.TimeDown          = 0;
@@ -884,7 +888,9 @@
 		this.TableCurrentMoveValueMin = null;
 		this.TableCurrentMoveValueMax = null;
 
-		this.ShowMenuTimerId = -1;
+		this.ContextMenuLastMode 		= 0; // 0 - none, 1 - target, 2 - select (text), 3 - object(s)
+		this.ContextMenuLastModeCounter = 0;
+		this.ContextMenuShowTimerId = -1;
 
 		this.Init = function(ctrl)
 		{
@@ -900,7 +906,7 @@
 			});
 
 			LoadMobileImages();
-		}
+		};
 
 		this.MoveCursorToPoint = function(e)
 		{
@@ -918,10 +924,23 @@
 			this.DrawingDocument.NeedScrollToTargetFlag = false;
 
 			global_mouseEvent.ClickCount = old_click_count;
-		}
+		};
+
+		this.IsWorkedPosition = function()
+		{
+			if (this.IsTouching)
+				return true;
+
+			if (this.iScroll && this.iScroll.animating)
+				return true;
+
+			return false;
+		};
 
 		this.onTouchStart = function(e)
 		{
+			this.IsTouching = true;
+
 			if (null != this.DrawingDocument.m_oDocumentRenderer)
 				return this.onTouchStart_renderer(e);
 
@@ -1233,7 +1252,7 @@
 
 					var dKoef                     = (100 * AscCommon.g_dKoef_pix_to_mm / this.HtmlPage.m_nZoomValue);
 					global_mouseEvent.KoefPixToMM = 5;
-					if (this.LogicDocument.DrawingObjects.isPointInDrawingObjects2(pos.X, pos.Y, pos.Page))
+					if (this.LogicDocument.DrawingObjects.isPointInDrawingObjects3(pos.X, pos.Y, pos.Page))
 					{
 						bIsKoefPixToMM = true;
 						this.Mode      = MobileTouchMode.FlowObj;
@@ -1387,7 +1406,7 @@
 					e.returnValue = false;
 				return false;
 			}
-		}
+		};
 		this.onTouchMove  = function(e)
 		{
 			if (null != this.DrawingDocument.m_oDocumentRenderer)
@@ -1585,20 +1604,23 @@
 				default:
 					break;
 			}
-		}
+		};
 		this.onTouchEnd   = function(e)
 		{
+			this.IsTouching = false;
+
 			if (null != this.DrawingDocument.m_oDocumentRenderer)
 				return this.onTouchEnd_renderer(e);
 
 			if (this.Mode != MobileTouchMode.FlowObj && this.Mode != MobileTouchMode.TableMove)
             {
-
 				check_MouseUpEvent(e.changedTouches ? e.changedTouches[0] : e);
             }
 
 			this.ScrollH = this.HtmlPage.m_dScrollX;
 			this.ScrollV = this.HtmlPage.m_dScrollY;
+
+			var isCheckContextMenuMode = true;
 
 			switch (this.Mode)
 			{
@@ -1636,6 +1658,7 @@
 					{
 						// нужно запускать анимацию скролла, если она есть
 						// TODO:
+						isCheckContextMenuMode = false;
 						this.iScroll._end(e);
 					}
 
@@ -1650,6 +1673,7 @@
 					this.HtmlPage.OnScroll();
 
 					this.Mode = MobileTouchMode.None;
+					isCheckContextMenuMode = false;
 					break;
 				}
 				case MobileTouchMode.InlineObj:
@@ -1786,9 +1810,9 @@
 				return false;
 			}
 
-			// если есть селект - то показать меню
-			this.CheckSelectEnd(true);
-		}
+			if (!this.iScroll.animating)
+				this.CheckContextMenuTouchEnd(isCheckContextMenuMode);
+		};
 
 		this.onTouchStart_renderer = function(e)
 		{
@@ -1851,7 +1875,7 @@
 				e.preventDefault();
 			else
 				e.returnValue = false;
-		}
+		};
 		this.onTouchMove_renderer  = function(e)
 		{
 			check_MouseMoveEvent(e.touches ? e.touches[0] : e);
@@ -1915,7 +1939,7 @@
 				e.preventDefault();
 			else
 				e.returnValue = false;
-		}
+		};
 		this.onTouchEnd_renderer   = function(e)
 		{
 			check_MouseUpEvent(e.changedTouches ? e.changedTouches[0] : e);
@@ -1957,48 +1981,7 @@
 				e.preventDefault();
 			else
 				e.returnValue = false;
-		}
-
-		this.CheckSelectEnd = function(bIsAttack)
-		{
-			var _bIsRet = false;
-			if (!bIsAttack)
-				_bIsRet = this.IsTrackingCurrent;
-
-			if (_bIsRet)
-				return;
-
-			if (null != this.RectSelect1 && null != this.RectSelect2 && !this.HtmlPage.m_oApi.isViewMode)
-			{
-				var _matrix = this.DrawingDocument.SelectionMatrix;
-
-				var pos1 = null;
-				var pos4 = null;
-
-				if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
-				{
-					pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1);
-					pos4 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h, this.PageSelect2);
-				}
-				else
-				{
-					var _x1 = _matrix.TransformPointX(this.RectSelect1.x, this.RectSelect1.y);
-					var _y1 = _matrix.TransformPointY(this.RectSelect1.x, this.RectSelect1.y);
-
-					var _x2 = _matrix.TransformPointX(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h);
-					var _y2 = _matrix.TransformPointY(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h);
-
-					pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(_x1, _y1, this.PageSelect1);
-					pos4 = this.DrawingDocument.ConvertCoordsToCursorWR(_x2, _y2, this.PageSelect2);
-				}
-
-				var _x = (pos1.X + pos4.X) >> 1;
-				var _y = pos1.Y;
-
-				if (!this.iScroll.animating)
-					this.SendShowMenu(_x, _y);
-			}
-		}
+		};
 
 		this.CheckZoomCriticalValues = function(zoomMin)
 		{
@@ -2036,68 +2019,218 @@
 				this.ZoomValue = this.ZoomValueMin;
 				this.HtmlPage.m_oApi.zoom(this.ZoomValue);
 			}
-		}
+		};
 
 		this.Resize = function()
 		{
 			if (this.iScroll != null)
 				this.iScroll.refresh(true);
-		}
+		};
 
-		this.SendShowMenu = function(x, y)
+		this.SendShowContextMenu = function()
 		{
-			if (-1 != this.ShowMenuTimerId)
+			if (-1 != this.ContextMenuShowTimerId)
 			{
-				clearTimeout(this.ShowMenuTimerId);
+				clearTimeout(this.ContextMenuShowTimerId);
 			}
 			var that             = this;
-			that.ShowMenuTimerId = setTimeout(function()
+			this.ContextMenuShowTimerId = setTimeout(function()
 			{
-				that.HtmlPage.m_oApi.sendEvent("asc_onShowPopMenu", x, y);
+				var _pos = that.GetContextMenuPosition();
+				that.HtmlPage.m_oApi.sendEvent("asc_onShowPopMenu", _pos.X, _pos.Y, (_pos.Mode > 1) ? true : false);
 			}, 500);
-		}
+		};
+
+		this.GetContextMenuPosition = function()
+		{
+			var _posX = 0;
+			var _posY = 0;
+			var _page = 0;
+			var _transform = null;
+			var tmpX, tmpY, tmpX2, tmpY2;
+			var _pos = null;
+
+			var _mode = 0;
+
+			var _target = this.LogicDocument.Is_SelectionUse();
+			if (_target === false)
+			{
+				_posX = this.DrawingDocument.m_dTargetX;
+				_posY = this.DrawingDocument.m_dTargetY;
+				_page = this.DrawingDocument.m_lTargetPage;
+				_transform = this.DrawingDocument.TextMatrix;
+
+				if (_transform)
+				{
+					tmpX = _transform.TransformPointX(_posX, _posY);
+					tmpY = _transform.TransformPointY(_posX, _posY);
+				}
+				else
+				{
+					tmpX = _posX;
+					tmpY = _posY;
+				}
+
+				_pos = this.DrawingDocument.ConvertCoordsToCursorWR(tmpX, tmpY, _page);
+				_posX = _pos.X;
+				_posY = _pos.Y;
+
+				_mode = 1;
+			}
+
+			var _select = this.LogicDocument.Get_SelectionBounds();
+			if (_select)
+			{
+				var _rect1 = _select.Start;
+				var _rect2 = _select.End;
+
+				tmpX = _rect1.X;
+				tmpY = _rect1.Y;
+				tmpX2 = _rect2.X + _rect2.W;
+				tmpY2 = _rect2.Y + _rect2.H;
+
+				_transform = this.DrawingDocument.SelectionMatrix;
+
+				if (_transform)
+				{
+					_posX = _transform.TransformPointX(tmpX, tmpY);
+					_posY = _transform.TransformPointY(tmpX, tmpY);
+
+					tmpX = _posX;
+					tmpY = _posY;
+
+					_posX = _transform.TransformPointX(tmpX2, tmpY2);
+					_posY = _transform.TransformPointY(tmpX2, tmpY2);
+
+					tmpX2 = _posX;
+					tmpY2 = _posY;
+				}
+
+				_pos = this.DrawingDocument.ConvertCoordsToCursorWR(tmpX, tmpY, _rect1.Page);
+				_posX = _pos.X;
+				_posY = _pos.Y;
+
+				_pos = this.DrawingDocument.ConvertCoordsToCursorWR(tmpX2, tmpY2, _rect2.Page);
+				_posX += _pos.X;
+				_posX = _posX >> 1;
+
+				_mode = 2;
+			}
+
+			var _object_bounds = this.LogicDocument.DrawingObjects.getSelectedObjectsBounds();
+			if ((0 == _mode) && _object_bounds)
+			{
+				_pos = this.DrawingDocument.ConvertCoordsToCursorWR(_object_bounds.minX, _object_bounds.minY, _object_bounds.pageIndex);
+				_posX = _pos.X;
+				_posY = _pos.Y;
+
+				_pos = this.DrawingDocument.ConvertCoordsToCursorWR(_object_bounds.maxX, _object_bounds.maxY, _object_bounds.pageIndex);
+				_posX += _pos.X;
+				_posX = _posX >> 1;
+
+				_mode = 3;
+			}
+
+			return { X : _posX, Y : _posY, Mode : _mode };
+		};
+
+		this.GetContextMenuType = function()
+		{
+			var _mode = 0;
+
+			if (!this.LogicDocument.Is_SelectionUse())
+				_mode = 1; // target
+
+			if (this.LogicDocument.Get_SelectionBounds())
+				_mode = 2; // select
+
+			if (_mode == 0 && this.LogicDocument.DrawingObjects.getSelectedObjectsBounds())
+				_mode = 3; // object
+
+			return _mode;
+		};
+
+		this.CheckContextMenuTouchEnd = function(isCheck)
+		{
+			// isCheck: если пришли сюда после скролла или зума (или их анимации) - то не нужно проверять состояние редактора.
+			// Нужно проверять последнее сохраненной состояние
+
+			if (isCheck)
+			{
+				var _mode = this.GetContextMenuType();
+				if (_mode == this.ContextMenuLastMode)
+				{
+					this.ContextMenuLastModeCounter++;
+					this.ContextMenuLastModeCounter &= 0x01;
+				}
+				else
+					this.ContextMenuLastModeCounter = 0;
+
+				this.ContextMenuLastMode = _mode;
+			}
+
+			if (this.ContextMenuLastMode > 0 && 1 == this.ContextMenuLastModeCounter)
+				this.SendShowContextMenu();
+		};
+
+		this.ClearContextMenu = function()
+		{
+			this.ContextMenuLastMode 		= 0;
+			this.ContextMenuLastModeCounter = 0;
+			this.HtmlPage.m_oApi.sendEvent("asc_onHidePopMenu");
+		};
 
 		this.OnScrollAnimationEnd = function()
 		{
 			if (this.HtmlPage.m_oApi.isViewMode)
 				return;
 
-			if (null != this.RectSelect1 && null != this.RectSelect2)
-			{
-				var pos1 = null;
-				var pos4 = null;
+			this.CheckContextMenuTouchEnd(false);
+		};
 
-				var _matrix = this.DrawingDocument.SelectionMatrix;
-				if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
-				{
-					pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1);
-					pos4 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h, this.PageSelect2);
-				}
-				else
-				{
-					var _x1 = _matrix.TransformPointX(this.RectSelect1.x, this.RectSelect1.y);
-					var _y1 = _matrix.TransformPointY(this.RectSelect1.x, this.RectSelect1.y);
+		this.CheckSelectRects = function()
+		{
+			this.RectSelect1 = null;
+			this.RectSelect2 = null;
 
-					var _x2 = _matrix.TransformPointX(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h);
-					var _y2 = _matrix.TransformPointY(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h);
+			if (!this.LogicDocument)
+				return;
 
-					pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(_x1, _y1, this.PageSelect1);
-					pos4 = this.DrawingDocument.ConvertCoordsToCursorWR(_x2, _y2, this.PageSelect2);
-				}
+			var _select = this.LogicDocument.Get_SelectionBounds();
+			if (!_select)
+				return;
 
-				var _x = (pos1.X + pos4.X) >> 1;
-				var _y = pos1.Y;
+			var _rect1 = _select.Start;
+			var _rect2 = _select.End;
 
-				this.SendShowMenu(_x, _y);
-			}
-		}
+			if (!_rect1 || !_rect2)
+				return;
+
+			this.RectSelect1 	= new AscCommon._rect();
+			this.RectSelect1.x 	= _rect1.X;
+			this.RectSelect1.y 	= _rect1.Y;
+			this.RectSelect1.w 	= _rect1.W;
+			this.RectSelect1.h 	= _rect1.H;
+			this.PageSelect1 	= _rect1.Page;
+
+			this.RectSelect2 	= new AscCommon._rect();
+			this.RectSelect2.x 	= _rect2.X;
+			this.RectSelect2.y 	= _rect2.Y;
+			this.RectSelect2.w 	= _rect2.W;
+			this.RectSelect2.h 	= _rect2.H;
+			this.PageSelect2 	= _rect2.Page;
+		};
 
 		this.CheckSelect = function(overlay)
 		{
+			this.CheckSelectRects();
 			if (null == this.RectSelect1 || null == this.RectSelect2)
 				return;
 
 			var _matrix = this.DrawingDocument.SelectionMatrix;
+			var ctx         = overlay.m_oContext;
+			ctx.strokeStyle = "#146FE1";
+			ctx.fillStyle 	= "#146FE1";
 
 			if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
 			{
@@ -2107,8 +2240,7 @@
 				var pos3 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y, this.PageSelect2);
 				var pos4 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h, this.PageSelect2);
 
-				var ctx         = overlay.m_oContext;
-				ctx.strokeStyle = "#1B63BA";
+				ctx.beginPath();
 
 				ctx.moveTo(pos1.X >> 0, pos1.Y >> 0);
 				ctx.lineTo(pos2.X >> 0, pos2.Y >> 0);
@@ -2121,32 +2253,11 @@
 
 				ctx.beginPath();
 
-				ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-				overlay.AddEllipse(pos1.X, pos1.Y - 5, 6.5);
-				overlay.AddEllipse(pos4.X, pos4.Y + 5, 6.5);
+				overlay.AddEllipse(pos1.X, pos1.Y - 5, MOBILE_SELECT_TRACK_ROUND / 2);
+				overlay.AddEllipse(pos4.X, pos4.Y + 5, MOBILE_SELECT_TRACK_ROUND / 2);
 				ctx.fill();
 
 				ctx.beginPath();
-
-				ctx.fillStyle = "#FFFFFF";
-				overlay.AddEllipse(pos1.X, pos1.Y - 5, 6);
-				overlay.AddEllipse(pos4.X, pos4.Y + 5, 6);
-				ctx.fill();
-
-				ctx.beginPath();
-
-				ctx.fillStyle = "#1B63BA";
-				overlay.AddEllipse(pos1.X, pos1.Y - 5, 5);
-				overlay.AddEllipse(pos4.X, pos4.Y + 5, 5);
-				ctx.fill();
-
-				/*
-				 ctx.beginPath();
-				 ctx.fillStyle = "#FFFFFF";
-				 overlay.AddEllipse(pos1.X, pos1.Y - 5, 2);
-				 overlay.AddEllipse(pos4.X, pos4.Y + 5, 2);
-				 ctx.fill();
-				 */
 			}
 			else
 			{
@@ -2168,8 +2279,7 @@
 				var pos3 = this.DrawingDocument.ConvertCoordsToCursorWR(_xx21, _yy21, this.PageSelect2);
 				var pos4 = this.DrawingDocument.ConvertCoordsToCursorWR(_xx22, _yy22, this.PageSelect2);
 
-				var ctx         = overlay.m_oContext;
-				ctx.strokeStyle = "#1B63BA";
+				ctx.beginPath();
 
 				ctx.moveTo(pos1.X, pos1.Y);
 				ctx.lineTo(pos2.X, pos2.Y);
@@ -2181,111 +2291,6 @@
 				ctx.stroke();
 
 				ctx.beginPath();
-
-				ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-				overlay.AddEllipse(pos1.X, pos1.Y - 5, 6.5);
-				overlay.AddEllipse(pos4.X, pos4.Y + 5, 6.5);
-				ctx.fill();
-
-				ctx.beginPath();
-
-				ctx.fillStyle = "#FFFFFF";
-				overlay.AddEllipse(pos1.X, pos1.Y - 5, 6);
-				overlay.AddEllipse(pos4.X, pos4.Y + 5, 6);
-				ctx.fill();
-
-				ctx.beginPath();
-
-				ctx.fillStyle = "#1B63BA";
-				overlay.AddEllipse(pos1.X, pos1.Y - 5, 5);
-				overlay.AddEllipse(pos4.X, pos4.Y + 5, 5);
-				ctx.fill();
-			}
-		}
-
-		this.CheckSelect2 = function(overlay)
-		{
-			if (null == this.RectSelect1 || null == this.RectSelect2)
-				return;
-
-			var _matrix = this.DrawingDocument.SelectionMatrix;
-
-			if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
-			{
-				var pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1);
-				var pos2 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y + this.RectSelect1.h, this.PageSelect1);
-
-				var pos3 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y, this.PageSelect2);
-				var pos4 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h, this.PageSelect2);
-
-				var ctx         = overlay.m_oContext;
-				ctx.strokeStyle = "#1B63BA";
-
-				ctx.moveTo(pos1.X >> 0, pos1.Y >> 0);
-				ctx.lineTo(pos2.X >> 0, pos2.Y >> 0);
-
-				ctx.moveTo(pos3.X >> 0, pos3.Y >> 0);
-				ctx.lineTo(pos4.X >> 0, pos4.Y >> 0);
-
-				ctx.lineWidth = 2;
-				ctx.stroke();
-
-				ctx.beginPath();
-
-				if (!window.g_table_track_round.asc_complete)
-					return;
-
-				var _w = window.g_table_track_round.width;
-				var _h = window.g_table_track_round.height;
-
-				var _x1 = (pos1.X - (_w / 2)) >> 0;
-				var _y1 = (pos1.Y - 5 - (_h / 2)) >> 0;
-
-				var _x2 = (pos4.X - (_w / 2)) >> 0;
-				var _y2 = (pos4.Y + 5 - (_h / 2)) >> 0;
-
-				ctx.drawImage(window.g_table_track_round, _x1, _y1);
-				ctx.drawImage(window.g_table_track_round, _x2, _y2);
-
-				overlay.CheckRect(_x1, _y1, _w, _h);
-				overlay.CheckRect(_x2, _y2, _w, _h);
-			}
-			else
-			{
-				var _xx11 = _matrix.TransformPointX(this.RectSelect1.x, this.RectSelect1.y);
-				var _yy11 = _matrix.TransformPointY(this.RectSelect1.x, this.RectSelect1.y);
-
-				var _xx12 = _matrix.TransformPointX(this.RectSelect1.x, this.RectSelect1.y + this.RectSelect1.h);
-				var _yy12 = _matrix.TransformPointY(this.RectSelect1.x, this.RectSelect1.y + this.RectSelect1.h);
-
-				var _xx21 = _matrix.TransformPointX(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y);
-				var _yy21 = _matrix.TransformPointY(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y);
-
-				var _xx22 = _matrix.TransformPointX(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h);
-				var _yy22 = _matrix.TransformPointY(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h);
-
-				var pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(_xx11, _yy11, this.PageSelect1);
-				var pos2 = this.DrawingDocument.ConvertCoordsToCursorWR(_xx12, _yy12, this.PageSelect1);
-
-				var pos3 = this.DrawingDocument.ConvertCoordsToCursorWR(_xx21, _yy21, this.PageSelect2);
-				var pos4 = this.DrawingDocument.ConvertCoordsToCursorWR(_xx22, _yy22, this.PageSelect2);
-
-				var ctx         = overlay.m_oContext;
-				ctx.strokeStyle = "#1B63BA";
-
-				ctx.moveTo(pos1.X, pos1.Y);
-				ctx.lineTo(pos2.X, pos2.Y);
-
-				ctx.moveTo(pos3.X, pos3.Y);
-				ctx.lineTo(pos4.X, pos4.Y);
-
-				ctx.lineWidth = 2;
-				ctx.stroke();
-
-				ctx.beginPath();
-
-				if (!window.g_table_track_round.asc_complete)
-					return;
 
 				var ex01 = _matrix.TransformPointX(0, 0);
 				var ey01 = _matrix.TransformPointY(0, 0);
@@ -2300,22 +2305,19 @@
 				var ex = 5 * (ex11 - ex01) / _len;
 				var ey = 5 * (ey11 - ey01) / _len;
 
-				var _w = window.g_table_track_round.width;
-				var _h = window.g_table_track_round.height;
+				var _x1 = (pos1.X - ex) >> 0;
+				var _y1 = (pos1.Y - ey) >> 0;
 
-				var _x1 = (pos1.X - ex - (_w / 2)) >> 0;
-				var _y1 = (pos1.Y - ey - (_h / 2)) >> 0;
+				var _x2 = (pos4.X + ex) >> 0;
+				var _y2 = (pos4.Y + ey) >> 0;
 
-				var _x2 = (pos4.X + ex - (_w / 2)) >> 0;
-				var _y2 = (pos4.Y + ey - (_h / 2)) >> 0;
+				overlay.AddEllipse(_x1, _y1, MOBILE_SELECT_TRACK_ROUND / 2);
+				overlay.AddEllipse(_x2, _y2, MOBILE_SELECT_TRACK_ROUND / 2);
+				ctx.fill();
 
-				ctx.drawImage(window.g_table_track_round, _x1, _y1);
-				ctx.drawImage(window.g_table_track_round, _x2, _y2);
-
-				overlay.CheckRect(_x1, _y1, _w, _h);
-				overlay.CheckRect(_x2, _y2, _w, _h);
+				ctx.beginPath();
 			}
-		}
+		};
 
 		this.CheckTableRules = function(overlay)
 		{
@@ -2336,254 +2338,7 @@
 				return;
 			}
 
-			var _table_markup = horRuler.m_oTableMarkup;
-
-			this.HtmlPage.CheckShowOverlay();
-
-			var _epsRects  = this.TableRulersRectOffset;
-			var _rectWidth = this.TableRulersRectSize;
-
-			var ctx         = overlay.m_oContext;
-			ctx.fillStyle   = "#F0F0F0";
-			ctx.strokeStyle = "#000000";
-			ctx.lineWidth   = 1;
-
-			var _tableW = 0;
-			var _cols   = _table_markup.Cols;
-			for (var i = 0; i < _cols.length; i++)
-			{
-				_tableW += _cols[i];
-			}
-
-			if (!_table_outline_dr.TableMatrix || global_MatrixTransformer.IsIdentity(_table_outline_dr.TableMatrix))
-			{
-				this.TableMovePoint = {X : _tableOutline.X, Y : _tableOutline.Y};
-
-				var pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(_tableOutline.X, _tableOutline.Y, _tableOutline.PageNum);
-				var pos2 = this.DrawingDocument.ConvertCoordsToCursorWR(_tableOutline.X + _tableW, _tableOutline.Y, _tableOutline.PageNum);
-
-				ctx.beginPath();
-
-				var TableMoveRect_x = (pos1.X >> 0) + 0.5 - (_epsRects + _rectWidth);
-				var TableMoveRect_y = (pos1.Y >> 0) + 0.5 - (_epsRects + _rectWidth);
-
-				overlay.AddRect(TableMoveRect_x, TableMoveRect_y, _rectWidth, _rectWidth);
-				overlay.AddRect((pos1.X >> 0) + 0.5, TableMoveRect_y, (pos2.X - pos1.X) >> 0, _rectWidth);
-
-				var _count = _table_markup.Rows.length;
-				var _y1    = 0;
-				var _y2    = 0;
-				for (var i = 0; i < _count; i++)
-				{
-					if (i == 0)
-						_y1 = _table_markup.Rows[i].Y;
-
-					_y2 = _table_markup.Rows[i].Y;
-					_y2 += _table_markup.Rows[i].H;
-				}
-
-				var pos3 = this.DrawingDocument.ConvertCoordsToCursorWR(_tableOutline.X, _y1, this.DrawingDocument.m_lCurrentPage);
-				var pos4 = this.DrawingDocument.ConvertCoordsToCursorWR(_tableOutline.X, _y2, this.DrawingDocument.m_lCurrentPage);
-
-				overlay.AddRect((pos1.X >> 0) + 0.5 - (_epsRects + _rectWidth), (pos3.Y >> 0) + 0.5, _rectWidth, (pos4.Y - pos3.Y) >> 0);
-
-				ctx.fill();
-				ctx.stroke();
-
-				ctx.beginPath();
-				ctx.fillStyle   = "#FFFFFF";
-				ctx.strokeStyle = "#0000FF";
-
-				var dKoef = (this.HtmlPage.m_nZoomValue * g_dKoef_mm_to_pix / 100);
-				var xDst  = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.left;
-				var yDst  = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.top;
-
-				var _oldY = _table_markup.Rows[0].Y + _table_markup.Rows[0].H;
-
-				this.TableVerRulerPoints = [];
-				var _rectIndex           = 0;
-				var _x                   = (pos1.X >> 0) + 0.5 - (_epsRects + _rectWidth);
-				for (var i = 1; i <= _count; i++)
-				{
-					var _newPos = (i != _count) ? _table_markup.Rows[i].Y : _oldY;
-
-					var _p = {Y : _oldY, H : (_newPos - _oldY)};
-
-					var _r_x = _x;
-					var _r_y = ((yDst + dKoef * _oldY) >> 0) + 0.5;
-					var _r_h = ((_newPos - _oldY) * dKoef) >> 0;
-					overlay.AddRect(_r_x, _r_y, _rectWidth, _r_h);
-
-					this.TableVerRulerPoints[_rectIndex++] = _p;
-
-					if (i != _count)
-						_oldY = _table_markup.Rows[i].Y + _table_markup.Rows[i].H;
-				}
-
-				this.TableHorRulerPoints = [];
-				_rectIndex               = 0;
-				var _col                 = _table_markup.X;
-				for (var i = 1; i <= _cols.length; i++)
-				{
-					_col += _cols[i - 1];
-					var _x = _col - _table_markup.Margins[i - 1].Right;
-					var _r = _col + ((i == _cols.length) ? 0 : _table_markup.Margins[i].Left);
-
-					var __x = ((xDst + dKoef * _x) >> 0) + 0.5;
-					var __r = ((xDst + dKoef * _r) >> 0) + 0.5;
-
-					overlay.AddRect(__x, TableMoveRect_y, __r - __x, _rectWidth);
-
-					this.TableHorRulerPoints[_rectIndex++] = {X : _x, W : _r - _x, C : _col};
-				}
-
-				ctx.fill();
-				ctx.stroke();
-
-				ctx.beginPath();
-				if (this.Mode == MobileTouchMode.TableRuler)
-				{
-					if (0 == this.TableCurrentMoveDir)
-					{
-						var _pos = this.DrawingDocument.ConvertCoordsToCursorWR(this.TableCurrentMoveValue, 0, _table_outline_dr.CurrentPageIndex);
-						overlay.VertLine(_pos.X, true);
-					}
-					else
-					{
-						var _pos = this.DrawingDocument.ConvertCoordsToCursorWR(0, this.TableCurrentMoveValue, _table_outline_dr.CurrentPageIndex);
-						overlay.HorLine(_pos.Y, true);
-					}
-				}
-			}
-			else
-			{
-				var dKoef = (this.HtmlPage.m_nZoomValue * g_dKoef_mm_to_pix / 100);
-				var xDst  = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.left;
-				var yDst  = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.top;
-
-				ctx.lineWidth = 1 / dKoef;
-
-				var _coord_transform = new AscCommon.CMatrix();
-				_coord_transform.sx  = dKoef;
-				_coord_transform.sy  = dKoef;
-				_coord_transform.tx  = xDst;
-				_coord_transform.ty  = yDst;
-
-				_coord_transform.Multiply(_table_outline_dr.TableMatrix, AscCommon.MATRIX_ORDER_PREPEND);
-				ctx.setTransform(_coord_transform.sx, _coord_transform.shy, _coord_transform.shx, _coord_transform.sy, _coord_transform.tx, _coord_transform.ty);
-
-				this.TableMovePoint = {X : _tableOutline.X, Y : _tableOutline.Y};
-
-				ctx.beginPath();
-
-				var _rectW  = _rectWidth / dKoef;
-				var _offset = (_epsRects + _rectWidth) / dKoef;
-
-				ctx.rect(this.TableMovePoint.X - _offset, this.TableMovePoint.Y - _offset, _rectW, _rectW);
-				ctx.rect(this.TableMovePoint.X, this.TableMovePoint.Y - _offset, _tableW, _rectW);
-
-				var _count = _table_markup.Rows.length;
-				var _y1    = 0;
-				var _y2    = 0;
-				for (var i = 0; i < _count; i++)
-				{
-					if (i == 0)
-						_y1 = _table_markup.Rows[i].Y;
-
-					_y2 = _table_markup.Rows[i].Y;
-					_y2 += _table_markup.Rows[i].H;
-				}
-
-				ctx.rect(this.TableMovePoint.X - _offset, this.TableMovePoint.Y, _rectW, _y2 - _y1);
-
-				overlay.CheckRectT(this.TableMovePoint.X, this.TableMovePoint.Y, _tableW, _y2 - _y1, _coord_transform, 2 * (_epsRects + _rectWidth));
-
-				ctx.fill();
-				ctx.stroke();
-
-				ctx.beginPath();
-				ctx.fillStyle   = "#FFFFFF";
-				ctx.strokeStyle = "#0000FF";
-
-				var _oldY = _table_markup.Rows[0].Y + _table_markup.Rows[0].H;
-				_oldY -= _table_outline_dr.TableMatrix.ty;
-
-				this.TableVerRulerPoints = [];
-				var _rectIndex           = 0;
-				var _xx                  = this.TableMovePoint.X - _offset;
-				for (var i = 1; i <= _count; i++)
-				{
-					var _newPos = (i != _count) ? (_table_markup.Rows[i].Y - _table_outline_dr.TableMatrix.ty) : _oldY;
-
-					var _p = {Y : _oldY, H : (_newPos - _oldY)};
-
-					ctx.rect(_xx, _p.Y, _rectW, _p.H);
-
-					this.TableVerRulerPoints[_rectIndex++] = _p;
-
-					if (i != _count)
-					{
-						_oldY = _table_markup.Rows[i].Y + _table_markup.Rows[i].H;
-						_oldY -= _table_outline_dr.TableMatrix.ty;
-					}
-				}
-
-				this.TableHorRulerPoints = [];
-				_rectIndex               = 0;
-				var _col                 = this.TableMovePoint.X;
-				for (var i = 1; i <= _cols.length; i++)
-				{
-					_col += _cols[i - 1];
-					var _x = _col - _table_markup.Margins[i - 1].Right;
-					var _r = _col + ((i == _cols.length) ? 0 : _table_markup.Margins[i].Left);
-
-					ctx.rect(_x, this.TableMovePoint.Y - _offset, _r - _x, _rectW);
-
-					this.TableHorRulerPoints[_rectIndex++] = {X : _x, W : _r - _x, C : _col};
-				}
-
-				ctx.fill();
-				ctx.stroke();
-
-				ctx.setTransform(1, 0, 0, 1, 0, 0);
-
-				ctx.beginPath();
-				if (this.Mode == MobileTouchMode.TableRuler)
-				{
-					if (0 == this.TableCurrentMoveDir)
-					{
-						var _pos = this.DrawingDocument.ConvertCoordsToCursorWR(this.TableCurrentMoveValue, 0, _table_outline_dr.CurrentPageIndex, _table_outline_dr.TableMatrix);
-						overlay.VertLine(_pos.X, true);
-					}
-					else
-					{
-						var _pos = this.DrawingDocument.ConvertCoordsToCursorWR(0, this.TableCurrentMoveValue, _table_outline_dr.CurrentPageIndex, _table_outline_dr.TableMatrix);
-						overlay.HorLine(_pos.Y, true);
-					}
-				}
-			}
-		}
-
-		this.CheckTableRules2 = function(overlay)
-		{
-			if (this.HtmlPage.m_oApi.isViewMode)
-				return;
-
-			var horRuler = this.HtmlPage.m_oHorRuler;
-			var verRuler = this.HtmlPage.m_oVerRuler;
-
-			var _table_outline_dr = this.DrawingDocument.TableOutlineDr;
-			var _tableOutline     = _table_outline_dr.TableOutline;
-
-			if (horRuler.CurrentObjectType != RULER_OBJECT_TYPE_TABLE || verRuler.CurrentObjectType != RULER_OBJECT_TYPE_TABLE || !_tableOutline)
-			{
-				this.TableMovePoint      = null;
-				this.TableHorRulerPoints = null;
-				this.TableVerRulerPoints = null;
-				return;
-			}
-
-			if (!window.g_table_track_mobile_move.asc_complete || !window.g_table_track_round.asc_complete || !window.g_table_track_diamond.asc_complete)
+			if (!window.g_table_track_mobile_move.asc_complete)
 				return;
 
 			var _table_markup = horRuler.m_oTableMarkup;
@@ -2596,7 +2351,6 @@
 			var _rectWidth = this.TableRulersRectSize;
 
 			var ctx = overlay.m_oContext;
-
 			ctx.strokeStyle = "#616161";
 			ctx.lineWidth   = 1;
 
@@ -2663,9 +2417,6 @@
 
 				ctx.beginPath();
 
-				var ___w = window.g_table_track_diamond.width;
-				var ___h = window.g_table_track_diamond.height;
-
 				var dKoef = (this.HtmlPage.m_nZoomValue * g_dKoef_mm_to_pix / 100);
 				var xDst  = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.left;
 				var yDst  = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.top;
@@ -2674,21 +2425,20 @@
 
 				this.TableVerRulerPoints = [];
 				var _rectIndex           = 0;
-				var _x                   = (pos1.X >> 0) + 0.5 - (_epsRects + _rectWidth);
+				var _x                   = (pos1.X - _epsRects - _rectWidth) >> 0;
+
+				ctx.fillStyle = "#146FE1";
 				for (var i = 1; i <= _count; i++)
 				{
 					var _newPos = (i != _count) ? _table_markup.Rows[i].Y : _oldY;
 
 					var _p = {Y : _oldY, H : (_newPos - _oldY)};
+					var _y = this.DrawingDocument.ConvertCoordsToCursorWR(0, _oldY, _tableOutline.PageNum);
 
-					var _r_x = _x;
-					var _r_y = ((yDst + dKoef * _oldY) >> 0) + 0.5;
-					var _r_h = ((_newPos - _oldY) * dKoef) >> 0;
-
-					var xImage = (_r_x + 1) >> 0;
-					var yImage = (_r_y + (_r_h / 2) - (___h / 2)) >> 0;
-					overlay.CheckRect(xImage, yImage, ___w, ___h);
-					ctx.drawImage(window.g_table_track_diamond, xImage, yImage);
+					ctx.beginPath();
+					overlay.AddDiamond(_x + 1.5 + (_rectWidth >> 1), _y.Y, MOBILE_TABLE_RULER_DIAMOND);
+					ctx.fill();
+					ctx.beginPath();
 
 					this.TableVerRulerPoints[_rectIndex++] = _p;
 
@@ -2705,14 +2455,12 @@
 					var _x = _col - _table_markup.Margins[i - 1].Right;
 					var _r = _col + ((i == _cols.length) ? 0 : _table_markup.Margins[i].Left);
 
-					var __x = ((xDst + dKoef * _x) >> 0) + 0.5;
-					var __r = ((xDst + dKoef * _r) >> 0) + 0.5;
 					var __c = ((xDst + dKoef * _col) >> 0) + 0.5;
 
-					var xImage = (__c - (___w / 2)) >> 0;
-					var yImage = (TableMoveRect_y + 1) >> 0;
-					overlay.CheckRect(xImage, yImage, ___w, ___h);
-					ctx.drawImage(window.g_table_track_diamond, xImage, yImage);
+					ctx.beginPath();
+					overlay.AddDiamond(__c, TableMoveRect_y +_rectWidth / 2, MOBILE_TABLE_RULER_DIAMOND);
+					ctx.fill();
+					ctx.beginPath();
 
 					this.TableHorRulerPoints[_rectIndex++] = {X : _x, W : _r - _x, C : _col};
 				}
@@ -2735,16 +2483,31 @@
 			else
 			{
 				var dKoef = (this.HtmlPage.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+
 				var xDst  = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.left;
 				var yDst  = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.top;
 
 				ctx.lineWidth = 1 / dKoef;
+
+				if (overlay.IsRetina)
+					dKoef *= 2;
 
 				var _coord_transform = new AscCommon.CMatrix();
 				_coord_transform.sx  = dKoef;
 				_coord_transform.sy  = dKoef;
 				_coord_transform.tx  = xDst;
 				_coord_transform.ty  = yDst;
+
+				var _diamond_size = MOBILE_TABLE_RULER_DIAMOND;
+				if (overlay.IsRetina)
+				{
+					_coord_transform.tx *= 2;
+					_coord_transform.ty *= 2;
+
+					_diamond_size *= 2;
+				}
+
+				ctx.save();
 
 				_coord_transform.Multiply(_table_outline_dr.TableMatrix, AscCommon.MATRIX_ORDER_PREPEND);
 				ctx.setTransform(_coord_transform.sx, _coord_transform.shy, _coord_transform.shx, _coord_transform.sy, _coord_transform.tx, _coord_transform.ty);
@@ -2755,6 +2518,11 @@
 
 				var _rectW  = _rectWidth / dKoef;
 				var _offset = (_epsRects + _rectWidth) / dKoef;
+				if (overlay.IsRetina)
+				{
+					_rectW *= 2;
+					_offset *= 2;
+				}
 
 				ctx.drawImage(window.g_table_track_mobile_move, this.TableMovePoint.X - _offset, this.TableMovePoint.Y - _offset, _rectW, _rectW);
 
@@ -2799,9 +2567,7 @@
 				var _oldY = _table_markup.Rows[0].Y + _table_markup.Rows[0].H;
 				_oldY -= _table_outline_dr.TableMatrix.ty;
 
-				var ___w = window.g_table_track_diamond.width;
-				var ___h = window.g_table_track_diamond.height;
-
+				ctx.fillStyle = "#146FE1";
 				this.TableVerRulerPoints = [];
 				var _rectIndex           = 0;
 				var _xx                  = this.TableMovePoint.X - _offset;
@@ -2811,8 +2577,11 @@
 
 					var _p = {Y : _oldY, H : (_newPos - _oldY)};
 
-					var ___y = (_p.Y + (_p.H / 2) - ((___h / dKoef) / 2));
-					ctx.drawImage(window.g_table_track_diamond, _xx, ___y, ___w / dKoef, ___h / dKoef);
+					var ___y = (_p.Y + (_p.H / 2));
+					ctx.beginPath();
+					overlay.AddDiamond(_xx + _rectW / 2, ___y, _diamond_size / dKoef);
+					ctx.fill();
+					ctx.beginPath();
 
 					this.TableVerRulerPoints[_rectIndex++] = _p;
 
@@ -2832,13 +2601,15 @@
 					var _x = _col - _table_markup.Margins[i - 1].Right;
 					var _r = _col + ((i == _cols.length) ? 0 : _table_markup.Margins[i].Left);
 
-					var ___x = (_col - ((___w / dKoef) / 2));
-					ctx.drawImage(window.g_table_track_diamond, ___x, (this.TableMovePoint.Y - _offset), ___w / dKoef, ___h / dKoef);
+					ctx.beginPath();
+					overlay.AddDiamond(_col, this.TableMovePoint.Y - _offset + _rectW / 2, _diamond_size / dKoef);
+					ctx.fill();
+					ctx.beginPath();
 
 					this.TableHorRulerPoints[_rectIndex++] = {X : _x, W : _r - _x, C : _col};
 				}
 
-				ctx.setTransform(1, 0, 0, 1, 0, 0);
+				ctx.restore();
 
 				ctx.beginPath();
 				if (this.Mode == MobileTouchMode.TableRuler)
@@ -2855,7 +2626,7 @@
 					}
 				}
 			}
-		}
+		};
 	}
 
 	function CReaderTouchManager()
@@ -2939,25 +2710,6 @@
 			window.g_table_track_mobile_move.asc_complete = true;
 		};
 		window.g_table_track_mobile_move.src          = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAArlJREFUeNqMlc9rWkEQx8ffGqMJBJpSUEIISInxpCfT1krioQQ85xISEKGBkGuhpxwEL4GAoOBJ8V9IxJCQ1l4SkFKxQvEfKEXQ0Nb4IxLtfBefvMeriQPj7ps377Mzu7OjZjgckoYlGo2+tFqtcZ1OFyAiG00nfx8eHj7f3d19SKfTP5g11LBRs7u761lYWPiytbVl9/l8ZDKZpqL1ej0qlUp0enr6p9FovM5kMhU92w02my0OmN/vJ0TcbreJVxZzCH9ARqORQqGQCurxeAC2n52dxfkxDOCMXq9/5fV6aTAYEIc/BkHYkWKx2Ni2ubn5X+j5+fkbweIf5GdFmoAhMkny+TzF43GyWCzi+ejoSIA3NjYUQA4IA5xMmGnhBO33+4rowuEwbW9vKz7Gdtzf36uiHH2n1eJQkCoE0WFeKBTE2O12qdlsKhQ2vLu6uhKjXMHSyuhivLi4oEQiQVLUk/T4+JiKxaLCJtKXQNDLy0tKJpM0NzcnrThR4HNyciLm6+vraiAEB8P1KE9hoqCMzGYzGQwG4asASoZAIEDz8/OUSqWeBGLxg4MDWl1dHe+rKkKUDWpqf3//SeDh4SG5XC5x6nKGYg+lW+J2u6nT6TwKBEzuo0pZPiJSyPX1NWWz2bFdy1UWiUQIt0rykUSe8pDrr837MCMvakgwGCSHw0G5XE487+3t0dLSkip6FDozumABOODVvt3c3PiXl5cVjq1Wi1ZWVmhnZ0dcL6fTqYoMUqlUYP8Klg7dhlNp3N7evuM7a0DZcE9UrL64uEh2u318APJ35XIZl6HN0I/1er2GfmhkfcGb/JYP4/3s7OwaL2Ceph/yvnU5i+/VajVVq9U+semnaLCjTvGM9TkuAaKesmP3WX+z/mKts3Y00l/ACDIzamfa0UKPCU4QR9tDEwIcfwH/BBgAl4G4NBf6Z6AAAAAASUVORK5CYII=";
-
-		window.g_table_track_round = new Image();
-		window.g_table_track_round;
-		window.g_table_track_round.asc_complete = false;
-		window.g_table_track_round.onload       = function()
-		{
-			window.g_table_track_round.asc_complete = true;
-		};
-		window.g_table_track_round.src          = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAmlJREFUeNp8k01oE0EUx9/uZjdxtQlpU9Acc2mL2lMOKhgQlCAU8ZSDeBFMoWc95ODJY80ht7YxF1MUIQcrfvQQsIdSESQBay2JtClVaIsbljZfJpPdGd/EiUYTfeTHbGbn/995b95IjDEYEMeQKHIVGUX2kSVkESG9C6W/DSild4ktPci8I7BaaINZozDqluHyGRWuBZ2gSHRGluX5gQaWZd3ZO5Ti0YUKfDH7tzV+SoL5qBt8J1hUUZQUn5O7L3O5nIfYSvz2XHmgmEdhn8FMsoyfVR4mk0mVzzk628CoVCrTmbdHsGtYIKsa/Cs+fSWwnK9BJBK5gbJ0dweKqqrh1Y0Kmsnw/5BgZf0INE2b4hk4xCwf/XvfjoC0XCBT2lnYHwwoqcGBQbHYHj/XdQ3URqNh+HQy0arWQNY86K3066kNdusQRvQhqNfr5V4DqVgsrl2a9IVerq2D7GpinVw425MOo8CsBtCmCeHgecjn8ys8hc4xYjGGAoHA2Gbh8/vQdAY2dr+DpLlRr/GKo9jGXxMYqcLFyWFYTlwHl8t5lhCy0/1Eu1Qqma9ePE8+m52C034bWuYWNM1twRb+34YLYxo8vh+GdPrRLIqrvHVANJJDtOy5VCq12LZs9uT1B3Yz9pRdiabYrXsZtvRmk1HKWCKRmMN1QWSEn143BV5ylzAJ6Lo+HovFwqFQaMLr9R43DKOazWY/xuPxrG3bRVyzg/Aitn61svSzAfglGuZHipxEvAjvqhZiikt1IJ6bqKV/3AVh4kR0xC1GpZMrQB2piZFw8cDbKNKRRV0c4tkWcCOsxG/RDwEGALPnFhI3WYx7AAAAAElFTkSuQmCC";
-
-		window.g_table_track_diamond = new Image();
-		window.g_table_track_diamond;
-		window.g_table_track_diamond.asc_complete = false;
-		window.g_table_track_diamond.onload       = function()
-		{
-			window.g_table_track_diamond.asc_complete = true;
-		};
-		window.g_table_track_diamond.src          = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAmdJREFUeNqck0toE1EUQO9MakqbKi5CqyIIIm0hDUTIQuhGKtSqIEQRXIjZda92Iemu6iJGdKFWhCI2JJhAVi2ouJBuulKXXWgM2OYzNb8Z8898cr2vHT9pZhLxwWF493OYefMuICL04ArxXn92re2a1DTtliBp6F0s4WZeQ9r7/kumKMqcIGo4fU/E8ZtFPL0g4mZORYrPm/XwYLBUVZ3LV7jA9SdF2CrgTmxbQvA+lSAjcXcpP2/Ux5uLREiKlrbcdokHL8XNhPy/in4LyxZTIW/0aWaiXkKOHZwgCMe4geFv1x6lIClZgbNYoddCTYaRoSaEbhyFQZDG7Hb7F56jlclk+gBbIFey0CwLoNR/gCrXQVWanVCc5VmdXM5SmwbpdHof8+x8ptvtzubTnx9EfU440l+AppQEpSaB2qiC2qz/gfYszvJ2Sw4iPgdU84nHLpcr1XZmTqdz+cP6u1exO5Nw2FaCBjU0q0WQ62WQScKebN+QUmDvlyC2MAkbn9ZiDodj6ZeDnTSn0xeJRLbcJycO3p6dGVtd24CCWAatBdDSVHqzCqjVHIzYarByfxo+rr997fF4FqkvTZTYP9wdg13pfuIEcS4UCq2msmWcuBpE29QyDp2Noe1MEEcvv8RESsJoNPqG6i4Qo8QB9iJt42Qo/F7C8UvP0XrqIR6/+IxEoqmoYzb3CsPh8EqShFOzQfyaLHYVGQ76HuFMIBBYisfjCb/f/4L2581EDE4XtC26Mkw4SAwTh3R5hV1+IkvUqE/t6DOS/SUc0KVsJBSiSjSMRF1lupDX7yITa0SL6ltm9T8FGADChEYX8dVTaAAAAABJRU5ErkJggg==";
-
 	}
 
 	//--------------------------------------------------------export----------------------------------------------------

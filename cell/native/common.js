@@ -42,6 +42,8 @@ window.location.host = "";
 window.location.href = "";
 window.location.pathname = "";
 
+window.XMLHttpRequest = function () {};
+
 window.NATIVE_EDITOR_ENJINE = true;
 window.NATIVE_EDITOR_ENJINE_SYNC_RECALC = true;
 window.IS_NATIVE_EDITOR = true;
@@ -75,6 +77,15 @@ var AscCommonWord = window["AscCommonWord"];
 
 window["AscCommonSlide"] = {};
 var AscCommonSlide = window["AscCommonSlide"];
+
+function ConvertJSC_Array(_array)
+{
+	var _len = _array.length;
+	var ret = new Uint8Array(_len);
+	for (var i = 0; i < _len; i++)
+		ret[i] = _array.getAt(i);
+	return ret;
+}
 
 function Image() {
     this.src = "";
@@ -280,58 +291,70 @@ window["native"] = native;
 
 var _api = null;
 
-window.NativeSupportTimeouts = false;
+window.NativeSupportTimeouts = true;
 window.NativeTimeoutObject = {};
 
-function clearTimeout(_id) {
-    if (!window.NativeSupportTimeouts)
-        return;
-
-    window.NativeTimeoutObject["" + _id] = undefined;
-    window.native["ClearTimeout"](_id);
-}
 function setTimeout(func, interval) {
     if (!window.NativeSupportTimeouts)
         return;
 
-    var _id = window.native["GenerateTimeoutId"](interval);
-    window.NativeTimeoutObject["" + _id] = func;
-    return _id;
+    var id = window["native"]["GenerateTimeoutId"](interval);
+    window.NativeTimeoutObject["" + id] = {"func": func, repeat: false};
+   
+    return id;
 }
-function offline_timeoutFire(_id) {
+
+function clearTimeout(id) {
     if (!window.NativeSupportTimeouts)
         return;
 
-    var _prop = "" + _id;
-    var _func = window.NativeTimeoutObject[_prop];
-    window.NativeTimeoutObject[_prop] = undefined;
-
-    if (!_func)
-        return;
-
-    _func.call(null);
-    _func = null;
+    window.NativeTimeoutObject["" + id] = undefined;
+    window["native"]["ClearTimeout"](id);
 }
-function clearInterval(_id) {
-    if (!window.NativeSupportTimeouts)
-        return;
 
-    window.NativeTimeoutObject["" + _id] = undefined;
-    window.native["ClearTimeout"](_id);
-}
 function setInterval(func, interval) {
     if (!window.NativeSupportTimeouts)
         return;
 
-    var _intervalFunc = function()
-    {
-        func.call(null);
-        setTimeout(func, interval);
-    };
+    var id = window["native"]["GenerateTimeoutId"](interval);
+    window.NativeTimeoutObject["" + id] = {func: func, repeat: true, interval: interval};
+    
+    return id;
+}
+function clearInterval(id) {
+    if (!window.NativeSupportTimeouts)
+        return;
 
-    var _id = window.native["GenerateTimeoutId"](interval);
-    window.NativeTimeoutObject["" + _id] = _intervalFunc;
-    return _id;
+    window.NativeTimeoutObject["" + id] = undefined;
+    window["native"]["ClearTimeout"](id);
+}
+
+function offline_timeoutFire(id) {
+    if (!window.NativeSupportTimeouts)
+        return;
+
+    var prop = "" + id;
+    
+    if (undefined === window.NativeTimeoutObject[prop]) {
+        return;
+    }
+    
+    var func = window.NativeTimeoutObject[prop].func;
+    var repeat = window.NativeTimeoutObject[prop].repeat;
+    var interval = window.NativeTimeoutObject[prop].interval;
+   
+    window.NativeTimeoutObject[prop] = undefined;
+
+    if (!func)
+        return;
+
+    func.call(null);
+    
+    if (repeat) {
+        setInterval(func, interval);
+    }
+    
+    func = null;
 }
 
 window.clearTimeout = clearTimeout;
@@ -352,120 +375,6 @@ window["NativeCorrectImageUrlOnCopy"] = function(url) {
     return window["native"]["CorrectImageUrlOnCopy"](url);
 };
 
-window['AscFonts'].CFontManager = function CFontManager() {
-    this.m_oLibrary = {};
-    this.Initialize = function(){};
-    this.ClearFontsRasterCache = function(){};
-};
-window["use_native_fonts_only"] = true;
-
-// FT_Common
-function _FT_Common() {
-    this.UintToInt = function(v)
-    {
-        return (v>2147483647)?v-4294967296:v;
-    };
-    this.UShort_To_Short = function(v)
-    {
-        return (v>32767)?v-65536:v;
-    };
-    this.IntToUInt = function(v)
-    {
-        return (v<0)?v+4294967296:v;
-    };
-    this.Short_To_UShort = function(v)
-    {
-        return (v<0)?v+65536:v;
-    };
-    this.memset = function(d,v,s)
-    {
-        for (var i=0;i<s;i++)
-            d[i]=v;
-    };
-    this.memcpy = function(d,s,l)
-    {
-        for (var i=0;i<l;i++)
-            d[i]=s[i];
-    };
-    this.memset_p = function(d,v,s)
-    {
-        var _d = d.data;
-        var _e = d.pos+s;
-        for (var i=d.pos;i<_e;i++)
-            _d[i]=v;
-    };
-    this.memcpy_p = function(d,s,l)
-    {
-        var _d1=d.data;
-        var _p1=d.pos;
-        var _d2=s.data;
-        var _p2=s.pos;
-        for (var i=0;i<l;i++)
-            _d1[_p1++]=_d2[_p2++];
-    };
-    this.memcpy_p2 = function(d,s,p,l)
-    {
-        var _d1=d.data;
-        var _p1=d.pos;
-        var _p2=p;
-        for (var i=0;i<l;i++)
-            _d1[_p1++]=s[_p2++];
-    };
-    this.realloc = function(memory, pointer, cur_count, new_count)
-    {
-        var ret = { block: null, err : 0, size : new_count};
-        if (cur_count < 0 || new_count < 0)
-        {
-            /* may help catch/prevent nasty security issues */
-            ret.err = 6;
-        }
-        else if (new_count == 0)
-        {
-            ret.block = null;
-        }
-        else if (cur_count == 0)
-        {
-            ret.block = memory.Alloc(new_count);
-        }
-        else
-        {
-            var block2 = memory.Alloc(new_count);
-            FT_Common.memcpy_p(block2, pointer, cur_count);
-            ret.block = block2;
-        }
-        return ret;
-    };
-
-    this.realloc_long = function(memory, pointer, cur_count, new_count)
-    {
-        var ret = { block: null, err : 0, size : new_count};
-        if (cur_count < 0 || new_count < 0)
-        {
-            /* may help catch/prevent nasty security issues */
-            ret.err = 6;
-        }
-        else if (new_count == 0)
-        {
-            ret.block = null;
-        }
-        else if (cur_count == 0)
-        {
-            ret.block = CreateIntArray(new_count);
-        }
-        else
-        {
-            var block2 = CreateIntArray(new_count);
-            for (var i = 0; i < cur_count; i++)
-                block2[i] = pointer[i];
-
-            ret.block = block2;
-        }
-        return ret;
-    };
-}
-var FT_Common = new _FT_Common();
-
 var global_memory_stream_menu = CreateNativeMemoryStream();
 
-window['AscFonts'] = window['AscFonts'] || {};
-window['AscFonts'].FT_Common = FT_Common;
+window['SockJS'] = createSockJS();

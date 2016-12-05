@@ -64,9 +64,60 @@
 		/** @const */
 		var kArrayL = "array";
 
+		var recalcType = {
+			recalc	: 0, // без пересчета
+			full		: 1, // пересчитываем все
+			newLines: 2  // пересчитываем новые строки
+
+		};
+
+		function horizontalAlignFromString(val) {
+			var ha = null;
+			switch (val) {
+				case "left": ha = AscCommon.align_Left;break;
+				case "right": ha = AscCommon.align_Right;break;
+				case "center": ha = AscCommon.align_Center;break;
+				case "justify": ha = AscCommon.align_Justify;break;
+			}
+			return ha;
+		}
+		function horizontalAlignToString(val) {
+			var ha = "none";
+			switch (val) {
+				case AscCommon.align_Left: ha = "left";break;
+				case AscCommon.align_Right: ha = "right";break;
+				case AscCommon.align_Center: ha = "center";break;
+				case AscCommon.align_Justify: ha = "justify";break;
+			}
+			return ha;
+		}
+		function verticalAlignFromString(val) {
+			var va = null;
+			switch (val) {
+				case "bottom": va = Asc.c_oAscVAlign.Bottom;break;
+				case "center": va = Asc.c_oAscVAlign.Center;break;
+				case "distributed": va = Asc.c_oAscVAlign.Dist;break;
+				case "justify": va = Asc.c_oAscVAlign.Just;break;
+				case "top": va = Asc.c_oAscVAlign.Top;break;
+			}
+			return va;
+		}
+		function verticalAlignToString(val) {
+			var va = "none";
+			switch (val) {
+				case Asc.c_oAscVAlign.Bottom: va = "bottom";break;
+				case Asc.c_oAscVAlign.Center: va = "center";break;
+				case Asc.c_oAscVAlign.Dist: va = "distributed";break;
+				case Asc.c_oAscVAlign.Just: va = "justify";break;
+				case Asc.c_oAscVAlign.Top: va = "top";break;
+			}
+			return va;
+		}
+
 		function applyFunction(callback) {
-			if (kFunctionL === typeof callback)
+			if (kFunctionL === typeof callback) {
 				callback.apply(null, Array.prototype.slice.call(arguments, 1));
+			}
 		}
 
 		function typeOf(obj) {
@@ -211,6 +262,7 @@
 			this.r2 = r2;
 			this.refType1 = referenceType.R;
 			this.refType2 = referenceType.R;
+			this.type = c_oAscSelectionType.RangeCells;
 
 			return normalize ? this.normalize() : this;
 		}
@@ -233,6 +285,7 @@
 			var oRes = new Range(this.c1, this.r1, this.c2, this.r2, normalize);
 			oRes.refType1 = this.refType1;
 			oRes.refType2 = this.refType2;
+			oRes.type = this.type;
 			return oRes;
 		};
 
@@ -262,9 +315,13 @@
 		Range.prototype.contains = function (c, r) {
 			return this.c1 <= c && c <= this.c2 && this.r1 <= r && r <= this.r2;
 		};
+		Range.prototype.contains2 = function (cell) {
+			return this.contains(cell.col, cell.row);
+		};
 
 		Range.prototype.containsRange = function (range) {
-			return this.contains(range.c1, range.r1) && this.contains(range.c2, range.r2);
+			var allRange = this.getAllRange();
+			return allRange.contains(range.c1, range.r1) && allRange.contains(range.c2, range.r2);
 		};
 
 		Range.prototype.containsFirstLineRange = function (range) {
@@ -528,6 +585,7 @@
      */
 		function Range3D() {
 			this.sheet = '';
+			this.sheet2 = '';
 
 			if (3 == arguments.length) {
 				var range = arguments[0];
@@ -553,8 +611,182 @@
 			}
 			return oRes && Range3D.superclass.isIntersect.apply(this, arguments);
 		};
-		Range3D.prototype.clone = function(){
+		Range3D.prototype.clone = function () {
 			return new Range3D(ActiveRange.superclass.clone.apply(this, arguments), this.sheet, this.sheet2);
+		};
+		Range3D.prototype.setSheet = function (sheet, sheet2) {
+			this.sheet = sheet;
+			this.sheet2 = sheet2 ? sheet2 : sheet;
+		};
+		Range3D.prototype.getName = function () {
+			return AscCommon.parserHelp.get3DRef(this.sheet, Range3D.superclass.getName.apply(this));
+		};
+
+		/**
+		 * @constructor
+		 */
+		function SelectionRange(ws) {
+			this.ranges = [new Range(0, 0, 0, 0)];
+			this.activeCell = new AscCommon.CellBase(0, 0); // Active cell
+			this.activeCellId = 0;
+
+			this.worksheet = ws;
+		}
+
+		SelectionRange.prototype.clean = function () {
+			this.ranges = [new Range(0, 0, 0, 0)];
+			this.activeCellId = -1;
+		};
+		SelectionRange.prototype.contains = function (c, r) {
+			return this.ranges.some(function (item) {
+				return item.contains(c, r);
+			});
+		};
+		SelectionRange.prototype.contains2 = function (cell) {
+			return this.contains(cell.col, cell.row);
+		};
+		SelectionRange.prototype.containsRange = function (range) {
+			return this.ranges.some(function (item) {
+				return item.containsRange(range);
+			});
+		};
+		SelectionRange.prototype.clone = function (worksheet) {
+			var res = new SelectionRange();
+			res.ranges = this.ranges.map(function (range) {
+				return range.clone();
+			});
+			res.activeCell = this.activeCell.clone();
+			res.activeCellId = this.activeCellId;
+			res.worksheet = worksheet || this.worksheet;
+			return res;
+		};
+		SelectionRange.prototype.isEqual = function (range) {
+			return false;
+			// todo return this.activeCell.isEqual(range.cell);
+		};
+		SelectionRange.prototype.addRange = function () {
+			this.ranges.push(new Range(0, 0, 0, 0));
+			this.activeCellId = -1;
+			this.activeCell.clean();
+		};
+		SelectionRange.prototype.assign2 = function (range) {
+			this.clean();
+			this.getLast().assign2(range);
+			this.update();
+		};
+		SelectionRange.prototype.offsetCell = function (dr, dc, fCheckSize) {
+			var done, curRange, mc;
+			var lastRow = this.activeCell.row;
+			var lastCol = this.activeCell.col;
+			this.activeCell.row += dr;
+			this.activeCell.col += dc;
+
+			while (!done) {
+				done = true;
+
+				curRange = this.ranges[this.activeCellId];
+				if (!curRange.contains2(this.activeCell)) {
+					if (dr) {
+						if (0 < dr) {
+							this.activeCell.row = curRange.r1;
+							this.activeCell.col += 1;
+						} else {
+							this.activeCell.row = curRange.r2;
+							this.activeCell.col -= 1;
+						}
+					} else {
+						if (0 < dc) {
+							this.activeCell.row += 1;
+							this.activeCell.col = curRange.c1;
+						} else {
+							this.activeCell.row -= 1;
+							this.activeCell.col = curRange.c2;
+						}
+					}
+
+					if (!curRange.contains2(this.activeCell)) {
+						if (0 < dc || 0 < dr) {
+							this.activeCellId += 1;
+							this.activeCellId = (this.ranges.length > this.activeCellId) ? this.activeCellId : 0;
+							curRange = this.ranges[this.activeCellId];
+
+							this.activeCell.row = curRange.r1;
+							this.activeCell.col = curRange.c1;
+						} else {
+							this.activeCellId -= 1;
+							this.activeCellId = (0 <= this.activeCellId) ? this.activeCellId : this.ranges.length - 1;
+							curRange = this.ranges[this.activeCellId];
+
+							this.activeCell.row = curRange.r2;
+							this.activeCell.col = curRange.c2;
+						}
+					}
+				}
+
+				mc = this.worksheet.getMergedByCell(this.activeCell.row, this.activeCell.col);
+
+				if (mc) {
+					if (dc > 0 && (this.activeCell.col > mc.c1 || this.activeCell.row !== mc.r1)) {
+						// Движение слева направо
+						this.activeCell.col = mc.c2 + 1;
+						done = false;
+					} else if (dc < 0 && (this.activeCell.col < mc.c2 || this.activeCell.row !== mc.r1)) {
+						// Движение справа налево
+						this.activeCell.col = mc.c1 - 1;
+						done = false;
+					}
+					if (dr > 0 && (this.activeCell.row > mc.r1 || this.activeCell.col !== mc.c1)) {
+						// Движение сверху вниз
+						this.activeCell.row = mc.r2 + 1;
+						done = false;
+					} else if (dr < 0 && (this.activeCell.row < mc.r2 || this.activeCell.col !== mc.c1)) {
+						// Движение снизу вверх
+						this.activeCell.row = mc.r1 - 1;
+						done = false;
+					}
+				}
+				if (!done) {
+					continue;
+				}
+
+				while (this.activeCell.col >= curRange.c1 && this.activeCell.col <= curRange.c2 && fCheckSize(0, this.activeCell.col)) {
+					this.activeCell.col += dc || (dr > 0 ? +1 : -1);
+					done = false;
+				}
+				if (!done) {
+					continue;
+				}
+
+				while (this.activeCell.row >= curRange.r1 && this.activeCell.row <= curRange.r2 && fCheckSize(this.activeCell.row, 0)) {
+					this.activeCell.row += dr || (dc > 0 ? +1 : -1);
+					done = false;
+				}
+
+				break;
+			}
+			return (lastRow !== this.activeCell.row || lastCol !== this.activeCell.col)
+		};
+		SelectionRange.prototype.setCell = function (r, c) {
+			this.activeCell.row = r;
+			this.activeCell.col = c;
+			this.update();
+		};
+		SelectionRange.prototype.getLast = function () {
+			return this.ranges[this.ranges.length - 1];
+		};
+		SelectionRange.prototype.isSingleRange = function () {
+			return 1 === this.ranges.length;
+		};
+		SelectionRange.prototype.update = function () {
+			//меняем выделеную ячейку, если она не входит в диапазон
+			//возможно, в будующем придется пределать логику, пока нет примеров, когда это работает плохо
+			var range = this.ranges[this.activeCellId];
+			if (!range || !range.contains(this.activeCell.col, this.activeCell.row)) {
+				range = this.getLast();
+				this.activeCell.col = range.c1;
+				this.activeCell.row = range.r1;
+				this.activeCellId = this.ranges.length - 1;
+			}
 		};
 
     /**
@@ -1254,7 +1486,7 @@
 			return this;
 		}
 		function CPrintPagesData () {
-			this.arrPages = null;
+			this.arrPages = [];
 			this.currentIndex = 0;
 
 			return this;
@@ -1589,7 +1821,7 @@
 			this.isReplaceAll = false;					// заменить все (если у нас замена)
 
 			// внутренние переменные
-			this.activeRange = null;
+			this.activeCell = null;
 			this.indexInArray = 0;
 			this.countFind = 0;
 			this.countReplace = 0;
@@ -1610,7 +1842,7 @@
 			result.replaceWith = this.replaceWith;
 			result.isReplaceAll = this.isReplaceAll;
 
-			result.activeRange = this.activeRange ? this.activeRange.clone() : null;
+			result.activeCell = this.activeCell ? this.activeCell.clone() : null;
 			result.indexInArray = this.indexInArray;
 			result.countFind = this.countFind;
 			result.countReplace = this.countReplace;
@@ -1652,6 +1884,19 @@
 		asc_CCompleteMenu.prototype.asc_getName = function () {return this.name;};
 		asc_CCompleteMenu.prototype.asc_getType = function () {return this.type;};
 
+		function CCacheMeasureEmpty() {
+			this.cache = {};
+		}
+		CCacheMeasureEmpty.prototype.add = function (elem, val) {
+			var font = (this.cache[elem.fn] || (this.cache[elem.fn] = {}));
+			font[elem.fs] = val;
+		};
+		CCacheMeasureEmpty.prototype.get = function (elem) {
+			var font = this.cache[elem.fn];
+			return font ? font[elem.fs] : null;
+		};
+		var g_oCacheMeasureEmpty = new CCacheMeasureEmpty();
+
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
@@ -1659,7 +1904,12 @@
 		var prot;
 		window['Asc'] = window['Asc'] || {};
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+		window["AscCommonExcel"].recalcType = recalcType;
 		window["AscCommonExcel"].applyFunction = applyFunction;
+		window["AscCommonExcel"].horizontalAlignFromString = horizontalAlignFromString;
+		window["AscCommonExcel"].horizontalAlignToString = horizontalAlignToString;
+		window["AscCommonExcel"].verticalAlignFromString = verticalAlignFromString;
+		window["AscCommonExcel"].verticalAlignToString = verticalAlignToString;
 		window["Asc"].typeOf = typeOf;
 		window["Asc"].lastIndexOf = lastIndexOf;
 		window["Asc"].search = search;
@@ -1682,6 +1932,7 @@
 		window["AscCommonExcel"].CRangeOffset = CRangeOffset;
 		window["Asc"].Range = Range;
 		window["AscCommonExcel"].Range3D = Range3D;
+		window["AscCommonExcel"].SelectionRange = SelectionRange;
 		window["AscCommonExcel"].ActiveRange = ActiveRange;
 		window["AscCommonExcel"].FormulaRange = FormulaRange;
 		window["AscCommonExcel"].MultiplyRange = MultiplyRange;
@@ -1813,4 +2064,6 @@
 		prot = asc_CCompleteMenu.prototype;
 		prot["asc_getName"] = prot.asc_getName;
 		prot["asc_getType"] = prot.asc_getType;
+
+		window["AscCommonExcel"].g_oCacheMeasureEmpty = g_oCacheMeasureEmpty;
 })(window);

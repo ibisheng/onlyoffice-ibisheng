@@ -1,4 +1,4 @@
-﻿/*
+/*
  * (c) Copyright Ascensio System SIA 2010-2016
  *
  * This program is a free software product. You can redistribute it and/or
@@ -37,6 +37,7 @@
 	// Import
 	var offlineMode = AscCommon.offlineMode;
 	var c_oEditorId = AscCommon.c_oEditorId;
+	var c_oCloseCode = AscCommon.c_oCloseCode;
 
 	var c_oAscError           = Asc.c_oAscError;
 	var c_oAscAsyncAction     = Asc.c_oAscAsyncAction;
@@ -55,6 +56,7 @@
 		this.HtmlElement     = null;
 
 		this.isMobileVersion = (config['mobile'] === true);
+		this.isEmbedVersion = (config['embedded'] === true);
 
 		this.isViewMode = false;
 
@@ -64,7 +66,6 @@
 		this.LoadedObject        = null;
 		this.DocumentType        = 0; // 0 - empty, 1 - test, 2 - document (from json)
 		this.DocInfo             = null;
-		this.documentVKey        = null;
 		this.documentId          = undefined;
 		this.documentUserId      = undefined;
 		this.documentUrl         = "null";
@@ -107,6 +108,8 @@
 		// Режим вставки диаграмм в редакторе документов
 		this.isChartEditor         = false;
 		this.isOpenedChartFrame    = false;
+
+		this.MathMenuLoad          = false;
 
 		// CoAuthoring and Chat
 		this.User                   = undefined;
@@ -234,13 +237,14 @@
 			this.documentTitle       = this.DocInfo.get_Title();
 			this.documentFormat      = this.DocInfo.get_Format();
 			this.documentCallbackUrl = this.DocInfo.get_CallbackUrl();
-			this.documentVKey        = this.DocInfo.get_VKey();
 
 			this.documentOpenOptions = this.DocInfo.asc_getOptions();
 
 			this.User = new AscCommon.asc_CUser();
 			this.User.setId(this.DocInfo.get_UserId());
 			this.User.setUserName(this.DocInfo.get_UserName());
+			this.User.setFirstName(this.DocInfo.get_FirstName());
+			this.User.setLastName(this.DocInfo.get_LastName());
 
 			//чтобы в versionHistory был один documentId для auth и open
 			this.CoAuthoringApi.setDocId(this.documentId);
@@ -393,11 +397,9 @@
 				"id"            : this.documentId,
 				"userid"        : this.documentUserId,
 				"format"        : this.documentFormat,
-				"vkey"          : this.documentVKey,
 				"url"           : this.documentUrl,
 				"title"         : this.documentTitle,
-				"embeddedfonts" : this.isUseEmbeddedCutFonts,
-				"viewmode"      : this.getViewMode()
+				"embeddedfonts" : this.isUseEmbeddedCutFonts
 			};
 			if (isVersionHistory)
 			{
@@ -405,7 +407,11 @@
 				rData["userconnectionid"] = this.CoAuthoringApi.getUserConnectionId();
 			}
 		}
-		this.CoAuthoringApi.auth(this.getViewMode(), rData);
+		if (isVersionHistory) {
+			this.CoAuthoringApi.versionHistory(rData);
+		} else {
+			this.CoAuthoringApi.auth(this.getViewMode(), rData);
+		}
 
 		if (!isRepeat) {
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
@@ -515,7 +521,7 @@
 		}
 		//в обычном серверном режиме портим ссылку, потому что CoAuthoring теперь имеет встроенный адрес
 		//todo надо использовать проверку get_OfflineApp
-		if (!(window['NATIVE_EDITOR_ENJINE'] || offlineMode === this.documentUrl))
+		if (!(window['NATIVE_EDITOR_ENJINE'] || offlineMode === this.documentUrl) || window['IS_NATIVE_EDITOR'])
 		{
 			this.CoAuthoringApi.set_url(null);
 		}
@@ -572,63 +578,102 @@
 		{
 			t.sendEvent('asc_onError', c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
 		};
+		this.CoAuthoringApi.onMeta                    = function(data)
+		{
+			var newDocumentTitle = data["title"];
+			if (newDocumentTitle) {
+				t.documentTitle = newDocumentTitle;
+				if (t.DocInfo) {
+					t.DocInfo.asc_putTitle(newDocumentTitle);
+				}
+			}
+			t.sendEvent('asc_onMeta', data);
+		};
+		this.CoAuthoringApi.onSession = function(data) {
+			var code = data["code"];
+			var reason = data["reason"];
+			var interval = data["interval"];
+			var extendSession = true;
+			if (c_oCloseCode.sessionIdle == code) {
+				var lastTime = new Date().getTime();
+				var idleTime = new Date().getTime() - lastTime;
+				if (idleTime < interval) {
+					t.CoAuthoringApi.extendSession(idleTime);
+				} else {
+					extendSession = false;
+				}
+			} else if (c_oCloseCode.sessionAbsolute == code) {
+				extendSession = false;
+			}
+			if (!extendSession) {
+				if (History.Have_Changes()) {
+					//enter view mode because save async
+					t.sendEvent('asc_onCoAuthoringDisconnect');
+					t.asc_setViewMode(true);
+
+					t.CoAuthoringApi.onUnSaveLock = function() {
+						t.CoAuthoringApi.onUnSaveLock = null;
+
+						t.CoAuthoringApi.disconnect(code, reason);
+					};
+					if (t.collaborativeEditing.applyChanges) {
+						t.collaborativeEditing.applyChanges();
+						t.collaborativeEditing.sendChanges();
+					} else {
+						AscCommon.CollaborativeEditing.Apply_Changes();
+						AscCommon.CollaborativeEditing.Send_Changes();
+					}
+				} else {
+					t.CoAuthoringApi.disconnect(code, reason);
+				}
+			}
+		};
 		/**
 		 * Event об отсоединении от сервера
 		 * @param {jQuery} e  event об отсоединении с причиной
 		 * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
 		 * @param {Bool} isCloseCoAuthoring
 		 */
-		this.CoAuthoringApi.onDisconnect = function(e, isDisconnectAtAll, isCloseCoAuthoring)
+		this.CoAuthoringApi.onDisconnect = function(e, errorCode)
 		{
 			if (AscCommon.ConnectionState.None === t.CoAuthoringApi.get_state())
 			{
 				t.asyncServerIdEndLoaded();
 			}
-			if (isDisconnectAtAll)
+			if (null != errorCode)
 			{
 				// Посылаем наверх эвент об отключении от сервера
 				t.sendEvent('asc_onCoAuthoringDisconnect');
 				// И переходим в режим просмотра т.к. мы не можем сохранить файл
 				t.asc_setViewMode(true);
-				t.sendEvent('asc_onError', isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
+				t.sendEvent('asc_onError', errorCode, c_oAscError.Level.NoCritical);
 			}
 		};
-		this.CoAuthoringApi.onDocumentOpen = function(inputWrap)
-		{
-			if (inputWrap["data"])
-			{
+		this.CoAuthoringApi.onDocumentOpen = function (inputWrap) {
+			if (inputWrap["data"]) {
 				var input = inputWrap["data"];
-				switch (input["type"])
-				{
+				switch (input["type"]) {
 					case 'reopen':
 					case 'open':
-						switch (input["status"])
-						{
+						switch (input["status"]) {
 							case "updateversion":
 							case "ok":
 								var urls = input["data"];
 								AscCommon.g_oDocumentUrls.init(urls);
-								if (null != urls['Editor.bin'])
-								{
-									if ('ok' === input["status"] || t.getViewMode())
-									{
+								if (null != urls['Editor.bin']) {
+									if ('ok' === input["status"] || t.getViewMode()) {
 										t._onOpenCommand(urls['Editor.bin']);
-									}
-									else
-									{
-										t.sendEvent("asc_onDocumentUpdateVersion", function()
-										{
-											if (t.isCoAuthoringEnable)
-											{
+									} else {
+										t.sendEvent("asc_onDocumentUpdateVersion", function () {
+											if (t.isCoAuthoringEnable) {
 												t.asc_coAuthoringDisconnect();
 											}
 											t._onOpenCommand(urls['Editor.bin']);
 										})
 									}
-								}
-								else
-								{
-									t.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
+								} else {
+									t.sendEvent("asc_onError", c_oAscError.ID.ConvertationOpenError,
+										c_oAscError.Level.Critical);
 								}
 								break;
 							case "needparams":
@@ -638,18 +683,17 @@
 								t._onNeedParams(null, true);
 								break;
 							case "err":
-								t.sendEvent("asc_onError", AscCommon.mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
+								t.sendEvent("asc_onError",
+									AscCommon.mapAscServerErrorToAscError(parseInt(input["data"]),
+										Asc.c_oAscError.ID.ConvertationOpenError), c_oAscError.Level.Critical);
 								break;
 						}
 						break;
 					default:
-						if (t.fCurCallback)
-						{
+						if (t.fCurCallback) {
 							t.fCurCallback(input);
 							t.fCurCallback = null;
-						}
-						else
-						{
+						} else {
 							t.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 						}
 						break;
@@ -658,7 +702,7 @@
 		};
 
 		this._coAuthoringInitEnd();
-		this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', this.editorId, this.documentFormatSave);
+		this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', this.editorId, this.documentFormatSave, this.DocInfo);
 	};
 	baseEditorsApi.prototype._coAuthoringInitEnd                 = function()
 	{
@@ -728,7 +772,7 @@
 	baseEditorsApi.prototype.asc_addImage                        = function()
 	{
 		var t = this;
-		AscCommon.ShowImageFileDialog(this.documentId, this.documentUserId, function(error, files)
+		AscCommon.ShowImageFileDialog(this.documentId, this.documentUserId, this.CoAuthoringApi.get_jwt(), function(error, files)
 		{
 			t._uploadCallback(error, files);
 		}, function(error)
@@ -750,7 +794,7 @@
 		else
 		{
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-			AscCommon.UploadImageFiles(files, this.documentId, this.documentUserId, function(error, url)
+			AscCommon.UploadImageFiles(files, this.documentId, this.documentUserId, this.CoAuthoringApi.get_jwt(), function(error, url)
 			{
 				if (c_oAscError.ID.No !== error)
 				{
@@ -861,6 +905,10 @@
 	{
 	};
 
+
+	baseEditorsApi.prototype.asc_startEditCurrentOleObject = function(){
+
+	};
 	// Version History
 	baseEditorsApi.prototype.asc_showRevision   = function(newObj)
 	{
@@ -950,6 +998,30 @@
 		}
 
 		this.sendEvent('asc_onInitStandartTextures', arr);
+	};
+
+	baseEditorsApi.prototype.sendMathToMenu = function ()
+	{
+		if (this.MathMenuLoad)
+			return;
+		// GENERATE_IMAGES
+		//var _MathPainter = new CMathPainter(this.m_oWordControl.m_oApi);
+		//_MathPainter.StartLoad();
+		//return;
+		var _MathPainter = new AscFormat.CMathPainter(this);
+		_MathPainter.Generate();
+		this.MathMenuLoad = true;
+	};
+
+	baseEditorsApi.prototype.sendMathTypesToMenu         = function(_math)
+	{
+		this.sendEvent("asc_onMathTypes", _math);
+	};
+
+	baseEditorsApi.prototype.asyncFontEndLoaded_MathDraw = function(Obj)
+	{
+		this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
+		Obj.Generate2();
 	};
 
 	// plugins
@@ -1047,6 +1119,12 @@
 	};
 	baseEditorsApi.prototype.pre_Paste = function(_fonts, _images, callback)
 	{
+	};
+
+	baseEditorsApi.prototype.asc_Remove = function()
+	{
+		if (AscCommon.g_inputContext)
+			AscCommon.g_inputContext.emulateKeyDownApi(46);
 	};
 
 	// System input

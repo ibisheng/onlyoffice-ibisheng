@@ -66,7 +66,7 @@
 		this.Api = null;
 
 		this.IsNeedDivOnCopy  = AscBrowser.isIE;
-		this.IsNeedDivOnPaste = AscBrowser.isIE || AscBrowser.isMozilla;
+		this.IsNeedDivOnPaste = AscBrowser.isIE/* || AscBrowser.isMozilla*/;
 
 		this.IsCopyCutOnlyInEditable = AscBrowser.isIE || AscBrowser.isMozilla;
 		this.IsPasteOnlyInEditable   = AscBrowser.isIE || AscBrowser.isMozilla || AscBrowser.isSafari;
@@ -273,7 +273,7 @@
 					}
 					sHtml += "</body></html>";
 
-					this.CommonIframe_PasteStart(sHtml);
+					this.CommonIframe_PasteStart(sHtml, _text_format);
 					return false;
 				}
 
@@ -764,7 +764,7 @@
 			}
 		},
 
-		CommonIframe_PasteStart : function(_html_data)
+		CommonIframe_PasteStart : function(_html_data, text_data)
 		{
 			var ifr = document.getElementById(this.CommonIframeId);
 			if (!ifr)
@@ -797,7 +797,7 @@
 				{
 					ifr.style.display = "block";
 
-					this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, frameWindow.document.body, ifr);
+					this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, frameWindow.document.body, ifr, text_data);
 				}
 			}
 

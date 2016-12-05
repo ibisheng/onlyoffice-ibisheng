@@ -287,13 +287,13 @@
                 posh = (angle === 90 || angle === -90) ? textW : Math.abs(angleSin * textW),
                 posv = (angle === 90 || angle === -90) ? 0 : Math.abs(angleCos * textW),
 
-                isHorzLeft      = ('left'   === alignHorizontal),
-                isHorzCenter    = ('center' === alignHorizontal),
-                isHorzRight     = ('right'  === alignHorizontal),
+                isHorzLeft      = (AscCommon.align_Left   === alignHorizontal),
+                isHorzCenter    = (AscCommon.align_Center === alignHorizontal),
+                isHorzRight     = (AscCommon.align_Right  === alignHorizontal),
 
-                isVertBottom    = ('bottom' === alignVertical),
-                isVertCenter    = ('center' === alignVertical),
-                isVertTop       = ('top'    === alignVertical);
+                isVertBottom    = (Asc.c_oAscVAlign.Bottom === alignVertical),
+                isVertCenter    = (Asc.c_oAscVAlign.Center === alignVertical),
+                isVertTop       = (Asc.c_oAscVAlign.Top    === alignVertical);
 
             if (isVertBottom) {
                 if (angle < 0) {
@@ -596,7 +596,7 @@
 
 			var x = a_2 + a_2_3;
 
-			if (va === "superscript") {
+			if (va === AscCommon.vertalign_SuperScript) {
 				h = asc_calcnpt(hpt, ppi);
 				d = h - a;
 
@@ -605,7 +605,7 @@
 				l.bl2 = a_2_3;
 				l.a = fm.ascender + a_2;         // >0
 				l.d = fm.descender - a_2;        // <0
-			} else if (va === "subscript") {
+			} else if (va === AscCommon.vertalign_SubScript) {
 				h_2_3 = asc_calcnpt(hpt * 2/3, ppi);
 				d_2_3 = h_2_3 - a_2_3;
 				l.th = x + d_2_3;
@@ -812,7 +812,7 @@
 			var wrap = this.flags && this.flags.wrapText && !this.flags.isNumberFormat;
 			var wrapNL = this.flags && this.flags.wrapOnlyNL;
 			var hasRepeats = false;
-			var i, j, fr, fmt, text, p, p_ = {}, pIndex, va, f, f_, eq, startCh;
+			var i, j, fr, fmt, text, p, p_ = {}, pIndex, f, f_, eq, startCh;
 			var tw = 0, nlPos = 0, hpPos = undefined, isSP_ = true, delta = 0;
 
 			function measureFragment(s) {
@@ -882,9 +882,8 @@
 				p = p ? p.clone() : new charProperties();
 
 				// reduce font size for subscript and superscript chars
-				va = fmt.va !== undefined ? fmt.va.toLowerCase() : "";
-				if (va === "subscript" || va === "superscript") {
-					p.va = va;
+				if (fmt.va === AscCommon.vertalign_SuperScript || fmt.va === AscCommon.vertalign_SubScript) {
+					p.va = fmt.va;
 					p.fsz = f.FontSize;
 					f.FontSize *= 2/3;
 					p.font = f;
@@ -980,15 +979,15 @@
 			var ppix = ctx.getPPIX();
 			var ppiy = ctx.getPPIY();
 			var shrink = this.flags && this.flags.shrinkToFit;
-			var align  = this.flags ? this.flags.textAlign.toLowerCase() : "";
+			var align  = this.flags ? this.flags.textAlign : null;
 			var i, j, p, p_, f, f_, strBeg;
 			var n = 0, l = this.lines[0], x1 = l ? initX(0) : 0, y1 = y, dx = l ? computeWordDeltaX() : 0;
 
 			function initX(startPos) {
 				var x_ = x;
-				if (align === "right") {
+				if (align === AscCommon.align_Right) {
 					x_ = asc_calcnpt(x + maxWidth - self._calcLineWidth(startPos), ppix, -1/*px*/);
-				} else if (align === "center") {
+				} else if (align === AscCommon.align_Center) {
 					x_ = asc_calcnpt(x + 0.5 * (maxWidth - asc_calcnpt(self._calcLineWidth(startPos), ppix)), ppix, 0/*px*/);
 				}
 				l.startX = x_;
@@ -996,7 +995,7 @@
 			}
 
 			function computeWordDeltaX() {
-				if (align !== "justify" || n === self.lines.length - 1) {return 0;}
+				if (align !== AscCommon.align_Justify || n === self.lines.length - 1) {return 0;}
 				for (var i = l.beg, c = 0; i <= l.end; ++i) {
 					var p = self.charProps[i];
 					if (p && p.wrd) {++c;}
@@ -1012,7 +1011,7 @@
 				var isSO = so === true;
 				var fsz, x2, y, lw, dy, i, b, x_, cp, w_1px, h_1px;
 
-				if (align !== "justify" || dx < 0.000001) {
+				if (align !== AscCommon.align_Justify || dx < 0.000001) {
 					ctx.fillText(self.chars.slice(begin, end), x1, y1 + l.bl + dh, undefined, self.charWidths.slice(begin, end), angle);
 				} else {
 					for (i = b = begin, x_ = x1; i < end; ++i) {

@@ -8233,6 +8233,7 @@ FmtScheme.prototype =
     {
         var oCopy = new FmtScheme();
         oCopy.name = this.name;
+        var i;
         for(i = 0; i < this.fillStyleLst.length; ++i)
         {
             oCopy.fillStyleLst[i] = this.fillStyleLst[i].createDuplicate();
@@ -11032,17 +11033,20 @@ TextListStyle.prototype =
 };
 
 // DEFAULT OBJECTS
-function GenerateDefaultTheme(presentation)
+function GenerateDefaultTheme(presentation, opt_fontName)
 {
     return ExecuteNoHistory(function()
     {
+		if (!opt_fontName) {
+			opt_fontName = "Arial";
+		}
         var theme = new CTheme();
         theme.presentation = presentation;
         theme.setFontScheme(new FontScheme());
         theme.themeElements.fontScheme.setMajorFont(new FontCollection(theme.themeElements.fontScheme));
         theme.themeElements.fontScheme.setMinorFont(new FontCollection(theme.themeElements.fontScheme));
-        theme.themeElements.fontScheme.majorFont.setLatin("Arial");
-        theme.themeElements.fontScheme.minorFont.setLatin("Arial");
+        theme.themeElements.fontScheme.majorFont.setLatin(opt_fontName);
+        theme.themeElements.fontScheme.minorFont.setLatin(opt_fontName);
 
 
         var scheme = theme.themeElements.clrScheme;
@@ -12647,7 +12651,8 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].PARRUN_TYPE_RUN		  = 1;
     window['AscFormat'].PARRUN_TYPE_FLD		  = 2;
     window['AscFormat'].PARRUN_TYPE_BR		  = 3;
-    window['AscFormat'].PARRUN_TYPE_TEXT_MATH = 4;
+	window['AscFormat'].PARRUN_TYPE_MATH	  = 4;
+	window['AscFormat'].PARRUN_TYPE_MATHPARA  = 5;
 
     window['AscFormat']._weight_body = _weight_body;
     window['AscFormat']._weight_chart = _weight_chart;

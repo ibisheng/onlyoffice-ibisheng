@@ -159,6 +159,18 @@ RgbColor.prototype =
 	{
 		return this.Properties;
 	},
+
+    isEqual: function(oColor)
+    {
+        if(!oColor){
+            return false;
+        }
+        if(this.rgb !== oColor.rgb){
+            return false;
+        }
+        return true;
+    },
+
 	getProperty : function(nType)
 	{
 		switch(nType)
@@ -208,20 +220,18 @@ var g_oThemeColorProperties = {
 	};
 function ThemeColor()
 {
-	this.Properties = g_oThemeColorProperties;
 	this.rgb = null;
 	this.theme = null;
 	this.tint = null;
 }
 ThemeColor.prototype =
 {
+	Properties: g_oThemeColorProperties,
 	clone : function()
 	{
-		var res = new ThemeColor();
-		res.rgb = this.rgb;
-		res.theme = this.theme;
-		res.tint = this.tint;
-		return res;
+		//ThemeColor must be created by g_oColorManager for correct rebuild
+		//no need getThemeColor because it return same object
+		return this;
 	},
 	getType : function()
 	{
@@ -249,6 +259,19 @@ ThemeColor.prototype =
 		case this.Properties.tint: this.tint = value;break;
 		}
 	},
+    isEqual: function(oColor)
+    {
+        if(!oColor){
+            return false;
+        }
+        if(this.theme !== oColor.theme){
+            return false;
+        }
+        if(!AscFormat.fApproxEqual(this.tint, oColor.tint)){
+            return false;
+        }
+        return true;
+    },
 	Write_ToBinary2 : function(oBinaryWriter)
 	{
 		oBinaryWriter.WriteByte(this.theme);
@@ -465,29 +488,28 @@ var g_oFontProperties = {
 		c: 7,
 		va: 8
 	};
-/** @constructor */
-function Font(val)
-{
-	if(null == val)
-		val = g_oDefaultFormat.FontAbs;
-	this.Properties = g_oFontProperties;
-	this.fn = val.fn;
-	this.scheme = val.scheme;
-	this.fs = val.fs;
-	this.b = val.b;
-	this.i = val.i;
-	this.u = val.u;
-	this.s = val.s;
-	this.c = val.c;
-	this.va = val.va;
-    //skip и repeat не сохраняются в файл нужны здесь только чтобы класс Font можно было использовать в комплексных строках
-    this.skip = val.skip;
-    this.repeat = val.repeat;
-}
-Font.prototype =
-{
-	clean : function()
-	{
+
+	/** @constructor */
+	function Font(val) {
+		if (null == val) {
+			val = g_oDefaultFormat.FontAbs;
+		}
+		this.Properties = g_oFontProperties;
+		this.fn = val.fn;
+		this.scheme = val.scheme;
+		this.fs = val.fs;
+		this.b = val.b;
+		this.i = val.i;
+		this.u = val.u;
+		this.s = val.s;
+		this.c = val.c;
+		this.va = val.va;
+		//skip и repeat не сохраняются в файл нужны здесь только чтобы класс Font можно было использовать в комплексных строках
+		this.skip = val.skip;
+		this.repeat = val.repeat;
+	}
+
+	Font.prototype.clean = function () {
 		this.fn = null;
 		this.scheme = null;
 		this.fs = null;
@@ -499,16 +521,15 @@ Font.prototype =
 		this.va = null;
 		this.skip = null;
 		this.repeat = null;
-	},
-	_mergeProperty : function(first, second, def)
-	{
-		if(def != first)
+	};
+	Font.prototype._mergeProperty = function (first, second, def) {
+		if (def != first) {
 			return first;
-		else
+		} else {
 			return second;
-	},
-	merge : function(font)
-	{
+		}
+	};
+	Font.prototype.merge = function (font) {
 		var defaultFontAbs = g_oDefaultFormat.FontAbs;
 		var oRes = new Font();
 		oRes.fn = this._mergeProperty(this.fn, font.fn, defaultFontAbs.fn);
@@ -519,184 +540,244 @@ Font.prototype =
 		oRes.u = this._mergeProperty(this.u, font.u, defaultFontAbs.u);
 		oRes.s = this._mergeProperty(this.s, font.s, defaultFontAbs.s);
 		//заглушка excel при merge стилей игнорирует default цвет
-		if(this.c instanceof ThemeColor && g_nColorTextDefault == this.c.theme && null == this.c.tint)
+		if (this.c instanceof ThemeColor && g_nColorTextDefault == this.c.theme && null == this.c.tint) {
 			oRes.c = this._mergeProperty(font.c, this.c, defaultFontAbs.c);
-		else
+		} else {
 			oRes.c = this._mergeProperty(this.c, font.c, defaultFontAbs.c);
+		}
 		oRes.va = this._mergeProperty(this.va, font.va, defaultFontAbs.va);
 		oRes.skip = this._mergeProperty(this.skip, font.skip, defaultFontAbs.skip);
 		oRes.repeat = this._mergeProperty(this.repeat, font.repeat, defaultFontAbs.repeat);
 		return oRes;
-	},
-	getRgbOrNull : function()
-	{
+	};
+	Font.prototype.getRgbOrNull = function () {
 		var nRes = null;
-		if(null != this.c)
+		if (null != this.c) {
 			nRes = this.c.getRgb();
+		}
 		return nRes;
-	},
-	getDif : function(val)
-	{
+	};
+	Font.prototype.getDif = function (val) {
 		var oRes = new Font(this);
 		var bEmpty = true;
-		if(this.fn == val.fn)
-			oRes.fn =  null;
-		else
+		if (this.fn == val.fn) {
+			oRes.fn = null;
+		} else {
 			bEmpty = false;
-		if(this.scheme == val.scheme)
-			oRes.scheme =  null;
-		else
+		}
+		if (this.scheme == val.scheme) {
+			oRes.scheme = null;
+		} else {
 			bEmpty = false;
-		if(this.fs == val.fs)
-			oRes.fs =  null;
-		else
+		}
+		if (this.fs == val.fs) {
+			oRes.fs = null;
+		} else {
 			bEmpty = false;
-		if(this.b == val.b)
-			oRes.b =  null;
-		else
+		}
+		if (this.b == val.b) {
+			oRes.b = null;
+		} else {
 			bEmpty = false;
-		if(this.i == val.i)
-			oRes.i =  null;
-		else
+		}
+		if (this.i == val.i) {
+			oRes.i = null;
+		} else {
 			bEmpty = false;
-		if(this.u == val.u)
-			oRes.u =  null;
-		else
+		}
+		if (this.u == val.u) {
+			oRes.u = null;
+		} else {
 			bEmpty = false;
-		if(this.s == val.s)
-			oRes.s =  null;
-		else
+		}
+		if (this.s == val.s) {
+			oRes.s = null;
+		} else {
 			bEmpty = false;
-		if(g_oColorManager.isEqual(this.c, val.c))
-			oRes.c =  null;
-		else
+		}
+		if (g_oColorManager.isEqual(this.c, val.c)) {
+			oRes.c = null;
+		} else {
 			bEmpty = false;
-		if(this.va == val.va)
-			oRes.va =  null;
-		else
+		}
+		if (this.va == val.va) {
+			oRes.va = null;
+		} else {
 			bEmpty = false;
-		if(this.skip == val.skip)
-			oRes.skip =  null;
-		else
+		}
+		if (this.skip == val.skip) {
+			oRes.skip = null;
+		} else {
 			bEmpty = false;
-		if(this.repeat == val.repeat)
-			oRes.repeat =  null;
-		else
+		}
+		if (this.repeat == val.repeat) {
+			oRes.repeat = null;
+		} else {
 			bEmpty = false;
-		if(bEmpty)
+		}
+		if (bEmpty) {
 			oRes = null;
+		}
 		return oRes;
-	},
-	isEqual : function(font)
-	{
+	};
+	Font.prototype.isEqual = function (font) {
 		var bRes = this.fs == font.fs && this.b == font.b && this.i == font.i && this.u == font.u && this.s == font.s &&
-				g_oColorManager.isEqual(this.c, font.c) && this.va == font.va && this.skip == font.skip && this.repeat == font.repeat;
-		if(bRes)
-		{
-		    if (Asc.EFontScheme.fontschemeNone == this.scheme && Asc.EFontScheme.fontschemeNone == font.scheme)
+			g_oColorManager.isEqual(this.c, font.c) && this.va == font.va && this.skip == font.skip &&
+			this.repeat == font.repeat;
+		if (bRes) {
+			if (Asc.EFontScheme.fontschemeNone == this.scheme && Asc.EFontScheme.fontschemeNone == font.scheme) {
 				bRes = this.fn == font.fn;
-		    else if (Asc.EFontScheme.fontschemeNone != this.scheme && Asc.EFontScheme.fontschemeNone != font.scheme)
+			} else if (Asc.EFontScheme.fontschemeNone != this.scheme &&
+				Asc.EFontScheme.fontschemeNone != font.scheme) {
 				bRes = this.scheme == font.scheme;
-			else
+			} else {
 				bRes = false;
+			}
 		}
 		return bRes;
-	},
-    clone : function()
-    {
+	};
+	Font.prototype.clone = function () {
 		return new Font(this);
-    },
-	set : function(oVal)
-	{
-	    if (null != oVal.fn) {
-	        this.fn = oVal.fn;
-	        this.scheme = Asc.EFontScheme.fontschemeNone;
-	    }
-		if(null != oVal.scheme)
-            this.scheme = oVal.scheme;
-        if(null != oVal.fs)
-            this.fs = oVal.fs;
-        if(null != oVal.b)
-            this.b = oVal.b;
-        if(null != oVal.i)
-            this.i = oVal.i;
-        if(null != oVal.u)
-            this.u = oVal.u;
-        if(null != oVal.s)
-            this.s = oVal.s;
-        if(null != oVal.c)
-            this.c = oVal.c;
-		if(null != oVal.va)
-            this.va = oVal.va;
-        if(null != oVal.skip)
-            this.skip = oVal.skip;
-		if(null != oVal.repeat)
-            this.repeat = oVal.repeat;
-	},
-	intersect : function(oFont, oDefVal)
-	{
-		if(this.fn != oFont.fn)
-            this.fn = oDefVal.fn;
-		if(this.scheme != oFont.scheme)
-            this.scheme = oDefVal.scheme;
-        if(this.fs != oFont.fs)
-            this.fs = oDefVal.fs;
-		if(this.b != oFont.b)
-            this.b = oDefVal.b;
-		if(this.i != oFont.i)
-            this.i = oDefVal.i;
-		if(this.u != oFont.u)
-            this.u = oDefVal.u;
-		if(this.s != oFont.s)
-            this.s = oDefVal.s;
-		if(false == g_oColorManager.isEqual(this.c, oFont.c))
-            this.c = oDefVal.c;
-		if(this.va != oFont.va)
-            this.va = oDefVal.va;
-		if(this.skip != oFont.skip)
-            this.skip = oDefVal.skip;
-		if(this.repeat != oFont.repeat)
-            this.repeat = oDefVal.repeat;
-	},
-	getType : function()
-	{
+	};
+	Font.prototype.set = function (oVal) {
+		if (null != oVal.fn) {
+			this.fn = oVal.fn;
+			this.scheme = Asc.EFontScheme.fontschemeNone;
+		}
+		if (null != oVal.scheme) {
+			this.scheme = oVal.scheme;
+		}
+		if (null != oVal.fs) {
+			this.fs = oVal.fs;
+		}
+		if (null != oVal.b) {
+			this.b = oVal.b;
+		}
+		if (null != oVal.i) {
+			this.i = oVal.i;
+		}
+		if (null != oVal.u) {
+			this.u = oVal.u;
+		}
+		if (null != oVal.s) {
+			this.s = oVal.s;
+		}
+		if (null != oVal.c) {
+			this.c = oVal.c;
+		}
+		if (null != oVal.va) {
+			this.va = oVal.va;
+		}
+		if (null != oVal.skip) {
+			this.skip = oVal.skip;
+		}
+		if (null != oVal.repeat) {
+			this.repeat = oVal.repeat;
+		}
+	};
+	Font.prototype.intersect = function (oFont, oDefVal) {
+		if (this.fn != oFont.fn) {
+			this.fn = oDefVal.fn;
+		}
+		if (this.scheme != oFont.scheme) {
+			this.scheme = oDefVal.scheme;
+		}
+		if (this.fs != oFont.fs) {
+			this.fs = oDefVal.fs;
+		}
+		if (this.b != oFont.b) {
+			this.b = oDefVal.b;
+		}
+		if (this.i != oFont.i) {
+			this.i = oDefVal.i;
+		}
+		if (this.u != oFont.u) {
+			this.u = oDefVal.u;
+		}
+		if (this.s != oFont.s) {
+			this.s = oDefVal.s;
+		}
+		if (false == g_oColorManager.isEqual(this.c, oFont.c)) {
+			this.c = oDefVal.c;
+		}
+		if (this.va != oFont.va) {
+			this.va = oDefVal.va;
+		}
+		if (this.skip != oFont.skip) {
+			this.skip = oDefVal.skip;
+		}
+		if (this.repeat != oFont.repeat) {
+			this.repeat = oDefVal.repeat;
+		}
+	};
+	Font.prototype.getType = function () {
 		return UndoRedoDataTypes.StyleFont;
-	},
-	getProperties : function()
-	{
+	};
+	Font.prototype.getProperties = function () {
 		return this.Properties;
-	},
-	getProperty : function(nType)
-	{
-		switch(nType)
-		{
-			case this.Properties.fn: return this.fn;break;
-			case this.Properties.scheme: return this.scheme;break;
-			case this.Properties.fs: return this.fs;break;
-			case this.Properties.b: return this.b;break;
-			case this.Properties.i: return this.i;break;
-			case this.Properties.u: return this.u;break;
-			case this.Properties.s: return this.s;break;
-			case this.Properties.c: return this.c;break;
-			case this.Properties.va: return this.va;break;
+	};
+	Font.prototype.getProperty = function (nType) {
+		switch (nType) {
+			case this.Properties.fn:
+				return this.fn;
+				break;
+			case this.Properties.scheme:
+				return this.scheme;
+				break;
+			case this.Properties.fs:
+				return this.fs;
+				break;
+			case this.Properties.b:
+				return this.b;
+				break;
+			case this.Properties.i:
+				return this.i;
+				break;
+			case this.Properties.u:
+				return this.u;
+				break;
+			case this.Properties.s:
+				return this.s;
+				break;
+			case this.Properties.c:
+				return this.c;
+				break;
+			case this.Properties.va:
+				return this.va;
+				break;
 		}
-	},
-	setProperty : function(nType, value)
-	{
-		switch(nType)
-		{
-			case this.Properties.fn: this.fn = value;break;
-			case this.Properties.scheme: this.scheme = value;break;
-			case this.Properties.fs: this.fs = value;break;
-			case this.Properties.b: this.b = value;break;
-			case this.Properties.i: this.i = value;break;
-			case this.Properties.u: this.u = value;break;
-			case this.Properties.s: this.s = value;break;
-			case this.Properties.c: this.c = value;break;
-			case this.Properties.va: this.va = value;break;
+	};
+	Font.prototype.setProperty = function (nType, value) {
+		switch (nType) {
+			case this.Properties.fn:
+				this.fn = value;
+				break;
+			case this.Properties.scheme:
+				this.scheme = value;
+				break;
+			case this.Properties.fs:
+				this.fs = value;
+				break;
+			case this.Properties.b:
+				this.b = value;
+				break;
+			case this.Properties.i:
+				this.i = value;
+				break;
+			case this.Properties.u:
+				this.u = value;
+				break;
+			case this.Properties.s:
+				this.s = value;
+				break;
+			case this.Properties.c:
+				this.c = value;
+				break;
+			case this.Properties.va:
+				this.va = value;
+				break;
 		}
-	}
-};
+	};
 var g_oFillProperties = {
 		bg: 0
 	};
@@ -879,33 +960,32 @@ var g_oBorderProperties = {
 		dd: 7,
 		du: 8
 	};
-/** @constructor */
-function Border(val)
-{
-	if(null == val)
-		val = g_oDefaultFormat.BorderAbs;
-	this.Properties = g_oBorderProperties;
-	this.l = val.l.clone();
-	this.t = val.t.clone();
-	this.r = val.r.clone();
-	this.b = val.b.clone();
-	this.d = val.d.clone();
-	this.ih = val.ih.clone();
-	this.iv = val.iv.clone();
-	this.dd = val.dd;
-	this.du = val.du;
-}
-Border.prototype =
-{
-	_mergeProperty : function(first, second, def)
-	{
-		if((null != def.isEqual && false == def.isEqual(first)) || (null == def.isEqual && def != first))
+
+	/** @constructor */
+	function Border(val) {
+		if (null == val) {
+			val = g_oDefaultFormat.BorderAbs;
+		}
+		this.Properties = g_oBorderProperties;
+		this.l = val.l.clone();
+		this.t = val.t.clone();
+		this.r = val.r.clone();
+		this.b = val.b.clone();
+		this.d = val.d.clone();
+		this.ih = val.ih.clone();
+		this.iv = val.iv.clone();
+		this.dd = val.dd;
+		this.du = val.du;
+	}
+
+	Border.prototype._mergeProperty = function (first, second, def) {
+		if ((null != def.isEqual && false == def.isEqual(first)) || (null == def.isEqual && def != first)) {
 			return first;
-		else
+		} else {
 			return second;
-	},
-	merge : function(border)
-	{
+		}
+	};
+	Border.prototype.merge = function (border) {
 		var defaultBorder = g_oDefaultFormat.Border;
 		var oRes = new Border();
 		oRes.l = this._mergeProperty(this.l, border.l, defaultBorder.l).clone();
@@ -918,60 +998,67 @@ Border.prototype =
 		oRes.dd = this._mergeProperty(this.dd, border.dd, defaultBorder.dd);
 		oRes.du = this._mergeProperty(this.du, border.du, defaultBorder.du);
 		return oRes;
-	},
-	getDif : function(val)
-	{
+	};
+	Border.prototype.getDif = function (val) {
 		var oRes = new Border(this);
 		var bEmpty = true;
-		if(true == this.l.isEqual(val.l))
-			oRes.l =  null;
-		else
+		if (true == this.l.isEqual(val.l)) {
+			oRes.l = null;
+		} else {
 			bEmpty = false;
-		if(true == this.t.isEqual(val.t))
-			oRes.t =  null;
-		else
+		}
+		if (true == this.t.isEqual(val.t)) {
+			oRes.t = null;
+		} else {
 			bEmpty = false;
-		if(true == this.r.isEqual(val.r))
-			oRes.r =  null;
-		else
+		}
+		if (true == this.r.isEqual(val.r)) {
+			oRes.r = null;
+		} else {
 			bEmpty = false;
-		if(true == this.b.isEqual(val.b))
-			oRes.b =  null;
-		else
+		}
+		if (true == this.b.isEqual(val.b)) {
+			oRes.b = null;
+		} else {
 			bEmpty = false;
-		if(true == this.d.isEqual(val.d))
-			oRes.d =  null;
-		if(true == this.ih.isEqual(val.ih))
-			oRes.ih =  null;
-		else
+		}
+		if (true == this.d.isEqual(val.d)) {
+			oRes.d = null;
+		}
+		if (true == this.ih.isEqual(val.ih)) {
+			oRes.ih = null;
+		} else {
 			bEmpty = false;
-		if(true == this.iv.isEqual(val.iv))
-			oRes.iv =  null;
-		else
+		}
+		if (true == this.iv.isEqual(val.iv)) {
+			oRes.iv = null;
+		} else {
 			bEmpty = false;
-		if(this.dd == val.dd)
-			oRes.dd =  null;
-		else
+		}
+		if (this.dd == val.dd) {
+			oRes.dd = null;
+		} else {
 			bEmpty = false;
-		if(this.du == val.du)
-			oRes.du =  null;
-		else
+		}
+		if (this.du == val.du) {
+			oRes.du = null;
+		} else {
 			bEmpty = false;
-		if(bEmpty)
+		}
+		if (bEmpty) {
 			oRes = null;
+		}
 		return oRes;
-	},
-	isEqual : function(val)
-	{
-		return this.l.isEqual(val.l) && this.t.isEqual(val.t) && this.r.isEqual(val.r) && this.b.isEqual(val.b) && this.d.isEqual(val.d) &&
-				this.ih.isEqual(val.ih) && this.iv.isEqual(val.iv) && this.dd == val.dd && this.du == val.du;
-	},
-    clone : function()
-    {
-        return new Border(this);
-    },
-	clean : function()
-	{
+	};
+	Border.prototype.isEqual = function (val) {
+		return this.l.isEqual(val.l) && this.t.isEqual(val.t) && this.r.isEqual(val.r) && this.b.isEqual(val.b) &&
+			this.d.isEqual(val.d) && this.ih.isEqual(val.ih) && this.iv.isEqual(val.iv) && this.dd == val.dd &&
+			this.du == val.du;
+	};
+	Border.prototype.clone = function () {
+		return new Border(this);
+	};
+	Border.prototype.clean = function () {
 		var defaultBorder = g_oDefaultFormat.Border;
 		this.l = defaultBorder.l.clone();
 		this.t = defaultBorder.t.clone();
@@ -982,68 +1069,111 @@ Border.prototype =
 		this.iv = defaultBorder.iv.clone();
 		this.dd = defaultBorder.dd;
 		this.du = defaultBorder.du;
-	},
-    mergeInner : function(border){
-        if(border){
-            if(border.l)
+	};
+	Border.prototype.mergeInner = function (border) {
+		if (border) {
+			if (border.l) {
 				this.l.merge(border.l);
-            if(border.t)
-                this.t.merge(border.t);
-            if(border.r)
-                this.r.merge(border.r);
-            if(border.b)
-                this.b.merge(border.b);
-            if(border.d)
-                this.d.merge(border.d);
-            if(border.ih)
+			}
+			if (border.t) {
+				this.t.merge(border.t);
+			}
+			if (border.r) {
+				this.r.merge(border.r);
+			}
+			if (border.b) {
+				this.b.merge(border.b);
+			}
+			if (border.d) {
+				this.d.merge(border.d);
+			}
+			if (border.ih) {
 				this.ih.merge(border.ih);
-            if(border.iv)
-                this.iv.merge(border.iv);
-            if(null != border.dd)
-                this.dd = this.dd || border.dd;
-            if(null != border.du)
-                this.du = this.du || border.du;
-        }
-    },
-	getType : function()
-	{
+			}
+			if (border.iv) {
+				this.iv.merge(border.iv);
+			}
+			if (null != border.dd) {
+				this.dd = this.dd || border.dd;
+			}
+			if (null != border.du) {
+				this.du = this.du || border.du;
+			}
+		}
+	};
+	Border.prototype.getType = function () {
 		return UndoRedoDataTypes.StyleBorder;
-	},
-	getProperties : function()
-	{
+	};
+	Border.prototype.getProperties = function () {
 		return this.Properties;
-	},
-	getProperty : function(nType)
-	{
-		switch(nType)
-		{
-			case this.Properties.l: return this.l;break;
-			case this.Properties.t: return this.t;break;
-			case this.Properties.r: return this.r;break;
-			case this.Properties.b: return this.b;break;
-			case this.Properties.d: return this.d;break;
-			case this.Properties.ih: return this.ih;break;
-			case this.Properties.iv: return this.iv;break;
-			case this.Properties.dd: return this.dd;break;
-			case this.Properties.du: return this.du;break;
+	};
+	Border.prototype.getProperty = function (nType) {
+		switch (nType) {
+			case this.Properties.l:
+				return this.l;
+				break;
+			case this.Properties.t:
+				return this.t;
+				break;
+			case this.Properties.r:
+				return this.r;
+				break;
+			case this.Properties.b:
+				return this.b;
+				break;
+			case this.Properties.d:
+				return this.d;
+				break;
+			case this.Properties.ih:
+				return this.ih;
+				break;
+			case this.Properties.iv:
+				return this.iv;
+				break;
+			case this.Properties.dd:
+				return this.dd;
+				break;
+			case this.Properties.du:
+				return this.du;
+				break;
 		}
-	},
-	setProperty : function(nType, value)
-	{
-		switch(nType)
-		{
-			case this.Properties.l: this.l = value;break;
-			case this.Properties.t: this.t = value;break;
-			case this.Properties.r: this.r = value;break;
-			case this.Properties.b: this.b = value;break;
-			case this.Properties.d: this.d = value;break;
-			case this.Properties.ih: this.ih = value;break;
-			case this.Properties.iv: this.iv = value;break;
-			case this.Properties.dd: this.dd = value;break;
-			case this.Properties.du: this.du = value;break;
+	};
+	Border.prototype.setProperty = function (nType, value) {
+		switch (nType) {
+			case this.Properties.l:
+				this.l = value;
+				break;
+			case this.Properties.t:
+				this.t = value;
+				break;
+			case this.Properties.r:
+				this.r = value;
+				break;
+			case this.Properties.b:
+				this.b = value;
+				break;
+			case this.Properties.d:
+				this.d = value;
+				break;
+			case this.Properties.ih:
+				this.ih = value;
+				break;
+			case this.Properties.iv:
+				this.iv = value;
+				break;
+			case this.Properties.dd:
+				this.dd = value;
+				break;
+			case this.Properties.du:
+				this.du = value;
+				break;
 		}
-	}
-};
+	};
+	Border.prototype.notEmpty = function () {
+		return (this.l && c_oAscBorderStyles.None !== this.l.s) || (this.r && c_oAscBorderStyles.None !== this.r.s) ||
+			(this.t && c_oAscBorderStyles.None !== this.t.s) || (this.b && c_oAscBorderStyles.None !== this.b.s) ||
+			(this.dd && c_oAscBorderStyles.None !== this.dd.s) || (this.du && c_oAscBorderStyles.None !== this.du.s);
+	};
 var g_oNumProperties = {
 		f: 0
 	};
@@ -1360,7 +1490,7 @@ Align.prototype =
 {
 	_mergeProperty : function(first, second, def)
 	{
-		if(false == def.isEqual(first))
+		if (def != first)
 			return first;
 		else
 			return second;
@@ -2557,6 +2687,7 @@ Col.prototype =
 var g_nRowFlag_empty = 0;
 var g_nRowFlag_hd = 1;
 var g_nRowFlag_CustomHeight = 2;
+var g_nRowFlag_CalcHeight = 4;
 /**
  * @constructor
  */
@@ -3065,10 +3196,9 @@ CCellValue.prototype =
 					oNumFormat = oNumFormatCache.get(g_oDefaultFormat.Num.getFormat());
 				if(false == oNumFormat.isGeneralFormat())
 				{
-					var oAdditionalResult = {};
 					if(null != this.number)
 					{
-						aText = oNumFormat.format(this.number, this.type, dDigitsCount, oAdditionalResult);
+						aText = oNumFormat.format(this.number, this.type, dDigitsCount);
 						sText = null;
 					}
 					else if(CellValueType.String == this.type)
@@ -3076,12 +3206,12 @@ CCellValue.prototype =
 					    var oTextFormat = oNumFormat.getTextFormat();
 					    if (null != oTextFormat && "@" != oTextFormat.formatString) {
 					        if (null != this.text) {
-					            aText = oNumFormat.format(this.text, this.type, dDigitsCount, oAdditionalResult);
+					            aText = oNumFormat.format(this.text, this.type, dDigitsCount);
 					            sText = null;
 					        }
 					        else if (null != this.multiText) {
 					            var sSimpleString = this.getStringFromMultiText();
-					            aText = oNumFormat.format(sSimpleString, this.type, dDigitsCount, oAdditionalResult);
+					            aText = oNumFormat.format(sSimpleString, this.type, dDigitsCount);
 					            sText = null;
 					        }
 					    }
@@ -4553,128 +4683,968 @@ CellArea.prototype = {
 	}
 };
 
-/** @constructor */
-function sparklineGroup() {
-	// attributes
-	this.manualMax = undefined;
-	this.manualMin = undefined;
-	this.lineWeight = 0.75;
-	this.type = Asc.ESparklineType.Line;
-	this.dateAxis = false;
-	this.displayEmptyCellsAs = Asc.EDispBlanksAs.Zero;
-	this.markers = false;
-	this.high = false;
-	this.low = false;
-	this.first = false;
-	this.last = false;
-	this.negative = false;
-	this.displayXAxis = false;
-	this.displayHidden = false;
-	this.minAxisType = Asc.SparklineAxisMinMax.Individual;
-	this.maxAxisType = Asc.SparklineAxisMinMax.Individual;
-	this.rightToLeft = false;
+	/** @constructor */
+	function sparklineGroup(addId) {
+		// attributes
+		this.type = null;
+		this.lineWeight = null;
+		this.displayEmptyCellsAs = null;
+		this.markers = null;
+		this.high = null;
+		this.low = null;
+		this.first = null;
+		this.last = null;
+		this.negative = null;
+		this.displayXAxis = null;
+		this.displayHidden = null;
+		this.minAxisType = null;
+		this.maxAxisType = null;
+		this.rightToLeft = null;
+		this.manualMax = null;
+		this.manualMin = null;
 
-	// elements
-	this.colorSeries = null;
-	this.colorNegative = null;
-	this.colorAxis = null;
-	this.colorMarkers = null;
-	this.colorFirst = null;
-	this.colorLast = null;
-	this.colorHigh = null;
-	this.colorLow = null;
-	this.f = null;
-	this.arrSparklines = [];
-	this.arrCachedSparklines = [];
-}
-sparklineGroup.prototype.clone = function() {
-	var res = new sparklineGroup();
-	res.manualMax = this.manualMax;
-	res.manualMin = this.manualMin;
-	res.lineWeight = this.lineWeight;
-	res.type = this.type;
-	res.dateAxis = this.dateAxis;
-	res.displayEmptyCellsAs = this.displayEmptyCellsAs;
-	res.markers = this.markers;
-	res.high = this.high;
-	res.low = this.low;
-	res.first = this.first;
-	res.last = this.last;
-	res.negative = this.negative;
-	res.displayXAxis = this.displayXAxis;
-	res.displayHidden = this.displayHidden;
-	res.minAxisType = this.minAxisType;
-	res.maxAxisType = this.maxAxisType;
-	res.rightToLeft = this.rightToLeft;
+		this.dateAxis = null;
 
-	res.colorSeries = this.colorSeries ? this.colorSeries.clone() : null;
-	res.colorNegative = this.colorNegative ? this.colorNegative.clone() : null;
-	res.colorAxis = this.colorAxis ? this.colorAxis : null;
-	res.colorMarkers = this.colorMarkers ? this.colorMarkers : null;
-	res.colorFirst = this.colorFirst ? this.colorFirst : null;
-	res.colorLast = this.colorLast ? this.colorLast : null;
-	res.colorHigh = this.colorHigh ? this.colorHigh : null;
-	res.colorLow = this.colorLow ? this.colorLow : null;
-	res.f = this.f;
+		// elements
+		this.colorSeries = null;
+		this.colorNegative = null;
+		this.colorAxis = null;
+		this.colorMarkers = null;
+		this.colorFirst = null;
+		this.colorLast = null;
+		this.colorHigh = null;
+		this.colorLow = null;
 
-	for (var i = 0; i < this.arrSparklines.length; ++i) {
-		res.arrSparklines.push(this.arrSparklines[i].clone());
-	}
-	return res;
-};
-sparklineGroup.prototype.addView = function(oSparklineView, index) {
-	this.arrCachedSparklines[index] = oSparklineView;
-};
-sparklineGroup.prototype.draw = function(oDrawingContext) {
-	var graphics = new AscCommon.CGraphics();
-	graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
-		oDrawingContext.getWidth(3), oDrawingContext.getHeight(3));
-	graphics.m_oFontManager = AscCommon.g_fontManager;
-	for (var i = 0; i < this.arrCachedSparklines.length; ++i) {
-		this.arrCachedSparklines[i].draw(graphics);
-	}
-};
-sparklineGroup.prototype.cleanCache = function() {
-	// ToDo clean only colors (for color scheme)
-	this.arrCachedSparklines = [];
-};
-sparklineGroup.prototype.updateCache = function(sheet, ranges) {
-	var sparklineRange;
-	for (var i = 0; i < this.arrSparklines.length; ++i) {
-		sparklineRange = this.arrSparklines[i]._f;
-		for (var j = 0; j < ranges.length; ++j) {
-			if (sparklineRange.isIntersect(ranges[j], sheet)) {
-				this.arrCachedSparklines[i] = null;
-				break;
-			}
+		this.f = null;
+		this.arrSparklines = [];
+
+		//for drawing preview
+		this.canvas = null;
+
+		this.worksheet = null;
+		this.Id = null;
+		if (addId) {
+			this.Id = AscCommon.g_oIdCounter.Get_NewId();
+			AscCommon.g_oTableId.Add(this, this.Id);
 		}
 	}
-};
-/** @constructor */
-function sparkline() {
-	this.sqref = null;
-	this.f = null;
-	this._f = null;
-}
-sparkline.prototype.clone = function() {
-	var res = new sparkline();
-	
-	res.sqref = this.sqref ? this.sqref.clone() : null;
-	res.f = this.f;
-	res._f = this._f ? this._f.clone() : null;
-	
-	return res;
-};
-sparkline.prototype.setSqref = function(sqref) {
-	this.sqref = AscCommonExcel.g_oRangeCache.getAscRange(sqref);
-};
-sparkline.prototype.setF = function(f) {
-	this.f = f;
-	this._f = AscCommonExcel.g_oRangeCache.getRange3D(this.f);
-};
-sparkline.prototype.checkInRange = function(range) {
-	return this.sqref ? range.isIntersect(this.sqref) : false;
-};
+	sparklineGroup.prototype.getObjectType = function () {
+		return AscDFH.historyitem_type_Sparkline;
+	};
+	sparklineGroup.prototype.Get_Id = function () {
+		return this.Id;
+	};
+	sparklineGroup.prototype.Save_Changes = function (data, w) {
+		w.WriteLong(data.Type);
+		switch (data.Type) {
+			case AscCH.historyitem_Sparkline_Type:
+			case AscCH.historyitem_Sparkline_DisplayEmptyCellsAs:
+			case AscCH.historyitem_Sparkline_MinAxisType:
+			case AscCH.historyitem_Sparkline_MaxAxisType:
+				w.WriteLong(data.newPr);
+				break;
+			case AscCH.historyitem_Sparkline_LineWeight:
+				w.WriteDouble2(data.newPr);
+				break;
+			case AscCH.historyitem_Sparkline_Markers:
+			case AscCH.historyitem_Sparkline_High:
+			case AscCH.historyitem_Sparkline_Low:
+			case AscCH.historyitem_Sparkline_First:
+			case AscCH.historyitem_Sparkline_Last:
+			case AscCH.historyitem_Sparkline_Negative:
+			case AscCH.historyitem_Sparkline_DisplayXAxis:
+			case AscCH.historyitem_Sparkline_DisplayHidden:
+			case AscCH.historyitem_Sparkline_RightToLeft:
+			case AscCH.historyitem_Sparkline_DateAxis:
+				w.WriteBool(data.newPr);
+				break;
+			case AscCH.historyitem_Sparkline_ManualMax:
+			case AscCH.historyitem_Sparkline_ManualMin:
+				w.WriteBool(null !== data.newPr);
+				if (null !== data.newPr) {
+					w.WriteDouble2(data.newPr);
+				}
+				break;
+			case AscCH.historyitem_Sparkline_ColorSeries:
+			case AscCH.historyitem_Sparkline_ColorNegative:
+			case AscCH.historyitem_Sparkline_ColorAxis:
+			case AscCH.historyitem_Sparkline_ColorMarkers:
+			case AscCH.historyitem_Sparkline_ColorFirst:
+			case AscCH.historyitem_Sparkline_colorLast:
+			case AscCH.historyitem_Sparkline_ColorHigh:
+			case AscCH.historyitem_Sparkline_ColorLow:
+				w.WriteBool(null !== data.newPr);
+				if (null !== data.newPr) {
+					w.WriteLong(data.newPr.getType());
+					data.newPr.Write_ToBinary2(w);
+				}
+				break;
+			case AscCH.historyitem_Sparkline_F:
+				w.WriteBool(null !== data.newPr);
+				if (null !== data.newPr) {
+					w.WriteString2(data.newPr);
+				}
+				break;
+			case AscCH.historyitem_Sparkline_ChangeData:
+				if (data.newPr) {
+					w.WriteLong(data.newPr.length);
+					data.newPr.forEach(function (item) {
+						w.WriteLong(item.sqref.c1);
+						w.WriteLong(item.sqref.r1);
+						w.WriteString2(item.f);
+					});
+				}
+				break;
+			case AscCH.historyitem_Sparkline_RemoveData:
+				w.WriteLong(data.oldPr.sqref.c1);
+				w.WriteLong(data.oldPr.sqref.r1);
+				break;
+			case AscCH.historyitem_Sparkline_RemoveSparkline:
+				break;
+		}
+	};
+	sparklineGroup.prototype.Load_Changes = function (r) {
+		var readColor = function(r) {
+			var color = null;
+			if (r.GetBool()) {
+				switch (r.GetLong()) {
+					case UndoRedoDataTypes.RgbColor:
+						color = new RgbColor();
+						color.Read_FromBinary2(r);
+						break;
+					case UndoRedoDataTypes.ThemeColor:
+						color = new ThemeColor();
+						color = color.Read_FromBinary2AndReplace(r);
+						break;
+				}
+			}
+			return color;
+		};
+
+		var col, row;
+		var type = r.GetLong();
+		switch (type) {
+			case AscCH.historyitem_Sparkline_Type:
+				this.type = r.GetLong();
+				break;
+			case AscCH.historyitem_Sparkline_LineWeight:
+				this.lineWeight = r.GetDoubleLE();
+				break;
+			case AscCH.historyitem_Sparkline_DisplayEmptyCellsAs:
+				this.displayEmptyCellsAs = r.GetLong();
+				break;
+			case AscCH.historyitem_Sparkline_MinAxisType:
+				this.minAxisType = r.GetLong();
+				break;
+			case AscCH.historyitem_Sparkline_MaxAxisType:
+				this.lineWeight = r.GetLong();
+				break;
+			case AscCH.historyitem_Sparkline_Markers:
+				this.markers = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_High:
+				this.high = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_Low:
+				this.low = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_First:
+				this.first = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_Last:
+				this.last = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_Negative:
+				this.negative = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_DisplayXAxis:
+				this.displayXAxis = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_DisplayHidden:
+				this.displayHidden = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_RightToLeft:
+				this.rightToLeft = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_DateAxis:
+				this.dateAxis = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_ManualMax:
+				this.manualMax = r.GetBool() ? r.GetDoubleLE() : null;
+				break;
+			case AscCH.historyitem_Sparkline_ManualMin:
+				this.manualMin = r.GetBool() ? r.GetDoubleLE() : null;
+				break;
+			case AscCH.historyitem_Sparkline_ColorSeries:
+				this.colorSeries = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_ColorNegative:
+				this.colorNegative = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_ColorAxis:
+				this.colorAxis = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_ColorMarkers:
+				this.colorMarkers = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_ColorFirst:
+				this.colorFirst = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_colorLast:
+				this.colorLast = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_ColorHigh:
+				this.colorHigh = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_ColorLow:
+				this.colorLow = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_F:
+				this.f = r.GetBool() ? r.GetString2() : null;
+				break;
+			case AscCH.historyitem_Sparkline_ChangeData:
+				this.arrSparklines = [];
+				var count = r.GetLong(), oSparkline;
+				for (var i = 0; i < count; ++i) {
+					oSparkline = new sparkline();
+					col = r.GetLong();
+					row = r.GetLong();
+					oSparkline.sqref = new Asc.Range(col, row, col, row);
+					oSparkline.setF(r.GetString2());
+					this.arrSparklines.push(oSparkline);
+				}
+				break;
+			case AscCH.historyitem_Sparkline_RemoveData:
+				col = r.GetLong();
+				row = r.GetLong();
+				this.remove(new Asc.Range(col, row, col, row));
+				break;
+			case AscCH.historyitem_Sparkline_RemoveSparkline:
+				if (this.worksheet) {
+					this.worksheet.removeSparklineGroup(this.Get_Id());
+				}
+				break;
+		}
+		this.cleanCache();
+	};
+	sparklineGroup.prototype.Write_ToBinary2 = function (w) {
+		w.WriteLong(this.getObjectType());
+		w.WriteString2(this.Id);
+		w.WriteString2(this.worksheet ? this.worksheet.getId() : '-1');
+	};
+	sparklineGroup.prototype.Read_FromBinary2 = function (r) {
+		this.Id = r.GetString2();
+
+		// ToDDo не самая лучшая схема добавления на лист...
+		var api_sheet = Asc['editor'];
+		this.worksheet = api_sheet.wbModel.getWorksheetById(r.GetString2());
+		if (this.worksheet) {
+			this.worksheet.insertSparklineGroup(this);
+		}
+	};
+	sparklineGroup.prototype.Undo = function (data) {
+		var t = this;
+		switch (data.Type) {
+			case AscCH.historyitem_Sparkline_Type:
+				this.type = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_LineWeight:
+				this.lineWeight = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_DisplayEmptyCellsAs:
+				this.displayEmptyCellsAs = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_Markers:
+				this.markers = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_High:
+				this.high = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_Low:
+				this.low = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_First:
+				this.first = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_Last:
+				this.last = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_Negative:
+				this.negative = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_DisplayXAxis:
+				this.displayXAxis = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_DisplayHidden:
+				this.displayHidden = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_MinAxisType:
+				this.minAxisType = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_MaxAxisType:
+				this.maxAxisType = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_RightToLeft:
+				this.rightToLeft = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ManualMax:
+				this.manualMax = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ManualMin:
+				this.manualMin = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_DateAxis:
+				this.dateAxis = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorSeries:
+				this.colorSeries = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorNegative:
+				this.colorNegative = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorAxis:
+				this.colorAxis = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorMarkers:
+				this.colorMarkers = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorFirst:
+				this.colorFirst = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_colorLast:
+				this.colorLast = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorHigh:
+				this.colorHigh = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorLow:
+				this.colorLow = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_F:
+				this.f = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ChangeData:
+				this.arrSparklines = [];
+				if (data.oldPr) {
+					data.oldPr.forEach(function (item) {
+						t.arrSparklines.push(item.clone());
+					});
+				}
+				break;
+			case AscCH.historyitem_Sparkline_RemoveData:
+				this.arrSparklines.push(data.oldPr);
+				break;
+			case AscCH.historyitem_Sparkline_RemoveSparkline:
+				if (this.worksheet) {
+					this.worksheet.insertSparklineGroup(this);
+				}
+				break;
+		}
+
+		this.cleanCache();
+	};
+	sparklineGroup.prototype.Redo = function (data) {
+		var t = this;
+		switch (data.Type) {
+			case AscCH.historyitem_Sparkline_Type:
+				this.type = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_LineWeight:
+				this.lineWeight = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_DisplayEmptyCellsAs:
+				this.displayEmptyCellsAs = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_Markers:
+				this.markers = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_High:
+				this.high = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_Low:
+				this.low = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_First:
+				this.first = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_Last:
+				this.last = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_Negative:
+				this.negative = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_DisplayXAxis:
+				this.displayXAxis = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_DisplayHidden:
+				this.displayHidden = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_MinAxisType:
+				this.minAxisType = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_MaxAxisType:
+				this.maxAxisType = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_RightToLeft:
+				this.rightToLeft = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ManualMax:
+				this.manualMax = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ManualMin:
+				this.manualMin = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_DateAxis:
+				this.dateAxis = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorSeries:
+				this.colorSeries = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorNegative:
+				this.colorNegative = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorAxis:
+				this.colorAxis = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorMarkers:
+				this.colorMarkers = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorFirst:
+				this.colorFirst = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_colorLast:
+				this.colorLast = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorHigh:
+				this.colorHigh = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorLow:
+				this.colorLow = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_F:
+				this.f = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ChangeData:
+				this.arrSparklines = [];
+				if (data.newPr) {
+					data.newPr.forEach(function (item) {
+						t.arrSparklines.push(item.clone());
+					});
+				}
+				break;
+			case AscCH.historyitem_Sparkline_RemoveData:
+				this.remove(data.oldPr.sqref);
+				break;
+			case AscCH.historyitem_Sparkline_RemoveSparkline:
+				if (this.worksheet) {
+					this.worksheet.removeSparklineGroup(this.Get_Id());
+				}
+				break;
+		}
+		this.cleanCache();
+	};
+	sparklineGroup.prototype.default = function () {
+		this.type = Asc.c_oAscSparklineType.Line;
+		this.lineWeight = 0.75;
+		this.displayEmptyCellsAs = Asc.c_oAscEDispBlanksAs.Zero;
+		this.markers = false;
+		this.high = false;
+		this.low = false;
+		this.first = false;
+		this.last = false;
+		this.negative = false;
+		this.displayXAxis = false;
+		this.displayHidden = false;
+		this.minAxisType = Asc.c_oAscSparklineAxisMinMax.Individual;
+		this.maxAxisType = Asc.c_oAscSparklineAxisMinMax.Individual;
+		this.rightToLeft = false;
+		this.manualMax = null;
+		this.manualMin = null;
+		this.dateAxis = false;
+
+		// elements
+		var defaultSeriesColor = 3629202;
+		var defaultOtherColor = 13631488;
+
+		this.colorSeries = new RgbColor(defaultSeriesColor);
+		this.colorNegative = new RgbColor(defaultOtherColor);
+		this.colorAxis = new RgbColor(defaultOtherColor);
+		this.colorMarkers = new RgbColor(defaultOtherColor);
+		this.colorFirst = new RgbColor(defaultOtherColor);
+		this.colorLast = new RgbColor(defaultOtherColor);
+		this.colorHigh = new RgbColor(defaultOtherColor);
+		this.colorLow = new RgbColor(defaultOtherColor);
+	};
+	sparklineGroup.prototype.setWorksheet = function (worksheet, oldWorksheet) {
+		this.worksheet = worksheet;
+		if (oldWorksheet) {
+			var oldSparklines = [];
+			var newSparklines = [];
+			for (var i = 0; i < this.arrSparklines.length; ++i) {
+				oldSparklines.push(this.arrSparklines[i].clone());
+				this.arrSparklines[i].updateWorksheet(worksheet.sName, oldWorksheet.sName);
+				newSparklines.push(this.arrSparklines[i].clone());
+			}
+			History.Add(this, {Type: AscCH.historyitem_Sparkline_ChangeData, oldPr: oldSparklines, newPr: newSparklines});
+		}
+	};
+	sparklineGroup.prototype.set = function (val) {
+		var t = this;
+		var checkProperty = function(propOld, propNew, type) {
+			if (null !== propNew && propOld !== propNew) {
+				History.Add(t, {Type: type, oldPr: propOld, newPr: propNew});
+				return propNew;
+			}
+			return propOld;
+		};
+		var getColor = function (color) {
+			return color instanceof Asc.asc_CColor ? CorrectAscColor(color) : color ? color.clone(): color;
+		};
+
+		this.type = checkProperty(this.type, val.type, AscCH.historyitem_Sparkline_Type);
+		this.lineWeight = checkProperty(this.lineWeight, val.lineWeight, AscCH.historyitem_Sparkline_LineWeight);
+		this.displayEmptyCellsAs = checkProperty(this.displayEmptyCellsAs, val.displayEmptyCellsAs, AscCH.historyitem_Sparkline_DisplayEmptyCellsAs);
+		this.markers = checkProperty(this.markers, val.markers, AscCH.historyitem_Sparkline_Markers);
+		this.high = checkProperty(this.high, val.high, AscCH.historyitem_Sparkline_High);
+		this.low = checkProperty(this.low, val.low, AscCH.historyitem_Sparkline_Low);
+		this.first = checkProperty(this.first, val.first, AscCH.historyitem_Sparkline_First);
+		this.last = checkProperty(this.last, val.last, AscCH.historyitem_Sparkline_Last);
+		this.negative = checkProperty(this.negative, val.negative, AscCH.historyitem_Sparkline_Negative);
+		this.displayXAxis = checkProperty(this.displayXAxis, val.displayXAxis, AscCH.historyitem_Sparkline_DisplayXAxis);
+		this.displayHidden = checkProperty(this.displayHidden, val.displayHidden, AscCH.historyitem_Sparkline_DisplayHidden);
+		this.minAxisType = checkProperty(this.minAxisType, val.minAxisType, AscCH.historyitem_Sparkline_MinAxisType);
+		this.maxAxisType = checkProperty(this.maxAxisType, val.maxAxisType, AscCH.historyitem_Sparkline_MaxAxisType);
+		this.rightToLeft = checkProperty(this.rightToLeft, val.rightToLeft, AscCH.historyitem_Sparkline_RightToLeft);
+		this.manualMax = checkProperty(this.manualMax, val.manualMax, AscCH.historyitem_Sparkline_ManualMax);
+		this.manualMin = checkProperty(this.manualMin, val.manualMin, AscCH.historyitem_Sparkline_ManualMin);
+		this.dateAxis = checkProperty(this.dateAxis, val.dateAxis, AscCH.historyitem_Sparkline_DateAxis);
+
+		this.colorSeries = checkProperty(this.colorSeries, getColor(val.colorSeries), AscCH.historyitem_Sparkline_ColorSeries);
+		this.colorNegative = checkProperty(this.colorNegative, getColor(val.colorNegative), AscCH.historyitem_Sparkline_ColorNegative);
+		this.colorAxis = checkProperty(this.colorAxis, getColor(val.colorAxis), AscCH.historyitem_Sparkline_ColorAxis);
+		this.colorMarkers = checkProperty(this.colorMarkers, getColor(val.colorMarkers), AscCH.historyitem_Sparkline_ColorMarkers);
+		this.colorFirst = checkProperty(this.colorFirst, getColor(val.colorFirst), AscCH.historyitem_Sparkline_ColorFirst);
+		this.colorLast = checkProperty(this.colorLast, getColor(val.colorLast), AscCH.historyitem_Sparkline_colorLast);
+		this.colorHigh = checkProperty(this.colorHigh, getColor(val.colorHigh), AscCH.historyitem_Sparkline_ColorHigh);
+		this.colorLow = checkProperty(this.colorLow, getColor(val.colorLow), AscCH.historyitem_Sparkline_ColorLow);
+
+		this.f = checkProperty(this.f, val.f, AscCH.historyitem_Sparkline_F);
+
+		this.cleanCache();
+	};
+	sparklineGroup.prototype.clone = function (onlyProps) {
+		var res = new sparklineGroup(!onlyProps);
+		res.set(this);
+		res.f = this.f;
+
+		if (!onlyProps) {
+			var newSparklines = [];
+			for (var i = 0; i < this.arrSparklines.length; ++i) {
+				res.arrSparklines.push(this.arrSparklines[i].clone());
+				newSparklines.push(this.arrSparklines[i].clone());
+			}
+			History.Add(res, {Type: AscCH.historyitem_Sparkline_ChangeData, oldPr: null, newPr: newSparklines});
+		}
+
+		return res;
+	};
+	sparklineGroup.prototype.draw = function (oDrawingContext) {
+		var oCacheView;
+		var graphics = new AscCommon.CGraphics();
+		graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
+			oDrawingContext.getWidth(3), oDrawingContext.getHeight(3));
+		graphics.m_oFontManager = AscCommon.g_fontManager;
+		for (var i = 0; i < this.arrSparklines.length; ++i) {
+			if (oCacheView = this.arrSparklines[i].oCacheView) {
+				oCacheView.draw(graphics);
+			}
+		}
+	};
+	sparklineGroup.prototype.cleanCache = function () {
+		// ToDo clean only colors (for color scheme)
+		for (var i = 0; i < this.arrSparklines.length; ++i) {
+			this.arrSparklines[i].oCacheView = null;
+		}
+	};
+	sparklineGroup.prototype.updateCache = function (sheet, ranges) {
+		var sparklineRange;
+		for (var i = 0; i < this.arrSparklines.length; ++i) {
+			sparklineRange = this.arrSparklines[i]._f;
+			for (var j = 0; j < ranges.length; ++j) {
+				if (sparklineRange.isIntersect(ranges[j], sheet)) {
+					this.arrSparklines[i].oCacheView = null;
+					break;
+				}
+			}
+		}
+	};
+	sparklineGroup.prototype.contains = function (c, r) {
+		for (var j = 0; j < this.arrSparklines.length; ++j) {
+			if (this.arrSparklines[j].contains(c, r)) {
+				return j;
+			}
+		}
+		return -1;
+	};
+	sparklineGroup.prototype.intersectionSimple = function (range) {
+		for (var j = 0; j < this.arrSparklines.length; ++j) {
+			if (this.arrSparklines[j].intersectionSimple(range)) {
+				return j;
+			}
+		}
+		return -1;
+	};
+	sparklineGroup.prototype.remove = function (range) {
+		for (var i = 0; i < this.arrSparklines.length; ++i) {
+			if (this.arrSparklines[i].checkInRange(range)) {
+				History.Add(this, {Type: AscCH.historyitem_Sparkline_RemoveData, oldPr: this.arrSparklines[i], newPr: null});
+				this.arrSparklines.splice(i, 1);
+				--i;
+			}
+		}
+
+		var bRemove = 0 === this.arrSparklines.length;
+		if (bRemove) {
+			History.Add(this, {Type: AscCH.historyitem_Sparkline_RemoveSparkline, oldPr: this, newPr: null});
+		}
+		return bRemove;
+	};
+	sparklineGroup.prototype.asc_getId = function () {
+		return this.Id;
+	};
+	sparklineGroup.prototype.asc_getType = function () {
+		return null !== this.type ? this.type : Asc.c_oAscSparklineType.Line;
+	};
+	sparklineGroup.prototype.asc_getLineWeight = function () {
+		return null !== this.lineWeight ? this.lineWeight : 0.75;
+	};
+	sparklineGroup.prototype.asc_getDisplayEmpty = function () {
+		return null !== this.displayEmptyCellsAs ? this.displayEmptyCellsAs : Asc.c_oAscEDispBlanksAs.Zero;
+	};
+	sparklineGroup.prototype.asc_getMarkersPoint = function () {
+		return !!this.markers;
+	};
+	sparklineGroup.prototype.asc_getHighPoint = function () {
+		return !!this.high;
+	};
+	sparklineGroup.prototype.asc_getLowPoint = function () {
+		return !!this.low;
+	};
+	sparklineGroup.prototype.asc_getFirstPoint = function () {
+		return !!this.first;
+	};
+	sparklineGroup.prototype.asc_getLastPoint = function () {
+		return !!this.last;
+	};
+	sparklineGroup.prototype.asc_getNegativePoint = function () {
+		return !!this.negative;
+	};
+	sparklineGroup.prototype.asc_getDisplayXAxis = function () {
+		return this.displayXAxis;
+	};
+	sparklineGroup.prototype.asc_getDisplayHidden = function () {
+		return this.displayHidden;
+	};
+	sparklineGroup.prototype.asc_getMinAxisType = function () {
+		return null !== this.minAxisType ? this.minAxisType : Asc.c_oAscSparklineAxisMinMax.Individual;
+	};
+	sparklineGroup.prototype.asc_getMaxAxisType = function () {
+		return null !== this.maxAxisType ? this.minAxisType : Asc.c_oAscSparklineAxisMinMax.Individual;
+	};
+	sparklineGroup.prototype.asc_getRightToLeft = function () {
+		return this.rightToLeft;
+	};
+	sparklineGroup.prototype.asc_getManualMax = function () {
+		return this.manualMax;
+	};
+	sparklineGroup.prototype.asc_getManualMin = function () {
+		return this.manualMin;
+	};
+	sparklineGroup.prototype.asc_getColorSeries = function () {
+		return this.colorSeries ? Asc.colorObjToAscColor(this.colorSeries) : this.colorSeries;
+	};
+	sparklineGroup.prototype.asc_getColorNegative = function () {
+		return this.colorNegative ? Asc.colorObjToAscColor(this.colorNegative) : this.colorNegative;
+	};
+	sparklineGroup.prototype.asc_getColorAxis = function () {
+		return this.colorAxis ? Asc.colorObjToAscColor(this.colorAxis) : this.colorAxis;
+	};
+	sparklineGroup.prototype.asc_getColorMarkers = function () {
+		return this.colorMarkers ? Asc.colorObjToAscColor(this.colorMarkers) : this.colorMarkers;
+	};
+	sparklineGroup.prototype.asc_getColorFirst = function () {
+		return this.colorFirst ? Asc.colorObjToAscColor(this.colorFirst) : this.colorFirst;
+	};
+	sparklineGroup.prototype.asc_getColorLast = function () {
+		return this.colorLast ? Asc.colorObjToAscColor(this.colorLast) : this.colorLast;
+	};
+	sparklineGroup.prototype.asc_getColorHigh = function () {
+		return this.colorHigh ? Asc.colorObjToAscColor(this.colorHigh) : this.colorHigh;
+	};
+	sparklineGroup.prototype.asc_getColorLow = function () {
+		return this.colorLow ? Asc.colorObjToAscColor(this.colorLow) : this.colorLow;
+	};
+	sparklineGroup.prototype.asc_setType = function (val) {
+		this.type = val;
+	};
+	sparklineGroup.prototype.asc_setLineWeight = function (val) {
+		this.lineWeight = val;
+	};
+	sparklineGroup.prototype.asc_setDisplayEmpty = function (val) {
+		this.displayEmptyCellsAs = val;
+	};
+	sparklineGroup.prototype.asc_setMarkersPoint = function (val) {
+		this.markers = val;
+	};
+	sparklineGroup.prototype.asc_setHighPoint = function (val) {
+		this.high = val;
+	};
+	sparklineGroup.prototype.asc_setLowPoint = function (val) {
+		this.low = val;
+	};
+	sparklineGroup.prototype.asc_setFirstPoint = function (val) {
+		this.first = val;
+	};
+	sparklineGroup.prototype.asc_setLastPoint = function (val) {
+		this.last = val;
+	};
+	sparklineGroup.prototype.asc_setNegativePoint = function (val) {
+		this.negative = val;
+	};
+	sparklineGroup.prototype.asc_setDisplayXAxis = function (val) {
+		this.displayXAxis = val;
+	};
+	sparklineGroup.prototype.asc_setDisplayHidden = function (val) {
+		this.displayHidden = val;
+	};
+	sparklineGroup.prototype.asc_setMinAxisType = function (val) {
+		this.minAxisType = val;
+	};
+	sparklineGroup.prototype.asc_setMaxAxisType = function (val) {
+		this.maxAxisType = val;
+	};
+	sparklineGroup.prototype.asc_setRightToLeft = function (val) {
+		this.rightToLeft = val;
+	};
+	sparklineGroup.prototype.asc_setManualMax = function (val) {
+		this.manualMax = val;
+	};
+	sparklineGroup.prototype.asc_setManualMin = function (val) {
+		this.manualMin = val;
+	};
+	sparklineGroup.prototype.asc_setColorSeries = function (val) {
+		this.colorSeries = val;
+	};
+	sparklineGroup.prototype.asc_setColorNegative = function (val) {
+		this.colorNegative = val;
+	};
+	sparklineGroup.prototype.asc_setColorAxis = function (val) {
+		this.colorAxis = val;
+	};
+	sparklineGroup.prototype.asc_setColorMarkers = function (val) {
+		this.colorMarkers = val;
+	};
+	sparklineGroup.prototype.asc_setColorFirst = function (val) {
+		this.colorFirst = val;
+	};
+	sparklineGroup.prototype.asc_setColorLast = function (val) {
+		this.colorLast = val;
+	};
+	sparklineGroup.prototype.asc_setColorHigh = function (val) {
+		this.colorHigh = val;
+	};
+	sparklineGroup.prototype.asc_setColorLow = function (val) {
+		this.colorLow = val;
+	};
+
+	sparklineGroup.prototype.createExcellColor = function(aColor) {
+		var oExcellColor = null;
+		if(Array.isArray(aColor)) {
+			if(2 === aColor.length){
+				oExcellColor = AscCommonExcel.g_oColorManager.getThemeColor(aColor[0], aColor[1]);
+			}
+			else if(1 === aColor.length){
+				oExcellColor = new AscCommonExcel.RgbColor(0x00ffffff & aColor[0]);
+			}
+		}
+		return oExcellColor;
+	};
+
+	sparklineGroup.prototype._generateThumbCache = function () {
+		function createItem(value) {
+			return {numFormatStr: "General", isDateTimeFormat: false, val: value, isHidden: false};
+		}
+
+		switch (this.asc_getType()) {
+			case Asc.c_oAscSparklineType.Line: {
+				return [createItem(4), createItem(-58), createItem(51), createItem(-124), createItem(124), createItem(60)];
+			}
+			case Asc.c_oAscSparklineType.Column: {
+				return [createItem(88), createItem(56), createItem(144), createItem(64), createItem(-56), createItem(-104),
+					createItem(-40), createItem(-24), createItem(-56), createItem(104), createItem(56), createItem(80),
+					createItem(-56), createItem(88)];
+			}
+			case Asc.c_oAscSparklineType.Stacked: {
+				return [createItem(1), createItem(-1), createItem(-1), createItem(-2), createItem(1), createItem(1),
+					createItem(-1), createItem(1), createItem(1), createItem(1), createItem(1), createItem(2), createItem(-1),
+					createItem(1)];
+			}
+		}
+		return [];
+	};
+
+	sparklineGroup.prototype._drawThumbBySparklineGroup = function (oSparkline, oSparklineGroup, oSparklineView, oGraphics) {
+		oSparklineView.initFromSparkline(oSparkline, oSparklineGroup, null, true);
+		var api_sheet = Asc['editor'];
+
+		AscFormat.ExecuteNoHistory(function () {
+			oSparklineView.chartSpace.setWorksheet(api_sheet.wb.getWorksheet().model);
+		}, this, []);
+
+		oSparklineView.chartSpace.extX = 100;
+		oSparklineView.chartSpace.extY = 100;
+		oSparklineView.chartSpace.x = 0;
+		oSparklineView.chartSpace.y = 0;
+		var type = oSparklineGroup.asc_getType();
+		if (type === Asc.c_oAscSparklineType.Stacked) {
+			AscFormat.ExecuteNoHistory(function () {
+				var oPlotArea = oSparklineView.chartSpace.chart.plotArea;
+				if (!oPlotArea.layout) {
+					oPlotArea.setLayout(new AscFormat.CLayout());
+				}
+				var fPos = 0.32;
+				oPlotArea.layout.setWMode(AscFormat.LAYOUT_MODE_FACTOR);
+				oPlotArea.layout.setW(1.0);
+				oPlotArea.layout.setHMode(AscFormat.LAYOUT_MODE_FACTOR);
+				oPlotArea.layout.setH(1 - 2 * fPos);
+				oPlotArea.layout.setYMode(AscFormat.LAYOUT_MODE_EDGE);
+				oPlotArea.layout.setY(fPos);
+			}, this, []);
+		}
+		if (type === Asc.c_oAscSparklineType.Line) {
+			AscFormat.ExecuteNoHistory(function () {
+				var oPlotArea = oSparklineView.chartSpace.chart.plotArea;
+				if (!oPlotArea.layout) {
+					oPlotArea.setLayout(new AscFormat.CLayout());
+				}
+				var fPos = 0.16;
+				oPlotArea.layout.setWMode(AscFormat.LAYOUT_MODE_FACTOR);
+				oPlotArea.layout.setW(1 - fPos);
+				oPlotArea.layout.setHMode(AscFormat.LAYOUT_MODE_FACTOR);
+				oPlotArea.layout.setH(1 - fPos);
+			}, this, []);
+		}
+		AscFormat.ExecuteNoHistory(function () {
+			AscFormat.CheckSpPrXfrm(oSparklineView.chartSpace);
+		}, this, []);
+		oSparklineView.chartSpace.recalculate();
+		oSparklineView.chartSpace.brush = AscFormat.CreateSolidFillRGBA(0xFF, 0xFF, 0xFF, 0xFF);
+
+		oSparklineView.chartSpace.draw(oGraphics);
+	};
+
+	sparklineGroup.prototype._isEqualStyle = function (oSparklineGroup) {
+		var equalColors = function (color1, color2) {
+			return color1 ? color1.isEqual(color2) : color1 === color2;
+		};
+		return equalColors(this.colorSeries, oSparklineGroup.colorSeries) &&
+			equalColors(this.colorNegative, oSparklineGroup.colorNegative) &&
+			equalColors(this.colorMarkers, oSparklineGroup.colorMarkers) &&
+			equalColors(this.colorFirst, oSparklineGroup.colorFirst) &&
+			equalColors(this.colorLast, oSparklineGroup.colorLast) &&
+			equalColors(this.colorHigh, oSparklineGroup.colorHigh) && equalColors(this.colorLow, oSparklineGroup.colorLow);
+	};
+
+	sparklineGroup.prototype.asc_getStyles = function () {
+		History.TurnOff();
+		var aRet = [];
+		var nStyleIndex = -1;
+		var oSparklineGroup = this.clone(true);
+
+		var canvas = document.createElement('canvas');
+		canvas.width = 50;
+		canvas.height = 50;
+		if (AscCommon.AscBrowser.isRetina) {
+			canvas.width >>= 1;
+			canvas.height >>= 1;
+		}
+		var oSparklineView = new AscFormat.CSparklineView();
+		var oSparkline = new sparkline();
+		oSparkline.oCache = this._generateThumbCache();
+		var oGraphics = new AscCommon.CGraphics();
+		oGraphics.init(canvas.getContext('2d'), canvas.width, canvas.height, 100, 100);
+		oGraphics.m_oFontManager = AscCommon.g_fontManager;
+		oGraphics.transform(1, 0, 0, 1, 0, 0);
+
+		for (var i = 0; i < 36; ++i) {
+			oSparklineGroup.asc_setStyle(i);
+			if (nStyleIndex === -1 && this._isEqualStyle(oSparklineGroup)) {
+				nStyleIndex = i;
+			}
+
+			this._drawThumbBySparklineGroup(oSparkline, oSparklineGroup, oSparklineView, oGraphics);
+			aRet.push(canvas.toDataURL("image/png"));
+		}
+		aRet.push(nStyleIndex);
+		History.TurnOn();
+		return aRet;
+	};
+
+	sparklineGroup.prototype.asc_setStyle = function (nStyleIndex) {
+		var oStyle = AscFormat.aSparklinesStyles[nStyleIndex];
+		if (oStyle) {
+			this.colorSeries = this.createExcellColor(oStyle[0]);
+			this.colorNegative = this.createExcellColor(oStyle[1]);
+			this.colorAxis = this.createExcellColor(0xff000000);
+			this.colorMarkers = this.createExcellColor(oStyle[2]);
+			this.colorFirst = this.createExcellColor(oStyle[3]);
+			this.colorLast = this.createExcellColor(oStyle[4]);
+			this.colorHigh = this.createExcellColor(oStyle[5]);
+			this.colorLow = this.createExcellColor(oStyle[6]);
+		}
+	};
+	/** @constructor */
+	function sparkline() {
+		this.sqref = null;
+		this.f = null;
+		this._f = null;
+
+		//for preview
+		this.oCache = null;
+		this.oCacheView = null;
+	}
+
+	sparkline.prototype.clone = function () {
+		var res = new sparkline();
+
+		res.sqref = this.sqref ? this.sqref.clone() : null;
+		res.f = this.f;
+		res._f = this._f ? this._f.clone() : null;
+
+		return res;
+	};
+	sparkline.prototype.setSqref = function (sqref) {
+		this.sqref = AscCommonExcel.g_oRangeCache.getAscRange(sqref);
+	};
+	sparkline.prototype.setF = function (f) {
+		this.f = f;
+		this._f = AscCommonExcel.g_oRangeCache.getRange3D(this.f);
+	};
+	sparkline.prototype.updateWorksheet = function (sheet, oldSheet) {
+		if (this._f && oldSheet === this._f.sheet && (null === this._f.sheet2 || oldSheet === this._f.sheet2)) {
+			this._f.setSheet(sheet);
+			this.f = this._f.getName();
+		}
+	};
+	sparkline.prototype.checkInRange = function (range) {
+		return this.sqref ? range.isIntersect(this.sqref) : false;
+	};
+	sparkline.prototype.contains = function (c, r) {
+		return this.sqref ? this.sqref.contains(c, r) : false;
+	};
+	sparkline.prototype.intersectionSimple = function (range) {
+		return this.sqref ? this.sqref.intersectionSimple(range) : false;
+	};
 
 // For Auto Filters
 /** @constructor */
@@ -5929,7 +6899,6 @@ CustomFilter.prototype.isHideValue = function(val) {
 	{
 		var isNumberFilter = this.Operator == c_oAscCustomAutoFilter.isGreaterThan || this.Operator == c_oAscCustomAutoFilter.isGreaterThanOrEqualTo || this.Operator == c_oAscCustomAutoFilter.isLessThan || this.Operator == c_oAscCustomAutoFilter.isLessThanOrEqualTo;
 		
-		
 		if(c_oAscCustomAutoFilter.equals === this.Operator || c_oAscCustomAutoFilter.doesNotEqual === this.Operator)
 		{
 			filterVal = isNaN(this.Val) ? this.Val.toLowerCase() : this.Val;
@@ -5938,10 +6907,10 @@ CustomFilter.prototype.isHideValue = function(val) {
 		{
 			if(isNaN(this.Val))
 			{
-				return !result;
+				filterVal =  this.Val;
 			}
 			else
-			{	
+			{
 				filterVal =  parseFloat(this.Val);
 				val = parseFloat(val);
 			}
@@ -6836,13 +7805,66 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].g_nRowFlag_empty = g_nRowFlag_empty;
 	window['AscCommonExcel'].g_nRowFlag_hd = g_nRowFlag_hd;
 	window['AscCommonExcel'].g_nRowFlag_CustomHeight = g_nRowFlag_CustomHeight;
+	window['AscCommonExcel'].g_nRowFlag_CalcHeight = g_nRowFlag_CalcHeight;
 	window['AscCommonExcel'].Row = Row;
 	window['AscCommonExcel'].CCellValueMultiText = CCellValueMultiText;
 	window['AscCommonExcel'].CCellValue = CCellValue;
 	window['AscCommonExcel'].RangeDataManagerElem = RangeDataManagerElem;
 	window['AscCommonExcel'].RangeDataManager = RangeDataManager;
 	window['AscCommonExcel'].CellArea = CellArea;
-	window['AscCommonExcel'].sparklineGroup = sparklineGroup;
+	window["Asc"]["sparklineGroup"] = window['AscCommonExcel'].sparklineGroup = sparklineGroup;
+	prot = sparklineGroup.prototype;
+	prot["asc_getId"]							= prot.asc_getId;
+	prot["asc_getType"]						= prot.asc_getType;
+	prot["asc_getLineWeight"]			= prot.asc_getLineWeight;
+	prot["asc_getDisplayEmpty"]		= prot.asc_getDisplayEmpty;
+	prot["asc_getMarkersPoint"]		= prot.asc_getMarkersPoint;
+	prot["asc_getHighPoint"]			= prot.asc_getHighPoint;
+	prot["asc_getLowPoint"]				= prot.asc_getLowPoint;
+	prot["asc_getFirstPoint"]			= prot.asc_getFirstPoint;
+	prot["asc_getLastPoint"]			= prot.asc_getLastPoint;
+	prot["asc_getNegativePoint"]	= prot.asc_getNegativePoint;
+	prot["asc_getDisplayXAxis"]		= prot.asc_getDisplayXAxis;
+	prot["asc_getDisplayHidden"]	= prot.asc_getDisplayHidden;
+	prot["asc_getMinAxisType"]		= prot.asc_getMinAxisType;
+	prot["asc_getMaxAxisType"]		= prot.asc_getMaxAxisType;
+	prot["asc_getRightToLeft"]		= prot.asc_getRightToLeft;
+	prot["asc_getManualMax"]			= prot.asc_getManualMax;
+	prot["asc_getManualMin"]			= prot.asc_getManualMin;
+	prot["asc_getColorSeries"]		= prot.asc_getColorSeries;
+	prot["asc_getColorNegative"]	= prot.asc_getColorNegative;
+	prot["asc_getColorAxis"]			= prot.asc_getColorAxis;
+	prot["asc_getColorMarkers"]		= prot.asc_getColorMarkers;
+	prot["asc_getColorFirst"]			= prot.asc_getColorFirst;
+	prot["asc_getColorLast"]			= prot.asc_getColorLast;
+	prot["asc_getColorHigh"]			= prot.asc_getColorHigh;
+	prot["asc_getColorLow"]				= prot.asc_getColorLow;
+	prot["asc_setType"]						= prot.asc_setType;
+	prot["asc_setLineWeight"]			= prot.asc_setLineWeight;
+	prot["asc_setDisplayEmpty"]		= prot.asc_setDisplayEmpty;
+	prot["asc_setMarkersPoint"]		= prot.asc_setMarkersPoint;
+	prot["asc_setHighPoint"]			= prot.asc_setHighPoint;
+	prot["asc_setLowPoint"]				= prot.asc_setLowPoint;
+	prot["asc_setFirstPoint"]			= prot.asc_setFirstPoint;
+	prot["asc_setLastPoint"]			= prot.asc_setLastPoint;
+	prot["asc_setNegativePoint"]	= prot.asc_setNegativePoint;
+	prot["asc_setDisplayXAxis"]		= prot.asc_setDisplayXAxis;
+	prot["asc_setDisplayHidden"]	= prot.asc_setDisplayHidden;
+	prot["asc_setMinAxisType"]		= prot.asc_setMinAxisType;
+	prot["asc_setMaxAxisType"]		= prot.asc_setMaxAxisType;
+	prot["asc_setRightToLeft"]		= prot.asc_setRightToLeft;
+	prot["asc_setManualMax"]			= prot.asc_setManualMax;
+	prot["asc_setManualMin"]			= prot.asc_setManualMin;
+	prot["asc_setColorSeries"]		= prot.asc_setColorSeries;
+	prot["asc_setColorNegative"]	= prot.asc_setColorNegative;
+	prot["asc_setColorAxis"]			= prot.asc_setColorAxis;
+	prot["asc_setColorMarkers"]		= prot.asc_setColorMarkers;
+	prot["asc_setColorFirst"]			= prot.asc_setColorFirst;
+	prot["asc_setColorLast"]			= prot.asc_setColorLast;
+	prot["asc_setColorHigh"]			= prot.asc_setColorHigh;
+	prot["asc_setColorLow"]				= prot.asc_setColorLow;
+	prot["asc_getStyles"]				= prot.asc_getStyles;
+	prot["asc_setStyle"]				= prot.asc_setStyle;
 	window['AscCommonExcel'].sparkline = sparkline;
 	window['AscCommonExcel'].TablePart = TablePart;
 	window['AscCommonExcel'].AutoFilter = AutoFilter;
@@ -6858,7 +7880,7 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].getShortDateFormat = getShortDateFormat;
   window['AscCommonExcel'].getCurrencyFormatSimple = getCurrencyFormatSimple;
   window['AscCommonExcel'].getCurrencyFormat = getCurrencyFormat;
-	
+
 window["Asc"]["CustomFilters"]			= window["Asc"].CustomFilters = CustomFilters;
 prot									= CustomFilters.prototype;
 prot["asc_getAnd"]						= prot.asc_getAnd;

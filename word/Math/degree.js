@@ -532,7 +532,7 @@ CDegree.prototype.setPosition = function(pos, PosInfo)
 };
 CDegree.prototype.Get_InterfaceProps = function()
 {
-    var Type = this.Pr.type == DEGREE_SUBSCRIPT ? c_oAscMathInterfaceScript.Sub : c_oAscMathInterfaceScript.Sup;
+    var Type = this.Pr.type == DEGREE_SUBSCRIPT ? Asc.c_oAscMathInterfaceScript.Sub : Asc.c_oAscMathInterfaceScript.Sup;
     return new CMathMenuScript(this, Type);
 };
 CDegree.prototype.Can_ModifyArgSize = function()
@@ -1161,15 +1161,15 @@ CDegreeSubSup.prototype.protected_GetRangeEndPos = function(CurLine, CurRange)
 };
 CDegreeSubSup.prototype.Apply_MenuProps = function(Props)
 {
-    if(Props.Type == c_oAscMathInterfaceType.Script)
+    if(Props.Type == Asc.c_oAscMathInterfaceType.Script)
     {
-        if(Props.ScriptType == c_oAscMathInterfaceScript.PreSubSup && this.Pr.type == DEGREE_SubSup)
+        if(Props.ScriptType == Asc.c_oAscMathInterfaceScript.PreSubSup && this.Pr.type == DEGREE_SubSup)
         {
             AscCommon.History.Add(this, new CChangesMathDegreeSubSupType(DEGREE_PreSubSup, this.Pr.type));
             this.raw_SetType(DEGREE_PreSubSup);
         }
 
-        if(Props.ScriptType == c_oAscMathInterfaceScript.SubSup && this.Pr.type == DEGREE_PreSubSup)
+        if(Props.ScriptType == Asc.c_oAscMathInterfaceScript.SubSup && this.Pr.type == DEGREE_PreSubSup)
         {
             AscCommon.History.Add(this, new CChangesMathDegreeSubSupType(DEGREE_SubSup, this.Pr.type));
             this.raw_SetType(DEGREE_SubSup);
@@ -1183,7 +1183,7 @@ CDegreeSubSup.prototype.raw_SetType = function(type)
 };
 CDegreeSubSup.prototype.Get_InterfaceProps = function()
 {
-    var Type = this.Pr.type == DEGREE_PreSubSup ? c_oAscMathInterfaceScript.PreSubSup : c_oAscMathInterfaceScript.SubSup;
+    var Type = this.Pr.type == DEGREE_PreSubSup ? Asc.c_oAscMathInterfaceScript.PreSubSup : Asc.c_oAscMathInterfaceScript.SubSup;
     return new CMathMenuScript(this, Type);
 };
 CDegreeSubSup.prototype.Can_ModifyArgSize = function()
@@ -1201,7 +1201,7 @@ function CMathMenuScript(Script, Type)
 {
     CMathMenuScript.superclass.constructor.call(this, Script);
 
-    this.Type       = c_oAscMathInterfaceType.Script;
+    this.Type       = Asc.c_oAscMathInterfaceType.Script;
 
     if (undefined !== Type)
         this.ScriptType = Type;

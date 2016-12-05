@@ -39,6 +39,7 @@ AscCommon.baseEditorsApi.prototype._onEndPermissions = function()
 		var oResult = new AscCommon.asc_CAscEditorPermissions();
 		oResult.setLicenseType(Asc.c_oLicenseResult.Success);
 		oResult.setCanBranding(true);
+		oResult.setRights(Asc.c_oRights.Edit);
 		this.sendEvent('asc_onGetEditorPermissions', oResult);
 	}
 };

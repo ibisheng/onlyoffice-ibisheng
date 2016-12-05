@@ -111,6 +111,14 @@
 		ExpiredTrial: 6
 	};
 
+	var c_oRights = {
+		None    : 0,
+		Edit    : 1,
+		Review  : 2,
+		Comment : 3,
+		View    : 4
+	};
+
 	/**
 	 * Класс asc_CAscEditorPermissions для прав редакторов
 	 * -----------------------------------------------------------------------------
@@ -122,12 +130,15 @@
 		this.licenseType = c_oLicenseResult.Error;
 		this.isLight = false;
 		this.trial = false;
+		this.rights = c_oRights.None;
+
 		this.canCoAuthoring = true;
 		this.canReaderMode = true;
 		this.canBranding = false;
 		this.isAutosaveEnable = true;
 		this.AutosaveMinInterval = 300;
 		this.isAnalyticsEnable = false;
+		this.buildVersion = null;
 		return this;
 	}
 
@@ -158,6 +169,12 @@
 	asc_CAscEditorPermissions.prototype.asc_getTrial = function () {
 		return this.trial;
 	};
+	asc_CAscEditorPermissions.prototype.asc_getRights = function () {
+		return this.rights;
+	};
+	asc_CAscEditorPermissions.prototype.asc_getBuildVersion = function () {
+		return this.buildVersion;
+	};
 
 	asc_CAscEditorPermissions.prototype.setLicenseType = function (v) {
 		this.licenseType = v;
@@ -168,8 +185,14 @@
 	asc_CAscEditorPermissions.prototype.setIsLight = function (v) {
 		this.isLight = v;
 	};
-	asc_CAscEditorPermissions.prototype.setIsTrial = function (v) {
+	asc_CAscEditorPermissions.prototype.setTrial = function (v) {
 		this.trial = v;
+	};
+	asc_CAscEditorPermissions.prototype.setRights = function (v) {
+		this.rights = v;
+	};
+	asc_CAscEditorPermissions.prototype.setBuildVersion = function (v) {
+		this.buildVersion = v;
 	};
 
 	/** @constructor */
@@ -2083,8 +2106,8 @@
 
 				var bIsCorrect = false;
 				if (_image.Image != null) {
-					var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
-					var __h = Math.max(parseInt(_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
+					var __w = Math.max((_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
+					var __h = Math.max((_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
 
 					var dKoef = Math.max(__w / _w, __h / _h);
 					if (dKoef > 1) {
@@ -2098,7 +2121,7 @@
 					}
 				}
 
-				return new asc_CImageSize(parseInt(_w), parseInt(_h), bIsCorrect);
+				return new asc_CImageSize(_w, _h, bIsCorrect);
 			}
 			return new asc_CImageSize(50, 50, false);
 		},
@@ -2465,6 +2488,9 @@
 			if (typeof obj.VKey != 'undefined') {
 				this.VKey = obj.VKey;
 			}
+			if (typeof obj.Token != 'undefined') {
+				this.Token = obj.Token;
+			}
 			if (typeof obj.UserId != 'undefined') {
 				this.UserId = obj.UserId;
 			}
@@ -2479,6 +2505,15 @@
 			if (typeof obj.CallbackUrl != 'undefined') {
 				this.CallbackUrl = obj.CallbackUrl;
 			}
+			if (typeof obj.Mode != 'undefined') {
+				this.Mode = obj.Mode;
+			}
+			if (typeof obj.Permissions != 'undefined') {
+				this.Permissions = obj.Permissions;
+			}
+			if (typeof obj.Lang != 'undefined') {
+				this.Lang = obj.Lang;
+			}
         if (obj.OfflineApp === true) {
             this.OfflineApp = true;
         }
@@ -2491,10 +2526,14 @@
 			this.Title = null;
 			this.Format = null;
 			this.VKey = null;
+			this.Token = null;
 			this.UserInfo = null;
 			this.Options = null;
 			this.CallbackUrl = null;
 			this.TemplateReplacement = null;
+			this.Mode = null;
+			this.Permissions = null;
+			this.Lang = null;
 		}
 	}
 
@@ -2528,6 +2567,12 @@
 	asc_CDocInfo.prototype.put_VKey = asc_CDocInfo.prototype.asc_putVKey = function (v) {
 		this.VKey = v;
 	};
+	asc_CDocInfo.prototype.get_Token = asc_CDocInfo.prototype.asc_getToken = function () {
+		return this.Token;
+	};
+	asc_CDocInfo.prototype.put_Token = asc_CDocInfo.prototype.asc_putToken = function (v) {
+		this.Token = v;
+	};
 	asc_CDocInfo.prototype.get_OfflineApp = asc_CDocInfo.prototype.asc_getOfflineApp = function () {
 		return this.OfflineApp;
 	};
@@ -2539,6 +2584,12 @@
 	};
 	asc_CDocInfo.prototype.get_UserName = asc_CDocInfo.prototype.asc_getUserName = function () {
 		return (this.UserInfo ? this.UserInfo.get_FullName() : null );
+	};
+	asc_CDocInfo.prototype.get_FirstName = asc_CDocInfo.prototype.asc_getFirstName = function () {
+		return (this.UserInfo ? this.UserInfo.get_FirstName() : null );
+	};
+	asc_CDocInfo.prototype.get_LastName = asc_CDocInfo.prototype.asc_getLastName = function () {
+		return (this.UserInfo ? this.UserInfo.get_LastName() : null );
 	};
 	asc_CDocInfo.prototype.get_Options = asc_CDocInfo.prototype.asc_getOptions = function () {
 		return this.Options;
@@ -2563,6 +2614,24 @@
 	};
 	asc_CDocInfo.prototype.put_UserInfo = asc_CDocInfo.prototype.asc_putUserInfo = function (v) {
 		this.UserInfo = v;
+	};
+	asc_CDocInfo.prototype.get_Mode = asc_CDocInfo.prototype.asc_getMode = function () {
+		return this.Mode;
+	};
+	asc_CDocInfo.prototype.put_Mode = asc_CDocInfo.prototype.asc_putMode = function (v) {
+		this.Mode = v;
+	};
+	asc_CDocInfo.prototype.get_Permissions = asc_CDocInfo.prototype.asc_getPermissions = function () {
+		return this.Permissions;
+	};
+	asc_CDocInfo.prototype.put_Permissions = asc_CDocInfo.prototype.asc_putPermissions = function (v) {
+		this.Permissions = v;
+	};
+	asc_CDocInfo.prototype.get_Lang = asc_CDocInfo.prototype.asc_getLang = function () {
+		return this.Lang;
+	};
+	asc_CDocInfo.prototype.put_Lang = asc_CDocInfo.prototype.asc_putLang = function (v) {
+		this.Lang = v;
 	};
 
 	function COpenProgress() {
@@ -2683,6 +2752,14 @@
 	prot['Connections'] = prot.Connections;
 	prot['ExpiredTrial'] = prot.ExpiredTrial;
 
+	window['Asc']['c_oRights'] = window['Asc'].c_oRights = c_oRights;
+	prot = c_oRights;
+	prot['None'] = prot.None;
+	prot['Edit'] = prot.Edit;
+	prot['Review'] = prot.Review;
+	prot['Comment'] = prot.Comment;
+	prot['View'] = prot.View;
+
 	window["AscCommon"].asc_CAscEditorPermissions = asc_CAscEditorPermissions;
 	prot = asc_CAscEditorPermissions.prototype;
 	prot["asc_getLicenseType"] = prot.asc_getLicenseType;
@@ -2694,6 +2771,8 @@
 	prot["asc_getIsAnalyticsEnable"] = prot.asc_getIsAnalyticsEnable;
 	prot["asc_getIsLight"] = prot.asc_getIsLight;
 	prot["asc_getTrial"] = prot.asc_getTrial;
+	prot["asc_getRights"] = prot.asc_getRights;
+	prot["asc_getBuildVersion"] = prot.asc_getBuildVersion;
 
 	window["AscCommon"].asc_ValAxisSettings = asc_ValAxisSettings;
 	prot = asc_ValAxisSettings.prototype;
@@ -3313,6 +3392,12 @@
 	prot["put_TemplateReplacement"] = prot["asc_putTemplateReplacement"] = prot.asc_putTemplateReplacement;
 	prot["get_UserInfo"] = prot["asc_getUserInfo"] = prot.asc_getUserInfo;
 	prot["put_UserInfo"] = prot["asc_putUserInfo"] = prot.asc_putUserInfo;
+	prot["get_Token"] = prot["asc_getToken"] = prot.asc_getToken;
+	prot["put_Token"] = prot["asc_putToken"] = prot.asc_putToken;
+	prot["get_Mode"] = prot["asc_getMode"] = prot.asc_getMode;
+	prot["put_Mode"] = prot["asc_putMode"] = prot.asc_putMode;
+	prot["get_Permissions"] = prot["asc_getPermissions"] = prot.asc_getPermissions;
+	prot["put_Permissions"] = prot["asc_putPermissions"] = prot.asc_putPermissions;
 
 	window["AscCommon"].COpenProgress = COpenProgress;
 	prot = COpenProgress.prototype;

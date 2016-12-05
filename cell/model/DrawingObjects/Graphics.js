@@ -479,6 +479,12 @@ CGraphics.prototype =
         this.m_oFontManager.m_pFont = null;
     },
 
+    ClearLastFont : function()
+    {
+        this.m_oLastFont    = new AscCommon.CFontSetup();
+        this.m_oLastFont2   = null;
+    },
+
     // images
     drawImage2 : function(img,x,y,w,h,alpha,srcRect)
     {

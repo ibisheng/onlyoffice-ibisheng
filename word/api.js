@@ -342,6 +342,54 @@
 		this["userId"] = v;
 	};
 
+	function CAscFootnotePr(obj)
+	{
+		this.NumRestart = undefined;
+		this.NumFormat  = undefined;
+		this.NumStart   = undefined;
+		this.Pos        = undefined;
+
+		if (obj)
+		{
+			this.NumRestart = obj.NumRestart;
+			this.NumFormat  = obj.NumFormat;
+			this.NumStart   = obj.NumStart;
+			this.Pos        = obj.Pos;
+		}
+	}
+	CAscFootnotePr.prototype.get_Pos = function()
+	{
+		return this.Pos;
+	};
+	CAscFootnotePr.prototype.put_Pos = function(v)
+	{
+		this.Pos = v;
+	};
+	CAscFootnotePr.prototype.get_NumStart = function()
+	{
+		return this.NumStart;
+	};
+	CAscFootnotePr.prototype.put_NumStart = function(v)
+	{
+		this.NumStart = v;
+	};
+	CAscFootnotePr.prototype.get_NumFormat = function()
+	{
+		return this.NumFormat;
+	};
+	CAscFootnotePr.prototype.put_NumFormat = function(v)
+	{
+		this.NumFormat = v;
+	};
+	CAscFootnotePr.prototype.get_NumRestart = function()
+	{
+		return this.NumRestart;
+	};
+	CAscFootnotePr.prototype.put_NumRestart = function(v)
+	{
+		this.NumRestart = v;
+	};
+
 	// пользоваться так:
 	// подрубить его последним из скриптов к страничке
 	// и вызвать, после подгрузки (конец метода OnInit <- Drawing/HtmlPage.js)
@@ -1363,15 +1411,7 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.asyncFontEndLoaded_MathDraw = function(Obj)
-	{
-		this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
-		Obj.Generate2();
-	};
-	asc_docs_api.prototype.sendMathTypesToMenu         = function(_math)
-	{
-		this.sendEvent("asc_onMathTypes", _math);
-	};
+
 
 	asc_docs_api.prototype.asyncFontEndLoaded_DropCap = function(Obj)
 	{
@@ -1699,6 +1739,9 @@ background-repeat: no-repeat;\
 			this.sync_TextPosition(TextPr.Position);
 			this.sync_TextLangCallBack(TextPr.Lang);
 			this.sync_TextColor(TextPr);
+
+			if (this.isMobileVersion)
+				this.sendEvent("asc_onTextShd", new Asc.asc_CParagraphShd(TextPr.Shd));
 		}
 	};
 	asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
@@ -2164,7 +2207,6 @@ background-repeat: no-repeat;\
 						"id"            : this.documentId,
 						"userid"        : this.documentUserId,
 						"format"        : this.documentFormat,
-						"vkey"          : this.documentVKey,
 						"c"             : "reopen",
 						"url"           : this.documentUrl,
 						"title"         : this.documentTitle,
@@ -2186,7 +2228,6 @@ background-repeat: no-repeat;\
 						"id": this.documentId,
 						"userid": this.documentUserId,
 						"format": this.documentFormat,
-						"vkey": this.documentVKey,
 						"c": "reopen",
 						"url": this.documentUrl,
 						"title": this.documentTitle,
@@ -2465,6 +2506,20 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.ClearPropObjCallback = function(prop)
 	{//колбэк предшествующий приходу свойств объекта, prop а всякий случай
 		this.sendEvent("asc_onClearPropObj", prop);
+	};
+
+	// mobile version methods:
+	asc_docs_api.prototype.asc_GetDefaultTableStyles = function()
+	{
+		if (!this.WordControl.m_oLogicDocument)
+			return;
+
+		this.WordControl.m_oDrawingDocument.StartTableStylesCheck();
+		this.WordControl.m_oDrawingDocument.TableStylesSheckLook = new Asc.CTablePropLook();
+		this.WordControl.m_oDrawingDocument.TableStylesSheckLook.FirstCol = true;
+		this.WordControl.m_oDrawingDocument.TableStylesSheckLook.FirstRow = true;
+		this.WordControl.m_oDrawingDocument.TableStylesSheckLook.BandHor  = true;
+		this.WordControl.m_oDrawingDocument.EndTableStylesCheck();
 	};
 
 	/*----------------------------------------------------------------*/
@@ -3720,6 +3775,16 @@ background-repeat: no-repeat;\
 	{
 		this.sendEvent("asc_onColumnsProps", ColumnsProps);
 	};
+	asc_docs_api.prototype.asc_SetFootnoteProps = function(oFootnotePr, bApplyToAll)
+	{
+		this.WordControl.m_oLogicDocument.SetFootnotePr(oFootnotePr, bApplyToAll);
+	};
+	asc_docs_api.prototype.asc_GetFootnoteProps = function()
+	{
+		return this.WordControl.m_oLogicDocument.GetFootnotePr();
+	};
+	asc_docs_api.prototype["asc_GetFootnoteProps"] = asc_docs_api.prototype.asc_GetFootnoteProps;
+	asc_docs_api.prototype["asc_SetFootnoteProps"] = asc_docs_api.prototype.asc_SetFootnoteProps;
 
 	asc_docs_api.prototype.put_AddPageBreak              = function()
 	{
@@ -4984,7 +5049,6 @@ background-repeat: no-repeat;\
 			var rData = {
 				"id"        : this.documentId,
 				"userid"    : this.documentUserId,
-				"vkey"      : this.documentVKey,
 				"c"         : "imgurl",
 				"saveindex" : g_oDocumentUrls.getMaxIndex(),
 				"data"      : url
@@ -5048,10 +5112,10 @@ background-repeat: no-repeat;\
 			var _h = Math.max(1, ColumnSize.H);
 			if (_image.Image != null)
 			{
-				var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
-				var __h = Math.max(parseInt(_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
+				var __w = Math.max((_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
+				var __h = Math.max((_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
 				_w      = Math.max(5, Math.min(_w, __w));
-				_h      = Math.max(5, Math.min(parseInt(_w * __h / __w)));
+				_h      = Math.max(5, Math.min((_w * __h / __w)));
 			}
 
 			var src = _image.src;
@@ -5101,10 +5165,10 @@ background-repeat: no-repeat;\
 				var _h = Math.max(1, ColumnSize.H);
 				if (_image.Image != null)
 				{
-					var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
-					var __h = Math.max(parseInt(_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
+					var __w = Math.max((_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
+					var __h = Math.max((_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
 					_w      = Math.max(5, Math.min(_w, __w));
-					_h      = Math.max(5, Math.min(parseInt(_w * __h / __w)));
+					_h      = Math.max(5, Math.min((_w * __h / __w)));
 				}
 				var src = _image.src;
 
@@ -5347,7 +5411,6 @@ background-repeat: no-repeat;\
 					var rData = {
 						"id"        : this.documentId,
 						"userid"    : this.documentUserId,
-						"vkey"      : this.documentVKey,
 						"c"         : "imgurl",
 						"saveindex" : g_oDocumentUrls.getMaxIndex(),
 						"data"      : sImageToDownLoad
@@ -5593,6 +5656,10 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 		}
 	};
+
+    asc_docs_api.prototype.asc_startEditCurrentOleObject = function(){
+		this.WordControl.m_oLogicDocument.DrawingObjects.startEditCurrentOleObject();
+    };
 	//-----------------------------------------------------------------
 	// События контекстного меню
 	//-----------------------------------------------------------------
@@ -6754,7 +6821,7 @@ background-repeat: no-repeat;\
 		if (!this.isViewMode)
 		{
 			this.sendStandartTextures();
-			this.WordControl.m_oDrawingDocument.SendMathToMenu();
+			this.sendMathToMenu();
 
 			if (this.shapeElementId)
 			{
@@ -7044,7 +7111,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.SetMobileVersion = function(val)
 	{
 		this.isMobileVersion = val;
-		if (this.isMobileVersion)
+		if (/*this.isMobileVersion*/false)
 		{
 			this.WordControl.bIsRetinaSupport         = false; // ipad имеет проблемы с большими картинками
 			this.WordControl.bIsRetinaNoSupportAttack = true;
@@ -7191,6 +7258,24 @@ background-repeat: no-repeat;\
 			editor.sync_EndAddShape();
 			editor.sync_StartAddShapeCallback(false);
 		}
+	};
+
+	asc_docs_api.prototype.AddShapeOnCurrentPage = function(_type)
+	{
+		if (!this.WordControl.m_oLogicDocument)
+			return;
+
+		var _pageNum = this.GetCurrentVisiblePage();
+		// получаем размеры страницы
+		var _sectionPr = this.WordControl.m_oLogicDocument.Get_PageLimits(_pageNum);
+
+		var _min = Math.min(_sectionPr.XLimit / 2, _sectionPr.YLimit / 2);
+
+		this.WordControl.m_oLogicDocument.DrawingObjects.addShapeOnPage(_type, _pageNum,
+			_sectionPr.X + _sectionPr.XLimit / 4,
+			_sectionPr.Y + _sectionPr.YLimit / 4,
+			_min,
+			_min);
 	};
 
 	asc_docs_api.prototype.AddTextArt = function(nStyle)
@@ -7435,7 +7520,7 @@ background-repeat: no-repeat;\
 		oAdditionalData["c"]            = command;
 		oAdditionalData["id"]           = this.documentId;
 		oAdditionalData["userid"]       = this.documentUserId;
-		oAdditionalData["vkey"]         = this.documentVKey;
+		oAdditionalData["jwt"]         = this.CoAuthoringApi.get_jwt();
 		oAdditionalData["outputformat"] = filetype;
 		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype));
 		oAdditionalData["savetype"]     = AscCommon.c_oAscSaveTypes.CompleteAll;
@@ -7559,7 +7644,8 @@ background-repeat: no-repeat;\
 					}
 					else
 					{
-						error = mapAscServerErrorToAscError(parseInt(input["data"]));
+						error = mapAscServerErrorToAscError(parseInt(input["data"]),
+							AscCommon.c_oAscAdvancedOptionsAction.Save);
 					}
 				}
 				if (c_oAscError.ID.No != error)
@@ -8319,9 +8405,11 @@ background-repeat: no-repeat;\
 		return this.WordControl.m_oDrawingDocument.m_lPagesCount;
 	};
 
-	window["asc_docs_api"].prototype["asc_nativeGetPDF"] = function()
+	window["asc_docs_api"].prototype["asc_nativeGetPDF"] = function(_param)
 	{
 		var pagescount = this["asc_nativePrintPagesCount"]();
+		if (0x0100 & _param)
+            pagescount = 1;
 
 		var _renderer                  = new AscCommon.CDocumentRenderer();
 		_renderer.VectorMemoryForPrint = new AscCommon.CMemory();
@@ -8381,6 +8469,11 @@ background-repeat: no-repeat;\
 	window["asc_docs_api"].prototype["asc_putSpellCheckCurrentWord"] = function(value)
 	{
 		this.IsSpellCheckCurrentWord = value;
+	};
+	window["asc_docs_api"].prototype["asc_setParagraphStylesSizes"] = function(width, height)
+	{
+		GlobalSkin.STYLE_THUMBNAIL_WIDTH = width;
+		GlobalSkin.STYLE_THUMBNAIL_HEIGHT = height;
 	};
 
 	// desktop editor spellcheck
@@ -8457,6 +8550,15 @@ background-repeat: no-repeat;\
 	CMailMergeSendData.prototype['put_RecordCount']                     = CMailMergeSendData.prototype.put_RecordCount;
 	CMailMergeSendData.prototype['get_UserId']                          = CMailMergeSendData.prototype.get_UserId;
 	CMailMergeSendData.prototype['put_UserId']                          = CMailMergeSendData.prototype.put_UserId;
+	window['Asc']['CAscFootnotePr']                                     = CAscFootnotePr;
+	CAscFootnotePr.prototype['get_Pos']                                 = CAscFootnotePr.prototype.get_Pos;
+	CAscFootnotePr.prototype['put_Pos']                                 = CAscFootnotePr.prototype.put_Pos;
+	CAscFootnotePr.prototype['get_NumStart']                            = CAscFootnotePr.prototype.get_NumStart;
+	CAscFootnotePr.prototype['put_NumStart']                            = CAscFootnotePr.prototype.put_NumStart;
+	CAscFootnotePr.prototype['get_NumFormat']                           = CAscFootnotePr.prototype.get_NumFormat;
+	CAscFootnotePr.prototype['put_NumFormat']                           = CAscFootnotePr.prototype.put_NumFormat;
+	CAscFootnotePr.prototype['get_NumRestart']                          = CAscFootnotePr.prototype.get_NumRestart;
+	CAscFootnotePr.prototype['put_NumRestart']                          = CAscFootnotePr.prototype.put_NumRestart;
 	window['Asc']['asc_docs_api']                                       = asc_docs_api;
 	asc_docs_api.prototype['LoadFontsFromServer']                       = asc_docs_api.prototype.LoadFontsFromServer;
 	asc_docs_api.prototype['SetCollaborativeMarksShowType']             = asc_docs_api.prototype.SetCollaborativeMarksShowType;
@@ -8827,6 +8929,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['SetMarkerFormat']                           = asc_docs_api.prototype.SetMarkerFormat;
 	asc_docs_api.prototype['sync_MarkerFormatCallback']                 = asc_docs_api.prototype.sync_MarkerFormatCallback;
 	asc_docs_api.prototype['StartAddShape']                             = asc_docs_api.prototype.StartAddShape;
+	asc_docs_api.prototype['AddShapeOnCurrentPage']                     = asc_docs_api.prototype.AddShapeOnCurrentPage;
 	asc_docs_api.prototype['AddTextArt']                                = asc_docs_api.prototype.AddTextArt;
 	asc_docs_api.prototype['sync_StartAddShapeCallback']                = asc_docs_api.prototype.sync_StartAddShapeCallback;
 	asc_docs_api.prototype['CanGroup']                                  = asc_docs_api.prototype.CanGroup;
@@ -8910,7 +9013,12 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_SetSilentMode"]                         = asc_docs_api.prototype.asc_SetSilentMode;
 	asc_docs_api.prototype["asc_addOleObject"]                          = asc_docs_api.prototype.asc_addOleObject;
 	asc_docs_api.prototype["asc_editOleObject"]                         = asc_docs_api.prototype.asc_editOleObject;
+	asc_docs_api.prototype["asc_startEditCurrentOleObject"]             = asc_docs_api.prototype.asc_startEditCurrentOleObject;
 	asc_docs_api.prototype["asc_InputClearKeyboardElement"]             = asc_docs_api.prototype.asc_InputClearKeyboardElement;
+
+	// mobile
+	asc_docs_api.prototype["asc_GetDefaultTableStyles"]             	= asc_docs_api.prototype.asc_GetDefaultTableStyles;
+	asc_docs_api.prototype["asc_Remove"]             					= asc_docs_api.prototype.asc_Remove;
 
 	CParagraphPropEx.prototype['get_ContextualSpacing'] = CParagraphPropEx.prototype.get_ContextualSpacing;
 	CParagraphPropEx.prototype['get_Ind']               = CParagraphPropEx.prototype.get_Ind;

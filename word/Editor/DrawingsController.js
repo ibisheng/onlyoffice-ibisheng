@@ -508,5 +508,8 @@ CDrawingsController.prototype.GetColumnSize = function()
 		H : AscCommon.Page_Height - (AscCommon.Y_Top_Margin + AscCommon.Y_Bottom_Margin)
 	};
 };
-
+CDrawingsController.prototype.GetCurrentSectionPr = function()
+{
+	return null;
+};
 

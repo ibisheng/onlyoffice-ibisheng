@@ -7566,33 +7566,46 @@ ParaPresentationNumbering.prototype =
 /**
  * Класс представляющий ссылку на сноску.
  * @param {CFootEndnote} Footnote - Ссылка на сноску.
+ * @param {string} CustomMark
+ * @param {string?} CustomText
  * @constructor
  * @extends {CRunElementBase}
  */
-function ParaFootnoteReference(Footnote)
+function ParaFootnoteReference(Footnote, CustomMark, CustomText)
 {
-	this.Footnote = Footnote;
+	this.Footnote   = Footnote;
+	this.CustomMark = CustomMark ? CustomMark : undefined;
+	this.CustomText = CustomText ? CustomText : undefined;
 
 	this.Width        = 0;
 	this.WidthVisible = 0;
 	this.Number       = 1;
+	this.NumFormat    = numbering_numfmt_Decimal;
 
 	this.Run          = null;
 }
 AscCommon.extendClass(ParaFootnoteReference, CRunElementBase);
-ParaFootnoteReference.prototype.Type            = para_FootnoteReference;
-ParaFootnoteReference.prototype.Get_Type        = function()
+ParaFootnoteReference.prototype.Type = para_FootnoteReference;
+ParaFootnoteReference.prototype.Get_Type = function()
 {
 	return para_FootnoteReference;
 };
-ParaFootnoteReference.prototype.Draw            = function(X, Y, Context, PDSE)
+ParaFootnoteReference.prototype.Draw = function(X, Y, Context, PDSE)
 {
-	Context.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
-	g_oTextMeasurer.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
+	if (true === this.IsCustomMarkFollows())
+		return;
 
-	// TODO: Пока делаем обычный вариант с типом Decimal
+	var TextPr = this.Run.Get_CompiledPr(false);
+
+	var FontKoef = 1;
+	if (TextPr.VertAlign !== AscCommon.vertalign_Baseline)
+		FontKoef = vertalign_Koef_Size;
+
+	Context.SetFontSlot(fontslot_ASCII, FontKoef);
+	g_oTextMeasurer.SetFontSlot(fontslot_ASCII, FontKoef);
+
 	var _X = X;
-	var T  = Numbering_Number_To_String(this.Number);
+	var T  = this.private_GetString();
 	for (var nPos = 0; nPos < T.length; ++nPos)
 	{
 		var Char = T.charAt(nPos);
@@ -7600,54 +7613,83 @@ ParaFootnoteReference.prototype.Draw            = function(X, Y, Context, PDSE)
 		_X += g_oTextMeasurer.Measure(Char).Width;
 	}
 
-	// TODO: Надо переделать в отдельную функцию отрисовщика
-	if (editor && editor.ShowParaMarks)
+	if (editor && editor.ShowParaMarks && Context.DrawFootnoteRect)
 	{
-		if (Context.m_oContext && Context.m_oContext.setLineDash)
-			Context.m_oContext.setLineDash([1, 1]);
-
-		var l = X, t = PDSE.LineTop, r = X + this.Get_Width(), b = PDSE.BaseLine;
-		Context.drawHorLineExt(c_oAscLineDrawingRule.Top, t, l, r, 0, 0, 0);
-		Context.drawVerLine(c_oAscLineDrawingRule.Right, l, t, b, 0);
-		Context.drawVerLine(c_oAscLineDrawingRule.Left, r, t, b, 0);
-		Context.drawHorLineExt(c_oAscLineDrawingRule.Top, b, l, r, 0, 0, 0);
-
-		if (Context.m_oContext && Context.m_oContext.setLineDash)
-			Context.m_oContext.setLineDash([]);
+	    Context.p_color(0, 0, 0, 255);
+	    Context.DrawFootnoteRect(X, PDSE.LineTop, this.Get_Width(), PDSE.BaseLine - PDSE.LineTop);
 	}
 };
-ParaFootnoteReference.prototype.Measure         = function(Context, TextPr, MathInfo, Run)
+ParaFootnoteReference.prototype.Measure = function(Context, TextPr, MathInfo, Run)
 {
 	this.Run = Run;
 	this.private_Measure();
 };
-ParaFootnoteReference.prototype.Copy            = function()
+ParaFootnoteReference.prototype.Copy = function()
 {
-	return new ParaFootnoteReference(this.Footnote);
+	var oFootnote = this.Footnote.Parent.CreateFootnote();
+	oFootnote.Copy2(this.Footnote);
+	return new ParaFootnoteReference(oFootnote);
 };
-ParaFootnoteReference.prototype.Write_ToBinary  = function(Writer)
+ParaFootnoteReference.prototype.Write_ToBinary = function(Writer)
 {
 	// Long   : Type
 	// String : FootnoteId
+	// Bool : is undefined mark ?
+	// false -> String2 : CustomMark
 	Writer.WriteLong(this.Type);
 	Writer.WriteString2(this.Footnote.Get_Id());
+
+	if (undefined === this.CustomMark)
+	{
+		Writer.WriteBool(true);
+	}
+	else
+	{
+		Writer.WriteBool(false);
+		Writer.WriteString2(this.CustomMark);
+	}
 };
 ParaFootnoteReference.prototype.Read_FromBinary = function(Reader)
 {
 	// String : FootnoteId
+	// Bool : is undefined mark ?
+	// false -> String2 : CustomMark
 	this.Footnote = g_oTableId.Get_ById(Reader.GetString2());
+
+	if (false === Reader.GetBool())
+		this.CustomMark = Reader.GetString2();
 };
-ParaFootnoteReference.prototype.Get_Footnote    = function()
+ParaFootnoteReference.prototype.Get_Footnote = function()
 {
 	return this.Footnote;
 };
-ParaFootnoteReference.prototype.UpdateNumber = function(PageAbs)
+ParaFootnoteReference.prototype.UpdateNumber = function(PRS)
 {
-	if (this.Footnote)
+	if (this.Footnote && true !== PRS.IsFastRecalculate() && PRS.TopDocument instanceof CDocument)
 	{
-		var oLogicDocument = this.Footnote.Get_LogicDocument();
+		var nPageAbs    = PRS.GetPageAbs();
+		var nColumnAbs  = PRS.GetColumnAbs();
+		var nAdditional = PRS.GetFootnoteReferencesCount(this);
+		var oSectPr     = PRS.GetSectPr();
+		var nNumFormat  = oSectPr.GetFootnoteNumFormat();
+
+		var oLogicDocument       = this.Footnote.Get_LogicDocument();
 		var oFootnotesController = oLogicDocument.GetFootnotesController();
-		this.Number = oFootnotesController.GetFootnoteNumberOnPage(PageAbs, this.Footnote);
+
+		this.NumFormat = nNumFormat;
+		this.Number    = oFootnotesController.GetFootnoteNumberOnPage(nPageAbs, nColumnAbs, oSectPr) + nAdditional;
+
+		// Если данная сноска не участвует в нумерации, просто уменьшаем ей номер на 1, для упрощения работы
+		if (this.IsCustomMarkFollows())
+			this.Number--;
+
+		this.private_Measure();
+		this.Footnote.SetNumber(this.Number, oSectPr, this.IsCustomMarkFollows());
+	}
+	else
+	{
+		this.Number    = 1;
+		this.NumFormat = numbering_numfmt_Decimal;
 		this.private_Measure();
 	}
 };
@@ -7656,17 +7698,27 @@ ParaFootnoteReference.prototype.private_Measure = function()
 	if (!this.Run)
 		return;
 
+	if (this.IsCustomMarkFollows())
+	{
+		this.Width        = 0;
+		this.WidthVisible = 0;
+		return;
+	}
+
 	var oMeasurer = g_oTextMeasurer;
 
 	var TextPr = this.Run.Get_CompiledPr(false);
 	var Theme  = this.Run.Get_Paragraph().Get_Theme();
 
-	oMeasurer.SetTextPr(TextPr, Theme);
-	oMeasurer.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
+    var FontKoef = 1;
+    if (TextPr.VertAlign !== AscCommon.vertalign_Baseline)
+        FontKoef = vertalign_Koef_Size;
 
-	// TODO: Пока делаем обычный вариант с типом Decimal
+	oMeasurer.SetTextPr(TextPr, Theme);
+	oMeasurer.SetFontSlot(fontslot_ASCII, FontKoef);
+
 	var X = 0;
-	var T = Numbering_Number_To_String(this.Number);
+	var T = this.private_GetString();
 	for (var nPos = 0; nPos < T.length; ++nPos)
 	{
 		var Char = T.charAt(nPos);
@@ -7676,6 +7728,29 @@ ParaFootnoteReference.prototype.private_Measure = function()
 	var ResultWidth   = (Math.max((X + TextPr.Spacing), 0) * TEXTWIDTH_DIVIDER) | 0;
 	this.Width        = ResultWidth;
 	this.WidthVisible = ResultWidth;
+};
+ParaFootnoteReference.prototype.private_GetString = function()
+{
+	if (numbering_numfmt_Decimal === this.NumFormat)
+		return Numbering_Number_To_String(this.Number);
+	if (numbering_numfmt_LowerRoman === this.NumFormat)
+		return Numbering_Number_To_Roman(this.Number, true);
+	else if (numbering_numfmt_UpperRoman === this.NumFormat)
+		return Numbering_Number_To_Roman(this.Number, false);
+	else if (numbering_numfmt_LowerLetter === this.NumFormat)
+		return Numbering_Number_To_Alpha(this.Number, true);
+	else if (numbering_numfmt_UpperLetter === this.NumFormat)
+		return Numbering_Number_To_Alpha(this.Number, false);
+	else// if (numbering_numfmt_Decimal === this.NumFormat)
+		return Numbering_Number_To_String(this.Number);
+};
+ParaFootnoteReference.prototype.IsCustomMarkFollows = function()
+{
+	return (true === this.CustomMark ? true : false);
+};
+ParaFootnoteReference.prototype.GetCustomText = function()
+{
+	return this.CustomText;
 };
 
 /**
@@ -7689,14 +7764,30 @@ function ParaFootnoteRef(Footnote)
 	ParaFootnoteRef.superclass.constructor.call(this, Footnote);
 }
 AscCommon.extendClass(ParaFootnoteRef, ParaFootnoteReference);
-ParaFootnoteRef.prototype.Type     = para_FootnoteRef;
+ParaFootnoteRef.prototype.Type = para_FootnoteRef;
 ParaFootnoteRef.prototype.Get_Type = function()
 {
 	return para_FootnoteRef;
 };
-ParaFootnoteRef.prototype.Copy     = function()
+ParaFootnoteRef.prototype.Copy = function()
 {
 	return new ParaFootnoteRef(this.Get_Footnote());
+};
+ParaFootnoteRef.prototype.UpdateNumber = function(oFootnote)
+{
+	this.Footnote = oFootnote;
+	if (this.Footnote && this.Footnote instanceof CFootEndnote)
+	{
+		this.Number    = this.Footnote.GetNumber();
+		this.NumFormat = this.Footnote.GetReferenceSectPr().GetFootnoteNumFormat();
+		this.private_Measure();
+	}
+	else
+	{
+		this.Number    = 1;
+		this.NumFormat = numbering_numfmt_Decimal;
+		this.private_Measure();
+	}
 };
 
 /**
@@ -7719,22 +7810,13 @@ ParaSeparator.prototype.Draw     = function(X, Y, Context, PDSE)
 {
 	var l = X, t = PDSE.LineTop, r = X + this.Get_Width(), b = PDSE.BaseLine;
 
+    Context.p_color(0, 0, 0, 255);
 	Context.drawHorLineExt(c_oAscLineDrawingRule.Center, (t + b) / 2, l, r, this.LineW, 0, 0);
 
-	// TODO: Надо переделать в отдельную функцию отрисовщика
-	if (editor && editor.ShowParaMarks)
-	{
-		if (Context.m_oContext && Context.m_oContext.setLineDash)
-			Context.m_oContext.setLineDash([1, 1]);
-
-		Context.drawHorLineExt(c_oAscLineDrawingRule.Top, t, l, r, 0, 0, 0);
-		Context.drawVerLine(c_oAscLineDrawingRule.Right, l, t, b, 0);
-		Context.drawVerLine(c_oAscLineDrawingRule.Left, r, t, b, 0);
-		Context.drawHorLineExt(c_oAscLineDrawingRule.Top, b, l, r, 0, 0, 0);
-
-		if (Context.m_oContext && Context.m_oContext.setLineDash)
-			Context.m_oContext.setLineDash([]);
-	}
+	if (editor && editor.ShowParaMarks && Context.DrawFootnoteRect)
+    {
+        Context.DrawFootnoteRect(X, PDSE.LineTop, this.Get_Width(), PDSE.BaseLine - PDSE.LineTop);
+    }
 };
 ParaSeparator.prototype.Measure  = function(Context, TextPr)
 {
@@ -7768,22 +7850,13 @@ ParaContinuationSeparator.prototype.Draw         = function(X, Y, Context, PDSE)
 {
 	var l = X, t = PDSE.LineTop, r = X + this.Get_Width(), b = PDSE.BaseLine;
 
+    Context.p_color(0, 0, 0, 255);
 	Context.drawHorLineExt(c_oAscLineDrawingRule.Center, (t + b) / 2, l, r, this.LineW, 0, 0);
 
-	// TODO: Надо переделать в отдельную функцию отрисовщика
-	if (editor && editor.ShowParaMarks)
-	{
-		if (Context.m_oContext && Context.m_oContext.setLineDash)
-			Context.m_oContext.setLineDash([1, 1]);
-
-		Context.drawHorLineExt(c_oAscLineDrawingRule.Top, t, l, r, 0, 0, 0);
-		Context.drawVerLine(c_oAscLineDrawingRule.Right, l, t, b, 0);
-		Context.drawVerLine(c_oAscLineDrawingRule.Left, r, t, b, 0);
-		Context.drawHorLineExt(c_oAscLineDrawingRule.Top, b, l, r, 0, 0, 0);
-
-		if (Context.m_oContext && Context.m_oContext.setLineDash)
-			Context.m_oContext.setLineDash([]);
-	}
+	if (editor && editor.ShowParaMarks && Context.DrawFootnoteRect)
+    {
+        Context.DrawFootnoteRect(X, PDSE.LineTop, this.Get_Width(), PDSE.BaseLine - PDSE.LineTop);
+    }
 };
 ParaContinuationSeparator.prototype.Measure      = function(Context, TextPr)
 {

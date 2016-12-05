@@ -65,10 +65,6 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Worksheet_RowProp = 11;
 	window['AscCH'].historyitem_Worksheet_Sort = 12;
 	window['AscCH'].historyitem_Worksheet_MoveRange = 13;
-	window['AscCH'].historyitem_Worksheet_Merge = 14;
-	window['AscCH'].historyitem_Worksheet_Unmerge = 15;
-	window['AscCH'].historyitem_Worksheet_SetHyperlink = 16;
-	window['AscCH'].historyitem_Worksheet_RemoveHyperlink = 17;
 	window['AscCH'].historyitem_Worksheet_Rename = 18;
 	window['AscCH'].historyitem_Worksheet_Hide = 19;
 //не добавляем в историю события historyitem_Worksheet_CreateRow, CreateCol, CreateCell - потому что появляется много ошибок(например удаление строк, если снизу были данные и undo)
@@ -148,6 +144,35 @@ function (window, undefined) {
 	window['AscCH'].historyitem_AutoFilter_ChangeTableName = 14;
 	window['AscCH'].historyitem_AutoFilter_ClearFilterColumn = 15;
 
+	window['AscCH'].historyitem_Sparkline_Type = 1;
+	window['AscCH'].historyitem_Sparkline_LineWeight = 2;
+	window['AscCH'].historyitem_Sparkline_DisplayEmptyCellsAs = 3;
+	window['AscCH'].historyitem_Sparkline_Markers = 4;
+	window['AscCH'].historyitem_Sparkline_High = 5;
+	window['AscCH'].historyitem_Sparkline_Low = 6;
+	window['AscCH'].historyitem_Sparkline_First = 7;
+	window['AscCH'].historyitem_Sparkline_Last = 8;
+	window['AscCH'].historyitem_Sparkline_Negative = 9;
+	window['AscCH'].historyitem_Sparkline_DisplayXAxis = 10;
+	window['AscCH'].historyitem_Sparkline_DisplayHidden = 11;
+	window['AscCH'].historyitem_Sparkline_MinAxisType = 12;
+	window['AscCH'].historyitem_Sparkline_MaxAxisType = 13;
+	window['AscCH'].historyitem_Sparkline_RightToLeft = 14;
+	window['AscCH'].historyitem_Sparkline_ManualMax = 15;
+	window['AscCH'].historyitem_Sparkline_ManualMin = 16;
+	window['AscCH'].historyitem_Sparkline_DateAxis = 17;
+	window['AscCH'].historyitem_Sparkline_ColorSeries = 18;
+	window['AscCH'].historyitem_Sparkline_ColorNegative = 19;
+	window['AscCH'].historyitem_Sparkline_ColorAxis = 20;
+	window['AscCH'].historyitem_Sparkline_ColorMarkers = 21;
+	window['AscCH'].historyitem_Sparkline_ColorFirst = 22;
+	window['AscCH'].historyitem_Sparkline_colorLast = 23;
+	window['AscCH'].historyitem_Sparkline_ColorHigh = 24;
+	window['AscCH'].historyitem_Sparkline_ColorLow = 25;
+	window['AscCH'].historyitem_Sparkline_F = 26;
+	window['AscCH'].historyitem_Sparkline_ChangeData = 27;
+	window['AscCH'].historyitem_Sparkline_RemoveData = 28;
+	window['AscCH'].historyitem_Sparkline_RemoveSparkline = 29;
 
 function CHistory()
 {
@@ -176,6 +201,12 @@ CHistory.prototype.init = function(workbook) {
 };
 CHistory.prototype.Is_UserSaveMode = function() {
   return this.UserSaveMode;
+};
+CHistory.prototype.Is_Clear = function() {
+    if ( this.Points.length <= 0 )
+        return true;
+
+    return false;
 };
 CHistory.prototype.Clear = function()
 {
@@ -243,15 +274,14 @@ CHistory.prototype.UndoRedoPrepare = function (oRedoObjectParam, bUndo) {
 	else
 		this.workbook.bRedoChanges = true;
 
-	if(!window["NATIVE_EDITOR_ENJINE"]) {
+	if (!window["NATIVE_EDITOR_ENJINE"]) {
 		var wsViews = Asc["editor"].wb.wsViews;
 		for (var i = 0; i < wsViews.length; ++i) {
-			if (wsViews[i] && wsViews[i].objectRender && wsViews[i].objectRender.controller) {
-				wsViews[i].objectRender.controller.resetSelection(undefined, true);
-			}
-			if (wsViews[i] && wsViews[i].isChartAreaEditMode ) {
-				wsViews[i].isChartAreaEditMode = false;
-				wsViews[i].arrActiveChartsRanges = [];
+			if (wsViews[i]) {
+				if (wsViews[i].objectRender && wsViews[i].objectRender.controller) {
+					wsViews[i].objectRender.controller.resetSelection(undefined, true);
+				}
+				wsViews[i].endEditChart();
 			}
 		}
 	}
@@ -352,6 +382,10 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
         }
 	}
 
+	/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
+	this.workbook.unLockDraw();
+	this.workbook.buildRecalc();
+
 	if (null != Point) {
 		//синхронизация index и id worksheet
 		if (oRedoObjectParam.bUpdateWorksheetByModel)
@@ -374,13 +408,14 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 		    if (null !== nSheetId)
 		        this.workbook.handlers.trigger('showWorksheet', nSheetId);
 		}
-
-		for (i in Point.UpdateRigions)
-			this.workbook.handlers.trigger("cleanCellCache", i, {'0': Point.UpdateRigions[i]}, false, true, oRedoObjectParam.bAddRemoveRowCol);
-
+		//changeWorksheetUpdate before cleanCellCache to call _calcHeightRows
 		for (i in oRedoObjectParam.oChangeWorksheetUpdate)
 			this.workbook.handlers.trigger("changeWorksheetUpdate",
 				oRedoObjectParam.oChangeWorksheetUpdate[i],{lockDraw: true, reinitRanges: true});
+
+		for (i in Point.UpdateRigions)
+			this.workbook.handlers.trigger("cleanCellCache", i, {'0': Point.UpdateRigions[i]}, true, oRedoObjectParam.bAddRemoveRowCol);
+
 		if (oRedoObjectParam.bOnSheetsChanged)
 			this.workbook.handlers.trigger("asc_onSheetsChanged");
 		for (i in oRedoObjectParam.oOnUpdateTabColor) {
@@ -449,9 +484,6 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
         }
     }
 
-	/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
-	this.workbook.unLockDraw();
-	this.workbook.buildRecalc();
 	if (oRedoObjectParam.bIsOn)
 		this.TurnOn();
 };
@@ -623,12 +655,13 @@ CHistory.prototype.Create_NewPoint = function()
 	var UpdateRigions = {};
 	var Time  = new Date().getTime();
 	var UndoSheetId = null, oSelectionState = this.workbook.handlers.trigger("getSelectionState");
-
-	// ToDo Берем всегда, т.к. в случае с LastState мы можем не попасть на нужный лист и не заселектить нужный диапазон!
-	var oSelectRange = this.workbook.handlers.trigger("getSelection");
+	var oSelectRange = null;
 	var wsActive = this.workbook.getWorksheet(this.workbook.getActive());
-	if (wsActive)
+	if (wsActive) {
 		UndoSheetId = wsActive.getId();
+		// ToDo Берем всегда, т.к. в случае с LastState мы можем не попасть на нужный лист и не заселектить нужный диапазон!
+		oSelectRange = wsActive.selectionRange.getLast(); // ToDo get only last selection range
+	}
 
     // Создаем новую точку
     this.Points[++this.Index] = {
@@ -713,7 +746,7 @@ CHistory.prototype._sendCanUndoRedo = function()
 {
 	this.workbook.handlers.trigger("setCanUndo", this.Can_Undo());
 	this.workbook.handlers.trigger("setCanRedo", this.Can_Redo());
-	this.workbook.handlers.trigger("setDocumentModified", this.Is_Modified());
+	this.workbook.handlers.trigger("setDocumentModified", this.Have_Changes());
 };
 CHistory.prototype.SetSelection = function(range)
 {
@@ -839,7 +872,7 @@ CHistory.prototype.Get_DeleteIndex = function () {
 	return DeleteIndex;
 };
 /** @returns {boolean} */
-CHistory.prototype.Is_Modified = function(IsNotUserSave) {
+CHistory.prototype.Have_Changes = function(IsNotUserSave) {
   var checkIndex = (this.Is_UserSaveMode() && !IsNotUserSave) ? this.UserSavedIndex : this.SavedIndex;
   if (-1 === this.Index && null === checkIndex && false === this.ForceSave) {
     return false;

@@ -46,22 +46,25 @@ function CHistory(Document)
     this.CollaborativeEditing = null;
     this.CanNotAddChanges = false;//флаг для отслеживания ошибок добавления изменений без точки:Create_NewPoint->Add->Save_Changes->Add
 
-    this.RecalculateData =
-    {
-        Inline   : {Pos : -1, PageNum : 0},
-        Flow     : [],
-        HdrFtr   : [],
-        Drawings : {
-            All       : false,
-            Map       : {},
-            ThemeInfo : null
-        },
-
-        Tables : [],
-        NumPr  : [],
-
-        Update : true
-    };
+	this.RecalculateData =
+	{
+		Inline       : {
+			Pos     : -1,
+			PageNum : 0
+		},
+		Flow         : [],
+		HdrFtr       : [],
+		Drawings     : {
+			All       : false,
+			Map       : {},
+			ThemeInfo : null
+		},
+		Tables       : [],
+		NumPr        : [],
+		NotesEnd     : false,
+		NotesEndPage : 0,
+		Update       : true
+	};
 
 	this.TurnOffHistory = 0;
     this.MinorChanges   = false; // Данный параметр нужен, чтобы определить влияют ли добавленные изменения на пересчет
@@ -249,6 +252,7 @@ CHistory.prototype =
                     var Item = Point.Items[Index];
                     Item.Class.Undo(Item.Data);
                     Item.Class.Refresh_RecalcData(Item.Data);
+                    this.private_UpdateContentChangesOnUndo(Item);
                 }
             }
         }
@@ -262,6 +266,7 @@ CHistory.prototype =
                 var Item = Point.Items[Index];
                 Item.Class.Undo(Item.Data);
                 Item.Class.Refresh_RecalcData(Item.Data);
+				this.private_UpdateContentChangesOnUndo(Item);
             }
         }
 
@@ -289,6 +294,7 @@ CHistory.prototype =
             var Item = Point.Items[Index];
             Item.Class.Redo( Item.Data );
             Item.Class.Refresh_RecalcData( Item.Data );
+			this.private_UpdateContentChangesOnRedo(Item);
         }
 
         // Восстанавливаем состояние на следующую точку
@@ -479,23 +485,27 @@ CHistory.prototype =
     {
         // NumPr здесь не обнуляем
         var NumPr = this.RecalculateData.NumPr;
-        this.RecalculateData =
-        {
-            Inline   : {Pos : -1, PageNum : 0},
-            Flow     : [],
-            HdrFtr   : [],
-            Drawings : {
-                All       : false,
-                Map       : {},
-                ThemeInfo : null
-            },
+		this.RecalculateData =
+		{
+			Inline   : {
+				Pos     : -1,
+				PageNum : 0
+			},
+			Flow     : [],
+			HdrFtr   : [],
+			Drawings : {
+				All       : false,
+				Map       : {},
+				ThemeInfo : null
+			},
 
-            Tables : [],
-            NumPr  : NumPr,
-
-            Update : true
-        };
-    },
+			Tables       : [],
+			NumPr        : NumPr,
+			NotesEnd     : false,
+			NotesEndPage : 0,
+			Update       : true
+		};
+	},
 
     RecalcData_Add : function(Data)
     {
@@ -590,6 +600,13 @@ CHistory.prototype =
                 }
                 break;
             }
+
+			case AscDFH.historyitem_recalctype_NotesEnd:
+			{
+				this.RecalculateData.NotesEnd     = true;
+				this.RecalculateData.NotesEndPage = Data.PageNum;
+				break;
+			}
         }
     },
 
@@ -1041,6 +1058,65 @@ CHistory.prototype =
         } catch (e) {
         }
     }
+};
+CHistory.prototype.private_UpdateContentChangesOnUndo = function(Item)
+{
+	if (this.private_IsContentChange(Item.Class, Item.Data))
+	{
+		Item.Class.m_oContentChanges.RemoveByHistoryItem(Item);
+	}
+};
+CHistory.prototype.private_UpdateContentChangesOnRedo = function(Item)
+{
+	if (this.private_IsContentChange(Item.Class, Item.Data))
+	{
+		var bAdd  = this.private_IsAddContentChange(Item.Class, Item.Data);
+		var Count = this.private_GetItemsCountInContentChange(Item.Class, Item.Data);
+
+		var ContentChanges = new AscCommon.CContentChangesElement( ( bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove ), Data.Pos, Count, Item );
+		Class.Add_ContentChanges( ContentChanges );
+		this.CollaborativeEditing.Add_NewDC( Class );
+	}
+};
+CHistory.prototype.private_IsContentChange = function(Class, Data)
+{
+	var bPresentation = !(typeof CPresentation === "undefined");
+	var bSlide = !(typeof Slide === "undefined");
+	if ( ( Class instanceof CDocument        && ( AscDFH.historyitem_Document_AddItem        === Data.Type || AscDFH.historyitem_Document_RemoveItem        === Data.Type ) ) ||
+		(((Class instanceof CDocumentContent || Class instanceof AscFormat.CDrawingDocContent)) && ( AscDFH.historyitem_DocumentContent_AddItem === Data.Type || AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
+		( Class instanceof CTable           && ( AscDFH.historyitem_Table_AddRow            === Data.Type || AscDFH.historyitem_Table_RemoveRow            === Data.Type ) ) ||
+		( Class instanceof CTableRow        && ( AscDFH.historyitem_TableRow_AddCell        === Data.Type || AscDFH.historyitem_TableRow_RemoveCell        === Data.Type ) ) ||
+		( Class instanceof Paragraph        && ( AscDFH.historyitem_Paragraph_AddItem       === Data.Type || AscDFH.historyitem_Paragraph_RemoveItem       === Data.Type ) ) ||
+		( Class instanceof ParaHyperlink    && ( AscDFH.historyitem_Hyperlink_AddItem       === Data.Type || AscDFH.historyitem_Hyperlink_RemoveItem       === Data.Type ) ) ||
+		( Class instanceof ParaRun          && ( AscDFH.historyitem_ParaRun_AddItem         === Data.Type || AscDFH.historyitem_ParaRun_RemoveItem         === Data.Type ) ) ||
+		( bPresentation && Class instanceof CPresentation && (AscDFH.historyitem_Presentation_AddSlide === Data.Type || AscDFH.historyitem_Presentation_RemoveSlide === Data.Type)) ||
+		( bSlide && Class instanceof Slide && (AscDFH.historyitem_SlideAddToSpTree === Data.Type || AscDFH.historyitem_SlideRemoveFromSpTree === Data.Type))
+	)
+		return true;
+
+	return false;
+};
+CHistory.prototype.private_IsAddContentChange = function(Class, Data)
+{
+	return ( ( Class instanceof CDocument        && AscDFH.historyitem_Document_AddItem        === Data.Type ) ||
+		( ((Class instanceof CDocumentContent || Class instanceof AscFormat.CDrawingDocContent)) && AscDFH.historyitem_DocumentContent_AddItem === Data.Type ) ||
+		( Class instanceof CTable           && AscDFH.historyitem_Table_AddRow            === Data.Type ) ||
+		( Class instanceof CTableRow        && AscDFH.historyitem_TableRow_AddCell        === Data.Type ) ||
+		( Class instanceof Paragraph        && AscDFH.historyitem_Paragraph_AddItem       === Data.Type ) ||
+		( Class instanceof ParaHyperlink    && AscDFH.historyitem_Hyperlink_AddItem       === Data.Type ) ||
+		( Class instanceof ParaRun          && AscDFH.historyitem_ParaRun_AddItem         === Data.Type ) ||
+		( bPresentation && Class instanceof CPresentation && (AscDFH.historyitem_Presentation_AddSlide === Data.Type )) ||
+		( bSlide && Class instanceof Slide && (AscDFH.historyitem_SlideAddToSpTree === Data.Type))
+	) ? true : false;
+};
+CHistory.prototype.private_GetItemsCountInContentChange = function(Class, Data)
+{
+	if ( ( Class instanceof Paragraph ) ||  ( Class instanceof ParaHyperlink) || ( Class instanceof ParaRun ) ||
+		( Class instanceof CDocument        && AscDFH.historyitem_Document_RemoveItem        === Data.Type ) ||
+		( ((Class instanceof CDocumentContent || Class instanceof AscFormat.CDrawingDocContent)) && AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) )
+		return Data.Items.length;
+
+	return 1;
 };
 
 function CRC32()

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * (c) Copyright Ascensio System SIA 2010-2016
  *
  * This program is a free software product. You can redistribute it and/or
@@ -268,7 +268,9 @@ function openFileCommand(binUrl, changesUrl, Signature, callback) {
   };
   var sFileUrl = binUrl;
   sFileUrl = sFileUrl.replace(/\\/g, "/");
-  asc_ajax({
+
+  if (!window['IS_NATIVE_EDITOR']) {
+    asc_ajax({
     url: sFileUrl,
     dataType: "text",
     success: function(result) {
@@ -292,6 +294,8 @@ function openFileCommand(binUrl, changesUrl, Signature, callback) {
       onEndOpen();
     }
   });
+  }
+ 
   if (null != changesUrl) {
     getJSZipUtils().getBinaryContent(changesUrl, function(err, data) {
       bEndLoadChanges = true;
@@ -314,8 +318,26 @@ function openFileCommand(binUrl, changesUrl, Signature, callback) {
   } else {
     bEndLoadChanges = true;
   }
-}
-function sendCommand(editor, fCallback, rdata, dataContainer) {
+
+	if (window['IS_NATIVE_EDITOR']) {
+		var result = window["native"]["openFileCommand"](sFileUrl, changesUrl, Signature);
+
+		var url;
+		var nIndex = sFileUrl.lastIndexOf("/");
+		url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
+		if (0 < result.length) {
+			oResult.bSerFormat = Signature === result.substring(0, Signature.length);
+			oResult.data = result;
+			oResult.url = url;
+		} else {
+			bError = true;
+		}
+
+		bEndLoadFile = true;
+		onEndOpen();
+	}
+ }
+ function sendCommand(editor, fCallback, rdata, dataContainer) {
   //json не должен превышать размера 2097152, иначе при его чтении будет exception
   var docConnectionId = editor.CoAuthoringApi.getDocId();
   if (docConnectionId && docConnectionId !== rdata["id"]) {
@@ -345,43 +367,73 @@ function sendCommand(editor, fCallback, rdata, dataContainer) {
   });
 }
 
-function mapAscServerErrorToAscError(nServerError) {
-	var nRes = Asc.c_oAscError.ID.Unknown;
-	switch (nServerError) {
-		case c_oAscServerError.NoError : nRes = Asc.c_oAscError.ID.No; break;
-		case c_oAscServerError.TaskQueue :
-		case c_oAscServerError.TaskResult : nRes = Asc.c_oAscError.ID.Database; break;
-		case c_oAscServerError.ConvertDownload : nRes = Asc.c_oAscError.ID.DownloadError; break;
-		case c_oAscServerError.ConvertTimeout : nRes = Asc.c_oAscError.ID.ConvertationTimeout; break;
-		case c_oAscServerError.ConvertDRM :
-		case c_oAscServerError.ConvertPASSWORD : nRes = Asc.c_oAscError.ID.ConvertationPassword; break;
-		case c_oAscServerError.ConvertCONVERT_CORRUPTED :
-		case c_oAscServerError.ConvertLIBREOFFICE :
-		case c_oAscServerError.ConvertPARAMS :
-		case c_oAscServerError.ConvertNEED_PARAMS :
-		case c_oAscServerError.ConvertUnknownFormat :
-		case c_oAscServerError.ConvertReadFile :
-		case c_oAscServerError.Convert : nRes = Asc.c_oAscError.ID.ConvertationError; break;
-		case c_oAscServerError.UploadContentLength : nRes = Asc.c_oAscError.ID.UplImageSize; break;
-		case c_oAscServerError.UploadExtension : nRes = Asc.c_oAscError.ID.UplImageExt; break;
-		case c_oAscServerError.UploadCountFiles : nRes = Asc.c_oAscError.ID.UplImageFileCount; break;
-		case c_oAscServerError.VKey : nRes = Asc.c_oAscError.ID.FileVKey; break;
-		case c_oAscServerError.VKeyEncrypt : nRes = Asc.c_oAscError.ID.VKeyEncrypt; break;
-		case c_oAscServerError.VKeyKeyExpire : nRes = Asc.c_oAscError.ID.KeyExpire; break;
-		case c_oAscServerError.VKeyUserCountExceed : nRes = Asc.c_oAscError.ID.UserCountExceed; break;
-		case c_oAscServerError.Storage :
-		case c_oAscServerError.StorageFileNoFound :
-		case c_oAscServerError.StorageRead :
-		case c_oAscServerError.StorageWrite :
-		case c_oAscServerError.StorageRemoveDir :
-		case c_oAscServerError.StorageCreateDir :
-		case c_oAscServerError.StorageGetInfo :
-		case c_oAscServerError.Upload :
-		case c_oAscServerError.ReadRequestStream :
-		case c_oAscServerError.Unknown : nRes = Asc.c_oAscError.ID.Unknown; break;
+	function mapAscServerErrorToAscError(nServerError, nAction) {
+		var nRes = Asc.c_oAscError.ID.Unknown;
+		switch (nServerError) {
+			case c_oAscServerError.NoError :
+				nRes = Asc.c_oAscError.ID.No;
+				break;
+			case c_oAscServerError.TaskQueue :
+			case c_oAscServerError.TaskResult :
+				nRes = Asc.c_oAscError.ID.Database;
+				break;
+			case c_oAscServerError.ConvertDownload :
+				nRes = Asc.c_oAscError.ID.DownloadError;
+				break;
+			case c_oAscServerError.ConvertTimeout :
+				nRes = Asc.c_oAscError.ID.ConvertationTimeout;
+				break;
+			case c_oAscServerError.ConvertDRM :
+			case c_oAscServerError.ConvertPASSWORD :
+				nRes = Asc.c_oAscError.ID.ConvertationPassword;
+				break;
+			case c_oAscServerError.ConvertCONVERT_CORRUPTED :
+			case c_oAscServerError.ConvertLIBREOFFICE :
+			case c_oAscServerError.ConvertPARAMS :
+			case c_oAscServerError.ConvertNEED_PARAMS :
+			case c_oAscServerError.ConvertUnknownFormat :
+			case c_oAscServerError.ConvertReadFile :
+			case c_oAscServerError.Convert :
+				nRes =
+					AscCommon.c_oAscAdvancedOptionsAction.Save === nAction ? Asc.c_oAscError.ID.ConvertationSaveError :
+						Asc.c_oAscError.ID.ConvertationOpenError;
+				break;
+			case c_oAscServerError.UploadContentLength :
+				nRes = Asc.c_oAscError.ID.UplImageSize;
+				break;
+			case c_oAscServerError.UploadExtension :
+				nRes = Asc.c_oAscError.ID.UplImageExt;
+				break;
+			case c_oAscServerError.UploadCountFiles :
+				nRes = Asc.c_oAscError.ID.UplImageFileCount;
+				break;
+			case c_oAscServerError.VKey :
+				nRes = Asc.c_oAscError.ID.FileVKey;
+				break;
+			case c_oAscServerError.VKeyEncrypt :
+				nRes = Asc.c_oAscError.ID.VKeyEncrypt;
+				break;
+			case c_oAscServerError.VKeyKeyExpire :
+				nRes = Asc.c_oAscError.ID.KeyExpire;
+				break;
+			case c_oAscServerError.VKeyUserCountExceed :
+				nRes = Asc.c_oAscError.ID.UserCountExceed;
+				break;
+			case c_oAscServerError.Storage :
+			case c_oAscServerError.StorageFileNoFound :
+			case c_oAscServerError.StorageRead :
+			case c_oAscServerError.StorageWrite :
+			case c_oAscServerError.StorageRemoveDir :
+			case c_oAscServerError.StorageCreateDir :
+			case c_oAscServerError.StorageGetInfo :
+			case c_oAscServerError.Upload :
+			case c_oAscServerError.ReadRequestStream :
+			case c_oAscServerError.Unknown :
+				nRes = Asc.c_oAscError.ID.Unknown;
+				break;
+		}
+		return nRes;
 	}
-	return nRes;
-}
 
 function joinUrls(base, relative) {
     //http://stackoverflow.com/questions/14780350/convert-relative-path-to-absolute-using-javascript
@@ -664,7 +716,7 @@ function build_rx_table(local){
         loc_this_row = cStrucTableLocalColumns['tr'],
         structured_tables_headata = new XRegExp('(?:\\[\\#'+loc_headers+'\\]\\,\\[\\#'+loc_data+'\\])'),
         structured_tables_datals = new XRegExp('(?:\\[\\#'+loc_data+'\\]\\,\\[\\#'+loc_totals+'\\])' ),
-        structured_tables_userColumn = new XRegExp('(?:[' + str_namedRanges + '\\d.]|\\u0027[#\\[\\]\\u0027]|\\u0020)+'),
+        structured_tables_userColumn = new XRegExp('(?:[' + str_namedRanges + '\\d.]|\\u0027[#\\[\\]\\u0027]|\\u0020|\\u0025)+'),
         structured_tables_reservedColumn = new XRegExp('\\#(?:'+loc_all+'|'+loc_headers+'|'+loc_totals+'|'+loc_data+'|'+loc_this_row+')|@');
 
 	return XRegExp.build( '^(?<tableName>{{tableName}})\\[(?<columnName>{{columnName}})?\\]', {
@@ -864,7 +916,7 @@ function InitOnMessage (callback) {
 		}, false);
 	}
 }
-function ShowImageFileDialog (documentId, documentUserId, callback, callbackOld) {
+function ShowImageFileDialog (documentId, documentUserId, jwt, callback, callbackOld) {
 	var fileName;
 	if ("undefined" != typeof(FileReader)) {
 		fileName = GetUploadInput(function (e) {
@@ -877,7 +929,11 @@ function ShowImageFileDialog (documentId, documentUserId, callback, callbackOld)
 		});
 	} else {
 		var frameWindow = GetUploadIFrame();
-		var content = '<html><head></head><body><form action="'+sUploadServiceLocalUrlOld+'/'+documentId+'/'+documentUserId+'/'+g_oDocumentUrls.getMaxIndex()+'" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" accept="image/*" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
+		var url = sUploadServiceLocalUrlOld+'/'+documentId+'/'+documentUserId+'/'+g_oDocumentUrls.getMaxIndex();
+		if (jwt) {
+			url += '/' + jwt;
+		}
+		var content = '<html><head></head><body><form action="'+url+'" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" accept="image/*" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
 		frameWindow.document.open();
 		frameWindow.document.write(content);
 		frameWindow.document.close();
@@ -919,11 +975,15 @@ function InitDragAndDrop (oHtmlElement, callback) {
 		};
 	}
 }
-function UploadImageFiles (files, documentId, documentUserId, callback) {
+function UploadImageFiles (files, documentId, documentUserId, jwt, callback) {
 	if (files.length > 0) {
 		var file = files[0];
+		var url = sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex();
+		if (jwt) {
+			url += '/' + jwt;
+		}
 		var xhr = new XMLHttpRequest();
-		xhr.open('POST', sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex(), true);
+		xhr.open('POST', url, true);
 		xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
 		xhr.onreadystatechange = function() {
 			if (4 == this.readyState) {
@@ -1034,7 +1094,7 @@ function GetUploadInput(onchange) {
     input.setAttribute('name', inputName);
     input.setAttribute('type', 'file');
     input.setAttribute('accept', 'image/*');
-    input.setAttribute('style', 'position:absolute;left:-2px;top:-2px;width:1px;height:1px;z-index:-1000;');
+    input.setAttribute('style', 'position:absolute;left:-2px;top:-2px;width:1px;height:1px;z-index:-1000;cursor:pointer;');
     input.onchange = onchange;
     document.body.appendChild( input );
     return input;
@@ -1752,19 +1812,11 @@ var kCurFormatPainterWord = '';
 if (AscBrowser.isIE)
 // Пути указаны относительно html в меню, не надо их исправлять
 // и коммитить на пути относительно тестового меню
-	kCurFormatPainterWord = 'url(../../../sdk/Common/Images/text_copy.cur), pointer';
+	kCurFormatPainterWord = 'url(../../../../sdk/common/Images/text_copy.cur), pointer';
 else if (AscBrowser.isOpera)
 	kCurFormatPainterWord = 'pointer';
 else
 	kCurFormatPainterWord = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAATCAYAAACdkl3yAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJxJREFUeNrslGEOwBAMhVtxM5yauxnColWJzt+9pFkl9vWlBeac4VINYG4h3vueFUeKIHLOjRTsp+pdKaX6QY2jufripobpzRoB0ro6qdW5I+q3qGxowXONI9LACcBBBMYhA/RuFJxA+WnXK1CBJJg0kKMD2cc8hNKe25P9gxSy01VY3pjdhHYgCCG0RYyR5Bphpk8kMofHjh4BBgA9UXIXw7elTAAAAABJRU5ErkJggg==') 2 11, pointer";
-
-  function extendClass (Child, Parent) {
-    var F = function() { };
-    F.prototype = Parent.prototype;
-    Child.prototype = new F();
-    Child.prototype.constructor = Child;
-    Child.superclass = Parent.prototype;
-  }
 
 function asc_ajax (obj) {
 	var url = "", type = "GET",
@@ -2155,6 +2207,7 @@ CTableId.prototype.Read_Class_FromBinary = function(Reader)
         case AscDFH.historyitem_type_PropLocker               : Element = new AscCommonSlide.PropLocker(); break;
         case AscDFH.historyitem_type_Theme                    : Element = new AscFormat.CTheme(); break;
         case AscDFH.historyitem_type_GraphicFrame             : Element = new AscFormat.CGraphicFrame(); break;
+		case AscDFH.historyitem_type_Sparkline                : Element = new AscCommonExcel.sparklineGroup(false); break;
     }
 
     if ( null !== Element )
@@ -2481,6 +2534,17 @@ CContentChanges.prototype.Add = function(Changes)
 {
 	this.m_aChanges.push( Changes );
 };
+CContentChanges.prototype.RemoveByHistoryItem = function(Item)
+{
+	for (var nIndex = 0, nCount = this.m_aChanges.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.m_aChanges[nIndex].m_pData === Item)
+		{
+			this.m_aChanges.splice(nIndex, 1);
+			return;
+		}
+	}
+};
 CContentChanges.prototype.Clear = function()
 {
 	this.m_aChanges.length = 0;
@@ -2751,7 +2815,6 @@ window["SetDoctRendererParams"] = function(_params)
   window["AscCommon"].CanDropFiles = CanDropFiles;
   window["AscCommon"].getUrlType = getUrlType;
   window["AscCommon"].prepareUrl = prepareUrl;
-  window["AscCommon"].extendClass = extendClass;
   window["AscCommon"].getUserColorById = getUserColorById;
   window["AscCommon"].isNullOrEmptyString = isNullOrEmptyString;
 

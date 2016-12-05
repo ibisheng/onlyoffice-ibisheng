@@ -45,6 +45,15 @@ var ORIENTATION_MIN_MAX = AscFormat.ORIENTATION_MIN_MAX;
 var globalBasePercent = 100;
 var global3DPersperctive = 30; // ToDo а нужна ли она в ChartsDrawer ?
 
+var c_oChartFloorPosition =
+{
+	None: 0,
+	Left: 1,
+	Right: 2,
+	Bottom: 3,
+	Top: 4
+};
+
 /** @constructor */
 function Processor3D(width, height, left, right, bottom, top, chartSpace, chartsDrawer) {
 	this.widthCanvas = width;
@@ -81,11 +90,17 @@ function Processor3D(width, height, left, right, bottom, top, chartSpace, charts
 	this.angleOy = this.view3D && this.view3D.rotY ? (- this.view3D.rotY / 360) * (Math.PI * 2) : 0;
 	this.angleOz = this.view3D && this.view3D.rotZ ? (- this.view3D.rotZ / 360) * (Math.PI * 2) : 0;
 	
+	/*if(this.view3D.rAngAx && this.view3D.rotX < 0)
+	{	
+		this.angleOx = - this.angleOx;
+		this.angleOy = - this.angleOy;
+	}*/
+	
 	this.orientationCatAx = null;
 	this.orientationValAx = null;
 }
 
-Processor3D.prototype.calaculate3DProperties = function(baseDepth, gapDepth, isTest)
+Processor3D.prototype.calaculate3DProperties = function(baseDepth, gapDepth, bIsCheck)
 {
 	this.calculateCommonOptions();
 	
@@ -109,11 +124,15 @@ Processor3D.prototype.calaculate3DProperties = function(baseDepth, gapDepth, isT
 		this._calculateScaleFromDepth();
 	
 	//сдвиг камеры для того, чтобы попали все линии
-	if(!isTest)
+	if(!bIsCheck)
+	{
 		this._calculateCameraDiff();
-	
-	if(!isTest && this.view3D.rAngAx)
-		this._recalculateScaleWithMaxWidth();
+		
+		if(this.view3D.rAngAx)
+		{
+			this._recalculateScaleWithMaxWidth();
+		}
+	}
 };
 
 Processor3D.prototype.calculateCommonOptions = function()
@@ -130,7 +149,7 @@ Processor3D.prototype._calculateAutoHPercent = function()
 	if(this.hPercent == null)
 	{
 		this.hPercent = this.view3D.hPercent === null ? (heightLine / widthLine) : this.view3D.hPercent / 100;
-		if(this.chartsDrawer.calcProp.type === "HBar" && this.view3D.hPercent === null && this.view3D.rAngAx)
+		if(this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar && ((this.view3D.hPercent === null && this.view3D.rAngAx) || (this.view3D.hPercent !== null && !this.view3D.rAngAx)))
 			this.hPercent = 1 / this.hPercent;
 	}
 };
@@ -145,14 +164,15 @@ Processor3D.prototype._recalculateScaleWithMaxWidth = function()
     var optimalWidth = heightLine * 10;
 	
 	var subType = this.chartsDrawer.calcProp.subType;
-	var isStandardType = !!(subType === "standard" || this.chartsDrawer.calcProp.type === "Line" || this.chartsDrawer.calcProp.type === "Area" && subType === "normal");
+	var type = this.chartsDrawer.calcProp.type;
+	var isStandardType = !!(subType === "standard" || type === AscFormat.c_oChartTypes.Line || type === AscFormat.c_oChartTypes.Area && subType === "normal");
 
     var optimalWidthLine, kF;
 	if(!isStandardType)
 	{
 		this.widthCanvas = optimalWidth + (this.left + this.right);
 		this._calculateScaleNStandard();
-		optimalWidthLine = this.depthPerspective * Math.sin(-this.angleOy) + ((this.widthCanvas - (this.left + this.right)) / this.aspectRatioX) / this.scaleX;
+		optimalWidthLine = Math.abs(this.depthPerspective * Math.sin(-this.angleOy)) + ((this.widthCanvas - (this.left + this.right)) / this.aspectRatioX) / this.scaleX;
 		kF = optimalWidthLine / widthLine;
 		
 		if(optimalWidthLine < widthLine)
@@ -162,7 +182,7 @@ Processor3D.prototype._recalculateScaleWithMaxWidth = function()
 		}
 		else
 		{
-			this.aspectRatioX = widthLine / ((optimalWidthLine - this.depthPerspective*Math.sin(-this.angleOy))/kF);
+			this.aspectRatioX = widthLine / ((optimalWidthLine - Math.abs(this.depthPerspective * Math.sin(-this.angleOy))) / kF);
 			this.scaleY = this.scaleY * kF;
 			this.scaleZ = this.scaleZ * kF;
 			
@@ -170,33 +190,9 @@ Processor3D.prototype._recalculateScaleWithMaxWidth = function()
 		}
 
 		this._recalculateCameraDiff();
-		return;
-	}
-	
-	//TODO протестировать, и если не будет проблем, то убрать if-else
-	if(this.angleOy != 0)
-	{
-		if(this.depthPerspective * Math.sin(-this.angleOy) + ((this.widthCanvas - (this.left + this.right)) / this.aspectRatioX) / this.scaleX <= widthLine)
-			return;
-		
-		//рассчитываем параметры диаграммы при оптимальной ширине
-		this.widthCanvas = optimalWidth + (this.left + this.right);
-		this.calaculate3DProperties(null, null, true);
-		optimalWidthLine = this.depthPerspective * Math.sin(-this.angleOy) + ((this.widthCanvas - (this.left + this.right)) / this.aspectRatioX) / this.scaleX;
-		kF = optimalWidthLine / widthLine;
-		
-		this.aspectRatioX = widthLine / ((optimalWidthLine - this.depthPerspective*Math.sin(-this.angleOy))/kF);
-		this.scaleY = this.scaleY * kF;
-		this.scaleZ = this.scaleZ * kF;
-		
-		this.widthCanvas = widthCanvas;
-		
-		this._recalculateCameraDiff();
 	}
 	else
 	{
-		//рассчитываем параметры диаграммы при оптимальной ширине
-		this.widthCanvas = optimalWidth + (this.left + this.right);
 		var scaleX = this.scaleX;
 		var scaleY = this.scaleY;
 		var scaleZ = this.scaleZ;
@@ -205,33 +201,72 @@ Processor3D.prototype._recalculateScaleWithMaxWidth = function()
 		var aspectRatioY = this.aspectRatioY;
 		var aspectRatioZ = this.aspectRatioZ;
 		
-		this.calaculate3DProperties(null, null, true);
-		optimalWidthLine = this.depthPerspective * Math.sin(-this.angleOy) + ((this.widthCanvas - (this.left + this.right)) / this.aspectRatioX) / this.scaleX;
-		
-		
-		if(optimalWidthLine < widthLine)
+		//если будут проблемы с поворотом standard диграмм, раскомментровать!
+		//TODO протестировать, и если не будет проблем, то убрать if-else
+		if(Math.abs(this.angleOy) > Math.PI)
 		{
+			//рассчитываем параметры диаграммы при оптимальной ширине
+			this.widthCanvas = optimalWidth + (this.left + this.right);
+			
+			this.calaculate3DProperties(null, null, true);
+			
+			var newDepth = Math.abs(this.depthPerspective * Math.sin(-this.angleOy));
+			optimalWidthLine =  newDepth + ((this.widthCanvas - (this.left + this.right)) / this.aspectRatioX) / this.scaleX;
+			kF = optimalWidthLine / widthLine;
+			
+			if(optimalWidthLine < widthLine)
+			{
+				this.widthCanvas = widthCanvas;
+				this.scaleX = scaleX;
+				this.scaleY = scaleY;
+				this.scaleZ = scaleZ;
+				
+				this.aspectRatioX = aspectRatioX;
+				this.aspectRatioY = aspectRatioY;
+				this.aspectRatioZ = aspectRatioZ;
+				
+				return;
+			}
+			
+			this.aspectRatioX = widthLine / ((optimalWidthLine - newDepth) / kF);
+			this.scaleY = this.scaleY * kF;
+			this.scaleZ = this.scaleZ * kF;
+			
 			this.widthCanvas = widthCanvas;
-			this.scaleX = scaleX;
-			this.scaleY = scaleY;
-			this.scaleZ = scaleZ;
 			
-			this.aspectRatioX = aspectRatioX;
-			this.aspectRatioY = aspectRatioY;
-			this.aspectRatioZ = aspectRatioZ;
-			
-			return;
+			this._recalculateCameraDiff();
 		}
-		
-		
-		kF = optimalWidthLine / widthLine;
-		this.aspectRatioX = widthLine / ((optimalWidthLine - this.depthPerspective*Math.sin(-this.angleOy))/kF);
-		this.scaleY = this.scaleY * kF;
-		this.scaleZ = this.scaleZ * kF;
-		
-		this.widthCanvas = widthCanvas;
-		
-		this._recalculateCameraDiff();
+		else
+		{
+			//рассчитываем параметры диаграммы при оптимальной ширине
+			this.widthCanvas = optimalWidth + (this.left + this.right);
+			this.calaculate3DProperties(null, null, true);
+			
+			optimalWidthLine = this.depthPerspective * Math.sin(-this.angleOy) + ((this.widthCanvas - (this.left + this.right)) / this.aspectRatioX) / this.scaleX;
+			
+			if(optimalWidthLine < widthLine)
+			{
+				this.widthCanvas = widthCanvas;
+				this.scaleX = scaleX;
+				this.scaleY = scaleY;
+				this.scaleZ = scaleZ;
+				
+				this.aspectRatioX = aspectRatioX;
+				this.aspectRatioY = aspectRatioY;
+				this.aspectRatioZ = aspectRatioZ;
+				
+				return;
+			}
+			
+			kF = optimalWidthLine / widthLine;
+			this.aspectRatioX = widthLine / ((optimalWidthLine - this.depthPerspective*Math.sin(-this.angleOy))/kF);
+			this.scaleY = this.scaleY * kF;
+			this.scaleZ = this.scaleZ * kF;
+			
+			this.widthCanvas = widthCanvas;
+			
+			this._recalculateCameraDiff();
+		}
 	}
 };
 
@@ -242,11 +277,11 @@ Processor3D.prototype._calculateScaleNStandard = function()
 	var widthLine = this.widthCanvas - (this.left + this.right);
 	var heightLine = this.heightCanvas - (this.top + this.bottom);
 	
-	var trueDepth = this.depthPerspective * Math.sin(-this.angleOx);
+	var trueDepth = Math.abs(this.depthPerspective * Math.sin(-this.angleOx));
 	var mustHeight = heightLine - trueDepth;
-	var mustWidth = this.chartsDrawer.calcProp.type === "HBar" ? mustHeight * this.hPercent : mustHeight / this.hPercent;
+	var mustWidth = this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar ? mustHeight * this.hPercent : mustHeight / this.hPercent;
 	
-	var areaStackedKf = this.chartsDrawer.calcProp.type === "Area" && this.chartsDrawer.calcProp.subType !== "normal" ?  (ptCount / ((ptCount - 1))) : 1;
+	var areaStackedKf = this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Area && this.chartsDrawer.calcProp.subType !== "normal" ?  (ptCount / ((ptCount - 1))) : 1;
 	
 	//без маштабирования
 	if(this.angleOy === 0)
@@ -296,12 +331,12 @@ Processor3D.prototype.calculateZPositionValAxis = function()
 		if((angleOyAbs >= Math.PI / 2 && angleOyAbs < Math.PI) ||  (angleOyAbs >= 3 * Math.PI / 2 && angleOyAbs < 2 * Math.PI))
 			result = this.depthPerspective;
 	}
-	else if(this.chartsDrawer.calcProp.type !== "HBar" && this.orientationCatAx !== ORIENTATION_MIN_MAX && this.depthPerspective !== undefined)
+	else if(this.chartsDrawer.calcProp.type !== AscFormat.c_oChartTypes.HBar && this.orientationCatAx !== ORIENTATION_MIN_MAX && this.depthPerspective !== undefined)
 	{
 		//if(this.chartSpace.chart.plotArea.valAx && this.chartSpace.chart.plotArea.valAx.yPoints && this.chartSpace.chart.plotArea.catAx.posY === this.chartSpace.chart.plotArea.valAx.yPoints[0].pos)
 			result = this.depthPerspective;
 	}
-	else if(this.chartsDrawer.calcProp.type === "HBar" && this.orientationCatAx !== ORIENTATION_MIN_MAX && this.depthPerspective !== undefined)
+	else if(this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar && this.orientationCatAx !== ORIENTATION_MIN_MAX && this.depthPerspective !== undefined)
 	{
 		//if(this.chartSpace.chart.plotArea.valAx && this.chartSpace.chart.plotArea.valAx.yPoints && this.chartSpace.chart.plotArea.catAx.posY === this.chartSpace.chart.plotArea.valAx.yPoints[0].pos)
 			result = this.depthPerspective;
@@ -317,12 +352,12 @@ Processor3D.prototype.calculateZPositionCatAxis = function()
 	{
 		result = Math.cos(this.angleOy) > 0 ? 0 : this.depthPerspective;
 	}
-	else if(this.chartsDrawer.calcProp.type !== "HBar" && this.orientationValAx !== ORIENTATION_MIN_MAX && this.depthPerspective !== undefined)
+	else if(this.chartsDrawer.calcProp.type !== AscFormat.c_oChartTypes.HBar && this.orientationValAx !== ORIENTATION_MIN_MAX && this.depthPerspective !== undefined)
 	{
 		if(this.chartSpace.chart.plotArea.valAx && this.chartSpace.chart.plotArea.valAx.yPoints && this.chartSpace.chart.plotArea.catAx.posY === this.chartSpace.chart.plotArea.valAx.yPoints[0].pos)
 			result = this.depthPerspective;
 	}
-	else if(this.chartsDrawer.calcProp.type === "HBar" && this.orientationValAx !== ORIENTATION_MIN_MAX && this.depthPerspective !== undefined)
+	else if(this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar && this.orientationValAx !== ORIENTATION_MIN_MAX && this.depthPerspective !== undefined)
 	{
 		result = this.depthPerspective;
 	}
@@ -330,10 +365,57 @@ Processor3D.prototype.calculateZPositionCatAxis = function()
 	return result;
 };
 
-
+Processor3D.prototype.calculateFloorPosition = function()
+{
+	var res;
+	
+	if(this.view3D.rAngAx)
+	{
+		if(this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar)
+		{	
+			var absOy = Math.abs(this.angleOy);
+			res = c_oChartFloorPosition.Left;
+			if(absOy > Math.PI)
+			{
+				res = c_oChartFloorPosition.Right;
+			}
+		}
+		else
+		{
+			res = c_oChartFloorPosition.Bottom;
+			if(this.angleOx > 0)
+			{
+				res = c_oChartFloorPosition.None;
+			}
+		}
+		
+	}
+	else
+	{
+		if(this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar)
+		{	
+			var absOy = Math.abs(this.angleOy);
+			res = c_oChartFloorPosition.Left;
+			if(absOy > Math.PI)
+			{
+				res = c_oChartFloorPosition.Right;
+			}
+		}
+		else
+		{
+			res = c_oChartFloorPosition.Bottom;
+			if(this.angleOx > 0)
+			{
+				res = c_oChartFloorPosition.None;
+			}
+		}
+	}
+	
+	return res;
+};
 
 //***functions for complete transformation point***
-Processor3D.prototype.convertAndTurnPoint = function(x, y, z, isNotProject)
+Processor3D.prototype.convertAndTurnPoint = function(x, y, z, isNScale, isNRotate, isNProject)
 {
 	var res = null;
 	
@@ -343,7 +425,7 @@ Processor3D.prototype.convertAndTurnPoint = function(x, y, z, isNotProject)
 	}
 	else
 	{
-		res = this.convertAndTurnPointPerspective(x, y, z, isNotProject);
+		res = this.convertAndTurnPointPerspective(x, y, z, isNScale, isNRotate, isNProject);
 	}
 	
 	return res;
@@ -354,103 +436,92 @@ Processor3D.prototype.convertAndTurnPointRAngAx = function(x, y, z)
 	var heightChart = this.heightCanvas - this.top - this.bottom;
 	var widthOriginalChart = this.widthCanvas - this.left - this.right;
 
-	//aspectRatio
-	if(this.view3D.rAngAx)
-	{
-		x = x / this.aspectRatioX;
-		y = y / this.aspectRatioY;
-	}
-	else
-	{
-		var aspectRatio = (widthOriginalChart) / (heightChart);
-		x = x / aspectRatio;
-	}
-	
-
-	x = x / this.scaleX;
-	y = y / this.scaleY;
-	z = z / this.scaleZ;
-	
 	var point3D = new Point3D(x, y, z, this);
+	this.scale(point3D);
 	
 	//diff
 	var centerXDiff = heightChart / 2 + this.left / 2;
 	var centerYDiff = heightChart / 2 + this.top;
 	var centerZDiff = this.depthPerspective / 2;
 	
-	
 	point3D.offset(-centerXDiff, -centerYDiff, -centerZDiff);
 	
 	//rotate
-	var matrixRotateAllAxis;
-	if(!this.view3D.rAngAx)
-		matrixRotateAllAxis = this._getMatrixRotateAllAxis();
-	else
-		matrixRotateAllAxis = this._shearXY();
-		
+	var matrixRotateAllAxis = this._shearXY();
 	point3D.multiplyPointOnMatrix1(matrixRotateAllAxis);
 	
 	// diff camera for charts write into rect
 	point3D.offset(this.cameraDiffX, this.cameraDiffY, this.cameraDiffZ);
-	
-	//project
-	var projectionPoint = point3D;
-	if(!this.view3D.rAngAx)
-	{
-		var projectiveMatrix = this._getPerspectiveProjectionMatrix(1 / (this.rPerspective));
-		projectionPoint = point3D.project(projectiveMatrix);
-	}
 	
 	//undiff
 	var specialReverseDiff = this.widthCanvas / 2 + (this.left - this.right) / 2;
-	projectionPoint.offset(specialReverseDiff, centerYDiff, centerZDiff);
+	point3D.offset(specialReverseDiff, centerYDiff, centerZDiff);
 	
-	return {x: projectionPoint.x, y: projectionPoint.y, z: z};
+	return {x: point3D.x, y: point3D.y, z: z};
 };
 
-Processor3D.prototype.convertAndTurnPointPerspective = function(x, y, z, isNotProject)
+Processor3D.prototype.convertAndTurnPointPerspective = function(x, y, z, isNScale, isNRotate, isNProject)
 {
-	//aspectRatio
-	x = x / this.aspectRatioX;
-	y = y / this.aspectRatioY;
-
-	x = x / this.scaleX;
-	y = y / this.scaleY;
-	z = z / this.scaleZ;
-	
 	var point3D = new Point3D(x, y, z, this);
 	
+	if(!isNScale)
+	{
+		this.scale(point3D);
+	}
+	
+	if(!isNRotate)
+	{
+		this.rotatePerspective(point3D);
+	}
+	
+	if(!isNProject)
+	{
+		this.projectPerspective(point3D);
+	}
+	
+	return {x: point3D.x, y: point3D.y, z: point3D.z};
+};
+
+Processor3D.prototype.scale = function(point3D)
+{
+	//aspectRatio
+	point3D.x = point3D.x / this.aspectRatioX;
+	point3D.y = point3D.y / this.aspectRatioY;
+
+	point3D.x = point3D.x / this.scaleX;
+	point3D.y = point3D.y / this.scaleY;
+	point3D.z = point3D.z / this.scaleZ;
+},
+
+
+Processor3D.prototype.rotatePerspective = function(point3D)
+{
 	//diff
-	var centerZDiff = this.depthPerspective / 2;
-	
-	point3D.offset((-this.widthCanvas / 2) / this.aspectRatioX, (-this.heightCanvas / 2) / this.aspectRatioY /** aspectRatio*/, 0);
-	
+	point3D.offset((-this.widthCanvas / 2) / this.aspectRatioX, (-this.heightCanvas / 2) / this.aspectRatioY, 0);
 	//rotate
-	var matrixRotateAllAxis;
-	if(!this.view3D.rAngAx)
-		matrixRotateAllAxis = this._getMatrixRotateAllAxis();
-	else
-		matrixRotateAllAxis = this._shearXY();
-		
+	var matrixRotateAllAxis = this._getMatrixRotateAllAxis();	
 	point3D.multiplyPointOnMatrix1(matrixRotateAllAxis);
+	
+	point3D.offset((this.widthCanvas / 2) / this.aspectRatioX, (this.heightCanvas / 2) / this.aspectRatioY, 0);
+};
+
+
+Processor3D.prototype.projectPerspective = function(point3D)
+{
+	//diff
+	point3D.offset((-this.widthCanvas / 2) / this.aspectRatioX, (-this.heightCanvas / 2) / this.aspectRatioY /** aspectRatio*/, 0);
 	
 	// diff camera for charts write into rect
 	point3D.offset(this.cameraDiffX, this.cameraDiffY, this.cameraDiffZ);
 	
 	//project
-	var projectionPoint = point3D;
-	if(!this.view3D.rAngAx && !isNotProject)
-	{
-		var projectiveMatrix = this._getPerspectiveProjectionMatrix(1 / (this.rPerspective));
-		projectionPoint = point3D.project(projectiveMatrix);
-	}
+	var projectiveMatrix = this._getPerspectiveProjectionMatrix(1 / (this.rPerspective));
+	point3D.project(projectiveMatrix);
 	
 	//undiff
 	var specialReverseDiffX = this.widthCanvas / 2 + (this.left - this.right) / 2;
 	var specialReverseDiffY = this.heightCanvas / 2 + (this.top - this.bottom) / 2; 
-	projectionPoint.offset(specialReverseDiffX, specialReverseDiffY, centerZDiff);
-	
-	return {x: projectionPoint.x, y: projectionPoint.y, z: projectionPoint.z};
+	point3D.offset(specialReverseDiffX, specialReverseDiffY, 0);
 };
 
 //functions for step transformation point
@@ -601,6 +672,12 @@ Processor3D.prototype.calculatePropertiesForPieCharts = function()
 		depth = depth / kF;
 	}
 	
+	//ToDo временная правка для круговой диграммы с углом поворота 0 градусов
+	if(0 === radius2)
+	{
+		radius2 = 1;
+	}
+	
 	return {radius1: radius1, radius2: radius2, depth: depth};
 };
 
@@ -658,7 +735,7 @@ Processor3D.prototype._getPerspectiveProjectionMatrix = function(fov)
 
 Processor3D.prototype.correctPointsPosition = function(chartSpace)
 {
-	if(this.chartsDrawer.calcProp.type === "Pie")
+	if(this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Pie)
 		return;
 	
 	var pxToMM = 1 / AscCommon.g_dKoef_pix_to_mm;
@@ -668,7 +745,7 @@ Processor3D.prototype.correctPointsPosition = function(chartSpace)
 	if(!xPoints)
 		xPoints = chartSpace.chart.plotArea && chartSpace.chart.plotArea.valAx ? chartSpace.chart.plotArea.valAx.xPoints : null;
 	
-	var coordYAxisOx = chartSpace.chart.plotArea.catAx.posY ? chartSpace.chart.plotArea.catAx.posY : chartSpace.chart.plotArea.catAx.yPos;
+	var coordYAxisOx = chartSpace.chart.plotArea.catAx.posY;
 	if(!coordYAxisOx)
 		coordYAxisOx = chartSpace.chart.plotArea.valAx.posY != undefined ? chartSpace.chart.plotArea.valAx.posY : chartSpace.chart.plotArea.valAx.posY;
 	
@@ -709,7 +786,7 @@ Processor3D.prototype.correctPointsPosition = function(chartSpace)
 		for(var i = 0; i < xPoints.length; i++)
 		{
 			var widthText = 0;
-			if(t.chartsDrawer.calcProp.type === "HBar" && valCatAx && valCatAx.labels && t.orientationCatAx !== ORIENTATION_MIN_MAX)
+			if(t.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar && valCatAx && valCatAx.labels && t.orientationCatAx !== ORIENTATION_MIN_MAX)
 				widthText = valCatAx.labels.extY * pxToMM;
 			
 			var point = t.convertAndTurnPoint(xPoints[i].pos * pxToMM, coordYAxisOx * pxToMM - widthText, z);
@@ -781,7 +858,7 @@ Processor3D.prototype.correctPointsPosition = function(chartSpace)
 	
 	if(xPoints)
 	{	
-		if(this.chartsDrawer.calcProp.type !== "HBar")
+		if(this.chartsDrawer.calcProp.type !== AscFormat.c_oChartTypes.HBar)
 			correctPointsOx(xPoints);
 		else
 			correctPointsOxHBar(xPoints);
@@ -789,7 +866,7 @@ Processor3D.prototype.correctPointsPosition = function(chartSpace)
 	
 	if(yPoints)
 	{
-		if(this.chartsDrawer.calcProp.type !== "HBar")
+		if(this.chartsDrawer.calcProp.type !== AscFormat.c_oChartTypes.HBar)
 			correctPointsOy(yPoints);
 		else
 			correctPointsOyHBar(yPoints);
@@ -803,7 +880,7 @@ Processor3D.prototype._calculatePerspective = function(view3D)
 	var perspective = view3D && view3D.perspective ? view3D.perspective : global3DPersperctive;
 	var alpha = perspective / 4;//в xml проиходит двойной угол(в параметрах ms стоит 40, приходит в xml 80)
 	//TODO this.top - this.bottom пересмотреть
-	var catt = ((heightLine / 2 + (this.top - this.bottom))) / Math.tan((alpha / 360) * (Math.PI * 2));
+	var catt = ((heightLine / 2 + (Math.abs(this.top - this.bottom)))) / Math.tan((alpha / 360) * (Math.PI * 2));
 	var rPerspective;
 	if(catt === 0)
 		rPerspective = 0;
@@ -819,26 +896,26 @@ Processor3D.prototype._calculateDepth = function()
 	var heightOriginalChart = this.heightCanvas - (this.top + this.bottom);
 	var subType = this.chartsDrawer.calcProp.subType;
 	var type = this.chartsDrawer.calcProp.type;
-	var defaultOverlap = (subType == "stacked" || subType == "stackedPer" || subType == "standard" || type == "Line" || type == "Area") ? 100 : 0;
+	var defaultOverlap = (subType == "stacked" || subType == "stackedPer" || subType == "standard" || type == AscFormat.c_oChartTypes.Line || type == AscFormat.c_oChartTypes.Area) ? 100 : 0;
 	var overlap       = this.chartSpace.chart.plotArea.chart.overlap ? (this.chartSpace.chart.plotArea.chart.overlap / 100) : (defaultOverlap / 100);
 	var gapWidth = this.chartSpace.chart.plotArea.chart.gapWidth != null ? (this.chartSpace.chart.plotArea.chart.gapWidth / 100) : (150 / 100);
-	var gapDepth = this.chartSpace.chart.plotArea.chart.gapDepth != null ? (this.chartSpace.chart.plotArea.chart.gapDepth / 100) : type === "Area" && subType !== "normal" ? 1 : (150 / 100);
+	var gapDepth = this.chartSpace.chart.plotArea.chart.gapDepth != null ? (this.chartSpace.chart.plotArea.chart.gapDepth / 100) : type === AscFormat.c_oChartTypes.Area && subType !== "normal" ? 1 : (150 / 100);
 	var basePercent = this.view3D && this.view3D.depthPercent ? this.view3D.depthPercent / 100 : globalBasePercent / 100;//процент от базовой глубины
 	var seriesCount = this.chartsDrawer.calcProp.seriesCount;
 	var ptCount = this.chartsDrawer.calcProp.ptCount;
-	var sinOx = Math.sin(-this.angleOx);
+	var sinOx = Math.abs(Math.sin(-this.angleOx));
 	var sinOy = Math.sin(-this.angleOy);
-	var hPercent = type == "HBar" ? 1 : this.hPercent;
+	var hPercent = type == AscFormat.c_oChartTypes.HBar ? 1 : this.hPercent;
 	var depthPercent = this.view3D.depthPercent !== null ? this.view3D.depthPercent / 100 : 1;
 	var t = this;
 	
-	var areaStackedKf = type === "Area" && subType !== "normal" ?  (ptCount / (2 * (ptCount - 1))) : 1;
+	var areaStackedKf = type === AscFormat.c_oChartTypes.Area && subType !== "normal" ?  (ptCount / (2 * (ptCount - 1))) : 1;
 	
 	var depth = 0;
 	var chartWidth = 0;
 	
 	var standardType = false;
-	if(subType == "standard" || type == "Line" || (type == "Area" && subType == "normal"))
+	if(subType == "standard" || type == AscFormat.c_oChartTypes.Line || (type == AscFormat.c_oChartTypes.Area && subType == "normal"))
 		standardType = true;
 	
 	var heightHPercent = heightOriginalChart / hPercent;
@@ -852,7 +929,7 @@ Processor3D.prototype._calculateDepth = function()
 		{
 			chartWidth = widthOneBar + heightHPercent;
 		}
-		else if(this.angleOx !== 0/* && this.angleOy !== 0*/)//AngleOYNoAut + AngleOYNoAutPerHeight + (ANGLEOX+ANGLEOY) + AngleOYOXNoAut + ANGLEOXANGLEOYHPerDPer(ANGLEOX+ANGLEOY HPercent)
+		else if(this.angleOx !== 0)//AngleOYNoAut + AngleOYNoAutPerHeight + (ANGLEOX+ANGLEOY) + AngleOYOXNoAut + ANGLEOXANGLEOYHPerDPer(ANGLEOX+ANGLEOY HPercent)
 		{
 			//если выставить ширину 255 будет так же, как и в документе с расчётами
 			b = (seriesCount - (seriesCount - 1) * overlap + gapWidth);
@@ -869,7 +946,7 @@ Processor3D.prototype._calculateDepth = function()
 			var widthChart = (widthOriginalChart / t.aspectRatioX) / t.specialStandardScaleX;
 
 			b = (seriesCount - (seriesCount - 1) * overlap + gapWidth);
-			if(subType == "standard" || type == "Line" || type == "Area")
+			if(subType == "standard" || type == AscFormat.c_oChartTypes.Line || type == AscFormat.c_oChartTypes.Area)
 				b = b / seriesCount;
 			
 			angleOxKf = sinOx === 0 ? 1 : sinOx;
@@ -883,7 +960,7 @@ Processor3D.prototype._calculateDepth = function()
 	{
 		angleOxKf = sinOx === 0 ? 0 : sinOx;
 		
-		if(type == "Area")
+		if(type == AscFormat.c_oChartTypes.Area)
 			depth = (depthPercent / (angleOxKf*depthPercent + ((ptCount + (Math.floor((seriesCount - ptCount) / 2 - 0.5))) / seriesCount * hPercent))) * (heightOriginalChart);
 		else
 			depth = (depthPercent / (angleOxKf*depthPercent + ((ptCount + (Math.floor((seriesCount - ptCount) / 2))) / seriesCount * hPercent))) * (heightOriginalChart);
@@ -892,7 +969,7 @@ Processor3D.prototype._calculateDepth = function()
 			depth = depth * Math.sin(-this.angleOx);
 	}
 	
-	return sinOx !== 0 ? depth / Math.sin(-this.angleOx) : depth;
+	return sinOx !== 0 ? Math.abs(depth / sinOx) : Math.abs(depth);
 };
 
 Processor3D.prototype._calculateDepthPerspective = function()
@@ -907,15 +984,17 @@ Processor3D.prototype._calculateDepthPerspective = function()
 	var seriesCount = this.chartsDrawer.calcProp.seriesCount;
 	
 	var width = widthChart / this.chartsDrawer.calcProp.ptCount;
-
-	var defaultOverlap = (this.chartsDrawer.calcProp.subType == "stacked" || this.chartsDrawer.calcProp.subType == "stackedPer" || this.chartsDrawer.calcProp.subType == "standard" || this.chartsDrawer.calcProp.type == "Line") ? 100 : 0;
+	
+	var isNormalArea = !!(this.chartsDrawer.calcProp.subType == "normal" && this.chartsDrawer.calcProp.type == AscFormat.c_oChartTypes.Area);
+	
+	var defaultOverlap = (this.chartsDrawer.calcProp.subType == "stacked" || this.chartsDrawer.calcProp.subType == "stackedPer" || this.chartsDrawer.calcProp.subType == "standard" || this.chartsDrawer.calcProp.type == AscFormat.c_oChartTypes.Line || isNormalArea) ? 100 : 0;
 	var overlap       = this.chartSpace.chart.plotArea.chart.overlap ? (this.chartSpace.chart.plotArea.chart.overlap / 100) : (defaultOverlap / 100);
 	
 	var gapWidth = this.chartSpace.chart.plotArea.chart.gapWidth != null ? (this.chartSpace.chart.plotArea.chart.gapWidth / 100) : (150 / 100);
 	var gapDepth = this.chartSpace.chart.plotArea.chart.gapDepth != null ? (this.chartSpace.chart.plotArea.chart.gapDepth / 100) : (150 / 100);
 	
 	var baseDepth = width / (seriesCount - (seriesCount - 1) * overlap + gapWidth);
-	if(this.chartsDrawer.calcProp.subType == "standard" || this.chartsDrawer.calcProp.type == "Line")
+	if(this.chartsDrawer.calcProp.subType == "standard" || this.chartsDrawer.calcProp.type == AscFormat.c_oChartTypes.Line || isNormalArea)
 		baseDepth = (width / (seriesCount - (seriesCount - 1) * overlap + gapWidth)) * seriesCount;
 		
 	//РїСЂРѕС†РµРЅС‚ РѕС‚ Р±Р°Р·РѕРІРѕР№ РіР»СѓР±РёРЅС‹
@@ -923,13 +1002,13 @@ Processor3D.prototype._calculateDepthPerspective = function()
 	var depth = baseDepth * basePercent;
 	depth = depth + depth * gapDepth;
 	
-	if(this.chartsDrawer.calcProp.type === "HBar" && this.hPercent !== null)
+	if(this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar && this.hPercent !== null)
 	{
 		depth = this.hPercent * depth;
 	}
 	
 	//TODO глубина в некоторых случаях отличается(тип Standard)
-	if(this.chartsDrawer.calcProp.subType === "standard" || this.chartsDrawer.calcProp.type === "Line")
+	if(this.chartsDrawer.calcProp.subType === "standard" || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Line || isNormalArea)
 	{
 		var b = 1 / seriesCount;
 		
@@ -946,7 +1025,7 @@ Processor3D.prototype._calculateDepthPerspective = function()
 
 Processor3D.prototype._calcSpecialStandardScaleX = function()
 {
-	if(!(this.chartsDrawer.calcProp.subType == "standard" || this.chartsDrawer.calcProp.type == "Line"))
+	if(!(this.chartsDrawer.calcProp.subType == "standard" || this.chartsDrawer.calcProp.type == AscFormat.c_oChartTypes.Line || (this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Area && this.chartsDrawer.calcProp.subType == "normal")))
 		return;
 	
 	//calculate width in 3d standard charts with rAngAx
@@ -964,15 +1043,14 @@ Processor3D.prototype._calculateScaleFromDepth = function (/*isSkip*/)
 		var heightCanvas = this.heightCanvas;
 		var heightChart = heightCanvas - this.top - this.bottom;
 		
-		this.scaleY = heightChart / (this.depthPerspective * Math.sin(this.angleOx) + heightChart);
-		
+		this.scaleY = heightChart / (-this.depthPerspective * Math.sin(Math.abs(this.angleOx)) + heightChart);
 		//меняется ширина в зависимости от количества значений
 		//if(this.chartsDrawer.calcProp.subType == "standard")
 			//this.scaleX += parseInt((this.chartsDrawer.calcProp.seriesCount  + 1) / 2) - 1;
 		
 		var subType = this.chartsDrawer.calcProp.subType;
         var newDepth, newWidth;
-		if(!(subType == "standard" || this.chartsDrawer.calcProp.type === "Line" || (this.chartsDrawer.calcProp.type === "Area" && subType == "normal")))
+		if(!(subType == "standard" || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Line || (this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Area && subType == "normal")))
 		{
             newDepth = this.depthPerspective * Math.sin(-this.angleOx);
             newWidth = heightChart - newDepth;
@@ -1030,9 +1108,9 @@ Processor3D.prototype._calculateCameraDiff = function (/*isSkip*/)
 		var minMaxOx = this._getMinMaxOx(points, faces);
 		this._calculateCameraDiffX(minMaxOx);
 	
-	//***Calculate cameraDiffY***
-	var minMaxOy = this._getMinMaxOy(points, faces);
-	this._calculateCameraDiffY(minMaxOy.top, minMaxOy.bottom);
+		//***Calculate cameraDiffY***
+		var minMaxOy = this._getMinMaxOy(points, faces);
+		this._calculateCameraDiffY(minMaxOy.top, minMaxOy.bottom);
 	}
 };
 
@@ -2232,13 +2310,13 @@ Processor3D.prototype._calcAspectRatio = function()
 	var aspectRatioY = 1;
 	
 	var subType = this.chartsDrawer.calcProp.subType;
-	if((subType === "standard"  || this.chartsDrawer.calcProp.type === "Line") && !this.view3D.rAngAx)
+	if((subType === "standard"  || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Line  || (this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Area && subType == "normal")) && !this.view3D.rAngAx)
 	{
 		this._calcSpecialStandardScaleX();
 		
 		aspectRatioX = (widthOriginalChart / (heightOriginalChart / hPercent)) * this.specialStandardScaleX;
 	}
-	else if(subType === "standard" || this.chartsDrawer.calcProp.type === "Line" || (this.chartsDrawer.calcProp.type === "Area" && subType == "normal"))
+	else if(subType === "standard" || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Line)
 	{
 		var seriesCount = this.chartsDrawer.calcProp.seriesCount;
 		var ptCount = this.chartsDrawer.calcProp.ptCount;
@@ -2385,4 +2463,5 @@ Point3D.prototype =
 	window['AscFormat'] = window['AscFormat'] || {};
 	window['AscFormat'].Processor3D = Processor3D;
 	window['AscFormat'].Point3D = Point3D;
+	window['AscCommon'].c_oChartFloorPosition = c_oChartFloorPosition;
 })(window);

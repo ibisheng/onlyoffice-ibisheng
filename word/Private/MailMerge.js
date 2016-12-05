@@ -152,13 +152,10 @@ Asc['asc_docs_api'].prototype.asc_sendMailMergeData = function(oData)
     this._downloadAs("sendmm", Asc.c_oAscFileType.TXT, actionType, options, function(input) {
         if (null != input && "sendmm" == input["type"])
         {
-            if ("ok" == input["status"])
+            if ("ok" != input["status"])
             {
-                ;
-            }
-            else
-            {
-                t.sendEvent("asc_onError", AscCommon.mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+                t.sendEvent("asc_onError", AscCommon.mapAscServerErrorToAscError(parseInt(input["data"])),
+                    c_oAscError.Level.NoCritical);
             }
         }
         else

@@ -393,6 +393,10 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(options)
         {
             var old_range = options.getRange();
             options.putRange(null);
+            options.style = null;
+            this.editChartCallback(options);
+            options.style = 1;
+            options.bCreate = true;
             this.editChartCallback(options);
             options.putRange(old_range);
         }

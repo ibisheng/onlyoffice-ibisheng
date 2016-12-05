@@ -446,7 +446,7 @@
 			}
 
 			this.handlers.trigger("changeSelection", /*isStartPoint*/false, coord.x, coord.y,
-				/*isCoord*/true, /*isSelectMode*/isSelectMode,
+				/*isCoord*/true, /*isSelectMode*/isSelectMode, false,
 				function (d) {
 					t.scroll(d);
 
@@ -607,7 +607,7 @@
 					if (!d) return;
 					t.scroll(d);
 					asc_applyFunction(callback);
-				}, event.metaKey || event.ctrlKey);
+				});
 		};
 
 		/**
@@ -820,7 +820,7 @@
 					stop();
 					// Обработать как спец селект
 					if (ctrlKey && shiftKey) {
-						t.handlers.trigger("changeSelection", /*isStartPoint*/true, 0, 0, /*isCoord*/true, /*isSelectMode*/false);
+						t.handlers.trigger("changeSelection", /*isStartPoint*/true, 0, 0, /*isCoord*/true, /*isSelectMode*/false, false);
 					} else if (ctrlKey) {
 						t.handlers.trigger("selectColumnsByRange");
 					} else {
@@ -940,7 +940,7 @@
 								t.handlers.trigger("setFontAttributes", "s");
 							}, 65: function () {
 								t.handlers.trigger("changeSelection", /*isStartPoint*/true, -1, -1, /*isCoord*/true, /*isSelectMode*/
-									false);
+									false, false);
 							}, 66: function () {
 								t.handlers.trigger("setFontAttributes", "b");
 							}, 73: function () {
@@ -1011,7 +1011,7 @@
 					}
 
 					t.handlers.trigger("changeSelection", /*isStartPoint*/!shiftKey, dc, dr, /*isCoord*/false, /*isSelectMode*/
-						false, function (d) {
+						false, false, function (d) {
 							t.scroll(d);
 
 							if (t.isFormulaEditMode) {
@@ -1213,15 +1213,18 @@
 
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseDown = function (event) {
-			if (AscCommon.g_inputContext)
+			if (AscCommon.g_inputContext) {
 				AscCommon.g_inputContext.externalChangeFocus();
-			
+			}
+
 			var t = this;
+			var ctrlKey = event.metaKey || event.ctrlKey;
 			var coord = t._getCoordinates(event);
 			event.isLocked = t.isMousePressed = true;
 
-			if (t.handlers.trigger("isGlobalLockEditCell"))
+			if (t.handlers.trigger("isGlobalLockEditCell")) {
 				return;
+			}
 
 			if (!this.enableKeyEvents) {
 				t.handlers.trigger("canvasClick");
@@ -1229,35 +1232,40 @@
 
 			// Shapes
 			var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
-			if ( asc["editor"].isStartAddShape || graphicsInfo ) {
+			if (asc["editor"].isStartAddShape || graphicsInfo) {
 				// При выборе диапазона не нужно выделять автофигуру
-				if (t.isSelectionDialogMode)
+				if (t.isSelectionDialogMode) {
 					return;
+				}
 
-				if (this.handlers.trigger("getCellEditMode") && !this.handlers.trigger("stopCellEditing"))
+				if (this.handlers.trigger("getCellEditMode") && !this.handlers.trigger("stopCellEditing")) {
 					return;
+				}
 
 				t.isShapeAction = true;
-                t.isUpOnCanvas = false;
+				t.isUpOnCanvas = false;
 
 
 				t.clickCounter.mouseDownEvent(coord.x, coord.y, event.button);
 				event.ClickCount = t.clickCounter.clickCount;
-				if (0 === event.ClickCount % 2)
+				if (0 === event.ClickCount % 2) {
 					t.isDblClickInMouseDown = true;
-				
+				}
+
 				t.handlers.trigger("graphicObjectMouseDown", event, coord.x, coord.y);
 				t.handlers.trigger("updateSelectionShape", /*isSelectOnShape*/true);
 				return;
-			} else
+			} else {
 				t.isShapeAction = false;
+			}
 
 			if (2 === event.detail) {
 				// Это означает, что это MouseDown для dblClick эвента (его обрабатывать не нужно)
 				// Порядок эвентов для dblClick - http://javascript.ru/tutorial/events/mouse#dvoynoy-levyy-klik
 
 				// Проверка для IE, т.к. он присылает DblClick при сдвиге мыши...
-				if (this.mouseDownLastCord && coord.x === this.mouseDownLastCord.x && coord.y === this.mouseDownLastCord.y && 0 === event.button && !this.handlers.trigger('isFormatPainter')) {
+				if (this.mouseDownLastCord && coord.x === this.mouseDownLastCord.x && coord.y === this.mouseDownLastCord.y &&
+					0 === event.button && !this.handlers.trigger('isFormatPainter')) {
 					// Выставляем, что мы уже сделали dblClick (иначе вдруг браузер не поддерживает свойство detail)
 					this.isDblClickInMouseDown = true;
 					// Нам нужно обработать эвент браузера о dblClick (если мы редактируем ячейку, то покажем курсор, если нет - то просто ничего не произойдет)
@@ -1270,14 +1278,18 @@
 			}
 			// Для IE preventDefault делать не нужно
 			if (!(AscBrowser.isIE || AscBrowser.isOpera)) {
-				if (event.preventDefault)
+				if (event.preventDefault) {
 					event.preventDefault();
-				else
+				} else {
 					event.returnValue = false;
+				}
 			}
 
-			if (!this.targetInfo)
-				this.handlers.trigger("updateWorksheet", this.element, coord.x, coord.y, false, function (info){t.targetInfo = info;});
+			if (!this.targetInfo) {
+				this.handlers.trigger("updateWorksheet", this.element, coord.x, coord.y, false, function (info) {
+					t.targetInfo = info;
+				});
+			}
 
 			// Запоминаем координаты нажатия
 			this.mouseDownLastCord = coord;
@@ -1289,7 +1301,7 @@
 					t._changeSelection(event, /*isSelectMode*/true);
 					return;
 				}
-				if (t.targetInfo){
+				if (t.targetInfo) {
 					if (t.targetInfo.target === c_oTargetType.ColumnResize || t.targetInfo.target === c_oTargetType.RowResize) {
 						t.isResizeMode = true;
 						t._resizeElement(event);
@@ -1305,11 +1317,11 @@
 						t._moveRangeHandle(event);
 						return;
 					} else if (t.targetInfo.target === c_oTargetType.FilterObject && 0 === event.button) {
-						  t._autoFiltersClick(t.targetInfo.idFilter);
-						  return;
+						t._autoFiltersClick(t.targetInfo.idFilter);
+						return;
 					} else if (undefined !== t.targetInfo.commentIndexes && false === this.settings.isViewerMode) {
 						t._commentCellClick(event);
-					} else if (t.targetInfo.target === c_oTargetType.MoveResizeRange && false === this.settings.isViewerMode ){
+					} else if (t.targetInfo.target === c_oTargetType.MoveResizeRange && false === this.settings.isViewerMode) {
 						this.isMoveResizeRange = true;
 						t._moveResizeRangeHandle(event, t.targetInfo);
 						return;
@@ -1323,7 +1335,9 @@
 				}
 			} else {
 				if (!t.isFormulaEditMode) {
-					if (!t.handlers.trigger("stopCellEditing")) {return;}
+					if (!t.handlers.trigger("stopCellEditing")) {
+						return;
+					}
 				} else {
 					if (event.shiftKey) {
 						t.isSelectMode = true;
@@ -1332,27 +1346,31 @@
 					} else {
 						if (t.isFormulaEditMode) {
 							// !!! в зависимости от цели делаем разные действия - либо селектим область либо мувим существующий диапазон
-							if ( t.targetInfo && t.targetInfo.target === c_oTargetType.MoveResizeRange && false === this.settings.isViewerMode ){
+							if (t.targetInfo && t.targetInfo.target === c_oTargetType.MoveResizeRange &&
+								false === this.settings.isViewerMode) {
 								this.isMoveResizeRange = true;
 								t._moveResizeRangeHandle(event, t.targetInfo);
 								return;
 							} else if (false === t.handlers.trigger("canEnterCellRange")) {
 								// для определения рэнджа под курсором и активизации его для WorksheetView
-								if (!t.handlers.trigger("stopCellEditing")) {return;}
+								if (!t.handlers.trigger("stopCellEditing")) {
+									return;
+								}
 							}
 						}
 						t.isSelectMode = true;
-						t.handlers.trigger("changeSelection", /*isStartPoint*/true, coord.x, coord.y,
-								/*isCoord*/true, /*isSelectMode*/true,
-								function (d) {
-									t.scroll(d);
+						t.handlers.trigger("changeSelection", /*isStartPoint*/true, coord.x, coord.y, /*isCoord*/true,
+							/*isSelectMode*/true, ctrlKey, function (d) {
+								t.scroll(d);
 
-									if (t.isFormulaEditMode) {
-										t.handlers.trigger("enterCellRange");
-									} else if (t.handlers.trigger("getCellEditMode")) {
-										if (!t.handlers.trigger("stopCellEditing")) {return;}
+								if (t.isFormulaEditMode) {
+									t.handlers.trigger("enterCellRange");
+								} else if (t.handlers.trigger("getCellEditMode")) {
+									if (!t.handlers.trigger("stopCellEditing")) {
+										return;
 									}
-								});
+								}
+							});
 						return;
 					}
 				}
@@ -1362,14 +1380,14 @@
 			if (2 === event.button) {
 				t.handlers.trigger("changeSelectionRightClick", coord.x, coord.y);
 			} else {
-				if (t.targetInfo && t.targetInfo.target === c_oTargetType.FillHandle  && false === this.settings.isViewerMode){
+				if (t.targetInfo && t.targetInfo.target === c_oTargetType.FillHandle && false === this.settings.isViewerMode) {
 					// В режиме автозаполнения
 					t.isFillHandleMode = true;
 					t._changeFillHandle(event);
 				} else {
 					t.isSelectMode = true;
-					t.handlers.trigger("changeSelection", /*isStartPoint*/true, coord.x,
-						coord.y, /*isCoord*/true, /*isSelectMode*/true);
+					t.handlers.trigger("changeSelection", /*isStartPoint*/true, coord.x, coord.y, /*isCoord*/true,
+						/*isSelectMode*/true, ctrlKey);
 				}
 			}
 		};
@@ -1519,7 +1537,8 @@
 
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseWheel = function (event) {
-			if (this.isFillHandleMode || this.isMoveRangeMode || this.isMoveResizeRange) {
+			var ctrlKey = event.metaKey || event.ctrlKey;
+			if (this.isFillHandleMode || this.isMoveRangeMode || this.isMoveResizeRange || ctrlKey) {
 				return true;
 			}
 
@@ -1584,7 +1603,6 @@
 				x <<= 1;
 				y <<= 1;
 			}
-
 
 			return {x: x, y: y};
 		};

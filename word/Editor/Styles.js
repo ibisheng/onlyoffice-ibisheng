@@ -3920,6 +3920,47 @@ CStyle.prototype =
         }
     }
 };
+CStyle.prototype.CreateFootnoteText = function()
+{
+	var oParaPr = {
+		Spacing : {
+			After    : 0,
+			Line     : 1,
+			LineRule : linerule_Auto
+		}
+	};
+
+	var oTextPr = {
+		FontSize : 10
+	};
+
+	this.Set_UiPriority(99);
+	this.Set_SemiHidden(true);
+	this.Set_UnhideWhenUsed(true);
+	this.Set_TextPr(oTextPr);
+	this.Set_ParaPr(oParaPr);
+};
+CStyle.prototype.CreateFootnoteTextChar = function()
+{
+	var oTextPr = {
+		FontSize : 10
+	};
+
+	this.Set_UiPriority(99);
+	this.Set_SemiHidden(true);
+	this.Set_TextPr(oTextPr);
+};
+CStyle.prototype.CreateFootnoteReference = function()
+{
+	var oTextPr = {
+		VertAlign : AscCommon.vertalign_SuperScript
+	};
+
+	this.Set_UiPriority(99);
+	this.Set_SemiHidden(true);
+	this.Set_UnhideWhenUsed(true);
+	this.Set_TextPr(oTextPr);
+};
 
 function CStyles(bCreateDefault)
 {
@@ -3928,24 +3969,27 @@ function CStyles(bCreateDefault)
         this.Id = AscCommon.g_oIdCounter.Get_NewId();
         this.Lock = new AscCommon.CLock();
 
-        this.Default =
-        {
-            ParaPr      : new CParaPr(),
-            TextPr      : new CTextPr(),
-            TablePr     : new CTablePr(),
-            TableRowPr  : new CTableRowPr(),
-            TableCellPr : new CTableCellPr(),
-            Paragraph : null,
-            Character : null,
-            Numbering : null,
-            Table     : null,
-            TableGrid : null,
-            Headings  : [],
-            ParaList  : null,
-            Header    : null,
-            Footer    : null,
-            Hyperlink : null
-        };
+		this.Default = {
+			ParaPr      : new CParaPr(),
+			TextPr      : new CTextPr(),
+			TablePr     : new CTablePr(),
+			TableRowPr  : new CTableRowPr(),
+			TableCellPr : new CTableCellPr(),
+
+			Paragraph         : null,
+			Character         : null,
+			Numbering         : null,
+			Table             : null,
+			TableGrid         : null,
+			Headings          : [],
+			ParaList          : null,
+			Header            : null,
+			Footer            : null,
+			Hyperlink         : null,
+			FootnoteText      : null,
+			FootnoteTextChar  : null,
+			FootnoteReference : null
+		};
 
         // Заполняем значения по умолчанию
         this.Default.ParaPr.Init_Default();
@@ -4170,39 +4214,58 @@ function CStyles(bCreateDefault)
         Style_Hyperlink.Create_Character_Hyperlink();
         this.Default.Hyperlink = this.Add( Style_Hyperlink );
 
+		// Создаем стили для сносок
+		var StyleFootnoteText = new CStyle("footnote text", this.Default.Paragraph, null, styletype_Paragraph);
+		StyleFootnoteText.CreateFootnoteText();
+		this.Default.FootnoteText = this.Add(StyleFootnoteText);
+
+		var StyleFootnoteTextChar = new CStyle("Footnote Text Char", this.Default.Character, null, styletype_Character);
+		StyleFootnoteTextChar.CreateFootnoteTextChar();
+		this.Default.FootnoteTextChar = this.Add(StyleFootnoteTextChar);
+
+		StyleFootnoteTextChar.Set_Link(StyleFootnoteText.GetId());
+		StyleFootnoteText.Set_Link(StyleFootnoteTextChar.GetId());
+
+		var StyleFootnoteReference = new CStyle("footnote reference", this.Default.Character, null, styletype_Character);
+		StyleFootnoteReference.CreateFootnoteReference();
+		this.Default.FootnoteReference = this.Add(StyleFootnoteReference);
+
         // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
         g_oTableId.Add( this, this.Id );
     }
-    else
-    {
-        this.Default =
-        {
-            ParaPr      : new CParaPr(),
-            TextPr      : new CTextPr(),
-            TablePr     : new CTablePr(),
-            TableRowPr  : new CTableRowPr(),
-            TableCellPr : new CTableCellPr(),
-            Paragraph : null,
-            Character : null,
-            Numbering : null,
-            Table     : null,
-            TableGrid : null,
-            Headings  : [],
-            ParaList  : null,
-            Header    : null,
-            Footer    : null,
-            Hyperlink : null
-        };
+	else
+	{
+		this.Default = {
+			ParaPr      : new CParaPr(),
+			TextPr      : new CTextPr(),
+			TablePr     : new CTablePr(),
+			TableRowPr  : new CTableRowPr(),
+			TableCellPr : new CTableCellPr(),
 
-        // Заполняем значения по умолчанию
-        this.Default.ParaPr.Init_Default();
-        this.Default.TextPr.Init_Default();
-        this.Default.TablePr.Init_Default();
-        this.Default.TableRowPr.Init_Default();
-        this.Default.TableCellPr.Init_Default();
+			Paragraph         : null,
+			Character         : null,
+			Numbering         : null,
+			Table             : null,
+			TableGrid         : null,
+			Headings          : [],
+			ParaList          : null,
+			Header            : null,
+			Footer            : null,
+			Hyperlink         : null,
+			FootnoteText      : null,
+			FootnoteTextChar  : null,
+			FootnoteReference : null
+		};
 
-        this.Style = [];
-    }
+		// Заполняем значения по умолчанию
+		this.Default.ParaPr.Init_Default();
+		this.Default.TextPr.Init_Default();
+		this.Default.TablePr.Init_Default();
+		this.Default.TableRowPr.Init_Default();
+		this.Default.TableCellPr.Init_Default();
+
+		this.Style = [];
+	}
 
     this.LogicDocument = null;
 }
@@ -4304,7 +4367,8 @@ CStyles.prototype =
     Set_DefaultParaPr : function(ParaPr)
     {
         History.Add(this, {Type : AscDFH.historyitem_Styles_ChangeDefaultParaPr, Old : this.Default.ParaPr, New : ParaPr});
-        this.Default.ParaPr = ParaPr;
+		this.Default.ParaPr.Init_Default();
+		this.Default.ParaPr.Merge(ParaPr);
 
         // TODO: Пока данная функция используется только в билдере, как только будет использоваться в самом редакторе,
         //       надо будет сделать, чтобы происходил пересчет всех стилей.
@@ -4318,7 +4382,8 @@ CStyles.prototype =
     Set_DefaultTextPr : function(TextPr)
     {
         History.Add(this, {Type : AscDFH.historyitem_Styles_ChangeDefaultTextPr, Old : this.Default.TextPr, New : TextPr});
-        this.Default.TextPr = TextPr;
+        this.Default.TextPr.Init_Default();
+		this.Default.TextPr.Merge(TextPr);
 
         // TODO: Пока данная функция используется только в билдере, как только будет использоваться в самом редакторе,
         //       надо будет сделать, чтобы происходил пересчет всех стилей.
@@ -4404,7 +4469,7 @@ CStyles.prototype =
         }
 
         // Рассчитываем стиль
-        this.Internal_Get_Pr(Pr, StyleId, Type, ( null === TableStyle && null == ShapeStyle ? true : false ), []);
+        this.Internal_Get_Pr(Pr, StyleId, Type, ( null === TableStyle && null == ShapeStyle ? true : false ), [], StyleId);
 
         if (styletype_Table === Type)
         {
@@ -4513,7 +4578,7 @@ CStyles.prototype =
         return null;
     },
 
-    Internal_Get_Pr : function(Pr, StyleId, Type, bUseDefault, PassedStyles)
+    Internal_Get_Pr : function(Pr, StyleId, Type, bUseDefault, PassedStyles, StartStyleId)
     {
         // Делаем проверку от зацикливания, среди уже пройденных стилей ищем текущий стриль.
         for (var nIndex = 0, nCount = PassedStyles.length; nIndex < nCount; nIndex++)
@@ -4687,22 +4752,22 @@ CStyles.prototype =
         else
         {
             // Копируем свойства родительского стиля
-            this.Internal_Get_Pr( Pr, Style.BasedOn, Type, false, PassedStyles );
+			this.Internal_Get_Pr(Pr, Style.BasedOn, Type, false, PassedStyles, StartStyleId);
 
-            // Копируем свойства из стиля нумерации, если она задана
-            if ( (styletype_Paragraph === Type || styletype_Table === Type) && ( undefined != Style.ParaPr.NumPr ) )
-            {
-                var Numbering = editor.WordControl.m_oLogicDocument.Get_Numbering();
-                if ( undefined != Style.ParaPr.NumPr.NumId && 0 != Style.ParaPr.NumPr.NumId )
-                {
-                    var AbstractNum = Numbering.Get_AbstractNum( Style.ParaPr.NumPr.NumId );
-                    var Lvl = AbstractNum.Get_LvlByStyle( StyleId );
-                    if ( -1 != Lvl )
-                        Pr.ParaPr.Merge( Numbering.Get_ParaPr( Style.ParaPr.NumPr.NumId, Lvl ) );
-                    else
-                        Pr.ParaPr.NumPr = undefined;
-                }
-            }
+            // Копируем свойства из стиля нумерации, если она задана, но только для самого стиля, а не для базовых
+			if ((styletype_Paragraph === Type || styletype_Table === Type) && ( undefined != Style.ParaPr.NumPr ) && StyleId === StartStyleId)
+			{
+				var Numbering = editor.WordControl.m_oLogicDocument.Get_Numbering();
+				if (undefined != Style.ParaPr.NumPr.NumId && 0 != Style.ParaPr.NumPr.NumId)
+				{
+					var AbstractNum = Numbering.Get_AbstractNum(Style.ParaPr.NumPr.NumId);
+					var Lvl         = AbstractNum.Get_LvlByStyle(StyleId);
+					if (-1 != Lvl)
+						Pr.ParaPr.Merge(Numbering.Get_ParaPr(Style.ParaPr.NumPr.NumId, Lvl));
+					else
+						Pr.ParaPr.NumPr = undefined;
+				}
+			}
 
             // Копируем свойства текущего стиля
             switch ( Type )
@@ -4895,13 +4960,15 @@ CStyles.prototype =
 
             case AscDFH.historyitem_Styles_ChangeDefaultParaPr:
             {
-                this.Default.ParaPr = Data.Old;
+				this.Default.ParaPr.Init_Default();
+				this.Default.ParaPr.Merge(Data.Old);
                 break;
             }
 
             case AscDFH.historyitem_Styles_ChangeDefaultTextPr:
             {
-                this.Default.TextPr = Data.Old;
+				this.Default.TextPr.Init_Default();
+				this.Default.TextPr.Merge(Data.Old);
                 break;
             }
         }
@@ -4929,13 +4996,15 @@ CStyles.prototype =
 
             case AscDFH.historyitem_Styles_ChangeDefaultParaPr:
             {
-                this.Default.ParaPr = Data.New;
+				this.Default.ParaPr.Init_Default();
+				this.Default.ParaPr.Merge(Data.New);
                 break;
             }
 
             case AscDFH.historyitem_Styles_ChangeDefaultTextPr:
             {
-                this.Default.TextPr = Data.New;
+				this.Default.TextPr.Init_Default();
+				this.Default.TextPr.Merge(Data.New);
                 break;
             }
         }
@@ -5085,7 +5154,8 @@ CStyles.prototype =
                 // Variable : ParaPr
                 var oParaPr = new CParaPr();
                 oParaPr.Read_FromBinary(Reader);
-                this.Default.ParaPr = oParaPr;
+                this.Default.ParaPr.Init_Default();
+				this.Default.ParaPr.Merge(oParaPr);
                 break;
             }
             case AscDFH.historyitem_Styles_ChangeDefaultTextPr:
@@ -5093,7 +5163,8 @@ CStyles.prototype =
                 // Variable : TextPr
                 var oTextPr = new CTextPr();
                 oTextPr.Read_FromBinary(Reader);
-                this.Default.TextPr = oTextPr;
+				this.Default.TextPr.Init_Default();
+                this.Default.TextPr.Merge(oTextPr);
                 break;
             }
         }
@@ -5130,6 +5201,18 @@ CStyles.prototype =
             }
         }
     }
+};
+CStyles.prototype.GetDefaultFootnoteText = function()
+{
+	return this.Default.FootnoteText;
+};
+CStyles.prototype.GetDefaultFootnoteTextChar = function()
+{
+	return this.Default.FootnoteTextChar;
+};
+CStyles.prototype.GetDefaultFootnoteReference = function()
+{
+	return this.Default.FootnoteReference;
 };
 
 function CDocumentColor(r,g,b, Auto)
@@ -5634,6 +5717,10 @@ CDocumentBorder.prototype =
         }
     }
 };
+CDocumentBorder.prototype.IsNone = function()
+{
+	return this.Value === border_None ? true : false;
+};
 
 function CTableMeasurement(Type, W)
 {
@@ -5811,7 +5898,7 @@ CTablePr.prototype =
         if ( undefined != TablePr.TableCellMar.Top )
             this.TableCellMar.Top = TablePr.TableCellMar.Top.Copy();
 
-        if ( undefined != TablePr.TableCellMar )
+        if ( undefined != TablePr.TableCellSpacing )
             this.TableCellSpacing = TablePr.TableCellSpacing;
 
         if ( undefined != TablePr.TableInd )
@@ -9833,6 +9920,7 @@ function CParaPr()
     this.DefaultRunPr      = undefined;
     this.Bullet            = undefined;
     this.Lvl               = undefined;
+    this.DefaultTabSize    = undefined;
 
     this.PrChange          = undefined;
 }
@@ -9901,6 +9989,9 @@ CParaPr.prototype =
 
         if(undefined != this.Lvl)
             ParaPr.Lvl = this.Lvl;
+
+        if(undefined != this.DefaultTabSize)
+            ParaPr.DefaultTabSize = this.DefaultTabSize;
 
         if (true === bCopyPrChange && undefined !== this.PrChange)
         {
@@ -9997,6 +10088,10 @@ CParaPr.prototype =
 
         if(undefined != ParaPr.Lvl)
             this.Lvl = ParaPr.Lvl;
+
+        if(undefined != ParaPr.DefaultTabSize)
+            this.DefaultTabSize = ParaPr.DefaultTabSize;
+
     },
 
     Init_Default : function()
@@ -10033,6 +10128,7 @@ CParaPr.prototype =
 
         this.DefaultRunPr              = undefined;
         this.Bullet                    = undefined;
+        this.DefaultTabSize            = undefined;
     },
 
     Set_FromObject : function(ParaPr)
@@ -10148,6 +10244,11 @@ CParaPr.prototype =
             this.Bullet = new AscFormat.CBullet();
             this.Bullet.Set_FromObject(ParaPr.Bullet);
         }
+
+        if(undefined != ParaPr.DefaultTabSize)
+        {
+            this.DefaultTabSize = ParaPr.DefaultTabSize;
+        }
     },
 
     Compare : function(ParaPr)
@@ -10260,6 +10361,10 @@ CParaPr.prototype =
 
         if(undefined != this.Lvl && undefined != ParaPr.Lvl && ParaPr.Lvl === this.Lvl)
             Result_ParaPr.Lvl = this.Lvl;
+
+
+        if(undefined != this.DefaultTabSize && undefined != ParaPr.DefaultTabSize && ParaPr.DefaultTabSize === this.DefaultTabSize)
+            Result_ParaPr.DefaultTabSize = this.DefaultTabSize;
 
 
         return Result_ParaPr;
@@ -10397,6 +10502,12 @@ CParaPr.prototype =
             Flags |= 1048576;
         }
 
+        if(undefined != this.DefaultTabSize)
+        {
+            Writer.WriteDouble(this.DefaultTabSize);
+            Flags |= 2097152;
+        }
+
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
         Writer.WriteLong( Flags );
@@ -10509,6 +10620,11 @@ CParaPr.prototype =
         if(Flags & 1048576)
         {
             this.Lvl = Reader.GetByte();
+        }
+
+        if(Flags & 2097152)
+        {
+            this.DefaultTabSize = Reader.GetDouble();
         }
     },
 

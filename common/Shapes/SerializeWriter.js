@@ -122,6 +122,7 @@ function CBinaryFileWriter()
     this.IsUseFullUrl = false;
     this.PresentationThemesOrigin = "";
 
+	this.DocSaveParams = null;
     var oThis = this;
 
     this.Start_UseFullUrl = function()
@@ -1679,6 +1680,13 @@ function CBinaryFileWriter()
                     break;
             }
 
+
+            var defTab = pPr.DefaultTabSize;
+            if (defTab !== undefined && defTab != null)
+            {
+                oThis._WriteInt1(1, defTab * 36000);
+            }
+
             var ind = pPr.Ind;
             if (ind !== undefined && ind != null)
             {
@@ -2714,6 +2722,39 @@ function CBinaryFileWriter()
 
                     break;
                 }
+				case para_Math:
+				{
+					if (null != _elem.Root)
+					{
+						oThis.StartRecord(0); // subtype
+						oThis.StartRecord(AscFormat.PARRUN_TYPE_MATHPARA);
+						var _memory = new AscCommon.CMemory(true);
+						_memory.ImData = oThis.ImData;
+						_memory.data = oThis.data;
+						_memory.len = oThis.len;
+						_memory.pos = oThis.pos;
+						oThis.UseContinueWriter = true;
+
+						if (!oThis.DocSaveParams) {
+							oThis.DocSaveParams = new AscCommonWord.DocSaveParams(false, false);
+						}
+						var boMaths = new Binary_oMathWriter(_memory, null, oThis.DocSaveParams);
+						boMaths.bs.WriteItemWithLength(function(){boMaths.WriteOMathPara(_elem)});	
+
+						oThis.ImData = _memory.ImData;
+						oThis.data = _memory.data;
+						oThis.len = _memory.len;
+						oThis.pos = _memory.pos;
+						oThis.UseContinueWriter = false;
+
+						_memory.ImData = null;
+						_memory.data = null;
+						
+						oThis.EndRecord();
+						oThis.EndRecord();
+						_count++;
+					}
+				}
                 default:
                     break;
             }
@@ -4509,6 +4550,44 @@ function CBinaryFileWriter()
                 this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
             }
         }
+		this.WriteRunProperties = function(memory, rPr)
+		{
+			if (this.BinaryFileWriter.UseContinueWriter)
+			{
+				this.BinaryFileWriter.ImData = memory.ImData;
+				this.BinaryFileWriter.data = memory.data;
+				this.BinaryFileWriter.len = memory.len;
+				this.BinaryFileWriter.pos = memory.pos;
+			}
+			else
+			{
+				this.TreeDrawingIndex++;
+				this.arrayStackStarts.push(this.BinaryFileWriter.pos);
+			}
+
+			var _writer = this.BinaryFileWriter;
+			_writer.StartRecord(0);
+			_writer.WriteRunProperties(rPr);
+			_writer.EndRecord();
+
+			if (this.BinaryFileWriter.UseContinueWriter)
+			{
+				memory.ImData = this.BinaryFileWriter.ImData;
+				memory.data = this.BinaryFileWriter.data;
+				memory.len = this.BinaryFileWriter.len;
+				memory.pos = this.BinaryFileWriter.pos;
+			}
+			else
+			{
+				this.TreeDrawingIndex--;
+
+				var oldPos = this.arrayStackStarts[this.arrayStackStarts.length - 1];
+				memory.WriteBuffer(this.BinaryFileWriter.data, oldPos, this.BinaryFileWriter.pos - oldPos);
+				this.BinaryFileWriter.pos = oldPos;
+
+				this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
+			}
+		}
         this.WriteDrawing = function(memory, grObject, Document, oMapCommentId, oNumIdMap, copyParams, saveParams)
         {
             this.TreeDrawingIndex++;

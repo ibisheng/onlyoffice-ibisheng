@@ -62,13 +62,6 @@
 
 
 	/** @const */
-	var kLeftAlign = "left";
-	/** @const */
-	var kRightAlign = "right";
-	/** @const */
-	var kCenterAlign = "center";
-
-	/** @const */
 	var kBeginOfLine = -1;
 	/** @const */
 	var kBeginOfText = -2;
@@ -752,8 +745,8 @@
 		var u = ctx.getUnits();
 
 		this.textFlags = opt.flags.clone();
-		if ( this.textFlags.textAlign.toLowerCase() === "justify" || this.isFormula() ) {
-			this.textFlags.textAlign = "left";
+		if ( this.textFlags.textAlign === AscCommon.align_Justify || this.isFormula() ) {
+			this.textFlags.textAlign = AscCommon.align_Left;
 		}
 
 		this._cleanFragments( opt.fragments );
@@ -789,16 +782,17 @@
 	};
 
 	CellEditor.prototype._parseRangeStr = function (s) {
-		var range = AscCommonExcel.g_oRangeCache.getActiveRange(s);
+		//var range = AscCommonExcel.g_oRangeCache.getActiveRange(s);
+		var range = AscCommonExcel.g_oRangeCache.getAscRange(s);
 		return range ? range.clone() : null;
 	};
 
 	CellEditor.prototype._parseFormulaRanges = function () {
-		var s = this._getFragmentsText( this.options.fragments ), t = this, ret = false, range,
-			wsOPEN = this.handlers.trigger( "getCellFormulaEnterWSOpen" ),
-			ws = wsOPEN ? wsOPEN.model : this.handlers.trigger( "getActiveWS" );
+		var s = this._getFragmentsText(
+			this.options.fragments), t = this, ret = false, range, wsOPEN = this.handlers.trigger(
+			"getCellFormulaEnterWSOpen"), ws = wsOPEN ? wsOPEN.model : this.handlers.trigger("getActiveWS");
 
-		if ( s.length < 1 || s.charAt( 0 ) !== "=" || this.options.cellNumFormat == Asc.c_oAscNumFormatType.Text ) {
+		if (s.length < 1 || s.charAt(0) !== "=" || this.options.cellNumFormat == Asc.c_oAscNumFormatType.Text) {
 			return ret;
 		}
 
@@ -822,14 +816,13 @@
 //             var __e__ = new Date().getTime();
 //             console.log("e-s "+ (__e__ - __s__));
 
-		this._formula = new AscCommonExcel.parserFormula( s.substr( 1 ), this.options.cellName, ws );
+		this._formula = new AscCommonExcel.parserFormula(s.substr(1), this.options.cellName, ws);
 		this._formula.parse();
 
-		var r, offset, _e, _s, wsName = null, refStr, isName = false,
-			_sColorPos;
+		var r, offset, _e, _s, wsName = null, refStr, isName = false, _sColorPos;
 
-		if ( this._formula.RefPos && this._formula.RefPos.length > 0 ) {
-			for ( var index = 0; index < this._formula.RefPos.length; index++ ) {
+		if (this._formula.RefPos && this._formula.RefPos.length > 0) {
+			for (var index = 0; index < this._formula.RefPos.length; index++) {
 				wsName = null;
 				isName = false;
 				r = this._formula.RefPos[index];
@@ -839,18 +832,16 @@
 				_sColorPos = _s = r.start;
 
 
-				switch ( r.oper.type ) {
-					case cElementType.cell          :
-					{
-						if ( wsOPEN ) {
+				switch (r.oper.type) {
+					case cElementType.cell          : {
+						if (wsOPEN) {
 							wsName = wsOPEN.model.getName();
 						}
 						ret = true;
 						refStr = r.oper.value;
 						break;
 					}
-					case cElementType.cell3D        :
-					{
+					case cElementType.cell3D        : {
 						ret = true;
 						wsName = r.oper.ws.getName();
 						_s = _e - r.oper.value.length;
@@ -858,18 +849,16 @@
 						refStr = r.oper.value;
 						break;
 					}
-					case cElementType.cellsRange    :
-					{
-						if ( wsOPEN ) {
+					case cElementType.cellsRange    : {
+						if (wsOPEN) {
 							wsName = wsOPEN.model.getName();
 						}
 						ret = true;
 						refStr = r.oper.value;
 						break;
 					}
-					case cElementType.cellsRange3D  :
-					{
-						if ( !r.oper.isSingleSheet() ) {
+					case cElementType.cellsRange3D  : {
+						if (!r.oper.isSingleSheet()) {
 							continue;
 						}
 						ret = true;
@@ -880,20 +869,20 @@
 						break;
 					}
 					case cElementType.table          :
-					case cElementType.name          :
-					{
+					case cElementType.name          : {
 						var nameRef = r.oper.toRef();
-						if( nameRef instanceof AscCommonExcel.cError ) continue;
-						switch ( nameRef.type ) {
+						if (nameRef instanceof AscCommonExcel.cError) {
+							continue;
+						}
+						switch (nameRef.type) {
 
-							case cElementType.cellsRange3D          :{
-								if ( !nameRef.isSingleSheet() ) {
+							case cElementType.cellsRange3D          : {
+								if (!nameRef.isSingleSheet()) {
 									continue;
 								}
 							}
 							case cElementType.cellsRange          :
-							case cElementType.cell3D        :
-							{
+							case cElementType.cell3D        : {
 								ret = true;
 								refStr = nameRef.value;
 								wsName = nameRef.getWS().getName();
@@ -908,15 +897,19 @@
 						continue;
 				}
 
-				if ( ret ) {
-					range = t._parseRangeStr( refStr );
-					if(!range) return false;
+				if (ret) {
+					range = t._parseRangeStr(refStr);
+					if (!range) {
+						return false;
+					}
 					range.cursorePos = offset - (_e - _s) + 1;
 					range.formulaRangeLength = _e - _s;
 					range.colorRangePos = offset - (_e - _sColorPos) + 1;
 					range.colorRangeLength = _e - _sColorPos;
-					if ( isName )range.isName = isName;
-					t.handlers.trigger( "newRange", range, wsName );
+					if (isName) {
+						range.isName = isName;
+					}
+					t.handlers.trigger("newRange", range, wsName);
 				}
 			}
 		}
@@ -924,7 +917,7 @@
 	};
 
 	CellEditor.prototype._findRangeUnderCursor = function () {
-		var t = this, s = t.textRender.getChars(0, t.textRender.getCharsCount()), range, arrFR = this.handlers.trigger(
+		var ranges, t = this, s = t.textRender.getChars(0, t.textRender.getCharsCount()), range, arrFR = this.handlers.trigger(
 			"getFormulaRanges"), a;
 
 		for (var id = 0; id < arrFR.length; id++) {
@@ -932,11 +925,14 @@
 			 * находится ли курсор в позиции над этим диапазоном, дабы не парсить всю формулу заново
 			 * необходимо чтобы парсить случаи когда используется что-то такое sumnas2:K2 - sumnas2 невалидная ссылка.
 			 * */
-			a = arrFR[id];
-			if (t.cursorPos >= a.cursorePos && t.cursorPos <= a.cursorePos + a.formulaRangeLength) {
-				range = a.clone(true);
-				range.isName = a.isName;
-				return {index: a.cursorePos, length: a.formulaRangeLength, range: range};
+			ranges = arrFR[id].ranges;
+			for (var i = 0, l = ranges.length; i < l; ++i) {
+				a = ranges[i];
+				if (t.cursorPos >= a.cursorePos && t.cursorPos <= a.cursorePos + a.formulaRangeLength) {
+					range = a.clone(true);
+					range.isName = a.isName;
+					return {index: a.cursorePos, length: a.formulaRangeLength, range: range};
+				}
 			}
 		}
 
@@ -1026,7 +1022,7 @@
 						if (this.handlers.trigger("getActiveWS") && this.handlers.trigger("getActiveWS").getName() != wsName) {
 							return {index: -1, length: 0, range: null};
 						}
-						range.isName = isName
+						range.isName = isName;
 						return {index: _s, length: r.oper.value.length, range: range, wsName: wsName};
 					}
 				}
@@ -1070,33 +1066,36 @@
 	};
 
 	CellEditor.prototype._getRenderFragments = function () {
-		var opt = this.options, fragments = opt.fragments, i, j, first, last, val, lengthColors, tmpColors, colorIndex, uniqueColorIndex;
-		if ( this.isFormula() ) {
-			var arrRanges = this.handlers.trigger( "getFormulaRanges" );
-			if ( 0 < arrRanges.length ) {
+		var opt = this.options, fragments = opt.fragments, ranges, i, j, k, l, first, last, val, lengthColors, tmpColors, colorIndex, uniqueColorIndex;
+		if (this.isFormula()) {
+			var arrRanges = this.handlers.trigger("getFormulaRanges");
+			if (0 < arrRanges.length) {
 				fragments = [];
-				for ( i = 0; i < opt.fragments.length; ++i )
-					fragments.push( opt.fragments[i].clone() );
+				for (i = 0; i < opt.fragments.length; ++i) {
+					fragments.push(opt.fragments[i].clone());
+				}
 
 				lengthColors = AscCommonExcel.c_oAscFormulaRangeBorderColor.length;
 				tmpColors = [];
 				uniqueColorIndex = 0;
-				for ( i = 0; i < arrRanges.length; ++i ) {
-					val = arrRanges[i];
+				for (i = 0; i < arrRanges.length; ++i) {
+					ranges = arrRanges[i].ranges;
+					for (j = 0, l = ranges.length; j < l; ++j) {
+						val = ranges[j];
+						colorIndex = asc.getUniqueRangeColor(ranges, j, tmpColors);
+						if (null == colorIndex) {
+							colorIndex = uniqueColorIndex++;
+						}
+						tmpColors.push(colorIndex);
 
-					colorIndex = asc.getUniqueRangeColor( arrRanges, i, tmpColors );
-					if ( null == colorIndex ) {
-						colorIndex = uniqueColorIndex++;
-					}
-					tmpColors.push( colorIndex );
-
-					this._extractFragments( val.colorRangePos, val.colorRangeLength, fragments );
-
-					first = this._findFragment( val.cursorePos, fragments );
-					last = this._findFragment( val.cursorePos + val.formulaRangeLength - 1, fragments );
-					if ( first && last ) {
-						for ( j = first.index; j <= last.index; ++j )
-							fragments[j].format.c = AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % lengthColors];
+						this._extractFragments(val.colorRangePos, val.colorRangeLength, fragments);
+						first = this._findFragment(val.cursorePos, fragments);
+						last = this._findFragment(val.cursorePos + val.formulaRangeLength - 1, fragments);
+						if (first && last) {
+							for (k = first.index; k <= last.index; ++k) {
+								fragments[k].format.c = AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % lengthColors];
+							}
+						}
 					}
 				}
 			}
@@ -1192,7 +1191,7 @@
 		this._updateUndoRedoChanged();
 
 		if ( window['IS_NATIVE_EDITOR'] && !this.dontUpdateText ) {
-			window['native'].onCellEditorChangeText( this._getFragmentsText( this.options.fragments ) );
+			window['native']['onCellEditorChangeText']( this._getFragmentsText( this.options.fragments ) );
 		}
 	};
 
@@ -1257,14 +1256,14 @@
 		}
 
 		switch ( t.textFlags.textAlign ) {
-			case kRightAlign:
+			case AscCommon.align_Right:
 				r = expandLeftSide();
 				break;
-			case kCenterAlign:
+			case AscCommon.align_Center:
 				l = expandLeftSide();
 				r = expandRightSide();
 				break;
-			case kLeftAlign:
+			case AscCommon.align_Left:
 			default:
 				r = expandRightSide();
 		}
@@ -1442,7 +1441,7 @@
 		var cur = this.textRender.calcCharOffset(this.cursorPos);
 		var charsCount = this.textRender.getCharsCount();
 		var curLeft = asc_round(
-			((kRightAlign !== this.textFlags.textAlign || this.cursorPos !== charsCount) && cur !== null &&
+			((AscCommon.align_Right !== this.textFlags.textAlign || this.cursorPos !== charsCount) && cur !== null &&
 			cur.left !== null ? cur.left : this._getContentPosition()) * this.kx);
 		var curTop = asc_round(((cur !== null ? cur.top : 0) + y) * this.ky);
 		var curHeight = asc_round((cur !== null ? cur.height : this._getContentHeight()) * this.ky);
@@ -1654,9 +1653,9 @@
 		var ppix = this.drawingCtx.getPPIX();
 
 		switch ( this.textFlags.textAlign ) {
-			case kRightAlign:
+			case AscCommon.align_Right:
 				return asc_calcnpt( this.right - this.left, ppix, -this.defaults.padding - 1 );
-			case kCenterAlign:
+			case AscCommon.align_Center:
 				return asc_calcnpt( 0.5 * (this.right - this.left), ppix, 0 );
 		}
 		return asc_calcnpt( 0, ppix, this.defaults.padding );
@@ -1835,18 +1834,18 @@
 		}
 	};
 
-	CellEditor.prototype._findFragment = function ( pos, fragments ) {
+	CellEditor.prototype._findFragment = function (pos, fragments) {
 		var i, begin, end;
-		if ( !fragments ) {
+		if (!fragments) {
 			fragments = this.options.fragments;
 		}
 
-		for ( i = 0, begin = 0; i < fragments.length; ++i ) {
+		for (i = 0, begin = 0; i < fragments.length; ++i) {
 			end = begin + fragments[i].text.length;
-			if ( pos >= begin && pos < end ) {
+			if (pos >= begin && pos < end) {
 				return {index: i, begin: begin, end: end};
 			}
-			if ( i < fragments.length - 1 ) {
+			if (i < fragments.length - 1) {
 				begin = end;
 			}
 		}
@@ -1917,20 +1916,20 @@
 		return res;
 	};
 
-	CellEditor.prototype._extractFragments = function ( startPos, length, fragments ) {
+	CellEditor.prototype._extractFragments = function (startPos, length, fragments) {
 		var fr;
 
-		fr = this._findFragment( startPos, fragments );
-		if ( !fr ) {
+		fr = this._findFragment(startPos, fragments);
+		if (!fr) {
 			throw "Can not extract fragment of text";
 		}
-		this._splitFragment( fr, startPos, fragments );
+		this._splitFragment(fr, startPos, fragments);
 
-		fr = this._findFragment( startPos + length, fragments );
-		if ( !fr ) {
+		fr = this._findFragment(startPos + length, fragments);
+		if (!fr) {
 			throw "Can not extract fragment of text";
 		}
-		this._splitFragment( fr, startPos + length, fragments );
+		this._splitFragment(fr, startPos + length, fragments);
 	};
 
 	CellEditor.prototype._addFragments = function ( f, pos ) {
@@ -2129,8 +2128,8 @@
 		result.italic = tmp.i;
 		result.underline = (Asc.EUnderline.underlineNone !== tmp.u); // ToDo убрать, когда будет реализовано двойное подчеркивание
 		result.strikeout = tmp.s;
-		result.subscript = tmp.va === "subscript";
-		result.superscript = tmp.va === "superscript";
+		result.subscript = tmp.va === AscCommon.vertalign_SubScript;
+		result.superscript = tmp.va === AscCommon.vertalign_SuperScript;
 		result.color = (tmp.c ? asc.colorObjToAscColor( tmp.c ) : new Asc.asc_CColor( this.options.textColor ));
 
 		this.handlers.trigger( "updateEditorSelectionInfo", result );
@@ -2593,62 +2592,61 @@
 	};
 
 	/** @param event {MouseEvent} */
-	CellEditor.prototype._onWindowMouseMove = function ( event ) {
-		if ( c_oAscCellEditorSelectState.no !== this.isSelectMode && !this.hasCursor ) {
-			this._changeSelection( this._getCoordinates( event ) );
+	CellEditor.prototype._onWindowMouseMove = function (event) {
+		if (c_oAscCellEditorSelectState.no !== this.isSelectMode && !this.hasCursor) {
+			this._changeSelection(this._getCoordinates(event));
 		}
 		return true;
 	};
 
 	/** @param event {MouseEvent} */
-	CellEditor.prototype._onMouseDown = function ( event ) {
-		if (AscCommon.g_inputContext)
+	CellEditor.prototype._onMouseDown = function (event) {
+		if (AscCommon.g_inputContext) {
 			AscCommon.g_inputContext.externalChangeFocus();
-
-		var pos;
-		var coord = this._getCoordinates( event );
-		if ( !window['IS_NATIVE_EDITOR'] ) {
-			this.clickCounter.mouseDownEvent( coord.x, coord.y, event.button );
 		}
 
-		this.setFocus( true );
+		var pos;
+		var coord = this._getCoordinates(event);
+		if (!window['IS_NATIVE_EDITOR']) {
+			this.clickCounter.mouseDownEvent(coord.x, coord.y, event.button);
+		}
+
+		this.setFocus(true);
 
 		this.isTopLineActive = false;
 		this.input.isFocused = false;
 
-		if ( 0 === event.button ) {
-			if ( 1 === this.clickCounter.getClickCount() % 2 ) {
+		if (0 === event.button) {
+			if (1 === this.clickCounter.getClickCount() % 2) {
 				this.isSelectMode = c_oAscCellEditorSelectState.char;
-				if ( !event.shiftKey ) {
+				if (!event.shiftKey) {
 					this._showCursor();
-					pos = this._findCursorPosition( coord );
-					if ( pos !== undefined ) {
-						pos >= 0 ? this._moveCursor( kPosition, pos ) : this._moveCursor( pos );
+					pos = this._findCursorPosition(coord);
+					if (pos !== undefined) {
+						pos >= 0 ? this._moveCursor(kPosition, pos) : this._moveCursor(pos);
 					}
+				} else {
+					this._changeSelection(coord);
 				}
-				else {
-					this._changeSelection( coord );
-				}
-			}
-			else {
+			} else {
 				// Dbl click
 				this.isSelectMode = c_oAscCellEditorSelectState.word;
 				// Окончание слова
-				var endWord = this.textRender.getNextWord( this.cursorPos );
+				var endWord = this.textRender.getNextWord(this.cursorPos);
 				// Начало слова (ищем по окончанию, т.к. могли попасть в пробел)
-				var startWord = this.textRender.getPrevWord( endWord );
+				var startWord = this.textRender.getPrevWord(endWord);
 
-				this._moveCursor( kPosition, startWord );
-				this._selectChars( kPosition, endWord );
+				this._moveCursor(kPosition, startWord);
+				this._selectChars(kPosition, endWord);
 			}
 		}
 		return true;
 	};
 
 	/** @param event {MouseEvent} */
-	CellEditor.prototype._onMouseUp = function ( event ) {
-		if ( 2 === event.button ) {
-			this.handlers.trigger( 'onContextMenu', event );
+	CellEditor.prototype._onMouseUp = function (event) {
+		if (2 === event.button) {
+			this.handlers.trigger('onContextMenu', event);
 			return true;
 		}
 		this.isSelectMode = c_oAscCellEditorSelectState.no;
@@ -2691,6 +2689,11 @@
 		var offs = this.canvasOverlay.getBoundingClientRect();
 		var x = (((event.pageX * AscBrowser.zoom) >> 0) - offs.left) / this.kx;
 		var y = (((event.pageY * AscBrowser.zoom) >> 0) - offs.top) / this.ky;
+
+		if (AscBrowser.isRetina) {
+			x <<= 1;
+			y <<= 1;
+		}
 
 		return {x: x, y: y};
 	};
