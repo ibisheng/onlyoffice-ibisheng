@@ -683,12 +683,10 @@ ParaDrawing.prototype.getXfrmExtY = function()
 };
 ParaDrawing.prototype.Get_Bounds = function()
 {
-	return {
-		Left   : this.X,
-		Top    : this.Y,
-		Bottom : this.Y + this.getXfrmExtY(),
-		Right  : this.X + this.getXfrmExtX()
-	};
+    var W, H;
+    W = this.GraphicObj.bounds.w;
+    H = this.GraphicObj.bounds.h;
+    return {Left : this.X, Top : this.Y, Bottom : this.Y + H, Right : this.X + W};
 };
 ParaDrawing.prototype.Search = function(Str, Props, SearchEngine, Type)
 {

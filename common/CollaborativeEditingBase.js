@@ -743,6 +743,7 @@ CCollaborativeEditingBase.prototype.InitMemory = function() {
 	};
 	CCollaborativeEditingBase.prototype.private_AddOverallChange = function(oChange)
 	{
+	    return true;
 	};
 
 

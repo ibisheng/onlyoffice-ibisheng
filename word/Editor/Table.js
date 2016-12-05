@@ -6770,7 +6770,7 @@ CTable.prototype =
 
                         // Добавляем ячейку
                         Row.Content[CurCell] = CellInfo.Cell.Copy(Row);
-                        History.Add( Row, { Type : AscDFH.historyitem_TableRow_AddCell, Pos : CurCell, Item : { Cell : Row.Content[CurCell], CellInfo : {}  } } );
+                        History.Add(new CChangesTableRowAddCell(Row, CurCell, Row.Content[CurCell]));
                         CurCell++;
 
                         var VMerge = CellInfo.Cell.Get_VMerge();
@@ -7853,7 +7853,17 @@ CTable.prototype =
         if ( null === B || undefined === B )
             B = this.Distance.B;
 
-        History.Add( this, { Type : AscDFH.historyitem_Table_Distance, Old : { Left : this.Distance.L, Top : this.Distance.T, Right : this.Distance.R, Bottom : this.Distance.B }, New : { Left : L, Top : T, Right : R, Bottom : B } } );
+		History.Add(new CChangesTableDistance(this, {
+			Left   : this.Distance.L,
+			Top    : this.Distance.T,
+			Right  : this.Distance.R,
+			Bottom : this.Distance.B
+		}, {
+			Left   : L,
+			Top    : T,
+			Right  : R,
+			Bottom : B
+		}));
         this.Distance.L = L;
         this.Distance.R = R;
         this.Distance.T = T;
@@ -9094,13 +9104,13 @@ CTable.prototype =
             }
         }
 
+		this.Selection_Remove();
+
         // Удаляем строки.
         for ( var Index = Rows_to_delete.length - 1; Index >= 0; Index-- )
         {
             this.Internal_Remove_Row( Rows_to_delete[Index] );
         }
-
-        this.Selection_Remove();
 
         // Возвращаем курсор
         this.DrawingDocument.TargetStart();

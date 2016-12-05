@@ -82,7 +82,7 @@
 		"../common/Drawings/HatchPattern.js",
 		
 		"../common/scroll.js",
-		"../cell/view/iscroll.js",
+		"../common/Scrolls/iscroll.js",
 
         "../common/wordcopypaste.js",
 
@@ -249,7 +249,7 @@
 		"../common/FontsFreeType/TextMeasurer.js",
 		"../cell/model/DrawingObjects/Graphics.js",
         	"../common/Drawings/TextDrawer.js",
-		"../cell/view/iscroll.js"
+		"../common/Scrolls/iscroll.js"
 	  ],
       "dst": "../cell",
       "externs": [

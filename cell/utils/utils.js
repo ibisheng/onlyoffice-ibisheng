@@ -278,6 +278,8 @@
 			return normalize ? this.normalize() : this;
 		};
 		Range.prototype.assign2 = function (range) {
+			this.refType1 = range.refType1;
+			this.refType2 = range.refType2;
 			return this.assign(range.c1, range.r1, range.c2, range.r2);
 		};
 
@@ -673,6 +675,55 @@
 			this.clean();
 			this.getLast().assign2(range);
 			this.update();
+		};
+		SelectionRange.prototype.union = function (range) {
+			var res = this.ranges.some(function (item) {
+				var success = false;
+				if (item.c1 === range.c1 && item.c2 === range.c2) {
+					if (range.r1 === item.r2 + 1) {
+						item.r2 = range.r2;
+						success = true;
+					} else if (range.r2 === item.r1 - 1) {
+						item.r1 = range.r1;
+						success = true;
+					}
+				} else if (item.r1 === range.r1 && item.r2 === range.r2) {
+					if (range.c1 === item.c2 + 1) {
+						item.c2 = range.c2;
+						success = true;
+					} else if (range.c2 === item.c1 - 1) {
+						item.c1 = range.c1;
+						success = true;
+					}
+				}
+				return success;
+			});
+			if (!res) {
+				this.addRange();
+				this.getLast().assign2(range);
+			}
+		};
+		SelectionRange.prototype.getUnion = function () {
+			var result = new SelectionRange();
+			var unionRanges = function (ranges, res) {
+				ranges.forEach(function (item, i) {
+					if (0 === i) {
+						res.assign2(item);
+					} else {
+						res.union(item);
+					}
+				});
+			};
+			unionRanges(this.ranges, result);
+
+			var isUnion = true, resultTmp;
+			while (isUnion && !result.isSingleRange()) {
+				resultTmp = new SelectionRange();
+				unionRanges(result.ranges, resultTmp);
+				isUnion = result.ranges.length !== resultTmp.ranges.length;
+				result = resultTmp;
+			}
+			return result;
 		};
 		SelectionRange.prototype.offsetCell = function (dr, dc, fCheckSize) {
 			var done, curRange, mc;
@@ -1235,7 +1286,7 @@
 		function isFixedWidthCell(frag) {
 			for (var i = 0; i < frag.length; ++i) {
 				var f = frag[i].format;
-				if (f && f.repeat) {return true;}
+				if (f && f.getRepeat()) {return true;}
 			}
 			return false;
 		}
@@ -1734,8 +1785,10 @@
         var fc = oStyle.getFontColor();
         var oFontColor = fc !== null ? fc : new AscCommon.CColor(0, 0, 0);
         var format = oStyle.getFont();
+        var fs = format.getSize();
         // Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
-        var oFont = new Asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs, format.b, format.i, format.u, format.s);
+		var oFont = new Asc.FontProperties(format.getName(), (16 < fs) ? 16 : fs,
+			format.getBold(), format.getItalic(), format.getUnderline(), format.getStrikeout());
 
         var width_padding = 3; // 4 * 72 / 96
 
@@ -1888,12 +1941,13 @@
 			this.cache = {};
 		}
 		CCacheMeasureEmpty.prototype.add = function (elem, val) {
-			var font = (this.cache[elem.fn] || (this.cache[elem.fn] = {}));
-			font[elem.fs] = val;
+			var fn = elem.getName();
+			var font = (this.cache[fn] || (this.cache[fn] = {}));
+			font[elem.getSize()] = val;
 		};
 		CCacheMeasureEmpty.prototype.get = function (elem) {
-			var font = this.cache[elem.fn];
-			return font ? font[elem.fs] : null;
+			var font = this.cache[elem.getName()];
+			return font ? font[elem.getSize()] : null;
 		};
 		var g_oCacheMeasureEmpty = new CCacheMeasureEmpty();
 

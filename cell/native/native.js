@@ -3992,6 +3992,10 @@ function OfflineEditor () {
             range = range.intersection(ranges[i]);
         }
         
+        if ((null === range) && (ranges.length > 0)) {
+            range = ranges[0];
+        }
+        
         if (autocorrection) {
             this._resizeWorkRegion(ws, range.c2, range.r2);
             region = {columnBeg:0, columnEnd:ws.cols.length - 1, columnOff:0, rowBeg:0, rowEnd: ws.rows.length - 1, rowOff:0};
@@ -4726,8 +4730,10 @@ function OfflineEditor () {
             var fc = oStyle.getFontColor();
             var oFontColor = fc !== null ? fc : new AscCommon.CColor(0, 0, 0);
             var format = oStyle.getFont();
+            var fs = format.getSize();
             // Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
-            var oFont = new window["Asc"].FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs, format.b, format.i, format.u, format.s);
+            var oFont = new window["Asc"].FontProperties(format.getName(), (16 < fs) ? 16 : fs,
+                format.getBold(), format.getItalic(), format.getUnderline(), format.getStrikeout());
 
             var width_padding = 3; // 4 * 72 / 96
 
@@ -4773,16 +4779,6 @@ function OfflineEditor () {
                     {
                         window["native"]["BeginDrawDocumentStyle"](customStyles[i].name, n);
                         this.af_getSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont);
-
-//                        options =
-//                        {
-//                            name: i,
-//                            displayName: customStyles[i].displayName,
-//                            type: 'custom',
-//                            image: this.af_getSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont)
-//                        };
-
-                        // result[n] = new formatTablePictures(options);
                         n++;
 
                         window["native"]["EndDrawStyle"]();
@@ -4798,15 +4794,6 @@ function OfflineEditor () {
                     {
                         window["native"]["BeginDrawDefaultStyle"](defaultStyles[i].name, n);
                         this.af_getSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont);
-
-//                        options =
-//                        {
-//                            name: i,
-//                            displayName: defaultStyles[i].displayName,
-//                            type: 'default',
-//                            image: this.af_getSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont)
-//                        };
-                        //result[n] = new formatTablePictures(options);
                         n++;
 
                         window["native"]["EndDrawStyle"]();
@@ -5141,31 +5128,31 @@ function OfflineEditor () {
             if(!styleOptions || !styleOptions.wholeTable || !styleOptions.wholeTable.dxf.font)
                 defaultColor = blackColor;
             else
-                defaultColor = styleOptions.wholeTable.dxf.font.c;
+                defaultColor = styleOptions.wholeTable.dxf.font.getColor();
 
             for(var n = 1; n < 6; n++)
             {
                 ctx.beginPath();
                 color = null;
                 if(n == 1 && styleOptions && styleOptions.headerRow && styleOptions.headerRow.dxf.font)
-                    color = styleOptions.headerRow.dxf.font.c;
+                    color = styleOptions.headerRow.dxf.font.getColor();
                 else if(n == 5 && styleOptions && styleOptions.totalRow && styleOptions.totalRow.dxf.font)
-                    color = styleOptions.totalRow.dxf.font.c;
+                    color = styleOptions.totalRow.dxf.font.getColor();
                 else if(styleOptions && styleOptions.headerRow && styleInfo.ShowRowStripes)
                 {
                     if((n == 2 || (n == 5 && !styleOptions.totalRow)) &&  styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.font)
-                        color  = styleOptions.firstRowStripe.dxf.font.c;
+                        color  = styleOptions.firstRowStripe.dxf.font.getColor();
                     else if(n == 3 && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font)
-                        color  = styleOptions.secondRowStripe.dxf.font.c;
+                        color  = styleOptions.secondRowStripe.dxf.font.getColor();
                     else
                         color = defaultColor
                 }
                 else if(styleOptions && !styleOptions.headerRow && styleInfo.ShowRowStripes)
                 {
                     if((n == 1 || n == 3 || (n == 5 && !styleOptions.totalRow)) && styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.font)
-                        color  = styleOptions.firstRowStripe.dxf.font.c;
+                        color  = styleOptions.firstRowStripe.dxf.font.getColor();
                     else if((n == 2 || n == 4) && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font)
-                        color  = styleOptions.secondRowStripe.dxf.font.c;
+                        color  = styleOptions.secondRowStripe.dxf.font.getColor();
                     else
                         color = defaultColor
                 }
@@ -5191,74 +5178,53 @@ function OfflineEditor () {
         AscCommon.ChartPreviewManager.prototype.clearPreviews = function() {window["native"]["ClearCacheChartStyles"]();};
         AscCommon.ChartPreviewManager.prototype.createChartPreview = function(_graphics, type, styleIndex) {
             return AscFormat.ExecuteNoHistory(function(){
-                if(!this.chartsByTypes[type])
-                    this.chartsByTypes[type] = this.getChartByType(type);
-                var chart_space = this.chartsByTypes[type];
-                if(chart_space.style !== styleIndex)
-                {
-                    chart_space.style = styleIndex;
-                    chart_space.recalculateMarkers();
-                    chart_space.recalculateSeriesColors();
-                    chart_space.recalculatePlotAreaChartBrush();
-                    chart_space.recalculatePlotAreaChartPen();
-                    chart_space.recalculateChartBrush();
-                    chart_space.recalculateChartPen();
-                    chart_space.recalculateUpDownBars();
-                }
-                chart_space.recalculatePenBrush();
-
-                var _width_px = this.CHART_PREVIEW_WIDTH_PIX;
-                var _height_px = this.CHART_PREVIEW_WIDTH_PIX;
-                if (AscCommon.AscBrowser.isRetina)
-                {
-                    _width_px <<= 1;
-                    _height_px <<= 1;
-                }
-
-                window["native"]["BeginDrawDefaultStyle"](type + '', styleIndex);
-
-                //window["native"]["DD_StartNativeDraw"](_width_px, _height_px, 50, 50);
-
-                var dKoefToMM = AscCommon.g_dKoef_pix_to_mm;
-                if (this.IsRetinaEnabled)
-                    dKoefToMM /= 2;
-
-                chart_space.draw(_graphics);
-                _graphics.ClearParams();
-
-                window["native"]["EndDrawStyle"]();
-
-//               var _stream = global_memory_stream_menu;
-//               _stream["ClearNoAttack"]();
-//               _stream["WriteByte"](4);
-//               _stream["WriteLong"](type);
-//               _stream["WriteLong"](styleIndex);
-//                window["native"]["DD_EndNativeDraw"](_stream);
+            
+            if(!this.chartsByTypes[type])
+                this.chartsByTypes[type] = this.getChartByType(type);
+            
+            var chart_space = this.chartsByTypes[type];
+            AscFormat.ApplyPresetToChartSpace(chart_space, AscCommon.g_oChartPresets[type][styleIndex]);
+            chart_space.recalcInfo.recalculateReferences = false;
+            chart_space.recalculate();
+            
+            var _width_px = this.CHART_PREVIEW_WIDTH_PIX;
+            var _height_px = this.CHART_PREVIEW_HEIGHT_PIX;
+            if (AscCommon.AscBrowser.isRetina)
+            {
+                _width_px <<= 1;
+                _height_px <<= 1;
+            }
+            
+            window["native"]["BeginDrawDefaultStyle"](type + '', styleIndex);
+            
+            var dKoefToMM = AscCommon.g_dKoef_pix_to_mm;
+            if (this.IsRetinaEnabled)
+                dKoefToMM /= 2;
+            
+            chart_space.draw(_graphics);
+            _graphics.ClearParams();
+            
+            window["native"]["EndDrawStyle"]();
 
             }, this, []);
-
         };
+        
         AscCommon.ChartPreviewManager.prototype.getChartPreviews = function(chartType) {
-
-            if (AscFormat.isRealNumber(chartType))
-            {
+            
+            if (AscFormat.isRealNumber(chartType)) {
+                
                 var bIsCached = window["native"]["IsCachedChartStyles"](chartType);
-                if (!bIsCached)
-                {
-                    // window["native"]["DD_PrepareNativeDraw"]();
-
+                if (!bIsCached) {
+                    
                     window["native"]["SetStylesType"](2);
-
+                    
                     var _graphics = new CDrawingStream();
-
-                    for (var i = 1; i < 49; ++i) {
-                        this.createChartPreview(_graphics, chartType, i);
+                    
+                    if(AscCommon.g_oChartPresets[chartType]){
+                        var nStylesCount = AscCommon.g_oChartPresets[chartType].length;
+                        for(var i = 0; i < nStylesCount; ++i)
+                            this.createChartPreview(_graphics, chartType, i);
                     }
-
-                    // var _stream = global_memory_stream_menu;
-                    // _stream["ClearNoAttack"]();
-                    // _stream["WriteByte"](5);
-                    // _api.WordControl.m_oDrawingDocument.Native["DD_EndNativeDraw"](_stream);
                 }
             }
         };

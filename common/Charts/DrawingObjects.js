@@ -2866,7 +2866,7 @@ function DrawingObjects() {
 				_this.controller.selectObject(aObjects[0].graphicObject, 0);
             }
             _this.controller.editChartDrawingObjects(chart);
-            _this.showDrawingObjects(false);
+            //_this.showDrawingObjects(false);
         }
     };
 

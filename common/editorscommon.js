@@ -2026,6 +2026,17 @@ CContentChanges.prototype.Add = function(Changes)
 {
 	this.m_aChanges.push( Changes );
 };
+CContentChanges.prototype.RemoveByHistoryItem = function(Item)
+{
+	for (var nIndex = 0, nCount = this.m_aChanges.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.m_aChanges[nIndex].m_pData === Item)
+		{
+			this.m_aChanges.splice(nIndex, 1);
+			return;
+		}
+	}
+};
 CContentChanges.prototype.Clear = function()
 {
 	this.m_aChanges.length = 0;

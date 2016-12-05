@@ -742,6 +742,8 @@ CGraphicObjects.prototype =
             {
                 History.Create_NewPoint(AscDFH.historydescription_Document_GrObjectsBringForwardGroup);
                 this.selection.groupSelection.bringForward();
+                this.document.Recalculate();
+                this.document.Document_UpdateUndoRedoState();
             }
         }
         else
@@ -797,6 +799,8 @@ CGraphicObjects.prototype =
             {
                 History.Create_NewPoint(AscDFH.historydescription_Document_GrObjectsSendToBackGroup);
                 this.selection.groupSelection.sendToBack();
+                this.document.Recalculate();
+                this.document.Document_UpdateUndoRedoState();
             }
         }
         else
@@ -831,6 +835,8 @@ CGraphicObjects.prototype =
             {
                 History.Create_NewPoint(AscDFH.historydescription_Document_GrObjectsBringBackwardGroup);
                 this.selection.groupSelection.bringBackward();
+                this.document.Recalculate();
+                this.document.Document_UpdateUndoRedoState();
             }
         }
         else

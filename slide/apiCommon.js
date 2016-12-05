@@ -258,7 +258,14 @@ function CBackground (obj)
 {
     if (obj)
     {
-        this.Color = (undefined != obj.Color && null != obj.Color) ? AscCommon.CreateAscColorCustom(obj.Color.r, obj.Color.g, obj.Color.b) : null;
+        if (obj.Unifill && obj.Unifill.fill && obj.Unifill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_SOLID && obj.Unifill.fill.color)
+        {
+            this.Color = AscCommon.CreateAscColor(obj.Unifill.fill.color);
+        }
+        else
+        {
+            this.Color = (undefined != obj.Color && null != obj.Color) ? AscCommon.CreateAscColorCustom(obj.Color.r, obj.Color.g, obj.Color.b) : null;
+        }
         this.Value = (undefined != obj.Value) ? obj.Value : null;
     }
     else
@@ -267,10 +274,10 @@ function CBackground (obj)
         this.Value = 1;
     }
 }
-CBackground.prototype.get_Color = function (){return this.Color;}
-CBackground.prototype.put_Color = function (v){this.Color = (v) ? v: null;}
-CBackground.prototype.get_Value = function (){return this.Value;}
-CBackground.prototype.put_Value = function (v){this.Value = v;}
+CBackground.prototype.get_Color = function (){return this.Color;};
+CBackground.prototype.put_Color = function (v){this.Color = (v) ? v: null;};
+CBackground.prototype.get_Value = function (){return this.Value;};
+CBackground.prototype.put_Value = function (v){this.Value = v;};
 
 function CTablePositionH(obj)
 {

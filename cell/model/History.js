@@ -252,10 +252,25 @@ CHistory.prototype.Undo = function()
 	for ( var Index = Point.Items.length - 1; Index >= 0; Index-- )
 	{
 		var Item = Point.Items[Index];
-		if(!Item.Class.Read_FromBinary2)
+
+
+
+		if(!Item.Class.Read_FromBinary2 && !Item.Class.IsChangesClass)
 			Item.Class.Undo( Item.Type, Item.Data, Item.SheetId );
 		else
-			Item.Class.Undo(Item.Data);
+		{
+            if (Item.Class && Item.Class.IsChangesClass && Item.Class.IsChangesClass())
+            {
+                Item.Class.Undo();
+                Item.Class.RefreshRecalcData();
+            }
+            else
+            {
+                Item.Class.Undo(Item.Type);
+                Item.Class.Refresh_RecalcData && Item.Class.Refresh_RecalcData(Item.Type);
+            }
+        }
+
 		this._addRedoObjectParam(oRedoObjectParam, Item);
 	}
 	this.UndoRedoEnd(Point, oRedoObjectParam, true);
@@ -301,26 +316,39 @@ CHistory.prototype.RedoAdd = function(oRedoObjectParam, Class, Type, sheetid, ra
 		this.TurnOff();
 
 	// ToDo Убрать это!!!
-	if(Class && !Class.Load_Changes)
+	if(Class && !Class.Load_Changes && !Class.Load)
 	{
 		Class.Redo( Type, Data, sheetid );
 	}
 	else
 	{
-		if(!Data.isDrawingCollaborativeData)
+		if(Class && Data && !Data.isDrawingCollaborativeData)
 			Class.Redo(Data);
 		else
 		{
-			Data.oBinaryReader.Seek2(Data.nPos);
-			if(!Class)
-			{
-				Class = AscCommon.g_oTableId.Get_ById(Data.sChangedObjectId);
-				if(Class)
-					this.Add(Class, Type, sheetid, range, Data, LocalChange);
-			}
-			if(Class)
-			{
-				Class.Load_Changes(Data.oBinaryReader, null, new CDocumentColor(255, 255, 255));
+			if(!Class){
+				if(Data.isDrawingCollaborativeData){
+                    Data.oBinaryReader.Seek2(Data.nPos);
+                    var nReaderPos   = Data.oBinaryReader.GetCurPos();
+                    var nChangesType = Data.oBinaryReader.GetLong();
+
+                    var changedObject = AscCommon.g_oTableId.Get_ById(Data.sChangedObjectId);
+                    if(changedObject){
+
+                        var fChangesClass = AscDFH.changesFactory[nChangesType];
+                        if (fChangesClass)
+                        {
+                            var oChange = new fChangesClass(changedObject);
+                            oChange.ReadFromBinary(Data.oBinaryReader);
+                            oChange.Load(new CDocumentColor(255, 255, 255));
+                        }
+                        else
+                        {
+                            Data.oBinaryReader.Seek2(nReaderPos);
+                            changedObject.Load_Changes(Data.oBinaryReader, null, new CDocumentColor(255, 255, 255));
+                        }
+					}
+				}
 			}
 		}
 	}
@@ -340,12 +368,24 @@ CHistory.prototype.RedoExecute = function(Point, oRedoObjectParam)
 	for ( var Index = 0; Index < Point.Items.length; Index++ )
 	{
 		var Item = Point.Items[Index];
-		if(!Item.Class.Load_Changes)
+		if(!Item.Class.Read_FromBinary2 && !Item.Class.IsChangesClass)
 			Item.Class.Redo( Item.Type, Item.Data, Item.SheetId );
 		else
 		{
-			if(!Item.Data.isDrawingCollaborativeData)
-				Item.Class.Redo(Item.Data);
+			if(!Item.Data || !Item.Data.isDrawingCollaborativeData)
+			{
+                if (Item.Class && Item.Class.IsChangesClass && Item.Class.IsChangesClass())
+                {
+                    Item.Class.Redo();
+                    Item.Class.RefreshRecalcData();
+                }
+                else
+                {
+                    Item.Class.Redo(Item.Type);
+                    Item.Class.Refresh_RecalcData && Item.Class.Refresh_RecalcData(Item.Type);
+                }
+
+            }
 			else
 			{
 				Item.Data.oBinaryReader.Seek(Item.Data.nPos);
@@ -548,8 +588,10 @@ CHistory.prototype.Get_RecalcData = function(Point2)
 				{
 					var Item = Point.Items[Index];
 
-					if ( /*true === Item.NeedRecalc*/ Item.Class && Item.Class.Refresh_RecalcData )
-						Item.Class.Refresh_RecalcData( Item.Data );
+					if (Item.Class && Item.Class.Refresh_RecalcData )
+						Item.Class.Refresh_RecalcData( Item.Type );
+					else if (Item.Class && Item.Class.RefreshRecalcData )
+                        Item.Class.RefreshRecalcData();
 					if(Item.Type === AscCH.historyitem_Workbook_ChangeColorScheme && Item.Class === AscCommonExcel.g_oUndoRedoWorkbook)
 					{
 						var wsViews = Asc["editor"].wb.wsViews;
@@ -694,32 +736,15 @@ CHistory.prototype.Add = function(Class, Type, sheetid, range, Data, LocalChange
 	var Item;
 	if ( this.RecIndex >= this.Index )
 		this.RecIndex = this.Index - 1;
-
-	// ToDo Убрать это!!!
-	if(Class && !Class.Save_Changes)
+	Item =
 	{
-		Item =
-		{
-			Class : Class,
-			Type  : Type,
-			SheetId : sheetid,
-			Range : null,
-			Data  : Data,
-			LocalChange: this.LocalChange
-		};
-	}
-	else
-	{
-		Item =
-		{
-			Class : Class,
-			Type  : Type.Type,
-			SheetId : sheetid,
-			Range : null,
-			Data  : Type,
-			LocalChange: this.LocalChange
-		};
-	}
+		Class : Class,
+		Type  : Type,
+		SheetId : sheetid,
+		Range : null,
+		Data  : Data,
+		LocalChange: this.LocalChange
+	};
 	if(null != range)
 		Item.Range = range.clone();
 	if(null != LocalChange)

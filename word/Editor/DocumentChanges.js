@@ -78,7 +78,11 @@ CChangesDocumentAddItem.prototype.Undo = function()
 	var oDocument = this.Class;
 	var Elements  = oDocument.Content.splice(Pos, 1);
 	oDocument.private_RecalculateNumbering(Elements);
-	oDocument.SectionsInfo.Update_OnRemove(Pos, 1);
+	if(oDocument.SectionsInfo)
+	{
+        oDocument.SectionsInfo.Update_OnRemove(Pos, 1);
+	}
+
 
 	if (Pos > 0)
 	{
@@ -108,7 +112,10 @@ CChangesDocumentAddItem.prototype.Redo = function()
 	var oDocument = this.Class;
 	oDocument.Content.splice(Pos, 0, Element);
 	oDocument.private_RecalculateNumbering([Element]);
-	oDocument.SectionsInfo.Update_OnAdd(Pos, [Element]);
+	if(oDocument.SectionsInfo)
+	{
+        oDocument.SectionsInfo.Update_OnAdd(Pos, [Element]);
+	}
 
 	if (Pos > 0)
 	{
@@ -178,7 +185,10 @@ CChangesDocumentAddItem.prototype.Load = function(Color)
 
 		oDocument.Content.splice(Pos, 0, Element);
 		oDocument.private_RecalculateNumbering([Element]);
-		oDocument.SectionsInfo.Update_OnAdd(Pos, [Element]);
+		if(oDocument.SectionsInfo)
+		{
+            oDocument.SectionsInfo.Update_OnAdd(Pos, [Element]);
+		}
 		oDocument.private_ReindexContent(Pos);
 
 		AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(oDocument, Pos);
@@ -215,7 +225,11 @@ CChangesDocumentRemoveItem.prototype.Undo = function()
 	oDocument.private_RecalculateNumbering(this.Items);
 	oDocument.Content = Array_start.concat(this.Items, Array_end);
 
-	oDocument.SectionsInfo.Update_OnAdd(this.Pos, this.Items);
+	if(oDocument.SectionsInfo)
+	{
+        oDocument.SectionsInfo.Update_OnAdd(this.Pos, this.Items);
+	}
+
 
 	var nStartIndex = Math.max(this.Pos - 1, 0);
 	var nEndIndex   = Math.min(oDocument.Content.length - 1, this.Pos + this.Items.length + 1);
@@ -240,7 +254,11 @@ CChangesDocumentRemoveItem.prototype.Redo = function()
 	var oDocument = this.Class;
 	var Elements = oDocument.Content.splice(this.Pos, this.Items.length);
 	oDocument.private_RecalculateNumbering(Elements);
-	oDocument.SectionsInfo.Update_OnRemove(this.Pos, this.Items.length);
+	if(oDocument.SectionsInfo)
+	{
+        oDocument.SectionsInfo.Update_OnRemove(this.Pos, this.Items.length);
+	}
+
 
 	var Pos = this.Pos;
 	if (Pos > 0)
@@ -300,7 +318,10 @@ CChangesDocumentRemoveItem.prototype.Load = function(Color)
 			oDocument.Content[Pos].Prev = null;
 		}
 
-		oDocument.SectionsInfo.Update_OnRemove(Pos, 1);
+		if(oDocument.SectionsInfo)
+		{
+            oDocument.SectionsInfo.Update_OnRemove(Pos, 1);
+		}
 		oDocument.private_ReindexContent(Pos);
 	}
 };

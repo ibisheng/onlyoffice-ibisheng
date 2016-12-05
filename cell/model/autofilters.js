@@ -1729,7 +1729,7 @@
 					else
 					{
 						curFilter.SortState.SortConditions[0].dxf.font = new AscCommonExcel.Font();
-						curFilter.SortState.SortConditions[0].dxf.font.c = color;
+						curFilter.SortState.SortConditions[0].dxf.font.setColor(color);
 						curFilter.SortState.SortConditions[0].ConditionSortBy = Asc.ESortBy.sortbyFontColor;
 					}
 

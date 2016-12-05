@@ -46,6 +46,19 @@ AscDFH.changesFactory[AscDFH.historyitem_Footnotes_SetFootnotePrNumStart]    = C
 AscDFH.changesFactory[AscDFH.historyitem_Footnotes_SetFootnotePrNumRestart]  = CChangesFootnotesSetFootnotePrNumRestart;
 AscDFH.changesFactory[AscDFH.historyitem_Footnotes_SetFootnotePrNumFormat]   = CChangesFootnotesSetFootnotePrNumFormat;
 
+//----------------------------------------------------------------------------------------------------------------------
+// Карта зависимости изменений
+//----------------------------------------------------------------------------------------------------------------------
+AscDFH.changesRelationMap[AscDFH.historyitem_Footnotes_AddFootnote]              = [AscDFH.historyitem_Footnotes_AddFootnote];
+AscDFH.changesRelationMap[AscDFH.historyitem_Footnotes_SetSeparator]             = [AscDFH.historyitem_Footnotes_SetSeparator];
+AscDFH.changesRelationMap[AscDFH.historyitem_Footnotes_SetContinuationSeparator] = [AscDFH.historyitem_Footnotes_SetContinuationSeparator];
+AscDFH.changesRelationMap[AscDFH.historyitem_Footnotes_SetContinuationNotice]    = [AscDFH.historyitem_Footnotes_SetContinuationNotice];
+AscDFH.changesRelationMap[AscDFH.historyitem_Footnotes_SetFootnotePrPos]         = [AscDFH.historyitem_Footnotes_SetFootnotePrPos];
+AscDFH.changesRelationMap[AscDFH.historyitem_Footnotes_SetFootnotePrNumStart]    = [AscDFH.historyitem_Footnotes_SetFootnotePrNumStart];
+AscDFH.changesRelationMap[AscDFH.historyitem_Footnotes_SetFootnotePrNumRestart]  = [AscDFH.historyitem_Footnotes_SetFootnotePrNumRestart];
+AscDFH.changesRelationMap[AscDFH.historyitem_Footnotes_SetFootnotePrNumFormat]   = [AscDFH.historyitem_Footnotes_SetFootnotePrNumFormat];
+//----------------------------------------------------------------------------------------------------------------------
+
 /**
  * @constructor
  * @extends {AscDFH.CChangesBase}
@@ -79,6 +92,16 @@ CChangesParaFieldAddItem.prototype.ReadFromBinary = function(Reader)
 CChangesParaFieldAddItem.prototype.CreateReverseChange = function()
 {
 	return null;
+};
+CChangesParaFieldAddItem.prototype.Merge = function(oChange)
+{
+	if (this.Class !== oChange.Class)
+		return true;
+
+	if (this.Type === oChange.Type && this.Id === oChange.Id)
+		return false;
+
+	return true;
 };
 /**
  * @constructor

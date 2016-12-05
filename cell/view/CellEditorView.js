@@ -1093,7 +1093,7 @@
 						last = this._findFragment(val.cursorePos + val.formulaRangeLength - 1, fragments);
 						if (first && last) {
 							for (k = first.index; k <= last.index; ++k) {
-								fragments[k].format.c = AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % lengthColors];
+								fragments[k].format.setColor(AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % lengthColors]);
 							}
 						}
 					}
@@ -1984,11 +1984,11 @@
 			}
 			fr[i].text = s;
 			f = fr[i].format;
-			if (f.fn === "") {
-				f.fn = t.options.font.FontFamily.Name;
+			if (f.getName() === "") {
+				f.setName(t.options.font.FontFamily.Name);
 			}
-			if (f.fs === 0) {
-				f.fs = t.options.font.FontSize;
+			if (f.getSize() === 0) {
+				f.setSize(t.options.font.FontSize);
 			}
 		}
 	};
@@ -2008,39 +2008,43 @@
 	CellEditor.prototype._setFormatProperty = function (format, prop, val) {
 		switch (prop) {
 			case "fn":
-				format.fn = val;
-				format.scheme = Asc.EFontScheme.fontschemeNone;
+				format.setName(val);
+				format.setScheme(null);
 				break;
 			case "fs":
-				format.fs = val;
+				format.setSize(val);
 				break;
 			case "b":
-				val = (null === val) ? ((format.b) ? !format.b : true) : val;
-				format.b = val;
+				var bold = format.getBold();
+				val = (null === val) ? ((bold) ? !bold : true) : val;
+				format.setBold(val);
 				break;
 			case "i":
-				val = (null === val) ? ((format.i) ? !format.i : true) : val;
-				format.i = val;
+				var italic = format.getItalic();
+				val = (null === val) ? ((italic) ? !italic : true) : val;
+				format.setItalic(val);
 				break;
 			case "u":
-				val = (null === val) ? ((Asc.EUnderline.underlineSingle !== format.u) ? Asc.EUnderline.underlineSingle :
+				var underline = format.getUnderline();
+				val = (null === val) ? ((Asc.EUnderline.underlineNone === underline) ? Asc.EUnderline.underlineSingle :
 					Asc.EUnderline.underlineNone) : val;
-				format.u = val;
+				format.setUnderline(val);
 				break;
 			case "s":
-				val = (null === val) ? ((format.s) ? !format.s : true) : val;
-				format.s = val;
+				var strikeout = format.getStrikeout();
+				val = (null === val) ? ((strikeout) ? !strikeout : true) : val;
+				format.setStrikeout(val);
 				break;
 			case "fa":
-				format.va = val;
+				format.setVerticalAlign(val);
 				break;
 			case "c":
-				format.c = val;
+				format.setColor(val);
 				break;
 			case "changeFontSize":
-				var newFontSize = asc_incDecFonSize(val, format.fs);
+				var newFontSize = asc_incDecFonSize(val, format.getSize());
 				if (null !== newFontSize) {
-					format.fs = newFontSize;
+					format.setSize(newFontSize);
 				}
 				break;
 		}
@@ -2120,17 +2124,19 @@
 			return;
 		}
 		tmp = this.options.fragments[tmp.index].format;
-
+		var va = tmp.getVerticalAlign();
+		var fc = tmp.getColor();
 		var result = new AscCommonExcel.asc_CFont();
-		result.name = tmp.fn;
-		result.size = tmp.fs;
-		result.bold = tmp.b;
-		result.italic = tmp.i;
-		result.underline = (Asc.EUnderline.underlineNone !== tmp.u); // ToDo убрать, когда будет реализовано двойное подчеркивание
-		result.strikeout = tmp.s;
-		result.subscript = tmp.va === AscCommon.vertalign_SubScript;
-		result.superscript = tmp.va === AscCommon.vertalign_SuperScript;
-		result.color = (tmp.c ? asc.colorObjToAscColor( tmp.c ) : new Asc.asc_CColor( this.options.textColor ));
+		result.name = tmp.getName();
+		result.size = tmp.getSize();
+		result.bold = tmp.getBold();
+		result.italic = tmp.getItalic();
+		// ToDo убрать, когда будет реализовано двойное подчеркивание
+		result.underline = (Asc.EUnderline.underlineNone !== tmp.getUnderline());
+		result.strikeout = tmp.getStrikeout();
+		result.subscript = va === AscCommon.vertalign_SubScript;
+		result.superscript = va === AscCommon.vertalign_SuperScript;
+		result.color = (fc ? asc.colorObjToAscColor( fc ) : new Asc.asc_CColor( this.options.textColor ));
 
 		this.handlers.trigger( "updateEditorSelectionInfo", result );
 	};

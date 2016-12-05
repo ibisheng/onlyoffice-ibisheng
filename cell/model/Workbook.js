@@ -2051,10 +2051,10 @@ Workbook.prototype.rebuildColors=function(){
 		this.aWorksheets[i].rebuildColors();
 };
 Workbook.prototype.getDefaultFont=function(){
-	return g_oDefaultFormat.Font.fn;
+	return g_oDefaultFormat.Font.getName();
 };
 Workbook.prototype.getDefaultSize=function(){
-	return g_oDefaultFormat.Font.fs;
+	return g_oDefaultFormat.Font.getSize();
 };
 Workbook.prototype.getActive=function(){
 	return this.nActive;
@@ -2482,8 +2482,7 @@ Workbook.prototype._generateFontMap=function(){
 		"Arial"		: 1
 	};
 
-	if(null != g_oDefaultFormat.Font.fn)
-		oFontMap[g_oDefaultFormat.Font.fn] = 1;
+	oFontMap[g_oDefaultFormat.Font.getName()] = 1;
 	
 	for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
 		this.aWorksheets[i].generateFontMap(oFontMap);
@@ -3382,33 +3381,33 @@ Woorksheet.prototype.generateFontMap=function(oFontMap){
 	for(var i in this.aCols)
 	{
 		var col = this.aCols[i];
-		if(null != col && null != col.xfs && null != col.xfs.font && null != col.xfs.font.fn)
-			oFontMap[col.xfs.font.fn] = 1;
+		if(null != col && null != col.xfs && null != col.xfs.font)
+			oFontMap[col.xfs.font.getName()] = 1;
 	}
-	if(null != this.oAllCol && null != this.oAllCol.xfs && null != this.oAllCol.xfs.font && null != this.oAllCol.xfs.font.fn)
-		oFontMap[this.oAllCol.xfs.font.fn] = 1;
+	if(null != this.oAllCol && null != this.oAllCol.xfs && null != this.oAllCol.xfs.font)
+		oFontMap[this.oAllCol.xfs.font.getName()] = 1;
 	//пробегаемся строкам
 	for(var i in this.aGCells)
 	{
 		var row = this.aGCells[i];
-		if(null != row && null != row.xfs && null != row.xfs.font && null != row.xfs.font.fn)
-			oFontMap[row.xfs.font.fn] = 1;
+		if(null != row && null != row.xfs && null != row.xfs.font)
+			oFontMap[row.xfs.font.getName()] = 1;
 		//пробегаемся по ячейкам
 		for(var j in row.c)
 		{
 			var cell = row.c[j];
 			if(null != cell)
 			{
-				if(null != cell.xfs && null != cell.xfs.font && null != cell.xfs.font.fn)
-					oFontMap[cell.xfs.font.fn] = 1;
+				if(null != cell.xfs && null != cell.xfs.font)
+					oFontMap[cell.xfs.font.getName()] = 1;
 				//смотрим в комплексных строках
 				if(null != cell.oValue && null != cell.oValue.multiText)
 				{
 					for(var k = 0, length3 = cell.oValue.multiText.length; k < length3; ++k)
 					{
 						var part = cell.oValue.multiText[k];
-						if(null != part.format && null != part.format.fn)
-							oFontMap[part.format.fn] = 1;
+						if(null != part.format)
+							oFontMap[part.format.getName()] = 1;
 					}
 				}
 			}
@@ -3604,7 +3603,17 @@ Woorksheet.prototype.clone=function(sNewId, sName, tableNames){
 				this.sheetViews[j].pane = null;
 			}
 		}
-
+		
+		if (this.TableParts && this.TableParts.length) {
+			var tableParts = this.TableParts;
+			if (tableParts) {
+				for (var i = 0; i < tableParts.length; i++) {
+					//TODO пока заменяем при открытии на TotalsRowFormula
+					tableParts[i].checkTotalRowFormula();
+				}
+			}
+		}
+		
 		this._updateConditionalFormatting(null);
 
 		this.handlers = handlers;
@@ -5774,7 +5783,7 @@ Cell.prototype.compileXfs=function(){
 		if(null != this.xfs)
 		{
 			if(null != this.compiledXfs)
-				this.compiledXfs = this.xfs.merge(this.compiledXfs);
+				this.compiledXfs = this.xfs.merge(this.compiledXfs, true);
 			else
 				this.compiledXfs = this.xfs;
 		}
@@ -6331,6 +6340,12 @@ Cell.prototype.setFormulaCA = function(ca){
 	if(ca) this.sFormulaCA = true;
 	else if( this.sFormulaCA ) this.sFormulaCA = null;
 };
+	Cell.prototype.getFont=function(){
+		var xfs = this.getCompiledStyle();
+		if(null != xfs && null != xfs.font)
+			return xfs.font;
+		return g_oDefaultFormat.Font;
+	};
 //-------------------------------------------------------------------------------------------------
 
 	function CellAndValue(c, v) {
@@ -7564,10 +7579,10 @@ Range.prototype.isNotDefaultFont = function () {
 	var row = this.worksheet._getRowNoEmpty(this.bbox.r1);
 	if (row && null != row.xfs && null != row.xfs.font)
 		rowFont = row.xfs.font;
-	else if (null != this.oAllCol)
-		rowFont = this.oAllCol;
+	else if (null != this.worksheet.oAllCol && this.worksheet.oAllCol.xfs && this.worksheet.oAllCol.xfs.font)
+		rowFont = this.worksheet.oAllCol.xfs.font;
 
-	return (cellFont.fn !== rowFont.fn || cellFont.fs !== rowFont.fs);
+	return (cellFont.getName() !== rowFont.getName() || cellFont.getSize() !== rowFont.getSize());
 };
 Range.prototype.getFont = function(){
 	var nRow = this.bbox.r1;
@@ -7590,42 +7605,6 @@ Range.prototype.getFont = function(){
 			return col.xfs.font;
 	}
     return g_oDefaultFormat.Font;
-};
-Range.prototype.getFontname=function(){
-	return this.getFont().fn;
-};
-Range.prototype.getFontsize=function(){
-	return this.getFont().fs;
-};
-Range.prototype.getFontcolor=function(){
-	return this.getFont().c;
-};
-Range.prototype.getBold=function(){
-	return this.getFont().b;
-};
-Range.prototype.getItalic=function(){
-	return this.getFont().i;
-};
-Range.prototype.getUnderline=function(){
-	return this.getFont().u;
-};
-Range.prototype.getStrikeout=function(){
-	return this.getFont().s;
-};
-Range.prototype.getFontAlign=function(){
-	return this.getFont().va;
-};
-Range.prototype.getQuotePrefix=function(){
-	var nRow = this.bbox.r1;
-	var nCol = this.bbox.c1;
-	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
-	if(null != cell)
-	{
-		var xfs = cell.getCompiledStyle();
-		if(null != xfs && null != xfs.QuotePrefix)
-			return xfs.QuotePrefix;
-	}
-	return false;
 };
 Range.prototype.getAlignVertical=function(){
 	var nRow = this.bbox.r1;
@@ -7900,33 +7879,6 @@ Range.prototype.getAngle=function(){
 			return angleFormatToInterface(col.xfs.align.angle);
 	}
     return angleFormatToInterface(g_oDefaultFormat.Align.angle);
-};
-Range.prototype.getVerticalText=function(){
-	var nRow = this.bbox.r1;
-	var nCol = this.bbox.c1;
-	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
-	if(null != cell)
-    {
-		var xfs = cell.getCompiledStyle();
-        if(null != xfs)
-		{
-			if(null != xfs.align)
-				return g_nVerticalTextAngle == xfs.align.angle;
-			else
-				return g_nVerticalTextAngle == g_oDefaultFormat.AlignAbs.angle;
-		}
-    }
-	else
-	{
-		//стили столбов и колонок
-		var row = this.worksheet._getRowNoEmpty(nRow);
-		if(row && null != row.xfs && null != row.xfs.align)
-			return g_nVerticalTextAngle == row.xfs.align.angle;
-		var col = this.worksheet._getColNoEmptyWithAll(nCol);
-		if(null != col && null != col.xfs && null != col.xfs.align)
-			return g_nVerticalTextAngle == col.xfs.align.angle;
-	}
-    return g_nVerticalTextAngle == g_oDefaultFormat.Align.angle;
 };
 Range.prototype.hasMerged=function(){
 	var aMerged = this.worksheet.mergeManager.get(this.bbox);
@@ -8373,10 +8325,10 @@ Range.prototype.setHyperlink=function(val, bWithoutStyle){
 		if(true != bWithoutStyle)
 		{
 			var oHyperlinkFont = new AscCommonExcel.Font();
-			oHyperlinkFont.fn = this.worksheet.workbook.getDefaultFont();
-			oHyperlinkFont.fs = this.worksheet.workbook.getDefaultSize();
-			oHyperlinkFont.u = Asc.EUnderline.underlineSingle;
-			oHyperlinkFont.c = AscCommonExcel.g_oColorManager.getThemeColor(AscCommonExcel.g_nColorHyperlink);
+			oHyperlinkFont.setName(this.worksheet.workbook.getDefaultFont());
+			oHyperlinkFont.setSize(this.worksheet.workbook.getDefaultSize());
+			oHyperlinkFont.setUnderline(Asc.EUnderline.underlineSingle);
+			oHyperlinkFont.setColor(AscCommonExcel.g_oColorManager.getThemeColor(AscCommonExcel.g_nColorHyperlink));
 			this.setFont(oHyperlinkFont);
 		}
 		if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
@@ -8869,7 +8821,7 @@ Range.prototype.sort=function(nOption, nStartCol, sortColor, opt_guessHeader){
 							colorsTextCell = [];
 						}
 						
-						colorsTextCell.push(value2[n].format.c);
+						colorsTextCell.push(value2[n].format.getColor());
 					}
 				}
 				
