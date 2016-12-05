@@ -5315,10 +5315,11 @@ CellArea.prototype = {
 			if (0 === i) {
 				result.assign2(item.sqref);
 			} else {
-				result.union(item.sqref);
+				result.addRange();
+				result.getLast().assign2(item.sqref);
 			}
 		});
-		return result;
+		return result.getUnion();
 	};
 	sparklineGroup.prototype.asc_getId = function () {
 		return this.Id;

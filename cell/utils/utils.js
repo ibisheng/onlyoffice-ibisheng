@@ -701,6 +701,28 @@
 				this.getLast().assign2(range);
 			}
 		};
+		SelectionRange.prototype.getUnion = function () {
+			var result = new SelectionRange();
+			var unionRanges = function (ranges, res) {
+				ranges.forEach(function (item, i) {
+					if (0 === i) {
+						res.assign2(item);
+					} else {
+						res.union(item);
+					}
+				});
+			};
+			unionRanges(this.ranges, result);
+
+			var isUnion = true, resultTmp;
+			while (isUnion && !result.isSingleRange()) {
+				resultTmp = new SelectionRange();
+				unionRanges(result.ranges, resultTmp);
+				isUnion = result.ranges.length !== resultTmp.ranges.length;
+				result = resultTmp;
+			}
+			return result;
+		};
 		SelectionRange.prototype.offsetCell = function (dr, dc, fCheckSize) {
 			var done, curRange, mc;
 			var lastRow = this.activeCell.row;
