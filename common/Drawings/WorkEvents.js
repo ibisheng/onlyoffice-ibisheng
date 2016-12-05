@@ -900,7 +900,7 @@
 			_style += "-webkit-transform: translateZ(0); -moz-transform: translateZ(0); -ms-transform: translateZ(0); -o-transform: translateZ(0); transform: translateZ(0);";
 			_style += "-webkit-touch-callout: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;";
 			_style += "-webkit-text-size-adjust: none; -moz-text-size-adjust: none; -ms-text-size-adjust: none; -o-text-size-adjust: none; text-size-adjust: none;";
-			_scroller.style = _style;
+			_scroller.setAttribute("style", _style);
 
 			_scroller.id = _id;
 			_wrapper.appendChild(_scroller);
