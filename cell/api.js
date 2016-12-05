@@ -88,6 +88,7 @@ var editor;
     this.wb = null;
     this.wbModel = null;
     this.tmpLocale = null;
+    this.tmpLocalization = null;
 
     this.documentFormatSave = c_oAscFileType.XLSX;
 
@@ -3141,30 +3142,35 @@ var editor;
     }
   };
 
-  // Выставление локали
-  spreadsheet_api.prototype.asc_setLocalization = function(oLocalizedData) {
-    if (null == oLocalizedData) {
-      AscCommonExcel.cFormulaFunctionLocalized = null;
-      AscCommonExcel.cFormulaFunctionToLocale = null;
-    } else {
-      AscCommonExcel.cFormulaFunctionLocalized = {};
-      AscCommonExcel.cFormulaFunctionToLocale = {};
-      var localName;
-      for (var i in AscCommonExcel.cFormulaFunction) {
-        localName = oLocalizedData[i] ? oLocalizedData[i] : null;
-        localName = localName ? localName : i;
-        AscCommonExcel.cFormulaFunctionLocalized[localName] = AscCommonExcel.cFormulaFunction[i];
-        AscCommonExcel.cFormulaFunctionToLocale[i] = localName;
-      }
-    }
-    AscCommon.build_local_rx(oLocalizedData?oLocalizedData["LocalFormulaOperands"]:null);
-    if (this.wb) {
-      this.wb.initFormulasList();
-    }
-    if (this.wbModel) {
-      this.wbModel.rebuildColors();
-    }
-  };
+	// Выставление локали
+	spreadsheet_api.prototype.asc_setLocalization = function (oLocalizedData) {
+		if (!this.isLoadFullApi) {
+			this.tmpLocalization = oLocalizedData;
+			return;
+		}
+
+		if (null == oLocalizedData) {
+			AscCommonExcel.cFormulaFunctionLocalized = null;
+			AscCommonExcel.cFormulaFunctionToLocale = null;
+		} else {
+			AscCommonExcel.cFormulaFunctionLocalized = {};
+			AscCommonExcel.cFormulaFunctionToLocale = {};
+			var localName;
+			for (var i in AscCommonExcel.cFormulaFunction) {
+				localName = oLocalizedData[i] ? oLocalizedData[i] : null;
+				localName = localName ? localName : i;
+				AscCommonExcel.cFormulaFunctionLocalized[localName] = AscCommonExcel.cFormulaFunction[i];
+				AscCommonExcel.cFormulaFunctionToLocale[i] = localName;
+			}
+		}
+		AscCommon.build_local_rx(oLocalizedData ? oLocalizedData["LocalFormulaOperands"] : null);
+		if (this.wb) {
+			this.wb.initFormulasList();
+		}
+		if (this.wbModel) {
+			this.wbModel.rebuildColors();
+		}
+	};
 
   spreadsheet_api.prototype.asc_nativeOpenFile = function(base64File, version, isUser) {
     asc["editor"] = this;
@@ -3354,20 +3360,22 @@ var editor;
     });
   };
 
-  spreadsheet_api.prototype._onEndLoadSdk = function() {
-    History = AscCommon.History;
+	spreadsheet_api.prototype._onEndLoadSdk = function () {
+		History = AscCommon.History;
 
-    if (this.isMobileVersion)
-        this.asc_setMobileVersion(true);
+		if (this.isMobileVersion) {
+			this.asc_setMobileVersion(true);
+		}
 
-    spreadsheet_api.superclass._onEndLoadSdk.call(this);
+		spreadsheet_api.superclass._onEndLoadSdk.call(this);
 
-    this.controller = new AscCommonExcel.asc_CEventsController();
+		this.controller = new AscCommonExcel.asc_CEventsController();
 
-    this.formulasList = AscCommonExcel.getFormulasInfo();
-    this.asc_setLocale(this.tmpLocale);
-    this.asc_setViewMode(this.isViewMode);
-  };
+		this.formulasList = AscCommonExcel.getFormulasInfo();
+		this.asc_setLocale(this.tmpLocale);
+		this.asc_setLocalization(this.tmpLocalization);
+		this.asc_setViewMode(this.isViewMode);
+	};
 
   /*
    * Export
