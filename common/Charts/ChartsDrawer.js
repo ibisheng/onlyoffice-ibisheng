@@ -9154,22 +9154,23 @@ drawPieChart.prototype =
 			return res;
 		};
 		
-		var calculateInsideFaces = function(startAng, swapAng)
+		var calculateInsideFaces = function(startAng1, swapAng1, startAng2, swapAng2)
 		{
 			var path = getNewPath();
 			
-			var endAng = startAng + swapAng;
-			var p = getSegmentPoints(startAng, endAng);
+			var endAng1 = startAng1 + swapAng1;
+			var endAng2 = startAng2 + swapAng2;
+			var p = getSegmentPoints(startAng1, endAng1, startAng2, endAng2);
 			
-			path.moveTo(xCenter  /pxToMm * pathW, yCenter / pxToMm * pathH);
+			path.moveTo(pointCenter1.x  /pxToMm * pathW, pointCenter1.y / pxToMm * pathH);
 			path.lnTo(p.x0  /pxToMm * pathW, p.y0 / pxToMm * pathH);
 			path.lnTo(p.x1  /pxToMm * pathW, p.y1 / pxToMm * pathH);
-			path.lnTo(xCenter / pxToMm * pathW, (yCenter + depth) / pxToMm * pathH);
+			path.lnTo(pointCenter2.x / pxToMm * pathW, (pointCenter2.y) / pxToMm * pathH);
 			
-			path.moveTo(xCenter  /pxToMm * pathW, yCenter / pxToMm * pathH);
+			path.moveTo(pointCenter1.x  /pxToMm * pathW, pointCenter1.y / pxToMm * pathH);
 			path.lnTo(p.x2 / pxToMm * pathW, p.y2 / pxToMm * pathH);
 			path.lnTo(p.x3 / pxToMm * pathW, p.y3 / pxToMm * pathH);
-			path.lnTo(xCenter / pxToMm * pathW, (yCenter + depth) / pxToMm * pathH);
+			path.lnTo(pointCenter2.x / pxToMm * pathW, (pointCenter2.y) / pxToMm * pathH);
 			
 			path.recalculate(gdLst);
 			
@@ -9268,7 +9269,7 @@ drawPieChart.prototype =
 		
 		//INSIDE FACES
 		var insidePath = null;
-		//var insidePath = calculateInsideFaces(stAng, swAng);
+		var insidePath = calculateInsideFaces(startAngle1, swapAngle1, startAngle2, swapAngle2);
 		
 		//UP FACE
 		var upPath = null;
