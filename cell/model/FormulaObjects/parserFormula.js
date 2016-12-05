@@ -5315,6 +5315,10 @@ function parseNum( str ) {
 	function matching(x, y, operator) {
 		var res = false, rS;
 		if (cElementType.string === y.type) {
+			if ('<' === operator || '>' === operator || '<=' === operator || '>=' === operator) {
+				return _func[x.type][y.type](x, y, operator).toBool();
+			}
+
 			y = y.toString();
 			if ('' === y) {
 				// Empty compare string

@@ -189,8 +189,10 @@
 		 * @return {StringRender}  Returns 'this' to allow chaining
 		 */
 		StringRender.prototype.setDefaultFontFromFmt = function(fmt) {
-			if (asc_typeof(fmt.fn) !== "string" || !(fmt.fs > 0)) {
-				throw "Can not make font from {fmt.fn=" + fmt.fn + ", fmt.fs=" + fmt.fs + "}";
+			var fn = fmt.getName();
+			var fs = fmt.getSize();
+			if (asc_typeof(fn) !== "string" || !(fs > 0)) {
+				throw "Can not make font from {fmt.fn=" + fn + ", fmt.fs=" + fs + "}";
 			}
 			this.defaultFont = this._makeFont(fmt);
 			return this;
@@ -205,7 +207,7 @@
 		StringRender.prototype.setString = function(str, flags) {
 			this.fragments = [];
 			if ( asc_typeof(str) === "string" ) {
-				this.fragments.push({text: str, format: {}});
+				this.fragments.push({text: str, format: new AscCommonExcel.Font()});
 			} else {
 				for (var i = 0; i < str.length; ++i) {
 					this.fragments.push({text: str[i].text, format: str[i].format});
@@ -527,9 +529,11 @@
 		 * @return {Asc.FontProperties}
 		 */
 		StringRender.prototype._makeFont = function(format) {
-			if (format !== undefined && asc_typeof(format.fn) === "string") {
-				var fsz = format.fs > 0 ? format.fs : this.defaultFont.FontSize;
-				return new asc.FontProperties(format.fn, fsz, format.b, format.i, format.u, format.s);
+			var fn = format !== undefined ? format.getName() : undefined;
+			if (format !== undefined && asc_typeof(fn) === "string") {
+				var fs = format.getSize();
+				var fsz = fs > 0 ? fs : this.defaultFont.FontSize;
+				return new asc.FontProperties(fn, fsz, format.getBold(), format.getItalic(), format.getUnderline(), format.getStrikeout());
 			}
 			return this.defaultFont;
 		};
@@ -874,6 +878,7 @@
 				startCh = this.charWidths.length;
 				fr = this.fragments[i];
 				fmt = fr.format;
+				var va = fmt.getVerticalAlign();
 				text = this._filterText(fr.text, wrap || wrapNL);
 
 				f = this._makeFont(fmt);
@@ -882,8 +887,8 @@
 				p = p ? p.clone() : new charProperties();
 
 				// reduce font size for subscript and superscript chars
-				if (fmt.va === AscCommon.vertalign_SuperScript || fmt.va === AscCommon.vertalign_SubScript) {
-					p.va = fmt.va;
+				if (va === AscCommon.vertalign_SuperScript || va === AscCommon.vertalign_SubScript) {
+					p.va = va;
 					p.fsz = f.FontSize;
 					f.FontSize *= 2/3;
 					p.font = f;
@@ -891,7 +896,7 @@
 
 				// change font on canvas
 				eq = f.isEqual(f_);
-				if (!eq || f.Underline !== f_.Underline || f.Strikeout !== f_.Strikeout || fmt.c !== p_.c) {
+				if (!eq || f.Underline !== f_.Underline || f.Strikeout !== f_.Strikeout || fmt.getColor() !== p_.c) {
 					if (!eq) {ctx.setFont(f, this.angle);}
 					p.font = f;
 					f_ = f;
@@ -903,16 +908,16 @@
 				}
 				if (p.font) {
 					p.fm = ctx.getFontMetrics();
-					p.c = fmt.c;
+					p.c = fmt.getColor();
 					this.charProps[pIndex] = p;
 					p_ = p;
 				}
 
-				if (fmt.skip) {
+				if (fmt.getSkip()) {
 					this._getCharPropAt(pIndex).skip = text.length;
 				}
 
-				if (fmt.repeat) {
+				if (fmt.getRepeat()) {
 					if (hasRepeats)
 						throw "Repeat should occur no more than once";
 

@@ -3783,14 +3783,16 @@ PasteProcessor.prototype =
 				for(var n = 0; n < value2.length; n++)
 				{
 					var oCurRun = new ParaRun(oCurPar);
+					var format = value2[n].format;
 					
 					//***text property***
-					oCurRun.Pr.Bold = value2[n].format.b;
-					if(value2[n].format.c)
-						oCurRun.Pr.Color = new CDocumentColor(value2[n].format.c.getR(), value2[n].format.c.getG(), value2[n].format.c.getB());
+					oCurRun.Pr.Bold = format.getBold();
+					var fc = format.getColor();
+					if(fc)
+						oCurRun.Pr.Color = new CDocumentColor(fc.getR(), fc.getG(), fc.getB());
 					
 					//font					
-					var font_family = value2[n].format.fn;
+					var font_family = format.getName();
 					addFont(font_family);
 					oCurRun.Pr.FontFamily = font_family;
 					var oFontItem = this.oFonts[font_family];
@@ -3802,10 +3804,10 @@ PasteProcessor.prototype =
 						oCurRun.Pr.RFonts.EastAsia = {Name: oFontItem.Name, Index: oFontItem.Index};
 					}
 					
-					oCurRun.Pr.FontSize = value2[n].format.fs;
-					oCurRun.Pr.Italic = value2[n].format.i;
-					oCurRun.Pr.Strikeout = value2[n].format.s;
-					oCurRun.Pr.Underline = value2[n].format.u === 3 ? true : false;
+					oCurRun.Pr.FontSize = format.getSize();
+					oCurRun.Pr.Italic = format.getItalic();
+					oCurRun.Pr.Strikeout = format.getStrikeout();
+					oCurRun.Pr.Underline = format.getUnderline() !== 2 ? true : false;
 					
 					//text
 					var value = value2[n].text;
@@ -4049,7 +4051,7 @@ PasteProcessor.prototype =
         tempWorkbook.theme = this.oDocument.theme ? this.oDocument.theme : this.oLogicDocument.theme;
 		if(!tempWorkbook.theme && this.oLogicDocument.themes && this.oLogicDocument.themes[0])
 			tempWorkbook.theme = this.oLogicDocument.themes[0];
-		
+
 		Asc.getBinaryOtherTableGVar(tempWorkbook);
 		
 		pptx_content_loader.Start_UseFullUrl();
@@ -6018,7 +6020,7 @@ PasteProcessor.prototype =
 					//TODO пересмотреть! node.getAttribute("width") в FF возврашает "auto" -> изображения в FF не всталяются
 					if((!nWidth || !nHeight))
 					{
-						if(AscBrowser.isMozilla)
+						if(AscBrowser.isMozilla || AscBrowser.isIE)
 						{
 							nWidth = parseInt(node.width);
 							nHeight = parseInt(node.height);

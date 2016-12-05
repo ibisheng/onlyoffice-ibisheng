@@ -1746,21 +1746,8 @@
                 var elem = this.oFontMap[i];
                 aFonts[elem.index] = elem.val;
             }
-            for(var i = 0, length = aFonts.length; i < length; ++i)
-            {
-                var font = aFonts[i];
-                var fontMinimized = font.getDif(g_oDefaultFormat.FontAbs);
-                if(null == fontMinimized)
-                    fontMinimized = new AscCommonExcel.Font();
-                if(null == fontMinimized.fn)
-                    fontMinimized.fn = g_oDefaultFormat.FontAbs.fn;
-                if(null == fontMinimized.scheme)
-                    fontMinimized.scheme = g_oDefaultFormat.FontAbs.scheme;
-                if(null == fontMinimized.fs)
-                    fontMinimized.fs = g_oDefaultFormat.FontAbs.fs;
-                if(null == fontMinimized.c)
-                    fontMinimized.c = g_oDefaultFormat.FontAbs.c;
-                this.bs.WriteItem(c_oSerStylesTypes.Font, function(){oThis.WriteFont(fontMinimized);});
+            for(var i = 0, length = aFonts.length; i < length; ++i) {
+                this.bs.WriteItem(c_oSerStylesTypes.Font, function(){oThis.WriteFont(aFonts[i]);});
             }
         };
         this.WriteFont = function(font)
@@ -4601,8 +4588,7 @@
                 }
 
                 if(0 == this.aCellXfs.length && !this.isCopyPaste)
-                    this.oStyleManager.init(oNewXfs);
-                this.minimizeXfs(oNewXfs);
+                    this.oStyleManager.init(oNewXfs, this.wb);
                 // При открытии стиль будет ссылкой
                 oNewXfs.isReference = true;
                 this.aCellXfs.push(oNewXfs);
@@ -4629,7 +4615,6 @@
                     var Dxf = Dxfs[elem.DxfId];
                     if(null != Dxf)
                     {
-                        this.minimizeXfs(Dxf);
                         var oTableStyleElement = new CTableStyleElement();
                         oTableStyleElement.dxf = Dxf;
                         if(null != elem.Size)
@@ -4668,19 +4653,6 @@
                     }
                 }
             }
-        };
-        this.minimizeXfs = function(xfs)
-        {
-            if(null != xfs.border && g_oDefaultFormat.Border.isEqual(xfs.border))
-                xfs.border = null;
-            if(null != xfs.fill && g_oDefaultFormat.Fill.isEqual(xfs.fill))
-                xfs.fill = null;
-            if(null != xfs.font && g_oDefaultFormat.Font.isEqual(xfs.font))
-                xfs.font = null;
-            if(null != xfs.num && g_oDefaultFormat.Num.isEqual(xfs.num))
-                xfs.num = null;
-            if(null != xfs.align && g_oDefaultFormat.AlignAbs.isEqual(xfs.align))
-                xfs.align = null;
         };
       this.ParseNum = function(oNum, oNumFmts) {
         var oRes = null;
@@ -6946,31 +6918,23 @@
         };
     }
 
-    function getBinaryOtherTableGVar(workbook)
+    function getBinaryOtherTableGVar(wb)
     {
-        var wb = this.wb ? this.wb : workbook;
-
         AscCommonExcel.g_oColorManager.setTheme(wb.theme);
 
         var sMinorFont = null;
         if(null != wb.theme.themeElements && null != wb.theme.themeElements.fontScheme && null != wb.theme.themeElements.fontScheme.minorFont)
             sMinorFont = wb.theme.themeElements.fontScheme.minorFont.latin;
-        var sDefFont = "Arial";
+        var sDefFont = "Calibri";
         if(null != sMinorFont && "" != sMinorFont)
             sDefFont = sMinorFont;
-        g_oDefaultFormat.Font = g_oDefaultFormat.FontAbs = new AscCommonExcel.Font({
-            fn : sDefFont,
-            scheme : EFontScheme.fontschemeNone,
-            fs : 11,
-            b : false,
-            i : false,
-            u : EUnderline.underlineNone,
-            s : false,
-            c : AscCommonExcel.g_oColorManager.getThemeColor(AscCommonExcel.g_nColorTextDefault),
-            va : AscCommon.vertalign_Baseline,
-            skip : false,
-            repeat : false
-        });
+        g_oDefaultFormat.Font = new AscCommonExcel.Font();
+		g_oDefaultFormat.Font.assignFromObject({
+		    fn: sDefFont,
+            scheme: EFontScheme.fontschemeMinor,
+			fs: 11,
+			c: AscCommonExcel.g_oColorManager.getThemeColor(AscCommonExcel.g_nColorTextDefault)
+		});
         g_oDefaultFormat.Fill = g_oDefaultFormat.FillAbs = new AscCommonExcel.Fill({bg : null});
         g_oDefaultFormat.Border = g_oDefaultFormat.BorderAbs = new AscCommonExcel.Border({
             l : new AscCommonExcel.BorderProp(),

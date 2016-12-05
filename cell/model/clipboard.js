@@ -625,8 +625,8 @@
 
 				function getTextDecoration(format) {
 					var res = [];
-					if (Asc.EUnderline.underlineNone !== format.u) { res.push("underline"); }
-					if (format.s) {res.push("line-through");}
+					if (Asc.EUnderline.underlineNone !== format.getUnderline()) { res.push("underline"); }
+					if (format.getStrikeout()) {res.push("line-through");}
 					return res.length > 0 ? res.join(",") : "";
 				}
 				
@@ -638,7 +638,7 @@
 					
 				for (res = [], i = 0; i < val.length; ++i) 
 				{
-					if(val[i] && val[i].format && val[i].format.skip)
+					if(val[i] && val[i].format && val[i].format.getSkip())
 						continue;						
 					if(cell == undefined || (cell != undefined && (hyperlink == null || (hyperlink != null && hyperlink.getLocation() != null))))
 					{
@@ -666,20 +666,20 @@
 					}
 					
 					f = val[i].format;
-					if (f.c) 
-					{
-						if(f.c && f.c.rgb)
-							span.style.color = number2color(f.c.rgb);
-						else
-							span.style.color = number2color(f.c);
+					var fn = f.getName();
+					var fs = f.getSize();
+					var fc = f.getColor();
+					var va = f.getVerticalAlign();
+					if (fc) {
+						span.style.color = number2color(fc.getRgb());
 					}
 					
-					if (f.fn !== defFN) {span.style.fontFamily = f.fn;}
-					if (f.fs !== defFS) {span.style.fontSize = f.fs + 'pt';}
-					if (f.b) {span.style.fontWeight = 'bold';}
-					if (f.i) {span.style.fontStyle = 'italic';}
+					if (fn !== defFN) {span.style.fontFamily = fn;}
+					if (fs !== defFS) {span.style.fontSize = fs + 'pt';}
+					if (f.getBold()) {span.style.fontWeight = 'bold';}
+					if (f.getItalic()) {span.style.fontStyle = 'italic';}
 					span.style.textDecoration = getTextDecoration(f);
-					span.style.verticalAlign = f.va === AscCommon.vertalign_SubScript ? 'sub' : f.va === AscCommon.vertalign_SuperScript ? 'super' : 'baseline';
+					span.style.verticalAlign = va === AscCommon.vertalign_SubScript ? 'sub' : va === AscCommon.vertalign_SuperScript ? 'super' : 'baseline';
 					span.innerHTML = span.innerHTML.replace(/\n/g,'<br>');
 					res.push(span);
 				}
@@ -2130,10 +2130,10 @@
 					//***text property***
 					if(format)
 					{
-						oCurRun.Pr.Bold = format.b;
-						oCurRun.Pr.Italic = format.i;
-						oCurRun.Pr.Strikeout = format.s;
-						oCurRun.Pr.Underline = format.u === 3 ? true : false;
+						oCurRun.Pr.Bold = format.getBold();
+						oCurRun.Pr.Italic = format.getItalic();
+						oCurRun.Pr.Strikeout = format.getStrikeout();
+						oCurRun.Pr.Underline = format.getUnderline() !== 2 ? true : false;
 					}
 				
 					for(var k = 0, length = value.length; k < length; k++)
@@ -2398,117 +2398,7 @@
 				
 				return res;
 			},
-			
-			_getHtmlFromWorksheet: function(worksheet)
-			{
-				var res = document.createElement("body");
-				
-				var getTextDecoration = function(format) 
-				{
-					var res = [];
-					if (Asc.EUnderline.underlineNone !== format.u) 
-					{
-						res.push("underline"); 
-					}
-					if (format.s) 
-					{
-						res.push("line-through");
-					}
-					
-					return res.length > 0 ? res.join(",") : "";
-				}
-				
-				var getSpan = function(text, format, isAddSpace, isHyperLink)
-				{
-					var value = "";
-					
-					if(null != cell)
-					{
-						value += text;
-					}
-					
-					if("" === value)
-					{
-						return null;
-					}
-					
-					if(isAddSpace)
-					{
-						value += " ";
-					}
-					
-					var elem;
-					if(isHyperLink)
-					{
-						elem = document.createElement("a");
-						elem.href = isHyperLink.Hyperlink;
-						elem.title = isHyperLink.ToolTip;
-					}
-					else
-					{
-						elem = document.createElement("span");
-					}
-					
-					elem.innerText = value;
-					
-					if(format)
-					{
-						if (format.b) 
-						{
-							elem.style.fontWeight = 'bold';
-						}
-						
-						if (format.i) 
-						{
-							elem.style.fontStyle = 'italic';
-						}
-						
-						elem.style.textDecoration = getTextDecoration(format);
-					}
-					
-					return elem;
-				};
-				
-				for(var i in worksheet.aGCells)
-				{
-					var row = worksheet.aGCells[i];
-					
-					for(var j in row.c)
-					{
-						var cell = row.c[j];
-						var isHyperlink = worksheet.getCell3( i, j ).getHyperlink();
-						
-						if(cell.oValue && cell.oValue.multiText)
-						{
-							for(var n = 0; n < cell.oValue.multiText.length; n++)
-							{
-								var curMultiText = cell.oValue.multiText[n];
-								var format = curMultiText.format;
-								var elem = getSpan(curMultiText.text, format);
-								if(null !== elem)
-								{	
-									res.appendChild(elem);
-								}
-							}
-						}
-						else
-						{
-							var format = cell.xfs && cell.xfs.font ? cell.xfs.font : null;
-							
-							var isAddSpace = row.c[parseInt(j) + 1] || (!row.c[parseInt(j) + 1] && worksheet.aGCells[parseInt(i) + 1]) ? true : false;
-							var elem = getSpan(cell.getValue(), format, isAddSpace, isHyperlink);
-							if(null !== elem)
-							{	
-								res.appendChild(elem);
-							}
-						}
-						
-					}
-				}
-				
-				return res;
-			},
-			
+
 			_getTableFromText: function (worksheet, sText)
 			{
 				var activeRange = worksheet.model.selectionRange.getLast().clone(true);
@@ -2517,7 +2407,7 @@
 				var addTextIntoCell = function(row, col, text)
 				{
 					var cell = aResult.getCell(rowCounter, colCounter);
-					cell.content[0] = {text: text, format: {}};
+					cell.content[0] = {text: text, format: new AscCommonExcel.Font()};
 					
 					return cell;
 				};
@@ -2615,21 +2505,6 @@
 			
 			constructor: excelPasteContent,
 			
-			getDefaultPasteContent: function(worksheet, row, col, text)
-			{
-				var pasteCell = this.getCell(row, col);
-				pasteCell.setDefaultCell(worksheet);
-				pasteCell.content[0].text = text;
-				
-				this.props.fontsNew = [];
-				this.props.rowSpanSpCount = 0;
-				this.props.cellCount = 1;
-				this.props._images = undefined;
-				this.props._aPastedImages = undefined;
-				
-				return this;
-			},
-			
 			setCellContent: function(row, col, data)
 			{
 				if(!this.content[row])
@@ -2705,24 +2580,6 @@
 				result.hyperLink = this.hyperLink;
 				
 				return result;
-			},
-			
-			setDefaultCell: function (worksheet)
-			{
-				var fn = worksheet.model.workbook.getDefaultFont();
-				var fs = worksheet.model.workbook.getDefaultSize();
-				
-				this.content.push({
-					format: {
-						fn: fn,
-						fs: fs,
-						b: false,
-						i: false,
-						u: Asc.EUnderline.underlineNone,
-						s: false,
-						va: null
-					},
-					text: ''});
 			}
 		};
 		
@@ -2916,7 +2773,7 @@
 					text += this._getAllNumberingText(Lvl, numberingText);
 						
 					formatText = this._getPrParaRun(paraPr, LvlPr.TextPr);
-					fontFamily = formatText.format.fn;
+					fontFamily = formatText.format.getName();
 					this.fontsNew[fontFamily] = 1;
 					
 					oNewItem.content.push(formatText);
@@ -3543,18 +3400,20 @@
 					verticalAlign = AscCommon.vertalign_SubScript;
 				else if(cTextPr.VertAlign == 1)
 					verticalAlign = AscCommon.vertalign_SuperScript;
-					
+
+				var font = new AscCommonExcel.Font();
+				font.assignFromObject({
+					fn: fontFamily,
+					fs: cTextPr.FontSize ? cTextPr.FontSize : paragraphFontSize,
+					c: colorText ? colorText : colorParagraph,
+					b: cTextPr.Bold ? cTextPr.Bold : paragraphBold,
+					i: cTextPr.Italic ? cTextPr.Italic : paragraphItalic,
+					u: cTextPr.Underline ? Asc.EUnderline.underlineSingle : paragraphUnderline,
+					s: cTextPr.Strikeout ? cTextPr.Strikeout : cTextPr.DStrikeout ? cTextPr.DStrikeout : paragraphStrikeout,
+					va: verticalAlign ? verticalAlign : paragraphVertAlign
+				});
 				formatText = {
-					format: {
-						fn: fontFamily,
-						fs: cTextPr.FontSize ? cTextPr.FontSize : paragraphFontSize,
-						c: colorText ? colorText : colorParagraph,
-						b: cTextPr.Bold ? cTextPr.Bold : paragraphBold,
-						i: cTextPr.Italic ? cTextPr.Italic : paragraphItalic,
-						u: cTextPr.Underline ? Asc.EUnderline.underlineSingle : paragraphUnderline,
-						s: cTextPr.Strikeout ? cTextPr.Strikeout : cTextPr.DStrikeout ? cTextPr.DStrikeout : paragraphStrikeout,
-						va: verticalAlign ? verticalAlign : paragraphVertAlign
-					}
+					format: font
 				};
 				
 				return formatText;

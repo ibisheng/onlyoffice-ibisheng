@@ -267,7 +267,7 @@ CHistory.prototype.Undo = function()
             else
             {
                 Item.Class.Undo(Item.Type);
-                Item.Class.Refresh_RecalcData(Item.Type);
+                Item.Class.Refresh_RecalcData && Item.Class.Refresh_RecalcData(Item.Type);
             }
         }
 
@@ -382,7 +382,7 @@ CHistory.prototype.RedoExecute = function(Point, oRedoObjectParam)
                 else
                 {
                     Item.Class.Redo(Item.Type);
-                    Item.Class.Refresh_RecalcData(Item.Type);
+                    Item.Class.Refresh_RecalcData && Item.Class.Refresh_RecalcData(Item.Type);
                 }
 
             }

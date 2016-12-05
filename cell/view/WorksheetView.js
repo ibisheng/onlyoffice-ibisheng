@@ -4579,7 +4579,6 @@
                 cto = this._calcCellTextOffset(col, row, ha, tm.width);
             }
         }
-        var oFontColor = c.getFontcolor();
         var textBound = {};
 
         if (angle) {
@@ -4634,7 +4633,7 @@
         this._fetchCellCache(col, row).text = {
             state: this.stringRender.getInternalState(),
             flags: fl,
-            color: (oFontColor || this.settings.cells.defaultState.color),
+            color: (c.getFont().getColor() || this.settings.cells.defaultState.color),
             metrics: tm,
             cellW: cto.maxWidth,
             cellHA: ha,
@@ -6923,10 +6922,10 @@
 			asc_debug("log", "Unknown cell's info: col = " + c1 + ", row = " + r1);
 			return {};
 		}
-
-		var fc = c.getFontcolor();
+		var font = c.getFont();
+		var fa = font.getVerticalAlign();
+		var fc = font.getColor();
 		var bg = c.getFill();
-		var fa = c.getFontAlign();
 		var cellType = c.getType();
 		var isNumberFormat = (!cellType || CellValueType.Number === cellType);
 
@@ -6989,12 +6988,13 @@
 		cell_info.flags.lockText = ("" !== cell_info.text && (isNumberFormat || "" !== cell_info.formula));
 
 		cell_info.font = new asc_CFont();
-		cell_info.font.name = c.getFontname();
-		cell_info.font.size = c.getFontsize();
-		cell_info.font.bold = c.getBold();
-		cell_info.font.italic = c.getItalic();
-		cell_info.font.underline = (Asc.EUnderline.underlineNone !== c.getUnderline()); // ToDo убрать, когда будет реализовано двойное подчеркивание
-		cell_info.font.strikeout = c.getStrikeout();
+		cell_info.font.name = font.getName();
+		cell_info.font.size = font.getSize();
+		cell_info.font.bold = font.getBold();
+		cell_info.font.italic = font.getItalic();
+		// ToDo убрать, когда будет реализовано двойное подчеркивание
+		cell_info.font.underline = (Asc.EUnderline.underlineNone !== font.getUnderline()); 
+		cell_info.font.strikeout = font.getStrikeout();
 		cell_info.font.subscript = fa === AscCommon.vertalign_SubScript;
 		cell_info.font.superscript = fa === AscCommon.vertalign_SuperScript;
 		cell_info.font.color = (fc ? asc_obj2Color(fc) : new Asc.asc_CColor(c_opt.defaultState.color));
@@ -8675,7 +8675,7 @@
                         r = mc ? mc.r1 : activeCell.row;
                         cell = t._getVisibleCell(c, r);
                         if (undefined !== cell) {
-                            var oldFontSize = cell.getFontsize();
+                            var oldFontSize = cell.getFont().getSize();
                             var newFontSize = asc_incDecFonSize(val, oldFontSize);
                             if (null !== newFontSize) {
                                 range.setFontsize(newFontSize);
@@ -9138,25 +9138,17 @@
                                 if (nameFormat) {
                                     range.setNumFormat(nameFormat);
                                 }
-                                range.setBold(onlyChild.format.b);
-                                range.setItalic(onlyChild.format.i);
-                                range.setStrikeout(onlyChild.format.s);
-                                if (!isOneMerge && onlyChild.format && onlyChild.format.c != null &&
-                                  onlyChild.format.c != undefined) {
-                                    range.setFontcolor(onlyChild.format.c);
-                                }
-                                range.setUnderline(onlyChild.format.u);
-                                range.setAlignVertical(contentCurrentObj.va);
-                                range.setFontname(onlyChild.format.fn);
-                                range.setFontsize(onlyChild.format.fs);
+                                range.setFont(onlyChild.format);
                             } else {
                                 range.setValue2(contentCurrentObj);
                                 range.setAlignVertical(currentObj.va);
                             }
 
-                            if (contentCurrentObj.length === 1 && contentCurrentObj[0].format.fs !== '' &&
-                              contentCurrentObj[0].format.fs !== null && contentCurrentObj[0].format.fs !== undefined) {
-                                range.setFontsize(contentCurrentObj[0].format.fs);
+                            if (contentCurrentObj.length === 1 && contentCurrentObj[0].format) {
+                                var fs = contentCurrentObj[0].format.getSize();
+                                if (fs !== '' && fs !== null && fs !== undefined) {
+                                    range.setFontsize(fs);
+                                }
                             }
                             if (!isOneMerge) {
                                 range.setAlignHorizontal(currentObj.a);
@@ -9464,9 +9456,9 @@
                                 if (value2[nF] && value2[nF].sId) {
                                     numFormula = nF;
                                     break;
-                                } else if (value2[nF] && value2[nF].format && value2[nF].format.skip) {
+                                } else if (value2[nF] && value2[nF].format && value2[nF].format.getSkip()) {
                                     skipFormat = true;
-                                } else if (value2[nF] && value2[nF].format && !value2[nF].format.skip) {
+                                } else if (value2[nF] && value2[nF].format && !value2[nF].format.getSkip()) {
                                     noSkipVal = nF;
                                 }
                             }
@@ -9525,15 +9517,7 @@
 
                                 if (!isOneMerge)//settings for text
                                 {
-                                    range.setBold(value2[numStyle].format.b);
-                                    range.setItalic(value2[numStyle].format.i);
-                                    range.setStrikeout(value2[numStyle].format.s);
-                                    if (value2[numStyle].format && null != value2[numStyle].format.c) {
-                                        range.setFontcolor(value2[numStyle].format.c);
-                                    }
-                                    range.setUnderline(value2[numStyle].format.u);
-                                    range.setFontname(value2[numStyle].format.fn);
-                                    range.setFontsize(value2[numStyle].format.fs);
+                                    range.setFont(value2[numStyle].format);
                                 }
                             } else {
                                 firstRange.setValue2(value2);
@@ -10956,7 +10940,7 @@
 			bg = c.getFill();
 			this.isFormulaEditMode = false;
 
-			var oFontColor = c.getFontcolor();
+			var font = c.getFont();
 			// Скрываем окно редактирования комментария
 			this.model.workbook.handlers.trigger("asc_onHideComment");
 
@@ -10974,9 +10958,9 @@
 			editor.open({
 				fragments: fragments,
 				flags: fl,
-				font: new asc.FontProperties(c.getFontname(), c.getFontsize()),
+				font: new asc.FontProperties(font.getName(), font.getSize()),
 				background: bg || this.settings.cells.defaultState.background,
-				textColor: oFontColor || this.settings.cells.defaultState.color,
+				textColor: font.getColor() || this.settings.cells.defaultState.color,
 				cursorPos: cursorPos,
 				zoom: this.getZoom(),
 				focus: isFocus,
@@ -11597,7 +11581,7 @@
                     case Asc.ESortBy.sortbyFontColor:
                     {
                         type = Asc.c_oAscSortOptions.ByColorFont;
-                        rgbColor = sortState.SortConditions[0].dxf.font.c;
+                        rgbColor = sortState.SortConditions[0].dxf.font.getColor();
                         break;
                     }
                     default:
@@ -11692,7 +11676,7 @@
                     var cell = t.model._getCell(activeCell.row, activeCell.col);
                     if (filter.filter && filter.filter.dxf && filter.filter.dxf.fill) {
                         if (false === filter.filter.CellColor) {
-                            var fontColor = cell.xfs && cell.xfs.font ? cell.xfs.font.c : null;
+                            var fontColor = cell.xfs && cell.xfs.font ? cell.xfs.font.getColor() : null;
                             //TODO добавлять дефолтовый цвет шрифта в случае, если цвет шрифта не указан
                             if (null !== fontColor) {
                                 filter.filter.dxf.fill.bg = fontColor;
@@ -12388,7 +12372,7 @@
                     case Asc.ESortBy.sortbyFontColor:
                     {
                         sortVal = Asc.c_oAscSortOptions.ByColorFont;
-                        sortColor = SortConditions.dxf && SortConditions.dxf.font ? SortConditions.dxf.font.c : null;
+                        sortColor = SortConditions.dxf && SortConditions.dxf.font ? SortConditions.dxf.font.getColor() : null;
                         break;
                     }
                     default:
@@ -12515,11 +12499,11 @@
             //font colors
             if (null !== cell.oValue.multiText) {
                 for (var j = 0; j < cell.oValue.multiText.length; j++) {
-                    var fontColor = cell.oValue.multiText[j].format ? cell.oValue.multiText[j].format.c : null;
+                    var fontColor = cell.oValue.multiText[j].format ? cell.oValue.multiText[j].format.getColor() : null;
                     addFontColorsToArray(fontColor);
                 }
             } else {
-                var fontColor = cell.xfs && cell.xfs.font ? cell.xfs.font.c : null;
+                var fontColor = cell.xfs && cell.xfs.font ? cell.xfs.font.getColor() : null;
                 addFontColorsToArray(fontColor);
             }
 
