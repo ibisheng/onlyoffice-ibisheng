@@ -8513,9 +8513,11 @@ drawPieChart.prototype =
 		var numCache = this._getFirstRealNumCache();
 		var sumData = this.cChartDrawer._getSumArray(numCache, true);
 		
-		var startAngle = this.cChartSpace.chart.view3D && this.cChartSpace.chart.view3D.rotY ? (- this.cChartSpace.chart.view3D.rotY / 360) * (Math.PI * 2) : 0
-		startAngle += Math.PI / 2;
+		var startAngle = Math.PI / 2;
 		var newStartAngle = startAngle;
+		
+		var firstAngle = this.cChartSpace.chart.view3D && this.cChartSpace.chart.view3D.rotY ? (- this.cChartSpace.chart.view3D.rotY / 360) * (Math.PI * 2) : 0;
+		
 		
 		var getAngleByCoordsSidesTriangle = function(aC, bC, cC)
 		{
@@ -8550,42 +8552,100 @@ drawPieChart.prototype =
 		};
 		
 		var angles = [];
-		for (var i = numCache.length - 1; i >= 0; i--) 
+		for (var i = numCache.length; i >= 0; i--) 
 		{
 			//рассчитываем угол
-			var partOfSum = numCache[i].val / sumData;
-			var swapAngle = Math.abs((parseFloat(partOfSum)) * (Math.PI * 2));
+			if(i === numCache.length)
+			{
+				var swapAngle = firstAngle
+			}
+			else
+			{
+				var partOfSum = numCache[i].val / sumData;
+				var swapAngle = Math.abs((parseFloat(partOfSum)) * (Math.PI * 2));
+			}
+			
 			
 			var tempSwapAngle = 0, newSwapAngle = 0, tempStartAngle = startAngle;
 			while(true)
 			{
-				if(tempStartAngle + Math.PI / 2 < startAngle + swapAngle)
+				if(i === numCache.length && swapAngle < 0)
 				{
-					tempSwapAngle = Math.PI / 2;
+					if(tempStartAngle - Math.PI / 2 > startAngle + swapAngle)
+					{
+						tempSwapAngle = -Math.PI / 2;
+					}
+					else
+					{
+						tempSwapAngle = (startAngle + swapAngle) - tempStartAngle;
+					}
 				}
 				else
 				{
-					tempSwapAngle = (startAngle + swapAngle) - tempStartAngle;
+					if(tempStartAngle + Math.PI / 2 < startAngle + swapAngle)
+					{
+						tempSwapAngle = Math.PI / 2;
+					}
+					else
+					{
+						tempSwapAngle = (startAngle + swapAngle) - tempStartAngle;
+					}
 				}
+				
 				
 				var p1 = getPointsByAngle(tempStartAngle);
 				var p2 = getPointsByAngle(tempStartAngle + tempSwapAngle);
 				newSwapAngle += getAngleByCoordsSidesTriangle({x: p2.x - p1.x, y: p2.y - p1.y}, {x: xCenter - p1.x, y: yCenter - p1.y}, {x: xCenter - p2.x, y: yCenter - p2.y});
 				
 				
-				if(tempStartAngle + Math.PI / 2 < startAngle + swapAngle)
-				{					
-					tempStartAngle += Math.PI / 2;
+				if(i === numCache.length && swapAngle < 0)
+				{
+					if(tempStartAngle - Math.PI / 2 > startAngle + swapAngle)
+					{					
+						tempStartAngle -= Math.PI / 2;
+					}
+					else
+					{
+						if(i !== numCache.length)
+							angles.push({start: newStartAngle, swap: newSwapAngle, end: newStartAngle + newSwapAngle});
+						
+						break;
+					}
 				}
 				else
 				{
-					angles.push({start: newStartAngle, swap: newSwapAngle, end: newStartAngle + newSwapAngle});
-					break;
+					if(tempStartAngle + Math.PI / 2 < startAngle + swapAngle)
+					{					
+						tempStartAngle += Math.PI / 2;
+					}
+					else
+					{
+						if(i !== numCache.length)
+							angles.push({start: newStartAngle, swap: newSwapAngle, end: newStartAngle + newSwapAngle});
+						
+						break;
+					}
 				}
+				
 			}
 			
 			startAngle += swapAngle;
-			newStartAngle += newSwapAngle;
+			if(i === numCache.length)
+			{
+				if(swapAngle < 0)
+				{
+					newStartAngle -= newSwapAngle;
+				}
+				else
+				{
+					newStartAngle += newSwapAngle;
+				}
+				
+			}
+			else
+			{
+				newStartAngle += newSwapAngle;
+			}
         }
 		
 		return angles;
