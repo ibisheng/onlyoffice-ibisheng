@@ -6020,7 +6020,7 @@ PasteProcessor.prototype =
 					//TODO пересмотреть! node.getAttribute("width") в FF возврашает "auto" -> изображения в FF не всталяются
 					if((!nWidth || !nHeight))
 					{
-						if(AscBrowser.isMozilla)
+						if(AscBrowser.isMozilla || AscBrowser.isIE)
 						{
 							nWidth = parseInt(node.width);
 							nHeight = parseInt(node.height);
