@@ -66,7 +66,6 @@ var g_oColorManager = null;
 		Num: null,
 		Border: null,
 		Align: null,
-		FontAbs: null,
 		FillAbs: null,
 		NumAbs: null,
 		BorderAbs: null,
@@ -490,26 +489,7 @@ var g_oFontProperties = {
 	};
 
 	/** @constructor */
-	function Font(val) {
-		if (null == val) {
-			val = g_oDefaultFormat.FontAbs;
-		}
-		this.Properties = g_oFontProperties;
-		this.fn = val.fn;
-		this.scheme = val.scheme;
-		this.fs = val.fs;
-		this.b = val.b;
-		this.i = val.i;
-		this.u = val.u;
-		this.s = val.s;
-		this.c = val.c;
-		this.va = val.va;
-		//skip и repeat не сохраняются в файл нужны здесь только чтобы класс Font можно было использовать в комплексных строках
-		this.skip = val.skip;
-		this.repeat = val.repeat;
-	}
-
-	Font.prototype.clean = function () {
+	function Font() {
 		this.fn = null;
 		this.scheme = null;
 		this.fs = null;
@@ -521,33 +501,80 @@ var g_oFontProperties = {
 		this.va = null;
 		this.skip = null;
 		this.repeat = null;
+	}
+	Font.prototype.Properties = g_oFontProperties;
+	Font.prototype.assign = function(font) {
+		this.fn = font.fn;
+		this.scheme = font.scheme;
+		this.fs = font.fs;
+		this.b = font.b;
+		this.i = font.i;
+		this.u = font.u;
+		this.s = font.s;
+		this.c = font.c;
+		this.va = font.va;
+		this.skip = font.skip;
+		this.repeat = font.repeat;
 	};
-	Font.prototype._mergeProperty = function (first, second, def) {
-		if (def != first) {
-			return first;
-		} else {
-			return second;
+	Font.prototype.assignFromObject = function(font) {
+		if (null != font.fn) {
+			this.setName(font.fn);
+		}
+		if (null != font.scheme) {
+			this.setScheme(font.scheme);
+		}
+		if (null != font.fs) {
+			this.setSize(font.fs);
+		}
+		if (null != font.b) {
+			this.setBold(font.b);
+		}
+		if (null != font.i) {
+			this.setItalic(font.i);
+		}
+		if (null != font.u) {
+			this.setUnderline(font.u);
+		}
+		if (null != font.s) {
+			this.setStrikeout(font.s);
+		}
+		if (null != font.c) {
+			this.setColor(font.c);
+		}
+		if (null != font.va) {
+			this.setVerticalAlign(font.va);
+		}
+		if (null != font.skip) {
+			this.setSkip(font.skip);
+		}
+		if (null != font.repeat) {
+			this.setRepeat(font.repeat);
 		}
 	};
-	Font.prototype.merge = function (font) {
-		var defaultFontAbs = g_oDefaultFormat.FontAbs;
+	Font.prototype.merge = function (font, isTable) {
 		var oRes = new Font();
-		oRes.fn = this._mergeProperty(this.fn, font.fn, defaultFontAbs.fn);
-		oRes.scheme = this._mergeProperty(this.scheme, font.scheme, defaultFontAbs.scheme);
-		oRes.fs = this._mergeProperty(this.fs, font.fs, defaultFontAbs.fs);
-		oRes.b = this._mergeProperty(this.b, font.b, defaultFontAbs.b);
-		oRes.i = this._mergeProperty(this.i, font.i, defaultFontAbs.i);
-		oRes.u = this._mergeProperty(this.u, font.u, defaultFontAbs.u);
-		oRes.s = this._mergeProperty(this.s, font.s, defaultFontAbs.s);
-		//заглушка excel при merge стилей игнорирует default цвет
-		if (this.c instanceof ThemeColor && g_nColorTextDefault == this.c.theme && null == this.c.tint) {
-			oRes.c = this._mergeProperty(font.c, this.c, defaultFontAbs.c);
+		oRes.fn = this.fn || font.fn;
+		oRes.scheme = this.scheme || font.scheme;
+		oRes.fs = this.fs || font.fs;
+		if (isTable){
+			oRes.b = font.b;
+			oRes.i = font.i;
+			oRes.s = font.s;
 		} else {
-			oRes.c = this._mergeProperty(this.c, font.c, defaultFontAbs.c);
+			oRes.b = this.b || font.b;
+			oRes.i = this.i || font.i;
+			oRes.s = this.s || font.s;
 		}
-		oRes.va = this._mergeProperty(this.va, font.va, defaultFontAbs.va);
-		oRes.skip = this._mergeProperty(this.skip, font.skip, defaultFontAbs.skip);
-		oRes.repeat = this._mergeProperty(this.repeat, font.repeat, defaultFontAbs.repeat);
+		oRes.u = this.u || font.u;
+		//заглушка excel при merge стилей игнорирует default цвет
+		if (isTable && this.c && this.c.isEqual(g_oDefaultFormat.Font)) {
+			oRes.c = font.c || this.c;
+		} else {
+			oRes.c = this.c || font.c;
+		}
+		oRes.va = this.va || font.va;
+		oRes.skip = this.skip || font.skip;
+		oRes.repeat = this.repeat || font.repeat;
 		return oRes;
 	};
 	Font.prototype.getRgbOrNull = function () {
@@ -557,79 +584,18 @@ var g_oFontProperties = {
 		}
 		return nRes;
 	};
-	Font.prototype.getDif = function (val) {
-		var oRes = new Font(this);
-		var bEmpty = true;
-		if (this.fn == val.fn) {
-			oRes.fn = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.scheme == val.scheme) {
-			oRes.scheme = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.fs == val.fs) {
-			oRes.fs = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.b == val.b) {
-			oRes.b = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.i == val.i) {
-			oRes.i = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.u == val.u) {
-			oRes.u = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.s == val.s) {
-			oRes.s = null;
-		} else {
-			bEmpty = false;
-		}
-		if (g_oColorManager.isEqual(this.c, val.c)) {
-			oRes.c = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.va == val.va) {
-			oRes.va = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.skip == val.skip) {
-			oRes.skip = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.repeat == val.repeat) {
-			oRes.repeat = null;
-		} else {
-			bEmpty = false;
-		}
-		if (bEmpty) {
-			oRes = null;
-		}
-		return oRes;
-	};
 	Font.prototype.isEqual = function (font) {
 		var bRes = this.fs == font.fs && this.b == font.b && this.i == font.i && this.u == font.u && this.s == font.s &&
 			g_oColorManager.isEqual(this.c, font.c) && this.va == font.va && this.skip == font.skip &&
 			this.repeat == font.repeat;
 		if (bRes) {
-			if (Asc.EFontScheme.fontschemeNone == this.scheme && Asc.EFontScheme.fontschemeNone == font.scheme) {
+			var schemeThis = this.getScheme();
+			var schemeOther = font.getScheme();
+			if (Asc.EFontScheme.fontschemeNone == schemeThis && Asc.EFontScheme.fontschemeNone == schemeOther) {
 				bRes = this.fn == font.fn;
-			} else if (Asc.EFontScheme.fontschemeNone != this.scheme &&
-				Asc.EFontScheme.fontschemeNone != font.scheme) {
-				bRes = this.scheme == font.scheme;
+			} else if (Asc.EFontScheme.fontschemeNone != schemeThis &&
+				Asc.EFontScheme.fontschemeNone != schemeOther) {
+				bRes = schemeThis == schemeOther;
 			} else {
 				bRes = false;
 			}
@@ -637,43 +603,9 @@ var g_oFontProperties = {
 		return bRes;
 	};
 	Font.prototype.clone = function () {
-		return new Font(this);
-	};
-	Font.prototype.set = function (oVal) {
-		if (null != oVal.fn) {
-			this.fn = oVal.fn;
-			this.scheme = Asc.EFontScheme.fontschemeNone;
-		}
-		if (null != oVal.scheme) {
-			this.scheme = oVal.scheme;
-		}
-		if (null != oVal.fs) {
-			this.fs = oVal.fs;
-		}
-		if (null != oVal.b) {
-			this.b = oVal.b;
-		}
-		if (null != oVal.i) {
-			this.i = oVal.i;
-		}
-		if (null != oVal.u) {
-			this.u = oVal.u;
-		}
-		if (null != oVal.s) {
-			this.s = oVal.s;
-		}
-		if (null != oVal.c) {
-			this.c = oVal.c;
-		}
-		if (null != oVal.va) {
-			this.va = oVal.va;
-		}
-		if (null != oVal.skip) {
-			this.skip = oVal.skip;
-		}
-		if (null != oVal.repeat) {
-			this.repeat = oVal.repeat;
-		}
+		var font = new Font();
+		font.assign(this);
+		return font;
 	};
 	Font.prototype.intersect = function (oFont, oDefVal) {
 		if (this.fn != oFont.fn) {
@@ -709,6 +641,72 @@ var g_oFontProperties = {
 		if (this.repeat != oFont.repeat) {
 			this.repeat = oDefVal.repeat;
 		}
+	};
+	Font.prototype.getName = function () {
+		return this.fn || g_oDefaultFormat.Font.fn;
+	};
+	Font.prototype.setName = function (val) {
+		return this.fn = val;
+	};
+	Font.prototype.getScheme = function () {
+		return this.scheme || g_oDefaultFormat.Font.scheme;
+	};
+	Font.prototype.setScheme = function(val) {
+		return (null != val && Asc.EFontScheme.fontschemeNone != val) ? this.scheme = val : this.scheme = null;
+	};
+	Font.prototype.getSize = function () {
+		return this.fs || g_oDefaultFormat.Font.fs;
+	};
+	Font.prototype.setSize = function(val) {
+		return this.fs = val;
+	};
+	Font.prototype.getBold = function () {
+		return null != this.b ? this.b : (g_oDefaultFormat.Font.b || false);
+	};
+	Font.prototype.setBold = function(val) {
+		return val ? this.b = true : this.b = null;
+	};
+	Font.prototype.getItalic = function () {
+		return null != this.i ? this.i : (g_oDefaultFormat.Font.i || false);
+	};
+	Font.prototype.setItalic = function(val) {
+		return val ? this.i = true : this.i = null;
+	};
+	Font.prototype.getUnderline = function () {
+		return null != this.u ? this.u : (g_oDefaultFormat.Font.u || Asc.EUnderline.underlineNone);
+	};
+	Font.prototype.setUnderline = function(val) {
+		return (null != val && Asc.EUnderline.underlineNone != val) ? this.u = val : this.u = null;
+	};
+	Font.prototype.getStrikeout = function () {
+		return null != this.s ? this.s : (g_oDefaultFormat.Font.s || false);
+	};
+	Font.prototype.setStrikeout = function(val) {
+		return val ? this.s = true : this.s = null;
+	};
+	Font.prototype.getColor = function () {
+		return this.c || g_oDefaultFormat.Font.c;
+	};
+	Font.prototype.setColor = function(val) {
+		return this.c = val;
+	};
+	Font.prototype.getVerticalAlign = function () {
+		return null != this.va ? this.va : (g_oDefaultFormat.Font.va || AscCommon.vertalign_Baseline);
+	};
+	Font.prototype.setVerticalAlign = function(val) {
+		return (null != val && AscCommon.vertalign_Baseline != val) ? this.va = val : this.va = null;
+	};
+	Font.prototype.getSkip = function () {
+		return !!this.skip;
+	};
+	Font.prototype.setSkip = function(val) {
+		return val ? this.skip = true : this.skip = null;
+	};
+	Font.prototype.getRepeat = function () {
+		return !!this.repeat;
+	};
+	Font.prototype.setRepeat = function (val) {
+		return val ? this.repeat = true : this.repeat = null;
 	};
 	Font.prototype.getType = function () {
 		return UndoRedoDataTypes.StyleFont;
@@ -1360,7 +1358,7 @@ function CellXfs() {
 }
 CellXfs.prototype =
 {
-	_mergeProperty : function(first, second)
+	_mergeProperty : function(first, second, isTable)
 	{
 		var res = null;
 		if(null != first || null != second)
@@ -1372,19 +1370,19 @@ CellXfs.prototype =
 			else
 			{
 				if(null != first.merge)
-					res = first.merge(second);
+					res = first.merge(second, isTable);
 				else
 					res = first;
 			}
 		}
 		return res;
 	},
-	merge : function(xfs)
+	merge : function(xfs, isTable)
 	{
 		var oRes = new CellXfs();
 		oRes.border = this._mergeProperty(this.border, xfs.border);
 		oRes.fill = this._mergeProperty(this.fill, xfs.fill);
-		oRes.font = this._mergeProperty(this.font, xfs.font);
+		oRes.font = this._mergeProperty(this.font, xfs.font, isTable);
 		oRes.num = this._mergeProperty(this.num, xfs.num);
 		oRes.align = this._mergeProperty(this.align, xfs.align);
 		oRes.QuotePrefix = this._mergeProperty(this.QuotePrefix, xfs.QuotePrefix);
@@ -1603,8 +1601,8 @@ CCellStyles.prototype._generateFontMap = function (oFontMap, aStyles) {
 	var i, length, oStyle;
 	for (i = 0, length = aStyles.length; i < length; ++i) {
 		oStyle = aStyles[i];
-		if (null != oStyle.xfs && null != oStyle.xfs.font && null != oStyle.xfs.font.fn)
-			oFontMap[oStyle.xfs.font.fn] = 1;
+		if (null != oStyle.xfs && null != oStyle.xfs.font)
+			oFontMap[oStyle.xfs.font.getName()] = 1;
 	}
 };
 /**
@@ -1761,7 +1759,7 @@ CCellStyle.prototype.getFill = function () {
 };
 CCellStyle.prototype.getFontColor = function () {
 	if (null != this.xfs && null != this.xfs.font)
-		return this.xfs.font.c;
+		return this.xfs.font.getColor();
 
 	return g_oDefaultFormat.Font.c;
 };
@@ -1782,19 +1780,37 @@ CCellStyle.prototype.getNumFormatStr = function () {
 };
 /** @constructor */
 function StyleManager(){
-    //содержат все свойства по умолчанию
-	this.oDefaultFont = null;
-	this.oDefaultAlign = null;
-	this.oDefaultQuotePrefix = null;
-    //стиль ячейки по умолчанию, может содержать не все свойства
+	//стиль ячейки по умолчанию, может содержать не все свойства
 	this.oDefaultXfs = new CellXfs();
 }
 StyleManager.prototype =
 {
-    init : function(oDefaultXfs)
-    {
-		if(null != oDefaultXfs.font)
-			g_oDefaultFormat.Font = oDefaultXfs.font.clone();
+	init: function(oDefaultXfs, wb) {
+		//font
+		if (!oDefaultXfs.font) {
+			oDefaultXfs.font = new AscCommonExcel.Font();
+		}
+		if (!oDefaultXfs.font.scheme) {
+			oDefaultXfs.font.scheme = Asc.EFontScheme.fontschemeMinor;
+		}
+		if (!oDefaultXfs.font.fn) {
+			var sThemeFont = null;
+			if (null != wb.theme.themeElements && null != wb.theme.themeElements.fontScheme) {
+				if (Asc.EFontScheme.fontschemeMinor == oDefaultXfs.font.scheme && wb.theme.themeElements.fontScheme.minorFont) {
+					sThemeFont = wb.theme.themeElements.fontScheme.minorFont.latin;
+				} else if (Asc.EFontScheme.fontschemeMajor == oDefaultXfs.font.scheme && wb.theme.themeElements.fontScheme.majorFont) {
+					sThemeFont = wb.theme.themeElements.fontScheme.majorFont.latin;
+				}
+			}
+			oDefaultXfs.font.fn = sThemeFont ? sThemeFont : "Calibri";
+		}
+		if (!oDefaultXfs.font.fs) {
+			oDefaultXfs.font.fs = 11;
+		}
+		if (!oDefaultXfs.font.c) {
+			oDefaultXfs.font.c = AscCommonExcel.g_oColorManager.getThemeColor(AscCommonExcel.g_nColorTextDefault);
+		}
+		g_oDefaultFormat.Font = oDefaultXfs.font;
 		if(null != oDefaultXfs.fill)
 			g_oDefaultFormat.Fill = oDefaultXfs.fill.clone();
 		if(null != oDefaultXfs.border)
@@ -1918,23 +1934,18 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.fn;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.fn;
+			oRes.oldVal = null;
 		//todo undo для scheme
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font)
-			{
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.fn = g_oDefaultFormat.Font.fn;
-                xfs.font.scheme = Asc.EFontScheme.fontschemeNone;
+		var isSetNull = (null == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
 			}
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.fn = val;
-            xfs.font.scheme = Asc.EFontScheme.fontschemeNone;
-        }
+			xfs.font.setName(val);
+			xfs.font.setScheme(null);
+		}
 		return oRes;
 	},
 	setFontsize : function(oItemWithXfs, val)
@@ -1944,19 +1955,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.fs;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.fs;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.fs = g_oDefaultFormat.Font.fs;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.fs = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setSize(val);
+		}
 		return oRes;
 	},
 	setFontcolor : function(oItemWithXfs, val)
@@ -1967,18 +1975,15 @@ StyleManager.prototype =
             oRes.oldVal = xfs.font.c;
 		else
 			oRes.oldVal = g_oDefaultFormat.Font.c;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.c = g_oDefaultFormat.Font.c;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.c = val;
-        }
+		var isSetNull = (null == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setColor(val);
+		}
 		return oRes;
 	},
 	setBold : function(oItemWithXfs, val)
@@ -1988,19 +1993,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.b;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.b;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.b = g_oDefaultFormat.Font.b;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.b = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val || false == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setBold(val);
+		}
 		return oRes;
 	},
 	setItalic : function(oItemWithXfs, val)
@@ -2010,19 +2012,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.i;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.i;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.i = g_oDefaultFormat.Font.i;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.i = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val || false == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setItalic(val);
+		}
 		return oRes;
 	},
 	setUnderline : function(oItemWithXfs, val)
@@ -2032,19 +2031,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.u;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.u;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.u = g_oDefaultFormat.Font.u;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.u = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val || Asc.EUnderline.underlineNone == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setUnderline(val);
+		}
 		return oRes;
 	},
 	setStrikeout : function(oItemWithXfs, val)
@@ -2054,19 +2050,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.s;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.s;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.s = g_oDefaultFormat.Font.s;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.s = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val || false == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setStrikeout(val);
+		}
 		return oRes;
 	},
 	setFontAlign : function(oItemWithXfs, val)
@@ -2076,19 +2069,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.va;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.va;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.va = g_oDefaultFormat.Font.va;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.va = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val || AscCommon.vertalign_Baseline == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setVerticalAlign(val);
+		}
 		return oRes;
 	},
 	setAlignVertical : function(oItemWithXfs, val)
@@ -3149,7 +3139,7 @@ CCellValue.prototype =
 			var aText = this.aTextValue2[gc_nMaxDigCountView];
 			for(var i = 0, length = aText.length; i < length; ++i)
 			{
-				if(aText[i].format && aText[i].format.skip == false)
+				if(aText[i].format && aText[i].format.getSkip() == false)
 					this.textValue += aText[i].text;
 			}
 		}
@@ -3255,13 +3245,13 @@ CCellValue.prototype =
 					{
 						aRes = null;
 						sText = null;
+						var font = new AscCommonExcel.Font();
 						if (dDigitsCount > 1){
-						    var oNumFormatFont = new AscCommon.NumFormatFont();
-						    oNumFormatFont.repeat = true;
-						    aText = [{ text: "#", format: oNumFormatFont }];
+							font.setRepeat(true);
+							aText = [{ text: "#", format: font}];
 						}
 						else
-							aText = [{text: "", format: {}}];
+							aText = [{text: "", format: font}];
 					}
 				}
 			}
@@ -3283,9 +3273,9 @@ CCellValue.prototype =
 				{
 					aRes = null;
 					sText = null;
-					var oNumFormatFont = new AscCommon.NumFormatFont();
-					oNumFormatFont.repeat = true;
-					aText = [{ text: "#", format: oNumFormatFont }];
+					var font = new AscCommonExcel.Font();
+					font.setRepeat(true);
+					aText = [{ text: "#", format: font }];
 				}
 			}
 			if(null == aRes)
@@ -3421,7 +3411,7 @@ CCellValue.prototype =
 			var oNewItem = new Fragment();
 			oNewItem.text = sText;
 			oNewItem.format = cellfont.clone();
-			color = oNewItem.format.c;
+			color = oNewItem.format.getColor();
 			if(color instanceof ThemeColor)
 			{
 				//для посещенных гиперссылок
@@ -3430,12 +3420,12 @@ CCellValue.prototype =
 					var hyperlink = cell.ws.hyperlinkManager.getByCell(cell.nRow, cell.nCol);
 					if(null != hyperlink && hyperlink.data.getVisited())
 					{
-						oNewItem.format.c = g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null);
+						oNewItem.format.setColor(g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null));
 					}
 				}
 			}
-			oNewItem.format.skip = false;
-			oNewItem.format.repeat = false;
+			oNewItem.format.setSkip(false);
+			oNewItem.format.setRepeat(false);
 			aResult.push(oNewItem);
 		} else if(null != aText){
 			for(var i = 0; i < aText.length; i++){
@@ -3445,11 +3435,11 @@ CCellValue.prototype =
 				{
 					oNewItem.text = oCurtext.text;
 					var oCurFormat = new Font();
-					oCurFormat.set(cellfont);
+					oCurFormat.assign(cellfont);
 					if(null != oCurtext.format)
-						oCurFormat.set(oCurtext.format);
+						oCurFormat.assignFromObject(oCurtext.format);
 					oNewItem.format = oCurFormat;
-					color = oNewItem.format.c;
+					color = oNewItem.format.getColor();
 					if(color instanceof ThemeColor)
 					{
 						//для посещенных гиперссылок
@@ -3458,7 +3448,7 @@ CCellValue.prototype =
 							var hyperlink = cell.ws.hyperlinkManager.getByCell(cell.nRow, cell.nCol);
 							if(null != hyperlink && hyperlink.data.getVisited())
 							{
-								oNewItem.format.c = g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null);
+								oNewItem.format.setColor(g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null));
 							}
 						}
 					}
@@ -3605,12 +3595,13 @@ CCellValue.prototype =
 					var item = aVal[i];
 					var oNewElem = new CCellValueMultiText();
 					oNewElem.text = item.text;
-					oNewElem.format = g_oDefaultFormat.Font.clone();
-					if(null != item.format)
-						oNewElem.format.set(item.format);
+					if (null != item.format) {
+						oNewElem.format = new Font();
+						oNewElem.format.assign(item.format);
+					}
 					this.multiText.push(oNewElem);
 				}
-				this.miminizeMultiText(cell, true);
+				this.minimizeMultiText(cell, true);
 			}
 			//обрабатываем QuotePrefix
 			if(null != this.text)
@@ -3652,16 +3643,13 @@ CCellValue.prototype =
 			oRes.push(this.multiText[i].clone());
 		return oRes;
 	},
-	miminizeMultiText : function(cell, bSetCellFont)
+	minimizeMultiText : function(cell, bSetCellFont)
 	{
 		var bRes = false;
-		if(null == bSetCellFont)
-			bSetCellFont = true;
 		if(null != this.multiText && this.multiText.length > 0)
 		{
-		    var range = cell.ws.getCell3(cell.nRow, cell.nCol);
-		    var cellFont = range.getFont();
-		    var oIntersectFont;
+		    var cellFont = cell.getFont();
+		    var oIntersectFont = null;
 		    for (var i = 0, length = this.multiText.length; i < length; i++) {
 		        var elem = this.multiText[i];
 			    if (null != elem.format) {
@@ -3670,11 +3658,11 @@ CCellValue.prototype =
 			        oIntersectFont.intersect(elem.format, cellFont);
 			    }
 			    else {
-			        oIntersectFont = cellFont.clone();
+			        oIntersectFont = cellFont;
 			        break;
 			    }
 			}
-				
+
 			if(bSetCellFont)
 			{
 			    if (oIntersectFont.isEqual(g_oDefaultFormat.Font))
@@ -3726,7 +3714,7 @@ CCellValue.prototype =
 				        fAction(elem.format)
 				}
 				//пробуем преобразовать в простую строку
-				if(this.miminizeMultiText(cell, false))
+				if(this.minimizeMultiText(cell, false))
 				{
 					var DataNew = cell.getValueData();
 					History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValue, cell.ws.getId(), new Asc.Range(cell.nCol, cell.nRow, cell.nCol, cell.nRow), new UndoRedoData_CellSimpleData(cell.nRow,cell.nCol, backupObj, DataNew));
@@ -3743,35 +3731,35 @@ CCellValue.prototype =
 	},
 	setFontname : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.fn;}, function(format){format.fn = val;});
+		return this._setFontProp(cell, function(format){return val != format.getName();}, function(format){format.setName(val);});
 	},
 	setFontsize : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.fs;}, function(format){format.fs = val;});
+		return this._setFontProp(cell, function(format){return val != format.getSize();}, function(format){format.setSize(val);});
 	},
 	setFontcolor : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.c;}, function(format){format.c = val;});
+		return this._setFontProp(cell, function(format){return val != format.getColor();}, function(format){format.setColor(val);});
 	},
 	setBold : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.b;}, function(format){format.b = val;});
+		return this._setFontProp(cell, function(format){return val != format.getBold();}, function(format){format.setBold(val);});
 	},
 	setItalic : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.i;}, function(format){format.i = val;});
+		return this._setFontProp(cell, function(format){return val != format.getItalic();}, function(format){format.setItalic(val);});
 	},
 	setUnderline : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.u;}, function(format){format.u = val;});
+		return this._setFontProp(cell, function(format){return val != format.getUnderline();}, function(format){format.setUnderline(val);});
 	},
 	setStrikeout : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.s;}, function(format){format.s = val;});
+		return this._setFontProp(cell, function(format){return val != format.getStrikeout();}, function(format){format.setStrikeout(val);});
 	},
 	setFontAlign : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.va;}, function(format){format.va = val;});
+		return this._setFontProp(cell, function(format){return val != format.getVerticalAlign();}, function(format){format.setVerticalAlign(val);});
 	},
 	setValueType : function(type)
 	{
@@ -7266,7 +7254,7 @@ ColorFilter.prototype.isHideValue = function(cell) {
 			{
 				for(var j = 0; j < cell.oValue.multiText.length; j++)
 				{
-					var fontColor = cell.oValue.multiText[j].format ? cell.oValue.multiText[j].format.c : null;
+					var fontColor = cell.oValue.multiText[j].format ? cell.oValue.multiText[j].format.getColor() : null;
 					if(isEqualColors(filterColor,fontColor ))
 					{
 						res = false;
@@ -7276,7 +7264,7 @@ ColorFilter.prototype.isHideValue = function(cell) {
 			}
 			else
 			{
-				var fontColor =  cell.xfs && cell.xfs.font ? cell.xfs.font.c : null;
+				var fontColor =  cell.xfs && cell.xfs.font ? cell.xfs.font.getColor() : null;
 				if(isEqualColors(filterColor,fontColor))
 				{
 					res = false;

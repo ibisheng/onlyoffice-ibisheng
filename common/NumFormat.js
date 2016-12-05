@@ -123,15 +123,6 @@ function getNumberParts(x)
         return !isNaN(parseFloat(n)) && isFinite(n);
     }
 
-function NumFormatFont() {
-    this.skip = null;
-    this.repeat = null;
-    this.c = null;
-}
-NumFormatFont.prototype.isEqual = function (val) {
-    return this.skip == val.skip && this.repeat == val.repeat && this.c == val.c;
-};
-
 function FormatObj(type, val)
 {
     this.type = type;
@@ -1309,7 +1300,7 @@ NumFormat.prototype =
         }
         else if(numFormat_DigitSpace == item.type)
         {
-            var oNewFont = new NumFormatFont();
+            var oNewFont = new AscCommonExcel.Font();
 			oNewFont.skip = true;
             this._CommitText(res, oCurText, "0", oNewFont);
             if(null != item.val)
@@ -1336,7 +1327,7 @@ NumFormat.prototype =
             if(-1 != this.Color)
             {
                 if(null == format)
-                    format = new NumFormatFont();
+                    format = new AscCommonExcel.Font();
                 format.c = new AscCommonExcel.RgbColor(this.Color);
             }
             if(null != prev && ((null == prev.format && null == format) || (null != prev.format && null != format && format.isEqual(prev.format))))
@@ -1425,7 +1416,7 @@ NumFormat.prototype =
             for (var i = 0; i < res.length; ++i) {
                 var elem = res[i];
                 if (null == elem.format) {
-                    elem.format = new NumFormatFont();
+                    elem.format = new AscCommonExcel.Font();
                 }
                 elem.format.c = new AscCommonExcel.RgbColor(this.Color);
             }
@@ -1446,7 +1437,7 @@ NumFormat.prototype =
             {
                 if(this.isInvalidDateValue(number))
                 {
-                    var oNewFont = new NumFormatFont();
+                    var oNewFont = new AscCommonExcel.Font();
 					oNewFont.repeat = true;
                     this._CommitText(res, null, "#", oNewFont);
                     return res;
@@ -1632,13 +1623,13 @@ NumFormat.prototype =
                 }
                 else if(numFormat_Repeat == item.type)
                 {
-                    var oNewFont = new NumFormatFont();
+                    var oNewFont = new AscCommonExcel.Font();
 					oNewFont.repeat = true;
                     this._CommitText(res, oCurText, item.val, oNewFont);
                 }
                 else if(numFormat_Skip == item.type)
                 {
-                    var oNewFont = new NumFormatFont();
+                    var oNewFont = new AscCommonExcel.Font();
 					oNewFont.skip = true;
                     this._CommitText(res, oCurText, item.val, oNewFont);
                 }
@@ -1782,7 +1773,7 @@ NumFormat.prototype =
 				nLen += elem.text.length;
 		}
 		if(nLen > Asc.c_oAscMaxColumnWidth){
-			var oNewFont = new NumFormatFont();
+			var oNewFont = new AscCommonExcel.Font();
 			oNewFont.repeat = true;
 			res = [{text: "#", format: oNewFont}];
 		}
@@ -2315,7 +2306,7 @@ CellFormat.prototype =
 			    res = oFormat.format(number, nValType, dDigitsCount, cultureInfo, bChart);
 			else if(null != this.aComporationFormats)
 			{
-			    var oNewFont = new NumFormatFont();
+			    var oNewFont = new AscCommonExcel.Font();
 				oNewFont.repeat = true;
 				res = [{text: "#", format: oNewFont}];
 			}
@@ -3980,7 +3971,6 @@ var g_oDefaultCultureInfo = g_aCultureInfos[1033];//en-US//1033//fr-FR//1036//ba
     //---------------------------------------------------------export---------------------------------------------------
     window['AscCommon'] = window['AscCommon'] || {};
     window['AscCommon'].isNumber = isNumber;
-    window["AscCommon"].NumFormatFont = NumFormatFont;
     window["AscCommon"].NumFormat = NumFormat;
     window["AscCommon"].CellFormat = CellFormat;
     window["AscCommon"].DecodeGeneralFormat = DecodeGeneralFormat;
