@@ -43,9 +43,9 @@
 	/**
 	 * @extends {AscCommon.CMobileTouchManagerBase}
 	 */
-	function CMobileTouchManager()
+	function CMobileTouchManager(_config)
 	{
-		CMobileTouchManager.superclass.constructor.call(this);
+		CMobileTouchManager.superclass.constructor.call(this, _config);
 
 		this.LogicDocument   = null;
 		this.DrawingDocument = null;

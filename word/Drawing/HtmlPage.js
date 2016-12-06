@@ -444,7 +444,7 @@ function CEditorPage(api)
 
 		if (this.m_oApi.isMobileVersion)
 		{
-			this.MobileTouchManager = new AscCommon.CMobileTouchManager();
+			this.MobileTouchManager = new AscCommon.CMobileTouchManager({});
 			this.MobileTouchManager.Init(this);
 		}
 
@@ -2353,7 +2353,7 @@ function CEditorPage(api)
 
 				if (oThis.m_oApi.isMobileVersion)
 				{
-					oThis.MobileTouchManager = new AscCommon.CMobileTouchManager();
+					oThis.MobileTouchManager = new AscCommon.CMobileTouchManager({});
 					oThis.MobileTouchManager.Init(oThis);
 				}
 
