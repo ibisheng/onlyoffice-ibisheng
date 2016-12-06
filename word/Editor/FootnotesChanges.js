@@ -69,31 +69,31 @@ function CChangesFootnotesAddFootnote(Class, Id)
 
 	this.Id = Id;
 }
-AscCommon.extendClass(CChangesParaFieldAddItem, AscDFH.CChangesBase);
-CChangesParaFieldAddItem.prototype.Type = AscDFH.historyitem_Footnotes_AddFootnote;
-CChangesParaFieldAddItem.prototype.Undo = function()
+AscCommon.extendClass(CChangesFootnotesAddFootnote, AscDFH.CChangesBase);
+CChangesFootnotesAddFootnote.prototype.Type = AscDFH.historyitem_Footnotes_AddFootnote;
+CChangesFootnotesAddFootnote.prototype.Undo = function()
 {
 	delete this.Class.Footnote[this.Id];
 };
-CChangesParaFieldAddItem.prototype.Redo = function()
+CChangesFootnotesAddFootnote.prototype.Redo = function()
 {
 	this.Class.Footnote[this.Id] = AscCommon.g_oTableId.Get_ById(this.Id);
 };
-CChangesParaFieldAddItem.prototype.WriteToBinary = function(Writer)
+CChangesFootnotesAddFootnote.prototype.WriteToBinary = function(Writer)
 {
 	// String : Id
 	Writer.WriteString2(this.Id);
 };
-CChangesParaFieldAddItem.prototype.ReadFromBinary = function(Reader)
+CChangesFootnotesAddFootnote.prototype.ReadFromBinary = function(Reader)
 {
 	// String : Id
 	this.Id = Reader.GetString2();
 };
-CChangesParaFieldAddItem.prototype.CreateReverseChange = function()
+CChangesFootnotesAddFootnote.prototype.CreateReverseChange = function()
 {
 	return null;
 };
-CChangesParaFieldAddItem.prototype.Merge = function(oChange)
+CChangesFootnotesAddFootnote.prototype.Merge = function(oChange)
 {
 	if (this.Class !== oChange.Class)
 		return true;
