@@ -1739,6 +1739,9 @@ background-repeat: no-repeat;\
 			this.sync_TextPosition(TextPr.Position);
 			this.sync_TextLangCallBack(TextPr.Lang);
 			this.sync_TextColor(TextPr);
+
+			if (this.isMobileVersion)
+				this.sendEvent("asc_onTextShd", new Asc.asc_CParagraphShd(TextPr.Shd));
 		}
 	};
 	asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
@@ -2512,7 +2515,10 @@ background-repeat: no-repeat;\
 			return;
 
 		this.WordControl.m_oDrawingDocument.StartTableStylesCheck();
-		this.WordControl.m_oDrawingDocument.TableStylesSheckLook = new CTableLook();
+		this.WordControl.m_oDrawingDocument.TableStylesSheckLook = new Asc.CTablePropLook();
+		this.WordControl.m_oDrawingDocument.TableStylesSheckLook.FirstCol = true;
+		this.WordControl.m_oDrawingDocument.TableStylesSheckLook.FirstRow = true;
+		this.WordControl.m_oDrawingDocument.TableStylesSheckLook.BandHor  = true;
 		this.WordControl.m_oDrawingDocument.EndTableStylesCheck();
 	};
 
@@ -4134,7 +4140,14 @@ background-repeat: no-repeat;\
 	{
 		if (obj)
 		{
-			this.Color = (undefined != obj.Color && null != obj.Color) ? AscCommon.CreateAscColorCustom(obj.Color.r, obj.Color.g, obj.Color.b) : null;
+            if (obj.Unifill && obj.Unifill.fill && obj.Unifill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_SOLID && obj.Unifill.fill.color)
+            {
+                this.Color = AscCommon.CreateAscColor(obj.Unifill.fill.color);
+            }
+            else
+            {
+                this.Color = (undefined != obj.Color && null != obj.Color) ? AscCommon.CreateAscColorCustom(obj.Color.r, obj.Color.g, obj.Color.b) : null;
+            }
 			this.Value = (undefined != obj.Value) ? obj.Value : null;
 		}
 		else
@@ -5650,6 +5663,10 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 		}
 	};
+
+    asc_docs_api.prototype.asc_startEditCurrentOleObject = function(){
+		this.WordControl.m_oLogicDocument.DrawingObjects.startEditCurrentOleObject();
+    };
 	//-----------------------------------------------------------------
 	// События контекстного меню
 	//-----------------------------------------------------------------
@@ -7634,7 +7651,8 @@ background-repeat: no-repeat;\
 					}
 					else
 					{
-						error = mapAscServerErrorToAscError(parseInt(input["data"]));
+						error = mapAscServerErrorToAscError(parseInt(input["data"]),
+							AscCommon.c_oAscAdvancedOptionsAction.Save);
 					}
 				}
 				if (c_oAscError.ID.No != error)
@@ -8459,6 +8477,11 @@ background-repeat: no-repeat;\
 	{
 		this.IsSpellCheckCurrentWord = value;
 	};
+	window["asc_docs_api"].prototype["asc_setParagraphStylesSizes"] = function(width, height)
+	{
+		GlobalSkin.STYLE_THUMBNAIL_WIDTH = width;
+		GlobalSkin.STYLE_THUMBNAIL_HEIGHT = height;
+	};
 
 	// desktop editor spellcheck
 	function CSpellCheckApi_desktop()
@@ -8941,6 +8964,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_setDrawCollaborationMarks']             = asc_docs_api.prototype.asc_setDrawCollaborationMarks;
 	asc_docs_api.prototype['asc_AddMath']                               = asc_docs_api.prototype.asc_AddMath;
 	asc_docs_api.prototype['asc_AddMath2']                              = asc_docs_api.prototype.asc_AddMath2;
+	asc_docs_api.prototype['asc_AddPageCount']                          = asc_docs_api.prototype.asc_AddPageCount;
 	asc_docs_api.prototype['asc_StartMailMerge']                        = asc_docs_api.prototype.asc_StartMailMerge;
 	asc_docs_api.prototype['asc_StartMailMergeByList']                  = asc_docs_api.prototype.asc_StartMailMergeByList;
 	asc_docs_api.prototype['asc_GetReceptionsCount']                    = asc_docs_api.prototype.asc_GetReceptionsCount;
@@ -8997,10 +9021,12 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_SetSilentMode"]                         = asc_docs_api.prototype.asc_SetSilentMode;
 	asc_docs_api.prototype["asc_addOleObject"]                          = asc_docs_api.prototype.asc_addOleObject;
 	asc_docs_api.prototype["asc_editOleObject"]                         = asc_docs_api.prototype.asc_editOleObject;
+	asc_docs_api.prototype["asc_startEditCurrentOleObject"]             = asc_docs_api.prototype.asc_startEditCurrentOleObject;
 	asc_docs_api.prototype["asc_InputClearKeyboardElement"]             = asc_docs_api.prototype.asc_InputClearKeyboardElement;
 
 	// mobile
 	asc_docs_api.prototype["asc_GetDefaultTableStyles"]             	= asc_docs_api.prototype.asc_GetDefaultTableStyles;
+	asc_docs_api.prototype["asc_Remove"]             					= asc_docs_api.prototype.asc_Remove;
 
 	CParagraphPropEx.prototype['get_ContextualSpacing'] = CParagraphPropEx.prototype.get_ContextualSpacing;
 	CParagraphPropEx.prototype['get_Ind']               = CParagraphPropEx.prototype.get_Ind;

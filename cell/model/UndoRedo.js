@@ -82,7 +82,7 @@ function UndoRedoItemSerializable(oClass, nActionType, nSheetId, oRange, oData, 
 UndoRedoItemSerializable.prototype = {
 	Serialize : function(oBinaryWriter, collaborativeEditing)
 	{
-		if(this.oData.getType || this.oClass.Save_Changes)
+		if((this.oData && this.oData.getType) || this.oClass.Save_Changes || this.oClass.WriteToBinary)
 		{
 			var oThis = this;
 			var oBinaryCommonWriter = new AscCommon.BinaryCommonWriter(oBinaryWriter);
@@ -92,7 +92,7 @@ UndoRedoItemSerializable.prototype = {
 	SerializeInner : function(oBinaryWriter, collaborativeEditing)
 	{
 		//nClassType
-        if(!this.oClass.Save_Changes)
+        if(!this.oClass.Save_Changes && !this.oClass.WriteToBinary)
         {
             oBinaryWriter.WriteBool(true);
             var nClassType = this.oClass.getClassType();
@@ -139,9 +139,20 @@ UndoRedoItemSerializable.prototype = {
         else
         {
             oBinaryWriter.WriteBool(false);
-            oBinaryWriter.WriteString2(this.oClass.Get_Id());
+            var Class;
+            if (this.oClass && this.oClass.IsChangesClass && this.oClass.IsChangesClass())
+            {
+                Class = this.oClass.GetClass();
+                oBinaryWriter.WriteString2(Class.Get_Id());
+                oBinaryWriter.WriteLong(this.oClass.Type);
+                this.oClass.WriteToBinary(oBinaryWriter);
+            }
+            else
+            {
+                oBinaryWriter.WriteString2(this.oClass.Get_Id());
+                this.oClass.Save_Changes(this.nActionType, oBinaryWriter);
+            }
 
-            this.oClass.Save_Changes(this.oData, oBinaryWriter);
         }
 	},
 	SerializeDataObject : function(oBinaryWriter, oData, nSheetId, collaborativeEditing)
@@ -281,14 +292,12 @@ UndoRedoItemSerializable.prototype = {
         else
         {
             var changedObjectId = oBinaryReader.GetString2();
-            var changedObject = AscCommon.g_oTableId.Get_ById(changedObjectId);
             this.nActionType = 1;
-            this.oClass = changedObject;
             this.oData = new DrawingCollaborativeData();
-            this.oData.oClass = changedObject;
             this.oData.sChangedObjectId = changedObjectId;
             this.oData.oBinaryReader = oBinaryReader;
             this.oData.nPos = oBinaryReader.cur;
+
         }
 	},
 	DeserializeData : function(oBinaryReader)

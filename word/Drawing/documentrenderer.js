@@ -504,13 +504,16 @@ CDocMeta.prototype =
 
     drawPage : function(pageIndex, g)
     {
+        // если пришла отрисовка - то точно надо перерисовать (изменился размер)
+		this.stopRenderingPage(pageIndex);
+
         var drObject = new CDrawingObject(this);
         drObject.Page = pageIndex;
         drObject.StreamPos = this.Pages[pageIndex].start;
         drObject.Graphics = g;
 
         this.Drawings[this.Drawings.length] = drObject;
-        this.OnImageLoad(drObject);
+		this.OnImageLoad(drObject);
     },
 
     stopRenderingPage : function(pageIndex)
@@ -571,6 +574,12 @@ CDocMeta.prototype =
         }
 
         var bIsFromPaint = (this.Pages[obj.Page].start == obj.StreamPos) ? 1 : 0;
+        if (bIsFromPaint)
+        {
+            // default colors: black!!!
+            g.b_color1(0, 0, 0, 255);
+            g.p_color(0, 0, 0, 255);
+        }
 
         if (obj.CheckOnScroll() && 0 == bIsFromPaint)
             editor.WordControl.OnScroll();
@@ -1863,7 +1872,7 @@ CDocMeta.prototype =
                 Line1 = sel.Line1;
                 Line2 = sel.Line2;
 
-                if (sel.Glyph1 < sel.Glyph2 || -1 == sel.Glyph2)
+                if (((sel.Glyph1 != -1) && (sel.Glyph1 < sel.Glyph2)) || (-1 == sel.Glyph2))
                 {
                     Glyph1 = sel.Glyph1;
                     Glyph2 = sel.Glyph2;

@@ -3697,8 +3697,14 @@ CAreaSeries.prototype =
             this.setOrder(o.order);
         if(o.pictureOptions)
             this.setPictureOptions(o.pictureOptions);
-        if(o.spPr)
+        if(o.spPr){
             this.setSpPr(o.spPr);
+            if((o instanceof AscFormat.CLineSeries) || (o instanceof AscFormat.CScatterSeries)){
+                if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_NOFILL){
+                    this.spPr.setFill(null);
+                }
+            }
+        }
         if(o.trendline)
             this.setTrendline(o.trendline);
         if(o.tx)
@@ -3863,7 +3869,7 @@ CAreaSeries.prototype =
                     for(i = 0; i < pts.length; ++i)
                     {
                         if(AscFormat.isRealNumber(pts[i].val))
-                            summ += pts[i].val;
+                            summ += Math.abs(pts[i].val);
 
                         if(pts[i].idx === idx)
                         {
@@ -3940,13 +3946,13 @@ CAreaSeries.prototype =
     },
     setTx: function(pr)
     {
-        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetTx, oldPr: this.trendline, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetTx, oldPr: this.tx, newPr: pr});
         this.tx = pr;
     },
 
     setVal: function(pr)
     {
-        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetVal, oldPr: this.trendline, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetVal, oldPr: this.val, newPr: pr});
         this.val = pr;
         if(this.val && this.val.setParent)
         {
@@ -4284,7 +4290,8 @@ function CCatAx()
     this.txPr            = null;
 
     this.parent = null;
-
+    this.posX = null;
+    this.posY = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -4857,6 +4864,22 @@ CCatAx.prototype =
             this.txPr.setParent(this);
         }
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.handleUpdateInternalChart)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
+    },
+
+    handleUpdateFill: function()
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
+    },
+
+    handleUpdateLn: function()
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
             this.parent.parent.parent.handleUpdateInternalChart();
         }
@@ -5641,6 +5664,8 @@ function CDateAx()
     this.txPr           = null;
 
     this.parent = null;
+    this.posX = null;
+    this.posY = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -6788,6 +6813,8 @@ function CSerAx()
     this.txPr           = null;
 
     this.parent = null;
+    this.posX = null;
+    this.posY = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -7716,6 +7743,8 @@ function CValAx()
     this.txPr           = null;
 
     this.parent = null;
+    this.posX = null;
+    this.posY = null;
 
 
     this.Id = g_oIdCounter.Get_NewId();
@@ -8030,6 +8059,22 @@ CValAx.prototype =
         this.parent = pr;
     },
 
+    handleUpdateFill: function()
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
+    },
+
+    handleUpdateLn: function()
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
+    },
+
     Undo: function(data)
     {
         switch(data.Type)
@@ -8190,7 +8235,7 @@ CValAx.prototype =
             }
             case AscDFH.historyitem_ValAxSetSpPr:
             {
-                this.axId = data.oldPr;
+                this.spPr = data.oldPr;
                 break;
             }
             case AscDFH.historyitem_ValAxSetTickLblPos:
@@ -8379,7 +8424,7 @@ CValAx.prototype =
             }
             case AscDFH.historyitem_ValAxSetSpPr:
             {
-                this.axId = data.newPr;
+                this.spPr = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
                     this.parent.parent.parent.handleUpdateInternalChart();
@@ -9344,8 +9389,15 @@ CBarSeries.prototype =
             this.setPictureOptions(o.pictureOptions);
         if(o.shape)
             this.setShape(o.shape);
-        if(o.spPr)
+        if(o.spPr){
             this.setSpPr(o.spPr);
+            if((o instanceof AscFormat.CLineSeries) || (o instanceof AscFormat.CScatterSeries)){
+                if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_NOFILL){
+                    this.spPr.setFill(null);
+                }
+            }
+        }
+
         if(o.trendline)
             this.setTrendline(o.trendline);
         if(o.tx)
@@ -13724,7 +13776,7 @@ function CLegend()
     this.layout = null;
     this.legendEntryes = [];
     this.legendPos = null;
-    this.overlay = true;
+    this.overlay = false;
     this.spPr = null;
     this.txPr = null;
 
@@ -15325,8 +15377,12 @@ CLineSeries.prototype =
             this.setOrder(other.order);
         if(AscFormat.isRealBool(other.smooth))
             this.setSmooth(other.smooth);
-        if(other.spPr)
+        if(other.spPr){
             this.setSpPr(other.spPr);
+            if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_NOFILL){
+                this.spPr.setFill(null);
+            }
+        }
         if(other.trendline)
             this.setTrendline(other.trendline);
         if(other.tx)
@@ -18435,8 +18491,12 @@ CPieSeries.prototype =
             this.setIdx(o.idx);
         if(o.order)
             this.setOrder(o.order);
-        if(o.spPr)
+        if(o.spPr){
             this.setSpPr(o.spPr);
+            if(!(o instanceof AscFormat.CPieSeries)){
+                this.spPr.setFill(null);
+            }
+        }
         if(o.tx)
             this.setTx(o.tx);
         if(o.val)
@@ -23064,7 +23124,7 @@ CSurfaceSeries.prototype =
 function CTitle()
 {
     this.layout  = null;
-    this.overlay = true;
+    this.overlay = false;
     this.spPr    = null;
     this.tx      = null;
     this.txPr    = null;
@@ -23095,7 +23155,8 @@ function CTitle()
         recalculateBrush: true,
         recalculatePen: true,
         recalcStyle: true,
-        recalculateContent: true
+        recalculateContent: true,
+        recalculateGeometry: true
     };
 
 
@@ -23143,6 +23204,7 @@ CTitle.prototype =
         this.recalcInfo.recalcTransformText = true;
         this.recalcInfo.recalcContent = true;
         this.recalcInfo.recalculateContent = true;
+        this.recalcInfo.recalculateGeometry = true;
 
         this.parent && this.parent.Refresh_RecalcData2 && this.parent.Refresh_RecalcData2(pageIndex, this);
     },
@@ -23154,6 +23216,7 @@ CTitle.prototype =
         this.recalcInfo.recalcTransformText = true;
         this.recalcInfo.recalcContent = true;
         this.recalcInfo.recalculateContent = true;
+        this.recalcInfo.recalculateGeometry = true;
         if(this.tx && this.tx.rich && this.tx.rich.content)
         {
             this.tx.rich.content.Recalc_AllParagraphs_CompiledPr();
@@ -23320,6 +23383,8 @@ CTitle.prototype =
     hitInBoundingRect:  CShape.prototype.hitInBoundingRect,
 
     hitInTextRect: CShape.prototype.hitInTextRect,
+    recalculateGeometry: CShape.prototype.recalculateGeometry,
+    getTransform : CShape.prototype.getTransform ,
 
     checkHitToBounds: function(x, y)
     {
@@ -23586,6 +23651,10 @@ CTitle.prototype =
             {
                 this.recalculateTransformText();
                 this.recalcInfo.recalcTransformText = false;
+            }
+            if(this.recalcInfo.recalculateGeometry){
+                this.recalculateGeometry && this.recalculateGeometry();
+                this.recalcInfo.recalculateGeometry = false;
             }
             if(this.chart)
             {

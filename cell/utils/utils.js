@@ -64,9 +64,60 @@
 		/** @const */
 		var kArrayL = "array";
 
+		var recalcType = {
+			recalc	: 0, // без пересчета
+			full		: 1, // пересчитываем все
+			newLines: 2  // пересчитываем новые строки
+
+		};
+
+		function horizontalAlignFromString(val) {
+			var ha = null;
+			switch (val) {
+				case "left": ha = AscCommon.align_Left;break;
+				case "right": ha = AscCommon.align_Right;break;
+				case "center": ha = AscCommon.align_Center;break;
+				case "justify": ha = AscCommon.align_Justify;break;
+			}
+			return ha;
+		}
+		function horizontalAlignToString(val) {
+			var ha = "none";
+			switch (val) {
+				case AscCommon.align_Left: ha = "left";break;
+				case AscCommon.align_Right: ha = "right";break;
+				case AscCommon.align_Center: ha = "center";break;
+				case AscCommon.align_Justify: ha = "justify";break;
+			}
+			return ha;
+		}
+		function verticalAlignFromString(val) {
+			var va = null;
+			switch (val) {
+				case "bottom": va = Asc.c_oAscVAlign.Bottom;break;
+				case "center": va = Asc.c_oAscVAlign.Center;break;
+				case "distributed": va = Asc.c_oAscVAlign.Dist;break;
+				case "justify": va = Asc.c_oAscVAlign.Just;break;
+				case "top": va = Asc.c_oAscVAlign.Top;break;
+			}
+			return va;
+		}
+		function verticalAlignToString(val) {
+			var va = "none";
+			switch (val) {
+				case Asc.c_oAscVAlign.Bottom: va = "bottom";break;
+				case Asc.c_oAscVAlign.Center: va = "center";break;
+				case Asc.c_oAscVAlign.Dist: va = "distributed";break;
+				case Asc.c_oAscVAlign.Just: va = "justify";break;
+				case Asc.c_oAscVAlign.Top: va = "top";break;
+			}
+			return va;
+		}
+
 		function applyFunction(callback) {
-			if (kFunctionL === typeof callback)
+			if (kFunctionL === typeof callback) {
 				callback.apply(null, Array.prototype.slice.call(arguments, 1));
+			}
 		}
 
 		function typeOf(obj) {
@@ -227,6 +278,8 @@
 			return normalize ? this.normalize() : this;
 		};
 		Range.prototype.assign2 = function (range) {
+			this.refType1 = range.refType1;
+			this.refType2 = range.refType2;
 			return this.assign(range.c1, range.r1, range.c2, range.r2);
 		};
 
@@ -735,6 +788,7 @@
      */
 		function Range3D() {
 			this.sheet = '';
+			this.sheet2 = '';
 
 			if (3 == arguments.length) {
 				var range = arguments[0];
@@ -760,8 +814,15 @@
 			}
 			return oRes && Range3D.superclass.isIntersect.apply(this, arguments);
 		};
-		Range3D.prototype.clone = function(){
+		Range3D.prototype.clone = function () {
 			return new Range3D(ActiveRange.superclass.clone.apply(this, arguments), this.sheet, this.sheet2);
+		};
+		Range3D.prototype.setSheet = function (sheet, sheet2) {
+			this.sheet = sheet;
+			this.sheet2 = sheet2 ? sheet2 : sheet;
+		};
+		Range3D.prototype.getName = function () {
+			return AscCommon.parserHelp.get3DRef(this.sheet, Range3D.superclass.getName.apply(this));
 		};
 
 		/**
@@ -815,6 +876,55 @@
 			this.clean();
 			this.getLast().assign2(range);
 			this.update();
+		};
+		SelectionRange.prototype.union = function (range) {
+			var res = this.ranges.some(function (item) {
+				var success = false;
+				if (item.c1 === range.c1 && item.c2 === range.c2) {
+					if (range.r1 === item.r2 + 1) {
+						item.r2 = range.r2;
+						success = true;
+					} else if (range.r2 === item.r1 - 1) {
+						item.r1 = range.r1;
+						success = true;
+					}
+				} else if (item.r1 === range.r1 && item.r2 === range.r2) {
+					if (range.c1 === item.c2 + 1) {
+						item.c2 = range.c2;
+						success = true;
+					} else if (range.c2 === item.c1 - 1) {
+						item.c1 = range.c1;
+						success = true;
+					}
+				}
+				return success;
+			});
+			if (!res) {
+				this.addRange();
+				this.getLast().assign2(range);
+			}
+		};
+		SelectionRange.prototype.getUnion = function () {
+			var result = new SelectionRange();
+			var unionRanges = function (ranges, res) {
+				ranges.forEach(function (item, i) {
+					if (0 === i) {
+						res.assign2(item);
+					} else {
+						res.union(item);
+					}
+				});
+			};
+			unionRanges(this.ranges, result);
+
+			var isUnion = true, resultTmp;
+			while (isUnion && !result.isSingleRange()) {
+				resultTmp = new SelectionRange();
+				unionRanges(result.ranges, resultTmp);
+				isUnion = result.ranges.length !== resultTmp.ranges.length;
+				result = resultTmp;
+			}
+			return result;
 		};
 		SelectionRange.prototype.offsetCell = function (dr, dc, fCheckSize) {
 			var done, curRange, mc;
@@ -1382,7 +1492,7 @@
 		function isFixedWidthCell(frag) {
 			for (var i = 0; i < frag.length; ++i) {
 				var f = frag[i].format;
-				if (f && f.repeat) {return true;}
+				if (f && f.getRepeat()) {return true;}
 			}
 			return false;
 		}
@@ -1633,7 +1743,7 @@
 			return this;
 		}
 		function CPrintPagesData () {
-			this.arrPages = null;
+			this.arrPages = [];
 			this.currentIndex = 0;
 
 			return this;
@@ -1881,8 +1991,10 @@
         var fc = oStyle.getFontColor();
         var oFontColor = fc !== null ? fc : new AscCommon.CColor(0, 0, 0);
         var format = oStyle.getFont();
+        var fs = format.getSize();
         // Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
-        var oFont = new Asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs, format.b, format.i, format.u, format.s);
+		var oFont = new Asc.FontProperties(format.getName(), (16 < fs) ? 16 : fs,
+			format.getBold(), format.getItalic(), format.getUnderline(), format.getStrikeout());
 
         var width_padding = 3; // 4 * 72 / 96
 
@@ -1975,6 +2087,7 @@
 			this.countFindAll = 0;
 			this.countReplaceAll = 0;
 			this.sheetIndex = -1;
+			this.error = false;
 		}
 		asc_CFindOptions.prototype.clone = function () {
 			var result = new asc_CFindOptions();
@@ -1996,6 +2109,7 @@
 			result.countFindAll = this.countFindAll;
 			result.countReplaceAll = this.countReplaceAll;
 			result.sheetIndex = this.sheetIndex;
+			result.error = this.error;
 			return result;
 		};
 		asc_CFindOptions.prototype.isEqual = function (obj) {
@@ -2007,6 +2121,7 @@
 		asc_CFindOptions.prototype.clearFindAll = function () {
 			this.countFindAll = 0;
 			this.countReplaceAll = 0;
+			this.error = false;
 		};
 		asc_CFindOptions.prototype.updateFindAll = function () {
 			this.countFindAll += this.countFind;
@@ -2035,12 +2150,13 @@
 			this.cache = {};
 		}
 		CCacheMeasureEmpty.prototype.add = function (elem, val) {
-			var font = (this.cache[elem.fn] || (this.cache[elem.fn] = {}));
-			font[elem.fs] = val;
+			var fn = elem.getName();
+			var font = (this.cache[fn] || (this.cache[fn] = {}));
+			font[elem.getSize()] = val;
 		};
 		CCacheMeasureEmpty.prototype.get = function (elem) {
-			var font = this.cache[elem.fn];
-			return font ? font[elem.fs] : null;
+			var font = this.cache[elem.getName()];
+			return font ? font[elem.getSize()] : null;
 		};
 		var g_oCacheMeasureEmpty = new CCacheMeasureEmpty();
 
@@ -2051,7 +2167,12 @@
 		var prot;
 		window['Asc'] = window['Asc'] || {};
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+		window["AscCommonExcel"].recalcType = recalcType;
 		window["AscCommonExcel"].applyFunction = applyFunction;
+		window["AscCommonExcel"].horizontalAlignFromString = horizontalAlignFromString;
+		window["AscCommonExcel"].horizontalAlignToString = horizontalAlignToString;
+		window["AscCommonExcel"].verticalAlignFromString = verticalAlignFromString;
+		window["AscCommonExcel"].verticalAlignToString = verticalAlignToString;
 		window["Asc"].typeOf = typeOf;
 		window["Asc"].lastIndexOf = lastIndexOf;
 		window["Asc"].search = search;

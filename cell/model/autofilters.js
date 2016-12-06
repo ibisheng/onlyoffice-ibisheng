@@ -1760,7 +1760,7 @@
 					else
 					{
 						curFilter.SortState.SortConditions[0].dxf.font = new AscCommonExcel.Font();
-						curFilter.SortState.SortConditions[0].dxf.font.c = color;
+						curFilter.SortState.SortConditions[0].dxf.font.setColor(color);
 						curFilter.SortState.SortConditions[0].ConditionSortBy = Asc.ESortBy.sortbyFontColor;
 					}
 
@@ -2013,6 +2013,17 @@
 						worksheet.mergeManager.remove(tablePart.Ref.clone());
 					}
 				}
+			},
+			
+			getMaxColRow: function()
+			{
+				var r = -1, c = -1;
+				this.worksheet.TableParts.forEach(function (item) {
+					r = Math.max(r, item.Ref.r2);
+					c = Math.max(c, item.Ref.c2);
+				});
+				
+				return new AscCommon.CellBase(r, c);
 			},
 			
 			_setStyleTablePartsAfterOpenRows: function(ref)
@@ -4341,7 +4352,6 @@
 					var aNoHiddenRow = [];
 					for(var i = bbox.r1; i <= bbox.r2; i++)
 					{
-						var row = worksheet._getRowNoEmpty(i);
 						if (!worksheet.getRowHidden(i))
 							aNoHiddenRow.push(i);
 					}

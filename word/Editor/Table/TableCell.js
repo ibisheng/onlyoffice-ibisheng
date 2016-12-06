@@ -1044,12 +1044,12 @@ CTableCell.prototype =
         }
     },
 
-    Set_Pr : function(CellPr)
-    {
-        History.Add( this, { Type : AscDFH.historyitem_TableCell_Pr, Old : this.Pr, New : CellPr } );
-        this.Pr = CellPr;
-        this.Recalc_CompiledPr();
-    },
+	Set_Pr : function(CellPr)
+	{
+		History.Add(new CChangesTableCellPr(this, this.Pr, CellPr));
+		this.Pr = CellPr;
+		this.Recalc_CompiledPr();
+	},
 
     Copy_Pr : function(OtherPr, bCopyOnlyVisualProps)
     {
@@ -1179,21 +1179,12 @@ CTableCell.prototype =
         return W.Copy();
     },
 
-    Set_W : function(CellW)
-    {
-        if ( undefined === CellW )
-        {
-            History.Add( this, { Type : AscDFH.historyitem_TableCell_W, Old : this.Pr.TableCellW, New : undefined } );
-            this.Pr.TableCellW = undefined;
-        }
-        else
-        {
-            History.Add( this, { Type : AscDFH.historyitem_TableCell_W, Old : this.Pr.TableCellW, New : CellW } );
-            this.Pr.TableCellW = CellW;
-        }
-
-        this.Recalc_CompiledPr();
-    },
+	Set_W : function(CellW)
+	{
+		History.Add(new CChangesTableCellW(this, this.Pr.TableCellW, CellW));
+		this.Pr.TableCellW = CellW;
+		this.Recalc_CompiledPr();
+	},
 
     Get_GridSpan : function()
     {
@@ -1201,26 +1192,15 @@ CTableCell.prototype =
         return GridSpan;
     },
 
-    Set_GridSpan : function(Value)
-    {
-        if ( undefined === Value && undefined === this.Pr.GridSpan )
-            return;
+	Set_GridSpan : function(Value)
+	{
+		if (this.Pr.GridSpan === Value)
+			return;
 
-        if ( undefined === Value && undefined != this.Pr.GridSpan )
-        {
-            History.Add( this, { Type : AscDFH.historyitem_TableCell_GridSpan, Old : this.Pr.GridSpan, New : undefined } );
-            this.Pr.GridSpan = undefined;
-
-            this.Recalc_CompiledPr();
-        }
-        else if ( Value != this.Pr.GridSpan )
-        {
-            History.Add( this, { Type : AscDFH.historyitem_TableCell_GridSpan, Old : ( undefined === this.Pr.GridSpan ? undefined : this.Pr.GridSpan ), New : Value } );
-            this.Pr.GridSpan = Value;
-
-            this.Recalc_CompiledPr();
-        }
-    },
+		History.Add(new CChangesTableCellGridSpan(this, this.Pr.GridSpan, Value));
+		this.Pr.GridSpan = Value;
+		this.Recalc_CompiledPr();
+	},
 
     Get_Margins : function()
     {
@@ -1256,116 +1236,100 @@ CTableCell.prototype =
             return false;
     },
 
-    Set_Margins : function(Margin, Type)
-    {
-        var OldValue = ( undefined === this.Pr.TableCellMar ? undefined : this.Pr.TableCellMar );
+	Set_Margins : function(Margin, Type)
+	{
+		var OldValue = ( undefined === this.Pr.TableCellMar ? undefined : this.Pr.TableCellMar );
 
-        if ( undefined === Margin )
-        {
-            if ( undefined != this.Pr.TableCellMar )
-            {
-                History.Add( this, { Type : AscDFH.historyitem_TableCell_Margins, Old : OldValue, New : undefined } );
-                this.Pr.TableCellMar = undefined;
+		if (undefined === Margin || null === Margin)
+		{
+			if (Margin !== this.Pr.TableCellMar)
+			{
+				History.Add(new CChangesTableCellMargins(this, OldValue, Margin));
+				this.Pr.TableCellMar = undefined;
+				this.Recalc_CompiledPr();
+			}
 
-                this.Recalc_CompiledPr();
-            }
+			return;
+		}
 
-            return;
-        }
+		var Margins_new = this.Pr.TableCellMar;
 
-        if ( null === Margin )
-        {
-            if ( null != this.Pr.TableCellMar )
-            {
-                History.Add( this, { Type : AscDFH.historyitem_TableCell_Margins, Old : OldValue, New : null } );
-                this.Pr.TableCellMar = null;
+		var bNeedChange  = false;
+		var TableMargins = this.Row.Table.Get_TableCellMar();
+		if (null === Margins_new || undefined === Margins_new)
+		{
+			Margins_new = {
+				Left   : TableMargins.Left.Copy(),
+				Right  : TableMargins.Right.Copy(),
+				Top    : TableMargins.Top.Copy(),
+				Bottom : TableMargins.Bottom.Copy()
+			};
 
-                this.Recalc_CompiledPr();
-            }
+			bNeedChange = true;
+		}
 
-            return;
-        }
+		switch (Type)
+		{
+			case -1 :
+			{
+				bNeedChange = true;
 
-        var Margins_new = this.Pr.TableCellMar;
+				Margins_new.Top.W       = Margin.Top.W;
+				Margins_new.Top.Type    = Margin.Top.Type;
+				Margins_new.Right.W     = Margin.Right.W;
+				Margins_new.Right.Type  = Margin.Right.Type;
+				Margins_new.Bottom.W    = Margin.Bottom.W;
+				Margins_new.Bottom.Type = Margin.Bottom.Type;
+				Margins_new.Left.W      = Margin.Left.W;
+				Margins_new.Left.Type   = Margin.Left.Type;
 
-        var bNeedChange  = false;
-        var TableMargins = this.Row.Table.Get_TableCellMar();
-        if ( null === Margins_new || undefined === Margins_new )
-        {
-            Margins_new =
-            {
-                Left   : TableMargins.Left.Copy(),
-                Right  : TableMargins.Right.Copy(),
-                Top    : TableMargins.Top.Copy(),
-                Bottom : TableMargins.Bottom.Copy()
-            };
+				break;
+			}
+			case 0:
+			{
+				if (true != bNeedChange && Margins_new.Top.W != Margin.W || Margins_new.Top.Type != Margin.Type)
+					bNeedChange = true;
 
-            bNeedChange = true;
-        }
+				Margins_new.Top.W    = Margin.W;
+				Margins_new.Top.Type = Margin.Type;
+				break;
+			}
+			case 1:
+			{
+				if (true != bNeedChange && Margins_new.Right.W != Margin.W || Margins_new.Right.Type != Margin.Type)
+					bNeedChange = true;
 
-        switch ( Type )
-        {
-            case -1 :
-            {
-                bNeedChange = true;
+				Margins_new.Right.W    = Margin.W;
+				Margins_new.Right.Type = Margin.Type;
+				break;
+			}
+			case 2:
+			{
+				if (true != bNeedChange && Margins_new.Bottom.W != Margin.W || Margins_new.Bottom.Type != Margin.Type)
+					bNeedChange = true;
 
-                Margins_new.Top.W       = Margin.Top.W;
-                Margins_new.Top.Type    = Margin.Top.Type;
-                Margins_new.Right.W     = Margin.Right.W;
-                Margins_new.Right.Type  = Margin.Right.Type;
-                Margins_new.Bottom.W    = Margin.Bottom.W;
-                Margins_new.Bottom.Type = Margin.Bottom.Type;
-                Margins_new.Left.W      = Margin.Left.W;
-                Margins_new.Left.Type   = Margin.Left.Type;
+				Margins_new.Bottom.W    = Margin.W;
+				Margins_new.Bottom.Type = Margin.Type;
+				break;
+			}
+			case 3:
+			{
+				if (true != bNeedChange && Margins_new.Left.W != Margin.W || Margins_new.Left.Type != Margin.Type)
+					bNeedChange = true;
 
-                break;
-            }
-            case 0:
-            {
-                if ( true != bNeedChange && Margins_new.Top.W != Margin.W || Margins_new.Top.Type != Margin.Type )
-                    bNeedChange = true;
+				Margins_new.Left.W    = Margin.W;
+				Margins_new.Left.Type = Margin.Type;
+				break;
+			}
+		}
 
-                Margins_new.Top.W    = Margin.W;
-                Margins_new.Top.Type = Margin.Type;
-                break;
-            }
-            case 1:
-            {
-                if ( true != bNeedChange && Margins_new.Right.W != Margin.W || Margins_new.Right.Type != Margin.Type )
-                    bNeedChange = true;
-
-                Margins_new.Right.W    = Margin.W;
-                Margins_new.Right.Type = Margin.Type;
-                break;
-            }
-            case 2:
-            {
-                if ( true != bNeedChange && Margins_new.Bottom.W != Margin.W || Margins_new.Bottom.Type != Margin.Type )
-                    bNeedChange = true;
-
-                Margins_new.Bottom.W    = Margin.W;
-                Margins_new.Bottom.Type = Margin.Type;
-                break;
-            }
-            case 3:
-            {
-                if ( true != bNeedChange && Margins_new.Left.W != Margin.W || Margins_new.Left.Type != Margin.Type )
-                    bNeedChange = true;
-
-                Margins_new.Left.W    = Margin.W;
-                Margins_new.Left.Type = Margin.Type;
-                break;
-            }
-        }
-
-        if ( true === bNeedChange )
-        {
-            History.Add( this, { Type : AscDFH.historyitem_TableCell_Margins, Old : OldValue, New : Margins_new } );
-            this.Pr.TableCellMar = Margins_new;
-
-            this.Recalc_CompiledPr();
-        }
-    },
+		if (true === bNeedChange)
+		{
+			History.Add(new CChangesTableCellMargins(this, OldValue, Margins_new));
+			this.Pr.TableCellMar = Margins_new;
+			this.Recalc_CompiledPr();
+		}
+	},
 
     Get_Shd : function()
     {
@@ -1373,28 +1337,26 @@ CTableCell.prototype =
         return Shd;
     },
 
-    Set_Shd : function(Shd)
-    {
-        if ( undefined === Shd && undefined === this.Pr.Shd )
-            return;
+	Set_Shd : function(Shd)
+	{
+		if (undefined === Shd && undefined === this.Pr.Shd)
+			return;
 
-        if ( undefined === Shd )
-        {
-            History.Add( this, { Type : AscDFH.historyitem_TableCell_Shd, Old : this.Pr.Shd, New : undefined } );
-            this.Pr.Shd = undefined;
-
-            this.Recalc_CompiledPr();
-        }
-        else if ( undefined === this.Pr.Shd || false === this.Pr.Shd.Compare(Shd) )
-        {
-            var _Shd = new CDocumentShd();
-            _Shd.Set_FromObject( Shd );
-            History.Add( this, { Type : AscDFH.historyitem_TableCell_Shd, Old : ( undefined === this.Pr.Shd ? undefined : this.Pr.Shd ), New : _Shd } );
-            this.Pr.Shd = _Shd;
-
-            this.Recalc_CompiledPr();
-        }
-    },
+		if (undefined === Shd)
+		{
+			History.Add(new CChangesTableCellShd(this, this.Pr.Shd, undefined));
+			this.Pr.Shd = undefined;
+			this.Recalc_CompiledPr();
+		}
+		else if (undefined === this.Pr.Shd || false === this.Pr.Shd.Compare(Shd))
+		{
+			var _Shd = new CDocumentShd();
+			_Shd.Set_FromObject(Shd);
+			History.Add(new CChangesTableCellShd(this, this.Pr.Shd, _Shd));
+			this.Pr.Shd = _Shd;
+			this.Recalc_CompiledPr();
+		}
+	},
 
     Get_VMerge : function()
     {
@@ -1402,24 +1364,15 @@ CTableCell.prototype =
         return VMerge;
     },
 
-    Set_VMerge : function(Value)
-    {
-        if ( undefined === Value && undefined === this.Pr.VMerge )
-            return;
+	Set_VMerge : function(Value)
+	{
+		if (Value === this.Pr.VMerge)
+			return;
 
-        if ( undefined === Value )
-        {
-            History.Add( this, { Type : AscDFH.historyitem_TableCell_VMerge, Old : this.Pr.VMerge, New : undefined } );
-            this.Pr.VMerge = undefined;
-            this.Recalc_CompiledPr();
-        }
-        else if ( Value != this.Pr.VMerge )
-        {
-            History.Add( this, { Type : AscDFH.historyitem_TableCell_VMerge, Old : ( undefined === this.Pr.VMerge ? undefined : this.Pr.VMerge ), New : Value } );
-            this.Pr.VMerge = Value;
-            this.Recalc_CompiledPr();
-        }
-    },
+		History.Add(new CChangesTableCellVMerge(this, this.Pr.VMerge, Value));
+		this.Pr.VMerge = Value;
+		this.Recalc_CompiledPr();
+	},
 
     Get_VAlign : function()
     {
@@ -1427,39 +1380,30 @@ CTableCell.prototype =
         return VAlign;
     },
 
-    Set_VAlign : function(Value)
-    {
-        if ( undefined === Value && undefined === this.Pr.VAlign )
-            return;
+	Set_VAlign : function(Value)
+	{
+		if (Value === this.Pr.VAlign)
+			return;
 
-        if ( undefined === Value )
-        {
-            History.Add( this, { Type : AscDFH.historyitem_TableCell_VAlign, Old : this.Pr.VAlign, New : undefined } );
-            this.Pr.VMerge = undefined;
-            this.Recalc_CompiledPr();
-        }
-        else if ( Value != this.Pr.VAlign )
-        {
-            History.Add( this, { Type : AscDFH.historyitem_TableCell_VAlign, Old : ( undefined === this.Pr.VAlign ? undefined : this.Pr.VAlign ), New : Value } );
-            this.Pr.VAlign = Value;
-            this.Recalc_CompiledPr();
-        }
-    },
+		History.Add(new CChangesTableCellVAlign(this, this.Pr.VAlign, Value));
+		this.Pr.VAlign = Value;
+		this.Recalc_CompiledPr();
+	},
 
     Get_NoWrap : function()
     {
         return this.Get_CompiledPr(false).NoWrap;
     },
 
-    Set_NoWrap : function(Value)
-    {
-        if (this.Pr.NoWrap !== Value)
-        {
-            History.Add(this, {Type : AscDFH.historyitem_TableCell_NoWrap, Old : this.Pr.NoWrap, New : Value});
-            this.Pr.NoWrap = Value;
-            this.Recalc_CompiledPr();
-        }
-    },
+	Set_NoWrap : function(Value)
+	{
+		if (this.Pr.NoWrap !== Value)
+		{
+			History.Add(new CChangesTableCellNoWrap(this, this.Pr.NoWrap, Value));
+			this.Pr.NoWrap = Value;
+			this.Recalc_CompiledPr();
+		}
+	},
 
     Is_VerticalText : function()
     {
@@ -1475,15 +1419,15 @@ CTableCell.prototype =
         return this.Get_CompiledPr(false).TextDirection;
     },
 
-    Set_TextDirection : function(Value)
-    {
-        if (Value !== this.Pr.TextDirection)
-        {
-            History.Add(this, {Type : AscDFH.historyitem_TableCell_TextDirection, Old : this.Pr.TextDirection, New : Value});
-            this.Pr.TextDirection = Value;
-            this.Recalc_CompiledPr();
-        }
-    },
+	Set_TextDirection : function(Value)
+	{
+		if (Value !== this.Pr.TextDirection)
+		{
+			History.Add(new CChangesTableCellTextDirection(this, this.Pr.TextDirection, Value));
+			this.Pr.TextDirection = Value;
+			this.Recalc_CompiledPr();
+		}
+	},
 
     Set_TextDirectionFromApi : function(TextDirection)
     {
@@ -1594,106 +1538,147 @@ CTableCell.prototype =
     },
 
     // 0 - Top, 1 - Right, 2- Bottom, 3- Left
-    Set_Border : function(Border, Type)
-    {
-        var DstBorder   = this.Pr.TableCellBorders.Top;
-        var HistoryType = AscDFH.historyitem_TableCell_Border_Left;
-        switch (Type)
-        {
-            case 0 : DstBorder = this.Pr.TableCellBorders.Top;    HistoryType = AscDFH.historyitem_TableCell_Border_Top;    break;
-            case 1 : DstBorder = this.Pr.TableCellBorders.Right;  HistoryType = AscDFH.historyitem_TableCell_Border_Right;  break;
-            case 2 : DstBorder = this.Pr.TableCellBorders.Bottom; HistoryType = AscDFH.historyitem_TableCell_Border_Bottom; break;
-            case 3 : DstBorder = this.Pr.TableCellBorders.Left;   HistoryType = AscDFH.historyitem_TableCell_Border_Left;   break;
-        }
+	Set_Border : function(Border, Type)
+	{
+		var DstBorder = this.Pr.TableCellBorders.Top;
+		switch (Type)
+		{
+			case 0 :
+				DstBorder = this.Pr.TableCellBorders.Top;
+				break;
+			case 1 :
+				DstBorder = this.Pr.TableCellBorders.Right;
+				break;
+			case 2 :
+				DstBorder = this.Pr.TableCellBorders.Bottom;
+				break;
+			case 3 :
+				DstBorder = this.Pr.TableCellBorders.Left;
+				break;
+		}
 
-        if ( undefined === Border )
-        {
-            if ( undefined === DstBorder )
-                return;
-            else
-            {
-                History.Add( this, { Type : HistoryType, Old : DstBorder, New : undefined } );
+		if (undefined === Border || null === Border)
+		{
+			if (Border === DstBorder)
+				return;
 
-                switch (Type)
-                {
-                    case 0 : this.Pr.TableCellBorders.Top    = undefined; break;
-                    case 1 : this.Pr.TableCellBorders.Right  = undefined; break;
-                    case 2 : this.Pr.TableCellBorders.Bottom = undefined; break;
-                    case 3 : this.Pr.TableCellBorders.Left   = undefined; break;
-                }
+			switch (Type)
+			{
+				case 0:
+				{
+					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Top, Border));
+					this.Pr.TableCellBorders.Top = undefined;
+					break;
+				}
+				case 1 :
+				{
+					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Right, Border));
+					this.Pr.TableCellBorders.Right = undefined;
+					break;
+				}
+				case 2 :
+				{
+					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Bottom, Border));
+					this.Pr.TableCellBorders.Bottom = undefined;
+					break;
+				}
+				case 3 :
+				{
+					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Left, Border));
+					this.Pr.TableCellBorders.Left = undefined;
+					break;
+				}
+			}
 
-                this.Recalc_CompiledPr();
-            }
-        }
-        else if ( null === Border )
-        {
-            if ( null === DstBorder )
-                return;
-            else
-            {
-                History.Add( this, { Type : HistoryType, Old : DstBorder, New : null } );
+			this.Recalc_CompiledPr();
+		}
+		else if (null === DstBorder)
+		{
+			var NewBorder = this.Get_Border(Type).Copy();
 
-                switch (Type)
-                {
-                    case 0 : this.Pr.TableCellBorders.Top    = null; break;
-                    case 1 : this.Pr.TableCellBorders.Right  = null; break;
-                    case 2 : this.Pr.TableCellBorders.Bottom = null; break;
-                    case 3 : this.Pr.TableCellBorders.Left   = null; break;
-                }
+			NewBorder.Value   = null != Border.Value ? Border.Value : NewBorder.Value;
+			NewBorder.Size    = null != Border.Size ? Border.Size : NewBorder.Size;
+			NewBorder.Color.r = null != Border.Color ? Border.Color.r : NewBorder.Color.r;
+			NewBorder.Color.g = null != Border.Color ? Border.Color.g : NewBorder.Color.g;
+			NewBorder.Color.b = null != Border.Color ? Border.Color.b : NewBorder.Color.b;
+			NewBorder.Unifill = null != Border.Unifill ? Border.Unifill : NewBorder.Unifill;
 
-                this.Recalc_CompiledPr();
-            }
-        }
-        else if ( null === DstBorder )
-        {
-            // Нам вернется граница из таблицы
-            var NewBorder = this.Get_Border(Type).Copy();
-            NewBorder.Value   = ( null != Border.Value ? Border.Value   : NewBorder.Value );
-            NewBorder.Size    = ( null != Border.Size  ? Border.Size    : NewBorder.Size  );
-            NewBorder.Color.r = ( null != Border.Color ? Border.Color.r : NewBorder.Color.r );
-            NewBorder.Color.g = ( null != Border.Color ? Border.Color.g : NewBorder.Color.g );
-            NewBorder.Color.b = ( null != Border.Color ? Border.Color.b : NewBorder.Color.b );
-            NewBorder.Unifill = ( null != Border.Unifill ? Border.Unifill : NewBorder.Unifill);
-            History.Add( this, { Type : HistoryType, Old : null, New : NewBorder } );
+			switch (Type)
+			{
+				case 0:
+				{
+					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Top, NewBorder));
+					this.Pr.TableCellBorders.Top = NewBorder;
+					break;
+				}
+				case 1 :
+				{
+					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Right, NewBorder));
+					this.Pr.TableCellBorders.Right = NewBorder;
+					break;
+				}
+				case 2 :
+				{
+					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Bottom, NewBorder));
+					this.Pr.TableCellBorders.Bottom = NewBorder;
+					break;
+				}
+				case 3 :
+				{
+					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Left, NewBorder));
+					this.Pr.TableCellBorders.Left = NewBorder;
+					break;
+				}
+			}
 
-            switch (Type)
-            {
-                case 0 : this.Pr.TableCellBorders.Top    = NewBorder; break;
-                case 1 : this.Pr.TableCellBorders.Right  = NewBorder; break;
-                case 2 : this.Pr.TableCellBorders.Bottom = NewBorder; break;
-                case 3 : this.Pr.TableCellBorders.Left   = NewBorder; break;
-            }
+			this.Recalc_CompiledPr();
+		}
+		else
+		{
+			var NewBorder = new CDocumentBorder();
 
-            this.Recalc_CompiledPr();
-        }
-        else
-        {
-            var NewBorder = new CDocumentBorder();
+			var DefBorder = DstBorder;
+			if (undefined === DefBorder)
+				DefBorder = new CDocumentBorder();
 
-            var DefBorder = DstBorder;
-            if ( undefined === DefBorder )
-                DefBorder = new CDocumentBorder();
+			NewBorder.Value   = null != Border.Value ? Border.Value : DefBorder.Value;
+			NewBorder.Size    = null != Border.Size ? Border.Size : DefBorder.Size;
+			NewBorder.Color.r = null != Border.Color ? Border.Color.r : DefBorder.Color.r;
+			NewBorder.Color.g = null != Border.Color ? Border.Color.g : DefBorder.Color.g;
+			NewBorder.Color.b = null != Border.Color ? Border.Color.b : DefBorder.Color.b;
+			NewBorder.Unifill = null != Border.Unifill ? Border.Unifill : DefBorder.Unifill;
 
-            NewBorder.Value   = ( null != Border.Value   ? Border.Value   : DefBorder.Value );
-            NewBorder.Size    = ( null != Border.Size    ? Border.Size    : DefBorder.Size  );
-            NewBorder.Color.r = ( null != Border.Color   ? Border.Color.r : DefBorder.Color.r );
-            NewBorder.Color.g = ( null != Border.Color   ? Border.Color.g : DefBorder.Color.g );
-            NewBorder.Color.b = ( null != Border.Color   ? Border.Color.b : DefBorder.Color.b );
-            NewBorder.Unifill = ( null != Border.Unifill ? Border.Unifill : DefBorder.Unifill);
+			switch (Type)
+			{
+				case 0:
+				{
+					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Top, NewBorder));
+					this.Pr.TableCellBorders.Top = NewBorder;
+					break;
+				}
+				case 1 :
+				{
+					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Right, NewBorder));
+					this.Pr.TableCellBorders.Right = NewBorder;
+					break;
+				}
+				case 2 :
+				{
+					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Bottom, NewBorder));
+					this.Pr.TableCellBorders.Bottom = NewBorder;
+					break;
+				}
+				case 3 :
+				{
+					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Left, NewBorder));
+					this.Pr.TableCellBorders.Left = NewBorder;
+					break;
+				}
+			}
 
-            History.Add( this, { Type : HistoryType, Old : DstBorder, New : NewBorder } );
-
-            switch (Type)
-            {
-                case 0 : this.Pr.TableCellBorders.Top    = NewBorder; break;
-                case 1 : this.Pr.TableCellBorders.Right  = NewBorder; break;
-                case 2 : this.Pr.TableCellBorders.Bottom = NewBorder; break;
-                case 3 : this.Pr.TableCellBorders.Left   = NewBorder; break;
-            }
-
-            this.Recalc_CompiledPr();
-        }
-    },
+			this.Recalc_CompiledPr();
+		}
+	},
 
     Set_BorderInfo_Top : function( TopInfo )
     {
@@ -1727,282 +1712,6 @@ CTableCell.prototype =
     //-----------------------------------------------------------------------------------
     // Undo/Redo функции
     //-----------------------------------------------------------------------------------
-    Undo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_TableCell_GridSpan:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.GridSpan = undefined;
-                else
-                    this.Pr.GridSpan = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Margins:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.TableCellMar = undefined;
-                else
-                    this.Pr.TableCellMar = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Shd:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.Shd = undefined;
-                else
-                    this.Pr.Shd = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_VMerge:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.VMerge = undefined;
-                else
-                    this.Pr.VMerge = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Border_Left:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.TableCellBorders.Left = undefined;
-                else
-                    this.Pr.TableCellBorders.Left = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Border_Right:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.TableCellBorders.Right = undefined;
-                else
-                    this.Pr.TableCellBorders.Right = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Border_Top:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.TableCellBorders.Top = undefined;
-                else
-                    this.Pr.TableCellBorders.Top = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Border_Bottom:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.TableCellBorders.Bottom = undefined;
-                else
-                    this.Pr.TableCellBorders.Bottom = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_VAlign:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.VAlign = undefined;
-                else
-                    this.Pr.VAlign = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_W:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.TableCellW = undefined;
-                else
-                    this.Pr.TableCellW = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Pr:
-            {
-                this.Pr = Data.Old;
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_TextDirection:
-            {
-                this.Pr.TextDirection = Data.Old;
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_NoWrap:
-            {
-                this.Pr.NoWrap = Data.Old;
-                this.Recalc_CompiledPr();
-                break;
-        }
-        }
-    },
-
-    Redo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_TableCell_GridSpan:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.GridSpan = undefined;
-                else
-                    this.Pr.GridSpan = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Margins:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.TableCellMar = undefined;
-                else
-                    this.Pr.TableCellMar = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Shd:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.Shd = undefined;
-                else
-                    this.Pr.Shd = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_VMerge:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.VMerge = undefined;
-                else
-                    this.Pr.VMerge = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Border_Left:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.TableCellBorders.Left = undefined;
-                else
-                    this.Pr.TableCellBorders.Left = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Border_Right:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.TableCellBorders.Right = undefined;
-                else
-                    this.Pr.TableCellBorders.Right = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Border_Top:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.TableCellBorders.Top = undefined;
-                else
-                    this.Pr.TableCellBorders.Top = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Border_Bottom:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.TableCellBorders.Bottom = undefined;
-                else
-                    this.Pr.TableCellBorders.Bottom = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_VAlign:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.VAlign = undefined;
-                else
-                    this.Pr.VAlign = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_W:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.TableCellW = undefined;
-                else
-                    this.Pr.TableCellW = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Pr:
-            {
-                this.Pr = Data.New;
-                this.Recalc_CompiledPr();
-                break;
-            }
-            case AscDFH.historyitem_TableCell_TextDirection:
-            {
-                this.Pr.TextDirection = Data.New;
-                this.Recalc_CompiledPr();
-                break;
-            }
-            case AscDFH.historyitem_TableCell_NoWrap:
-            {
-                this.Pr.NoWrap = Data.New;
-                this.Recalc_CompiledPr();
-                break;
-        }
-        }
-    },
-
     Get_ParentObject_or_DocumentPos : function()
     {
         return this.Row.Table.Get_ParentObject_or_DocumentPos(this.Row.Table.Index);
@@ -2066,514 +1775,6 @@ CTableCell.prototype =
     //-----------------------------------------------------------------------------------
     // Функции для работы с совместным редактирования
     //-----------------------------------------------------------------------------------
-    Save_Changes : function(Data, Writer)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        Writer.WriteLong( AscDFH.historyitem_type_TableCell );
-
-        var Type = Data.Type;
-
-        // Пишем тип
-        Writer.WriteLong( Type );
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_TableCell_GridSpan:
-            {
-                // Bool : Is undefined
-                // Если false
-                //   Long : GridSpan
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Writer.WriteLong( Data.New );
-                }
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Margins:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //
-                //   Bool : IsNull
-                //   Если false
-                //
-                //     Variable : Top    (CTableMeasure)
-                //     Variable : Left   (CTableMeasure)
-                //     Variable : Bottom (CTableMeasure)
-                //     Variable : Right  (CTableMeasure)
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-
-                    if ( null === Data.New )
-                        Writer.WriteBool( true );
-                    else
-                    {
-                        Writer.WriteBool( false );
-                        Data.New.Top.Write_ToBinary( Writer );
-                        Data.New.Left.Write_ToBinary( Writer );
-                        Data.New.Bottom.Write_ToBinary( Writer );
-                        Data.New.Right.Write_ToBinary( Writer );
-                    }
-                }
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Shd:
-            {
-                // Bool : IsUndefined
-                // Если  false
-                //   Variable : Shd (CDocumentShd)
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Data.New.Write_ToBinary( Writer );
-                }
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_VMerge:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Long : VMerge
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Writer.WriteLong( Data.New );
-                }
-
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Border_Left:
-            case AscDFH.historyitem_TableCell_Border_Right:
-            case AscDFH.historyitem_TableCell_Border_Top:
-            case AscDFH.historyitem_TableCell_Border_Bottom:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Bool : IsNull
-                //   Если false
-                //     Variable : Border (CDocumentBorder)
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-
-                    if ( null === Data.New )
-                        Writer.WriteBool( true );
-                    else
-                    {
-                        Writer.WriteBool( false );
-                        Data.New.Write_ToBinary( Writer );
-                    }
-                }
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_VAlign:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Long : VAlign
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Writer.WriteLong( Data.New );
-                }
-
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_W:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Variable : TableCellW
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Data.New.Write_ToBinary(Writer);
-                }
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Pr:
-            {
-                // CTableCellPr
-                Data.New.Write_ToBinary( Writer );
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_TextDirection:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Long : textDirection
-                if (undefined === Data.New)
-                    Writer.WriteBool(true);
-                else
-                {
-                    Writer.WriteBool(false);
-                    Writer.WriteLong(Data.New);
-                }
-            }
-
-            case AscDFH.historyitem_TableCell_NoWrap:
-            {
-                // Bool : IsUndefined
-                // false - > Bool : NoWrap
-                if (undefined === Data.New)
-                {
-                    Writer.WriteBool(true);
-        }
-                else
-                {
-                    Writer.WriteBool(false);
-                    Writer.WriteBool(Data.New);
-                }
-
-                break;
-            }
-        }
-
-        return Writer;
-    },
-
-    Save_Changes2 : function(Data, Writer)
-    {
-        return false;
-    },
-
-    Load_Changes : function(Reader, Reader2)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        var ClassType = Reader.GetLong();
-        if ( AscDFH.historyitem_type_TableCell != ClassType )
-            return;
-
-        var Type = Reader.GetLong();
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_TableCell_GridSpan:
-            {
-                // Bool : Is undefined
-                // Если false
-                //   Long : GridSpan
-
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    this.Pr.GridSpan = undefined;
-                else
-                    this.Pr.GridSpan = Reader.GetLong();
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Margins:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //
-                //   Bool : IsNull
-                //   Если false
-                //
-                //     Variable : Top    (CTableMeasure)
-                //     Variable : Left   (CTableMeasure)
-                //     Variable : Bottom (CTableMeasure)
-                //     Variable : Right  (CTableMeasure)
-
-                var bUndefined = Reader.GetBool();
-
-                if ( true === bUndefined )
-                    this.Pr.TableCellMar = undefined;
-                else
-                {
-                    var bNull = Reader.GetBool();
-
-                    if ( true === bNull )
-                        this.Pr.TableCellMar = null;
-                    else
-                    {
-                        this.Pr.TableCellMar =
-                        {
-                            Top    : new CTableMeasurement(tblwidth_Auto, 0),
-                            Left   : new CTableMeasurement(tblwidth_Auto, 0),
-                            Bottom : new CTableMeasurement(tblwidth_Auto, 0),
-                            Right  : new CTableMeasurement(tblwidth_Auto, 0)
-                        };
-
-                        this.Pr.TableCellMar.Top.Read_FromBinary( Reader );
-                        this.Pr.TableCellMar.Left.Read_FromBinary( Reader );
-                        this.Pr.TableCellMar.Bottom.Read_FromBinary( Reader );
-                        this.Pr.TableCellMar.Right.Read_FromBinary( Reader );
-                    }
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Shd:
-            {
-                // Bool : IsUndefined
-                // Если  false
-                //   Variable : Shd (CDocumentShd)
-
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    this.Pr.Shd = undefined;
-                else
-                {
-                    this.Pr.Shd = new CDocumentShd();
-                    this.Pr.Shd.Read_FromBinary( Reader );
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_VMerge:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Long : VMerge
-
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    delete this.Pr.VMerge;
-                else
-                    this.Pr.VMerge = Reader.GetLong();
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Border_Left:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Bool : IsNull
-                //   Если false
-                //     Variable : Border (CDocumentBorder)
-
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    this.Pr.TableCellBorders.Left = undefined;
-                else
-                {
-                    var bNull = Reader.GetBool();
-
-                    if ( true === bNull )
-                        this.Pr.TableCellBorders.Left = null;
-                    else
-                    {
-                        this.Pr.TableCellBorders.Left = new CDocumentBorder();
-                        this.Pr.TableCellBorders.Left.Read_FromBinary( Reader );
-                    }
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Border_Right:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Bool : IsNull
-                //   Если false
-                //     Variable : Border (CDocumentBorder)
-
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    this.Pr.TableCellBorders.Right = undefined;
-                else
-                {
-                    var bNull = Reader.GetBool();
-
-                    if ( true === bNull )
-                        this.Pr.TableCellBorders.Right = null;
-                    else
-                    {
-                        this.Pr.TableCellBorders.Right = new CDocumentBorder();
-                        this.Pr.TableCellBorders.Right.Read_FromBinary( Reader );
-                    }
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Border_Top:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Bool : IsNull
-                //   Если false
-                //     Variable : Border (CDocumentBorder)
-
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    this.Pr.TableCellBorders.Top = undefined;
-                else
-                {
-                    var bNull = Reader.GetBool();
-
-                    if ( true === bNull )
-                        this.Pr.TableCellBorders.Top = null;
-                    else
-                    {
-                        this.Pr.TableCellBorders.Top = new CDocumentBorder();
-                        this.Pr.TableCellBorders.Top.Read_FromBinary( Reader );
-                    }
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Border_Bottom:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Bool : IsNull
-                //   Если false
-                //     Variable : Border (CDocumentBorder)
-
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    this.Pr.TableCellBorders.Bottom = undefined;
-                else
-                {
-                    var bNull = Reader.GetBool();
-
-                    if ( true === bNull )
-                        this.Pr.TableCellBorders.Bottom = null;
-                    else
-                    {
-                        this.Pr.TableCellBorders.Bottom = new CDocumentBorder();
-                        this.Pr.TableCellBorders.Bottom.Read_FromBinary( Reader );
-                    }
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_VAlign:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Long : VAlign
-
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    delete this.Pr.VAlign;
-                else
-                    this.Pr.VAlign = Reader.GetLong();
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_W:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Variable : TableCellW
-
-                if ( true === Reader.GetBool() )
-                    delete this.Pr.TableCellW;
-                else
-                {
-                    this.Pr.TableCellW = new CTableMeasurement(tblwidth_Auto, 0);
-                    this.Pr.TableCellW.Read_FromBinary( Reader );
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_Pr:
-            {
-                // CTableCellPr
-
-                this.Pr = new CTableCellPr();
-                this.Pr.Read_FromBinary( Reader );
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_TextDirection:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Long : textDirection
-                if (true === Reader.GetBool())
-                    this.Pr.TextDirection = undefined;
-                else
-                    this.Pr.TextDirection = Reader.GetLong();
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableCell_NoWrap:
-            {
-                // Bool : IsUndefined
-                // false - > Bool : NoWrap
-
-                if (true === Reader.GetBool())
-                    this.Pr.NoWrap = undefined;
-                else
-                    this.Pr.NoWrap = Reader.GetBool();
-
-                this.Recalc_CompiledPr();
-                break;
-        }
-        }
-    },
-
     Write_ToBinary2 : function(Writer)
     {
         Writer.WriteLong( AscDFH.historyitem_type_TableCell );

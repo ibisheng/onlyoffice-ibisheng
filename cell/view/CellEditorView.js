@@ -62,13 +62,6 @@
 
 
 	/** @const */
-	var kLeftAlign = "left";
-	/** @const */
-	var kRightAlign = "right";
-	/** @const */
-	var kCenterAlign = "center";
-
-	/** @const */
 	var kBeginOfLine = -1;
 	/** @const */
 	var kBeginOfText = -2;
@@ -505,7 +498,8 @@
 		t._moveCursor(kEndOfText);
 	};
 
-	CellEditor.prototype.move = function ( l, t, r, b ) {
+	CellEditor.prototype.move = function (l, t, r, b) {
+		this.textFlags.wrapOnlyCE = false;
 		this.sides = this.options.getSides();
 		this.left = this.sides.cellX;
 		this.top = this.sides.cellY;
@@ -513,36 +507,34 @@
 		this.bottom = this.sides.b[0];
 		// ToDo вынести в отдельную функцию
 		var canExpW = true, canExpH = true, tm, expW, expH, fragments = this._getRenderFragments();
-		if ( 0 < fragments.length ) {
-			tm = this.textRender.measureString( fragments, this.textFlags, this._getContentWidth() );
+		if (0 < fragments.length) {
+			tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
 			expW = tm.width > this._getContentWidth();
 			expH = tm.height > this._getContentHeight();
 
-			while ( expW && canExpW || expH && canExpH ) {
-				if ( expW ) {
+			while (expW && canExpW || expH && canExpH) {
+				if (expW) {
 					canExpW = this._expandWidth();
 				}
-				if ( expH ) {
+				if (expH) {
 					canExpH = this._expandHeight();
 				}
 
-				if ( !canExpW ) {
-					this.textFlags.wrapText = true;
-					tm = this.textRender.measureString( fragments, this.textFlags, this._getContentWidth() );
-				}
-				else {
-					tm = this.textRender.measure( this._getContentWidth() );
+				if (!canExpW) {
+					this.textFlags.wrapOnlyCE = true;
+					tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
+				} else {
+					tm = this.textRender.measure(this._getContentWidth());
 				}
 				expW = tm.width > this._getContentWidth();
 				expH = tm.height > this._getContentHeight();
 			}
 		}
 
-		if ( this.left < l || this.top < t || this.left > r || this.top > b ) {
+		if (this.left < l || this.top < t || this.left > r || this.top > b) {
 			// hide
 			this._hideCanvas();
-		}
-		else {
+		} else {
 			this._adjustCanvas();
 			this._showCanvas();
 			this._renderText();
@@ -752,8 +744,8 @@
 		var u = ctx.getUnits();
 
 		this.textFlags = opt.flags.clone();
-		if ( this.textFlags.textAlign.toLowerCase() === "justify" || this.isFormula() ) {
-			this.textFlags.textAlign = "left";
+		if ( this.textFlags.textAlign === AscCommon.align_Justify || this.isFormula() ) {
+			this.textFlags.textAlign = AscCommon.align_Left;
 		}
 
 		this._cleanFragments( opt.fragments );
@@ -1102,7 +1094,7 @@
 						last = this._findFragment(val.cursorePos + val.formulaRangeLength - 1, fragments);
 						if (first && last) {
 							for (k = first.index; k <= last.index; ++k) {
-								fragments[k].format.c = AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % lengthColors];
+								fragments[k].format.setColor(AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % lengthColors]);
 							}
 						}
 					}
@@ -1118,25 +1110,24 @@
 	CellEditor.prototype._draw = function () {
 		var canExpW = true, canExpH = true, tm, expW, expH, fragments = this._getRenderFragments();
 
-		if ( 0 < fragments.length ) {
-			tm = this.textRender.measureString( fragments, this.textFlags, this._getContentWidth() );
+		if (0 < fragments.length) {
+			tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
 			expW = tm.width > this._getContentWidth();
 			expH = tm.height > this._getContentHeight();
 
-			while ( expW && canExpW || expH && canExpH ) {
-				if ( expW ) {
+			while (expW && canExpW || expH && canExpH) {
+				if (expW) {
 					canExpW = this._expandWidth();
 				}
-				if ( expH ) {
+				if (expH) {
 					canExpH = this._expandHeight();
 				}
 
-				if ( !canExpW ) {
-					this.textFlags.wrapText = true;
-					tm = this.textRender.measureString( fragments, this.textFlags, this._getContentWidth() );
-				}
-				else {
-					tm = this.textRender.measure( this._getContentWidth() );
+				if (!canExpW) {
+					this.textFlags.wrapOnlyCE = true;
+					tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
+				} else {
+					tm = this.textRender.measure(this._getContentWidth());
 				}
 				expW = tm.width > this._getContentWidth();
 				expH = tm.height > this._getContentHeight();
@@ -1148,59 +1139,59 @@
 		this._adjustCanvas();
 		this._showCanvas();
 		this._renderText();
-		this.input.value = this._getFragmentsText( fragments );
+		this.input.value = this._getFragmentsText(fragments);
 		this._updateCursorPosition();
 		this._showCursor();
 	};
 
 	CellEditor.prototype._update = function () {
-		this._updateFormulaEditMod( /*bIsOpen*/false );
+		this._updateFormulaEditMod(/*bIsOpen*/false);
 
 		var tm, canExpW, canExpH, oldLC, doAjust = false, fragments = this._getRenderFragments();
 
-		if ( 0 < fragments.length ) {
+		if (0 < fragments.length) {
 			oldLC = this.textRender.getLinesCount();
-			tm = this.textRender.measureString( fragments, this.textFlags, this._getContentWidth() );
-			if ( this.textRender.getLinesCount() < oldLC ) {
+			tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
+			if (this.textRender.getLinesCount() < oldLC) {
 				this.topLineIndex -= oldLC - this.textRender.getLinesCount();
 			}
 
-			canExpW = !this.textFlags.wrapText;
-			while ( tm.width > this._getContentWidth() && canExpW ) {
+			canExpW = !(this.textFlags.wrapText || this.textFlags.wrapOnlyCE);
+			while (tm.width > this._getContentWidth() && canExpW) {
 				canExpW = this._expandWidth();
-				if ( !canExpW ) {
-					this.textFlags.wrapText = true;
-					tm = this.textRender.measureString( fragments, this.textFlags, this._getContentWidth() );
+				if (!canExpW) {
+					this.textFlags.wrapOnlyCE = true;
+					tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
 				}
 				doAjust = true;
 			}
 
 			canExpH = true;
-			while ( tm.height > this._getContentHeight() && canExpH ) {
+			while (tm.height > this._getContentHeight() && canExpH) {
 				canExpH = this._expandHeight();
 				doAjust = true;
 			}
-			if ( this.textRender.isLastCharNL() && !doAjust && canExpH ) {
-				var lm = this.textRender.calcCharHeight( this.textRender.getCharsCount() - 1 );
-				if ( tm.height + lm.th > this._getContentHeight() ) {
+			if (this.textRender.isLastCharNL() && !doAjust && canExpH) {
+				var lm = this.textRender.calcCharHeight(this.textRender.getCharsCount() - 1);
+				if (tm.height + lm.th > this._getContentHeight()) {
 					this._expandHeight();
 					doAjust = true;
 				}
 			}
 		}
-		if ( doAjust ) {
+		if (doAjust) {
 			this._adjustCanvas();
 		}
 
 		this._renderText();  // вызов нужен для пересчета поля line.startX, которое используется в _updateCursorPosition
 		this._fireUpdated(); // вызов нужен для обновление текста верхней строки, перед обновлением позиции курсора
-		this._updateCursorPosition( true );
+		this._updateCursorPosition(true);
 		this._showCursor();
 
 		this._updateUndoRedoChanged();
 
-		if ( window['IS_NATIVE_EDITOR'] && !this.dontUpdateText ) {
-			window['native'].onCellEditorChangeText( this._getFragmentsText( this.options.fragments ) );
+		if (window['IS_NATIVE_EDITOR'] && !this.dontUpdateText) {
+			window['native']['onCellEditorChangeText'](this._getFragmentsText(this.options.fragments));
 		}
 	};
 
@@ -1265,14 +1256,14 @@
 		}
 
 		switch ( t.textFlags.textAlign ) {
-			case kRightAlign:
+			case AscCommon.align_Right:
 				r = expandLeftSide();
 				break;
-			case kCenterAlign:
+			case AscCommon.align_Center:
 				l = expandLeftSide();
 				r = expandRightSide();
 				break;
-			case kLeftAlign:
+			case AscCommon.align_Left:
 			default:
 				r = expandRightSide();
 		}
@@ -1450,7 +1441,7 @@
 		var cur = this.textRender.calcCharOffset(this.cursorPos);
 		var charsCount = this.textRender.getCharsCount();
 		var curLeft = asc_round(
-			((kRightAlign !== this.textFlags.textAlign || this.cursorPos !== charsCount) && cur !== null &&
+			((AscCommon.align_Right !== this.textFlags.textAlign || this.cursorPos !== charsCount) && cur !== null &&
 			cur.left !== null ? cur.left : this._getContentPosition()) * this.kx);
 		var curTop = asc_round(((cur !== null ? cur.top : 0) + y) * this.ky);
 		var curHeight = asc_round((cur !== null ? cur.height : this._getContentHeight()) * this.ky);
@@ -1485,6 +1476,7 @@
 		if (AscBrowser.isRetina) {
 			curLeft >>= 1;
 			curTop >>= 1;
+			curHeight >>= 1;
 		}
 
 
@@ -1662,9 +1654,9 @@
 		var ppix = this.drawingCtx.getPPIX();
 
 		switch ( this.textFlags.textAlign ) {
-			case kRightAlign:
+			case AscCommon.align_Right:
 				return asc_calcnpt( this.right - this.left, ppix, -this.defaults.padding - 1 );
-			case kCenterAlign:
+			case AscCommon.align_Center:
 				return asc_calcnpt( 0.5 * (this.right - this.left), ppix, 0 );
 		}
 		return asc_calcnpt( 0, ppix, this.defaults.padding );
@@ -1993,11 +1985,11 @@
 			}
 			fr[i].text = s;
 			f = fr[i].format;
-			if (f.fn === "") {
-				f.fn = t.options.font.FontFamily.Name;
+			if (f.getName() === "") {
+				f.setName(t.options.font.FontFamily.Name);
 			}
-			if (f.fs === 0) {
-				f.fs = t.options.font.FontSize;
+			if (f.getSize() === 0) {
+				f.setSize(t.options.font.FontSize);
 			}
 		}
 	};
@@ -2017,39 +2009,43 @@
 	CellEditor.prototype._setFormatProperty = function (format, prop, val) {
 		switch (prop) {
 			case "fn":
-				format.fn = val;
-				format.scheme = Asc.EFontScheme.fontschemeNone;
+				format.setName(val);
+				format.setScheme(null);
 				break;
 			case "fs":
-				format.fs = val;
+				format.setSize(val);
 				break;
 			case "b":
-				val = (null === val) ? ((format.b) ? !format.b : true) : val;
-				format.b = val;
+				var bold = format.getBold();
+				val = (null === val) ? ((bold) ? !bold : true) : val;
+				format.setBold(val);
 				break;
 			case "i":
-				val = (null === val) ? ((format.i) ? !format.i : true) : val;
-				format.i = val;
+				var italic = format.getItalic();
+				val = (null === val) ? ((italic) ? !italic : true) : val;
+				format.setItalic(val);
 				break;
 			case "u":
-				val = (null === val) ? ((Asc.EUnderline.underlineSingle !== format.u) ? Asc.EUnderline.underlineSingle :
+				var underline = format.getUnderline();
+				val = (null === val) ? ((Asc.EUnderline.underlineNone === underline) ? Asc.EUnderline.underlineSingle :
 					Asc.EUnderline.underlineNone) : val;
-				format.u = val;
+				format.setUnderline(val);
 				break;
 			case "s":
-				val = (null === val) ? ((format.s) ? !format.s : true) : val;
-				format.s = val;
+				var strikeout = format.getStrikeout();
+				val = (null === val) ? ((strikeout) ? !strikeout : true) : val;
+				format.setStrikeout(val);
 				break;
 			case "fa":
-				format.va = val;
+				format.setVerticalAlign(val);
 				break;
 			case "c":
-				format.c = val;
+				format.setColor(val);
 				break;
 			case "changeFontSize":
-				var newFontSize = asc_incDecFonSize(val, format.fs);
+				var newFontSize = asc_incDecFonSize(val, format.getSize());
 				if (null !== newFontSize) {
-					format.fs = newFontSize;
+					format.setSize(newFontSize);
 				}
 				break;
 		}
@@ -2129,17 +2125,19 @@
 			return;
 		}
 		tmp = this.options.fragments[tmp.index].format;
-
+		var va = tmp.getVerticalAlign();
+		var fc = tmp.getColor();
 		var result = new AscCommonExcel.asc_CFont();
-		result.name = tmp.fn;
-		result.size = tmp.fs;
-		result.bold = tmp.b;
-		result.italic = tmp.i;
-		result.underline = (Asc.EUnderline.underlineNone !== tmp.u); // ToDo убрать, когда будет реализовано двойное подчеркивание
-		result.strikeout = tmp.s;
-		result.subscript = tmp.va === "subscript";
-		result.superscript = tmp.va === "superscript";
-		result.color = (tmp.c ? asc.colorObjToAscColor( tmp.c ) : new Asc.asc_CColor( this.options.textColor ));
+		result.name = tmp.getName();
+		result.size = tmp.getSize();
+		result.bold = tmp.getBold();
+		result.italic = tmp.getItalic();
+		// ToDo убрать, когда будет реализовано двойное подчеркивание
+		result.underline = (Asc.EUnderline.underlineNone !== tmp.getUnderline());
+		result.strikeout = tmp.getStrikeout();
+		result.subscript = va === AscCommon.vertalign_SubScript;
+		result.superscript = va === AscCommon.vertalign_SuperScript;
+		result.color = (fc ? asc.colorObjToAscColor( fc ) : new Asc.asc_CColor( this.options.textColor ));
 
 		this.handlers.trigger( "updateEditorSelectionInfo", result );
 	};
@@ -2698,6 +2696,11 @@
 		var offs = this.canvasOverlay.getBoundingClientRect();
 		var x = (((event.pageX * AscBrowser.zoom) >> 0) - offs.left) / this.kx;
 		var y = (((event.pageY * AscBrowser.zoom) >> 0) - offs.top) / this.ky;
+
+		if (AscBrowser.isRetina) {
+			x <<= 1;
+			y <<= 1;
+		}
 
 		return {x: x, y: y};
 	};

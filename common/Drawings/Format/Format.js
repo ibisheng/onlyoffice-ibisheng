@@ -11033,17 +11033,20 @@ TextListStyle.prototype =
 };
 
 // DEFAULT OBJECTS
-function GenerateDefaultTheme(presentation)
+function GenerateDefaultTheme(presentation, opt_fontName)
 {
     return ExecuteNoHistory(function()
     {
+		if (!opt_fontName) {
+			opt_fontName = "Arial";
+		}
         var theme = new CTheme();
         theme.presentation = presentation;
         theme.setFontScheme(new FontScheme());
         theme.themeElements.fontScheme.setMajorFont(new FontCollection(theme.themeElements.fontScheme));
         theme.themeElements.fontScheme.setMinorFont(new FontCollection(theme.themeElements.fontScheme));
-        theme.themeElements.fontScheme.majorFont.setLatin("Arial");
-        theme.themeElements.fontScheme.minorFont.setLatin("Arial");
+        theme.themeElements.fontScheme.majorFont.setLatin(opt_fontName);
+        theme.themeElements.fontScheme.minorFont.setLatin(opt_fontName);
 
 
         var scheme = theme.themeElements.clrScheme;

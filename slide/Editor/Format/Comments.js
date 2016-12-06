@@ -1151,26 +1151,6 @@ CComment.prototype =
         return Writer;
     },
 
-    Save_Changes2: function(Data, Writer)
-    {
-        var bRetValue = false;
-        var Type = Data.Type;
-        switch ( Type )
-        {
-            case  AscDFH.historyitem_Comment_Change:
-            {
-                break;
-            }
-
-            case  AscDFH.historyitem_Comment_TypeInfo:
-            {
-                break;
-            }
-        }
-
-        return bRetValue;
-    },
-
     Load_Changes: function(Reader, Reader2)
     {
         // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.

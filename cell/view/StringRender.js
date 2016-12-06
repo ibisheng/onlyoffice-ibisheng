@@ -189,8 +189,10 @@
 		 * @return {StringRender}  Returns 'this' to allow chaining
 		 */
 		StringRender.prototype.setDefaultFontFromFmt = function(fmt) {
-			if (asc_typeof(fmt.fn) !== "string" || !(fmt.fs > 0)) {
-				throw "Can not make font from {fmt.fn=" + fmt.fn + ", fmt.fs=" + fmt.fs + "}";
+			var fn = fmt.getName();
+			var fs = fmt.getSize();
+			if (asc_typeof(fn) !== "string" || !(fs > 0)) {
+				throw "Can not make font from {fmt.fn=" + fn + ", fmt.fs=" + fs + "}";
 			}
 			this.defaultFont = this._makeFont(fmt);
 			return this;
@@ -205,7 +207,7 @@
 		StringRender.prototype.setString = function(str, flags) {
 			this.fragments = [];
 			if ( asc_typeof(str) === "string" ) {
-				this.fragments.push({text: str, format: {}});
+				this.fragments.push({text: str, format: new AscCommonExcel.Font()});
 			} else {
 				for (var i = 0; i < str.length; ++i) {
 					this.fragments.push({text: str[i].text, format: str[i].format});
@@ -287,13 +289,13 @@
                 posh = (angle === 90 || angle === -90) ? textW : Math.abs(angleSin * textW),
                 posv = (angle === 90 || angle === -90) ? 0 : Math.abs(angleCos * textW),
 
-                isHorzLeft      = ('left'   === alignHorizontal),
-                isHorzCenter    = ('center' === alignHorizontal),
-                isHorzRight     = ('right'  === alignHorizontal),
+                isHorzLeft      = (AscCommon.align_Left   === alignHorizontal),
+                isHorzCenter    = (AscCommon.align_Center === alignHorizontal),
+                isHorzRight     = (AscCommon.align_Right  === alignHorizontal),
 
-                isVertBottom    = ('bottom' === alignVertical),
-                isVertCenter    = ('center' === alignVertical),
-                isVertTop       = ('top'    === alignVertical);
+                isVertBottom    = (Asc.c_oAscVAlign.Bottom === alignVertical),
+                isVertCenter    = (Asc.c_oAscVAlign.Center === alignVertical),
+                isVertTop       = (Asc.c_oAscVAlign.Top    === alignVertical);
 
             if (isVertBottom) {
                 if (angle < 0) {
@@ -527,9 +529,11 @@
 		 * @return {Asc.FontProperties}
 		 */
 		StringRender.prototype._makeFont = function(format) {
-			if (format !== undefined && asc_typeof(format.fn) === "string") {
-				var fsz = format.fs > 0 ? format.fs : this.defaultFont.FontSize;
-				return new asc.FontProperties(format.fn, fsz, format.b, format.i, format.u, format.s);
+			var fn = format !== undefined ? format.getName() : undefined;
+			if (format !== undefined && asc_typeof(fn) === "string") {
+				var fs = format.getSize();
+				var fsz = fs > 0 ? fs : this.defaultFont.FontSize;
+				return new asc.FontProperties(fn, fsz, format.getBold(), format.getItalic(), format.getUnderline(), format.getStrikeout());
 			}
 			return this.defaultFont;
 		};
@@ -552,7 +556,7 @@
 		 * @return {Number}
 		 */
 		StringRender.prototype._calcLineWidth = function (startPos, endPos) {
-			var wrap = this.flags && (this.flags.wrapText || this.flags.wrapOnlyNL);
+			var wrap = this.flags && (this.flags.wrapText || this.flags.wrapOnlyNL || this.flags.wrapOnlyCE);
 			var isAtEnd, j, chProp, tw;
 
 			if (endPos === undefined || endPos < 0) {
@@ -596,7 +600,7 @@
 
 			var x = a_2 + a_2_3;
 
-			if (va === "superscript") {
+			if (va === AscCommon.vertalign_SuperScript) {
 				h = asc_calcnpt(hpt, ppi);
 				d = h - a;
 
@@ -605,7 +609,7 @@
 				l.bl2 = a_2_3;
 				l.a = fm.ascender + a_2;         // >0
 				l.d = fm.descender - a_2;        // <0
-			} else if (va === "subscript") {
+			} else if (va === AscCommon.vertalign_SubScript) {
 				h_2_3 = asc_calcnpt(hpt * 2/3, ppi);
 				d_2_3 = h_2_3 - a_2_3;
 				l.th = x + d_2_3;
@@ -809,10 +813,10 @@
 		StringRender.prototype._measureChars = function (maxWidth) {
 			var self = this;
 			var ctx = this.drawingCtx;
-			var wrap = this.flags && this.flags.wrapText && !this.flags.isNumberFormat;
+			var wrap = this.flags && (this.flags.wrapText || this.flags.wrapOnlyCE) && !this.flags.isNumberFormat;
 			var wrapNL = this.flags && this.flags.wrapOnlyNL;
 			var hasRepeats = false;
-			var i, j, fr, fmt, text, p, p_ = {}, pIndex, va, f, f_, eq, startCh;
+			var i, j, fr, fmt, text, p, p_ = {}, pIndex, f, f_, eq, startCh;
 			var tw = 0, nlPos = 0, hpPos = undefined, isSP_ = true, delta = 0;
 
 			function measureFragment(s) {
@@ -874,6 +878,7 @@
 				startCh = this.charWidths.length;
 				fr = this.fragments[i];
 				fmt = fr.format;
+				var va = fmt.getVerticalAlign();
 				text = this._filterText(fr.text, wrap || wrapNL);
 
 				f = this._makeFont(fmt);
@@ -882,8 +887,7 @@
 				p = p ? p.clone() : new charProperties();
 
 				// reduce font size for subscript and superscript chars
-				va = fmt.va !== undefined ? fmt.va.toLowerCase() : "";
-				if (va === "subscript" || va === "superscript") {
+				if (va === AscCommon.vertalign_SuperScript || va === AscCommon.vertalign_SubScript) {
 					p.va = va;
 					p.fsz = f.FontSize;
 					f.FontSize *= 2/3;
@@ -892,7 +896,7 @@
 
 				// change font on canvas
 				eq = f.isEqual(f_);
-				if (!eq || f.Underline !== f_.Underline || f.Strikeout !== f_.Strikeout || fmt.c !== p_.c) {
+				if (!eq || f.Underline !== f_.Underline || f.Strikeout !== f_.Strikeout || fmt.getColor() !== p_.c) {
 					if (!eq) {ctx.setFont(f, this.angle);}
 					p.font = f;
 					f_ = f;
@@ -904,16 +908,16 @@
 				}
 				if (p.font) {
 					p.fm = ctx.getFontMetrics();
-					p.c = fmt.c;
+					p.c = fmt.getColor();
 					this.charProps[pIndex] = p;
 					p_ = p;
 				}
 
-				if (fmt.skip) {
+				if (fmt.getSkip()) {
 					this._getCharPropAt(pIndex).skip = text.length;
 				}
 
-				if (fmt.repeat) {
+				if (fmt.getRepeat()) {
 					if (hasRepeats)
 						throw "Repeat should occur no more than once";
 
@@ -980,15 +984,15 @@
 			var ppix = ctx.getPPIX();
 			var ppiy = ctx.getPPIY();
 			var shrink = this.flags && this.flags.shrinkToFit;
-			var align  = this.flags ? this.flags.textAlign.toLowerCase() : "";
+			var align  = this.flags ? this.flags.textAlign : null;
 			var i, j, p, p_, f, f_, strBeg;
 			var n = 0, l = this.lines[0], x1 = l ? initX(0) : 0, y1 = y, dx = l ? computeWordDeltaX() : 0;
 
 			function initX(startPos) {
 				var x_ = x;
-				if (align === "right") {
+				if (align === AscCommon.align_Right) {
 					x_ = asc_calcnpt(x + maxWidth - self._calcLineWidth(startPos), ppix, -1/*px*/);
-				} else if (align === "center") {
+				} else if (align === AscCommon.align_Center) {
 					x_ = asc_calcnpt(x + 0.5 * (maxWidth - asc_calcnpt(self._calcLineWidth(startPos), ppix)), ppix, 0/*px*/);
 				}
 				l.startX = x_;
@@ -996,7 +1000,7 @@
 			}
 
 			function computeWordDeltaX() {
-				if (align !== "justify" || n === self.lines.length - 1) {return 0;}
+				if (align !== AscCommon.align_Justify || n === self.lines.length - 1) {return 0;}
 				for (var i = l.beg, c = 0; i <= l.end; ++i) {
 					var p = self.charProps[i];
 					if (p && p.wrd) {++c;}
@@ -1012,7 +1016,7 @@
 				var isSO = so === true;
 				var fsz, x2, y, lw, dy, i, b, x_, cp, w_1px, h_1px;
 
-				if (align !== "justify" || dx < 0.000001) {
+				if (align !== AscCommon.align_Justify || dx < 0.000001) {
 					ctx.fillText(self.chars.slice(begin, end), x1, y1 + l.bl + dh, undefined, self.charWidths.slice(begin, end), angle);
 				} else {
 					for (i = b = begin, x_ = x1; i < end; ++i) {

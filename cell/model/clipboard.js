@@ -142,7 +142,7 @@
 				}
 			},
 
-			pasteData: function(ws, _format, data1, data2)
+			pasteData: function(ws, _format, data1, data2, text_data)
 			{
 				var t = this;
 				t.pasteProcessor.clean();
@@ -161,7 +161,14 @@
 						}
 						else
 						{
-							t.pasteProcessor.editorPasteExec(ws, data1);
+							if(text_data)
+							{
+								t.pasteProcessor.pasteTextOnSheet(ws, text_data);
+							}
+							else
+							{
+								t.pasteProcessor.editorPasteExec(ws, data1);
+							}
 						}
 
 						break;
@@ -272,7 +279,8 @@
 				var sBase64;
 				
 				var selectedContent = new CSelectedContent();
-				isIntoShape.Get_SelectedContent(selectedContent);
+                AscFormat.ExecuteNoHistory(function(){isIntoShape.Get_SelectedContent(selectedContent);}, this, []);
+
 				
 				var oPresentationWriter = new AscCommon.CBinaryFileWriter();
 				
@@ -538,12 +546,20 @@
 							}
 
 							if (!cell.getWrap()) {td.style.whiteSpace = "nowrap";}else {td.style.whiteSpace = "normal";} 
-
-							if(cell.getAlignHorizontal() != 'none')
-								td.style.textAlign = cell.getAlignHorizontal();
-							td.style.verticalAlign = cell.getAlignVertical();
-							if(cell.getAlignVertical() == 'center')
-								td.style.verticalAlign = 'middle';
+							
+							switch (cell.getAlignHorizontal()) {
+								case AscCommon.align_Left: td.style.textAlign = "left"; break;
+								case AscCommon.align_Right: td.style.textAlign = "right"; break;
+								case AscCommon.align_Center: td.style.textAlign = "center"; break;
+								case AscCommon.align_Justify: td.style.textAlign = "justify"; break;
+							}
+							switch (cell.getAlignVertical()) {
+								case Asc.c_oAscVAlign.Bottom: td.style.verticalAlign = "bottom"; break;
+								case Asc.c_oAscVAlign.Center:
+								case Asc.c_oAscVAlign.Dist:
+								case Asc.c_oAscVAlign.Just: td.style.verticalAlign = "middle"; break;
+								case Asc.c_oAscVAlign.Top: td.style.verticalAlign = "top"; break;
+							}
 
 							b = cell.getBorderFull();
 							if(mbbox)
@@ -609,8 +625,8 @@
 
 				function getTextDecoration(format) {
 					var res = [];
-					if (Asc.EUnderline.underlineNone !== format.u) { res.push("underline"); }
-					if (format.s) {res.push("line-through");}
+					if (Asc.EUnderline.underlineNone !== format.getUnderline()) { res.push("underline"); }
+					if (format.getStrikeout()) {res.push("line-through");}
 					return res.length > 0 ? res.join(",") : "";
 				}
 				
@@ -622,7 +638,7 @@
 					
 				for (res = [], i = 0; i < val.length; ++i) 
 				{
-					if(val[i] && val[i].format && val[i].format.skip)
+					if(val[i] && val[i].format && val[i].format.getSkip())
 						continue;						
 					if(cell == undefined || (cell != undefined && (hyperlink == null || (hyperlink != null && hyperlink.getLocation() != null))))
 					{
@@ -650,20 +666,20 @@
 					}
 					
 					f = val[i].format;
-					if (f.c) 
-					{
-						if(f.c && f.c.rgb)
-							span.style.color = number2color(f.c.rgb);
-						else
-							span.style.color = number2color(f.c);
+					var fn = f.getName();
+					var fs = f.getSize();
+					var fc = f.getColor();
+					var va = f.getVerticalAlign();
+					if (fc) {
+						span.style.color = number2color(fc.getRgb());
 					}
 					
-					if (f.fn !== defFN) {span.style.fontFamily = f.fn;}
-					if (f.fs !== defFS) {span.style.fontSize = f.fs + 'pt';}
-					if (f.b) {span.style.fontWeight = 'bold';}
-					if (f.i) {span.style.fontStyle = 'italic';}
+					if (fn !== defFN) {span.style.fontFamily = fn;}
+					if (fs !== defFS) {span.style.fontSize = fs + 'pt';}
+					if (f.getBold()) {span.style.fontWeight = 'bold';}
+					if (f.getItalic()) {span.style.fontStyle = 'italic';}
 					span.style.textDecoration = getTextDecoration(f);
-					span.style.verticalAlign = f.va === 'subscript' ? 'sub' : f.va === 'superscript' ? 'super' : 'baseline';
+					span.style.verticalAlign = va === AscCommon.vertalign_SubScript ? 'sub' : va === AscCommon.vertalign_SuperScript ? 'super' : 'baseline';
 					span.innerHTML = span.innerHTML.replace(/\n/g,'<br>');
 					res.push(span);
 				}
@@ -839,23 +855,34 @@
                         }
                         else if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
                         {
-                            if(aPastedImages && aPastedImages.length)
-                            {
-                                t._loadImagesOnServer(aPastedImages, function() {
-                                    t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
-                                });
-                            }
-                            else
-                            {
-                                t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
-                            }
+                            
+							var newFonts = {};
+							for(var i = 0; i < pasteData.Drawings.length; i++)
+							{
+								pasteData.Drawings[i].graphicObject.getAllFonts(newFonts);
+							}
+							
+							worksheet._loadFonts(newFonts, function() {
+								if(aPastedImages && aPastedImages.length)
+								{
+									t._loadImagesOnServer(aPastedImages, function() {
+										t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
+									});
+								}
+								else
+								{
+									t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
+								}
+							});	
                         }
 					}
 					else 
 					{	
 						if(isIntoShape)
 						{
+							History.TurnOff();
 							var docContent = this._convertTableFromExcelToDocument(worksheet, pasteData, isIntoShape);
+							History.TurnOn();
 							
 							var callback = function(isSuccess)
 							{
@@ -886,6 +913,7 @@
 			_pasteFromBinaryWord: function(worksheet, base64, isIntoShape, isCellEditMode)
 			{
 				var res = true;
+				var t = this;
 				var pasteData = this.ReadFromBinaryWord(base64, worksheet);
 				
 				if(isCellEditMode)
@@ -895,7 +923,15 @@
 				//insert binary from word into SHAPE
 				else if(isIntoShape)
 				{
-					this._insertBinaryIntoShapeContent(worksheet, pasteData.content, true);
+					var callback = function(isSuccess)
+					{
+						if(isSuccess)
+						{
+							t._insertBinaryIntoShapeContent(worksheet, pasteData.content, true);
+						}
+					};
+							
+					worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
 				}
 				else
 				{
@@ -933,8 +969,15 @@
 						}
 						else if(isIntoShape)
 						{
-							this._insertBinaryIntoShapeContent(worksheet, docContent)
-							
+							var callback = function(isSuccess)
+							{
+								if(isSuccess)
+								{
+									t._insertBinaryIntoShapeContent(worksheet, docContent)
+								}
+							};
+									
+							worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
 							return true;
 						}
 						else
@@ -980,11 +1023,16 @@
 						var objects = this.ReadPresentationShapes(stream, worksheet);
 						var arr_shapes = objects.arrShapes;
 						
-						if(arr_shapes && arr_shapes.length)
+						if(arr_shapes && arr_shapes.length && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 						{
-							var aPastedImages = objects.arrImages;
-							if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
+							var newFonts = {};
+							for(var i = 0; i < arr_shapes.length; i++)
 							{
+								arr_shapes[i].graphicObject.getAllFonts(newFonts);
+							}
+							
+							var aPastedImages = objects.arrImages;
+							worksheet._loadFonts(newFonts, function() {
 								if(aPastedImages && aPastedImages.length)
 								{
 									t._loadImagesOnServer(aPastedImages, function() {
@@ -992,8 +1040,10 @@
 									});
 								}
 								else
+								{
 									t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape);
-							}
+								}
+							});
 						}
 						
 						return true;
@@ -1050,6 +1100,11 @@
 			
 			_insertBinaryIntoShapeContent: function(worksheet, content, isConvertToPPTX)
 			{
+				if(!content || !content.length)
+				{
+					return;
+				}
+				
 				History.Create_NewPoint();
 				History.StartTransaction();
 				
@@ -1077,7 +1132,7 @@
 					
 					if(type_Paragraph === element.GetType())//paragraph
 					{
-						selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element, worksheet.model.DrawingDocument, target_doc_content);
+						selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element, worksheet.model.DrawingDocument, target_doc_content, true);
 						elements.push(selectedElement);
 					}
 					else if(type_Table === element.GetType())//table
@@ -1103,10 +1158,44 @@
 				if (null != paragraph && type_Paragraph == paragraph.GetType() && selectedContent.Elements && selectedContent.Elements.length)
 				{
 					var NearPos = {Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false)};
-					paragraph.Check_NearestPos(NearPos);
+
+
+                    NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
+                    paragraph.Check_NearestPos(NearPos);
+
+                    var ParaNearPos = NearPos.Paragraph.Get_ParaNearestPos(NearPos);
+                    if (null === ParaNearPos || ParaNearPos.Classes.length < 2)
+                        return;
+
+                    var LastClass = ParaNearPos.Classes[ParaNearPos.Classes.length - 1];
+                    if (para_Math_Run === LastClass.Type)
+                    {
+                        // Проверяем, что вставляемый контент тоже формула
+                        var Element = selectedContent.Elements[0].Element;
+                        if (1 !== selectedContent.Elements.length || type_Paragraph !== Element.Get_Type() || null === LastClass.Parent)
+                            return;
+
+                        var Math  = null;
+                        var Count = Element.Content.length;
+                        for (var Index = 0; Index < Count; Index++)
+                        {
+                            var Item = Element.Content[Index];
+                            if (para_Math === Item.Type && null === Math)
+                                Math = Element.Content[Index];
+                            else if (true !== Item.Is_Empty({SkipEnd : true}))
+                                return;
+                        }
+                    }
+                    else if (para_Run !== LastClass.Type)
+                        return;
+
+                    if (null === paragraph.Parent || undefined === paragraph.Parent)
+                        return;
+
+                    paragraph.Check_NearestPos(NearPos);
 					target_doc_content.Insert_Content(selectedContent, NearPos);
 					
-					worksheet.objectRender.controller.cursorMoveRight(false, false)
+					worksheet.objectRender.controller.cursorMoveRight(false, false);
 					
 					var oTargetTextObject = AscFormat.getTargetTextObject(worksheet.objectRender.controller);
 					oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
@@ -1656,18 +1745,26 @@
 				//определяем стартовую позицию, если изображений несколько вставляется
 				for(var i = 0; i < addImagesFromWord.length; i++)
 				{
-					graphicObject = addImagesFromWord[i].image.GraphicObj;
+					if(para_Math === addImagesFromWord[i].image.Type)
+					{
+						graphicObject = ws.objectRender.createShapeAndInsertContent(addImagesFromWord[i].image);
+					}
+					else
+					{
+						graphicObject = addImagesFromWord[i].image.GraphicObj;
 					
-					//convert from word
-                    if(graphicObject.setBDeleted2)
-                    {
-                        graphicObject.setBDeleted2(true);
-                    }
-                    else
-                    {
-                        graphicObject.bDeleted = true;
-                    }
-					graphicObject = graphicObject.convertToPPTX(ws.model.DrawingDocument, ws.model);
+						//convert from word
+						if(graphicObject.setBDeleted2)
+						{
+							graphicObject.setBDeleted2(true);
+						}
+						else
+						{
+							graphicObject.bDeleted = true;
+						}
+						graphicObject = graphicObject.convertToPPTX(ws.model.DrawingDocument, ws.model, true);
+					}
+					
 					
 					//create new drawingBase
 					drawingObject = ws.objectRender.createDrawingObject();
@@ -2033,10 +2130,10 @@
 					//***text property***
 					if(format)
 					{
-						oCurRun.Pr.Bold = format.b;
-						oCurRun.Pr.Italic = format.i;
-						oCurRun.Pr.Strikeout = format.s;
-						oCurRun.Pr.Underline = format.u === 3 ? true : false;
+						oCurRun.Pr.Bold = format.getBold();
+						oCurRun.Pr.Italic = format.getItalic();
+						oCurRun.Pr.Strikeout = format.getStrikeout();
+						oCurRun.Pr.Underline = format.getUnderline() !== 2 ? true : false;
 					}
 				
 					for(var k = 0, length = value.length; k < length; k++)
@@ -2205,9 +2302,7 @@
 					return;
 				}
 				
-				var aResult = new excelPasteContent();
-				aResult = aResult.getDefaultPasteContent(worksheet, this.activeRange.r1, this.activeRange.c1, text);
-				
+				var aResult = this._getTableFromText(worksheet, text);
 				if(aResult && !(aResult.onlyImages && window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 				{
 					worksheet.setSelectionInfo('paste', aResult, this);
@@ -2303,116 +2398,98 @@
 				
 				return res;
 			},
-			
-			_getHtmlFromWorksheet: function(worksheet)
+
+			_getTableFromText: function (worksheet, sText)
 			{
-				var res = document.createElement("body");
+				var activeRange = worksheet.model.selectionRange.getLast().clone(true);
+				var t = this;
 				
-				var getTextDecoration = function(format) 
+				var addTextIntoCell = function(row, col, text)
 				{
-					var res = [];
-					if (Asc.EUnderline.underlineNone !== format.u) 
-					{
-						res.push("underline"); 
-					}
-					if (format.s) 
-					{
-						res.push("line-through");
-					}
+					var cell = aResult.getCell(rowCounter, colCounter);
+					cell.content[0] = {text: text, format: new AscCommonExcel.Font()};
 					
-					return res.length > 0 ? res.join(",") : "";
-				}
-				
-				var getSpan = function(text, format, isAddSpace, isHyperLink)
-				{
-					var value = "";
-					
-					if(null != cell)
-					{
-						value += text;
-					}
-					
-					if("" === value)
-					{
-						return null;
-					}
-					
-					if(isAddSpace)
-					{
-						value += " ";
-					}
-					
-					var elem;
-					if(isHyperLink)
-					{
-						elem = document.createElement("a");
-						elem.href = isHyperLink.Hyperlink;
-						elem.title = isHyperLink.ToolTip;
-					}
-					else
-					{
-						elem = document.createElement("span");
-					}
-					
-					elem.innerText = value;
-					
-					if(format)
-					{
-						if (format.b) 
-						{
-							elem.style.fontWeight = 'bold';
-						}
-						
-						if (format.i) 
-						{
-							elem.style.fontStyle = 'italic';
-						}
-						
-						elem.style.textDecoration = getTextDecoration(format);
-					}
-					
-					return elem;
+					return cell;
 				};
 				
-				for(var i in worksheet.aGCells)
+				var aResult = new excelPasteContent();
+				var width = 0;
+				var colCounter = activeRange.c1;
+				var rowCounter = activeRange.r1;
+				var sCurChar = "";
+				for ( var i = 0, length = sText.length; i < length; i++ )
 				{
-					var row = worksheet.aGCells[i];
+					var Char = sText.charAt(i);
+					var Code = sText.charCodeAt(i);
+					var Item = null;
 					
-					for(var j in row.c)
+					if(colCounter - activeRange.c1 > width)
 					{
-						var cell = row.c[j];
-						var isHyperlink = worksheet.getCell3( i, j ).getHyperlink();
-						
-						if(cell.oValue && cell.oValue.multiText)
+						width = colCounter - activeRange.c1;
+					}
+					
+					if ( '\n' === Char )
+					{
+						if("" == sCurChar)
 						{
-							for(var n = 0; n < cell.oValue.multiText.length; n++)
-							{
-								var curMultiText = cell.oValue.multiText[n];
-								var format = curMultiText.format;
-								var elem = getSpan(curMultiText.text, format);
-								if(null !== elem)
-								{	
-									res.appendChild(elem);
-								}
-							}
+							addTextIntoCell(rowCounter, colCounter, sCurChar);
+							colCounter = activeRange.c1;
+							rowCounter++;
 						}
 						else
 						{
-							var format = cell.xfs && cell.xfs.font ? cell.xfs.font : null;
+							addTextIntoCell(rowCounter, colCounter, sCurChar);
+							colCounter = activeRange.c1;
 							
-							var isAddSpace = row.c[parseInt(j) + 1] || (!row.c[parseInt(j) + 1] && worksheet.aGCells[parseInt(i) + 1]) ? true : false;
-							var elem = getSpan(cell.getValue(), format, isAddSpace, isHyperlink);
-							if(null !== elem)
-							{	
-								res.appendChild(elem);
-							}
+							rowCounter++;
+							sCurChar = "";
+						}
+					}
+					else if ( 13 === Code )
+					{
+						continue;
+					}
+					else
+					{
+						if(32 == Code || 160 == Code) //160 - nbsp
+						{
+							sCurChar += " ";
+						}
+						else if ( 9 === Code )//tab
+						{
+							addTextIntoCell(rowCounter, colCounter, sCurChar);
+							
+							colCounter++;
+							sCurChar = "";
+						}
+						else
+						{
+							sCurChar += t._copyPasteCorrectString(Char);
 						}
 						
+						if(i == length - 1)
+						{
+							addTextIntoCell(rowCounter, colCounter, sCurChar);
+						}	
 					}
 				}
 				
+				aResult.props.cellCount = width + 1;
+				aResult.props.rowSpanSpCount = 0;
+				
+				return aResult;
+			},
+			
+			_copyPasteCorrectString: function (str)
+			{
+				var res = str;
+				res = res.replace(/&/g,'&amp;');
+				res = res.replace(/</g,'&lt;');
+				res = res.replace(/>/g,'&gt;');
+				res = res.replace(/'/g,'&apos;');
+				res = res.replace(/"/g,'&quot;');
 				return res;
-			}
+			},
 		};
 		
 		/** @constructor */
@@ -2427,21 +2504,6 @@
 		excelPasteContent.prototype = {
 			
 			constructor: excelPasteContent,
-			
-			getDefaultPasteContent: function(worksheet, row, col, text)
-			{
-				var pasteCell = this.getCell(row, col);
-				pasteCell.setDefaultCell(worksheet);
-				pasteCell.content[0].text = text;
-				
-				this.props.fontsNew = [];
-				this.props.rowSpanSpCount = 0;
-				this.props.cellCount = 1;
-				this.props._images = undefined;
-				this.props._aPastedImages = undefined;
-				
-				return this;
-			},
 			
 			setCellContent: function(row, col, data)
 			{
@@ -2518,24 +2580,6 @@
 				result.hyperLink = this.hyperLink;
 				
 				return result;
-			},
-			
-			setDefaultCell: function (worksheet)
-			{
-				var fn = worksheet.model.workbook.getDefaultFont();
-				var fs = worksheet.model.workbook.getDefaultSize();
-				
-				this.content.push({
-					format: {
-						fn: fn,
-						fs: fs,
-						b: false,
-						i: false,
-						u: Asc.EUnderline.underlineNone,
-						s: false,
-						va: 'none'
-					},
-					text: ''});
 			}
 		};
 		
@@ -2576,8 +2620,8 @@
 				this.aResult.props.fontsNew = this.fontsNew;
 				this.aResult.props.rowSpanSpCount = 0;
 				this.aResult.props.cellCount = coverDocument.width;
-				this.aResult.props._images = pasteData.images ? pasteData.images : this.aResult.props._images;
-				this.aResult.props._aPastedImages = pasteData.aPastedImages ? pasteData.aPastedImages : this.aResult.props._aPastedImages;
+				this.aResult.props._images = pasteData.images && pasteData.images.length ? pasteData.images : this.aResult.props._images;
+				this.aResult.props._aPastedImages = pasteData.aPastedImages && pasteData.aPastedImages.length ? pasteData.aPastedImages : this.aResult.props._aPastedImages;
 				
 				worksheet.setSelectionInfo('paste', this.aResult, this);
 			},
@@ -2679,9 +2723,6 @@
 					this.aResult.deleteCell(row + this.maxLengthRowCount, col)
 				};
 	
-				//if(!aResult[row])
-					//aResult[row] = [];
-					
 				var s = 0;
 				var c1 = col !== undefined ? col : activeRange.c1;
 				
@@ -2697,13 +2738,13 @@
 				
 				//горизонтальное выравнивание
 				var horisonalAlign = this._getAlignHorisontal(paraPr);
-				if(horisonalAlign)
-					oNewItem.a = this._getAlignHorisontal(paraPr);
-				else if(horisonalAlign == null)
+				/*if(horisonalAlign)
+					oNewItem.a = horisonalAlign;
+				else*/ if(horisonalAlign == null)
 					oNewItem.wrap = true;
 					
 				//вертикальное выравнивание
-				oNewItem.va = "center";
+				oNewItem.va = Asc.c_oAscVAlign.Center;
 					
 				//так же wrap выставляем у параграфа, чьим родителем является ячейка таблицы	
 				if(this._getParentByTag(paragraph, c_oAscBoundsElementType.Cell) != null)
@@ -2732,7 +2773,7 @@
 					text += this._getAllNumberingText(Lvl, numberingText);
 						
 					formatText = this._getPrParaRun(paraPr, LvlPr.TextPr);
-					fontFamily = formatText.format.fn;
+					fontFamily = formatText.format.getName();
 					this.fontsNew[fontFamily] = 1;
 					
 					oNewItem.content.push(formatText);
@@ -2758,7 +2799,7 @@
 						{
 							s = this._parseParaRun(content[n], oNewItem, paraPr, s, row, c1, text);
 							break;
-						};
+						}
 						case para_Hyperlink://*hyperLink*
 						{	
 							//если несколько ссылок в одном параграфе, то отменяем ссылки
@@ -2785,13 +2826,36 @@
 									{
 										s = this._parseParaRun(content[n].Content[h], oNewItem, paraPr, s, row, c1, text);
 										break;
-									};
-								};
-							};
+									}
+								}
+							}
 							break;
-						};
-					};
-				};
+						}
+						case para_Math://*para_Math*
+						{
+							var tempFonts = [];
+							content[n].Get_AllFontNames(tempFonts);
+							
+							for(var i in tempFonts)
+							{
+								this.fontsNew[i] = 1;
+							}
+							
+							if(!aResult.props.addImagesFromWord)
+							{
+								aResult.props.addImagesFromWord = [];
+							}
+							aResult.props.addImagesFromWord.push({image: content[n], col: s + c1, row: row});
+							
+							if(null === this.isUsuallyPutImages)
+							{
+								this._addImageToMap(content[n]);
+							}
+							
+							break;
+						}
+					}
+				}
 				
 			},
 			
@@ -2818,14 +2882,12 @@
 						{
 							text += String.fromCharCode(paraRunContent[pR].Value);
 							break;
-						};
-						
+						}
 						case para_Space://*paraSpace*
 						{
 							text += " ";
 							break;
-						};
-						
+						}
 						case para_Tab://*paraEnd / paraTab*
 						{
 							this.fontsNew[paragraphFontFamily] = 1;	
@@ -2845,8 +2907,7 @@
 							s++;
 							
 							break;
-						};
-						
+						}
 						case para_Drawing:
 						{
 							if(!aResult.props.addImagesFromWord)
@@ -2855,8 +2916,9 @@
 							
 							if(null === this.isUsuallyPutImages)
 								this._addImageToMap(paraRunContent[pR]);
-						};
-						
+								
+							break;
+						}
 						case para_End:
 						{	
 							var cell = aResult.getCell(row, s + c1);
@@ -2868,9 +2930,11 @@
 								aResult.content = checkMaxTextLength.aResult.content;
 								this.maxLengthRowCount += checkMaxTextLength.r - row;
 							}
-						};
+							
+							break;
+						}
 					}
-				};
+				}
 				
 				if(text != "")
 				{	
@@ -2885,7 +2949,7 @@
 					cloneNewItem  = oNewItem.clone();
 					
 					text = "";
-				};
+				}
 				
 				return s;
 			},
@@ -2993,17 +3057,17 @@
 				{
 					case 0:
 					{
-						result = "right";
+						result = AscCommon.align_Right;
 						break;
 					}
 					case 1:
 					{
-						result = "left";
+						result = AscCommon.align_Left;
 						break;
 					}
 					case 2:
 					{
-						result = "center";
+						result = AscCommon.align_Center;
 						break;
 					}
 					case 3:
@@ -3011,7 +3075,7 @@
 						result = null;
 						break;
 					}
-				};
+				}
 				
 				return result;
 			},
@@ -3315,11 +3379,11 @@
 				var paragraphItalic = paraPr.TextPr.Italic;
 				var paragraphStrikeout = paraPr.TextPr.Strikeout;
 				var paragraphUnderline = paraPr.TextPr.Underline ? Asc.EUnderline.underlineSingle : Asc.EUnderline.underlineNone;
-				var paragraphVertAlign = "none";
+				var paragraphVertAlign = null;
 				if(paraPr.TextPr.VertAlign == 1)
-					paragraphVertAlign = "superscript";
+					paragraphVertAlign = AscCommon.vertalign_SuperScript;
 				else if(paraPr.TextPr.VertAlign == 2)
-					paragraphVertAlign = "subscript";
+					paragraphVertAlign = AscCommon.vertalign_SubScript;
 
 				var colorParagraph = new AscCommonExcel.RgbColor(this.clipboard._getBinaryColor("rgb(" + paraPr.TextPr.Color.r + "," + paraPr.TextPr.Color.g + "," + paraPr.TextPr.Color.b + ")"));
 				
@@ -3333,21 +3397,23 @@
 				
 				var verticalAlign;
 				if(cTextPr.VertAlign == 2)
-					verticalAlign = "subscript";
+					verticalAlign = AscCommon.vertalign_SubScript;
 				else if(cTextPr.VertAlign == 1)
-					verticalAlign = "superscript";
-					
+					verticalAlign = AscCommon.vertalign_SuperScript;
+
+				var font = new AscCommonExcel.Font();
+				font.assignFromObject({
+					fn: fontFamily,
+					fs: cTextPr.FontSize ? cTextPr.FontSize : paragraphFontSize,
+					c: colorText ? colorText : colorParagraph,
+					b: cTextPr.Bold ? cTextPr.Bold : paragraphBold,
+					i: cTextPr.Italic ? cTextPr.Italic : paragraphItalic,
+					u: cTextPr.Underline ? Asc.EUnderline.underlineSingle : paragraphUnderline,
+					s: cTextPr.Strikeout ? cTextPr.Strikeout : cTextPr.DStrikeout ? cTextPr.DStrikeout : paragraphStrikeout,
+					va: verticalAlign ? verticalAlign : paragraphVertAlign
+				});
 				formatText = {
-					format: {
-						fn: fontFamily,
-						fs: cTextPr.FontSize ? cTextPr.FontSize : paragraphFontSize,
-						c: colorText ? colorText : colorParagraph,
-						b: cTextPr.Bold ? cTextPr.Bold : paragraphBold,
-						i: cTextPr.Italic ? cTextPr.Italic : paragraphItalic,
-						u: cTextPr.Underline ? Asc.EUnderline.underlineSingle : paragraphUnderline,
-						s: cTextPr.Strikeout ? cTextPr.Strikeout : cTextPr.DStrikeout ? cTextPr.DStrikeout : paragraphStrikeout,
-						va: verticalAlign ? verticalAlign : paragraphVertAlign
-					}
+					format: font
 				};
 				
 				return formatText;

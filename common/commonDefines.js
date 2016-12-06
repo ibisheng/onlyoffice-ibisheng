@@ -88,7 +88,7 @@
 			No                   : 0,
 			Unknown              : -1,
 			ConvertationTimeout  : -2,
-			ConvertationError    : -3,
+
 			DownloadError        : -4,
 			UnexpectedGuid       : -5,
 			Database             : -6,
@@ -106,6 +106,7 @@
 			VKeyEncrypt           : -20,
 			KeyExpire             : -21,
 			UserCountExceed       : -22,
+			AccessDeny            : -23,
 
 			SplitCellMaxRows     : -30,
 			SplitCellMaxCols     : -31,
@@ -142,6 +143,12 @@
 
 			UserDrop : -100,
 			Warning  : -101,
+
+			PrintMaxPagesCount					: -110,
+
+			SessionAbsolute: -120,
+			SessionIdle: -121,
+			SessionToken: -122,
 
 			/* для формул */
 			FrmlWrongCountParentheses   : -300,
@@ -667,12 +674,12 @@
 		STROKE_COLOR : 1
 	};
 
-	var c_oAscVerticalTextAlign = {
-		TEXT_ALIGN_BOTTOM : 0, // (Text Anchor Enum ( Bottom ))
-		TEXT_ALIGN_CTR    : 1, // (Text Anchor Enum ( Center ))
-		TEXT_ALIGN_DIST   : 2, // (Text Anchor Enum ( Distributed ))
-		TEXT_ALIGN_JUST   : 3, // (Text Anchor Enum ( Justified ))
-		TEXT_ALIGN_TOP    : 4  // Top
+	var c_oAscVAlign = {
+		Bottom : 0, // (Text Anchor Enum ( Bottom ))
+		Center : 1, // (Text Anchor Enum ( Center ))
+		Dist   : 2, // (Text Anchor Enum ( Distributed ))
+		Just   : 3, // (Text Anchor Enum ( Justified ))
+		Top    : 4  // Top
 	};
 
 	var c_oAscVertDrawingText = {
@@ -1097,7 +1104,6 @@
 	prot['No']                               = prot.No;
 	prot['Unknown']                          = prot.Unknown;
 	prot['ConvertationTimeout']              = prot.ConvertationTimeout;
-	prot['ConvertationError']                = prot.ConvertationError;
 	prot['ConvertationOpenError']            = prot.ConvertationOpenError;
 	prot['ConvertationSaveError']            = prot.ConvertationSaveError;
 	prot['DownloadError']                    = prot.DownloadError;
@@ -1116,6 +1122,7 @@
 	prot['VKeyEncrypt']                      = prot.VKeyEncrypt;
 	prot['KeyExpire']                        = prot.KeyExpire;
 	prot['UserCountExceed']                  = prot.UserCountExceed;
+	prot['AccessDeny']                       = prot.AccessDeny;
 	prot['SplitCellMaxRows']                 = prot.SplitCellMaxRows;
 	prot['SplitCellMaxCols']                 = prot.SplitCellMaxCols;
 	prot['SplitCellRowsDivider']             = prot.SplitCellRowsDivider;
@@ -1139,6 +1146,10 @@
 	prot['CannotFillRange']                  = prot.CannotFillRange;
 	prot['UserDrop']                         = prot.UserDrop;
 	prot['Warning']                          = prot.Warning;
+	prot['PrintMaxPagesCount']               = prot.PrintMaxPagesCount;
+	prot['SessionAbsolute']                  = prot.SessionAbsolute;
+	prot['SessionIdle']                      = prot.SessionIdle;
+	prot['SessionToken']                     = prot.SessionToken;
 	prot['FrmlWrongCountParentheses']        = prot.FrmlWrongCountParentheses;
 	prot['FrmlWrongOperator']                = prot.FrmlWrongOperator;
 	prot['FrmlWrongMaxArgument']             = prot.FrmlWrongMaxArgument;
@@ -1434,13 +1445,13 @@
 	prot                                     = c_oAscStrokeType;
 	prot['STROKE_NONE']                      = prot.STROKE_NONE;
 	prot['STROKE_COLOR']                     = prot.STROKE_COLOR;
-	window['Asc']['c_oAscVerticalTextAlign'] = c_oAscVerticalTextAlign;
-	prot                                     = c_oAscVerticalTextAlign;
-	prot['TEXT_ALIGN_BOTTOM']                = prot.TEXT_ALIGN_BOTTOM;
-	prot['TEXT_ALIGN_CTR']                   = prot.TEXT_ALIGN_CTR;
-	prot['TEXT_ALIGN_DIST']                  = prot.TEXT_ALIGN_DIST;
-	prot['TEXT_ALIGN_JUST']                  = prot.TEXT_ALIGN_JUST;
-	prot['TEXT_ALIGN_TOP']                   = prot.TEXT_ALIGN_TOP;
+	window['Asc']['c_oAscVAlign'] = window['Asc'].c_oAscVAlign = c_oAscVAlign;
+	prot                          = c_oAscVAlign;
+	prot['Bottom']                = prot.Bottom;
+	prot['Center']                = prot.Center;
+	prot['Dist']                  = prot.Dist;
+	prot['Just']                  = prot.Just;
+	prot['Top']                   = prot.Top;
 	window['Asc']['c_oAscVertDrawingText']   = c_oAscVertDrawingText;
 	prot                                     = c_oAscVertDrawingText;
 	prot['normal']                           = prot.normal;

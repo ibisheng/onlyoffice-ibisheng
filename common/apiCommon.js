@@ -2488,6 +2488,9 @@
 			if (typeof obj.VKey != 'undefined') {
 				this.VKey = obj.VKey;
 			}
+			if (typeof obj.Token != 'undefined') {
+				this.Token = obj.Token;
+			}
 			if (typeof obj.UserId != 'undefined') {
 				this.UserId = obj.UserId;
 			}
@@ -2502,6 +2505,15 @@
 			if (typeof obj.CallbackUrl != 'undefined') {
 				this.CallbackUrl = obj.CallbackUrl;
 			}
+			if (typeof obj.Mode != 'undefined') {
+				this.Mode = obj.Mode;
+			}
+			if (typeof obj.Permissions != 'undefined') {
+				this.Permissions = obj.Permissions;
+			}
+			if (typeof obj.Lang != 'undefined') {
+				this.Lang = obj.Lang;
+			}
         if (obj.OfflineApp === true) {
             this.OfflineApp = true;
         }
@@ -2514,10 +2526,14 @@
 			this.Title = null;
 			this.Format = null;
 			this.VKey = null;
+			this.Token = null;
 			this.UserInfo = null;
 			this.Options = null;
 			this.CallbackUrl = null;
 			this.TemplateReplacement = null;
+			this.Mode = null;
+			this.Permissions = null;
+			this.Lang = null;
 		}
 	}
 
@@ -2550,6 +2566,12 @@
 	};
 	asc_CDocInfo.prototype.put_VKey = asc_CDocInfo.prototype.asc_putVKey = function (v) {
 		this.VKey = v;
+	};
+	asc_CDocInfo.prototype.get_Token = asc_CDocInfo.prototype.asc_getToken = function () {
+		return this.Token;
+	};
+	asc_CDocInfo.prototype.put_Token = asc_CDocInfo.prototype.asc_putToken = function (v) {
+		this.Token = v;
 	};
 	asc_CDocInfo.prototype.get_OfflineApp = asc_CDocInfo.prototype.asc_getOfflineApp = function () {
 		return this.OfflineApp;
@@ -3370,6 +3392,12 @@
 	prot["put_TemplateReplacement"] = prot["asc_putTemplateReplacement"] = prot.asc_putTemplateReplacement;
 	prot["get_UserInfo"] = prot["asc_getUserInfo"] = prot.asc_getUserInfo;
 	prot["put_UserInfo"] = prot["asc_putUserInfo"] = prot.asc_putUserInfo;
+	prot["get_Token"] = prot["asc_getToken"] = prot.asc_getToken;
+	prot["put_Token"] = prot["asc_putToken"] = prot.asc_putToken;
+	prot["get_Mode"] = prot["asc_getMode"] = prot.asc_getMode;
+	prot["put_Mode"] = prot["asc_putMode"] = prot.asc_putMode;
+	prot["get_Permissions"] = prot["asc_getPermissions"] = prot.asc_getPermissions;
+	prot["put_Permissions"] = prot["asc_putPermissions"] = prot.asc_putPermissions;
 
 	window["AscCommon"].COpenProgress = COpenProgress;
 	prot = COpenProgress.prototype;

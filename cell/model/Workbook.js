@@ -1435,10 +1435,10 @@ Workbook.prototype.rebuildColors=function(){
 		this.aWorksheets[i].rebuildColors();
 };
 Workbook.prototype.getDefaultFont=function(){
-	return g_oDefaultFormat.Font.fn;
+	return g_oDefaultFormat.Font.getName();
 };
 Workbook.prototype.getDefaultSize=function(){
-	return g_oDefaultFormat.Font.fs;
+	return g_oDefaultFormat.Font.getSize();
 };
 Workbook.prototype.getActive=function(){
 	return this.nActive;
@@ -1749,8 +1749,7 @@ Workbook.prototype._generateFontMap=function(){
 		"Arial"		: 1
 	};
 
-	if(null != g_oDefaultFormat.Font.fn)
-		oFontMap[g_oDefaultFormat.Font.fn] = 1;
+	oFontMap[g_oDefaultFormat.Font.getName()] = 1;
 	
 	for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
 		this.aWorksheets[i].generateFontMap(oFontMap);
@@ -2403,33 +2402,33 @@ Woorksheet.prototype.generateFontMap=function(oFontMap){
 	for(var i in this.aCols)
 	{
 		var col = this.aCols[i];
-		if(null != col && null != col.xfs && null != col.xfs.font && null != col.xfs.font.fn)
-			oFontMap[col.xfs.font.fn] = 1;
+		if(null != col && null != col.xfs && null != col.xfs.font)
+			oFontMap[col.xfs.font.getName()] = 1;
 	}
-	if(null != this.oAllCol && null != this.oAllCol.xfs && null != this.oAllCol.xfs.font && null != this.oAllCol.xfs.font.fn)
-		oFontMap[this.oAllCol.xfs.font.fn] = 1;
+	if(null != this.oAllCol && null != this.oAllCol.xfs && null != this.oAllCol.xfs.font)
+		oFontMap[this.oAllCol.xfs.font.getName()] = 1;
 	//пробегаемся строкам
 	for(var i in this.aGCells)
 	{
 		var row = this.aGCells[i];
-		if(null != row && null != row.xfs && null != row.xfs.font && null != row.xfs.font.fn)
-			oFontMap[row.xfs.font.fn] = 1;
+		if(null != row && null != row.xfs && null != row.xfs.font)
+			oFontMap[row.xfs.font.getName()] = 1;
 		//пробегаемся по ячейкам
 		for(var j in row.c)
 		{
 			var cell = row.c[j];
 			if(null != cell)
 			{
-				if(null != cell.xfs && null != cell.xfs.font && null != cell.xfs.font.fn)
-					oFontMap[cell.xfs.font.fn] = 1;
+				if(null != cell.xfs && null != cell.xfs.font)
+					oFontMap[cell.xfs.font.getName()] = 1;
 				//смотрим в комплексных строках
 				if(null != cell.oValue && null != cell.oValue.multiText)
 				{
 					for(var k = 0, length3 = cell.oValue.multiText.length; k < length3; ++k)
 					{
 						var part = cell.oValue.multiText[k];
-						if(null != part.format && null != part.format.fn)
-							oFontMap[part.format.fn] = 1;
+						if(null != part.format)
+							oFontMap[part.format.getName()] = 1;
 					}
 				}
 			}
@@ -2520,27 +2519,39 @@ Woorksheet.prototype.copyFrom=function(wsFrom, sName, tableNames){	var i, elem, 
 
 	return renameParams;
 };
-Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
-{
-    if(null != this.Drawings && this.Drawings.length > 0)
-    {
+	Woorksheet.prototype.copyDrawingObjects = function (oNewWs, wsFrom) {
+		var i;
+		if (null != this.Drawings && this.Drawings.length > 0) {
         var drawingObjects = new AscFormat.DrawingObjects();
         oNewWs.Drawings = [];
       AscFormat.NEW_WORKSHEET_DRAWING_DOCUMENT = oNewWs.DrawingDocument;
-        for(var i = 0; i < this.Drawings.length; ++i)
-        {
+			for (i = 0; i < this.Drawings.length; ++i) {
             var drawingObject = drawingObjects.cloneDrawingObject(this.Drawings[i]);
             drawingObject.graphicObject = this.Drawings[i].graphicObject.copy();
             drawingObject.graphicObject.setWorksheet(oNewWs);
             drawingObject.graphicObject.addToDrawingObjects();
             var drawingBase = this.Drawings[i];
-            drawingObject.graphicObject.setDrawingBaseCoords(drawingBase.from.col, drawingBase.from.colOff, drawingBase.from.row, drawingBase.from.rowOff, drawingBase.to.col, drawingBase.to.colOff, drawingBase.to.row, drawingBase.to.rowOff, drawingBase.Pos.X, drawingBase.Pos.Y, drawingBase.ext.cx, drawingBase.ext.cy);
+				drawingObject.graphicObject.setDrawingBaseCoords(drawingBase.from.col, drawingBase.from.colOff,
+					drawingBase.from.row, drawingBase.from.rowOff, drawingBase.to.col, drawingBase.to.colOff,
+					drawingBase.to.row, drawingBase.to.rowOff, drawingBase.Pos.X, drawingBase.Pos.Y, drawingBase.ext.cx,
+					drawingBase.ext.cy);
+				if(drawingObject.graphicObject.setDrawingBaseType){
+                    drawingObject.graphicObject.setDrawingBaseType(drawingBase.Type);
+                }
             oNewWs.Drawings[oNewWs.Drawings.length - 1] = drawingObject;
         }
       AscFormat.NEW_WORKSHEET_DRAWING_DOCUMENT = null;
         drawingObjects.pushToAObjects(oNewWs.Drawings);
-        drawingObjects.updateChartReferences2(parserHelp.getEscapeSheetName(wsFrom.sName), parserHelp.getEscapeSheetName(oNewWs.sName));
+			drawingObjects.updateChartReferences2(parserHelp.getEscapeSheetName(wsFrom.sName),
+				parserHelp.getEscapeSheetName(oNewWs.sName));
     }
+
+		var newSparkline;
+		for (i = 0; i < this.aSparklineGroups.length; ++i) {
+			newSparkline = this.aSparklineGroups[i].clone();
+			newSparkline.setWorksheet(oNewWs, wsFrom);
+			oNewWs.aSparklineGroups.push(newSparkline);
+		}
 };
 	Woorksheet.prototype.initPostOpen = function (handlers, bNoBuildDep) {
 		if (this.aFormulaExt) {
@@ -2617,6 +2628,16 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
 			}
 		}
 
+		if (this.TableParts && this.TableParts.length) {
+			var tableParts = this.TableParts;
+			if (tableParts) {
+				for (var i = 0; i < tableParts.length; i++) {
+					//TODO пока заменяем при открытии на TotalsRowFormula
+					tableParts[i].checkTotalRowFormula();
+				}
+			}
+		}
+		
 		this._updateConditionalFormatting(null);
 
 		this.handlers = handlers;
@@ -3346,7 +3367,7 @@ Woorksheet.prototype.setColHidden=function(bHidden, start, stop){
 			else
 			{
 				col.hd = null;
-				if(0 == col.width)
+				if(0 >= col.width)
 					col.width = null;
 			}
 			var oNewProps = col.getWidthProp();
@@ -3485,6 +3506,7 @@ Woorksheet.prototype.setRowHeight=function(height, start, stop, isCustom){
             if (isCustom) {
               row.flags |= AscCommonExcel.g_nRowFlag_CustomHeight;
             }
+			row.flags |= AscCommonExcel.g_nRowFlag_CalcHeight;
 			row.flags &= ~AscCommonExcel.g_nRowFlag_hd;
 			var oNewProps = row.getHeightProp();
 			if(false === oOldProps.isEqual(oNewProps))
@@ -3576,6 +3598,7 @@ Woorksheet.prototype.setRowBestFit=function(bBestFit, height, start, stop){
 				row.flags &= ~AscCommonExcel.g_nRowFlag_CustomHeight;
 			else
 				row.flags |= AscCommonExcel.g_nRowFlag_CustomHeight;
+			row.flags |= AscCommonExcel.g_nRowFlag_CalcHeight;
 			row.h = height;
 			var oNewProps = row.getHeightProp();
 			if(false == oOldProps.isEqual(oNewProps))
@@ -3679,7 +3702,7 @@ Woorksheet.prototype._getCell=function(row, col){
 		var oRow = this._getRowNoEmpty(row);
 		var oCol = this._getColNoEmptyWithAll(col);
 		var xfs = null;
-		if(null != oRow && null != oRow.xfs)
+		if(oRow && null != oRow.xfs)
 			xfs = oRow.xfs.clone();
 		else if(null != oCol && null != oCol.xfs)
 			xfs = oCol.xfs.clone();
@@ -3705,14 +3728,11 @@ Woorksheet.prototype._getCellNoEmpty=function(row, col){
 };
 Woorksheet.prototype._getRowNoEmpty=function(row){
 	//0-based
-	var oCurRow = this.aGCells[row];
-	if(oCurRow)
-		return oCurRow;
-	return null;
+	return this.aGCells[row];
 };
 Woorksheet.prototype._getRowNoEmptyWithAll=function(row){
 	var oRes = this._getRowNoEmpty(row);
-	if(null == oRes)
+	if(!oRes)
 		oRes = this.oSheetFormatPr.oAllRow;
 	return oRes;
 };
@@ -3881,7 +3901,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 	for(var i = oBBoxFrom.r1; i <= oBBoxFrom.r2; i++)
 	{
 		var row = this._getRowNoEmpty(i);
-		if(null != row)
+		if(row)
 		{
 			var oTempRow = {};
 			aTempObj.cells[i + offset.offsetRow] = oTempRow;
@@ -3951,7 +3971,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 		var oRangeFrom = this.getRange3(oBBoxFrom.r1, oBBoxFrom.c1, oBBoxFrom.r2, oBBoxFrom.c2 );
         oRangeFrom._setPropertyNoEmpty(null, null, function(cell, nRow0, nCol0, nRowStart, nColStart){
             var row = oThis._getRowNoEmpty(nRow0);
-            if(null != row)
+            if(row)
                 delete row.c[nCol0];
         });
     }
@@ -3960,7 +3980,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 		if(null != intersection){
 			oRangeIntersection._setPropertyNoEmpty(null, null, function(cell, nRow0, nCol0, nRowStart, nColStart){
 				var row = oThis._getRowNoEmpty(nRow0);
-				if(null != row)
+				if(row)
 					delete row.c[nCol0];
 			});
 		}
@@ -4385,10 +4405,37 @@ Woorksheet.prototype.updateSparklineCache = function(sheet, ranges) {
 	Woorksheet.prototype.getSparklineGroup = function(c, r) {
 		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
 			if (-1 !== this.aSparklineGroups[i].contains(c, r)) {
-				return this.aSparklineGroups[i].clone(true);
+				return this.aSparklineGroups[i];
 			}
 		}
 		return null;
+	};
+	Woorksheet.prototype.removeSparklines = function (range) {
+		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
+			if (this.aSparklineGroups[i].remove(range)) {
+				History.Add(this.aSparklineGroups[i], {Type: AscCH.historyitem_Sparkline_RemoveSparkline, oldPr: null, newPr: null});
+				this.aSparklineGroups.splice(i--, 1);
+			}
+		}
+	};
+	Woorksheet.prototype.removeSparklineGroups = function (range) {
+		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
+			if (-1 !== this.aSparklineGroups[i].intersectionSimple(range)) {
+				History.Add(this.aSparklineGroups[i], {Type: AscCH.historyitem_Sparkline_RemoveSparkline, oldPr: null, newPr: null});
+				this.aSparklineGroups.splice(i--, 1);
+			}
+		}
+	};
+	Woorksheet.prototype.insertSparklineGroup = function (sparklineGroup) {
+		this.aSparklineGroups.push(sparklineGroup);
+	};
+	Woorksheet.prototype.removeSparklineGroup = function (id) {
+		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
+			if (id === this.aSparklineGroups[i].Get_Id()) {
+				this.aSparklineGroups.splice(i, 1);
+				break;
+			}
+		}
 	};
 	Woorksheet.prototype.getCwf = function() {
 		var cwf = {};
@@ -4444,7 +4491,7 @@ Cell.prototype.compileXfs=function(){
 		if(null != this.xfs)
 		{
 			if(null != this.compiledXfs)
-				this.compiledXfs = this.xfs.merge(this.compiledXfs);
+				this.compiledXfs = this.xfs.merge(this.compiledXfs, true);
 			else
 				this.compiledXfs = this.xfs;
 		}
@@ -5009,6 +5056,12 @@ Cell.prototype.setValueData = function(Val){
 			this.formulaParsed.calculate();
     }
   };
+	Cell.prototype.getFont=function(){
+		var xfs = this.getCompiledStyle();
+		if(null != xfs && null != xfs.font)
+			return xfs.font;
+		return g_oDefaultFormat.Font;
+	};
 	Cell.prototype._adjustCellFormat = function() {
 		if (this.formulaParsed && this.formulaParsed.value && this.formulaParsed.outStack) {
 			var valueCalc = this.formulaParsed.value;
@@ -5850,8 +5903,6 @@ Range.prototype.setFontAlign=function(val){
 };
 Range.prototype.setAlignVertical=function(val){
 	History.Create_NewPoint();
-	if("none" == val)
-		val = null;
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -6256,7 +6307,7 @@ Range.prototype.getValueForEdit2=function(){
 		var oRow = this.worksheet._getRowNoEmpty(this.bbox.r1);
 		var oCol = this.worksheet._getColNoEmptyWithAll(this.bbox.c1);
 		var xfs = null;
-		if(null != oRow && null != oRow.xfs)
+		if(oRow && null != oRow.xfs)
 			xfs = oRow.xfs.clone();
 		else if(null != oCol && null != oCol.xfs)
 			xfs = oCol.xfs.clone();
@@ -6292,7 +6343,7 @@ Range.prototype.getValue2=function(dDigitsCount, fIsFitMeasurer){
 		var oRow = this.worksheet._getRowNoEmpty(this.bbox.r1);
 		var oCol = this.worksheet._getColNoEmptyWithAll(this.bbox.c1);
 		var xfs = null;
-		if(null != oRow && null != oRow.xfs)
+		if(oRow && null != oRow.xfs)
 			xfs = oRow.xfs.clone();
 		else if(null != oCol && null != oCol.xfs)
 			xfs = oCol.xfs.clone();
@@ -6312,7 +6363,7 @@ Range.prototype.getXfId=function(){
 	} else {
 		//стили столбов и колонок
 		var row = this.worksheet._getRowNoEmpty(nRow);
-		if(null != row && null != row.xfs && null != row.xfs.XfId)
+		if(row && null != row.xfs && null != row.xfs.XfId)
 			return row.xfs.XfId;
 		var col = this.worksheet._getColNoEmptyWithAll(nCol);
 		if(null != col && null != col.xfs && null != col.xfs.XfId)
@@ -6347,7 +6398,7 @@ Range.prototype.getNumFormatStr=function(){
 	{
 		//стили столбов и колонок
 		var row = this.worksheet._getRowNoEmpty(nRow);
-		if(null != row && null != row.xfs && null != row.xfs.num)
+		if(row && null != row.xfs && null != row.xfs.num)
 			return row.xfs.num.getFormat();
 		var col = this.worksheet._getColNoEmptyWithAll(nCol);
 		if(null != col && null != col.xfs && null != col.xfs.num)
@@ -6364,12 +6415,12 @@ Range.prototype.isNotDefaultFont = function () {
 	var cellFont = this.getFont();
 	var rowFont = g_oDefaultFormat.Font;
 	var row = this.worksheet._getRowNoEmpty(this.bbox.r1);
-	if (null != row && null != row.xfs && null != row.xfs.font)
+	if (row && null != row.xfs && null != row.xfs.font)
 		rowFont = row.xfs.font;
-	else if (null != this.oAllCol)
-		rowFont = this.oAllCol;
+	else if (null != this.worksheet.oAllCol && this.worksheet.oAllCol.xfs && this.worksheet.oAllCol.xfs.font)
+		rowFont = this.worksheet.oAllCol.xfs.font;
 
-	return (cellFont.fn !== rowFont.fn || cellFont.fs !== rowFont.fs);
+	return (cellFont.getName() !== rowFont.getName() || cellFont.getSize() !== rowFont.getSize());
 };
 Range.prototype.getFont = function(){
 	var nRow = this.bbox.r1;
@@ -6385,49 +6436,13 @@ Range.prototype.getFont = function(){
 	{
 		//стили столбов и колонок
 		var row = this.worksheet._getRowNoEmpty(nRow);
-		if(null != row && null != row.xfs && null != row.xfs.font)
+		if(row && null != row.xfs && null != row.xfs.font)
 			return row.xfs.font;
 		var col = this.worksheet._getColNoEmptyWithAll(nCol);
 		if(null != col && null != col.xfs && null != col.xfs.font)
 			return col.xfs.font;
 	}
     return g_oDefaultFormat.Font;
-};
-Range.prototype.getFontname=function(){
-	return this.getFont().fn;
-};
-Range.prototype.getFontsize=function(){
-	return this.getFont().fs;
-};
-Range.prototype.getFontcolor=function(){
-	return this.getFont().c;
-};
-Range.prototype.getBold=function(){
-	return this.getFont().b;
-};
-Range.prototype.getItalic=function(){
-	return this.getFont().i;
-};
-Range.prototype.getUnderline=function(){
-	return this.getFont().u;
-};
-Range.prototype.getStrikeout=function(){
-	return this.getFont().s;
-};
-Range.prototype.getFontAlign=function(){
-	return this.getFont().va;
-};
-Range.prototype.getQuotePrefix=function(){
-	var nRow = this.bbox.r1;
-	var nCol = this.bbox.c1;
-	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
-	if(null != cell)
-	{
-		var xfs = cell.getCompiledStyle();
-		if(null != xfs && null != xfs.QuotePrefix)
-			return xfs.QuotePrefix;
-	}
-	return false;
 };
 Range.prototype.getAlignVertical=function(){
 	var nRow = this.bbox.r1;
@@ -6448,7 +6463,7 @@ Range.prototype.getAlignVertical=function(){
 	{
 		//стили столбов и колонок
 		var row = this.worksheet._getRowNoEmpty(nRow);
-		if(null != row && null != row.xfs && null != row.xfs.align)
+		if(row && null != row.xfs && null != row.xfs.align)
 			return row.xfs.align.ver;
 		var col = this.worksheet._getColNoEmptyWithAll(nCol);
 		if(null != col && null != col.xfs && null != col.xfs.align)
@@ -6475,7 +6490,7 @@ Range.prototype.getAlignHorizontal=function(){
 	{
 		//стили столбов и колонок
 		var row = this.worksheet._getRowNoEmpty(nRow);
-		if(null != row && null != row.xfs && null != row.xfs.align)
+		if(row && null != row.xfs && null != row.xfs.align)
 			return row.xfs.align.hor;
 		var col = this.worksheet._getColNoEmptyWithAll(nCol);
 		if(null != col && null != col.xfs && null != col.xfs.align)
@@ -6487,16 +6502,16 @@ Range.prototype.getAlignHorizontalByValue=function(){
 	//возвращает Align в зависимости от значния в ячейке
 	//values:  none, center, justify, left , right, null
 	var align = this.getAlignHorizontal();
-	if("none" == align){
+	if(null == align){
 		//пытаемся определить по значению
 		var nRow = this.bbox.r1;
 		var nCol = this.bbox.c1;
 		var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 		if(cell){
 			switch(cell.getType()){
-				case CellValueType.String:align = "left";break;
+				case CellValueType.String:align = AscCommon.align_Left;break;
 				case CellValueType.Bool:
-				case CellValueType.Error:align = "center";break;
+				case CellValueType.Error:align = AscCommon.align_Center;break;
 				default:
 				//Если есть value и не проставлен тип значит это число, у всех остальных типов значение не null
 				if(this.getValueWithoutFormat())
@@ -6504,17 +6519,17 @@ Range.prototype.getAlignHorizontalByValue=function(){
 					//смотрим 
 					var oNumFmt = this.getNumFormat();
 					if(true == oNumFmt.isTextFormat())
-						align = "left";
+						align = AscCommon.align_Left;
 					else
-						align = "right";
+						align = AscCommon.align_Right;
 				}
 				else
-					align = "left";
+					align = AscCommon.align_Left;
 				break;
 			}
 		}
-		if("none" == align)
-			align = "left";
+		if(null == align)
+			align = AscCommon.align_Left;
 	}
 	return align;
 };
@@ -6532,7 +6547,7 @@ Range.prototype.getFill=function(){
 	{
 		//стили столбов и колонок
 		var row = this.worksheet._getRowNoEmpty(nRow);
-		if(null != row && null != row.xfs && null != row.xfs.fill)
+		if(row && null != row.xfs && null != row.xfs.fill)
 			return row.xfs.fill.bg;
 		var col = this.worksheet._getColNoEmptyWithAll(nCol);
 		if(null != col && null != col.xfs && null != col.xfs.fill)
@@ -6562,7 +6577,7 @@ Range.prototype.getBorderSrc=function(_cell){
 	{
 		//стили столбов и колонок
 		var row = this.worksheet._getRowNoEmpty(nRow);
-		if(null != row && null != row.xfs && null != row.xfs.border)
+		if(row && null != row.xfs && null != row.xfs.border)
 			return row.xfs.border;
 		var col = this.worksheet._getColNoEmptyWithAll(nCol);
 		if(null != col && null != col.xfs && null != col.xfs.border)
@@ -6640,7 +6655,7 @@ Range.prototype.getShrinkToFit=function(){
 	{
 		//стили столбов и колонок
 		var row = this.worksheet._getRowNoEmpty(nRow);
-		if(null != row && null != row.xfs && null != row.xfs.align)
+		if(row && null != row.xfs && null != row.xfs.align)
 			return row.xfs.align.shrink;
 		var col = this.worksheet._getColNoEmptyWithAll(nCol);
 		if(null != col && null != col.xfs && null != col.xfs.align)
@@ -6650,7 +6665,7 @@ Range.prototype.getShrinkToFit=function(){
 };
 Range.prototype.getWrapByAlign = function (align) {
 	// Для justify wrap всегда true
-	return "justify" === align.hor ? true : align.wrap;
+	return AscCommon.align_Justify === align.hor ? true : align.wrap;
 };
 Range.prototype.getWrap=function(){
 	var nRow = this.bbox.r1;
@@ -6667,7 +6682,7 @@ Range.prototype.getWrap=function(){
     } else {
 		//стили столбов и колонок
 		var row = this.worksheet._getRowNoEmpty(nRow);
-		if(null != row && null != row.xfs && null != row.xfs.align)
+		if(row && null != row.xfs && null != row.xfs.align)
 			return this.getWrapByAlign(row.xfs.align);
 		var col = this.worksheet._getColNoEmptyWithAll(nCol);
 		if(null != col && null != col.xfs && null != col.xfs.align)
@@ -6695,40 +6710,13 @@ Range.prototype.getAngle=function(){
 	{
 		//стили столбов и колонок
 		var row = this.worksheet._getRowNoEmpty(nRow);
-		if(null != row && null != row.xfs && null != row.xfs.align)
+		if(row && null != row.xfs && null != row.xfs.align)
 			return angleFormatToInterface(row.xfs.align.angle);
 		var col = this.worksheet._getColNoEmptyWithAll(nCol);
 		if(null != col && null != col.xfs && null != col.xfs.align)
 			return angleFormatToInterface(col.xfs.align.angle);
 	}
     return angleFormatToInterface(g_oDefaultFormat.Align.angle);
-};
-Range.prototype.getVerticalText=function(){
-	var nRow = this.bbox.r1;
-	var nCol = this.bbox.c1;
-	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
-	if(null != cell)
-    {
-		var xfs = cell.getCompiledStyle();
-        if(null != xfs)
-		{
-			if(null != xfs.align)
-				return g_nVerticalTextAngle == xfs.align.angle;
-			else
-				return g_nVerticalTextAngle == g_oDefaultFormat.AlignAbs.angle;
-		}
-    }
-	else
-	{
-		//стили столбов и колонок
-		var row = this.worksheet._getRowNoEmpty(nRow);
-		if(null != row && null != row.xfs && null != row.xfs.align)
-			return g_nVerticalTextAngle == row.xfs.align.angle;
-		var col = this.worksheet._getColNoEmptyWithAll(nCol);
-		if(null != col && null != col.xfs && null != col.xfs.align)
-			return g_nVerticalTextAngle == col.xfs.align.angle;
-	}
-    return g_nVerticalTextAngle == g_oDefaultFormat.Align.angle;
 };
 Range.prototype.hasMerged=function(){
 	var aMerged = this.worksheet.mergeManager.get(this.bbox);
@@ -6747,7 +6735,7 @@ Range.prototype.merge=function(type){
 	History.StartTransaction();	
 	if(oBBox.r1 == oBBox.r2 && oBBox.c1 == oBBox.c2){
 		if(type == Asc.c_oAscMergeOptions.MergeCenter)
-			this.setAlignHorizontal("center");
+			this.setAlignHorizontal(AscCommon.align_Center);
 		History.EndTransaction();
 		return;
 	}
@@ -6757,7 +6745,7 @@ Range.prototype.merge=function(type){
 		if(type == Asc.c_oAscMergeOptions.MergeCenter)
 		{
 			//сбрасываем AlignHorizontal
-			this.setAlignHorizontal("none");
+			this.setAlignHorizontal(null);
 			History.EndTransaction();
 			return;
 		}
@@ -6820,12 +6808,12 @@ Range.prototype.merge=function(type){
 	else if(c_oRangeType.Row == nRangeType)
 	{
 		var oTopRow = this.worksheet._getRowNoEmpty(oBBox.r1);
-		if(null != oTopRow && null != oTopRow.xfs && null != oTopRow.xfs.border && false == oTopRow.xfs.border.t.isEmpty())
+		if(oTopRow && null != oTopRow.xfs && null != oTopRow.xfs.border && false == oTopRow.xfs.border.t.isEmpty())
 			oTopBorder = oTopRow.xfs.border.t;
 		if(oBBox.r1 != oBBox.r2)
 		{
 			var oBottomRow = this.worksheet._getRowNoEmpty(oBBox.r2);
-			if(null != oBottomRow && null != oBottomRow.xfs && null != oBottomRow.xfs.border && false == oBottomRow.xfs.border.b.isEmpty())
+			if(oBottomRow && null != oBottomRow.xfs && null != oBottomRow.xfs.border && false == oBottomRow.xfs.border.b.isEmpty())
 				oBottomBorder = oBottomRow.xfs.border.b;
 		}
 	}
@@ -7057,7 +7045,7 @@ Range.prototype.merge=function(type){
 		}
 	});
 	if(type == Asc.c_oAscMergeOptions.MergeCenter)
-		this.setAlignHorizontal("center");
+		this.setAlignHorizontal(AscCommon.align_Center);
 	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
 		this.worksheet.mergeManager.add(this.bbox, 1);
 	History.EndTransaction();
@@ -7175,10 +7163,10 @@ Range.prototype.setHyperlink=function(val, bWithoutStyle){
 		if(true != bWithoutStyle)
 		{
 			var oHyperlinkFont = new AscCommonExcel.Font();
-			oHyperlinkFont.fn = this.worksheet.workbook.getDefaultFont();
-			oHyperlinkFont.fs = this.worksheet.workbook.getDefaultSize();
-			oHyperlinkFont.u = Asc.EUnderline.underlineSingle;
-			oHyperlinkFont.c = AscCommonExcel.g_oColorManager.getThemeColor(AscCommonExcel.g_nColorHyperlink);
+			oHyperlinkFont.setName(this.worksheet.workbook.getDefaultFont());
+			oHyperlinkFont.setSize(this.worksheet.workbook.getDefaultSize());
+			oHyperlinkFont.setUnderline(Asc.EUnderline.underlineSingle);
+			oHyperlinkFont.setColor(AscCommonExcel.g_oColorManager.getThemeColor(AscCommonExcel.g_nColorHyperlink));
 			this.setFont(oHyperlinkFont);
 		}
 		if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
@@ -7643,7 +7631,7 @@ Range.prototype.sort=function(nOption, nStartCol, sortColor, opt_guessHeader){
 	var fAddSortElems = function(oCell, nRow0, nCol0,nRowStart0, nColStart0){
 		//не сортируем сткрытие строки
 		var row = oThis.worksheet._getRowNoEmpty(nRow0);
-		if(null != row)
+		if(row)
 		{
 			if(0 != (AscCommonExcel.g_nRowFlag_hd & row.flags))
 				aHiddenRow[nRow0] = 1;
@@ -7670,7 +7658,7 @@ Range.prototype.sort=function(nOption, nStartCol, sortColor, opt_guessHeader){
 							colorsTextCell = [];
 						}
 						
-						colorsTextCell.push(value2[n].format.c);
+						colorsTextCell.push(value2[n].format.getColor());
 					}
 				}
 				

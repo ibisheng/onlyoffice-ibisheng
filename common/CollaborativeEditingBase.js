@@ -38,10 +38,9 @@ var FOREIGN_CURSOR_LABEL_HIDETIME = 1500;
 
 function CCollaborativeChanges()
 {
-    this.m_pData         = null;
-    this.m_oColor        = null;
+	this.m_pData  = null;
+	this.m_oColor = null;
 }
-
 CCollaborativeChanges.prototype.Set_Data = function(pData)
 {
     this.m_pData = pData;
@@ -52,180 +51,157 @@ CCollaborativeChanges.prototype.Set_Color = function(oColor)
 };
 CCollaborativeChanges.prototype.Set_FromUndoRedo = function(Class, Data, Binary)
 {
-    if ( "undefined" === typeof(Class.Get_Id) )
-        return false;
+	if (!Class.Get_Id)
+		return false;
 
-    // Преобразуем данные в бинарный файл
-    this.m_pData  = this.Internal_Save_Data( Class, Data, Binary );
-
-    return true;
+	this.m_pData = this.private_SaveData(Binary);
+	return true;
 };
 CCollaborativeChanges.prototype.Apply_Data = function()
 {
-    var LoadData  = this.Internal_Load_Data(this.m_pData);
-    var ClassId   = LoadData.Reader.GetString2();
-    var ReaderPos = LoadData.Reader.GetCurPos();
-    var Type      = LoadData.Reader.GetLong();
-    var Class     = null;
+	var CollaborativeEditing = AscCommon.CollaborativeEditing;
 
-    if (AscDFH.historyitem_type_HdrFtr === Type)
-        Class = editor.WordControl.m_oLogicDocument.HdrFtr;
-    else
-        Class = AscCommon.g_oTableId.Get_ById(ClassId);
+	var Reader  = this.private_LoadData(this.m_pData);
+	var ClassId = Reader.GetString2();
+	var Class   = AscCommon.g_oTableId.Get_ById(ClassId);
 
-    LoadData.Reader.Seek2(ReaderPos);
+	if (!Class)
+		return false;
 
-    if (null != Class)
-        return Class.Load_Changes(LoadData.Reader, LoadData.Reader2, this.m_oColor);
-    else
-        return false;
+	//------------------------------------------------------------------------------------------------------------------
+	// Новая схема
+	var nReaderPos   = Reader.GetCurPos();
+	var nChangesType = Reader.GetLong();
+
+	var fChangesClass = AscDFH.changesFactory[nChangesType];
+	if (fChangesClass)
+	{
+		var oChange = new fChangesClass(Class);
+		oChange.ReadFromBinary(Reader);
+
+		if (true === CollaborativeEditing.private_AddOverallChange(oChange))
+			oChange.Load(this.m_oColor);
+
+		return true;
+	}
+	else
+	{
+		CollaborativeEditing.private_AddOverallChange(this.m_pData);
+		// Сюда мы попадаем, когда у данного изменения нет класса и он все еще работает по старой схеме через объект
+
+		Reader.Seek2(nReaderPos);
+		//\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+		// Старая схема
+
+		if (!Class.Load_Changes)
+			return false;
+
+		return Class.Load_Changes(Reader, null, this.m_oColor);
+	}
 };
-CCollaborativeChanges.prototype.Internal_Load_Data = function(szSrc)
+CCollaborativeChanges.prototype.private_LoadData = function(szSrc)
 {
-    var srcLen = szSrc.length;
-    var index =  -1;
-
-    while (true)
-    {
-        index++;
-        var _c = szSrc.charCodeAt(index);
-        if (_c == ";".charCodeAt(0))
-        {
-            index++;
-            break;
-        }
-    }
-
-    var bPost = false;
-    // Ищем следующее вхождение ";"
-    while (index < srcLen)
-    {
-        index++;
-        var _c = szSrc.charCodeAt(index);
-        if (_c == ";".charCodeAt(0))
-        {
-            index++;
-            bPost = true;
-            break;
-        }
-    }
-
-    if ( true === bPost )
-        return { Reader : this.Internal_Load_Data2(szSrc, 0, index - 1), Reader2 : this.Internal_Load_Data2(szSrc, index, srcLen ) };
-    else
-        return { Reader : this.Internal_Load_Data2(szSrc, 0, szSrc.length), Reader2 : null };
+    return this.GetStream(szSrc, 0, szSrc.length);
 };
-CCollaborativeChanges.prototype.Internal_Load_Data2 = function(szSrc, offset, srcLen)
+CCollaborativeChanges.prototype.GetStream = function(szSrc, offset, srcLen)
 {
-    var nWritten = 0;
+	var nWritten = 0;
 
-    var index =  -1 + offset;
-    var dst_len = "";
+	var index   = -1 + offset;
+	var dst_len = "";
 
-    while (true)
-    {
-        index++;
-        var _c = szSrc.charCodeAt(index);
-        if (_c == ";".charCodeAt(0))
-        {
-            index++;
-            break;
-        }
+	while (true)
+	{
+		index++;
+		var _c = szSrc.charCodeAt(index);
+		if (_c == ";".charCodeAt(0))
+		{
+			index++;
+			break;
+		}
 
-        dst_len += String.fromCharCode(_c);
-    }
+		dst_len += String.fromCharCode(_c);
+	}
 
-    var dstLen = parseInt(dst_len);
+	var dstLen = parseInt(dst_len);
 
-    var pointer = AscFonts.g_memory.Alloc(dstLen);
-    var stream = new AscCommon.FT_Stream2(pointer.data, dstLen);
-    stream.obj = pointer.obj;
+	var pointer = AscFonts.g_memory.Alloc(dstLen);
+	var stream  = new AscCommon.FT_Stream2(pointer.data, dstLen);
+	stream.obj  = pointer.obj;
 
-    var dstPx = stream.data;
+	var dstPx = stream.data;
 
-    if (window.chrome)
-    {
-        while (index < srcLen)
-        {
-            var dwCurr = 0;
-            var i;
-            var nBits = 0;
-            for (i=0; i<4; i++)
-            {
-                if (index >= srcLen)
-                    break;
-                var nCh = AscFonts.DecodeBase64Char(szSrc.charCodeAt(index++));
-                if (nCh == -1)
-                {
-                    i--;
-                    continue;
-                }
-                dwCurr <<= 6;
-                dwCurr |= nCh;
-                nBits += 6;
-            }
+	if (window.chrome)
+	{
+		while (index < srcLen)
+		{
+			var dwCurr = 0;
+			var i;
+			var nBits  = 0;
+			for (i = 0; i < 4; i++)
+			{
+				if (index >= srcLen)
+					break;
+				var nCh = AscFonts.DecodeBase64Char(szSrc.charCodeAt(index++));
+				if (nCh == -1)
+				{
+					i--;
+					continue;
+				}
+				dwCurr <<= 6;
+				dwCurr |= nCh;
+				nBits += 6;
+			}
 
-            dwCurr <<= 24-nBits;
-            for (i=0; i<nBits/8; i++)
-            {
-                dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
-                dwCurr <<= 8;
-            }
-        }
-    }
-    else
-    {
-        var p = AscFonts.b64_decode;
-        while (index < srcLen)
-        {
-            var dwCurr = 0;
-            var i;
-            var nBits = 0;
-            for (i=0; i<4; i++)
-            {
-                if (index >= srcLen)
-                    break;
-                var nCh = p[szSrc.charCodeAt(index++)];
-                if (nCh == undefined)
-                {
-                    i--;
-                    continue;
-                }
-                dwCurr <<= 6;
-                dwCurr |= nCh;
-                nBits += 6;
-            }
+			dwCurr <<= 24 - nBits;
+			for (i = 0; i < nBits / 8; i++)
+			{
+				dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+				dwCurr <<= 8;
+			}
+		}
+	}
+	else
+	{
+		var p = AscFonts.b64_decode;
+		while (index < srcLen)
+		{
+			var dwCurr = 0;
+			var i;
+			var nBits  = 0;
+			for (i = 0; i < 4; i++)
+			{
+				if (index >= srcLen)
+					break;
+				var nCh = p[szSrc.charCodeAt(index++)];
+				if (nCh == undefined)
+				{
+					i--;
+					continue;
+				}
+				dwCurr <<= 6;
+				dwCurr |= nCh;
+				nBits += 6;
+			}
 
-            dwCurr <<= 24-nBits;
-            for (i=0; i<nBits/8; i++)
-            {
-                dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
-                dwCurr <<= 8;
-            }
-        }
-    }
+			dwCurr <<= 24 - nBits;
+			for (i = 0; i < nBits / 8; i++)
+			{
+				dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+				dwCurr <<= 8;
+			}
+		}
+	}
 
-    return stream;
+	return stream;
 };
-CCollaborativeChanges.prototype.Internal_Save_Data = function(Class, Data, Binary)
+CCollaborativeChanges.prototype.private_SaveData = function(Binary)
 {
-    var Writer = AscCommon.History.BinaryWriter;
-    var Pos = Binary.Pos;
-    var Len = Binary.Len;
-
-    if ( "undefined" != typeof(Class.Save_Changes2) )
-    {
-        AscCommon.CollaborativeEditing.InitMemory();
-        var Writer2 = AscCommon.CollaborativeEditing.m_oMemory;
-        Writer2.Seek(0);
-        if ( true === Class.Save_Changes2( Data, Writer2 ) )
-            return Len + ";" + Writer.GetBase64Memory2(Pos, Len) + ";" + Writer2.GetCurPosition() + ";" + Writer2.GetBase64Memory();
-    }
-
-    return Len + ";" + Writer.GetBase64Memory2(Pos, Len);
+	var Writer = AscCommon.History.BinaryWriter;
+	var Pos    = Binary.Pos;
+	var Len    = Binary.Len;
+	return Len + ";" + Writer.GetBase64Memory2(Pos, Len);
 };
-
-
 
 
 function CCollaborativeEditingBase()
@@ -445,6 +421,9 @@ CCollaborativeEditingBase.prototype.Apply_OtherChanges = function()
     // Чтобы заново созданные параграфы не отображались залоченными
     AscCommon.g_oIdCounter.Set_Load( true );
 
+    if (this.m_aChanges.length > 0)
+    	this.private_CollectOwnChanges();
+
     // Применяем изменения, пока они есть
     var _count = this.m_aChanges.length;
     for (var i = 0; i < _count; i++)
@@ -461,7 +440,7 @@ CCollaborativeEditingBase.prototype.Apply_OtherChanges = function()
         //this.m_nErrorLog_PointChangesCount++;
     }
 
-    this.m_aChanges = [];
+    this.private_ClearChanges();
 
     // У новых элементов выставляем указатели на другие классы
     this.Apply_LinkData();
@@ -752,6 +731,20 @@ CCollaborativeEditingBase.prototype.InitMemory = function() {
         this.m_oMemory = new AscCommon.CMemory();
     }
 };
+//----------------------------------------------------------------------------------------------------------------------
+// Private area
+//----------------------------------------------------------------------------------------------------------------------
+	CCollaborativeEditingBase.prototype.private_ClearChanges = function()
+	{
+		this.m_aChanges = [];
+	};
+	CCollaborativeEditingBase.prototype.private_CollectOwnChanges = function()
+	{
+	};
+	CCollaborativeEditingBase.prototype.private_AddOverallChange = function(oChange)
+	{
+	    return true;
+	};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -903,7 +896,6 @@ CDocumentPositionsManager.prototype.Remove_DocumentPosition = function(DocPos)
         }
     }
 };
-
     //--------------------------------------------------------export----------------------------------------------------
     window['AscCommon'] = window['AscCommon'] || {};
     window['AscCommon'].FOREIGN_CURSOR_LABEL_HIDETIME = FOREIGN_CURSOR_LABEL_HIDETIME;

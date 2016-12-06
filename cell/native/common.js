@@ -78,6 +78,15 @@ var AscCommonWord = window["AscCommonWord"];
 window["AscCommonSlide"] = {};
 var AscCommonSlide = window["AscCommonSlide"];
 
+function ConvertJSC_Array(_array)
+{
+	var _len = _array.length;
+	var ret = new Uint8Array(_len);
+	for (var i = 0; i < _len; i++)
+		ret[i] = _array.getAt(i);
+	return ret;
+}
+
 function Image() {
     this.src = "";
     this.onload = function()
@@ -307,18 +316,8 @@ function setInterval(func, interval) {
     if (!window.NativeSupportTimeouts)
         return;
 
-   // console.log("setInterval");
-    
-//    var intervalFunc = function() {
-//
-//        console.log("intervalFunc");
-//
-//        func.call(null);
-//        setInterval(func, interval);
-//    }
-
     var id = window["native"]["GenerateTimeoutId"](interval);
-    window.NativeTimeoutObject["" + id] = {func: func, repeat: true, interval: interval}; // intervalFunc;
+    window.NativeTimeoutObject["" + id] = {func: func, repeat: true, interval: interval};
     
     return id;
 }
@@ -376,11 +375,6 @@ window["NativeCorrectImageUrlOnCopy"] = function(url) {
     return window["native"]["CorrectImageUrlOnCopy"](url);
 };
 
-window["use_native_fonts_only"] = true;
-
 var global_memory_stream_menu = CreateNativeMemoryStream();
-
-window['AscFonts'] = window['AscFonts'] || {};
-window['AscFonts'].FT_Common = FT_Common;
 
 window['SockJS'] = createSockJS();

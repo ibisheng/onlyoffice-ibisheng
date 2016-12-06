@@ -341,6 +341,12 @@
     }
   };
 
+  CDocsCoApi.prototype.versionHistory = function(data) {
+    if (this._CoAuthoringApi && this._onlineWork) {
+      this._CoAuthoringApi.versionHistory(data);
+    }
+  };
+
   CDocsCoApi.prototype.callback_OnAuthParticipantsChanged = function(e, count) {
     if (this.onAuthParticipantsChanged) {
       this.onAuthParticipantsChanged(e, count);
@@ -480,7 +486,7 @@
   };
 
   function LockBufferElement(arrayBlockId, callback) {
-    this._arrayBlockId = arrayBlockId;
+    this._arrayBlockId = arrayBlockId ? arrayBlockId.slice() : null;
     this._callback = callback;
   }
 
@@ -573,7 +579,8 @@
     this.mode = undefined;
     this.permissions = undefined;
     this.lang = undefined;
-    this.jwt = undefined;
+    this.jwtOpen = undefined;
+    this.jwtSession = undefined;
     this._isViewer = false;
     this._isReSaveAfterAuth = false;	// Флаг для сохранения после повторной авторизации (для разрыва соединения во время сохранения)
     this._lockBuffer = [];
@@ -600,7 +607,7 @@
   };
 
   DocsCoApi.prototype.get_jwt = function() {
-    return this.jwt;
+    return this.jwtSession || this.jwtOpen;
   };
 
   DocsCoApi.prototype.getSessionId = function() {
@@ -625,7 +632,7 @@
   };
 
   DocsCoApi.prototype.askLock = function(arrayBlockId, callback) {
-    if (ConnectionState.SaveChanges === this._state) {
+    if (ConnectionState.SaveChanges === this._state || ConnectionState.AskSaveChanges === this._state) {
       // Мы в режиме сохранения. Lock-и запросим после окончания.
       this._lockBuffer.push(new LockBufferElement(arrayBlockId, callback));
       return;
@@ -715,9 +722,13 @@
           t._saveCallback[indexCallback] = null;
           //Not signaled already
           oTmpCallback({error: "Timed out"});
+          t._state = ConnectionState.Authorized;
+          // Делаем отложенные lock-и
+          t._sendBufferedLocks();
         }
       }, this.errorTimeOut);
     }
+    this._state = ConnectionState.AskSaveChanges;
     this._send({"type": "isSaveLock"});
   };
 
@@ -806,6 +817,10 @@
     this._send({'type': 'extendSession', 'idletime': idleTime});
   };
 
+  DocsCoApi.prototype.versionHistory = function(data) {
+    this._send({'type': 'versionHistory', 'cmd': data});
+  };
+
   DocsCoApi.prototype.openDocument = function(data) {
     this._send({"type": "openDocument", "message": data});
   };
@@ -890,7 +905,8 @@
   DocsCoApi.prototype._onRefreshToken = function(jwt) {
     var t = this;
     if (jwt) {
-      t.jwt = jwt.token;
+      t.jwtOpen = undefined;
+      t.jwtSession = jwt.token;
       if (null !== t.jwtTimeOutId) {
         clearTimeout(t.jwtTimeOutId);
         t.jwtTimeOutId = null;
@@ -898,7 +914,7 @@
       var timeout = Math.max(0, jwt.expires - t.maxAttemptCount * t.reconnectInterval);
       t.jwtTimeOutId = setTimeout(function(){
         t.jwtTimeOutId = null;
-        t._send({'type': 'refreshToken', 'jwt': t.jwt});
+        t._send({'type': 'refreshToken', 'jwtSession': t.jwtSession});
       }, timeout);
     }
   };
@@ -1013,7 +1029,7 @@
   };
 
   DocsCoApi.prototype._onSaveLock = function(data) {
-    if (undefined != data["saveLock"] && null != data["saveLock"]) {
+    if (null != data["saveLock"]) {
       var indexCallback = this._saveCallback.length - 1;
       var oTmpCallback = this._saveCallback[indexCallback];
       if (oTmpCallback) {
@@ -1025,6 +1041,11 @@
 
         this._saveCallback[indexCallback] = null;
         oTmpCallback(data);
+        if (data['error']) {
+          this._state = ConnectionState.Authorized;
+			// Делаем отложенные lock-и
+			this._sendBufferedLocks();
+        }
       }
     }
   };
@@ -1295,7 +1316,7 @@
 	this.mode = docInfo.get_Mode();
 	this.permissions = docInfo.get_Permissions();
 	this.lang = docInfo.get_Lang();
-	this.jwt = docInfo.get_VKey();
+	this.jwtOpen = docInfo.get_Token();
 
     this.setDocId(docid);
     this._initSocksJs();
@@ -1348,7 +1369,8 @@
       'lang': this.lang,
       'mode': this.mode,
       'permissions': this.permissions,
-      'jwt': this.jwt,
+      'jwtOpen': this.jwtOpen,
+      'jwtSession': this.jwtSession,
       'version': asc_coAuthV
     });
   };
@@ -1486,20 +1508,22 @@
   };
 
   DocsCoApi.prototype._getDisconnectErrorCode = function(opt_closeCode) {
-    if(c_oCloseCode.serverShutdown === opt_closeCode) {
+    if (c_oCloseCode.serverShutdown === opt_closeCode) {
       return Asc.c_oAscError.ID.CoAuthoringDisconnect;
-    } else if(c_oCloseCode.sessionIdle === opt_closeCode) {
-      return Asc.c_oAscError.ID.CoAuthoringDisconnect;
-    } else if(c_oCloseCode.sessionAbsolute === opt_closeCode) {
-      return Asc.c_oAscError.ID.CoAuthoringDisconnect;
-    } else if(c_oCloseCode.accessDeny === opt_closeCode) {
-      return Asc.c_oAscError.ID.CoAuthoringDisconnect;
-    } else if(c_oCloseCode.jwtEmptySecret === opt_closeCode) {
-      return Asc.c_oAscError.ID.CoAuthoringDisconnect;
-    } else if(c_oCloseCode.jwtExpired === opt_closeCode) {
-      return Asc.c_oAscError.ID.CoAuthoringDisconnect;
-    } else if(c_oCloseCode.jwtError === opt_closeCode) {
-      return Asc.c_oAscError.ID.CoAuthoringDisconnect;
+    } else if (c_oCloseCode.sessionIdle === opt_closeCode) {
+      return Asc.c_oAscError.ID.SessionIdle;
+    } else if (c_oCloseCode.sessionAbsolute === opt_closeCode) {
+      return Asc.c_oAscError.ID.SessionAbsolute;
+    } else if (c_oCloseCode.accessDeny === opt_closeCode) {
+      return Asc.c_oAscError.ID.AccessDeny;
+    } else if (c_oCloseCode.jwtExpired === opt_closeCode) {
+      if (this.jwtSession) {
+        return Asc.c_oAscError.ID.SessionToken;
+      } else {
+        return Asc.c_oAscError.ID.KeyExpire;
+      }
+    } else if (c_oCloseCode.jwtError === opt_closeCode) {
+      return Asc.c_oAscError.ID.VKeyEncrypt;
     }
     return this.isCloseCoAuthoring ? Asc.c_oAscError.ID.UserDrop : Asc.c_oAscError.ID.CoAuthoringDisconnect;
   };

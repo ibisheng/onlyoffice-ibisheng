@@ -166,7 +166,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
             ( (this.pen && this.pen.Fill && this.pen.Fill.fill
                 && this.pen.Fill.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.pen.Fill.fill.type != c_oAscFill.FILL_TYPE_NONE)
                 || (this.brush && this.brush.fill && this.brush.fill
-                && this.brush.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.brush.fill.type != c_oAscFill.FILL_TYPE_NONE) )
+                && this.brush.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.brush.fill.type != c_oAscFill.FILL_TYPE_NONE) );
     }
 
 
@@ -620,13 +620,13 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
         this.cY = this.chartSizes.startY + this.chartSizes.h/2;
         this.geometry = new AscFormat.Geometry();
         var oPen = new AscFormat.CLn();
-        oPen.w = 50000;
-        oPen.Fill = AscFormat.CreateSolidFillRGBA(0xcc, 0xe5, 0xff, 255);
+        oPen.w = 15000;
+        oPen.Fill = AscFormat.CreateSolidFillRGBA(255, 255, 255, 255);
         this.objectToDraw = new OverlayObject(this.geometry, oChartSpace.extX, oChartSpace.extY, null, oPen, oChartSpace.transform );
 
         var oPen2 = new AscFormat.CLn();
-        oPen2.w = 12400;
-        oPen2.Fill = AscFormat.CreateSolidFillRGBA(0, 0, 0, 255);
+        oPen2.w = 15000;
+        oPen2.Fill = AscFormat.CreateSolidFillRGBA(0x61, 0x9e, 0xde, 255);
         oPen2.prstDash = 0;
         this.objectToDraw2 = new OverlayObject(this.geometry, oChartSpace.extX, oChartSpace.extY, null, oPen2, oChartSpace.transform );
 
@@ -753,7 +753,7 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
         while(this.view3D.rotY < 0){
             this.view3D.rotY += 360;
         }
-        while(this.view3D.rotY > 360){
+        while(this.view3D.rotY >= 360){
             this.view3D.rotY -= 360;
         }
 
@@ -763,8 +763,8 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
 
 		if(oChartSpace.chart.plotArea && oChartSpace.chart.plotArea.chart && oChartSpace.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart){
 			if(this.view3D.rotX < 0){
-            this.view3D.rotX = 0;
-        }
+                this.view3D.rotX = 0;
+            }
 		}
 		
         if(this.view3D.rotX < -90){
@@ -778,6 +778,11 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
         this.processor3D.angleOx = this.view3D && this.view3D.rotX ? (- this.view3D.rotX / 360) * (Math.PI * 2) : 0;
         this.processor3D.angleOy = this.view3D && this.view3D.rotY ? (- this.view3D.rotY / 360) * (Math.PI * 2) : 0;
         this.processor3D.angleOz = 0;
+
+      //  this.processor3D.view3D = this.view3D;
+    //    this.processor3D.calaculate3DProperties();
+        //this.processor3D.view3D = oChartSpace.chart.view3D;
+
         this.calculateGeometry();
     };
 

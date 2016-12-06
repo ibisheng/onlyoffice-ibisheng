@@ -727,13 +727,6 @@
         underlineSingleAccounting:  4
     };
     /** @enum */
-    var EVerticalAlignRun =
-    {
-        verticalalignrunBaseline: 0,
-        verticalalignrunSubscript: 1,
-        verticalalignrunSuperscript: 2
-    };
-    /** @enum */
     var ECellAnchorType =
     {
         cellanchorAbsolute:  0,
@@ -746,27 +739,6 @@
         visibleHidden:  0,
         visibleVeryHidden:  1,
         visibleVisible:  2
-    };
-    /** @enum */
-    var EHorizontalAlignment =
-    {
-        horizontalalignmentCenter:  0,
-        horizontalalignmentContinuous:  1,
-        horizontalalignmentDistributed:  2,
-        horizontalalignmentFill:  3,
-        horizontalalignmentGeneral:  4,
-        horizontalalignmentJustify:  5,
-        horizontalalignmentLeft:  6,
-        horizontalalignmentRight:  7
-    };
-    /** @enum */
-    var EVerticalAlignment =
-    {
-        verticalalignmentBottom:  0,
-        verticalalignmentCenter:  1,
-        verticalalignmentDistributed:  2,
-        verticalalignmentJustify:  3,
-        verticalalignmentTop:  4
     };
     /** @enum */
     var ECellTypeType =
@@ -1774,21 +1746,8 @@
                 var elem = this.oFontMap[i];
                 aFonts[elem.index] = elem.val;
             }
-            for(var i = 0, length = aFonts.length; i < length; ++i)
-            {
-                var font = aFonts[i];
-                var fontMinimized = font.getDif(g_oDefaultFormat.FontAbs);
-                if(null == fontMinimized)
-                    fontMinimized = new AscCommonExcel.Font();
-                if(null == fontMinimized.fn)
-                    fontMinimized.fn = g_oDefaultFormat.FontAbs.fn;
-                if(null == fontMinimized.scheme)
-                    fontMinimized.scheme = g_oDefaultFormat.FontAbs.scheme;
-                if(null == fontMinimized.fs)
-                    fontMinimized.fs = g_oDefaultFormat.FontAbs.fs;
-                if(null == fontMinimized.c)
-                    fontMinimized.c = g_oDefaultFormat.FontAbs.c;
-                this.bs.WriteItem(c_oSerStylesTypes.Font, function(){oThis.WriteFont(fontMinimized);});
+            for(var i = 0, length = aFonts.length; i < length; ++i) {
+                this.bs.WriteItem(c_oSerStylesTypes.Font, function(){oThis.WriteFont(aFonts[i]);});
             }
         };
         this.WriteFont = function(font)
@@ -1845,16 +1804,16 @@
             }
             if(null != font.va)
             {
-                var nVertAlign = EVerticalAlignRun.verticalalignrunBaseline;
-                switch(font.va)
-                {
-                    case "baseline": nVertAlign = EVerticalAlignRun.verticalalignrunBaseline;break;
-                    case "subscript": nVertAlign = EVerticalAlignRun.verticalalignrunSubscript;break;
-                    case "superscript": nVertAlign = EVerticalAlignRun.verticalalignrunSuperscript;break;
+                var va = font.va;
+                //server constants SubScript:1, SuperScript: 2
+                if (va === AscCommon.vertalign_SubScript) {
+                    va = AscCommon.vertalign_SuperScript;
+                } else if (va === AscCommon.vertalign_SuperScript) {
+                    va = AscCommon.vertalign_SubScript;
                 }
                 this.memory.WriteByte(c_oSerFontTypes.VertAlign);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
-                this.memory.WriteByte(nVertAlign);
+                this.memory.WriteByte(va);
             }
         };
         this.WriteNumFmts = function()
@@ -1988,18 +1947,16 @@
         {
             if(null != align.hor)
             {
-                var nHorizontalAlignment = EHorizontalAlignment.horizontalalignmentGeneral;
-                switch(align.hor)
-                {
-                    case "center" : nHorizontalAlignment = EHorizontalAlignment.horizontalalignmentCenter;break;
-                    case "justify" : nHorizontalAlignment = EHorizontalAlignment.horizontalalignmentJustify;break;
-                    case "none" : nHorizontalAlignment = EHorizontalAlignment.horizontalalignmentGeneral;break;
-                    case "left" : nHorizontalAlignment = EHorizontalAlignment.horizontalalignmentLeft;break;
-                    case "right" : nHorizontalAlignment = EHorizontalAlignment.horizontalalignmentRight;break;
+                var ha = 4;
+                switch (align.hor) {
+                    case AscCommon.align_Center :ha = 0;break;
+                    case AscCommon.align_Justify :ha = 5;break;
+                    case AscCommon.align_Left :ha = 6;break;
+                    case AscCommon.align_Right :ha = 7;break;
                 }
                 this.memory.WriteByte(c_oSerAligmentTypes.Horizontal);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
-                this.memory.WriteByte(nHorizontalAlignment);
+                this.memory.WriteByte(ha);
             }
             if(null != align.indent)
             {
@@ -2027,18 +1984,9 @@
             }
             if(null != align.ver)
             {
-                var nVerticalAlignment = EHorizontalAlignment.horizontalalignmentGeneral;
-                switch(align.ver)
-                {
-                    case "bottom" : nVerticalAlignment = EVerticalAlignment.verticalalignmentBottom;break;
-                    case "center" : nVerticalAlignment = EVerticalAlignment.verticalalignmentCenter;break;
-                    case "distributed" : nVerticalAlignment = EVerticalAlignment.verticalalignmentDistributed;break;
-                    case "justify" : nVerticalAlignment = EVerticalAlignment.verticalalignmentJustify;break;
-                    case "top" : nVerticalAlignment = EVerticalAlignment.verticalalignmentTop;break;
-                }
                 this.memory.WriteByte(c_oSerAligmentTypes.Vertical);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
-                this.memory.WriteByte(nVerticalAlignment);
+                this.memory.WriteByte(align.ver);
             }
             if(null != align.wrap)
             {
@@ -4466,12 +4414,12 @@
                 rPr.u = this.stream.GetUChar();
             else if ( c_oSerFontTypes.VertAlign == type )
             {
-                switch(this.stream.GetUChar())
-                {
-                    case EVerticalAlignRun.verticalalignrunBaseline: rPr.va = "baseline";break;
-                    case EVerticalAlignRun.verticalalignrunSubscript: rPr.va = "subscript";break;
-                    case EVerticalAlignRun.verticalalignrunSuperscript: rPr.va = "superscript";break;
-                    default: rPr.va = "baseline";break;
+                rPr.va = this.stream.GetUChar();
+                //server constants SubScript:1, SuperScript: 2
+                if (rPr.va === AscCommon.vertalign_SubScript) {
+                    rPr.va = AscCommon.vertalign_SuperScript;
+                } else if (rPr.va === AscCommon.vertalign_SuperScript) {
+                    rPr.va = AscCommon.vertalign_SubScript;
                 }
             }
             else if ( c_oSerFontTypes.Scheme == type )
@@ -4641,8 +4589,7 @@
                 }
 
                 if(0 == this.aCellXfs.length && !this.isCopyPaste)
-                    this.oStyleManager.init(oNewXfs);
-                this.minimizeXfs(oNewXfs);
+                    this.oStyleManager.init(oNewXfs, this.wb);
                 // При открытии стиль будет ссылкой
                 oNewXfs.isReference = true;
                 this.aCellXfs.push(oNewXfs);
@@ -4669,7 +4616,6 @@
                     var Dxf = Dxfs[elem.DxfId];
                     if(null != Dxf)
                     {
-                        this.minimizeXfs(Dxf);
                         var oTableStyleElement = new CTableStyleElement();
                         oTableStyleElement.dxf = Dxf;
                         if(null != elem.Size)
@@ -4708,19 +4654,6 @@
                     }
                 }
             }
-        };
-        this.minimizeXfs = function(xfs)
-        {
-            if(null != xfs.border && g_oDefaultFormat.Border.isEqual(xfs.border))
-                xfs.border = null;
-            if(null != xfs.fill && g_oDefaultFormat.Fill.isEqual(xfs.fill))
-                xfs.fill = null;
-            if(null != xfs.font && g_oDefaultFormat.Font.isEqual(xfs.font))
-                xfs.font = null;
-            if(null != xfs.num && g_oDefaultFormat.Num.isEqual(xfs.num))
-                xfs.num = null;
-            if(null != xfs.align && g_oDefaultFormat.AlignAbs.isEqual(xfs.align))
-                xfs.align = null;
         };
       this.ParseNum = function(oNum, oNumFmts) {
         var oRes = null;
@@ -4980,14 +4913,14 @@
             {
                 switch(this.stream.GetUChar())
                 {
-                    case EHorizontalAlignment.horizontalalignmentCenter : oAligment.hor = "center";break;
-                    case EHorizontalAlignment.horizontalalignmentContinuous : oAligment.hor = "center";break;
-                    case EHorizontalAlignment.horizontalalignmentDistributed : oAligment.hor = "justify";break;
-                    case EHorizontalAlignment.horizontalalignmentFill : oAligment.hor = "justify";break;
-                    case EHorizontalAlignment.horizontalalignmentGeneral : oAligment.hor = "none";break;
-                    case EHorizontalAlignment.horizontalalignmentJustify : oAligment.hor = "justify";break;
-                    case EHorizontalAlignment.horizontalalignmentLeft : oAligment.hor = "left";break;
-                    case EHorizontalAlignment.horizontalalignmentRight : oAligment.hor = "right";break;
+                    case 0 :
+                    case 1 : oAligment.hor = AscCommon.align_Center;break;
+                    case 2 :
+                    case 3 :
+                    case 5 : oAligment.hor = AscCommon.align_Justify;break;
+                    case 4 : oAligment.hor = null;break;
+                    case 6 : oAligment.hor = AscCommon.align_Left;break;
+                    case 7 : oAligment.hor = AscCommon.align_Right;break;
                 }
             }
             else if ( c_oSerAligmentTypes.Indent == type )
@@ -5000,13 +4933,10 @@
                 oAligment.angle = this.stream.GetULongLE();
             else if ( c_oSerAligmentTypes.Vertical == type )
             {
-                switch(this.stream.GetUChar())
-                {
-                    case EVerticalAlignment.verticalalignmentBottom : oAligment.ver = "bottom";break;
-                    case EVerticalAlignment.verticalalignmentCenter : oAligment.ver = "center";break;
-                    case EVerticalAlignment.verticalalignmentDistributed : oAligment.ver = "distributed";break;
-                    case EVerticalAlignment.verticalalignmentJustify : oAligment.ver = "justify";break;
-                    case EVerticalAlignment.verticalalignmentTop : oAligment.ver = "top";break;
+                oAligment.ver = this.stream.GetUChar();
+                if (Asc.c_oAscVAlign.Dist == oAligment.ver ||
+                    Asc.c_oAscVAlign.Just == oAligment.ver) {
+                    oAligment.ver = Asc.c_oAscVAlign.Center;
                 }
             }
             else if ( c_oSerAligmentTypes.WrapText == type )
@@ -5234,7 +5164,7 @@
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadTableCustomStyle(t,l, oNewStyle, aElements);
                 });
-                if(null != oNewStyle.name && aElements.length > 0) {
+                if(null != oNewStyle.name) {
                     if (null === oNewStyle.displayName)
                         oNewStyle.displayName = oNewStyle.name;
                     oCustomStyles[oNewStyle.name] = {style : oNewStyle, elements: aElements};
@@ -5646,7 +5576,7 @@
                 });
 			} else if (c_oSerWorksheetsTypes.SparklineGroups === type) {
                 res = this.bcr.Read1(length, function (t, l) {
-                    return oThis.ReadSparklineGroups(t, l, oWorksheet.aSparklineGroups);
+                    return oThis.ReadSparklineGroups(t, l, oWorksheet);
                 });
             } else
                 res = c_oSerConstants.ReadUnknown;
@@ -5706,6 +5636,9 @@
             else if ( c_oSerWorksheetColTypes.Width == type )
             {
                 oCol.width = this.stream.GetDoubleLE();
+				if (oCol.width < 0) {
+					oCol.width = 0;
+				}
                 if(AscCommon.CurFileVersion < 2)
                     oCol.CustomWidth = 1;
             }
@@ -6658,15 +6591,16 @@
 
             return res;
         };
-		this.ReadSparklineGroups = function (type, length, aSparklineGroups) {
+		this.ReadSparklineGroups = function (type, length, oWorksheet) {
             var oThis = this;
             var res = c_oSerConstants.ReadOk;
             if (c_oSer_Sparkline.SparklineGroup === type) {
 				var newSparklineGroup = new AscCommonExcel.sparklineGroup(true);
+                newSparklineGroup.setWorksheet(oWorksheet);
 				res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadSparklineGroup(t, l, newSparklineGroup);
                 });
-                aSparklineGroups.push(newSparklineGroup);
+                oWorksheet.aSparklineGroups.push(newSparklineGroup);
 			} else
                 res = c_oSerConstants.ReadUnknown;
             return res;
@@ -6866,7 +6800,7 @@
             });
             this.wb.clrSchemeMap = AscFormat.GenerateDefaultColorMap();
             if(null == this.wb.theme)
-                this.wb.theme = AscFormat.GenerateDefaultTheme(this.wb);
+                this.wb.theme = AscFormat.GenerateDefaultTheme(this.wb, 'Calibri');
 
             Asc.getBinaryOtherTableGVar(this.wb);
 
@@ -6983,31 +6917,23 @@
         };
     }
 
-    function getBinaryOtherTableGVar(workbook)
+    function getBinaryOtherTableGVar(wb)
     {
-        var wb = this.wb ? this.wb : workbook;
-
         AscCommonExcel.g_oColorManager.setTheme(wb.theme);
 
         var sMinorFont = null;
         if(null != wb.theme.themeElements && null != wb.theme.themeElements.fontScheme && null != wb.theme.themeElements.fontScheme.minorFont)
             sMinorFont = wb.theme.themeElements.fontScheme.minorFont.latin;
-        var sDefFont = "Arial";
+        var sDefFont = "Calibri";
         if(null != sMinorFont && "" != sMinorFont)
             sDefFont = sMinorFont;
-        g_oDefaultFormat.Font = g_oDefaultFormat.FontAbs = new AscCommonExcel.Font({
-            fn : sDefFont,
-            scheme : EFontScheme.fontschemeNone,
-            fs : 11,
-            b : false,
-            i : false,
-            u : EUnderline.underlineNone,
-            s : false,
-            c : AscCommonExcel.g_oColorManager.getThemeColor(AscCommonExcel.g_nColorTextDefault),
-            va : "baseline",
-            skip : false,
-            repeat : false
-        });
+        g_oDefaultFormat.Font = new AscCommonExcel.Font();
+		g_oDefaultFormat.Font.assignFromObject({
+		    fn: sDefFont,
+            scheme: EFontScheme.fontschemeMinor,
+			fs: 11,
+			c: AscCommonExcel.g_oColorManager.getThemeColor(AscCommonExcel.g_nColorTextDefault)
+		});
         g_oDefaultFormat.Fill = g_oDefaultFormat.FillAbs = new AscCommonExcel.Fill({bg : null});
         g_oDefaultFormat.Border = g_oDefaultFormat.BorderAbs = new AscCommonExcel.Border({
             l : new AscCommonExcel.BorderProp(),
@@ -7022,12 +6948,12 @@
         });
         g_oDefaultFormat.Num = g_oDefaultFormat.NumAbs = new AscCommonExcel.Num({f : "General"});
         g_oDefaultFormat.Align = g_oDefaultFormat.AlignAbs = new AscCommonExcel.Align({
-            hor : "none",
+            hor : null,
             indent : 0,
             RelativeIndent : 0,
             shrink : false,
             angle : 0,
-            ver : "bottom",
+            ver : Asc.c_oAscVAlign.Bottom,
             wrap : false
         });
     }
@@ -8204,11 +8130,8 @@
     window['AscCommonExcel'] = window['AscCommonExcel'] || {};
     window["Asc"].EBorderStyle = EBorderStyle;
     window["Asc"].EUnderline = EUnderline;
-    window["Asc"].EVerticalAlignRun = EVerticalAlignRun;
     window["Asc"].ECellAnchorType = ECellAnchorType;
     window["Asc"].EVisibleType = EVisibleType;
-    window["Asc"].EHorizontalAlignment = EHorizontalAlignment;
-    window["Asc"].EVerticalAlignment = EVerticalAlignment;
     window["Asc"].ECellTypeType = ECellTypeType;
     window["Asc"].ECellFormulaType = ECellFormulaType;
     window["Asc"].EPageOrientation = EPageOrientation;

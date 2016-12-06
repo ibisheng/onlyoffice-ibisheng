@@ -24032,9 +24032,8 @@ function Ins_SHPIX(exc, args, args_pos)
             }
             else
                 Move_Zp2_Point(exc, point, dx, dy, true);
-
-            exc.GS.loop--;
         }
+		exc.GS.loop--;
     }
 
     exc.GS.loop = 1;

@@ -117,7 +117,7 @@
 		this.TextArea_Not_ContentEditableDiv = true;//AscCommon.AscBrowser.isIeEdge ? false : true;
 		this.HtmlArea = null;
 
-		this.HtmlAreaOffset = 60;
+		this.HtmlAreaOffset = 40;
 
 		this.LockerTargetTimer = -1;
 
@@ -204,7 +204,7 @@
 
 			var _style = "left:0px;top:" + (-this.HtmlAreaOffset) + "px;";
 			_style += "background:transparent;border:none;position:absolute;text-shadow:0 0 0 #000;outline:none;color:transparent;width:1000px;height:50px;";
-			_style += "overflow:hidden;padding:0px;margin:0px;font-family:arial;font-size:12pt;resize:none;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;";
+			_style += "overflow:hidden;padding:0px;margin:0px;font-family:arial;font-size:10pt;resize:none;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;";
 			this.HtmlArea.setAttribute("style", _style);
 			this.HtmlArea.setAttribute("spellcheck", false);
 
@@ -394,6 +394,26 @@
 				// this.HtmlAreaOffset - не сдвигаем, курсор должен быть виден
 				this.debugCalculatePlace(xPos + this.FixedPosCheckElementX, yPos + this.FixedPosCheckElementY);
 			}
+		},
+
+		emulateKeyDownApi : function(code)
+		{
+			var _e = {
+				altKey : false,
+				ctrlKey : false,
+				shiftKey : false,
+				target : null,
+				charCode : 0,
+				which : 0,
+				keyCode : code,
+				code : "",
+
+				preventDefault : function() {},
+				stopPropagation : function() {}
+			};
+
+			this.Api.onKeyDown(_e);
+			this.Api.onKeyUp(_e);
 		},
 
 		putAreaValue : function(val)

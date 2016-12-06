@@ -144,6 +144,35 @@ function (window, undefined) {
 	window['AscCH'].historyitem_AutoFilter_ChangeColumnName = 16;
 	window['AscCH'].historyitem_AutoFilter_ChangeTotalRow = 17;
 
+	window['AscCH'].historyitem_Sparkline_Type = 1;
+	window['AscCH'].historyitem_Sparkline_LineWeight = 2;
+	window['AscCH'].historyitem_Sparkline_DisplayEmptyCellsAs = 3;
+	window['AscCH'].historyitem_Sparkline_Markers = 4;
+	window['AscCH'].historyitem_Sparkline_High = 5;
+	window['AscCH'].historyitem_Sparkline_Low = 6;
+	window['AscCH'].historyitem_Sparkline_First = 7;
+	window['AscCH'].historyitem_Sparkline_Last = 8;
+	window['AscCH'].historyitem_Sparkline_Negative = 9;
+	window['AscCH'].historyitem_Sparkline_DisplayXAxis = 10;
+	window['AscCH'].historyitem_Sparkline_DisplayHidden = 11;
+	window['AscCH'].historyitem_Sparkline_MinAxisType = 12;
+	window['AscCH'].historyitem_Sparkline_MaxAxisType = 13;
+	window['AscCH'].historyitem_Sparkline_RightToLeft = 14;
+	window['AscCH'].historyitem_Sparkline_ManualMax = 15;
+	window['AscCH'].historyitem_Sparkline_ManualMin = 16;
+	window['AscCH'].historyitem_Sparkline_DateAxis = 17;
+	window['AscCH'].historyitem_Sparkline_ColorSeries = 18;
+	window['AscCH'].historyitem_Sparkline_ColorNegative = 19;
+	window['AscCH'].historyitem_Sparkline_ColorAxis = 20;
+	window['AscCH'].historyitem_Sparkline_ColorMarkers = 21;
+	window['AscCH'].historyitem_Sparkline_ColorFirst = 22;
+	window['AscCH'].historyitem_Sparkline_colorLast = 23;
+	window['AscCH'].historyitem_Sparkline_ColorHigh = 24;
+	window['AscCH'].historyitem_Sparkline_ColorLow = 25;
+	window['AscCH'].historyitem_Sparkline_F = 26;
+	window['AscCH'].historyitem_Sparkline_ChangeData = 27;
+	window['AscCH'].historyitem_Sparkline_RemoveData = 28;
+	window['AscCH'].historyitem_Sparkline_RemoveSparkline = 29;
 
 function CHistory()
 {
@@ -223,10 +252,25 @@ CHistory.prototype.Undo = function()
 	for ( var Index = Point.Items.length - 1; Index >= 0; Index-- )
 	{
 		var Item = Point.Items[Index];
-		if(!Item.Class.Read_FromBinary2)
+
+
+
+		if(!Item.Class.Read_FromBinary2 && !Item.Class.IsChangesClass)
 			Item.Class.Undo( Item.Type, Item.Data, Item.SheetId );
 		else
-			Item.Class.Undo(Item.Data);
+		{
+            if (Item.Class && Item.Class.IsChangesClass && Item.Class.IsChangesClass())
+            {
+                Item.Class.Undo();
+                Item.Class.RefreshRecalcData();
+            }
+            else
+            {
+                Item.Class.Undo(Item.Type);
+                Item.Class.Refresh_RecalcData && Item.Class.Refresh_RecalcData(Item.Type);
+            }
+        }
+
 		this._addRedoObjectParam(oRedoObjectParam, Item);
 	}
 	this.UndoRedoEnd(Point, oRedoObjectParam, true);
@@ -272,26 +316,39 @@ CHistory.prototype.RedoAdd = function(oRedoObjectParam, Class, Type, sheetid, ra
 		this.TurnOff();
 
 	// ToDo Убрать это!!!
-	if(Class && !Class.Load_Changes)
+	if(Class && !Class.Load_Changes && !Class.Load)
 	{
 		Class.Redo( Type, Data, sheetid );
 	}
 	else
 	{
-		if(!Data.isDrawingCollaborativeData)
+		if(Class && Data && !Data.isDrawingCollaborativeData)
 			Class.Redo(Data);
 		else
 		{
+			if(!Class){
+				if(Data.isDrawingCollaborativeData){
 			Data.oBinaryReader.Seek2(Data.nPos);
-			if(!Class)
+                    var nReaderPos   = Data.oBinaryReader.GetCurPos();
+                    var nChangesType = Data.oBinaryReader.GetLong();
+
+                    var changedObject = AscCommon.g_oTableId.Get_ById(Data.sChangedObjectId);
+                    if(changedObject){
+
+                        var fChangesClass = AscDFH.changesFactory[nChangesType];
+                        if (fChangesClass)
 			{
-				Class = AscCommon.g_oTableId.Get_ById(Data.sChangedObjectId);
-				if(Class)
-					this.Add(Class, Type, sheetid, range, Data, LocalChange);
+                            var oChange = new fChangesClass(changedObject);
+                            oChange.ReadFromBinary(Data.oBinaryReader);
+                            oChange.Load(new CDocumentColor(255, 255, 255));
 			}
-			if(Class)
+                        else
 			{
-				Class.Load_Changes(Data.oBinaryReader, null, new CDocumentColor(255, 255, 255));
+                            Data.oBinaryReader.Seek2(nReaderPos);
+                            changedObject.Load_Changes(Data.oBinaryReader, null, new CDocumentColor(255, 255, 255));
+			}
+		}
+	}
 			}
 		}
 	}
@@ -311,12 +368,24 @@ CHistory.prototype.RedoExecute = function(Point, oRedoObjectParam)
 	for ( var Index = 0; Index < Point.Items.length; Index++ )
 	{
 		var Item = Point.Items[Index];
-		if(!Item.Class.Load_Changes)
+		if(!Item.Class.Read_FromBinary2 && !Item.Class.IsChangesClass)
 			Item.Class.Redo( Item.Type, Item.Data, Item.SheetId );
 		else
 		{
-			if(!Item.Data.isDrawingCollaborativeData)
-				Item.Class.Redo(Item.Data);
+			if(!Item.Data || !Item.Data.isDrawingCollaborativeData)
+			{
+                if (Item.Class && Item.Class.IsChangesClass && Item.Class.IsChangesClass())
+                {
+                    Item.Class.Redo();
+                    Item.Class.RefreshRecalcData();
+                }
+			else
+			{
+                    Item.Class.Redo(Item.Type);
+                    Item.Class.Refresh_RecalcData && Item.Class.Refresh_RecalcData(Item.Type);
+                }
+
+            }
 			else
 			{
 				Item.Data.oBinaryReader.Seek(Item.Data.nPos);
@@ -353,6 +422,10 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
         }
 	}
 
+	/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
+	this.workbook.unLockDraw();
+	this.workbook.buildRecalc();
+
 	if (null != Point) {
 		//синхронизация index и id worksheet
 		if (oRedoObjectParam.bUpdateWorksheetByModel)
@@ -375,13 +448,14 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 		    if (null !== nSheetId)
 		        this.workbook.handlers.trigger('showWorksheet', nSheetId);
 		}
+		//changeWorksheetUpdate before cleanCellCache to call _calcHeightRows
+		for (i in oRedoObjectParam.oChangeWorksheetUpdate)
+			this.workbook.handlers.trigger("changeWorksheetUpdate",
+				oRedoObjectParam.oChangeWorksheetUpdate[i],{lockDraw: true, reinitRanges: true});
 
 		for (i in Point.UpdateRigions)
 			this.workbook.handlers.trigger("cleanCellCache", i, {'0': Point.UpdateRigions[i]}, true, oRedoObjectParam.bAddRemoveRowCol);
 
-		for (i in oRedoObjectParam.oChangeWorksheetUpdate)
-			this.workbook.handlers.trigger("changeWorksheetUpdate",
-				oRedoObjectParam.oChangeWorksheetUpdate[i],{lockDraw: true, reinitRanges: true});
 		if (oRedoObjectParam.bOnSheetsChanged)
 			this.workbook.handlers.trigger("asc_onSheetsChanged");
 		for (i in oRedoObjectParam.oOnUpdateTabColor) {
@@ -516,8 +590,10 @@ CHistory.prototype.Get_RecalcData = function(Point2)
 				{
 					var Item = Point.Items[Index];
 
-					if ( /*true === Item.NeedRecalc*/ Item.Class && Item.Class.Refresh_RecalcData )
-						Item.Class.Refresh_RecalcData( Item.Data );
+					if (Item.Class && Item.Class.Refresh_RecalcData )
+						Item.Class.Refresh_RecalcData( Item.Type );
+					else if (Item.Class && Item.Class.RefreshRecalcData )
+                        Item.Class.RefreshRecalcData();
 					if(Item.Type === AscCH.historyitem_Workbook_ChangeColorScheme && Item.Class === AscCommonExcel.g_oUndoRedoWorkbook)
 					{
 						var wsViews = Asc["editor"].wb.wsViews;
@@ -662,10 +738,6 @@ CHistory.prototype.Add = function(Class, Type, sheetid, range, Data, LocalChange
 	var Item;
 	if ( this.RecIndex >= this.Index )
 		this.RecIndex = this.Index - 1;
-
-	// ToDo Убрать это!!!
-	if(Class && !Class.Save_Changes)
-	{
 		Item =
 		{
 			Class : Class,
@@ -675,19 +747,6 @@ CHistory.prototype.Add = function(Class, Type, sheetid, range, Data, LocalChange
 			Data  : Data,
 			LocalChange: this.LocalChange
 		};
-	}
-	else
-	{
-		Item =
-		{
-			Class : Class,
-			Type  : Type.Type,
-			SheetId : sheetid,
-			Range : null,
-			Data  : Type,
-			LocalChange: this.LocalChange
-		};
-	}
 	if(null != range)
 		Item.Range = range.clone();
 	if(null != LocalChange)

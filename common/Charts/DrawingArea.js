@@ -82,7 +82,7 @@ function FrozenPlace(ws, type) {
 		
 			case FrozenAreaType.Top: {
 				if (!_this.frozenCell.col && _this.frozenCell.row)
-					_this.range = new asc_Range(0, 0, _this.worksheet.getLastVisibleCol(), _this.frozenCell.row - 1);
+					_this.range = new asc_Range(_this.worksheet.getFirstVisibleCol(), 0, _this.worksheet.getLastVisibleCol(), _this.frozenCell.row - 1);
 				else
 					_this.isValid = false;
 			}

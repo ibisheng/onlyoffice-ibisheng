@@ -66,7 +66,6 @@ var g_oColorManager = null;
 		Num: null,
 		Border: null,
 		Align: null,
-		FontAbs: null,
 		FillAbs: null,
 		NumAbs: null,
 		BorderAbs: null,
@@ -220,20 +219,18 @@ var g_oThemeColorProperties = {
 	};
 function ThemeColor()
 {
-	this.Properties = g_oThemeColorProperties;
 	this.rgb = null;
 	this.theme = null;
 	this.tint = null;
 }
 ThemeColor.prototype =
 {
+	Properties: g_oThemeColorProperties,
 	clone : function()
 	{
-		var res = new ThemeColor();
-		res.rgb = this.rgb;
-		res.theme = this.theme;
-		res.tint = this.tint;
-		return res;
+		//ThemeColor must be created by g_oColorManager for correct rebuild
+		//no need getThemeColor because it return same object
+		return this;
 	},
 	getType : function()
 	{
@@ -252,7 +249,15 @@ ThemeColor.prototype =
 		case this.Properties.tint:return this.tint;break;
 		}
 	},
-
+	setProperty : function(nType, value)
+	{
+		switch(nType)
+		{
+		case this.Properties.rgb: this.rgb = value;break;
+		case this.Properties.theme: this.theme= value;break;
+		case this.Properties.tint: this.tint = value;break;
+		}
+	},
     isEqual: function(oColor)
     {
         if(!oColor){
@@ -266,16 +271,6 @@ ThemeColor.prototype =
         }
         return true;
     },
-
-	setProperty : function(nType, value)
-	{
-		switch(nType)
-		{
-		case this.Properties.rgb: this.rgb = value;break;
-		case this.Properties.theme: this.theme= value;break;
-		case this.Properties.tint: this.tint = value;break;
-		}
-	},
 	Write_ToBinary2 : function(oBinaryWriter)
 	{
 		oBinaryWriter.WriteByte(this.theme);
@@ -494,26 +489,7 @@ var g_oFontProperties = {
 	};
 
 	/** @constructor */
-	function Font(val) {
-		if (null == val) {
-			val = g_oDefaultFormat.FontAbs;
-		}
-		this.Properties = g_oFontProperties;
-		this.fn = val.fn;
-		this.scheme = val.scheme;
-		this.fs = val.fs;
-		this.b = val.b;
-		this.i = val.i;
-		this.u = val.u;
-		this.s = val.s;
-		this.c = val.c;
-		this.va = val.va;
-		//skip и repeat не сохраняются в файл нужны здесь только чтобы класс Font можно было использовать в комплексных строках
-		this.skip = val.skip;
-		this.repeat = val.repeat;
-	}
-
-	Font.prototype.clean = function () {
+	function Font() {
 		this.fn = null;
 		this.scheme = null;
 		this.fs = null;
@@ -525,33 +501,80 @@ var g_oFontProperties = {
 		this.va = null;
 		this.skip = null;
 		this.repeat = null;
+	}
+	Font.prototype.Properties = g_oFontProperties;
+	Font.prototype.assign = function(font) {
+		this.fn = font.fn;
+		this.scheme = font.scheme;
+		this.fs = font.fs;
+		this.b = font.b;
+		this.i = font.i;
+		this.u = font.u;
+		this.s = font.s;
+		this.c = font.c;
+		this.va = font.va;
+		this.skip = font.skip;
+		this.repeat = font.repeat;
 	};
-	Font.prototype._mergeProperty = function (first, second, def) {
-		if (def != first) {
-			return first;
-		} else {
-			return second;
+	Font.prototype.assignFromObject = function(font) {
+		if (null != font.fn) {
+			this.setName(font.fn);
+		}
+		if (null != font.scheme) {
+			this.setScheme(font.scheme);
+		}
+		if (null != font.fs) {
+			this.setSize(font.fs);
+		}
+		if (null != font.b) {
+			this.setBold(font.b);
+		}
+		if (null != font.i) {
+			this.setItalic(font.i);
+		}
+		if (null != font.u) {
+			this.setUnderline(font.u);
+		}
+		if (null != font.s) {
+			this.setStrikeout(font.s);
+		}
+		if (null != font.c) {
+			this.setColor(font.c);
+		}
+		if (null != font.va) {
+			this.setVerticalAlign(font.va);
+		}
+		if (null != font.skip) {
+			this.setSkip(font.skip);
+		}
+		if (null != font.repeat) {
+			this.setRepeat(font.repeat);
 		}
 	};
-	Font.prototype.merge = function (font) {
-		var defaultFontAbs = g_oDefaultFormat.FontAbs;
+	Font.prototype.merge = function (font, isTable) {
 		var oRes = new Font();
-		oRes.fn = this._mergeProperty(this.fn, font.fn, defaultFontAbs.fn);
-		oRes.scheme = this._mergeProperty(this.scheme, font.scheme, defaultFontAbs.scheme);
-		oRes.fs = this._mergeProperty(this.fs, font.fs, defaultFontAbs.fs);
-		oRes.b = this._mergeProperty(this.b, font.b, defaultFontAbs.b);
-		oRes.i = this._mergeProperty(this.i, font.i, defaultFontAbs.i);
-		oRes.u = this._mergeProperty(this.u, font.u, defaultFontAbs.u);
-		oRes.s = this._mergeProperty(this.s, font.s, defaultFontAbs.s);
-		//заглушка excel при merge стилей игнорирует default цвет
-		if (this.c instanceof ThemeColor && g_nColorTextDefault == this.c.theme && null == this.c.tint) {
-			oRes.c = this._mergeProperty(font.c, this.c, defaultFontAbs.c);
+		oRes.fn = this.fn || font.fn;
+		oRes.scheme = this.scheme || font.scheme;
+		oRes.fs = this.fs || font.fs;
+		if (isTable){
+			oRes.b = font.b;
+			oRes.i = font.i;
+			oRes.s = font.s;
 		} else {
-			oRes.c = this._mergeProperty(this.c, font.c, defaultFontAbs.c);
+			oRes.b = this.b || font.b;
+			oRes.i = this.i || font.i;
+			oRes.s = this.s || font.s;
 		}
-		oRes.va = this._mergeProperty(this.va, font.va, defaultFontAbs.va);
-		oRes.skip = this._mergeProperty(this.skip, font.skip, defaultFontAbs.skip);
-		oRes.repeat = this._mergeProperty(this.repeat, font.repeat, defaultFontAbs.repeat);
+		oRes.u = this.u || font.u;
+		//заглушка excel при merge стилей игнорирует default цвет
+		if (isTable && this.c && this.c.isEqual(g_oDefaultFormat.Font)) {
+			oRes.c = font.c || this.c;
+		} else {
+			oRes.c = this.c || font.c;
+		}
+		oRes.va = this.va || font.va;
+		oRes.skip = this.skip || font.skip;
+		oRes.repeat = this.repeat || font.repeat;
 		return oRes;
 	};
 	Font.prototype.getRgbOrNull = function () {
@@ -561,79 +584,18 @@ var g_oFontProperties = {
 		}
 		return nRes;
 	};
-	Font.prototype.getDif = function (val) {
-		var oRes = new Font(this);
-		var bEmpty = true;
-		if (this.fn == val.fn) {
-			oRes.fn = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.scheme == val.scheme) {
-			oRes.scheme = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.fs == val.fs) {
-			oRes.fs = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.b == val.b) {
-			oRes.b = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.i == val.i) {
-			oRes.i = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.u == val.u) {
-			oRes.u = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.s == val.s) {
-			oRes.s = null;
-		} else {
-			bEmpty = false;
-		}
-		if (g_oColorManager.isEqual(this.c, val.c)) {
-			oRes.c = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.va == val.va) {
-			oRes.va = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.skip == val.skip) {
-			oRes.skip = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.repeat == val.repeat) {
-			oRes.repeat = null;
-		} else {
-			bEmpty = false;
-		}
-		if (bEmpty) {
-			oRes = null;
-		}
-		return oRes;
-	};
 	Font.prototype.isEqual = function (font) {
 		var bRes = this.fs == font.fs && this.b == font.b && this.i == font.i && this.u == font.u && this.s == font.s &&
 			g_oColorManager.isEqual(this.c, font.c) && this.va == font.va && this.skip == font.skip &&
 			this.repeat == font.repeat;
 		if (bRes) {
-			if (Asc.EFontScheme.fontschemeNone == this.scheme && Asc.EFontScheme.fontschemeNone == font.scheme) {
+			var schemeThis = this.getScheme();
+			var schemeOther = font.getScheme();
+			if (Asc.EFontScheme.fontschemeNone == schemeThis && Asc.EFontScheme.fontschemeNone == schemeOther) {
 				bRes = this.fn == font.fn;
-			} else if (Asc.EFontScheme.fontschemeNone != this.scheme &&
-				Asc.EFontScheme.fontschemeNone != font.scheme) {
-				bRes = this.scheme == font.scheme;
+			} else if (Asc.EFontScheme.fontschemeNone != schemeThis &&
+				Asc.EFontScheme.fontschemeNone != schemeOther) {
+				bRes = schemeThis == schemeOther;
 			} else {
 				bRes = false;
 			}
@@ -641,43 +603,9 @@ var g_oFontProperties = {
 		return bRes;
 	};
 	Font.prototype.clone = function () {
-		return new Font(this);
-	};
-	Font.prototype.set = function (oVal) {
-		if (null != oVal.fn) {
-			this.fn = oVal.fn;
-			this.scheme = Asc.EFontScheme.fontschemeNone;
-		}
-		if (null != oVal.scheme) {
-			this.scheme = oVal.scheme;
-		}
-		if (null != oVal.fs) {
-			this.fs = oVal.fs;
-		}
-		if (null != oVal.b) {
-			this.b = oVal.b;
-		}
-		if (null != oVal.i) {
-			this.i = oVal.i;
-		}
-		if (null != oVal.u) {
-			this.u = oVal.u;
-		}
-		if (null != oVal.s) {
-			this.s = oVal.s;
-		}
-		if (null != oVal.c) {
-			this.c = oVal.c;
-		}
-		if (null != oVal.va) {
-			this.va = oVal.va;
-		}
-		if (null != oVal.skip) {
-			this.skip = oVal.skip;
-		}
-		if (null != oVal.repeat) {
-			this.repeat = oVal.repeat;
-		}
+		var font = new Font();
+		font.assign(this);
+		return font;
 	};
 	Font.prototype.intersect = function (oFont, oDefVal) {
 		if (this.fn != oFont.fn) {
@@ -713,6 +641,72 @@ var g_oFontProperties = {
 		if (this.repeat != oFont.repeat) {
 			this.repeat = oDefVal.repeat;
 		}
+	};
+	Font.prototype.getName = function () {
+		return this.fn || g_oDefaultFormat.Font.fn;
+	};
+	Font.prototype.setName = function (val) {
+		return this.fn = val;
+	};
+	Font.prototype.getScheme = function () {
+		return this.scheme || g_oDefaultFormat.Font.scheme;
+	};
+	Font.prototype.setScheme = function(val) {
+		return (null != val && Asc.EFontScheme.fontschemeNone != val) ? this.scheme = val : this.scheme = null;
+	};
+	Font.prototype.getSize = function () {
+		return this.fs || g_oDefaultFormat.Font.fs;
+	};
+	Font.prototype.setSize = function(val) {
+		return this.fs = val;
+	};
+	Font.prototype.getBold = function () {
+		return null != this.b ? this.b : (g_oDefaultFormat.Font.b || false);
+	};
+	Font.prototype.setBold = function(val) {
+		return val ? this.b = true : this.b = null;
+	};
+	Font.prototype.getItalic = function () {
+		return null != this.i ? this.i : (g_oDefaultFormat.Font.i || false);
+	};
+	Font.prototype.setItalic = function(val) {
+		return val ? this.i = true : this.i = null;
+	};
+	Font.prototype.getUnderline = function () {
+		return null != this.u ? this.u : (g_oDefaultFormat.Font.u || Asc.EUnderline.underlineNone);
+	};
+	Font.prototype.setUnderline = function(val) {
+		return (null != val && Asc.EUnderline.underlineNone != val) ? this.u = val : this.u = null;
+	};
+	Font.prototype.getStrikeout = function () {
+		return null != this.s ? this.s : (g_oDefaultFormat.Font.s || false);
+	};
+	Font.prototype.setStrikeout = function(val) {
+		return val ? this.s = true : this.s = null;
+	};
+	Font.prototype.getColor = function () {
+		return this.c || g_oDefaultFormat.Font.c;
+	};
+	Font.prototype.setColor = function(val) {
+		return this.c = val;
+	};
+	Font.prototype.getVerticalAlign = function () {
+		return null != this.va ? this.va : (g_oDefaultFormat.Font.va || AscCommon.vertalign_Baseline);
+	};
+	Font.prototype.setVerticalAlign = function(val) {
+		return (null != val && AscCommon.vertalign_Baseline != val) ? this.va = val : this.va = null;
+	};
+	Font.prototype.getSkip = function () {
+		return !!this.skip;
+	};
+	Font.prototype.setSkip = function(val) {
+		return val ? this.skip = true : this.skip = null;
+	};
+	Font.prototype.getRepeat = function () {
+		return !!this.repeat;
+	};
+	Font.prototype.setRepeat = function (val) {
+		return val ? this.repeat = true : this.repeat = null;
 	};
 	Font.prototype.getType = function () {
 		return UndoRedoDataTypes.StyleFont;
@@ -964,33 +958,32 @@ var g_oBorderProperties = {
 		dd: 7,
 		du: 8
 	};
-/** @constructor */
-function Border(val)
-{
-	if(null == val)
-		val = g_oDefaultFormat.BorderAbs;
-	this.Properties = g_oBorderProperties;
-	this.l = val.l.clone();
-	this.t = val.t.clone();
-	this.r = val.r.clone();
-	this.b = val.b.clone();
-	this.d = val.d.clone();
-	this.ih = val.ih.clone();
-	this.iv = val.iv.clone();
-	this.dd = val.dd;
-	this.du = val.du;
-}
-Border.prototype =
-{
-	_mergeProperty : function(first, second, def)
-	{
-		if((null != def.isEqual && false == def.isEqual(first)) || (null == def.isEqual && def != first))
+
+	/** @constructor */
+	function Border(val) {
+		if (null == val) {
+			val = g_oDefaultFormat.BorderAbs;
+		}
+		this.Properties = g_oBorderProperties;
+		this.l = val.l.clone();
+		this.t = val.t.clone();
+		this.r = val.r.clone();
+		this.b = val.b.clone();
+		this.d = val.d.clone();
+		this.ih = val.ih.clone();
+		this.iv = val.iv.clone();
+		this.dd = val.dd;
+		this.du = val.du;
+	}
+
+	Border.prototype._mergeProperty = function (first, second, def) {
+		if ((null != def.isEqual && false == def.isEqual(first)) || (null == def.isEqual && def != first)) {
 			return first;
-		else
+		} else {
 			return second;
-	},
-	merge : function(border)
-	{
+		}
+	};
+	Border.prototype.merge = function (border) {
 		var defaultBorder = g_oDefaultFormat.Border;
 		var oRes = new Border();
 		oRes.l = this._mergeProperty(this.l, border.l, defaultBorder.l).clone();
@@ -1003,60 +996,67 @@ Border.prototype =
 		oRes.dd = this._mergeProperty(this.dd, border.dd, defaultBorder.dd);
 		oRes.du = this._mergeProperty(this.du, border.du, defaultBorder.du);
 		return oRes;
-	},
-	getDif : function(val)
-	{
+	};
+	Border.prototype.getDif = function (val) {
 		var oRes = new Border(this);
 		var bEmpty = true;
-		if(true == this.l.isEqual(val.l))
-			oRes.l =  null;
-		else
+		if (true == this.l.isEqual(val.l)) {
+			oRes.l = null;
+		} else {
 			bEmpty = false;
-		if(true == this.t.isEqual(val.t))
-			oRes.t =  null;
-		else
+		}
+		if (true == this.t.isEqual(val.t)) {
+			oRes.t = null;
+		} else {
 			bEmpty = false;
-		if(true == this.r.isEqual(val.r))
-			oRes.r =  null;
-		else
+		}
+		if (true == this.r.isEqual(val.r)) {
+			oRes.r = null;
+		} else {
 			bEmpty = false;
-		if(true == this.b.isEqual(val.b))
-			oRes.b =  null;
-		else
+		}
+		if (true == this.b.isEqual(val.b)) {
+			oRes.b = null;
+		} else {
 			bEmpty = false;
-		if(true == this.d.isEqual(val.d))
-			oRes.d =  null;
-		if(true == this.ih.isEqual(val.ih))
-			oRes.ih =  null;
-		else
+		}
+		if (true == this.d.isEqual(val.d)) {
+			oRes.d = null;
+		}
+		if (true == this.ih.isEqual(val.ih)) {
+			oRes.ih = null;
+		} else {
 			bEmpty = false;
-		if(true == this.iv.isEqual(val.iv))
-			oRes.iv =  null;
-		else
+		}
+		if (true == this.iv.isEqual(val.iv)) {
+			oRes.iv = null;
+		} else {
 			bEmpty = false;
-		if(this.dd == val.dd)
-			oRes.dd =  null;
-		else
+		}
+		if (this.dd == val.dd) {
+			oRes.dd = null;
+		} else {
 			bEmpty = false;
-		if(this.du == val.du)
-			oRes.du =  null;
-		else
+		}
+		if (this.du == val.du) {
+			oRes.du = null;
+		} else {
 			bEmpty = false;
-		if(bEmpty)
+		}
+		if (bEmpty) {
 			oRes = null;
+		}
 		return oRes;
-	},
-	isEqual : function(val)
-	{
-		return this.l.isEqual(val.l) && this.t.isEqual(val.t) && this.r.isEqual(val.r) && this.b.isEqual(val.b) && this.d.isEqual(val.d) &&
-				this.ih.isEqual(val.ih) && this.iv.isEqual(val.iv) && this.dd == val.dd && this.du == val.du;
-	},
-    clone : function()
-    {
-        return new Border(this);
-    },
-	clean : function()
-	{
+	};
+	Border.prototype.isEqual = function (val) {
+		return this.l.isEqual(val.l) && this.t.isEqual(val.t) && this.r.isEqual(val.r) && this.b.isEqual(val.b) &&
+			this.d.isEqual(val.d) && this.ih.isEqual(val.ih) && this.iv.isEqual(val.iv) && this.dd == val.dd &&
+			this.du == val.du;
+	};
+	Border.prototype.clone = function () {
+		return new Border(this);
+	};
+	Border.prototype.clean = function () {
 		var defaultBorder = g_oDefaultFormat.Border;
 		this.l = defaultBorder.l.clone();
 		this.t = defaultBorder.t.clone();
@@ -1067,68 +1067,111 @@ Border.prototype =
 		this.iv = defaultBorder.iv.clone();
 		this.dd = defaultBorder.dd;
 		this.du = defaultBorder.du;
-	},
-    mergeInner : function(border){
-        if(border){
-            if(border.l)
+	};
+	Border.prototype.mergeInner = function (border) {
+		if (border) {
+			if (border.l) {
 				this.l.merge(border.l);
-            if(border.t)
-                this.t.merge(border.t);
-            if(border.r)
-                this.r.merge(border.r);
-            if(border.b)
-                this.b.merge(border.b);
-            if(border.d)
-                this.d.merge(border.d);
-            if(border.ih)
+			}
+			if (border.t) {
+				this.t.merge(border.t);
+			}
+			if (border.r) {
+				this.r.merge(border.r);
+			}
+			if (border.b) {
+				this.b.merge(border.b);
+			}
+			if (border.d) {
+				this.d.merge(border.d);
+			}
+			if (border.ih) {
 				this.ih.merge(border.ih);
-            if(border.iv)
-                this.iv.merge(border.iv);
-            if(null != border.dd)
-                this.dd = this.dd || border.dd;
-            if(null != border.du)
-                this.du = this.du || border.du;
-        }
-    },
-	getType : function()
-	{
+			}
+			if (border.iv) {
+				this.iv.merge(border.iv);
+			}
+			if (null != border.dd) {
+				this.dd = this.dd || border.dd;
+			}
+			if (null != border.du) {
+				this.du = this.du || border.du;
+			}
+		}
+	};
+	Border.prototype.getType = function () {
 		return UndoRedoDataTypes.StyleBorder;
-	},
-	getProperties : function()
-	{
+	};
+	Border.prototype.getProperties = function () {
 		return this.Properties;
-	},
-	getProperty : function(nType)
-	{
-		switch(nType)
-		{
-			case this.Properties.l: return this.l;break;
-			case this.Properties.t: return this.t;break;
-			case this.Properties.r: return this.r;break;
-			case this.Properties.b: return this.b;break;
-			case this.Properties.d: return this.d;break;
-			case this.Properties.ih: return this.ih;break;
-			case this.Properties.iv: return this.iv;break;
-			case this.Properties.dd: return this.dd;break;
-			case this.Properties.du: return this.du;break;
+	};
+	Border.prototype.getProperty = function (nType) {
+		switch (nType) {
+			case this.Properties.l:
+				return this.l;
+				break;
+			case this.Properties.t:
+				return this.t;
+				break;
+			case this.Properties.r:
+				return this.r;
+				break;
+			case this.Properties.b:
+				return this.b;
+				break;
+			case this.Properties.d:
+				return this.d;
+				break;
+			case this.Properties.ih:
+				return this.ih;
+				break;
+			case this.Properties.iv:
+				return this.iv;
+				break;
+			case this.Properties.dd:
+				return this.dd;
+				break;
+			case this.Properties.du:
+				return this.du;
+				break;
 		}
-	},
-	setProperty : function(nType, value)
-	{
-		switch(nType)
-		{
-			case this.Properties.l: this.l = value;break;
-			case this.Properties.t: this.t = value;break;
-			case this.Properties.r: this.r = value;break;
-			case this.Properties.b: this.b = value;break;
-			case this.Properties.d: this.d = value;break;
-			case this.Properties.ih: this.ih = value;break;
-			case this.Properties.iv: this.iv = value;break;
-			case this.Properties.dd: this.dd = value;break;
-			case this.Properties.du: this.du = value;break;
+	};
+	Border.prototype.setProperty = function (nType, value) {
+		switch (nType) {
+			case this.Properties.l:
+				this.l = value;
+				break;
+			case this.Properties.t:
+				this.t = value;
+				break;
+			case this.Properties.r:
+				this.r = value;
+				break;
+			case this.Properties.b:
+				this.b = value;
+				break;
+			case this.Properties.d:
+				this.d = value;
+				break;
+			case this.Properties.ih:
+				this.ih = value;
+				break;
+			case this.Properties.iv:
+				this.iv = value;
+				break;
+			case this.Properties.dd:
+				this.dd = value;
+				break;
+			case this.Properties.du:
+				this.du = value;
+				break;
 		}
-	}
-};
+	};
+	Border.prototype.notEmpty = function () {
+		return (this.l && c_oAscBorderStyles.None !== this.l.s) || (this.r && c_oAscBorderStyles.None !== this.r.s) ||
+			(this.t && c_oAscBorderStyles.None !== this.t.s) || (this.b && c_oAscBorderStyles.None !== this.b.s) ||
+			(this.dd && c_oAscBorderStyles.None !== this.dd.s) || (this.du && c_oAscBorderStyles.None !== this.du.s);
+	};
 var g_oNumProperties = {
 		f: 0
 	};
@@ -1159,13 +1202,13 @@ Num.prototype =
         }
         switch (this.id) {
           case 15:
-            res = 'd' + separator + 'mmm' + separator + 'yy';
+            res = AscCommon.getShortDateMonthFormat(true, true, separator, null);
             break;
           case 16:
-            res = 'd' + separator + 'mmm';
+            res = AscCommon.getShortDateMonthFormat(true, false, separator, null);
             break;
           case 17:
-            res = 'mmm' + separator + 'yy';
+            res = AscCommon.getShortDateMonthFormat(false, true, separator, null);
             break;
         }
       } else {
@@ -1183,7 +1226,7 @@ Num.prototype =
             res = AscCommonExcel.getCurrencyFormatSimple(null, true, true, true);
             break;
           case 22:
-            res = AscCommonExcel.getShortDateFormat(null) + " h:mm";
+            res = AscCommon.getShortDateFormat(null) + " h:mm";
             break;
           case 14:
           case 27:
@@ -1192,7 +1235,7 @@ Num.prototype =
           case 30:
           case 31:
           case 36:
-            res = AscCommonExcel.getShortDateFormat(null);
+            res = AscCommon.getShortDateFormat(null);
             break;
           case 37:
             res = AscCommonExcel.getCurrencyFormatSimple(null, false, false, false);
@@ -1315,7 +1358,7 @@ function CellXfs() {
 }
 CellXfs.prototype =
 {
-	_mergeProperty : function(first, second)
+	_mergeProperty : function(first, second, isTable)
 	{
 		var res = null;
 		if(null != first || null != second)
@@ -1327,19 +1370,19 @@ CellXfs.prototype =
 			else
 			{
 				if(null != first.merge)
-					res = first.merge(second);
+					res = first.merge(second, isTable);
 				else
 					res = first;
 			}
 		}
 		return res;
 	},
-	merge : function(xfs)
+	merge : function(xfs, isTable)
 	{
 		var oRes = new CellXfs();
 		oRes.border = this._mergeProperty(this.border, xfs.border);
 		oRes.fill = this._mergeProperty(this.fill, xfs.fill);
-		oRes.font = this._mergeProperty(this.font, xfs.font);
+		oRes.font = this._mergeProperty(this.font, xfs.font, isTable);
 		oRes.num = this._mergeProperty(this.num, xfs.num);
 		oRes.align = this._mergeProperty(this.align, xfs.align);
 		oRes.QuotePrefix = this._mergeProperty(this.QuotePrefix, xfs.QuotePrefix);
@@ -1558,8 +1601,8 @@ CCellStyles.prototype._generateFontMap = function (oFontMap, aStyles) {
 	var i, length, oStyle;
 	for (i = 0, length = aStyles.length; i < length; ++i) {
 		oStyle = aStyles[i];
-		if (null != oStyle.xfs && null != oStyle.xfs.font && null != oStyle.xfs.font.fn)
-			oFontMap[oStyle.xfs.font.fn] = 1;
+		if (null != oStyle.xfs && null != oStyle.xfs.font)
+			oFontMap[oStyle.xfs.font.getName()] = 1;
 	}
 };
 /**
@@ -1716,7 +1759,7 @@ CCellStyle.prototype.getFill = function () {
 };
 CCellStyle.prototype.getFontColor = function () {
 	if (null != this.xfs && null != this.xfs.font)
-		return this.xfs.font.c;
+		return this.xfs.font.getColor();
 
 	return g_oDefaultFormat.Font.c;
 };
@@ -1737,19 +1780,37 @@ CCellStyle.prototype.getNumFormatStr = function () {
 };
 /** @constructor */
 function StyleManager(){
-    //содержат все свойства по умолчанию
-	this.oDefaultFont = null;
-	this.oDefaultAlign = null;
-	this.oDefaultQuotePrefix = null;
-    //стиль ячейки по умолчанию, может содержать не все свойства
+	//стиль ячейки по умолчанию, может содержать не все свойства
 	this.oDefaultXfs = new CellXfs();
 }
 StyleManager.prototype =
 {
-    init : function(oDefaultXfs)
-    {
-		if(null != oDefaultXfs.font)
-			g_oDefaultFormat.Font = oDefaultXfs.font.clone();
+	init: function(oDefaultXfs, wb) {
+		//font
+		if (!oDefaultXfs.font) {
+			oDefaultXfs.font = new AscCommonExcel.Font();
+		}
+		if (!oDefaultXfs.font.scheme) {
+			oDefaultXfs.font.scheme = Asc.EFontScheme.fontschemeMinor;
+		}
+		if (!oDefaultXfs.font.fn) {
+			var sThemeFont = null;
+			if (null != wb.theme.themeElements && null != wb.theme.themeElements.fontScheme) {
+				if (Asc.EFontScheme.fontschemeMinor == oDefaultXfs.font.scheme && wb.theme.themeElements.fontScheme.minorFont) {
+					sThemeFont = wb.theme.themeElements.fontScheme.minorFont.latin;
+				} else if (Asc.EFontScheme.fontschemeMajor == oDefaultXfs.font.scheme && wb.theme.themeElements.fontScheme.majorFont) {
+					sThemeFont = wb.theme.themeElements.fontScheme.majorFont.latin;
+				}
+			}
+			oDefaultXfs.font.fn = sThemeFont ? sThemeFont : "Calibri";
+		}
+		if (!oDefaultXfs.font.fs) {
+			oDefaultXfs.font.fs = 11;
+		}
+		if (!oDefaultXfs.font.c) {
+			oDefaultXfs.font.c = AscCommonExcel.g_oColorManager.getThemeColor(AscCommonExcel.g_nColorTextDefault);
+		}
+		g_oDefaultFormat.Font = oDefaultXfs.font;
 		if(null != oDefaultXfs.fill)
 			g_oDefaultFormat.Fill = oDefaultXfs.fill.clone();
 		if(null != oDefaultXfs.border)
@@ -1873,23 +1934,18 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.fn;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.fn;
+			oRes.oldVal = null;
 		//todo undo для scheme
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font)
-			{
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.fn = g_oDefaultFormat.Font.fn;
-                xfs.font.scheme = Asc.EFontScheme.fontschemeNone;
+		var isSetNull = (null == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
 			}
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.fn = val;
-            xfs.font.scheme = Asc.EFontScheme.fontschemeNone;
-        }
+			xfs.font.setName(val);
+			xfs.font.setScheme(null);
+		}
 		return oRes;
 	},
 	setFontsize : function(oItemWithXfs, val)
@@ -1899,19 +1955,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.fs;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.fs;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.fs = g_oDefaultFormat.Font.fs;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.fs = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setSize(val);
+		}
 		return oRes;
 	},
 	setFontcolor : function(oItemWithXfs, val)
@@ -1922,18 +1975,15 @@ StyleManager.prototype =
             oRes.oldVal = xfs.font.c;
 		else
 			oRes.oldVal = g_oDefaultFormat.Font.c;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.c = g_oDefaultFormat.Font.c;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.c = val;
-        }
+		var isSetNull = (null == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setColor(val);
+		}
 		return oRes;
 	},
 	setBold : function(oItemWithXfs, val)
@@ -1943,19 +1993,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.b;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.b;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.b = g_oDefaultFormat.Font.b;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.b = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val || false == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setBold(val);
+		}
 		return oRes;
 	},
 	setItalic : function(oItemWithXfs, val)
@@ -1965,19 +2012,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.i;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.i;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.i = g_oDefaultFormat.Font.i;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.i = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val || false == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setItalic(val);
+		}
 		return oRes;
 	},
 	setUnderline : function(oItemWithXfs, val)
@@ -1987,19 +2031,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.u;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.u;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.u = g_oDefaultFormat.Font.u;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.u = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val || Asc.EUnderline.underlineNone == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setUnderline(val);
+		}
 		return oRes;
 	},
 	setStrikeout : function(oItemWithXfs, val)
@@ -2009,19 +2050,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.s;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.s;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.s = g_oDefaultFormat.Font.s;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.s = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val || false == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setStrikeout(val);
+		}
 		return oRes;
 	},
 	setFontAlign : function(oItemWithXfs, val)
@@ -2031,19 +2069,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.va;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.va;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.va = g_oDefaultFormat.Font.va;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.va = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val || AscCommon.vertalign_Baseline == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setVerticalAlign(val);
+		}
 		return oRes;
 	},
 	setAlignVertical : function(oItemWithXfs, val)
@@ -2642,6 +2677,7 @@ Col.prototype =
 var g_nRowFlag_empty = 0;
 var g_nRowFlag_hd = 1;
 var g_nRowFlag_CustomHeight = 2;
+var g_nRowFlag_CalcHeight = 4;
 /**
  * @constructor
  */
@@ -3103,7 +3139,7 @@ CCellValue.prototype =
 			var aText = this.aTextValue2[gc_nMaxDigCountView];
 			for(var i = 0, length = aText.length; i < length; ++i)
 			{
-				if(aText[i].format && aText[i].format.skip == false)
+				if(aText[i].format && aText[i].format.getSkip() == false)
 					this.textValue += aText[i].text;
 			}
 		}
@@ -3209,13 +3245,13 @@ CCellValue.prototype =
 					{
 						aRes = null;
 						sText = null;
+						var font = new AscCommonExcel.Font();
 						if (dDigitsCount > 1){
-						    var oNumFormatFont = new AscCommon.NumFormatFont();
-						    oNumFormatFont.repeat = true;
-						    aText = [{ text: "#", format: oNumFormatFont }];
+							font.setRepeat(true);
+							aText = [{ text: "#", format: font}];
 						}
 						else
-							aText = [{text: "", format: {}}];
+							aText = [{text: "", format: font}];
 					}
 				}
 			}
@@ -3237,9 +3273,9 @@ CCellValue.prototype =
 				{
 					aRes = null;
 					sText = null;
-					var oNumFormatFont = new AscCommon.NumFormatFont();
-					oNumFormatFont.repeat = true;
-					aText = [{ text: "#", format: oNumFormatFont }];
+					var font = new AscCommonExcel.Font();
+					font.setRepeat(true);
+					aText = [{ text: "#", format: font }];
 				}
 			}
 			if(null == aRes)
@@ -3308,17 +3344,7 @@ CCellValue.prototype =
 											    bTime = true;
 											var sDateFormat = "";
 											if (bDate) {
-											    for (var i = 0, length = cultureInfo.ShortDatePattern.length; i < length; i++) {
-											        var nIndex = cultureInfo.ShortDatePattern[i] - 0;
-											        if (0 != i)
-											            sDateFormat += "/";
-											        if (0 == nIndex)
-											            sDateFormat += "d";
-											        else if (1 == nIndex)
-											            sDateFormat += "m";
-											        else if (2 == nIndex)
-											            sDateFormat += "yyyy";
-											    }
+												sDateFormat = AscCommon.getShortDateFormat(cultureInfo);
 											}
                                             var sTimeFormat = 'h:mm:ss';
                                             if (cultureInfo.AMDesignator.length > 0 && cultureInfo.PMDesignator.length > 0){
@@ -3376,7 +3402,7 @@ CCellValue.prototype =
 			var oNewItem = new Fragment();
 			oNewItem.text = sText;
 			oNewItem.format = cellfont.clone();
-			color = oNewItem.format.c;
+			color = oNewItem.format.getColor();
 			if(color instanceof ThemeColor)
 			{
 				//для посещенных гиперссылок
@@ -3385,12 +3411,12 @@ CCellValue.prototype =
 					var hyperlink = cell.ws.hyperlinkManager.getByCell(cell.nRow, cell.nCol);
 					if(null != hyperlink && hyperlink.data.getVisited())
 					{
-						oNewItem.format.c = g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null);
+						oNewItem.format.setColor(g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null));
 					}
 				}
 			}
-			oNewItem.format.skip = false;
-			oNewItem.format.repeat = false;
+			oNewItem.format.setSkip(false);
+			oNewItem.format.setRepeat(false);
 			aResult.push(oNewItem);
 		} else if(null != aText){
 			for(var i = 0; i < aText.length; i++){
@@ -3400,11 +3426,11 @@ CCellValue.prototype =
 				{
 					oNewItem.text = oCurtext.text;
 					var oCurFormat = new Font();
-					oCurFormat.set(cellfont);
+					oCurFormat.assign(cellfont);
 					if(null != oCurtext.format)
-						oCurFormat.set(oCurtext.format);
+						oCurFormat.assignFromObject(oCurtext.format);
 					oNewItem.format = oCurFormat;
-					color = oNewItem.format.c;
+					color = oNewItem.format.getColor();
 					if(color instanceof ThemeColor)
 					{
 						//для посещенных гиперссылок
@@ -3413,7 +3439,7 @@ CCellValue.prototype =
 							var hyperlink = cell.ws.hyperlinkManager.getByCell(cell.nRow, cell.nCol);
 							if(null != hyperlink && hyperlink.data.getVisited())
 							{
-								oNewItem.format.c = g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null);
+								oNewItem.format.setColor(g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null));
 							}
 						}
 					}
@@ -3560,12 +3586,13 @@ CCellValue.prototype =
 					var item = aVal[i];
 					var oNewElem = new CCellValueMultiText();
 					oNewElem.text = item.text;
-					oNewElem.format = g_oDefaultFormat.Font.clone();
-					if(null != item.format)
-						oNewElem.format.set(item.format);
+					if (null != item.format) {
+						oNewElem.format = new Font();
+						oNewElem.format.assign(item.format);
+					}
 					this.multiText.push(oNewElem);
 				}
-				this.miminizeMultiText(cell, true);
+				this.minimizeMultiText(cell, true);
 			}
 			//обрабатываем QuotePrefix
 			if(null != this.text)
@@ -3607,16 +3634,13 @@ CCellValue.prototype =
 			oRes.push(this.multiText[i].clone());
 		return oRes;
 	},
-	miminizeMultiText : function(cell, bSetCellFont)
+	minimizeMultiText : function(cell, bSetCellFont)
 	{
 		var bRes = false;
-		if(null == bSetCellFont)
-			bSetCellFont = true;
 		if(null != this.multiText && this.multiText.length > 0)
 		{
-		    var range = cell.ws.getCell3(cell.nRow, cell.nCol);
-		    var cellFont = range.getFont();
-		    var oIntersectFont;
+		    var cellFont = cell.getFont();
+		    var oIntersectFont = null;
 		    for (var i = 0, length = this.multiText.length; i < length; i++) {
 		        var elem = this.multiText[i];
 			    if (null != elem.format) {
@@ -3625,11 +3649,11 @@ CCellValue.prototype =
 			        oIntersectFont.intersect(elem.format, cellFont);
 			    }
 			    else {
-			        oIntersectFont = cellFont.clone();
+			        oIntersectFont = cellFont;
 			        break;
 			    }
 			}
-				
+
 			if(bSetCellFont)
 			{
 			    if (oIntersectFont.isEqual(g_oDefaultFormat.Font))
@@ -3681,7 +3705,7 @@ CCellValue.prototype =
 				        fAction(elem.format)
 				}
 				//пробуем преобразовать в простую строку
-				if(this.miminizeMultiText(cell, false))
+				if(this.minimizeMultiText(cell, false))
 				{
 					var DataNew = cell.getValueData();
 					History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValue, cell.ws.getId(), new Asc.Range(cell.nCol, cell.nRow, cell.nCol, cell.nRow), new UndoRedoData_CellSimpleData(cell.nRow,cell.nCol, backupObj, DataNew));
@@ -3698,35 +3722,35 @@ CCellValue.prototype =
 	},
 	setFontname : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.fn;}, function(format){format.fn = val;});
+		return this._setFontProp(cell, function(format){return val != format.getName();}, function(format){format.setName(val);});
 	},
 	setFontsize : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.fs;}, function(format){format.fs = val;});
+		return this._setFontProp(cell, function(format){return val != format.getSize();}, function(format){format.setSize(val);});
 	},
 	setFontcolor : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.c;}, function(format){format.c = val;});
+		return this._setFontProp(cell, function(format){return val != format.getColor();}, function(format){format.setColor(val);});
 	},
 	setBold : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.b;}, function(format){format.b = val;});
+		return this._setFontProp(cell, function(format){return val != format.getBold();}, function(format){format.setBold(val);});
 	},
 	setItalic : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.i;}, function(format){format.i = val;});
+		return this._setFontProp(cell, function(format){return val != format.getItalic();}, function(format){format.setItalic(val);});
 	},
 	setUnderline : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.u;}, function(format){format.u = val;});
+		return this._setFontProp(cell, function(format){return val != format.getUnderline();}, function(format){format.setUnderline(val);});
 	},
 	setStrikeout : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.s;}, function(format){format.s = val;});
+		return this._setFontProp(cell, function(format){return val != format.getStrikeout();}, function(format){format.setStrikeout(val);});
 	},
 	setFontAlign : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.va;}, function(format){format.va = val;});
+		return this._setFontProp(cell, function(format){return val != format.getVerticalAlign();}, function(format){format.setVerticalAlign(val);});
 	},
 	setValueType : function(type)
 	{
@@ -4658,7 +4682,7 @@ CellArea.prototype = {
 		this.manualMax = null;
 		this.manualMin = null;
 
-		this.dateAxis = false;
+		this.dateAxis = null;
 
 		// elements
 		this.colorSeries = null;
@@ -4672,20 +4696,431 @@ CellArea.prototype = {
 
 		this.f = null;
 		this.arrSparklines = [];
-		this.arrCachedSparklines = [];
 
 		//for drawing preview
 		this.canvas = null;
-		this.sparklineView = null;
 
+		this.worksheet = null;
 		this.Id = null;
 		if (addId) {
 			this.Id = AscCommon.g_oIdCounter.Get_NewId();
 			AscCommon.g_oTableId.Add(this, this.Id);
 		}
 	}
+	sparklineGroup.prototype.getObjectType = function () {
+		return AscDFH.historyitem_type_Sparkline;
+	};
 	sparklineGroup.prototype.Get_Id = function () {
 		return this.Id;
+	};
+	sparklineGroup.prototype.Save_Changes = function (data, w) {
+		w.WriteLong(data.Type);
+		switch (data.Type) {
+			case AscCH.historyitem_Sparkline_Type:
+			case AscCH.historyitem_Sparkline_DisplayEmptyCellsAs:
+			case AscCH.historyitem_Sparkline_MinAxisType:
+			case AscCH.historyitem_Sparkline_MaxAxisType:
+				w.WriteLong(data.newPr);
+				break;
+			case AscCH.historyitem_Sparkline_LineWeight:
+				w.WriteDouble2(data.newPr);
+				break;
+			case AscCH.historyitem_Sparkline_Markers:
+			case AscCH.historyitem_Sparkline_High:
+			case AscCH.historyitem_Sparkline_Low:
+			case AscCH.historyitem_Sparkline_First:
+			case AscCH.historyitem_Sparkline_Last:
+			case AscCH.historyitem_Sparkline_Negative:
+			case AscCH.historyitem_Sparkline_DisplayXAxis:
+			case AscCH.historyitem_Sparkline_DisplayHidden:
+			case AscCH.historyitem_Sparkline_RightToLeft:
+			case AscCH.historyitem_Sparkline_DateAxis:
+				w.WriteBool(data.newPr);
+				break;
+			case AscCH.historyitem_Sparkline_ManualMax:
+			case AscCH.historyitem_Sparkline_ManualMin:
+				w.WriteBool(null !== data.newPr);
+				if (null !== data.newPr) {
+					w.WriteDouble2(data.newPr);
+				}
+				break;
+			case AscCH.historyitem_Sparkline_ColorSeries:
+			case AscCH.historyitem_Sparkline_ColorNegative:
+			case AscCH.historyitem_Sparkline_ColorAxis:
+			case AscCH.historyitem_Sparkline_ColorMarkers:
+			case AscCH.historyitem_Sparkline_ColorFirst:
+			case AscCH.historyitem_Sparkline_colorLast:
+			case AscCH.historyitem_Sparkline_ColorHigh:
+			case AscCH.historyitem_Sparkline_ColorLow:
+				w.WriteBool(null !== data.newPr);
+				if (null !== data.newPr) {
+					w.WriteLong(data.newPr.getType());
+					data.newPr.Write_ToBinary2(w);
+				}
+				break;
+			case AscCH.historyitem_Sparkline_F:
+				w.WriteBool(null !== data.newPr);
+				if (null !== data.newPr) {
+					w.WriteString2(data.newPr);
+				}
+				break;
+			case AscCH.historyitem_Sparkline_ChangeData:
+				if (data.newPr) {
+					w.WriteLong(data.newPr.length);
+					data.newPr.forEach(function (item) {
+						w.WriteLong(item.sqref.c1);
+						w.WriteLong(item.sqref.r1);
+						w.WriteString2(item.f);
+					});
+				}
+				break;
+			case AscCH.historyitem_Sparkline_RemoveData:
+				w.WriteLong(data.oldPr.sqref.c1);
+				w.WriteLong(data.oldPr.sqref.r1);
+				break;
+			case AscCH.historyitem_Sparkline_RemoveSparkline:
+				break;
+		}
+	};
+	sparklineGroup.prototype.Load_Changes = function (r) {
+		var readColor = function(r) {
+			var color = null;
+			if (r.GetBool()) {
+				switch (r.GetLong()) {
+					case UndoRedoDataTypes.RgbColor:
+						color = new RgbColor();
+						color.Read_FromBinary2(r);
+						break;
+					case UndoRedoDataTypes.ThemeColor:
+						color = new ThemeColor();
+						color = color.Read_FromBinary2AndReplace(r);
+						break;
+				}
+			}
+			return color;
+		};
+
+		var col, row;
+		var type = r.GetLong();
+		switch (type) {
+			case AscCH.historyitem_Sparkline_Type:
+				this.type = r.GetLong();
+				break;
+			case AscCH.historyitem_Sparkline_LineWeight:
+				this.lineWeight = r.GetDoubleLE();
+				break;
+			case AscCH.historyitem_Sparkline_DisplayEmptyCellsAs:
+				this.displayEmptyCellsAs = r.GetLong();
+				break;
+			case AscCH.historyitem_Sparkline_MinAxisType:
+				this.minAxisType = r.GetLong();
+				break;
+			case AscCH.historyitem_Sparkline_MaxAxisType:
+				this.lineWeight = r.GetLong();
+				break;
+			case AscCH.historyitem_Sparkline_Markers:
+				this.markers = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_High:
+				this.high = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_Low:
+				this.low = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_First:
+				this.first = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_Last:
+				this.last = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_Negative:
+				this.negative = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_DisplayXAxis:
+				this.displayXAxis = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_DisplayHidden:
+				this.displayHidden = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_RightToLeft:
+				this.rightToLeft = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_DateAxis:
+				this.dateAxis = r.GetBool();
+				break;
+			case AscCH.historyitem_Sparkline_ManualMax:
+				this.manualMax = r.GetBool() ? r.GetDoubleLE() : null;
+				break;
+			case AscCH.historyitem_Sparkline_ManualMin:
+				this.manualMin = r.GetBool() ? r.GetDoubleLE() : null;
+				break;
+			case AscCH.historyitem_Sparkline_ColorSeries:
+				this.colorSeries = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_ColorNegative:
+				this.colorNegative = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_ColorAxis:
+				this.colorAxis = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_ColorMarkers:
+				this.colorMarkers = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_ColorFirst:
+				this.colorFirst = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_colorLast:
+				this.colorLast = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_ColorHigh:
+				this.colorHigh = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_ColorLow:
+				this.colorLow = readColor(r);
+				break;
+			case AscCH.historyitem_Sparkline_F:
+				this.f = r.GetBool() ? r.GetString2() : null;
+				break;
+			case AscCH.historyitem_Sparkline_ChangeData:
+				this.arrSparklines = [];
+				var count = r.GetLong(), oSparkline;
+				for (var i = 0; i < count; ++i) {
+					oSparkline = new sparkline();
+					col = r.GetLong();
+					row = r.GetLong();
+					oSparkline.sqref = new Asc.Range(col, row, col, row);
+					oSparkline.setF(r.GetString2());
+					this.arrSparklines.push(oSparkline);
+				}
+				break;
+			case AscCH.historyitem_Sparkline_RemoveData:
+				col = r.GetLong();
+				row = r.GetLong();
+				this.remove(new Asc.Range(col, row, col, row));
+				break;
+			case AscCH.historyitem_Sparkline_RemoveSparkline:
+				if (this.worksheet) {
+					this.worksheet.removeSparklineGroup(this.Get_Id());
+				}
+				break;
+		}
+		this.cleanCache();
+	};
+	sparklineGroup.prototype.Write_ToBinary2 = function (w) {
+		w.WriteLong(this.getObjectType());
+		w.WriteString2(this.Id);
+		w.WriteString2(this.worksheet ? this.worksheet.getId() : '-1');
+	};
+	sparklineGroup.prototype.Read_FromBinary2 = function (r) {
+		this.Id = r.GetString2();
+
+		// ToDDo не самая лучшая схема добавления на лист...
+		var api_sheet = Asc['editor'];
+		this.worksheet = api_sheet.wbModel.getWorksheetById(r.GetString2());
+		if (this.worksheet) {
+			this.worksheet.insertSparklineGroup(this);
+		}
+	};
+	sparklineGroup.prototype.Undo = function (data) {
+		var t = this;
+		switch (data.Type) {
+			case AscCH.historyitem_Sparkline_Type:
+				this.type = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_LineWeight:
+				this.lineWeight = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_DisplayEmptyCellsAs:
+				this.displayEmptyCellsAs = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_Markers:
+				this.markers = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_High:
+				this.high = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_Low:
+				this.low = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_First:
+				this.first = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_Last:
+				this.last = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_Negative:
+				this.negative = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_DisplayXAxis:
+				this.displayXAxis = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_DisplayHidden:
+				this.displayHidden = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_MinAxisType:
+				this.minAxisType = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_MaxAxisType:
+				this.maxAxisType = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_RightToLeft:
+				this.rightToLeft = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ManualMax:
+				this.manualMax = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ManualMin:
+				this.manualMin = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_DateAxis:
+				this.dateAxis = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorSeries:
+				this.colorSeries = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorNegative:
+				this.colorNegative = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorAxis:
+				this.colorAxis = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorMarkers:
+				this.colorMarkers = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorFirst:
+				this.colorFirst = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_colorLast:
+				this.colorLast = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorHigh:
+				this.colorHigh = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorLow:
+				this.colorLow = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_F:
+				this.f = data.oldPr;
+				break;
+			case AscCH.historyitem_Sparkline_ChangeData:
+				this.arrSparklines = [];
+				if (data.oldPr) {
+					data.oldPr.forEach(function (item) {
+						t.arrSparklines.push(item.clone());
+					});
+				}
+				break;
+			case AscCH.historyitem_Sparkline_RemoveData:
+				this.arrSparklines.push(data.oldPr);
+				break;
+			case AscCH.historyitem_Sparkline_RemoveSparkline:
+				if (this.worksheet) {
+					this.worksheet.insertSparklineGroup(this);
+				}
+				break;
+		}
+
+		this.cleanCache();
+	};
+	sparklineGroup.prototype.Redo = function (data) {
+		var t = this;
+		switch (data.Type) {
+			case AscCH.historyitem_Sparkline_Type:
+				this.type = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_LineWeight:
+				this.lineWeight = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_DisplayEmptyCellsAs:
+				this.displayEmptyCellsAs = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_Markers:
+				this.markers = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_High:
+				this.high = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_Low:
+				this.low = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_First:
+				this.first = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_Last:
+				this.last = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_Negative:
+				this.negative = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_DisplayXAxis:
+				this.displayXAxis = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_DisplayHidden:
+				this.displayHidden = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_MinAxisType:
+				this.minAxisType = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_MaxAxisType:
+				this.maxAxisType = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_RightToLeft:
+				this.rightToLeft = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ManualMax:
+				this.manualMax = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ManualMin:
+				this.manualMin = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_DateAxis:
+				this.dateAxis = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorSeries:
+				this.colorSeries = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorNegative:
+				this.colorNegative = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorAxis:
+				this.colorAxis = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorMarkers:
+				this.colorMarkers = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorFirst:
+				this.colorFirst = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_colorLast:
+				this.colorLast = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorHigh:
+				this.colorHigh = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ColorLow:
+				this.colorLow = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_F:
+				this.f = data.newPr;
+				break;
+			case AscCH.historyitem_Sparkline_ChangeData:
+				this.arrSparklines = [];
+				if (data.newPr) {
+					data.newPr.forEach(function (item) {
+						t.arrSparklines.push(item.clone());
+					});
+				}
+				break;
+			case AscCH.historyitem_Sparkline_RemoveData:
+				this.remove(data.oldPr.sqref);
+				break;
+			case AscCH.historyitem_Sparkline_RemoveSparkline:
+				if (this.worksheet) {
+					this.worksheet.removeSparklineGroup(this.Get_Id());
+				}
+				break;
+		}
+		this.cleanCache();
 	};
 	sparklineGroup.prototype.default = function () {
 		this.type = Asc.c_oAscSparklineType.Line;
@@ -4704,107 +5139,111 @@ CellArea.prototype = {
 		this.rightToLeft = false;
 		this.manualMax = null;
 		this.manualMin = null;
+		this.dateAxis = false;
 
 		// elements
 		var defaultSeriesColor = 3629202;
 		var defaultOtherColor = 13631488;
 
-		this.colorSeries = new AscCommonExcel.RgbColor(defaultSeriesColor);
-		this.colorNegative = new AscCommonExcel.RgbColor(defaultOtherColor);
-		this.colorAxis = new AscCommonExcel.RgbColor(defaultOtherColor);
-		this.colorMarkers = new AscCommonExcel.RgbColor(defaultOtherColor);
-		this.colorFirst = new AscCommonExcel.RgbColor(defaultOtherColor);
-		this.colorLast = new AscCommonExcel.RgbColor(defaultOtherColor);
-		this.colorHigh = new AscCommonExcel.RgbColor(defaultOtherColor);
-		this.colorLow = new AscCommonExcel.RgbColor(defaultOtherColor);
+		this.colorSeries = new RgbColor(defaultSeriesColor);
+		this.colorNegative = new RgbColor(defaultOtherColor);
+		this.colorAxis = new RgbColor(defaultOtherColor);
+		this.colorMarkers = new RgbColor(defaultOtherColor);
+		this.colorFirst = new RgbColor(defaultOtherColor);
+		this.colorLast = new RgbColor(defaultOtherColor);
+		this.colorHigh = new RgbColor(defaultOtherColor);
+		this.colorLow = new RgbColor(defaultOtherColor);
+	};
+	sparklineGroup.prototype.setWorksheet = function (worksheet, oldWorksheet) {
+		this.worksheet = worksheet;
+		if (oldWorksheet) {
+			var oldSparklines = [];
+			var newSparklines = [];
+			for (var i = 0; i < this.arrSparklines.length; ++i) {
+				oldSparklines.push(this.arrSparklines[i].clone());
+				this.arrSparklines[i].updateWorksheet(worksheet.sName, oldWorksheet.sName);
+				newSparklines.push(this.arrSparklines[i].clone());
+			}
+			History.Add(this, {Type: AscCH.historyitem_Sparkline_ChangeData, oldPr: oldSparklines, newPr: newSparklines});
+		}
 	};
 	sparklineGroup.prototype.set = function (val) {
-		this.lineWeight = null !== val.lineWeight ? val.lineWeight : this.lineWeight;
-		this.type = null !== val.type ? val.type : this.type;
-		this.dateAxis = null !== val.dateAxis ? val.dateAxis : this.dateAxis;
-		this.displayEmptyCellsAs = null !== val.displayEmptyCellsAs ? val.displayEmptyCellsAs : this.displayEmptyCellsAs;
-		this.markers = null !== val.markers ? val.markers : this.markers;
-		this.high = null !== val.high ? val.high : this.high;
-		this.low = null !== val.low ? val.low : this.low;
-		this.first = null !== val.first ? val.first : this.first;
-		this.last = null !== val.last ? val.last : this.last;
-		this.negative = null !== val.negative ? val.negative : this.negative;
-		this.displayXAxis = null !== val.displayXAxis ? val.displayXAxis : this.displayXAxis;
-		this.displayHidden = null !== val.displayHidden ? val.displayHidden : this.displayHidden;
-		this.minAxisType = null !== val.minAxisType ? val.minAxisType : this.minAxisType;
-		this.maxAxisType = null !== val.maxAxisType ? val.maxAxisType : this.maxAxisType;
-		this.rightToLeft = null !== val.rightToLeft ? val.rightToLeft : this.rightToLeft;
-		this.manualMax = null !== val.manualMax ? val.manualMax : this.manualMax;
-		this.manualMin = null !== val.manualMin ? val.manualMin : this.manualMin;
-
-		var getColor = function (color) {
-			return color instanceof Asc.asc_CColor ? AscCommonExcel.CorrectAscColor(color) : color;
+		var t = this;
+		var checkProperty = function(propOld, propNew, type) {
+			if (null !== propNew && propOld !== propNew) {
+				History.Add(t, {Type: type, oldPr: propOld, newPr: propNew});
+				return propNew;
+			}
+			return propOld;
 		};
-		this.colorSeries = null !== val.colorSeries ? getColor(val.colorSeries) : this.colorSeries;
-		this.colorNegative = null !== val.colorNegative ? getColor(val.colorNegative) : this.colorNegative;
-		this.colorAxis = null !== val.colorAxis ? getColor(val.colorAxis) : this.colorAxis;
-		this.colorMarkers = null !== val.colorMarkers ? getColor(val.colorMarkers) : this.colorMarkers;
-		this.colorFirst = null !== val.colorFirst ? getColor(val.colorFirst) : this.colorFirst;
-		this.colorLast = null !== val.colorLast ? getColor(val.colorLast) : this.colorLast;
-		this.colorHigh = null !== val.colorHigh ? getColor(val.colorHigh) : this.colorHigh;
-		this.colorLow = null !== val.colorLow ? getColor(val.colorLow) : this.colorLow;
+		var getColor = function (color) {
+			return color instanceof Asc.asc_CColor ? CorrectAscColor(color) : color ? color.clone(): color;
+		};
+
+		this.type = checkProperty(this.type, val.type, AscCH.historyitem_Sparkline_Type);
+		this.lineWeight = checkProperty(this.lineWeight, val.lineWeight, AscCH.historyitem_Sparkline_LineWeight);
+		this.displayEmptyCellsAs = checkProperty(this.displayEmptyCellsAs, val.displayEmptyCellsAs, AscCH.historyitem_Sparkline_DisplayEmptyCellsAs);
+		this.markers = checkProperty(this.markers, val.markers, AscCH.historyitem_Sparkline_Markers);
+		this.high = checkProperty(this.high, val.high, AscCH.historyitem_Sparkline_High);
+		this.low = checkProperty(this.low, val.low, AscCH.historyitem_Sparkline_Low);
+		this.first = checkProperty(this.first, val.first, AscCH.historyitem_Sparkline_First);
+		this.last = checkProperty(this.last, val.last, AscCH.historyitem_Sparkline_Last);
+		this.negative = checkProperty(this.negative, val.negative, AscCH.historyitem_Sparkline_Negative);
+		this.displayXAxis = checkProperty(this.displayXAxis, val.displayXAxis, AscCH.historyitem_Sparkline_DisplayXAxis);
+		this.displayHidden = checkProperty(this.displayHidden, val.displayHidden, AscCH.historyitem_Sparkline_DisplayHidden);
+		this.minAxisType = checkProperty(this.minAxisType, val.minAxisType, AscCH.historyitem_Sparkline_MinAxisType);
+		this.maxAxisType = checkProperty(this.maxAxisType, val.maxAxisType, AscCH.historyitem_Sparkline_MaxAxisType);
+		this.rightToLeft = checkProperty(this.rightToLeft, val.rightToLeft, AscCH.historyitem_Sparkline_RightToLeft);
+		this.manualMax = checkProperty(this.manualMax, val.manualMax, AscCH.historyitem_Sparkline_ManualMax);
+		this.manualMin = checkProperty(this.manualMin, val.manualMin, AscCH.historyitem_Sparkline_ManualMin);
+		this.dateAxis = checkProperty(this.dateAxis, val.dateAxis, AscCH.historyitem_Sparkline_DateAxis);
+
+		this.colorSeries = checkProperty(this.colorSeries, getColor(val.colorSeries), AscCH.historyitem_Sparkline_ColorSeries);
+		this.colorNegative = checkProperty(this.colorNegative, getColor(val.colorNegative), AscCH.historyitem_Sparkline_ColorNegative);
+		this.colorAxis = checkProperty(this.colorAxis, getColor(val.colorAxis), AscCH.historyitem_Sparkline_ColorAxis);
+		this.colorMarkers = checkProperty(this.colorMarkers, getColor(val.colorMarkers), AscCH.historyitem_Sparkline_ColorMarkers);
+		this.colorFirst = checkProperty(this.colorFirst, getColor(val.colorFirst), AscCH.historyitem_Sparkline_ColorFirst);
+		this.colorLast = checkProperty(this.colorLast, getColor(val.colorLast), AscCH.historyitem_Sparkline_colorLast);
+		this.colorHigh = checkProperty(this.colorHigh, getColor(val.colorHigh), AscCH.historyitem_Sparkline_ColorHigh);
+		this.colorLow = checkProperty(this.colorLow, getColor(val.colorLow), AscCH.historyitem_Sparkline_ColorLow);
+
+		this.f = checkProperty(this.f, val.f, AscCH.historyitem_Sparkline_F);
 
 		this.cleanCache();
 	};
 	sparklineGroup.prototype.clone = function (onlyProps) {
 		var res = new sparklineGroup(!onlyProps);
-		res.Id = this.Id;
-		res.lineWeight = this.lineWeight;
-		res.type = this.type;
-		res.dateAxis = this.dateAxis;
-		res.displayEmptyCellsAs = this.displayEmptyCellsAs;
-		res.markers = this.markers;
-		res.high = this.high;
-		res.low = this.low;
-		res.first = this.first;
-		res.last = this.last;
-		res.negative = this.negative;
-		res.displayXAxis = this.displayXAxis;
-		res.displayHidden = this.displayHidden;
-		res.minAxisType = this.minAxisType;
-		res.maxAxisType = this.maxAxisType;
-		res.rightToLeft = this.rightToLeft;
-		res.manualMax = this.manualMax;
-		res.manualMin = this.manualMin;
-
-		res.colorSeries = this.colorSeries ? this.colorSeries.clone() : null;
-		res.colorNegative = this.colorNegative ? this.colorNegative.clone() : null;
-		res.colorAxis = this.colorAxis ? this.colorAxis.clone() : null;
-		res.colorMarkers = this.colorMarkers ? this.colorMarkers.clone() : null;
-		res.colorFirst = this.colorFirst ? this.colorFirst.clone() : null;
-		res.colorLast = this.colorLast ? this.colorLast.clone() : null;
-		res.colorHigh = this.colorHigh ? this.colorHigh.clone() : null;
-		res.colorLow = this.colorLow ? this.colorLow.clone() : null;
+		res.set(this);
 		res.f = this.f;
 
 		if (!onlyProps) {
+			var newSparklines = [];
 			for (var i = 0; i < this.arrSparklines.length; ++i) {
 				res.arrSparklines.push(this.arrSparklines[i].clone());
+				newSparklines.push(this.arrSparklines[i].clone());
 			}
+			History.Add(res, {Type: AscCH.historyitem_Sparkline_ChangeData, oldPr: null, newPr: newSparklines});
 		}
 
 		return res;
 	};
-	sparklineGroup.prototype.addView = function (oSparklineView, index) {
-		this.arrCachedSparklines[index] = oSparklineView;
-	};
 	sparklineGroup.prototype.draw = function (oDrawingContext) {
+		var oCacheView;
 		var graphics = new AscCommon.CGraphics();
 		graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
 			oDrawingContext.getWidth(3), oDrawingContext.getHeight(3));
 		graphics.m_oFontManager = AscCommon.g_fontManager;
-		for (var i = 0; i < this.arrCachedSparklines.length; ++i) {
-			this.arrCachedSparklines[i].draw(graphics);
+		for (var i = 0; i < this.arrSparklines.length; ++i) {
+			if (oCacheView = this.arrSparklines[i].oCacheView) {
+				oCacheView.draw(graphics);
+			}
 		}
 	};
 	sparklineGroup.prototype.cleanCache = function () {
 		// ToDo clean only colors (for color scheme)
-		this.arrCachedSparklines = [];
+		for (var i = 0; i < this.arrSparklines.length; ++i) {
+			this.arrSparklines[i].oCacheView = null;
+		}
 	};
 	sparklineGroup.prototype.updateCache = function (sheet, ranges) {
 		var sparklineRange;
@@ -4812,7 +5251,7 @@ CellArea.prototype = {
 			sparklineRange = this.arrSparklines[i]._f;
 			for (var j = 0; j < ranges.length; ++j) {
 				if (sparklineRange.isIntersect(ranges[j], sheet)) {
-					this.arrCachedSparklines[i] = null;
+					this.arrSparklines[i].oCacheView = null;
 					break;
 				}
 			}
@@ -4825,6 +5264,41 @@ CellArea.prototype = {
 			}
 		}
 		return -1;
+	};
+	sparklineGroup.prototype.intersectionSimple = function (range) {
+		for (var j = 0; j < this.arrSparklines.length; ++j) {
+			if (this.arrSparklines[j].intersectionSimple(range)) {
+				return j;
+			}
+		}
+		return -1;
+	};
+	sparklineGroup.prototype.remove = function (range) {
+		for (var i = 0; i < this.arrSparklines.length; ++i) {
+			if (this.arrSparklines[i].checkInRange(range)) {
+				History.Add(this, {Type: AscCH.historyitem_Sparkline_RemoveData, oldPr: this.arrSparklines[i], newPr: null});
+				this.arrSparklines.splice(i, 1);
+				--i;
+			}
+		}
+
+		var bRemove = 0 === this.arrSparklines.length;
+		if (bRemove) {
+			History.Add(this, {Type: AscCH.historyitem_Sparkline_RemoveSparkline, oldPr: this, newPr: null});
+		}
+		return bRemove;
+	};
+	sparklineGroup.prototype.getLocationRanges = function () {
+		var result = new AscCommonExcel.SelectionRange();
+		this.arrSparklines.forEach(function (item, i) {
+			if (0 === i) {
+				result.assign2(item.sqref);
+			} else {
+				result.addRange();
+				result.getLast().assign2(item.sqref);
+			}
+		});
+		return result.getUnion();
 	};
 	sparklineGroup.prototype.asc_getId = function () {
 		return this.Id;
@@ -4839,22 +5313,22 @@ CellArea.prototype = {
 		return null !== this.displayEmptyCellsAs ? this.displayEmptyCellsAs : Asc.c_oAscEDispBlanksAs.Zero;
 	};
 	sparklineGroup.prototype.asc_getMarkersPoint = function () {
-		return this.markers;
+		return !!this.markers;
 	};
 	sparklineGroup.prototype.asc_getHighPoint = function () {
-		return this.high;
+		return !!this.high;
 	};
 	sparklineGroup.prototype.asc_getLowPoint = function () {
-		return this.low;
+		return !!this.low;
 	};
 	sparklineGroup.prototype.asc_getFirstPoint = function () {
-		return this.first;
+		return !!this.first;
 	};
 	sparklineGroup.prototype.asc_getLastPoint = function () {
-		return this.last;
+		return !!this.last;
 	};
 	sparklineGroup.prototype.asc_getNegativePoint = function () {
-		return this.negative;
+		return !!this.negative;
 	};
 	sparklineGroup.prototype.asc_getDisplayXAxis = function () {
 		return this.displayXAxis;
@@ -4863,10 +5337,10 @@ CellArea.prototype = {
 		return this.displayHidden;
 	};
 	sparklineGroup.prototype.asc_getMinAxisType = function () {
-		return this.minAxisType;
+		return null !== this.minAxisType ? this.minAxisType : Asc.c_oAscSparklineAxisMinMax.Individual;
 	};
 	sparklineGroup.prototype.asc_getMaxAxisType = function () {
-		return this.maxAxisType;
+		return null !== this.maxAxisType ? this.minAxisType : Asc.c_oAscSparklineAxisMinMax.Individual;
 	};
 	sparklineGroup.prototype.asc_getRightToLeft = function () {
 		return this.rightToLeft;
@@ -4900,6 +5374,25 @@ CellArea.prototype = {
 	};
 	sparklineGroup.prototype.asc_getColorLow = function () {
 		return this.colorLow ? Asc.colorObjToAscColor(this.colorLow) : this.colorLow;
+	};
+	sparklineGroup.prototype.asc_getDataRanges = function () {
+		var oDataRange = new AscCommonExcel.SelectionRange();
+		var oLocationRange = new AscCommonExcel.SelectionRange();
+		//var bInit = false;
+		var arrResultData = [];
+		var arrResultLocation = [];
+		this.arrSparklines.forEach(function (item) {
+			/*if (bInit) {
+			} else {
+				bInit = true;
+				oDataRange.assign2(item.sqref);
+				oLocationRange.assign2();
+			}*/
+			arrResultData.push(item.f);
+			arrResultLocation.push(item.sqref.getAbsName());
+		});
+		return [arrResultData.join(AscCommon.FormulaSeparators.functionArgumentSeparator),
+			arrResultLocation.join(AscCommon.FormulaSeparators.functionArgumentSeparator)];
 	};
 	sparklineGroup.prototype.asc_setType = function (val) {
 		this.type = val;
@@ -4987,14 +5480,14 @@ CellArea.prototype = {
 		return oExcellColor;
 	};
 
-	sparklineGroup.prototype.generateCache = function () {
+	sparklineGroup.prototype._generateThumbCache = function () {
 		function createItem(value) {
 			return {numFormatStr: "General", isDateTimeFormat: false, val: value, isHidden: false};
 		}
 
-		switch (this.type) {
+		switch (this.asc_getType()) {
 			case Asc.c_oAscSparklineType.Line: {
-				return [createItem(128), createItem(56), createItem(175), createItem(0), createItem(248), createItem(184)];
+				return [createItem(4), createItem(-58), createItem(51), createItem(-124), createItem(124), createItem(60)];
 			}
 			case Asc.c_oAscSparklineType.Column: {
 				return [createItem(88), createItem(56), createItem(144), createItem(64), createItem(-56), createItem(-104),
@@ -5010,35 +5503,22 @@ CellArea.prototype = {
 		return [];
 	};
 
-	sparklineGroup.prototype.getThumbBySparklineGroup = function (oSparklineGroup) {
-		if (!this.canvas) {
-			this.canvas = document.createElement('canvas');
-			if (AscCommon.AscBrowser.isRetina) {
-				this.canvas.width = 100;
-				this.canvas.height = 100;
-			} else {
-				this.canvas.width = 50;
-				this.canvas.height = 50;
-			}
-		}
-		//	if(!this.sparklineView){
-		this.sparklineView = new AscFormat.CSparklineView();
-		var oSparkline = new sparkline();
-		oSparkline.oCache = this.generateCache();
-		this.sparklineView.initFromSparkline(oSparkline, oSparklineGroup, null, true);
+	sparklineGroup.prototype._drawThumbBySparklineGroup = function (oSparkline, oSparklineGroup, oSparklineView, oGraphics) {
+		oSparklineView.initFromSparkline(oSparkline, oSparklineGroup, null, true);
 		var api_sheet = Asc['editor'];
 
 		AscFormat.ExecuteNoHistory(function () {
-			this.sparklineView.chartSpace.setWorksheet(api_sheet.wb.getWorksheet().model);
+			oSparklineView.chartSpace.setWorksheet(api_sheet.wb.getWorksheet().model);
 		}, this, []);
 
-		this.sparklineView.chartSpace.extX = 100;
-		this.sparklineView.chartSpace.extY = 100;
-		this.sparklineView.chartSpace.x = 0;
-		this.sparklineView.chartSpace.y = 0;
-		if (oSparklineGroup.type === Asc.c_oAscSparklineType.Stacked) {
+		oSparklineView.chartSpace.extX = 100;
+		oSparklineView.chartSpace.extY = 100;
+		oSparklineView.chartSpace.x = 0;
+		oSparklineView.chartSpace.y = 0;
+		var type = oSparklineGroup.asc_getType();
+		if (type === Asc.c_oAscSparklineType.Stacked) {
 			AscFormat.ExecuteNoHistory(function () {
-				var oPlotArea = this.sparklineView.chartSpace.chart.plotArea;
+				var oPlotArea = oSparklineView.chartSpace.chart.plotArea;
 				if (!oPlotArea.layout) {
 					oPlotArea.setLayout(new AscFormat.CLayout());
 				}
@@ -5051,9 +5531,9 @@ CellArea.prototype = {
 				oPlotArea.layout.setY(fPos);
 			}, this, []);
 		}
-		if (oSparklineGroup.type === Asc.c_oAscSparklineType.Line) {
+		if (type === Asc.c_oAscSparklineType.Line) {
 			AscFormat.ExecuteNoHistory(function () {
-				var oPlotArea = this.sparklineView.chartSpace.chart.plotArea;
+				var oPlotArea = oSparklineView.chartSpace.chart.plotArea;
 				if (!oPlotArea.layout) {
 					oPlotArea.setLayout(new AscFormat.CLayout());
 				}
@@ -5065,68 +5545,58 @@ CellArea.prototype = {
 			}, this, []);
 		}
 		AscFormat.ExecuteNoHistory(function () {
-			AscFormat.CheckSpPrXfrm(this.sparklineView.chartSpace);
+			AscFormat.CheckSpPrXfrm(oSparklineView.chartSpace);
 		}, this, []);
-		this.sparklineView.chartSpace.recalculate();
-		this.sparklineView.chartSpace.brush = AscFormat.CreateSolidFillRGBA(0xFF, 0xFF, 0xFF, 0xFF);
-		//	}
+		oSparklineView.chartSpace.recalculate();
+		oSparklineView.chartSpace.brush = AscFormat.CreateSolidFillRGBA(0xFF, 0xFF, 0xFF, 0xFF);
 
-		var oGraphics = new AscCommon.CGraphics();
-		oGraphics.init(this.canvas.getContext('2d'), this.canvas.width, this.canvas.height,
-			this.sparklineView.chartSpace.extX, this.sparklineView.chartSpace.extY);
-		oGraphics.m_oFontManager = AscCommon.g_fontManager;
-		oGraphics.transform(1, 0, 0, 1, 0, 0);
-		this.sparklineView.chartSpace.draw(oGraphics);
-		return this.canvas.toDataURL("image/png");
+		oSparklineView.chartSpace.draw(oGraphics);
 	};
 
-	sparklineGroup.prototype.isEqualColors = function (oSparklineGroup) {
-		if (this.colorSeries && !this.colorSeries.isEqual(oSparklineGroup.colorSeries) ||
-			!this.colorSeries && oSparklineGroup.colorSeries) {
-			return false;
-		}
-		if (this.colorNegative && !this.colorNegative.isEqual(oSparklineGroup.colorNegative) ||
-			!this.colorNegative && oSparklineGroup.colorNegative) {
-			return false;
-		}
-		/*if(this.colorAxis && !this.colorAxis.isEqual(oSparklineGroup.colorAxis) || !this.colorAxis && oSparklineGroup.colorAxis){
-		 return false;
-		 }*/
-		if (this.colorMarkers && !this.colorMarkers.isEqual(oSparklineGroup.colorMarkers) ||
-			!this.colorMarkers && oSparklineGroup.colorMarkers) {
-			return false;
-		}
-		if (this.colorFirst && !this.colorFirst.isEqual(oSparklineGroup.colorFirst) ||
-			!this.colorFirst && oSparklineGroup.colorFirst) {
-			return false;
-		}
-		if (this.colorLast && !this.colorLast.isEqual(oSparklineGroup.colorLast) ||
-			!this.colorLast && oSparklineGroup.colorLast) {
-			return false;
-		}
-		if (this.colorHigh && !this.colorHigh.isEqual(oSparklineGroup.colorHigh) ||
-			!this.colorHigh && oSparklineGroup.colorHigh) {
-			return false;
-		}
-		if (this.colorLow && !this.colorLow.isEqual(oSparklineGroup.colorLow) ||
-			!this.colorLow && oSparklineGroup.colorLow) {
-			return false;
-		}
-		return true;
+	sparklineGroup.prototype._isEqualStyle = function (oSparklineGroup) {
+		var equalColors = function (color1, color2) {
+			return color1 ? color1.isEqual(color2) : color1 === color2;
+		};
+		return equalColors(this.colorSeries, oSparklineGroup.colorSeries) &&
+			equalColors(this.colorNegative, oSparklineGroup.colorNegative) &&
+			equalColors(this.colorMarkers, oSparklineGroup.colorMarkers) &&
+			equalColors(this.colorFirst, oSparklineGroup.colorFirst) &&
+			equalColors(this.colorLast, oSparklineGroup.colorLast) &&
+			equalColors(this.colorHigh, oSparklineGroup.colorHigh) && equalColors(this.colorLow, oSparklineGroup.colorLow);
 	};
 
 	sparklineGroup.prototype.asc_getStyles = function () {
+		History.TurnOff();
 		var aRet = [];
 		var nStyleIndex = -1;
 		var oSparklineGroup = this.clone(true);
+
+		var canvas = document.createElement('canvas');
+		canvas.width = 50;
+		canvas.height = 50;
+		if (AscCommon.AscBrowser.isRetina) {
+			canvas.width >>= 1;
+			canvas.height >>= 1;
+		}
+		var oSparklineView = new AscFormat.CSparklineView();
+		var oSparkline = new sparkline();
+		oSparkline.oCache = this._generateThumbCache();
+		var oGraphics = new AscCommon.CGraphics();
+		oGraphics.init(canvas.getContext('2d'), canvas.width, canvas.height, 100, 100);
+		oGraphics.m_oFontManager = AscCommon.g_fontManager;
+		oGraphics.transform(1, 0, 0, 1, 0, 0);
+
 		for (var i = 0; i < 36; ++i) {
 			oSparklineGroup.asc_setStyle(i);
-			if (nStyleIndex === -1 && this.isEqualColors(oSparklineGroup)) {
+			if (nStyleIndex === -1 && this._isEqualStyle(oSparklineGroup)) {
 				nStyleIndex = i;
 			}
-			aRet.push(this.getThumbBySparklineGroup(oSparklineGroup));
+
+			this._drawThumbBySparklineGroup(oSparkline, oSparklineGroup, oSparklineView, oGraphics);
+			aRet.push(canvas.toDataURL("image/png"));
 		}
 		aRet.push(nStyleIndex);
+		History.TurnOn();
 		return aRet;
 	};
 
@@ -5151,6 +5621,7 @@ CellArea.prototype = {
 
 		//for preview
 		this.oCache = null;
+		this.oCacheView = null;
 	}
 
 	sparkline.prototype.clone = function () {
@@ -5163,17 +5634,27 @@ CellArea.prototype = {
 		return res;
 	};
 	sparkline.prototype.setSqref = function (sqref) {
-		this.sqref = AscCommonExcel.g_oRangeCache.getAscRange(sqref);
+		this.sqref = AscCommonExcel.g_oRangeCache.getAscRange(sqref).clone();
+		this.sqref.setAbs(true, true, true. true);
 	};
 	sparkline.prototype.setF = function (f) {
 		this.f = f;
 		this._f = AscCommonExcel.g_oRangeCache.getRange3D(this.f);
+	};
+	sparkline.prototype.updateWorksheet = function (sheet, oldSheet) {
+		if (this._f && oldSheet === this._f.sheet && (null === this._f.sheet2 || oldSheet === this._f.sheet2)) {
+			this._f.setSheet(sheet);
+			this.f = this._f.getName();
+		}
 	};
 	sparkline.prototype.checkInRange = function (range) {
 		return this.sqref ? range.isIntersect(this.sqref) : false;
 	};
 	sparkline.prototype.contains = function (c, r) {
 		return this.sqref ? this.sqref.contains(c, r) : false;
+	};
+	sparkline.prototype.intersectionSimple = function (range) {
+		return this.sqref ? this.sqref.intersectionSimple(range) : false;
 	};
 
 // For Auto Filters
@@ -6854,7 +7335,7 @@ ColorFilter.prototype.isHideValue = function(cell) {
 			{
 				for(var j = 0; j < cell.oValue.multiText.length; j++)
 				{
-					var fontColor = cell.oValue.multiText[j].format ? cell.oValue.multiText[j].format.c : null;
+					var fontColor = cell.oValue.multiText[j].format ? cell.oValue.multiText[j].format.getColor() : null;
 					if(isEqualColors(filterColor,fontColor ))
 					{
 						res = false;
@@ -6864,7 +7345,7 @@ ColorFilter.prototype.isHideValue = function(cell) {
 			}
 			else
 			{
-				var fontColor =  cell.xfs && cell.xfs.font ? cell.xfs.font.c : null;
+				var fontColor =  cell.xfs && cell.xfs.font ? cell.xfs.font.getColor() : null;
 				if(isEqualColors(filterColor,fontColor))
 				{
 					res = false;
@@ -7159,25 +7640,6 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	this.dateTimeGrouping = oDateGroupItem.DateTimeGrouping;
 };
 
-function getShortDateFormat(opt_cultureInfo) {
-	var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
-	var dateElems = [];
-	for (var i = 0; i < cultureInfo.ShortDatePattern.length; ++i) {
-		switch (cultureInfo.ShortDatePattern[i]) {
-			case '0':
-				dateElems.push('d');
-				break;
-			case '1':
-				dateElems.push('m');
-				break;
-			case '2':
-				dateElems.push('yyyy');
-				break;
-		}
-	}
-	return dateElems.join('/');
-}
-
 function getCurrencyFormatSimple(opt_cultureInfo, opt_fraction, opt_currency, opt_red) {
   var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
   var numberFormat = opt_fraction ? '#,##0.00' : '#,##0';
@@ -7425,6 +7887,7 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].g_nRowFlag_empty = g_nRowFlag_empty;
 	window['AscCommonExcel'].g_nRowFlag_hd = g_nRowFlag_hd;
 	window['AscCommonExcel'].g_nRowFlag_CustomHeight = g_nRowFlag_CustomHeight;
+	window['AscCommonExcel'].g_nRowFlag_CalcHeight = g_nRowFlag_CalcHeight;
 	window['AscCommonExcel'].Row = Row;
 	window['AscCommonExcel'].CCellValueMultiText = CCellValueMultiText;
 	window['AscCommonExcel'].CCellValue = CCellValue;
@@ -7458,7 +7921,8 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	prot["asc_getColorLast"]			= prot.asc_getColorLast;
 	prot["asc_getColorHigh"]			= prot.asc_getColorHigh;
 	prot["asc_getColorLow"]				= prot.asc_getColorLow;
-	prot["asc_setType"]						= prot.asc_setType;
+	prot["asc_getDataRanges"]			= prot.asc_getDataRanges;
+	prot["asc_setType"]					= prot.asc_setType;
 	prot["asc_setLineWeight"]			= prot.asc_setLineWeight;
 	prot["asc_setDisplayEmpty"]		= prot.asc_setDisplayEmpty;
 	prot["asc_setMarkersPoint"]		= prot.asc_setMarkersPoint;
@@ -7496,7 +7960,6 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].DateGroupItem = DateGroupItem;
 	window['AscCommonExcel'].SortCondition = SortCondition;
 	window['AscCommonExcel'].AutoFilterDateElem = AutoFilterDateElem;
-	window['AscCommonExcel'].getShortDateFormat = getShortDateFormat;
   window['AscCommonExcel'].getCurrencyFormatSimple = getCurrencyFormatSimple;
   window['AscCommonExcel'].getCurrencyFormat = getCurrencyFormat;
 

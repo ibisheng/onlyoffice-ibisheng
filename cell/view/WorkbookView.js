@@ -174,6 +174,8 @@
 
     this.isCellEditMode = false;
 
+    this.isShowComments = true;
+
     this.formulasList = [];		// Список всех формул
     this.lastFormulaPos = -1; 		// Последняя позиция формулы
     this.lastFormulaNameLength = '';		// Последний кусок формулы
@@ -799,6 +801,17 @@
     this.handlers.add("asc_onLockDefNameManager", function(reason) {
       self.defNameAllowCreate = !(reason == Asc.c_oAscDefinedNameReason.LockDefNameManager);
     });
+    this.handlers.add('addComment', function (id, data) {
+      self._onWSSelectionChanged();
+      self.handlers.trigger('asc_onAddComment', id, data);
+    });
+    this.handlers.add('removeComment', function (id) {
+      self._onWSSelectionChanged();
+      self.handlers.trigger('asc_onRemoveComment', id);
+    });
+    this.handlers.add('hiddenComments', function () {
+      return !self.isShowComments;
+    });
 
     this.cellCommentator = new AscCommonExcel.CCellCommentator({
       model: new WorkbookCommentsModel(this.handlers, this.model.aComments),
@@ -1375,15 +1388,14 @@
 		  ws = this.getWorksheet(index);
      }
 
+	  ws.cleanSelection();
+
 	  for (var i in this.wsViews) {
 		  this.wsViews[i].setFormulaEditMode(false);
-	  }
-
-      ws.updateSelection();
-
-	  for (var i in this.wsViews) {
 		  this.wsViews[i].cleanFormulaRanges();
 	  }
+
+	  ws.updateSelectionWithSparklines();
 
     if (isCellEditMode) {
       this.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
@@ -1754,6 +1766,9 @@
     if (isRetina) {
       this.canvas.style.width = this.canvasOverlay.style.width = this.canvasGraphic.style.width = this.canvasGraphicOverlay.style.width = styleWidth + 'px';
       this.canvas.style.height = this.canvasOverlay.style.height = this.canvasGraphic.style.height = this.canvasGraphicOverlay.style.height = styleHeight + 'px';
+    } else {
+      this.canvas.style.width = this.canvasOverlay.style.width = this.canvasGraphic.style.width = this.canvasGraphicOverlay.style.width = width + 'px';
+      this.canvas.style.height = this.canvasOverlay.style.height = this.canvasGraphic.style.height = this.canvasGraphicOverlay.style.height = height + 'px';
     }
 
     // При смене ориентации у планшета, сбрасываются флаги у canvas!
@@ -2022,10 +2037,10 @@
     t.clipboard.checkCopyToClipboard(ws, _clipboard, _formats);
   };
 
-  WorkbookView.prototype.pasteData = function(_format, data1, data2) {
+  WorkbookView.prototype.pasteData = function(_format, data1, data2, text_data) {
     var t = this, ws;
     ws = t.getWorksheet();
-    t.clipboard.pasteData(ws, _format, data1, data2);
+    t.clipboard.pasteData(ws, _format, data1, data2, text_data);
   };
 
   WorkbookView.prototype.selectionCut = function() {
@@ -2215,7 +2230,7 @@
     }
 
     if (result) {
-      return ws.setSelection(result);
+      return ws.setSelectionUndoRedo(result);
     }
     this._cleanFindResults();
     return null;
@@ -2241,33 +2256,30 @@
     ws.replaceCellText(options, false, this.fReplaceCallback);
   };
   WorkbookView.prototype._replaceCellTextCallback = function(options) {
-    options.updateFindAll();
-    if (!options.scanOnOnlySheet && options.isReplaceAll) {
-      // Замена на всей книге
-      var i = ++options.sheetIndex;
-      if (this.model.getActive() === i) {
-        i = ++options.sheetIndex;
-      }
+    if (!options.error) {
+		options.updateFindAll();
+		if (!options.scanOnOnlySheet && options.isReplaceAll) {
+			// Замена на всей книге
+			var i = ++options.sheetIndex;
+			if (this.model.getActive() === i) {
+				i = ++options.sheetIndex;
+			}
 
-      if (i < this.model.getWorksheetCount()) {
-        var ws = this.getWorksheet(i);
-        ws.replaceCellText(options, true, this.fReplaceCallback);
-        return;
-      }
+			if (i < this.model.getWorksheetCount()) {
+				var ws = this.getWorksheet(i);
+				ws.replaceCellText(options, true, this.fReplaceCallback);
+				return;
+			}
+		}
+
+		this.handlers.trigger("asc_onRenameCellTextEnd", options.countFindAll, options.countReplaceAll);
     }
-
-    this.handlers.trigger("asc_onRenameCellTextEnd", options.countFindAll, options.countReplaceAll);
 
     History.EndTransaction();
     if (options.isReplaceAll) {
       // Заканчиваем медленную операцию
       this.Api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);
     }
-  };
-
-  // Поиск ячейки по ссылке
-  WorkbookView.prototype.findCell = function(reference) {
-    return this.getWorksheet().findCell(reference, this.controller.settings.isViewerMode);
   };
 
   WorkbookView.prototype.getDefinedNames = function(defNameListId) {
@@ -2385,7 +2397,7 @@
   // Печать
   WorkbookView.prototype.printSheets = function(pdf_writer, printPagesData) {
     var ws;
-    if (null === printPagesData.arrPages || 0 === printPagesData.arrPages.length) {
+    if (0 === printPagesData.arrPages.length) {
       // Печать пустой страницы
       ws = this.getWorksheet();
       ws.drawForPrint(pdf_writer, null);
@@ -2412,31 +2424,23 @@
     if (printType === Asc.c_oAscPrintType.ActiveSheets) {
       activeWs = wb.getActive();
       ws = this.getWorksheet(activeWs);
-      printPagesData.arrPages =
-        ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/false, /*indexWorksheet*/
-          activeWs);
+      ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, false, activeWs, printPagesData.arrPages);
     } else if (printType === Asc.c_oAscPrintType.EntireWorkbook) {
       // Колличество листов
       var countWorksheets = this.model.getWorksheetCount();
       for (var i = 0; i < countWorksheets; ++i) {
         ws = this.getWorksheet(i);
-        var arrPages = ws.calcPagesPrint(wb.getWorksheet(i).PagePrintOptions, /*printOnlySelection*/false,
-          /*indexWorksheet*/i);
-        if (null !== arrPages) {
-          if (null === printPagesData.arrPages) {
-            printPagesData.arrPages = [];
-          }
-          printPagesData.arrPages = printPagesData.arrPages.concat(arrPages);
-        }
+        ws.calcPagesPrint(wb.getWorksheet(i).PagePrintOptions, false, i, printPagesData.arrPages);
       }
     } else if (printType === Asc.c_oAscPrintType.Selection) {
       activeWs = wb.getActive();
       ws = this.getWorksheet(activeWs);
-      printPagesData.arrPages =
-        ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/true, /*indexWorksheet*/
-          activeWs);
+      ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, true, activeWs, printPagesData.arrPages);
     }
 
+    if (AscCommonExcel.c_kMaxPrintPages === printPagesData.arrPages.length) {
+      this.handlers.trigger("asc_onError", c_oAscError.ID.PrintMaxPagesCount, c_oAscError.Level.NoCritical);
+    }
     return printPagesData;
   };
 
@@ -2476,7 +2480,7 @@
 
   WorkbookView.prototype.reInit = function() {
     var ws = this.getWorksheet();
-    ws._initCellsArea(/*fullRecalc*/true);
+    ws._initCellsArea(AscCommonExcel.recalcType.full);
     ws._updateVisibleColsCount();
     ws._updateVisibleRowsCount();
   };
@@ -2514,12 +2518,18 @@
     this.isDocumentPlaceChangedEnabled = val;
   };
 
+  WorkbookView.prototype.showComments = function (val) {
+    if (this.isShowComments !== val) {
+      this.isShowComments = val;
+      this.drawWS();
+    }
+  };
+
   /*
    * @param {c_oAscRenderingModeType} mode Режим отрисовки
    * @param {Boolean} isInit инициализация или нет
    */
   WorkbookView.prototype.setFontRenderingMode = function(mode, isInit) {
-    var ws;
     if (mode !== this.fontRenderingMode) {
       this.fontRenderingMode = mode;
       if (c_oAscFontRenderingModeType.noHinting === mode) {
@@ -2531,8 +2541,7 @@
       }
 
       if (!isInit) {
-        ws = this.getWorksheet();
-        ws.draw();
+        this.drawWS();
         this.cellEditor.setFontRenderingMode(mode);
       }
     }
@@ -2588,7 +2597,7 @@
     this.buffers.main.setFont(this.defaultFont);
     // Измеряем в pt
     this.stringRender.measureString("0123456789", {
-      wrapText: false, shrinkToFit: false, isMerged: false, textAlign: /*khaLeft*/"left"
+      wrapText: false, shrinkToFit: false, isMerged: false, textAlign: /*khaLeft*/AscCommon.align_Left
     });
 
     var ppiX = 96; // Мерить только с 96
@@ -2957,30 +2966,30 @@
     if (!styleOptions || !styleOptions.wholeTable || !styleOptions.wholeTable.dxf.font) {
       defaultColor = blackColor;
     } else {
-      defaultColor = styleOptions.wholeTable.dxf.font.c;
+      defaultColor = styleOptions.wholeTable.dxf.font.getColor();
     }
     for (var n = 1; n < 6; n++) {
       ctx.beginPath();
       color = null;
       if (n == 1 && styleOptions && styleOptions.headerRow && styleOptions.headerRow.dxf.font) {
-        color = styleOptions.headerRow.dxf.font.c;
+        color = styleOptions.headerRow.dxf.font.getColor();
       } else if (n == 5 && styleOptions && styleOptions.totalRow && styleOptions.totalRow.dxf.font) {
-        color = styleOptions.totalRow.dxf.font.c;
+        color = styleOptions.totalRow.dxf.font.getColor();
       } else if (styleOptions && styleOptions.headerRow && styleInfo.ShowRowStripes) {
         if ((n == 2 || (n == 5 && !styleOptions.totalRow)) && styleOptions.firstRowStripe &&
           styleOptions.firstRowStripe.dxf.font) {
-          color = styleOptions.firstRowStripe.dxf.font.c;
+          color = styleOptions.firstRowStripe.dxf.font.getColor();
         } else if (n == 3 && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font) {
-          color = styleOptions.secondRowStripe.dxf.font.c;
+          color = styleOptions.secondRowStripe.dxf.font.getColor();
         } else {
           color = defaultColor
         }
       } else if (styleOptions && !styleOptions.headerRow && styleInfo.ShowRowStripes) {
         if ((n == 1 || n == 3 || (n == 5 && !styleOptions.totalRow)) && styleOptions.firstRowStripe &&
           styleOptions.firstRowStripe.dxf.font) {
-          color = styleOptions.firstRowStripe.dxf.font.c;
+          color = styleOptions.firstRowStripe.dxf.font.getColor();
         } else if ((n == 2 || n == 4) && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font) {
-          color = styleOptions.secondRowStripe.dxf.font.c;
+          color = styleOptions.secondRowStripe.dxf.font.getColor();
         } else {
           color = defaultColor
         }

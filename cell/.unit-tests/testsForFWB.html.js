@@ -384,4 +384,19 @@ $(function(){
 
     });
 
+	test(";;;", function test_empty() {
+		var numbers = [1, -1, 0, "q"];
+		var form = new CellFormat(";;;");
+		strictEqual(fGetFormatedText(form.format(1)), "", "format: ;;;, number: 1");
+		strictEqual(fGetFormatedText(form.format(-1)), "", "format: ;;;, number: -1");
+		strictEqual(fGetFormatedText(form.format(0)), "", "format: ;;;, number: 0");
+		strictEqual(fGetFormatedText(form.format("q")), "", "format: ;;;, number: q");
+		
+		var form = new CellFormat(";;");
+		strictEqual(fGetFormatedText(form.format(1)), "", "format: ;;, number: 1");
+		strictEqual(fGetFormatedText(form.format(-1)), "", "format: ;;, number: -1");
+		strictEqual(fGetFormatedText(form.format(0)), "", "format: ;;, number: 0");
+		strictEqual(fGetFormatedText(form.format("q")), "q", "format: ;;, number: q");
+	});
+
 });

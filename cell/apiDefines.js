@@ -49,17 +49,6 @@ var c_oAscConfirm = {
   ConfirmPutMergeRange: 1
 };
 
-var c_oAscAlignType = {
-  NONE: "none",
-  LEFT: "left",
-  CENTER: "center",
-  RIGHT: "right",
-  JUSTIFY: "justify",
-  TOP: "top",
-  MIDDLE: "center",
-  BOTTOM: "bottom"
-};
-
 var c_oAscMergeOptions = {
   Unmerge: 0,
   Merge: 1,
@@ -91,7 +80,9 @@ var c_oAscCleanOptions = {
   Format: 2,
   Formula: 4,
   Comments: 5,
-  Hyperlinks: 6
+  Hyperlinks: 6,
+  Sparklines: 7,
+  SparklineGroups: 8
 };
 
 var c_oAscDrawDepOptions = {
@@ -133,8 +124,6 @@ var c_oAscMouseMoveLockedObjectType = {
   TableProperties: 1,
   Sheet: 2
 };
-
-
 
 var c_oAscLockTypeElem = {
   Range: 1,
@@ -378,9 +367,10 @@ var c_oAscPopUpSelectorType = {
     Custom: 2
   };
 
+  var c_kMaxPrintPages = 1500;
+
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommonExcel'] = window['AscCommonExcel'] || {};
-  window['AscCommonExcel'].c_oAscAlignType = c_oAscAlignType;
   window['AscCommonExcel'].c_oAscDrawDepOptions = c_oAscDrawDepOptions;
   window['AscCommonExcel'].c_oAscGraphicOption = c_oAscGraphicOption;
   window['AscCommonExcel'].c_oAscLockTypeElem = c_oAscLockTypeElem;
@@ -400,6 +390,7 @@ var c_oAscPopUpSelectorType = {
   window['AscCommonExcel'].c_oAscLockNameFrozenPane = c_oAscLockNameFrozenPane;
   window['AscCommonExcel'].c_oAscLockNameTabColor = c_oAscLockNameTabColor;
   window['AscCommonExcel'].c_oAscLockAddSheet = c_oAscLockAddSheet;
+  window['AscCommonExcel'].c_kMaxPrintPages = c_kMaxPrintPages;
 
   window['AscCommon'] = window['AscCommon'] || {};
   window['AscCommon'].c_oSerFormat = c_oSerFormat;
@@ -441,6 +432,8 @@ var c_oAscPopUpSelectorType = {
   prot['Formula'] = prot.Formula;
   prot['Comments'] = prot.Comments;
   prot['Hyperlinks'] = prot.Hyperlinks;
+  prot['Sparklines'] = prot.Sparklines;
+  prot['SparklineGroups'] = prot.SparklineGroups;
   window['Asc']['c_oAscSelectionDialogType'] = window['Asc'].c_oAscSelectionDialogType = c_oAscSelectionDialogType;
   prot = c_oAscSelectionDialogType;
   prot['None'] = prot.None;
