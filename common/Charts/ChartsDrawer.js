@@ -8385,13 +8385,13 @@ drawPieChart.prototype =
 	
 	_reсalculatePie3DPerspective: function ()
     {
-		var numCache = this._getFirstRealNumCache();
-		var sumData = this.cChartDrawer._getSumArray(numCache, true);
-		
 		var left = this.chartProp.chartGutter._left;
 		var right = this.chartProp.chartGutter._right;
 		var top = this.chartProp.chartGutter._top;
 		var bottom = this.chartProp.chartGutter._bottom;
+		
+		var trueWidth = this.chartProp.trueWidth;
+		var trueHeight = this.chartProp.trueHeight;
 		
 		var widthCanvas = this.chartProp.widthCanvas;
 		var heightCanvas = this.chartProp.heightCanvas;
@@ -8399,9 +8399,7 @@ drawPieChart.prototype =
 		var height = heightCanvas - (top + bottom);
 		var width = widthCanvas - (left + right);
 
-		var angle = this.cChartDrawer.processor3D.angleOy;
 		var tempDepth = this.cChartDrawer.processor3D.depthPerspective;
-		
 		
 		var x1 = left, y1 = top + height, z1 = 0;
 		var x2 = left, y2 = top, z2 = 0;
@@ -8427,9 +8425,6 @@ drawPieChart.prototype =
 		var radius3D1 = (z6 - z2) / 2;
 		var radius3D2 = (z5 - z1) / 2;
 		
-		//var test1 = this.cChartDrawer._convertAndTurnPoint(x5, y5, z5);
-		//var test2 = this.cChartDrawer._convertAndTurnPoint(x5, y5, z5);
-		
 		var center3D1 = new Point3D(x2 + ((x3 - x2) / 2), y2, z2 + (radius3D1));
 		var center3D2 = new Point3D(x1 + ((x4 - x1) / 2), y1, z1 + (radius3D2));
 		
@@ -8442,9 +8437,6 @@ drawPieChart.prototype =
 		var test1 = this.cChartDrawer._convertAndTurnPoint(x2, y2, center3D1.z);
 		var test2 = this.cChartDrawer._convertAndTurnPoint(x3, y3, center3D1.z);
 		
-		
-		
-		
 		var test11 = this.cChartDrawer._convertAndTurnPoint(x4, y4, center3D2.z);
 		var test22 = this.cChartDrawer._convertAndTurnPoint(x1, y1, center3D2.z);
 		
@@ -8452,19 +8444,6 @@ drawPieChart.prototype =
 		var radius12 = Math.abs((point6.y - point2.y) / 2);
 		var radius21 = Math.abs((test22.x - test11.x) / 2);
 		var radius22 = Math.abs((point5.y - point1.y) / 2);
-		
-		var kF1 = radius11 / radius12;
-		var kF2 = radius11 / radius21;
-		var kF3 = radius11 / radius22;
-		
-		
-		var depth = point2.y - point1.y;
-		
-		var trueWidth = this.chartProp.trueWidth;
-		var trueHeight = this.chartProp.trueHeight;
-		
-		var xCenter1 = this.chartProp.chartGutter._left + trueWidth/2;
-		var yCenter1 = Math.abs(point6.y - point2.y) / 2 + point6.y;
 		
 		var center1 = {x: this.chartProp.chartGutter._left + trueWidth/2, y: -(point6.y - point2.y) / 2 + point6.y};
 		var center2 = {x: this.chartProp.chartGutter._left + trueWidth/2, y: -(point5.y - point1.y) / 2 + point5.y};
@@ -9000,9 +8979,6 @@ drawPieChart.prototype =
 		var calculateUpFace = function(startAng, swapAng)
 		{
 			var path = getNewPath();
-			
-			var endAng = startAng + swapAng;
-			
 			
 			var radiusSpec = (radiusUp1 * radiusUp2) /  Math.sqrt(Math.pow(radiusUp2, 2) * Math.pow((Math.cos(startAng)), 2) + Math.pow(radiusUp1, 2) * Math.pow(Math.sin(startAng),2));
 			
