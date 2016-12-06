@@ -423,8 +423,7 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 	}
 
 	/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
-	this.workbook.unLockDraw();
-	this.workbook.buildRecalc();
+	this.workbook.dependencyFormulas.unlockRecal();
 
 	if (null != Point) {
 		//синхронизация index и id worksheet
@@ -524,8 +523,6 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
         }
     }
 
-	/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
-	this.workbook.dependencyFormulas.unlockRecal();
 	if (oRedoObjectParam.bIsOn)
 		this.TurnOn();
 };
