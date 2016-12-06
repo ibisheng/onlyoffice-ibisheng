@@ -2526,13 +2526,9 @@
                 continue;
             }
 
-            // ToDo подумать, может стоит не брать ячейку из модели (а брать из кеш-а)
-            var c = this._getVisibleCell( col, row );
-            if ( !c ) {
-                continue;
-            }
-
-            var bg = c.getFill();
+			// ToDo подумать, может стоит не брать ячейку из модели (а брать из кеш-а)
+			var c = this._getVisibleCell(col, row);
+			var bg = c.getFill();
             var mc = null;
             var mwidth = 0, mheight = 0;
 
@@ -2563,21 +2559,17 @@
                 if ( bg === null ) {
                     if ( col === colEnd && col < this.cols.length - 1 && row < this.rows.length - 1 ) {
                         var c2 = this._getVisibleCell( col + 1, row );
-                        if ( c2 ) {
-                            var bg2 = c2.getFill();
-                            if ( bg2 !== null ) {
-                                ctx.setFillStyle( bg2 )
-                                    .fillRect( this.cols[col + 1].left - offsetX - this.width_1px, this.rows[row].top - offsetY - this.height_1px, this.width_1px, this.rows[row].height + this.height_1px );
-                            }
-                        }
+						var bg2 = c2.getFill();
+						if ( bg2 !== null ) {
+							ctx.setFillStyle( bg2 )
+								.fillRect( this.cols[col + 1].left - offsetX - this.width_1px, this.rows[row].top - offsetY - this.height_1px, this.width_1px, this.rows[row].height + this.height_1px );
+						}
                         var c3 = this._getVisibleCell( col, row + 1 );
-                        if ( c3 ) {
-                            var bg3 = c3.getFill();
-                            if ( bg3 !== null ) {
-                                ctx.setFillStyle( bg3 )
-                                    .fillRect( this.cols[col].left - offsetX - this.width_1px, this.rows[row + 1].top - offsetY - this.height_1px, this.cols[col].width + this.width_1px, this.height_1px );
-                            }
-                        }
+						var bg3 = c3.getFill();
+						if ( bg3 !== null ) {
+							ctx.setFillStyle( bg3 )
+								.fillRect( this.cols[col].left - offsetX - this.width_1px, this.rows[row + 1].top - offsetY - this.height_1px, this.cols[col].width + this.width_1px, this.height_1px );
+						}
                     }
                     continue;
                 }
