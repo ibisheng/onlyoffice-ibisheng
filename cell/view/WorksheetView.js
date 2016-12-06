@@ -6917,11 +6917,6 @@
 		var c1 = mc ? mc.c1 : cell.col;
 		var r1 = mc ? mc.r1 : cell.row;
 		var c = this._getVisibleCell(c1, r1);
-
-		if (c === undefined) {
-			asc_debug("log", "Unknown cell's info: col = " + c1 + ", row = " + r1);
-			return {};
-		}
 		var font = c.getFont();
 		var fa = font.getVerticalAlign();
 		var fc = font.getColor();
@@ -8674,14 +8669,12 @@
                         c = mc ? mc.c1 : activeCell.col;
                         r = mc ? mc.r1 : activeCell.row;
                         cell = t._getVisibleCell(c, r);
-                        if (undefined !== cell) {
-                            var oldFontSize = cell.getFont().getSize();
-                            var newFontSize = asc_incDecFonSize(val, oldFontSize);
-                            if (null !== newFontSize) {
-                                range.setFontsize(newFontSize);
-                                canChangeColWidth = c_oAscCanChangeColWidth.numbers;
-                            }
-                        }
+						var oldFontSize = cell.getFont().getSize();
+						var newFontSize = asc_incDecFonSize(val, oldFontSize);
+						if (null !== newFontSize) {
+							range.setFontsize(newFontSize);
+							canChangeColWidth = c_oAscCanChangeColWidth.numbers;
+						}
                         break;
                     case "style":
                         range.setCellStyle(val);
@@ -10603,24 +10596,19 @@
                   ++options.countReplace;
 
                   var c = t._getVisibleCell(cell.c1, cell.r1);
+				  var cellValue = c.getValueForEdit();
+				  cellValue = cellValue.replace(valueForSearching, options.replaceWith);
 
-                  if (c === undefined) {
-                      asc_debug("log", "Unknown cell's info: col = " + cell.c1 + ", row = " + cell.r1);
-                  } else {
-                      var cellValue = c.getValueForEdit();
-                      cellValue = cellValue.replace(valueForSearching, options.replaceWith);
+				  var oCellEdit = new asc_Range(cell.c1, cell.r1, cell.c1, cell.r1);
+				  var v, newValue;
+				  // get first fragment and change its text
+				  v = c.getValueForEdit2().slice(0, 1);
+				  // Создаем новый массив, т.к. getValueForEdit2 возвращает ссылку
+				  newValue = [];
+				  newValue[0] = new AscCommonExcel.Fragment({text: cellValue, format: v[0].format.clone()});
 
-                      var oCellEdit = new asc_Range(cell.c1, cell.r1, cell.c1, cell.r1);
-                      var v, newValue;
-                      // get first fragment and change its text
-                      v = c.getValueForEdit2().slice(0, 1);
-                      // Создаем новый массив, т.к. getValueForEdit2 возвращает ссылку
-                      newValue = [];
-                      newValue[0] = new AscCommonExcel.Fragment({text: cellValue, format: v[0].format.clone()});
-
-                      t._saveCellValueAfterEdit(oCellEdit, c, newValue, /*flags*/undefined, /*skipNLCheck*/false,
-                        /*isNotHistory*/true, /*lockDraw*/true);
-                  }
+				  t._saveCellValueAfterEdit(oCellEdit, c, newValue, /*flags*/undefined, /*skipNLCheck*/false,
+                      /*isNotHistory*/true, /*lockDraw*/true);
               }
 
               window.setTimeout(function () {
@@ -11036,11 +11024,6 @@
         var activeCell = selectionRange.activeCell;
         var c = t._getVisibleCell(activeCell.col, activeCell.row);
         var v, copyValue;
-
-        if (!c) {
-            throw "Can not get cell data (col=" + activeCell.col + ", row=" + activeCell.row + ")";
-        }
-
         // get first fragment and change its text
         v = c.getValueForEdit2().slice(0, 1);
         // Создаем новый массив, т.к. getValueForEdit2 возвращает ссылку
