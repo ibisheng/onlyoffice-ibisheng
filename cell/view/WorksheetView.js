@@ -10599,8 +10599,12 @@
 				  newValue = [];
 				  newValue[0] = new AscCommonExcel.Fragment({text: cellValue, format: v[0].format.clone()});
 
-				  t._saveCellValueAfterEdit(oCellEdit, c, newValue, /*flags*/undefined, /*skipNLCheck*/false,
-                      /*isNotHistory*/true, /*lockDraw*/true);
+				  if (!t._saveCellValueAfterEdit(oCellEdit, c, newValue, /*flags*/undefined, /*skipNLCheck*/false,
+                      /*isNotHistory*/true, /*lockDraw*/true)) {
+					  options.error = true;
+					  t.draw(lockDraw);
+					  return callback(options);
+                  }
               }
 
               window.setTimeout(function () {

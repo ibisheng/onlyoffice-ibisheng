@@ -1881,6 +1881,7 @@
 			this.countFindAll = 0;
 			this.countReplaceAll = 0;
 			this.sheetIndex = -1;
+			this.error = false;
 		}
 		asc_CFindOptions.prototype.clone = function () {
 			var result = new asc_CFindOptions();
@@ -1902,6 +1903,7 @@
 			result.countFindAll = this.countFindAll;
 			result.countReplaceAll = this.countReplaceAll;
 			result.sheetIndex = this.sheetIndex;
+			result.error = this.error;
 			return result;
 		};
 		asc_CFindOptions.prototype.isEqual = function (obj) {
@@ -1913,6 +1915,7 @@
 		asc_CFindOptions.prototype.clearFindAll = function () {
 			this.countFindAll = 0;
 			this.countReplaceAll = 0;
+			this.error = false;
 		};
 		asc_CFindOptions.prototype.updateFindAll = function () {
 			this.countFindAll += this.countFind;
