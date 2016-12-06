@@ -1474,6 +1474,7 @@
 		if (AscBrowser.isRetina) {
 			curLeft >>= 1;
 			curTop >>= 1;
+			curHeight >>= 1;
 		}
 
 
