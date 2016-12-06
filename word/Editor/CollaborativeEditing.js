@@ -660,7 +660,6 @@ CWordCollaborativeEditing.prototype.Undo = function()
 
 	// Формируем новую пачку действий, которые будут откатывать нужные нам действия.
 
-
 	// На первом шаге мы заданнуюю пачку изменений коммутируем с последними измениями. Смотрим на то какой набор
 	// изменений у нас получается.
 	// Объектная модель у нас простая: класс, в котором возможно есть массив элементов(тоже классов), у которого воможно
@@ -710,10 +709,7 @@ CWordCollaborativeEditing.prototype.Undo = function()
 			arrReverseChanges.splice(0, 0, oReverseChange);
 	}
 
-
-
-
-
+	// Накатываем изменения в данном клиенте
 	var oLogicDocument = this.m_oLogicDocument;
 
 	oLogicDocument.DrawingDocument.EndTrackTable(null, true);
@@ -730,6 +726,26 @@ CWordCollaborativeEditing.prototype.Undo = function()
 	oLogicDocument.Document_UpdateSelectionState();
 	oLogicDocument.Document_UpdateInterfaceState();
 	oLogicDocument.Document_UpdateRulersState();
+
+	var oBinaryWriter = History.BinaryWriter;
+	var aSendingChanges = [];
+	for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
+	{
+		var oReverseChange = arrReverseChanges[nIndex];
+		var oChangeClass   = oReverseChange.GetClass();
+
+		var nBinaryPos = oBinaryWriter.GetCurPosition();
+		oBinaryWriter.WriteString2(oChangeClass.Get_Id());
+		oBinaryWriter.WriteLong(oReverseChange.Type);
+		oReverseChange.WriteToBinary(oBinaryWriter);
+
+		var nBinaryLen = oBinaryWriter.GetCurPosition() - nBinaryPos;
+
+		var oChange = new AscCommon.CCollaborativeChanges();
+		oChange.Set_FromUndoRedo(oChangeClass, oReverseChange, {Pos : nBinaryPos, Len : nBinaryLen});
+		aSendingChanges.push(oChange.m_pData);
+	}
+	editor.CoAuthoringApi.saveChanges(aSendingChanges, 0, null);
 };
 CWordCollaborativeEditing.prototype.CanUndo = function()
 {

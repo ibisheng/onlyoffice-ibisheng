@@ -8332,7 +8332,7 @@ CDocumentContent.prototype.Internal_Content_Add       = function(Position, NewOb
         NextObj = null;
 
     this.private_RecalculateNumbering([NewObject]);
-    History.Add(new CChangesDocumentContentAddItem(this, Position, NewObject));
+    History.Add(new CChangesDocumentContentAddItem(this, Position, [NewObject]));
     this.Content.splice(Position, 0, NewObject);
     NewObject.Set_Parent(this);
     NewObject.Set_DocumentNext(NextObj);

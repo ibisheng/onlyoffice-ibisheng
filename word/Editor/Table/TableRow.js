@@ -580,7 +580,7 @@ CTableRow.prototype =
 
 	Remove_Cell : function(Index)
 	{
-		History.Add(new CChangesTableRowRemoveCell(this, Index, this.Content[Index]));
+		History.Add(new CChangesTableRowRemoveCell(this, Index, [this.Content[Index]]));
 
 		this.Content.splice(Index, 1);
 		this.CellsInfo.splice(Index, 1);

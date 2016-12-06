@@ -57,9 +57,9 @@ AscDFH.changesRelationMap[AscDFH.historyitem_DocumentContent_RemoveItem] = [
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
  */
-function CChangesDocumentContentAddItem(Class, Pos, Item)
+function CChangesDocumentContentAddItem(Class, Pos, Items)
 {
-	CChangesDocumentContentAddItem.superclass.constructor.call(this, Class, Pos, [Item], true);
+	CChangesDocumentContentAddItem.superclass.constructor.call(this, Class, Pos, Items, true);
 }
 AscCommon.extendClass(CChangesDocumentContentAddItem, AscDFH.CChangesBaseContentChange);
 CChangesDocumentContentAddItem.prototype.Type = AscDFH.historyitem_DocumentContent_AddItem;
