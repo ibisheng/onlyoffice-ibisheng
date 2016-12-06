@@ -5387,8 +5387,8 @@ CellArea.prototype = {
 				oDataRange.assign2(item.sqref);
 				oLocationRange.assign2();
 			}*/
-			arrResultData.push(item.sqref.getAbsName());
-			arrResultLocation.push(item.f);
+			arrResultData.push(item.f);
+			arrResultLocation.push(item.sqref.getAbsName());
 		});
 		return [arrResultData.join(AscCommon.FormulaSeparators.functionArgumentSeparator),
 			arrResultLocation.join(AscCommon.FormulaSeparators.functionArgumentSeparator)];
