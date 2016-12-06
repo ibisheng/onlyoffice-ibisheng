@@ -6767,7 +6767,11 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 90 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + Z - Undo
     {
-        this.Document_Undo();
+    	if (true === e.ShiftKey)
+			this.CollaborativeEditing.Undo();
+    	else
+        	this.Document_Undo();
+
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 93 || 57351 == e.KeyCode /*в Opera такой код*/) // контекстное меню
@@ -7401,7 +7405,7 @@ CDocument.prototype.Internal_Content_Add = function(Position, NewObject, bCheckT
 		NextObj = null;
 
 	this.private_RecalculateNumbering([NewObject]);
-	this.History.Add(new CChangesDocumentAddItem(this, Position, NewObject));
+	this.History.Add(new CChangesDocumentAddItem(this, Position, [NewObject]));
 	this.Content.splice(Position, 0, NewObject);
 	NewObject.Set_Parent(this);
 	NewObject.Set_DocumentNext(NextObj);

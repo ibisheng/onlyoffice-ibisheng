@@ -715,7 +715,7 @@ CWordCollaborativeEditing.prototype.Undo = function()
 	oLogicDocument.DrawingDocument.EndTrackTable(null, true);
 	oLogicDocument.DrawingObjects.TurnOffCheckChartSelection();
 
-	for (var nIndex = arrReverseChanges.length - 1; nIndex >= 0; --nIndex)
+	for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
 	{
 		arrReverseChanges[nIndex].Load();
 	}
