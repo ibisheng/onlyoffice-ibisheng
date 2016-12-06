@@ -811,8 +811,8 @@ function CEditorPage(api)
 
 				this.TextBoxBackground.HtmlElement["ontouchstart"] = function(e)
 				{
-				    if (AscCommon.g_inputContext)
-				        AscCommon.g_inputContext.externalChangeFocus();
+					if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+						return;
 
 				    if (!oThis.IsFocus)
 				        oThis.m_oApi.asc_enableKeyEvents(true);
@@ -856,8 +856,8 @@ function CEditorPage(api)
 			{
 				this.TextBoxBackground.HtmlElement["onmousedown"] = function(e)
 				{
-				    if (AscCommon.g_inputContext)
-                        AscCommon.g_inputContext.externalChangeFocus();
+					if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+						return;
 
 					if (!oThis.MobileTouchManager)
 						return false;
@@ -1620,8 +1620,8 @@ function CEditorPage(api)
 				e.returnValue = false;
 		}
 
-		if (AscCommon.g_inputContext)
-			AscCommon.g_inputContext.externalChangeFocus();
+		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+			return;
 
 		var oWordControl = oThis;
 

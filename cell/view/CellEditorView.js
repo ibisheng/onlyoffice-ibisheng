@@ -2606,9 +2606,8 @@
 
 	/** @param event {MouseEvent} */
 	CellEditor.prototype._onMouseDown = function (event) {
-		if (AscCommon.g_inputContext) {
-			AscCommon.g_inputContext.externalChangeFocus();
-		}
+		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+			return;
 
 		var pos;
 		var coord = this._getCoordinates(event);
