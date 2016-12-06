@@ -1353,8 +1353,8 @@ function CEditorPage(api)
 		if (false === oThis.m_oApi.bInit_word_control)
 			return;
 
-		if (AscCommon.g_inputContext)
-			AscCommon.g_inputContext.externalChangeFocus();
+		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+			return;
 
 		var _isCatch = false;
 
@@ -1586,8 +1586,8 @@ function CEditorPage(api)
 				e.returnValue = false;
 		}
 
-		if (AscCommon.g_inputContext)
-			AscCommon.g_inputContext.externalChangeFocus();
+		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+			return;
 
 		oWordControl.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
 		if (oWordControl.DemonstrationManager.Mode)
