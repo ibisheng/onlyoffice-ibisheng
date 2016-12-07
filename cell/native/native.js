@@ -6287,7 +6287,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
             break;
         }
 
-        case 9 : // ASC_MENU_EVENT_TYPE_IMAGE
+        case 9: // ASC_MENU_EVENT_TYPE_IMAGE
         {
             var ws = _api.wb.getWorksheet();
             if (ws && ws.objectRender && ws.objectRender.controller) {
@@ -6439,6 +6439,13 @@ window["native"]["offline_apply_event"] = function(type,params) {
 
                 ws.objectRender.controller.setGraphicObjectProps(_imagePr);
             }
+            break;
+        }
+            
+        case 12: // ASC_MENU_EVENT_TYPE_TABLESTYLES
+        {
+            var wb = _api.wb;
+            wb.getTablePictures();
             break;
         }
 
@@ -7301,7 +7308,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
             
         case 11010: // ASC_SOCKET_EVENT_TYPE_ON_DISCONNECT
         {
-
+            break;
         }
             
         case 11020: // ASC_SOCKET_EVENT_TYPE_TRY_RECONNECT
@@ -7309,6 +7316,25 @@ window["native"]["offline_apply_event"] = function(type,params) {
             var t = _api.CoAuthoringApi._CoAuthoringApi;
             delete t.sockjs;
             t._initSocksJs();
+            break;
+        }
+            
+        case 21000: // ASC_COAUTH_EVENT_TYPE_INSERT_URL_IMAGE
+        {
+            var urls = JSON.parse(params[0]);
+            AscCommon.g_oDocumentUrls.addUrls(urls);
+            var firstUrl;
+            for (var i in urls) {
+                if (urls.hasOwnProperty(i)) {
+                    firstUrl = urls[i];
+                    break;
+                }
+            }
+
+            params[0] = firstUrl;
+            _return = _s.offline_addImageDrawingObject(params);
+            
+            break;
         }
             
         default:

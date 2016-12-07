@@ -153,6 +153,10 @@ DocumentUrls.prototype = {
 			this.urlsReverse[url] = i;
 			this.imageCount++;
 		}
+ 
+        if (window["IS_NATIVE_EDITOR"]) {
+            window["native"]["setUrlsCount"](this.imageCount);
+        }
 	},
 	addImageUrl : function(strPath, url){
 		var urls = {};

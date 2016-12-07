@@ -410,9 +410,9 @@ CChangesTableRowHeight.prototype.Merge = private_TableRowChangesOnMergePr;
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
  */
-function CChangesTableRowAddCell(Class, Pos, Cell)
+function CChangesTableRowAddCell(Class, Pos, Cells)
 {
-	CChangesTableRowAddCell.superclass.constructor.call(this, Class, Pos, [Cell], true);
+	CChangesTableRowAddCell.superclass.constructor.call(this, Class, Pos, Cells, true);
 }
 AscCommon.extendClass(CChangesTableRowAddCell, AscDFH.CChangesBaseContentChange);
 CChangesTableRowAddCell.prototype.Type = AscDFH.historyitem_TableRow_AddCell;
@@ -477,9 +477,9 @@ CChangesTableRowAddCell.prototype.CreateReverseChange = function()
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
  */
-function CChangesTableRowRemoveCell(Class, Pos, Cell)
+function CChangesTableRowRemoveCell(Class, Pos, Cells)
 {
-	CChangesTableRowRemoveCell.superclass.constructor.call(this, Class, Pos, [Cell], false);
+	CChangesTableRowRemoveCell.superclass.constructor.call(this, Class, Pos, Cells, false);
 }
 AscCommon.extendClass(CChangesTableRowRemoveCell, AscDFH.CChangesBaseContentChange);
 CChangesTableRowRemoveCell.prototype.Type = AscDFH.historyitem_TableRow_RemoveCell;

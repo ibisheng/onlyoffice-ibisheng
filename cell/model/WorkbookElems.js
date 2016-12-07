@@ -1202,13 +1202,13 @@ Num.prototype =
         }
         switch (this.id) {
           case 15:
-            res = 'd' + separator + 'mmm' + separator + 'yy';
+            res = AscCommon.getShortDateMonthFormat(true, true, separator, null);
             break;
           case 16:
-            res = 'd' + separator + 'mmm';
+            res = AscCommon.getShortDateMonthFormat(true, false, separator, null);
             break;
           case 17:
-            res = 'mmm' + separator + 'yy';
+            res = AscCommon.getShortDateMonthFormat(false, true, separator, null);
             break;
         }
       } else {
@@ -1226,7 +1226,7 @@ Num.prototype =
             res = AscCommonExcel.getCurrencyFormatSimple(null, true, true, true);
             break;
           case 22:
-            res = AscCommonExcel.getShortDateFormat(null) + " h:mm";
+            res = AscCommon.getShortDateFormat(null) + " h:mm";
             break;
           case 14:
           case 27:
@@ -1235,7 +1235,7 @@ Num.prototype =
           case 30:
           case 31:
           case 36:
-            res = AscCommonExcel.getShortDateFormat(null);
+            res = AscCommon.getShortDateFormat(null);
             break;
           case 37:
             res = AscCommonExcel.getCurrencyFormatSimple(null, false, false, false);
@@ -3343,17 +3343,7 @@ CCellValue.prototype =
 											    bTime = true;
 											var sDateFormat = "";
 											if (bDate) {
-											    for (var i = 0, length = cultureInfo.ShortDatePattern.length; i < length; i++) {
-											        var nIndex = cultureInfo.ShortDatePattern[i] - 0;
-											        if (0 != i)
-											            sDateFormat += "/";
-											        if (0 == nIndex)
-											            sDateFormat += "d";
-											        else if (1 == nIndex)
-											            sDateFormat += "m";
-											        else if (2 == nIndex)
-											            sDateFormat += "yyyy";
-											    }
+												sDateFormat = AscCommon.getShortDateFormat(cultureInfo);
 											}
                                             var sTimeFormat = 'h:mm:ss';
                                             if (cultureInfo.AMDesignator.length > 0 && cultureInfo.PMDesignator.length > 0){
@@ -5397,8 +5387,8 @@ CellArea.prototype = {
 				oDataRange.assign2(item.sqref);
 				oLocationRange.assign2();
 			}*/
-			arrResultData.push(item.sqref.getAbsName());
-			arrResultLocation.push(item.f);
+			arrResultData.push(item.f);
+			arrResultLocation.push(item.sqref.getAbsName());
 		});
 		return [arrResultData.join(AscCommon.FormulaSeparators.functionArgumentSeparator),
 			arrResultLocation.join(AscCommon.FormulaSeparators.functionArgumentSeparator)];
@@ -7559,25 +7549,6 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	this.dateTimeGrouping = oDateGroupItem.DateTimeGrouping;
 };
 
-function getShortDateFormat(opt_cultureInfo) {
-	var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
-	var dateElems = [];
-	for (var i = 0; i < cultureInfo.ShortDatePattern.length; ++i) {
-		switch (cultureInfo.ShortDatePattern[i]) {
-			case '0':
-				dateElems.push('d');
-				break;
-			case '1':
-				dateElems.push('m');
-				break;
-			case '2':
-				dateElems.push('yyyy');
-				break;
-		}
-	}
-	return dateElems.join('/');
-}
-
 function getCurrencyFormatSimple(opt_cultureInfo, opt_fraction, opt_currency, opt_red) {
   var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
   var numberFormat = opt_fraction ? '#,##0.00' : '#,##0';
@@ -7898,7 +7869,6 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].DateGroupItem = DateGroupItem;
 	window['AscCommonExcel'].SortCondition = SortCondition;
 	window['AscCommonExcel'].AutoFilterDateElem = AutoFilterDateElem;
-	window['AscCommonExcel'].getShortDateFormat = getShortDateFormat;
   window['AscCommonExcel'].getCurrencyFormatSimple = getCurrencyFormatSimple;
   window['AscCommonExcel'].getCurrencyFormat = getCurrencyFormat;
 

@@ -1386,7 +1386,7 @@ function CChangesParagraphPresentationPrBullet(Class, Old, New, Color)
 {
 	CChangesParagraphPresentationPrBullet.superclass.constructor.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphPresentationPrLevel, AscDFH.CChangesBaseObjectProperty);
+AscCommon.extendClass(CChangesParagraphPresentationPrBullet, AscDFH.CChangesBaseObjectProperty);
 CChangesParagraphPresentationPrBullet.prototype.Type = AscDFH.historyitem_Paragraph_PresentationPr_Bullet;
 CChangesParagraphPresentationPrBullet.prototype.private_CreateObject = function()
 {

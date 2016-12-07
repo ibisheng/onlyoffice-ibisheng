@@ -682,7 +682,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             }
             else {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.auto);
-                if (c_oAscChartTypeSettings.lineNormal === settings.type) {
+
 					for (i = 0; i < aSeriesPoints.length; ++i) {
 						if (fMinVal === null) {
 							fMinVal = aSeriesPoints[i].val;
@@ -693,7 +693,6 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
 							}
 						}
 					}
-                }
             }
             if (oSparklineGroup.asc_getMaxAxisType() === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.asc_getManualMax() !== null) {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
@@ -701,17 +700,15 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             }
             else {
                 val_ax_props.putMaxValRule(c_oAscValAxisRule.auto);
-				if (c_oAscChartTypeSettings.lineNormal === settings.type) {
-					for (i = 0; i < aSeriesPoints.length; ++i) {
-						if (fMaxVal === null) {
-							fMaxVal = aSeriesPoints[i].val;
-						} else {
-							if (fMaxVal < aSeriesPoints[i].val) {
-								fMaxVal = aSeriesPoints[i].val;
-							}
-						}
-					}
-				}
+                for (i = 0; i < aSeriesPoints.length; ++i) {
+                    if (fMaxVal === null) {
+                        fMaxVal = aSeriesPoints[i].val;
+                    } else {
+                        if (fMaxVal < aSeriesPoints[i].val) {
+                            fMaxVal = aSeriesPoints[i].val;
+                        }
+                    }
+                }
             }
             if (fMinVal !== null && fMaxVal !== null) {
                 if (fMinVal !== fMaxVal) {
@@ -862,15 +859,6 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             if(fCallbackSeries)
             {
 
-                if(nSparklineType !== Asc.c_oAscSparklineType.Line){
-                    for(i = 0; i < aSeriesPoints.length; ++i)
-                    {
-                        if(AscFormat.fApproxEqual(aSeriesPoints[i].val,  0))
-                        {
-                            fCallbackSeries(oSerie, aSeriesPoints[i].idx, null);
-                        }
-                    }
-                }
 
                 if(oSparklineGroup.negative && oSparklineGroup.colorNegative)
                 {
@@ -928,6 +916,17 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
                     for(i = 0; i < aMinPoints.length; ++i)
                     {
                         fCallbackSeries(oSerie, aMinPoints[i].idx, oSparklineGroup.colorLow);
+                    }
+                }
+
+
+                if(nSparklineType !== Asc.c_oAscSparklineType.Line){
+                    for(i = 0; i < aSeriesPoints.length; ++i)
+                    {
+                        if(AscFormat.fApproxEqual(aSeriesPoints[i].val,  0))
+                        {
+                            fCallbackSeries(oSerie, aSeriesPoints[i].idx, null);
+                        }
                     }
                 }
             }

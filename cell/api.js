@@ -341,7 +341,7 @@ var editor;
     if (cultureInfo) {
       var numFormatDigit = AscCommon.oNumFormatCache.get('#,##0.00');
 
-      var formatDate = AscCommonExcel.getShortDateFormat(cultureInfo);
+      var formatDate = AscCommon.getShortDateFormat(cultureInfo);
       formatDate += " h:mm";
       if (cultureInfo.AMDesignator && cultureInfo.PMDesignator) {
         formatDate += " AM/PM";

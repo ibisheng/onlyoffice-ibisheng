@@ -556,7 +556,7 @@
 		 * @return {Number}
 		 */
 		StringRender.prototype._calcLineWidth = function (startPos, endPos) {
-			var wrap = this.flags && (this.flags.wrapText || this.flags.wrapOnlyNL);
+			var wrap = this.flags && (this.flags.wrapText || this.flags.wrapOnlyNL || this.flags.wrapOnlyCE);
 			var isAtEnd, j, chProp, tw;
 
 			if (endPos === undefined || endPos < 0) {
@@ -813,7 +813,7 @@
 		StringRender.prototype._measureChars = function (maxWidth) {
 			var self = this;
 			var ctx = this.drawingCtx;
-			var wrap = this.flags && this.flags.wrapText && !this.flags.isNumberFormat;
+			var wrap = this.flags && (this.flags.wrapText || this.flags.wrapOnlyCE) && !this.flags.isNumberFormat;
 			var wrapNL = this.flags && this.flags.wrapOnlyNL;
 			var hasRepeats = false;
 			var i, j, fr, fmt, text, p, p_ = {}, pIndex, f, f_, eq, startCh;

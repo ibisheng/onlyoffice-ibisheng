@@ -498,7 +498,8 @@
 		t._moveCursor(kEndOfText);
 	};
 
-	CellEditor.prototype.move = function ( l, t, r, b ) {
+	CellEditor.prototype.move = function (l, t, r, b) {
+		this.textFlags.wrapOnlyCE = false;
 		this.sides = this.options.getSides();
 		this.left = this.sides.cellX;
 		this.top = this.sides.cellY;
@@ -506,36 +507,34 @@
 		this.bottom = this.sides.b[0];
 		// ToDo вынести в отдельную функцию
 		var canExpW = true, canExpH = true, tm, expW, expH, fragments = this._getRenderFragments();
-		if ( 0 < fragments.length ) {
-			tm = this.textRender.measureString( fragments, this.textFlags, this._getContentWidth() );
+		if (0 < fragments.length) {
+			tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
 			expW = tm.width > this._getContentWidth();
 			expH = tm.height > this._getContentHeight();
 
-			while ( expW && canExpW || expH && canExpH ) {
-				if ( expW ) {
+			while (expW && canExpW || expH && canExpH) {
+				if (expW) {
 					canExpW = this._expandWidth();
 				}
-				if ( expH ) {
+				if (expH) {
 					canExpH = this._expandHeight();
 				}
 
-				if ( !canExpW ) {
-					this.textFlags.wrapText = true;
-					tm = this.textRender.measureString( fragments, this.textFlags, this._getContentWidth() );
-				}
-				else {
-					tm = this.textRender.measure( this._getContentWidth() );
+				if (!canExpW) {
+					this.textFlags.wrapOnlyCE = true;
+					tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
+				} else {
+					tm = this.textRender.measure(this._getContentWidth());
 				}
 				expW = tm.width > this._getContentWidth();
 				expH = tm.height > this._getContentHeight();
 			}
 		}
 
-		if ( this.left < l || this.top < t || this.left > r || this.top > b ) {
+		if (this.left < l || this.top < t || this.left > r || this.top > b) {
 			// hide
 			this._hideCanvas();
-		}
-		else {
+		} else {
 			this._adjustCanvas();
 			this._showCanvas();
 			this._renderText();
@@ -1109,25 +1108,24 @@
 	CellEditor.prototype._draw = function () {
 		var canExpW = true, canExpH = true, tm, expW, expH, fragments = this._getRenderFragments();
 
-		if ( 0 < fragments.length ) {
-			tm = this.textRender.measureString( fragments, this.textFlags, this._getContentWidth() );
+		if (0 < fragments.length) {
+			tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
 			expW = tm.width > this._getContentWidth();
 			expH = tm.height > this._getContentHeight();
 
-			while ( expW && canExpW || expH && canExpH ) {
-				if ( expW ) {
+			while (expW && canExpW || expH && canExpH) {
+				if (expW) {
 					canExpW = this._expandWidth();
 				}
-				if ( expH ) {
+				if (expH) {
 					canExpH = this._expandHeight();
 				}
 
-				if ( !canExpW ) {
-					this.textFlags.wrapText = true;
-					tm = this.textRender.measureString( fragments, this.textFlags, this._getContentWidth() );
-				}
-				else {
-					tm = this.textRender.measure( this._getContentWidth() );
+				if (!canExpW) {
+					this.textFlags.wrapOnlyCE = true;
+					tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
+				} else {
+					tm = this.textRender.measure(this._getContentWidth());
 				}
 				expW = tm.width > this._getContentWidth();
 				expH = tm.height > this._getContentHeight();
@@ -1139,59 +1137,59 @@
 		this._adjustCanvas();
 		this._showCanvas();
 		this._renderText();
-		this.input.value = this._getFragmentsText( fragments );
+		this.input.value = this._getFragmentsText(fragments);
 		this._updateCursorPosition();
 		this._showCursor();
 	};
 
 	CellEditor.prototype._update = function () {
-		this._updateFormulaEditMod( /*bIsOpen*/false );
+		this._updateFormulaEditMod(/*bIsOpen*/false);
 
 		var tm, canExpW, canExpH, oldLC, doAjust = false, fragments = this._getRenderFragments();
 
-		if ( 0 < fragments.length ) {
+		if (0 < fragments.length) {
 			oldLC = this.textRender.getLinesCount();
-			tm = this.textRender.measureString( fragments, this.textFlags, this._getContentWidth() );
-			if ( this.textRender.getLinesCount() < oldLC ) {
+			tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
+			if (this.textRender.getLinesCount() < oldLC) {
 				this.topLineIndex -= oldLC - this.textRender.getLinesCount();
 			}
 
-			canExpW = !this.textFlags.wrapText;
-			while ( tm.width > this._getContentWidth() && canExpW ) {
+			canExpW = !(this.textFlags.wrapText || this.textFlags.wrapOnlyCE);
+			while (tm.width > this._getContentWidth() && canExpW) {
 				canExpW = this._expandWidth();
-				if ( !canExpW ) {
-					this.textFlags.wrapText = true;
-					tm = this.textRender.measureString( fragments, this.textFlags, this._getContentWidth() );
+				if (!canExpW) {
+					this.textFlags.wrapOnlyCE = true;
+					tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
 				}
 				doAjust = true;
 			}
 
 			canExpH = true;
-			while ( tm.height > this._getContentHeight() && canExpH ) {
+			while (tm.height > this._getContentHeight() && canExpH) {
 				canExpH = this._expandHeight();
 				doAjust = true;
 			}
-			if ( this.textRender.isLastCharNL() && !doAjust && canExpH ) {
-				var lm = this.textRender.calcCharHeight( this.textRender.getCharsCount() - 1 );
-				if ( tm.height + lm.th > this._getContentHeight() ) {
+			if (this.textRender.isLastCharNL() && !doAjust && canExpH) {
+				var lm = this.textRender.calcCharHeight(this.textRender.getCharsCount() - 1);
+				if (tm.height + lm.th > this._getContentHeight()) {
 					this._expandHeight();
 					doAjust = true;
 				}
 			}
 		}
-		if ( doAjust ) {
+		if (doAjust) {
 			this._adjustCanvas();
 		}
 
 		this._renderText();  // вызов нужен для пересчета поля line.startX, которое используется в _updateCursorPosition
 		this._fireUpdated(); // вызов нужен для обновление текста верхней строки, перед обновлением позиции курсора
-		this._updateCursorPosition( true );
+		this._updateCursorPosition(true);
 		this._showCursor();
 
 		this._updateUndoRedoChanged();
 
-		if ( window['IS_NATIVE_EDITOR'] && !this.dontUpdateText ) {
-			window['native']['onCellEditorChangeText']( this._getFragmentsText( this.options.fragments ) );
+		if (window['IS_NATIVE_EDITOR'] && !this.dontUpdateText) {
+			window['native']['onCellEditorChangeText'](this._getFragmentsText(this.options.fragments));
 		}
 	};
 
@@ -1476,6 +1474,7 @@
 		if (AscBrowser.isRetina) {
 			curLeft >>= 1;
 			curTop >>= 1;
+			curHeight >>= 1;
 		}
 
 
@@ -2607,9 +2606,8 @@
 
 	/** @param event {MouseEvent} */
 	CellEditor.prototype._onMouseDown = function (event) {
-		if (AscCommon.g_inputContext) {
-			AscCommon.g_inputContext.externalChangeFocus();
-		}
+		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+			return;
 
 		var pos;
 		var coord = this._getCoordinates(event);

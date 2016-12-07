@@ -593,9 +593,9 @@ CChangesTableInline.prototype.private_SetValue = function(Value)
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
  */
-function CChangesTableAddRow(Class, Pos, Row)
+function CChangesTableAddRow(Class, Pos, Rows)
 {
-	CChangesTableAddRow.superclass.constructor.call(this, Class, Pos, [Row], true);
+	CChangesTableAddRow.superclass.constructor.call(this, Class, Pos, Rows, true);
 }
 AscCommon.extendClass(CChangesTableAddRow, AscDFH.CChangesBaseContentChange);
 CChangesTableAddRow.prototype.Type = AscDFH.historyitem_Table_AddRow;
@@ -666,9 +666,9 @@ CChangesTableAddRow.prototype.CreateReverseChange = function()
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
  */
-function CChangesTableRemoveRow(Class, Pos, Row)
+function CChangesTableRemoveRow(Class, Pos, Rows)
 {
-	CChangesTableRemoveRow.superclass.constructor.call(this, Class, Pos, [Row], false);
+	CChangesTableRemoveRow.superclass.constructor.call(this, Class, Pos, Rows, false);
 }
 AscCommon.extendClass(CChangesTableRemoveRow, AscDFH.CChangesBaseContentChange);
 CChangesTableRemoveRow.prototype.Type = AscDFH.historyitem_Table_RemoveRow;

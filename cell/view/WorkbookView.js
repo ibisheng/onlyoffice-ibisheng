@@ -2246,22 +2246,24 @@
     ws.replaceCellText(options, false, this.fReplaceCallback);
   };
   WorkbookView.prototype._replaceCellTextCallback = function(options) {
-    options.updateFindAll();
-    if (!options.scanOnOnlySheet && options.isReplaceAll) {
-      // Замена на всей книге
-      var i = ++options.sheetIndex;
-      if (this.model.getActive() === i) {
-        i = ++options.sheetIndex;
-      }
+    if (!options.error) {
+		options.updateFindAll();
+		if (!options.scanOnOnlySheet && options.isReplaceAll) {
+			// Замена на всей книге
+			var i = ++options.sheetIndex;
+			if (this.model.getActive() === i) {
+				i = ++options.sheetIndex;
+			}
 
-      if (i < this.model.getWorksheetCount()) {
-        var ws = this.getWorksheet(i);
-        ws.replaceCellText(options, true, this.fReplaceCallback);
-        return;
-      }
+			if (i < this.model.getWorksheetCount()) {
+				var ws = this.getWorksheet(i);
+				ws.replaceCellText(options, true, this.fReplaceCallback);
+				return;
+			}
+		}
+
+		this.handlers.trigger("asc_onRenameCellTextEnd", options.countFindAll, options.countReplaceAll);
     }
-
-    this.handlers.trigger("asc_onRenameCellTextEnd", options.countFindAll, options.countReplaceAll);
 
     History.EndTransaction();
     if (options.isReplaceAll) {

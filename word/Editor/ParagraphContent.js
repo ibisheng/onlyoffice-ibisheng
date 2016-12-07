@@ -1908,6 +1908,17 @@ ParaPageCount.prototype.private_UpdateWidth = function()
 	this.Width        = RealWidth;
 	this.WidthVisible = RealWidth;
 };
+ParaPageCount.prototype.Write_ToBinary = function(Writer)
+{
+	// Long : Type
+	// Long : PageCount
+	Writer.WriteLong(this.Type);
+	Writer.WriteLong(this.PageCount);
+};
+ParaPageCount.prototype.Read_FromBinary = function(Reader)
+{
+	this.PageCount = Reader.GetLong();
+};
 
 function ParagraphContent_Read_FromBinary(Reader)
 {
