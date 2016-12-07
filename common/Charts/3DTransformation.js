@@ -98,6 +98,11 @@ function Processor3D(width, height, left, right, bottom, top, chartSpace, charts
 	
 	this.orientationCatAx = null;
 	this.orientationValAx = null;
+	
+	this.matrixRotateOx = null;
+	this.matrixRotateOy = null;
+	this.matrixRotateAllAxis = null;
+	this.matrixShearXY = null;
 }
 
 Processor3D.prototype.calaculate3DProperties = function(baseDepth, gapDepth, bIsCheck)
@@ -686,8 +691,11 @@ Processor3D.prototype.calculatePropertiesForPieCharts = function()
 //***functions for matrix transformation***
 Processor3D.prototype._shearXY = function()
 {
-	//TODO матрица перевёрнута
-	return [[1, 0, 0, 0], [0, 1, 0, 0], [Math.sin(-this.angleOy), Math.sin(this.angleOx), 0, 0], [0, 0, 0, 0]];
+	if(null === this.matrixShearXY)
+	{
+		this.matrixShearXY = [[1, 0, 0, 0], [0, 1, 0, 0], [Math.sin(-this.angleOy), Math.sin(this.angleOx), 0, 0], [0, 0, 0, 0]];
+	}
+	return this.matrixShearXY;
 };
 
 Processor3D.prototype._getMatrixRotateAllAxis = function()
@@ -702,18 +710,33 @@ Processor3D.prototype._getMatrixRotateAllAxis = function()
 	|-sinOy * cosOx     sinOx     cosOy * cosOx  0|
 	|-sinOy              0        (cosOy + 1)   1|*/
 	
+	if(null === this.matrixRotateAllAxis)
+	{
+		this.matrixRotateAllAxis = Point3D.prototype.multiplyMatrix(matrixRotateOY, matrixRotateOX);
+	}
 	
-	return Point3D.prototype.multiplyMatrix(matrixRotateOY, matrixRotateOX);
+	return this.matrixRotateAllAxis;
 };
 
 Processor3D.prototype._getMatrixRotateOx = function()
 {
-	return [[1, 0, 0, 0], [0, Math.cos(-this.angleOx), Math.sin(-this.angleOx), 0], [0, - Math.sin(-this.angleOx), Math.cos(-this.angleOx), 1], [0, 0, 0, 1]];
+	//todo посмотреть возможность заменить массивы на Float32Array
+	if(null === this.matrixRotateOx)
+	{
+		this.matrixRotateOx = [[1, 0, 0, 0], [0, Math.cos(-this.angleOx), Math.sin(-this.angleOx), 0], [0, - Math.sin(-this.angleOx), Math.cos(-this.angleOx), 1], [0, 0, 0, 1]];
+	}
+	
+	return this.matrixRotateOx;
 };
 
 Processor3D.prototype._getMatrixRotateOy = function()
 {
-	return [[Math.cos(-this.angleOy), 0, -Math.sin(-this.angleOy), 0], [0, 1, 0, 0], [Math.sin(-this.angleOy), 0, Math.cos(-this.angleOy), 1], [0, 0, 0, 1]];
+	if(null === this.matrixRotateOy)
+	{
+		this.matrixRotateOy = [[Math.cos(-this.angleOy), 0, -Math.sin(-this.angleOy), 0], [0, 1, 0, 0], [Math.sin(-this.angleOy), 0, Math.cos(-this.angleOy), 1], [0, 0, 0, 1]];
+	}
+	
+	return this.matrixRotateOy;
 };
 
 Processor3D.prototype._getMatrixRotateOz = function()
