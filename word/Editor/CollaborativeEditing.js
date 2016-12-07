@@ -718,6 +718,7 @@ CWordCollaborativeEditing.prototype.Undo = function()
 	for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
 	{
 		arrReverseChanges[nIndex].Load();
+		this.m_aAllChanges.push(arrReverseChanges[nIndex]);
 	}
 
 	oLogicDocument.DrawingObjects.TurnOnCheckChartSelection();
@@ -839,7 +840,7 @@ CWordCollaborativeEditing.prototype.private_Commutate = function(oActionL, oActi
 	{
 		if (oActionR.Add)
 		{
-			if (oActionL.Pos >= oActionR)
+			if (oActionL.Pos >= oActionR.Pos)
 				oActionL.Pos++;
 			else
 				oActionR.Pos++;
