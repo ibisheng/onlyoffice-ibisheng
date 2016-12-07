@@ -119,7 +119,7 @@ AscBrowser.checkZoom = function()
 	AscBrowser.zoom = 1.0;
 	AscBrowser.isRetina = false;
 
-    if (AscBrowser.isChrome && !AscBrowser.isOpera && document && document.firstElementChild && document.body)
+    if (AscBrowser.isChrome && !AscBrowser.isOpera && !AscBrowser.isMobile && document && document.firstElementChild && document.body)
     {
         if (false)
 		{
