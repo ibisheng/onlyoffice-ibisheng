@@ -8243,8 +8243,6 @@ background-repeat: no-repeat;\
 
 					if (true === AscCommon.CollaborativeEditing.private_AddOverallChange(oChange))
 						oChange.Load(_color);
-
-					return true;
 				}
 				else
 				{
