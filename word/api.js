@@ -8209,11 +8209,10 @@ background-repeat: no-repeat;\
 
 		var stream = new AscCommon.FT_Stream2(data, data.length);
 		stream.obj = null;
-		var Loader = {Reader : stream, Reader2 : null};
 		var _color = new AscCommonWord.CDocumentColor(191, 255, 199);
 
 		// Применяем изменения, пока они есть
-		var _count = Loader.Reader.GetLong();
+		var _count = stream.GetLong();
 
 		var _pos = 4;
 		for (var i = 0; i < _count; i++)
@@ -8224,30 +8223,41 @@ background-repeat: no-repeat;\
 					break;
 			}
 
-			var _len    = Loader.Reader.GetLong();
+			var nChangeLen = stream.GetLong();
 			_pos += 4;
-			stream.size = _pos + _len;
+			stream.size = _pos + nChangeLen;
 
-			var _id       = Loader.Reader.GetString2();
-			var _read_pos = Loader.Reader.GetCurPos();
+			var ClassId = stream.GetString2();
+			var Class   = AscCommon.g_oTableId.Get_ById(ClassId);
 
-			var Type  = Loader.Reader.GetLong();
-			var Class = null;
+			var nReaderPos  = stream.GetCurPos();
+			var nChangeType = stream.GetLong();
 
-			if (AscDFH.historyitem_type_HdrFtr === Type)
+			if (Class)
 			{
-				Class = editor.WordControl.m_oLogicDocument.HdrFtr;
+				var fChangesClass = AscDFH.changesFactory[nChangeType];
+				if (fChangesClass)
+				{
+					var oChange = new fChangesClass(Class);
+					oChange.ReadFromBinary(stream);
+
+					if (true === AscCommon.CollaborativeEditing.private_AddOverallChange(oChange))
+						oChange.Load(_color);
+
+					return true;
+				}
+				else
+				{
+					AscCommon.CollaborativeEditing.private_AddOverallChange(data);
+
+					stream.Seek(nReaderPos);
+					stream.Seek2(nReaderPos);
+
+					Class.Load_Changes(stream, null, _color);
+				}
 			}
-			else
-				Class = g_oTableId.Get_ById(_id);
 
-			stream.Seek(_read_pos);
-			stream.Seek2(_read_pos);
-
-			if (null != Class)
-				Class.Load_Changes(Loader.Reader, Loader.Reader2, _color);
-
-			_pos += _len;
+			_pos += nChangeLen;
 			stream.Seek2(_pos);
 			stream.size = data.length;
 		}
