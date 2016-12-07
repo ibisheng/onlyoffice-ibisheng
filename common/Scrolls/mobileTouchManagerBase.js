@@ -1523,7 +1523,7 @@
 	};
 
 	/* simple click */
-	CMobileTouchManagerBase.prototype.MoveCursorToPoint = function(e)
+	CMobileTouchManagerBase.prototype.MoveCursorToPoint = function(isHalfHeight)
 	{
 		AscCommon.check_MouseMoveEvent(e);
 		var pos = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
@@ -1534,8 +1534,11 @@
 		var nearPos = this.delegate.Logic_GetNearestPos(pos.Page, pos.X, pos.Y);
 
 		this.delegate.DrawingDocument.NeedScrollToTargetFlag = true;
-		this.delegate.Logic_OnMouseDown(global_mouseEvent, nearPos.X, nearPos.Y, pos.Page);
-		this.delegate.Logic_OnMouseUp(global_mouseEvent, nearPos.X, nearPos.Y, pos.Page);
+		var y = nearPos.Y;
+		if (isHalfHeight)
+			y += nearPos.Height / 2;
+		this.delegate.Logic_OnMouseDown(global_mouseEvent, nearPos.X, y, pos.Page);
+		this.delegate.Logic_OnMouseUp(global_mouseEvent, nearPos.X, y, pos.Page);
 		this.delegate.DrawingDocument.NeedScrollToTargetFlag = false;
 
 		global_mouseEvent.ClickCount = old_click_count;

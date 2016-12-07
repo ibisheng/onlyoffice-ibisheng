@@ -86,7 +86,7 @@
 		AscCommon.check_MouseDownEvent(e.touches ? e.touches[0] : e, true);
 		global_mouseEvent.KoefPixToMM = 1;
 		global_mouseEvent.LockMouse();
-		this.HtmlPage.m_oApi.sendEvent("asc_onHidePopMenu");
+		this.Api.sendEvent("asc_onHidePopMenu");
 
 		this.TableCurrentMoveValueMin = null;
 		this.TableCurrentMoveValueMax = null;
@@ -270,22 +270,7 @@
 		{
 			case AscCommon.MobileTouchMode.Cursor:
 			{
-				var pos = this.DrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
-
-				var old_click_count          = global_mouseEvent.ClickCount;
-				global_mouseEvent.ClickCount = 1;
-
-				var nearPos = this.LogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
-
-				this.DrawingDocument.NeedScrollToTargetFlag = true;
-				global_mouseEvent.Type                      = AscCommon.g_mouse_event_type_down;
-				this.LogicDocument.OnMouseDown(global_mouseEvent, nearPos.X, nearPos.Y + nearPos.Height / 2, pos.Page);
-				global_mouseEvent.Type = AscCommon.g_mouse_event_type_up;
-				this.LogicDocument.OnMouseUp(global_mouseEvent, nearPos.X, nearPos.Y + nearPos.Height / 2, pos.Page);
-				this.DrawingDocument.NeedScrollToTargetFlag = false;
-
-				global_mouseEvent.ClickCount = old_click_count;
-
+				this.MoveCursorToPoint(true);
 				break;
 			}
 			case AscCommon.MobileTouchMode.Scroll:
@@ -294,39 +279,11 @@
 				if ((_newTime - this.TimeDown) > this.ReadingGlassTime && !this.MoveAfterDown)
 				{
 					this.Mode = AscCommon.MobileTouchMode.Cursor;
-
-					var pos = this.DrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
-
-					var old_click_count          = global_mouseEvent.ClickCount;
-					global_mouseEvent.ClickCount = 1;
-
-					var nearPos = this.LogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
-
-					this.DrawingDocument.NeedScrollToTargetFlag = true;
-					global_mouseEvent.Type                      = AscCommon.g_mouse_event_type_down;
-					this.LogicDocument.OnMouseDown(global_mouseEvent, nearPos.X, nearPos.Y, pos.Page);
-					global_mouseEvent.Type = AscCommon.g_mouse_event_type_up;
-					this.LogicDocument.OnMouseUp(global_mouseEvent, nearPos.X, nearPos.Y, pos.Page);
-					this.DrawingDocument.NeedScrollToTargetFlag = false;
-
-					global_mouseEvent.ClickCount = old_click_count;
+					this.MoveCursorToPoint(false);
 				}
 				else
 				{
-					var _offsetX = global_mouseEvent.X - this.DownPointOriginal.X;
-					var _offsetY = global_mouseEvent.Y - this.DownPointOriginal.Y;
-
 					this.iScroll._move(e);
-					/*
-					 if (_offsetX != 0 && this.HtmlPage.m_dScrollX_max > 0)
-					 {
-					 this.HtmlPage.m_oScrollHorApi.scrollToX(this.ScrollH - _offsetX);
-					 }
-					 if (_offsetY != 0 && this.HtmlPage.m_dScrollY_max > 0)
-					 {
-					 this.HtmlPage.m_oScrollVerApi.scrollToY(this.ScrollV - _offsetY);
-					 }*/
-
 					AscCommon.stopEvent(e);
 				}
 				break;
@@ -369,7 +326,7 @@
 			}
 			case AscCommon.MobileTouchMode.FlowObj:
 			{
-				this.HtmlPage.onMouseMove(e.touches ? e.touches[0] : e);
+				this.delegate.Drawing_OnMouseMove(e.touches ? e.touches[0] : e);
 				AscCommon.stopEvent(e);
 				break;
 			}
@@ -377,24 +334,25 @@
 			{
 				// во время движения может смениться порядок ректов
 				global_mouseEvent.ClickCount = 1;
-				var pos                      = this.DrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
-				this.LogicDocument.OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
+				var pos                      = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
+				this.delegate.Logic_OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
 				AscCommon.stopEvent(e);
 				break;
 			}
 			case AscCommon.MobileTouchMode.TableMove:
 			{
-				this.HtmlPage.onMouseMove(e.touches ? e.touches[0] : e);
+				this.delegate.Drawing_OnMouseMove(e.touches ? e.touches[0] : e);
 				AscCommon.stopEvent(e);
 				break;
 			}
 			case AscCommon.MobileTouchMode.TableRuler:
 			{
-				var pos = this.DrawingDocument.ConvertCoordsFromCursorPage(global_mouseEvent.X, global_mouseEvent.Y, this.DrawingDocument.TableOutlineDr.CurrentPageIndex);
+				var DrawingDocument = this.delegate.DrawingDocument;
+				var pos = DrawingDocument.ConvertCoordsFromCursorPage(global_mouseEvent.X, global_mouseEvent.Y, DrawingDocument.TableOutlineDr.CurrentPageIndex);
 
 				var _Transform = null;
-				if (this.DrawingDocument.TableOutlineDr)
-					_Transform = this.DrawingDocument.TableOutlineDr.TableMatrix;
+				if (DrawingDocument.TableOutlineDr)
+					_Transform = DrawingDocument.TableOutlineDr.TableMatrix;
 
 				if (_Transform && !global_MatrixTransformer.IsIdentity(_Transform))
 				{
@@ -438,7 +396,7 @@
 							this.TableCurrentMoveValue = this.TableCurrentMoveValueMax;
 					}
 				}
-				this.HtmlPage.OnUpdateOverlay();
+				this.delegate.HtmlPage.OnUpdateOverlay();
 
 				AscCommon.stopEvent(e);
 				break;
@@ -474,24 +432,8 @@
 				if (!this.MoveAfterDown)
 				{
 					global_mouseEvent.Button = 0;
-					var pos                  = this.DrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
-
-					this.LogicDocument.OnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
-					global_mouseEvent.Type = AscCommon.g_mouse_event_type_up;
-					this.LogicDocument.OnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
-
-					this.LogicDocument.Document_UpdateInterfaceState();
-
-					var horRuler      = this.HtmlPage.m_oHorRuler;
-					var _oldRulerType = horRuler.CurrentObjectType;
-					this.LogicDocument.Document_UpdateRulersState();
-
-					if (horRuler.CurrentObjectType != _oldRulerType)
-						this.HtmlPage.OnUpdateOverlay();
-
-					this.LogicDocument.Update_CursorType(pos.X, pos.Y, pos.Page, global_mouseEvent);
-
-					this.HtmlPage.m_oApi.sendEvent("asc_onTapEvent", e);
+					this.MoveCursorToPoint(false);
+					this.Api.sendEvent("asc_onTapEvent", e);
 				}
 				else
 				{
