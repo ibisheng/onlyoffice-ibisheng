@@ -8445,8 +8445,8 @@ drawPieChart.prototype =
 		var radius21 = Math.abs((test22.x - test11.x) / 2);
 		var radius22 = Math.abs((point5.y - point1.y) / 2);
 		
-		var center1 = {x: this.chartProp.chartGutter._left + trueWidth/2, y: -(point6.y - point2.y) / 2 + point6.y};
-		var center2 = {x: this.chartProp.chartGutter._left + trueWidth/2, y: -(point5.y - point1.y) / 2 + point5.y};
+		var center1 = {x: this.chartProp.chartGutter._left + trueWidth/2, y: (point2.y - point6.y) / 2 + point6.y};
+		var center2 = {x: this.chartProp.chartGutter._left + trueWidth/2, y: (point1.y - point5.y) / 2 + point5.y};
 		
 		var angles1 = this._calculateAngles3DPerspective(center1.x, center1.y, radius11, radius12, radius3D1, center3D1);
 		var angles2 = this._calculateAngles3DPerspective(center2.x, center2.y, radius21, radius22, radius3D2, center3D2);
@@ -8472,7 +8472,7 @@ drawPieChart.prototype =
 				angles2[i].swap = end1 - start1;
 			}
 			
-			var paths = this._calculateSegment3DPerspective(radius11, radius12, radius21, radius22, angles1[i], angles2[i], center1, center2, pointCenter1, pointCenter2);
+			var paths = this._calculateSegment3DPerspective(radius11, radius12, radius21, radius22, angles1[i], angles2[i], center1, center2, pointCenter1, pointCenter2, Math.sign(point2.y - point6.y));
 			
 			if(!this.paths.series[angles1.length - i - 1])
 			{
@@ -8851,7 +8851,7 @@ drawPieChart.prototype =
 		return path;
 	},
 	
-	_calculateSegment3DPerspective: function(radiusUp1, radiusUp2, radiusDown1, radiusDown2, angles1, angles2, center1, center2, pointCenter1, pointCenter2)
+	_calculateSegment3DPerspective: function(radiusUp1, radiusUp2, radiusDown1, radiusDown2, angles1, angles2, center1, center2, pointCenter1, pointCenter2, upFaceSign)
 	{	
 		var xCenter = center1.x, yCenter = center1.y, xCenter1 = center2.x, yCenter1 = center2.y;
 		var startAngle1 = angles1.start, swapAngle1 = angles1.swap, startAngle2 = angles2.start, swapAngle2 = angles2.swap;
@@ -9043,17 +9043,17 @@ drawPieChart.prototype =
 			
 			if((start >= 0 && start >= Math.PI && start <= 2 * Math.PI) || (start < 0 && start >= -Math.PI && start <= 0))
 			{
-				frontPath.push(calculateFrontFace(start, swap, start2, swap2));
+				frontPath.push(calculateFrontFace(upFaceSign*start, upFaceSign*swap, start2, swap2));
 			}
 		}
 		
 		//INSIDE FACES
 		var insidePath = null;
-		insidePath = calculateInsideFaces(startAngle1, swapAngle1, startAngle2, swapAngle2);
+		insidePath = calculateInsideFaces(upFaceSign*startAngle1, upFaceSign*swapAngle1, startAngle2, swapAngle2);
 		
 		//UP FACE
 		var upPath = null;
-		upPath = calculateUpFace(startAngle1, swapAngle1);
+		upPath = calculateUpFace(upFaceSign*startAngle1, upFaceSign*swapAngle1);
 		
 		//DOWN FACE
 		var downPath = null;
