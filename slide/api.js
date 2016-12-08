@@ -6346,32 +6346,41 @@ background-repeat: no-repeat;\
 					break;
 			}
 
-			var _len    = Loader.Reader.GetLong();
-			_pos += 4;
-			stream.size = _pos + _len;
+            var nChangeLen = stream.GetLong();
+            _pos += 4;
+            stream.size = _pos + nChangeLen;
 
-			var _id       = Loader.Reader.GetString2();
-			var _read_pos = Loader.Reader.GetCurPos();
+            var ClassId = stream.GetString2();
+            var Class   = AscCommon.g_oTableId.Get_ById(ClassId);
 
-			var Type  = Loader.Reader.GetLong();
-			var Class = null;
+            var nReaderPos  = stream.GetCurPos();
+            var nChangeType = stream.GetLong();
 
-			if (AscDFH.historyitem_type_HdrFtr === Type)
-			{
-				Class = editor.WordControl.m_oLogicDocument.HdrFtr;
-			}
-			else
-				Class = g_oTableId.Get_ById(_id);
+            if (Class)
+            {
+                var fChangesClass = AscDFH.changesFactory[nChangeType];
+                if (fChangesClass)
+                {
+                    var oChange = new fChangesClass(Class);
+                    oChange.ReadFromBinary(stream);
 
-			stream.Seek(_read_pos);
-			stream.Seek2(_read_pos);
+                    if (true === AscCommon.CollaborativeEditing.private_AddOverallChange(oChange))
+                        oChange.Load(_color);
+                }
+                else
+                {
+                    AscCommon.CollaborativeEditing.private_AddOverallChange(data);
 
-			if (null != Class)
-				Class.Load_Changes(Loader.Reader, Loader.Reader2, _color);
+                    stream.Seek(nReaderPos);
+                    stream.Seek2(nReaderPos);
 
-			_pos += _len;
-			stream.Seek2(_pos);
-			stream.size = data.length;
+                    Class.Load_Changes(stream, null, _color);
+                }
+            }
+
+            _pos += nChangeLen;
+            stream.Seek2(_pos);
+            stream.size = data.length;
 		}
 
 		if (isFull)
