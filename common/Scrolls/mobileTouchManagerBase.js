@@ -86,11 +86,11 @@
 
 		this.Manager.iScroll.on('scroll', function()
 		{
-			this.ScrollTo(this);
+			this.manager.delegate.ScrollTo(this);
 		});
 		this.Manager.iScroll.on('scrollEnd', function()
 		{
-			this.ScrollEnd(this);
+			this.manager.delegate.ScrollEnd(this);
 		});
 	};
 
@@ -165,13 +165,13 @@
 	/**
 	 * @extends {CMobileDelegateSimple}
 	 */
-	function CMobileDelegateEditor(_api)
+	function CMobileDelegateEditor(_manager)
 	{
-		CMobileDelegateEditor.superclass.constructor.call(this, _api);
+		CMobileDelegateEditor.superclass.constructor.call(this, _manager);
 
-		this.HtmlPage 			= _api.WordControl;
-		this.LogicDocument		= _api.WordControl.m_oLogicDocument;
-		this.DrawingDocument 	= _api.WordControl.m_oDrawingDocument;
+		this.HtmlPage 			= this.Api.WordControl;
+		this.LogicDocument		= this.Api.WordControl.m_oLogicDocument;
+		this.DrawingDocument 	= this.Api.WordControl.m_oDrawingDocument;
 	}
 	AscCommon.extendClass(CMobileDelegateEditor, CMobileDelegateSimple);
 
@@ -179,9 +179,9 @@
 	{
 		return this.DrawingDocument.SelectionMatrix;
 	};
-	CMobileDelegateEditor.prototype.ConvertCoordsToCursor = function(x, y, page)
+	CMobileDelegateEditor.prototype.ConvertCoordsToCursor = function(x, y, page, isGlobal)
 	{
-		return this.DrawingDocument.ConvertCoordsToCursor(x, y, page);
+		return this.DrawingDocument.ConvertCoordsToCursor3(x, y, page, (isGlobal !== false));
 	};
 	CMobileDelegateEditor.prototype.ConvertCoordsFromCursor = function(x, y)
 	{
@@ -395,15 +395,15 @@
 	};
 	CMobileDelegateEditor.prototype.Logic_OnMouseDown = function(e, x, y, page)
 	{
-		return this.LogicDocument.OnMouseDown(global_mouseEvent, x, y, page);
+		return this.LogicDocument.OnMouseDown(e, x, y, page);
 	};
-	CMobileDelegateEditor.prototype.Logic_OnMouseMove = function()
+	CMobileDelegateEditor.prototype.Logic_OnMouseMove = function(e, x, y, page)
 	{
-		return this.LogicDocument.OnMouseMove(global_mouseEvent, x, y, page);
+		return this.LogicDocument.OnMouseMove(e, x, y, page);
 	};
-	CMobileDelegateEditor.prototype.Logic_OnMouseUp = function()
+	CMobileDelegateEditor.prototype.Logic_OnMouseUp = function(e, x, y, page)
 	{
-		return this.LogicDocument.OnMouseUp(global_mouseEvent, x, y, page);
+		return this.LogicDocument.OnMouseUp(e, x, y, page);
 	};
 	CMobileDelegateEditor.prototype.Drawing_OnMouseDown = function(e)
 	{
@@ -473,12 +473,13 @@
 
 		/* scroll object */
 		this.iScroll = null;
+		this.iScrollElement	= "mobile_scroller_id";
 
 		/* delegate */
 		this.delegate = null;
 	}
 
-	CMobileTouchManagerBase.prototype.CreateScrollerDiv = function(_wrapper, _id)
+	CMobileTouchManagerBase.prototype.CreateScrollerDiv = function(_wrapper)
 	{
 		var _scroller = document.createElement('div');
 		var _style = "position: absolute; z-index: 0; margin: 0; padding: 0; -webkit-tap-highlight-color: rgba(0,0,0,0); width: 100%; heigth: 100%; display: block;";
@@ -487,7 +488,7 @@
 		_style += "-webkit-text-size-adjust: none; -moz-text-size-adjust: none; -ms-text-size-adjust: none; -o-text-size-adjust: none; text-size-adjust: none;";
 		_scroller.setAttribute("style", _style);
 
-		_scroller.id = _id;
+		_scroller.id = this.iScrollElement;
 		_wrapper.appendChild(_scroller);
 	};
 
@@ -554,8 +555,6 @@
 		if (!this.TableTrackEnabled)
 			return false;
 
-		var _offset = this.delegate.GetElementOffset();
-
 		var _eps     = this.TrackTargetEps;
 		var bIsTable = false;
 
@@ -567,8 +566,8 @@
 
 			if (!_Transform || global_MatrixTransformer.IsIdentity(_Transform))
 			{
-				var _x = global_mouseEvent.X - _offset.X;
-				var _y = global_mouseEvent.Y - _offset.Y;
+				var _x = global_mouseEvent.X;
+				var _y = global_mouseEvent.Y;
 
 				var posLT   = this.delegate.ConvertCoordsToCursor(this.TableMovePoint.X, this.TableMovePoint.Y, _PageNum);
 				var _offset = this.TableRulersRectSize + this.TableRulersRectOffset;
@@ -858,7 +857,7 @@
 
 	CMobileTouchManagerBase.prototype.Destroy = function()
 	{
-		var _scroller = document.getElementById("mobile_scroller_id");
+		var _scroller = document.getElementById(this.iScrollElement);
 		this.delegate.GetScrollerParent().removeChild(_scroller);
 
 		if (this.iScroll != null)
@@ -964,11 +963,11 @@
 
 		if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
 		{
-			var pos1 = this.delegate.ConvertCoordsToCursor(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1);
-			var pos2 = this.delegate.ConvertCoordsToCursor(this.RectSelect1.x, this.RectSelect1.y + this.RectSelect1.h, this.PageSelect1);
+			var pos1 = this.delegate.ConvertCoordsToCursor(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1, false);
+			var pos2 = this.delegate.ConvertCoordsToCursor(this.RectSelect1.x, this.RectSelect1.y + this.RectSelect1.h, this.PageSelect1, false);
 
-			var pos3 = this.delegate.ConvertCoordsToCursor(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y, this.PageSelect2);
-			var pos4 = this.delegate.ConvertCoordsToCursor(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h, this.PageSelect2);
+			var pos3 = this.delegate.ConvertCoordsToCursor(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y, this.PageSelect2, false);
+			var pos4 = this.delegate.ConvertCoordsToCursor(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h, this.PageSelect2, false);
 
 			ctx.beginPath();
 
@@ -1003,11 +1002,11 @@
 			var _xx22 = _matrix.TransformPointX(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h);
 			var _yy22 = _matrix.TransformPointY(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h);
 
-			var pos1 = this.delegate.ConvertCoordsToCursor(_xx11, _yy11, this.PageSelect1);
-			var pos2 = this.delegate.ConvertCoordsToCursor(_xx12, _yy12, this.PageSelect1);
+			var pos1 = this.delegate.ConvertCoordsToCursor(_xx11, _yy11, this.PageSelect1, false);
+			var pos2 = this.delegate.ConvertCoordsToCursor(_xx12, _yy12, this.PageSelect1, false);
 
-			var pos3 = this.delegate.ConvertCoordsToCursor(_xx21, _yy21, this.PageSelect2);
-			var pos4 = this.delegate.ConvertCoordsToCursor(_xx22, _yy22, this.PageSelect2);
+			var pos3 = this.delegate.ConvertCoordsToCursor(_xx21, _yy21, this.PageSelect2, false);
+			var pos4 = this.delegate.ConvertCoordsToCursor(_xx22, _yy22, this.PageSelect2, false);
 
 			ctx.beginPath();
 
@@ -1078,7 +1077,7 @@
 		if (_table_markup.Rows.length == 0)
 			return;
 
-		this.HtmlPage.CheckShowOverlay();
+		HtmlPage.CheckShowOverlay();
 
 		var _epsRects  = this.TableRulersRectOffset;
 		var _rectWidth = this.TableRulersRectSize;
@@ -1098,8 +1097,8 @@
 		{
 			this.TableMovePoint = {X : _tableOutline.X, Y : _tableOutline.Y};
 
-			var pos1 = rawingDocument.ConvertCoordsToCursorWR(_tableOutline.X, _tableOutline.Y, _tableOutline.PageNum);
-			var pos2 = rawingDocument.ConvertCoordsToCursorWR(_tableOutline.X + _tableW, _tableOutline.Y, _tableOutline.PageNum);
+			var pos1 = DrawingDocument.ConvertCoordsToCursorWR(_tableOutline.X, _tableOutline.Y, _tableOutline.PageNum);
+			var pos2 = DrawingDocument.ConvertCoordsToCursorWR(_tableOutline.X + _tableW, _tableOutline.Y, _tableOutline.PageNum);
 
 			ctx.beginPath();
 
@@ -1525,13 +1524,12 @@
 	/* simple click */
 	CMobileTouchManagerBase.prototype.MoveCursorToPoint = function(isHalfHeight)
 	{
-		AscCommon.check_MouseMoveEvent(e);
 		var pos = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
 
 		var old_click_count          = global_mouseEvent.ClickCount;
 		global_mouseEvent.ClickCount = 1;
 
-		var nearPos = this.delegate.Logic_GetNearestPos(pos.Page, pos.X, pos.Y);
+		var nearPos = this.delegate.Logic_GetNearestPos(pos.X, pos.Y, pos.Page);
 
 		this.delegate.DrawingDocument.NeedScrollToTargetFlag = true;
 		var y = nearPos.Y;

@@ -822,7 +822,7 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oLogicDocument.TurnOff_CheckSpelling();
 
 		if (this.WordControl.MobileTouchManager)
-			this.WordControl.MobileTouchManager.LogicDocument = this.WordControl.m_oLogicDocument;
+			this.WordControl.MobileTouchManager.delegate.LogicDocument = this.WordControl.m_oLogicDocument;
 	};
 
 	asc_docs_api.prototype.InitViewer = function()

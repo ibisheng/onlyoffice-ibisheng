@@ -445,7 +445,7 @@ function CEditorPage(api)
 		if (this.m_oApi.isMobileVersion)
 		{
 			this.MobileTouchManager = new AscCommon.CMobileTouchManager({});
-			this.MobileTouchManager.Init(this);
+			this.MobileTouchManager.Init(this.m_oApi);
 		}
 
 		this.checkNeedRules();

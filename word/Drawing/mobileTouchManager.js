@@ -56,7 +56,7 @@
 		// создаем делегата. инициализация его - ПОСЛЕ создания iScroll
 		this.delegate = new AscCommon.CMobileDelegateEditor(this);
 		var _element = this.delegate.GetScrollerParent();
-		this.CreateScrollerDiv(_element, "mobile_scroller_id");
+		this.CreateScrollerDiv(_element);
 
 		this.iScroll = new window.IScroll(_element, {
 			scrollbars: true,
@@ -65,7 +65,7 @@
 			shrinkScrollbars: 'scale',
 			fadeScrollbars: true,
 			scrollX : true,
-			scroller_id : "mobile_scroller_id",
+			scroller_id : this.iScrollElement,
 			bounce : false
 		});
 
@@ -110,6 +110,26 @@
 		if (e.touches && 2 == e.touches.length)
 		{
 			this.Mode = AscCommon.MobileTouchMode.Zoom;
+		}
+
+		// если не используем этот моус даун - то уменьшаем количество кликов
+		switch (this.Mode)
+		{
+			case AscCommon.MobileTouchMode.None:
+			case AscCommon.MobileTouchMode.Scroll:
+			case AscCommon.MobileTouchMode.InlineObj:
+			case AscCommon.MobileTouchMode.FlowObj:
+			case AscCommon.MobileTouchMode.Zoom:
+			case AscCommon.MobileTouchMode.Cursor:
+			case AscCommon.MobileTouchMode.TableMove:
+			{
+				// так как был уже check, нужно уменьшить количество кликов
+				if (global_mouseEvent.ClickCount > 0)
+					global_mouseEvent.ClickCount--;
+				break;
+			}
+			default:
+				break;
 		}
 
 		switch (this.Mode)
@@ -192,10 +212,6 @@
 			}
 			case AscCommon.MobileTouchMode.FlowObj:
 			{
-				// так как был уже check, нужно уменьшить количество кликов
-				if (global_mouseEvent.ClickCount > 0)
-					global_mouseEvent.ClickCount--;
-
 				if (bIsKoefPixToMM)
 				{
 					global_mouseEvent.KoefPixToMM = 5;
@@ -206,7 +222,7 @@
 			}
 			case AscCommon.MobileTouchMode.Zoom:
 			{
-				this.HtmlPage.NoneRepaintPages = true;
+				this.delegate.HtmlPage.NoneRepaintPages = true;
 
 				var _x1 = (e.touches[0].pageX !== undefined) ? e.touches[0].pageX : e.touches[0].clientX;
 				var _y1 = (e.touches[0].pageY !== undefined) ? e.touches[0].pageY : e.touches[0].clientY;
@@ -227,15 +243,12 @@
 			}
 			case AscCommon.MobileTouchMode.TableMove:
 			{
-				// так как был уже check, нужно уменьшить количество кликов
-				if (global_mouseEvent.ClickCount > 0)
-					global_mouseEvent.ClickCount--;
 				this.delegate.Drawing_OnMouseDown(e.touches ? e.touches[0] : e);
 				break;
 			}
 			case AscCommon.MobileTouchMode.TableRuler:
 			{
-				this.HtmlPage.OnUpdateOverlay();
+				this.delegate.HtmlPage.OnUpdateOverlay();
 				break;
 			}
 		}
@@ -251,7 +264,7 @@
 	};
 	CMobileTouchManager.prototype.onTouchMove  = function(e)
 	{
-		if (null != this.delegate.IsReader())
+		if (this.delegate.IsReader())
 			return this.onTouchMove_renderer(e);
 
 		if (this.Mode != AscCommon.MobileTouchMode.FlowObj && this.Mode != AscCommon.MobileTouchMode.TableMove)
@@ -409,12 +422,13 @@
 	{
 		this.IsTouching = false;
 
-		if (null != this.delegate.IsReader())
+		if (this.delegate.IsReader())
 			return this.onTouchEnd_renderer(e);
 
+		var _e = e.changedTouches ? e.changedTouches[0] : e;
 		if (this.Mode != AscCommon.MobileTouchMode.FlowObj && this.Mode != AscCommon.MobileTouchMode.TableMove)
 		{
-			AscCommon.check_MouseUpEvent(e.changedTouches ? e.changedTouches[0] : e);
+			AscCommon.check_MouseUpEvent(_e);
 		}
 
 		var isCheckContextMenuMode = true;
@@ -432,7 +446,8 @@
 				if (!this.MoveAfterDown)
 				{
 					global_mouseEvent.Button = 0;
-					this.MoveCursorToPoint(false);
+					this.delegate.Drawing_OnMouseDown(_e);
+					this.delegate.Drawing_OnMouseUp(_e);
 					this.Api.sendEvent("asc_onTapEvent", e);
 				}
 				else
@@ -565,7 +580,7 @@
 					var _markup = HtmlPage.m_oHorRuler.m_oTableMarkup;
 					_markup.Rows[this.TableCurrentMovePos].H += (this.TableCurrentMoveValue - this.TableCurrentMoveValueOld);
 
-					if ( false === this.HtmlPage.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
+					if ( false === this.delegate.HtmlPage.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
 					{
 						HtmlPage.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTableMarkup_Hor);
 						_markup.Table.Update_TableMarkupFromRuler(_markup, false, this.TableCurrentMovePos + 1);
