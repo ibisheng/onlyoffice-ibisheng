@@ -446,7 +446,7 @@ CChangesTableRowAddCell.prototype.private_ReadItem = function(Reader)
 };
 CChangesTableRowAddCell.prototype.Load = function(Color)
 {
-	if (this.Items.length <= 0 || this.PosArray <= 0)
+	if (this.Items.length <= 0 || this.PosArray.length <= 0)
 		return;
 
 	var oRow = this.Class;
