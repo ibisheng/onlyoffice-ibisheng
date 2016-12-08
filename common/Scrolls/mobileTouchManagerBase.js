@@ -479,6 +479,8 @@
 		this.delegate = null;
 	}
 
+	// создание вспомогательного элемента, для прокрутки. по идее потом можно изменить
+	// просто на сдвиги. но пока так
 	CMobileTouchManagerBase.prototype.CreateScrollerDiv = function(_wrapper)
 	{
 		var _scroller = document.createElement('div');
@@ -492,6 +494,8 @@
 		_wrapper.appendChild(_scroller);
 	};
 
+	// здесь загрузка нужных картинок. пока только для таблицы (движение)
+	// грузим в конструкторе, используем тогда, когда загружено (asc_complete)
 	CMobileTouchManagerBase.prototype.LoadMobileImages = function()
 	{
 		window.g_table_track_mobile_move = new Image();
@@ -503,6 +507,7 @@
 		window.g_table_track_mobile_move.src          = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAArlJREFUeNqMlc9rWkEQx8ffGqMJBJpSUEIISInxpCfT1krioQQ85xISEKGBkGuhpxwEL4GAoOBJ8V9IxJCQ1l4SkFKxQvEfKEXQ0Nb4IxLtfBefvMeriQPj7ps377Mzu7OjZjgckoYlGo2+tFqtcZ1OFyAiG00nfx8eHj7f3d19SKfTP5g11LBRs7u761lYWPiytbVl9/l8ZDKZpqL1ej0qlUp0enr6p9FovM5kMhU92w02my0OmN/vJ0TcbreJVxZzCH9ARqORQqGQCurxeAC2n52dxfkxDOCMXq9/5fV6aTAYEIc/BkHYkWKx2Ni2ubn5X+j5+fkbweIf5GdFmoAhMkny+TzF43GyWCzi+ejoSIA3NjYUQA4IA5xMmGnhBO33+4rowuEwbW9vKz7Gdtzf36uiHH2n1eJQkCoE0WFeKBTE2O12qdlsKhQ2vLu6uhKjXMHSyuhivLi4oEQiQVLUk/T4+JiKxaLCJtKXQNDLy0tKJpM0NzcnrThR4HNyciLm6+vraiAEB8P1KE9hoqCMzGYzGQwG4asASoZAIEDz8/OUSqWeBGLxg4MDWl1dHe+rKkKUDWpqf3//SeDh4SG5XC5x6nKGYg+lW+J2u6nT6TwKBEzuo0pZPiJSyPX1NWWz2bFdy1UWiUQIt0rykUSe8pDrr837MCMvakgwGCSHw0G5XE487+3t0dLSkip6FDozumABOODVvt3c3PiXl5cVjq1Wi1ZWVmhnZ0dcL6fTqYoMUqlUYP8Klg7dhlNp3N7evuM7a0DZcE9UrL64uEh2u318APJ35XIZl6HN0I/1er2GfmhkfcGb/JYP4/3s7OwaL2Ceph/yvnU5i+/VajVVq9U+semnaLCjTvGM9TkuAaKesmP3WX+z/mKts3Y00l/ACDIzamfa0UKPCU4QR9tDEwIcfwH/BBgAl4G4NBf6Z6AAAAAASUVORK5CYII=";
 	};
 
+	// onTouchStart => попали ли в якорьки селекта, чтобы не начинать скроллы/зумы
 	CMobileTouchManagerBase.prototype.CheckSelectTrack = function()
 	{
 		if (!this.SelectEnabled)
@@ -550,6 +555,7 @@
 		return (this.Mode == AscCommon.MobileTouchMode.Select);
 	};
 
+	// onTouchStart => попали ли в якорьки таблицы, чтобы не начинать скроллы/зумы
 	CMobileTouchManagerBase.prototype.CheckTableTrack = function()
 	{
 		if (!this.TableTrackEnabled)
@@ -795,6 +801,7 @@
 		return bIsTable;
 	};
 
+	// onTouchStart => попали ли в якорьки трека объекта (шейп, картинка), чтобы не начинать скроллы/зумы
 	CMobileTouchManagerBase.prototype.CheckObjectTrack = function()
 	{
 		var pos = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
@@ -814,6 +821,7 @@
 		return (AscCommon.MobileTouchMode.FlowObj == this.Mode);
 	};
 
+	// в мобильной версии - меньше, чем "по ширине" - не делаем
 	CMobileTouchManagerBase.prototype.CheckZoomCriticalValues = function(zoomMin)
 	{
 		if (zoomMin !== undefined)
@@ -832,6 +840,7 @@
 		}
 	};
 
+	// изменился размер документа/экрана => нужно перескитать вспомогательный элемент для скролла
 	CMobileTouchManagerBase.prototype.Resize = function()
 	{
 		if (this.iScroll != null)
@@ -844,6 +853,7 @@
 		}
 	};
 
+	// есть ли тач или анимационный скролл/зум
 	CMobileTouchManagerBase.prototype.IsWorkedPosition = function()
 	{
 		if (this.IsTouching)
@@ -855,6 +865,7 @@
 		return false;
 	};
 
+	// удаление вспомогательного элемента
 	CMobileTouchManagerBase.prototype.Destroy = function()
 	{
 		var _scroller = document.getElementById(this.iScrollElement);
@@ -911,6 +922,7 @@
 		this.Api.sendEvent("asc_onHidePopMenu");
 	};
 
+	// закончился скролл
 	CMobileTouchManagerBase.prototype.OnScrollAnimationEnd = function()
 	{
 		if (this.Api.isViewMode)
@@ -919,7 +931,7 @@
 		this.CheckContextMenuTouchEnd(false);
 	};
 
-	/* select rects */
+	// обновление ректов для селекта текстового
 	CMobileTouchManagerBase.prototype.CheckSelectRects = function()
 	{
 		this.RectSelect1 = null;
@@ -950,8 +962,12 @@
 		this.PageSelect2 	= _rect2.Page;
 	};
 
+	// отрисовка текстового селекта
 	CMobileTouchManagerBase.prototype.CheckSelect = function(overlay)
 	{
+		if (!this.SelectEnabled)
+			return;
+
 		this.CheckSelectRects();
 		if (null == this.RectSelect1 || null == this.RectSelect2)
 			return;
@@ -1048,6 +1064,8 @@
 		}
 	};
 
+	// отрисовка табличного селекта
+	// заточка на определенного делегата
 	CMobileTouchManagerBase.prototype.CheckTableRules = function(overlay)
 	{
 		if (this.Api.isViewMode || !this.TableTrackEnabled)
@@ -1360,7 +1378,7 @@
 		}
 	};
 
-	/* viewer methods */
+	/* document renderer mode (заточка на делегата) */
 	CMobileTouchManagerBase.prototype.onTouchStart_renderer = function(e)
 	{
 		AscCommon.check_MouseDownEvent(e.touches ? e.touches[0] : e, true);
@@ -1504,7 +1522,7 @@
 			case AscCommon.MobileTouchMode.Zoom:
 			{
 				// здесь нужно запускать отрисовку, если есть анимация зума
-				this.delegate.HtmlPage.NoneRepaintPdelegate.ages = false;
+				this.delegate.HtmlPage.NoneRepaintPages = false;
 				this.delegate.HtmlPage.m_bIsFullRepaint = true;
 				this.delegate.HtmlPage.OnScroll();
 
@@ -1521,7 +1539,7 @@
 			e.returnValue = false;
 	};
 
-	/* simple click */
+	/* перемещение курсора (именно курсора!) до ближайщей позиции. заточка на делегата */
 	CMobileTouchManagerBase.prototype.MoveCursorToPoint = function(isHalfHeight)
 	{
 		var pos = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
@@ -1543,6 +1561,7 @@
 	};
 
 	//--------------------------------------------------------export----------------------------------------------------
+	AscCommon.CMobileDelegateSimple = CMobileDelegateSimple;
 	AscCommon.CMobileTouchManagerBase = CMobileTouchManagerBase;
 	AscCommon.CMobileDelegateEditor = CMobileDelegateEditor;
 })(window);

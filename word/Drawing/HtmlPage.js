@@ -444,7 +444,7 @@ function CEditorPage(api)
 
 		if (this.m_oApi.isMobileVersion)
 		{
-			this.MobileTouchManager = new AscCommon.CMobileTouchManager({});
+			this.MobileTouchManager = new AscCommon.CMobileTouchManager();
 			this.MobileTouchManager.Init(this.m_oApi);
 		}
 
@@ -2278,7 +2278,7 @@ function CEditorPage(api)
 		}
 
 		this.ReaderTouchManager = new AscCommon.CReaderTouchManager();
-		this.ReaderTouchManager.Init(this);
+		this.ReaderTouchManager.Init(this.m_oApi);
 
 		this.TransformDivUseAnimation(this.ReaderModeDivWrapper, 0);
 
@@ -2353,8 +2353,9 @@ function CEditorPage(api)
 
 				if (oThis.m_oApi.isMobileVersion)
 				{
-					oThis.MobileTouchManager = new AscCommon.CMobileTouchManager({});
-					oThis.MobileTouchManager.Init(oThis);
+					oThis.MobileTouchManager = new AscCommon.CMobileTouchManager();
+					oThis.MobileTouchManager.Init(oThis.m_oApi);
+					oThis.MobileTouchManager.Resize();
 				}
 
 				return;

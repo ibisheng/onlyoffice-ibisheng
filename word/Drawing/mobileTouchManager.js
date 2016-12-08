@@ -45,7 +45,7 @@
 	 */
 	function CMobileTouchManager(_config)
 	{
-		CMobileTouchManager.superclass.constructor.call(this, _config);
+		CMobileTouchManager.superclass.constructor.call(this, _config || {});
 	}
 	AscCommon.extendClass(CMobileTouchManager, AscCommon.CMobileTouchManagerBase);
 
@@ -610,80 +610,116 @@
 			this.CheckContextMenuTouchEnd(isCheckContextMenuMode);
 	};
 
-	function CReaderTouchManager()
+	/*************************************** READER ******************************************/
+	/**
+	 * @extends {AscCommon.CMobileDelegateSimple}
+	 */
+	function CMobileDelegateEditorReader(_manager)
 	{
-		this.HtmlPage = null;
-		this.iScroll  = null;
+		CMobileDelegateEditorReader.superclass.constructor.call(this, _manager);
+
+		this.HtmlPage 			= this.Api.WordControl;
+	}
+	AscCommon.extendClass(CMobileDelegateEditorReader, AscCommon.CMobileDelegateSimple);
+
+	CMobileDelegateEditorReader.prototype.GetZoom = function()
+	{
+		return this.HtmlPage.m_nZoomValue;
+	};
+	CMobileDelegateEditorReader.prototype.SetZoom = function(_value)
+	{
+		this.HtmlPage.m_oApi.zoom(_value);
+	};
+	CMobileDelegateEditorReader.prototype.GetScrollerParent = function()
+	{
+		return this.HtmlPage.m_oMainView.HtmlElement;
+	};
+
+	/**
+	 * @extends {AscCommon.CMobileTouchManagerBase}
+	 */
+	function CReaderTouchManager(_config)
+	{
+		CReaderTouchManager.superclass.constructor.call(this, _config || {});
+
+		this.SelectEnabled = false;
+		this.TableTrackEnabled = false;
 
 		this.bIsLock          = false;
 		this.bIsMoveAfterDown = false;
-
-		this.Init = function(ctrl)
-		{
-			this.HtmlPage        = ctrl;
-			this.LogicDocument   = ctrl.m_oLogicDocument;
-			this.DrawingDocument = ctrl.m_oDrawingDocument;
-
-			this.iScroll = new window.IScroll(this.HtmlPage.m_oMainView.HtmlElement, {
-				scrollbars: true,
-				mouseWheel: true,
-				interactiveScrollbars: true,
-				shrinkScrollbars: 'scale',
-				fadeScrollbars: true,
-				scrollX : true,
-				scroller_id : "reader_id",
-				bounce : false
-			});
-			this.iScroll.manager = this;
-
-			this.HtmlPage.m_oApi.sendEvent("asc_onHidePopMenu");
-		};
-
-		this.onTouchStart = function(e)
-		{
-			this.iScroll._start(e);
-			this.bIsLock          = true;
-			this.bIsMoveAfterDown = false;
-		};
-		this.onTouchMove  = function(e)
-		{
-			if (!this.bIsLock)
-				return;
-			this.iScroll._move(e);
-			this.bIsMoveAfterDown = true;
-		};
-		this.onTouchEnd   = function(e)
-		{
-			this.iScroll._end(e);
-			this.bIsLock = false;
-
-			if (this.bIsMoveAfterDown === false)
-			{
-				this.HtmlPage.m_oApi.sendEvent("asc_onTapEvent", e);
-			}
-		};
-
-		this.Resize = function()
-		{
-			this.HtmlPage.ReaderModeDivWrapper.style.width  = this.HtmlPage.m_oMainView.HtmlElement.style.width;
-			this.HtmlPage.ReaderModeDivWrapper.style.height = this.HtmlPage.m_oMainView.HtmlElement.style.height;
-
-			if (this.iScroll != null)
-				this.iScroll.refresh();
-		};
-
-		this.ChangeFontSize = function()
-		{
-			if (this.iScroll != null)
-				this.iScroll.refresh();
-		};
-
-		this.Destroy = function()
-		{
-			if (this.iScroll != null)
-				this.iScroll.destroy();
-		};
 	}
+	AscCommon.extendClass(CReaderTouchManager, AscCommon.CMobileTouchManagerBase);
+
+	CReaderTouchManager.prototype.Init = function(_api)
+	{
+		this.Api = _api;
+		this.iScrollElement = "reader_id";
+
+		// создаем делегата. инициализация его - ПОСЛЕ создания iScroll
+		this.delegate = new CMobileDelegateEditorReader(this);
+
+		this.iScroll = new window.IScroll(this.delegate.GetScrollerParent(), {
+			scrollbars: true,
+			mouseWheel: true,
+			interactiveScrollbars: true,
+			shrinkScrollbars: 'scale',
+			fadeScrollbars: true,
+			scrollX : true,
+			scroller_id : this.iScrollElement,
+			bounce : true
+		});
+
+		// создаем делегата. инициализация его - ПОСЛЕ создания iScroll
+		this.delegate.Init(this);
+
+		this.Api.sendEvent("asc_onHidePopMenu");
+	};
+
+	CReaderTouchManager.prototype.onTouchStart = function(e)
+	{
+		this.iScroll._start(e);
+		this.bIsLock          = true;
+		this.bIsMoveAfterDown = false;
+	};
+	CReaderTouchManager.prototype.onTouchMove  = function(e)
+	{
+		if (!this.bIsLock)
+			return;
+		this.iScroll._move(e);
+		this.bIsMoveAfterDown = true;
+	};
+	CReaderTouchManager.prototype.onTouchEnd   = function(e)
+	{
+		this.iScroll._end(e);
+		this.bIsLock = false;
+
+		if (this.bIsMoveAfterDown === false)
+		{
+			this.Api.sendEvent("asc_onTapEvent", e);
+		}
+	};
+
+	CReaderTouchManager.prototype.Resize = function()
+	{
+		var HtmlPage = this.delegate.HtmlPage;
+		HtmlPage.ReaderModeDivWrapper.style.width  = HtmlPage.m_oMainView.HtmlElement.style.width;
+		HtmlPage.ReaderModeDivWrapper.style.height = HtmlPage.m_oMainView.HtmlElement.style.height;
+
+		if (this.iScroll != null)
+			this.iScroll.refresh();
+	};
+
+	CReaderTouchManager.prototype.ChangeFontSize = function()
+	{
+		if (this.iScroll != null)
+			this.iScroll.refresh();
+	};
+
+	CReaderTouchManager.prototype.Destroy = function()
+	{
+		if (this.iScroll != null)
+			this.iScroll.destroy();
+	};
 
 	//--------------------------------------------------------export----------------------------------------------------
 	window['AscCommon']                          = window['AscCommon'] || {};
