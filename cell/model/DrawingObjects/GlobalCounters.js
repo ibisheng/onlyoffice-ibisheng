@@ -148,6 +148,19 @@ CCollaborativeEditing.prototype.Check_MergeData = function()
 //-----------------------------------------------------------------------------------
 CCollaborativeEditing.prototype.Get_GlobalLock = function()
 {
+	return false;
+};
+CCollaborativeEditing.prototype.Set_GlobalLock = function(isLock)
+{
+
+};
+CCollaborativeEditing.prototype.Get_GlobalLockSelection = function()
+{
+	return false;
+};
+CCollaborativeEditing.prototype.Set_GlobalLockSelection = function(isLock)
+{
+
 };
 
 CCollaborativeEditing.prototype.OnStart_CheckLock = function()

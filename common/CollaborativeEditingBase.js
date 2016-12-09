@@ -219,8 +219,8 @@ function CCollaborativeEditingBase()
     this.m_aEndActions  = []; // Массив действий, которые надо выполнить после принятия чужих изменений
 
 
-    this.m_bGlobalLock  = false;         // Запрещаем производить любые "редактирующие" действия (т.е. то, что в историю запишется)
-    this.m_bGlobalLockSelection = false; // Запрещаем изменять селект и курсор
+    this.m_bGlobalLock          = 0; // Запрещаем производить любые "редактирующие" действия (т.е. то, что в историю запишется)
+    this.m_bGlobalLockSelection = 0; // Запрещаем изменять селект и курсор
     this.m_aCheckLocks  = [];    // Массив для проверки залоченности объектов, которые мы собираемся изменять
 
     this.m_aNewObjects  = []; // Массив со списком чужих новых объектов
@@ -464,8 +464,8 @@ CCollaborativeEditingBase.prototype.Release_Locks = function()
 };
 CCollaborativeEditingBase.prototype.OnStart_Load_Objects = function()
 {
-    AscCommon.CollaborativeEditing.m_bGlobalLock = true;
-    AscCommon.CollaborativeEditing.m_bGlobalLockSelection = true;
+    AscCommon.CollaborativeEditing.Set_GlobalLock(true);
+    AscCommon.CollaborativeEditing.Set_GlobalLockSelection(true);
     // Вызываем функцию для загрузки необходимых элементов (новые картинки и шрифты)
     editor.pre_Save(AscCommon.CollaborativeEditing.m_aNewImages);
 };
@@ -505,7 +505,25 @@ CCollaborativeEditingBase.prototype.Check_MergeData = function()
 //-----------------------------------------------------------------------------------
 CCollaborativeEditingBase.prototype.Get_GlobalLock = function()
 {
-    return this.m_bGlobalLock;
+    return (0 === this.m_bGlobalLock ? false : true);
+};
+CCollaborativeEditingBase.prototype.Set_GlobalLock = function(isLock)
+{
+	if (isLock)
+		this.m_bGlobalLock++;
+	else
+		this.m_bGlobalLock = Math.max(0, this.m_bGlobalLock - 1);
+};
+CCollaborativeEditingBase.prototype.Set_GlobalLockSelection = function(isLock)
+{
+	if (isLock)
+		this.m_bGlobalLockSelection++;
+	else
+		this.m_bGlobalLockSelection = Math.max(0, this.m_bGlobalLockSelection - 1);
+};
+CCollaborativeEditingBase.prototype.Get_GlobalLockSelection = function()
+{
+	return (0 === this.m_bGlobalLockSelection ? false : true);
 };
 CCollaborativeEditingBase.prototype.OnStart_CheckLock = function()
 {

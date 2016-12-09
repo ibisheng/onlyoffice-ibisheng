@@ -3510,7 +3510,7 @@ CDocument.prototype.RecalculateCurPos = function()
 	if (true === this.TurnOffRecalcCurPos)
 		return;
 
-	if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
+	if (true === AscCommon.CollaborativeEditing.Get_GlobalLockSelection())
 		return;
 
 	this.DrawingDocument.UpdateTargetTransform(null);
@@ -3526,7 +3526,7 @@ CDocument.prototype.Internal_CheckCurPage = function()
 	if (true === this.TurnOffRecalcCurPos)
 		return;
 
-	if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
+	if (true === AscCommon.CollaborativeEditing.Get_GlobalLockSelection())
 		return;
 
 	var nCurPage = this.Controller.GetCurPage();
@@ -6767,11 +6767,7 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 90 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + Z - Undo
     {
-    	if (true === e.ShiftKey)
-			this.CollaborativeEditing.Undo();
-    	else
-        	this.Document_Undo();
-
+       	this.Document_Undo();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 93 || 57351 == e.KeyCode /*в Opera такой код*/) // контекстное меню
@@ -8027,7 +8023,7 @@ CDocument.prototype.Document_UpdateInterfaceState = function(bSaveCurRevisionCha
 	if (true === this.TurnOffInterfaceEvents)
 		return;
 
-	if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
+	if (true === AscCommon.CollaborativeEditing.Get_GlobalLockSelection())
 		return;
 
 	// Удаляем весь список
@@ -8054,7 +8050,7 @@ CDocument.prototype.Document_UpdateRulersState = function()
 	if (true === this.TurnOffInterfaceEvents)
 		return;
 
-	if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
+	if (true === AscCommon.CollaborativeEditing.Get_GlobalLockSelection())
 		return;
 
 	this.DrawingDocument.Set_RulerState_Start();
@@ -8095,7 +8091,7 @@ CDocument.prototype.Document_UpdateSelectionState = function()
 	if (true === this.TurnOffInterfaceEvents)
 		return;
 
-	if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
+	if (true === AscCommon.CollaborativeEditing.Get_GlobalLockSelection())
 		return;
 
 	this.DrawingDocument.UpdateTargetTransform(null);
@@ -8140,7 +8136,7 @@ CDocument.prototype.Document_UpdateUndoRedoState = function()
 	if (true === this.TurnOffInterfaceEvents)
 		return;
 
-	if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
+	if (true === AscCommon.CollaborativeEditing.Get_GlobalLockSelection())
 		return;
 
 	// TODO: Возможно стоит перенсти эту проверку в класс CHistory и присылать
@@ -8156,7 +8152,7 @@ CDocument.prototype.Document_UpdateCopyCutState = function()
 	if (true === this.TurnOffInterfaceEvents)
 		return;
 
-	if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
+	if (true === AscCommon.CollaborativeEditing.Get_GlobalLockSelection())
 		return;
 
 	// Во время работы селекта не обновляем состояние
@@ -8170,7 +8166,7 @@ CDocument.prototype.Document_UpdateCanAddHyperlinkState = function()
 	if (true === this.TurnOffInterfaceEvents)
 		return;
 
-	if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
+	if (true === AscCommon.CollaborativeEditing.Get_GlobalLockSelection())
 		return;
 
 	// Проверяем можно ли добавить гиперссылку
@@ -8181,7 +8177,7 @@ CDocument.prototype.Document_UpdateSectionPr = function()
 	if (true === this.TurnOffInterfaceEvents)
 		return;
 
-	if (true === this.CollaborativeEditing.m_bGlobalLockSelection)
+	if (true === this.CollaborativeEditing.Get_GlobalLockSelection())
 		return;
 
 	// Обновляем ориентацию страницы
@@ -8363,16 +8359,27 @@ CDocument.prototype.Document_Undo = function(Options)
 	if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
 		return;
 
-	this.DrawingDocument.EndTrackTable(null, true);
-	this.DrawingObjects.TurnOffCheckChartSelection();
+	if (true !== this.History.Can_Undo() && this.Api && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
+	{
+		if (this.CollaborativeEditing.CanUndo())
+		{
+			this.CollaborativeEditing.Set_GlobalLock(true);
+			this.Api.asc_Save(true, true);
+		}
+	}
+	else
+	{
+		this.DrawingDocument.EndTrackTable(null, true);
+		this.DrawingObjects.TurnOffCheckChartSelection();
 
-	this.History.Undo(Options);
-	this.DrawingObjects.TurnOnCheckChartSelection();
-	this.Recalculate(false, false, this.History.RecalculateData);
+		this.History.Undo(Options);
+		this.DrawingObjects.TurnOnCheckChartSelection();
+		this.Recalculate(false, false, this.History.RecalculateData);
 
-	this.Document_UpdateSelectionState();
-	this.Document_UpdateInterfaceState();
-	this.Document_UpdateRulersState();
+		this.Document_UpdateSelectionState();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateRulersState();
+	}
 };
 CDocument.prototype.Document_Redo = function()
 {

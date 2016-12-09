@@ -5684,7 +5684,7 @@ background-repeat: no-repeat;\
 
 		if (!this.isViewMode && this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Theme) === false)
 		{
-			AscCommon.CollaborativeEditing.m_bGlobalLock = true;
+			AscCommon.CollaborativeEditing.Set_GlobalLock(true);
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_ChangeTheme);
 			this.ThemeLoader.StartLoadTheme(indexTheme);
 		}
@@ -5695,7 +5695,7 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.EndLoadTheme   = function(theme_load_info)
 	{
-		AscCommon.CollaborativeEditing.m_bGlobalLock = false;
+		AscCommon.CollaborativeEditing.Set_GlobalLock(false);
 
 		// применение темы
 		var _array = this.WordControl.Thumbnails.GetSelectedArray();

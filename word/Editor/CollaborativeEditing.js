@@ -202,8 +202,8 @@ CWordCollaborativeEditing.prototype.OnEnd_Load_Objects = function()
     // Данная функция вызывается, когда загрузились внешние объекты (картинки и шрифты)
 
     // Снимаем лок
-    AscCommon.CollaborativeEditing.m_bGlobalLock = false;
-    AscCommon.CollaborativeEditing.m_bGlobalLockSelection = false;
+    AscCommon.CollaborativeEditing.Set_GlobalLock(false);
+    AscCommon.CollaborativeEditing.Set_GlobalLockSelection(false);
 
     // Запускаем полный пересчет документа
     var LogicDocument = editor.WordControl.m_oLogicDocument;
@@ -265,7 +265,9 @@ CWordCollaborativeEditing.prototype.OnEnd_CheckLock = function(DontLockInFastMod
 
         // Ставим глобальный лок, только во время совместного редактирования
         if (-1 === this.m_nUseType)
-            this.m_bGlobalLock = true;
+		{
+			this.Set_GlobalLock(true);
+		}
         else
         {
             // Пробегаемся по массиву и проставляем, что залочено нами
@@ -296,7 +298,7 @@ CWordCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
     var oThis   = AscCommon.CollaborativeEditing;
     var oEditor = editor;
 
-    if (true === oThis.m_bGlobalLock)
+    if (true === oThis.Get_GlobalLock())
     {
         // Здесь проверяем есть ли длинная операция, если она есть, то до ее окончания нельзя делать
         // Undo, иначе точка истории уберется, а изменения допишутся в предыдущую.
@@ -304,7 +306,7 @@ CWordCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
             return;
 
         // Снимаем глобальный лок
-        oThis.m_bGlobalLock = false;
+        oThis.Set_GlobalLock(false);
 
         if (result["lock"])
         {
