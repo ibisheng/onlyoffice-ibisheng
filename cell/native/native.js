@@ -7629,3 +7629,22 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
                
                }, 5);
 };
+
+window["AscCommon"].getFullImageSrc2 = function (src) {
+    
+    var start = src.slice(0, 6);
+    if (0 === start.indexOf('theme') && editor.ThemeLoader){
+        return  editor.ThemeLoader.ThemesUrlAbs + src;
+    }
+    
+    if (0 !== start.indexOf('http:') && 0 !== start.indexOf('data:') && 0 !== start.indexOf('https:') &&
+        0 !== start.indexOf('file:') && 0 !== start.indexOf('ftp:')){
+        var srcFull = AscCommon.g_oDocumentUrls.getImageUrl(src);
+        if(srcFull){
+            window["native"]["loadUrlImage"](srcFull, src);
+            return srcFull;
+        }
+    }
+    return src;
+}
+
