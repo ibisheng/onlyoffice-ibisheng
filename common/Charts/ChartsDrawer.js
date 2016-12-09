@@ -2766,8 +2766,10 @@ CChartsDrawer.prototype =
 	},
 	
 	//TODO временная функция для теста результата значений
-	getPlainEquation: function(point1, point2, point3)
+	getPlainEquation3: function(point1, point2, point3)
 	{
+		var a1 = point1.x, b1 = point1.y, c1 = point1.z, a2 = point2.x, b2 = point2.y, c2 = point2.z, a3 = point3.x, b3 = point3.y, c3 = point3.z;
+		
 		var subMatrix = function(oldmat, row, col) 
 		{
 			var i;
@@ -2840,17 +2842,8 @@ CChartsDrawer.prototype =
 			}
 			return tmp;
 		};
-		
-		var a1 = point1.x;
-		var b1 = point1.y;
-		var c1 = point1.z;
-		var a2 = point2.x;
-		var b2 = point2.y;
-		var c2 = point2.z;
-		var a3 = point3.x;
-		var b3 = point3.y;
-		var c3 = point3.z;
 
+		
 		var mat = [];
 		mat[0] = []; mat[1] = []; mat[2] = [];
 		mat[0][0] = a1; mat[0][1] = b1; mat[0][2] = c1;
@@ -2877,11 +2870,45 @@ CChartsDrawer.prototype =
 		var c = determinant(replaceCol(mat, 2, vec)) * factor;
 		var d = det * factor;
 		
-		return {a: a, b: b, c: c, d: d};
+		var res1 = {a: a, b: b, c: c, d: d};
+		/*var t = this.getPlainEquation(point1, point2, point3)
+		
+		if(!(Math.sign(res1.a) === Math.sign(t.a) && Math.sign(res1.b) === Math.sign(t.b) && Math.sign(res1.c) === Math.sign(t.c) && Math.sign(res1.d) === Math.sign(t.d)))
+		{
+			console.log("palundra");
+		}*/
+		
+		return res1;
+	},
+	
+	//TODO если будет проблема при отрисовке граней(перекрытие друг другом), вернуть протестированную функцию  - getPlainEquation3
+	getPlainEquation: function(point1, point2, point3)
+	{
+		var x1 = point1.x, y1 = point1.y, z1 = point1.z;
+		var x2 = point2.x, y2 = point2.y, z2 = point2.z;
+		var x3 = point3.x, y3 = point3.y, z3 = point3.z;
+		
+		var a = x2 - x1;
+		var b = y2 - y1;
+		var c = z2 - z1;
+		var d = x3 - x1;
+		var e = y3 - y1;
+		var f = z3 - z1;
+		
+		var xK = b*f - e*c;
+		var yK = -(a*f - d*c);
+		var zK = a*e - d*b;
+		
+		var a1 = -xK;
+		var b1 = -yK;
+		var c1 = -zK;
+		var d1 = -(-y1 * yK - x1*xK - z1 * zK);
+		
+		return {a: a1, b: b1, c: c1, d: d1};
 	},
 	
 	//уравнение плоскости
-	getPlainEquation2: function(point1, point2, point3, point4)
+	getPlainEquation2: function(point1, point2, point3)
 	{
 		var x1 = point1.x, y1 = point1.y, z1 = point1.z;
 		var x2 = point2.x, y2 = point2.y, z2 = point2.z;

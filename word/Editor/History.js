@@ -221,12 +221,7 @@ CHistory.prototype =
 
         // Проверяем можно ли сделать Undo
         if (true !== this.Can_Undo())
-        {
-            if (this.Api && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
-                this.Api.sync_TryUndoInFastCollaborative();
-
             return null;
-        }
 
         // Запоминаем самое последнее состояние документа для Redo
         if ( this.Index === this.Points.length - 1 )

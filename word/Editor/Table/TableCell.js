@@ -1572,19 +1572,19 @@ CTableCell.prototype =
 				}
 				case 1 :
 				{
-					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Right, Border));
+					History.Add(new CChangesTableCellBorderRight(this, this.Pr.TableCellBorders.Right, Border));
 					this.Pr.TableCellBorders.Right = undefined;
 					break;
 				}
 				case 2 :
 				{
-					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Bottom, Border));
+					History.Add(new CChangesTableCellBorderBottom(this, this.Pr.TableCellBorders.Bottom, Border));
 					this.Pr.TableCellBorders.Bottom = undefined;
 					break;
 				}
 				case 3 :
 				{
-					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Left, Border));
+					History.Add(new CChangesTableCellBorderLeft(this, this.Pr.TableCellBorders.Left, Border));
 					this.Pr.TableCellBorders.Left = undefined;
 					break;
 				}
@@ -1613,19 +1613,19 @@ CTableCell.prototype =
 				}
 				case 1 :
 				{
-					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Right, NewBorder));
+					History.Add(new CChangesTableCellBorderRight(this, this.Pr.TableCellBorders.Right, NewBorder));
 					this.Pr.TableCellBorders.Right = NewBorder;
 					break;
 				}
 				case 2 :
 				{
-					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Bottom, NewBorder));
+					History.Add(new CChangesTableCellBorderBottom(this, this.Pr.TableCellBorders.Bottom, NewBorder));
 					this.Pr.TableCellBorders.Bottom = NewBorder;
 					break;
 				}
 				case 3 :
 				{
-					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Left, NewBorder));
+					History.Add(new CChangesTableCellBorderLeft(this, this.Pr.TableCellBorders.Left, NewBorder));
 					this.Pr.TableCellBorders.Left = NewBorder;
 					break;
 				}
@@ -1658,19 +1658,19 @@ CTableCell.prototype =
 				}
 				case 1 :
 				{
-					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Right, NewBorder));
+					History.Add(new CChangesTableCellBorderRight(this, this.Pr.TableCellBorders.Right, NewBorder));
 					this.Pr.TableCellBorders.Right = NewBorder;
 					break;
 				}
 				case 2 :
 				{
-					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Bottom, NewBorder));
+					History.Add(new CChangesTableCellBorderBottom(this, this.Pr.TableCellBorders.Bottom, NewBorder));
 					this.Pr.TableCellBorders.Bottom = NewBorder;
 					break;
 				}
 				case 3 :
 				{
-					History.Add(new CChangesTableCellBorderTop(this, this.Pr.TableCellBorders.Left, NewBorder));
+					History.Add(new CChangesTableCellBorderLeft(this, this.Pr.TableCellBorders.Left, NewBorder));
 					this.Pr.TableCellBorders.Left = NewBorder;
 					break;
 				}

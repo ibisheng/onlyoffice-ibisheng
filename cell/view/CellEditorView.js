@@ -1169,13 +1169,6 @@
 				canExpH = this._expandHeight();
 				doAjust = true;
 			}
-			if (this.textRender.isLastCharNL() && !doAjust && canExpH) {
-				var lm = this.textRender.calcCharHeight(this.textRender.getCharsCount() - 1);
-				if (tm.height + lm.th > this._getContentHeight()) {
-					this._expandHeight();
-					doAjust = true;
-				}
-			}
 		}
 		if (doAjust) {
 			this._adjustCanvas();
@@ -1328,16 +1321,16 @@
 		}
 	};
 
-	CellEditor.prototype._renderText = function ( dy ) {
+	CellEditor.prototype._renderText = function (dy) {
 		var t = this, opt = t.options, ctx = t.drawingCtx;
 
-		if ( !window['IS_NATIVE_EDITOR'] ) {
-			ctx.setFillStyle( opt.background )
-				.fillRect( 0, 0, ctx.getWidth(), ctx.getHeight() );
+		if (!window['IS_NATIVE_EDITOR']) {
+			ctx.setFillStyle(opt.background)
+				.fillRect(0, 0, ctx.getWidth(), ctx.getHeight());
 		}
 
-		if ( opt.fragments.length > 0 ) {
-			t.textRender.render( t._getContentLeft(), (dy === undefined ? 0 : dy), t._getContentWidth(), opt.textColor );
+		if (opt.fragments.length > 0) {
+			t.textRender.render(t._getContentLeft(), dy || 0, t._getContentWidth(), opt.textColor);
 		}
 	};
 

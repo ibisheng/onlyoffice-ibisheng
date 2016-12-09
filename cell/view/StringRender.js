@@ -648,13 +648,13 @@
 		 */
 		StringRender.prototype._calcTextMetrics = function (dontCalcRepeatChars) {
 			var self = this, i = 0, p, p_, lm, beg = 0;
-			var l = new LineInfo(), TW = 0, TH = 0, BL = 0, CL = 0;
+			var l = new LineInfo(), TW = 0, TH = 0, BL = 0;
 
 			function addLine(b, e) {
 				if (-1 !== b)
-					l.tw += self._calcLineWidth(b, e - 1);
+					l.tw += self._calcLineWidth(b, e);
 				l.beg = b;
-				l.end = e - 1;
+				l.end = e;
 				self.lines.push(l);
 				if (TW < l.tw) {TW = l.tw;}
 				BL = TH + l.bl;
@@ -696,21 +696,17 @@
 					// process 'new line' marker
 					if (p && (p.nl || p.hp)) {
 						addLine(beg, i);
-						beg = i;
+						beg = i + (p.nl ? 1 : 0);
 						lm = this._calcLineMetrics(p_.fsz !== undefined ? p_.fsz : p_.font.FontSize, p_.va, p_.fm);
 						l = new LineInfo(0, lm.th, lm.bl, lm.a, lm.d);
 					}
 				}
+				if (beg <= i) {
+					// add last line of text
+					addLine(beg, i - 1);
+				}
 			}
-
-			if (beg < i) {
-				// add last line of text
-				addLine(beg, i);
-			}
-			if (this.lines.length > 0) {
-				CL = (this.lines[0].bl - this.lines[0].a + BL + l.d) / 2;
-			}
-			return new asc.TextMetrics(TW, TH, 0, BL, 0, 0, CL);
+			return new asc.TextMetrics(TW, TH, 0, BL, 0, 0, (this.lines[0].bl - this.lines[0].a + BL + l.d) / 2);
 		};
 
 		StringRender.prototype._getRepeatCharPos = function () {
@@ -836,7 +832,7 @@
 
 						if (isNL) {
 							// add new line marker
-							nlPos = chPos + 1;
+							nlPos = chPos;
 							self._getCharPropAt(nlPos).nl = true;
 							self._getCharPropAt(nlPos).delta = delta;
 							ch = " ";
@@ -1066,6 +1062,9 @@
 						// render fragment
 						x1 += renderFragment(strBeg, i, p_, this.angle);
 						strBeg = i;
+					}
+					if (p.nl) {
+						strBeg += 1;
 					}
 
 					if (p.font) {

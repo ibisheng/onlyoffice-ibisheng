@@ -119,7 +119,7 @@ CTableRow.prototype =
 		for (var Index = 0; Index < CellsCount; Index++)
 		{
 			Row.Content[Index] = this.Content[Index].Copy(Row);
-			History.Add(new CChangesTableRowAddCell(Row, Index, Row.Content[Index]));
+			History.Add(new CChangesTableRowAddCell(Row, Index, [Row.Content[Index]]));
 		}
 
 		Row.Internal_ReIndexing();
@@ -593,7 +593,7 @@ CTableRow.prototype =
 		if ("undefined" === typeof(Cell) || null === Cell)
 			Cell = new CTableCell(Row);
 
-		History.Add(new CChangesTableRowAddCell(this, Index, Cell));
+		History.Add(new CChangesTableRowAddCell(this, Index, [Cell]));
 
 		this.Content.splice(Index, 0, Cell);
 		this.CellsInfo.splice(Index, 0, {});
