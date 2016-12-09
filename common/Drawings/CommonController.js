@@ -1196,6 +1196,15 @@ DrawingObjectsController.prototype =
         }, this, []);
     },
 
+
+    Is_SelectionUse: function(){
+        var content = this.getTargetDocContent(undefined, true);
+        if(content){
+            return content.Is_SelectionUse();
+        }
+        return false;
+    },
+
     getFromTargetTextObjectContextMenuPosition: function(oTargetTextObject, pageIndex)
     {
         var dX, dY, oDocContent, oTransformText, oParagraph, document = editor.WordControl.m_oLogicDocument, dPosX = 0, dPosY = 0;
