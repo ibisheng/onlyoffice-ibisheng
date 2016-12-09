@@ -762,6 +762,8 @@ function CEditorPage(api)
 	{
 		if (this.m_oApi.isMobileVersion)
 		{
+			this.m_oThumbnailsContainer.HtmlElement.style.zIndex = "11";
+
 			this.TextBoxBackground = CreateControl(AscCommon.g_inputContext.HtmlArea.id);
 			this.TextBoxBackground.HtmlElement.parentNode.parentNode.style.zIndex = 10;
 
@@ -2846,7 +2848,13 @@ function CEditorPage(api)
 			ctx.stroke();
 			ctx.beginPath();
 			ctx.globalAlpha = 1.0;
+
+			if (this.MobileTouchManager)
+				this.MobileTouchManager.CheckSelect(overlay);
 		}
+
+		if (this.MobileTouchManager)
+			this.MobileTouchManager.CheckTableRules(overlay);
 
 		ctx.globalAlpha = 1.0;
 		ctx             = null;
@@ -3128,6 +3136,9 @@ function CEditorPage(api)
 		this.Thumbnails.SlideHeight = this.m_oLogicDocument.Height;
 		this.Thumbnails.SlidesCount = this.m_oDrawingDocument.SlidesCount;
 		this.Thumbnails.CheckSizes();
+
+		if (this.MobileTouchManager)
+			this.MobileTouchManager.Resize();
 	};
 
 	this.CheckCalculateDocumentSize = function(_bounds)
