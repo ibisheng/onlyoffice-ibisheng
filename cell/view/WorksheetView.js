@@ -11831,11 +11831,12 @@
             this.objectRender.rebuildChartGraphicObjects(arrChanged);
             this.draw();
             this.handlers.trigger("reinitializeScroll");
+			this._updateSelectionNameAndInfo();
         } else {
             // Просто отрисуем
             this.draw();
+			this._updateSelectionNameAndInfo();
         }
-
     };
 
     WorksheetView.prototype._loadFonts = function (fonts, callback) {
