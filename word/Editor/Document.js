@@ -8143,7 +8143,12 @@ CDocument.prototype.Document_UpdateUndoRedoState = function()
 	//       данные события при изменении значения History.Index
 
 	// Проверяем состояние Undo/Redo
-	this.Api.sync_CanUndoCallback(this.History.Can_Undo());
+
+	var bCanUndo = this.History.Can_Undo();
+	if (true !== bCanUndo && this.Api && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
+		bCanUndo = this.CollaborativeEditing.CanUndo();
+
+	this.Api.sync_CanUndoCallback(bCanUndo);
 	this.Api.sync_CanRedoCallback(this.History.Can_Redo());
 	this.Api.CheckChangedDocument();
 };
