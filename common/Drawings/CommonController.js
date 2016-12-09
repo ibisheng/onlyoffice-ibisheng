@@ -1245,6 +1245,42 @@ DrawingObjectsController.prototype =
     },
 
 
+
+    isPointInDrawingObjects3: function(x, y)
+    {
+        var oOldState = this.curState;
+        this.changeCurrentState(new AscFormat.NullState(this));
+        var oResult, bRet = false;
+        this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
+        oResult = this.curState.onMouseDown(AscCommon.global_mouseEvent, x, y, 0);
+        this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
+        if(AscCommon.isRealObject(oResult)){
+            if(oResult.cursorType !== "text"){
+                var object = g_oTableId.Get_ById(oResult.objectId);
+                if(AscCommon.isRealObject(object) && (object.selected) ){
+                    bRet = true;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+        }
+        this.changeCurrentState(oOldState);
+        return bRet;
+    },
+
+    Get_SelectionBounds: function()
+    {
+        var oTargetDocContent = this.getTargetDocContent(false, true);
+        if(isRealObject(oTargetDocContent))
+        {
+            return oTargetDocContent.Get_SelectionBounds();
+        }
+        return null;
+    },
+
+
     CreateDocContent: function(){
         var oController = this;
         if(this.selection.groupSelection){
