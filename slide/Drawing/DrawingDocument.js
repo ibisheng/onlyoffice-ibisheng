@@ -3081,6 +3081,8 @@ function CThumbnailsManager()
 	this.MouseThumbnailsAnimateScrollTopTimer    = -1;
 	this.MouseThumbnailsAnimateScrollBottomTimer = -1;
 
+	this.ScrollerHeight = 0;
+
 	this.m_oWordControl = null;
 	var oThis           = this;
 
@@ -3941,6 +3943,12 @@ function CThumbnailsManager()
 		{
 			var lPosition = (dPosition * word_control.m_oScrollThumbApi.getMaxScrolledY()) >> 0;
 			word_control.m_oScrollThumbApi.scrollToY(lPosition);
+		}
+
+		this.ScrollerHeight = nHeightPix;
+		if (word_control.MobileTouchManagerThumbnails)
+		{
+			word_control.MobileTouchManagerThumbnails.Resize();
 		}
 
 		this.CalculatePlaces();

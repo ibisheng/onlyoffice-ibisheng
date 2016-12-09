@@ -1873,9 +1873,6 @@ Indicator.prototype = {
 
 		e.preventDefault();
 		e.stopPropagation();
-		
-		// !!!
-		this._execEvent('scroll');
 	},
 
 	_end: function (e) {
