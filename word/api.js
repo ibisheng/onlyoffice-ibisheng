@@ -822,7 +822,7 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oLogicDocument.TurnOff_CheckSpelling();
 
 		if (this.WordControl.MobileTouchManager)
-			this.WordControl.MobileTouchManager.LogicDocument = this.WordControl.m_oLogicDocument;
+			this.WordControl.MobileTouchManager.delegate.LogicDocument = this.WordControl.m_oLogicDocument;
 	};
 
 	asc_docs_api.prototype.InitViewer = function()
@@ -1999,7 +1999,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_SelectionCut = function()
 	{
-	    if (AscCommon.CollaborativeEditing.m_bGlobalLock)
+	    if (AscCommon.CollaborativeEditing.Get_GlobalLock())
     	    return;
 
 		var _logicDoc = this.WordControl.m_oLogicDocument;
@@ -2016,7 +2016,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_PasteData = function(_format, data1, data2)
 	{
-	    if (AscCommon.CollaborativeEditing.m_bGlobalLock)
+	    if (AscCommon.CollaborativeEditing.Get_GlobalLock())
 	        return;
 
 		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
@@ -2033,7 +2033,7 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.onSaveCallback = function(e)
+	asc_docs_api.prototype.onSaveCallback = function(e, isUndoRequest)
 	{
 		var t = this;
 		if (false == e["saveLock"])
@@ -2086,12 +2086,20 @@ background-repeat: no-repeat;\
 				CursorInfo = History.Get_DocumentPositionBinary();
 			}
 
-			// Пересылаем свои изменения
-			AscCommon.CollaborativeEditing.Send_Changes(this.IsUserSave, {
-				UserId      : this.CoAuthoringApi.getUserConnectionId(),
-				UserShortId : this.DocInfo.get_UserId(),
-				CursorInfo  : CursorInfo
-			}, HaveOtherChanges);
+			if (isUndoRequest)
+			{
+				AscCommon.CollaborativeEditing.Set_GlobalLock(false);
+				AscCommon.CollaborativeEditing.Undo();
+			}
+			else
+			{
+				// Пересылаем свои изменения
+				AscCommon.CollaborativeEditing.Send_Changes(this.IsUserSave, {
+					UserId      : this.CoAuthoringApi.getUserConnectionId(),
+					UserShortId : this.DocInfo.get_UserId(),
+					CursorInfo  : CursorInfo
+				}, HaveOtherChanges);
+			}
 		}
 		else
 		{
@@ -2109,14 +2117,14 @@ background-repeat: no-repeat;\
 				{
 					t.CoAuthoringApi.askSaveChanges(function(event)
 					{
-						t.onSaveCallback(event);
+						t.onSaveCallback(event, isUndoRequest);
 					});
 				}, TimeoutInterval);
 			}
 		}
 	};
 
-	asc_docs_api.prototype.asc_Save           = function(isAutoSave)
+	asc_docs_api.prototype.asc_Save           = function(isAutoSave, isUndoRequest)
 	{
 		this.IsUserSave = !isAutoSave;
 		if (true === this.canSave && !this.isLongAction())
@@ -2126,7 +2134,7 @@ background-repeat: no-repeat;\
 			var t = this;
 			this.CoAuthoringApi.askSaveChanges(function(e)
 			{
-				t.onSaveCallback(e);
+				t.onSaveCallback(e, isUndoRequest);
 			});
 		}
 	};
@@ -2351,9 +2359,6 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.sync_CanUndoCallback         = function(bCanUndo)
 	{
-		if (true === AscCommon.CollaborativeEditing.Is_Fast() && true !== AscCommon.CollaborativeEditing.Is_SingleUser())
-			bCanUndo = false;
-
 		this.sendEvent("asc_onCanUndo", bCanUndo);
 	};
 	asc_docs_api.prototype.sync_CanRedoCallback         = function(bCanRedo)
@@ -7373,7 +7378,7 @@ background-repeat: no-repeat;\
 			this.asc_SpellCheckDisconnect();
 			
 			this.ShowParaMarks                           = false;
-			AscCommon.CollaborativeEditing.m_bGlobalLock = true;
+			AscCommon.CollaborativeEditing.Set_GlobalLock(true);
 			//this.isShowTableEmptyLine = false;
 			//this.WordControl.m_bIsRuler = true;
 

@@ -2404,6 +2404,16 @@ var editor;
     this.handlers.trigger("asc_onEndAddShape");
   };
 
+
+    spreadsheet_api.prototype.asc_addShapeOnSheet = function(sPreset) {
+        if(this.wb){
+          var ws = this.wb.getWorksheet();
+          if(ws && ws.objectRender){
+            ws.objectRender.addShapeOnSheet(sPreset);
+          }
+        }
+    };
+
   spreadsheet_api.prototype.asc_addOleObjectAction = function(sLocalUrl, sData, sApplicationId, fWidth, fHeight, nWidthPix, nHeightPix)
   {
     var _image = this.ImageLoader.LoadImage(AscCommon.getFullImageSrc2(sLocalUrl), 1);
@@ -3555,6 +3565,7 @@ var editor;
   prot["setEndPointHistory"] = prot.setEndPointHistory;
   prot["asc_startAddShape"] = prot.asc_startAddShape;
   prot["asc_endAddShape"] = prot.asc_endAddShape;
+  prot["asc_addShapeOnSheet"] = prot.asc_addShapeOnSheet;
   prot["asc_isAddAutoshape"] = prot.asc_isAddAutoshape;
   prot["asc_canAddShapeHyperlink"] = prot.asc_canAddShapeHyperlink;
   prot["asc_canGroupGraphicsObjects"] = prot.asc_canGroupGraphicsObjects;

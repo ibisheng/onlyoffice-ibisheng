@@ -41,6 +41,168 @@
 	var global_keyboardEvent = AscCommon.global_keyboardEvent;
 
 	/**
+	 * @extends {AscCommon.CMobileDelegateEditor}
+	 */
+	function CMobileDelegateEditorPresentation(_manager)
+	{
+		CMobileDelegateEditorPresentation.superclass.constructor.call(this, _manager);
+	}
+	AscCommon.extendClass(CMobileDelegateEditorPresentation, AscCommon.CMobileDelegateEditor);
+
+	CMobileDelegateEditorPresentation.prototype.ConvertCoordsToCursor = function(x, y, page, isGlobal)
+	{
+		return this.DrawingDocument.ConvertCoordsToCursor(x, y);
+	};
+	CMobileDelegateEditorPresentation.prototype.ConvertCoordsFromCursor = function(x, y)
+	{
+		return this.DrawingDocument.ConvertCoordsFromCursor2(x, y);
+	};
+	CMobileDelegateEditorPresentation.prototype.GetScrollerSize = function()
+	{
+		return {
+			W : (this.DrawingDocument.SlideCurrectRect.right - this.DrawingDocument.SlideCurrectRect.left),
+			H : (this.DrawingDocument.SlideCurrectRect.bottom - this.DrawingDocument.SlideCurrectRect.top)
+		};
+	};
+	CMobileDelegateEditorPresentation.prototype.GetObjectTrack = function(x, y, page)
+	{
+		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.isPointInDrawingObjects(x, y, page);
+	};
+	CMobileDelegateEditorPresentation.prototype.GetSelectionRectsBounds = function()
+	{
+		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.Get_SelectionBounds();
+	};
+	CMobileDelegateEditorPresentation.prototype.ScrollTo = function(_scroll)
+	{
+		var bIsHorPresent = (this.HtmlPage.m_oScrollHorApi != null);
+		if (_scroll.directionLocked == "v")
+		{
+			this.HtmlPage.m_oScrollVerApi.scrollToY(-_scroll.y);
+		}
+		else if (_scroll.directionLocked == "h" && bIsHorPresent)
+		{
+			this.HtmlPage.m_oScrollHorApi.scrollToX(-_scroll.x);
+		}
+		else if (_scroll.directionLocked == "n")
+		{
+			if (bIsHorPresent)
+				this.HtmlPage.m_oScrollHorApi.scrollToX(-_scroll.x);
+			this.HtmlPage.m_oScrollVerApi.scrollToY(-_scroll.y);
+		}
+	};
+	CMobileDelegateEditorPresentation.prototype.GetContextMenuType = function()
+	{
+		var _mode = AscCommon.MobileTouchContextMenuType.None;
+
+		var _controller = this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects;
+
+		if (!_controller.Is_SelectionUse())
+			_mode = AscCommon.MobileTouchContextMenuType.Target;
+
+		if (_controller.Get_SelectionBounds())
+			_mode = AscCommon.MobileTouchContextMenuType.Select;
+
+		if (_mode == 0 && _controller.getSelectedObjectsBounds())
+			_mode = AscCommon.MobileTouchContextMenuType.Object;
+
+		return _mode;
+	};
+	CMobileDelegateEditorPresentation.prototype.GetContextMenuPosition = function()
+	{
+		var _controller = this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects;
+
+		var _posX = 0;
+		var _posY = 0;
+		var _page = 0;
+		var _transform = null;
+		var tmpX, tmpY, tmpX2, tmpY2;
+		var _pos = null;
+
+		var _mode = 0;
+
+		var _target = _controller.Is_SelectionUse();
+		if (_target === false)
+		{
+			_posX = this.DrawingDocument.m_dTargetX;
+			_posY = this.DrawingDocument.m_dTargetY;
+			_page = this.DrawingDocument.m_lTargetPage;
+			_transform = this.DrawingDocument.TextMatrix;
+
+			if (_transform)
+			{
+				tmpX = _transform.TransformPointX(_posX, _posY);
+				tmpY = _transform.TransformPointY(_posX, _posY);
+			}
+			else
+			{
+				tmpX = _posX;
+				tmpY = _posY;
+			}
+
+			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(tmpX, tmpY, _page);
+			_posX = _pos.X;
+			_posY = _pos.Y;
+
+			_mode = 1;
+		}
+
+		var _select = _controller.Get_SelectionBounds();
+		if (_select)
+		{
+			var _rect1 = _select.Start;
+			var _rect2 = _select.End;
+
+			tmpX = _rect1.X;
+			tmpY = _rect1.Y;
+			tmpX2 = _rect2.X + _rect2.W;
+			tmpY2 = _rect2.Y + _rect2.H;
+
+			_transform = this.DrawingDocument.SelectionMatrix;
+
+			if (_transform)
+			{
+				_posX = _transform.TransformPointX(tmpX, tmpY);
+				_posY = _transform.TransformPointY(tmpX, tmpY);
+
+				tmpX = _posX;
+				tmpY = _posY;
+
+				_posX = _transform.TransformPointX(tmpX2, tmpY2);
+				_posY = _transform.TransformPointY(tmpX2, tmpY2);
+
+				tmpX2 = _posX;
+				tmpY2 = _posY;
+			}
+
+			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(tmpX, tmpY, _rect1.Page);
+			_posX = _pos.X;
+			_posY = _pos.Y;
+
+			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(tmpX2, tmpY2, _rect2.Page);
+			_posX += _pos.X;
+			_posX = _posX >> 1;
+
+			_mode = 2;
+		}
+
+		var _object_bounds = _controller.getSelectedObjectsBounds();
+		if ((0 == _mode) && _object_bounds)
+		{
+			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(_object_bounds.minX, _object_bounds.minY, _object_bounds.pageIndex);
+			_posX = _pos.X;
+			_posY = _pos.Y;
+
+			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(_object_bounds.maxX, _object_bounds.maxY, _object_bounds.pageIndex);
+			_posX += _pos.X;
+			_posX = _posX >> 1;
+
+			_mode = 3;
+		}
+
+		return { X : _posX, Y : _posY, Mode : _mode };
+	};
+
+	/**
 	 * @extends {AscCommon.CMobileTouchManagerBase}
 	 */
 	function CMobileTouchManager(_config)
@@ -54,7 +216,7 @@
 		this.Api = _api;
 
 		// создаем делегата. инициализация его - ПОСЛЕ создания iScroll
-		this.delegate = new AscCommon.CMobileDelegateEditor(this);
+		this.delegate = new CMobileDelegateEditorPresentation(this);
 		var _element = this.delegate.GetScrollerParent();
 		this.CreateScrollerDiv(_element);
 
@@ -610,55 +772,81 @@
 			this.CheckContextMenuTouchEnd(isCheckContextMenuMode);
 	};
 
-	/*************************************** READER ******************************************/
+
+	/**************************************************************************/
 	/**
 	 * @extends {AscCommon.CMobileDelegateSimple}
 	 */
-	function CMobileDelegateEditorReader(_manager)
+	function CMobileDelegateThumbnails(_manager)
 	{
-		CMobileDelegateEditorReader.superclass.constructor.call(this, _manager);
+		CMobileDelegateThumbnails.superclass.constructor.call(this, _manager);
 
 		this.HtmlPage 			= this.Api.WordControl;
+		this.Thumbnails 		= this.HtmlPage.Thumbnails;
 	}
-	AscCommon.extendClass(CMobileDelegateEditorReader, AscCommon.CMobileDelegateSimple);
+	AscCommon.extendClass(CMobileDelegateThumbnails, AscCommon.CMobileDelegateSimple);
 
-	CMobileDelegateEditorReader.prototype.GetZoom = function()
+	CMobileDelegateThumbnails.prototype.GetScrollerParent = function()
 	{
-		return this.HtmlPage.m_nZoomValue;
+		return this.HtmlPage.m_oThumbnailsContainer.HtmlElement;
 	};
-	CMobileDelegateEditorReader.prototype.SetZoom = function(_value)
+	CMobileDelegateThumbnails.prototype.GetScrollerSize = function()
 	{
-		this.HtmlPage.m_oApi.zoom(_value);
+		return { W : 1, H : this.Thumbnails.ScrollerHeight };
 	};
-	CMobileDelegateEditorReader.prototype.GetScrollerParent = function()
+	CMobileDelegateThumbnails.prototype.ScrollTo = function(_scroll)
 	{
-		return this.HtmlPage.m_oMainView.HtmlElement;
+		this.HtmlPage.m_oScrollThumbApi.scrollToY(-_scroll.y);
+	};
+	CMobileDelegateThumbnails.prototype.ScrollEnd = function(_scroll)
+	{
+		_scroll.manager.OnScrollAnimationEnd();
+	};
+	CMobileDelegateThumbnails.prototype.Drawing_OnMouseDown = function(e)
+	{
+		return this.Thumbnails.onMouseDown(e);
+	};
+	CMobileDelegateThumbnails.prototype.Drawing_OnMouseMove = function(e)
+	{
+		return this.Thumbnails.onMouseMove(e);
+	};
+	CMobileDelegateThumbnails.prototype.Drawing_OnMouseUp = function(e)
+	{
+		return this.Thumbnails.onMouseUp(e);
+	};
+	CMobileDelegateThumbnails.prototype.GetContextMenuType = function()
+	{
+		return AscCommon.MobileTouchContextMenuType.Slide;
+	};
+	CMobileDelegateThumbnails.prototype.GetContextMenuPosition = function()
+	{
+		return { X : 0, Y : 0 };
 	};
 
 	/**
 	 * @extends {AscCommon.CMobileTouchManagerBase}
 	 */
-	function CReaderTouchManager(_config)
+	function CMobileTouchManagerThumbnails(_config)
 	{
-		CReaderTouchManager.superclass.constructor.call(this, _config || {});
+		CMobileTouchManagerThumbnails.superclass.constructor.call(this, _config || {});
 
 		this.SelectEnabled = false;
 		this.TableTrackEnabled = false;
-
-		this.bIsLock          = false;
-		this.bIsMoveAfterDown = false;
+		this.ZoomEnabled = false;
 	}
-	AscCommon.extendClass(CReaderTouchManager, AscCommon.CMobileTouchManagerBase);
+	AscCommon.extendClass(CMobileTouchManagerThumbnails, AscCommon.CMobileTouchManagerBase);
 
-	CReaderTouchManager.prototype.Init = function(_api)
+	CMobileTouchManagerThumbnails.prototype.Init = function(_api)
 	{
 		this.Api = _api;
-		this.iScrollElement = "reader_id";
+		this.iScrollElement = "scroller_id_thumbnails";
 
 		// создаем делегата. инициализация его - ПОСЛЕ создания iScroll
-		this.delegate = new CMobileDelegateEditorReader(this);
+		this.delegate = new CMobileDelegateThumbnails(this);
+		var _element = this.delegate.GetScrollerParent();
+		this.CreateScrollerDiv(_element);
 
-		this.iScroll = new window.IScroll(this.delegate.GetScrollerParent(), {
+		this.iScroll = new window.IScroll(_element, {
 			scrollbars: true,
 			mouseWheel: true,
 			interactiveScrollbars: true,
@@ -669,60 +857,126 @@
 			bounce : true
 		});
 
-		// создаем делегата. инициализация его - ПОСЛЕ создания iScroll
-		this.delegate.Init(this);
-
-		this.Api.sendEvent("asc_onHidePopMenu");
+		this.delegate.Init();
 	};
 
-	CReaderTouchManager.prototype.onTouchStart = function(e)
+	CMobileTouchManagerThumbnails.prototype.onTouchStart = function(e)
 	{
-		this.iScroll._start(e);
-		this.bIsLock          = true;
-		this.bIsMoveAfterDown = false;
-	};
-	CReaderTouchManager.prototype.onTouchMove  = function(e)
-	{
-		if (!this.bIsLock)
+		if (this.IsTouching)
 			return;
-		this.iScroll._move(e);
-		this.bIsMoveAfterDown = true;
-	};
-	CReaderTouchManager.prototype.onTouchEnd   = function(e)
-	{
-		this.iScroll._end(e);
-		this.bIsLock = false;
 
-		if (this.bIsMoveAfterDown === false)
+		this.IsTouching = true;
+		this.MoveAfterDown = false;
+
+		var _e = e.touches ? e.touches[0] : e;
+
+		AscCommon.check_MouseDownEvent(_e, false);
+		this.DownPointOriginal.X = global_mouseEvent.X;
+		this.DownPointOriginal.Y = global_mouseEvent.Y;
+
+		this.TimeDown = new Date().getTime();
+
+		this.Mode = AscCommon.MobileTouchMode.Scroll;
+		this.iScroll._start(e);
+
+		if (e.preventDefault)
+			e.preventDefault();
+		else
+			e.returnValue = false;
+		return false;
+	};
+	CMobileTouchManagerThumbnails.prototype.onTouchMove  = function(e)
+	{
+		if (!this.IsTouching)
 		{
-			this.Api.sendEvent("asc_onTapEvent", e);
+			AscCommon.stopEvent(e);
+			return false;
 		}
+
+		var _e = e.touches ? e.touches[0] : e;
+
+		if (!this.MoveAfterDown)
+		{
+			AscCommon.check_MouseMoveEvent(_e);
+			if (Math.abs(this.DownPointOriginal.X - global_mouseEvent.X) > this.MoveMinDist ||
+				Math.abs(this.DownPointOriginal.Y - global_mouseEvent.Y) > this.MoveMinDist)
+			{
+				this.MoveAfterDown = true;
+			}
+		}
+
+		switch (this.Mode)
+		{
+			case AscCommon.MobileTouchMode.Scroll:
+			{
+				var _newTime = new Date().getTime();
+				if ((_newTime - this.TimeDown) > this.ReadingGlassTime && !this.MoveAfterDown)
+				{
+					this.Mode = AscCommon.MobileTouchMode.FlowObj;
+					this.delegate.Drawing_OnMouseDown(_e);
+				}
+				else
+				{
+					this.iScroll._move(e);
+				}
+				break;
+			}
+			case AscCommon.MobileTouchMode.FlowObj:
+			{
+				this.delegate.Drawing_OnMouseMove(_e);
+				break;
+			}
+			default:
+				break;
+		}
+
+		AscCommon.stopEvent(e);
+		return false;
 	};
-
-	CReaderTouchManager.prototype.Resize = function()
+	CMobileTouchManagerThumbnails.prototype.onTouchEnd   = function(e)
 	{
-		var HtmlPage = this.delegate.HtmlPage;
-		HtmlPage.ReaderModeDivWrapper.style.width  = HtmlPage.m_oMainView.HtmlElement.style.width;
-		HtmlPage.ReaderModeDivWrapper.style.height = HtmlPage.m_oMainView.HtmlElement.style.height;
+		this.IsTouching = false;
 
-		if (this.iScroll != null)
-			this.iScroll.refresh();
-	};
+		var _e = e.changedTouches ? e.changedTouches[0] : e;
 
-	CReaderTouchManager.prototype.ChangeFontSize = function()
-	{
-		if (this.iScroll != null)
-			this.iScroll.refresh();
-	};
+		var isCheckContextMenuMode = false;
+		switch (this.Mode)
+		{
+			case AscCommon.MobileTouchMode.Scroll:
+			{
+				this.iScroll._end(e);
+				if (!this.MoveAfterDown)
+				{
+					global_mouseEvent.Button = 0;
+					this.delegate.Drawing_OnMouseDown(_e);
+					this.delegate.Drawing_OnMouseUp(_e);
 
-	CReaderTouchManager.prototype.Destroy = function()
-	{
-		if (this.iScroll != null)
-			this.iScroll.destroy();
+					isCheckContextMenuMode = true;
+				}
+				break;
+			}
+			case AscCommon.MobileTouchMode.FlowObj:
+			{
+				this.delegate.Drawing_OnMouseUp(_e);
+				break;
+			}
+			default:
+				break;
+		}
+
+		this.delegate.HtmlPage.m_oThumbnails.HtmlElement.style.cursor = "default";
+
+		this.Mode = AscCommon.MobileTouchMode.None;
+
+		if (true !== this.iScroll.isAnimating)
+			this.CheckContextMenuTouchEnd(isCheckContextMenuMode);
+
+		AscCommon.stopEvent(e);
+		return false;
 	};
 
 	//--------------------------------------------------------export----------------------------------------------------
-	window['AscCommon']                          = window['AscCommon'] || {};
-	window['AscCommon'].CMobileTouchManager      = CMobileTouchManager;
-	window['AscCommon'].CReaderTouchManager      = CReaderTouchManager;
+	window['AscCommon']                          		= window['AscCommon'] || {};
+	window['AscCommon'].CMobileTouchManager      		= CMobileTouchManager;
+	window['AscCommon'].CMobileTouchManagerThumbnails   = CMobileTouchManagerThumbnails;
 })(window);
