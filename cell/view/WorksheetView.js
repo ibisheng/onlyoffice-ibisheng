@@ -1759,10 +1759,11 @@
         } else {
             var pageWidthWithFields = pageWidth - pageLeftField - pageRightField;
             var pageHeightWithFields = pageHeight - pageTopField - pageBottomField;
-            var leftFieldInPt = pageLeftField / vector_koef;
-            var topFieldInPt = pageTopField / vector_koef;
-            var rightFieldInPt = pageRightField / vector_koef;
-            var bottomFieldInPt = pageBottomField / vector_koef;
+            // 1px offset for borders
+            var leftFieldInPt = pageLeftField / vector_koef + this.width_1px;
+            var topFieldInPt = pageTopField / vector_koef + this.height_1px;
+            var rightFieldInPt = pageRightField / vector_koef + this.width_1px;
+            var bottomFieldInPt = pageBottomField / vector_koef + this.height_1px;
 
             if (pageHeadings) {
                 // Рисуем заголовки, нужно чуть сдвинуться
