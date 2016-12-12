@@ -737,6 +737,8 @@ function getRangeType(oBBox){
 				var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: oldUndoName, to: newUndoName};
 				this._broadcastDefName(defName.name, notifyData);
 				History.TurnOn();
+				this.addToChangedDefName(defName);
+				this.calcTree();
 			}
 		},
 		changeTableName: function(tableName, newName) {

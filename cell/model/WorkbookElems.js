@@ -5904,45 +5904,40 @@ TablePart.prototype.isAutoFilter = function()
 TablePart.prototype.getTableRangeForFormula = function(objectParam)
 {
 	var res = null;
+	var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
+	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
 	switch(objectParam.param)
 	{
 		case FormulaTablePartInfo.all:
 		{
 			res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r2);
-            //All поразному работает в случае если у таблицы есть или нет строки Totals
-            //При наличии Totals All возвращает диапазон с учетом этой строки.
 			break;
 		}
 		case FormulaTablePartInfo.data:
 		{
-			var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
-			var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
-			
 			res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 			break;
 		}
 		case FormulaTablePartInfo.headers:
 		{
-			if(this.HeaderRowCount === null)
-			{
+			if(this.HeaderRowCount === null) {
 				res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r1);
+			} else if(!objectParam.toRef) {
+				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 			}
 			break;
 		}
 		case FormulaTablePartInfo.totals:
 		{
-			if(this.TotalsRowCount)
-			{
+			if(this.TotalsRowCount) {
 				res = new Asc.Range(this.Ref.c1, this.Ref.r2, this.Ref.c2, this.Ref.r2);
+			} else if(!objectParam.toRef) {
+				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 			}
-			
 			break;
 		}
 		case FormulaTablePartInfo.thisRow:
 		{
-			//like FormulaTablePartInfo.data
-			var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
-			var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
 			if (objectParam.cell) {
 				if (startRow <= objectParam.cell.r1 && objectParam.cell.r1 <= endRow) {
 					res = new Asc.Range(this.Ref.c1, objectParam.cell.r1, this.Ref.c2, objectParam.cell.r1);
@@ -5961,18 +5956,11 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 				break;
 			if(endCol === null)
 				endCol = startCol;
-			
-			var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
-			var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
-			
+
 			res = new Asc.Range(this.Ref.c1 + startCol, startRow, this.Ref.c1 + endCol, endRow);
 			break;
 		}
 	}
-    if( objectParam.includeColumnHeader && res ){
-        res.r1--;
-        res.r1 < 0 ? res.r1 = 0 : null;
-    }
 	return res;
 };
 

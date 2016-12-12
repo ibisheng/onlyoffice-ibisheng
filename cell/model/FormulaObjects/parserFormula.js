@@ -1561,7 +1561,7 @@ function cStrucTable( val, wb, ws ) {
     this.isDynamic = false;//#This row
     this.area = null;
     this.val = val;
-	var ret = this._createArea( val, null );
+	var ret = this._createArea(val, null, false);
 	return (ret && ret.type != cElementType.error) ? this : ret;
 }
 
@@ -1581,7 +1581,7 @@ cStrucTable.prototype.toRef = function (opt_bbox) {
 		return new cError( cErrorType.wrong_name );
 	}
     if(!this.area || this.isDynamic){
-        this._createArea( this.val, opt_bbox );
+        this._createArea( this.val, opt_bbox, true );
     }
     return this.area;
 };
@@ -1680,147 +1680,144 @@ cStrucTable.prototype.toLocaleString = function () {
 			return tblStr.replace("%1", "");
 		}
 	};
-cStrucTable.prototype._createArea = function ( val, opt_bbox ) {
-    this.columnName  = val['columnName'];
+	cStrucTable.prototype._createArea = function(val, opt_bbox, opt_toRef) {
+		this.columnName = val['columnName'];
 
-    var paramObj = {param: null, startCol: null, endCol: null, cell: opt_bbox, includeColumnHeader:false};
+		var paramObj = {param: null, startCol: null, endCol: null, cell: opt_bbox, toRef: opt_toRef};
 
-    if ( val['oneColumn'] || val['columnRange'] ) {
+		if (val['oneColumn'] || val['columnRange']) {
 
-        this.oneColumn = val['oneColumn'];
-        this.columnRange = val['columnRange'];
+			this.oneColumn = val['oneColumn'];
+			this.columnRange = val['columnRange'];
 
-    paramObj.param = AscCommon.FormulaTablePartInfo.columns;
-        if ( val['columnRange'] ) {
-            this.columnRange = val['columnRange'];
-            paramObj.startCol = this.colStart = val['colStart'].replace(/'#/g,"#");
-            paramObj.endCol = this.colEnd = val['colEnd'].replace(/'#/g,"#");
-      if (!this.colEnd) {
-				this.colEnd = this.colStart;
-      }
+			paramObj.param = AscCommon.FormulaTablePartInfo.columns;
+			if (val['columnRange']) {
+				this.columnRange = val['columnRange'];
+				paramObj.startCol = this.colStart = val['colStart'].replace(/'#/g, "#");
+				paramObj.endCol = this.colEnd = val['colEnd'].replace(/'#/g, "#");
+				if (!this.colEnd) {
+					this.colEnd = this.colStart;
+				}
 
-			this.colStartIndex = this.wb.getTableIndexColumnByName( this.tableName, this.colStart );
-			this.colEndIndex = this.wb.getTableIndexColumnByName( this.tableName, this.colEnd );
-			if( !this.colStartIndex && !this.colEndIndex ){
-				return this._createAreaError(paramObj);
-			}
-    } else {
-            paramObj.startCol = this.oneColumn = val['oneColumn'].replace(/'#/g,"#");
-			this.oneColumnIndex = this.wb.getTableIndexColumnByName( this.tableName, this.oneColumn );
-			if( !this.oneColumnIndex ){
-				return this._createAreaError(paramObj);
-			}
-        }
-
-        var tableData = this.wb.getTableRangeForFormula( this.tableName, paramObj );
-
-        if ( !tableData ) {
-			return this._createAreaError(paramObj);
-        }
-		if( tableData.range ){
-			this.area = tableData.range.isOneCell() ?
-        new cRef3D(tableData.range.getAbsName(), this.wb.getWorksheetById(tableData.wsID)
-          .getName(), this.wb) :
-        new cArea3D(tableData.range.getAbsName(), this.wb.getWorksheetById(tableData.wsID)
-          .getName(), this.wb.getWorksheetById(tableData.wsID).getName(), this.wb);
-		}
-  } else if (val['reservedColumn'] || !val['columnName']) {
-		this.reservedColumn = val['reservedColumn'] || "";
-    this.reservedColumnIndex = paramObj.param = parserHelp.getColumnTypeByName(this.reservedColumn);
-        if(AscCommon.FormulaTablePartInfo.thisRow == paramObj.param){
-            this.isDynamic = true;
-        }
-
-        tableData = this.wb.getTableRangeForFormula( this.tableName, paramObj );
-        if ( !tableData ) {
-			return this._createAreaError(paramObj);
-        }
-		if( tableData.range ){
-			this.area = tableData.range.isOneCell() ?
-        new cRef3D(tableData.range.getAbsName(), this.wb.getWorksheetById(tableData.wsID)
-          .getName(), this.wb) :
-        new cArea3D(tableData.range.getAbsName(), this.wb.getWorksheetById(tableData.wsID)
-          .getName(), this.wb.getWorksheetById(tableData.wsID).getName(), this.wb);
-		}
-  } else if (val['hdtcc']) {
-        this.hdt = val['hdt'];
-		this.hdtIndexes = [];
-		this.hdtcstart = val['hdtcstart'];
-        this.hdtcend = val['hdtcend'];
-        var re = /\[(.*?)\]/ig, m, data, range;
-        while ( null !== (m = re.exec( this.hdt )) ) {
-      paramObj.param = parserHelp.getColumnTypeByName(m[1]);
-            if(AscCommon.FormulaTablePartInfo.thisRow == paramObj.param){
-                this.isDynamic = true;
-            }
-			this.hdtIndexes.push(paramObj.param);
-            data = this.wb.getTableRangeForFormula( this.tableName, paramObj );
-
-            if ( !data ) {
-				return this._createAreaError(paramObj);
-            }
-
-            if ( range ) {
-                range.union2( data.range );
-      } else {
-                range = data.range;
-            }
-        }
-
-        if ( this.hdtcstart ) {
-			this.hdtcstart = this.hdtcstart.replace(/'#/g,"#");
-      paramObj.param = AscCommon.FormulaTablePartInfo.columns;
-            paramObj.startCol = this.hdtcstart;
-            paramObj.endCol = null;
-			this.hdtcstartIndex = this.wb.getTableIndexColumnByName( this.tableName, this.hdtcstart );
-
-			if( !this.hdtcstartIndex ){
-				return this._createAreaError(paramObj);
+				this.colStartIndex = this.wb.getTableIndexColumnByName(this.tableName, this.colStart);
+				this.colEndIndex = this.wb.getTableIndexColumnByName(this.tableName, this.colEnd);
+				if (!this.colStartIndex && !this.colEndIndex) {
+					return this._createAreaError(paramObj);
+				}
+			} else {
+				paramObj.startCol = this.oneColumn = val['oneColumn'].replace(/'#/g, "#");
+				this.oneColumnIndex = this.wb.getTableIndexColumnByName(this.tableName, this.oneColumn);
+				if (!this.oneColumnIndex) {
+					return this._createAreaError(paramObj);
+				}
 			}
 
-            if ( this.hdtcend ) {
-				this.hdtcend = this.hdtcend.replace(/'#/g,"#");
-                paramObj.endCol = this.hdtcend;
-				this.hdtcendIndex = this.wb.getTableIndexColumnByName( this.tableName, this.hdtcend );
+			var tableData = this.wb.getTableRangeForFormula(this.tableName, paramObj);
+			if (!tableData) {
+				return this._createAreaError(paramObj);
+			}
+			this._createAreaByTableData(tableData);
+		} else if (val['reservedColumn'] || !val['columnName']) {
+			this.reservedColumn = val['reservedColumn'] || "";
+			this.reservedColumnIndex = paramObj.param = parserHelp.getColumnTypeByName(this.reservedColumn);
+			if (AscCommon.FormulaTablePartInfo.thisRow == paramObj.param ||
+				AscCommon.FormulaTablePartInfo.headers == paramObj.param ||
+				AscCommon.FormulaTablePartInfo.totals == paramObj.param) {
+				this.isDynamic = true;
+			}
 
-				if( !this.hdtcendIndex ){
+			tableData = this.wb.getTableRangeForFormula(this.tableName, paramObj);
+			if (!tableData) {
+				return this._createAreaError(paramObj);
+			}
+			this._createAreaByTableData(tableData);
+		} else if (val['hdtcc']) {
+			this.hdt = val['hdt'];
+			this.hdtIndexes = [];
+			this.hdtcstart = val['hdtcstart'];
+			this.hdtcend = val['hdtcend'];
+			var re = /\[(.*?)\]/ig, m, data, range;
+			while (null !== (m = re.exec(this.hdt))) {
+				paramObj.param = parserHelp.getColumnTypeByName(m[1]);
+				if (AscCommon.FormulaTablePartInfo.thisRow == paramObj.param ||
+					AscCommon.FormulaTablePartInfo.headers == paramObj.param ||
+					AscCommon.FormulaTablePartInfo.totals == paramObj.param) {
+					this.isDynamic = true;
+				}
+				this.hdtIndexes.push(paramObj.param);
+				data = this.wb.getTableRangeForFormula(this.tableName, paramObj);
+
+				if (!data) {
 					return this._createAreaError(paramObj);
 				}
 
-            }
+				if (range) {
+					range.union2(data.range);
+				} else {
+					range = data.range;
+				}
+			}
 
-          if (range) {
-            var _c1 = range.c1 + (this.hdtcstartIndex ? this.hdtcstartIndex.index : 0);
-            range = new Asc.Range(_c1, range.r1, this.hdtcendIndex ? range.c1 + this.hdtcendIndex.index : _c1, range.r2);
-          } else {
-            paramObj.includeColumnHeader = true;
-            data = this.wb.getTableRangeForFormula( this.tableName, paramObj );
+			if (this.hdtcstart) {
+				this.hdtcstart = this.hdtcstart.replace(/'#/g, "#");
+				paramObj.param = AscCommon.FormulaTablePartInfo.columns;
+				paramObj.startCol = this.hdtcstart;
+				paramObj.endCol = null;
+				this.hdtcstartIndex = this.wb.getTableIndexColumnByName(this.tableName, this.hdtcstart);
 
-            if ( !data ) {
-				return this._createAreaError(paramObj);
-            }
-            range = data.range;
-          }
-        }
+				if (!this.hdtcstartIndex) {
+					return this._createAreaError(paramObj);
+				}
 
-        tableData = data;
-        tableData.range = range;
-		if( range ){
-			this.area = range.isOneCell() ?
-				new cRef3D( range.getAbsName(), this.wb.getWorksheetById( tableData.wsID ).getName(), this.wb ):
-        new cArea3D(range.getAbsName(), this.wb.getWorksheetById(tableData.wsID)
-          .getName(), this.wb.getWorksheetById(tableData.wsID).getName(), this.wb);
+				if (this.hdtcend) {
+					this.hdtcend = this.hdtcend.replace(/'#/g, "#");
+					paramObj.endCol = this.hdtcend;
+					this.hdtcendIndex = this.wb.getTableIndexColumnByName(this.tableName, this.hdtcend);
+
+					if (!this.hdtcendIndex) {
+						return this._createAreaError(paramObj);
+					}
+
+				}
+
+				if (range) {
+					var _c1 = range.c1 + (this.hdtcstartIndex ? this.hdtcstartIndex.index : 0);
+					var _c2 = this.hdtcendIndex ? range.c1 + this.hdtcendIndex.index : _c1;
+					range = new Asc.Range(_c1, range.r1, _c2, range.r2);
+				} else {
+					data = this.wb.getTableRangeForFormula(this.tableName, paramObj);
+
+					if (!data) {
+						return this._createAreaError(paramObj);
+					}
+					range = data.range;
+				}
+			}
+
+			tableData = data;
+			tableData.range = range;
+			this._createAreaByTableData(tableData);
 		}
-    }
 
-    !this.area ? this.area = new cError( cErrorType.bad_reference ) : null;
-	return this.area;
-};
+		!this.area ? this.area = new cError(cErrorType.bad_reference) : null;
+		return this.area;
+	};
 	cStrucTable.prototype._createAreaError = function (paramObj) {
 		if(AscCommon.FormulaTablePartInfo.thisRow == paramObj.param){
 			return this.area = new cError( cErrorType.wrong_value_type );
 		} else {
 			return this.area = new cError( cErrorType.bad_reference );
+		}
+	};
+	cStrucTable.prototype._createAreaByTableData = function (tableData) {
+		if (tableData.range) {
+			var refName = tableData.range.getAbsName();
+			var sheetName = this.wb.getWorksheetById(tableData.wsID).getName();
+			if (tableData.range.isOneCell()) {
+				this.area = new cRef3D(refName, sheetName, this.wb);
+			} else {
+				this.area = new cArea3D(refName, sheetName, sheetName, this.wb);
+			}
 		}
 	};
 cStrucTable.prototype._buildLocalTableString = function (reservedColumn,local) {
