@@ -837,7 +837,7 @@
 				
 				if(null === bIsInFilter)
 				{
-					if(activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2)//если ячейка выделенная одна
+					if(activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2 && !userRange)//если ячейка выделенная одна
 					{
 						addRange = this._getAdjacentCellsAF(activeCells);
 					}
@@ -867,7 +867,7 @@
 					
 					addRange.setAbs(true, true, true, true);
 					res.asc_setIsTitle(bIsTitle);
-					res.asc_setRange(range.getName());
+					res.asc_setRange(range.getAbsName());
 				}
 				
 				return res;
@@ -5033,18 +5033,23 @@
 			_getFilterInfoByAddTableProps: function(ar, addFormatTableOptionsObj)
 			{
 				var tempRange =  new Asc.Range(ar.c1, ar.r1, ar.c2, ar.r2);
-				var addNameColumn, filterRange;
+				var addNameColumn, filterRange, bIsManualOptions = false;
 
 				if(addFormatTableOptionsObj === false)
+				{
 					addNameColumn = true;
+				}
 				else if(addFormatTableOptionsObj && typeof addFormatTableOptionsObj == 'object')
 				{
 					tempRange = addFormatTableOptionsObj.asc_getRange();
 					addNameColumn = !addFormatTableOptionsObj.asc_getIsTitle();
 					tempRange = AscCommonExcel.g_oRangeCache.getAscRange(tempRange).clone();
+					bIsManualOptions = true;
 				}
 				else if(addFormatTableOptionsObj === true)
+				{
 					addNameColumn = false;
+				}
 
 				//expand range
 				var tablePartsContainsRange = this._isTablePartsContainsRange(tempRange);
@@ -5052,17 +5057,23 @@
 				{
 					filterRange = tablePartsContainsRange.Ref.clone();
 				}
-				else if(tempRange.isOneCell())
+				else if(tempRange.isOneCell() && !bIsManualOptions)
+				{
 					filterRange = this._getAdjacentCellsAF(tempRange, this.worksheet);
+				}
 				else
+				{
 					filterRange = tempRange;
+				}
 
 				var rangeWithoutDiff = filterRange.clone();
 				if(addNameColumn)
+				{
 					filterRange.r2 = filterRange.r2 + 1;
-					
+				}
+				
 				return {filterRange: filterRange, addNameColumn: addNameColumn, rangeWithoutDiff: rangeWithoutDiff, tablePartsContainsRange: tablePartsContainsRange};
-			}			
+			}
 		};
 
 		/*
