@@ -5288,7 +5288,7 @@ CellArea.prototype = {
 		}
 		return bRemove;
 	};
-	sparklineGroup.prototype.getLocationRanges = function () {
+	sparklineGroup.prototype.getLocationRanges = function (onlySingle) {
 		var result = new AscCommonExcel.SelectionRange();
 		this.arrSparklines.forEach(function (item, i) {
 			if (0 === i) {
@@ -5298,7 +5298,24 @@ CellArea.prototype = {
 				result.getLast().assign2(item.sqref);
 			}
 		});
-		return result.getUnion();
+		var unionRange = result.getUnion();
+		return (!onlySingle || unionRange.isSingleRange()) ? unionRange : result;
+	};
+	sparklineGroup.prototype.getDataRanges = function () {
+		var isUnion = true;
+		var sheet = this.worksheet.getName();
+		var result = new AscCommonExcel.SelectionRange();
+		this.arrSparklines.forEach(function (item, i) {
+			isUnion = isUnion && sheet === item._f.sheet;
+			if (0 === i) {
+				result.assign2(item._f);
+			} else {
+				result.addRange();
+				result.getLast().assign2(item._f);
+			}
+		});
+		var unionRange = isUnion ? result.getUnion() : result;
+		return unionRange.isSingleRange() ? unionRange : result;
 	};
 	sparklineGroup.prototype.asc_getId = function () {
 		return this.Id;
@@ -5376,21 +5393,21 @@ CellArea.prototype = {
 		return this.colorLow ? Asc.colorObjToAscColor(this.colorLow) : this.colorLow;
 	};
 	sparklineGroup.prototype.asc_getDataRanges = function () {
-		var oDataRange = new AscCommonExcel.SelectionRange();
-		var oLocationRange = new AscCommonExcel.SelectionRange();
-		//var bInit = false;
 		var arrResultData = [];
 		var arrResultLocation = [];
-		this.arrSparklines.forEach(function (item) {
-			/*if (bInit) {
-			} else {
-				bInit = true;
-				oDataRange.assign2(item.sqref);
-				oLocationRange.assign2();
-			}*/
-			arrResultData.push(item.f);
-			arrResultLocation.push(item.sqref.getAbsName());
-		});
+		var oLocationRanges = this.getLocationRanges(true);
+		var oDataRanges = oLocationRanges.isSingleRange() && this.getDataRanges();
+		if (oLocationRanges.isSingleRange() && oDataRanges.isSingleRange()) {
+			for (var i = 0; i < oLocationRanges.ranges.length; ++i) {
+				arrResultData.push(oDataRanges.ranges[i].getName());
+				arrResultLocation.push(oLocationRanges.ranges[i].getAbsName());
+			}
+		} else {
+			this.arrSparklines.forEach(function (item) {
+				arrResultData.push(item.f);
+				arrResultLocation.push(item.sqref.getAbsName());
+			});
+		}
 		return [arrResultData.join(AscCommon.FormulaSeparators.functionArgumentSeparator),
 			arrResultLocation.join(AscCommon.FormulaSeparators.functionArgumentSeparator)];
 	};
