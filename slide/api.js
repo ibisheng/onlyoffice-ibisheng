@@ -1579,36 +1579,6 @@ background-repeat: no-repeat;\
 
 	// -------
 
-	// -------
-	asc_docs_api.prototype.get_ContentCount = function()
-	{
-		return this.WordControl.m_oLogicDocument.Content.length;
-	};
-
-	asc_docs_api.prototype.select_Element = function(Index)
-	{
-		var Document = this.WordControl.m_oLogicDocument;
-
-		if (true === Document.Selection.Use)
-			Document.Selection_Remove();
-
-		Document.DrawingDocument.SelectEnabled(true);
-		Document.DrawingDocument.TargetEnd();
-
-		Document.Selection.Use   = true;
-		Document.Selection.Start = false;
-		Document.Selection.Flag  = AscCommon.selectionflag_Common;
-
-		Document.Selection.StartPos = Index;
-		Document.Selection.EndPos   = Index;
-
-		Document.Content[Index].Selection.Use      = true;
-		Document.Content[Index].Selection.StartPos = Document.Content[Index].Internal_GetStartPos();
-		Document.Content[Index].Selection.EndPos   = Document.Content[Index].Content.length - 1;
-
-		Document.Selection_Draw();
-	};
-
 	asc_docs_api.prototype.UpdateTextPr = function(TextPr)
 	{
 		if ("undefined" != typeof(TextPr))
@@ -6582,7 +6552,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_getPropertyEditorTextArts']       = asc_docs_api.prototype.asc_getPropertyEditorTextArts;
 	asc_docs_api.prototype['get_PropertyEditorThemes']            = asc_docs_api.prototype.get_PropertyEditorThemes;
 	asc_docs_api.prototype['get_ContentCount']                    = asc_docs_api.prototype.get_ContentCount;
-	asc_docs_api.prototype['select_Element']                      = asc_docs_api.prototype.select_Element;
 	asc_docs_api.prototype['UpdateTextPr']                        = asc_docs_api.prototype.UpdateTextPr;
 	asc_docs_api.prototype['sync_TextSpacing']                    = asc_docs_api.prototype.sync_TextSpacing;
 	asc_docs_api.prototype['sync_TextDStrikeout']                 = asc_docs_api.prototype.sync_TextDStrikeout;
