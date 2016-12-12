@@ -11342,10 +11342,11 @@
                 t.handlers.trigger("selectionChanged");
                 return;
             }
-
+			
+			var addNameColumn, filterRange; 
             if (addFormatTableOptionsObj && isChangeAutoFilterToTablePart(addFormatTableOptionsObj) === true)//CHANGE FILTER TO TABLEPART
             {
-                var filterRange = t.model.AutoFilter.Ref.clone();
+				filterRange = t.model.AutoFilter.Ref.clone();
 
                 var addFilterCallBack = function () {
                     History.Create_NewPoint();
@@ -11357,7 +11358,7 @@
                     History.EndTransaction();
                 };
 
-                var addNameColumn = false;
+                addNameColumn = false;
                 if (addFormatTableOptionsObj === false) {
                     addNameColumn = true;
                 } else if (typeof addFormatTableOptionsObj == 'object') {
@@ -11370,7 +11371,6 @@
                 t._isLockedCells(filterRange, /*subType*/null, addFilterCallBack);
             } else//ADD
             {
-                var addNameColumn;
                 var addFilterCallBack = function () {
                     History.Create_NewPoint();
                     History.StartTransaction();
@@ -11390,8 +11390,8 @@
                     addFilterCallBack();
                 } else {
                     var filterInfo = t.model.autoFilters._getFilterInfoByAddTableProps(ar, addFormatTableOptionsObj);
-                    var filterRange = filterInfo.filterRange
-                    var addNameColumn = filterInfo.addNameColumn;
+                    filterRange = filterInfo.filterRange
+                    addNameColumn = filterInfo.addNameColumn;
 
                     t._isLockedCells(filterRange, null, addFilterCallBack)
                 }

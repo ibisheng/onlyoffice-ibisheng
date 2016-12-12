@@ -387,6 +387,26 @@
 								worksheet._moveRange(rangeWithoutDiff,  new Asc.Range(filterRange.c1, filterRange.r1 + 1, filterRange.c2, filterRange.r2));
 							}
 						}
+						else if(!addNameColumn)
+						{
+							if(filterRange.r1 === filterRange.r2)
+							{
+								if(t._isEmptyCellsUnderRange(rangeWithoutDiff))
+								{
+									filterRange.r2++;
+								}
+								else
+								{
+									filterRange.r2++;
+									//shift down not empty range and move
+									if(!isTurnOffHistory)
+									{
+										worksheet.getRange3(filterRange.r2, filterRange.c1, filterRange.r2, filterRange.c2).addCellsShiftBottom();
+									}
+								}
+							}
+						}
+						
 
 						//add to model
 						var newTablePart = t._addNewFilter(filterRange, styleName, bWithoutFilter, tablePartDisplayName, pasteStyleObj);
