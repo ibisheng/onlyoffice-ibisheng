@@ -275,7 +275,7 @@
 		this.m_oFactoryClass[AscDFH.historyitem_type_deg_subsup]             = AscCommonWord.CDegreeSubSup;
 		this.m_oFactoryClass[AscDFH.historyitem_type_deg]                    = AscCommonWord.CDegree;
 
-		if (window.AscCommonSlide)
+		if (window['AscCommonSlide'])
 		{
 			this.m_oFactoryClass[AscDFH.historyitem_type_Slide]         = AscCommonSlide.Slide;
 			this.m_oFactoryClass[AscDFH.historyitem_type_SlideLayout]   = AscCommonSlide.SlideLayout;
@@ -287,7 +287,7 @@
 		this.m_oFactoryClass[AscDFH.historyitem_type_Theme]                  = AscFormat.CTheme;
 		this.m_oFactoryClass[AscDFH.historyitem_type_GraphicFrame]           = AscFormat.CGraphicFrame;
 
-		if (window.AscCommonExcel)
+		if (window['AscCommonExcel'])
 		{
 			this.m_oFactoryClass[AscDFH.historyitem_type_Sparkline] = AscCommonExcel.sparklineGroup;
 		}
