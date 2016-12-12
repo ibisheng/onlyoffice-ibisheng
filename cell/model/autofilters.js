@@ -2661,17 +2661,18 @@
 					{
 						var table = worksheet.TableParts[i];
 						var intersection = range.intersection(table.Ref);
-						if(null !== intersection && intersection.r1 === table.Ref.r1 + 1 && intersection.r2 >= table.Ref.r2)
+						if(null !== intersection && intersection.r1 === table.Ref.r1 + 1)
 						{
-							range.r1++;
-							
-							if(emptyRange)
+							if(intersection.r2 >= table.Ref.r2 || (table.TotalsRowCount > 0 && intersection.r2 === table.Ref.r2 - 1))
 							{
-								var deleteRange = this.worksheet.getRange3(table.Ref.r1 + 1, range.c1, table.Ref.r1 + 1, range.c2);
-								deleteRange.cleanText()
+								range.r1++;
+								if(emptyRange)
+								{
+									var deleteRange = this.worksheet.getRange3(table.Ref.r1 + 1, table.Ref.c1, table.Ref.r1 + 1, table.Ref.c2);
+									deleteRange.cleanText()
+								}
+								break;
 							}
-							
-							break;
 						}
 					}
 				}
