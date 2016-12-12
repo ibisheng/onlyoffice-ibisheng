@@ -1911,8 +1911,6 @@
         }
     };
     WorksheetView.prototype.drawForPrint = function(drawingCtx, printPagesData) {
-        var isAppBridge = (undefined != window['appBridge']);
-
         if (null === printPagesData) {
             // Напечатаем пустую страницу
             drawingCtx.BeginPage(c_oAscPrintDefaultSettings.PageWidth, c_oAscPrintDefaultSettings.PageHeight);
@@ -1921,10 +1919,6 @@
             drawingCtx.BeginPage(printPagesData.pageWidth, printPagesData.pageHeight);
             drawingCtx.AddClipRect(printPagesData.pageClipRectLeft, printPagesData.pageClipRectTop,
               printPagesData.pageClipRectWidth, printPagesData.pageClipRectHeight);
-
-            if (isAppBridge) {
-                window['appBridge']['dummyCommandUpdate']();
-            }
 
             var offsetCols = printPagesData.startOffsetPt;
             var range = printPagesData.pageRange;
@@ -1935,10 +1929,6 @@
             // Сменим visibleRange для прохождения проверок отрисовки
             this.visibleRange = range;
 
-            if (isAppBridge) {
-                window['appBridge']['dummyCommandUpdate']();
-            }
-
             // Нужно отрисовать заголовки
             if (printPagesData.pageHeadings) {
                 this._drawColumnHeaders(drawingCtx, range.c1, range.c2, /*style*/ undefined, offsetX,
@@ -1947,36 +1937,20 @@
                   printPagesData.leftFieldInPt - this.cellsLeft, offsetY);
             }
 
-            if (isAppBridge) {
-                window['appBridge']['dummyCommandUpdate']();
-            }
-
             // Рисуем сетку
             if (printPagesData.pageGridLines) {
                 this._drawGrid(drawingCtx, range, offsetX, offsetY, printPagesData.pageWidth / vector_koef,
                   printPagesData.pageHeight / vector_koef);
             }
 
-            if (isAppBridge) {
-                window['appBridge']['dummyCommandUpdate']();
-            }
-
             // Отрисовываем ячейки и бордеры
             this._drawCellsAndBorders(drawingCtx, range, offsetX, offsetY);
-
-            if (isAppBridge) {
-                window['appBridge']['dummyCommandUpdate']();
-            }
 
             var drawingPrintOptions = {
                 ctx: drawingCtx, printPagesData: printPagesData
             };
             this.objectRender.showDrawingObjectsEx(false, null, drawingPrintOptions);
             this.visibleRange = tmpVisibleRange;
-
-            if (isAppBridge) {
-                window['appBridge']['dummyCommandUpdate']();
-            }
 
             drawingCtx.RemoveClipRect();
             drawingCtx.EndPage();
