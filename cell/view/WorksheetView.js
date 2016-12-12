@@ -1711,10 +1711,10 @@
 
         var pageLeftField, pageRightField, pageTopField, pageBottomField;
         if (pageMargins instanceof asc_CPageMargins) {
-            pageLeftField = pageMargins.asc_getLeft();
-            pageRightField = pageMargins.asc_getRight();
-            pageTopField = pageMargins.asc_getTop();
-            pageBottomField = pageMargins.asc_getBottom();
+            pageLeftField = Math.max(pageMargins.asc_getLeft(), c_oAscPrintDefaultSettings.MinPageLeftField);
+            pageRightField = Math.max(pageMargins.asc_getRight(), c_oAscPrintDefaultSettings.MinPageRightField);
+            pageTopField = Math.max(pageMargins.asc_getTop(), c_oAscPrintDefaultSettings.MinPageTopField);
+            pageBottomField = Math.max(pageMargins.asc_getBottom(), c_oAscPrintDefaultSettings.MinPageBottomField);
         }
 
         if (null == pageGridLines) {
