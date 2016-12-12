@@ -396,6 +396,26 @@
 								worksheet._moveRange(rangeWithoutDiff,  new Asc.Range(filterRange.c1, filterRange.r1 + 1, filterRange.c2, filterRange.r2));
 							}
 						}
+						else if(!addNameColumn)
+						{
+							if(filterRange.r1 === filterRange.r2)
+							{
+								if(t._isEmptyCellsUnderRange(rangeWithoutDiff))
+								{
+									filterRange.r2++;
+								}
+								else
+								{
+									filterRange.r2++;
+									//shift down not empty range and move
+									if(!isTurnOffHistory)
+									{
+										worksheet.getRange3(filterRange.r2, filterRange.c1, filterRange.r2, filterRange.c2).addCellsShiftBottom();
+									}
+								}
+							}
+						}
+						
 
 						//add to model
 						var newTablePart = t._addNewFilter(filterRange, styleName, bWithoutFilter, displayName, tablePart, offset);
@@ -1572,11 +1592,17 @@
 							
 							filter.changeRef(null, diff);
 						}
-						else if(activeRange.r1 > ref.r1 && activeRange.r2 > ref.r2 && activeRange.r1 < ref.r2)
+						else if(activeRange.r1 > ref.r1 && activeRange.r2 > ref.r2 && activeRange.r1 <= ref.r2)
 						{
 							oldFilter = filter.clone(null);
-							
-							filter.changeRef(null, diff + (activeRange.r2 - ref.r2));
+							if(diff < 0)
+							{
+								filter.changeRef(null, diff + (activeRange.r2 - ref.r2));
+							}
+							else
+							{
+								filter.changeRef(null, diff);
+							}
 						}
 					}
 					

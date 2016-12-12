@@ -65,9 +65,9 @@ AscDFH.changesRelationMap[AscDFH.historyitem_Document_MathSettings]      = [AscD
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
  */
-function CChangesDocumentAddItem(Class, Pos, Item)
+function CChangesDocumentAddItem(Class, Pos, Items)
 {
-	CChangesDocumentAddItem.superclass.constructor.call(this, Class, Pos, [Item], true);
+	CChangesDocumentAddItem.superclass.constructor.call(this, Class, Pos, Items, true);
 }
 AscCommon.extendClass(CChangesDocumentAddItem, AscDFH.CChangesBaseContentChange);
 CChangesDocumentAddItem.prototype.Type = AscDFH.historyitem_Document_AddItem;

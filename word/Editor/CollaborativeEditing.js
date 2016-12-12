@@ -202,8 +202,8 @@ CWordCollaborativeEditing.prototype.OnEnd_Load_Objects = function()
     // Данная функция вызывается, когда загрузились внешние объекты (картинки и шрифты)
 
     // Снимаем лок
-    AscCommon.CollaborativeEditing.m_bGlobalLock = false;
-    AscCommon.CollaborativeEditing.m_bGlobalLockSelection = false;
+    AscCommon.CollaborativeEditing.Set_GlobalLock(false);
+    AscCommon.CollaborativeEditing.Set_GlobalLockSelection(false);
 
     // Запускаем полный пересчет документа
     var LogicDocument = editor.WordControl.m_oLogicDocument;
@@ -265,7 +265,9 @@ CWordCollaborativeEditing.prototype.OnEnd_CheckLock = function(DontLockInFastMod
 
         // Ставим глобальный лок, только во время совместного редактирования
         if (-1 === this.m_nUseType)
-            this.m_bGlobalLock = true;
+		{
+			this.Set_GlobalLock(true);
+		}
         else
         {
             // Пробегаемся по массиву и проставляем, что залочено нами
@@ -296,7 +298,7 @@ CWordCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
     var oThis   = AscCommon.CollaborativeEditing;
     var oEditor = editor;
 
-    if (true === oThis.m_bGlobalLock)
+    if (true === oThis.Get_GlobalLock())
     {
         // Здесь проверяем есть ли длинная операция, если она есть, то до ее окончания нельзя делать
         // Undo, иначе точка истории уберется, а изменения допишутся в предыдущую.
@@ -304,7 +306,7 @@ CWordCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
             return;
 
         // Снимаем глобальный лок
-        oThis.m_bGlobalLock = false;
+        oThis.Set_GlobalLock(false);
 
         if (result["lock"])
         {
@@ -660,7 +662,6 @@ CWordCollaborativeEditing.prototype.Undo = function()
 
 	// Формируем новую пачку действий, которые будут откатывать нужные нам действия.
 
-
 	// На первом шаге мы заданнуюю пачку изменений коммутируем с последними измениями. Смотрим на то какой набор
 	// изменений у нас получается.
 	// Объектная модель у нас простая: класс, в котором возможно есть массив элементов(тоже классов), у которого воможно
@@ -710,18 +711,16 @@ CWordCollaborativeEditing.prototype.Undo = function()
 			arrReverseChanges.splice(0, 0, oReverseChange);
 	}
 
-
-
-
-
+	// Накатываем изменения в данном клиенте
 	var oLogicDocument = this.m_oLogicDocument;
 
 	oLogicDocument.DrawingDocument.EndTrackTable(null, true);
 	oLogicDocument.DrawingObjects.TurnOffCheckChartSelection();
 
-	for (var nIndex = arrReverseChanges.length - 1; nIndex >= 0; --nIndex)
+	for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
 	{
 		arrReverseChanges[nIndex].Load();
+		this.m_aAllChanges.push(arrReverseChanges[nIndex]);
 	}
 
 	oLogicDocument.DrawingObjects.TurnOnCheckChartSelection();
@@ -730,6 +729,26 @@ CWordCollaborativeEditing.prototype.Undo = function()
 	oLogicDocument.Document_UpdateSelectionState();
 	oLogicDocument.Document_UpdateInterfaceState();
 	oLogicDocument.Document_UpdateRulersState();
+
+	var oBinaryWriter = History.BinaryWriter;
+	var aSendingChanges = [];
+	for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
+	{
+		var oReverseChange = arrReverseChanges[nIndex];
+		var oChangeClass   = oReverseChange.GetClass();
+
+		var nBinaryPos = oBinaryWriter.GetCurPosition();
+		oBinaryWriter.WriteString2(oChangeClass.Get_Id());
+		oBinaryWriter.WriteLong(oReverseChange.Type);
+		oReverseChange.WriteToBinary(oBinaryWriter);
+
+		var nBinaryLen = oBinaryWriter.GetCurPosition() - nBinaryPos;
+
+		var oChange = new AscCommon.CCollaborativeChanges();
+		oChange.Set_FromUndoRedo(oChangeClass, oReverseChange, {Pos : nBinaryPos, Len : nBinaryLen});
+		aSendingChanges.push(oChange.m_pData);
+	}
+	editor.CoAuthoringApi.saveChanges(aSendingChanges, 0, null);
 };
 CWordCollaborativeEditing.prototype.CanUndo = function()
 {
@@ -823,7 +842,7 @@ CWordCollaborativeEditing.prototype.private_Commutate = function(oActionL, oActi
 	{
 		if (oActionR.Add)
 		{
-			if (oActionL.Pos >= oActionR)
+			if (oActionL.Pos >= oActionR.Pos)
 				oActionL.Pos++;
 			else
 				oActionR.Pos++;

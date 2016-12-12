@@ -2513,7 +2513,7 @@ CTable.prototype =
         for ( var Index = 0; Index < Rows; Index++ )
         {
             Table.Content[Index] = this.Content[Index].Copy( Table );
-            History.Add(new CChangesTableAddRow(Table, Index, Table.Content[Index]));
+            History.Add(new CChangesTableAddRow(Table, Index, [Table.Content[Index]]));
         }
 
         Table.Internal_ReIndexing(0);
@@ -6770,7 +6770,7 @@ CTable.prototype =
 
                         // Добавляем ячейку
                         Row.Content[CurCell] = CellInfo.Cell.Copy(Row);
-                        History.Add(new CChangesTableRowAddCell(Row, CurCell, Row.Content[CurCell]));
+                        History.Add(new CChangesTableRowAddCell(Row, CurCell, [Row.Content[CurCell]]));
                         CurCell++;
 
                         var VMerge = CellInfo.Cell.Get_VMerge();
@@ -6798,7 +6798,7 @@ CTable.prototype =
 
                 // Добавляем строку в новую таблицу
                 Table.Content[CurRow2] = Row;
-                History.Add(new CChangesTableAddRow(Table, CurRow2, Table.Content[CurRow2]));
+                History.Add(new CChangesTableAddRow(Table, CurRow2, [Table.Content[CurRow2]]));
                 CurRow2++;
             }
 
@@ -10193,7 +10193,7 @@ CTable.prototype =
 
 		this.Content[Index].PreDelete();
 
-		History.Add(new CChangesTableRemoveRow(this, Index, this.Content[Index]));
+		History.Add(new CChangesTableRemoveRow(this, Index, [this.Content[Index]]));
 
 		this.Rows--;
 		this.Content.splice(Index, 1);
@@ -10215,7 +10215,7 @@ CTable.prototype =
 
         var NewRow = ( undefined === _NewRow ? new CTableRow( this, CellsCount ) : _NewRow );
 
-        History.Add(new CChangesTableAddRow(this, Index, NewRow));
+        History.Add(new CChangesTableAddRow(this, Index, [NewRow]));
 
         this.Content.splice( Index, 0, NewRow );
         this.TableRowsBottom.splice( Index, 0, {} );

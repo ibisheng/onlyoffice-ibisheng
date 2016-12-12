@@ -445,7 +445,7 @@ function CEditorPage(api)
 		if (this.m_oApi.isMobileVersion)
 		{
 			this.MobileTouchManager = new AscCommon.CMobileTouchManager();
-			this.MobileTouchManager.Init(this);
+			this.MobileTouchManager.Init(this.m_oApi);
 		}
 
 		this.checkNeedRules();
@@ -811,8 +811,8 @@ function CEditorPage(api)
 
 				this.TextBoxBackground.HtmlElement["ontouchstart"] = function(e)
 				{
-				    if (AscCommon.g_inputContext)
-				        AscCommon.g_inputContext.externalChangeFocus();
+					if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+						return;
 
 				    if (!oThis.IsFocus)
 				        oThis.m_oApi.asc_enableKeyEvents(true);
@@ -856,8 +856,8 @@ function CEditorPage(api)
 			{
 				this.TextBoxBackground.HtmlElement["onmousedown"] = function(e)
 				{
-				    if (AscCommon.g_inputContext)
-                        AscCommon.g_inputContext.externalChangeFocus();
+					if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+						return;
 
 					if (!oThis.MobileTouchManager)
 						return false;
@@ -1620,8 +1620,8 @@ function CEditorPage(api)
 				e.returnValue = false;
 		}
 
-		if (AscCommon.g_inputContext)
-			AscCommon.g_inputContext.externalChangeFocus();
+		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+			return;
 
 		var oWordControl = oThis;
 
@@ -2278,7 +2278,7 @@ function CEditorPage(api)
 		}
 
 		this.ReaderTouchManager = new AscCommon.CReaderTouchManager();
-		this.ReaderTouchManager.Init(this);
+		this.ReaderTouchManager.Init(this.m_oApi);
 
 		this.TransformDivUseAnimation(this.ReaderModeDivWrapper, 0);
 
@@ -2354,7 +2354,8 @@ function CEditorPage(api)
 				if (oThis.m_oApi.isMobileVersion)
 				{
 					oThis.MobileTouchManager = new AscCommon.CMobileTouchManager();
-					oThis.MobileTouchManager.Init(oThis);
+					oThis.MobileTouchManager.Init(oThis.m_oApi);
+					oThis.MobileTouchManager.Resize();
 				}
 
 				return;

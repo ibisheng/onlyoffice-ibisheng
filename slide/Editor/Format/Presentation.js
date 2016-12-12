@@ -1562,7 +1562,11 @@ CPresentation.prototype =
     },
 
     Selection_Remove: function()
-    {},
+    {
+        if(this.Slides[this.CurPage]){
+            this.Slides[this.CurPage].graphicObjects.resetSelection();
+        }
+    },
 
     Edit_Chart : function(binary)
     {

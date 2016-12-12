@@ -410,9 +410,9 @@ CChangesTableRowHeight.prototype.Merge = private_TableRowChangesOnMergePr;
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
  */
-function CChangesTableRowAddCell(Class, Pos, Cell)
+function CChangesTableRowAddCell(Class, Pos, Cells)
 {
-	CChangesTableRowAddCell.superclass.constructor.call(this, Class, Pos, [Cell], true);
+	CChangesTableRowAddCell.superclass.constructor.call(this, Class, Pos, Cells, true);
 }
 AscCommon.extendClass(CChangesTableRowAddCell, AscDFH.CChangesBaseContentChange);
 CChangesTableRowAddCell.prototype.Type = AscDFH.historyitem_TableRow_AddCell;
@@ -446,7 +446,7 @@ CChangesTableRowAddCell.prototype.private_ReadItem = function(Reader)
 };
 CChangesTableRowAddCell.prototype.Load = function(Color)
 {
-	if (this.Items.length <= 0 || this.PosArray <= 0)
+	if (this.Items.length <= 0 || this.PosArray.length <= 0)
 		return;
 
 	var oRow = this.Class;
@@ -477,9 +477,9 @@ CChangesTableRowAddCell.prototype.CreateReverseChange = function()
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
  */
-function CChangesTableRowRemoveCell(Class, Pos, Cell)
+function CChangesTableRowRemoveCell(Class, Pos, Cells)
 {
-	CChangesTableRowRemoveCell.superclass.constructor.call(this, Class, Pos, [Cell], false);
+	CChangesTableRowRemoveCell.superclass.constructor.call(this, Class, Pos, Cells, false);
 }
 AscCommon.extendClass(CChangesTableRowRemoveCell, AscDFH.CChangesBaseContentChange);
 CChangesTableRowRemoveCell.prototype.Type = AscDFH.historyitem_TableRow_RemoveCell;

@@ -2972,7 +2972,7 @@ function CDrawingDocument()
 
 		return {X: x_pix, Y: y_pix, Error: false};
 	}
-	this.ConvertCoordsToCursor3 = function (x, y, pageIndex)
+	this.ConvertCoordsToCursor3 = function (x, y, pageIndex, isGlobal)
 	{
 		// теперь крутить всякие циклы нет смысла
 		if (pageIndex < 0 || pageIndex >= this.m_lPagesCount)
@@ -2982,8 +2982,19 @@ function CDrawingDocument()
 
 		var dKoef = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
 
-		var _x = this.m_oWordControl.X;
-		var _y = this.m_oWordControl.Y;
+		var _x = 0;
+		var _y = 0;
+		if (isGlobal)
+		{
+			_x = this.m_oWordControl.X;
+			_y = this.m_oWordControl.Y;
+
+			if (true == this.m_oWordControl.m_bIsRuler)
+			{
+				_x += 5 * g_dKoef_mm_to_pix;
+				_y += 7 * g_dKoef_mm_to_pix;
+			}
+		}
 
 		var x_pix = (this.m_arrPages[pageIndex].drawingPage.left + x * dKoef + _x + 0.5) >> 0;
 		var y_pix = (this.m_arrPages[pageIndex].drawingPage.top + y * dKoef + _y + 0.5) >> 0;

@@ -187,6 +187,9 @@ function CEditorPage(api)
 	this.m_oScrollThumbApi = null;
 	this.m_oScrollNotesApi = null;
 
+	this.MobileTouchManager 			= null;
+	this.MobileTouchManagerThumbnails 	= null;
+
 	// properties
 	this.m_bIsHorScrollVisible          = false;
 	this.m_bIsCheckHeedHorScrollRepeat  = false;
@@ -406,6 +409,11 @@ function CEditorPage(api)
 		this.m_oThumbnailsContainer.AddControl(this.m_oThumbnails_scroll);
 		// ----------------
 
+		if (this.m_oApi.isMobileVersion)
+		{
+			this.m_oThumbnails_scroll.HtmlElement.style.display = "none";
+		}
+
 		// main content -------------------------------------------------------------
 		this.m_oMainContent = CreateControlContainer("id_main");
 
@@ -536,6 +544,15 @@ function CEditorPage(api)
 		// --------------------------------------------------------------------------
 
 		this.m_oDrawingDocument.TargetHtmlElement = document.getElementById('id_target_cursor');
+
+		if (this.m_oApi.isMobileVersion)
+		{
+			this.MobileTouchManager = new AscCommon.CMobileTouchManager();
+			this.MobileTouchManager.Init(this.m_oApi);
+
+			this.MobileTouchManagerThumbnails = new AscCommon.CMobileTouchManagerThumbnails();
+			this.MobileTouchManagerThumbnails.Init(this.m_oApi);
+		}
 
 		this.m_oOverlayApi.m_oControl  = this.m_oOverlay;
 		this.m_oOverlayApi.m_oHtmlPage = this;
@@ -673,70 +690,270 @@ function CEditorPage(api)
 
 	this.initEvents2MobileAdvances = function()
 	{
-		this.m_oEditor.HtmlElement["ontouchstart"] = function(e)
+		if (!this.m_oApi.isMobileVersion)
 		{
-			oThis.onMouseDown(e.touches[0]);
-			return false;
-		};
-		this.m_oEditor.HtmlElement["ontouchmove"]  = function(e)
-		{
-			oThis.onMouseMove(e.touches[0]);
-			return false;
-		};
-		this.m_oEditor.HtmlElement["ontouchend"]   = function(e)
-		{
-			oThis.onMouseUp(e.changedTouches[0]);
-			return false;
-		};
+			this.m_oEditor.HtmlElement["ontouchstart"] = function (e)
+			{
+				oThis.onMouseDown(e.touches[0]);
+				return false;
+			};
+			this.m_oEditor.HtmlElement["ontouchmove"] = function (e)
+			{
+				oThis.onMouseMove(e.touches[0]);
+				return false;
+			};
+			this.m_oEditor.HtmlElement["ontouchend"] = function (e)
+			{
+				oThis.onMouseUp(e.changedTouches[0]);
+				return false;
+			};
 
-		this.m_oOverlay.HtmlElement["ontouchstart"] = function(e)
-		{
-			oThis.onMouseDown(e.touches[0]);
-			return false;
-		};
-		this.m_oOverlay.HtmlElement["ontouchmove"]  = function(e)
-		{
-			oThis.onMouseMove(e.touches[0]);
-			return false;
-		};
-		this.m_oOverlay.HtmlElement["ontouchend"]   = function(e)
-		{
-			oThis.onMouseUp(e.changedTouches[0]);
-			return false;
-		};
+			this.m_oOverlay.HtmlElement["ontouchstart"] = function (e)
+			{
+				oThis.onMouseDown(e.touches[0]);
+				return false;
+			};
+			this.m_oOverlay.HtmlElement["ontouchmove"] = function (e)
+			{
+				oThis.onMouseMove(e.touches[0]);
+				return false;
+			};
+			this.m_oOverlay.HtmlElement["ontouchend"] = function (e)
+			{
+				oThis.onMouseUp(e.changedTouches[0]);
+				return false;
+			};
 
-		this.m_oTopRuler_horRuler.HtmlElement["ontouchstart"] = function(e)
-		{
-			oThis.horRulerMouseDown(e.touches[0]);
-			return false;
-		};
-		this.m_oTopRuler_horRuler.HtmlElement["ontouchmove"]  = function(e)
-		{
-			oThis.horRulerMouseMove(e.touches[0]);
-			return false;
-		};
-		this.m_oTopRuler_horRuler.HtmlElement["ontouchend"]   = function(e)
-		{
-			oThis.horRulerMouseUp(e.changedTouches[0]);
-			return false;
-		};
+			this.m_oTopRuler_horRuler.HtmlElement["ontouchstart"] = function (e)
+			{
+				oThis.horRulerMouseDown(e.touches[0]);
+				return false;
+			};
+			this.m_oTopRuler_horRuler.HtmlElement["ontouchmove"] = function (e)
+			{
+				oThis.horRulerMouseMove(e.touches[0]);
+				return false;
+			};
+			this.m_oTopRuler_horRuler.HtmlElement["ontouchend"] = function (e)
+			{
+				oThis.horRulerMouseUp(e.changedTouches[0]);
+				return false;
+			};
 
-		this.m_oLeftRuler_vertRuler.HtmlElement["ontouchstart"] = function(e)
-		{
-			oThis.verRulerMouseDown(e.touches[0]);
-			return false;
-		};
-		this.m_oLeftRuler_vertRuler.HtmlElement["ontouchmove"]  = function(e)
-		{
-			oThis.verRulerMouseMove(e.touches[0]);
-			return false;
-		};
-		this.m_oLeftRuler_vertRuler.HtmlElement["ontouchend"]   = function(e)
-		{
-			oThis.verRulerMouseUp(e.changedTouches[0]);
-			return false;
-		};
+			this.m_oLeftRuler_vertRuler.HtmlElement["ontouchstart"] = function (e)
+			{
+				oThis.verRulerMouseDown(e.touches[0]);
+				return false;
+			};
+			this.m_oLeftRuler_vertRuler.HtmlElement["ontouchmove"] = function (e)
+			{
+				oThis.verRulerMouseMove(e.touches[0]);
+				return false;
+			};
+			this.m_oLeftRuler_vertRuler.HtmlElement["ontouchend"] = function (e)
+			{
+				oThis.verRulerMouseUp(e.changedTouches[0]);
+				return false;
+			};
+		}
 	};
+
+	this.initEventsMobile = function()
+	{
+		if (this.m_oApi.isMobileVersion)
+		{
+			this.m_oThumbnailsContainer.HtmlElement.style.zIndex = "11";
+
+			this.TextBoxBackground = CreateControl(AscCommon.g_inputContext.HtmlArea.id);
+			this.TextBoxBackground.HtmlElement.parentNode.parentNode.style.zIndex = 10;
+
+			var __hasTouch = 'ontouchstart' in window;
+
+			if (__hasTouch)
+			{
+				this.TextBoxBackground.HtmlElement["ontouchcancel"] = function(e)
+				{
+					if (!oThis.MobileTouchManager)
+						return false;
+
+					oThis.IsUpdateOverlayOnlyEndReturn = true;
+					oThis.StartUpdateOverlay();
+					var ret                            = oThis.MobileTouchManager.onTouchEnd(e);
+					oThis.IsUpdateOverlayOnlyEndReturn = false;
+					oThis.EndUpdateOverlay();
+					return ret;
+				};
+
+				this.TextBoxBackground.HtmlElement["ontouchstart"] = function(e)
+				{
+					if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+						return;
+
+					if (!oThis.IsFocus)
+						oThis.m_oApi.asc_enableKeyEvents(true);
+
+					if (!oThis.MobileTouchManager)
+						return false;
+
+					oThis.IsUpdateOverlayOnlyEndReturn = true;
+					oThis.StartUpdateOverlay();
+					var ret                            = oThis.MobileTouchManager.onTouchStart(e);
+					oThis.IsUpdateOverlayOnlyEndReturn = false;
+					oThis.EndUpdateOverlay();
+					return ret;
+				};
+				this.TextBoxBackground.HtmlElement["ontouchmove"]  = function(e)
+				{
+					if (!oThis.MobileTouchManager)
+						return false;
+
+					oThis.IsUpdateOverlayOnlyEndReturn = true;
+					oThis.StartUpdateOverlay();
+					var ret                            = oThis.MobileTouchManager.onTouchMove(e);
+					oThis.IsUpdateOverlayOnlyEndReturn = false;
+					oThis.EndUpdateOverlay();
+					return ret;
+				};
+				this.TextBoxBackground.HtmlElement["ontouchend"]   = function(e)
+				{
+					if (!oThis.MobileTouchManager)
+						return false;
+
+					oThis.IsUpdateOverlayOnlyEndReturn = true;
+					oThis.StartUpdateOverlay();
+					var ret                            = oThis.MobileTouchManager.onTouchEnd(e);
+					oThis.IsUpdateOverlayOnlyEndReturn = false;
+					oThis.EndUpdateOverlay();
+					return ret;
+				};
+
+				//
+				this.m_oThumbnails.HtmlElement["ontouchstart"] = function(e)
+				{
+					if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+						return;
+
+					if (!oThis.MobileTouchManagerThumbnails)
+						return false;
+
+					return oThis.MobileTouchManagerThumbnails.onTouchStart(e);
+				};
+				this.m_oThumbnails.HtmlElement["ontouchmove"] = function(e)
+				{
+					if (!oThis.MobileTouchManagerThumbnails)
+						return false;
+
+					return oThis.MobileTouchManagerThumbnails.onTouchMove(e);
+				};
+				this.m_oThumbnails.HtmlElement["ontouchend"]   = function(e)
+				{
+					if (!oThis.MobileTouchManagerThumbnails)
+						return false;
+
+					return oThis.MobileTouchManagerThumbnails.onTouchEnd(e);
+				};
+				this.m_oThumbnails.HtmlElement["ontouchcancel"]   = function(e)
+				{
+					if (!oThis.MobileTouchManagerThumbnails)
+						return false;
+
+					return oThis.MobileTouchManagerThumbnails.onTouchEnd(e);
+				};
+			}
+			else
+			{
+				this.TextBoxBackground.HtmlElement["onmousedown"] = function(e)
+				{
+					if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+						return;
+
+					if (!oThis.MobileTouchManager)
+						return false;
+
+					oThis.IsUpdateOverlayOnlyEndReturn = true;
+					oThis.StartUpdateOverlay();
+					var ret                            = oThis.MobileTouchManager.onTouchStart(e);
+					oThis.IsUpdateOverlayOnlyEndReturn = false;
+					oThis.EndUpdateOverlay();
+					return ret;
+				};
+				this.TextBoxBackground.HtmlElement["onmousemove"] = function(e)
+				{
+					if (!oThis.MobileTouchManager)
+						return false;
+
+					oThis.IsUpdateOverlayOnlyEndReturn = true;
+					oThis.StartUpdateOverlay();
+					var ret                            = oThis.MobileTouchManager.onTouchMove(e);
+					oThis.IsUpdateOverlayOnlyEndReturn = false;
+					oThis.EndUpdateOverlay();
+					return ret;
+				};
+				this.TextBoxBackground.HtmlElement["onmouseup"]   = function(e)
+				{
+					if (!oThis.MobileTouchManager)
+						return false;
+
+					oThis.IsUpdateOverlayOnlyEndReturn = true;
+					oThis.StartUpdateOverlay();
+					var ret                            = oThis.MobileTouchManager.onTouchEnd(e);
+					oThis.IsUpdateOverlayOnlyEndReturn = false;
+					oThis.EndUpdateOverlay();
+					return ret;
+				};
+
+				//
+				this.m_oThumbnails.HtmlElement["onmousedown"] = function(e)
+				{
+					if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+						return;
+
+					if (!oThis.MobileTouchManagerThumbnails)
+						return false;
+
+					return oThis.MobileTouchManagerThumbnails.onTouchStart(e);
+				};
+				this.m_oThumbnails.HtmlElement["onmousemove"] = function(e)
+				{
+					if (!oThis.MobileTouchManagerThumbnails)
+						return false;
+
+					return oThis.MobileTouchManagerThumbnails.onTouchMove(e);
+				};
+				this.m_oThumbnails.HtmlElement["onmouseup"]   = function(e)
+				{
+					if (!oThis.MobileTouchManagerThumbnails)
+						return false;
+
+					return oThis.MobileTouchManagerThumbnails.onTouchEnd(e);
+				};
+			}
+
+			if (AscCommon.AscBrowser.isAndroid)
+			{
+				this.TextBoxBackground.HtmlElement["oncontextmenu"] = function(e)
+				{
+					if (e.preventDefault)
+						e.preventDefault();
+
+					e.returnValue = false;
+					return false;
+				};
+
+				this.TextBoxBackground.HtmlElement["onselectstart"] = function(e)
+				{
+					oThis.m_oLogicDocument.Select_All();
+
+					if (e.preventDefault)
+						e.preventDefault();
+
+					e.returnValue = false;
+					return false;
+				};
+			}
+		}
+	};
+
 	this.onButtonRulersClick       = function()
 	{
 		if (false === oThis.m_oApi.bInit_word_control || true === oThis.m_oApi.isViewMode)
@@ -1353,8 +1570,8 @@ function CEditorPage(api)
 		if (false === oThis.m_oApi.bInit_word_control)
 			return;
 
-		if (AscCommon.g_inputContext)
-			AscCommon.g_inputContext.externalChangeFocus();
+		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+			return;
 
 		var _isCatch = false;
 
@@ -1586,8 +1803,8 @@ function CEditorPage(api)
 				e.returnValue = false;
 		}
 
-		if (AscCommon.g_inputContext)
-			AscCommon.g_inputContext.externalChangeFocus();
+		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+			return;
 
 		oWordControl.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
 		if (oWordControl.DemonstrationManager.Mode)
@@ -2631,7 +2848,13 @@ function CEditorPage(api)
 			ctx.stroke();
 			ctx.beginPath();
 			ctx.globalAlpha = 1.0;
+
+			if (this.MobileTouchManager)
+				this.MobileTouchManager.CheckSelect(overlay);
 		}
+
+		if (this.MobileTouchManager)
+			this.MobileTouchManager.CheckTableRules(overlay);
 
 		ctx.globalAlpha = 1.0;
 		ctx             = null;
@@ -2913,6 +3136,9 @@ function CEditorPage(api)
 		this.Thumbnails.SlideHeight = this.m_oLogicDocument.Height;
 		this.Thumbnails.SlidesCount = this.m_oDrawingDocument.SlidesCount;
 		this.Thumbnails.CheckSizes();
+
+		if (this.MobileTouchManager)
+			this.MobileTouchManager.Resize();
 	};
 
 	this.CheckCalculateDocumentSize = function(_bounds)
@@ -3039,20 +3265,15 @@ function CEditorPage(api)
 
 		this.m_oApi.syncOnThumbnailsShow();
 
-		if (!this.m_oApi.isMobileVersion)
-        {
-            AscCommon.InitBrowserInputContext(this.m_oApi, "id_target_cursor");
-            if (AscCommon.g_inputContext)
-                AscCommon.g_inputContext.onResize("id_main_view");
-        }
-        else
-        {
-            window.onkeydown = this.onKeyDown;
-            window.onkeypress = this.onKeyPress;
-            window.onkeyup = this.onKeyUp;
+		if (true)
+		{
+			AscCommon.InitBrowserInputContext(this.m_oApi, "id_target_cursor");
+			if (AscCommon.g_inputContext)
+				AscCommon.g_inputContext.onResize("id_main_view");
 
-            window['AscCommon'].g_clipboardBase.Init(api);
-        }
+			if (this.m_oApi.isMobileVersion)
+				this.initEventsMobile();
+		}
 	};
 
 	this.StartMainTimer = function()

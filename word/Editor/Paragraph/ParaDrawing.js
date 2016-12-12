@@ -111,6 +111,8 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
 		B : 0
 	};
 
+	this.docPr = new AscFormat.CNvPr();
+
 	this.SizeRelH = undefined;
 	this.SizeRelV = undefined;
 	//{RelativeFrom      : c_oAscRelativeFromH.Column, Percent: ST_PositivePercentage}
@@ -1673,6 +1675,7 @@ ParaDrawing.prototype.Write_ToBinary2 = function(Writer)
 	AscFormat.writeObject(Writer, this.Parent);
 	AscFormat.writeObject(Writer, this.wrappingPolygon);
 	AscFormat.writeLong(Writer, this.RelativeHeight);
+	AscFormat.writeObject(Writer, this.docPr);
 };
 ParaDrawing.prototype.Read_FromBinary2 = function(Reader)
 {
@@ -1687,6 +1690,7 @@ ParaDrawing.prototype.Read_FromBinary2 = function(Reader)
 	this.Parent          = AscFormat.readObject(Reader);
 	this.wrappingPolygon = AscFormat.readObject(Reader);
 	this.RelativeHeight  = AscFormat.readLong(Reader);
+	this.docPr = AscFormat.readObject(Reader);
 	if (this.wrappingPolygon)
 	{
 		this.wrappingPolygon.wordGraphicObject = this;

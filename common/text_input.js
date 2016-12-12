@@ -810,8 +810,20 @@
 
 			if (AscCommon.AscBrowser.isIE)
 			{
-				oEvent.preventDefault = function () {
-					Object.defineProperty(this, "defaultPrevented", {get: function () {return true;}});
+				oEvent.preventDefault = function ()
+				{
+					try
+					{
+						Object.defineProperty(this, "defaultPrevented", {
+							get: function ()
+							{
+								return true;
+							}
+						});
+					}
+					catch(err)
+					{
+					}
 				};
 			}
 
@@ -1411,6 +1423,8 @@
 			if (_locale == undefined || _locale == null)
 				_locale = "";
 
+			ti_console_log_ms("msCheckComposition: " + type);
+
 			var isNoUseCtx = ((_locale.indexOf("zh-Hant") == 0) || (_locale.indexOf("zh-Hans") == 0)) ? true : false;
 			// этот код нарушает китайский ввод (написать много, и начать выбирать мышкой!!! по короткими частям)
 			// но пока так. иначе проблемы на корейском
@@ -1428,6 +1442,7 @@
 						{
 							// не натуральный end!!!
 							type = c_oCompositionState.process;
+							ti_console_log_ms("msCheckComposition: end => process");
 						}
 					}
 				}
@@ -1445,7 +1460,13 @@
 				if (_value.indexOf(this.ieNonCompositionPrefixConfirm) != 0)
 				{
 					// по идее нужно стереть, но мы пока просто заканчиваем ввод
+					ti_console_log_ms("msCheckComposition: externalEndCompositeInput");
+					ti_console_log_ms("[" + _value + "], prefix: " + this.ieNonCompositionPrefixConfirm);
 					this.externalEndCompositeInput();
+					if (type == c_oCompositionState.end)
+					{
+						this.apiCompositeEnd();
+					}
 					return;
 				}
 			}
@@ -1489,6 +1510,8 @@
 
 			if (type == c_oCompositionState.end)
 			{
+				ti_console_log_ms("msCheckComposition: end!!!");
+
 				this.apiCompositeEnd();
 
 				this.unlockTarget();
@@ -1618,11 +1641,21 @@
 
 		externalChangeFocus : function()
 		{
-			if (this.compositionState == c_oCompositionState.process)
+			if (this.compositionState == c_oCompositionState.end)
+				return false;
+
+			setTimeout(function()
 			{
-				this.apiCompositeEnd();
-				this.clear();
-			}
+				var _input = window['AscCommon'].g_inputContext;
+				if (_input.compositionState == c_oCompositionState.process)
+				{
+					//_input.apiCompositeEnd();
+					_input.clear();
+				}
+
+			}, 10);
+
+			return true;
 		}
 	};
 

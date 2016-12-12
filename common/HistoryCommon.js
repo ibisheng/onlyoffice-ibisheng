@@ -1736,6 +1736,8 @@
 	window['AscDFH'].historyitem_CNvPr_SetId       = window['AscDFH'].historyitem_type_CNvPr | 1;
 	window['AscDFH'].historyitem_CNvPr_SetName     = window['AscDFH'].historyitem_type_CNvPr | 2;
 	window['AscDFH'].historyitem_CNvPr_SetIsHidden = window['AscDFH'].historyitem_type_CNvPr | 3;
+	window['AscDFH'].historyitem_CNvPr_SetDescr    = window['AscDFH'].historyitem_type_CNvPr | 4;
+	window['AscDFH'].historyitem_CNvPr_SetTitle    = window['AscDFH'].historyitem_type_CNvPr | 5;
 
 	window['AscDFH'].historyitem_NvPr_SetIsPhoto   = window['AscDFH'].historyitem_type_NvPr | 1;
 	window['AscDFH'].historyitem_NvPr_SetUserDrawn = window['AscDFH'].historyitem_type_NvPr | 2;

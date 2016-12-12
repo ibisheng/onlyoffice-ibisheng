@@ -3081,6 +3081,8 @@ function CThumbnailsManager()
 	this.MouseThumbnailsAnimateScrollTopTimer    = -1;
 	this.MouseThumbnailsAnimateScrollBottomTimer = -1;
 
+	this.ScrollerHeight = 0;
+
 	this.m_oWordControl = null;
 	var oThis           = this;
 
@@ -3232,8 +3234,8 @@ function CThumbnailsManager()
 		else
 			e.returnValue = false;
 
-		if (AscCommon.g_inputContext)
-			AscCommon.g_inputContext.externalChangeFocus();
+		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+			return;
 
 		var control = oThis.m_oWordControl.m_oThumbnails.HtmlElement;
 		if (global_mouseEvent.IsLocked == true && global_mouseEvent.Sender != control)
@@ -3941,6 +3943,12 @@ function CThumbnailsManager()
 		{
 			var lPosition = (dPosition * word_control.m_oScrollThumbApi.getMaxScrolledY()) >> 0;
 			word_control.m_oScrollThumbApi.scrollToY(lPosition);
+		}
+
+		this.ScrollerHeight = nHeightPix;
+		if (word_control.MobileTouchManagerThumbnails)
+		{
+			word_control.MobileTouchManagerThumbnails.Resize();
 		}
 
 		this.CalculatePlaces();

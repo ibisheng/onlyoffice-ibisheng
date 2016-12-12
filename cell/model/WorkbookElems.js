@@ -59,19 +59,6 @@ var c_oAscNumFormatType = Asc.c_oAscNumFormatType;
 
 var g_oColorManager = null;
 	
-	var g_oDefaultFormat = {
-		XfId: null,
-		Font: null,
-		Fill: null,
-		Num: null,
-		Border: null,
-		Align: null,
-		FillAbs: null,
-		NumAbs: null,
-		BorderAbs: null,
-		AlignAbs: null
-	};
-
 var g_nHSLMaxValue = 255;
 var g_nColorTextDefault = 1;
 var g_nColorHyperlink = 10;
@@ -447,6 +434,20 @@ ColorManager.prototype =
 };
 g_oColorManager = new ColorManager();
 
+	var g_oDefaultFormat = {
+		XfId: null,
+		Font: null,
+		Fill: null,
+		Num: null,
+		Border: null,
+		Align: null,
+		FillAbs: null,
+		NumAbs: null,
+		BorderAbs: null,
+		AlignAbs: null,
+		ColorAuto: new RgbColor(0)
+	};
+
 	/** @constructor */
 	function Fragment(val) {
 		this.text = null;
@@ -649,7 +650,7 @@ var g_oFontProperties = {
 		return this.fn = val;
 	};
 	Font.prototype.getScheme = function () {
-		return this.scheme || g_oDefaultFormat.Font.scheme;
+		return this.scheme || Asc.EFontScheme.fontschemeNone;
 	};
 	Font.prototype.setScheme = function(val) {
 		return (null != val && Asc.EFontScheme.fontschemeNone != val) ? this.scheme = val : this.scheme = null;
@@ -661,37 +662,37 @@ var g_oFontProperties = {
 		return this.fs = val;
 	};
 	Font.prototype.getBold = function () {
-		return null != this.b ? this.b : (g_oDefaultFormat.Font.b || false);
+		return !!this.b;
 	};
 	Font.prototype.setBold = function(val) {
 		return val ? this.b = true : this.b = null;
 	};
 	Font.prototype.getItalic = function () {
-		return null != this.i ? this.i : (g_oDefaultFormat.Font.i || false);
+		return !!this.i;
 	};
 	Font.prototype.setItalic = function(val) {
 		return val ? this.i = true : this.i = null;
 	};
 	Font.prototype.getUnderline = function () {
-		return null != this.u ? this.u : (g_oDefaultFormat.Font.u || Asc.EUnderline.underlineNone);
+		return this.u || Asc.EUnderline.underlineNone;
 	};
 	Font.prototype.setUnderline = function(val) {
 		return (null != val && Asc.EUnderline.underlineNone != val) ? this.u = val : this.u = null;
 	};
 	Font.prototype.getStrikeout = function () {
-		return null != this.s ? this.s : (g_oDefaultFormat.Font.s || false);
+		return !!this.s;
 	};
 	Font.prototype.setStrikeout = function(val) {
 		return val ? this.s = true : this.s = null;
 	};
 	Font.prototype.getColor = function () {
-		return this.c || g_oDefaultFormat.Font.c;
+		return this.c || g_oDefaultFormat.ColorAuto;
 	};
 	Font.prototype.setColor = function(val) {
 		return this.c = val;
 	};
 	Font.prototype.getVerticalAlign = function () {
-		return null != this.va ? this.va : (g_oDefaultFormat.Font.va || AscCommon.vertalign_Baseline);
+		return this.va || AscCommon.vertalign_Baseline;
 	};
 	Font.prototype.setVerticalAlign = function(val) {
 		return (null != val && AscCommon.vertalign_Baseline != val) ? this.va = val : this.va = null;
@@ -1974,7 +1975,7 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.c;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.c;
+			oRes.oldVal = null;
 		var isSetNull = (null == val);
 		if (!isSetNull || (null != xfs && null != xfs.font)) {
 			if (isSetNull) {

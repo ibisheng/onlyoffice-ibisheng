@@ -4577,6 +4577,8 @@ function CNvPr()
     this.id = 0;
     this.name = "";
     this.isHidden = false;
+    this.descr = null;
+    this.title = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id)
@@ -4625,6 +4627,18 @@ CNvPr.prototype =
         this.isHidden = isHidden;
     },
 
+    setDecr: function(descr)
+    {
+        History.Add(this, {Type: AscDFH.historyitem_CNvPr_SetDescr , oldPr: this.descr, newPr: descr});
+        this.descr = descr;
+    },
+
+    setTitle: function(title)
+    {
+        History.Add(this, {Type: AscDFH.historyitem_CNvPr_SetTitle, oldPr: this.title, newPr: title});
+        this.title = title;
+    },
+
     Undo: function(data)
     {
         switch(data.Type)
@@ -4642,6 +4656,18 @@ CNvPr.prototype =
             case AscDFH.historyitem_CNvPr_SetIsHidden:
             {
                 this.isHidden = data.oldIsHidden;
+                break;
+            }
+
+            case AscDFH.historyitem_CNvPr_SetDescr:
+            {
+                this.descr = data.oldPr;
+                break;
+            }
+
+            case AscDFH.historyitem_CNvPr_SetTitle:
+            {
+                this.title = data.oldPr;
                 break;
             }
         }
@@ -4664,6 +4690,17 @@ CNvPr.prototype =
             case AscDFH.historyitem_CNvPr_SetIsHidden:
             {
                 this.isHidden = data.newIsHidden;
+                break;
+            }
+            case AscDFH.historyitem_CNvPr_SetDescr:
+            {
+                this.descr = data.newPr;
+                break;
+            }
+
+            case AscDFH.historyitem_CNvPr_SetTitle:
+            {
+                this.title = data.newPr;
                 break;
             }
         }
@@ -4692,6 +4729,17 @@ CNvPr.prototype =
             case AscDFH.historyitem_CNvPr_SetIsHidden:
             {
                 writeBool(w, data.newIsHidden);
+                break;
+            }
+            case AscDFH.historyitem_CNvPr_SetDescr:
+            {
+                writeString(w, data.newPr);
+                break;
+            }
+
+            case AscDFH.historyitem_CNvPr_SetTitle:
+            {
+                writeString(w, data.newPr);
                 break;
             }
         }
@@ -4725,6 +4773,18 @@ CNvPr.prototype =
             case AscDFH.historyitem_CNvPr_SetIsHidden:
             {
                 this.isHidden = readBool(r);
+                break;
+            }
+
+            case AscDFH.historyitem_CNvPr_SetDescr:
+            {
+                this.descr = readString(r);
+                break;
+            }
+
+            case AscDFH.historyitem_CNvPr_SetTitle:
+            {
+                this.title = readString(r);
                 break;
             }
         }

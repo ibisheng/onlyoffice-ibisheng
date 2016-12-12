@@ -2336,6 +2336,7 @@ function asc_ReadAutoFiltersOptions(s, p) {
                 }
                 
                 filter.asc_setValues(values);
+                break;
             }
             case 255:
             default:
@@ -2348,22 +2349,128 @@ function asc_ReadAutoFiltersOptions(s, p) {
     
     return filter;
 }
+function asc_ReadFormatTableInfo(s, p) {
+    var fmt = new AscCommonExcel.asc_CFormatTableInfo();
+    var isNull = true;
+    var next = true;
+    while (next)
+    {
+        var _attr = s[p.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                fmt.tableStyleName = s[p.pos++]; isNull = false;
+                break;
+            }
+            case 1:
+            {
+                fmt.tableRange = s[p.pos++]; isNull = false;
+                break;
+            }
+            case 2:
+            {
+                fmt.tableStyleName = s[p.pos++]; isNull = false;
+                break;
+            }
+            case 3:
+            {
+                fmt.bandHor = s[p.pos++]; isNull = false;
+                break;
+            }
+            case 4:
+            {
+                fmt.bandVer = s[p.pos++]; isNull = false;
+                break;
+            }
+            case 5:
+            {
+                fmt.filterButton = s[p.pos++]; isNull = false;
+                break;
+            }
+            case 6:
+            {
+                fmt.firstCol = s[p.pos++]; isNull = false;
+                break;
+            }
+            case 7:
+            {
+                fmt.firstRow = s[p.pos++]; isNull = false;
+                break;
+            }
+            case 8:
+            {
+                fmt.isDeleteColumn = s[p.pos++]; isNull = false;
+                break;
+            }
+            case 9:
+            {
+                fmt.isDeleteRow = s[p.pos++]; isNull = false;
+                break;
+            }
+            case 10:
+            {
+                fmt.isDeleteTable = s[p.pos++]; isNull = false;
+                break;
+            }
+            case 11:
+            {
+                fmt.isInsertColumnLeft = s[p.pos++]; isNull = false;
+                break;
+            }
+            case 12:
+            {
+                fmt.isInsertColumnRight = s[p.pos++]; isNull = false;
+                break;
+            }
+            case 13:
+            {
+                fmt.IsInsertRowAbove = s[p.pos++]; isNull = false;
+                break;
+            }
+            case 14:
+            {
+                fmt.isInsertRowBelow = s[p.pos++]; isNull = false;
+                break;
+            }
+            case 15:
+            {
+                fmt.lastCol = s[p.pos++]; isNull = false;
+                break;
+            }
+            case 16:
+            {
+                fmt.lastRow = s[p.pos++]; isNull = false;
+                break;
+            }
+
+            case 255:
+            default:
+            {
+                next = false;
+                break;
+            }
+        }
+    }
+    
+    return isNull ? null : fmt;
+}
 
 function asc_WriteCBorder(i, c, s) {
     if (!c) return;
-
+    
     s['WriteByte'](i);
-
+    
     if (c.asc_getStyle()) {
         s['WriteByte'](0);
         s['WriteString2'](c.asc_getStyle());
     }
-
+    
     if (c.asc_getColor()) {
         s['WriteByte'](1);
         s['WriteLong'](c.asc_getColor());
     }
-
+    
     s['WriteByte'](255);
 }
 function asc_WriteCHyperLink(i, c, s) {
@@ -4755,7 +4862,7 @@ function OfflineEditor () {
         AscCommonExcel.WorkbookView.prototype = Object.create (AscCommonExcel.WorkbookView.prototype);
         AscCommonExcel.WorkbookView.prototype.constructor = AscCommonExcel.WorkbookView;
 
-        AscCommonExcel.WorkbookView.prototype.af_getTablePictures =  function(wb, fmgrGraphics, oFont) {
+        AscCommonExcel.WorkbookView.prototype.af_getTablePictures  = function(wb, fmgrGraphics, oFont, props) {
 
             window["native"]["SetStylesType"](1);
 
@@ -4768,58 +4875,58 @@ function OfflineEditor () {
             canvas.width = styleThumbnailWidth;
             canvas.height = styleThumbnailHeight;
             var customStyles = wb.TableStyles.CustomStyles;
-            var result  = [];
+            var result = [];
             var options;
             var n = 0;
-            if(customStyles)
-            {
-                for(var i in customStyles)
-                {
-                    if(customStyles[i].table)
-                    {
+            if (customStyles) {
+                for (var i in customStyles) {
+                    if (customStyles[i].table) {
                         window["native"]["BeginDrawDocumentStyle"](customStyles[i].name, n);
-                        this.af_getSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont);
-                        n++;
-
+                        this.af_getSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont, props);
                         window["native"]["EndDrawStyle"]();
+                        n++;
                     }
                 }
             }
             var defaultStyles = wb.TableStyles.DefaultStyles;
-            if(defaultStyles)
-            {
-                for(var i in defaultStyles)
-                {
-                    if(defaultStyles[i].table)
-                    {
+            if (defaultStyles) {
+                for (var i in defaultStyles) {
+                    if (defaultStyles[i].table) {
                         window["native"]["BeginDrawDefaultStyle"](defaultStyles[i].name, n);
-                        this.af_getSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont);
-                        n++;
-
+                        this.af_getSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont, props);
                         window["native"]["EndDrawStyle"]();
+                        n++;
                     }
                 }
             }
             return result;
         };
-        AscCommonExcel.WorkbookView.prototype.af_getSmallIconTable = function(canvas, style, fmgrGraphics, oFont) {
+        AscCommonExcel.WorkbookView.prototype.af_getSmallIconTable = function(canvas, style, fmgrGraphics, oFont, props) {
 
             var ctx = new Asc.DrawingContext({canvas: canvas, units: 0/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
             var styleOptions = style;
-            //по умолчанию ставим строку заголовка и чередующиеся строки, позже нужно будет получать параметр
-            var styleInfo = false;
-
-            if(!styleInfo)
-            {
+          
+            var styleInfo;
+            if (props) {
                 styleInfo = {
-                    ShowColumnStripes: false,
-                    ShowFirstColumn: false,
-                    ShowLastColumn: false,
-                    ShowRowStripes: true,
-                    TotalsRowCount: 0
-                }
+                ShowColumnStripes: props.asc_getBandVer(),
+                ShowFirstColumn: props.asc_getFirstCol(),
+                ShowLastColumn: props.asc_getLastCol(),
+                ShowRowStripes: props.asc_getBandHor(),
+                HeaderRowCount: props.asc_getFirstRow(),
+                TotalsRowCount: props.asc_getLastRow()
+                };
+            } else {
+                styleInfo = {
+                ShowColumnStripes: false,
+                ShowFirstColumn: false,
+                ShowLastColumn: false,
+                ShowRowStripes: true,
+                HeaderRowCount: true,
+                TotalsRowCount: false
+                };
             }
-
+            
             var xSize = styleThumbnailWidth  * pxToMM;       //61 * pxToMM;
             var ySize = styleThumbnailHeight * pxToMM;      //45 * pxToMM;
 
@@ -4830,200 +4937,186 @@ function OfflineEditor () {
 
             //**draw background**
             var defaultColorBackground;
-            if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill)
+            if (styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill) {
                 defaultColorBackground = styleOptions.wholeTable.dxf.fill.bg;
-            else
+            } else {
                 defaultColorBackground = whiteColor;
-
+            }
+            
             var color;
-            if(styleOptions != undefined)
-            {
-                if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
-                {
+            if (styleOptions != undefined) {
+                if (styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg) {
                     ctx.setFillStyle(styleOptions.wholeTable.dxf.fill.bg);
-                    ctx.fillRect(0,0,xSize,ySize);
-                }
-                else
-                {
+                    ctx.fillRect(0, 0, xSize, ySize);
+                } else {
                     ctx.setFillStyle(whiteColor);
-                    ctx.fillRect(0,0,xSize,ySize);
+                    ctx.fillRect(0, 0, xSize, ySize);
                 }
-                if(styleInfo.ShowColumnStripes)//column stripes
+                if (styleInfo.ShowColumnStripes)//column stripes
                 {
-                    for(k = 0; k < 6; k++)
-                    {
+                    for (k = 0; k < 6; k++) {
                         color = defaultColorBackground;
-                        if((k)%2 == 0)
-                        {
-                            if(styleOptions.firstColumnStripe && styleOptions.firstColumnStripe.dxf.fill && null != styleOptions.firstColumnStripe.dxf.fill.bg)
-                                color =  styleOptions.firstColumnStripe.dxf.fill.bg;
-                            else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
-                                color =  styleOptions.wholeTable.dxf.fill.bg;
-                        }
-                        else
-                        {
-                            if(styleOptions.secondColumnStripe && styleOptions.secondColumnStripe.dxf.fill && null != styleOptions.secondColumnStripe.dxf.fill.bg)
+                        if (k % 2 == 0) {
+                            if (styleOptions.firstColumnStripe && styleOptions.firstColumnStripe.dxf.fill &&
+                                null != styleOptions.firstColumnStripe.dxf.fill.bg) {
+                                color = styleOptions.firstColumnStripe.dxf.fill.bg;
+                            } else if (styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill &&
+                                       null != styleOptions.wholeTable.dxf.fill.bg) {
+                                color = styleOptions.wholeTable.dxf.fill.bg;
+                            }
+                        } else {
+                            if (styleOptions.secondColumnStripe && styleOptions.secondColumnStripe.dxf.fill &&
+                                null != styleOptions.secondColumnStripe.dxf.fill.bg) {
                                 color = styleOptions.secondColumnStripe.dxf.fill.bg;
-                            else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
-                                color =  styleOptions.wholeTable.dxf.fill.bg;
+                            } else if (styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill &&
+                                       null != styleOptions.wholeTable.dxf.fill.bg) {
+                                color = styleOptions.wholeTable.dxf.fill.bg;
+                            }
                         }
                         ctx.setFillStyle(color);
-                        ctx.fillRect(k*stepX,0,stepX,ySize);
+                        ctx.fillRect(k * stepX, 0, stepX, ySize);
                     }
                 }
-
-                if(styleInfo.ShowRowStripes)//row stripes
+                
+                if (styleInfo.ShowRowStripes)//row stripes
                 {
-                    for(k = 0; k < 6; k++)
-                    {
+                    for (var k = 0; k < 6; k++) {
                         color = null;
-                        if(styleOptions)//styleOptions.headerRow
-                        {
-                            if(k ==0)
-                                k++;
-                            if((k)%2 != 0)
-                            {
-                                if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill && null != styleOptions.firstRowStripe.dxf.fill.bg)
+                        
+                        if (k == 0 && styleInfo.HeaderRowCount) {
+                            continue;
+                        }
+                        
+                        if (styleInfo.HeaderRowCount) {
+                            if (k % 2 != 0) {
+                                if (styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill &&
+                                    null != styleOptions.firstRowStripe.dxf.fill.bg) {
                                     color = styleOptions.firstRowStripe.dxf.fill.bg;
-                            }
-                            else
-                            {
-                                if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill && null != styleOptions.secondRowStripe.dxf.fill.bg)
+                                }
+                            } else {
+                                if (styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill &&
+                                    null != styleOptions.secondRowStripe.dxf.fill.bg) {
                                     color = styleOptions.secondRowStripe.dxf.fill.bg;
-                                else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
-                                    color = styleOptions.wholeTable.dxf.fill.bg;
-
+                                }
                             }
-                            if(color != null)
-                            {
-                                ctx.setFillStyle(color);
-                                if(k == 1)
-                                    ctx.fillRect(0, k*stepY, xSize, stepY);
-                                else if(k == 3)
-                                    ctx.fillRect(0, k*stepY, xSize,stepY);
-                                else
-                                    ctx.fillRect(0, k*stepY, xSize, stepY);
-                                //else
-                                //ctx.fillRect(0,k*stepY,xSize,stepY);
-                            }
-
-                        }
-                        else
-                        {
-                            color = null;
-                            if((k+1)%2 != 0)
-                            {
-                                if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill && null != styleOptions.firstRowStripe.dxf.fill.bg)
-                                    color =  styleOptions.firstRowStripe.dxf.fill.bg;
-                            }
-                            else
-                            {
-                                if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill && null != styleOptions.secondRowStripe.dxf.fill.bg)
-                                    color =  styleOptions.secondRowStripe.dxf.fill.bg;
-                                else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
-                                    color =  styleOptions.wholeTable.dxf.fill.bg;
-                            }
-
-                            if(color != null)
-                            {
-                                ctx.setFillStyle(color);
-                                ctx.fillRect(0, k*stepY, xSize, stepY);
+                        } else {
+                            if (k % 2 != 0) {
+                                if (styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill &&
+                                    null != styleOptions.secondRowStripe.dxf.fill.bg) {
+                                    color = styleOptions.secondRowStripe.dxf.fill.bg;
+                                }
+                            } else {
+                                if (styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill &&
+                                    null != styleOptions.firstRowStripe.dxf.fill.bg) {
+                                    color = styleOptions.firstRowStripe.dxf.fill.bg;
+                                }
                             }
                         }
-
+                        
+                        if (color != null) {
+                            ctx.setFillStyle(color);
+                            ctx.fillRect(0, k * stepY, xSize, stepY);
+                        }
                     }
-
                 }
-                if(styleInfo.ShowFirstColumn && styleOptions.firstColumn)//first column
-                {
-                    if(styleOptions.firstColumn && styleOptions.firstColumn.dxf.fill && null != styleOptions.firstColumn.dxf.fill.bg)
-                        ctx.setFillStyle(styleOptions.firstColumn.dxf.fill.bg);
-                    else
-                        ctx.setFillStyle(defaultColorBackground);
-                    ctx.fillRect(0,0,stepX,ySize);
-                }
-                if(styleInfo.ShowLastColumn)//last column
+                
+                if (styleInfo.ShowFirstColumn && styleOptions.firstColumn)//first column
                 {
                     color = null;
-                    if(styleOptions.lastColumn && styleOptions.lastColumn.dxf.fill && null != styleOptions.lastColumn.dxf.fill.bg)
-                        color =styleOptions.lastColumn.dxf.fill.bg;
-
-                    if(color != null)
-                    {
+                    if (styleOptions.firstColumn && styleOptions.firstColumn.dxf.fill &&
+                        null != styleOptions.firstColumn.dxf.fill.bg) {
+                        color = styleOptions.firstColumn.dxf.fill.bg;
+                    }
+                    
+                    if (color != null) {
                         ctx.setFillStyle(color);
-                        ctx.fillRect(4*stepX,0,stepX,ySize);
+                        ctx.fillRect(0, 0, stepX, ySize);
                     }
-
                 }
-                if(styleOptions)//header row
+                if (styleInfo.ShowLastColumn)//last column
                 {
-                    if(styleOptions.headerRow && styleOptions.headerRow.dxf.fill && null != styleOptions.headerRow.dxf.fill.bg)
-                    {
-                        ctx.setFillStyle(styleOptions.headerRow.dxf.fill.bg);
+                    color = null;
+                    if (styleOptions.lastColumn && styleOptions.lastColumn.dxf.fill &&
+                        null != styleOptions.lastColumn.dxf.fill.bg) {
+                        color = styleOptions.lastColumn.dxf.fill.bg;
                     }
-                    else
-                    {
+                    
+                    if (color != null) {
+                        ctx.setFillStyle(color);
+                        ctx.fillRect(4 * stepX + 1, 0, stepX, ySize);
+                    }
+                    
+                }
+                if (styleInfo.HeaderRowCount)//header row
+                {
+                    if (styleOptions.headerRow && styleOptions.headerRow.dxf.fill && null != styleOptions.headerRow.dxf.fill.bg) {
+                        ctx.setFillStyle(styleOptions.headerRow.dxf.fill.bg);
+                    } else {
                         ctx.setFillStyle(defaultColorBackground);
                     }
                     ctx.fillRect(0, 0, xSize, stepY);
-
+                    
                 }
-                if(styleInfo.TotalsRowCount)//total row
+                if (styleInfo.TotalsRowCount)//total row
                 {
                     color = null;
-                    if(styleOptions.totalRow && styleOptions.totalRow.dxf.fill && null != styleOptions.totalRow.dxf.fill.bg)
+                    if (styleOptions.totalRow && styleOptions.totalRow.dxf.fill && null != styleOptions.totalRow.dxf.fill.bg) {
                         color = styleOptions.totalRow.dxf.fill.bg;
-                    else
-                        color = defaultColorBackground;
-                    ctx.setFillStyle(color);
-                    ctx.fillRect(0, stepY*4, xSize, stepY);
+                    }
+                    
+                    if (color !== null) {
+                        ctx.setFillStyle(color);
+                        ctx.fillRect(0, stepY * 4, xSize, stepY);
+                    }
                 }
-
-
+                
+                
                 //первая ячейка
-                if(styleOptions.firstHeaderCell && styleInfo.ShowFirstColumn)
-                {
-                    if(styleOptions.firstHeaderCell && styleOptions.firstHeaderCell.dxf.fill && null != styleOptions.firstHeaderCell.dxf.fill.bg)
+                if (styleOptions.firstHeaderCell && styleInfo.ShowFirstColumn) {
+                    if (styleOptions.firstHeaderCell && styleOptions.firstHeaderCell.dxf.fill &&
+                        null != styleOptions.firstHeaderCell.dxf.fill.bg) {
                         ctx.setFillStyle(styleOptions.firstHeaderCell.dxf.fill.bg);
-                    else
+                    } else {
                         ctx.setFillStyle(defaultColorBackground);
-                    ctx.fillRect(0,0,stepX,stepY);
+                    }
+                    ctx.fillRect(0, 0, stepX, stepY);
                 }
                 //последняя в первой строке
-                if(styleOptions.lastHeaderCell && styleInfo.ShowLastColumn)
-                {
-                    if(styleOptions.lastHeaderCell && styleOptions.lastHeaderCell.dxf.fill && null != styleOptions.lastHeaderCell.dxf.fill.bg)
+                if (styleOptions.lastHeaderCell && styleInfo.ShowLastColumn) {
+                    if (styleOptions.lastHeaderCell && styleOptions.lastHeaderCell.dxf.fill &&
+                        null != styleOptions.lastHeaderCell.dxf.fill.bg) {
                         ctx.setFillStyle(styleOptions.lastHeaderCell.dxf.fill.bg);
-                    else
+                    } else {
                         ctx.setFillStyle(defaultColorBackground);
-                    ctx.fillRect(4*stepX,0,stepX,stepY);
+                    }
+                    ctx.fillRect(4 * stepX, 0, stepX, stepY);
                 }
                 //первая в последней строке
-                if(styleOptions.firstTotalCell  && styleInfo.TotalsRowCount && styleInfo.ShowFirstColumn)
-                {
-                    if(styleOptions.firstTotalCell && styleOptions.firstTotalCell.dxf.fill && null != styleOptions.firstTotalCell.dxf.fill.bg)
+                if (styleOptions.firstTotalCell && styleInfo.TotalsRowCount && styleInfo.ShowFirstColumn) {
+                    if (styleOptions.firstTotalCell && styleOptions.firstTotalCell.dxf.fill &&
+                        null != styleOptions.firstTotalCell.dxf.fill.bg) {
                         ctx.setFillStyle(styleOptions.firstTotalCell.dxf.fill.bg);
-                    else
+                    } else {
                         ctx.setFillStyle(defaultColorBackground);
-                    ctx.fillRect(0,4*stepY,stepX,stepY);
+                    }
+                    ctx.fillRect(0, 4 * stepY, stepX, stepY);
                 }
                 //последняя ячейка
-                if(styleOptions.lastTotalCell  && styleInfo.TotalsRowCount && styleInfo.ShowLastColumn)
-                {
-                    if(styleOptions.lastTotalCell && styleOptions.lastTotalCell.dxf.fill && null != styleOptions.lastTotalCell.dxf.fill.bg)
+                if (styleOptions.lastTotalCell && styleInfo.TotalsRowCount && styleInfo.ShowLastColumn) {
+                    if (styleOptions.lastTotalCell && styleOptions.lastTotalCell.dxf.fill &&
+                        null != styleOptions.lastTotalCell.dxf.fill.bg) {
                         ctx.setFillStyle(styleOptions.lastTotalCell.dxf.fill.bg);
-                    else
+                    } else {
                         ctx.setFillStyle(defaultColorBackground);
-                    ctx.fillRect(4*stepX,4*stepY,stepX,ySize);
+                    }
+                    ctx.fillRect(4 * stepX, 4 * stepY, stepX, ySize);
                 }
-
-            }
-            else
-            {
+                
+            } else {
                 ctx.setFillStyle(whiteColor);
-                ctx.fillRect(0,0,xSize,ySize);
+                ctx.fillRect(0, 0, xSize, ySize);
             }
-
+            
             //**draw vertical and horizontal lines**
             if(styleOptions != undefined)
             {
@@ -5080,41 +5173,35 @@ function OfflineEditor () {
                 }
 
                 var border;
-                if(styleInfo.ShowRowStripes)
-                {
-                    if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.border)
+                if (styleInfo.ShowRowStripes) {
+                    if (styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.border) {
                         border = styleOptions.firstRowStripe.dxf.border;
-                    else if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.border)
+                    } else if (styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.border) {
                         border = styleOptions.secondRowStripe.dxf.border;
-
-                    if(border)
-                    {
-                        for(n = 1; n < 5; n++)
-                        {
-                            ctx.lineHor(0, stepY*n, xSize);
+                    }
+                    
+                    if (border) {
+                        for (n = 1; n < 5; n++) {
+                            ctx.lineHor(0, stepY * n, xSize);
                         }
                         ctx.stroke();
                     }
                 }
-                if(styleOptions.totalRow && styleInfo.TotalsRowCount && styleOptions.totalRow.dxf.border)
-                {
+                if (styleOptions.totalRow && styleInfo.TotalsRowCount && styleOptions.totalRow.dxf.border) {
                     border = styleOptions.totalRow.dxf.border;
-                    if(border.t.s !== AscCommon.c_oAscBorderStyles.None)
-                    {
+                    if (border.t.s !== AscCommon.c_oAscBorderStyles.None) {
                         ctx.setStrokeStyle(border.t.c);
                         ctx.lineVer(0, xSize, ySize);
                     }
                 }
-                if(styleOptions.headerRow && styleOptions.headerRow.dxf.border)//header row
+                if (styleOptions.headerRow && styleOptions.headerRow.dxf.border && styleInfo.HeaderRowCount)//header row
                 {
                     border = styleOptions.headerRow.dxf.border;
-                    if(border.t.s !== AscCommon.c_oAscBorderStyles.None)
-                    {
+                    if (border.t.s !== AscCommon.c_oAscBorderStyles.None) {
                         ctx.setStrokeStyle(border.t.c);
                         ctx.lineHor(0, 0, xSize);
                     }
-                    if(border.b.s !== AscCommon.c_oAscBorderStyles.None)
-                    {
+                    if (border.b.s !== AscCommon.c_oAscBorderStyles.None) {
                         ctx.setStrokeStyle(border.b.c);
                         ctx.lineHor(0, stepY, xSize);
                     }
@@ -5122,49 +5209,46 @@ function OfflineEditor () {
                 }
                 ctx.closePath();
             }
-
+            
             //**draw marks line**
             var defaultColor;
-            if(!styleOptions || !styleOptions.wholeTable || !styleOptions.wholeTable.dxf.font)
+            if (!styleOptions || !styleOptions.wholeTable || !styleOptions.wholeTable.dxf.font) {
                 defaultColor = blackColor;
-            else
+            } else {
                 defaultColor = styleOptions.wholeTable.dxf.font.getColor();
-
-            for(var n = 1; n < 6; n++)
-            {
+            }
+            for (var n = 1; n < 6; n++) {
                 ctx.beginPath();
                 color = null;
-                if(n == 1 && styleOptions && styleOptions.headerRow && styleOptions.headerRow.dxf.font)
+                if (n == 1 && styleOptions && styleOptions.headerRow && styleOptions.headerRow.dxf.font) {
                     color = styleOptions.headerRow.dxf.font.getColor();
-                else if(n == 5 && styleOptions && styleOptions.totalRow && styleOptions.totalRow.dxf.font)
+                } else if (n == 5 && styleOptions && styleOptions.totalRow && styleOptions.totalRow.dxf.font) {
                     color = styleOptions.totalRow.dxf.font.getColor();
-                else if(styleOptions && styleOptions.headerRow && styleInfo.ShowRowStripes)
-                {
-                    if((n == 2 || (n == 5 && !styleOptions.totalRow)) &&  styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.font)
-                        color  = styleOptions.firstRowStripe.dxf.font.getColor();
-                    else if(n == 3 && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font)
-                        color  = styleOptions.secondRowStripe.dxf.font.getColor();
-                    else
+                } else if (styleOptions && styleOptions.headerRow && styleInfo.ShowRowStripes) {
+                    if ((n == 2 || (n == 5 && !styleOptions.totalRow)) && styleOptions.firstRowStripe &&
+                        styleOptions.firstRowStripe.dxf.font) {
+                        color = styleOptions.firstRowStripe.dxf.font.getColor();
+                    } else if (n == 3 && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font) {
+                        color = styleOptions.secondRowStripe.dxf.font.getColor();
+                    } else {
                         color = defaultColor
-                }
-                else if(styleOptions && !styleOptions.headerRow && styleInfo.ShowRowStripes)
-                {
-                    if((n == 1 || n == 3 || (n == 5 && !styleOptions.totalRow)) && styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.font)
-                        color  = styleOptions.firstRowStripe.dxf.font.getColor();
-                    else if((n == 2 || n == 4) && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font)
-                        color  = styleOptions.secondRowStripe.dxf.font.getColor();
-                    else
+                    }
+                } else if (styleOptions && !styleOptions.headerRow && styleInfo.ShowRowStripes) {
+                    if ((n == 1 || n == 3 || (n == 5 && !styleOptions.totalRow)) && styleOptions.firstRowStripe &&
+                        styleOptions.firstRowStripe.dxf.font) {
+                        color = styleOptions.firstRowStripe.dxf.font.getColor();
+                    } else if ((n == 2 || n == 4) && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font) {
+                        color = styleOptions.secondRowStripe.dxf.font.getColor();
+                    } else {
                         color = defaultColor
-                }
-                else
+                    }
+                } else {
                     color = defaultColor;
+                }
                 ctx.setStrokeStyle(color);
                 var k = 0;
-                var strY = n*stepY - stepY/2;
-                while(k < 6)
-                {
-                    //ctx.lineHor(k*stepX + 3 * pxToMM, strY, (k + 1)*stepX - 2 * pxToMM);
-
+                var strY = n * stepY - stepY / 2;
+                while (k < 6) {
                     window["native"]["PD_PathMoveTo"](k*stepX + stepX * 0.25, strY);
                     window["native"]["PD_PathLineTo"]((k + 1)*stepX - stepX * 0.25, strY);
                     k++;
@@ -6444,8 +6528,9 @@ window["native"]["offline_apply_event"] = function(type,params) {
             
         case 12: // ASC_MENU_EVENT_TYPE_TABLESTYLES
         {
-            var wb = _api.wb;
-            wb.getTablePictures();
+            var props = asc_ReadFormatTableInfo(params, _current);
+            // console.log(JSON.stringify(props));
+            _api.wb.getTablePictures(props);
             break;
         }
 
@@ -7004,7 +7089,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
             break;
         }
 
-        case 3010: // ASC_SPREADSHEETS_EVENT_TYPE_FILTER_CHANGE_AUTO
+        case 3010: // ASC_SPREADSHEETS_EVENT_TYPE_AUTO_FILTER_CHANGE
         {
             var changeFilter = asc_ReadAutoFilter(params, _current);
             
@@ -7024,7 +7109,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
             break;
         }
 
-        case 3040: // ASC_SPREADSHEETS_EVENT_TYPE_FILTER_FORMAT_TABLE_OPTIONS
+        case 3040: // ASC_SPREADSHEETS_EVENT_TYPE_AUTO_FILTER_FORMAT_TABLE_OPTIONS
         {
             var formatOptions = _api.asc_getAddFormatTableOptions(params);
             _stream = global_memory_stream_menu;
@@ -7544,3 +7629,22 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
                
                }, 5);
 };
+
+window["AscCommon"].getFullImageSrc2 = function (src) {
+    
+    var start = src.slice(0, 6);
+    if (0 === start.indexOf('theme') && editor.ThemeLoader){
+        return  editor.ThemeLoader.ThemesUrlAbs + src;
+    }
+    
+    if (0 !== start.indexOf('http:') && 0 !== start.indexOf('data:') && 0 !== start.indexOf('https:') &&
+        0 !== start.indexOf('file:') && 0 !== start.indexOf('ftp:')){
+        var srcFull = AscCommon.g_oDocumentUrls.getImageUrl(src);
+        if(srcFull){
+            window["native"]["loadUrlImage"](srcFull, src);
+            return srcFull;
+        }
+    }
+    return src;
+}
+

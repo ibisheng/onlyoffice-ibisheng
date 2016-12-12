@@ -396,7 +396,7 @@ function CChangesParaTextPrHighLight(Class, Old, New, Color)
 {
 	CChangesParaTextPrHighLight.superclass.constructor.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrVertAlign, AscDFH.CChangesBaseProperty);
+AscCommon.extendClass(CChangesParaTextPrHighLight, AscDFH.CChangesBaseProperty);
 CChangesParaTextPrHighLight.prototype.Type = AscDFH.historyitem_TextPr_HighLight;
 CChangesParaTextPrHighLight.prototype.private_SetValue = function(Value)
 {
