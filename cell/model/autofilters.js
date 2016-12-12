@@ -1561,11 +1561,17 @@
 							
 							filter.changeRef(null, diff);
 						}
-						else if(activeRange.r1 > ref.r1 && activeRange.r2 > ref.r2 && activeRange.r1 < ref.r2)
+						else if(activeRange.r1 > ref.r1 && activeRange.r2 > ref.r2 && activeRange.r1 <= ref.r2)
 						{
 							oldFilter = filter.clone(null);
-							
-							filter.changeRef(null, diff + (activeRange.r2 - ref.r2));
+							if(diff < 0)
+							{
+								filter.changeRef(null, diff + (activeRange.r2 - ref.r2));
+							}
+							else
+							{
+								filter.changeRef(null, diff);
+							}
 						}
 					}
 					
