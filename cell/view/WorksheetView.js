@@ -11866,21 +11866,6 @@
         return arrResult;
     };
 
-    WorksheetView.prototype.af_setStyleAfterOpen = function () {
-        var worksheet = this.model;
-        if (worksheet.TableParts && worksheet.TableParts.length) {
-            var tableParts = worksheet.TableParts;
-            if (tableParts) {
-                for (var i = 0; i < tableParts.length; i++) {
-                    this.model.autoFilters._setColorStyleTable(tableParts[i].Ref, tableParts[i]);
-                    //TODO пока заменяем при открытии на TotalsRowFormula
-                    tableParts[i].checkTotalRowFormula(worksheet);
-                }
-            }
-
-        }
-    };
-
     WorksheetView.prototype.af_drawButtons = function (updatedRange, offsetX, offsetY) {
         var ws = this;
         var aWs = this.model;

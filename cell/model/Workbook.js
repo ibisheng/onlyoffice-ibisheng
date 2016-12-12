@@ -2627,17 +2627,7 @@ Woorksheet.prototype.copyFrom=function(wsFrom, sName, tableNames){	var i, elem, 
 				this.sheetViews[j].pane = null;
 			}
 		}
-
-		if (this.TableParts && this.TableParts.length) {
-			var tableParts = this.TableParts;
-			if (tableParts) {
-				for (var i = 0; i < tableParts.length; i++) {
-					//TODO пока заменяем при открытии на TotalsRowFormula
-					tableParts[i].checkTotalRowFormula();
-				}
-			}
-		}
-		
+		this.setTableFormulaAfterOpen();
 		this._updateConditionalFormatting(null);
 
 		this.handlers = handlers;
@@ -4453,6 +4443,13 @@ Woorksheet.prototype.updateSparklineCache = function(sheet, ranges) {
 			for (var i = 0; i < this.TableParts.length; i++) {
 				var table = this.TableParts[i];
 				this.autoFilters._setColorStyleTable(table.Ref, table);
+			}
+		}
+	};
+	Woorksheet.prototype.setTableFormulaAfterOpen = function () {
+		if (this.TableParts && this.TableParts.length) {
+			for (var i = 0; i < this.TableParts.length; i++) {
+				var table = this.TableParts[i];
 				//TODO пока заменяем при открытии на TotalsRowFormula
 				table.checkTotalRowFormula(this);
 			}
