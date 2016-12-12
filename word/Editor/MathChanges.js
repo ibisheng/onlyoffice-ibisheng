@@ -207,8 +207,8 @@ CChangesMathContentAddItem.prototype.Redo = function()
 {
 	var oMathContent = this.Class;
 
-	var Array_start = this.Content.slice(0, this.Pos);
-	var Array_end   = this.Content.slice(this.Pos);
+	var Array_start = oMathContent.Content.slice(0, this.Pos);
+	var Array_end   = oMathContent.Content.slice(this.Pos);
 
 	oMathContent.Content = Array_start.concat(this.Items, Array_end);
 
