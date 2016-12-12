@@ -312,7 +312,7 @@ function CComment(Parent, Data)
             Data : Data
         };
 
-        History.Add( this, { Type : AscDFH.historyitem_Comment_TypeInfo, New : New, Old : this.m_oTypeInfo } );
+        History.Add(new CChangesCommentTypeInfo(this, this.m_oTypeInfo, New));
 
         this.m_oTypeInfo = New;
 
