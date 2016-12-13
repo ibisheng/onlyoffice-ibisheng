@@ -2737,20 +2737,20 @@ CUserCacheColor.prototype.init = function(nColor) {
         return;
     }
 
-    if (window["AscDesktopEditor"])
+    if (window["AscDesktopEditor"] && window["local_load_add"])
     {
+    	var _context = { "completeLoad" : function() { return callback(); } };
+		window["local_load_add"](_context, "sdk-all-from-min", url);
         var _ret_param = window["AscDesktopEditor"]["LoadJS"](url);
+		if (2 != _ret_param)
+			window["local_load_remove"](url);
         if (_ret_param == 1)
         {
             setTimeout(callback, 1);
             return;
         }
         else if (_ret_param == 2)
-        {
-            window["asc_desktop_localModuleId"] = "sdk-all.js";
-            window["asc_desktop_context"] = { "completeLoad" : function() { return callback(); } };
             return;
-        }
     }
 
     var script = document.createElement('script');
