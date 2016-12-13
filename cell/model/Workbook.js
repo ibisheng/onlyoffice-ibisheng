@@ -6430,11 +6430,14 @@ Range.prototype._foreach2=function(action){
 		}
 	}
 };
-Range.prototype._foreachNoEmpty=function(action){
+Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 	if(null != action)
 	{
 		var oBBox = this.bbox, minC = Math.min( this.worksheet.getColsCount(), oBBox.c2 ), minR = Math.min( this.worksheet.getRowsCount(), oBBox.r2 );
 		for(var i = oBBox.r1; i <= minR; i++){
+			if (excludeHiddenRows && this.worksheet.getRowHidden(i)) {
+				continue;
+			}
 			for(var j = oBBox.c1; j <= minC; j++){
 				var oCurCell = this.worksheet._getCellNoEmpty(i, j);
 				if(null != oCurCell)
