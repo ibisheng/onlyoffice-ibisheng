@@ -816,7 +816,7 @@ CWordCollaborativeEditing.prototype.private_CommutateContentChanges = function(o
 		}
 
 		if (null !== oResult)
-			arrCommutateActions.splice(0, 0, oResult);
+			arrCommutateActions.push(oResult);
 	}
 
 	if (arrCommutateActions.length > 0)
