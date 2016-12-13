@@ -5465,6 +5465,28 @@ Woorksheet.prototype.getTableNameColumnByIndex = function(tableName, columnIndex
 	}
 	return res;
 };
+Woorksheet.prototype.bIsApplyFilterBySheet = function(){
+	var res = false;
+	
+	if(this.AutoFilter && this.AutoFilter.isApplyAutoFilter())
+	{
+		res = true;
+	}
+	
+	if(false === res && this.TableParts)
+	{
+		for(var i = 0; i < this.TableParts.length; i++)
+		{
+			if(true === this.TableParts[i].isApplyAutoFilter())
+			{
+				res = true;
+				break;
+			}
+		}
+	}
+	
+	return res;
+};
 
 function inCache(aCache, sFormula, aRefs)
 {
