@@ -271,3 +271,4 @@ Asc['asc_docs_api'].prototype.asc_setAdvancedOptions = function(idOption, option
         window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
     }
 };
+Asc['asc_docs_api'].prototype["asc_setAdvancedOptions"] = Asc['asc_docs_api'].prototype.asc_setAdvancedOptions;
