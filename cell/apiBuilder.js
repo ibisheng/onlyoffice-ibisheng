@@ -480,6 +480,42 @@
 		}
 	};
 
+	/**
+	 * Set bold
+	 * @param {bool} value
+	 * @constructor
+	 */
+	ApiRange.prototype.SetBold = function (value) {
+		this.range.setBold(!!value);
+	};
+
+	/**
+	 * Set italic
+	 * @param {bool} value
+	 * @constructor
+	 */
+	ApiRange.prototype.SetItalic = function (value) {
+		this.range.setItalic(!!value);
+	};
+
+	/**
+	 * Set underline
+	 * @param {bool} value
+	 * @constructor
+	 */
+	ApiRange.prototype.SetUnderline = function (value) {
+		this.range.setUnderline(!!value);
+	};
+
+	/**
+	 * Set strikeout
+	 * @param {bool} value
+	 * @constructor
+	 */
+	ApiRange.prototype.SetStrikeout = function (value) {
+		this.range.setStrikeout(!!value);
+	};
+
 
 
 
@@ -707,6 +743,10 @@
 	ApiRange.prototype["SetFontName"] = ApiRange.prototype.SetFontName;
 	ApiRange.prototype["SetAlignVertical"] = ApiRange.prototype.SetAlignVertical;
 	ApiRange.prototype["SetAlignHorizontal"] = ApiRange.prototype.SetAlignHorizontal;
+	ApiRange.prototype["SetBold"] = ApiRange.prototype.SetBold;
+	ApiRange.prototype["SetItalic"] = ApiRange.prototype.SetItalic;
+	ApiRange.prototype["SetUnderline"] = ApiRange.prototype.SetUnderline;
+	ApiRange.prototype["SetStrikeout"] = ApiRange.prototype.SetStrikeout;
 
 
 	ApiDrawing.prototype["GetClassType"]             =  ApiDrawing.prototype.GetClassType;
