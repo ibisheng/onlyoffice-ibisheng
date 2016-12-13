@@ -5465,7 +5465,7 @@ Woorksheet.prototype.getTableNameColumnByIndex = function(tableName, columnIndex
 	}
 	return res;
 };
-Woorksheet.prototype.bIsApplyFilterBySheet = function(){
+Woorksheet.prototype.isApplyFilterBySheet = function(){
 	var res = false;
 	
 	if(this.AutoFilter && this.AutoFilter.isApplyAutoFilter())
