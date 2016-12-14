@@ -1679,12 +1679,12 @@
 
 
     /** @constructor */
-    function asc_CStylesPainter() {
+    function asc_CStylesPainter(width, height) {
       this.defaultStyles = null;
       this.docStyles = null;
 
-      this.styleThumbnailWidth = 112;
-      this.styleThumbnailHeight = 38;
+      this.styleThumbnailWidth = width;
+      this.styleThumbnailHeight = height;
       this.styleThumbnailWidthPt = this.styleThumbnailWidth * 72 / 96;
       this.styleThumbnailHeightPt = this.styleThumbnailHeight * 72 / 96;
 

@@ -125,6 +125,11 @@ var editor;
     this.isShapeImageChangeUrl = false;
     this.isTextArtChangeUrl = false;
 
+
+	  // Styles sizes
+      this.styleThumbnailWidth = 112;
+	  this.styleThumbnailHeight = 38;
+
     this.formulasList = null;	// Список всех формул
 
     this._init();
@@ -966,6 +971,11 @@ var editor;
     }
   };
 
+	spreadsheet_api.prototype.asc_setThumbnailStylesSizes = function (width, height) {
+		this.styleThumbnailWidth = width;
+		this.styleThumbnailHeight = height;
+	};
+
   // Посылает эвент о том, что обновились листы
   spreadsheet_api.prototype.sheetsChanged = function() {
     this.handlers.trigger("asc_onSheetsChanged");
@@ -1415,7 +1425,8 @@ var editor;
 			}
 
 			// Отправка стилей ячеек
-			this.handlers.trigger("asc_onInitEditorStyles", this.wb.getCellStyles());
+			this.handlers.trigger("asc_onInitEditorStyles",
+				this.wb.getCellStyles(this.styleThumbnailWidth, this.styleThumbnailHeight));
 		}
 	};
 
@@ -3434,6 +3445,7 @@ var editor;
 
   prot["asc_SetDocumentPlaceChangedEnabled"] = prot.asc_SetDocumentPlaceChangedEnabled;
   prot["asc_SetFastCollaborative"] = prot.asc_SetFastCollaborative;
+	prot["asc_setThumbnailStylesSizes"] = prot.asc_setThumbnailStylesSizes;
 
   // Workbook interface
 
