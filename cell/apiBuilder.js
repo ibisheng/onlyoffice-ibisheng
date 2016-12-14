@@ -516,6 +516,16 @@
 		this.range.setStrikeout(!!value);
 	};
 
+	/**
+	 * Set fill color in the rgb format.
+	 * @param {byte} r
+	 * @param {byte} g
+	 * @param {byte} b
+	 */
+	ApiRange.prototype.SetFillColor = function (r, g, b) {
+		this.range.setFill(new AscCommonExcel.RgbColor((r << 16) + (g << 8) + b));
+	};
+
 
 
 
@@ -747,6 +757,7 @@
 	ApiRange.prototype["SetItalic"] = ApiRange.prototype.SetItalic;
 	ApiRange.prototype["SetUnderline"] = ApiRange.prototype.SetUnderline;
 	ApiRange.prototype["SetStrikeout"] = ApiRange.prototype.SetStrikeout;
+	ApiRange.prototype["SetFillColor"] = ApiRange.prototype.SetFillColor;
 
 
 	ApiDrawing.prototype["GetClassType"]             =  ApiDrawing.prototype.GetClassType;
