@@ -549,6 +549,15 @@
 		this.range.setFill(new AscCommonExcel.RgbColor((r << 16) + (g << 8) + b));
 	};
 
+	/**
+	 * Set the number format.
+	 * @memberof ApiRange
+	 * @param {string} value
+	 */
+	ApiRange.prototype.SetNumberFormat = function (value) {
+		this.range.setNumFormat(value);
+	};
+
 
 
 
@@ -783,6 +792,7 @@
 	ApiRange.prototype["SetUnderline"] = ApiRange.prototype.SetUnderline;
 	ApiRange.prototype["SetStrikeout"] = ApiRange.prototype.SetStrikeout;
 	ApiRange.prototype["SetFillColor"] = ApiRange.prototype.SetFillColor;
+	ApiRange.prototype["SetNumberFormat"] = ApiRange.prototype.SetNumberFormat;
 
 
 	ApiDrawing.prototype["GetClassType"]             =  ApiDrawing.prototype.GetClassType;

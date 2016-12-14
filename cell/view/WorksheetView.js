@@ -8525,8 +8525,8 @@
                         res = new AscCommonExcel.Border();
                         // Diagonal
                         res.d = makeBorder(val[c_oAscBorderOptions.DiagD] || val[c_oAscBorderOptions.DiagU]);
-                        res.dd = val[c_oAscBorderOptions.DiagD] ? true : false;
-                        res.du = val[c_oAscBorderOptions.DiagU] ? true : false;
+                        res.dd = !!val[c_oAscBorderOptions.DiagD];
+                        res.du = !!val[c_oAscBorderOptions.DiagU];
                         // Vertical
                         res.l = makeBorder(val[c_oAscBorderOptions.Left]);
                         res.iv = makeBorder(val[c_oAscBorderOptions.InnerV]);
