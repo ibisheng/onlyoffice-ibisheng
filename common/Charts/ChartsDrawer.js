@@ -7445,6 +7445,8 @@ function drawPieChart()
 	this.angleFor3D = null;
 	this.properties3d = null;
 	this.usually3dPropsCalc = [];
+	
+	this.tempDrawOrder = null;
 }
 
 drawPieChart.prototype =
@@ -8501,6 +8503,11 @@ drawPieChart.prototype =
 			
 			var paths = this._calculateSegment3DPerspective(radius11, radius12, radius21, radius22, angles1[i], angles2[i], center1, center2, pointCenter1, pointCenter2, Math.sign(point2.y - point6.y));
 			
+			if(null === this.tempDrawOrder)
+			{
+				this.tempDrawOrder = Math.sign(point2.y - point6.y) < 0 ? true : null;
+			}
+			
 			if(!this.paths.series[angles1.length - i - 1])
 			{
 				this.paths.series[angles1.length - i - 1] = [];
@@ -9134,77 +9141,56 @@ drawPieChart.prototype =
 		var pen = numCache[0].pen;
 		drawPath(this.paths.test, pen, null);
 		
-		
-		//DOWN
-		for (var i = 0,len = numCache.length; i < len; i++) 
+		var sides = {down: 0, inside: 1, up: 2, front: 3};
+		var drawPaths = function(side)
 		{
-			var val = numCache[i];
-			var brush = val.brush;
-			var pen = val.pen;
-			var path = this.paths.series[i];
-			
-			if(path)
+			for (var i = 0,len = numCache.length; i < len; i++) 
 			{
-				for(var j = path.length - 1; j >= 0; j--)
+				var val = numCache[i];
+				var brush = val.brush;
+				var pen = val.pen;
+				var path = t.paths.series[i];
+				
+				if(path)
 				{
-					drawPath(path[j].downPath, pen, null);
-				}
-			}
-		}
-		
-		//INSIDE
-		for (var i = 0,len = numCache.length; i < len; i++) 
-		{
-			var val = numCache[i];
-			var brush = val.brush;
-			var pen = val.pen;
-			var path = this.paths.series[i];
-			
-			if(path)
-			{
-				for(var j = path.length - 1; j >= 0; j--)
-				{
-					drawPath(path[j].insidePath, pen, brush, null, true);	
-				}
-			}
-        }
-		
-		//FRONT
-        for (var i = 0,len = numCache.length; i < len; i++) 
-		{
-			var val = numCache[i];
-			var brush = val.brush;
-			var pen = val.pen;
-			var path = this.paths.series[i];
-			
-			if(path)
-			{
-				for(var j = path.length - 1; j >= 0; j--)
-				{
-					for(var k = 0; k < path[j].frontPath.length;k++)
+					for(var j = path.length - 1; j >= 0; j--)
 					{
-						drawPath(path[j].frontPath[k], pen, brush, true, true);
+						if(side === sides.down)
+						{
+							drawPath(path[j].downPath, pen, null);
+						}
+						else if(side === sides.inside)
+						{
+							drawPath(path[j].insidePath, pen, brush, null, true);
+						}
+						else if(side === sides.up)
+						{
+							drawPath(path[j].upPath, pen, brush);
+						}
+						else if(side === sides.frontPath)
+						{
+							for(var k = 0; k < path[j].frontPath.length;k++)
+							{
+								drawPath(path[j].frontPath[k], pen, brush, true, true);
+							}
+						}
 					}
 				}
 			}
-        }
+		};
 		
-		//UP
-		for (var i = 0,len = numCache.length; i < len; i++) 
+		drawPaths(sides.down);
+		drawPaths(sides.inside);
+		if(this.tempDrawOrder !== null)
 		{
-			var val = numCache[i];
-			var brush = val.brush;
-			var pen = val.pen;
-			var path = this.paths.series[i];
-			
-			if(path)
-			{
-				for(var j = path.length - 1; j >= 0; j--)
-				{
-					drawPath(path[j].upPath, pen, brush);
-				}
-			}
-        }
+			drawPaths(sides.up);
+			drawPaths(sides.frontPath);
+		}
+		else
+		{
+			drawPaths(sides.frontPath);
+			drawPaths(sides.up);
+		}
     },
 	
 	_calculateTestFrame: function(point1, point2, point3, point4, point5, point6, point7, point8)

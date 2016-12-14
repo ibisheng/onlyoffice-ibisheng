@@ -138,6 +138,55 @@ Processor3D.prototype.calaculate3DProperties = function(baseDepth, gapDepth, bIs
 			this._recalculateScaleWithMaxWidth();
 		}
 	}
+	
+	if(AscFormat.c_oChartTypes.Pie === this.chartsDrawer.calcProp.type && !this.view3D.rAngAx)
+	{
+		//TODO пересмотреть функцию
+		this.tempChangeAspectRatioForPie();
+	}
+};
+
+Processor3D.prototype.tempChangeAspectRatioForPie = function()
+{
+	var perspectiveDepth = this.depthPerspective;
+	
+	var widthCanvas = this.widthCanvas;
+	var originalWidthChart = widthCanvas - this.left - this.right;
+	
+	var heightCanvas = this.heightCanvas;
+	var heightChart = heightCanvas - this.top - this.bottom;
+	
+	var points = [], faces = [];
+	
+	points.push(new Point3D(this.left + originalWidthChart / 2, this.top, perspectiveDepth, this));
+	points.push(new Point3D(this.left, this.top, perspectiveDepth / 2, this));
+	points.push(new Point3D(this.left + originalWidthChart, this.top, perspectiveDepth / 2, this));
+	points.push(new Point3D(this.left + originalWidthChart / 2, this.top, 0, this));
+	
+	points.push(new Point3D(this.left + originalWidthChart / 2, this.top + heightChart, perspectiveDepth, this));
+	points.push(new Point3D(this.left, this.top + heightChart, perspectiveDepth / 2, this));
+	points.push(new Point3D(this.left + originalWidthChart, this.top + heightChart, perspectiveDepth / 2, this));
+	points.push(new Point3D(this.left + originalWidthChart / 2, this.top + heightChart, 0, this));
+	
+	faces.push([0,1,2,3]);
+	faces.push([2,5,4,3]);
+	faces.push([1,6,7,0]);
+	faces.push([6,5,4,7]);
+	faces.push([7,4,3,0]);
+	faces.push([1,6,2,5]);
+	
+	var minMaxOx = this._getMinMaxOx(points, faces);
+	var minMaxOy = this._getMinMaxOy(points, faces);
+	
+	var kF = ((minMaxOx.right - minMaxOx.left) / originalWidthChart);
+	if((minMaxOy.bottom - minMaxOy.top) / kF > heightChart)
+	{
+		kF =  ((minMaxOy.bottom - minMaxOy.top) / heightChart);
+	}
+	
+	this.aspectRatioX = this.aspectRatioX * kF;
+	this.aspectRatioY = this.aspectRatioY * kF;
+	this.aspectRatioZ = this.aspectRatioZ * kF;
 };
 
 Processor3D.prototype.calculateCommonOptions = function()
@@ -1200,7 +1249,7 @@ Processor3D.prototype._calculateCameraDiff = function (/*isSkip*/)
 	var points = [];
 	var faces = [];
 	
-	if(AscFormat.c_oChartTypes.Pie === this.chartsDrawer.calcProp.type)
+	/*if(AscFormat.c_oChartTypes.Pie === this.chartsDrawer.calcProp.type)
 	{
 		points.push(new Point3D(this.left + originalWidthChart / 2, this.top, perspectiveDepth, this));
 		points.push(new Point3D(this.left, this.top, perspectiveDepth / 2, this));
@@ -1213,7 +1262,7 @@ Processor3D.prototype._calculateCameraDiff = function (/*isSkip*/)
 		points.push(new Point3D(this.left + originalWidthChart / 2, this.top + heightChart, 0, this));
 	}
 	else
-	{
+	{*/
 		points.push(new Point3D(this.left, this.top, perspectiveDepth, this));
 		points.push(new Point3D(this.left, heightChart + this.top, perspectiveDepth, this));
 		points.push(new Point3D(originalWidthChart + this.left, heightChart + this.top, perspectiveDepth, this));
@@ -1222,7 +1271,7 @@ Processor3D.prototype._calculateCameraDiff = function (/*isSkip*/)
 		points.push(new Point3D(originalWidthChart + this.left, heightChart + this.top, 0, this));
 		points.push(new Point3D(this.left, heightChart + this.top, 0, this));
 		points.push(new Point3D(this.left, this.top, 0, this));
-	}
+	//}
 	
 	faces.push([0,1,2,3]);
 	faces.push([2,5,4,3]);
