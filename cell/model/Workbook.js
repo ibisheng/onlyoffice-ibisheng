@@ -4002,18 +4002,32 @@ Woorksheet.prototype.setHidden = function (hidden) {
 Woorksheet.prototype.getSheetViewSettings = function () {
 	return this.sheetViews[0].clone();
 };
-Woorksheet.prototype.setSheetViewSettings = function (options) {
-	var current = this.getSheetViewSettings();
-	if (current.isEqual(options))
-		return;
+	Woorksheet.prototype.setDisplayGridlines = function (value) {
+		var view = this.sheetViews[0];
+		if (value !== view.showGridLines) {
+			History.Create_NewPoint();
+			History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_SetDisplayGridlines,
+				this.getId(), null, new UndoRedoData_FromTo(view.showGridLines, value));
+			view.showGridLines = value;
 
-	History.Create_NewPoint();
-	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_SetViewSettings, this.getId(), null, new UndoRedoData_FromTo(current, options.clone()));
+			if (!this.workbook.bUndoChanges && !this.workbook.bRedoChanges) {
+				this.workbook.handlers.trigger("asc_onUpdateSheetViewSettings");
+			}
+		}
+	};
+	Woorksheet.prototype.setDisplayHeadings = function (value) {
+		var view = this.sheetViews[0];
+		if (value !== view.showRowColHeaders) {
+			History.Create_NewPoint();
+			History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_SetDisplayHeadings,
+				this.getId(), null, new UndoRedoData_FromTo(view.showRowColHeaders, value));
+			view.showRowColHeaders = value;
 
-	this.sheetViews[0].setSettings(options);
-	if (!this.workbook.bUndoChanges && !this.workbook.bRedoChanges)
-	    this.workbook.handlers.trigger("asc_onUpdateSheetViewSettings");
-};
+			if (!this.workbook.bUndoChanges && !this.workbook.bRedoChanges) {
+				this.workbook.handlers.trigger("asc_onUpdateSheetViewSettings");
+			}
+		}
+	};
 Woorksheet.prototype.getRowsCount=function(){
 	var result = this.nRowsCount;
 	var pane = this.sheetViews[0].pane;

@@ -1570,14 +1570,8 @@
 			this["r2"] = r2;
 		}
 
-		var g_oCSheetViewSettingsProperties = {
-				showGridLines		: 0,
-				showRowColHeaders	: 1
-			};
 		/** @constructor */
 		function asc_CSheetViewSettings () {
-			this.Properties = g_oCSheetViewSettingsProperties;
-
 			// Показывать ли сетку
 			this.showGridLines = null;
 			// Показывать обозначения строк и столбцов
@@ -1603,33 +1597,11 @@
 				return this.asc_getShowGridLines() === settings.asc_getShowGridLines() &&
 					this.asc_getShowRowColHeaders() === settings.asc_getShowRowColHeaders();
 			},
-			setSettings: function (settings) {
-				this.showGridLines = settings.showGridLines;
-				this.showRowColHeaders = settings.showRowColHeaders;
-			},
 			asc_getShowGridLines: function () { return false !== this.showGridLines; },
 			asc_getShowRowColHeaders: function () { return false !== this.showRowColHeaders; },
 			asc_getIsFreezePane: function () { return null !== this.pane && this.pane.isInit(); },
 			asc_setShowGridLines: function (val) { this.showGridLines = val; },
-			asc_setShowRowColHeaders: function (val) { this.showRowColHeaders = val; },
-			getType : function () {
-				return AscCommonExcel.UndoRedoDataTypes.SheetViewSettings;
-			},
-			getProperties : function () {
-				return this.Properties;
-			},
-			getProperty : function (nType) {
-				switch (nType) {
-					case this.Properties.showGridLines: return this.showGridLines;break;
-					case this.Properties.showRowColHeaders: return this.showRowColHeaders;break;
-				}
-			},
-			setProperty : function (nType, value) {
-				switch (nType) {
-					case this.Properties.showGridLines: this.showGridLines = value;break;
-					case this.Properties.showRowColHeaders: this.showRowColHeaders = value;break;
-				}
-			}
+			asc_setShowRowColHeaders: function (val) { this.showRowColHeaders = val; }
 		};
 
 		/** @constructor */

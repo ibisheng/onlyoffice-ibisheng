@@ -2181,9 +2181,15 @@ var editor;
     return this.wb.getWorksheet().getSheetViewSettings();
   };
 
-  spreadsheet_api.prototype.asc_setSheetViewSettings = function(options) {
-    this.wb.getWorksheet().changeWorksheet("sheetViewSettings", options);
-  };
+	spreadsheet_api.prototype.asc_setDisplayGridlines = function (value) {
+		this.wb.getWorksheet()
+			.changeWorksheet("sheetViewSettings", {type: AscCH.historyitem_Worksheet_SetDisplayGridlines, value: value});
+	};
+
+	spreadsheet_api.prototype.asc_setDisplayHeadings = function (value) {
+		this.wb.getWorksheet()
+			.changeWorksheet("sheetViewSettings", {type: AscCH.historyitem_Worksheet_SetDisplayHeadings, value: value});
+	};
 
   // Images & Charts
 
@@ -3499,7 +3505,8 @@ var editor;
   prot["asc_emptyCells"] = prot.asc_emptyCells;
   prot["asc_mergeCellsDataLost"] = prot.asc_mergeCellsDataLost;
   prot["asc_getSheetViewSettings"] = prot.asc_getSheetViewSettings;
-  prot["asc_setSheetViewSettings"] = prot.asc_setSheetViewSettings;
+	prot["asc_setDisplayGridlines"] = prot.asc_setDisplayGridlines;
+	prot["asc_setDisplayHeadings"] = prot.asc_setDisplayHeadings;
 
   // Defined Names
   prot["asc_getDefinedNames"] = prot.asc_getDefinedNames;

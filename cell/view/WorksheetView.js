@@ -10086,7 +10086,11 @@
 				break;
 			case "sheetViewSettings":
 				functionModelAction = function () {
-					t.model.setSheetViewSettings(val);
+				    if (AscCH.historyitem_Worksheet_SetDisplayGridlines === val.type) {
+						t.model.setDisplayGridlines(val.value);
+                    } else {
+						t.model.setDisplayHeadings(val.value);
+                    }
 
 					isUpdateCols = true;
 					isUpdateRows = true;

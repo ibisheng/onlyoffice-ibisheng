@@ -169,6 +169,24 @@
 	};
 
 	/**
+	 * Set displayed gridlines
+	 * @memberof ApiWorksheet
+	 * @param {bool} value
+	 */
+	ApiWorksheet.prototype.SetDisplayGridlines = function (value) {
+		this.worksheet.setDisplayGridlines(!!value);
+	};
+
+	/**
+	 * Set displayed headings
+	 * @memberof ApiWorksheet
+	 * @param {bool} value
+	 */
+	ApiWorksheet.prototype.SetDisplayHeadings = function (value) {
+		this.worksheet.setDisplayHeadings(!!value);
+	};
+
+	/**
 	 * Set column width
 	 * @memberof ApiWorksheet
 	 * @param {string} sDataRange
@@ -336,7 +354,7 @@
 
 	/**
 	 * Create a shape.
-	 * @memberof Api
+	 * @memberof ApiWorksheet
 	 * @param {ShapeType} [sType="rect"]
 	 * @param {EMU} nWidth
 	 * @param {EMU} nHeight
@@ -357,7 +375,7 @@
 
 	/**
 	 * Create a image.
-	 * @memberof Api
+	 * @memberof ApiWorksheet
 	 * @param {string} sImageSrc
 	 * @param {EMU} nWidth
 	 * @param {EMU} nHeight
@@ -393,14 +411,15 @@
 	/**
 	 * Set cell value
 	 * @memberof ApiRange
-	 * @param {string} val
+	 * @param {string} value
 	 */
-	ApiRange.prototype.SetValue = function (val) {
-		this.range.setValue(val);
+	ApiRange.prototype.SetValue = function (value) {
+		this.range.setValue(value);
 	};
 
 	/**
 	 * Set text color in the rgb format.
+	 * @memberof ApiRange
 	 * @param {byte} r
 	 * @param {byte} g
 	 * @param {byte} b
@@ -411,6 +430,7 @@
 
 	/**
 	 * Set font size
+	 * @memberof ApiRange
 	 * @param {number} size
 	 */
 	ApiRange.prototype.SetFontSize = function (size) {
@@ -419,6 +439,7 @@
 
 	/**
 	 * Set font name
+	 * @memberof ApiRange
 	 * @param {string} name
 	 */
 	ApiRange.prototype.SetFontName = function (name) {
@@ -427,6 +448,7 @@
 
 	/**
 	 * Set align vertical
+	 * @memberof ApiRange
 	 * @param {'center' | 'bottom' | 'top'} value
 	 */
 	ApiRange.prototype.SetAlignVertical = function (value) {
@@ -482,8 +504,8 @@
 
 	/**
 	 * Set bold
+	 * @memberof ApiRange
 	 * @param {bool} value
-	 * @constructor
 	 */
 	ApiRange.prototype.SetBold = function (value) {
 		this.range.setBold(!!value);
@@ -491,8 +513,8 @@
 
 	/**
 	 * Set italic
+	 * @memberof ApiRange
 	 * @param {bool} value
-	 * @constructor
 	 */
 	ApiRange.prototype.SetItalic = function (value) {
 		this.range.setItalic(!!value);
@@ -500,8 +522,8 @@
 
 	/**
 	 * Set underline
+	 * @memberof ApiRange
 	 * @param {bool} value
-	 * @constructor
 	 */
 	ApiRange.prototype.SetUnderline = function (value) {
 		this.range.setUnderline(!!value);
@@ -509,8 +531,8 @@
 
 	/**
 	 * Set strikeout
+	 * @memberof ApiRange
 	 * @param {bool} value
-	 * @constructor
 	 */
 	ApiRange.prototype.SetStrikeout = function (value) {
 		this.range.setStrikeout(!!value);
@@ -518,6 +540,7 @@
 
 	/**
 	 * Set fill color in the rgb format.
+	 * @memberof ApiRange
 	 * @param {byte} r
 	 * @param {byte} g
 	 * @param {byte} b
@@ -741,6 +764,8 @@
 	ApiWorksheet.prototype["GetRangeByNumber"] = ApiWorksheet.prototype.GetRangeByNumber;
 	ApiWorksheet.prototype["FormatAsTable"] = ApiWorksheet.prototype.FormatAsTable;
 	ApiWorksheet.prototype["SetColumnWidth"] = ApiWorksheet.prototype.SetColumnWidth;
+	ApiWorksheet.prototype["SetDisplayGridlines"] = ApiWorksheet.prototype.SetDisplayGridlines;
+	ApiWorksheet.prototype["SetDisplayHeadings"] = ApiWorksheet.prototype.SetDisplayHeadings;
 	ApiWorksheet.prototype["AddChart"] = ApiWorksheet.prototype.AddChart;
 	ApiWorksheet.prototype["AddShape"] = ApiWorksheet.prototype.AddShape;
 	ApiWorksheet.prototype["AddImage"] = ApiWorksheet.prototype.AddImage;

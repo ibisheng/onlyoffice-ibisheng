@@ -72,12 +72,14 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Worksheet_CreateRow = 20;
 	window['AscCH'].historyitem_Worksheet_CreateCol = 21;
 	window['AscCH'].historyitem_Worksheet_CreateCell = 22;
-	window['AscCH'].historyitem_Worksheet_SetViewSettings = 23;
+
 	window['AscCH'].historyitem_Worksheet_RemoveCellFormula = 24;
 	window['AscCH'].historyitem_Worksheet_ChangeMerge = 25;
 	window['AscCH'].historyitem_Worksheet_ChangeHyperlink = 26;
 	window['AscCH'].historyitem_Worksheet_SetTabColor = 27;
 	window['AscCH'].historyitem_Worksheet_RowHide = 28;
+	window['AscCH'].historyitem_Worksheet_SetDisplayGridlines = 31;
+	window['AscCH'].historyitem_Worksheet_SetDisplayHeadings = 32;
 // Frozen cell
 	window['AscCH'].historyitem_Worksheet_ChangeFrozenCell = 30;
 
@@ -543,7 +545,9 @@ CHistory.prototype.Redo = function()
 	this.UndoRedoEnd(Point, oRedoObjectParam, false);
 };
 CHistory.prototype._addRedoObjectParam = function (oRedoObjectParam, Point) {
-	if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && AscCH.historyitem_Worksheet_SetViewSettings === Point.Type) {
+	if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class &&
+		(AscCH.historyitem_Worksheet_SetDisplayGridlines === Point.Type ||
+		AscCH.historyitem_Worksheet_SetDisplayHeadings === Point.Type)) {
 		oRedoObjectParam.bIsReInit = true;
 		oRedoObjectParam.oOnUpdateSheetViewSettings[Point.SheetId] = Point.SheetId;
 	}
