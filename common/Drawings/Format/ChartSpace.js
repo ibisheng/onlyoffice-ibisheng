@@ -1195,7 +1195,7 @@ CChartSpace.prototype.parseChartFormula = function(sFormula)
     if(this.worksheet && typeof sFormula === "string" && sFormula.length > 0){
         return AscCommonExcel.getRangeByRef(sFormula, this.worksheet);
     }
-    return null;
+    return [];
 };
 CChartSpace.prototype.checkBBoxIntersection = function(bbox1, bbox2)
 {
