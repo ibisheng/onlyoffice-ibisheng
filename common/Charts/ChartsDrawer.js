@@ -8938,27 +8938,27 @@ drawPieChart.prototype =
 			
 			res.push({angle: startAng});
 			
-			var tempStartAng = Math.round(startAng * 100) / 100;
-			var tempEndAng = Math.round(endAng * 100) / 100;
-			var tempPI = Math.round(Math.PI * 100) / 100;
+			var tempStartAng = startAng;
+			var tempEndAng = endAng;
+			var tempPI = Math.PI;
 			
-			if(tempStartAng < -2*tempPI && tempEndAng > -2*tempPI)
+			if(tempStartAng <= -2*tempPI && tempEndAng > -2*tempPI)
 			{
 				res.push({angle: -2*Math.PI});
 			}
-			if(tempStartAng < -tempPI && tempEndAng > -tempPI)
+			if(tempStartAng <= -tempPI && tempEndAng > -tempPI)
 			{
 				res.push({angle: -Math.PI});
 			}
-			if(tempStartAng < 0 && tempEndAng > 0)
+			if(tempStartAng <= 0 && tempEndAng > 0)
 			{
 				res.push({angle: 0});
 			}
-			if(tempStartAng < tempPI && tempEndAng > tempPI)
+			if(tempStartAng <= tempPI && tempEndAng > tempPI)
 			{
 				res.push({angle: Math.PI});
 			}
-			if(tempStartAng < 2*tempPI && tempEndAng > 2*tempPI)
+			if(tempStartAng <= 2*tempPI && tempEndAng > 2*tempPI)
 			{
 				res.push({angle: 2*Math.PI});
 			}
