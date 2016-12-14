@@ -125,10 +125,6 @@ var editor;
     this.isShapeImageChangeUrl = false;
     this.isTextArtChangeUrl = false;
 
-    //находится ли фокус в рабочей области редактора(используется для copy/paste в MAC)
-    // ToDo убрать, когда Гоша поправит clipboard.js
-    this.IsFocus = null;
-
     this.formulasList = null;	// Список всех формул
 
     this._init();
@@ -1993,8 +1989,6 @@ var editor;
     if (this.wb) {
       this.wb.enableKeyEventsHandler(isEnabled);
     }
-    //наличие фокуса в рабочей области редактора(используется для copy/paste в MAC)
-    this.IsFocus = isEnabled;
 
     if (isFromInput !== true && AscCommon.g_inputContext)
       AscCommon.g_inputContext.setInterfaceEnableKeyEvents(isEnabled);
