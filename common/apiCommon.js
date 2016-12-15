@@ -925,8 +925,7 @@
 			}
 			return this.hex;
 		}, asc_getColor: function () {
-			var ret = new CColor(this.r, this.g, this.b);
-			return ret;
+			return new CColor(this.r, this.g, this.b);
 		}, asc_putAuto: function (v) {
 			this.Auto = v;
 		}, asc_getAuto: function () {

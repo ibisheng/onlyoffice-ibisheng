@@ -96,6 +96,24 @@
 	AscCommon.extendClass(ApiChart, ApiDrawing);
 
 	/**
+	 * Class representing a base class for color types
+	 * @constructor
+	 */
+	function ApiColor(color) {
+		this.color = color;
+	}
+
+	/**
+	 * Class representing RGB color
+	 * @constructor
+	 */
+	function ApiRGBColor(r, g, b) {
+		ApiRGBColor.superclass.constructor.call(this, new Asc.asc_CColor(r, g, b));
+	}
+
+	AscCommon.extendClass(ApiRGBColor, ApiColor);
+
+	/**
 	 * Returns an object that represents the active sheet
 	 * @memberof Api
 	 * @returns {ApiWorksheet}
@@ -107,6 +125,18 @@
 
 	Api.prototype.CreateNewHistoryPoint = function(){
 		History.Create_NewPoint();
+	};
+
+	/**
+	 * Create a RGB color
+	 * @memberof Api
+	 * @param {byte} r
+	 * @param {byte} g
+	 * @param {byte} b
+	 * @returns {ApiRGBColor}
+	 */
+	Api.prototype.CreateRGBColor = function (r, g, b) {
+		return new ApiRGBColor(r, g, b);
 	};
 
 	/**
@@ -392,6 +422,16 @@
 	};
 
 	/**
+	 * Specifies the border to be retrieved.
+	 * @typedef {("DiagonalDown" | "DiagonalUp" | "Bottom" | "Left" | "Right" | "Top" | "InsideHorizontal" | "InsideVertical")} BordersIndex
+	 */
+
+	/**
+	 * Specifies the line style for the border.
+	 * @typedef {("None" | "Double" | "Hair" | "DashDotDot" | "DashDot" | "Dotted" | "Dashed" | "Thin" | "MediumDashDotDot" | "SlantDashDot" | "MediumDashDot" | "MediumDashed" | "Medium" | "Thick")} LineStyle
+	 */
+
+	/**
 	 * Get cell row
 	 * @memberof ApiRange
 	 * @returns {Number}
@@ -420,12 +460,10 @@
 	/**
 	 * Set text color in the rgb format.
 	 * @memberof ApiRange
-	 * @param {byte} r
-	 * @param {byte} g
-	 * @param {byte} b
+	 * @param {ApiColor} color
 	 */
-	ApiRange.prototype.SetFontColor = function (r, g, b) {
-		this.range.setFontcolor(new AscCommonExcel.RgbColor((r << 16) + (g << 8) + b));
+	ApiRange.prototype.SetFontColor = function (color) {
+		this.range.setFontcolor(AscCommonExcel.CorrectAscColor(color.color));
 	};
 
 	/**
@@ -541,12 +579,10 @@
 	/**
 	 * Set fill color in the rgb format.
 	 * @memberof ApiRange
-	 * @param {byte} r
-	 * @param {byte} g
-	 * @param {byte} b
+	 * @param {ApiColor} color
 	 */
-	ApiRange.prototype.SetFillColor = function (r, g, b) {
-		this.range.setFill(new AscCommonExcel.RgbColor((r << 16) + (g << 8) + b));
+	ApiRange.prototype.SetFillColor = function (color) {
+		this.range.setFill(AscCommonExcel.CorrectAscColor(color.color));
 	};
 
 	/**
@@ -556,6 +592,46 @@
 	 */
 	ApiRange.prototype.SetNumberFormat = function (value) {
 		this.range.setNumFormat(value);
+	};
+
+	/**
+	 * Set border properties.
+	 * @memberof ApiRange
+	 * @param {BordersIndex} bordersIndex
+	 * @param {LineStyle} lineStyle
+	 * @param {ApiColor} color
+	 */
+	ApiRange.prototype.SetBorders = function (bordersIndex, lineStyle, color) {
+		var borders = new AscCommonExcel.Border();
+		switch (bordersIndex) {
+			case 'DiagonalDown':
+				borders.dd = true;
+				borders.d = private_MakeBorder(lineStyle, color);
+				break;
+			case 'DiagonalUp':
+				borders.du = true;
+				borders.d = private_MakeBorder(lineStyle, color);
+				break;
+			case 'Bottom':
+				borders.b = private_MakeBorder(lineStyle, color);
+				break;
+			case 'Left':
+				borders.l = private_MakeBorder(lineStyle, color);
+				break;
+			case 'Right':
+				borders.r = private_MakeBorder(lineStyle, color);
+				break;
+			case 'Top':
+				borders.t = private_MakeBorder(lineStyle, color);
+				break;
+			case 'InsideHorizontal':
+				borders.ih = private_MakeBorder(lineStyle, color);
+				break;
+			case 'InsideVertical':
+				borders.iv = private_MakeBorder(lineStyle, color);
+				break;
+		}
+		this.range.setBorder(borders);
 	};
 
 	/**
@@ -581,8 +657,6 @@
 	ApiRange.prototype.UnMerge = function () {
 		this.range.unmerge();
 	};
-
-
 
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -790,6 +864,7 @@
 
 	Api.prototype["GetActiveSheet"] = Api.prototype.GetActiveSheet;
 	Api.prototype["CreateNewHistoryPoint"] = Api.prototype.CreateNewHistoryPoint;
+	Api.prototype["CreateRGBColor"] = Api.prototype.CreateRGBColor;
 
 	ApiWorksheet.prototype["GetActiveCell"] = ApiWorksheet.prototype.GetActiveCell;
 	ApiWorksheet.prototype["SetName"] = ApiWorksheet.prototype.SetName;
@@ -817,6 +892,7 @@
 	ApiRange.prototype["SetStrikeout"] = ApiRange.prototype.SetStrikeout;
 	ApiRange.prototype["SetFillColor"] = ApiRange.prototype.SetFillColor;
 	ApiRange.prototype["SetNumberFormat"] = ApiRange.prototype.SetNumberFormat;
+	ApiRange.prototype["SetBorders"] = ApiRange.prototype.SetBorders;
 	ApiRange.prototype["Merge"] = ApiRange.prototype.Merge;
 	ApiRange.prototype["UnMerge"] = ApiRange.prototype.UnMerge;
 
@@ -853,6 +929,60 @@
 		oDrawing.setDrawingBaseType(AscCommon.c_oAscCellAnchorType.cellanchorOneCell);
 		oDrawing.setDrawingBaseCoords(nFromCol, nColOffset/36000.0, nFromRow, nRowOffset/36000.0, 0, 0, 0, 0, 0, 0, 0, 0);
 		oDrawing.setDrawingBaseExt(nExtX/36000.0, nExtY/36000.0);
+	}
+
+	function private_MakeBorder(lineStyle, color) {
+		var border = new AscCommonExcel.BorderProp();
+		switch (lineStyle) {
+			case 'Double':
+				border.setStyle(AscCommon.c_oAscBorderStyles.Double);
+				break;
+			case 'Hair':
+				border.setStyle(AscCommon.c_oAscBorderStyles.Hair);
+				break;
+			case 'DashDotDot':
+				border.setStyle(AscCommon.c_oAscBorderStyles.DashDotDot);
+				break;
+			case 'DashDot':
+				border.setStyle(AscCommon.c_oAscBorderStyles.DashDot);
+				break;
+			case 'Dotted':
+				border.setStyle(AscCommon.c_oAscBorderStyles.Dotted);
+				break;
+			case 'Dashed':
+				border.setStyle(AscCommon.c_oAscBorderStyles.Dashed);
+				break;
+			case 'Thin':
+				border.setStyle(AscCommon.c_oAscBorderStyles.Thin);
+				break;
+			case 'MediumDashDotDot':
+				border.setStyle(AscCommon.c_oAscBorderStyles.MediumDashDotDot);
+				break;
+			case 'SlantDashDot':
+				border.setStyle(AscCommon.c_oAscBorderStyles.SlantDashDot);
+				break;
+			case 'MediumDashDot':
+				border.setStyle(AscCommon.c_oAscBorderStyles.MediumDashDot);
+				break;
+			case 'MediumDashed':
+				border.setStyle(AscCommon.c_oAscBorderStyles.MediumDashed);
+				break;
+			case 'Medium':
+				border.setStyle(AscCommon.c_oAscBorderStyles.Medium);
+				break;
+			case 'Thick':
+				border.setStyle(AscCommon.c_oAscBorderStyles.Thick);
+				break;
+			case 'None':
+			default:
+				border.setStyle(AscCommon.c_oAscBorderStyles.None);
+				break;
+		}
+
+		if (color) {
+			border.c = AscCommonExcel.CorrectAscColor(color);
+		}
+		return border;
 	}
 
 }(window, null));
