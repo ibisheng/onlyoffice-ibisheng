@@ -4078,31 +4078,11 @@
      * @param {boolean} bShowSerName
      * @param {boolean} bShowCatName
      * @param {boolean} bShowVal
+     * @param {boolean} bShowPercent
      * */
-    ApiChart.prototype.SetShowDataLabels = function(bShowSerName, bShowCatName, bShowVal)
+    ApiChart.prototype.SetShowDataLabels = function(bShowSerName, bShowCatName, bShowVal, bShowPercent)
     {
-        if(this.Chart && this.Chart.chart && this.Chart.chart.plotArea && this.Chart.chart.plotArea.charts[0])
-        {
-            var oChart = this.Chart.chart.plotArea.charts[0];
-            if(false == bShowSerName && false == bShowCatName && false == bShowVal)
-            {
-                if(oChart.dLbls)
-                {
-                    oChart.setDLbls(null);
-                }
-            }
-            if(!oChart.dLbls)
-            {
-                oChart.setDLbls(new AscFormat.CDLbls());
-            }
-            oChart.dLbls.setSeparator(",");
-            oChart.dLbls.setShowSerName(true == bShowSerName);
-            oChart.dLbls.setShowCatName(true == bShowCatName);
-            oChart.dLbls.setShowVal(true == bShowVal);
-            oChart.dLbls.setShowLegendKey(false);
-            //oChart.dLbls.setShowPercent(false);
-            oChart.dLbls.setShowBubbleSize(false);
-        }
+        AscFormat.builder_SetShowDataLabels(this.Chart, bShowSerName, bShowCatName, bShowVal, bShowPercent);
     };
 
     //------------------------------------------------------------------------------------------------------------------

@@ -678,10 +678,11 @@
      * @param {boolean} bShowSerName
      * @param {boolean} bShowCatName
      * @param {boolean} bShowVal
+     * @param {boolean} bShowPercent
      * */
-    ApiChart.prototype.SetShowDataLabels = function(bShowSerName, bShowCatName, bShowVal)
+    ApiChart.prototype.SetShowDataLabels = function(bShowSerName, bShowCatName, bShowVal, bShowPercent)
     {
-        AscFormat.builder_SetShowDataLabels(this.Chart, bShowSerName, bShowCatName, bShowVal);
+        AscFormat.builder_SetShowDataLabels(this.Chart, bShowSerName, bShowCatName, bShowVal, bShowPercent);
     };
 
 

@@ -12530,10 +12530,11 @@ function CorrectUniColor(asc_color, unicolor, flag)
         }
     }
 
-    function builder_SetShowDataLabels(oChartSpace, bShowSerName, bShowCatName, bShowVal){
+    function builder_SetShowDataLabels(oChartSpace, bShowSerName, bShowCatName, bShowVal, bShowPerecent){
         if(oChartSpace && oChartSpace.chart && oChartSpace.chart.plotArea && oChartSpace.chart.plotArea.charts[0]){
             var oChart = oChartSpace.chart.plotArea.charts[0];
-            if(false == bShowSerName && false == bShowCatName && false == bShowVal)
+            var bPieChart = oChart.getObjectType() === AscDFH.historyitem_type_PieChart || oChart.getObjectType() === AscDFH.historyitem_type_DoughnutChart;
+            if(false == bShowSerName && false == bShowCatName && false == bShowVal && (bPieChart && bShowPerecent === false))
             {
                 if(oChart.dLbls)
                 {
@@ -12549,7 +12550,10 @@ function CorrectUniColor(asc_color, unicolor, flag)
             oChart.dLbls.setShowCatName(true == bShowCatName);
             oChart.dLbls.setShowVal(true == bShowVal);
             oChart.dLbls.setShowLegendKey(false);
-            //oChart.dLbls.setShowPercent(false);
+            if(bPieChart){
+                oChart.dLbls.setShowPercent(true === bShowPerecent);
+            }
+
             oChart.dLbls.setShowBubbleSize(false);
         }
     }
