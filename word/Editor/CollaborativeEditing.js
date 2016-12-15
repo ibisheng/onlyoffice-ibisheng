@@ -752,7 +752,7 @@ CWordCollaborativeEditing.prototype.Undo = function()
 		oChange.Set_FromUndoRedo(oChangeClass, oReverseChange, {Pos : nBinaryPos, Len : nBinaryLen});
 		aSendingChanges.push(oChange.m_pData);
 	}
-	editor.CoAuthoringApi.saveChanges(aSendingChanges, 0, null);
+	editor.CoAuthoringApi.saveChanges(aSendingChanges, null, null);
 
 
 	this.private_RestoreDocumentState(DocState);
