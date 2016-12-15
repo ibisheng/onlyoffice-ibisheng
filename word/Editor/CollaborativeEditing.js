@@ -726,18 +726,13 @@ CWordCollaborativeEditing.prototype.Undo = function()
 	oLogicDocument.DrawingDocument.EndTrackTable(null, true);
 	oLogicDocument.DrawingObjects.TurnOffCheckChartSelection();
 
+	var DocState = this.private_SaveDocumentState();
+
 	for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
 	{
 		arrReverseChanges[nIndex].Load();
 		this.m_aAllChanges.push(arrReverseChanges[nIndex]);
 	}
-
-	oLogicDocument.DrawingObjects.TurnOnCheckChartSelection();
-	oLogicDocument.Recalculate(false, false, AscCommon.History.Get_RecalcData(null, arrReverseChanges));
-
-	oLogicDocument.Document_UpdateSelectionState();
-	oLogicDocument.Document_UpdateInterfaceState();
-	oLogicDocument.Document_UpdateRulersState();
 
 	var oBinaryWriter = History.BinaryWriter;
 	var aSendingChanges = [];
@@ -758,6 +753,16 @@ CWordCollaborativeEditing.prototype.Undo = function()
 		aSendingChanges.push(oChange.m_pData);
 	}
 	editor.CoAuthoringApi.saveChanges(aSendingChanges, 0, null);
+
+
+	this.private_RestoreDocumentState(DocState);
+
+	oLogicDocument.DrawingObjects.TurnOnCheckChartSelection();
+	oLogicDocument.Recalculate(false, false, AscCommon.History.Get_RecalcData(null, arrReverseChanges));
+
+	oLogicDocument.Document_UpdateSelectionState();
+	oLogicDocument.Document_UpdateInterfaceState();
+	oLogicDocument.Document_UpdateRulersState();
 };
 CWordCollaborativeEditing.prototype.CanUndo = function()
 {

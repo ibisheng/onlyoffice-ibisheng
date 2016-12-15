@@ -341,78 +341,14 @@ CCollaborativeEditingBase.prototype.Apply_Changes = function()
 
         editor.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.ApplyChanges);
 
-        var LogicDocument = editor.WordControl.m_oLogicDocument;
-
-        var DocState;
-        if (true !== this.Is_Fast())
-        {
-            DocState = LogicDocument.Get_SelectionState2();
-            this.m_aCursorsToUpdate = {};
-        }
-        else
-        {
-            DocState = LogicDocument.Save_DocumentStateBeforeLoadChanges();
-            this.Clear_DocumentPositions();
-
-            if (DocState.Pos)
-                this.Add_DocumentPosition(DocState.Pos);
-            if (DocState.StartPos)
-                this.Add_DocumentPosition(DocState.StartPos);
-            if (DocState.EndPos)
-                this.Add_DocumentPosition(DocState.EndPos);
-
-            if (DocState.FootnotesStart && DocState.FootnotesStart.Pos)
-                this.Add_DocumentPosition(DocState.FootnotesStart.Pos);
-            if (DocState.FootnotesStart && DocState.FootnotesStart.StartPos)
-                this.Add_DocumentPosition(DocState.FootnotesStart.StartPos);
-            if (DocState.FootnotesStart && DocState.FootnotesStart.EndPos)
-                this.Add_DocumentPosition(DocState.FootnotesStart.EndPos);
-            if (DocState.FootnotesEnd && DocState.FootnotesEnd.Pos)
-                this.Add_DocumentPosition(DocState.FootnotesEnd.Pos);
-            if (DocState.FootnotesEnd && DocState.FootnotesEnd.StartPos)
-                this.Add_DocumentPosition(DocState.FootnotesEnd.StartPos);
-            if (DocState.FootnotesEnd && DocState.FootnotesEnd.EndPos)
-                this.Add_DocumentPosition(DocState.FootnotesEnd.EndPos);
-        }
-
+        var DocState = this.private_SaveDocumentState();
         this.Clear_NewImages();
 
         this.Apply_OtherChanges();
 
         // После того как мы приняли чужие изменения, мы должны залочить новые объекты, которые были залочены
         this.Lock_NeedLock();
-
-        if (true !== this.Is_Fast())
-        {
-            LogicDocument.Set_SelectionState2(DocState);
-        }
-        else
-        {
-            if (DocState.Pos)
-                this.Update_DocumentPosition(DocState.Pos);
-            if (DocState.StartPos)
-                this.Update_DocumentPosition(DocState.StartPos);
-            if (DocState.EndPos)
-                this.Update_DocumentPosition(DocState.EndPos);
-
-            if (DocState.FootnotesStart && DocState.FootnotesStart.Pos)
-                this.Update_DocumentPosition(DocState.FootnotesStart.Pos);
-            if (DocState.FootnotesStart && DocState.FootnotesStart.StartPos)
-                this.Update_DocumentPosition(DocState.FootnotesStart.StartPos);
-            if (DocState.FootnotesStart && DocState.FootnotesStart.EndPos)
-                this.Update_DocumentPosition(DocState.FootnotesStart.EndPos);
-            if (DocState.FootnotesEnd && DocState.FootnotesEnd.Pos)
-                this.Update_DocumentPosition(DocState.FootnotesEnd.Pos);
-            if (DocState.FootnotesEnd && DocState.FootnotesEnd.StartPos)
-                this.Update_DocumentPosition(DocState.FootnotesEnd.StartPos);
-            if (DocState.FootnotesEnd && DocState.FootnotesEnd.EndPos)
-                this.Update_DocumentPosition(DocState.FootnotesEnd.EndPos);
-
-
-            LogicDocument.Load_DocumentStateAfterLoadChanges(DocState);
-            this.Refresh_ForeignCursors();
-        }
-
+        this.private_RestoreDocumentState(DocState);
         this.OnStart_Load_Objects();
     }
 };
@@ -748,6 +684,77 @@ CCollaborativeEditingBase.prototype.InitMemory = function() {
     if (!this.m_oMemory) {
         this.m_oMemory = new AscCommon.CMemory();
     }
+};
+CCollaborativeEditingBase.prototype.private_SaveDocumentState = function()
+{
+	var LogicDocument = editor.WordControl.m_oLogicDocument;
+
+	var DocState;
+	if (true !== this.Is_Fast())
+	{
+		DocState = LogicDocument.Get_SelectionState2();
+		this.m_aCursorsToUpdate = {};
+	}
+	else
+	{
+		DocState = LogicDocument.Save_DocumentStateBeforeLoadChanges();
+		this.Clear_DocumentPositions();
+
+		if (DocState.Pos)
+			this.Add_DocumentPosition(DocState.Pos);
+		if (DocState.StartPos)
+			this.Add_DocumentPosition(DocState.StartPos);
+		if (DocState.EndPos)
+			this.Add_DocumentPosition(DocState.EndPos);
+
+		if (DocState.FootnotesStart && DocState.FootnotesStart.Pos)
+			this.Add_DocumentPosition(DocState.FootnotesStart.Pos);
+		if (DocState.FootnotesStart && DocState.FootnotesStart.StartPos)
+			this.Add_DocumentPosition(DocState.FootnotesStart.StartPos);
+		if (DocState.FootnotesStart && DocState.FootnotesStart.EndPos)
+			this.Add_DocumentPosition(DocState.FootnotesStart.EndPos);
+		if (DocState.FootnotesEnd && DocState.FootnotesEnd.Pos)
+			this.Add_DocumentPosition(DocState.FootnotesEnd.Pos);
+		if (DocState.FootnotesEnd && DocState.FootnotesEnd.StartPos)
+			this.Add_DocumentPosition(DocState.FootnotesEnd.StartPos);
+		if (DocState.FootnotesEnd && DocState.FootnotesEnd.EndPos)
+			this.Add_DocumentPosition(DocState.FootnotesEnd.EndPos);
+	}
+	return DocState;
+};
+CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocState)
+{
+	var LogicDocument = editor.WordControl.m_oLogicDocument;
+	if (true !== this.Is_Fast())
+	{
+		LogicDocument.Set_SelectionState2(DocState);
+	}
+	else
+	{
+		if (DocState.Pos)
+			this.Update_DocumentPosition(DocState.Pos);
+		if (DocState.StartPos)
+			this.Update_DocumentPosition(DocState.StartPos);
+		if (DocState.EndPos)
+			this.Update_DocumentPosition(DocState.EndPos);
+
+		if (DocState.FootnotesStart && DocState.FootnotesStart.Pos)
+			this.Update_DocumentPosition(DocState.FootnotesStart.Pos);
+		if (DocState.FootnotesStart && DocState.FootnotesStart.StartPos)
+			this.Update_DocumentPosition(DocState.FootnotesStart.StartPos);
+		if (DocState.FootnotesStart && DocState.FootnotesStart.EndPos)
+			this.Update_DocumentPosition(DocState.FootnotesStart.EndPos);
+		if (DocState.FootnotesEnd && DocState.FootnotesEnd.Pos)
+			this.Update_DocumentPosition(DocState.FootnotesEnd.Pos);
+		if (DocState.FootnotesEnd && DocState.FootnotesEnd.StartPos)
+			this.Update_DocumentPosition(DocState.FootnotesEnd.StartPos);
+		if (DocState.FootnotesEnd && DocState.FootnotesEnd.EndPos)
+			this.Update_DocumentPosition(DocState.FootnotesEnd.EndPos);
+
+
+		LogicDocument.Load_DocumentStateAfterLoadChanges(DocState);
+		this.Refresh_ForeignCursors();
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Private area
