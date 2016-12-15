@@ -1077,30 +1077,30 @@ cCORREL.prototype.getInfo = function () {
 
 	cCOUNTA.prototype = Object.create(cBaseFunction.prototype);
 	cCOUNTA.prototype.Calculate = function (arg) {
-		var count = 0;
+		var element, count = 0;
 		for (var i = 0; i < arg.length; i++) {
-			var _arg = arg[i];
-			if (cElementType.cell === _arg.type || cElementType.cell3D === _arg.type) {
+			element = arg[i];
+			if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
 			    if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
-					var _argV = _arg.getValue();
+					var _argV = element.getValue();
 					if (cElementType.empty !== _argV.type) {
 						count++;
 					}
 				}
-			} else if (cElementType.cellsRange === _arg.type || cElementType.cellsRange3D === _arg.type) {
-				var _argAreaValue = _arg.getValue(this.checkExclude, this.excludeHiddenRows);
+			} else if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
+				var _argAreaValue = element.getValue(this.checkExclude, this.excludeHiddenRows);
 				for (var j = 0; j < _argAreaValue.length; j++) {
 					if (cElementType.empty !== _argAreaValue[j].type) {
 						count++;
 					}
 				}
-			} else if (cElementType.array === _arg.type) {
-				_arg.foreach(function (elem) {
+			} else if (cElementType.array === element.type) {
+				element.foreach(function (elem) {
 					if (cElementType.empty !== elem.type) {
 						count++;
 					}
 				})
-			} else if (cElementType.empty !== _arg.type) {
+			} else if (cElementType.empty !== element.type) {
 				count++;
 			}
 		}
@@ -2665,11 +2665,11 @@ cLOGNORMDIST.prototype.getInfo = function () {
 
 	cMAX.prototype = Object.create(cBaseFunction.prototype);
 	cMAX.prototype.Calculate = function (arg) {
-		var v, argI, argIVal, max = Number.NEGATIVE_INFINITY;
+		var v, element, argIVal, max = Number.NEGATIVE_INFINITY;
 		for (var i = 0; i < this.argumentsCurrent; i++) {
-			argI = arg[i];
-			argIVal = argI.getValue();
-			if (cElementType.cell === argI.type || cElementType.cell3D === argI.type) {
+			element = arg[i];
+			argIVal = element.getValue();
+			if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
 			    if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
 					if (cElementType.error === argIVal.type) {
 						return this.value = argIVal;
@@ -2681,8 +2681,8 @@ cLOGNORMDIST.prototype.getInfo = function () {
 						}
 					}
 				}
-			} else if (cElementType.cellsRange === argI.type || cElementType.cellsRange3D === argI.type) {
-				var argArr = argI.getValue(this.checkExclude, this.excludeHiddenRows);
+			} else if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
+				var argArr = element.getValue(this.checkExclude, this.excludeHiddenRows);
 				for (var j = 0; j < argArr.length; j++) {
 					if (cElementType.number === argArr[j].type) {
 						v = argArr[j].tocNumber();
@@ -2693,22 +2693,22 @@ cLOGNORMDIST.prototype.getInfo = function () {
 						return this.value = argArr[j];
 					}
 				}
-			} else if (cElementType.error === argI.type) {
-				return this.value = argI;
-			} else if (cElementType.string === argI.type) {
-				v = argI.tocNumber();
+			} else if (cElementType.error === element.type) {
+				return this.value = element;
+			} else if (cElementType.string === element.type) {
+				v = element.tocNumber();
 				if (cElementType.number === v.type) {
 					if (v.getValue() > max) {
 						max = v.getValue();
 					}
 				}
-			} else if (cElementType.bool === argI.type || cElementType.empty === argI.type) {
-				v = argI.tocNumber();
+			} else if (cElementType.bool === element.type || cElementType.empty === element.type) {
+				v = element.tocNumber();
 				if (v.getValue() > max) {
 					max = v.getValue();
 				}
-			} else if (cElementType.array === argI.type) {
-				argI.foreach(function (elem) {
+			} else if (cElementType.array === element.type) {
+				element.foreach(function (elem) {
 					if (cElementType.number === elem.type) {
 						if (elem.getValue() > max) {
 							max = elem.getValue();
@@ -2722,8 +2722,8 @@ cLOGNORMDIST.prototype.getInfo = function () {
 					return this.value = max;
 				}
 			} else {
-				if (argI.getValue() > max) {
-					max = argI.getValue();
+				if (element.getValue() > max) {
+					max = element.getValue();
 				}
 			}
 		}
@@ -2929,11 +2929,11 @@ cMEDIAN.prototype.getInfo = function () {
 
 	cMIN.prototype = Object.create(cBaseFunction.prototype);
 	cMIN.prototype.Calculate = function (arg) {
-		var v, argI, argIVal, min = Number.POSITIVE_INFINITY;
+		var v, element, argIVal, min = Number.POSITIVE_INFINITY;
 		for (var i = 0; i < this.argumentsCurrent; i++) {
-			argI = arg[i];
-			argIVal = argI.getValue();
-			if (cElementType.cell === argI.type || cElementType.cell3D === argI.type) {
+			element = arg[i];
+			argIVal = element.getValue();
+			if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
 			    if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
 					if (cElementType.error === argIVal.type) {
 						return this.value = argIVal;
@@ -2945,8 +2945,8 @@ cMEDIAN.prototype.getInfo = function () {
 						}
 					}
 				}
-			} else if (cElementType.cellsRange === argI.type || cElementType.cellsRange3D === argI.type) {
-				var argArr = argI.getValue(this.checkExclude, this.excludeHiddenRows);
+			} else if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
+				var argArr = element.getValue(this.checkExclude, this.excludeHiddenRows);
 				for (var j = 0; j < argArr.length; j++) {
 					if (cElementType.number === argArr[j].type) {
 						v = argArr[j].tocNumber();
@@ -2958,22 +2958,22 @@ cMEDIAN.prototype.getInfo = function () {
 						return this.value = argArr[j];
 					}
 				}
-			} else if (cElementType.error === argI.type) {
-				return this.value = argI;
-			} else if (cElementType.string === argI.type) {
-				v = argI.tocNumber();
+			} else if (cElementType.error === element.type) {
+				return this.value = element;
+			} else if (cElementType.string === element.type) {
+				v = element.tocNumber();
 				if (cElementType.number === v.type) {
 					if (v.getValue() < min) {
 						min = v.getValue();
 					}
 				}
-			} else if (cElementType.bool === argI.type || cElementType.empty === argI.type) {
-				v = argI.tocNumber();
+			} else if (cElementType.bool === element.type || cElementType.empty === element.type) {
+				v = element.tocNumber();
 				if (v.getValue() < min) {
 					min = v.getValue();
 				}
-			} else if (cElementType.array === argI.type) {
-				argI.foreach(function (elem) {
+			} else if (cElementType.array === element.type) {
+				element.foreach(function (elem) {
 					if (cElementType.number === elem.type) {
 						if (elem.getValue() < min) {
 							min = elem.getValue();
@@ -2987,8 +2987,8 @@ cMEDIAN.prototype.getInfo = function () {
 					return this.value = min;
 				}
 			} else {
-				if (argI.getValue() < min) {
-					min = argI.getValue();
+				if (element.getValue() < min) {
+					min = element.getValue();
 				}
 			}
 		}
@@ -4726,20 +4726,20 @@ cSTANDARDIZE.prototype.getInfo = function () {
 
 	cSTDEV.prototype = Object.create(cBaseFunction.prototype);
 	cSTDEV.prototype.Calculate = function (arg) {
-		var i, count = 0, sum = new cNumber(0), member = [];
+		var i, element, count = 0, sum = new cNumber(0), member = [];
 		for (i = 0; i < arg.length; i++) {
-			var _arg = arg[i];
-			if (cElementType.cell === _arg.type || cElementType.cell3D === _arg.type) {
+			element = arg[i];
+			if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
 			    if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
-					var _argV = _arg.getValue();
+					var _argV = element.getValue();
 					if (cElementType.number === _argV.type) {
 						member.push(_argV);
 						sum = _func[sum.type][_argV.type](sum, _argV, "+");
 						count++;
 					}
 				}
-			} else if (cElementType.cellsRange === _arg.type || cElementType.cellsRange3D === _arg.type) {
-				var _argAreaValue = _arg.getValue(this.checkExclude, this.excludeHiddenRows);
+			} else if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
+				var _argAreaValue = element.getValue(this.checkExclude, this.excludeHiddenRows);
 				for (var j = 0; j < _argAreaValue.length; j++) {
 					var __arg = _argAreaValue[j];
 					if (cElementType.number === __arg.type) {
@@ -4748,8 +4748,8 @@ cSTANDARDIZE.prototype.getInfo = function () {
 						count++;
 					}
 				}
-			} else if (cElementType.array === _arg.type) {
-				_arg.foreach(function (elem) {
+			} else if (cElementType.array === element.type) {
+				element.foreach(function (elem) {
 					var e = elem.tocNumber();
 					if (cElementType.number === e.type) {
 						member.push(e);
@@ -4758,10 +4758,10 @@ cSTANDARDIZE.prototype.getInfo = function () {
 					}
 				})
 			} else {
-				_arg = _arg.tocNumber();
-				if (cElementType.number === _arg.type) {
-					member.push(_arg);
-					sum = _func[sum.type][_arg.type](sum, _arg, "+");
+				element = element.tocNumber();
+				if (cElementType.number === element.type) {
+					member.push(element);
+					sum = _func[sum.type][element.type](sum, element, "+");
 					count++;
 				}
 			}
@@ -4896,33 +4896,33 @@ cSTDEVA.prototype.getInfo = function () {
 			return new cNumber(isNaN(_x) ? new cError(cErrorType.division_by_zero) : Math.sqrt(sumSQRDeltaX / xLength));
 		}
 
-		var arr0 = [];
+		var element, arr0 = [];
 
 		for (var j = 0; j < arg.length; j++) {
-			var _arg = arg[j];
-			if (cElementType.cellsRange === _arg.type || cElementType.cellsRange3D === _arg.type) {
+			element = arg[j];
+			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
 				var _arrVal = arg.getValue(this.checkExclude, this.excludeHiddenRows);
 				_arrVal.forEach(function (elem) {
 					if (cElementType.number === elem.type || cElementType.error === elem.type) {
 						arr0.push(elem);
 					}
 				});
-			} else if (cElementType.cell === _arg.type || cElementType.cell3D === _arg.type) {
+			} else if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
 			    if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
-					var a = _arg.getValue();
+					var a = element.getValue();
 					if (cElementType.number === a.type || cElementType.error === a.type) {
 						arr0.push(a);
 					}
 				}
-			} else if (cElementType.array === _arg.type) {
-				_arg.foreach(function (elem) {
+			} else if (cElementType.array === element.type) {
+				element.foreach(function (elem) {
 					if (cElementType.number === elem.type || cElementType.error === elem.type) {
 						arr0.push(elem);
 					}
 				});
-			} else if (cElementType.number === _arg.type || cElementType.bool === _arg.type) {
-				arr0.push(_arg.tocNumber());
-			} else if (cElementType.string === _arg.type || cElementType.empty === _arg.type) {
+			} else if (cElementType.number === element.type || cElementType.bool === element.type) {
+				arr0.push(element.tocNumber());
+			} else if (cElementType.string === element.type || cElementType.empty === element.type) {
 				arr0.push(new cNumber(0));
 			} else {
 				return this.value = new cError(cErrorType.wrong_value_type);
@@ -5216,33 +5216,33 @@ cTTEST.prototype = Object.create( cBaseFunction.prototype );
 
 		}
 
-		var arr0 = [];
+		var element, arr0 = [];
 
 		for (var j = 0; j < arg.length; j++) {
-			var _arg = arg[j];
-			if (cElementType.cellsRange === _arg.type || cElementType.cellsRange3D === _arg.type) {
-				var _arrVal = _arg.getValue(this.checkExclude, this.excludeHiddenRows);
+			element = arg[j];
+			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
+				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
 				_arrVal.forEach(function (elem) {
 					if (cElementType.number === elem.type || cElementType.error === elem.type) {
 						arr0.push(elem);
 					}
 				});
-			} else if (cElementType.cell === _arg.type || cElementType.cell3D === _arg.type) {
+			} else if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
 			    if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
-					var a = _arg.getValue();
+					var a = element.getValue();
 					if (cElementType.number === a.type || cElementType.error === a.type) {
 						arr0.push(a);
 					}
 				}
-			} else if (cElementType.array === _arg.type) {
-				_arg.foreach(function (elem) {
+			} else if (cElementType.array === element.type) {
+				element.foreach(function (elem) {
 					if (cElementType.number === elem.type || cElementType.error === elem.type) {
 						arr0.push(elem);
 					}
 				});
-			} else if (cElementType.number === _arg.type || cElementType.bool === _arg.type) {
-				arr0.push(_arg.tocNumber());
-			} else if (cElementType.string === _arg.type || cElementType.empty === _arg.type) {
+			} else if (cElementType.number === element.type || cElementType.bool === element.type) {
+				arr0.push(element.tocNumber());
+			} else if (cElementType.string === element.type || cElementType.empty === element.type) {
 				continue;
 			} else {
 				return this.value = new cError(cErrorType.wrong_value_type);
@@ -5418,33 +5418,33 @@ cVARA.prototype.getInfo = function () {
 
 		}
 
-		var arr0 = [];
+		var element, arr0 = [];
 
 		for (var j = 0; j < arg.length; j++) {
-			var _arg = arg[j];
-			if (cElementType.cellsRange === _arg.type || cElementType.cellsRange3D === _arg.type) {
-				var _arrVal = _arg.getValue(this.checkExclude, this.excludeHiddenRows);
+			element = arg[j];
+			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
+				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
 				_arrVal.forEach(function (elem) {
 					if (cElementType.number === elem.type || cElementType.error === elem.type) {
 						arr0.push(elem);
 					}
 				});
-			} else if (cElementType.cell === _arg.type || cElementType.cell3D === _arg.type) {
+			} else if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
 			    if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
-					var a = _arg.getValue();
+					var a = element.getValue();
 					if (cElementType.number === a.type || cElementType.error === a.type) {
 						arr0.push(a);
 					}
 				}
-			} else if (cElementType.array === _arg.type) {
-				_arg.foreach(function (elem) {
+			} else if (cElementType.array === element.type) {
+				element.foreach(function (elem) {
 					if (cElementType.number === elem.type || cElementType.error === elem.type) {
 						arr0.push(elem);
 					}
 				});
-			} else if (cElementType.number === _arg.type || cElementType.bool === _arg.type) {
-				arr0.push(_arg.tocNumber());
-			} else if (cElementType.string === _arg.type || cElementType.empty === _arg.type) {
+			} else if (cElementType.number === element.type || cElementType.bool === element.type) {
+				arr0.push(element.tocNumber());
+			} else if (cElementType.string === element.type || cElementType.empty === element.type) {
 				arr0.push(new cNumber(0));
 			} else {
 				return this.value = new cError(cErrorType.wrong_value_type);

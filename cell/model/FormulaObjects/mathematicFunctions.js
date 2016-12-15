@@ -2652,23 +2652,24 @@ cPOWER.prototype.getInfo = function () {
 
 	cPRODUCT.prototype = Object.create(cBaseFunction.prototype);
 	cPRODUCT.prototype.Calculate = function (arg) {
-		var arg0 = new cNumber(1);
+		var element, arg0 = new cNumber(1);
 		for (var i = 0; i < arg.length; i++) {
-			if (cElementType.cellsRange === arg[i].type || cElementType.cellsRange3D === arg[i].type) {
-				var _arrVal = arg[i].getValue(this.checkExclude, this.excludeHiddenRows);
+			element = arg[i];
+			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
+				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
 				for (var j = 0; j < _arrVal.length; j++) {
 					arg0 = _func[arg0.type][_arrVal[j].type](arg0, _arrVal[j], "*");
 					if (cElementType.error === arg0.type) {
 						return this.value = arg0;
 					}
 				}
-			} else if (cElementType.cell === arg[i].type || cElementType.cell3D === arg[i].type) {
+			} else if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
 			    if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
-					var _arg = arg[i].getValue();
+					var _arg = element.getValue();
 					arg0 = _func[arg0.type][_arg.type](arg0, _arg, "*");
 				}
-			} else if (cElementType.array === arg[i].type) {
-				arg[i].foreach(function (elem) {
+			} else if (cElementType.array === element.type) {
+				element.foreach(function (elem) {
 					if (cElementType.string === elem.type || cElementType.bool === elem.type || cElementType.empty === elem.type) {
 						return;
 					}
@@ -2676,7 +2677,7 @@ cPOWER.prototype.getInfo = function () {
 					arg0 = _func[arg0.type][elem.type](arg0, elem, "*");
 				})
 			} else {
-				arg0 = _func[arg0.type][arg[i].type](arg0, arg[i], "*");
+				arg0 = _func[arg0.type][element.type](arg0, element, "*");
 			}
 			if (cElementType.error === arg0.type) {
 				return this.value = arg0;
