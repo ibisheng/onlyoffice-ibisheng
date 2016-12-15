@@ -404,7 +404,7 @@ CChartsDrawer.prototype =
 				var convertResultY2 = this._convertAndTurnPoint(posX * this.calcProp.pxToMM, downYPoint * this.calcProp.pxToMM, 0);
 				var heightPerspectiveChart = convertResultY1.y - convertResultY2.y;
 				
-				var y = (convertResultY2.y + heightPerspectiveChart / 2) / this.calcProp.pxToMM - heightTitle / 2;
+				y = (convertResultY2.y + heightPerspectiveChart / 2) / this.calcProp.pxToMM - heightTitle / 2;
 			}
 			else
 			{
@@ -532,7 +532,7 @@ CChartsDrawer.prototype =
 		
 		var pxToMM = this.calcProp.pxToMM;
 		
-		var isHBar = (chartSpace.chart.plotArea.chart.getObjectType() == AscDFH.historyitem_type_BarChart && chartSpace.chart.plotArea.chart.barDir === AscFormat.BAR_DIR_BAR) ? true : false;
+		var isHBar = !!(chartSpace.chart.plotArea.chart.getObjectType() == AscDFH.historyitem_type_BarChart && chartSpace.chart.plotArea.chart.barDir === AscFormat.BAR_DIR_BAR);
 		
 		//если точки рассчитаны - ставим маргин в зависимости от них
 		var marginOnPoints = this._calculateMarginOnPoints(chartSpace, isHBar);
@@ -597,7 +597,7 @@ CChartsDrawer.prototype =
 				}
 				case c_oAscChartLegendShowSettings.top:
 				{
-					topKey += fLegendExtY
+					topKey += fLegendExtY;
 					break;
 				}
 				case c_oAscChartLegendShowSettings.right:
@@ -2220,7 +2220,7 @@ CChartsDrawer.prototype =
 		return result;
 	},
 	
-	getLogarithmicValue: function(val, logBase, yPoints)
+	getLogarithmicValue: function(val, logBase)
 	{
 		if(val < 0)
 			return 0;
@@ -2244,7 +2244,6 @@ CChartsDrawer.prototype =
 		else
 		{
 			var parseTemp = logVal.toString().split(".");
-			var nextTemp = Math.pow(logBase, parseFloat(parseTemp[0]) - 1);
 			temp = Math.pow(logBase, parseFloat(parseTemp[0]));
 			
 			temp =  temp - temp * parseFloat("0." + parseTemp[1]);
@@ -2286,7 +2285,7 @@ CChartsDrawer.prototype =
 		var angleOy = chartSpace.chart.view3D && chartSpace.chart.view3D.rotY ? (- chartSpace.chart.view3D.rotY / 360) * (Math.PI * 2) : 0;
 		if(chartSpace.chart.view3D && !chartSpace.chart.view3D.rAngAx && angleOy !== 0)
 		{
-			var angleOy = Math.abs(angleOy);
+			angleOy = Math.abs(angleOy);
 
 			if(angleOy >= Math.PI / 2 && angleOy < 3 * Math.PI / 2)
 				res = true;
@@ -2361,7 +2360,7 @@ CChartsDrawer.prototype =
 	_getFirstDegree: function(val)
 	{
 		var secPart = val.toString().split('.');
-		var numPow = 1,tempMax;
+		var numPow = 1, tempMax;
 		
 		if(secPart[1] && secPart[1].toString().indexOf('e+') != -1 && secPart[0] && secPart[0].toString().length == 1)
 		{
@@ -2374,10 +2373,10 @@ CChartsDrawer.prototype =
 			numPow = Math.pow(10, expNum[1]);
 		}
 		else if(0 != secPart[0])
-			numPow = Math.pow(10, secPart[0].toString().length - 1)
+			numPow = Math.pow(10, secPart[0].toString().length - 1);
 		else if(0 == secPart[0] && secPart[1] != undefined)
 		{
-			var tempMax = val;
+			tempMax = val;
 			var num = 0;
 			while(1 > tempMax)
 			{
@@ -2579,13 +2578,13 @@ CChartsDrawer.prototype =
 		var n = z1 - z0;
 		
 		//check line
-		var x123 = (point1.x - x0) / (x1 - x0);
+		/*var x123 = (point1.x - x0) / (x1 - x0);
 		var y123 = (point1.y - y0) / (y1 - y0);
 		var z123 = (point1.z - z0) / (z1 - z0);
 		
 		var x321 = (point2.x - x0) / (x1 - x0);
 		var y321 = (point2.y - y0) / (y1 - y0);
-		var z321 = (point2.z - z0) / (z1 - z0);
+		var z321 = (point2.z - z0) / (z1 - z0);*/
 		
 		return {l: l, m: m, n: n, x1: x0, y1: y0, z1: z0};
 	},
@@ -3045,17 +3044,17 @@ CChartsDrawer.prototype =
 		var result;
 		if(this.calcProp.type == c_oChartTypes.Bar)
 		{
-			result = (val > 0 && visible < 0 || val < 0 && visible > 0) ? true : false;
+			result = !!(val > 0 && visible < 0 || val < 0 && visible > 0);
 			if(!(this.calcProp.subType == "stacked") && !(this.calcProp.subType == "stackedPer") && this.cChartSpace.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
 				result = !result;
 		}
 		else if(this.calcProp.type == c_oChartTypes.Line)
 		{
-			result = visible < 0 ? true : false
+			result = visible < 0;
 		}
 		else if(this.calcProp.type == c_oChartTypes.HBar)
 		{
-			result = (val < 0 && visible < 0 || val > 0 && visible > 0) ? true : false;
+			result = !!(val < 0 && visible < 0 || val > 0 && visible > 0);
 			
 			if(!(this.calcProp.subType == "stacked") && !(this.calcProp.subType == "stackedPer") && this.cChartSpace.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
 				result = !result;
@@ -3106,8 +3105,7 @@ CChartsDrawer.prototype =
 	_isSwitchCurrent3DChart: function(chartSpace)
 	{
 		var res = false;
-		
-		var excelApi = window["Asc"] && window["Asc"]["editor"];
+
 		var chart = chartSpace && chartSpace.chart ? chartSpace.chart.plotArea.charts[0]: null;
 		var typeChart = chart ? chart.getObjectType() : null;
 		
@@ -3237,7 +3235,7 @@ drawBarChart.prototype =
 		
 		var nullPositionOX = this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase ?  this.chartProp.nullPositionOXLog : this.cChartSpace.chart.plotArea.catAx.posY * this.chartProp.pxToMM;
 		
-		var height, startX, startY, diffYVal, val, paths, seriesHeight = [], tempValues = [], seria, startYColumnPosition, startXPosition, prevVal, idx, seriesCounter = 0;
+		var height, startX, startY, val, paths, seriesHeight = [], tempValues = [], seria, startYColumnPosition, startXPosition, prevVal, idx, seriesCounter = 0;
 		var cubeCount = 0;
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 			numCache        = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : this.chartProp.series[i].val.numLit;
@@ -3794,7 +3792,6 @@ drawBarChart.prototype =
 	_DrawBars3D: function()
 	{
 		var t = this;
-		var processor3D = this.cChartDrawer.processor3D;
 		
 		var drawVerges = function(i, j, paths, onlyLessNull, k, isNotPen, isNotBrush)
 		{
@@ -4480,9 +4477,9 @@ drawLineChart.prototype =
 	{
 		var t = this;
 		
-		var drawVerges = function(j, i, onlyLessNull)
+		var drawVerges = function(j, i)
 		{
-		var brush, pen, seria;
+			var brush, pen, seria;
 			
 			seria = t.chartProp.series[j];
 				brush = seria.brush;
@@ -4579,7 +4576,7 @@ drawLineChart.prototype =
 				cColorMod.val = 35000;
 			}
 			
-			this._addColorMods(cColorMod, duplicateBrush)
+			this._addColorMods(cColorMod, duplicateBrush);
 			
 			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
 			pen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0.1);
@@ -4753,7 +4750,7 @@ drawAreaChart.prototype =
 		{
 			this._calculatePaths3D();
 			
-			var cSortFaces = new CSortFaces(this.cChartDrawer);
+			//var cSortFaces = new CSortFaces(this.cChartDrawer);
 			//this.upFaces = cSortFaces.sortFaces(this.upFaces);
 			
 			var upDownFaces = this.upFaces.concat(this.downFaces);
@@ -4782,7 +4779,7 @@ drawAreaChart.prototype =
 			}
 			
 			var anotherFaces = this.sortZIndexPathsFront.concat(this.sortZIndexPathsBack).concat(this.sortZIndexPathsLeft).concat(this.sortZIndexPathsRight);
-			this.sortZIndexPaths = upDownFaces.concat(anotherFaces)
+			this.sortZIndexPaths = upDownFaces.concat(anotherFaces);
 			
 			//медленная, но более качественный сортировка
 			//var anotherFaces = this.sortZIndexPathsFront.concat(this.sortZIndexPathsBack).concat(this.sortZIndexPathsLeft).concat(this.sortZIndexPathsRight);
@@ -4900,7 +4897,7 @@ drawAreaChart.prototype =
 		return path;
 	},
 	
-	_calculateLine3D: function (points, seriaNum, allPoints)
+	_calculateLine3D: function (points, seriaNum)
     {
 		//pointsIn3D[0] - верхняя кривая ближней стороны, pointsIn3D[1] - нижняя кривая ближней стороны, pointsIn3D[2] - верхняя кривая дальней стороны, pointsIn3D[3] - нижняя кривая дальней стороны
 		var pointsIn3D = [], t = this, pxToMm = this.chartProp.pxToMM;
@@ -5236,7 +5233,7 @@ drawAreaChart.prototype =
 		var	point5 = pointsIn3D[upNear][0];
 		var	point6 = pointsIn3D[upFar][0];
 		var	point7 = pointsIn3D[upFar][pointsIn3D[upFar].length - 1];
-		var	point8 = pointsIn3D[upNear][pointsIn3D[upNear].length - 1]
+		var	point8 = pointsIn3D[upNear][pointsIn3D[upNear].length - 1];
 		
 		
 		//front
@@ -5308,7 +5305,7 @@ drawAreaChart.prototype =
 	
 	_calculateRect3DStacked: function(arrPoints, arrPointsProject, arrNotRotatePoints, point, seria)
 	{	
-		var path, pxToMm = this.chartProp.pxToMM, t = this, paths = [];
+		var pxToMm = this.chartProp.pxToMM, t = this;
 		
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
@@ -5697,7 +5694,7 @@ drawAreaChart.prototype =
 		this.prevUp[pointIndex][seriaIndex] = curUp;
 	},
 	
-	_calculateSimpleRect: function(arrPoints, arrPointsProject, point, seria, props)
+	_calculateSimpleRect: function(arrPoints, arrPointsProject, point, seria)
 	{
 		var path, pxToMm = this.chartProp.pxToMM, t = this, paths = [];
 		var pathH = this.chartProp.pathH;
@@ -5853,8 +5850,7 @@ drawAreaChart.prototype =
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
 		var pxToMm = this.chartProp.pxToMM;
-		
-		var numCache = this.chartProp.series[ser].val.numRef ? this.chartProp.series[ser].val.numRef.numCache : this.chartProp.series[ser].val.numLit;
+
 		var point = this.cChartDrawer.getIdxPoint(this.chartProp.series[ser], val);
 		var path;
 		
@@ -6008,7 +6004,6 @@ drawAreaChart.prototype =
 		}
 		else
 		{
-			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache :  this.chartProp.series[i].val.numLit;
 			idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[i], n);
 			val = idxPoint ? parseFloat(idxPoint.val) : null;
 		}
@@ -6019,7 +6014,6 @@ drawAreaChart.prototype =
     {
 		//ширина линии
 		var brush;
-		var FillUniColor;
 		var pen;
 		var seria, dataSeries;
 		
@@ -6107,7 +6101,6 @@ drawAreaChart.prototype =
 	_drawBars3D: function()
 	{
 		var t = this;
-		var processor3D = this.cChartDrawer.processor3D;
 		var isStacked = !!(this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked");
 		
 		if(!isStacked)
@@ -6212,14 +6205,12 @@ drawAreaChart.prototype =
 		var cZ = k.x * n.y - n.x * k.y;
 		var visible = aX + bY + cZ;
 		
-		return visible < 0 ? true : false
+		return visible < 0;
 	},
 	
 	_getIntersectionLines: function(line1Point1, line1Point2, line2Point1, line2Point2)
 	{
 		var chartHeight = this.chartProp.trueHeight;
-		var chartWidth = this.chartProp.trueWidth;
-		var left = this.chartProp.chartGutter._left;
 		var top = this.chartProp.chartGutter._top;
 		
 		var x1 = line1Point1.x;
@@ -6240,7 +6231,7 @@ drawAreaChart.prototype =
 		var res = null; 
 		
 		if(y < top + chartHeight && y > top && x > line1Point1.x && x < line1Point2.x)
-			res = {x: x, y: y}
+			res = {x: x, y: y};
 		
 		return res;
 	}
@@ -6295,8 +6286,7 @@ drawHBarChart.prototype =
         //соответствует подписям оси категорий(OX)
 		var xPoints = this.cChartSpace.chart.plotArea.valAx.xPoints;
 		var yPoints = this.cChartSpace.chart.plotArea.catAx.yPoints;
-		
-		var xaxispos       = this.chartProp.xaxispos;
+
 		var heightGraph    = this.chartProp.heightCanvas - this.chartProp.chartGutter._top - this.chartProp.chartGutter._bottom;
 		
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
@@ -6315,7 +6305,7 @@ drawHBarChart.prototype =
 		var widthOverLap = individualBarHeight * (overlap / 100);
 		var hmargin = (gapWidth / 100 * individualBarHeight) / 2;
 		
-		var width, startX, startY, diffYVal, val, paths, seriesHeight = [], seria, startXColumnPosition, startYPosition, newStartX, newStartY, idx, seriesCounter = 0, numCache;
+		var width, startX, startY, val, paths, seriesHeight = [], seria, startXColumnPosition, startYPosition, newStartX, newStartY, idx, seriesCounter = 0, numCache;
 		
 		//for 3d
 		var perspectiveDepth, gapDepth, DiffGapDepth;
@@ -6508,9 +6498,9 @@ drawHBarChart.prototype =
 		return {pen: pen, brush: brush}
 	},
 	
-	_getStartYColumnPosition: function (seriesHeight, j, i, val, xPoints, summBarVal)
+	_getStartYColumnPosition: function (seriesHeight, j, i, val, xPoints)
 	{
-		var startY, diffYVal, width, numCache, dVal, curVal, prevVal, endBlockPosition, startBlockPosition;
+		var startY, width, curVal, prevVal, endBlockPosition, startBlockPosition;
 		var catAx = this.cChartSpace.chart.plotArea.catAx;
 		var nullPositionOX = catAx.posX !== null ? catAx.posX * this.chartProp.pxToMM : 0;
 		
@@ -6985,7 +6975,6 @@ drawHBarChart.prototype =
 	_DrawBars3D3: function()
 	{
 		var t = this;
-		var processor3D = this.cChartDrawer.processor3D;
 		
 		var verges = 
 		{
@@ -9476,8 +9465,6 @@ drawRadarChart.prototype =
 	
 	_calculateLines: function ()
 	{
-		//соответствует подписям оси категорий(OX)
-		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
 		//соответствует подписям оси значений(OY)
 		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
 		
@@ -9487,7 +9474,7 @@ drawRadarChart.prototype =
 		var xCenter = (this.chartProp.chartGutter._left + trueWidth/2) / this.chartProp.pxToMM;
 		var yCenter = (this.chartProp.chartGutter._top + trueHeight/2) / this.chartProp.pxToMM;
 		
-		var y, y1, x, x1, val, nextVal, tempVal, seria, dataSeries;
+		var y, y1, x, x1, val, nextVal, seria, dataSeries;
 		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache.pts : this.chartProp.series[0].val.numLit.pts;
 		var tempAngle = 2 * Math.PI / numCache.length;
 		var xDiff = ((trueHeight / 2) / yPoints.length) / this.chartProp.pxToMM;
@@ -9700,7 +9687,7 @@ drawRadarChart.prototype =
 		return {x: centerX, y: centerY};
 	},
 	
-	_drawLines: function (isRedraw/*isSkip*/)
+	_drawLines: function ()
     {
 		var brush, pen, dataSeries, seria, markerBrush, markerPen, numCache;
 		
@@ -9844,7 +9831,7 @@ drawScatterChart.prototype =
 		
 		var points;
 		
-		var y, y1, y2, y3, x, x1, x2, x3, val, nextVal, tempVal, seria, dataSeries, compiledMarkerSize, compiledMarkerSymbol, idx, numCache;
+		var y, y1, y2, y3, x, val, seria, dataSeries, compiledMarkerSize, compiledMarkerSymbol, idx, numCache;
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 		
 			seria = this.chartProp.series[i];
@@ -9909,13 +9896,8 @@ drawScatterChart.prototype =
 		
 		var digHeightOy = Math.abs(maxOy - minOy);
 		var digHeightOx = Math.abs(maxOx - minOx);
-
-		var koffX = trueWidth/digHeightOx;
-		var koffY = trueHeight/digHeightOy;	
 		
-		var nullPositionOX = this.chartProp.nullPositionOX / this.chartProp.pxToMM;
-		
-		var seria, yVal, xVal, points, x, x1, y, y1, yNumCache, xNumCache, compiledMarkerSize, compiledMarkerSymbol, idxPoint;
+		var seria, yVal, xVal, points, yNumCache, xNumCache, compiledMarkerSize, compiledMarkerSymbol, idxPoint;
 		for(var i = 0; i < this.chartProp.series.length; i++)
 		{
 			seria = this.chartProp.series[i];
@@ -9973,7 +9955,6 @@ drawScatterChart.prototype =
 	
 	_calculateAllLines: function(points)
 	{
-		var startPoint, endPoint;
 		//соответствует подписям оси категорий(OX)
 		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
 		//соответствует подписям оси значений(OY)
@@ -10029,7 +10010,7 @@ drawScatterChart.prototype =
 		return val;
 	},
 	
-	_drawScatter: function (isRedraw/*isSkip*/)
+	_drawScatter: function ()
     {
 		var brush, pen, dataSeries, seria, markerBrush, markerPen, numCache;
 		
@@ -10421,12 +10402,10 @@ drawStockChart.prototype =
 	},
 
 	
-	_drawLines: function (isRedraw/*isSkip*/)
+	_drawLines: function ()
     {
 		var brush;
 		var pen;
-		var dataSeries;
-		var seria;
 		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
 		
 		for (var i = 0; i < numCache.pts.length; i++) {
@@ -10619,11 +10598,8 @@ drawBubbleChart.prototype =
 		
 		var digHeightOy = Math.abs(maxOy - minOy);
 		var digHeightOx = Math.abs(maxOx - minOx);
-
-		var koffX = trueWidth/digHeightOx;
-		var koffY = trueHeight/digHeightOy;	
 		
-		var seria, yVal, xVal, points, x, x1, y, y1, yNumCache, xNumCache;
+		var seria, yVal, xVal, points, x, y, yNumCache, xNumCache;
 		for(var i = 0; i < this.chartProp.series.length; i++)
 		{
 			seria = this.chartProp.series[i];
@@ -10929,7 +10905,7 @@ gridChart.prototype =
 			
 			//соответствует подписям оси категорий(OX)
 			if(this.cChartSpace.chart.plotArea.valAx)
-				var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+				yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
 			
 			var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache.pts : this.chartProp.series[0].val.numLit.pts;
 			var tempAngle = 2 * Math.PI / numCache.length;
@@ -10963,7 +10939,6 @@ gridChart.prototype =
 					gdLst["h"] = 1;
 					
 					path.stroke = true;
-					var pxToMm = this.chartProp.pxToMM;
 					if(k == 0)
 					{
 						xFirst = x;
@@ -11099,7 +11074,7 @@ gridChart.prototype =
 		}
 	},
 	
-	_calculateLine: function(x, y, x1, y1, i)
+	_calculateLine: function(x, y, x1, y1)
 	{
 		var path;
 		if(this.cChartDrawer.nDimensionCount === 3)
@@ -11111,7 +11086,7 @@ gridChart.prototype =
 			var angleOz = 0;
 			
 			var rAngAx = this.cChartDrawer.processor3D.view3D.rAngAx;
-			var isVertLine = x === x1 ? true : false;
+			var isVertLine = x === x1;
 			
 			var convertResult = this.cChartDrawer._convertAndTurnPoint(x, y, 0);
 			var x1n = convertResult.x;
@@ -11296,7 +11271,6 @@ gridChart.prototype =
 	{
 		var pen;
 		var path;
-		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints ? this.cChartSpace.chart.plotArea.valAx.yPoints : this.cChartSpace.chart.plotArea.catAx.yPoints;
 		
 		for(var i = 0; i < this.paths.horisontalLines.length; i++)
 		{
@@ -11327,7 +11301,6 @@ gridChart.prototype =
 	_drawVerticalLines: function()
 	{
 		var pen, path;
-		var xPoints = this.cChartSpace.chart.plotArea.valAx.xPoints ? this.cChartSpace.chart.plotArea.valAx.xPoints : this.cChartSpace.chart.plotArea.catAx.xPoints;
 		
 		for(var i = 0; i < this.paths.verticalLines.length; i++)
 		{
@@ -11397,7 +11370,6 @@ catAxisChart.prototype =
 	
 	_calculateAxis : function()
 	{
-		var nullPoisition = this.chartProp.nullPositionOX;
 		var axisPos;
 		if(this.chartProp.type == c_oChartTypes.HBar)
 		{	
@@ -11638,10 +11610,6 @@ catAxisChart.prototype =
 		if(this.cChartDrawer.nDimensionCount === 3)
 		{
 			var view3DProp = this.cChartSpace.chart.view3D;
-			var angleOx = view3DProp && view3DProp.rotX ? (- view3DProp.rotX / 360) * (Math.PI * 2) : 0;
-			var angleOy = view3DProp && view3DProp.rotY ? (- view3DProp.rotY / 360) * (Math.PI * 2) : 0;
-			var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
-			var angleOz = 0;
 			
 			var z = this.cChartDrawer.processor3D.calculateZPositionCatAxis();
 			
@@ -11663,8 +11631,7 @@ catAxisChart.prototype =
 		path.pathW = pathW;
 		gdLst["w"] = 1;
 		gdLst["h"] = 1;
-		
-		var pxToMm = this.chartProp.pxToMM;
+
 		path.moveTo(x * pathW, y * pathH);
 		path.lnTo(x1 * pathW, y1 * pathH);
 		path.recalculate(gdLst);
@@ -12018,13 +11985,9 @@ serAxisChart.prototype =
 	
 	_calculateAxis : function()
 	{
-		var nullPoisition = this.cChartSpace.chart.plotArea.valAx.posX;
 		var nullPositionOx = this.chartProp.nullPositionOX;
 		
 		var view3DProp = this.cChartSpace.chart.view3D;
-		var angleOx = view3DProp && view3DProp.rotX ? (- view3DProp.rotX / 360) * (Math.PI * 2) : 0;
-		var angleOy = view3DProp && view3DProp.rotY ? (- view3DProp.rotY / 360) * (Math.PI * 2) : 0;
-		var angleOz = 0;
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		
 		//var z = this.cChartDrawer.processor3D.calculateZPositionValAxis();
@@ -12048,22 +12011,12 @@ serAxisChart.prototype =
 	_calculateTickMark : function()
 	{
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
-		
 		var tickmarksProps = this._getTickmarksProps();
-		
 		var widthLine = tickmarksProps.widthLine;
-		var crossMajorStep = tickmarksProps.crossMajorStep;
 		
 		if(widthLine !== 0)
 		{
-			var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
-
 			var stepY = perspectiveDepth / this.chartProp.seriesCount;
-			var minorStep = stepY / this.chartProp.numhMinorlines;
-			
-			var posY;
-			var posMinorY;
-			
 			var startX = this.chartProp.widthCanvas - this.chartProp.chartGutter._right;
 			var startY = this.chartProp.nullPositionOX;
 			
@@ -12616,11 +12569,7 @@ areaChart.prototype =
 		var bottomMargin = this.chartProp.chartGutter._bottom;
 		
 		var view3DProp = this.cChartSpace.chart.view3D;
-		var angleOx = view3DProp && view3DProp.rotX ? (- view3DProp.rotX / 360) * (Math.PI * 2) : 0;
-		var angleOy = view3DProp && view3DProp.rotY ? (- view3DProp.rotY / 360) * (Math.PI * 2) : 0;
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
-		var angleOz = 0;
-		
 		
 		var convertResult = this.cChartDrawer._convertAndTurnPoint(leftMargin, heightGraph - bottomMargin, perspectiveDepth);
 		var x1n = convertResult.x;
@@ -12793,7 +12742,6 @@ CSortFaces.prototype =
 	sortParallelepipeds: function(parallelepipeds)
 	{
 		var intersectionsParallelepipeds = this._getIntersectionsParallelepipeds(parallelepipeds);
-		var intersections = intersectionsParallelepipeds.intersections;
 		var revIntersections = intersectionsParallelepipeds.reverseIntersections;
 		var countIntersection = intersectionsParallelepipeds.countIntersection;
 		
@@ -12904,9 +12852,6 @@ CSortFaces.prototype =
 			
 			for(var m = 0; m < parallelepipeds.length; m++)
 			{
-				//ищем пересечения с данным параллалепипедом
-				var toParallalepiped = parallelepipeds[m];
-				
 				if(m === i || usuallyIntersect[i] === m || usuallyIntersectRev[i] === m)
 				{
 					continue;
@@ -12959,8 +12904,6 @@ CSortFaces.prototype =
 	
 	sortFaces: function(faces)
 	{
-		var firstVerges = [];
-		var lastVerges = [];
 		var t = this;
 		
 		var iterCount = 0;
@@ -13009,10 +12952,8 @@ CSortFaces.prototype =
 	_isIntersectionFacesPointLines: function(plainVerge, i, sortZIndexPaths)
 	{
 		var res = false;
-		
 		var t = this;
-		
-		var lineArray = [];		
+
 		for(var j = 0; j < plainVerge.points.length; j++)
 		{
 			var pointFromVerge = plainVerge.points[j];
@@ -13038,9 +12979,7 @@ CSortFaces.prototype =
 		{
 			if(k === i)
 				continue;
-			
-			var plainEqucation = sortZIndexPaths[k].plainEquation;
-			
+
 			if(this._isIntersectionFaceAndLine(sortZIndexPaths[k], lineEqucation, pointFromVerge, i, j, k))
 			{
 				res = true;
@@ -13052,7 +12991,7 @@ CSortFaces.prototype =
 	},
 	
 	//пересечение прямой гранью
-	_isIntersectionFaceAndLine: function(plain, lineEquation, pointFromVerge, i, j, k)
+	_isIntersectionFaceAndLine: function(plain, lineEquation, pointFromVerge)
 	{
 		var res = false;
 		var t = this;
