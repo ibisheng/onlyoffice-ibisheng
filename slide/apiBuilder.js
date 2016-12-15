@@ -656,6 +656,23 @@
         AscFormat.builder_SetChartLegendPos(this.Chart, sLegendPos);
     };
 
+
+    /**
+     * Specifies a  vertical axis orientation
+     * @param {bool} bIsMinMax
+     * */
+    ApiChart.prototype.SetVerAxisOrientation = function(bIsMinMax){
+        AscFormat.builder_SetChartVertAxisOrientation(this.Chart, bIsMinMax);
+    };
+
+    /**
+     * Specifies a  horizontal axis orientation
+     * @param {bool} bIsMinMax
+     * */
+    ApiChart.prototype.SetHorAxisOrientation = function(bIsMinMax){
+        AscFormat.builder_SetChartHorAxisOrientation(this.Chart, bIsMinMax);
+    };
+
     /**
      * Spicifies a show options for data labels
      * @param {boolean} bShowSerName
@@ -708,6 +725,8 @@
     ApiChart.prototype["SetTitle"]                   =  ApiChart.prototype.SetTitle;
     ApiChart.prototype["SetHorAxisTitle"]            =  ApiChart.prototype.SetHorAxisTitle;
     ApiChart.prototype["SetVerAxisTitle"]            =  ApiChart.prototype.SetVerAxisTitle;
+    ApiChart.prototype["SetVerAxisOrientation"]      =  ApiChart.prototype.SetVerAxisOrientation;
+    ApiChart.prototype["SetHorAxisOrientation"]      =  ApiChart.prototype.SetHorAxisOrientation;
     ApiChart.prototype["SetLegendPos"]               =  ApiChart.prototype.SetLegendPos;
     ApiChart.prototype["SetShowDataLabels"]          =  ApiChart.prototype.SetShowDataLabels;
 
