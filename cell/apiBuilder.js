@@ -577,6 +577,15 @@
 	};
 
 	/**
+	 * Set wrap
+	 * @memberof ApiRange
+	 * @param {bool} value
+	 */
+	ApiRange.prototype.SetWrap = function (value) {
+		this.range.setWrap(!!value);
+	};
+
+	/**
 	 * Set fill color in the rgb format.
 	 * @memberof ApiRange
 	 * @param {ApiColor} color
@@ -908,6 +917,7 @@
 	ApiRange.prototype["SetItalic"] = ApiRange.prototype.SetItalic;
 	ApiRange.prototype["SetUnderline"] = ApiRange.prototype.SetUnderline;
 	ApiRange.prototype["SetStrikeout"] = ApiRange.prototype.SetStrikeout;
+	ApiRange.prototype["SetWrap"] = ApiRange.prototype.SetWrap;
 	ApiRange.prototype["SetFillColor"] = ApiRange.prototype.SetFillColor;
 	ApiRange.prototype["SetNumberFormat"] = ApiRange.prototype.SetNumberFormat;
 	ApiRange.prototype["SetBorders"] = ApiRange.prototype.SetBorders;
