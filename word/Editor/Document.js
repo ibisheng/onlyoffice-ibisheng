@@ -5499,7 +5499,7 @@ CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
                 Type      : changestype_2_ElementsArray_and_Type,
                 Elements  : [Para],
                 CheckType : changestype_Paragraph_Content
-            }))
+            }, true))
         {
             // Если надо удаляем выделенную часть (пересчет отключаем на время удаления)
             if (true !== bCopy)

@@ -754,7 +754,6 @@ CWordCollaborativeEditing.prototype.Undo = function()
 	}
 	editor.CoAuthoringApi.saveChanges(aSendingChanges, null, null);
 
-
 	this.private_RestoreDocumentState(DocState);
 
 	oLogicDocument.DrawingObjects.TurnOnCheckChartSelection();
