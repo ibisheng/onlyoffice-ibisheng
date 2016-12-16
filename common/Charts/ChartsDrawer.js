@@ -1881,7 +1881,7 @@ CChartsDrawer.prototype =
 			}
 			case AscDFH.historyitem_type_BubbleChart:
 			{
-				this.calcProp.type = c_oChartTypes.Scatter;
+				this.calcProp.type = c_oChartTypes.BubbleChart;
 				break;
 			}
 		}
@@ -10564,7 +10564,7 @@ drawBubbleChart.prototype =
 	
 	recalculate : function(chartsDrawer)
 	{
-		this.chartProp = chartProp.calcProp;
+		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		this.paths = {};
@@ -10574,7 +10574,7 @@ drawBubbleChart.prototype =
 	
 	draw : function(chartsDrawer)
     {
-		this.chartProp = chartProp.calcProp;
+		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		
