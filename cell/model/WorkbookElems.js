@@ -123,6 +123,9 @@ function shiftSort(a, b, offset)
 	}
 	return nRes;
 }
+function createRgbColor(r, g, b) {
+	return new RgbColor((r << 16) + (g << 8) + b);
+}
 var g_oRgbColorProperties = {
 		rgb : 0
 	};
@@ -365,7 +368,7 @@ function CorrectAscColor(asc_color)
 		}
 		default:
 		{
-			ret = new RgbColor((asc_color.asc_getR() << 16) + (asc_color.asc_getG() << 8) + asc_color.asc_getB());
+			ret = createRgbColor(asc_color.asc_getR(), asc_color.asc_getG(), asc_color.asc_getB());
 		}
 	}
 	return ret;
@@ -7795,6 +7798,7 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].map_themeExcel_to_themePresentation = map_themeExcel_to_themePresentation;
 	window['AscCommonExcel'].shiftGetBBox = shiftGetBBox;
 	window['AscCommonExcel'].RgbColor = RgbColor;
+	window['AscCommonExcel'].createRgbColor = createRgbColor;
 	window['AscCommonExcel'].ThemeColor = ThemeColor;
 	window['AscCommonExcel'].CorrectAscColor = CorrectAscColor;
 	window['AscCommonExcel'].Fragment = Fragment;

@@ -104,16 +104,6 @@
 	}
 
 	/**
-	 * Class representing RGB color
-	 * @constructor
-	 */
-	function ApiRGBColor(r, g, b) {
-		ApiRGBColor.superclass.constructor.call(this, new Asc.asc_CColor(r, g, b));
-	}
-
-	AscCommon.extendClass(ApiRGBColor, ApiColor);
-
-	/**
 	 * Returns an object that represents the active sheet
 	 * @memberof Api
 	 * @returns {ApiWorksheet}
@@ -133,10 +123,10 @@
 	 * @param {byte} r
 	 * @param {byte} g
 	 * @param {byte} b
-	 * @returns {ApiRGBColor}
+	 * @returns {ApiColor}
 	 */
-	Api.prototype.CreateRGBColor = function (r, g, b) {
-		return new ApiRGBColor(r, g, b);
+	Api.prototype.CreateColorFromRGB = function (r, g, b) {
+		return new ApiColor(AscCommonExcel.createRgbColor(r, g, b));
 	};
 
 	/**
@@ -891,7 +881,7 @@
 
 	Api.prototype["GetActiveSheet"] = Api.prototype.GetActiveSheet;
 	Api.prototype["CreateNewHistoryPoint"] = Api.prototype.CreateNewHistoryPoint;
-	Api.prototype["CreateRGBColor"] = Api.prototype.CreateRGBColor;
+	Api.prototype["CreateColorFromRGB"] = Api.prototype.CreateColorFromRGB;
 
 	ApiWorksheet.prototype["GetActiveCell"] = ApiWorksheet.prototype.GetActiveCell;
 	ApiWorksheet.prototype["SetName"] = ApiWorksheet.prototype.SetName;

@@ -856,6 +856,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_CColor() {
 		this.type = c_oAscColor.COLOR_TYPE_SRGB;
 		this.value = null;
@@ -886,7 +887,7 @@
 	}
 
 	asc_CColor.prototype = {
-		asc_getR: function () {
+		constructor: asc_CColor, asc_getR: function () {
 			return this.r
 		}, asc_putR: function (v) {
 			this.r = v;
