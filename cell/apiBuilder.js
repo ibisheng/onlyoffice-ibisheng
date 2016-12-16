@@ -453,7 +453,7 @@
 	 * @param {ApiColor} color
 	 */
 	ApiRange.prototype.SetFontColor = function (color) {
-		this.range.setFontcolor(AscCommonExcel.CorrectAscColor(color.color));
+		this.range.setFontcolor(color.color);
 	};
 
 	/**
@@ -581,7 +581,7 @@
 	 * @param {ApiColor} color
 	 */
 	ApiRange.prototype.SetFillColor = function (color) {
-		this.range.setFill(AscCommonExcel.CorrectAscColor(color.color));
+		this.range.setFill(color.color);
 	};
 
 	/**
@@ -1001,7 +1001,7 @@
 		}
 
 		if (color) {
-			border.c = AscCommonExcel.CorrectAscColor(color);
+			border.c = color.color;
 		}
 		return border;
 	}
