@@ -962,9 +962,6 @@
 				
 				if (undoData.clone) {
 					cloneData = undoData.clone(null);
-					if (cloneData.buildDependencies) {
-						cloneData.buildDependencies();
-					}
 				} else
 					cloneData = undoData;
 					
@@ -986,10 +983,7 @@
 				{
 					if(cloneData.TableStyleInfo)
 					{
-						if(!worksheet.TableParts)
-							worksheet.TableParts = [];
-						worksheet.TableParts[worksheet.TableParts.length] = cloneData;
-						worksheet.workbook.dependencyFormulas.addTableName(worksheet, cloneData);
+						worksheet.addTablePart(cloneData ,true);
 						this._setColorStyleTable(cloneData.Ref, cloneData, null, true);
 					}
 					else
@@ -1005,7 +999,7 @@
 						{
 							if(cloneData.newFilterRef && cloneData.oldFilter && cloneData.oldFilter.DisplayName === worksheet.TableParts[l].DisplayName)
 							{
-								worksheet.TableParts[l] = cloneData.oldFilter.clone(null);
+								worksheet.changeTablePart(l, cloneData.oldFilter.clone(null), false);
 
 								//чистим стиль от старой таблицы
 								var clearRange = new AscCommonExcel.Range(worksheet, cloneData.newFilterRef.r1, cloneData.newFilterRef.c1, cloneData.newFilterRef.r2, cloneData.newFilterRef.c2);
@@ -1031,9 +1025,8 @@
 					for(var l = 0; l < worksheet.TableParts.length; l++)
 					{
 						if(oldName === worksheet.TableParts[l].DisplayName)
-						{							
-							worksheet.TableParts[l] = cloneData.oldFilter.clone(null);
-							worksheet.workbook.dependencyFormulas.changeTableName(oldName, worksheet.TableParts[l].DisplayName);
+						{
+							worksheet.changeTablePart(l, cloneData.oldFilter.clone(null), true);
 							break;
 						}
 					}
@@ -1048,7 +1041,7 @@
 						{
 							if(cloneData.oldFilter.DisplayName === worksheet.TableParts[l].DisplayName)
 							{
-								worksheet.TableParts[l] = cloneData.oldFilter.clone(null);
+								worksheet.changeTablePart(l, cloneData.oldFilter.clone(null), false);
 								break;
 							}	
 						}
@@ -1064,7 +1057,7 @@
 							//если передавать в redo displaName -> конфликт при совместном ред.(1- ый добавляет ф/т + undo, 2-ой добавляет ф/т, первый делает redo->2 одинаковых имени)
 							if(cloneData.Ref.isEqual(worksheet.TableParts[l].Ref))
 							{
-								worksheet.TableParts[l] = cloneData.clone(null);
+								worksheet.changeTablePart(l, cloneData.clone(null), false);
 								this._setColorStyleTable(cloneData.Ref, cloneData, null, true);
 								break;
 							}	
@@ -1089,7 +1082,7 @@
 							{
 								if(cloneData.Ref.isEqual(worksheet.TableParts[l].Ref))
 								{
-									worksheet.TableParts[l] = cloneData;
+									worksheet.changeTablePart(l, cloneData, false);
 									if(cloneData.AutoFilter && cloneData.AutoFilter.FilterColumns)
 										this._reDrawCurrentFilter(cloneData.AutoFilter.FilterColumns, worksheet.TableParts[l]);
 									else
@@ -1109,10 +1102,7 @@
 						{
 							if(cloneData.TableStyleInfo)
 							{
-								if(!worksheet.TableParts)
-									worksheet.TableParts = [];
-								worksheet.TableParts[worksheet.TableParts.length] = cloneData;
-                                worksheet.workbook.dependencyFormulas.addTableName(worksheet, cloneData);
+								worksheet.addTablePart.push(cloneData);
 								this._setColorStyleTable(cloneData.Ref, cloneData, null, true);
 							}
 							else
@@ -1133,11 +1123,7 @@
 							if(cloneData.Ref.isEqual(worksheet.TableParts[l].Ref))
 							{
 								this._cleanStyleTable(cloneData.Ref);
-                                worksheet.workbook.dependencyFormulas.delTableName(worksheet.TableParts[l].DisplayName);
-                                var deleted = worksheet.TableParts.splice(l,1);
-								for (var delIndex = 0; delIndex < deleted.length; ++delIndex) {
-									deleted[delIndex].removeDependencies();
-								}
+								worksheet.deleteTablePart(l);
 							}	
 						}
 					}
@@ -1198,6 +1184,7 @@
 				
 				var changeFilter = function(filter, isTablePart)
 				{
+					var bRes = false;
 					var oldFilter = filter.clone(null);
 					var oRange = AscCommonExcel.Range.prototype.createFromBBox(worksheet, oldFilter.Ref);
 
@@ -1220,11 +1207,9 @@
                         }
 						else
 							t._addHistoryObj(oldFilter, AscCH.historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, oldFilter.Ref);
-						
-						if(isTablePart)
-							worksheet.workbook.dependencyFormulas.delTableName(oldFilter.DisplayName)
-					} else
-						return filter;
+						bRes = true;
+					}
+					return bRes;
 				};
 				
 				if(worksheet.AutoFilter)
@@ -1233,19 +1218,13 @@
 				}
 				if(worksheet.TableParts)
 				{
-					var newTableParts = [];
-					for(var i = 0; i < worksheet.TableParts.length; i++)
+					for (var i = worksheet.TableParts.length - 1; i >= 0; i--)
 					{
 						var tablePart = worksheet.TableParts[i];
-						var filter = changeFilter(tablePart, true);
-						if(filter){
-							newTableParts.push(filter);
-						} else {
-							tablePart.removeDependencies();
+						if (!changeFilter(tablePart, true)) {
+							worksheet.deleteTablePart(i);
 						}
-
 					}
-					worksheet.TableParts = newTableParts;
 				}
 				
 				t._setStyleTablePartsAfterOpenRows(activeCells);
@@ -3072,7 +3051,7 @@
 						}
 						
 						var oldLabel = tableColumn.TotalsRowLabel;
-						var oldFormula = tableColumn.TotalsRowFormula ? tableColumn.TotalsRowFormula.Formula : null;
+						var oldFormula = tableColumn.getTotalsRowFormula();
 						
 						if(null !== formula)
 						{
@@ -3616,8 +3595,6 @@
 				}
 				else
 				{	
-					if(!worksheet.TableParts)
-						worksheet.TableParts = [];
 					//ref = Asc.g_oRangeCache.getAscRange(val[0].id + ':' + val[val.length - 1].idNext).clone();
 					
 					newFilter = worksheet.createTablePart();
@@ -3651,8 +3628,7 @@
 					}
 					
 					newFilter.DisplayName = newTableName;
-					worksheet.workbook.dependencyFormulas.addTableName(worksheet, newFilter);
-					
+
 					var tableColumns;
 					if(tablePart && tablePart.TableColumns)
 					{
@@ -3668,7 +3644,7 @@
 					}
 					
 					newFilter.TableColumns = tableColumns;
-					worksheet.TableParts[worksheet.TableParts.length] = newFilter;
+					worksheet.addTablePart(newFilter, true);
 					//TODO возможно дублируется при всавке(ф-ия _pasteFromBinary) - пересмотреть
 					if (tablePart) {
 						var renameParams = {};

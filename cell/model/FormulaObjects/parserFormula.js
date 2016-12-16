@@ -3756,7 +3756,6 @@ function parserFormula( formula, parent, _ws ) {
     this.parenthesesNotEnough = false;
     this.f = [];
     this.reRowCol = /^(ROW|ROWS|COLUMN|COLUMNS)$/gi
-    this.regSpace = /\$/g;
     this.countRef = 0;
 
 	this.listenerId = lastListenerId++;
@@ -3764,6 +3763,7 @@ function parserFormula( formula, parent, _ws ) {
 	this.isDirty = false;
 	this.isCalculate = false;
 	this.isTable = false;
+	this.isInDependencies = false;
 	this.parent = parent;
 }
   parserFormula.prototype.getWs = function() {
@@ -3881,7 +3881,9 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
   oRes.isParsed = this.isParsed;
   return oRes;
 };
-
+	parserFormula.prototype.getFormula = function() {
+		return this.Formula;
+	}
 parserFormula.prototype.setFormula = function(formula) {
   this.Formula = formula;
   this.is3D = false;
@@ -5100,7 +5102,10 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
   }
 };
 	parserFormula.prototype.buildDependencies = function() {
-
+		if (this.isInDependencies) {
+			return;
+		}
+		this.isInDependencies = true;
 		var ref, wsR;
 		var isTable = this.isTable;
 		var bbox;
@@ -5160,6 +5165,10 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
 		}
 	};
 	parserFormula.prototype.removeDependencies = function() {
+		if (!this.isInDependencies) {
+			return;
+		}
+		this.isInDependencies = false;
 		var ref;
 		var wsR;
 		var isTable = this.isTable;

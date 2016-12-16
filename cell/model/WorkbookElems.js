@@ -5673,7 +5673,7 @@ function TablePart(handlers) {
 	this.result = null;
 	this.handlers = handlers;
 }
-TablePart.prototype.clone = function(ws, tableName) {
+TablePart.prototype.clone = function() {
 	var i, res = new TablePart(this.handlers);
 	res.Ref = this.Ref ? this.Ref.clone() : null;
 	res.HeaderRowCount = this.HeaderRowCount;
@@ -5695,17 +5695,7 @@ TablePart.prototype.clone = function(ws, tableName) {
 		for (i = 0; i < this.result.length; ++i)
 			res.result.push(this.result[i].clone());
 	}
-	if(tableName)
-	{
-		res.DisplayName = tableName;
-	}
-	else
-	{
-		res.DisplayName = this.DisplayName;
-	}
-	
-	if(ws !== null)
-		res.recalc(ws, tableName);
+	res.DisplayName = this.DisplayName;
 	return res;
 };
 	TablePart.prototype.renameSheetCopy = function(ws, renameParams) {
@@ -5726,10 +5716,6 @@ TablePart.prototype.clone = function(ws, tableName) {
 			this.TableColumns[i].buildDependencies();
 		}
 	};
-TablePart.prototype.recalc = function(ws, tableName) {
-	this.DisplayName = ws.workbook.dependencyFormulas.getNextTableName();
-	ws.workbook.dependencyFormulas.addTableName(ws, this);
-};
 TablePart.prototype.moveRef = function(col, row) {
 	var ref = this.Ref.clone();
 	ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
@@ -6318,8 +6304,8 @@ function TableColumn() {
 		} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
 			if (eventData.isRebuild) {
 				var ws = this.TotalsRowFormula.ws;
-				this.TotalsRowFormula = null;//to prevent removeDependencies in _setTotalRowFormula
-				this._setTotalRowFormula(eventData.assemble, ws, true);
+				this.TotalsRowFormula = null;//to prevent removeDependencies in applyTotalRowFormula
+				this.applyTotalRowFormula(eventData.assemble, ws, true);
 			} else {
 				this.TotalsRowFormula.Formula = eventData.assemble;
 				this.TotalsRowFormula.buildDependencies();
@@ -6328,12 +6314,14 @@ function TableColumn() {
 	};
 	TableColumn.prototype.renameSheetCopy = function(ws, renameParams) {
 		if (this.TotalsRowFormula) {
+			this.buildDependencies();
 			this.TotalsRowFormula.renameSheetCopy(renameParams);
-			this._setTotalRowFormula(this.TotalsRowFormula.assemble(true), ws, true);
+			this.applyTotalRowFormula(this.TotalsRowFormula.assemble(true), ws, true);
 		}
 	};
 	TableColumn.prototype.buildDependencies = function() {
 		if (this.TotalsRowFormula) {
+			this.TotalsRowFormula.parse();
 			this.TotalsRowFormula.buildDependencies();
 		}
 	};
@@ -6349,7 +6337,7 @@ TableColumn.prototype.clone = function() {
 	res.TotalsRowFunction = this.TotalsRowFunction;
 
 	if (this.TotalsRowFormula) {
-		res._setTotalRowFormula(this.TotalsRowFormula.Formula, this.TotalsRowFormula.ws, false);
+		res.applyTotalRowFormula(this.TotalsRowFormula.Formula, this.TotalsRowFormula.ws, false);
 	}
 	if (this.dxf)
 		res.dxf = this.dxf.clone;
@@ -6395,9 +6383,7 @@ TableColumn.prototype.getTotalRowFormula = function(tablePart){
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionCustom:
 			{
-				if (this.TotalsRowFormula) {
-					res = this.TotalsRowFormula.Formula;
-				}
+				res = this.getTotalsRowFormula();
 				break;
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionMax:
@@ -6437,18 +6423,20 @@ TableColumn.prototype.getTotalRowFormula = function(tablePart){
 
 TableColumn.prototype.cleanTotalsData = function(){
 	this.CalculatedColumnFormula = null;
-	this._setTotalRowFormula(null, null, false);
+	this.applyTotalRowFormula(null, null, false);
 	this.TotalsRowFunction = null;
 	this.TotalsRowLabel = null;
 };
-
+	TableColumn.prototype.getTotalsRowFormula = function(){
+		return this.TotalsRowFormula ? this.TotalsRowFormula.getFormula() : null;
+	};
 TableColumn.prototype.setTotalsRowFormula = function(val, ws){
 	this.cleanTotalsData();
 	if("=" === val[0])
 	{
 		val = val.substring(1);
 	}
-	this._setTotalRowFormula(val, ws, true);
+	this.applyTotalRowFormula(val, ws, true);
 	this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
 };
 
@@ -6465,22 +6453,20 @@ TableColumn.prototype.checkTotalRowFormula = function(ws, tablePart){
 		
 		if(null !== totalRowFormula)
 		{
-			this._setTotalRowFormula(totalRowFormula, ws, true);
+			this.applyTotalRowFormula(totalRowFormula, ws, true);
 			this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
 		}
 	}
 };
-	TableColumn.prototype._setTotalRowFormula = function(val, opt_ws, opt_buildDep) {
-		if (this.TotalsRowFormula) {
-			this.TotalsRowFormula.removeDependencies();
-			this.TotalsRowFormula = null;
-		}
+	TableColumn.prototype.applyTotalRowFormula = function(val, opt_ws, opt_buildDep) {
+		this.removeDependencies();
 		if (val) {
 			this.TotalsRowFormula = new AscCommonExcel.parserFormula(val, this, opt_ws);
-			this.TotalsRowFormula.parse();
 			if (opt_buildDep) {
-				this.TotalsRowFormula.buildDependencies();
+				this.buildDependencies();
 			}
+		} else {
+			this.TotalsRowFormula = null;
 		}
 	};
 
