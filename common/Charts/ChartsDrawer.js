@@ -308,7 +308,35 @@ CChartsDrawer.prototype =
 		}
 	},
 	
-	
+	recalculateOnly3dProps: function()
+	{
+		this.cChartSpace = chartSpace;
+		this.calcProp = {};
+		
+		if(this._isSwitchCurrent3DChart(chartSpace))
+		{
+			standartMarginForCharts = 16;
+			this.nDimensionCount = 3;
+			
+			if(!chartSpace.bEmptySeries)
+			this._calculateProperties(chartSpace);
+		
+			if(this.calcProp.widthCanvas == undefined && this.calcProp.pxToMM == undefined)
+			{
+				this.calcProp.pathH = 1000000000;
+				this.calcProp.pathW = 1000000000;
+				this.calcProp.pxToMM = 1 / AscCommon.g_dKoef_pix_to_mm;
+				this.calcProp.widthCanvas = chartSpace.extX * this.calcProp.pxToMM;
+				this.calcProp.heightCanvas = chartSpace.extY * this.calcProp.pxToMM;
+			}
+			
+			if(!chartSpace.bEmptySeries)
+			{
+				if(this.nDimensionCount === 3)
+					this._calaculate3DProperties(chartSpace);
+			}
+		}
+	},
 	
 	//****positions text labels****
 	reCalculatePositionText : function(type, chartSpace, ser, val, bLayout)
