@@ -226,12 +226,7 @@ CChartSpace.prototype.getParentObjects = function()
     return parents;
 };
 CChartSpace.prototype.recalculateTransform = CShape.prototype.recalculateTransform;
-CChartSpace.prototype.recalculateChart = function()
-{
-    if(this.chartObj == null)
-        this.chartObj =  new AscFormat.CChartsDrawer();
-    this.chartObj.reCalculate(this);
-};
+
 CChartSpace.prototype.canResize = CShape.prototype.canResize;
 CChartSpace.prototype.canMove = CShape.prototype.canMove;
 CChartSpace.prototype.canRotate = function()
