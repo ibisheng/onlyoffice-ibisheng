@@ -5518,7 +5518,7 @@ Woorksheet.prototype._RecalculatedFunctions=function(cell,bad,setCellFormat){
             for ( var i = 0, length = c.formulaParsed.outStack.length; i < length; i++ ) {
                 elem = c.formulaParsed.outStack[i];
                 if ( elem instanceof AscCommonExcel.cRef || elem instanceof cRef3D || elem instanceof AscCommonExcel.cArea || elem instanceof cArea3D ) {
-                    var r = elem.getRange();
+                    var r = elem.getRanges();
                     if ( elem instanceof cArea3D && r.length > 0 )
                         r = r[0];
                     if ( r && r.getNumFormatStr ) {
