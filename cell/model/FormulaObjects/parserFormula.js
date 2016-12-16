@@ -1295,7 +1295,13 @@ cArea3D.prototype.getWS = function () {
 		return range ? range.getBBox0() : range;
 	};
 	cArea3D.prototype.isValid = function () {
-		return !!this.getRanges();
+		var r = this.getRanges();
+		for (var i = 0; i < r.length; ++i) {
+			if (!r) {
+				return false;
+			}
+		}
+		return true;
 	};
 	cArea3D.prototype.countCells = function () {
 		var _wsA = this.wsRange();
