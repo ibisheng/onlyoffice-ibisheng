@@ -11826,9 +11826,17 @@ Paragraph.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
         }
     }
 
+    // TODO: Как только разберемся с ParaEnd, исправить здесь.
+    if (Pos === this.Content.length - 1 && this.Content.length > 1)
+	{
+		Pos     = this.Content.length - 2;
+		_Flag   = -1;
+		_DocPos = null;
+	}
+
     this.CurPos.ContentPos = Pos;
     if (this.Content[Pos] && this.Content[Pos].Set_ContentPosition)
-    this.Content[Pos].Set_ContentPosition(_DocPos, Depth + 1, _Flag);
+    	this.Content[Pos].Set_ContentPosition(_DocPos, Depth + 1, _Flag);
     else
         this.Correct_ContentPos2();
 };

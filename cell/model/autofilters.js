@@ -848,7 +848,7 @@
 				
 				if(null === bIsInFilter)
 				{
-					if(activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2)//если ячейка выделенная одна
+					if(activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2 && !userRange)//если ячейка выделенная одна
 					{
 						addRange = this._getAdjacentCellsAF(activeCells);
 					}
@@ -878,7 +878,7 @@
 					
 					addRange.setAbs(true, true, true, true);
 					res.asc_setIsTitle(bIsTitle);
-					res.asc_setRange(range.getName());
+					res.asc_setRange(range.getAbsName());
 				}
 				
 				return res;
@@ -2568,7 +2568,7 @@
 						{
 							//если сверху пустая строка, то просто увеличиваем диапазон и меняем флаг
 							var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 - 1, tablePart.Ref.c2, tablePart.Ref.r1 - 1); 
-							if(this._isEmptyRange(rangeUpTable, 0) && this.searchRangeInTableParts(rangeUpTable) === -1)
+							if(rangeUpTable.r1 >= 0 && this._isEmptyRange(rangeUpTable, 0) && this.searchRangeInTableParts(rangeUpTable) === -1)
 							{
 								isSetValue = true;
 								
@@ -2670,17 +2670,18 @@
 					{
 						var table = worksheet.TableParts[i];
 						var intersection = range.intersection(table.Ref);
-						if(null !== intersection && intersection.r1 === table.Ref.r1 + 1 && intersection.r2 >= table.Ref.r2)
+						if(null !== intersection && intersection.r1 === table.Ref.r1 + 1)
 						{
-							range.r1++;
-							
-							if(emptyRange)
+							if(intersection.r2 >= table.Ref.r2 || (table.TotalsRowCount > 0 && intersection.r2 === table.Ref.r2 - 1))
 							{
-								var deleteRange = this.worksheet.getRange3(table.Ref.r1 + 1, range.c1, table.Ref.r1 + 1, range.c2);
-								deleteRange.cleanText()
+								range.r1++;
+								if(emptyRange)
+								{
+									var deleteRange = this.worksheet.getRange3(table.Ref.r1 + 1, table.Ref.c1, table.Ref.r1 + 1, table.Ref.c2);
+									deleteRange.cleanText()
+								}
+								break;
 							}
-							
-							break;
 						}
 					}
 				}
@@ -5090,18 +5091,23 @@
 			_getFilterInfoByAddTableProps: function(ar, addFormatTableOptionsObj)
 			{
 				var tempRange =  new Asc.Range(ar.c1, ar.r1, ar.c2, ar.r2);
-				var addNameColumn, filterRange;
+				var addNameColumn, filterRange, bIsManualOptions = false;
 
 				if(addFormatTableOptionsObj === false)
+				{
 					addNameColumn = true;
+				}
 				else if(addFormatTableOptionsObj && typeof addFormatTableOptionsObj == 'object')
 				{
 					tempRange = addFormatTableOptionsObj.asc_getRange();
 					addNameColumn = !addFormatTableOptionsObj.asc_getIsTitle();
 					tempRange = AscCommonExcel.g_oRangeCache.getAscRange(tempRange).clone();
+					bIsManualOptions = true;
 				}
 				else if(addFormatTableOptionsObj === true)
+				{
 					addNameColumn = false;
+				}
 
 				//expand range
 				var tablePartsContainsRange = this._isTablePartsContainsRange(tempRange);
@@ -5109,17 +5115,23 @@
 				{
 					filterRange = tablePartsContainsRange.Ref.clone();
 				}
-				else if(tempRange.isOneCell())
+				else if(tempRange.isOneCell() && !bIsManualOptions)
+				{
 					filterRange = this._getAdjacentCellsAF(tempRange, this.worksheet);
+				}
 				else
+				{
 					filterRange = tempRange;
+				}
 
 				var rangeWithoutDiff = filterRange.clone();
 				if(addNameColumn)
+				{
 					filterRange.r2 = filterRange.r2 + 1;
-					
+				}
+				
 				return {filterRange: filterRange, addNameColumn: addNameColumn, rangeWithoutDiff: rangeWithoutDiff, tablePartsContainsRange: tablePartsContainsRange};
-			}			
+			}
 		};
 
 		/*

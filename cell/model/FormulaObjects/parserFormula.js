@@ -949,14 +949,17 @@ cArea.prototype.clone = function (opt_ws) {
 cArea.prototype.getWsId = function () {
     return this.ws.Id;
 };
-	cArea.prototype.getValue = function () {
+	cArea.prototype.getValue = function (checkExclude, excludeHiddenRows) {
 		var val = [], r = this.getRange();
 		if (!r) {
 			val.push(new cError(cErrorType.bad_reference));
 		} else {
+			if (checkExclude && !excludeHiddenRows) {
+				excludeHiddenRows = this.ws.isApplyFilterBySheet();
+			}
 			r._foreachNoEmpty(function (cell) {
 				val.push(checkTypeCell(cell));
-			});
+			}, excludeHiddenRows);
 		}
 		return val;
 	};
@@ -970,6 +973,9 @@ cArea.prototype.getWsId = function () {
 		return res;
 	};
 cArea.prototype.getRange = function () {
+		if (!this.range) {
+			this.range = this.ws.getRange2(this._cells);
+		}
     return this.range;
 };
 cArea.prototype.tocNumber = function () {
@@ -1155,7 +1161,7 @@ cArea3D.prototype.getRange = function () {
 	cArea3D.prototype.getRanges = function () {
 		return (this.range(this.wsRange()));
 	};
-	cArea3D.prototype.getValue = function () {
+	cArea3D.prototype.getValue = function (checkExclude, excludeHiddenRows) {
 		var i, _wsA = this.wsRange();
 		var _val = [];
 		if (_wsA.length < 1) {
@@ -1169,15 +1175,19 @@ cArea3D.prototype.getRange = function () {
 			}
 
 		}
+		var _exclude;
 		var _r = this.range(_wsA);
 		for (i = 0; i < _r.length; i++) {
 			if (!_r[i]) {
 				_val.push(new cError(cErrorType.bad_reference));
 				return _val;
 			}
+			if (checkExclude && !(_exclude = excludeHiddenRows)) {
+				_exclude = _wsA[i].isApplyFilterBySheet();
+			}
 			_r[i]._foreachNoEmpty(function (cell) {
 				_val.push(checkTypeCell(cell));
-			});
+			}, _exclude);
 		}
 		return _val;
 	};
@@ -1340,16 +1350,16 @@ cArea3D.prototype.isValid = function () {
 		return this.wsFrom === this.wsTo;
 	};
 
-/** @constructor */
-function cRef( val, ws ) {/*Ref means A1 for example*/
-    this.constructor.call( this, val, cElementType.cell );
+	/** @constructor */
+	function cRef(val, ws) {/*Ref means A1 for example*/
+		this.constructor.call(this, val, cElementType.cell);
 
-    this.ws = ws;
-	this.range = null;
-	if (val) {
-		this.range = ws.getRange2(val.replace(AscCommon.rx_space_g, ""));
+		this.ws = ws;
+		this.range = null;
+		if (val) {
+			this.range = ws.getRange2(val.replace(AscCommon.rx_space_g, ""));
+		}
 	}
-}
 
 cRef.prototype = Object.create( cBaseType.prototype );
 cRef.prototype.clone = function (opt_ws) {
@@ -1399,18 +1409,22 @@ cRef.prototype.getMatrix = function () {
 cRef.prototype.getBBox0 = function () {
     return this.getRange().getBBox0();
 };
+	cRef.prototype.isHidden = function (excludeHiddenRows) {
+		if (!excludeHiddenRows) {
+			excludeHiddenRows = this.ws.isApplyFilterBySheet();
+		}
+		return excludeHiddenRows && this._valid && this.ws.getRowHidden(this.getRange().r1);
+	};
 
 /** @constructor */
 function cRef3D( val, _wsFrom, wb ) {/*Ref means Sheat1!A1 for example*/
     this.constructor.call( this, val, cElementType.cell3D );
-	this.ws = null;
-	if (_wsFrom) {
-		this.ws = wb.getWorksheetByName(_wsFrom);
-	}
-	this.range = null;
-	if (val && this.ws) {
-		this.range = this.ws.getRange2(val);
-	}
+
+		this.ws = null;
+		this.range = null;
+		if (val && this.ws) {
+			this.range = this.ws.getRange2(val);
+		}
 }
 
 cRef3D.prototype = Object.create( cBaseType.prototype );
@@ -1433,9 +1447,16 @@ cRef3D.prototype.clone = function (opt_ws) {
 cRef3D.prototype.getWsId = function () {
     return this.ws.Id;
 };
-cRef3D.prototype.getRange = function () {
-	return this.range;
-};
+	cRef3D.prototype.getRange = function () {
+		if (this.ws) {
+			if (this.range) {
+				return this.range;
+			}
+			return this.range = this.ws.getRange2(this._cells);
+		} else {
+			return this.range = null;
+		}
+	};
 cRef3D.prototype.isValid = function () {
     return !!this.getRange();
 };
@@ -1473,6 +1494,13 @@ cRef3D.prototype.getBBox0 = function () {
     }
     return null;
 };
+	cRef3D.prototype.isHidden = function (excludeHiddenRows) {
+		if (!excludeHiddenRows) {
+			excludeHiddenRows = this.ws.isApplyFilterBySheet();
+		}
+		var _r = this.getRange();
+		return excludeHiddenRows && _r && this.ws.getRowHidden(_r.r1);
+	};
 
 /** @constructor */
 function cEmpty() {

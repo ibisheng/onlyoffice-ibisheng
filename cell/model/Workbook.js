@@ -2958,17 +2958,31 @@
 	Woorksheet.prototype.getSheetViewSettings = function () {
 		return this.sheetViews[0].clone();
 	};
-	Woorksheet.prototype.setSheetViewSettings = function (options) {
-		var current = this.getSheetViewSettings();
-		if (current.isEqual(options))
-			return;
+	Woorksheet.prototype.setDisplayGridlines = function (value) {
+		var view = this.sheetViews[0];
+		if (value !== view.showGridLines) {
+			History.Create_NewPoint();
+			History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_SetDisplayGridlines,
+				this.getId(), null, new UndoRedoData_FromTo(view.showGridLines, value));
+			view.showGridLines = value;
 
-		History.Create_NewPoint();
-		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_SetViewSettings, this.getId(), null, new UndoRedoData_FromTo(current, options.clone()));
+			if (!this.workbook.bUndoChanges && !this.workbook.bRedoChanges) {
+				this.workbook.handlers.trigger("asc_onUpdateSheetViewSettings");
+			}
+		}
+	};
+	Woorksheet.prototype.setDisplayHeadings = function (value) {
+		var view = this.sheetViews[0];
+		if (value !== view.showRowColHeaders) {
+			History.Create_NewPoint();
+			History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_SetDisplayHeadings,
+				this.getId(), null, new UndoRedoData_FromTo(view.showRowColHeaders, value));
+			view.showRowColHeaders = value;
 
-		this.sheetViews[0].setSettings(options);
-		if (!this.workbook.bUndoChanges && !this.workbook.bRedoChanges)
-			this.workbook.handlers.trigger("asc_onUpdateSheetViewSettings");
+			if (!this.workbook.bUndoChanges && !this.workbook.bRedoChanges) {
+				this.workbook.handlers.trigger("asc_onUpdateSheetViewSettings");
+			}
+		}
 	};
 	Woorksheet.prototype.getRowsCount=function(){
 		var result = this.nRowsCount;
@@ -4290,6 +4304,28 @@
 		}
 		return res;
 	};
+Woorksheet.prototype.isApplyFilterBySheet = function(){
+	var res = false;
+	
+	if(this.AutoFilter && this.AutoFilter.isApplyAutoFilter())
+	{
+		res = true;
+	}
+	
+	if(false === res && this.TableParts)
+	{
+		for(var i = 0; i < this.TableParts.length; i++)
+		{
+			if(true === this.TableParts[i].isApplyAutoFilter())
+			{
+				res = true;
+				break;
+			}
+		}
+	}
+	
+	return res;
+};
 	Woorksheet.prototype.getTableNames = function() {
 		var res = [];
 		if (this.TableParts) {
@@ -5262,11 +5298,14 @@
 			}
 		}
 	};
-	Range.prototype._foreachNoEmpty=function(action){
+Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 		if(null != action)
 		{
 			var oBBox = this.bbox, minC = Math.min( this.worksheet.getColsCount(), oBBox.c2 ), minR = Math.min( this.worksheet.getRowsCount(), oBBox.r2 );
 			for(var i = oBBox.r1; i <= minR; i++){
+			if (excludeHiddenRows && this.worksheet.getRowHidden(i)) {
+				continue;
+			}
 				for(var j = oBBox.c1; j <= minC; j++){
 					var oCurCell = this.worksheet._getCellNoEmpty(i, j);
 					if(null != oCurCell)

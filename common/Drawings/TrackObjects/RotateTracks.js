@@ -633,7 +633,7 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
 
         var pxToMM = this.chartSpace.chartObj.calcProp.pxToMM;
         var oChSz = this.chartSizes;
-        this.centerPoint = this.processor3D.convertAndTurnPoint((oChSz.startX + oChSz.w/2)*pxToMM, (oChSz.startY + oChSz.h/2)*pxToMM, this.depthPerspective/2);
+        //this.centerPoint = this.processor3D.convertAndTurnPoint((oChSz.startX + oChSz.w/2)*pxToMM, (oChSz.startY + oChSz.h/2)*pxToMM, this.depthPerspective/2);
     }, this, []);
 
 
@@ -646,13 +646,13 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
         var dOldAlpha = null;
         var oGraphics = overlay.Graphics ? overlay.Graphics : overlay;
         if(AscFormat.isRealNumber(oGraphics.globalAlpha) && oGraphics.put_GlobalAlpha){
-            dOldAlpha = oGraphics.globalAlpha;
-            oGraphics.put_GlobalAlpha(false, 1);
-        }
-        this.objectToDraw.draw(overlay, transform);
-        this.objectToDraw2.draw(overlay, transform);
-        if(AscFormat.isRealNumber(dOldAlpha) && oGraphics.put_GlobalAlpha){
-            oGraphics.put_GlobalAlpha(true, dOldAlpha);
+
+            var graphics = oGraphics;
+            graphics.SaveGrState();
+            graphics.SetIntegerGrid(false);
+            graphics.transform3(oChartSpace.transform, false);
+            oChartSpace.chartObj.draw(oChartSpace, graphics);
+            graphics.RestoreGrState();
         }
     };
 
@@ -712,7 +712,7 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
     this.getBounds = function()
     {
         var boundsChecker = new  AscFormat.CSlideBoundsChecker();
-        this.draw(boundsChecker);
+        //this.draw(boundsChecker);
         var tr = this.transform;
         var arr_p_x = [];
         var arr_p_y = [];
@@ -775,6 +775,14 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
             this.view3D.rotX = 90;
         }
 
+        var OldView = oChartSpace.chart.view3D;
+
+        oChartSpace.chart.view3D = this.view3D;
+        oChartSpace.recalcInfo.recalculateChart = true;
+        oChartSpace.recalculate();
+        oChartSpace.chart.view3D = OldView;
+        return;
+
         this.processor3D.angleOx = this.view3D && this.view3D.rotX ? (- this.view3D.rotX / 360) * (Math.PI * 2) : 0;
         this.processor3D.angleOy = this.view3D && this.view3D.rotY ? (- this.view3D.rotY / 360) * (Math.PI * 2) : 0;
         this.processor3D.angleOz = 0;
@@ -783,7 +791,7 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
     //    this.processor3D.calaculate3DProperties();
         //this.processor3D.view3D = oChartSpace.chart.view3D;
 
-        this.calculateGeometry();
+        //this.calculateGeometry();
     };
 
     this.trackEnd = function()

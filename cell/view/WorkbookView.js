@@ -1500,8 +1500,8 @@
       return this.af_getTablePictures(this.model, this.fmgrGraphics, this.m_oFont, props);
   };
 
-  WorkbookView.prototype.getCellStyles = function() {
-    var oStylesPainter = new asc_CSP();
+  WorkbookView.prototype.getCellStyles = function(width, height) {
+    var oStylesPainter = new asc_CSP(width, height);
     oStylesPainter.generateStylesAll(this.model.CellStyles, this.fmgrGraphics, this.m_oFont, this.stringRender);
     return oStylesPainter;
   };

@@ -1374,8 +1374,11 @@
 
 				AscCommon.sendImgUrls(api, oObjectsForDownload.aUrls, function (data) {
 					var oImageMap = {};
+					
+					History.TurnOff();
 					AscCommon.ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
-
+					History.TurnOn();
+					
 					callback();
 				}, true);
 			},

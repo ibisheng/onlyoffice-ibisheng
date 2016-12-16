@@ -73,71 +73,72 @@ AscCommon.extendClass(CChangesDocumentAddItem, AscDFH.CChangesBaseContentChange)
 CChangesDocumentAddItem.prototype.Type = AscDFH.historyitem_Document_AddItem;
 CChangesDocumentAddItem.prototype.Undo = function()
 {
-	var Pos = this.Pos;
-
 	var oDocument = this.Class;
-	var Elements  = oDocument.Content.splice(Pos, 1);
-	oDocument.private_RecalculateNumbering(Elements);
-	if(oDocument.SectionsInfo)
+	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
 	{
-        oDocument.SectionsInfo.Update_OnRemove(Pos, 1);
-	}
-
-
-	if (Pos > 0)
-	{
-		if (Pos <= oDocument.Content.length - 1)
+		var Pos = true !== this.UseArray ? this.Pos : this.PosArray[nIndex];
+		var Elements = oDocument.Content.splice(Pos, 1);
+		oDocument.private_RecalculateNumbering(Elements);
+		if (oDocument.SectionsInfo)
 		{
-			oDocument.Content[Pos - 1].Next = oDocument.Content[Pos];
-			oDocument.Content[Pos].Prev     = oDocument.Content[Pos - 1];
+			oDocument.SectionsInfo.Update_OnRemove(Pos, 1);
 		}
-		else
+
+		if (Pos > 0)
 		{
-			oDocument.Content[Pos - 1].Next = null;
+			if (Pos <= oDocument.Content.length - 1)
+			{
+				oDocument.Content[Pos - 1].Next = oDocument.Content[Pos];
+				oDocument.Content[Pos].Prev     = oDocument.Content[Pos - 1];
+			}
+			else
+			{
+				oDocument.Content[Pos - 1].Next = null;
+			}
 		}
-	}
-	else if (Pos <= oDocument.Content.length - 1)
-	{
-		oDocument.Content[Pos].Prev = null;
+		else if (Pos <= oDocument.Content.length - 1)
+		{
+			oDocument.Content[Pos].Prev = null;
+		}
 	}
 };
 CChangesDocumentAddItem.prototype.Redo = function()
 {
-	if (this.Items.length <= 0)
-		return;
-
-	var Element = this.Items[0];
-	var Pos     = this.Pos;
-
 	var oDocument = this.Class;
-	oDocument.Content.splice(Pos, 0, Element);
-	oDocument.private_RecalculateNumbering([Element]);
-	if(oDocument.SectionsInfo)
+	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
 	{
-        oDocument.SectionsInfo.Update_OnAdd(Pos, [Element]);
-	}
+		var Element = this.Items[nIndex];
+		var Pos     = true !== this.UseArray ? this.Pos + nIndex : this.PosArray[nIndex];
 
-	if (Pos > 0)
-	{
-		oDocument.Content[Pos - 1].Next = Element;
-		Element.Prev                    = oDocument.Content[Pos - 1];
-	}
-	else
-	{
-		Element.Prev = null;
-	}
+		oDocument.Content.splice(Pos, 0, Element);
+		oDocument.private_RecalculateNumbering([Element]);
+		if (oDocument.SectionsInfo)
+		{
+			oDocument.SectionsInfo.Update_OnAdd(Pos, [Element]);
+		}
 
-	if (Pos < oDocument.Content.length - 1)
-	{
-		oDocument.Content[Pos + 1].Prev = Element;
-		Element.Next                    = oDocument.Content[Pos + 1];
-	}
-	else
-	{
-		Element.Next = null;
-	}
+		if (Pos > 0)
+		{
+			oDocument.Content[Pos - 1].Next = Element;
+			Element.Prev                    = oDocument.Content[Pos - 1];
+		}
+		else
+		{
+			Element.Prev = null;
+		}
 
-	Element.Parent = oDocument;
+		if (Pos < oDocument.Content.length - 1)
+		{
+			oDocument.Content[Pos + 1].Prev = Element;
+			Element.Next                    = oDocument.Content[Pos + 1];
+		}
+		else
+		{
+			Element.Next = null;
+		}
+
+		Element.Parent = oDocument;
+	}
 };
 CChangesDocumentAddItem.prototype.private_WriteItem = function(Writer, Item)
 {
@@ -149,49 +150,48 @@ CChangesDocumentAddItem.prototype.private_ReadItem = function(Reader)
 };
 CChangesDocumentAddItem.prototype.Load = function(Color)
 {
-	if (this.Items.length <= 0 || this.PosArray.length <= 0)
-		return;
-
 	var oDocument = this.Class;
-
-	var Pos     = oDocument.m_oContentChanges.Check(AscCommon.contentchanges_Add, this.PosArray[0]);
-	var Element = this.Items[0];
-
-	Pos = Math.min(Pos, oDocument.Content.length);
-
-	if (null != Element)
+	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
 	{
-		if (Pos > 0)
-		{
-			oDocument.Content[Pos - 1].Next = Element;
-			Element.Prev                    = oDocument.Content[Pos - 1];
-		}
-		else
-		{
-			Element.Prev = null;
-		}
+		var Pos     = oDocument.m_oContentChanges.Check(AscCommon.contentchanges_Add, true !== this.UseArray ? this.Pos + nIndex : this.PosArray[nIndex]);
+		var Element = this.Items[nIndex];
 
-		if (Pos <= oDocument.Content.length - 1)
-		{
-			oDocument.Content[Pos].Prev = Element;
-			Element.Next                = oDocument.Content[Pos];
-		}
-		else
-		{
-			Element.Next = null;
-		}
+		Pos = Math.min(Pos, oDocument.Content.length);
 
-		Element.Parent = oDocument;
-
-		oDocument.Content.splice(Pos, 0, Element);
-		oDocument.private_RecalculateNumbering([Element]);
-		if(oDocument.SectionsInfo)
+		if (null != Element)
 		{
-            oDocument.SectionsInfo.Update_OnAdd(Pos, [Element]);
-		}
-		oDocument.private_ReindexContent(Pos);
+			if (Pos > 0)
+			{
+				oDocument.Content[Pos - 1].Next = Element;
+				Element.Prev                    = oDocument.Content[Pos - 1];
+			}
+			else
+			{
+				Element.Prev = null;
+			}
 
-		AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(oDocument, Pos);
+			if (Pos <= oDocument.Content.length - 1)
+			{
+				oDocument.Content[Pos].Prev = Element;
+				Element.Next                = oDocument.Content[Pos];
+			}
+			else
+			{
+				Element.Next = null;
+			}
+
+			Element.Parent = oDocument;
+
+			oDocument.Content.splice(Pos, 0, Element);
+			oDocument.private_RecalculateNumbering([Element]);
+			if (oDocument.SectionsInfo)
+			{
+				oDocument.SectionsInfo.Update_OnAdd(Pos, [Element]);
+			}
+			oDocument.private_ReindexContent(Pos);
+
+			AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(oDocument, Pos);
+		}
 	}
 };
 CChangesDocumentAddItem.prototype.IsRelated = function(oChanges)
@@ -291,7 +291,7 @@ CChangesDocumentRemoveItem.prototype.Load = function(Color)
 	var oDocument = this.Class;
 	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
 	{
-		var Pos = oDocument.m_oContentChanges.Check(AscCommon.contentchanges_Remove, this.PosArray[nIndex]);
+		var Pos = oDocument.m_oContentChanges.Check(AscCommon.contentchanges_Remove, true !== this.UseArray ? this.Pos : this.PosArray[nIndex]);
 
 		// действие совпало, не делаем его
 		if (false === Pos)

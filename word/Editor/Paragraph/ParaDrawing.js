@@ -1300,16 +1300,10 @@ ParaDrawing.prototype.OnEnd_MoveInline = function(NearPos)
 
 	var RunPr = this.Remove_FromDocument(false);
 
-	if (this.LogicDocument && this.DocumentContent && true === this.LogicDocument.Is_TrackRevisions())
-	{
-		var NewParaDrawing = this.Copy();
-		NewParaDrawing.Add_ToDocument(NearPos, true, RunPr);
-		this.DocumentContent.Select_DrawingObject(NewParaDrawing.Get_Id());
-	}
-	else
-	{
-		this.Add_ToDocument(NearPos, true, RunPr);
-	}
+	// При переносе всегда создаем копию, чтобы в совместном редактировании не было проблем
+	var NewParaDrawing = this.Copy();
+	NewParaDrawing.Add_ToDocument(NearPos, true, RunPr);
+	this.DocumentContent.Select_DrawingObject(NewParaDrawing.Get_Id());
 };
 ParaDrawing.prototype.Get_ParentTextTransform = function()
 {

@@ -1711,10 +1711,10 @@
 
         var pageLeftField, pageRightField, pageTopField, pageBottomField;
         if (pageMargins instanceof asc_CPageMargins) {
-            pageLeftField = pageMargins.asc_getLeft();
-            pageRightField = pageMargins.asc_getRight();
-            pageTopField = pageMargins.asc_getTop();
-            pageBottomField = pageMargins.asc_getBottom();
+            pageLeftField = Math.max(pageMargins.asc_getLeft(), c_oAscPrintDefaultSettings.MinPageLeftField);
+            pageRightField = Math.max(pageMargins.asc_getRight(), c_oAscPrintDefaultSettings.MinPageRightField);
+            pageTopField = Math.max(pageMargins.asc_getTop(), c_oAscPrintDefaultSettings.MinPageTopField);
+            pageBottomField = Math.max(pageMargins.asc_getBottom(), c_oAscPrintDefaultSettings.MinPageBottomField);
         }
 
         if (null == pageGridLines) {
@@ -1759,10 +1759,11 @@
         } else {
             var pageWidthWithFields = pageWidth - pageLeftField - pageRightField;
             var pageHeightWithFields = pageHeight - pageTopField - pageBottomField;
-            var leftFieldInPt = pageLeftField / vector_koef;
-            var topFieldInPt = pageTopField / vector_koef;
-            var rightFieldInPt = pageRightField / vector_koef;
-            var bottomFieldInPt = pageBottomField / vector_koef;
+            // 1px offset for borders
+            var leftFieldInPt = pageLeftField / vector_koef + this.width_1px;
+            var topFieldInPt = pageTopField / vector_koef + this.height_1px;
+            var rightFieldInPt = pageRightField / vector_koef + this.width_1px;
+            var bottomFieldInPt = pageBottomField / vector_koef + this.height_1px;
 
             if (pageHeadings) {
                 // Рисуем заголовки, нужно чуть сдвинуться
@@ -1911,8 +1912,6 @@
         }
     };
     WorksheetView.prototype.drawForPrint = function(drawingCtx, printPagesData) {
-        var isAppBridge = (undefined != window['appBridge']);
-
         if (null === printPagesData) {
             // Напечатаем пустую страницу
             drawingCtx.BeginPage(c_oAscPrintDefaultSettings.PageWidth, c_oAscPrintDefaultSettings.PageHeight);
@@ -1921,10 +1920,6 @@
             drawingCtx.BeginPage(printPagesData.pageWidth, printPagesData.pageHeight);
             drawingCtx.AddClipRect(printPagesData.pageClipRectLeft, printPagesData.pageClipRectTop,
               printPagesData.pageClipRectWidth, printPagesData.pageClipRectHeight);
-
-            if (isAppBridge) {
-                window['appBridge']['dummyCommandUpdate']();
-            }
 
             var offsetCols = printPagesData.startOffsetPt;
             var range = printPagesData.pageRange;
@@ -1935,10 +1930,6 @@
             // Сменим visibleRange для прохождения проверок отрисовки
             this.visibleRange = range;
 
-            if (isAppBridge) {
-                window['appBridge']['dummyCommandUpdate']();
-            }
-
             // Нужно отрисовать заголовки
             if (printPagesData.pageHeadings) {
                 this._drawColumnHeaders(drawingCtx, range.c1, range.c2, /*style*/ undefined, offsetX,
@@ -1947,36 +1938,20 @@
                   printPagesData.leftFieldInPt - this.cellsLeft, offsetY);
             }
 
-            if (isAppBridge) {
-                window['appBridge']['dummyCommandUpdate']();
-            }
-
             // Рисуем сетку
             if (printPagesData.pageGridLines) {
                 this._drawGrid(drawingCtx, range, offsetX, offsetY, printPagesData.pageWidth / vector_koef,
                   printPagesData.pageHeight / vector_koef);
             }
 
-            if (isAppBridge) {
-                window['appBridge']['dummyCommandUpdate']();
-            }
-
             // Отрисовываем ячейки и бордеры
             this._drawCellsAndBorders(drawingCtx, range, offsetX, offsetY);
-
-            if (isAppBridge) {
-                window['appBridge']['dummyCommandUpdate']();
-            }
 
             var drawingPrintOptions = {
                 ctx: drawingCtx, printPagesData: printPagesData
             };
             this.objectRender.showDrawingObjectsEx(false, null, drawingPrintOptions);
             this.visibleRange = tmpVisibleRange;
-
-            if (isAppBridge) {
-                window['appBridge']['dummyCommandUpdate']();
-            }
 
             drawingCtx.RemoveClipRect();
             drawingCtx.EndPage();
@@ -8513,8 +8488,8 @@
                         res = new AscCommonExcel.Border();
                         // Diagonal
                         res.d = makeBorder(val[c_oAscBorderOptions.DiagD] || val[c_oAscBorderOptions.DiagU]);
-                        res.dd = val[c_oAscBorderOptions.DiagD] ? true : false;
-                        res.du = val[c_oAscBorderOptions.DiagU] ? true : false;
+                        res.dd = !!val[c_oAscBorderOptions.DiagD];
+                        res.du = !!val[c_oAscBorderOptions.DiagU];
                         // Vertical
                         res.l = makeBorder(val[c_oAscBorderOptions.Left]);
                         res.iv = makeBorder(val[c_oAscBorderOptions.InnerV]);
@@ -10085,7 +10060,11 @@
                 break;
             case "sheetViewSettings":
                 functionModelAction = function () {
-                    t.model.setSheetViewSettings(val);
+				    if (AscCH.historyitem_Worksheet_SetDisplayGridlines === val.type) {
+						t.model.setDisplayGridlines(val.value);
+                    } else {
+						t.model.setDisplayHeadings(val.value);
+                    }
 
                     isUpdateCols = true;
                     isUpdateRows = true;
@@ -11638,7 +11617,7 @@
                             //TODO просмотерть ситуации без заливки
                             var color = cell.getStyle();
                             var cellColor = null !== color && color.fill && color.fill.bg ? color.fill.bg : null;
-                            filter.filter.dxf.fill.bg = cellColor;
+                            filter.filter.dxf.fill.bg = null !== cellColor ? new AscCommonExcel.RgbColor(cellColor.rgb) : new AscCommonExcel.RgbColor(null);
                         }
                     }
                 }

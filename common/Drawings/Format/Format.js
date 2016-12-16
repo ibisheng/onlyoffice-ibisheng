@@ -12439,6 +12439,43 @@ function CorrectUniColor(asc_color, unicolor, flag)
         }
     }
 
+
+    function  builder_SetChartVertAxisOrientation(oChartSpace, bIsMinMax) {
+        if(oChartSpace){
+            var verAxis = oChartSpace.chart.plotArea.getVerticalAxis();
+            if(verAxis)
+            {
+                if(!verAxis.scaling)
+                    verAxis.setScaling(new CScaling());
+                var scaling = verAxis.scaling;
+                if(bIsMinMax){
+                    scaling.setOrientation(AscFormat.ORIENTATION_MIN_MAX);
+                }
+                else{
+                    scaling.setOrientation(AscFormat.ORIENTATION_MAX_MIN);
+                }
+            }
+        }
+    }
+
+
+    function builder_SetChartHorAxisOrientation(oChartSpace, bIsMinMax){
+        if(oChartSpace){
+            var horAxis = oChartSpace.chart.plotArea.getHorizontalAxis();
+            if(horAxis){
+                if(!horAxis.scaling)
+                    horAxis.setScaling(new CScaling());
+                var scaling = horAxis.scaling;
+                if(bIsMinMax){
+                    scaling.setOrientation(AscFormat.ORIENTATION_MIN_MAX);
+                }
+                else{
+                    scaling.setOrientation(AscFormat.ORIENTATION_MAX_MIN);
+                }
+            }
+        }
+    }
+
     function builder_SetChartLegendPos(oChartSpace, sLegendPos){
 
         if(oChartSpace && oChartSpace.chart)
@@ -12493,10 +12530,11 @@ function CorrectUniColor(asc_color, unicolor, flag)
         }
     }
 
-    function builder_SetShowDataLabels(oChartSpace, bShowSerName, bShowCatName, bShowVal){
+    function builder_SetShowDataLabels(oChartSpace, bShowSerName, bShowCatName, bShowVal, bShowPerecent){
         if(oChartSpace && oChartSpace.chart && oChartSpace.chart.plotArea && oChartSpace.chart.plotArea.charts[0]){
             var oChart = oChartSpace.chart.plotArea.charts[0];
-            if(false == bShowSerName && false == bShowCatName && false == bShowVal)
+            var bPieChart = oChart.getObjectType() === AscDFH.historyitem_type_PieChart || oChart.getObjectType() === AscDFH.historyitem_type_DoughnutChart;
+            if(false == bShowSerName && false == bShowCatName && false == bShowVal && (bPieChart && bShowPerecent === false))
             {
                 if(oChart.dLbls)
                 {
@@ -12512,7 +12550,10 @@ function CorrectUniColor(asc_color, unicolor, flag)
             oChart.dLbls.setShowCatName(true == bShowCatName);
             oChart.dLbls.setShowVal(true == bShowVal);
             oChart.dLbls.setShowLegendKey(false);
-            //oChart.dLbls.setShowPercent(false);
+            if(bPieChart){
+                oChart.dLbls.setShowPercent(true === bShowPerecent);
+            }
+
             oChart.dLbls.setShowBubbleSize(false);
         }
     }
@@ -12635,6 +12676,9 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].builder_SetChartVertAxisTitle = builder_SetChartVertAxisTitle;
     window['AscFormat'].builder_SetChartLegendPos = builder_SetChartLegendPos;
     window['AscFormat'].builder_SetShowDataLabels = builder_SetShowDataLabels;
+
+    window['AscFormat'].builder_SetChartVertAxisOrientation = builder_SetChartVertAxisOrientation;
+    window['AscFormat'].builder_SetChartHorAxisOrientation = builder_SetChartHorAxisOrientation;
 
     window['AscFormat'].Ax_Counter = Ax_Counter;
     window['AscFormat'].TYPE_TRACK = TYPE_TRACK;

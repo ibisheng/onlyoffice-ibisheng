@@ -125,9 +125,10 @@ var editor;
     this.isShapeImageChangeUrl = false;
     this.isTextArtChangeUrl = false;
 
-    //находится ли фокус в рабочей области редактора(используется для copy/paste в MAC)
-    // ToDo убрать, когда Гоша поправит clipboard.js
-    this.IsFocus = null;
+
+	  // Styles sizes
+      this.styleThumbnailWidth = 112;
+	  this.styleThumbnailHeight = 38;
 
     this.formulasList = null;	// Список всех формул
 
@@ -971,6 +972,11 @@ var editor;
     }
   };
 
+	spreadsheet_api.prototype.asc_setThumbnailStylesSizes = function (width, height) {
+		this.styleThumbnailWidth = width;
+		this.styleThumbnailHeight = height;
+	};
+
   // Посылает эвент о том, что обновились листы
   spreadsheet_api.prototype.sheetsChanged = function() {
     this.handlers.trigger("asc_onSheetsChanged");
@@ -1420,7 +1426,8 @@ var editor;
 			}
 
 			// Отправка стилей ячеек
-			this.handlers.trigger("asc_onInitEditorStyles", this.wb.getCellStyles());
+			this.handlers.trigger("asc_onInitEditorStyles",
+				this.wb.getCellStyles(this.styleThumbnailWidth, this.styleThumbnailHeight));
 		}
 	};
 
@@ -1995,8 +2002,6 @@ var editor;
     if (this.wb) {
       this.wb.enableKeyEventsHandler(isEnabled);
     }
-    //наличие фокуса в рабочей области редактора(используется для copy/paste в MAC)
-    this.IsFocus = isEnabled;
 
     if (isFromInput !== true && AscCommon.g_inputContext)
       AscCommon.g_inputContext.setInterfaceEnableKeyEvents(isEnabled);
@@ -2178,9 +2183,15 @@ var editor;
     return this.wb.getWorksheet().getSheetViewSettings();
   };
 
-  spreadsheet_api.prototype.asc_setSheetViewSettings = function(options) {
-    this.wb.getWorksheet().changeWorksheet("sheetViewSettings", options);
-  };
+	spreadsheet_api.prototype.asc_setDisplayGridlines = function (value) {
+		this.wb.getWorksheet()
+			.changeWorksheet("sheetViewSettings", {type: AscCH.historyitem_Worksheet_SetDisplayGridlines, value: value});
+	};
+
+	spreadsheet_api.prototype.asc_setDisplayHeadings = function (value) {
+		this.wb.getWorksheet()
+			.changeWorksheet("sheetViewSettings", {type: AscCH.historyitem_Worksheet_SetDisplayHeadings, value: value});
+	};
 
   // Images & Charts
 
@@ -3442,6 +3453,7 @@ var editor;
 
   prot["asc_SetDocumentPlaceChangedEnabled"] = prot.asc_SetDocumentPlaceChangedEnabled;
   prot["asc_SetFastCollaborative"] = prot.asc_SetFastCollaborative;
+	prot["asc_setThumbnailStylesSizes"] = prot.asc_setThumbnailStylesSizes;
 
   // Workbook interface
 
@@ -3495,7 +3507,8 @@ var editor;
   prot["asc_emptyCells"] = prot.asc_emptyCells;
   prot["asc_mergeCellsDataLost"] = prot.asc_mergeCellsDataLost;
   prot["asc_getSheetViewSettings"] = prot.asc_getSheetViewSettings;
-  prot["asc_setSheetViewSettings"] = prot.asc_setSheetViewSettings;
+	prot["asc_setDisplayGridlines"] = prot.asc_setDisplayGridlines;
+	prot["asc_setDisplayHeadings"] = prot.asc_setDisplayHeadings;
 
   // Defined Names
   prot["asc_getDefinedNames"] = prot.asc_getDefinedNames;

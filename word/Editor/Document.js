@@ -5499,7 +5499,7 @@ CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
                 Type      : changestype_2_ElementsArray_and_Type,
                 Elements  : [Para],
                 CheckType : changestype_Paragraph_Content
-            }))
+            }, true))
         {
             // Если надо удаляем выделенную часть (пересчет отключаем на время удаления)
             if (true !== bCopy)
@@ -8366,7 +8366,7 @@ CDocument.prototype.Document_Undo = function(Options)
 
 	if (true !== this.History.Can_Undo() && this.Api && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
 	{
-		if (this.CollaborativeEditing.CanUndo())
+		if (this.CollaborativeEditing.CanUndo() && true === this.Api.canSave)
 		{
 			this.CollaborativeEditing.Set_GlobalLock(true);
 			this.Api.asc_Save(true, true);

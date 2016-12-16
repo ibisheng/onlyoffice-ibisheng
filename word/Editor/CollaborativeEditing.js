@@ -48,6 +48,8 @@ function CWordCollaborativeEditing()
     this.m_aForeignCursorsXY     = {};
     this.m_aForeignCursorsToShow = {};
 
+    this.m_nAllChangesSavedIndex = 0;
+
     this.m_aAllChanges        = []; // Список всех изменений
 	this.m_aOwnChangesIndexes = []; // Список номеров своих изменений в общем списке, которые мы можем откатить
 
@@ -628,7 +630,7 @@ CWordCollaborativeEditing.prototype.private_AddOverallChange = function(oChange)
 	// Здесь мы должны смержить пришедшее изменение с одним из наших изменений
 	for (var nIndex = 0, nCount = this.m_oOwnChanges.length; nIndex < nCount; ++nIndex)
 	{
-		if (false === oChange.Merge(this.m_oOwnChanges[nIndex]))
+		if (oChange && oChange.Merge && false === oChange.Merge(this.m_oOwnChanges[nIndex]))
 			return false;
 	}
 
@@ -637,20 +639,27 @@ CWordCollaborativeEditing.prototype.private_AddOverallChange = function(oChange)
 };
 CWordCollaborativeEditing.prototype.private_OnSendOwnChanges = function(arrChanges, nDeleteIndex)
 {
-	this.m_aOwnChangesIndexes.push({
-		Position : this.m_aAllChanges.length,
-		Count    : arrChanges.length
-	});
-
-	this.m_aAllChanges = this.m_aAllChanges.concat(arrChanges);
-
-	// TODO: Пока nDeleteIndex не учитывается, исправить.
-
-	// TODO: Тут возможен случай, когда arrChanges пустой. Возможно необходимо убрать несколько последних записей
-	//       в массиве this.m_aOwnChangesIndexes
+	if (null !== nDeleteIndex)
+	{
+		this.m_aAllChanges.length = this.m_nAllChangesSavedIndex + nDeleteIndex;
+	}
+	else
+	{
+		this.m_nAllChangesSavedIndex = this.m_aAllChanges.length;
+	}
 
 	// TODO: Пока мы делаем это как одну точку, которую надо откатить. Надо пробежаться по массиву и разбить его
-	//       по отдельным действиям.
+	//       по отдельным действиям. В принципе, данная схема срабатывает в быстром совместном редактировании,
+	//       так что как правило две точки не успевают попасть в одно сохранение.
+	if (arrChanges.length > 0)
+	{
+		this.m_aOwnChangesIndexes.push({
+			Position : this.m_aAllChanges.length,
+			Count    : arrChanges.length
+		});
+
+		this.m_aAllChanges = this.m_aAllChanges.concat(arrChanges);
+	}
 };
 CWordCollaborativeEditing.prototype.Undo = function()
 {
@@ -717,18 +726,13 @@ CWordCollaborativeEditing.prototype.Undo = function()
 	oLogicDocument.DrawingDocument.EndTrackTable(null, true);
 	oLogicDocument.DrawingObjects.TurnOffCheckChartSelection();
 
+	var DocState = this.private_SaveDocumentState();
+
 	for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
 	{
 		arrReverseChanges[nIndex].Load();
 		this.m_aAllChanges.push(arrReverseChanges[nIndex]);
 	}
-
-	oLogicDocument.DrawingObjects.TurnOnCheckChartSelection();
-	oLogicDocument.Recalculate(false, false, AscCommon.History.Get_RecalcData(null, arrReverseChanges));
-
-	oLogicDocument.Document_UpdateSelectionState();
-	oLogicDocument.Document_UpdateInterfaceState();
-	oLogicDocument.Document_UpdateRulersState();
 
 	var oBinaryWriter = History.BinaryWriter;
 	var aSendingChanges = [];
@@ -748,7 +752,16 @@ CWordCollaborativeEditing.prototype.Undo = function()
 		oChange.Set_FromUndoRedo(oChangeClass, oReverseChange, {Pos : nBinaryPos, Len : nBinaryLen});
 		aSendingChanges.push(oChange.m_pData);
 	}
-	editor.CoAuthoringApi.saveChanges(aSendingChanges, 0, null);
+	editor.CoAuthoringApi.saveChanges(aSendingChanges, null, null);
+
+	this.private_RestoreDocumentState(DocState);
+
+	oLogicDocument.DrawingObjects.TurnOnCheckChartSelection();
+	oLogicDocument.Recalculate(false, false, AscCommon.History.Get_RecalcData(null, arrReverseChanges));
+
+	oLogicDocument.Document_UpdateSelectionState();
+	oLogicDocument.Document_UpdateInterfaceState();
+	oLogicDocument.Document_UpdateRulersState();
 };
 CWordCollaborativeEditing.prototype.CanUndo = function()
 {
@@ -807,7 +820,7 @@ CWordCollaborativeEditing.prototype.private_CommutateContentChanges = function(o
 		}
 
 		if (null !== oResult)
-			arrCommutateActions.splice(0, 0, oResult);
+			arrCommutateActions.push(oResult);
 	}
 
 	if (arrCommutateActions.length > 0)

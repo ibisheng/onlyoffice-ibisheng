@@ -123,6 +123,9 @@ function shiftSort(a, b, offset)
 	}
 	return nRes;
 }
+function createRgbColor(r, g, b) {
+	return new RgbColor((r << 16) + (g << 8) + b);
+}
 var g_oRgbColorProperties = {
 		rgb : 0
 	};
@@ -365,7 +368,7 @@ function CorrectAscColor(asc_color)
 		}
 		default:
 		{
-			ret = new RgbColor((asc_color.asc_getR() << 16) + (asc_color.asc_getG() << 8) + asc_color.asc_getB());
+			ret = createRgbColor(asc_color.asc_getR(), asc_color.asc_getG(), asc_color.asc_getB());
 		}
 	}
 	return ret;
@@ -5289,7 +5292,7 @@ CellArea.prototype = {
 		}
 		return bRemove;
 	};
-	sparklineGroup.prototype.getLocationRanges = function () {
+	sparklineGroup.prototype.getLocationRanges = function (onlySingle) {
 		var result = new AscCommonExcel.SelectionRange();
 		this.arrSparklines.forEach(function (item, i) {
 			if (0 === i) {
@@ -5299,7 +5302,24 @@ CellArea.prototype = {
 				result.getLast().assign2(item.sqref);
 			}
 		});
-		return result.getUnion();
+		var unionRange = result.getUnion();
+		return (!onlySingle || unionRange.isSingleRange()) ? unionRange : result;
+	};
+	sparklineGroup.prototype.getDataRanges = function () {
+		var isUnion = true;
+		var sheet = this.worksheet.getName();
+		var result = new AscCommonExcel.SelectionRange();
+		this.arrSparklines.forEach(function (item, i) {
+			isUnion = isUnion && sheet === item._f.sheet;
+			if (0 === i) {
+				result.assign2(item._f);
+			} else {
+				result.addRange();
+				result.getLast().assign2(item._f);
+			}
+		});
+		var unionRange = isUnion ? result.getUnion() : result;
+		return unionRange.isSingleRange() ? unionRange : result;
 	};
 	sparklineGroup.prototype.asc_getId = function () {
 		return this.Id;
@@ -5377,21 +5397,21 @@ CellArea.prototype = {
 		return this.colorLow ? Asc.colorObjToAscColor(this.colorLow) : this.colorLow;
 	};
 	sparklineGroup.prototype.asc_getDataRanges = function () {
-		var oDataRange = new AscCommonExcel.SelectionRange();
-		var oLocationRange = new AscCommonExcel.SelectionRange();
-		//var bInit = false;
 		var arrResultData = [];
 		var arrResultLocation = [];
-		this.arrSparklines.forEach(function (item) {
-			/*if (bInit) {
-			} else {
-				bInit = true;
-				oDataRange.assign2(item.sqref);
-				oLocationRange.assign2();
-			}*/
-			arrResultData.push(item.f);
-			arrResultLocation.push(item.sqref.getAbsName());
-		});
+		var oLocationRanges = this.getLocationRanges(true);
+		var oDataRanges = oLocationRanges.isSingleRange() && this.getDataRanges();
+		if (oLocationRanges.isSingleRange() && oDataRanges.isSingleRange()) {
+			for (var i = 0; i < oLocationRanges.ranges.length; ++i) {
+				arrResultData.push(oDataRanges.ranges[i].getName());
+				arrResultLocation.push(oLocationRanges.ranges[i].getAbsName());
+			}
+		} else {
+			this.arrSparklines.forEach(function (item) {
+				arrResultData.push(item.f);
+				arrResultLocation.push(item.sqref.getAbsName());
+			});
+		}
 		return [arrResultData.join(AscCommon.FormulaSeparators.functionArgumentSeparator),
 			arrResultLocation.join(AscCommon.FormulaSeparators.functionArgumentSeparator)];
 	};
@@ -7843,6 +7863,7 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].map_themeExcel_to_themePresentation = map_themeExcel_to_themePresentation;
 	window['AscCommonExcel'].shiftGetBBox = shiftGetBBox;
 	window['AscCommonExcel'].RgbColor = RgbColor;
+	window['AscCommonExcel'].createRgbColor = createRgbColor;
 	window['AscCommonExcel'].ThemeColor = ThemeColor;
 	window['AscCommonExcel'].CorrectAscColor = CorrectAscColor;
 	window['AscCommonExcel'].Fragment = Fragment;

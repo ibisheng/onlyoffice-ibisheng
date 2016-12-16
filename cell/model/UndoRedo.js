@@ -418,7 +418,6 @@ var UndoRedoDataTypes = new function() {
 
     this.DefinedName = 39;
 
-	this.SheetViewSettings = 43;
     this.GlobalTableIdAdd = 44;
     this.GraphicObjects = 45;
     this.GOPairProps = 46;
@@ -496,7 +495,6 @@ var UndoRedoDataTypes = new function() {
 			case this.SingleProperty: return new UndoRedoData_SingleProperty(); break;
 			case this.RgbColor: return new AscCommonExcel.RgbColor(); break;
 			case this.ThemeColor: return new AscCommonExcel.ThemeColor(); break;
-			case this.SheetViewSettings: return new AscCommonExcel.asc_CSheetViewSettings(); break;
             case this.GraphicObjects: return new UndoRedoDataGraphicObjects();break;
             case this.GlobalTableIdAdd: return new UndoRedoData_GTableIdAdd(); break;
 
@@ -3430,8 +3428,10 @@ UndoRedoWoorksheet.prototype = {
 			else
 				ws._getCell(Data.nRow, Data.nCol);
 		}
-        else if (AscCH.historyitem_Worksheet_SetViewSettings === Type) {
-			ws.setSheetViewSettings(bUndo ? Data.from : Data.to);
+        else if (AscCH.historyitem_Worksheet_SetDisplayGridlines === Type) {
+			ws.setDisplayGridlines(bUndo ? Data.from : Data.to);
+		} else if (AscCH.historyitem_Worksheet_SetDisplayHeadings === Type) {
+			ws.setDisplayHeadings(bUndo ? Data.from : Data.to);
 		}
 		else if(AscCH.historyitem_Worksheet_ChangeMerge === Type){
 			from = null;

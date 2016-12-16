@@ -8173,7 +8173,7 @@ CTable.prototype =
 			return;
 
 		var _Shd = undefined;
-		if (undefined !== Shd)
+		if (undefined !== Value)
 		{
 			_Shd       = new CDocumentShd();
 			_Shd.Value = Value;

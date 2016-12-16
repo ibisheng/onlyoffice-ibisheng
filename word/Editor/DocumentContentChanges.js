@@ -65,62 +65,64 @@ AscCommon.extendClass(CChangesDocumentContentAddItem, AscDFH.CChangesBaseContent
 CChangesDocumentContentAddItem.prototype.Type = AscDFH.historyitem_DocumentContent_AddItem;
 CChangesDocumentContentAddItem.prototype.Undo = function()
 {
-	var Pos = this.Pos;
-
 	var oDocument = this.Class;
-	var Elements  = oDocument.Content.splice(Pos, 1);
-	oDocument.private_RecalculateNumbering(Elements);
+	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
+	{
+		var Pos = true !== this.UseArray ? this.Pos : this.PosArray[nIndex];
+		var Elements = oDocument.Content.splice(Pos, 1);
+		oDocument.private_RecalculateNumbering(Elements);
 
-	if (Pos > 0)
-	{
-		if (Pos <= oDocument.Content.length - 1)
+		if (Pos > 0)
 		{
-			oDocument.Content[Pos - 1].Next = oDocument.Content[Pos];
-			oDocument.Content[Pos].Prev     = oDocument.Content[Pos - 1];
+			if (Pos <= oDocument.Content.length - 1)
+			{
+				oDocument.Content[Pos - 1].Next = oDocument.Content[Pos];
+				oDocument.Content[Pos].Prev     = oDocument.Content[Pos - 1];
+			}
+			else
+			{
+				oDocument.Content[Pos - 1].Next = null;
+			}
 		}
-		else
+		else if (Pos <= oDocument.Content.length - 1)
 		{
-			oDocument.Content[Pos - 1].Next = null;
+			oDocument.Content[Pos].Prev = null;
 		}
-	}
-	else if (Pos <= oDocument.Content.length - 1)
-	{
-		oDocument.Content[Pos].Prev = null;
 	}
 };
 CChangesDocumentContentAddItem.prototype.Redo = function()
 {
-	if (this.Items.length <= 0)
-		return;
-
-	var Element = this.Items[0];
-	var Pos     = this.Pos;
-
 	var oDocument = this.Class;
-	oDocument.Content.splice(Pos, 0, Element);
-	oDocument.private_RecalculateNumbering([Element]);
+	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
+	{
+		var Element = this.Items[nIndex];
+		var Pos     = true !== this.UseArray ? this.Pos + nIndex : this.PosArray[nIndex];
 
-	if (Pos > 0)
-	{
-		oDocument.Content[Pos - 1].Next = Element;
-		Element.Prev                    = oDocument.Content[Pos - 1];
-	}
-	else
-	{
-		Element.Prev = null;
-	}
+		oDocument.Content.splice(Pos, 0, Element);
+		oDocument.private_RecalculateNumbering([Element]);
 
-	if (Pos < oDocument.Content.length - 1)
-	{
-		oDocument.Content[Pos + 1].Prev = Element;
-		Element.Next                    = oDocument.Content[Pos + 1];
-	}
-	else
-	{
-		Element.Next = null;
-	}
+		if (Pos > 0)
+		{
+			oDocument.Content[Pos - 1].Next = Element;
+			Element.Prev                    = oDocument.Content[Pos - 1];
+		}
+		else
+		{
+			Element.Prev = null;
+		}
 
-	Element.Parent = oDocument;
+		if (Pos < oDocument.Content.length - 1)
+		{
+			oDocument.Content[Pos + 1].Prev = Element;
+			Element.Next                    = oDocument.Content[Pos + 1];
+		}
+		else
+		{
+			Element.Next = null;
+		}
+
+		Element.Parent = oDocument;
+	}
 };
 CChangesDocumentContentAddItem.prototype.private_WriteItem = function(Writer, Item)
 {
@@ -136,41 +138,43 @@ CChangesDocumentContentAddItem.prototype.Load = function(Color)
 		return;
 
 	var oDocument = this.Class;
-
-	var Pos     = oDocument.m_oContentChanges.Check(AscCommon.contentchanges_Add, this.PosArray[0]);
-	var Element = this.Items[0];
-
-	Pos = Math.min(Pos, oDocument.Content.length);
-
-	if (null != Element)
+	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
 	{
-		if (Pos > 0)
-		{
-			oDocument.Content[Pos - 1].Next = Element;
-			Element.Prev                    = oDocument.Content[Pos - 1];
-		}
-		else
-		{
-			Element.Prev = null;
-		}
+		var Pos     = oDocument.m_oContentChanges.Check(AscCommon.contentchanges_Add, true !== this.UseArray ? this.Pos + nIndex : this.PosArray[nIndex]);
+		var Element = this.Items[nIndex];
 
-		if (Pos <= oDocument.Content.length - 1)
+		Pos = Math.min(Pos, oDocument.Content.length);
+
+		if (null != Element)
 		{
-			oDocument.Content[Pos].Prev = Element;
-			Element.Next                = oDocument.Content[Pos];
+			if (Pos > 0)
+			{
+				oDocument.Content[Pos - 1].Next = Element;
+				Element.Prev                    = oDocument.Content[Pos - 1];
+			}
+			else
+			{
+				Element.Prev = null;
+			}
+
+			if (Pos <= oDocument.Content.length - 1)
+			{
+				oDocument.Content[Pos].Prev = Element;
+				Element.Next                = oDocument.Content[Pos];
+			}
+			else
+			{
+				Element.Next = null;
+			}
+
+			Element.Parent = oDocument;
+
+			oDocument.Content.splice(Pos, 0, Element);
+			oDocument.private_RecalculateNumbering([Element]);
+			oDocument.private_ReindexContent(Pos);
+
+			AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(oDocument, Pos);
 		}
-		else
-		{
-			Element.Next = null;
-		}
-
-		Element.Parent = oDocument;
-
-		oDocument.Content.splice(Pos, 0, Element);
-		oDocument.private_RecalculateNumbering([Element]);
-		oDocument.private_ReindexContent(Pos);
-
-		AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(oDocument, Pos);
 	}
 };
 CChangesDocumentContentAddItem.prototype.IsRelated = function(oChanges)
@@ -265,7 +269,7 @@ CChangesDocumentContentRemoveItem.prototype.Load = function(Color)
 	var oDocument = this.Class;
 	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
 	{
-		var Pos = oDocument.m_oContentChanges.Check(AscCommon.contentchanges_Remove, this.PosArray[nIndex]);
+		var Pos = oDocument.m_oContentChanges.Check(AscCommon.contentchanges_Remove, true !== this.UseArray ? this.Pos : this.PosArray[nIndex]);
 
 		// действие совпало, не делаем его
 		if (false === Pos)

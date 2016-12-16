@@ -31,7 +31,7 @@
  */
 
 "use strict";
-
+var GLOBAL_PATH_COUNT = 0;
 (
 /**
 * @param {Window} window
@@ -516,6 +516,37 @@ function checkPointInMap(map, worksheet, row, col)
     }
 
 
+    function CPathMemory(){
+        this.size = 1000;
+        this.ArrPathCommand = new Float64Array(this.size);
+        this.curPos = -1;
+
+        this.path = new AscFormat.Path2(this);
+ }
+
+    CPathMemory.prototype.AllocPath = function(){
+
+        if(this.curPos + 1 >= this.ArrPathCommand.length){
+            var aNewArray = new Float64Array((((3/2)*(this.curPos + 1)) >> 0) + 1);
+            for(var i = 0; i < this.ArrPathCommand.length; ++i){
+                aNewArray[i] = this.ArrPathCommand[i];
+            }
+            this.ArrPathCommand = aNewArray;
+            this.path.ArrPathCommand = aNewArray;
+        }
+
+        this.path.startPos = ++this.curPos;
+        this.path.curLen = 0;
+        this.ArrPathCommand[this.curPos] = 0;
+        return this.path;
+    };
+
+    CPathMemory.prototype.GetPath = function(index){
+        this.path.startPos = index;
+        this.path.curLen = 0;
+        return this.path;
+    };
+
 function CChartSpace()
 {
     CChartSpace.superclass.constructor.call(this);
@@ -539,6 +570,7 @@ function CChartSpace()
     this.calculatedChart = null;
 
 
+    this.pathMemory = new CPathMemory();
 
 
     this.bbox = null;
@@ -567,7 +599,16 @@ function CChartSpace()
 }
 AscCommon.extendClass(CChartSpace, AscFormat.CGraphicObjectBase);
 
-CChartSpace.prototype.select = CShape.prototype.select;
+
+    CChartSpace.prototype.AllocPath = function(){
+        return this.pathMemory.AllocPath().startPos;
+    };
+
+    CChartSpace.prototype.GetPath = function(index){
+        return this.pathMemory.GetPath(index);
+    }
+
+        CChartSpace.prototype.select = CShape.prototype.select;
 CChartSpace.prototype.checkDrawingBaseCoords = CShape.prototype.checkDrawingBaseCoords;
 CChartSpace.prototype.setDrawingBaseCoords = CShape.prototype.setDrawingBaseCoords;
 CChartSpace.prototype.deleteBFromSerialize = CShape.prototype.deleteBFromSerialize;
@@ -1195,7 +1236,7 @@ CChartSpace.prototype.parseChartFormula = function(sFormula)
     if(this.worksheet && typeof sFormula === "string" && sFormula.length > 0){
         return AscCommonExcel.getRangeByRef(sFormula, this.worksheet);
     }
-    return null;
+    return [];
 };
 CChartSpace.prototype.checkBBoxIntersection = function(bbox1, bbox2)
 {
@@ -10380,6 +10421,7 @@ CChartSpace.prototype.addToSetPosition = function(dLbl)
 
 CChartSpace.prototype.recalculateChart = function()
 {
+    this.pathMemory.curPos = -1;
     if(this.chartObj == null)
         this.chartObj =  new AscFormat.CChartsDrawer();
     this.chartObj.reCalculate(this);
