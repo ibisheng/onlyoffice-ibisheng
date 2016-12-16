@@ -60,7 +60,8 @@ var c_oChartTypes =
 	Stock: 6,
 	DoughnutChart: 7,
 	Radar: 8,
-	BubbleChart: 9
+	BubbleChart: 9,
+	Surface: 10
 };
 
 var c_oChartBar3dFaces =
@@ -213,6 +214,11 @@ CChartsDrawer.prototype =
 			case c_oChartTypes.BubbleChart:
 			{
 				newChart = new drawBubbleChart();
+				break;
+			}
+			case c_oChartTypes.Surface:
+			{
+				newChart = new drawSurfaceChart();
 				break;
 			}
 		}
@@ -1884,6 +1890,11 @@ CChartsDrawer.prototype =
 				this.calcProp.type = c_oChartTypes.Scatter;
 				break;
 			}
+			case AscDFH.historyitem_type_SurfaceChart:
+			{
+				this.calcProp.type = c_oChartTypes.Surface;
+				break;
+			}
 		}
 		
 		var grouping = chartProp.chart.plotArea.chart.grouping;
@@ -3118,12 +3129,13 @@ CChartsDrawer.prototype =
 			var isLine = typeChart === AscDFH.historyitem_type_LineChart;
 			var isPie = typeChart === AscDFH.historyitem_type_PieChart;
 			var isArea = typeChart === AscDFH.historyitem_type_AreaChart;
+			var isSurface = typeChart === AscDFH.historyitem_type_SurfaceChart;
 			
-			if(!isPerspective && (isBar || isLine || isHBar || isPie || isArea))
+			if(!isPerspective && (isBar || isLine || isHBar || isPie || isArea || isSurface))
 			{
 				res = true;
 			}
-			else if(isPerspective && (isBar || isLine|| isHBar || isArea || isPie))
+			else if(isPerspective && (isBar || isLine|| isHBar || isArea || isPie || isSurface))
 			{
 				res = true;
 			}
@@ -10838,6 +10850,147 @@ drawBubbleChart.prototype =
 	}
 };
 
+
+/** @constructor */
+function drawSurfaceChart()
+{
+	this.chartProp = null;
+	this.cChartDrawer = null;
+	this.cChartSpace = null;
+	this.paths = {};
+}
+
+drawSurfaceChart.prototype =
+{
+	constructor: drawSurfaceChart,
+	
+	recalculate: function(chartsDrawer)
+	{
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		this.paths = {};
+		
+		this._recalculate();
+	},
+	
+	draw: function(chartsDrawer)
+    {
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
+		this._draw();
+	},
+	
+	_recalculate: function()
+	{
+		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
+		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
+		
+		var y, x, z, val, seria, dataSeries, compiledMarkerSize, compiledMarkerSymbol, idx, numCache, idxPoint, points = [];
+		for (var i = 0; i < this.chartProp.series.length; i++) {
+		
+			seria = this.chartProp.series[i];
+			numCache = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
+			
+			if(!numCache)
+			{
+				continue;
+			}
+			
+			dataSeries = numCache.pts;
+			for(var n = 0; n < numCache.ptCount; n++)
+			{	
+				//рассчитываем значения
+				idx = dataSeries[n] && dataSeries[n].idx != null ? dataSeries[n].idx : n;				
+				val = this._getYVal(idx, i);
+				
+				x  = xPoints[n].pos * this.chartProp.pxToMM;
+				y  = this.cChartDrawer.getYPosition(val, yPoints) * this.chartProp.pxToMM;
+				z = (perspectiveDepth / (this.chartProp.series.length - 1)) * (i);
+				
+				if(!points)
+					points = [];
+				if(!points[i])
+					points[i] = [];
+				
+				if(val != null)
+				{
+					var convertResult = this.cChartDrawer._convertAndTurnPoint(x, y, z);
+					var x1 = convertResult.x;
+					var y1 = convertResult.y;
+					points[i][n] = {x: x1, y: y1};
+				}
+				else
+				{
+					points[i][n] = null;
+				}
+			}
+		}
+		
+		this.test(points);
+	},
+	
+	test: function(points)
+	{
+		for (var i = 0; i < points.length; i++) 
+		{
+			for(var j = 0; j < points[i].length - 1; j++)
+			{
+				var p = points[i][j];
+				var p1 = points[i][j + 1];
+				
+				if(!this.paths.series)
+				{
+					this.paths.series = [];
+				}
+				
+				this.paths.series.push(this._calculatePath(p.x, p.y, p1.x, p1.y));
+			}
+		}
+	},
+	
+	_getYVal: function(n, i)
+	{
+		var idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[i], n);
+		var val = idxPoint ? parseFloat(idxPoint.val) : null;
+		
+		return val;
+	},
+	
+	_calculatePath: function(x, y, x1, y1)
+	{
+		var pxToMm = this.chartProp.pxToMM;
+		var path  = new Path();
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
+		path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
+		path.lnTo(x1 / pxToMm * pathW, y1 / pxToMm * pathH);
+		path.recalculate(gdLst);
+		
+		return path;
+	},
+	
+	_draw: function()
+	{
+		for(var i = 0; i < this.paths.series.length; i++)
+		{
+			var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
+			
+			this.cChartDrawer.drawPath(this.paths.series[i], pen, null, false);
+		}
+	}
+}
 
 
 	/** @constructor */
