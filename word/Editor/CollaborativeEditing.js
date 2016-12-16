@@ -734,7 +734,7 @@ CWordCollaborativeEditing.prototype.Undo = function()
 		this.m_aAllChanges.push(arrReverseChanges[nIndex]);
 	}
 
-	var oBinaryWriter = History.BinaryWriter;
+	var oBinaryWriter = AscCommon.History.BinaryWriter;
 	var aSendingChanges = [];
 	for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
 	{
