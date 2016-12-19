@@ -2454,6 +2454,8 @@
 			var tableTo = tableFrom.clone(null);
 			if(tableNames && tableNames.length) {
 				tableTo.changeDisplayName(tableNames[i]);
+			} else {
+				tableTo.changeDisplayName(this.workbook.dependencyFormulas.getNextTableName());
 			}
 			this.addTablePart(tableTo, true);
 			renameParams.tableNameMap[tableFrom.DisplayName] = tableTo.DisplayName;
@@ -4487,7 +4489,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 	Woorksheet.prototype.addTablePart = function (tablePart, bAddToDependencies) {
 		this.TableParts.push(tablePart);
 		if (bAddToDependencies) {
-			this.dependencyFormulas.addTableName(sheet, tablePart);
+			this.workbook.dependencyFormulas.addTableName(this, tablePart);
 			tablePart.buildDependencies();
 		}
 	};

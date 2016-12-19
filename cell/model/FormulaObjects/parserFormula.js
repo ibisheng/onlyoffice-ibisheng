@@ -1421,6 +1421,9 @@ function cRef3D( val, _wsFrom, wb ) {/*Ref means Sheat1!A1 for example*/
     this.constructor.call( this, val, cElementType.cell3D );
 
 		this.ws = null;
+		if (_wsFrom) {
+			this.ws = wb.getWorksheetByName(_wsFrom);
+		}
 		this.range = null;
 		if (val && this.ws) {
 			this.range = this.ws.getRange2(val);
