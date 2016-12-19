@@ -308,9 +308,9 @@ CChartsDrawer.prototype =
 		}
 	},
 	
-	recalculateOnly3dProps: function()
+	recalculateOnly3dProps: function(chartSpace)
 	{
-		this.cChartSpace = chartSpace;
+		//this.cChartSpace = chartSpace;
 		this.calcProp = {};
 		
 		if(this._isSwitchCurrent3DChart(chartSpace))
