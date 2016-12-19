@@ -3788,6 +3788,11 @@ background-repeat: no-repeat;\
 	{
 		return this.WordControl.m_oLogicDocument.GetFootnotePr();
 	};
+	asc_docs_api.prototype.asc_AddFootnote = function(sText)
+	{
+		return this.WordControl.m_oLogicDocument.AddFootnote(sText);
+	};
+	asc_docs_api.prototype["asc_AddFootnote"]      = asc_docs_api.prototype.asc_AddFootnote;
 	asc_docs_api.prototype["asc_GetFootnoteProps"] = asc_docs_api.prototype.asc_GetFootnoteProps;
 	asc_docs_api.prototype["asc_SetFootnoteProps"] = asc_docs_api.prototype.asc_SetFootnoteProps;
 
