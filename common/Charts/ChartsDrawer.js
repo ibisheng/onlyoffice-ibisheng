@@ -10889,7 +10889,7 @@ drawSurfaceChart.prototype =
 		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		
-		var y, x, z, val, seria, dataSeries, compiledMarkerSize, compiledMarkerSymbol, idx, numCache, idxPoint, points = [];
+		var y, x, z, val, seria, dataSeries, compiledMarkerSize, compiledMarkerSymbol, idx, numCache, idxPoint, points = [], points3d = [];
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 		
 			seria = this.chartProp.series[i];
@@ -10915,9 +10915,15 @@ drawSurfaceChart.prototype =
 					points = [];
 				if(!points[i])
 					points[i] = [];
+					
+				if(!points3d)
+					points3d = [];
+				if(!points3d[i])
+					points3d[i] = [];
 				
 				if(val != null)
 				{
+					points3d[i][n] = {x: x, y: y, z: z};
 					var convertResult = this.cChartDrawer._convertAndTurnPoint(x, y, z);
 					var x1 = convertResult.x;
 					var y1 = convertResult.y;
@@ -10930,12 +10936,32 @@ drawSurfaceChart.prototype =
 			}
 		}
 		
-		this.test(points);
+		console.time("asd");
+		this.test(points, points3d);
+		console.timeEnd("asd");
 	},
 	
-	test: function(points)
+	test: function(points, points3d)
 	{
-		for (var i = 0; i < points.length; i++) 
+		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
+		var gridPlaneEquations = [];
+		var left = this.chartProp.chartGutter._left;
+		var right = this.chartProp.chartGutter._right;
+		var width = this.chartProp.widthCanvas - (left + right);
+		
+		for(var i = 0; i < yPoints.length; i++)
+		{
+			var p1 = this.cChartDrawer._convertAndTurnPoint(left, yPoints[i].pos * this.chartProp.pxToMM, 0, null, null, true);
+			var p2 = this.cChartDrawer._convertAndTurnPoint(left + width, yPoints[i].pos * this.chartProp.pxToMM, 0, null, null, true);
+			var p3 = this.cChartDrawer._convertAndTurnPoint(left + width, yPoints[i].pos * this.chartProp.pxToMM, perspectiveDepth, null, null, true); 
+			
+			var plainEquation = this.cChartDrawer.getPlainEquation(p1, p2, p3);
+			gridPlaneEquations.push(plainEquation);
+		}
+		
+		
+		for(var i = 0; i < points.length; i++) 
 		{
 			for(var j = 0; j < points[i].length - 1; j++)
 			{
@@ -10948,6 +10974,35 @@ drawSurfaceChart.prototype =
 				}
 				
 				this.paths.series.push(this._calculatePath(p.x, p.y, p1.x, p1.y));
+				
+				
+				var p3d = this.cChartDrawer._convertAndTurnPoint(points3d[i][j].x, points3d[i][j].y, points3d[i][j].z, null, null, true);
+				var p13d = this.cChartDrawer._convertAndTurnPoint(points3d[i][j + 1].x, points3d[i][j + 1].y, points3d[i][j + 1].z, null, null, true);
+				var lineEquation = this.cChartDrawer.getLineEquation(p3d, p13d);
+				for(var k = 0; k < gridPlaneEquations.length; k++)
+				{
+					var intersection = this.cChartDrawer.isIntersectionPlainAndLine(gridPlaneEquations[k] ,lineEquation);
+					var projectPoint = this.cChartDrawer._convertAndTurnPoint(intersection.x, intersection.y, intersection.z, true, true);
+					
+					
+				}
+			}
+		}
+		
+		
+		for (var i = 0; i < points.length - 1; i++) 
+		{
+			for(var j = 0; j < points[i].length; j++)
+			{
+				var p = points[i][j];
+				var p1 = points[i + 1][j];
+				
+				if(!this.paths.test)
+				{
+					this.paths.test = [];
+				}
+				
+				this.paths.test.push(this._calculatePath(p.x, p.y, p1.x, p1.y));
 			}
 		}
 	},
@@ -10986,8 +11041,17 @@ drawSurfaceChart.prototype =
 		for(var i = 0; i < this.paths.series.length; i++)
 		{
 			var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
+			pen.w = 30000;
 			
 			this.cChartDrawer.drawPath(this.paths.series[i], pen, null, false);
+		}
+		
+		for(var i = 0; i < this.paths.test.length; i++)
+		{
+			var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
+			pen.w = 20000;
+			
+			this.cChartDrawer.drawPath(this.paths.test[i], pen, null, false);
 		}
 	}
 }
