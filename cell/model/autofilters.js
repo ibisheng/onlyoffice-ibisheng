@@ -1221,7 +1221,7 @@
 					for (var i = worksheet.TableParts.length - 1; i >= 0; i--)
 					{
 						var tablePart = worksheet.TableParts[i];
-						if (!changeFilter(tablePart, true)) {
+						if (changeFilter(tablePart, true)) {
 							worksheet.deleteTablePart(i);
 						}
 					}

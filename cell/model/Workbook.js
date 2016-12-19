@@ -755,9 +755,8 @@
 		delTableName: function(tableName) {
 			var defName = this._delDefName(tableName, null);
 			this.addToChangedDefName(defName);
-			//todo make ref
-			// var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: defName.getAscCDefName(), to: null};
-			// this._broadcastDefName(tableName, notifyData);
+			var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: defName.getUndoDefName(), to: null};
+			this._broadcastDefName(tableName, notifyData);
 		},
 		rebuildTable: function(tableName) {
 			var defName = this.getDefNameByName(tableName, null);

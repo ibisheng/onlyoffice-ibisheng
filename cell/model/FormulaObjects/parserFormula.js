@@ -3839,7 +3839,9 @@ function parserFormula( formula, parent, _ws ) {
 				this.shiftCells(data.type, data.sheetId, data.bbox, data.offset);
 				eventData.isRebuild = false;
 			} else if (AscCommon.c_oNotifyType.ChangeDefName === data.type) {
-				if (data.from.name != data.to.name) {
+				if (!data.to) {
+					this.removeTableName(data.from);
+				} else if (data.from.name != data.to.name) {
 					this.changeDefName(data.from, data.to);
 				} else if (data.from.isTable) {
 					needAssemble = false;
@@ -4545,6 +4547,14 @@ parserFormula.prototype.parse = function(local, digitDelim) {
       else if (_tableTMP = parserHelp.isTable.call(this, this.Formula, this.pCurrPos, local)) {
         found_operand = new cStrucTable(_tableTMP, this.wb, this.ws);
 
+		if (found_operand.type == cElementType.error) {
+			/*используется неверный именованный диапазон или таблица*/
+			this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+			this.outStack = [];
+			this.elemArr = [];
+			return false;
+		}
+
         if (found_operand.type != cElementType.error) {
           this.RefPos.push({
             start: this.pCurrPos - this.operand_str.length,
@@ -4555,17 +4565,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
           });
           this.countRef++;
         }
-
-//					if(found_operand.type==cElementType.error) {
-//						/*используется неверный именованный диапазон или таблица*/
-//						this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
-//						this.outStack = [];
-//						this.elemArr = [];
-//						return false;
-//					}
-
-
-      }
+	  }
 
       /* Referens to DefinedNames */ else if (parserHelp.isName.call(this, this.Formula, this.pCurrPos, this.wb,
           this.ws)[0]) {
@@ -4820,18 +4820,8 @@ parserFormula.prototype.calculate = function(opt_defName, opt_range) {
 		var i, elem, sheetId;
 		for (i = 0; i < this.outStack.length; i++) {
 			elem = this.outStack[i];
-			if (elem.type == cElementType.table) {
-				sheetId = elem.ws ? elem.ws.getId() : null;
-				if (elem.tableName == defName.name && (null == defName.sheetId || sheetId == defName.sheetId )) {
-					var rangeCell = null;
-					if (this.parent && this.parent.onFormulaEvent) {
-						rangeCell = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.GetRangeCell);
-					}
-					if (!rangeCell) {
-						rangeCell = this.ws.getCell3(0, 0);
-					}
-					this.outStack[i] = elem.toRef(rangeCell.getBBox0());
-				}
+			if (elem.type == cElementType.table && elem.tableName == defName.name) {
+				this.outStack[i] = new cError(cErrorType.bad_reference);
 			}
 		}
 	};
