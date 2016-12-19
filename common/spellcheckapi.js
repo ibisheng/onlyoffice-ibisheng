@@ -242,7 +242,7 @@
   SpellCheckApi.prototype.init = function(docid) {
     this._docid = docid;
     //Begin send auth
-    this.sockjs_url = AscCommon.getBaseUrl() + this._url + '/doc/' + docid + '/c';
+    this.sockjs_url = AscCommon.getBaseUrl() + "../../../.." + this._url + '/doc/' + docid + '/c';
     this.sockjs = initSocksJs(this.sockjs_url, this);
   };
 

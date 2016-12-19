@@ -125,7 +125,7 @@ var nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30
 
 function getBaseUrl() {
   var index_html = location.href;
-  return index_html.substring(0, index_html.lastIndexOf("/") + 1) + "../../../..";
+  return index_html.substring(0, index_html.lastIndexOf("/") + 1);
 }
 
 function getEncodingParams() {
