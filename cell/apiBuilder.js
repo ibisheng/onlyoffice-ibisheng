@@ -126,6 +126,11 @@
 	 * */
 
 	/**
+	 *
+	 * @typedef {("none" | "nextTo" | "low" | "high")} TickLabelPosition
+	 * **/
+
+	/**
 	 * Class representing a base class for color types
 	 * @constructor
 	 */
@@ -918,6 +923,22 @@
 	{
 		AscFormat.builder_SetShowDataLabels(this.Chart, bShowSerName, bShowCatName, bShowVal, bShowPercent);
 	};
+	/**
+	 * Spicifies tick labels position vertical axis
+	 * @param {TickLabelPosition} sTickLabelPosition
+	 * */
+	ApiChart.prototype.SetVertAxisTickLabelPosition = function(sTickLabelPosition)
+	{
+		AscFormat.builder_SetChartVertAxisTickLablePosition(this.Chart, sTickLabelPosition);
+	};
+	/**
+	 * Spicifies tick labels position horizontal axis
+	 * @param {TickLabelPosition} sTickLabelPosition
+	 * */
+	ApiChart.prototype.SetHorAxisTickLabelPosition = function(sTickLabelPosition)
+	{
+		AscFormat.builder_SetChartHorAxisTickLablePosition(this.Chart, sTickLabelPosition);
+	};
 
 
 	Api.prototype["GetActiveSheet"] = Api.prototype.GetActiveSheet;
@@ -957,24 +978,26 @@
 	ApiRange.prototype["UnMerge"] = ApiRange.prototype.UnMerge;
 
 
-	ApiDrawing.prototype["GetClassType"]             =  ApiDrawing.prototype.GetClassType;
-	ApiDrawing.prototype["SetSize"]                  =  ApiDrawing.prototype.SetSize;
-	ApiDrawing.prototype["SetPosition"]              =  ApiDrawing.prototype.SetPosition;
+	ApiDrawing.prototype["GetClassType"]               =  ApiDrawing.prototype.GetClassType;
+	ApiDrawing.prototype["SetSize"]                    =  ApiDrawing.prototype.SetSize;
+	ApiDrawing.prototype["SetPosition"]                =  ApiDrawing.prototype.SetPosition;
 
-	ApiImage.prototype["GetClassType"]               =  ApiImage.prototype.GetClassType;
+	ApiImage.prototype["GetClassType"]                 =  ApiImage.prototype.GetClassType;
 
-	ApiShape.prototype["GetClassType"]               =  ApiShape.prototype.GetClassType;
-	ApiShape.prototype["GetDocContent"]              =  ApiShape.prototype.GetDocContent;
-	ApiShape.prototype["SetVerticalTextAlign"]       =  ApiShape.prototype.SetVerticalTextAlign;
+	ApiShape.prototype["GetClassType"]                 =  ApiShape.prototype.GetClassType;
+	ApiShape.prototype["GetDocContent"]                =  ApiShape.prototype.GetDocContent;
+	ApiShape.prototype["SetVerticalTextAlign"]         =  ApiShape.prototype.SetVerticalTextAlign;
 
-	ApiChart.prototype["GetClassType"]               =  ApiChart.prototype.GetClassType;
-	ApiChart.prototype["SetTitle"]                   =  ApiChart.prototype.SetTitle;
-	ApiChart.prototype["SetHorAxisTitle"]            =  ApiChart.prototype.SetHorAxisTitle;
-	ApiChart.prototype["SetVerAxisTitle"]            =  ApiChart.prototype.SetVerAxisTitle;
-	ApiChart.prototype["SetVerAxisOrientation"]      =  ApiChart.prototype.SetVerAxisOrientation;
-	ApiChart.prototype["SetHorAxisOrientation"]      =  ApiChart.prototype.SetHorAxisOrientation;
-	ApiChart.prototype["SetLegendPos"]               =  ApiChart.prototype.SetLegendPos;
-	ApiChart.prototype["SetShowDataLabels"]          =  ApiChart.prototype.SetShowDataLabels;
+	ApiChart.prototype["GetClassType"]                 =  ApiChart.prototype.GetClassType;
+	ApiChart.prototype["SetTitle"]                     =  ApiChart.prototype.SetTitle;
+	ApiChart.prototype["SetHorAxisTitle"]              =  ApiChart.prototype.SetHorAxisTitle;
+	ApiChart.prototype["SetVerAxisTitle"]              =  ApiChart.prototype.SetVerAxisTitle;
+	ApiChart.prototype["SetVerAxisOrientation"]        =  ApiChart.prototype.SetVerAxisOrientation;
+	ApiChart.prototype["SetHorAxisOrientation"]        =  ApiChart.prototype.SetHorAxisOrientation;
+	ApiChart.prototype["SetLegendPos"]                 =  ApiChart.prototype.SetLegendPos;
+	ApiChart.prototype["SetShowDataLabels"]            =  ApiChart.prototype.SetShowDataLabels;
+	ApiChart.prototype["SetVertAxisTickLabelPosition"] =  ApiChart.prototype.SetVertAxisTickLabelPosition;
+	ApiChart.prototype["SetHorAxisTickLabelPosition"]  =  ApiChart.prototype.SetHorAxisTickLabelPosition;
 
 
 	function private_SetCoords(oDrawing, oWorksheet, nExtX, nExtY, nFromCol, nColOffset,  nFromRow, nRowOffset){
