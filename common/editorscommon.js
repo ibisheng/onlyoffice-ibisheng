@@ -124,7 +124,7 @@ var sUploadServiceLocalUrlOld = "../../../../uploadold";
 var nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
 
 function getBaseUrl() {
-  var index_html = location.href;
+var index_html = window["location"]["href"];
   return index_html.substring(0, index_html.lastIndexOf("/") + 1);
 }
 
