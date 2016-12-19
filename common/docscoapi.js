@@ -1327,7 +1327,7 @@
   DocsCoApi.prototype.setDocId = function(docid) {
     //todo возможно надо менять sockjs_url
     this._docid = docid;
-    this.sockjs_url = '/doc/' + docid + '/c';
+    this.sockjs_url = AscCommon.getBaseUrl() + '/doc/' + docid + '/c';
   };
   // Авторизация (ее нужно делать после выставления состояния редактора view-mode)
   DocsCoApi.prototype.auth = function(isViewer, opt_openCmd) {
