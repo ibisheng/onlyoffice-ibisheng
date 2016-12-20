@@ -53,15 +53,6 @@ var section_borders_OffsetFromText = 0x01;
 var section_borders_ZOrderBack  = 0x00;
 var section_borders_ZOrderFront = 0x01;
 
-var section_footnote_RestartContinuous = 0x00;
-var section_footnote_RestartEachSect   = 0x01;
-var section_footnote_RestartEachPage   = 0x02;
-
-var section_footnote_PosBeneathText = 0x00;
-var section_footnote_PosDocEnd      = 0x01;
-var section_footnote_PosPageBottom  = 0x02;
-var section_footnote_PosSectEnd     = 0x03;
-
 function CSectionPr(LogicDocument)
 {
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
