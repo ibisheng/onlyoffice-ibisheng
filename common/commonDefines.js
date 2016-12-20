@@ -816,7 +816,8 @@
 		Rebuild: 4,
 		Changed: 5,
 		ChangeDefName: 6,
-		ChangeSheet: 7
+		ChangeSheet: 7,
+		DelColumnTable: 8
 	};
 
 	var c_oNotifyParentType = {

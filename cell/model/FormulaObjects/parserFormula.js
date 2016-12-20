@@ -1859,6 +1859,59 @@ cStrucTable.prototype._buildLocalTableString = function (reservedColumn,local) {
 			this.tableName = to.name;
 		}
 	};
+	cStrucTable.prototype.removeTableColumn = function(deleted) {
+		if (this.oneColumn) {
+			if (deleted[this.oneColumn]) {
+				return true;
+			} else {
+				this.oneColumnIndex = this.wb.getTableIndexColumnByName(this.tableName, this.oneColumn);
+				if (!this.oneColumnIndex) {
+					return true;
+				}
+			}
+		}
+		if (this.columnRange) {
+			if (deleted[this.colStart]) {
+				return true;
+			} else {
+				this.colStartIndex = this.wb.getTableIndexColumnByName(this.tableName, this.colStart);
+				if (!this.colStartIndex) {
+					return true;
+				}
+			}
+			if (deleted[this.colEnd]) {
+				return true;
+			} else {
+				this.colEndIndex = this.wb.getTableIndexColumnByName(this.tableName, this.colEnd);
+				if (!this.colEndIndex) {
+					return true;
+				}
+			}
+		}
+		if (this.hdt) {
+			if(this.hdtcstart){
+				if (deleted[this.hdtcstart]) {
+					return true;
+				} else {
+					this.hdtcstartIndex = this.wb.getTableIndexColumnByName(this.tableName, this.hdtcstart);
+					if (!this.hdtcstartIndex) {
+						return true;
+					}
+				}
+			}
+			if(this.hdtcend){
+				if (deleted[this.hdtcend]) {
+					return true;
+				} else {
+					this.hdtcendIndex = this.wb.getTableIndexColumnByName(this.tableName, this.hdtcend);
+					if (!this.hdtcendIndex) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	};
 
 /** @constructor */
 function cName3D(val, wb, ws) {
@@ -3841,12 +3894,16 @@ function parserFormula( formula, parent, _ws ) {
 			} else if (AscCommon.c_oNotifyType.ChangeDefName === data.type) {
 				if (!data.to) {
 					this.removeTableName(data.from);
+					eventData.isRebuild = true;
 				} else if (data.from.name != data.to.name) {
 					this.changeDefName(data.from, data.to);
 				} else if (data.from.isTable) {
 					needAssemble = false;
 					eventData.isRebuild = true;
 				}
+			} else if (AscCommon.c_oNotifyType.DelColumnTable === data.type) {
+				this.removeTableColumn(data.tableName, data.deleted);
+				eventData.isRebuild = true;
 			} else if (AscCommon.c_oNotifyType.Rebuild === data.type) {
 				eventData.isRebuild = true;
 			} else if (AscCommon.c_oNotifyType.ChangeSheet === data.type) {
@@ -4817,11 +4874,22 @@ parserFormula.prototype.calculate = function(opt_defName, opt_range) {
 		}
 	};
 	parserFormula.prototype.removeTableName = function(defName) {
-		var i, elem, sheetId;
+		var i, elem;
 		for (i = 0; i < this.outStack.length; i++) {
 			elem = this.outStack[i];
 			if (elem.type == cElementType.table && elem.tableName == defName.name) {
 				this.outStack[i] = new cError(cErrorType.bad_reference);
+			}
+		}
+	};
+	parserFormula.prototype.removeTableColumn = function(tableName, deleted) {
+		var i, elem;
+		for (i = 0; i < this.outStack.length; i++) {
+			elem = this.outStack[i];
+			if (elem.type == cElementType.table && elem.tableName == tableName) {
+				if (elem.removeTableColumn(deleted)) {
+					this.outStack[i] = new cError(cErrorType.bad_reference);
+				}
 			}
 		}
 	};

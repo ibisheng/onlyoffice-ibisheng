@@ -5852,10 +5852,16 @@ TablePart.prototype.deleteTableColumns = function(activeRange)
 		diff = activeRange.c2 - activeRange.c1 + 1;
 		startCol = activeRange.c1 - this.Ref.c1;
 	}
-	
-	if(diff !== null){
+
+	if (diff !== null) {
 		var deleted = this.TableColumns.splice(startCol, diff);
 		this.removeDependencies(deleted);
+
+		var deletedMap = {};
+		for (var i = 0; i < deleted.length; ++i) {
+			deletedMap[deleted[i].Name] = 1;
+		}
+		this.handlers.trigger("deleteColumnTablePart", this.DisplayName, deletedMap);
 	}
 
 };
@@ -6073,12 +6079,8 @@ TablePart.prototype.getRangeWithoutHeaderFooter = function()
 
 TablePart.prototype.checkTotalRowFormula = function(ws)
 {
-	if(this.TotalsRowCount)
-	{
-		for(var i = 0; i < this.TableColumns.length; i++)
-		{
-			this.TableColumns[i].checkTotalRowFormula(ws, this);
-		}
+	for (var i = 0; i < this.TableColumns.length; i++) {
+		this.TableColumns[i].checkTotalRowFormula(ws, this);
 	}
 };
 

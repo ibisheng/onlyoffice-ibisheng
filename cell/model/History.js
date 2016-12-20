@@ -930,7 +930,7 @@ CHistory.prototype.GetSerializeArray = function()
 //функция, которая перемещает последнее действие на первую позицию(в текущей точке)
 CHistory.prototype.ChangeActionsEndToStart = function()
 {
-    var curPoint = this.Points[this.Index];
+	var curPoint = this.Points[this.Index];
 	if(curPoint && curPoint.Items.length > 0)
 	{
 		var endAction = curPoint.Items.pop();

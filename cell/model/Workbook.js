@@ -753,9 +753,15 @@
 			}
 		},
 		delTableName: function(tableName) {
+			this.buildDependency();
 			var defName = this._delDefName(tableName, null);
 			this.addToChangedDefName(defName);
 			var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: defName.getUndoDefName(), to: null};
+			this._broadcastDefName(tableName, notifyData);
+		},
+		delColumnTable: function(tableName, deleted) {
+			this.buildDependency();
+			var notifyData = {type: AscCommon.c_oNotifyType.DelColumnTable, tableName: tableName, deleted: deleted};
 			this._broadcastDefName(tableName, notifyData);
 		},
 		rebuildTable: function(tableName) {
@@ -1395,6 +1401,9 @@
 			},
 			"changeColumnTablePart": function ( tableName ) {
 				self.dependencyFormulas.rebuildTable( tableName );
+			},
+			"deleteColumnTablePart": function(tableName, deleted) {
+				self.dependencyFormulas.delColumnTable(tableName, deleted);
 			}
 		} );
 		for(var i = 0, length = tableCustomFunc.length; i < length; ++i) {
