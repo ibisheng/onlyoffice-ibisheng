@@ -61,6 +61,32 @@
 	{
 		return this.DrawingDocument.ConvertCoordsFromCursor2(x, y);
 	};
+	CMobileDelegateEditorPresentation.prototype.GetZoomFit = function()
+	{
+		var HtmlPage = this.HtmlPage;
+		var w = HtmlPage.m_oEditor.HtmlElement.width;
+		if (HtmlPage.bIsRetinaSupport)
+			w >>= 1;
+
+		var h = (((HtmlPage.m_oBody.AbsolutePosition.B - HtmlPage.m_oBody.AbsolutePosition.T) -
+			(HtmlPage.m_oTopRuler.AbsolutePosition.B - HtmlPage.m_oTopRuler.AbsolutePosition.T)) * g_dKoef_mm_to_pix) >> 0;
+
+		var _pageWidth  = this.LogicDocument.Width * g_dKoef_mm_to_pix;
+		var _pageHeight = this.LogicDocument.Height * g_dKoef_mm_to_pix;
+
+		var _hor_Zoom = 100;
+		if (0 != _pageWidth)
+			_hor_Zoom = (100 * (w - 2 * HtmlPage.SlideDrawer.CONST_BORDER)) / _pageWidth;
+		var _ver_Zoom = 100;
+		if (0 != _pageHeight)
+			_ver_Zoom = (100 * (h - 2 * HtmlPage.SlideDrawer.CONST_BORDER)) / _pageHeight;
+
+		var _new_value = (Math.min(_hor_Zoom, _ver_Zoom) - 0.5) >> 0;
+
+		if (_new_value < 5)
+			_new_value = 5;
+		return _new_value;
+	};
 	CMobileDelegateEditorPresentation.prototype.GetScrollerSize = function()
 	{
 		var _controlH = parseInt(this.HtmlPage.m_oMainView.HtmlElement.style.height);

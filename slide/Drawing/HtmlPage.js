@@ -2477,6 +2477,12 @@ function CEditorPage(api)
 		this.m_bIsRePaintOnScroll      = true;
 
 		this.m_oBoundsController.ClearNoAttack();
+
+		if (0 == this.m_nZoomType && this.MobileTouchManager)
+		{
+			this.MobileTouchManager.CheckZoomCriticalValues();
+		}
+
 		this.OnScroll();
 		this.onTimerScroll_sync(true);
 
