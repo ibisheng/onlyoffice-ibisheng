@@ -365,6 +365,8 @@
 
 		global_mouseEvent.Type   = g_mouse_event_type_down;
 		global_mouseEvent.Button = (e.button !== undefined) ? e.button : 0;
+		if (global_mouseEvent.Button == -1)
+			global_mouseEvent.Button = 0;
 
 		global_mouseEvent.Sender = (e.srcElement) ? e.srcElement : e.target;
 

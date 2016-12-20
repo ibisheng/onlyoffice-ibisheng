@@ -708,6 +708,8 @@ function CDrawingDocument()
 	this.TargetShowFlag        = false;
 	this.TargetShowNeedFlag    = false;
 
+	this.SelectionMatrix = null;
+
 	this.CanvasHit        = document.createElement('canvas');
 	this.CanvasHit.width  = 10;
 	this.CanvasHit.height = 10;
@@ -1850,6 +1852,9 @@ function CDrawingDocument()
 	}
 	this.AddPageSelection = function(pageIndex, x, y, width, height)
 	{
+		if (null == this.SelectionMatrix)
+			this.SelectionMatrix = this.TextMatrix;
+
 		if (pageIndex < 0 || pageIndex != this.SlideCurrent || Math.abs(width) < 0.001 || Math.abs(height) < 0.001)
 			return;
 
