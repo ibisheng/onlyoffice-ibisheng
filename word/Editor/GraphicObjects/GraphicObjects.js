@@ -2035,18 +2035,9 @@ CGraphicObjects.prototype =
         }
     },
 
-
     isSelectionUse: function()
     {
-        var content = this.getTargetDocContent();
-        if(content)
-        {
-            return content.Is_TextSelectionUse();
-        }
-        else
-        {
-            return this.selectedObjects.length > 0;
-        }
+        return this.selectedObjects.length > 0;
     },
 
     paragraphFormatPaste: function( CopyTextPr, CopyParaPr, Bool )
