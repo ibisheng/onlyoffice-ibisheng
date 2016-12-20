@@ -1267,7 +1267,7 @@ DrawingObjectsController.prototype =
                 }
                 else
                 {
-                    return -1;
+                    return false;
                 }
             }
         }
