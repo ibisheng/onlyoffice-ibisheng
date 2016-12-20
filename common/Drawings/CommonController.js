@@ -1198,11 +1198,7 @@ DrawingObjectsController.prototype =
 
 
     Is_SelectionUse: function(){
-        var content = this.getTargetDocContent(undefined, true);
-        if(content){
-            return content.Is_SelectionUse();
-        }
-        return false;
+        return this.selectedObjects.length > 0;
     },
 
     getFromTargetTextObjectContextMenuPosition: function(oTargetTextObject, pageIndex)
