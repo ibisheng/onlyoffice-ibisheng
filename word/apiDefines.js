@@ -182,26 +182,17 @@ var c_oSerFormat = {
 	Signature : "DOCY"
 };
 
-var section_footnote_RestartContinuous = 0x00;
-var section_footnote_RestartEachSect   = 0x01;
-var section_footnote_RestartEachPage   = 0x02;
-
-var section_footnote_PosBeneathText = 0x00;
-var section_footnote_PosDocEnd      = 0x01;
-var section_footnote_PosPageBottom  = 0x02;
-var section_footnote_PosSectEnd     = 0x03;
-
 var c_oAscFootnotePos = {
-	BeneathText : section_footnote_PosBeneathText,
-	DocEnd      : section_footnote_PosDocEnd,
-	PageBottom  : section_footnote_PosPageBottom,
-	SectEnd     : section_footnote_PosSectEnd
+	BeneathText : 0x00, //section_footnote_PosBeneathText
+	DocEnd      : 0x01, //section_footnote_PosDocEnd
+	PageBottom  : 0x02, //section_footnote_PosPageBottom,
+	SectEnd     : 0x03  //section_footnote_PosSectEnd
 };
 
 var c_oAscFootnoteRestart = {
-	Continuous : section_footnote_RestartContinuous,
-	EachSect   : section_footnote_RestartEachSect,
-	EachPage   : section_footnote_RestartEachPage
+	Continuous : 0x00, //section_footnote_RestartContinuous,
+	EachSect   : 0x01, //section_footnote_RestartEachSect,
+	EachPage   : 0x02  //section_footnote_RestartEachPage
 };
 
 window["flat_desine"] = false;
