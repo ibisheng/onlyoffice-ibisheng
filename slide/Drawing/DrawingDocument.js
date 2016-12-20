@@ -3110,22 +3110,25 @@ function CThumbnailsManager()
 
 	this.initEvents2MobileAdvances = function()
 	{
+		if (this.m_oWordControl.m_oApi.isMobileVersion)
+			return;
+
 		var control             = this.m_oWordControl.m_oThumbnails.HtmlElement;
 		control["ontouchstart"] = function(e)
 		{
 			oThis.onMouseDown(e.touches[0]);
 			return false;
-		}
+		};
 		control["ontouchmove"]  = function(e)
 		{
 			oThis.onMouseMove(e.touches[0]);
 			return false;
-		}
+		};
 		control["ontouchend"]   = function(e)
 		{
 			oThis.onMouseUp(e.changedTouches[0]);
 			return false;
-		}
+		};
 	}
 
 	this.GetThumbnailPagePosition = function(pageIndex)
