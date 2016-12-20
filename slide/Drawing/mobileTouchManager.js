@@ -63,14 +63,15 @@
 	};
 	CMobileDelegateEditorPresentation.prototype.GetScrollerSize = function()
 	{
+		var _controlH = parseInt(this.HtmlPage.m_oMainView.HtmlElement.style.height);
 		return {
-			W : (this.DrawingDocument.SlideCurrectRect.right - this.DrawingDocument.SlideCurrectRect.left),
-			H : (this.DrawingDocument.SlideCurrectRect.bottom - this.DrawingDocument.SlideCurrectRect.top)
+			W : (this.HtmlPage.m_dDocumentWidth),
+			H : (this.HtmlPage.SlideScrollMAX - this.HtmlPage.SlideScrollMIN + _controlH)
 		};
 	};
 	CMobileDelegateEditorPresentation.prototype.GetObjectTrack = function(x, y, page)
 	{
-		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.isPointInDrawingObjects(x, y, page);
+		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.isPointInDrawingObjects3(x, y, page);
 	};
 	CMobileDelegateEditorPresentation.prototype.GetSelectionRectsBounds = function()
 	{
@@ -81,7 +82,7 @@
 		var bIsHorPresent = (this.HtmlPage.m_oScrollHorApi != null);
 		if (_scroll.directionLocked == "v")
 		{
-			this.HtmlPage.m_oScrollVerApi.scrollToY(-_scroll.y);
+			this.HtmlPage.m_oScrollVerApi.scrollToY(-_scroll.y + this.HtmlPage.SlideScrollMIN);
 		}
 		else if (_scroll.directionLocked == "h" && bIsHorPresent)
 		{
@@ -91,7 +92,7 @@
 		{
 			if (bIsHorPresent)
 				this.HtmlPage.m_oScrollHorApi.scrollToX(-_scroll.x);
-			this.HtmlPage.m_oScrollVerApi.scrollToY(-_scroll.y);
+			this.HtmlPage.m_oScrollVerApi.scrollToY(-_scroll.y + this.HtmlPage.SlideScrollMIN);
 		}
 	};
 	CMobileDelegateEditorPresentation.prototype.GetContextMenuType = function()

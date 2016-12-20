@@ -927,8 +927,8 @@
 
 	CMobileTouchManagerBase.prototype.ClearContextMenu = function()
 	{
-		this.ContextMenuLastMode 		= AscCommon.MobileTouchContextMenuType.None;
-		this.ContextMenuLastModeCounter = 0;
+		//this.ContextMenuLastMode 		= AscCommon.MobileTouchContextMenuType.None;
+		//this.ContextMenuLastModeCounter = 0;
 		this.Api.sendEvent("asc_onHidePopMenu");
 	};
 
