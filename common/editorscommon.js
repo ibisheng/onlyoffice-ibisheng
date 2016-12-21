@@ -153,7 +153,7 @@ DocumentUrls.prototype = {
 			this.urlsReverse[url] = i;
 			this.imageCount++;
 		}
- 
+
         if (window["IS_NATIVE_EDITOR"]) {
             window["native"]["setUrlsCount"](this.imageCount);
         }
@@ -299,7 +299,7 @@ function openFileCommand(binUrl, changesUrl, Signature, callback) {
     }
   });
   }
- 
+
   if (null != changesUrl) {
     getJSZipUtils().getBinaryContent(changesUrl, function(err, data) {
       bEndLoadChanges = true;
@@ -695,7 +695,7 @@ function test_defName(){
     thisRow: 5,
     columns: 6
   };
-  
+
 var cStrucTableLocalColumns = null,
 	cBoolLocal = {},
 	cErrorOrigin = {"nil":"#NULL!","div":"#DIV\/0!","value":"#VALUE!","ref":"#REF!","name":"#NAME?","num":"#NUM!","na":"#N\/A","getdata":"#GETTING_DATA","uf":"#UNSUPPORTED_FUNCTION!"},
@@ -2208,11 +2208,11 @@ function getUserColorById(userId, userName, isDark, isNumericValue)
     var oColor = true === isDark ? res.Dark : res.Light;
     return true === isNumericValue ? ((oColor.r << 16) & 0xFF0000) | ((oColor.g << 8) & 0xFF00) | (oColor.b & 0xFF) : oColor;
 }
-  
+
   function isNullOrEmptyString(str) {
     return (str == undefined) || (str == null) || (str == "");
   }
-  
+
 function CUserCacheColor(nColor)
 {
   this.Light = null;
@@ -2285,14 +2285,53 @@ CUserCacheColor.prototype.init = function(nColor) {
     }
   }
 
-var g_oIdCounter = new CIdCounter();
+	function getColorThemeByIndex(index) {
+		var _c, scheme = null;
+		var oColorScheme = AscCommon.g_oUserColorScheme;
+		if (index >= oColorScheme.length) {
+			return scheme;
+		}
+		scheme = new AscFormat.ClrScheme();
+
+		var tmp = oColorScheme[index];
+		scheme.name = tmp.name;
+
+		_c = tmp.get_dk1();
+		scheme.colors[8] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_lt1();
+		scheme.colors[12] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_dk2();
+		scheme.colors[9] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_lt2();
+		scheme.colors[13] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_accent1();
+		scheme.colors[0] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_accent2();
+		scheme.colors[1] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_accent3();
+		scheme.colors[2] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_accent4();
+		scheme.colors[3] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_accent5();
+		scheme.colors[4] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_accent6();
+		scheme.colors[5] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_hlink();
+		scheme.colors[11] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_folHlink();
+		scheme.colors[10] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+
+		return scheme;
+	}
+
+	var g_oIdCounter = new CIdCounter();
 
 window["SetDoctRendererParams"] = function(_params)
 {
 	if (_params["retina"] === true)
 		AscBrowser.isRetina = true;
 };
-  
+
   //------------------------------------------------------------export---------------------------------------------------
   window['AscCommon'] = window['AscCommon'] || {};
   window["AscCommon"].getEncodingParams = getEncodingParams;
@@ -2332,6 +2371,7 @@ window["SetDoctRendererParams"] = function(_params)
   window["AscCommon"].CContentChangesElement = CContentChangesElement;
 
   window["AscCommon"].loadSdk = loadSdk;
+	window["AscCommon"].getColorThemeByIndex = getColorThemeByIndex;
 
   window["AscCommon"].g_oDocumentUrls = g_oDocumentUrls;
   window["AscCommon"].FormulaTablePartInfo = FormulaTablePartInfo;

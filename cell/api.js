@@ -2888,7 +2888,7 @@ var editor;
 		var onChangeColorScheme = function (res) {
 			if (res) {
 				var theme = t.wbModel.theme;
-				var scheme = t.getColorThemeByIndex(index);
+				var scheme = AscCommon.getColorThemeByIndex(index);
 				if (!scheme) {
 					index -= AscCommon.g_oUserColorScheme.length;
 					if (index < 0 || index >= theme.extraClrSchemeLst.length) {

@@ -6548,7 +6548,7 @@ background-repeat: no-repeat;\
 
 		if (this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_ColorScheme) === false)
 		{
-			var scheme = this.getColorThemeByIndex(index_scheme);
+			var scheme = AscCommon.getColorThemeByIndex(index_scheme);
 			if (!scheme)
 			{
 				index_scheme -= AscCommon.g_oUserColorScheme.length;

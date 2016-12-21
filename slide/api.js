@@ -4204,7 +4204,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
 	{
-		var scheme = this.getColorThemeByIndex(index_scheme);
+		var scheme = AscCommon.getColorThemeByIndex(index_scheme);
 		if (!scheme)
 		{
 			index_scheme -= AscCommon.g_oUserColorScheme.length;
