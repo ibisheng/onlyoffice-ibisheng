@@ -38,9 +38,10 @@ var FOREIGN_CURSOR_LABEL_HIDETIME = 1500;
 
 function CCollaborativeChanges()
 {
-	this.m_pData  = null;
-	this.m_oColor = null;
+    this.m_pData         = null;
+    this.m_oColor        = null;
 }
+
 CCollaborativeChanges.prototype.Set_Data = function(pData)
 {
     this.m_pData = pData;
@@ -51,157 +52,180 @@ CCollaborativeChanges.prototype.Set_Color = function(oColor)
 };
 CCollaborativeChanges.prototype.Set_FromUndoRedo = function(Class, Data, Binary)
 {
-	if (!Class.Get_Id)
-		return false;
+    if ( "undefined" === typeof(Class.Get_Id) )
+        return false;
 
-	this.m_pData = this.private_SaveData(Binary);
-	return true;
+    // Преобразуем данные в бинарный файл
+    this.m_pData  = this.Internal_Save_Data( Class, Data, Binary );
+
+    return true;
 };
 CCollaborativeChanges.prototype.Apply_Data = function()
 {
-	var CollaborativeEditing = AscCommon.CollaborativeEditing;
+    var LoadData  = this.Internal_Load_Data(this.m_pData);
+    var ClassId   = LoadData.Reader.GetString2();
+    var ReaderPos = LoadData.Reader.GetCurPos();
+    var Type      = LoadData.Reader.GetLong();
+    var Class     = null;
 
-	var Reader  = this.private_LoadData(this.m_pData);
-	var ClassId = Reader.GetString2();
-	var Class   = AscCommon.g_oTableId.Get_ById(ClassId);
+    if (AscDFH.historyitem_type_HdrFtr === Type)
+        Class = editor.WordControl.m_oLogicDocument.HdrFtr;
+    else
+        Class = AscCommon.g_oTableId.Get_ById(ClassId);
 
-	if (!Class)
-		return false;
+    LoadData.Reader.Seek2(ReaderPos);
 
-	//------------------------------------------------------------------------------------------------------------------
-	// Новая схема
-	var nReaderPos   = Reader.GetCurPos();
-	var nChangesType = Reader.GetLong();
-
-	var fChangesClass = AscDFH.changesFactory[nChangesType];
-	if (fChangesClass)
-	{
-		var oChange = new fChangesClass(Class);
-		oChange.ReadFromBinary(Reader);
-
-		if (true === CollaborativeEditing.private_AddOverallChange(oChange))
-			oChange.Load(this.m_oColor);
-
-		return true;
-	}
-	else
-	{
-		CollaborativeEditing.private_AddOverallChange(this.m_pData);
-		// Сюда мы попадаем, когда у данного изменения нет класса и он все еще работает по старой схеме через объект
-
-		Reader.Seek2(nReaderPos);
-		//\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-		// Старая схема
-
-		if (!Class.Load_Changes)
-			return false;
-
-		return Class.Load_Changes(Reader, null, this.m_oColor);
-	}
+    if (null != Class)
+        return Class.Load_Changes(LoadData.Reader, LoadData.Reader2, this.m_oColor);
+    else
+        return false;
 };
-CCollaborativeChanges.prototype.private_LoadData = function(szSrc)
+CCollaborativeChanges.prototype.Internal_Load_Data = function(szSrc)
 {
-    return this.GetStream(szSrc, 0, szSrc.length);
+    var srcLen = szSrc.length;
+    var index =  -1;
+
+    while (true)
+    {
+        index++;
+        var _c = szSrc.charCodeAt(index);
+        if (_c == ";".charCodeAt(0))
+        {
+            index++;
+            break;
+        }
+    }
+
+    var bPost = false;
+    // Ищем следующее вхождение ";"
+    while (index < srcLen)
+    {
+        index++;
+        var _c = szSrc.charCodeAt(index);
+        if (_c == ";".charCodeAt(0))
+        {
+            index++;
+            bPost = true;
+            break;
+        }
+    }
+
+    if ( true === bPost )
+        return { Reader : this.Internal_Load_Data2(szSrc, 0, index - 1), Reader2 : this.Internal_Load_Data2(szSrc, index, srcLen ) };
+    else
+        return { Reader : this.Internal_Load_Data2(szSrc, 0, szSrc.length), Reader2 : null };
 };
-CCollaborativeChanges.prototype.GetStream = function(szSrc, offset, srcLen)
+CCollaborativeChanges.prototype.Internal_Load_Data2 = function(szSrc, offset, srcLen)
 {
-	var nWritten = 0;
+    var nWritten = 0;
 
-	var index   = -1 + offset;
-	var dst_len = "";
+    var index =  -1 + offset;
+    var dst_len = "";
 
-	while (true)
-	{
-		index++;
-		var _c = szSrc.charCodeAt(index);
-		if (_c == ";".charCodeAt(0))
-		{
-			index++;
-			break;
-		}
+    while (true)
+    {
+        index++;
+        var _c = szSrc.charCodeAt(index);
+        if (_c == ";".charCodeAt(0))
+        {
+            index++;
+            break;
+        }
 
-		dst_len += String.fromCharCode(_c);
-	}
+        dst_len += String.fromCharCode(_c);
+    }
 
-	var dstLen = parseInt(dst_len);
+    var dstLen = parseInt(dst_len);
 
-	var pointer = AscFonts.g_memory.Alloc(dstLen);
-	var stream  = new AscCommon.FT_Stream2(pointer.data, dstLen);
-	stream.obj  = pointer.obj;
+    var pointer = AscFonts.g_memory.Alloc(dstLen);
+    var stream = new AscCommon.FT_Stream2(pointer.data, dstLen);
+    stream.obj = pointer.obj;
 
-	var dstPx = stream.data;
+    var dstPx = stream.data;
 
-	if (window.chrome)
-	{
-		while (index < srcLen)
-		{
-			var dwCurr = 0;
-			var i;
-			var nBits  = 0;
-			for (i = 0; i < 4; i++)
-			{
-				if (index >= srcLen)
-					break;
-				var nCh = AscFonts.DecodeBase64Char(szSrc.charCodeAt(index++));
-				if (nCh == -1)
-				{
-					i--;
-					continue;
-				}
-				dwCurr <<= 6;
-				dwCurr |= nCh;
-				nBits += 6;
-			}
+    if (window.chrome)
+    {
+        while (index < srcLen)
+        {
+            var dwCurr = 0;
+            var i;
+            var nBits = 0;
+            for (i=0; i<4; i++)
+            {
+                if (index >= srcLen)
+                    break;
+                var nCh = AscFonts.DecodeBase64Char(szSrc.charCodeAt(index++));
+                if (nCh == -1)
+                {
+                    i--;
+                    continue;
+                }
+                dwCurr <<= 6;
+                dwCurr |= nCh;
+                nBits += 6;
+            }
 
-			dwCurr <<= 24 - nBits;
-			for (i = 0; i < nBits / 8; i++)
-			{
-				dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
-				dwCurr <<= 8;
-			}
-		}
-	}
-	else
-	{
-		var p = AscFonts.b64_decode;
-		while (index < srcLen)
-		{
-			var dwCurr = 0;
-			var i;
-			var nBits  = 0;
-			for (i = 0; i < 4; i++)
-			{
-				if (index >= srcLen)
-					break;
-				var nCh = p[szSrc.charCodeAt(index++)];
-				if (nCh == undefined)
-				{
-					i--;
-					continue;
-				}
-				dwCurr <<= 6;
-				dwCurr |= nCh;
-				nBits += 6;
-			}
+            dwCurr <<= 24-nBits;
+            for (i=0; i<nBits/8; i++)
+            {
+                dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+                dwCurr <<= 8;
+            }
+        }
+    }
+    else
+    {
+        var p = AscFonts.b64_decode;
+        while (index < srcLen)
+        {
+            var dwCurr = 0;
+            var i;
+            var nBits = 0;
+            for (i=0; i<4; i++)
+            {
+                if (index >= srcLen)
+                    break;
+                var nCh = p[szSrc.charCodeAt(index++)];
+                if (nCh == undefined)
+                {
+                    i--;
+                    continue;
+                }
+                dwCurr <<= 6;
+                dwCurr |= nCh;
+                nBits += 6;
+            }
 
-			dwCurr <<= 24 - nBits;
-			for (i = 0; i < nBits / 8; i++)
-			{
-				dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
-				dwCurr <<= 8;
-			}
-		}
-	}
+            dwCurr <<= 24-nBits;
+            for (i=0; i<nBits/8; i++)
+            {
+                dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+                dwCurr <<= 8;
+            }
+        }
+    }
 
-	return stream;
+    return stream;
 };
-CCollaborativeChanges.prototype.private_SaveData = function(Binary)
+CCollaborativeChanges.prototype.Internal_Save_Data = function(Class, Data, Binary)
 {
-	var Writer = AscCommon.History.BinaryWriter;
-	var Pos    = Binary.Pos;
-	var Len    = Binary.Len;
-	return Len + ";" + Writer.GetBase64Memory2(Pos, Len);
+    var Writer = AscCommon.History.BinaryWriter;
+    var Pos = Binary.Pos;
+    var Len = Binary.Len;
+
+    if ( "undefined" != typeof(Class.Save_Changes2) )
+    {
+        AscCommon.CollaborativeEditing.InitMemory();
+        var Writer2 = AscCommon.CollaborativeEditing.m_oMemory;
+        Writer2.Seek(0);
+        if ( true === Class.Save_Changes2( Data, Writer2 ) )
+            return Len + ";" + Writer.GetBase64Memory2(Pos, Len) + ";" + Writer2.GetCurPosition() + ";" + Writer2.GetBase64Memory();
+    }
+
+    return Len + ";" + Writer.GetBase64Memory2(Pos, Len);
 };
+
+
 
 
 function CCollaborativeEditingBase()
@@ -219,8 +243,8 @@ function CCollaborativeEditingBase()
     this.m_aEndActions  = []; // Массив действий, которые надо выполнить после принятия чужих изменений
 
 
-    this.m_bGlobalLock          = 0; // Запрещаем производить любые "редактирующие" действия (т.е. то, что в историю запишется)
-    this.m_bGlobalLockSelection = 0; // Запрещаем изменять селект и курсор
+    this.m_bGlobalLock  = false;         // Запрещаем производить любые "редактирующие" действия (т.е. то, что в историю запишется)
+    this.m_bGlobalLockSelection = false; // Запрещаем изменять селект и курсор
     this.m_aCheckLocks  = [];    // Массив для проверки залоченности объектов, которые мы собираемся изменять
 
     this.m_aNewObjects  = []; // Массив со списком чужих новых объектов
@@ -341,14 +365,78 @@ CCollaborativeEditingBase.prototype.Apply_Changes = function()
 
         editor.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.ApplyChanges);
 
-        var DocState = this.private_SaveDocumentState();
+        var LogicDocument = editor.WordControl.m_oLogicDocument;
+
+        var DocState;
+        if (true !== this.Is_Fast())
+        {
+            DocState = LogicDocument.Get_SelectionState2();
+            this.m_aCursorsToUpdate = {};
+        }
+        else
+        {
+            DocState = LogicDocument.Save_DocumentStateBeforeLoadChanges();
+            this.Clear_DocumentPositions();
+
+            if (DocState.Pos)
+                this.Add_DocumentPosition(DocState.Pos);
+            if (DocState.StartPos)
+                this.Add_DocumentPosition(DocState.StartPos);
+            if (DocState.EndPos)
+                this.Add_DocumentPosition(DocState.EndPos);
+
+            if (DocState.FootnotesStart && DocState.FootnotesStart.Pos)
+                this.Add_DocumentPosition(DocState.FootnotesStart.Pos);
+            if (DocState.FootnotesStart && DocState.FootnotesStart.StartPos)
+                this.Add_DocumentPosition(DocState.FootnotesStart.StartPos);
+            if (DocState.FootnotesStart && DocState.FootnotesStart.EndPos)
+                this.Add_DocumentPosition(DocState.FootnotesStart.EndPos);
+            if (DocState.FootnotesEnd && DocState.FootnotesEnd.Pos)
+                this.Add_DocumentPosition(DocState.FootnotesEnd.Pos);
+            if (DocState.FootnotesEnd && DocState.FootnotesEnd.StartPos)
+                this.Add_DocumentPosition(DocState.FootnotesEnd.StartPos);
+            if (DocState.FootnotesEnd && DocState.FootnotesEnd.EndPos)
+                this.Add_DocumentPosition(DocState.FootnotesEnd.EndPos);
+        }
+
         this.Clear_NewImages();
 
         this.Apply_OtherChanges();
 
         // После того как мы приняли чужие изменения, мы должны залочить новые объекты, которые были залочены
         this.Lock_NeedLock();
-        this.private_RestoreDocumentState(DocState);
+
+        if (true !== this.Is_Fast())
+        {
+            LogicDocument.Set_SelectionState2(DocState);
+        }
+        else
+        {
+            if (DocState.Pos)
+                this.Update_DocumentPosition(DocState.Pos);
+            if (DocState.StartPos)
+                this.Update_DocumentPosition(DocState.StartPos);
+            if (DocState.EndPos)
+                this.Update_DocumentPosition(DocState.EndPos);
+
+            if (DocState.FootnotesStart && DocState.FootnotesStart.Pos)
+                this.Update_DocumentPosition(DocState.FootnotesStart.Pos);
+            if (DocState.FootnotesStart && DocState.FootnotesStart.StartPos)
+                this.Update_DocumentPosition(DocState.FootnotesStart.StartPos);
+            if (DocState.FootnotesStart && DocState.FootnotesStart.EndPos)
+                this.Update_DocumentPosition(DocState.FootnotesStart.EndPos);
+            if (DocState.FootnotesEnd && DocState.FootnotesEnd.Pos)
+                this.Update_DocumentPosition(DocState.FootnotesEnd.Pos);
+            if (DocState.FootnotesEnd && DocState.FootnotesEnd.StartPos)
+                this.Update_DocumentPosition(DocState.FootnotesEnd.StartPos);
+            if (DocState.FootnotesEnd && DocState.FootnotesEnd.EndPos)
+                this.Update_DocumentPosition(DocState.FootnotesEnd.EndPos);
+
+
+            LogicDocument.Load_DocumentStateAfterLoadChanges(DocState);
+            this.Refresh_ForeignCursors();
+        }
+
         this.OnStart_Load_Objects();
     }
 };
@@ -356,9 +444,6 @@ CCollaborativeEditingBase.prototype.Apply_OtherChanges = function()
 {
     // Чтобы заново созданные параграфы не отображались залоченными
     AscCommon.g_oIdCounter.Set_Load( true );
-
-    if (this.m_aChanges.length > 0)
-    	this.private_CollectOwnChanges();
 
     // Применяем изменения, пока они есть
     var _count = this.m_aChanges.length;
@@ -376,7 +461,7 @@ CCollaborativeEditingBase.prototype.Apply_OtherChanges = function()
         //this.m_nErrorLog_PointChangesCount++;
     }
 
-    this.private_ClearChanges();
+    this.m_aChanges = [];
 
     // У новых элементов выставляем указатели на другие классы
     this.Apply_LinkData();
@@ -400,8 +485,8 @@ CCollaborativeEditingBase.prototype.Release_Locks = function()
 };
 CCollaborativeEditingBase.prototype.OnStart_Load_Objects = function()
 {
-    AscCommon.CollaborativeEditing.Set_GlobalLock(true);
-    AscCommon.CollaborativeEditing.Set_GlobalLockSelection(true);
+    AscCommon.CollaborativeEditing.m_bGlobalLock = true;
+    AscCommon.CollaborativeEditing.m_bGlobalLockSelection = true;
     // Вызываем функцию для загрузки необходимых элементов (новые картинки и шрифты)
     editor.pre_Save(AscCommon.CollaborativeEditing.m_aNewImages);
 };
@@ -441,25 +526,7 @@ CCollaborativeEditingBase.prototype.Check_MergeData = function()
 //-----------------------------------------------------------------------------------
 CCollaborativeEditingBase.prototype.Get_GlobalLock = function()
 {
-    return (0 === this.m_bGlobalLock ? false : true);
-};
-CCollaborativeEditingBase.prototype.Set_GlobalLock = function(isLock)
-{
-	if (isLock)
-		this.m_bGlobalLock++;
-	else
-		this.m_bGlobalLock = Math.max(0, this.m_bGlobalLock - 1);
-};
-CCollaborativeEditingBase.prototype.Set_GlobalLockSelection = function(isLock)
-{
-	if (isLock)
-		this.m_bGlobalLockSelection++;
-	else
-		this.m_bGlobalLockSelection = Math.max(0, this.m_bGlobalLockSelection - 1);
-};
-CCollaborativeEditingBase.prototype.Get_GlobalLockSelection = function()
-{
-	return (0 === this.m_bGlobalLockSelection ? false : true);
+    return this.m_bGlobalLock;
 };
 CCollaborativeEditingBase.prototype.OnStart_CheckLock = function()
 {
@@ -685,91 +752,6 @@ CCollaborativeEditingBase.prototype.InitMemory = function() {
         this.m_oMemory = new AscCommon.CMemory();
     }
 };
-CCollaborativeEditingBase.prototype.private_SaveDocumentState = function()
-{
-	var LogicDocument = editor.WordControl.m_oLogicDocument;
-
-	var DocState;
-	if (true !== this.Is_Fast())
-	{
-		DocState = LogicDocument.Get_SelectionState2();
-		this.m_aCursorsToUpdate = {};
-	}
-	else
-	{
-		DocState = LogicDocument.Save_DocumentStateBeforeLoadChanges();
-		this.Clear_DocumentPositions();
-
-		if (DocState.Pos)
-			this.Add_DocumentPosition(DocState.Pos);
-		if (DocState.StartPos)
-			this.Add_DocumentPosition(DocState.StartPos);
-		if (DocState.EndPos)
-			this.Add_DocumentPosition(DocState.EndPos);
-
-		if (DocState.FootnotesStart && DocState.FootnotesStart.Pos)
-			this.Add_DocumentPosition(DocState.FootnotesStart.Pos);
-		if (DocState.FootnotesStart && DocState.FootnotesStart.StartPos)
-			this.Add_DocumentPosition(DocState.FootnotesStart.StartPos);
-		if (DocState.FootnotesStart && DocState.FootnotesStart.EndPos)
-			this.Add_DocumentPosition(DocState.FootnotesStart.EndPos);
-		if (DocState.FootnotesEnd && DocState.FootnotesEnd.Pos)
-			this.Add_DocumentPosition(DocState.FootnotesEnd.Pos);
-		if (DocState.FootnotesEnd && DocState.FootnotesEnd.StartPos)
-			this.Add_DocumentPosition(DocState.FootnotesEnd.StartPos);
-		if (DocState.FootnotesEnd && DocState.FootnotesEnd.EndPos)
-			this.Add_DocumentPosition(DocState.FootnotesEnd.EndPos);
-	}
-	return DocState;
-};
-CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocState)
-{
-	var LogicDocument = editor.WordControl.m_oLogicDocument;
-	if (true !== this.Is_Fast())
-	{
-		LogicDocument.Set_SelectionState2(DocState);
-	}
-	else
-	{
-		if (DocState.Pos)
-			this.Update_DocumentPosition(DocState.Pos);
-		if (DocState.StartPos)
-			this.Update_DocumentPosition(DocState.StartPos);
-		if (DocState.EndPos)
-			this.Update_DocumentPosition(DocState.EndPos);
-
-		if (DocState.FootnotesStart && DocState.FootnotesStart.Pos)
-			this.Update_DocumentPosition(DocState.FootnotesStart.Pos);
-		if (DocState.FootnotesStart && DocState.FootnotesStart.StartPos)
-			this.Update_DocumentPosition(DocState.FootnotesStart.StartPos);
-		if (DocState.FootnotesStart && DocState.FootnotesStart.EndPos)
-			this.Update_DocumentPosition(DocState.FootnotesStart.EndPos);
-		if (DocState.FootnotesEnd && DocState.FootnotesEnd.Pos)
-			this.Update_DocumentPosition(DocState.FootnotesEnd.Pos);
-		if (DocState.FootnotesEnd && DocState.FootnotesEnd.StartPos)
-			this.Update_DocumentPosition(DocState.FootnotesEnd.StartPos);
-		if (DocState.FootnotesEnd && DocState.FootnotesEnd.EndPos)
-			this.Update_DocumentPosition(DocState.FootnotesEnd.EndPos);
-
-
-		LogicDocument.Load_DocumentStateAfterLoadChanges(DocState);
-		this.Refresh_ForeignCursors();
-	}
-};
-//----------------------------------------------------------------------------------------------------------------------
-// Private area
-//----------------------------------------------------------------------------------------------------------------------
-	CCollaborativeEditingBase.prototype.private_ClearChanges = function()
-	{
-		this.m_aChanges = [];
-	};
-	CCollaborativeEditingBase.prototype.private_CollectOwnChanges = function()
-	{
-	};
-	CCollaborativeEditingBase.prototype.private_AddOverallChange = function(oChange)
-	{
-	    return true;
-	};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -921,6 +903,7 @@ CDocumentPositionsManager.prototype.Remove_DocumentPosition = function(DocPos)
         }
     }
 };
+
     //--------------------------------------------------------export----------------------------------------------------
     window['AscCommon'] = window['AscCommon'] || {};
     window['AscCommon'].FOREIGN_CURSOR_LABEL_HIDETIME = FOREIGN_CURSOR_LABEL_HIDETIME;

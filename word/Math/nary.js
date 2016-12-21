@@ -494,27 +494,27 @@ CNary.prototype.getSubMathContent = function()
 };
 CNary.prototype.Apply_MenuProps = function(Props)
 {
-	if (Props.Type == Asc.c_oAscMathInterfaceType.LargeOperator)
-	{
-		if (Props.LimLoc !== undefined && false == this.ParaMath.Is_Inline() && this.Pr.limLoc !== Props.LimLoc)
-		{
-			var LimLoc = Props.LimLoc == Asc.c_oAscMathInterfaceNaryLimitLocation.SubSup ? NARY_SubSup : NARY_UndOvr;
-			AscCommon.History.Add(new CChangesMathNaryLimLoc(this, this.Pr.limLoc, LimLoc));
-			this.raw_SetLimLoc(LimLoc);
-		}
+    if(Props.Type == Asc.c_oAscMathInterfaceType.LargeOperator)
+    {
+        if(Props.LimLoc !== undefined && false == this.ParaMath.Is_Inline() && this.Pr.limLoc !== Props.LimLoc)
+        {
+            var LimLoc = Props.LimLoc == Asc.c_oAscMathInterfaceNaryLimitLocation.SubSup ? NARY_SubSup : NARY_UndOvr;
+            AscCommon.History.Add(this, new CChangesMathNaryLimLoc(LimLoc, this.Pr.limLoc));
+            this.raw_SetLimLoc(LimLoc);
+        }
 
-		if (Props.HideUpper !== undefined && Props.HideUpper !== this.Pr.supHide)
-		{
-			AscCommon.History.Add(new CChangesMathNaryUpperLimit(this, this.Pr.supHide, !this.Pr.supHide));
-			this.raw_HideUpperIterator(!this.Pr.supHide);
-		}
+        if(Props.HideUpper !== undefined && Props.HideUpper !== this.Pr.supHide)
+        {
+            AscCommon.History.Add(this, new CChangesMathNaryUpperLimit(!this.Pr.supHide, this.Pr.supHide));
+            this.raw_HideUpperIterator(!this.Pr.supHide);
+        }
 
-		if (Props.HideLower !== undefined && Props.HideLower !== this.Pr.subHide)
-		{
-			AscCommon.History.Add(new CChangesMathNaryLowerLimit(this, this.Pr.subHide, !this.Pr.subHide));
-			this.raw_HideLowerIterator(!this.Pr.subHide);
-		}
-	}
+        if(Props.HideLower !== undefined && Props.HideLower !== this.Pr.subHide)
+        {
+            AscCommon.History.Add(this, new CChangesMathNaryLowerLimit(!this.Pr.subHide, this.Pr.subHide));
+            this.raw_HideLowerIterator(!this.Pr.subHide);
+        }
+    }
 };
 CNary.prototype.Get_InterfaceProps = function()
 {

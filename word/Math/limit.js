@@ -285,16 +285,16 @@ CLimit.prototype.ApplyProperties = function(RPI)
 };
 CLimit.prototype.Apply_MenuProps = function(Props)
 {
-	if (Props.Type == Asc.c_oAscMathInterfaceType.Limit && Props.Pos !== undefined)
-	{
-		var Type = Props.Pos == Asc.c_oAscMathInterfaceLimitPos.Bottom ? LIMIT_LOW : LIMIT_UP;
+    if(Props.Type == Asc.c_oAscMathInterfaceType.Limit && Props.Pos !== undefined)
+    {
+        var Type = Props.Pos == Asc.c_oAscMathInterfaceLimitPos.Bottom ? LIMIT_LOW : LIMIT_UP;
 
-		if (this.Pr.type !== Type)
-		{
-			AscCommon.History.Add(new CChangesMathLimitType(this, this.Pr.type, Type));
-			this.raw_SetType(Type);
-		}
-	}
+        if(this.Pr.type !== Type)
+        {
+            AscCommon.History.Add(this, new CChangesMathLimitType(Type, this.Pr.type));
+            this.raw_SetType(Type);
+        }
+    }
 };
 CLimit.prototype.Get_InterfaceProps = function()
 {

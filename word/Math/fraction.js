@@ -577,32 +577,32 @@ CFraction.prototype.fillContent = function()
 };
 CFraction.prototype.Apply_MenuProps = function(Props)
 {
-	if (Props.Type == Asc.c_oAscMathInterfaceType.Fraction && Props.FractionType !== undefined)
-	{
-		var FractionType = this.Pr.type;
+    if(Props.Type == Asc.c_oAscMathInterfaceType.Fraction && Props.FractionType !== undefined)
+    {
+        var FractionType = this.Pr.type;
 
-		switch (Props.FractionType)
-		{
-			case Asc.c_oAscMathInterfaceFraction.Bar:
-				FractionType = BAR_FRACTION;
-				break;
-			case Asc.c_oAscMathInterfaceFraction.Skewed:
-				FractionType = SKEWED_FRACTION;
-				break;
-			case Asc.c_oAscMathInterfaceFraction.Linear:
-				FractionType = LINEAR_FRACTION;
-				break;
-			case Asc.c_oAscMathInterfaceFraction.NoBar:
-				FractionType = NO_BAR_FRACTION;
-				break;
-		}
+        switch (Props.FractionType)
+        {
+            case Asc.c_oAscMathInterfaceFraction.Bar:
+                FractionType = BAR_FRACTION;
+                break;
+            case Asc.c_oAscMathInterfaceFraction.Skewed:
+                FractionType = SKEWED_FRACTION;
+                break;
+            case Asc.c_oAscMathInterfaceFraction.Linear:
+                FractionType = LINEAR_FRACTION;
+                break;
+            case Asc.c_oAscMathInterfaceFraction.NoBar:
+                FractionType = NO_BAR_FRACTION;
+                break;
+        }
 
-		if (FractionType !== this.Pr.type)
-		{
-			AscCommon.History.Add(new CChangesMathFractionType(this, this.Pr.type, FractionType));
-			this.raw_SetFractionType(FractionType);
-		}
-	}
+        if(FractionType !== this.Pr.type)
+        {
+            AscCommon.History.Add(this, new CChangesMathFractionType(FractionType, this.Pr.type));
+            this.raw_SetFractionType(FractionType);
+        }
+    }
 };
 CFraction.prototype.Get_InterfaceProps = function()
 {

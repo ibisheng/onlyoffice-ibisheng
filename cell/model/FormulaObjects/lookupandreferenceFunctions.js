@@ -582,17 +582,29 @@
 				}
 				if (parserHelp.isArea.call(o, o.Formula, o.pCurrPos)) {
 					found_operand = new cArea3D(o.operand_str.toUpperCase(), _wsFrom, _wsTo, wb);
+					if (o.operand_str.indexOf("$") > -1) {
+						found_operand.isAbsolute = true;
+					}
 				} else if (parserHelp.isRef.call(o, o.Formula, o.pCurrPos)) {
 					if (_wsTo != _wsFrom) {
 						found_operand = new cArea3D(o.operand_str.toUpperCase(), _wsFrom, _wsTo, wb);
 					} else {
 						found_operand = new cRef3D(o.operand_str.toUpperCase(), _wsFrom, wb);
 					}
+					if (o.operand_str.indexOf("$") > -1) {
+						found_operand.isAbsolute = true;
+					}
 				}
 			} else if (parserHelp.isArea.call(o, o.Formula, o.pCurrPos)) {
 				found_operand = new cArea(o.operand_str.toUpperCase(), r1.worksheet);
+				if (o.operand_str.indexOf("$") > -1) {
+					found_operand.isAbsolute = true;
+				}
 			} else if (parserHelp.isRef.call(o, o.Formula, o.pCurrPos, true)) {
 				found_operand = new cRef(o.operand_str.toUpperCase(), r1.worksheet);
+				if (o.operand_str.indexOf("$") > -1) {
+					found_operand.isAbsolute = true;
+				}
 			} else if (parserHelp.isName.call(o, o.Formula, o.pCurrPos, wb)[0]) {
 				found_operand = new AscCommonExcel.cName(o.operand_str, wb, r1.worksheet);
 			}
@@ -617,6 +629,37 @@
 		if (found_operand) {
 			if (cElementType.name === found_operand.type) {
 				found_operand = found_operand.toRef();
+			}
+
+			var cellName = r1.getFirst().getID(), wsId = r1.worksheet.getId();
+
+			if ((cElementType.cell === found_operand.type || cElementType.cell3D === found_operand.type ||
+				cElementType.cellsRange === found_operand.type) && found_operand.isValid()) {
+				var nFrom, nTo;
+
+				if (r2) {
+					nFrom = r2.defName;
+				} else {
+					nFrom = wb.dependencyFormulas.addNode(wsId, cellName);
+				}
+
+				nTo = wb.dependencyFormulas.addNode(found_operand.getWsId(), found_operand._cells);
+
+				found_operand.setNode(nTo);
+
+				wb.dependencyFormulas.addEdge2(nFrom, nTo);
+			} else if (cElementType.cellsRange3D === found_operand.type && found_operand.isValid()) {
+				var wsR = found_operand.wsRange(), nTo, _cell = found_operand._cells.replace(/\$/g, "");
+
+				for (var j = 0; j < wsR.length; j++) {
+					if (r2) {
+						nTo = wb.dependencyFormulas.addNode(wsR[j].Id, _cell);
+						wb.dependencyFormulas.addEdge2(r2.defName, nTo);
+					} else {
+						wb.dependencyFormulas.addEdge(wsId, cellName.replace(/\$/g, ""), wsR[j].Id, _cell);
+					}
+				}
+
 			}
 
 			return this.value = found_operand;
@@ -991,6 +1034,38 @@
 			}
 		} else {
 			this.value = new cError(cErrorType.wrong_value_type);
+		}
+
+		if (cElementType.cellsRange === this.value.type || cElementType.cell === this.value.type ||
+			cElementType.cell3D === this.value.type || cElementType.cellsRange3D === this.value.type) {
+			var r1 = arguments[1], r2 = arguments[2], wb = r1.worksheet.workbook, cellName = r1.getFirst()
+				.getID(), wsId = r1.worksheet.getId();
+
+			if ((cElementType.cell === this.value.type || cElementType.cell3D === this.value.type ||
+				cElementType.cellsRange === this.value.type) && this.value.isValid()) {
+				var nFrom, nTo;
+
+				if (r2) {
+					nFrom = r2.defName;
+				} else {
+					nFrom = wb.dependencyFormulas.addNode(wsId, cellName);
+				}
+
+				nTo = wb.dependencyFormulas.addNode(this.value.getWsId(), this.value._cells.replace(/\$/g, ""));
+				this.value.setNode(nTo);
+				wb.dependencyFormulas.addEdge2(nFrom, nTo);
+			} else if (cElementType.cellsRange3D === this.value.type && this.value.isValid()) {
+				var wsR = this.value.wsRange(), nTo, _cell = this.value._cells.replace(/\$/g, "");
+
+				for (var j = 0; j < wsR.length; j++) {
+					if (r2) {
+						nTo = wb.dependencyFormulas.addNode(wsR[j].Id, _cell);
+						wb.dependencyFormulas.addEdge2(r2.defName, nTo);
+					} else {
+						wb.dependencyFormulas.addEdge(wsId, cellName.replace(/\$/g, ""), wsR[j].Id, _cell);
+					}
+				}
+			}
 		}
 
 		return this.value;

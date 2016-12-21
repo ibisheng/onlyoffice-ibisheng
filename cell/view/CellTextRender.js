@@ -208,6 +208,14 @@
 			}
 
 			co = this.charOffset(pos, i - 1, h);
+
+			// если самый последний символ - это новая строка, то надо сместить еще на одну линию
+			if (t.charWidths[t.chars.length - 1] === 0) {
+				co.left = null;
+				co.top += l[i - 1].th;
+				co.lineIndex++;
+			}
+
 			return co;
 		};
 
@@ -230,6 +238,10 @@
 
 		CellTextRender.prototype.getCharWidth = function (pos) {
 			return this.charWidths[pos];
+		};
+
+		CellTextRender.prototype.isLastCharNL = function () {
+			return this.charWidths[this.chars.length - 1] === 0;
 		};
 
 

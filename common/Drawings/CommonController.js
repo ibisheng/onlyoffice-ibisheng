@@ -1196,15 +1196,6 @@ DrawingObjectsController.prototype =
         }, this, []);
     },
 
-
-    Is_SelectionUse: function(){
-        var content = this.getTargetDocContent(undefined, true);
-        if(content){
-            return content.Is_SelectionUse();
-        }
-        return false;
-    },
-
     getFromTargetTextObjectContextMenuPosition: function(oTargetTextObject, pageIndex)
     {
         var dX, dY, oDocContent, oTransformText, oParagraph, document = editor.WordControl.m_oLogicDocument, dPosX = 0, dPosY = 0;
@@ -1251,42 +1242,6 @@ DrawingObjectsController.prototype =
             }
         }
         return {X: 0, Y: 0, PageIndex: pageIndex};
-    },
-
-
-
-    isPointInDrawingObjects3: function(x, y)
-    {
-        var oOldState = this.curState;
-        this.changeCurrentState(new AscFormat.NullState(this));
-        var oResult, bRet = false;
-        this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
-        oResult = this.curState.onMouseDown(AscCommon.global_mouseEvent, x, y, 0);
-        this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
-        if(AscCommon.isRealObject(oResult)){
-            if(oResult.cursorType !== "text"){
-                var object = g_oTableId.Get_ById(oResult.objectId);
-                if(AscCommon.isRealObject(object) && (object.selected) ){
-                    bRet = true;
-                }
-                else
-                {
-                    return -1;
-                }
-            }
-        }
-        this.changeCurrentState(oOldState);
-        return bRet;
-    },
-
-    Get_SelectionBounds: function()
-    {
-        var oTargetDocContent = this.getTargetDocContent(false, true);
-        if(isRealObject(oTargetDocContent))
-        {
-            return oTargetDocContent.Get_SelectionBounds();
-        }
-        return null;
     },
 
 

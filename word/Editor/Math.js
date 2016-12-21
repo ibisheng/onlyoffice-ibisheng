@@ -2496,11 +2496,11 @@ ParaMath.prototype.Get_Align = function()
 };
 ParaMath.prototype.Set_Align = function(Align)
 {
-	if (this.Jc !== Align)
-	{
-		History.Add(new CChangesMathParaJc(this, this.Jc, Align));
-		this.raw_SetAlign(Align);
-	}
+    if (this.Jc !== Align)
+    {
+        History.Add(this, new CChangesMathParaJc(Align, this.Jc));
+        this.raw_SetAlign(Align);
+    }
 };
 ParaMath.prototype.raw_SetAlign = function(Align)
 {
@@ -3036,6 +3036,26 @@ ParaMath.prototype.Selection_CorrectLeftPos = function(Direction)
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------
+ParaMath.prototype.Undo = function(Data)
+{
+    Data.Undo(this);
+};
+
+ParaMath.prototype.Redo = function(Data)
+{
+    Data.Redo(this);
+};
+
+ParaMath.prototype.Save_Changes = function(Data, Writer)
+{
+    WriteChanges_ToBinary(Data, Writer);
+};
+
+ParaMath.prototype.Load_Changes = function(Reader)
+{
+    ReadChanges_FromBinary(Reader, this);
+};
+
 ParaMath.prototype.Write_ToBinary2 = function(Writer)
 {
     Writer.WriteLong( AscDFH.historyitem_type_Math );
@@ -3344,6 +3364,7 @@ ParaMath.prototype.Handle_Tab = function(isForward)
         this.Root.Displace_BreakOperator(isForward, bBrkBefore, CountOperators);
     }
 };
+
 ParaMath.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
     return this.Root.Set_ContentSelection(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag);
@@ -3352,6 +3373,2329 @@ ParaMath.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
 {
     return this.Root.Set_ContentPosition(DocPos, Depth, Flag);
 };
+//----------------------------------------------------------------------------------------------------------------------
+// Классы с изменениями
+//----------------------------------------------------------------------------------------------------------------------
+function ReadChanges_FromBinary(Reader, Class)
+{
+    var Type = Reader.GetLong();
+    var Changes = null;
+
+    switch(Type)
+    {
+        case AscDFH.historyitem_Math_CtrPrpFSize           : Changes = new CChangesMathFontSize(); break;
+        case AscDFH.historyitem_Math_ParaJc                : Changes = new CChangesMathParaJc(); break;
+        case AscDFH.historyitem_Math_CtrPrpShd             : Changes = new CChangesMathShd(); break;
+        case AscDFH.historyitem_Math_AddItems_ToMathBase   : Changes = new CChangesMathAddItems(); break;
+        case AscDFH.historyitem_Math_CtrPrpColor           : Changes = new CChangesMathColor(); break;
+        case AscDFH.historyitem_Math_CtrPrpUnifill         : Changes = new CChangesMathUnifill(); break;
+        case AscDFH.historyitem_Math_CtrPrpUnderline       : Changes = new CChangesMathUnderline(); break;
+        case AscDFH.historyitem_Math_CtrPrpStrikeout       : Changes = new CChangesMathStrikeout(); break;
+        case AscDFH.historyitem_Math_CtrPrpDoubleStrikeout : Changes = new CChangesMath_DoubleStrikeout(); break;
+        case AscDFH.historyitem_Math_CtrPrpItalic          : Changes = new CChangesMathItalic(); break;
+        case AscDFH.historyitem_Math_CtrPrpBold            : Changes = new CChangesMathBold(); break;
+        case AscDFH.historyitem_Math_RFontsAscii           : Changes = new CChangesMath_RFontsAscii(); break;
+        case AscDFH.historyitem_Math_RFontsHAnsi           : Changes = new CChangesMath_RFontsHAnsi(); break;
+        case AscDFH.historyitem_Math_RFontsCS              : Changes = new CChangesMath_RFontsCS(); break;
+        case AscDFH.historyitem_Math_RFontsEastAsia        : Changes = new CChangesMath_RFontsEastAsia(); break;
+        case AscDFH.historyitem_Math_RFontsHint            : Changes = new CChangesMath_RFontsHint(); break;
+        case AscDFH.historyitem_Math_CtrPrpHighLight       : Changes = new CChangesMathHighLight(); break;
+        case AscDFH.historyitem_Math_ReviewType            : Changes = new CChangesMathBaseReviewType(); break;
+        case AscDFH.historyitem_Math_CtrPrpTextFill        : Changes = new CChangesMathTextFill(); break;
+        case AscDFH.historyitem_Math_CtrPrpTextOutline     : Changes = new CChangesMathTextOutline(); break;
+		case AscDFH.historyitem_Math_BoxAlnAt              : Changes = new CChangesMathBoxAlnAt(); break;
+        case AscDFH.historyitem_Math_FractionType          : Changes = new CChangesMathFractionType(); break;
+        case AscDFH.historyitem_Math_RadicalHideDegree     : Changes = new CChangesMathRadicalHideDegree(); break;
+        case AscDFH.historyitem_Math_NaryLimLoc            : Changes = new CChangesMathNaryLimLoc(); break;
+        case AscDFH.historyitem_Math_NaryUpperLimit        : Changes = new CChangesMathNaryUpperLimit(); break;
+        case AscDFH.historyitem_Math_NaryLowerLimit        : Changes = new CChangesMathNaryLowerLimit(); break;
+        case AscDFH.historyitem_Math_DelimBegOper          : Changes = new CChangesMathDelimBegOper(); break;
+        case AscDFH.historyitem_Math_DelimEndOper          : Changes = new CChangesMathDelimEndOper(); break;
+        case AscDFH.historyitem_Math_BaseSetColumn         : Changes = new CChangesMathBaseSetColumn(); break;
+        case AscDFH.historyitem_Math_BaseRemoveItems       : Changes = new CChangesMathRemoveItems(); break;
+        case AscDFH.historyitem_Math_DelimiterGrow         : Changes = new CChangesMathDelimiterGrow(); break;
+        case AscDFH.historyitem_Math_DelimiterShape        : Changes = new CChangesMathDelimiterShape(); break;
+        case AscDFH.historyitem_Math_GroupCharPr           : Changes = new CChangesMathGroupCharPr(); break;
+        case AscDFH.historyitem_Math_LimitType             : Changes = new CChangesMathLimitType(); break;
+        case AscDFH.historyitem_Math_BorderBoxTop          : Changes = new CChangesMathBorderBoxTop(); break;
+        case AscDFH.historyitem_Math_BorderBoxBot          : Changes = new CChangesMathBorderBoxBot(); break;
+        case AscDFH.historyitem_Math_BorderBoxLeft         : Changes = new CChangesMathBorderBoxLeft(); break;
+        case AscDFH.historyitem_Math_BorderBoxRight        : Changes = new CChangesMathBorderBoxRight(); break;
+        case AscDFH.historyitem_Math_BorderBoxHor          : Changes = new CChangesMathBorderBoxHor(); break;
+        case AscDFH.historyitem_Math_BorderBoxVer          : Changes = new CChangesMathBorderBoxVer(); break;
+        case AscDFH.historyitem_Math_BorderBoxTopLTR       : Changes = new CChangesMathBorderBoxTopLTR(); break;
+        case AscDFH.historyitem_Math_BorderBoxTopRTL       : Changes = new CChangesMathBorderBoxTopRTL(); break;
+        case AscDFH.historyitem_Math_MatrixAddRow          : Changes = new CChangesMathMatrixAddRow(); break;
+        case AscDFH.historyitem_Math_MatrixRemoveRow       : Changes = new CChangesMathMatrixRemoveRow(); break;
+        case AscDFH.historyitem_Math_MatrixAddColumn       : Changes = new CChangesMathMatrixAddColumn(); break;
+        case AscDFH.historyitem_Math_MatrixRemoveColumn    : Changes = new CChangesMathMatrixRemoveColumn(); break;
+        case AscDFH.historyitem_Math_MatrixBaseJc          : Changes = new CChangesMathMatrixBaseJc(); break;
+        case AscDFH.historyitem_Math_MatrixColumnJc        : Changes = new CChangesMathMatrixColumnJc(); break;
+        case AscDFH.historyitem_Math_MatrixInterval        : Changes = new CChangesMathMatrixInterval(); break;
+        case AscDFH.historyitem_Math_MatrixPlh             : Changes = new CChangesMathMatrixPlh(); break;
+        case AscDFH.historyitem_Math_MatrixMinColumnWidth  : Changes = new CChangesMathMatrixMinColumnWidth(); break;
+        case AscDFH.historyitem_Math_BarLinePos            : Changes = new CChangesMathBarLinePos(); break;
+        case AscDFH.historyitem_Math_BoxForcedBreak        : Changes = new CChangesMathBoxForcedBreak(); break;
+        case AscDFH.historyitem_Math_DegreeSubSupType      : Changes = new CChangesMathDegreeSubSupType(); break;
+    }
+
+    if (null !== Changes)
+        Changes.Load_Changes(Reader, Class);
+}
+
+function WriteChanges_ToBinary(Changes, Writer)
+{
+    Writer.WriteLong(Changes.Type);
+    Changes.Save_Changes(Writer);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Классы с изменениями
+//----------------------------------------------------------------------------------------------------------------------
+function CChangesMathFontSize(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+
+CChangesMathFontSize.prototype.Type = AscDFH.historyitem_Math_CtrPrpFSize;
+
+CChangesMathFontSize.prototype.Undo = function(Class)
+{
+    Class.raw_SetFontSize(this.Old);
+};
+CChangesMathFontSize.prototype.Redo = function(Class)
+{
+    Class.raw_SetFontSize(this.New);
+};
+CChangesMathFontSize.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+    // Long : New
+    if (undefined === this.New)
+        Writer.WriteBool(true);
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteLong(this.New);
+    }
+};
+CChangesMathFontSize.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+    // Long : New
+
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathShd(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathShd.prototype.Type = AscDFH.historyitem_Math_CtrPrpShd;
+CChangesMathShd.prototype.Undo = function(Class)
+{
+    Class.raw_SetShd(this.Old);
+};
+CChangesMathShd.prototype.Redo = function(Class)
+{
+    Class.raw_SetShd(this.New);
+};
+CChangesMathShd.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+
+    if ( undefined !== this.New )
+    {
+        Writer.WriteBool(false);
+        this.New.Write_ToBinary(Writer);
+    }
+    else
+        Writer.WriteBool(true);
+
+};
+CChangesMathShd.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+
+    if ( Reader.GetBool() == false)
+    {
+        this.New = new CDocumentShd();
+        this.New.Read_FromBinary( Reader );
+    }
+    else
+    {
+        this.New = undefined;
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMathHighLight(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathHighLight.prototype.Type = AscDFH.historyitem_Math_CtrPrpHighLight;
+CChangesMathHighLight.prototype.Undo = function(Class)
+{
+    Class.raw_SetHighLight(this.Old);
+};
+CChangesMathHighLight.prototype.Redo = function(Class)
+{
+    Class.raw_SetHighLight(this.New);
+};
+CChangesMathHighLight.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined != this.New )
+    {
+        Writer.WriteBool(false);
+        if ( highlight_None != this.New )
+        {
+            Writer.WriteBool( false );
+            this.New.Write_ToBinary( Writer );
+        }
+        else
+            Writer.WriteBool( true );
+    }
+    else
+        Writer.WriteBool(true);
+};
+CChangesMathHighLight.prototype.Load_Changes = function(Reader, Class)
+{
+    if ( Reader.GetBool() == false )
+    {
+        if ( Reader.GetBool() == false )
+        {
+            this.New = new CDocumentColor(0,0,0);
+            this.New.Read_FromBinary(Reader);
+        }
+        else
+            this.New = highlight_None;
+    }
+    else
+        this.New = undefined;
+
+    this.Redo(Class);
+};
+
+function CChangesMathColor(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathColor.prototype.Type = AscDFH.historyitem_Math_CtrPrpColor;
+CChangesMathColor.prototype.Undo = function(Class)
+{
+    Class.raw_SetColor(this.Old);
+};
+CChangesMathColor.prototype.Redo = function(Class)
+{
+    Class.raw_SetColor(this.New);
+};
+CChangesMathColor.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+
+    if ( undefined !== this.New )
+    {
+        Writer.WriteBool(false);
+        this.New.Write_ToBinary(Writer);
+    }
+    else
+    {
+        Writer.WriteBool(true);
+    }
+};
+CChangesMathColor.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+
+    if ( Reader.GetBool() == false)
+    {
+        this.New = new CDocumentColor(0, 0, 0, false);
+        this.New.Read_FromBinary(Reader);
+    }
+    else
+    {
+        this.New = undefined;
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMathUnifill(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathUnifill.prototype.Type = AscDFH.historyitem_Math_CtrPrpUnifill;
+CChangesMathUnifill.prototype.Undo = function(Class)
+{
+    Class.raw_SetUnifill(this.Old);
+};
+CChangesMathUnifill.prototype.Redo = function(Class)
+{
+    Class.raw_SetUnifill(this.New);
+};
+CChangesMathUnifill.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+
+    if ( undefined !== this.New )
+    {
+        Writer.WriteBool(false);
+        this.New.Write_ToBinary(Writer);
+    }
+    else
+    {
+        Writer.WriteBool(true);
+    }
+};
+CChangesMathUnifill.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+
+    if ( Reader.GetBool() == false)
+    {
+        this.New = new AscFormat.CUniFill();
+        this.New.Read_FromBinary(Reader);
+    }
+    else
+    {
+        this.New = undefined;
+    }
+
+    this.Redo(Class);
+};
+function CChangesMathTextFill(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathTextFill.prototype.Type = AscDFH.historyitem_Math_CtrPrpTextFill;
+CChangesMathTextFill.prototype.Undo = function(Class)
+{
+    Class.raw_SetTextFill(this.Old);
+};
+CChangesMathTextFill.prototype.Redo = function(Class)
+{
+    Class.raw_SetTextFill(this.New);
+};
+CChangesMathTextFill.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+
+    if ( undefined !== this.New )
+    {
+        Writer.WriteBool(false);
+        this.New.Write_ToBinary(Writer);
+    }
+    else
+    {
+        Writer.WriteBool(true);
+    }
+};
+CChangesMathTextFill.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+
+    if ( Reader.GetBool() == false)
+    {
+        this.New = new AscFormat.CUniFill();
+        this.New.Read_FromBinary(Reader);
+    }
+    else
+    {
+        this.New = undefined;
+    }
+    this.Redo(Class);
+};
+function CChangesMathTextOutline(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathTextOutline.prototype.Type = AscDFH.historyitem_Math_CtrPrpTextOutline;
+CChangesMathTextOutline.prototype.Undo = function(Class)
+{
+    Class.raw_SetTextOutline(this.Old);
+};
+CChangesMathTextOutline.prototype.Redo = function(Class)
+{
+    Class.raw_SetTextOutline(this.New);
+};
+CChangesMathTextOutline.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+
+    if ( undefined !== this.New )
+    {
+        Writer.WriteBool(false);
+        this.New.Write_ToBinary(Writer);
+    }
+    else
+    {
+        Writer.WriteBool(true);
+    }
+};
+CChangesMathTextOutline.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+
+    if ( Reader.GetBool() == false)
+    {
+        this.New = new AscFormat.CLn();
+        this.New.Read_FromBinary(Reader);
+    }
+    else
+    {
+        this.New = undefined;
+    }
+    this.Redo(Class);
+};
+function CChangesMathUnderline(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathUnderline.prototype.Type = AscDFH.historyitem_Math_CtrPrpUnderline;
+CChangesMathUnderline.prototype.Undo = function(Class)
+{
+    Class.raw_SetUnderline(this.Old);
+};
+CChangesMathUnderline.prototype.Redo = function(Class)
+{
+    Class.raw_SetUnderline(this.New);
+};
+CChangesMathUnderline.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+    // Bool : IsUnderline
+
+    if (undefined === this.New)
+        Writer.WriteBool(true);
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteBool(this.New);
+    }
+
+};
+CChangesMathUnderline.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+    // Bool : IsUnderline
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+}
+
+function CChangesMathStrikeout(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathStrikeout.prototype.Type = AscDFH.historyitem_Math_CtrPrpStrikeout;
+CChangesMathStrikeout.prototype.Undo = function(Class)
+{
+    Class.raw_SetStrikeout(this.Old);
+};
+CChangesMathStrikeout.prototype.Redo = function(Class)
+{
+    Class.raw_SetStrikeout(this.New);
+};
+CChangesMathStrikeout.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+    // Bool : IsStrikeOut
+
+    if (undefined === this.New)
+        Writer.WriteBool(true);
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteBool(this.New);
+    }
+};
+CChangesMathStrikeout.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+    // Bool : IsStrikeOut
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMath_DoubleStrikeout(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMath_DoubleStrikeout.prototype.Type = AscDFH.historyitem_Math_CtrPrpDoubleStrikeout;
+CChangesMath_DoubleStrikeout.prototype.Undo = function(Class)
+{
+    Class.raw_Set_DoubleStrikeout(this.Old);
+};
+CChangesMath_DoubleStrikeout.prototype.Redo = function(Class)
+{
+    Class.raw_Set_DoubleStrikeout(this.New);
+};
+CChangesMath_DoubleStrikeout.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+    // Bool : IsDoubleStrikeOut
+
+    if (undefined === this.New)
+        Writer.WriteBool(true);
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteBool(this.New);
+    }
+};
+CChangesMath_DoubleStrikeout.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+    // Bool : IsDoubleStrikeOut
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathItalic(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathItalic.prototype.Type = AscDFH.historyitem_Math_CtrPrpItalic;
+CChangesMathItalic.prototype.Undo = function(Class)
+{
+    Class.raw_SetItalic(this.Old);
+};
+CChangesMathItalic.prototype.Redo = function(Class)
+{
+    Class.raw_SetItalic(this.New);
+};
+CChangesMathItalic.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+    // Bool : IsItalic
+
+    if (undefined === this.New)
+        Writer.WriteBool(true);
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteBool(this.New);
+    }
+
+};
+CChangesMathItalic.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+    // Bool : IsItalic
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+
+};
+
+function CChangesMathBold(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBold.prototype.Type = AscDFH.historyitem_Math_CtrPrpBold;
+CChangesMathBold.prototype.Undo = function(Class)
+{
+    Class.raw_SetBold(this.Old);
+};
+CChangesMathBold.prototype.Redo = function(Class)
+{
+    Class.raw_SetBold(this.New);
+};
+CChangesMathBold.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+    // Bool : IsBold
+
+    if (undefined === this.New)
+        Writer.WriteBool(true);
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteBool(this.New);
+    }
+
+};
+CChangesMathBold.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+    // Bool : IsBold
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+
+};
+
+
+function CChangesMath_RFontsAscii(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMath_RFontsAscii.prototype.Type = AscDFH.historyitem_Math_RFontsAscii;
+CChangesMath_RFontsAscii.prototype.Undo = function(Class)
+{
+    Class.raw_SetRFontsAscii(this.Old);
+};
+CChangesMath_RFontsAscii.prototype.Redo = function(Class)
+{
+    Class.raw_SetRFontsAscii(this.New);
+};
+CChangesMath_RFontsAscii.prototype.Save_Changes = function(Writer)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if (undefined === this.New)
+    {
+        Writer.WriteBool(true);
+    }
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteString2(this.New.Name);
+    }
+};
+CChangesMath_RFontsAscii.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+    {
+        this.New =
+        {
+            Name  : Reader.GetString2(),
+            Index : -1
+        };
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMath_RFontsHAnsi(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMath_RFontsHAnsi.prototype.Type = AscDFH.historyitem_Math_RFontsHAnsi;
+CChangesMath_RFontsHAnsi.prototype.Undo = function(Class)
+{
+    Class.raw_SetRFontsHAnsi(this.Old);
+};
+CChangesMath_RFontsHAnsi.prototype.Redo = function(Class)
+{
+    Class.raw_SetRFontsHAnsi(this.New);
+};
+CChangesMath_RFontsHAnsi.prototype.Save_Changes = function(Writer)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if (undefined === this.New)
+    {
+        Writer.WriteBool(true);
+    }
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteString2(this.New.Name);
+    }
+};
+CChangesMath_RFontsHAnsi.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+    {
+        this.New =
+        {
+            Name  : Reader.GetString2(),
+            Index : -1
+        };
+    }
+
+    this.Redo(Class);
+};
+
+
+function CChangesMath_RFontsCS(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMath_RFontsCS.prototype.Type = AscDFH.historyitem_Math_RFontsCS;
+CChangesMath_RFontsCS.prototype.Undo = function(Class)
+{
+    Class.raw_SetRFontsCS(this.Old);
+};
+CChangesMath_RFontsCS.prototype.Redo = function(Class)
+{
+    Class.raw_SetRFontsCS(this.New);
+};
+CChangesMath_RFontsCS.prototype.Save_Changes = function(Writer)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if (undefined === this.New)
+    {
+        Writer.WriteBool(true);
+    }
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteString2(this.New.Name);
+    }
+};
+CChangesMath_RFontsCS.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+    {
+        this.New =
+        {
+            Name  : Reader.GetString2(),
+            Index : -1
+        };
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMath_RFontsEastAsia(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMath_RFontsEastAsia.prototype.Type = AscDFH.historyitem_Math_RFontsEastAsia;
+CChangesMath_RFontsEastAsia.prototype.Undo = function(Class)
+{
+    Class.raw_SetRFontsEastAsia(this.Old);
+};
+CChangesMath_RFontsEastAsia.prototype.Redo = function(Class)
+{
+    Class.raw_SetRFontsEastAsia(this.New);
+};
+CChangesMath_RFontsEastAsia.prototype.Save_Changes = function(Writer)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if (undefined === this.New)
+    {
+        Writer.WriteBool(true);
+    }
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteString2(this.New.Name);
+    }
+
+
+};
+CChangesMath_RFontsEastAsia.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+    {
+        this.New =
+        {
+            Name  : Reader.GetString2(),
+            Index : -1
+        };
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMath_RFontsHint(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMath_RFontsHint.prototype.Type = AscDFH.historyitem_Math_RFontsHint;
+CChangesMath_RFontsHint.prototype.Undo = function(Class)
+{
+    Class.raw_SetRFontsHint(this.Old);
+};
+CChangesMath_RFontsHint.prototype.Redo = function(Class)
+{
+    Class.raw_SetRFontsHint(this.New);
+};
+CChangesMath_RFontsHint.prototype.Save_Changes = function(Writer)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if (undefined === this.New)
+    {
+        Writer.WriteBool(true);
+    }
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteLong(this.New);
+    }
+};
+CChangesMath_RFontsHint.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+
+function CChangesMathAddItems(Pos, Items)
+{
+    this.Pos   = Pos;
+    this.Items = Items;
+}
+CChangesMathAddItems.prototype.Type = AscDFH.historyitem_Math_AddItems_ToMathBase;
+CChangesMathAddItems.prototype.Undo = function(Class)
+{
+    Class.raw_RemoveFromContent(this.Pos, this.Items.length);
+};
+CChangesMathAddItems.prototype.Redo = function(Class)
+{
+    Class.raw_AddToContent(this.Pos, this.Items, false);
+};
+CChangesMathAddItems.prototype.Save_Changes = function(Writer)
+{
+    // Long : Count
+    // Long : Pos
+    // Array of String : Id
+
+    var Count = this.Items.length;
+    Writer.WriteLong(Count);
+    Writer.WriteLong(this.Pos);
+
+    for(var Index = 0; Index < Count; Index++)
+    {
+        Writer.WriteString2(this.Items[Index].Get_Id());
+    }
+};
+CChangesMathAddItems.prototype.Load_Changes = function(Reader, Class)
+{
+    // Long : Count
+    // Long : Pos
+    // Array of String : Id
+
+    var Count = Reader.GetLong();
+    this.Pos  = Reader.GetLong();
+
+    this.Items = [];
+    for(var Index = 0; Index < Count; Index++)
+    {
+        var Element = g_oTableId.Get_ById(Reader.GetString2());
+
+        if (null !== Element)
+            this.Items.push(Element);
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMathParaJc(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathParaJc.prototype.Type = AscDFH.historyitem_Math_ParaJc;
+CChangesMathParaJc.prototype.Undo = function(Class)
+{
+    Class.raw_SetAlign(this.Old);
+};
+CChangesMathParaJc.prototype.Redo = function(Class)
+{
+    Class.raw_SetAlign(this.New);
+};
+CChangesMathParaJc.prototype.Save_Changes = function(Writer)
+{
+    // Bool : undefined?
+    // Long : value
+    if (undefined === this.New)
+        Writer.WriteBool(true);
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteLong(this.New);
+    }
+};
+CChangesMathParaJc.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBaseReviewType(NewType, NewInfo, OldType, OldInfo)
+{
+    this.NewType = NewType;
+    this.NewInfo = NewInfo ? NewInfo.Copy() : undefined;
+    this.OldType = OldType;
+    this.OldInfo = OldInfo ? OldInfo.Copy() : undefined;
+}
+CChangesMathBaseReviewType.prototype.Type = AscDFH.historyitem_Math_ReviewType;
+CChangesMathBaseReviewType.prototype.Undo = function(Class)
+{
+    Class.raw_SetReviewType(this.OldType, this.OldInfo);
+};
+CChangesMathBaseReviewType.prototype.Redo = function(Class)
+{
+    Class.raw_SetReviewType(this.NewType, this.NewInfo);
+};
+CChangesMathBaseReviewType.prototype.Save_Changes = function(Writer)
+{
+    // Long        : ReviewType
+    // Bool        : ReviewInfo undefined ?
+    //   false     : ReviewInfo
+
+    Writer.WriteLong(this.NewType);
+
+    if (undefined === this.NewInfo)
+    {
+        Writer.WriteBool(true);
+    }
+    else
+    {
+        Writer.WriteBool(false);
+        this.NewInfo.Write_ToBinary(Writer);
+    }
+};
+CChangesMathBaseReviewType.prototype.Load_Changes = function(Reader, Class)
+{
+    // Long        : ReviewType
+    // CReviewInfo : ReviewInfo
+
+    this.NewType = Reader.GetLong();
+
+    if (true === Reader.GetBool())
+    {
+        this.NewInfo = undefined;
+    }
+    else
+    {
+        this.NewInfo = new CReviewInfo();
+        this.NewInfo.Read_FromBinary(Reader);
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMathBoxAlnAt(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBoxAlnAt.prototype.Type = AscDFH.historyitem_Math_BoxAlnAt;
+CChangesMathBoxAlnAt.prototype.Undo = function(Class)
+{
+    Class.raw_setAlnAt(this.Old);
+};
+CChangesMathBoxAlnAt.prototype.Redo = function(Class)
+{
+    Class.raw_setAlnAt(this.New);
+};
+CChangesMathBoxAlnAt.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathBoxAlnAt.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathFractionType(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathFractionType.prototype.Type = AscDFH.historyitem_Math_FractionType;
+CChangesMathFractionType.prototype.Undo = function(Class)
+{
+    Class.raw_SetFractionType(this.Old);
+};
+CChangesMathFractionType.prototype.Redo = function(Class)
+{
+    Class.raw_SetFractionType(this.New);
+};
+CChangesMathFractionType.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathFractionType.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathRadicalHideDegree(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathRadicalHideDegree.prototype.Type = AscDFH.historyitem_Math_RadicalHideDegree;
+CChangesMathRadicalHideDegree.prototype.Undo = function(Class)
+{
+    Class.raw_SetHideDegree(this.Old);
+};
+CChangesMathRadicalHideDegree.prototype.Redo = function(Class)
+{
+    Class.raw_SetHideDegree(this.New);
+};
+CChangesMathRadicalHideDegree.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathRadicalHideDegree.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+function CChangesMathNaryLimLoc(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathNaryLimLoc.prototype.Type = AscDFH.historyitem_Math_NaryLimLoc;
+CChangesMathNaryLimLoc.prototype.Undo = function(Class)
+{
+    Class.raw_SetLimLoc(this.Old);
+};
+CChangesMathNaryLimLoc.prototype.Redo = function(Class)
+{
+    Class.raw_SetLimLoc(this.New);
+};
+CChangesMathNaryLimLoc.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathNaryLimLoc.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathNaryUpperLimit(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathNaryUpperLimit.prototype.Type = AscDFH.historyitem_Math_NaryUpperLimit;
+CChangesMathNaryUpperLimit.prototype.Undo = function(Class)
+{
+    Class.raw_HideUpperIterator(this.Old);
+};
+CChangesMathNaryUpperLimit.prototype.Redo = function(Class)
+{
+    Class.raw_HideUpperIterator(this.New);
+};
+CChangesMathNaryUpperLimit.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathNaryUpperLimit.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathNaryLowerLimit(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathNaryLowerLimit.prototype.Type = AscDFH.historyitem_Math_NaryLowerLimit;
+CChangesMathNaryLowerLimit.prototype.Undo = function(Class)
+{
+    Class.raw_HideLowerIterator(this.Old);
+};
+CChangesMathNaryLowerLimit.prototype.Redo = function(Class)
+{
+    Class.raw_HideLowerIterator(this.New);
+};
+CChangesMathNaryLowerLimit.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathNaryLowerLimit.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathDelimBegOper(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathDelimBegOper.prototype.Type = AscDFH.historyitem_Math_DelimBegOper;
+CChangesMathDelimBegOper.prototype.Undo = function(Class)
+{
+    Class.raw_HideBegOperator(this.Old);
+};
+CChangesMathDelimBegOper.prototype.Redo = function(Class)
+{
+    Class.raw_HideBegOperator(this.New);
+};
+CChangesMathDelimBegOper.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong(this.New);
+    }
+};
+CChangesMathDelimBegOper.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathDelimEndOper(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathDelimEndOper.prototype.Type = AscDFH.historyitem_Math_DelimEndOper;
+CChangesMathDelimEndOper.prototype.Undo = function(Class)
+{
+    Class.raw_HideEndOperator(this.Old);
+};
+CChangesMathDelimEndOper.prototype.Redo = function(Class)
+{
+    Class.raw_HideEndOperator(this.New);
+};
+CChangesMathDelimEndOper.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong(this.New);
+    }
+};
+CChangesMathDelimEndOper.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBaseSetColumn(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBaseSetColumn.prototype.Type = AscDFH.historyitem_Math_BaseSetColumn;
+CChangesMathBaseSetColumn.prototype.Undo = function(Class)
+{
+    Class.raw_SetColumn(this.Old);
+};
+CChangesMathBaseSetColumn.prototype.Redo = function(Class)
+{
+    Class.raw_SetColumn(this.New);
+};
+CChangesMathBaseSetColumn.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathBaseSetColumn.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathRemoveItems(Pos, Items)
+{
+    this.Pos   = Pos;
+    this.Items = Items;
+}
+CChangesMathRemoveItems.prototype.Type = AscDFH.historyitem_Math_BaseRemoveItems;
+CChangesMathRemoveItems.prototype.Undo = function(Class)
+{
+    Class.raw_AddToContent(this.Pos, this.Items, false);
+};
+CChangesMathRemoveItems.prototype.Redo = function(Class)
+{
+    Class.raw_RemoveFromContent(this.Pos, this.Items.length);
+};
+CChangesMathRemoveItems.prototype.Save_Changes = function(Writer)
+{
+    // Long : Count
+    // Long : Pos
+    // Array of String : Id
+
+    var Count = this.Items.length;
+    Writer.WriteLong(Count);
+    Writer.WriteLong(this.Pos);
+
+    for(var Index = 0; Index < Count; Index++)
+    {
+        Writer.WriteString2(this.Items[Index].Get_Id());
+    }
+};
+CChangesMathRemoveItems.prototype.Load_Changes = function(Reader, Class)
+{
+    // Long : Count
+    // Long : Pos
+    // Array of String : Id
+
+    var Count = Reader.GetLong();
+    this.Pos   = Reader.GetLong();
+
+    this.Items = [];
+    for(var Index = 0; Index < Count; Index++)
+    {
+        var Element = g_oTableId.Get_ById(Reader.GetString2());
+
+        if (null !== Element)
+            this.Items.push(Element);
+    }
+
+    this.Redo(Class);
+
+    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, this.Pos, Count);
+};
+
+function CChangesMathDelimiterGrow(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathDelimiterGrow.prototype.Type = AscDFH.historyitem_Math_DelimiterGrow;
+CChangesMathDelimiterGrow.prototype.Undo = function(Class)
+{
+    Class.raw_SetGrow(this.Old);
+};
+CChangesMathDelimiterGrow.prototype.Redo = function(Class)
+{
+    Class.raw_SetGrow(this.New);
+};
+CChangesMathDelimiterGrow.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathDelimiterGrow.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathDelimiterShape(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathDelimiterShape.prototype.Type = AscDFH.historyitem_Math_DelimiterShape;
+
+CChangesMathDelimiterShape.prototype.Undo = function(Class)
+{
+    Class.raw_SetShape(this.Old);
+};
+CChangesMathDelimiterShape.prototype.Redo = function(Class)
+{
+    Class.raw_SetShape(this.New);
+};
+CChangesMathDelimiterShape.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathDelimiterShape.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathGroupCharPr(NewPr, OldPr)
+{
+    this.New = NewPr;
+    this.Old = OldPr;
+}
+CChangesMathGroupCharPr.prototype.Type = AscDFH.historyitem_Math_GroupCharPr;
+CChangesMathGroupCharPr.prototype.Undo = function(Class)
+{
+    Class.raw_SetPr(this.Old);
+};
+CChangesMathGroupCharPr.prototype.Redo = function(Class)
+{
+    Class.raw_SetPr(this.New);
+};
+CChangesMathGroupCharPr.prototype.Save_Changes = function(Writer)
+{
+    // Bool : undefined?
+    // Long : value
+    if (undefined === this.New)
+        Writer.WriteBool(true);
+    else
+    {
+        Writer.WriteBool(false);
+        this.New.Write_ToBinary(Writer);
+    }
+};
+CChangesMathGroupCharPr.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+    {
+        this.New = new CMathGroupChrPr();
+        this.New.Read_FromBinary(Reader);
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMathLimitType(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathLimitType.prototype.Type = AscDFH.historyitem_Math_LimitType;
+
+CChangesMathLimitType.prototype.Undo = function(Class)
+{
+    Class.raw_SetType(this.Old);
+};
+CChangesMathLimitType.prototype.Redo = function(Class)
+{
+    Class.raw_SetType(this.New);
+};
+CChangesMathLimitType.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathLimitType.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBorderBoxTop(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBorderBoxTop.prototype.Type = AscDFH.historyitem_Math_BorderBoxTop;
+CChangesMathBorderBoxTop.prototype.Undo = function(Class)
+{
+    Class.raw_SetTop(this.Old);
+};
+CChangesMathBorderBoxTop.prototype.Redo = function(Class)
+{
+    Class.raw_SetTop(this.New);
+};
+CChangesMathBorderBoxTop.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathBorderBoxTop.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+
+function CChangesMathBorderBoxBot(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBorderBoxBot.prototype.Type = AscDFH.historyitem_Math_BorderBoxBot;
+CChangesMathBorderBoxBot.prototype.Undo = function(Class)
+{
+    Class.raw_SetBot(this.Old);
+};
+CChangesMathBorderBoxBot.prototype.Redo = function(Class)
+{
+    Class.raw_SetBot(this.New);
+};
+CChangesMathBorderBoxBot.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathBorderBoxBot.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBorderBoxLeft(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBorderBoxLeft.prototype.Type = AscDFH.historyitem_Math_BorderBoxLeft;
+CChangesMathBorderBoxLeft.prototype.Undo = function(Class)
+{
+    Class.raw_SetLeft(this.Old);
+};
+CChangesMathBorderBoxLeft.prototype.Redo = function(Class)
+{
+    Class.raw_SetLeft(this.New);
+};
+CChangesMathBorderBoxLeft.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathBorderBoxLeft.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBorderBoxRight(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBorderBoxRight.prototype.Type = AscDFH.historyitem_Math_BorderBoxRight;
+CChangesMathBorderBoxRight.prototype.Undo = function(Class)
+{
+    Class.raw_SetRight(this.Old);
+};
+CChangesMathBorderBoxRight.prototype.Redo = function(Class)
+{
+    Class.raw_SetRight(this.New);
+};
+CChangesMathBorderBoxRight.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathBorderBoxRight.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBorderBoxHor(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBorderBoxHor.prototype.Type = AscDFH.historyitem_Math_BorderBoxHor;
+CChangesMathBorderBoxHor.prototype.Undo = function(Class)
+{
+    Class.raw_SetHor(this.Old);
+};
+CChangesMathBorderBoxHor.prototype.Redo = function(Class)
+{
+    Class.raw_SetHor(this.New);
+};
+CChangesMathBorderBoxHor.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathBorderBoxHor.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBorderBoxVer(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBorderBoxVer.prototype.Type = AscDFH.historyitem_Math_BorderBoxVer;
+CChangesMathBorderBoxVer.prototype.Undo = function(Class)
+{
+    Class.raw_SetVer(this.Old);
+};
+CChangesMathBorderBoxVer.prototype.Redo = function(Class)
+{
+    Class.raw_SetVer(this.New);
+};
+CChangesMathBorderBoxVer.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathBorderBoxVer.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBorderBoxTopLTR(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBorderBoxTopLTR.prototype.Type = AscDFH.historyitem_Math_BorderBoxTopLTR;
+CChangesMathBorderBoxTopLTR.prototype.Undo = function(Class)
+{
+    Class.raw_SetTopLTR(this.Old);
+};
+CChangesMathBorderBoxTopLTR.prototype.Redo = function(Class)
+{
+    Class.raw_SetTopLTR(this.New);
+};
+CChangesMathBorderBoxTopLTR.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathBorderBoxTopLTR.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBorderBoxTopRTL(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBorderBoxTopRTL.prototype.Type = AscDFH.historyitem_Math_BorderBoxTopRTL;
+CChangesMathBorderBoxTopRTL.prototype.Undo = function(Class)
+{
+    Class.raw_SetTopRTL(this.Old);
+};
+CChangesMathBorderBoxTopRTL.prototype.Redo = function(Class)
+{
+    Class.raw_SetTopRTL(this.New);
+};
+CChangesMathBorderBoxTopRTL.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathBorderBoxTopRTL.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathMatrixAddRow(Pos, Items)
+{
+    this.Pos         = Pos;
+    this.Items       = Items;
+}
+CChangesMathMatrixAddRow.prototype.Type = AscDFH.historyitem_Math_MatrixAddRow;
+CChangesMathMatrixAddRow.prototype.Undo = function(Class)
+{
+    Class.raw_RemoveRow(this.Pos, this.Items.length);
+};
+CChangesMathMatrixAddRow.prototype.Redo = function(Class)
+{
+    Class.raw_AddRow(this.Pos, this.Items);
+};
+CChangesMathMatrixAddRow.prototype.Save_Changes = function(Writer)
+{
+    // Long : Count
+    // Long : Pos
+    // Array of String : Id
+
+    var Count = this.Items.length;
+    Writer.WriteLong(Count);
+    Writer.WriteLong(this.Pos);
+
+    for(var Index = 0; Index < Count; Index++)
+    {
+        Writer.WriteString2(this.Items[Index].Get_Id());
+    }
+};
+CChangesMathMatrixAddRow.prototype.Load_Changes = function(Reader, Class)
+{
+    // Long : Count
+    // Long : Pos
+    // Array of String : Id
+
+    var Count = Reader.GetLong();
+    this.Pos  = Reader.GetLong();
+
+    this.Items = [];
+    for(var Index = 0; Index < Count; Index++)
+    {
+        var Element = g_oTableId.Get_ById(Reader.GetString2());
+
+        if (null !== Element)
+            this.Items.push(Element);
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMathMatrixRemoveRow(Pos, Items)
+{
+    this.Pos         = Pos;
+    this.Items       = Items;
+}
+CChangesMathMatrixRemoveRow.prototype.Type = AscDFH.historyitem_Math_MatrixRemoveRow;
+CChangesMathMatrixRemoveRow.prototype.Undo = function(Class)
+{
+    Class.raw_AddRow(this.Pos, this.Items);
+};
+CChangesMathMatrixRemoveRow.prototype.Redo = function(Class)
+{
+    Class.raw_RemoveRow(this.Pos, this.Items.length);
+};
+CChangesMathMatrixRemoveRow.prototype.Save_Changes = function(Writer)
+{
+    // Long : Count
+    // Long : Pos
+    // Array of String : Id
+
+    var Count = this.Items.length;
+    Writer.WriteLong(Count);
+    Writer.WriteLong(this.Pos);
+
+    for(var Index = 0; Index < Count; Index++)
+    {
+        Writer.WriteString2(this.Items[Index].Get_Id());
+    }
+};
+CChangesMathMatrixRemoveRow.prototype.Load_Changes = function(Reader, Class)
+{
+    // Long : Count
+    // Long : Pos
+    // Array of String : Id
+
+    var Count = Reader.GetLong();
+    this.Pos  = Reader.GetLong();
+
+    this.Items = [];
+    for(var Index = 0; Index < Count; Index++)
+    {
+        var Element = g_oTableId.Get_ById(Reader.GetString2());
+
+        if (null !== Element)
+            this.Items.push(Element);
+    }
+
+    this.Redo(Class);
+
+    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, this.Pos, Count);
+};
+
+function CChangesMathMatrixAddColumn(Pos, Items)
+{
+    this.Pos           = Pos;
+    this.Items         = Items;
+}
+CChangesMathMatrixAddColumn.prototype.Type = AscDFH.historyitem_Math_MatrixAddColumn;
+CChangesMathMatrixAddColumn.prototype.Undo = function(Class)
+{
+    Class.raw_RemoveColumn(this.Pos, this.Items.length);
+};
+CChangesMathMatrixAddColumn.prototype.Redo = function(Class)
+{
+    Class.raw_AddColumn(this.Pos, this.Items);
+};
+CChangesMathMatrixAddColumn.prototype.Save_Changes = function(Writer)
+{
+    // Long : CountItems
+    // Long : Pos
+    // Array of String : Id
+
+    var CountItems = this.Items.length;
+    Writer.WriteLong(CountItems);
+    Writer.WriteLong(this.Pos);
+
+    for(var Index = 0; Index < CountItems; Index++)
+    {
+        Writer.WriteString2(this.Items[Index].Get_Id());
+    }
+};
+CChangesMathMatrixAddColumn.prototype.Load_Changes = function(Reader, Class)
+{
+    // Long : CountItems
+    // Long : Pos
+    // Array of String : Id
+
+    var CountItems    = Reader.GetLong();
+    this.Pos          = Reader.GetLong();
+
+    this.Items = [];
+    for(var Index = 0; Index < CountItems; Index++)
+    {
+        var Element = g_oTableId.Get_ById(Reader.GetString2());
+
+        if (null !== Element)
+            this.Items.push(Element);
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMathMatrixRemoveColumn(Pos, Items)
+{
+    this.Pos           = Pos;
+    this.Items         = Items;
+}
+CChangesMathMatrixRemoveColumn.prototype.Type = AscDFH.historyitem_Math_MatrixRemoveColumn;
+CChangesMathMatrixRemoveColumn.prototype.Undo = function(Class)
+{
+    Class.raw_AddColumn(this.Pos, this.Items);
+};
+CChangesMathMatrixRemoveColumn.prototype.Redo = function(Class)
+{
+    Class.raw_RemoveColumn(this.Pos, this.Items.length);
+};
+CChangesMathMatrixRemoveColumn.prototype.Save_Changes = function(Writer)
+{
+    // Long : CountItems
+    // Long : Pos
+    // Long : CountColumn
+    // Array of String : Id
+
+    var CountItems = this.Items.length;
+    Writer.WriteLong(CountItems);
+    Writer.WriteLong(this.Pos);
+    //Writer.WriteLong(this.CountColumn);
+
+    for(var Index = 0; Index < CountItems; Index++)
+    {
+        Writer.WriteString2(this.Items[Index].Get_Id());
+    }
+};
+CChangesMathMatrixRemoveColumn.prototype.Load_Changes = function(Reader, Class)
+{
+    // Long : CountItems
+    // Long : Pos
+    // Long: CountColumn
+    // Array of String : Id
+
+    var CountItems    = Reader.GetLong();
+    this.Pos          = Reader.GetLong();
+    //this.CountColumn  = Reader.GetLong();
+
+    this.Items = [];
+    for(var Index = 0; Index < CountItems; Index++)
+    {
+        var Element = g_oTableId.Get_ById(Reader.GetString2());
+
+        if (null !== Element)
+            this.Items.push(Element);
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMathMatrixBaseJc(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathMatrixBaseJc.prototype.Type = AscDFH.historyitem_Math_MatrixBaseJc;
+CChangesMathMatrixBaseJc.prototype.Undo = function(Class)
+{
+    Class.raw_SetBaseJc(this.Old);
+};
+CChangesMathMatrixBaseJc.prototype.Redo = function(Class)
+{
+    Class.raw_SetBaseJc(this.New);
+};
+CChangesMathMatrixBaseJc.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathMatrixBaseJc.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathMatrixColumnJc(NewValue, OldValue, ColumnPos)
+{
+    this.New       = NewValue;
+    this.Old       = OldValue;
+    this.ColumnPos = ColumnPos;
+}
+CChangesMathMatrixColumnJc.prototype.Type = AscDFH.historyitem_Math_MatrixColumnJc;
+CChangesMathMatrixColumnJc.prototype.Undo = function(Class)
+{
+    Class.raw_SetColumnJc(this.Old, this.ColumnPos);
+};
+CChangesMathMatrixColumnJc.prototype.Redo = function(Class)
+{
+    Class.raw_SetColumnJc(this.New, this.ColumnPos);
+};
+CChangesMathMatrixColumnJc.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+
+    Writer.WriteLong( this.ColumnPos );
+};
+CChangesMathMatrixColumnJc.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+    {
+        this.New = undefined;
+    }
+    else
+    {
+        this.New = Reader.GetLong();
+    }
+
+    this.ColumnPos = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathMatrixInterval(Params)
+{
+    if(Params != undefined)
+    {
+        this.ItemType = Params.ItemType;
+        this.NewRule  = Params.NewRule;
+        this.NewGap   = Params.NewGap;
+        this.OldRule  = Params.OldRule;
+        this.OldGap   = Params.OldGap;
+    }
+}
+CChangesMathMatrixInterval.prototype.Type = AscDFH.historyitem_Math_MatrixInterval;
+CChangesMathMatrixInterval.prototype.Undo = function(Class)
+{
+    Class.raw_SetInterval(this.ItemType, this.OldRule, this.OldGap);
+};
+CChangesMathMatrixInterval.prototype.Redo = function(Class)
+{
+    Class.raw_SetInterval(this.ItemType, this.NewRule, this.NewGap);
+};
+CChangesMathMatrixInterval.prototype.Save_Changes = function(Writer)
+{
+    Writer.WriteLong(this.ItemType);
+
+    if(undefined === this.NewRule)
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.NewRule );
+    }
+
+    if(undefined === this.NewGap)
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.NewGap );
+    }
+};
+CChangesMathMatrixInterval.prototype.Load_Changes = function(Reader, Class)
+{
+    this.ItemType = Reader.GetLong();
+
+    if (true === Reader.GetBool())
+    {
+        this.NewRule = undefined;
+    }
+    else
+    {
+        this.NewRule = Reader.GetLong();
+    }
+
+    if (true === Reader.GetBool())
+    {
+        this.NewGap = undefined;
+    }
+    else
+    {
+        this.NewGap = Reader.GetLong();
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMathMatrixPlh(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathMatrixPlh.prototype.Type = AscDFH.historyitem_Math_MatrixPlh;
+CChangesMathMatrixPlh.prototype.Undo = function(Class)
+{
+    Class.raw_HidePlh(this.Old);
+};
+CChangesMathMatrixPlh.prototype.Redo = function(Class)
+{
+    Class.raw_HidePlh(this.New);
+};
+CChangesMathMatrixPlh.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathMatrixPlh.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathMatrixMinColumnWidth(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathMatrixMinColumnWidth.prototype.Type = AscDFH.historyitem_Math_MatrixMinColumnWidth;
+CChangesMathMatrixMinColumnWidth.prototype.Undo = function(Class)
+{
+    Class.raw_Set_MinColumnWidth(this.Old);
+};
+CChangesMathMatrixMinColumnWidth.prototype.Redo = function(Class)
+{
+    Class.raw_Set_MinColumnWidth(this.New);
+};
+CChangesMathMatrixMinColumnWidth.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathMatrixMinColumnWidth.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBarLinePos(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBarLinePos.prototype.Type = AscDFH.historyitem_Math_BarLinePos;
+CChangesMathBarLinePos.prototype.Undo = function(Class)
+{
+    Class.raw_SetLinePos(this.Old);
+};
+CChangesMathBarLinePos.prototype.Redo = function(Class)
+{
+    Class.raw_SetLinePos(this.New);
+};
+CChangesMathBarLinePos.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathBarLinePos.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBoxForcedBreak(NewBreak, OldBreak, OldAlnAt)
+{
+    this.NewBreak = NewBreak;
+
+    this.OldBreak = OldBreak;
+    this.OldAlnAt = OldAlnAt;
+}
+CChangesMathBoxForcedBreak.prototype.Type = AscDFH.historyitem_Math_BoxForcedBreak;
+CChangesMathBoxForcedBreak.prototype.Undo = function(Class)
+{
+    Class.raw_ForcedBreak(this.OldBreak, this.OldAlnAt);
+};
+CChangesMathBoxForcedBreak.prototype.Redo = function(Class)
+{
+    Class.raw_ForcedBreak(this.NewBreak);
+};
+CChangesMathBoxForcedBreak.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.NewBreak )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.NewBreak );
+    }
+};
+CChangesMathBoxForcedBreak.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.NewBreak = undefined;
+    else
+        this.NewBreak = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+
+function CChangesMathDegreeSubSupType(NewType, OldType)
+{
+    this.New = NewType;
+    this.Old = OldType;
+}
+CChangesMathDegreeSubSupType.prototype.Type = AscDFH.historyitem_Math_DegreeSubSupType;
+CChangesMathDegreeSubSupType.prototype.Undo = function(Class)
+{
+    Class.raw_SetType(this.Old);
+};
+CChangesMathDegreeSubSupType.prototype.Redo = function(Class)
+{
+    Class.raw_SetType(this.New);
+};
+CChangesMathDegreeSubSupType.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathDegreeSubSupType.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
 
 function MatGetKoeffArgSize(FontSize, ArgSize)
 {

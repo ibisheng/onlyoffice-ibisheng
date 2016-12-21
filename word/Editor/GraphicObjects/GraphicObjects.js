@@ -2417,7 +2417,15 @@ CGraphicObjects.prototype =
         return {X: 0, Y: 0};
     },
 
-    Get_SelectionBounds: DrawingObjectsController.prototype.Get_SelectionBounds,
+    Get_SelectionBounds: function()
+    {
+        var oTargetDocContent = this.getTargetDocContent(false, true);
+        if(isRealObject(oTargetDocContent))
+        {
+            return oTargetDocContent.Get_SelectionBounds();
+        }
+        return null;
+    },
 
     checkCommonBounds: function(arrDrawings)
     {

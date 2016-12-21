@@ -469,80 +469,87 @@ cAVEDEV.prototype.getInfo = function () {
     };
 };
 
-	/** @constructor */
-	function cAVERAGE() {
-		this.name = "AVERAGE";
-		this.type = cElementType.func;
-		this.value = null;
-		this.argumentsMin = 1;
-		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
+function cAVERAGE() {
+//    cBaseFunction.call( this, "AVERAGE" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
 
-	}
+    this.name = "AVERAGE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 
-	cAVERAGE.prototype = Object.create(cBaseFunction.prototype);
-	cAVERAGE.prototype.Calculate = function (arg) {
-		var count = 0, sum = new cNumber(0);
-		for (var i = 0; i < arg.length; i++) {
-			var _arg = arg[i];
-			if (cElementType.cell === _arg.type || cElementType.cell3D === _arg.type) {
-			    if (!this.checkExclude || !_arg.isHidden(this.excludeHiddenRows)) {
-					var _argV = _arg.getValue();
-					if (cElementType.string === _argV.type || cElementType.empty === _argV.type ||
-						cElementType.bool === _argV.type) {
-						continue;
-					} else if (cElementType.number === _argV.type) {
-						sum = _func[sum.type][_argV.type](sum, _argV, "+");
-						count++;
-					} else if (cElementType.error === _argV.type) {
-						return this.value = _argV;
-					}
-				}
-			} else if (cElementType.cellsRange === _arg.type || cElementType.cellsRange3D === _arg.type) {
-				var _argAreaValue = _arg.getValue(this.checkExclude, this.excludeHiddenRows);
-				for (var j = 0; j < _argAreaValue.length; j++) {
-					var __arg = _argAreaValue[j];
-					if (cElementType.string === __arg.type || cElementType.empty === __arg.type || cElementType.bool === __arg.type) {
-						continue;
-					} else if (cElementType.number === __arg.type) {
-						sum = _func[sum.type][__arg.type](sum, __arg, "+");
-						count++;
-					} else if (cElementType.error === __arg.type) {
-						return this.value = __arg;
-					}
-				}
-			} else if (cElementType.array === _arg.type) {
-				_arg.foreach(function (elem) {
-					if (cElementType.string === elem.type || cElementType.empty === elem.type || cElementType.bool === elem.type) {
-						return false;
-					}
-					var e = elem.tocNumber();
-					if (cElementType.number === e.type) {
-						sum = _func[sum.type][e.type](sum, e, "+");
-						count++;
-					}
-				})
-			} else {
-				_arg = _arg.tocNumber();
-				if (cElementType.error === _arg.type) {
-					return this.value = _arg;
-				}
-				sum = _func[sum.type][_arg.type](sum, _arg, "+");
-				count++;
-			}
-		}
-		return this.value = new cNumber(sum.getValue() / count);
-	};
-	cAVERAGE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
+}
+
+cAVERAGE.prototype = Object.create( cBaseFunction.prototype );
+cAVERAGE.prototype.Calculate = function ( arg ) {
+    var count = 0, sum = new cNumber( 0 );
+    for ( var i = 0; i < arg.length; i++ ) {
+        var _arg = arg[i];
+        if ( _arg instanceof cRef || _arg instanceof cRef3D ) {
+            var _argV = _arg.getValue();
+            if ( _argV instanceof cString || _argV instanceof cEmpty || _argV instanceof cBool ) {
+                continue;
+            }
+            else if ( _argV instanceof cNumber ) {
+                sum = _func[sum.type][_argV.type]( sum, _argV, "+" );
+                count++;
+            }
+            else if ( _argV instanceof cError ) {
+                return this.value = _argV;
+            }
+        }
+        else if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
+            var _argAreaValue = _arg.getValue();
+            for ( var j = 0; j < _argAreaValue.length; j++ ) {
+                var __arg = _argAreaValue[j];
+                if ( __arg instanceof cString || __arg instanceof cEmpty || __arg instanceof cBool ) {
+                    continue;
+                }
+                else if ( __arg instanceof cNumber ) {
+                    sum = _func[sum.type][__arg.type]( sum, __arg, "+" );
+                    count++;
+                }
+                else if ( __arg instanceof cError ) {
+                    return this.value = __arg;
+                }
+            }
+        }
+        else if ( _arg instanceof cArray ) {
+            _arg.foreach( function ( elem ) {
+                if ( elem instanceof cString || elem instanceof cEmpty || elem instanceof cBool ) {
+                    return false;
+                }
+                var e = elem.tocNumber();
+                if ( e instanceof cNumber ) {
+                    sum = _func[sum.type][e.type]( sum, e, "+" );
+                    count++;
+                }
+            } )
+        }
+        else {
+            _arg = _arg.tocNumber();
+            if ( _arg instanceof cError )
+                return this.value = _arg;
+            sum = _func[sum.type][_arg.type]( sum, _arg, "+" );
+            count++;
+        }
+    }
+    return this.value = new cNumber( sum.getValue() / count );
+};
+cAVERAGE.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( argument-list )"
+    };
+};
 
 function cAVERAGEA() {
 //    cBaseFunction.call( this, "AVERAGEA" );
@@ -1004,113 +1011,122 @@ cCORREL.prototype.getInfo = function () {
     };
 };
 
-	/** @constructor */
-	function cCOUNT() {
-		this.name = "COUNT";
-		this.type = cElementType.func;
-		this.value = null;
-		this.argumentsMin = 1;
-		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.noneFormat;
-	}
+function cCOUNT() {
+    this.name = "COUNT";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+}
 
-	cCOUNT.prototype = Object.create(cBaseFunction.prototype);
-	cCOUNT.prototype.Calculate = function (arg) {
-		var count = 0;
-		for (var i = 0; i < arg.length; i++) {
-			var _arg = arg[i];
-			if (cElementType.cell === _arg.type || cElementType.cell3D === _arg.type) {
-			    if (!this.checkExclude || !_arg.isHidden(this.excludeHiddenRows)) {
-					var _argV = _arg.getValue();
-					if (cElementType.number === _argV.type) {
-						count++;
-					}
-				}
-			} else if (cElementType.cellsRange === _arg.type || cElementType.cellsRange3D === _arg) {
-				var _argAreaValue = _arg.getValue(this.checkExclude, this.excludeHiddenRows);
-				for (var j = 0; j < _argAreaValue.length; j++) {
-					if (cElementType.number === _argAreaValue[j].type) {
-						count++;
-					}
-				}
-			} else if (cElementType.number === _arg.type || cElementType.bool === _arg.type || cElementType.empty === _arg.type) {
-				count++;
-			} else if (cElementType.string === _arg.type) {
-				if (cElementType.number === _arg.tocNumber().type) {
-					count++;
-				}
-			} else if (cElementType.array === _arg.type) {
-				_arg.foreach(function (elem) {
-					if (cElementType.number === elem.tocNumber().type) {
-						count++;
-					}
-				})
-			}
-		}
-		return this.value = new cNumber(count);
-	};
-	cCOUNT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
+cCOUNT.prototype = Object.create( cBaseFunction.prototype );
+cCOUNT.prototype.Calculate = function ( arg ) {
+    var count = 0;
+    for ( var i = 0; i < arg.length; i++ ) {
+        var _arg = arg[i];
+        if ( _arg instanceof cRef || _arg instanceof cRef3D ) {
+            var _argV = _arg.getValue();
+            if ( _argV instanceof cNumber ) {
+                count++;
+            }
+        }
+        else if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
+            var _argAreaValue = _arg.getValue();
+            for ( var j = 0; j < _argAreaValue.length; j++ ) {
+                if ( _argAreaValue[j] instanceof cNumber ) {
+                    count++;
+                }
+            }
+        }
+        else if ( _arg instanceof cNumber || _arg instanceof cBool || _arg instanceof cEmpty ) {
+            count++;
+        }
+        else if ( _arg instanceof cString ) {
+            if ( _arg.tocNumber() instanceof cNumber )
+                count++;
+        }
+        else if ( _arg instanceof cArray ) {
+            _arg.foreach( function ( elem ) {
+                var e = elem.tocNumber();
+                if ( e instanceof cNumber ) {
+                    count++;
+                }
+            } )
+        }
+    }
+    return this.value = new cNumber( count );
+};
+cCOUNT.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( argument-list )"
+    };
+};
 
-	/** @constructor */
-	function cCOUNTA() {
-		this.name = "COUNTA";
-		this.type = cElementType.func;
-		this.value = null;
-		this.argumentsMin = 1;
-		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.noneFormat;
-	}
+function cCOUNTA() {
+//    cBaseFunction.call( this, "COUNTA" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+//    this.setFormat( this.formatType.noneFormat );
 
-	cCOUNTA.prototype = Object.create(cBaseFunction.prototype);
-	cCOUNTA.prototype.Calculate = function (arg) {
-		var element, count = 0;
-		for (var i = 0; i < arg.length; i++) {
-			element = arg[i];
-			if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
-			    if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
-					var _argV = element.getValue();
-					if (cElementType.empty !== _argV.type) {
-						count++;
-					}
-				}
-			} else if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _argAreaValue = element.getValue(this.checkExclude, this.excludeHiddenRows);
-				for (var j = 0; j < _argAreaValue.length; j++) {
-					if (cElementType.empty !== _argAreaValue[j].type) {
-						count++;
-					}
-				}
-			} else if (cElementType.array === element.type) {
-				element.foreach(function (elem) {
-					if (cElementType.empty !== elem.type) {
-						count++;
-					}
-				})
-			} else if (cElementType.empty !== element.type) {
-				count++;
-			}
-		}
-		return this.value = new cNumber(count);
-	};
-	cCOUNTA.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
+    this.name = "COUNTA";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
+}
+
+cCOUNTA.prototype = Object.create( cBaseFunction.prototype );
+cCOUNTA.prototype.Calculate = function ( arg ) {
+    var count = 0;
+    for ( var i = 0; i < arg.length; i++ ) {
+        var _arg = arg[i];
+        if ( _arg instanceof cRef || _arg instanceof cRef3D ) {
+            var _argV = _arg.getValue();
+            if ( !(_argV instanceof cEmpty) ) {
+                count++;
+            }
+        }
+        else if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
+            var _argAreaValue = _arg.getValue();
+            for ( var j = 0; j < _argAreaValue.length; j++ ) {
+                if ( !(_argAreaValue[j] instanceof cEmpty) ) {
+                    count++;
+                }
+            }
+        }
+        else if ( _arg instanceof cArray ) {
+            _arg.foreach( function ( elem ) {
+                if ( !(elem instanceof cEmpty) ) {
+                    count++;
+                }
+            } )
+        }
+        else if ( !( _arg instanceof cEmpty ) ) {
+            count++;
+        }
+    }
+    return this.value = new cNumber( count );
+};
+cCOUNTA.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( argument-list )"
+    };
+};
 
     function cCOUNTBLANK() {
         this.name = "COUNTBLANK";
@@ -2647,93 +2663,93 @@ cLOGNORMDIST.prototype.getInfo = function () {
     };
 };
 
-	/** @constructor */
-	function cMAX() {
-		this.name = "MAX";
-		this.type = cElementType.func;
-		this.value = null;
-		this.argumentsMin = 1;
-		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
+function cMAX() {
+//    cBaseFunction.call( this, "MAX" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
 
-	}
+    this.name = "MAX";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 
-	cMAX.prototype = Object.create(cBaseFunction.prototype);
-	cMAX.prototype.Calculate = function (arg) {
-		var v, element, argIVal, max = Number.NEGATIVE_INFINITY;
-		for (var i = 0; i < this.argumentsCurrent; i++) {
-			element = arg[i];
-			argIVal = element.getValue();
-			if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
-			    if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
-					if (cElementType.error === argIVal.type) {
-						return this.value = argIVal;
-					}
-					if (cElementType.number === argIVal.type) {
-						v = argIVal.tocNumber();
-						if (v.getValue() > max) {
-							max = v.getValue();
-						}
-					}
-				}
-			} else if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var argArr = element.getValue(this.checkExclude, this.excludeHiddenRows);
-				for (var j = 0; j < argArr.length; j++) {
-					if (cElementType.number === argArr[j].type) {
-						v = argArr[j].tocNumber();
-						if (v.getValue() > max) {
-							max = v.getValue();
-						}
-					} else if (cElementType.error === argArr[j].type) {
-						return this.value = argArr[j];
-					}
-				}
-			} else if (cElementType.error === element.type) {
-				return this.value = element;
-			} else if (cElementType.string === element.type) {
-				v = element.tocNumber();
-				if (cElementType.number === v.type) {
-					if (v.getValue() > max) {
-						max = v.getValue();
-					}
-				}
-			} else if (cElementType.bool === element.type || cElementType.empty === element.type) {
-				v = element.tocNumber();
-				if (v.getValue() > max) {
-					max = v.getValue();
-				}
-			} else if (cElementType.array === element.type) {
-				element.foreach(function (elem) {
-					if (cElementType.number === elem.type) {
-						if (elem.getValue() > max) {
-							max = elem.getValue();
-						}
-					} else if (cElementType.error === elem.type) {
-						max = elem;
-						return true;
-					}
-				});
-				if (cElementType.error === max.type) {
-					return this.value = max;
-				}
-			} else {
-				if (element.getValue() > max) {
-					max = element.getValue();
-				}
-			}
-		}
-		return this.value = (max === Number.NEGATIVE_INFINITY ? new cNumber(0) : new cNumber(max));
-	};
-	cMAX.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(number1, number2, ...)"
-		};
-	};
+}
+
+cMAX.prototype = Object.create( cBaseFunction.prototype );
+cMAX.prototype.Calculate = function ( arg ) {
+    var argI, argIVal, max = Number.NEGATIVE_INFINITY;
+    for ( var i = 0; i < this.argumentsCurrent; i++ ) {
+        argI = arg[i], argIVal = argI.getValue();
+        if ( argI instanceof cRef || argI instanceof cRef3D ) {
+            if ( argIVal instanceof cError )
+                return this.value = argIVal;
+            if ( argIVal instanceof cNumber ) {
+                var v = argIVal.tocNumber();
+                if ( v.getValue() > max )
+                    max = v.getValue();
+            }
+        }
+        else if ( argI instanceof cArea || argI instanceof cArea3D ) {
+            var argArr = argI.getValue();
+            for ( var j = 0; j < argArr.length; j++ ) {
+                if ( argArr[j] instanceof cNumber ) {
+                    var v = argArr[j].tocNumber();
+                    if ( v.getValue() > max )
+                        max = v.getValue();
+                }
+                else if ( argArr[j] instanceof cError ) {
+                    return this.value = argArr[j];
+                }
+            }
+        }
+        else if ( argI instanceof cError )
+            return this.value = argI;
+        else if ( argI instanceof cString ) {
+            var v = argI.tocNumber();
+            if ( v instanceof cNumber )
+                if ( v.getValue() > max )
+                    max = v.getValue();
+        }
+        else if ( argI instanceof cBool || argI instanceof cEmpty ) {
+            var v = argI.tocNumber();
+            if ( v.getValue() > max )
+                max = v.getValue();
+        }
+        else if ( argI instanceof cArray ) {
+            argI.foreach( function ( elem ) {
+                if ( elem instanceof cNumber ) {
+                    if ( elem.getValue() > max )
+                        max = elem.getValue();
+                }
+                else if ( elem instanceof cError ) {
+                    max = elem;
+                    return true;
+                }
+            } );
+            if ( max instanceof cError ) {
+                return this.value = max;
+            }
+        }
+        else {
+            if ( argI.getValue() > max )
+                max = argI.getValue();
+        }
+    }
+    return this.value = ( max === Number.NEGATIVE_INFINITY ? new cNumber( 0 ) : new cNumber( max ) );
+};
+cMAX.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"(number1, number2, ...)"
+    };
+};
 
 function cMAXA() {
 //    cBaseFunction.call( this, "MAXA" );
@@ -2911,94 +2927,94 @@ cMEDIAN.prototype.getInfo = function () {
     };
 };
 
-	/** @constructor */
-	function cMIN() {
-		this.name = "MIN";
-		this.type = cElementType.func;
-		this.value = null;
-		this.argumentsMin = 1;
-		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
+function cMIN() {
+//    cBaseFunction.call( this, "MIN" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
 
-	}
+    this.name = "MIN";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 
-	cMIN.prototype = Object.create(cBaseFunction.prototype);
-	cMIN.prototype.Calculate = function (arg) {
-		var v, element, argIVal, min = Number.POSITIVE_INFINITY;
-		for (var i = 0; i < this.argumentsCurrent; i++) {
-			element = arg[i];
-			argIVal = element.getValue();
-			if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
-			    if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
-					if (cElementType.error === argIVal.type) {
-						return this.value = argIVal;
-					}
-					if (cElementType.number === argIVal.type) {
-						v = argIVal.tocNumber();
-						if (v.getValue() < min) {
-							min = v.getValue();
-						}
-					}
-				}
-			} else if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var argArr = element.getValue(this.checkExclude, this.excludeHiddenRows);
-				for (var j = 0; j < argArr.length; j++) {
-					if (cElementType.number === argArr[j].type) {
-						v = argArr[j].tocNumber();
-						if (v.getValue() < min) {
-							min = v.getValue();
-						}
-						continue;
-					} else if (cElementType.error === argArr[j].type) {
-						return this.value = argArr[j];
-					}
-				}
-			} else if (cElementType.error === element.type) {
-				return this.value = element;
-			} else if (cElementType.string === element.type) {
-				v = element.tocNumber();
-				if (cElementType.number === v.type) {
-					if (v.getValue() < min) {
-						min = v.getValue();
-					}
-				}
-			} else if (cElementType.bool === element.type || cElementType.empty === element.type) {
-				v = element.tocNumber();
-				if (v.getValue() < min) {
-					min = v.getValue();
-				}
-			} else if (cElementType.array === element.type) {
-				element.foreach(function (elem) {
-					if (cElementType.number === elem.type) {
-						if (elem.getValue() < min) {
-							min = elem.getValue();
-						}
-					} else if (cElementType.error === elem.type) {
-						min = elem;
-						return true;
-					}
-				});
-				if (cElementType.error === min.type) {
-					return this.value = min;
-				}
-			} else {
-				if (element.getValue() < min) {
-					min = element.getValue();
-				}
-			}
-		}
-		return this.value = ( min === Number.POSITIVE_INFINITY ? new cNumber(0) : new cNumber(min) );
-	};
-	cMIN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(number1, number2, ...)"
-		};
-	};
+}
+
+cMIN.prototype = Object.create( cBaseFunction.prototype );
+cMIN.prototype.Calculate = function ( arg ) {
+    var argI, argIVal, min = Number.POSITIVE_INFINITY;
+    for ( var i = 0; i < this.argumentsCurrent; i++ ) {
+        argI = arg[i], argIVal = argI.getValue();
+        if ( argI instanceof cRef || argI instanceof cRef3D ) {
+            if ( argIVal instanceof cError )
+                return this.value = argIVal;
+            if ( argIVal instanceof cNumber ) {
+                var v = argIVal.tocNumber();
+                if ( v.getValue() < min )
+                    min = v.getValue();
+            }
+        }
+        else if ( argI instanceof cArea || argI instanceof cArea3D ) {
+            var argArr = argI.getValue();
+            for ( var j = 0; j < argArr.length; j++ ) {
+                if ( argArr[j] instanceof cNumber ) {
+                    var v = argArr[j].tocNumber();
+                    if ( v.getValue() < min )
+                        min = v.getValue();
+                    continue;
+                }
+                else if ( argArr[j] instanceof cError ) {
+                    return this.value = argArr[j];
+                }
+            }
+        }
+        else if ( argI instanceof cError )
+            return this.value = argI;
+        else if ( argI instanceof cString ) {
+            var v = argI.tocNumber();
+            if ( v instanceof cNumber )
+                if ( v.getValue() < min )
+                    min = v.getValue();
+        }
+        else if ( argI instanceof cBool || argI instanceof cEmpty ) {
+            var v = argI.tocNumber();
+            if ( v.getValue() < min )
+                min = v.getValue();
+        }
+        else if ( argI instanceof cArray ) {
+            argI.foreach( function ( elem ) {
+                if ( elem instanceof cNumber ) {
+                    if ( elem.getValue() < min )
+                        min = elem.getValue();
+                }
+                else if ( elem instanceof cError ) {
+                    min = elem;
+                    return true;
+                }
+            } )
+            if ( min instanceof cError ) {
+                return this.value = min;
+            }
+        }
+        else {
+            if ( argI.getValue() < min )
+                min = argI.getValue();
+        }
+    }
+    return this.value = ( min === Number.POSITIVE_INFINITY ? new cNumber( 0 ) : new cNumber( min ) );
+};
+cMIN.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"(number1, number2, ...)"
+    };
+};
 
 function cMINA() {
 //    cBaseFunction.call( this, "MINA" );
@@ -4708,76 +4724,82 @@ cSTANDARDIZE.prototype.getInfo = function () {
     };
 };
 
-	/** @constructor */
-	function cSTDEV() {
-		this.name = "STDEV";
-		this.type = cElementType.func;
-		this.value = null;
-		this.argumentsMin = 1;
-		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.noneFormat;
+function cSTDEV() {
+//    cBaseFunction.call( this, "STDEV" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+//    this.setFormat( this.formatType.noneFormat );
 
-	}
+    this.name = "STDEV";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
 
-	cSTDEV.prototype = Object.create(cBaseFunction.prototype);
-	cSTDEV.prototype.Calculate = function (arg) {
-		var i, element, count = 0, sum = new cNumber(0), member = [];
-		for (i = 0; i < arg.length; i++) {
-			element = arg[i];
-			if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
-			    if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
-					var _argV = element.getValue();
-					if (cElementType.number === _argV.type) {
-						member.push(_argV);
-						sum = _func[sum.type][_argV.type](sum, _argV, "+");
-						count++;
-					}
-				}
-			} else if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _argAreaValue = element.getValue(this.checkExclude, this.excludeHiddenRows);
-				for (var j = 0; j < _argAreaValue.length; j++) {
-					var __arg = _argAreaValue[j];
-					if (cElementType.number === __arg.type) {
-						member.push(__arg);
-						sum = _func[sum.type][__arg.type](sum, __arg, "+");
-						count++;
-					}
-				}
-			} else if (cElementType.array === element.type) {
-				element.foreach(function (elem) {
-					var e = elem.tocNumber();
-					if (cElementType.number === e.type) {
-						member.push(e);
-						sum = _func[sum.type][e.type](sum, e, "+");
-						count++;
-					}
-				})
-			} else {
-				element = element.tocNumber();
-				if (cElementType.number === element.type) {
-					member.push(element);
-					sum = _func[sum.type][element.type](sum, element, "+");
-					count++;
-				}
-			}
-		}
-		var average = sum.getValue() / count, res = 0, av;
-		for (i = 0; i < member.length; i++) {
-			av = member[i] - average;
-			res += av * av;
-		}
-		return this.value = new cNumber(Math.sqrt(res / (count - 1)));
-	};
-	cSTDEV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
+}
+
+cSTDEV.prototype = Object.create( cBaseFunction.prototype );
+cSTDEV.prototype.Calculate = function ( arg ) {
+    var count = 0, sum = new cNumber( 0 ), member = [];
+    for ( var i = 0; i < arg.length; i++ ) {
+        var _arg = arg[i];
+        if ( _arg instanceof cRef || _arg instanceof cRef3D ) {
+            var _argV = _arg.getValue();
+            if ( _argV instanceof cNumber ) {
+                member.push( _argV );
+                sum = _func[sum.type][_argV.type]( sum, _argV, "+" );
+                count++;
+            }
+        }
+        else if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
+            var _argAreaValue = _arg.getValue();
+            for ( var j = 0; j < _argAreaValue.length; j++ ) {
+                var __arg = _argAreaValue[j];
+                if ( __arg instanceof cNumber ) {
+                    member.push( __arg );
+                    sum = _func[sum.type][__arg.type]( sum, __arg, "+" );
+                    count++;
+                }
+            }
+        }
+        else if ( _arg instanceof cArray ) {
+            _arg.foreach( function ( elem ) {
+                var e = elem.tocNumber();
+                if ( e instanceof cNumber ) {
+                    member.push( e );
+                    sum = _func[sum.type][e.type]( sum, e, "+" );
+                    count++;
+                }
+            } )
+        }
+        else {
+            _arg = _arg.tocNumber();
+            if ( _arg instanceof cNumber ) {
+                member.push( _arg );
+                sum = _func[sum.type][_arg.type]( sum, _arg, "+" );
+                count++;
+            }
+        }
+    }
+    var average = sum.getValue() / count, res = 0, av;
+    for ( var i = 0; i < member.length; i++ ) {
+        av = member[i] - average;
+        res += av * av;
+    }
+    return this.value = new cNumber( Math.sqrt( res / (count - 1) ) );
+};
+cSTDEV.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( argument-list )"
+    };
+};
 
 function cSTDEVA() {
 //    cBaseFunction.call( this, "STDEVA" );
@@ -4856,86 +4878,96 @@ cSTDEVA.prototype.getInfo = function () {
     };
 };
 
-	/** @constructor */
-	function cSTDEVP() {
-		this.name = "STDEVP";
-		this.type = cElementType.func;
-		this.value = null;
-		this.argumentsMin = 1;
-		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
-	}
+function cSTDEVP() {
+//    cBaseFunction.call( this, "STDEVP" );
 
-	cSTDEVP.prototype = Object.create(cBaseFunction.prototype);
-	cSTDEVP.prototype.Calculate = function (arg) {
-		function _var(x) {
-			var i, tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
-			for (i = 0; i < x.length; i++) {
+    this.name = "STDEVP";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 
-				if (cElementType.number === x[i].type) {
-					_x += x[i].getValue();
-					tA.push(x[i].getValue());
-					xLength++;
-				} else if (cElementType.error === x[i].type) {
-					return x[i];
-				}
+}
 
-			}
+cSTDEVP.prototype = Object.create( cBaseFunction.prototype );
+cSTDEVP.prototype.Calculate = function ( arg ) {
 
-			_x /= xLength;
+    function _var( x ) {
 
-			for (i = 0; i < x.length; i++) {
-				sumSQRDeltaX += (tA[i] - _x) * (tA[i] - _x)
-			}
+        var tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
+        for ( var i = 0; i < x.length; i++ ) {
 
-			return new cNumber(isNaN(_x) ? new cError(cErrorType.division_by_zero) : Math.sqrt(sumSQRDeltaX / xLength));
-		}
+            if ( x[i] instanceof cNumber ) {
+                _x += x[i].getValue();
+                tA.push( x[i].getValue() );
+                xLength++;
+            }
+            else if ( x[i] instanceof  cError ) {
+                return x[i];
+            }
 
-		var element, arr0 = [];
+        }
 
-		for (var j = 0; j < arg.length; j++) {
-			element = arg[j];
-			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _arrVal = arg.getValue(this.checkExclude, this.excludeHiddenRows);
-				_arrVal.forEach(function (elem) {
-					if (cElementType.number === elem.type || cElementType.error === elem.type) {
-						arr0.push(elem);
-					}
-				});
-			} else if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
-			    if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
-					var a = element.getValue();
-					if (cElementType.number === a.type || cElementType.error === a.type) {
-						arr0.push(a);
-					}
-				}
-			} else if (cElementType.array === element.type) {
-				element.foreach(function (elem) {
-					if (cElementType.number === elem.type || cElementType.error === elem.type) {
-						arr0.push(elem);
-					}
-				});
-			} else if (cElementType.number === element.type || cElementType.bool === element.type) {
-				arr0.push(element.tocNumber());
-			} else if (cElementType.string === element.type || cElementType.empty === element.type) {
-				arr0.push(new cNumber(0));
-			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
-			}
+        _x /= xLength;
 
-		}
-		return this.value = _var(arr0);
-	};
-	cSTDEVP.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
+        for ( var i = 0; i < x.length; i++ ) {
+
+            sumSQRDeltaX += (tA[i] - _x) * (tA[i] - _x)
+
+        }
+
+        return new cNumber( isNaN(_x) ? new cError( cErrorType.division_by_zero ) : Math.sqrt( sumSQRDeltaX / xLength ) );
+
+    }
+
+    var arr0 = [];
+
+    for ( var j = 0; j < arg.length; j++ ) {
+        var _arg = arg[j];
+        if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
+            _arg.foreach2( function ( elem ) {
+                if ( elem instanceof  cNumber || elem instanceof  cError ) {
+                    arr0.push( elem );
+                }
+            } );
+        }
+        else if ( _arg instanceof cRef || _arg instanceof cRef3D ) {
+            var a = _arg.getValue();
+            if ( a instanceof  cNumber || a instanceof  cError ) {
+                arr0.push( a );
+            }
+        }
+        else if ( _arg instanceof cArray ) {
+            _arg.foreach( function ( elem ) {
+                if ( elem instanceof  cNumber || elem instanceof  cError ) {
+                    arr0.push( elem );
+                }
+            } );
+        }
+        else if ( _arg instanceof cNumber || _arg instanceof cBool ) {
+            arr0.push( _arg.tocNumber() );
+        }
+        else if ( _arg instanceof cString || _arg instanceof  cEmpty ) {
+            arr0.push( new cNumber( 0 ) );
+        }
+        else
+            return this.value = new cError( cErrorType.wrong_value_type );
+
+    }
+    return this.value = _var( arr0 );
+};
+cSTDEVP.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( argument-list )"
+    };
+};
 
 function cSTDEVPA() {
 //    cBaseFunction.call( this, "STDEVPA" );
@@ -5170,93 +5202,104 @@ function cTTEST() {
 
 cTTEST.prototype = Object.create( cBaseFunction.prototype );
 
-	/** @constructor */
-	function cVAR() {
-		this.name = "VAR";
-		this.type = cElementType.func;
-		this.value = null;
-		this.argumentsMin = 1;
-		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
+function cVAR() {
+//    cBaseFunction.call( this, "VAR" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
 
-	}
+    this.name = "VAR";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 
-	cVAR.prototype = Object.create(cBaseFunction.prototype);
-	cVAR.prototype.Calculate = function (arg) {
-		function _var(x) {
-			if (x.length < 1) {
-				return new cError(cErrorType.division_by_zero);
-			}
+}
 
-			var i, tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
-			for (i = 0; i < x.length; i++) {
+cVAR.prototype = Object.create( cBaseFunction.prototype );
+cVAR.prototype.Calculate = function ( arg ) {
 
-				if (cElementType.number === x[i].type) {
-					_x += x[i].getValue();
-					tA.push(x[i].getValue());
-					xLength++;
-				} else if (cElementType.error === x[i].type) {
-					return x[i];
-				}
+    function _var( x ) {
 
-			}
+        if( x.length < 1 ){
+            return new cError( cErrorType.division_by_zero );
+        }
 
-			_x /= xLength;
+        var tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
+        for ( var i = 0; i < x.length; i++ ) {
 
-			for (i = 0; i < x.length; i++) {
-				sumSQRDeltaX += (tA[i] - _x) * (tA[i] - _x)
-			}
+            if ( x[i] instanceof cNumber ) {
+                _x += x[i].getValue();
+                tA.push( x[i].getValue() );
+                xLength++;
+            }
+            else if ( x[i] instanceof  cError ) {
+                return x[i];
+            }
 
-			return new cNumber(sumSQRDeltaX / (xLength - 1))
+        }
 
-		}
+        _x /= xLength;
 
-		var element, arr0 = [];
+        for ( var i = 0; i < x.length; i++ ) {
 
-		for (var j = 0; j < arg.length; j++) {
-			element = arg[j];
-			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
-				_arrVal.forEach(function (elem) {
-					if (cElementType.number === elem.type || cElementType.error === elem.type) {
-						arr0.push(elem);
-					}
-				});
-			} else if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
-			    if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
-					var a = element.getValue();
-					if (cElementType.number === a.type || cElementType.error === a.type) {
-						arr0.push(a);
-					}
-				}
-			} else if (cElementType.array === element.type) {
-				element.foreach(function (elem) {
-					if (cElementType.number === elem.type || cElementType.error === elem.type) {
-						arr0.push(elem);
-					}
-				});
-			} else if (cElementType.number === element.type || cElementType.bool === element.type) {
-				arr0.push(element.tocNumber());
-			} else if (cElementType.string === element.type || cElementType.empty === element.type) {
-				continue;
-			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
-			}
+            sumSQRDeltaX += (tA[i] - _x) * (tA[i] - _x)
 
-		}
-		return this.value = _var(arr0);
+        }
 
-	};
-	cVAR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
+        return new cNumber( sumSQRDeltaX / (xLength - 1) )
+
+    }
+
+    var arr0 = [];
+
+    for ( var j = 0; j < arg.length; j++ ) {
+        var _arg = arg[j];
+        if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
+            _arg.foreach2( function ( elem ) {
+                if ( elem instanceof  cNumber || elem instanceof  cError ){
+                    arr0.push( elem );
+                }
+            } );
+        }
+        else if ( _arg instanceof cRef || _arg instanceof cRef3D ) {
+            var a = _arg.getValue();
+            if ( a instanceof  cNumber || a instanceof  cError ){
+                arr0.push( a );
+            }
+        }
+        else if ( _arg instanceof cArray ) {
+            _arg.foreach( function ( elem ) {
+                if ( elem instanceof  cNumber || elem instanceof  cError ){
+                    arr0.push( elem );
+                }
+            } );
+        }
+        else if ( _arg instanceof cNumber || _arg instanceof cBool ) {
+            arr0.push( _arg.tocNumber() );
+        }
+        else if ( _arg instanceof cString || _arg instanceof  cEmpty ) {
+            continue;
+        }
+        else{
+            return this.value = new cError( cErrorType.wrong_value_type );
+        }
+
+    }
+    return this.value = _var( arr0 );
+
+};
+cVAR.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( argument-list )"
+    };
+};
 
 function cVARA() {
 //    cBaseFunction.call( this, "VARA" );
@@ -5372,92 +5415,100 @@ cVARA.prototype.getInfo = function () {
     };
 };
 
-	/** @constructor */
-	function cVARP() {
-		this.name = "VARP";
-		this.type = cElementType.func;
-		this.value = null;
-		this.argumentsMin = 1;
-		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
+function cVARP() {
+//    cBaseFunction.call( this, "VARP" );
 
-	}
+    this.name = "VARP";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 
-	cVARP.prototype = Object.create(cBaseFunction.prototype);
-	cVARP.prototype.Calculate = function (arg) {
-		function _var(x) {
-			if (x.length < 1) {
-				return new cError(cErrorType.division_by_zero);
-			}
+}
 
-			var tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
-			for (var i = 0; i < x.length; i++) {
+cVARP.prototype = Object.create( cBaseFunction.prototype );
+cVARP.prototype.Calculate = function ( arg ) {
 
-				if (cElementType.number === x[i].type) {
-					_x += x[i].getValue();
-					tA.push(x[i].getValue());
-					xLength++;
-				} else if (cElementType.error === x[i].type) {
-					return x[i];
-				}
+    function _var( x ) {
 
-			}
+        if( x.length < 1 ){
+            return new cError( cErrorType.division_by_zero );
+        }
 
-			_x /= xLength;
+        var tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
+        for ( var i = 0; i < x.length; i++ ) {
 
-			for (var i = 0; i < x.length; i++) {
-				sumSQRDeltaX += (tA[i] - _x) * (tA[i] - _x);
-			}
+            if ( x[i] instanceof cNumber ) {
+                _x += x[i].getValue();
+                tA.push( x[i].getValue() );
+                xLength++;
+            }
+            else if ( x[i] instanceof  cError ) {
+                return x[i];
+            }
 
-			return new cNumber(sumSQRDeltaX / xLength);
+        }
 
-		}
+        _x /= xLength;
 
-		var element, arr0 = [];
+        for ( var i = 0; i < x.length; i++ ) {
 
-		for (var j = 0; j < arg.length; j++) {
-			element = arg[j];
-			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
-				_arrVal.forEach(function (elem) {
-					if (cElementType.number === elem.type || cElementType.error === elem.type) {
-						arr0.push(elem);
-					}
-				});
-			} else if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
-			    if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
-					var a = element.getValue();
-					if (cElementType.number === a.type || cElementType.error === a.type) {
-						arr0.push(a);
-					}
-				}
-			} else if (cElementType.array === element.type) {
-				element.foreach(function (elem) {
-					if (cElementType.number === elem.type || cElementType.error === elem.type) {
-						arr0.push(elem);
-					}
-				});
-			} else if (cElementType.number === element.type || cElementType.bool === element.type) {
-				arr0.push(element.tocNumber());
-			} else if (cElementType.string === element.type || cElementType.empty === element.type) {
-				arr0.push(new cNumber(0));
-			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
-			}
+            sumSQRDeltaX += (tA[i] - _x) * (tA[i] - _x);
 
-		}
-		return this.value = _var(arr0);
-	};
-	cVARP.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
+        }
+
+        return new cNumber( sumSQRDeltaX / xLength );
+
+    }
+
+    var arr0 = [];
+
+    for ( var j = 0; j < arg.length; j++ ) {
+        var _arg = arg[j];
+        if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
+            _arg.foreach2( function ( elem ) {
+                if ( elem instanceof  cNumber || elem instanceof  cError ) {
+                    arr0.push( elem );
+                }
+            } );
+        }
+        else if ( _arg instanceof cRef || _arg instanceof cRef3D ) {
+            var a = _arg.getValue();
+            if ( a instanceof  cNumber || a instanceof  cError ) {
+                arr0.push( a );
+            }
+        }
+        else if ( _arg instanceof cArray ) {
+            _arg.foreach( function ( elem ) {
+                if ( elem instanceof  cNumber || elem instanceof  cError ) {
+                    arr0.push( elem );
+                }
+            } );
+        }
+        else if ( _arg instanceof cNumber || _arg instanceof cBool ) {
+            arr0.push( _arg.tocNumber() );
+        }
+        else if ( _arg instanceof cString || _arg instanceof  cEmpty ) {
+            arr0.push( new cNumber( 0 ) );
+        }
+        else
+            return this.value = new cError( cErrorType.wrong_value_type );
+
+    }
+    return this.value = _var( arr0 );
+};
+cVARP.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( argument-list )"
+    };
+};
 
 function cVARdotP() {
 //    cBaseFunction.call( this, "VARP" );
