@@ -3025,6 +3025,9 @@
 			H: ws.getCellTop(range.r2, 3) - t + ws.getRowHeight(range.r2, 3)
 		};
 	};
+	WorkbookView.prototype.ConvertXYToLogic = function (x, y) {
+	  return this.getWorksheet().ConvertXYToLogic(x, y);
+	};
 
   //------------------------------------------------------------export---------------------------------------------------
   window['AscCommonExcel'] = window['AscCommonExcel'] || {};

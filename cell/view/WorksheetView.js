@@ -13142,6 +13142,35 @@
 
         return res;
     };
+
+    // Convert coordinates methods
+	WorksheetView.prototype.ConvertXYToLogic = function (x, y) {
+		x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
+		y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
+
+		var c = this.visibleRange.c1, cFrozen, widthDiff;
+		var r = this.visibleRange.r1, rFrozen, heightDiff;
+		if (this.topLeftFrozenCell) {
+			cFrozen = this.topLeftFrozenCell.getCol0();
+			widthDiff = this.cols[cFrozen].left - this.cols[0].left;
+			if (x < this.cellsLeft + widthDiff && 0 !== widthDiff) {
+				c = 0;
+			}
+
+			rFrozen = this.topLeftFrozenCell.getRow0();
+			heightDiff = this.rows[rFrozen].top - this.rows[0].top;
+			if (y < this.cellsTop + heightDiff && 0 !== heightDiff) {
+				r = 0;
+			}
+		}
+
+		x += this.cols[c].left + this.cols[c].width;
+		y += this.rows[r].top + this.rows[r].height;
+
+		x *= asc_getcvt(1/*px*/, 3/*pt*/, this._getPPIX());
+		y *= asc_getcvt(1/*px*/, 3/*pt*/, this._getPPIY());
+		return {X: x, Y: y};
+	};
     
     //------------------------------------------------------------export---------------------------------------------------
     window['AscCommonExcel'] = window['AscCommonExcel'] || {};
