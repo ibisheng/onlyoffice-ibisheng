@@ -44,7 +44,7 @@ function CWrapPolygon(wordGraphicObject)
 {
     this.calculatedPoints = [];
     this.arrPoints = [];
-    this.relativeArrPoints = [];
+    this.relativeArrPoints = new ArrayWrapPoint([]);
 
     this.edited = false;
 
@@ -83,22 +83,22 @@ CWrapPolygon.prototype =
 
     setEdited: function(pr)
     {
-        History.Add(this, {Type: AscDFH.historyitem_WrapPolygonSetEdited, oldPr: this.edited, newPr: pr});
+        History.Add(new CChangesWrapPolygonEdited(this, this.edited, pr));
         this.edited = pr;
     },
 
     setArrRelPoints: function(pr)
     {
-        History.Add(this, {Type:AscDFH.historyitem_WrapPolygonSetRelPoints, oldPr: this.relativeArrPoints, newPr: pr});
+        var NewRelPoint = new ArrayWrapPoint(pr);
+        History.Add(new CChangesWrapPolygonRelPoints(this, this.relativeArrPoints, NewRelPoint));
         this.relativeArrPoints = pr;
     },
 
     setWrapSide: function(pr)
     {
-        History.Add(this, {Type: AscDFH.historyitem_WrapPolygonSetWrapSide, oldPr: this.wrapSide, newPr: pr});
+        History.Add(new CChangesWrapPolygonWrapSide(this, this.wrapSide, pr));
         this.wrapSide = pr;
     },
-
 
     fromOther: function(wrapPolygon)
     {
@@ -433,37 +433,6 @@ CWrapPolygon.prototype =
 
     },
 
-    checkBottomNaN: function(arr)
-    {
-        for(var i = 0; i < arr.length; ++i)
-        {
-            if(isNaN(arr[i].Y1))
-                return true;
-        }
-        return false;
-    },
-
-    isRect: function()
-    {
-        if(this.arrPoints.length === 4)
-        {
-            if(Math.abs(this.arrPoints[0].y - this.arrPoints[1].y) < 0.01
-                && Math.abs(this.arrPoints[1].x - this.arrPoints[2].x) < 0.01
-                && Math.abs(this.arrPoints[2].y - this.arrPoints[3].y) < 0.01
-                && Math.abs(this.arrPoints[3].x - this.arrPoints[0].x) < 0.01
-                || Math.abs(this.arrPoints[0].x - this.arrPoints[1].x) < 0.01
-                && Math.abs(this.arrPoints[1].y - this.arrPoints[2].y) < 0.01
-                && Math.abs(this.arrPoints[2].x - this.arrPoints[3].x) < 0.01
-                && Math.abs(this.arrPoints[3].y - this.arrPoints[0].y) < 0.01
-                )
-            {
-                return true;
-            }
-        }
-        return false;
-    },
-
-
     calculate: function(drawing)
     {
         var arrPolygons = drawing.getArrayWrapPolygons();
@@ -782,7 +751,6 @@ CWrapPolygon.prototype =
         this.right  = this.localRight + x;
         this.bottom = this.localBottom + y;
     },
-
 
     Undo: function(data)
     {
@@ -1108,6 +1076,104 @@ TrackPointWrapPointWrapPolygon.prototype =
         overlay.ds();
     }
 };
+
+
+function CChangesWrapPolygonEdited(Class, OldPr, NewPr){
+    CChangesWrapPolygonEdited.superclass.constructor.call(this, Class, OldPr, NewPr);
+}
+AscCommon.extendClass(CChangesWrapPolygonEdited, AscDFH.CChangesBaseBoolProperty);
+CChangesWrapPolygonEdited.prototype.Type = AscDFH.historyitem_WrapPolygonSetEdited;
+CChangesWrapPolygonEdited.prototype.private_SetValue = function(value){
+    if(this.Class){
+        this.Class.edited = value;
+        if(this.Class.wordGraphicObject && this.Class.wordGraphicObject.GraphicObj && this.Class.wordGraphicObject.GraphicObj.recalcWrapPolygon)
+        {
+            this.Class.wordGraphicObject.GraphicObj.recalcWrapPolygon();
+            this.Class.wordGraphicObject.GraphicObj.addToRecalculate()
+        }
+    }
+};
+
+function CChangesWrapPolygonWrapSide(Class, OldPr, NewPr){
+    CChangesWrapPolygonWrapSide.superclass.constructor.call(this, Class, OldPr, NewPr);
+}
+AscCommon.extendClass(CChangesWrapPolygonWrapSide, AscDFH.CChangesBaseLongProperty);
+CChangesWrapPolygonWrapSide.prototype.Type = AscDFH.historyitem_WrapPolygonSetWrapSide;
+CChangesWrapPolygonWrapSide.prototype.private_SetValue = function(value){
+    if(this.Class){
+        this.Class.wrapSide = value;
+        if(this.Class.wordGraphicObject && this.Class.wordGraphicObject.GraphicObj && this.Class.wordGraphicObject.GraphicObj.recalcWrapPolygon)
+        {
+            this.Class.wordGraphicObject.GraphicObj.recalcWrapPolygon();
+            this.Class.wordGraphicObject.GraphicObj.addToRecalculate()
+        }
+    }
+
+};
+
+function CChangesWrapPolygonRelPoints(Class, OldPr, NewPr){
+    CChangesWrapPolygonRelPoints.superclass.constructor.call(this, Class, OldPr, NewPr);
+}
+AscCommon.extendClass(CChangesWrapPolygonRelPoints, AscDFH.CChangesBaseObjectProperty);
+CChangesWrapPolygonRelPoints.prototype.Type = AscDFH.historyitem_WrapPolygonSetRelPoints;
+CChangesWrapPolygonRelPoints.prototype.private_IsCreateEmptyObject = function(){
+    return true;
+};
+CChangesWrapPolygonRelPoints.prototype.private_CreateObject = function(){
+    return new ArrayWrapPoint();
+};
+
+CChangesWrapPolygonRelPoints.prototype.private_SetValue = function(value){
+    if(this.Class){
+        var aRelPoints = [];
+        for(var i = 0;  i < value.length; ++i){
+            aRelPoints.push(value[i]);
+        }
+        this.Class.relativeArrPoints = aRelPoints;
+        if(this.Class.wordGraphicObject && this.Class.wordGraphicObject.GraphicObj && this.Class.wordGraphicObject.GraphicObj.recalcWrapPolygon)
+        {
+            this.Class.wordGraphicObject.GraphicObj.recalcWrapPolygon();
+            this.Class.wordGraphicObject.GraphicObj.addToRecalculate()
+        }
+    }
+};
+
+function ArrayWrapPoint(oArray){
+    ArrayWrapPoint.superclass.constructor.call(this);
+    if(oArray){
+        this.length = oArray.length;
+        for(var i = 0;  i < oArray.length; ++i){
+            this[i] = {};
+            this[i].x = oArray[i].x;
+            this[i].y = oArray[i].y;
+        }
+    }
+}
+AscCommon.extendClass(ArrayWrapPoint, Array);
+ArrayWrapPoint.prototype.Write_ToBinary = function(Writer){
+    Writer.WriteLong(this.length);
+    for(var i = 0; i < this.length; ++i){
+        Writer.WriteLong(this[i].x >> 0);
+        Writer.WriteLong(this[i].y >> 0);
+    }
+};
+ArrayWrapPoint.prototype.Read_FromBinary = function(Reader){
+    var nLength = Reader.GetLong();
+    var x, y;
+    for(var i = 0; i < nLength; ++i){
+        x = Reader.GetLong();
+        y = Reader.GetLong();
+        this.push({x: x, y: y});
+    }
+    this.length = nLength;
+};
+
+
+AscDFH.changesFactory = AscDFH.changesFactory || {};
+AscDFH.changesFactory[AscDFH.historyitem_WrapPolygonSetEdited] = CChangesWrapPolygonEdited;
+AscDFH.changesFactory[AscDFH.historyitem_WrapPolygonSetWrapSide] = CChangesWrapPolygonWrapSide;
+AscDFH.changesFactory[AscDFH.historyitem_WrapPolygonSetRelPoints] = CChangesWrapPolygonRelPoints;
+
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

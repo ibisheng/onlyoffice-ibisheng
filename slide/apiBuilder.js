@@ -391,7 +391,7 @@
         if(this.Presentation){
             var width = nWidth/36000.0;
             var height = nHeight/36000.0;
-            History.Add(this, {Type: AscDFH.historyitem_Presentation_SlideSize, oldW: this.Presentation.Width, newW: width, oldH: this.Presentation.Height, newH:  height});
+            History.Add(this.Presentation, {Type: AscDFH.historyitem_Presentation_SlideSize, oldW: this.Presentation.Width, newW: width, oldH: this.Presentation.Height, newH:  height});
             this.Presentation.Width = width;
             this.Presentation.Height = height;
             this.Presentation.changeSlideSizeFunction(this.Presentation.Width, this.Presentation.Height);
