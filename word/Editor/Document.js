@@ -11082,6 +11082,51 @@ CDocument.prototype.AddFootnote = function(sText)
 		}
 	}
 };
+CDocument.prototype.RemoveAllFootnotes = function()
+{
+	var nDocPosType = this.Get_DocPosType();
+	if (docpostype_Content !== nDocPosType && docpostype_Footnotes !== nDocPosType)
+		return;
+
+	var oEngine = new CDocumentFootnotesRangeEngine(true);
+	oEngine.Init(null, null);
+
+	var arrParagraphs = this.Get_AllParagraphs({OnlyMainDocument : true, All : true});
+	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
+	{
+		arrParagraphs[nIndex].Get_FootnotesList(oEngine);
+	}
+
+	var arrFootnotes  = oEngine.GetRange();
+	var arrParagraphs = oEngine.GetParagraphs();
+	var arrRuns       = oEngine.GetRuns();
+	var arrRefs       = oEngine.GetRefs();
+
+	if (arrRuns.length !== arrRefs.length || arrFootnotes.length !== arrRuns.length)
+		return;
+
+	if (false === this.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : arrParagraphs, CheckType : changestype_Paragraph_Content }, true))
+	{
+		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_RemoveAllFootnotes);
+
+		for (var nIndex = 0, nCount = arrFootnotes.length; nIndex < nCount; ++nIndex)
+		{
+			var oRef = arrRefs[nIndex];
+			var oRun = arrRuns[nIndex];
+
+			oRun.RemoveElement(oRef);
+		}
+
+		this.Recalculate();
+
+		if (docpostype_Footnotes === nDocPosType)
+		{
+			this.CurPos.Type = docpostype_Content;
+			if (arrRuns.length > 0)
+				arrRuns[0].Make_ThisElementCurrent();
+		}
+	}
+};
 CDocument.prototype.GetFootnotesController = function()
 {
 	return this.Footnotes;
@@ -16746,20 +16791,26 @@ CDocumentNumberingInfoEngine.prototype.Get_NumInfo = function()
     return this.NumInfo;
 };
 
-function CDocumentFootnotesRangeEngine()
+function CDocumentFootnotesRangeEngine(bExtendedInfo)
 {
 	this.m_oFirstFootnote = null; // Если не задана ищем с начала
 	this.m_oLastFootnote  = null; // Если не задана ищем до конца
 
-	this.m_arrFootnotes = [];
-	this.m_bForceStop     = false;
+	this.m_arrFootnotes  = [];
+	this.m_bForceStop    = false;
+
+	this.m_bExtendedInfo = (true === bExtendedInfo ? true : false);
+	this.m_arrParagraphs = [];
+	this.m_oCurParagraph = null;
+	this.m_arrRuns       = [];
+	this.m_arrRefs       = [];
 }
 CDocumentFootnotesRangeEngine.prototype.Init = function(oFirstFootnote, oLastFootnote)
 {
 	this.m_oFirstFootnote = oFirstFootnote ? oFirstFootnote : null;
 	this.m_oLastFootnote  = oLastFootnote ? oLastFootnote : null;
 };
-CDocumentFootnotesRangeEngine.prototype.Add = function(oFootnote)
+CDocumentFootnotesRangeEngine.prototype.Add = function(oFootnote, oFootnoteRef, oRun)
 {
 	if (!oFootnote || true === this.m_bForceStop)
 		return;
@@ -16767,18 +16818,18 @@ CDocumentFootnotesRangeEngine.prototype.Add = function(oFootnote)
 	if (this.m_arrFootnotes.length <= 0 && null !== this.m_oFirstFootnote)
 	{
 		if (this.m_oFirstFootnote === oFootnote)
-			this.m_arrFootnotes.push(oFootnote);
+			this.private_AddFootnote(oFootnote, oFootnoteRef, oRun);
 		else if (this.m_oLastFootnote === oFootnote)
 			this.m_bForceStop = true;
 	}
 	else if (this.m_arrFootnotes.length >= 1 && null !== this.m_oLastFootnote)
 	{
 		if (this.m_oLastFootnote !== this.m_arrFootnotes[this.m_arrFootnotes.length - 1])
-			this.m_arrFootnotes.push(oFootnote);
+			this.private_AddFootnote(oFootnote, oFootnoteRef, oRun);
 	}
 	else
 	{
-		this.m_arrFootnotes.push(oFootnote);
+		this.private_AddFootnote(oFootnote, oFootnoteRef, oRun);
 	}
 };
 CDocumentFootnotesRangeEngine.prototype.IsRangeFull = function()
@@ -16794,6 +16845,37 @@ CDocumentFootnotesRangeEngine.prototype.IsRangeFull = function()
 CDocumentFootnotesRangeEngine.prototype.GetRange = function()
 {
 	return this.m_arrFootnotes;
+};
+CDocumentFootnotesRangeEngine.prototype.GetParagraphs = function()
+{
+	return this.m_arrParagraphs;
+};
+CDocumentFootnotesRangeEngine.prototype.SetCurrentParagraph = function(oParagraph)
+{
+	this.m_oCurParagraph = oParagraph;
+};
+CDocumentFootnotesRangeEngine.prototype.private_AddFootnote = function(oFootnote, oFootnoteRef, oRun)
+{
+	this.m_arrFootnotes.push(oFootnote);
+
+	if (true === this.m_bExtendedInfo)
+	{
+		this.m_arrRuns.push(oRun);
+		this.m_arrRefs.push(oFootnoteRef);
+
+		// Добавляем в общий список используемых параграфов
+		var nCount = this.m_arrParagraphs.length;
+		if (nCount <= 0 || this.m_arrParagraphs[nCount - 1] !== this.m_oCurParagraph)
+			this.m_arrParagraphs[nCount] = this.m_oCurParagraph;
+	}
+};
+CDocumentFootnotesRangeEngine.prototype.GetRuns = function()
+{
+	return this.m_arrRuns;
+};
+CDocumentFootnotesRangeEngine.prototype.GetRefs = function()
+{
+	return this.m_arrRefs;
 };
 
 

@@ -12039,6 +12039,7 @@ Paragraph.prototype.private_CompareBorderSettings = function(Pr1, Pr2)
 };
 Paragraph.prototype.Get_FootnotesList = function(oEngine)
 {
+	oEngine.SetCurrentParagraph(this);
 	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
 	{
 		if (this.Content[nIndex].Get_FootnotesList)

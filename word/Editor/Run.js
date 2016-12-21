@@ -8989,7 +8989,7 @@ ParaRun.prototype.Get_FootnotesList = function(oEngine)
 		var oItem = this.Content[nIndex];
 		if (para_FootnoteReference === oItem.Type)
 		{
-			oEngine.Add(oItem.Get_Footnote());
+			oEngine.Add(oItem.Get_Footnote(), oItem, this);
 		}
 	}
 };
@@ -9006,6 +9006,14 @@ ParaRun.prototype.GetParaEnd = function()
 	}
 
 	return null;
+};
+ParaRun.prototype.RemoveElement = function(oElement)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		if (oElement === this.Content[nIndex])
+			return this.Remove_FromContent(nIndex, 1, true);
+	}
 };
 
 function CParaRunStartState(Run)
