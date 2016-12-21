@@ -3002,9 +3002,14 @@
 	WorkbookView.prototype.GetSelectionRectsBounds = function () {
 		var ws = this.getWorksheet();
 		var range = ws.getSelectedRange();
-		var p1 = this.getCellCoord(range.c1, range.r1);
-		var p2 = this.getCellCoord(range.c2, range.r2);
-		return {X : p1._x, Y : p1._y, W : p2._x - p1._x + p2._width, H : p2._y - p1._y + p2._height};
+		var l = ws.getCellLeft(range.c1, 3);
+		var t = ws.getCellTop(range.r1, 3);
+		return {
+			X: l,
+			Y: t,
+			W: ws.getCellLeft(range.c2, 3) - l + ws.getColumnWidth(range.c2, 3),
+			H: ws.getCellTop(range.r2, 3) - t + ws.getRowHeight(range.r2, 3)
+		};
 	};
 
   //------------------------------------------------------------export---------------------------------------------------
