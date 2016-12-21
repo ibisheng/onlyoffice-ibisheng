@@ -869,14 +869,8 @@
 				return;
 			}
 			var notifyData = {type: AscCommon.c_oNotifyType.Dirty};
-			console.time('all');
-			console.time('_buildDependency');
 			this.buildDependency();
-			console.time('_buildDependency');
-			console.time('broadscastVolatile');
 			this._broadscastVolatile(notifyData);
-			console.timeEnd('broadscastVolatile');
-			console.time('broadcastCells');
 			var calcTrack = [];
 			var noCalcTrack = [];
 			while (this.changedCell || this.changedDefName) {
@@ -884,8 +878,6 @@
 				this._broadcastCells(notifyData, calcTrack);
 			}
 			this._broadcastCellsEnd();
-			console.timeEnd('broadcastCells');
-			console.time('calculate');
 			for (var i = 0; i < noCalcTrack.length; ++i) {
 				var formula = noCalcTrack[i];
 				//defName recalc when calc formula containing it. no need calc it
@@ -897,8 +889,6 @@
 					formula.calculate();
 				}
 			}
-			console.timeEnd('calculate');
-			console.time('cleanCellCache');
 			for (var i in this.cleanCellCache) {
 				this.wb.handlers.trigger("cleanCellCache", i, {0: this.cleanCellCache[i]},
 										 AscCommonExcel.c_oAscCanChangeColWidth.none);
@@ -906,8 +896,6 @@
 			this.cleanCellCache = {};
 			AscCommonExcel.g_oVLOOKUPCache.clean();
 			AscCommonExcel.g_oHLOOKUPCache.clean();
-			console.timeEnd('cleanCellCache');
-			console.timeEnd('all');
 		},
 		calcAll: function(sheetId){
 			var worksheets = [];
@@ -1218,23 +1206,15 @@
 		},
 		getByCells: function(cells) {
 			var res = [];
-			console.time('getByCells');
-			console.time('getNodeAll');
 			var nodes = this.yTree.getNodeAll();
-			console.timeEnd('getNodeAll');
-			console.time('forin');
 			var cellArr = [];
 			for (var cellIndex in cells) {
 				cellArr.push(cellIndex - 0);
 			}
-			console.timeEnd('forin');
-			console.time('sort');
 			//sort завязана на реализацию getCellIndex
 			cellArr.sort(function(a, b) {
 				return a - b;
 			});
-			console.timeEnd('sort');
-			console.time('other');
 			if (cellArr.length > 0 && nodes.length > 0) {
 				var curNodes = {};
 				var curY = null;
@@ -1284,8 +1264,6 @@
 					}
 				}
 			}
-			console.timeEnd('other');
-			console.timeEnd('getByCells');
 			//for(var i = 0 ; i < res.length; ++i){
 			//	res[i].isOutput = false;
 			//}

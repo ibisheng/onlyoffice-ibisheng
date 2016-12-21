@@ -5857,11 +5857,12 @@ TablePart.prototype.deleteTableColumns = function(activeRange)
 		var deleted = this.TableColumns.splice(startCol, diff);
 		this.removeDependencies(deleted);
 
-		var deletedMap = {};
-		for (var i = 0; i < deleted.length; ++i) {
-			deletedMap[deleted[i].Name] = 1;
-		}
-		this.handlers.trigger("deleteColumnTablePart", this.DisplayName, deletedMap);
+		//todo undo
+		// var deletedMap = {};
+		// for (var i = 0; i < deleted.length; ++i) {
+		// 	deletedMap[deleted[i].Name] = 1;
+		// }
+		// this.handlers.trigger("deleteColumnTablePart", this.DisplayName, deletedMap);
 	}
 
 };

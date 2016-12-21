@@ -4604,13 +4604,14 @@ parserFormula.prototype.parse = function(local, digitDelim) {
       else if (_tableTMP = parserHelp.isTable.call(this, this.Formula, this.pCurrPos, local)) {
         found_operand = new cStrucTable(_tableTMP, this.wb, this.ws);
 
-		if (found_operand.type == cElementType.error) {
-			/*используется неверный именованный диапазон или таблица*/
-			this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
-			this.outStack = [];
-			this.elemArr = [];
-			return false;
-		}
+		//todo undo delete column
+		// if (found_operand.type == cElementType.error) {
+		// 	/*используется неверный именованный диапазон или таблица*/
+		// 	this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+		// 	this.outStack = [];
+		// 	this.elemArr = [];
+		// 	return false;
+		// }
 
         if (found_operand.type != cElementType.error) {
           this.RefPos.push({
