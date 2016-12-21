@@ -2996,6 +2996,10 @@
     return canvas.toDataURL("image/png");
   };
 
+	WorkbookView.prototype.Is_SelectionUse = function () {
+        return !this.getWorksheet().getSelectionShape();
+    };
+
   //------------------------------------------------------------export---------------------------------------------------
   window['AscCommonExcel'] = window['AscCommonExcel'] || {};
   window["AscCommonExcel"].WorkbookView = WorkbookView;
