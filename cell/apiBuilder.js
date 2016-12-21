@@ -148,6 +148,43 @@
 		return new ApiWorksheet(this.wbModel.getWorksheet(index));
 	};
 
+	/**
+	 * Returns an object that represents the active sheet
+	 * @memberof Api
+	 * @returns {ThemesColors}
+	 */
+	Api.prototype.GetThemesColors = function () {
+		/**
+		 * @enum
+		 * @name ThemesColors
+		 */
+		var result = {};
+		AscCommon.g_oUserColorScheme.forEach(function (item, i) {
+			result[item.get_name()] = i;
+		});
+
+		return result;
+	};
+
+	/**
+	 * Returns an object that represents the active sheet
+	 * @memberof Api
+	 * @param {ThemesColors | string} theme
+	 */
+	Api.prototype.SetThemeColors = function (theme) {
+		if ('string' === typeof theme) {
+			if (!AscCommon.g_oUserColorScheme.some(function (item, i) {
+					if (theme === item.get_name()) {
+						theme = i;
+						return true;
+					}
+				})) {
+				return;
+			}
+		}
+		this.wbModel.changeColorScheme(theme);
+	};
+
 	Api.prototype.CreateNewHistoryPoint = function(){
 		History.Create_NewPoint();
 	};
@@ -942,6 +979,8 @@
 
 
 	Api.prototype["GetActiveSheet"] = Api.prototype.GetActiveSheet;
+	Api.prototype["GetThemesColors"] = Api.prototype.GetThemesColors;
+	Api.prototype["SetThemeColors"] = Api.prototype.SetThemeColors;
 	Api.prototype["CreateNewHistoryPoint"] = Api.prototype.CreateNewHistoryPoint;
 	Api.prototype["CreateColorFromRGB"] = Api.prototype.CreateColorFromRGB;
 	Api.prototype["CreateColorByName"] = Api.prototype.CreateColorByName;
