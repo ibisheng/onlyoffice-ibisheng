@@ -1328,6 +1328,22 @@ var editor;
 
     this.wb = new AscCommonExcel.WorkbookView(this.wbModel, this.controller, this.handlers, this.HtmlElement, this.topLineEditorElement, this, this.collaborativeEditing, this.fontRenderingMode);
 
+    if (this.isMobileVersion) {
+
+        var _container = document.getElementById(this.HtmlElementName);
+        if (_container)
+          _container.style.overflow = "hidden";
+        this.wb.MobileTouchManager = new AscCommonExcel.CMobileTouchManager({ eventsElement : "cell_mobile_element" });
+        this.wb.MobileTouchManager.Init(this);
+
+        // input context must be created!!!
+        var _areaId = AscCommon.g_inputContext.HtmlArea.id;
+        var _element = document.getElementById(_areaId);
+        _element.parentNode.parentNode.style.zIndex = 10;
+
+        this.wb.MobileTouchManager.initEvents(AscCommon.g_inputContext.HtmlArea.id);
+    }
+
     this.DocumentLoadComplete = true;
 
     this.asc_CheckGuiControlColors();

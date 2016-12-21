@@ -146,16 +146,6 @@
 			this.handlers = new AscCommonExcel.asc_CHandlersList(handlers);
             this._createScrollBars();
             if( this.view.Api.isMobileVersion ){
-                var __hasTouch = 'ontouchstart' in window;
-                if (__hasTouch) {
-                    this.widget.addEventListener("touchstart"	, function (e) {self._onTouchStart(e); return false;}			, false);
-                    this.widget.addEventListener("touchmove"	, function (e) {self._onTouchMove(e); return false;}			, false);
-                    this.widget.addEventListener("touchend"		, function (e) {self._onTouchEnd(e); return false;}	, false);
-                } else {
-                    this.widget.addEventListener("touchstart"	, function (e) {self._onMouseDown(e.touches[0]); return false;}			, false);
-                    this.widget.addEventListener("touchmove"	, function (e) {self._onMouseMove(e.touches[0]); return false;}			, false);
-                    this.widget.addEventListener("touchend"		, function (e) {self._onMouseUp(e.changedTouches[0]); return false;}	, false);
-                }
                 /*раньше события на ресайз вызывался из меню через контроллер. теперь контроллер в меню не доступен, для ресайза подписываемся на глобальный ресайз от window.*/
                 window.addEventListener("resize", function () {self._onWindowResize.apply(self, arguments);}, false);
                 return this;

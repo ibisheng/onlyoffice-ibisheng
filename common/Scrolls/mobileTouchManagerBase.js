@@ -36,6 +36,7 @@
 {
 	// define after window['AscCommon']
 	var AscCommon = window['AscCommon'];
+	var global_mouseEvent = AscCommon.global_mouseEvent;
 
 	AscCommon.MobileTouchMode =
 		{
@@ -853,6 +854,7 @@
 	// изменился размер документа/экрана => нужно перескитать вспомогательный элемент для скролла
 	CMobileTouchManagerBase.prototype.Resize = function()
 	{
+		this.CheckZoomCriticalValues();
 		if (this.iScroll != null)
 		{
 			var _size = this.delegate.GetScrollerSize();

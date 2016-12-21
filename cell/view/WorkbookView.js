@@ -836,10 +836,6 @@
       self._replaceCellTextCallback.apply(self, arguments);
     };
 
-    if (this.Api.isMobileVersion) {
-      this.MobileTouchManager = new AscCommonExcel.CMobileTouchManager();
-      this.MobileTouchManager.Init(this);
-    }
     return this;
   };
 
