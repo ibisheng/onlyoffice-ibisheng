@@ -364,6 +364,120 @@
 			return bRes;
 		};
 
+		Range.prototype.isIntersectForShift = function(range, offset) {
+			var isHor = offset && 0 != offset.offsetCol;
+			var toDelete = offset && (offset.offsetCol < 0 || offset.offsetRow < 0);
+			if (isHor) {
+				if (this.r1 <= range.r1 && range.r2 <= this.r2 && this.c1 <= range.c2) {
+					return true;
+				} else if (toDelete && this.c1 <= range.c1 && range.c2 <= this.c2) {
+					var topIn = this.r1 <= range.r1 && range.r1 <= this.r2;
+					var bottomIn = this.r1 <= range.r2 && range.r2 <= this.r2;
+					return topIn || bottomIn;
+				} else {
+					return false;
+				}
+			} else {
+				if (this.c1 <= range.c1 && range.c2 <= this.c2 && this.r1 <= range.r2) {
+					return true;
+				} else if (toDelete && this.r1 <= range.r1 && range.r2 <= this.r2) {
+					var leftIn = this.c1 <= range.c1 && range.c1 <= this.c2;
+					var rightIn = this.c1 <= range.c2 && range.c2 <= this.c2;
+					return leftIn || rightIn;
+				} else {
+					return false;
+				}
+			}
+		};
+
+		Range.prototype.isIntersectForShiftCell = function(col, row, offset) {
+			var isHor = offset && 0 != offset.offsetCol;
+			if (isHor) {
+				return this.r1 <= row && row <= this.r2 && this.c1 <= col;
+			} else {
+				return this.c1 <= col && col <= this.c2 && this.r1 <= row;
+			}
+		};
+
+		Range.prototype.forShift = function(bbox, offset, bUndo) {
+			var isNoDelete = true;
+			var isHor = 0 != offset.offsetCol;
+			var toDelete = offset.offsetCol < 0 || offset.offsetRow < 0;
+
+			if (isHor) {
+				if (toDelete) {
+					if (this.c1 < bbox.c1) {
+						if (this.c2 <= bbox.c2) {
+							this.setOffsetLast({offsetCol: -(this.c2 - bbox.c1 + 1), offsetRow: 0});
+						} else {
+							this.setOffsetLast(offset);
+						}
+					} else if (this.c1 <= bbox.c2) {
+						if (this.c2 <= bbox.c2) {
+							if(!bUndo){
+								var topIn = bbox.r1 <= this.r1 && this.r1 <= bbox.r2;
+								var bottomIn = bbox.r1 <= this.r2 && this.r2 <= bbox.r2;
+								if (topIn && bottomIn) {
+									isNoDelete = false;
+								} else if (topIn) {
+									this.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r2 - this.r1 + 1});
+								} else if (bottomIn) {
+									this.setOffsetLast({offsetCol: 0, offsetRow: bbox.r1 - this.r2 - 1});
+								}
+							}
+						} else {
+							this.setOffsetFirst({offsetCol: bbox.c1 - this.c1, offsetRow: 0});
+							this.setOffsetLast(offset);
+						}
+					} else {
+						this.setOffset(offset);
+					}
+				} else {
+					if (this.c1 < bbox.c1) {
+						this.setOffsetLast(offset);
+					} else {
+						this.setOffset(offset);
+					}
+				}
+			} else {
+				if (toDelete) {
+					if (this.r1 < bbox.r1) {
+						if (this.r2 <= bbox.r2) {
+							this.setOffsetLast({offsetCol: 0, offsetRow: -(this.r2 - bbox.r1 + 1)});
+						} else {
+							this.setOffsetLast(offset);
+						}
+					} else if (this.r1 <= bbox.r2) {
+						if (this.r2 <= bbox.r2) {
+							if(!bUndo) {
+								var leftIn = bbox.c1 <= this.c1 && this.c1 <= bbox.c2;
+								var rightIn = bbox.c1 <= this.c2 && this.c2 <= bbox.c2;
+								if (leftIn && rightIn) {
+									isNoDelete = false;
+								} else if (leftIn) {
+									this.setOffsetFirst({offsetCol: bbox.c2 - this.c1 + 1, offsetRow: 0});
+								} else if (rightIn) {
+									this.setOffsetLast({offsetCol: bbox.c1 - this.c2 - 1, offsetRow: 0});
+								}
+							}
+						} else {
+							this.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r1 - this.r1});
+							this.setOffsetLast(offset);
+						}
+					} else {
+						this.setOffset(offset);
+					}
+				} else {
+					if (this.r1 < bbox.r1) {
+						this.setOffsetLast(offset);
+					} else {
+						this.setOffset(offset);
+					}
+				}
+			}
+			return isNoDelete;
+		};
+
 		Range.prototype.isOneCell = function () {
 			return this.r1 === this.r2 && this.c1 === this.c2;
 		};
@@ -382,6 +496,93 @@
 			this.r2 = Math.max(this.r2, range.r2);
 		};
 
+		Range.prototype.union3 = function (c, r) {
+			this.c1 = Math.min(this.c1, c);
+			this.c2 = Math.max(this.c2, c);
+			this.r1 = Math.min(this.r1, r);
+			this.r2 = Math.max(this.r2, r);
+		};
+		Range.prototype.setOffsetWithAbs = function(offset) {
+			var temp;
+			var offsetRow = offset.offsetRow;
+			var offsetCol = offset.offsetCol;
+			if (0 === this.r1 && gc_nMaxRow0 === this.r2) {
+				//full sheet is 1:1048576 but offsetRow is valid for it
+				offsetRow = 0;
+			} else if (0 === this.c1 && gc_nMaxCol0 === this.c2) {
+				offsetCol = 0;
+			}
+			var isAbsRow1 = this.isAbsRow(this.refType1);
+			var isAbsCol1 = this.isAbsCol(this.refType1);
+			var isAbsRow2 = this.isAbsRow(this.refType2);
+			var isAbsCol2 = this.isAbsCol(this.refType2);
+			if (!isAbsRow1) {
+				this.r1 += offsetRow;
+				if (this.r1 < 0) {
+					this.r1 = 0;
+					return false;
+				}
+				if (this.r1 > gc_nMaxRow0) {
+					this.r1 = gc_nMaxRow0;
+					return false;
+				}
+			}
+			if (!isAbsCol1) {
+				this.c1 += offsetCol;
+				if (this.c1 < 0) {
+					this.c1 = 0;
+					return false;
+				}
+				if (this.c1 > gc_nMaxCol0) {
+					this.c1 = gc_nMaxCol0;
+					return false;
+				}
+			}
+			if (!isAbsRow2) {
+				this.r2 += offsetRow;
+				if (this.r2 < 0) {
+					this.r2 = 0;
+					return false;
+				}
+				if (this.r2 > gc_nMaxRow0) {
+					this.r2 = gc_nMaxRow0;
+					return false;
+				}
+			}
+			if (!isAbsCol2) {
+				this.c2 += offsetCol;
+				if (this.c2 < 0) {
+					this.c2 = 0;
+					return false;
+				}
+				if (this.c2 > gc_nMaxCol0) {
+					this.c2 = gc_nMaxCol0;
+					return false;
+				}
+			}
+			//switch abs flag
+			if (this.r1 > this.r2) {
+				temp = this.r1;
+				this.r1 = this.r2;
+				this.r2 = temp;
+				if (!isAbsRow1 && isAbsRow2) {
+					isAbsRow1 = !isAbsRow1;
+					isAbsRow2 = !isAbsRow2;
+					this.setAbs(isAbsRow1, isAbsCol1, isAbsRow2, isAbsCol2);
+				}
+			}
+			if (this.c1 > this.c2) {
+				temp = this.c1;
+				this.c1 = this.c2;
+				this.c2 = temp;
+				if (!isAbsCol1 && isAbsCol2) {
+					isAbsCol1 = !isAbsCol1;
+					isAbsCol2 = !isAbsCol2;
+					this.setAbs(isAbsRow1, isAbsCol1, isAbsRow2, isAbsCol2);
+				}
+			}
+			return true;
+		};
 		Range.prototype.setOffset = function (offset) {
 			if (this.r1 == 0 && this.r2 == gc_nMaxRow0 && offset.offsetRow != 0 ||
 				this.c1 == 0 && this.c2 == gc_nMaxCol0 && offset.offsetCol != 0) {
@@ -457,7 +658,7 @@
 					sRes += "$";
 				}
 				sRes += (this.r1 + 1);
-				if (!this.isOneCell()) {
+				if (!this.isOneCell() || r1Abs !== r2Abs || c1Abs !== c2Abs) {
 					sRes += ":";
 					if (c2Abs) {
 						sRes += "$";
@@ -930,6 +1131,11 @@
 		};
 		ActiveRange.prototype.union2 = function () {
 			ActiveRange.superclass.union2.apply(this, arguments);
+			this._updateAdditionalData();
+			return this;
+		};
+		ActiveRange.prototype.union3 = function () {
+			ActiveRange.superclass.union3.apply(this, arguments);
 			this._updateAdditionalData();
 			return this;
 		};

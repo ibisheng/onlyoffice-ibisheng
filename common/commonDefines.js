@@ -793,7 +793,6 @@
 		PageRightField  : 17.8,
 		PageTopField    : 19.1,
 		PageBottomField : 19.1,
-
 		MinPageLeftField	: 0.17,
 		MinPageRightField	: 0.17,
 		MinPageTopField		: 0.17,
@@ -807,6 +806,26 @@
 		FitToPage  : 1,
 		FitToWidth : 2,
 		CustomMode : 3
+	};
+
+	var c_oNotifyType = {
+		Dirty: 0,
+		Shift: 1,
+		Move: 2,
+		Delete: 3,
+		Rebuild: 4,
+		Changed: 5,
+		ChangeDefName: 6,
+		ChangeSheet: 7,
+		DelColumnTable: 8
+	};
+
+	var c_oNotifyParentType = {
+		CanDo: 0,
+		Change: 1,
+		ChangeFormula: 2,
+		EndCalculate: 3,
+		GetRangeCell: 4
 	};
 
 	var c_oDashType = {
@@ -1043,6 +1062,7 @@
 
 	var contentchanges_Add    = 1;
 	var contentchanges_Remove = 2;
+
 
 	var offlineMode = '_offline_';
 
@@ -1632,6 +1652,8 @@
 	window["AscCommon"].c_oAscMouseMoveDataTypes    = c_oAscMouseMoveDataTypes;
 	window["AscCommon"].c_oAscPrintDefaultSettings  = c_oAscPrintDefaultSettings;
 	window["AscCommon"].c_oZoomType                 = c_oZoomType;
+	window["AscCommon"].c_oNotifyType               = c_oNotifyType;
+	window["AscCommon"].c_oNotifyParentType         = c_oNotifyParentType;
 	window["AscCommon"].c_oAscEncodings             = c_oAscEncodings;
 	window["AscCommon"].c_oAscEncodingsMap          = c_oAscEncodingsMap;
 	window["AscCommon"].c_oAscCodePageUtf8          = c_oAscCodePageUtf8;

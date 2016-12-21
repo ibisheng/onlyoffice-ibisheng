@@ -453,7 +453,17 @@
         // FormatPainter
         'isFormatPainter': function () {
           return self.stateFormatPainter;
-        }
+        },
+
+        //calcAll
+        'calcAll': function (shiftKey) {
+          if(shiftKey){
+            var ws = self.model.getActiveWs();
+            self.model.dependencyFormulas.calcAll(ws.getId());
+          } else {
+            self.model.dependencyFormulas.calcAll();
+          }
+        },
       });
 
       if (this.input && this.input.addEventListener) {
@@ -2294,7 +2304,11 @@
 
     var editDefinedNamesCallback = function(res) {
       if (res) {
-        t.model.editDefinesNames(oldName, newName);
+        if (oldName && oldName.asc_getIsTable()) {
+          ws.model.autoFilters.changeDisplayNameTable(oldName.asc_getName(), newName.asc_getName());
+        } else {
+          t.model.editDefinesNames(oldName, newName);
+        }
         t.handlers.trigger("asc_onEditDefName", oldName, newName);
         //условие исключает второй вызов asc_onRefreshDefNameList(первый в unlockDefName)
         if(!(t.collaborativeEditing.getCollaborativeEditing() && t.collaborativeEditing.getFast()))
@@ -2309,7 +2323,7 @@
     var defNameId;
     if (oldName) {
       defNameId = t.model.getDefinedName(oldName);
-      defNameId = defNameId ? defNameId.nodeId : null;
+      defNameId = defNameId ? defNameId.getNodeId() : null;
     }
 
     var callback = function() {
@@ -2347,14 +2361,14 @@
 
       var delDefinedNamesCallback = function(res) {
         if (res) {
-          t.handlers.trigger("asc_onDelDefName", t.model.delDefinesNames(oldName));
+          t.model.delDefinesNames(oldName);
           t.handlers.trigger("asc_onRefreshDefNameList");
         } else {
           t.handlers.trigger("asc_onError", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
         }
         t._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
       };
-      var defNameId = t.model.getDefinedName(oldName).nodeId;
+      var defNameId = t.model.getDefinedName(oldName).getNodeId();
 
       ws._isLockedDefNames(delDefinedNamesCallback, defNameId);
 

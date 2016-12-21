@@ -292,6 +292,7 @@ var editor;
     AscCommonExcel.g_oUndoRedoComment = new AscCommonExcel.UndoRedoComment(wbModel);
     AscCommonExcel.g_oUndoRedoAutoFilters = new AscCommonExcel.UndoRedoAutoFilters(wbModel);
     AscCommonExcel.g_oUndoRedoSparklines = new AscCommonExcel.UndoRedoSparklines(wbModel);
+    AscCommonExcel.g_DefNameWorksheet = new AscCommonExcel.Woorksheet(wbModel, -1);
   };
 
   spreadsheet_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) {//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
@@ -1620,7 +1621,7 @@ var editor;
   spreadsheet_api.prototype._onUpdateDefinedNames = function(lockElem) {
 //      if( lockElem.Element["subType"] == AscCommonExcel.c_oAscLockTypeElemSubType.DefinedNames ){
       if( lockElem.Element["sheetId"] == -1 && lockElem.Element["rangeOrObjectId"] != -1 && !this.collaborativeEditing.getFast() ){
-          var dN = this.wbModel.dependencyFormulas.defNameList[lockElem.Element["rangeOrObjectId"]];
+          var dN = this.wbModel.dependencyFormulas.getDefNameByNodeId(lockElem.Element["rangeOrObjectId"]);
           if (dN) {
               dN.isLock = lockElem.UserId;
               this.handlers.trigger("asc_onRefreshDefNameList",dN.getAscCDefName());
@@ -1783,7 +1784,7 @@ var editor;
 
         History.Create_NewPoint();
         History.StartTransaction();
-
+        t.wbModel.dependencyFormulas.lockRecal();
         // Нужно проверить все диаграммы, ссылающиеся на удаляемый лист
         for (var key in t.wb.model.aWorksheets) {
           var wsModel = t.wb.model.aWorksheets[key];
@@ -1806,6 +1807,7 @@ var editor;
           // Посылаем callback об изменении списка листов
           t.sheetsChanged();
         }
+        t.wbModel.dependencyFormulas.unlockRecal();
         History.EndTransaction();
       }
     };
@@ -1821,7 +1823,7 @@ var editor;
     if (1 === d) {
       where -= 1;
     }
-
+    History.Create_NewPoint();
     this.wb.replaceWorksheet(i, where);
     this.wbModel.replaceWorksheet(i, where);
 
