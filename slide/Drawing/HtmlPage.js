@@ -3401,10 +3401,10 @@ function CEditorPage(api)
 				arr[i].Height = master.sldLayoutLst[i].Height64;
 			}
 
-			editor.sendEvent("asc_onUpdateLayout", arr);
-			editor.sendEvent("asc_onUpdateThemeIndex", this.MasterLayouts.ThemeIndex);
+			this.m_oApi.sendEvent("asc_onUpdateLayout", arr);
+			this.m_oApi.sendEvent("asc_onUpdateThemeIndex", this.MasterLayouts.ThemeIndex);
 
-			this.m_oDrawingDocument.SendThemeColorScheme();
+			this.m_oApi.sendColorThemes(this.MasterLayouts.Theme);
 		}
 
 		this.m_oDrawingDocument.CheckGuiControlColors(bIsAttack);

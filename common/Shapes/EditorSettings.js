@@ -34,6 +34,9 @@
 
 (function(window, undefined){
 
+	var CAscColorScheme = AscCommon.CAscColorScheme;
+	var CColor = AscCommon.CColor;
+
 var g_oAutoShapesGroups = [
     "Basic shapes",
     "Figured arrows",
@@ -402,343 +405,323 @@ function GetDefaultMods(r, g, b, pos, editor_id)
     return [];
 }
 
-var g_oUserColorScheme = [];
-g_oUserColorScheme[0] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 31, G: 73, B: 125},
-	lt2:	{R: 238, G: 236, B: 225},
-	accent1:	{R: 79, G: 129, B: 189},
-	accent2:	{R: 192, G: 80, B: 77},
-	accent3:	{R: 155, G: 187, B: 89},
-	accent4:	{R: 128, G: 100, B: 162},
-	accent5:	{R: 75, G: 172, B: 198},
-	accent6:	{R: 247, G: 150, B: 70},
-	hlink:	{R: 0, G: 0, B: 255},
-	folHlink:	{R: 128, G: 0, B: 128},
-	name:	"Office"
-};
-
-g_oUserColorScheme[1] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 0, G: 0, B: 0},
-	lt2:	{R: 248, G: 248, B: 248},
-	accent1:	{R: 221, G: 221, B: 221},
-	accent2:	{R: 178, G: 178, B: 178},
-	accent3:	{R: 150, G: 150, B: 150},
-	accent4:	{R: 128, G: 128, B: 128},
-	accent5:	{R: 95, G: 95, B: 95},
-	accent6:	{R: 77, G: 77, B: 77},
-	hlink:	{R: 95, G: 95, B: 95},
-	folHlink:	{R: 145, G: 145, B: 145},
-	name:	"Grayscale"
-};
-
-g_oUserColorScheme[2] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 105, G: 103, B: 109},
-	lt2:	{R: 201, G: 194, B: 209},
-	accent1:	{R: 206, G: 185, B: 102},
-	accent2:	{R: 156, G: 176, B: 132},
-	accent3:	{R: 107, G: 177, B: 201},
-	accent4:	{R: 101, G: 133, B: 207},
-	accent5:	{R: 126, G: 107, B: 201},
-	accent6:	{R: 163, G: 121, B: 187},
-	hlink:	{R: 65, G: 0, B: 130},
-	folHlink:	{R: 147, G: 41, B: 104},
-	name:	"Apex"
-};
-
-g_oUserColorScheme[3] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 50, G: 50, B: 50},
-	lt2:	{R: 227, G: 222, B: 209},
-	accent1:	{R: 240, G: 127, B: 9},
-	accent2:	{R: 159, G: 41, B: 54},
-	accent3:	{R: 27, G: 88, B: 124},
-	accent4:	{R: 78, G: 133, B: 66},
-	accent5:	{R: 96, G: 72, B: 120},
-	accent6:	{R: 193, G: 152, B: 89},
-	hlink:	{R: 107, G: 159, B: 37},
-	folHlink:	{R: 178, G: 107, B: 2},
-	name:	"Aspect"
-};
-
-g_oUserColorScheme[4] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 100, G: 107, B: 134},
-	lt2:	{R: 197, G: 209, B: 215},
-	accent1:	{R: 209, G: 99, B: 73},
-	accent2:	{R: 204, G: 180, B: 0},
-	accent3:	{R: 140, G: 173, B: 174},
-	accent4:	{R: 140, G: 123, B: 112},
-	accent5:	{R: 143, G: 176, B: 140},
-	accent6:	{R: 209, G: 144, B: 73},
-	hlink:	{R: 0, G: 163, B: 214},
-	folHlink:	{R: 105, G: 79, B: 7},
-	name:	"Civic"
-};
-
-g_oUserColorScheme[5] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 70, G: 70, B: 70},
-	lt2:	{R: 222, G: 245, B: 250},
-	accent1:	{R: 45, G: 162, B: 191},
-	accent2:	{R: 218, G: 31, B: 40},
-	accent3:	{R: 235, G: 100, B: 27},
-	accent4:	{R: 57, G: 99, B: 157},
-	accent5:	{R: 71, G: 75, B: 120},
-	accent6:	{R: 125, G: 60, B: 74},
-	hlink:	{R: 255, G: 129, B: 25},
-	folHlink:	{R: 68, G: 185, B: 232},
-	name:	"Concourse"
-};
-
-g_oUserColorScheme[6] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 105, G: 100, B: 100},
-	lt2:	{R: 233, G: 229, B: 220},
-	accent1:	{R: 211, G: 72, B: 23},
-	accent2:	{R: 155, G: 45, B: 31},
-	accent3:	{R: 162, G: 142, B: 106},
-	accent4:	{R: 149, G: 98, B: 81},
-	accent5:	{R: 145, G: 132, B: 133},
-	accent6:	{R: 133, G: 93, B: 93},
-	hlink:	{R: 204, G: 153, B: 0},
-	folHlink:	{R: 150, G: 169, B: 169},
-	name:	"Equity"
-};
-
-g_oUserColorScheme[7] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 4, G: 97, B: 123},
-	lt2:	{R: 219, G: 245, B: 249},
-	accent1:	{R: 15, G: 111, B: 198},
-	accent2:	{R: 0, G: 157, B: 217},
-	accent3:	{R: 11, G: 208, B: 217},
-	accent4:	{R: 16, G: 207, B: 155},
-	accent5:	{R: 124, G: 202, B: 98},
-	accent6:	{R: 165, G: 194, B: 73},
-	hlink:	{R: 244, G: 145, B: 0},
-	folHlink:	{R: 133, G: 223, B: 208},
-	name:	"Flow"
-};
-
-g_oUserColorScheme[8] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 103, G: 106, B: 85},
-	lt2:	{R: 234, G: 235, B: 222},
-	accent1:	{R: 114, G: 163, B: 118},
-	accent2:	{R: 176, G: 204, B: 176},
-	accent3:	{R: 168, G: 205, B: 215},
-	accent4:	{R: 192, G: 190, B: 175},
-	accent5:	{R: 206, G: 197, B: 151},
-	accent6:	{R: 232, G: 183, B: 183},
-	hlink:	{R: 219, G: 83, B: 83},
-	folHlink:	{R: 144, G: 54, B: 56},
-	name:	"Foundry"
-};
-
-g_oUserColorScheme[9] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 119, G: 95, B: 85},
-	lt2:	{R: 235, G: 221, B: 195},
-	accent1:	{R: 148, G: 182, B: 210},
-	accent2:	{R: 221, G: 128, B: 71},
-	accent3:	{R: 165, G: 171, B: 129},
-	accent4:	{R: 216, G: 178, B: 92},
-	accent5:	{R: 123, G: 167, B: 157},
-	accent6:	{R: 150, G: 140, B: 140},
-	hlink:	{R: 247, G: 182, B: 21},
-	folHlink:	{R: 112, G: 68, B: 4},
-	name:	"Median"
-};
-
-g_oUserColorScheme[10] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 78, G: 91, B: 111},
-	lt2:	{R: 214, G: 236, B: 255},
-	accent1:	{R: 127, G: 209, B: 59},
-	accent2:	{R: 234, G: 21, B: 122},
-	accent3:	{R: 254, G: 184, B: 10},
-	accent4:	{R: 0, G: 173, B: 220},
-	accent5:	{R: 115, G: 138, B: 200},
-	accent6:	{R: 26, G: 179, B: 159},
-	hlink:	{R: 235, G: 136, B: 3},
-	folHlink:	{R: 95, G: 119, B: 145},
-	name:	"Metro"
-};
-
-g_oUserColorScheme[11] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 90, G: 99, B: 120},
-	lt2:	{R: 212, G: 212, B: 214},
-	accent1:	{R: 240, G: 173, B: 0},
-	accent2:	{R: 96, G: 181, B: 204},
-	accent3:	{R: 230, G: 108, B: 125},
-	accent4:	{R: 107, G: 183, B: 109},
-	accent5:	{R: 232, G: 134, B: 81},
-	accent6:	{R: 198, G: 72, B: 71},
-	hlink:	{R: 22, G: 139, B: 186},
-	folHlink:	{R: 104, G: 0, B: 0},
-	name:	"Module"
-};
-
-g_oUserColorScheme[12] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 177, G: 63, B: 154},
-	lt2:	{R: 244, G: 231, B: 237},
-	accent1:	{R: 184, G: 61, B: 104},
-	accent2:	{R: 172, G: 102, B: 187},
-	accent3:	{R: 222, G: 108, B: 54},
-	accent4:	{R: 249, G: 182, B: 57},
-	accent5:	{R: 207, G: 109, B: 164},
-	accent6:	{R: 250, G: 141, B: 61},
-	hlink:	{R: 255, G: 222, B: 102},
-	folHlink:	{R: 212, G: 144, B: 197},
-	name:	"Opulent"
-};
-
-g_oUserColorScheme[13] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 87, G: 95, B: 109},
-	lt2:	{R: 255, G: 243, B: 157},
-	accent1:	{R: 254, G: 134, B: 55},
-	accent2:	{R: 117, G: 152, B: 217},
-	accent3:	{R: 179, G: 44, B: 22},
-	accent4:	{R: 245, G: 205, B: 45},
-	accent5:	{R: 174, G: 186, B: 213},
-	accent6:	{R: 119, G: 124, B: 132},
-	hlink:	{R: 210, G: 97, B: 28},
-	folHlink:	{R: 59, G: 67, B: 91},
-	name:	"Oriel"
-};
-
-g_oUserColorScheme[14] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 70, G: 70, B: 83},
-	lt2:	{R: 221, G: 233, B: 236},
-	accent1:	{R: 114, G: 124, B: 163},
-	accent2:	{R: 159, G: 184, B: 205},
-	accent3:	{R: 210, G: 218, B: 122},
-	accent4:	{R: 250, G: 218, B: 122},
-	accent5:	{R: 184, G: 132, B: 114},
-	accent6:	{R: 142, G: 115, B: 106},
-	hlink:	{R: 178, G: 146, B: 202},
-	folHlink:	{R: 107, G: 86, B: 128},
-	name:	"Origin"
-};
-
-g_oUserColorScheme[15] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 68, G: 77, B: 38},
-	lt2:	{R: 254, G: 250, B: 201},
-	accent1:	{R: 165, G: 181, B: 146},
-	accent2:	{R: 243, G: 164, B: 71},
-	accent3:	{R: 231, G: 188, B: 41},
-	accent4:	{R: 208, G: 146, B: 167},
-	accent5:	{R: 156, G: 133, B: 192},
-	accent6:	{R: 128, G: 158, B: 194},
-	hlink:	{R: 142, G: 88, B: 182},
-	folHlink:	{R: 127, G: 111, B: 111},
-	name:	"Paper"
-};
-
-g_oUserColorScheme[16] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 79, G: 39, B: 28},
-	lt2:	{R: 231, G: 222, B: 201},
-	accent1:	{R: 56, G: 145, B: 167},
-	accent2:	{R: 254, G: 184, B: 10},
-	accent3:	{R: 195, G: 45, B: 46},
-	accent4:	{R: 132, G: 170, B: 51},
-	accent5:	{R: 150, G: 67, B: 5},
-	accent6:	{R: 71, G: 90, B: 141},
-	hlink:	{R: 141, G: 199, B: 101},
-	folHlink:	{R: 170, G: 138, B: 20},
-	name:	"Solstice"
-};
-
-g_oUserColorScheme[17] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 59, G: 59, B: 59},
-	lt2:	{R: 212, G: 210, B: 208},
-	accent1:	{R: 110, G: 160, B: 176},
-	accent2:	{R: 204, G: 175, B: 10},
-	accent3:	{R: 141, G: 137, B: 164},
-	accent4:	{R: 116, G: 133, B: 96},
-	accent5:	{R: 158, G: 146, B: 115},
-	accent6:	{R: 126, G: 132, B: 141},
-	hlink:	{R: 0, G: 200, B: 195},
-	folHlink:	{R: 161, G: 22, B: 224},
-	name:	"Technic"
-};
-
-g_oUserColorScheme[18] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 78, G: 59, B: 48},
-	lt2:	{R: 251, G: 238, B: 201},
-	accent1:	{R: 240, G: 162, B: 46},
-	accent2:	{R: 165, G: 100, B: 78},
-	accent3:	{R: 181, G: 139, B: 128},
-	accent4:	{R: 195, G: 152, B: 109},
-	accent5:	{R: 161, G: 149, B: 116},
-	accent6:	{R: 193, G: 117, B: 41},
-	hlink:	{R: 173, G: 31, B: 31},
-	folHlink:	{R: 255, G: 196, B: 47},
-	name:	"Trek"
-};
-
-g_oUserColorScheme[19] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 66, G: 68, B: 86},
-	lt2:	{R: 222, G: 222, B: 222},
-	accent1:	{R: 83, G: 84, B: 138},
-	accent2:	{R: 67, G: 128, B: 134},
-	accent3:	{R: 160, G: 77, B: 163},
-	accent4:	{R: 196, G: 101, B: 45},
-	accent5:	{R: 139, G: 93, B: 61},
-	accent6:	{R: 92, G: 146, B: 181},
-	hlink:	{R: 103, G: 175, B: 189},
-	folHlink:	{R: 194, G: 168, B: 116},
-	name:	"Urban"
-};
-
-g_oUserColorScheme[20] = {
-	dk1:	{R: 0, G: 0, B: 0},
-	lt1:	{R: 255, G: 255, B: 255},
-	dk2:	{R: 102, G: 102, B: 102},
-	lt2:	{R: 210, G: 210, B: 210},
-	accent1:	{R: 255, G: 56, B: 140},
-	accent2:	{R: 228, G: 0, B: 89},
-	accent3:	{R: 156, G: 0, B: 127},
-	accent4:	{R: 104, G: 0, B: 127},
-	accent5:	{R: 0, G: 91, B: 211},
-	accent6:	{R: 0, G: 52, B: 158},
-	hlink:	{R: 23, G: 187, B: 253},
-	folHlink:	{R: 255, G: 121, B: 194},
-	name:	"Verve"
-};
-
+	var g_oUserColorScheme = [];
+	var elem;
+	elem = new CAscColorScheme();
+	elem.name = 'Office';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(31, 73, 125));
+	elem.colors.push(new CColor(238, 236, 225));
+	elem.colors.push(new CColor(79, 129, 189));
+	elem.colors.push(new CColor(192, 80, 77));
+	elem.colors.push(new CColor(155, 187, 89));
+	elem.colors.push(new CColor(128, 100, 162));
+	elem.colors.push(new CColor(75, 172, 198));
+	elem.colors.push(new CColor(247, 150, 70));
+	elem.colors.push(new CColor(0, 0, 255));
+	elem.colors.push(new CColor(128, 0, 128));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Grayscale';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(248, 248, 248));
+	elem.colors.push(new CColor(221, 221, 221));
+	elem.colors.push(new CColor(178, 178, 178));
+	elem.colors.push(new CColor(150, 150, 150));
+	elem.colors.push(new CColor(128, 128, 128));
+	elem.colors.push(new CColor(95, 95, 95));
+	elem.colors.push(new CColor(77, 77, 77));
+	elem.colors.push(new CColor(95, 95, 95));
+	elem.colors.push(new CColor(145, 145, 145));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Apex';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(105, 103, 109));
+	elem.colors.push(new CColor(201, 194, 209));
+	elem.colors.push(new CColor(206, 185, 102));
+	elem.colors.push(new CColor(156, 176, 132));
+	elem.colors.push(new CColor(107, 177, 201));
+	elem.colors.push(new CColor(101, 133, 207));
+	elem.colors.push(new CColor(126, 107, 201));
+	elem.colors.push(new CColor(163, 121, 187));
+	elem.colors.push(new CColor(65, 0, 130));
+	elem.colors.push(new CColor(147, 41, 104));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Aspect';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(50, 50, 50));
+	elem.colors.push(new CColor(227, 222, 209));
+	elem.colors.push(new CColor(240, 127, 9));
+	elem.colors.push(new CColor(159, 41, 54));
+	elem.colors.push(new CColor(27, 88, 124));
+	elem.colors.push(new CColor(78, 133, 66));
+	elem.colors.push(new CColor(96, 72, 120));
+	elem.colors.push(new CColor(193, 152, 89));
+	elem.colors.push(new CColor(107, 159, 37));
+	elem.colors.push(new CColor(178, 107, 2));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Civic';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(100, 107, 134));
+	elem.colors.push(new CColor(197, 209, 215));
+	elem.colors.push(new CColor(209, 99, 73));
+	elem.colors.push(new CColor(204, 180, 0));
+	elem.colors.push(new CColor(140, 173, 174));
+	elem.colors.push(new CColor(140, 123, 112));
+	elem.colors.push(new CColor(143, 176, 140));
+	elem.colors.push(new CColor(209, 144, 73));
+	elem.colors.push(new CColor(0, 163, 214));
+	elem.colors.push(new CColor(105, 79, 7));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Concourse';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(70, 70, 70));
+	elem.colors.push(new CColor(222, 245, 250));
+	elem.colors.push(new CColor(45, 162, 191));
+	elem.colors.push(new CColor(218, 31, 40));
+	elem.colors.push(new CColor(235, 100, 27));
+	elem.colors.push(new CColor(57, 99, 157));
+	elem.colors.push(new CColor(71, 75, 120));
+	elem.colors.push(new CColor(125, 60, 74));
+	elem.colors.push(new CColor(255, 129, 25));
+	elem.colors.push(new CColor(68, 185, 232));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Equity';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(105, 100, 100));
+	elem.colors.push(new CColor(233, 229, 220));
+	elem.colors.push(new CColor(211, 72, 23));
+	elem.colors.push(new CColor(155, 45, 31));
+	elem.colors.push(new CColor(162, 142, 106));
+	elem.colors.push(new CColor(149, 98, 81));
+	elem.colors.push(new CColor(145, 132, 133));
+	elem.colors.push(new CColor(133, 93, 93));
+	elem.colors.push(new CColor(204, 153, 0));
+	elem.colors.push(new CColor(150, 169, 169));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Flow';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(4, 97, 123));
+	elem.colors.push(new CColor(219, 245, 249));
+	elem.colors.push(new CColor(15, 111, 198));
+	elem.colors.push(new CColor(0, 157, 217));
+	elem.colors.push(new CColor(11, 208, 217));
+	elem.colors.push(new CColor(16, 207, 155));
+	elem.colors.push(new CColor(124, 202, 98));
+	elem.colors.push(new CColor(165, 194, 73));
+	elem.colors.push(new CColor(244, 145, 0));
+	elem.colors.push(new CColor(133, 223, 208));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Foundry';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(103, 106, 85));
+	elem.colors.push(new CColor(234, 235, 222));
+	elem.colors.push(new CColor(114, 163, 118));
+	elem.colors.push(new CColor(176, 204, 176));
+	elem.colors.push(new CColor(168, 205, 215));
+	elem.colors.push(new CColor(192, 190, 175));
+	elem.colors.push(new CColor(206, 197, 151));
+	elem.colors.push(new CColor(232, 183, 183));
+	elem.colors.push(new CColor(219, 83, 83));
+	elem.colors.push(new CColor(144, 54, 56));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Median';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(119, 95, 85));
+	elem.colors.push(new CColor(235, 221, 195));
+	elem.colors.push(new CColor(148, 182, 210));
+	elem.colors.push(new CColor(221, 128, 71));
+	elem.colors.push(new CColor(165, 171, 129));
+	elem.colors.push(new CColor(216, 178, 92));
+	elem.colors.push(new CColor(123, 167, 157));
+	elem.colors.push(new CColor(150, 140, 140));
+	elem.colors.push(new CColor(247, 182, 21));
+	elem.colors.push(new CColor(112, 68, 4));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Metro';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(78, 91, 111));
+	elem.colors.push(new CColor(214, 236, 255));
+	elem.colors.push(new CColor(127, 209, 59));
+	elem.colors.push(new CColor(234, 21, 122));
+	elem.colors.push(new CColor(254, 184, 10));
+	elem.colors.push(new CColor(0, 173, 220));
+	elem.colors.push(new CColor(115, 138, 200));
+	elem.colors.push(new CColor(26, 179, 159));
+	elem.colors.push(new CColor(235, 136, 3));
+	elem.colors.push(new CColor(95, 119, 145));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Module';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(90, 99, 120));
+	elem.colors.push(new CColor(212, 212, 214));
+	elem.colors.push(new CColor(240, 173, 0));
+	elem.colors.push(new CColor(96, 181, 204));
+	elem.colors.push(new CColor(230, 108, 125));
+	elem.colors.push(new CColor(107, 183, 109));
+	elem.colors.push(new CColor(232, 134, 81));
+	elem.colors.push(new CColor(198, 72, 71));
+	elem.colors.push(new CColor(22, 139, 186));
+	elem.colors.push(new CColor(104, 0, 0));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Opulent';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(177, 63, 154));
+	elem.colors.push(new CColor(244, 231, 237));
+	elem.colors.push(new CColor(184, 61, 104));
+	elem.colors.push(new CColor(172, 102, 187));
+	elem.colors.push(new CColor(222, 108, 54));
+	elem.colors.push(new CColor(249, 182, 57));
+	elem.colors.push(new CColor(207, 109, 164));
+	elem.colors.push(new CColor(250, 141, 61));
+	elem.colors.push(new CColor(255, 222, 102));
+	elem.colors.push(new CColor(212, 144, 197));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Oriel';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(87, 95, 109));
+	elem.colors.push(new CColor(255, 243, 157));
+	elem.colors.push(new CColor(254, 134, 55));
+	elem.colors.push(new CColor(117, 152, 217));
+	elem.colors.push(new CColor(179, 44, 22));
+	elem.colors.push(new CColor(245, 205, 45));
+	elem.colors.push(new CColor(174, 186, 213));
+	elem.colors.push(new CColor(119, 124, 132));
+	elem.colors.push(new CColor(210, 97, 28));
+	elem.colors.push(new CColor(59, 67, 91));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Origin';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(70, 70, 83));
+	elem.colors.push(new CColor(221, 233, 236));
+	elem.colors.push(new CColor(114, 124, 163));
+	elem.colors.push(new CColor(159, 184, 205));
+	elem.colors.push(new CColor(210, 218, 122));
+	elem.colors.push(new CColor(250, 218, 122));
+	elem.colors.push(new CColor(184, 132, 114));
+	elem.colors.push(new CColor(142, 115, 106));
+	elem.colors.push(new CColor(178, 146, 202));
+	elem.colors.push(new CColor(107, 86, 128));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Paper';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(68, 77, 38));
+	elem.colors.push(new CColor(254, 250, 201));
+	elem.colors.push(new CColor(165, 181, 146));
+	elem.colors.push(new CColor(243, 164, 71));
+	elem.colors.push(new CColor(231, 188, 41));
+	elem.colors.push(new CColor(208, 146, 167));
+	elem.colors.push(new CColor(156, 133, 192));
+	elem.colors.push(new CColor(128, 158, 194));
+	elem.colors.push(new CColor(142, 88, 182));
+	elem.colors.push(new CColor(127, 111, 111));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Solstice';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(79, 39, 28));
+	elem.colors.push(new CColor(231, 222, 201));
+	elem.colors.push(new CColor(56, 145, 167));
+	elem.colors.push(new CColor(254, 184, 10));
+	elem.colors.push(new CColor(195, 45, 46));
+	elem.colors.push(new CColor(132, 170, 51));
+	elem.colors.push(new CColor(150, 67, 5));
+	elem.colors.push(new CColor(71, 90, 141));
+	elem.colors.push(new CColor(141, 199, 101));
+	elem.colors.push(new CColor(170, 138, 20));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Technic';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(59, 59, 59));
+	elem.colors.push(new CColor(212, 210, 208));
+	elem.colors.push(new CColor(110, 160, 176));
+	elem.colors.push(new CColor(204, 175, 10));
+	elem.colors.push(new CColor(141, 137, 164));
+	elem.colors.push(new CColor(116, 133, 96));
+	elem.colors.push(new CColor(158, 146, 115));
+	elem.colors.push(new CColor(126, 132, 141));
+	elem.colors.push(new CColor(0, 200, 195));
+	elem.colors.push(new CColor(161, 22, 224));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Trek';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(78, 59, 48));
+	elem.colors.push(new CColor(251, 238, 201));
+	elem.colors.push(new CColor(240, 162, 46));
+	elem.colors.push(new CColor(165, 100, 78));
+	elem.colors.push(new CColor(181, 139, 128));
+	elem.colors.push(new CColor(195, 152, 109));
+	elem.colors.push(new CColor(161, 149, 116));
+	elem.colors.push(new CColor(193, 117, 41));
+	elem.colors.push(new CColor(173, 31, 31));
+	elem.colors.push(new CColor(255, 196, 47));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Urban';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(66, 68, 86));
+	elem.colors.push(new CColor(222, 222, 222));
+	elem.colors.push(new CColor(83, 84, 138));
+	elem.colors.push(new CColor(67, 128, 134));
+	elem.colors.push(new CColor(160, 77, 163));
+	elem.colors.push(new CColor(196, 101, 45));
+	elem.colors.push(new CColor(139, 93, 61));
+	elem.colors.push(new CColor(92, 146, 181));
+	elem.colors.push(new CColor(103, 175, 189));
+	elem.colors.push(new CColor(194, 168, 116));
+	g_oUserColorScheme.push(elem);
+	elem = new CAscColorScheme();
+	elem.name = 'Verve';
+	elem.colors.push(new CColor(0, 0, 0));
+	elem.colors.push(new CColor(255, 255, 255));
+	elem.colors.push(new CColor(102, 102, 102));
+	elem.colors.push(new CColor(210, 210, 210));
+	elem.colors.push(new CColor(255, 56, 140));
+	elem.colors.push(new CColor(228, 0, 89));
+	elem.colors.push(new CColor(156, 0, 127));
+	elem.colors.push(new CColor(104, 0, 127));
+	elem.colors.push(new CColor(0, 91, 211));
+	elem.colors.push(new CColor(0, 52, 158));
+	elem.colors.push(new CColor(23, 187, 253));
+	elem.colors.push(new CColor(255, 121, 194));
+	g_oUserColorScheme.push(elem);
 
 var g_oUserTexturePresets = [
     "data:image/png;base64,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",

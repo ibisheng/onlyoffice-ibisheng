@@ -1024,6 +1024,113 @@
 		Obj.Generate2();
 	};
 
+	baseEditorsApi.prototype.sendColorThemes = function (theme) {
+		var result = AscCommon.g_oUserColorScheme.slice();
+
+		// theme colors
+		var elem, _c;
+		var _extra = theme.extraClrSchemeLst;
+		var _count = _extra.length;
+		var _rgba = {R: 0, G: 0, B: 0, A: 255};
+		for (var i = 0; i < _count; ++i) {
+			var _scheme = _extra[i].clrScheme;
+
+			elem = new AscCommon.CAscColorScheme();
+			elem.name = _scheme.name;
+
+			_scheme.colors[8].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[8].RGBA;
+			elem.Colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[12].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[12].RGBA;
+			elem.Colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[9].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[9].RGBA;
+			elem.Colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[13].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[13].RGBA;
+			elem.Colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[0].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[0].RGBA;
+			elem.Colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[1].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[1].RGBA;
+			elem.Colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[2].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[2].RGBA;
+			elem.Colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[3].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[3].RGBA;
+			elem.Colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[4].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[4].RGBA;
+			elem.Colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[5].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[5].RGBA;
+			elem.Colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[11].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[11].RGBA;
+			elem.Colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[10].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[10].RGBA;
+			elem.Colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			infos.push(elem)
+		}
+
+		this.sendEvent("asc_onSendThemeColorSchemes", result);
+		return result;
+	};
+	baseEditorsApi.prototype.getColorThemeByIndex = function (index) {
+		var _c, scheme = null;
+		var oColorScheme = AscCommon.g_oUserColorScheme;
+		if (index >= oColorScheme.length) {
+			return scheme;
+		}
+		scheme = new AscFormat.ClrScheme();
+		
+		var tmp = oColorScheme[index];
+		scheme.name = tmp.name;
+
+		_c = tmp.get_dk1();
+		scheme.colors[8] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_lt1();
+		scheme.colors[12] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_dk2();
+		scheme.colors[9] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_lt2();
+		scheme.colors[13] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_accent1();
+		scheme.colors[0] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_accent2();
+		scheme.colors[1] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_accent3();
+		scheme.colors[2] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_accent4();
+		scheme.colors[3] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_accent5();
+		scheme.colors[4] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_accent6();
+		scheme.colors[5] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_hlink();
+		scheme.colors[11] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+		_c = tmp.get_folHlink();
+		scheme.colors[10] = AscFormat.CreateUniColorRGB(_c.r, _c.g, _c.b);
+
+		return scheme;
+	};
+
 	// plugins
 	baseEditorsApi.prototype.asc_pluginsRegister   = function(basePath, plugins)
 	{

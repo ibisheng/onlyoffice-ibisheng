@@ -5705,7 +5705,7 @@ AscCommon.ChartPreviewManager.prototype.getChartPreviews = function(chartType)
 };
 
 // additional
-
+/*
 Asc['asc_docs_api'].prototype.__SendThemeColorScheme = function()
 {
     var infos = [];
@@ -5826,4 +5826,4 @@ Asc['asc_docs_api'].prototype.__SendThemeColorScheme = function()
 
     this.WordControl.m_oApi.sync_SendThemeColorSchemes(infos);
 };
-
+*/

@@ -94,7 +94,6 @@ var editor;
 
     // объекты, нужные для отправки в тулбар (шрифты, стили)
     this._gui_control_colors = null;
-    this._gui_color_schemes = null;
     this.GuiControlColorsMap = null;
     this.IsSendStandartColors = false;
 
@@ -216,124 +215,6 @@ var editor;
     }
 
     this.asc_SendThemeColors(_ret_array, standart_colors);
-  };
-
-  spreadsheet_api.prototype.asc_SendThemeColorScheme = function() {
-    var infos = [];
-    var _index = 0;
-
-    var _c = null;
-
-    // user scheme
-    var oColorScheme = AscCommon.g_oUserColorScheme;
-    var _count_defaults = oColorScheme.length;
-    for (var i = 0; i < _count_defaults; ++i) {
-      var _obj = oColorScheme[i];
-      infos[_index] = new AscCommon.CAscColorScheme();
-      infos[_index].Name = _obj.name;
-
-      _c = _obj.dk1;
-      infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
-
-      _c = _obj.lt1;
-      infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
-
-      _c = _obj.dk2;
-      infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
-
-      _c = _obj.lt2;
-      infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
-
-      _c = _obj.accent1;
-      infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
-
-      _c = _obj.accent2;
-      infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
-
-      _c = _obj.accent3;
-      infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
-
-      _c = _obj.accent4;
-      infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
-
-      _c = _obj.accent5;
-      infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
-
-      _c = _obj.accent6;
-      infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
-
-      _c = _obj.hlink;
-      infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
-
-      _c = _obj.folHlink;
-      infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
-
-      ++_index;
-    }
-
-    // theme colors
-    var _theme = this.wbModel.theme;
-    var _extra = _theme.extraClrSchemeLst;
-    var _count = _extra.length;
-    var _rgba = {R: 0, G: 0, B: 0, A: 255};
-    for (var i = 0; i < _count; ++i) {
-      var _scheme = _extra[i].clrScheme;
-
-      infos[_index] = new AscCommon.CAscColorScheme();
-      infos[_index].Name = _scheme.name;
-
-      _scheme.colors[8].Calculate(_theme, null, null, null, _rgba);
-      _c = _scheme.colors[8].RGBA;
-      infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
-
-      _scheme.colors[12].Calculate(_theme, null, null, null, _rgba);
-      _c = _scheme.colors[12].RGBA;
-      infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
-
-      _scheme.colors[9].Calculate(_theme, null, null, null, _rgba);
-      _c = _scheme.colors[9].RGBA;
-      infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
-
-      _scheme.colors[13].Calculate(_theme, null, null, null, _rgba);
-      _c = _scheme.colors[13].RGBA;
-      infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
-
-      _scheme.colors[0].Calculate(_theme, null, null, null, _rgba);
-      _c = _scheme.colors[0].RGBA;
-      infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
-
-      _scheme.colors[1].Calculate(_theme, null, null, null, _rgba);
-      _c = _scheme.colors[1].RGBA;
-      infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
-
-      _scheme.colors[2].Calculate(_theme, null, null, null, _rgba);
-      _c = _scheme.colors[2].RGBA;
-      infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
-
-      _scheme.colors[3].Calculate(_theme, null, null, null, _rgba);
-      _c = _scheme.colors[3].RGBA;
-      infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
-
-      _scheme.colors[4].Calculate(_theme, null, null, null, _rgba);
-      _c = _scheme.colors[4].RGBA;
-      infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
-
-      _scheme.colors[5].Calculate(_theme, null, null, null, _rgba);
-      _c = _scheme.colors[5].RGBA;
-      infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
-
-      _scheme.colors[11].Calculate(_theme, null, null, null, _rgba);
-      _c = _scheme.colors[11].RGBA;
-      infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
-
-      _scheme.colors[10].Calculate(_theme, null, null, null, _rgba);
-      _c = _scheme.colors[10].RGBA;
-      infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
-
-      _index++;
-    }
-
-    this.asc_SendThemeColorSchemes(infos);
   };
 
   spreadsheet_api.prototype.asc_getLocaleExample = function(val, number, date) {
@@ -945,9 +826,6 @@ var editor;
     if (null !== this._gui_control_colors && "asc_onSendThemeColors" === name) {
       this.handlers.trigger("asc_onSendThemeColors", this._gui_control_colors.Colors, this._gui_control_colors.StandartColors);
       this._gui_control_colors = null;
-    } else if (null !== this._gui_color_schemes && "asc_onSendThemeColorSchemes" === name) {
-      this.handlers.trigger("asc_onSendThemeColorSchemes", this._gui_color_schemes);
-      this._gui_color_schemes = null;
     }
   };
 
@@ -1452,7 +1330,7 @@ var editor;
     this.DocumentLoadComplete = true;
 
     this.asc_CheckGuiControlColors();
-    this.asc_SendThemeColorScheme();
+    this.sendColorThemes(this.wbModel.theme);
     this.asc_ApplyColorScheme(false);
 
     this.sendStandartTextures();
@@ -2987,85 +2865,34 @@ var editor;
     }
   };
 
-  spreadsheet_api.prototype.asc_SendThemeColorSchemes = function(param) {
-    this._gui_color_schemes = param;
-    var ret = this.handlers.trigger("asc_onSendThemeColorSchemes", param);
-    if (false !== ret) {
-      this._gui_color_schemes = null;
-    }
-  };
-  spreadsheet_api.prototype.asc_ChangeColorScheme = function(index_scheme) {
-    var t = this;
-    var onChangeColorScheme = function(res) {
-      if (res) {
-        var theme = t.wbModel.theme;
+	spreadsheet_api.prototype.asc_ChangeColorScheme = function (index) {
+		var t = this;
+		var onChangeColorScheme = function (res) {
+			if (res) {
+				var theme = t.wbModel.theme;
+				var scheme = t.getColorThemeByIndex(index);
+				if (!scheme) {
+					index -= AscCommon.g_oUserColorScheme.length;
+					if (index < 0 || index >= theme.extraClrSchemeLst.length) {
+						return;
+					}
 
-        var oldClrScheme = theme.themeElements.clrScheme;
-        var oColorScheme = AscCommon.g_oUserColorScheme;
-        var _count_defaults = oColorScheme.length;
-        if (index_scheme < _count_defaults) {
-          var _obj = oColorScheme[index_scheme];
-          var scheme = new AscFormat.ClrScheme();
-          scheme.name = _obj.name;
-          var _c;
-
-          _c = _obj.dk1;
-          scheme.colors[8] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-          _c = _obj.lt1;
-          scheme.colors[12] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-          _c = _obj.dk2;
-          scheme.colors[9] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-          _c = _obj.lt2;
-          scheme.colors[13] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-          _c = _obj.accent1;
-          scheme.colors[0] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-          _c = _obj.accent2;
-          scheme.colors[1] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-          _c = _obj.accent3;
-          scheme.colors[2] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-          _c = _obj.accent4;
-          scheme.colors[3] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-          _c = _obj.accent5;
-          scheme.colors[4] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-          _c = _obj.accent6;
-          scheme.colors[5] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-          _c = _obj.hlink;
-          scheme.colors[11] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-          _c = _obj.folHlink;
-          scheme.colors[10] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-          theme.themeElements.clrScheme = scheme;
-        } else {
-          index_scheme -= _count_defaults;
-
-          if (index_scheme < 0 || index_scheme >= theme.extraClrSchemeLst.length) {
-            return;
-          }
-
-          theme.themeElements.clrScheme = theme.extraClrSchemeLst[index_scheme].clrScheme.createDuplicate();
-        }
-        History.Create_NewPoint();
-        //не делаем Duplicate потому что предполагаем что схема не будет менять частями, а только обьектом целиком.
-        History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_ChangeColorScheme, null, null, new AscCommonExcel.UndoRedoData_ClrScheme(oldClrScheme, theme.themeElements.clrScheme));
-        t.asc_AfterChangeColorScheme();
-      }
-    };
-    // ToDo поправить заглушку, сделать новый тип lock element-а
-    var sheetId = -1; // Делаем не существующий лист и не существующий объект
-    var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId, sheetId);
-    this._getIsLockObjectSheet(lockInfo, onChangeColorScheme);
-  };
+					scheme = theme.extraClrSchemeLst[index].clrScheme.createDuplicate();
+				}
+				History.Create_NewPoint();
+				//не делаем Duplicate потому что предполагаем что схема не будет менять частями, а только обьектом целиком.
+				History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_ChangeColorScheme, null,
+					null, new AscCommonExcel.UndoRedoData_ClrScheme(theme.themeElements.clrScheme, scheme));
+				theme.themeElements.clrScheme = scheme;
+				t.asc_AfterChangeColorScheme();
+			}
+		};
+		// ToDo поправить заглушку, сделать новый тип lock element-а
+		var sheetId = -1; // Делаем не существующий лист и не существующий объект
+		var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId,
+			sheetId);
+		this._getIsLockObjectSheet(lockInfo, onChangeColorScheme);
+	};
   spreadsheet_api.prototype.asc_AfterChangeColorScheme = function() {
     this.wbModel.rebuildColors();
     this.asc_CheckGuiControlColors();
