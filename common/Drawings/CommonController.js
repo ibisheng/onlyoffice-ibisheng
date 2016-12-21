@@ -1498,6 +1498,22 @@ DrawingObjectsController.prototype =
     {
     },
 
+
+    getNearestPos: function(x, y){
+        var oTragetDocContent = this.getTargetDocContent(false, false);
+        if(oTragetDocContent){
+            var tx = x, ty = y;
+            var oTransform = oTragetDocContent.Get_ParentTextTransform();
+            if(oTransform){
+                var oInvertTransform = AscCommon.global_MatrixTransformer.Invert(oTransform);
+                tx = oInvertTransform.TransformPointX(x, y);
+                ty = oInvertTransform.TransformPointY(x, y);
+                return oTragetDocContent.Get_NearestPos(0, tx, ty, false);
+            }
+        }
+        return null;
+    },
+
     getTargetDocContent: function(bCheckChartTitle, bOrTable)
     {
         var text_object = getTargetTextObject(this);
