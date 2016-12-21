@@ -1428,6 +1428,9 @@ background-repeat: no-repeat;\
 	{
 		this.WordControl.m_oLogicDocument                    = new AscCommonSlide.CPresentation(this.WordControl.m_oDrawingDocument);
 		this.WordControl.m_oDrawingDocument.m_oLogicDocument = this.WordControl.m_oLogicDocument;
+
+		if (this.WordControl.MobileTouchManager)
+			this.WordControl.MobileTouchManager.delegate.LogicDocument = this.WordControl.m_oLogicDocument;
 	};
 
 	asc_docs_api.prototype.SetInterfaceDrawImagePlaceSlide = function(div_id)
@@ -1575,36 +1578,6 @@ background-repeat: no-repeat;\
 	};
 
 	// -------
-
-	// -------
-	asc_docs_api.prototype.get_ContentCount = function()
-	{
-		return this.WordControl.m_oLogicDocument.Content.length;
-	};
-
-	asc_docs_api.prototype.select_Element = function(Index)
-	{
-		var Document = this.WordControl.m_oLogicDocument;
-
-		if (true === Document.Selection.Use)
-			Document.Selection_Remove();
-
-		Document.DrawingDocument.SelectEnabled(true);
-		Document.DrawingDocument.TargetEnd();
-
-		Document.Selection.Use   = true;
-		Document.Selection.Start = false;
-		Document.Selection.Flag  = AscCommon.selectionflag_Common;
-
-		Document.Selection.StartPos = Index;
-		Document.Selection.EndPos   = Index;
-
-		Document.Content[Index].Selection.Use      = true;
-		Document.Content[Index].Selection.StartPos = Document.Content[Index].Internal_GetStartPos();
-		Document.Content[Index].Selection.EndPos   = Document.Content[Index].Content.length - 1;
-
-		Document.Selection_Draw();
-	};
 
 	asc_docs_api.prototype.UpdateTextPr = function(TextPr)
 	{
@@ -5681,7 +5654,7 @@ background-repeat: no-repeat;\
 
 		if (!this.isViewMode && this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Theme) === false)
 		{
-			AscCommon.CollaborativeEditing.m_bGlobalLock = true;
+			AscCommon.CollaborativeEditing.Set_GlobalLock(true);
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_ChangeTheme);
 			this.ThemeLoader.StartLoadTheme(indexTheme);
 		}
@@ -5692,7 +5665,7 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.EndLoadTheme   = function(theme_load_info)
 	{
-		AscCommon.CollaborativeEditing.m_bGlobalLock = false;
+		AscCommon.CollaborativeEditing.Set_GlobalLock(false);
 
 		// применение темы
 		var _array = this.WordControl.Thumbnails.GetSelectedArray();
@@ -6346,32 +6319,41 @@ background-repeat: no-repeat;\
 					break;
 			}
 
-			var _len    = Loader.Reader.GetLong();
-			_pos += 4;
-			stream.size = _pos + _len;
+            var nChangeLen = stream.GetLong();
+            _pos += 4;
+            stream.size = _pos + nChangeLen;
 
-			var _id       = Loader.Reader.GetString2();
-			var _read_pos = Loader.Reader.GetCurPos();
+            var ClassId = stream.GetString2();
+            var Class   = AscCommon.g_oTableId.Get_ById(ClassId);
 
-			var Type  = Loader.Reader.GetLong();
-			var Class = null;
+            var nReaderPos  = stream.GetCurPos();
+            var nChangeType = stream.GetLong();
 
-			if (AscDFH.historyitem_type_HdrFtr === Type)
-			{
-				Class = editor.WordControl.m_oLogicDocument.HdrFtr;
-			}
-			else
-				Class = g_oTableId.Get_ById(_id);
+            if (Class)
+            {
+                var fChangesClass = AscDFH.changesFactory[nChangeType];
+                if (fChangesClass)
+                {
+                    var oChange = new fChangesClass(Class);
+                    oChange.ReadFromBinary(stream);
 
-			stream.Seek(_read_pos);
-			stream.Seek2(_read_pos);
+                    if (true === AscCommon.CollaborativeEditing.private_AddOverallChange(oChange))
+                        oChange.Load(_color);
+                }
+                else
+                {
+                    AscCommon.CollaborativeEditing.private_AddOverallChange(data);
 
-			if (null != Class)
-				Class.Load_Changes(Loader.Reader, Loader.Reader2, _color);
+                    stream.Seek(nReaderPos);
+                    stream.Seek2(nReaderPos);
 
-			_pos += _len;
-			stream.Seek2(_pos);
-			stream.size = data.length;
+                    Class.Load_Changes(stream, null, _color);
+                }
+            }
+
+            _pos += nChangeLen;
+            stream.Seek2(_pos);
+            stream.size = data.length;
 		}
 
 		if (isFull)
@@ -6570,7 +6552,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_getPropertyEditorTextArts']       = asc_docs_api.prototype.asc_getPropertyEditorTextArts;
 	asc_docs_api.prototype['get_PropertyEditorThemes']            = asc_docs_api.prototype.get_PropertyEditorThemes;
 	asc_docs_api.prototype['get_ContentCount']                    = asc_docs_api.prototype.get_ContentCount;
-	asc_docs_api.prototype['select_Element']                      = asc_docs_api.prototype.select_Element;
 	asc_docs_api.prototype['UpdateTextPr']                        = asc_docs_api.prototype.UpdateTextPr;
 	asc_docs_api.prototype['sync_TextSpacing']                    = asc_docs_api.prototype.sync_TextSpacing;
 	asc_docs_api.prototype['sync_TextDStrikeout']                 = asc_docs_api.prototype.sync_TextDStrikeout;

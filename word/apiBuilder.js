@@ -3998,6 +3998,23 @@
         }
     };
 
+
+    /**
+     * Specifies a  vertical axis orientation
+     * @param {bool} bIsMinMax
+     * */
+    ApiChart.prototype.SetVerAxisOrientation = function(bIsMinMax){
+        AscFormat.builder_SetChartVertAxisOrientation(this.Chart, bIsMinMax);
+    };
+
+    /**
+     * Specifies a  horizontal axis orientation
+     * @param {bool} bIsMinMax
+     * */
+    ApiChart.prototype.SetHorAxisOrientation = function(bIsMinMax){
+        AscFormat.builder_SetChartHorAxisOrientation(this.Chart, bIsMinMax);
+    };
+
     /**
      * Specifies a legend position
      * @param {"left" | "top" | "right" | "bottom" | "none"} sLegendPos
@@ -4061,31 +4078,11 @@
      * @param {boolean} bShowSerName
      * @param {boolean} bShowCatName
      * @param {boolean} bShowVal
+     * @param {boolean} bShowPercent
      * */
-    ApiChart.prototype.SetShowDataLabels = function(bShowSerName, bShowCatName, bShowVal)
+    ApiChart.prototype.SetShowDataLabels = function(bShowSerName, bShowCatName, bShowVal, bShowPercent)
     {
-        if(this.Chart && this.Chart.chart && this.Chart.chart.plotArea && this.Chart.chart.plotArea.charts[0])
-        {
-            var oChart = this.Chart.chart.plotArea.charts[0];
-            if(false == bShowSerName && false == bShowCatName && false == bShowVal)
-            {
-                if(oChart.dLbls)
-                {
-                    oChart.setDLbls(null);
-                }
-            }
-            if(!oChart.dLbls)
-            {
-                oChart.setDLbls(new AscFormat.CDLbls());
-            }
-            oChart.dLbls.setSeparator(",");
-            oChart.dLbls.setShowSerName(true == bShowSerName);
-            oChart.dLbls.setShowCatName(true == bShowCatName);
-            oChart.dLbls.setShowVal(true == bShowVal);
-            oChart.dLbls.setShowLegendKey(false);
-            //oChart.dLbls.setShowPercent(false);
-            oChart.dLbls.setShowBubbleSize(false);
-        }
+        AscFormat.builder_SetShowDataLabels(this.Chart, bShowSerName, bShowCatName, bShowVal, bShowPercent);
     };
 
     //------------------------------------------------------------------------------------------------------------------
@@ -4440,6 +4437,8 @@
     ApiChart.prototype["SetTitle"]                   = ApiChart.prototype.SetTitle;
     ApiChart.prototype["SetHorAxisTitle"]            = ApiChart.prototype.SetHorAxisTitle;
     ApiChart.prototype["SetVerAxisTitle"]            = ApiChart.prototype.SetVerAxisTitle;
+    ApiChart.prototype["SetVerAxisOrientation"]      =  ApiChart.prototype.SetVerAxisOrientation;
+    ApiChart.prototype["SetHorAxisOrientation"]      =  ApiChart.prototype.SetHorAxisOrientation;
     ApiChart.prototype["SetLegendPos"]               = ApiChart.prototype.SetLegendPos;
     ApiChart.prototype["SetShowDataLabels"]          = ApiChart.prototype.SetShowDataLabels;
 

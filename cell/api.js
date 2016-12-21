@@ -88,6 +88,7 @@ var editor;
     this.wb = null;
     this.wbModel = null;
     this.tmpLocale = null;
+    this.tmpLocalization = null;
 
     this.documentFormatSave = c_oAscFileType.XLSX;
 
@@ -124,9 +125,10 @@ var editor;
     this.isShapeImageChangeUrl = false;
     this.isTextArtChangeUrl = false;
 
-    //находится ли фокус в рабочей области редактора(используется для copy/paste в MAC)
-    // ToDo убрать, когда Гоша поправит clipboard.js
-    this.IsFocus = null;
+
+	  // Styles sizes
+      this.styleThumbnailWidth = 112;
+	  this.styleThumbnailHeight = 38;
 
     this.formulasList = null;	// Список всех формул
 
@@ -340,7 +342,7 @@ var editor;
     if (cultureInfo) {
       var numFormatDigit = AscCommon.oNumFormatCache.get('#,##0.00');
 
-      var formatDate = AscCommonExcel.getShortDateFormat(cultureInfo);
+      var formatDate = AscCommon.getShortDateFormat(cultureInfo);
       formatDate += " h:mm";
       if (cultureInfo.AMDesignator && cultureInfo.PMDesignator) {
         formatDate += " AM/PM";
@@ -409,6 +411,7 @@ var editor;
     AscCommonExcel.g_oUndoRedoComment = new AscCommonExcel.UndoRedoComment(wbModel);
     AscCommonExcel.g_oUndoRedoAutoFilters = new AscCommonExcel.UndoRedoAutoFilters(wbModel);
     AscCommonExcel.g_oUndoRedoSparklines = new AscCommonExcel.UndoRedoSparklines(wbModel);
+    AscCommonExcel.g_DefNameWorksheet = new AscCommonExcel.Woorksheet(wbModel, -1);
   };
 
   spreadsheet_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) {//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
@@ -969,6 +972,11 @@ var editor;
     }
   };
 
+	spreadsheet_api.prototype.asc_setThumbnailStylesSizes = function (width, height) {
+		this.styleThumbnailWidth = width;
+		this.styleThumbnailHeight = height;
+	};
+
   // Посылает эвент о том, что обновились листы
   spreadsheet_api.prototype.sheetsChanged = function() {
     this.handlers.trigger("asc_onSheetsChanged");
@@ -1409,22 +1417,19 @@ var editor;
     return (c_oAscLockTypeElem.Object === lockElem.Element["type"] && lockElem.Element["rangeOrObjectId"] === AscCommonExcel.c_oAscLockNameFrozenPane);
   };
 
-  spreadsheet_api.prototype._sendWorkbookStyles = function() {
-    if (this.wbModel) {
+	spreadsheet_api.prototype._sendWorkbookStyles = function () {
+		if (this.wbModel) {
 
-        if (!window['IS_NATIVE_EDITOR']) {
-            // Для нативной версии не генерируем стили
-            if (window["NATIVE_EDITOR_ENJINE"] && (!this.handlers.hasTrigger("asc_onInitTablePictures") || !this.handlers.hasTrigger("asc_onInitEditorStyles"))) {
-                return;
-            }
-        }
+			if (!window['IS_NATIVE_EDITOR'] && window["NATIVE_EDITOR_ENJINE"]) {
+				// Для нативной версии (сборка) не генерируем стили
+				return;
+			}
 
-      // Отправка стилей форматированных таблиц
-      this.handlers.trigger("asc_onInitTablePictures", this.wb.getTablePictures());
-      // Отправка стилей ячеек
-      this.handlers.trigger("asc_onInitEditorStyles", this.wb.getCellStyles());
-    }
-  };
+			// Отправка стилей ячеек
+			this.handlers.trigger("asc_onInitEditorStyles",
+				this.wb.getCellStyles(this.styleThumbnailWidth, this.styleThumbnailHeight));
+		}
+	};
 
   spreadsheet_api.prototype.startCollaborationEditing = function() {
     // Начинаем совместное редактирование
@@ -1738,7 +1743,7 @@ var editor;
   spreadsheet_api.prototype._onUpdateDefinedNames = function(lockElem) {
 //      if( lockElem.Element["subType"] == AscCommonExcel.c_oAscLockTypeElemSubType.DefinedNames ){
       if( lockElem.Element["sheetId"] == -1 && lockElem.Element["rangeOrObjectId"] != -1 && !this.collaborativeEditing.getFast() ){
-          var dN = this.wbModel.dependencyFormulas.defNameList[lockElem.Element["rangeOrObjectId"]];
+          var dN = this.wbModel.dependencyFormulas.getDefNameByNodeId(lockElem.Element["rangeOrObjectId"]);
           if (dN) {
               dN.isLock = lockElem.UserId;
               this.handlers.trigger("asc_onRefreshDefNameList",dN.getAscCDefName());
@@ -1901,7 +1906,7 @@ var editor;
 
         History.Create_NewPoint();
         History.StartTransaction();
-
+        t.wbModel.dependencyFormulas.lockRecal();
         // Нужно проверить все диаграммы, ссылающиеся на удаляемый лист
         for (var key in t.wb.model.aWorksheets) {
           var wsModel = t.wb.model.aWorksheets[key];
@@ -1924,6 +1929,7 @@ var editor;
           // Посылаем callback об изменении списка листов
           t.sheetsChanged();
         }
+        t.wbModel.dependencyFormulas.unlockRecal();
         History.EndTransaction();
       }
     };
@@ -1939,7 +1945,7 @@ var editor;
     if (1 === d) {
       where -= 1;
     }
-
+    History.Create_NewPoint();
     this.wb.replaceWorksheet(i, where);
     this.wbModel.replaceWorksheet(i, where);
 
@@ -1996,8 +2002,6 @@ var editor;
     if (this.wb) {
       this.wb.enableKeyEventsHandler(isEnabled);
     }
-    //наличие фокуса в рабочей области редактора(используется для copy/paste в MAC)
-    this.IsFocus = isEnabled;
 
     if (isFromInput !== true && AscCommon.g_inputContext)
       AscCommon.g_inputContext.setInterfaceEnableKeyEvents(isEnabled);
@@ -2179,9 +2183,15 @@ var editor;
     return this.wb.getWorksheet().getSheetViewSettings();
   };
 
-  spreadsheet_api.prototype.asc_setSheetViewSettings = function(options) {
-    this.wb.getWorksheet().changeWorksheet("sheetViewSettings", options);
-  };
+	spreadsheet_api.prototype.asc_setDisplayGridlines = function (value) {
+		this.wb.getWorksheet()
+			.changeWorksheet("sheetViewSettings", {type: AscCH.historyitem_Worksheet_SetDisplayGridlines, value: value});
+	};
+
+	spreadsheet_api.prototype.asc_setDisplayHeadings = function (value) {
+		this.wb.getWorksheet()
+			.changeWorksheet("sheetViewSettings", {type: AscCH.historyitem_Worksheet_SetDisplayHeadings, value: value});
+	};
 
   // Images & Charts
 
@@ -2406,6 +2416,16 @@ var editor;
     this.isStartAddShape = false;
     this.handlers.trigger("asc_onEndAddShape");
   };
+
+
+    spreadsheet_api.prototype.asc_addShapeOnSheet = function(sPreset) {
+        if(this.wb){
+          var ws = this.wb.getWorksheet();
+          if(ws && ws.objectRender){
+            ws.objectRender.addShapeOnSheet(sPreset);
+          }
+        }
+    };
 
   spreadsheet_api.prototype.asc_addOleObjectAction = function(sLocalUrl, sData, sApplicationId, fWidth, fHeight, nWidthPix, nHeightPix)
   {
@@ -3145,30 +3165,35 @@ var editor;
     }
   };
 
-  // Выставление локали
-  spreadsheet_api.prototype.asc_setLocalization = function(oLocalizedData) {
-    if (null == oLocalizedData) {
-      AscCommonExcel.cFormulaFunctionLocalized = null;
-      AscCommonExcel.cFormulaFunctionToLocale = null;
-    } else {
-      AscCommonExcel.cFormulaFunctionLocalized = {};
-      AscCommonExcel.cFormulaFunctionToLocale = {};
-      var localName;
-      for (var i in AscCommonExcel.cFormulaFunction) {
-        localName = oLocalizedData[i] ? oLocalizedData[i] : null;
-        localName = localName ? localName : i;
-        AscCommonExcel.cFormulaFunctionLocalized[localName] = AscCommonExcel.cFormulaFunction[i];
-        AscCommonExcel.cFormulaFunctionToLocale[i] = localName;
-      }
-    }
-    AscCommon.build_local_rx(oLocalizedData?oLocalizedData["LocalFormulaOperands"]:null);
-    if (this.wb) {
-      this.wb.initFormulasList();
-    }
-    if (this.wbModel) {
-      this.wbModel.rebuildColors();
-    }
-  };
+	// Выставление локали
+	spreadsheet_api.prototype.asc_setLocalization = function (oLocalizedData) {
+		if (!this.isLoadFullApi) {
+			this.tmpLocalization = oLocalizedData;
+			return;
+		}
+
+		if (null == oLocalizedData) {
+			AscCommonExcel.cFormulaFunctionLocalized = null;
+			AscCommonExcel.cFormulaFunctionToLocale = null;
+		} else {
+			AscCommonExcel.cFormulaFunctionLocalized = {};
+			AscCommonExcel.cFormulaFunctionToLocale = {};
+			var localName;
+			for (var i in AscCommonExcel.cFormulaFunction) {
+				localName = oLocalizedData[i] ? oLocalizedData[i] : null;
+				localName = localName ? localName : i;
+				AscCommonExcel.cFormulaFunctionLocalized[localName] = AscCommonExcel.cFormulaFunction[i];
+				AscCommonExcel.cFormulaFunctionToLocale[i] = localName;
+			}
+		}
+		AscCommon.build_local_rx(oLocalizedData ? oLocalizedData["LocalFormulaOperands"] : null);
+		if (this.wb) {
+			this.wb.initFormulasList();
+		}
+		if (this.wbModel) {
+			this.wbModel.rebuildColors();
+		}
+	};
 
   spreadsheet_api.prototype.asc_nativeOpenFile = function(base64File, version, isUser) {
     asc["editor"] = this;
@@ -3358,20 +3383,22 @@ var editor;
     });
   };
 
-  spreadsheet_api.prototype._onEndLoadSdk = function() {
-    History = AscCommon.History;
+	spreadsheet_api.prototype._onEndLoadSdk = function () {
+		History = AscCommon.History;
 
-    if (this.isMobileVersion)
-        this.asc_setMobileVersion(true);
+		if (this.isMobileVersion) {
+			this.asc_setMobileVersion(true);
+		}
 
-    spreadsheet_api.superclass._onEndLoadSdk.call(this);
+		spreadsheet_api.superclass._onEndLoadSdk.call(this);
 
-    this.controller = new AscCommonExcel.asc_CEventsController();
+		this.controller = new AscCommonExcel.asc_CEventsController();
 
-    this.formulasList = AscCommonExcel.getFormulasInfo();
-    this.asc_setLocale(this.tmpLocale);
-    this.asc_setViewMode(this.isViewMode);
-  };
+		this.formulasList = AscCommonExcel.getFormulasInfo();
+		this.asc_setLocale(this.tmpLocale);
+		this.asc_setLocalization(this.tmpLocalization);
+		this.asc_setViewMode(this.isViewMode);
+	};
 
   /*
    * Export
@@ -3426,6 +3453,7 @@ var editor;
 
   prot["asc_SetDocumentPlaceChangedEnabled"] = prot.asc_SetDocumentPlaceChangedEnabled;
   prot["asc_SetFastCollaborative"] = prot.asc_SetFastCollaborative;
+	prot["asc_setThumbnailStylesSizes"] = prot.asc_setThumbnailStylesSizes;
 
   // Workbook interface
 
@@ -3479,7 +3507,8 @@ var editor;
   prot["asc_emptyCells"] = prot.asc_emptyCells;
   prot["asc_mergeCellsDataLost"] = prot.asc_mergeCellsDataLost;
   prot["asc_getSheetViewSettings"] = prot.asc_getSheetViewSettings;
-  prot["asc_setSheetViewSettings"] = prot.asc_setSheetViewSettings;
+	prot["asc_setDisplayGridlines"] = prot.asc_setDisplayGridlines;
+	prot["asc_setDisplayHeadings"] = prot.asc_setDisplayHeadings;
 
   // Defined Names
   prot["asc_getDefinedNames"] = prot.asc_getDefinedNames;
@@ -3551,6 +3580,7 @@ var editor;
   prot["setEndPointHistory"] = prot.setEndPointHistory;
   prot["asc_startAddShape"] = prot.asc_startAddShape;
   prot["asc_endAddShape"] = prot.asc_endAddShape;
+  prot["asc_addShapeOnSheet"] = prot.asc_addShapeOnSheet;
   prot["asc_isAddAutoshape"] = prot.asc_isAddAutoshape;
   prot["asc_canAddShapeHyperlink"] = prot.asc_canAddShapeHyperlink;
   prot["asc_canGroupGraphicsObjects"] = prot.asc_canGroupGraphicsObjects;

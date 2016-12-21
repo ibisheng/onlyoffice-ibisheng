@@ -453,7 +453,17 @@
         // FormatPainter
         'isFormatPainter': function () {
           return self.stateFormatPainter;
-        }
+        },
+
+        //calcAll
+        'calcAll': function (shiftKey) {
+          if(shiftKey){
+            var ws = self.model.getActiveWs();
+            self.model.dependencyFormulas.calcAll(ws.getId());
+          } else {
+            self.model.dependencyFormulas.calcAll();
+          }
+        },
       });
 
       if (this.input && this.input.addEventListener) {
@@ -1378,15 +1388,14 @@
 		  ws = this.getWorksheet(index);
      }
 
+	  ws.cleanSelection();
+
 	  for (var i in this.wsViews) {
 		  this.wsViews[i].setFormulaEditMode(false);
-	  }
-
-      ws.updateSelection();
-
-	  for (var i in this.wsViews) {
 		  this.wsViews[i].cleanFormulaRanges();
 	  }
+
+	  ws.updateSelectionWithSparklines();
 
     if (isCellEditMode) {
       this.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
@@ -1491,8 +1500,8 @@
       return this.af_getTablePictures(this.model, this.fmgrGraphics, this.m_oFont, props);
   };
 
-  WorkbookView.prototype.getCellStyles = function() {
-    var oStylesPainter = new asc_CSP();
+  WorkbookView.prototype.getCellStyles = function(width, height) {
+    var oStylesPainter = new asc_CSP(width, height);
     oStylesPainter.generateStylesAll(this.model.CellStyles, this.fmgrGraphics, this.m_oFont, this.stringRender);
     return oStylesPainter;
   };
@@ -2247,22 +2256,24 @@
     ws.replaceCellText(options, false, this.fReplaceCallback);
   };
   WorkbookView.prototype._replaceCellTextCallback = function(options) {
-    options.updateFindAll();
-    if (!options.scanOnOnlySheet && options.isReplaceAll) {
-      // Замена на всей книге
-      var i = ++options.sheetIndex;
-      if (this.model.getActive() === i) {
-        i = ++options.sheetIndex;
-      }
+    if (!options.error) {
+		options.updateFindAll();
+		if (!options.scanOnOnlySheet && options.isReplaceAll) {
+			// Замена на всей книге
+			var i = ++options.sheetIndex;
+			if (this.model.getActive() === i) {
+				i = ++options.sheetIndex;
+			}
 
-      if (i < this.model.getWorksheetCount()) {
-        var ws = this.getWorksheet(i);
-        ws.replaceCellText(options, true, this.fReplaceCallback);
-        return;
-      }
+			if (i < this.model.getWorksheetCount()) {
+				var ws = this.getWorksheet(i);
+				ws.replaceCellText(options, true, this.fReplaceCallback);
+				return;
+			}
+		}
+
+		this.handlers.trigger("asc_onRenameCellTextEnd", options.countFindAll, options.countReplaceAll);
     }
-
-    this.handlers.trigger("asc_onRenameCellTextEnd", options.countFindAll, options.countReplaceAll);
 
     History.EndTransaction();
     if (options.isReplaceAll) {
@@ -2293,7 +2304,11 @@
 
     var editDefinedNamesCallback = function(res) {
       if (res) {
-        t.model.editDefinesNames(oldName, newName);
+        if (oldName && oldName.asc_getIsTable()) {
+          ws.model.autoFilters.changeDisplayNameTable(oldName.asc_getName(), newName.asc_getName());
+        } else {
+          t.model.editDefinesNames(oldName, newName);
+        }
         t.handlers.trigger("asc_onEditDefName", oldName, newName);
         //условие исключает второй вызов asc_onRefreshDefNameList(первый в unlockDefName)
         if(!(t.collaborativeEditing.getCollaborativeEditing() && t.collaborativeEditing.getFast()))
@@ -2308,7 +2323,7 @@
     var defNameId;
     if (oldName) {
       defNameId = t.model.getDefinedName(oldName);
-      defNameId = defNameId ? defNameId.nodeId : null;
+      defNameId = defNameId ? defNameId.getNodeId() : null;
     }
 
     var callback = function() {
@@ -2346,14 +2361,14 @@
 
       var delDefinedNamesCallback = function(res) {
         if (res) {
-          t.handlers.trigger("asc_onDelDefName", t.model.delDefinesNames(oldName));
+          t.model.delDefinesNames(oldName);
           t.handlers.trigger("asc_onRefreshDefNameList");
         } else {
           t.handlers.trigger("asc_onError", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
         }
         t._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
       };
-      var defNameId = t.model.getDefinedName(oldName).nodeId;
+      var defNameId = t.model.getDefinedName(oldName).getNodeId();
 
       ws._isLockedDefNames(delDefinedNamesCallback, defNameId);
 
@@ -2951,30 +2966,30 @@
     if (!styleOptions || !styleOptions.wholeTable || !styleOptions.wholeTable.dxf.font) {
       defaultColor = blackColor;
     } else {
-      defaultColor = styleOptions.wholeTable.dxf.font.c;
+      defaultColor = styleOptions.wholeTable.dxf.font.getColor();
     }
     for (var n = 1; n < 6; n++) {
       ctx.beginPath();
       color = null;
       if (n == 1 && styleOptions && styleOptions.headerRow && styleOptions.headerRow.dxf.font) {
-        color = styleOptions.headerRow.dxf.font.c;
+        color = styleOptions.headerRow.dxf.font.getColor();
       } else if (n == 5 && styleOptions && styleOptions.totalRow && styleOptions.totalRow.dxf.font) {
-        color = styleOptions.totalRow.dxf.font.c;
+        color = styleOptions.totalRow.dxf.font.getColor();
       } else if (styleOptions && styleOptions.headerRow && styleInfo.ShowRowStripes) {
         if ((n == 2 || (n == 5 && !styleOptions.totalRow)) && styleOptions.firstRowStripe &&
           styleOptions.firstRowStripe.dxf.font) {
-          color = styleOptions.firstRowStripe.dxf.font.c;
+          color = styleOptions.firstRowStripe.dxf.font.getColor();
         } else if (n == 3 && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font) {
-          color = styleOptions.secondRowStripe.dxf.font.c;
+          color = styleOptions.secondRowStripe.dxf.font.getColor();
         } else {
           color = defaultColor
         }
       } else if (styleOptions && !styleOptions.headerRow && styleInfo.ShowRowStripes) {
         if ((n == 1 || n == 3 || (n == 5 && !styleOptions.totalRow)) && styleOptions.firstRowStripe &&
           styleOptions.firstRowStripe.dxf.font) {
-          color = styleOptions.firstRowStripe.dxf.font.c;
+          color = styleOptions.firstRowStripe.dxf.font.getColor();
         } else if ((n == 2 || n == 4) && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font) {
-          color = styleOptions.secondRowStripe.dxf.font.c;
+          color = styleOptions.secondRowStripe.dxf.font.getColor();
         } else {
           color = defaultColor
         }

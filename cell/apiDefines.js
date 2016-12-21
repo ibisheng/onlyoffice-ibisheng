@@ -95,7 +95,6 @@ var c_oAscSelectionDialogType = {
   None: 0,
   FormatTable: 1,
   Chart: 2,
-  DefinedName: 3,
   FormatTableChangeRange: 4
 };
 
@@ -439,7 +438,6 @@ var c_oAscPopUpSelectorType = {
   prot['None'] = prot.None;
   prot['FormatTable'] = prot.FormatTable;
   prot['Chart'] = prot.Chart;
-  prot['DefinedName'] = prot.DefinedName;
   prot['FormatTableChangeRange'] = prot.FormatTableChangeRange;
   window['Asc']['c_oAscHyperlinkType'] = window['Asc'].c_oAscHyperlinkType = c_oAscHyperlinkType;
   prot = c_oAscHyperlinkType;

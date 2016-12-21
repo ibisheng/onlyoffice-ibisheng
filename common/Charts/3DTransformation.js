@@ -90,14 +90,19 @@ function Processor3D(width, height, left, right, bottom, top, chartSpace, charts
 	this.angleOy = this.view3D && this.view3D.rotY ? (- this.view3D.rotY / 360) * (Math.PI * 2) : 0;
 	this.angleOz = this.view3D && this.view3D.rotZ ? (- this.view3D.rotZ / 360) * (Math.PI * 2) : 0;
 	
-	/*if(this.view3D.rAngAx && this.view3D.rotX < 0)
+	if(!this.view3D.rAngAx && AscFormat.c_oChartTypes.Pie === this.chartsDrawer.calcProp.type)
 	{	
-		this.angleOx = - this.angleOx;
-		this.angleOy = - this.angleOy;
-	}*/
+		this.angleOy = 0;
+	}
 	
 	this.orientationCatAx = null;
 	this.orientationValAx = null;
+	
+	this.matrixRotateOx = null;
+	this.matrixRotateOy = null;
+	this.matrixRotateAllAxis = null;
+	this.matrixShearXY = null;
+	this.projectMatrix = null;
 }
 
 Processor3D.prototype.calaculate3DProperties = function(baseDepth, gapDepth, bIsCheck)
@@ -133,6 +138,55 @@ Processor3D.prototype.calaculate3DProperties = function(baseDepth, gapDepth, bIs
 			this._recalculateScaleWithMaxWidth();
 		}
 	}
+	
+	if(AscFormat.c_oChartTypes.Pie === this.chartsDrawer.calcProp.type && !this.view3D.rAngAx)
+	{
+		//TODO пересмотреть функцию
+		this.tempChangeAspectRatioForPie();
+	}
+};
+
+Processor3D.prototype.tempChangeAspectRatioForPie = function()
+{
+	var perspectiveDepth = this.depthPerspective;
+	
+	var widthCanvas = this.widthCanvas;
+	var originalWidthChart = widthCanvas - this.left - this.right;
+	
+	var heightCanvas = this.heightCanvas;
+	var heightChart = heightCanvas - this.top - this.bottom;
+	
+	var points = [], faces = [];
+	
+	points.push(new Point3D(this.left + originalWidthChart / 2, this.top, perspectiveDepth, this));
+	points.push(new Point3D(this.left, this.top, perspectiveDepth / 2, this));
+	points.push(new Point3D(this.left + originalWidthChart, this.top, perspectiveDepth / 2, this));
+	points.push(new Point3D(this.left + originalWidthChart / 2, this.top, 0, this));
+	
+	points.push(new Point3D(this.left + originalWidthChart / 2, this.top + heightChart, perspectiveDepth, this));
+	points.push(new Point3D(this.left, this.top + heightChart, perspectiveDepth / 2, this));
+	points.push(new Point3D(this.left + originalWidthChart, this.top + heightChart, perspectiveDepth / 2, this));
+	points.push(new Point3D(this.left + originalWidthChart / 2, this.top + heightChart, 0, this));
+	
+	faces.push([0,1,2,3]);
+	faces.push([2,5,4,3]);
+	faces.push([1,6,7,0]);
+	faces.push([6,5,4,7]);
+	faces.push([7,4,3,0]);
+	faces.push([1,6,2,5]);
+	
+	var minMaxOx = this._getMinMaxOx(points, faces);
+	var minMaxOy = this._getMinMaxOy(points, faces);
+	
+	var kF = ((minMaxOx.right - minMaxOx.left) / originalWidthChart);
+	if((minMaxOy.bottom - minMaxOy.top) / kF > heightChart)
+	{
+		kF =  ((minMaxOy.bottom - minMaxOy.top) / heightChart);
+	}
+	
+	this.aspectRatioX = this.aspectRatioX * kF;
+	this.aspectRatioY = this.aspectRatioY * kF;
+	this.aspectRatioZ = this.aspectRatioZ * kF;
 };
 
 Processor3D.prototype.calculateCommonOptions = function()
@@ -151,6 +205,13 @@ Processor3D.prototype._calculateAutoHPercent = function()
 		this.hPercent = this.view3D.hPercent === null ? (heightLine / widthLine) : this.view3D.hPercent / 100;
 		if(this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar && ((this.view3D.hPercent === null && this.view3D.rAngAx) || (this.view3D.hPercent !== null && !this.view3D.rAngAx)))
 			this.hPercent = 1 / this.hPercent;
+			
+		if(AscFormat.c_oChartTypes.Pie === this.chartsDrawer.calcProp.type)
+		{
+			this.hPercent = 0.12;
+			//this.view3D.depthPercent = 180;
+		}
+		
 	}
 };
 
@@ -686,8 +747,25 @@ Processor3D.prototype.calculatePropertiesForPieCharts = function()
 //***functions for matrix transformation***
 Processor3D.prototype._shearXY = function()
 {
-	//TODO матрица перевёрнута
-	return [[1, 0, 0, 0], [0, 1, 0, 0], [Math.sin(-this.angleOy), Math.sin(this.angleOx), 0, 0], [0, 0, 0, 0]];
+	if(null === this.matrixShearXY)
+	{
+		this.matrixShearXY = new Matrix4D();
+		
+		this.matrixShearXY.a31 =  Math.sin(-this.angleOy);
+		this.matrixShearXY.a32 =  Math.sin(this.angleOx);
+		this.matrixShearXY.a33 =  0;
+		this.matrixShearXY.a44 =  0;
+	}
+	
+	return this.matrixShearXY;
+};
+Processor3D.prototype._shearXY2 = function()
+{
+	if(null === this.matrixShearXY)
+	{
+		this.matrixShearXY = [[1, 0, 0, 0], [0, 1, 0, 0], [Math.sin(-this.angleOy), Math.sin(this.angleOx), 0, 0], [0, 0, 0, 0]];
+	}
+	return this.matrixShearXY;
 };
 
 Processor3D.prototype._getMatrixRotateAllAxis = function()
@@ -702,18 +780,92 @@ Processor3D.prototype._getMatrixRotateAllAxis = function()
 	|-sinOy * cosOx     sinOx     cosOy * cosOx  0|
 	|-sinOy              0        (cosOy + 1)   1|*/
 	
+	if(null === this.matrixRotateAllAxis)
+	{
+		this.matrixRotateAllAxis = matrixRotateOY.multiply(matrixRotateOX);
+	}
 	
-	return Point3D.prototype.multiplyMatrix(matrixRotateOY, matrixRotateOX);
+	return this.matrixRotateAllAxis;
 };
 
 Processor3D.prototype._getMatrixRotateOx = function()
 {
-	return [[1, 0, 0, 0], [0, Math.cos(-this.angleOx), Math.sin(-this.angleOx), 0], [0, - Math.sin(-this.angleOx), Math.cos(-this.angleOx), 1], [0, 0, 0, 1]];
+	//todo посмотреть возможность заменить массивы на Float32Array
+	if(null === this.matrixRotateOx)
+	{
+		this.matrixRotateOx = new Matrix4D()/*[[1, 0, 0, 0], [0, Math.cos(-this.angleOx), Math.sin(-this.angleOx), 0], [0, - Math.sin(-this.angleOx), Math.cos(-this.angleOx), 1], [0, 0, 0, 1]]*/;
+		
+		var cos = Math.cos(-this.angleOx);
+		var sin = Math.sin(-this.angleOx);
+		
+		this.matrixRotateOx.a22 =  cos;
+		this.matrixRotateOx.a23 =  sin;
+		this.matrixRotateOx.a32 = -sin;
+		this.matrixRotateOx.a33 = cos;
+		this.matrixRotateOx.a34 = 1;
+	}
+	
+	return this.matrixRotateOx;
 };
 
 Processor3D.prototype._getMatrixRotateOy = function()
 {
-	return [[Math.cos(-this.angleOy), 0, -Math.sin(-this.angleOy), 0], [0, 1, 0, 0], [Math.sin(-this.angleOy), 0, Math.cos(-this.angleOy), 1], [0, 0, 0, 1]];
+	if(null === this.matrixRotateOy)
+	{
+		this.matrixRotateOy = new Matrix4D()/*[[Math.cos(-this.angleOy), 0, -Math.sin(-this.angleOy), 0], [0, 1, 0, 0], [Math.sin(-this.angleOy), 0, Math.cos(-this.angleOy), 1], [0, 0, 0, 1]]*/;
+		
+		var cos = Math.cos(-this.angleOy);
+		var sin = Math.sin(-this.angleOy);
+		
+		this.matrixRotateOy.a11 =  cos;
+		this.matrixRotateOy.a13 = -sin;
+		this.matrixRotateOy.a31 =  sin;
+		this.matrixRotateOy.a33 =  cos;
+		this.matrixRotateOy.a34 =  1;
+	}
+	
+	return this.matrixRotateOy;
+};
+
+Processor3D.prototype._getMatrixRotateAllAxis2 = function()
+{
+	var matrixRotateOY = this._getMatrixRotateOy2();
+	var matrixRotateOX = this._getMatrixRotateOx2();
+	
+	/*итоговая матрица
+	
+	|cosOy               0           sinOy      0|
+	|sinOx * sinOy     cosOx    -sinOx * cosOy  0|
+	|-sinOy * cosOx     sinOx     cosOy * cosOx  0|
+	|-sinOy              0        (cosOy + 1)   1|*/
+	
+	if(!this.matrixRotateAllAxis2)
+	{
+		this.matrixRotateAllAxis2 = Point3D.prototype.multiplyMatrix(matrixRotateOY, matrixRotateOX);
+	}
+	
+	return this.matrixRotateAllAxis2;
+};
+
+Processor3D.prototype._getMatrixRotateOx2 = function()
+{
+	//todo посмотреть возможность заменить массивы на Float32Array
+	if(!this.matrixRotateOx2)
+	{
+		this.matrixRotateOx2 = [[1, 0, 0, 0], [0, Math.cos(-this.angleOx), Math.sin(-this.angleOx), 0], [0, - Math.sin(-this.angleOx), Math.cos(-this.angleOx), 1], [0, 0, 0, 1]];
+	}
+	
+	return this.matrixRotateOx2;
+};
+
+Processor3D.prototype._getMatrixRotateOy2 = function()
+{
+	if(!this.matrixRotateOy2)
+	{
+		this.matrixRotateOy2 = [[Math.cos(-this.angleOy), 0, -Math.sin(-this.angleOy), 0], [0, 1, 0, 0], [Math.sin(-this.angleOy), 0, Math.cos(-this.angleOy), 1], [0, 0, 0, 1]];
+	}
+	
+	return this.matrixRotateOy2;
 };
 
 Processor3D.prototype._getMatrixRotateOz = function()
@@ -722,6 +874,23 @@ Processor3D.prototype._getMatrixRotateOz = function()
 };
 
 Processor3D.prototype._getPerspectiveProjectionMatrix = function(fov)
+{
+	/*var zf = this.rPerspective + this.depthPerspective;
+	var zn = this.rPerspective;
+	var q = zf / (zf - zn);
+	return [[1 / Math.tan(this.rPerspective / 2), 0, 0, 0], [0, 1 / Math.tan(this.rPerspective / 2), 0, 0], [0, 0, q, 1], [0, 0, -q * zn, 0]];*/
+	//[[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1 / fov], [0, 0, 0, 1]]
+	if(null === this.projectMatrix)
+	{
+		this.projectMatrix = new Matrix4D();
+		this.projectMatrix.a33 = 0;
+		this.projectMatrix.a34 = 1 / fov;
+	}
+	
+	return this.projectMatrix;
+};
+
+Processor3D.prototype._getPerspectiveProjectionMatrix2 = function(fov)
 {
 	/*var zf = this.rPerspective + this.depthPerspective;
 	var zn = this.rPerspective;
@@ -993,6 +1162,12 @@ Processor3D.prototype._calculateDepthPerspective = function()
 	var gapWidth = this.chartSpace.chart.plotArea.chart.gapWidth != null ? (this.chartSpace.chart.plotArea.chart.gapWidth / 100) : (150 / 100);
 	var gapDepth = this.chartSpace.chart.plotArea.chart.gapDepth != null ? (this.chartSpace.chart.plotArea.chart.gapDepth / 100) : (150 / 100);
 	
+	if(AscFormat.c_oChartTypes.Area === this.chartsDrawer.calcProp.type)
+	{
+		gapWidth = 0;
+		gapDepth = 0;
+	}
+	
 	var baseDepth = width / (seriesCount - (seriesCount - 1) * overlap + gapWidth);
 	if(this.chartsDrawer.calcProp.subType == "standard" || this.chartsDrawer.calcProp.type == AscFormat.c_oChartTypes.Line || isNormalArea)
 		baseDepth = (width / (seriesCount - (seriesCount - 1) * overlap + gapWidth)) * seriesCount;
@@ -1073,14 +1248,30 @@ Processor3D.prototype._calculateCameraDiff = function (/*isSkip*/)
 	//add test points for parallelepiped rect
 	var points = [];
 	var faces = [];
-	points.push(new Point3D(this.left, this.top, perspectiveDepth, this));
-	points.push(new Point3D(this.left, heightChart + this.top, perspectiveDepth, this));
-	points.push(new Point3D(originalWidthChart + this.left, heightChart + this.top, perspectiveDepth, this));
-	points.push(new Point3D(originalWidthChart + this.left, this.top, perspectiveDepth, this));
-	points.push(new Point3D(originalWidthChart + this.left, this.top, 0, this));
-	points.push(new Point3D(originalWidthChart + this.left, heightChart + this.top, 0, this));
-	points.push(new Point3D(this.left, heightChart + this.top, 0, this));
-	points.push(new Point3D(this.left, this.top, 0, this));
+	
+	/*if(AscFormat.c_oChartTypes.Pie === this.chartsDrawer.calcProp.type)
+	{
+		points.push(new Point3D(this.left + originalWidthChart / 2, this.top, perspectiveDepth, this));
+		points.push(new Point3D(this.left, this.top, perspectiveDepth / 2, this));
+		points.push(new Point3D(this.left + originalWidthChart, this.top, perspectiveDepth / 2, this));
+		points.push(new Point3D(this.left + originalWidthChart / 2, this.top, 0, this));
+		
+		points.push(new Point3D(this.left + originalWidthChart / 2, this.top + heightChart, perspectiveDepth, this));
+		points.push(new Point3D(this.left, this.top + heightChart, perspectiveDepth / 2, this));
+		points.push(new Point3D(this.left + originalWidthChart, this.top + heightChart, perspectiveDepth / 2, this));
+		points.push(new Point3D(this.left + originalWidthChart / 2, this.top + heightChart, 0, this));
+	}
+	else
+	{*/
+		points.push(new Point3D(this.left, this.top, perspectiveDepth, this));
+		points.push(new Point3D(this.left, heightChart + this.top, perspectiveDepth, this));
+		points.push(new Point3D(originalWidthChart + this.left, heightChart + this.top, perspectiveDepth, this));
+		points.push(new Point3D(originalWidthChart + this.left, this.top, perspectiveDepth, this));
+		points.push(new Point3D(originalWidthChart + this.left, this.top, 0, this));
+		points.push(new Point3D(originalWidthChart + this.left, heightChart + this.top, 0, this));
+		points.push(new Point3D(this.left, heightChart + this.top, 0, this));
+		points.push(new Point3D(this.left, this.top, 0, this));
+	//}
 	
 	faces.push([0,1,2,3]);
 	faces.push([2,5,4,3]);
@@ -1335,6 +1526,7 @@ Processor3D.prototype.checkOutSideArea = function(newPoints)
 		}
 	};
 	
+	calculateZ(100);
 	calculateZ(10);
 	calculateZ(1);
 	
@@ -2345,6 +2537,8 @@ function Point3D(x, y, z, chartsDrawer)
 	this.x = x;
 	this.y = y;
 	this.z = z;
+	this.t = 1;
+	
 	if(chartsDrawer)
 	{
 		this.chartProp = chartsDrawer.calcProp;
@@ -2384,11 +2578,11 @@ Point3D.prototype =
 	project: function(matrix)
 	{
 		//умножаем
-		var projectPoint = this.multiplyPointOnMatrix(matrix);
+		var projectPoint = matrix.multiplyPoint(this);
 		
 		//делим на 4 коэффициэнт
-		var newX = projectPoint[0][0] / projectPoint[0][3];
-		var newY = projectPoint[0][1] / projectPoint[0][3];
+		var newX = projectPoint.x / projectPoint.t;
+		var newY = projectPoint.y / projectPoint.t;
 		
 		this.x = newX;
 		this.y = newY;
@@ -2414,24 +2608,25 @@ Point3D.prototype =
 		return this;
 	},
 	
-	multiplyPointOnMatrix: function(matrix)
-	{
-		var pointMatrix = [[this.x, this.y, this.z, 1]];
-		
-		return this.multiplyMatrix(pointMatrix , matrix);
-	},
-	
 	multiplyPointOnMatrix1: function(matrix)
 	{
+		var multiplyMatrix = matrix.multiplyPoint(this);
+		this.x = multiplyMatrix.x;
+		this.y = multiplyMatrix.y;
+		this.z = multiplyMatrix.z;
+	},
+	
+	multiplyPointOnMatrix12: function(matrix)
+	{
 		var pointMatrix = [[this.x, this.y, this.z, 1]];
 		
-		var multiplyMatrix = this.multiplyMatrix(pointMatrix , matrix);
+		var multiplyMatrix = this.multiplyMatrix(pointMatrix , matrix, true);
 		this.x = multiplyMatrix[0][0];
 		this.y = multiplyMatrix[0][1];
 		this.z = multiplyMatrix[0][2];
 	},
 	
-	multiplyMatrix: function(A, B)
+	multiplyMatrix2: function(A, B)
 	{
 		var rowsA = A.length, colsA = A[0].length,
 			rowsB = B.length, colsB = B[0].length,
@@ -2456,8 +2651,153 @@ Point3D.prototype =
 		 }
 
 		return C;
+	},
+	
+	multiplyMatrix: function(A, B, pointOnMatrtix)
+	{	
+		var C = [];
+		
+		if(!pointOnMatrtix)
+		{
+			C[0] = [];
+			C[0][0] = A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0] + A[0][3] * B[3][0];
+			C[0][1] = A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1] + A[0][3] * B[3][1];
+			C[0][2] = A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2] + A[0][3] * B[3][2];
+			C[0][3] = A[0][0] * B[0][3] + A[0][1] * B[1][3] + A[0][2] * B[2][3] + A[0][3] * B[3][3];
+			
+			C[1] = [];
+			C[1][0] = A[1][0] * B[0][0] + A[1][1] * B[1][0] + A[1][2] * B[2][0] + A[1][3] * B[3][0];
+			C[1][1] = A[1][0] * B[0][1] + A[1][1] * B[1][1] + A[1][2] * B[2][1] + A[1][3] * B[3][1];
+			C[1][2] = A[1][0] * B[0][2] + A[1][1] * B[1][2] + A[1][2] * B[2][2] + A[1][3] * B[3][2];
+			C[1][3] = A[1][0] * B[0][3] + A[1][1] * B[1][3] + A[1][2] * B[2][3] + A[1][3] * B[3][3];
+			
+			C[2] = [];
+			C[2][0] = A[2][0] * B[0][0] + A[2][1] * B[1][0] + A[2][2] * B[2][0] + A[2][3] * B[3][0];
+			C[2][1] = A[2][0] * B[0][1] + A[2][1] * B[1][1] + A[2][2] * B[2][1] + A[2][3] * B[3][1];
+			C[2][2] = A[2][0] * B[0][2] + A[2][1] * B[1][2] + A[2][2] * B[2][2] + A[2][3] * B[3][2];
+			C[2][3] = A[2][0] * B[0][3] + A[2][1] * B[1][3] + A[2][2] * B[2][3] + A[2][3] * B[3][3];
+			
+			C[3] = [];
+			C[3][0] = A[3][0] * B[0][0] + A[3][1] * B[1][0] + A[3][2] * B[2][0] + A[3][3] * B[3][0];
+			C[3][1] = A[3][0] * B[0][1] + A[3][1] * B[1][1] + A[3][2] * B[2][1] + A[3][3] * B[3][1];
+			C[3][2] = A[3][0] * B[0][2] + A[3][1] * B[1][2] + A[3][2] * B[2][2] + A[3][3] * B[3][2];
+			C[3][3] = A[3][0] * B[0][3] + A[3][1] * B[1][3] + A[3][2] * B[2][3] + A[3][3] * B[3][3];
+		}
+		else
+		{
+			C[0] = [];
+			C[0][0] = A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0] + A[0][3] * B[3][0];
+			C[0][1] = A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1] + A[0][3] * B[3][1];
+			C[0][2] = A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2] + A[0][3] * B[3][2];
+			C[0][3] = A[0][0] * B[0][3] + A[0][1] * B[1][3] + A[0][2] * B[2][3] + A[0][3] * B[3][3];
+			
+			C[1] = [];
+			C[1][0] = B[0][0] + B[1][0] + B[2][0] + B[3][0];
+			C[1][1] = B[0][1] + B[1][1] + B[2][1] + B[3][1];
+			C[1][2] = B[0][2] + B[1][2] + B[2][2] + B[3][2];
+			C[1][3] = B[0][3] + B[1][3] + B[2][3] + B[3][3];
+			
+			C[2] = [];
+			C[2][0] = B[0][0] + B[1][0] + B[2][0] + B[3][0];
+			C[2][1] = B[0][1] + B[1][1] + B[2][1] + B[3][1];
+			C[2][2] = B[0][2] + B[1][2] + B[2][2] + B[3][2];
+			C[2][3] = B[0][3] + B[1][3] + B[2][3] + B[3][3];
+			
+			C[3] = [];
+			C[3][0] = B[0][0] + B[1][0] + B[2][0] + B[3][0];
+			C[3][1] = B[0][1] + B[1][1] + B[2][1] + B[3][1];
+			C[3][2] = B[0][2] + B[1][2] + B[2][2] + B[3][2];
+			C[3][3] = B[0][3] + B[1][3] + B[2][3] + B[3][3];
+		}
+		
+		return C;
 	}
 };
+
+function Matrix4D() 
+{
+	this.a11 = 1.0;
+	this.a12 = 0.0;
+	this.a13 = 0.0;
+	this.a14 = 0.0;
+	
+	this.a21 = 0.0;
+	this.a22 = 1.0;
+	this.a23 = 0.0;
+	this.a24 = 0.0;
+	
+	this.a31 = 0.0;
+	this.a32 = 0.0;
+	this.a33 = 1.0;
+	this.a34 = 0.0;
+	
+	this.a41 = 0.0;
+	this.a42 = 0.0;
+	this.a43 = 0.0;
+	this.a44 = 1.0;
+
+	return this;
+}
+Matrix4D.prototype.reset = function () 
+{
+	this.a11 = 1.0;
+	this.a12 = 0.0;
+	this.a13 = 0.0;
+	this.a14 = 0.0;
+	
+	this.a21 = 0.0;
+	this.a22 = 1.0;
+	this.a23 = 0.0;
+	this.a24 = 0.0;
+	
+	this.a31 = 0.0;
+	this.a32 = 0.0;
+	this.a33 = 1.0;
+	this.a34 = 0.0;
+	
+	this.a41 = 0.0;
+	this.a42 = 0.0;
+	this.a43 = 0.0;
+	this.a44 = 1.0;
+};
+Matrix4D.prototype.multiply = function (m) 
+{
+	var res = new Matrix4D();
+	
+	res.a11 = this.a11 * m.a11 + this.a12 * m.a21 + this.a13 * m.a31 + this.a14 * m.a41;
+	res.a12 = this.a11 * m.a12 + this.a12 * m.a22 + this.a13 * m.a32 + this.a14 * m.a42;
+	res.a13 = this.a11 * m.a13 + this.a12 * m.a23 + this.a13 * m.a33 + this.a14 * m.a43;
+	res.a14 = this.a11 * m.a14 + this.a12 * m.a24 + this.a13 * m.a34 + this.a14 * m.a44;
+	
+	res.a21 = this.a21 * m.a11 + this.a22 * m.a21 + this.a23 * m.a31 + this.a24 * m.a41;
+	res.a22 = this.a21 * m.a12 + this.a22 * m.a22 + this.a23 * m.a32 + this.a24 * m.a42;
+	res.a23 = this.a21 * m.a13 + this.a22 * m.a23 + this.a23 * m.a33 + this.a24 * m.a43;
+	res.a24 = this.a21 * m.a14 + this.a22 * m.a24 + this.a23 * m.a34 + this.a24 * m.a44;
+	
+	res.a31 = this.a31 * m.a11 + this.a32 * m.a21 + this.a33 * m.a31 + this.a34 * m.a41;
+	res.a32 = this.a31 * m.a12 + this.a32 * m.a22 + this.a33 * m.a32 + this.a34 * m.a42;
+	res.a33 = this.a31 * m.a13 + this.a32 * m.a23 + this.a33 * m.a33 + this.a34 * m.a43;
+	res.a34 = this.a31 * m.a14 + this.a32 * m.a24 + this.a33 * m.a34 + this.a34 * m.a44;
+	
+	res.a41 = this.a41 * m.a11 + this.a42 * m.a21 + this.a43 * m.a31 + this.a44 * m.a41;
+	res.a42 = this.a41 * m.a12 + this.a42 * m.a22 + this.a43 * m.a32 + this.a44 * m.a42;
+	res.a43 = this.a41 * m.a13 + this.a42 * m.a23 + this.a43 * m.a33 + this.a44 * m.a43;
+	res.a44 = this.a41 * m.a14 + this.a42 * m.a24 + this.a43 * m.a34 + this.a44 * m.a44;
+	
+	return res;
+};
+Matrix4D.prototype.multiplyPoint = function (p) 
+{
+	var res = new Point3D();
+	
+	res.x = p.x * this.a11 + p.y * this.a21 + p.z * this.a31 + this.a41;
+	res.y = p.x * this.a12 + p.y * this.a22 + p.z * this.a32 + this.a42;
+	res.z = p.x * this.a13 + p.y * this.a23 + p.z * this.a33 + this.a43;
+	res.t = p.x * this.a14 + p.y * this.a24 + p.z * this.a34 + this.a44;
+	
+	return res;
+};
+
 
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscFormat'] = window['AscFormat'] || {};

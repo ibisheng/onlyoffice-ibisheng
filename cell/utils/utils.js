@@ -278,6 +278,8 @@
 			return normalize ? this.normalize() : this;
 		};
 		Range.prototype.assign2 = function (range) {
+			this.refType1 = range.refType1;
+			this.refType2 = range.refType2;
 			return this.assign(range.c1, range.r1, range.c2, range.r2);
 		};
 
@@ -362,6 +364,120 @@
 			return bRes;
 		};
 
+		Range.prototype.isIntersectForShift = function(range, offset) {
+			var isHor = offset && 0 != offset.offsetCol;
+			var toDelete = offset && (offset.offsetCol < 0 || offset.offsetRow < 0);
+			if (isHor) {
+				if (this.r1 <= range.r1 && range.r2 <= this.r2 && this.c1 <= range.c2) {
+					return true;
+				} else if (toDelete && this.c1 <= range.c1 && range.c2 <= this.c2) {
+					var topIn = this.r1 <= range.r1 && range.r1 <= this.r2;
+					var bottomIn = this.r1 <= range.r2 && range.r2 <= this.r2;
+					return topIn || bottomIn;
+				} else {
+					return false;
+				}
+			} else {
+				if (this.c1 <= range.c1 && range.c2 <= this.c2 && this.r1 <= range.r2) {
+					return true;
+				} else if (toDelete && this.r1 <= range.r1 && range.r2 <= this.r2) {
+					var leftIn = this.c1 <= range.c1 && range.c1 <= this.c2;
+					var rightIn = this.c1 <= range.c2 && range.c2 <= this.c2;
+					return leftIn || rightIn;
+				} else {
+					return false;
+				}
+			}
+		};
+
+		Range.prototype.isIntersectForShiftCell = function(col, row, offset) {
+			var isHor = offset && 0 != offset.offsetCol;
+			if (isHor) {
+				return this.r1 <= row && row <= this.r2 && this.c1 <= col;
+			} else {
+				return this.c1 <= col && col <= this.c2 && this.r1 <= row;
+			}
+		};
+
+		Range.prototype.forShift = function(bbox, offset, bUndo) {
+			var isNoDelete = true;
+			var isHor = 0 != offset.offsetCol;
+			var toDelete = offset.offsetCol < 0 || offset.offsetRow < 0;
+
+			if (isHor) {
+				if (toDelete) {
+					if (this.c1 < bbox.c1) {
+						if (this.c2 <= bbox.c2) {
+							this.setOffsetLast({offsetCol: -(this.c2 - bbox.c1 + 1), offsetRow: 0});
+						} else {
+							this.setOffsetLast(offset);
+						}
+					} else if (this.c1 <= bbox.c2) {
+						if (this.c2 <= bbox.c2) {
+							if(!bUndo){
+								var topIn = bbox.r1 <= this.r1 && this.r1 <= bbox.r2;
+								var bottomIn = bbox.r1 <= this.r2 && this.r2 <= bbox.r2;
+								if (topIn && bottomIn) {
+									isNoDelete = false;
+								} else if (topIn) {
+									this.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r2 - this.r1 + 1});
+								} else if (bottomIn) {
+									this.setOffsetLast({offsetCol: 0, offsetRow: bbox.r1 - this.r2 - 1});
+								}
+							}
+						} else {
+							this.setOffsetFirst({offsetCol: bbox.c1 - this.c1, offsetRow: 0});
+							this.setOffsetLast(offset);
+						}
+					} else {
+						this.setOffset(offset);
+					}
+				} else {
+					if (this.c1 < bbox.c1) {
+						this.setOffsetLast(offset);
+					} else {
+						this.setOffset(offset);
+					}
+				}
+			} else {
+				if (toDelete) {
+					if (this.r1 < bbox.r1) {
+						if (this.r2 <= bbox.r2) {
+							this.setOffsetLast({offsetCol: 0, offsetRow: -(this.r2 - bbox.r1 + 1)});
+						} else {
+							this.setOffsetLast(offset);
+						}
+					} else if (this.r1 <= bbox.r2) {
+						if (this.r2 <= bbox.r2) {
+							if(!bUndo) {
+								var leftIn = bbox.c1 <= this.c1 && this.c1 <= bbox.c2;
+								var rightIn = bbox.c1 <= this.c2 && this.c2 <= bbox.c2;
+								if (leftIn && rightIn) {
+									isNoDelete = false;
+								} else if (leftIn) {
+									this.setOffsetFirst({offsetCol: bbox.c2 - this.c1 + 1, offsetRow: 0});
+								} else if (rightIn) {
+									this.setOffsetLast({offsetCol: bbox.c1 - this.c2 - 1, offsetRow: 0});
+								}
+							}
+						} else {
+							this.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r1 - this.r1});
+							this.setOffsetLast(offset);
+						}
+					} else {
+						this.setOffset(offset);
+					}
+				} else {
+					if (this.r1 < bbox.r1) {
+						this.setOffsetLast(offset);
+					} else {
+						this.setOffset(offset);
+					}
+				}
+			}
+			return isNoDelete;
+		};
+
 		Range.prototype.isOneCell = function () {
 			return this.r1 === this.r2 && this.c1 === this.c2;
 		};
@@ -380,6 +496,93 @@
 			this.r2 = Math.max(this.r2, range.r2);
 		};
 
+		Range.prototype.union3 = function (c, r) {
+			this.c1 = Math.min(this.c1, c);
+			this.c2 = Math.max(this.c2, c);
+			this.r1 = Math.min(this.r1, r);
+			this.r2 = Math.max(this.r2, r);
+		};
+		Range.prototype.setOffsetWithAbs = function(offset) {
+			var temp;
+			var offsetRow = offset.offsetRow;
+			var offsetCol = offset.offsetCol;
+			if (0 === this.r1 && gc_nMaxRow0 === this.r2) {
+				//full sheet is 1:1048576 but offsetRow is valid for it
+				offsetRow = 0;
+			} else if (0 === this.c1 && gc_nMaxCol0 === this.c2) {
+				offsetCol = 0;
+			}
+			var isAbsRow1 = this.isAbsRow(this.refType1);
+			var isAbsCol1 = this.isAbsCol(this.refType1);
+			var isAbsRow2 = this.isAbsRow(this.refType2);
+			var isAbsCol2 = this.isAbsCol(this.refType2);
+			if (!isAbsRow1) {
+				this.r1 += offsetRow;
+				if (this.r1 < 0) {
+					this.r1 = 0;
+					return false;
+				}
+				if (this.r1 > gc_nMaxRow0) {
+					this.r1 = gc_nMaxRow0;
+					return false;
+				}
+			}
+			if (!isAbsCol1) {
+				this.c1 += offsetCol;
+				if (this.c1 < 0) {
+					this.c1 = 0;
+					return false;
+				}
+				if (this.c1 > gc_nMaxCol0) {
+					this.c1 = gc_nMaxCol0;
+					return false;
+				}
+			}
+			if (!isAbsRow2) {
+				this.r2 += offsetRow;
+				if (this.r2 < 0) {
+					this.r2 = 0;
+					return false;
+				}
+				if (this.r2 > gc_nMaxRow0) {
+					this.r2 = gc_nMaxRow0;
+					return false;
+				}
+			}
+			if (!isAbsCol2) {
+				this.c2 += offsetCol;
+				if (this.c2 < 0) {
+					this.c2 = 0;
+					return false;
+				}
+				if (this.c2 > gc_nMaxCol0) {
+					this.c2 = gc_nMaxCol0;
+					return false;
+				}
+			}
+			//switch abs flag
+			if (this.r1 > this.r2) {
+				temp = this.r1;
+				this.r1 = this.r2;
+				this.r2 = temp;
+				if (!isAbsRow1 && isAbsRow2) {
+					isAbsRow1 = !isAbsRow1;
+					isAbsRow2 = !isAbsRow2;
+					this.setAbs(isAbsRow1, isAbsCol1, isAbsRow2, isAbsCol2);
+				}
+			}
+			if (this.c1 > this.c2) {
+				temp = this.c1;
+				this.c1 = this.c2;
+				this.c2 = temp;
+				if (!isAbsCol1 && isAbsCol2) {
+					isAbsCol1 = !isAbsCol1;
+					isAbsCol2 = !isAbsCol2;
+					this.setAbs(isAbsRow1, isAbsCol1, isAbsRow2, isAbsCol2);
+				}
+			}
+			return true;
+		};
 		Range.prototype.setOffset = function (offset) {
 			if (this.r1 == 0 && this.r2 == gc_nMaxRow0 && offset.offsetRow != 0 ||
 				this.c1 == 0 && this.c2 == gc_nMaxCol0 && offset.offsetCol != 0) {
@@ -455,7 +658,7 @@
 					sRes += "$";
 				}
 				sRes += (this.r1 + 1);
-				if (!this.isOneCell()) {
+				if (!this.isOneCell() || r1Abs !== r2Abs || c1Abs !== c2Abs) {
 					sRes += ":";
 					if (c2Abs) {
 						sRes += "$";
@@ -674,6 +877,55 @@
 			this.getLast().assign2(range);
 			this.update();
 		};
+		SelectionRange.prototype.union = function (range) {
+			var res = this.ranges.some(function (item) {
+				var success = false;
+				if (item.c1 === range.c1 && item.c2 === range.c2) {
+					if (range.r1 === item.r2 + 1) {
+						item.r2 = range.r2;
+						success = true;
+					} else if (range.r2 === item.r1 - 1) {
+						item.r1 = range.r1;
+						success = true;
+					}
+				} else if (item.r1 === range.r1 && item.r2 === range.r2) {
+					if (range.c1 === item.c2 + 1) {
+						item.c2 = range.c2;
+						success = true;
+					} else if (range.c2 === item.c1 - 1) {
+						item.c1 = range.c1;
+						success = true;
+					}
+				}
+				return success;
+			});
+			if (!res) {
+				this.addRange();
+				this.getLast().assign2(range);
+			}
+		};
+		SelectionRange.prototype.getUnion = function () {
+			var result = new SelectionRange();
+			var unionRanges = function (ranges, res) {
+				ranges.forEach(function (item, i) {
+					if (0 === i) {
+						res.assign2(item);
+					} else {
+						res.union(item);
+					}
+				});
+			};
+			unionRanges(this.ranges, result);
+
+			var isUnion = true, resultTmp;
+			while (isUnion && !result.isSingleRange()) {
+				resultTmp = new SelectionRange();
+				unionRanges(result.ranges, resultTmp);
+				isUnion = result.ranges.length !== resultTmp.ranges.length;
+				result = resultTmp;
+			}
+			return result;
+		};
 		SelectionRange.prototype.offsetCell = function (dr, dc, fCheckSize) {
 			var done, curRange, mc;
 			var lastRow = this.activeCell.row;
@@ -879,6 +1131,11 @@
 		};
 		ActiveRange.prototype.union2 = function () {
 			ActiveRange.superclass.union2.apply(this, arguments);
+			this._updateAdditionalData();
+			return this;
+		};
+		ActiveRange.prototype.union3 = function () {
+			ActiveRange.superclass.union3.apply(this, arguments);
 			this._updateAdditionalData();
 			return this;
 		};
@@ -1235,7 +1492,7 @@
 		function isFixedWidthCell(frag) {
 			for (var i = 0; i < frag.length; ++i) {
 				var f = frag[i].format;
-				if (f && f.repeat) {return true;}
+				if (f && f.getRepeat()) {return true;}
 			}
 			return false;
 		}
@@ -1519,14 +1776,8 @@
 			this["r2"] = r2;
 		}
 
-		var g_oCSheetViewSettingsProperties = {
-				showGridLines		: 0,
-				showRowColHeaders	: 1
-			};
 		/** @constructor */
 		function asc_CSheetViewSettings () {
-			this.Properties = g_oCSheetViewSettingsProperties;
-
 			// Показывать ли сетку
 			this.showGridLines = null;
 			// Показывать обозначения строк и столбцов
@@ -1552,33 +1803,11 @@
 				return this.asc_getShowGridLines() === settings.asc_getShowGridLines() &&
 					this.asc_getShowRowColHeaders() === settings.asc_getShowRowColHeaders();
 			},
-			setSettings: function (settings) {
-				this.showGridLines = settings.showGridLines;
-				this.showRowColHeaders = settings.showRowColHeaders;
-			},
 			asc_getShowGridLines: function () { return false !== this.showGridLines; },
 			asc_getShowRowColHeaders: function () { return false !== this.showRowColHeaders; },
 			asc_getIsFreezePane: function () { return null !== this.pane && this.pane.isInit(); },
 			asc_setShowGridLines: function (val) { this.showGridLines = val; },
-			asc_setShowRowColHeaders: function (val) { this.showRowColHeaders = val; },
-			getType : function () {
-				return AscCommonExcel.UndoRedoDataTypes.SheetViewSettings;
-			},
-			getProperties : function () {
-				return this.Properties;
-			},
-			getProperty : function (nType) {
-				switch (nType) {
-					case this.Properties.showGridLines: return this.showGridLines;break;
-					case this.Properties.showRowColHeaders: return this.showRowColHeaders;break;
-				}
-			},
-			setProperty : function (nType, value) {
-				switch (nType) {
-					case this.Properties.showGridLines: this.showGridLines = value;break;
-					case this.Properties.showRowColHeaders: this.showRowColHeaders = value;break;
-				}
-			}
+			asc_setShowRowColHeaders: function (val) { this.showRowColHeaders = val; }
 		};
 
 		/** @constructor */
@@ -1628,12 +1857,12 @@
 
 
     /** @constructor */
-    function asc_CStylesPainter() {
+    function asc_CStylesPainter(width, height) {
       this.defaultStyles = null;
       this.docStyles = null;
 
-      this.styleThumbnailWidth = 112;
-      this.styleThumbnailHeight = 38;
+      this.styleThumbnailWidth = width;
+      this.styleThumbnailHeight = height;
       this.styleThumbnailWidthPt = this.styleThumbnailWidth * 72 / 96;
       this.styleThumbnailHeightPt = this.styleThumbnailHeight * 72 / 96;
 
@@ -1734,8 +1963,10 @@
         var fc = oStyle.getFontColor();
         var oFontColor = fc !== null ? fc : new AscCommon.CColor(0, 0, 0);
         var format = oStyle.getFont();
+        var fs = format.getSize();
         // Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
-        var oFont = new Asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs, format.b, format.i, format.u, format.s);
+		var oFont = new Asc.FontProperties(format.getName(), (16 < fs) ? 16 : fs,
+			format.getBold(), format.getItalic(), format.getUnderline(), format.getStrikeout());
 
         var width_padding = 3; // 4 * 72 / 96
 
@@ -1828,6 +2059,7 @@
 			this.countFindAll = 0;
 			this.countReplaceAll = 0;
 			this.sheetIndex = -1;
+			this.error = false;
 		}
 		asc_CFindOptions.prototype.clone = function () {
 			var result = new asc_CFindOptions();
@@ -1849,6 +2081,7 @@
 			result.countFindAll = this.countFindAll;
 			result.countReplaceAll = this.countReplaceAll;
 			result.sheetIndex = this.sheetIndex;
+			result.error = this.error;
 			return result;
 		};
 		asc_CFindOptions.prototype.isEqual = function (obj) {
@@ -1860,6 +2093,7 @@
 		asc_CFindOptions.prototype.clearFindAll = function () {
 			this.countFindAll = 0;
 			this.countReplaceAll = 0;
+			this.error = false;
 		};
 		asc_CFindOptions.prototype.updateFindAll = function () {
 			this.countFindAll += this.countFind;
@@ -1888,12 +2122,13 @@
 			this.cache = {};
 		}
 		CCacheMeasureEmpty.prototype.add = function (elem, val) {
-			var font = (this.cache[elem.fn] || (this.cache[elem.fn] = {}));
-			font[elem.fs] = val;
+			var fn = elem.getName();
+			var font = (this.cache[fn] || (this.cache[fn] = {}));
+			font[elem.getSize()] = val;
 		};
 		CCacheMeasureEmpty.prototype.get = function (elem) {
-			var font = this.cache[elem.fn];
-			return font ? font[elem.fs] : null;
+			var font = this.cache[elem.getName()];
+			return font ? font[elem.getSize()] : null;
 		};
 		var g_oCacheMeasureEmpty = new CCacheMeasureEmpty();
 
