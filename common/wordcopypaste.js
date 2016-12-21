@@ -3643,6 +3643,7 @@ PasteProcessor.prototype =
 	_convertTableFromExcel: function(aContentExcel)
 	{
 		var worksheet = aContentExcel.workbook.aWorksheets[0];
+		var pasteRange = AscCommonExcel.g_oRangeCache.getAscRange(aContentExcel.activeRange);
 		var rows = worksheet._getRows(), range;
 		var tempActiveRef = aContentExcel.activeRange;
 		var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(tempActiveRef);
@@ -3782,16 +3783,14 @@ PasteProcessor.prototype =
 				for(var n = 0; n < value2.length; n++)
 				{
 					var oCurRun = new ParaRun(oCurPar);
-					var format = value2[n].format;
 					
 					//***text property***
-					oCurRun.Pr.Bold = format.getBold();
-					var fc = format.getColor();
-					if(fc)
-						oCurRun.Pr.Color = new CDocumentColor(fc.getR(), fc.getG(), fc.getB());
+					oCurRun.Pr.Bold = value2[n].format.b;
+					if(value2[n].format.c)
+						oCurRun.Pr.Color = new CDocumentColor(value2[n].format.c.getR(), value2[n].format.c.getG(), value2[n].format.c.getB());
 					
 					//font					
-					var font_family = format.getName();
+					var font_family = value2[n].format.fn;
 					addFont(font_family);
 					oCurRun.Pr.FontFamily = font_family;
 					var oFontItem = this.oFonts[font_family];
@@ -3803,10 +3802,10 @@ PasteProcessor.prototype =
 						oCurRun.Pr.RFonts.EastAsia = {Name: oFontItem.Name, Index: oFontItem.Index};
 					}
 					
-					oCurRun.Pr.FontSize = format.getSize();
-					oCurRun.Pr.Italic = format.getItalic();
-					oCurRun.Pr.Strikeout = format.getStrikeout();
-					oCurRun.Pr.Underline = format.getUnderline() !== 2 ? true : false;
+					oCurRun.Pr.FontSize = value2[n].format.fs;
+					oCurRun.Pr.Italic = value2[n].format.i;
+					oCurRun.Pr.Strikeout = value2[n].format.s;
+					oCurRun.Pr.Underline = value2[n].format.u === 3 ? true : false;
 					
 					//text
 					var value = value2[n].text;
@@ -4050,7 +4049,7 @@ PasteProcessor.prototype =
         tempWorkbook.theme = this.oDocument.theme ? this.oDocument.theme : this.oLogicDocument.theme;
 		if(!tempWorkbook.theme && this.oLogicDocument.themes && this.oLogicDocument.themes[0])
 			tempWorkbook.theme = this.oLogicDocument.themes[0];
-
+		
 		Asc.getBinaryOtherTableGVar(tempWorkbook);
 		
 		pptx_content_loader.Start_UseFullUrl();
@@ -4175,13 +4174,7 @@ PasteProcessor.prototype =
 			if(style_index != null && arr_shapes[i].Drawing.graphicObject && arr_shapes[i].Drawing.graphicObject.Set_TableStyle)
 			{
 				if(!PasteElementsId.g_bIsDocumentCopyPaste)
-				{
-					//TODO продумать добавления нового стиля(ReadTableStyle->получуть id нового стиля, сравнить новый стиль со всеми присутвующими.если нет - добавить и сделать Set_TableStyle(id))
-					if(presentation.TableStylesIdMap[style_index])
-					{
-						arr_shapes[i].Drawing.graphicObject.Set_TableStyle(style_index, true);
-					}
-				}	
+					arr_shapes[i].Drawing.graphicObject.Set_TableStyle(style_index, true);
 				else if(cStyle)
 				{
 					//пока не применяем стили, посольку они отличаются
@@ -6019,7 +6012,7 @@ PasteProcessor.prototype =
 					//TODO пересмотреть! node.getAttribute("width") в FF возврашает "auto" -> изображения в FF не всталяются
 					if((!nWidth || !nHeight))
 					{
-						if(AscBrowser.isMozilla || AscBrowser.isIE)
+						if(AscBrowser.isMozilla)
 						{
 							nWidth = parseInt(node.width);
 							nHeight = parseInt(node.height);

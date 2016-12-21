@@ -856,7 +856,6 @@
 		}
 	};
 
-	/** @constructor */
 	function asc_CColor() {
 		this.type = c_oAscColor.COLOR_TYPE_SRGB;
 		this.value = null;
@@ -887,7 +886,7 @@
 	}
 
 	asc_CColor.prototype = {
-		constructor: asc_CColor, asc_getR: function () {
+		asc_getR: function () {
 			return this.r
 		}, asc_putR: function (v) {
 			this.r = v;
@@ -926,7 +925,8 @@
 			}
 			return this.hex;
 		}, asc_getColor: function () {
-			return new CColor(this.r, this.g, this.b);
+			var ret = new CColor(this.r, this.g, this.b);
+			return ret;
 		}, asc_putAuto: function (v) {
 			this.Auto = v;
 		}, asc_getAuto: function () {

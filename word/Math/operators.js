@@ -3769,76 +3769,76 @@ CDelimiter.prototype.getElementMathContent = function(Index)
 };
 CDelimiter.prototype.Apply_MenuProps = function(Props)
 {
-	var NewContent;
+    var NewContent;
 
-	if (Props.Type == Asc.c_oAscMathInterfaceType.Delimiter)
-	{
-		if (Props.HideBegOper !== undefined && Props.HideBegOper !== this.begOper.Is_Empty())
-		{
-			var BegOper = this.private_GetLeftOperator(Props.HideBegOper);
+    if(Props.Type == Asc.c_oAscMathInterfaceType.Delimiter)
+    {
+        if(Props.HideBegOper !== undefined && Props.HideBegOper !== this.begOper.Is_Empty())
+        {
+            var BegOper = this.private_GetLeftOperator(Props.HideBegOper);
 
-			History.Add(new CChangesMathDelimBegOper(this, this.Pr.begChr, BegOper));
-			this.raw_HideBegOperator(BegOper);
-		}
+            History.Add(this, new CChangesMathDelimBegOper(BegOper, this.Pr.begChr));
+            this.raw_HideBegOperator(BegOper);
+        }
 
-		if (Props.HideEndOper !== undefined && Props.HideEndOper !== this.endOper.Is_Empty())
-		{
-			var EndOper = this.private_GetRightOperator(Props.HideEndOper);
+        if(Props.HideEndOper !== undefined && Props.HideEndOper !== this.endOper.Is_Empty())
+        {
+            var EndOper = this.private_GetRightOperator(Props.HideEndOper);
 
-			History.Add(new CChangesMathDelimEndOper(this, this.Pr.endChr, EndOper));
-			this.raw_HideEndOperator(EndOper);
-		}
+            History.Add(this, new CChangesMathDelimEndOper(EndOper, this.Pr.endChr));
+            this.raw_HideEndOperator(EndOper);
+        }
 
-		if (Props.Grow !== undefined && Props.Grow !== this.Pr.grow)
-		{
-			History.Add(new CChangesMathDelimiterGrow(this, this.Pr.grow, Props.Grow));
-			this.raw_SetGrow(Props.Grow);
-		}
+        if(Props.Grow !== undefined && Props.Grow !== this.Pr.grow)
+        {
+            History.Add(this, new CChangesMathDelimiterGrow(Props.Grow, this.Pr.grow));
+            this.raw_SetGrow(Props.Grow);
+        }
 
-		if (Props.MatchBrackets !== undefined && this.Pr.grow == true)
-		{
-			var Shp = Props.MatchBrackets == true ? DELIMITER_SHAPE_MATCH : DELIMITER_SHAPE_CENTERED;
+        if(Props.MatchBrackets !== undefined && this.Pr.grow == true)
+        {
+            var Shp = Props.MatchBrackets == true ? DELIMITER_SHAPE_MATCH : DELIMITER_SHAPE_CENTERED ;
 
-			if (Shp !== this.Pr.shp)
-			{
-				History.Add(new CChangesMathDelimiterShape(this, this.Pr.shp, Shp));
-				this.raw_SetShape(Shp);
-			}
-		}
+            if(Shp !== this.Pr.shp)
+            {
+                History.Add(this, new CChangesMathDelimiterShape(Shp, this.Pr.shp));
+                this.raw_SetShape(Shp);
+            }
+        }
 
-		if (Props.Action & c_oMathMenuAction.DeleteDelimiterArgument)
-		{
-			if (this.Pr.column > 1)
-			{
-				History.Add(new CChangesMathDelimiterSetColumn(this, this.Pr.column, this.Pr.column - 1));
-				this.raw_SetColumn(this.Pr.column - 1);
+        if(Props.Action & c_oMathMenuAction.DeleteDelimiterArgument)
+        {
+            if(this.Pr.column > 1)
+            {
+                History.Add(this, new CChangesMathBaseSetColumn(this.Pr.column - 1, this.Pr.column));
+                this.raw_SetColumn(this.Pr.column - 1);
 
-				this.protected_RemoveItems(this.CurPos, [this.Content[this.CurPos]], true);
-			}
-		}
+                this.protected_RemoveItems(this.CurPos, [ this.Content[this.CurPos] ], true);
+            }
+        }
 
-		if (Props.Action & c_oMathMenuAction.InsertDelimiterArgument)
-		{
-			if (Props.Action & c_oMathMenuAction.InsertBefore)
-			{
-				History.Add(new CChangesMathDelimiterSetColumn(this, this.Pr.column, this.Pr.column + 1));
-				this.raw_SetColumn(this.Pr.column + 1);
+        if(Props.Action & c_oMathMenuAction.InsertDelimiterArgument)
+        {
+            if(Props.Action & c_oMathMenuAction.InsertBefore)
+            {
+                History.Add(this, new CChangesMathBaseSetColumn(this.Pr.column + 1, this.Pr.column));
+                this.raw_SetColumn(this.Pr.column + 1);
 
-				NewContent = new CMathContent();
-				NewContent.Correct_Content(true);
-				this.protected_AddToContent(this.CurPos, [NewContent], true);
-			}
-			else
-			{
-				History.Add(new CChangesMathDelimiterSetColumn(this, this.Pr.column, this.Pr.column + 1));
-				this.raw_SetColumn(this.Pr.column + 1);
+                NewContent = new CMathContent();
+                NewContent.Correct_Content(true);
+                this.protected_AddToContent(this.CurPos, [NewContent], true);
+            }
+            else
+            {
+                History.Add(this, new CChangesMathBaseSetColumn(this.Pr.column + 1, this.Pr.column));
+                this.raw_SetColumn(this.Pr.column + 1);
 
-				NewContent = new CMathContent();
-				NewContent.Correct_Content(true);
-				this.protected_AddToContent(this.CurPos + 1, [NewContent], true);
-			}
-		}
-	}
+                NewContent = new CMathContent();
+                NewContent.Correct_Content(true);
+                this.protected_AddToContent(this.CurPos + 1, [NewContent], true);
+            }
+        }
+    }
 };
 CDelimiter.prototype.Get_InterfaceProps = function()
 {
@@ -4448,7 +4448,7 @@ CGroupCharacter.prototype.private_InversePr = function()
 {
     var NewPr = this.private_GetInversePr(this.Pr);
     var OldPr = this.Pr.Copy();
-    History.Add(new CChangesMathGroupCharPr(this, OldPr, NewPr));
+    History.Add(this, new CChangesMathGroupCharPr(NewPr, OldPr));
     this.raw_SetPr(NewPr);
 };
 CGroupCharacter.prototype.raw_SetPr = function(Pr)

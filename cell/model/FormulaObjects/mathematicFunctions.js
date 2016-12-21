@@ -2635,62 +2635,65 @@ cPOWER.prototype.getInfo = function () {
     };
 };
 
-	/** @constructor */
-	function cPRODUCT() {
-		this.name = "PRODUCT";
-		this.type = cElementType.func;
-		this.value = null;
-		this.argumentsMin = 1;
-		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
-	}
+function cPRODUCT() {
+//    cBaseFunction.call( this, "PRODUCT" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
 
-	cPRODUCT.prototype = Object.create(cBaseFunction.prototype);
-	cPRODUCT.prototype.Calculate = function (arg) {
-		var element, arg0 = new cNumber(1);
-		for (var i = 0; i < arg.length; i++) {
-			element = arg[i];
-			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
-				for (var j = 0; j < _arrVal.length; j++) {
-					arg0 = _func[arg0.type][_arrVal[j].type](arg0, _arrVal[j], "*");
-					if (cElementType.error === arg0.type) {
-						return this.value = arg0;
-					}
-				}
-			} else if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
-			    if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
-					var _arg = element.getValue();
-					arg0 = _func[arg0.type][_arg.type](arg0, _arg, "*");
-				}
-			} else if (cElementType.array === element.type) {
-				element.foreach(function (elem) {
-					if (cElementType.string === elem.type || cElementType.bool === elem.type || cElementType.empty === elem.type) {
-						return;
-					}
+    this.name = "PRODUCT";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 
-					arg0 = _func[arg0.type][elem.type](arg0, elem, "*");
-				})
-			} else {
-				arg0 = _func[arg0.type][element.type](arg0, element, "*");
-			}
-			if (cElementType.error === arg0.type) {
-				return this.value = arg0;
-			}
+}
 
-		}
-		return this.value = arg0;
-	};
-	cPRODUCT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
+cPRODUCT.prototype = Object.create( cBaseFunction.prototype );
+cPRODUCT.prototype.Calculate = function ( arg ) {
+    var arg0 = new cNumber( 1 );
+    for ( var i = 0; i < arg.length; i++ ) {
+        if ( arg[i] instanceof cArea || arg[i] instanceof cArea3D ) {
+            var _arrVal = arg[i].getValue();
+            for ( var j = 0; j < _arrVal.length; j++ ) {
+                arg0 = _func[arg0.type][_arrVal[j].type]( arg0, _arrVal[j], "*" );
+                if ( arg0 instanceof cError )
+                    return this.value = arg0;
+            }
+        }
+        else if ( arg[i] instanceof cRef || arg[i] instanceof cRef3D ) {
+            var _arg = arg[i].getValue();
+            arg0 = _func[arg0.type][_arg.type]( arg0, _arg, "*" );
+        }
+        else if ( arg[i] instanceof cArray ) {
+            arg[i].foreach( function ( elem ) {
+
+                if ( elem instanceof cString || elem instanceof cBool || elem instanceof cEmpty )
+                    return;
+
+                arg0 = _func[arg0.type][elem.type]( arg0, elem, "*" );
+            } )
+        }
+        else {
+            arg0 = _func[arg0.type][arg[i].type]( arg0, arg[i], "*" );
+        }
+        if ( arg0 instanceof cError )
+            return this.value = arg0;
+
+    }
+    return this.value = arg0;
+};
+cPRODUCT.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( argument-list )"
+    };
+};
 
 function cQUOTIENT() {
 //    cBaseFunction.call( this, "QUOTIENT" );
@@ -3831,161 +3834,144 @@ cSQRTPI.prototype.getInfo = function () {
     };
 };
 
-	/** @constructor */
-	function cSUBTOTAL() {
-		cBaseFunction.call(this, "SUBTOTAL");
-		this.setArgumentsMin(1);
-		this.setArgumentsMax(255);
-	}
+    /** @constructor */
+    function cSUBTOTAL() {
+        cBaseFunction.call(this, "SUBTOTAL");
+        this.setArgumentsMin(1);
+        this.setArgumentsMax(255);
+    }
 
-	cSUBTOTAL.prototype = Object.create(cBaseFunction.prototype);
-	cSUBTOTAL.prototype.Calculate = function (arg) {
-		var f, exclude = false, arg0 = arg[0];
+    cSUBTOTAL.prototype = Object.create(cBaseFunction.prototype);
+    cSUBTOTAL.prototype.Calculate = function (arg) {
+        var f, arg0 = arg[0];
 
-		if (cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first);
-		}
-		arg0 = arg0.tocNumber();
-		if (cElementType.number !== arg0.type) {
-			return this.value = arg0;
-		}
-
-		arg0 = arg0.getValue();
-
-		switch (arg0) {
-			case cSubTotalFunctionType.excludes.AVERAGE:
-				exclude = true;
-			case cSubTotalFunctionType.includes.AVERAGE:
-				f = new AscCommonExcel.cAVERAGE();
-				break;
-			case cSubTotalFunctionType.excludes.COUNT:
-				exclude = true;
-			case cSubTotalFunctionType.includes.COUNT:
-				f = new AscCommonExcel.cCOUNT();
-				break;
-			case cSubTotalFunctionType.excludes.COUNTA:
-				exclude = true;
-			case cSubTotalFunctionType.includes.COUNTA:
-				f = new AscCommonExcel.cCOUNTA();
-				break;
-			case cSubTotalFunctionType.excludes.MAX:
-				exclude = true;
-			case cSubTotalFunctionType.includes.MAX:
-				f = new AscCommonExcel.cMAX();
-				f.setArgumentsCount(arg.length - 1);
-				break;
-			case cSubTotalFunctionType.excludes.MIN:
-				exclude = true;
-			case cSubTotalFunctionType.includes.MIN:
-				f = new AscCommonExcel.cMIN();
-				f.setArgumentsCount(arg.length - 1);
-				break;
-			case cSubTotalFunctionType.excludes.PRODUCT:
-				exclude = true;
-			case cSubTotalFunctionType.includes.PRODUCT:
-				f = new cPRODUCT();
-				break;
-			case cSubTotalFunctionType.excludes.STDEV:
-				exclude = true;
-			case cSubTotalFunctionType.includes.STDEV:
-				f = new AscCommonExcel.cSTDEV();
-				break;
-			case cSubTotalFunctionType.excludes.STDEVP:
-				exclude = true;
-			case cSubTotalFunctionType.includes.STDEVP:
-				f = new AscCommonExcel.cSTDEVP();
-				break;
-			case cSubTotalFunctionType.excludes.SUM:
-				exclude = true;
-			case cSubTotalFunctionType.includes.SUM:
-				f = new cSUM();
-				break;
-			case cSubTotalFunctionType.excludes.VAR:
-				exclude = true;
-			case cSubTotalFunctionType.includes.VAR:
-				f = new AscCommonExcel.cVAR();
-				break;
-			case cSubTotalFunctionType.excludes.VARP:
-				exclude = true;
-			case cSubTotalFunctionType.includes.VARP:
-				f = new AscCommonExcel.cVARP();
-				break;
-		}
-		if (f) {
-			f.checkExclude = true;
-			f.excludeHiddenRows = exclude;
-			this.value = f.Calculate(arg.slice(1));
+        if (cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
+            arg0 = arg0.cross(arguments[1].first);
+        }
+        arg0 = arg0.tocNumber();
+        if (cElementType.number !== arg0.type) {
+            return this.value = arg0;
         }
 
-		return this.value;
-	};
-	cSUBTOTAL.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( function-number , argument-list )"
-		};
-	};
+        arg0 = arg0.getValue();
 
-	/** @constructor */
-	function cSUM() {
-		this.name = "SUM";
-		this.type = cElementType.func;
-		this.value = null;
-		this.argumentsMin = 1;
-		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
-	}
+        switch (arg0) {
+            case cSubTotalFunctionType.includes.AVERAGE:
+            case cSubTotalFunctionType.excludes.AVERAGE:
+                this.value = (new AscCommonExcel.cAVERAGE()).Calculate(arg.slice(1));
+                break;
+            case cSubTotalFunctionType.includes.COUNT:
+            case cSubTotalFunctionType.excludes.COUNT:
+                this.value = (new AscCommonExcel.cCOUNT()).Calculate(arg.slice(1));
+                break;
+            case cSubTotalFunctionType.includes.COUNTA:
+            case cSubTotalFunctionType.excludes.COUNTA:
+                this.value = (new AscCommonExcel.cCOUNTA()).Calculate(arg.slice(1));
+                break;
+            case cSubTotalFunctionType.includes.MAX:
+            case cSubTotalFunctionType.excludes.MAX:
+                f = new AscCommonExcel.cMAX();
+                f.setArgumentsCount(arg.length - 1);
+                this.value = f.Calculate(arg.slice(1));
+                break;
+            case cSubTotalFunctionType.includes.MIN:
+            case cSubTotalFunctionType.excludes.MIN:
+                f = new AscCommonExcel.cMIN();
+                f.setArgumentsCount(arg.length - 1);
+                this.value = f.Calculate(arg.slice(1));
+                break;
+            case cSubTotalFunctionType.includes.PRODUCT:
+            case cSubTotalFunctionType.excludes.PRODUCT:
+                this.value = (new cPRODUCT()).Calculate(arg.slice(1));
+                break;
+            case cSubTotalFunctionType.includes.STDEV:
+            case cSubTotalFunctionType.excludes.STDEV:
+                this.value = (new AscCommonExcel.cSTDEV()).Calculate(arg.slice(1));
+                break;
+            case cSubTotalFunctionType.includes.STDEVP:
+            case cSubTotalFunctionType.excludes.STDEVP:
+                this.value = (new AscCommonExcel.cSTDEVP()).Calculate(arg.slice(1));
+                break;
+            case cSubTotalFunctionType.includes.SUM:
+            case cSubTotalFunctionType.excludes.SUM:
+                this.value = (new cSUM()).Calculate(arg.slice(1));
+                break;
+            case cSubTotalFunctionType.includes.VAR:
+            case cSubTotalFunctionType.excludes.VAR:
+                this.value = (new AscCommonExcel.cVAR()).Calculate(arg.slice(1));
+                break;
+            case cSubTotalFunctionType.includes.VARP:
+            case cSubTotalFunctionType.excludes.VARP:
+                this.value = (new AscCommonExcel.cVARP()).Calculate(arg.slice(1));
+                break;
+        }
 
-	cSUM.prototype = Object.create(cBaseFunction.prototype);
-	cSUM.prototype.Calculate = function (arg) {
-		var element, _arg, arg0 = new cNumber(0);
-		for (var i = 0; i < arg.length; i++) {
-			element = arg[i];
-			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
-				for (var j = 0; j < _arrVal.length; j++) {
-					if (cElementType.bool !== _arrVal[j].type && cElementType.string !== _arrVal[j].type) {
-						arg0 = _func[arg0.type][_arrVal[j].type](arg0, _arrVal[j], "+");
-					}
-					if (cElementType.error === arg0.type) {
-						return this.value = arg0;
-					}
-				}
-			} else if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
-			    if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
-					_arg = element.getValue();
-					if (cElementType.bool !== _arg.type && cElementType.string !== _arg.type) {
-						arg0 = _func[arg0.type][_arg.type](arg0, _arg, "+");
-					}
-				}
-			} else if (cElementType.array === element.type) {
-				element.foreach(function (arrElem) {
-					if (cElementType.bool !== arrElem.type && cElementType.string !== arrElem.type &&
-						cElementType.empty !== arrElem.type) {
-						arg0 = _func[arg0.type][arrElem.type](arg0, arrElem, "+");
-					}
-				});
-			} else {
-				_arg = element.tocNumber();
-				arg0 = _func[arg0.type][_arg.type](arg0, _arg, "+");
-			}
-			if (cElementType.error === arg0.type) {
-				return this.value = arg0;
-			}
+        return this.value;
+    };
+    cSUBTOTAL.prototype.getInfo = function () {
+        return {
+            name: this.name, args: "( function-number , argument-list )"
+        };
+    };
 
-		}
+    /** @constructor */
+    function cSUM() {
+        this.name = "SUM";
+        this.type = cElementType.func;
+        this.value = null;
+        this.argumentsMin = 1;
+        this.argumentsCurrent = 0;
+        this.argumentsMax = 255;
+        this.formatType = {
+            def: -1, //подразумевается формат первой ячейки входящей в формулу.
+            noneFormat: -2
+        };
+        this.numFormat = this.formatType.def;
+    }
 
-		return this.value = arg0;
-	};
-	cSUM.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
+    cSUM.prototype = Object.create(cBaseFunction.prototype);
+    cSUM.prototype.Calculate = function (arg) {
+        var element, _arg, arg0 = new cNumber(0);
+        for (var i = 0; i < arg.length; i++) {
+            element = arg[i];
+            if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
+                var _arrVal = element.getValue();
+                for (var j = 0; j < _arrVal.length; j++) {
+                    if (cElementType.bool !== _arrVal[j].type && cElementType.string !== _arrVal[j].type) {
+                        arg0 = _func[arg0.type][_arrVal[j].type](arg0, _arrVal[j], "+");
+                    }
+                    if (cElementType.error === arg0.type) {
+                        return this.value = arg0;
+                    }
+                }
+            } else if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
+                _arg = element.getValue();
+                if (cElementType.bool !== _arg.type && cElementType.string !== _arg.type) {
+                    arg0 = _func[arg0.type][_arg.type](arg0, _arg, "+");
+                }
+            } else if (cElementType.array === element.type) {
+                element.foreach(function (arrElem) {
+                    if (cElementType.bool !== arrElem.type && cElementType.string !== arrElem.type && cElementType.empty !== arrElem.type) {
+                        arg0 = _func[arg0.type][arrElem.type](arg0, arrElem, "+");
+                    }
+                })
+            } else {
+                _arg = element.tocNumber();
+                arg0 = _func[arg0.type][_arg.type](arg0, _arg, "+");
+            }
+            if (cElementType.error === arg0.type) {
+                return this.value = arg0;
+            }
+
+        }
+
+        return this.value = arg0;
+    };
+    cSUM.prototype.getInfo = function () {
+        return {
+            name: this.name, args: "( argument-list )"
+        };
+    };
 
     /** @constructor */
     function cSUMIF() {

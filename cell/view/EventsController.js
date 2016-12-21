@@ -729,9 +729,6 @@
 			t.skipKeyPress = true;
 
 			switch (event.which) {
-				case 120: // F9
-					t.handlers.trigger("calcAll", shiftKey);
-					return result;
 
 				case 113: // F2
 					if (isViewerMode || t.handlers.trigger("getCellEditMode") || t.isSelectionDialogMode) {

@@ -9,7 +9,7 @@ cd $BASEDIR
 
 echo npm install
 
-grunt --level=WHITESPACE_ONLY --mobile=true --noclosure=true --formatting=PRETTY_PRINT
+grunt --level=WHITESPACE_ONLY --mobile=true --noclosure=true
 echo grunt --level=ADVANCED --mobile=true  --noclosure=true
 
 echo -n $'\r' > temp.txt

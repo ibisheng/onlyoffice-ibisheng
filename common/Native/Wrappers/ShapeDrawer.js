@@ -317,19 +317,7 @@ CShapeDrawer.prototype =
         if (y > this.max_y)
             this.max_y = y;
     },
-   
-    CheckDash : function()
-    {
-        if (this.Ln.prstDash != null && AscCommon.DashPatternPresets[this.Ln.prstDash])
-        {
-            var _arr = AscCommon.DashPatternPresets[this.Ln.prstDash].slice();
-            for (var indexD = 0; indexD < _arr.length; indexD++)
-                _arr[indexD] *= this.StrokeWidth;
-         
-            //  this.Graphics.p_dash(_arr);
-        }
-    },
-    
+
     fromShape2 : function(shape, graphics, geom)
     {
         this.fromShape(shape, graphics);
@@ -630,20 +618,17 @@ CShapeDrawer.prototype =
     },
     _z : function()
     {
-        this.IsCurrentPathCanArrows = false;
         if (this.bIsCheckBounds)
             return;
 		return this.Graphics._z();		
     },
     _s : function()
     {
-        this.IsCurrentPathCanArrows = true;
-        return this.Graphics._s();
+		return this.Graphics._s();
     },
     _e : function()
     {
-        this.IsCurrentPathCanArrows = true;
-        return this.Graphics._e();
+		return this.Graphics._e();    
     },
 
     df : function(mode)
@@ -851,7 +836,7 @@ CShapeDrawer.prototype =
             var x2 = trans.TransformPointX(1, 1);
             var y2 = trans.TransformPointY(1, 1);
             var dKoef = Math.sqrt(((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1))/2);
-            var _pen_w = this.StrokeWidth * dKoef; // (this.Graphics.IsTrack === true) ? (this.Graphics.Graphics.m_oContext.lineWidth * dKoef) : (this.Graphics.m_oContext.lineWidth * dKoef);
+            var _pen_w = (this.Graphics.IsTrack === true) ? (this.Graphics.Graphics.m_oContext.lineWidth * dKoef) : (this.Graphics.m_oContext.lineWidth * dKoef);
 
             var _max_delta_eps2 = 0.001;
 
@@ -1051,14 +1036,7 @@ CShapeDrawer.prototype =
                     var points = null;
                     if (_fill.lin)
                     {
-                        var _angle = _fill.lin.angle;
-                        if (_fill.rotateWithShape === false && this.Graphics.m_oTransform)
-                        {
-                            //_angle -= (60000 * this.Graphics.m_oTransform.GetRotation());
-                            _angle = AscCommon.GradientGetAngleNoRotate(_angle, this.Graphics.m_oTransform);
-                        }
-                        
-                        points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, _angle, _fill.lin.scale);
+                        points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, _fill.lin.angle, _fill.lin.scale);
                     }
                     else if (_fill.path)
                     {
@@ -1206,12 +1184,11 @@ CShapeDrawer.prototype =
                 if (_max_delta > 0.001)
                 {
                     this.Graphics.ArrayPoints = null;
-                    DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.tailEnd.type, this.Ln.tailEnd.GetWidth(_pen_w, 7 / AscCommon.g_dKoef_mm_to_pix), this.Ln.tailEnd.GetLen(_pen_w, 7 / AscCommon.g_dKoef_mm_to_pix), this, trans1);
+                    DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.tailEnd.type, this.Ln.tailEnd.GetWidth(_pen_w), this.Ln.tailEnd.GetLen(_pen_w), this, trans1);
                     this.Graphics.ArrayPoints = arr;
                 }
             }
             this.IsArrowsDrawing = false;
-            this.CheckDash();
         }
     },
 

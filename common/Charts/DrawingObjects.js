@@ -682,7 +682,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             }
             else {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.auto);
-
+                if (c_oAscChartTypeSettings.lineNormal === settings.type) {
 					for (i = 0; i < aSeriesPoints.length; ++i) {
 						if (fMinVal === null) {
 							fMinVal = aSeriesPoints[i].val;
@@ -693,6 +693,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
 							}
 						}
 					}
+                }
             }
             if (oSparklineGroup.asc_getMaxAxisType() === Asc.c_oAscSparklineAxisMinMax.Custom && oSparklineGroup.asc_getManualMax() !== null) {
                 val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
@@ -700,15 +701,17 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             }
             else {
                 val_ax_props.putMaxValRule(c_oAscValAxisRule.auto);
-                for (i = 0; i < aSeriesPoints.length; ++i) {
-                    if (fMaxVal === null) {
-                        fMaxVal = aSeriesPoints[i].val;
-                    } else {
-                        if (fMaxVal < aSeriesPoints[i].val) {
-                            fMaxVal = aSeriesPoints[i].val;
-                        }
-                    }
-                }
+				if (c_oAscChartTypeSettings.lineNormal === settings.type) {
+					for (i = 0; i < aSeriesPoints.length; ++i) {
+						if (fMaxVal === null) {
+							fMaxVal = aSeriesPoints[i].val;
+						} else {
+							if (fMaxVal < aSeriesPoints[i].val) {
+								fMaxVal = aSeriesPoints[i].val;
+							}
+						}
+					}
+				}
             }
             if (fMinVal !== null && fMaxVal !== null) {
                 if (fMinVal !== fMaxVal) {
@@ -859,6 +862,15 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             if(fCallbackSeries)
             {
 
+                if(nSparklineType !== Asc.c_oAscSparklineType.Line){
+                    for(i = 0; i < aSeriesPoints.length; ++i)
+                    {
+                        if(AscFormat.fApproxEqual(aSeriesPoints[i].val,  0))
+                        {
+                            fCallbackSeries(oSerie, aSeriesPoints[i].idx, null);
+                        }
+                    }
+                }
 
                 if(oSparklineGroup.negative && oSparklineGroup.colorNegative)
                 {
@@ -916,17 +928,6 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
                     for(i = 0; i < aMinPoints.length; ++i)
                     {
                         fCallbackSeries(oSerie, aMinPoints[i].idx, oSparklineGroup.colorLow);
-                    }
-                }
-
-
-                if(nSparklineType !== Asc.c_oAscSparklineType.Line){
-                    for(i = 0; i < aSeriesPoints.length; ++i)
-                    {
-                        if(AscFormat.fApproxEqual(aSeriesPoints[i].val,  0))
-                        {
-                            fCallbackSeries(oSerie, aSeriesPoints[i].idx, null);
-                        }
                     }
                 }
             }
@@ -1647,68 +1648,6 @@ function DrawingObjects() {
     //-----------------------------------------------------------------------------------
     // Constructor
     //-----------------------------------------------------------------------------------
-
-    _this.addShapeOnSheet = function(sType){
-        if(this.controller){
-            if (!_this.isViewerMode()) {
-
-                var oVisibleRange = worksheet.getVisibleRange();
-
-                _this.objectLocker.reset();
-                _this.objectLocker.addObjectId(AscCommon.g_oIdCounter.Get_NewId());
-                _this.objectLocker.checkObjects(function (bLock) {
-                    if (bLock !== true)
-                        return;
-                    _this.controller.resetSelection();
-
-                    var activeCell = worksheet.model.selectionRange.activeCell;
-
-
-
-                    var metrics = {};
-                    metrics.col = activeCell.col;
-                    metrics.colOff = 0;
-                    metrics.row = activeCell.row;
-                    metrics.rowOff = 0;
-
-
-                    var coordsFrom = _this.coordsManager.calculateCoords(metrics);
-
-
-
-                    var ext_x, ext_y;
-                    if(typeof AscFormat.SHAPE_EXT[sType] === "number")
-                    {
-                        ext_x = AscFormat.SHAPE_EXT[sType];
-                    }
-                    else
-                    {
-                        ext_x = 25.4;
-                    }
-                    if(typeof AscFormat.SHAPE_ASPECTS[sType] === "number")
-                    {
-                        var _aspect = AscFormat.SHAPE_ASPECTS[sType];
-                        ext_y = ext_x/_aspect;
-                    }
-                    else
-                    {
-                        ext_y = ext_x;
-                    }
-                    History.Create_NewPoint();
-
-                    var posX = pxToMm(coordsFrom.x) + MOVE_DELTA;
-                    var posY = pxToMm(coordsFrom.y) + MOVE_DELTA;
-                    var oTrack = new AscFormat.NewShapeTrack(sType, posX, posY, _this.controller.getTheme(), null, null, null, 0);
-                    oTrack.track({}, posX + ext_x, posY + ext_y);
-                    var oShape = oTrack.getShape(false, _this.drawingDocument, null);
-                    oShape.setWorksheet(worksheet.model);
-                    oShape.addToDrawingObjects();
-                    worksheet.setSelectionShape(true);
-                    _this.controller.startRecalculate();
-                });
-            }
-        }
-    };
 
     _this.getScrollOffset = function()
     {

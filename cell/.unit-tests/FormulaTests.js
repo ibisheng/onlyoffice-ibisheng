@@ -472,21 +472,6 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 6 );
     } );
-	
-	test( "Test: \"Cross\"", function () {
-
-		ws.getRange2( "A7" ).setValue( "1" );
-		ws.getRange2( "A8" ).setValue( "2" );
-		ws.getRange2( "A9" ).setValue( "3" );
-		oParser = new parserFormula( 'A7:A9', null, ws );
-		ok( oParser.parse() );
-		strictEqual( oParser.calculate().cross(new AscCommon.CellAddress(5, 0, 0), ws.getId()).getValue(), "#VALUE!" );
-		strictEqual( oParser.calculate().cross(new AscCommon.CellAddress(6, 0, 0), ws.getId()).getValue(), 1 );
-		strictEqual( oParser.calculate().cross(new AscCommon.CellAddress(7, 0, 0), ws.getId()).getValue(), 2 );
-		strictEqual( oParser.calculate().cross(new AscCommon.CellAddress(8, 0, 0), ws.getId()).getValue(), 3 );
-		strictEqual( oParser.calculate().cross(new AscCommon.CellAddress(9, 0, 0), ws.getId()).getValue(), "#VALUE!" );
-
-	} );
 
 	test( "Test: \"Parse intersection\"", function () {
 
@@ -985,15 +970,15 @@ $( function () {
         oParser = new parserFormula( "Лист2!A2", "A1", ws );
         ok( oParser.parse() );
         // strictEqual( oParser.parse(), true)
-        strictEqual( oParser.renameSheet( "Лист2", "Лист3" ).assemble(), "Лист3!A2" );
+        strictEqual( oParser.changeSheet( "Лист2", "Лист3" ).assemble(), "Лист3!A2" );
 
         oParser = new parserFormula( "Лист2:Лист3!A2", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.renameSheet( "Лист2", "Лист1" ).assemble(), "Лист1:Лист3!A2" );
+        strictEqual( oParser.changeSheet( "Лист2", "Лист1" ).assemble(), "Лист1:Лист3!A2" );
 
         oParser = new parserFormula( "Лист2!A2:A5", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.renameSheet( "Лист2", "Лист3" ).assemble(), "Лист3!A2:A5" );
+        strictEqual( oParser.changeSheet( "Лист2", "Лист3" ).assemble(), "Лист3!A2:A5" );
 
         ws = wb.getWorksheet( 0 );
         ws.getRange2( "S95" ).setValue( "2" );
@@ -1430,6 +1415,8 @@ $( function () {
 
     test( "Test: \"TEXT\"", function () {
 
+        wb.dependencyFormulas = new AscCommonExcel.DependencyGraph( wb );
+
         oParser = new parserFormula( "TEXT(1234.567,\"$0.00\")", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), "$1234.57" );
@@ -1441,6 +1428,8 @@ $( function () {
     } );
 
     test( "Test: \"WORKDAY\"", function () {
+
+        wb.dependencyFormulas = new AscCommonExcel.DependencyGraph( wb );
 
         oParser = new parserFormula( "WORKDAY(DATE(2006,1,1),0)", "A2", ws );
         ok( oParser.parse() );

@@ -822,7 +822,7 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oLogicDocument.TurnOff_CheckSpelling();
 
 		if (this.WordControl.MobileTouchManager)
-			this.WordControl.MobileTouchManager.delegate.LogicDocument = this.WordControl.m_oLogicDocument;
+			this.WordControl.MobileTouchManager.LogicDocument = this.WordControl.m_oLogicDocument;
 	};
 
 	asc_docs_api.prototype.InitViewer = function()
@@ -1999,7 +1999,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_SelectionCut = function()
 	{
-	    if (AscCommon.CollaborativeEditing.Get_GlobalLock())
+	    if (AscCommon.CollaborativeEditing.m_bGlobalLock)
     	    return;
 
 		var _logicDoc = this.WordControl.m_oLogicDocument;
@@ -2016,7 +2016,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_PasteData = function(_format, data1, data2)
 	{
-	    if (AscCommon.CollaborativeEditing.Get_GlobalLock())
+	    if (AscCommon.CollaborativeEditing.m_bGlobalLock)
 	        return;
 
 		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
@@ -2033,7 +2033,7 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.onSaveCallback = function(e, isUndoRequest)
+	asc_docs_api.prototype.onSaveCallback = function(e)
 	{
 		var t = this;
 		if (false == e["saveLock"])
@@ -2086,20 +2086,12 @@ background-repeat: no-repeat;\
 				CursorInfo = History.Get_DocumentPositionBinary();
 			}
 
-			if (isUndoRequest)
-			{
-				AscCommon.CollaborativeEditing.Set_GlobalLock(false);
-				AscCommon.CollaborativeEditing.Undo();
-			}
-			else
-			{
-				// Пересылаем свои изменения
-				AscCommon.CollaborativeEditing.Send_Changes(this.IsUserSave, {
-					UserId      : this.CoAuthoringApi.getUserConnectionId(),
-					UserShortId : this.DocInfo.get_UserId(),
-					CursorInfo  : CursorInfo
-				}, HaveOtherChanges);
-			}
+			// Пересылаем свои изменения
+			AscCommon.CollaborativeEditing.Send_Changes(this.IsUserSave, {
+				UserId      : this.CoAuthoringApi.getUserConnectionId(),
+				UserShortId : this.DocInfo.get_UserId(),
+				CursorInfo  : CursorInfo
+			}, HaveOtherChanges);
 		}
 		else
 		{
@@ -2117,14 +2109,14 @@ background-repeat: no-repeat;\
 				{
 					t.CoAuthoringApi.askSaveChanges(function(event)
 					{
-						t.onSaveCallback(event, isUndoRequest);
+						t.onSaveCallback(event);
 					});
 				}, TimeoutInterval);
 			}
 		}
 	};
 
-	asc_docs_api.prototype.asc_Save           = function(isAutoSave, isUndoRequest)
+	asc_docs_api.prototype.asc_Save           = function(isAutoSave)
 	{
 		this.IsUserSave = !isAutoSave;
 		if (true === this.canSave && !this.isLongAction())
@@ -2134,7 +2126,7 @@ background-repeat: no-repeat;\
 			var t = this;
 			this.CoAuthoringApi.askSaveChanges(function(e)
 			{
-				t.onSaveCallback(e, isUndoRequest);
+				t.onSaveCallback(e);
 			});
 		}
 	};
@@ -2359,6 +2351,9 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.sync_CanUndoCallback         = function(bCanUndo)
 	{
+		if (true === AscCommon.CollaborativeEditing.Is_Fast() && true !== AscCommon.CollaborativeEditing.Is_SingleUser())
+			bCanUndo = false;
+
 		this.sendEvent("asc_onCanUndo", bCanUndo);
 	};
 	asc_docs_api.prototype.sync_CanRedoCallback         = function(bCanRedo)
@@ -4145,14 +4140,7 @@ background-repeat: no-repeat;\
 	{
 		if (obj)
 		{
-            if (obj.Unifill && obj.Unifill.fill && obj.Unifill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_SOLID && obj.Unifill.fill.color)
-            {
-                this.Color = AscCommon.CreateAscColor(obj.Unifill.fill.color);
-            }
-            else
-            {
-                this.Color = (undefined != obj.Color && null != obj.Color) ? AscCommon.CreateAscColorCustom(obj.Color.r, obj.Color.g, obj.Color.b) : null;
-            }
+			this.Color = (undefined != obj.Color && null != obj.Color) ? AscCommon.CreateAscColorCustom(obj.Color.r, obj.Color.g, obj.Color.b) : null;
 			this.Value = (undefined != obj.Value) ? obj.Value : null;
 		}
 		else
@@ -7378,7 +7366,7 @@ background-repeat: no-repeat;\
 			this.asc_SpellCheckDisconnect();
 			
 			this.ShowParaMarks                           = false;
-			AscCommon.CollaborativeEditing.Set_GlobalLock(true);
+			AscCommon.CollaborativeEditing.m_bGlobalLock = true;
 			//this.isShowTableEmptyLine = false;
 			//this.WordControl.m_bIsRuler = true;
 
@@ -8214,10 +8202,11 @@ background-repeat: no-repeat;\
 
 		var stream = new AscCommon.FT_Stream2(data, data.length);
 		stream.obj = null;
+		var Loader = {Reader : stream, Reader2 : null};
 		var _color = new AscCommonWord.CDocumentColor(191, 255, 199);
 
 		// Применяем изменения, пока они есть
-		var _count = stream.GetLong();
+		var _count = Loader.Reader.GetLong();
 
 		var _pos = 4;
 		for (var i = 0; i < _count; i++)
@@ -8228,39 +8217,30 @@ background-repeat: no-repeat;\
 					break;
 			}
 
-			var nChangeLen = stream.GetLong();
+			var _len    = Loader.Reader.GetLong();
 			_pos += 4;
-			stream.size = _pos + nChangeLen;
+			stream.size = _pos + _len;
 
-			var ClassId = stream.GetString2();
-			var Class   = AscCommon.g_oTableId.Get_ById(ClassId);
+			var _id       = Loader.Reader.GetString2();
+			var _read_pos = Loader.Reader.GetCurPos();
 
-			var nReaderPos  = stream.GetCurPos();
-			var nChangeType = stream.GetLong();
+			var Type  = Loader.Reader.GetLong();
+			var Class = null;
 
-			if (Class)
+			if (AscDFH.historyitem_type_HdrFtr === Type)
 			{
-				var fChangesClass = AscDFH.changesFactory[nChangeType];
-				if (fChangesClass)
-				{
-					var oChange = new fChangesClass(Class);
-					oChange.ReadFromBinary(stream);
-
-					if (true === AscCommon.CollaborativeEditing.private_AddOverallChange(oChange))
-						oChange.Load(_color);
-				}
-				else
-				{
-					AscCommon.CollaborativeEditing.private_AddOverallChange(data);
-
-					stream.Seek(nReaderPos);
-					stream.Seek2(nReaderPos);
-
-					Class.Load_Changes(stream, null, _color);
-				}
+				Class = editor.WordControl.m_oLogicDocument.HdrFtr;
 			}
+			else
+				Class = g_oTableId.Get_ById(_id);
 
-			_pos += nChangeLen;
+			stream.Seek(_read_pos);
+			stream.Seek2(_read_pos);
+
+			if (null != Class)
+				Class.Load_Changes(Loader.Reader, Loader.Reader2, _color);
+
+			_pos += _len;
 			stream.Seek2(_pos);
 			stream.size = data.length;
 		}
