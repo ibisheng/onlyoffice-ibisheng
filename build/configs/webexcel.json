@@ -83,6 +83,7 @@
 		
 		"../common/scroll.js",
 		"../common/Scrolls/iscroll.js",
+		"../common/Scrolls/mobileTouchManagerBase.js",
 
         "../common/wordcopypaste.js",
 
@@ -215,41 +216,43 @@
 		  "../common/Local/license.js"
 		],
 		"common": [
-		  "../common/Local/common.js",
-          	  "../cell/Local/api.js"
+			"../common/Local/common.js",
+          	"../cell/Local/api.js"
 		]
 	  },
 	  "mobile_banners": {
-        	"min": [
-		  "../common/Native/Wrappers/memory.js"
+			"min": [
+			"../common/Native/Wrappers/memory.js"
 		],
 		"common": [
-		  "../cell/native/DrawingContext.js"
+			"../cell/native/DrawingContext.js"
 		]
 	  },
 	  "mobile": [	 
-        	"../common/Native/Wrappers/TextMeasurerWrapper.js",
-        	"../common/Native/Wrappers/DrawingStream.js",
+        "../common/Native/Wrappers/TextMeasurerWrapper.js",
+        "../common/Native/Wrappers/DrawingStream.js",
 		"../common/Native/Wrappers/ShapeDrawer.js",
-        	"../cell/native/TextDrawer.js",
-        	"../cell/native/Overlay.js",
+        "../cell/native/TextDrawer.js",
+        "../cell/native/Overlay.js",
 		"../cell/native/Graphics.js",
-        	"../cell/native/DrawingDocument.js",
+        "../cell/native/DrawingDocument.js",
  		"../cell/native/native.js"
 	  ],
       "exclude_mobile": [
-        	"../common/Overlay.js",
-        	"../common/Controls.js",
+        "../common/Overlay.js",
+        "../common/Controls.js",
 		"../cell/graphics/DrawingContext.js",
-        	"../cell/model/DrawingObjects/ShapeDrawer.js",
-        	"../cell/model/DrawingObjects/DrawingDocument.js", 
+        "../cell/model/DrawingObjects/ShapeDrawer.js",
+        "../cell/model/DrawingObjects/DrawingDocument.js", 
 		"../common/FontsFreeType/font_engine.js",
-        	"../common/FontsFreeType/FontFile.js",
-        	"../common/FontsFreeType/FontManager.js",
+        "../common/FontsFreeType/FontFile.js",
+        "../common/FontsFreeType/FontManager.js",
 		"../common/FontsFreeType/TextMeasurer.js",
 		"../cell/model/DrawingObjects/Graphics.js",
-        	"../common/Drawings/TextDrawer.js",
-		"../common/Scrolls/iscroll.js"
+        "../common/Drawings/TextDrawer.js",
+		"../common/Scrolls/iscroll.js",
+		"../common/Scrolls/mobileTouchManagerBase.js",
+		"../cell/view/mobileTouch.js"
 	  ],
       "dst": "../cell",
       "externs": [
