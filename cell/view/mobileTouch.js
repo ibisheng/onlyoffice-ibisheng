@@ -49,6 +49,8 @@ function (window, undefined)
 		this.WB = _manager.Api.wb;
 		this.DrawingDocument = this.WB.getWorksheet().objectRender.drawingDocument;
 
+		this.Offset = { X: 0, Y: 0};
+
 		CMobileDelegateEditorCell.superclass.constructor.call(this, _manager);
 	}
 	AscCommon.extendClass(CMobileDelegateEditorCell, AscCommon.CMobileDelegateSimple);
@@ -61,7 +63,11 @@ function (window, undefined)
 	};
 	CMobileDelegateEditorCell.prototype.ConvertCoordsFromCursor = function(x, y)
 	{
-		var _res = this.WB.ConvertXYToLogic(x, y);
+		var _element = document.getElementById("editor_sdk");
+		this.Offset.X = _element.offsetLeft;
+		this.Offset.Y = _element.offsetTop;
+
+		var _res = this.WB.ConvertXYToLogic(x - this.Offset.X, y - this.Offset.Y);
 		var _point = {X: _res.X, Y: _res.Y, Page: 0, DrawPage: 0};
 		return _point;
 	};
@@ -303,7 +309,7 @@ function (window, undefined)
 		this.TableTrackEnabled = false;
 	};
 
-	CMobileTouchManager.MoveCursorToPoint = function()
+	CMobileTouchManager.prototype.MoveCursorToPoint = function()
 	{
 		// TODO:
 	};
