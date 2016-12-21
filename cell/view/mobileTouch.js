@@ -55,11 +55,14 @@ function (window, undefined)
 
 	CMobileDelegateEditorCell.prototype.ConvertCoordsToCursor = function(x, y, page, isGlobal)
 	{
-		return {X: 0, Y: 0, Error: false};
+		var _res = this.WB.ConvertLogicToXY(x, y);
+		var _point = {X: _res.X, Y: _res.Y, Page: 0, DrawPage: 0};
+		return _point;
 	};
 	CMobileDelegateEditorCell.prototype.ConvertCoordsFromCursor = function(x, y)
 	{
-		var _point = {X: 0, Y: 0, Page: 0, DrawPage: 0};
+		var _res = this.WB.ConvertXYToLogic(x, y);
+		var _point = {X: _res.X, Y: _res.Y, Page: 0, DrawPage: 0};
 		return _point;
 	};
 	CMobileDelegateEditorCell.prototype.GetZoomFit = function()

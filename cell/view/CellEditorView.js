@@ -191,6 +191,7 @@
 		if (null != this.element) {
 			t.canvasOuter = document.createElement('div');
 			t.canvasOuter.id = "ce-canvas-outer";
+			t.canvasOuter.style.position = "absolute";
 			t.canvasOuter.style.display = "none";
 			t.canvasOuter.style.zIndex = z;
 			var innerHTML = '<canvas id="ce-canvas" style="z-index: ' + (z + 1) + '"></canvas>';
