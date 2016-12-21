@@ -10871,7 +10871,9 @@ drawSurfaceChart.prototype =
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		this.paths = {};
 		
+		console.time("asd");
 		this._recalculate();
+		console.timeEnd("asd");
 	},
 	
 	draw: function(chartsDrawer)
@@ -10891,7 +10893,6 @@ drawSurfaceChart.prototype =
 		
 		var y, x, z, val, seria, dataSeries, compiledMarkerSize, compiledMarkerSymbol, idx, numCache, idxPoint, points = [], points3d = [];
 		for (var i = 0; i < this.chartProp.series.length; i++) {
-		
 			seria = this.chartProp.series[i];
 			numCache = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
 			
@@ -10911,6 +10912,18 @@ drawSurfaceChart.prototype =
 				y  = this.cChartDrawer.getYPosition(val, yPoints) * this.chartProp.pxToMM;
 				z = (perspectiveDepth / (this.chartProp.series.length - 1)) * (i);
 				
+				//рассчитываем значения
+				var idx2 = dataSeries[n + 1] && dataSeries[n + 1].idx != null ? dataSeries[n + 1].idx : null;				
+				var val2 = this._getYVal(idx2, i);
+				
+				if(idx2 !== null)
+				{	
+					var x2  = xPoints[n + 1].pos * this.chartProp.pxToMM;
+					var y2  = this.cChartDrawer.getYPosition(val2, yPoints) * this.chartProp.pxToMM;
+					var z2 = (perspectiveDepth / (this.chartProp.series.length - 1)) * (i);
+				}
+				
+				
 				if(!points)
 					points = [];
 				if(!points[i])
@@ -10923,11 +10936,40 @@ drawSurfaceChart.prototype =
 				
 				if(val != null)
 				{
-					points3d[i][n] = {x: x, y: y, z: z};
+					points3d[i][n] = {x: x, y: y, z: z, val: val};
 					var convertResult = this.cChartDrawer._convertAndTurnPoint(x, y, z);
 					var x1 = convertResult.x;
 					var y1 = convertResult.y;
-					points[i][n] = {x: x1, y: y1};
+					points[i][n] = {x: x1, y: y1, val: val};
+					
+					/*if(null !== idx2)
+					{
+						for(var k = 0; k < yPoints.length; k++)
+						{
+							if(yPoints[k].val > val && yPoints[k].val < val2)
+							{
+								var curLine1 = this.cChartDrawer.getLineEquation({x: x, y: y, z: z}, {x: x2, y: y2, z: z2});
+								var gridX1 = xPoints[0].pos * this.chartProp.pxToMM;
+								var gridX2 = xPoints[xPoints.length - 1].pos * this.chartProp.pxToMM;
+								var gridY1 = yPoints[k].pos * this.chartProp.pxToMM;
+								var gridY2 = yPoints[k].pos * this.chartProp.pxToMM;
+								
+								var curLine2 = this.cChartDrawer.getLineEquation({x: gridX1,y: gridY1, z: z}, {x: gridX2, y: gridY2, z: z});
+								var curTempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, curLine2);
+								
+								var convertResult = this.cChartDrawer._convertAndTurnPoint(curTempIntersection.x, curTempIntersection.y, z);
+								if(!points[i][n].intersections)
+								{
+									points[i][n].intersections = [];
+								}
+								points[i][n].intersections[k] = convertResult;
+							}
+							else if(yPoints[k].val < val && yPoints[k].val > val2)
+							{
+								var test = 1;
+							}
+						}
+					}*/
 				}
 				else
 				{
@@ -10936,21 +10978,21 @@ drawSurfaceChart.prototype =
 			}
 		}
 		
-		console.time("asd");
 		this.test(points, points3d);
-		console.timeEnd("asd");
 	},
 	
 	test: function(points, points3d)
 	{
 		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
+		
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		var gridPlaneEquations = [];
 		var left = this.chartProp.chartGutter._left;
 		var right = this.chartProp.chartGutter._right;
 		var width = this.chartProp.widthCanvas - (left + right);
 		
-		for(var i = 0; i < yPoints.length; i++)
+		/*for(var i = 0; i < yPoints.length; i++)
 		{
 			var p1 = this.cChartDrawer._convertAndTurnPoint(left, yPoints[i].pos * this.chartProp.pxToMM, 0, null, null, true);
 			var p2 = this.cChartDrawer._convertAndTurnPoint(left + width, yPoints[i].pos * this.chartProp.pxToMM, 0, null, null, true);
@@ -10958,10 +11000,10 @@ drawSurfaceChart.prototype =
 			
 			var plainEquation = this.cChartDrawer.getPlainEquation(p1, p2, p3);
 			gridPlaneEquations.push(plainEquation);
-		}
+		}*/
 		
-		
-		for(var i = 0; i < points.length; i++) 
+		var temp = [];
+		for(var i = 0; i < points.length; i++)
 		{
 			for(var j = 0; j < points[i].length - 1; j++)
 			{
@@ -10973,10 +11015,9 @@ drawSurfaceChart.prototype =
 					this.paths.series = [];
 				}
 				
-				this.paths.series.push(this._calculatePath(p.x, p.y, p1.x, p1.y));
+				//this.paths.series.push(this._calculatePath(p.x, p.y, p1.x, p1.y));
 				
-				
-				var p3d = this.cChartDrawer._convertAndTurnPoint(points3d[i][j].x, points3d[i][j].y, points3d[i][j].z, null, null, true);
+				/*var p3d = this.cChartDrawer._convertAndTurnPoint(points3d[i][j].x, points3d[i][j].y, points3d[i][j].z, null, null, true);
 				var p13d = this.cChartDrawer._convertAndTurnPoint(points3d[i][j + 1].x, points3d[i][j + 1].y, points3d[i][j + 1].z, null, null, true);
 				var lineEquation = this.cChartDrawer.getLineEquation(p3d, p13d);
 				for(var k = 0; k < gridPlaneEquations.length; k++)
@@ -10984,25 +11025,162 @@ drawSurfaceChart.prototype =
 					var intersection = this.cChartDrawer.isIntersectionPlainAndLine(gridPlaneEquations[k] ,lineEquation);
 					var projectPoint = this.cChartDrawer._convertAndTurnPoint(intersection.x, intersection.y, intersection.z, true, true);
 					
+					if(!temp[k])
+					{
+						temp[k] = [];
+					}
+					if(!temp[k][i])
+					{
+						temp[k][i] = [];
+					}
 					
-				}
+					temp[k][i][j] = projectPoint;
+				}*/
 			}
 		}
 		
 		
+		
 		for (var i = 0; i < points.length - 1; i++) 
 		{
-			for(var j = 0; j < points[i].length; j++)
+			for(var j = 0; j < points[i].length - 1; j++)
 			{
 				var p = points[i][j];
 				var p1 = points[i + 1][j];
+				
+				var p2 = points[i][j + 1];
+				var p21 = points[i + 1][j + 1];
+				
+				
+				
 				
 				if(!this.paths.test)
 				{
 					this.paths.test = [];
 				}
 				
-				this.paths.test.push(this._calculatePath(p.x, p.y, p1.x, p1.y));
+				//this.paths.test.push(this._calculatePath(p.x, p.y, p1.x, p1.y));
+				//this.paths.test.push(this._calculatePath(p2.x, p2.y, p21.x, p21.y));
+				
+				this.paths.test.push(this.cChartDrawer._calculatePathFace(p, p2, p21, p1, true));
+				
+				var p3d = points3d[i][j];
+				var p13d = points3d[i + 1][j];
+				
+				var p23d = points3d[i][j + 1];
+				var p213d = points3d[i + 1][j + 1];
+				
+				var lines = [{p1: p3d, p2: p23d}, {p1: p13d, p2: p213d}];
+				
+				
+				//var tempFaces = [{p1: p, p2: p2, p3: p21, p1: p1}];
+				if(Math.abs(p1.y - p.y) !== Math.abs(p2.y - p21.y) /*&& Math.abs(p1.val - p.val) !== Math.abs(p2.val - p21.val)*/)
+				{
+					var max = p.val;
+					var maxIndex = 0;
+					var arrVal = [p, p1, p2, p21];
+					for(var t = 0; t < arrVal.length; t++)
+					{
+						if(arrVal[t].val > max)
+						{	
+							max = arrVal[t].val;
+							maxIndex = t;
+						}
+					}
+					
+					if(maxIndex === 0 || maxIndex === 3)
+					{	
+						//var tempFaces = [{p: p, p21: p21, p1: p1}, {p: p, p21: p21, p2: p2}];
+						lines.push({p1: p213d, p2: p3d});
+						this.paths.test.push(this._calculatePath(p21.x, p21.y, p.x, p.y));
+					}
+					else
+					{
+						lines.push({p1: p213d, p2: p3d});
+						//var tempFaces = [{p: p, p21: p21, p1: p1}, {p: p, p21: p21, p2: p2}];
+						this.paths.test.push(this._calculatePath(p2.x, p2.y, p1.x, p1.y));
+					}
+					
+					
+					//console.log("p1:" + p1.val + " p: " + p.val + " p2: " + p2.val + " p21: " + p21.val);
+				}
+				
+				//p, p2, p21, p1 - точки данного сегмента
+				//  p1-----p21
+				//  |       |
+				//  |       |
+				//  p-------p2
+				
+				//находим пересечение даннного сегмента с плоскостями сетки
+				
+				var pointsArr = [];
+				for(var k = 0; k < yPoints.length; k++)
+				{
+					//var pointsStart = {p1: , p2: };
+					
+					var gridX1 = xPoints[0].pos * this.chartProp.pxToMM;
+					var gridX2 = xPoints[xPoints.length - 1].pos * this.chartProp.pxToMM;
+					var gridY1 = yPoints[k].pos * this.chartProp.pxToMM;
+					var gridY2 = yPoints[k].pos * this.chartProp.pxToMM;
+					
+					
+					for(var n = 0; n < lines.length; n++)
+					{
+						var curLine2 = this.cChartDrawer.getLineEquation({x: gridX1,y: gridY1, z: lines[n].p2.z}, {x: gridX2, y: gridY2, z: lines[n].p2.z});
+						var curLine1 = this.cChartDrawer.getLineEquation(lines[n].p1, lines[n].p2);
+						if(yPoints[k].val >= lines[n].p1.val && yPoints[k].val <= lines[n].p2.val)
+						{
+							
+							var curTempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, curLine2);
+							
+							
+							var convertResult = this.cChartDrawer._convertAndTurnPoint(curTempIntersection.x, curTempIntersection.y, lines[n].p2.z);
+							
+							
+							
+							var test1 = 1;
+							/*if(!points[i][n].intersections)
+							{
+								points[i][n].intersections = [];
+							}
+							points[i][n].intersections[k] = convertResult;*/
+						}
+					}
+				}
+				
+				
+				
+				
+				
+				/*if(p.intersections)
+				{
+					for(var k = 0; k < p.intersections.length; k++)
+					{
+						if(p.intersections[k] && p1.intersections && p1.intersections[k])
+						{
+							this.paths.test.push(this._calculatePath(p.intersections[k].x, p.intersections[k].y, p1.intersections[k].x, p1.intersections[k].y));
+						}
+						else if(p.intersections[k])
+						{
+							this.paths.test.push(this._calculatePath(p.intersections[k].x, p.intersections[k].y, p1.x, p1.y));
+						}
+					}
+				}
+				else if(p1.intersections)
+				{
+					for(var k = 0; k < p1.intersections.length; k++)
+					{
+						if(p1.intersections[k] && p.intersections && p.intersections[k])
+						{
+							this.paths.test.push(this._calculatePath(p1.intersections[k].x, p1.intersections[k].y, p.intersections[k].x, p.intersections[k].y));
+						}
+						else if(p1.intersections[k])
+						{
+							this.paths.test.push(this._calculatePath(p.x, p.y, p1.intersections[k].x, p1.intersections[k].y));
+						}
+					}
+				}*/
+				
 			}
 		}
 	},
