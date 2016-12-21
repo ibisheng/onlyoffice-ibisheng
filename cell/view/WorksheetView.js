@@ -13164,8 +13164,8 @@
 			}
 		}
 
-		x += this.cols[c].left;
-		y += this.rows[r].top;
+		x += this.cols[c].left - this.cellsLeft;
+		y += this.rows[r].top - this.cellsTop;
 
 		x *= asc_getcvt(1/*pt*/, 3/*mm*/, this._getPPIX());
 		y *= asc_getcvt(1/*pt*/, 3/*mm*/, this._getPPIY());
