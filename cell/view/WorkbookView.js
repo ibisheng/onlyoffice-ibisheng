@@ -3004,7 +3004,7 @@
 		var range = ws.getSelectedRange();
 		var p1 = this.getCellCoord(range.c1, range.r1);
 		var p2 = this.getCellCoord(range.c2, range.r2);
-		return {X : p1._x, Y : p1._y, W : p2._x - p1._x + p2._width., H : p2._y - p1._y + p2._height};
+		return {X : p1._x, Y : p1._y, W : p2._x - p1._x + p2._width, H : p2._y - p1._y + p2._height};
 	};
 
   //------------------------------------------------------------export---------------------------------------------------
