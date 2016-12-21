@@ -2248,6 +2248,24 @@
 		var sheetId = this.getSheetIdByIndex(ascName.LocalSheetId);
 		return new UndoRedoData_DefinedNames(ascName.Name, ascName.Ref, sheetId, ascName.isTable);
 	};
+	Workbook.prototype.changeColorScheme = function (index) {
+		var scheme = AscCommon.getColorThemeByIndex(index);
+		if (!scheme) {
+			index -= AscCommon.g_oUserColorScheme.length;
+			if (index < 0 || index >= this.theme.extraClrSchemeLst.length) {
+				return false;
+			}
+
+			scheme = this.theme.extraClrSchemeLst[index].clrScheme.createDuplicate();
+		}
+		History.Create_NewPoint();
+		//не делаем Duplicate потому что предполагаем что схема не будет менять частями, а только обьектом целиком.
+		History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_ChangeColorScheme, null,
+			null, new AscCommonExcel.UndoRedoData_ClrScheme(this.theme.themeElements.clrScheme, scheme));
+		this.theme.themeElements.clrScheme = scheme;
+		this.rebuildColors();
+		return true;
+	};
 //-------------------------------------------------------------------------------------------------
 	/**
 	 * @constructor

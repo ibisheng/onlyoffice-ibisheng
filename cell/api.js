@@ -2887,22 +2887,9 @@ var editor;
 		var t = this;
 		var onChangeColorScheme = function (res) {
 			if (res) {
-				var theme = t.wbModel.theme;
-				var scheme = AscCommon.getColorThemeByIndex(index);
-				if (!scheme) {
-					index -= AscCommon.g_oUserColorScheme.length;
-					if (index < 0 || index >= theme.extraClrSchemeLst.length) {
-						return;
-					}
-
-					scheme = theme.extraClrSchemeLst[index].clrScheme.createDuplicate();
+				if (t.wbModel.changeColorScheme(index)) {
+					t.asc_AfterChangeColorScheme();
 				}
-				History.Create_NewPoint();
-				//не делаем Duplicate потому что предполагаем что схема не будет менять частями, а только обьектом целиком.
-				History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_ChangeColorScheme, null,
-					null, new AscCommonExcel.UndoRedoData_ClrScheme(theme.themeElements.clrScheme, scheme));
-				theme.themeElements.clrScheme = scheme;
-				t.asc_AfterChangeColorScheme();
 			}
 		};
 		// ToDo поправить заглушку, сделать новый тип lock element-а
@@ -2912,7 +2899,6 @@ var editor;
 		this._getIsLockObjectSheet(lockInfo, onChangeColorScheme);
 	};
   spreadsheet_api.prototype.asc_AfterChangeColorScheme = function() {
-    this.wbModel.rebuildColors();
     this.asc_CheckGuiControlColors();
     this.asc_ApplyColorScheme(true);
   };

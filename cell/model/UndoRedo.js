@@ -2868,6 +2868,7 @@ UndoRedoWorkbook.prototype = {
 				wb.theme.themeElements.clrScheme = Data.oldVal;
 			else
 				wb.theme.themeElements.clrScheme = Data.newVal;
+			wb.rebuildColors();
 			wb.oApi.asc_AfterChangeColorScheme();
 		}
 		else if (AscCH.historyitem_Workbook_DefinedNamesChange === Type || AscCH.historyitem_Workbook_DefinedNamesChangeUndo === Type) {
