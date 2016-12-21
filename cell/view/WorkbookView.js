@@ -3024,6 +3024,9 @@
 	WorkbookView.prototype.ConvertXYToLogic = function (x, y) {
 	  return this.getWorksheet().ConvertXYToLogic(x, y);
 	};
+	WorkbookView.prototype.ConvertLogicToXY = function (xL, yL) {
+		return this.getWorksheet().ConvertLogicToXY(xL, yL);
+	};
 
   //------------------------------------------------------------export---------------------------------------------------
   window['AscCommonExcel'] = window['AscCommonExcel'] || {};
