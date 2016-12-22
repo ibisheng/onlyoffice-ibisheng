@@ -11012,8 +11012,8 @@ drawSurfaceChart.prototype =
 		
 		var getIntersectionPlanesAndLines = function(lines, pointsValue)
 		{
-			var minVal = Math.min(pointsValue[0], pointsValue[1], pointsValue[2], pointsValue[3]);
-			var maxVal = Math.max(pointsValue[0], pointsValue[1], pointsValue[2], pointsValue[3]);
+			var minVal = Math.min(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val, pointsValue[3].val);
+			var maxVal = Math.max(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val, pointsValue[3].val);
 			
 			//находим пересечение даннного сегмента с плоскостями сетки
 			for(var k = 0; k < yPoints.length; k++)
@@ -11023,25 +11023,50 @@ drawSurfaceChart.prototype =
 					continue;
 				}
 				
-				//var pointsStart = {p1: , p2: };
-				
 				var gridX1 = xPoints[0].pos * t.chartProp.pxToMM;
 				var gridX2 = xPoints[xPoints.length - 1].pos * t.chartProp.pxToMM;
 				var gridY1 = yPoints[k].pos * t.chartProp.pxToMM;
 				var gridY2 = yPoints[k].pos * t.chartProp.pxToMM;
-				
 				var curPlain = t.cChartDrawer.getPlainEquation({x: gridX1,y: gridY1, z: 0}, {x: gridX2, y: gridY2, z: 0}, {x: gridX2, y: gridY2, z: perspectiveDepth});
 				
-				var tempPoints;
+				var tempPoints = [];
+				var isFacePoint = null; 
+				if(pointsValue[0].val === yPoints[k].val)
+				{
+				    tempPoints[0] = pointsValue[0];
+					isFacePoint = pointsValue[0];
+				}
+				else if(pointsValue[1].val === yPoints[k].val)
+				{
+					tempPoints[0] = pointsValue[1];
+					isFacePoint = pointsValue[1];
+				}
+				else if(pointsValue[2].val === yPoints[k].val)
+				{
+					tempPoints[1] = pointsValue[2];
+					isFacePoint = pointsValue[2];
+				}
+				else if(pointsValue[3].val === yPoints[k].val)
+				{
+					tempPoints[1] = pointsValue[3];
+					isFacePoint = pointsValue[3];
+				}
+				
+				//n --> lines --> 0 - down, 1 - up, 2 - left, 3 - right, 4 - diagonal 
 				for(var n = 0; n < lines.length; n++)
 				{
+					
+					
 					var curLine1 = t.cChartDrawer.getLineEquation(lines[n].p1, lines[n].p2);
 					
 					var isIntersectionPlainAndLine = t.cChartDrawer.isIntersectionPlainAndLine(curPlain ,curLine1);
 					var convertResult = t.cChartDrawer._convertAndTurnPoint(isIntersectionPlainAndLine.x, isIntersectionPlainAndLine.y, isIntersectionPlainAndLine.z);
 					
+					if(isFacePoint && convertResult.x === isFacePoint.x && convertResult.y === isFacePoint.y)
+					{
+						continue;
+					}
 					
-					//(x-x1)(y2-y1)-(y-y1)(x2-x1) = 0
 					var isBetween = (convertResult.x >= lines[n].p111.x && convertResult.x <= lines[n].p222.x) || (convertResult.x <= lines[n].p111.x && convertResult.x >= lines[n].p222.x);
 					
 					//принадлежит ли даная точка отрезку
@@ -11050,61 +11075,69 @@ drawSurfaceChart.prototype =
 						var vectorMultiplication = ((convertResult.x - lines[n].p111.x) * (lines[n].p222.y - lines[n].p111.y)) - ((convertResult.y - lines[n].p111.y) * (lines[n].p222.x - lines[n].p111.x));
 						if(Math.round(vectorMultiplication) === 0)
 						{
-							var test = true;
-							//console.log(convertResult);
+							tempPoints[n] = convertResult;
 						}
 					}
-					
-					/*if((yPoints[k].val >= lines[n].p1.val && yPoints[k].val <= lines[n].p2.val) || (yPoints[k].val <= lines[n].p1.val && yPoints[k].val >= lines[n].p2.val))
-					{
-						
-						var curTempIntersection = t.cChartDrawer.isIntersectionLineAndLine(curLine1, curLine2);
-						
-						
-						var convertResult = t.cChartDrawer._convertAndTurnPoint(curTempIntersection.x, curTempIntersection.y, lines[n].p2.z);
-						
-						if(!tempPoints)
-						{
-							tempPoints = {};
-						}
-						
-						if(0 === n)
-						{
-							tempPoints.p1 = convertResult; 
-						}
-						else if(2 === n)
-						{
-							tempPoints.p3 = convertResult; 
-						}
-						else if(1 === n)
-						{
-							tempPoints.p2 = convertResult; 
-						}
-					}*/
 				}
 				
-				/*if(tempPoints && tempPoints.p1 && tempPoints.p2)
+				
+				
+				
+				var p1 = null, p2 = null;
+				
+				if(tempPoints[0] && tempPoints[1])
+				{
+					p1 = tempPoints[0];
+					p2 = tempPoints[1];
+				}
+				else if(tempPoints[0] && tempPoints[3])
+				{
+					p1 = tempPoints[0];
+					p2 = tempPoints[3];
+				}
+				else if(tempPoints[3] && tempPoints[1])
+				{
+					p1 = tempPoints[3];
+					p2 = tempPoints[1];
+				}
+				else if(tempPoints[2] && tempPoints[1])
+				{
+					p1 = tempPoints[2];
+					p2 = tempPoints[1];
+				}
+				else if(tempPoints[2] && tempPoints[0])
+				{
+					p1 = tempPoints[2];
+					p2 = tempPoints[0];
+				}
+				else if(tempPoints[2] && tempPoints[3])
+				{
+					p1 = tempPoints[2];
+					p2 = tempPoints[3];
+				}
+				
+				
+				if(p1 && p2)
 				{
 					if(!t.paths.test2[k])
 					{
 						t.paths.test2[k] = [];
 					}
-					t.paths.test2[k].push(t.cChartDrawer._calculatePathFace(pointStart.p1, pointStart.p2, tempPoints.p2, tempPoints.p1, true));
-					pointStart = {p1: tempPoints.p1, p2: tempPoints.p2};
-				}*/
+					
+					if(tempPoints[4])
+					{
+						t.paths.test2[k].push(t._calculatePath(p1.x, p1.y, tempPoints[4].x, tempPoints[4].y))
+						t.paths.test2[k].push(t._calculatePath(tempPoints[4].x, tempPoints[4].y, p2.x, p2.y))
+					}
+					else
+					{
+						t.paths.test2[k].push(t._calculatePath(p1.x, p1.y, p2.x, p2.y))
+					}
+				}
+				
 			}
 		};
 		
-		
-		/*for(var i = 0; i < yPoints.length; i++)
-		{
-			var p1 = this.cChartDrawer._convertAndTurnPoint(left, yPoints[i].pos * this.chartProp.pxToMM, 0, null, null, true);
-			var p2 = this.cChartDrawer._convertAndTurnPoint(left + width, yPoints[i].pos * this.chartProp.pxToMM, 0, null, null, true);
-			var p3 = this.cChartDrawer._convertAndTurnPoint(left + width, yPoints[i].pos * this.chartProp.pxToMM, perspectiveDepth, null, null, true); 
-			
-			var plainEquation = this.cChartDrawer.getPlainEquation(p1, p2, p3);
-			gridPlaneEquations.push(plainEquation);
-		}*/
 		
 		var temp = [];
 		for(var i = 0; i < points.length; i++)
@@ -11222,8 +11255,8 @@ drawSurfaceChart.prototype =
 				
 				
 				var pointStart = {p1: p, p2: p1};
-				getIntersectionLinesAndLines(lines, pointStart);
-				var pointsValue = [p1.val, p2.val, p21.val, p.val];
+				//getIntersectionLinesAndLines(lines, pointStart);
+				var pointsValue = [p1, p2, p21, p];
 				getIntersectionPlanesAndLines(lines, pointsValue);
 				
 				
