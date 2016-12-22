@@ -11643,7 +11643,7 @@
                             //TODO просмотерть ситуации без заливки
                             var color = cell.getStyle();
                             var cellColor = null !== color && color.fill && color.fill.bg ? color.fill.bg : null;
-                            filter.filter.dxf.fill.bg = cellColor;
+                            filter.filter.dxf.fill.bg = null !== cellColor ? new AscCommonExcel.RgbColor(cellColor.rgb) : new AscCommonExcel.RgbColor(null);
                         }
                     }
                 }

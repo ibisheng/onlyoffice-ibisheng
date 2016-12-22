@@ -96,6 +96,36 @@
 	AscCommon.extendClass(ApiChart, ApiDrawing);
 
 	/**
+	 * @typedef {("aliceBlue" | "antiqueWhite" | "aqua" | "aquamarine" | "azure" | "beige" | "bisque" | "black" |
+     *     "blanchedAlmond" | "blue" | "blueViolet" | "brown" | "burlyWood" | "cadetBlue" | "chartreuse" | "chocolate"
+     *     | "coral" | "cornflowerBlue" | "cornsilk" | "crimson" | "cyan" | "darkBlue" | "darkCyan" | "darkGoldenrod" |
+     *     "darkGray" | "darkGreen" | "darkGrey" | "darkKhaki" | "darkMagenta" | "darkOliveGreen" | "darkOrange" |
+     *     "darkOrchid" | "darkRed" | "darkSalmon" | "darkSeaGreen" | "darkSlateBlue" | "darkSlateGray" |
+     *     "darkSlateGrey" | "darkTurquoise" | "darkViolet" | "deepPink" | "deepSkyBlue" | "dimGray" | "dimGrey" |
+     *     "dkBlue" | "dkCyan" | "dkGoldenrod" | "dkGray" | "dkGreen" | "dkGrey" | "dkKhaki" | "dkMagenta" |
+     *     "dkOliveGreen" | "dkOrange" | "dkOrchid" | "dkRed" | "dkSalmon" | "dkSeaGreen" | "dkSlateBlue" |
+     *     "dkSlateGray" | "dkSlateGrey" | "dkTurquoise" | "dkViolet" | "dodgerBlue" | "firebrick" | "floralWhite" |
+     *     "forestGreen" | "fuchsia" | "gainsboro" | "ghostWhite" | "gold" | "goldenrod" | "gray" | "green" |
+     *     "greenYellow" | "grey" | "honeydew" | "hotPink" | "indianRed" | "indigo" | "ivory" | "khaki" | "lavender" |
+     *     "lavenderBlush" | "lawnGreen" | "lemonChiffon" | "lightBlue" | "lightCoral" | "lightCyan" |
+     *     "lightGoldenrodYellow" | "lightGray" | "lightGreen" | "lightGrey" | "lightPink" | "lightSalmon" |
+     *     "lightSeaGreen" | "lightSkyBlue" | "lightSlateGray" | "lightSlateGrey" | "lightSteelBlue" | "lightYellow" |
+     *     "lime" | "limeGreen" | "linen" | "ltBlue" | "ltCoral" | "ltCyan" | "ltGoldenrodYellow" | "ltGray" |
+     *     "ltGreen" | "ltGrey" | "ltPink" | "ltSalmon" | "ltSeaGreen" | "ltSkyBlue" | "ltSlateGray" | "ltSlateGrey"|
+     *     "ltSteelBlue" | "ltYellow" | "magenta" | "maroon" | "medAquamarine" | "medBlue" | "mediumAquamarine" |
+     *     "mediumBlue" | "mediumOrchid" | "mediumPurple" | "mediumSeaGreen" | "mediumSlateBlue" |
+     *     "mediumSpringGreen" | "mediumTurquoise" | "mediumVioletRed" | "medOrchid" | "medPurple" | "medSeaGreen" |
+     *     "medSlateBlue" | "medSpringGreen" | "medTurquoise" | "medVioletRed" | "midnightBlue" | "mintCream" |
+     *     "mistyRose" | "moccasin" | "navajoWhite" | "navy" | "oldLace" | "olive" | "oliveDrab" | "orange" |
+     *     "orangeRed" | "orchid" | "paleGoldenrod" | "paleGreen" | "paleTurquoise" | "paleVioletRed" | "papayaWhip"|
+     *     "peachPuff" | "peru" | "pink" | "plum" | "powderBlue" | "purple" | "red" | "rosyBrown" | "royalBlue" |
+     *     "saddleBrown" | "salmon" | "sandyBrown" | "seaGreen" | "seaShell" | "sienna" | "silver" | "skyBlue" |
+     *     "slateBlue" | "slateGray" | "slateGrey" | "snow" | "springGreen" | "steelBlue" | "tan" | "teal" |
+     *     "thistle" | "tomato" | "turquoise" | "violet" | "wheat" | "white" | "whiteSmoke" | "yellow" |
+     *     "yellowGreen")} PresetColor
+	 * */
+
+	/**
 	 * Class representing a base class for color types
 	 * @constructor
 	 */
@@ -127,6 +157,17 @@
 	 */
 	Api.prototype.CreateColorFromRGB = function (r, g, b) {
 		return new ApiColor(AscCommonExcel.createRgbColor(r, g, b));
+	};
+
+	/**
+	 * Create a RGB color
+	 * @memberof Api
+	 * @param {PresetColor} presetColor
+	 * @returns {ApiColor}
+	 */
+	Api.prototype.CreateColorByName = function (presetColor) {
+		var rgb = map_prst_color[presetColor];
+		return new ApiColor(AscCommonExcel.createRgbColor((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF));
 	};
 
 	/**
@@ -453,7 +494,7 @@
 	 * @param {ApiColor} color
 	 */
 	ApiRange.prototype.SetFontColor = function (color) {
-		this.range.setFontcolor(AscCommonExcel.CorrectAscColor(color.color));
+		this.range.setFontcolor(color.color);
 	};
 
 	/**
@@ -581,7 +622,7 @@
 	 * @param {ApiColor} color
 	 */
 	ApiRange.prototype.SetFillColor = function (color) {
-		this.range.setFill(AscCommonExcel.CorrectAscColor(color.color));
+		this.range.setFill(color.color);
 	};
 
 	/**
@@ -882,6 +923,7 @@
 	Api.prototype["GetActiveSheet"] = Api.prototype.GetActiveSheet;
 	Api.prototype["CreateNewHistoryPoint"] = Api.prototype.CreateNewHistoryPoint;
 	Api.prototype["CreateColorFromRGB"] = Api.prototype.CreateColorFromRGB;
+	Api.prototype["CreateColorByName"] = Api.prototype.CreateColorByName;
 
 	ApiWorksheet.prototype["GetActiveCell"] = ApiWorksheet.prototype.GetActiveCell;
 	ApiWorksheet.prototype["SetName"] = ApiWorksheet.prototype.SetName;
@@ -1001,7 +1043,7 @@
 		}
 
 		if (color) {
-			border.c = AscCommonExcel.CorrectAscColor(color);
+			border.c = color.color;
 		}
 		return border;
 	}
