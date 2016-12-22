@@ -12575,7 +12575,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
                 break;
             }
             case "nextTo":{
-                nPositionType = c_oAscTickLabelsPos.TICK_LABEL_POSITION_LOW;
+                nPositionType = c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO;
                 break;
             }
             case "none":{
