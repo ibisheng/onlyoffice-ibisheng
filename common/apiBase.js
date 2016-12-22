@@ -473,6 +473,10 @@
 			AscCommon.getFile(url);
 		}
 	};
+	baseEditorsApi.prototype.forceSave = function()
+	{
+		this.CoAuthoringApi.forceSave()
+	};
 	// Выставление интервала автосохранения (0 - означает, что автосохранения нет)
 	baseEditorsApi.prototype.asc_setAutoSaveGap                  = function(autoSaveGap)
 	{
