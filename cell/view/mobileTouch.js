@@ -66,6 +66,13 @@ function (window, undefined)
 	{
 		var _res = this.WB.ConvertLogicToXY(x, y);
 		var _point = {X: _res.X, Y: _res.Y, Page: 0, DrawPage: 0};
+
+		if (isGlobal !== false)
+		{
+			_point.X += this.Offset.X;
+			_point.Y += this.Offset.Y;
+		}
+
 		return _point;
 	};
 	CMobileDelegateEditorCell.prototype.ConvertCoordsFromCursor = function(x, y)
@@ -250,8 +257,10 @@ function (window, undefined)
 	CMobileDelegateEditorCell.prototype._convertLogicToEvent = function(e, x, y, page)
 	{
 		var _e = {};
-		_e.pageX = x / AscBrowser.zoom;
-		_e.pageY = y / AscBrowser.zoom;
+		var _pos = this.ConvertCoordsToCursor(x, y, 0);
+
+		_e.pageX = _pos.X / AscBrowser.zoom;
+		_e.pageY = _pos.Y / AscBrowser.zoom;
 
 		_e.altKey 	= global_mouseEvent.AltKey;
 		_e.shiftKey = global_mouseEvent.ShiftKey;
@@ -402,11 +411,11 @@ function (window, undefined)
 			}
 			case AscCommon.MobileTouchMode.Select:
 			{
-				var _x1 = this.RectSelect1.x;
-				var _y1 = this.RectSelect1.y + this.RectSelect1.h / 2;
+				var _x1 = this.RectSelect1.x + 0.5;
+				var _y1 = this.RectSelect1.y + 0.5;
 
-				var _x2 = this.RectSelect2.x + this.RectSelect2.w;
-				var _y2 = this.RectSelect2.y + this.RectSelect2.h / 2;
+				var _x2 = this.RectSelect2.x + this.RectSelect2.w - 0.5;
+				var _y2 = this.RectSelect2.y + this.RectSelect2.h - 0.5;
 
 				if (1 == this.DragSelect)
 				{
@@ -424,7 +433,7 @@ function (window, undefined)
 						this.delegate.Logic_OnMouseDown(global_mouseEvent, __X, __Y, this.PageSelect2);
 					}
 
-					var pos1 = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
+					var pos1 = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X + this.delegate.Offset.X, global_mouseEvent.Y + this.delegate.Offset.Y);
 					this.delegate.Logic_OnMouseMove(global_mouseEvent, pos1.X, pos1.Y, pos1.Page);
 				}
 				else if (2 == this.DragSelect)
@@ -443,7 +452,7 @@ function (window, undefined)
 						this.delegate.Logic_OnMouseDown(global_mouseEvent, __X, __Y, this.PageSelect1);
 					}
 
-					var pos4 = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
+					var pos4 = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X + this.delegate.Offset.X, global_mouseEvent.Y + this.delegate.Offset.Y);
 					this.delegate.Logic_OnMouseMove(global_mouseEvent, pos4.X, pos4.Y, pos4.Page);
 				}
 				break;
@@ -574,7 +583,7 @@ function (window, undefined)
 			{
 				// во время движения может смениться порядок ректов
 				global_mouseEvent.ClickCount = 1;
-				var pos                      = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
+				var pos                      = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X + this.delegate.Offset.X, global_mouseEvent.Y + this.delegate.Offset.Y);
 				this.delegate.Logic_OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
 				AscCommon.stopEvent(e);
 				break;
@@ -646,7 +655,7 @@ function (window, undefined)
 				// ничего не нужно делать
 				this.DragSelect = 0;
 				this.Mode       = AscCommon.MobileTouchMode.None;
-				var pos         = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
+				var pos         = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X + this.delegate.Offset.X, global_mouseEvent.Y + this.delegate.Offset.Y);
 				this.delegate.Logic_OnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
 				AscCommon.stopEvent(e);
 				break;
