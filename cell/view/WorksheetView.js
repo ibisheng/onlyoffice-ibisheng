@@ -3588,6 +3588,24 @@
         }
         ctx.closePath().stroke();
 
+		// draw active cell in selection
+		var isActive = AscCommonExcel.selectionLineType.ActiveCell & selectionLineType;
+		if (isActive) {
+			var cell = (this.isSelectionDialogMode ? this.copyActiveRange : this.model.selectionRange).activeCell;
+			var fs = this.model.getMergedByCell(cell.row, cell.col);
+			fs = range.intersectionSimple(
+				fs ? fs : new asc_Range(cell.col, cell.row, cell.col, cell.row));
+			if (fs) {
+				var _x1 = c[fs.c1].left - offsetX + width_1px;
+				var _y1 = r[fs.r1].top - offsetY + height_1px;
+				var _w = c[fs.c2].left - c[fs.c1].left + c[fs.c2].width - width_2px;
+				var _h = r[fs.r2].top - r[fs.r1].top + r[fs.r2].height - height_2px;
+				if (0 < _w && 0 < _h) {
+					ctx.clearRect(_x1, _y1, _w, _h);
+				}
+			}
+		}
+
         if (canFill) {/*Отрисовка светлой полосы при выборе ячеек для формулы*/
             ctx.setLineWidth(1);
             ctx.setStrokeStyle(colorN);
@@ -3605,24 +3623,6 @@
                 fVerLine.apply(ctx, [x2 - width_1px, y1, y2 - height_2px]);
             }
             ctx.closePath().stroke();
-        }
-
-        // draw active cell in selection
-        var isActive = AscCommonExcel.selectionLineType.ActiveCell & selectionLineType;
-        if (isActive) {
-            var cell = (this.isSelectionDialogMode ? this.copyActiveRange : this.model.selectionRange).activeCell;
-            var fs = this.model.getMergedByCell(cell.row, cell.col);
-            fs = range.intersectionSimple(
-              fs ? fs : new asc_Range(cell.col, cell.row, cell.col, cell.row));
-            if (fs) {
-                var _x1 = c[fs.c1].left - offsetX + width_1px;
-                var _y1 = r[fs.r1].top - offsetY + height_1px;
-                var _w = c[fs.c2].left - c[fs.c1].left + c[fs.c2].width - width_2px;
-                var _h = r[fs.r2].top - r[fs.r1].top + r[fs.r2].height - height_2px;
-                if (0 < _w && 0 < _h) {
-                    ctx.clearRect(_x1, _y1, _w, _h);
-                }
-            }
         }
 
         // Отрисовка квадратов для move/resize
