@@ -10983,6 +10983,7 @@ drawSurfaceChart.prototype =
 	
 	test: function(points, points3d)
 	{
+		var t = this;
 		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
 		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
 		
@@ -10991,6 +10992,159 @@ drawSurfaceChart.prototype =
 		var left = this.chartProp.chartGutter._left;
 		var right = this.chartProp.chartGutter._right;
 		var width = this.chartProp.widthCanvas - (left + right);
+		
+		
+		
+		var getIntersectionLinesAndLines = function(lines, pointStart)
+		{
+			//находим пересечение даннного сегмента с плоскостями сетки
+			for(var k = 0; k < yPoints.length; k++)
+			{
+				//var pointsStart = {p1: , p2: };
+				
+				var gridX1 = xPoints[0].pos * t.chartProp.pxToMM;
+				var gridX2 = xPoints[xPoints.length - 1].pos * t.chartProp.pxToMM;
+				var gridY1 = yPoints[k].pos * t.chartProp.pxToMM;
+				var gridY2 = yPoints[k].pos * t.chartProp.pxToMM;
+				
+				
+				var tempPoints;
+				for(var n = 0; n < lines.length; n++)
+				{
+					var curLine2 = t.cChartDrawer.getLineEquation({x: gridX1,y: gridY1, z: lines[n].p2.z}, {x: gridX2, y: gridY2, z: lines[n].p2.z});
+					var curLine1 = t.cChartDrawer.getLineEquation(lines[n].p1, lines[n].p2);
+					
+					if((yPoints[k].val >= lines[n].p1.val && yPoints[k].val <= lines[n].p2.val) || (yPoints[k].val <= lines[n].p1.val && yPoints[k].val >= lines[n].p2.val))
+					{
+						
+						var curTempIntersection = t.cChartDrawer.isIntersectionLineAndLine(curLine1, curLine2);
+						
+						
+						var convertResult = t.cChartDrawer._convertAndTurnPoint(curTempIntersection.x, curTempIntersection.y, lines[n].p2.z);
+						
+						if(!tempPoints)
+						{
+							tempPoints = {};
+						}
+						
+						if(0 === n)
+						{
+							tempPoints.p1 = convertResult; 
+						}
+						else if(2 === n)
+						{
+							tempPoints.p3 = convertResult; 
+						}
+						else if(1 === n)
+						{
+							tempPoints.p2 = convertResult; 
+						}
+						
+						/*if(!points[i][n].intersections)
+						{
+							points[i][n].intersections = [];
+						}
+						points[i][n].intersections[k] = convertResult;*/
+					}
+				}
+				
+				if(tempPoints && tempPoints.p1 && tempPoints.p2)
+				{
+					if(!t.paths.test2[k])
+					{
+						t.paths.test2[k] = [];
+					}
+					t.paths.test2[k].push(t.cChartDrawer._calculatePathFace(pointStart.p1, pointStart.p2, tempPoints.p2, tempPoints.p1, true));
+					pointStart = {p1: tempPoints.p1, p2: tempPoints.p2};
+				}
+			}
+		};
+		
+		var getIntersectionPlanesAndLines = function(lines, pointsValue)
+		{
+			var minVal = Math.min(pointsValue[0], pointsValue[1], pointsValue[2], pointsValue[3]);
+			var maxVal = Math.max(pointsValue[0], pointsValue[1], pointsValue[2], pointsValue[3]);
+			
+			//находим пересечение даннного сегмента с плоскостями сетки
+			for(var k = 0; k < yPoints.length; k++)
+			{
+				if(!(yPoints[k].val >= minVal && yPoints[k].val <= maxVal))
+				{
+					continue;
+				}
+				
+				//var pointsStart = {p1: , p2: };
+				
+				var gridX1 = xPoints[0].pos * t.chartProp.pxToMM;
+				var gridX2 = xPoints[xPoints.length - 1].pos * t.chartProp.pxToMM;
+				var gridY1 = yPoints[k].pos * t.chartProp.pxToMM;
+				var gridY2 = yPoints[k].pos * t.chartProp.pxToMM;
+				
+				var curPlain = t.cChartDrawer.getPlainEquation({x: gridX1,y: gridY1, z: 0}, {x: gridX2, y: gridY2, z: 0}, {x: gridX2, y: gridY2, z: perspectiveDepth});
+				
+				var tempPoints;
+				for(var n = 0; n < lines.length; n++)
+				{
+					var curLine1 = t.cChartDrawer.getLineEquation(lines[n].p1, lines[n].p2);
+					
+					var isIntersectionPlainAndLine = t.cChartDrawer.isIntersectionPlainAndLine(curPlain ,curLine1);
+					var convertResult = t.cChartDrawer._convertAndTurnPoint(isIntersectionPlainAndLine.x, isIntersectionPlainAndLine.y, isIntersectionPlainAndLine.z);
+					
+					
+					//(x-x1)(y2-y1)-(y-y1)(x2-x1) = 0
+					var isBetween = (convertResult.x >= lines[n].p111.x && convertResult.x <= lines[n].p222.x) || (convertResult.x <= lines[n].p111.x && convertResult.x >= lines[n].p222.x);
+					
+					//принадлежит ли даная точка отрезку
+					if(isBetween)
+					{
+						var vectorMultiplication = ((convertResult.x - lines[n].p111.x) * (lines[n].p222.y - lines[n].p111.y)) - ((convertResult.y - lines[n].p111.y) * (lines[n].p222.x - lines[n].p111.x));
+						if(Math.round(vectorMultiplication) === 0)
+						{
+							var test = true;
+							//console.log(convertResult);
+						}
+					}
+					
+					/*if((yPoints[k].val >= lines[n].p1.val && yPoints[k].val <= lines[n].p2.val) || (yPoints[k].val <= lines[n].p1.val && yPoints[k].val >= lines[n].p2.val))
+					{
+						
+						var curTempIntersection = t.cChartDrawer.isIntersectionLineAndLine(curLine1, curLine2);
+						
+						
+						var convertResult = t.cChartDrawer._convertAndTurnPoint(curTempIntersection.x, curTempIntersection.y, lines[n].p2.z);
+						
+						if(!tempPoints)
+						{
+							tempPoints = {};
+						}
+						
+						if(0 === n)
+						{
+							tempPoints.p1 = convertResult; 
+						}
+						else if(2 === n)
+						{
+							tempPoints.p3 = convertResult; 
+						}
+						else if(1 === n)
+						{
+							tempPoints.p2 = convertResult; 
+						}
+					}*/
+				}
+				
+				/*if(tempPoints && tempPoints.p1 && tempPoints.p2)
+				{
+					if(!t.paths.test2[k])
+					{
+						t.paths.test2[k] = [];
+					}
+					t.paths.test2[k].push(t.cChartDrawer._calculatePathFace(pointStart.p1, pointStart.p2, tempPoints.p2, tempPoints.p1, true));
+					pointStart = {p1: tempPoints.p1, p2: tempPoints.p2};
+				}*/
+			}
+		};
+		
 		
 		/*for(var i = 0; i < yPoints.length; i++)
 		{
@@ -11059,6 +11213,11 @@ drawSurfaceChart.prototype =
 					this.paths.test = [];
 				}
 				
+				if(!this.paths.test2)
+				{
+					this.paths.test2 = [];
+				}
+				
 				//this.paths.test.push(this._calculatePath(p.x, p.y, p1.x, p1.y));
 				//this.paths.test.push(this._calculatePath(p2.x, p2.y, p21.x, p21.y));
 				
@@ -11070,7 +11229,7 @@ drawSurfaceChart.prototype =
 				var p23d = points3d[i][j + 1];
 				var p213d = points3d[i + 1][j + 1];
 				
-				var lines = [{p1: p3d, p2: p23d}, {p1: p13d, p2: p213d}];
+				var lines = [{p1: p3d, p2: p23d, p111: p, p222: p2}, {p1: p13d, p2: p213d, p111: p1, p222: p21}, {p1: p3d, p2: p13d, p111: p, p222: p1}, {p1: p23d, p2: p213d, p111: p2, p222: p21}];
 				
 				
 				//var tempFaces = [{p1: p, p2: p2, p3: p21, p1: p1}];
@@ -11079,24 +11238,24 @@ drawSurfaceChart.prototype =
 					var max = p.val;
 					var maxIndex = 0;
 					var arrVal = [p, p1, p2, p21];
-					for(var t = 0; t < arrVal.length; t++)
+					for(var m = 0; m < arrVal.length; m++)
 					{
-						if(arrVal[t].val > max)
+						if(arrVal[m].val > max)
 						{	
-							max = arrVal[t].val;
-							maxIndex = t;
+							max = arrVal[m].val;
+							maxIndex = m;
 						}
 					}
 					
 					if(maxIndex === 0 || maxIndex === 3)
 					{	
 						//var tempFaces = [{p: p, p21: p21, p1: p1}, {p: p, p21: p21, p2: p2}];
-						lines.push({p1: p213d, p2: p3d});
+						lines.push({p1: p213d, p2: p3d, p111: p21, p222: p});
 						this.paths.test.push(this._calculatePath(p21.x, p21.y, p.x, p.y));
 					}
 					else
 					{
-						lines.push({p1: p213d, p2: p3d});
+						lines.push({p1: p13d, p2: p23d, p111: p1, p222: p2});
 						//var tempFaces = [{p: p, p21: p21, p1: p1}, {p: p, p21: p21, p2: p2}];
 						this.paths.test.push(this._calculatePath(p2.x, p2.y, p1.x, p1.y));
 					}
@@ -11111,44 +11270,11 @@ drawSurfaceChart.prototype =
 				//  |       |
 				//  p-------p2
 				
-				//находим пересечение даннного сегмента с плоскостями сетки
 				
-				var pointsArr = [];
-				for(var k = 0; k < yPoints.length; k++)
-				{
-					//var pointsStart = {p1: , p2: };
-					
-					var gridX1 = xPoints[0].pos * this.chartProp.pxToMM;
-					var gridX2 = xPoints[xPoints.length - 1].pos * this.chartProp.pxToMM;
-					var gridY1 = yPoints[k].pos * this.chartProp.pxToMM;
-					var gridY2 = yPoints[k].pos * this.chartProp.pxToMM;
-					
-					
-					for(var n = 0; n < lines.length; n++)
-					{
-						var curLine2 = this.cChartDrawer.getLineEquation({x: gridX1,y: gridY1, z: lines[n].p2.z}, {x: gridX2, y: gridY2, z: lines[n].p2.z});
-						var curLine1 = this.cChartDrawer.getLineEquation(lines[n].p1, lines[n].p2);
-						if(yPoints[k].val >= lines[n].p1.val && yPoints[k].val <= lines[n].p2.val)
-						{
-							
-							var curTempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, curLine2);
-							
-							
-							var convertResult = this.cChartDrawer._convertAndTurnPoint(curTempIntersection.x, curTempIntersection.y, lines[n].p2.z);
-							
-							
-							
-							var test1 = 1;
-							/*if(!points[i][n].intersections)
-							{
-								points[i][n].intersections = [];
-							}
-							points[i][n].intersections[k] = convertResult;*/
-						}
-					}
-				}
-				
-				
+				var pointStart = {p1: p, p2: p1};
+				getIntersectionLinesAndLines(lines, pointStart);
+				var pointsValue = [p1.val, p2.val, p21.val, p.val];
+				getIntersectionPlanesAndLines(lines, pointsValue);
 				
 				
 				
@@ -11230,6 +11356,55 @@ drawSurfaceChart.prototype =
 			pen.w = 20000;
 			
 			this.cChartDrawer.drawPath(this.paths.test[i], pen, null, false);
+		}
+		
+		
+		
+		
+		for(var i = 0; i < this.paths.test2.length; i++)
+		{
+			if(!this.paths.test2[i])
+				continue;
+				
+			for(var j = 0; j < this.paths.test2[i].length; j++)
+			{
+				
+				if(this.chartProp.series[1])
+				{
+					var pt = this.chartProp.series[1].val.numRef.numCache.pts[0];
+					var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
+					//pen.w = 5000;
+					
+					var brush = pt.brush;
+					
+					var  props = this.cChartSpace.getParentObjects();
+					var duplicateBrush = brush;
+						
+					duplicateBrush = brush.createDuplicate();
+					var cColorMod = new AscFormat.CColorMod;
+					
+					cColorMod.val = 15000 + (i) * 10000;
+					
+					cColorMod.name = "shade";
+					duplicateBrush.addColorMod(cColorMod);
+					duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
+					
+					brush = duplicateBrush;
+				}
+				else
+				{
+					//var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
+					//pen.w = 5000;
+					var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
+					pen.w = 5000;
+					var brush = null;
+				}
+				
+				
+				
+				this.cChartDrawer.drawPath(this.paths.test2[i][j], pen, brush);
+			}
+			
 		}
 	}
 }
