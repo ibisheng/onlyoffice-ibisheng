@@ -11271,8 +11271,10 @@ drawSurfaceChart.prototype =
 	
 	_calculatePath: function(x, y, x1, y1)
 	{
+		var pathId = this.cChartSpace.AllocPath();
+        var path  = this.cChartSpace.GetPath(pathId);
+		
 		var pxToMm = this.chartProp.pxToMM;
-		var path  = new Path();
 		
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
@@ -11285,9 +11287,8 @@ drawSurfaceChart.prototype =
 		
 		path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
 		path.lnTo(x1 / pxToMm * pathW, y1 / pxToMm * pathH);
-		path.recalculate(gdLst);
 		
-		return path;
+		return pathId;
 	},
 	
 	_draw: function()
