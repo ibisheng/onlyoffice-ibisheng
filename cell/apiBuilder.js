@@ -634,10 +634,29 @@
 	/**
 	 * Set underline
 	 * @memberof ApiRange
-	 * @param {bool} value
+	 * @param {'none' | 'single' | 'singleAccounting' | 'double' | 'doubleAccounting'} value
 	 */
 	ApiRange.prototype.SetUnderline = function (value) {
-		this.range.setUnderline(!!value);
+		var val;
+		switch (value) {
+			case 'single':
+				val = Asc.EUnderline.underlineSingle;
+				break;
+			case 'singleAccounting':
+				val = Asc.EUnderline.underlineSingleAccounting;
+				break;
+			case 'double':
+				val = Asc.EUnderline.underlineDouble;
+				break;
+			case 'doubleAccounting':
+				val = Asc.EUnderline.underlineDoubleAccounting;
+				break;
+			case 'none':
+			default:
+				val = Asc.EUnderline.underlineNone;
+				break;
+		}
+		this.range.setUnderline(val);
 	};
 
 	/**
