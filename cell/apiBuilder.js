@@ -997,6 +997,14 @@
 		AscFormat.builder_SetChartHorAxisTickLablePosition(this.Chart, sTickLabelPosition);
 	};
 
+	/**
+	 * Get the type of this class.
+	 * @returns {"color"}
+	 */
+	ApiColor.prototype.GetClassType = function () {
+		return "color";
+	};
+
 
 	Api.prototype["GetActiveSheet"] = Api.prototype.GetActiveSheet;
 	Api.prototype["GetThemesColors"] = Api.prototype.GetThemesColors;
@@ -1057,6 +1065,8 @@
 	ApiChart.prototype["SetShowDataLabels"]            =  ApiChart.prototype.SetShowDataLabels;
 	ApiChart.prototype["SetVertAxisTickLabelPosition"] =  ApiChart.prototype.SetVertAxisTickLabelPosition;
 	ApiChart.prototype["SetHorAxisTickLabelPosition"]  =  ApiChart.prototype.SetHorAxisTickLabelPosition;
+
+	ApiColor.prototype["GetClassType"]                 =  ApiColor.prototype.GetClassType;
 
 
 	function private_SetCoords(oDrawing, oWorksheet, nExtX, nExtY, nFromCol, nColOffset,  nFromRow, nRowOffset){
