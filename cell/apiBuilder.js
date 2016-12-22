@@ -743,8 +743,9 @@
 	ApiRange.prototype.Merge = function (across) {
 		if (across) {
 			var ws = this.range.worksheet;
-			for (var r = this.range.r1; r <= this.range.r2; ++r) {
-				ws.getRange3(r, this.range.c1, r, this.range.c2).merge(null);
+			var bbox = this.range.getBBox0();
+			for (var r = bbox.r1; r <= bbox.r2; ++r) {
+				ws.getRange3(r, bbox.c1, r, bbox.c2).merge(null);
 			}
 		} else {
 			this.range.merge(null);
