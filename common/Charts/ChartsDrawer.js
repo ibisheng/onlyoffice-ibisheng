@@ -11066,6 +11066,22 @@ drawSurfaceChart.prototype =
 					{
 						continue;
 					}
+					if(pointsValue[0] && convertResult.x === pointsValue[0].x && convertResult.y === pointsValue[0].y)
+					{
+						continue;
+					}
+					if(pointsValue[1] && convertResult.x === pointsValue[1].x && convertResult.y === pointsValue[1].y)
+					{
+						continue;
+					}
+					if(pointsValue[2] && convertResult.x === pointsValue[2].x && convertResult.y === pointsValue[2].y)
+					{
+						continue;
+					}
+					if(pointsValue[3] && convertResult.x === pointsValue[3].x && convertResult.y === pointsValue[3].y)
+					{
+						continue;
+					}
 					
 					var isBetween = (convertResult.x >= lines[n].p111.x && convertResult.x <= lines[n].p222.x) || (convertResult.x <= lines[n].p111.x && convertResult.x >= lines[n].p222.x);
 					
@@ -11368,6 +11384,9 @@ drawSurfaceChart.prototype =
 					var cColorMod = new AscFormat.CColorMod;
 					
 					cColorMod.val = 15000 + (i) * 10000;
+					
+					pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
+					pen.w = 40000;
 					
 					cColorMod.name = "shade";
 					duplicateBrush.addColorMod(cColorMod);
