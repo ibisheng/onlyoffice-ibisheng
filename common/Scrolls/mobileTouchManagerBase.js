@@ -95,6 +95,10 @@
 		});
 	};
 
+	CMobileDelegateSimple.prototype.Resize = function()
+	{
+		return null;
+	};
 	CMobileDelegateSimple.prototype.GetSelectionTransform = function()
 	{
 		return null;
@@ -854,6 +858,7 @@
 	// изменился размер документа/экрана => нужно перескитать вспомогательный элемент для скролла
 	CMobileTouchManagerBase.prototype.Resize = function()
 	{
+		this.delegate.Resize();
 		this.CheckZoomCriticalValues();
 		if (this.iScroll != null)
 		{

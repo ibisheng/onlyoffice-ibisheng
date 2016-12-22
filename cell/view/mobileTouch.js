@@ -40,6 +40,7 @@ function (window, undefined)
 	// Import
 	var MATRIX_ORDER_PREPEND = AscCommon.MATRIX_ORDER_PREPEND;
 	var global_mouseEvent = AscCommon.global_mouseEvent;
+	var AscBrowser = AscCommon.AscBrowser;
 
 	/**
 	 * @extends {AscCommon.CMobileDelegateSimple}
@@ -55,6 +56,12 @@ function (window, undefined)
 	}
 	AscCommon.extendClass(CMobileDelegateEditorCell, AscCommon.CMobileDelegateSimple);
 
+	CMobileDelegateEditorCell.prototype.Resize = function()
+	{
+		var _element = document.getElementById("editor_sdk");
+		this.Offset.X = _element.offsetLeft;
+		this.Offset.Y = _element.offsetTop;
+	};
 	CMobileDelegateEditorCell.prototype.ConvertCoordsToCursor = function(x, y, page, isGlobal)
 	{
 		var _res = this.WB.ConvertLogicToXY(x, y);
@@ -63,10 +70,6 @@ function (window, undefined)
 	};
 	CMobileDelegateEditorCell.prototype.ConvertCoordsFromCursor = function(x, y)
 	{
-		var _element = document.getElementById("editor_sdk");
-		this.Offset.X = _element.offsetLeft;
-		this.Offset.Y = _element.offsetTop;
-
 		var _res = this.WB.ConvertXYToLogic(x - this.Offset.X, y - this.Offset.Y);
 		var _point = {X: _res.X, Y: _res.Y, Page: 0, DrawPage: 0};
 		return _point;
@@ -101,6 +104,16 @@ function (window, undefined)
 	};
 	CMobileDelegateEditorCell.prototype.GetSelectionRectsBounds = function()
 	{
+		var _selection = this.WB.GetSelectionRectsBounds();
+		if (_selection)
+		{
+			var _obj = {
+				Start : { X: _selection.X, Y: _selection.Y, W: _selection.W, H: _selection.H, Page: 0 },
+				End : { X: _selection.X, Y: _selection.Y, W: _selection.W, H: _selection.H, Page: 0 }
+			};
+			return _obj;
+		}
+
 		return this.WB.getWorksheet().objectRender.controller.Get_SelectionBounds();
 	};
 	CMobileDelegateEditorCell.prototype.ScrollTo = function(_scroll)
@@ -395,7 +408,6 @@ function (window, undefined)
 				var _x2 = this.RectSelect2.x + this.RectSelect2.w;
 				var _y2 = this.RectSelect2.y + this.RectSelect2.h / 2;
 
-				this.delegate.LogicDocument.Selection_Remove();
 				if (1 == this.DragSelect)
 				{
 					global_mouseEvent.Button = 0;
@@ -671,197 +683,131 @@ function (window, undefined)
 		return this.onTouchEnd(e);
 	};
 
+	// отрисовка текстового селекта
+	CMobileTouchManager.prototype.CheckSelect = function(overlay, color)
+	{
+		if (!this.SelectEnabled)
+			return;
 
-// 	function CMobileTouchManager()
-// 	{
-// 		this.LogicDocument = null;
-// 		this.DrawingDocument = null;
-// 		this.HtmlPage = null;
-//
-// 		this.Mode = 0;
-//
-// 		this.ReadingGlassTime = 750;
-// 		this.TimeDown = 0;
-// 		this.DownPoint = null;
-// 		this.DownPointOriginal = {X: 0, Y: 0};
-// 		this.MoveAfterDown = false;
-// 		this.MoveMinDist = 10;
-//
-// 		this.RectSelect1 = null;
-// 		this.RectSelect2 = null;
-//
-// 		this.PageSelect1 = 0;
-// 		this.PageSelect2 = 0;
-//
-// 		this.ZoomDistance = 0;
-// 		this.ZoomValue = 100;
-// 		this.ZoomValueMin = 50;
-// 		this.ZoomValueMax = 300;
-//
-// 		this.iScroll = null;
-// 		this.ctrl = null;
-//
-// 		this.longTapFlag = false;
-// 		this.longTapTimer = -1;
-// 	}
-//
-// 	CMobileTouchManager.prototype.CreateScrollerDiv = function (_wrapper, _id)
-// 	{
-// 		var _scroller = document.createElement('div');
-// 		var _style = "position: absolute; z-index: 0; margin: 0; padding: 0; -webkit-tap-highlight-color: rgba(0,0,0,0); width: 100%; heigth: 100%; display: block;";
-// 		_style += "-webkit-transform: translateZ(0); -moz-transform: translateZ(0); -ms-transform: translateZ(0); -o-transform: translateZ(0); transform: translateZ(0);";
-// 		_style += "-webkit-touch-callout: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;";
-// 		_style += "-webkit-text-size-adjust: none; -moz-text-size-adjust: none; -ms-text-size-adjust: none; -o-text-size-adjust: none; text-size-adjust: none;";
-// 		_scroller.setAttribute("style", _style);
-//
-// 		_scroller.id = _id;
-// 		_wrapper.appendChild(_scroller);
-// 	};
-// 	CMobileTouchManager.prototype.Init = function (ctrl)
-// 	{
-// 		this.ctrl = ctrl;
-//
-// 		this.CreateScrollerDiv(this.ctrl.element, "mobile_scroller_id");
-//
-// 		this.iScroll = new window.IScroll(this.ctrl.element, {
-// 			scrollbars: true,
-// 			mouseWheel: true,
-// 			interactiveScrollbars: true,
-// 			shrinkScrollbars: 'scale',
-// 			fadeScrollbars: true,
-// 			scrollX: true,
-// 			scroller_id: "mobile_scroller_id",
-// 			bounce: false,
-// 			momentum: false
-// 		});
-// 		this.iScroll.manager = this;
-//
-// 		this.iScroll.on('scroll', function ()
-// 		{
-// 			var _api = this.manager.ctrl;
-//
-// 			if (this.directionLocked == "v")
-// 			{
-// 				_api._onScrollY(-this.y / _api.controller.settings.hscrollStep);
-// 			}
-// 			else if (this.directionLocked == "h")
-// 			{
-// 				_api._onScrollX(-this.x / _api.controller.settings.vscrollStep);
-// 			}
-// 			else if (this.directionLocked == "n")
-// 			{
-// 				_api._onScrollX(-this.x / _api.controller.settings.vscrollStep);
-// 				_api._onScrollY(-this.y / _api.controller.settings.hscrollStep);
-// 			}
-// 		});
-// 	};
-//
-// 	CMobileTouchManager.prototype.MoveCursorToPoint = function (e)
-// 	{
-// 		AscCommon.check_MouseMoveEvent(e);
-// 		var pos = this.DrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
-//
-// 		var old_click_count = global_mouseEvent.ClickCount;
-// 		global_mouseEvent.ClickCount = 1;
-//
-// 		var nearPos = this.LogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
-//
-// 		this.DrawingDocument.NeedScrollToTargetFlag = true;
-// 		this.LogicDocument.OnMouseDown(global_mouseEvent, nearPos.X, nearPos.Y, pos.Page);
-// 		this.LogicDocument.OnMouseUp(global_mouseEvent, nearPos.X, nearPos.Y, pos.Page);
-// 		this.DrawingDocument.NeedScrollToTargetFlag = false;
-//
-// 		global_mouseEvent.ClickCount = old_click_count;
-// 	};
-//
-// 	CMobileTouchManager.prototype.onTouchStart = function (e)
-// 	{
-// 		this.longTapFlag = true;
-// 		this.wasMove = false;
-// 		var thas = this, evt = e,
-// 			point = arguments[0].touches ? arguments[0].touches[0] : arguments[0];
-//
-// 		function longTapDetected()
-// 		{
-// 			if (thas.longTapFlag)
-// 				alert("clientX " + point.clientX + " clientY " + point.clientY)
-// 			thas.longTapFlag = false;
-// 			clearInterval(this.longTapTimer);
-// 		}
-//
-// 		this.DownPointOriginal.X = point.clientX;
-// 		this.DownPointOriginal.Y = point.clientY;
-//
-// 		this.iScroll._start(e);
-// 		e.preventDefault();
-// 		e.returnValue = false;
-// //        this.longTapTimer = setTimeout(longTapDetected,1000,e);
-// 		return false;
-// 	};
-// 	CMobileTouchManager.prototype.onTouchMove = function (e)
-// 	{
-// 		this.longTapFlag = false;
-// 		this.wasMove = true;
-// //        clearInterval(this.longTapTimer);
-// 		this.iScroll._move(e);
-// 		e.preventDefault();
-// 		e.returnValue = false;
-// //        this.canZoom = false;
-// 		return false;
-// 	};
-// 	CMobileTouchManager.prototype.onTouchEnd = function (e)
-// 	{
-// 		this.longTapFlag = false;
-// //        clearInterval(this.longTapTimer);
-// 		this.iScroll._end(e);
-//
-// 		var now = new Date().getTime(), point = e.changedTouches ? e.changedTouches[0] : e;
-//
-// 		/*        this.mylatesttap = this.mylatesttap||now+1
-// 		 var timesince = now - this.mylatesttap;
-// 		 if((timesince < 300) && (timesince > 0)){
-// 		 //            this.ctrl.handlers.trigger("asc_onDoubleTapEvent",e);
-// 		 this.mylatesttap = null;
-// 		 if ( this.wasZoom ) {
-// 		 this.zoomFactor = 1;
-// 		 this.wasZoom = false;
-// 		 }
-// 		 else {
-// 		 this.zoomFactor = 2;
-// 		 this.wasZoom = true;
-// 		 }
-// 		 this.ctrl._onScrollY(0);
-// 		 this.ctrl._onScrollX(0);
-// 		 this.ctrl.changeZoom( this.zoomFactor );
-// 		 this.iScroll.zoom( point.clientX, point.clientY, this.zoomFactor );
-// 		 }else{
-// 		 // too much time to be a doubletap
-// 		 this.mylatesttap = now+1;
-// 		 }*/
-//
-// 		if (Math.abs(this.DownPointOriginal.X - point.clientX) < this.ctrl.controller.settings.hscrollStep && Math.abs(this.DownPointOriginal.Y - point.clientY) < this.ctrl.controller.settings.vscrollStep)
-// 			this.ctrl.handlers.trigger("asc_onTapEvent", e);
-//
-// 		e.preventDefault();
-// 		e.returnValue = false;
-// 		this.wasMove = false;
-// 		return;
-// 	};
-//
-// 	CMobileTouchManager.prototype.Resize = function ()
-// 	{
-// 		if (this.iScroll != null)
-// 		{
-// 			var _api = this.ctrl;
-// 			var _pixelW = _api.element.clientWidth + _api.m_dScrollX_max;
-// 			var _pixelH = _api.element.clientHeight + _api.m_dScrollY_max;
-//
-// 			this.iScroll.scroller.style.width = _pixelW + "px";
-// 			this.iScroll.scroller.style.height = _pixelH + "px";
-//
-// 			this.iScroll.refresh();
-// 		}
-// 	};
+		this.CheckSelectRects();
+		if (null == this.RectSelect1 || null == this.RectSelect2)
+			return;
+
+		var _matrix = this.delegate.GetSelectionTransform();
+		var ctx         = overlay.m_oContext;
+
+		if (undefined === color)
+		{
+			ctx.strokeStyle = "#146FE1";
+			ctx.fillStyle = "#146FE1";
+		}
+		else
+		{
+			ctx.fillStyle = "rgba(" + color.r + "," + color.g + "," + color.b + "," + color.a + ")";
+		}
+
+		if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
+		{
+			var pos1 = this.delegate.ConvertCoordsToCursor(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1, false);
+			var pos2 = this.delegate.ConvertCoordsToCursor(this.RectSelect1.x, this.RectSelect1.y + this.RectSelect1.h, this.PageSelect1, false);
+
+			var pos3 = this.delegate.ConvertCoordsToCursor(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y, this.PageSelect2, false);
+			var pos4 = this.delegate.ConvertCoordsToCursor(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h, this.PageSelect2, false);
+
+			if (undefined === color)
+			{
+				ctx.beginPath();
+
+				ctx.moveTo(pos1.X >> 0, pos1.Y >> 0);
+				ctx.lineTo(pos2.X >> 0, pos2.Y >> 0);
+
+				ctx.moveTo(pos3.X >> 0, pos3.Y >> 0);
+				ctx.lineTo(pos4.X >> 0, pos4.Y >> 0);
+
+				ctx.lineWidth = 2;
+				ctx.stroke();
+			}
+
+			ctx.beginPath();
+
+			var _offset = (undefined === color) ? 5 : 0;
+
+			overlay.AddEllipse(pos1.X, pos1.Y - _offset, AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
+			overlay.AddEllipse(pos4.X, pos4.Y + _offset, AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
+			ctx.fill();
+
+			ctx.beginPath();
+		}
+		else
+		{
+			var _xx11 = _matrix.TransformPointX(this.RectSelect1.x, this.RectSelect1.y);
+			var _yy11 = _matrix.TransformPointY(this.RectSelect1.x, this.RectSelect1.y);
+
+			var _xx12 = _matrix.TransformPointX(this.RectSelect1.x, this.RectSelect1.y + this.RectSelect1.h);
+			var _yy12 = _matrix.TransformPointY(this.RectSelect1.x, this.RectSelect1.y + this.RectSelect1.h);
+
+			var _xx21 = _matrix.TransformPointX(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y);
+			var _yy21 = _matrix.TransformPointY(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y);
+
+			var _xx22 = _matrix.TransformPointX(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h);
+			var _yy22 = _matrix.TransformPointY(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h);
+
+			var pos1 = this.delegate.ConvertCoordsToCursor(_xx11, _yy11, this.PageSelect1, false);
+			var pos2 = this.delegate.ConvertCoordsToCursor(_xx12, _yy12, this.PageSelect1, false);
+
+			var pos3 = this.delegate.ConvertCoordsToCursor(_xx21, _yy21, this.PageSelect2, false);
+			var pos4 = this.delegate.ConvertCoordsToCursor(_xx22, _yy22, this.PageSelect2, false);
+
+			if (undefined === color)
+			{
+				ctx.beginPath();
+
+				ctx.moveTo(pos1.X, pos1.Y);
+				ctx.lineTo(pos2.X, pos2.Y);
+
+				ctx.moveTo(pos3.X, pos3.Y);
+				ctx.lineTo(pos4.X, pos4.Y);
+
+				ctx.lineWidth = 2;
+				ctx.stroke();
+			}
+
+			ctx.beginPath();
+
+			if (undefined === color)
+			{
+				var ex01 = _matrix.TransformPointX(0, 0);
+				var ey01 = _matrix.TransformPointY(0, 0);
+
+				var ex11 = _matrix.TransformPointX(0, 1);
+				var ey11 = _matrix.TransformPointY(0, 1);
+
+				var _len = Math.sqrt((ex11 - ex01) * (ex11 - ex01) + (ey11 - ey01) * (ey11 - ey01));
+				if (_len == 0)
+					_len = 0.01;
+
+				var ex = 5 * (ex11 - ex01) / _len;
+				var ey = 5 * (ey11 - ey01) / _len;
+
+				var _x1 = (pos1.X - ex) >> 0;
+				var _y1 = (pos1.Y - ey) >> 0;
+
+				var _x2 = (pos4.X + ex) >> 0;
+				var _y2 = (pos4.Y + ey) >> 0;
+
+				overlay.AddEllipse(_x1, _y1, AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
+				overlay.AddEllipse(_x2, _y2, AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
+			}
+			else
+			{
+				overlay.AddEllipse(pos1.X, pos1.Y, AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
+				overlay.AddEllipse(pos4.X, pos4.Y, AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
+			}
+			ctx.fill();
+
+			ctx.beginPath();
+		}
+	};
 
 	//--------------------------------------------------------export----------------------------------------------------
 	window['AscCommonExcel'] = window['AscCommonExcel'] || {};

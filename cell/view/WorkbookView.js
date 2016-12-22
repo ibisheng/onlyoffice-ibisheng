@@ -699,6 +699,14 @@
       },
 		"getCellEditMode": function() {
 			return self.isCellEditMode;
+		},
+		"drawMobileSelection" : function(color) {
+      		if (self.MobileTouchManager)
+			{
+				var _canvas = self.getWorksheet().objectRender.getDrawingCanvas();
+				if (_canvas)
+					self.MobileTouchManager.CheckSelect(_canvas.trackOverlay, color);
+			}
 		}
     });
 
@@ -3011,12 +3019,16 @@
     };
 	WorkbookView.prototype.GetSelectionRectsBounds = function () {
 		var ws = this.getWorksheet();
-		var range = ws.getSelectedRange();
+		var range = ws.getSelectedRange().bbox;
 		var l = ws.getCellLeft(range.c1, 3);
 		var t = ws.getCellTop(range.r1, 3);
+
+		var _offX = ws.cellsLeft * asc_getcvt(1/*pt*/, 3/*mm*/, ws._getPPIX());
+		var _offY = ws.cellsTop * asc_getcvt(1/*pt*/, 3/*mm*/, ws._getPPIY());
+
 		return {
-			X: l,
-			Y: t,
+			X: l + _offX,
+			Y: t + _offY,
 			W: ws.getCellLeft(range.c2, 3) - l + ws.getColumnWidth(range.c2, 3),
 			H: ws.getCellTop(range.r2, 3) - t + ws.getRowHeight(range.r2, 3)
 		};

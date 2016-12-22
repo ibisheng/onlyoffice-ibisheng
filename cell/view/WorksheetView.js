@@ -3791,6 +3791,7 @@
             this._drawElements(this._drawSelectionElement, range, selectionLineType,
               this.settings.activeCellBorderColor);
         }
+		this.handlers.trigger("drawMobileSelection", this.settings.activeCellBorderColor);
     };
 
     WorksheetView.prototype._drawFormatPainterRange = function () {
