@@ -12724,6 +12724,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].Ax_Counter = Ax_Counter;
     window['AscFormat'].TYPE_TRACK = TYPE_TRACK;
     window['AscFormat'].TYPE_KIND = TYPE_KIND;
+	window['AscFormat'].mapPrstColor = map_prst_color;
     window['AscFormat'].ar_arrow = ar_arrow;
     window['AscFormat'].ar_diamond = ar_diamond;
     window['AscFormat'].ar_none = ar_none;

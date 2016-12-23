@@ -208,7 +208,7 @@
 	 * @returns {ApiColor}
 	 */
 	Api.prototype.CreateColorByName = function (presetColor) {
-		var rgb = map_prst_color[presetColor];
+		var rgb = AscFormat.mapPrstColor[presetColor];
 		return new ApiColor(AscCommonExcel.createRgbColor((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF));
 	};
 
