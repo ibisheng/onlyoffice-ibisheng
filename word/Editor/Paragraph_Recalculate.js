@@ -1108,6 +1108,9 @@ Paragraph.prototype.private_RecalculateLineInfo        = function(CurLine, CurPa
 
     if (true === PRS.BadLeftTab)
         this.Lines[CurLine].Info |= paralineinfo_BadLeftTab;
+
+    if (PRS.GetFootnoteReferencesCount() > 0)
+    	this.Lines[CurLine].Info |= paralineinfo_Notes;
 };
 
 Paragraph.prototype.private_RecalculateLineMetrics     = function(CurLine, CurPage, PRS, ParaPr)
@@ -2179,6 +2182,7 @@ var paralineinfo_End           = 0x0004; // Последняя строка па
 var paralineinfo_RangeY        = 0x0008; // Строка начинается после какого-либо объекта с обтеканием
 var paralineinfo_BreakRealPage = 0x0010; // В строке есть PageBreak
 var paralineinfo_BadLeftTab    = 0x0020; // В строке есть левый таб, который правее правой границы
+var paralineinfo_Notes         = 0x0040; // В строке есть сноски
 
 function CParaLine()
 {

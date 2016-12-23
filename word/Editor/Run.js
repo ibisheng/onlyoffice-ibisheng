@@ -275,14 +275,30 @@ ParaRun.prototype.Get_Text = function(Text)
         switch ( ItemType )
         {
             case para_Drawing:
-            case para_End:
             case para_PageNum:
             case para_PageCount:
             {
-                Text.Text = null;
-                bBreak = true;
+				if (true === Text.BreakOnNonText)
+				{
+					Text.Text = null;
+					bBreak = true;
+				}
+
                 break;
             }
+			case para_End:
+			{
+				if (true === Text.BreakOnNonText)
+				{
+					Text.Text = null;
+					bBreak = true;
+				}
+
+				if (true === Text.ParaEndToSpace)
+					Text.Text += " ";
+
+				break;
+			}
 
             case para_Text : Text.Text += String.fromCharCode(Item.Value); break;
             case para_Space:
@@ -3571,6 +3587,12 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                     WidthVisible = Item.Width / TEXTWIDTH_DIVIDER + PRSA.JustifyWord;//WidthVisible = Item.Get_Width() + PRSA.JustifyWord;
 
                 Item.WidthVisible = (WidthVisible * TEXTWIDTH_DIVIDER) | 0;//Item.Set_WidthVisible(WidthVisible);
+
+				if (para_FootnoteReference === ItemType)
+				{
+					var oFootnote = Item.Get_Footnote();
+					oFootnote.UpdatePositionInfo(this.Paragraph, this, _CurLine, _CurRange, PRSA.X, WidthVisible);
+				}
 
                 PRSA.X    += WidthVisible;
                 PRSA.LastW = WidthVisible;
@@ -9068,6 +9090,20 @@ ParaRun.prototype.GotoFootnoteRef = function(isNext, isCurrent, isStepOver)
 	}
 
 	return nResult;
+};
+ParaRun.prototype.GetFootnoteRefsInRange = function(arrFootnotes, _CurLine, _CurRange)
+{
+	var CurLine = _CurLine - this.StartLine;
+	var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
+
+	var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+	var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+	for (var CurPos = StartPos; CurPos < EndPos; CurPos++)
+	{
+		if (para_FootnoteReference === this.Content[CurPos].Type)
+			arrFootnotes.push(this.Content[CurPos]);
+	}
 };
 
 function CParaRunStartState(Run)

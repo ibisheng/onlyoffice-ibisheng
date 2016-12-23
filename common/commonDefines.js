@@ -745,7 +745,8 @@
 	var c_oAscMouseMoveDataTypes = {
 		Common       : 0,
 		Hyperlink    : 1,
-		LockedObject : 2
+		LockedObject : 2,
+		Footnote     : 3
 	};
 
 	// selection type

@@ -9288,12 +9288,19 @@ Paragraph.prototype =
         MMData.Y_abs = Coords.Y;
 
         var Hyperlink = this.Check_Hyperlink(X, Y, CurPage);
+        var Footnote  = this.CheckFootnote(X, Y, CurPage);
 
         if (null != Hyperlink && (Y <= this.Pages[CurPage].Bounds.Bottom && Y >= this.Pages[CurPage].Bounds.Top))
         {
             MMData.Type      = AscCommon.c_oAscMouseMoveDataTypes.Hyperlink;
             MMData.Hyperlink = new Asc.CHyperlinkProperty( Hyperlink );
         }
+        else if (null !== Footnote)
+		{
+			MMData.Type   = AscCommon.c_oAscMouseMoveDataTypes.Footnote;
+			MMData.Text   = Footnote.GetHint();
+			MMData.Number = Footnote.GetNumber();
+		}
         else
             MMData.Type      = AscCommon.c_oAscMouseMoveDataTypes.Common;
 
@@ -12119,6 +12126,73 @@ Paragraph.prototype.GotoFootnoteRef = function(isNext, isCurrent)
 
 	return false;
 };
+Paragraph.prototype.GetText = function(oPr)
+{
+	var oText = new CParagraphGetText();
+	oText.SetBreakOnNonText(false);
+	oText.SetParaEndToSpace(true);
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Content[nIndex].Get_Text)
+			this.Content[nIndex].Get_Text(oText);
+	}
+
+	return oText.Text;
+};
+Paragraph.prototype.CheckFootnote = function(X, Y, CurPage)
+{
+	var SearchPosXY = this.Get_ParaContentPosByXY(X, Y, CurPage, false, false);
+	var CurLine = SearchPosXY.Line;
+
+	if (true !== SearchPosXY.InText)
+		return null;
+
+	if (!this.Lines[CurLine])
+	{
+		return null;
+	}
+	else if (this.Lines[CurLine].Info & paralineinfo_Notes)
+	{
+		var arrFootnoteRefs = this.private_GetFootnoteRefsInLine(CurLine);
+		var nMinDiff = 1000000000;
+		var oNote = null;
+		for (var nIndex = 0, nCount = arrFootnoteRefs.length; nIndex < nCount; ++nIndex)
+		{
+			var oFootnoteRef = arrFootnoteRefs[nIndex];
+			var oFootnote    = oFootnoteRef.Get_Footnote();
+			var oPosInfo     = oFootnote.GetPositionInfo();
+
+			if (Math.abs(X - oPosInfo.X) < nMinDiff || Math.abs(X - (oPosInfo.X + oPosInfo.W)) < nMinDiff)
+			{
+				nMinDiff = Math.min(Math.abs(X - oPosInfo.X), Math.abs(X - (oPosInfo.X + oPosInfo.W)));
+				oNote    = oFootnote;
+			}
+		}
+
+		if (nMinDiff > 10)
+			oNote = null;
+
+		return oNote;
+	}
+
+	return null;
+};
+Paragraph.prototype.private_GetFootnoteRefsInLine = function(CurLine)
+{
+	var arrFootnotes = [];
+	var oLine = this.Lines[CurLine];
+	for (var CurRange = 0, RangesCount = oLine.Ranges.length; CurRange < RangesCount; ++CurRange)
+	{
+		var oRange = oLine.Ranges[CurRange];
+		for (var CurPos = oRange.StartPos; CurPos <= oRange.EndPos; ++CurPos)
+		{
+			if (this.Content[CurPos].GetFootnoteRefsInRange)
+				this.Content[CurPos].GetFootnoteRefsInRange(arrFootnotes, CurLine, CurRange);
+		}
+	}
+	return arrFootnotes;
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;
@@ -12928,7 +13002,18 @@ function CParagraphCheckPageBreakEnd(PageBreak)
 function CParagraphGetText()
 {
     this.Text = "";
+
+    this.BreakOnNonText = true;
+    this.ParaEndToSpace = false;
 }
+CParagraphGetText.prototype.SetBreakOnNonText = function(bValue)
+{
+	this.BreakOnNonText = bValue;
+};
+CParagraphGetText.prototype.SetParaEndToSpace = function(bValue)
+{
+	this.ParaEndToSpace = bValue;
+};
 
 function CParagraphNearPos()
 {

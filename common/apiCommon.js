@@ -2412,28 +2412,41 @@
 	//-----------------------------------------------------------------
 	// События движения мыши
 	//-----------------------------------------------------------------
-	function CMouseMoveData(obj) {
-		if (obj) {
-			this.Type = ( undefined != obj.Type ) ? obj.Type : c_oAscMouseMoveDataTypes.Common;
+	function CMouseMoveData(obj)
+	{
+		if (obj)
+		{
+			this.Type  = ( undefined != obj.Type ) ? obj.Type : c_oAscMouseMoveDataTypes.Common;
 			this.X_abs = ( undefined != obj.X_abs ) ? obj.X_abs : 0;
 			this.Y_abs = ( undefined != obj.Y_abs ) ? obj.Y_abs : 0;
 
-			switch (this.Type) {
-				case c_oAscMouseMoveDataTypes.Hyperlink : {
+			switch (this.Type)
+			{
+				case c_oAscMouseMoveDataTypes.Hyperlink :
+				{
 					this.Hyperlink = ( undefined != obj.PageNum ) ? obj.PageNum : 0;
 					break;
 				}
 
-				case c_oAscMouseMoveDataTypes.LockedObject : {
-					this.UserId = ( undefined != obj.UserId ) ? obj.UserId : "";
-					this.HaveChanges = ( undefined != obj.HaveChanges ) ? obj.HaveChanges : false;
+				case c_oAscMouseMoveDataTypes.LockedObject :
+				{
+					this.UserId           = ( undefined != obj.UserId ) ? obj.UserId : "";
+					this.HaveChanges      = ( undefined != obj.HaveChanges ) ? obj.HaveChanges : false;
 					this.LockedObjectType =
 						( undefined != obj.LockedObjectType ) ? obj.LockedObjectType : Asc.c_oAscMouseMoveLockedObjectType.Common;
 					break;
 				}
+				case c_oAscMouseMoveDataTypes.Footnote:
+				{
+					this.Text   = "";
+					this.Number = 1;
+					break;
+				}
 			}
-		} else {
-			this.Type = c_oAscMouseMoveDataTypes.Common;
+		}
+		else
+		{
+			this.Type  = c_oAscMouseMoveDataTypes.Common;
 			this.X_abs = 0;
 			this.Y_abs = 0;
 		}
@@ -2459,6 +2472,14 @@
 	};
 	CMouseMoveData.prototype.get_LockedObjectType = function () {
 		return this.LockedObjectType;
+	};
+	CMouseMoveData.prototype.get_FootnoteText = function()
+	{
+		return this.Text;
+	};
+	CMouseMoveData.prototype.get_FootnoteNumber = function()
+	{
+		return this.Number;
 	};
 
 	function asc_CUserInfo(obj) {

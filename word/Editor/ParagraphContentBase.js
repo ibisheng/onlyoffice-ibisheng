@@ -2634,6 +2634,20 @@ CParagraphContentWithParagraphLikeContent.prototype.GotoFootnoteRef = function(i
 
 	return false;
 };
+CParagraphContentWithParagraphLikeContent.prototype.GetFootnoteRefsInRange = function(arrFootnotes, _CurLine, _CurRange)
+{
+	var CurLine = _CurLine - this.StartLine;
+	var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
+
+	var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+	var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+	for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+	{
+		if (this.Content[CurPos].GetFootnoteRefsInRange)
+			this.Content[CurPos].GetFootnoteRefsInRange(arrFootnotes, _CurLine, _CurRange);
+	}
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые должны быть реализованы в классах наследниках
 //----------------------------------------------------------------------------------------------------------------------
