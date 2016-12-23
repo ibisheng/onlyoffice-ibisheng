@@ -263,7 +263,7 @@
 											<canvas id="ws-canvas-graphic"></canvas>\
 											<canvas id="ws-canvas-graphic-overlay"></canvas>\
 											<canvas id="id_target_cursor" class="block_elem" width="1" height="1"\
-												style="width:2px;height:13px;display:none;z-index:1004;"></canvas>\
+												style="width:2px;height:13px;display:none;z-index:9;"></canvas>\
 										</div>';
 
       this.canvas = document.getElementById("ws-canvas");
@@ -3018,6 +3018,9 @@
         return !this.getWorksheet().getSelectionShape();
     };
 	WorkbookView.prototype.GetSelectionRectsBounds = function () {
+		if (this.getWorksheet().getSelectionShape())
+		  return null;
+
 		var ws = this.getWorksheet();
 		var range = ws.getSelectedRange().bbox;
 		var l = ws.getCellLeft(range.c1, 3);

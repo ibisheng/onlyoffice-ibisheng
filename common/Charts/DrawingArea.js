@@ -711,17 +711,19 @@ DrawingArea.prototype.drawSelection = function(drawingDocument) {
         // Clip
         this.frozenPlaces[i].clip(shapeOverlayCtx);
 
-        if (null == drawingDocument.m_oDocumentRenderer) {
+        if (true) {
             if (drawingDocument.m_bIsSelection) {
-                if (drawingDocument.m_bIsSelection) {
-                    trackOverlay.m_oControl.HtmlElement.style.display = "block";
+				drawingDocument.SelectionMatrix = null;
+				trackOverlay.m_oControl.HtmlElement.style.display = "block";
 
-                    if (null == trackOverlay.m_oContext)
-                        trackOverlay.m_oContext = trackOverlay.m_oControl.HtmlElement.getContext('2d');
-                }
+				if (null == trackOverlay.m_oContext)
+					trackOverlay.m_oContext = trackOverlay.m_oControl.HtmlElement.getContext('2d');
+
                 drawingDocument.private_StartDrawSelection(trackOverlay);
                 this.worksheet.objectRender.controller.drawTextSelection();
                 drawingDocument.private_EndDrawSelection();
+
+				this.worksheet.handlers.trigger("drawMobileSelection");
             }
 
             ctx.globalAlpha = 1.0;
@@ -733,20 +735,6 @@ DrawingArea.prototype.drawSelection = function(drawingDocument) {
                 this.worksheet.objectRender.controller.drawTracks(shapeOverlayCtx);
                 shapeOverlayCtx.put_GlobalAlpha(true, 1);
             }
-        }
-        else {
-            ctx.fillStyle = "rgba(51,102,204,255)";
-            ctx.beginPath();
-
-            for (var j = drawingDocument.m_lDrawingFirst; j <= drawingDocument.m_lDrawingEnd; j++) {
-                var drawPage = drawingDocument.m_arrPages[j].drawingPage;
-                drawingDocument.m_oDocumentRenderer.DrawSelection(j, trackOverlay, drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top);
-            }
-
-            ctx.globalAlpha = 0.2;
-            ctx.fill();
-            ctx.beginPath();
-            ctx.globalAlpha = 1.0;
         }
 
         // Restore

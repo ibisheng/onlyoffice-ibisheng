@@ -58,6 +58,7 @@ var c_oAscValAxisRule = Asc.c_oAscValAxisRule;
 var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
 var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
 var c_oAscSelectionType = Asc.c_oAscSelectionType;
+var global_mouseEvent = AscCommon.global_mouseEvent;
 
 var aSparklinesStyles =
 [
@@ -4504,6 +4505,10 @@ function ObjectLocker(ws) {
 function ClickCounter() {
     this.x = 0;
     this.y = 0;
+
+    this.lastX = -1000;
+    this.lastY = -1000;
+
     this.button = 0;
     this.time = 0;
     this.clickCount = 0;
@@ -4511,11 +4516,26 @@ function ClickCounter() {
 }
 ClickCounter.prototype.mouseDownEvent = function(x, y, button) {
     var currTime = getCurrentTime();
-    if (this.button === button && this.x === x && this.y === y && (currTime - this.time < 500)) {
+
+	var _eps = 3 * global_mouseEvent.KoefPixToMM;
+	if ((Math.abs(global_mouseEvent.X - global_mouseEvent.LastX) > _eps) || (Math.abs(global_mouseEvent.Y - global_mouseEvent.LastY) > _eps))
+	{
+		// not only move!!! (touch - fast click in different places)
+		global_mouseEvent.LastClickTime = -1;
+		global_mouseEvent.ClickCount    = 0;
+	}
+
+	this.x = x;
+	this.y = y;
+
+	if (this.button === button && Math.abs(this.x - this.lastX) <= _eps && Math.abs(this.y - this.lastY) <= _eps && (currTime - this.time < 500)) {
         ++this.clickCount;
     } else {
         this.clickCount = 1;
     }
+
+    this.lastX = this.x;
+	this.lastY = this.y;
 
     if (this.log) {
         console.log("-----");

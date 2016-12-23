@@ -1456,7 +1456,7 @@ function CDrawingDocument(drawingObjects)
     this.GuiCanvasFillTextureCtxTextArt = null;
     this.LastDrawingUrlTextArt = "";
 
-
+	this.SelectionMatrix = null;
 
     this.GuiCanvasTextProps = null;
     this.GuiCanvasTextPropsId = "gui_textprops_canvas_id";
@@ -3133,6 +3133,8 @@ function CDrawingDocument(drawingObjects)
 
     this.AddPageSelection = function(pageIndex, x, y, w, h)
     {
+		if (null == this.SelectionMatrix)
+			this.SelectionMatrix = this.TextMatrix;
        /*    if (pageIndex < this.m_lDrawingFirst || pageIndex > this.m_lDrawingEnd)
         {
             return;

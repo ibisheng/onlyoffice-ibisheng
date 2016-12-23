@@ -101,6 +101,12 @@ function (window, undefined)
 			H : this.WB.element.clientHeight + this.WB.m_dScrollY_max
 		};
 	};
+	CMobileDelegateEditorCell.prototype.GetSelectionTransform = function()
+	{
+		if (this.WB.getWorksheet().objectRender.controller.selectedObjects.length == 0)
+			return null;
+		return this.WB.getWorksheet().objectRender.controller.drawingDocument.SelectionMatrix;
+	};
 	CMobileDelegateEditorCell.prototype.GetScrollerParent = function()
 	{
 		return this.WB.element;
@@ -338,10 +344,11 @@ function (window, undefined)
 
 	CMobileTouchManager.prototype.onTouchStart = function(e)
 	{
+		var _e = e.touches ? e.touches[0] : e;
 		this.IsTouching = true;
 
 		global_mouseEvent.KoefPixToMM = 5;
-		AscCommon.check_MouseDownEvent(e.touches ? e.touches[0] : e, true);
+		AscCommon.check_MouseDownEvent(_e, true);
 		global_mouseEvent.KoefPixToMM = 1;
 		global_mouseEvent.LockMouse();
 		this.Api.sendEvent("asc_onHidePopMenu");
@@ -433,8 +440,7 @@ function (window, undefined)
 						this.delegate.Logic_OnMouseDown(global_mouseEvent, __X, __Y, this.PageSelect2);
 					}
 
-					var pos1 = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X + this.delegate.Offset.X, global_mouseEvent.Y + this.delegate.Offset.Y);
-					this.delegate.Logic_OnMouseMove(global_mouseEvent, pos1.X, pos1.Y, pos1.Page);
+					this.delegate.Drawing_OnMouseMove(_e);
 				}
 				else if (2 == this.DragSelect)
 				{
@@ -452,8 +458,7 @@ function (window, undefined)
 						this.delegate.Logic_OnMouseDown(global_mouseEvent, __X, __Y, this.PageSelect1);
 					}
 
-					var pos4 = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X + this.delegate.Offset.X, global_mouseEvent.Y + this.delegate.Offset.Y);
-					this.delegate.Logic_OnMouseMove(global_mouseEvent, pos4.X, pos4.Y, pos4.Page);
+					this.delegate.Drawing_OnMouseMove(_e);
 				}
 				break;
 			}
@@ -503,6 +508,7 @@ function (window, undefined)
 	};
 	CMobileTouchManager.prototype.onTouchMove  = function(e)
 	{
+		var _e = e.touches ? e.touches[0] : e;
 		if (this.Mode != AscCommon.MobileTouchMode.FlowObj && this.Mode != AscCommon.MobileTouchMode.TableMove)
 			AscCommon.check_MouseMoveEvent(e.touches ? e.touches[0] : e);
 
@@ -583,8 +589,7 @@ function (window, undefined)
 			{
 				// во время движения может смениться порядок ректов
 				global_mouseEvent.ClickCount = 1;
-				var pos                      = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X + this.delegate.Offset.X, global_mouseEvent.Y + this.delegate.Offset.Y);
-				this.delegate.Logic_OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
+				this.delegate.Drawing_OnMouseMove(_e);
 				AscCommon.stopEvent(e);
 				break;
 			}
@@ -655,8 +660,7 @@ function (window, undefined)
 				// ничего не нужно делать
 				this.DragSelect = 0;
 				this.Mode       = AscCommon.MobileTouchMode.None;
-				var pos         = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X + this.delegate.Offset.X, global_mouseEvent.Y + this.delegate.Offset.Y);
-				this.delegate.Logic_OnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
+				this.delegate.Drawing_OnMouseUp(_e);
 				AscCommon.stopEvent(e);
 				break;
 			}
@@ -693,7 +697,7 @@ function (window, undefined)
 	};
 
 	// отрисовка текстового селекта
-	CMobileTouchManager.prototype.CheckSelect = function(overlay, color)
+	CMobileTouchManager.prototype.CheckSelect = function(overlay, color, drDocument)
 	{
 		if (!this.SelectEnabled)
 			return;
