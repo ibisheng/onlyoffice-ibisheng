@@ -3448,11 +3448,6 @@ function CDrawingDocument(drawingObjects)
 
     }
 
-    this.SendThemeColorScheme = function()
-    {
-
-    }
-
     this.DrawImageTextureFillShape = function(url)
     {
 

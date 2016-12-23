@@ -189,8 +189,10 @@
 		 * @return {StringRender}  Returns 'this' to allow chaining
 		 */
 		StringRender.prototype.setDefaultFontFromFmt = function(fmt) {
-			if (asc_typeof(fmt.fn) !== "string" || !(fmt.fs > 0)) {
-				throw "Can not make font from {fmt.fn=" + fmt.fn + ", fmt.fs=" + fmt.fs + "}";
+			var fn = fmt.getName();
+			var fs = fmt.getSize();
+			if (asc_typeof(fn) !== "string" || !(fs > 0)) {
+				throw "Can not make font from {fmt.fn=" + fn + ", fmt.fs=" + fs + "}";
 			}
 			this.defaultFont = this._makeFont(fmt);
 			return this;
@@ -205,7 +207,7 @@
 		StringRender.prototype.setString = function(str, flags) {
 			this.fragments = [];
 			if ( asc_typeof(str) === "string" ) {
-				this.fragments.push({text: str, format: {}});
+				this.fragments.push({text: str, format: new AscCommonExcel.Font()});
 			} else {
 				for (var i = 0; i < str.length; ++i) {
 					this.fragments.push({text: str[i].text, format: str[i].format});
@@ -527,9 +529,11 @@
 		 * @return {Asc.FontProperties}
 		 */
 		StringRender.prototype._makeFont = function(format) {
-			if (format !== undefined && asc_typeof(format.fn) === "string") {
-				var fsz = format.fs > 0 ? format.fs : this.defaultFont.FontSize;
-				return new asc.FontProperties(format.fn, fsz, format.b, format.i, format.u, format.s);
+			var fn = format !== undefined ? format.getName() : undefined;
+			if (format !== undefined && asc_typeof(fn) === "string") {
+				var fs = format.getSize();
+				var fsz = fs > 0 ? fs : this.defaultFont.FontSize;
+				return new asc.FontProperties(fn, fsz, format.getBold(), format.getItalic(), format.getUnderline(), format.getStrikeout());
 			}
 			return this.defaultFont;
 		};
@@ -552,7 +556,7 @@
 		 * @return {Number}
 		 */
 		StringRender.prototype._calcLineWidth = function (startPos, endPos) {
-			var wrap = this.flags && (this.flags.wrapText || this.flags.wrapOnlyNL);
+			var wrap = this.flags && (this.flags.wrapText || this.flags.wrapOnlyNL || this.flags.wrapOnlyCE);
 			var isAtEnd, j, chProp, tw;
 
 			if (endPos === undefined || endPos < 0) {
@@ -644,13 +648,13 @@
 		 */
 		StringRender.prototype._calcTextMetrics = function (dontCalcRepeatChars) {
 			var self = this, i = 0, p, p_, lm, beg = 0;
-			var l = new LineInfo(), TW = 0, TH = 0, BL = 0, CL = 0;
+			var l = new LineInfo(), TW = 0, TH = 0, BL = 0;
 
 			function addLine(b, e) {
 				if (-1 !== b)
-					l.tw += self._calcLineWidth(b, e - 1);
+					l.tw += self._calcLineWidth(b, e);
 				l.beg = b;
-				l.end = e - 1;
+				l.end = e;
 				self.lines.push(l);
 				if (TW < l.tw) {TW = l.tw;}
 				BL = TH + l.bl;
@@ -692,21 +696,17 @@
 					// process 'new line' marker
 					if (p && (p.nl || p.hp)) {
 						addLine(beg, i);
-						beg = i;
+						beg = i + (p.nl ? 1 : 0);
 						lm = this._calcLineMetrics(p_.fsz !== undefined ? p_.fsz : p_.font.FontSize, p_.va, p_.fm);
 						l = new LineInfo(0, lm.th, lm.bl, lm.a, lm.d);
 					}
 				}
+				if (beg <= i) {
+					// add last line of text
+					addLine(beg, i - 1);
+				}
 			}
-
-			if (beg < i) {
-				// add last line of text
-				addLine(beg, i);
-			}
-			if (this.lines.length > 0) {
-				CL = (this.lines[0].bl - this.lines[0].a + BL + l.d) / 2;
-			}
-			return new asc.TextMetrics(TW, TH, 0, BL, 0, 0, CL);
+			return new asc.TextMetrics(TW, TH, 0, BL, 0, 0, (this.lines[0].bl - this.lines[0].a + BL + l.d) / 2);
 		};
 
 		StringRender.prototype._getRepeatCharPos = function () {
@@ -809,7 +809,7 @@
 		StringRender.prototype._measureChars = function (maxWidth) {
 			var self = this;
 			var ctx = this.drawingCtx;
-			var wrap = this.flags && this.flags.wrapText && !this.flags.isNumberFormat;
+			var wrap = this.flags && (this.flags.wrapText || this.flags.wrapOnlyCE) && !this.flags.isNumberFormat;
 			var wrapNL = this.flags && this.flags.wrapOnlyNL;
 			var hasRepeats = false;
 			var i, j, fr, fmt, text, p, p_ = {}, pIndex, f, f_, eq, startCh;
@@ -832,7 +832,7 @@
 
 						if (isNL) {
 							// add new line marker
-							nlPos = chPos + 1;
+							nlPos = chPos;
 							self._getCharPropAt(nlPos).nl = true;
 							self._getCharPropAt(nlPos).delta = delta;
 							ch = " ";
@@ -874,6 +874,7 @@
 				startCh = this.charWidths.length;
 				fr = this.fragments[i];
 				fmt = fr.format;
+				var va = fmt.getVerticalAlign();
 				text = this._filterText(fr.text, wrap || wrapNL);
 
 				f = this._makeFont(fmt);
@@ -882,8 +883,8 @@
 				p = p ? p.clone() : new charProperties();
 
 				// reduce font size for subscript and superscript chars
-				if (fmt.va === AscCommon.vertalign_SuperScript || fmt.va === AscCommon.vertalign_SubScript) {
-					p.va = fmt.va;
+				if (va === AscCommon.vertalign_SuperScript || va === AscCommon.vertalign_SubScript) {
+					p.va = va;
 					p.fsz = f.FontSize;
 					f.FontSize *= 2/3;
 					p.font = f;
@@ -891,7 +892,7 @@
 
 				// change font on canvas
 				eq = f.isEqual(f_);
-				if (!eq || f.Underline !== f_.Underline || f.Strikeout !== f_.Strikeout || fmt.c !== p_.c) {
+				if (!eq || f.Underline !== f_.Underline || f.Strikeout !== f_.Strikeout || fmt.getColor() !== p_.c) {
 					if (!eq) {ctx.setFont(f, this.angle);}
 					p.font = f;
 					f_ = f;
@@ -903,16 +904,16 @@
 				}
 				if (p.font) {
 					p.fm = ctx.getFontMetrics();
-					p.c = fmt.c;
+					p.c = fmt.getColor();
 					this.charProps[pIndex] = p;
 					p_ = p;
 				}
 
-				if (fmt.skip) {
+				if (fmt.getSkip()) {
 					this._getCharPropAt(pIndex).skip = text.length;
 				}
 
-				if (fmt.repeat) {
+				if (fmt.getRepeat()) {
 					if (hasRepeats)
 						throw "Repeat should occur no more than once";
 
@@ -1061,6 +1062,9 @@
 						// render fragment
 						x1 += renderFragment(strBeg, i, p_, this.angle);
 						strBeg = i;
+					}
+					if (p.nl) {
+						strBeg += 1;
 					}
 
 					if (p.font) {

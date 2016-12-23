@@ -59,20 +59,6 @@ var c_oAscNumFormatType = Asc.c_oAscNumFormatType;
 
 var g_oColorManager = null;
 	
-	var g_oDefaultFormat = {
-		XfId: null,
-		Font: null,
-		Fill: null,
-		Num: null,
-		Border: null,
-		Align: null,
-		FontAbs: null,
-		FillAbs: null,
-		NumAbs: null,
-		BorderAbs: null,
-		AlignAbs: null
-	};
-
 var g_nHSLMaxValue = 255;
 var g_nColorTextDefault = 1;
 var g_nColorHyperlink = 10;
@@ -136,6 +122,9 @@ function shiftSort(a, b, offset)
 	    }
 	}
 	return nRes;
+}
+function createRgbColor(r, g, b) {
+	return new RgbColor((r << 16) + (g << 8) + b);
 }
 var g_oRgbColorProperties = {
 		rgb : 0
@@ -379,7 +368,7 @@ function CorrectAscColor(asc_color)
 		}
 		default:
 		{
-			ret = new RgbColor((asc_color.asc_getR() << 16) + (asc_color.asc_getG() << 8) + asc_color.asc_getB());
+			ret = createRgbColor(asc_color.asc_getR(), asc_color.asc_getG(), asc_color.asc_getB());
 		}
 	}
 	return ret;
@@ -448,6 +437,20 @@ ColorManager.prototype =
 };
 g_oColorManager = new ColorManager();
 
+	var g_oDefaultFormat = {
+		XfId: null,
+		Font: null,
+		Fill: null,
+		Num: null,
+		Border: null,
+		Align: null,
+		FillAbs: null,
+		NumAbs: null,
+		BorderAbs: null,
+		AlignAbs: null,
+		ColorAuto: new RgbColor(0)
+	};
+
 	/** @constructor */
 	function Fragment(val) {
 		this.text = null;
@@ -490,26 +493,7 @@ var g_oFontProperties = {
 	};
 
 	/** @constructor */
-	function Font(val) {
-		if (null == val) {
-			val = g_oDefaultFormat.FontAbs;
-		}
-		this.Properties = g_oFontProperties;
-		this.fn = val.fn;
-		this.scheme = val.scheme;
-		this.fs = val.fs;
-		this.b = val.b;
-		this.i = val.i;
-		this.u = val.u;
-		this.s = val.s;
-		this.c = val.c;
-		this.va = val.va;
-		//skip и repeat не сохраняются в файл нужны здесь только чтобы класс Font можно было использовать в комплексных строках
-		this.skip = val.skip;
-		this.repeat = val.repeat;
-	}
-
-	Font.prototype.clean = function () {
+	function Font() {
 		this.fn = null;
 		this.scheme = null;
 		this.fs = null;
@@ -521,33 +505,80 @@ var g_oFontProperties = {
 		this.va = null;
 		this.skip = null;
 		this.repeat = null;
+	}
+	Font.prototype.Properties = g_oFontProperties;
+	Font.prototype.assign = function(font) {
+		this.fn = font.fn;
+		this.scheme = font.scheme;
+		this.fs = font.fs;
+		this.b = font.b;
+		this.i = font.i;
+		this.u = font.u;
+		this.s = font.s;
+		this.c = font.c;
+		this.va = font.va;
+		this.skip = font.skip;
+		this.repeat = font.repeat;
 	};
-	Font.prototype._mergeProperty = function (first, second, def) {
-		if (def != first) {
-			return first;
-		} else {
-			return second;
+	Font.prototype.assignFromObject = function(font) {
+		if (null != font.fn) {
+			this.setName(font.fn);
+		}
+		if (null != font.scheme) {
+			this.setScheme(font.scheme);
+		}
+		if (null != font.fs) {
+			this.setSize(font.fs);
+		}
+		if (null != font.b) {
+			this.setBold(font.b);
+		}
+		if (null != font.i) {
+			this.setItalic(font.i);
+		}
+		if (null != font.u) {
+			this.setUnderline(font.u);
+		}
+		if (null != font.s) {
+			this.setStrikeout(font.s);
+		}
+		if (null != font.c) {
+			this.setColor(font.c);
+		}
+		if (null != font.va) {
+			this.setVerticalAlign(font.va);
+		}
+		if (null != font.skip) {
+			this.setSkip(font.skip);
+		}
+		if (null != font.repeat) {
+			this.setRepeat(font.repeat);
 		}
 	};
-	Font.prototype.merge = function (font) {
-		var defaultFontAbs = g_oDefaultFormat.FontAbs;
+	Font.prototype.merge = function (font, isTable) {
 		var oRes = new Font();
-		oRes.fn = this._mergeProperty(this.fn, font.fn, defaultFontAbs.fn);
-		oRes.scheme = this._mergeProperty(this.scheme, font.scheme, defaultFontAbs.scheme);
-		oRes.fs = this._mergeProperty(this.fs, font.fs, defaultFontAbs.fs);
-		oRes.b = this._mergeProperty(this.b, font.b, defaultFontAbs.b);
-		oRes.i = this._mergeProperty(this.i, font.i, defaultFontAbs.i);
-		oRes.u = this._mergeProperty(this.u, font.u, defaultFontAbs.u);
-		oRes.s = this._mergeProperty(this.s, font.s, defaultFontAbs.s);
-		//заглушка excel при merge стилей игнорирует default цвет
-		if (this.c instanceof ThemeColor && g_nColorTextDefault == this.c.theme && null == this.c.tint) {
-			oRes.c = this._mergeProperty(font.c, this.c, defaultFontAbs.c);
+		oRes.fn = this.fn || font.fn;
+		oRes.scheme = this.scheme || font.scheme;
+		oRes.fs = this.fs || font.fs;
+		if (isTable){
+			oRes.b = font.b;
+			oRes.i = font.i;
+			oRes.s = font.s;
 		} else {
-			oRes.c = this._mergeProperty(this.c, font.c, defaultFontAbs.c);
+			oRes.b = this.b || font.b;
+			oRes.i = this.i || font.i;
+			oRes.s = this.s || font.s;
 		}
-		oRes.va = this._mergeProperty(this.va, font.va, defaultFontAbs.va);
-		oRes.skip = this._mergeProperty(this.skip, font.skip, defaultFontAbs.skip);
-		oRes.repeat = this._mergeProperty(this.repeat, font.repeat, defaultFontAbs.repeat);
+		oRes.u = this.u || font.u;
+		//заглушка excel при merge стилей игнорирует default цвет
+		if (isTable && this.c && this.c.isEqual(g_oDefaultFormat.Font)) {
+			oRes.c = font.c || this.c;
+		} else {
+			oRes.c = this.c || font.c;
+		}
+		oRes.va = this.va || font.va;
+		oRes.skip = this.skip || font.skip;
+		oRes.repeat = this.repeat || font.repeat;
 		return oRes;
 	};
 	Font.prototype.getRgbOrNull = function () {
@@ -557,79 +588,18 @@ var g_oFontProperties = {
 		}
 		return nRes;
 	};
-	Font.prototype.getDif = function (val) {
-		var oRes = new Font(this);
-		var bEmpty = true;
-		if (this.fn == val.fn) {
-			oRes.fn = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.scheme == val.scheme) {
-			oRes.scheme = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.fs == val.fs) {
-			oRes.fs = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.b == val.b) {
-			oRes.b = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.i == val.i) {
-			oRes.i = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.u == val.u) {
-			oRes.u = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.s == val.s) {
-			oRes.s = null;
-		} else {
-			bEmpty = false;
-		}
-		if (g_oColorManager.isEqual(this.c, val.c)) {
-			oRes.c = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.va == val.va) {
-			oRes.va = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.skip == val.skip) {
-			oRes.skip = null;
-		} else {
-			bEmpty = false;
-		}
-		if (this.repeat == val.repeat) {
-			oRes.repeat = null;
-		} else {
-			bEmpty = false;
-		}
-		if (bEmpty) {
-			oRes = null;
-		}
-		return oRes;
-	};
 	Font.prototype.isEqual = function (font) {
 		var bRes = this.fs == font.fs && this.b == font.b && this.i == font.i && this.u == font.u && this.s == font.s &&
 			g_oColorManager.isEqual(this.c, font.c) && this.va == font.va && this.skip == font.skip &&
 			this.repeat == font.repeat;
 		if (bRes) {
-			if (Asc.EFontScheme.fontschemeNone == this.scheme && Asc.EFontScheme.fontschemeNone == font.scheme) {
+			var schemeThis = this.getScheme();
+			var schemeOther = font.getScheme();
+			if (Asc.EFontScheme.fontschemeNone == schemeThis && Asc.EFontScheme.fontschemeNone == schemeOther) {
 				bRes = this.fn == font.fn;
-			} else if (Asc.EFontScheme.fontschemeNone != this.scheme &&
-				Asc.EFontScheme.fontschemeNone != font.scheme) {
-				bRes = this.scheme == font.scheme;
+			} else if (Asc.EFontScheme.fontschemeNone != schemeThis &&
+				Asc.EFontScheme.fontschemeNone != schemeOther) {
+				bRes = schemeThis == schemeOther;
 			} else {
 				bRes = false;
 			}
@@ -637,43 +607,9 @@ var g_oFontProperties = {
 		return bRes;
 	};
 	Font.prototype.clone = function () {
-		return new Font(this);
-	};
-	Font.prototype.set = function (oVal) {
-		if (null != oVal.fn) {
-			this.fn = oVal.fn;
-			this.scheme = Asc.EFontScheme.fontschemeNone;
-		}
-		if (null != oVal.scheme) {
-			this.scheme = oVal.scheme;
-		}
-		if (null != oVal.fs) {
-			this.fs = oVal.fs;
-		}
-		if (null != oVal.b) {
-			this.b = oVal.b;
-		}
-		if (null != oVal.i) {
-			this.i = oVal.i;
-		}
-		if (null != oVal.u) {
-			this.u = oVal.u;
-		}
-		if (null != oVal.s) {
-			this.s = oVal.s;
-		}
-		if (null != oVal.c) {
-			this.c = oVal.c;
-		}
-		if (null != oVal.va) {
-			this.va = oVal.va;
-		}
-		if (null != oVal.skip) {
-			this.skip = oVal.skip;
-		}
-		if (null != oVal.repeat) {
-			this.repeat = oVal.repeat;
-		}
+		var font = new Font();
+		font.assign(this);
+		return font;
 	};
 	Font.prototype.intersect = function (oFont, oDefVal) {
 		if (this.fn != oFont.fn) {
@@ -709,6 +645,72 @@ var g_oFontProperties = {
 		if (this.repeat != oFont.repeat) {
 			this.repeat = oDefVal.repeat;
 		}
+	};
+	Font.prototype.getName = function () {
+		return this.fn || g_oDefaultFormat.Font.fn;
+	};
+	Font.prototype.setName = function (val) {
+		return this.fn = val;
+	};
+	Font.prototype.getScheme = function () {
+		return this.scheme || Asc.EFontScheme.fontschemeNone;
+	};
+	Font.prototype.setScheme = function(val) {
+		return (null != val && Asc.EFontScheme.fontschemeNone != val) ? this.scheme = val : this.scheme = null;
+	};
+	Font.prototype.getSize = function () {
+		return this.fs || g_oDefaultFormat.Font.fs;
+	};
+	Font.prototype.setSize = function(val) {
+		return this.fs = val;
+	};
+	Font.prototype.getBold = function () {
+		return !!this.b;
+	};
+	Font.prototype.setBold = function(val) {
+		return val ? this.b = true : this.b = null;
+	};
+	Font.prototype.getItalic = function () {
+		return !!this.i;
+	};
+	Font.prototype.setItalic = function(val) {
+		return val ? this.i = true : this.i = null;
+	};
+	Font.prototype.getUnderline = function () {
+		return this.u || Asc.EUnderline.underlineNone;
+	};
+	Font.prototype.setUnderline = function(val) {
+		return (null != val && Asc.EUnderline.underlineNone != val) ? this.u = val : this.u = null;
+	};
+	Font.prototype.getStrikeout = function () {
+		return !!this.s;
+	};
+	Font.prototype.setStrikeout = function(val) {
+		return val ? this.s = true : this.s = null;
+	};
+	Font.prototype.getColor = function () {
+		return this.c || g_oDefaultFormat.ColorAuto;
+	};
+	Font.prototype.setColor = function(val) {
+		return this.c = val;
+	};
+	Font.prototype.getVerticalAlign = function () {
+		return this.va || AscCommon.vertalign_Baseline;
+	};
+	Font.prototype.setVerticalAlign = function(val) {
+		return (null != val && AscCommon.vertalign_Baseline != val) ? this.va = val : this.va = null;
+	};
+	Font.prototype.getSkip = function () {
+		return !!this.skip;
+	};
+	Font.prototype.setSkip = function(val) {
+		return val ? this.skip = true : this.skip = null;
+	};
+	Font.prototype.getRepeat = function () {
+		return !!this.repeat;
+	};
+	Font.prototype.setRepeat = function (val) {
+		return val ? this.repeat = true : this.repeat = null;
 	};
 	Font.prototype.getType = function () {
 		return UndoRedoDataTypes.StyleFont;
@@ -1204,13 +1206,13 @@ Num.prototype =
         }
         switch (this.id) {
           case 15:
-            res = 'd' + separator + 'mmm' + separator + 'yy';
+            res = AscCommon.getShortDateMonthFormat(true, true, separator, null);
             break;
           case 16:
-            res = 'd' + separator + 'mmm';
+            res = AscCommon.getShortDateMonthFormat(true, false, separator, null);
             break;
           case 17:
-            res = 'mmm' + separator + 'yy';
+            res = AscCommon.getShortDateMonthFormat(false, true, separator, null);
             break;
         }
       } else {
@@ -1228,7 +1230,7 @@ Num.prototype =
             res = AscCommonExcel.getCurrencyFormatSimple(null, true, true, true);
             break;
           case 22:
-            res = AscCommonExcel.getShortDateFormat(null) + " h:mm";
+            res = AscCommon.getShortDateFormat(null) + " h:mm";
             break;
           case 14:
           case 27:
@@ -1237,7 +1239,7 @@ Num.prototype =
           case 30:
           case 31:
           case 36:
-            res = AscCommonExcel.getShortDateFormat(null);
+            res = AscCommon.getShortDateFormat(null);
             break;
           case 37:
             res = AscCommonExcel.getCurrencyFormatSimple(null, false, false, false);
@@ -1360,7 +1362,7 @@ function CellXfs() {
 }
 CellXfs.prototype =
 {
-	_mergeProperty : function(first, second)
+	_mergeProperty : function(first, second, isTable)
 	{
 		var res = null;
 		if(null != first || null != second)
@@ -1372,19 +1374,19 @@ CellXfs.prototype =
 			else
 			{
 				if(null != first.merge)
-					res = first.merge(second);
+					res = first.merge(second, isTable);
 				else
 					res = first;
 			}
 		}
 		return res;
 	},
-	merge : function(xfs)
+	merge : function(xfs, isTable)
 	{
 		var oRes = new CellXfs();
 		oRes.border = this._mergeProperty(this.border, xfs.border);
 		oRes.fill = this._mergeProperty(this.fill, xfs.fill);
-		oRes.font = this._mergeProperty(this.font, xfs.font);
+		oRes.font = this._mergeProperty(this.font, xfs.font, isTable);
 		oRes.num = this._mergeProperty(this.num, xfs.num);
 		oRes.align = this._mergeProperty(this.align, xfs.align);
 		oRes.QuotePrefix = this._mergeProperty(this.QuotePrefix, xfs.QuotePrefix);
@@ -1603,8 +1605,8 @@ CCellStyles.prototype._generateFontMap = function (oFontMap, aStyles) {
 	var i, length, oStyle;
 	for (i = 0, length = aStyles.length; i < length; ++i) {
 		oStyle = aStyles[i];
-		if (null != oStyle.xfs && null != oStyle.xfs.font && null != oStyle.xfs.font.fn)
-			oFontMap[oStyle.xfs.font.fn] = 1;
+		if (null != oStyle.xfs && null != oStyle.xfs.font)
+			oFontMap[oStyle.xfs.font.getName()] = 1;
 	}
 };
 /**
@@ -1761,7 +1763,7 @@ CCellStyle.prototype.getFill = function () {
 };
 CCellStyle.prototype.getFontColor = function () {
 	if (null != this.xfs && null != this.xfs.font)
-		return this.xfs.font.c;
+		return this.xfs.font.getColor();
 
 	return g_oDefaultFormat.Font.c;
 };
@@ -1782,19 +1784,37 @@ CCellStyle.prototype.getNumFormatStr = function () {
 };
 /** @constructor */
 function StyleManager(){
-    //содержат все свойства по умолчанию
-	this.oDefaultFont = null;
-	this.oDefaultAlign = null;
-	this.oDefaultQuotePrefix = null;
-    //стиль ячейки по умолчанию, может содержать не все свойства
+	//стиль ячейки по умолчанию, может содержать не все свойства
 	this.oDefaultXfs = new CellXfs();
 }
 StyleManager.prototype =
 {
-    init : function(oDefaultXfs)
-    {
-		if(null != oDefaultXfs.font)
-			g_oDefaultFormat.Font = oDefaultXfs.font.clone();
+	init: function(oDefaultXfs, wb) {
+		//font
+		if (!oDefaultXfs.font) {
+			oDefaultXfs.font = new AscCommonExcel.Font();
+		}
+		if (!oDefaultXfs.font.scheme) {
+			oDefaultXfs.font.scheme = Asc.EFontScheme.fontschemeMinor;
+		}
+		if (!oDefaultXfs.font.fn) {
+			var sThemeFont = null;
+			if (null != wb.theme.themeElements && null != wb.theme.themeElements.fontScheme) {
+				if (Asc.EFontScheme.fontschemeMinor == oDefaultXfs.font.scheme && wb.theme.themeElements.fontScheme.minorFont) {
+					sThemeFont = wb.theme.themeElements.fontScheme.minorFont.latin;
+				} else if (Asc.EFontScheme.fontschemeMajor == oDefaultXfs.font.scheme && wb.theme.themeElements.fontScheme.majorFont) {
+					sThemeFont = wb.theme.themeElements.fontScheme.majorFont.latin;
+				}
+			}
+			oDefaultXfs.font.fn = sThemeFont ? sThemeFont : "Calibri";
+		}
+		if (!oDefaultXfs.font.fs) {
+			oDefaultXfs.font.fs = 11;
+		}
+		if (!oDefaultXfs.font.c) {
+			oDefaultXfs.font.c = AscCommonExcel.g_oColorManager.getThemeColor(AscCommonExcel.g_nColorTextDefault);
+		}
+		g_oDefaultFormat.Font = oDefaultXfs.font;
 		if(null != oDefaultXfs.fill)
 			g_oDefaultFormat.Fill = oDefaultXfs.fill.clone();
 		if(null != oDefaultXfs.border)
@@ -1918,23 +1938,18 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.fn;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.fn;
+			oRes.oldVal = null;
 		//todo undo для scheme
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font)
-			{
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.fn = g_oDefaultFormat.Font.fn;
-                xfs.font.scheme = Asc.EFontScheme.fontschemeNone;
+		var isSetNull = (null == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
 			}
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.fn = val;
-            xfs.font.scheme = Asc.EFontScheme.fontschemeNone;
-        }
+			xfs.font.setName(val);
+			xfs.font.setScheme(null);
+		}
 		return oRes;
 	},
 	setFontsize : function(oItemWithXfs, val)
@@ -1944,19 +1959,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.fs;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.fs;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.fs = g_oDefaultFormat.Font.fs;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.fs = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setSize(val);
+		}
 		return oRes;
 	},
 	setFontcolor : function(oItemWithXfs, val)
@@ -1966,19 +1978,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.c;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.c;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.c = g_oDefaultFormat.Font.c;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.c = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setColor(val);
+		}
 		return oRes;
 	},
 	setBold : function(oItemWithXfs, val)
@@ -1988,19 +1997,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.b;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.b;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.b = g_oDefaultFormat.Font.b;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.b = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val || false == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setBold(val);
+		}
 		return oRes;
 	},
 	setItalic : function(oItemWithXfs, val)
@@ -2010,19 +2016,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.i;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.i;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.i = g_oDefaultFormat.Font.i;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.i = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val || false == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setItalic(val);
+		}
 		return oRes;
 	},
 	setUnderline : function(oItemWithXfs, val)
@@ -2032,19 +2035,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.u;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.u;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.u = g_oDefaultFormat.Font.u;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.u = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val || Asc.EUnderline.underlineNone == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setUnderline(val);
+		}
 		return oRes;
 	},
 	setStrikeout : function(oItemWithXfs, val)
@@ -2054,19 +2054,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.s;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.s;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.s = g_oDefaultFormat.Font.s;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.s = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val || false == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setStrikeout(val);
+		}
 		return oRes;
 	},
 	setFontAlign : function(oItemWithXfs, val)
@@ -2076,19 +2073,16 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.va;
 		else
-			oRes.oldVal = g_oDefaultFormat.Font.va;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.font) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.va = g_oDefaultFormat.Font.va;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font.va = val;
-        }
+			oRes.oldVal = null;
+		var isSetNull = (null == val || AscCommon.vertalign_Baseline == val);
+		if (!isSetNull || (null != xfs && null != xfs.font)) {
+			if (isSetNull) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+			} else {
+				xfs = this._prepareSetFont(oItemWithXfs);
+			}
+			xfs.font.setVerticalAlign(val);
+		}
 		return oRes;
 	},
 	setAlignVertical : function(oItemWithXfs, val)
@@ -2736,7 +2730,7 @@ Row.prototype =
 	{
 		this.ws._removeRow(this.index);
 	},
-	clone : function(oNewWs)
+	clone : function(oNewWs, renameParams)
 	{
         if(!oNewWs)
             oNewWs = this.ws;
@@ -2748,7 +2742,7 @@ Row.prototype =
 		if(null != this.h)
 			oNewRow.h = this.h;
 		for(var i in this.c)
-			oNewRow.c[i] = this.c[i].clone(oNewWs);
+			oNewRow.c[i] = this.c[i].clone(oNewWs, renameParams);
 		return oNewRow;
 	},
 	getDefaultXfs : function()
@@ -3149,7 +3143,7 @@ CCellValue.prototype =
 			var aText = this.aTextValue2[gc_nMaxDigCountView];
 			for(var i = 0, length = aText.length; i < length; ++i)
 			{
-				if(aText[i].format && aText[i].format.skip == false)
+				if(aText[i].format && aText[i].format.getSkip() == false)
 					this.textValue += aText[i].text;
 			}
 		}
@@ -3255,13 +3249,13 @@ CCellValue.prototype =
 					{
 						aRes = null;
 						sText = null;
+						var font = new AscCommonExcel.Font();
 						if (dDigitsCount > 1){
-						    var oNumFormatFont = new AscCommon.NumFormatFont();
-						    oNumFormatFont.repeat = true;
-						    aText = [{ text: "#", format: oNumFormatFont }];
+							font.setRepeat(true);
+							aText = [{ text: "#", format: font}];
 						}
 						else
-							aText = [{text: "", format: {}}];
+							aText = [{text: "", format: font}];
 					}
 				}
 			}
@@ -3283,15 +3277,16 @@ CCellValue.prototype =
 				{
 					aRes = null;
 					sText = null;
-					var oNumFormatFont = new AscCommon.NumFormatFont();
-					oNumFormatFont.repeat = true;
-					aText = [{ text: "#", format: oNumFormatFont }];
+					var font = new AscCommonExcel.Font();
+					font.setRepeat(true);
+					aText = [{ text: "#", format: font }];
 				}
 			}
 			if(null == aRes)
 				aRes = this._getValue2Result(cell, sText, aText);
-			if( cell.sFormula ){
-				aRes[0].sFormula = cell.sFormula;
+			var formula = cell.getFormula();
+			if( formula ){
+				aRes[0].sFormula = formula;
 				aRes[0].sId = cell.getName();
 			}
 			
@@ -3310,7 +3305,7 @@ CCellValue.prototype =
 			var oValueText = null;
 			var oValueArray = null;
 			var xfs = cell.getCompiledStyle();
-			if(cell.sFormula)
+			if(cell.formulaParsed)
 				oValueText = "="+cell.formulaParsed.assembleLocale(AscCommonExcel.cFormulaFunctionToLocale,true);	// ToDo если будет притормаживать, то завести переменную и не рассчитывать каждый раз!
 			else
 			{
@@ -3353,17 +3348,7 @@ CCellValue.prototype =
 											    bTime = true;
 											var sDateFormat = "";
 											if (bDate) {
-											    for (var i = 0, length = cultureInfo.ShortDatePattern.length; i < length; i++) {
-											        var nIndex = cultureInfo.ShortDatePattern[i] - 0;
-											        if (0 != i)
-											            sDateFormat += "/";
-											        if (0 == nIndex)
-											            sDateFormat += "d";
-											        else if (1 == nIndex)
-											            sDateFormat += "m";
-											        else if (2 == nIndex)
-											            sDateFormat += "yyyy";
-											    }
+												sDateFormat = AscCommon.getShortDateFormat(cultureInfo);
 											}
                                             var sTimeFormat = 'h:mm:ss';
                                             if (cultureInfo.AMDesignator.length > 0 && cultureInfo.PMDesignator.length > 0){
@@ -3421,7 +3406,7 @@ CCellValue.prototype =
 			var oNewItem = new Fragment();
 			oNewItem.text = sText;
 			oNewItem.format = cellfont.clone();
-			color = oNewItem.format.c;
+			color = oNewItem.format.getColor();
 			if(color instanceof ThemeColor)
 			{
 				//для посещенных гиперссылок
@@ -3430,12 +3415,12 @@ CCellValue.prototype =
 					var hyperlink = cell.ws.hyperlinkManager.getByCell(cell.nRow, cell.nCol);
 					if(null != hyperlink && hyperlink.data.getVisited())
 					{
-						oNewItem.format.c = g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null);
+						oNewItem.format.setColor(g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null));
 					}
 				}
 			}
-			oNewItem.format.skip = false;
-			oNewItem.format.repeat = false;
+			oNewItem.format.setSkip(false);
+			oNewItem.format.setRepeat(false);
 			aResult.push(oNewItem);
 		} else if(null != aText){
 			for(var i = 0; i < aText.length; i++){
@@ -3445,11 +3430,11 @@ CCellValue.prototype =
 				{
 					oNewItem.text = oCurtext.text;
 					var oCurFormat = new Font();
-					oCurFormat.set(cellfont);
+					oCurFormat.assign(cellfont);
 					if(null != oCurtext.format)
-						oCurFormat.set(oCurtext.format);
+						oCurFormat.assignFromObject(oCurtext.format);
 					oNewItem.format = oCurFormat;
-					color = oNewItem.format.c;
+					color = oNewItem.format.getColor();
 					if(color instanceof ThemeColor)
 					{
 						//для посещенных гиперссылок
@@ -3458,7 +3443,7 @@ CCellValue.prototype =
 							var hyperlink = cell.ws.hyperlinkManager.getByCell(cell.nRow, cell.nCol);
 							if(null != hyperlink && hyperlink.data.getVisited())
 							{
-								oNewItem.format.c = g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null);
+								oNewItem.format.setColor(g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null));
 							}
 						}
 					}
@@ -3605,12 +3590,13 @@ CCellValue.prototype =
 					var item = aVal[i];
 					var oNewElem = new CCellValueMultiText();
 					oNewElem.text = item.text;
-					oNewElem.format = g_oDefaultFormat.Font.clone();
-					if(null != item.format)
-						oNewElem.format.set(item.format);
+					if (null != item.format) {
+						oNewElem.format = new Font();
+						oNewElem.format.assign(item.format);
+					}
 					this.multiText.push(oNewElem);
 				}
-				this.miminizeMultiText(cell, true);
+				this.minimizeMultiText(cell, true);
 			}
 			//обрабатываем QuotePrefix
 			if(null != this.text)
@@ -3652,16 +3638,13 @@ CCellValue.prototype =
 			oRes.push(this.multiText[i].clone());
 		return oRes;
 	},
-	miminizeMultiText : function(cell, bSetCellFont)
+	minimizeMultiText : function(cell, bSetCellFont)
 	{
 		var bRes = false;
-		if(null == bSetCellFont)
-			bSetCellFont = true;
 		if(null != this.multiText && this.multiText.length > 0)
 		{
-		    var range = cell.ws.getCell3(cell.nRow, cell.nCol);
-		    var cellFont = range.getFont();
-		    var oIntersectFont;
+		    var cellFont = cell.getFont();
+		    var oIntersectFont = null;
 		    for (var i = 0, length = this.multiText.length; i < length; i++) {
 		        var elem = this.multiText[i];
 			    if (null != elem.format) {
@@ -3670,11 +3653,11 @@ CCellValue.prototype =
 			        oIntersectFont.intersect(elem.format, cellFont);
 			    }
 			    else {
-			        oIntersectFont = cellFont.clone();
+			        oIntersectFont = cellFont;
 			        break;
 			    }
 			}
-				
+
 			if(bSetCellFont)
 			{
 			    if (oIntersectFont.isEqual(g_oDefaultFormat.Font))
@@ -3726,7 +3709,7 @@ CCellValue.prototype =
 				        fAction(elem.format)
 				}
 				//пробуем преобразовать в простую строку
-				if(this.miminizeMultiText(cell, false))
+				if(this.minimizeMultiText(cell, false))
 				{
 					var DataNew = cell.getValueData();
 					History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValue, cell.ws.getId(), new Asc.Range(cell.nCol, cell.nRow, cell.nCol, cell.nRow), new UndoRedoData_CellSimpleData(cell.nRow,cell.nCol, backupObj, DataNew));
@@ -3743,35 +3726,35 @@ CCellValue.prototype =
 	},
 	setFontname : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.fn;}, function(format){format.fn = val;});
+		return this._setFontProp(cell, function(format){return val != format.getName();}, function(format){format.setName(val);});
 	},
 	setFontsize : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.fs;}, function(format){format.fs = val;});
+		return this._setFontProp(cell, function(format){return val != format.getSize();}, function(format){format.setSize(val);});
 	},
 	setFontcolor : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.c;}, function(format){format.c = val;});
+		return this._setFontProp(cell, function(format){return val != format.getColor();}, function(format){format.setColor(val);});
 	},
 	setBold : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.b;}, function(format){format.b = val;});
+		return this._setFontProp(cell, function(format){return val != format.getBold();}, function(format){format.setBold(val);});
 	},
 	setItalic : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.i;}, function(format){format.i = val;});
+		return this._setFontProp(cell, function(format){return val != format.getItalic();}, function(format){format.setItalic(val);});
 	},
 	setUnderline : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.u;}, function(format){format.u = val;});
+		return this._setFontProp(cell, function(format){return val != format.getUnderline();}, function(format){format.setUnderline(val);});
 	},
 	setStrikeout : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.s;}, function(format){format.s = val;});
+		return this._setFontProp(cell, function(format){return val != format.getStrikeout();}, function(format){format.setStrikeout(val);});
 	},
 	setFontAlign : function(cell, val)
 	{
-		return this._setFontProp(cell, function(format){return val != format.va;}, function(format){format.va = val;});
+		return this._setFontProp(cell, function(format){return val != format.getVerticalAlign();}, function(format){format.setVerticalAlign(val);});
 	},
 	setValueType : function(type)
 	{
@@ -5309,6 +5292,35 @@ CellArea.prototype = {
 		}
 		return bRemove;
 	};
+	sparklineGroup.prototype.getLocationRanges = function (onlySingle) {
+		var result = new AscCommonExcel.SelectionRange();
+		this.arrSparklines.forEach(function (item, i) {
+			if (0 === i) {
+				result.assign2(item.sqref);
+			} else {
+				result.addRange();
+				result.getLast().assign2(item.sqref);
+			}
+		});
+		var unionRange = result.getUnion();
+		return (!onlySingle || unionRange.isSingleRange()) ? unionRange : result;
+	};
+	sparklineGroup.prototype.getDataRanges = function () {
+		var isUnion = true;
+		var sheet = this.worksheet.getName();
+		var result = new AscCommonExcel.SelectionRange();
+		this.arrSparklines.forEach(function (item, i) {
+			isUnion = isUnion && sheet === item._f.sheet;
+			if (0 === i) {
+				result.assign2(item._f);
+			} else {
+				result.addRange();
+				result.getLast().assign2(item._f);
+			}
+		});
+		var unionRange = isUnion ? result.getUnion() : result;
+		return unionRange.isSingleRange() ? unionRange : result;
+	};
 	sparklineGroup.prototype.asc_getId = function () {
 		return this.Id;
 	};
@@ -5383,6 +5395,25 @@ CellArea.prototype = {
 	};
 	sparklineGroup.prototype.asc_getColorLow = function () {
 		return this.colorLow ? Asc.colorObjToAscColor(this.colorLow) : this.colorLow;
+	};
+	sparklineGroup.prototype.asc_getDataRanges = function () {
+		var arrResultData = [];
+		var arrResultLocation = [];
+		var oLocationRanges = this.getLocationRanges(true);
+		var oDataRanges = oLocationRanges.isSingleRange() && this.getDataRanges();
+		if (oLocationRanges.isSingleRange() && oDataRanges.isSingleRange()) {
+			for (var i = 0; i < oLocationRanges.ranges.length; ++i) {
+				arrResultData.push(oDataRanges.ranges[i].getName());
+				arrResultLocation.push(oLocationRanges.ranges[i].getAbsName());
+			}
+		} else {
+			this.arrSparklines.forEach(function (item) {
+				arrResultData.push(item.f);
+				arrResultLocation.push(item.sqref.getAbsName());
+			});
+		}
+		return [arrResultData.join(AscCommon.FormulaSeparators.functionArgumentSeparator),
+			arrResultLocation.join(AscCommon.FormulaSeparators.functionArgumentSeparator)];
 	};
 	sparklineGroup.prototype.asc_setType = function (val) {
 		this.type = val;
@@ -5624,7 +5655,8 @@ CellArea.prototype = {
 		return res;
 	};
 	sparkline.prototype.setSqref = function (sqref) {
-		this.sqref = AscCommonExcel.g_oRangeCache.getAscRange(sqref);
+		this.sqref = AscCommonExcel.g_oRangeCache.getAscRange(sqref).clone();
+		this.sqref.setAbs(true, true, true. true);
 	};
 	sparkline.prototype.setF = function (f) {
 		this.f = f;
@@ -5661,7 +5693,7 @@ function TablePart(handlers) {
 	this.result = null;
 	this.handlers = handlers;
 }
-TablePart.prototype.clone = function(ws, tableName) {
+TablePart.prototype.clone = function() {
 	var i, res = new TablePart(this.handlers);
 	res.Ref = this.Ref ? this.Ref.clone() : null;
 	res.HeaderRowCount = this.HeaderRowCount;
@@ -5683,31 +5715,34 @@ TablePart.prototype.clone = function(ws, tableName) {
 		for (i = 0; i < this.result.length; ++i)
 			res.result.push(this.result[i].clone());
 	}
-	
-	if(tableName)
-	{
-		res.DisplayName = tableName;
-	}
-	else
-	{
-		res.DisplayName = this.DisplayName;
-	}
-	
-	if(ws !== null)
-		res.recalc(ws, tableName);
-		
+	res.DisplayName = this.DisplayName;
 	return res;
 };
-TablePart.prototype.recalc = function(ws, tableName) {
-	this.DisplayName = ws.workbook.dependencyFormulas.getNextTableName(ws, this.Ref, tableName);
-};
+	TablePart.prototype.renameSheetCopy = function(ws, renameParams) {
+		for (var i = 0; i < this.TableColumns.length; ++i) {
+			this.TableColumns[i].renameSheetCopy(ws, renameParams);
+		}
+	};
+	TablePart.prototype.removeDependencies = function(opt_cols) {
+		if (!opt_cols) {
+			opt_cols = this.TableColumns;
+		}
+		for (var i = 0; i < opt_cols.length; ++i) {
+			opt_cols[i].removeDependencies();
+		}
+	};
+	TablePart.prototype.buildDependencies = function() {
+		for (var i = 0; i < this.TableColumns.length; ++i) {
+			this.TableColumns[i].buildDependencies();
+		}
+	};
 TablePart.prototype.moveRef = function(col, row) {
 	var ref = this.Ref.clone();
 	ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
 
 	this.Ref = ref;
 	//event
-	this.handlers.trigger("changeRefTablePart", this.DisplayName, this.Ref);
+	this.handlers.trigger("changeRefTablePart", this);
 
 	if(this.AutoFilter)
 		this.AutoFilter.moveRef(col, row);
@@ -5722,9 +5757,7 @@ TablePart.prototype.changeRef = function(col, row, bIsFirst) {
 	this.Ref = ref;
 	
 	//event
-	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
-	var refNamedRanges = Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, endRow);
-	this.handlers.trigger("changeRefTablePart", this.DisplayName, refNamedRanges);
+	this.handlers.trigger("changeRefTablePart", this);
 	
 	if(this.AutoFilter)
 		this.AutoFilter.changeRef(col, row, bIsFirst);
@@ -5741,9 +5774,10 @@ TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewT
 		
 		if(null !== intersectionRanges)
 		{
+			this.removeDependencies();
+			var tableColumn;
 			for(var i = range.c1; i <= range.c2; i++)
 			{
-				var tableColumn;
 				if(i >= intersectionRanges.c1 && i <= intersectionRanges.c2)
 				{
 					var tableIndex = i - this.Ref.c1;
@@ -5759,17 +5793,18 @@ TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewT
 			
 			for(var j = 0; j < newTableColumns.length; j++)
 			{
-				if(newTableColumns[j].Name === null)
-					newTableColumns[j].Name = autoFilters._generateColumnName2(newTableColumns);
+				tableColumn = newTableColumns[j];
+				if(tableColumn.Name === null)
+					tableColumn.Name = autoFilters._generateColumnName2(newTableColumns);
 			}
 			
 			this.TableColumns = newTableColumns;
+			this.buildDependencies();
 		}
 	}
-	
 	this.Ref = Asc.Range(range.c1, range.r1, range.c2, range.r2);
 	//event
-	this.handlers.trigger("changeRefTablePart", this.DisplayName, this.Ref);
+	this.handlers.trigger("changeRefTablePart", this);
 	
 	if(this.AutoFilter)
 		this.AutoFilter.changeRefOnRange(range);
@@ -5817,15 +5852,25 @@ TablePart.prototype.deleteTableColumns = function(activeRange)
 		diff = activeRange.c2 - activeRange.c1 + 1;
 		startCol = activeRange.c1 - this.Ref.c1;
 	}
-	
-	if(diff !== null)
-		this.TableColumns.splice(startCol, diff);
+
+	if (diff !== null) {
+		var deleted = this.TableColumns.splice(startCol, diff);
+		this.removeDependencies(deleted);
+
+		//todo undo
+		// var deletedMap = {};
+		// for (var i = 0; i < deleted.length; ++i) {
+		// 	deletedMap[deleted[i].Name] = 1;
+		// }
+		// this.handlers.trigger("deleteColumnTablePart", this.DisplayName, deletedMap);
+	}
+
 };
 
 TablePart.prototype.addTableColumns = function(activeRange, autoFilters)
 {
 	var newTableColumns = [], num = 0;
-
+	this.removeDependencies();
 	for(var j = 0; j < this.TableColumns.length;)
 	{
 		var curCol = num + this.Ref.c1;
@@ -5844,20 +5889,24 @@ TablePart.prototype.addTableColumns = function(activeRange, autoFilters)
 	
 	for(var j = 0; j < newTableColumns.length; j++)
 	{
-		if(newTableColumns[j].Name === null)
-			newTableColumns[j].Name = autoFilters._generateColumnName2(newTableColumns);
+		var tableColumn = newTableColumns[j];
+		if(tableColumn.Name === null)
+			tableColumn.Name = autoFilters._generateColumnName2(newTableColumns);
 	}
 	
 	this.TableColumns = newTableColumns;
+	this.buildDependencies();
 };
 
 TablePart.prototype.addTableLastColumn = function(activeRange, autoFilters, isAddLastColumn)
 {
+	this.removeDependencies();
 	var newTableColumns = this.TableColumns;
 	newTableColumns.push(new TableColumn());
 	newTableColumns[newTableColumns.length - 1].Name = autoFilters._generateColumnName2(newTableColumns);
 	
 	this.TableColumns = newTableColumns;
+	this.buildDependencies();
 };
 
 TablePart.prototype.isAutoFilter = function()
@@ -5868,42 +5917,47 @@ TablePart.prototype.isAutoFilter = function()
 TablePart.prototype.getTableRangeForFormula = function(objectParam)
 {
 	var res = null;
+	var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
+	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
 	switch(objectParam.param)
 	{
 		case FormulaTablePartInfo.all:
 		{
 			res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r2);
-            //All поразному работает в случае если у таблицы есть или нет строки Totals
-            //При наличии Totals All возвращает диапазон с учетом этой строки.
 			break;
 		}
 		case FormulaTablePartInfo.data:
 		{
-			var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
-			var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
-			
 			res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 			break;
 		}
 		case FormulaTablePartInfo.headers:
 		{
-			res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r1);
+			if(this.HeaderRowCount === null) {
+				res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r1);
+			} else if(!objectParam.toRef) {
+				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+			}
 			break;
 		}
 		case FormulaTablePartInfo.totals:
 		{
-			if(this.TotalsRowCount)
-			{
+			if(this.TotalsRowCount) {
 				res = new Asc.Range(this.Ref.c1, this.Ref.r2, this.Ref.c2, this.Ref.r2);
+			} else if(!objectParam.toRef) {
+				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 			}
-			
 			break;
 		}
 		case FormulaTablePartInfo.thisRow:
 		{
-//            if( this.Ref.containsRange( objectParam.cell ) ){
-                res = new Asc.Range( this.Ref.c1, objectParam.cell.r1, this.Ref.c2, objectParam.cell.r1 );
-//            }
+			if (objectParam.cell) {
+				if (startRow <= objectParam.cell.r1 && objectParam.cell.r1 <= endRow) {
+					res = new Asc.Range(this.Ref.c1, objectParam.cell.r1, this.Ref.c2, objectParam.cell.r1);
+				}
+			} else {
+				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+			}
 			break;
 		}
 		case FormulaTablePartInfo.columns:
@@ -5915,18 +5969,11 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 				break;
 			if(endCol === null)
 				endCol = startCol;
-			
-			var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
-			var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
-			
+
 			res = new Asc.Range(this.Ref.c1 + startCol, startRow, this.Ref.c1 + endCol, endRow);
 			break;
 		}
 	}
-    if( objectParam.includeColumnHeader && res ){
-        res.r1--;
-        res.r1 < 0 ? res.r1 = 0 : null;
-    }
 	return res;
 };
 
@@ -6003,15 +6050,19 @@ TablePart.prototype.isShowButton = function()
 	return res;
 };
 
-TablePart.prototype.generateTotalsRowLabel = function()
+TablePart.prototype.generateTotalsRowLabel = function(ws)
 {
 	if(!this.TableColumns)
 	{
 		return;
 	}
 	
-	this.TableColumns[0].generateTotalsRowLabel();
-	this.TableColumns[this.TableColumns.length - 1].generateTotalsRowFunction(this);
+	//в случае одной колонки выставляем только формулу
+	if(this.TableColumns.length > 1)
+	{
+		this.TableColumns[0].generateTotalsRowLabel();
+	}
+	this.TableColumns[this.TableColumns.length - 1].generateTotalsRowFunction(ws, this);
 };
 
 TablePart.prototype.changeDisplayName = function(newName)
@@ -6027,14 +6078,10 @@ TablePart.prototype.getRangeWithoutHeaderFooter = function()
 	return Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 };
 
-TablePart.prototype.checkTotalRowFormula = function()
+TablePart.prototype.checkTotalRowFormula = function(ws)
 {
-	if(this.TotalsRowCount)
-	{
-		for(var i = 0; i < this.TableColumns.length; i++)
-		{
-			this.TableColumns[i].checkTotalRowFormula(this);
-		}
+	for (var i = 0; i < this.TableColumns.length; i++) {
+		this.TableColumns[i].checkTotalRowFormula(ws, this);
 	}
 };
 
@@ -6208,7 +6255,10 @@ AutoFilter.prototype.isShowButton = function()
 
 AutoFilter.prototype.getRangeWithoutHeaderFooter = function()
 {
-	return Asc.Range(this.Ref.c1, this.Ref.r1 + 1, this.Ref.c2, this.Ref.r2);
+	var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
+	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
+
+	return Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 }; 
 
 AutoFilter.prototype._getFilterColumnByColId = function(colId)
@@ -6269,12 +6319,49 @@ function TableColumn() {
 	this.dxf = null;
 	this.CalculatedColumnFormula = null;
 }
+	TableColumn.prototype.onFormulaEvent = function(type, eventData) {
+		if (AscCommon.c_oNotifyParentType.CanDo === type) {
+			return true;
+		} else if (AscCommon.c_oNotifyParentType.Change === type) {
+			this.TotalsRowFormula.setIsDirty(false);
+		} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
+			if (eventData.isRebuild) {
+				var ws = this.TotalsRowFormula.ws;
+				this.TotalsRowFormula = null;//to prevent removeDependencies in applyTotalRowFormula
+				this.applyTotalRowFormula(eventData.assemble, ws, true);
+			} else {
+				this.TotalsRowFormula.Formula = eventData.assemble;
+				this.TotalsRowFormula.buildDependencies();
+			}
+		}
+	};
+	TableColumn.prototype.renameSheetCopy = function(ws, renameParams) {
+		if (this.TotalsRowFormula) {
+			this.buildDependencies();
+			this.TotalsRowFormula.renameSheetCopy(renameParams);
+			this.applyTotalRowFormula(this.TotalsRowFormula.assemble(true), ws, true);
+		}
+	};
+	TableColumn.prototype.buildDependencies = function() {
+		if (this.TotalsRowFormula) {
+			this.TotalsRowFormula.parse();
+			this.TotalsRowFormula.buildDependencies();
+		}
+	};
+	TableColumn.prototype.removeDependencies = function() {
+		if (this.TotalsRowFormula) {
+			this.TotalsRowFormula.removeDependencies();
+		}
+	};
 TableColumn.prototype.clone = function() {
 	var res = new TableColumn();
 	res.Name = this.Name;
 	res.TotalsRowLabel = this.TotalsRowLabel;
 	res.TotalsRowFunction = this.TotalsRowFunction;
-	res.TotalsRowFormula = this.TotalsRowFormula;
+
+	if (this.TotalsRowFormula) {
+		res.applyTotalRowFormula(this.TotalsRowFormula.Formula, this.TotalsRowFormula.ws, false);
+	}
 	if (this.dxf)
 		res.dxf = this.dxf.clone;
 	res.CalculatedColumnFormula = this.CalculatedColumnFormula;
@@ -6287,12 +6374,12 @@ TableColumn.prototype.generateTotalsRowLabel = function(){
 		this.TotalsRowLabel = "Summary";
 	}
 };
-TableColumn.prototype.generateTotalsRowFunction = function(tablePart){
+TableColumn.prototype.generateTotalsRowFunction = function(ws, tablePart){
 	//TODO добавить в перевод
-	if(this.TotalsRowFunction === null)
+	if(null === this.TotalsRowFunction && null === this.TotalsRowLabel)
 	{	
 		this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
-		this.TotalsRowFormula = "SUBTOTAL(109," + tablePart.DisplayName + "[" + this.Name + "])";
+		this.setTotalsRowFormula("SUBTOTAL(109," + tablePart.DisplayName + "[" + this.Name + "])", ws);
 	}
 };
 
@@ -6319,7 +6406,7 @@ TableColumn.prototype.getTotalRowFormula = function(tablePart){
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionCustom:
 			{
-				res = this.TotalsRowFormula;
+				res = this.getTotalsRowFormula();
 				break;
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionMax:
@@ -6359,19 +6446,20 @@ TableColumn.prototype.getTotalRowFormula = function(tablePart){
 
 TableColumn.prototype.cleanTotalsData = function(){
 	this.CalculatedColumnFormula = null;
-	this.TotalsRowFormula = null;
+	this.applyTotalRowFormula(null, null, false);
 	this.TotalsRowFunction = null;
 	this.TotalsRowLabel = null;
 };
-
-TableColumn.prototype.setTotalsRowFormula = function(val){
+	TableColumn.prototype.getTotalsRowFormula = function(){
+		return this.TotalsRowFormula ? this.TotalsRowFormula.getFormula() : null;
+	};
+TableColumn.prototype.setTotalsRowFormula = function(val, ws){
 	this.cleanTotalsData();
 	if("=" === val[0])
 	{
 		val = val.substring(1);
 	}
-	
-	this.TotalsRowFormula = val;
+	this.applyTotalRowFormula(val, ws, true);
 	this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
 };
 
@@ -6381,18 +6469,29 @@ TableColumn.prototype.setTotalsRowLabel = function(val){
 	this.TotalsRowLabel = val;
 };
 
-TableColumn.prototype.checkTotalRowFormula = function(tablePart){
+TableColumn.prototype.checkTotalRowFormula = function(ws, tablePart){
 	if(null !== this.TotalsRowFunction && Asc.ETotalsRowFunction.totalrowfunctionCustom !== this.TotalsRowFunction)
 	{
 		var totalRowFormula = this.getTotalRowFormula(tablePart);
 		
 		if(null !== totalRowFormula)
 		{
-			this.TotalsRowFormula = totalRowFormula;
+			this.applyTotalRowFormula(totalRowFormula, ws, true);
 			this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
 		}
 	}
 };
+	TableColumn.prototype.applyTotalRowFormula = function(val, opt_ws, opt_buildDep) {
+		this.removeDependencies();
+		if (val) {
+			this.TotalsRowFormula = new AscCommonExcel.parserFormula(val, this, opt_ws);
+			if (opt_buildDep) {
+				this.buildDependencies();
+			}
+		} else {
+			this.TotalsRowFormula = null;
+		}
+	};
 
 /** @constructor */
 function TableStyleInfo() {
@@ -7234,7 +7333,7 @@ ColorFilter.prototype.isHideValue = function(cell) {
 			{
 				for(var j = 0; j < cell.oValue.multiText.length; j++)
 				{
-					var fontColor = cell.oValue.multiText[j].format ? cell.oValue.multiText[j].format.c : null;
+					var fontColor = cell.oValue.multiText[j].format ? cell.oValue.multiText[j].format.getColor() : null;
 					if(isEqualColors(filterColor,fontColor ))
 					{
 						res = false;
@@ -7244,7 +7343,7 @@ ColorFilter.prototype.isHideValue = function(cell) {
 			}
 			else
 			{
-				var fontColor =  cell.xfs && cell.xfs.font ? cell.xfs.font.c : null;
+				var fontColor =  cell.xfs && cell.xfs.font ? cell.xfs.font.getColor() : null;
 				if(isEqualColors(filterColor,fontColor))
 				{
 					res = false;
@@ -7539,25 +7638,6 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	this.dateTimeGrouping = oDateGroupItem.DateTimeGrouping;
 };
 
-function getShortDateFormat(opt_cultureInfo) {
-	var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
-	var dateElems = [];
-	for (var i = 0; i < cultureInfo.ShortDatePattern.length; ++i) {
-		switch (cultureInfo.ShortDatePattern[i]) {
-			case '0':
-				dateElems.push('d');
-				break;
-			case '1':
-				dateElems.push('m');
-				break;
-			case '2':
-				dateElems.push('yyyy');
-				break;
-		}
-	}
-	return dateElems.join('/');
-}
-
 function getCurrencyFormatSimple(opt_cultureInfo, opt_fraction, opt_currency, opt_red) {
   var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
   var numberFormat = opt_fraction ? '#,##0.00' : '#,##0';
@@ -7786,6 +7866,7 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].map_themeExcel_to_themePresentation = map_themeExcel_to_themePresentation;
 	window['AscCommonExcel'].shiftGetBBox = shiftGetBBox;
 	window['AscCommonExcel'].RgbColor = RgbColor;
+	window['AscCommonExcel'].createRgbColor = createRgbColor;
 	window['AscCommonExcel'].ThemeColor = ThemeColor;
 	window['AscCommonExcel'].CorrectAscColor = CorrectAscColor;
 	window['AscCommonExcel'].Fragment = Fragment;
@@ -7839,7 +7920,8 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	prot["asc_getColorLast"]			= prot.asc_getColorLast;
 	prot["asc_getColorHigh"]			= prot.asc_getColorHigh;
 	prot["asc_getColorLow"]				= prot.asc_getColorLow;
-	prot["asc_setType"]						= prot.asc_setType;
+	prot["asc_getDataRanges"]			= prot.asc_getDataRanges;
+	prot["asc_setType"]					= prot.asc_setType;
 	prot["asc_setLineWeight"]			= prot.asc_setLineWeight;
 	prot["asc_setDisplayEmpty"]		= prot.asc_setDisplayEmpty;
 	prot["asc_setMarkersPoint"]		= prot.asc_setMarkersPoint;
@@ -7877,7 +7959,6 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].DateGroupItem = DateGroupItem;
 	window['AscCommonExcel'].SortCondition = SortCondition;
 	window['AscCommonExcel'].AutoFilterDateElem = AutoFilterDateElem;
-	window['AscCommonExcel'].getShortDateFormat = getShortDateFormat;
   window['AscCommonExcel'].getCurrencyFormatSimple = getCurrencyFormatSimple;
   window['AscCommonExcel'].getCurrencyFormat = getCurrencyFormat;
 
@@ -7923,4 +8004,14 @@ prot["asc_setFilterVal"]				= prot.asc_setFilterVal;
 prot["asc_setPercent"]					= prot.asc_setPercent;
 prot["asc_setTop"]						= prot.asc_setTop;
 prot["asc_setVal"]						= prot.asc_setVal;
+
+window["Asc"]["TreeRBNode"]			= window["Asc"].TreeRBNode = TreeRBNode;
+window["Asc"]["TreeRB"]			= window["Asc"].TreeRB = TreeRB;
+prot									= TreeRB.prototype;
+prot["insertOrGet"]						= prot.insertOrGet;
+prot["deleteNode"]			= prot.deleteNode;
+prot["enumerate"]						= prot.enumerate;
+prot["getElem"]			= prot.getElem;
+prot["getNodeAll"]			= prot.getNodeAll;
+prot["isEmpty"]			= prot.getNodeAll;
 })(window);

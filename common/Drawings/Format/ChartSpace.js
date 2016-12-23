@@ -31,7 +31,7 @@
  */
 
 "use strict";
-
+var GLOBAL_PATH_COUNT = 0;
 (
 /**
 * @param {Window} window
@@ -516,6 +516,37 @@ function checkPointInMap(map, worksheet, row, col)
     }
 
 
+    function CPathMemory(){
+        this.size = 1000;
+        this.ArrPathCommand = new Float64Array(this.size);
+        this.curPos = -1;
+
+        this.path = new AscFormat.Path2(this);
+ }
+
+    CPathMemory.prototype.AllocPath = function(){
+
+        if(this.curPos + 1 >= this.ArrPathCommand.length){
+            var aNewArray = new Float64Array((((3/2)*(this.curPos + 1)) >> 0) + 1);
+            for(var i = 0; i < this.ArrPathCommand.length; ++i){
+                aNewArray[i] = this.ArrPathCommand[i];
+            }
+            this.ArrPathCommand = aNewArray;
+            this.path.ArrPathCommand = aNewArray;
+        }
+
+        this.path.startPos = ++this.curPos;
+        this.path.curLen = 0;
+        this.ArrPathCommand[this.curPos] = 0;
+        return this.path;
+    };
+
+    CPathMemory.prototype.GetPath = function(index){
+        this.path.startPos = index;
+        this.path.curLen = 0;
+        return this.path;
+    };
+
 function CChartSpace()
 {
     CChartSpace.superclass.constructor.call(this);
@@ -539,6 +570,7 @@ function CChartSpace()
     this.calculatedChart = null;
 
 
+    this.pathMemory = new CPathMemory();
 
 
     this.bbox = null;
@@ -567,7 +599,16 @@ function CChartSpace()
 }
 AscCommon.extendClass(CChartSpace, AscFormat.CGraphicObjectBase);
 
-CChartSpace.prototype.select = CShape.prototype.select;
+
+    CChartSpace.prototype.AllocPath = function(){
+        return this.pathMemory.AllocPath().startPos;
+    };
+
+    CChartSpace.prototype.GetPath = function(index){
+        return this.pathMemory.GetPath(index);
+    }
+
+        CChartSpace.prototype.select = CShape.prototype.select;
 CChartSpace.prototype.checkDrawingBaseCoords = CShape.prototype.checkDrawingBaseCoords;
 CChartSpace.prototype.setDrawingBaseCoords = CShape.prototype.setDrawingBaseCoords;
 CChartSpace.prototype.deleteBFromSerialize = CShape.prototype.deleteBFromSerialize;
@@ -1195,7 +1236,7 @@ CChartSpace.prototype.parseChartFormula = function(sFormula)
     if(this.worksheet && typeof sFormula === "string" && sFormula.length > 0){
         return AscCommonExcel.getRangeByRef(sFormula, this.worksheet);
     }
-    return null;
+    return [];
 };
 CChartSpace.prototype.checkBBoxIntersection = function(bbox1, bbox2)
 {
@@ -3732,6 +3773,25 @@ CChartSpace.prototype.recalculateAxis = function()
                                 }
                                 y_ax.labels.x = rect.x + hor_interval_width*(arr_x_val[arr_x_val.length-1] - arr_x_val[0]);
                                 y_ax.posX = rect.x + (crosses-arr_x_val[0])*hor_interval_width;
+
+                                if(y_ax.labels.x < 0){
+                                    rect.x -= y_ax.labels.x;
+                                    rect.w += y_ax.labels.x;
+                                    bCorrectedLayoutRect = true;
+                                }
+                                if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                    rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
+                                    bCorrectedLayoutRect = true;
+                                }
+                                if(bCorrectedLayoutRect){
+                                    hor_interval_width = checkFiniteNumber(rect.w/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
+                                    for(i = 0; i < arr_x_val.length; ++i)
+                                    {
+                                        arr_x_points[i] = rect.x + hor_interval_width*(arr_x_val[i] - arr_x_val[0]);
+                                    }
+                                    y_ax.labels.x = rect.x + hor_interval_width*(arr_x_val[arr_x_val.length-1] - arr_x_val[0]);
+                                    y_ax.posX = rect.x + (crosses-arr_x_val[0])*hor_interval_width;
+                                }
                             }
                             break;
                         }
@@ -3763,6 +3823,27 @@ CChartSpace.prototype.recalculateAxis = function()
                                 }
                                 y_ax.labels.x = rect.x - y_ax.labels.extX;
                                 y_ax.posX = rect.x + (crosses-arr_x_val[0])*hor_interval_width;
+
+
+                                if(y_ax.labels.x < 0){
+                                    rect.x -= y_ax.labels.x;
+                                    rect.w += y_ax.labels.x;
+                                    bCorrectedLayoutRect = true;
+                                }
+                                if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                    rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
+                                    bCorrectedLayoutRect = true;
+                                }
+                                if(bCorrectedLayoutRect){
+                                    hor_interval_width = checkFiniteNumber(rect.w/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
+                                    for(i = 0; i < arr_x_val.length; ++i)
+                                    {
+                                        arr_x_points[i] = rect.x + hor_interval_width*(arr_x_val[i] - arr_x_val[0]);
+                                    }
+                                    y_ax.labels.x = rect.x - y_ax.labels.extX;
+                                    y_ax.posX = rect.x + (crosses-arr_x_val[0])*hor_interval_width;
+                                }
+
                             }
 
                             break;
@@ -3819,6 +3900,26 @@ CChartSpace.prototype.recalculateAxis = function()
                                     {
                                         arr_x_points[i] = rect.x + hor_interval_width*(arr_x_val[i] - arr_x_val[0]);
                                     }
+
+                                    if(y_ax.labels.x < 0){
+                                        rect.x -= y_ax.labels.x;
+                                        rect.w += y_ax.labels.x;
+                                        bCorrectedLayoutRect = true;
+                                    }
+                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                        rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
+                                        bCorrectedLayoutRect = true;
+                                    }
+                                    if(bCorrectedLayoutRect){
+                                        y_ax.labels.x = rect.x + rect.w;
+                                        y_ax.posX = rect.x + rect.w;
+                                        hor_interval_width = checkFiniteNumber(rect.w/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
+                                        for(i = 0; i < arr_x_val.length; ++i)
+                                        {
+                                            arr_x_points[i] = rect.x + hor_interval_width*(arr_x_val[i] - arr_x_val[0]);
+                                        }
+                                    }
+
                                 }
                             }
                             else
@@ -3842,6 +3943,25 @@ CChartSpace.prototype.recalculateAxis = function()
                                         arr_x_points[i] = y_ax.posX + (arr_x_val[i] - crosses) * hor_interval_width;
                                     }
                                     y_ax.labels.x = y_ax.posX - y_ax.labels.extX;
+
+                                    if(y_ax.labels.x < 0){
+                                        rect.x -= y_ax.labels.x;
+                                        rect.w += y_ax.labels.x;
+                                        bCorrectedLayoutRect = true;
+                                    }
+                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                        rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
+                                        bCorrectedLayoutRect = true;
+                                    }
+                                    if(bCorrectedLayoutRect){
+                                        hor_interval_width = checkFiniteNumber(rect.w/ (arr_x_val[arr_x_val.length - 1] - arr_x_val[0]));
+                                        y_ax.posX = rect.x + rect.w - (arr_x_val[arr_x_val.length - 1] - crosses) * hor_interval_width;
+                                        for (i = 0; i < arr_x_val.length; ++i) {
+                                            arr_x_points[i] = y_ax.posX + (arr_x_val[i] - crosses) * hor_interval_width;
+                                        }
+                                        y_ax.labels.x = y_ax.posX - y_ax.labels.extX;
+                                    }
+
                                 }
                             }
                             break;
@@ -3881,6 +4001,28 @@ CChartSpace.prototype.recalculateAxis = function()
                                     arr_x_points[i] = y_ax.posX - (arr_x_val[i]-crosses)*hor_interval_width;
                                 }
                                 y_ax.labels.x = y_ax.posX - (arr_x_val[arr_x_val.length-1]-crosses)*hor_interval_width - y_ax.labels.extX;
+
+                                if(y_ax.labels.x < 0){
+                                    rect.x -= y_ax.labels.x;
+                                    rect.w += y_ax.labels.x;
+                                    bCorrectedLayoutRect = true;
+                                }
+                                if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                    rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
+                                    bCorrectedLayoutRect = true;
+                                }
+                                if(bCorrectedLayoutRect){
+                                    hor_interval_width = checkFiniteNumber(rect.w/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
+
+                                    y_ax.posX = rect.x + rect.w - (crosses - arr_x_val[0])*hor_interval_width;
+                                    for(i = 0; i < arr_x_val.length; ++i)
+                                    {
+                                        arr_x_points[i] = y_ax.posX - (arr_x_val[i]-crosses)*hor_interval_width;
+                                    }
+                                    y_ax.labels.x = y_ax.posX - (arr_x_val[arr_x_val.length-1]-crosses)*hor_interval_width - y_ax.labels.extX;
+                                }
+
+
                             }
                             break;
                         }
@@ -3914,6 +4056,26 @@ CChartSpace.prototype.recalculateAxis = function()
                                     arr_x_points[i] = y_ax.posX - (arr_x_val[i]-crosses)*hor_interval_width;
                                 }
                                 y_ax.labels.x = rect.x + rect.w;
+
+                                if(y_ax.labels.x < 0){
+                                    rect.x -= y_ax.labels.x;
+                                    rect.w += y_ax.labels.x;
+                                    bCorrectedLayoutRect = true;
+                                }
+                                if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                    rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
+                                    bCorrectedLayoutRect = true;
+                                }
+                                if(bCorrectedLayoutRect){
+                                    hor_interval_width = checkFiniteNumber(rect.w/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
+                                    y_ax.posX = rect.x + rect.w - (crosses - arr_x_val[0])*hor_interval_width;
+                                    for(i = 0; i < arr_x_val.length; ++i)
+                                    {
+                                        arr_x_points[i] = y_ax.posX - (arr_x_val[i]-crosses)*hor_interval_width;
+                                    }
+                                    y_ax.labels.x = rect.x + rect.w;
+                                }
+
                             }
                             break;
                         }
@@ -3959,6 +4121,24 @@ CChartSpace.prototype.recalculateAxis = function()
                                     hor_interval_width = checkFiniteNumber(rect.w/ (arr_x_val[arr_x_val.length - 1] - arr_x_val[0]));
                                     y_ax.posX = rect.x + rect.w  - (crosses - arr_x_val[0]) * hor_interval_width;
                                     y_ax.labels.x = y_ax.posX - ((arr_x_val[arr_x_val.length - 1] - crosses) * hor_interval_width) - y_ax.labels.extX;
+
+
+
+                                    if(y_ax.labels.x < 0){
+                                        rect.x -= y_ax.labels.x;
+                                        rect.w += y_ax.labels.x;
+                                        bCorrectedLayoutRect = true;
+                                    }
+                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                        rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
+                                        bCorrectedLayoutRect = true;
+                                    }
+                                    if(bCorrectedLayoutRect){
+                                        hor_interval_width = checkFiniteNumber(rect.w/ (arr_x_val[arr_x_val.length - 1] - arr_x_val[0]));
+                                        y_ax.posX = rect.x + rect.w  - (crosses - arr_x_val[0]) * hor_interval_width;
+                                        y_ax.labels.x = y_ax.posX - ((arr_x_val[arr_x_val.length - 1] - crosses) * hor_interval_width) - y_ax.labels.extX;
+                                    }
+
                                 }
                             }
                             else
@@ -3978,6 +4158,25 @@ CChartSpace.prototype.recalculateAxis = function()
                                     left_align_labels = false;
                                     y_ax.posX = rect.x + hor_interval_width * (arr_x_val[arr_x_val.length - 1] - crosses);
                                     y_ax.labels.x = y_ax.posX;
+
+
+
+                                    if(y_ax.labels.x < 0){
+                                        rect.x -= y_ax.labels.x;
+                                        rect.w += y_ax.labels.x;
+                                        bCorrectedLayoutRect = true;
+                                    }
+                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                        rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
+                                        bCorrectedLayoutRect = true;
+                                    }
+                                    if(bCorrectedLayoutRect){
+                                        hor_interval_width = checkFiniteNumber(rect.w / (arr_x_val[arr_x_val.length - 1] - arr_x_val[0]));
+                                        left_align_labels = false;
+                                        y_ax.posX = rect.x + hor_interval_width * (arr_x_val[arr_x_val.length - 1] - crosses);
+                                        y_ax.labels.x = y_ax.posX;
+                                    }
+
                                 }
                             }
                             for(i = 0;  i < arr_x_val.length; ++i)
@@ -4066,6 +4265,26 @@ CChartSpace.prototype.recalculateAxis = function()
                                     arr_y_points[i] = rect.y + rect.h - (arr_val[i] - arr_val[0])*vert_interval_height;
                                 }
                                 x_ax.posY = rect.y + rect.h - (crosses_x - arr_val[0])*vert_interval_height;
+
+                                var bCheckXLabels = false;
+                                if(x_ax.labels.y < 0){
+                                    bCheckXLabels = true;
+                                    rect.y -= x_ax.labels.y;
+                                    rect.h -= x_ax.labels.h;
+                                }
+                                if(x_ax.labels.y + x_ax.labels.extY > this.extY){
+                                    bCheckXLabels = true;
+                                    rect.h -= (x_ax.labels.y + x_ax.labels.extY - this.extY)
+                                }
+                                if(bCheckXLabels){
+                                    vert_interval_height = checkFiniteNumber(rect.h/(arr_val[arr_val.length-1] - arr_val[0]));
+                                    x_ax.labels.y = rect.y + rect.h - (arr_val[arr_val.length - 1] - arr_val[0])*vert_interval_height - x_ax.labels.extY;
+                                    for(i = 0; i < arr_val.length; ++i)
+                                    {
+                                        arr_y_points[i] = rect.y + rect.h - (arr_val[i] - arr_val[0])*vert_interval_height;
+                                    }
+                                    x_ax.posY = rect.y + rect.h - (crosses_x - arr_val[0])*vert_interval_height;
+                                }
                             }
                             break;
                         }
@@ -4091,6 +4310,28 @@ CChartSpace.prototype.recalculateAxis = function()
                                     arr_y_points[i] = rect.y + rect.h - (arr_val[i] - arr_val[0])*vert_interval_height;
                                 }
                                 x_ax.posY = rect.y + rect.h - (crosses_x - arr_val[0])*vert_interval_height;
+
+                                var bCheckXLabels = false;
+                                if(x_ax.labels.y < 0){
+                                    bCheckXLabels = true;
+                                    rect.y -= x_ax.labels.y;
+                                    rect.h -= x_ax.labels.h;
+                                }
+                                if(x_ax.labels.y + x_ax.labels.extY > this.extY){
+                                    bCheckXLabels = true;
+                                    rect.h -= (x_ax.labels.y + x_ax.labels.extY - this.extY)
+                                }
+                                if(bCheckXLabels){
+
+                                    x_ax.labels.y = rect.y + rect.h;
+                                    vert_interval_height = checkFiniteNumber(rect.h/(arr_val[arr_val.length-1] - arr_val[0]));
+
+                                    for(i = 0; i < arr_val.length; ++i)
+                                    {
+                                        arr_y_points[i] = rect.y + rect.h - (arr_val[i] - arr_val[0])*vert_interval_height;
+                                    }
+                                    x_ax.posY = rect.y + rect.h - (crosses_x - arr_val[0])*vert_interval_height;
+                                }
                             }
                             break;
                         }
@@ -4138,6 +4379,28 @@ CChartSpace.prototype.recalculateAxis = function()
                                     }
                                     x_ax.posY = rect.y + rect.h - (arr_val[arr_val.length - 1] - arr_val[0]) * vert_interval_height;
                                     x_ax.labels.y = x_ax.posY - x_ax.labels.extY;
+
+
+
+                                    var bCheckXLabels = false;
+                                    if(x_ax.labels.y < 0){
+                                        bCheckXLabels = true;
+                                        rect.y -= x_ax.labels.y;
+                                        rect.h -= x_ax.labels.h;
+                                    }
+                                    if(x_ax.labels.y + x_ax.labels.extY > this.extY){
+                                        bCheckXLabels = true;
+                                        rect.h -= (x_ax.labels.y + x_ax.labels.extY - this.extY)
+                                    }
+                                    if(bCheckXLabels){
+                                        vert_interval_height = checkFiniteNumber(rect.h / (arr_val[arr_val.length - 1] - arr_val[0]));
+                                        for (i = 0; i < arr_val.length; ++i) {
+                                            arr_y_points[i] = rect.y + rect.h - (arr_val[i] - arr_val[0]) * vert_interval_height;
+                                        }
+                                        x_ax.posY = rect.y + rect.h - (arr_val[arr_val.length - 1] - arr_val[0]) * vert_interval_height;
+                                        x_ax.labels.y = x_ax.posY - x_ax.labels.extY;
+                                    }
+
                                 }
                             }
                             else
@@ -4163,6 +4426,27 @@ CChartSpace.prototype.recalculateAxis = function()
                                     for (i = 0; i < arr_val.length; ++i) {
                                         arr_y_points[i] = x_ax.posY - (arr_val[i] - crosses_x) * vert_interval_height;
                                     }
+
+
+                                    var bCheckXLabels = false;
+                                    if(x_ax.labels.y < 0){
+                                        bCheckXLabels = true;
+                                        rect.y -= x_ax.labels.y;
+                                        rect.h -= x_ax.labels.h;
+                                    }
+                                    if(x_ax.labels.y + x_ax.labels.extY > this.extY){
+                                        bCheckXLabels = true;
+                                        rect.h -= (x_ax.labels.y + x_ax.labels.extY - this.extY)
+                                    }
+                                    if(bCheckXLabels){
+                                        vert_interval_height = checkFiniteNumber(rect.h / (arr_val[arr_val.length - 1] - arr_val[0]));
+                                        x_ax.posY = rect.y + (arr_val[arr_val.length - 1] - crosses_x) * vert_interval_height;
+                                        x_ax.labels.y = x_ax.posY;
+                                        for (i = 0; i < arr_val.length; ++i) {
+                                            arr_y_points[i] = x_ax.posY - (arr_val[i] - crosses_x) * vert_interval_height;
+                                        }
+                                    }
+
                                 }
                             }
                             break;
@@ -4191,6 +4475,27 @@ CChartSpace.prototype.recalculateAxis = function()
                                     arr_y_points[i] = x_ax.posY + vert_interval_height * (arr_val[i] - crosses_x);
                                 }
                                 x_ax.labels.y = x_ax.posY + vert_interval_height * (arr_val[arr_val.length - 1] - crosses_x);
+
+
+                                var bCheckXLabels = false;
+                                if(x_ax.labels.y < 0){
+                                    bCheckXLabels = true;
+                                    rect.y -= x_ax.labels.y;
+                                    rect.h -= x_ax.labels.h;
+                                }
+                                if(x_ax.labels.y + x_ax.labels.extY > this.extY){
+                                    bCheckXLabels = true;
+                                    rect.h -= (x_ax.labels.y + x_ax.labels.extY - this.extY)
+                                }
+                                if(bCheckXLabels){
+                                    vert_interval_height = checkFiniteNumber(rect.h / (arr_val[arr_val.length - 1] - arr_val[0]));
+                                    x_ax.posY = rect.y + (crosses_x - arr_val[0]) * vert_interval_height;
+                                    for (i = 0; i < arr_val.length; ++i) {
+                                        arr_y_points[i] = x_ax.posY + vert_interval_height * (arr_val[i] - crosses_x);
+                                    }
+                                    x_ax.labels.y = x_ax.posY + vert_interval_height * (arr_val[arr_val.length - 1] - crosses_x);
+                                }
+
                             }
                             break;
                         }
@@ -4214,6 +4519,26 @@ CChartSpace.prototype.recalculateAxis = function()
                                     arr_y_points[i] = rect.y + vert_interval_height * (arr_val[i] - arr_val[0]);
                                 }
                                 x_ax.labels.y = rect.y - x_ax.labels.extY;
+
+
+                                var bCheckXLabels = false;
+                                if(x_ax.labels.y < 0){
+                                    bCheckXLabels = true;
+                                    rect.y -= x_ax.labels.y;
+                                    rect.h -= x_ax.labels.h;
+                                }
+                                if(x_ax.labels.y + x_ax.labels.extY > this.extY){
+                                    bCheckXLabels = true;
+                                    rect.h -= (x_ax.labels.y + x_ax.labels.extY - this.extY)
+                                }
+                                if(bCheckXLabels){
+                                    vert_interval_height = checkFiniteNumber(rect.h / (arr_val[arr_val.length - 1] - arr_val[0]));
+                                    x_ax.posY = rect.y + (crosses_x - arr_val[0]) * vert_interval_height;
+                                    for (i = 0; i < arr_val.length; ++i) {
+                                        arr_y_points[i] = rect.y + vert_interval_height * (arr_val[i] - arr_val[0]);
+                                    }
+                                    x_ax.labels.y = rect.y - x_ax.labels.extY;
+                                }
                             }
                             break;
                         }
@@ -4260,6 +4585,26 @@ CChartSpace.prototype.recalculateAxis = function()
                                         arr_y_points[i] = rect.y + vert_interval_height * (arr_val[i] - arr_val[0]);
                                     }
                                     x_ax.labels.y = rect.y + rect.extY;
+
+
+                                    var bCheckXLabels = false;
+                                    if(x_ax.labels.y < 0){
+                                        bCheckXLabels = true;
+                                        rect.y -= x_ax.labels.y;
+                                        rect.h -= x_ax.labels.h;
+                                    }
+                                    if(x_ax.labels.y + x_ax.labels.extY > this.extY){
+                                        bCheckXLabels = true;
+                                        rect.h -= (x_ax.labels.y + x_ax.labels.extY - this.extY)
+                                    }
+                                    if(bCheckXLabels){
+                                        vert_interval_height = checkFiniteNumber(rect.h / (arr_val[arr_val.length - 1] - arr_val[0]));
+                                        x_ax.posY = rect.y + (crosses_x - arr_val[0]) * vert_interval_height;
+                                        for (i = 0; i < arr_val.length; ++i) {
+                                            arr_y_points[i] = rect.y + vert_interval_height * (arr_val[i] - arr_val[0]);
+                                        }
+                                        x_ax.labels.y = rect.y + rect.extY;
+                                    }
                                 }
                             }
                             else
@@ -4287,6 +4632,25 @@ CChartSpace.prototype.recalculateAxis = function()
                                     x_ax.labels.y = x_ax.posY - x_ax.labels.extY;
                                     for (i = 0; i < arr_val.length; ++i) {
                                         arr_y_points[i] = x_ax.posY + vert_interval_height * (arr_val[i] - crosses_x);
+                                    }
+
+                                    var bCheckXLabels = false;
+                                    if(x_ax.labels.y < 0){
+                                        bCheckXLabels = true;
+                                        rect.y -= x_ax.labels.y;
+                                        rect.h -= x_ax.labels.h;
+                                    }
+                                    if(x_ax.labels.y + x_ax.labels.extY > this.extY){
+                                        bCheckXLabels = true;
+                                        rect.h -= (x_ax.labels.y + x_ax.labels.extY - this.extY)
+                                    }
+                                    if(bCheckXLabels){
+                                        vert_interval_height = checkFiniteNumber(rect.h / (arr_val[arr_val.length - 1] - arr_val[0]));
+                                        x_ax.posY = rect.y + rect.h - vert_interval_height * (arr_val[arr_val.length - 1] - crosses_x);
+                                        x_ax.labels.y = x_ax.posY - x_ax.labels.extY;
+                                        for (i = 0; i < arr_val.length; ++i) {
+                                            arr_y_points[i] = x_ax.posY + vert_interval_height * (arr_val[i] - crosses_x);
+                                        }
                                     }
                                 }
                             }
@@ -10057,6 +10421,7 @@ CChartSpace.prototype.addToSetPosition = function(dLbl)
 
 CChartSpace.prototype.recalculateChart = function()
 {
+    this.pathMemory.curPos = -1;
     if(this.chartObj == null)
         this.chartObj =  new AscFormat.CChartsDrawer();
     this.chartObj.reCalculate(this);

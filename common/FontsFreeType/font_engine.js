@@ -13744,7 +13744,7 @@ function tt_face_load_hmtx(face, stream, isvertical)
     num_shorts_checked = parseInt((table_len - num_longs * 4) / 2);
 
     if (num_longs > 0)
-        lm.long_metrics = new Array(num_longs);
+        lm.long_metrics = new CreateIntArray(num_longs * 2);
     if (num_shorts > 0)
         lm.short_metrics = new Array(num_shorts);
 
@@ -13756,11 +13756,11 @@ function tt_face_load_hmtx(face, stream, isvertical)
 
     error = stream.EnterFrame(table_len);
 
+    var _cur = 0;
     for (var i = 0; i < num_longs; i++)
     {
-        longs[i] = new TT_LongMetricsRec();
-        longs[i].advance = stream.GetUShort();
-        longs[i].bearing = stream.GetShort();
+    	longs[_cur++] = stream.GetUShort();
+		longs[_cur++] = stream.GetShort();
     }
 
     var count_s = Math.min(num_shorts, num_shorts_checked);
@@ -13883,14 +13883,14 @@ function tt_face_get_metrics(face, vertical, gindex)
 
     if (gindex < k)
     {
-        longs_m = header.long_metrics[gindex];
-        v1 = longs_m.bearing;
-        v2 = longs_m.advance;
+    	var _ind = gindex << 1;
+		v1 = header.long_metrics[_ind + 1];
+		v2 = header.long_metrics[_ind];
     }
     else
     {
         v1 = header.short_metrics[gindex - k];
-        v2 = header.long_metrics[k - 1].advance;
+		v2 = header.long_metrics[(k - 1) << 1];
     }
     return { bearing:v1,advance:v2 };
 }

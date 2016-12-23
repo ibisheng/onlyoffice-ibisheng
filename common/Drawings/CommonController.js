@@ -1196,6 +1196,11 @@ DrawingObjectsController.prototype =
         }, this, []);
     },
 
+
+    Is_SelectionUse: function(){
+        return this.selectedObjects.length > 0;
+    },
+
     getFromTargetTextObjectContextMenuPosition: function(oTargetTextObject, pageIndex)
     {
         var dX, dY, oDocContent, oTransformText, oParagraph, document = editor.WordControl.m_oLogicDocument, dPosX = 0, dPosY = 0;
@@ -1242,6 +1247,42 @@ DrawingObjectsController.prototype =
             }
         }
         return {X: 0, Y: 0, PageIndex: pageIndex};
+    },
+
+
+
+    isPointInDrawingObjects3: function(x, y)
+    {
+        var oOldState = this.curState;
+        this.changeCurrentState(new AscFormat.NullState(this));
+        var oResult, bRet = false;
+        this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
+        oResult = this.curState.onMouseDown(AscCommon.global_mouseEvent, x, y, 0);
+        this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
+        if(AscCommon.isRealObject(oResult)){
+            if(oResult.cursorType !== "text"){
+                var object = g_oTableId.Get_ById(oResult.objectId);
+                if(AscCommon.isRealObject(object) && (object.selected) ){
+                    bRet = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        this.changeCurrentState(oOldState);
+        return bRet;
+    },
+
+    Get_SelectionBounds: function()
+    {
+        var oTargetDocContent = this.getTargetDocContent(false, true);
+        if(isRealObject(oTargetDocContent))
+        {
+            return oTargetDocContent.Get_SelectionBounds();
+        }
+        return null;
     },
 
 
@@ -1455,6 +1496,22 @@ DrawingObjectsController.prototype =
 
     getAllFontNames: function()
     {
+    },
+
+
+    getNearestPos: function(x, y){
+        var oTragetDocContent = this.getTargetDocContent(false, false);
+        if(oTragetDocContent){
+            var tx = x, ty = y;
+            var oTransform = oTragetDocContent.Get_ParentTextTransform();
+            if(oTransform){
+                var oInvertTransform = AscCommon.global_MatrixTransformer.Invert(oTransform);
+                tx = oInvertTransform.TransformPointX(x, y);
+                ty = oInvertTransform.TransformPointY(x, y);
+                return oTragetDocContent.Get_NearestPos(0, tx, ty, false);
+            }
+        }
+        return null;
     },
 
     getTargetDocContent: function(bCheckChartTitle, bOrTable)

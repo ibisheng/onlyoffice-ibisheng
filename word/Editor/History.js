@@ -105,58 +105,55 @@ CHistory.prototype =
         this.FileSize     = nSize;
     },
 
-    Update_PointInfoItem : function(PointIndex, StartPoint, LastPoint, SumIndex, DeletedIndex)
-    {
-        var Point = this.Points[PointIndex];
-        if (Point)
-        {
-            // Проверяем первое изменение. Если оно уже нужного типа, тогда мы его удаляем. Добавляем специфическое
-            // первое изменение с описанием.
-            var Class = AscCommon.g_oTableId;
+	Update_PointInfoItem : function(PointIndex, StartPoint, LastPoint, SumIndex, DeletedIndex)
+	{
+		var Point = this.Points[PointIndex];
+		if (Point)
+		{
+			// Проверяем первое изменение. Если оно уже нужного типа, тогда мы его удаляем. Добавляем специфическое
+			// первое изменение с описанием.
+			var Class = AscCommon.g_oTableId;
 
-            if (Point.Items.length > 0)
-            {
-                var FirstItem = Point.Items[0];
-                if (FirstItem.Class === Class && AscDFH.historyitem_TableId_Description === FirstItem.Data.Type)
-                    Point.Items.splice(0, 1);
-            }
+			if (Point.Items.length > 0)
+			{
+				var FirstItem = Point.Items[0];
+				if (FirstItem.Class === Class && AscDFH.historyitem_TableId_Description === FirstItem.Data.Type)
+					Point.Items.splice(0, 1);
+			}
 
-            var Data =
-            {
-                Type         : AscDFH.historyitem_TableId_Description,
-                FileCheckSum : this.FileCheckSum,
-                FileSize     : this.FileSize,
-                Description  : Point.Description,
-                ItemsCount   : Point.Items.length,
-                PointIndex   : PointIndex,
-                StartPoint   : StartPoint,
-                LastPoint    : LastPoint,
-                SumIndex     : SumIndex,
-                DeletedIndex : DeletedIndex
-            };
+			var Data = new AscCommon.CChangesTableIdDescription(Class,
+				this.FileCheckSum,
+				this.FileSize,
+				Point.Description,
+				Point.Items.length,
+				PointIndex,
+				StartPoint,
+				LastPoint,
+				SumIndex,
+				DeletedIndex
+			);
 
-            var Binary_Pos = this.BinaryWriter.GetCurPosition();
-            this.BinaryWriter.WriteString2(Class.Get_Id());
-            Class.Save_Changes(Data, this.BinaryWriter);
+			var Binary_Pos = this.BinaryWriter.GetCurPosition();
+			this.BinaryWriter.WriteString2(Class.Get_Id());
+			this.BinaryWriter.WriteLong(Data.Type);
+			Data.WriteToBinary(this.BinaryWriter);
 
-            var Binary_Len = this.BinaryWriter.GetCurPosition() - Binary_Pos;
+			var Binary_Len = this.BinaryWriter.GetCurPosition() - Binary_Pos;
 
-            var Item =
-            {
-                Class : Class,
-                Data  : Data,
-                Binary:
-                {
-                    Pos : Binary_Pos,
-                    Len : Binary_Len
-                },
+			var Item = {
+				Class  : Class,
+				Data   : Data,
+				Binary : {
+					Pos : Binary_Pos,
+					Len : Binary_Len
+				},
 
-                NeedRecalc : false
-            };
+				NeedRecalc : false
+			};
 
-            Point.Items.splice(0, 0, Item);
-        }
-    },
+			Point.Items.splice(0, 0, Item);
+		}
+	},
 
     Is_Clear : function()
     {
@@ -224,12 +221,7 @@ CHistory.prototype =
 
         // Проверяем можно ли сделать Undo
         if (true !== this.Can_Undo())
-        {
-            if (this.Api && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
-                this.Api.sync_TryUndoInFastCollaborative();
-
             return null;
-        }
 
         // Запоминаем самое последнее состояние документа для Redo
         if ( this.Index === this.Points.length - 1 )
@@ -250,8 +242,17 @@ CHistory.prototype =
                 for (var Index = Point.Items.length - 1; Index >= 0; Index--)
                 {
                     var Item = Point.Items[Index];
-                    Item.Class.Undo(Item.Data);
-                    Item.Class.Refresh_RecalcData(Item.Data);
+
+					if (Item.Data && Item.Data.IsChangesClass && Item.Data.IsChangesClass())
+					{
+						Item.Data.Undo();
+						Item.Data.RefreshRecalcData();
+					}
+					else
+					{
+						Item.Class.Undo(Item.Data);
+						Item.Class.Refresh_RecalcData(Item.Data);
+					}
                     this.private_UpdateContentChangesOnUndo(Item);
                 }
             }
@@ -264,8 +265,16 @@ CHistory.prototype =
             for (var Index = Point.Items.length - 1; Index >= 0; Index--)
             {
                 var Item = Point.Items[Index];
-                Item.Class.Undo(Item.Data);
-                Item.Class.Refresh_RecalcData(Item.Data);
+				if (Item.Data && Item.Data.IsChangesClass && Item.Data.IsChangesClass())
+				{
+					Item.Data.Undo();
+					Item.Data.RefreshRecalcData();
+				}
+				else
+				{
+					Item.Class.Undo(Item.Data);
+					Item.Class.Refresh_RecalcData(Item.Data);
+				}
 				this.private_UpdateContentChangesOnUndo(Item);
             }
         }
@@ -292,8 +301,17 @@ CHistory.prototype =
         for ( var Index = 0; Index < Point.Items.length; Index++ )
         {
             var Item = Point.Items[Index];
-            Item.Class.Redo( Item.Data );
-            Item.Class.Refresh_RecalcData( Item.Data );
+
+			if (Item.Data && Item.Data.IsChangesClass && Item.Data.IsChangesClass())
+			{
+				Item.Data.Redo();
+				Item.Data.RefreshRecalcData();
+			}
+			else
+			{
+				Item.Class.Redo(Item.Data);
+				Item.Class.Refresh_RecalcData(Item.Data);
+			}
 			this.private_UpdateContentChangesOnRedo(Item);
         }
 
@@ -384,102 +402,121 @@ CHistory.prototype =
     // Регистрируем новое изменение:
     // Class - объект, в котором оно произошло
     // Data  - сами изменения
-    Add : function(Class, Data)
-    {
+	Add : function(_Class, Data)
+	{
 		if (0 !== this.TurnOffHistory || this.Index < 0)
-            return;
+			return;
 
-        this._CheckCanNotAddChanges();
+		this._CheckCanNotAddChanges();
 
-        // Заглушка на случай, если у нас во время создания одной точки в истории, после нескольких изменений идет
-        // пересчет, потом снова добавляются изменения и снова запускается пересчет и т.д.
-        if ( this.RecIndex >= this.Index )
-            this.RecIndex = this.Index - 1;
+		// Заглушка на случай, если у нас во время создания одной точки в истории, после нескольких изменений идет
+		// пересчет, потом снова добавляются изменения и снова запускается пересчет и т.д.
+		if (this.RecIndex >= this.Index)
+			this.RecIndex = this.Index - 1;
 
-        var Binary_Pos = this.BinaryWriter.GetCurPosition();
+		var Binary_Pos = this.BinaryWriter.GetCurPosition();
 
-        this.BinaryWriter.WriteString2(Class.Get_Id());
-        Class.Save_Changes( Data, this.BinaryWriter );
+		var Class;
+		if (_Class && _Class.IsChangesClass && _Class.IsChangesClass())
+		{
+			Class = _Class.GetClass();
+			Data  = _Class;
 
-        var Binary_Len = this.BinaryWriter.GetCurPosition() - Binary_Pos;
+			this.BinaryWriter.WriteString2(Class.Get_Id());
+			this.BinaryWriter.WriteLong(_Class.Type);
+			_Class.WriteToBinary(this.BinaryWriter);
+		}
+		else
+		{
+			Class = _Class;
+			this.BinaryWriter.WriteString2(Class.Get_Id());
+			Class.Save_Changes(Data, this.BinaryWriter);
+		}
 
-        var Item =
-        {
-            Class : Class,
-            Data  : Data,
-            Binary:
-            {
-                Pos : Binary_Pos,
-                Len : Binary_Len
-            },
-            
-            NeedRecalc : !this.MinorChanges
-        };
+		var Binary_Len = this.BinaryWriter.GetCurPosition() - Binary_Pos;
+		var Item       = {
+			Class  : Class,
+			Data   : Data,
+			Binary : {
+				Pos : Binary_Pos,
+				Len : Binary_Len
+			},
 
-        this.Points[this.Index].Items.push( Item );
+			NeedRecalc : !this.MinorChanges
+		};
 
-        if (!this.CollaborativeEditing)
-            return;
+		this.Points[this.Index].Items.push(Item);
 
-        var bPresentation = !(typeof CPresentation === "undefined");
-        var bSlide = !(typeof Slide === "undefined");
-        if ( ( Class instanceof CDocument        && ( AscDFH.historyitem_Document_AddItem        === Data.Type || AscDFH.historyitem_Document_RemoveItem        === Data.Type ) ) ||
-            (((Class instanceof CDocumentContent || Class instanceof AscFormat.CDrawingDocContent)) && ( AscDFH.historyitem_DocumentContent_AddItem === Data.Type || AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
-            ( Class instanceof CTable           && ( AscDFH.historyitem_Table_AddRow            === Data.Type || AscDFH.historyitem_Table_RemoveRow            === Data.Type ) ) ||
-            ( Class instanceof CTableRow        && ( AscDFH.historyitem_TableRow_AddCell        === Data.Type || AscDFH.historyitem_TableRow_RemoveCell        === Data.Type ) ) ||
-            ( Class instanceof Paragraph        && ( AscDFH.historyitem_Paragraph_AddItem       === Data.Type || AscDFH.historyitem_Paragraph_RemoveItem       === Data.Type ) ) ||
-            ( Class instanceof ParaHyperlink    && ( AscDFH.historyitem_Hyperlink_AddItem       === Data.Type || AscDFH.historyitem_Hyperlink_RemoveItem       === Data.Type ) ) ||
-            ( Class instanceof ParaRun          && ( AscDFH.historyitem_ParaRun_AddItem         === Data.Type || AscDFH.historyitem_ParaRun_RemoveItem         === Data.Type ) ) ||
-            ( bPresentation && Class instanceof CPresentation && (AscDFH.historyitem_Presentation_AddSlide === Data.Type || AscDFH.historyitem_Presentation_RemoveSlide === Data.Type)) ||
-            ( bSlide && Class instanceof Slide && (AscDFH.historyitem_SlideAddToSpTree === Data.Type || AscDFH.historyitem_SlideRemoveFromSpTree === Data.Type))
-            )
-        {
-            var bAdd = ( ( Class instanceof CDocument        && AscDFH.historyitem_Document_AddItem        === Data.Type ) ||
-                ( ((Class instanceof CDocumentContent || Class instanceof AscFormat.CDrawingDocContent)) && AscDFH.historyitem_DocumentContent_AddItem === Data.Type ) ||
-                ( Class instanceof CTable           && AscDFH.historyitem_Table_AddRow            === Data.Type ) ||
-                ( Class instanceof CTableRow        && AscDFH.historyitem_TableRow_AddCell        === Data.Type ) ||
-                ( Class instanceof Paragraph        && AscDFH.historyitem_Paragraph_AddItem       === Data.Type ) ||
-                ( Class instanceof ParaHyperlink    && AscDFH.historyitem_Hyperlink_AddItem       === Data.Type ) ||
-                ( Class instanceof ParaRun          && AscDFH.historyitem_ParaRun_AddItem         === Data.Type ) ||
-                ( bPresentation && Class instanceof CPresentation && (AscDFH.historyitem_Presentation_AddSlide === Data.Type )) ||
-                ( bSlide && Class instanceof Slide && (AscDFH.historyitem_SlideAddToSpTree === Data.Type))
-                ) ? true : false;
+		if (!this.CollaborativeEditing)
+			return;
 
-            var Count = 1;
+		if (_Class && _Class.IsChangesClass && _Class.IsChangesClass())
+		{
+			if (_Class.IsContentChange())
+			{
+				var bAdd  = _Class.IsAdd();
+				var Count = _Class.GetItemsCount();
 
-            if ( ( Class instanceof Paragraph ) ||  ( Class instanceof ParaHyperlink) || ( Class instanceof ParaRun ) ||
-                ( Class instanceof CDocument        && AscDFH.historyitem_Document_RemoveItem        === Data.Type ) ||
-                ( ((Class instanceof CDocumentContent || Class instanceof AscFormat.CDrawingDocContent)) && AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) )
-                Count = Data.Items.length;
+				var ContentChanges = new AscCommon.CContentChangesElement(bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove, Data.Pos, Count, Item);
+				Class.Add_ContentChanges(ContentChanges);
+				this.CollaborativeEditing.Add_NewDC(Class);
 
-            var ContentChanges = new AscCommon.CContentChangesElement( ( bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove ), Data.Pos, Count, Item );
-            Class.Add_ContentChanges( ContentChanges );
-            this.CollaborativeEditing.Add_NewDC( Class );
+				if (true === bAdd)
+					this.CollaborativeEditing.Update_DocumentPositionsOnAdd(Class, Data.Pos);
+				else
+					this.CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, Data.Pos, Count);
+			}
+		}
+		else
+		{
 
-            if (true === bAdd)
-                this.CollaborativeEditing.Update_DocumentPositionsOnAdd(Class, Data.Pos);
-            else
-                this.CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, Data.Pos, Count);
-        }
-        if(this.CollaborativeEditing.AddPosExtChanges && Class instanceof AscFormat.CXfrm)
-        {
-            if(AscDFH.historyitem_Xfrm_SetOffX  === Data.Type ||
-                AscDFH.historyitem_Xfrm_SetOffY === Data.Type ||
-                AscDFH.historyitem_Xfrm_SetExtX === Data.Type ||
-                AscDFH.historyitem_Xfrm_SetExtY === Data.Type ||
-                AscDFH.historyitem_Xfrm_SetChOffX === Data.Type ||
-                AscDFH.historyitem_Xfrm_SetChOffY === Data.Type ||
-                AscDFH.historyitem_Xfrm_SetChExtX === Data.Type ||
-                AscDFH.historyitem_Xfrm_SetChExtY  === Data.Type)
-            {
-                this.CollaborativeEditing.AddPosExtChanges(Item,
-                    AscDFH.historyitem_Xfrm_SetOffX  === Data.Type ||
-                    AscDFH.historyitem_Xfrm_SetExtX === Data.Type ||
-                        AscDFH.historyitem_Xfrm_SetChOffX === Data.Type ||
-                        AscDFH.historyitem_Xfrm_SetChExtX === Data.Type );
-            }
-        }
-    },
+			var bPresentation = !(typeof CPresentation === "undefined");
+			var bSlide        = !(typeof Slide === "undefined");
+			if (( Class instanceof AscFormat.CDrawingDocContent && ( AscDFH.historyitem_DocumentContent_AddItem === Data.Type || AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
+				( bPresentation && Class instanceof CPresentation && (AscDFH.historyitem_Presentation_AddSlide === Data.Type || AscDFH.historyitem_Presentation_RemoveSlide === Data.Type)) ||
+				( bSlide && Class instanceof Slide && (AscDFH.historyitem_SlideAddToSpTree === Data.Type || AscDFH.historyitem_SlideRemoveFromSpTree === Data.Type))
+			)
+			{
+				var bAdd = ( ( Class instanceof AscFormat.CDrawingDocContent && AscDFH.historyitem_DocumentContent_AddItem === Data.Type ) ||
+					( bPresentation && Class instanceof CPresentation && (AscDFH.historyitem_Presentation_AddSlide === Data.Type )) ||
+					( bSlide && Class instanceof Slide && (AscDFH.historyitem_SlideAddToSpTree === Data.Type))
+				) ? true : false;
+
+				var Count = 1;
+
+				if (Class instanceof AscFormat.CDrawingDocContent && AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type)
+					Count = Data.Items.length;
+
+				var ContentChanges = new AscCommon.CContentChangesElement(( bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove ), Data.Pos, Count, Item);
+				Class.Add_ContentChanges(ContentChanges);
+				this.CollaborativeEditing.Add_NewDC(Class);
+
+				if (true === bAdd)
+					this.CollaborativeEditing.Update_DocumentPositionsOnAdd(Class, Data.Pos);
+				else
+					this.CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, Data.Pos, Count);
+			}
+		}
+
+		if (this.CollaborativeEditing.AddPosExtChanges && Class instanceof AscFormat.CXfrm)
+		{
+			if (AscDFH.historyitem_Xfrm_SetOffX === Data.Type ||
+				AscDFH.historyitem_Xfrm_SetOffY === Data.Type ||
+				AscDFH.historyitem_Xfrm_SetExtX === Data.Type ||
+				AscDFH.historyitem_Xfrm_SetExtY === Data.Type ||
+				AscDFH.historyitem_Xfrm_SetChOffX === Data.Type ||
+				AscDFH.historyitem_Xfrm_SetChOffY === Data.Type ||
+				AscDFH.historyitem_Xfrm_SetChExtX === Data.Type ||
+				AscDFH.historyitem_Xfrm_SetChExtY === Data.Type)
+			{
+				this.CollaborativeEditing.AddPosExtChanges(Item,
+					AscDFH.historyitem_Xfrm_SetOffX === Data.Type ||
+					AscDFH.historyitem_Xfrm_SetExtX === Data.Type ||
+					AscDFH.historyitem_Xfrm_SetChOffX === Data.Type ||
+					AscDFH.historyitem_Xfrm_SetChExtX === Data.Type);
+			}
+		}
+	},
 
     Internal_RecalcData_Clear : function()
     {
@@ -818,12 +855,21 @@ CHistory.prototype =
       return false;
     },
 
-    Get_RecalcData : function(RecalcData)
+    Get_RecalcData : function(RecalcData, arrChanges)
     {
         if (RecalcData)
         {
             this.RecalculateData = RecalcData;
         }
+        else if (arrChanges)
+		{
+			this.Internal_RecalcData_Clear();
+			for (var nIndex = 0, nCount = arrChanges.length; nIndex < nCount; ++nIndex)
+			{
+				var oChange = arrChanges[nIndex];
+				oChange.RefreshRecalcData();
+			}
+		}
         else
         {
             if (this.Index >= 0)

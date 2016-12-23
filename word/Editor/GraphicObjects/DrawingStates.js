@@ -535,7 +535,7 @@ MoveInlineObject.prototype =
             var new_check_paragraph = this.majorObject.parent.checkShapeChildAndGetTopParagraph(this.InlinePos.Paragraph);
             if(parent_paragraph !== new_check_paragraph)
                 check_paragraphs.push(new_check_paragraph);
-            if(false === editor.isViewMode &&  false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : AscCommon.changestype_Paragraph_Content}))
+            if(false === editor.isViewMode &&  false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : AscCommon.changestype_Paragraph_Content}, true))
             {
                 History.Create_NewPoint(AscDFH.historydescription_Document_MoveInlineObject);
                 this.majorObject.parent.OnEnd_MoveInline(this.InlinePos);
@@ -544,7 +544,7 @@ MoveInlineObject.prototype =
         else
         {
             check_paragraphs.push(this.majorObject.parent.checkShapeChildAndGetTopParagraph(this.InlinePos.Paragraph));
-            if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : AscCommon.changestype_Paragraph_Content}))
+            if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : AscCommon.changestype_Paragraph_Content}, true))
             {
                 History.Create_NewPoint(AscDFH.historydescription_Document_CopyAndMoveInlineObject);
                 var new_para_drawing = new ParaDrawing(this.majorObject.parent.Extent.W, this.majorObject.parent.Extent.H, null, this.drawingObjects.drawingDocument, null, null);
@@ -711,7 +711,7 @@ RotateState.prototype =
                             }
                         }
                     }
-                    if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : aCheckParagraphs, CheckType : AscCommon.changestype_Paragraph_Content}))
+                    if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : aCheckParagraphs, CheckType : AscCommon.changestype_Paragraph_Content}, true))
                     {
                         History.Create_NewPoint(AscDFH.historydescription_Document_RotateFlowDrawingNoCtrl);
                         for(i = 0; i < aDrawings.length; ++i)
@@ -736,8 +736,12 @@ RotateState.prototype =
 
                                 original.Remove_FromDocument(false);
                                 aNearestPos[i].Paragraph.Check_NearestPos(aNearestPos[i]);
-                                original.Set_XYForAdd(bounds.posX, bounds.posY, aNearestPos[i], pageIndex);
-                                aDrawings[i].Add_ToDocument(aNearestPos[i], false);
+
+                                // Всегда создаем копию при переносе, чтобы не было проблем при совместном редактировании
+                                var originalCopy = original.Copy();
+								originalCopy.Set_XYForAdd(bounds.posX, bounds.posY, aNearestPos[i], pageIndex);
+								originalCopy.Add_ToDocument(aNearestPos[i], false);
+								original.DocumentContent.Select_DrawingObject(originalCopy.Get_Id());
 
                                 if(bTrackRevisions){
                                     this.drawingObjects.document.TrackRevisions = true;

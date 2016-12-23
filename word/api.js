@@ -491,7 +491,6 @@
 
 		// объекты, нужные для отправки в тулбар (шрифты, стили)
 		this._gui_control_colors = null;
-		this._gui_color_schemes  = null;
 
 		this.DocumentReaderMode = null;
 
@@ -822,7 +821,7 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oLogicDocument.TurnOff_CheckSpelling();
 
 		if (this.WordControl.MobileTouchManager)
-			this.WordControl.MobileTouchManager.LogicDocument = this.WordControl.m_oLogicDocument;
+			this.WordControl.MobileTouchManager.delegate.LogicDocument = this.WordControl.m_oLogicDocument;
 	};
 
 	asc_docs_api.prototype.InitViewer = function()
@@ -945,22 +944,13 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_checkNeedCallback = function(name)
 	{
-		if (_callbacks.hasOwnProperty(name))
-		{
-			return true;
-		}
-		return false;
+		return _callbacks.hasOwnProperty(name);
 	};
 
 	// тут методы, замены евентов
 	asc_docs_api.prototype.get_PropertyThemeColors       = function()
 	{
-		var _ret = [this._gui_control_colors.Colors, this._gui_control_colors.StandartColors];
-		return _ret;
-	};
-	asc_docs_api.prototype.get_PropertyThemeColorSchemes = function()
-	{
-		return this._gui_color_schemes;
+		return [this._gui_control_colors.Colors, this._gui_control_colors.StandartColors];
 	};
 	// -------
 
@@ -1999,7 +1989,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_SelectionCut = function()
 	{
-	    if (AscCommon.CollaborativeEditing.m_bGlobalLock)
+	    if (AscCommon.CollaborativeEditing.Get_GlobalLock())
     	    return;
 
 		var _logicDoc = this.WordControl.m_oLogicDocument;
@@ -2016,7 +2006,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_PasteData = function(_format, data1, data2)
 	{
-	    if (AscCommon.CollaborativeEditing.m_bGlobalLock)
+	    if (AscCommon.CollaborativeEditing.Get_GlobalLock())
 	        return;
 
 		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
@@ -2033,7 +2023,7 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.onSaveCallback = function(e)
+	asc_docs_api.prototype.onSaveCallback = function(e, isUndoRequest)
 	{
 		var t = this;
 		if (false == e["saveLock"])
@@ -2086,12 +2076,20 @@ background-repeat: no-repeat;\
 				CursorInfo = History.Get_DocumentPositionBinary();
 			}
 
-			// Пересылаем свои изменения
-			AscCommon.CollaborativeEditing.Send_Changes(this.IsUserSave, {
-				UserId      : this.CoAuthoringApi.getUserConnectionId(),
-				UserShortId : this.DocInfo.get_UserId(),
-				CursorInfo  : CursorInfo
-			}, HaveOtherChanges);
+			if (isUndoRequest)
+			{
+				AscCommon.CollaborativeEditing.Set_GlobalLock(false);
+				AscCommon.CollaborativeEditing.Undo();
+			}
+			else
+			{
+				// Пересылаем свои изменения
+				AscCommon.CollaborativeEditing.Send_Changes(this.IsUserSave, {
+					UserId      : this.CoAuthoringApi.getUserConnectionId(),
+					UserShortId : this.DocInfo.get_UserId(),
+					CursorInfo  : CursorInfo
+				}, HaveOtherChanges);
+			}
 		}
 		else
 		{
@@ -2109,14 +2107,14 @@ background-repeat: no-repeat;\
 				{
 					t.CoAuthoringApi.askSaveChanges(function(event)
 					{
-						t.onSaveCallback(event);
+						t.onSaveCallback(event, isUndoRequest);
 					});
 				}, TimeoutInterval);
 			}
 		}
 	};
 
-	asc_docs_api.prototype.asc_Save           = function(isAutoSave)
+	asc_docs_api.prototype.asc_Save           = function(isAutoSave, isUndoRequest)
 	{
 		this.IsUserSave = !isAutoSave;
 		if (true === this.canSave && !this.isLongAction())
@@ -2126,7 +2124,7 @@ background-repeat: no-repeat;\
 			var t = this;
 			this.CoAuthoringApi.askSaveChanges(function(e)
 			{
-				t.onSaveCallback(e);
+				t.onSaveCallback(e, isUndoRequest);
 			});
 		}
 	};
@@ -2351,9 +2349,6 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.sync_CanUndoCallback         = function(bCanUndo)
 	{
-		if (true === AscCommon.CollaborativeEditing.Is_Fast() && true !== AscCommon.CollaborativeEditing.Is_SingleUser())
-			bCanUndo = false;
-
 		this.sendEvent("asc_onCanUndo", bCanUndo);
 	};
 	asc_docs_api.prototype.sync_CanRedoCallback         = function(bCanRedo)
@@ -3783,8 +3778,18 @@ background-repeat: no-repeat;\
 	{
 		return this.WordControl.m_oLogicDocument.GetFootnotePr();
 	};
-	asc_docs_api.prototype["asc_GetFootnoteProps"] = asc_docs_api.prototype.asc_GetFootnoteProps;
-	asc_docs_api.prototype["asc_SetFootnoteProps"] = asc_docs_api.prototype.asc_SetFootnoteProps;
+	asc_docs_api.prototype.asc_AddFootnote = function(sText)
+	{
+		return this.WordControl.m_oLogicDocument.AddFootnote(sText);
+	};
+	asc_docs_api.prototype.asc_RemoveAllFootnotes = function()
+	{
+		this.WordControl.m_oLogicDocument.RemoveAllFootnotes();
+	};
+	asc_docs_api.prototype["asc_AddFootnote"]        = asc_docs_api.prototype.asc_AddFootnote;
+	asc_docs_api.prototype["asc_RemoveAllFootnotes"] = asc_docs_api.prototype.asc_RemoveAllFootnotes;
+	asc_docs_api.prototype["asc_GetFootnoteProps"]   = asc_docs_api.prototype.asc_GetFootnoteProps;
+	asc_docs_api.prototype["asc_SetFootnoteProps"]   = asc_docs_api.prototype.asc_SetFootnoteProps;
 
 	asc_docs_api.prototype.put_AddPageBreak              = function()
 	{
@@ -4140,7 +4145,14 @@ background-repeat: no-repeat;\
 	{
 		if (obj)
 		{
-			this.Color = (undefined != obj.Color && null != obj.Color) ? AscCommon.CreateAscColorCustom(obj.Color.r, obj.Color.g, obj.Color.b) : null;
+            if (obj.Unifill && obj.Unifill.fill && obj.Unifill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_SOLID && obj.Unifill.fill.color)
+            {
+                this.Color = AscCommon.CreateAscColor(obj.Unifill.fill.color);
+            }
+            else
+            {
+                this.Color = (undefined != obj.Color && null != obj.Color) ? AscCommon.CreateAscColorCustom(obj.Color.r, obj.Color.g, obj.Color.b) : null;
+            }
 			this.Value = (undefined != obj.Value) ? obj.Value : null;
 		}
 		else
@@ -6468,7 +6480,7 @@ background-repeat: no-repeat;\
 		if (null != this.WordControl.m_oLogicDocument)
 		{
 			this.WordControl.m_oDrawingDocument.CheckGuiControlColors();
-			this.WordControl.m_oDrawingDocument.SendThemeColorScheme();
+			this.sendColorThemes(this.WordControl.m_oLogicDocument.theme);
 			this.sendEvent("asc_onUpdateChartStyles");
 		}
 
@@ -6527,10 +6539,6 @@ background-repeat: no-repeat;\
 		this._gui_control_colors = {Colors : colors, StandartColors : standart_colors};
 		this.sendEvent("asc_onSendThemeColors", colors, standart_colors);
 	};
-	asc_docs_api.prototype.sync_SendThemeColorSchemes = function(param)
-	{
-		this._gui_color_schemes = param;
-	};
 
 	asc_docs_api.prototype.ChangeColorScheme            = function(index_scheme)
 	{
@@ -6543,72 +6551,17 @@ background-repeat: no-repeat;\
 
 		var theme = this.WordControl.m_oLogicDocument.theme;
 
-		var oColorScheme    = AscCommon.g_oUserColorScheme;
-		var _count_defaults = oColorScheme.length;
-
 		if (this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_ColorScheme) === false)
 		{
-			History.Create_NewPoint(AscDFH.historydescription_Document_ChangeColorScheme);
-			var data = {Type : AscDFH.historyitem_ChangeColorScheme, oldScheme : theme.themeElements.clrScheme};
-
-			if (index_scheme < _count_defaults)
+			var scheme = AscCommon.getColorThemeByIndex(index_scheme);
+			if (!scheme)
 			{
-				var _obj    = oColorScheme[index_scheme];
-				var scheme  = new AscFormat.ClrScheme();
-				scheme.name = _obj.name;
-				var _c      = null;
-
-				_c               = _obj.dk1;
-				scheme.colors[8] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-				_c                = _obj.lt1;
-				scheme.colors[12] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-				_c               = _obj.dk2;
-				scheme.colors[9] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-				_c                = _obj.lt2;
-				scheme.colors[13] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-				_c               = _obj.accent1;
-				scheme.colors[0] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-				_c               = _obj.accent2;
-				scheme.colors[1] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-				_c               = _obj.accent3;
-				scheme.colors[2] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-				_c               = _obj.accent4;
-				scheme.colors[3] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-				_c               = _obj.accent5;
-				scheme.colors[4] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-				_c               = _obj.accent6;
-				scheme.colors[5] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-				_c                = _obj.hlink;
-				scheme.colors[11] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-				_c                = _obj.folHlink;
-				scheme.colors[10] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-				theme.themeElements.clrScheme = scheme;
-				/*_changer.calculateAfterChangeTheme();
-
-				 // TODO:
-				 this.WordControl.m_oDrawingDocument.ClearCachePages();
-				 this.WordControl.OnScroll();*/
-			}
-			else
-			{
-				index_scheme -= _count_defaults;
+				index_scheme -= AscCommon.g_oUserColorScheme.length;
 
 				if (index_scheme < 0 || index_scheme >= theme.extraClrSchemeLst.length)
 					return;
 
-				theme.themeElements.clrScheme = theme.extraClrSchemeLst[index_scheme].clrScheme.createDuplicate();
+				scheme = theme.extraClrSchemeLst[index_scheme].clrScheme.createDuplicate();
 				/*_changer.calculateAfterChangeTheme();
 
 				 // TODO:
@@ -6616,7 +6569,13 @@ background-repeat: no-repeat;\
 				 this.WordControl.OnScroll();*/
 			}
 
-			data.newScheme = theme.themeElements.clrScheme;
+			History.Create_NewPoint(AscDFH.historydescription_Document_ChangeColorScheme);
+			var data = {
+				Type: AscDFH.historyitem_ChangeColorScheme,
+				oldScheme: theme.themeElements.clrScheme,
+				newScheme: scheme
+			};
+			theme.themeElements.clrScheme = scheme;
 			History.Add(this.WordControl.m_oLogicDocument.DrawingObjects, data);
 			this.WordControl.m_oDrawingDocument.CheckGuiControlColors();
 			this.chartPreviewManager.clearPreviews();
@@ -7366,7 +7325,7 @@ background-repeat: no-repeat;\
 			this.asc_SpellCheckDisconnect();
 			
 			this.ShowParaMarks                           = false;
-			AscCommon.CollaborativeEditing.m_bGlobalLock = true;
+			AscCommon.CollaborativeEditing.Set_GlobalLock(true);
 			//this.isShowTableEmptyLine = false;
 			//this.WordControl.m_bIsRuler = true;
 
@@ -8202,11 +8161,10 @@ background-repeat: no-repeat;\
 
 		var stream = new AscCommon.FT_Stream2(data, data.length);
 		stream.obj = null;
-		var Loader = {Reader : stream, Reader2 : null};
 		var _color = new AscCommonWord.CDocumentColor(191, 255, 199);
 
 		// Применяем изменения, пока они есть
-		var _count = Loader.Reader.GetLong();
+		var _count = stream.GetLong();
 
 		var _pos = 4;
 		for (var i = 0; i < _count; i++)
@@ -8217,30 +8175,39 @@ background-repeat: no-repeat;\
 					break;
 			}
 
-			var _len    = Loader.Reader.GetLong();
+			var nChangeLen = stream.GetLong();
 			_pos += 4;
-			stream.size = _pos + _len;
+			stream.size = _pos + nChangeLen;
 
-			var _id       = Loader.Reader.GetString2();
-			var _read_pos = Loader.Reader.GetCurPos();
+			var ClassId = stream.GetString2();
+			var Class   = AscCommon.g_oTableId.Get_ById(ClassId);
 
-			var Type  = Loader.Reader.GetLong();
-			var Class = null;
+			var nReaderPos  = stream.GetCurPos();
+			var nChangeType = stream.GetLong();
 
-			if (AscDFH.historyitem_type_HdrFtr === Type)
+			if (Class)
 			{
-				Class = editor.WordControl.m_oLogicDocument.HdrFtr;
+				var fChangesClass = AscDFH.changesFactory[nChangeType];
+				if (fChangesClass)
+				{
+					var oChange = new fChangesClass(Class);
+					oChange.ReadFromBinary(stream);
+
+					if (true === AscCommon.CollaborativeEditing.private_AddOverallChange(oChange))
+						oChange.Load(_color);
+				}
+				else
+				{
+					AscCommon.CollaborativeEditing.private_AddOverallChange(data);
+
+					stream.Seek(nReaderPos);
+					stream.Seek2(nReaderPos);
+
+					Class.Load_Changes(stream, null, _color);
+				}
 			}
-			else
-				Class = g_oTableId.Get_ById(_id);
 
-			stream.Seek(_read_pos);
-			stream.Seek2(_read_pos);
-
-			if (null != Class)
-				Class.Load_Changes(Loader.Reader, Loader.Reader2, _color);
-
-			_pos += _len;
+			_pos += nChangeLen;
 			stream.Seek2(_pos);
 			stream.size = data.length;
 		}
@@ -8600,7 +8567,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_getPropertyEditorShapes']               = asc_docs_api.prototype.asc_getPropertyEditorShapes;
 	asc_docs_api.prototype['asc_getPropertyEditorTextArts']             = asc_docs_api.prototype.asc_getPropertyEditorTextArts;
 	asc_docs_api.prototype['get_PropertyThemeColors']                   = asc_docs_api.prototype.get_PropertyThemeColors;
-	asc_docs_api.prototype['get_PropertyThemeColorSchemes']             = asc_docs_api.prototype.get_PropertyThemeColorSchemes;
 	asc_docs_api.prototype['_coAuthoringSetChange']                     = asc_docs_api.prototype._coAuthoringSetChange;
 	asc_docs_api.prototype['_coAuthoringSetChanges']                    = asc_docs_api.prototype._coAuthoringSetChanges;
 	asc_docs_api.prototype['asc_coAuthoringChatSendMessage']            = asc_docs_api.prototype.asc_coAuthoringChatSendMessage;
@@ -8891,7 +8857,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asyncFontsDocumentEndLoaded']               = asc_docs_api.prototype.asyncFontsDocumentEndLoaded;
 	asc_docs_api.prototype['CreateFontsCharMap']                        = asc_docs_api.prototype.CreateFontsCharMap;
 	asc_docs_api.prototype['sync_SendThemeColors']                      = asc_docs_api.prototype.sync_SendThemeColors;
-	asc_docs_api.prototype['sync_SendThemeColorSchemes']                = asc_docs_api.prototype.sync_SendThemeColorSchemes;
 	asc_docs_api.prototype['ChangeColorScheme']                         = asc_docs_api.prototype.ChangeColorScheme;
 	asc_docs_api.prototype['asyncImagesDocumentEndLoaded']              = asc_docs_api.prototype.asyncImagesDocumentEndLoaded;
 	asc_docs_api.prototype['OpenDocumentEndCallback']                   = asc_docs_api.prototype.OpenDocumentEndCallback;

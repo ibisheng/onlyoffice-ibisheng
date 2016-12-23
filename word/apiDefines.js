@@ -182,6 +182,19 @@ var c_oSerFormat = {
 	Signature : "DOCY"
 };
 
+var c_oAscFootnotePos = {
+	BeneathText : 0x00, //section_footnote_PosBeneathText
+	DocEnd      : 0x01, //section_footnote_PosDocEnd
+	PageBottom  : 0x02, //section_footnote_PosPageBottom,
+	SectEnd     : 0x03  //section_footnote_PosSectEnd
+};
+
+var c_oAscFootnoteRestart = {
+	Continuous : 0x00, //section_footnote_RestartContinuous,
+	EachSect   : 0x01, //section_footnote_RestartEachSect,
+	EachPage   : 0x02  //section_footnote_RestartEachPage
+};
+
 window["flat_desine"] = false;
 
 //------------------------------------------------------------export---------------------------------------------------
@@ -258,6 +271,18 @@ prot['ParaAdd'] = c_oAscRevisionsChangeType.ParaAdd;
 prot['ParaRem'] = c_oAscRevisionsChangeType.ParaRem;
 prot['TextPr']  = c_oAscRevisionsChangeType.TextPr;
 prot['ParaPr']  = c_oAscRevisionsChangeType.ParaPr;
+
+prot = window['Asc']['c_oAscFootnotePos'] = c_oAscFootnotePos;
+prot['BeneathText'] = c_oAscFootnotePos.BeneathText;
+prot['DocEnd']      = c_oAscFootnotePos.DocEnd;
+prot['PageBottom']  = c_oAscFootnotePos.PageBottom;
+prot['SectEnd']     = c_oAscFootnotePos.SectEnd;
+
+prot = window['Asc']['c_oAscFootnoteRestart'] = c_oAscFootnoteRestart;
+prot['Continuous'] = c_oAscFootnoteRestart.Continuous;
+prot['EachSect']   = c_oAscFootnoteRestart.EachSect;
+prot['EachPage']   = c_oAscFootnoteRestart.EachPage;
+
 
 window['AscCommon']                = window['AscCommon'] || {};
 window['AscCommon'].c_oSerFormat   = c_oSerFormat;

@@ -599,7 +599,7 @@ function RotateTrackGroup(originalObject)
 function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
 {
     this.chartSpace = oChartSpace;
-    this.numHandle = numHandle;
+
 
 
     this.originalObject = oChartSpace;
@@ -611,6 +611,28 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
 
     this.startX = oChartSpace.invertTransform.TransformPointX(startX, startY);
     this.startY = oChartSpace.invertTransform.TransformPointY(startX, startY);
+
+    this.bChartTrack = false;
+    var oChartObj = oChartSpace.chart.plotArea.charts[0];
+    if(oChartObj){
+        var nPointsCount = 0;
+        if(oChartObj.getObjectType() === AscDFH.historyitem_type_PieChart || oChartObj.getObjectType() === AscDFH.historyitem_type_PieChart){
+            if(oChartObj.series[0]){
+                nPointsCount = AscFormat.getPtsFromSeries(oChartObj.series[0]).length;
+            }
+        }
+        else{
+            for(var i = 0; i < oChartObj.series.length; ++i){
+                nPointsCount += AscFormat.getPtsFromSeries(oChartObj.series[i]).length;
+            }
+        }
+
+
+        if(nPointsCount < 30){
+            this.bChartTrack = true;
+        }
+    }
+
 
     AscFormat.ExecuteNoHistory(function(){
         this.view3D = oChartSpace.chart.view3D.createDuplicate();
@@ -637,7 +659,7 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
     }, this, []);
 
 
-    this.draw = function(overlay, transform)
+   /* this.draw = function(overlay, transform)
     {
         if(AscFormat.isRealNumber(this.chartSpace.selectStartPage) && overlay.SetCurrentPage)
         {
@@ -646,14 +668,54 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
         var dOldAlpha = null;
         var oGraphics = overlay.Graphics ? overlay.Graphics : overlay;
         if(AscFormat.isRealNumber(oGraphics.globalAlpha) && oGraphics.put_GlobalAlpha){
-            dOldAlpha = oGraphics.globalAlpha;
-            oGraphics.put_GlobalAlpha(false, 1);
+
+            var graphics = oGraphics;
+            graphics.SaveGrState();
+            graphics.SetIntegerGrid(false);
+            graphics.transform3(oChartSpace.transform, false);
+            oChartSpace.chartObj.draw(oChartSpace, graphics);
+            graphics.RestoreGrState();
         }
-        this.objectToDraw.draw(overlay, transform);
-        this.objectToDraw2.draw(overlay, transform);
-        if(AscFormat.isRealNumber(dOldAlpha) && oGraphics.put_GlobalAlpha){
-            oGraphics.put_GlobalAlpha(true, dOldAlpha);
+    };*/
+
+    this.draw = function(overlay, transform)
+    {
+
+        if(this.bChartTrack){
+            if(AscFormat.isRealNumber(this.chartSpace.selectStartPage) && overlay.SetCurrentPage)
+            {
+                overlay.SetCurrentPage(this.chartSpace.selectStartPage);
+            }
+            var dOldAlpha = null;
+            var oGraphics = overlay.Graphics ? overlay.Graphics : overlay;
+            if(AscFormat.isRealNumber(oGraphics.globalAlpha) && oGraphics.put_GlobalAlpha){
+
+                var graphics = oGraphics;
+                graphics.SaveGrState();
+                graphics.SetIntegerGrid(false);
+                graphics.transform3(oChartSpace.transform, false);
+                oChartSpace.chartObj.draw(oChartSpace, graphics);
+                graphics.RestoreGrState();
+            }
         }
+        else{
+            if(AscFormat.isRealNumber(this.chartSpace.selectStartPage) && overlay.SetCurrentPage)
+            {
+                overlay.SetCurrentPage(this.chartSpace.selectStartPage);
+            }
+            var dOldAlpha = null;
+            var oGraphics = overlay.Graphics ? overlay.Graphics : overlay;
+            if(AscFormat.isRealNumber(oGraphics.globalAlpha) && oGraphics.put_GlobalAlpha){
+                dOldAlpha = oGraphics.globalAlpha;
+                oGraphics.put_GlobalAlpha(false, 1);
+            }
+            this.objectToDraw.draw(overlay, transform);
+            this.objectToDraw2.draw(overlay, transform);
+            if(AscFormat.isRealNumber(dOldAlpha) && oGraphics.put_GlobalAlpha){
+                oGraphics.put_GlobalAlpha(true, dOldAlpha);
+            }
+        }
+
     };
 
 
@@ -669,29 +731,32 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
             var pxToMM = this.chartSpace.chartObj.calcProp.pxToMM;
             this.geometry.pathLst.push(path);
             var oChSz = this.chartSizes;
+            var processor3D = this.chartSpace.chartObj.processor3D;
+
+
 
             var centerPoint2 = this.processor3D.convertAndTurnPoint((oChSz.startX + oChSz.w/2)*pxToMM, (oChSz.startY + oChSz.h/2)*pxToMM, this.depthPerspective/2);
 
             var deltaX = (this.centerPoint.x - centerPoint2.x)/pxToMM;
             var deltaY = (this.centerPoint.y - centerPoint2.y)/pxToMM;
 
-            var point1 = this.processor3D.convertAndTurnPoint(oChSz.startX*pxToMM, oChSz.startY*pxToMM, 0);
+            var point1 = processor3D.convertAndTurnPoint(oChSz.startX*pxToMM, oChSz.startY*pxToMM, 0);
             path.moveTo(point1.x/pxToMM + deltaX, point1.y/pxToMM + deltaY);
-            var point2 = this.processor3D.convertAndTurnPoint((oChSz.startX + oChSz.w) *pxToMM, oChSz.startY*pxToMM, 0);
+            var point2 = processor3D.convertAndTurnPoint((oChSz.startX + oChSz.w) *pxToMM, oChSz.startY*pxToMM, 0);
             path.lnTo(point2.x/pxToMM + deltaX, point2.y/pxToMM + deltaY);
-            var point3 = this.processor3D.convertAndTurnPoint((oChSz.startX + oChSz.w)*pxToMM, (oChSz.startY + oChSz.h)*pxToMM, 0);
+            var point3 = processor3D.convertAndTurnPoint((oChSz.startX + oChSz.w)*pxToMM, (oChSz.startY + oChSz.h)*pxToMM, 0);
             path.lnTo(point3.x/pxToMM + deltaX, point3.y/pxToMM + deltaY);
-            var point4 = this.processor3D.convertAndTurnPoint((oChSz.startX)*pxToMM, (oChSz.startY + oChSz.h)*pxToMM, 0);
+            var point4 = processor3D.convertAndTurnPoint((oChSz.startX)*pxToMM, (oChSz.startY + oChSz.h)*pxToMM, 0);
             path.lnTo(point4.x/pxToMM + deltaX, point4.y/pxToMM + deltaY);
             path.close();
 
-            var point1d = this.processor3D.convertAndTurnPoint(oChSz.startX*pxToMM, oChSz.startY*pxToMM, this.depthPerspective);
+            var point1d = processor3D.convertAndTurnPoint(oChSz.startX*pxToMM, oChSz.startY*pxToMM, this.depthPerspective);
             path.moveTo(point1d.x/pxToMM + deltaX, point1d.y/pxToMM + deltaY);
-            var point2d = this.processor3D.convertAndTurnPoint((oChSz.startX + oChSz.w) *pxToMM, oChSz.startY*pxToMM, this.depthPerspective);
+            var point2d = processor3D.convertAndTurnPoint((oChSz.startX + oChSz.w) *pxToMM, oChSz.startY*pxToMM, this.depthPerspective);
             path.lnTo(point2d.x/pxToMM + deltaX, point2d.y/pxToMM + deltaY);
-            var point3d = this.processor3D.convertAndTurnPoint((oChSz.startX + oChSz.w)*pxToMM, (oChSz.startY + oChSz.h)*pxToMM, this.depthPerspective);
+            var point3d = processor3D.convertAndTurnPoint((oChSz.startX + oChSz.w)*pxToMM, (oChSz.startY + oChSz.h)*pxToMM, this.depthPerspective);
             path.lnTo(point3d.x/pxToMM + deltaX, point3d.y/pxToMM + deltaY);
-            var point4d = this.processor3D.convertAndTurnPoint((oChSz.startX)*pxToMM, (oChSz.startY + oChSz.h)*pxToMM, this.depthPerspective);
+            var point4d = processor3D.convertAndTurnPoint((oChSz.startX)*pxToMM, (oChSz.startY + oChSz.h)*pxToMM, this.depthPerspective);
             path.lnTo(point4d.x/pxToMM + deltaX, point4d.y/pxToMM + deltaY);
             path.close();
 
@@ -712,7 +777,7 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
     this.getBounds = function()
     {
         var boundsChecker = new  AscFormat.CSlideBoundsChecker();
-        this.draw(boundsChecker);
+        //this.draw(boundsChecker);
         var tr = this.transform;
         var arr_p_x = [];
         var arr_p_y = [];
@@ -775,15 +840,20 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
             this.view3D.rotX = 90;
         }
 
-        this.processor3D.angleOx = this.view3D && this.view3D.rotX ? (- this.view3D.rotX / 360) * (Math.PI * 2) : 0;
-        this.processor3D.angleOy = this.view3D && this.view3D.rotY ? (- this.view3D.rotY / 360) * (Math.PI * 2) : 0;
-        this.processor3D.angleOz = 0;
 
-      //  this.processor3D.view3D = this.view3D;
-    //    this.processor3D.calaculate3DProperties();
-        //this.processor3D.view3D = oChartSpace.chart.view3D;
-
-        this.calculateGeometry();
+        var OldView = oChartSpace.chart.view3D;
+        if(this.bChartTrack){
+            oChartSpace.chart.view3D = this.view3D;
+            oChartSpace.recalcInfo.recalculateChart = true;
+            oChartSpace.recalculate();
+            oChartSpace.chart.view3D = OldView;
+        }
+        else{
+            oChartSpace.chart.view3D = this.view3D;
+            oChartSpace.chartObj.recalculateOnly3dProps(oChartSpace);
+            oChartSpace.chart.view3D = OldView;
+            this.calculateGeometry();
+        }
     };
 
     this.trackEnd = function()

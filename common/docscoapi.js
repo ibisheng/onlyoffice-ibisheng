@@ -347,6 +347,12 @@
     }
   };
 
+	CDocsCoApi.prototype.forceSave = function() {
+		if (this._CoAuthoringApi && this._onlineWork) {
+			this._CoAuthoringApi.forceSave();
+		}
+	};
+
   CDocsCoApi.prototype.callback_OnAuthParticipantsChanged = function(e, count) {
     if (this.onAuthParticipantsChanged) {
       this.onAuthParticipantsChanged(e, count);
@@ -820,6 +826,10 @@
   DocsCoApi.prototype.versionHistory = function(data) {
     this._send({'type': 'versionHistory', 'cmd': data});
   };
+
+	DocsCoApi.prototype.forceSave = function() {
+		this._send({'type': 'forcesave'});
+	};
 
   DocsCoApi.prototype.openDocument = function(data) {
     this._send({"type": "openDocument", "message": data});

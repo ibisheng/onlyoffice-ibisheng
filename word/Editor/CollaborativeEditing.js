@@ -47,6 +47,13 @@ function CWordCollaborativeEditing()
     this.m_aForeignCursors       = {};
     this.m_aForeignCursorsXY     = {};
     this.m_aForeignCursorsToShow = {};
+
+    this.m_nAllChangesSavedIndex = 0;
+
+    this.m_aAllChanges        = []; // Список всех изменений
+	this.m_aOwnChangesIndexes = []; // Список номеров своих изменений в общем списке, которые мы можем откатить
+
+	this.m_oOwnChanges        = [];
 }
 
 AscCommon.extendClass(CWordCollaborativeEditing, AscCommon.CCollaborativeEditingBase);
@@ -81,7 +88,7 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
     }
     var deleteIndex = ( null === AscCommon.History.SavedIndex ? null : SumIndex );
 
-    var aChanges = [];
+    var aChanges = [], aChanges2 = [];
     for (var PointIndex = StartPoint; PointIndex <= LastPoint; PointIndex++)
     {
         var Point = AscCommon.History.Points[PointIndex];
@@ -92,6 +99,12 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
             var Item = Point.Items[Index];
             var oChanges = new AscCommon.CCollaborativeChanges();
             oChanges.Set_FromUndoRedo(Item.Class, Item.Data, Item.Binary);
+
+			if (Item.Data.IsChangesClass && Item.Data.IsChangesClass())
+				aChanges2.push(Item.Data);
+			else
+				aChanges2.push(oChanges.m_pDatay);
+
             aChanges.push(oChanges.m_pData);
         }
     }
@@ -110,12 +123,17 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
     this.m_aNeedUnlock.length = 0;
     this.m_aNeedUnlock2.length = 0;
 
-    var deleteIndex = ( null === AscCommon.History.SavedIndex ? null : SumIndex );
-    if (0 < aChanges.length || null !== deleteIndex) {
-        editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo);
-        AscCommon.History.CanNotAddChanges = true;
-    } else
-        editor.CoAuthoringApi.unLockDocument(true);
+	var deleteIndex = ( null === AscCommon.History.SavedIndex ? null : SumIndex );
+	if (0 < aChanges.length || null !== deleteIndex)
+	{
+		this.private_OnSendOwnChanges(aChanges2, deleteIndex);
+		editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo);
+		AscCommon.History.CanNotAddChanges = true;
+	}
+	else
+	{
+		editor.CoAuthoringApi.unLockDocument(true);
+	}
 
     if (-1 === this.m_nUseType)
     {
@@ -186,8 +204,8 @@ CWordCollaborativeEditing.prototype.OnEnd_Load_Objects = function()
     // Данная функция вызывается, когда загрузились внешние объекты (картинки и шрифты)
 
     // Снимаем лок
-    AscCommon.CollaborativeEditing.m_bGlobalLock = false;
-    AscCommon.CollaborativeEditing.m_bGlobalLockSelection = false;
+    AscCommon.CollaborativeEditing.Set_GlobalLock(false);
+    AscCommon.CollaborativeEditing.Set_GlobalLockSelection(false);
 
     // Запускаем полный пересчет документа
     var LogicDocument = editor.WordControl.m_oLogicDocument;
@@ -249,7 +267,9 @@ CWordCollaborativeEditing.prototype.OnEnd_CheckLock = function(DontLockInFastMod
 
         // Ставим глобальный лок, только во время совместного редактирования
         if (-1 === this.m_nUseType)
-            this.m_bGlobalLock = true;
+		{
+			this.Set_GlobalLock(true);
+		}
         else
         {
             // Пробегаемся по массиву и проставляем, что залочено нами
@@ -280,7 +300,7 @@ CWordCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
     var oThis   = AscCommon.CollaborativeEditing;
     var oEditor = editor;
 
-    if (true === oThis.m_bGlobalLock)
+    if (true === oThis.Get_GlobalLock())
     {
         // Здесь проверяем есть ли длинная операция, если она есть, то до ее окончания нельзя делать
         // Undo, иначе точка истории уберется, а изменения допишутся в предыдущую.
@@ -288,7 +308,7 @@ CWordCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
             return;
 
         // Снимаем глобальный лок
-        oThis.m_bGlobalLock = false;
+        oThis.Set_GlobalLock(false);
 
         if (result["lock"])
         {
@@ -576,6 +596,306 @@ CWordCollaborativeEditing.prototype.Update_ForeignCursorLabelPosition = function
 
     var Api = this.m_oLogicDocument.Get_Api();
     Api.sync_ShowForeignCursorLabel(UserId, X, Y, Color);
+};
+//----------------------------------------------------------------------------------------------------------------------
+//
+//----------------------------------------------------------------------------------------------------------------------
+CWordCollaborativeEditing.prototype.private_ClearChanges = function()
+{
+	this.m_aChanges = [];
+};
+CWordCollaborativeEditing.prototype.private_CollectOwnChanges = function()
+{
+	var StartPoint = ( null === AscCommon.History.SavedIndex ? 0 : AscCommon.History.SavedIndex + 1 );
+	var LastPoint  = -1;
+
+	if (this.m_nUseType <= 0)
+		LastPoint = AscCommon.History.Points.length - 1;
+	else
+		LastPoint = AscCommon.History.Index;
+
+	for (var PointIndex = StartPoint; PointIndex <= LastPoint; PointIndex++)
+	{
+		var Point = AscCommon.History.Points[PointIndex];
+		for (var Index = 0; Index < Point.Items.length; Index++)
+		{
+			var Item = Point.Items[Index];
+			if (Item.Data.IsChangesClass && Item.Data.IsChangesClass())
+				this.m_oOwnChanges.push(Item.Data);
+		}
+	}
+};
+CWordCollaborativeEditing.prototype.private_AddOverallChange = function(oChange)
+{
+	// Здесь мы должны смержить пришедшее изменение с одним из наших изменений
+	for (var nIndex = 0, nCount = this.m_oOwnChanges.length; nIndex < nCount; ++nIndex)
+	{
+		if (oChange && oChange.Merge && false === oChange.Merge(this.m_oOwnChanges[nIndex]))
+			return false;
+	}
+
+	this.m_aAllChanges.push(oChange);
+	return true;
+};
+CWordCollaborativeEditing.prototype.private_OnSendOwnChanges = function(arrChanges, nDeleteIndex)
+{
+	if (null !== nDeleteIndex)
+	{
+		this.m_aAllChanges.length = this.m_nAllChangesSavedIndex + nDeleteIndex;
+	}
+	else
+	{
+		this.m_nAllChangesSavedIndex = this.m_aAllChanges.length;
+	}
+
+	// TODO: Пока мы делаем это как одну точку, которую надо откатить. Надо пробежаться по массиву и разбить его
+	//       по отдельным действиям. В принципе, данная схема срабатывает в быстром совместном редактировании,
+	//       так что как правило две точки не успевают попасть в одно сохранение.
+	if (arrChanges.length > 0)
+	{
+		this.m_aOwnChangesIndexes.push({
+			Position : this.m_aAllChanges.length,
+			Count    : arrChanges.length
+		});
+
+		this.m_aAllChanges = this.m_aAllChanges.concat(arrChanges);
+	}
+};
+CWordCollaborativeEditing.prototype.Undo = function()
+{
+	if (true === this.Get_GlobalLock())
+		return;
+
+	if (this.m_aOwnChangesIndexes.length <= 0)
+		return false;
+
+	// Формируем новую пачку действий, которые будут откатывать нужные нам действия.
+
+	// На первом шаге мы заданнуюю пачку изменений коммутируем с последними измениями. Смотрим на то какой набор
+	// изменений у нас получается.
+	// Объектная модель у нас простая: класс, в котором возможно есть массив элементов(тоже классов), у которого воможно
+	// есть набор свойств. Поэтому у нас ровно 2 типа изменений: изменения внутри массива элементов, либо изменения
+	// свойств. Изменения этих двух типов коммутируют между собой, изменения разных классов тоже коммутируют.
+	var arrChanges    = [];
+	var oIndexes      = this.m_aOwnChangesIndexes[this.m_aOwnChangesIndexes.length - 1];
+	var nPosition     = oIndexes.Position;
+	var nCount        = oIndexes.Count;
+	var nOverallCount = this.m_aAllChanges.length;
+
+	var oContentChangesMap = {
+
+	};
+
+	for (var nIndex = nCount - 1; nIndex >= 0; --nIndex)
+	{
+		var oChange = this.m_aAllChanges[nPosition + nIndex];
+		if (!oChange || !oChange.IsChangesClass || !oChange.IsChangesClass())
+			continue;
+
+		var oClass = oChange.GetClass();
+		if (oChange.IsContentChange())
+		{
+			var _oChange = oChange.Copy();
+
+			if (this.private_CommutateContentChanges(oContentChangesMap, oClass, _oChange, nPosition + nCount))
+				arrChanges.splice(0, 0, _oChange);
+		}
+		else
+		{
+			var _oChange = oChange; // TODO: Тут надо бы сделать копирование
+
+			if (this.private_CommutatePropertyChanges(oClass, _oChange, nPosition + nCount))
+				arrChanges.splice(0, 0, _oChange);
+		}
+	}
+
+	// Удаляем запись о последнем изменении
+	this.m_aOwnChangesIndexes.length = this.m_aOwnChangesIndexes.length - 1;
+
+	var arrReverseChanges = [];
+	for (var nIndex = 0, nCount = arrChanges.length; nIndex < nCount; ++nIndex)
+	{
+		var oReverseChange = arrChanges[nIndex].CreateReverseChange();
+		if (oReverseChange)
+			arrReverseChanges.splice(0, 0, oReverseChange);
+	}
+
+	// Накатываем изменения в данном клиенте
+	var oLogicDocument = this.m_oLogicDocument;
+
+	oLogicDocument.DrawingDocument.EndTrackTable(null, true);
+	oLogicDocument.DrawingObjects.TurnOffCheckChartSelection();
+
+	var DocState = this.private_SaveDocumentState();
+
+	for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
+	{
+		arrReverseChanges[nIndex].Load();
+		this.m_aAllChanges.push(arrReverseChanges[nIndex]);
+	}
+
+	var oBinaryWriter = AscCommon.History.BinaryWriter;
+	var aSendingChanges = [];
+	for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
+	{
+		var oReverseChange = arrReverseChanges[nIndex];
+		var oChangeClass   = oReverseChange.GetClass();
+
+		var nBinaryPos = oBinaryWriter.GetCurPosition();
+		oBinaryWriter.WriteString2(oChangeClass.Get_Id());
+		oBinaryWriter.WriteLong(oReverseChange.Type);
+		oReverseChange.WriteToBinary(oBinaryWriter);
+
+		var nBinaryLen = oBinaryWriter.GetCurPosition() - nBinaryPos;
+
+		var oChange = new AscCommon.CCollaborativeChanges();
+		oChange.Set_FromUndoRedo(oChangeClass, oReverseChange, {Pos : nBinaryPos, Len : nBinaryLen});
+		aSendingChanges.push(oChange.m_pData);
+	}
+	editor.CoAuthoringApi.saveChanges(aSendingChanges, null, null);
+
+	this.private_RestoreDocumentState(DocState);
+
+	oLogicDocument.DrawingObjects.TurnOnCheckChartSelection();
+	oLogicDocument.Recalculate(false, false, AscCommon.History.Get_RecalcData(null, arrReverseChanges));
+
+	oLogicDocument.Document_UpdateSelectionState();
+	oLogicDocument.Document_UpdateInterfaceState();
+	oLogicDocument.Document_UpdateRulersState();
+};
+CWordCollaborativeEditing.prototype.CanUndo = function()
+{
+	return this.m_aOwnChangesIndexes.length <= 0 ? false : true;
+};
+CWordCollaborativeEditing.prototype.private_CommutateContentChanges = function(oMap, oClass, oChange, nStartPosition)
+{
+	var arrOtherActions = [];
+
+	if (oMap[oClass.Get_Id()])
+	{
+		arrOtherActions = oMap[oClass.Get_Id()];
+	}
+	else
+	{
+		for (var nIndex = nStartPosition, nOverallCount = this.m_aAllChanges.length; nIndex < nOverallCount; ++nIndex)
+		{
+			var oTempChange = this.m_aAllChanges[nIndex];
+			if (!oTempChange || !oTempChange.IsChangesClass || !oTempChange.IsChangesClass())
+				continue;
+
+			if (oChange.IsRelated(oTempChange))
+			{
+				arrOtherActions.push(oTempChange.ConvertToSimpleActions());
+			}
+		}
+
+		oMap[oClass.Get_Id()] = arrOtherActions;
+	}
+
+	var arrActions = oChange.ConvertToSimpleActions();
+
+	var arrCommutateActions = [];
+	for (var nActionIndex = arrActions.length - 1; nActionIndex >= 0; --nActionIndex)
+	{
+		var oAction = arrActions[nActionIndex];
+		var oResult = oAction;
+
+		for (var nIndex = 0, nOtherActionsCount = arrOtherActions.length; nIndex < nOtherActionsCount; ++nIndex)
+		{
+			var arrOActions = arrOtherActions[nIndex];
+			for (var nIndex2 = 0, nOtherActionsCount2 = arrOActions.length; nIndex2 < nOtherActionsCount2; ++nIndex2)
+			{
+				var oOtherAction = arrOActions[nIndex2];
+
+				if (false === this.private_Commutate(oAction, oOtherAction))
+				{
+					arrOActions.splice(nIndex2, 1);
+					oResult = null;
+					break;
+				}
+			}
+
+			if (null === oResult)
+				break;
+		}
+
+		if (null !== oResult)
+			arrCommutateActions.push(oResult);
+	}
+
+	if (arrCommutateActions.length > 0)
+		oChange.ConvertFromSimpleActions(arrCommutateActions);
+	else
+		return false;
+
+	return true;
+};
+CWordCollaborativeEditing.prototype.private_Commutate = function(oActionL, oActionR)
+{
+	if (oActionL.Add)
+	{
+		if (oActionR.Add)
+		{
+			if (oActionL.Pos >= oActionR.Pos)
+				oActionL.Pos++;
+			else
+				oActionR.Pos--;
+		}
+		else
+		{
+			if (oActionL.Pos > oActionR.Pos)
+				oActionL.Pos--;
+			else if (oActionL.Pos === oActionR.Pos)
+				return false;
+			else
+				oActionR.Pos--;
+		}
+	}
+	else
+	{
+		if (oActionR.Add)
+		{
+			if (oActionL.Pos >= oActionR.Pos)
+				oActionL.Pos++;
+			else
+				oActionR.Pos++;
+		}
+		else
+		{
+			if (oActionL.Pos > oActionR.Pos)
+				oActionL.Pos--;
+			else
+				oActionR.Pos++;
+		}
+	}
+
+	return true;
+};
+CWordCollaborativeEditing.prototype.private_CommutatePropertyChanges = function(oClass, oChange, nStartPosition)
+{
+	// В GoogleDocs если 2 пользователя исправляют одно и тоже свойство у одного и того же класса, тогда Undo работает
+	// у обоих. Например, первый выставляет параграф по центру (изначально по левому), второй после этого по правому
+	// краю. Тогда на Undo первого пользователя возвращает параграф по левому краю, а у второго по центру, неважно в
+	// какой последовательности они вызывают Undo.
+	// Далем как у них: т.е. изменения свойств мы всегда откатываем, даже если данное свойсво менялось в последующих
+	// изменениях.
+
+	// Здесь вариант: свойство не откатываем, если оно менялось в одном из последующих действий. (для работы этого
+	// варианта нужно реализовать функцию IsRelated у всех изменений).
+
+	// // Значит это изменение свойства. Пробегаемся по всем следующим изменениям и смотрим, менялось ли такое
+	// // свойство у данного класса, если да, тогда данное изменение невозможно скоммутировать.
+	// for (var nIndex = nStartPosition, nOverallCount = this.m_aAllChanges.length; nIndex < nOverallCount; ++nIndex)
+	// {
+	// 	var oTempChange = this.m_aAllChanges[nIndex];
+	// 	if (!oTempChange || !oTempChange.IsChangesClass || !oTempChangeIsChangesClass())
+	// 		continue;
+	//
+	// 	if (oChange.IsRelated(oTempChange))
+	// 		return false;
+	// }
+
+	return true;
 };
 
 //--------------------------------------------------------export----------------------------------------------------

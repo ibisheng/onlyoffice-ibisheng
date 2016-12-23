@@ -1034,7 +1034,7 @@ ParaRun.prototype.private_UpdateCompositeInputPositionsOnRemove = function(Pos, 
 // Добавляем элемент в позицию с сохранием в историю
 ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 {
-    History.Add( this, { Type : AscDFH.historyitem_ParaRun_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
+	History.Add(new CChangesRunAddItem(this, Pos, [Item], true));
     this.Content.splice( Pos, 0, Item );
 
     if (true === UpdatePosition)
@@ -1090,7 +1090,7 @@ ParaRun.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
 {
     // Получим массив удаляемых элементов
     var DeletedItems = this.Content.slice( Pos, Pos + Count );
-    History.Add( this, { Type : AscDFH.historyitem_Paragraph_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+	History.Add(new CChangesRunRemoveItem(this, Pos, DeletedItems));
 
     this.Content.splice( Pos, Count );
 
@@ -1154,7 +1154,7 @@ ParaRun.prototype.Concat_ToContent = function(NewItems)
     var StartPos = this.Content.length;
     this.Content = this.Content.concat( NewItems );
 
-    History.Add( this, { Type : AscDFH.historyitem_ParaRun_AddItem, Pos : StartPos, EndPos : this.Content.length - 1, Items : NewItems, Color : false } );
+    History.Add(new CChangesRunAddItem(this, StartPos, NewItems, false));
 
     this.private_UpdateTrackRevisionOnChangeContent(true);
 
@@ -1597,7 +1597,7 @@ ParaRun.prototype.Split = function (ContentPos, Depth)
 
 ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
 {
-    History.Add(this, {Type : AscDFH.historyitem_ParaRun_OnStartSplit, Pos : CurPos});
+    History.Add(new CChangesRunOnStartSplit(this, CurPos));
     AscCommon.CollaborativeEditing.OnStart_SplitRun(this, CurPos);
 
     // Если задается Parent и ParentPos, тогда ран автоматически добавляется в родительский класс
@@ -1735,7 +1735,7 @@ ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
         }
     }
 
-    History.Add(this, {Type : AscDFH.historyitem_ParaRun_OnEndSplit, NewRun : NewRun});
+    History.Add(new CChangesRunOnEndSplit(this, NewRun));
     AscCommon.CollaborativeEditing.OnEnd_SplitRun(NewRun);
     return NewRun;
 };
@@ -6185,7 +6185,7 @@ ParaRun.prototype.Set_Pr = function(TextPr)
     var OldValue = this.Pr;
     this.Pr = TextPr;
 
-    History.Add( this, { Type : AscDFH.historyitem_ParaRun_TextPr, New : TextPr, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+	History.Add(new CChangesRunTextPr(this, OldValue, TextPr, this.private_IsCollPrChangeMine()));
     this.Recalc_CompiledPr(true);
 
     this.protected_UpdateSpellChecking();
@@ -6453,7 +6453,7 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 
 ParaRun.prototype.Split_Run = function(Pos)
 {
-    History.Add(this, {Type : AscDFH.historyitem_ParaRun_OnStartSplit, Pos : Pos});
+    History.Add(new CChangesRunOnStartSplit(this, Pos));
     AscCommon.CollaborativeEditing.OnStart_SplitRun(this, Pos);
 
     // Создаем новый ран
@@ -6535,7 +6535,7 @@ ParaRun.prototype.Split_Run = function(Pos)
         }
     }
 
-    History.Add(this, {Type : AscDFH.historyitem_ParaRun_OnEndSplit, NewRun : NewRun});
+    History.Add(new CChangesRunOnEndSplit(this, NewRun));
     AscCommon.CollaborativeEditing.OnEnd_SplitRun(NewRun);
     return NewRun;
 };
@@ -6750,26 +6750,50 @@ ParaRun.prototype.Add_PrChange = function()
     if (false === this.Have_PrChange())
     {
         this.Pr.Add_PrChange();
-        History.Add(this, {Type : AscDFH.historyitem_ParaRun_PrChange, New : {PrChange : this.Pr.PrChange, ReviewInfo : this.Pr.ReviewInfo}, Old : {PrChange : undefined, ReviewInfo : undefined}});
-        this.private_UpdateTrackRevisions();
+		History.Add(new CChangesRunPrChange(this,
+			{
+				PrChange   : undefined,
+				ReviewInfo : undefined
+			},
+			{
+				PrChange   : this.Pr.PrChange,
+				ReviewInfo : this.Pr.ReviewInfo
+			}));
+		this.private_UpdateTrackRevisions();
     }
 };
 
 ParaRun.prototype.Set_PrChange = function(PrChange, ReviewInfo)
 {
-    History.Add(this, {Type : AscDFH.historyitem_ParaRun_PrChange, New : {PrChange : PrChange, ReviewInfo : ReviewInfo ? ReviewInfo.Copy() : undefined}, Old : {PrChange : this.Pr.PrChange, ReviewInfo : this.Pr.ReviewInfo ? this.Pr.ReviewInfo.Copy() : undefined}});
-    this.Pr.Set_PrChange(PrChange, ReviewInfo);
+	History.Add(new CChangesRunPrChange(this,
+		{
+			PrChange   : this.Pr.PrChange,
+			ReviewInfo : this.Pr.ReviewInfo ? this.Pr.ReviewInfo.Copy() : undefined
+		},
+		{
+			PrChange   : PrChange,
+			ReviewInfo : ReviewInfo ? ReviewInfo.Copy() : undefined
+		}));
+	this.Pr.Set_PrChange(PrChange, ReviewInfo);
     this.private_UpdateTrackRevisions();
 };
 
 ParaRun.prototype.Remove_PrChange = function()
 {
-    if (true === this.Have_PrChange())
-    {
-        History.Add(this, {Type : AscDFH.historyitem_ParaRun_PrChange, New : {PrChange : undefined, ReviewInfo : undefined}, Old : {PrChange : this.Pr.PrChange, ReviewInfo : this.Pr.ReviewInfo}});
-        this.Pr.Remove_PrChange();
-        this.private_UpdateTrackRevisions();
-    }
+	if (true === this.Have_PrChange())
+	{
+		History.Add(new CChangesRunPrChange(this,
+			{
+				PrChange   : this.Pr.PrChange,
+				ReviewInfo : this.Pr.ReviewInfo
+			},
+			{
+				PrChange   : undefined,
+				ReviewInfo : undefined
+			}));
+		this.Pr.Remove_PrChange();
+		this.private_UpdateTrackRevisions();
+	}
 };
 
 ParaRun.prototype.Reject_PrChange = function()
@@ -6798,7 +6822,7 @@ ParaRun.prototype.Set_Bold = function(Value)
         var OldValue = this.Pr.Bold;
         this.Pr.Bold = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Bold, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunBold(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6817,7 +6841,7 @@ ParaRun.prototype.Set_Italic = function(Value)
         var OldValue = this.Pr.Italic;
         this.Pr.Italic = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Italic, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunItalic(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6836,7 +6860,7 @@ ParaRun.prototype.Set_Strikeout = function(Value)
         var OldValue = this.Pr.Strikeout;
         this.Pr.Strikeout = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Strikeout, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunStrikeout(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6855,7 +6879,7 @@ ParaRun.prototype.Set_Underline = function(Value)
         var OldValue = this.Pr.Underline;
         this.Pr.Underline = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Underline, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunUnderline(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6874,7 +6898,7 @@ ParaRun.prototype.Set_FontSize = function(Value)
         var OldValue = this.Pr.FontSize;
         this.Pr.FontSize = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_FontSize, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunFontSize(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6893,7 +6917,7 @@ ParaRun.prototype.Set_Color = function(Value)
         var OldValue = this.Pr.Color;
         this.Pr.Color = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Color, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunColor(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6907,7 +6931,7 @@ ParaRun.prototype.Set_Unifill = function(Value, bForce)
         var OldValue = this.Pr.Unifill;
         this.Pr.Unifill = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Unifill, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunUnifill(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6920,7 +6944,7 @@ ParaRun.prototype.Set_TextFill = function(Value, bForce)
         var OldValue = this.Pr.TextFill;
         this.Pr.TextFill = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_TextFill, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunTextFill(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6934,7 +6958,7 @@ ParaRun.prototype.Set_TextOutline = function(Value)
         var OldValue = this.Pr.TextOutline;
         this.Pr.TextOutline = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_TextOutline, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunTextOutline(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6953,7 +6977,7 @@ ParaRun.prototype.Set_VertAlign = function(Value)
         var OldValue = this.Pr.VertAlign;
         this.Pr.VertAlign = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_VertAlign, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunVertAlign(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6971,7 +6995,7 @@ ParaRun.prototype.Set_HighLight = function(Value)
     if ( (undefined === Value && undefined !== OldValue) || ( highlight_None === Value && highlight_None !== OldValue ) || ( Value instanceof CDocumentColor && ( undefined === OldValue || highlight_None === OldValue || false === Value.Compare(OldValue) ) ) )
     {
         this.Pr.HighLight = Value;
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_HighLight, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunHighLight(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -6990,7 +7014,7 @@ ParaRun.prototype.Set_RStyle = function(Value)
         var OldValue = this.Pr.RStyle;
         this.Pr.RStyle = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_RStyle, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunRStyle(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -7008,7 +7032,7 @@ ParaRun.prototype.Set_Spacing = function(Value)
         var OldValue = this.Pr.Spacing;
         this.Pr.Spacing = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Spacing, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunSpacing(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -7027,7 +7051,7 @@ ParaRun.prototype.Set_DStrikeout = function(Value)
         var OldValue = this.Pr.DStrikeout;
         this.Pr.DStrikeout = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_DStrikeout, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunDStrikeout(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -7046,7 +7070,7 @@ ParaRun.prototype.Set_Caps = function(Value)
         var OldValue = this.Pr.Caps;
         this.Pr.Caps = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Caps, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunCaps(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7064,7 +7088,7 @@ ParaRun.prototype.Set_SmallCaps = function(Value)
         var OldValue = this.Pr.SmallCaps;
         this.Pr.SmallCaps = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_SmallCaps, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunSmallCaps(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7082,7 +7106,7 @@ ParaRun.prototype.Set_Position = function(Value)
         var OldValue = this.Pr.Position;
         this.Pr.Position = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Position, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunPosition(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
 
@@ -7100,7 +7124,7 @@ ParaRun.prototype.Set_RFonts = function(Value)
     var OldValue = this.Pr.RFonts;
     this.Pr.RFonts = Value;
 
-    History.Add( this, { Type : AscDFH.historyitem_ParaRun_RFonts, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+    History.Add(new CChangesRunRFonts(this, OldValue, Value, this.private_IsCollPrChangeMine()));
 
     this.Recalc_CompiledPr(true);
     this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -7153,7 +7177,7 @@ ParaRun.prototype.Set_RFonts_Ascii = function(Value)
         var OldValue = this.Pr.RFonts.Ascii;
         this.Pr.RFonts.Ascii = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_RFonts_Ascii, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunRFontsAscii(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7166,7 +7190,7 @@ ParaRun.prototype.Set_RFonts_HAnsi = function(Value)
         var OldValue = this.Pr.RFonts.HAnsi;
         this.Pr.RFonts.HAnsi = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_RFonts_HAnsi, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunRFontsHAnsi(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7179,7 +7203,7 @@ ParaRun.prototype.Set_RFonts_CS = function(Value)
         var OldValue = this.Pr.RFonts.CS;
         this.Pr.RFonts.CS = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_RFonts_CS, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunRFontsCS(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7192,7 +7216,7 @@ ParaRun.prototype.Set_RFonts_EastAsia = function(Value)
         var OldValue = this.Pr.RFonts.EastAsia;
         this.Pr.RFonts.EastAsia = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_RFonts_EastAsia, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunRFontsEastAsia(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7205,7 +7229,7 @@ ParaRun.prototype.Set_RFonts_Hint = function(Value)
         var OldValue = this.Pr.RFonts.Hint;
         this.Pr.RFonts.Hint = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_RFonts_Hint, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunRFontsHint(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7219,7 +7243,7 @@ ParaRun.prototype.Set_Lang = function(Value)
     if ( undefined != Value )
         this.Pr.Lang.Set_FromObject( Value );
 
-    History.Add( this, { Type : AscDFH.historyitem_ParaRun_Lang, New : this.Pr.Lang, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+    History.Add(new CChangesRunLang(this, OldValue, this.Pr.Lang, this.private_IsCollPrChangeMine()));
     this.Recalc_CompiledPr(false);
     this.private_UpdateTrackRevisionOnChangeTextPr(true);
 };
@@ -7248,7 +7272,7 @@ ParaRun.prototype.Set_Lang_Bidi = function(Value)
         var OldValue = this.Pr.Lang.Bidi;
         this.Pr.Lang.Bidi = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Lang_Bidi, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+		History.Add(new CChangesRunLangBidi(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7261,7 +7285,7 @@ ParaRun.prototype.Set_Lang_EastAsia = function(Value)
         var OldValue = this.Pr.Lang.EastAsia;
         this.Pr.Lang.EastAsia = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Lang_EastAsia, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunLangEastAsia(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7274,7 +7298,7 @@ ParaRun.prototype.Set_Lang_Val = function(Value)
         var OldValue = this.Pr.Lang.Val;
         this.Pr.Lang.Val = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_Lang_Val, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+        History.Add(new CChangesRunLangVal(this, OldValue, Value, this.private_IsCollPrChangeMine()));
         this.Recalc_CompiledPr(false);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
@@ -7295,7 +7319,7 @@ ParaRun.prototype.Set_Shd = function(Shd)
     else
         this.Pr.Shd = undefined;
 
-    History.Add( this, { Type : AscDFH.historyitem_ParaRun_Shd, New : this.Pr.Shd, Old : OldShd, Color : this.private_IsCollPrChangeMine() } );
+    History.Add(new CChangesRunShd(this, OldShd, this.Pr.Shd, this.private_IsCollPrChangeMine()));
     this.Recalc_CompiledPr(false);
     this.private_UpdateTrackRevisionOnChangeTextPr(true);
 };
@@ -7303,893 +7327,6 @@ ParaRun.prototype.Set_Shd = function(Shd)
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-ParaRun.prototype.Undo = function(Data)
-{
-    var Type = Data.Type;
-
-    switch ( Type )
-    {
-        case AscDFH.historyitem_ParaRun_AddItem :
-        {
-            this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
-
-            this.RecalcInfo.Measure = true;
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeContent(false);
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RemoveItem :
-        {
-            var Pos = Data.Pos;
-
-            var Array_start = this.Content.slice( 0, Pos );
-            var Array_end   = this.Content.slice( Pos );
-
-            this.Content = Array_start.concat( Data.Items, Array_end );
-
-            this.RecalcInfo.Measure = true;
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeContent(false);
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_TextPr:
-        {
-            if ( undefined != Data.Old )
-                this.Pr = Data.Old;
-            else
-                this.Pr = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Bold:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.Bold = Data.Old;
-            else
-                this.Pr.Bold = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Italic:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.Italic = Data.Old;
-            else
-                this.Pr.Italic = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Strikeout:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.Strikeout = Data.Old;
-            else
-                this.Pr.Strikeout = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Underline:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.Underline = Data.Old;
-            else
-                this.Pr.Underline = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_FontSize:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.FontSize = Data.Old;
-            else
-                this.Pr.FontSize = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Color:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.Color = Data.Old;
-            else
-                this.Pr.Color = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_Unifill:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.Unifill = Data.Old;
-            else
-                this.Pr.Unifill = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_TextFill:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.TextFill = Data.Old;
-            else
-                this.Pr.TextFill = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_TextOutline:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.TextOutline = Data.Old;
-            else
-                this.Pr.TextOutline = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_VertAlign:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.VertAlign = Data.Old;
-            else
-                this.Pr.VertAlign = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_HighLight:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.HighLight = Data.Old;
-            else
-                this.Pr.HighLight = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RStyle:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.RStyle = Data.Old;
-            else
-                this.Pr.RStyle = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Spacing:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.Spacing = Data.Old;
-            else
-                this.Pr.Spacing = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_DStrikeout:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.DStrikeout = Data.Old;
-            else
-                this.Pr.DStrikeout = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_Caps:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.Caps = Data.Old;
-            else
-                this.Pr.Caps = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_SmallCaps:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.SmallCaps = Data.Old;
-            else
-                this.Pr.SmallCaps = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Position:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.Position = Data.Old;
-            else
-                this.Pr.Position = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.RFonts = Data.Old;
-            else
-                this.Pr.RFonts = new CRFonts();
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts_Ascii:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.RFonts.Ascii = Data.Old;
-            else
-                this.Pr.RFonts.Ascii = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts_HAnsi:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.RFonts.HAnsi = Data.Old;
-            else
-                this.Pr.RFonts.HAnsi = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts_CS:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.RFonts.CS = Data.Old;
-            else
-                this.Pr.RFonts.CS = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts_EastAsia:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.RFonts.EastAsia = Data.Old;
-            else
-                this.Pr.RFonts.EastAsia = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts_Hint:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.RFonts.Hint = Data.Old;
-            else
-                this.Pr.RFonts.Hint = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Lang:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.Lang = Data.Old;
-            else
-                this.Pr.Lang = new CLang();
-
-            this.Recalc_CompiledPr(false);
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Lang_Bidi:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.Lang.Bidi = Data.Old;
-            else
-                this.Pr.Lang.Bidi = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Lang_EastAsia:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.Lang.EastAsia = Data.Old;
-            else
-                this.Pr.Lang.EastAsia = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Lang_Val:
-        {
-            if ( undefined != Data.Old )
-                this.Pr.Lang.Val = Data.Old;
-            else
-                this.Pr.Lang.Val = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Shd:
-        {
-            this.Pr.Shd = Data.Old;
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_MathStyle:
-        {
-            this.MathPrp.sty = Data.Old;
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_MathPrp:
-        {
-            this.MathPrp = Data.Old;
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_ReviewType:
-        {
-            this.ReviewType = Data.Old.ReviewType;
-            this.ReviewInfo = Data.Old.ReviewInfo;
-            this.private_UpdateTrackRevisions();
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_PrChange:
-        {
-            this.Pr.PrChange   = Data.Old.PrChange;
-            this.Pr.ReviewInfo = Data.Old.ReviewInfo;
-            this.private_UpdateTrackRevisions();
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_ContentReviewInfo:
-        {
-            this.ReviewInfo = Data.Old;
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_PrReviewInfo:
-        {
-            this.Pr.ReviewInfo = Data.Old;
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_MathAlnAt:
-        {
-            this.MathPrp.Apply_AlnAt(Data.Old);
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_MathForcedBreak:
-        {
-            if(Data.bInsert)
-            {
-                this.MathPrp.Delete_ForcedBreak();
-            }
-            else
-            {
-                this.MathPrp.Insert_ForcedBreak(Data.alnAt);
-            }
-
-            break;
-        }
-    }
-};
-
-ParaRun.prototype.Redo = function(Data)
-{
-    var Type = Data.Type;
-
-    switch ( Type )
-    {
-        case  AscDFH.historyitem_ParaRun_AddItem:
-        {
-            var Pos = Data.Pos;
-
-            var Array_start = this.Content.slice( 0, Pos );
-            var Array_end   = this.Content.slice( Pos );
-
-            this.Content = Array_start.concat( Data.Items, Array_end );
-
-            this.RecalcInfo.Measure = true;
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeContent(false);
-            break;
-
-        }
-
-        case AscDFH.historyitem_ParaRun_RemoveItem:
-        {
-            this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
-
-            this.RecalcInfo.Measure = true;
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeContent(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_TextPr:
-        {
-            if ( undefined != Data.New )
-                this.Pr = Data.New;
-            else
-                this.Pr = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Bold:
-        {
-            if ( undefined != Data.New )
-                this.Pr.Bold = Data.New;
-            else
-                this.Pr.Bold = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Italic:
-        {
-            if ( undefined != Data.New )
-                this.Pr.Italic = Data.New;
-            else
-                this.Pr.Italic = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Strikeout:
-        {
-            if ( undefined != Data.New )
-                this.Pr.Strikeout = Data.New;
-            else
-                this.Pr.Strikeout = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Underline:
-        {
-            if ( undefined != Data.New )
-                this.Pr.Underline = Data.New;
-            else
-                this.Pr.Underline = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_FontSize:
-        {
-            if ( undefined != Data.New )
-                this.Pr.FontSize = Data.New;
-            else
-                this.Pr.FontSize = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Color:
-        {
-            if ( undefined != Data.New )
-                this.Pr.Color = Data.New;
-            else
-                this.Pr.Color = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_Unifill:
-        {
-            if ( undefined != Data.New )
-                this.Pr.Unifill = Data.New;
-            else
-                this.Pr.Unifill = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_TextFill:
-        {
-            if ( undefined != Data.New )
-                this.Pr.TextFill = Data.New;
-            else
-                this.Pr.TextFill = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_TextOutline:
-        {
-            if ( undefined != Data.New )
-                this.Pr.TextOutline = Data.New;
-            else
-                this.Pr.TextOutline = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-
-        case AscDFH.historyitem_ParaRun_VertAlign:
-        {
-            if ( undefined != Data.New )
-                this.Pr.VertAlign = Data.New;
-            else
-                this.Pr.VertAlign = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_HighLight:
-        {
-            if ( undefined != Data.New )
-                this.Pr.HighLight = Data.New;
-            else
-                this.Pr.HighLight = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RStyle:
-        {
-            if ( undefined != Data.New )
-                this.Pr.RStyle = Data.New;
-            else
-                this.Pr.RStyle = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Spacing:
-        {
-            if ( undefined != Data.New )
-                this.Pr.Spacing = Data.New;
-            else
-                this.Pr.Spacing = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_DStrikeout:
-        {
-            if ( undefined != Data.New )
-                this.Pr.DStrikeout = Data.New;
-            else
-                this.Pr.DStrikeout = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_Caps:
-        {
-            if ( undefined != Data.New )
-                this.Pr.Caps = Data.New;
-            else
-                this.Pr.Caps = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_SmallCaps:
-        {
-            if ( undefined != Data.New )
-                this.Pr.SmallCaps = Data.New;
-            else
-                this.Pr.SmallCaps = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Position:
-        {
-            if ( undefined != Data.New )
-                this.Pr.Position = Data.New;
-            else
-                this.Pr.Position = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts:
-        {
-            if ( undefined != Data.New )
-                this.Pr.RFonts = Data.New;
-            else
-                this.Pr.RFonts = new CRFonts();
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts_Ascii:
-        {
-            if ( undefined != Data.New )
-                this.Pr.RFonts.Ascii = Data.New;
-            else
-                this.Pr.RFonts.Ascii = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts_HAnsi:
-        {
-            if ( undefined != Data.New )
-                this.Pr.RFonts.HAnsi = Data.New;
-            else
-                this.Pr.RFonts.HAnsi = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts_CS:
-        {
-            if ( undefined != Data.New )
-                this.Pr.RFonts.CS = Data.New;
-            else
-                this.Pr.RFonts.CS = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts_EastAsia:
-        {
-            if ( undefined != Data.New )
-                this.Pr.RFonts.EastAsia = Data.New;
-            else
-                this.Pr.RFonts.EastAsia = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts_Hint:
-        {
-            if ( undefined != Data.New )
-                this.Pr.RFonts.Hint = Data.New;
-            else
-                this.Pr.RFonts.Hint = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Lang:
-        {
-            if ( undefined != Data.New )
-                this.Pr.Lang = Data.New;
-            else
-                this.Pr.Lang = new CLang();
-
-            this.Recalc_CompiledPr(false);
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Lang_Bidi:
-        {
-            if ( undefined != Data.New )
-                this.Pr.Lang.Bidi = Data.New;
-            else
-                this.Pr.Lang.Bidi = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Lang_EastAsia:
-        {
-            if ( undefined != Data.New )
-                this.Pr.Lang.EastAsia = Data.New;
-            else
-                this.Pr.Lang.EastAsia = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Lang_Val:
-        {
-            if ( undefined != Data.New )
-                this.Pr.Lang.Val = Data.New;
-            else
-                this.Pr.Lang.Val = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Shd:
-        {
-            this.Pr.Shd = Data.New;
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_MathStyle:
-        {
-            this.MathPrp.sty = Data.New;
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_MathPrp:
-        {
-            this.MathPrp = Data.New;
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_ReviewType:
-        {
-            this.ReviewType = Data.New.ReviewType;
-            this.ReviewInfo = Data.New.ReviewInfo;
-            this.private_UpdateTrackRevisions();
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_PrChange:
-        {
-            this.Pr.PrChange   = Data.New.PrChange;
-            this.Pr.ReviewInfo = Data.New.ReviewInfo;
-            this.private_UpdateTrackRevisions();
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_ContentReviewInfo:
-        {
-            this.ReviewInfo = Data.New;
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_PrReviewInfo:
-        {
-            this.Pr.ReviewInfo = Data.New;
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_MathAlnAt:
-        {
-            this.MathPrp.Apply_AlnAt(Data.New);
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_MathForcedBreak:
-        {
-            if(Data.bInsert)
-            {
-                this.MathPrp.Insert_ForcedBreak(Data.alnAt);
-            }
-            else
-            {
-                this.MathPrp.Delete_ForcedBreak();
-            }
-
-            break;
-        }
-    }
-};
 ParaRun.prototype.Check_HistoryUninon = function(Data1, Data2)
 {
     var Type1 = Data1.Type;
@@ -8206,1366 +7343,6 @@ ParaRun.prototype.Check_HistoryUninon = function(Data1, Data2)
 //-----------------------------------------------------------------------------------
 // Функции для совместного редактирования
 //-----------------------------------------------------------------------------------
-ParaRun.prototype.Save_Changes = function(Data, Writer)
-{
-    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-    // Long : тип класса
-    // Long : тип изменений
-
-    Writer.WriteLong( AscDFH.historyitem_type_ParaRun );
-
-    var Type = Data.Type;
-
-    // Пишем тип
-    Writer.WriteLong( Type );
-
-    switch ( Type )
-    {
-        case AscDFH.historyitem_ParaRun_AddItem:
-        {
-            // Bool     : Подсвечивать ли данные изменения
-            // Long     : Количество элементов
-            // Array of :
-            //  {
-            //    Long     : Позиция
-            //    Variable : Элемент
-            //  }
-
-            var bArray = Data.UseArray;
-            var Count  = Data.Items.length;
-
-            if (false === Data.Color)
-                Writer.WriteBool(false);
-            else
-                Writer.WriteBool(true);
-
-            Writer.WriteLong( Count );
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                if ( true === bArray )
-                    Writer.WriteLong( Data.PosArray[Index] );
-                else
-                    Writer.WriteLong( Data.Pos + Index );
-
-                Data.Items[Index].Write_ToBinary(Writer);
-            }
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RemoveItem:
-        {
-            // Long          : Количество удаляемых элементов
-            // Array of Long : позиции удаляемых элементов
-
-            var bArray = Data.UseArray;
-            var Count  = Data.Items.length;
-
-            var StartPos = Writer.GetCurPosition();
-            Writer.Skip(4);
-            var RealCount = Count;
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                if ( true === bArray )
-                {
-                    if ( false === Data.PosArray[Index] )
-                    {
-                        RealCount--;
-                    }
-                    else
-                    {
-                        Writer.WriteLong(Data.PosArray[Index]);
-                    }
-                }
-                else
-                {
-                    Writer.WriteLong(Data.Pos);
-                }
-            }
-
-            var EndPos = Writer.GetCurPosition();
-            Writer.Seek( StartPos );
-            Writer.WriteLong( RealCount );
-            Writer.Seek( EndPos );
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_TextPr:
-        {
-            // Bool     : Подсвечивать ли данные изменения
-            // CTextPr
-            if (false === Data.Color)
-                Writer.WriteBool(false);
-            else
-                Writer.WriteBool(true);
-
-            this.Pr.Write_ToBinary( Writer );
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Bold:
-        case AscDFH.historyitem_ParaRun_Italic:
-        case AscDFH.historyitem_ParaRun_Strikeout:
-        case AscDFH.historyitem_ParaRun_Underline:
-        {
-            // Bool : Подсвечивать ли данные изменения
-            // Bool : IsUndefined
-            // Bool : Value
-
-            if (false === Data.Color)
-                Writer.WriteBool(false);
-            else
-                Writer.WriteBool(true);
-
-            if ( undefined != Data.New )
-            {
-                Writer.WriteBool( false );
-                Writer.WriteBool( Data.New );
-            }
-            else
-                Writer.WriteBool( true );
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_FontSize:
-        {
-            // Bool : Подсвечивать ли данные изменения
-            // Bool   : IsUndefined
-            // Double : FontSize
-
-            if (false === Data.Color)
-                Writer.WriteBool(false);
-            else
-                Writer.WriteBool(true);
-
-            if ( undefined != Data.New )
-            {
-                Writer.WriteBool(false);
-                Writer.WriteDouble( Data.New );
-            }
-            else
-                Writer.WriteBool(true);
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Color:
-        {
-            // Bool : Подсвечивать ли данные изменения
-            // Bool     : IsUndefined
-            // Variable : Color (CDocumentColor)
-
-            if (false === Data.Color)
-                Writer.WriteBool(false);
-            else
-                Writer.WriteBool(true);
-
-            if ( undefined != Data.New )
-            {
-                Writer.WriteBool(false);
-                Data.New.Write_ToBinary( Writer );
-            }
-            else
-                Writer.WriteBool(true);
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Unifill:
-        case AscDFH.historyitem_ParaRun_TextFill:
-        case AscDFH.historyitem_ParaRun_TextOutline:
-        {
-            if (false === Data.Color)
-                Writer.WriteBool(false);
-            else
-                Writer.WriteBool(true);
-
-            if ( undefined != Data.New )
-            {
-                Writer.WriteBool(false);
-                Data.New.Write_ToBinary( Writer );
-            }
-            else
-                Writer.WriteBool(true);
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_VertAlign:
-        {
-            // Bool  : IsUndefined
-            // Long  : VertAlign
-
-            if (false === Data.Color)
-                Writer.WriteBool(false);
-            else
-                Writer.WriteBool(true);
-
-            if ( undefined != Data.New )
-            {
-                Writer.WriteBool(false);
-                Writer.WriteLong(Data.New);
-            }
-            else
-                Writer.WriteBool(true);
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_HighLight:
-        {
-            // Bool  : IsUndefined
-            // Если false
-            //   Bool  : IsNone
-            //   Если false
-            //     Variable : Color (CDocumentColor)
-
-            if (false === Data.Color)
-                Writer.WriteBool(false);
-            else
-                Writer.WriteBool(true);
-
-            if ( undefined != Data.New )
-            {
-                Writer.WriteBool(false);
-                if ( highlight_None != Data.New )
-                {
-                    Writer.WriteBool( false );
-                    Data.New.Write_ToBinary( Writer );
-                }
-                else
-                    Writer.WriteBool( true );
-            }
-            else
-                Writer.WriteBool(true);
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RStyle:
-        {
-            // Bool : IsUndefined
-            // Если false
-            //   String : RStyle
-
-            if (false === Data.Color)
-                Writer.WriteBool(false);
-            else
-                Writer.WriteBool(true);
-
-            if ( undefined != Data.New )
-            {
-                Writer.WriteBool( false );
-                Writer.WriteString2( Data.New );
-            }
-            else
-                Writer.WriteBool( true );
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Spacing:
-        case AscDFH.historyitem_ParaRun_Position:
-        {
-            // Bool : IsUndefined
-            // Если false
-            //   Double : Spacing
-
-            if (false === Data.Color)
-                Writer.WriteBool(false);
-            else
-                Writer.WriteBool(true);
-
-            if ( undefined != Data.New )
-            {
-                Writer.WriteBool( false );
-                Writer.WriteDouble( Data.New );
-            }
-            else
-                Writer.WriteBool( true );
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_DStrikeout:
-        case AscDFH.historyitem_ParaRun_Caps:
-        case AscDFH.historyitem_ParaRun_SmallCaps:
-        {
-            // Bool : IsUndefined
-            // Если false
-            //   Bool : value
-
-            if (false === Data.Color)
-                Writer.WriteBool(false);
-            else
-                Writer.WriteBool(true);
-
-            if ( undefined != Data.New )
-            {
-                Writer.WriteBool( false );
-                Writer.WriteBool( Data.New );
-            }
-            else
-                Writer.WriteBool( true );
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts:
-        {
-            // Bool : undefined ?
-            // false -> CRFonts
-
-            if (false === Data.Color)
-                Writer.WriteBool(false);
-            else
-                Writer.WriteBool(true);
-
-            if ( undefined != Data.New )
-            {
-                Writer.WriteBool( false );
-                Data.New.Write_ToBinary( Writer );
-            }
-            else
-                Writer.WriteBool( true );
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts_Ascii:
-        case AscDFH.historyitem_ParaRun_RFonts_HAnsi:
-        case AscDFH.historyitem_ParaRun_RFonts_CS:
-        case AscDFH.historyitem_ParaRun_RFonts_EastAsia:
-        {
-            // Bool : undefined?
-            // false -> String
-
-            if (false === Data.Color)
-                Writer.WriteBool(false);
-            else
-                Writer.WriteBool(true);
-
-            if ( undefined != Data.New )
-            {
-                Writer.WriteBool( false );
-                Writer.WriteString2( Data.New.Name );
-            }
-            else
-                Writer.WriteBool( true );
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts_Hint:
-        {
-            // Bool : undefined?
-            // false -> Long
-
-            if (false === Data.Color)
-                Writer.WriteBool(false);
-            else
-                Writer.WriteBool(true);
-
-            if ( undefined != Data.New )
-            {
-                Writer.WriteBool( false );
-                Writer.WriteLong( Data.New );
-            }
-            else
-                Writer.WriteBool( true );
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Lang:
-        {
-            // Bool : undefined ?
-            // false -> CLang
-
-            if (false === Data.Color)
-                Writer.WriteBool(false);
-            else
-                Writer.WriteBool(true);
-
-            if ( undefined != Data.New )
-            {
-                Writer.WriteBool( false );
-                Data.New.Write_ToBinary( Writer );
-            }
-            else
-                Writer.WriteBool( true );
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Lang_Bidi:
-        case AscDFH.historyitem_ParaRun_Lang_EastAsia:
-        case AscDFH.historyitem_ParaRun_Lang_Val:
-        {
-            // Bool : undefined ?
-            // false -> Long
-
-            if (false === Data.Color)
-                Writer.WriteBool(false);
-            else
-                Writer.WriteBool(true);
-
-            if ( undefined != Data.New )
-            {
-                Writer.WriteBool( false );
-                Writer.WriteLong( Data.New );
-            }
-            else
-                Writer.WriteBool( true );
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Shd:
-        {
-            // Bool : undefined
-            // false - >
-            // Variable : CDocumentShd
-
-            if (false === Data.Color)
-                Writer.WriteBool(false);
-            else
-                Writer.WriteBool(true);
-
-            if ( undefined !== Data.New )
-            {
-                Writer.WriteBool(false);
-                Data.New.Write_ToBinary(Writer);
-            }
-            else
-                Writer.WriteBool(true);
-
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_MathStyle:
-        {
-            // Bool : undefined ?
-            // false -> Long
-            if ( undefined != Data.New )
-            {
-                Writer.WriteBool( false );
-                Writer.WriteLong( Data.New );
-            }
-            else
-                Writer.WriteBool( true );
-
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_MathPrp:
-        {
-            var StartPos = Writer.GetCurPosition();
-            Writer.Skip(4);
-            var Flags = 0;
-            if ( undefined != this.MathPrp.aln )
-            {
-                Writer.WriteBool( this.MathPrp.aln );
-                Flags |= 1;
-            }
-            if ( undefined != this.MathPrp.brk )
-            {
-                this.MathPrp.brk.Write_ToBinary(Writer);
-                Flags |= 2;
-            }
-            if ( undefined != this.MathPrp.lit )
-            {
-                Writer.WriteBool( this.MathPrp.lit );
-                Flags |= 4;
-            }
-            if ( undefined != this.MathPrp.nor )
-            {
-                Writer.WriteBool( this.MathPrp.nor );
-                Flags |= 8;
-            }
-            if ( undefined != this.MathPrp.scr )
-            {
-                Writer.WriteLong( this.MathPrp.scr );
-                Flags |= 16;
-            }
-            if ( undefined != this.MathPrp.sty )
-            {
-                Writer.WriteLong( this.MathPrp.sty );
-                Flags |= 32;
-            }
-            var EndPos = Writer.GetCurPosition();
-            Writer.Seek( StartPos );
-            Writer.WriteLong( Flags );
-            Writer.Seek( EndPos );
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_ReviewType:
-        {
-            // Long        : ReviewType
-            // CReviewInfo : ReviewInfo
-            Writer.WriteLong(Data.New.ReviewType);
-            Data.New.ReviewInfo.Write_ToBinary(Writer);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_PrChange:
-        {
-            // Bool : is undefined ?
-            // false -> TextPr
-            // Bool : is undefined ?
-            // false -> ReviewInfo
-
-            if (undefined === Data.New.PrChange)
-            {
-                Writer.WriteBool(true);
-            }
-            else
-            {
-                Writer.WriteBool(false);
-                Data.New.PrChange.Write_ToBinary(Writer);
-            }
-
-            if (undefined === Data.New.ReviewInfo)
-            {
-                Writer.WriteBool(true);
-            }
-            else
-            {
-                Writer.WriteBool(false);
-                Data.New.ReviewInfo.Write_ToBinary(Writer);
-            }
-
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_ContentReviewInfo:
-        {
-            // Bool : is undefined ?
-            // false -> ReviewInfo
-            if (undefined === Data.New)
-            {
-                Writer.WriteBool(true);
-            }
-            else
-            {
-                Writer.WriteBool(false);
-                Data.New.Write_ToBinary(Writer);
-            }
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_PrReviewInfo:
-        {
-            // Bool : is undefined ?
-            // false -> ReviewInfo
-            if (undefined === Data.New)
-            {
-                Writer.WriteBool(true);
-            }
-            else
-            {
-                Writer.WriteBool(false);
-                Data.New.Write_ToBinary(Writer);
-            }
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_OnStartSplit:
-        {
-            Writer.WriteLong(Data.Pos);
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_OnEndSplit:
-        {
-            Writer.WriteString2(Data.NewRun.Get_Id());
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_MathAlnAt:
-        {
-            if ( undefined != Data.New )
-            {
-                Writer.WriteBool( false );
-                Writer.WriteLong( Data.New );
-            }
-            else
-            {
-                Writer.WriteBool( true );
-            }
-
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_MathForcedBreak:
-        {
-            if(Data.bInsert)
-            {
-                Writer.WriteBool( true );
-            }
-            else
-            {
-                Writer.WriteBool( false );
-            }
-
-            break;
-        }
-
-    }
-
-    return Writer;
-};
-
-ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
-{
-    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-    // Long : тип класса
-    // Long : тип изменений
-
-    var ClassType = Reader.GetLong();
-    if ( AscDFH.historyitem_type_ParaRun != ClassType )
-        return;
-
-    var Type = Reader.GetLong();
-
-    var bColorPrChange = false;
-    switch ( Type )
-    {
-        case AscDFH.historyitem_ParaRun_AddItem :
-        {
-            // Bool     : Подсвечивать ли данные изменения
-            // Long     : Количество элементов
-            // Array of :
-            //  {
-            //    Long     : Позиция
-            //    Variable : Id Элемента
-            //  }
-
-            var bColorChanges = Reader.GetBool();
-            var Count = Reader.GetLong();
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var Pos     = this.m_oContentChanges.Check( AscCommon.contentchanges_Add, Reader.GetLong() );
-                var Element = ParagraphContent_Read_FromBinary(Reader);
-
-                if ( null != Element )
-                {
-                    if (true === bColorChanges && null !== Color)
-                    {
-                        this.CollaborativeMarks.Update_OnAdd( Pos );
-                        this.CollaborativeMarks.Add( Pos, Pos + 1, Color );
-                        AscCommon.CollaborativeEditing.Add_ChangedClass(this);
-                    }
-
-                    this.Content.splice(Pos, 0, Element);
-                    this.private_UpdatePositionsOnAdd(Pos);
-					this.private_UpdateCompositeInputPositionsOnAdd(Pos);
-                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
-                }
-            }
-
-            this.RecalcInfo.Measure = true;
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeContent(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RemoveItem:
-        {
-            // Long          : Количество удаляемых элементов
-            // Array of Long : позиции удаляемых элементов
-
-            var Count = Reader.GetLong();
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var ChangesPos = this.m_oContentChanges.Check(AscCommon.contentchanges_Remove, Reader.GetLong());
-
-                // действие совпало, не делаем его
-                if (false === ChangesPos)
-                    continue;
-
-                this.CollaborativeMarks.Update_OnRemove(ChangesPos, 1);
-                this.Content.splice(ChangesPos, 1);
-                this.private_UpdatePositionsOnRemove(ChangesPos, 1);
-				this.private_UpdateCompositeInputPositionsOnRemove(ChangesPos, 1);
-                AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
-            }
-
-            this.RecalcInfo.Measure = true;
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeContent(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_TextPr:
-        {
-            // CTextPr
-            bColorPrChange = Reader.GetBool();
-            this.Pr = new CTextPr();
-            this.Pr.Read_FromBinary( Reader );
-
-            var unifill = this.Pr.Unifill;
-            if(typeof AscCommon.CollaborativeEditing !== "undefined")
-            {
-                if(unifill && unifill.fill && unifill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
-                {
-                    AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(unifill.fill.RasterImageId));
-                }
-            }
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Bold:
-        {
-            // Bool : IsUndefined
-            // Bool : Bold
-
-            bColorPrChange = Reader.GetBool();
-
-            if ( true === Reader.GetBool() )
-                this.Pr.Bold = undefined;
-            else
-                this.Pr.Bold = Reader.GetBool();
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Italic:
-        {
-            // Bool : IsUndefined
-            // Bool : Italic
-
-            bColorPrChange = Reader.GetBool();
-
-            if ( true === Reader.GetBool() )
-                this.Pr.Italic = undefined;
-            else
-                this.Pr.Italic = Reader.GetBool();
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Strikeout:
-        {
-            // Bool : IsUndefined
-            // Bool : Strikeout
-            bColorPrChange = Reader.GetBool();
-            if ( true === Reader.GetBool() )
-                this.Pr.Strikeout = undefined;
-            else
-                this.Pr.Strikeout = Reader.GetBool();
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Underline:
-        {
-            // Bool   : IsUndefined?
-            // Bool   : Underline
-            bColorPrChange = Reader.GetBool();
-            if ( true != Reader.GetBool() )
-                this.Pr.Underline = Reader.GetBool();
-            else
-                this.Pr.Underline = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_FontSize:
-        {
-            // Bool   : IsUndefined
-            // Double : FontSize
-            bColorPrChange = Reader.GetBool();
-            if ( true != Reader.GetBool() )
-                this.Pr.FontSize = Reader.GetDouble();
-            else
-                this.Pr.FontSize = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Color:
-        {
-            // Bool     : IsUndefined
-            // Variable : Color (CDocumentColor)
-            bColorPrChange = Reader.GetBool();
-            if ( true != Reader.GetBool() )
-            {
-                this.Pr.Color = new CDocumentColor(0, 0, 0, false);
-                this.Pr.Color.Read_FromBinary(Reader);
-            }
-            else
-                this.Pr.Color = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-
-        case AscDFH.historyitem_ParaRun_Unifill:
-        {
-            bColorPrChange = Reader.GetBool();
-            if ( true != Reader.GetBool() )
-            {
-                var unifill = new AscFormat.CUniFill();
-                unifill.Read_FromBinary(Reader);
-                this.Pr.Unifill = unifill;
-                if(typeof AscCommon.CollaborativeEditing !== "undefined")
-                {
-                    if(unifill.fill && unifill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
-                    {
-                        AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(unifill.fill.RasterImageId));
-                    }
-                }
-            }
-            else
-                this.Pr.Unifill = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-
-
-        case AscDFH.historyitem_ParaRun_TextFill:
-        {
-            bColorPrChange = Reader.GetBool();
-            if ( true != Reader.GetBool() )
-            {
-                var unifill = new AscFormat.CUniFill();
-                unifill.Read_FromBinary(Reader);
-                this.Pr.TextFill = unifill;
-            }
-            else
-                this.Pr.TextFill = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_TextOutline:
-        {
-            bColorPrChange = Reader.GetBool();
-            if ( true != Reader.GetBool() )
-            {
-                var ln = new AscFormat.CLn();
-                ln.Read_FromBinary(Reader);
-                this.Pr.TextOutline = ln;
-            }
-            else
-                this.Pr.TextOutline = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_VertAlign:
-        {
-            // Bool  : IsUndefined
-            // Long  : VertAlign
-            bColorPrChange = Reader.GetBool();
-            if ( true != Reader.GetBool() )
-                this.Pr.VertAlign = Reader.GetLong();
-            else
-                this.Pr.VertAlign = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_HighLight:
-        {
-            // Bool  : IsUndefined
-            // Если false
-            //   Bool  : IsNull
-            //   Если false
-            //     Variable : Color (CDocumentColor)
-            bColorPrChange = Reader.GetBool();
-            if ( true != Reader.GetBool() )
-            {
-                if ( true != Reader.GetBool() )
-                {
-                    this.Pr.HighLight = new CDocumentColor(0,0,0);
-                    this.Pr.HighLight.Read_FromBinary(Reader);
-                }
-                else
-                    this.Pr.HighLight = highlight_None;
-            }
-            else
-                this.Pr.HighLight = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RStyle:
-        {
-            // Bool : IsUndefined
-            // Если false
-            //   String : RStyle
-            bColorPrChange = Reader.GetBool();
-            if ( true != Reader.GetBool() )
-                this.Pr.RStyle = Reader.GetString2();
-            else
-                this.Pr.RStyle = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Spacing:
-        {
-            // Bool : IsUndefined
-            // Если false
-            //   Double : Spacing
-            bColorPrChange = Reader.GetBool();
-            if ( true != Reader.GetBool() )
-                this.Pr.Spacing = Reader.GetDouble();
-            else
-                this.Pr.Spacing = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_DStrikeout:
-        {
-            // Bool : IsUndefined
-            // Если false
-            //   Bool : DStrikeout
-            bColorPrChange = Reader.GetBool();
-            if ( true != Reader.GetBool() )
-                this.Pr.DStrikeout = Reader.GetBool();
-            else
-                this.Pr.DStrikeout = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Caps:
-        {
-            // Bool : IsUndefined
-            // Если false
-            //   Bool : Caps
-            bColorPrChange = Reader.GetBool();
-            if ( true != Reader.GetBool() )
-                this.Pr.Caps = Reader.GetBool();
-            else
-                this.Pr.Caps = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_SmallCaps:
-        {
-            // Bool : IsUndefined
-            // Если false
-            //   Bool : SmallCaps
-            bColorPrChange = Reader.GetBool();
-            if ( true != Reader.GetBool() )
-                this.Pr.SmallCaps = Reader.GetBool();
-            else
-                this.Pr.SmallCaps = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Position:
-        {
-            // Bool : IsUndefined
-            // Если false
-            //   Double : Position
-            bColorPrChange = Reader.GetBool();
-            if ( true != Reader.GetBool() )
-                this.Pr.Position = Reader.GetDouble();
-            else
-                this.Pr.Position = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts:
-        {
-            // Bool : undefined ?
-            // false -> CRFonts
-            bColorPrChange = Reader.GetBool();
-            if ( false === Reader.GetBool() )
-            {
-                this.Pr.RFonts = new CRFonts();
-                this.Pr.RFonts.Read_FromBinary( Reader );
-            }
-            else
-                this.Pr.RFonts = new CRFonts();
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts_Ascii:
-        {
-            // Bool : undefined ?
-            // false -> String
-            bColorPrChange = Reader.GetBool();
-            if ( false === Reader.GetBool() )
-            {
-                this.Pr.RFonts.Ascii =
-                {
-                    Name  : Reader.GetString2(),
-                    Index : -1
-                };
-            }
-            else
-                this.Pr.RFonts.Ascii = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts_HAnsi:
-        {
-            // Bool : undefined ?
-            // false -> String
-            bColorPrChange = Reader.GetBool();
-            if ( false === Reader.GetBool() )
-            {
-                this.Pr.RFonts.HAnsi =
-                {
-                    Name  : Reader.GetString2(),
-                    Index : -1
-                };
-            }
-            else
-                this.Pr.RFonts.HAnsi = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts_CS:
-        {
-            // Bool : undefined ?
-            // false -> String
-            bColorPrChange = Reader.GetBool();
-            if ( false === Reader.GetBool() )
-            {
-                this.Pr.RFonts.CS =
-                {
-                    Name  : Reader.GetString2(),
-                    Index : -1
-                };
-            }
-            else
-                this.Pr.RFonts.CS = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts_EastAsia:
-        {
-            // Bool : undefined ?
-            // false -> String
-            bColorPrChange = Reader.GetBool();
-            if ( false === Reader.GetBool() )
-            {
-                this.Pr.RFonts.EastAsia =
-                {
-                    Name  : Reader.GetString2(),
-                    Index : -1
-                };
-            }
-            else
-                this.Pr.RFonts.EastAsia = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_RFonts_Hint:
-        {
-            // Bool : undefined ?
-            // false -> Long
-            bColorPrChange = Reader.GetBool();
-            if ( false === Reader.GetBool() )
-                this.Pr.RFonts.Hint = Reader.GetLong();
-            else
-                this.Pr.RFonts.Hint = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Lang:
-        {
-            // Bool : undefined ?
-            // false -> Lang
-            bColorPrChange = Reader.GetBool();
-            if ( false === Reader.GetBool() )
-            {
-                this.Pr.Lang = new CLang();
-                this.Pr.Lang.Read_FromBinary( Reader );
-            }
-            else
-                this.Pr.Lang = new CLang();
-
-            this.Recalc_CompiledPr(true);
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Lang_Bidi:
-        {
-            // Bool : undefined ?
-            // false -> Long
-            bColorPrChange = Reader.GetBool();
-            if ( false === Reader.GetBool() )
-                this.Pr.Lang.Bidi = Reader.GetLong();
-            else
-                this.Pr.Lang.Bidi = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Lang_EastAsia:
-        {
-            // Bool : undefined ?
-            // false -> Long
-            bColorPrChange = Reader.GetBool();
-            if ( false === Reader.GetBool() )
-                this.Pr.Lang.EastAsia = Reader.GetLong();
-            else
-                this.Pr.Lang.EastAsia = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Lang_Val:
-        {
-            // Bool : undefined ?
-            // false -> Long
-            bColorPrChange = Reader.GetBool();
-            if ( false === Reader.GetBool() )
-                this.Pr.Lang.Val = Reader.GetLong();
-            else
-                this.Pr.Lang.Val = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_Shd:
-        {
-            // Bool : undefined
-            // false - >
-            // Variable : CDocumentShd
-            bColorPrChange = Reader.GetBool();
-            if ( false === Reader.GetBool() )
-            {
-                this.Pr.Shd = new CDocumentShd();
-                this.Pr.Shd.Read_FromBinary( Reader );
-            }
-            else
-                this.Pr.Shd = undefined;
-
-            this.Recalc_CompiledPr(false);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_MathStyle:
-        {
-            // Bool : undefined ?
-            // false -> Long
-            if ( false === Reader.GetBool() )
-                this.MathPrp.sty = Reader.GetLong();
-            else
-                this.MathPrp.sty = undefined;
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_MathPrp:
-        {
-            var Flags = Reader.GetLong();
-            if ( Flags & 1 )
-                this.MathPrp.aln = Reader.GetBool();
-
-            if ( Flags & 2 )
-            {
-                this.MathPrp.brk = new CMathBreak();
-                this.MathPrp.brk.Read_FromBinary(Reader);
-            }
-
-            if ( Flags & 4 )
-                this.MathPrp.lit = Reader.GetBool();
-            if ( Flags & 8 )
-                this.MathPrp.nor = Reader.GetBool();
-            if ( Flags & 16 )
-                this.MathPrp.scr = Reader.GetLong();
-            if ( Flags & 32 )
-                this.MathPrp.sty = Reader.GetLong();
-
-            this.Recalc_CompiledPr(true);
-            this.private_UpdateTrackRevisionOnChangeTextPr(false);
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_ReviewType:
-        {
-            // Long        : ReviewType
-            // CReviewInfo : ReviewInfo
-            this.ReviewType = Reader.GetLong();
-            this.ReviewInfo.Read_FromBinary(Reader);
-            this.private_UpdateTrackRevisions();
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_PrChange:
-        {
-            // Bool : is undefined ?
-            // false -> TextPr
-            // Bool : is undefined ?
-            // false -> ReviewInfo
-
-            if (false === Reader.GetBool())
-            {
-                this.Pr.PrChange = new CTextPr();
-                this.Pr.PrChange.Read_FromBinary(Reader);
-            }
-            else
-            {
-                this.Pr.PrChange = undefined;
-            }
-
-            if (false === Reader.GetBool())
-            {
-                this.Pr.ReviewInfo = new CReviewInfo();
-                this.Pr.ReviewInfo.Read_FromBinary(Reader);
-            }
-            else
-            {
-                this.Pr.ReviewInfo = undefined;
-            }
-
-            this.private_UpdateTrackRevisions();
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_ContentReviewInfo:
-        {
-            // Bool : is undefined ?
-            // false -> ReviewInfo
-            if (false === Reader.GetBool())
-            {
-                this.ReviewInfo = new CReviewInfo();
-                this.ReviewInfo.Read_FromBinary(Reader);
-            }
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_PrReviewInfo:
-        {
-            // Bool : is undefined ?
-            // false -> ReviewInfo
-            if (false === Reader.GetBool())
-            {
-                this.ReviewInfo = new CReviewInfo();
-                this.ReviewInfo.Read_FromBinary(Reader);
-            }
-            else
-            {
-                this.ReviewInfo = undefined;
-            }
-            break;
-        }
-
-        case AscDFH.historyitem_ParaRun_OnStartSplit:
-        {
-            // Long
-            var Pos = Reader.GetLong();
-            AscCommon.CollaborativeEditing.OnStart_SplitRun(this, Pos);
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_OnEndSplit:
-        {
-            // String2
-            var RunId = Reader.GetString2();
-            AscCommon.CollaborativeEditing.OnEnd_SplitRun(g_oTableId.Get_ById(RunId));
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_MathAlnAt:
-        {
-            if ( false === Reader.GetBool() )
-                this.MathPrp.brk.Apply_AlnAt(Reader.GetLong());
-            else
-                this.MathPrp.brk.Apply_AlnAt(undefined);
-
-            break;
-        }
-        case AscDFH.historyitem_ParaRun_MathForcedBreak:
-        {
-            if ( true === Reader.GetBool() )
-            {
-                this.MathPrp.brk = new CMathBreak();
-            }
-            else
-            {
-                this.MathPrp.brk = undefined;
-            }
-
-            break;
-        }
-    }
-
-    if (bColorPrChange && Color)
-    {
-        this.private_AddCollPrChangeOther(Color);
-    }
-};
-
 ParaRun.prototype.Write_ToBinary2 = function(Writer)
 {
     Writer.WriteLong( AscDFH.historyitem_type_ParaRun );
@@ -10232,7 +8009,7 @@ ParaRun.prototype.Math_Apply_Style = function(Value)
         var OldValue     = this.MathPrp.sty;
         this.MathPrp.sty = Value;
 
-        History.Add( this, { Type : AscDFH.historyitem_ParaRun_MathStyle, New : Value, Old : OldValue } );
+        History.Add(new CChangesRunMathStyle(this, OldValue, Value));
 
         this.Recalc_CompiledPr(true);
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
@@ -10461,16 +8238,16 @@ ParaRun.prototype.Check_ForcedBreak = function(bStart, bEnd)
 };
 ParaRun.prototype.Set_MathForcedBreak = function(bInsert)
 {
-    if(bInsert == true && false == this.MathPrp.IsBreak())
-    {
-        History.Add(this, {Type: AscDFH.historyitem_ParaRun_MathForcedBreak, bInsert: true, alnAt: undefined });
-        this.MathPrp.Insert_ForcedBreak();
-    }
-    else if(bInsert == false && true == this.MathPrp.IsBreak())
-    {
-        History.Add(this, {Type: AscDFH.historyitem_ParaRun_MathForcedBreak, bInsert: false, alnAt: this.MathPrp.Get_AlnAt()});
-        this.MathPrp.Delete_ForcedBreak();
-    }
+	if (bInsert == true && false == this.MathPrp.IsBreak())
+	{
+		History.Add(new CChangesRunMathForcedBreak(this, true, undefined));
+		this.MathPrp.Insert_ForcedBreak();
+	}
+	else if (bInsert == false && true == this.MathPrp.IsBreak())
+	{
+		History.Add(new CChangesRunMathForcedBreak(this, false, this.MathPrp.Get_AlnAt()));
+		this.MathPrp.Delete_ForcedBreak();
+	}
 };
 ParaRun.prototype.Math_SplitRunForcedBreak = function()
 {
@@ -10524,7 +8301,7 @@ ParaRun.prototype.Set_MathPr = function(MPrp)
     var OldValue = this.MathPrp;
     this.MathPrp.Set_Pr(MPrp);
 
-    History.Add( this, { Type : AscDFH.historyitem_ParaRun_MathPrp, New : this.MathPrp, Old : OldValue } );
+    History.Add(new CChangesRunMathPrp(this, OldValue, this.MathPrp));
     this.Recalc_CompiledPr(true);
     this.private_UpdateTrackRevisionOnChangeTextPr(true);
 };
@@ -10730,18 +8507,34 @@ ParaRun.prototype.Set_ReviewType = function(Value)
         this.ReviewType = Value;
         this.ReviewInfo.Update();
 
-        History.Add(this, {Type : AscDFH.historyitem_ParaRun_ReviewType, New : {ReviewType :  this.ReviewType, ReviewInfo : this.ReviewInfo.Copy()}, Old : {ReviewType :  OldReviewType, ReviewInfo : OldReviewInfo}});
-        this.private_UpdateTrackRevisions();
-    }
+		History.Add(new CChangesRunReviewType(this,
+			{
+				ReviewType : OldReviewType,
+				ReviewInfo : OldReviewInfo
+			},
+			{
+				ReviewType : this.ReviewType,
+				ReviewInfo : this.ReviewInfo.Copy()
+			}));
+		this.private_UpdateTrackRevisions();
+	}
 };
 ParaRun.prototype.Set_ReviewTypeWithInfo = function(ReviewType, ReviewInfo)
 {
-    History.Add(this, {Type : AscDFH.historyitem_ParaRun_ReviewType, Old : {ReviewType :  this.ReviewType, ReviewInfo : this.ReviewInfo ? this.ReviewInfo.Copy() : undefined}, New : {ReviewType :  ReviewType, ReviewInfo : ReviewInfo ? ReviewInfo.Copy() : undefined}});
+	History.Add(new CChangesRunReviewType(this,
+		{
+			ReviewType : this.ReviewType,
+			ReviewInfo : this.ReviewInfo ? this.ReviewInfo.Copy() : undefined
+		},
+		{
+			ReviewType : ReviewType,
+			ReviewInfo : ReviewInfo ? ReviewInfo.Copy() : undefined
+		}));
 
-    this.ReviewType = ReviewType;
-    this.ReviewInfo = ReviewInfo;
+	this.ReviewType = ReviewType;
+	this.ReviewInfo = ReviewInfo;
 
-    this.private_UpdateTrackRevisions();
+	this.private_UpdateTrackRevisions();
 };
 ParaRun.prototype.Get_Parent = function()
 {
@@ -10881,7 +8674,7 @@ ParaRun.prototype.private_UpdateTrackRevisionOnChangeContent = function(bUpdateI
         {
             var OldReviewInfo = this.ReviewInfo.Copy();
             this.ReviewInfo.Update();
-            History.Add(this, {Type : AscDFH.historyitem_ParaRun_ContentReviewInfo, Old : OldReviewInfo, New : this.ReviewInfo.Copy()});
+            History.Add(new CChangesRunContentReviewInfo(this, OldReviewInfo, this.ReviewInfo.Copy()));
         }
     }
 };
@@ -10895,7 +8688,7 @@ ParaRun.prototype.private_UpdateTrackRevisionOnChangeTextPr = function(bUpdateIn
         {
             var OldReviewInfo = this.Pr.ReviewInfo.Copy();
             this.Pr.ReviewInfo.Update();
-            History.Add(this, {Type : AscDFH.historyitem_ParaRun_PrReviewInfo, Old : OldReviewInfo, New : this.Pr.ReviewInfo.Copy()});
+            History.Add(new CChangesRunPrReviewInfo(this, OldReviewInfo, this.Pr.ReviewInfo.Copy()));
         }
     }
 };
@@ -11141,7 +8934,7 @@ ParaRun.prototype.Displace_BreakOperator = function(isForward, bBrkBefore, Count
 
             if(AlnAt !== NewAlnAt)
             {
-                History.Add(this, {Type: AscDFH.historyitem_ParaRun_MathAlnAt, New: NewAlnAt, Old: AlnAt});
+                History.Add(new CChangesRunMathAlnAt(this, AlnAt, NewAlnAt));
             }
         }
     }
@@ -11196,7 +8989,7 @@ ParaRun.prototype.Get_FootnotesList = function(oEngine)
 		var oItem = this.Content[nIndex];
 		if (para_FootnoteReference === oItem.Type)
 		{
-			oEngine.Add(oItem.Get_Footnote());
+			oEngine.Add(oItem.Get_Footnote(), oItem, this);
 		}
 	}
 };
@@ -11213,6 +9006,14 @@ ParaRun.prototype.GetParaEnd = function()
 	}
 
 	return null;
+};
+ParaRun.prototype.RemoveElement = function(oElement)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		if (oElement === this.Content[nIndex])
+			return this.Remove_FromContent(nIndex, 1, true);
+	}
 };
 
 function CParaRunStartState(Run)

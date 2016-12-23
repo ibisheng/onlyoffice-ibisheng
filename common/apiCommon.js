@@ -857,6 +857,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_CColor() {
 		this.type = c_oAscColor.COLOR_TYPE_SRGB;
 		this.value = null;
@@ -887,7 +888,7 @@
 	}
 
 	asc_CColor.prototype = {
-		asc_getR: function () {
+		constructor: asc_CColor, asc_getR: function () {
 			return this.r
 		}, asc_putR: function (v) {
 			this.r = v;
@@ -926,8 +927,7 @@
 			}
 			return this.hex;
 		}, asc_getColor: function () {
-			var ret = new CColor(this.r, this.g, this.b);
-			return ret;
+			return new CColor(this.r, this.g, this.b);
 		}, asc_putAuto: function (v) {
 			this.Auto = v;
 		}, asc_getAuto: function () {
@@ -2362,15 +2362,51 @@
 	// c_oAscColor.COLOR_TYPE_SCHEME	: value - тип цвета в схеме
 	// c_oAscColor.COLOR_TYPE_SYS		: конвертируется в srgb
 	function CAscColorScheme() {
-		this.Colors = [];
-		this.Name = "";
+		this.colors = [];
+		this.name = "";
 	}
 
 	CAscColorScheme.prototype.get_colors = function () {
-		return this.Colors;
+		return this.colors;
 	};
 	CAscColorScheme.prototype.get_name = function () {
-		return this.Name;
+		return this.name;
+	};
+	CAscColorScheme.prototype.get_dk1 = function () {
+		return this.colors[0];
+	};
+	CAscColorScheme.prototype.get_lt1 = function () {
+		return this.colors[1];
+	};
+	CAscColorScheme.prototype.get_dk2 = function () {
+		return this.colors[2];
+	};
+	CAscColorScheme.prototype.get_lt2 = function () {
+		return this.colors[3];
+	};
+	CAscColorScheme.prototype.get_accent1 = function () {
+		return this.colors[4];
+	};
+	CAscColorScheme.prototype.get_accent2 = function () {
+		return this.colors[5];
+	};
+	CAscColorScheme.prototype.get_accent3 = function () {
+		return this.colors[6];
+	};
+	CAscColorScheme.prototype.get_accent4 = function () {
+		return this.colors[7];
+	};
+	CAscColorScheme.prototype.get_accent5 = function () {
+		return this.colors[8];
+	};
+	CAscColorScheme.prototype.get_accent6 = function () {
+		return this.colors[9];
+	};
+	CAscColorScheme.prototype.get_hlink = function () {
+		return this.colors[10];
+	};
+	CAscColorScheme.prototype.get_folHlink = function () {
+		return this.colors[11];
 	};
 
 	//-----------------------------------------------------------------

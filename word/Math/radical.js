@@ -719,14 +719,14 @@ CRadical.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 };
 CRadical.prototype.Apply_MenuProps = function(Props)
 {
-    if(Props.Type == Asc.c_oAscMathInterfaceType.Radical && Props.HideDegree !== undefined)
-    {
-        if(true == this.Iterator.IsPlaceholder() && Props.HideDegree !== this.Pr.degHide)
-        {
-            AscCommon.History.Add(this, new CChangesMathRadicalHideDegree( Props.HideDegree, this.Pr.degHide ));
-            this.raw_SetHideDegree(Props.HideDegree);
-        }
-    }
+	if (Props.Type == Asc.c_oAscMathInterfaceType.Radical && Props.HideDegree !== undefined)
+	{
+		if (true == this.Iterator.IsPlaceholder() && Props.HideDegree !== this.Pr.degHide)
+		{
+			AscCommon.History.Add(new CChangesMathRadicalHideDegree(this, this.Pr.degHide, Props.HideDegree));
+			this.raw_SetHideDegree(Props.HideDegree);
+		}
+	}
 };
 CRadical.prototype.Get_InterfaceProps = function()
 {

@@ -1,7 +1,7 @@
 {
   "name": "common",
   "version": "0.0.0",
-  "homepage": "http://www.teamlab.com",
+  "homepage": "http://www.onlyoffice.com",
   "private": true,
   "dependencies": {
     "google-closure-compiler": "20160315.2.0",

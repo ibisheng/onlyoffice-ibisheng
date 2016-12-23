@@ -191,6 +191,7 @@
 		if (null != this.element) {
 			t.canvasOuter = document.createElement('div');
 			t.canvasOuter.id = "ce-canvas-outer";
+			t.canvasOuter.style.position = "absolute";
 			t.canvasOuter.style.display = "none";
 			t.canvasOuter.style.zIndex = z;
 			var innerHTML = '<canvas id="ce-canvas" style="z-index: ' + (z + 1) + '"></canvas>';
@@ -498,7 +499,8 @@
 		t._moveCursor(kEndOfText);
 	};
 
-	CellEditor.prototype.move = function ( l, t, r, b ) {
+	CellEditor.prototype.move = function (l, t, r, b) {
+		this.textFlags.wrapOnlyCE = false;
 		this.sides = this.options.getSides();
 		this.left = this.sides.cellX;
 		this.top = this.sides.cellY;
@@ -506,36 +508,34 @@
 		this.bottom = this.sides.b[0];
 		// ToDo вынести в отдельную функцию
 		var canExpW = true, canExpH = true, tm, expW, expH, fragments = this._getRenderFragments();
-		if ( 0 < fragments.length ) {
-			tm = this.textRender.measureString( fragments, this.textFlags, this._getContentWidth() );
+		if (0 < fragments.length) {
+			tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
 			expW = tm.width > this._getContentWidth();
 			expH = tm.height > this._getContentHeight();
 
-			while ( expW && canExpW || expH && canExpH ) {
-				if ( expW ) {
+			while (expW && canExpW || expH && canExpH) {
+				if (expW) {
 					canExpW = this._expandWidth();
 				}
-				if ( expH ) {
+				if (expH) {
 					canExpH = this._expandHeight();
 				}
 
-				if ( !canExpW ) {
-					this.textFlags.wrapText = true;
-					tm = this.textRender.measureString( fragments, this.textFlags, this._getContentWidth() );
-				}
-				else {
-					tm = this.textRender.measure( this._getContentWidth() );
+				if (!canExpW) {
+					this.textFlags.wrapOnlyCE = true;
+					tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
+				} else {
+					tm = this.textRender.measure(this._getContentWidth());
 				}
 				expW = tm.width > this._getContentWidth();
 				expH = tm.height > this._getContentHeight();
 			}
 		}
 
-		if ( this.left < l || this.top < t || this.left > r || this.top > b ) {
+		if (this.left < l || this.top < t || this.left > r || this.top > b) {
 			// hide
 			this._hideCanvas();
-		}
-		else {
+		} else {
 			this._adjustCanvas();
 			this._showCanvas();
 			this._renderText();
@@ -816,7 +816,8 @@
 //             var __e__ = new Date().getTime();
 //             console.log("e-s "+ (__e__ - __s__));
 
-		this._formula = new AscCommonExcel.parserFormula(s.substr(1), this.options.cellName, ws);
+		var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(this.options.cellName);
+		this._formula = new AscCommonExcel.parserFormula(s.substr(1), null, ws);
 		this._formula.parse();
 
 		var r, offset, _e, _s, wsName = null, refStr, isName = false, _sColorPos;
@@ -870,7 +871,7 @@
 					}
 					case cElementType.table          :
 					case cElementType.name          : {
-						var nameRef = r.oper.toRef();
+						var nameRef = r.oper.toRef(bbox);
 						if (nameRef instanceof AscCommonExcel.cError) {
 							continue;
 						}
@@ -940,7 +941,8 @@
 		var r, offset, _e, _s, wsName = null, ret = false, refStr, isName = false, _sColorPos, wsOPEN = this.handlers.trigger(
 			"getCellFormulaEnterWSOpen"), ws = wsOPEN ? wsOPEN.model : this.handlers.trigger("getActiveWS");
 
-		this._formula = new AscCommonExcel.parserFormula(s.substr(1), this.options.cellName, ws);
+		var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(this.options.cellName);
+		this._formula = new AscCommonExcel.parserFormula(s.substr(1), null, ws);
 		this._formula.parse();
 
 		if (this._formula.RefPos && this._formula.RefPos.length > 0) {
@@ -989,7 +991,7 @@
 					}
 					case cElementType.table          :
 					case cElementType.name          : {
-						var nameRef = r.oper.toRef();
+						var nameRef = r.oper.toRef(bbox);
 						if (nameRef instanceof AscCommonExcel.cError) {
 							continue;
 						}
@@ -1093,7 +1095,7 @@
 						last = this._findFragment(val.cursorePos + val.formulaRangeLength - 1, fragments);
 						if (first && last) {
 							for (k = first.index; k <= last.index; ++k) {
-								fragments[k].format.c = AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % lengthColors];
+								fragments[k].format.setColor(AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % lengthColors]);
 							}
 						}
 					}
@@ -1109,25 +1111,24 @@
 	CellEditor.prototype._draw = function () {
 		var canExpW = true, canExpH = true, tm, expW, expH, fragments = this._getRenderFragments();
 
-		if ( 0 < fragments.length ) {
-			tm = this.textRender.measureString( fragments, this.textFlags, this._getContentWidth() );
+		if (0 < fragments.length) {
+			tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
 			expW = tm.width > this._getContentWidth();
 			expH = tm.height > this._getContentHeight();
 
-			while ( expW && canExpW || expH && canExpH ) {
-				if ( expW ) {
+			while (expW && canExpW || expH && canExpH) {
+				if (expW) {
 					canExpW = this._expandWidth();
 				}
-				if ( expH ) {
+				if (expH) {
 					canExpH = this._expandHeight();
 				}
 
-				if ( !canExpW ) {
-					this.textFlags.wrapText = true;
-					tm = this.textRender.measureString( fragments, this.textFlags, this._getContentWidth() );
-				}
-				else {
-					tm = this.textRender.measure( this._getContentWidth() );
+				if (!canExpW) {
+					this.textFlags.wrapOnlyCE = true;
+					tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
+				} else {
+					tm = this.textRender.measure(this._getContentWidth());
 				}
 				expW = tm.width > this._getContentWidth();
 				expH = tm.height > this._getContentHeight();
@@ -1139,59 +1140,52 @@
 		this._adjustCanvas();
 		this._showCanvas();
 		this._renderText();
-		this.input.value = this._getFragmentsText( fragments );
+		this.input.value = this._getFragmentsText(fragments);
 		this._updateCursorPosition();
 		this._showCursor();
 	};
 
 	CellEditor.prototype._update = function () {
-		this._updateFormulaEditMod( /*bIsOpen*/false );
+		this._updateFormulaEditMod(/*bIsOpen*/false);
 
 		var tm, canExpW, canExpH, oldLC, doAjust = false, fragments = this._getRenderFragments();
 
-		if ( 0 < fragments.length ) {
+		if (0 < fragments.length) {
 			oldLC = this.textRender.getLinesCount();
-			tm = this.textRender.measureString( fragments, this.textFlags, this._getContentWidth() );
-			if ( this.textRender.getLinesCount() < oldLC ) {
+			tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
+			if (this.textRender.getLinesCount() < oldLC) {
 				this.topLineIndex -= oldLC - this.textRender.getLinesCount();
 			}
 
-			canExpW = !this.textFlags.wrapText;
-			while ( tm.width > this._getContentWidth() && canExpW ) {
+			canExpW = !(this.textFlags.wrapText || this.textFlags.wrapOnlyCE);
+			while (tm.width > this._getContentWidth() && canExpW) {
 				canExpW = this._expandWidth();
-				if ( !canExpW ) {
-					this.textFlags.wrapText = true;
-					tm = this.textRender.measureString( fragments, this.textFlags, this._getContentWidth() );
+				if (!canExpW) {
+					this.textFlags.wrapOnlyCE = true;
+					tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
 				}
 				doAjust = true;
 			}
 
 			canExpH = true;
-			while ( tm.height > this._getContentHeight() && canExpH ) {
+			while (tm.height > this._getContentHeight() && canExpH) {
 				canExpH = this._expandHeight();
 				doAjust = true;
 			}
-			if ( this.textRender.isLastCharNL() && !doAjust && canExpH ) {
-				var lm = this.textRender.calcCharHeight( this.textRender.getCharsCount() - 1 );
-				if ( tm.height + lm.th > this._getContentHeight() ) {
-					this._expandHeight();
-					doAjust = true;
-				}
-			}
 		}
-		if ( doAjust ) {
+		if (doAjust) {
 			this._adjustCanvas();
 		}
 
 		this._renderText();  // вызов нужен для пересчета поля line.startX, которое используется в _updateCursorPosition
 		this._fireUpdated(); // вызов нужен для обновление текста верхней строки, перед обновлением позиции курсора
-		this._updateCursorPosition( true );
+		this._updateCursorPosition(true);
 		this._showCursor();
 
 		this._updateUndoRedoChanged();
 
-		if ( window['IS_NATIVE_EDITOR'] && !this.dontUpdateText ) {
-			window['native']['onCellEditorChangeText']( this._getFragmentsText( this.options.fragments ) );
+		if (window['IS_NATIVE_EDITOR'] && !this.dontUpdateText) {
+			window['native']['onCellEditorChangeText'](this._getFragmentsText(this.options.fragments));
 		}
 	};
 
@@ -1330,16 +1324,16 @@
 		}
 	};
 
-	CellEditor.prototype._renderText = function ( dy ) {
+	CellEditor.prototype._renderText = function (dy) {
 		var t = this, opt = t.options, ctx = t.drawingCtx;
 
-		if ( !window['IS_NATIVE_EDITOR'] ) {
-			ctx.setFillStyle( opt.background )
-				.fillRect( 0, 0, ctx.getWidth(), ctx.getHeight() );
+		if (!window['IS_NATIVE_EDITOR']) {
+			ctx.setFillStyle(opt.background)
+				.fillRect(0, 0, ctx.getWidth(), ctx.getHeight());
 		}
 
-		if ( opt.fragments.length > 0 ) {
-			t.textRender.render( t._getContentLeft(), (dy === undefined ? 0 : dy), t._getContentWidth(), opt.textColor );
+		if (opt.fragments.length > 0) {
+			t.textRender.render(t._getContentLeft(), dy || 0, t._getContentWidth(), opt.textColor);
 		}
 	};
 
@@ -1476,6 +1470,7 @@
 		if (AscBrowser.isRetina) {
 			curLeft >>= 1;
 			curTop >>= 1;
+			curHeight >>= 1;
 		}
 
 
@@ -1984,11 +1979,11 @@
 			}
 			fr[i].text = s;
 			f = fr[i].format;
-			if (f.fn === "") {
-				f.fn = t.options.font.FontFamily.Name;
+			if (f.getName() === "") {
+				f.setName(t.options.font.FontFamily.Name);
 			}
-			if (f.fs === 0) {
-				f.fs = t.options.font.FontSize;
+			if (f.getSize() === 0) {
+				f.setSize(t.options.font.FontSize);
 			}
 		}
 	};
@@ -2008,39 +2003,43 @@
 	CellEditor.prototype._setFormatProperty = function (format, prop, val) {
 		switch (prop) {
 			case "fn":
-				format.fn = val;
-				format.scheme = Asc.EFontScheme.fontschemeNone;
+				format.setName(val);
+				format.setScheme(null);
 				break;
 			case "fs":
-				format.fs = val;
+				format.setSize(val);
 				break;
 			case "b":
-				val = (null === val) ? ((format.b) ? !format.b : true) : val;
-				format.b = val;
+				var bold = format.getBold();
+				val = (null === val) ? ((bold) ? !bold : true) : val;
+				format.setBold(val);
 				break;
 			case "i":
-				val = (null === val) ? ((format.i) ? !format.i : true) : val;
-				format.i = val;
+				var italic = format.getItalic();
+				val = (null === val) ? ((italic) ? !italic : true) : val;
+				format.setItalic(val);
 				break;
 			case "u":
-				val = (null === val) ? ((Asc.EUnderline.underlineSingle !== format.u) ? Asc.EUnderline.underlineSingle :
+				var underline = format.getUnderline();
+				val = (null === val) ? ((Asc.EUnderline.underlineNone === underline) ? Asc.EUnderline.underlineSingle :
 					Asc.EUnderline.underlineNone) : val;
-				format.u = val;
+				format.setUnderline(val);
 				break;
 			case "s":
-				val = (null === val) ? ((format.s) ? !format.s : true) : val;
-				format.s = val;
+				var strikeout = format.getStrikeout();
+				val = (null === val) ? ((strikeout) ? !strikeout : true) : val;
+				format.setStrikeout(val);
 				break;
 			case "fa":
-				format.va = val;
+				format.setVerticalAlign(val);
 				break;
 			case "c":
-				format.c = val;
+				format.setColor(val);
 				break;
 			case "changeFontSize":
-				var newFontSize = asc_incDecFonSize(val, format.fs);
+				var newFontSize = asc_incDecFonSize(val, format.getSize());
 				if (null !== newFontSize) {
-					format.fs = newFontSize;
+					format.setSize(newFontSize);
 				}
 				break;
 		}
@@ -2120,17 +2119,19 @@
 			return;
 		}
 		tmp = this.options.fragments[tmp.index].format;
-
+		var va = tmp.getVerticalAlign();
+		var fc = tmp.getColor();
 		var result = new AscCommonExcel.asc_CFont();
-		result.name = tmp.fn;
-		result.size = tmp.fs;
-		result.bold = tmp.b;
-		result.italic = tmp.i;
-		result.underline = (Asc.EUnderline.underlineNone !== tmp.u); // ToDo убрать, когда будет реализовано двойное подчеркивание
-		result.strikeout = tmp.s;
-		result.subscript = tmp.va === AscCommon.vertalign_SubScript;
-		result.superscript = tmp.va === AscCommon.vertalign_SuperScript;
-		result.color = (tmp.c ? asc.colorObjToAscColor( tmp.c ) : new Asc.asc_CColor( this.options.textColor ));
+		result.name = tmp.getName();
+		result.size = tmp.getSize();
+		result.bold = tmp.getBold();
+		result.italic = tmp.getItalic();
+		// ToDo убрать, когда будет реализовано двойное подчеркивание
+		result.underline = (Asc.EUnderline.underlineNone !== tmp.getUnderline());
+		result.strikeout = tmp.getStrikeout();
+		result.subscript = va === AscCommon.vertalign_SubScript;
+		result.superscript = va === AscCommon.vertalign_SuperScript;
+		result.color = (fc ? asc.colorObjToAscColor( fc ) : new Asc.asc_CColor( this.options.textColor ));
 
 		this.handlers.trigger( "updateEditorSelectionInfo", result );
 	};

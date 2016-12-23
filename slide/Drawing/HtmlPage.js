@@ -187,6 +187,9 @@ function CEditorPage(api)
 	this.m_oScrollThumbApi = null;
 	this.m_oScrollNotesApi = null;
 
+	this.MobileTouchManager 			= null;
+	this.MobileTouchManagerThumbnails 	= null;
+
 	// properties
 	this.m_bIsHorScrollVisible          = false;
 	this.m_bIsCheckHeedHorScrollRepeat  = false;
@@ -406,6 +409,11 @@ function CEditorPage(api)
 		this.m_oThumbnailsContainer.AddControl(this.m_oThumbnails_scroll);
 		// ----------------
 
+		if (this.m_oApi.isMobileVersion)
+		{
+			this.m_oThumbnails_scroll.HtmlElement.style.display = "none";
+		}
+
 		// main content -------------------------------------------------------------
 		this.m_oMainContent = CreateControlContainer("id_main");
 
@@ -520,7 +528,7 @@ function CEditorPage(api)
 		// ----------
 
 		this.m_oMainView = CreateControlContainer("id_main_view");
-		this.m_oMainView.Bounds.SetParams(5, 7, ScrollWidthMm, 0, true, true, true, true, -1, -1);
+		this.m_oMainView.Bounds.SetParams(5, 7, this.m_oApi.isMobileVersion ? 0 : ScrollWidthMm, 0, true, true, true, true, -1, -1);
 		this.m_oMainView.Anchor = (g_anchor_left | g_anchor_right | g_anchor_top | g_anchor_bottom);
 		this.m_oMainContent.AddControl(this.m_oMainView);
 
@@ -536,6 +544,15 @@ function CEditorPage(api)
 		// --------------------------------------------------------------------------
 
 		this.m_oDrawingDocument.TargetHtmlElement = document.getElementById('id_target_cursor');
+
+		if (this.m_oApi.isMobileVersion)
+		{
+			this.MobileTouchManager = new AscCommon.CMobileTouchManager( { eventsElement : "slides_mobile_element" } );
+			this.MobileTouchManager.Init(this.m_oApi);
+
+			this.MobileTouchManagerThumbnails = new AscCommon.CMobileTouchManagerThumbnails( { eventsElement : "slides_mobile_element" } );
+			this.MobileTouchManagerThumbnails.Init(this.m_oApi);
+		}
 
 		this.m_oOverlayApi.m_oControl  = this.m_oOverlay;
 		this.m_oOverlayApi.m_oHtmlPage = this;
@@ -673,70 +690,111 @@ function CEditorPage(api)
 
 	this.initEvents2MobileAdvances = function()
 	{
-		this.m_oEditor.HtmlElement["ontouchstart"] = function(e)
+		if (!this.m_oApi.isMobileVersion)
 		{
-			oThis.onMouseDown(e.touches[0]);
-			return false;
-		};
-		this.m_oEditor.HtmlElement["ontouchmove"]  = function(e)
-		{
-			oThis.onMouseMove(e.touches[0]);
-			return false;
-		};
-		this.m_oEditor.HtmlElement["ontouchend"]   = function(e)
-		{
-			oThis.onMouseUp(e.changedTouches[0]);
-			return false;
-		};
+			this.m_oEditor.HtmlElement["ontouchstart"] = function (e)
+			{
+				oThis.onMouseDown(e.touches[0]);
+				return false;
+			};
+			this.m_oEditor.HtmlElement["ontouchmove"] = function (e)
+			{
+				oThis.onMouseMove(e.touches[0]);
+				return false;
+			};
+			this.m_oEditor.HtmlElement["ontouchend"] = function (e)
+			{
+				oThis.onMouseUp(e.changedTouches[0]);
+				return false;
+			};
 
-		this.m_oOverlay.HtmlElement["ontouchstart"] = function(e)
-		{
-			oThis.onMouseDown(e.touches[0]);
-			return false;
-		};
-		this.m_oOverlay.HtmlElement["ontouchmove"]  = function(e)
-		{
-			oThis.onMouseMove(e.touches[0]);
-			return false;
-		};
-		this.m_oOverlay.HtmlElement["ontouchend"]   = function(e)
-		{
-			oThis.onMouseUp(e.changedTouches[0]);
-			return false;
-		};
+			this.m_oOverlay.HtmlElement["ontouchstart"] = function (e)
+			{
+				oThis.onMouseDown(e.touches[0]);
+				return false;
+			};
+			this.m_oOverlay.HtmlElement["ontouchmove"] = function (e)
+			{
+				oThis.onMouseMove(e.touches[0]);
+				return false;
+			};
+			this.m_oOverlay.HtmlElement["ontouchend"] = function (e)
+			{
+				oThis.onMouseUp(e.changedTouches[0]);
+				return false;
+			};
 
-		this.m_oTopRuler_horRuler.HtmlElement["ontouchstart"] = function(e)
-		{
-			oThis.horRulerMouseDown(e.touches[0]);
-			return false;
-		};
-		this.m_oTopRuler_horRuler.HtmlElement["ontouchmove"]  = function(e)
-		{
-			oThis.horRulerMouseMove(e.touches[0]);
-			return false;
-		};
-		this.m_oTopRuler_horRuler.HtmlElement["ontouchend"]   = function(e)
-		{
-			oThis.horRulerMouseUp(e.changedTouches[0]);
-			return false;
-		};
+			this.m_oTopRuler_horRuler.HtmlElement["ontouchstart"] = function (e)
+			{
+				oThis.horRulerMouseDown(e.touches[0]);
+				return false;
+			};
+			this.m_oTopRuler_horRuler.HtmlElement["ontouchmove"] = function (e)
+			{
+				oThis.horRulerMouseMove(e.touches[0]);
+				return false;
+			};
+			this.m_oTopRuler_horRuler.HtmlElement["ontouchend"] = function (e)
+			{
+				oThis.horRulerMouseUp(e.changedTouches[0]);
+				return false;
+			};
 
-		this.m_oLeftRuler_vertRuler.HtmlElement["ontouchstart"] = function(e)
-		{
-			oThis.verRulerMouseDown(e.touches[0]);
-			return false;
-		};
-		this.m_oLeftRuler_vertRuler.HtmlElement["ontouchmove"]  = function(e)
-		{
-			oThis.verRulerMouseMove(e.touches[0]);
-			return false;
-		};
-		this.m_oLeftRuler_vertRuler.HtmlElement["ontouchend"]   = function(e)
-		{
-			oThis.verRulerMouseUp(e.changedTouches[0]);
-			return false;
-		};
+			this.m_oLeftRuler_vertRuler.HtmlElement["ontouchstart"] = function (e)
+			{
+				oThis.verRulerMouseDown(e.touches[0]);
+				return false;
+			};
+			this.m_oLeftRuler_vertRuler.HtmlElement["ontouchmove"] = function (e)
+			{
+				oThis.verRulerMouseMove(e.touches[0]);
+				return false;
+			};
+			this.m_oLeftRuler_vertRuler.HtmlElement["ontouchend"] = function (e)
+			{
+				oThis.verRulerMouseUp(e.changedTouches[0]);
+				return false;
+			};
+		}
 	};
+
+	this.initEventsMobile = function()
+	{
+		if (this.m_oApi.isMobileVersion)
+		{
+			this.m_oThumbnailsContainer.HtmlElement.style.zIndex = "11";
+
+			this.TextBoxBackground = CreateControl(AscCommon.g_inputContext.HtmlArea.id);
+			this.TextBoxBackground.HtmlElement.parentNode.parentNode.style.zIndex = 10;
+
+			this.MobileTouchManager.initEvents(AscCommon.g_inputContext.HtmlArea.id);
+			this.MobileTouchManagerThumbnails.initEvents(this.m_oThumbnails.HtmlElement.id);
+
+			if (AscCommon.AscBrowser.isAndroid)
+			{
+				this.TextBoxBackground.HtmlElement["oncontextmenu"] = function(e)
+				{
+					if (e.preventDefault)
+						e.preventDefault();
+
+					e.returnValue = false;
+					return false;
+				};
+
+				this.TextBoxBackground.HtmlElement["onselectstart"] = function(e)
+				{
+					oThis.m_oLogicDocument.Select_All();
+
+					if (e.preventDefault)
+						e.preventDefault();
+
+					e.returnValue = false;
+					return false;
+				};
+			}
+		}
+	};
+
 	this.onButtonRulersClick       = function()
 	{
 		if (false === oThis.m_oApi.bInit_word_control || true === oThis.m_oApi.isViewMode)
@@ -2419,6 +2477,7 @@ function CEditorPage(api)
 		this.m_bIsRePaintOnScroll      = true;
 
 		this.m_oBoundsController.ClearNoAttack();
+
 		this.OnScroll();
 		this.onTimerScroll_sync(true);
 
@@ -2577,6 +2636,7 @@ function CEditorPage(api)
 		var ctx = overlay.m_oContext;
 
 		var drDoc = this.m_oDrawingDocument;
+		drDoc.SelectionMatrix = null;
 
 		if (drDoc.SlideCurrent >= drDoc.m_oLogicDocument.Slides.length)
 			drDoc.SlideCurrent = drDoc.m_oLogicDocument.Slides.length - 1;
@@ -2631,7 +2691,13 @@ function CEditorPage(api)
 			ctx.stroke();
 			ctx.beginPath();
 			ctx.globalAlpha = 1.0;
+
+			if (this.MobileTouchManager)
+				this.MobileTouchManager.CheckSelect(overlay);
 		}
+
+		if (this.MobileTouchManager)
+			this.MobileTouchManager.CheckTableRules(overlay);
 
 		ctx.globalAlpha = 1.0;
 		ctx             = null;
@@ -2913,6 +2979,9 @@ function CEditorPage(api)
 		this.Thumbnails.SlideHeight = this.m_oLogicDocument.Height;
 		this.Thumbnails.SlidesCount = this.m_oDrawingDocument.SlidesCount;
 		this.Thumbnails.CheckSizes();
+
+		if (this.MobileTouchManager)
+			this.MobileTouchManager.Resize();
 	};
 
 	this.CheckCalculateDocumentSize = function(_bounds)
@@ -3039,20 +3108,15 @@ function CEditorPage(api)
 
 		this.m_oApi.syncOnThumbnailsShow();
 
-		if (!this.m_oApi.isMobileVersion)
-        {
-            AscCommon.InitBrowserInputContext(this.m_oApi, "id_target_cursor");
-            if (AscCommon.g_inputContext)
-                AscCommon.g_inputContext.onResize("id_main_view");
-        }
-        else
-        {
-            window.onkeydown = this.onKeyDown;
-            window.onkeypress = this.onKeyPress;
-            window.onkeyup = this.onKeyUp;
+		if (true)
+		{
+			AscCommon.InitBrowserInputContext(this.m_oApi, "id_target_cursor");
+			if (AscCommon.g_inputContext)
+				AscCommon.g_inputContext.onResize("id_main_view");
 
-            window['AscCommon'].g_clipboardBase.Init(api);
-        }
+			if (this.m_oApi.isMobileVersion)
+				this.initEventsMobile();
+		}
 	};
 
 	this.StartMainTimer = function()
@@ -3335,10 +3399,10 @@ function CEditorPage(api)
 				arr[i].Height = master.sldLayoutLst[i].Height64;
 			}
 
-			editor.sendEvent("asc_onUpdateLayout", arr);
-			editor.sendEvent("asc_onUpdateThemeIndex", this.MasterLayouts.ThemeIndex);
+			this.m_oApi.sendEvent("asc_onUpdateLayout", arr);
+			this.m_oApi.sendEvent("asc_onUpdateThemeIndex", this.MasterLayouts.ThemeIndex);
 
-			this.m_oDrawingDocument.SendThemeColorScheme();
+			this.m_oApi.sendColorThemes(this.MasterLayouts.Theme);
 		}
 
 		this.m_oDrawingDocument.CheckGuiControlColors(bIsAttack);

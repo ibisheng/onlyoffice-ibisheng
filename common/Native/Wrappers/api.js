@@ -5466,7 +5466,7 @@ Asc['asc_docs_api'].prototype["Native_Editor_Initialize_Settings"] = function(_p
                 if (_val === true)
                 {
                     this.ShowParaMarks = false;
-                    AscCommon.CollaborativeEditing.m_bGlobalLock = true;
+                    AscCommon.CollaborativeEditing.Set_GlobalLock(true);
 
                     this.isViewMode = true;
                     this.WordControl.m_oDrawingDocument.IsViewMode = true;
@@ -5705,7 +5705,7 @@ AscCommon.ChartPreviewManager.prototype.getChartPreviews = function(chartType)
 };
 
 // additional
-
+/*
 Asc['asc_docs_api'].prototype.__SendThemeColorScheme = function()
 {
     var infos = [];
@@ -5826,4 +5826,4 @@ Asc['asc_docs_api'].prototype.__SendThemeColorScheme = function()
 
     this.WordControl.m_oApi.sync_SendThemeColorSchemes(infos);
 };
-
+*/

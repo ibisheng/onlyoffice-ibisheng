@@ -91,7 +91,7 @@ ParaHyperlink.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
         return;
     }
 
-    History.Add( this, { Type : AscDFH.historyitem_Hyperlink_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
+	History.Add(new CChangesHyperlinkAddItem(this, Pos, [Item]));
 
     ParaHyperlink.superclass.Add_ToContent.apply(this, arguments);
 };
@@ -100,7 +100,7 @@ ParaHyperlink.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition
 {
     // Получим массив удаляемых элементов
     var DeletedItems = this.Content.slice( Pos, Pos + Count );
-    History.Add( this, { Type : AscDFH.historyitem_Hyperlink_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+    History.Add(new CChangesHyperlinkRemoveItem(this, Pos, DeletedItems));
 
     ParaHyperlink.superclass.Remove_FromContent.apply(this, arguments);
 };
@@ -296,7 +296,7 @@ ParaHyperlink.prototype.Get_Visited = function()
 
 ParaHyperlink.prototype.Set_ToolTip = function(ToolTip)
 {
-    History.Add( this, { Type : AscDFH.historyitem_Hyperlink_ToolTip, New : ToolTip, Old : this.ToolTip } );
+    History.Add(new CChangesHyperlinkToolTip(this, this.ToolTip, ToolTip));
     this.ToolTip = ToolTip;
 };
 
@@ -320,268 +320,12 @@ ParaHyperlink.prototype.Get_Value = function()
 
 ParaHyperlink.prototype.Set_Value = function(Value)
 {
-    History.Add( this, { Type : AscDFH.historyitem_Hyperlink_Value, New : Value, Old : this.Value } );
+    History.Add(new CChangesHyperlinkValue(this, this.Value, Value));
     this.Value = Value;
-};
-
-//-----------------------------------------------------------------------------------
-// Undo/Redo функции
-//-----------------------------------------------------------------------------------
-ParaHyperlink.prototype.Undo = function(Data)
-{
-    var Type = Data.Type;
-    switch(Type)
-    {
-        case AscDFH.historyitem_Hyperlink_AddItem :
-        {
-            this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
-            this.private_UpdateTrackRevisions();
-            this.protected_UpdateSpellChecking();
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_RemoveItem :
-        {
-            var Pos = Data.Pos;
-
-            var Array_start = this.Content.slice( 0, Pos );
-            var Array_end   = this.Content.slice( Pos );
-
-            this.Content = Array_start.concat( Data.Items, Array_end );
-            this.private_UpdateTrackRevisions();
-            this.protected_UpdateSpellChecking();
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_Value :
-        {
-            this.Value = Data.Old;
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_ToolTip :
-        {
-            this.ToolTip = Data.Old;
-            break;
-        }
-    }
-};
-
-ParaHyperlink.prototype.Redo = function(Data)
-{
-    var Type = Data.Type;
-    switch(Type)
-    {
-        case AscDFH.historyitem_Hyperlink_AddItem :
-        {
-            var Pos = Data.Pos;
-
-            var Array_start = this.Content.slice( 0, Pos );
-            var Array_end   = this.Content.slice( Pos );
-
-            this.Content = Array_start.concat( Data.Items, Array_end );
-            this.private_UpdateTrackRevisions();
-            this.protected_UpdateSpellChecking();
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_RemoveItem :
-        {
-            this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
-            this.private_UpdateTrackRevisions();
-            this.protected_UpdateSpellChecking();
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_Value :
-        {
-            this.Value = Data.New;
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_ToolTip :
-        {
-            this.ToolTip = Data.New;
-            break;
-        }
-    }
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------
-ParaHyperlink.prototype.Save_Changes = function(Data, Writer)
-{
-    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-    // Long : тип класса
-    // Long : тип изменений
-
-    Writer.WriteLong( AscDFH.historyitem_type_Hyperlink );
-
-    var Type = Data.Type;
-
-    // Пишем тип
-    Writer.WriteLong( Type );
-
-    switch(Type)
-    {
-        case AscDFH.historyitem_Hyperlink_AddItem :
-        {
-            // Long     : Количество элементов
-            // Array of :
-            //  {
-            //    Long     : Позиция
-            //    Variable : Id элемента
-            //  }
-
-            var bArray = Data.UseArray;
-            var Count  = Data.Items.length;
-
-            Writer.WriteLong( Count );
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                if ( true === bArray )
-                    Writer.WriteLong( Data.PosArray[Index] );
-                else
-                    Writer.WriteLong( Data.Pos + Index );
-
-                Writer.WriteString2( Data.Items[Index].Get_Id() );
-            }
-
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_RemoveItem :
-        {
-            // Long          : Количество удаляемых элементов
-            // Array of Long : позиции удаляемых элементов
-
-            var bArray = Data.UseArray;
-            var Count  = Data.Items.length;
-
-            var StartPos = Writer.GetCurPosition();
-            Writer.Skip(4);
-            var RealCount = Count;
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                if ( true === bArray )
-                {
-                    if ( false === Data.PosArray[Index] )
-                        RealCount--;
-                    else
-                        Writer.WriteLong( Data.PosArray[Index] );
-                }
-                else
-                    Writer.WriteLong( Data.Pos );
-            }
-
-            var EndPos = Writer.GetCurPosition();
-            Writer.Seek( StartPos );
-            Writer.WriteLong( RealCount );
-            Writer.Seek( EndPos );
-
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_Value :
-        {
-            // String : Value
-            Writer.WriteString2( Data.New );
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_ToolTip :
-        {
-            // String : ToolTip
-            Writer.WriteString2( Data.New );
-
-            break;
-        }
-    }
-};
-
-ParaHyperlink.prototype.Load_Changes = function(Reader)
-{
-    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-    // Long : тип класса
-    // Long : тип изменений
-
-    var ClassType = Reader.GetLong();
-    if ( AscDFH.historyitem_type_Hyperlink != ClassType )
-        return;
-
-    var Type = Reader.GetLong();
-
-    switch ( Type )
-    {
-        case AscDFH.historyitem_Hyperlink_AddItem :
-        {
-            // Long     : Количество элементов
-            // Array of :
-            //  {
-            //    Long     : Позиция
-            //    Variable : Id Элемента
-            //  }
-
-            var Count = Reader.GetLong();
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var Pos     = this.m_oContentChanges.Check( AscCommon.contentchanges_Add, Reader.GetLong() );
-                var Element = AscCommon.g_oTableId.Get_ById( Reader.GetString2() );
-
-                if ( null != Element )
-                {
-                    this.Content.splice( Pos, 0, Element );
-                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
-                }
-            }
-            this.private_UpdateTrackRevisions();
-            this.protected_UpdateSpellChecking();
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_RemoveItem:
-        {
-            // Long          : Количество удаляемых элементов
-            // Array of Long : позиции удаляемых элементов
-
-            var Count = Reader.GetLong();
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var ChangesPos = this.m_oContentChanges.Check( AscCommon.contentchanges_Remove, Reader.GetLong() );
-
-                // действие совпало, не делаем его
-                if ( false === ChangesPos )
-                    continue;
-
-                this.Content.splice( ChangesPos, 1 );
-                AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
-            }
-            this.private_UpdateTrackRevisions();
-            this.protected_UpdateSpellChecking();
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_Value:
-        {
-            // String : Value
-            this.Value = Reader.GetString2();
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_ToolTip :
-        {
-            // String : ToolTip
-            this.ToolTip = Reader.GetString2();
-
-            break;
-        }
-    }
-};
-
 ParaHyperlink.prototype.Write_ToBinary2 = function(Writer)
 {
     Writer.WriteLong( AscDFH.historyitem_type_Hyperlink );

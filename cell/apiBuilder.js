@@ -96,6 +96,49 @@
 	AscCommon.extendClass(ApiChart, ApiDrawing);
 
 	/**
+	 * @typedef {("aliceBlue" | "antiqueWhite" | "aqua" | "aquamarine" | "azure" | "beige" | "bisque" | "black" |
+     *     "blanchedAlmond" | "blue" | "blueViolet" | "brown" | "burlyWood" | "cadetBlue" | "chartreuse" | "chocolate"
+     *     | "coral" | "cornflowerBlue" | "cornsilk" | "crimson" | "cyan" | "darkBlue" | "darkCyan" | "darkGoldenrod" |
+     *     "darkGray" | "darkGreen" | "darkGrey" | "darkKhaki" | "darkMagenta" | "darkOliveGreen" | "darkOrange" |
+     *     "darkOrchid" | "darkRed" | "darkSalmon" | "darkSeaGreen" | "darkSlateBlue" | "darkSlateGray" |
+     *     "darkSlateGrey" | "darkTurquoise" | "darkViolet" | "deepPink" | "deepSkyBlue" | "dimGray" | "dimGrey" |
+     *     "dkBlue" | "dkCyan" | "dkGoldenrod" | "dkGray" | "dkGreen" | "dkGrey" | "dkKhaki" | "dkMagenta" |
+     *     "dkOliveGreen" | "dkOrange" | "dkOrchid" | "dkRed" | "dkSalmon" | "dkSeaGreen" | "dkSlateBlue" |
+     *     "dkSlateGray" | "dkSlateGrey" | "dkTurquoise" | "dkViolet" | "dodgerBlue" | "firebrick" | "floralWhite" |
+     *     "forestGreen" | "fuchsia" | "gainsboro" | "ghostWhite" | "gold" | "goldenrod" | "gray" | "green" |
+     *     "greenYellow" | "grey" | "honeydew" | "hotPink" | "indianRed" | "indigo" | "ivory" | "khaki" | "lavender" |
+     *     "lavenderBlush" | "lawnGreen" | "lemonChiffon" | "lightBlue" | "lightCoral" | "lightCyan" |
+     *     "lightGoldenrodYellow" | "lightGray" | "lightGreen" | "lightGrey" | "lightPink" | "lightSalmon" |
+     *     "lightSeaGreen" | "lightSkyBlue" | "lightSlateGray" | "lightSlateGrey" | "lightSteelBlue" | "lightYellow" |
+     *     "lime" | "limeGreen" | "linen" | "ltBlue" | "ltCoral" | "ltCyan" | "ltGoldenrodYellow" | "ltGray" |
+     *     "ltGreen" | "ltGrey" | "ltPink" | "ltSalmon" | "ltSeaGreen" | "ltSkyBlue" | "ltSlateGray" | "ltSlateGrey"|
+     *     "ltSteelBlue" | "ltYellow" | "magenta" | "maroon" | "medAquamarine" | "medBlue" | "mediumAquamarine" |
+     *     "mediumBlue" | "mediumOrchid" | "mediumPurple" | "mediumSeaGreen" | "mediumSlateBlue" |
+     *     "mediumSpringGreen" | "mediumTurquoise" | "mediumVioletRed" | "medOrchid" | "medPurple" | "medSeaGreen" |
+     *     "medSlateBlue" | "medSpringGreen" | "medTurquoise" | "medVioletRed" | "midnightBlue" | "mintCream" |
+     *     "mistyRose" | "moccasin" | "navajoWhite" | "navy" | "oldLace" | "olive" | "oliveDrab" | "orange" |
+     *     "orangeRed" | "orchid" | "paleGoldenrod" | "paleGreen" | "paleTurquoise" | "paleVioletRed" | "papayaWhip"|
+     *     "peachPuff" | "peru" | "pink" | "plum" | "powderBlue" | "purple" | "red" | "rosyBrown" | "royalBlue" |
+     *     "saddleBrown" | "salmon" | "sandyBrown" | "seaGreen" | "seaShell" | "sienna" | "silver" | "skyBlue" |
+     *     "slateBlue" | "slateGray" | "slateGrey" | "snow" | "springGreen" | "steelBlue" | "tan" | "teal" |
+     *     "thistle" | "tomato" | "turquoise" | "violet" | "wheat" | "white" | "whiteSmoke" | "yellow" |
+     *     "yellowGreen")} PresetColor
+	 * */
+
+	/**
+	 *
+	 * @typedef {("none" | "nextTo" | "low" | "high")} TickLabelPosition
+	 * **/
+
+	/**
+	 * Class representing a base class for color types
+	 * @constructor
+	 */
+	function ApiColor(color) {
+		this.color = color;
+	}
+
+	/**
 	 * Returns an object that represents the active sheet
 	 * @memberof Api
 	 * @returns {ApiWorksheet}
@@ -105,8 +148,68 @@
 		return new ApiWorksheet(this.wbModel.getWorksheet(index));
 	};
 
+	/**
+	 * Returns an object that represents the active sheet
+	 * @memberof Api
+	 * @returns {ThemesColors}
+	 */
+	Api.prototype.GetThemesColors = function () {
+		/**
+		 * @enum
+		 * @name ThemesColors
+		 */
+		var result = {};
+		AscCommon.g_oUserColorScheme.forEach(function (item, i) {
+			result[item.get_name()] = i;
+		});
+
+		return result;
+	};
+
+	/**
+	 * Returns an object that represents the active sheet
+	 * @memberof Api
+	 * @param {ThemesColors | string} theme
+	 */
+	Api.prototype.SetThemeColors = function (theme) {
+		if ('string' === typeof theme) {
+			if (!AscCommon.g_oUserColorScheme.some(function (item, i) {
+					if (theme === item.get_name()) {
+						theme = i;
+						return true;
+					}
+				})) {
+				return;
+			}
+		}
+		this.wbModel.changeColorScheme(theme);
+	};
+
 	Api.prototype.CreateNewHistoryPoint = function(){
 		History.Create_NewPoint();
+	};
+
+	/**
+	 * Create a RGB color
+	 * @memberof Api
+	 * @param {byte} r
+	 * @param {byte} g
+	 * @param {byte} b
+	 * @returns {ApiColor}
+	 */
+	Api.prototype.CreateColorFromRGB = function (r, g, b) {
+		return new ApiColor(AscCommonExcel.createRgbColor(r, g, b));
+	};
+
+	/**
+	 * Create a RGB color
+	 * @memberof Api
+	 * @param {PresetColor} presetColor
+	 * @returns {ApiColor}
+	 */
+	Api.prototype.CreateColorByName = function (presetColor) {
+		var rgb = map_prst_color[presetColor];
+		return new ApiColor(AscCommonExcel.createRgbColor((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF));
 	};
 
 	/**
@@ -166,6 +269,24 @@
 	 */
 	ApiWorksheet.prototype.SetColumnWidth = function (column, width) {
 		this.worksheet.setColWidth(width, column, column);
+	};
+
+	/**
+	 * Set displayed gridlines
+	 * @memberof ApiWorksheet
+	 * @param {bool} value
+	 */
+	ApiWorksheet.prototype.SetDisplayGridlines = function (value) {
+		this.worksheet.setDisplayGridlines(!!value);
+	};
+
+	/**
+	 * Set displayed headings
+	 * @memberof ApiWorksheet
+	 * @param {bool} value
+	 */
+	ApiWorksheet.prototype.SetDisplayHeadings = function (value) {
+		this.worksheet.setDisplayHeadings(!!value);
 	};
 
 	/**
@@ -336,7 +457,7 @@
 
 	/**
 	 * Create a shape.
-	 * @memberof Api
+	 * @memberof ApiWorksheet
 	 * @param {ShapeType} [sType="rect"]
 	 * @param {EMU} nWidth
 	 * @param {EMU} nHeight
@@ -357,7 +478,7 @@
 
 	/**
 	 * Create a image.
-	 * @memberof Api
+	 * @memberof ApiWorksheet
 	 * @param {string} sImageSrc
 	 * @param {EMU} nWidth
 	 * @param {EMU} nHeight
@@ -372,6 +493,16 @@
 		private_SetCoords(oImage, this.worksheet, nWidth, nHeight, nFromCol, nColOffset,  nFromRow, nRowOffset);
 		return new ApiImage(AscFormat.DrawingObjectsController.prototype.createImage(sImageSrc, 0, 0, nWidth/36000, nHeight/36000));
 	};
+
+	/**
+	 * Specifies the border to be retrieved.
+	 * @typedef {("DiagonalDown" | "DiagonalUp" | "Bottom" | "Left" | "Right" | "Top" | "InsideHorizontal" | "InsideVertical")} BordersIndex
+	 */
+
+	/**
+	 * Specifies the line style for the border.
+	 * @typedef {("None" | "Double" | "Hair" | "DashDotDot" | "DashDot" | "Dotted" | "Dashed" | "Thin" | "MediumDashDotDot" | "SlantDashDot" | "MediumDashDot" | "MediumDashed" | "Medium" | "Thick")} LineStyle
+	 */
 
 	/**
 	 * Get cell row
@@ -393,24 +524,24 @@
 	/**
 	 * Set cell value
 	 * @memberof ApiRange
-	 * @param {string} val
+	 * @param {string} value
 	 */
-	ApiRange.prototype.SetValue = function (val) {
-		this.range.setValue(val);
+	ApiRange.prototype.SetValue = function (value) {
+		this.range.setValue(value);
 	};
 
 	/**
 	 * Set text color in the rgb format.
-	 * @param {byte} r
-	 * @param {byte} g
-	 * @param {byte} b
+	 * @memberof ApiRange
+	 * @param {ApiColor} color
 	 */
-	ApiRange.prototype.SetFontColor = function (r, g, b) {
-		this.range.setFontcolor(new AscCommonExcel.RgbColor((r << 16) + (g << 8) + b));
+	ApiRange.prototype.SetFontColor = function (color) {
+		this.range.setFontcolor(color.color);
 	};
 
 	/**
 	 * Set font size
+	 * @memberof ApiRange
 	 * @param {number} size
 	 */
 	ApiRange.prototype.SetFontSize = function (size) {
@@ -419,6 +550,7 @@
 
 	/**
 	 * Set font name
+	 * @memberof ApiRange
 	 * @param {string} name
 	 */
 	ApiRange.prototype.SetFontName = function (name) {
@@ -427,6 +559,7 @@
 
 	/**
 	 * Set align vertical
+	 * @memberof ApiRange
 	 * @param {'center' | 'bottom' | 'top'} value
 	 */
 	ApiRange.prototype.SetAlignVertical = function (value) {
@@ -480,7 +613,152 @@
 		}
 	};
 
+	/**
+	 * Set bold
+	 * @memberof ApiRange
+	 * @param {bool} value
+	 */
+	ApiRange.prototype.SetBold = function (value) {
+		this.range.setBold(!!value);
+	};
 
+	/**
+	 * Set italic
+	 * @memberof ApiRange
+	 * @param {bool} value
+	 */
+	ApiRange.prototype.SetItalic = function (value) {
+		this.range.setItalic(!!value);
+	};
+
+	/**
+	 * Set underline
+	 * @memberof ApiRange
+	 * @param {'none' | 'single' | 'singleAccounting' | 'double' | 'doubleAccounting'} value
+	 */
+	ApiRange.prototype.SetUnderline = function (value) {
+		var val;
+		switch (value) {
+			case 'single':
+				val = Asc.EUnderline.underlineSingle;
+				break;
+			case 'singleAccounting':
+				val = Asc.EUnderline.underlineSingleAccounting;
+				break;
+			case 'double':
+				val = Asc.EUnderline.underlineDouble;
+				break;
+			case 'doubleAccounting':
+				val = Asc.EUnderline.underlineDoubleAccounting;
+				break;
+			case 'none':
+			default:
+				val = Asc.EUnderline.underlineNone;
+				break;
+		}
+		this.range.setUnderline(val);
+	};
+
+	/**
+	 * Set strikeout
+	 * @memberof ApiRange
+	 * @param {bool} value
+	 */
+	ApiRange.prototype.SetStrikeout = function (value) {
+		this.range.setStrikeout(!!value);
+	};
+
+	/**
+	 * Set wrap
+	 * @memberof ApiRange
+	 * @param {bool} value
+	 */
+	ApiRange.prototype.SetWrap = function (value) {
+		this.range.setWrap(!!value);
+	};
+
+	/**
+	 * Set fill color in the rgb format.
+	 * @memberof ApiRange
+	 * @param {ApiColor} color
+	 */
+	ApiRange.prototype.SetFillColor = function (color) {
+		this.range.setFill(color.color);
+	};
+
+	/**
+	 * Set the number format.
+	 * @memberof ApiRange
+	 * @param {string} value
+	 */
+	ApiRange.prototype.SetNumberFormat = function (value) {
+		this.range.setNumFormat(value);
+	};
+
+	/**
+	 * Set border properties.
+	 * @memberof ApiRange
+	 * @param {BordersIndex} bordersIndex
+	 * @param {LineStyle} lineStyle
+	 * @param {ApiColor} color
+	 */
+	ApiRange.prototype.SetBorders = function (bordersIndex, lineStyle, color) {
+		var borders = new AscCommonExcel.Border();
+		switch (bordersIndex) {
+			case 'DiagonalDown':
+				borders.dd = true;
+				borders.d = private_MakeBorder(lineStyle, color);
+				break;
+			case 'DiagonalUp':
+				borders.du = true;
+				borders.d = private_MakeBorder(lineStyle, color);
+				break;
+			case 'Bottom':
+				borders.b = private_MakeBorder(lineStyle, color);
+				break;
+			case 'Left':
+				borders.l = private_MakeBorder(lineStyle, color);
+				break;
+			case 'Right':
+				borders.r = private_MakeBorder(lineStyle, color);
+				break;
+			case 'Top':
+				borders.t = private_MakeBorder(lineStyle, color);
+				break;
+			case 'InsideHorizontal':
+				borders.ih = private_MakeBorder(lineStyle, color);
+				break;
+			case 'InsideVertical':
+				borders.iv = private_MakeBorder(lineStyle, color);
+				break;
+		}
+		this.range.setBorder(borders);
+	};
+
+	/**
+	 * Creates a merged cell from the specified Range.
+	 * @memberof ApiRange
+	 * @param {bool} across
+	 */
+	ApiRange.prototype.Merge = function (across) {
+		if (across) {
+			var ws = this.range.worksheet;
+			var bbox = this.range.getBBox0();
+			for (var r = bbox.r1; r <= bbox.r2; ++r) {
+				ws.getRange3(r, bbox.c1, r, bbox.c2).merge(null);
+			}
+		} else {
+			this.range.merge(null);
+		}
+	};
+
+	/**
+	 * Separates a merged area into individual cells.
+	 * @memberof ApiRange
+	 */
+	ApiRange.prototype.UnMerge = function () {
+		this.range.unmerge();
+	};
 
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -665,6 +943,23 @@
 		AscFormat.builder_SetChartVertAxisTitle(this.Chart, sTitle, nFontSize);
 	};
 
+
+	/**
+	 * Specifies a  vertical axis orientation
+	 * @param {bool} bIsMinMax
+	 * */
+	ApiChart.prototype.SetVerAxisOrientation = function(bIsMinMax){
+		AscFormat.builder_SetChartVertAxisOrientation(this.Chart, bIsMinMax);
+	};
+
+	/**
+	 * Specifies a  horizontal axis orientation
+	 * @param {bool} bIsMinMax
+	 * */
+	ApiChart.prototype.SetHorAxisOrientation = function(bIsMinMax){
+		AscFormat.builder_SetChartHorAxisOrientation(this.Chart, bIsMinMax);
+	};
+
 	/**
 	 * Specifies a legend position
 	 * @param {"left" | "top" | "right" | "bottom" | "none"} sLegendPos
@@ -679,15 +974,44 @@
 	 * @param {boolean} bShowSerName
 	 * @param {boolean} bShowCatName
 	 * @param {boolean} bShowVal
+	 * @param {boolean} bShowPercent
 	 * */
-	ApiChart.prototype.SetShowDataLabels = function(bShowSerName, bShowCatName, bShowVal)
+	ApiChart.prototype.SetShowDataLabels = function(bShowSerName, bShowCatName, bShowVal, bShowPercent)
 	{
-		AscFormat.builder_SetShowDataLabels(this.Chart, bShowSerName, bShowCatName, bShowVal);
+		AscFormat.builder_SetShowDataLabels(this.Chart, bShowSerName, bShowCatName, bShowVal, bShowPercent);
+	};
+	/**
+	 * Spicifies tick labels position vertical axis
+	 * @param {TickLabelPosition} sTickLabelPosition
+	 * */
+	ApiChart.prototype.SetVertAxisTickLabelPosition = function(sTickLabelPosition)
+	{
+		AscFormat.builder_SetChartVertAxisTickLablePosition(this.Chart, sTickLabelPosition);
+	};
+	/**
+	 * Spicifies tick labels position horizontal axis
+	 * @param {TickLabelPosition} sTickLabelPosition
+	 * */
+	ApiChart.prototype.SetHorAxisTickLabelPosition = function(sTickLabelPosition)
+	{
+		AscFormat.builder_SetChartHorAxisTickLablePosition(this.Chart, sTickLabelPosition);
+	};
+
+	/**
+	 * Get the type of this class.
+	 * @returns {"color"}
+	 */
+	ApiColor.prototype.GetClassType = function () {
+		return "color";
 	};
 
 
 	Api.prototype["GetActiveSheet"] = Api.prototype.GetActiveSheet;
+	Api.prototype["GetThemesColors"] = Api.prototype.GetThemesColors;
+	Api.prototype["SetThemeColors"] = Api.prototype.SetThemeColors;
 	Api.prototype["CreateNewHistoryPoint"] = Api.prototype.CreateNewHistoryPoint;
+	Api.prototype["CreateColorFromRGB"] = Api.prototype.CreateColorFromRGB;
+	Api.prototype["CreateColorByName"] = Api.prototype.CreateColorByName;
 
 	ApiWorksheet.prototype["GetActiveCell"] = ApiWorksheet.prototype.GetActiveCell;
 	ApiWorksheet.prototype["SetName"] = ApiWorksheet.prototype.SetName;
@@ -695,6 +1019,8 @@
 	ApiWorksheet.prototype["GetRangeByNumber"] = ApiWorksheet.prototype.GetRangeByNumber;
 	ApiWorksheet.prototype["FormatAsTable"] = ApiWorksheet.prototype.FormatAsTable;
 	ApiWorksheet.prototype["SetColumnWidth"] = ApiWorksheet.prototype.SetColumnWidth;
+	ApiWorksheet.prototype["SetDisplayGridlines"] = ApiWorksheet.prototype.SetDisplayGridlines;
+	ApiWorksheet.prototype["SetDisplayHeadings"] = ApiWorksheet.prototype.SetDisplayHeadings;
 	ApiWorksheet.prototype["AddChart"] = ApiWorksheet.prototype.AddChart;
 	ApiWorksheet.prototype["AddShape"] = ApiWorksheet.prototype.AddShape;
 	ApiWorksheet.prototype["AddImage"] = ApiWorksheet.prototype.AddImage;
@@ -707,24 +1033,41 @@
 	ApiRange.prototype["SetFontName"] = ApiRange.prototype.SetFontName;
 	ApiRange.prototype["SetAlignVertical"] = ApiRange.prototype.SetAlignVertical;
 	ApiRange.prototype["SetAlignHorizontal"] = ApiRange.prototype.SetAlignHorizontal;
+	ApiRange.prototype["SetBold"] = ApiRange.prototype.SetBold;
+	ApiRange.prototype["SetItalic"] = ApiRange.prototype.SetItalic;
+	ApiRange.prototype["SetUnderline"] = ApiRange.prototype.SetUnderline;
+	ApiRange.prototype["SetStrikeout"] = ApiRange.prototype.SetStrikeout;
+	ApiRange.prototype["SetWrap"] = ApiRange.prototype.SetWrap;
+	ApiRange.prototype["SetFillColor"] = ApiRange.prototype.SetFillColor;
+	ApiRange.prototype["SetNumberFormat"] = ApiRange.prototype.SetNumberFormat;
+	ApiRange.prototype["SetBorders"] = ApiRange.prototype.SetBorders;
+	ApiRange.prototype["Merge"] = ApiRange.prototype.Merge;
+	ApiRange.prototype["UnMerge"] = ApiRange.prototype.UnMerge;
 
 
-	ApiDrawing.prototype["GetClassType"]             =  ApiDrawing.prototype.GetClassType;
-	ApiDrawing.prototype["SetSize"]                  =  ApiDrawing.prototype.SetSize;
-	ApiDrawing.prototype["SetPosition"]              =  ApiDrawing.prototype.SetPosition;
+	ApiDrawing.prototype["GetClassType"]               =  ApiDrawing.prototype.GetClassType;
+	ApiDrawing.prototype["SetSize"]                    =  ApiDrawing.prototype.SetSize;
+	ApiDrawing.prototype["SetPosition"]                =  ApiDrawing.prototype.SetPosition;
 
-	ApiImage.prototype["GetClassType"]               =  ApiImage.prototype.GetClassType;
+	ApiImage.prototype["GetClassType"]                 =  ApiImage.prototype.GetClassType;
 
-	ApiShape.prototype["GetClassType"]               =  ApiShape.prototype.GetClassType;
-	ApiShape.prototype["GetDocContent"]              =  ApiShape.prototype.GetDocContent;
-	ApiShape.prototype["SetVerticalTextAlign"]       =  ApiShape.prototype.SetVerticalTextAlign;
+	ApiShape.prototype["GetClassType"]                 =  ApiShape.prototype.GetClassType;
+	ApiShape.prototype["GetDocContent"]                =  ApiShape.prototype.GetDocContent;
+	ApiShape.prototype["SetVerticalTextAlign"]         =  ApiShape.prototype.SetVerticalTextAlign;
 
-	ApiChart.prototype["GetClassType"]               =  ApiChart.prototype.GetClassType;
-	ApiChart.prototype["SetTitle"]                   =  ApiChart.prototype.SetTitle;
-	ApiChart.prototype["SetHorAxisTitle"]            =  ApiChart.prototype.SetHorAxisTitle;
-	ApiChart.prototype["SetVerAxisTitle"]            =  ApiChart.prototype.SetVerAxisTitle;
-	ApiChart.prototype["SetLegendPos"]               =  ApiChart.prototype.SetLegendPos;
-	ApiChart.prototype["SetShowDataLabels"]          =  ApiChart.prototype.SetShowDataLabels;
+	ApiChart.prototype["GetClassType"]                 =  ApiChart.prototype.GetClassType;
+	ApiChart.prototype["SetTitle"]                     =  ApiChart.prototype.SetTitle;
+	ApiChart.prototype["SetHorAxisTitle"]              =  ApiChart.prototype.SetHorAxisTitle;
+	ApiChart.prototype["SetVerAxisTitle"]              =  ApiChart.prototype.SetVerAxisTitle;
+	ApiChart.prototype["SetVerAxisOrientation"]        =  ApiChart.prototype.SetVerAxisOrientation;
+	ApiChart.prototype["SetHorAxisOrientation"]        =  ApiChart.prototype.SetHorAxisOrientation;
+	ApiChart.prototype["SetLegendPos"]                 =  ApiChart.prototype.SetLegendPos;
+	ApiChart.prototype["SetShowDataLabels"]            =  ApiChart.prototype.SetShowDataLabels;
+	ApiChart.prototype["SetVertAxisTickLabelPosition"] =  ApiChart.prototype.SetVertAxisTickLabelPosition;
+	ApiChart.prototype["SetHorAxisTickLabelPosition"]  =  ApiChart.prototype.SetHorAxisTickLabelPosition;
+
+	ApiColor.prototype["GetClassType"]                 =  ApiColor.prototype.GetClassType;
+
 
 	function private_SetCoords(oDrawing, oWorksheet, nExtX, nExtY, nFromCol, nColOffset,  nFromRow, nRowOffset){
 		oDrawing.x = 0;
@@ -741,6 +1084,60 @@
 		oDrawing.setDrawingBaseType(AscCommon.c_oAscCellAnchorType.cellanchorOneCell);
 		oDrawing.setDrawingBaseCoords(nFromCol, nColOffset/36000.0, nFromRow, nRowOffset/36000.0, 0, 0, 0, 0, 0, 0, 0, 0);
 		oDrawing.setDrawingBaseExt(nExtX/36000.0, nExtY/36000.0);
+	}
+
+	function private_MakeBorder(lineStyle, color) {
+		var border = new AscCommonExcel.BorderProp();
+		switch (lineStyle) {
+			case 'Double':
+				border.setStyle(AscCommon.c_oAscBorderStyles.Double);
+				break;
+			case 'Hair':
+				border.setStyle(AscCommon.c_oAscBorderStyles.Hair);
+				break;
+			case 'DashDotDot':
+				border.setStyle(AscCommon.c_oAscBorderStyles.DashDotDot);
+				break;
+			case 'DashDot':
+				border.setStyle(AscCommon.c_oAscBorderStyles.DashDot);
+				break;
+			case 'Dotted':
+				border.setStyle(AscCommon.c_oAscBorderStyles.Dotted);
+				break;
+			case 'Dashed':
+				border.setStyle(AscCommon.c_oAscBorderStyles.Dashed);
+				break;
+			case 'Thin':
+				border.setStyle(AscCommon.c_oAscBorderStyles.Thin);
+				break;
+			case 'MediumDashDotDot':
+				border.setStyle(AscCommon.c_oAscBorderStyles.MediumDashDotDot);
+				break;
+			case 'SlantDashDot':
+				border.setStyle(AscCommon.c_oAscBorderStyles.SlantDashDot);
+				break;
+			case 'MediumDashDot':
+				border.setStyle(AscCommon.c_oAscBorderStyles.MediumDashDot);
+				break;
+			case 'MediumDashed':
+				border.setStyle(AscCommon.c_oAscBorderStyles.MediumDashed);
+				break;
+			case 'Medium':
+				border.setStyle(AscCommon.c_oAscBorderStyles.Medium);
+				break;
+			case 'Thick':
+				border.setStyle(AscCommon.c_oAscBorderStyles.Thick);
+				break;
+			case 'None':
+			default:
+				border.setStyle(AscCommon.c_oAscBorderStyles.None);
+				break;
+		}
+
+		if (color) {
+			border.c = color.color;
+		}
+		return border;
 	}
 
 }(window, null));

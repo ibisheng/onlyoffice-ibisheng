@@ -1722,11 +1722,11 @@ cTEXT.prototype.Calculate = function ( arg ) {
 
     for ( var i = 0, length = aText.length; i < length; ++i ) {
 
-        if ( aText[i].format && aText[i].format.skip ) {
+        if ( aText[i].format && aText[i].format.getSkip() ) {
             text += " ";
             continue;
         }
-        if ( aText[i].format && aText[i].format.repeat )
+        if ( aText[i].format && aText[i].format.getRepeat() )
             continue;
 
         text += aText[i].text;

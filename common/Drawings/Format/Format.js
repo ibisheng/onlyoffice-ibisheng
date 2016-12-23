@@ -4577,6 +4577,8 @@ function CNvPr()
     this.id = 0;
     this.name = "";
     this.isHidden = false;
+    this.descr = null;
+    this.title = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id)
@@ -4625,6 +4627,18 @@ CNvPr.prototype =
         this.isHidden = isHidden;
     },
 
+    setDecr: function(descr)
+    {
+        History.Add(this, {Type: AscDFH.historyitem_CNvPr_SetDescr , oldPr: this.descr, newPr: descr});
+        this.descr = descr;
+    },
+
+    setTitle: function(title)
+    {
+        History.Add(this, {Type: AscDFH.historyitem_CNvPr_SetTitle, oldPr: this.title, newPr: title});
+        this.title = title;
+    },
+
     Undo: function(data)
     {
         switch(data.Type)
@@ -4642,6 +4656,18 @@ CNvPr.prototype =
             case AscDFH.historyitem_CNvPr_SetIsHidden:
             {
                 this.isHidden = data.oldIsHidden;
+                break;
+            }
+
+            case AscDFH.historyitem_CNvPr_SetDescr:
+            {
+                this.descr = data.oldPr;
+                break;
+            }
+
+            case AscDFH.historyitem_CNvPr_SetTitle:
+            {
+                this.title = data.oldPr;
                 break;
             }
         }
@@ -4664,6 +4690,17 @@ CNvPr.prototype =
             case AscDFH.historyitem_CNvPr_SetIsHidden:
             {
                 this.isHidden = data.newIsHidden;
+                break;
+            }
+            case AscDFH.historyitem_CNvPr_SetDescr:
+            {
+                this.descr = data.newPr;
+                break;
+            }
+
+            case AscDFH.historyitem_CNvPr_SetTitle:
+            {
+                this.title = data.newPr;
                 break;
             }
         }
@@ -4692,6 +4729,17 @@ CNvPr.prototype =
             case AscDFH.historyitem_CNvPr_SetIsHidden:
             {
                 writeBool(w, data.newIsHidden);
+                break;
+            }
+            case AscDFH.historyitem_CNvPr_SetDescr:
+            {
+                writeString(w, data.newPr);
+                break;
+            }
+
+            case AscDFH.historyitem_CNvPr_SetTitle:
+            {
+                writeString(w, data.newPr);
                 break;
             }
         }
@@ -4725,6 +4773,18 @@ CNvPr.prototype =
             case AscDFH.historyitem_CNvPr_SetIsHidden:
             {
                 this.isHidden = readBool(r);
+                break;
+            }
+
+            case AscDFH.historyitem_CNvPr_SetDescr:
+            {
+                this.descr = readString(r);
+                break;
+            }
+
+            case AscDFH.historyitem_CNvPr_SetTitle:
+            {
+                this.title = readString(r);
                 break;
             }
         }
@@ -12379,6 +12439,43 @@ function CorrectUniColor(asc_color, unicolor, flag)
         }
     }
 
+
+    function  builder_SetChartVertAxisOrientation(oChartSpace, bIsMinMax) {
+        if(oChartSpace){
+            var verAxis = oChartSpace.chart.plotArea.getVerticalAxis();
+            if(verAxis)
+            {
+                if(!verAxis.scaling)
+                    verAxis.setScaling(new CScaling());
+                var scaling = verAxis.scaling;
+                if(bIsMinMax){
+                    scaling.setOrientation(AscFormat.ORIENTATION_MIN_MAX);
+                }
+                else{
+                    scaling.setOrientation(AscFormat.ORIENTATION_MAX_MIN);
+                }
+            }
+        }
+    }
+
+
+    function builder_SetChartHorAxisOrientation(oChartSpace, bIsMinMax){
+        if(oChartSpace){
+            var horAxis = oChartSpace.chart.plotArea.getHorizontalAxis();
+            if(horAxis){
+                if(!horAxis.scaling)
+                    horAxis.setScaling(new CScaling());
+                var scaling = horAxis.scaling;
+                if(bIsMinMax){
+                    scaling.setOrientation(AscFormat.ORIENTATION_MIN_MAX);
+                }
+                else{
+                    scaling.setOrientation(AscFormat.ORIENTATION_MAX_MIN);
+                }
+            }
+        }
+    }
+
     function builder_SetChartLegendPos(oChartSpace, sLegendPos){
 
         if(oChartSpace && oChartSpace.chart)
@@ -12433,10 +12530,11 @@ function CorrectUniColor(asc_color, unicolor, flag)
         }
     }
 
-    function builder_SetShowDataLabels(oChartSpace, bShowSerName, bShowCatName, bShowVal){
+    function builder_SetShowDataLabels(oChartSpace, bShowSerName, bShowCatName, bShowVal, bShowPerecent){
         if(oChartSpace && oChartSpace.chart && oChartSpace.chart.plotArea && oChartSpace.chart.plotArea.charts[0]){
             var oChart = oChartSpace.chart.plotArea.charts[0];
-            if(false == bShowSerName && false == bShowCatName && false == bShowVal)
+            var bPieChart = oChart.getObjectType() === AscDFH.historyitem_type_PieChart || oChart.getObjectType() === AscDFH.historyitem_type_DoughnutChart;
+            if(false == bShowSerName && false == bShowCatName && false == bShowVal && (bPieChart && bShowPerecent === false))
             {
                 if(oChart.dLbls)
                 {
@@ -12452,12 +12550,54 @@ function CorrectUniColor(asc_color, unicolor, flag)
             oChart.dLbls.setShowCatName(true == bShowCatName);
             oChart.dLbls.setShowVal(true == bShowVal);
             oChart.dLbls.setShowLegendKey(false);
-            //oChart.dLbls.setShowPercent(false);
+            if(bPieChart){
+                oChart.dLbls.setShowPercent(true === bShowPerecent);
+            }
+
             oChart.dLbls.setShowBubbleSize(false);
         }
     }
 
 
+    function builder_SetChartAxisLabelsPos(oAxis, sPosition){
+        if(!oAxis || !oAxis.setTickLblPos){
+            return;
+        }
+        var nPositionType = null;
+        var c_oAscTickLabelsPos = window['Asc'].c_oAscTickLabelsPos;
+        switch(sPosition){
+            case "high":{
+                nPositionType = c_oAscTickLabelsPos.TICK_LABEL_POSITION_HIGH;
+                break;
+            }
+            case "low":{
+                nPositionType = c_oAscTickLabelsPos.TICK_LABEL_POSITION_LOW;
+                break;
+            }
+            case "nextTo":{
+                nPositionType = c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO;
+                break;
+            }
+            case "none":{
+                nPositionType = c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE;
+                break;
+            }
+        }
+        if(nPositionType !== null){
+            oAxis.setTickLblPos(nPositionType);
+        }
+    }
+
+    function builder_SetChartVertAxisTickLablePosition(oChartSpace, sPosition){
+        if(oChartSpace){
+            builder_SetChartAxisLabelsPos(oChartSpace.chart.plotArea.getVerticalAxis(), sPosition);
+        }
+    }
+    function builder_SetChartHorAxisTickLablePosition(oChartSpace, sPosition){
+        if(oChartSpace){
+            builder_SetChartAxisLabelsPos(oChartSpace.chart.plotArea.getHorizontalAxis(), sPosition);
+        }
+    }
 
     //----------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
@@ -12575,6 +12715,11 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].builder_SetChartVertAxisTitle = builder_SetChartVertAxisTitle;
     window['AscFormat'].builder_SetChartLegendPos = builder_SetChartLegendPos;
     window['AscFormat'].builder_SetShowDataLabels = builder_SetShowDataLabels;
+
+    window['AscFormat'].builder_SetChartVertAxisOrientation = builder_SetChartVertAxisOrientation;
+    window['AscFormat'].builder_SetChartHorAxisOrientation = builder_SetChartHorAxisOrientation;
+    window['AscFormat'].builder_SetChartVertAxisTickLablePosition = builder_SetChartVertAxisTickLablePosition;
+    window['AscFormat'].builder_SetChartHorAxisTickLablePosition = builder_SetChartHorAxisTickLablePosition;
 
     window['AscFormat'].Ax_Counter = Ax_Counter;
     window['AscFormat'].TYPE_TRACK = TYPE_TRACK;

@@ -9,7 +9,10 @@
 		"../common/apiCommon.js",
 		"../common/SerializeCommonWordExcel.js",
 		"../common/editorscommon.js",
-		"../common/AdvancedOptions.js",
+        "../common/HistoryCommon.js",
+        "../common/TableId.js",
+        "../common/TableIdChanges.js",
+        "../common/AdvancedOptions.js",
 		"../cell/apiDefines.js",
 		"../cell/utils/utils.js",
 		"../cell/view/HandlerList.js",
@@ -42,7 +45,6 @@
 		"../common/Drawings/ArcTo.js",
 		"../common/Drawings/ColorArray.js",
 
-        "../common/Drawings/Format/Constants.js",
 		"../common/Drawings/CommonController.js",
 		"../common/Drawings/States.js",
 		"../common/Drawings/Format/CreateGeometry.js",
@@ -80,7 +82,8 @@
 		"../common/Drawings/HatchPattern.js",
 		
 		"../common/scroll.js",
-		"../cell/view/iscroll.js",
+		"../common/Scrolls/iscroll.js",
+		"../common/Scrolls/mobileTouchManagerBase.js",
 
         "../common/wordcopypaste.js",
 
@@ -127,35 +130,54 @@
         "../cell/model/DrawingObjects/Format/ChartSpacePrototype.js",
 		
         "../word/Editor/Comments.js",
+        "../word/Editor/CommentsChanges.js",
         "../word/Editor/Styles.js",
+        "../word/Editor/StylesChanges.js",
         "../word/Editor/FlowObjects.js",
         "../word/Editor/ParagraphContent.js",
         "../word/Editor/ParagraphContentBase.js",
+        "../word/Editor/Paragraph/ParaTextPr.js",
+        "../word/Editor/Paragraph/ParaTextPrChanges.js",
+        "../word/Editor/Paragraph/ParaDrawing.js",
+        "../word/Editor/Paragraph/ParaDrawingChanges.js",
         "../word/Editor/Hyperlink.js",
+        "../word/Editor/HyperlinkChanges.js",
         "../word/Editor/Field.js",
+        "../word/Editor/FieldChanges.js",
         "../word/Editor/Run.js",
+        "../word/Editor/RunChanges.js",
         "../word/Editor/Math.js",
+        "../word/Editor/MathChanges.js",
         "../word/Editor/Paragraph.js",
+        "../word/Editor/ParagraphChanges.js",
         "../word/Editor/Paragraph_Recalculate.js",
         "../word/Editor/Sections.js",
+        "../word/Editor/SectionsChanges.js",
         "../word/Editor/Numbering.js",
+        "../word/Editor/NumberingChanges.js",
         "../word/Editor/HeaderFooter.js",
 		"../word/Editor/DocumentContentBase.js",
         "../word/Editor/Document.js",
+        "../word/Editor/DocumentChanges.js",
         "../word/Editor/DocumentContent.js",
+        "../word/Editor/DocumentContentChanges.js",
 		"../word/Editor/DocumentControllerBase.js",
 		"../word/Editor/LogicDocumentController.js",
 		"../word/Editor/DrawingsController.js",
 		"../word/Editor/HeaderFooterController.js",
         "../word/Editor/Table.js",
+        "../word/Editor/Table/TableChanges.js",
         "../word/Editor/Table/TableRecalculate.js",
         "../word/Editor/Table/TableDraw.js",
         "../word/Editor/Table/TableRow.js",
+        "../word/Editor/Table/TableRowChanges.js",
         "../word/Editor/Table/TableCell.js",
+        "../word/Editor/Table/TableCellChanges.js",
         "../word/Editor/Serialize2.js",
         "../word/Editor/FontClassification.js",
         "../word/Editor/Spelling.js",
 		"../word/Editor/Footnotes.js",
+        "../word/Editor/FootnotesChanges.js",
 		"../word/Editor/FootEndNote.js",						
         "../word/Editor/GraphicObjects/WrapManager.js",
         "../word/Editor/Common.js",
@@ -194,41 +216,43 @@
 		  "../common/Local/license.js"
 		],
 		"common": [
-		  "../common/Local/common.js",
-          	  "../cell/Local/api.js"
+			"../common/Local/common.js",
+          	"../cell/Local/api.js"
 		]
 	  },
 	  "mobile_banners": {
-        	"min": [
-		  "../common/Native/Wrappers/memory.js"
+			"min": [
+			"../common/Native/Wrappers/memory.js"
 		],
 		"common": [
-		  "../cell/native/DrawingContext.js"
+			"../cell/native/DrawingContext.js"
 		]
 	  },
 	  "mobile": [	 
-        	"../common/Native/Wrappers/TextMeasurerWrapper.js",
-        	"../common/Native/Wrappers/DrawingStream.js",
+        "../common/Native/Wrappers/TextMeasurerWrapper.js",
+        "../common/Native/Wrappers/DrawingStream.js",
 		"../common/Native/Wrappers/ShapeDrawer.js",
-        	"../cell/native/TextDrawer.js",
-        	"../cell/native/Overlay.js",
+        "../cell/native/TextDrawer.js",
+        "../cell/native/Overlay.js",
 		"../cell/native/Graphics.js",
-        	"../cell/native/DrawingDocument.js",
+        "../cell/native/DrawingDocument.js",
  		"../cell/native/native.js"
 	  ],
       "exclude_mobile": [
-        	"../common/Overlay.js",
-        	"../common/Controls.js",
+        "../common/Overlay.js",
+        "../common/Controls.js",
 		"../cell/graphics/DrawingContext.js",
-        	"../cell/model/DrawingObjects/ShapeDrawer.js",
-        	"../cell/model/DrawingObjects/DrawingDocument.js", 
+        "../cell/model/DrawingObjects/ShapeDrawer.js",
+        "../cell/model/DrawingObjects/DrawingDocument.js", 
 		"../common/FontsFreeType/font_engine.js",
-        	"../common/FontsFreeType/FontFile.js",
-        	"../common/FontsFreeType/FontManager.js",
+        "../common/FontsFreeType/FontFile.js",
+        "../common/FontsFreeType/FontManager.js",
 		"../common/FontsFreeType/TextMeasurer.js",
 		"../cell/model/DrawingObjects/Graphics.js",
-        	"../common/Drawings/TextDrawer.js",
-		"../cell/view/iscroll.js"
+        "../common/Drawings/TextDrawer.js",
+		"../common/Scrolls/iscroll.js",
+		"../common/Scrolls/mobileTouchManagerBase.js",
+		"../cell/view/mobileTouch.js"
 	  ],
       "dst": "../cell",
       "externs": [

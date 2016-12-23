@@ -1450,7 +1450,7 @@
             if(null != tableColumn.TotalsRowFormula)
             {
                 this.memory.WriteByte(c_oSer_TableColumns.TotalsRowFormula);
-                this.memory.WriteString2(tableColumn.TotalsRowFormula);
+                this.memory.WriteString2(tableColumn.TotalsRowFormula.Formula);
             }
             if(null != tableColumn.dxf)
             {
@@ -1746,21 +1746,8 @@
                 var elem = this.oFontMap[i];
                 aFonts[elem.index] = elem.val;
             }
-            for(var i = 0, length = aFonts.length; i < length; ++i)
-            {
-                var font = aFonts[i];
-                var fontMinimized = font.getDif(g_oDefaultFormat.FontAbs);
-                if(null == fontMinimized)
-                    fontMinimized = new AscCommonExcel.Font();
-                if(null == fontMinimized.fn)
-                    fontMinimized.fn = g_oDefaultFormat.FontAbs.fn;
-                if(null == fontMinimized.scheme)
-                    fontMinimized.scheme = g_oDefaultFormat.FontAbs.scheme;
-                if(null == fontMinimized.fs)
-                    fontMinimized.fs = g_oDefaultFormat.FontAbs.fs;
-                if(null == fontMinimized.c)
-                    fontMinimized.c = g_oDefaultFormat.FontAbs.c;
-                this.bs.WriteItem(c_oSerStylesTypes.Font, function(){oThis.WriteFont(fontMinimized);});
+            for(var i = 0, length = aFonts.length; i < length; ++i) {
+                this.bs.WriteItem(c_oSerStylesTypes.Font, function(){oThis.WriteFont(aFonts[i]);});
             }
         };
         this.WriteFont = function(font)
@@ -3258,8 +3245,8 @@
 					if(ECellTypeType.celltypeNumber != nType)
 						this.bs.WriteItem(c_oSerCellTypes.Type, function(){oThis.memory.WriteByte(nType);});
 				}
-				if(null != cell.sFormula)
-					this.bs.WriteItem(c_oSerCellTypes.Formula, function(){oThis.WriteFormula(cell.sFormula, cell.sFormulaCA);});
+				if(null != cell.formulaParsed)
+					this.bs.WriteItem(c_oSerCellTypes.Formula, function(){oThis.WriteFormula(cell.formulaParsed);});
 				if(null != cell.oValue && false == cell.oValue.isEmpty())
 				{
 					var dValue = 0;
@@ -3335,7 +3322,7 @@
 				}
 			}
         };
-        this.WriteFormula = function(sFormula, sFormulaCA)
+        this.WriteFormula = function(formulaParsed)
         {
             // if(null != oFormula.aca)
             // {
@@ -3349,11 +3336,11 @@
             // this.memory.WriteByte(c_oSerPropLenType.Byte);
             // this.memory.WriteBool(oFormula.bx);
             // }
-            if(null != sFormulaCA)
+            if(true === formulaParsed.ca)
             {
                 this.memory.WriteByte(c_oSerFormulaTypes.Ca);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
-                this.memory.WriteBool(sFormulaCA);
+                this.memory.WriteBool(formulaParsed.ca);
             }
             // if(null != oFormula.del1)
             // {
@@ -3417,7 +3404,7 @@
             // }
             this.memory.WriteByte(c_oSerFormulaTypes.Text);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
-            this.memory.WriteString2(sFormula);
+            this.memory.WriteString2(formulaParsed.Formula);
         };
         this.WriteComments = function(aComments, aCommentsCoords)
         {
@@ -3875,12 +3862,13 @@
         };
     }
     /** @constructor */
-    function Binary_TableReader(stream, ws, Dxfs)
+    function Binary_TableReader(stream, oReadResult, ws, Dxfs)
     {
         this.stream = stream;
         this.ws = ws;
         this.Dxfs = Dxfs;
         this.bcr = new Binary_CommonReader(this.stream);
+        this.oReadResult = oReadResult;
         this.Read = function(length, aTables)
         {
             var res = c_oSerConstants.ReadOk;
@@ -3901,7 +3889,7 @@
                     return oThis.ReadTable(t,l, oNewTable);
                 });
                 if(null != oNewTable.Ref && null != oNewTable.DisplayName)
-                    this.ws.workbook.dependencyFormulas.addTableName(oNewTable.DisplayName, this.ws, oNewTable.Ref, oNewTable);
+                    this.ws.workbook.dependencyFormulas.addTableName(this.ws, oNewTable, true);
                 aTables.push(oNewTable);
             }
             else
@@ -4257,10 +4245,10 @@
                 oTableColumn.TotalsRowLabel = this.stream.GetString2LE(length);
             else if ( c_oSer_TableColumns.TotalsRowFunction == type )
                 oTableColumn.TotalsRowFunction = this.stream.GetUChar();
-            else if ( c_oSer_TableColumns.TotalsRowFormula == type )
-                oTableColumn.TotalsRowFormula = this.stream.GetString2LE(length);
-            else if ( c_oSer_TableColumns.DataDxfId == type )
-            {
+            else if ( c_oSer_TableColumns.TotalsRowFormula == type ) {
+                var formula = this.stream.GetString2LE(length);
+                this.oReadResult.tableCustomFunc.push({formula: formula, column: oTableColumn, ws: this.ws});
+            }  else if ( c_oSer_TableColumns.DataDxfId == type ) {
                 var DxfId = this.stream.GetULongLE();
                 oTableColumn.dxf = this.Dxfs[DxfId];
             }
@@ -4601,8 +4589,7 @@
                 }
 
                 if(0 == this.aCellXfs.length && !this.isCopyPaste)
-                    this.oStyleManager.init(oNewXfs);
-                this.minimizeXfs(oNewXfs);
+                    this.oStyleManager.init(oNewXfs, this.wb);
                 // При открытии стиль будет ссылкой
                 oNewXfs.isReference = true;
                 this.aCellXfs.push(oNewXfs);
@@ -4629,7 +4616,6 @@
                     var Dxf = Dxfs[elem.DxfId];
                     if(null != Dxf)
                     {
-                        this.minimizeXfs(Dxf);
                         var oTableStyleElement = new CTableStyleElement();
                         oTableStyleElement.dxf = Dxf;
                         if(null != elem.Size)
@@ -4668,19 +4654,6 @@
                     }
                 }
             }
-        };
-        this.minimizeXfs = function(xfs)
-        {
-            if(null != xfs.border && g_oDefaultFormat.Border.isEqual(xfs.border))
-                xfs.border = null;
-            if(null != xfs.fill && g_oDefaultFormat.Fill.isEqual(xfs.fill))
-                xfs.fill = null;
-            if(null != xfs.font && g_oDefaultFormat.Font.isEqual(xfs.font))
-                xfs.font = null;
-            if(null != xfs.num && g_oDefaultFormat.Num.isEqual(xfs.num))
-                xfs.num = null;
-            if(null != xfs.align && g_oDefaultFormat.AlignAbs.isEqual(xfs.align))
-                xfs.align = null;
         };
       this.ParseNum = function(oNum, oNumFmts) {
         var oRes = null;
@@ -5191,7 +5164,7 @@
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadTableCustomStyle(t,l, oNewStyle, aElements);
                 });
-                if(null != oNewStyle.name && aElements.length > 0) {
+                if(null != oNewStyle.name) {
                     if (null === oNewStyle.displayName)
                         oNewStyle.displayName = oNewStyle.name;
                     oCustomStyles[oNewStyle.name] = {style : oNewStyle, elements: aElements};
@@ -5337,15 +5310,12 @@
             var oThis = this;
             if ( c_oSerWorkbookTypes.DefinedName == type )
             {
-                var oNewDefinedName = new AscCommonExcel.DefinedName();
+                var oNewDefinedName = new Asc.asc_CDefName();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadDefinedName(t,l,oNewDefinedName);
                 });
-                if(null != oNewDefinedName.Name && null != oNewDefinedName.Ref)
-                {
-
-                    this.oWorkbook.dependencyFormulas.addDefinedNameNode(oNewDefinedName.Name, oNewDefinedName.LocalSheetId, oNewDefinedName.Ref, oNewDefinedName.Hidden);
-
+                if (null != oNewDefinedName.Name && null != oNewDefinedName.Ref) {
+                    this.oWorkbook.dependencyFormulas.addDefNameOpen(oNewDefinedName.Name, oNewDefinedName.Ref, oNewDefinedName.LocalSheetId, oNewDefinedName.Hidden, false);
                 }
             }
             else
@@ -5369,7 +5339,7 @@
         };
     }
     /** @constructor */
-    function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs, oMediaArray, copyPasteObj)
+    function Binary_WorksheetTableReader(stream, oReadResult, wb, aSharedStrings, aCellXfs, Dxfs, oMediaArray, copyPasteObj)
     {
         this.stream = stream;
         this.wb = wb;
@@ -5382,6 +5352,7 @@
         this.aHyperlinks = [];
         this.copyPasteObj = copyPasteObj;
         this.curWorksheet = null;
+        this.oReadResult = oReadResult;
         this.Read = function()
         {
             var oThis = this;
@@ -5573,7 +5544,7 @@
             }
             else if ( c_oSerWorksheetsTypes.Autofilter == type )
             {
-                oBinary_TableReader = new Binary_TableReader(this.stream, oWorksheet, this.Dxfs);
+                oBinary_TableReader = new Binary_TableReader(this.stream, this.oReadResult, oWorksheet, this.Dxfs);
                 oWorksheet.AutoFilter = new AscCommonExcel.AutoFilter();
                 res = this.bcr.Read1(length, function(t,l){
                     return oBinary_TableReader.ReadAutoFilter(t,l, oWorksheet.AutoFilter);
@@ -5581,7 +5552,7 @@
             }
             else if ( c_oSerWorksheetsTypes.TableParts == type )
             {
-                oBinary_TableReader = new Binary_TableReader(this.stream, oWorksheet, this.Dxfs);
+                oBinary_TableReader = new Binary_TableReader(this.stream, this.oReadResult, oWorksheet, this.Dxfs);
                 oBinary_TableReader.Read(length, oWorksheet.TableParts);
             } else if ( c_oSerWorksheetsTypes.Comments == type
                 && !(typeof editor !== "undefined" && editor.WordControl && editor.WordControl.m_oLogicDocument && Array.isArray(editor.WordControl.m_oLogicDocument.Slides))) {
@@ -6946,31 +6917,23 @@
         };
     }
 
-    function getBinaryOtherTableGVar(workbook)
+    function getBinaryOtherTableGVar(wb)
     {
-        var wb = this.wb ? this.wb : workbook;
-
         AscCommonExcel.g_oColorManager.setTheme(wb.theme);
 
         var sMinorFont = null;
         if(null != wb.theme.themeElements && null != wb.theme.themeElements.fontScheme && null != wb.theme.themeElements.fontScheme.minorFont)
             sMinorFont = wb.theme.themeElements.fontScheme.minorFont.latin;
-        var sDefFont = "Arial";
+        var sDefFont = "Calibri";
         if(null != sMinorFont && "" != sMinorFont)
             sDefFont = sMinorFont;
-        g_oDefaultFormat.Font = g_oDefaultFormat.FontAbs = new AscCommonExcel.Font({
-            fn : sDefFont,
-            scheme : EFontScheme.fontschemeNone,
-            fs : 11,
-            b : false,
-            i : false,
-            u : EUnderline.underlineNone,
-            s : false,
-            c : AscCommonExcel.g_oColorManager.getThemeColor(AscCommonExcel.g_nColorTextDefault),
-            va : AscCommon.vertalign_Baseline,
-            skip : false,
-            repeat : false
-        });
+        g_oDefaultFormat.Font = new AscCommonExcel.Font();
+		g_oDefaultFormat.Font.assignFromObject({
+		    fn: sDefFont,
+            scheme: EFontScheme.fontschemeMinor,
+			fs: 11,
+			c: AscCommonExcel.g_oColorManager.getThemeColor(AscCommonExcel.g_nColorTextDefault)
+		});
         g_oDefaultFormat.Fill = g_oDefaultFormat.FillAbs = new AscCommonExcel.Fill({bg : null});
         g_oDefaultFormat.Border = g_oDefaultFormat.BorderAbs = new AscCommonExcel.Border({
             l : new AscCommonExcel.BorderProp(),
@@ -7004,6 +6967,9 @@
         {
             isCopyPaste: isCopyPaste,
             activeRange: null
+        };
+        this.oReadResult = {
+            tableCustomFunc: []
         };
         this.getbase64DecodedData = function(szSrc)
         {
@@ -7239,11 +7205,11 @@
                         // res = (new Binary_WorkbookTableReader(this.stream, wb)).Read();
                         // break;
                         case c_oSerTableTypes.Worksheets:
-                            res = (new Binary_WorksheetTableReader(this.stream, wb, aSharedStrings, aCellXfs, aDxfs, oMediaArray, this.copyPasteObj)).Read();
+                            res = (new Binary_WorksheetTableReader(this.stream, this.oReadResult, wb, aSharedStrings, aCellXfs, aDxfs, oMediaArray, this.copyPasteObj)).Read();
                             break;
-                        case c_oSerTableTypes.CalcChain:
-                            res = (new Binary_CalcChainTableReader(this.stream, wb.calcChain)).Read();
-                            break;
+                        // case c_oSerTableTypes.CalcChain:
+                        //     res = (new Binary_CalcChainTableReader(this.stream, wb.calcChain)).Read();
+                        //     break;
                         // case c_oSerTableTypes.Other:
                         // res = (new Binary_OtherTableReader(this.stream, oMediaArray)).Read();
                         // break;
@@ -7262,9 +7228,9 @@
                     if(c_oSerConstants.ReadOk == res)
                         res = (new Binary_WorkbookTableReader(this.stream, wb)).Read();
                 }
-                wb.init();
+                wb.init(this.oReadResult.tableCustomFunc, false, true);
             } else if(window["Asc"] && window["Asc"]["editor"] !== undefined){
-                wb.init(true);
+                wb.init(this.oReadResult.tableCustomFunc, true);
             }
             return res;
         };
@@ -8187,6 +8153,9 @@
     window["Asc"].CTableStyleElement = CTableStyleElement;
     window["AscCommonExcel"].BinaryFileReader = BinaryFileReader;
     window["AscCommonExcel"].BinaryFileWriter = BinaryFileWriter;
+
+    window["AscCommonExcel"].BinaryTableWriter = BinaryTableWriter;
+    window["AscCommonExcel"].Binary_TableReader = Binary_TableReader;
 
     window["Asc"].getBinaryOtherTableGVar = getBinaryOtherTableGVar;
 })(window);

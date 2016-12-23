@@ -290,8 +290,8 @@ CCollaborativeEditing.prototype.OnEnd_Load_Objects = function()
     // Данная функция вызывается, когда загрузились внешние объекты (картинки и шрифты)
 
     // Снимаем лок
-    AscCommon.CollaborativeEditing.m_bGlobalLock = false;
-    AscCommon.CollaborativeEditing.m_bGlobalLockSelection = false;
+    AscCommon.CollaborativeEditing.Set_GlobalLock(false);
+    AscCommon.CollaborativeEditing.Set_GlobalLockSelection(false);
 
     // Запускаем полный пересчет документа
     var LogicDocument = editor.WordControl.m_oLogicDocument;
@@ -335,7 +335,9 @@ CCollaborativeEditing.prototype.OnEnd_CheckLock = function()
 
         // Ставим глобальный лок, только во время совместного редактирования
         if ( true === this.m_bUse )
-            this.m_bGlobalLock = true;
+		{
+			this.Set_GlobalLock(true);
+		}
         else
         {
             // Пробегаемся по массиву и проставляем, что залочено нами
@@ -389,13 +391,13 @@ CCollaborativeEditing.prototype.OnEnd_CheckLock = function()
 
 CCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
 {
-    if (true === AscCommon.CollaborativeEditing.m_bGlobalLock)
+    if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
     {
         if (false == editor.checkLongActionCallback(AscCommon.CollaborativeEditing.OnCallback_AskLock, result))
             return;
 
         // Снимаем глобальный лок
-        AscCommon.CollaborativeEditing.m_bGlobalLock = false;
+        AscCommon.CollaborativeEditing.Set_GlobalLock(false);
 
         if (result["lock"])
         {
