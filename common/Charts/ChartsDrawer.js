@@ -2709,7 +2709,45 @@ CChartsDrawer.prototype =
 		
 		return {x: x, y: y, z: z};
 	},
+	
+	isIntersectionPlainAndLineSegment: function(plainEquation, point1, point2, projPoint1, projPoint2)
+	{
+		var res = null;
+		var lineEquation = this.getLineEquation(point1, point2);
 		
+		var intersection = this.isIntersectionPlainAndLine(plainEquation, lineEquation);
+		var convertResult = this._convertAndTurnPoint(intersection.x, intersection.y, intersection.z);
+		var isBetween = (convertResult.x >= projPoint1.x && convertResult.x <= projPoint2.x) || (convertResult.x <= projPoint1.x && convertResult.x >= projPoint2.x);
+		
+		//принадлежит ли даная точка отрезку
+		if(isBetween)
+		{
+			var vectorMultiplication = ((convertResult.x - projPoint1.x) * (projPoint2.y - projPoint1.y)) - ((convertResult.y - projPoint1.y) * (projPoint2.x - projPoint1.x));
+			if(Math.round(vectorMultiplication) === 0)
+			{
+				res = convertResult;
+			}
+		}
+		
+		return res;
+	},
+	
+	isPointsLieIntoOnePlane: function(point1, point2, point3, point4)
+	{
+		var bRes = false;
+		
+		var plain1 = this.getPlainEquation(point1, point2, point3);
+		var plain2 = this.getPlainEquation(point3, point4, point1);
+		
+		//todo пересмотреть округление
+		if(Math.round(plain1.a) === Math.round(plain2.a) && Math.round(plain1.b) === Math.round(plain2.b) && Math.round(plain1.c) === Math.round(plain2.c) && Math.round(plain1.d) === Math.round(plain2.d))
+		{
+			bRes = true;
+		}
+		
+		return bRes;
+	},
+	
 	//получаем площадь произвольного выпуклого четырехугольника
 	getAreaQuadrilateral: function(point0, point1, point2, point3)
 	{
@@ -10891,35 +10929,6 @@ drawSurfaceChart.prototype =
 					var x1 = convertResult.x;
 					var y1 = convertResult.y;
 					points[i][n] = {x: x1, y: y1, val: val};
-					
-					/*if(null !== idx2)
-					{
-						for(var k = 0; k < yPoints.length; k++)
-						{
-							if(yPoints[k].val > val && yPoints[k].val < val2)
-							{
-								var curLine1 = this.cChartDrawer.getLineEquation({x: x, y: y, z: z}, {x: x2, y: y2, z: z2});
-								var gridX1 = xPoints[0].pos * this.chartProp.pxToMM;
-								var gridX2 = xPoints[xPoints.length - 1].pos * this.chartProp.pxToMM;
-								var gridY1 = yPoints[k].pos * this.chartProp.pxToMM;
-								var gridY2 = yPoints[k].pos * this.chartProp.pxToMM;
-								
-								var curLine2 = this.cChartDrawer.getLineEquation({x: gridX1,y: gridY1, z: z}, {x: gridX2, y: gridY2, z: z});
-								var curTempIntersection = this.cChartDrawer.isIntersectionLineAndLine(curLine1, curLine2);
-								
-								var convertResult = this.cChartDrawer._convertAndTurnPoint(curTempIntersection.x, curTempIntersection.y, z);
-								if(!points[i][n].intersections)
-								{
-									points[i][n].intersections = [];
-								}
-								points[i][n].intersections[k] = convertResult;
-							}
-							else if(yPoints[k].val < val && yPoints[k].val > val2)
-							{
-								var test = 1;
-							}
-						}
-					}*/
 				}
 				else
 				{
@@ -10936,79 +10945,8 @@ drawSurfaceChart.prototype =
 		var t = this;
 		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
 		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
-		
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
-		var gridPlaneEquations = [];
-		var left = this.chartProp.chartGutter._left;
-		var right = this.chartProp.chartGutter._right;
-		var width = this.chartProp.widthCanvas - (left + right);
 		
-		
-		
-		var getIntersectionLinesAndLines = function(lines, pointStart)
-		{
-			//находим пересечение даннного сегмента с плоскостями сетки
-			for(var k = 0; k < yPoints.length; k++)
-			{
-				//var pointsStart = {p1: , p2: };
-				
-				var gridX1 = xPoints[0].pos * t.chartProp.pxToMM;
-				var gridX2 = xPoints[xPoints.length - 1].pos * t.chartProp.pxToMM;
-				var gridY1 = yPoints[k].pos * t.chartProp.pxToMM;
-				var gridY2 = yPoints[k].pos * t.chartProp.pxToMM;
-				
-				
-				var tempPoints;
-				for(var n = 0; n < lines.length; n++)
-				{
-					var curLine2 = t.cChartDrawer.getLineEquation({x: gridX1,y: gridY1, z: lines[n].p2.z}, {x: gridX2, y: gridY2, z: lines[n].p2.z});
-					var curLine1 = t.cChartDrawer.getLineEquation(lines[n].p1, lines[n].p2);
-					
-					if((yPoints[k].val >= lines[n].p1.val && yPoints[k].val <= lines[n].p2.val) || (yPoints[k].val <= lines[n].p1.val && yPoints[k].val >= lines[n].p2.val))
-					{
-						
-						var curTempIntersection = t.cChartDrawer.isIntersectionLineAndLine(curLine1, curLine2);
-						
-						
-						var convertResult = t.cChartDrawer._convertAndTurnPoint(curTempIntersection.x, curTempIntersection.y, lines[n].p2.z);
-						
-						if(!tempPoints)
-						{
-							tempPoints = {};
-						}
-						
-						if(0 === n)
-						{
-							tempPoints.p1 = convertResult; 
-						}
-						else if(2 === n)
-						{
-							tempPoints.p3 = convertResult; 
-						}
-						else if(1 === n)
-						{
-							tempPoints.p2 = convertResult; 
-						}
-						
-						/*if(!points[i][n].intersections)
-						{
-							points[i][n].intersections = [];
-						}
-						points[i][n].intersections[k] = convertResult;*/
-					}
-				}
-				
-				if(tempPoints && tempPoints.p1 && tempPoints.p2)
-				{
-					if(!t.paths.test2[k])
-					{
-						t.paths.test2[k] = [];
-					}
-					t.paths.test2[k].push(t.cChartDrawer._calculatePathFace(pointStart.p1, pointStart.p2, tempPoints.p2, tempPoints.p1, true));
-					pointStart = {p1: tempPoints.p1, p2: tempPoints.p2};
-				}
-			}
-		};
 		
 		var getIntersectionPlanesAndLines = function(lines, pointsValue)
 		{
@@ -11027,7 +10965,7 @@ drawSurfaceChart.prototype =
 				var gridX2 = xPoints[xPoints.length - 1].pos * t.chartProp.pxToMM;
 				var gridY1 = yPoints[k].pos * t.chartProp.pxToMM;
 				var gridY2 = yPoints[k].pos * t.chartProp.pxToMM;
-				var curPlain = t.cChartDrawer.getPlainEquation({x: gridX1,y: gridY1, z: 0}, {x: gridX2, y: gridY2, z: 0}, {x: gridX2, y: gridY2, z: perspectiveDepth});
+				var gridPlain = t.cChartDrawer.getPlainEquation({x: gridX1,y: gridY1, z: 0}, {x: gridX2, y: gridY2, z: 0}, {x: gridX2, y: gridY2, z: perspectiveDepth});
 				
 				var tempPoints = [];
 				var isFacePoint = null; 
@@ -11055,12 +10993,9 @@ drawSurfaceChart.prototype =
 				//n --> lines --> 0 - down, 1 - up, 2 - left, 3 - right, 4 - diagonal 
 				for(var n = 0; n < lines.length; n++)
 				{
-					
-					
-					var curLine1 = t.cChartDrawer.getLineEquation(lines[n].p1, lines[n].p2);
-					
-					var isIntersectionPlainAndLine = t.cChartDrawer.isIntersectionPlainAndLine(curPlain ,curLine1);
-					var convertResult = t.cChartDrawer._convertAndTurnPoint(isIntersectionPlainAndLine.x, isIntersectionPlainAndLine.y, isIntersectionPlainAndLine.z);
+					var convertResult = t.cChartDrawer.isIntersectionPlainAndLineSegment(gridPlain, lines[n].p1, lines[n].p2, lines[n].p111, lines[n].p222);
+					if(!convertResult)
+						continue;
 					
 					if(isFacePoint && convertResult.x === isFacePoint.x && convertResult.y === isFacePoint.y)
 					{
@@ -11083,20 +11018,8 @@ drawSurfaceChart.prototype =
 						continue;
 					}
 					
-					var isBetween = (convertResult.x >= lines[n].p111.x && convertResult.x <= lines[n].p222.x) || (convertResult.x <= lines[n].p111.x && convertResult.x >= lines[n].p222.x);
-					
-					//принадлежит ли даная точка отрезку
-					if(isBetween)
-					{
-						var vectorMultiplication = ((convertResult.x - lines[n].p111.x) * (lines[n].p222.y - lines[n].p111.y)) - ((convertResult.y - lines[n].p111.y) * (lines[n].p222.x - lines[n].p111.x));
-						if(Math.round(vectorMultiplication) === 0)
-						{
-							tempPoints[n] = convertResult;
-						}
-					}
+					tempPoints[n] = convertResult;
 				}
-				
-				
 				
 				
 				var p1 = null, p2 = null;
@@ -11155,44 +11078,14 @@ drawSurfaceChart.prototype =
 		};
 		
 		
-		var temp = [];
-		for(var i = 0; i < points.length; i++)
+		if(!this.paths.test)
 		{
-			for(var j = 0; j < points[i].length - 1; j++)
-			{
-				var p = points[i][j];
-				var p1 = points[i][j + 1];
-				
-				if(!this.paths.series)
-				{
-					this.paths.series = [];
-				}
-				
-				//this.paths.series.push(this._calculatePath(p.x, p.y, p1.x, p1.y));
-				
-				/*var p3d = this.cChartDrawer._convertAndTurnPoint(points3d[i][j].x, points3d[i][j].y, points3d[i][j].z, null, null, true);
-				var p13d = this.cChartDrawer._convertAndTurnPoint(points3d[i][j + 1].x, points3d[i][j + 1].y, points3d[i][j + 1].z, null, null, true);
-				var lineEquation = this.cChartDrawer.getLineEquation(p3d, p13d);
-				for(var k = 0; k < gridPlaneEquations.length; k++)
-				{
-					var intersection = this.cChartDrawer.isIntersectionPlainAndLine(gridPlaneEquations[k] ,lineEquation);
-					var projectPoint = this.cChartDrawer._convertAndTurnPoint(intersection.x, intersection.y, intersection.z, true, true);
-					
-					if(!temp[k])
-					{
-						temp[k] = [];
-					}
-					if(!temp[k][i])
-					{
-						temp[k][i] = [];
-					}
-					
-					temp[k][i][j] = projectPoint;
-				}*/
-			}
+			this.paths.test = [];
 		}
-		
-		
+		if(!this.paths.test2)
+		{
+			this.paths.test2 = [];
+		}
 		
 		for (var i = 0; i < points.length - 1; i++) 
 		{
@@ -11200,39 +11093,20 @@ drawSurfaceChart.prototype =
 			{
 				var p = points[i][j];
 				var p1 = points[i + 1][j];
-				
 				var p2 = points[i][j + 1];
 				var p21 = points[i + 1][j + 1];
-				
-				
-				
-				
-				if(!this.paths.test)
-				{
-					this.paths.test = [];
-				}
-				
-				if(!this.paths.test2)
-				{
-					this.paths.test2 = [];
-				}
-				
-				//this.paths.test.push(this._calculatePath(p.x, p.y, p1.x, p1.y));
-				//this.paths.test.push(this._calculatePath(p2.x, p2.y, p21.x, p21.y));
 				
 				this.paths.test.push(this.cChartDrawer._calculatePathFace(p, p2, p21, p1, true));
 				
 				var p3d = points3d[i][j];
 				var p13d = points3d[i + 1][j];
-				
 				var p23d = points3d[i][j + 1];
 				var p213d = points3d[i + 1][j + 1];
 				
 				var lines = [{p1: p3d, p2: p23d, p111: p, p222: p2}, {p1: p13d, p2: p213d, p111: p1, p222: p21}, {p1: p3d, p2: p13d, p111: p, p222: p1}, {p1: p23d, p2: p213d, p111: p2, p222: p21}];
 				
-				
-				//var tempFaces = [{p1: p, p2: p2, p3: p21, p1: p1}];
-				if(Math.abs(p1.y - p.y) !== Math.abs(p2.y - p21.y) /*&& Math.abs(p1.val - p.val) !== Math.abs(p2.val - p21.val)*/)
+
+				if(!this.cChartDrawer.isPointsLieIntoOnePlane(p3d, p13d, p213d, p23d))
 				{
 					var max = p.val;
 					var maxIndex = 0;
@@ -11248,19 +11122,14 @@ drawSurfaceChart.prototype =
 					
 					if(maxIndex === 0 || maxIndex === 3)
 					{	
-						//var tempFaces = [{p: p, p21: p21, p1: p1}, {p: p, p21: p21, p2: p2}];
 						lines.push({p1: p213d, p2: p3d, p111: p21, p222: p});
 						this.paths.test.push(this._calculatePath(p21.x, p21.y, p.x, p.y));
 					}
 					else
 					{
 						lines.push({p1: p13d, p2: p23d, p111: p1, p222: p2});
-						//var tempFaces = [{p: p, p21: p21, p1: p1}, {p: p, p21: p21, p2: p2}];
 						this.paths.test.push(this._calculatePath(p2.x, p2.y, p1.x, p1.y));
 					}
-					
-					
-					//console.log("p1:" + p1.val + " p: " + p.val + " p2: " + p2.val + " p21: " + p21.val);
 				}
 				
 				//p, p2, p21, p1 - точки данного сегмента
@@ -11268,44 +11137,8 @@ drawSurfaceChart.prototype =
 				//  |       |
 				//  |       |
 				//  p-------p2
-				
-				
-				var pointStart = {p1: p, p2: p1};
-				//getIntersectionLinesAndLines(lines, pointStart);
 				var pointsValue = [p1, p2, p21, p];
-				getIntersectionPlanesAndLines(lines, pointsValue);
-				
-				
-				
-				/*if(p.intersections)
-				{
-					for(var k = 0; k < p.intersections.length; k++)
-					{
-						if(p.intersections[k] && p1.intersections && p1.intersections[k])
-						{
-							this.paths.test.push(this._calculatePath(p.intersections[k].x, p.intersections[k].y, p1.intersections[k].x, p1.intersections[k].y));
-						}
-						else if(p.intersections[k])
-						{
-							this.paths.test.push(this._calculatePath(p.intersections[k].x, p.intersections[k].y, p1.x, p1.y));
-						}
-					}
-				}
-				else if(p1.intersections)
-				{
-					for(var k = 0; k < p1.intersections.length; k++)
-					{
-						if(p1.intersections[k] && p.intersections && p.intersections[k])
-						{
-							this.paths.test.push(this._calculatePath(p1.intersections[k].x, p1.intersections[k].y, p.intersections[k].x, p.intersections[k].y));
-						}
-						else if(p1.intersections[k])
-						{
-							this.paths.test.push(this._calculatePath(p.x, p.y, p1.intersections[k].x, p1.intersections[k].y));
-						}
-					}
-				}*/
-				
+				//getIntersectionPlanesAndLines(lines, pointsValue);
 			}
 		}
 	},
@@ -11342,14 +11175,6 @@ drawSurfaceChart.prototype =
 	
 	_draw: function()
 	{
-		for(var i = 0; i < this.paths.series.length; i++)
-		{
-			var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
-			pen.w = 30000;
-			
-			this.cChartDrawer.drawPath(this.paths.series[i], pen, null, false);
-		}
-		
 		for(var i = 0; i < this.paths.test.length; i++)
 		{
 			var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
