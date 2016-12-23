@@ -10947,6 +10947,33 @@ drawSurfaceChart.prototype =
 		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		
+		var getGridPlain = function(index)
+		{
+			var gridX1 = xPoints[0].pos * t.chartProp.pxToMM;
+			var gridX2 = xPoints[xPoints.length - 1].pos * t.chartProp.pxToMM;
+			
+			var gridY1 = yPoints[index].pos * t.chartProp.pxToMM;
+			var gridY2 = yPoints[index].pos * t.chartProp.pxToMM;
+			var gridPlain = t.cChartDrawer.getPlainEquation({x: gridX1,y: gridY1, z: 0}, {x: gridX2, y: gridY2, z: 0}, {x: gridX2, y: gridY2, z: perspectiveDepth});
+			
+			return gridPlain;
+		};
+		
+		var isEqualPoints = function(arr, point)
+		{
+			var res = null;
+			
+			for(var p = 0; p < arr.length; p++)
+			{
+				if(arr[p] && point.x === arr[p].x && point.y === arr[p].y)
+				{
+					res = p;
+					break;
+				}
+			}
+			
+			return res;
+		};
 		
 		var getIntersectionPlanesAndLines = function(lines, pointsValue)
 		{
@@ -10961,11 +10988,7 @@ drawSurfaceChart.prototype =
 					continue;
 				}
 				
-				var gridX1 = xPoints[0].pos * t.chartProp.pxToMM;
-				var gridX2 = xPoints[xPoints.length - 1].pos * t.chartProp.pxToMM;
-				var gridY1 = yPoints[k].pos * t.chartProp.pxToMM;
-				var gridY2 = yPoints[k].pos * t.chartProp.pxToMM;
-				var gridPlain = t.cChartDrawer.getPlainEquation({x: gridX1,y: gridY1, z: 0}, {x: gridX2, y: gridY2, z: 0}, {x: gridX2, y: gridY2, z: perspectiveDepth});
+				var gridPlain = getGridPlain(k);
 				
 				var tempPoints = [];
 				var isFacePoint = null; 
@@ -11001,19 +11024,7 @@ drawSurfaceChart.prototype =
 					{
 						continue;
 					}
-					if(pointsValue[0] && convertResult.x === pointsValue[0].x && convertResult.y === pointsValue[0].y)
-					{
-						continue;
-					}
-					if(pointsValue[1] && convertResult.x === pointsValue[1].x && convertResult.y === pointsValue[1].y)
-					{
-						continue;
-					}
-					if(pointsValue[2] && convertResult.x === pointsValue[2].x && convertResult.y === pointsValue[2].y)
-					{
-						continue;
-					}
-					if(pointsValue[3] && convertResult.x === pointsValue[3].x && convertResult.y === pointsValue[3].y)
+					if(null !== isEqualPoints(pointsValue, convertResult))
 					{
 						continue;
 					}
@@ -11138,7 +11149,7 @@ drawSurfaceChart.prototype =
 				//  |       |
 				//  p-------p2
 				var pointsValue = [p1, p2, p21, p];
-				//getIntersectionPlanesAndLines(lines, pointsValue);
+				getIntersectionPlanesAndLines(lines, pointsValue);
 			}
 		}
 	},
