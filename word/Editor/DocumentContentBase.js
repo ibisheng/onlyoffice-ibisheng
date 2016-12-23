@@ -225,3 +225,50 @@ CDocumentContentBase.prototype.private_RecalculateEmptySectionParagraph = functi
 	Element.Pages[0].Bounds.Top    = ___Y;
 	Element.Pages[0].Bounds.Bottom = ___Y + LastVisibleBounds.H;
 };
+/**
+ * Передвигаем курсор (от текущего положения) к началу ссылки на сноску
+ * @param isNext двигаемся вперед или назад
+ * @param isCurrent находимся ли мы в текущем объекте
+ * @returns {boolean}
+ * @constructor
+ */
+CDocumentContentBase.prototype.GotoFootnoteRef = function(isNext, isCurrent)
+{
+	var nCurPos = 0;
+
+	if (true === isCurrent)
+	{
+		if (true === this.Selection.Use)
+			nCurPos = Math.min(this.Selection.StartPos, this.Selection.EndPos);
+		else
+			nCurPos = this.CurPos.ContentPos;
+	}
+	else
+	{
+		if (isNext)
+			nCurPos = 0;
+		else
+			nCurPos = this.Content.length - 1;
+	}
+
+	if (isNext)
+	{
+		for (var nIndex = nCurPos, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+		{
+			var oElement = this.Content[nIndex];
+			if (oElement.GotoFootnoteRef(true, true === isCurrent && nIndex === nCurPos))
+				return true;
+		}
+	}
+	else
+	{
+		for (var nIndex = nCurPos; nIndex >= 0; --nIndex)
+		{
+			var oElement = this.Content[nIndex];
+			if (oElement.GotoFootnoteRef(false, true === isCurrent && nIndex === nCurPos))
+				return true;
+		}
+	}
+
+	return false;
+};

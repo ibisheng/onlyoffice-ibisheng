@@ -1028,6 +1028,24 @@ CFootnotesController.prototype.Check_TableCoincidence = function(oTable)
 {
 	return false;
 };
+CFootnotesController.prototype.GotoNextFootnote = function()
+{
+	var oNextFootnote = this.private_GetNextFootnote(this.CurFootnote);
+	if (oNextFootnote)
+	{
+		oNextFootnote.Cursor_MoveToStartPos(false);
+		this.private_SetCurrentFootnoteNoSelection(oNextFootnote);
+	}
+};
+CFootnotesController.prototype.GotoPrevFootnote = function()
+{
+	var oPrevFootnote = this.private_GetPrevFootnote(this.CurFootnote);
+	if (oPrevFootnote)
+	{
+		oPrevFootnote.Cursor_MoveToStartPos(false);
+		this.private_SetCurrentFootnoteNoSelection(oPrevFootnote);
+	}
+};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private area
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -12071,6 +12071,54 @@ Paragraph.prototype.GetAutoWidthForDropCap = function()
 		return this.Lines[0].Ranges[0].W;
 	}
 };
+Paragraph.prototype.GotoFootnoteRef = function(isNext, isCurrent)
+{
+	var nPos = 0;
+
+	if (true === isCurrent)
+	{
+		if (true === this.Selection.Use)
+			nPos = Math.min(this.Selection.StartPos, this.Selection.EndPos);
+		else
+			nPos = this.CurPos.ContentPos;
+
+	}
+	else
+	{
+		if (true === isNext)
+			nPos = 0;
+		else
+			nPos = this.Content.length - 1;
+	}
+
+	var isStepOver = false;
+	if (true === isNext)
+	{
+		for (var nIndex = nPos, nCount = this.Content.length - 1; nIndex < nCount; ++nIndex)
+		{
+			var nRes = this.Content[nIndex].GotoFootnoteRef ? this.Content[nIndex].GotoFootnoteRef(true, true === isCurrent && nPos === nIndex, isStepOver) : 0;
+
+			if (nRes > 0)
+				isStepOver = true;
+			else  if (-1 === nRes)
+				return true;
+		}
+	}
+	else
+	{
+		for (var nIndex = nPos; nIndex >= 0; --nIndex)
+		{
+			var nRes = this.Content[nIndex].GotoFootnoteRef ? this.Content[nIndex].GotoFootnoteRef(true, true === isCurrent && nPos === nIndex, isStepOver) : 0;
+
+			if (nRes > 0)
+				isStepOver = true;
+			else  if (-1 === nRes)
+				return true;
+		}
+	}
+
+	return false;
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;

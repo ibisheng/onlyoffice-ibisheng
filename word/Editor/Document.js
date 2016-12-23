@@ -11085,8 +11085,6 @@ CDocument.prototype.AddFootnote = function(sText)
 CDocument.prototype.RemoveAllFootnotes = function()
 {
 	var nDocPosType = this.Get_DocPosType();
-	if (docpostype_Content !== nDocPosType && docpostype_Footnotes !== nDocPosType)
-		return;
 
 	var oEngine = new CDocumentFootnotesRangeEngine(true);
 	oEngine.Init(null, null);
@@ -11126,6 +11124,40 @@ CDocument.prototype.RemoveAllFootnotes = function()
 				arrRuns[0].Make_ThisElementCurrent();
 		}
 	}
+};
+CDocument.prototype.GotoFootnote = function(isNext)
+{
+	var nDocPosType = this.Get_DocPosType();
+
+	if (docpostype_Footnotes === nDocPosType)
+	{
+		if (isNext)
+			this.Footnotes.GotoNextFootnote();
+		else
+			this.Footnotes.GotoPrevFootnote();
+
+		this.Document_UpdateSelectionState();
+		this.Document_UpdateInterfaceState();
+
+		return;
+	}
+
+	if (docpostype_HdrFtr == this.CurPos.Type)
+	{
+		this.Document_End_HdrFtrEditing();
+	}
+	else if (docpostype_DrawingObjects === nDocPosType)
+	{
+		this.DrawingObjects.resetSelection2();
+		this.private_UpdateCursorXY(true, true);
+
+		this.CurPos.Type = docpostype_Content;
+
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateSelectionState();
+	}
+
+	return this.GotoFootnoteRef(isNext, true);
 };
 CDocument.prototype.GetFootnotesController = function()
 {

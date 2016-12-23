@@ -3786,10 +3786,15 @@ background-repeat: no-repeat;\
 	{
 		this.WordControl.m_oLogicDocument.RemoveAllFootnotes();
 	};
+	asc_docs_api.prototype.asc_GotoFootnote = function(isNext)
+	{
+		this.WordControl.m_oLogicDocument.GotoFootnote(isNext);
+	};
 	asc_docs_api.prototype["asc_AddFootnote"]        = asc_docs_api.prototype.asc_AddFootnote;
 	asc_docs_api.prototype["asc_RemoveAllFootnotes"] = asc_docs_api.prototype.asc_RemoveAllFootnotes;
 	asc_docs_api.prototype["asc_GetFootnoteProps"]   = asc_docs_api.prototype.asc_GetFootnoteProps;
 	asc_docs_api.prototype["asc_SetFootnoteProps"]   = asc_docs_api.prototype.asc_SetFootnoteProps;
+	asc_docs_api.prototype["asc_GotoFootnote"]       = asc_docs_api.prototype.asc_GotoFootnote;
 
 	asc_docs_api.prototype.put_AddPageBreak              = function()
 	{

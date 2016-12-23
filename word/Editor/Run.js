@@ -8567,14 +8567,14 @@ ParaRun.prototype.private_GetPosInParent = function(_Parent)
 
     return RunPos;
 };
-ParaRun.prototype.Make_ThisElementCurrent = function()
+ParaRun.prototype.Make_ThisElementCurrent = function(bUpdateStates)
 {
     if (this.Is_UseInDocument())
     {
         var ContentPos = this.Paragraph.Get_PosByElement(this);
         ContentPos.Add(this.State.ContentPos);
         this.Paragraph.Set_ParaContentPos(ContentPos, true, -1, -1);
-        this.Paragraph.Document_SetThisElementCurrent(false);
+        this.Paragraph.Document_SetThisElementCurrent(true === bUpdateStates ? true : false);
     }
 };
 ParaRun.prototype.Get_AllParagraphs = function(Props, ParaArray)
@@ -9014,6 +9014,60 @@ ParaRun.prototype.RemoveElement = function(oElement)
 		if (oElement === this.Content[nIndex])
 			return this.Remove_FromContent(nIndex, 1, true);
 	}
+};
+ParaRun.prototype.GotoFootnoteRef = function(isNext, isCurrent, isStepOver)
+{
+	var nPos = 0;
+	if (true === isCurrent)
+	{
+		if (true === this.Selection.Use)
+			nPos = Math.min(this.Selection.StartPos, this.Selection.EndPos);
+		else
+			nPos = this.State.ContentPos;
+	}
+	else
+	{
+		if (true === isNext)
+			nPos = 0;
+		else
+			nPos = this.Content.length - 1;
+	}
+
+	var nResult = 0;
+	if (true === isNext)
+	{
+		for (var nIndex = nPos, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+		{
+			if (para_FootnoteReference === this.Content[nIndex].Type && ((true !== isCurrent && true === isStepOver) || (true === isCurrent && (true === this.Selection.Use || nPos !== nIndex))))
+			{
+				if (this.Paragraph && this.Paragraph.LogicDocument)
+					this.Paragraph.LogicDocument.Selection_Remove();
+
+				this.State.ContentPos = nIndex;
+				this.Make_ThisElementCurrent(true);
+				return -1;
+			}
+			nResult++;
+		}
+	}
+	else
+	{
+		for (var nIndex = nPos; nIndex >= 0; --nIndex)
+		{
+			if (para_FootnoteReference === this.Content[nIndex].Type && ((true !== isCurrent && true === isStepOver) || (true === isCurrent && (true === this.Selection.Use || nPos !== nIndex))))
+			{
+				if (this.Paragraph && this.Paragraph.LogicDocument)
+					this.Paragraph.LogicDocument.Selection_Remove();
+
+				this.State.ContentPos = nIndex;
+				this.Make_ThisElementCurrent(true);
+				return -1;
+			}
+			nResult++;
+		}
+	}
+
+	return nResult;
 };
 
 function CParaRunStartState(Run)
