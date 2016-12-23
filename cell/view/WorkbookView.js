@@ -3030,8 +3030,8 @@
 		var _offY = ws.cellsTop * asc_getcvt(1/*pt*/, 3/*mm*/, ws._getPPIY());
 
 		return {
-			X: l + _offX,
-			Y: t + _offY,
+			X: l - _offX,
+			Y: t - _offY,
 			W: ws.getCellLeft(range.c2, 3) - l + ws.getColumnWidth(range.c2, 3),
 			H: ws.getCellTop(range.r2, 3) - t + ws.getRowHeight(range.r2, 3)
 		};

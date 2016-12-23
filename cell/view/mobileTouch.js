@@ -702,6 +702,9 @@ function (window, undefined)
 		if (!this.SelectEnabled)
 			return;
 
+		if (color !== undefined)
+			overlay.Clear();
+
 		this.CheckSelectRects();
 		if (null == this.RectSelect1 || null == this.RectSelect2)
 			return;

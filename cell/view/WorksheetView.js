@@ -13192,8 +13192,8 @@
 			}
 		}
 
-		xL -= this.cols[c].left;
-		yL -= this.rows[r].top;
+		xL -= (this.cols[c].left - this.cellsLeft - this.cellsLeft);
+		yL -= (this.rows[r].top - this.cellsTop - this.cellsTop);
 
 		xL *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
 		yL *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
