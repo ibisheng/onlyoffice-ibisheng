@@ -1284,13 +1284,19 @@ cArea3D.prototype.getBBox = function () {
 		var range = this.getRange();
 		return range ? range.getBBox() : range;
 };
-cArea3D.prototype.getBBox0 = function () {
+	cArea3D.prototype.getBBox0 = function () {
 		var range = this.getRange();
 		return range ? range.getBBox0() : range;
-};
-cArea3D.prototype.isValid = function () {
-		return !!this.getRange();
-};
+	};
+	cArea3D.prototype.isValid = function () {
+		var r = this.getRanges();
+		for (var i = 0; i < r.length; ++i) {
+			if (!r) {
+				return false;
+			}
+		}
+		return true;
+	};
 	cArea3D.prototype.countCells = function () {
 		var _wsA = this.wsRange();
 		var _val = [];

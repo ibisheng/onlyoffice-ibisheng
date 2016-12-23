@@ -3354,6 +3354,9 @@ function CEditorPage(api)
 
 	this.CheckLayouts = function(bIsAttack)
 	{
+        if(window["NATIVE_EDITOR_ENJINE"] === true){
+            return;
+        }
 		var master = null;
 		if (-1 == this.m_oDrawingDocument.SlideCurrent && 0 == this.m_oLogicDocument.slideMasters.length)
 			return;

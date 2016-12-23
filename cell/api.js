@@ -3123,6 +3123,8 @@ var editor;
     var _adjustPrint = window.AscDesktopEditor_PrintData || new Asc.asc_CAdjustPrint();
     window.AscDesktopEditor_PrintData = undefined;
 
+    var isOnePage = ((_param & 0x0100) == 0x0100);
+    _param &= 0xFF;
     if (1 == _param) {
       _adjustPrint.asc_setPrintType(Asc.c_oAscPrintType.EntireWorkbook);
       var pageSetup;

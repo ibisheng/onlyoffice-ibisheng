@@ -5135,9 +5135,6 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 					if (cElementType.cell === elem.type || cElementType.cell3D === elem.type ||
 						cElementType.cellsRange === elem.type || cElementType.cellsRange3D === elem.type) {
 						var r = elem.getRange();
-						if (cElementType.cellsRange3D === elem.type && r.length > 0) {
-							r = r[0];
-						}
 						if (r && r.getNumFormatStr) {
 							var sCurFormat = this.getNumFormatStr();
 							if (g_oDefaultFormat.Num.getFormat() == sCurFormat) {
