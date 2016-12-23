@@ -151,25 +151,21 @@
 	/**
 	 * Returns an object that represents the active sheet
 	 * @memberof Api
-	 * @returns {ThemesColors}
+	 * @returns {array}
 	 */
 	Api.prototype.GetThemesColors = function () {
-		/**
-		 * @enum
-		 * @name ThemesColors
-		 */
-		var result = {};
-		AscCommon.g_oUserColorScheme.forEach(function (item, i) {
-			result[item.get_name()] = i;
+		var result = [];
+		AscCommon.g_oUserColorScheme.forEach(function (item) {
+			result.push(item.get_name());
 		});
 
 		return result;
 	};
 
 	/**
-	 * Returns an object that represents the active sheet
+	 * Set theme colors
 	 * @memberof Api
-	 * @param {ThemesColors | string} theme
+	 * @param {string | number} theme
 	 */
 	Api.prototype.SetThemeColors = function (theme) {
 		if ('string' === typeof theme) {
