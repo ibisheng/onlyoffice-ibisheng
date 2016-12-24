@@ -357,7 +357,8 @@ var c_oSerParType = {
     Hyperlink: 10,
 	FldSimple: 11,
 	Del: 12,
-	Ins: 13
+	Ins: 13,
+	Background: 14
 };
 var c_oSerDocTableType = {
     tblPr:0,
@@ -799,6 +800,11 @@ var c_oSerNotes = {
 	PrFntPos: 9,
 	PrEndPos: 10,
 	PrRef: 11
+};
+var c_oSerBackgroundType = {
+	Color: 0,
+	ColorTheme: 1,
+	pptxDrawing: 2
 };
 var ETblStyleOverrideType = {
 	tblstyleoverridetypeBand1Horz:  0,
@@ -4068,8 +4074,35 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
         {
             //sectPr
             this.bs.WriteItem(c_oSerParType.sectPr, function(){oThis.bpPrs.WriteSectPr(oThis.Document.SectPr, oThis.Document);});
-        }
+			if (oThis.Document.Background) {
+				this.bs.WriteItem(c_oSerParType.Background, function(){oThis.WriteBackground(oThis.Document.Background);});
+			}
+		}
     };
+	this.WriteBackground = function(oBackground) {
+		var oThis = this;
+		var color = null;
+		if (null != oBackground.Color)
+			color = oBackground.Color;
+		else if (null != oBackground.Unifill) {
+			var doc = editor.WordControl.m_oLogicDocument;
+			oBackground.Unifill.check(doc.Get_Theme(), doc.Get_ColorMap());
+			var RGBA = oBackground.Unifill.getRGBAColor();
+			color = new AscCommonWord.CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
+		}
+		if (null != color && !color.Auto)
+			this.bs.WriteColor(c_oSerBackgroundType.Color, color);
+		if (null != oBackground.Unifill || (null != oBackground.Color && oBackground.Color.Auto)) {
+			this.memory.WriteByte(c_oSerBackgroundType.ColorTheme);
+			this.memory.WriteByte(c_oSerPropLenType.Variable);
+			this.bs.WriteItemWithLength(function () { oThis.bs.WriteColorTheme(oBackground.Unifill, oBackground.Color); });
+		}
+		if (oBackground.shape) {
+			this.memory.WriteByte(c_oSerBackgroundType.pptxDrawing);
+			this.memory.WriteByte(c_oSerPropLenType.Variable);
+			this.bs.WriteItemWithLength(function(){oThis.WriteGraphicObj(oBackground.shape);});
+		}
+	}
     this.WriteParapraph = function(par, bUseSelection, selectedAll)
     {
         var oThis = this;
@@ -4501,6 +4534,12 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 		this.saveParams.footnotes[index] = {type: null, content: footnote};
 		this.bs.WriteItem(c_oSerNotes.RefId, function () { oThis.memory.WriteLong(index); });
 	};
+	this.WriteGraphicObj = function(graphicObj) {
+		var oThis = this;
+		this.memory.WriteByte(c_oSerImageType2.PptxData);
+		this.memory.WriteByte(c_oSerPropLenType.Variable);
+		this.bs.WriteItemWithLength(function(){pptx_content_writer.WriteDrawing(oThis.memory, graphicObj, oThis.Document, oThis.oMapCommentId, oThis.oNumIdMap, oThis.copyParams, oThis.saveParams);});
+	}
     this.WriteImage = function(img)
     {
 		var oThis = this;
@@ -4531,12 +4570,8 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				
 				var oBinaryChartWriter = new AscCommon.BinaryChartWriter(this.memory);
 				this.bs.WriteItemWithLength(function () { oBinaryChartWriter.WriteCT_ChartSpace(img.GraphicObj); });
-			}
-			else
-			{
-				this.memory.WriteByte(c_oSerImageType2.PptxData);
-				this.memory.WriteByte(c_oSerPropLenType.Variable);
-				this.bs.WriteItemWithLength(function(){pptx_content_writer.WriteDrawing(oThis.memory, img.GraphicObj, oThis.Document, oThis.oMapCommentId, oThis.oNumIdMap, oThis.copyParams, oThis.saveParams);});
+			} else {
+				this.WriteGraphicObj(img.GraphicObj);
 			}
 		}
 		else
@@ -4671,12 +4706,8 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
 				var oBinaryChartWriter = new AscCommon.BinaryChartWriter(this.memory);
 				this.bs.WriteItemWithLength(function () { oBinaryChartWriter.WriteCT_ChartSpace(img.GraphicObj); });
-			}
-			else
-			{
-				this.memory.WriteByte(c_oSerImageType2.PptxData);
-				this.memory.WriteByte(c_oSerPropLenType.Variable);
-				this.bs.WriteItemWithLength(function(){pptx_content_writer.WriteDrawing(oThis.memory, img.GraphicObj, oThis.Document, oThis.oMapCommentId, oThis.oNumIdMap, oThis.copyParams, oThis.saveParams);});
+			} else {
+				this.WriteGraphicObj(img.GraphicObj);
 			}
 		}
 		if(this.saveParams && this.saveParams.bMailMergeHtml)
@@ -8590,11 +8621,43 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 					}
 				}
 			}
-        }
-        else
+		// } else if ( c_oSerParType.Background === type ) {
+			// oThis.Document.Background = {Color: null, Unifill: null, shape: null};
+			// res = this.bcr.Read2(length, function(t, l){
+				// return oThis.ReadBackground(t,l, oThis.Document.Background);
+			// });
+		} else
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
+	this.ReadBackground = function(type, length, oBackground)
+	{
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		if (c_oSerBackgroundType.Color === type){
+			oBackground.Color = this.bcr.ReadColor();
+		} else if(c_oSerBackgroundType.ColorTheme === type) {
+			var themeColor = {Auto: null, Color: null, Tint: null, Shade: null};
+			res = this.bcr.Read2(length, function(t, l){
+				return oThis.bcr.ReadColorTheme(t, l, themeColor);
+			});
+			if(true == themeColor.Auto)
+				oBackground.Color = new CDocumentColor(0, 0, 0, true);
+			var unifill = CreateThemeUnifill(themeColor.Color, themeColor.Tint, themeColor.Shade);
+			if(null != unifill)
+				oBackground.Unifill = unifill;
+			else if (null != oBackground.Color && !oBackground.Color.Auto)
+				oBackground.Unifill = AscFormat.CreteSolidFillRGB(oBackground.Color.r, oBackground.Color.g, oBackground.Color.b);
+		} else if(c_oSerBackgroundType.pptxDrawing === type) {
+			var oDrawing = {};
+			var oParStruct = new OpenParStruct(null, null);
+			res = this.ReadDrawing (type, length, oParStruct, oDrawing);
+			if(null != oDrawing.content.GraphicObj)
+				oBackground.shape = oDrawing.content.GraphicObj;
+		} else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	}
     this.ReadParagraph = function(type, length, paragraph, Content)
     {
         var res = c_oSerConstants.ReadOk;
