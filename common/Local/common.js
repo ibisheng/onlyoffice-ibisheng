@@ -233,17 +233,6 @@ window["asc_initAdvancedOptions"] = function(_code)
 	_editor._onNeedParams(undefined, (_code == 90 || _code == 91) ? true : undefined);
 };
 
-// copy/paste focus error!!!
-window["asc_desktop_copypaste"] = function(_api, _method)
-{
-    var bIsFocus = _api.asc_IsFocus();
-    if (!bIsFocus)
-        _api.asc_enableKeyEvents(true);
-    window["AscDesktopEditor"][_method]();
-    if (!bIsFocus)
-        _api.asc_enableKeyEvents(false);
-}
-
 // меняем среду
 //AscBrowser.isSafari = false;
 //AscBrowser.isSafariMacOs = false;
