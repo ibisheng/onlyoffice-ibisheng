@@ -444,7 +444,8 @@ var c_oSerImageType2 = {
 	CachedImage: 26,
 	SizeRelH: 27,
 	SizeRelV: 28,
-	GraphicFramePr: 30
+	GraphicFramePr: 30,
+	DocPr: 31
 };
 var c_oSerEffectExtent = {
 	Left: 0,
@@ -800,6 +801,13 @@ var c_oSerNotes = {
 	PrFntPos: 9,
 	PrEndPos: 10,
 	PrRef: 11
+};
+var c_oSerDocPr = {
+	Id: 0,
+	Name: 1,
+	Hidden: 2,
+	Title: 3,
+	Descr: 4
 };
 var c_oSerBackgroundType = {
 	Color: 0,
@@ -4563,6 +4571,11 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
 				this.bs.WriteItemWithLength(function(){oThis.WriteGraphicFramePr(img.GraphicObj.locks);});
 			}
+			if (null != img.docPr) {
+				this.memory.WriteByte(c_oSerImageType2.DocPr);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.bs.WriteItemWithLength(function(){oThis.WriteDocPr(img.docPr);});
+			}
 			if(null != img.GraphicObj.chart)
 			{
 				this.memory.WriteByte(c_oSerImageType2.Chart2);
@@ -4700,6 +4713,11 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
 				this.bs.WriteItemWithLength(function(){oThis.WriteGraphicFramePr(img.GraphicObj.locks);});
 			}
+			if (null != img.docPr) {
+				this.memory.WriteByte(c_oSerImageType2.DocPr);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.bs.WriteItemWithLength(function(){oThis.WriteDocPr(img.docPr);});
+			}
 			if(null != img.GraphicObj.chart)
 			{
 				this.memory.WriteByte(c_oSerImageType2.Chart2);
@@ -4748,6 +4766,26 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 			this.memory.WriteByte(c_oSerGraphicFramePr.NoSelect);
 			this.memory.WriteByte(c_oSerPropLenType.Byte);
 			this.memory.WriteBool(!!(locks & AscFormat.LOCKS_MASKS.noSelect << 1));
+		}
+	}
+	this.WriteDocPr = function(docPr)
+	{
+		var oThis = this;
+		this.bs.WriteItem(c_oSerDocPr.Id, function(){oThis.memory.WriteLong(oThis.saveParams.docPrId++);});
+		if (null != docPr.name) {
+			this.memory.WriteByte(c_oSerDocPr.Name);
+			this.memory.WriteString2(docPr.name);
+		}
+		if (null != docPr.isHidden) {
+			this.bs.WriteItem(c_oSerDocPr.Hidden, function(){oThis.memory.WriteBool(docPr.isHidden);});
+		}
+		if (null != docPr.title) {
+			this.memory.WriteByte(c_oSerDocPr.Title);
+			this.memory.WriteString2(docPr.title);
+		}
+		if (null != docPr.descr) {
+			this.memory.WriteByte(c_oSerDocPr.Descr);
+			this.memory.WriteString2(docPr.descr);
 		}
 	}
 	this.WriteEffectExtent = function(EffectExtent)
@@ -9498,6 +9536,10 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 			res = this.bcr.Read2(length, function(t, l){
 					return oThis.ReadNvGraphicFramePr(t, l, graphicFramePr);
 				});
+		} else if( c_oSerImageType2.DocPr === type ) {
+			res = this.bcr.Read1(length, function(t, l){
+					return oThis.ReadDocPr(t, l, oParaDrawing.docPr);
+				});
 		}
 		else if( c_oSerImageType2.CachedImage === type )
 		{
@@ -9532,6 +9574,24 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 		} else if (c_oSerGraphicFramePr.NoSelect === type) {
 			value = this.stream.GetBool();
 			graphicFramePr.locks |= (AscFormat.LOCKS_MASKS.noSelect | (value ? AscFormat.LOCKS_MASKS.noSelect << 1 : 0));
+		} else {
+			res = c_oSerConstants.ReadUnknown;
+		}
+		return res;
+	}
+	this.ReadDocPr = function(type, length, docPr) {
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		if (c_oSerDocPr.Id === type) {
+			docPr.id = this.stream.GetLongLE();
+		} else if (c_oSerDocPr.Name === type) {
+			docPr.name = this.stream.GetString2LE(length);
+		} else if (c_oSerDocPr.Hidden === type) {
+			docPr.isHidden = this.stream.GetBool();
+		} else if (c_oSerDocPr.Title === type) {
+			docPr.title = this.stream.GetString2LE(length);
+		} else if (c_oSerDocPr.Descr === type) {
+			docPr.descr = this.stream.GetString2LE(length);
 		} else {
 			res = c_oSerConstants.ReadUnknown;
 		}
@@ -13416,6 +13476,7 @@ function DocSaveParams(bMailMergeDocx, bMailMergeHtml) {
 	this.trackRevisionId = 0;
 	this.footnotes = {};
 	this.footnotesIndex = 0;
+	this.docPrId = 0;
 };
 function DocReadResult(doc) {
 	this.logicDocument = doc;
