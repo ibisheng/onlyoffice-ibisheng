@@ -2733,6 +2733,15 @@ CChartsDrawer.prototype =
 		return res;
 	},
 	
+	isPointLieIntoPlane: function(planeEquation, point)
+	{
+		var bRes = false;
+		
+		bRes = !!(planeEquation.a * point.x + planeEquation.b * point.y + planeEquation.c * point.z + planeEquation.d == 0);
+		
+		return bRes;
+	},
+	
 	isPointsLieIntoOnePlane: function(point1, point2, point3, point4)
 	{
 		var bRes = false;
@@ -10950,6 +10959,15 @@ drawSurfaceChart.prototype =
 		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		
+		if(!this.paths.test)
+		{
+			this.paths.test = [];
+		}
+		if(!this.paths.test2)
+		{
+			this.paths.test2 = [];
+		}
+		
 		var getGridPlain = function(index)
 		{
 			var gridX1 = xPoints[0].pos * t.chartProp.pxToMM;
@@ -10978,10 +10996,77 @@ drawSurfaceChart.prototype =
 			return res;
 		};
 		
+		var getIntersectionPlaneAndLines = function(k, lines, pointsValue)
+		{
+			var res = null;
+			
+			var gridPlain = getGridPlain(k);
+			var clearIntersectionPoints = [];
+			var segmentIntersectionPoints = [];
+		
+			//n --> lines --> 0 - down, 1 - up, 2 - left, 3 - right, 4 - diagonal
+			for(var n = 0; n < lines.length; n++)
+			{
+				var convertResult = t.cChartDrawer.isIntersectionPlainAndLineSegment(gridPlain, lines[n].p1, lines[n].p2, lines[n].p111, lines[n].p222);
+				if(!convertResult)
+					continue;
+				
+				if(null === isEqualPoints(pointsValue, convertResult))
+				{
+					clearIntersectionPoints.push(convertResult);
+				}
+				else
+				{
+					if(null === isEqualPoints(segmentIntersectionPoints, convertResult))
+					{
+						segmentIntersectionPoints.push(convertResult);
+					}
+				}
+			}
+			
+			if(!segmentIntersectionPoints.length)
+			{
+				if(clearIntersectionPoints.length === 2)//две точки, не равняющиеся ни одной точке сегмента
+				{
+					var p1 = clearIntersectionPoints[0];
+					var p2 = clearIntersectionPoints[1];
+					
+					res = t._calculatePath(p1.x, p1.y, p2.x, p2.y);
+				}
+				
+				if(clearIntersectionPoints.length > 2)
+				{
+					console.log("SOS");
+				}
+			}
+			else if(segmentIntersectionPoints.length && clearIntersectionPoints.length)
+			{
+				if(1 === segmentIntersectionPoints.length && 1 === clearIntersectionPoints.length)
+				{
+					var p1 = segmentIntersectionPoints[0];
+					var p2 = clearIntersectionPoints[0];
+					
+					res = t._calculatePath(p1.x, p1.y, p2.x, p2.y);
+				}
+			}
+			
+			return res;
+		};
+		
 		var getIntersectionPlanesAndLines = function(lines, pointsValue)
 		{
-			var minVal = Math.min(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val, pointsValue[3].val);
-			var maxVal = Math.max(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val, pointsValue[3].val);
+			var minVal;
+			var maxVal;
+			if(pointsValue.length === 4)
+			{
+				minVal = Math.min(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val, pointsValue[3].val);
+				maxVal = Math.max(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val, pointsValue[3].val);
+			}
+			else
+			{
+				minVal = Math.min(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val);
+				maxVal = Math.max(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val);
+			}
 			
 			//находим пересечение даннного сегмента с плоскостями сетки
 			for(var k = 0; k < yPoints.length; k++)
@@ -10991,154 +11076,16 @@ drawSurfaceChart.prototype =
 					continue;
 				}
 				
-				var gridPlain = getGridPlain(k);
-				var clearIntersectionPoints = [];
-				var segmentIntersectionPoints = [];
-			
-				//n --> lines --> 0 - down, 1 - up, 2 - left, 3 - right, 4 - diagonal
-				for(var n = 0; n < lines.length; n++)
-				{
-					var convertResult = t.cChartDrawer.isIntersectionPlainAndLineSegment(gridPlain, lines[n].p1, lines[n].p2, lines[n].p111, lines[n].p222);
-					if(!convertResult)
-						continue;
-					
-					if(null === isEqualPoints(pointsValue, convertResult))
-					{
-						clearIntersectionPoints.push(convertResult);
-					}
-					else
-					{
-						if(null === isEqualPoints(segmentIntersectionPoints, convertResult))
-						{
-							segmentIntersectionPoints.push(convertResult);
-						}
-					}
-				}
+				var path = getIntersectionPlaneAndLines(k, lines, pointsValue);
 				
-				if(!segmentIntersectionPoints.length)
+				if(!t.paths.test2[k])
 				{
-					if(clearIntersectionPoints.length === 2)//две точки, не равняющиеся ни одной точке сегмента
-					{
-						var p1 = clearIntersectionPoints[0];
-						var p2 = clearIntersectionPoints[1];
-						
-						if(!t.paths.test2[k])
-						{
-							t.paths.test2[k] = [];
-						}
-						
-						t.paths.test2[k].push(t._calculatePath(p1.x, p1.y, p2.x, p2.y));
-					}
-					
-					if(clearIntersectionPoints.length > 2)
-					{
-						console.log("SOS");
-					}
+					t.paths.test2[k] = [];
 				}
-				else if(segmentIntersectionPoints.length && clearIntersectionPoints.length)
-				{
-					if(1 === segmentIntersectionPoints.length && 1 === clearIntersectionPoints.length)
-					{
-						var p1 = segmentIntersectionPoints[0];
-						var p2 = clearIntersectionPoints[0];
-						
-						if(!t.paths.test2[k])
-						{
-							t.paths.test2[k] = [];
-						}
-						
-						t.paths.test2[k].push(t._calculatePath(p1.x, p1.y, p2.x, p2.y));
-					}
-				}
+				t.paths.test2[k].push(path);
 			}
 		};
 		
-		
-		var getIntersectionPlanesAndLines2 = function(lines, pointsValue)
-		{
-			var minVal = Math.min(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val);
-			var maxVal = Math.max(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val);
-			
-			//находим пересечение даннного сегмента с плоскостями сетки
-			for(var k = 0; k < yPoints.length; k++)
-			{
-				if(!(yPoints[k].val >= minVal && yPoints[k].val <= maxVal))
-				{
-					continue;
-				}
-				
-				var gridPlain = getGridPlain(k);
-				var clearIntersectionPoints = [];
-				var segmentIntersectionPoints = [];
-				var diagonalIntersection = null;
-			
-				//n --> lines --> 0 - down, 1 - up, 2 - left, 3 - right, 4 - diagonal
-				for(var n = 0; n < lines.length; n++)
-				{
-					var convertResult = t.cChartDrawer.isIntersectionPlainAndLineSegment(gridPlain, lines[n].p1, lines[n].p2, lines[n].p111, lines[n].p222);
-					if(!convertResult)
-						continue;
-					
-					if(null === isEqualPoints(pointsValue, convertResult))
-					{
-						clearIntersectionPoints.push(convertResult);
-					}
-					else
-					{
-						if(null === isEqualPoints(segmentIntersectionPoints, convertResult))
-						{
-							segmentIntersectionPoints.push(convertResult);
-						}
-					}
-				}
-				
-				if(!segmentIntersectionPoints.length)
-				{
-					//две точки, не равняющиеся ни одной точке сегмента, проходящие через диагональ
-					if(clearIntersectionPoints.length === 2)//две точки, не равняющиеся ни одной точке сегмента
-					{
-						var p1 = clearIntersectionPoints[0];
-						var p2 = clearIntersectionPoints[1];
-						
-						if(!t.paths.test2[k])
-						{
-							t.paths.test2[k] = [];
-						}
-						
-						t.paths.test2[k].push(t._calculatePath(p1.x, p1.y, p2.x, p2.y))
-					}
-					
-					if(clearIntersectionPoints.length > 2)
-					{
-						console.log("SOS");
-					}
-				}
-				else if(segmentIntersectionPoints.length && clearIntersectionPoints.length)
-				{
-					if(1 === segmentIntersectionPoints.length && 1 === clearIntersectionPoints.length)
-					{
-						var p1 = segmentIntersectionPoints[0];
-						var p2 = clearIntersectionPoints[0];
-						
-						if(!t.paths.test2[k])
-						{
-							t.paths.test2[k] = [];
-						}
-						
-						t.paths.test2[k].push(t._calculatePath(p1.x, p1.y, p2.x, p2.y));
-					}
-				}
-			}
-		};
-		
-		if(!this.paths.test)
-		{
-			this.paths.test = [];
-		}
-		if(!this.paths.test2)
-		{
-			this.paths.test2 = [];
-		}
 		
 		for (var i = 0; i < points.length - 1; i++) 
 		{
@@ -11214,8 +11161,8 @@ drawSurfaceChart.prototype =
 						var lines2 = [lines[4], lines[1], lines[3]];
 						var pointsValue2 = [p1, p21, p2];
 					}
-					getIntersectionPlanesAndLines2(lines1, pointsValue1);
-					getIntersectionPlanesAndLines2(lines2, pointsValue2);
+					getIntersectionPlanesAndLines(lines1, pointsValue1);
+					getIntersectionPlanesAndLines(lines2, pointsValue2);
 				}
 			}
 		}
