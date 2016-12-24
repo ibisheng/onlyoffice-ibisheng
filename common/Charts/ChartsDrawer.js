@@ -11031,7 +11031,7 @@ drawSurfaceChart.prototype =
 					var p1 = clearIntersectionPoints[0];
 					var p2 = clearIntersectionPoints[1];
 					
-					res = t._calculatePath(p1.x, p1.y, p2.x, p2.y);
+					res = {p1: p1, p2: p2}/*t._calculatePath(p1.x, p1.y, p2.x, p2.y)*/;
 				}
 				
 				if(clearIntersectionPoints.length > 2)
@@ -11046,7 +11046,7 @@ drawSurfaceChart.prototype =
 					var p1 = segmentIntersectionPoints[0];
 					var p2 = clearIntersectionPoints[0];
 					
-					res = t._calculatePath(p1.x, p1.y, p2.x, p2.y);
+					res = {p1: p1, p2: p2};
 				}
 			}
 			
@@ -11069,6 +11069,7 @@ drawSurfaceChart.prototype =
 			}
 			
 			//находим пересечение даннного сегмента с плоскостями сетки
+			var prevPoints;
 			for(var k = 0; k < yPoints.length; k++)
 			{
 				if(!(yPoints[k].val >= minVal && yPoints[k].val <= maxVal))
@@ -11076,13 +11077,36 @@ drawSurfaceChart.prototype =
 					continue;
 				}
 				
-				var path = getIntersectionPlaneAndLines(k, lines, pointsValue);
-				
-				if(!t.paths.test2[k])
+				var points = getIntersectionPlaneAndLines(k, lines, pointsValue);
+				if(null !== points && prevPoints)
 				{
-					t.paths.test2[k] = [];
+					//var path = t._calculatePath(points.p1.x, points.p1.y, points.p2.x, points.p2.y);
+					var p1 = prevPoints.p1;
+					var p2 = prevPoints.p2;
+					var p3 = points.p2;
+					var p4 = points.p1;
+					
+					/*if(prevPoints.p1.x > prevPoints.p2.x)
+					{
+						p1 = prevPoints.p2;
+						p2 = prevPoints.p1;
+					}*/
+					
+					/*if(points.p1.x > points.p2.x)
+					{
+						p3 = points.p2;
+						p4 = points.p1;
+					}*/
+					
+					var path = t._calculateTempFace(p1, p2, p3, p4, true);
+					
+					if(!t.paths.test2[k])
+					{
+						t.paths.test2[k] = [];
+					}
+					t.paths.test2[k].push(path);
 				}
-				t.paths.test2[k].push(path);
+				prevPoints = points;
 			}
 		};
 		
@@ -11168,6 +11192,27 @@ drawSurfaceChart.prototype =
 		}
 	},
 	
+	_calculateTempFace: function(p1, p2, p3, p4)
+	{	
+		var point1 = p1;
+		var point2 = p2;
+		
+		var points = [p1, p2, p3, p4];
+		var sortArray = [];
+		for(var i = 0; i < points.length; i++)
+		{
+			sortArray[i] = {tan: Math.atan2(points[i].x - points[0].x, points[i].y - points[0].y), point: points[i]};
+		}
+		
+		sortArray.sort (function sortArr(a, b)
+		{
+			return  b.tan - a.tan;
+		});
+	
+		var path = this.cChartDrawer._calculatePathFace(sortArray[0].point, sortArray[1].point, sortArray[2].point, sortArray[3].point, true);
+		
+		return path
+	},
 	
 	test2: function(points, points3d)
 	{
@@ -11484,8 +11529,8 @@ drawSurfaceChart.prototype =
 					
 					cColorMod.val = 15000 + (i) * 10000;
 					
-					pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
-					pen.w = 40000;
+					/*pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
+					pen.w = 40000;*/
 					
 					cColorMod.name = "shade";
 					duplicateBrush.addColorMod(cColorMod);
