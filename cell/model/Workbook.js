@@ -838,6 +838,12 @@
 				this.cleanCellCache[sheetId] = Asc.Range(col, row, col, row);
 			}
 		},
+		notifyChanged: function(changedFormulas) {
+			var notifyData = {type: AscCommon.c_oNotifyType.Changed};
+			for (var listenerId in changedFormulas) {
+				changedFormulas[listenerId].notify(notifyData);
+			}
+		},
 		//build, calc
 		buildDependency: function() {
 			for (var sheetId in this.buildCell) {
@@ -897,29 +903,6 @@
 			AscCommonExcel.g_oVLOOKUPCache.clean();
 			AscCommonExcel.g_oHLOOKUPCache.clean();
 		},
-		calcAll: function(sheetId){
-			var worksheets = [];
-			if (sheetId) {
-				worksheets.push(this.wb.getWorksheetById(sheetId));
-			} else {
-				var wsCount = this.wb.getWorksheetCount();
-				for (var i = 0; i < wsCount; ++i) {
-					worksheets.push(this.wb.getWorksheet(i));
-				}
-			}
-			for (var i = 0; i < worksheets.length; ++i) {
-				var ws = worksheets[i];
-				if (ws) {
-					var cwf = ws.getCwf();
-					for (var i in cwf) {
-						var ca = g_oCellAddressUtils.getCellAddress(i);
-						var c = ws._getCellNoEmpty(ca.getRow0(), ca.getCol0());
-						this.addToChangedCell(c);
-					}
-				}
-			}
-			this.calcTree();
-		},
 		initOpen: function() {
 			this._foreachDefName(function(defName) {
 				defName.setRef(defName.ref, true, true);
@@ -934,6 +917,13 @@
 			});
 			res.tableNameIndex = this.tableNameIndex;
 			return res;
+		},
+		getAllFormulas: function(formulas) {
+			this._foreachDefName(function(defName) {
+				if (!defName.isTable && defName.parsedRef) {
+					formulas.push(defName.parsedRef);
+				}
+			});
 		},
 		//internal
 		_addDefName: function(defName) {
@@ -1766,8 +1756,26 @@
 			this.aWorksheets[i].reassignImageUrls(oImages);
 		}
 	};
-	Workbook.prototype.recalcWB = function(isRecalcWB){
-		//todo
+	Workbook.prototype.recalcWB = function(rebuild, opt_sheetId) {
+		var formulas;
+		if (rebuild) {
+			formulas = this.getAllFormulas();
+			for (var i = 0; i < formulas.length; ++i) {
+				var formula = formulas[i];
+				formula.removeDependencies();
+				formula.setFormula(formula.getFormula());
+				formula.parse();
+				formula.buildDependencies();
+			}
+		} else if (opt_sheetId) {
+			formulas = [];
+			var ws = this.wb.getWorksheetById(opt_sheetId);
+			ws.getAllFormulas(formulas);
+		} else {
+			formulas = this.getAllFormulas();
+		}
+		this.dependencyFormulas.notifyChanged(formulas);
+		this.dependencyFormulas.calcTree();
 	};
 	Workbook.prototype.checkDefName = function (checkName, scope) {
 		return this.dependencyFormulas.checkDefName(checkName, scope);
@@ -1853,6 +1861,14 @@
 		//init trigger
 		wb.init({}, true, false);
 		return wb;
+	};
+	Workbook.prototype.getAllFormulas = function() {
+		var res = [];
+		this.dependencyFormulas.getAllFormulas(res);
+		for (var i = 0; i < this.aWorksheets.length; ++i) {
+			this.aWorksheets[i].getAllFormulas(res);
+		}
+		return res;
 	};
 	Workbook.prototype._forwardTransformation = function(wbSnapshot, changesMine, changesTheir) {
 		History.TurnOff();
@@ -3048,8 +3064,8 @@
 			}
 			delete this.aGCells[nIndex];
 		}
-		//renameDependencyNodesChanged after move cells to get new locations
-		this.renameDependencyNodesChanged(changedFormulas);
+		//notifyChanged after move cells to get new locations
+		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RemoveRows, this.getId(), new Asc.Range(0, start, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, start, stop));
 		this.autoFilters.insertRows( "delCell", new Asc.Range(0, start, gc_nMaxCol0, stop), c_oAscDeleteOptions.DeleteRows );
 
@@ -3104,8 +3120,8 @@
 			}
 			History.LocalChange = false;
 		}
-		//renameDependencyNodesChanged after move cells to get new locations
-		this.renameDependencyNodesChanged(changedFormulas);
+		//notifyChanged after move cells to get new locations
+		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_AddRows, this.getId(), new Asc.Range(0, index, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, index, index + count - 1));
 
 		this.autoFilters.insertRows( "insCell", new Asc.Range(0, index, gc_nMaxCol0, index + count - 1), c_oAscInsertOptions.InsertColumns );
@@ -3185,8 +3201,8 @@
 			if(null != elem)
 				elem.moveHor(nDif);
 		}
-		//renameDependencyNodesChanged after move cells to get new locations
-		this.renameDependencyNodesChanged(changedFormulas);
+		//notifyChanged after move cells to get new locations
+		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RemoveCols, this.getId(), new Asc.Range(start, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, start, stop));
 
 		this.autoFilters.insertColumn( "delCell",  new Asc.Range(start, 0, stop, gc_nMaxRow0), c_oAscInsertOptions.InsertColumns );
@@ -3224,8 +3240,8 @@
 				this._moveCellHor(nRowIndex, nIndex, count, oActualRange);
 			}
 		}
-		//renameDependencyNodesChanged after move cells to get new locations
-		this.renameDependencyNodesChanged(changedFormulas);
+		//notifyChanged after move cells to get new locations
+		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_AddCols, this.getId(), new Asc.Range(index, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, index, index + count - 1));
 
 		this.autoFilters.insertColumn( "insCells",  new Asc.Range(index, 0, index + count - 1, gc_nMaxRow0), c_oAscInsertOptions.InsertColumns );
@@ -4114,8 +4130,8 @@
 				}
 			}
 		}
-		//renameDependencyNodesChanged after move cells to get new locations
-		this.renameDependencyNodesChanged(changedFormulas);
+		//notifyChanged after move cells to get new locations
+		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsLeft, this.getId(), new Asc.Range(nLeft, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
 		this.autoFilters.insertColumn( "delCell",  oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftLeft );
 		//todo проверить не уменьшились ли границы таблицы
@@ -4155,8 +4171,8 @@
 				}
 			}
 		}
-		//renameDependencyNodesChanged after move cells to get new locations
-		this.renameDependencyNodesChanged(changedFormulas);
+		//notifyChanged after move cells to get new locations
+		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsTop, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
 		this.autoFilters.insertRows( "delCell", oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftTop );
 		//todo проверить не уменьшились ли границы таблицы
@@ -4191,8 +4207,8 @@
 				}
 			}
 		}
-		//renameDependencyNodesChanged after move cells to get new locations
-		this.renameDependencyNodesChanged(changedFormulas);
+		//notifyChanged after move cells to get new locations
+		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsRight, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
 		this.autoFilters.insertColumn( "insCells",  oBBox, c_oAscInsertOptions.InsertCellsAndShiftRight, displayNameFormatTable );
 	};
@@ -4224,8 +4240,8 @@
 				}
 			}
 		}
-		//renameDependencyNodesChanged after move cells to get new locations
-		this.renameDependencyNodesChanged(changedFormulas);
+		//notifyChanged after move cells to get new locations
+		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsBottom, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
 
 		if(!this.workbook.bUndoChanges)
@@ -4343,12 +4359,6 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 	};
 	Woorksheet.prototype.renameDependencyNodes = function(offset, oBBox, rec, noDelete){
 		return this.workbook.dependencyFormulas.shift(this.Id, oBBox, offset);
-	};
-	Woorksheet.prototype.renameDependencyNodesChanged = function(changedFormulas){
-		var notifyData = {type: AscCommon.c_oNotifyType.Changed};
-		for (var listenerId in changedFormulas) {
-			changedFormulas[listenerId].notify(notifyData);
-		}
 	};
 	Woorksheet.prototype.getAllCol = function(){
 		if(null == this.oAllCol)
@@ -4472,6 +4482,18 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			}
 		});
 		return cwf;
+	};
+	Woorksheet.prototype.getAllFormulas = function(formulas) {
+		var range = this.getRange3(0, 0, gc_nMaxRow0, gc_nMaxCol0);
+		range._setPropertyNoEmpty(null, null, function(cell) {
+			if (cell.formulaParsed) {
+				formulas.push(cell.formulaParsed);
+			}
+		});
+		for (var i = 0; i < this.TableParts.length; ++i) {
+			var table = this.TableParts[i];
+			table.getAllFormulas(formulas);
+		}
 	};
 	Woorksheet.prototype.setTableStyleAfterOpen = function () {
 		if (this.TableParts && this.TableParts.length) {

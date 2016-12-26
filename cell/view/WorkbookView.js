@@ -456,12 +456,14 @@
         },
 
         //calcAll
-        'calcAll': function (shiftKey) {
-          if(shiftKey){
+        'calcAll': function (ctrlKey, altKey, shiftKey) {
+          if(ctrlKey && altKey && shiftKey){
+            self.model.recalcWB(true);
+          } else if(shiftKey){
             var ws = self.model.getActiveWs();
-            self.model.dependencyFormulas.calcAll(ws.getId());
+            self.model.recalcWB(false, ws.getId());
           } else {
-            self.model.dependencyFormulas.calcAll();
+            self.model.recalcWB(false);
           }
         },
       });

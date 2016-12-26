@@ -5736,6 +5736,11 @@ TablePart.prototype.clone = function() {
 			this.TableColumns[i].buildDependencies();
 		}
 	};
+	TablePart.prototype.getAllFormulas = function(formulas) {
+		for (var i = 0; i < this.TableColumns.length; ++i) {
+			this.TableColumns[i].getAllFormulas(formulas);
+		}
+	};
 TablePart.prototype.moveRef = function(col, row) {
 	var ref = this.Ref.clone();
 	ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
@@ -6351,6 +6356,11 @@ function TableColumn() {
 	TableColumn.prototype.removeDependencies = function() {
 		if (this.TotalsRowFormula) {
 			this.TotalsRowFormula.removeDependencies();
+		}
+	};
+	TableColumn.prototype.getAllFormulas = function(formulas) {
+		if (this.TotalsRowFormula) {
+			formulas.push(this.TotalsRowFormula);
 		}
 	};
 TableColumn.prototype.clone = function() {

@@ -720,7 +720,7 @@
 
 			switch (event.which) {
 				case 120: // F9
-					t.handlers.trigger("calcAll", shiftKey);
+					t.handlers.trigger("calcAll", ctrlKey, event.altKey, shiftKey);
 					return result;
 
 				case 113: // F2

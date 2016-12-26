@@ -3996,6 +3996,11 @@ parserFormula.prototype.setFormula = function(formula) {
   this.parenthesesNotEnough = false;
   this.f = [];
   this.countRef = 0;
+  this.ca = false;
+  this.isDirty = false;
+  this.isCalculate = false;
+  this.isTable = false;
+  this.isInDependencies = false;
 };
 
 parserFormula.prototype.parse = function(local, digitDelim) {
