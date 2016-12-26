@@ -11031,7 +11031,7 @@ drawSurfaceChart.prototype =
 					var p1 = clearIntersectionPoints[0];
 					var p2 = clearIntersectionPoints[1];
 					
-					res = {p1: p1, p2: p2}/*t._calculatePath(p1.x, p1.y, p2.x, p2.y)*/;
+					res = [p1, p2]/*t._calculatePath(p1.x, p1.y, p2.x, p2.y)*/;
 				}
 				
 				if(clearIntersectionPoints.length > 2)
@@ -11046,8 +11046,49 @@ drawSurfaceChart.prototype =
 					var p1 = segmentIntersectionPoints[0];
 					var p2 = clearIntersectionPoints[0];
 					
-					res = {p1: p1, p2: p2};
+					res = [p1, p2];
 				}
+			}
+			
+			return res;
+		};
+		
+		var getMinMaxValArray = function(pointsValue)
+		{
+			var min, max;
+			if(pointsValue.length === 4)
+			{
+				min = Math.min(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val, pointsValue[3].val);
+				max = Math.max(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val, pointsValue[3].val);
+			}
+			else
+			{
+				min = Math.min(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val);
+				max = Math.max(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val);
+			}
+			return {min: min, max: max}
+		};
+		
+		var calculateFaceBetween2GridLines = function(minVal, maxVal, k, pointsValue)
+		{
+			var res = false;
+			
+			if(yPoints[k - 1] && minVal >= yPoints[k - 1].val && maxVal <= yPoints[k].val)
+			{
+				var p1 = pointsValue[0];
+				var p2 = pointsValue[1];
+				var p3 = pointsValue[2];
+				var p4 = pointsValue[3] ? pointsValue[3] : pointsValue[2];
+				
+				var path = t._calculateTempFace(p1, p2, p3, p4, true);
+				
+				if(!t.paths.test2[k])
+				{
+					t.paths.test2[k] = [];
+				}
+				t.paths.test2[k].push(path);
+				
+				res = true;
 			}
 			
 			return res;
@@ -11055,48 +11096,64 @@ drawSurfaceChart.prototype =
 		
 		var getIntersectionPlanesAndLines = function(lines, pointsValue)
 		{
-			var minVal;
-			var maxVal;
-			if(pointsValue.length === 4)
-			{
-				minVal = Math.min(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val, pointsValue[3].val);
-				maxVal = Math.max(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val, pointsValue[3].val);
-			}
-			else
-			{
-				minVal = Math.min(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val);
-				maxVal = Math.max(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val);
-			}
+			var minMaxVal = getMinMaxValArray(pointsValue);
+			var minVal = minMaxVal.min;
+			var maxVal = minMaxVal.max;
 			
-			//находим пересечение даннного сегмента с плоскостями сетки
-			var prevPoints;
+			var prevPoints = null;
 			for(var k = 0; k < yPoints.length; k++)
 			{
-				if(!(yPoints[k].val >= minVal && yPoints[k].val <= maxVal))
+				if(calculateFaceBetween2GridLines(minVal, maxVal, k, pointsValue))
 				{
-					continue;
+					break;
+				}
+				if(!(yPoints[k].val >= minVal && yPoints[k].val <= maxVal) && !(prevPoints && k === yPoints.length - 1))
+				{
+					continue;	
 				}
 				
+				var isCalculatePrevPoints = false;
+				if(null === prevPoints)
+				{
+					for(var j = 0; j < pointsValue.length; j++)
+					{
+						if(pointsValue[j].val <= yPoints[k].val)
+						{
+							if(!prevPoints)
+							{
+								prevPoints = [];
+							}
+							prevPoints.push(pointsValue[j]);
+							isCalculatePrevPoints = true;
+						}	
+					}
+				}
+				
+				
 				var points = getIntersectionPlaneAndLines(k, lines, pointsValue);
+				if(!isCalculatePrevPoints && null === points && prevPoints)
+				{
+					for(var j = 0; j < pointsValue.length; j++)
+					{
+						if(pointsValue[j].val >= yPoints[k - 1].val)
+						{
+							if(!points)
+							{
+								points = [];
+							}
+							points.push(pointsValue[j]);
+							isCalculatePrevPoints = true;
+						}	
+					}
+				}
+				
+	
 				if(null !== points && prevPoints)
 				{
-					//var path = t._calculatePath(points.p1.x, points.p1.y, points.p2.x, points.p2.y);
-					var p1 = prevPoints.p1;
-					var p2 = prevPoints.p2;
-					var p3 = points.p2;
-					var p4 = points.p1;
-					
-					/*if(prevPoints.p1.x > prevPoints.p2.x)
-					{
-						p1 = prevPoints.p2;
-						p2 = prevPoints.p1;
-					}*/
-					
-					/*if(points.p1.x > points.p2.x)
-					{
-						p3 = points.p2;
-						p4 = points.p1;
-					}*/
+					var p1 = prevPoints[0];
+					var p2 = prevPoints[1] ? prevPoints[1] : prevPoints[0];
+					var p3 = points[0];
+					var p4 = points[1] ? points[1] : points[0];
 					
 					var path = t._calculateTempFace(p1, p2, p3, p4, true);
 					
@@ -11106,7 +11163,26 @@ drawSurfaceChart.prototype =
 					}
 					t.paths.test2[k].push(path);
 				}
-				prevPoints = points;
+				else if(prevPoints && prevPoints.length === 3 && !points)
+				{
+					var p1 = prevPoints[0];
+					var p2 = prevPoints[1];
+					var p3 = prevPoints[2];
+					var p4 = prevPoints[3] ? prevPoints[3] : prevPoints[2];
+					
+					var path = t._calculateTempFace(p1, p2, p3, p4, true);
+					
+					if(!t.paths.test2[k])
+					{
+						t.paths.test2[k] = [];
+					}
+					t.paths.test2[k].push(path);
+				}
+				
+				if(points !== null)
+				{
+					prevPoints = points;
+				}
 			}
 		};
 		
@@ -11144,7 +11220,20 @@ drawSurfaceChart.prototype =
 						}
 					}
 					
-					if(maxIndex === 0 || maxIndex === 3)
+					/*if(maxIndex === 0 || maxIndex === 3)
+					{	
+						lines.push({p1: p213d, p2: p3d, p111: p21, p222: p});
+						this.paths.test.push(this._calculatePath(p21.x, p21.y, p.x, p.y));
+						isDiagonalLine = 1;
+					}
+					else
+					{
+						lines.push({p1: p13d, p2: p23d, p111: p1, p222: p2});
+						this.paths.test.push(this._calculatePath(p2.x, p2.y, p1.x, p1.y));
+						isDiagonalLine = 2;
+					}*/
+					
+					if(p1.val + p2.val < p21.val + p.val)
 					{	
 						lines.push({p1: p213d, p2: p3d, p111: p21, p222: p});
 						this.paths.test.push(this._calculatePath(p21.x, p21.y, p.x, p.y));
@@ -11183,7 +11272,7 @@ drawSurfaceChart.prototype =
 						var lines1 = [lines[2], lines[0], lines[4]];
 						var pointsValue1 = [p, p1, p2];
 						var lines2 = [lines[4], lines[1], lines[3]];
-						var pointsValue2 = [p1, p21, p2];
+						var pointsValue2 = [p2, p1, p21];
 					}
 					getIntersectionPlanesAndLines(lines1, pointsValue1);
 					getIntersectionPlanesAndLines(lines2, pointsValue2);
@@ -11198,10 +11287,14 @@ drawSurfaceChart.prototype =
 		var point2 = p2;
 		
 		var points = [p1, p2, p3, p4];
+		
+		var x = 1/3*(p1.x + p2.x + p3.x); 
+		var y = 1/3*(p1.y + p2.y + p3.y)
+		
 		var sortArray = [];
 		for(var i = 0; i < points.length; i++)
 		{
-			sortArray[i] = {tan: Math.atan2(points[i].x - points[0].x, points[i].y - points[0].y), point: points[i]};
+			sortArray[i] = {tan: Math.atan2(points[i].x - x, points[i].y - y), point: points[i]};
 		}
 		
 		sortArray.sort (function sortArr(a, b)
@@ -11497,14 +11590,14 @@ drawSurfaceChart.prototype =
 		for(var i = 0; i < this.paths.test.length; i++)
 		{
 			var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
-			pen.w = 20000;
+			//pen.w = 20000;
 			
 			this.cChartDrawer.drawPath(this.paths.test[i], pen, null, false);
 		}
 		
-		
-		
-		
+		var style = AscFormat.CHART_STYLE_MANAGER.getStyleByIndex(this.cChartSpace.style);
+		var base_fills = AscFormat.getArrayFillsFromBase(style.fill2, 10);    
+	
 		for(var i = 0; i < this.paths.test2.length; i++)
 		{
 			if(!this.paths.test2[i])
@@ -11512,46 +11605,24 @@ drawSurfaceChart.prototype =
 				
 			for(var j = 0; j < this.paths.test2[i].length; j++)
 			{
+				var seria = this.chartProp.series[i-1] ? this.chartProp.series[i-1] : this.chartProp.series[0];
+				var pt = seria.val.numRef.numCache.pts[0];
+				//var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
 				
-				if(this.chartProp.series[1])
-				{
-					var pt = this.chartProp.series[1].val.numRef.numCache.pts[0];
-					var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
-					//pen.w = 5000;
-					
-					var brush = pt.brush;
-					
-					var  props = this.cChartSpace.getParentObjects();
-					var duplicateBrush = brush;
-						
-					duplicateBrush = brush.createDuplicate();
-					var cColorMod = new AscFormat.CColorMod;
-					
-					cColorMod.val = 15000 + (i) * 10000;
-					
-					/*pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
-					pen.w = 40000;*/
-					
-					cColorMod.name = "shade";
-					duplicateBrush.addColorMod(cColorMod);
-					duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
-					
-					brush = duplicateBrush;
-				}
-				else
-				{
-					//var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
-					//pen.w = 5000;
-					var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
-					pen.w = 5000;
-					var brush = null;
-				}
+				var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
+				var brush = base_fills[i - 1];
 				
+				var props = this.cChartSpace.getParentObjects();
+				var duplicateBrush = brush;
+				duplicateBrush = brush.createDuplicate();
+				var cColorMod = new AscFormat.CColorMod;
+				duplicateBrush.addColorMod(cColorMod);
+				duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
 				
-				
+				brush = duplicateBrush;
+
 				this.cChartDrawer.drawPath(this.paths.test2[i][j], pen, brush);
 			}
-			
 		}
 	}
 }
