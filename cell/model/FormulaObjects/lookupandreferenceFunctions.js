@@ -845,7 +845,7 @@
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber(1);
 
 		function findMatch(a0, a1, a2) {
-			var a1RowCount = a1.length, a1ColumnCount = a1[0].length, a0Value = a0.getValue(), a2Value = a2.getValue(), arr = [], res = new cError(cErrorType.not_available), index = -1;
+			var i, a1RowCount = a1.length, a1ColumnCount = a1[0].length, a0Value = a0.getValue(), a2Value = a2.getValue(), arr = [], res = new cError(cErrorType.not_available), index = -1;
 
 			if (a1RowCount > 1 && a1ColumnCount > 1) {
 				return new cError(cErrorType.not_available);
@@ -866,7 +866,7 @@
 			}
 
 			if (a2Value == -1) {
-				for (var i = 0; i < arr.length; i++) {
+				for (i = 0; i < arr.length; i++) {
 					if (arr[i] >= a0Value) {
 						index = i;
 					} else {
@@ -875,14 +875,14 @@
 				}
 			} else if (a2Value == 0) {
 				if (cElementType.string === a0.type) {
-					for (var i = 0; i < arr.length; i++) {
+					for (i = 0; i < arr.length; i++) {
 						if (AscCommonExcel.searchRegExp2(arr[i].toString(), a0Value)) {
 							index = i;
 							break;
 						}
 					}
 				} else {
-					for (var i = 0; i < arr.length; i++) {
+					for (i = 0; i < arr.length; i++) {
 						if (arr[i] == a0Value) {
 							index = i;
 							break;
@@ -890,10 +890,9 @@
 					}
 				}
 			} else if (a2Value == 1) {
-				for (var i = 0; i < arr.length; i++) {
+				for (i = 0; i < arr.length; i++) {
 					if (arr[i] <= a0Value) {
 						index = i;
-					} else {
 						break;
 					}
 				}
