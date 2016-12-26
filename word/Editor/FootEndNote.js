@@ -141,8 +141,8 @@ CFootEndnote.prototype.AddDefaultFootnoteContent = function(sText)
 };
 CFootEndnote.prototype.Recalculate_Page = function(PageIndex, bStart)
 {
-	CFootEndnote.superclass.Recalculate_Page.call(this, PageIndex, bStart);
 	this.NeedUpdateHint = true;
+	return CFootEndnote.superclass.Recalculate_Page.call(this, PageIndex, bStart);
 };
 CFootEndnote.prototype.GetHint = function()
 {
