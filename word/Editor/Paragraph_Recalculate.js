@@ -1109,7 +1109,7 @@ Paragraph.prototype.private_RecalculateLineInfo        = function(CurLine, CurPa
     if (true === PRS.BadLeftTab)
         this.Lines[CurLine].Info |= paralineinfo_BadLeftTab;
 
-    if (PRS.GetFootnoteReferencesCount() > 0)
+    if (PRS.GetFootnoteReferencesCount(null, true) > 0)
     	this.Lines[CurLine].Info |= paralineinfo_Notes;
 };
 
@@ -2992,8 +2992,10 @@ CParagraphRecalculateStateWrap.prototype.AddFootnoteReference = function(oFootno
 
 	this.Footnotes.push({FootnoteReference : oFootnoteReference, Pos : oPos});
 };
-CParagraphRecalculateStateWrap.prototype.GetFootnoteReferencesCount = function(oFootnoteReference)
+CParagraphRecalculateStateWrap.prototype.GetFootnoteReferencesCount = function(oFootnoteReference, isAllowCustom)
 {
+	var _isAllowCustom = (true === isAllowCustom ? true : false);
+
 	// Если данную ссылку мы добавляли уже в строке, тогда ищем сколько было элементов до нее, если не добавляли,
 	// тогда возвращаем просто количество ссылок. Ссылки с флагом CustomMarkFollows не учитываются
 
@@ -3003,7 +3005,7 @@ CParagraphRecalculateStateWrap.prototype.GetFootnoteReferencesCount = function(o
 		if (this.Footnotes[nIndex].FootnoteReference === oFootnoteReference)
 			return nRefsCount;
 
-		if (true !== this.Footnotes[nIndex].FootnoteReference.IsCustomMarkFollows())
+		if (true === _isAllowCustom || true !== this.Footnotes[nIndex].FootnoteReference.IsCustomMarkFollows())
 			nRefsCount++;
 	}
 

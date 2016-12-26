@@ -11068,7 +11068,7 @@ CDocument.prototype.AddFootnote = function(sText)
 			oFootnote.AddDefaultFootnoteContent(sText);
 
 			if (sText)
-				this.Paragraph_Add(new ParaFootnoteReference(oFootnote, true, sText));
+				this.Paragraph_Add(new ParaFootnoteReference(oFootnote, sText));
 			else
 				this.Paragraph_Add(new ParaFootnoteReference(oFootnote));
 
