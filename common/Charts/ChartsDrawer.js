@@ -2626,6 +2626,18 @@ CChartsDrawer.prototype =
 		return {l: l, m: m, n: n, x1: x0, y1: y0, z1: z0};
 	},
 	
+	getLineEquation2d: function(point1, point2)
+	{
+		var x1 = point1.x, y1 = point1.y;
+		var x2 = point2.x, y2 = point2.y;
+		
+		//y = kx + b
+		var k = (y2 - y1) / (x2 - x1);
+		var b = y1 - k * x1;
+		
+		return {k: k, b: b};
+	},
+	
 	isIntersectionLineAndLine: function(equation1, equation2)
 	{
 		var x10 = equation1.x1;
@@ -2731,6 +2743,15 @@ CChartsDrawer.prototype =
 		}
 		
 		return res;
+	},
+	
+	isPoint2DLieOnLine: function(lineEquation, point)
+	{
+		var bRes = false;
+		
+		bRes = !!(Math.round(point.y * 1000) / 1000 === Math.round((lineEquation.k * point.x + lineEquation.b) * 1000) / 1000);
+		
+		return bRes;
 	},
 	
 	isPointLieIntoPlane: function(planeEquation, point)
@@ -3106,6 +3127,45 @@ CChartsDrawer.prototype =
 		path.lnTo(point3.x / pxToMm * pathW, point3.y / pxToMm * pathH);
 		path.lnTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
 		path.lnTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
+
+		return pathId;
+	},
+	
+	calculatePathFacesArray: function(faceArr, isConvertPxToMM)
+	{
+		var pxToMm = 1;
+		if(isConvertPxToMM)
+		{
+			pxToMm = this.calcProp.pxToMM;
+		} 
+
+		var pathId = this.cChartSpace.AllocPath();
+		var path  = this.cChartSpace.GetPath(pathId);
+		
+		var pathH = this.calcProp.pathH;
+		var pathW = this.calcProp.pathW;
+		
+		var firstPoint = null;
+		for(var i = 0; i < faceArr.length; i++)
+		{
+			if(faceArr[i] && faceArr[i].point)
+			{
+				if(null === firstPoint)
+				{
+					path.moveTo(faceArr[i].point.x / pxToMm * pathW, faceArr[i].point.y / pxToMm * pathH);
+					firstPoint = faceArr[i].point;
+				}
+				else
+				{
+					path.lnTo(faceArr[i].point.x / pxToMm * pathW, faceArr[i].point.y / pxToMm * pathH);
+				}
+			}
+		}
+		
+		if(null !== firstPoint)
+		{
+			path.lnTo(firstPoint.x / pxToMm * pathW, firstPoint.y / pxToMm * pathH);
+		}
 
 		return pathId;
 	},
@@ -11085,7 +11145,7 @@ drawSurfaceChart.prototype =
 				var p3 = pointsValue[2];
 				var p4 = pointsValue[3] ? pointsValue[3] : pointsValue[2];
 				
-				var path = t._calculateTempFace(p1, p2, p3, p4, true);
+				var path = t._calculateTempFace([p1, p2, p3, p4]);
 				
 				if(!t.paths.test2[k])
 				{
@@ -11099,11 +11159,13 @@ drawSurfaceChart.prototype =
 			return res;
 		};
 		
-		var getIntersectionPlanesAndLines = function(lines, pointsValue)
+		var getIntersectionPlanesAndLines = function(lines, pointsValue, bIsAddIntoPaths)
 		{
 			var minMaxVal = getMinMaxValArray(pointsValue);
 			var minVal = minMaxVal.min;
 			var maxVal = minMaxVal.max;
+			
+			var res = [];
 			
 			var prevPoints = null;
 			for(var k = 0; k < yPoints.length; k++)
@@ -11152,37 +11214,25 @@ drawSurfaceChart.prototype =
 					}
 				}
 				
-				if(points && prevPoints && 2 === points.length && 2 === prevPoints.length)
-				{
-					//проверка на существование 5 точки
-					
-					var p1 = prevPoints[0];
-					var p2 = prevPoints[1];
-					var p3 = points[0];
-					var p4 = points[1];
-					
-					var path = t._calculateTempFace(p1, p2, p3, p4, true);
-					
-					if(!t.paths.test2[k])
-					{
-						t.paths.test2[k] = [];
-					}
-					t.paths.test2[k].push(path);
-				}
-				else if(null !== points && prevPoints)
+				
+				if(null !== points && prevPoints)
 				{
 					var p1 = prevPoints[0];
 					var p2 = prevPoints[1] ? prevPoints[1] : prevPoints[0];
 					var p3 = points[0];
 					var p4 = points[1] ? points[1] : points[0];
 					
-					var path = t._calculateTempFace(p1, p2, p3, p4, true);
-					
-					if(!t.paths.test2[k])
+					if(bIsAddIntoPaths)
 					{
-						t.paths.test2[k] = [];
+						var path = t._calculateTempFace([p1, p2, p3, p4]);
+						if(!t.paths.test2[k])
+						{
+							t.paths.test2[k] = [];
+						}
+						t.paths.test2[k].push(path);
 					}
-					t.paths.test2[k].push(path);
+					
+					res[k] = [p1, p2, p3, p4];
 				}
 				else if(prevPoints && prevPoints.length === 3 && !points && isCalculatePrevPoints)
 				{
@@ -11191,13 +11241,17 @@ drawSurfaceChart.prototype =
 					var p3 = prevPoints[2];
 					var p4 = prevPoints[3] ? prevPoints[3] : prevPoints[2];
 					
-					var path = t._calculateTempFace(p1, p2, p3, p4, true);
-					
-					if(!t.paths.test2[k])
+					if(bIsAddIntoPaths)
 					{
-						t.paths.test2[k] = [];
+						var path = t._calculateTempFace([p1, p2, p3, p4]);
+						if(!t.paths.test2[k])
+						{
+							t.paths.test2[k] = [];
+						}
+						t.paths.test2[k].push(path);
 					}
-					t.paths.test2[k].push(path);
+					
+					res[k] = [p1, p2, p3, p4];
 				}
 				
 				if(points !== null)
@@ -11205,6 +11259,8 @@ drawSurfaceChart.prototype =
 					prevPoints = points;
 				}
 			}
+			
+			return res;
 		};
 		
 		
@@ -11263,7 +11319,7 @@ drawSurfaceChart.prototype =
 				var pointsValue = [p1, p2, p21, p];
 				if(null === isDiagonalLine)
 				{
-					getIntersectionPlanesAndLines(lines, pointsValue);
+					var pointsFace = getIntersectionPlanesAndLines(lines, pointsValue, true);
 				}
 				else
 				{
@@ -11282,22 +11338,101 @@ drawSurfaceChart.prototype =
 						var lines2 = [lines[4], lines[1], lines[3]];
 						var pointsValue2 = [p2, p1, p21];
 					}
-					getIntersectionPlanesAndLines(lines1, pointsValue1);
-					getIntersectionPlanesAndLines(lines2, pointsValue2);
+					var pointsFace1 = getIntersectionPlanesAndLines(lines1, pointsValue1);
+					var pointsFace2 = getIntersectionPlanesAndLines(lines2, pointsValue2);
+					
+					var lengthFaces = Math.max(pointsFace1.length, pointsFace2.length);
+					for(var l = 0; l < lengthFaces; l++)
+					{
+						if(pointsFace1[l] && pointsFace2[l])
+						{
+							/*var gridPlain1 = getGridPlain(l - 1);
+							var gridPlain2 = getGridPlain(l);
+							var convertResult1 = t.cChartDrawer.isIntersectionPlainAndLineSegment(gridPlain1, lines[4].p1, lines[4].p2, lines[4].p111, lines[4].p222);
+							var convertResult2 = t.cChartDrawer.isIntersectionPlainAndLineSegment(gridPlain2, lines[4].p1, lines[4].p2, lines[4].p111, lines[4].p222);*/
+							
+							//находим две точки, принадлежащие диагональной прямой. у обоих сегментов они должны быть
+							var lineEquation = t.cChartDrawer.getLineEquation2d(lines[4].p111, lines[4].p222);
+							
+							var points1 = [];
+							for(var s = 0; s < pointsFace1[l].length; s++)
+							{
+								if(null === isEqualPoints(points1, pointsFace1[l][s]) && t.cChartDrawer.isPoint2DLieOnLine(lineEquation, pointsFace1[l][s]))
+								{
+									points1.push(pointsFace1[l][s]);
+								}
+							}
+							
+							var points2 = []
+							for(var s = 0; s < pointsFace2[l].length; s++)
+							{
+								if(null === isEqualPoints(points2, pointsFace2[l][s]) && t.cChartDrawer.isPoint2DLieOnLine(lineEquation, pointsFace2[l][s]))
+								{
+									points2.push(pointsFace2[l][s]);
+								}
+							}
+							
+							if(points1.length < 2 && points2.length === 2)
+							{
+								pointsFace1[l].push(points2[0]);
+								pointsFace1[l].push(points2[1]);
+							}
+							else if(points2.length < 2 && points1.length === 2)
+							{
+								pointsFace2[l].push(points1[0]);
+								pointsFace2[l].push(points1[1]);
+							}
+							
+							
+							
+							var test = 1;
+							/*var path = t._calculateTempFace(pointsFace1[l].concat(pointsFace2[l]));
+							if(!t.paths.test2[l])
+							{
+								t.paths.test2[l] = [];
+							}
+							t.paths.test2[l].push(path);*/
+						}
+						
+						
+						
+						if(pointsFace1[l])
+						{
+							if(!t.paths.test2[l])
+							{
+								t.paths.test2[l] = [];
+							}
+							
+							var path1 = t._calculateTempFace(pointsFace1[l]);
+							t.paths.test2[l].push(path1);
+						}
+						if(pointsFace2[l])
+						{
+							if(!t.paths.test2[l])
+							{
+								t.paths.test2[l] = [];
+							}
+							
+							var path2 = t._calculateTempFace(pointsFace2[l]);
+							t.paths.test2[l].push(path2);
+						}
+					}
 				}
 			}
 		}
 	},
 	
-	_calculateTempFace: function(p1, p2, p3, p4)
+	_calculateTempFace: function(points)
 	{	
-		var point1 = p1;
-		var point2 = p2;
-		
-		var points = [p1, p2, p3, p4];
-		
-		var x = 1/3*(p1.x + p2.x + p3.x); 
-		var y = 1/3*(p1.y + p2.y + p3.y)
+		var summX = 0;
+		var summY = 0;
+		for(var i = 0; i < points.length; i++)
+		{
+			summX += points[i].x;
+			summY += points[i].y;
+		}
+		var x = 1/(points.length)*(summX); 
+		var y = 1/(points.length)*(summY);
 		
 		var sortArray = [];
 		for(var i = 0; i < points.length; i++)
@@ -11310,7 +11445,7 @@ drawSurfaceChart.prototype =
 			return  b.tan - a.tan;
 		});
 	
-		var path = this.cChartDrawer._calculatePathFace(sortArray[0].point, sortArray[1].point, sortArray[2].point, sortArray[3].point, true);
+		var path = this.cChartDrawer.calculatePathFacesArray(sortArray, true);
 		
 		return path
 	},
