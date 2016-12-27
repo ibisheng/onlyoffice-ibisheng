@@ -845,64 +845,61 @@
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber(1);
 
 		function findMatch(a0, a1, a2) {
-			var i, a1RowCount = a1.length, a1ColumnCount = a1[0].length, a0Value = a0.getValue(), a2Value = a2.getValue(), arr = [], res = new cError(cErrorType.not_available), index = -1;
+			var i, item, a1RowCount = a1.length, a1ColumnCount = a1[0].length, a2Value = a2.getValue(), arr, index = -1;
+			var a0Type = a0.type;
+			var a0Value = a0.getValue();
+			if(!(cElementType.number === a0Type || cElementType.string === a0Type || cElementType.bool === a0Type || cElementType.error === a0Type || cElementType.empty === a0Type)) {
+				a0Type = a0Value.type;
+				a0Value = a0Value.getValue();
+			}
 
 			if (a1RowCount > 1 && a1ColumnCount > 1) {
 				return new cError(cErrorType.not_available);
-			} else if (a1RowCount == 1 && a1ColumnCount > 1) {
-				for (var i = 0; i < a1ColumnCount; i++) {
-					arr[i] = a1[0][i].getValue();
-				}
-			} else if (a1RowCount > 1 && a1ColumnCount == 1) {
-				for (var i = 0; i < a1RowCount; i++) {
-					arr[i] = a1[i][0].getValue();
-				}
+			} else if (a1RowCount === 1 && a1ColumnCount >= 1) {
+				arr = a1[0];
 			} else {
-				arr[0] = a1[0][0];
+				arr = [];
+				for (i = 0; i < a1RowCount; i++) {
+					arr[i] = a1[i][0];
+				}
 			}
 
-			if (!(a2Value == 1 || a2Value == 0 || a2Value == -1)) {
+			if (!(-1 === a2Value || 0 === a2Value || 1 === a2Value)) {
 				return new cError(cErrorType.not_numeric);
 			}
 
-			if (a2Value == -1) {
-				for (i = 0; i < arr.length; i++) {
-					if (arr[i] >= a0Value) {
-						index = i;
-					} else {
-						break;
-					}
-				}
-			} else if (a2Value == 0) {
-				if (cElementType.string === a0.type) {
-					for (i = 0; i < arr.length; i++) {
-						if (AscCommonExcel.searchRegExp2(arr[i].toString(), a0Value)) {
+			for (i = 0; i < arr.length; ++i) {
+				item = arr[i];
+				if (arr[i].type === a0Type) {
+					if (0 === a2Value) {
+						if (cElementType.string === a0Type) {
+							if (AscCommonExcel.searchRegExp2(item.toString(), a0Value)) {
+								index = i;
+								break;
+							}
+						} else {
+							if (item == a0Value) {
+								index = i;
+								break;
+							}
+						}
+					} else if (1 === a2Value) {
+						if (item <= a0Value) {
 							index = i;
+						} else {
 							break;
 						}
-					}
-				} else {
-					for (i = 0; i < arr.length; i++) {
-						if (arr[i] == a0Value) {
+					} else if (-1 === a2Value) {
+						if (item >= a0Value) {
 							index = i;
+						} else {
 							break;
 						}
-					}
-				}
-			} else if (a2Value == 1) {
-				for (i = 0; i < arr.length; i++) {
-					if (arr[i] <= a0Value) {
-						index = i;
-						break;
 					}
 				}
 			}
 
-			if (index > -1) {
-				res = new cNumber(index + 1);
-			}
-
-			return res;
+			return (-1 < index) ? new cNumber(index + 1) : new cError(cErrorType.not_available);
 
 		}
 
@@ -917,6 +914,8 @@
 			arg1 = arg1.getMatrix();
 		} else if (cElementType.cellsRange3D === arg1.type && arg1.wsFrom == arg1.wsTo) {
 			arg1 = arg1.getMatrix()[0];
+		} else if (cElementType.cell === arg1.type || cElementType.cell3D === arg1.type) {
+			arg1 = arg1.getMatrix();
 		} else {
 			return this.value = new cError(cErrorType.not_available);
 		}
