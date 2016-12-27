@@ -3711,8 +3711,8 @@ function CBinaryFileWriter()
         oThis._WriteInt1(0, cNvPr.id);
         oThis._WriteString1(1, cNvPr.name);
 		oThis._WriteBool1(2, cNvPr.isHidden);
-		oThis._WriteString1(3, cNvPr.title);
-		oThis._WriteString1(4, cNvPr.descr);
+		oThis._WriteString2(3, cNvPr.title);
+		oThis._WriteString2(4, cNvPr.descr);
         oThis.WriteUChar(g_nodeAttributeEnd);
     }
 
