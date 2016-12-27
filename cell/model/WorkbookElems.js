@@ -6260,10 +6260,7 @@ AutoFilter.prototype.isShowButton = function()
 
 AutoFilter.prototype.getRangeWithoutHeaderFooter = function()
 {
-	var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
-	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
-
-	return Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+	return Asc.Range(this.Ref.c1, this.Ref.r1 + 1, this.Ref.c2, this.Ref.r2);
 }; 
 
 AutoFilter.prototype._getFilterColumnByColId = function(colId)
