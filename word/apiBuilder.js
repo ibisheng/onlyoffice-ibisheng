@@ -532,6 +532,12 @@
      *     "greenYellow" | "grey" | "honeydew" | "hotPink" | "indianRed" | "indigo" | "ivory" | "khaki" | "lavender" | "lavenderBlush" | "lawnGreen" | "lemonChiffon" | "lightBlue" | "lightCoral" | "lightCyan" | "lightGoldenrodYellow" | "lightGray" | "lightGreen" | "lightGrey" | "lightPink" | "lightSalmon" | "lightSeaGreen" | "lightSkyBlue" | "lightSlateGray" | "lightSlateGrey" | "lightSteelBlue" | "lightYellow" | "lime" | "limeGreen" | "linen" | "ltBlue" | "ltCoral" | "ltCyan" | "ltGoldenrodYellow" | "ltGray" | "ltGreen" | "ltGrey" | "ltPink" | "ltSalmon" | "ltSeaGreen" | "ltSkyBlue" | "ltSlateGray" | "ltSlateGrey" | "ltSteelBlue" | "ltYellow" | "magenta" | "maroon" | "medAquamarine" | "medBlue" | "mediumAquamarine" | "mediumBlue" | "mediumOrchid" | "mediumPurple" | "mediumSeaGreen" | "mediumSlateBlue" | "mediumSpringGreen" | "mediumTurquoise" | "mediumVioletRed" | "medOrchid" | "medPurple" | "medSeaGreen" | "medSlateBlue" | "medSpringGreen" | "medTurquoise" | "medVioletRed" | "midnightBlue" | "mintCream" | "mistyRose" | "moccasin" | "navajoWhite" | "navy" | "oldLace" | "olive" | "oliveDrab" | "orange" | "orangeRed" | "orchid" | "paleGoldenrod" | "paleGreen" | "paleTurquoise" | "paleVioletRed" | "papayaWhip" | "peachPuff" | "peru" | "pink" | "plum" | "powderBlue" | "purple" | "red" | "rosyBrown" | "royalBlue" | "saddleBrown" | "salmon" | "sandyBrown" | "seaGreen" | "seaShell" | "sienna" | "silver" | "skyBlue" | "slateBlue" | "slateGray" | "slateGrey" | "snow" | "springGreen" | "steelBlue" | "tan" | "teal" | "thistle" | "tomato" | "turquoise" | "violet" | "wheat" | "white" | "whiteSmoke" | "yellow" | "yellowGreen")} PresetColor
      * */
 
+
+    /**
+     *
+     * @typedef {("none" | "nextTo" | "low" | "high")} TickLabelPosition
+     * **/
+
     /**
      * @typedef {"tile" | "stretch"} BlipFillType
      * */
@@ -4085,6 +4091,25 @@
         AscFormat.builder_SetShowDataLabels(this.Chart, bShowSerName, bShowCatName, bShowVal, bShowPercent);
     };
 
+
+    /**
+     * Spicifies tick labels position vertical axis
+     * @param {TickLabelPosition} sTickLabelPosition
+     * */
+    ApiChart.prototype.SetVertAxisTickLabelPosition = function(sTickLabelPosition)
+    {
+        AscFormat.builder_SetChartVertAxisTickLablePosition(this.Chart, sTickLabelPosition);
+    };
+    /**
+     * Spicifies tick labels position horizontal axis
+     * @param {TickLabelPosition} sTickLabelPosition
+     * */
+    ApiChart.prototype.SetHorAxisTickLabelPosition = function(sTickLabelPosition)
+    {
+        AscFormat.builder_SetChartHorAxisTickLablePosition(this.Chart, sTickLabelPosition);
+    };
+
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiFill
@@ -4433,14 +4458,16 @@
     ApiShape.prototype["SetVerticalTextAlign"]       = ApiShape.prototype.SetVerticalTextAlign;
     ApiShape.prototype["SetPaddings"]                = ApiShape.prototype.SetPaddings;
 
-    ApiChart.prototype["GetClassType"]               = ApiChart.prototype.GetClassType;
-    ApiChart.prototype["SetTitle"]                   = ApiChart.prototype.SetTitle;
-    ApiChart.prototype["SetHorAxisTitle"]            = ApiChart.prototype.SetHorAxisTitle;
-    ApiChart.prototype["SetVerAxisTitle"]            = ApiChart.prototype.SetVerAxisTitle;
-    ApiChart.prototype["SetVerAxisOrientation"]      =  ApiChart.prototype.SetVerAxisOrientation;
-    ApiChart.prototype["SetHorAxisOrientation"]      =  ApiChart.prototype.SetHorAxisOrientation;
-    ApiChart.prototype["SetLegendPos"]               = ApiChart.prototype.SetLegendPos;
-    ApiChart.prototype["SetShowDataLabels"]          = ApiChart.prototype.SetShowDataLabels;
+    ApiChart.prototype["GetClassType"]                 = ApiChart.prototype.GetClassType;
+    ApiChart.prototype["SetTitle"]                     = ApiChart.prototype.SetTitle;
+    ApiChart.prototype["SetHorAxisTitle"]              = ApiChart.prototype.SetHorAxisTitle;
+    ApiChart.prototype["SetVerAxisTitle"]              = ApiChart.prototype.SetVerAxisTitle;
+    ApiChart.prototype["SetVerAxisOrientation"]        = ApiChart.prototype.SetVerAxisOrientation;
+    ApiChart.prototype["SetHorAxisOrientation"]        = ApiChart.prototype.SetHorAxisOrientation;
+    ApiChart.prototype["SetLegendPos"]                 = ApiChart.prototype.SetLegendPos;
+    ApiChart.prototype["SetShowDataLabels"]            = ApiChart.prototype.SetShowDataLabels;
+    ApiChart.prototype["SetVertAxisTickLabelPosition"] = ApiChart.prototype.SetVertAxisTickLabelPosition;
+    ApiChart.prototype["SetHorAxisTickLabelPosition"]  = ApiChart.prototype.SetHorAxisTickLabelPosition;
 
     ApiFill.prototype["GetClassType"]                = ApiFill.prototype.GetClassType;
 

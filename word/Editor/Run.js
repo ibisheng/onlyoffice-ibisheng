@@ -275,14 +275,30 @@ ParaRun.prototype.Get_Text = function(Text)
         switch ( ItemType )
         {
             case para_Drawing:
-            case para_End:
             case para_PageNum:
             case para_PageCount:
             {
-                Text.Text = null;
-                bBreak = true;
+				if (true === Text.BreakOnNonText)
+				{
+					Text.Text = null;
+					bBreak = true;
+				}
+
                 break;
             }
+			case para_End:
+			{
+				if (true === Text.BreakOnNonText)
+				{
+					Text.Text = null;
+					bBreak = true;
+				}
+
+				if (true === Text.ParaEndToSpace)
+					Text.Text += " ";
+
+				break;
+			}
 
             case para_Text : Text.Text += String.fromCharCode(Item.Value); break;
             case para_Space:
@@ -3571,6 +3587,12 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                     WidthVisible = Item.Width / TEXTWIDTH_DIVIDER + PRSA.JustifyWord;//WidthVisible = Item.Get_Width() + PRSA.JustifyWord;
 
                 Item.WidthVisible = (WidthVisible * TEXTWIDTH_DIVIDER) | 0;//Item.Set_WidthVisible(WidthVisible);
+
+				if (para_FootnoteReference === ItemType)
+				{
+					var oFootnote = Item.Get_Footnote();
+					oFootnote.UpdatePositionInfo(this.Paragraph, this, _CurLine, _CurRange, PRSA.X, WidthVisible);
+				}
 
                 PRSA.X    += WidthVisible;
                 PRSA.LastW = WidthVisible;
@@ -8567,14 +8589,14 @@ ParaRun.prototype.private_GetPosInParent = function(_Parent)
 
     return RunPos;
 };
-ParaRun.prototype.Make_ThisElementCurrent = function()
+ParaRun.prototype.Make_ThisElementCurrent = function(bUpdateStates)
 {
     if (this.Is_UseInDocument())
     {
         var ContentPos = this.Paragraph.Get_PosByElement(this);
         ContentPos.Add(this.State.ContentPos);
         this.Paragraph.Set_ParaContentPos(ContentPos, true, -1, -1);
-        this.Paragraph.Document_SetThisElementCurrent(false);
+        this.Paragraph.Document_SetThisElementCurrent(true === bUpdateStates ? true : false);
     }
 };
 ParaRun.prototype.Get_AllParagraphs = function(Props, ParaArray)
@@ -8989,7 +9011,7 @@ ParaRun.prototype.Get_FootnotesList = function(oEngine)
 		var oItem = this.Content[nIndex];
 		if (para_FootnoteReference === oItem.Type)
 		{
-			oEngine.Add(oItem.Get_Footnote());
+			oEngine.Add(oItem.Get_Footnote(), oItem, this);
 		}
 	}
 };
@@ -9006,6 +9028,82 @@ ParaRun.prototype.GetParaEnd = function()
 	}
 
 	return null;
+};
+ParaRun.prototype.RemoveElement = function(oElement)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		if (oElement === this.Content[nIndex])
+			return this.Remove_FromContent(nIndex, 1, true);
+	}
+};
+ParaRun.prototype.GotoFootnoteRef = function(isNext, isCurrent, isStepOver)
+{
+	var nPos = 0;
+	if (true === isCurrent)
+	{
+		if (true === this.Selection.Use)
+			nPos = Math.min(this.Selection.StartPos, this.Selection.EndPos);
+		else
+			nPos = this.State.ContentPos;
+	}
+	else
+	{
+		if (true === isNext)
+			nPos = 0;
+		else
+			nPos = this.Content.length - 1;
+	}
+
+	var nResult = 0;
+	if (true === isNext)
+	{
+		for (var nIndex = nPos, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+		{
+			if (para_FootnoteReference === this.Content[nIndex].Type && ((true !== isCurrent && true === isStepOver) || (true === isCurrent && (true === this.Selection.Use || nPos !== nIndex))))
+			{
+				if (this.Paragraph && this.Paragraph.LogicDocument)
+					this.Paragraph.LogicDocument.Selection_Remove();
+
+				this.State.ContentPos = nIndex;
+				this.Make_ThisElementCurrent(true);
+				return -1;
+			}
+			nResult++;
+		}
+	}
+	else
+	{
+		for (var nIndex = nPos; nIndex >= 0; --nIndex)
+		{
+			if (para_FootnoteReference === this.Content[nIndex].Type && ((true !== isCurrent && true === isStepOver) || (true === isCurrent && (true === this.Selection.Use || nPos !== nIndex))))
+			{
+				if (this.Paragraph && this.Paragraph.LogicDocument)
+					this.Paragraph.LogicDocument.Selection_Remove();
+
+				this.State.ContentPos = nIndex;
+				this.Make_ThisElementCurrent(true);
+				return -1;
+			}
+			nResult++;
+		}
+	}
+
+	return nResult;
+};
+ParaRun.prototype.GetFootnoteRefsInRange = function(arrFootnotes, _CurLine, _CurRange)
+{
+	var CurLine = _CurLine - this.StartLine;
+	var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
+
+	var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+	var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+	for (var CurPos = StartPos; CurPos < EndPos; CurPos++)
+	{
+		if (para_FootnoteReference === this.Content[CurPos].Type)
+			arrFootnotes.push(this.Content[CurPos]);
+	}
 };
 
 function CParaRunStartState(Run)

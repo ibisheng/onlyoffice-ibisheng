@@ -357,7 +357,8 @@ var c_oSerParType = {
     Hyperlink: 10,
 	FldSimple: 11,
 	Del: 12,
-	Ins: 13
+	Ins: 13,
+	Background: 14
 };
 var c_oSerDocTableType = {
     tblPr:0,
@@ -443,7 +444,8 @@ var c_oSerImageType2 = {
 	CachedImage: 26,
 	SizeRelH: 27,
 	SizeRelV: 28,
-	GraphicFramePr: 30
+	GraphicFramePr: 30,
+	DocPr: 31
 };
 var c_oSerEffectExtent = {
 	Left: 0,
@@ -799,6 +801,18 @@ var c_oSerNotes = {
 	PrFntPos: 9,
 	PrEndPos: 10,
 	PrRef: 11
+};
+var c_oSerDocPr = {
+	Id: 0,
+	Name: 1,
+	Hidden: 2,
+	Title: 3,
+	Descr: 4
+};
+var c_oSerBackgroundType = {
+	Color: 0,
+	ColorTheme: 1,
+	pptxDrawing: 2
 };
 var ETblStyleOverrideType = {
 	tblstyleoverridetypeBand1Horz:  0,
@@ -4068,8 +4082,35 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
         {
             //sectPr
             this.bs.WriteItem(c_oSerParType.sectPr, function(){oThis.bpPrs.WriteSectPr(oThis.Document.SectPr, oThis.Document);});
-        }
+			if (oThis.Document.Background) {
+				this.bs.WriteItem(c_oSerParType.Background, function(){oThis.WriteBackground(oThis.Document.Background);});
+			}
+		}
     };
+	this.WriteBackground = function(oBackground) {
+		var oThis = this;
+		var color = null;
+		if (null != oBackground.Color)
+			color = oBackground.Color;
+		else if (null != oBackground.Unifill) {
+			var doc = editor.WordControl.m_oLogicDocument;
+			oBackground.Unifill.check(doc.Get_Theme(), doc.Get_ColorMap());
+			var RGBA = oBackground.Unifill.getRGBAColor();
+			color = new AscCommonWord.CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
+		}
+		if (null != color && !color.Auto)
+			this.bs.WriteColor(c_oSerBackgroundType.Color, color);
+		if (null != oBackground.Unifill || (null != oBackground.Color && oBackground.Color.Auto)) {
+			this.memory.WriteByte(c_oSerBackgroundType.ColorTheme);
+			this.memory.WriteByte(c_oSerPropLenType.Variable);
+			this.bs.WriteItemWithLength(function () { oThis.bs.WriteColorTheme(oBackground.Unifill, oBackground.Color); });
+		}
+		if (oBackground.shape) {
+			this.memory.WriteByte(c_oSerBackgroundType.pptxDrawing);
+			this.memory.WriteByte(c_oSerPropLenType.Variable);
+			this.bs.WriteItemWithLength(function(){oThis.WriteGraphicObj(oBackground.shape);});
+		}
+	}
     this.WriteParapraph = function(par, bUseSelection, selectedAll)
     {
         var oThis = this;
@@ -4501,6 +4542,12 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 		this.saveParams.footnotes[index] = {type: null, content: footnote};
 		this.bs.WriteItem(c_oSerNotes.RefId, function () { oThis.memory.WriteLong(index); });
 	};
+	this.WriteGraphicObj = function(graphicObj) {
+		var oThis = this;
+		this.memory.WriteByte(c_oSerImageType2.PptxData);
+		this.memory.WriteByte(c_oSerPropLenType.Variable);
+		this.bs.WriteItemWithLength(function(){pptx_content_writer.WriteDrawing(oThis.memory, graphicObj, oThis.Document, oThis.oMapCommentId, oThis.oNumIdMap, oThis.copyParams, oThis.saveParams);});
+	}
     this.WriteImage = function(img)
     {
 		var oThis = this;
@@ -4524,6 +4571,11 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
 				this.bs.WriteItemWithLength(function(){oThis.WriteGraphicFramePr(img.GraphicObj.locks);});
 			}
+			if (null != img.docPr) {
+				this.memory.WriteByte(c_oSerImageType2.DocPr);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.bs.WriteItemWithLength(function(){oThis.WriteDocPr(img.docPr);});
+			}
 			if(null != img.GraphicObj.chart)
 			{
 				this.memory.WriteByte(c_oSerImageType2.Chart2);
@@ -4531,12 +4583,8 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				
 				var oBinaryChartWriter = new AscCommon.BinaryChartWriter(this.memory);
 				this.bs.WriteItemWithLength(function () { oBinaryChartWriter.WriteCT_ChartSpace(img.GraphicObj); });
-			}
-			else
-			{
-				this.memory.WriteByte(c_oSerImageType2.PptxData);
-				this.memory.WriteByte(c_oSerPropLenType.Variable);
-				this.bs.WriteItemWithLength(function(){pptx_content_writer.WriteDrawing(oThis.memory, img.GraphicObj, oThis.Document, oThis.oMapCommentId, oThis.oNumIdMap, oThis.copyParams, oThis.saveParams);});
+			} else {
+				this.WriteGraphicObj(img.GraphicObj);
 			}
 		}
 		else
@@ -4665,18 +4713,19 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
 				this.bs.WriteItemWithLength(function(){oThis.WriteGraphicFramePr(img.GraphicObj.locks);});
 			}
+			if (null != img.docPr) {
+				this.memory.WriteByte(c_oSerImageType2.DocPr);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.bs.WriteItemWithLength(function(){oThis.WriteDocPr(img.docPr);});
+			}
 			if(null != img.GraphicObj.chart)
 			{
 				this.memory.WriteByte(c_oSerImageType2.Chart2);
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
 				var oBinaryChartWriter = new AscCommon.BinaryChartWriter(this.memory);
 				this.bs.WriteItemWithLength(function () { oBinaryChartWriter.WriteCT_ChartSpace(img.GraphicObj); });
-			}
-			else
-			{
-				this.memory.WriteByte(c_oSerImageType2.PptxData);
-				this.memory.WriteByte(c_oSerPropLenType.Variable);
-				this.bs.WriteItemWithLength(function(){pptx_content_writer.WriteDrawing(oThis.memory, img.GraphicObj, oThis.Document, oThis.oMapCommentId, oThis.oNumIdMap, oThis.copyParams, oThis.saveParams);});
+			} else {
+				this.WriteGraphicObj(img.GraphicObj);
 			}
 		}
 		if(this.saveParams && this.saveParams.bMailMergeHtml)
@@ -4717,6 +4766,26 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 			this.memory.WriteByte(c_oSerGraphicFramePr.NoSelect);
 			this.memory.WriteByte(c_oSerPropLenType.Byte);
 			this.memory.WriteBool(!!(locks & AscFormat.LOCKS_MASKS.noSelect << 1));
+		}
+	}
+	this.WriteDocPr = function(docPr)
+	{
+		var oThis = this;
+		this.bs.WriteItem(c_oSerDocPr.Id, function(){oThis.memory.WriteLong(oThis.saveParams.docPrId++);});
+		if (null != docPr.name) {
+			this.memory.WriteByte(c_oSerDocPr.Name);
+			this.memory.WriteString2(docPr.name);
+		}
+		if (null != docPr.isHidden) {
+			this.bs.WriteItem(c_oSerDocPr.Hidden, function(){oThis.memory.WriteBool(docPr.isHidden);});
+		}
+		if (null != docPr.title) {
+			this.memory.WriteByte(c_oSerDocPr.Title);
+			this.memory.WriteString2(docPr.title);
+		}
+		if (null != docPr.descr) {
+			this.memory.WriteByte(c_oSerDocPr.Descr);
+			this.memory.WriteString2(docPr.descr);
 		}
 	}
 	this.WriteEffectExtent = function(EffectExtent)
@@ -8590,11 +8659,43 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 					}
 				}
 			}
-        }
-        else
+		// } else if ( c_oSerParType.Background === type ) {
+			// oThis.Document.Background = {Color: null, Unifill: null, shape: null};
+			// res = this.bcr.Read2(length, function(t, l){
+				// return oThis.ReadBackground(t,l, oThis.Document.Background);
+			// });
+		} else
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
+	this.ReadBackground = function(type, length, oBackground)
+	{
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		if (c_oSerBackgroundType.Color === type){
+			oBackground.Color = this.bcr.ReadColor();
+		} else if(c_oSerBackgroundType.ColorTheme === type) {
+			var themeColor = {Auto: null, Color: null, Tint: null, Shade: null};
+			res = this.bcr.Read2(length, function(t, l){
+				return oThis.bcr.ReadColorTheme(t, l, themeColor);
+			});
+			if(true == themeColor.Auto)
+				oBackground.Color = new CDocumentColor(0, 0, 0, true);
+			var unifill = CreateThemeUnifill(themeColor.Color, themeColor.Tint, themeColor.Shade);
+			if(null != unifill)
+				oBackground.Unifill = unifill;
+			else if (null != oBackground.Color && !oBackground.Color.Auto)
+				oBackground.Unifill = AscFormat.CreteSolidFillRGB(oBackground.Color.r, oBackground.Color.g, oBackground.Color.b);
+		} else if(c_oSerBackgroundType.pptxDrawing === type) {
+			var oDrawing = {};
+			var oParStruct = new OpenParStruct(null, null);
+			res = this.ReadDrawing (type, length, oParStruct, oDrawing);
+			if(null != oDrawing.content.GraphicObj)
+				oBackground.shape = oDrawing.content.GraphicObj;
+		} else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	}
     this.ReadParagraph = function(type, length, paragraph, Content)
     {
         var res = c_oSerConstants.ReadOk;
@@ -9435,6 +9536,10 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 			res = this.bcr.Read2(length, function(t, l){
 					return oThis.ReadNvGraphicFramePr(t, l, graphicFramePr);
 				});
+		} else if( c_oSerImageType2.DocPr === type ) {
+			res = this.bcr.Read1(length, function(t, l){
+					return oThis.ReadDocPr(t, l, oParaDrawing.docPr);
+				});
 		}
 		else if( c_oSerImageType2.CachedImage === type )
 		{
@@ -9469,6 +9574,24 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 		} else if (c_oSerGraphicFramePr.NoSelect === type) {
 			value = this.stream.GetBool();
 			graphicFramePr.locks |= (AscFormat.LOCKS_MASKS.noSelect | (value ? AscFormat.LOCKS_MASKS.noSelect << 1 : 0));
+		} else {
+			res = c_oSerConstants.ReadUnknown;
+		}
+		return res;
+	}
+	this.ReadDocPr = function(type, length, docPr) {
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		if (c_oSerDocPr.Id === type) {
+			docPr.id = this.stream.GetLongLE();
+		} else if (c_oSerDocPr.Name === type) {
+			docPr.name = this.stream.GetString2LE(length);
+		} else if (c_oSerDocPr.Hidden === type) {
+			docPr.isHidden = this.stream.GetBool();
+		} else if (c_oSerDocPr.Title === type) {
+			docPr.title = this.stream.GetString2LE(length);
+		} else if (c_oSerDocPr.Descr === type) {
+			docPr.descr = this.stream.GetString2LE(length);
 		} else {
 			res = c_oSerConstants.ReadUnknown;
 		}
@@ -13353,6 +13476,7 @@ function DocSaveParams(bMailMergeDocx, bMailMergeHtml) {
 	this.trackRevisionId = 0;
 	this.footnotes = {};
 	this.footnotesIndex = 0;
+	this.docPrId = 0;
 };
 function DocReadResult(doc) {
 	this.logicDocument = doc;

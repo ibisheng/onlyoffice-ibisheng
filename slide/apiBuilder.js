@@ -183,6 +183,12 @@
      * @typedef {("aliceBlue" | "antiqueWhite" | "aqua" | "aquamarine" | "azure" | "beige" | "bisque" | "black" | "blanchedAlmond" | "blue" | "blueViolet" | "brown" | "burlyWood" | "cadetBlue" | "chartreuse" | "chocolate" | "coral" | "cornflowerBlue" | "cornsilk" | "crimson" | "cyan" | "darkBlue" | "darkCyan" | "darkGoldenrod" | "darkGray" | "darkGreen" | "darkGrey" | "darkKhaki" | "darkMagenta" | "darkOliveGreen" | "darkOrange" | "darkOrchid" | "darkRed" | "darkSalmon" | "darkSeaGreen" | "darkSlateBlue" | "darkSlateGray" | "darkSlateGrey" | "darkTurquoise" | "darkViolet" | "deepPink" | "deepSkyBlue" | "dimGray" | "dimGrey" | "dkBlue" | "dkCyan" | "dkGoldenrod" | "dkGray" | "dkGreen" | "dkGrey" | "dkKhaki" | "dkMagenta" | "dkOliveGreen" | "dkOrange" | "dkOrchid" | "dkRed" | "dkSalmon" | "dkSeaGreen" | "dkSlateBlue" | "dkSlateGray" | "dkSlateGrey" | "dkTurquoise" | "dkViolet" | "dodgerBlue" | "firebrick" | "floralWhite" | "forestGreen" | "fuchsia" | "gainsboro" | "ghostWhite" | "gold" | "goldenrod" | "gray" | "green" | "greenYellow" | "grey" | "honeydew" | "hotPink" | "indianRed" | "indigo" | "ivory" | "khaki" | "lavender" | "lavenderBlush" | "lawnGreen" | "lemonChiffon" | "lightBlue" | "lightCoral" | "lightCyan" | "lightGoldenrodYellow" | "lightGray" | "lightGreen" | "lightGrey" | "lightPink" | "lightSalmon" | "lightSeaGreen" | "lightSkyBlue" | "lightSlateGray" | "lightSlateGrey" | "lightSteelBlue" | "lightYellow" | "lime" | "limeGreen" | "linen" | "ltBlue" | "ltCoral" | "ltCyan" | "ltGoldenrodYellow" | "ltGray" | "ltGreen" | "ltGrey" | "ltPink" | "ltSalmon" | "ltSeaGreen" | "ltSkyBlue" | "ltSlateGray" | "ltSlateGrey" | "ltSteelBlue" | "ltYellow" | "magenta" | "maroon" | "medAquamarine" | "medBlue" | "mediumAquamarine" | "mediumBlue" | "mediumOrchid" | "mediumPurple" | "mediumSeaGreen" | "mediumSlateBlue" | "mediumSpringGreen" | "mediumTurquoise" | "mediumVioletRed" | "medOrchid" | "medPurple" | "medSeaGreen" | "medSlateBlue" | "medSpringGreen" | "medTurquoise" | "medVioletRed" | "midnightBlue" | "mintCream" | "mistyRose" | "moccasin" | "navajoWhite" | "navy" | "oldLace" | "olive" | "oliveDrab" | "orange" | "orangeRed" | "orchid" | "paleGoldenrod" | "paleGreen" | "paleTurquoise" | "paleVioletRed" | "papayaWhip" | "peachPuff" | "peru" | "pink" | "plum" | "powderBlue" | "purple" | "red" | "rosyBrown" | "royalBlue" | "saddleBrown" | "salmon" | "sandyBrown" | "seaGreen" | "seaShell" | "sienna" | "silver" | "skyBlue" | "slateBlue" | "slateGray" | "slateGrey" | "snow" | "springGreen" | "steelBlue" | "tan" | "teal" | "thistle" | "tomato" | "turquoise" | "violet" | "wheat" | "white" | "whiteSmoke" | "yellow" | "yellowGreen")} PresetColor
      * */
 
+
+    /**
+     *
+     * @typedef {("none" | "nextTo" | "low" | "high")} TickLabelPosition
+     * **/
+
     /**
      * @typedef {"tile" | "stretch"} BlipFillType
      * */
@@ -385,7 +391,7 @@
         if(this.Presentation){
             var width = nWidth/36000.0;
             var height = nHeight/36000.0;
-            History.Add(this, {Type: AscDFH.historyitem_Presentation_SlideSize, oldW: this.Presentation.Width, newW: width, oldH: this.Presentation.Height, newH:  height});
+            History.Add(this.Presentation, {Type: AscDFH.historyitem_Presentation_SlideSize, oldW: this.Presentation.Width, newW: width, oldH: this.Presentation.Height, newH:  height});
             this.Presentation.Width = width;
             this.Presentation.Height = height;
             this.Presentation.changeSlideSizeFunction(this.Presentation.Width, this.Presentation.Height);
@@ -685,6 +691,23 @@
         AscFormat.builder_SetShowDataLabels(this.Chart, bShowSerName, bShowCatName, bShowVal, bShowPercent);
     };
 
+    /**
+     * Spicifies tick labels position vertical axis
+     * @param {TickLabelPosition} sTickLabelPosition
+     * */
+    ApiChart.prototype.SetVertAxisTickLabelPosition = function(sTickLabelPosition)
+    {
+        AscFormat.builder_SetChartVertAxisTickLablePosition(this.Chart, sTickLabelPosition);
+    };
+    /**
+     * Spicifies tick labels position horizontal axis
+     * @param {TickLabelPosition} sTickLabelPosition
+     * */
+    ApiChart.prototype.SetHorAxisTickLabelPosition = function(sTickLabelPosition)
+    {
+        AscFormat.builder_SetChartHorAxisTickLablePosition(this.Chart, sTickLabelPosition);
+    };
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Export
@@ -722,14 +745,16 @@
     ApiShape.prototype["GetDocContent"]              =  ApiShape.prototype.GetDocContent;
     ApiShape.prototype["SetVerticalTextAlign"]       =  ApiShape.prototype.SetVerticalTextAlign;
 
-    ApiChart.prototype["GetClassType"]               =  ApiChart.prototype.GetClassType;
-    ApiChart.prototype["SetTitle"]                   =  ApiChart.prototype.SetTitle;
-    ApiChart.prototype["SetHorAxisTitle"]            =  ApiChart.prototype.SetHorAxisTitle;
-    ApiChart.prototype["SetVerAxisTitle"]            =  ApiChart.prototype.SetVerAxisTitle;
-    ApiChart.prototype["SetVerAxisOrientation"]      =  ApiChart.prototype.SetVerAxisOrientation;
-    ApiChart.prototype["SetHorAxisOrientation"]      =  ApiChart.prototype.SetHorAxisOrientation;
-    ApiChart.prototype["SetLegendPos"]               =  ApiChart.prototype.SetLegendPos;
-    ApiChart.prototype["SetShowDataLabels"]          =  ApiChart.prototype.SetShowDataLabels;
+    ApiChart.prototype["GetClassType"]                 =  ApiChart.prototype.GetClassType;
+    ApiChart.prototype["SetTitle"]                     =  ApiChart.prototype.SetTitle;
+    ApiChart.prototype["SetHorAxisTitle"]              =  ApiChart.prototype.SetHorAxisTitle;
+    ApiChart.prototype["SetVerAxisTitle"]              =  ApiChart.prototype.SetVerAxisTitle;
+    ApiChart.prototype["SetVerAxisOrientation"]        =  ApiChart.prototype.SetVerAxisOrientation;
+    ApiChart.prototype["SetHorAxisOrientation"]        =  ApiChart.prototype.SetHorAxisOrientation;
+    ApiChart.prototype["SetLegendPos"]                 =  ApiChart.prototype.SetLegendPos;
+    ApiChart.prototype["SetShowDataLabels"]            =  ApiChart.prototype.SetShowDataLabels;
+    ApiChart.prototype["SetVertAxisTickLabelPosition"] = ApiChart.prototype.SetVertAxisTickLabelPosition;
+    ApiChart.prototype["SetHorAxisTickLabelPosition"]  = ApiChart.prototype.SetHorAxisTickLabelPosition;
 
     function private_GetCurrentSlide(){
         var oApiPresentation = editor.GetPresentation();

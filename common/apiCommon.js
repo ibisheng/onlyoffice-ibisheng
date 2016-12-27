@@ -108,7 +108,8 @@
 		Success     : 3,
 		UnknownUser : 4,
 		Connections : 5,
-		ExpiredTrial: 6
+		ExpiredTrial: 6,
+		SuccessLimit: 7
 	};
 
 	var c_oRights = {
@@ -2361,42 +2362,91 @@
 	// c_oAscColor.COLOR_TYPE_SCHEME	: value - тип цвета в схеме
 	// c_oAscColor.COLOR_TYPE_SYS		: конвертируется в srgb
 	function CAscColorScheme() {
-		this.Colors = [];
-		this.Name = "";
+		this.colors = [];
+		this.name = "";
 	}
 
 	CAscColorScheme.prototype.get_colors = function () {
-		return this.Colors;
+		return this.colors;
 	};
 	CAscColorScheme.prototype.get_name = function () {
-		return this.Name;
+		return this.name;
+	};
+	CAscColorScheme.prototype.get_dk1 = function () {
+		return this.colors[0];
+	};
+	CAscColorScheme.prototype.get_lt1 = function () {
+		return this.colors[1];
+	};
+	CAscColorScheme.prototype.get_dk2 = function () {
+		return this.colors[2];
+	};
+	CAscColorScheme.prototype.get_lt2 = function () {
+		return this.colors[3];
+	};
+	CAscColorScheme.prototype.get_accent1 = function () {
+		return this.colors[4];
+	};
+	CAscColorScheme.prototype.get_accent2 = function () {
+		return this.colors[5];
+	};
+	CAscColorScheme.prototype.get_accent3 = function () {
+		return this.colors[6];
+	};
+	CAscColorScheme.prototype.get_accent4 = function () {
+		return this.colors[7];
+	};
+	CAscColorScheme.prototype.get_accent5 = function () {
+		return this.colors[8];
+	};
+	CAscColorScheme.prototype.get_accent6 = function () {
+		return this.colors[9];
+	};
+	CAscColorScheme.prototype.get_hlink = function () {
+		return this.colors[10];
+	};
+	CAscColorScheme.prototype.get_folHlink = function () {
+		return this.colors[11];
 	};
 
 	//-----------------------------------------------------------------
 	// События движения мыши
 	//-----------------------------------------------------------------
-	function CMouseMoveData(obj) {
-		if (obj) {
-			this.Type = ( undefined != obj.Type ) ? obj.Type : c_oAscMouseMoveDataTypes.Common;
+	function CMouseMoveData(obj)
+	{
+		if (obj)
+		{
+			this.Type  = ( undefined != obj.Type ) ? obj.Type : c_oAscMouseMoveDataTypes.Common;
 			this.X_abs = ( undefined != obj.X_abs ) ? obj.X_abs : 0;
 			this.Y_abs = ( undefined != obj.Y_abs ) ? obj.Y_abs : 0;
 
-			switch (this.Type) {
-				case c_oAscMouseMoveDataTypes.Hyperlink : {
+			switch (this.Type)
+			{
+				case c_oAscMouseMoveDataTypes.Hyperlink :
+				{
 					this.Hyperlink = ( undefined != obj.PageNum ) ? obj.PageNum : 0;
 					break;
 				}
 
-				case c_oAscMouseMoveDataTypes.LockedObject : {
-					this.UserId = ( undefined != obj.UserId ) ? obj.UserId : "";
-					this.HaveChanges = ( undefined != obj.HaveChanges ) ? obj.HaveChanges : false;
+				case c_oAscMouseMoveDataTypes.LockedObject :
+				{
+					this.UserId           = ( undefined != obj.UserId ) ? obj.UserId : "";
+					this.HaveChanges      = ( undefined != obj.HaveChanges ) ? obj.HaveChanges : false;
 					this.LockedObjectType =
 						( undefined != obj.LockedObjectType ) ? obj.LockedObjectType : Asc.c_oAscMouseMoveLockedObjectType.Common;
 					break;
 				}
+				case c_oAscMouseMoveDataTypes.Footnote:
+				{
+					this.Text   = "";
+					this.Number = 1;
+					break;
+				}
 			}
-		} else {
-			this.Type = c_oAscMouseMoveDataTypes.Common;
+		}
+		else
+		{
+			this.Type  = c_oAscMouseMoveDataTypes.Common;
 			this.X_abs = 0;
 			this.Y_abs = 0;
 		}
@@ -2422,6 +2472,14 @@
 	};
 	CMouseMoveData.prototype.get_LockedObjectType = function () {
 		return this.LockedObjectType;
+	};
+	CMouseMoveData.prototype.get_FootnoteText = function()
+	{
+		return this.Text;
+	};
+	CMouseMoveData.prototype.get_FootnoteNumber = function()
+	{
+		return this.Number;
 	};
 
 	function asc_CUserInfo(obj) {
@@ -2751,6 +2809,7 @@
 	prot['UnknownUser'] = prot.UnknownUser;
 	prot['Connections'] = prot.Connections;
 	prot['ExpiredTrial'] = prot.ExpiredTrial;
+	prot['SuccessLimit'] = prot.SuccessLimit;
 
 	window['Asc']['c_oRights'] = window['Asc'].c_oRights = c_oRights;
 	prot = c_oRights;

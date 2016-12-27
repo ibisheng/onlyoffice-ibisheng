@@ -5840,12 +5840,12 @@ function BinaryPPTYLoader()
                 }
                 case 3:
                 {
-                    s.GetString2();
+                    cNvPr.title = s.GetString2();
                     break;
                 }
                 case 4:
                 {
-                    s.GetString2();
+                    cNvPr.descr = s.GetString2();
                     break;
                 }
                 default:

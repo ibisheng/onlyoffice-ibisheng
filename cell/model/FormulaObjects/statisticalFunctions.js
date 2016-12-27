@@ -1031,7 +1031,7 @@ cCORREL.prototype.getInfo = function () {
 						count++;
 					}
 				}
-			} else if (cElementType.cellsRange === _arg.type || cElementType.cellsRange3D === _arg) {
+			} else if (cElementType.cellsRange === _arg.type || cElementType.cellsRange3D === _arg.type) {
 				var _argAreaValue = _arg.getValue(this.checkExclude, this.excludeHiddenRows);
 				for (var j = 0; j < _argAreaValue.length; j++) {
 					if (cElementType.number === _argAreaValue[j].type) {

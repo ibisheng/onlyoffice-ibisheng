@@ -45,12 +45,10 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Workbook_SheetAdd = 1;
 	window['AscCH'].historyitem_Workbook_SheetRemove = 2;
 	window['AscCH'].historyitem_Workbook_SheetMove = 3;
-	window['AscCH'].historyitem_Workbook_SheetPositions = 4;
 	window['AscCH'].historyitem_Workbook_ChangeColorScheme = 5;
 	window['AscCH'].historyitem_Workbook_AddFont = 6;
-	window['AscCH'].historyitem_Workbook_DefinedNamesAdd = 7;
-	window['AscCH'].historyitem_Workbook_DefinedNamesChange = 8;
-	window['AscCH'].historyitem_Workbook_DefinedNamesDelete = 9;
+	window['AscCH'].historyitem_Workbook_DefinedNamesChange = 7;
+	window['AscCH'].historyitem_Workbook_DefinedNamesChangeUndo = 8;
 
 	window['AscCH'].historyitem_Worksheet_RemoveCell = 1;
 	window['AscCH'].historyitem_Worksheet_RemoveRows = 2;
@@ -73,7 +71,6 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Worksheet_CreateCol = 21;
 	window['AscCH'].historyitem_Worksheet_CreateCell = 22;
 
-	window['AscCH'].historyitem_Worksheet_RemoveCellFormula = 24;
 	window['AscCH'].historyitem_Worksheet_ChangeMerge = 25;
 	window['AscCH'].historyitem_Worksheet_ChangeHyperlink = 26;
 	window['AscCH'].historyitem_Worksheet_SetTabColor = 27;
@@ -125,6 +122,7 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Cell_SetQuotePrefix = 20;
 	window['AscCH'].historyitem_Cell_Angle = 21;
 	window['AscCH'].historyitem_Cell_Style = 22;
+	window['AscCH'].historyitem_Cell_ChangeValueUndo = 23;
 
 	window['AscCH'].historyitem_Comment_Add = 1;
 	window['AscCH'].historyitem_Comment_Remove = 2;
@@ -145,6 +143,8 @@ function (window, undefined) {
 	window['AscCH'].historyitem_AutoFilter_ChangeTableRef = 13;
 	window['AscCH'].historyitem_AutoFilter_ChangeTableName = 14;
 	window['AscCH'].historyitem_AutoFilter_ClearFilterColumn = 15;
+	window['AscCH'].historyitem_AutoFilter_ChangeColumnName = 16;
+	window['AscCH'].historyitem_AutoFilter_ChangeTotalRow = 17;
 
 	window['AscCH'].historyitem_Sparkline_Type = 1;
 	window['AscCH'].historyitem_Sparkline_LineWeight = 2;
@@ -284,7 +284,7 @@ CHistory.prototype.UndoRedoPrepare = function (oRedoObjectParam, bUndo) {
 		this.TurnOff();
 	}
 	/* отключаем отрисовку на случай необходимости пересчета ячеек, заносим ячейку, при необходимости в список перерисовываемых */
-	this.workbook.lockDraw();
+	this.workbook.dependencyFormulas.lockRecal();
 
 	if (bUndo)
 		this.workbook.bUndoChanges = true;
@@ -330,7 +330,7 @@ CHistory.prototype.RedoAdd = function(oRedoObjectParam, Class, Type, sheetid, ra
 		{
 			if(!Class){
 				if(Data.isDrawingCollaborativeData){
-                    Data.oBinaryReader.Seek2(Data.nPos);
+			Data.oBinaryReader.Seek2(Data.nPos);
                     var nReaderPos   = Data.oBinaryReader.GetCurPos();
                     var nChangesType = Data.oBinaryReader.GetLong();
 
@@ -339,18 +339,18 @@ CHistory.prototype.RedoAdd = function(oRedoObjectParam, Class, Type, sheetid, ra
 
                         var fChangesClass = AscDFH.changesFactory[nChangesType];
                         if (fChangesClass)
-                        {
+			{
                             var oChange = new fChangesClass(changedObject);
                             oChange.ReadFromBinary(Data.oBinaryReader);
                             oChange.Load(new CDocumentColor(255, 255, 255));
-                        }
+			}
                         else
-                        {
+			{
                             Data.oBinaryReader.Seek2(nReaderPos);
                             changedObject.Load_Changes(Data.oBinaryReader, null, new CDocumentColor(255, 255, 255));
-                        }
-					}
-				}
+			}
+		}
+	}
 			}
 		}
 	}
@@ -381,8 +381,8 @@ CHistory.prototype.RedoExecute = function(Point, oRedoObjectParam)
                     Item.Class.Redo();
                     Item.Class.RefreshRecalcData();
                 }
-                else
-                {
+			else
+			{
                     Item.Class.Redo(Item.Type);
                     Item.Class.Refresh_RecalcData && Item.Class.Refresh_RecalcData(Item.Type);
                 }
@@ -425,8 +425,7 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 	}
 
 	/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
-	this.workbook.unLockDraw();
-	this.workbook.buildRecalc();
+	this.workbook.dependencyFormulas.unlockRecal();
 
 	if (null != Point) {
 		//синхронизация index и id worksheet
@@ -553,7 +552,7 @@ CHistory.prototype._addRedoObjectParam = function (oRedoObjectParam, Point) {
 	}
 	else if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && (AscCH.historyitem_Worksheet_RowProp == Point.Type || AscCH.historyitem_Worksheet_ColProp == Point.Type || AscCH.historyitem_Worksheet_RowHide == Point.Type))
 		oRedoObjectParam.oChangeWorksheetUpdate[Point.SheetId] = Point.SheetId;
-	else if (AscCommonExcel.g_oUndoRedoWorkbook === Point.Class && (AscCH.historyitem_Workbook_SheetAdd === Point.Type || AscCH.historyitem_Workbook_SheetRemove === Point.Type || AscCH.historyitem_Workbook_SheetMove === Point.Type || AscCH.historyitem_Workbook_SheetPositions === Point.Type)) {
+	else if (AscCommonExcel.g_oUndoRedoWorkbook === Point.Class && (AscCH.historyitem_Workbook_SheetAdd === Point.Type || AscCH.historyitem_Workbook_SheetRemove === Point.Type || AscCH.historyitem_Workbook_SheetMove === Point.Type)) {
 		oRedoObjectParam.bUpdateWorksheetByModel = true;
 		oRedoObjectParam.bOnSheetsChanged = true;
 	}
@@ -740,15 +739,15 @@ CHistory.prototype.Add = function(Class, Type, sheetid, range, Data, LocalChange
 	var Item;
 	if ( this.RecIndex >= this.Index )
 		this.RecIndex = this.Index - 1;
-	Item =
-	{
-		Class : Class,
-		Type  : Type,
-		SheetId : sheetid,
-		Range : null,
-		Data  : Data,
-		LocalChange: this.LocalChange
-	};
+		Item =
+		{
+			Class : Class,
+			Type  : Type,
+			SheetId : sheetid,
+			Range : null,
+			Data  : Data,
+			LocalChange: this.LocalChange
+		};
 	if(null != range)
 		Item.Range = range.clone();
 	if(null != LocalChange)
@@ -931,7 +930,7 @@ CHistory.prototype.GetSerializeArray = function()
 //функция, которая перемещает последнее действие на первую позицию(в текущей точке)
 CHistory.prototype.ChangeActionsEndToStart = function()
 {
-    var curPoint = this.Points[this.Index];
+	var curPoint = this.Points[this.Index];
 	if(curPoint && curPoint.Items.length > 0)
 	{
 		var endAction = curPoint.Items.pop();

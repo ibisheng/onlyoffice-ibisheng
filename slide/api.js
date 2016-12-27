@@ -1390,7 +1390,7 @@ background-repeat: no-repeat;\
                                     <canvas id=\"id_viewer_overlay\" class=\"block_elem\" style=\"-ms-touch-action: none;-webkit-user-select: none;z-index:2\"></canvas>\
                                     <canvas id=\"id_target_cursor\" class=\"block_elem\" width=\"1\" height=\"1\" style=\"-ms-touch-action: none;-webkit-user-select: none;width:2px;height:13px;display:none;z-index:4;\"></canvas>\
                                 </div>\
-							    <div id=\"id_panel_right\" class=\"block_elem\" style=\"margin-right:1px;background-color:#F1F1F1;\">\
+							    <div id=\"id_panel_right\" class=\"block_elem\" style=\"margin-right:1px;background-color:#F1F1F1;z-index:0;\">\
 							        <div id=\"id_buttonRulers\" class=\"block_elem buttonRuler\"></div>\
 								    <div id=\"id_vertical_scroll\" style=\"left:0;top:0;width:14px;overflow:hidden;position:absolute;\">\
 									    <div id=\"panel_right_scroll\" class=\"block_elem\" style=\"left:0;top:0;width:1px;height:6000px;\"></div>\
@@ -4202,63 +4202,12 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_onSendThemeColors", colors, standart_colors);
 	};
 
-	asc_docs_api.prototype.sync_SendThemeColorSchemes = function(param)
-	{
-		this.sendEvent("asc_onSendThemeColorSchemes", param);
-	};
-
 	asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
 	{
-		var oColorScheme    = AscCommon.g_oUserColorScheme;
-		var _count_defaults = oColorScheme.length;
-		if (index_scheme < _count_defaults)
+		var scheme = AscCommon.getColorThemeByIndex(index_scheme);
+		if (!scheme)
 		{
-			var _obj    = oColorScheme[index_scheme];
-			var scheme  = new AscFormat.ClrScheme();
-			scheme.name = _obj.name;
-			var _c      = null;
-
-			_c               = _obj.dk1;
-			scheme.colors[8] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-			_c                = _obj.lt1;
-			scheme.colors[12] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-			_c               = _obj.dk2;
-			scheme.colors[9] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-			_c                = _obj.lt2;
-			scheme.colors[13] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-			_c               = _obj.accent1;
-			scheme.colors[0] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-			_c               = _obj.accent2;
-			scheme.colors[1] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-			_c               = _obj.accent3;
-			scheme.colors[2] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-			_c               = _obj.accent4;
-			scheme.colors[3] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-			_c               = _obj.accent5;
-			scheme.colors[4] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-			_c               = _obj.accent6;
-			scheme.colors[5] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-			_c                = _obj.hlink;
-			scheme.colors[11] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-			_c                = _obj.folHlink;
-			scheme.colors[10] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
-
-			this.WordControl.m_oLogicDocument.changeColorScheme(scheme);
-		}
-		else
-		{
-			index_scheme -= _count_defaults;
+			index_scheme -= AscCommon.g_oUserColorScheme.length;
 			if (null == this.WordControl.MasterLayouts)
 				return;
 
@@ -4269,9 +4218,10 @@ background-repeat: no-repeat;\
 			if (index_scheme < 0 || index_scheme >= theme.extraClrSchemeLst.length)
 				return;
 
-			this.WordControl.m_oLogicDocument.changeColorScheme(theme.extraClrSchemeLst[index_scheme].clrScheme);
+			scheme = theme.extraClrSchemeLst[index_scheme].clrScheme;
 		}
 
+		this.WordControl.m_oLogicDocument.changeColorScheme(scheme);
 		this.WordControl.m_oDrawingDocument.CheckGuiControlColors();
 	};
 
@@ -6763,7 +6713,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['sync_countPagesCallback']             = asc_docs_api.prototype.sync_countPagesCallback;
 	asc_docs_api.prototype['sync_currentPageCallback']            = asc_docs_api.prototype.sync_currentPageCallback;
 	asc_docs_api.prototype['sync_SendThemeColors']                = asc_docs_api.prototype.sync_SendThemeColors;
-	asc_docs_api.prototype['sync_SendThemeColorSchemes']          = asc_docs_api.prototype.sync_SendThemeColorSchemes;
 	asc_docs_api.prototype['ChangeColorScheme']                   = asc_docs_api.prototype.ChangeColorScheme;
 	asc_docs_api.prototype['asc_enableKeyEvents']                 = asc_docs_api.prototype.asc_enableKeyEvents;
 	asc_docs_api.prototype['asc_showComments']                    = asc_docs_api.prototype.asc_showComments;

@@ -36,6 +36,7 @@
 {
 	// define after window['AscCommon']
 	var AscCommon = window['AscCommon'];
+	var global_mouseEvent = AscCommon.global_mouseEvent;
 
 	AscCommon.MobileTouchMode =
 		{
@@ -94,11 +95,15 @@
 		});
 	};
 
+	CMobileDelegateSimple.prototype.Resize = function()
+	{
+		return null;
+	};
 	CMobileDelegateSimple.prototype.GetSelectionTransform = function()
 	{
 		return null;
 	};
-	CMobileDelegateSimple.prototype.ConvertCoordsToCursor = function(x, y, page)
+	CMobileDelegateSimple.prototype.ConvertCoordsToCursor = function(x, y, page, isCanvas /* делать ли сдвиги на сам редактор */)
 	{
 		return null;
 	};
@@ -418,7 +423,7 @@
 		return this.HtmlPage.onMouseUp(e);
 	};
 
-	function CMobileTouchManagerBase(_config, _delegate)
+	function CMobileTouchManagerBase(_config)
 	{
 		this.Api			= null;
 		this.Mode 			= AscCommon.MobileTouchMode.None;
@@ -477,7 +482,17 @@
 
 		/* delegate */
 		this.delegate = null;
+
+		/* eventsElement */
+		this.eventsElement = _config.eventsElement;
 	}
+
+	CMobileTouchManagerBase.prototype.initEvents = function(_id)
+	{
+		this.eventsElement = _id;
+		this.iScroll.eventsElement = this.eventsElement;
+		this.iScroll._initEvents();
+	};
 
 	// создание вспомогательного элемента, для прокрутки. по идее потом можно изменить
 	// просто на сдвиги. но пока так
@@ -843,6 +858,8 @@
 	// изменился размер документа/экрана => нужно перескитать вспомогательный элемент для скролла
 	CMobileTouchManagerBase.prototype.Resize = function()
 	{
+		this.delegate.Resize();
+		this.CheckZoomCriticalValues();
 		if (this.iScroll != null)
 		{
 			var _size = this.delegate.GetScrollerSize();
@@ -917,8 +934,8 @@
 
 	CMobileTouchManagerBase.prototype.ClearContextMenu = function()
 	{
-		this.ContextMenuLastMode 		= AscCommon.MobileTouchContextMenuType.None;
-		this.ContextMenuLastModeCounter = 0;
+		//this.ContextMenuLastMode 		= AscCommon.MobileTouchContextMenuType.None;
+		//this.ContextMenuLastModeCounter = 0;
 		this.Api.sendEvent("asc_onHidePopMenu");
 	};
 
@@ -1558,6 +1575,38 @@
 		this.delegate.DrawingDocument.NeedScrollToTargetFlag = false;
 
 		global_mouseEvent.ClickCount = old_click_count;
+	};
+
+	CMobileTouchManagerBase.prototype.onTouchStart = function(e)
+	{
+		AscCommon.stopEvent(e);
+		return false;
+	};
+	CMobileTouchManagerBase.prototype.onTouchMove = function(e)
+	{
+		AscCommon.stopEvent(e);
+		return false;
+	};
+	CMobileTouchManagerBase.prototype.onTouchEnd = function(e)
+	{
+		AscCommon.stopEvent(e);
+		return false;
+	};
+
+	CMobileTouchManagerBase.prototype.mainOnTouchStart = function(e)
+	{
+		AscCommon.stopEvent(e);
+		return false;
+	};
+	CMobileTouchManagerBase.prototype.mainOnTouchMove = function(e)
+	{
+		AscCommon.stopEvent(e);
+		return false;
+	};
+	CMobileTouchManagerBase.prototype.mainOnTouchEnd = function(e)
+	{
+		AscCommon.stopEvent(e);
+		return false;
 	};
 
 	//--------------------------------------------------------export----------------------------------------------------

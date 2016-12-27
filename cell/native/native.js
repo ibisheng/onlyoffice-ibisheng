@@ -3899,8 +3899,8 @@ function OfflineEditor () {
             _api.asc_nativeOpenFile(window["native"]["GetFileString"](), undefined, true);
             
             this.asc_WriteAllWorksheets(true);
-            
-            _api.asc_SendThemeColorScheme();
+
+			_api.sendColorThemes(_api.wbModel.theme);
             _api.asc_ApplyColorScheme(false);
             _api._applyFirstLoadChanges();
             
@@ -7577,7 +7577,7 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
                t.DocumentLoadComplete = true;
                
                t.asc_CheckGuiControlColors();
-               t.asc_SendThemeColorScheme();
+               t.sendColorThemes();
                t.asc_ApplyColorScheme(false);
                
                t.sendStandartTextures();

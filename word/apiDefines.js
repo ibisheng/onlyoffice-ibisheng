@@ -182,6 +182,30 @@ var c_oSerFormat = {
 	Signature : "DOCY"
 };
 
+var c_oAscFootnotePos = {
+	BeneathText : 0x00, //section_footnote_PosBeneathText
+	DocEnd      : 0x01, //section_footnote_PosDocEnd
+	PageBottom  : 0x02, //section_footnote_PosPageBottom,
+	SectEnd     : 0x03  //section_footnote_PosSectEnd
+};
+
+var c_oAscFootnoteRestart = {
+	Continuous : 0x00, //section_footnote_RestartContinuous,
+	EachSect   : 0x01, //section_footnote_RestartEachSect,
+	EachPage   : 0x02  //section_footnote_RestartEachPage
+};
+
+var c_oAscNumberingFormat = {
+	None        : 0x0000, // numbering_numfmt_None
+	Bullet      : 0x1001, // numbering_numfmt_Bullet
+	Decimal     : 0x2002, // numbering_numfmt_Decimal
+	LowerRoman  : 0x2003, // numbering_numfmt_LowerRoman
+	UpperRoman  : 0x2004, // numbering_numfmt_UpperRoman
+	LowerLetter : 0x2005, // numbering_numfmt_LowerLetter
+	UpperLetter : 0x2006, // numbering_numfmt_UpperLetter
+	DecimalZero : 0x2007  // numbering_numfmt_DecimalZero
+};
+
 window["flat_desine"] = false;
 
 //------------------------------------------------------------export---------------------------------------------------
@@ -258,6 +282,28 @@ prot['ParaAdd'] = c_oAscRevisionsChangeType.ParaAdd;
 prot['ParaRem'] = c_oAscRevisionsChangeType.ParaRem;
 prot['TextPr']  = c_oAscRevisionsChangeType.TextPr;
 prot['ParaPr']  = c_oAscRevisionsChangeType.ParaPr;
+
+prot = window['Asc']['c_oAscFootnotePos'] = c_oAscFootnotePos;
+prot['BeneathText'] = c_oAscFootnotePos.BeneathText;
+prot['DocEnd']      = c_oAscFootnotePos.DocEnd;
+prot['PageBottom']  = c_oAscFootnotePos.PageBottom;
+prot['SectEnd']     = c_oAscFootnotePos.SectEnd;
+
+prot = window['Asc']['c_oAscFootnoteRestart'] = c_oAscFootnoteRestart;
+prot['Continuous'] = c_oAscFootnoteRestart.Continuous;
+prot['EachSect']   = c_oAscFootnoteRestart.EachSect;
+prot['EachPage']   = c_oAscFootnoteRestart.EachPage;
+
+prot = window['Asc']['c_oAscNumberingFormat'] = c_oAscNumberingFormat;
+prot['None']        = c_oAscNumberingFormat.None;
+prot['Bullet']      = c_oAscNumberingFormat.Bullet;
+prot['Decimal']     = c_oAscNumberingFormat.Decimal;
+prot['LowerRoman']  = c_oAscNumberingFormat.LowerRoman;
+prot['UpperRoman']  = c_oAscNumberingFormat.UpperRoman;
+prot['LowerLetter'] = c_oAscNumberingFormat.LowerLetter;
+prot['UpperLetter'] = c_oAscNumberingFormat.UpperLetter;
+prot['DecimalZero'] = c_oAscNumberingFormat.DecimalZero;
+
 
 window['AscCommon']                = window['AscCommon'] || {};
 window['AscCommon'].c_oSerFormat   = c_oSerFormat;

@@ -1405,12 +1405,3 @@ CFootnotePr.prototype.ReadFromBinary = function(Reader)
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CSectionPr = CSectionPr;
-
-window['AscCommonWord']['section_footnote_RestartContinuous'] = section_footnote_RestartContinuous;
-window['AscCommonWord']['section_footnote_RestartEachSect']   = section_footnote_RestartEachSect;
-window['AscCommonWord']['section_footnote_RestartEachPage']   = section_footnote_RestartEachPage;
-
-window['AscCommonWord']['section_footnote_PosBeneathText'] = section_footnote_PosBeneathText;
-window['AscCommonWord']['section_footnote_PosDocEnd']      = section_footnote_PosDocEnd;
-window['AscCommonWord']['section_footnote_PosPageBottom']  = section_footnote_PosPageBottom;
-window['AscCommonWord']['section_footnote_PosSectEnd']     = section_footnote_PosSectEnd;

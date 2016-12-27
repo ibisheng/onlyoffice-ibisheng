@@ -263,7 +263,7 @@
 											<canvas id="ws-canvas-graphic"></canvas>\
 											<canvas id="ws-canvas-graphic-overlay"></canvas>\
 											<canvas id="id_target_cursor" class="block_elem" width="1" height="1"\
-												style="width:2px;height:13px;display:none;z-index:1004;"></canvas>\
+												style="width:2px;height:13px;display:none;z-index:9;"></canvas>\
 										</div>';
 
       this.canvas = document.getElementById("ws-canvas");
@@ -453,7 +453,19 @@
         // FormatPainter
         'isFormatPainter': function () {
           return self.stateFormatPainter;
-        }
+        },
+
+        //calcAll
+        'calcAll': function (ctrlKey, altKey, shiftKey) {
+          if(ctrlKey && altKey && shiftKey){
+            self.model.recalcWB(true);
+          } else if(shiftKey){
+            var ws = self.model.getActiveWs();
+            self.model.recalcWB(false, ws.getId());
+          } else {
+            self.model.recalcWB(false);
+          }
+        },
       });
 
       if (this.input && this.input.addEventListener) {
@@ -689,6 +701,14 @@
       },
 		"getCellEditMode": function() {
 			return self.isCellEditMode;
+		},
+		"drawMobileSelection" : function(color) {
+      		if (self.MobileTouchManager)
+			{
+				var _canvas = self.getWorksheet().objectRender.getDrawingCanvas();
+				if (_canvas)
+					self.MobileTouchManager.CheckSelect(_canvas.trackOverlay, color);
+			}
 		}
     });
 
@@ -826,10 +846,6 @@
       self._replaceCellTextCallback.apply(self, arguments);
     };
 
-    if (this.Api.isMobileVersion) {
-      this.MobileTouchManager = new AscCommonExcel.CMobileTouchManager();
-      this.MobileTouchManager.Init(this);
-    }
     return this;
   };
 
@@ -2294,7 +2310,11 @@
 
     var editDefinedNamesCallback = function(res) {
       if (res) {
-        t.model.editDefinesNames(oldName, newName);
+        if (oldName && oldName.asc_getIsTable()) {
+          ws.model.autoFilters.changeDisplayNameTable(oldName.asc_getName(), newName.asc_getName());
+        } else {
+          t.model.editDefinesNames(oldName, newName);
+        }
         t.handlers.trigger("asc_onEditDefName", oldName, newName);
         //условие исключает второй вызов asc_onRefreshDefNameList(первый в unlockDefName)
         if(!(t.collaborativeEditing.getCollaborativeEditing() && t.collaborativeEditing.getFast()))
@@ -2309,7 +2329,7 @@
     var defNameId;
     if (oldName) {
       defNameId = t.model.getDefinedName(oldName);
-      defNameId = defNameId ? defNameId.nodeId : null;
+      defNameId = defNameId ? defNameId.getNodeId() : null;
     }
 
     var callback = function() {
@@ -2347,14 +2367,14 @@
 
       var delDefinedNamesCallback = function(res) {
         if (res) {
-          t.handlers.trigger("asc_onDelDefName", t.model.delDefinesNames(oldName));
+          t.model.delDefinesNames(oldName);
           t.handlers.trigger("asc_onRefreshDefNameList");
         } else {
           t.handlers.trigger("asc_onError", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
         }
         t._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
       };
-      var defNameId = t.model.getDefinedName(oldName).nodeId;
+      var defNameId = t.model.getDefinedName(oldName).getNodeId();
 
       ws._isLockedDefNames(delDefinedNamesCallback, defNameId);
 
@@ -2995,6 +3015,35 @@
 
     return canvas.toDataURL("image/png");
   };
+
+	WorkbookView.prototype.Is_SelectionUse = function () {
+        return !this.getWorksheet().getSelectionShape();
+    };
+	WorkbookView.prototype.GetSelectionRectsBounds = function () {
+		if (this.getWorksheet().getSelectionShape())
+		  return null;
+
+		var ws = this.getWorksheet();
+		var range = ws.getSelectedRange().bbox;
+		var l = ws.getCellLeft(range.c1, 3);
+		var t = ws.getCellTop(range.r1, 3);
+
+		var _offX = ws.cellsLeft * asc_getcvt(1/*pt*/, 3/*mm*/, ws._getPPIX());
+		var _offY = ws.cellsTop * asc_getcvt(1/*pt*/, 3/*mm*/, ws._getPPIY());
+
+		return {
+			X: l - _offX,
+			Y: t - _offY,
+			W: ws.getCellLeft(range.c2, 3) - l + ws.getColumnWidth(range.c2, 3),
+			H: ws.getCellTop(range.r2, 3) - t + ws.getRowHeight(range.r2, 3)
+		};
+	};
+	WorkbookView.prototype.ConvertXYToLogic = function (x, y) {
+	  return this.getWorksheet().ConvertXYToLogic(x, y);
+	};
+	WorkbookView.prototype.ConvertLogicToXY = function (xL, yL) {
+		return this.getWorksheet().ConvertLogicToXY(xL, yL);
+	};
 
   //------------------------------------------------------------export---------------------------------------------------
   window['AscCommonExcel'] = window['AscCommonExcel'] || {};

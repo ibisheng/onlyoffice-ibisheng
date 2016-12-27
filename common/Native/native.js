@@ -505,7 +505,8 @@ function NativeOpenFile2(_params)
 		if (_api.NativeAfterLoad)
 			_api.NativeAfterLoad();
 
-		if (_api.__SendThemeColorScheme)
+		// ToDo get_PropertyThemeColorSchemes method removed, now the only Event!!!!
+		/*if (_api.__SendThemeColorScheme)
 			_api.__SendThemeColorScheme();
 
 		if (_api.get_PropertyThemeColorSchemes)
@@ -518,7 +519,7 @@ function NativeOpenFile2(_params)
 				AscCommon.asc_WriteColorSchemes(schemes, st);
 				window["native"]["OnCallMenuEvent"](2404, st); // ASC_MENU_EVENT_TYPE_COLOR_SCHEMES
 			}
-		}
+		}*/
 	}
 	else
 	{

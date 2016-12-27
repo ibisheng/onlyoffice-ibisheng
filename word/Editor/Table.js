@@ -12112,6 +12112,81 @@ CTable.prototype.private_SetTableLayoutFixedAndUpdateCellsWidth = function(nExce
 		}
 	}
 };
+CTable.prototype.GotoFootnoteRef = function(isNext, isCurrent)
+{
+	var nRow = 0, nCell = 0;
+	if (true === isCurrent)
+	{
+		if (true === this.Selection.Use)
+		{
+			var nStartRow  = this.Selection.StartPos.Pos.Row;
+			var nStartCell = this.Selection.StartPos.Pos.Cell;
+
+			var nEndRow  = this.Selection.EndPos.Pos.Row;
+			var nEndCell = this.Selection.EndPos.Pos.Cell;
+
+			if (nStartRow < nEndRow || (nStartRow === nEndRow && nStartCell <= nEndCell))
+			{
+				nRow  = nStartRow;
+				nCell = nStartCell;
+			}
+			else
+			{
+				nRow  = nEndRow;
+				nCell = nEndCell;
+			}
+		}
+		else
+		{
+			nCell = this.CurCell.Index;
+			nRow  = this.CurCell.Row.Index;
+		}
+	}
+	else
+	{
+		if (true === isNext)
+		{
+			nRow = 0;
+			nCell = 0;
+		}
+		else
+		{
+			nRow  = this.Content.length - 1;
+			nCell = this.Content[nRow].Get_CellsCount() - 1;
+		}
+	}
+
+	if (true === isNext)
+	{
+		for (var nCurRow = nRow, nRowsCount = this.Content.length; nCurRow < nRowsCount; ++nCurRow)
+		{
+			var oRow = this.Content[nCurRow];
+			var nStartCell = (nCurRow === nRow ? nCell : 0);
+			for (var nCurCell = nStartCell, nCellsCount = oRow.Get_CellsCount(); nCurCell < nCellsCount; ++nCurCell)
+			{
+				var oCell = oRow.Get_Cell(nCurCell);
+				if (oCell.Content.GotoFootnoteRef(true, true === isCurrent && nCurRow === nRow && nCurCell === nCell))
+					return true;
+			}
+		}
+	}
+	else
+	{
+		for (var nCurRow = nRow; nCurRow >= 0; --nCurRow)
+		{
+			var oRow = this.Content[nCurRow];
+			var nStartCell = (nCurRow === nRow ? nCell : oRow.Get_CellsCount() - 1);
+			for (var nCurCell = nStartCell; nCurCell >= 0; --nCurCell)
+			{
+				var oCell = oRow.Get_Cell(nCurCell);
+				if (oCell.Content.GotoFootnoteRef(false, true === isCurrent && nCurRow === nRow && nCurCell === nCell))
+					return true;
+			}
+		}
+	}
+
+	return false;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook
 //----------------------------------------------------------------------------------------------------------------------

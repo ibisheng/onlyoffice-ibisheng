@@ -444,7 +444,7 @@ function CEditorPage(api)
 
 		if (this.m_oApi.isMobileVersion)
 		{
-			this.MobileTouchManager = new AscCommon.CMobileTouchManager();
+			this.MobileTouchManager = new AscCommon.CMobileTouchManager( { eventsElement : "word_mobile_element" } );
 			this.MobileTouchManager.Init(this.m_oApi);
 		}
 
@@ -792,108 +792,7 @@ function CEditorPage(api)
 		    this.TextBoxBackground = CreateControl(AscCommon.g_inputContext.HtmlArea.id);
             this.TextBoxBackground.HtmlElement.parentNode.parentNode.style.zIndex = 10;
 
-			var __hasTouch = 'ontouchstart' in window;
-
-			if (__hasTouch)
-			{
-				this.TextBoxBackground.HtmlElement["ontouchcancel"] = function(e)
-				{
-					if (!oThis.MobileTouchManager)
-						return false;
-
-					oThis.IsUpdateOverlayOnlyEndReturn = true;
-					oThis.StartUpdateOverlay();
-					var ret                            = oThis.MobileTouchManager.onTouchEnd(e);
-					oThis.IsUpdateOverlayOnlyEndReturn = false;
-					oThis.EndUpdateOverlay();
-					return ret;
-				};
-
-				this.TextBoxBackground.HtmlElement["ontouchstart"] = function(e)
-				{
-					if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
-						return;
-
-				    if (!oThis.IsFocus)
-				        oThis.m_oApi.asc_enableKeyEvents(true);
-
-					if (!oThis.MobileTouchManager)
-						return false;
-
-					oThis.IsUpdateOverlayOnlyEndReturn = true;
-					oThis.StartUpdateOverlay();
-					var ret                            = oThis.MobileTouchManager.onTouchStart(e);
-					oThis.IsUpdateOverlayOnlyEndReturn = false;
-					oThis.EndUpdateOverlay();
-					return ret;
-				};
-				this.TextBoxBackground.HtmlElement["ontouchmove"]  = function(e)
-				{
-					if (!oThis.MobileTouchManager)
-						return false;
-
-					oThis.IsUpdateOverlayOnlyEndReturn = true;
-					oThis.StartUpdateOverlay();
-					var ret                            = oThis.MobileTouchManager.onTouchMove(e);
-					oThis.IsUpdateOverlayOnlyEndReturn = false;
-					oThis.EndUpdateOverlay();
-					return ret;
-				};
-				this.TextBoxBackground.HtmlElement["ontouchend"]   = function(e)
-				{
-					if (!oThis.MobileTouchManager)
-						return false;
-
-					oThis.IsUpdateOverlayOnlyEndReturn = true;
-					oThis.StartUpdateOverlay();
-					var ret                            = oThis.MobileTouchManager.onTouchEnd(e);
-					oThis.IsUpdateOverlayOnlyEndReturn = false;
-					oThis.EndUpdateOverlay();
-					return ret;
-				};
-			}
-			else
-			{
-				this.TextBoxBackground.HtmlElement["onmousedown"] = function(e)
-				{
-					if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
-						return;
-
-					if (!oThis.MobileTouchManager)
-						return false;
-
-					oThis.IsUpdateOverlayOnlyEndReturn = true;
-					oThis.StartUpdateOverlay();
-					var ret                            = oThis.MobileTouchManager.onTouchStart(e);
-					oThis.IsUpdateOverlayOnlyEndReturn = false;
-					oThis.EndUpdateOverlay();
-					return ret;
-				};
-				this.TextBoxBackground.HtmlElement["onmousemove"] = function(e)
-				{
-					if (!oThis.MobileTouchManager)
-						return false;
-
-					oThis.IsUpdateOverlayOnlyEndReturn = true;
-					oThis.StartUpdateOverlay();
-					var ret                            = oThis.MobileTouchManager.onTouchMove(e);
-					oThis.IsUpdateOverlayOnlyEndReturn = false;
-					oThis.EndUpdateOverlay();
-					return ret;
-				};
-				this.TextBoxBackground.HtmlElement["onmouseup"]   = function(e)
-				{
-					if (!oThis.MobileTouchManager)
-						return false;
-
-					oThis.IsUpdateOverlayOnlyEndReturn = true;
-					oThis.StartUpdateOverlay();
-					var ret                            = oThis.MobileTouchManager.onTouchEnd(e);
-					oThis.IsUpdateOverlayOnlyEndReturn = false;
-					oThis.EndUpdateOverlay();
-					return ret;
-				};
-			}
+            this.MobileTouchManager.initEvents(AscCommon.g_inputContext.HtmlArea.id);
 
 			if (AscBrowser.isAndroid)
 			{
@@ -2794,11 +2693,6 @@ function CEditorPage(api)
 		this.m_bIsRePaintOnScroll      = true;
 
 		this.m_oBoundsController.ClearNoAttack();
-
-		if (0 == this.m_nZoomType && this.MobileTouchManager)
-		{
-			this.MobileTouchManager.CheckZoomCriticalValues();
-		}
 
 		this.OnScroll();
 		this.onTimerScroll2_sync();

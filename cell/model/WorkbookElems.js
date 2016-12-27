@@ -2730,7 +2730,7 @@ Row.prototype =
 	{
 		this.ws._removeRow(this.index);
 	},
-	clone : function(oNewWs)
+	clone : function(oNewWs, renameParams)
 	{
         if(!oNewWs)
             oNewWs = this.ws;
@@ -2742,7 +2742,7 @@ Row.prototype =
 		if(null != this.h)
 			oNewRow.h = this.h;
 		for(var i in this.c)
-			oNewRow.c[i] = this.c[i].clone(oNewWs);
+			oNewRow.c[i] = this.c[i].clone(oNewWs, renameParams);
 		return oNewRow;
 	},
 	getDefaultXfs : function()
@@ -3284,8 +3284,9 @@ CCellValue.prototype =
 			}
 			if(null == aRes)
 				aRes = this._getValue2Result(cell, sText, aText);
-			if( cell.sFormula ){
-				aRes[0].sFormula = cell.sFormula;
+			var formula = cell.getFormula();
+			if( formula ){
+				aRes[0].sFormula = formula;
 				aRes[0].sId = cell.getName();
 			}
 			
@@ -3304,7 +3305,7 @@ CCellValue.prototype =
 			var oValueText = null;
 			var oValueArray = null;
 			var xfs = cell.getCompiledStyle();
-			if(cell.sFormula)
+			if(cell.formulaParsed)
 				oValueText = "="+cell.formulaParsed.assembleLocale(AscCommonExcel.cFormulaFunctionToLocale,true);	// ToDo если будет притормаживать, то завести переменную и не рассчитывать каждый раз!
 			else
 			{
@@ -5692,7 +5693,7 @@ function TablePart(handlers) {
 	this.result = null;
 	this.handlers = handlers;
 }
-TablePart.prototype.clone = function(ws, tableName) {
+TablePart.prototype.clone = function() {
 	var i, res = new TablePart(this.handlers);
 	res.Ref = this.Ref ? this.Ref.clone() : null;
 	res.HeaderRowCount = this.HeaderRowCount;
@@ -5714,31 +5715,39 @@ TablePart.prototype.clone = function(ws, tableName) {
 		for (i = 0; i < this.result.length; ++i)
 			res.result.push(this.result[i].clone());
 	}
-	
-	if(tableName)
-	{
-		res.DisplayName = tableName;
-	}
-	else
-	{
-		res.DisplayName = this.DisplayName;
-	}
-	
-	if(ws !== null)
-		res.recalc(ws, tableName);
-		
+	res.DisplayName = this.DisplayName;
 	return res;
 };
-TablePart.prototype.recalc = function(ws, tableName) {
-	this.DisplayName = ws.workbook.dependencyFormulas.getNextTableName(ws, this.Ref, tableName);
-};
+	TablePart.prototype.renameSheetCopy = function(ws, renameParams) {
+		for (var i = 0; i < this.TableColumns.length; ++i) {
+			this.TableColumns[i].renameSheetCopy(ws, renameParams);
+		}
+	};
+	TablePart.prototype.removeDependencies = function(opt_cols) {
+		if (!opt_cols) {
+			opt_cols = this.TableColumns;
+		}
+		for (var i = 0; i < opt_cols.length; ++i) {
+			opt_cols[i].removeDependencies();
+		}
+	};
+	TablePart.prototype.buildDependencies = function() {
+		for (var i = 0; i < this.TableColumns.length; ++i) {
+			this.TableColumns[i].buildDependencies();
+		}
+	};
+	TablePart.prototype.getAllFormulas = function(formulas) {
+		for (var i = 0; i < this.TableColumns.length; ++i) {
+			this.TableColumns[i].getAllFormulas(formulas);
+		}
+	};
 TablePart.prototype.moveRef = function(col, row) {
 	var ref = this.Ref.clone();
 	ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
 
 	this.Ref = ref;
 	//event
-	this.handlers.trigger("changeRefTablePart", this.DisplayName, this.Ref);
+	this.handlers.trigger("changeRefTablePart", this);
 
 	if(this.AutoFilter)
 		this.AutoFilter.moveRef(col, row);
@@ -5753,9 +5762,7 @@ TablePart.prototype.changeRef = function(col, row, bIsFirst) {
 	this.Ref = ref;
 	
 	//event
-	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
-	var refNamedRanges = Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, endRow);
-	this.handlers.trigger("changeRefTablePart", this.DisplayName, refNamedRanges);
+	this.handlers.trigger("changeRefTablePart", this);
 	
 	if(this.AutoFilter)
 		this.AutoFilter.changeRef(col, row, bIsFirst);
@@ -5772,9 +5779,10 @@ TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewT
 		
 		if(null !== intersectionRanges)
 		{
+			this.removeDependencies();
+			var tableColumn;
 			for(var i = range.c1; i <= range.c2; i++)
 			{
-				var tableColumn;
 				if(i >= intersectionRanges.c1 && i <= intersectionRanges.c2)
 				{
 					var tableIndex = i - this.Ref.c1;
@@ -5790,17 +5798,18 @@ TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewT
 			
 			for(var j = 0; j < newTableColumns.length; j++)
 			{
-				if(newTableColumns[j].Name === null)
-					newTableColumns[j].Name = autoFilters._generateColumnName2(newTableColumns);
+				tableColumn = newTableColumns[j];
+				if(tableColumn.Name === null)
+					tableColumn.Name = autoFilters._generateColumnName2(newTableColumns);
 			}
 			
 			this.TableColumns = newTableColumns;
+			this.buildDependencies();
 		}
 	}
-	
 	this.Ref = Asc.Range(range.c1, range.r1, range.c2, range.r2);
 	//event
-	this.handlers.trigger("changeRefTablePart", this.DisplayName, this.Ref);
+	this.handlers.trigger("changeRefTablePart", this);
 	
 	if(this.AutoFilter)
 		this.AutoFilter.changeRefOnRange(range);
@@ -5848,15 +5857,25 @@ TablePart.prototype.deleteTableColumns = function(activeRange)
 		diff = activeRange.c2 - activeRange.c1 + 1;
 		startCol = activeRange.c1 - this.Ref.c1;
 	}
-	
-	if(diff !== null)
-		this.TableColumns.splice(startCol, diff);
+
+	if (diff !== null) {
+		var deleted = this.TableColumns.splice(startCol, diff);
+		this.removeDependencies(deleted);
+
+		//todo undo
+		// var deletedMap = {};
+		// for (var i = 0; i < deleted.length; ++i) {
+		// 	deletedMap[deleted[i].Name] = 1;
+		// }
+		// this.handlers.trigger("deleteColumnTablePart", this.DisplayName, deletedMap);
+	}
+
 };
 
 TablePart.prototype.addTableColumns = function(activeRange, autoFilters)
 {
 	var newTableColumns = [], num = 0;
-
+	this.removeDependencies();
 	for(var j = 0; j < this.TableColumns.length;)
 	{
 		var curCol = num + this.Ref.c1;
@@ -5875,20 +5894,24 @@ TablePart.prototype.addTableColumns = function(activeRange, autoFilters)
 	
 	for(var j = 0; j < newTableColumns.length; j++)
 	{
-		if(newTableColumns[j].Name === null)
-			newTableColumns[j].Name = autoFilters._generateColumnName2(newTableColumns);
+		var tableColumn = newTableColumns[j];
+		if(tableColumn.Name === null)
+			tableColumn.Name = autoFilters._generateColumnName2(newTableColumns);
 	}
 	
 	this.TableColumns = newTableColumns;
+	this.buildDependencies();
 };
 
 TablePart.prototype.addTableLastColumn = function(activeRange, autoFilters, isAddLastColumn)
 {
+	this.removeDependencies();
 	var newTableColumns = this.TableColumns;
 	newTableColumns.push(new TableColumn());
 	newTableColumns[newTableColumns.length - 1].Name = autoFilters._generateColumnName2(newTableColumns);
 	
 	this.TableColumns = newTableColumns;
+	this.buildDependencies();
 };
 
 TablePart.prototype.isAutoFilter = function()
@@ -5899,42 +5922,47 @@ TablePart.prototype.isAutoFilter = function()
 TablePart.prototype.getTableRangeForFormula = function(objectParam)
 {
 	var res = null;
+	var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
+	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
 	switch(objectParam.param)
 	{
 		case FormulaTablePartInfo.all:
 		{
 			res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r2);
-            //All поразному работает в случае если у таблицы есть или нет строки Totals
-            //При наличии Totals All возвращает диапазон с учетом этой строки.
 			break;
 		}
 		case FormulaTablePartInfo.data:
 		{
-			var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
-			var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
-			
 			res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 			break;
 		}
 		case FormulaTablePartInfo.headers:
 		{
-			res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r1);
+			if(this.HeaderRowCount === null) {
+				res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r1);
+			} else if(!objectParam.toRef) {
+				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+			}
 			break;
 		}
 		case FormulaTablePartInfo.totals:
 		{
-			if(this.TotalsRowCount)
-			{
+			if(this.TotalsRowCount) {
 				res = new Asc.Range(this.Ref.c1, this.Ref.r2, this.Ref.c2, this.Ref.r2);
+			} else if(!objectParam.toRef) {
+				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 			}
-			
 			break;
 		}
 		case FormulaTablePartInfo.thisRow:
 		{
-//            if( this.Ref.containsRange( objectParam.cell ) ){
-                res = new Asc.Range( this.Ref.c1, objectParam.cell.r1, this.Ref.c2, objectParam.cell.r1 );
-//            }
+			if (objectParam.cell) {
+				if (startRow <= objectParam.cell.r1 && objectParam.cell.r1 <= endRow) {
+					res = new Asc.Range(this.Ref.c1, objectParam.cell.r1, this.Ref.c2, objectParam.cell.r1);
+				}
+			} else {
+				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+			}
 			break;
 		}
 		case FormulaTablePartInfo.columns:
@@ -5946,18 +5974,11 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 				break;
 			if(endCol === null)
 				endCol = startCol;
-			
-			var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
-			var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
-			
+
 			res = new Asc.Range(this.Ref.c1 + startCol, startRow, this.Ref.c1 + endCol, endRow);
 			break;
 		}
 	}
-    if( objectParam.includeColumnHeader && res ){
-        res.r1--;
-        res.r1 < 0 ? res.r1 = 0 : null;
-    }
 	return res;
 };
 
@@ -6034,15 +6055,19 @@ TablePart.prototype.isShowButton = function()
 	return res;
 };
 
-TablePart.prototype.generateTotalsRowLabel = function()
+TablePart.prototype.generateTotalsRowLabel = function(ws)
 {
 	if(!this.TableColumns)
 	{
 		return;
 	}
 	
-	this.TableColumns[0].generateTotalsRowLabel();
-	this.TableColumns[this.TableColumns.length - 1].generateTotalsRowFunction(this);
+	//в случае одной колонки выставляем только формулу
+	if(this.TableColumns.length > 1)
+	{
+		this.TableColumns[0].generateTotalsRowLabel();
+	}
+	this.TableColumns[this.TableColumns.length - 1].generateTotalsRowFunction(ws, this);
 };
 
 TablePart.prototype.changeDisplayName = function(newName)
@@ -6058,14 +6083,10 @@ TablePart.prototype.getRangeWithoutHeaderFooter = function()
 	return Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 };
 
-TablePart.prototype.checkTotalRowFormula = function()
+TablePart.prototype.checkTotalRowFormula = function(ws)
 {
-	if(this.TotalsRowCount)
-	{
-		for(var i = 0; i < this.TableColumns.length; i++)
-		{
-			this.TableColumns[i].checkTotalRowFormula(this);
-		}
+	for (var i = 0; i < this.TableColumns.length; i++) {
+		this.TableColumns[i].checkTotalRowFormula(ws, this);
 	}
 };
 
@@ -6300,12 +6321,54 @@ function TableColumn() {
 	this.dxf = null;
 	this.CalculatedColumnFormula = null;
 }
+	TableColumn.prototype.onFormulaEvent = function(type, eventData) {
+		if (AscCommon.c_oNotifyParentType.CanDo === type) {
+			return true;
+		} else if (AscCommon.c_oNotifyParentType.Change === type) {
+			this.TotalsRowFormula.setIsDirty(false);
+		} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
+			if (eventData.isRebuild) {
+				var ws = this.TotalsRowFormula.ws;
+				this.TotalsRowFormula = null;//to prevent removeDependencies in applyTotalRowFormula
+				this.applyTotalRowFormula(eventData.assemble, ws, true);
+			} else {
+				this.TotalsRowFormula.Formula = eventData.assemble;
+				this.TotalsRowFormula.buildDependencies();
+			}
+		}
+	};
+	TableColumn.prototype.renameSheetCopy = function(ws, renameParams) {
+		if (this.TotalsRowFormula) {
+			this.buildDependencies();
+			this.TotalsRowFormula.renameSheetCopy(renameParams);
+			this.applyTotalRowFormula(this.TotalsRowFormula.assemble(true), ws, true);
+		}
+	};
+	TableColumn.prototype.buildDependencies = function() {
+		if (this.TotalsRowFormula) {
+			this.TotalsRowFormula.parse();
+			this.TotalsRowFormula.buildDependencies();
+		}
+	};
+	TableColumn.prototype.removeDependencies = function() {
+		if (this.TotalsRowFormula) {
+			this.TotalsRowFormula.removeDependencies();
+		}
+	};
+	TableColumn.prototype.getAllFormulas = function(formulas) {
+		if (this.TotalsRowFormula) {
+			formulas.push(this.TotalsRowFormula);
+		}
+	};
 TableColumn.prototype.clone = function() {
 	var res = new TableColumn();
 	res.Name = this.Name;
 	res.TotalsRowLabel = this.TotalsRowLabel;
 	res.TotalsRowFunction = this.TotalsRowFunction;
-	res.TotalsRowFormula = this.TotalsRowFormula;
+
+	if (this.TotalsRowFormula) {
+		res.applyTotalRowFormula(this.TotalsRowFormula.Formula, this.TotalsRowFormula.ws, false);
+	}
 	if (this.dxf)
 		res.dxf = this.dxf.clone;
 	res.CalculatedColumnFormula = this.CalculatedColumnFormula;
@@ -6318,12 +6381,12 @@ TableColumn.prototype.generateTotalsRowLabel = function(){
 		this.TotalsRowLabel = "Summary";
 	}
 };
-TableColumn.prototype.generateTotalsRowFunction = function(tablePart){
+TableColumn.prototype.generateTotalsRowFunction = function(ws, tablePart){
 	//TODO добавить в перевод
-	if(this.TotalsRowFunction === null)
+	if(null === this.TotalsRowFunction && null === this.TotalsRowLabel)
 	{	
 		this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
-		this.TotalsRowFormula = "SUBTOTAL(109," + tablePart.DisplayName + "[" + this.Name + "])";
+		this.setTotalsRowFormula("SUBTOTAL(109," + tablePart.DisplayName + "[" + this.Name + "])", ws);
 	}
 };
 
@@ -6350,7 +6413,7 @@ TableColumn.prototype.getTotalRowFormula = function(tablePart){
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionCustom:
 			{
-				res = this.TotalsRowFormula;
+				res = this.getTotalsRowFormula();
 				break;
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionMax:
@@ -6390,19 +6453,20 @@ TableColumn.prototype.getTotalRowFormula = function(tablePart){
 
 TableColumn.prototype.cleanTotalsData = function(){
 	this.CalculatedColumnFormula = null;
-	this.TotalsRowFormula = null;
+	this.applyTotalRowFormula(null, null, false);
 	this.TotalsRowFunction = null;
 	this.TotalsRowLabel = null;
 };
-
-TableColumn.prototype.setTotalsRowFormula = function(val){
+	TableColumn.prototype.getTotalsRowFormula = function(){
+		return this.TotalsRowFormula ? this.TotalsRowFormula.getFormula() : null;
+	};
+TableColumn.prototype.setTotalsRowFormula = function(val, ws){
 	this.cleanTotalsData();
 	if("=" === val[0])
 	{
 		val = val.substring(1);
 	}
-	
-	this.TotalsRowFormula = val;
+	this.applyTotalRowFormula(val, ws, true);
 	this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
 };
 
@@ -6412,18 +6476,29 @@ TableColumn.prototype.setTotalsRowLabel = function(val){
 	this.TotalsRowLabel = val;
 };
 
-TableColumn.prototype.checkTotalRowFormula = function(tablePart){
+TableColumn.prototype.checkTotalRowFormula = function(ws, tablePart){
 	if(null !== this.TotalsRowFunction && Asc.ETotalsRowFunction.totalrowfunctionCustom !== this.TotalsRowFunction)
 	{
 		var totalRowFormula = this.getTotalRowFormula(tablePart);
 		
 		if(null !== totalRowFormula)
 		{
-			this.TotalsRowFormula = totalRowFormula;
+			this.applyTotalRowFormula(totalRowFormula, ws, true);
 			this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
 		}
 	}
 };
+	TableColumn.prototype.applyTotalRowFormula = function(val, opt_ws, opt_buildDep) {
+		this.removeDependencies();
+		if (val) {
+			this.TotalsRowFormula = new AscCommonExcel.parserFormula(val, this, opt_ws);
+			if (opt_buildDep) {
+				this.buildDependencies();
+			}
+		} else {
+			this.TotalsRowFormula = null;
+		}
+	};
 
 /** @constructor */
 function TableStyleInfo() {
@@ -7936,4 +8011,14 @@ prot["asc_setFilterVal"]				= prot.asc_setFilterVal;
 prot["asc_setPercent"]					= prot.asc_setPercent;
 prot["asc_setTop"]						= prot.asc_setTop;
 prot["asc_setVal"]						= prot.asc_setVal;
+
+window["Asc"]["TreeRBNode"]			= window["Asc"].TreeRBNode = TreeRBNode;
+window["Asc"]["TreeRB"]			= window["Asc"].TreeRB = TreeRB;
+prot									= TreeRB.prototype;
+prot["insertOrGet"]						= prot.insertOrGet;
+prot["deleteNode"]			= prot.deleteNode;
+prot["enumerate"]						= prot.enumerate;
+prot["getElem"]			= prot.getElem;
+prot["getNodeAll"]			= prot.getNodeAll;
+prot["isEmpty"]			= prot.getNodeAll;
 })(window);

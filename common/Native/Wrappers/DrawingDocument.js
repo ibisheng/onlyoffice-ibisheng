@@ -2240,9 +2240,6 @@ CDrawingDocument.prototype =
     SendControlColors : function()
     {
     },
-    SendThemeColorScheme : function()
-    {
-    },
     DrawImageTextureFillShape : function()
     {
     },

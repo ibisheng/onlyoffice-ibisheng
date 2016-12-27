@@ -86,7 +86,7 @@ var utils = (function () {
 		hasTransform: _transform !== false,
 		hasPerspective: _prefixStyle('perspective') in _elementStyle,
 		hasTouch: 'ontouchstart' in window,
-		hasPointer: !!(window.PointerEvent || window.MSPointerEvent), // IE10 is prefixed
+		hasPointer: (!('ontouchstart' in window)) &&  (!!(window.PointerEvent || window.MSPointerEvent)), // IE10 is prefixed
 		hasTransition: _prefixStyle('transition') in _elementStyle
 	});
 
@@ -284,6 +284,7 @@ function IScroll (el, options) {
 	this.wrapper = typeof el == 'string' ? document.querySelector(el) : el;
 	this.scroller = (typeof options.scroller_id == 'string') ? document.getElementById(options.scroller_id) : this.wrapper.children[0];
 	this.scrollerStyle = this.scroller.style;		// cache style for better performance
+	this.eventsElement = options.eventsElement;
 
 	this.options = {
 
@@ -936,32 +937,46 @@ IScroll.prototype = {
 	},
 
 	_initEvents: function (remove) {
-		var eventType = remove ? utils.removeEvent : utils.addEvent,
-			target = this.options.bindToWrapper ? this.wrapper : window;
 
-		eventType(window, 'orientationchange', this);
-		eventType(window, 'resize', this);
+		if (typeof this.eventsElement == "string")
+		{
+			var _element = document.getElementById(this.eventsElement);
+			if (!_element)
+				return;
+			this.eventsElement = _element;
+		}
+
+		var eventType = remove ? utils.removeEvent : utils.addEvent,
+			target = this.options.bindToWrapper ? (this.eventsElement ? this.eventsElement : this.wrapper) : window;
+
+		var _wrapper = this.eventsElement ? this.eventsElement : this.wrapper;
+
+		if (this.options.resizeDetect)
+		{
+			eventType(window, 'orientationchange', this);
+			eventType(window, 'resize', this);
+		}
 
 		if ( this.options.click ) {
-			eventType(this.wrapper, 'click', this, true);
+			eventType(_wrapper, 'click', this, true);
 		}
 
 		if ( !this.options.disableMouse ) {
-			eventType(this.wrapper, 'mousedown', this);
+			eventType(_wrapper, 'mousedown', this);
 			eventType(target, 'mousemove', this);
 			eventType(target, 'mousecancel', this);
 			eventType(target, 'mouseup', this);
 		}
 
 		if ( utils.hasPointer && !this.options.disablePointer ) {
-			eventType(this.wrapper, utils.prefixPointerEvent('pointerdown'), this);
+			eventType(_wrapper, utils.prefixPointerEvent('pointerdown'), this);
 			eventType(target, utils.prefixPointerEvent('pointermove'), this);
 			eventType(target, utils.prefixPointerEvent('pointercancel'), this);
 			eventType(target, utils.prefixPointerEvent('pointerup'), this);
 		}
 
 		if ( utils.hasTouch && !this.options.disableTouch ) {
-			eventType(this.wrapper, 'touchstart', this);
+			eventType(_wrapper, 'touchstart', this);
 			eventType(target, 'touchmove', this);
 			eventType(target, 'touchcancel', this);
 			eventType(target, 'touchend', this);
@@ -1622,13 +1637,13 @@ IScroll.prototype = {
 			case 'pointerdown':
 			case 'MSPointerDown':
 			case 'mousedown':
-				this._start(e);
+				this.eventsElement ? this.manager.mainOnTouchStart(e) : this._start(e);
 				break;
 			case 'touchmove':
 			case 'pointermove':
 			case 'MSPointerMove':
 			case 'mousemove':
-				this._move(e);
+				this.eventsElement ? this.manager.mainOnTouchMove(e) : (e);
 				break;
 			case 'touchend':
 			case 'pointerup':
@@ -1638,7 +1653,7 @@ IScroll.prototype = {
 			case 'pointercancel':
 			case 'MSPointerCancel':
 			case 'mousecancel':
-				this._end(e);
+				this.eventsElement ? this.manager.mainOnTouchEnd(e) : this._end(e);
 				break;
 			case 'orientationchange':
 			case 'resize':

@@ -66,7 +66,9 @@
 			fadeScrollbars: true,
 			scrollX : true,
 			scroller_id : this.iScrollElement,
-			bounce : false
+			bounce : false,
+			eventsElement : this.eventsElement,
+			click : false
 		});
 
 		this.delegate.Init();
@@ -608,6 +610,44 @@
 
 		if (true !== this.iScroll.isAnimating)
 			this.CheckContextMenuTouchEnd(isCheckContextMenuMode);
+	};
+
+	CMobileTouchManager.prototype.mainOnTouchStart = function(e)
+	{
+		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+			return;
+
+		if (!this.Api.IsFocus)
+			this.Api.asc_enableKeyEvents(true);
+
+		var oWordControl = this.Api.WordControl;
+
+		oWordControl.IsUpdateOverlayOnlyEndReturn = true;
+		oWordControl.StartUpdateOverlay();
+		var ret = this.onTouchStart(e);
+		oWordControl.IsUpdateOverlayOnlyEndReturn = false;
+		oWordControl.EndUpdateOverlay();
+		return ret;
+	};
+	CMobileTouchManager.prototype.mainOnTouchMove = function(e)
+	{
+		var oWordControl = this.Api.WordControl;
+		oWordControl.IsUpdateOverlayOnlyEndReturn = true;
+		oWordControl.StartUpdateOverlay();
+		var ret = this.onTouchMove(e);
+		oWordControl.IsUpdateOverlayOnlyEndReturn = false;
+		oWordControl.EndUpdateOverlay();
+		return ret;
+	};
+	CMobileTouchManager.prototype.mainOnTouchEnd = function(e)
+	{
+		var oWordControl = this.Api.WordControl;
+		oWordControl.IsUpdateOverlayOnlyEndReturn = true;
+		oWordControl.StartUpdateOverlay();
+		var ret = this.onTouchEnd(e);
+		oWordControl.IsUpdateOverlayOnlyEndReturn = false;
+		oWordControl.EndUpdateOverlay();
+		return ret;
 	};
 
 	/*************************************** READER ******************************************/

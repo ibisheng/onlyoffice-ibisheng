@@ -126,6 +126,11 @@
 	 * */
 
 	/**
+	 *
+	 * @typedef {("none" | "nextTo" | "low" | "high")} TickLabelPosition
+	 * **/
+
+	/**
 	 * Class representing a base class for color types
 	 * @constructor
 	 */
@@ -141,6 +146,39 @@
 	Api.prototype.GetActiveSheet = function () {
 		var index = this.wbModel.getActive();
 		return new ApiWorksheet(this.wbModel.getWorksheet(index));
+	};
+
+	/**
+	 * Returns an object that represents the active sheet
+	 * @memberof Api
+	 * @returns {array}
+	 */
+	Api.prototype.GetThemesColors = function () {
+		var result = [];
+		AscCommon.g_oUserColorScheme.forEach(function (item) {
+			result.push(item.get_name());
+		});
+
+		return result;
+	};
+
+	/**
+	 * Set theme colors
+	 * @memberof Api
+	 * @param {string | number} theme
+	 */
+	Api.prototype.SetThemeColors = function (theme) {
+		if ('string' === typeof theme) {
+			if (!AscCommon.g_oUserColorScheme.some(function (item, i) {
+					if (theme === item.get_name()) {
+						theme = i;
+						return true;
+					}
+				})) {
+				return;
+			}
+		}
+		this.wbModel.changeColorScheme(theme);
 	};
 
 	Api.prototype.CreateNewHistoryPoint = function(){
@@ -166,7 +204,7 @@
 	 * @returns {ApiColor}
 	 */
 	Api.prototype.CreateColorByName = function (presetColor) {
-		var rgb = map_prst_color[presetColor];
+		var rgb = AscFormat.mapPrstColor[presetColor];
 		return new ApiColor(AscCommonExcel.createRgbColor((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF));
 	};
 
@@ -592,10 +630,29 @@
 	/**
 	 * Set underline
 	 * @memberof ApiRange
-	 * @param {bool} value
+	 * @param {'none' | 'single' | 'singleAccounting' | 'double' | 'doubleAccounting'} value
 	 */
 	ApiRange.prototype.SetUnderline = function (value) {
-		this.range.setUnderline(!!value);
+		var val;
+		switch (value) {
+			case 'single':
+				val = Asc.EUnderline.underlineSingle;
+				break;
+			case 'singleAccounting':
+				val = Asc.EUnderline.underlineSingleAccounting;
+				break;
+			case 'double':
+				val = Asc.EUnderline.underlineDouble;
+				break;
+			case 'doubleAccounting':
+				val = Asc.EUnderline.underlineDoubleAccounting;
+				break;
+			case 'none':
+			default:
+				val = Asc.EUnderline.underlineNone;
+				break;
+		}
+		this.range.setUnderline(val);
 	};
 
 	/**
@@ -682,8 +739,9 @@
 	ApiRange.prototype.Merge = function (across) {
 		if (across) {
 			var ws = this.range.worksheet;
-			for (var r = this.range.r1; r <= this.range.r2; ++r) {
-				ws.getRange3(r, this.range.c1, r, this.range.c2).merge(null);
+			var bbox = this.range.getBBox0();
+			for (var r = bbox.r1; r <= bbox.r2; ++r) {
+				ws.getRange3(r, bbox.c1, r, bbox.c2).merge(null);
 			}
 		} else {
 			this.range.merge(null);
@@ -918,9 +976,35 @@
 	{
 		AscFormat.builder_SetShowDataLabels(this.Chart, bShowSerName, bShowCatName, bShowVal, bShowPercent);
 	};
+	/**
+	 * Spicifies tick labels position vertical axis
+	 * @param {TickLabelPosition} sTickLabelPosition
+	 * */
+	ApiChart.prototype.SetVertAxisTickLabelPosition = function(sTickLabelPosition)
+	{
+		AscFormat.builder_SetChartVertAxisTickLablePosition(this.Chart, sTickLabelPosition);
+	};
+	/**
+	 * Spicifies tick labels position horizontal axis
+	 * @param {TickLabelPosition} sTickLabelPosition
+	 * */
+	ApiChart.prototype.SetHorAxisTickLabelPosition = function(sTickLabelPosition)
+	{
+		AscFormat.builder_SetChartHorAxisTickLablePosition(this.Chart, sTickLabelPosition);
+	};
+
+	/**
+	 * Get the type of this class.
+	 * @returns {"color"}
+	 */
+	ApiColor.prototype.GetClassType = function () {
+		return "color";
+	};
 
 
 	Api.prototype["GetActiveSheet"] = Api.prototype.GetActiveSheet;
+	Api.prototype["GetThemesColors"] = Api.prototype.GetThemesColors;
+	Api.prototype["SetThemeColors"] = Api.prototype.SetThemeColors;
 	Api.prototype["CreateNewHistoryPoint"] = Api.prototype.CreateNewHistoryPoint;
 	Api.prototype["CreateColorFromRGB"] = Api.prototype.CreateColorFromRGB;
 	Api.prototype["CreateColorByName"] = Api.prototype.CreateColorByName;
@@ -957,24 +1041,28 @@
 	ApiRange.prototype["UnMerge"] = ApiRange.prototype.UnMerge;
 
 
-	ApiDrawing.prototype["GetClassType"]             =  ApiDrawing.prototype.GetClassType;
-	ApiDrawing.prototype["SetSize"]                  =  ApiDrawing.prototype.SetSize;
-	ApiDrawing.prototype["SetPosition"]              =  ApiDrawing.prototype.SetPosition;
+	ApiDrawing.prototype["GetClassType"]               =  ApiDrawing.prototype.GetClassType;
+	ApiDrawing.prototype["SetSize"]                    =  ApiDrawing.prototype.SetSize;
+	ApiDrawing.prototype["SetPosition"]                =  ApiDrawing.prototype.SetPosition;
 
-	ApiImage.prototype["GetClassType"]               =  ApiImage.prototype.GetClassType;
+	ApiImage.prototype["GetClassType"]                 =  ApiImage.prototype.GetClassType;
 
-	ApiShape.prototype["GetClassType"]               =  ApiShape.prototype.GetClassType;
-	ApiShape.prototype["GetDocContent"]              =  ApiShape.prototype.GetDocContent;
-	ApiShape.prototype["SetVerticalTextAlign"]       =  ApiShape.prototype.SetVerticalTextAlign;
+	ApiShape.prototype["GetClassType"]                 =  ApiShape.prototype.GetClassType;
+	ApiShape.prototype["GetDocContent"]                =  ApiShape.prototype.GetDocContent;
+	ApiShape.prototype["SetVerticalTextAlign"]         =  ApiShape.prototype.SetVerticalTextAlign;
 
-	ApiChart.prototype["GetClassType"]               =  ApiChart.prototype.GetClassType;
-	ApiChart.prototype["SetTitle"]                   =  ApiChart.prototype.SetTitle;
-	ApiChart.prototype["SetHorAxisTitle"]            =  ApiChart.prototype.SetHorAxisTitle;
-	ApiChart.prototype["SetVerAxisTitle"]            =  ApiChart.prototype.SetVerAxisTitle;
-	ApiChart.prototype["SetVerAxisOrientation"]      =  ApiChart.prototype.SetVerAxisOrientation;
-	ApiChart.prototype["SetHorAxisOrientation"]      =  ApiChart.prototype.SetHorAxisOrientation;
-	ApiChart.prototype["SetLegendPos"]               =  ApiChart.prototype.SetLegendPos;
-	ApiChart.prototype["SetShowDataLabels"]          =  ApiChart.prototype.SetShowDataLabels;
+	ApiChart.prototype["GetClassType"]                 =  ApiChart.prototype.GetClassType;
+	ApiChart.prototype["SetTitle"]                     =  ApiChart.prototype.SetTitle;
+	ApiChart.prototype["SetHorAxisTitle"]              =  ApiChart.prototype.SetHorAxisTitle;
+	ApiChart.prototype["SetVerAxisTitle"]              =  ApiChart.prototype.SetVerAxisTitle;
+	ApiChart.prototype["SetVerAxisOrientation"]        =  ApiChart.prototype.SetVerAxisOrientation;
+	ApiChart.prototype["SetHorAxisOrientation"]        =  ApiChart.prototype.SetHorAxisOrientation;
+	ApiChart.prototype["SetLegendPos"]                 =  ApiChart.prototype.SetLegendPos;
+	ApiChart.prototype["SetShowDataLabels"]            =  ApiChart.prototype.SetShowDataLabels;
+	ApiChart.prototype["SetVertAxisTickLabelPosition"] =  ApiChart.prototype.SetVertAxisTickLabelPosition;
+	ApiChart.prototype["SetHorAxisTickLabelPosition"]  =  ApiChart.prototype.SetHorAxisTickLabelPosition;
+
+	ApiColor.prototype["GetClassType"]                 =  ApiColor.prototype.GetClassType;
 
 
 	function private_SetCoords(oDrawing, oWorksheet, nExtX, nExtY, nFromCol, nColOffset,  nFromRow, nRowOffset){

@@ -84,6 +84,8 @@
 		
 		"../common/scroll.js",
 		"../common/Scrolls/iscroll.js",
+		"../common/Scrolls/mobileTouchManagerBase.js",
+		"../word/Drawing/mobileTouchManager.js",
 
         "../common/wordcopypaste.js",
 		
@@ -226,7 +228,9 @@
         "../common/FontsFreeType/FontFile.js",
         "../common/FontsFreeType/FontManager.js",
         "../common/FontsFreeType/TextMeasurer.js",       
-        "../common/Scrolls/iscroll.js"
+        "../common/Scrolls/iscroll.js",
+		"../common/Scrolls/mobileTouchManagerBase.js",
+		"../word/Drawing/mobileTouchManager.js"
       ],
       "dst": "../word",
       "externs": [

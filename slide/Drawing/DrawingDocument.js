@@ -708,6 +708,8 @@ function CDrawingDocument()
 	this.TargetShowFlag        = false;
 	this.TargetShowNeedFlag    = false;
 
+	this.SelectionMatrix = null;
+
 	this.CanvasHit        = document.createElement('canvas');
 	this.CanvasHit.width  = 10;
 	this.CanvasHit.height = 10;
@@ -1850,6 +1852,9 @@ function CDrawingDocument()
 	}
 	this.AddPageSelection = function(pageIndex, x, y, width, height)
 	{
+		if (null == this.SelectionMatrix)
+			this.SelectionMatrix = this.TextMatrix;
+
 		if (pageIndex < 0 || pageIndex != this.SlideCurrent || Math.abs(width) < 0.001 || Math.abs(height) < 0.001)
 			return;
 
@@ -2398,127 +2403,6 @@ function CDrawingDocument()
 		}
 
 		this.m_oWordControl.m_oApi.sync_SendThemeColors(_ret_array, standart_colors);
-	}
-
-	this.SendThemeColorScheme = function()
-	{
-		var infos  = [];
-		var _index = 0;
-
-		var _c = null;
-
-		// user scheme
-		var oColorScheme    = AscCommon.g_oUserColorScheme;
-		var _count_defaults = oColorScheme.length;
-		for (var i = 0; i < _count_defaults; ++i)
-		{
-			var _obj           = oColorScheme[i];
-			infos[_index]      = new AscCommon.CAscColorScheme();
-			infos[_index].Name = _obj.name;
-
-			_c                      = _obj.dk1;
-			infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                      = _obj.lt1;
-			infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                      = _obj.dk2;
-			infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                      = _obj.lt2;
-			infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                      = _obj.accent1;
-			infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                      = _obj.accent2;
-			infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                      = _obj.accent3;
-			infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                      = _obj.accent4;
-			infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                      = _obj.accent5;
-			infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                      = _obj.accent6;
-			infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                       = _obj.hlink;
-			infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                       = _obj.folHlink;
-			infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
-
-			++_index;
-		}
-
-		// theme colors
-		var _theme = this.m_oWordControl.MasterLayouts.Theme;
-		var _extra = _theme.extraClrSchemeLst;
-		var _count = _extra.length;
-		var _rgba  = {R : 0, G : 0, B : 0, A : 255};
-		for (var i = 0; i < _count; ++i)
-		{
-			var _scheme = _extra[i].clrScheme;
-
-			infos[_index]      = new AscCommon.CAscColorScheme();
-			infos[_index].Name = _scheme.name;
-
-			_scheme.colors[8].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[8].RGBA;
-			infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[12].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[12].RGBA;
-			infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[9].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[9].RGBA;
-			infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[13].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[13].RGBA;
-			infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[0].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[0].RGBA;
-			infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[1].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[1].RGBA;
-			infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[2].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[2].RGBA;
-			infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[3].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[3].RGBA;
-			infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[4].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[4].RGBA;
-			infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[5].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[5].RGBA;
-			infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[11].Calculate(_theme, null, null, null, _rgba);
-			_c                       = _scheme.colors[11].RGBA;
-			infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[10].Calculate(_theme, null, null, null, _rgba);
-			_c                       = _scheme.colors[10].RGBA;
-			infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
-
-			_index++;
-		}
-
-		this.m_oWordControl.m_oApi.sync_SendThemeColorSchemes(infos);
 	}
 
 	this.DrawImageTextureFillShape = function(url)
@@ -3105,22 +2989,25 @@ function CThumbnailsManager()
 
 	this.initEvents2MobileAdvances = function()
 	{
+		if (this.m_oWordControl.m_oApi.isMobileVersion)
+			return;
+
 		var control             = this.m_oWordControl.m_oThumbnails.HtmlElement;
 		control["ontouchstart"] = function(e)
 		{
 			oThis.onMouseDown(e.touches[0]);
 			return false;
-		}
+		};
 		control["ontouchmove"]  = function(e)
 		{
 			oThis.onMouseMove(e.touches[0]);
 			return false;
-		}
+		};
 		control["ontouchend"]   = function(e)
 		{
 			oThis.onMouseUp(e.changedTouches[0]);
 			return false;
-		}
+		};
 	}
 
 	this.GetThumbnailPagePosition = function(pageIndex)

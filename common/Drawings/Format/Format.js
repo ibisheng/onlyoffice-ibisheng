@@ -12559,6 +12559,45 @@ function CorrectUniColor(asc_color, unicolor, flag)
     }
 
 
+    function builder_SetChartAxisLabelsPos(oAxis, sPosition){
+        if(!oAxis || !oAxis.setTickLblPos){
+            return;
+        }
+        var nPositionType = null;
+        var c_oAscTickLabelsPos = window['Asc'].c_oAscTickLabelsPos;
+        switch(sPosition){
+            case "high":{
+                nPositionType = c_oAscTickLabelsPos.TICK_LABEL_POSITION_HIGH;
+                break;
+            }
+            case "low":{
+                nPositionType = c_oAscTickLabelsPos.TICK_LABEL_POSITION_LOW;
+                break;
+            }
+            case "nextTo":{
+                nPositionType = c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO;
+                break;
+            }
+            case "none":{
+                nPositionType = c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE;
+                break;
+            }
+        }
+        if(nPositionType !== null){
+            oAxis.setTickLblPos(nPositionType);
+        }
+    }
+
+    function builder_SetChartVertAxisTickLablePosition(oChartSpace, sPosition){
+        if(oChartSpace){
+            builder_SetChartAxisLabelsPos(oChartSpace.chart.plotArea.getVerticalAxis(), sPosition);
+        }
+    }
+    function builder_SetChartHorAxisTickLablePosition(oChartSpace, sPosition){
+        if(oChartSpace){
+            builder_SetChartAxisLabelsPos(oChartSpace.chart.plotArea.getHorizontalAxis(), sPosition);
+        }
+    }
 
     //----------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
@@ -12679,10 +12718,13 @@ function CorrectUniColor(asc_color, unicolor, flag)
 
     window['AscFormat'].builder_SetChartVertAxisOrientation = builder_SetChartVertAxisOrientation;
     window['AscFormat'].builder_SetChartHorAxisOrientation = builder_SetChartHorAxisOrientation;
+    window['AscFormat'].builder_SetChartVertAxisTickLablePosition = builder_SetChartVertAxisTickLablePosition;
+    window['AscFormat'].builder_SetChartHorAxisTickLablePosition = builder_SetChartHorAxisTickLablePosition;
 
     window['AscFormat'].Ax_Counter = Ax_Counter;
     window['AscFormat'].TYPE_TRACK = TYPE_TRACK;
     window['AscFormat'].TYPE_KIND = TYPE_KIND;
+	window['AscFormat'].mapPrstColor = map_prst_color;
     window['AscFormat'].ar_arrow = ar_arrow;
     window['AscFormat'].ar_diamond = ar_diamond;
     window['AscFormat'].ar_none = ar_none;

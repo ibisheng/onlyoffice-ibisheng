@@ -528,7 +528,7 @@ function CEditorPage(api)
 		// ----------
 
 		this.m_oMainView = CreateControlContainer("id_main_view");
-		this.m_oMainView.Bounds.SetParams(5, 7, ScrollWidthMm, 0, true, true, true, true, -1, -1);
+		this.m_oMainView.Bounds.SetParams(5, 7, this.m_oApi.isMobileVersion ? 0 : ScrollWidthMm, 0, true, true, true, true, -1, -1);
 		this.m_oMainView.Anchor = (g_anchor_left | g_anchor_right | g_anchor_top | g_anchor_bottom);
 		this.m_oMainContent.AddControl(this.m_oMainView);
 
@@ -547,10 +547,10 @@ function CEditorPage(api)
 
 		if (this.m_oApi.isMobileVersion)
 		{
-			this.MobileTouchManager = new AscCommon.CMobileTouchManager();
+			this.MobileTouchManager = new AscCommon.CMobileTouchManager( { eventsElement : "slides_mobile_element" } );
 			this.MobileTouchManager.Init(this.m_oApi);
 
-			this.MobileTouchManagerThumbnails = new AscCommon.CMobileTouchManagerThumbnails();
+			this.MobileTouchManagerThumbnails = new AscCommon.CMobileTouchManagerThumbnails( { eventsElement : "slides_mobile_element" } );
 			this.MobileTouchManagerThumbnails.Init(this.m_oApi);
 		}
 
@@ -767,167 +767,8 @@ function CEditorPage(api)
 			this.TextBoxBackground = CreateControl(AscCommon.g_inputContext.HtmlArea.id);
 			this.TextBoxBackground.HtmlElement.parentNode.parentNode.style.zIndex = 10;
 
-			var __hasTouch = 'ontouchstart' in window;
-
-			if (__hasTouch)
-			{
-				this.TextBoxBackground.HtmlElement["ontouchcancel"] = function(e)
-				{
-					if (!oThis.MobileTouchManager)
-						return false;
-
-					oThis.IsUpdateOverlayOnlyEndReturn = true;
-					oThis.StartUpdateOverlay();
-					var ret                            = oThis.MobileTouchManager.onTouchEnd(e);
-					oThis.IsUpdateOverlayOnlyEndReturn = false;
-					oThis.EndUpdateOverlay();
-					return ret;
-				};
-
-				this.TextBoxBackground.HtmlElement["ontouchstart"] = function(e)
-				{
-					if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
-						return;
-
-					if (!oThis.IsFocus)
-						oThis.m_oApi.asc_enableKeyEvents(true);
-
-					if (!oThis.MobileTouchManager)
-						return false;
-
-					oThis.IsUpdateOverlayOnlyEndReturn = true;
-					oThis.StartUpdateOverlay();
-					var ret                            = oThis.MobileTouchManager.onTouchStart(e);
-					oThis.IsUpdateOverlayOnlyEndReturn = false;
-					oThis.EndUpdateOverlay();
-					return ret;
-				};
-				this.TextBoxBackground.HtmlElement["ontouchmove"]  = function(e)
-				{
-					if (!oThis.MobileTouchManager)
-						return false;
-
-					oThis.IsUpdateOverlayOnlyEndReturn = true;
-					oThis.StartUpdateOverlay();
-					var ret                            = oThis.MobileTouchManager.onTouchMove(e);
-					oThis.IsUpdateOverlayOnlyEndReturn = false;
-					oThis.EndUpdateOverlay();
-					return ret;
-				};
-				this.TextBoxBackground.HtmlElement["ontouchend"]   = function(e)
-				{
-					if (!oThis.MobileTouchManager)
-						return false;
-
-					oThis.IsUpdateOverlayOnlyEndReturn = true;
-					oThis.StartUpdateOverlay();
-					var ret                            = oThis.MobileTouchManager.onTouchEnd(e);
-					oThis.IsUpdateOverlayOnlyEndReturn = false;
-					oThis.EndUpdateOverlay();
-					return ret;
-				};
-
-				//
-				this.m_oThumbnails.HtmlElement["ontouchstart"] = function(e)
-				{
-					if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
-						return;
-
-					if (!oThis.MobileTouchManagerThumbnails)
-						return false;
-
-					return oThis.MobileTouchManagerThumbnails.onTouchStart(e);
-				};
-				this.m_oThumbnails.HtmlElement["ontouchmove"] = function(e)
-				{
-					if (!oThis.MobileTouchManagerThumbnails)
-						return false;
-
-					return oThis.MobileTouchManagerThumbnails.onTouchMove(e);
-				};
-				this.m_oThumbnails.HtmlElement["ontouchend"]   = function(e)
-				{
-					if (!oThis.MobileTouchManagerThumbnails)
-						return false;
-
-					return oThis.MobileTouchManagerThumbnails.onTouchEnd(e);
-				};
-				this.m_oThumbnails.HtmlElement["ontouchcancel"]   = function(e)
-				{
-					if (!oThis.MobileTouchManagerThumbnails)
-						return false;
-
-					return oThis.MobileTouchManagerThumbnails.onTouchEnd(e);
-				};
-			}
-			else
-			{
-				this.TextBoxBackground.HtmlElement["onmousedown"] = function(e)
-				{
-					if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
-						return;
-
-					if (!oThis.MobileTouchManager)
-						return false;
-
-					oThis.IsUpdateOverlayOnlyEndReturn = true;
-					oThis.StartUpdateOverlay();
-					var ret                            = oThis.MobileTouchManager.onTouchStart(e);
-					oThis.IsUpdateOverlayOnlyEndReturn = false;
-					oThis.EndUpdateOverlay();
-					return ret;
-				};
-				this.TextBoxBackground.HtmlElement["onmousemove"] = function(e)
-				{
-					if (!oThis.MobileTouchManager)
-						return false;
-
-					oThis.IsUpdateOverlayOnlyEndReturn = true;
-					oThis.StartUpdateOverlay();
-					var ret                            = oThis.MobileTouchManager.onTouchMove(e);
-					oThis.IsUpdateOverlayOnlyEndReturn = false;
-					oThis.EndUpdateOverlay();
-					return ret;
-				};
-				this.TextBoxBackground.HtmlElement["onmouseup"]   = function(e)
-				{
-					if (!oThis.MobileTouchManager)
-						return false;
-
-					oThis.IsUpdateOverlayOnlyEndReturn = true;
-					oThis.StartUpdateOverlay();
-					var ret                            = oThis.MobileTouchManager.onTouchEnd(e);
-					oThis.IsUpdateOverlayOnlyEndReturn = false;
-					oThis.EndUpdateOverlay();
-					return ret;
-				};
-
-				//
-				this.m_oThumbnails.HtmlElement["onmousedown"] = function(e)
-				{
-					if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
-						return;
-
-					if (!oThis.MobileTouchManagerThumbnails)
-						return false;
-
-					return oThis.MobileTouchManagerThumbnails.onTouchStart(e);
-				};
-				this.m_oThumbnails.HtmlElement["onmousemove"] = function(e)
-				{
-					if (!oThis.MobileTouchManagerThumbnails)
-						return false;
-
-					return oThis.MobileTouchManagerThumbnails.onTouchMove(e);
-				};
-				this.m_oThumbnails.HtmlElement["onmouseup"]   = function(e)
-				{
-					if (!oThis.MobileTouchManagerThumbnails)
-						return false;
-
-					return oThis.MobileTouchManagerThumbnails.onTouchEnd(e);
-				};
-			}
+			this.MobileTouchManager.initEvents(AscCommon.g_inputContext.HtmlArea.id);
+			this.MobileTouchManagerThumbnails.initEvents(this.m_oThumbnails.HtmlElement.id);
 
 			if (AscCommon.AscBrowser.isAndroid)
 			{
@@ -2636,6 +2477,7 @@ function CEditorPage(api)
 		this.m_bIsRePaintOnScroll      = true;
 
 		this.m_oBoundsController.ClearNoAttack();
+
 		this.OnScroll();
 		this.onTimerScroll_sync(true);
 
@@ -2794,6 +2636,7 @@ function CEditorPage(api)
 		var ctx = overlay.m_oContext;
 
 		var drDoc = this.m_oDrawingDocument;
+		drDoc.SelectionMatrix = null;
 
 		if (drDoc.SlideCurrent >= drDoc.m_oLogicDocument.Slides.length)
 			drDoc.SlideCurrent = drDoc.m_oLogicDocument.Slides.length - 1;
@@ -3511,6 +3354,9 @@ function CEditorPage(api)
 
 	this.CheckLayouts = function(bIsAttack)
 	{
+        if(window["NATIVE_EDITOR_ENJINE"] === true){
+            return;
+        }
 		var master = null;
 		if (-1 == this.m_oDrawingDocument.SlideCurrent && 0 == this.m_oLogicDocument.slideMasters.length)
 			return;
@@ -3553,10 +3399,10 @@ function CEditorPage(api)
 				arr[i].Height = master.sldLayoutLst[i].Height64;
 			}
 
-			editor.sendEvent("asc_onUpdateLayout", arr);
-			editor.sendEvent("asc_onUpdateThemeIndex", this.MasterLayouts.ThemeIndex);
+			this.m_oApi.sendEvent("asc_onUpdateLayout", arr);
+			this.m_oApi.sendEvent("asc_onUpdateThemeIndex", this.MasterLayouts.ThemeIndex);
 
-			this.m_oDrawingDocument.SendThemeColorScheme();
+			this.m_oApi.sendColorThemes(this.MasterLayouts.Theme);
 		}
 
 		this.m_oDrawingDocument.CheckGuiControlColors(bIsAttack);

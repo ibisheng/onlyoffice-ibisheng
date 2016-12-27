@@ -1198,11 +1198,7 @@ DrawingObjectsController.prototype =
 
 
     Is_SelectionUse: function(){
-        var content = this.getTargetDocContent(undefined, true);
-        if(content){
-            return content.Is_SelectionUse();
-        }
-        return false;
+        return this.selectedObjects.length > 0;
     },
 
     getFromTargetTextObjectContextMenuPosition: function(oTargetTextObject, pageIndex)
@@ -1271,7 +1267,7 @@ DrawingObjectsController.prototype =
                 }
                 else
                 {
-                    return -1;
+                    return false;
                 }
             }
         }
@@ -1500,6 +1496,22 @@ DrawingObjectsController.prototype =
 
     getAllFontNames: function()
     {
+    },
+
+
+    getNearestPos: function(x, y){
+        var oTragetDocContent = this.getTargetDocContent(false, false);
+        if(oTragetDocContent){
+            var tx = x, ty = y;
+            var oTransform = oTragetDocContent.Get_ParentTextTransform();
+            if(oTransform){
+                var oInvertTransform = AscCommon.global_MatrixTransformer.Invert(oTransform);
+                tx = oInvertTransform.TransformPointX(x, y);
+                ty = oInvertTransform.TransformPointY(x, y);
+                return oTragetDocContent.Get_NearestPos(0, tx, ty, false);
+            }
+        }
+        return null;
     },
 
     getTargetDocContent: function(bCheckChartTitle, bOrTable)

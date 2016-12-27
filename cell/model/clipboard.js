@@ -899,7 +899,7 @@
 							var newFonts = {};
 							pasteData.generateFontMap(newFonts);
 							worksheet._loadFonts(newFonts, function() {
-								worksheet.setSelectionInfo('paste', pasteData, false, "binary");
+								worksheet.setSelectionInfo('paste', pasteData, false, true);
 							});
 						}
 					}

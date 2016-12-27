@@ -1108,6 +1108,9 @@ Paragraph.prototype.private_RecalculateLineInfo        = function(CurLine, CurPa
 
     if (true === PRS.BadLeftTab)
         this.Lines[CurLine].Info |= paralineinfo_BadLeftTab;
+
+    if (PRS.GetFootnoteReferencesCount(null, true) > 0)
+    	this.Lines[CurLine].Info |= paralineinfo_Notes;
 };
 
 Paragraph.prototype.private_RecalculateLineMetrics     = function(CurLine, CurPage, PRS, ParaPr)
@@ -2179,6 +2182,7 @@ var paralineinfo_End           = 0x0004; // Последняя строка па
 var paralineinfo_RangeY        = 0x0008; // Строка начинается после какого-либо объекта с обтеканием
 var paralineinfo_BreakRealPage = 0x0010; // В строке есть PageBreak
 var paralineinfo_BadLeftTab    = 0x0020; // В строке есть левый таб, который правее правой границы
+var paralineinfo_Notes         = 0x0040; // В строке есть сноски
 
 function CParaLine()
 {
@@ -2988,8 +2992,10 @@ CParagraphRecalculateStateWrap.prototype.AddFootnoteReference = function(oFootno
 
 	this.Footnotes.push({FootnoteReference : oFootnoteReference, Pos : oPos});
 };
-CParagraphRecalculateStateWrap.prototype.GetFootnoteReferencesCount = function(oFootnoteReference)
+CParagraphRecalculateStateWrap.prototype.GetFootnoteReferencesCount = function(oFootnoteReference, isAllowCustom)
 {
+	var _isAllowCustom = (true === isAllowCustom ? true : false);
+
 	// Если данную ссылку мы добавляли уже в строке, тогда ищем сколько было элементов до нее, если не добавляли,
 	// тогда возвращаем просто количество ссылок. Ссылки с флагом CustomMarkFollows не учитываются
 
@@ -2999,7 +3005,7 @@ CParagraphRecalculateStateWrap.prototype.GetFootnoteReferencesCount = function(o
 		if (this.Footnotes[nIndex].FootnoteReference === oFootnoteReference)
 			return nRefsCount;
 
-		if (true !== this.Footnotes[nIndex].FootnoteReference.IsCustomMarkFollows())
+		if (true === _isAllowCustom || true !== this.Footnotes[nIndex].FootnoteReference.IsCustomMarkFollows())
 			nRefsCount++;
 	}
 

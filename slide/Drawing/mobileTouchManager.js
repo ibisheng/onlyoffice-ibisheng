@@ -52,21 +52,52 @@
 	CMobileDelegateEditorPresentation.prototype.ConvertCoordsToCursor = function(x, y, page, isGlobal)
 	{
 		return this.DrawingDocument.ConvertCoordsToCursor(x, y);
+		if (isGlobal)
+			return this.DrawingDocument.ConvertCoordsToCursor(x, y);
+		else
+			return this.DrawingDocument.ConvertCoordsToCursorWR(x, y);
 	};
 	CMobileDelegateEditorPresentation.prototype.ConvertCoordsFromCursor = function(x, y)
 	{
 		return this.DrawingDocument.ConvertCoordsFromCursor2(x, y);
 	};
+	CMobileDelegateEditorPresentation.prototype.GetZoomFit = function()
+	{
+		var HtmlPage = this.HtmlPage;
+		var w = HtmlPage.m_oEditor.HtmlElement.width;
+		if (HtmlPage.bIsRetinaSupport)
+			w >>= 1;
+
+		var h = (((HtmlPage.m_oBody.AbsolutePosition.B - HtmlPage.m_oBody.AbsolutePosition.T) -
+			(HtmlPage.m_oTopRuler.AbsolutePosition.B - HtmlPage.m_oTopRuler.AbsolutePosition.T)) * g_dKoef_mm_to_pix) >> 0;
+
+		var _pageWidth  = this.LogicDocument.Width * g_dKoef_mm_to_pix;
+		var _pageHeight = this.LogicDocument.Height * g_dKoef_mm_to_pix;
+
+		var _hor_Zoom = 100;
+		if (0 != _pageWidth)
+			_hor_Zoom = (100 * (w - 2 * HtmlPage.SlideDrawer.CONST_BORDER)) / _pageWidth;
+		var _ver_Zoom = 100;
+		if (0 != _pageHeight)
+			_ver_Zoom = (100 * (h - 2 * HtmlPage.SlideDrawer.CONST_BORDER)) / _pageHeight;
+
+		var _new_value = (Math.min(_hor_Zoom, _ver_Zoom) - 0.5) >> 0;
+
+		if (_new_value < 5)
+			_new_value = 5;
+		return _new_value;
+	};
 	CMobileDelegateEditorPresentation.prototype.GetScrollerSize = function()
 	{
+		var _controlH = parseInt(this.HtmlPage.m_oMainView.HtmlElement.style.height);
 		return {
-			W : (this.DrawingDocument.SlideCurrectRect.right - this.DrawingDocument.SlideCurrectRect.left),
-			H : (this.DrawingDocument.SlideCurrectRect.bottom - this.DrawingDocument.SlideCurrectRect.top)
+			W : (this.HtmlPage.m_dDocumentWidth),
+			H : (this.HtmlPage.SlideScrollMAX - this.HtmlPage.SlideScrollMIN + _controlH)
 		};
 	};
 	CMobileDelegateEditorPresentation.prototype.GetObjectTrack = function(x, y, page)
 	{
-		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.isPointInDrawingObjects(x, y, page);
+		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.isPointInDrawingObjects3(x, y, page);
 	};
 	CMobileDelegateEditorPresentation.prototype.GetSelectionRectsBounds = function()
 	{
@@ -77,7 +108,7 @@
 		var bIsHorPresent = (this.HtmlPage.m_oScrollHorApi != null);
 		if (_scroll.directionLocked == "v")
 		{
-			this.HtmlPage.m_oScrollVerApi.scrollToY(-_scroll.y);
+			this.HtmlPage.m_oScrollVerApi.scrollToY(-_scroll.y + this.HtmlPage.SlideScrollMIN);
 		}
 		else if (_scroll.directionLocked == "h" && bIsHorPresent)
 		{
@@ -87,7 +118,7 @@
 		{
 			if (bIsHorPresent)
 				this.HtmlPage.m_oScrollHorApi.scrollToX(-_scroll.x);
-			this.HtmlPage.m_oScrollVerApi.scrollToY(-_scroll.y);
+			this.HtmlPage.m_oScrollVerApi.scrollToY(-_scroll.y + this.HtmlPage.SlideScrollMIN);
 		}
 	};
 	CMobileDelegateEditorPresentation.prototype.GetContextMenuType = function()
@@ -228,7 +259,9 @@
 			fadeScrollbars: true,
 			scrollX : true,
 			scroller_id : this.iScrollElement,
-			bounce : false
+			bounce : false,
+			eventsElement : this.eventsElement,
+			click : false
 		});
 
 		this.delegate.Init();
@@ -772,6 +805,43 @@
 			this.CheckContextMenuTouchEnd(isCheckContextMenuMode);
 	};
 
+	CMobileTouchManager.prototype.mainOnTouchStart = function(e)
+	{
+		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+			return;
+
+		if (!this.Api.IsFocus)
+			this.Api.asc_enableKeyEvents(true);
+
+		var oWordControl = this.Api.WordControl;
+
+		oWordControl.IsUpdateOverlayOnlyEndReturn = true;
+		oWordControl.StartUpdateOverlay();
+		var ret = this.onTouchStart(e);
+		oWordControl.IsUpdateOverlayOnlyEndReturn = false;
+		oWordControl.EndUpdateOverlay();
+		return ret;
+	};
+	CMobileTouchManager.prototype.mainOnTouchMove = function(e)
+	{
+		var oWordControl = this.Api.WordControl;
+		oWordControl.IsUpdateOverlayOnlyEndReturn = true;
+		oWordControl.StartUpdateOverlay();
+		var ret = this.onTouchMove(e);
+		oWordControl.IsUpdateOverlayOnlyEndReturn = false;
+		oWordControl.EndUpdateOverlay();
+		return ret;
+	};
+	CMobileTouchManager.prototype.mainOnTouchEnd = function(e)
+	{
+		var oWordControl = this.Api.WordControl;
+		oWordControl.IsUpdateOverlayOnlyEndReturn = true;
+		oWordControl.StartUpdateOverlay();
+		var ret = this.onTouchEnd(e);
+		oWordControl.IsUpdateOverlayOnlyEndReturn = false;
+		oWordControl.EndUpdateOverlay();
+		return ret;
+	};
 
 	/**************************************************************************/
 	/**
@@ -973,6 +1043,22 @@
 
 		AscCommon.stopEvent(e);
 		return false;
+	};
+
+	CMobileTouchManagerThumbnails.prototype.mainOnTouchStart = function(e)
+	{
+		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+			return;
+
+		return this.onTouchStart(e);
+	};
+	CMobileTouchManagerThumbnails.prototype.mainOnTouchMove = function(e)
+	{
+		return this.onTouchMove(e);
+	};
+	CMobileTouchManagerThumbnails.prototype.mainOnTouchEnd = function(e)
+	{
+		return this.onTouchEnd(e);
 	};
 
 	//--------------------------------------------------------export----------------------------------------------------
