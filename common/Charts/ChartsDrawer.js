@@ -11033,11 +11033,6 @@ drawSurfaceChart.prototype =
 					
 					res = [p1, p2]/*t._calculatePath(p1.x, p1.y, p2.x, p2.y)*/;
 				}
-				
-				if(clearIntersectionPoints.length > 2)
-				{
-					console.log("SOS");
-				}
 			}
 			else if(segmentIntersectionPoints.length && clearIntersectionPoints.length)
 			{
@@ -11045,6 +11040,16 @@ drawSurfaceChart.prototype =
 				{
 					var p1 = segmentIntersectionPoints[0];
 					var p2 = clearIntersectionPoints[0];
+					
+					res = [p1, p2];
+				}
+			}
+			else if(segmentIntersectionPoints.length)
+			{
+				if(2 === segmentIntersectionPoints.length)
+				{
+					var p1 = segmentIntersectionPoints[0];
+					var p2 = segmentIntersectionPoints[1];
 					
 					res = [p1, p2];
 				}
@@ -11107,10 +11112,10 @@ drawSurfaceChart.prototype =
 				{
 					break;
 				}
-				if(!(yPoints[k].val >= minVal && yPoints[k].val <= maxVal) && !(prevPoints && k === yPoints.length - 1))
+				/*if(!(yPoints[k].val >= minVal && yPoints[k].val <= maxVal) && !(prevPoints && k === yPoints.length - 1))
 				{
 					continue;	
-				}
+				}*/
 				
 				var isCalculatePrevPoints = false;
 				if(null === prevPoints)
@@ -11147,8 +11152,24 @@ drawSurfaceChart.prototype =
 					}
 				}
 				
-	
-				if(null !== points && prevPoints)
+				if(points && prevPoints && 2 === points.length && 2 === prevPoints.length)
+				{
+					//проверка на существование 5 точки
+					
+					var p1 = prevPoints[0];
+					var p2 = prevPoints[1];
+					var p3 = points[0];
+					var p4 = points[1];
+					
+					var path = t._calculateTempFace(p1, p2, p3, p4, true);
+					
+					if(!t.paths.test2[k])
+					{
+						t.paths.test2[k] = [];
+					}
+					t.paths.test2[k].push(path);
+				}
+				else if(null !== points && prevPoints)
 				{
 					var p1 = prevPoints[0];
 					var p2 = prevPoints[1] ? prevPoints[1] : prevPoints[0];
@@ -11163,7 +11184,7 @@ drawSurfaceChart.prototype =
 					}
 					t.paths.test2[k].push(path);
 				}
-				else if(prevPoints && prevPoints.length === 3 && !points)
+				else if(prevPoints && prevPoints.length === 3 && !points && isCalculatePrevPoints)
 				{
 					var p1 = prevPoints[0];
 					var p2 = prevPoints[1];
@@ -11219,19 +11240,6 @@ drawSurfaceChart.prototype =
 							maxIndex = m;
 						}
 					}
-					
-					/*if(maxIndex === 0 || maxIndex === 3)
-					{	
-						lines.push({p1: p213d, p2: p3d, p111: p21, p222: p});
-						this.paths.test.push(this._calculatePath(p21.x, p21.y, p.x, p.y));
-						isDiagonalLine = 1;
-					}
-					else
-					{
-						lines.push({p1: p13d, p2: p23d, p111: p1, p222: p2});
-						this.paths.test.push(this._calculatePath(p2.x, p2.y, p1.x, p1.y));
-						isDiagonalLine = 2;
-					}*/
 					
 					if(p1.val + p2.val < p21.val + p.val)
 					{	
