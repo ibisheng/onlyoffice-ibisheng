@@ -39,6 +39,7 @@
   var ConnectionState = AscCommon.ConnectionState;
   var c_oEditorId = AscCommon.c_oEditorId;
   var c_oCloseCode = AscCommon.c_oCloseCode;
+  var c_oAscServerCommandErrors = AscCommon.c_oAscServerCommandErrors;
 
   // Класс надстройка, для online и offline работы
   function CDocsCoApi(options) {
@@ -539,6 +540,7 @@
 	this.jwtTimeOutId = null;
     this._id = null;
     this._sessionTimeConnect = null;
+	this._lastForceSaveId = null;
     this._indexUser = -1;
     // Если пользователей больше 1, то совместно редактируем
     this.isCoAuthoring = false;
@@ -828,7 +830,7 @@
   };
 
 	DocsCoApi.prototype.forceSave = function() {
-		this._send({'type': 'forcesave'});
+		this._send({'type': 'forcesave', 'saveid': new Date().getTime()});
 	};
 
   DocsCoApi.prototype.openDocument = function(data) {
@@ -928,6 +930,14 @@
       }, timeout);
     }
   };
+  
+	DocsCoApi.prototype._onForceSave = function(data) {
+		if (data['code'] === c_oAscServerCommandErrors.NoError) {
+			this._lastForceSaveId = data['saveid'];
+		} else if (data['code'] !== c_oAscServerCommandErrors.NotModified) {
+			this.onWarning(c_oAscError.ID.Unknown);
+		}
+	};
 
   DocsCoApi.prototype._onGetLock = function(data) {
     if (data["locks"]) {
@@ -1229,7 +1239,7 @@
   };
 
   DocsCoApi.prototype._onWarning = function(data) {
-    this.onWarning(data ? data['description'] : '');
+    this.onWarning(c_oAscError.ID.Warning);
   };
 
   DocsCoApi.prototype._onLicense = function(data) {
@@ -1469,6 +1479,9 @@
         case 'refreshToken' :
           t._onRefreshToken(dataObject["messages"]);
           break;
+		case 'forcesave' :
+			t._onForceSave(dataObject["messages"]);
+			break;
       }
     };
     sockjs.onclose = function(evt) {
