@@ -734,6 +734,49 @@ CWordCollaborativeEditing.prototype.Undo = function()
 		this.m_aAllChanges.push(arrReverseChanges[nIndex]);
 	}
 
+	// Может так случиться, что в каких-то классах DocumentContent удалились все элементы, либо
+	// в классе Paragraph удалился знак конца параграфа. Нам необходимо проверить все классы на корректность, и если
+	// нужно, добавить дополнительные изменения.
+
+	var mapDocumentContents = {};
+	var mapParagraphs       = {};
+	for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
+	{
+		var oChange = arrReverseChanges[nIndex];
+		var oClass  = oChange.GetClass();
+		if (oClass instanceof CDocument || oClass instanceof CDocumentContent)
+			mapDocumentContents[oClass.Get_Id()] = oClass;
+		else if (oClass instanceof Paragraph)
+			mapParagraphs[oClass.Get_Id()] = oClass;
+		else if (oClass instanceof ParaRun && true === oChange.IsContentChange() && oClass.Get_Paragraph())
+			mapParagraphs[oClass.Get_Paragraph().Get_Id()] = oClass.Get_Paragraph();
+	}
+
+	// Создаем точку в истории. Делаем действия через обычные функции (с отключенным пересчетом), которые пишут в
+	// историю. Сохраняем список изменений в новой точке, удаляем данную точку.
+	var oHistory = AscCommon.History;
+	oHistory.CreateNewPointForCollectChanges();
+	for (var sId in mapDocumentContents)
+	{
+		var oDocumentContent = mapDocumentContents[sId];
+		if (oDocumentContent.Content.length <= 0)
+		{
+			var oNewParagraph = new Paragraph(oLogicDocument.Get_DrawingDocument(), oDocumentContent, 0, 0, 0, 0, 0, false);
+			oDocumentContent.Add_ToContent(0, oNewParagraph);
+		}
+	}
+	for (var sId in mapParagraphs)
+	{
+		var oParagraph = mapParagraphs[sId];
+		oParagraph.CheckParaEnd();
+	}
+	var oHistoryPoint = oHistory.Points[oHistory.Points.length - 1];
+	for (var nIndex = 0, nCount = oHistoryPoint.Items.length; nIndex < nCount; ++nIndex)
+	{
+		arrReverseChanges.push(oHistoryPoint.Items[nIndex].Data);
+	}
+	oHistory.Remove_LastPoint();
+
 	var oBinaryWriter = AscCommon.History.BinaryWriter;
 	var aSendingChanges = [];
 	for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)

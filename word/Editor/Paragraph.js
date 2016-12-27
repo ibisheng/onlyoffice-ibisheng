@@ -12193,6 +12193,17 @@ Paragraph.prototype.private_GetFootnoteRefsInLine = function(CurLine)
 	}
 	return arrFootnotes;
 };
+Paragraph.prototype.CheckParaEnd = function()
+{
+	// TODO (ParaEnd): Как избавимся от ParaEnd убрать эту проверку
+	if (this.Content.length <= 0 || para_Run !== this.Content[this.Content.length - 1].Type || null === this.Content[this.Content.length - 1].GetParaEnd())
+	{
+		var oEndRun = new ParaRun(this);
+		oEndRun.Set_Pr(this.TextPr.Value.Copy());
+		oEndRun.Add_ToContent(0, new ParaEnd());
+		this.Add_ToContent(this.Content.length, oEndRun);
+	}
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;
