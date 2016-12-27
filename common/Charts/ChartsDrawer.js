@@ -11345,12 +11345,7 @@ drawSurfaceChart.prototype =
 					for(var l = 0; l < lengthFaces; l++)
 					{
 						if(pointsFace1[l] && pointsFace2[l])
-						{
-							/*var gridPlain1 = getGridPlain(l - 1);
-							var gridPlain2 = getGridPlain(l);
-							var convertResult1 = t.cChartDrawer.isIntersectionPlainAndLineSegment(gridPlain1, lines[4].p1, lines[4].p2, lines[4].p111, lines[4].p222);
-							var convertResult2 = t.cChartDrawer.isIntersectionPlainAndLineSegment(gridPlain2, lines[4].p1, lines[4].p2, lines[4].p111, lines[4].p222);*/
-							
+						{	
 							//находим две точки, принадлежащие диагональной прямой. у обоих сегментов они должны быть
 							var lineEquation = t.cChartDrawer.getLineEquation2d(lines[4].p111, lines[4].p222);
 							
@@ -11382,18 +11377,7 @@ drawSurfaceChart.prototype =
 								pointsFace2[l].push(points1[0]);
 								pointsFace2[l].push(points1[1]);
 							}
-							
-							
-							
-							var test = 1;
-							/*var path = t._calculateTempFace(pointsFace1[l].concat(pointsFace2[l]));
-							if(!t.paths.test2[l])
-							{
-								t.paths.test2[l] = [];
-							}
-							t.paths.test2[l].push(path);*/
 						}
-						
 						
 						
 						if(pointsFace1[l])
