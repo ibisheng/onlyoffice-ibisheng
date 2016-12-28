@@ -11184,6 +11184,18 @@ drawSurfaceChart.prototype =
 		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		
+		var getGridPlain = function(index)
+		{
+			var gridX1 = xPoints[0].pos * t.chartProp.pxToMM;
+			var gridX2 = xPoints[xPoints.length - 1].pos * t.chartProp.pxToMM;
+			
+			var gridY1 = yPoints[index].pos * t.chartProp.pxToMM;
+			var gridY2 = yPoints[index].pos * t.chartProp.pxToMM;
+			var gridPlain = t.cChartDrawer.getPlainEquation({x: gridX1,y: gridY1, z: 0}, {x: gridX2, y: gridY2, z: 0}, {x: gridX2, y: gridY2, z: perspectiveDepth});
+			
+			return gridPlain;
+		};
+		
 		var getIntersectionPlaneAndLines = function(k, lines, pointsValue)
 		{
 			var res = null;
