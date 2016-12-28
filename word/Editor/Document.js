@@ -5827,6 +5827,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 			this.Selection.Use      = true;
 			this.Selection.StartPos = DstIndex;
 			this.Selection.EndPos   = DstIndex + ElementsCount - 1;
+			this.CurPos.ContentPos  = DstIndex + ElementsCount - 1;
 		}
 
 		if (docpostype_DrawingObjects !== this.CurPos.Type)

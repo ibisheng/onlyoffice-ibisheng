@@ -1048,27 +1048,27 @@
     }
   };
 
-  DocsCoApi.prototype._onSaveLock = function(data) {
-    if (null != data["saveLock"]) {
-      var indexCallback = this._saveCallback.length - 1;
-      var oTmpCallback = this._saveCallback[indexCallback];
-      if (oTmpCallback) {
-        // Очищаем предыдущий таймер
-        if (null !== this.saveLockCallbackErrorTimeOutId) {
-          clearTimeout(this.saveLockCallbackErrorTimeOutId);
-          this.saveLockCallbackErrorTimeOutId = null;
-        }
+	DocsCoApi.prototype._onSaveLock = function (data) {
+		if (null != data["saveLock"]) {
+			var indexCallback = this._saveCallback.length - 1;
+			var oTmpCallback = this._saveCallback[indexCallback];
+			if (oTmpCallback) {
+				// Очищаем предыдущий таймер
+				if (null !== this.saveLockCallbackErrorTimeOutId) {
+					clearTimeout(this.saveLockCallbackErrorTimeOutId);
+					this.saveLockCallbackErrorTimeOutId = null;
+				}
 
-        this._saveCallback[indexCallback] = null;
-        oTmpCallback(data);
-        if (data['error']) {
-          this._state = ConnectionState.Authorized;
+				this._saveCallback[indexCallback] = null;
+				oTmpCallback(data);
+			}
+		}
+		if (null == data["saveLock"] || data['error'] || data["saveLock"]) {
+			this._state = ConnectionState.Authorized;
 			// Делаем отложенные lock-и
 			this._sendBufferedLocks();
-        }
-      }
-    }
-  };
+		}
+	};
 
   DocsCoApi.prototype._onUnSaveLock = function(data) {
     // Очищаем предыдущий таймер сохранения

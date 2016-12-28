@@ -1314,7 +1314,7 @@
 		this.canvasOuterStyle.top = top + 'px';
 		this.canvasOuterStyle.width = widthStyle + 'px';
 		this.canvasOuterStyle.height = heightStyle + 'px';
-		this.canvasOuterStyle.zIndex = this.top <= 0 ? -1 : z;
+		this.canvasOuterStyle.zIndex = this.top < 0 ? -1 : z;
 
 		this.canvas.width = this.canvasOverlay.width = width;
 		this.canvas.height = this.canvasOverlay.height = height;
