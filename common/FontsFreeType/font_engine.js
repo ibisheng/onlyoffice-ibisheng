@@ -406,30 +406,32 @@ function FT_Frame_Field(v,s,o)
 }
 function FT_Stream(data, size)
 {
-    this.obj = null;
-    this.data = data;
-    this.size = size;
-    this.pos = 0;
-    this.cur = 0;
-
-    this.Seek = function(_pos)
+	this.obj = null;
+	this.data = data;
+	this.size = size;
+	this.pos = 0;
+	this.cur = 0;
+}
+FT_Stream.prototype =
+{
+    Seek : function(_pos)
     {
         if (_pos > this.size)
             return 85;
         this.pos = _pos;
         return 0;
-    }
-    this.Skip = function(_skip)
+    },
+    Skip : function(_skip)
     {
         if (_skip < 0)
             return 85;
         return this.Seek(this.pos + _skip);
-    }
-    this.Read = function(pointer, count)
+    },
+    Read : function(pointer, count)
     {
         return this.ReadAt(this.pos, pointer, count);
-    }
-    this.ReadArray = function(count)
+    },
+    ReadArray : function(count)
     {
         var read_bytes = this.size - this.pos;
         if (read_bytes > count)
@@ -440,8 +442,8 @@ function FT_Stream(data, size)
         for (var i = 0;i<count;i++)
             a[i] = this.data[this.pos+i];
         return a;
-    }
-    this.ReadAt = function(_pos, pointer, count)
+    },
+    ReadAt : function(_pos, pointer, count)
     {
         if (_pos > this.size)
             return 85;
@@ -457,8 +459,8 @@ function FT_Stream(data, size)
             return 85;
 
         return 0;
-    }
-    this.TryRead = function(pointer, count)
+    },
+    TryRead : function(pointer, count)
     {
         var read_bytes = 0;
         if (this.pos < this.size)
@@ -471,16 +473,16 @@ function FT_Stream(data, size)
 
         this.pos += read_bytes;
         return read_bytes;
-    }
+    },
 
     // 1 bytes
-    this.GetUChar = function()
+    GetUChar : function()
     {
         if (this.cur >= this.size)
             return 0;
         return this.data[this.cur++];
-    }
-    this.GetChar = function()
+    },
+    GetChar : function()
     {
         if (this.cur >= this.size)
             return 0;
@@ -488,8 +490,8 @@ function FT_Stream(data, size)
         if (m > 127)
             m -= 256;
         return m;
-    }
-    this.GetString1 = function(len)
+    },
+    GetString1 : function(len)
     {
         if (this.cur + len > this.size)
             return "";
@@ -498,8 +500,8 @@ function FT_Stream(data, size)
             t += String.fromCharCode(this.data[this.cur + i]);
         this.cur += len;
         return t;
-    }
-    this.ReadString1 = function(len)
+    },
+    ReadString1 : function(len)
     {
         if (this.pos + len > this.size)
             return "";
@@ -508,9 +510,9 @@ function FT_Stream(data, size)
             t += String.fromCharCode(this.data[this.pos + i]);
         this.pos += len;
         return t;
-    }
+    },
 
-    this.ReadUChar = function()
+    ReadUChar : function()
     {
         if (this.pos >= this.size)
         {
@@ -519,8 +521,8 @@ function FT_Stream(data, size)
         }
         FT_Error = 0;
         return this.data[this.pos++];
-    }
-    this.ReadChar = function()
+    },
+    ReadChar : function()
     {
         if (this.pos >= this.size)
         {
@@ -532,20 +534,20 @@ function FT_Stream(data, size)
         if (m > 127)
             m -= 256;
         return m;
-    }
+    },
 
     // 2 byte
-    this.GetUShort = function()
+    GetUShort : function()
     {
         if (this.cur + 1 >= this.size)
             return 0;
         return (this.data[this.cur++] << 8 | this.data[this.cur++]);
-    }
-    this.GetShort = function()
+    },
+    GetShort : function()
     {
         return FT_Common.UShort_To_Short(this.GetUShort());
-    }
-    this.ReadUShort = function()
+    },
+    ReadUShort : function()
     {
         if (this.pos + 1 >= this.size)
         {
@@ -554,22 +556,22 @@ function FT_Stream(data, size)
         }
         FT_Error = 0;
         return (this.data[this.pos++] << 8 | this.data[this.pos++]);
-    }
-    this.ReadShort = function()
+    },
+    ReadShort : function()
     {
         return FT_Common.UShort_To_Short(this.ReadUShort());
-    }
-    this.GetUShortLE = function()
+    },
+    GetUShortLE : function()
     {
         if (this.cur + 1 >= this.size)
             return 0;
         return (this.data[this.cur++] | this.data[this.cur++] << 8);
-    }
-    this.GetShortLE = function()
+    },
+    GetShortLE : function()
     {
         return FT_Common.UShort_To_Short(this.GetUShortLE());
-    }
-    this.ReadUShortLE = function()
+    },
+    ReadUShortLE : function()
     {
         if (this.pos + 1 >= this.size)
         {
@@ -578,14 +580,14 @@ function FT_Stream(data, size)
         }
         FT_Error = 0;
         return (this.data[this.pos++] | this.data[this.pos++] << 8);
-    }
-    this.ReadShortLE = function()
+    },
+    ReadShortLE : function()
     {
         return FT_Common.UShort_To_Short(this.ReadUShortLE());
-    }
+    },
 
     // 4 byte
-    this.GetULong = function()
+    GetULong : function()
     {
         if (this.cur + 3 >= this.size)
             return 0;
@@ -594,14 +596,14 @@ function FT_Stream(data, size)
         if (s < 0)
             s += 4294967296;
         return s;
-    }
-    this.GetLong = function()
+    },
+    GetLong : function()
     {
         // 32-битные числа - по умолчанию знаковые!!!
         //return FT_Common.UintToInt(this.GetULong());
         return (this.data[this.cur++] << 24 | this.data[this.cur++] << 16 | this.data[this.cur++] << 8 | this.data[this.cur++]);
-    }
-    this.ReadULong = function()
+    },
+    ReadULong : function()
     {
         if (this.pos + 3 >= this.size)
         {
@@ -613,8 +615,8 @@ function FT_Stream(data, size)
         if (s < 0)
             s += 4294967296;
         return s;
-    }
-    this.ReadLong = function()
+    },
+    ReadLong : function()
     {
         // 32-битные числа - по умолчанию знаковые!!!
         //return FT_Common.Uint_To_int(this.ReadULong());
@@ -625,19 +627,19 @@ function FT_Stream(data, size)
         }
         FT_Error = 0;
         return (this.data[this.pos++] << 24 | this.data[this.pos++] << 16 | this.data[this.pos++] << 8 | this.data[this.pos++]);
-    }
+    },
 
-    this.GetULongLE = function()
+    GetULongLE : function()
     {
         if (this.cur + 3 >= this.size)
             return 0;
         return (this.data[this.cur++] | this.data[this.cur++] << 8 | this.data[this.cur++] << 16 | this.data[this.cur++] << 24);
-    }
-    this.GetLongLE = function()
+    },
+    GetLongLE : function()
     {
         return FT_Common.Uint_To_int(this.GetULongLE());
-    }
-    this.ReadULongLE = function()
+    },
+    ReadULongLE : function()
     {
         if (this.pos + 3 >= this.size)
         {
@@ -646,26 +648,26 @@ function FT_Stream(data, size)
         }
         FT_Error = 0;
         return (this.data[this.pos++] | this.data[this.pos++] << 8 | this.data[this.pos++] << 16 | this.data[this.pos++] << 24);
-    }
-    this.ReadLongLE = function()
+    },
+    ReadLongLE : function()
     {
         return FT_Common.Uint_To_int(this.ReadULongLE());
-    }
+    },
 
     // 3 byte
-    this.GetUOffset = function()
+    GetUOffset : function()
     {
         if (this.cur + 2 >= this.size)
             return 0;
         return (this.data[this.cur++] << 16 | this.data[this.cur++] << 8 | this.data[this.cur++]);
-    }
-    this.GetUOffsetLE = function()
+    },
+    GetUOffsetLE : function()
     {
         if (this.cur + 2 >= this.size)
             return 0;
         return (this.data[this.cur++] | this.data[this.cur++] << 8 | this.data[this.cur++] << 16);
-    }
-    this.ReadUOffset = function()
+    },
+    ReadUOffset : function()
     {
         if (this.pos + 2 >= this.size)
         {
@@ -674,8 +676,8 @@ function FT_Stream(data, size)
         }
         FT_Error = 0;
         return (this.data[this.pos++] << 16 | this.data[this.pos++] << 8 | this.data[this.pos++]);
-    }
-    this.ReadUOffsetLE = function()
+    },
+    ReadUOffsetLE : function()
     {
         if (this.pos + 2 >= this.size)
         {
@@ -684,8 +686,8 @@ function FT_Stream(data, size)
         }
         FT_Error = 0;
         return (this.data[this.pos++] | this.data[this.pos++] << 8 | this.data[this.pos++] << 16);
-    }
-    this.EnterFrame = function(count)
+    },
+    EnterFrame : function(count)
     {
         if (this.pos >= this.size || this.size - this.pos < count)
             return 85;
@@ -693,8 +695,8 @@ function FT_Stream(data, size)
         this.cur = this.pos;
         this.pos += count;
         return 0;
-    }
-    this.ExtractFrame = function(count, pointer)
+    },
+    ExtractFrame : function(count, pointer)
     {
         if (null == pointer)
             pointer = new CPointer();
@@ -708,16 +710,16 @@ function FT_Stream(data, size)
 
         this.cur = 0;
         return err;
-    }
-    this.ReleaseFrame = function()
+    },
+    ReleaseFrame : function()
     {
-    }
-    this.ExitFrame = function()
+    },
+    ExitFrame : function()
     {
         this.cur = 0;
-    }
+    },
 
-    this.ReadFields = function(arrayFields, structure)
+    ReadFields : function(arrayFields, structure)
     {
         // arrayFields : array {value, size, offset}
         // structures : data pointer
@@ -864,8 +866,8 @@ function FT_Stream(data, size)
         while ( 1 );
 
         return error;
-    }
-    this.ReadFields2 = function(fields, structure)
+    },
+    ReadFields2 : function(fields, structure)
     {
         // arrayFields : array {value, size, offset}
         // structures : data pointer
@@ -1016,7 +1018,7 @@ function FT_Stream(data, size)
 
         return error;
     }
-}
+};
 /******************************************************************************/
 // memory
 /******************************************************************************/
