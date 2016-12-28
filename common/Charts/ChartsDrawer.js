@@ -11007,12 +11007,401 @@ drawSurfaceChart.prototype =
 			}
 		}
 		
-		this.test(points, points3d);
+		this._calculateAllFaces(points, points3d);
 	},
 	
 	
 	
-	test: function(points, points3d)
+	_calculateAllFaces: function(points, points3d)
+	{		
+		if(!this.paths.test)
+		{
+			this.paths.test = [];
+		}
+		if(!this.paths.test2)
+		{
+			this.paths.test2 = [];
+		}
+		
+		for (var i = 0; i < points.length - 1; i++) 
+		{
+			for(var j = 0; j < points[i].length - 1; j++)
+			{
+				var p1 = points[i][j];
+				var p2 = points[i + 1][j];
+				var p3 = points[i][j + 1];
+				var p4 = points[i + 1][j + 1];
+				
+				this.paths.test.push(this.cChartDrawer._calculatePathFace(p1, p2, p3, p4, true));
+				
+				var p13d = points3d[i][j];
+				var p23d = points3d[i + 1][j];
+				var p33d = points3d[i][j + 1];
+				var p43d = points3d[i + 1][j + 1];	
+				
+				//рассчитываем отдельный сегмент - смотрим, может ли он располагаться в одной плоскости + делим его плоскостями сетки
+				//p, p2, p21, p1 - точки данного сегмента
+				//  p1-----p21
+				//  |       |
+				//  |       |
+				//  p-------p2
+				this._calculateFace(p1, p2, p3, p4, p13d, p23d, p33d, p43d);
+			}
+		}
+	},
+
+	_calculateFace: function(p, p1, p2, p21, p3d, p13d, p23d, p213d)
+	{
+		var t = this;
+			
+		var lines = [];
+		lines[0] = {p1: p3d, p2: p23d, p111: p, p222: p2};
+		lines[1] = {p1: p13d, p2: p213d, p111: p1, p222: p21};
+		lines[2] = {p1: p3d, p2: p13d, p111: p, p222: p1};
+		lines[3] = {p1: p23d, p2: p213d, p111: p2, p222: p21};
+		
+		
+		var pointsValue = [p1, p2, p21, p];
+		if(this.cChartDrawer.isPointsLieIntoOnePlane(p3d, p13d, p213d, p23d))
+		{
+			var pointsFace = this._getIntersectionPlanesAndLines(lines, pointsValue, true);
+		}
+		else
+		{
+			var isDiagonalLine = null;
+			
+			var max = p.val;
+			var maxIndex = 0;
+			var arrVal = [p, p1, p2, p21];
+			for(var m = 0; m < arrVal.length; m++)
+			{
+				if(arrVal[m].val > max)
+				{	
+					max = arrVal[m].val;
+					maxIndex = m;
+				}
+			}
+			
+			if(p1.val + p2.val < p21.val + p.val)
+			{	
+				lines.push({p1: p213d, p2: p3d, p111: p21, p222: p});
+				this.paths.test.push(this._calculatePath(p21.x, p21.y, p.x, p.y));
+				isDiagonalLine = 1;
+			}
+			else
+			{
+				lines.push({p1: p13d, p2: p23d, p111: p1, p222: p2});
+				this.paths.test.push(this._calculatePath(p2.x, p2.y, p1.x, p1.y));
+				isDiagonalLine = 2;
+			}
+			
+			if(1 === isDiagonalLine)
+			{
+				var lines1 = [lines[0], lines[3], lines[4]];
+				var pointsValue1 = [p, p21, p2];
+				var lines2 = [lines[2], lines[1], lines[4]];
+				var pointsValue2 = [p, p1, p21];
+				
+			}
+			else
+			{	
+				var lines1 = [lines[2], lines[0], lines[4]];
+				var pointsValue1 = [p, p1, p2];
+				var lines2 = [lines[4], lines[1], lines[3]];
+				var pointsValue2 = [p2, p1, p21];
+			}
+			var pointsFace1 = this._getIntersectionPlanesAndLines(lines1, pointsValue1);
+			var pointsFace2 = this._getIntersectionPlanesAndLines(lines2, pointsValue2);
+			
+			var lengthFaces = Math.max(pointsFace1.length, pointsFace2.length);
+			for(var l = 0; l < lengthFaces; l++)
+			{
+				if(pointsFace1[l] && pointsFace2[l])
+				{	
+					//находим две точки, принадлежащие диагональной прямой. у обоих сегментов они должны быть
+					var lineEquation = t.cChartDrawer.getLineEquation2d(lines[4].p111, lines[4].p222);
+					
+					var points1 = [];
+					for(var s = 0; s < pointsFace1[l].length; s++)
+					{
+						if(null === this._isEqualPoints(points1, pointsFace1[l][s]) && t.cChartDrawer.isPoint2DLieOnLine(lineEquation, pointsFace1[l][s]))
+						{
+							points1.push(pointsFace1[l][s]);
+						}
+					}
+					
+					var points2 = []
+					for(var s = 0; s < pointsFace2[l].length; s++)
+					{
+						if(null === this._isEqualPoints(points2, pointsFace2[l][s]) && t.cChartDrawer.isPoint2DLieOnLine(lineEquation, pointsFace2[l][s]))
+						{
+							points2.push(pointsFace2[l][s]);
+						}
+					}
+					
+					if(points1.length < 2 && points2.length === 2)
+					{
+						pointsFace1[l].push(points2[0]);
+						pointsFace1[l].push(points2[1]);
+					}
+					else if(points2.length < 2 && points1.length === 2)
+					{
+						pointsFace2[l].push(points1[0]);
+						pointsFace2[l].push(points1[1]);
+					}
+				}
+				
+				
+				if(pointsFace1[l])
+				{
+					if(!t.paths.test2[l])
+					{
+						t.paths.test2[l] = [];
+					}
+					
+					var path1 = t._calculateTempFace(pointsFace1[l]);
+					t.paths.test2[l].push(path1);
+				}
+				if(pointsFace2[l])
+				{
+					if(!t.paths.test2[l])
+					{
+						t.paths.test2[l] = [];
+					}
+					
+					var path2 = t._calculateTempFace(pointsFace2[l]);
+					t.paths.test2[l].push(path2);
+				}
+			}
+		}
+	},
+	
+	
+	_getIntersectionPlanesAndLines: function(lines, pointsValue, bIsAddIntoPaths)
+	{
+		var t = this;
+		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
+		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
+		
+		var getIntersectionPlaneAndLines = function(k, lines, pointsValue)
+		{
+			var res = null;
+			
+			var gridPlain = getGridPlain(k);
+			var clearIntersectionPoints = [];
+			var segmentIntersectionPoints = [];
+		
+			//n --> lines --> 0 - down, 1 - up, 2 - left, 3 - right, 4 - diagonal
+			for(var n = 0; n < lines.length; n++)
+			{
+				var convertResult = t.cChartDrawer.isIntersectionPlainAndLineSegment(gridPlain, lines[n].p1, lines[n].p2, lines[n].p111, lines[n].p222);
+				if(!convertResult)
+					continue;
+				
+				if(null === t._isEqualPoints(pointsValue, convertResult))
+				{
+					clearIntersectionPoints.push(convertResult);
+				}
+				else
+				{
+					if(null === t._isEqualPoints(segmentIntersectionPoints, convertResult))
+					{
+						segmentIntersectionPoints.push(convertResult);
+					}
+				}
+			}
+			
+			if(!segmentIntersectionPoints.length)
+			{
+				if(clearIntersectionPoints.length === 2)//две точки, не равняющиеся ни одной точке сегмента
+				{
+					var p1 = clearIntersectionPoints[0];
+					var p2 = clearIntersectionPoints[1];
+					
+					res = [p1, p2]/*t._calculatePath(p1.x, p1.y, p2.x, p2.y)*/;
+				}
+			}
+			else if(segmentIntersectionPoints.length && clearIntersectionPoints.length)
+			{
+				if(1 === segmentIntersectionPoints.length && 1 === clearIntersectionPoints.length)
+				{
+					var p1 = segmentIntersectionPoints[0];
+					var p2 = clearIntersectionPoints[0];
+					
+					res = [p1, p2];
+				}
+			}
+			else if(segmentIntersectionPoints.length)
+			{
+				if(2 === segmentIntersectionPoints.length)
+				{
+					var p1 = segmentIntersectionPoints[0];
+					var p2 = segmentIntersectionPoints[1];
+					
+					res = [p1, p2];
+				}
+			}
+			
+			return res;
+		};
+		
+		var getMinMaxValArray = function(pointsValue)
+		{
+			var min, max;
+			if(pointsValue.length === 4)
+			{
+				min = Math.min(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val, pointsValue[3].val);
+				max = Math.max(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val, pointsValue[3].val);
+			}
+			else
+			{
+				min = Math.min(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val);
+				max = Math.max(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val);
+			}
+			return {min: min, max: max}
+		};
+		
+		var calculateFaceBetween2GridLines = function(minVal, maxVal, k, pointsValue)
+		{
+			var res = false;
+			
+			if(yPoints[k - 1] && minVal >= yPoints[k - 1].val && maxVal <= yPoints[k].val)
+			{
+				var p1 = pointsValue[0];
+				var p2 = pointsValue[1];
+				var p3 = pointsValue[2];
+				var p4 = pointsValue[3] ? pointsValue[3] : pointsValue[2];
+				
+				var path = t._calculateTempFace([p1, p2, p3, p4]);
+				
+				if(!t.paths.test2[k])
+				{
+					t.paths.test2[k] = [];
+				}
+				t.paths.test2[k].push(path);
+				
+				res = true;
+			}
+			
+			return res;
+		};
+		
+		var minMaxVal = getMinMaxValArray(pointsValue);
+		var minVal = minMaxVal.min;
+		var maxVal = minMaxVal.max;
+		
+		var res = [];
+		
+		var prevPoints = null;
+		for(var k = 0; k < yPoints.length; k++)
+		{
+			if(calculateFaceBetween2GridLines(minVal, maxVal, k, pointsValue))
+			{
+				break;
+			}
+			
+			var isCalculatePrevPoints = false;
+			if(null === prevPoints)
+			{
+				for(var j = 0; j < pointsValue.length; j++)
+				{
+					if(pointsValue[j].val <= yPoints[k].val)
+					{
+						if(!prevPoints)
+						{
+							prevPoints = [];
+						}
+						prevPoints.push(pointsValue[j]);
+						isCalculatePrevPoints = true;
+					}	
+				}
+			}
+			
+			
+			var points = getIntersectionPlaneAndLines(k, lines, pointsValue);
+			if(!isCalculatePrevPoints && null === points && prevPoints)
+			{
+				for(var j = 0; j < pointsValue.length; j++)
+				{
+					if(pointsValue[j].val >= yPoints[k - 1].val)
+					{
+						if(!points)
+						{
+							points = [];
+						}
+						points.push(pointsValue[j]);
+						isCalculatePrevPoints = true;
+					}	
+				}
+			}
+			
+			
+			if(null !== points && prevPoints)
+			{
+				var p1 = prevPoints[0];
+				var p2 = prevPoints[1] ? prevPoints[1] : prevPoints[0];
+				var p3 = points[0];
+				var p4 = points[1] ? points[1] : points[0];
+				
+				if(bIsAddIntoPaths)
+				{
+					var path = t._calculateTempFace([p1, p2, p3, p4]);
+					if(!t.paths.test2[k])
+					{
+						t.paths.test2[k] = [];
+					}
+					t.paths.test2[k].push(path);
+				}
+				
+				res[k] = [p1, p2, p3, p4];
+			}
+			else if(prevPoints && prevPoints.length === 3 && !points && isCalculatePrevPoints)
+			{
+				var p1 = prevPoints[0];
+				var p2 = prevPoints[1];
+				var p3 = prevPoints[2];
+				var p4 = prevPoints[3] ? prevPoints[3] : prevPoints[2];
+				
+				if(bIsAddIntoPaths)
+				{
+					var path = t._calculateTempFace([p1, p2, p3, p4]);
+					if(!t.paths.test2[k])
+					{
+						t.paths.test2[k] = [];
+					}
+					t.paths.test2[k].push(path);
+				}
+				
+				res[k] = [p1, p2, p3, p4];
+			}
+			
+			if(points !== null)
+			{
+				prevPoints = points;
+			}
+		}
+		
+		return res;
+	},
+	
+	_isEqualPoints: function(arr, point)
+	{
+		var res = null;
+		
+		for(var p = 0; p < arr.length; p++)
+		{
+			if(arr[p] && parseInt(point.x) === parseInt(arr[p].x) && parseInt(point.y) === parseInt(arr[p].y))
+			{
+				res = p;
+				break;
+			}
+		}
+		
+		return res;
+	},
+	
+	test21: function(points, points3d)
 	{
 		var t = this;
 		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
