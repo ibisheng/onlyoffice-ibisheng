@@ -1182,7 +1182,7 @@
 				
 				History.StartTransaction();
 				
-				var changeFilter = function(filter, isTablePart)
+				var changeFilter = function(filter, isTablePart, index)
 				{
 					var bRes = false;
 					var oldFilter = filter.clone(null);
@@ -1192,9 +1192,11 @@
 
 					//смотрим находится ли фильтр(первая его строчка) внутри выделенного фрагмента
 					if ((activeCells.containsFirstLineRange(bbox) && !isTablePart) || (isTablePart && activeCells.containsRange(bbox))) {
-						if(isTablePart)
+						if(isTablePart) {
 							oRange.setTableStyle(null);
-						else
+							//write formulas history before filter history
+							worksheet.deleteTablePart(index);
+						} else
 							worksheet.AutoFilter = null;
 							
 						//открываем скрытые строки
@@ -1221,9 +1223,7 @@
 					for (var i = worksheet.TableParts.length - 1; i >= 0; i--)
 					{
 						var tablePart = worksheet.TableParts[i];
-						if (changeFilter(tablePart, true)) {
-							worksheet.deleteTablePart(i);
-						}
+						changeFilter(tablePart, true, i);
 					}
 				}
 				
@@ -2938,6 +2938,8 @@
 				if(worksheet.TableParts)
 				{
 					worksheet.workbook.dependencyFormulas.buildDependency();
+					//without lockRecal each setValue call calculation
+					worksheet.workbook.dependencyFormulas.lockRecal();
 					for(var i = 0; i < worksheet.TableParts.length; i++)
 					{
 						var filter = worksheet.TableParts[i];
@@ -2950,6 +2952,7 @@
 						var intersection = range.intersection(tableRange);
 						if(null !== intersection && 0 !== filter.HeaderRowCount)
 						{
+							var toHistory = [];
 							//проходимся по всем заголовкам
 							for(var j = tableRange.c1; j <= tableRange.c2; j++)
 							{
@@ -2989,20 +2992,24 @@
 									filter.TableColumns[j - tableRange.c1].Name = generateName;
 									newVal = generateName;
 								}
-								
+
 								if(null !== newVal)
 								{
-									this._addHistoryObj({nCol: cell.bbox.c1, nRow: cell.bbox.r1, val: oldVal}, AscCH.historyitem_AutoFilter_ChangeColumnName, {activeCells: range, nCol: cell.bbox.c1, nRow: cell.bbox.r1, val: newVal});
+									toHistory.push([{nCol: cell.bbox.c1, nRow: cell.bbox.r1, val: oldVal}, AscCH.historyitem_AutoFilter_ChangeColumnName, {activeCells: range, nCol: cell.bbox.c1, nRow: cell.bbox.r1, val: newVal}]);
 								}
 							}
-							
+							//write formulas history before filter history
 							worksheet.handlers.trigger("changeColumnTablePart", filter.DisplayName);
+							for (var i = 0; i < toHistory.length; ++i) {
+								this._addHistoryObj.apply(this, toHistory[i]);
+							}
 						}
 						else
 						{
 							this._changeTotalsRowData(filter, range, props);
 						}
 					}
+					worksheet.workbook.dependencyFormulas.unlockRecal();
 				}
 			},
 			
