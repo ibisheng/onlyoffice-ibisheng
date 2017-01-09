@@ -928,3 +928,14 @@
 	window['AscCommon'] = window['AscCommon'] || {};
 	window['AscCommon'].g_clipboardBase = g_clipboardBase;
 })(window);
+
+// copy/paste focus error!!!
+window["asc_desktop_copypaste"] = function(_api, _method)
+{
+	var bIsFocus = _api.asc_IsFocus();
+	if (!bIsFocus)
+		_api.asc_enableKeyEvents(true);
+	window["AscDesktopEditor"][_method]();
+	if (!bIsFocus)
+		_api.asc_enableKeyEvents(false);
+};
