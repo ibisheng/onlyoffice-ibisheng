@@ -11307,6 +11307,11 @@ drawSurfaceChart.prototype =
 				break;
 			}
 			
+			if(yPoints[k - 1] && yPoints[k].val > maxVal && yPoints[k - 1].val >= maxVal)
+			{
+				break;
+			}
+			
 			var pointNeedAddIntoFace = null;
 			if(yPoints[k - 1])
 			{
@@ -11369,6 +11374,10 @@ drawSurfaceChart.prototype =
 				var p4 = points[1] ? points[1] : points[0];
 				
 				var arrPoints = [p1, p2, p3, p4];
+				if(points[2])
+				{
+					arrPoints.push(points[2]);
+				}
 				
 				if(null !== pointNeedAddIntoFace)
 				{
