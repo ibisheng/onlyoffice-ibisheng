@@ -1958,6 +1958,10 @@ CChartsDrawer.prototype =
 		else
 			this.calcProp.scale = this._roundValues(this._getAxisData2(false, this.calcProp.min, this.calcProp.max, chartProp));	
 		
+		if(this.calcProp.scale && this.calcProp.scale.length > 2)
+		{
+			this.calcProp.axisStep = Math.abs(this.calcProp.scale[1] - this.calcProp.scale[0]);
+		}
 		
 		this.calcProp.widthCanvas = chartProp.extX*this.calcProp.pxToMM;
 		this.calcProp.heightCanvas = chartProp.extY*this.calcProp.pxToMM;
@@ -2764,7 +2768,7 @@ CChartsDrawer.prototype =
 		return bRes;
 	},
 	
-	isPointsLieIntoOnePlane: function(point1, point2, point3, point4)
+	isPointsLieIntoOnePlane2: function(point1, point2, point3, point4)
 	{
 		var bRes = false;
 		
@@ -2780,7 +2784,7 @@ CChartsDrawer.prototype =
 		return bRes;
 	},
 	
-	isPointsLieIntoOnePlane2: function(point1, point2, point3, point4)
+	isPointsLieIntoOnePlane: function(point1, point2, point3, point4)
 	{
 		var bRes = false;
 		
@@ -2792,6 +2796,31 @@ CChartsDrawer.prototype =
 		}
 		
 		return bRes;
+	},
+	
+	isPointsLieIntoOnePlane3: function(point1, point2, point3, point4)
+	{
+		/*var vector1 = Math.sqrt(Math.pow(point4.x - point1.x, 2) + Math.pow(point4.y - point1.y, 2) + Math.pow(point4.z - point1.z, 2));//DA
+		var vector2 = Math.sqrt(Math.pow(point4.x - point2.x, 2) + Math.pow(point4.y - point2.y, 2) + Math.pow(point4.z - point2.z, 2));//DB
+		var vector2 = Math.sqrt(Math.pow(point4.x - point3.x, 2) + Math.pow(point4.y - point3.y, 2) + Math.pow(point4.z - point3.z, 2));//DC*/
+		
+		var vector1 = {x: point4.x - point1.x, y: point4.y - point1.y, z: point4.z - point1.z};//DA
+		var vector2 = {x: point4.x - point2.x, y: point4.y - point2.y, z: point4.z - point2.z};//DB
+		var vector3 = {x: point4.x - point3.x, y: point4.y - point3.y, z: point4.z - point3.z};//DC
+		
+		var a1 = vector1.x;
+		var b1 = vector1.y;
+		var c1 = vector1.z;
+		var a2 = vector2.x;
+		var b2 = vector2.y;
+		var c2 = vector2.z;
+		var a3 = vector3.x;
+		var b3 = vector3.y;
+		var c3 = vector3.z;
+		
+		var res = a1 * b2 * c3 + a3 * b1 * c2 + a2 * b3 * c1 - a3 * b2 * c1 - a1 * b3 * c2 - a2 * b1 * c3;
+		
+		return res;
 	},
 	
 	//получаем площадь произвольного выпуклого четырехугольника
@@ -10964,6 +10993,16 @@ drawSurfaceChart.prototype =
 		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		
+		var roundInt = 1;
+		if(this.chartProp.axisStep)
+		{
+			var roundProps = this.cChartDrawer._getFirstDegree(this.chartProp.axisStep);
+			var roundProp = roundProps.numPow.toString().split('.');
+			var roundCount = roundProp && roundProp[1] ? roundProp[1].length : 0;
+			roundInt = Math.pow(10, roundCount + 1);
+		}
+		
+		//var roundKF = this.chartProp.axisStep;
 		var y, x, z, val, seria, dataSeries, compiledMarkerSize, compiledMarkerSymbol, idx, numCache, idxPoint, points = [], points3d = [];
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 			seria = this.chartProp.series[i];
@@ -10979,7 +11018,8 @@ drawSurfaceChart.prototype =
 			{	
 				//рассчитываем значения
 				idx = dataSeries[n] && dataSeries[n].idx != null ? dataSeries[n].idx : n;				
-				val = this._getYVal(idx, i);
+				val = Math.round(this._getYVal(idx, i) * roundInt) / roundInt;
+				//val = this._getYVal(idx, i);
 				
 				x  = xPoints[n].pos * this.chartProp.pxToMM;
 				y  = this.cChartDrawer.getYPosition(val, yPoints) * this.chartProp.pxToMM;
@@ -11077,6 +11117,7 @@ drawSurfaceChart.prototype =
 		
 		
 		var pointsValue = [p1, p2, p21, p];
+		var res = this.cChartDrawer.isPointsLieIntoOnePlane3(p3d, p13d, p213d, p23d);
 		if(this.cChartDrawer.isPointsLieIntoOnePlane(p3d, p13d, p213d, p23d))
 		{
 			var pointsFace = this._getIntersectionPlanesAndLines(lines, pointsValue, true);
@@ -11546,7 +11587,7 @@ drawSurfaceChart.prototype =
 			var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
 			//pen.w = 20000;
 			
-			this.cChartDrawer.drawPath(this.paths.test[i], pen, null, false);
+			//this.cChartDrawer.drawPath(this.paths.test[i], pen, null, false);
 		}
 		
 		var style = AscFormat.CHART_STYLE_MANAGER.getStyleByIndex(this.cChartSpace.style);
@@ -11562,9 +11603,12 @@ drawSurfaceChart.prototype =
 				var seria = this.chartProp.series[i-1] ? this.chartProp.series[i-1] : this.chartProp.series[0];
 				var pt = seria.val.numRef.numCache.pts[0];
 				//var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
-				
+				//var pen = null;
 				var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
 				var brush = base_fills[i];
+				
+				//pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
+				pen = null;
 				
 				var props = this.cChartSpace.getParentObjects();
 				var duplicateBrush = brush;
@@ -11574,6 +11618,7 @@ drawSurfaceChart.prototype =
 				duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
 				
 				brush = duplicateBrush;
+				
 
 				this.cChartDrawer.drawPath(this.paths.test2[i][j], pen, brush);
 			}
