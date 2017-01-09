@@ -11017,8 +11017,9 @@ drawSurfaceChart.prototype =
 			for(var n = 0; n < numCache.ptCount; n++)
 			{	
 				//рассчитываем значения
-				idx = dataSeries[n] && dataSeries[n].idx != null ? dataSeries[n].idx : n;				
-				val = Math.round(this._getYVal(idx, i) * roundInt) / roundInt;
+				idx = dataSeries[n] && dataSeries[n].idx != null ? dataSeries[n].idx : n;
+				//TODO временно заменил idx на n. позже нужно использовать idx
+				val = Math.round(this._getYVal(n, i) * roundInt) / roundInt;
 				//val = this._getYVal(idx, i);
 				
 				x  = xPoints[n].pos * this.chartProp.pxToMM;
@@ -11026,8 +11027,9 @@ drawSurfaceChart.prototype =
 				z = (perspectiveDepth / (this.chartProp.series.length - 1)) * (i);
 				
 				//рассчитываем значения
-				var idx2 = dataSeries[n + 1] && dataSeries[n + 1].idx != null ? dataSeries[n + 1].idx : null;				
-				var val2 = this._getYVal(idx2, i);
+				var idx2 = dataSeries[n + 1] && dataSeries[n + 1].idx != null ? dataSeries[n + 1].idx : null;
+				//TODO временно заменил idx на n. позже нужно использовать idx
+				var val2 = Math.round(this._getYVal(n + 1, i) * roundInt) / roundInt;
 				
 				if(idx2 !== null)
 				{	
