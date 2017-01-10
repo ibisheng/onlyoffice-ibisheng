@@ -11110,7 +11110,8 @@ drawSurfaceChart.prototype =
 	_calculateFace: function(p, p1, p2, p21, p3d, p13d, p23d, p213d)
 	{
 		var t = this;
-			
+		
+		//все стороны сегмента
 		var lines = [];
 		lines[0] = {p1: p3d, p2: p23d, p111: p, p222: p2};
 		lines[1] = {p1: p13d, p2: p213d, p111: p1, p222: p21};
@@ -11120,14 +11121,12 @@ drawSurfaceChart.prototype =
 		
 		var pointsValue = [p1, p2, p21, p];
 		var res = this.cChartDrawer.isPointsLieIntoOnePlane3(p3d, p13d, p213d, p23d);
-		if(this.cChartDrawer.isPointsLieIntoOnePlane(p3d, p13d, p213d, p23d))
+		if(this.cChartDrawer.isPointsLieIntoOnePlane(p3d, p13d, p213d, p23d))//не делим диагональю данный сегмент
 		{
 			var pointsFace = this._getIntersectionPlanesAndLines(lines, pointsValue, true);
 		}
-		else
+		else//делим диагональю данный сегмент
 		{
-			var isDiagonalLine = null;
-			
 			var max = p.val;
 			var maxIndex = 0;
 			var arrVal = [p, p1, p2, p21];
@@ -11140,38 +11139,37 @@ drawSurfaceChart.prototype =
 				}
 			}
 			
+			//разбиваем диагональю данный сегмент на два сегмента
 			if(p1.val + p2.val < p21.val + p.val)
 			{	
+				//добавляем диагональ
 				lines.push({p1: p213d, p2: p3d, p111: p21, p222: p});
-				this.paths.test.push(this._calculatePath(p21.x, p21.y, p.x, p.y));
-				isDiagonalLine = 1;
-			}
-			else
-			{
-				lines.push({p1: p13d, p2: p23d, p111: p1, p222: p2});
-				this.paths.test.push(this._calculatePath(p2.x, p2.y, p1.x, p1.y));
-				isDiagonalLine = 2;
-			}
-			
-			if(1 === isDiagonalLine)
-			{
+				//this.paths.test.push(this._calculatePath(p21.x, p21.y, p.x, p.y));
+				
 				var lines1 = [lines[0], lines[3], lines[4]];
 				var pointsValue1 = [p, p21, p2];
 				var lines2 = [lines[2], lines[1], lines[4]];
 				var pointsValue2 = [p, p1, p21];
-				
 			}
 			else
-			{	
+			{
+				//добавляем диагональ
+				lines.push({p1: p13d, p2: p23d, p111: p1, p222: p2});
+				//this.paths.test.push(this._calculatePath(p2.x, p2.y, p1.x, p1.y));
+				
 				var lines1 = [lines[2], lines[0], lines[4]];
 				var pointsValue1 = [p, p1, p2];
 				var lines2 = [lines[4], lines[1], lines[3]];
 				var pointsValue2 = [p2, p1, p21];
 			}
-			var pointsFace1 = this._getIntersectionPlanesAndLines(lines1, pointsValue1);
-			var pointsFace2 = this._getIntersectionPlanesAndLines(lines2, pointsValue2);
 			
-			var lengthFaces = Math.max(pointsFace1.length, pointsFace2.length);
+			
+			//находим пересечение двух сегментов с плоскостями сетки
+			var pointsFace1 = this._getIntersectionPlanesAndLines(lines1, pointsValue1, true);
+			var pointsFace2 = this._getIntersectionPlanesAndLines(lines2, pointsValue2, true);
+			
+			//TODO временно убираю. если будут проблемы в отрисовке - раскомментировать!
+			/*var lengthFaces = Math.max(pointsFace1.length, pointsFace2.length);
 			for(var l = 0; l < lengthFaces; l++)
 			{
 				if(pointsFace1[l] && pointsFace2[l])
@@ -11210,27 +11208,21 @@ drawSurfaceChart.prototype =
 				}
 				
 				
-				if(pointsFace1[l])
+				if(!t.paths.test2[l])
 				{
-					if(!t.paths.test2[l])
-					{
-						t.paths.test2[l] = [];
-					}
-					
+					t.paths.test2[l] = [];
+				}
+				if(pointsFace1[l])
+				{	
 					var path1 = t._calculateTempFace(pointsFace1[l]);
 					t.paths.test2[l].push(path1);
 				}
 				if(pointsFace2[l])
 				{
-					if(!t.paths.test2[l])
-					{
-						t.paths.test2[l] = [];
-					}
-					
 					var path2 = t._calculateTempFace(pointsFace2[l]);
 					t.paths.test2[l].push(path2);
 				}
-			}
+			}*/
 		}
 	},
 	
@@ -11283,11 +11275,17 @@ drawSurfaceChart.prototype =
 				
 				var path = t._calculateTempFace([p1, p2, p3, p4]);
 				
-				if(!t.paths.test2[k])
+				var addIndex = k;
+				if(minVal === maxVal && yPoints[k] && minVal === yPoints[k].val)
 				{
-					t.paths.test2[k] = [];
+					addIndex = k + 1;
 				}
-				t.paths.test2[k].push(path);
+				
+				if(!t.paths.test2[addIndex])
+				{
+					t.paths.test2[addIndex] = [];
+				}
+				t.paths.test2[addIndex].push(path);
 				
 				res = true;
 			}
@@ -11304,11 +11302,12 @@ drawSurfaceChart.prototype =
 		var prevPoints = null;
 		for(var k = 0; k < yPoints.length; k++)
 		{
+			//если сегмент весь находится между двумя соседними плоскостями сетки, то есть ни с одной из них не имеет пересечений
 			if(calculateFaceBetween2GridLines(minVal, maxVal, k, pointsValue))
 			{
 				break;
 			}
-			
+			//если значение сетки больше максимального значения сегмента
 			if(yPoints[k - 1] && yPoints[k].val > maxVal && yPoints[k - 1].val >= maxVal)
 			{
 				break;
@@ -11349,8 +11348,10 @@ drawSurfaceChart.prototype =
 				}
 			}
 			
+			//находим точки пересечения с текущей плоскостью сетки
 			var gridPlane = getGridPlain(k);
 			var points = this._getIntersectionPlaneAndLines(gridPlane, lines, pointsValue);
+			
 			if(!isCalculatePrevPoints && null === points && prevPoints)
 			{
 				for(var j = 0; j < pointsValue.length; j++)
