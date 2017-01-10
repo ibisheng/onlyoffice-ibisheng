@@ -11314,6 +11314,7 @@ drawSurfaceChart.prototype =
 				break;
 			}
 			
+			//точки, которые находятся между данными плоскостями сетки(или лежат на них), обязательно должны войти в сегмент
 			var pointNeedAddIntoFace = null;
 			if(yPoints[k - 1])
 			{
@@ -11369,7 +11370,7 @@ drawSurfaceChart.prototype =
 				}
 			}
 			
-			
+			var arrPoints = null;
 			if(null !== points && prevPoints)
 			{
 				var p1 = prevPoints[0];
@@ -11377,38 +11378,11 @@ drawSurfaceChart.prototype =
 				var p3 = points[0];
 				var p4 = points[1] ? points[1] : points[0];
 				
-				var arrPoints = [p1, p2, p3, p4];
+				arrPoints = [p1, p2, p3, p4];
 				if(points[2])
 				{
 					arrPoints.push(points[2]);
 				}
-				
-				if(null !== pointNeedAddIntoFace)
-				{
-					if(pointNeedAddIntoFace[0])
-					{
-						arrPoints.push(pointNeedAddIntoFace[0]);
-					}
-					if(pointNeedAddIntoFace[1])
-					{
-						arrPoints.push(pointNeedAddIntoFace[1]);
-					}
-					if(pointNeedAddIntoFace[2])
-					{
-						arrPoints.push(pointNeedAddIntoFace[2]);
-					}
-				}
-				
-				if(bIsAddIntoPaths)
-				{
-					var path = t._calculateTempFace(arrPoints);
-					if(!t.paths.test2[k])
-					{
-						t.paths.test2[k] = [];
-					}
-					t.paths.test2[k].push(path);
-				}
-				
 				res[k] = arrPoints;
 			}
 			else if(prevPoints && prevPoints.length === 3 && !points && isCalculatePrevPoints)
@@ -11418,34 +11392,28 @@ drawSurfaceChart.prototype =
 				var p3 = prevPoints[2];
 				var p4 = prevPoints[3] ? prevPoints[3] : prevPoints[2];
 				
-				var arrPoints = [p1, p2, p3, p4];
-				if(null !== pointNeedAddIntoFace)
-				{
-					if(pointNeedAddIntoFace[0])
-					{
-						arrPoints.push(pointNeedAddIntoFace[0]);
-					}
-					if(pointNeedAddIntoFace[1])
-					{
-						arrPoints.push(pointNeedAddIntoFace[1]);
-					}
-					if(pointNeedAddIntoFace[2])
-					{
-						arrPoints.push(pointNeedAddIntoFace[2]);
-					}
-				}
-				
-				if(bIsAddIntoPaths)
-				{
-					var path = t._calculateTempFace(arrPoints);
-					if(!t.paths.test2[k])
-					{
-						t.paths.test2[k] = [];
-					}
-					t.paths.test2[k].push(path);
-				}
-				
+				arrPoints = [p1, p2, p3, p4];
 				res[k] = arrPoints;
+			}
+			
+			//добавляем точки, которые обязательно должны присутвовать в сегменте
+			if(arrPoints && null !== pointNeedAddIntoFace)
+			{
+				for(var i = 0; i < pointNeedAddIntoFace.length; i++)
+				{
+					arrPoints.push(pointNeedAddIntoFace[i]);
+				}
+			}
+			
+			//add to path array
+			if(arrPoints && bIsAddIntoPaths)
+			{
+				var path = t._calculateTempFace(arrPoints);
+				if(!t.paths.test2[k])
+				{
+					t.paths.test2[k] = [];
+				}
+				t.paths.test2[k].push(path);
 			}
 			
 			if(points !== null)
@@ -11512,6 +11480,12 @@ drawSurfaceChart.prototype =
 				var p2 = segmentIntersectionPoints[1];
 				
 				res = [p1, p2];
+			}
+			else if(1 === segmentIntersectionPoints.length)
+			{
+				var p1 = segmentIntersectionPoints[0];
+				
+				res = [p1];
 			}
 		}
 		
