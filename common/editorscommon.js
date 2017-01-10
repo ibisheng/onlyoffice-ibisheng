@@ -118,10 +118,15 @@ String.prototype.strongMatch = function(regExp){
 if (typeof require =="function" && !window["XRegExp"]){window["XRegExp"] = require("xregexp");}
 
 var oZipChanges = null;
-var sDownloadServiceLocalUrl = "/downloadas";
-var sUploadServiceLocalUrl = "/upload";
-var sUploadServiceLocalUrlOld = "/uploadold";
+var sDownloadServiceLocalUrl = "../../../../downloadas";
+var sUploadServiceLocalUrl = "../../../../upload";
+var sUploadServiceLocalUrlOld = "../../../../uploadold";
 var nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
+
+function getBaseUrl() {
+var index_html = window["location"]["href"];
+  return index_html.substring(0, index_html.lastIndexOf("/") + 1);
+}
 
 function getEncodingParams() {
 	var res = [];
@@ -2334,6 +2339,7 @@ window["SetDoctRendererParams"] = function(_params)
 
   //------------------------------------------------------------export---------------------------------------------------
   window['AscCommon'] = window['AscCommon'] || {};
+  window["AscCommon"].getBaseUrl = getBaseUrl;
   window["AscCommon"].getEncodingParams = getEncodingParams;
   window["AscCommon"].saveWithParts = saveWithParts;
   window["AscCommon"].loadFileContent = loadFileContent;
