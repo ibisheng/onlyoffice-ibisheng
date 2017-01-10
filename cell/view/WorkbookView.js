@@ -465,7 +465,7 @@
           } else {
             self.model.recalcWB(false);
           }
-        },
+        }
       });
 
       if (this.input && this.input.addEventListener) {
