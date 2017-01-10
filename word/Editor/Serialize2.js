@@ -5784,7 +5784,7 @@ function BinaryFileReader(doc, openParams)
 		{
 			var numPr = this.oReadResult.paraNumPrs[i];
 			var oNumClass = this.oReadResult.numToNumClass[numPr.NumId];
-			if(null != oNumClass)
+			if(null != oNumClass && 0 !== numPr.NumId)
 				numPr.NumId = oNumClass.Get_Id();
 			else
 				numPr.NumId = 0;

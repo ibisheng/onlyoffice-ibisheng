@@ -7984,7 +7984,10 @@ Paragraph.prototype =
                 }
                 else if (0 === this.Pr.NumPr.NumId)
                 {
-                    // Почему то Word в такой ситуации ведет себя так
+                	// Word значение 0 для NumId воспринимает как отсутствие нумерации
+					Lvl = -1;
+					Pr.ParaPr.NumPr = undefined;
+
                     Pr.ParaPr.Ind.Left      = 0;
                     Pr.ParaPr.Ind.FirstLine = 0;
                 }
