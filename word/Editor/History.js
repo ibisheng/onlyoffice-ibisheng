@@ -358,6 +358,23 @@ CHistory.prototype =
         // Удаляем ненужные точки
         this.Points.length = this.Index + 1;
     },
+
+	/**
+	 * Специальная функция, для создания точки, чтобы отловить все изменения, которые происходят. После использования
+	 * данная точка ДОЛЖНА быть удалена через функцию Remove_LastPoint.
+	 */
+	CreateNewPointForCollectChanges : function()
+	{
+		this.Points[++this.Index] = {
+			State       : null,
+			Items       : [],
+			Time        : null,
+			Additional  : {},
+			Description : -1
+		};
+
+		this.Points.length = this.Index + 1;
+	},
     
     Remove_LastPoint : function()
     {

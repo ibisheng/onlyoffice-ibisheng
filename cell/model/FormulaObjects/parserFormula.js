@@ -1688,22 +1688,26 @@ cStrucTable.prototype.toLocaleString = function () {
 			data = data.substr(0, data.length - 1);
 			if (this.hdtcstart) {
 
-				columns_1 = this.wb.getTableNameColumnByIndex(this.tableName, this.hdtcstartIndex.index);
-				if (columns_1) {
-					this.hdtcstart = columns_1.columnName;
-				} else if (this.hdtcstartIndex.name) {
-					this.hdtcstart = this.hdtcstartIndex.name;
+				if (this.hdtcstartIndex) {
+					columns_1 = this.wb.getTableNameColumnByIndex(this.tableName, this.hdtcstartIndex.index);
+					if (columns_1) {
+						this.hdtcstart = columns_1.columnName;
+					} else if (this.hdtcstartIndex.name) {
+						this.hdtcstart = this.hdtcstartIndex.name;
+					}
 				}
 
 				data += FormulaSeparators.functionArgumentSeparatorDef + "[" + this.hdtcstart.replace(/#/g, "'#") + "]"
 			}
 			if (this.hdtcend) {
 
-				columns_2 = this.wb.getTableNameColumnByIndex(this.tableName, this.hdtcendIndex.index);
-				if (columns_2) {
-					this.hdtcend = columns_2.columnName;
-				} else if (this.hdtcendIndex.name) {
-					this.hdtcend = this.hdtcendIndex.name;
+				if (this.hdtcendIndex) {
+					columns_2 = this.wb.getTableNameColumnByIndex(this.tableName, this.hdtcendIndex.index);
+					if (columns_2) {
+						this.hdtcend = columns_2.columnName;
+					} else if (this.hdtcendIndex.name) {
+						this.hdtcend = this.hdtcendIndex.name;
+					}
 				}
 
 				data += ":[" + this.hdtcend.replace(/#/g, "'#") + "]"
@@ -1738,7 +1742,7 @@ cStrucTable.prototype.toLocaleString = function () {
 
 				this.colStartIndex = this.wb.getTableIndexColumnByName(this.tableName, this.colStart);
 				this.colEndIndex = this.wb.getTableIndexColumnByName(this.tableName, this.colEnd);
-				if (!this.colStartIndex && !this.colEndIndex) {
+				if (!this.colStartIndex || !this.colEndIndex) {
 					return this._createAreaError(paramObj);
 				}
 			} else {
@@ -4994,6 +4998,12 @@ parserFormula.prototype.calculate = function(opt_defName, opt_range) {
 		return this;
 	};
 	parserFormula.prototype.renameSheetCopy = function(params) {
+		var isInDependencies = this.isInDependencies;
+		if (isInDependencies) {
+			//before change outStack necessary to removeDependencies
+			this.removeDependencies();
+		}
+
 		for (var i = 0; i < this.outStack.length; i++) {
 			var elem = this.outStack[i];
 			if (cElementType.cell3D === elem.type) {
@@ -5028,6 +5038,9 @@ parserFormula.prototype.calculate = function(opt_defName, opt_range) {
 					elem.tableName = newTableName;
 				}
 			}
+		}
+		if (isInDependencies) {
+			this.buildDependencies();
 		}
 		return this;
 	};

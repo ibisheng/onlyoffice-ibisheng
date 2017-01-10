@@ -578,9 +578,9 @@
 			t.isOnLoadLicense = true;
 			t._onEndPermissions();
 		};
-		this.CoAuthoringApi.onWarning                 = function(e)
+		this.CoAuthoringApi.onWarning                 = function(code)
 		{
-			t.sendEvent('asc_onError', c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
+			t.sendEvent('asc_onError', code || c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
 		};
 		this.CoAuthoringApi.onMeta                    = function(data)
 		{

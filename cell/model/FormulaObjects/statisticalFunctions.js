@@ -4901,7 +4901,7 @@ cSTDEVA.prototype.getInfo = function () {
 		for (var j = 0; j < arg.length; j++) {
 			element = arg[j];
 			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _arrVal = arg.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
 				_arrVal.forEach(function (elem) {
 					if (cElementType.number === elem.type || cElementType.error === elem.type) {
 						arr0.push(elem);

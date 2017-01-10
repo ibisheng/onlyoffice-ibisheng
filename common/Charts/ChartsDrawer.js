@@ -8555,12 +8555,13 @@ drawPieChart.prototype =
 			
 			return res;
 		};
-		
+
+		var oThis = this;
 		var calculateInsideFaces = function(startAng1, swapAng1, startAng2, swapAng2)
 		{
 
-            var pathId = this.cChartSpace.AllocPath();
-            var path  = this.cChartSpace.GetPath(pathId);
+            var pathId = oThis.cChartSpace.AllocPath();
+            var path  = oThis.cChartSpace.GetPath(pathId);
 			
 			var endAng1 = startAng1 + swapAng1;
 			var endAng2 = startAng2 + swapAng2;
@@ -8584,8 +8585,8 @@ drawPieChart.prototype =
 		var calculateFrontFace = function(startAng, swapAng, startAng2, swapAng2)
 		{
 
-            var pathId = this.cChartSpace.AllocPath();
-            var path  = this.cChartSpace.GetPath(pathId);
+            var pathId = oThis.cChartSpace.AllocPath();
+            var path  = oThis.cChartSpace.GetPath(pathId);
 			
 			var endAng = startAng + swapAng;
 			var endAng2 = startAng2 + swapAng2;
@@ -8606,8 +8607,8 @@ drawPieChart.prototype =
 		var calculateUpFace = function(startAng, swapAng)
 		{
 
-            var pathId = this.cChartSpace.AllocPath();
-            var path  = this.cChartSpace.GetPath(pathId);
+            var pathId = oThis.cChartSpace.AllocPath();
+            var path  = oThis.cChartSpace.GetPath(pathId);
 			
 			var radiusSpec = (radiusUp1 * radiusUp2) /  Math.sqrt(Math.pow(radiusUp2, 2) * Math.pow((Math.cos(startAng)), 2) + Math.pow(radiusUp1, 2) * Math.pow(Math.sin(startAng),2));
 			
@@ -8627,8 +8628,8 @@ drawPieChart.prototype =
 		var calculateDownFace = function(startAng, swapAng)
 		{
 
-            var pathId = this.cChartSpace.AllocPath();
-            var path  = this.cChartSpace.GetPath(pathId);
+            var pathId = oThis.cChartSpace.AllocPath();
+            var path  = oThis.cChartSpace.GetPath(pathId);
 
 			var radiusSpec = (radiusDown1 * radiusDown2) /  Math.sqrt(Math.pow(radiusDown2, 2) * Math.pow((Math.cos(startAng)), 2) + Math.pow(radiusDown1, 2) * Math.pow(Math.sin(startAng),2));
 			//var radiusSpec2 = (radius11 * radius2) /  Math.sqrt(Math.pow(radius2, 2) * Math.pow((Math.cos(endAng)), 2) + Math.pow(radius11, 2) * Math.pow(Math.sin(endAng),2))

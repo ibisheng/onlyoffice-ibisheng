@@ -268,7 +268,8 @@
 	}
 
 	function getVertexIndex(bbox) {
-		return bbox.getName();
+		//without $
+		return bbox.getAbsName2(false, false, false, false);
 	}
 
 	function DependencyGraph(wb) {
@@ -755,6 +756,9 @@
 		delTableName: function(tableName) {
 			this.buildDependency();
 			var defName = this._delDefName(tableName, null);
+			if (defName) {
+				defName.removeDependencies();
+			}
 			this.addToChangedDefName(defName);
 			var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: defName.getUndoDefName(), to: null};
 			this._broadcastDefName(tableName, notifyData);
@@ -920,7 +924,7 @@
 		},
 		getAllFormulas: function(formulas) {
 			this._foreachDefName(function(defName) {
-				if (!defName.isTable && defName.parsedRef) {
+				if (defName.parsedRef) {
 					formulas.push(defName.parsedRef);
 				}
 			});
@@ -1220,7 +1224,14 @@
 						for (var id in curNodeY.storedValue.vals) {
 							var elem = curNodeY.storedValue.vals[id];
 							if (0 !== (1 & elem.startFlag) && !elem.dataWrap.isOutput) {
-								curNodes[id] = elem;
+								for (var i = elem.dataWrap.bbox.c1; i <= elem.dataWrap.bbox.c2; ++i) {
+									var curNodesElem = curNodes[i];
+									if (!curNodesElem) {
+										curNodesElem = {};
+										curNodes[i] = curNodesElem;
+									}
+									curNodesElem[id] = elem;
+								}
 							}
 						}
 					}
@@ -1231,12 +1242,18 @@
 						curCellY = g_FCI.row;
 					}
 					if (curCellY <= curY) {
-						for (var id in curNodes) {
-							var elem = curNodes[id];
-							if (elem && elem.dataWrap.bbox.contains(curCellX, curCellY)) {
+						var curNodesElemX = curNodes[curCellX];
+						for (var id in curNodesElemX) {
+							var elem = curNodesElemX[id];
+							if (!elem.dataWrap.isOutput) {
 								elem.dataWrap.isOutput = true;
 								res.push(elem.dataWrap);
-								delete curNodes[id];
+								for (var i = elem.dataWrap.bbox.c1; i <= elem.dataWrap.bbox.c2; ++i) {
+									var curNodesElem = curNodes[i];
+									if (curNodesElem) {
+										delete curNodesElem[id];
+									}
+								}
 							}
 						}
 						curCellIndex++;
@@ -1246,7 +1263,12 @@
 						for (var id in curNodeY.storedValue.vals) {
 							var elem = curNodeY.storedValue.vals[id];
 							if (0 !== (2 & elem.startFlag) && !elem.dataWrap.isOutput) {
-								delete curNodes[id];
+								for (var i = elem.dataWrap.bbox.c1; i <= elem.dataWrap.bbox.c2; ++i) {
+									var curNodesElem = curNodes[i];
+									if (curNodesElem) {
+										delete curNodesElem[id];
+									}
+								}
 							}
 						}
 						curNodeYIndex++;
@@ -4357,7 +4379,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		}
 		return res;
 	};
-	Woorksheet.prototype.renameDependencyNodes = function(offset, oBBox, rec, noDelete){
+	Woorksheet.prototype.renameDependencyNodes = function(offset, oBBox){
 		return this.workbook.dependencyFormulas.shift(this.Id, oBBox, offset);
 	};
 	Woorksheet.prototype.getAllCol = function(){
@@ -4753,7 +4775,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			cell.removeHyperlink();
 		}
 	};
-	Cell.prototype.setFormula = function(formula) {
+	Cell.prototype.setFormula = function(formula, bHistoryUndo) {
 		var DataOld = null;
 		var DataNew = null;
 		if (History.Is_On())
@@ -4766,8 +4788,10 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 
 		if (History.Is_On()) {
 			DataNew = this.getValueData();
-			if (false == DataOld.isEqual(DataNew))
-				History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew));
+			if (false == DataOld.isEqual(DataNew)){
+				var typeHistory = bHistoryUndo ? AscCH.historyitem_Cell_ChangeValueUndo : AscCH.historyitem_Cell_ChangeValue;
+				History.Add(AscCommonExcel.g_oUndoRedoCell, typeHistory, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew), bHistoryUndo);}
+
 		}
 	};
 	Cell.prototype.removeDependencies = function() {
@@ -5182,7 +5206,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
 			var DataOld = this.getValueData();
 			if (eventData.isRebuild) {
-				this.setFormula(eventData.assemble);
+				this.setFormula(eventData.assemble, true);
 			} else {
 				this.formulaParsed.Formula = eventData.assemble;
 				this.formulaParsed.buildDependencies();
