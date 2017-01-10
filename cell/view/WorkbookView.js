@@ -1530,6 +1530,7 @@
    * @returns {WorkbookView}
    */
   WorkbookView.prototype.showWorksheet = function (index, isResized, bLockDraw) {
+    // ToDo disable method for assembly
     if (index === this.wsActive) {
       return this;
     }
@@ -1624,7 +1625,7 @@
       ws.objectRender.controller.updateOverlay();
     }
 
-    if (isSendInfo) {
+    if (isSendInfo && !window["NATIVE_EDITOR_ENJINE"]) {
       this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
       this._onWSSelectionChanged();
       this._onSelectionMathInfoChanged(ws.getSelectionMathInfo());
