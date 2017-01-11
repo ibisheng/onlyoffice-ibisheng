@@ -11261,9 +11261,9 @@ drawSurfaceChart.prototype =
 			return {min: min, max: max}
 		};
 		
-		var calculateFaceBetween2GridLines = function(minVal, maxVal, k, pointsValue)
+		var calculateFaceBetween2GridLines = function(minVal, maxVal, k, pointsValue, res)
 		{
-			var res = false;
+			var result = false;
 			
 			if(yPoints[k - 1] && minVal >= yPoints[k - 1].val && maxVal <= yPoints[k].val)
 			{
@@ -11280,16 +11280,20 @@ drawSurfaceChart.prototype =
 					addIndex = k + 1;
 				}
 				
-				if(!t.paths.test2[addIndex])
+				if(bIsAddIntoPaths)
 				{
-					t.paths.test2[addIndex] = [];
+					if(!t.paths.test2[addIndex])
+					{
+						t.paths.test2[addIndex] = [];
+					}
+					t.paths.test2[addIndex].push(path);
 				}
-				t.paths.test2[addIndex].push(path);
 				
-				res = true;
+				res[k] = [p1, p2, p3, p4];
+				result = true;
 			}
 			
-			return res;
+			return result;
 		};
 		
 		var minMaxVal = getMinMaxValArray(pointsValue);
@@ -11302,7 +11306,7 @@ drawSurfaceChart.prototype =
 		for(var k = 0; k < yPoints.length; k++)
 		{
 			//если сегмент весь находится между двумя соседними плоскостями сетки, то есть ни с одной из них не имеет пересечений
-			if(calculateFaceBetween2GridLines(minVal, maxVal, k, pointsValue))
+			if(calculateFaceBetween2GridLines(minVal, maxVal, k, pointsValue, res))
 			{
 				break;
 			}
