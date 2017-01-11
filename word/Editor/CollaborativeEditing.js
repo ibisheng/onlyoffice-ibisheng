@@ -744,11 +744,11 @@ CWordCollaborativeEditing.prototype.Undo = function()
 	{
 		var oChange = arrReverseChanges[nIndex];
 		var oClass  = oChange.GetClass();
-		if (oClass instanceof CDocument || oClass instanceof CDocumentContent)
+		if (oClass instanceof AscCommonWord.CDocument || oClass instanceof AscCommonWord.CDocumentContent)
 			mapDocumentContents[oClass.Get_Id()] = oClass;
-		else if (oClass instanceof Paragraph)
+		else if (oClass instanceof AscCommonWord.Paragraph)
 			mapParagraphs[oClass.Get_Id()] = oClass;
-		else if (oClass instanceof ParaRun && true === oChange.IsContentChange() && oClass.Get_Paragraph())
+		else if (oClass instanceof AscCommonWord.ParaRun && true === oChange.IsContentChange() && oClass.Get_Paragraph())
 			mapParagraphs[oClass.Get_Paragraph().Get_Id()] = oClass.Get_Paragraph();
 	}
 
@@ -761,7 +761,7 @@ CWordCollaborativeEditing.prototype.Undo = function()
 		var oDocumentContent = mapDocumentContents[sId];
 		if (oDocumentContent.Content.length <= 0)
 		{
-			var oNewParagraph = new Paragraph(oLogicDocument.Get_DrawingDocument(), oDocumentContent, 0, 0, 0, 0, 0, false);
+			var oNewParagraph = new AscCommonWord.Paragraph(oLogicDocument.Get_DrawingDocument(), oDocumentContent, 0, 0, 0, 0, 0, false);
 			oDocumentContent.Add_ToContent(0, oNewParagraph);
 		}
 	}
