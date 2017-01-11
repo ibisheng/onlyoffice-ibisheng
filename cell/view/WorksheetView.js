@@ -12467,7 +12467,7 @@
         var _changeSelectionFromCellToColumn = function () {
             if (tableParts && tableParts.length && activeRange.isOneCell()) {
                 for (var i = 0; i < tableParts.length; i++) {
-                    if (tableParts[i].Ref.containsFirstLineRange(activeRange)) {
+                    if (tableParts[i].HeaderRowCount !== 0 && tableParts[i].Ref.containsRange(activeRange) && tableParts[i].Ref.r1 === activeRange.r1) {
                         var newActiveRange = new Asc.Range(activeRange.c1, activeRange.r1, activeRange.c1, tableParts[i].Ref.r2);
                         if (!activeRange.isEqual(newActiveRange)) {
                             t.setSelectionUndoRedo(newActiveRange);
