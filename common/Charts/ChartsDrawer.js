@@ -10974,9 +10974,7 @@ drawSurfaceChart.prototype =
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		this.paths = {};
 		
-		console.time("asd");
 		this._recalculate();
-		console.timeEnd("asd");
 	},
 	
 	draw: function(chartsDrawer)
@@ -11459,7 +11457,7 @@ drawSurfaceChart.prototype =
 				var p1 = clearIntersectionPoints[0];
 				var p2 = clearIntersectionPoints[1];
 				
-				res = [p1, p2]/*t._calculatePath(p1.x, p1.y, p2.x, p2.y)*/;
+				res = [p1, p2];
 			}
 		}
 		else if(segmentIntersectionPoints.length && clearIntersectionPoints.length)
@@ -11589,13 +11587,9 @@ drawSurfaceChart.prototype =
 			{
 				var seria = this.chartProp.series[i-1] ? this.chartProp.series[i-1] : this.chartProp.series[0];
 				var pt = seria.val.numRef.numCache.pts[0];
-				//var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
-				//var pen = null;
-				var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
-				var brush = base_fills[i];
 				
-				//pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
-				pen = null;
+				var brush = base_fills[i];
+				//pen = null;
 				
 				var props = this.cChartSpace.getParentObjects();
 				var duplicateBrush = brush;
@@ -11605,8 +11599,8 @@ drawSurfaceChart.prototype =
 				duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
 				
 				brush = duplicateBrush;
+				var pen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0.13);
 				
-
 				this.cChartDrawer.drawPath(this.paths.test2[i][j], pen, brush);
 			}
 		}
