@@ -3000,8 +3000,8 @@
 							}
 							//write formulas history before filter history
 							worksheet.handlers.trigger("changeColumnTablePart", filter.DisplayName);
-							for (var i = 0; i < toHistory.length; ++i) {
-								this._addHistoryObj.apply(this, toHistory[i]);
+							for (var k = 0; k < toHistory.length; ++k) {
+								this._addHistoryObj.apply(this, toHistory[k]);
 							}
 						}
 						else
