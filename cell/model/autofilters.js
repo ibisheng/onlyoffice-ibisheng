@@ -1564,7 +1564,7 @@
 						{
 							oldFilter = filter.clone(null);
 							
-							if(bTablePart && activeRange.r1 <= ref.r2 && activeRange.r2 >= ref.r2)
+							if(diff < 0 && bTablePart && activeRange.r1 <= ref.r2 && activeRange.r2 >= ref.r2)
 							{
 								filter.TotalsRowCount = null;
 							}
