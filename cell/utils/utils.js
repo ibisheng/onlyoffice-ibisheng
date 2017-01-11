@@ -2132,6 +2132,17 @@
 		};
 		var g_oCacheMeasureEmpty = new CCacheMeasureEmpty();
 
+		function asc_CFormatCellsInfo() {
+			this.type = 1;
+			this.decimalPlaces = 2;
+			this.separator = false;
+			this.symbol = false;
+		}
+		asc_CFormatCellsInfo.prototype.asc_setType = function (val) {this.type = val;};
+		asc_CFormatCellsInfo.prototype.asc_setDecimalPlaces = function (val) {this.decimalPlaces = val;};
+		asc_CFormatCellsInfo.prototype.asc_setSeparator = function (val) {this.separator = val;};
+		asc_CFormatCellsInfo.prototype.asc_setSymbol = function (val) {this.symbol = val;};
+
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
@@ -2301,4 +2312,11 @@
 		prot["asc_getType"] = prot.asc_getType;
 
 		window["AscCommonExcel"].g_oCacheMeasureEmpty = g_oCacheMeasureEmpty;
+
+		window["Asc"].asc_CFormatCellsInfo = asc_CFormatCellsInfo;
+		prot = asc_CCompleteMenu.prototype;
+		prot["asc_setType"] = prot.asc_setType;
+		prot["asc_setDecimalPlaces"] = prot.asc_setDecimalPlaces;
+		prot["asc_setSeparator"] = prot.asc_setSeparator;
+		prot["asc_setSymbol"] = prot.asc_setSymbol;
 })(window);

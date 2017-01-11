@@ -236,6 +236,15 @@ var editor;
     }
     return res;
   };
+	spreadsheet_api.prototype.asc_getLocaleExample2 = function (format, value, culture) {
+		var cultureInfo = AscCommon.g_aCultureInfos[culture] || AscCommon.g_oDefaultCultureInfo;
+		var numFormat = AscCommon.oNumFormatCache.get(format);
+		value = (null == value) ? this.wb.getSelectionInfo().asc_getFormula() : value;
+		return numFormat.formatToChart(value, cultureInfo);
+	};
+	spreadsheet_api.prototype.asc_getFormatCells = function (info) {
+
+	};
   spreadsheet_api.prototype.asc_getLocaleCurrency = function(val) {
     var cultureInfo = AscCommon.g_aCultureInfos[val];
     if (!cultureInfo) {
@@ -3246,6 +3255,8 @@ var editor;
   prot["asc_GetFontThumbnailsPath"] = prot.asc_GetFontThumbnailsPath;
   prot["asc_setDocInfo"] = prot.asc_setDocInfo;
   prot["asc_getLocaleExample"] = prot.asc_getLocaleExample;
+	prot['asc_getLocaleExample2'] = prot.asc_getLocaleExample2;
+	prot['asc_getFormatCells'] = prot.asc_getFormatCells;
   prot["asc_getLocaleCurrency"] = prot.asc_getLocaleCurrency;
   prot["asc_setLocale"] = prot.asc_setLocale;
   prot["asc_getEditorPermissions"] = prot.asc_getEditorPermissions;
