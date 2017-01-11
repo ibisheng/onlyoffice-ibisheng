@@ -173,6 +173,10 @@ CFootEndnote.prototype.GetPositionInfo = function()
 {
 	return this.PositionInfo;
 };
+CFootEndnote.prototype.OnFastRecalculate = function()
+{
+	this.NeedUpdateHint = true;
+};
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

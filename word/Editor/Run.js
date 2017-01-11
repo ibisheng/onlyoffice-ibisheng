@@ -409,6 +409,7 @@ ParaRun.prototype.Add = function(Item, bMath)
 				var NewRun = this.private_SplitRunInCurPos();
 				if (NewRun)
 				{
+					NewRun.Set_VertAlign(undefined);
 					NewRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
 					NewRun.Cursor_MoveToStartPos();
 					NewRun.Add(Item, bMath);
@@ -2458,14 +2459,17 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     if (para_ContinuationSeparator === ItemType)
                         Item.Update_Width(PRS);
 
-					if (para_FootnoteReference === ItemType)
+                    if (true !== PRS.IsFastRecalculate())
 					{
-						Item.UpdateNumber(PRS);
-						PRS.AddFootnoteReference(Item, PRS.GetCurrentContentPos(Pos));
-					}
-					else if (para_FootnoteRef === ItemType)
-					{
-						Item.UpdateNumber(PRS.TopDocument);
+						if (para_FootnoteReference === ItemType)
+						{
+							Item.UpdateNumber(PRS);
+							PRS.AddFootnoteReference(Item, PRS.GetCurrentContentPos(Pos));
+						}
+						else if (para_FootnoteRef === ItemType)
+						{
+							Item.UpdateNumber(PRS.TopDocument);
+						}
 					}
 
                     // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.

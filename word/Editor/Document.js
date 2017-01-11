@@ -1853,6 +1853,14 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
                 this.DrawingDocument.OnEndRecalculate(false, true);
                 History.Reset_RecalcIndex();
                 this.private_UpdateCursorXY(true, true);
+
+                if (Para.Parent && Para.Parent.Get_TopDocumentContent)
+				{
+					var oTopDocument = Para.Parent.Get_TopDocumentContent();
+					if (oTopDocument instanceof CFootEndnote)
+						oTopDocument.OnFastRecalculate();
+				}
+
                 return;
             }
         }
@@ -1883,7 +1891,15 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
                 this.DrawingDocument.OnEndRecalculate(false, true);
                 History.Reset_RecalcIndex();
                 this.private_UpdateCursorXY(true, true);
-                return;
+
+                if (SimplePara.Parent && SimplePara.Parent.Get_TopDocumentContent)
+				{
+					var oTopDocument = SimplePara.Parent.Get_TopDocumentContent();
+					if (oTopDocument instanceof CFootEndnote)
+						oTopDocument.OnFastRecalculate();
+				}
+
+				return;
             }
         }
     }
