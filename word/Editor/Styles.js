@@ -7748,6 +7748,9 @@ CTextPr.prototype =
         if (this.Vanish !== TextPr.Vanish)
             return false;
 
+		if (!IsEqualStyleObjects(this.Shd, TextPr.Shd))
+			return false;
+
         return true;
     },
 
