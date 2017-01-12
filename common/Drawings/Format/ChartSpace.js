@@ -5008,10 +5008,14 @@ CChartSpace.prototype.recalculateAxis = function()
                     }
                     if(pts_len > string_pts.length)
                     {
-                        for(i = 0; i < pts_len; ++i)
+                        for(i = string_pts.length; i < pts_len; ++i)
                         {
                             string_pts.push({val:i+1 + ""});
                         }
+                    }
+                    else
+                    {
+                        string_pts.splice(pts_len, string_pts.length - pts_len);
                     }
                 }
                 /*---------------------расчет позиции блока с подписями вертикальной оси-----------------------------------------------------------------------------*/
