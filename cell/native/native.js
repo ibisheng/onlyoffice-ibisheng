@@ -4026,7 +4026,7 @@ function OfflineEditor () {
             asc_WriteUsers(users, stream);
             window["native"]["OnCallMenuEvent"](20101, stream); // ASC_COAUTH_EVENT_TYPE_PARTICIPANTS_CHANGED
         });
-     
+        
         _api.asc_registerCallback("asc_onParticipantsChanged", function(users) {
                                   var stream = global_memory_stream_menu;
                                   stream["ClearNoAttack"]();
@@ -4036,6 +4036,21 @@ function OfflineEditor () {
         
         _api.asc_registerCallback("asc_onSheetsChanged", function () {
                                   t.asc_WriteAllWorksheets(true, true);
+                                  });
+        
+        _api.asc_registerCallback("asc_onWorkbookLocked", function(locked) {
+                                  var stream = global_memory_stream_menu;
+                                  stream["ClearNoAttack"]();
+                                  stream["WriteBool"](locked);
+                                  window["native"]["OnCallMenuEvent"](20104, stream); // ASC_COAUTH_EVENT_TYPE_WORKBOOK_LOCKED
+                                  });
+        
+        _api.asc_registerCallback("asc_onWorksheetLocked", function(index, locked) {
+                                  var stream = global_memory_stream_menu;
+                                  stream["ClearNoAttack"]();
+                                  stream["WriteLong"](index);
+                                  stream["WriteBool"](locked);
+                                  window["native"]["OnCallMenuEvent"](20105, stream); // ASC_COAUTH_EVENT_TYPE_WORKSHEET_LOCKED
                                   });
         
         _api.asc_registerCallback("asc_onGetEditorPermissions", function(state) {
