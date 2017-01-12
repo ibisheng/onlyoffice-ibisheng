@@ -25587,6 +25587,11 @@ CView3d.prototype =
         History.Add(this, {Type: AscDFH.historyitem_View3d_SetRAngAx, oldPr: this.rAngAx, newPr: pr});
         this.rAngAx = pr;
     },
+
+    getRAngAx: function(){
+        return this.rAngAx !== false;
+    },
+
     setRotX: function(pr)
     {
         History.Add(this, {Type: AscDFH.historyitem_View3d_SetRotX, oldPr: this.rotX, newPr: pr});

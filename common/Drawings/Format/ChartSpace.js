@@ -7953,14 +7953,10 @@ CChartSpace.prototype.recalculateLegend = function()
             distance_to_text = marker_size*0.8;
         }
         var left_inset = marker_size + 3*distance_to_text;
-        var legend_pos;
+        var legend_pos = c_oAscChartLegendShowSettings.right;
         if(AscFormat.isRealNumber(legend.legendPos))
         {
             legend_pos = legend.legendPos;
-        }
-        else if(!isRealObject(legend.layout))
-        {
-            legend_pos = c_oAscChartLegendShowSettings.bottom;
         }
         var legend_width, legend_height;
         var fFixedWidth = null, fFixedHeight = null;
