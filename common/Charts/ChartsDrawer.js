@@ -1958,7 +1958,7 @@ CChartsDrawer.prototype =
 		else
 			this.calcProp.scale = this._roundValues(this._getAxisData2(false, this.calcProp.min, this.calcProp.max, chartProp));	
 		
-		if(this.calcProp.scale && this.calcProp.scale.length > 2)
+		if(this.calcProp.scale && this.calcProp.scale.length >= 2)
 		{
 			this.calcProp.axisStep = Math.abs(this.calcProp.scale[1] - this.calcProp.scale[0]);
 		}
@@ -11162,10 +11162,51 @@ drawSurfaceChart.prototype =
 				var pointsValue2 = [p2, p1, p21];
 			}
 			
+			//для поверхностных диаграмм без заливки
+			var bIsWireframeChart = false;
 			
 			//находим пересечение двух сегментов с плоскостями сетки
-			var pointsFace1 = this._getIntersectionPlanesAndLines(lines1, pointsValue1, true);
-			var pointsFace2 = this._getIntersectionPlanesAndLines(lines2, pointsValue2, true);
+			var pointsFace1 = this._getIntersectionPlanesAndLines(lines1, pointsValue1, !bIsWireframeChart);
+			var pointsFace2 = this._getIntersectionPlanesAndLines(lines2, pointsValue2, !bIsWireframeChart);
+			
+			if(bIsWireframeChart)
+			{
+				var lengthFaces = Math.max(pointsFace1.length, pointsFace2.length);
+				for(var l = 0; l < lengthFaces; l++)
+				{
+					var newPath = null;
+					if(pointsFace1[l] && pointsFace2[l])
+					{	
+						var cleanPoints1 = this._getArrayWithoutRepeatePoints(pointsFace1[l]);
+						var cleanPoints2 = this._getArrayWithoutRepeatePoints(pointsFace2[l]);
+						
+						if(cleanPoints1.length >= 3 && cleanPoints2.length >= 3)
+						{
+							newPath = cleanPoints1.concat(cleanPoints2);
+						}
+					}
+					else if(pointsFace1[l])
+					{
+						newPath = pointsFace1[l];
+					}
+					else if(pointsFace2[l])
+					{
+						newPath = pointsFace2[l];
+					}
+					
+					
+					if(newPath)
+					{
+						if(!t.paths.test2[l])
+						{
+							t.paths.test2[l] = [];
+						}
+						
+						var path2 = t._calculateTempFace(newPath);
+						t.paths.test2[l].push(path2);
+					}
+				}
+			}
 			
 			//TODO временно убираю. если будут проблемы в отрисовке - раскомментировать!
 			/*var lengthFaces = Math.max(pointsFace1.length, pointsFace2.length);
@@ -11508,6 +11549,21 @@ drawSurfaceChart.prototype =
 		}
 		
 		return res;
+	},
+	
+	_getArrayWithoutRepeatePoints: function(arr)
+	{
+		var newArray = [];
+		
+		for(var i = 0; i < arr.length; i++)
+		{
+			if(null === this._isEqualPoints(newArray, arr[i]))
+			{
+				newArray.push(arr[i]);
+			}
+		}
+		
+		return newArray;
 	},
 	
 	_calculateTempFace: function(points)
