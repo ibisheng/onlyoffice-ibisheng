@@ -856,19 +856,18 @@ Fill.prototype =
 		}
 	}
 };
-var g_oBorderPropProperties = {
-		s: 0,
-		c: 1
+	var g_oBorderPropProperties = {
+		s: 0, c: 1
 	};
-function BorderProp()
-{
-	this.Properties = g_oBorderPropProperties;
-	this.s = c_oAscBorderStyles.None;
-	this.w = c_oAscBorderWidth.None;
-	this.c = g_oColorManager.getThemeColor(1);
-}
-BorderProp.prototype = {
-	setStyle : function (style) {
+
+	function BorderProp() {
+		this.Properties = g_oBorderPropProperties;
+		this.s = c_oAscBorderStyles.None;
+		this.w = c_oAscBorderWidth.None;
+		this.c = g_oColorManager.getThemeColor(1);
+	}
+
+	BorderProp.prototype.setStyle = function (style) {
 		this.s = style;
 		switch (this.s) {
 			case c_oAscBorderStyles.Thin:
@@ -894,63 +893,94 @@ BorderProp.prototype = {
 				this.w = c_oAscBorderWidth.None;
 				break;
 		}
-	},
-	getRgbOrNull : function()
-	{
+	};
+	BorderProp.prototype.getDashSegments = function () {
+		var res;
+		switch (this.s) {
+			case c_oAscBorderStyles.Hair:
+				res = [1, 1];
+				break;
+			case c_oAscBorderStyles.Dotted:
+				res = [2, 2];
+				break;
+			case c_oAscBorderStyles.DashDotDot:
+			case c_oAscBorderStyles.MediumDashDotDot:
+				res = [3, 3, 3, 3, 9, 3];
+				break;
+			case c_oAscBorderStyles.DashDot:
+			case c_oAscBorderStyles.MediumDashDot:
+			case c_oAscBorderStyles.SlantDashDot:
+				res = [3, 3, 9, 3];
+				break;
+			case c_oAscBorderStyles.Dashed:
+				res = [3, 1];
+				break;
+			case c_oAscBorderStyles.MediumDashed:
+				res = [9, 3];
+				break;
+			case c_oAscBorderStyles.Thin:
+			case c_oAscBorderStyles.Medium:
+			case c_oAscBorderStyles.Thick:
+			case c_oAscBorderStyles.Double:
+			default:
+				res = [];
+				break;
+		}
+		return res;
+	};
+	BorderProp.prototype.getRgbOrNull = function () {
 		var nRes = null;
-		if(null != this.c)
+		if (null != this.c) {
 			nRes = this.c.getRgb();
+		}
 		return nRes;
-	},
-	isEmpty : function()
-	{
+	};
+	BorderProp.prototype.isEmpty = function () {
 		return c_oAscBorderStyles.None === this.s;
-	},
-	isEqual : function(val)
-	{
+	};
+	BorderProp.prototype.isEqual = function (val) {
 		return this.s === val.s && g_oColorManager.isEqual(this.c, val.c);
-	},
-	clone : function()
-	{
+	};
+	BorderProp.prototype.clone = function () {
 		var res = new BorderProp();
 		res.merge(this);
 		return res;
-	},
-	merge : function(oBorderProp)
-	{
-		if(null != oBorderProp.s && c_oAscBorderStyles.None !== oBorderProp.s)
-		{
+	};
+	BorderProp.prototype.merge = function (oBorderProp) {
+		if (null != oBorderProp.s && c_oAscBorderStyles.None !== oBorderProp.s) {
 			this.s = oBorderProp.s;
 			this.w = oBorderProp.w;
-			if(null != oBorderProp.c)
+			if (null != oBorderProp.c) {
 				this.c = oBorderProp.c;
+			}
 		}
-	},
-	getType : function()
-	{
+	};
+	BorderProp.prototype.getType = function () {
 		return UndoRedoDataTypes.StyleBorderProp;
-	},
-	getProperties : function()
-	{
+	};
+	BorderProp.prototype.getProperties = function () {
 		return this.Properties;
-	},
-	getProperty : function(nType)
-	{
-		switch(nType)
-		{
-			case this.Properties.s: return this.s;break;
-			case this.Properties.c: return this.c;break;
+	};
+	BorderProp.prototype.getProperty = function (nType) {
+		switch (nType) {
+			case this.Properties.s:
+				return this.s;
+				break;
+			case this.Properties.c:
+				return this.c;
+				break;
 		}
-	},
-	setProperty : function(nType, value)
-	{
-		switch(nType)
-		{
-			case this.Properties.s: this.setStyle(value);break;
-			case this.Properties.c: this.c = value;break;
+	};
+	BorderProp.prototype.setProperty = function (nType, value) {
+		switch (nType) {
+			case this.Properties.s:
+				this.setStyle(value);
+				break;
+			case this.Properties.c:
+				this.c = value;
+				break;
 		}
-	}
-};
+	};
 var g_oBorderProperties = {
 		l: 0,
 		t: 1,

@@ -2933,233 +2933,252 @@
         }
     };
 
-    /** Рисует рамки для ячеек */
-    WorksheetView.prototype._drawCellsBorders = function ( drawingCtx, range, offsetX, offsetY, mergedCells ) {
-        //TODO: использовать стили линий при рисовании границ
-        var t = this;
-        var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
-        var c = this.cols;
-        var r = this.rows;
+	/** Рисует рамки для ячеек */
+	WorksheetView.prototype._drawCellsBorders = function (drawingCtx, range, offsetX, offsetY, mergedCells) {
+		//TODO: использовать стили линий при рисовании границ
+		var t = this;
+		var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
+		var c = this.cols;
+		var r = this.rows;
 
-        var objectMergedCells = {}; // Двумерный map вида строка-колонка {1: {1: range, 4: range}}
-        var i, mergeCellInfo, startCol, endRow, endCol, col, row;
-        for ( i in mergedCells ) {
-            mergeCellInfo = mergedCells[i];
-            startCol = Math.max( range.c1, mergeCellInfo.c1 );
-            endRow = Math.min( mergeCellInfo.r2, range.r2, this.nRowsCount );
-            endCol = Math.min( mergeCellInfo.c2, range.c2, this.nColsCount );
-            for ( row = Math.max( range.r1, mergeCellInfo.r1 ); row <= endRow; ++row ) {
-                if ( !objectMergedCells.hasOwnProperty( row ) ) {
-                    objectMergedCells[row] = {};
-                }
-                for ( col = startCol; col <= endCol; ++col )
-                    objectMergedCells[row][col] = mergeCellInfo;
-            }
-        }
+		var objectMergedCells = {}; // Двумерный map вида строка-колонка {1: {1: range, 4: range}}
+		var i, mergeCellInfo, startCol, endRow, endCol, col, row;
+		for (i in mergedCells) {
+			mergeCellInfo = mergedCells[i];
+			startCol = Math.max(range.c1, mergeCellInfo.c1);
+			endRow = Math.min(mergeCellInfo.r2, range.r2, this.nRowsCount);
+			endCol = Math.min(mergeCellInfo.c2, range.c2, this.nColsCount);
+			for (row = Math.max(range.r1, mergeCellInfo.r1); row <= endRow; ++row) {
+				if (!objectMergedCells.hasOwnProperty(row)) {
+					objectMergedCells[row] = {};
+				}
+				for (col = startCol; col <= endCol; ++col) {
+					objectMergedCells[row][col] = mergeCellInfo;
+				}
+			}
+		}
 
-        var bc = null, bw = -1, isNotFirst = false; // cached border color
+		var bc = null, bs = c_oAscBorderStyles.None, isNotFirst = false; // cached border color
 
-        function drawBorder( type, border, x1, y1, x2, y2 ) {
-            var isStroke = false, isNewColor = !AscCommonExcel.g_oColorManager.isEqual( bc, border.c ), isNewWidth = bw !== border.w;
-            if ( isNotFirst && (isNewColor || isNewWidth) ) {
-                ctx.stroke();
-                isStroke = true;
-            }
+		function drawBorder(type, border, x1, y1, x2, y2) {
+			var isStroke = false, isNewColor = !AscCommonExcel.g_oColorManager.isEqual(bc,
+				border.c), isNewStyle = bs !== border.s;
+			if (isNotFirst && (isNewColor || isNewStyle)) {
+				ctx.stroke();
+				isStroke = true;
+			}
 
-            if ( isNewColor ) {
-                bc = border.c;
-                ctx.setStrokeStyle( bc );
-            }
-            if ( isNewWidth ) {
-                bw = border.w;
-                ctx.setLineWidth( border.w );
-            }
+			if (isNewColor) {
+				bc = border.c;
+				ctx.setStrokeStyle(bc);
+			}
+			if (isNewStyle) {
+				bs = border.s;
+				ctx.setLineWidth(border.w);
+				ctx.setLineDash(border.getDashSegments());
+			}
 
-            if ( isStroke || false === isNotFirst ) {
-                isNotFirst = true;
-                ctx.beginPath();
-            }
+			if (isStroke || false === isNotFirst) {
+				isNotFirst = true;
+				ctx.beginPath();
+			}
 
-            switch ( type ) {
-                case c_oAscBorderType.Hor:
-                    ctx.lineHor( x1, y1, x2 );
-                    break;
-                case c_oAscBorderType.Ver:
-                    ctx.lineVer( x1, y1, y2 );
-                    break;
-                case c_oAscBorderType.Diag:
-                    ctx.lineDiag( x1, y1, x2, y2 );
-                    break;
-            }
-        }
+			switch (type) {
+				case c_oAscBorderType.Hor:
+					ctx.lineHor(x1, y1, x2);
+					break;
+				case c_oAscBorderType.Ver:
+					ctx.lineVer(x1, y1, y2);
+					break;
+				case c_oAscBorderType.Diag:
+					ctx.lineDiag(x1, y1, x2, y2);
+					break;
+			}
+		}
 
-        function drawVerticalBorder( borderLeftObject, borderRightObject, x, y1, y2 ) {
-            var border, borderLeft = borderLeftObject ? borderLeftObject.borders : null, borderRight = borderRightObject ? borderRightObject.borders : null;
+		function drawVerticalBorder(borderLeftObject, borderRightObject, x, y1, y2) {
+			var border, borderLeft = borderLeftObject ? borderLeftObject.borders :
+				null, borderRight = borderRightObject ? borderRightObject.borders : null;
 
-            if ( borderLeft && borderLeft.r.w ) {
-                border = borderLeft.r;
-            }
-            else if ( borderRight && borderRight.l.w ) {
-                border = borderRight.l;
-            }
-            if ( !border || border.w < 1 ) {
-                return;
-            }
+			if (borderLeft && borderLeft.r.w) {
+				border = borderLeft.r;
+			} else if (borderRight && borderRight.l.w) {
+				border = borderRight.l;
+			}
+			if (!border || border.w < 1) {
+				return;
+			}
 
-            // ToDo переделать рассчет
-            var tbw = t._calcMaxBorderWidth( borderLeftObject && borderLeftObject.getTopBorder(), borderRightObject && borderRightObject.getTopBorder() ); // top border width
-            var bbw = t._calcMaxBorderWidth( borderLeftObject && borderLeftObject.getBottomBorder(), borderRightObject && borderRightObject.getBottomBorder() ); // bottom border width
-            var dy1 = tbw > border.w ? tbw - 1 : (tbw > 1 ? -1 : 0);
-            var dy2 = bbw > border.w ? -2 : (bbw > 2 ? 1 : 0);
+			// ToDo переделать рассчет
+			var tbw = t._calcMaxBorderWidth(borderLeftObject && borderLeftObject.getTopBorder(),
+				borderRightObject && borderRightObject.getTopBorder()); // top border width
+			var bbw = t._calcMaxBorderWidth(borderLeftObject && borderLeftObject.getBottomBorder(),
+				borderRightObject && borderRightObject.getBottomBorder()); // bottom border width
+			var dy1 = tbw > border.w ? tbw - 1 : (tbw > 1 ? -1 : 0);
+			var dy2 = bbw > border.w ? -2 : (bbw > 2 ? 1 : 0);
 
-            drawBorder( c_oAscBorderType.Ver, border, x, y1 + (-1 + dy1) * t.height_1px, x, y2 + (1 + dy2) * t.height_1px );
-        }
+			drawBorder(c_oAscBorderType.Ver, border, x, y1 + (-1 + dy1) * t.height_1px, x,
+				y2 + (1 + dy2) * t.height_1px);
+		}
 
-        function drawHorizontalBorder( borderTopObject, borderBottomObject, x1, y, x2 ) {
-            var border, borderTop = borderTopObject ? borderTopObject.borders : null, borderBottom = borderBottomObject ? borderBottomObject.borders : null;
+		function drawHorizontalBorder(borderTopObject, borderBottomObject, x1, y, x2) {
+			var border, borderTop = borderTopObject ? borderTopObject.borders :
+				null, borderBottom = borderBottomObject ? borderBottomObject.borders : null;
 
-            if ( borderTop && borderTop.b.w ) {
-                border = borderTop.b;
-            }
-            else if ( borderBottom && borderBottom.t.w ) {
-                border = borderBottom.t;
-            }
+			if (borderTop && borderTop.b.w) {
+				border = borderTop.b;
+			} else if (borderBottom && borderBottom.t.w) {
+				border = borderBottom.t;
+			}
 
-            if ( border && border.w > 0 ) {
-                // ToDo переделать рассчет
-                var lbw = t._calcMaxBorderWidth( borderTopObject && borderTopObject.getLeftBorder(), borderBottomObject && borderBottomObject.getLeftBorder() );
-                var rbw = t._calcMaxBorderWidth( borderTopObject && borderTopObject.getRightBorder(), borderTopObject && borderTopObject.getRightBorder() );
-                var dx1 = border.w > lbw ? (lbw > 1 ? -1 : 0) : (lbw > 2 ? 2 : 1);
-                var dx2 = border.w > rbw ? (rbw > 2 ? 1 : 0) : (rbw > 1 ? -2 : -1);
-                drawBorder( c_oAscBorderType.Hor, border, x1 + (-1 + dx1) * t.width_1px, y, x2 + (1 + dx2) * t.width_1px, y );
-            }
-        }
+			if (border && border.w > 0) {
+				// ToDo переделать рассчет
+				var lbw = t._calcMaxBorderWidth(borderTopObject && borderTopObject.getLeftBorder(),
+					borderBottomObject && borderBottomObject.getLeftBorder());
+				var rbw = t._calcMaxBorderWidth(borderTopObject && borderTopObject.getRightBorder(),
+					borderTopObject && borderTopObject.getRightBorder());
+				var dx1 = border.w > lbw ? (lbw > 1 ? -1 : 0) : (lbw > 2 ? 2 : 1);
+				var dx2 = border.w > rbw ? (rbw > 2 ? 1 : 0) : (rbw > 1 ? -2 : -1);
+				drawBorder(c_oAscBorderType.Hor, border, x1 + (-1 + dx1) * t.width_1px, y, x2 + (1 + dx2) * t.width_1px,
+					y);
+			}
+		}
 
-        var arrPrevRow = [], arrCurrRow = [], arrNextRow = [];
-        var objMCPrevRow = null, objMCRow = null, objMCNextRow = null;
-        var bCur, bPrev, bNext, bTopCur, bTopPrev, bTopNext, bBotCur, bBotPrev, bBotNext;
-        bCur = bPrev = bNext = bTopCur = bTopNext = bBotCur = bBotNext = null;
-        row = range.r1 - 1;
-        var prevCol = range.c1 - 1;
-        // Определим первую колонку (т.к. могут быть скрытые колонки)
-        while ( 0 <= prevCol && c[prevCol].width < t.width_1px )
-            --prevCol;
+		var arrPrevRow = [], arrCurrRow = [], arrNextRow = [];
+		var objMCPrevRow = null, objMCRow = null, objMCNextRow = null;
+		var bCur, bPrev, bNext, bTopCur, bTopPrev, bTopNext, bBotCur, bBotPrev, bBotNext;
+		bCur = bPrev = bNext = bTopCur = bTopNext = bBotCur = bBotNext = null;
+		row = range.r1 - 1;
+		var prevCol = range.c1 - 1;
+		// Определим первую колонку (т.к. могут быть скрытые колонки)
+		while (0 <= prevCol && c[prevCol].width < t.width_1px)
+			--prevCol;
 
-        // Сначала пройдемся по верхней строке (над отрисовываемым диапазоном)
-        while ( 0 <= row ) {
-            if ( r[row].height >= t.height_1px ) {
-                objMCPrevRow = objectMergedCells[row];
-                for ( col = prevCol; col <= range.c2 && col < t.nColsCount; ++col ) {
-                    if ( 0 > col || c[col].width < t.width_1px ) {
-                        continue;
-                    }
-                    arrPrevRow[col] = new CellBorderObject( t._getVisibleCell( col, row ).getBorder(), objMCPrevRow ? objMCPrevRow[col] : null, col, row );
-                }
-                break;
-            }
-            --row;
-        }
+		// Сначала пройдемся по верхней строке (над отрисовываемым диапазоном)
+		while (0 <= row) {
+			if (r[row].height >= t.height_1px) {
+				objMCPrevRow = objectMergedCells[row];
+				for (col = prevCol; col <= range.c2 && col < t.nColsCount; ++col) {
+					if (0 > col || c[col].width < t.width_1px) {
+						continue;
+					}
+					arrPrevRow[col] =
+						new CellBorderObject(t._getVisibleCell(col, row).getBorder(), objMCPrevRow ? objMCPrevRow[col] :
+							null, col, row);
+				}
+				break;
+			}
+			--row;
+		}
 
-        var mc = null, nextRow, isFirstRow = true;
-        var isPrevColExist = (0 <= prevCol);
-        for ( row = range.r1; row <= range.r2 && row < t.nRowsCount; row = nextRow ) {
-            nextRow = row + 1;
-            if ( r[row].height < t.height_1px ) {
-                continue;
-            }
-            // Нужно отсеять пустые снизу
-            for ( ; nextRow <= range.r2 && nextRow < t.nRowsCount; ++nextRow )
-                if ( r[nextRow].height >= t.height_1px ) {
-                    break;
-                }
+		var mc = null, nextRow, isFirstRow = true;
+		var isPrevColExist = (0 <= prevCol);
+		for (row = range.r1; row <= range.r2 && row < t.nRowsCount; row = nextRow) {
+			nextRow = row + 1;
+			if (r[row].height < t.height_1px) {
+				continue;
+			}
+			// Нужно отсеять пустые снизу
+			for (; nextRow <= range.r2 && nextRow < t.nRowsCount; ++nextRow) {
+				if (r[nextRow].height >= t.height_1px) {
+					break;
+				}
+			}
 
-            var isFirstRowTmp = isFirstRow, isLastRow = nextRow > range.r2 || nextRow >= t.nRowsCount;
-            isFirstRow = false; // Это уже не первая строка (определяем не по совпадению с range.r1, а по видимости)
+			var isFirstRowTmp = isFirstRow, isLastRow = nextRow > range.r2 || nextRow >= t.nRowsCount;
+			isFirstRow = false; // Это уже не первая строка (определяем не по совпадению с range.r1, а по видимости)
 
-            objMCRow = isFirstRowTmp ? objectMergedCells[row] : objMCNextRow;
-            objMCNextRow = objectMergedCells[nextRow];
+			objMCRow = isFirstRowTmp ? objectMergedCells[row] : objMCNextRow;
+			objMCNextRow = objectMergedCells[nextRow];
 
-            var rowCache = t._fetchRowCache( row );
-            var y1 = r[row].top - offsetY;
-            var y2 = y1 + r[row].height - t.height_1px;
+			var rowCache = t._fetchRowCache(row);
+			var y1 = r[row].top - offsetY;
+			var y2 = y1 + r[row].height - t.height_1px;
 
-            var nextCol, isFirstCol = true;
-            for ( col = range.c1; col <= range.c2 && col < t.nColsCount; col = nextCol ) {
-                nextCol = col + 1;
-                if ( c[col].width < t.width_1px ) {
-                    continue;
-                }
-                // Нужно отсеять пустые справа
-                for ( ; nextCol <= range.c2 && nextCol < t.nColsCount; ++nextCol )
-                    if ( c[nextCol].width >= t.width_1px ) {
-                        break;
-                    }
+			var nextCol, isFirstCol = true;
+			for (col = range.c1; col <= range.c2 && col < t.nColsCount; col = nextCol) {
+				nextCol = col + 1;
+				if (c[col].width < t.width_1px) {
+					continue;
+				}
+				// Нужно отсеять пустые справа
+				for (; nextCol <= range.c2 && nextCol < t.nColsCount; ++nextCol) {
+					if (c[nextCol].width >= t.width_1px) {
+						break;
+					}
+				}
 
-                var isFirstColTmp = isFirstCol, isLastCol = nextCol > range.c2 || nextCol >= t.nColsCount;
-                isFirstCol = false; // Это уже не первая колонка (определяем не по совпадению с range.c1, а по видимости)
+				var isFirstColTmp = isFirstCol, isLastCol = nextCol > range.c2 || nextCol >= t.nColsCount;
+				isFirstCol = false; // Это уже не первая колонка (определяем не по совпадению с range.c1, а по видимости)
 
-                mc = objMCRow ? objMCRow[col] : null;
+				mc = objMCRow ? objMCRow[col] : null;
 
-                var x1 = c[col].left - offsetX;
-                var x2 = x1 + c[col].width - this.width_1px;
+				var x1 = c[col].left - offsetX;
+				var x2 = x1 + c[col].width - this.width_1px;
 
-                if ( row === t.nRowsCount ) {
-                    bBotPrev = bBotCur = bBotNext = null;
-                }
-                else {
-                    if ( isFirstColTmp ) {
-                        bBotPrev = arrNextRow[prevCol] = new CellBorderObject( isPrevColExist ? t._getVisibleCell( prevCol, nextRow ).getBorder() : null, objMCNextRow ? objMCNextRow[prevCol] : null, prevCol, nextRow );
-                        bBotCur = arrNextRow[col] = new CellBorderObject( t._getVisibleCell( col, nextRow ).getBorder(), objMCNextRow ? objMCNextRow[col] : null, col, nextRow );
-                    }
-                    else {
-                        bBotPrev = bBotCur;
-                        bBotCur = bBotNext;
-                    }
-                }
+				if (row === t.nRowsCount) {
+					bBotPrev = bBotCur = bBotNext = null;
+				} else {
+					if (isFirstColTmp) {
+						bBotPrev = arrNextRow[prevCol] =
+							new CellBorderObject(isPrevColExist ? t._getVisibleCell(prevCol, nextRow).getBorder() :
+								null, objMCNextRow ? objMCNextRow[prevCol] : null, prevCol, nextRow);
+						bBotCur = arrNextRow[col] =
+							new CellBorderObject(t._getVisibleCell(col, nextRow).getBorder(), objMCNextRow ?
+								objMCNextRow[col] : null, col, nextRow);
+					} else {
+						bBotPrev = bBotCur;
+						bBotCur = bBotNext;
+					}
+				}
 
-                if ( isFirstColTmp ) {
-                    bPrev = arrCurrRow[prevCol] = new CellBorderObject( isPrevColExist ? t._getVisibleCell( prevCol, row ).getBorder() : null, objMCRow ? objMCRow[prevCol] : null, prevCol, row );
-                    bCur = arrCurrRow[col] = new CellBorderObject( t._getVisibleCell( col, row ).getBorder(), mc, col, row );
-                    bTopPrev = arrPrevRow[prevCol];
-                    bTopCur = arrPrevRow[col];
-                }
-                else {
-                    bPrev = bCur;
-                    bCur = bNext;
-                    bTopPrev = bTopCur;
-                    bTopCur = bTopNext;
-                }
+				if (isFirstColTmp) {
+					bPrev = arrCurrRow[prevCol] =
+						new CellBorderObject(isPrevColExist ? t._getVisibleCell(prevCol, row).getBorder() :
+							null, objMCRow ? objMCRow[prevCol] : null, prevCol, row);
+					bCur =
+						arrCurrRow[col] = new CellBorderObject(t._getVisibleCell(col, row).getBorder(), mc, col, row);
+					bTopPrev = arrPrevRow[prevCol];
+					bTopCur = arrPrevRow[col];
+				} else {
+					bPrev = bCur;
+					bCur = bNext;
+					bTopPrev = bTopCur;
+					bTopCur = bTopNext;
+				}
 
-                if ( col === t.nColsCount ) {
-                    bNext = null;
-                    bTopNext = null;
-                }
-                else {
-                    bNext = arrCurrRow[nextCol] = new CellBorderObject( t._getVisibleCell( nextCol, row ).getBorder(), objMCRow ? objMCRow[nextCol] : null, nextCol, row );
-                    bTopNext = arrPrevRow[nextCol];
+				if (col === t.nColsCount) {
+					bNext = null;
+					bTopNext = null;
+				} else {
+					bNext = arrCurrRow[nextCol] =
+						new CellBorderObject(t._getVisibleCell(nextCol, row).getBorder(), objMCRow ? objMCRow[nextCol] :
+							null, nextCol, row);
+					bTopNext = arrPrevRow[nextCol];
 
-                    if ( row === t.nRowsCount ) {
-                        bBotNext = null;
-                    }
-                    else {
-                        bBotNext = arrNextRow[nextCol] = new CellBorderObject( t._getVisibleCell( nextCol, nextRow ).getBorder(), objMCNextRow ? objMCNextRow[nextCol] : null, nextCol, nextRow );
-                    }
-                }
+					if (row === t.nRowsCount) {
+						bBotNext = null;
+					} else {
+						bBotNext = arrNextRow[nextCol] =
+							new CellBorderObject(t._getVisibleCell(nextCol, nextRow).getBorder(), objMCNextRow ?
+								objMCNextRow[nextCol] : null, nextCol, nextRow);
+					}
+				}
 
-                if ( mc && row !== mc.r1 && row !== mc.r2 && col !== mc.c1 && col !== mc.c2 ) {
-                    continue;
-                }
+				if (mc && row !== mc.r1 && row !== mc.r2 && col !== mc.c1 && col !== mc.c2) {
+					continue;
+				}
 
-                // draw diagonal borders
-                if ( (bCur.borders.dd || bCur.borders.du) && (!mc || (row === mc.r1 && col === mc.c1)) ) {
-                    var x2Diagonal = x2;
-                    var y2Diagonal = y2;
-                    if ( mc ) {
-                        // Merge cells
-                        x2Diagonal = c[mc.c2].left + c[mc.c2].width - offsetX - t.width_1px;
-                        y2Diagonal = r[mc.r2].top + r[mc.r2].height - offsetY - t.height_1px;
-                    }
-                    // ToDo Clip diagonal borders
+				// draw diagonal borders
+				if ((bCur.borders.dd || bCur.borders.du) && (!mc || (row === mc.r1 && col === mc.c1))) {
+					var x2Diagonal = x2;
+					var y2Diagonal = y2;
+					if (mc) {
+						// Merge cells
+						x2Diagonal = c[mc.c2].left + c[mc.c2].width - offsetX - t.width_1px;
+						y2Diagonal = r[mc.r2].top + r[mc.r2].height - offsetY - t.height_1px;
+					}
+					// ToDo Clip diagonal borders
                     /*ctx.save()
                      .beginPath()
                      .rect(x1 + this.width_1px * (lb.w < 1 ? -1 : (lb.w < 3 ? 0 : +1)),
@@ -3168,58 +3187,60 @@
                      r[row].height + this.height_1px * ( -1 + (tb.w < 1 ? +1 : (tb.w < 3 ? 0 : -1)) + (bb.w < 1 ? +1 : (bb.w < 2 ? 0 : -1)) ))
                      .clip();
                      */
-                    if ( bCur.borders.dd ) {
-                        // draw diagonal line l,t - r,b
-                        drawBorder( c_oAscBorderType.Diag, bCur.borders.d, x1 - t.width_1px, y1 - t.height_1px, x2Diagonal, y2Diagonal );
-                    }
-                    if ( bCur.borders.du ) {
-                        // draw diagonal line l,b - r,t
-                        drawBorder( c_oAscBorderType.Diag, bCur.borders.d, x1 - t.width_1px, y2Diagonal, x2Diagonal, y1 - t.height_1px );
-                    }
-                    // ToDo Clip diagonal borders
-                    //ctx.restore();
-                    // canvas context has just been restored, so destroy border color cache
-                    //bc = undefined;
-                }
+					if (bCur.borders.dd) {
+						// draw diagonal line l,t - r,b
+						drawBorder(c_oAscBorderType.Diag, bCur.borders.d, x1 - t.width_1px, y1 - t.height_1px,
+							x2Diagonal, y2Diagonal);
+					}
+					if (bCur.borders.du) {
+						// draw diagonal line l,b - r,t
+						drawBorder(c_oAscBorderType.Diag, bCur.borders.d, x1 - t.width_1px, y2Diagonal, x2Diagonal,
+							y1 - t.height_1px);
+					}
+					// ToDo Clip diagonal borders
+					//ctx.restore();
+					// canvas context has just been restored, so destroy border color cache
+					//bc = undefined;
+				}
 
-                // draw left border
-                if ( isFirstColTmp && !t._isLeftBorderErased( col, rowCache ) ) {
-                    drawVerticalBorder( bPrev, bCur, x1 - t.width_1px, y1, y2 );
-                    // Если мы в печати и печатаем первый столбец, то нужно напечатать бордеры
+				// draw left border
+				if (isFirstColTmp && !t._isLeftBorderErased(col, rowCache)) {
+					drawVerticalBorder(bPrev, bCur, x1 - t.width_1px, y1, y2);
+					// Если мы в печати и печатаем первый столбец, то нужно напечатать бордеры
 //						if (lb.w >= 1 && drawingCtx && 0 === col) {
-                    // Иначе они будут не такой ширины
-                    // ToDo посмотреть что с этим ? в печати будет обрезка
+					// Иначе они будут не такой ширины
+					// ToDo посмотреть что с этим ? в печати будет обрезка
 //							drawVerticalBorder(lb, tb, tbPrev, bb, bbPrev, x1, y1, y2);
 //						}
-                }
-                // draw right border
-                if ( (!mc || col === mc.c2) && !t._isRightBorderErased( col, rowCache ) ) {
-                    drawVerticalBorder( bCur, bNext, x2, y1, y2 );
-                }
-                // draw top border
-                if ( isFirstRowTmp ) {
-                    drawHorizontalBorder( bTopCur, bCur, x1, y1 - t.height_1px, x2 );
-                    // Если мы в печати и печатаем первую строку, то нужно напечатать бордеры
+				}
+				// draw right border
+				if ((!mc || col === mc.c2) && !t._isRightBorderErased(col, rowCache)) {
+					drawVerticalBorder(bCur, bNext, x2, y1, y2);
+				}
+				// draw top border
+				if (isFirstRowTmp) {
+					drawHorizontalBorder(bTopCur, bCur, x1, y1 - t.height_1px, x2);
+					// Если мы в печати и печатаем первую строку, то нужно напечатать бордеры
 //						if (tb.w > 0 && drawingCtx && 0 === row) {
-                    // ToDo посмотреть что с этим ? в печати будет обрезка
+					// ToDo посмотреть что с этим ? в печати будет обрезка
 //							drawHorizontalBorder.call(this, tb, lb, lbPrev, rb, rbPrev, x1, y1, x2);
 //						}
-                }
-                if ( !mc || row === mc.r2 ) {
-                    // draw bottom border
-                    drawHorizontalBorder( bCur, bBotCur, x1, y2, x2 );
-                }
-            }
+				}
+				if (!mc || row === mc.r2) {
+					// draw bottom border
+					drawHorizontalBorder(bCur, bBotCur, x1, y2, x2);
+				}
+			}
 
-            arrPrevRow = arrCurrRow;
-            arrCurrRow = arrNextRow;
-            arrNextRow = [];
-        }
+			arrPrevRow = arrCurrRow;
+			arrCurrRow = arrNextRow;
+			arrNextRow = [];
+		}
 
-        if ( isNotFirst ) {
-            ctx.stroke();
-        }
-    };
+		if (isNotFirst) {
+			ctx.stroke();
+		}
+	};
 
     /** Рисует закрепленные области областей */
     WorksheetView.prototype._drawFrozenPane = function ( noCells ) {
