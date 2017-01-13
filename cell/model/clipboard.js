@@ -1737,7 +1737,7 @@
 			
 			_insertImagesFromBinaryWord: function(ws, data, aImagesSync)
 			{
-				var activeRange = ws.activeRange;
+				var activeRange = ws.model.selectionRange.getLast().clone();
 				var curCol, drawingObject, curRow, startCol = 0, startRow = 0, xfrm, drawingBase, graphicObject, offX, offY, rot;
 
 				History.Create_NewPoint();
@@ -1839,8 +1839,8 @@
 					AscFormat.CheckSpPrXfrm(drawingObject.graphicObject);
 					xfrm = drawingObject.graphicObject.spPr.xfrm;
 
-					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[addImagesFromWord[i].col].left - ws.getCellLeft(0, 1), 1, 3);
-					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[addImagesFromWord[i].row].top  - ws.getCellTop(0, 1), 1, 3);
+					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[addImagesFromWord[i].col + activeRange.c1].left - ws.getCellLeft(0, 1), 1, 3);
+					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[addImagesFromWord[i].row + activeRange.r1].top  - ws.getCellTop(0, 1), 1, 3);
 					
 					xfrm.setOffX(curCol);
 					xfrm.setOffY(curRow);
@@ -2404,7 +2404,6 @@
 
 			_getTableFromText: function (worksheet, sText)
 			{
-				var activeRange = worksheet.model.selectionRange.getLast().clone(true);
 				var t = this;
 				
 				var addTextIntoCell = function(row, col, text)
@@ -2417,8 +2416,8 @@
 				
 				var aResult = new excelPasteContent();
 				var width = 0;
-				var colCounter = activeRange.c1;
-				var rowCounter = activeRange.r1;
+				var colCounter = 0;
+				var rowCounter = 0;
 				var sCurChar = "";
 				for ( var i = 0, length = sText.length; i < length; i++ )
 				{
@@ -2426,9 +2425,9 @@
 					var Code = sText.charCodeAt(i);
 					var Item = null;
 					
-					if(colCounter - activeRange.c1 > width)
+					if(colCounter > width)
 					{
-						width = colCounter - activeRange.c1;
+						width = colCounter;
 					}
 					
 					if ( '\n' === Char )
@@ -2436,13 +2435,13 @@
 						if("" == sCurChar)
 						{
 							addTextIntoCell(rowCounter, colCounter, sCurChar);
-							colCounter = activeRange.c1;
+							colCounter = 0;
 							rowCounter++;
 						}
 						else
 						{
 							addTextIntoCell(rowCounter, colCounter, sCurChar);
-							colCounter = activeRange.c1;
+							colCounter = 0;
 							
 							rowCounter++;
 							sCurChar = "";
@@ -2608,7 +2607,6 @@
 			_paste : function(worksheet, pasteData)
 			{
 				var documentContent = pasteData.content;
-				var activeRange = worksheet.model.selectionRange.getLast().clone();
 				if(pasteData.images && pasteData.images.length)
 					this.isUsuallyPutImages = true;
 				
@@ -2617,7 +2615,7 @@
 				
 				var documentContentBounds = new DocumentContentBounds();
 				var coverDocument = documentContentBounds.getBounds(0,0, documentContent);
-				this._parseChildren(coverDocument, activeRange);
+				this._parseChildren(coverDocument);
 				
 				
 				this.aResult.props.fontsNew = this.fontsNew;
@@ -2629,7 +2627,7 @@
 				worksheet.setSelectionInfo('paste', this.aResult, this);
 			},
 			
-			_parseChildren: function(children, activeRange)
+			_parseChildren: function(children)
 			{
 				var childrens = children.children;
 				for(var i = 0; i < childrens.length; i++)
@@ -2661,7 +2659,7 @@
 								}	
 								
 								
-								var newCell = this.aResult.getCell(row + activeRange.r1, col + activeRange.c1)
+								var newCell = this.aResult.getCell(row, col)
 								newCell.rowSpan = rowSpan;
 								newCell.colSpan = colSpan;
 								
@@ -2684,14 +2682,14 @@
 						var colSpan = null;
 						var rowSpan = null;
 						
-						this._parseParagraph(childrens[i], activeRange, childrens[i].top + activeRange.r1, childrens[i].left + activeRange.c1);
+						this._parseParagraph(childrens[i], childrens[i].top, childrens[i].left);
 					}
 					else
-						this._parseChildren(childrens[i], activeRange);
+						this._parseChildren(childrens[i]);
 				}
 			},
 			
-			_parseParagraph: function(paragraph, activeRange, row, col, rowSpan, colSpan)
+			_parseParagraph: function(paragraph, row, col, rowSpan, colSpan)
 			{
 				var content = paragraph.elem.Content;
 				var row, cTextPr, fontFamily = "Arial";
@@ -2704,7 +2702,7 @@
 				{
 					if(aResult.content.length == 0)
 					{
-						row = activeRange.r1;
+						row = 0;
 					}
 					else
 						row = aResult.length;
@@ -2727,7 +2725,7 @@
 				};
 	
 				var s = 0;
-				var c1 = col !== undefined ? col : activeRange.c1;
+				var c1 = col !== undefined ? col : 0;
 				
 				//backgroundColor
 				var backgroundColor = this.getBackgroundColorTCell(paragraph);

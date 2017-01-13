@@ -8916,11 +8916,7 @@
 
         var arrFormula = [];
         var numFor = 0;
-        var rMax = pasteContent.content.length + pasteContent.props.rowSpanSpCount;
-        if (pasteContent.props.rowCount && pasteContent.props.rowCount !== 0 && pasteContent.props.isOneTable) {
-            rMax = pasteContent.props.rowCount + arn.r1;
-        }
-
+        var rMax = pasteContent.content.length + pasteContent.props.rowSpanSpCount + arn.r1;
         var cMax = pasteContent.props.cellCount + arn.c1;
 
         var isMultiple = false;
@@ -8933,32 +8929,14 @@
         //если вставляем в мерженную ячейку, диапазон которой больше или равен
         if (arn.c2 >= cMax - 1 && arn.r2 >= rMax - 1 && isMergedFirstCell && isMergedFirstCell.c1 === arn.c1 &&
           isMergedFirstCell.c2 === arn.c2 && isMergedFirstCell.r1 === arn.r1 && isMergedFirstCell.r2 === arn.r2 &&
-          cMax - arn.c1 === pasteContent.content[arn.r1][arn.c1].colSpan &&
-          rMax - arn.r1 === pasteContent.content[arn.r1][arn.c1].rowSpan) {
+          cMax - arn.c1 === pasteContent.content[0][0].colSpan &&
+          rMax - arn.r1 === pasteContent.content[0][0].rowSpan) {
             if (!isCheckSelection) {
-                pasteContent.content[arn.r1][arn.c1].colSpan = isMergedFirstCell.c2 - isMergedFirstCell.c1 + 1;
-                pasteContent.content[arn.r1][arn.c1].rowSpan = isMergedFirstCell.r2 - isMergedFirstCell.r1 + 1;
+                pasteContent.content[0][0].colSpan = isMergedFirstCell.c2 - isMergedFirstCell.c1 + 1;
+                pasteContent.content[0][0].rowSpan = isMergedFirstCell.r2 - isMergedFirstCell.r1 + 1;
             }
             isOneMerge = true;
-        } else if (arn.c2 >= cMax - 1 && arn.r2 >= rMax - 1 && pasteContent.props.isOneTable) {
-            //если область кратная куску вставки
-            var widthArea = arn.c2 - arn.c1 + 1;
-            var heightArea = arn.r2 - arn.r1 + 1;
-            var widthPasteFr = cMax - arn.c1;
-            var heightPasteFr = rMax - arn.r1;
-            //если кратны, то обрабатываем
-            if (widthArea % widthPasteFr === 0 && heightArea % heightPasteFr === 0) {
-                isMultiple = true;
-            } else if (firstCell.hasMerged() !== null)//в противном случае ошибка
-            {
-                if (isCheckSelection) {
-                    return arn;
-                } else {
-                    this.handlers.trigger("onError", c_oAscError.ID.PastInMergeAreaError, c_oAscError.Level.NoCritical);
-                    return;
-                }
-            }
-        } else {
+        }else {
             //проверка на наличие части объединённой ячейки в области куда осуществляем вставку
             for (var rFirst = arn.r1; rFirst < rMax; ++rFirst) {
                 for (var cFirst = arn.c1; cFirst < cMax; ++cFirst) {
@@ -9017,24 +8995,14 @@
             var plCol = 0;
         }
 
-        if (isMultiple) {
-            if (pasteContent.content[arn.r1] && pasteContent.content[arn.r1][arn.c1]) {
-                var currentObj = pasteContent.content[arn.r1][arn.c1].content[0];
-                var valFormat = '';
-                if (currentObj[0] !== undefined) {
-                    valFormat = currentObj[0].text;
-                }
-            }
-        }
-
         var mergeArr = [];
         for (var autoR = 0; autoR < maxARow; ++autoR) {
             for (var autoC = 0; autoC < maxACol; ++autoC) {
-                for (var r = arn.r1; r < rMax; ++r) {
-                    for (var c = arn.c1; c < pasteContent.content[r].length; ++c) {
+                for (var r = 0; r < rMax; ++r) {
+                    for (var c = 0; c < pasteContent.content[r].length; ++c) {
                         if (undefined !== pasteContent.content[r][c]) {
-                            var range = t.model.getRange3(r + autoR * plRow, c + autoC * plCol, r + autoR * plRow,
-                              c + autoC * plCol);
+                            var range = t.model.getRange3(r + autoR * plRow + arn.r1, c + autoC * plCol + arn.c1, r + autoR * plRow + arn.r1,
+                              c + autoC * plCol + arn.c1);
 
                             var currentObj = pasteContent.content[r][c];
                             var contentCurrentObj = currentObj.content;
