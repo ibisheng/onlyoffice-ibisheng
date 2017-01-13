@@ -8925,18 +8925,16 @@
         var rangeUnMerge = t.model.getRange3(arn.r1, arn.c1, rMax - 1, cMax - 1);
         var isOneMerge = false;
 
-
         //если вставляем в мерженную ячейку, диапазон которой больше или равен
-        if (arn.c2 >= cMax - 1 && arn.r2 >= rMax - 1 && isMergedFirstCell && isMergedFirstCell.c1 === arn.c1 &&
-          isMergedFirstCell.c2 === arn.c2 && isMergedFirstCell.r1 === arn.r1 && isMergedFirstCell.r2 === arn.r2 &&
-          cMax - arn.c1 === pasteContent.content[0][0].colSpan &&
-          rMax - arn.r1 === pasteContent.content[0][0].rowSpan) {
+		var fPasteCell = pasteContent.content[0][0];
+        if (arn.c2 >= cMax - 1 && arn.r2 >= rMax - 1 && isMergedFirstCell && isMergedFirstCell.isEqual(arn) &&  cMax - arn.c1 === fPasteCell.colSpan && rMax - arn.r1 === fPasteCell.rowSpan) {
             if (!isCheckSelection) {
                 pasteContent.content[0][0].colSpan = isMergedFirstCell.c2 - isMergedFirstCell.c1 + 1;
                 pasteContent.content[0][0].rowSpan = isMergedFirstCell.r2 - isMergedFirstCell.r1 + 1;
             }
             isOneMerge = true;
-        }else {
+        }
+		else {
             //проверка на наличие части объединённой ячейки в области куда осуществляем вставку
             for (var rFirst = arn.r1; rFirst < rMax; ++rFirst) {
                 for (var cFirst = arn.c1; cFirst < cMax; ++cFirst) {
@@ -8994,119 +8992,165 @@
             var plRow = 0;
             var plCol = 0;
         }
-
+		
+		var applyPropertiesByRange = function(range, props)
+		{
+			if(props.val)
+			{
+				range.setValue(props.val);
+			}
+			if(props.numFormat)
+			{
+				range.setNumFormat(props.numFormat);
+			}
+			if(props.font)
+			{
+				range.setFont(props.font);
+			}
+			if(props.value2)
+			{
+				range.setValue2(props.value2);
+			}
+			if(props.alignVertical)
+			{
+				range.setAlignVertical(props.alignVertical);
+			}
+			if(props.fontSize)
+			{
+				range.setFontsize(props.fontSize);
+			}
+			if(props.offsetLast)
+			{
+				range.setOffsetLast(props.offsetLast);
+			}
+			if(props.merge)
+			{
+				range.merge(props.merge);
+			}
+			if(props.borders)
+			{
+				range.setBorderSrc(props.borders);
+			}
+			if(props.wrap)
+			{
+				range.setWrap(props.wrap);
+			}
+			if(props.fill)
+			{
+				range.setFill(props.fill);
+			}
+			if (props.hyperLink) 
+			{
+				var _link = props.hyperLink.hyperLink;
+				var newHyperlink = new AscCommonExcel.Hyperlink();
+				if (_link.search('#') === 0) 
+				{
+					newHyperlink.setLocation(_link.replace('#', ''));
+				}
+				else 
+				{
+					newHyperlink.Hyperlink = _link;
+				}
+				newHyperlink.Ref = range;
+				newHyperlink.Tooltip = props.hyperLink;
+				range.setHyperlink(newHyperlink);
+			}
+		};
+		
         var mergeArr = [];
         for (var autoR = 0; autoR < maxARow; ++autoR) {
             for (var autoC = 0; autoC < maxACol; ++autoC) {
                 for (var r = 0; r < rMax; ++r) {
                     for (var c = 0; c < pasteContent.content[r].length; ++c) {
                         if (undefined !== pasteContent.content[r][c]) {
-                            var range = t.model.getRange3(r + autoR * plRow + arn.r1, c + autoC * plCol + arn.c1, r + autoR * plRow + arn.r1,
-                              c + autoC * plCol + arn.c1);
-
+							var pasteIntoRow = r + autoR * plRow + arn.r1;
+							var pasteIntoCol = c + autoC * plCol + arn.c1;
+                            var range = t.model.getRange3(pasteIntoRow, pasteIntoCol, pasteIntoRow, pasteIntoCol);
+								
+							var pastedRangeProps = {};
+							
                             var currentObj = pasteContent.content[r][c];
                             var contentCurrentObj = currentObj.content;
+							
+							//value
                             if (contentCurrentObj.length === 1) {
-                                var onlyChild = contentCurrentObj[0];
-                                var valFormat = onlyChild.text;
-                                var nameFormat = false;
-
-                                if (onlyChild.cellFrom) {
-                                    var offset = range.getCells()[0].getOffset2(
-                                      onlyChild.cellFrom), assemb, _p_ = new AscCommonExcel.parserFormula(onlyChild.text.substring(
-                                      1), null, range.worksheet);
-
-                                    if (_p_.parse()) {
-                                        assemb = _p_.changeOffset(offset).assemble(true);
-                                        //range.setValue("="+assemb);
-                                        arrFormula[numFor] = {};
-                                        arrFormula[numFor].range = range;
-                                        arrFormula[numFor].val = "=" + assemb;
-                                        numFor++;
-                                    }
-                                } else {
-                                    range.setValue(valFormat);
-                                }
-
-                                if (nameFormat) {
-                                    range.setNumFormat(nameFormat);
-                                }
-                                range.setFont(onlyChild.format);
+                                var onlyOneChild = contentCurrentObj[0];
+                                var valFormat = onlyOneChild.text;
+								pastedRangeProps.val = valFormat;
+								pastedRangeProps.font = onlyOneChild.format;
                             } else {
-                                range.setValue2(contentCurrentObj);
-                                range.setAlignVertical(currentObj.va);
+                                pastedRangeProps.value2 = contentCurrentObj;
+								pastedRangeProps.alignVertical = currentObj.va;
                             }
 
                             if (contentCurrentObj.length === 1 && contentCurrentObj[0].format) {
                                 var fs = contentCurrentObj[0].format.getSize();
                                 if (fs !== '' && fs !== null && fs !== undefined) {
-                                    range.setFontsize(fs);
+                                   pastedRangeProps.fontSize = fs;
+								}
                             }
-                            }
+							
+							//AlignHorizontal
                             if (!isOneMerge) {
-                                range.setAlignHorizontal(currentObj.a);
+                                pastedRangeProps.alignHorizontal = currentObj.a;
                             }
+							
+							//for merge
                             var isMerged = false;
                             for (var mergeCheck = 0; mergeCheck < mergeArr.length; ++mergeCheck) {
-                                if (r + 1 + autoR * plRow <= mergeArr[mergeCheck].r2 &&
-                                  r + 1 + autoR * plRow >= mergeArr[mergeCheck].r1 &&
-                                  c + autoC * plCol + 1 <= mergeArr[mergeCheck].c2 &&
-                                  c + 1 + autoC * plCol >= mergeArr[mergeCheck].c1) {
+                                var tempRow = r + 1 + autoR * plRow;
+								var tempCol = c + autoC * plCol + 1;
+								if (tempRow <= mergeArr[mergeCheck].r2 && tempRow >= mergeArr[mergeCheck].r1 && tempCol <= mergeArr[mergeCheck].c2 && tempCol >= mergeArr[mergeCheck].c1) {
                                     isMerged = true;
                                 }
                             }
-
-                            //обработка для мерженных ячеек
                             if ((currentObj.colSpan > 1 || currentObj.rowSpan > 1) && !isMerged) {
-                                range.setOffsetLast(
-                                  {offsetCol: currentObj.colSpan - 1, offsetRow: currentObj.rowSpan - 1});
+								pastedRangeProps.offsetLast = {offsetCol: currentObj.colSpan - 1, offsetRow: currentObj.rowSpan - 1};
                                 mergeArr[n] = {
                                     r1: range.first.row, r2: range.last.row, c1: range.first.col, c2: range.last.col
                                 };
                                 n++;
                                 if (contentCurrentObj[0] == undefined) {
-                                    range.setValue('');
+                                    pastedRangeProps.val = '';
                                 }
-                                range.merge(c_oAscMergeOptions.Merge);
+								pastedRangeProps.merge = c_oAscMergeOptions.Merge;
                             }
-
+							
+							//borders
                             if (!isOneMerge) {
-                                range.setBorderSrc(currentObj.borders);
+                                pastedRangeProps.borders = currentObj.borders;
                             }
-                            range.setWrap(currentObj.wrap);
+							
+							//wrap
+							pastedRangeProps.wrap = currentObj.wrap;
+							
+							//fill
                             if (currentObj.bc && currentObj.bc.rgb) {
-                                range.setFill(currentObj.bc);
+								pastedRangeProps.fill = currentObj.bc;
                             }
-
+							
+							//hyperlink
                             var link = pasteContent.content[r][c].hyperLink;
                             if (link) {
-                                var newHyperlink = new AscCommonExcel.Hyperlink();
-                                if (pasteContent.content[r][c].hyperLink.search('#') === 0) {
-                                    newHyperlink.setLocation(link.replace('#', ''));
-                                } else {
-                                    newHyperlink.Hyperlink = link;
-                                }
-                                newHyperlink.Ref = range;
-                                newHyperlink.Tooltip = pasteContent.content[r][c].toolTip;
-                                range.setHyperlink(newHyperlink);
+                                pastedRangeProps.hyperLink = pasteContent.content[r][c];
                             }
+							
+							//apply props by cell
+							applyPropertiesByRange(range, pastedRangeProps);
                         }
                     }
                 }
             }
         }
-
+		
         if (isMultiple) {
             arn.r2 = lastSelection.r2;
             arn.c2 = lastSelection.c2;
         }
 
         t.isChanged = true;
-        lastSelection.c2 = arn.c2;
-        lastSelection.r2 = arn.r2;
-        var arnFor = [];
-        arnFor[0] = arn;
-        arnFor[1] = arrFormula;
+        var arnFor = [arn, arrFormula];
+ 
         return arnFor;
     };
 
