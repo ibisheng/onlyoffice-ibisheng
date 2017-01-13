@@ -236,11 +236,23 @@ var editor;
     }
     return res;
   };
-	spreadsheet_api.prototype.asc_getLocaleExample2 = function (format, value, culture) {
+	spreadsheet_api.prototype.asc_getLocaleExample2 = function(format, value, culture) {
 		var cultureInfo = AscCommon.g_aCultureInfos[culture] || AscCommon.g_oDefaultCultureInfo;
 		var numFormat = AscCommon.oNumFormatCache.get(format);
-		value = (null == value) ? this.wb.getSelectionInfo().asc_getFormula() : value;
-		return numFormat.formatToChart(value, cultureInfo);
+		var res;
+		if (null == value) {
+			var ws = this.wbModel.getActiveWs();
+			var activeCell = ws.selectionRange.activeCell;
+			var cell = ws._getCellNoEmpty(activeCell.row, activeCell.col);
+			if (cell) {
+				res = cell.getValueForExample(numFormat, cultureInfo);
+			} else {
+				res = '';
+			}
+		} else {
+			res = numFormat.formatToChart(value, cultureInfo);
+		}
+		return res;
 	};
 	spreadsheet_api.prototype.asc_getFormatCells = function (info) {
 

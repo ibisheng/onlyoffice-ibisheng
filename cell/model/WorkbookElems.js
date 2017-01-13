@@ -3139,15 +3139,19 @@ CCellValue.prototype =
 		if(null == this.textValue)
 		{
 			this.getValue2(cell, gc_nMaxDigCountView, function(){return true;});
-			this.textValue = "";
-			var aText = this.aTextValue2[gc_nMaxDigCountView];
-			for(var i = 0, length = aText.length; i < length; ++i)
-			{
-				if(aText[i].format && aText[i].format.getSkip() == false)
-					this.textValue += aText[i].text;
-			}
+			this.textValue = this._textArrayToString(this.aTextValue2[gc_nMaxDigCountView]);
 		}
 		return this.textValue;
+	},
+	_textArrayToString: function(aText) {
+		var res = '';
+		for (var i = 0, length = aText.length; i < length; ++i) {
+			var elem = aText[i];
+			if (elem.format && elem.format.getSkip() == false) {
+				res += elem.text;
+			}
+		}
+		return res;
 	},
 	getValueForEdit : function(cell)
 	{
@@ -3170,120 +3174,7 @@ CCellValue.prototype =
 			aRes = this.aTextValue2[dDigitsCount];
 		if(null == aRes)
 		{
-			var bNeedMeasure = true;
-			var sText = null;
-			var aText = null;		
-			if(CellValueType.Number == this.type || CellValueType.String == this.type)
-			{
-				if(null != this.text)
-					sText = this.text;
-				else if(null != this.multiText)
-					aText = this.multiText;
-
-				if(CellValueType.String == this.type)
-					bNeedMeasure = false;
-				var oNumFormat;
-				var xfs = cell.getCompiledStyle();
-				if(null != xfs && null != xfs.num)
-					oNumFormat = oNumFormatCache.get(xfs.num.getFormat());
-				else
-					oNumFormat = oNumFormatCache.get(g_oDefaultFormat.Num.getFormat());
-				if(false == oNumFormat.isGeneralFormat())
-				{
-					if(null != this.number)
-					{
-						aText = oNumFormat.format(this.number, this.type, dDigitsCount);
-						sText = null;
-					}
-					else if(CellValueType.String == this.type)
-					{
-					    var oTextFormat = oNumFormat.getTextFormat();
-					    if (null != oTextFormat && "@" != oTextFormat.formatString) {
-					        if (null != this.text) {
-					            aText = oNumFormat.format(this.text, this.type, dDigitsCount);
-					            sText = null;
-					        }
-					        else if (null != this.multiText) {
-					            var sSimpleString = this.getStringFromMultiText();
-					            aText = oNumFormat.format(sSimpleString, this.type, dDigitsCount);
-					            sText = null;
-					        }
-					    }
-					}
-				}
-				else if(CellValueType.Number == this.type && null != this.number)
-				{
-					bNeedMeasure = false;
-					var bFindResult = false;
-					//варируем dDigitsCount чтобы результат влез в ячейку
-					var nTempDigCount = Math.ceil(dDigitsCount);
-					var sOriginText = this.number;
-					while(nTempDigCount >= 1)
-					{
-						//Строим подходящий general format
-						var sGeneral = AscCommon.DecodeGeneralFormat(sOriginText, this.type, nTempDigCount);
-						if(null != sGeneral)
-							oNumFormat = oNumFormatCache.get(sGeneral);
-
-						if(null != oNumFormat)
-						{
-							sText = null;
-							aText = oNumFormat.format(sOriginText, this.type, dDigitsCount);
-							if(true == oNumFormat.isTextFormat())
-								break;
-							else
-							{
-								aRes = this._getValue2Result(cell, sText, aText);
-								//Проверяем влезает ли текст
-								if(true == fIsFitMeasurer(aRes))
-								{
-									bFindResult = true;
-									break;
-								}
-								aRes = null;
-							}
-						}
-						nTempDigCount--;
-					}
-					if(false == bFindResult)
-					{
-						aRes = null;
-						sText = null;
-						var font = new AscCommonExcel.Font();
-						if (dDigitsCount > 1){
-							font.setRepeat(true);
-							aText = [{ text: "#", format: font}];
-						}
-						else
-							aText = [{text: "", format: font}];
-					}
-				}
-			}
-			else if(CellValueType.Bool == this.type)
-			{
-				if(null != this.number)
-					sText = (0 != this.number) ? cBoolLocal["t"].toUpperCase(): cBoolLocal["f"].toUpperCase();
-			}
-			else if(CellValueType.Error == this.type)
-			{
-				if(null != this.text)
-					sText = this._getValueTypeError(this.text);
-			}
-			if(bNeedMeasure)
-			{
-				aRes = this._getValue2Result(cell, sText, aText);
-				//Проверяем влезает ли текст
-				if(false == fIsFitMeasurer(aRes))
-				{
-					aRes = null;
-					sText = null;
-					var font = new AscCommonExcel.Font();
-					font.setRepeat(true);
-					aText = [{ text: "#", format: font }];
-				}
-			}
-			if(null == aRes)
-				aRes = this._getValue2Result(cell, sText, aText);
+			aRes = this._getValue2(cell, dDigitsCount, fIsFitMeasurer);
 			var formula = cell.getFormula();
 			if( formula ){
 				aRes[0].sFormula = formula;
@@ -3291,6 +3182,122 @@ CCellValue.prototype =
 			}
 			
 			this.aTextValue2[dDigitsCount] = aRes;
+		}
+		return aRes;
+	},
+	getValueForExample : function(cell, dDigitsCount, fIsFitMeasurer, numFormat, cultureInfo)
+	{
+		var aText = this._getValue2(cell, dDigitsCount, fIsFitMeasurer, numFormat, cultureInfo);
+		return this._textArrayToString(aText);
+	},
+	_getValue2: function(cell, dDigitsCount, fIsFitMeasurer, opt_numFormat, opt_cultureInfo) {
+		var aRes = null;
+		var bNeedMeasure = true;
+		var sText = null;
+		var aText = null;
+		if (CellValueType.Number == this.type || CellValueType.String == this.type) {
+			if (null != this.text) {
+				sText = this.text;
+			} else if (null != this.multiText) {
+				aText = this.multiText;
+			}
+
+			if (CellValueType.String == this.type) {
+				bNeedMeasure = false;
+			}
+			var oNumFormat;
+			if (opt_numFormat) {
+				oNumFormat = opt_numFormat;
+			} else {
+				var xfs = cell.getCompiledStyle();
+				if (null != xfs && null != xfs.num) {
+					oNumFormat = oNumFormatCache.get(xfs.num.getFormat());
+				} else {
+					oNumFormat = oNumFormatCache.get(g_oDefaultFormat.Num.getFormat());
+				}
+			}
+
+			if (false == oNumFormat.isGeneralFormat()) {
+				if (null != this.number) {
+					aText = oNumFormat.format(this.number, this.type, dDigitsCount, false, opt_cultureInfo);
+					sText = null;
+				} else if (CellValueType.String == this.type) {
+					var oTextFormat = oNumFormat.getTextFormat();
+					if (null != oTextFormat && "@" != oTextFormat.formatString) {
+						if (null != this.text) {
+							aText = oNumFormat.format(this.text, this.type, dDigitsCount, false, opt_cultureInfo);
+							sText = null;
+						} else if (null != this.multiText) {
+							var sSimpleString = this.getStringFromMultiText();
+							aText = oNumFormat.format(sSimpleString, this.type, dDigitsCount, false, opt_cultureInfo);
+							sText = null;
+						}
+					}
+				}
+			} else if (CellValueType.Number == this.type && null != this.number) {
+				bNeedMeasure = false;
+				var bFindResult = false;
+				//варируем dDigitsCount чтобы результат влез в ячейку
+				var nTempDigCount = Math.ceil(dDigitsCount);
+				var sOriginText = this.number;
+				while (nTempDigCount >= 1) {
+					//Строим подходящий general format
+					var sGeneral = AscCommon.DecodeGeneralFormat(sOriginText, this.type, nTempDigCount);
+					if (null != sGeneral) {
+						oNumFormat = oNumFormatCache.get(sGeneral);
+					}
+
+					if (null != oNumFormat) {
+						sText = null;
+						aText = oNumFormat.format(sOriginText, this.type, dDigitsCount, false, opt_cultureInfo);
+						if (true == oNumFormat.isTextFormat()) {
+							break;
+						} else {
+							aRes = this._getValue2Result(cell, sText, aText);
+							//Проверяем влезает ли текст
+							if (true == fIsFitMeasurer(aRes)) {
+								bFindResult = true;
+								break;
+							}
+							aRes = null;
+						}
+					}
+					nTempDigCount--;
+				}
+				if (false == bFindResult) {
+					aRes = null;
+					sText = null;
+					var font = new AscCommonExcel.Font();
+					if (dDigitsCount > 1) {
+						font.setRepeat(true);
+						aText = [{text: "#", format: font}];
+					} else {
+						aText = [{text: "", format: font}];
+					}
+				}
+			}
+		} else if (CellValueType.Bool == this.type) {
+			if (null != this.number) {
+				sText = (0 != this.number) ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase();
+			}
+		} else if (CellValueType.Error == this.type) {
+			if (null != this.text) {
+				sText = this._getValueTypeError(this.text);
+			}
+		}
+		if (bNeedMeasure) {
+			aRes = this._getValue2Result(cell, sText, aText);
+			//Проверяем влезает ли текст
+			if (false == fIsFitMeasurer(aRes)) {
+				aRes = null;
+				sText = null;
+				var font = new AscCommonExcel.Font();
+				font.setRepeat(true);
+				aText = [{text: "#", format: font}];
+			}
+		}
+		if (null == aRes) {
+			aRes = this._getValue2Result(cell, sText, aText);
 		}
 		return aRes;
 	},
