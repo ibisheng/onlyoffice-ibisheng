@@ -8938,7 +8938,7 @@
             //проверка на наличие части объединённой ячейки в области куда осуществляем вставку
             for (var rFirst = arn.r1; rFirst < rMax; ++rFirst) {
                 for (var cFirst = arn.c1; cFirst < cMax; ++cFirst) {
-                    range = t.model.getRange3(rFirst, cFirst, rFirst, cFirst);
+                    var range = t.model.getRange3(rFirst, cFirst, rFirst, cFirst);
                     var merged = range.hasMerged();
                     if (merged) {
                         if (merged.r1 < arn.r1 || merged.r2 > rMax - 1 || merged.c1 < arn.c1 || merged.c2 > cMax - 1) {
@@ -9057,7 +9057,82 @@
 			}
 		};
 		
-        var mergeArr = [];
+		var mergeArr = [];
+		var putInsertedCellIntoRange = function(row, col, currentObj)
+		{
+			var pastedRangeProps = {};
+			var contentCurrentObj = currentObj.content;
+			var range = t.model.getRange3(row, col, row, col);
+							
+			//value
+			if (contentCurrentObj.length === 1) {
+				var onlyOneChild = contentCurrentObj[0];
+				var valFormat = onlyOneChild.text;
+				pastedRangeProps.val = valFormat;
+				pastedRangeProps.font = onlyOneChild.format;
+			} else {
+				pastedRangeProps.value2 = contentCurrentObj;
+				pastedRangeProps.alignVertical = currentObj.va;
+			}
+
+			if (contentCurrentObj.length === 1 && contentCurrentObj[0].format) {
+				var fs = contentCurrentObj[0].format.getSize();
+				if (fs !== '' && fs !== null && fs !== undefined) {
+				   pastedRangeProps.fontSize = fs;
+				}
+			}
+			
+			//AlignHorizontal
+			if (!isOneMerge) {
+				pastedRangeProps.alignHorizontal = currentObj.a;
+			}
+			
+			//for merge
+			var isMerged = false;
+			for (var mergeCheck = 0; mergeCheck < mergeArr.length; ++mergeCheck) {
+				var tempRow = row + 1;
+				var tempCol = col + 1;
+				if (tempRow <= mergeArr[mergeCheck].r2 && tempRow >= mergeArr[mergeCheck].r1 && tempCol <= mergeArr[mergeCheck].c2 && tempCol >= mergeArr[mergeCheck].c1) {
+					isMerged = true;
+				}
+			}
+			if ((currentObj.colSpan > 1 || currentObj.rowSpan > 1) && !isMerged) {
+				var offsetCol  = currentObj.colSpan - 1;
+				var offsetRow = currentObj.rowSpan - 1;
+				pastedRangeProps.offsetLast = {offsetCol: offsetCol, offsetRow: offsetRow};
+				mergeArr[n] = {
+					r1: range.first.row, r2: range.last.row + offsetRow, c1: range.first.col, c2: range.last.col + offsetCol
+				};
+				n++;
+				if (contentCurrentObj[0] == undefined) {
+					pastedRangeProps.val = '';
+				}
+				pastedRangeProps.merge = c_oAscMergeOptions.Merge;
+			}
+			
+			//borders
+			if (!isOneMerge) {
+				pastedRangeProps.borders = currentObj.borders;
+			}
+			
+			//wrap
+			pastedRangeProps.wrap = currentObj.wrap;
+			
+			//fill
+			if (currentObj.bc && currentObj.bc.rgb) {
+				pastedRangeProps.fill = currentObj.bc;
+			}
+			
+			//hyperlink
+			var link = currentObj.hyperLink;
+			if (link) {
+				pastedRangeProps.hyperLink = currentObj;
+			}
+			
+			//apply props by cell
+			applyPropertiesByRange(range, pastedRangeProps);
+		};
+		
         for (var autoR = 0; autoR < maxARow; ++autoR) {
             for (var autoC = 0; autoC < maxACol; ++autoC) {
                 for (var r = 0; r < rMax; ++r) {
@@ -9065,80 +9140,10 @@
                         if (undefined !== pasteContent.content[r][c]) {
 							var pasteIntoRow = r + autoR * plRow + arn.r1;
 							var pasteIntoCol = c + autoC * plCol + arn.c1;
-                            var range = t.model.getRange3(pasteIntoRow, pasteIntoCol, pasteIntoRow, pasteIntoCol);
-								
-							var pastedRangeProps = {};
 							
                             var currentObj = pasteContent.content[r][c];
-                            var contentCurrentObj = currentObj.content;
-							
-							//value
-                            if (contentCurrentObj.length === 1) {
-                                var onlyOneChild = contentCurrentObj[0];
-                                var valFormat = onlyOneChild.text;
-								pastedRangeProps.val = valFormat;
-								pastedRangeProps.font = onlyOneChild.format;
-                            } else {
-                                pastedRangeProps.value2 = contentCurrentObj;
-								pastedRangeProps.alignVertical = currentObj.va;
-                            }
-
-                            if (contentCurrentObj.length === 1 && contentCurrentObj[0].format) {
-                                var fs = contentCurrentObj[0].format.getSize();
-                                if (fs !== '' && fs !== null && fs !== undefined) {
-                                   pastedRangeProps.fontSize = fs;
-								}
-                            }
-							
-							//AlignHorizontal
-                            if (!isOneMerge) {
-                                pastedRangeProps.alignHorizontal = currentObj.a;
-                            }
-							
-							//for merge
-                            var isMerged = false;
-                            for (var mergeCheck = 0; mergeCheck < mergeArr.length; ++mergeCheck) {
-                                var tempRow = pasteIntoRow + 1;
-								var tempCol = pasteIntoCol + 1;
-								if (tempRow <= mergeArr[mergeCheck].r2 && tempRow >= mergeArr[mergeCheck].r1 && tempCol <= mergeArr[mergeCheck].c2 && tempCol >= mergeArr[mergeCheck].c1) {
-                                    isMerged = true;
-                                }
-                            }
-                            if ((currentObj.colSpan > 1 || currentObj.rowSpan > 1) && !isMerged) {
-								var offsetCol  = currentObj.colSpan - 1;
-								var offsetRow = currentObj.rowSpan - 1;
-								pastedRangeProps.offsetLast = {offsetCol: offsetCol, offsetRow: offsetRow};
-                                mergeArr[n] = {
-                                    r1: range.first.row, r2: range.last.row + offsetRow, c1: range.first.col, c2: range.last.col + offsetCol
-                                };
-                                n++;
-                                if (contentCurrentObj[0] == undefined) {
-                                    pastedRangeProps.val = '';
-                                }
-								pastedRangeProps.merge = c_oAscMergeOptions.Merge;
-                            }
-							
-							//borders
-                            if (!isOneMerge) {
-                                pastedRangeProps.borders = currentObj.borders;
-                            }
-							
-							//wrap
-							pastedRangeProps.wrap = currentObj.wrap;
-							
-							//fill
-                            if (currentObj.bc && currentObj.bc.rgb) {
-								pastedRangeProps.fill = currentObj.bc;
-                            }
-							
-							//hyperlink
-                            var link = pasteContent.content[r][c].hyperLink;
-                            if (link) {
-                                pastedRangeProps.hyperLink = pasteContent.content[r][c];
-                            }
-							
-							//apply props by cell
-							applyPropertiesByRange(range, pastedRangeProps);
+                            
+							putInsertedCellIntoRange(pasteIntoRow, pasteIntoCol, currentObj);
                         }
                     }
                 }
