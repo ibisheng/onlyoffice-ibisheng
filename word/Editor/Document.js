@@ -527,6 +527,7 @@ function CDocumentPageSection()
     this.YLimit2 = 0;
 
     this.Columns = [];
+    this.ColumnsSep = false;
 
     this.IterationsCount          = 0;
     this.CurrentY                 = 0;
@@ -669,6 +670,10 @@ CDocumentPageColumn.prototype.Reset = function()
     this.Y      = 0;
     this.XLimit = 0;
     this.YLimit = 0;
+};
+CDocumentPageColumn.prototype.IsEmpty = function()
+{
+	return this.Empty;
 };
 
 function CDocumentPage()
@@ -2184,6 +2189,7 @@ CDocument.prototype.Recalculate_Page = function()
             {
                 Page.Sections[0].Columns[ColumnIndex] = new CDocumentPageColumn();
             }
+            Page.Sections[0].ColumnsSep = SectPr.Get_ColumnsSep();
         }
 
         var Count = this.Content.length;
@@ -2545,6 +2551,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
                             NewPageSection.EndPos        = Index;
                             NewPageSection.Y             = SectionY + 0.001;
                             NewPageSection.YLimit        = true === PageSection.Is_CalculatingSectionBottomLine() ? PageSection.YLimit2 : RealYLimit;
+                            NewPageSection.ColumnsSep    = NextSectInfo.SectPr.Get_ColumnsSep();
                             Page.Sections[_SectionIndex] = NewPageSection;
 
                             var ColumnsCount = NextSectInfo.SectPr.Get_ColumnsCount();
@@ -3619,6 +3626,14 @@ CDocument.prototype.Draw                                     = function(nPageInd
             var Column         = PageSection.Columns[ColumnIndex];
             var ColumnStartPos = Column.Pos;
             var ColumnEndPos   = Column.EndPos;
+
+            if (true === PageSection.ColumnsSep && ColumnIndex > 0 && !Column.IsEmpty())
+			{
+
+				var SepX = (Column.X + PageSection.Columns[ColumnIndex - 1].XLimit) / 2;
+				pGraphics.p_color(0, 0, 0, 255);
+				pGraphics.drawVerLine(c_oAscLineDrawingRule.Left, SepX, PageSection.Y, PageSection.YLimit, 0.75 * g_dKoef_pt_to_mm);
+			}
 
             // Плавающие объекты не должны попадать в клип колонок
             var FlowElements = [];
