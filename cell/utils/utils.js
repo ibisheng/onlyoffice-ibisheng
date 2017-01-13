@@ -2132,8 +2132,9 @@
 		};
 		var g_oCacheMeasureEmpty = new CCacheMeasureEmpty();
 
+		/** @constructor */
 		function asc_CFormatCellsInfo() {
-			this.type = 1;
+			this.type = Asc.c_oAscNumFormatType.General;
 			this.decimalPlaces = 2;
 			this.separator = false;
 			this.symbol = false;
