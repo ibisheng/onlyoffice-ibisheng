@@ -9098,16 +9098,18 @@
 							//for merge
                             var isMerged = false;
                             for (var mergeCheck = 0; mergeCheck < mergeArr.length; ++mergeCheck) {
-                                var tempRow = r + 1 + autoR * plRow;
-								var tempCol = c + autoC * plCol + 1;
+                                var tempRow = pasteIntoRow + 1;
+								var tempCol = pasteIntoCol + 1;
 								if (tempRow <= mergeArr[mergeCheck].r2 && tempRow >= mergeArr[mergeCheck].r1 && tempCol <= mergeArr[mergeCheck].c2 && tempCol >= mergeArr[mergeCheck].c1) {
                                     isMerged = true;
                                 }
                             }
                             if ((currentObj.colSpan > 1 || currentObj.rowSpan > 1) && !isMerged) {
-								pastedRangeProps.offsetLast = {offsetCol: currentObj.colSpan - 1, offsetRow: currentObj.rowSpan - 1};
+								var offsetCol  = currentObj.colSpan - 1;
+								var offsetRow = currentObj.rowSpan - 1;
+								pastedRangeProps.offsetLast = {offsetCol: offsetCol, offsetRow: offsetRow};
                                 mergeArr[n] = {
-                                    r1: range.first.row, r2: range.last.row, c1: range.first.col, c2: range.last.col
+                                    r1: range.first.row, r2: range.last.row + offsetRow, c1: range.first.col, c2: range.last.col + offsetCol
                                 };
                                 n++;
                                 if (contentCurrentObj[0] == undefined) {
@@ -9149,8 +9151,11 @@
         }
 
         t.isChanged = true;
-        var arnFor = [arn, arrFormula];
- 
+        lastSelection.c2 = arn.c2;
+        lastSelection.r2 = arn.r2;
+        var arnFor = [];
+        arnFor[0] = arn;
+        arnFor[1] = arrFormula;
         return arnFor;
     };
 
