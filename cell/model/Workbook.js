@@ -5129,7 +5129,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 	};
 	Cell.prototype.getValueData = function(){
 		this._checkDirty();
-		var formula = this.formulaParsed ? this.formulaParsed.Formula : null;;
+		var formula = this.formulaParsed ? this.formulaParsed.Formula : null;
 		return new UndoRedoData_CellValueData(formula, this.oValue.clone());
 	};
 	Cell.prototype.setValueData = function(Val){
