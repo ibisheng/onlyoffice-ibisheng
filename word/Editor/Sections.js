@@ -1207,7 +1207,7 @@ function CSectionColumns(SectPr)
 	this.SectPr     = SectPr;
 	this.EqualWidth = true;
 	this.Num        = 1;
-	this.Sep        = true;
+	this.Sep        = false;
 	this.Space      = 30;
 
 	this.Cols = [];
