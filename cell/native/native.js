@@ -7592,7 +7592,7 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
                t.DocumentLoadComplete = true;
                
                t.asc_CheckGuiControlColors();
-               t.sendColorThemes();
+               t.sendColorThemes(_api.wbModel.theme);
                t.asc_ApplyColorScheme(false);
                
                t.sendStandartTextures();
