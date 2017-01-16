@@ -8993,74 +8993,6 @@
             var plCol = 0;
         }
 		
-		var applyPropertiesByRange = function(range, props)
-		{
-			if(props.val)
-			{
-				range.setValue(props.val);
-			}
-			if(props.numFormat)
-			{
-				range.setNumFormat(props.numFormat);
-			}
-			if(props.font)
-			{
-				range.setFont(props.font);
-			}
-			if(props.value2)
-			{
-				range.setValue2(props.value2);
-			}
-			if(props.alignVertical)
-			{
-				range.setAlignVertical(props.alignVertical);
-			}
-			if(props.alignHorizontal)
-			{
-				range.setAlignHorizontal(props.alignHorizontal);
-			}
-			if(props.fontSize)
-			{
-				range.setFontsize(props.fontSize);
-			}
-			if(props.offsetLast)
-			{
-				range.setOffsetLast(props.offsetLast);
-			}
-			if(props.merge)
-			{
-				range.merge(props.merge);
-			}
-			if(props.borders)
-			{
-				range.setBorderSrc(props.borders);
-			}
-			if(props.wrap)
-			{
-				range.setWrap(props.wrap);
-			}
-			if(props.fill)
-			{
-				range.setFill(props.fill);
-			}
-			if (props.hyperLink) 
-			{
-				var _link = props.hyperLink.hyperLink;
-				var newHyperlink = new AscCommonExcel.Hyperlink();
-				if (_link.search('#') === 0) 
-				{
-					newHyperlink.setLocation(_link.replace('#', ''));
-				}
-				else 
-				{
-					newHyperlink.Hyperlink = _link;
-				}
-				newHyperlink.Ref = range;
-				newHyperlink.Tooltip = props.hyperLink;
-				range.setHyperlink(newHyperlink);
-			}
-		};
-		
 		var mergeArr = [];
 		var putInsertedCellIntoRange = function(row, col, currentObj)
 		{
@@ -9134,7 +9066,7 @@
 			}
 			
 			//apply props by cell
-			applyPropertiesByRange(range, pastedRangeProps);
+			t._setPastedDataByCurrentRange(range, pastedRangeProps);
 		};
 		
         for (var autoR = 0; autoR < maxARow; ++autoR) {
@@ -9172,7 +9104,6 @@
         var t = this;
         var arn = t.model.selectionRange.getLast();
         var arrFormula = [];
-        var numFor = 0;
 
         var pasteRange = window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange;
         var activeCellsPasteFragment = AscCommonExcel.g_oRangeCache.getAscRange(pasteRange);
@@ -9364,11 +9295,115 @@
 			}
 		};
 		
-		var setFormula = function(newVal, range)
+		var putInsertedCellIntoRange = function(nRow, nCol, pasteRow, pasteCol, rowDiff, colDiff, range, newVal)
 		{
+			var pastedRangeProps = {};
 			//range может далее изменится в связи с наличием мерженных ячеек, firstRange - не меняется(ему делаем setValue, как первой ячейке в диапазоне мерженных)
 			var firstRange = range.clone();
 			
+			//****paste comments****
+			if (val.aComments && val.aComments.length) {
+				addComments(pasteRow, pasteCol, val.aComments);
+			}
+			
+			//merge
+			checkMerge(range, curMerge, nRow, nCol, rowDiff, colDiff);
+
+			//set style
+			if (!isOneMerge) {
+				pastedRangeProps.cellStyle = newVal.getStyleName();
+			}
+
+			if (!isOneMerge)//settings for cell(format)
+			{
+				//format
+				var numFormat = newVal.getNumFormat();
+				var nameFormat;
+				if (numFormat && numFormat.sFormat) {
+					nameFormat = numFormat.sFormat;
+				}
+				
+				pastedRangeProps.numFormat = nameFormat;
+			}
+			
+			if (!isOneMerge)//settings for cell
+			{
+				//vertical align
+				pastedRangeProps.alignVertical = newVal.getAlignVertical();
+				//horizontal align
+				pastedRangeProps.alignHorizontal = newVal.getAlignHorizontal();
+				//borders
+				var fullBorders = newVal.getBorderFull();
+				if (range.bbox.c2 !== range.bbox.c1 && curMerge && fullBorders) {
+					//для мерженных ячеек, правая границу
+					var endMergeCell = val.getCell3(pasteRow, curMerge.c2);
+					var fullBordersEndMergeCell = endMergeCell.getBorderFull();
+					if (fullBordersEndMergeCell && fullBordersEndMergeCell.r) {
+						fullBorders.r = fullBordersEndMergeCell.r;
+					}
+				}
+				pastedRangeProps.bordersFull = fullBorders;
+				//fill
+				pastedRangeProps.fill = newVal.getFill();
+				//wrap
+				//range.setWrap(newVal.getWrap());
+				pastedRangeProps.wrap = newVal.getWrap();
+				//angle
+				pastedRangeProps.angle = newVal.getAngle();
+				//hyperlink
+				pastedRangeProps.hyperlinkObj = newVal.getHyperlink();
+			}
+			
+			//apply props by cell
+			t._setPastedDataByCurrentRange(range, pastedRangeProps, firstRange, newVal, isOneMerge, arrFormula, tablesMap);
+		};
+		
+        for (var autoR = 0; autoR < maxARow; ++autoR) {
+            for (var autoC = 0; autoC < maxACol; ++autoC) {
+                for (var r = arn.r1; r < rMax; ++r) {
+                    for (var c = arn.c1; c < cMax; ++c) {
+                        var pasteRow = r - arn.r1 + activeCellsPasteFragment.r1;
+                        var pasteCol = c - arn.c1 + activeCellsPasteFragment.c1;
+                        var newVal = val.getCell3(pasteRow, pasteCol);
+
+                        var curMerge = newVal.hasMerged();
+
+                        if (undefined !== newVal) {
+							
+							var nRow = r + autoR * plRow;
+							if (nRow > gc_nMaxRow0) {
+								nRow = gc_nMaxRow0;
+							}
+							var nCol = c + autoC * plCol;
+							if (nCol > gc_nMaxCol0) {
+								nCol = gc_nMaxCol0;
+							}
+							
+							var range = t.model.getRange3(nRow, nCol, nRow, nCol);
+							putInsertedCellIntoRange(nRow, nCol, pasteRow, pasteCol, autoR * plRow, autoC * plCol, range, newVal);
+							
+                            //если замержили range
+                            c = range.bbox.c2 - autoC * plCol;
+                            if (c === cMax) {
+                                r = range.bbox.r2 - autoC * plCol;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        t.isChanged = true;
+        var arnFor = [arn, arrFormula];
+		
+        return arnFor;
+    };
+	
+	WorksheetView.prototype._setPastedDataByCurrentRange = function(range, props, firstRange, newVal, isOneMerge, arrFormula, tablesMap)
+	{
+		//set formula - for paste from binary
+		var setFormula = function(newVal, firstRange, range)
+		{
 			var numFormula = null;
 			var skipFormat = null;
 			var noSkipVal = null;
@@ -9413,10 +9448,7 @@
 							assemb = _p_.changeOffset(offset).assemble(true);
 						}
 
-						arrFormula[numFor] = {};
-						arrFormula[numFor].range = range;
-						arrFormula[numFor].val = "=" + assemb;
-						numFor++;
+						arrFormula.push({range: range, val: "=" + assemb});
 					}
 				} else {
 					cellFrom = newVal.getCells();
@@ -9434,206 +9466,101 @@
 				if (!isOneMerge)//settings for text
 				{
 					range.setFont(value2[numStyle].format);
-					}
+				}
 			} else {
 				firstRange.setValue2(value2);
 			}
 		};
 		
-		var applyPropertiesByRange = function(range, newVal, props)
+		if(props.cellStyle)
 		{
-			if(props.cellStyle)
-			{
-				range.setCellStyle(props.cellStyle);
-			}
-			if(props.val)
-			{
-				range.setValue(props.val);
-			}
-			if(props.numFormat)
-			{
-				range.setNumFormat(props.numFormat);
-			}
-			
-			//for formula
-			setFormula(newVal, range);
-			
-			if(props.font)
-			{
-				range.setFont(props.font);
-			}
-			if(props.value2)
-			{
-				range.setValue2(props.value2);
-			}
-			if(props.alignVertical)
-			{
-				range.setAlignVertical(props.alignVertical);
-			}
-			if(props.alignHorizontal)
-			{
-				range.setAlignHorizontal(props.alignHorizontal);
-			}
-			if(props.fontSize)
-			{
-				range.setFontsize(props.fontSize);
-			}
-			if(props.offsetLast)
-			{
-				range.setOffsetLast(props.offsetLast);
-			}
-			if(props.merge)
-			{
-				range.merge(props.merge);
-			}
-			if(props.borders)
-			{
-				range.setBorderSrc(props.borders);
-			}
-			if(props.bordersFull)
-			{
-				range.setBorder(props.bordersFull);
-			}
-			if(props.wrap)
-			{
-				range.setWrap(props.wrap);
-			}
-			if(props.fill)
-			{
-				range.setFill(props.fill);
-			}
-			if(props.angle)
-			{
-				range.setAngle(props.angle);
-			}
-			if (props.hyperLink) 
-			{
-				var _link = props.hyperLink.hyperLink;
-				var newHyperlink = new AscCommonExcel.Hyperlink();
-				if (_link.search('#') === 0) 
-				{
-					newHyperlink.setLocation(_link.replace('#', ''));
-				}
-				else 
-				{
-					newHyperlink.Hyperlink = _link;
-				}
-				newHyperlink.Ref = range;
-				newHyperlink.Tooltip = props.hyperLink;
-				range.setHyperlink(newHyperlink);
-			}
-			if (props.hyperlinkObj) 
-			{
-				props.hyperlinkObj.Ref = range;
-				range.setHyperlink(props.hyperlinkObj, true);
-			}
-		};
-		
-		var putInsertedCellIntoRange = function(nRow, nCol, pasteRow, pasteCol, rowDiff, colDiff, range, newVal)
+			range.setCellStyle(props.cellStyle);
+		}
+		if(props.val)
 		{
-			var pastedRangeProps = {};
-
-			//****paste comments****
-			if (val.aComments && val.aComments.length) {
-				addComments(pasteRow, pasteCol, val.aComments);
-			}
-			
-			//merge
-			checkMerge(range, curMerge, nRow, nCol, rowDiff, colDiff);
-
-			//set style
-			if (isOneMerge) {
-				pastedRangeProps.cellStyle = newVal.getStyleName();
-			}
-
-			if (!isOneMerge)//settings for cell(format)
-			{
-				//format
-				var numFormat = newVal.getNumFormat();
-				var nameFormat;
-				if (numFormat && numFormat.sFormat) {
-					nameFormat = numFormat.sFormat;
-				}
-				
-				pastedRangeProps.numFormat = nameFormat;
-			}
-			
-			
-			if (!isOneMerge)//settings for cell
-			{
-				//vertical align
-				pastedRangeProps.alignVertical = newVal.getAlignVertical();
-				//horizontal align
-				pastedRangeProps.alignHorizontal = newVal.getAlignHorizontal();
-				//borders
-				var fullBorders = newVal.getBorderFull();
-				if (range.bbox.c2 !== range.bbox.c1 && curMerge && fullBorders) {
-					//для мерженных ячеек, правая границу
-					var endMergeCell = val.getCell3(pasteRow, curMerge.c2);
-					var fullBordersEndMergeCell = endMergeCell.getBorderFull();
-					if (fullBordersEndMergeCell && fullBordersEndMergeCell.r) {
-						fullBorders.r = fullBordersEndMergeCell.r;
-					}
-				}
-				pastedRangeProps.bordersFull = fullBorders;
-				//fill
-				pastedRangeProps.fill = newVal.getFill();
-				//wrap
-				//range.setWrap(newVal.getWrap());
-				pastedRangeProps.wrap = newVal.getWrap();
-				//angle
-				pastedRangeProps.angle = newVal.getAngle();
-				//hyperlink
-				pastedRangeProps.hyperlinkObj = newVal.getHyperlink();
-			}
-			
-			//apply props by cell
-			applyPropertiesByRange(range, newVal, pastedRangeProps);
-		};
+			range.setValue(props.val);
+		}
+		if(props.numFormat)
+		{
+			range.setNumFormat(props.numFormat);
+		}
 		
-        var newVal;
-        var curMerge;
-        var nRow, nCol;
-        for (var autoR = 0; autoR < maxARow; ++autoR) {
-            for (var autoC = 0; autoC < maxACol; ++autoC) {
-                for (var r = arn.r1; r < rMax; ++r) {
-                    for (var c = arn.c1; c < cMax; ++c) {
-                        var pasteRow = r - arn.r1 + activeCellsPasteFragment.r1;
-                        var pasteCol = c - arn.c1 + activeCellsPasteFragment.c1;
-                        newVal = val.getCell3(pasteRow, pasteCol);
-
-                        curMerge = newVal.hasMerged();
-
-                        if (undefined !== newVal) {
-							
-							nRow = r + autoR * plRow;
-							if (nRow > gc_nMaxRow0) {
-								nRow = gc_nMaxRow0;
-							}
-							nCol = c + autoC * plCol;
-							if (nCol > gc_nMaxCol0) {
-								nCol = gc_nMaxCol0;
-							}
-							
-							var range = t.model.getRange3(nRow, nCol, nRow, nCol);
-							putInsertedCellIntoRange(nRow, nCol, pasteRow, pasteCol, autoR * plRow, autoC * plCol, range, newVal);
-							
-                            //если замержили range
-                            c = range.bbox.c2 - autoC * plCol;
-                            if (c === cMax) {
-                                r = range.bbox.r2 - autoC * plCol;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        t.isChanged = true;
-        var arnFor = [arn, arrFormula];
+		//for formula
+		if(newVal)
+		{
+			setFormula(newVal, firstRange, range);
+		}
 		
-        return arnFor;
-    };
+		if(props.font)
+		{
+			range.setFont(props.font);
+		}
+		if(props.value2)
+		{
+			range.setValue2(props.value2);
+		}
+		if(props.alignVertical)
+		{
+			range.setAlignVertical(props.alignVertical);
+		}
+		if(props.alignHorizontal)
+		{
+			range.setAlignHorizontal(props.alignHorizontal);
+		}
+		if(props.fontSize)
+		{
+			range.setFontsize(props.fontSize);
+		}
+		if(props.offsetLast)
+		{
+			range.setOffsetLast(props.offsetLast);
+		}
+		if(props.merge)
+		{
+			range.merge(props.merge);
+		}
+		if(props.borders)
+		{
+			range.setBorderSrc(props.borders);
+		}
+		if(props.bordersFull)
+		{
+			range.setBorder(props.bordersFull);
+		}
+		if(props.wrap)
+		{
+			range.setWrap(props.wrap);
+		}
+		if(props.fill)
+		{
+			range.setFill(props.fill);
+		}
+		if(props.angle)
+		{
+			range.setAngle(props.angle);
+		}
+		if (props.hyperLink)
+		{
+			var _link = props.hyperLink.hyperLink;
+			var newHyperlink = new AscCommonExcel.Hyperlink();
+			if (_link.search('#') === 0) 
+			{
+				newHyperlink.setLocation(_link.replace('#', ''));
+			}
+			else 
+			{
+				newHyperlink.Hyperlink = _link;
+			}
+			newHyperlink.Ref = range;
+			newHyperlink.Tooltip = props.hyperLink;
+			range.setHyperlink(newHyperlink);
+		}
+		if (props.hyperlinkObj) 
+		{
+			props.hyperlinkObj.Ref = range;
+			range.setHyperlink(props.hyperlinkObj, true);
+		}
+	};
 
     // Залочена ли панель для закрепления
     WorksheetView.prototype._isLockedFrozenPane = function ( callback ) {
