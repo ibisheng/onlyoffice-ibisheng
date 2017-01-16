@@ -9565,7 +9565,7 @@
 				newHyperlink.Hyperlink = _link;
 			}
 			newHyperlink.Ref = range;
-			newHyperlink.Tooltip = rangeStyle.hyperLink;
+			newHyperlink.Tooltip = rangeStyle.hyperLink.toolTip;
 			range.setHyperlink(newHyperlink);
 		}
 		if (rangeStyle.hyperlinkObj) 
