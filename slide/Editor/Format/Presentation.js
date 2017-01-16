@@ -2230,7 +2230,11 @@ CPresentation.prototype =
             {
                 if(isRealObject(aSpTree[i].graphicObject) && typeof aSpTree[i].graphicObject.TableStyle === "string" && isRealObject(g_oTableId.Get_ById(aSpTree[i].graphicObject.TableStyle)))
                 {
-                    oMap[aSpTree[i].graphicObject.TableStyle] = true;
+                    var oStyle = AscCommon.g_oTableId.Get_ById(aSpTree[i].graphicObject.TableStyle);
+                    if(oStyle instanceof CStyle)
+                    {
+                        oMap[aSpTree[i].graphicObject.TableStyle] = true;
+                    }
                 }
             }
             else if(aSpTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape)

@@ -10087,6 +10087,8 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
             initMathRevisions(oMathAcc, props);
 			if (oParent)
 				oParent.addElementToContent(oMathAcc);
+			if(oParStruct)
+			    oMathAcc.Paragraph = oParStruct.paragraph;
 			oContent.content = oMathAcc.getBase();
         }
 		else if (c_oSer_OMathContentType.Element === type)
@@ -10425,6 +10427,9 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
             initMathRevisions(oBar, props);
 			if (oParent)
 				oParent.addElementToContent(oBar);
+
+            if(oParStruct)
+                oBar.Paragraph = oParStruct.paragraph;
 			oContent.content = oBar.getBase();
         }
 		else if (c_oSer_OMathContentType.Element === type)
@@ -10489,6 +10494,8 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
             initMathRevisions(oBorderBox, props);
 			if (oParent)
 				oParent.addElementToContent(oBorderBox);
+            if(oParStruct)
+                oBorderBox.Paragraph = oParStruct.paragraph;
 			oContent.content = oBorderBox.getBase();
         }
 		else if (c_oSer_OMathContentType.Element === type)
@@ -10576,6 +10583,8 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
             initMathRevisions(oBox, props);
 			if (oParent)
 				oParent.addElementToContent(oBox);
+            if(oParStruct)
+                oBox.Paragraph = oParStruct.paragraph;
 			oContent.content = oBox.getBase();
         }
 		else if (c_oSer_OMathContentType.Element === type)
@@ -10765,7 +10774,9 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
 			props.counter = 0;
 			var oDelimiter = new CDelimiter(props);
             initMathRevisions(oDelimiter, props);
-			oElem.addElementToContent(oDelimiter);			
+			oElem.addElementToContent(oDelimiter);
+            if(oParStruct)
+                oDelimiter.Paragraph = oParStruct.paragraph;
 			for (var i=0; i<props.column; i++)
 				arrContent[i] = oDelimiter.getBase(i);
         }
@@ -10871,7 +10882,9 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
 			props.counter = 0;
 			var oEqArr = new CEqArray(props);
             initMathRevisions(oEqArr, props);
-			oElem.addElementToContent(oEqArr);			
+			oElem.addElementToContent(oEqArr);
+            if(oParStruct)
+                oEqArr.Paragraph = oParStruct.paragraph;
 			for (var i=0; i<props.row; i++)
 				arrContent[i] = oEqArr.getElement(i);
         }
@@ -10956,6 +10969,8 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
             initMathRevisions(oFraction, props);
 			if (oParent)
 				oParent.addElementToContent(oFraction);
+            if(oParStruct)
+                oFraction.Paragraph = oParStruct.paragraph;
 			oElemDen.content = oFraction.getDenominator();
 			oElemNum.content = oFraction.getNumerator();
         }
@@ -10967,6 +10982,9 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
 				initMathRevisions(oFraction, props);
 				if (oParent)
 					oParent.addElementToContent(oFraction);
+
+                if(oParStruct)
+                    oFraction.Paragraph = oParStruct.paragraph;
 				oElemDen.content = oFraction.getDenominator();
 				oElemNum.content = oFraction.getNumerator();
 			}
@@ -10982,6 +11000,8 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
 				initMathRevisions(oFraction, props);
 				if (oParent)
 					oParent.addElementToContent(oFraction);
+                if(oParStruct)
+                    oFraction.Paragraph = oParStruct.paragraph;
 				oElemDen.content = oFraction.getDenominator();
 				oElemNum.content = oFraction.getNumerator();
 			}
@@ -11025,7 +11045,9 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
 			var oFunc = new CMathFunc(props);
             initMathRevisions(oFunc, props);
 			if (oParent)
-				oParent.addElementToContent(oFunc);	
+				oParent.addElementToContent(oFunc);
+            if(oParStruct)
+                oFunc.Paragraph = oParStruct.paragraph;
 			oContent.content = oFunc.getArgument();
 			oName.content = oFunc.getFName();
         }
@@ -11084,6 +11106,8 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
             initMathRevisions(oGroupChr, props);
 			if (oParent)
 				oParent.addElementToContent(oGroupChr);
+            if(oParStruct)
+                oGroupChr.Paragraph = oParStruct.paragraph;
 			oContent.content = oGroupChr.getBase();
         }
 		else if (c_oSer_OMathContentType.Element === type)
@@ -11208,6 +11232,9 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
             initMathRevisions(oLimLow, props);
 			if (oParent)
 				oParent.addElementToContent(oLimLow);
+
+            if(oParStruct)
+                oLimLow.Paragraph = oParStruct.paragraph;
 			oContent.content = oLimLow.getFName();
 			oLim.content = oLimLow.getIterator();
         }
@@ -11255,6 +11282,8 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
             initMathRevisions(oLimUpp, props);
 			if (oParent)			
 				oParent.addElementToContent(oLimUpp);
+            if(oParStruct)
+                oLimUpp.Paragraph = oParStruct.paragraph;
 			oContent.content = oLimUpp.getFName();
 			oLim.content = oLimUpp.getIterator();
         }
@@ -11666,6 +11695,8 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
             initMathRevisions(oNary, props);
 			if (oParent)
 				oParent.addElementToContent(oNary);
+            if(oParStruct)
+                oNary.Paragraph = oParStruct.paragraph;
 			oSub.content = oNary.getLowerIterator();
 			oSup.content = oNary.getUpperIterator();
 			oContent.content = oNary.getBase();
@@ -11854,6 +11885,8 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
             initMathRevisions(oPhant, props);
 			if (oParent)
 				oParent.addElementToContent(oPhant);
+            if(oParStruct)
+                oPhant.Paragraph = oParStruct.paragraph;
 			oContent.content = oPhant.getBase();
         }
 		else if (c_oSer_OMathContentType.Element === type)
@@ -11953,6 +11986,8 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
             initMathRevisions(oRad.content, props);
 			if (oParent)
 				oParent.addElementToContent(oRad.content);
+            if(oParStruct)
+                oRad.Paragraph = oParStruct.paragraph;
 			oDeg.content = oRad.content.getDegree();
 			oContent.content = oRad.content.getBase();
         }
@@ -12086,6 +12121,9 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
             initMathRevisions(oSPre, props);
 			if (oParent)
 				oParent.addElementToContent(oSPre);
+
+            if(oParStruct)
+                oSPre.Paragraph = oParStruct.paragraph;
 			oSub.content = oSPre.getLowerIterator();
 			oSup.content = oSPre.getUpperIterator();
 			oContent.content = oSPre.getBase();
@@ -12140,6 +12178,8 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
             initMathRevisions(oSSub, props);
 			if (oParent)
 				oParent.addElementToContent(oSSub);
+            if(oParStruct)
+                oSSub.Paragraph = oParStruct.paragraph;
 			oSub.content = oSSub.getLowerIterator();
 			oContent.content = oSSub.getBase();
         }
@@ -12187,6 +12227,8 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
             initMathRevisions(oSSubSup, props);
 			if (oParent)
 				oParent.addElementToContent(oSSubSup);
+            if(oParStruct)
+                oSSubSup.Paragraph = oParStruct.paragraph;
 			oSub.content = oSSubSup.getLowerIterator();
 			oSup.content = oSSubSup.getUpperIterator();
 			oContent.content = oSSubSup.getBase();
@@ -12280,6 +12322,8 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
             initMathRevisions(oSSup, props);
 			if (oParent)
 				oParent.addElementToContent(oSSup);
+            if(oParStruct)
+                oSSup.Paragraph = oParStruct.paragraph;
 			oSup.content = oSSup.getUpperIterator();
 			oContent.content = oSSup.getBase();
         }
