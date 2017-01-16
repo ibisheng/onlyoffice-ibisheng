@@ -9094,9 +9094,8 @@
         t.isChanged = true;
         lastSelection.c2 = arn.c2;
         lastSelection.r2 = arn.r2;
-        var arnFor = [];
-        arnFor[0] = arn;
-        arnFor[1] = arrFormula;
+        var arnFor = [arn, arrFormula];
+		
         return arnFor;
     };
 
@@ -9355,7 +9354,8 @@
 			}
 			
 			//apply props by cell
-			t._setPastedDataByCurrentRange(range, pastedRangeProps, firstRange, newVal, isOneMerge, arrFormula, tablesMap);
+			var formulaProps = {firstRange: firstRange, arrFormula: arrFormula, tablesMap: tablesMap, newVal: newVal, isOneMerge: isOneMerge};
+			t._setPastedDataByCurrentRange(range, pastedRangeProps, formulaProps);
 		};
 		
         for (var autoR = 0; autoR < maxARow; ++autoR) {
@@ -9399,8 +9399,21 @@
         return arnFor;
     };
 	
-	WorksheetView.prototype._setPastedDataByCurrentRange = function(range, props, firstRange, newVal, isOneMerge, arrFormula, tablesMap)
+	WorksheetView.prototype._setPastedDataByCurrentRange = function(range, rangeStyle, formulaProps)
 	{
+		var t = this;
+		
+		var firstRange, arrFormula, tablesMap, newVal, isOneMerge;
+		if(formulaProps)
+		{
+			//TODO firstRange возможно стоит убрать(добавлено было для правки бага 27745)
+			firstRange = formulaProps.firstRange;
+			arrFormula = formulaProps.arrFormula;
+			tablesMap = formulaProps.tablesMap;
+			newVal = formulaProps.newVal;
+			isOneMerge = formulaProps.isOneMerge;
+		}
+		
 		//set formula - for paste from binary
 		var setFormula = function(newVal, firstRange, range)
 		{
@@ -9453,7 +9466,7 @@
 				} else {
 					cellFrom = newVal.getCells();
 					if (isOneMerge && range && range.bbox) {
-						cellTo = this._getCell(range.bbox.c1, range.bbox.r1).getCells();
+						cellTo = t._getCell(range.bbox.c1, range.bbox.r1).getCells();
 					} else {
 						cellTo = firstRange.getCells();
 					}
@@ -9472,76 +9485,76 @@
 			}
 		};
 		
-		if(props.cellStyle)
+		if(rangeStyle.cellStyle)
 		{
-			range.setCellStyle(props.cellStyle);
+			range.setCellStyle(rangeStyle.cellStyle);
 		}
-		if(props.val)
+		if(rangeStyle.val)
 		{
-			range.setValue(props.val);
+			range.setValue(rangeStyle.val);
 		}
-		if(props.numFormat)
+		if(rangeStyle.numFormat)
 		{
-			range.setNumFormat(props.numFormat);
+			range.setNumFormat(rangeStyle.numFormat);
 		}
 		
 		//for formula
-		if(newVal)
+		if(formulaProps)
 		{
 			setFormula(newVal, firstRange, range);
 		}
 		
-		if(props.font)
+		if(rangeStyle.font)
 		{
-			range.setFont(props.font);
+			range.setFont(rangeStyle.font);
 		}
-		if(props.value2)
+		if(rangeStyle.value2)
 		{
-			range.setValue2(props.value2);
+			range.setValue2(rangeStyle.value2);
 		}
-		if(props.alignVertical)
+		if(rangeStyle.alignVertical)
 		{
-			range.setAlignVertical(props.alignVertical);
+			range.setAlignVertical(rangeStyle.alignVertical);
 		}
-		if(props.alignHorizontal)
+		if(rangeStyle.alignHorizontal)
 		{
-			range.setAlignHorizontal(props.alignHorizontal);
+			range.setAlignHorizontal(rangeStyle.alignHorizontal);
 		}
-		if(props.fontSize)
+		if(rangeStyle.fontSize)
 		{
-			range.setFontsize(props.fontSize);
+			range.setFontsize(rangeStyle.fontSize);
 		}
-		if(props.offsetLast)
+		if(rangeStyle.offsetLast)
 		{
-			range.setOffsetLast(props.offsetLast);
+			range.setOffsetLast(rangeStyle.offsetLast);
 		}
-		if(props.merge)
+		if(rangeStyle.merge)
 		{
-			range.merge(props.merge);
+			range.merge(rangeStyle.merge);
 		}
-		if(props.borders)
+		if(rangeStyle.borders)
 		{
-			range.setBorderSrc(props.borders);
+			range.setBorderSrc(rangeStyle.borders);
 		}
-		if(props.bordersFull)
+		if(rangeStyle.bordersFull)
 		{
-			range.setBorder(props.bordersFull);
+			range.setBorder(rangeStyle.bordersFull);
 		}
-		if(props.wrap)
+		if(rangeStyle.wrap)
 		{
-			range.setWrap(props.wrap);
+			range.setWrap(rangeStyle.wrap);
 		}
-		if(props.fill)
+		if(rangeStyle.fill)
 		{
-			range.setFill(props.fill);
+			range.setFill(rangeStyle.fill);
 		}
-		if(props.angle)
+		if(rangeStyle.angle)
 		{
-			range.setAngle(props.angle);
+			range.setAngle(rangeStyle.angle);
 		}
-		if (props.hyperLink)
+		if (rangeStyle.hyperLink)
 		{
-			var _link = props.hyperLink.hyperLink;
+			var _link = rangeStyle.hyperLink.hyperLink;
 			var newHyperlink = new AscCommonExcel.Hyperlink();
 			if (_link.search('#') === 0) 
 			{
@@ -9552,13 +9565,13 @@
 				newHyperlink.Hyperlink = _link;
 			}
 			newHyperlink.Ref = range;
-			newHyperlink.Tooltip = props.hyperLink;
+			newHyperlink.Tooltip = rangeStyle.hyperLink;
 			range.setHyperlink(newHyperlink);
 		}
-		if (props.hyperlinkObj) 
+		if (rangeStyle.hyperlinkObj) 
 		{
-			props.hyperlinkObj.Ref = range;
-			range.setHyperlink(props.hyperlinkObj, true);
+			rangeStyle.hyperlinkObj.Ref = range;
+			range.setHyperlink(rangeStyle.hyperlinkObj, true);
 		}
 	};
 
