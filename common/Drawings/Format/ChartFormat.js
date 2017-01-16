@@ -12115,7 +12115,7 @@ CDTable.prototype =
         w.WriteString2(this.Get_Id());
     },
 
-    Read_FromBinary: function(r)
+    Read_FromBinary2: function(r)
     {
         this.Id = r.GetString2();
     },
