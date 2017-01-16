@@ -3415,6 +3415,8 @@
 	prot["get_UserId"] = prot.get_UserId;
 	prot["get_HaveChanges"] = prot.get_HaveChanges;
 	prot["get_LockedObjectType"] = prot.get_LockedObjectType;
+	prot["get_FootnoteText"] =  prot.get_FootnoteText;
+	prot["get_FootnoteNumber"] = prot.get_FootnoteNumber;
 
 	window["Asc"]["asc_CUserInfo"] = window["Asc"].asc_CUserInfo = asc_CUserInfo;
 	prot = asc_CUserInfo.prototype;

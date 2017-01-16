@@ -665,6 +665,11 @@ CSectionPr.prototype =
         return this.Columns.Get_ColumnSpace(ColIndex);
     },
 
+	Get_ColumnsSep : function()
+	{
+		return this.Columns.Sep;
+	},
+
 	Set_Columns_EqualWidth : function(Equal)
 	{
 		if (Equal !== this.Columns.Equal)
