@@ -236,6 +236,13 @@ var editor;
     }
     return res;
   };
+	spreadsheet_api.prototype.asc_getCurrencySymbols = function () {
+		var result = {};
+		for (var key in AscCommon.g_aCultureInfos) {
+			result[key] = AscCommon.g_aCultureInfos[key].CurrencySymbol;
+		}
+		return result;
+	};
 	spreadsheet_api.prototype.asc_getLocaleExample2 = function(format, value, culture) {
 		var cultureInfo = AscCommon.g_aCultureInfos[culture] || AscCommon.g_oDefaultCultureInfo;
 		var numFormat = AscCommon.oNumFormatCache.get(format);
@@ -3374,6 +3381,7 @@ var editor;
   prot["asc_GetFontThumbnailsPath"] = prot.asc_GetFontThumbnailsPath;
   prot["asc_setDocInfo"] = prot.asc_setDocInfo;
   prot["asc_getLocaleExample"] = prot.asc_getLocaleExample;
+	prot['asc_getCurrencySymbols'] = prot.asc_getCurrencySymbols;
 	prot['asc_getLocaleExample2'] = prot.asc_getLocaleExample2;
 	prot['asc_getFormatCells'] = prot.asc_getFormatCells;
   prot["asc_getLocaleCurrency"] = prot.asc_getLocaleCurrency;
