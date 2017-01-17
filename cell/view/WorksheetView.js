@@ -8633,9 +8633,15 @@
                         break;
                         break;
                     case "paste":
+						var _clipboard = window["Asc"]["editor"].wb.clipboard;
+						_clipboard.specialPasteProps = _clipboard.specialPasteProps ? _clipboard.specialPasteProps : new AscCommonExcel.SpecialPasteProps();
+					
+                        t._loadDataBeforePaste(isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth);
+                        bIsUpdate = false;
+                        break;
+					 case "specialPaste":
                         // Вставляем текст из локального буфера или нет
-                        fromBinary ? t._pasteData(isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth) :
-                          t._loadDataBeforePaste(isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth);
+                        t.specialPaste();
                         bIsUpdate = false;
                         break;
                     case "hyperlink":
@@ -8689,14 +8695,19 @@
                 History.EndTransaction();
             }
         };
+		
+		//получаем диапазон вставки
         if ("paste" === prop && val.onlyImages !== true) {
-            // Для past свой диапазон
             var newRange;
             if (fromBinary) {
                 newRange = this._pasteFromBinary(val, true);
             } else {
                 newRange = this._pasteFromHTML(val, true);
             }
+			var sBinary = window["Asc"]["editor"].wb.clipboard.copyProcessor.getBinaryForCopy(this);
+			window["Asc"]["editor"].wb.clipboard.pasteProcessor.oSpecialPaste.undoBinary = sBinary;
+			//this.oSpecialPaste.undoImgsId;
+			
             checkRange = [newRange];
         }
         if ("paste" === prop && val.onlyImages === true) {
@@ -8705,9 +8716,35 @@
             this._isLockedCells(checkRange, /*subType*/null, onSelectionCallback);
         }
     };
-
+	
+	WorksheetView.prototype.specialPaste = function (props) {
+		var api = window["Asc"]["editor"];
+		//откатываемся до того, что было до вставки
+		if(api.wb.clipboard.pasteProcessor.oSpecialPaste.undoBinary)
+		{
+			//откатываем данные в ячейках
+			api.wb.clipboard.pasteProcessor.pasteFromBinary(this, api.wb.clipboard.pasteProcessor.oSpecialPaste.undoBinary);
+			
+			//удаляем вставленные изображения
+			
+		}
+		
+		//далее специальная вставка
+		var tempProps = new SpecialPasteProps();
+		tempProps.setProps("values");
+		api.wb.clipboard.specialPasteProps = tempProps;
+		if(api.wb.clipboard.pasteProcessor.oSpecialPaste.oPreSpecialPasteData)
+		{
+			var oPreSpecialPasteData = api.wb.clipboard.pasteProcessor.oSpecialPaste.oPreSpecialPasteData;
+			api.wb.clipboard.pasteData(this, oPreSpecialPasteData._format, oPreSpecialPasteData.data1, oPreSpecialPasteData.data2, oPreSpecialPasteData.text_data);
+		}
+	};
+	
     WorksheetView.prototype._pasteData = function (isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth) {
         var t = this;
+		var _clipboard = window["Asc"]["editor"].wb.clipboard;
+		var specialPasteProps = _clipboard.specialPasteProps;
+		
         var callTrigger = false;
         if (isLargeRange) {
             callTrigger = true;
@@ -8783,9 +8820,9 @@
         t.model.workbook.dependencyFormulas.lockRecal();
         var selectData;
         if (fromBinary) {
-            selectData = t._pasteFromBinary(val, null, tablesMap);
+            selectData = t._pasteFromBinary(val, null, tablesMap, specialPasteProps);
         } else {
-            selectData = t._pasteFromHTML(val);
+            selectData = t._pasteFromHTML(val, null, specialPasteProps);
         }
 
         t.model.autoFilters.renameTableColumn(t.model.selectionRange.getLast());
@@ -8837,7 +8874,15 @@
 
     WorksheetView.prototype._loadDataBeforePaste = function ( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth ) {
         var t = this;
-
+		var _clipboard = window["Asc"]["editor"].wb.clipboard;
+		var specialPasteProps = _clipboard.specialPasteProps;
+		
+		if(fromBinary)
+		{
+			t._pasteData(isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth);
+			return;
+		}
+		
         //загрузка шрифтов, в случае удачи на callback вставляем текст
         t._loadFonts( pasteContent.props.fontsNew, function () {
 
@@ -8928,7 +8973,7 @@
         } );
     };
 
-    WorksheetView.prototype._pasteFromHTML = function (pasteContent, isCheckSelection) {
+    WorksheetView.prototype._pasteFromHTML = function (pasteContent, isCheckSelection, specialPasteProps) {
         var t = this;
         var wb = window["Asc"]["editor"].wb;
         var lastSelection = this.model.selectionRange.getLast();
@@ -9120,7 +9165,7 @@
         return arnFor;
     };
 
-    WorksheetView.prototype._pasteFromBinary = function (val, isCheckSelection, tablesMap) {
+    WorksheetView.prototype._pasteFromBinary = function (val, isCheckSelection, tablesMap, specialPasteProps) {
         var t = this;
         var arn = t.model.selectionRange.getLast();
         var arrFormula = [];

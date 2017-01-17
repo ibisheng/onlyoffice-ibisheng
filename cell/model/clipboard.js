@@ -55,14 +55,137 @@
 				return n;
 			return "rgb(" + (n >> 16 & 0xFF) + "," + (n >> 8 & 0xFF) + "," + (n & 0xFF) + ")";
 		}
-
-
+		
+		function SpecialPasteProps()
+		{
+			this.cellStyle = true;
+			this.val = true;
+			this.numFormat = true;
+			this.formula = true;
+			this.font = true;
+			this.alignVertical = true;
+			this.alignHorizontal = true;
+			this.fontSize = true;
+			this.merge = true;
+			this.borders = true;
+			this.wrap = true;
+			this.fill = true;
+			this.angle = true;
+		}
+		
+		SpecialPasteProps.prototype = {
+			
+			constructor: SpecialPasteProps,
+			
+			clean: function()
+			{
+				this.cellStyle = true;
+				this.val = true;
+				this.numFormat = true;
+				this.formula = true;
+				this.font = true;
+				this.alignVertical = true;
+				this.alignHorizontal = true;
+				this.fontSize = true;
+				this.merge = true;
+				this.borders = true;
+				this.wrap = true;
+				this.fill = true;
+				this.angle = true;
+			},
+			revert: function()
+			{
+				this.cellStyle = null;
+				this.val = null;
+				this.numFormat = null;
+				this.formula = null;
+				this.font = null;
+				this.alignVertical = null;
+				this.alignHorizontal = null;
+				this.fontSize = null;
+				this.merge = null;
+				this.borders = null;
+				this.wrap = null;
+				this.fill = null;
+				this.angle = null;
+			},
+			setProps: function(props)
+			{
+				switch(props)
+				{
+					case "formulas":
+					{
+						
+					}
+					case "formulasNumberFormating":
+					{
+						
+					}
+					case "keepSourceFormating":
+					{
+						
+					}
+					case "noBorders":
+					{
+						this.borders = null;
+					}
+					case "keepSourceColumnWidth":
+					{
+						
+					}
+					case "keepSourceColumnWidths":
+					{
+						
+					}
+					case "transpose":
+					{
+						
+					}
+					
+					case "values":
+					{
+						this.revert();
+						this.val = true;
+					}
+					case "valuesSourceFormating":
+					{
+						
+					}
+					case "valuesNumberFormating":
+					{
+						
+					}
+					
+					case "formating":
+					{
+						
+					}
+					case "pasteLink":
+					{
+						
+					}
+					case "picture":
+					{
+						
+					}
+					case "linkedPicture":
+					{
+						
+					}
+					
+				}
+			},
+			
+		}
+		
 		/** @constructor */
 		function Clipboard() 
 		{	
 			this.copyProcessor = new CopyProcessorExcel();
 			this.pasteProcessor = new PasteProcessorExcel();
-
+			
+			this.specialPasteProps = null;
+			
 			return this;
 		}
 
@@ -206,6 +329,11 @@
 						
 						break;
 					}
+				}
+				
+				if(null === this.specialPasteProps)
+				{
+					this.pasteProcessor.oSpecialPaste.oPreSpecialPasteData = {_format: _format, data1: data1, data2: data2, text_data: text_data};
 				}
 			}
 		};
@@ -756,6 +884,8 @@
 		{
 			this.activeRange = null;
 			this.alreadyLoadImagesOnServer = false;
+			
+			this.oSpecialPaste = {};
 			
 			this.Api = window["Asc"]["editor"];
 			
@@ -4064,5 +4194,6 @@
 		//---------------------------------------------------------export---------------------------------------------------
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 		window["AscCommonExcel"].Clipboard = Clipboard;
+		window["AscCommonExcel"].SpecialPasteProps = SpecialPasteProps;
 	}
 )(jQuery, window);
