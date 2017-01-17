@@ -1168,7 +1168,7 @@ Path.prototype = {
         if (!isLine)
             isRect = this.isSmartRect();
 
-        if (!isLine && !isRect)
+        if (window["NATIVE_EDITOR_ENJINE"] || ( !isLine && !isRect))
             return this.draw(shape_drawer);
 
         var _old_int = _graphics.m_bIntegerGrid;
@@ -1872,7 +1872,7 @@ Path.prototype = {
             if (!isLine)
                 isRect = this.isSmartRect();
 
-            if (!isLine && !isRect)
+            if (window["NATIVE_EDITOR_ENJINE"] || ( !isLine && !isRect))
                 return this.draw(shape_drawer);
 
             var _old_int = _graphics.m_bIntegerGrid;
