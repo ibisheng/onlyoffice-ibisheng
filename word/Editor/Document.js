@@ -9385,6 +9385,19 @@ CDocument.prototype.GetCurrentSectionPr = function()
 
 	return oSectPr;
 };
+CDocument.prototype.GetFirstElementInSection = function(SectionIndex)
+{
+	if (SectionIndex <= 0)
+		return this.Content[0] ? this.Content[0] : null;
+
+	var nElementPos = this.SectionsInfo.Get_SectPr2(SectionIndex - 1).Index + 1;
+	return this.Content[nElementPos] ? this.Content[nElementPos] : null;
+};
+CDocument.prototype.GetSectionIndexByElementIndex = function(ElementIndex)
+{
+	return this.SectionsInfo.Get_Index(ElementIndex);
+};
+
 /**
  * Определяем использовать ли заливку текста в особых случаях, когда вызывается заливка параграфа.
  * @param bUse
