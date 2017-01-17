@@ -574,7 +574,11 @@
 		Medium : 2,	// 2px
 		Thick  : 3		// 3px
 	};
-	// Располагаются в порядке значимости для отрисовки
+	/** @enum {number} */
+	/**
+	 * Располагаются в порядке значимости для отрисовки
+	 * @enum {number}
+	 */
 	var c_oAscBorderStyles    = {
 		None             : 0,
 		Double           : 1,
@@ -720,7 +724,7 @@
 		None      : 0,
 		Tab       : 1,
 		Semicolon : 2,
-		Сolon     : 3,
+		Colon     : 3,
 		Comma     : 4,
 		Space     : 5
 	};
@@ -1979,7 +1983,7 @@
 			_object["variations"].push(this.variations[i].serialize());
 		}
 		return _object;
-	}
+	};
 	CPlugin.prototype["deserialize"] = function(_object)
 	{
 		this.name       = (_object["name"] != null) ? _object["name"] : this.name;
@@ -1992,7 +1996,7 @@
 			_variation["deserialize"](_object["variations"][i]);
 			this.variations.push(_variation);
 		}
-	}
+	};
 
 	window["Asc"]["CPluginVariation"] = window["Asc"].CPluginVariation = CPluginVariation;
 	window["Asc"]["CPlugin"] = window["Asc"].CPlugin = CPlugin;
