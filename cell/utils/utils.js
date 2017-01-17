@@ -2137,14 +2137,12 @@
 			this.type = Asc.c_oAscNumFormatType.General;
 			this.decimalPlaces = 2;
 			this.separator = false;
-			this.symbol = false;
-			this.fractionType = 0;
+			this.symbol = null;
 		}
 		asc_CFormatCellsInfo.prototype.asc_setType = function (val) {this.type = val;};
 		asc_CFormatCellsInfo.prototype.asc_setDecimalPlaces = function (val) {this.decimalPlaces = val;};
 		asc_CFormatCellsInfo.prototype.asc_setSeparator = function (val) {this.separator = val;};
 		asc_CFormatCellsInfo.prototype.asc_setSymbol = function (val) {this.symbol = val;};
-		asc_CFormatCellsInfo.prototype.asc_setFractionType = function (val) {this.fractionType = val;};
 
 		/*
 		 * Export
@@ -2322,5 +2320,4 @@
 		prot["asc_setDecimalPlaces"] = prot.asc_setDecimalPlaces;
 		prot["asc_setSeparator"] = prot.asc_setSeparator;
 		prot["asc_setSymbol"] = prot.asc_setSymbol;
-		prot["asc_setFractionType"] = prot.asc_setFractionType;
 })(window);
