@@ -1525,6 +1525,7 @@ function ParaFootnoteReference(Footnote, CustomMark)
 	this.NumFormat    = numbering_numfmt_Decimal;
 
 	this.Run          = null;
+	this.Widths       = [];
 }
 AscCommon.extendClass(ParaFootnoteReference, CRunElementBase);
 ParaFootnoteReference.prototype.Type = para_FootnoteReference;
@@ -1544,15 +1545,17 @@ ParaFootnoteReference.prototype.Draw = function(X, Y, Context, PDSE)
 		FontKoef = vertalign_Koef_Size;
 
 	Context.SetFontSlot(fontslot_ASCII, FontKoef);
-	g_oTextMeasurer.SetFontSlot(fontslot_ASCII, FontKoef);
 
 	var _X = X;
 	var T  = this.private_GetString();
+	if (this.Widths.length !== T.length)
+		return;
+
 	for (var nPos = 0; nPos < T.length; ++nPos)
 	{
 		var Char = T.charAt(nPos);
 		Context.FillText(_X, Y, Char);
-		_X += g_oTextMeasurer.Measure(Char).Width;
+		_X += this.Widths[nPos];
 	}
 
 	if (editor && editor.ShowParaMarks && Context.DrawFootnoteRect)
@@ -1661,11 +1664,15 @@ ParaFootnoteReference.prototype.private_Measure = function()
 
 	var X = 0;
 	var T = this.private_GetString();
+	this.Widths = [];
 	for (var nPos = 0; nPos < T.length; ++nPos)
 	{
-		var Char = T.charAt(nPos);
-		X += oMeasurer.Measure(Char).Width;
+		var Char  = T.charAt(nPos);
+		var CharW = oMeasurer.Measure(Char).Width
+		this.Widths.push(CharW);
+		X += CharW;
 	}
+
 
 	var ResultWidth   = (Math.max((X + TextPr.Spacing), 0) * TEXTWIDTH_DIVIDER) | 0;
 	this.Width        = ResultWidth;
