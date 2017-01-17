@@ -355,19 +355,17 @@ var editor;
 				//todo add all used in workbook formats
 			} else {
 				res.push(AscCommon.g_cGeneralFormat);
+				res.push('0.00');
+				res.push(AscCommon.getCurrencyFormatSimple2(cultureInfo, 2, currency, false));
+				res.push(AscCommon.getCurrencyFormat(cultureInfo, 2, currency, true));
+				res.push(AscCommon.getShortDateFormat(cultureInfo));
+				//todo F800 F400
+				res.push('[$-F800]dddd, mmmm dd, yyyy');
+				res.push('[$-F400]h:mm:ss AM/PM');
+				res.push('0.00%');
+				res.push('# ?/?');
+				res.push('@');
 			}
-		} else {
-			res.push(AscCommon.g_cGeneralFormat);
-			res.push('0.00');
-			res.push(AscCommon.getCurrencyFormatSimple2(null, 2, true, false));
-			res.push(AscCommon.getCurrencyFormat(null, 2, true, true));
-			res.push(AscCommon.getShortDateFormat());
-			//todo F800 F400
-			res.push('[$-F800]dddd, mmmm dd, yyyy');
-			res.push('[$-F400]h:mm:ss AM/PM');
-			res.push('0.00%');
-			res.push('# ?/?');
-			res.push('@');
 		}
 		return res;
 	};

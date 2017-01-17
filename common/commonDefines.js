@@ -229,6 +229,7 @@
 
 	//NumFormat defines
 	var c_oAscNumFormatType = {
+		None       : -1,
 		General    : 0,
 		Custom     : 1,
 		Text       : 2,
@@ -1203,6 +1204,7 @@
 	prot['BlockInteraction']             = prot.BlockInteraction;
 	window['Asc']['c_oAscNumFormatType'] = window['Asc'].c_oAscNumFormatType = c_oAscNumFormatType;
 	prot                                     = c_oAscNumFormatType;
+	prot['None']                             = prot.None;
 	prot['General']                          = prot.General;
 	prot['Custom']                           = prot.Custom;
 	prot['Text']                             = prot.Text;
