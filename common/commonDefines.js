@@ -865,9 +865,6 @@
     };
 
 
-
-
-
 	/** @enum {number} */
 	var c_oAscMathInterfaceBarPos = {
 		Top    : 0,
@@ -912,15 +909,12 @@
 		Right  : 2
 	};
 
-
-
 	/** @enum {number} */
 	var c_oAscMathInterfaceEqArrayAlign = {
 		Top    : 0,
 		Center : 1,
 		Bottom : 2
 	};
-
 
 	/** @enum {number} */
 	var c_oAscMathInterfaceNaryLimitLocation = {
@@ -934,7 +928,6 @@
 		Top    : 0,
 		Bottom : 1
 	};
-
 
 	var c_oAscEncodings    = [
 		[0, 28596, "ISO-8859-6", "Arabic (ISO 8859-6)"],
@@ -1420,6 +1413,22 @@
 	prot['Page']                           = prot.Page;
 	prot['Paragraph']                      = prot.Paragraph;
 	prot['TopMargin']                      = prot.TopMargin;
+	window['Asc']['c_oAscPageOrientation'] = window['AscCommon'].c_oAscBorderStyles = c_oAscBorderStyles;
+	prot                         = c_oAscPageOrientation;
+	prot['None']                 = prot.None;
+	prot['Double']               = prot.Double;
+	prot['Hair']                 = prot.Hair;
+	prot['DashDotDot']           = prot.DashDotDot;
+	prot['DashDot']              = prot.DashDot;
+	prot['Dotted']               = prot.Dotted;
+	prot['Dashed']               = prot.Dashed;
+	prot['Thin']                 = prot.Thin;
+	prot['MediumDashDotDot']     = prot.MediumDashDotDot;
+	prot['SlantDashDot']         = prot.SlantDashDot;
+	prot['MediumDashDot']        = prot.MediumDashDot;
+	prot['MediumDashed']         = prot.MediumDashed;
+	prot['Medium']               = prot.Medium;
+	prot['Thick']                = prot.Thick;
 	window['Asc']['c_oAscPageOrientation'] = window['Asc'].c_oAscPageOrientation = c_oAscPageOrientation;
 	prot                         = c_oAscPageOrientation;
 	prot['PagePortrait']         = prot.PagePortrait;
@@ -1641,7 +1650,6 @@
 	window["AscCommon"].c_oAscSizeRelFromV          = c_oAscSizeRelFromV;
 	window["AscCommon"].c_oAscWrapStyle             = c_oAscWrapStyle;
 	window["AscCommon"].c_oAscBorderWidth           = c_oAscBorderWidth;
-	window["AscCommon"].c_oAscBorderStyles          = c_oAscBorderStyles;
 	window["AscCommon"].c_oAscBorderType            = c_oAscBorderType;
 	window["AscCommon"].c_oAscLockTypes             = c_oAscLockTypes;
 	window["AscCommon"].c_oAscFormatPainterState    = c_oAscFormatPainterState;
