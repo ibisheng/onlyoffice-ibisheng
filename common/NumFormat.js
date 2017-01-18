@@ -165,11 +165,13 @@ function FormatObjBracket(sData)
                 {
                     var sFirstParam = aParams[0];
                     var sSecondParam = aParams[1];
-                    if(null != sFirstParam && sFirstParam.length > 0 && null != sSecondParam && sSecondParam.length > 0)
+                    if(null != sFirstParam && sFirstParam.length > 0)
                     {
                         this.CurrencyString = sFirstParam;
-                        this.Lid = sSecondParam;
                     }
+                    if (null != sSecondParam && sSecondParam.length > 0) {
+						this.Lid = sSecondParam;
+					}
                 }
             }
 			else if("=" == first || ">" == first || "<" == first)
@@ -283,6 +285,7 @@ function NumFormat(bAddMinusIfNes)
 	this.bRepeat = false;
     this.Color = -1;
 	this.ComporationOperator = null;
+	this.LCID = null;
     
 	this.bGeneralChart = false;//если в формате только один текст(например в chart "Основной")
     this.bAddMinusIfNes = bAddMinusIfNes;//когда не задано форматирование для отрицательных чисел иногда надо вставлять минус
@@ -1367,6 +1370,9 @@ NumFormat.prototype =
                         if (null != item.CurrencyString) {
                             sText += item.CurrencyString;
                         }
+						if (null != item.Lid) {
+							this.LCID = parseInt(item.Lid, 16);
+						}
                     }
                     else if (numFormat_DecimalPoint == item.type) {
                         sText += gc_sFormatDecimalPoint;
@@ -1425,6 +1431,10 @@ NumFormat.prototype =
     },
     format: function (number, nValType, dDigitsCount, cultureInfo, bChart)
     {
+		if (null != this.LCID) {
+			//Excel sometimes add 0x10000(0x442 and 0x10442)
+			cultureInfo = g_aCultureInfos[this.LCID & 0xFFFF];
+		}
         if (null == cultureInfo)
             cultureInfo = g_oDefaultCultureInfo;
         if(null == nValType)
@@ -3625,8 +3635,14 @@ function setCurrentCultureInfo(val) {
 		}
 		return true;
 	}
-	function getShortDateMonthFormat(bDate, bYear, separator, opt_cultureInfo) {
+	function getShortDateMonthFormat(bDate, bYear, opt_cultureInfo) {
 		var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
+		var separator;
+		if ('/' == AscCommon.g_oDefaultCultureInfo.DateSeparator) {
+			separator = '-';
+		} else {
+			separator = '/';
+		}
 		var sRes = '';
 		if (bDate) {
 			if (-1 != cultureInfo.ShortDatePattern.indexOf('1')) {
@@ -3670,6 +3686,338 @@ function setCurrentCultureInfo(val) {
 		}
 		return dateElems.join('/');
 	}
+
+	function getShortDateFormat2(day, month, year, opt_cultureInfo) {
+		var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
+		var dateElems = [];
+		for (var i = 0; i < cultureInfo.ShortDatePattern.length; ++i) {
+			switch (cultureInfo.ShortDatePattern[i]) {
+				case '0':
+				case '1':
+					if (day > 0) {
+						dateElems.push('d'.repeat(day));
+					}
+					break;
+				case '2':
+				case '3':
+					if (month > 0) {
+						dateElems.push('m'.repeat(month));
+					}
+					break;
+				case '4':
+				case '5':
+					if (year > 0) {
+						dateElems.push('y'.repeat(month));
+					}
+					break;
+			}
+		}
+		return dateElems.join('/');
+	}
+
+	function getNumberFormatSimple(opt_separate, opt_fraction) {
+		var numberFormat = opt_separate ? '#,##0' : '0';
+		if (opt_fraction > 0) {
+			numberFormat += '.' + '0'.repeat(opt_fraction);
+		}
+		return numberFormat;
+	}
+
+	function getNumberFormat(opt_cultureInfo, opt_separate, opt_fraction, opt_red) {
+		var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
+		var numberFormat = getNumberFormatSimple(opt_separate, opt_fraction);
+		var red = opt_red ? '[Red]' : '';
+
+		var positiveFormat;
+		var negativeFormat;
+		switch (cultureInfo.CurrencyNegativePattern) {
+			case 0:
+			case 4:
+			case 14:
+			case 15:
+				positiveFormat = numberFormat + '_)';
+				negativeFormat = '\\(' + numberFormat + '\\)';
+				break;
+			default:
+				positiveFormat = numberFormat + '_ ';
+				negativeFormat = '\\-' + numberFormat + '\\ ';
+				break;
+		}
+		return positiveFormat + ';' + red + negativeFormat;
+	}
+
+	function getLocaleFormat(opt_cultureInfo, opt_currency) {
+		var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
+		var symbol = opt_currency ? cultureInfo.CurrencySymbol : '';
+		return '[$' + symbol + '-' + cultureInfo.LCID.toString(16).toUpperCase() + ']';
+	}
+
+	function getCurrencyFormatSimple(opt_cultureInfo, opt_fraction, opt_currency, opt_currencyLocale, opt_red) {
+		var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
+		var numberFormat = getNumberFormatSimple(true, opt_fraction);
+		var signCurrencyFormat;
+		var signCurrencyFormatEnd;
+		var signCurrencyFormatSpace;
+		if (opt_currency) {
+			if (opt_currencyLocale) {
+				signCurrencyFormat = getLocaleFormat(cultureInfo, true);
+			} else {
+				signCurrencyFormat = '"' + cultureInfo.CurrencySymbol + '"';
+			}
+			signCurrencyFormatEnd = signCurrencyFormat;
+			signCurrencyFormatSpace = signCurrencyFormat + '\\ ';
+		} else {
+			signCurrencyFormatEnd = signCurrencyFormat = signCurrencyFormatSpace = '';
+			for (var i = 0; i < cultureInfo.CurrencySymbol.length; ++i) {
+				signCurrencyFormatEnd += '_' + cultureInfo.CurrencySymbol[i];
+			}
+		}
+		var red = opt_red ? '[Red]' : '';
+
+		var prefixs = ['_ ', '_-', '_(', '_)'];
+		var postfix = '';
+		var positiveFormat;
+		var negativeFormat;
+		switch (cultureInfo.CurrencyNegativePattern) {
+			case 0:
+				postfix = prefixs[3];
+				negativeFormat = '\\(' + signCurrencyFormat + numberFormat + '\\)';
+				break;
+			case 1:
+				negativeFormat = '\\-' + signCurrencyFormat + numberFormat;
+				break;
+			case 2:
+				negativeFormat = signCurrencyFormatSpace + '\\-' + numberFormat;
+				break;
+			case 3:
+				postfix = prefixs[1];
+				negativeFormat = signCurrencyFormatSpace + numberFormat + '\\-';
+				break;
+			case 4:
+				postfix = prefixs[3];
+				negativeFormat = '\\(' + numberFormat + signCurrencyFormatEnd + '\\)';
+				break;
+			case 5:
+				negativeFormat = '\\-' + numberFormat + signCurrencyFormatEnd;
+				break;
+			case 6:
+				negativeFormat = numberFormat + '\\-' + signCurrencyFormatEnd;
+				break;
+			case 7:
+				postfix = prefixs[1];
+				negativeFormat = numberFormat + signCurrencyFormatEnd + '\\-';
+				break;
+			case 8:
+				negativeFormat = '\\-' + numberFormat + '\\ ' + signCurrencyFormatEnd;
+				break;
+			case 9:
+				negativeFormat = '\\-' + signCurrencyFormatSpace + numberFormat;
+				break;
+			case 10:
+				postfix = prefixs[1];
+				negativeFormat = numberFormat + '\\ ' + signCurrencyFormatEnd + '\\-';
+				break;
+			case 11:
+				postfix = prefixs[1];
+				negativeFormat = signCurrencyFormatSpace + numberFormat + '\\-';
+				break;
+			case 12:
+				negativeFormat = signCurrencyFormatSpace + '\\-' + numberFormat;
+				break;
+			case 13:
+				negativeFormat = numberFormat + '\\-\\ ' + signCurrencyFormatEnd;
+				break;
+			case 14:
+				postfix = prefixs[3];
+				negativeFormat = '(' + signCurrencyFormat + numberFormat + '\\)';
+				break;
+			case 15:
+				postfix = prefixs[3];
+				negativeFormat = '\\(' + numberFormat + signCurrencyFormatEnd + '\\)';
+				break;
+		}
+		switch (cultureInfo.CurrencyPositivePattern) {
+			case 0:
+				positiveFormat = signCurrencyFormat + numberFormat;
+				break;
+			case 1:
+				positiveFormat = numberFormat + signCurrencyFormatEnd;
+				break;
+			case 2:
+				positiveFormat = signCurrencyFormatSpace + numberFormat;
+				break;
+			case 3:
+				positiveFormat = numberFormat + '\\ ' + signCurrencyFormatEnd;
+				break;
+		}
+		positiveFormat = positiveFormat + postfix;
+		return positiveFormat + ';' + red + negativeFormat;
+	}
+
+	function getCurrencyFormatSimple2(opt_cultureInfo, opt_fraction, opt_currency, opt_negative) {
+		var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
+		var numberFormat = getNumberFormatSimple(true, opt_fraction);
+		var signCurrencyFormat;
+		var signCurrencyFormatEnd;
+		var signCurrencyFormatSpace;
+		if (opt_currency) {
+			signCurrencyFormat = signCurrencyFormatEnd = getLocaleFormat(cultureInfo, true);
+			signCurrencyFormatSpace = signCurrencyFormat + '\\ ';
+		} else {
+			signCurrencyFormatEnd = signCurrencyFormat = signCurrencyFormatSpace = '';
+			for (var i = 0; i < cultureInfo.CurrencySymbol.length; ++i) {
+				signCurrencyFormatEnd += '_' + cultureInfo.CurrencySymbol[i];
+			}
+		}
+		var positiveFormat;
+		switch (cultureInfo.CurrencyNegativePattern) {
+			case 0:
+			case 1:
+			case 14:
+				positiveFormat = signCurrencyFormat + numberFormat;
+				break;
+			case 2:
+			case 3:
+			case 9:
+			case 10:
+			case 11:
+			case 12:
+				positiveFormat = signCurrencyFormatSpace + numberFormat;
+				break;
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 15:
+				positiveFormat = numberFormat + signCurrencyFormatEnd;
+				break;
+			case 8:
+			case 13:
+				positiveFormat = numberFormat + '\\ ' + signCurrencyFormatEnd;
+				break;
+		}
+		return opt_negative ? positiveFormat + ';[Red]' + positiveFormat : positiveFormat;
+	}
+
+	function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_currencyLocale) {
+		var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
+		var numberFormat = getNumberFormatSimple(true, opt_fraction);
+		var nullSignFormat = '* "-"';
+		if (opt_fraction) {
+			nullSignFormat += '?'.repeat(opt_fraction);
+		}
+		var signCurrencyFormat;
+		var signCurrencyFormatEnd;
+		var signCurrencyFormatSpace;
+		if (opt_currency) {
+			if (opt_currencyLocale) {
+				signCurrencyFormat = getLocaleFormat(cultureInfo, true);
+			} else {
+				signCurrencyFormat = '"' + cultureInfo.CurrencySymbol + '"';
+			}
+			signCurrencyFormatEnd = signCurrencyFormat;
+			signCurrencyFormatSpace = signCurrencyFormat + '\\ ';
+		} else {
+			signCurrencyFormatEnd = signCurrencyFormat = signCurrencyFormatSpace = '';
+			for (var i = 0; i < cultureInfo.CurrencySymbol.length; ++i) {
+				signCurrencyFormatEnd += '_' + cultureInfo.CurrencySymbol[i];
+			}
+		}
+
+		var prefixs = ['_ ', '_-', '_(', '_)'];
+		var prefix = prefixs[0];
+		var postfix = prefixs[0];
+		var positiveNumberFormat = '* ' + numberFormat;
+		var positiveFormat;
+		var negativeFormat;
+		var nullFormat;
+		switch (cultureInfo.CurrencyNegativePattern) {
+			case 0:
+				prefix = prefixs[2];
+				postfix = prefixs[3];
+				negativeFormat = prefix + signCurrencyFormat + '* \\(' + numberFormat + '\\)';
+				break;
+			case 1:
+				prefix = postfix = prefixs[1];
+				negativeFormat = '\\-' + signCurrencyFormat + '* ' + numberFormat + postfix;
+				break;
+			case 2:
+				negativeFormat = prefix + signCurrencyFormatSpace + '* \\-' + numberFormat + postfix;
+				break;
+			case 3:
+				prefix = postfix = prefixs[1];
+				negativeFormat = prefix + signCurrencyFormatSpace + '* ' + numberFormat + '\\-';
+				break;
+			case 4:
+				prefix = prefixs[2];
+				postfix = prefixs[3];
+				negativeFormat = prefix + '* \\(' + numberFormat + '\\)' + signCurrencyFormatEnd + postfix;
+				break;
+			case 5:
+				prefix = postfix = prefixs[1];
+				negativeFormat = '\\-* ' + numberFormat + signCurrencyFormatEnd + postfix;
+				break;
+			case 6:
+				negativeFormat = prefix + '* ' + numberFormat + '\\-' + signCurrencyFormatEnd + postfix;
+				break;
+			case 7:
+				negativeFormat = prefix + '* ' + numberFormat + signCurrencyFormatEnd + '\\-';
+				break;
+			case 8:
+				prefix = postfix = prefixs[1];
+				negativeFormat = '\\-* ' + numberFormat + '\\ ' + signCurrencyFormatEnd + postfix;
+				break;
+			case 9:
+				prefix = postfix = prefixs[1];
+				negativeFormat = '\\-' + signCurrencyFormatSpace + '* ' + numberFormat + postfix;
+				break;
+			case 10:
+				negativeFormat = prefix + '* ' + numberFormat + '\\ ' + signCurrencyFormatEnd + '\\-';
+				break;
+			case 11:
+				negativeFormat = prefix + signCurrencyFormatSpace + '* ' + numberFormat + '\\-';
+				break;
+			case 12:
+				negativeFormat = prefix + signCurrencyFormatSpace + '* \\-' + numberFormat + postfix;
+				break;
+			case 13:
+				negativeFormat = prefix + '* ' + numberFormat + '\\-\\ ' + signCurrencyFormatEnd + postfix;
+				break;
+			case 14:
+				prefix = prefixs[2];
+				postfix = prefixs[3];
+				negativeFormat = prefix + signCurrencyFormatSpace + '* \\(' + numberFormat + '\\)';
+				break;
+			case 15:
+				prefix = prefixs[2];
+				postfix = prefixs[3];
+				negativeFormat = prefix + '* \\(' + numberFormat + '\\)\\ ' + signCurrencyFormatEnd + postfix;
+				break;
+		}
+		switch (cultureInfo.CurrencyPositivePattern) {
+			case 0:
+				positiveFormat = signCurrencyFormat + positiveNumberFormat;
+				nullFormat = signCurrencyFormat + nullSignFormat;
+				break;
+			case 1:
+				positiveFormat = positiveNumberFormat + signCurrencyFormatEnd;
+				nullFormat = nullSignFormat + signCurrencyFormatEnd;
+				break;
+			case 2:
+				positiveFormat = signCurrencyFormatSpace + positiveNumberFormat;
+				nullFormat = signCurrencyFormatSpace + nullSignFormat;
+				break;
+			case 3:
+				positiveFormat = positiveNumberFormat + '\\ ' + signCurrencyFormatEnd;
+				nullFormat = nullSignFormat + '\\ ' + signCurrencyFormatEnd;
+				break;
+		}
+		positiveFormat = prefix + positiveFormat + postfix;
+		nullFormat = prefix + nullFormat + postfix;
+		var textFormat = prefix + '@' + postfix;
+		return positiveFormat + ';' + negativeFormat + ';' + nullFormat + ';' + textFormat;
+	}
+
 var g_aCultureInfos = {
 	1: {LCID: 1, Name: "ar", CurrencyPositivePattern: 2, CurrencyNegativePattern: 3, CurrencySymbol: "ر.س.‏", NumberDecimalSeparator: ".", NumberGroupSeparator: ",", NumberGroupSizes: [3], DayNames: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"], AbbreviatedDayNames: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"], MonthNames: ["محرم", "صفر", "ربيع الأول", "ربيع الثاني", "جمادى الأولى", "جمادى الثانية", "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة", ""], AbbreviatedMonthNames: ["محرم", "صفر", "ربيع الأول", "ربيع الثاني", "جمادى الأولى", "جمادى الثانية", "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة", ""], MonthGenitiveNames: [], AbbreviatedMonthGenitiveNames: [], AMDesignator: "ص", PMDesignator: "م", DateSeparator: "/", TimeSeparator: ":", ShortDatePattern: "134"},
 	2: {LCID: 2, Name: "bg", CurrencyPositivePattern: 3, CurrencyNegativePattern: 8, CurrencySymbol: "лв.", NumberDecimalSeparator: ",", NumberGroupSeparator: " ", NumberGroupSizes: [3], DayNames: ["неделя", "понеделник", "вторник", "сряда", "четвъртък", "петък", "събота"], AbbreviatedDayNames: ["нед", "пон", "вт", "ср", "четв", "пет", "съб"], MonthNames: ["януари", "февруари", "март", "април", "май", "юни", "юли", "август", "септември", "октомври", "ноември", "декември", ""], AbbreviatedMonthNames: ["яну", "фев", "мар", "апр", "май", "юни", "юли", "авг", "сеп", "окт", "ное", "дек", ""], MonthGenitiveNames: [], AbbreviatedMonthGenitiveNames: [], AMDesignator: "", PMDesignator: "", DateSeparator: ".", TimeSeparator: ":", ShortDatePattern: "025"},
@@ -4111,7 +4459,14 @@ var g_oDefaultCultureInfo = g_aCultureInfos[1033];//en-US//1033//fr-FR//1036//ba
     window["AscCommon"].DecodeGeneralFormat = DecodeGeneralFormat;
     window["AscCommon"].setCurrentCultureInfo = setCurrentCultureInfo;
 	window['AscCommon'].getShortDateFormat = getShortDateFormat;
+	window['AscCommon'].getShortDateFormat2 = getShortDateFormat2;
 	window['AscCommon'].getShortDateMonthFormat = getShortDateMonthFormat;
+	window['AscCommon'].getNumberFormatSimple = getNumberFormatSimple;
+	window['AscCommon'].getNumberFormat = getNumberFormat;
+	window['AscCommon'].getLocaleFormat = getLocaleFormat;
+	window['AscCommon'].getCurrencyFormatSimple = getCurrencyFormatSimple;
+	window['AscCommon'].getCurrencyFormatSimple2 = getCurrencyFormatSimple2;
+	window['AscCommon'].getCurrencyFormat = getCurrencyFormat;
 
     window["AscCommon"].gc_nMaxDigCount = gc_nMaxDigCount;
     window["AscCommon"].gc_nMaxDigCountView = gc_nMaxDigCountView;

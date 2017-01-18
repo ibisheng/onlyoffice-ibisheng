@@ -217,31 +217,145 @@ var editor;
     this.asc_SendThemeColors(_ret_array, standart_colors);
   };
 
-  spreadsheet_api.prototype.asc_getLocaleExample = function(val, number, date) {
-    var res = '';
-    var cultureInfo = AscCommon.g_aCultureInfos[val];
-    if (cultureInfo) {
-      var numFormatDigit = AscCommon.oNumFormatCache.get('#,##0.00');
-
-      var formatDate = AscCommon.getShortDateFormat(cultureInfo);
-      formatDate += " h:mm";
-      if (cultureInfo.AMDesignator && cultureInfo.PMDesignator) {
-        formatDate += " AM/PM";
-      }
-      var numFormatDate = AscCommon.oNumFormatCache.get(formatDate);
-
-      res += numFormatDigit.formatToChart(number, cultureInfo);
-      res += '; ';
-      res += numFormatDate.formatToChart(date.getExcelDateWithTime(), cultureInfo);
-    }
-    return res;
-  };
+  spreadsheet_api.prototype.asc_getCurrencySymbols = function () {
+		var result = {};
+		for (var key in AscCommon.g_aCultureInfos) {
+			result[key] = AscCommon.g_aCultureInfos[key].CurrencySymbol;
+		}
+		return result;
+	};
+	spreadsheet_api.prototype.asc_getLocaleExample = function(format, value, culture) {
+		var cultureInfo = AscCommon.g_aCultureInfos[culture] || AscCommon.g_oDefaultCultureInfo;
+		var numFormat = AscCommon.oNumFormatCache.get(format);
+		var res;
+		if (null == value) {
+			var ws = this.wbModel.getActiveWs();
+			var activeCell = ws.selectionRange.activeCell;
+			var cell = ws._getCellNoEmpty(activeCell.row, activeCell.col);
+			if (cell) {
+				res = cell.getValueForExample(numFormat, cultureInfo);
+			} else {
+				res = '';
+			}
+		} else {
+			res = numFormat.formatToChart(value, cultureInfo);
+		}
+		return res;
+	};
+	spreadsheet_api.prototype.asc_getFormatCells = function(info) {
+		var res = [];
+		if (info) {
+			var format;
+			var i;
+			var cultureInfo = AscCommon.g_aCultureInfos[info.symbol];
+			var currency = !!cultureInfo;
+			if (Asc.c_oAscNumFormatType.General === info.type) {
+				res.push(AscCommon.g_cGeneralFormat);
+			} else if (Asc.c_oAscNumFormatType.Number === info.type) {
+				var numberFormat = AscCommon.getNumberFormatSimple(info.separator, info.decimalPlaces);
+				res.push(numberFormat);
+				res.push(numberFormat + ';[Red]' + numberFormat);
+				res.push(AscCommon.getNumberFormat(cultureInfo, info.separator, info.decimalPlaces, false));
+				res.push(AscCommon.getNumberFormat(cultureInfo, info.separator, info.decimalPlaces, true));
+			} else if (Asc.c_oAscNumFormatType.Currency === info.type) {
+				res.push(AscCommon.getCurrencyFormatSimple2(cultureInfo, info.decimalPlaces, currency, false));
+				res.push(AscCommon.getCurrencyFormatSimple2(cultureInfo, info.decimalPlaces, currency, true));
+				res.push(AscCommon.getCurrencyFormatSimple(cultureInfo, info.decimalPlaces, currency, currency, false));
+				res.push(AscCommon.getCurrencyFormatSimple(cultureInfo, info.decimalPlaces, currency, currency, true));
+			} else if (Asc.c_oAscNumFormatType.Accounting === info.type) {
+				res.push(AscCommon.getCurrencyFormat(cultureInfo, info.decimalPlaces, currency, currency));
+			} else if (Asc.c_oAscNumFormatType.Date === info.type) {
+				//todo locale dependence
+				if (info.symbol == AscCommon.g_oDefaultCultureInfo.LCID) {
+					res.push(AscCommon.getShortDateFormat(cultureInfo));
+					res.push('[$-F800]dddd, mmmm dd, yyyy');
+				}
+				res.push(AscCommon.getShortDateFormat2(1, 1, 0, cultureInfo) + ';@');
+				res.push(AscCommon.getShortDateFormat2(1, 1, 2, cultureInfo) + ';@');
+				res.push(AscCommon.getShortDateFormat2(2, 2, 2, cultureInfo) + ';@');
+				res.push(AscCommon.getShortDateFormat2(1, 1, 4, cultureInfo) + ';@');
+				res.push(AscCommon.getShortDateFormat2(1, 1, 2, cultureInfo) + ' h:mm;@');
+				res.push('[$-409]' + AscCommon.getShortDateFormat2(1, 1, 2, cultureInfo) + ' h:mm AM/PM;@');
+				var locale = AscCommon.getLocaleFormat(cultureInfo, false);
+				res.push(locale + 'mmmmm;@');
+				res.push(locale + 'mmmm d, yyyy;@');
+				var separators = ['-', '/', ' '];
+				for (i = 0; i < separators.length; ++i) {
+					var separator = separators[i];
+					res.push(locale + 'd' + separator + 'mmm;@');
+					res.push(locale + 'd' + separator + 'mmm' + separator + 'yy;@');
+					res.push(locale + 'dd' + separator + 'mmm' + separator + 'yy;@');
+					res.push(locale + 'mmm' + separator + 'yy;@');
+					res.push(locale + 'mmmm' + separator + 'yy;@');
+					res.push(locale + 'mmmmm' + separator + 'yy;@');
+					res.push(locale + 'd' + separator + 'mmm' + separator + 'yyyy;@');
+				}
+			} else if (Asc.c_oAscNumFormatType.Time === info.type) {
+				res.push('[$-F400]h:mm:ss AM/PM', 'h:mm;@', 'h:mm AM/PM;@', 'h:mm:ss;@', 'h:mm:ss AM/PM;@', 'mm:ss.0;@',
+					'[h]:mm:ss;@');
+			} else if (Asc.c_oAscNumFormatType.Percent === info.type) {
+				format = '0';
+				if (info.decimalPlaces > 0) {
+					format += '.' + '0'.repeat(info.decimalPlaces);
+				}
+				format += '%';
+				res.push(format);
+			} else if (Asc.c_oAscNumFormatType.Fraction === info.type) {
+				res.push('# ?/?', '# ??/??', '# ???/???', '# ?/2', '# ?/4', '# ?/8', '# ??/16', '# ?/10', '# ??/100');
+			} else if (Asc.c_oAscNumFormatType.Scientific === info.type) {
+				format = '0.' + '0'.repeat(info.decimalPlaces) + 'E+00';
+				res.push(format);
+			} else if (Asc.c_oAscNumFormatType.Text === info.type) {
+				res.push('@');
+			} else if (Asc.c_oAscNumFormatType.Custom === info.type) {
+				for (i = 0; i <= 4; ++i) {
+					res.push(AscCommonExcel.aStandartNumFormats[i]);
+				}
+				res.push(AscCommon.getCurrencyFormatSimple(null, 0, false, false, false));
+				res.push(AscCommon.getCurrencyFormatSimple(null, 0, false, false, true));
+				res.push(AscCommon.getCurrencyFormatSimple(null, 2, false, false, false));
+				res.push(AscCommon.getCurrencyFormatSimple(null, 2, false, false, true));
+				res.push(AscCommon.getCurrencyFormatSimple(null, 0, true, false, false));
+				res.push(AscCommon.getCurrencyFormatSimple(null, 0, true, false, true));
+				res.push(AscCommon.getCurrencyFormatSimple(null, 2, true, false, false));
+				res.push(AscCommon.getCurrencyFormatSimple(null, 2, true, false, true));
+				for (i = 9; i <= 13; ++i) {
+					res.push(AscCommonExcel.aStandartNumFormats[i]);
+				}
+				res.push(AscCommon.getShortDateFormat(null));
+				res.push(AscCommon.getShortDateMonthFormat(true, true, null));
+				res.push(AscCommon.getShortDateMonthFormat(true, false, null));
+				res.push(AscCommon.getShortDateMonthFormat(false, true, null));
+				for (i = 18; i <= 21; ++i) {
+					res.push(AscCommonExcel.aStandartNumFormats[i]);
+				}
+				res.push(AscCommon.getShortDateFormat(null) + " h:mm");
+				for (i = 45; i <= 49; ++i) {
+					res.push(AscCommonExcel.aStandartNumFormats[i]);
+				}
+				//todo add all used in workbook formats
+			} else {
+				res.push(AscCommon.g_cGeneralFormat);
+				res.push('0.00');
+				res.push('0.00E+00');
+				res.push(AscCommon.getCurrencyFormat(cultureInfo, 2, currency, true));
+				res.push(AscCommon.getCurrencyFormatSimple2(cultureInfo, 2, currency, false));
+				res.push(AscCommon.getShortDateFormat(cultureInfo));
+				//todo F400
+				res.push('[$-F400]h:mm:ss AM/PM');
+				res.push('0.00%');
+				res.push('# ?/?');
+				res.push('@');
+			}
+		}
+		return res;
+	};
   spreadsheet_api.prototype.asc_getLocaleCurrency = function(val) {
     var cultureInfo = AscCommon.g_aCultureInfos[val];
     if (!cultureInfo) {
       cultureInfo = AscCommon.g_aCultureInfos[1033];
     }
-    return AscCommonExcel.getCurrencyFormat(cultureInfo, true, true, true);
+    return AscCommonExcel.getCurrencyFormat(cultureInfo, 2, true, true);
   };
   spreadsheet_api.prototype.asc_setLocale = function(val) {
     if (!this.isLoadFullApi) {
@@ -3245,7 +3359,9 @@ var editor;
 
   prot["asc_GetFontThumbnailsPath"] = prot.asc_GetFontThumbnailsPath;
   prot["asc_setDocInfo"] = prot.asc_setDocInfo;
-  prot["asc_getLocaleExample"] = prot.asc_getLocaleExample;
+	prot['asc_getCurrencySymbols'] = prot.asc_getCurrencySymbols;
+	prot['asc_getLocaleExample'] = prot.asc_getLocaleExample;
+	prot['asc_getFormatCells'] = prot.asc_getFormatCells;
   prot["asc_getLocaleCurrency"] = prot.asc_getLocaleCurrency;
   prot["asc_setLocale"] = prot.asc_setLocale;
   prot["asc_getEditorPermissions"] = prot.asc_getEditorPermissions;

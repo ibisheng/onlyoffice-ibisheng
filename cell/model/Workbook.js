@@ -5084,6 +5084,10 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		this._checkDirty();
 		return this.oValue.getValueForEdit2(this);
 	};
+	Cell.prototype.getValueForExample=function(numFormat, cultureInfo){
+		this._checkDirty();
+		return this.oValue.getValueForExample(this, AscCommon.gc_nMaxDigCountView, function(){return true;}, numFormat, cultureInfo);
+	};
 	Cell.prototype.getValueWithoutFormat=function(){
 		this._checkDirty();
 		return this.oValue.getValueWithoutFormat();
@@ -5129,7 +5133,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 	};
 	Cell.prototype.getValueData = function(){
 		this._checkDirty();
-		var formula = this.formulaParsed ? this.formulaParsed.Formula : null;;
+		var formula = this.formulaParsed ? this.formulaParsed.Formula : null;
 		return new UndoRedoData_CellValueData(formula, this.oValue.clone());
 	};
 	Cell.prototype.setValueData = function(Val){
