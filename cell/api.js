@@ -1417,8 +1417,8 @@ var editor;
 	spreadsheet_api.prototype._sendWorkbookStyles = function () {
 		if (this.wbModel) {
 
-			if (!window['IS_NATIVE_EDITOR'] && window["NATIVE_EDITOR_ENJINE"]) {
-				// Для нативной версии (сборка) не генерируем стили
+			if (window["NATIVE_EDITOR_ENJINE"]) {
+				// Для нативной версии (сборка и приложение) не генерируем стили
 				return;
 			}
 
@@ -3035,7 +3035,7 @@ var editor;
     }
 
     // На view-режиме не нужно отправлять стили
-    if (true !== this.getViewMode() && !this.isMobileVersion) {
+    if (true !== this.getViewMode()) {
       // Отправка стилей
       this._sendWorkbookStyles();
     }
