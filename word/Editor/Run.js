@@ -2884,8 +2884,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     Item.CheckRecalcAutoFit(oSectionPr);
                     if (true === Item.Is_Inline() || true === Para.Parent.Is_DrawingShape())
                     {
-                        if (true !== Item.Is_Inline())
-                            Item.Set_DrawingType(drawing_Inline);
+                    	// TODO: Нельзя что-то писать в историю во время пересчета, это действие надо делать при открытии
+                        // if (true !== Item.Is_Inline())
+                        //     Item.Set_DrawingType(drawing_Inline);
 
                         if (true === StartWord)
                             FirstItemOnLine = false;
@@ -5355,7 +5356,7 @@ ParaRun.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseConten
 		CurPos--;
 
 		var Item = this.Content[CurPos];
-		if (CurPos < 0 || (!(para_Drawing === Item.Type && false === Item.Is_Inline()) && !(para_FootnoteReference === Item.Type && true === Item.IsCustomMarkFollows())))
+		if (CurPos < 0 || (!(para_Drawing === Item.Type && false === Item.Is_Inline() && false === SearchPos.IsCheckAnchors()) && !(para_FootnoteReference === Item.Type && true === Item.IsCustomMarkFollows())))
 			break;
 	}
 
@@ -5385,7 +5386,7 @@ ParaRun.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseConte
 
 			var PrevItem     = this.Content[CurPos - 1];
 			var PrevItemType = PrevItem.Type;
-			if ((true !== StepEnd && para_End === PrevItemType) || (para_Drawing === PrevItemType && false === PrevItem.Is_Inline()) || (para_FootnoteReference === PrevItemType && true === PrevItem.IsCustomMarkFollows()))
+			if ((true !== StepEnd && para_End === PrevItemType) || (para_Drawing === PrevItemType && false === PrevItem.Is_Inline() && false === SearchPos.IsCheckAnchors()) || (para_FootnoteReference === PrevItemType && true === PrevItem.IsCustomMarkFollows()))
 				return;
 
 			break;
