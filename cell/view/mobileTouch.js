@@ -216,24 +216,21 @@ function (window, undefined)
 			tmpX2 = _rect2.X + _rect2.W;
 			tmpY2 = _rect2.Y + _rect2.H;
 
-			if (_isUseTransform)
+			_transform = this.DrawingDocument.SelectionMatrix;
+
+			if (_transform)
 			{
-				_transform = this.DrawingDocument.SelectionMatrix;
+				_posX = _transform.TransformPointX(tmpX, tmpY);
+				_posY = _transform.TransformPointY(tmpX, tmpY);
 
-				if (_transform)
-				{
-					_posX = _transform.TransformPointX(tmpX, tmpY);
-					_posY = _transform.TransformPointY(tmpX, tmpY);
+				tmpX = _posX;
+				tmpY = _posY;
 
-					tmpX = _posX;
-					tmpY = _posY;
+				_posX = _transform.TransformPointX(tmpX2, tmpY2);
+				_posY = _transform.TransformPointY(tmpX2, tmpY2);
 
-					_posX = _transform.TransformPointX(tmpX2, tmpY2);
-					_posY = _transform.TransformPointY(tmpX2, tmpY2);
-
-					tmpX2 = _posX;
-					tmpY2 = _posY;
-				}
+				tmpX2 = _posX;
+				tmpY2 = _posY;
 			}
 
 			_pos = this.ConvertCoordsToCursor(tmpX, tmpY, _rect1.Page);
