@@ -3867,14 +3867,18 @@ UndoRedoAutoFilters.prototype = {
 		return res;
 	};
 	UndoRedoSheetView.prototype._setState = function(state) {
-		if (window["NATIVE_EDITOR_ENJINE"]) {
+		var bApply = window["NATIVE_EDITOR_ENJINE"] || !this.wb.oApi.IsSendDocumentLoadCompleate;
+		if (bApply) {
 			if (null != state.active) {
 				var ws = this.wb.getWorksheetById(state.active);
 				if (ws) {
 					this.wb.setActive(ws.getIndex());
 				}
 			}
-			for (var sheetId in state.sheets) {
+		}
+		var sheetIdActive = this.wb.getActiveWs().getId();
+		for (var sheetId in state.sheets) {
+			if (bApply || sheetIdActive !== sheetId) {
 				var elem = state.sheets[sheetId];
 				var ws = this.wb.getWorksheetById(sheetId);
 				if (elem && ws) {
