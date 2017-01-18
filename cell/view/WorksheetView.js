@@ -8877,101 +8877,105 @@
 		var _clipboard = window["Asc"]["editor"].wb.clipboard;
 		var specialPasteProps = _clipboard.specialPasteProps;
 		
+		//paste from excel binary
 		if(fromBinary)
 		{
 			t._pasteData(isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth);
-			return;
 		}
-		
-        //загрузка шрифтов, в случае удачи на callback вставляем текст
-        t._loadFonts( pasteContent.props.fontsNew, function () {
-
-            var api = asc["editor"];
-            var isEndTransaction = false;
-            
-			var imagesFromWord = pasteContent.props.addImagesFromWord;
-			if ( imagesFromWord && imagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor) && specialPasteProps.images) 
+		else
+		{
+			var callbackLoadFonts = function()
 			{
-                var oObjectsForDownload = AscCommon.GetObjectsForImageDownload( pasteContent.props._aPastedImages );
-
-                //if already load images on server
-                if ( api.wb.clipboard.pasteProcessor.alreadyLoadImagesOnServer === true ) 
+				var api = asc["editor"];
+				var isEndTransaction = false;
+				
+				var imagesFromWord = pasteContent.props.addImagesFromWord;
+				if ( imagesFromWord && imagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor) && specialPasteProps.images) 
 				{
-                    var oImageMap = {};
-                    for ( var i = 0, length = oObjectsForDownload.aBuilderImagesByUrl.length; i < length; ++i ) 
-					{
-                        var url = oObjectsForDownload.aUrls[i];
+					var oObjectsForDownload = AscCommon.GetObjectsForImageDownload( pasteContent.props._aPastedImages );
 
-                        //get name from array already load on server urls
-                        var name = api.wb.clipboard.pasteProcessor.oImages[url];
-                        var aImageElem = oObjectsForDownload.aBuilderImagesByUrl[i];
-                        if ( name ) {
-                            if ( Array.isArray( aImageElem ) ) {
-                                for ( var j = 0; j < aImageElem.length; ++j ) {
-                                    var imageElem = aImageElem[j];
-                                    if ( null != imageElem ) {
-                                        imageElem.SetUrl( name );
-                                    }
-                                }
-                            }
-                            oImageMap[i] = name;
-                        }
-                        else {
-                            oImageMap[i] = url;
-                        }
-                    }
-
-                    if ( pasteContent.props.onlyImages !== true ) 
-					{
-                        t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
-                    }
-                    api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
-                    isEndTransaction = true;
-                }
-                else 
-				{
-					if(window["NATIVE_EDITOR_ENJINE"])
+					//if already load images on server
+					if ( api.wb.clipboard.pasteProcessor.alreadyLoadImagesOnServer === true ) 
 					{
 						var oImageMap = {};
-						AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
+						for ( var i = 0, length = oObjectsForDownload.aBuilderImagesByUrl.length; i < length; ++i ) 
+						{
+							var url = oObjectsForDownload.aUrls[i];
+
+							//get name from array already load on server urls
+							var name = api.wb.clipboard.pasteProcessor.oImages[url];
+							var aImageElem = oObjectsForDownload.aBuilderImagesByUrl[i];
+							if ( name ) {
+								if ( Array.isArray( aImageElem ) ) {
+									for ( var j = 0; j < aImageElem.length; ++j ) {
+										var imageElem = aImageElem[j];
+										if ( null != imageElem ) {
+											imageElem.SetUrl( name );
+										}
+									}
+								}
+								oImageMap[i] = name;
+							}
+							else {
+								oImageMap[i] = url;
+							}
+						}
 
 						if ( pasteContent.props.onlyImages !== true ) 
 						{
 							t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
 						}
 						api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
-						
 						isEndTransaction = true;
 					}
-					else
+					else 
 					{
-						AscCommon.sendImgUrls( api, oObjectsForDownload.aUrls, function ( data ) {
+						if(window["NATIVE_EDITOR_ENJINE"])
+						{
 							var oImageMap = {};
 							AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
 
-							if ( pasteContent.props.onlyImages !== true ) {
+							if ( pasteContent.props.onlyImages !== true ) 
+							{
 								t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
 							}
 							api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
-							//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
-							History.EndTransaction();
-						}, true );
-					}
-					
-                }
-            }
-            else if ( pasteContent.props.onlyImages !== true ) 
-			{
-                t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
-                isEndTransaction = true;
-            }
+							
+							isEndTransaction = true;
+						}
+						else
+						{
+							AscCommon.sendImgUrls( api, oObjectsForDownload.aUrls, function ( data ) {
+								var oImageMap = {};
+								AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
 
-            //закрываем транзакцию, поскольку в setSelectionInfo она не закроется
-            if ( isEndTransaction ) 
-			{
-                History.EndTransaction();
-            }
-        } );
+								if ( pasteContent.props.onlyImages !== true ) {
+									t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
+								}
+								api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
+								//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
+								History.EndTransaction();
+							}, true );
+						}
+						
+					}
+				}
+				else if ( pasteContent.props.onlyImages !== true ) 
+				{
+					t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
+					isEndTransaction = true;
+				}
+
+				//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
+				if ( isEndTransaction ) 
+				{
+					History.EndTransaction();
+				}
+			};
+			
+			//загрузка шрифтов, в случае удачи на callback вставляем текст
+			t._loadFonts( pasteContent.props.fontsNew, callbackLoadFonts);
+		}
     };
 
     WorksheetView.prototype._pasteFromHTML = function (pasteContent, isCheckSelection, specialPasteProps) {
