@@ -71,6 +71,8 @@
 			this.wrap = true;
 			this.fill = true;
 			this.angle = true;
+			
+			this.images = true;
 		}
 		
 		SpecialPasteProps.prototype = {
@@ -92,6 +94,8 @@
 				this.wrap = true;
 				this.fill = true;
 				this.angle = true;
+				
+				this.images = true;
 			},
 			revert: function()
 			{
@@ -108,6 +112,8 @@
 				this.wrap = null;
 				this.fill = null;
 				this.angle = null;
+				
+				this.images = null;
 			},
 			setProps: function(props)
 			{
@@ -115,62 +121,81 @@
 				{
 					case "formulas":
 					{
+						//только формулы(или значения)
+						this.revert();
+						this.formula = true;
+						this.val = true;
 						
+						break;
 					}
 					case "formulasNumberFormating":
 					{
+						//только формулы(или значения) и числовой формат
+						this.revert();
+						this.formula = true;
+						this.numFormat = true;
+						this.val = true;
 						
+						break;
 					}
 					case "keepSourceFormating":
 					{
-						
+						//формулы и формат
+						break;
 					}
 					case "noBorders":
 					{
+						//всё кроме бордеров
 						this.borders = null;
-					}
-					case "keepSourceColumnWidth":
-					{
-						
+						break;
 					}
 					case "keepSourceColumnWidths":
 					{
-						
+						break;
 					}
 					case "transpose":
 					{
 						
+						break;
 					}
 					
 					case "values":
 					{
+						//только значения(вместо формул также вставляются значения)
 						this.revert();
 						this.val = true;
 					}
-					case "valuesSourceFormating":
-					{
-						
-					}
 					case "valuesNumberFormating":
 					{
-						
+						this.revert();
+						this.val = true;
+						this.numFormat = true;
+						break;
+					}
+					case "valuesSourceFormating":
+					{
+						//все кроме формул
+						this.formula = null;
+						break;
 					}
 					
 					case "formating":
 					{
-						
+						this.formula = null;
+						break;
 					}
 					case "pasteLink":
 					{
-						
+						this.revert();
+						break;
 					}
 					case "picture":
 					{
-						
+						break;
 					}
 					case "linkedPicture":
 					{
-						
+						break;
 					}
 					
 				}

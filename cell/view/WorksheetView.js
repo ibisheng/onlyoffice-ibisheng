@@ -8889,7 +8889,8 @@
             var api = asc["editor"];
             var isEndTransaction = false;
             
-			if ( pasteContent.props.addImagesFromWord && pasteContent.props.addImagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor) ) 
+			var imagesFromWord = pasteContent.props.addImagesFromWord;
+			if ( imagesFromWord && imagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor) && specialPasteProps.images) 
 			{
                 var oObjectsForDownload = AscCommon.GetObjectsForImageDownload( pasteContent.props._aPastedImages );
 
@@ -9132,7 +9133,7 @@
 			}
 			
 			//apply props by cell
-			t._setPastedDataByCurrentRange(range, pastedRangeProps);
+			t._setPastedDataByCurrentRange(range, pastedRangeProps, null, specialPasteProps);
 		};
 		
         for (var autoR = 0; autoR < maxARow; ++autoR) {
@@ -9161,6 +9162,9 @@
         lastSelection.c2 = arn.c2;
         lastSelection.r2 = arn.r2;
         var arnFor = [arn, arrFormula];
+		
+		var _clipboard = window["Asc"]["editor"].wb.clipboard;
+		_clipboard.specialPasteProps = null;
 		
         return arnFor;
     };
@@ -9305,7 +9309,7 @@
 			}
 		};
 		
-		var checkMerge = function(range, curMerge, nRow, nCol, rowDiff, colDiff)
+		var checkMerge = function(range, curMerge, nRow, nCol, rowDiff, colDiff, pastedRangeProps)
 		{
 			var isMerged = false;
 			
@@ -9327,9 +9331,8 @@
 					if (offsetRow + nRow >= gc_nMaxRow0) {
 						offsetRow = gc_nMaxRow0 - nRow;
 					}
-
-					range.setOffsetLast({offsetCol: offsetCol, offsetRow: offsetRow});
-					range.merge(c_oAscMergeOptions.Merge);
+					
+					pastedRangeProps.offsetLast = {offsetCol: offsetCol, offsetRow: offsetRow};
 					
 					mergeArr[n] = {
 						r1: curMerge.r1 + arn.r1 - activeCellsPasteFragment.r1 + rowDiff,
@@ -9343,11 +9346,7 @@
 			else 
 			{
 				if (!isMerged) {
-					range.setOffsetLast({
-						offsetCol: (isMergedFirstCell.c2 - isMergedFirstCell.c1),
-						offsetRow: (isMergedFirstCell.r2 - isMergedFirstCell.r1)
-					});
-					range.merge(c_oAscMergeOptions.Merge);
+					pastedRangeProps.offsetLast = {offsetCol: isMergedFirstCell.c2 - isMergedFirstCell.c1, offsetRow: isMergedFirstCell.r2 - isMergedFirstCell.r1};
 					
 					mergeArr[n] = {
 						r1: isMergedFirstCell.r1,
@@ -9372,7 +9371,7 @@
 			}
 			
 			//merge
-			checkMerge(range, curMerge, nRow, nCol, rowDiff, colDiff);
+			checkMerge(range, curMerge, nRow, nCol, rowDiff, colDiff, pastedRangeProps);
 
 			//set style
 			if (!isOneMerge) {
@@ -9399,7 +9398,7 @@
 				pastedRangeProps.alignHorizontal = newVal.getAlignHorizontal();
 				//borders
 				var fullBorders = newVal.getBorderFull();
-				if (range.bbox.c2 !== range.bbox.c1 && curMerge && fullBorders) {
+				if (pastedRangeProps.offsetLast && pastedRangeProps.offsetLast.offsetCol > 0 && curMerge && fullBorders) {
 					//для мерженных ячеек, правая границу
 					var endMergeCell = val.getCell3(pasteRow, curMerge.c2);
 					var fullBordersEndMergeCell = endMergeCell.getBorderFull();
@@ -9421,7 +9420,7 @@
 			
 			//apply props by cell
 			var formulaProps = {firstRange: firstRange, arrFormula: arrFormula, tablesMap: tablesMap, newVal: newVal, isOneMerge: isOneMerge};
-			t._setPastedDataByCurrentRange(range, pastedRangeProps, formulaProps);
+			t._setPastedDataByCurrentRange(range, pastedRangeProps, formulaProps, specialPasteProps);
 		};
 		
         for (var autoR = 0; autoR < maxARow; ++autoR) {
@@ -9462,10 +9461,13 @@
         t.isChanged = true;
         var arnFor = [arn, arrFormula];
 		
+		var _clipboard = window["Asc"]["editor"].wb.clipboard;
+		_clipboard.specialPasteProps = null;
+		
         return arnFor;
     };
 	
-	WorksheetView.prototype._setPastedDataByCurrentRange = function(range, rangeStyle, formulaProps)
+	WorksheetView.prototype._setPastedDataByCurrentRange = function(range, rangeStyle, formulaProps, specialPasteProps)
 	{
 		var t = this;
 		
@@ -9551,15 +9553,15 @@
 			}
 		};
 		
-		if(rangeStyle.cellStyle)
+		if(rangeStyle.cellStyle && specialPasteProps.cellStyle)
 		{
 			range.setCellStyle(rangeStyle.cellStyle);
 		}
-		if(rangeStyle.val)
+		if(rangeStyle.val && specialPasteProps.val)
 		{
 			range.setValue(rangeStyle.val);
 		}
-		if(rangeStyle.numFormat)
+		if(rangeStyle.numFormat && specialPasteProps.cellStyle)
 		{
 			range.setNumFormat(rangeStyle.numFormat);
 		}
@@ -9570,7 +9572,7 @@
 			setFormula(newVal, firstRange, range);
 		}
 		
-		if(rangeStyle.font)
+		if(rangeStyle.font && specialPasteProps.font)
 		{
 			range.setFont(rangeStyle.font);
 		}
@@ -9578,47 +9580,44 @@
 		{
 			range.setValue2(rangeStyle.value2);
 		}
-		if(rangeStyle.alignVertical)
+		if(rangeStyle.alignVertical && specialPasteProps.alignVertical)
 		{
 			range.setAlignVertical(rangeStyle.alignVertical);
 		}
-		if(rangeStyle.alignHorizontal)
+		if(rangeStyle.alignHorizontal && specialPasteProps.alignHorizontal)
 		{
 			range.setAlignHorizontal(rangeStyle.alignHorizontal);
 		}
-		if(rangeStyle.fontSize)
+		if(rangeStyle.fontSize && specialPasteProps.fontSize)
 		{
 			range.setFontsize(rangeStyle.fontSize);
 		}
-		if(rangeStyle.offsetLast)
+		if(rangeStyle.offsetLast && specialPasteProps.merge)
 		{
 			range.setOffsetLast(rangeStyle.offsetLast);
-		}
-		if(rangeStyle.merge)
-		{
 			range.merge(rangeStyle.merge);
 		}
-		if(rangeStyle.borders)
+		if(rangeStyle.borders && specialPasteProps.borders)
 		{
 			range.setBorderSrc(rangeStyle.borders);
 		}
-		if(rangeStyle.bordersFull)
+		if(rangeStyle.bordersFull && specialPasteProps.borders)
 		{
 			range.setBorder(rangeStyle.bordersFull);
 		}
-		if(rangeStyle.wrap)
+		if(rangeStyle.wrap && specialPasteProps.wrap)
 		{
 			range.setWrap(rangeStyle.wrap);
 		}
-		if(rangeStyle.fill)
+		if(rangeStyle.fill && specialPasteProps.fill)
 		{
 			range.setFill(rangeStyle.fill);
 		}
-		if(rangeStyle.angle)
+		if(rangeStyle.angle && specialPasteProps.angle)
 		{
 			range.setAngle(rangeStyle.angle);
 		}
-		if (rangeStyle.hyperLink)
+		if (rangeStyle.hyperLink && specialPasteProps.hyperlink)
 		{
 			var _link = rangeStyle.hyperLink.hyperLink;
 			var newHyperlink = new AscCommonExcel.Hyperlink();
@@ -9634,7 +9633,7 @@
 			newHyperlink.Tooltip = rangeStyle.hyperLink.toolTip;
 			range.setHyperlink(newHyperlink);
 		}
-		if (rangeStyle.hyperlinkObj) 
+		if (rangeStyle.hyperlinkObj && specialPasteProps.hyperlink) 
 		{
 			rangeStyle.hyperlinkObj.Ref = range;
 			range.setHyperlink(rangeStyle.hyperlinkObj, true);
