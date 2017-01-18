@@ -2946,6 +2946,7 @@
 		//    Long     : позиции элементов
 		//    Variable : Item
 		// }
+		// Long : Поле Color
 
 		var bArray = this.UseArray;
 		var nCount = this.Items.length;
@@ -2979,6 +2980,15 @@
 		Writer.Seek(nStartPos);
 		Writer.WriteLong(nRealCount);
 		Writer.Seek(nEndPos);
+
+		var nColor = 0;
+		if (undefined !== this.Color)
+		{
+			nColor |= 1;
+			if (true === this.Color)
+				nColor |= 2;
+		}
+		Writer.WriteLong(nColor);
 	};
 	CChangesBaseContentChange.prototype.ReadFromBinary = function(Reader)
 	{
@@ -2988,6 +2998,7 @@
 		//    Long     : позиции элементов
 		//    Variable : Item
 		// }
+		// Long : поле Color
 
 		this.UseArray = true;
 		this.Items    = [];
@@ -2999,6 +3010,10 @@
 			this.PosArray[nIndex] = Reader.GetLong();
 			this.Items[nIndex]    = this.private_ReadItem(Reader);
 		}
+
+		var nColor = Reader.GetLong();
+		if (nColor & 1)
+			this.Color = (nColor & 2) ? true : false;
 	};
 	CChangesBaseContentChange.prototype.private_WriteItem = function(Writer, Item)
 	{
