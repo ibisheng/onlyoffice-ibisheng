@@ -2206,6 +2206,19 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_onClearPropObj", prop);
 	};
 
+	// mobile version methods:
+	asc_docs_api.prototype.asc_GetDefaultTableStyles = function()
+	{
+		if (!this.WordControl.m_oLogicDocument)
+			return;
+
+		this.WordControl.m_oDrawingDocument.StartTableStylesCheck();
+		this.WordControl.m_oDrawingDocument.TableStylesСheckLook = new Asc.CTablePropLook();
+		this.WordControl.m_oDrawingDocument.TableStylesСheckLook.FirstCol = true;
+		this.WordControl.m_oDrawingDocument.TableStylesСheckLook.FirstRow = true;
+		this.WordControl.m_oDrawingDocument.TableStylesСheckLook.BandHor  = true;
+		this.WordControl.m_oDrawingDocument.EndTableStylesCheck();
+	};
 
 	asc_docs_api.prototype.CollectHeaders                  = function()
 	{
@@ -6891,6 +6904,8 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_AddMath"]           			  = asc_docs_api.prototype.asc_AddMath;
 	asc_docs_api.prototype["asc_SetMathProps"]           		  = asc_docs_api.prototype.asc_SetMathProps;
 
+	// mobile
+	asc_docs_api.prototype["asc_GetDefaultTableStyles"]           	= asc_docs_api.prototype.asc_GetDefaultTableStyles;
 	asc_docs_api.prototype["asc_Remove"] 							= asc_docs_api.prototype.asc_Remove;
 
 	window['Asc']['asc_CCommentData'] = window['Asc'].asc_CCommentData = asc_CCommentData;
