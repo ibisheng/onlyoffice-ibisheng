@@ -166,7 +166,6 @@ function (window, undefined)
 	};
 	CMobileDelegateEditorCell.prototype.GetContextMenuPosition = function()
 	{
-		return { X : 0, Y : 0, Mode : AscCommon.MobileTouchContextMenuType.None };
 		var _controller = this.WB.getWorksheet().objectRender.controller;
 
 		var _posX = 0;
@@ -179,7 +178,9 @@ function (window, undefined)
 		var _mode = 0;
 
 		var _target = _controller.Is_SelectionUse();
-		if (_target === false)
+		var _selection = this.WB.GetSelectionRectsBounds();
+
+		if (!_target && !_selection)
 		{
 			_posX = this.DrawingDocument.m_dTargetX;
 			_posY = this.DrawingDocument.m_dTargetY;
@@ -197,7 +198,7 @@ function (window, undefined)
 				tmpY = _posY;
 			}
 
-			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(tmpX, tmpY, _page);
+			_pos = this.ConvertCoordsToCursor(tmpX, tmpY, _page);
 			_posX = _pos.X;
 			_posY = _pos.Y;
 
@@ -215,28 +216,48 @@ function (window, undefined)
 			tmpX2 = _rect2.X + _rect2.W;
 			tmpY2 = _rect2.Y + _rect2.H;
 
-			_transform = this.DrawingDocument.SelectionMatrix;
-
-			if (_transform)
+			if (_isUseTransform)
 			{
-				_posX = _transform.TransformPointX(tmpX, tmpY);
-				_posY = _transform.TransformPointY(tmpX, tmpY);
+				_transform = this.DrawingDocument.SelectionMatrix;
 
-				tmpX = _posX;
-				tmpY = _posY;
+				if (_transform)
+				{
+					_posX = _transform.TransformPointX(tmpX, tmpY);
+					_posY = _transform.TransformPointY(tmpX, tmpY);
 
-				_posX = _transform.TransformPointX(tmpX2, tmpY2);
-				_posY = _transform.TransformPointY(tmpX2, tmpY2);
+					tmpX = _posX;
+					tmpY = _posY;
 
-				tmpX2 = _posX;
-				tmpY2 = _posY;
+					_posX = _transform.TransformPointX(tmpX2, tmpY2);
+					_posY = _transform.TransformPointY(tmpX2, tmpY2);
+
+					tmpX2 = _posX;
+					tmpY2 = _posY;
+				}
 			}
 
-			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(tmpX, tmpY, _rect1.Page);
+			_pos = this.ConvertCoordsToCursor(tmpX, tmpY, _rect1.Page);
 			_posX = _pos.X;
 			_posY = _pos.Y;
 
-			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(tmpX2, tmpY2, _rect2.Page);
+			_pos = this.ConvertCoordsToCursor(tmpX2, tmpY2, _rect2.Page);
+			_posX += _pos.X;
+			_posX = _posX >> 1;
+
+			_mode = 2;
+		}
+		else if (_selection)
+		{
+			tmpX = _selection.X;
+			tmpY = _selection.Y;
+			tmpX2 = _selection.X + _selection.W;
+			tmpY2 = _selection.Y + _selection.H;
+
+			_pos = this.ConvertCoordsToCursor(tmpX, tmpY, 0);
+			_posX = _pos.X;
+			_posY = _pos.Y;
+
+			_pos = this.ConvertCoordsToCursor(tmpX2, tmpY2, 0);
 			_posX += _pos.X;
 			_posX = _posX >> 1;
 
@@ -246,17 +267,19 @@ function (window, undefined)
 		var _object_bounds = _controller.getSelectedObjectsBounds();
 		if ((0 == _mode) && _object_bounds)
 		{
-			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(_object_bounds.minX, _object_bounds.minY, _object_bounds.pageIndex);
+			_pos = this.ConvertCoordsToCursor(_object_bounds.minX, _object_bounds.minY, _object_bounds.pageIndex);
 			_posX = _pos.X;
 			_posY = _pos.Y;
 
-			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(_object_bounds.maxX, _object_bounds.maxY, _object_bounds.pageIndex);
+			_pos = this.ConvertCoordsToCursor(_object_bounds.maxX, _object_bounds.maxY, _object_bounds.pageIndex);
 			_posX += _pos.X;
 			_posX = _posX >> 1;
 
 			_mode = 3;
 		}
 
+		_posX -= this.Offset.X;
+		_posY -= this.Offset.Y;
 		return { X : _posX, Y : _posY, Mode : _mode };
 	};
 
