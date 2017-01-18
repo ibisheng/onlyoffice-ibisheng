@@ -3820,7 +3820,13 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
         _result_shape_prop.locked = true;
     }
     _result_shape_prop.lockAspect = !!(shapeProp1.lockAspect && shapeProp2.lockAspect);
-    _result_shape_prop.textArtProperties = CompareTextArtProperties(shapeProp1.textArtProperties, shapeProp2.textArtProperties)
+    _result_shape_prop.textArtProperties = CompareTextArtProperties(shapeProp1.textArtProperties, shapeProp2.textArtProperties);
+    if(shapeProp1.title === shapeProp2.title){
+        _result_shape_prop.title = shapeProp1.title;
+    }
+    if(shapeProp1.description === shapeProp2.description){
+        _result_shape_prop.description = shapeProp1.description;
+    }
     return _result_shape_prop;
 }
 
@@ -11894,6 +11900,8 @@ function CreateAscShapePropFromProp(shapeProp)
     {
         obj.textArtProperties = CreateAscTextArtProps(shapeProp.textArtProperties);
     }
+    obj.title = shapeProp.title;
+    obj.description = shapeProp.description;
     return obj;
 }
 

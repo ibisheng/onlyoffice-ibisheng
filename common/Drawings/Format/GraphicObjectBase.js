@@ -416,6 +416,39 @@
         }
     };
 
+    CGraphicObjectBase.prototype.getNvProps = function(){
+        return this.nvSpPr || this.nvPicPr || this.nvGrpSpPr || this.nvGraphicFramePr || null;
+    };
+
+    CGraphicObjectBase.prototype.setTitle = function(sTitle){
+        var oNvPr = this.getNvProps();
+        if(oNvPr){
+            oNvPr.setTitle(sTitle ? sTitle : null);
+        }
+    };
+
+    CGraphicObjectBase.prototype.setDescription = function(sDescription){
+        var oNvPr = this.getNvProps();
+        if(oNvPr){
+            oNvPr.setDecr(sDescription ? sDescription : null);
+        }
+    };
+   CGraphicObjectBase.prototype.getTitle = function(){
+        var oNvPr = this.getNvProps();
+        if(oNvPr){
+            return oNvPr.title ? oNvPr.title : undefined;
+        }
+        return undefined;
+    };
+
+    CGraphicObjectBase.prototype.getDescription = function(){
+        var oNvPr = this.getNvProps();
+        if(oNvPr){
+            return oNvPr.descr ? oNvPr.descr : undefined;
+        }
+        return undefined;
+    };
+
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGraphicObjectBase = CGraphicObjectBase;
     window['AscFormat'].CGraphicBounds     = CGraphicBounds;

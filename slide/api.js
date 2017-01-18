@@ -157,6 +157,9 @@
 			this.severalCharts      = obj.severalCharts != undefined ? obj.severalCharts : false;
 			this.severalChartTypes  = obj.severalChartTypes != undefined ? obj.severalChartTypes : undefined;
 			this.severalChartStyles = obj.severalChartStyles != undefined ? obj.severalChartStyles : undefined;
+
+			this.title = obj.title != undefined ? obj.title : undefined;
+			this.description = obj.description != undefined ? obj.description : undefined;
 		}
 		else
 		{
@@ -170,6 +173,8 @@
 			this.severalCharts      = false;
 			this.severalChartTypes  = undefined;
 			this.severalChartStyles = undefined;
+            this.title = undefined;
+            this.description = undefined;
 		}
 	}
 
@@ -403,6 +408,24 @@
 	CAscChartProp.prototype.asc_setWidth  = function(v)
 	{
 		this.Width = v;
+	};
+
+	CAscChartProp.prototype.asc_setTitle = function(v)
+	{
+		this.title = v;
+	};
+	CAscChartProp.prototype.asc_setDescription  = function(v)
+	{
+		this.description = v;
+	};
+
+	CAscChartProp.prototype.asc_getTitle = function()
+	{
+		return this.title;
+	};
+	CAscChartProp.prototype.asc_getDescription  = function()
+	{
+		return this.description;
 	};
 
 	CAscChartProp.prototype.getType = function()
@@ -6974,6 +6997,10 @@ background-repeat: no-repeat;\
 	CAscChartProp.prototype['asc_setStyleId']         = CAscChartProp.prototype.asc_setStyleId;
 	CAscChartProp.prototype['asc_setHeight']          = CAscChartProp.prototype.asc_setHeight;
 	CAscChartProp.prototype['asc_setWidth']           = CAscChartProp.prototype.asc_setWidth;
+	CAscChartProp.prototype['asc_setTitle']           = CAscChartProp.prototype.asc_setTitle;
+	CAscChartProp.prototype['asc_setDescription']     = CAscChartProp.prototype.asc_setDescription;
+	CAscChartProp.prototype['asc_getTitle']           = CAscChartProp.prototype.asc_getTitle;
+	CAscChartProp.prototype['asc_getDescription']     = CAscChartProp.prototype.asc_getDescription;
 	CAscChartProp.prototype['getType']                = CAscChartProp.prototype.getType;
 	CAscChartProp.prototype['putType']                = CAscChartProp.prototype.putType;
 	CAscChartProp.prototype['getStyle']               = CAscChartProp.prototype.getStyle;

@@ -498,6 +498,10 @@ CGraphicObjects.prototype =
                 shape_props.Width = props_by_types.shapeProps.w;
                 shape_props.Height = props_by_types.shapeProps.h;
                 shape_props.lockAspect = props_by_types.shapeProps.lockAspect;
+                if(this.selection.group){
+                    shape_props.description = props_by_types.shapeProps.description;
+                    shape_props.title = props_by_types.shapeProps.title;
+                }
             }
             if(props_by_types.imageProps)
             {
@@ -512,6 +516,10 @@ CGraphicObjects.prototype =
 
                 image_props.oleWidth = props_by_types.imageProps.oleWidth;
                 image_props.oleHeight = props_by_types.imageProps.oleHeight;
+                if(this.selection.group){
+                    image_props.description = props_by_types.imageProps.description;
+                    image_props.title = props_by_types.imageProps.title;
+                }
             }
             if(props_by_types.chartProps && !(props_by_types.chartProps.severalCharts === true))
             {
@@ -520,6 +528,10 @@ CGraphicObjects.prototype =
                 chart_props.severalCharts = props_by_types.chartProps.severalCharts;
                 chart_props.severalChartStyles = props_by_types.chartProps.severalChartStyles;
                 chart_props.severalChartTypes = props_by_types.chartProps.severalChartTypes;
+                if(this.selection.group){
+                    chart_props.description = props_by_types.chartProps.description;
+                    chart_props.title = props_by_types.chartProps.title;
+                }
             }
         }
 

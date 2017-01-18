@@ -2517,6 +2517,33 @@ DrawingObjectsController.prototype =
                 objects_by_type.charts[i].changeFill(props.fill);
             }
         }
+
+        for(i = 0; i < objects_by_type.shapes.length; ++i)
+        {
+            objects_by_type.shapes[i].setTitle(props.title);
+        }
+        for(i = 0; i < objects_by_type.groups.length; ++i)
+        {
+            objects_by_type.groups[i].setTitle(props.title);
+        }
+        for(i = 0; i < objects_by_type.charts.length; ++i)
+        {
+            objects_by_type.charts[i].setTitle(props.title);
+        }
+
+        for(i = 0; i < objects_by_type.shapes.length; ++i)
+        {
+            objects_by_type.shapes[i].setDescription(props.description);
+        }
+        for(i = 0; i < objects_by_type.groups.length; ++i)
+        {
+            objects_by_type.groups[i].setDescription(props.description);
+        }
+        for(i = 0; i < objects_by_type.charts.length; ++i)
+        {
+            objects_by_type.charts[i].setDescription(props.description);
+        }
+
         if(typeof props.ImageUrl === "string" && props.ImageUrl.length > 0)
         {
             for(i = 0; i < objects_by_type.images.length; ++i)
@@ -6790,7 +6817,9 @@ DrawingObjectsController.prototype =
                         bFromChart: false,
                         locked: locked,
                         textArtProperties: drawing.getTextArtProperties(),
-                        lockAspect: lockAspect
+                        lockAspect: lockAspect,
+                        title: drawing.getTitle(),
+                        description: drawing.getDescription()
                     };
                     if(!shape_props)
                         shape_props = new_shape_props;
@@ -6810,7 +6839,9 @@ DrawingObjectsController.prototype =
                         locked: locked,
                         x: drawing.x,
                         y: drawing.y,
-                        lockAspect: lockAspect
+                        lockAspect: lockAspect,
+                        title: drawing.getTitle(),
+                        description: drawing.getDescription()
                     };
                     if(!image_props)
                         image_props = new_image_props;
@@ -6831,6 +6862,10 @@ DrawingObjectsController.prototype =
                             image_props.locked = true;
                         if(image_props.lockAspect || new_image_props.lockAspect)
                             image_props.lockAspect = false;
+                        if(image_props.title !== new_image_props.title)
+                            image_props.title = undefined;
+                        if(image_props.description !== new_image_props.description)
+                            image_props.description = undefined;
                         
                     }
                     break;
@@ -6857,7 +6892,9 @@ DrawingObjectsController.prototype =
                         pluginGuid: drawing.m_sApplicationId,
                         pluginData: pluginData,
                         oleWidth: drawing.m_fDefaultSizeX,
-                        oleHeight: drawing.m_fDefaultSizeY
+                        oleHeight: drawing.m_fDefaultSizeY,
+                        title: drawing.getTitle(),
+                        description: drawing.getDescription()
                     };
                     if(!image_props)
                         image_props = new_image_props;
@@ -6881,6 +6918,10 @@ DrawingObjectsController.prototype =
                         image_props.pluginData = undefined;
                         image_props.oleWidth = undefined;
                         image_props.oleHeight = undefined;
+                        if(image_props.title !== new_image_props.title)
+                            image_props.title = undefined;
+                        if(image_props.description !== new_image_props.description)
+                            image_props.description = undefined;
                     }
                     break;
                 }
@@ -6895,7 +6936,9 @@ DrawingObjectsController.prototype =
                         w: drawing.extX,
                         h: drawing.extY,
                         locked: locked,
-                        lockAspect: lockAspect
+                        lockAspect: lockAspect,
+                        title: drawing.getTitle(),
+                        description: drawing.getDescription()
                     };
                     if(!chart_props)
                     {
@@ -6927,6 +6970,12 @@ DrawingObjectsController.prototype =
                             chart_props.locked = true;
                         if(!chart_props.lockAspect || !new_chart_props.lockAspect)
                             chart_props.locked = false;
+
+
+                        if(chart_props.title !== new_chart_props.title)
+                            chart_props.title = undefined;
+                        if(chart_props.description !== new_chart_props.description)
+                            chart_props.description = undefined;
                     }
 
                     new_shape_props =
@@ -6944,7 +6993,9 @@ DrawingObjectsController.prototype =
                         bFromChart: true,
                         locked: locked,
                         textArtProperties: null,
-                        lockAspect: lockAspect
+                        lockAspect: lockAspect,
+                        title: drawing.getTitle(),
+                        description: drawing.getDescription()
                     };
                     if(!shape_props)
                         shape_props = new_shape_props;
@@ -7063,6 +7114,12 @@ DrawingObjectsController.prototype =
                                 image_props.locked = true;
                             if(!image_props.lockAspect || !group_drawing_props.imageProps.lockAspect)
                                 image_props.lockAspect = false;
+                            if(image_props.title !== group_drawing_props.imageProps.title)
+                                image_props.title = undefined;
+                            if(image_props.description !== group_drawing_props.imageProps.description)
+                                image_props.description = undefined;
+
+
                         }
                     }
                     if(group_drawing_props.chartProps)
@@ -7087,6 +7144,14 @@ DrawingObjectsController.prototype =
                                 chart_props.w = null;
                             if(chart_props.h != null && chart_props.h !== group_drawing_props.chartProps.h)
                                 chart_props.h = null;
+
+
+
+                            if(chart_props.title !== group_drawing_props.title)
+                                chart_props.title = undefined;
+                            if(chart_props.description !== group_drawing_props.chartProps.description)
+                                chart_props.description = undefined;
+
 
                             if(chart_props.locked || group_drawing_props.chartProps.locked)
                                 chart_props.locked = true;

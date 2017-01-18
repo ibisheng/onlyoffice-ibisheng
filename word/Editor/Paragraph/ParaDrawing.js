@@ -352,6 +352,9 @@ ParaDrawing.prototype.Get_Props = function(OtherProps)
 		}
 	}
 
+    Props.title = this.docPr.title !== null ? this.docPr.title : undefined;
+    Props.description = this.docPr.descr !== null ? this.docPr.descr : undefined;
+
 	if (null != OtherProps && undefined != OtherProps)
 	{
 		// Соединяем
@@ -426,6 +429,14 @@ ParaDrawing.prototype.Get_Props = function(OtherProps)
 			Props.CanBeFlow = false;
 		else
 			Props.CanBeFlow = true;
+
+		if(undefined === OtherProps.title || Props.title !== OtherProps.title){
+			Props.title = undefined;
+		}
+
+		if(undefined === OtherProps.description || Props.description !== OtherProps.description){
+			Props.description = undefined;
+		}
 	}
 
 	return Props;
@@ -794,6 +805,13 @@ ParaDrawing.prototype.Set_Props = function(Props)
 	if (bCheckWrapPolygon)
 	{
 		this.Check_WrapPolygon();
+	}
+
+	if(undefined != Props.description){
+		this.docPr.setDecr(Props.description);
+	}
+	if(undefined != Props.title){
+		this.docPr.setTitle(Props.title);
 	}
 };
 ParaDrawing.prototype.CheckWH = function()
