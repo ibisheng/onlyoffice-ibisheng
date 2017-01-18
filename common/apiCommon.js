@@ -1912,7 +1912,7 @@
 			this.oleHeight = obj.oleHeight != undefined ? obj.oleHeight : undefined;
 
 			this.title = obj.title != undefined ? obj.title : undefined;
-			this.description = obj.title != undefined ? obj.title : undefined;
+			this.description = obj.description != undefined ? obj.description : undefined;
 
 		} else {
 			this.CanBeFlow = true;
