@@ -9297,7 +9297,6 @@
 		
 		
 		var mergeArr = [];
-		var n = 0;
 		var addComments = function(pasteRow, pasteCol, comments)
 		{
 			var comment;
@@ -9323,8 +9322,7 @@
 				}
 			}
 			 
-			if (!isOneMerge) 
-			{
+			if (!isOneMerge) {
 				if (curMerge != null && !isMerged) {
 					var offsetCol = curMerge.c2 - curMerge.c1;
 					if (offsetCol + nCol >= gc_nMaxCol0) {
@@ -9337,28 +9335,18 @@
 					}
 					
 					pastedRangeProps.offsetLast = {offsetCol: offsetCol, offsetRow: offsetRow};
-					
-					mergeArr[n] = {
+					mergeArr.push({
 						r1: curMerge.r1 + arn.r1 - activeCellsPasteFragment.r1 + rowDiff,
 						r2: curMerge.r2 + arn.r1 - activeCellsPasteFragment.r1 + rowDiff,
 						c1: curMerge.c1 + arn.c1 - activeCellsPasteFragment.c1 + colDiff,
 						c2: curMerge.c2 + arn.c1 - activeCellsPasteFragment.c1 + colDiff
-					};
-					n++;
+					});
 				}
 			} 
-			else 
-			{
+			else {
 				if (!isMerged) {
 					pastedRangeProps.offsetLast = {offsetCol: isMergedFirstCell.c2 - isMergedFirstCell.c1, offsetRow: isMergedFirstCell.r2 - isMergedFirstCell.r1};
-					
-					mergeArr[n] = {
-						r1: isMergedFirstCell.r1,
-						r2: isMergedFirstCell.r2,
-						c1: isMergedFirstCell.c1,
-						c2: isMergedFirstCell.c2
-					};
-					n++;
+					mergeArr.push({r1: isMergedFirstCell.r1, r2: isMergedFirstCell.r2, 	c1: isMergedFirstCell.c1, c2: isMergedFirstCell.c2});
 				}
 			}
 		};
