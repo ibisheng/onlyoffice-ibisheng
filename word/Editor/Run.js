@@ -5189,9 +5189,9 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
 
         if ((Math.abs( Diff ) < SearchPos.DiffX + 0.001 && (SearchPos.CenterMode || SearchPos.X > SearchPos.CurX)) && InMathText == false)
         {
-            SearchPos.DiffX = Math.abs( Diff );
-            SearchPos.Pos.Update( CurPos, Depth );
-            Result = true;
+			SearchPos.DiffX = Math.abs(Diff);
+			SearchPos.Pos.Update(CurPos, Depth);
+			Result = true;
 
             if ( Diff >= - 0.001 && Diff <= TempDx + 0.001 )
             {
@@ -5213,12 +5213,14 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
                 // Если мы ищем позицию для селекта, тогда нужно искать и за знаком параграфа
                 if ( true === StepEnd )
                 {
+					SearchPos.DiffX = Math.abs(Diff);
                     SearchPos.Pos.Update( this.Content.length, Depth );
                     Result = true;
                 }
             }
             else if ( CurPos === EndPos - 1 && para_NewLine != ItemType )
             {
+				SearchPos.DiffX = Math.abs(Diff);
                 SearchPos.Pos.Update( EndPos, Depth );
                 Result = true;
             }
@@ -5229,6 +5231,7 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
     // неправильную позицию вернем позицию начала данного путого рана.
     if ( SearchPos.DiffX > 1000000 - 1 )
     {
+    	SearchPos.DiffX = SearchPos.X - SearchPos.CurX;
         SearchPos.Pos.Update( StartPos, Depth );
         Result = true;
     }
@@ -5246,9 +5249,9 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
         Diff = SearchPos.X - SearchPos.CurX;
         if(SearchPos.InText == false && (bEmpty || StartPos !== EndPos) && (Math.abs( Diff ) < SearchPos.DiffX + 0.001 && (SearchPos.CenterMode || SearchPos.X > SearchPos.CurX)))
         {
-            SearchPos.DiffX = Math.abs( Diff );
-            SearchPos.Pos.Update( CurPos, Depth );
-            Result = true;
+			SearchPos.DiffX = Math.abs(Diff);
+			SearchPos.Pos.Update(CurPos, Depth);
+			Result = true;
         }
     }
 
