@@ -443,15 +443,15 @@ CChangesDocumentDefaultLanguage.prototype.WriteToBinary = function(Writer)
 {
 	// Long : New
 	// Long : Old
-	Writer.WriteBool(this.New);
-	Writer.WriteBool(this.Old);
+	Writer.WriteLong(this.New);
+	Writer.WriteLong(this.Old);
 };
 CChangesDocumentDefaultLanguage.prototype.ReadFromBinary = function(Reader)
 {
 	// Long : New
 	// Long : Old
-	this.New = Reader.GetBool();
-	this.Old = Reader.GetBool();
+	this.New = Reader.GetLong();
+	this.Old = Reader.GetLong();
 };
 CChangesDocumentDefaultLanguage.prototype.CreateReverseChange = function()
 {
