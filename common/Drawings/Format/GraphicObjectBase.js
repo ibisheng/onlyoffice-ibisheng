@@ -416,8 +416,15 @@
         }
     };
 
-    CGraphicObjectBase.prototype.getNvProps = function(){
+    CGraphicObjectBase.prototype.getUniNvProps = function(){
         return this.nvSpPr || this.nvPicPr || this.nvGrpSpPr || this.nvGraphicFramePr || null;
+    };
+    CGraphicObjectBase.prototype.getNvProps = function(){
+        var oUniNvPr = this.getUniNvProps();
+        if(oUniNvPr){
+            return oUniNvPr.cNvPr;
+        }
+        return null;
     };
 
     CGraphicObjectBase.prototype.setTitle = function(sTitle){
