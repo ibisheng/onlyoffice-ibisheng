@@ -763,6 +763,19 @@
 			var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: defName.getUndoDefName(), to: null};
 			this._broadcastDefName(tableName, notifyData);
 		},
+		delTableName2: function(tableName) {
+			this.buildDependency();
+			var defName = this.getDefNameByName(tableName);
+			
+			this.addToChangedDefName(defName);
+			var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: defName.getUndoDefName(), to: null};
+			this._broadcastDefName(tableName, notifyData, true);
+			
+			this._delDefName(tableName, null);
+			if (defName) {
+				defName.removeDependencies();
+			}
+		},
 		delColumnTable: function(tableName, deleted) {
 			this.buildDependency();
 			var notifyData = {type: AscCommon.c_oNotifyType.DelColumnTable, tableName: tableName, deleted: deleted};
@@ -1026,12 +1039,12 @@
 				this.volatileListeners[i].notify(notifyData);
 			}
 		},
-		_broadcastDefName: function(name, notifyData) {
+		_broadcastDefName: function(name, notifyData, bConvertTableFormulaToRef) {
 			var nameIndex = getDefNameIndex(name);
 			var container = this.defNameListeners[nameIndex];
 			if (container) {
 				for (var listenerId in container.listeners) {
-					container.listeners[listenerId].notify(notifyData);
+					container.listeners[listenerId].notify(notifyData, bConvertTableFormulaToRef);
 				}
 			}
 		},
@@ -4552,13 +4565,27 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			this.workbook.dependencyFormulas.changeTableName(oldTablePart.DisplayName, tablePart.DisplayName);
 		}
 	};
-	Woorksheet.prototype.deleteTablePart = function (index) {
-		var deleted = this.TableParts.splice(index, 1);
-		for (var delIndex = 0; delIndex < deleted.length; ++delIndex) {
-			var tablePart = deleted[delIndex];
-			this.workbook.dependencyFormulas.delTableName(tablePart.DisplayName);
+	Woorksheet.prototype.deleteTablePart = function (index, bConvertTableFormulaToRef) {
+		if(bConvertTableFormulaToRef)
+		{
+			//TODO скорее всего стоит убрать else
+			var tablePart = this.TableParts[index];
+			this.workbook.dependencyFormulas.delTableName2(tablePart.DisplayName);
 			tablePart.removeDependencies();
+			
+			//delete table
+			this.TableParts.splice(index, 1);
 		}
+		else
+		{
+			var deleted = this.TableParts.splice(index, 1);
+			for (var delIndex = 0; delIndex < deleted.length; ++delIndex) {
+				var tablePart = deleted[delIndex];
+				this.workbook.dependencyFormulas.delTableName(tablePart.DisplayName);
+				tablePart.removeDependencies();
+			}
+		}
+		
 	};
 //-------------------------------------------------------------------------------------------------
 	/**

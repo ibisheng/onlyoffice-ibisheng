@@ -3875,7 +3875,7 @@ function parserFormula( formula, parent, _ws ) {
 	parserFormula.prototype.setIsTable = function(isTable){
 		this.isTable = isTable;
 	};
-	parserFormula.prototype.notify = function(data) {
+	parserFormula.prototype.notify = function(data, bConvertTableFormulaToRef) {
 		var eventData = {notifyData: data, assemble: null, isRebuild: false, formula: this};
 		if (this.parent && this.parent.onFormulaEvent) {
 			var checkCanDo = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.CanDo, eventData);
@@ -3903,7 +3903,7 @@ function parserFormula( formula, parent, _ws ) {
 				eventData.isRebuild = false;
 			} else if (AscCommon.c_oNotifyType.ChangeDefName === data.type) {
 				if (!data.to) {
-					this.removeTableName(data.from);
+					this.removeTableName(data.from, bConvertTableFormulaToRef);
 					eventData.isRebuild = true;
 				} else if (data.from.name != data.to.name) {
 					this.changeDefName(data.from, data.to);
@@ -4889,12 +4889,19 @@ parserFormula.prototype.calculate = function(opt_defName, opt_range) {
 			}
 		}
 	};
-	parserFormula.prototype.removeTableName = function(defName) {
+	parserFormula.prototype.removeTableName = function(defName, bConvertTableFormulaToRef) {
 		var i, elem;
 		for (i = 0; i < this.outStack.length; i++) {
 			elem = this.outStack[i];
 			if (elem.type == cElementType.table && elem.tableName == defName.name) {
-				this.outStack[i] = new cError(cErrorType.bad_reference);
+				if(bConvertTableFormulaToRef)
+				{
+					this.outStack[i] = this.outStack[i].toRef();
+				}
+				else
+				{
+					this.outStack[i] = new cError(cErrorType.bad_reference);
+				}
 			}
 		}
 	};

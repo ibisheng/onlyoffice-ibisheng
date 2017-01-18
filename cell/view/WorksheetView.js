@@ -13092,7 +13092,47 @@
         formatTableInfo.isDeleteColumn = true;
         formatTableInfo.isDeleteTable = true;
     };
+	
+	WorksheetView.prototype.af_convertTableToRange = function (tableName) {
+        var t = this;
+		
+        var callback = function (isSuccess) {
+            if (false === isSuccess) {
+                return;
+            }
 
+            History.Create_NewPoint();
+            History.StartTransaction();
+			
+			t.model.workbook.dependencyFormulas.lockRecal();
+			
+            t.model.autoFilters.convertTableToRange(tableName);
+            t._onUpdateFormatTable(tableRange, false, true);
+			
+			t.model.workbook.dependencyFormulas.unlockRecal();
+			
+            History.EndTransaction();
+        };
+		
+        var table = t.model.autoFilters._getFilterByDisplayName(tableName);
+        var tableRange = null !== table ? table.Ref : null;
+
+        var lockRange = tableRange;
+        var callBackLockedDefNames = function (isSuccess) {
+            if (false === isSuccess) {
+                return;
+            }
+
+            t._isLockedCells(lockRange, null, callback);
+        };
+
+        //лочим данный именованный диапазон
+        var defNameId = t.model.workbook.dependencyFormulas.getDefNameByName(tableName, t.model.getId());
+        defNameId = defNameId ? defNameId.getNodeId() : null;
+
+        t._isLockedDefNames(callBackLockedDefNames, defNameId);
+    };
+	
     WorksheetView.prototype.af_changeTableRange = function (tableName, range) {
         var t = this;
         range = AscCommonExcel.g_oRangeCache.getAscRange(range);

@@ -600,7 +600,12 @@ var editor;
     var ws = this.wb.getWorksheet();
     return ws.af_changeTableRange(tableName, range);
   };
-  
+
+  spreadsheet_api.prototype.asc_convertTableToRange = function(tableName) {
+    var ws = this.wb.getWorksheet();
+    return ws.af_convertTableToRange(tableName);
+  };
+
   spreadsheet_api.prototype.asc_getTablePictures = function (props) 
   { 
 	return this.wb.getTablePictures(props); 
@@ -3481,6 +3486,7 @@ var editor;
   prot["asc_deleteCellsInTable"] = prot.asc_deleteCellsInTable;
   prot["asc_changeDisplayNameTable"] = prot.asc_changeDisplayNameTable;
   prot["asc_changeTableRange"] = prot.asc_changeTableRange;
+  prot["asc_convertTableToRange"] = prot.asc_convertTableToRange;
   prot["asc_getTablePictures"] = prot.asc_getTablePictures;
 
   // Drawing objects interface
