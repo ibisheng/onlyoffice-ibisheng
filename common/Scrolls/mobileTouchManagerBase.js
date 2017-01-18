@@ -492,6 +492,33 @@
 		this.eventsElement = _id;
 		this.iScroll.eventsElement = this.eventsElement;
 		this.iScroll._initEvents();
+
+		// затачиваемся на конкретные div в интерфейсе ( потом переделать? )
+		var _arrayElements = [];
+		var _testElem = document.getElementById("editor-navbar");
+		if (_testElem)
+			_arrayElements.push(_testElem);
+		_testElem = document.getElementById("cell-editing-box");
+		if (_testElem)
+			_arrayElements.push(_testElem);
+		_testElem = document.getElementsByClassName("statusbar")[0];
+		if (_testElem)
+			_arrayElements.push(_testElem);
+
+		for (var i = _arrayElements.length - 1; i >= 0; i--)
+		{
+			_arrayElements[i].onmousedown = _arrayElements[i]["ontouchstart"] =
+				_arrayElements[i].onmousemove = _arrayElements[i]["ontouchmove"] =
+					_arrayElements[i].onmouseup = _arrayElements[i]["ontouchend"] =
+						_arrayElements[i]["ontouchcancel"] = function(e) { AscCommon.stopEvent(e); };
+
+			/*
+			_arrayElements["onpointerdown"] = _arrayElements["onmspointerdown"] =
+				_arrayElements["onpointermove"] = _arrayElements["onmspointermove"] =
+					_arrayElements["onpointerup"] = _arrayElements["onmspointerup"] =
+						_arrayElements[i]["onpointercancel"] = _arrayElements[i]["onmspointercancel"] = function(e) { AscCommon.stopEvent(e); };
+			*/
+		}
 	};
 
 	// создание вспомогательного элемента, для прокрутки. по идее потом можно изменить
