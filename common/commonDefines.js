@@ -1419,7 +1419,7 @@
 	prot['Page']                           = prot.Page;
 	prot['Paragraph']                      = prot.Paragraph;
 	prot['TopMargin']                      = prot.TopMargin;
-	window['Asc']['c_oAscPageOrientation'] = window['AscCommon'].c_oAscBorderStyles = c_oAscBorderStyles;
+	window['Asc']['c_oAscBorderStyles'] = window['AscCommon'].c_oAscBorderStyles = c_oAscBorderStyles;
 	prot                         = c_oAscPageOrientation;
 	prot['None']                 = prot.None;
 	prot['Double']               = prot.Double;
