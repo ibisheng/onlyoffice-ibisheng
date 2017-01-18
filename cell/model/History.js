@@ -895,7 +895,9 @@ CHistory.prototype.Get_DeleteIndex = function () {
 				DeleteIndex += 1;
 			}
 		}
-		DeleteIndex += 1; // Это на взаимное расположение Sheet. Пишется в каждой точке изменений.
+	}
+	if (DeleteIndex > 0 && this.workbook.undoRedoSheetView.IsChangedState()) {
+		DeleteIndex += 1;
 	}
 	return DeleteIndex;
 };
@@ -921,9 +923,14 @@ CHistory.prototype.GetSerializeArray = function()
 		for(var j = 0, length2 = point.Items.length; j < length2; ++j)
 		{
 			var elem = point.Items[j];
-			aPointChanges.push(new AscCommonExcel.UndoRedoItemSerializable(elem.Class, elem.Type, elem.SheetId, elem.Range, elem.Data, elem.LocalChange));
+			if (!elem.LocalChange) {
+				aPointChanges.push(new AscCommonExcel.UndoRedoItemSerializable(elem.Class, elem.Type, elem.SheetId, elem.Range, elem.Data, elem.LocalChange));
+			}
 		}
 		aRes.push(aPointChanges);
+	}
+	if (aRes.length > 0 && this.workbook.undoRedoSheetView.IsChangedState()) {
+		aPointChanges.push(new AscCommonExcel.UndoRedoItemSerializable(this.workbook.undoRedoSheetView, null, null, null, null, false));
 	}
 	return aRes;
 };

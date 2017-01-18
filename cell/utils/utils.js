@@ -867,6 +867,18 @@
 			return false;
 			// todo return this.activeCell.isEqual(range.cell);
 		};
+		SelectionRange.prototype.isEqual2 = function(range) {
+			if (this.activeCellId !== range.activeCellId || !this.activeCell.isEqual(range.activeCell) ||
+				this.ranges.length !== range.ranges.length) {
+				return false;
+			}
+			for (var i = 0; i < this.ranges.length; ++i) {
+				if (!this.ranges[i].isEqual(range.ranges[i])) {
+					return false;
+				}
+			}
+			return true;
+		};
 		SelectionRange.prototype.addRange = function () {
 			this.ranges.push(new Range(0, 0, 0, 0));
 			this.activeCellId = -1;
@@ -1039,6 +1051,35 @@
 				this.activeCell.row = range.r1;
 				this.activeCellId = this.ranges.length - 1;
 			}
+		};
+		SelectionRange.prototype.WriteToBinary = function(w) {
+			w.WriteLong(this.ranges.length);
+			for (var i = 0; i < this.ranges.length; ++i) {
+				var range = this.ranges[i];
+				w.WriteLong(range.c1);
+				w.WriteLong(range.r1);
+				w.WriteLong(range.c2);
+				w.WriteLong(range.r2);
+			}
+			w.WriteLong(this.activeCell.row);
+			w.WriteLong(this.activeCell.col);
+			w.WriteLong(this.activeCellId);
+		};
+		SelectionRange.prototype.ReadFromBinary = function(r) {
+			this.clean();
+			var count = r.GetLong();
+			var rangesNew = [];
+			for (var i = 0; i < count; ++i) {
+				var range = new Asc.Range(r.GetLong(), r.GetLong(), r.GetLong(), r.GetLong());
+				rangesNew.push(range);
+			}
+			if (rangesNew.length > 0) {
+				this.ranges = rangesNew;
+			}
+			this.activeCell.row = r.GetLong();
+			this.activeCell.col = r.GetLong();
+			this.activeCellId = r.GetLong();
+			this.update();
 		};
 
     /**
@@ -1786,6 +1827,9 @@
 			// Закрепление области
 			this.pane = null;
 
+			//current view zoom
+			this.zoomScale = 100;
+
 			return this;
 		}
 
@@ -1795,6 +1839,7 @@
 				var result = new asc_CSheetViewSettings();
 				result.showGridLines = this.showGridLines;
 				result.showRowColHeaders = this.showRowColHeaders;
+				result.zoom = this.zoom;
 				if (this.pane)
 					result.pane = this.pane.clone();
 				return result;
@@ -1805,9 +1850,11 @@
 			},
 			asc_getShowGridLines: function () { return false !== this.showGridLines; },
 			asc_getShowRowColHeaders: function () { return false !== this.showRowColHeaders; },
+			asc_getZoomScale: function () { return this.zoomScale; },
 			asc_getIsFreezePane: function () { return null !== this.pane && this.pane.isInit(); },
 			asc_setShowGridLines: function (val) { this.showGridLines = val; },
-			asc_setShowRowColHeaders: function (val) { this.showRowColHeaders = val; }
+			asc_setShowRowColHeaders: function (val) { this.showRowColHeaders = val; },
+			asc_setZoomScale: function (val) { this.zoomScale = val; }
 		};
 
 		/** @constructor */

@@ -2591,6 +2591,8 @@
                 this.bs.WriteItem(c_oSer_SheetView.ShowGridLines, function(){oThis.memory.WriteBool(oSheetView.showGridLines);});
             if (null !== oSheetView.showRowColHeaders)
                 this.bs.WriteItem(c_oSer_SheetView.ShowRowColHeaders, function(){oThis.memory.WriteBool(oSheetView.showRowColHeaders);});
+			if (null !== oSheetView.zoomScale)
+				this.bs.WriteItem(c_oSer_SheetView.ZoomScale, function(){oThis.memory.WriteLong(oSheetView.zoomScale);});
             if (null !== oSheetView.pane && oSheetView.pane.isInit())
                 this.bs.WriteItem(c_oSer_SheetView.Pane, function(){oThis.WriteSheetViewPane(oSheetView.pane);});
 			if (null !== ws.selectionRange)
@@ -6492,7 +6494,7 @@
 			} else if (c_oSer_SheetView.WorkbookViewId === type) {
 				this.stream.GetLong();
 			} else if (c_oSer_SheetView.ZoomScale === type) {
-				this.stream.GetLong();
+				oSheetView.asc_setZoomScale(this.stream.GetLong());
 			} else if (c_oSer_SheetView.ZoomScaleNormal === type) {
 				this.stream.GetLong();
 			} else if (c_oSer_SheetView.ZoomScalePageLayoutView === type) {

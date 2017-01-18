@@ -1389,6 +1389,7 @@
 
 		this.maxDigitWidth = 0;
 		this.paddingPlusBorder = 0;
+		this.undoRedoSheetView = null;
 	}
 	Workbook.prototype.init=function(tableCustomFunc, bNoBuildDep, bSnapshot){
 		if(this.nActive < 0)
@@ -1432,6 +1433,8 @@
 		if (bSnapshot) {
 			this.snapshot = this._getSnapshot();
 		}
+		this.undoRedoSheetView = new AscCommonExcel.UndoRedoSheetView(this);
+		this.undoRedoSheetView.SaveState();
 	};
 	Workbook.prototype.rebuildColors=function(){
 		AscCommonExcel.g_oColorManager.rebuildColors();
@@ -1881,6 +1884,7 @@
 				}
 			}
 			this.aCollaborativeActions = [];
+			this.undoRedoSheetView.SaveState();
 			this.snapshot = this._getSnapshot();
 		}
 		return aRes;

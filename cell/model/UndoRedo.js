@@ -3789,6 +3789,142 @@ UndoRedoAutoFilters.prototype = {
 	UndoRedoSparklines.prototype.UndoRedo = function (Type, Data, nSheetId, bUndo) {
 	};
 
+	function UndoRedoSheetView(wb) {
+		this.wb = wb;
+		this.lastState = null;
+
+		this.Id = AscCommon.g_oIdCounter.Get_NewId();
+		g_oTableId.Add(this, this.Id);
+	}
+
+	UndoRedoSheetView.prototype.Type = -1;
+	UndoRedoSheetView.prototype.Get_Id = function() {
+		return this.Id;
+	};
+	UndoRedoSheetView.prototype.SaveState = function() {
+		this.lastState = this._getState();
+	};
+	UndoRedoSheetView.prototype.IsChangedState = function() {
+		return true;
+	};
+	UndoRedoSheetView.prototype.Save_Changes = function(data, w) {
+		w.WriteLong(this.Type);
+		var diff = this._getDiffState(this.lastState, this._getState());
+		if (null != diff.active) {
+			w.WriteByte(0);
+			w.WriteString2(diff.active);
+		}
+		for (var sheetId in diff.sheets) {
+			var elem = diff.sheets[sheetId];
+			if (elem) {
+				w.WriteByte(1);
+				w.WriteString2(sheetId);
+				if (null != elem.zoom) {
+					w.WriteByte(2);
+					w.WriteLong(elem.zoom);
+				}
+				if (null != elem.select) {
+					w.WriteByte(3);
+					elem.select.WriteToBinary(w);
+				}
+				w.WriteByte(255);
+			}
+		}
+		w.WriteByte(255);
+	};
+	UndoRedoSheetView.prototype.Load_Changes = function(r) {
+		var state = {active: null, sheets: {}};
+		r.GetLong();
+		var type;
+		while ((type = r.GetByte()) !== 255) {
+			if (0 === type) {
+				state.active = r.GetString2();
+			} else if (1 === type) {
+				var sheetId = r.GetString2();
+				var ws = this.wb.getWorksheetById(sheetId);
+				var elem = {zoom: null, select: null};
+				var subType;
+				while ((subType = r.GetByte()) !== 255) {
+					if (2 == subType) {
+						elem.zoom = r.GetLong();
+					} else if (3 == subType) {
+						elem.select = new AscCommonExcel.SelectionRange(ws);
+						elem.select.ReadFromBinary(r);
+					}
+				}
+				state.sheets[sheetId] = elem;
+			}
+		}
+		this._setState(state);
+	};
+	UndoRedoSheetView.prototype._getState = function() {
+		var wsActive = this.wb.getActiveWs();
+		var res = {active: wsActive.getId(), sheets: {}};
+		for (var i = 0; i < this.wb.getWorksheetCount(); ++i) {
+			var ws = this.wb.getWorksheet(i);
+			res.sheets[ws.getId()] = {zoom: ws.sheetViews[0].zoomScale, select: ws.selectionRange.clone()};
+		}
+		return res;
+	};
+	UndoRedoSheetView.prototype._setState = function(state) {
+		if (window["NATIVE_EDITOR_ENJINE"]) {
+			if (null != state.active) {
+				var ws = this.wb.getWorksheetById(state.active);
+				if (ws) {
+					this.wb.setActive(ws.getIndex());
+				}
+			}
+			for (var sheetId in state.sheets) {
+				var elem = state.sheets[sheetId];
+				var ws = this.wb.getWorksheetById(sheetId);
+				if (elem && ws) {
+					if (null != elem.zoom) {
+						ws.sheetViews[0].asc_setZoomScale(elem.zoom);
+					}
+					if (null != elem.select) {
+						ws.selectionRange = elem.select;
+					}
+				}
+			}
+		}
+	};
+	UndoRedoSheetView.prototype._getDiffState = function(stateBase, stateCur) {
+		if (!stateCur) {
+			return stateBase;
+		}
+		if (!stateBase) {
+			return stateCur;
+		}
+		//always write stateCur.active to set active
+		var res = {active: stateCur.active, sheets: {}};
+		for (var sheetId in stateCur.sheets) {
+			var elemCur = stateCur.sheets[sheetId];
+			var elemBase = stateBase.sheets[sheetId];
+			if (!elemCur) {
+				res.sheets[sheetId] = elemBase;
+				continue;
+			}
+			if (!elemBase) {
+				res.sheets[sheetId] = elemCur;
+				continue;
+			}
+			var bAdd = false;
+			var elemNew = {zoom: null, select: null};
+			if (elemBase.zoom !== elemCur.zoom) {
+				bAdd = true;
+				elemNew.zoom = elemCur.zoom;
+			}
+			if (!elemBase.select.isEqual2(elemCur.select)) {
+				bAdd = true;
+				elemNew.select = elemCur.select;
+			}
+			if (bAdd) {
+				res.sheets[sheetId] = elemNew;
+			}
+		}
+		return res;
+	};
+
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 	window['AscCommonExcel'].UndoRedoItemSerializable = UndoRedoItemSerializable;
@@ -3817,6 +3953,7 @@ UndoRedoAutoFilters.prototype = {
 	window['AscCommonExcel'].UndoRedoComment = UndoRedoComment;
 	window['AscCommonExcel'].UndoRedoAutoFilters = UndoRedoAutoFilters;
 	window['AscCommonExcel'].UndoRedoSparklines = UndoRedoSparklines;
+	window['AscCommonExcel'].UndoRedoSheetView = UndoRedoSheetView;
 
 	window['AscCommonExcel'].g_oUndoRedoWorkbook = null;
 	window['AscCommonExcel'].g_oUndoRedoCell = null;
