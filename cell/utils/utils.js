@@ -2366,7 +2366,7 @@
 		window["AscCommonExcel"].g_oCacheMeasureEmpty = g_oCacheMeasureEmpty;
 
 		window["Asc"]["asc_CFormatCellsInfo"] = window["Asc"].asc_CFormatCellsInfo = asc_CFormatCellsInfo;
-		prot = asc_CCompleteMenu.prototype;
+		prot = asc_CFormatCellsInfo.prototype;
 		prot["asc_setType"] = prot.asc_setType;
 		prot["asc_setDecimalPlaces"] = prot.asc_setDecimalPlaces;
 		prot["asc_setSeparator"] = prot.asc_setSeparator;
