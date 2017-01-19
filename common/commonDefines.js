@@ -234,7 +234,6 @@
 		Custom     : 1,
 		Text       : 2,
 		Number     : 3,
-		Integer    : 4,
 		Scientific : 5,
 		Currency   : 6,
 		Date       : 7,
@@ -1206,7 +1205,6 @@
 	prot['Custom']                           = prot.Custom;
 	prot['Text']                             = prot.Text;
 	prot['Number']                           = prot.Number;
-	prot['Integer']                          = prot.Integer;
 	prot['Scientific']                       = prot.Scientific;
 	prot['Currency']                         = prot.Currency;
 	prot['Date']                             = prot.Date;
