@@ -4018,6 +4018,115 @@ function setCurrentCultureInfo(val) {
 		return positiveFormat + ';' + negativeFormat + ';' + nullFormat + ';' + textFormat;
 	}
 
+	function getFormatCells(info) {
+		var res = [];
+		if (info) {
+			var format;
+			var i;
+			var cultureInfo = g_aCultureInfos[info.symbol];
+			var currency = !!cultureInfo;
+			if (Asc.c_oAscNumFormatType.General === info.type) {
+				res.push(AscCommon.g_cGeneralFormat);
+			} else if (Asc.c_oAscNumFormatType.Number === info.type) {
+				var numberFormat = getNumberFormatSimple(info.separator, info.decimalPlaces);
+				res.push(numberFormat);
+				res.push(numberFormat + ';[Red]' + numberFormat);
+				res.push(getNumberFormat(cultureInfo, info.separator, info.decimalPlaces, false));
+				res.push(getNumberFormat(cultureInfo, info.separator, info.decimalPlaces, true));
+			} else if (Asc.c_oAscNumFormatType.Currency === info.type) {
+				res.push(getCurrencyFormatSimple2(cultureInfo, info.decimalPlaces, currency, false));
+				res.push(getCurrencyFormatSimple2(cultureInfo, info.decimalPlaces, currency, true));
+				res.push(getCurrencyFormatSimple(cultureInfo, info.decimalPlaces, currency, currency, false));
+				res.push(getCurrencyFormatSimple(cultureInfo, info.decimalPlaces, currency, currency, true));
+			} else if (Asc.c_oAscNumFormatType.Accounting === info.type) {
+				res.push(getCurrencyFormat(cultureInfo, info.decimalPlaces, currency, currency));
+			} else if (Asc.c_oAscNumFormatType.Date === info.type) {
+				//todo locale dependence
+				if (info.symbol == AscCommon.g_oDefaultCultureInfo.LCID) {
+					res.push(getShortDateFormat(cultureInfo));
+					res.push('[$-F800]dddd, mmmm dd, yyyy');
+				}
+				res.push(getShortDateFormat2(1, 1, 0, cultureInfo) + ';@');
+				res.push(getShortDateFormat2(1, 1, 2, cultureInfo) + ';@');
+				res.push(getShortDateFormat2(2, 2, 2, cultureInfo) + ';@');
+				res.push(getShortDateFormat2(1, 1, 4, cultureInfo) + ';@');
+				res.push(getShortDateFormat2(1, 1, 2, cultureInfo) + ' h:mm;@');
+				res.push('[$-409]' + getShortDateFormat2(1, 1, 2, cultureInfo) + ' h:mm AM/PM;@');
+				var locale = getLocaleFormat(cultureInfo, false);
+				res.push(locale + 'mmmmm;@');
+				res.push(locale + 'mmmm d, yyyy;@');
+				var separators = ['-', '/', ' '];
+				for (i = 0; i < separators.length; ++i) {
+					var separator = separators[i];
+					res.push(locale + 'd' + separator + 'mmm;@');
+					res.push(locale + 'd' + separator + 'mmm' + separator + 'yy;@');
+					res.push(locale + 'dd' + separator + 'mmm' + separator + 'yy;@');
+					res.push(locale + 'mmm' + separator + 'yy;@');
+					res.push(locale + 'mmmm' + separator + 'yy;@');
+					res.push(locale + 'mmmmm' + separator + 'yy;@');
+					res.push(locale + 'd' + separator + 'mmm' + separator + 'yyyy;@');
+				}
+			} else if (Asc.c_oAscNumFormatType.Time === info.type) {
+				res.push('[$-F400]h:mm:ss AM/PM', 'h:mm;@', 'h:mm AM/PM;@', 'h:mm:ss;@', 'h:mm:ss AM/PM;@', 'mm:ss.0;@',
+					'[h]:mm:ss;@');
+			} else if (Asc.c_oAscNumFormatType.Percent === info.type) {
+				format = '0';
+				if (info.decimalPlaces > 0) {
+					format += '.' + '0'.repeat(info.decimalPlaces);
+				}
+				format += '%';
+				res.push(format);
+			} else if (Asc.c_oAscNumFormatType.Fraction === info.type) {
+				res.push('# ?/?', '# ??/??', '# ???/???', '# ?/2', '# ?/4', '# ?/8', '# ??/16', '# ?/10', '# ??/100');
+			} else if (Asc.c_oAscNumFormatType.Scientific === info.type) {
+				format = '0.' + '0'.repeat(info.decimalPlaces) + 'E+00';
+				res.push(format);
+			} else if (Asc.c_oAscNumFormatType.Text === info.type) {
+				res.push('@');
+			} else if (Asc.c_oAscNumFormatType.Custom === info.type) {
+				for (i = 0; i <= 4; ++i) {
+					res.push(AscCommonExcel.aStandartNumFormats[i]);
+				}
+				res.push(getCurrencyFormatSimple(null, 0, false, false, false));
+				res.push(getCurrencyFormatSimple(null, 0, false, false, true));
+				res.push(getCurrencyFormatSimple(null, 2, false, false, false));
+				res.push(getCurrencyFormatSimple(null, 2, false, false, true));
+				res.push(getCurrencyFormatSimple(null, 0, true, false, false));
+				res.push(getCurrencyFormatSimple(null, 0, true, false, true));
+				res.push(getCurrencyFormatSimple(null, 2, true, false, false));
+				res.push(getCurrencyFormatSimple(null, 2, true, false, true));
+				for (i = 9; i <= 13; ++i) {
+					res.push(AscCommonExcel.aStandartNumFormats[i]);
+				}
+				res.push(getShortDateFormat(null));
+				res.push(getShortDateMonthFormat(true, true, null));
+				res.push(getShortDateMonthFormat(true, false, null));
+				res.push(getShortDateMonthFormat(false, true, null));
+				for (i = 18; i <= 21; ++i) {
+					res.push(AscCommonExcel.aStandartNumFormats[i]);
+				}
+				res.push(getShortDateFormat(null) + " h:mm");
+				for (i = 45; i <= 49; ++i) {
+					res.push(AscCommonExcel.aStandartNumFormats[i]);
+				}
+				//todo add all used in workbook formats
+			} else {
+				res.push(AscCommon.g_cGeneralFormat);
+				res.push('0.00');
+				res.push('0.00E+00');
+				res.push(getCurrencyFormat(cultureInfo, 2, currency, true));
+				res.push(getCurrencyFormatSimple2(cultureInfo, 2, currency, false));
+				res.push(getShortDateFormat(cultureInfo));
+				//todo F400
+				res.push('[$-F400]h:mm:ss AM/PM');
+				res.push('0.00%');
+				res.push('# ?/?');
+				res.push('@');
+			}
+		}
+		return res;
+	}
+
 var g_aCultureInfos = {
 	1: {LCID: 1, Name: "ar", CurrencyPositivePattern: 2, CurrencyNegativePattern: 3, CurrencySymbol: "ر.س.‏", NumberDecimalSeparator: ".", NumberGroupSeparator: ",", NumberGroupSizes: [3], DayNames: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"], AbbreviatedDayNames: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"], MonthNames: ["محرم", "صفر", "ربيع الأول", "ربيع الثاني", "جمادى الأولى", "جمادى الثانية", "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة", ""], AbbreviatedMonthNames: ["محرم", "صفر", "ربيع الأول", "ربيع الثاني", "جمادى الأولى", "جمادى الثانية", "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة", ""], MonthGenitiveNames: [], AbbreviatedMonthGenitiveNames: [], AMDesignator: "ص", PMDesignator: "م", DateSeparator: "/", TimeSeparator: ":", ShortDatePattern: "134"},
 	2: {LCID: 2, Name: "bg", CurrencyPositivePattern: 3, CurrencyNegativePattern: 8, CurrencySymbol: "лв.", NumberDecimalSeparator: ",", NumberGroupSeparator: " ", NumberGroupSizes: [3], DayNames: ["неделя", "понеделник", "вторник", "сряда", "четвъртък", "петък", "събота"], AbbreviatedDayNames: ["нед", "пон", "вт", "ср", "четв", "пет", "съб"], MonthNames: ["януари", "февруари", "март", "април", "май", "юни", "юли", "август", "септември", "октомври", "ноември", "декември", ""], AbbreviatedMonthNames: ["яну", "фев", "мар", "апр", "май", "юни", "юли", "авг", "сеп", "окт", "ное", "дек", ""], MonthGenitiveNames: [], AbbreviatedMonthGenitiveNames: [], AMDesignator: "", PMDesignator: "", DateSeparator: ".", TimeSeparator: ":", ShortDatePattern: "025"},
@@ -4467,6 +4576,7 @@ var g_oDefaultCultureInfo = g_aCultureInfos[1033];//en-US//1033//fr-FR//1036//ba
 	window['AscCommon'].getCurrencyFormatSimple = getCurrencyFormatSimple;
 	window['AscCommon'].getCurrencyFormatSimple2 = getCurrencyFormatSimple2;
 	window['AscCommon'].getCurrencyFormat = getCurrencyFormat;
+	window['AscCommon'].getFormatCells = getFormatCells;
 
     window["AscCommon"].gc_nMaxDigCount = gc_nMaxDigCount;
     window["AscCommon"].gc_nMaxDigCountView = gc_nMaxDigCountView;
