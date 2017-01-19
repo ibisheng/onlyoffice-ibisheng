@@ -3875,7 +3875,7 @@ function parserFormula( formula, parent, _ws ) {
 	parserFormula.prototype.setIsTable = function(isTable){
 		this.isTable = isTable;
 	};
-	parserFormula.prototype.notify = function(data, bConvertTableFormulaToRef) {
+	parserFormula.prototype.notify = function(data) {
 		var eventData = {notifyData: data, assemble: null, isRebuild: false, formula: this};
 		if (this.parent && this.parent.onFormulaEvent) {
 			var checkCanDo = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.CanDo, eventData);
@@ -3903,7 +3903,7 @@ function parserFormula( formula, parent, _ws ) {
 				eventData.isRebuild = false;
 			} else if (AscCommon.c_oNotifyType.ChangeDefName === data.type) {
 				if (!data.to) {
-					this.removeTableName(data.from, bConvertTableFormulaToRef);
+					this.removeTableName(data.from, data.bConvertTableFormulaToRef);
 					eventData.isRebuild = true;
 				} else if (data.from.name != data.to.name) {
 					this.changeDefName(data.from, data.to);

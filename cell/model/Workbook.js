@@ -753,23 +753,13 @@
 				History.TurnOn();
 			}
 		},
-		delTableName: function(tableName) {
-			this.buildDependency();
-			var defName = this._delDefName(tableName, null);
-			if (defName) {
-				defName.removeDependencies();
-			}
-			this.addToChangedDefName(defName);
-			var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: defName.getUndoDefName(), to: null};
-			this._broadcastDefName(tableName, notifyData);
-		},
-		delTableName2: function(tableName) {
+		delTableName: function(tableName, bConvertTableFormulaToRef) {
 			this.buildDependency();
 			var defName = this.getDefNameByName(tableName);
 			
 			this.addToChangedDefName(defName);
-			var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: defName.getUndoDefName(), to: null};
-			this._broadcastDefName(tableName, notifyData, true);
+			var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: defName.getUndoDefName(), to: null, bConvertTableFormulaToRef: bConvertTableFormulaToRef};
+			this._broadcastDefName(tableName, notifyData);
 			
 			this._delDefName(tableName, null);
 			if (defName) {
@@ -1039,12 +1029,12 @@
 				this.volatileListeners[i].notify(notifyData);
 			}
 		},
-		_broadcastDefName: function(name, notifyData, bConvertTableFormulaToRef) {
+		_broadcastDefName: function(name, notifyData) {
 			var nameIndex = getDefNameIndex(name);
 			var container = this.defNameListeners[nameIndex];
 			if (container) {
 				for (var listenerId in container.listeners) {
-					container.listeners[listenerId].notify(notifyData, bConvertTableFormulaToRef);
+					container.listeners[listenerId].notify(notifyData);
 				}
 			}
 		},
@@ -4570,7 +4560,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		{
 			//TODO скорее всего стоит убрать else
 			var tablePart = this.TableParts[index];
-			this.workbook.dependencyFormulas.delTableName2(tablePart.DisplayName);
+			this.workbook.dependencyFormulas.delTableName(tablePart.DisplayName, bConvertTableFormulaToRef);
 			tablePart.removeDependencies();
 			
 			//delete table
