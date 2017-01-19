@@ -6949,7 +6949,7 @@
         cell_info.fill = new asc_CFill((null != bg) ? asc_obj2Color(bg) : bg);
 
 		cell_info.numFormat = c.getNumFormatStr();
-        cell_info.numFormatType = c.getNumFormatType();
+        cell_info.numFormatInfo = c.getNumFormatTypeInfo();
 
         // Получаем гиперссылку (//ToDo)
         var ar = selectionRange.getLast().clone();

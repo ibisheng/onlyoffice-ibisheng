@@ -2190,6 +2190,10 @@
 		asc_CFormatCellsInfo.prototype.asc_setDecimalPlaces = function (val) {this.decimalPlaces = val;};
 		asc_CFormatCellsInfo.prototype.asc_setSeparator = function (val) {this.separator = val;};
 		asc_CFormatCellsInfo.prototype.asc_setSymbol = function (val) {this.symbol = val;};
+		asc_CFormatCellsInfo.prototype.asc_getType = function () {return this.type;};
+		asc_CFormatCellsInfo.prototype.asc_getDecimalPlaces = function () {return this.decimalPlaces;};
+		asc_CFormatCellsInfo.prototype.asc_getSeparator = function () {return this.separator;};
+		asc_CFormatCellsInfo.prototype.asc_getSymbol = function () {return this.symbol;};
 
 		/*
 		 * Export
@@ -2367,4 +2371,8 @@
 		prot["asc_setDecimalPlaces"] = prot.asc_setDecimalPlaces;
 		prot["asc_setSeparator"] = prot.asc_setSeparator;
 		prot["asc_setSymbol"] = prot.asc_setSymbol;
+		prot["asc_getType"] = prot.asc_getType;
+		prot["asc_getDecimalPlaces"] = prot.asc_getDecimalPlaces;
+		prot["asc_getSeparator"] = prot.asc_getSeparator;
+		prot["asc_getSymbol"] = prot.asc_getSymbol;
 })(window);

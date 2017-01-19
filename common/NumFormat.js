@@ -4057,7 +4057,7 @@ function setCurrentCultureInfo(val) {
 				res.push(getCurrencyFormat(cultureInfo, info.decimalPlaces, currency, currency));
 			} else if (Asc.c_oAscNumFormatType.Date === info.type) {
 				//todo locale dependence
-				if (info.symbol == AscCommon.g_oDefaultCultureInfo.LCID) {
+				if (info.symbol == g_oDefaultCultureInfo.LCID) {
 					res.push(getShortDateFormat(cultureInfo));
 					res.push('[$-F800]dddd, mmmm dd, yyyy');
 				}
