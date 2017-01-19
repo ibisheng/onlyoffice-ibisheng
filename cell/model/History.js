@@ -896,9 +896,6 @@ CHistory.prototype.Get_DeleteIndex = function () {
 			}
 		}
 	}
-	if (DeleteIndex > 0 && this.workbook.undoRedoSheetView.IsChangedState()) {
-		DeleteIndex += 1;
-	}
 	return DeleteIndex;
 };
 /** @returns {boolean} */
@@ -923,14 +920,9 @@ CHistory.prototype.GetSerializeArray = function()
 		for(var j = 0, length2 = point.Items.length; j < length2; ++j)
 		{
 			var elem = point.Items[j];
-			if (!elem.LocalChange) {
-				aPointChanges.push(new AscCommonExcel.UndoRedoItemSerializable(elem.Class, elem.Type, elem.SheetId, elem.Range, elem.Data, elem.LocalChange));
-			}
+			aPointChanges.push(new AscCommonExcel.UndoRedoItemSerializable(elem.Class, elem.Type, elem.SheetId, elem.Range, elem.Data, elem.LocalChange));
 		}
 		aRes.push(aPointChanges);
-	}
-	if (aRes.length > 0 && this.workbook.undoRedoSheetView.IsChangedState()) {
-		aPointChanges.push(new AscCommonExcel.UndoRedoItemSerializable(this.workbook.undoRedoSheetView, null, null, null, null, false));
 	}
 	return aRes;
 };
