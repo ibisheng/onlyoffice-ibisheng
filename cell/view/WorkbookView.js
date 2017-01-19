@@ -318,155 +318,157 @@
     // Мерить нужно только со 100% и один раз для всего документа
     this._calcMaxDigitWidth();
 
-    if (!window["NATIVE_EDITOR_ENJINE"]) {
-      // initialize events controller
-      this.controller.init(this, this.element, /*this.canvasOverlay*/ this.canvasGraphicOverlay, /*handlers*/{
-        "resize": function () {
-          self.resize.apply(self, arguments);
-        }, "reinitializeScroll": function () {
-          self._onScrollReinitialize.apply(self, arguments);
-        }, "scrollY": function () {
-          self._onScrollY.apply(self, arguments);
-        }, "scrollX": function () {
-          self._onScrollX.apply(self, arguments);
-        }, "changeSelection": function () {
-          self._onChangeSelection.apply(self, arguments);
-        }, "changeSelectionDone": function () {
-          self._onChangeSelectionDone.apply(self, arguments);
-        }, "changeSelectionRightClick": function () {
-          self._onChangeSelectionRightClick.apply(self, arguments);
-        }, "selectionActivePointChanged": function () {
-          self._onSelectionActivePointChanged.apply(self, arguments);
-        }, "updateWorksheet": function () {
-          self._onUpdateWorksheet.apply(self, arguments);
-        }, "resizeElement": function () {
-          self._onResizeElement.apply(self, arguments);
-        }, "resizeElementDone": function () {
-          self._onResizeElementDone.apply(self, arguments);
-        }, "changeFillHandle": function () {
-          self._onChangeFillHandle.apply(self, arguments);
-        }, "changeFillHandleDone": function () {
-          self._onChangeFillHandleDone.apply(self, arguments);
-        }, "moveRangeHandle": function () {
-          self._onMoveRangeHandle.apply(self, arguments);
-        }, "moveRangeHandleDone": function () {
-          self._onMoveRangeHandleDone.apply(self, arguments);
-        }, "moveResizeRangeHandle": function () {
-          self._onMoveResizeRangeHandle.apply(self, arguments);
-        }, "moveResizeRangeHandleDone": function () {
-          self._onMoveResizeRangeHandleDone.apply(self, arguments);
-        }, "editCell": function () {
-          self._onEditCell.apply(self, arguments);
-        }, "stopCellEditing": function () {
-          return self._onStopCellEditing.apply(self, arguments);
-        }, "getCellEditMode": function () {
-          return self.isCellEditMode;
-        }, "empty": function () {
-          self._onEmpty.apply(self, arguments);
-        }, "canEnterCellRange": function () {
-          self.cellEditor.setFocus(false);
-          var ret = self.cellEditor.canEnterCellRange();
-          ret ? self.cellEditor.activateCellRange() : true;
-          return ret;
-        }, "enterCellRange": function () {
-          self.lockDraw = true;
-          self.cellEditor.setFocus(false);
-          self.getWorksheet().enterCellRange(self.cellEditor);
-          self.lockDraw = false;
-        }, "undo": function () {
-          self.undo.apply(self, arguments);
-        }, "redo": function () {
-          self.redo.apply(self, arguments);
-        }, "addColumn": function () {
-          self._onAddColumn.apply(self, arguments);
-        }, "addRow": function () {
-          self._onAddRow.apply(self, arguments);
-        }, "mouseDblClick": function () {
-          self._onMouseDblClick.apply(self, arguments);
-        }, "showNextPrevWorksheet": function () {
-          self._onShowNextPrevWorksheet.apply(self, arguments);
-        }, "setFontAttributes": function () {
-          self._onSetFontAttributes.apply(self, arguments);
-        }, "selectColumnsByRange": function () {
-          self._onSelectColumnsByRange.apply(self, arguments);
-        }, "selectRowsByRange": function () {
-          self._onSelectRowsByRange.apply(self, arguments);
-        }, "save": function () {
-          self.Api.asc_Save();
-        }, "showCellEditorCursor": function () {
-          self._onShowCellEditorCursor.apply(self, arguments);
-        }, "print": function () {
-          self.Api.onPrint();
-        }, "addFunction": function () {
-          self.insertFormulaInEditor.apply(self, arguments);
-        }, "canvasClick": function () {
-          self.enableKeyEventsHandler(true);
-        }, "autoFiltersClick": function () {
-          self._onAutoFiltersClick.apply(self, arguments);
-        }, "commentCellClick": function () {
-          self._onCommentCellClick.apply(self, arguments);
-        }, "isGlobalLockEditCell": function () {
-          return self.collaborativeEditing.getGlobalLockEditCell();
-        }, "updateSelectionName": function () {
-          self._onUpdateSelectionName.apply(self, arguments);
-        }, "stopFormatPainter": function () {
-          self._onStopFormatPainter.apply(self, arguments);
-        },
+	  if (!window["NATIVE_EDITOR_ENJINE"]) {
+		  // initialize events controller
+		  this.controller.init(this, this.element, /*this.canvasOverlay*/ this.canvasGraphicOverlay, /*handlers*/{
+			  "resize": function () {
+				  self.resize.apply(self, arguments);
+			  }, "reinitializeScroll": function () {
+				  self._onScrollReinitialize.apply(self, arguments);
+			  }, "scrollY": function () {
+				  self._onScrollY.apply(self, arguments);
+			  }, "scrollX": function () {
+				  self._onScrollX.apply(self, arguments);
+			  }, "changeSelection": function () {
+				  self._onChangeSelection.apply(self, arguments);
+			  }, "changeSelectionDone": function () {
+				  self._onChangeSelectionDone.apply(self, arguments);
+			  }, "changeSelectionRightClick": function () {
+				  self._onChangeSelectionRightClick.apply(self, arguments);
+			  }, "selectionActivePointChanged": function () {
+				  self._onSelectionActivePointChanged.apply(self, arguments);
+			  }, "updateWorksheet": function () {
+				  self._onUpdateWorksheet.apply(self, arguments);
+			  }, "resizeElement": function () {
+				  self._onResizeElement.apply(self, arguments);
+			  }, "resizeElementDone": function () {
+				  self._onResizeElementDone.apply(self, arguments);
+			  }, "changeFillHandle": function () {
+				  self._onChangeFillHandle.apply(self, arguments);
+			  }, "changeFillHandleDone": function () {
+				  self._onChangeFillHandleDone.apply(self, arguments);
+			  }, "moveRangeHandle": function () {
+				  self._onMoveRangeHandle.apply(self, arguments);
+			  }, "moveRangeHandleDone": function () {
+				  self._onMoveRangeHandleDone.apply(self, arguments);
+			  }, "moveResizeRangeHandle": function () {
+				  self._onMoveResizeRangeHandle.apply(self, arguments);
+			  }, "moveResizeRangeHandleDone": function () {
+				  self._onMoveResizeRangeHandleDone.apply(self, arguments);
+			  }, "editCell": function () {
+				  self._onEditCell.apply(self, arguments);
+			  }, "stopCellEditing": function () {
+				  return self._onStopCellEditing.apply(self, arguments);
+			  }, "getCellEditMode": function () {
+				  return self.isCellEditMode;
+			  }, "empty": function () {
+				  self._onEmpty.apply(self, arguments);
+			  }, "canEnterCellRange": function () {
+				  self.cellEditor.setFocus(false);
+				  var ret = self.cellEditor.canEnterCellRange();
+				  ret ? self.cellEditor.activateCellRange() : true;
+				  return ret;
+			  }, "enterCellRange": function () {
+				  self.lockDraw = true;
+				  self.cellEditor.setFocus(false);
+				  self.getWorksheet().enterCellRange(self.cellEditor);
+				  self.lockDraw = false;
+			  }, "undo": function () {
+				  self.undo.apply(self, arguments);
+			  }, "redo": function () {
+				  self.redo.apply(self, arguments);
+			  }, "addColumn": function () {
+				  self._onAddColumn.apply(self, arguments);
+			  }, "addRow": function () {
+				  self._onAddRow.apply(self, arguments);
+			  }, "mouseDblClick": function () {
+				  self._onMouseDblClick.apply(self, arguments);
+			  }, "showNextPrevWorksheet": function () {
+				  self._onShowNextPrevWorksheet.apply(self, arguments);
+			  }, "setFontAttributes": function () {
+				  self._onSetFontAttributes.apply(self, arguments);
+			  }, "setCellFormat": function () {
+				  self._onSetCellFormat.apply(self, arguments);
+			  }, "selectColumnsByRange": function () {
+				  self._onSelectColumnsByRange.apply(self, arguments);
+			  }, "selectRowsByRange": function () {
+				  self._onSelectRowsByRange.apply(self, arguments);
+			  }, "save": function () {
+				  self.Api.asc_Save();
+			  }, "showCellEditorCursor": function () {
+				  self._onShowCellEditorCursor.apply(self, arguments);
+			  }, "print": function () {
+				  self.Api.onPrint();
+			  }, "addFunction": function () {
+				  self.insertFormulaInEditor.apply(self, arguments);
+			  }, "canvasClick": function () {
+				  self.enableKeyEventsHandler(true);
+			  }, "autoFiltersClick": function () {
+				  self._onAutoFiltersClick.apply(self, arguments);
+			  }, "commentCellClick": function () {
+				  self._onCommentCellClick.apply(self, arguments);
+			  }, "isGlobalLockEditCell": function () {
+				  return self.collaborativeEditing.getGlobalLockEditCell();
+			  }, "updateSelectionName": function () {
+				  self._onUpdateSelectionName.apply(self, arguments);
+			  }, "stopFormatPainter": function () {
+				  self._onStopFormatPainter.apply(self, arguments);
+			  },
 
-        // Shapes
-        "graphicObjectMouseDown": function () {
-          self._onGraphicObjectMouseDown.apply(self, arguments);
-        }, "graphicObjectMouseMove": function () {
-          self._onGraphicObjectMouseMove.apply(self, arguments);
-        }, "graphicObjectMouseUp": function () {
-          self._onGraphicObjectMouseUp.apply(self, arguments);
-        }, "graphicObjectMouseUpEx": function () {
-          self._onGraphicObjectMouseUpEx.apply(self, arguments);
-        }, "graphicObjectWindowKeyDown": function () {
-          return self._onGraphicObjectWindowKeyDown.apply(self, arguments);
-        }, "graphicObjectWindowKeyPress": function () {
-          return self._onGraphicObjectWindowKeyPress.apply(self, arguments);
-        }, "getGraphicsInfo": function () {
-          return self._onGetGraphicsInfo.apply(self, arguments);
-        }, "updateSelectionShape": function () {
-          return self._onUpdateSelectionShape.apply(self, arguments);
-        }, "canReceiveKeyPress": function () {
-          return self.getWorksheet().objectRender.controller.canReceiveKeyPress();
-        }, "stopAddShape": function () {
-          self.getWorksheet().objectRender.controller.checkEndAddShape();
-        },
+			  // Shapes
+			  "graphicObjectMouseDown": function () {
+				  self._onGraphicObjectMouseDown.apply(self, arguments);
+			  }, "graphicObjectMouseMove": function () {
+				  self._onGraphicObjectMouseMove.apply(self, arguments);
+			  }, "graphicObjectMouseUp": function () {
+				  self._onGraphicObjectMouseUp.apply(self, arguments);
+			  }, "graphicObjectMouseUpEx": function () {
+				  self._onGraphicObjectMouseUpEx.apply(self, arguments);
+			  }, "graphicObjectWindowKeyDown": function () {
+				  return self._onGraphicObjectWindowKeyDown.apply(self, arguments);
+			  }, "graphicObjectWindowKeyPress": function () {
+				  return self._onGraphicObjectWindowKeyPress.apply(self, arguments);
+			  }, "getGraphicsInfo": function () {
+				  return self._onGetGraphicsInfo.apply(self, arguments);
+			  }, "updateSelectionShape": function () {
+				  return self._onUpdateSelectionShape.apply(self, arguments);
+			  }, "canReceiveKeyPress": function () {
+				  return self.getWorksheet().objectRender.controller.canReceiveKeyPress();
+			  }, "stopAddShape": function () {
+				  self.getWorksheet().objectRender.controller.checkEndAddShape();
+			  },
 
-        // Frozen anchor
-        "moveFrozenAnchorHandle": function () {
-          self._onMoveFrozenAnchorHandle.apply(self, arguments);
-        }, "moveFrozenAnchorHandleDone": function () {
-          self._onMoveFrozenAnchorHandleDone.apply(self, arguments);
-        },
+			  // Frozen anchor
+			  "moveFrozenAnchorHandle": function () {
+				  self._onMoveFrozenAnchorHandle.apply(self, arguments);
+			  }, "moveFrozenAnchorHandleDone": function () {
+				  self._onMoveFrozenAnchorHandleDone.apply(self, arguments);
+			  },
 
-        // AutoComplete
-        "showAutoComplete": function () {
-          self.showAutoComplete.apply(self, arguments);
-        }, "onContextMenu": function (event) {
-          self.handlers.trigger("asc_onContextMenu", event);
-        },
+			  // AutoComplete
+			  "showAutoComplete": function () {
+				  self.showAutoComplete.apply(self, arguments);
+			  }, "onContextMenu": function (event) {
+				  self.handlers.trigger("asc_onContextMenu", event);
+			  },
 
-        // FormatPainter
-        'isFormatPainter': function () {
-          return self.stateFormatPainter;
-        },
+			  // FormatPainter
+			  'isFormatPainter': function () {
+				  return self.stateFormatPainter;
+			  },
 
-        //calcAll
-        'calcAll': function (ctrlKey, altKey, shiftKey) {
-          if(ctrlKey && altKey && shiftKey){
-            self.model.recalcWB(true);
-          } else if(shiftKey){
-            var ws = self.model.getActiveWs();
-            self.model.recalcWB(false, ws.getId());
-          } else {
-            self.model.recalcWB(false);
-          }
-        }
-      });
+			  //calcAll
+			  'calcAll': function (ctrlKey, altKey, shiftKey) {
+				  if (ctrlKey && altKey && shiftKey) {
+					  self.model.recalcWB(true);
+				  } else if (shiftKey) {
+					  var ws = self.model.getActiveWs();
+					  self.model.recalcWB(false, ws.getId());
+				  } else {
+					  self.model.recalcWB(false);
+				  }
+			  }
+		  });
 
       if (this.input && this.input.addEventListener) {
         this.input.addEventListener("focus", function () {
@@ -1479,6 +1481,14 @@
     }
     return this.setFontAttributes(prop, val);
   };
+
+	WorkbookView.prototype._onSetCellFormat = function (prop) {
+	  var info = new Asc.asc_CFormatCellsInfo();
+	  info.asc_setSymbol(AscCommon.g_oDefaultCultureInfo.LCID);
+	  info.asc_setType(Asc.c_oAscNumFormatType.None);
+	  var formats = AscCommon.getFormatCells(info);
+	  this.setCellFormat(formats[prop]);
+	};
 
   WorkbookView.prototype._onSelectColumnsByRange = function() {
     this.getWorksheet()._selectColumnsByRange();
