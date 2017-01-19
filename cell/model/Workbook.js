@@ -9104,7 +9104,7 @@ Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 	window['AscCommonExcel'].oDefaultMetrics = oDefaultMetrics;
 	window['AscCommonExcel'].g_nAllColIndex = g_nAllColIndex;
 	window['AscCommonExcel'].g_nAllRowIndex = g_nAllRowIndex;
-	window['AscCommonExcel'].g_DefNameWorksheet;
+	window['AscCommonExcel'].g_DefNameWorksheet = null;
 	window['AscCommonExcel'].aStandartNumFormats = aStandartNumFormats;
 	window['AscCommonExcel'].aStandartNumFormatsId = aStandartNumFormatsId;
 	window['AscCommonExcel'].oFormulaLocaleInfo = oFormulaLocaleInfo;
