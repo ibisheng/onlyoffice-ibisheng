@@ -934,7 +934,7 @@
 								if (!shiftKey) {
 									return false;
 								}
-								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Number);
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Currency);
 								return true;
 							}, 53: function () {
 								t.handlers.trigger("setFontAttributes", "s");
@@ -961,6 +961,13 @@
 								return true;
 							}, 90: function () {
 								t.handlers.trigger("undo");
+								return true;
+							},
+							192: function () {
+								if (!shiftKey) {
+									return false;
+								}
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.General);
 								return true;
 							}
 						};
