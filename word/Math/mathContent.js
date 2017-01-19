@@ -2617,6 +2617,9 @@ CMathContent.prototype.private_LoadFromMenuSymbol = function(Type, Pr)
     {
         var TextPr, MathPr;
 
+        if (this.Content.length <= 0)
+			this.Correct_Content();
+
         if(this.Content.length > 0 && this.Content[this.CurPos].Type == para_Math_Run && this.Selection_IsEmpty() == true) // находимся в Run, селект отсутствует
         {
             TextPr = this.Content[this.CurPos].Get_TextPr();
