@@ -5146,6 +5146,9 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 	Cell.prototype.getNumFormatType=function(){
 		return this.getNumFormat().getType();
 	};
+	Cell.prototype.getNumFormatTypeInfo=function(){
+		return this.getNumFormat().getTypeInfo();
+	};
 	Cell.prototype.moveHor=function(val){
 		this.nCol += val;
 	};
@@ -6547,6 +6550,9 @@ Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 	};
 	Range.prototype.getNumFormatType=function(){
 		return this.getNumFormat().getType();
+	};
+	Range.prototype.getNumFormatTypeInfo=function(){
+		return this.getNumFormat().getTypeInfo();
 	};
 // Узнаем отличается ли шрифт (размер и гарнитура) в ячейке от шрифта в строке
 	Range.prototype.isNotDefaultFont = function () {

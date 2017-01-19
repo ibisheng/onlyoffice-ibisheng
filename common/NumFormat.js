@@ -79,6 +79,9 @@ var SignType = {Positive: 1, Negative: 2, Null:3};
 var gc_nMaxDigCount = 15;//Максимальное число знаков точности
 var gc_nMaxDigCountView = 11;//Максимальное число знаков в ячейке
 var gc_nMaxMantissa = Math.pow(10, gc_nMaxDigCount);
+var gc_aTimeFormats = ['[$-F400]h:mm:ss AM/PM', 'h:mm;@', 'h:mm AM/PM;@', 'h:mm:ss;@', 'h:mm:ss AM/PM;@', 'mm:ss.0;@',
+	'[h]:mm:ss;@'];
+var gc_aFractionFormats = ['# ?/?', '# ??/??', '# ???/???', '# ?/2', '# ?/4', '# ?/8', '# ??/16', '# ?/10', '# ??/100'];
 
 var NumComporationOperators =
 {
@@ -280,8 +283,6 @@ function NumFormat(bAddMinusIfNes)
     this.bSlash = false;
     this.bWhole = false;
 	this.bCurrency = false;
-	this.bNumber = false;
-	this.bInteger = false;
 	this.bRepeat = false;
     this.Color = -1;
 	this.ComporationOperator = null;
@@ -1368,10 +1369,12 @@ NumFormat.prototype =
                         sText += item.val;
                     } else if (numFormat_Bracket == item.type) {
                         if (null != item.CurrencyString) {
+							this.bCurrency = true;
                             sText += item.CurrencyString;
                         }
 						if (null != item.Lid) {
-							this.LCID = parseInt(item.Lid, 16);
+							//Excel sometimes add 0x10000(0x442 and 0x10442)
+							this.LCID = parseInt(item.Lid, 16) & 0xFFFF;
 						}
                     }
                     else if (numFormat_DecimalPoint == item.type) {
@@ -1388,17 +1391,8 @@ NumFormat.prototype =
                         }
                     }
                 }
-                var rxNumber = new RegExp("^[0#?]+(" + escapeRegExp(gc_sFormatDecimalPoint) + "[0#?]+)?$");
-                var match = this.formatString.match(rxNumber);
-                if (null != match) {
-                    if (null != match[1]) {
-                        this.bNumber = true;
-                    } else {
-                        this.bInteger = true;
                     }
                 }
-            }
-        }
         return this.valid;
     },
     isInvalidDateValue : function(number)
@@ -1432,8 +1426,7 @@ NumFormat.prototype =
     format: function (number, nValType, dDigitsCount, cultureInfo, bChart)
     {
 		if (null != this.LCID) {
-			//Excel sometimes add 0x10000(0x442 and 0x10442)
-			cultureInfo = g_aCultureInfos[this.LCID & 0xFFFF];
+			cultureInfo = g_aCultureInfos[this.LCID];
 		}
         if (null == cultureInfo)
             cultureInfo = g_oDefaultCultureInfo;
@@ -1987,37 +1980,12 @@ NumFormat.prototype =
         output.format = res;
         return true;
     },
-	getType : function()
-	{
-		var nType = c_oAscNumFormatType.Custom;
-		if(this.isGeneral())
-			nType = c_oAscNumFormatType.General;
-		else if(this.bTextFormat)
-			nType = c_oAscNumFormatType.Text;
-		else if(this.bDateTime)
-		{
-			if(this.bDate)
-				nType = c_oAscNumFormatType.Date;
-			else
-				nType = c_oAscNumFormatType.Time;
-		}
-		else if(this.nPercent > 0)
-			nType = c_oAscNumFormatType.Percent;
-		else if(this.bScientific)
-			nType = c_oAscNumFormatType.Scientific;
-		else if(this.bCurrency){
-			if(this.bRepeat)
-				nType = c_oAscNumFormatType.Accounting;
-			else
-				nType = c_oAscNumFormatType.Currency;
-		}
-		else if(this.bSlash)
-			nType = c_oAscNumFormatType.Fraction;
-		else if(this.bNumber)
-			nType = c_oAscNumFormatType.Number;
-		else if(this.bInteger)
-			nType = c_oAscNumFormatType.Integer;
-		return nType;
+	getFormatCellsInfo: function() {
+		var info = new Asc.asc_CFormatCellsInfo();
+		info.asc_setDecimalPlaces(this.aFracFormat.length);
+		info.asc_setSeparator(this.bThousandSep);
+		info.asc_setSymbol(this.LCID);
+		return info;
 	},
 	isGeneral: function() {
 		return 1 == this.aRawFormat.length && numFormat_General == this.aRawFormat[0].type;
@@ -2435,13 +2403,60 @@ CellFormat.prototype =
 		}
 		return result;
 	},
-	getType: function()
-	{
-		if(null != this.oPositiveFormat)
-			return this.oPositiveFormat.getType();
-		else if(null != this.aComporationFormats && this.aComporationFormats.length > 0)
-			return this.aComporationFormats[0].getType();
-		return c_oAscNumFormatType.General;
+	getType: function() {
+		return this.getTypeInfo().type;
+	},
+	getTypeInfo: function() {
+		var info;
+		if (null != this.oPositiveFormat) {
+			info = this.oPositiveFormat.getFormatCellsInfo();
+			info.asc_setType(this._getType(this.oPositiveFormat));
+		} else if (null != this.aComporationFormats && this.aComporationFormats.length > 0) {
+			info = this.aComporationFormats[0].getFormatCellsInfo();
+			info.asc_setType(this._getType(this.aComporationFormats[0]));
+		} else {
+			info = new Asc.asc_CFormatCellsInfo();
+			info.asc_setType(c_oAscNumFormatType.General);
+			info.asc_setDecimalPlaces(0);
+			info.asc_setSeparator(false);
+			info.asc_setSymbol(null);
+		}
+		return info;
+	},
+	_getType: function(format) {
+		var nType = c_oAscNumFormatType.Custom;
+		if (format.isGeneral()) {
+			nType = c_oAscNumFormatType.General;
+		}
+		else if (format.bDateTime) {
+			if (format.bDate) {
+				nType = c_oAscNumFormatType.Date;
+			} else {
+				nType = c_oAscNumFormatType.Time;
+			}
+		}
+		else if (format.bCurrency) {
+			if (format.bRepeat) {
+				nType = c_oAscNumFormatType.Accounting;
+			} else {
+				nType = c_oAscNumFormatType.Currency;
+			}
+		} else {
+			var info = format.getFormatCellsInfo();
+			var types = [c_oAscNumFormatType.Text, c_oAscNumFormatType.Percent, c_oAscNumFormatType.Scientific,
+				c_oAscNumFormatType.Number, c_oAscNumFormatType.Fraction];
+			for (var i = 0; i < types.length; ++i) {
+				var type = types[i];
+				info.asc_setType(type);
+				var formats = getFormatCells(info);
+				if (-1 != formats.indexOf(this.sFormat)) {
+					nType = type;
+					break;
+				}
+			}
+
+		}
+		return nType;
 	}
 };
 var oDecodeGeneralFormatCache = {};
@@ -4067,8 +4082,7 @@ function setCurrentCultureInfo(val) {
 					res.push(locale + 'd' + separator + 'mmm' + separator + 'yyyy;@');
 				}
 			} else if (Asc.c_oAscNumFormatType.Time === info.type) {
-				res.push('[$-F400]h:mm:ss AM/PM', 'h:mm;@', 'h:mm AM/PM;@', 'h:mm:ss;@', 'h:mm:ss AM/PM;@', 'mm:ss.0;@',
-					'[h]:mm:ss;@');
+				res = gc_aTimeFormats;
 			} else if (Asc.c_oAscNumFormatType.Percent === info.type) {
 				format = '0';
 				if (info.decimalPlaces > 0) {
@@ -4077,7 +4091,7 @@ function setCurrentCultureInfo(val) {
 				format += '%';
 				res.push(format);
 			} else if (Asc.c_oAscNumFormatType.Fraction === info.type) {
-				res.push('# ?/?', '# ??/??', '# ???/???', '# ?/2', '# ?/4', '# ?/8', '# ??/16', '# ?/10', '# ??/100');
+				res = gc_aFractionFormats;
 			} else if (Asc.c_oAscNumFormatType.Scientific === info.type) {
 				format = '0.' + '0'.repeat(info.decimalPlaces) + 'E+00';
 				res.push(format);
