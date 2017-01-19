@@ -5330,6 +5330,46 @@ CPresentation.prototype =
         this.Document_UpdateUndoRedoState();
     },
 
+
+    AddShapeOnCurrentPage: function (sPreset) {
+
+        if(!this.Slides[this.CurPage]){
+            return;
+        }
+        var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
+        oDrawingObjects.changeCurrentState(new AscFormat.StartAddNewShape(oDrawingObjects, sPreset));
+        this.OnMouseDown({}, this.Width/4, this.Height/4, this.CurPage);
+        this.OnMouseUp({}, this.Width/4, this.Height/4, this.CurPage);
+        this.Document_UpdateInterfaceState();
+        this.Document_UpdateRulersState();
+        this.Document_UpdateSelectionState();
+    },
+
+    Can_CopyCut: function()
+    {
+        if(!this.Slides[this.CurPage]){
+            return false;
+        }
+        var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
+        var oTargetContent = oDrawingObjects.getTargetDocContent();
+
+
+        if (oTargetContent)
+        {
+            if (true === oTargetContent.Is_SelectionUse() && true !== oTargetContent.Selection_IsEmpty(true))
+            {
+                 if (oTargetContent.Selection.StartPos !== oTargetContent.Selection.EndPos || type_Paragraph === oTargetContent.Content[oTargetContent.Selection.StartPos].Get_Type())
+                    return true;
+                else
+                    return oTargetContent.Content[oTargetContent.Selection.StartPos].Can_CopyCut();
+            }
+            return false;
+        }
+        else{
+            return oDrawingObjects.selectedObjects.length > 0;
+        }
+    },
+
     StartAddShape: function(preset, _is_apply)
     {
         if(this.Slides[this.CurPage])

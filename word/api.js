@@ -2509,6 +2509,9 @@ background-repeat: no-repeat;\
 		if (!this.WordControl.m_oLogicDocument)
 			return;
 
+
+
+
 		this.WordControl.m_oDrawingDocument.StartTableStylesCheck();
 		this.WordControl.m_oDrawingDocument.TableStylesСheckLook = new Asc.CTablePropLook();
 		this.WordControl.m_oDrawingDocument.TableStylesСheckLook.FirstCol = true;

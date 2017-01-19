@@ -4162,6 +4162,20 @@ background-repeat: no-repeat;\
 			this.WordControl.OnScroll();
 	};
 
+
+	asc_docs_api.prototype.AddShapeOnCurrentPage = function(sPreset){
+		if(!this.WordControl.m_oLogicDocument){
+			return;
+		}
+        this.WordControl.m_oLogicDocument.AddShapeOnCurrentPage(sPreset);
+	}
+	asc_docs_api.prototype.can_CopyCut = function(){
+		if(!this.WordControl.m_oLogicDocument){
+			return false;
+		}
+        return this.WordControl.m_oLogicDocument.Can_CopyCut();
+	}
+
 	/*----------------------------------------------------------------*/
 	/*functions for working with zoom & navigation*/
 	asc_docs_api.prototype.zoomIn         = function()
@@ -6910,6 +6924,9 @@ background-repeat: no-repeat;\
 	// mobile
 	asc_docs_api.prototype["asc_GetDefaultTableStyles"]           	= asc_docs_api.prototype.asc_GetDefaultTableStyles;
 	asc_docs_api.prototype["asc_Remove"] 							= asc_docs_api.prototype.asc_Remove;
+	asc_docs_api.prototype["AddShapeOnCurrentPage"] 				= asc_docs_api.prototype.AddShapeOnCurrentPage;
+	asc_docs_api.prototype["can_CopyCut"] 							= asc_docs_api.prototype.can_CopyCut;
+
 
 	window['Asc']['asc_CCommentData'] = window['Asc'].asc_CCommentData = asc_CCommentData;
 	asc_CCommentData.prototype['asc_getText']         = asc_CCommentData.prototype.asc_getText;
