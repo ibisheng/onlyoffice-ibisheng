@@ -227,20 +227,23 @@
 		Error  : 3
 	};
 
-	//NumFormat defines
+	/**
+	 * NumFormat defines
+	 * @enum {number}
+	 */
 	var c_oAscNumFormatType = {
 		None       : -1,
 		General    : 0,
-		Custom     : 1,
-		Text       : 2,
-		Number     : 3,
-		Scientific : 5,
-		Currency   : 6,
-		Date       : 7,
-		Time       : 8,
-		Percent    : 9,
-		Fraction   : 10,
-		Accounting : 11
+		Number     : 1,
+		Scientific : 2,
+		Accounting : 3,
+		Currency   : 4,
+		Date       : 5,
+		Time       : 6,
+		Percent    : 7,
+		Fraction   : 8,
+		Text       : 9,
+		Custom     : 10
 	};
 
 	var c_oAscDrawingLayerType = {
@@ -574,7 +577,6 @@
 		Medium : 2,	// 2px
 		Thick  : 3		// 3px
 	};
-	/** @enum {number} */
 	/**
 	 * Располагаются в порядке значимости для отрисовки
 	 * @enum {number}
@@ -1202,16 +1204,16 @@
 	prot                                     = c_oAscNumFormatType;
 	prot['None']                             = prot.None;
 	prot['General']                          = prot.General;
-	prot['Custom']                           = prot.Custom;
-	prot['Text']                             = prot.Text;
 	prot['Number']                           = prot.Number;
 	prot['Scientific']                       = prot.Scientific;
+	prot['Accounting']                       = prot.Accounting;
 	prot['Currency']                         = prot.Currency;
 	prot['Date']                             = prot.Date;
 	prot['Time']                             = prot.Time;
 	prot['Percent']                          = prot.Percent;
 	prot['Fraction']                         = prot.Fraction;
-	prot['Accounting']                       = prot.Accounting;
+	prot['Text']                             = prot.Text;
+	prot['Custom']                           = prot.Custom;
 	window['Asc']['c_oAscDrawingLayerType']  = c_oAscDrawingLayerType;
 	prot                                     = c_oAscDrawingLayerType;
 	prot['BringToFront']                     = prot.BringToFront;
