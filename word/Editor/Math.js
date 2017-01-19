@@ -3188,6 +3188,9 @@ ParaMath.prototype.Handle_AddNewLine = function()
  */
 ParaMath.prototype.Split = function (ContentPos, Depth)
 {
+	if (this.Cursor_Is_End())
+		return new ParaRun(this.Paragraph, false);
+
     var NewParaMath = new ParaMath();
     NewParaMath.Jc = this.Jc;
 
