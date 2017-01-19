@@ -2531,6 +2531,11 @@ DrawingObjectsController.prototype =
             objects_by_type.charts[i].setTitle(props.title);
         }
 
+        for(i = 0; i < objects_by_type.images.length; ++i)
+        {
+            objects_by_type.images[i].setTitle(props.title);
+        }
+
         for(i = 0; i < objects_by_type.shapes.length; ++i)
         {
             objects_by_type.shapes[i].setDescription(props.description);
@@ -2542,6 +2547,11 @@ DrawingObjectsController.prototype =
         for(i = 0; i < objects_by_type.charts.length; ++i)
         {
             objects_by_type.charts[i].setDescription(props.description);
+        }
+
+        for(i = 0; i < objects_by_type.images.length; ++i)
+        {
+            objects_by_type.images[i].setDescription(props.description);
         }
 
         if(typeof props.ImageUrl === "string" && props.ImageUrl.length > 0)
@@ -7314,6 +7324,10 @@ DrawingObjectsController.prototype =
             shape_props.ShapeProperties.canChangeArrows = props.shapeProps.canChangeArrows;
             shape_props.ShapeProperties.bFromChart = props.shapeProps.bFromChart;
             shape_props.ShapeProperties.lockAspect = props.shapeProps.lockAspect;
+            shape_props.ShapeProperties.description = props.shapeProps.description;
+            shape_props.ShapeProperties.title = props.shapeProps.title;
+            shape_props.description = props.shapeProps.description;
+            shape_props.title = props.shapeProps.title;
             shape_props.ShapeProperties.textArtProperties = AscFormat.CreateAscTextArtProps(props.shapeProps.textArtProperties);
             shape_props.lockAspect = props.shapeProps.lockAspect;
             if(props.shapeProps.textArtProperties)
@@ -7382,6 +7396,9 @@ DrawingObjectsController.prototype =
             image_props.oleWidth = props.imageProps.oleWidth;
             image_props.oleHeight = props.imageProps.oleHeight;
 
+            image_props.description = props.imageProps.description;
+            image_props.title = props.imageProps.title;
+
             if(!bParaLocked)
             {
                 bParaLocked = image_props.Locked;
@@ -7400,6 +7417,9 @@ DrawingObjectsController.prototype =
             {
                 bParaLocked = chart_props.Locked;
             }
+
+            chart_props.description = props.chartProps.description;
+            chart_props.title = props.chartProps.title;
             ret.push(chart_props);
         }
         for (i = 0; i < ret.length; i++)

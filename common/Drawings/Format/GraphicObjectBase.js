@@ -428,6 +428,9 @@
     };
 
     CGraphicObjectBase.prototype.setTitle = function(sTitle){
+        if(undefined === sTitle){
+            return;
+        }
         var oNvPr = this.getNvProps();
         if(oNvPr){
             oNvPr.setTitle(sTitle ? sTitle : null);
@@ -435,6 +438,9 @@
     };
 
     CGraphicObjectBase.prototype.setDescription = function(sDescription){
+        if(undefined === sDescription){
+            return;
+        }
         var oNvPr = this.getNvProps();
         if(oNvPr){
             oNvPr.setDecr(sDescription ? sDescription : null);

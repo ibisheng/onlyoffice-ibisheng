@@ -3924,6 +3924,9 @@ background-repeat: no-repeat;\
 		ImagePr.Width      = null === obj.Width ? null : parseFloat(obj.Width);
 		ImagePr.Height     = null === obj.Height ? null : parseFloat(obj.Height);
 
+		ImagePr.title       = obj.title;
+		ImagePr.description = obj.description;
+
 		if (undefined != obj.Position)
 		{
 			ImagePr.Position =
