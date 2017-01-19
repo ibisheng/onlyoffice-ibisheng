@@ -11347,7 +11347,6 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 						NextId = StyleId;
 				}
 
-
 				if (StyleId === NextId)
 				{
 					// Продолжаем (в плане настроек) новый параграф
@@ -11367,6 +11366,14 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 				{
 					Item.Set_SectionPr(undefined);
 					NewParagraph.Set_SectionPr(SectPr);
+				}
+
+				var LastRun = Item.Content[Item.Content.length - 1];
+				if (LastRun && LastRun.Pr.Lang && LastRun.Pr.Lang.Val)
+				{
+					NewParagraph.Select_All();
+					NewParagraph.Add(new ParaTextPr({Lang : LastRun.Pr.Lang.Copy()}));
+					NewParagraph.Selection_Remove();
 				}
 			}
 			else
