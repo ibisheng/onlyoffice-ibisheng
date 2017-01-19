@@ -560,18 +560,12 @@ var g_oFontProperties = {
 		oRes.fn = this.fn || font.fn;
 		oRes.scheme = this.scheme || font.scheme;
 		oRes.fs = this.fs || font.fs;
-		if (isTable){
-			oRes.b = font.b;
-			oRes.i = font.i;
-			oRes.s = font.s;
-		} else {
-			oRes.b = this.b || font.b;
-			oRes.i = this.i || font.i;
-			oRes.s = this.s || font.s;
-		}
+		oRes.b = this.b;
+		oRes.i = this.i;
+		oRes.s = this.s;
 		oRes.u = this.u || font.u;
 		//заглушка excel при merge стилей игнорирует default цвет
-		if (isTable && this.c && this.c.isEqual(g_oDefaultFormat.Font)) {
+		if (isTable && this.c && this.c.isEqual(g_oDefaultFormat.Font.c)) {
 			oRes.c = font.c || this.c;
 		} else {
 			oRes.c = this.c || font.c;
