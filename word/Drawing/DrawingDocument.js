@@ -5901,7 +5901,14 @@ function CDrawingDocument()
 
 				_table_styles = new CTable(this, logicDoc, true, 0, _x_mar, _y_mar, 1000, 1000, Rows, Cols, Grid);
 
-				_table_styles.Set_Props({TableStyle: i, TableLook: tableLook, TableLayout: c_oAscTableLayout.Fixed});
+				_table_styles.Set_Props({
+					TableStyle: i,
+					TableLook: tableLook,
+					TableLayout: c_oAscTableLayout.Fixed
+				});
+				_table_styles.Set_Props({
+					TableDefaultMargins : {Top : 0, Bottom : 0}
+				});
 
 				for (var j = 0; j < Rows; j++)
 					_table_styles.Content[j].Set_Height(H / Rows, Asc.linerule_AtLeast);
@@ -5913,6 +5920,9 @@ function CDrawingDocument()
 					TableLook: tableLook,
 					TableLayout: c_oAscTableLayout.Fixed,
 					CellSelect: false
+				});
+				_table_styles.Set_Props({
+					TableDefaultMargins : {Top : 0, Bottom : 0}
 				});
 				_table_styles.Recalc_CompiledPr2();
 
