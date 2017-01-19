@@ -51,11 +51,7 @@
 
 	CMobileDelegateEditorPresentation.prototype.ConvertCoordsToCursor = function(x, y, page, isGlobal)
 	{
-		return this.DrawingDocument.ConvertCoordsToCursor(x, y);
-		if (isGlobal)
-			return this.DrawingDocument.ConvertCoordsToCursor(x, y);
-		else
-			return this.DrawingDocument.ConvertCoordsToCursorWR(x, y);
+		return this.DrawingDocument.ConvertCoordsToCursor3(x, y, isGlobal);
 	};
 	CMobileDelegateEditorPresentation.prototype.ConvertCoordsFromCursor = function(x, y)
 	{
@@ -231,6 +227,11 @@
 		}
 
 		return { X : _posX, Y : _posY, Mode : _mode };
+	};
+
+	CMobileDelegateEditorPresentation.prototype.Logic_GetNearestPos = function(x, y, page)
+	{
+		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.getNearestPos(x, y);
 	};
 
 	/**
@@ -841,6 +842,54 @@
 		oWordControl.IsUpdateOverlayOnlyEndReturn = false;
 		oWordControl.EndUpdateOverlay();
 		return ret;
+	};
+
+	CMobileTouchManager.prototype.CheckSelectTrack = function()
+	{
+		// сдвиг относительно табнейлов => нужно переопределить
+		if (!this.SelectEnabled)
+			return false;
+
+		var _matrix = this.delegate.GetSelectionTransform();
+		if (_matrix && global_MatrixTransformer.IsIdentity(_matrix))
+			_matrix = null;
+
+		// проверим на попадание в селект - это может произойти на любом mode
+		if (null != this.RectSelect1 && null != this.RectSelect2)
+		{
+			var pos1 = null;
+			var pos4 = null;
+
+			if (!_matrix)
+			{
+				pos1 = this.delegate.ConvertCoordsToCursor(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1, true);
+				pos4 = this.delegate.ConvertCoordsToCursor(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h, this.PageSelect2, true);
+			}
+			else
+			{
+				var _xx1 = _matrix.TransformPointX(this.RectSelect1.x, this.RectSelect1.y);
+				var _yy1 = _matrix.TransformPointY(this.RectSelect1.x, this.RectSelect1.y);
+
+				var _xx2 = _matrix.TransformPointX(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h);
+				var _yy2 = _matrix.TransformPointY(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h);
+
+				pos1 = this.delegate.ConvertCoordsToCursor(_xx1, _yy1, this.PageSelect1, true);
+				pos4 = this.delegate.ConvertCoordsToCursor(_xx2, _yy2, this.PageSelect2, true);
+			}
+
+			if (Math.abs(pos1.X - global_mouseEvent.X) < this.TrackTargetEps && Math.abs(pos1.Y - global_mouseEvent.Y) < this.TrackTargetEps)
+			{
+				this.Mode       = AscCommon.MobileTouchMode.Select;
+				this.DragSelect = 1;
+			}
+			else if (Math.abs(pos4.X - global_mouseEvent.X) < this.TrackTargetEps && Math.abs(pos4.Y - global_mouseEvent.Y) < this.TrackTargetEps)
+			{
+				this.Mode       = AscCommon.MobileTouchMode.Select;
+				this.DragSelect = 2;
+			}
+		}
+
+		return (this.Mode == AscCommon.MobileTouchMode.Select);
 	};
 
 	/**************************************************************************/

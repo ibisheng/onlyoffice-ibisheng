@@ -679,9 +679,12 @@ function CEditorPage(api)
 		window.onkeyup    = this.onKeyUp;
 		*/
 
-		this.m_oBody.HtmlElement.onmousemove = this.onBodyMouseMove;
-		this.m_oBody.HtmlElement.onmousedown = this.onBodyMouseDown;
-		this.m_oBody.HtmlElement.onmouseup   = this.onBodyMouseUp;
+		if (!this.m_oApi.isMobileVersion)
+		{
+			this.m_oBody.HtmlElement.onmousemove = this.onBodyMouseMove;
+			this.m_oBody.HtmlElement.onmousedown = this.onBodyMouseDown;
+			this.m_oBody.HtmlElement.onmouseup = this.onBodyMouseUp;
+		}
 
 		this.initEvents2MobileAdvances();
 

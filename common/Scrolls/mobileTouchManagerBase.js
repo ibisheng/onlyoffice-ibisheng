@@ -1592,6 +1592,8 @@
 		global_mouseEvent.ClickCount = 1;
 
 		var nearPos = this.delegate.Logic_GetNearestPos(pos.X, pos.Y, pos.Page);
+		if (!nearPos)
+			return;
 
 		this.delegate.DrawingDocument.NeedScrollToTargetFlag = true;
 		var y = nearPos.Y;
