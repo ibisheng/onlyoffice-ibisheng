@@ -707,7 +707,7 @@
 			do {
 				this.tableNameIndex++;
 				sNewName = this.tableNamePattern + this.tableNameIndex + collaborativeIndexUser;
-			} while (this.isListeningDefName(sNewName));
+			} while (this.getDefNameByName(sNewName, null) || this.isListeningDefName(sNewName));
 			return sNewName;
 		},
 		addTableName: function(ws, table, opt_isOpen) {
