@@ -13237,24 +13237,26 @@
 		xL *= asc_getcvt(3/*mm*/, 1/*pt*/, this._getPPIX());
 		yL *= asc_getcvt(3/*mm*/, 1/*pt*/, this._getPPIY());
 
-		var c = this.visibleRange.c1, cFrozen, widthDiff;
-		var r = this.visibleRange.r1, rFrozen, heightDiff;
+		var c = this.visibleRange.c1, cFrozen, widthDiff = 0;
+		var r = this.visibleRange.r1, rFrozen, heightDiff = 0;
 		if (this.topLeftFrozenCell) {
 			cFrozen = this.topLeftFrozenCell.getCol0();
 			widthDiff = this.cols[cFrozen].left - this.cols[0].left;
-			if (xL < this.cellsLeft + widthDiff && 0 !== widthDiff) {
+			if (xL < widthDiff && 0 !== widthDiff) {
 				c = 0;
+				widthDiff = 0;
 			}
 
 			rFrozen = this.topLeftFrozenCell.getRow0();
 			heightDiff = this.rows[rFrozen].top - this.rows[0].top;
-			if (yL < this.cellsTop + heightDiff && 0 !== heightDiff) {
+			if (yL < heightDiff && 0 !== heightDiff) {
 				r = 0;
+				heightDiff = 0;
 			}
 		}
 
-		xL -= (this.cols[c].left - this.cellsLeft - this.cellsLeft);
-		yL -= (this.rows[r].top - this.cellsTop - this.cellsTop);
+		xL -= (this.cols[c].left - widthDiff - this.cellsLeft - this.cellsLeft);
+		yL -= (this.rows[r].top - heightDiff - this.cellsTop - this.cellsTop);
 
 		xL *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
 		yL *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
