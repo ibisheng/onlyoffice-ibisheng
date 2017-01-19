@@ -2097,6 +2097,10 @@
     }
   };
 
+	WorkbookView.prototype.setCellFormat = function (format) {
+		this.getWorksheet().setSelectionInfo("format", format);
+	};
+
   WorkbookView.prototype.emptyCells = function(options) {
     if (!this.getCellEditMode()) {
       this.getWorksheet().emptySelection(options);

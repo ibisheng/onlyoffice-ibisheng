@@ -2770,7 +2770,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_setCellFormat = function(format) {
-    this.wb.getWorksheet().setSelectionInfo("format", format);
+    this.wb.setCellFormat(format);
     this.wb.restoreFocus();
   };
 
