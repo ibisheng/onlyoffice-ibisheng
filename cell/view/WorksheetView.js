@@ -8641,7 +8641,7 @@
                         break;
 					 case "specialPaste":
                         // Вставляем текст из локального буфера или нет
-                        t.specialPaste();
+                        t.specialPaste(val);
                         bIsUpdate = false;
                         break;
                     case "hyperlink":
@@ -8730,8 +8730,8 @@
 		}
 		
 		//далее специальная вставка
-		var tempProps = new SpecialPasteProps();
-		tempProps.setProps("values");
+		var tempProps = new AscCommonExcel.SpecialPasteProps();
+		tempProps.setProps(props);
 		api.wb.clipboard.specialPasteProps = tempProps;
 		if(api.wb.clipboard.pasteProcessor.oSpecialPaste.oPreSpecialPasteData)
 		{
@@ -9049,7 +9049,6 @@
             arn.c2 = (cMax2 - 1 > 0) ? (cMax2 - 1) : 0;
         }
 
-        var n = 0;
         if (isMultiple)//случай автозаполнения сложных форм
         {
             t.model.getRange3(lastSelection.r1, lastSelection.c1, lastSelection.r2, lastSelection.c2).unmerge();
@@ -9107,10 +9106,8 @@
 				var offsetCol  = currentObj.colSpan - 1;
 				var offsetRow = currentObj.rowSpan - 1;
 				pastedRangeProps.offsetLast = {offsetCol: offsetCol, offsetRow: offsetRow};
-				mergeArr[n] = {
-					r1: range.first.row, r2: range.last.row + offsetRow, c1: range.first.col, c2: range.last.col + offsetCol
-				};
-				n++;
+				
+				mergeArr.push({r1: range.first.row, r2: range.last.row + offsetRow, c1: range.first.col, c2: range.last.col + offsetCol});
 				if (contentCurrentObj[0] == undefined) {
 					pastedRangeProps.val = '';
 				}
@@ -9296,7 +9293,6 @@
         }
 		
 		
-		var mergeArr = [];
 		var addComments = function(pasteRow, pasteCol, comments)
 		{
 			var comment;
@@ -9312,6 +9308,7 @@
 			}
 		};
 		
+		var mergeArr = [];
 		var checkMerge = function(range, curMerge, nRow, nCol, rowDiff, colDiff, pastedRangeProps)
 		{
 			var isMerged = false;
@@ -9475,11 +9472,13 @@
 		}
 		
 		//set formula - for paste from binary
-		var setFormula = function(newVal, firstRange, range)
+		var calculateValueAndBinaryFormula = function(newVal, firstRange, range)
 		{
 			var numFormula = null;
 			var skipFormat = null;
 			var noSkipVal = null;
+			
+			rangeStyle.value = newVal.getValue();
 			var value2 = newVal.getValue2();
 			for (var nF = 0; nF < value2.length; nF++) {
 				if (value2[nF] && value2[nF].sId) {
@@ -9491,6 +9490,7 @@
 					noSkipVal = nF;
 				}
 			}
+			
 			//TODO вместо range где возможно использовать cell
 			var cellFrom, cellTo;
 			if (value2.length == 1 || numFormula != null || (skipFormat != null && noSkipVal != null)) {
@@ -9504,8 +9504,8 @@
 
 				//formula
 				if (newVal.getFormula() && !isOneMerge) {
-					var offset = range.getCells()[numFormula].getOffset2(
-					  value2[numFormula].sId), assemb, _p_ = new AscCommonExcel.parserFormula(value2[numFormula].sFormula, null, range.worksheet);
+					var offset = range.getCells()[numFormula].getOffset2(value2[numFormula].sId);
+					var assemb, _p_ = new AscCommonExcel.parserFormula(value2[numFormula].sFormula, null, range.worksheet);
 
 					if (_p_.parse()) {
 						if(null !== tablesMap)
@@ -9520,8 +9520,10 @@
 						{
 							assemb = _p_.changeOffset(offset).assemble(true);
 						}
-
-						arrFormula.push({range: range, val: "=" + assemb});
+						
+						rangeStyle.formula = {range: range, val: "=" + assemb};
+						
+						//arrFormula.push({range: range, val: "=" + assemb});
 					}
 				} else {
 					cellFrom = newVal.getCells();
@@ -9532,83 +9534,121 @@
 					}
 
 					if (cellFrom && cellTo && cellFrom[0] && cellTo[0]) {
-						cellTo[0].setValueData(cellFrom[0].getValueData());
+						//cellTo[0].setValueData(cellFrom[0].getValueData());
+						rangeStyle.cellValueData = {valueData: cellFrom[0].getValueData(), cell: cellTo[0]};
 					}
 				}
-
+				
 				if (!isOneMerge)//settings for text
 				{
-					range.setFont(value2[numStyle].format);
+					rangeStyle.font = value2[numStyle].format;
+					//range.setFont(value2[numStyle].format);
 				}
 			} else {
-				firstRange.setValue2(value2);
+				rangeStyle.value2 = value2;
+				//firstRange.setValue2(value2);
 			}
 		};
 		
-		if(rangeStyle.cellStyle && specialPasteProps.cellStyle)
-		{
-			range.setCellStyle(rangeStyle.cellStyle);
-		}
-		if(rangeStyle.val && specialPasteProps.val)
-		{
-			range.setValue(rangeStyle.val);
-		}
-		if(rangeStyle.numFormat && specialPasteProps.cellStyle)
-		{
-			range.setNumFormat(rangeStyle.numFormat);
-		}
 		
 		//for formula
 		if(formulaProps)
 		{
-			setFormula(newVal, firstRange, range);
+			calculateValueAndBinaryFormula(newVal, firstRange, range);
 		}
 		
+		//cellStyle
+		if(rangeStyle.cellStyle && specialPasteProps.cellStyle)
+		{
+			range.setCellStyle(rangeStyle.cellStyle);
+		}
+		//numFormat
+		if(rangeStyle.numFormat && specialPasteProps.cellStyle)
+		{
+			range.setNumFormat(rangeStyle.numFormat);
+		}
+		//font
 		if(rangeStyle.font && specialPasteProps.font)
 		{
 			range.setFont(rangeStyle.font);
 		}
-		if(rangeStyle.value2)
+		
+		//
+		
+		//***value***
+		if(rangeStyle.formula)
 		{
-			range.setValue2(rangeStyle.value2);
+			arrFormula.push(rangeStyle.formula);
 		}
+		else if(rangeStyle.cellValueData)
+		{	
+			rangeStyle.cellValueData.cell.setValueData(rangeStyle.cellValueData.valueData);
+		}
+		else if(rangeStyle.value2)
+		{
+			if(formulaProps)
+			{
+				firstRange.setValue2(rangeStyle.value2);
+			}
+			else
+			{
+				range.setValue2(rangeStyle.value2);
+			}
+		}
+		else if(rangeStyle.val && specialPasteProps.val)
+		{
+			range.setValue(rangeStyle.val);
+		}
+		
+		//alignVertical
 		if(rangeStyle.alignVertical && specialPasteProps.alignVertical)
 		{
 			range.setAlignVertical(rangeStyle.alignVertical);
 		}
+		//alignHorizontal
 		if(rangeStyle.alignHorizontal && specialPasteProps.alignHorizontal)
 		{
 			range.setAlignHorizontal(rangeStyle.alignHorizontal);
 		}
+		//fontSize
 		if(rangeStyle.fontSize && specialPasteProps.fontSize)
 		{
 			range.setFontsize(rangeStyle.fontSize);
 		}
+		//offsetLast
 		if(rangeStyle.offsetLast && specialPasteProps.merge)
 		{
 			range.setOffsetLast(rangeStyle.offsetLast);
 			range.merge(rangeStyle.merge);
+		
 		}
+		//borders
 		if(rangeStyle.borders && specialPasteProps.borders)
 		{
 			range.setBorderSrc(rangeStyle.borders);
 		}
+		//bordersFull
 		if(rangeStyle.bordersFull && specialPasteProps.borders)
 		{
 			range.setBorder(rangeStyle.bordersFull);
 		}
+		//wrap
 		if(rangeStyle.wrap && specialPasteProps.wrap)
 		{
 			range.setWrap(rangeStyle.wrap);
 		}
+		//fill
 		if(rangeStyle.fill && specialPasteProps.fill)
 		{
 			range.setFill(rangeStyle.fill);
 		}
+		//angle
 		if(rangeStyle.angle && specialPasteProps.angle)
 		{
 			range.setAngle(rangeStyle.angle);
 		}
+		
+		//hyperLink
 		if (rangeStyle.hyperLink && specialPasteProps.hyperlink)
 		{
 			var _link = rangeStyle.hyperLink.hyperLink;
@@ -9625,7 +9665,7 @@
 			newHyperlink.Tooltip = rangeStyle.hyperLink.toolTip;
 			range.setHyperlink(newHyperlink);
 		}
-		if (rangeStyle.hyperlinkObj && specialPasteProps.hyperlink) 
+		else if (rangeStyle.hyperlinkObj && specialPasteProps.hyperlink) 
 		{
 			rangeStyle.hyperlinkObj.Ref = range;
 			range.setHyperlink(rangeStyle.hyperlinkObj, true);
