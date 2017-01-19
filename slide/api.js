@@ -2209,15 +2209,15 @@ background-repeat: no-repeat;\
 	// mobile version methods:
 	asc_docs_api.prototype.asc_GetDefaultTableStyles = function()
 	{
-		if (!this.WordControl.m_oLogicDocument)
+		var logicDoc = this.WordControl.m_oLogicDocument;
+		if (!logicDoc)
 			return;
 
-		this.WordControl.m_oDrawingDocument.StartTableStylesCheck();
-		this.WordControl.m_oDrawingDocument.TableStylesСheckLook = new Asc.CTablePropLook();
-		this.WordControl.m_oDrawingDocument.TableStylesСheckLook.FirstCol = true;
-		this.WordControl.m_oDrawingDocument.TableStylesСheckLook.FirstRow = true;
-		this.WordControl.m_oDrawingDocument.TableStylesСheckLook.BandHor  = true;
-		this.WordControl.m_oDrawingDocument.EndTableStylesCheck();
+		if (logicDoc.CurPage >= logicDoc.Slides.length)
+			return;
+
+		var tableLook = new CTableLook(true, true, false, false, true, false);
+		logicDoc.CheckTableStyles(logicDoc.Slides[logicDoc.CurPage], tableLook);
 	};
 
 	asc_docs_api.prototype.CollectHeaders                  = function()

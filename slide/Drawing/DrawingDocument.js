@@ -740,9 +740,6 @@ function CDrawingDocument()
 	this.AutoShapesTrack = null;
 	this.TransitionSlide = new CTransitionAnimation(null);
 
-	this.TableStylesСheckLook = null;
-	this.TableStylesСheckLookFlag = false;
-
 	this.MoveTargetInInputContext = function()
 	{
 		if (AscCommon.g_inputContext)
@@ -2700,29 +2697,8 @@ function CDrawingDocument()
 		_div_elem.appendChild(this.GuiCanvasFillTextureTextArt);
 	}
 
-	this.StartTableStylesCheck = function ()
-	{
-		this.TableStylesСheckLookFlag = true;
-	}
-
-	this.EndTableStylesCheck = function ()
-	{
-		this.TableStylesСheckLookFlag = false;
-		if (this.TableStylesСheckLook != null)
-		{
-			this.CheckTableStyles(this.TableStylesСheckLook);
-			this.TableStylesСheckLook = null;
-		}
-	}
-
 	this.CheckTableStyles = function()
 	{
-		if (this.TableStylesСheckLookFlag)
-		{
-			this.TableStylesСheckLook = tableLook;
-			return;
-		}
-
 		// сначала проверим, подписан ли кто на этот евент
 		// а то во вьюере не стоит ничего посылать
 
