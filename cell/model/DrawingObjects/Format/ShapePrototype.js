@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -215,11 +215,43 @@ function addToDrawings(worksheet, graphic, position, lockByDefault, anchor)
 
 CShape.prototype.addToDrawingObjects =  function(pos)
 {
-    var controller = this.getDrawingObjectsController();
     var position = addToDrawings(this.worksheet, this, pos, /*lockByDefault*/undefined, undefined);
     var data = {Type: AscDFH.historyitem_AutoShapes_AddToDrawingObjects, Pos: position};
     History.Add(this, data);
     this.worksheet.addContentChanges(new AscCommon.CContentChangesElement(AscCommon.contentchanges_Add, data.Pos, 1, data));
+
+    var nv_sp_pr, bNeedSet = false;
+    switch(this.getObjectType()){
+        case AscDFH.historyitem_type_Shape:{
+            if(!this.nvSpPr){
+                bNeedSet = true;
+            }
+            break;
+        }
+        case AscDFH.historyitem_type_ChartSpace:{
+            if(!this.nvGraphicFramePr){
+                bNeedSet = true;
+            }
+            break;
+        }
+        case AscDFH.historyitem_type_ImageShape:{
+            if(!this.nvPicPr){
+                bNeedSet = true;
+            }
+            break;
+        }
+        case AscDFH.historyitem_type_GroupShape:{
+            if(!this.nvGrpSpPr){
+                bNeedSet = true;
+            }
+            break;
+        }
+    }
+    if(bNeedSet){
+        nv_sp_pr = new AscFormat.UniNvPr();
+        nv_sp_pr.cNvPr.setId(++AscFormat.Ax_Counter.GLOBAL_AX_ID_COUNTER);
+        this.setNvSpPr(nv_sp_pr);
+    }
 };
 
 

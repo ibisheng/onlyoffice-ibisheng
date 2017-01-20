@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -9385,6 +9385,19 @@ CDocument.prototype.GetCurrentSectionPr = function()
 
 	return oSectPr;
 };
+CDocument.prototype.GetFirstElementInSection = function(SectionIndex)
+{
+	if (SectionIndex <= 0)
+		return this.Content[0] ? this.Content[0] : null;
+
+	var nElementPos = this.SectionsInfo.Get_SectPr2(SectionIndex - 1).Index + 1;
+	return this.Content[nElementPos] ? this.Content[nElementPos] : null;
+};
+CDocument.prototype.GetSectionIndexByElementIndex = function(ElementIndex)
+{
+	return this.SectionsInfo.Get_Index(ElementIndex);
+};
+
 /**
  * Определяем использовать ли заливку текста в особых случаях, когда вызывается заливка параграфа.
  * @param bUse
@@ -9489,7 +9502,7 @@ CDocument.prototype.private_StartSelectionFromCurPos = function()
 			Y = _Y;
 		}
 
-		this.CurPage = CurPara.Get_StartPage_Absolute() + CurPara.CurPos.PagesPos;
+		this.CurPage = CurPara.Get_CurrentPage_Absolute();
 		this.Selection_SetStart(X, Y, MouseEvent);
 		MouseEvent.Type = AscCommon.g_mouse_event_type_move;
 		this.Selection_SetEnd(X, Y, MouseEvent);
@@ -11334,7 +11347,6 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 						NextId = StyleId;
 				}
 
-
 				if (StyleId === NextId)
 				{
 					// Продолжаем (в плане настроек) новый параграф
@@ -11354,6 +11366,14 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 				{
 					Item.Set_SectionPr(undefined);
 					NewParagraph.Set_SectionPr(SectPr);
+				}
+
+				var LastRun = Item.Content[Item.Content.length - 1];
+				if (LastRun && LastRun.Pr.Lang && LastRun.Pr.Lang.Val)
+				{
+					NewParagraph.Select_All();
+					NewParagraph.Add(new ParaTextPr({Lang : LastRun.Pr.Lang.Copy()}));
+					NewParagraph.Selection_Remove();
 				}
 			}
 			else
@@ -12705,6 +12725,7 @@ CDocument.prototype.controller_MoveCursorUp = function(AddToSelect)
 	this.private_UpdateCursorXY(false, true);
 	var Result = this.private_MoveCursorUp(this.CurPos.RealX, this.CurPos.RealY, AddToSelect);
 
+	// TODO: Вообще Word селектит до начала данной колонки в таком случае, а не до начала документа
 	if (true === AddToSelect && true !== Result)
 		this.Cursor_MoveToStartPos(true);
 

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -176,6 +176,11 @@ CFootEndnote.prototype.GetPositionInfo = function()
 CFootEndnote.prototype.OnFastRecalculate = function()
 {
 	this.NeedUpdateHint = true;
+};
+CFootEndnote.prototype.Get_ColumnFields = function(ElementIndex, ColumnIndex)
+{
+	var PageAbs = this.Get_StartPage_Absolute();
+	return this.Parent.GetColumnFields(PageAbs, ColumnIndex);
 };
 
 //--------------------------------------------------------export----------------------------------------------------

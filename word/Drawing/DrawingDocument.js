@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -2093,8 +2093,8 @@ function CDrawingDocument()
 	this.TableStylesLastLook = null;
 	this.LastParagraphMargins = null;
 
-	this.TableStylesSheckLook = null;
-	this.TableStylesSheckLookFlag = false;
+	this.TableStylesСheckLook = null;
+	this.TableStylesСheckLookFlag = false;
 
 	this.InlineTextTrackEnabled = false;
 	this.InlineTextTrack = null;
@@ -5765,24 +5765,24 @@ function CDrawingDocument()
 
 	this.StartTableStylesCheck = function ()
 	{
-		this.TableStylesSheckLookFlag = true;
+		this.TableStylesСheckLookFlag = true;
 	}
 
 	this.EndTableStylesCheck = function ()
 	{
-		this.TableStylesSheckLookFlag = false;
-		if (this.TableStylesSheckLook != null)
+		this.TableStylesСheckLookFlag = false;
+		if (this.TableStylesСheckLook != null)
 		{
-			this.CheckTableStyles(this.TableStylesSheckLook);
-			this.TableStylesSheckLook = null;
+			this.CheckTableStyles(this.TableStylesСheckLook);
+			this.TableStylesСheckLook = null;
 		}
 	}
 
 	this.CheckTableStyles = function (tableLook)
 	{
-		if (this.TableStylesSheckLookFlag)
+		if (this.TableStylesСheckLookFlag)
 		{
-			this.TableStylesSheckLook = tableLook;
+			this.TableStylesСheckLook = tableLook;
 			return;
 		}
 
@@ -5901,7 +5901,14 @@ function CDrawingDocument()
 
 				_table_styles = new CTable(this, logicDoc, true, 0, _x_mar, _y_mar, 1000, 1000, Rows, Cols, Grid);
 
-				_table_styles.Set_Props({TableStyle: i, TableLook: tableLook, TableLayout: c_oAscTableLayout.Fixed});
+				_table_styles.Set_Props({
+					TableStyle: i,
+					TableLook: tableLook,
+					TableLayout: c_oAscTableLayout.Fixed
+				});
+				_table_styles.Set_Props({
+					TableDefaultMargins : {Top : 0, Bottom : 0}
+				});
 
 				for (var j = 0; j < Rows; j++)
 					_table_styles.Content[j].Set_Height(H / Rows, Asc.linerule_AtLeast);
@@ -5913,6 +5920,9 @@ function CDrawingDocument()
 					TableLook: tableLook,
 					TableLayout: c_oAscTableLayout.Fixed,
 					CellSelect: false
+				});
+				_table_styles.Set_Props({
+					TableDefaultMargins : {Top : 0, Bottom : 0}
 				});
 				_table_styles.Recalc_CompiledPr2();
 

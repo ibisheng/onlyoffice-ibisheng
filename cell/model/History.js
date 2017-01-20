@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -895,7 +895,6 @@ CHistory.prototype.Get_DeleteIndex = function () {
 				DeleteIndex += 1;
 			}
 		}
-		DeleteIndex += 1; // Это на взаимное расположение Sheet. Пишется в каждой точке изменений.
 	}
 	return DeleteIndex;
 };

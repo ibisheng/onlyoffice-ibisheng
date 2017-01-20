@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -707,7 +707,7 @@
 			do {
 				this.tableNameIndex++;
 				sNewName = this.tableNamePattern + this.tableNameIndex + collaborativeIndexUser;
-			} while (this.isListeningDefName(sNewName));
+			} while (this.getDefNameByName(sNewName, null) || this.isListeningDefName(sNewName));
 			return sNewName;
 		},
 		addTableName: function(ws, table, opt_isOpen) {
@@ -753,15 +753,18 @@
 				History.TurnOn();
 			}
 		},
-		delTableName: function(tableName) {
+		delTableName: function(tableName, bConvertTableFormulaToRef) {
 			this.buildDependency();
-			var defName = this._delDefName(tableName, null);
+			var defName = this.getDefNameByName(tableName);
+			
+			this.addToChangedDefName(defName);
+			var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: defName.getUndoDefName(), to: null, bConvertTableFormulaToRef: bConvertTableFormulaToRef};
+			this._broadcastDefName(tableName, notifyData);
+			
+			this._delDefName(tableName, null);
 			if (defName) {
 				defName.removeDependencies();
 			}
-			this.addToChangedDefName(defName);
-			var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: defName.getUndoDefName(), to: null};
-			this._broadcastDefName(tableName, notifyData);
 		},
 		delColumnTable: function(tableName, deleted) {
 			this.buildDependency();
@@ -4552,13 +4555,27 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			this.workbook.dependencyFormulas.changeTableName(oldTablePart.DisplayName, tablePart.DisplayName);
 		}
 	};
-	Woorksheet.prototype.deleteTablePart = function (index) {
-		var deleted = this.TableParts.splice(index, 1);
-		for (var delIndex = 0; delIndex < deleted.length; ++delIndex) {
-			var tablePart = deleted[delIndex];
-			this.workbook.dependencyFormulas.delTableName(tablePart.DisplayName);
+	Woorksheet.prototype.deleteTablePart = function (index, bConvertTableFormulaToRef) {
+		if(bConvertTableFormulaToRef)
+		{
+			//TODO скорее всего стоит убрать else
+			var tablePart = this.TableParts[index];
+			this.workbook.dependencyFormulas.delTableName(tablePart.DisplayName, bConvertTableFormulaToRef);
 			tablePart.removeDependencies();
+			
+			//delete table
+			this.TableParts.splice(index, 1);
 		}
+		else
+		{
+			var deleted = this.TableParts.splice(index, 1);
+			for (var delIndex = 0; delIndex < deleted.length; ++delIndex) {
+				var tablePart = deleted[delIndex];
+				this.workbook.dependencyFormulas.delTableName(tablePart.DisplayName);
+				tablePart.removeDependencies();
+			}
+		}
+		
 	};
 //-------------------------------------------------------------------------------------------------
 	/**
@@ -5084,6 +5101,10 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		this._checkDirty();
 		return this.oValue.getValueForEdit2(this);
 	};
+	Cell.prototype.getValueForExample=function(numFormat, cultureInfo){
+		this._checkDirty();
+		return this.oValue.getValueForExample(this, AscCommon.gc_nMaxDigCountView, function(){return true;}, numFormat, cultureInfo);
+	};
 	Cell.prototype.getValueWithoutFormat=function(){
 		this._checkDirty();
 		return this.oValue.getValueWithoutFormat();
@@ -5111,6 +5132,9 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 	Cell.prototype.getNumFormatType=function(){
 		return this.getNumFormat().getType();
 	};
+	Cell.prototype.getNumFormatTypeInfo=function(){
+		return this.getNumFormat().getTypeInfo();
+	};
 	Cell.prototype.moveHor=function(val){
 		this.nCol += val;
 	};
@@ -5129,7 +5153,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 	};
 	Cell.prototype.getValueData = function(){
 		this._checkDirty();
-		var formula = this.formulaParsed ? this.formulaParsed.Formula : null;;
+		var formula = this.formulaParsed ? this.formulaParsed.Formula : null;
 		return new UndoRedoData_CellValueData(formula, this.oValue.clone());
 	};
 	Cell.prototype.setValueData = function(Val){
@@ -6512,6 +6536,9 @@ Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 	};
 	Range.prototype.getNumFormatType=function(){
 		return this.getNumFormat().getType();
+	};
+	Range.prototype.getNumFormatTypeInfo=function(){
+		return this.getNumFormat().getTypeInfo();
 	};
 // Узнаем отличается ли шрифт (размер и гарнитура) в ячейке от шрифта в строке
 	Range.prototype.isNotDefaultFont = function () {
@@ -9069,7 +9096,7 @@ Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 	window['AscCommonExcel'].oDefaultMetrics = oDefaultMetrics;
 	window['AscCommonExcel'].g_nAllColIndex = g_nAllColIndex;
 	window['AscCommonExcel'].g_nAllRowIndex = g_nAllRowIndex;
-	window['AscCommonExcel'].g_DefNameWorksheet;
+	window['AscCommonExcel'].g_DefNameWorksheet = null;
 	window['AscCommonExcel'].aStandartNumFormats = aStandartNumFormats;
 	window['AscCommonExcel'].aStandartNumFormatsId = aStandartNumFormatsId;
 	window['AscCommonExcel'].oFormulaLocaleInfo = oFormulaLocaleInfo;

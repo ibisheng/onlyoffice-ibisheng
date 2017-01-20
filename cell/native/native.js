@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -2726,10 +2726,9 @@ function asc_WriteCCelInfo(c, s) {
         s['WriteString2'](c.asc_getStyleName());
     }
 
-    if (null != c.asc_getNumFormatType()) {
-        s['WriteByte'](22);
-        s['WriteLong'](c.asc_getNumFormatType());
-    }
+	s['WriteByte'](22);
+	s['WriteLong'](c.c.asc_getNumFormatInfo().asc_getType());
+
     if (null != c.asc_getAngle()) {
         s['WriteByte'](23);
         s['WriteDouble2'](c.asc_getAngle());

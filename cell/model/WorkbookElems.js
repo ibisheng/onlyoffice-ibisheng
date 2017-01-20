@@ -1,5 +1,5 @@
 ﻿/*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -560,18 +560,12 @@ var g_oFontProperties = {
 		oRes.fn = this.fn || font.fn;
 		oRes.scheme = this.scheme || font.scheme;
 		oRes.fs = this.fs || font.fs;
-		if (isTable){
-			oRes.b = font.b;
-			oRes.i = font.i;
-			oRes.s = font.s;
-		} else {
-			oRes.b = this.b || font.b;
-			oRes.i = this.i || font.i;
-			oRes.s = this.s || font.s;
-		}
+		oRes.b = this.b;
+		oRes.i = this.i;
+		oRes.s = this.s;
 		oRes.u = this.u || font.u;
 		//заглушка excel при merge стилей игнорирует default цвет
-		if (isTable && this.c && this.c.isEqual(g_oDefaultFormat.Font)) {
+		if (isTable && this.c && this.c.isEqual(g_oDefaultFormat.Font.c)) {
 			oRes.c = font.c || this.c;
 		} else {
 			oRes.c = this.c || font.c;
@@ -1228,41 +1222,37 @@ Num.prototype =
     var res = this.f;
     if (null != this.id) {
       if (15 <= this.id && this.id <= 17) {
-        var separator;
-        if ('/' == AscCommon.g_oDefaultCultureInfo.DateSeparator) {
-          separator = '-';
-        } else {
-          separator = '/';
-        }
         switch (this.id) {
           case 15:
-            res = AscCommon.getShortDateMonthFormat(true, true, separator, null);
+            res = AscCommon.getShortDateMonthFormat(true, true, null);
             break;
           case 16:
-            res = AscCommon.getShortDateMonthFormat(true, false, separator, null);
+            res = AscCommon.getShortDateMonthFormat(true, false, null);
             break;
           case 17:
-            res = AscCommon.getShortDateMonthFormat(false, true, separator, null);
+            res = AscCommon.getShortDateMonthFormat(false, true, null);
             break;
         }
       } else {
         switch (this.id) {
           case 5:
-            res = AscCommonExcel.getCurrencyFormatSimple(null, false, true, false);
+            res = AscCommon.getCurrencyFormatSimple(null, 0, true, false, false);
             break;
           case 6:
-            res = AscCommonExcel.getCurrencyFormatSimple(null, false, true, true);
+            res = AscCommon.getCurrencyFormatSimple(null, 0, true, false, true);
             break;
           case 7:
-            res = AscCommonExcel.getCurrencyFormatSimple(null, true, true, false);
+            res = AscCommon.getCurrencyFormatSimple(null, 2, true, false, false);
             break;
           case 8:
-            res = AscCommonExcel.getCurrencyFormatSimple(null, true, true, true);
+            res = AscCommon.getCurrencyFormatSimple(null, 2, true, false, true);
+            break;
+          case 14:
+            res = AscCommon.getShortDateFormat(null);
             break;
           case 22:
             res = AscCommon.getShortDateFormat(null) + " h:mm";
             break;
-          case 14:
           case 27:
           case 28:
           case 29:
@@ -1272,28 +1262,28 @@ Num.prototype =
             res = AscCommon.getShortDateFormat(null);
             break;
           case 37:
-            res = AscCommonExcel.getCurrencyFormatSimple(null, false, false, false);
+            res = AscCommon.getCurrencyFormatSimple(null, 0, false, false, false);
             break;
           case 38:
-            res = AscCommonExcel.getCurrencyFormatSimple(null, false, false, true);
+            res = AscCommon.getCurrencyFormatSimple(null, 0, false, false, true);
             break;
           case 39:
-            res = AscCommonExcel.getCurrencyFormatSimple(null, true, false, false);
+            res = AscCommon.getCurrencyFormatSimple(null, 2, false, false, false);
             break;
           case 40:
-            res = AscCommonExcel.getCurrencyFormatSimple(null, true, false, true);
+            res = AscCommon.getCurrencyFormatSimple(null, 2, false, false, true);
             break;
           case 41:
-            res = AscCommonExcel.getCurrencyFormat(null, false, false, false);
+            res = AscCommon.getCurrencyFormat(null, 0, false, false);
             break;
           case 42:
-            res = AscCommonExcel.getCurrencyFormat(null, false, true, false);
+            res = AscCommon.getCurrencyFormat(null, 0, true, false);
             break;
           case 43:
-            res = AscCommonExcel.getCurrencyFormat(null, true, false, false);
+            res = AscCommon.getCurrencyFormat(null, 2, false, false);
             break;
           case 44:
-            res = AscCommonExcel.getCurrencyFormat(null, true, true, false);
+            res = AscCommon.getCurrencyFormat(null, 2, true, false);
             break;
         }
       }
@@ -3169,15 +3159,19 @@ CCellValue.prototype =
 		if(null == this.textValue)
 		{
 			this.getValue2(cell, gc_nMaxDigCountView, function(){return true;});
-			this.textValue = "";
-			var aText = this.aTextValue2[gc_nMaxDigCountView];
-			for(var i = 0, length = aText.length; i < length; ++i)
-			{
-				if(aText[i].format && aText[i].format.getSkip() == false)
-					this.textValue += aText[i].text;
-			}
+			this.textValue = this._textArrayToString(this.aTextValue2[gc_nMaxDigCountView]);
 		}
 		return this.textValue;
+	},
+	_textArrayToString: function(aText) {
+		var res = '';
+		for (var i = 0, length = aText.length; i < length; ++i) {
+			var elem = aText[i];
+			if (elem.format && elem.format.getSkip() == false) {
+				res += elem.text;
+			}
+		}
+		return res;
 	},
 	getValueForEdit : function(cell)
 	{
@@ -3200,120 +3194,7 @@ CCellValue.prototype =
 			aRes = this.aTextValue2[dDigitsCount];
 		if(null == aRes)
 		{
-			var bNeedMeasure = true;
-			var sText = null;
-			var aText = null;		
-			if(CellValueType.Number == this.type || CellValueType.String == this.type)
-			{
-				if(null != this.text)
-					sText = this.text;
-				else if(null != this.multiText)
-					aText = this.multiText;
-
-				if(CellValueType.String == this.type)
-					bNeedMeasure = false;
-				var oNumFormat;
-				var xfs = cell.getCompiledStyle();
-				if(null != xfs && null != xfs.num)
-					oNumFormat = oNumFormatCache.get(xfs.num.getFormat());
-				else
-					oNumFormat = oNumFormatCache.get(g_oDefaultFormat.Num.getFormat());
-				if(false == oNumFormat.isGeneralFormat())
-				{
-					if(null != this.number)
-					{
-						aText = oNumFormat.format(this.number, this.type, dDigitsCount);
-						sText = null;
-					}
-					else if(CellValueType.String == this.type)
-					{
-					    var oTextFormat = oNumFormat.getTextFormat();
-					    if (null != oTextFormat && "@" != oTextFormat.formatString) {
-					        if (null != this.text) {
-					            aText = oNumFormat.format(this.text, this.type, dDigitsCount);
-					            sText = null;
-					        }
-					        else if (null != this.multiText) {
-					            var sSimpleString = this.getStringFromMultiText();
-					            aText = oNumFormat.format(sSimpleString, this.type, dDigitsCount);
-					            sText = null;
-					        }
-					    }
-					}
-				}
-				else if(CellValueType.Number == this.type && null != this.number)
-				{
-					bNeedMeasure = false;
-					var bFindResult = false;
-					//варируем dDigitsCount чтобы результат влез в ячейку
-					var nTempDigCount = Math.ceil(dDigitsCount);
-					var sOriginText = this.number;
-					while(nTempDigCount >= 1)
-					{
-						//Строим подходящий general format
-						var sGeneral = AscCommon.DecodeGeneralFormat(sOriginText, this.type, nTempDigCount);
-						if(null != sGeneral)
-							oNumFormat = oNumFormatCache.get(sGeneral);
-
-						if(null != oNumFormat)
-						{
-							sText = null;
-							aText = oNumFormat.format(sOriginText, this.type, dDigitsCount);
-							if(true == oNumFormat.isTextFormat())
-								break;
-							else
-							{
-								aRes = this._getValue2Result(cell, sText, aText);
-								//Проверяем влезает ли текст
-								if(true == fIsFitMeasurer(aRes))
-								{
-									bFindResult = true;
-									break;
-								}
-								aRes = null;
-							}
-						}
-						nTempDigCount--;
-					}
-					if(false == bFindResult)
-					{
-						aRes = null;
-						sText = null;
-						var font = new AscCommonExcel.Font();
-						if (dDigitsCount > 1){
-							font.setRepeat(true);
-							aText = [{ text: "#", format: font}];
-						}
-						else
-							aText = [{text: "", format: font}];
-					}
-				}
-			}
-			else if(CellValueType.Bool == this.type)
-			{
-				if(null != this.number)
-					sText = (0 != this.number) ? cBoolLocal["t"].toUpperCase(): cBoolLocal["f"].toUpperCase();
-			}
-			else if(CellValueType.Error == this.type)
-			{
-				if(null != this.text)
-					sText = this._getValueTypeError(this.text);
-			}
-			if(bNeedMeasure)
-			{
-				aRes = this._getValue2Result(cell, sText, aText);
-				//Проверяем влезает ли текст
-				if(false == fIsFitMeasurer(aRes))
-				{
-					aRes = null;
-					sText = null;
-					var font = new AscCommonExcel.Font();
-					font.setRepeat(true);
-					aText = [{ text: "#", format: font }];
-				}
-			}
-			if(null == aRes)
-				aRes = this._getValue2Result(cell, sText, aText);
+			aRes = this._getValue2(cell, dDigitsCount, fIsFitMeasurer);
 			var formula = cell.getFormula();
 			if( formula ){
 				aRes[0].sFormula = formula;
@@ -3321,6 +3202,122 @@ CCellValue.prototype =
 			}
 			
 			this.aTextValue2[dDigitsCount] = aRes;
+		}
+		return aRes;
+	},
+	getValueForExample : function(cell, dDigitsCount, fIsFitMeasurer, numFormat, cultureInfo)
+	{
+		var aText = this._getValue2(cell, dDigitsCount, fIsFitMeasurer, numFormat, cultureInfo);
+		return this._textArrayToString(aText);
+	},
+	_getValue2: function(cell, dDigitsCount, fIsFitMeasurer, opt_numFormat, opt_cultureInfo) {
+		var aRes = null;
+		var bNeedMeasure = true;
+		var sText = null;
+		var aText = null;
+		if (CellValueType.Number == this.type || CellValueType.String == this.type) {
+			if (null != this.text) {
+				sText = this.text;
+			} else if (null != this.multiText) {
+				aText = this.multiText;
+			}
+
+			if (CellValueType.String == this.type) {
+				bNeedMeasure = false;
+			}
+			var oNumFormat;
+			if (opt_numFormat) {
+				oNumFormat = opt_numFormat;
+			} else {
+				var xfs = cell.getCompiledStyle();
+				if (null != xfs && null != xfs.num) {
+					oNumFormat = oNumFormatCache.get(xfs.num.getFormat());
+				} else {
+					oNumFormat = oNumFormatCache.get(g_oDefaultFormat.Num.getFormat());
+				}
+			}
+
+			if (false == oNumFormat.isGeneralFormat()) {
+				if (null != this.number) {
+					aText = oNumFormat.format(this.number, this.type, dDigitsCount, false, opt_cultureInfo);
+					sText = null;
+				} else if (CellValueType.String == this.type) {
+					var oTextFormat = oNumFormat.getTextFormat();
+					if (null != oTextFormat && "@" != oTextFormat.formatString) {
+						if (null != this.text) {
+							aText = oNumFormat.format(this.text, this.type, dDigitsCount, false, opt_cultureInfo);
+							sText = null;
+						} else if (null != this.multiText) {
+							var sSimpleString = this.getStringFromMultiText();
+							aText = oNumFormat.format(sSimpleString, this.type, dDigitsCount, false, opt_cultureInfo);
+							sText = null;
+						}
+					}
+				}
+			} else if (CellValueType.Number == this.type && null != this.number) {
+				bNeedMeasure = false;
+				var bFindResult = false;
+				//варируем dDigitsCount чтобы результат влез в ячейку
+				var nTempDigCount = Math.ceil(dDigitsCount);
+				var sOriginText = this.number;
+				while (nTempDigCount >= 1) {
+					//Строим подходящий general format
+					var sGeneral = AscCommon.DecodeGeneralFormat(sOriginText, this.type, nTempDigCount);
+					if (null != sGeneral) {
+						oNumFormat = oNumFormatCache.get(sGeneral);
+					}
+
+					if (null != oNumFormat) {
+						sText = null;
+						aText = oNumFormat.format(sOriginText, this.type, dDigitsCount, false, opt_cultureInfo);
+						if (true == oNumFormat.isTextFormat()) {
+							break;
+						} else {
+							aRes = this._getValue2Result(cell, sText, aText);
+							//Проверяем влезает ли текст
+							if (true == fIsFitMeasurer(aRes)) {
+								bFindResult = true;
+								break;
+							}
+							aRes = null;
+						}
+					}
+					nTempDigCount--;
+				}
+				if (false == bFindResult) {
+					aRes = null;
+					sText = null;
+					var font = new AscCommonExcel.Font();
+					if (dDigitsCount > 1) {
+						font.setRepeat(true);
+						aText = [{text: "#", format: font}];
+					} else {
+						aText = [{text: "", format: font}];
+					}
+				}
+			}
+		} else if (CellValueType.Bool == this.type) {
+			if (null != this.number) {
+				sText = (0 != this.number) ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase();
+			}
+		} else if (CellValueType.Error == this.type) {
+			if (null != this.text) {
+				sText = this._getValueTypeError(this.text);
+			}
+		}
+		if (bNeedMeasure) {
+			aRes = this._getValue2Result(cell, sText, aText);
+			//Проверяем влезает ли текст
+			if (false == fIsFitMeasurer(aRes)) {
+				aRes = null;
+				sText = null;
+				var font = new AscCommonExcel.Font();
+				font.setRepeat(true);
+				aText = [{text: "#", format: font}];
+			}
+		}
+		if (null == aRes) {
+			aRes = this._getValue2Result(cell, sText, aText);
 		}
 		return aRes;
 	},
@@ -5720,6 +5717,9 @@ function TablePart(handlers) {
 	this.TableColumns = null;
 	this.TableStyleInfo = null;
 	
+	this.altText = null;
+	this.altTextSummary = null;
+	
 	this.result = null;
 	this.handlers = handlers;
 }
@@ -5746,6 +5746,10 @@ TablePart.prototype.clone = function() {
 			res.result.push(this.result[i].clone());
 	}
 	res.DisplayName = this.DisplayName;
+	
+	res.altText = this.altText;
+	res.altTextSummary = this.altTextSummary;
+	
 	return res;
 };
 	TablePart.prototype.renameSheetCopy = function(ws, renameParams) {
@@ -7675,222 +7679,6 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	this.dateTimeGrouping = oDateGroupItem.DateTimeGrouping;
 };
 
-function getCurrencyFormatSimple(opt_cultureInfo, opt_fraction, opt_currency, opt_red) {
-  var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
-  var numberFormat = opt_fraction ? '#,##0.00' : '#,##0';
-  var signCurrencyFormat;
-  var signCurrencyFormatEnd;
-  if (opt_currency) {
-    signCurrencyFormat = signCurrencyFormatEnd = '"' + cultureInfo.CurrencySymbol + '"';
-  } else {
-    signCurrencyFormatEnd = signCurrencyFormat = '';
-    for (var i = 0; i < cultureInfo.CurrencySymbol.length; ++i) {
-      signCurrencyFormatEnd += '_' + cultureInfo.CurrencySymbol[i];
-    }
-  }
-  var red = opt_red ? '[Red]' : '';
-
-  var prefixs = ['_ ', '_-', '_(', '_)'];
-  var postfix = '';
-  var positiveFormat;
-  var negativeFormat;
-  switch (cultureInfo.CurrencyNegativePattern) {
-    case 0:
-      postfix = prefixs[3];
-      negativeFormat = '\\(' + signCurrencyFormat + numberFormat + '\\)';
-      break;
-    case 1:
-      negativeFormat = '\\-' + signCurrencyFormat + numberFormat;
-      break;
-    case 2:
-      negativeFormat = signCurrencyFormat + '\\ \\-' + numberFormat;
-      break;
-    case 3:
-      postfix = prefixs[1];
-      negativeFormat = signCurrencyFormat + '\\ ' + numberFormat + '\\-';
-      break;
-    case 4:
-      postfix = prefixs[3];
-      negativeFormat = '\\(' + numberFormat + signCurrencyFormatEnd + '\\)';
-      break;
-    case 5:
-      negativeFormat = '\\-' + numberFormat + signCurrencyFormatEnd;
-      break;
-    case 6:
-      negativeFormat = numberFormat + '\\-' + signCurrencyFormatEnd;
-      break;
-    case 7:
-      postfix = prefixs[1];
-      negativeFormat = numberFormat + signCurrencyFormatEnd + '\\-';
-      break;
-    case 8:
-      negativeFormat = '\\-' + numberFormat + '\\ ' + signCurrencyFormatEnd;
-      break;
-    case 9:
-      negativeFormat = '\\-' + signCurrencyFormat + '\\ ' + numberFormat;
-      break;
-    case 10:
-      postfix = prefixs[1];
-      negativeFormat = numberFormat + '\\ ' + signCurrencyFormatEnd + '\\-';
-      break;
-    case 11:
-      postfix = prefixs[1];
-      negativeFormat = signCurrencyFormat + '\\ ' + numberFormat + '\\-';
-      break;
-    case 12:
-      negativeFormat = signCurrencyFormat + '\\ \\-' + numberFormat;
-      break;
-    case 13:
-      negativeFormat = numberFormat + '\\-\\ ' + signCurrencyFormatEnd;
-      break;
-    case 14:
-      postfix = prefixs[3];
-      negativeFormat = '(' + signCurrencyFormat + numberFormat + '\\)';
-      break;
-    case 15:
-      postfix = prefixs[3];
-      negativeFormat = '\\(' + numberFormat + signCurrencyFormatEnd + '\\)';
-      break;
-  }
-  switch (cultureInfo.CurrencyPositivePattern) {
-    case 0:
-      positiveFormat = signCurrencyFormat + numberFormat;
-      break;
-    case 1:
-      positiveFormat = numberFormat + signCurrencyFormatEnd;
-      break;
-    case 2:
-      positiveFormat = signCurrencyFormat + '\\ ' + numberFormat;
-      break;
-    case 3:
-      positiveFormat = numberFormat + '\\ ' + signCurrencyFormatEnd;
-      break;
-  }
-  positiveFormat = positiveFormat + postfix;
-  return positiveFormat + ';' + red + negativeFormat;
-}
-
-function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_currencyLocale) {
-  var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
-  var numberFormat;
-  var nullSignFormat;
-  if (opt_fraction) {
-    numberFormat = '#,##0.00';
-    nullSignFormat = '* "-"??';
-  } else {
-    numberFormat = '#,##0';
-    nullSignFormat = '* "-"';
-  }
-  var signCurrencyFormat;
-  var signCurrencyFormatEnd;
-  if (opt_currency) {
-    if (opt_currencyLocale) {
-      signCurrencyFormat = '[$' + cultureInfo.CurrencySymbol + '-' + cultureInfo.LCID.toString(16).toUpperCase() + ']';
-    } else {
-      signCurrencyFormat = '"' + cultureInfo.CurrencySymbol + '"';
-    }
-    signCurrencyFormatEnd = signCurrencyFormat;
-  } else {
-    signCurrencyFormatEnd = signCurrencyFormat = '';
-    for (var i = 0; i < cultureInfo.CurrencySymbol.length; ++i) {
-      signCurrencyFormatEnd += '_' + cultureInfo.CurrencySymbol[i];
-    }
-  }
-
-  var prefixs = ['_ ', '_-', '_(', '_)'];
-  var prefix = prefixs[0];
-  var postfix = prefixs[0];
-  var positiveNumberFormat = '* ' + numberFormat;
-  var positiveFormat;
-  var negativeFormat;
-  var nullFormat;
-  switch (cultureInfo.CurrencyNegativePattern) {
-    case 0:
-      prefix = prefixs[2];
-      postfix = prefixs[3];
-      negativeFormat = prefix + signCurrencyFormat + '* \\(' + numberFormat + '\\)';
-      break;
-    case 1:
-      prefix = postfix = prefixs[1];
-      negativeFormat = '\\-' + signCurrencyFormat + '* ' + numberFormat + postfix;
-      break;
-    case 2:
-      negativeFormat = prefix + signCurrencyFormat + '\\ * \\-' + numberFormat + postfix;
-      break;
-    case 3:
-      prefix = postfix = prefixs[1];
-      negativeFormat = prefix + signCurrencyFormat + '\\ * ' + numberFormat + '\\-';
-      break;
-    case 4:
-      prefix = prefixs[2];
-      postfix = prefixs[3];
-      negativeFormat = prefix + '* \\(' + numberFormat + '\\)' + signCurrencyFormatEnd + postfix;
-      break;
-    case 5:
-      prefix = postfix = prefixs[1];
-      negativeFormat = '\\-* ' + numberFormat + signCurrencyFormatEnd + postfix;
-      break;
-    case 6:
-      negativeFormat = prefix + '* ' + numberFormat + '\\-' + signCurrencyFormatEnd + postfix;
-      break;
-    case 7:
-      negativeFormat = prefix + '* ' + numberFormat + signCurrencyFormatEnd + '\\-';
-      break;
-    case 8:
-      prefix = postfix = prefixs[1];
-      negativeFormat = '\\-* ' + numberFormat + '\\ ' + signCurrencyFormatEnd + postfix;
-      break;
-    case 9:
-      prefix = postfix = prefixs[1];
-      negativeFormat = '\\-' + signCurrencyFormat + '\\ * ' + numberFormat + postfix;
-      break;
-    case 10:
-      negativeFormat = prefix + '* ' + numberFormat + '\\ ' + signCurrencyFormatEnd + '\\-';
-      break;
-    case 11:
-      negativeFormat = prefix + signCurrencyFormat + '\\ * ' + numberFormat + '\\-';
-      break;
-    case 12:
-      negativeFormat = prefix + signCurrencyFormat + '\\ * \\-' + numberFormat + postfix;
-      break;
-    case 13:
-      negativeFormat = prefix + '* ' + numberFormat + '\\-\\ ' + signCurrencyFormatEnd + postfix;
-      break;
-    case 14:
-      prefix = prefixs[2];
-      postfix = prefixs[3];
-      negativeFormat = prefix + signCurrencyFormat + '\\ * \\(' + numberFormat + '\\)';
-      break;
-    case 15:
-      prefix = prefixs[2];
-      postfix = prefixs[3];
-      negativeFormat = prefix + '* \\(' + numberFormat + '\\)\\ ' + signCurrencyFormatEnd + postfix;
-      break;
-  }
-  switch (cultureInfo.CurrencyPositivePattern) {
-    case 0:
-      positiveFormat = signCurrencyFormat + positiveNumberFormat;
-      nullFormat = signCurrencyFormat + nullSignFormat;
-      break;
-    case 1:
-      positiveFormat = positiveNumberFormat + signCurrencyFormatEnd;
-      nullFormat = nullSignFormat + signCurrencyFormatEnd;
-      break;
-    case 2:
-      positiveFormat = signCurrencyFormat + '\\ ' + positiveNumberFormat;
-      nullFormat = signCurrencyFormat + '\\ ' + nullSignFormat;
-      break;
-    case 3:
-      positiveFormat = positiveNumberFormat + '\\ ' + signCurrencyFormatEnd;
-      nullFormat = nullSignFormat + '\\ ' + signCurrencyFormatEnd;
-      break;
-  }
-  positiveFormat = prefix + positiveFormat + postfix;
-  nullFormat = prefix + nullFormat + postfix;
-  var textFormat = prefix + '@' + postfix;
-  return positiveFormat + ';' + negativeFormat + ';' + nullFormat + ';' + textFormat;
-}
-
 	//----------------------------------------------------------export----------------------------------------------------
 	var prot;
 	window['Asc'] = window['Asc'] || {};
@@ -7996,8 +7784,6 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].DateGroupItem = DateGroupItem;
 	window['AscCommonExcel'].SortCondition = SortCondition;
 	window['AscCommonExcel'].AutoFilterDateElem = AutoFilterDateElem;
-  window['AscCommonExcel'].getCurrencyFormatSimple = getCurrencyFormatSimple;
-  window['AscCommonExcel'].getCurrencyFormat = getCurrencyFormat;
 
 window["Asc"]["CustomFilters"]			= window["Asc"].CustomFilters = CustomFilters;
 prot									= CustomFilters.prototype;

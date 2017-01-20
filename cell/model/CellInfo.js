@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -266,7 +266,7 @@
     this.isLockedTable = false;
     this.isLockedSparkline = false;
     this.styleName = null;
-    this.numFormatType = null;
+    this.numFormatInfo = null;
     this.angle = null;
     this.autoFilterInfo = null;
     this.formatTableInfo = null;
@@ -324,8 +324,8 @@
   asc_CCellInfo.prototype.asc_getStyleName = function () {
     return this.styleName;
   };
-  asc_CCellInfo.prototype.asc_getNumFormatType = function () {
-    return this.numFormatType;
+  asc_CCellInfo.prototype.asc_getNumFormatInfo = function () {
+    return this.numFormatInfo;
   };
   asc_CCellInfo.prototype.asc_getAngle = function () {
     return this.angle;
@@ -467,7 +467,7 @@
   prot["asc_getLockedTable"] = prot.asc_getLockedTable;
   prot["asc_getLockedSparkline"] = prot.asc_getLockedSparkline;
   prot["asc_getStyleName"] = prot.asc_getStyleName;
-  prot["asc_getNumFormatType"] = prot.asc_getNumFormatType;
+  prot["asc_getNumFormatInfo"] = prot.asc_getNumFormatInfo;
   prot["asc_getAngle"] = prot.asc_getAngle;
   prot["asc_getAutoFilterInfo"] = prot.asc_getAutoFilterInfo;
   prot["asc_getFormatTableInfo"] = prot.asc_getFormatTableInfo;

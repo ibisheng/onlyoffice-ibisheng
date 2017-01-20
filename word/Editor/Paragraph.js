@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -4077,7 +4077,7 @@ Paragraph.prototype =
             SearchPos.InText = false;
 
         // Такое возможно, если все раны до этого (в том числе и этот) были пустыми, тогда, чтобы не возвращать
-        // неправильную позицию вернем позицию начала данного путого рана.
+        // неправильную позицию вернем позицию начала данного пустого рана.
         if ( SearchPos.DiffX > 1000000 - 1 )
         {
             SearchPos.Line  = -1;
@@ -6937,7 +6937,7 @@ Paragraph.prototype =
         }
 
         var Para = null;
-        if ( true === this.Selection_IsFromStart() && true === this.Selection_CheckParaEnd() )
+        if ( true === this.Selection_IsFromStart(true) && true === this.Selection_CheckParaEnd() )
         {
             Para = this.Copy(this.Parent);
             DocContent.Add( new CSelectedElement( Para, true ) );
@@ -8340,24 +8340,26 @@ Paragraph.prototype =
     },
 
     // Проверяем находится ли курсор в начале параграфа
-    Cursor_IsStart : function(_ContentPos)
+    Cursor_IsStart : function(_ContentPos, bCheckAnchors)
     {
-        // Просто попробуем переместится вправо от текущего положения, если мы не можем, значит
-        // мы стоим в конце параграфа.
+		// Просто попробуем переместится вправо от текущего положения, если мы не можем, значит
+		// мы стоим в конце параграфа.
 
-        var ContentPos = ( undefined === _ContentPos ? this.Get_ParaContentPos( false, false ) : _ContentPos );
-        var SearchPos  = new CParagraphSearchPos();
+		var ContentPos = ( undefined === _ContentPos ? this.Get_ParaContentPos(false, false) : _ContentPos );
+		var SearchPos  = new CParagraphSearchPos();
+		if (true === bCheckAnchors)
+			SearchPos.SetCheckAnchors();
 
-        this.Get_LeftPos( SearchPos, ContentPos );
+		this.Get_LeftPos(SearchPos, ContentPos);
 
-        if ( true === SearchPos.Found )
-            return false;
-        else
-            return true;
+		if (true === SearchPos.Found)
+			return false;
+		else
+			return true;
     },
 
     // Проверим, начинается ли выделение с начала параграфа
-    Selection_IsFromStart : function()
+    Selection_IsFromStart : function(bCheckAnchors)
     {
         if ( true === this.Is_SelectionUse() )
         {
@@ -8367,7 +8369,7 @@ Paragraph.prototype =
             if ( StartPos.Compare(EndPos) > 0 )
                 StartPos = EndPos;
             
-            if ( true != this.Cursor_IsStart( StartPos ) )
+            if ( true != this.Cursor_IsStart( StartPos, bCheckAnchors ) )
                 return false;
 
             return true;
@@ -12966,7 +12968,17 @@ function CParagraphSearchPos()
     this.UpdatePos   = false;
     
     this.ForSelection = false;
+
+    this.CheckAnchors = false;
 }
+CParagraphSearchPos.prototype.SetCheckAnchors = function(bCheck)
+{
+	this.CheckAnchors = bCheck;
+};
+CParagraphSearchPos.prototype.IsCheckAnchors = function()
+{
+	return this.CheckAnchors;
+};
 
 function CParagraphSearchPosXY()
 {

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -2841,32 +2841,36 @@ ParaMath.prototype.Cursor_MoveToEndPos = function(SelectFromEnd)
 
 ParaMath.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd, Flag) // получить логическую позицию по XY
 {
-    var Result = false;
+	var Result = false;
 
-    var CurX = SearchPos.CurX;
+	var CurX = SearchPos.CurX;
 
+	var MathX = SearchPos.CurX;
+	var MathW = this.Root.Get_Width(_CurLine, _CurRange);
 
-    if(SearchPos.X > SearchPos.CurX || SearchPos.DiffX > 1000000 - 1) // Необходимая проверка, если случайно пришла ф-ия поиска позиции, без этой проверки будет некорректно выполнен поиск (если внутри формулы есть мат объекты => позиции поиска перетрутся в CMathBase)
-    {
-        Result = this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
+	// Если мы попадаем четко в формулу, тогда ищем внутри нее, если нет, тогда не заходим внутрь
+	if ((SearchPos.X > MathX && SearchPos.X < MathX + MathW) || SearchPos.DiffX > 1000000 - 1)
+	{
+		Result = this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
 
-        if(SearchPos.InText)
-            SearchPos.DiffX  = 0.001; // чтобы всегда встать в формулу, если попали в текст
-    }
+		if (SearchPos.InText)
+			SearchPos.DiffX = 0.001; // чтобы всегда встать в формулу, если попали в текст
 
-    // Такое возможно, если все элементы до этого (в том числе и этот) были пустыми, тогда, чтобы не возвращать
-    // неправильную позицию вернем позицию начала данного элемента.
-    if (SearchPos.DiffX > 1000000 - 1)
-    {
-        this.Get_StartPos(SearchPos.Pos, Depth);
-        Result = true;
-    }
+		// Если мы попадаем в формулу, тогда не ищем позицию вне ее
+		if (Result)
+			SearchPos.DiffX = 0;
+	}
 
+	// Такое возможно, если все элементы до этого (в том числе и этот) были пустыми, тогда, чтобы не возвращать
+	// неправильную позицию вернем позицию начала данного элемента.
+	if (SearchPos.DiffX > 1000000 - 1)
+	{
+		this.Get_StartPos(SearchPos.Pos, Depth);
+		Result = true;
+	}
 
-    SearchPos.CurX = CurX + this.Root.Get_Width(_CurLine, _CurRange);
-
-
-    return Result;
+	SearchPos.CurX = CurX + MathW;
+	return Result;
 };
 
 ParaMath.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos) // получить текущую логическую позицию
@@ -3184,6 +3188,9 @@ ParaMath.prototype.Handle_AddNewLine = function()
  */
 ParaMath.prototype.Split = function (ContentPos, Depth)
 {
+	if (this.Cursor_Is_End())
+		return new ParaRun(this.Paragraph, false);
+
     var NewParaMath = new ParaMath();
     NewParaMath.Jc = this.Jc;
 

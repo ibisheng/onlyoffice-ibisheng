@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1374,6 +1374,8 @@
 	window['AscDFH'].historyitem_Table_Distance              = window['AscDFH'].historyitem_type_Table | 23;
 	window['AscDFH'].historyitem_Table_Pr                    = window['AscDFH'].historyitem_type_Table | 24;
 	window['AscDFH'].historyitem_Table_TableLayout           = window['AscDFH'].historyitem_type_Table | 25;
+	window['AscDFH'].historyitem_Table_TableDescription      = window['AscDFH'].historyitem_type_Table | 26;
+	window['AscDFH'].historyitem_Table_TableCaption          = window['AscDFH'].historyitem_type_Table | 27;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе CTableRow
 	//------------------------------------------------------------------------------------------------------------------
@@ -2946,6 +2948,7 @@
 		//    Long     : позиции элементов
 		//    Variable : Item
 		// }
+		// Long : Поле Color
 
 		var bArray = this.UseArray;
 		var nCount = this.Items.length;
@@ -2979,6 +2982,15 @@
 		Writer.Seek(nStartPos);
 		Writer.WriteLong(nRealCount);
 		Writer.Seek(nEndPos);
+
+		var nColor = 0;
+		if (undefined !== this.Color)
+		{
+			nColor |= 1;
+			if (true === this.Color)
+				nColor |= 2;
+		}
+		Writer.WriteLong(nColor);
 	};
 	CChangesBaseContentChange.prototype.ReadFromBinary = function(Reader)
 	{
@@ -2988,6 +3000,7 @@
 		//    Long     : позиции элементов
 		//    Variable : Item
 		// }
+		// Long : поле Color
 
 		this.UseArray = true;
 		this.Items    = [];
@@ -2999,6 +3012,10 @@
 			this.PosArray[nIndex] = Reader.GetLong();
 			this.Items[nIndex]    = this.private_ReadItem(Reader);
 		}
+
+		var nColor = Reader.GetLong();
+		if (nColor & 1)
+			this.Color = (nColor & 2) ? true : false;
 	};
 	CChangesBaseContentChange.prototype.private_WriteItem = function(Writer, Item)
 	{

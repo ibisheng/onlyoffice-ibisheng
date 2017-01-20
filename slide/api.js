@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -157,6 +157,9 @@
 			this.severalCharts      = obj.severalCharts != undefined ? obj.severalCharts : false;
 			this.severalChartTypes  = obj.severalChartTypes != undefined ? obj.severalChartTypes : undefined;
 			this.severalChartStyles = obj.severalChartStyles != undefined ? obj.severalChartStyles : undefined;
+
+			this.title = obj.title != undefined ? obj.title : undefined;
+			this.description = obj.description != undefined ? obj.description : undefined;
 		}
 		else
 		{
@@ -170,6 +173,8 @@
 			this.severalCharts      = false;
 			this.severalChartTypes  = undefined;
 			this.severalChartStyles = undefined;
+            this.title = undefined;
+            this.description = undefined;
 		}
 	}
 
@@ -403,6 +408,24 @@
 	CAscChartProp.prototype.asc_setWidth  = function(v)
 	{
 		this.Width = v;
+	};
+
+	CAscChartProp.prototype.asc_setTitle = function(v)
+	{
+		this.title = v;
+	};
+	CAscChartProp.prototype.asc_setDescription  = function(v)
+	{
+		this.description = v;
+	};
+
+	CAscChartProp.prototype.asc_getTitle = function()
+	{
+		return this.title;
+	};
+	CAscChartProp.prototype.asc_getDescription  = function()
+	{
+		return this.description;
 	};
 
 	CAscChartProp.prototype.getType = function()
@@ -2183,6 +2206,19 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_onClearPropObj", prop);
 	};
 
+	// mobile version methods:
+	asc_docs_api.prototype.asc_GetDefaultTableStyles = function()
+	{
+		var logicDoc = this.WordControl.m_oLogicDocument;
+		if (!logicDoc)
+			return;
+
+		if (logicDoc.CurPage >= logicDoc.Slides.length)
+			return;
+
+		var tableLook = new CTableLook(true, true, false, false, true, false);
+		logicDoc.CheckTableStyles(logicDoc.Slides[logicDoc.CurPage], tableLook);
+	};
 
 	asc_docs_api.prototype.CollectHeaders                  = function()
 	{
@@ -3888,6 +3924,9 @@ background-repeat: no-repeat;\
 		ImagePr.Width      = null === obj.Width ? null : parseFloat(obj.Width);
 		ImagePr.Height     = null === obj.Height ? null : parseFloat(obj.Height);
 
+		ImagePr.title       = obj.title;
+		ImagePr.description = obj.description;
+
 		if (undefined != obj.Position)
 		{
 			ImagePr.Position =
@@ -4122,6 +4161,20 @@ background-repeat: no-repeat;\
 		if (!bIsFreeze)
 			this.WordControl.OnScroll();
 	};
+
+
+	asc_docs_api.prototype.AddShapeOnCurrentPage = function(sPreset){
+		if(!this.WordControl.m_oLogicDocument){
+			return;
+		}
+        this.WordControl.m_oLogicDocument.AddShapeOnCurrentPage(sPreset);
+	}
+	asc_docs_api.prototype.can_CopyCut = function(){
+		if(!this.WordControl.m_oLogicDocument){
+			return false;
+		}
+        return this.WordControl.m_oLogicDocument.Can_CopyCut();
+	}
 
 	/*----------------------------------------------------------------*/
 	/*functions for working with zoom & navigation*/
@@ -6868,7 +6921,12 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_AddMath"]           			  = asc_docs_api.prototype.asc_AddMath;
 	asc_docs_api.prototype["asc_SetMathProps"]           		  = asc_docs_api.prototype.asc_SetMathProps;
 
+	// mobile
+	asc_docs_api.prototype["asc_GetDefaultTableStyles"]           	= asc_docs_api.prototype.asc_GetDefaultTableStyles;
 	asc_docs_api.prototype["asc_Remove"] 							= asc_docs_api.prototype.asc_Remove;
+	asc_docs_api.prototype["AddShapeOnCurrentPage"] 				= asc_docs_api.prototype.AddShapeOnCurrentPage;
+	asc_docs_api.prototype["can_CopyCut"] 							= asc_docs_api.prototype.can_CopyCut;
+
 
 	window['Asc']['asc_CCommentData'] = window['Asc'].asc_CCommentData = asc_CCommentData;
 	asc_CCommentData.prototype['asc_getText']         = asc_CCommentData.prototype.asc_getText;
@@ -6974,6 +7032,10 @@ background-repeat: no-repeat;\
 	CAscChartProp.prototype['asc_setStyleId']         = CAscChartProp.prototype.asc_setStyleId;
 	CAscChartProp.prototype['asc_setHeight']          = CAscChartProp.prototype.asc_setHeight;
 	CAscChartProp.prototype['asc_setWidth']           = CAscChartProp.prototype.asc_setWidth;
+	CAscChartProp.prototype['asc_putTitle']           = CAscChartProp.prototype['put_Title']           = CAscChartProp.prototype['asc_setTitle']           = CAscChartProp.prototype.asc_setTitle;
+	CAscChartProp.prototype['asc_putDescription']     = CAscChartProp.prototype['put_Description']     = CAscChartProp.prototype['asc_setDescription']     = CAscChartProp.prototype.asc_setDescription;
+	CAscChartProp.prototype['asc_getTitle']           = CAscChartProp.prototype.asc_getTitle;
+	CAscChartProp.prototype['asc_getDescription']     = CAscChartProp.prototype.asc_getDescription;
 	CAscChartProp.prototype['getType']                = CAscChartProp.prototype.getType;
 	CAscChartProp.prototype['putType']                = CAscChartProp.prototype.putType;
 	CAscChartProp.prototype['getStyle']               = CAscChartProp.prototype.getStyle;

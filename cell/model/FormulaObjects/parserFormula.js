@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -472,7 +472,7 @@ Date.prototype.getExcelDate = function () {
     return Math.floor( this.getExcelDateWithTime() );
 };
 
-Date.prototype.getExcelDateWithTime = function () {
+Date.prototype['getExcelDateWithTime'] = Date.prototype.getExcelDateWithTime = function () {
 //    return Math.floor( ( this.getTime() / 1000 - this.getTimezoneOffset() * 60 ) / c_sPerDay + ( AscCommonExcel.c_DateCorrectConst + (bDate1904 ? 0 : 1) ) );
     var year = this.getUTCFullYear(), month = this.getUTCMonth(), date = this.getUTCDate(), res;
 
@@ -3903,7 +3903,7 @@ function parserFormula( formula, parent, _ws ) {
 				eventData.isRebuild = false;
 			} else if (AscCommon.c_oNotifyType.ChangeDefName === data.type) {
 				if (!data.to) {
-					this.removeTableName(data.from);
+					this.removeTableName(data.from, data.bConvertTableFormulaToRef);
 					eventData.isRebuild = true;
 				} else if (data.from.name != data.to.name) {
 					this.changeDefName(data.from, data.to);
@@ -4889,12 +4889,19 @@ parserFormula.prototype.calculate = function(opt_defName, opt_range) {
 			}
 		}
 	};
-	parserFormula.prototype.removeTableName = function(defName) {
+	parserFormula.prototype.removeTableName = function(defName, bConvertTableFormulaToRef) {
 		var i, elem;
 		for (i = 0; i < this.outStack.length; i++) {
 			elem = this.outStack[i];
 			if (elem.type == cElementType.table && elem.tableName == defName.name) {
-				this.outStack[i] = new cError(cErrorType.bad_reference);
+				if(bConvertTableFormulaToRef)
+				{
+					this.outStack[i] = this.outStack[i].toRef();
+				}
+				else
+				{
+					this.outStack[i] = new cError(cErrorType.bad_reference);
+				}
 			}
 		}
 	};
