@@ -472,7 +472,7 @@ Date.prototype.getExcelDate = function () {
     return Math.floor( this.getExcelDateWithTime() );
 };
 
-Date.prototype.getExcelDateWithTime = function () {
+Date.prototype['getExcelDateWithTime'] = Date.prototype.getExcelDateWithTime = function () {
 //    return Math.floor( ( this.getTime() / 1000 - this.getTimezoneOffset() * 60 ) / c_sPerDay + ( AscCommonExcel.c_DateCorrectConst + (bDate1904 ? 0 : 1) ) );
     var year = this.getUTCFullYear(), month = this.getUTCMonth(), date = this.getUTCDate(), res;
 
