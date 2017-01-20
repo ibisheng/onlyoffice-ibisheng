@@ -810,6 +810,8 @@ CTable.prototype =
         }
 
         Pr.PercentFullWidth = this.private_RecalculatePercentWidth();
+        Pr.TableDescription = this.Get_TableDescription();
+        Pr.TableCaption     = this.Get_TableCaption();
 
         return Pr;
     },
@@ -2025,6 +2027,18 @@ CTable.prototype =
                     this.CurCell.Set_W(new CTableMeasurement(tblwidth_Pct, Math.abs(CellsWidth)));
             }
         }
+
+        // TableDescription
+        if (undefined !== Props.TableDescription && null !== Props.TableDescription)
+		{
+			this.Set_TableDescription(Props.TableDescription);
+		}
+
+		// TableCaption
+		if (undefined !== Props.TableCaption && null !== Props.TableCaption)
+		{
+			this.Set_TableCaption(Props.TableCaption);
+		}
 
         return true;
     },
@@ -8195,6 +8209,32 @@ CTable.prototype =
     {
         return this.Get_TableBorders();
     },
+
+	Set_TableDescription : function(sDescription)
+	{
+		History.Add(new CChangesTableTableDescription(this, this.Pr.TableDescription, sDescription));
+		this.Pr.TableDescription = sDescription;
+		this.Recalc_CompiledPr();
+	},
+
+	Get_TableDescription : function()
+	{
+		var Pr = this.Get_CompiledPr(false).TablePr;
+		return Pr.TableDescription;
+	},
+
+	Set_TableCaption : function(sCaption)
+	{
+		History.Add(new CChangesTableTableCaption(this, this.Pr.TableCaption, sCaption));
+		this.Pr.TableCaption = sCaption;
+		this.Recalc_CompiledPr();
+	},
+
+	Get_TableCaption : function()
+	{
+		var Pr = this.Get_CompiledPr(false).TablePr;
+		return Pr.TableCaption;
+	},
 //-----------------------------------------------------------------------------------
 // Работаем с сеткой таблицы
 //-----------------------------------------------------------------------------------

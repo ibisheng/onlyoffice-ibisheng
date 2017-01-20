@@ -1374,6 +1374,8 @@
 	window['AscDFH'].historyitem_Table_Distance              = window['AscDFH'].historyitem_type_Table | 23;
 	window['AscDFH'].historyitem_Table_Pr                    = window['AscDFH'].historyitem_type_Table | 24;
 	window['AscDFH'].historyitem_Table_TableLayout           = window['AscDFH'].historyitem_type_Table | 25;
+	window['AscDFH'].historyitem_Table_TableDescription      = window['AscDFH'].historyitem_type_Table | 26;
+	window['AscDFH'].historyitem_Table_TableCaption          = window['AscDFH'].historyitem_type_Table | 27;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе CTableRow
 	//------------------------------------------------------------------------------------------------------------------

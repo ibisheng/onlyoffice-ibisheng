@@ -4399,6 +4399,8 @@ background-repeat: no-repeat;\
 			this.CellsWidthNotEqual = tblProp.CellsWidthNotEqual;
 			this.Locked             = (undefined != tblProp.Locked) ? tblProp.Locked : false;
 			this.PercentFullWidth   = tblProp.PercentFullWidth;
+			this.TableDescription   = tblProp.TableDescription;
+			this.TableCaption       = tblProp.TableCaption;
 		}
 		else
 		{
@@ -4661,6 +4663,22 @@ background-repeat: no-repeat;\
 	CTableProp.prototype.get_CellsWidthNotEqual = function()
 	{
 		return this.CellsWidthNotEqual;
+	};
+	CTableProp.prototype.get_TableDescription   = function()
+	{
+		return this.TableDescription;
+	};
+	CTableProp.prototype.put_TableDescription   = function(v)
+	{
+		this.TableDescription = v;
+	};
+	CTableProp.prototype.get_TableCaption       = function()
+	{
+		return this.TableCaption;
+	};
+	CTableProp.prototype.put_TableCaption       = function(v)
+	{
+		this.TableCaption = v;
 	};
 
 
@@ -9129,7 +9147,11 @@ background-repeat: no-repeat;\
 	CTableProp.prototype['put_CellsWidth']         = CTableProp.prototype.put_CellsWidth;
 	CTableProp.prototype['get_PercentFullWidth']   = CTableProp.prototype.get_PercentFullWidth;
 	CTableProp.prototype['get_CellsWidthNotEqual'] = CTableProp.prototype.get_CellsWidthNotEqual;
-	
+	CTableProp.prototype['get_TableDescription']   = CTableProp.prototype.get_TableDescription;
+	CTableProp.prototype['put_TableDescription']   = CTableProp.prototype.put_TableDescription;
+	CTableProp.prototype['get_TableCaption']       = CTableProp.prototype.get_TableCaption;
+	CTableProp.prototype['put_TableCaption']       = CTableProp.prototype.put_TableCaption;
+
 	window['Asc']['CBorders']                      = window['Asc'].CBorders = CBorders;
 	CBorders.prototype['get_Left']    = CBorders.prototype.get_Left;
 	CBorders.prototype['put_Left']    = CBorders.prototype.put_Left;

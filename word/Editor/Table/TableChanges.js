@@ -62,7 +62,8 @@ AscDFH.changesFactory[AscDFH.historyitem_Table_PositionV]             = CChanges
 AscDFH.changesFactory[AscDFH.historyitem_Table_Distance]              = CChangesTableDistance;
 AscDFH.changesFactory[AscDFH.historyitem_Table_Pr]                    = CChangesTablePr;
 AscDFH.changesFactory[AscDFH.historyitem_Table_TableLayout]           = CChangesTableTableLayout;
-
+AscDFH.changesFactory[AscDFH.historyitem_Table_TableDescription]      = CChangesTableTableDescription;
+AscDFH.changesFactory[AscDFH.historyitem_Table_TableCaption]          = CChangesTableTableCaption;
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
 //----------------------------------------------------------------------------------------------------------------------
@@ -165,12 +166,23 @@ AscDFH.changesRelationMap[AscDFH.historyitem_Table_Pr]                    = [
 	AscDFH.historyitem_Table_TableStyleRowBandSize,
 	AscDFH.historyitem_Table_TableStyleColBandSize,
 	AscDFH.historyitem_Table_Pr,
-	AscDFH.historyitem_Table_TableLayout
+	AscDFH.historyitem_Table_TableLayout,
+	AscDFH.historyitem_Table_TableDescription,
+	AscDFH.historyitem_Table_TableCaption
 ];
 AscDFH.changesRelationMap[AscDFH.historyitem_Table_TableLayout]           = [
 	AscDFH.historyitem_Table_TableLayout,
 	AscDFH.historyitem_Table_Pr
 ];
+AscDFH.changesRelationMap[AscDFH.historyitem_Table_TableDescription] = [
+	AscDFH.historyitem_Table_TableDescription,
+	AscDFH.historyitem_Table_Pr
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_Table_TableCaption]     = [
+	AscDFH.historyitem_Table_TableCaption,
+	AscDFH.historyitem_Table_Pr
+];
+
 /**
  * Общая функция объединения изменений, которые зависят только от себя и AscDFH.historyitem_Table_Pr
  * @param oChange
@@ -1237,6 +1249,16 @@ CChangesTablePr.prototype.Merge = function(oChange)
 			this.New.TableLayout = oChange.New;
 			break;
 		}
+		case AscDFH.historyitem_Table_TableDescription:
+		{
+			this.New.TableDescription = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Table_TableCaption:
+		{
+			this.New.TableCaption = oChange.New;
+			break;
+		}
 	}
 
 	return true;
@@ -1258,3 +1280,37 @@ CChangesTableTableLayout.prototype.private_SetValue = function(Value)
 	oTable.Recalc_CompiledPr2();
 };
 CChangesTableTableLayout.prototype.Merge = private_TableChangesOnMergePr;
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseStringProperty}
+ */
+function CChangesTableTableDescription(Class, Old, New, Color)
+{
+	CChangesTableTableDescription.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(CChangesTableTableDescription, AscDFH.CChangesBaseStringProperty);
+CChangesTableTableDescription.prototype.Type = AscDFH.historyitem_Table_TableDescription;
+CChangesTableTableDescription.prototype.private_SetValue = function(Value)
+{
+	var oTable = this.Class;
+	oTable.Pr.TableDescription = Value;
+	oTable.Recalc_CompiledPr2();
+};
+CChangesTableTableDescription.prototype.Merge = private_TableChangesOnMergePr;
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseStringProperty}
+ */
+function CChangesTableTableCaption(Class, Old, New, Color)
+{
+	CChangesTableTableCaption.superclass.constructor.call(this, Class, Old, New, Color);
+}
+AscCommon.extendClass(CChangesTableTableCaption, AscDFH.CChangesBaseStringProperty);
+CChangesTableTableCaption.prototype.Type = AscDFH.historyitem_Table_TableCaption;
+CChangesTableTableCaption.prototype.private_SetValue = function(Value)
+{
+	var oTable = this.Class;
+	oTable.Pr.TableCaption = Value;
+	oTable.Recalc_CompiledPr2();
+};
+CChangesTableTableCaption.prototype.Merge = private_TableChangesOnMergePr;
