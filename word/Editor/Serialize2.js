@@ -186,7 +186,9 @@ var c_oSerProp_tblPrType = {
 	tblPrChange: 13,
 	TableCellSpacing: 14,
 	RowBandSize: 15,
-	ColBandSize: 16
+	ColBandSize: 16,
+	tblCaption: 17,
+	tblDescription: 18
 };
 var c_oSer_tblpPrType = {
     Page:0,
@@ -3519,6 +3521,16 @@ Binary_tblPrWriter.prototype =
 		if(null != tblPr.TableCellSpacing)
 		{
 			this.bs.WriteItem(c_oSerProp_tblPrType.TableCellSpacing, function(){oThis.memory.WriteDouble(tblPr.TableCellSpacing);});
+		}
+		if(null != tblPr.TableCaption)
+		{
+			this.memory.WriteByte(c_oSerProp_tblPrType.tblCaption);
+			this.memory.WriteString2(tblPr.TableCaption);
+		}
+		if(null != tblPr.TableDescription)
+		{
+			this.memory.WriteByte(c_oSerProp_tblPrType.tblDescription);
+			this.memory.WriteString2(tblPr.TableDescription);
 		}
     },
     WriteCellMar: function(cellMar)
@@ -7766,6 +7778,14 @@ Binary_tblPrReader.prototype =
 		{
 			Pr.TableCellSpacing = this.bcr.ReadDouble();
 		}
+		else if( c_oSerProp_tblPrType.tblCaption === type )
+		{
+			Pr.TableCaption = this.stream.GetString2LE(length);
+		}
+		else if( c_oSerProp_tblPrType.tblDescription === type )
+		{
+			Pr.TableDescription = this.stream.GetString2LE(length);
+		} 
 		else if(null != table)
 		{
 			if( c_oSerProp_tblPrType.tblpPr === type )
