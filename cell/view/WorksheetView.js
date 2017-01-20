@@ -9408,7 +9408,7 @@
 			}
 			
 			//apply props by cell
-			var formulaProps = {firstRange: firstRange, arrFormula: arrFormula, tablesMap: tablesMap, newVal: newVal, isOneMerge: isOneMerge};
+			var formulaProps = {firstRange: firstRange, arrFormula: arrFormula, tablesMap: tablesMap, newVal: newVal, isOneMerge: isOneMerge, val: val};
 			t._setPastedDataByCurrentRange(range, pastedRangeProps, formulaProps, specialPasteProps);
 		};
 		
@@ -9460,7 +9460,7 @@
 	{
 		var t = this;
 		
-		var firstRange, arrFormula, tablesMap, newVal, isOneMerge;
+		var firstRange, arrFormula, tablesMap, newVal, isOneMerge, val;
 		if(formulaProps)
 		{
 			//TODO firstRange возможно стоит убрать(добавлено было для правки бага 27745)
@@ -9469,6 +9469,7 @@
 			tablesMap = formulaProps.tablesMap;
 			newVal = formulaProps.newVal;
 			isOneMerge = formulaProps.isOneMerge;
+			val = formulaProps.val;
 		}
 		
 		//set formula - for paste from binary
@@ -9505,7 +9506,7 @@
 				//formula
 				if (newVal.getFormula() && !isOneMerge) {
 					var offset = range.getCells()[numFormula].getOffset2(value2[numFormula].sId);
-					var assemb, _p_ = new AscCommonExcel.parserFormula(value2[numFormula].sFormula, null, range.worksheet);
+					var assemb, _p_ = new AscCommonExcel.parserFormula(value2[numFormula].sFormula, null, val);
 
 					if (_p_.parse()) {
 						if(null !== tablesMap)
