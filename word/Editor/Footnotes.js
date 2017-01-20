@@ -219,7 +219,7 @@ CFootnotesController.prototype.Reset = function(nPageIndex, oSectPr)
 			_X += oSectPr.Get_ColumnSpace(nTempColumnIndex);
 		}
 
-		var _XLimit = (nColumnsCount - 1 !== nColumnIndex ? X + oSectPr.Get_ColumnWidth(nColumnIndex) : XLimit);
+		var _XLimit = (nColumnsCount - 1 !== nColumnIndex ? _X + oSectPr.Get_ColumnWidth(nColumnIndex) : XLimit);
 
 		var oColumn    = new CFootEndnotePageColumn();
 		oColumn.X      = _X;
@@ -3112,6 +3112,14 @@ CFootnotesController.prototype.GetColumnSize = function()
 CFootnotesController.prototype.GetCurrentSectionPr = function()
 {
 	return null;
+};
+CFootnotesController.prototype.GetColumnFields = function(nPageAbs, nColumnAbs)
+{
+	var oColumn = this.private_GetPageColumn(nPageAbs, nColumnAbs);
+	if (!oColumn)
+		return {X : 0, XLimit : 297};
+
+	return {X : oColumn.X, XLimit : oColumn.XLimit};
 };
 
 

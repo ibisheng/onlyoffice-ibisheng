@@ -9502,7 +9502,7 @@ CDocument.prototype.private_StartSelectionFromCurPos = function()
 			Y = _Y;
 		}
 
-		this.CurPage = CurPara.Get_StartPage_Absolute() + CurPara.CurPos.PagesPos;
+		this.CurPage = CurPara.Get_CurrentPage_Absolute();
 		this.Selection_SetStart(X, Y, MouseEvent);
 		MouseEvent.Type = AscCommon.g_mouse_event_type_move;
 		this.Selection_SetEnd(X, Y, MouseEvent);
@@ -12725,6 +12725,7 @@ CDocument.prototype.controller_MoveCursorUp = function(AddToSelect)
 	this.private_UpdateCursorXY(false, true);
 	var Result = this.private_MoveCursorUp(this.CurPos.RealX, this.CurPos.RealY, AddToSelect);
 
+	// TODO: Вообще Word селектит до начала данной колонки в таком случае, а не до начала документа
 	if (true === AddToSelect && true !== Result)
 		this.Cursor_MoveToStartPos(true);
 

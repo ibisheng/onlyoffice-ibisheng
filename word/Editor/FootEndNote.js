@@ -177,6 +177,11 @@ CFootEndnote.prototype.OnFastRecalculate = function()
 {
 	this.NeedUpdateHint = true;
 };
+CFootEndnote.prototype.Get_ColumnFields = function(ElementIndex, ColumnIndex)
+{
+	var PageAbs = this.Get_StartPage_Absolute();
+	return this.Parent.GetColumnFields(PageAbs, ColumnIndex);
+};
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
