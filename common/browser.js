@@ -114,7 +114,10 @@ AscBrowser.zoom = 1;
 AscBrowser.checkZoom = function()
 {
     if (AscBrowser.isAndroid)
-        return;
+	{
+		AscBrowser.isRetina = (Math.abs(2 - (window.devicePixelRatio / AscBrowser.zoom)) < 0.01);
+		return;
+	}
 
 	AscBrowser.zoom = 1.0;
 	AscBrowser.isRetina = false;
