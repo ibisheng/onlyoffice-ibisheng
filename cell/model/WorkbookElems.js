@@ -5717,6 +5717,9 @@ function TablePart(handlers) {
 	this.TableColumns = null;
 	this.TableStyleInfo = null;
 	
+	this.altText = null;
+	this.altTextSummary = null;
+	
 	this.result = null;
 	this.handlers = handlers;
 }
@@ -5743,6 +5746,10 @@ TablePart.prototype.clone = function() {
 			res.result.push(this.result[i].clone());
 	}
 	res.DisplayName = this.DisplayName;
+	
+	res.altText = this.altText;
+	res.altTextSummary = this.altTextSummary;
+	
 	return res;
 };
 	TablePart.prototype.renameSheetCopy = function(ws, renameParams) {
