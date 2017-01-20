@@ -2989,44 +2989,34 @@
     } else {
       defaultColor = styleOptions.wholeTable.dxf.font.getColor();
     }
-    for (var n = 1; n < 6; n++) {
-      ctx.beginPath();
-      color = null;
-      if (n == 1 && styleOptions && styleOptions.headerRow && styleOptions.headerRow.dxf.font) {
-        color = styleOptions.headerRow.dxf.font.getColor();
-      } else if (n == 5 && styleOptions && styleOptions.totalRow && styleOptions.totalRow.dxf.font) {
-        color = styleOptions.totalRow.dxf.font.getColor();
-      } else if (styleOptions && styleOptions.headerRow && styleInfo.ShowRowStripes) {
-        if ((n == 2 || (n == 5 && !styleOptions.totalRow)) && styleOptions.firstRowStripe &&
-          styleOptions.firstRowStripe.dxf.font) {
-          color = styleOptions.firstRowStripe.dxf.font.getColor();
-        } else if (n == 3 && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font) {
-          color = styleOptions.secondRowStripe.dxf.font.getColor();
-        } else {
-          color = defaultColor
-        }
-      } else if (styleOptions && !styleOptions.headerRow && styleInfo.ShowRowStripes) {
-        if ((n == 1 || n == 3 || (n == 5 && !styleOptions.totalRow)) && styleOptions.firstRowStripe &&
-          styleOptions.firstRowStripe.dxf.font) {
-          color = styleOptions.firstRowStripe.dxf.font.getColor();
-        } else if ((n == 2 || n == 4) && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font) {
-          color = styleOptions.secondRowStripe.dxf.font.getColor();
-        } else {
-          color = defaultColor
-        }
-      } else {
-        color = defaultColor;
-      }
-      ctx.setStrokeStyle(color);
-      var k = 0;
-      var strY = n * stepY - stepY / 2;
-      while (k < 6) {
-        ctx.lineHor(k * stepX + 3 * pxToMM, strY, (k + 1) * stepX - 2 * pxToMM);
-        k++;
-      }
-      ctx.stroke();
-      ctx.closePath();
-    }
+	
+	var headerRowCount = 1;
+	var totalsRowCount = 0;
+	if(null != styleInfo.HeaderRowCount)
+		headerRowCount = styleInfo.HeaderRowCount;
+	if(null != styleInfo.TotalsRowCount)
+		totalsRowCount = styleInfo.TotalsRowCount;
+	
+	var bbox = {c1: 0, r1: 0, c2: 4, r2: 4};
+	for (var i = 0; i < 5; i++) {
+	  var strY = (i + 1) * stepY - stepY / 2;
+	  for (var j = 0; j < 5; j++) {
+		color = defaultColor;
+		var curStyle = style.getStyle(bbox, i, j, styleInfo, headerRowCount, totalsRowCount);
+		if(curStyle && curStyle.font && curStyle.font.c)
+		{
+			color = curStyle.font.c;
+		}
+		
+		ctx.beginPath();
+		ctx.setStrokeStyle(color);
+		
+		ctx.lineHor(j * stepX + 3 * pxToMM, strY, (j + 1) * stepX - 2 * pxToMM);
+		
+		ctx.stroke();
+		ctx.closePath();
+	  }
+	}
 
     return canvas.toDataURL("image/png");
   };
