@@ -9438,7 +9438,7 @@
                                 //formula
                                 if (newVal.getFormula() && !isOneMerge) {
                                     var offset = range.getCells()[numFormula].getOffset2(
-                                      value2[numFormula].sId), assemb, _p_ = new AscCommonExcel.parserFormula(value2[numFormula].sFormula, null, range.worksheet);
+                                      value2[numFormula].sId), assemb, _p_ = new AscCommonExcel.parserFormula(value2[numFormula].sFormula, null, val);
 
                                     if (_p_.parse()) {
 										if(null !== tablesMap)
