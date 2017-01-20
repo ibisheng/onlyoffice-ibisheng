@@ -272,11 +272,6 @@
       this.canvasGraphicOverlay = document.getElementById("ws-canvas-graphic-overlay");
     }
 
-    // Для мобильных не поддерживаем ретину
-    if (this.Api.isMobileVersion) {
-      AscBrowser.isRetina = false;
-    }
-
     this.buffers.main = new asc.DrawingContext({
       canvas: this.canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
     });

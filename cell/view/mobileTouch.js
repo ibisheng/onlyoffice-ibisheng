@@ -47,6 +47,7 @@ function (window, undefined)
 	 */
 	function CMobileDelegateEditorCell(_manager)
 	{
+		this.Name = "cell";
 		this.WB = _manager.Api.wb;
 		this.DrawingDocument = this.WB.getWorksheet().objectRender.drawingDocument;
 
@@ -67,6 +68,12 @@ function (window, undefined)
 		var _res = this.WB.ConvertLogicToXY(x, y);
 		var _point = {X: _res.X, Y: _res.Y, Page: 0, DrawPage: 0};
 
+		if (AscBrowser.isRetina)
+		{
+			_point.X >>= 1;
+			_point.Y >>= 1;
+		}
+
 		if (isGlobal !== false)
 		{
 			_point.X += this.Offset.X;
@@ -77,7 +84,16 @@ function (window, undefined)
 	};
 	CMobileDelegateEditorCell.prototype.ConvertCoordsFromCursor = function(x, y)
 	{
-		var _res = this.WB.ConvertXYToLogic(x - this.Offset.X, y - this.Offset.Y);
+		var _x = x - this.Offset.X;
+		var _y = y - this.Offset.Y;
+
+		if (AscBrowser.isRetina)
+		{
+			_x <<= 1;
+			_y <<= 1;
+		}
+
+		var _res = this.WB.ConvertXYToLogic(_x, _y);
 		var _point = {X: _res.X, Y: _res.Y, Page: 0, DrawPage: 0};
 		return _point;
 	};
@@ -742,6 +758,8 @@ function (window, undefined)
 			ctx.fillStyle = "rgba(" + color.r + "," + color.g + "," + color.b + "," + color.a + ")";
 		}
 
+		var _koef = AscCommon.AscBrowser.isRetina ? 2 : 1;
+
 		if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
 		{
 			var pos1 = this.delegate.ConvertCoordsToCursor(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1, false);
@@ -754,11 +772,11 @@ function (window, undefined)
 			{
 				ctx.beginPath();
 
-				ctx.moveTo(pos1.X >> 0, pos1.Y >> 0);
-				ctx.lineTo(pos2.X >> 0, pos2.Y >> 0);
+				ctx.moveTo((_koef * pos1.X) >> 0, (_koef * pos1.Y) >> 0);
+				ctx.lineTo((_koef * pos2.X) >> 0, (_koef * pos2.Y) >> 0);
 
-				ctx.moveTo(pos3.X >> 0, pos3.Y >> 0);
-				ctx.lineTo(pos4.X >> 0, pos4.Y >> 0);
+				ctx.moveTo((_koef * pos3.X) >> 0, (_koef * pos3.Y) >> 0);
+				ctx.lineTo((_koef * pos4.X) >> 0, (_koef * pos4.Y) >> 0);
 
 				ctx.lineWidth = 2;
 				ctx.stroke();
@@ -768,8 +786,8 @@ function (window, undefined)
 
 			var _offset = (undefined === color) ? 5 : 0;
 
-			overlay.AddEllipse(pos1.X, pos1.Y - _offset, AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
-			overlay.AddEllipse(pos4.X, pos4.Y + _offset, AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
+			overlay.AddEllipse(_koef * pos1.X, _koef * (pos1.Y - _offset), _koef * AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
+			overlay.AddEllipse(_koef * pos4.X, _koef * (pos4.Y + _offset), _koef * AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
 			ctx.fill();
 
 			ctx.beginPath();
@@ -798,11 +816,11 @@ function (window, undefined)
 			{
 				ctx.beginPath();
 
-				ctx.moveTo(pos1.X, pos1.Y);
-				ctx.lineTo(pos2.X, pos2.Y);
+				ctx.moveTo(_koef * pos1.X, _koef * pos1.Y);
+				ctx.lineTo(_koef * pos2.X, _koef * pos2.Y);
 
-				ctx.moveTo(pos3.X, pos3.Y);
-				ctx.lineTo(pos4.X, pos4.Y);
+				ctx.moveTo(_koef * pos3.X, _koef * pos3.Y);
+				ctx.lineTo(_koef * pos4.X, _koef * pos4.Y);
 
 				ctx.lineWidth = 2;
 				ctx.stroke();
@@ -831,13 +849,13 @@ function (window, undefined)
 				var _x2 = (pos4.X + ex) >> 0;
 				var _y2 = (pos4.Y + ey) >> 0;
 
-				overlay.AddEllipse(_x1, _y1, AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
-				overlay.AddEllipse(_x2, _y2, AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
+				overlay.AddEllipse(_koef * _x1, _koef * _y1, _koef * AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
+				overlay.AddEllipse(_koef * _x2, _koef * _y2, _koef * AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
 			}
 			else
 			{
-				overlay.AddEllipse(pos1.X, pos1.Y, AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
-				overlay.AddEllipse(pos4.X, pos4.Y, AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
+				overlay.AddEllipse(_koef * pos1.X, _koef * pos1.Y, _koef * AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
+				overlay.AddEllipse(_koef * pos4.X, _koef * pos4.Y, _koef * AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
 			}
 			ctx.fill();
 

@@ -45,6 +45,7 @@
 	 */
 	function CMobileTouchManager(_config)
 	{
+		this.Name = "word";
 		CMobileTouchManager.superclass.constructor.call(this, _config || {});
 	}
 	AscCommon.extendClass(CMobileTouchManager, AscCommon.CMobileTouchManagerBase);

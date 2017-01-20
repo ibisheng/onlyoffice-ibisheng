@@ -45,6 +45,7 @@
 	 */
 	function CMobileDelegateEditorPresentation(_manager)
 	{
+		this.Name = "slide";
 		CMobileDelegateEditorPresentation.superclass.constructor.call(this, _manager);
 	}
 	AscCommon.extendClass(CMobileDelegateEditorPresentation, AscCommon.CMobileDelegateEditor);
