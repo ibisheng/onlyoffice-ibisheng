@@ -13540,7 +13540,7 @@ function DocSaveParams(bMailMergeDocx, bMailMergeHtml) {
 	this.trackRevisionId = 0;
 	this.footnotes = {};
 	this.footnotesIndex = 0;
-	this.docPrId = 0;
+	this.docPrId = 1;
 };
 function DocReadResult(doc) {
 	this.logicDocument = doc;
