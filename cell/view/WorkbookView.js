@@ -2687,51 +2687,51 @@
   };
 
   WorkbookView.prototype.af_getSmallIconTable = function (canvas, style, fmgrGraphics, oFont, props) {
-    var ctx = new Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
-    var styleOptions = style;
+	var ctx = new Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
-    //по умолчанию ставим строку заголовка и чередующиеся строки, позже нужно будет получать параметр
-    var styleInfo;
-    if (props) {
-      styleInfo = {
-        ShowColumnStripes: props.asc_getBandVer(),
-        ShowFirstColumn: props.asc_getFirstCol(),
-        ShowLastColumn: props.asc_getLastCol(),
-        ShowRowStripes: props.asc_getBandHor(),
-        HeaderRowCount: props.asc_getFirstRow(),
-        TotalsRowCount: props.asc_getLastRow()
-      };
-    } else {
-      styleInfo = {
-        ShowColumnStripes: false,
-        ShowFirstColumn: false,
-        ShowLastColumn: false,
-        ShowRowStripes: true,
-        HeaderRowCount: true,
-        TotalsRowCount: false
-      };
-    }
+	//по умолчанию ставим строку заголовка и чередующиеся строки, позже нужно будет получать параметр
+	var styleInfo;
+	if (props) {
+		styleInfo = {
+			ShowColumnStripes: props.asc_getBandVer(),
+			ShowFirstColumn: props.asc_getFirstCol(),
+			ShowLastColumn: props.asc_getLastCol(),
+			ShowRowStripes: props.asc_getBandHor(),
+			HeaderRowCount: props.asc_getFirstRow(),
+			TotalsRowCount: props.asc_getLastRow()
+		};
+	} else {
+		styleInfo = {
+			ShowColumnStripes: false,
+			ShowFirstColumn: false,
+			ShowLastColumn: false,
+			ShowRowStripes: true,
+			HeaderRowCount: true,
+			TotalsRowCount: false
+		};
+	}
 	
-    var pxToMM = 72 / 96;
+	var pxToMM = 72 / 96;
 	var startX = 1 * pxToMM;
 	var startY = 1 * pxToMM;
-	
-    var ySize = 45 * pxToMM - 2 * startY;
-    var xSize = 61 * pxToMM - 2 * startX;
 
-    var stepY = (ySize) / 5;
-    var stepX = (xSize - 1 * pxToMM) / 5;
+	var ySize = 45 * pxToMM - 2 * startY;
+	var xSize = 61 * pxToMM - 2 * startX;
+	
+	var stepY = (ySize) / 5;
+	var stepX = (xSize) / 5;
+	var lineStepX = (xSize - 1 * pxToMM) / 5;
 	
 	var whiteColor = new CColor(255, 255, 255);
-    var blackColor = new CColor(0, 0, 0);
-	
-	 var defaultColor;
-    if (!styleOptions || !styleOptions.wholeTable || !styleOptions.wholeTable.dxf.font) {
-      defaultColor = blackColor;
-    } else {
-      defaultColor = styleOptions.wholeTable.dxf.font.getColor();
-    }
-	
+	var blackColor = new CColor(0, 0, 0);
+
+	var defaultColor;
+	if (!style || !style.wholeTable || !style.wholeTable.dxf.font) {
+		defaultColor = blackColor;
+	} else {
+		defaultColor = style.wholeTable.dxf.font.getColor();
+	}
+
 	var headerRowCount = 1;
 	var totalsRowCount = 0;
 	if(null != styleInfo.HeaderRowCount)
@@ -2739,11 +2739,10 @@
 	if(null != styleInfo.TotalsRowCount)
 		totalsRowCount = styleInfo.TotalsRowCount;
 	
-	if (styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg) {
-		ctx.setFillStyle(styleOptions.wholeTable.dxf.fill.bg);
-		ctx.fillRect(startX, startY, xSize, ySize);
-	} else {
-		ctx.setFillStyle(whiteColor);
+	ctx.setFillStyle(whiteColor);
+	ctx.fillRect(0, 0, xSize + 2 * startX, ySize + 2 * startY);
+	if (style.wholeTable && style.wholeTable.dxf.fill && null != style.wholeTable.dxf.fill.bg) {
+		ctx.setFillStyle(style.wholeTable.dxf.fill.bg);
 		ctx.fillRect(startX, startY, xSize, ySize);
 	}
 	
@@ -2795,13 +2794,13 @@
 			if(curStyle && curStyle.border && curStyle.border.l && curStyle.border.l.w !== 0)
 			{
 				color = curStyle.border.l.c;
-				calculateLineVer(color, j * stepX, i * stepY, (i + 1) * stepY);
+				calculateLineVer(color, j * lineStepX, i * stepY, (i + 1) * stepY);
 			}
 			//right
 			if(curStyle && curStyle.border && curStyle.border.r && curStyle.border.r.w !== 0)
 			{
 				color = curStyle.border.r.c;
-				calculateLineVer(color, (j + 1) * stepX, i * stepY, (i + 1) * stepY);
+				calculateLineVer(color, (j + 1) * lineStepX, i * stepY, (i + 1) * stepY);
 			}
 			//top
 			if(curStyle && curStyle.border && curStyle.border.t && curStyle.border.t.w !== 0)
@@ -2822,7 +2821,7 @@
 			{
 				color = curStyle.font.c;
 			}
-			calculateLineHor(color, j * stepX + 3 * pxToMM, (i + 1) * stepY - stepY / 2, (j + 1) * stepX - 2 * pxToMM);
+			calculateLineHor(color, j * lineStepX + 3 * pxToMM, (i + 1) * stepY - stepY / 2, (j + 1) * lineStepX - 2 * pxToMM);
 		}
 	}
 
