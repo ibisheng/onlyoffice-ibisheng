@@ -423,7 +423,10 @@ CShape.prototype.handleUpdateGeometry = function()
 CShape.prototype.convertPixToMM = function(pix)
 {
     var drawingObjects =  getDrawingObjects_Sp(this);
-    return drawingObjects ? drawingObjects.convertMetric(pix, 0, 3) : 0;
+    var val = drawingObjects ? drawingObjects.convertMetric(pix, 0, 3) : 0;
+    if (AscCommon.AscBrowser.isRetina)
+        val *= 2;
+    return val;
 };
 CShape.prototype.getCanvasContext = function()
 {
