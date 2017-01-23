@@ -856,6 +856,9 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
             }
             else
             {
+            	while (CurPos < this.Content.length && para_Drawing === this.Content[CurPos].Type && false === this.Content[CurPos].Is_Inline())
+					CurPos++;
+
                 if (CurPos >= this.Content.length || para_End === this.Content[CurPos].Type)
                     return false;
 
