@@ -936,17 +936,27 @@ CMathBase.prototype.Get_TextPr = function(ContentPos, Depth)
 };
 CMathBase.prototype.Get_CompiledTextPr  = function(Copy)
 {
-    var  TextPr = this.Content[0].Get_CompiledTextPr(true, true);
+	var TextPr = null;
 
-    for(var i = 1; i < this.Content.length; i++)
-    {
-        var CurTextPr = this.Content[i].Get_CompiledTextPr(false, true);
+	var nStartPos = 0;
+	var nCount = this.Content.length;
+	while (null === TextPr && nStartPos < nCount)
+	{
+		if (this.Is_ContentUse(this.Content[nStartPos]))
+			TextPr = this.Content[nStartPos].Get_CompiledTextPr(true, true);
 
-        if ( null !== CurTextPr )
-            TextPr = TextPr.Compare( CurTextPr );
-    }
+		nStartPos++;
+	}
 
-    return TextPr;
+	for (var nPos = nStartPos; nPos < nCount; ++nPos)
+	{
+		var CurTextPr = this.Content[nPos].Get_CompiledTextPr(false, true);
+
+		if (null !== CurTextPr)
+			TextPr = TextPr.Compare(CurTextPr);
+	}
+
+	return TextPr;
 };
 CMathBase.prototype.Get_CompiledPr = function(Copy)
 {

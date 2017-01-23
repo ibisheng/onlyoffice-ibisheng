@@ -2465,6 +2465,8 @@ CMathContent.prototype.Load_FromMenu = function(Type, Paragraph)
     this.Paragraph = Paragraph;
 
     var Pr = {ctrPrp: new CTextPr()};
+    Pr.ctrPrp.Italic = true;
+    Pr.ctrPrp.RFonts.Set_All("Cambria Math", -1);
 
     var MainType = Type >> 24;
 
