@@ -1441,6 +1441,10 @@
 		}
 		return false;
 	};
+	Workbook.prototype.setActiveById=function(sheetId){
+		var ws = this.getWorksheetById(sheetId);
+		return this.setActive(ws.getIndex());
+	};
 	Workbook.prototype.getSheetIdByIndex = function(index) {
 		var ws = this.getWorksheet(index);
 		return ws ? ws.getId() : null;
