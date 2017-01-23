@@ -1570,7 +1570,8 @@
 
 		this.delegate.DrawingDocument.NeedScrollToTargetFlag = true;
 		var y = nearPos.Y;
-        nearPos.Paragraph.Parent.Cursor_MoveAt(nearPos.X, nearPos.Y, false);
+
+		nearPos.Paragraph.Parent.MoveCursorToNearestPos(nearPos);
         this.delegate.LogicDocument.Document_UpdateSelectionState();
 		this.delegate.DrawingDocument.NeedScrollToTargetFlag = false;
 
