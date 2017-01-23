@@ -1112,6 +1112,8 @@ function cArea3D( val, wsFrom, wsTo, wb ) {/*Area3D means "Sheat1!A1:E5" for exa
 	}
 	this.wsFrom = this._wb.getWorksheetByName( wsFrom ).getId();
 	this.wsTo = this._wb.getWorksheetByName( wsTo ).getId();
+	//dependenceRange allow change sheets and then independently removeDependencies
+	this.dependenceRange = null;
 }
 
 cArea3D.prototype = Object.create( cBaseType.prototype );
@@ -4642,7 +4644,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 
       /* Referens to DefinedNames */ else if (parserHelp.isName.call(this, this.Formula, this.pCurrPos, this.wb,
           this.ws)[0]) {
-        found_operand = new cName(this.operand_str, this.wb, this.ws);
+		  found_operand = new cName(this.operand_str, this.wb, this.ws);
         var defName = found_operand.getDefName();
         if (defName && defName.isTable) {
 			//need assemble becase source formula wrong
@@ -5267,6 +5269,7 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
 				this.wb.dependencyFormulas.startListeningRange(ref.getWsId(), bbox, this);
 			} else if (cElementType.cellsRange3D === ref.type && ref.isValid()) {
 				wsR = ref.range(ref.wsRange());
+				ref.dependenceRange = wsR;
 				for (var j = 0; j < wsR.length; j++) {
 					var range = wsR[j];
 					if (range) {
@@ -5327,8 +5330,8 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
 					bbox.setOffsetLast({offsetRow: 1, offsetCol: 0});
 				}
 				this.wb.dependencyFormulas.endListeningRange(ref.getWsId(), bbox, this);
-			} else if (cElementType.cellsRange3D === ref.type && ref.isValid()) {
-				wsR = ref.range(ref.wsRange());
+			} else if (cElementType.cellsRange3D === ref.type && ref.isValid() && ref.dependenceRange) {
+				wsR = ref.dependenceRange;
 				for (var j = 0; j < wsR.length; j++) {
 					var range = wsR[j];
 					if (range) {

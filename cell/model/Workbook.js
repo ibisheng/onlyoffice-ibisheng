@@ -465,32 +465,24 @@
 			}
 		},
 		removeSheet: function(sheetId, tableNames) {
+			var t = this;
 			//cells
-			var sheet = this.wb.getWorksheetById(sheetId);
-			var range = sheet.getRange3(0, 0, gc_nMaxRow0, gc_nMaxCol0);
-			range._setPropertyNoEmpty(null, null, function(cell){
-				if (cell.formulaParsed) {
-					cell.formulaParsed.removeDependencies();
+			var formulas = [];
+			this.wb.getWorksheetById(sheetId).getAllFormulas(formulas);
+			for (var i = 0; i < formulas.length; ++i) {
+				formulas[i].removeDependencies();
 				}
-			});
 			//defnames
-			var sheetContainerFrom = this.defNames.sheet[sheetId];
-			if (sheetContainerFrom) {
-				for (var name in sheetContainerFrom) {
-					var defNameOld = sheetContainerFrom[name];
-					if (!defNameOld.isTable) {
-						this._removeDefName(sheetId, name, AscCH.historyitem_Workbook_DefinedNamesChangeUndo);
+			this._foreachDefNameSheet(sheetId, function(defName){
+				if (!defName.isTable) {
+					t._removeDefName(sheetId, defName.name, AscCH.historyitem_Workbook_DefinedNamesChangeUndo);
 					}
-				}
-			}
+			});
 			//tables
 			var tableNamesMap = {};
 			for (var i = 0; i < tableNames.length; ++i) {
 				var tableName = tableNames[i];
-				var defName = this._delDefName(tableName, null);
-				if (defName) {
-					defName.removeDependencies();
-				}
+				this._removeDefName(null, tableName, null);
 				tableNamesMap[tableName] = 1;
 			}
 			//dependence
@@ -955,9 +947,11 @@
 		_removeDefName: function(sheetId, name, historyType) {
 			var defName = this._delDefName(name, sheetId);
 			if (defName) {
-				History.Create_NewPoint();
-				History.Add(AscCommonExcel.g_oUndoRedoWorkbook, historyType, null, null,
-							new UndoRedoData_FromTo(defName.getUndoDefName(), null));
+				if (null != historyType) {
+					History.Create_NewPoint();
+					History.Add(AscCommonExcel.g_oUndoRedoWorkbook, historyType, null, null,
+								new UndoRedoData_FromTo(defName.getUndoDefName(), null));
+				}
 
 				defName.removeDependencies();
 				this.addToChangedDefName(defName);
