@@ -275,6 +275,6 @@ CDocumentContentBase.prototype.GotoFootnoteRef = function(isNext, isCurrent)
 CDocumentContentBase.prototype.MoveCursorToNearestPos = function(oNearestPos)
 {
 	var oPara = oNearestPos.Paragraph;
-	oPara.Set_ContentPos(oNearestPos.ContentPos, true, -1, -1);
+	oPara.Set_ParaContentPos(oNearestPos.ContentPos, true, -1, -1);
 	oPara.Document_SetThisElementCurrent(true);
 };
