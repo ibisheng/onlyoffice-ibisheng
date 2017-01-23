@@ -940,7 +940,18 @@
 	};
 	CMobileDelegateThumbnails.prototype.GetContextMenuPosition = function()
 	{
-		return { X : 0, Y : 0 };
+		var aSelected    = this.Thumbnails.GetSelectedArray();
+		var nSlideIndex  = Math.min.apply(Math, aSelected);
+		var ConvertedPos = this.Thumbnails.GetThumbnailPagePosition(nSlideIndex);
+
+		var _ret = { X : 0, Y : 0, Mode : AscCommon.MobileTouchContextMenuType.Slide };
+		if (ConvertedPos)
+		{
+			_ret.X = ConvertedPos.X;
+			_ret.Y = ConvertedPos.Y;
+		}
+
+		return _ret;
 	};
 
 	/**

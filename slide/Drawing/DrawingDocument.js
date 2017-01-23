@@ -815,6 +815,9 @@ function CDrawingDocument()
 
 	this.OnRecalculatePage = function(index, pageObject)
 	{
+		if (this.m_oWordControl && this.m_oWordControl.MobileTouchManager)
+			this.m_oWordControl.MobileTouchManager.ClearContextMenu();
+
 		editor.sendEvent("asc_onDocumentChanged");
 
 		if (true === this.m_bIsSearching)
@@ -3883,6 +3886,9 @@ function CThumbnailsManager()
 			return;
 
 		var word_control = this.m_oWordControl;
+
+		if (word_control && word_control.MobileTouchManagerThumbnails)
+			word_control.MobileTouchManagerThumbnails.ClearContextMenu();
 
 		var canvas = word_control.m_oThumbnails.HtmlElement;
 		if (null == canvas)
