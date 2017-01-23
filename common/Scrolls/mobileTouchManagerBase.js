@@ -1570,10 +1570,8 @@
 
 		this.delegate.DrawingDocument.NeedScrollToTargetFlag = true;
 		var y = nearPos.Y;
-		if (isHalfHeight)
-			y += nearPos.Height / 2;
-		this.delegate.Logic_OnMouseDown(global_mouseEvent, nearPos.X, y, pos.Page);
-		this.delegate.Logic_OnMouseUp(global_mouseEvent, nearPos.X, y, pos.Page);
+        nearPos.Paragraph.Parent.Cursor_MoveAt(nearPos.X, nearPos.Y, false);
+        this.delegate.LogicDocument.Document_UpdateSelectionState();
 		this.delegate.DrawingDocument.NeedScrollToTargetFlag = false;
 
 		global_mouseEvent.ClickCount = old_click_count;

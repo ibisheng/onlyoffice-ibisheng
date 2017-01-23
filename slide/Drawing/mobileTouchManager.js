@@ -232,7 +232,7 @@
 
 	CMobileDelegateEditorPresentation.prototype.Logic_GetNearestPos = function(x, y, page)
 	{
-		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.getNearestPos(x, y);
+		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.getNearestPos2(x, y);
 	};
 
 	/**
