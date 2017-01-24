@@ -1647,7 +1647,10 @@ IScroll.prototype = {
 			case 'pointermove':
 			case 'MSPointerMove':
 			case 'mousemove':
-				this.eventsElement ? this.manager.mainOnTouchMove(e) : (e);
+				if (this.isDown || e.srcElement == this.eventsElement)
+				{
+					this.eventsElement ? this.manager.mainOnTouchMove(e) : (e);
+				}
 				break;
 			case 'touchend':
 			case 'pointerup':

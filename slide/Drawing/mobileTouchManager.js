@@ -275,6 +275,7 @@
 	CMobileTouchManager.prototype.onTouchStart = function(e)
 	{
 		this.IsTouching = true;
+		AscCommon.g_inputContext.enableVirtualKeyboard();
 
 		if (this.delegate.IsReader())
 			return this.onTouchStart_renderer(e);
@@ -327,6 +328,29 @@
 			}
 			default:
 				break;
+		}
+
+		var isPreventDefault = false;
+		switch (this.Mode)
+		{
+			case AscCommon.MobileTouchMode.InlineObj:
+			case AscCommon.MobileTouchMode.FlowObj:
+			case AscCommon.MobileTouchMode.Zoom:
+			case AscCommon.MobileTouchMode.TableMove:
+			{
+				isPreventDefault = true;
+				break;
+			}
+			case AscCommon.MobileTouchMode.None:
+			case AscCommon.MobileTouchMode.Scroll:
+			{
+				isPreventDefault = this.CheckObjectTrackBefore();
+				break;
+			}
+			default:
+			{
+				break;
+			}
 		}
 
 		switch (this.Mode)
@@ -450,14 +474,13 @@
 			}
 		}
 
-		if (this.Api.isViewMode)
-		{
-			if (e.preventDefault)
-				e.preventDefault();
-			else
-				e.returnValue = false;
-			return false;
-		}
+		if (AscCommon.AscBrowser.isAndroid)
+			isPreventDefault = false;
+
+		if (this.Api.isViewMode || isPreventDefault)
+			AscCommon.stopEvent(e);
+
+		return false;
 	};
 	CMobileTouchManager.prototype.onTouchMove  = function(e)
 	{
@@ -630,6 +653,24 @@
 
 		var isCheckContextMenuMode = true;
 
+		var isPreventDefault = false;
+		switch (this.Mode)
+		{
+			case AscCommon.MobileTouchMode.Scroll:
+			case AscCommon.MobileTouchMode.InlineObj:
+			case AscCommon.MobileTouchMode.FlowObj:
+			case AscCommon.MobileTouchMode.Zoom:
+			case AscCommon.MobileTouchMode.TableMove:
+			{
+				isPreventDefault = true;
+				break;
+			}
+			default:
+			{
+				break;
+			}
+		}
+
 		switch (this.Mode)
 		{
 			case AscCommon.MobileTouchMode.Cursor:
@@ -646,6 +687,10 @@
 					this.delegate.Drawing_OnMouseDown(_e);
 					this.delegate.Drawing_OnMouseUp(_e);
 					this.Api.sendEvent("asc_onTapEvent", e);
+
+					var typeMenu = this.delegate.GetContextMenuType();
+					if (typeMenu == AscCommon.MobileTouchContextMenuType.Target)
+						isPreventDefault = false;
 				}
 				else
 				{
@@ -794,17 +839,13 @@
 				break;
 		}
 
-		if (this.Api.isViewMode)
-		{
-			if (e.preventDefault)
-				e.preventDefault();
-			else
-				e.returnValue = false;
-			return false;
-		}
+		if (this.Api.isViewMode || isPreventDefault)
+			AscCommon.g_inputContext.preventVirtualKeyboard(e);
 
 		if (true !== this.iScroll.isAnimating)
 			this.CheckContextMenuTouchEnd(isCheckContextMenuMode);
+
+		return false;
 	};
 
 	CMobileTouchManager.prototype.mainOnTouchStart = function(e)
@@ -812,7 +853,7 @@
 		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
 			return;
 
-		if (!this.Api.IsFocus)
+		if (!this.Api.asc_IsFocus())
 			this.Api.asc_enableKeyEvents(true);
 
 		var oWordControl = this.Api.WordControl;

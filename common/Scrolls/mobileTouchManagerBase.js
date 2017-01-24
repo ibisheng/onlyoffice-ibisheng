@@ -126,7 +126,7 @@
 	CMobileDelegateSimple.prototype.SetZoom = function(_value)
 	{
 	};
-	CMobileDelegateSimple.prototype.GetObjectTrack = function(x, y, page)
+	CMobileDelegateSimple.prototype.GetObjectTrack = function(x, y, page, bSelected)
 	{
 		return false;
 	};
@@ -820,10 +820,8 @@
 	CMobileTouchManagerBase.prototype.CheckObjectTrack = function()
 	{
 		var pos = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
-
-		var dKoef                     = (100 * AscCommon.g_dKoef_pix_to_mm / this.delegate.GetZoom());
 		global_mouseEvent.KoefPixToMM = 5;
-		if (this.delegate.GetObjectTrack(pos.X, pos.Y, pos.Page))
+		if (this.delegate.GetObjectTrack(pos.X, pos.Y, pos.Page, true))
 		{
 			this.Mode      = AscCommon.MobileTouchMode.FlowObj;
 		}
@@ -834,6 +832,15 @@
 		global_mouseEvent.KoefPixToMM = 1;
 
 		return (AscCommon.MobileTouchMode.FlowObj == this.Mode);
+	};
+
+	CMobileTouchManagerBase.prototype.CheckObjectTrackBefore = function()
+	{
+		var pos = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
+		global_mouseEvent.KoefPixToMM = 5;
+		var bResult = this.delegate.GetObjectTrack(pos.X, pos.Y, pos.Page, false);
+		global_mouseEvent.KoefPixToMM = 1;
+		return bResult;
 	};
 
 	// в мобильной версии - меньше, чем "по ширине" - не делаем
