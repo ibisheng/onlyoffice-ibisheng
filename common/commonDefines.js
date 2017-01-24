@@ -421,7 +421,11 @@
 		scatterNone            : 31,
 		scatterSmooth          : 32,
 		scatterSmoothMarker    : 33,
-		unknown                : 34
+		surfaceNormal          : 34,
+		surfaceWireframe       : 35,
+		contourNormal          : 36,
+		contourWireframe       : 37,
+		unknown                : 38
 	};
 
 

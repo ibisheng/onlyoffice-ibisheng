@@ -4480,6 +4480,7 @@ DrawingObjectsController.prototype =
         return ret;
     },
 	_getChartSpace: function (chartSeries, options, bUseCache) {
+        options.type = c_oAscChartTypeSettings.surfaceNormal;
 		switch (options.type) {
 			case c_oAscChartTypeSettings.lineNormal:
 			case c_oAscChartTypeSettings.lineNormalMarker:
@@ -4540,6 +4541,14 @@ DrawingObjectsController.prototype =
 			case c_oAscChartTypeSettings.scatterSmooth:
 			case c_oAscChartTypeSettings.scatterSmoothMarker:
 				return AscFormat.CreateScatterChart(chartSeries, bUseCache, options);
+            case c_oAscChartTypeSettings.surfaceNormal:
+                return AscFormat.CreateSurfaceChart(chartSeries, bUseCache, options, false, false);
+            case c_oAscChartTypeSettings.surfaceWireframe:
+                return AscFormat.CreateSurfaceChart(chartSeries, bUseCache, options, false, true);
+            case c_oAscChartTypeSettings.contourNormal:
+                return AscFormat.CreateSurfaceChart(chartSeries, bUseCache, options, true, false);
+            case c_oAscChartTypeSettings.contourWireframe:
+                return AscFormat.CreateSurfaceChart(chartSeries, bUseCache, options, true, true);
 			// radar return CreateRadarChart(chartSeries);
 		}
 

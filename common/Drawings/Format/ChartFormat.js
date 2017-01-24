@@ -22414,6 +22414,9 @@ function CSurfaceChart()
 
     this.parent = null;
 
+    this.compiledBandFormats = [];
+
+
     this.Id = g_oIdCounter.Get_NewId();
 }
 
@@ -22459,6 +22462,19 @@ CSurfaceChart.prototype =
                 break;
             }
         }
+    },
+
+    isWireframe: function(){
+        return this.wireframe !== false;
+    },
+
+    getBandFmtByIndex: function(idx){
+        for(var i = 0; i < this.bandFmts.length; ++i){
+            if(this.bandFmts[i].idx === idx){
+                return this.bandFmts[i];
+            }
+        }
+        return null;
     },
 
     removeSeries: function(idx)
