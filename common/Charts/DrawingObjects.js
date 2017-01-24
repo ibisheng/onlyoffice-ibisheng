@@ -4518,6 +4518,9 @@ function ClickCounter() {
 ClickCounter.prototype.mouseDownEvent = function(x, y, button) {
     var currTime = getCurrentTime();
 
+    if (undefined === button)
+        button = 0;
+
 	var _eps = 3 * global_mouseEvent.KoefPixToMM;
 	if ((Math.abs(global_mouseEvent.X - global_mouseEvent.LastX) > _eps) || (Math.abs(global_mouseEvent.Y - global_mouseEvent.LastY) > _eps))
 	{

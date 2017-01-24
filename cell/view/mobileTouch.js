@@ -173,7 +173,7 @@ function (window, undefined)
 		if (!_controller.Is_SelectionUse() && !_selection)
 			_mode = AscCommon.MobileTouchContextMenuType.Target;
 
-		if (_controller.Get_SelectionBounds())
+		if (_controller.Get_SelectionBounds() || _selection)
 			_mode = AscCommon.MobileTouchContextMenuType.Select;
 
 		if (_mode == 0 && _controller.getSelectedObjectsBounds())
