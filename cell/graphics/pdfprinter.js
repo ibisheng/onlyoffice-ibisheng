@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -214,6 +214,14 @@ CPdfPrinter.prototype =
         this.DocumentRenderer.p_width(val * 1000 * vector_koef);
         return this;
     },
+	setLineDash : function(params)
+	{
+	    var tmp = [];
+	    for (var i = 0; i < params.length; ++i) {
+			tmp.push(params[i] * vector_koef);
+        }
+		return this.DocumentRenderer.p_dash(tmp);
+	},
     setLineCap : function(cap)
     {
         return this;
@@ -458,7 +466,7 @@ CPdfPrinter.prototype =
     },
     p_dash : function(params)
     {
-        // TODO:
+		return this.DocumentRenderer.p_dash(params);
     },
     // brush methods
     b_color1 : function(r,g,b,a)

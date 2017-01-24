@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -114,7 +114,10 @@ AscBrowser.zoom = 1;
 AscBrowser.checkZoom = function()
 {
     if (AscBrowser.isAndroid)
-        return;
+	{
+		AscBrowser.isRetina = (Math.abs(2 - (window.devicePixelRatio / AscBrowser.zoom)) < 0.01);
+		return;
+	}
 
 	AscBrowser.zoom = 1.0;
 	AscBrowser.isRetina = false;

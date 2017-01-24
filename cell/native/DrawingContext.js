@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -775,6 +775,11 @@
         this.ctx.lineJoin = join;
         return this;
     };
+ 
+    DrawingContext.prototype.setLineDash = function (segments) {
+        //TODO: 
+        return this;
+	};
 
     DrawingContext.prototype.fillRect = function (x, y, w, h) {
         var r = this._calcRect(x, y, w, h);

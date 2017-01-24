@@ -86,7 +86,7 @@ var utils = (function () {
 		hasTransform: _transform !== false,
 		hasPerspective: _prefixStyle('perspective') in _elementStyle,
 		hasTouch: 'ontouchstart' in window,
-		hasPointer: (!('ontouchstart' in window)) &&  (!!(window.PointerEvent || window.MSPointerEvent)), // IE10 is prefixed
+		hasPointer: false,//(!('ontouchstart' in window)) &&  (!!(window.PointerEvent || window.MSPointerEvent)), // IE10 is prefixed
 		hasTransition: _prefixStyle('transition') in _elementStyle
 	});
 
@@ -375,6 +375,8 @@ function IScroll (el, options) {
 
 	this.scrollTo(this.options.startX, this.options.startY);
 	this.enable();
+
+	this.isDown = false;
 }
 
 IScroll.prototype = {
@@ -1632,18 +1634,23 @@ IScroll.prototype = {
 		step();
 	},
 	handleEvent: function (e) {
-		switch ( e.type ) {
+		switch ( e.type )
+		{
 			case 'touchstart':
 			case 'pointerdown':
 			case 'MSPointerDown':
 			case 'mousedown':
+				this.isDown = true;
 				this.eventsElement ? this.manager.mainOnTouchStart(e) : this._start(e);
 				break;
 			case 'touchmove':
 			case 'pointermove':
 			case 'MSPointerMove':
 			case 'mousemove':
-				this.eventsElement ? this.manager.mainOnTouchMove(e) : (e);
+				if (this.isDown || e.srcElement == this.eventsElement)
+				{
+					this.eventsElement ? this.manager.mainOnTouchMove(e) : (e);
+				}
 				break;
 			case 'touchend':
 			case 'pointerup':
@@ -1653,7 +1660,11 @@ IScroll.prototype = {
 			case 'pointercancel':
 			case 'MSPointerCancel':
 			case 'mousecancel':
-				this.eventsElement ? this.manager.mainOnTouchEnd(e) : this._end(e);
+				if (this.isDown || e.srcElement == this.eventsElement)
+				{
+					this.eventsElement ? this.manager.mainOnTouchEnd(e) : this._end(e);
+				}
+				this.isDown = false;
 				break;
 			case 'orientationchange':
 			case 'resize':

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -47,6 +47,7 @@ function (window, undefined)
 	 */
 	function CMobileDelegateEditorCell(_manager)
 	{
+		this.Name = "cell";
 		this.WB = _manager.Api.wb;
 		this.DrawingDocument = this.WB.getWorksheet().objectRender.drawingDocument;
 
@@ -67,6 +68,12 @@ function (window, undefined)
 		var _res = this.WB.ConvertLogicToXY(x, y);
 		var _point = {X: _res.X, Y: _res.Y, Page: 0, DrawPage: 0};
 
+		if (AscBrowser.isRetina)
+		{
+			_point.X >>= 1;
+			_point.Y >>= 1;
+		}
+
 		if (isGlobal !== false)
 		{
 			_point.X += this.Offset.X;
@@ -77,7 +84,16 @@ function (window, undefined)
 	};
 	CMobileDelegateEditorCell.prototype.ConvertCoordsFromCursor = function(x, y)
 	{
-		var _res = this.WB.ConvertXYToLogic(x - this.Offset.X, y - this.Offset.Y);
+		var _x = x - this.Offset.X;
+		var _y = y - this.Offset.Y;
+
+		if (AscBrowser.isRetina)
+		{
+			_x <<= 1;
+			_y <<= 1;
+		}
+
+		var _res = this.WB.ConvertXYToLogic(_x, _y);
 		var _point = {X: _res.X, Y: _res.Y, Page: 0, DrawPage: 0};
 		return _point;
 	};
@@ -111,9 +127,9 @@ function (window, undefined)
 	{
 		return this.WB.element;
 	};
-	CMobileDelegateEditorCell.prototype.GetObjectTrack = function(x, y, page)
+	CMobileDelegateEditorCell.prototype.GetObjectTrack = function(x, y, page, bSelected)
 	{
-		return this.WB.getWorksheet().objectRender.controller.isPointInDrawingObjects3(x, y, page);
+		return this.WB.getWorksheet().objectRender.controller.isPointInDrawingObjects3(x, y, page, bSelected);
 	};
 	CMobileDelegateEditorCell.prototype.GetSelectionRectsBounds = function()
 	{
@@ -166,7 +182,6 @@ function (window, undefined)
 	};
 	CMobileDelegateEditorCell.prototype.GetContextMenuPosition = function()
 	{
-		return { X : 0, Y : 0, Mode : AscCommon.MobileTouchContextMenuType.None };
 		var _controller = this.WB.getWorksheet().objectRender.controller;
 
 		var _posX = 0;
@@ -179,7 +194,9 @@ function (window, undefined)
 		var _mode = 0;
 
 		var _target = _controller.Is_SelectionUse();
-		if (_target === false)
+		var _selection = this.WB.GetSelectionRectsBounds();
+
+		if (!_target && !_selection)
 		{
 			_posX = this.DrawingDocument.m_dTargetX;
 			_posY = this.DrawingDocument.m_dTargetY;
@@ -197,7 +214,7 @@ function (window, undefined)
 				tmpY = _posY;
 			}
 
-			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(tmpX, tmpY, _page);
+			_pos = this.ConvertCoordsToCursor(tmpX, tmpY, _page);
 			_posX = _pos.X;
 			_posY = _pos.Y;
 
@@ -232,11 +249,28 @@ function (window, undefined)
 				tmpY2 = _posY;
 			}
 
-			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(tmpX, tmpY, _rect1.Page);
+			_pos = this.ConvertCoordsToCursor(tmpX, tmpY, _rect1.Page);
 			_posX = _pos.X;
 			_posY = _pos.Y;
 
-			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(tmpX2, tmpY2, _rect2.Page);
+			_pos = this.ConvertCoordsToCursor(tmpX2, tmpY2, _rect2.Page);
+			_posX += _pos.X;
+			_posX = _posX >> 1;
+
+			_mode = 2;
+		}
+		else if (_selection)
+		{
+			tmpX = _selection.X;
+			tmpY = _selection.Y;
+			tmpX2 = _selection.X + _selection.W;
+			tmpY2 = _selection.Y + _selection.H;
+
+			_pos = this.ConvertCoordsToCursor(tmpX, tmpY, 0);
+			_posX = _pos.X;
+			_posY = _pos.Y;
+
+			_pos = this.ConvertCoordsToCursor(tmpX2, tmpY2, 0);
 			_posX += _pos.X;
 			_posX = _posX >> 1;
 
@@ -246,17 +280,19 @@ function (window, undefined)
 		var _object_bounds = _controller.getSelectedObjectsBounds();
 		if ((0 == _mode) && _object_bounds)
 		{
-			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(_object_bounds.minX, _object_bounds.minY, _object_bounds.pageIndex);
+			_pos = this.ConvertCoordsToCursor(_object_bounds.minX, _object_bounds.minY, _object_bounds.pageIndex);
 			_posX = _pos.X;
 			_posY = _pos.Y;
 
-			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(_object_bounds.maxX, _object_bounds.maxY, _object_bounds.pageIndex);
+			_pos = this.ConvertCoordsToCursor(_object_bounds.maxX, _object_bounds.maxY, _object_bounds.pageIndex);
 			_posX += _pos.X;
 			_posX = _posX >> 1;
 
 			_mode = 3;
 		}
 
+		_posX -= this.Offset.X;
+		_posY -= this.Offset.Y;
 		return { X : _posX, Y : _posY, Mode : _mode };
 	};
 
@@ -346,6 +382,7 @@ function (window, undefined)
 	{
 		var _e = e.touches ? e.touches[0] : e;
 		this.IsTouching = true;
+		AscCommon.g_inputContext.enableVirtualKeyboard();
 
 		global_mouseEvent.KoefPixToMM = 5;
 		AscCommon.check_MouseDownEvent(_e, true);
@@ -389,6 +426,29 @@ function (window, undefined)
 			}
 			default:
 				break;
+		}
+
+		var isPreventDefault = false;
+		switch (this.Mode)
+		{
+			case AscCommon.MobileTouchMode.InlineObj:
+			case AscCommon.MobileTouchMode.FlowObj:
+			case AscCommon.MobileTouchMode.Zoom:
+			case AscCommon.MobileTouchMode.TableMove:
+			{
+				isPreventDefault = true;
+				break;
+			}
+			case AscCommon.MobileTouchMode.None:
+			case AscCommon.MobileTouchMode.Scroll:
+			{
+				isPreventDefault = this.CheckObjectTrackBefore();
+				break;
+			}
+			default:
+			{
+				break;
+			}
 		}
 
 		switch (this.Mode)
@@ -497,14 +557,13 @@ function (window, undefined)
 			}
 		}
 
-		if (this.Api.isViewMode)
-		{
-			if (e.preventDefault)
-				e.preventDefault();
-			else
-				e.returnValue = false;
-			return false;
-		}
+		if (AscCommon.AscBrowser.isAndroid)
+			isPreventDefault = false;
+
+		if (this.Api.isViewMode || isPreventDefault)
+			AscCommon.stopEvent(e);
+
+		return false;
 	};
 	CMobileTouchManager.prototype.onTouchMove  = function(e)
 	{
@@ -609,6 +668,24 @@ function (window, undefined)
 
 		var isCheckContextMenuMode = true;
 
+		var isPreventDefault = false;
+		switch (this.Mode)
+		{
+			case AscCommon.MobileTouchMode.Scroll:
+			case AscCommon.MobileTouchMode.InlineObj:
+			case AscCommon.MobileTouchMode.FlowObj:
+			case AscCommon.MobileTouchMode.Zoom:
+			case AscCommon.MobileTouchMode.TableMove:
+			{
+				isPreventDefault = true;
+				break;
+			}
+			default:
+			{
+				break;
+			}
+		}
+
 		switch (this.Mode)
 		{
 			case AscCommon.MobileTouchMode.Cursor:
@@ -625,6 +702,10 @@ function (window, undefined)
 					this.delegate.Drawing_OnMouseDown(_e);
 					this.delegate.Drawing_OnMouseUp(_e);
 					this.Api.sendEvent("asc_onTapEvent", e);
+
+					var typeMenu = this.delegate.GetContextMenuType();
+					if (typeMenu == AscCommon.MobileTouchContextMenuType.Target)
+						isPreventDefault = false;
 				}
 				else
 				{
@@ -668,17 +749,13 @@ function (window, undefined)
 				break;
 		}
 
-		if (this.Api.isViewMode)
-		{
-			if (e.preventDefault)
-				e.preventDefault();
-			else
-				e.returnValue = false;
-			return false;
-		}
+		if (this.Api.isViewMode || isPreventDefault)
+			AscCommon.g_inputContext.preventVirtualKeyboard(e);
 
 		if (true !== this.iScroll.isAnimating)
 			this.CheckContextMenuTouchEnd(isCheckContextMenuMode);
+
+		return false;
 	};
 
 	CMobileTouchManager.prototype.mainOnTouchStart = function(e)
@@ -722,6 +799,8 @@ function (window, undefined)
 			ctx.fillStyle = "rgba(" + color.r + "," + color.g + "," + color.b + "," + color.a + ")";
 		}
 
+		var _koef = AscCommon.AscBrowser.isRetina ? 2 : 1;
+
 		if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
 		{
 			var pos1 = this.delegate.ConvertCoordsToCursor(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1, false);
@@ -734,11 +813,11 @@ function (window, undefined)
 			{
 				ctx.beginPath();
 
-				ctx.moveTo(pos1.X >> 0, pos1.Y >> 0);
-				ctx.lineTo(pos2.X >> 0, pos2.Y >> 0);
+				ctx.moveTo((_koef * pos1.X) >> 0, (_koef * pos1.Y) >> 0);
+				ctx.lineTo((_koef * pos2.X) >> 0, (_koef * pos2.Y) >> 0);
 
-				ctx.moveTo(pos3.X >> 0, pos3.Y >> 0);
-				ctx.lineTo(pos4.X >> 0, pos4.Y >> 0);
+				ctx.moveTo((_koef * pos3.X) >> 0, (_koef * pos3.Y) >> 0);
+				ctx.lineTo((_koef * pos4.X) >> 0, (_koef * pos4.Y) >> 0);
 
 				ctx.lineWidth = 2;
 				ctx.stroke();
@@ -748,8 +827,8 @@ function (window, undefined)
 
 			var _offset = (undefined === color) ? 5 : 0;
 
-			overlay.AddEllipse(pos1.X, pos1.Y - _offset, AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
-			overlay.AddEllipse(pos4.X, pos4.Y + _offset, AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
+			overlay.AddEllipse(_koef * pos1.X, _koef * (pos1.Y - _offset), _koef * AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
+			overlay.AddEllipse(_koef * pos4.X, _koef * (pos4.Y + _offset), _koef * AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
 			ctx.fill();
 
 			ctx.beginPath();
@@ -778,11 +857,11 @@ function (window, undefined)
 			{
 				ctx.beginPath();
 
-				ctx.moveTo(pos1.X, pos1.Y);
-				ctx.lineTo(pos2.X, pos2.Y);
+				ctx.moveTo(_koef * pos1.X, _koef * pos1.Y);
+				ctx.lineTo(_koef * pos2.X, _koef * pos2.Y);
 
-				ctx.moveTo(pos3.X, pos3.Y);
-				ctx.lineTo(pos4.X, pos4.Y);
+				ctx.moveTo(_koef * pos3.X, _koef * pos3.Y);
+				ctx.lineTo(_koef * pos4.X, _koef * pos4.Y);
 
 				ctx.lineWidth = 2;
 				ctx.stroke();
@@ -811,13 +890,13 @@ function (window, undefined)
 				var _x2 = (pos4.X + ex) >> 0;
 				var _y2 = (pos4.Y + ey) >> 0;
 
-				overlay.AddEllipse(_x1, _y1, AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
-				overlay.AddEllipse(_x2, _y2, AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
+				overlay.AddEllipse(_koef * _x1, _koef * _y1, _koef * AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
+				overlay.AddEllipse(_koef * _x2, _koef * _y2, _koef * AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
 			}
 			else
 			{
-				overlay.AddEllipse(pos1.X, pos1.Y, AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
-				overlay.AddEllipse(pos4.X, pos4.Y, AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
+				overlay.AddEllipse(_koef * pos1.X, _koef * pos1.Y, _koef * AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
+				overlay.AddEllipse(_koef * pos4.X, _koef * pos4.Y, _koef * AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
 			}
 			ctx.fill();
 

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -776,6 +776,11 @@
 		return this;
 	};
 
+	DrawingContext.prototype.setLineDash = function (segments) {
+		this.ctx.setLineDash(segments);
+		return this;
+	};
+
 	DrawingContext.prototype.fillRect = function (x, y, w, h) {
 		var r = this._calcRect(x, y, w, h);
 		this.ctx.fillRect(r.x, r.y, r.w, r.h);
@@ -926,35 +931,8 @@
 		var _g = this.fillColor.g;
 		var _b = this.fillColor.b;
 
-		if (AscCommon.AscBrowser.isMobileVersion) {
-			// Special for iPad (5.1)
-
-			if (!_r && !_g && !_b) {
-				this.ctx.drawImage(pGlyph.oBitmap.oGlyphData.m_oCanvas, 0, 0, nW, nH, nX, nY, nW, nH);
-			} else {
-				var canvD = document.createElement('canvas');
-				canvD.width = nW;
-				canvD.height = nH;
-				var ctxD = canvD.getContext("2d");
-				var pixDst = ctxD.getImageData(0, 0, nW, nH);
-				var dstP = pixDst.data;
-				var data = pGlyph.oBitmap.oGlyphData.m_oContext.getImageData(0, 0, nW, nH);
-				var dataPx = data.data;
-				var cur = 0;
-				var cnt = 4 * nW * nH;
-				for (var i = 3; i < cnt; i += 4) {
-					dstP[cur++] = _r;
-					dstP[cur++] = _g;
-					dstP[cur++] = _b;
-					dstP[cur++] = dataPx[i];
-				}
-				ctxD.putImageData(pixDst, 0, 0, 0, 0, nW, nH);
-				this.ctx.drawImage(canvD, 0, 0, nW, nH, nX, nY, nW, nH);
-			}
-		} else {
-			pGlyph.oBitmap.oGlyphData.checkColor(_r, _g, _b, nW, nH);
-			pGlyph.oBitmap.draw(this.ctx, nX, nY);
-		}
+		pGlyph.oBitmap.oGlyphData.checkColor(_r, _g, _b, nW, nH);
+		pGlyph.oBitmap.draw(this.ctx, nX, nY);
 	};
 
 	DrawingContext.prototype.fillText = function (text, x, y, maxWidth, charWidths, angle) {

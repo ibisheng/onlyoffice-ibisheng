@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -377,7 +377,8 @@
         SortState:5,
         TableColumns:6,
         TableStyleInfo:7,
-        HeaderRowCount:8
+		HeaderRowCount:8,
+		AltTextTable: 9
     };
     /** @enum */
     var c_oSer_TableStyleInfo =
@@ -699,7 +700,12 @@
         SparklineRef: 29,
         SparklineSqRef: 30
     };
-    /** @enum */
+	/** @enum */
+	var c_oSer_AltTextTable = {
+		AltText: 0,
+		AltTextSummary: 1
+	};
+	/** @enum */
     var EBorderStyle =
     {
         borderstyleDashDot:  0,
@@ -1164,7 +1170,21 @@
             //TableStyleInfo
             if(null != table.TableStyleInfo)
                 this.bs.WriteItem(c_oSer_TablePart.TableStyleInfo, function(){oThis.WriteTableStyleInfo(table.TableStyleInfo);});
+			if(null != table.altText || null != table.altTextSummary)
+				this.bs.WriteItem(c_oSer_TablePart.AltTextTable, function(){oThis.WriteAltTextTable(table);});
         };
+		this.WriteAltTextTable = function(table)
+		{
+			var oThis = this;
+			if (null != table.altText) {
+				this.memory.WriteByte(c_oSer_AltTextTable.AltText);
+				this.memory.WriteString2(table.altText);
+			}
+			if (null != table.altTextSummary) {
+				this.memory.WriteByte(c_oSer_AltTextTable.AltTextSummary);
+				this.memory.WriteString2(table.altTextSummary);
+			}
+ 		};
         this.WriteAutoFilter = function(autofilter)
         {
             var oThis = this;
@@ -2591,6 +2611,8 @@
                 this.bs.WriteItem(c_oSer_SheetView.ShowGridLines, function(){oThis.memory.WriteBool(oSheetView.showGridLines);});
             if (null !== oSheetView.showRowColHeaders)
                 this.bs.WriteItem(c_oSer_SheetView.ShowRowColHeaders, function(){oThis.memory.WriteBool(oSheetView.showRowColHeaders);});
+			if (null !== oSheetView.zoomScale)
+				this.bs.WriteItem(c_oSer_SheetView.ZoomScale, function(){oThis.memory.WriteLong(oSheetView.zoomScale);});
             if (null !== oSheetView.pane && oSheetView.pane.isInit())
                 this.bs.WriteItem(c_oSer_SheetView.Pane, function(){oThis.WriteSheetViewPane(oSheetView.pane);});
 			if (null !== ws.selectionRange)
@@ -3936,10 +3958,28 @@
                     return oThis.ReadTableStyleInfo(t,l, oTable.TableStyleInfo);
                 });
             }
+			else if ( c_oSer_TablePart.AltTextTable == type )
+			{
+				res = this.bcr.Read1(length, function(t,l){
+					return oThis.ReadAltTextTable(t,l, oTable);
+				});
+			}
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
+		this.ReadAltTextTable = function(type, length, oTable)
+		{
+			var res = c_oSerConstants.ReadOk;
+			var oThis = this;
+			if (c_oSer_AltTextTable.AltText == type) {
+				oTable.altText = this.stream.GetString2LE(length);
+			} else if ( c_oSer_AltTextTable.AltTextSummary == type ) {
+				oTable.altTextSummary  = this.stream.GetString2LE(length);
+			} else
+				res = c_oSerConstants.ReadUnknown;
+			return res;
+		};
         this.ReadAutoFilter = function(type, length, oAutoFilter)
         {
             var res = c_oSerConstants.ReadOk;
@@ -6492,7 +6532,7 @@
 			} else if (c_oSer_SheetView.WorkbookViewId === type) {
 				this.stream.GetLong();
 			} else if (c_oSer_SheetView.ZoomScale === type) {
-				this.stream.GetLong();
+				oSheetView.asc_setZoomScale(this.stream.GetLong());
 			} else if (c_oSer_SheetView.ZoomScaleNormal === type) {
 				this.stream.GetLong();
 			} else if (c_oSer_SheetView.ZoomScalePageLayoutView === type) {

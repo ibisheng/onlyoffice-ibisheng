@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -162,6 +162,9 @@
 		this.IsInitialInputContext = false;
 
 		this.IsDisableKeyPress = false;
+
+		this.virtualKeyboardClickTimeout = -1;
+		this.virtualKeyboardClickPrevent = false;
 	}
 
 	CTextInput.prototype =
@@ -308,6 +311,33 @@
 			 */
 
 			this.Api.Input_UpdatePos();
+
+			if (AscCommon.AscBrowser.isAndroid)
+			{
+				this.HtmlArea.onclick = function (e)
+				{
+					var _this = AscCommon.g_inputContext;
+
+					if (-1 != _this.virtualKeyboardClickTimeout)
+					{
+						clearTimeout(_this.virtualKeyboardClickTimeout);
+						_this.virtualKeyboardClickTimeout = -1;
+					}
+
+					if (!_this.virtualKeyboardClickPrevent)
+						return;
+
+					_this.HtmlArea.readOnly = true;
+					_this.virtualKeyboardClickPrevent = false;
+					AscCommon.stopEvent(e);
+					_this.virtualKeyboardClickTimeout = setTimeout(function ()
+					{
+						_this.HtmlArea.readOnly = false;
+						_this.virtualKeyboardClickTimeout = -1;
+					}, 1);
+					return false;
+				};
+			}
 		},
 
 		onResize : function(_editorContainerId)
@@ -1656,6 +1686,30 @@
 			}, 10);
 
 			return true;
+		},
+
+		preventVirtualKeyboard : function(e)
+		{
+			//AscCommon.stopEvent(e);
+
+			if (AscCommon.AscBrowser.isAndroid)
+			{
+				this.virtualKeyboardClickPrevent = true;
+			}
+		},
+
+		enableVirtualKeyboard : function()
+		{
+			if (AscCommon.AscBrowser.isAndroid)
+			{
+				if (-1 != this.virtualKeyboardClickTimeout)
+				{
+					clearTimeout(this.virtualKeyboardClickTimeout);
+					this.virtualKeyboardClickTimeout = -1;
+				}
+
+				this.virtualKeyboardClickPrevent = false;
+			}
 		}
 	};
 

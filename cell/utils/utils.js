@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -867,6 +867,18 @@
 			return false;
 			// todo return this.activeCell.isEqual(range.cell);
 		};
+		SelectionRange.prototype.isEqual2 = function(range) {
+			if (this.activeCellId !== range.activeCellId || !this.activeCell.isEqual(range.activeCell) ||
+				this.ranges.length !== range.ranges.length) {
+				return false;
+			}
+			for (var i = 0; i < this.ranges.length; ++i) {
+				if (!this.ranges[i].isEqual(range.ranges[i])) {
+					return false;
+				}
+			}
+			return true;
+		};
 		SelectionRange.prototype.addRange = function () {
 			this.ranges.push(new Range(0, 0, 0, 0));
 			this.activeCellId = -1;
@@ -1039,6 +1051,35 @@
 				this.activeCell.row = range.r1;
 				this.activeCellId = this.ranges.length - 1;
 			}
+		};
+		SelectionRange.prototype.WriteToBinary = function(w) {
+			w.WriteLong(this.ranges.length);
+			for (var i = 0; i < this.ranges.length; ++i) {
+				var range = this.ranges[i];
+				w.WriteLong(range.c1);
+				w.WriteLong(range.r1);
+				w.WriteLong(range.c2);
+				w.WriteLong(range.r2);
+			}
+			w.WriteLong(this.activeCell.row);
+			w.WriteLong(this.activeCell.col);
+			w.WriteLong(this.activeCellId);
+		};
+		SelectionRange.prototype.ReadFromBinary = function(r) {
+			this.clean();
+			var count = r.GetLong();
+			var rangesNew = [];
+			for (var i = 0; i < count; ++i) {
+				var range = new Asc.Range(r.GetLong(), r.GetLong(), r.GetLong(), r.GetLong());
+				rangesNew.push(range);
+			}
+			if (rangesNew.length > 0) {
+				this.ranges = rangesNew;
+			}
+			this.activeCell.row = r.GetLong();
+			this.activeCell.col = r.GetLong();
+			this.activeCellId = r.GetLong();
+			this.update();
 		};
 
     /**
@@ -1786,6 +1827,9 @@
 			// Закрепление области
 			this.pane = null;
 
+			//current view zoom
+			this.zoomScale = 100;
+
 			return this;
 		}
 
@@ -1795,6 +1839,7 @@
 				var result = new asc_CSheetViewSettings();
 				result.showGridLines = this.showGridLines;
 				result.showRowColHeaders = this.showRowColHeaders;
+				result.zoom = this.zoom;
 				if (this.pane)
 					result.pane = this.pane.clone();
 				return result;
@@ -1805,9 +1850,11 @@
 			},
 			asc_getShowGridLines: function () { return false !== this.showGridLines; },
 			asc_getShowRowColHeaders: function () { return false !== this.showRowColHeaders; },
+			asc_getZoomScale: function () { return this.zoomScale; },
 			asc_getIsFreezePane: function () { return null !== this.pane && this.pane.isInit(); },
 			asc_setShowGridLines: function (val) { this.showGridLines = val; },
-			asc_setShowRowColHeaders: function (val) { this.showRowColHeaders = val; }
+			asc_setShowRowColHeaders: function (val) { this.showRowColHeaders = val; },
+			asc_setZoomScale: function (val) { this.zoomScale = val; }
 		};
 
 		/** @constructor */
@@ -1853,6 +1900,8 @@
 			this.oOnUpdateTabColor = {};
 			this.oOnUpdateSheetViewSettings = {};
 			this.bAddRemoveRowCol = false;
+			this.bChangeActive = false;
+			this.activeSheet = null;
 		}
 
 
@@ -2132,6 +2181,22 @@
 		};
 		var g_oCacheMeasureEmpty = new CCacheMeasureEmpty();
 
+		/** @constructor */
+		function asc_CFormatCellsInfo() {
+			this.type = Asc.c_oAscNumFormatType.General;
+			this.decimalPlaces = 2;
+			this.separator = false;
+			this.symbol = null;
+		}
+		asc_CFormatCellsInfo.prototype.asc_setType = function (val) {this.type = val;};
+		asc_CFormatCellsInfo.prototype.asc_setDecimalPlaces = function (val) {this.decimalPlaces = val;};
+		asc_CFormatCellsInfo.prototype.asc_setSeparator = function (val) {this.separator = val;};
+		asc_CFormatCellsInfo.prototype.asc_setSymbol = function (val) {this.symbol = val;};
+		asc_CFormatCellsInfo.prototype.asc_getType = function () {return this.type;};
+		asc_CFormatCellsInfo.prototype.asc_getDecimalPlaces = function () {return this.decimalPlaces;};
+		asc_CFormatCellsInfo.prototype.asc_getSeparator = function () {return this.separator;};
+		asc_CFormatCellsInfo.prototype.asc_getSymbol = function () {return this.symbol;};
+
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
@@ -2301,4 +2366,15 @@
 		prot["asc_getType"] = prot.asc_getType;
 
 		window["AscCommonExcel"].g_oCacheMeasureEmpty = g_oCacheMeasureEmpty;
+
+		window["Asc"]["asc_CFormatCellsInfo"] = window["Asc"].asc_CFormatCellsInfo = asc_CFormatCellsInfo;
+		prot = asc_CFormatCellsInfo.prototype;
+		prot["asc_setType"] = prot.asc_setType;
+		prot["asc_setDecimalPlaces"] = prot.asc_setDecimalPlaces;
+		prot["asc_setSeparator"] = prot.asc_setSeparator;
+		prot["asc_setSymbol"] = prot.asc_setSymbol;
+		prot["asc_getType"] = prot.asc_getType;
+		prot["asc_getDecimalPlaces"] = prot.asc_getDecimalPlaces;
+		prot["asc_getSeparator"] = prot.asc_getSeparator;
+		prot["asc_getSymbol"] = prot.asc_getSymbol;
 })(window);

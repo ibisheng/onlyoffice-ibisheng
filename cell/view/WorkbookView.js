@@ -1,5 +1,5 @@
 ﻿/*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -272,11 +272,6 @@
       this.canvasGraphicOverlay = document.getElementById("ws-canvas-graphic-overlay");
     }
 
-    // Для мобильных не поддерживаем ретину
-    if (this.Api.isMobileVersion) {
-      AscBrowser.isRetina = false;
-    }
-
     this.buffers.main = new asc.DrawingContext({
       canvas: this.canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
     });
@@ -318,155 +313,157 @@
     // Мерить нужно только со 100% и один раз для всего документа
     this._calcMaxDigitWidth();
 
-    if (!window["NATIVE_EDITOR_ENJINE"]) {
-      // initialize events controller
-      this.controller.init(this, this.element, /*this.canvasOverlay*/ this.canvasGraphicOverlay, /*handlers*/{
-        "resize": function () {
-          self.resize.apply(self, arguments);
-        }, "reinitializeScroll": function () {
-          self._onScrollReinitialize.apply(self, arguments);
-        }, "scrollY": function () {
-          self._onScrollY.apply(self, arguments);
-        }, "scrollX": function () {
-          self._onScrollX.apply(self, arguments);
-        }, "changeSelection": function () {
-          self._onChangeSelection.apply(self, arguments);
-        }, "changeSelectionDone": function () {
-          self._onChangeSelectionDone.apply(self, arguments);
-        }, "changeSelectionRightClick": function () {
-          self._onChangeSelectionRightClick.apply(self, arguments);
-        }, "selectionActivePointChanged": function () {
-          self._onSelectionActivePointChanged.apply(self, arguments);
-        }, "updateWorksheet": function () {
-          self._onUpdateWorksheet.apply(self, arguments);
-        }, "resizeElement": function () {
-          self._onResizeElement.apply(self, arguments);
-        }, "resizeElementDone": function () {
-          self._onResizeElementDone.apply(self, arguments);
-        }, "changeFillHandle": function () {
-          self._onChangeFillHandle.apply(self, arguments);
-        }, "changeFillHandleDone": function () {
-          self._onChangeFillHandleDone.apply(self, arguments);
-        }, "moveRangeHandle": function () {
-          self._onMoveRangeHandle.apply(self, arguments);
-        }, "moveRangeHandleDone": function () {
-          self._onMoveRangeHandleDone.apply(self, arguments);
-        }, "moveResizeRangeHandle": function () {
-          self._onMoveResizeRangeHandle.apply(self, arguments);
-        }, "moveResizeRangeHandleDone": function () {
-          self._onMoveResizeRangeHandleDone.apply(self, arguments);
-        }, "editCell": function () {
-          self._onEditCell.apply(self, arguments);
-        }, "stopCellEditing": function () {
-          return self._onStopCellEditing.apply(self, arguments);
-        }, "getCellEditMode": function () {
-          return self.isCellEditMode;
-        }, "empty": function () {
-          self._onEmpty.apply(self, arguments);
-        }, "canEnterCellRange": function () {
-          self.cellEditor.setFocus(false);
-          var ret = self.cellEditor.canEnterCellRange();
-          ret ? self.cellEditor.activateCellRange() : true;
-          return ret;
-        }, "enterCellRange": function () {
-          self.lockDraw = true;
-          self.cellEditor.setFocus(false);
-          self.getWorksheet().enterCellRange(self.cellEditor);
-          self.lockDraw = false;
-        }, "undo": function () {
-          self.undo.apply(self, arguments);
-        }, "redo": function () {
-          self.redo.apply(self, arguments);
-        }, "addColumn": function () {
-          self._onAddColumn.apply(self, arguments);
-        }, "addRow": function () {
-          self._onAddRow.apply(self, arguments);
-        }, "mouseDblClick": function () {
-          self._onMouseDblClick.apply(self, arguments);
-        }, "showNextPrevWorksheet": function () {
-          self._onShowNextPrevWorksheet.apply(self, arguments);
-        }, "setFontAttributes": function () {
-          self._onSetFontAttributes.apply(self, arguments);
-        }, "selectColumnsByRange": function () {
-          self._onSelectColumnsByRange.apply(self, arguments);
-        }, "selectRowsByRange": function () {
-          self._onSelectRowsByRange.apply(self, arguments);
-        }, "save": function () {
-          self.Api.asc_Save();
-        }, "showCellEditorCursor": function () {
-          self._onShowCellEditorCursor.apply(self, arguments);
-        }, "print": function () {
-          self.Api.onPrint();
-        }, "addFunction": function () {
-          self.insertFormulaInEditor.apply(self, arguments);
-        }, "canvasClick": function () {
-          self.enableKeyEventsHandler(true);
-        }, "autoFiltersClick": function () {
-          self._onAutoFiltersClick.apply(self, arguments);
-        }, "commentCellClick": function () {
-          self._onCommentCellClick.apply(self, arguments);
-        }, "isGlobalLockEditCell": function () {
-          return self.collaborativeEditing.getGlobalLockEditCell();
-        }, "updateSelectionName": function () {
-          self._onUpdateSelectionName.apply(self, arguments);
-        }, "stopFormatPainter": function () {
-          self._onStopFormatPainter.apply(self, arguments);
-        },
+	  if (!window["NATIVE_EDITOR_ENJINE"]) {
+		  // initialize events controller
+		  this.controller.init(this, this.element, /*this.canvasOverlay*/ this.canvasGraphicOverlay, /*handlers*/{
+			  "resize": function () {
+				  self.resize.apply(self, arguments);
+			  }, "reinitializeScroll": function () {
+				  self._onScrollReinitialize.apply(self, arguments);
+			  }, "scrollY": function () {
+				  self._onScrollY.apply(self, arguments);
+			  }, "scrollX": function () {
+				  self._onScrollX.apply(self, arguments);
+			  }, "changeSelection": function () {
+				  self._onChangeSelection.apply(self, arguments);
+			  }, "changeSelectionDone": function () {
+				  self._onChangeSelectionDone.apply(self, arguments);
+			  }, "changeSelectionRightClick": function () {
+				  self._onChangeSelectionRightClick.apply(self, arguments);
+			  }, "selectionActivePointChanged": function () {
+				  self._onSelectionActivePointChanged.apply(self, arguments);
+			  }, "updateWorksheet": function () {
+				  self._onUpdateWorksheet.apply(self, arguments);
+			  }, "resizeElement": function () {
+				  self._onResizeElement.apply(self, arguments);
+			  }, "resizeElementDone": function () {
+				  self._onResizeElementDone.apply(self, arguments);
+			  }, "changeFillHandle": function () {
+				  self._onChangeFillHandle.apply(self, arguments);
+			  }, "changeFillHandleDone": function () {
+				  self._onChangeFillHandleDone.apply(self, arguments);
+			  }, "moveRangeHandle": function () {
+				  self._onMoveRangeHandle.apply(self, arguments);
+			  }, "moveRangeHandleDone": function () {
+				  self._onMoveRangeHandleDone.apply(self, arguments);
+			  }, "moveResizeRangeHandle": function () {
+				  self._onMoveResizeRangeHandle.apply(self, arguments);
+			  }, "moveResizeRangeHandleDone": function () {
+				  self._onMoveResizeRangeHandleDone.apply(self, arguments);
+			  }, "editCell": function () {
+				  self._onEditCell.apply(self, arguments);
+			  }, "stopCellEditing": function () {
+				  return self._onStopCellEditing.apply(self, arguments);
+			  }, "getCellEditMode": function () {
+				  return self.isCellEditMode;
+			  }, "empty": function () {
+				  self._onEmpty.apply(self, arguments);
+			  }, "canEnterCellRange": function () {
+				  self.cellEditor.setFocus(false);
+				  var ret = self.cellEditor.canEnterCellRange();
+				  ret ? self.cellEditor.activateCellRange() : true;
+				  return ret;
+			  }, "enterCellRange": function () {
+				  self.lockDraw = true;
+				  self.cellEditor.setFocus(false);
+				  self.getWorksheet().enterCellRange(self.cellEditor);
+				  self.lockDraw = false;
+			  }, "undo": function () {
+				  self.undo.apply(self, arguments);
+			  }, "redo": function () {
+				  self.redo.apply(self, arguments);
+			  }, "addColumn": function () {
+				  self._onAddColumn.apply(self, arguments);
+			  }, "addRow": function () {
+				  self._onAddRow.apply(self, arguments);
+			  }, "mouseDblClick": function () {
+				  self._onMouseDblClick.apply(self, arguments);
+			  }, "showNextPrevWorksheet": function () {
+				  self._onShowNextPrevWorksheet.apply(self, arguments);
+			  }, "setFontAttributes": function () {
+				  self._onSetFontAttributes.apply(self, arguments);
+			  }, "setCellFormat": function () {
+				  self._onSetCellFormat.apply(self, arguments);
+			  }, "selectColumnsByRange": function () {
+				  self._onSelectColumnsByRange.apply(self, arguments);
+			  }, "selectRowsByRange": function () {
+				  self._onSelectRowsByRange.apply(self, arguments);
+			  }, "save": function () {
+				  self.Api.asc_Save();
+			  }, "showCellEditorCursor": function () {
+				  self._onShowCellEditorCursor.apply(self, arguments);
+			  }, "print": function () {
+				  self.Api.onPrint();
+			  }, "addFunction": function () {
+				  self.insertFormulaInEditor.apply(self, arguments);
+			  }, "canvasClick": function () {
+				  self.enableKeyEventsHandler(true);
+			  }, "autoFiltersClick": function () {
+				  self._onAutoFiltersClick.apply(self, arguments);
+			  }, "commentCellClick": function () {
+				  self._onCommentCellClick.apply(self, arguments);
+			  }, "isGlobalLockEditCell": function () {
+				  return self.collaborativeEditing.getGlobalLockEditCell();
+			  }, "updateSelectionName": function () {
+				  self._onUpdateSelectionName.apply(self, arguments);
+			  }, "stopFormatPainter": function () {
+				  self._onStopFormatPainter.apply(self, arguments);
+			  },
 
-        // Shapes
-        "graphicObjectMouseDown": function () {
-          self._onGraphicObjectMouseDown.apply(self, arguments);
-        }, "graphicObjectMouseMove": function () {
-          self._onGraphicObjectMouseMove.apply(self, arguments);
-        }, "graphicObjectMouseUp": function () {
-          self._onGraphicObjectMouseUp.apply(self, arguments);
-        }, "graphicObjectMouseUpEx": function () {
-          self._onGraphicObjectMouseUpEx.apply(self, arguments);
-        }, "graphicObjectWindowKeyDown": function () {
-          return self._onGraphicObjectWindowKeyDown.apply(self, arguments);
-        }, "graphicObjectWindowKeyPress": function () {
-          return self._onGraphicObjectWindowKeyPress.apply(self, arguments);
-        }, "getGraphicsInfo": function () {
-          return self._onGetGraphicsInfo.apply(self, arguments);
-        }, "updateSelectionShape": function () {
-          return self._onUpdateSelectionShape.apply(self, arguments);
-        }, "canReceiveKeyPress": function () {
-          return self.getWorksheet().objectRender.controller.canReceiveKeyPress();
-        }, "stopAddShape": function () {
-          self.getWorksheet().objectRender.controller.checkEndAddShape();
-        },
+			  // Shapes
+			  "graphicObjectMouseDown": function () {
+				  self._onGraphicObjectMouseDown.apply(self, arguments);
+			  }, "graphicObjectMouseMove": function () {
+				  self._onGraphicObjectMouseMove.apply(self, arguments);
+			  }, "graphicObjectMouseUp": function () {
+				  self._onGraphicObjectMouseUp.apply(self, arguments);
+			  }, "graphicObjectMouseUpEx": function () {
+				  self._onGraphicObjectMouseUpEx.apply(self, arguments);
+			  }, "graphicObjectWindowKeyDown": function () {
+				  return self._onGraphicObjectWindowKeyDown.apply(self, arguments);
+			  }, "graphicObjectWindowKeyPress": function () {
+				  return self._onGraphicObjectWindowKeyPress.apply(self, arguments);
+			  }, "getGraphicsInfo": function () {
+				  return self._onGetGraphicsInfo.apply(self, arguments);
+			  }, "updateSelectionShape": function () {
+				  return self._onUpdateSelectionShape.apply(self, arguments);
+			  }, "canReceiveKeyPress": function () {
+				  return self.getWorksheet().objectRender.controller.canReceiveKeyPress();
+			  }, "stopAddShape": function () {
+				  self.getWorksheet().objectRender.controller.checkEndAddShape();
+			  },
 
-        // Frozen anchor
-        "moveFrozenAnchorHandle": function () {
-          self._onMoveFrozenAnchorHandle.apply(self, arguments);
-        }, "moveFrozenAnchorHandleDone": function () {
-          self._onMoveFrozenAnchorHandleDone.apply(self, arguments);
-        },
+			  // Frozen anchor
+			  "moveFrozenAnchorHandle": function () {
+				  self._onMoveFrozenAnchorHandle.apply(self, arguments);
+			  }, "moveFrozenAnchorHandleDone": function () {
+				  self._onMoveFrozenAnchorHandleDone.apply(self, arguments);
+			  },
 
-        // AutoComplete
-        "showAutoComplete": function () {
-          self.showAutoComplete.apply(self, arguments);
-        }, "onContextMenu": function (event) {
-          self.handlers.trigger("asc_onContextMenu", event);
-        },
+			  // AutoComplete
+			  "showAutoComplete": function () {
+				  self.showAutoComplete.apply(self, arguments);
+			  }, "onContextMenu": function (event) {
+				  self.handlers.trigger("asc_onContextMenu", event);
+			  },
 
-        // FormatPainter
-        'isFormatPainter': function () {
-          return self.stateFormatPainter;
-        },
+			  // FormatPainter
+			  'isFormatPainter': function () {
+				  return self.stateFormatPainter;
+			  },
 
-        //calcAll
-        'calcAll': function (ctrlKey, altKey, shiftKey) {
-          if(ctrlKey && altKey && shiftKey){
-            self.model.recalcWB(true);
-          } else if(shiftKey){
-            var ws = self.model.getActiveWs();
-            self.model.recalcWB(false, ws.getId());
-          } else {
-            self.model.recalcWB(false);
-          }
-        },
-      });
+			  //calcAll
+			  'calcAll': function (ctrlKey, altKey, shiftKey) {
+				  if (ctrlKey && altKey && shiftKey) {
+					  self.model.recalcWB(true);
+				  } else if (shiftKey) {
+					  var ws = self.model.getActiveWs();
+					  self.model.recalcWB(false, ws.getId());
+				  } else {
+					  self.model.recalcWB(false);
+				  }
+			  }
+		  });
 
       if (this.input && this.input.addEventListener) {
         this.input.addEventListener("focus", function () {
@@ -1480,6 +1477,14 @@
     return this.setFontAttributes(prop, val);
   };
 
+	WorkbookView.prototype._onSetCellFormat = function (prop) {
+	  var info = new Asc.asc_CFormatCellsInfo();
+	  info.asc_setSymbol(AscCommon.g_oDefaultCultureInfo.LCID);
+	  info.asc_setType(Asc.c_oAscNumFormatType.None);
+	  var formats = AscCommon.getFormatCells(info);
+	  this.setCellFormat(formats[prop]);
+	};
+
   WorkbookView.prototype._onSelectColumnsByRange = function() {
     this.getWorksheet()._selectColumnsByRange();
   };
@@ -1545,6 +1550,7 @@
    * @returns {WorkbookView}
    */
   WorkbookView.prototype.showWorksheet = function (index, isResized, bLockDraw) {
+    // ToDo disable method for assembly
     if (index === this.wsActive) {
       return this;
     }
@@ -1639,7 +1645,7 @@
       ws.objectRender.controller.updateOverlay();
     }
 
-    if (isSendInfo) {
+    if (isSendInfo && !window["NATIVE_EDITOR_ENJINE"]) {
       this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
       this._onWSSelectionChanged();
       this._onSelectionMathInfoChanged(ws.getSelectionMathInfo());
@@ -2095,6 +2101,10 @@
       this.cellEditor.setTextStyle(prop, val);
     }
   };
+
+	WorkbookView.prototype.setCellFormat = function (format) {
+		this.getWorksheet().setSelectionInfo("format", format);
+	};
 
   WorkbookView.prototype.emptyCells = function(options) {
     if (!this.getCellEditMode()) {
@@ -2672,346 +2682,143 @@
   };
 
   WorkbookView.prototype.af_getSmallIconTable = function (canvas, style, fmgrGraphics, oFont, props) {
-    var ctx = new Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
-    var styleOptions = style;
+	var ctx = new Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
-    //по умолчанию ставим строку заголовка и чередующиеся строки, позже нужно будет получать параметр
-    var styleInfo;
-    if (props) {
-      styleInfo = {
-        ShowColumnStripes: props.asc_getBandVer(),
-        ShowFirstColumn: props.asc_getFirstCol(),
-        ShowLastColumn: props.asc_getLastCol(),
-        ShowRowStripes: props.asc_getBandHor(),
-        HeaderRowCount: props.asc_getFirstRow(),
-        TotalsRowCount: props.asc_getLastRow()
-      };
-    } else {
-      styleInfo = {
-        ShowColumnStripes: false,
-        ShowFirstColumn: false,
-        ShowLastColumn: false,
-        ShowRowStripes: true,
-        HeaderRowCount: true,
-        TotalsRowCount: false
-      };
-    }
+	//по умолчанию ставим строку заголовка и чередующиеся строки, позже нужно будет получать параметр
+	var styleInfo;
+	if (props) {
+		styleInfo = {
+			ShowColumnStripes: props.asc_getBandVer(),
+			ShowFirstColumn: props.asc_getFirstCol(),
+			ShowLastColumn: props.asc_getLastCol(),
+			ShowRowStripes: props.asc_getBandHor(),
+			HeaderRowCount: props.asc_getFirstRow(),
+			TotalsRowCount: props.asc_getLastRow()
+		};
+	} else {
+		styleInfo = {
+			ShowColumnStripes: false,
+			ShowFirstColumn: false,
+			ShowLastColumn: false,
+			ShowRowStripes: true,
+			HeaderRowCount: true,
+			TotalsRowCount: false
+		};
+	}
+	
+	var pxToMM = 72 / 96;
+	var startX = 1 * pxToMM;
+	var startY = 1 * pxToMM;
 
+	var ySize = 45 * pxToMM - 2 * startY;
+	var xSize = 61 * pxToMM - 2 * startX;
+	
+	var stepY = (ySize) / 5;
+	var stepX = (xSize) / 5;
+	var lineStepX = (xSize - 1 * pxToMM) / 5;
+	
+	var whiteColor = new CColor(255, 255, 255);
+	var blackColor = new CColor(0, 0, 0);
 
-    var pxToMM = 72 / 96;
-    var ySize = 45 * pxToMM;
-    var xSize = 61 * pxToMM;
+	var defaultColor;
+	if (!style || !style.wholeTable || !style.wholeTable.dxf.font) {
+		defaultColor = blackColor;
+	} else {
+		defaultColor = style.wholeTable.dxf.font.getColor();
+	}
 
-    var stepY = (ySize) / 5;
-    var stepX = (60 * pxToMM) / 5;
-    var whiteColor = new CColor(255, 255, 255);
-    var blackColor = new CColor(0, 0, 0);
+	var headerRowCount = 1;
+	var totalsRowCount = 0;
+	if(null != styleInfo.HeaderRowCount)
+		headerRowCount = styleInfo.HeaderRowCount;
+	if(null != styleInfo.TotalsRowCount)
+		totalsRowCount = styleInfo.TotalsRowCount;
+	
+	ctx.setFillStyle(whiteColor);
+	ctx.fillRect(0, 0, xSize + 2 * startX, ySize + 2 * startY);
+	if (style.wholeTable && style.wholeTable.dxf.fill && null != style.wholeTable.dxf.fill.bg) {
+		ctx.setFillStyle(style.wholeTable.dxf.fill.bg);
+		ctx.fillRect(startX, startY, xSize, ySize);
+	}
+	
+	var calculateLineVer = function(color, x, y1, y2)
+	{
+		ctx.beginPath();
+		ctx.setStrokeStyle(color);
 
-    //**draw background**
-    var defaultColorBackground;
-    if (styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill) {
-      defaultColorBackground = styleOptions.wholeTable.dxf.fill.bg;
-    } else {
-      defaultColorBackground = whiteColor;
-    }
+		ctx.lineVer(x + startX, y1 + startY, y2 + startY);
 
-    var color;
-    if (styleOptions != undefined) {
-      if (styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg) {
-        ctx.setFillStyle(styleOptions.wholeTable.dxf.fill.bg);
-        ctx.fillRect(0, 0, xSize, ySize);
-      } else {
-        ctx.setFillStyle(whiteColor);
-        ctx.fillRect(0, 0, xSize, ySize);
-      }
-      if (styleInfo.ShowColumnStripes)//column stripes
-      {
-        for (k = 0; k < 6; k++) {
-          color = defaultColorBackground;
-          if (k % 2 == 0) {
-            if (styleOptions.firstColumnStripe && styleOptions.firstColumnStripe.dxf.fill &&
-              null != styleOptions.firstColumnStripe.dxf.fill.bg) {
-              color = styleOptions.firstColumnStripe.dxf.fill.bg;
-            } else if (styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill &&
-              null != styleOptions.wholeTable.dxf.fill.bg) {
-              color = styleOptions.wholeTable.dxf.fill.bg;
-            }
-          } else {
-            if (styleOptions.secondColumnStripe && styleOptions.secondColumnStripe.dxf.fill &&
-              null != styleOptions.secondColumnStripe.dxf.fill.bg) {
-              color = styleOptions.secondColumnStripe.dxf.fill.bg;
-            } else if (styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill &&
-              null != styleOptions.wholeTable.dxf.fill.bg) {
-              color = styleOptions.wholeTable.dxf.fill.bg;
-            }
-          }
-          ctx.setFillStyle(color);
-          ctx.fillRect(k * stepX, 0, stepX, ySize);
-        }
-      }
+		ctx.stroke();
+		ctx.closePath();
+	};
+	
+	var calculateLineHor = function(color, x1, y, x2)
+	{
+		ctx.beginPath();
+		ctx.setStrokeStyle(color);
 
-      if (styleInfo.ShowRowStripes)//row stripes
-      {
-        for (var k = 0; k < 6; k++) {
-          color = null;
+		ctx.lineHor(x1 + startX, y + startY, x2 + startX);
 
-          if (k == 0 && styleInfo.HeaderRowCount) {
-            continue;
-          }
-
-          if (styleInfo.HeaderRowCount) {
-            if (k % 2 != 0) {
-              if (styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill &&
-                null != styleOptions.firstRowStripe.dxf.fill.bg) {
-                color = styleOptions.firstRowStripe.dxf.fill.bg;
-              }
-            } else {
-              if (styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill &&
-                null != styleOptions.secondRowStripe.dxf.fill.bg) {
-                color = styleOptions.secondRowStripe.dxf.fill.bg;
-              }
-            }
-          } else {
-            if (k % 2 != 0) {
-              if (styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill &&
-                null != styleOptions.secondRowStripe.dxf.fill.bg) {
-                color = styleOptions.secondRowStripe.dxf.fill.bg;
-              }
-            } else {
-              if (styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill &&
-                null != styleOptions.firstRowStripe.dxf.fill.bg) {
-                color = styleOptions.firstRowStripe.dxf.fill.bg;
-              }
-            }
-          }
-
-          if (color != null) {
-            ctx.setFillStyle(color);
-            ctx.fillRect(0, k * stepY, xSize, stepY);
-          }
-        }
-      }
-
-      if (styleInfo.ShowFirstColumn && styleOptions.firstColumn)//first column
-      {
-        color = null;
-        if (styleOptions.firstColumn && styleOptions.firstColumn.dxf.fill &&
-          null != styleOptions.firstColumn.dxf.fill.bg) {
-          color = styleOptions.firstColumn.dxf.fill.bg;
-        }
-
-        if (color != null) {
-          ctx.setFillStyle(color);
-          ctx.fillRect(0, 0, stepX, ySize);
-        }
-      }
-      if (styleInfo.ShowLastColumn)//last column
-      {
-        color = null;
-        if (styleOptions.lastColumn && styleOptions.lastColumn.dxf.fill &&
-          null != styleOptions.lastColumn.dxf.fill.bg) {
-          color = styleOptions.lastColumn.dxf.fill.bg;
-        }
-
-        if (color != null) {
-          ctx.setFillStyle(color);
-          ctx.fillRect(4 * stepX + 1, 0, stepX, ySize);
-        }
-
-      }
-      if (styleInfo.HeaderRowCount)//header row
-      {
-        if (styleOptions.headerRow && styleOptions.headerRow.dxf.fill && null != styleOptions.headerRow.dxf.fill.bg) {
-          ctx.setFillStyle(styleOptions.headerRow.dxf.fill.bg);
-        } else {
-          ctx.setFillStyle(defaultColorBackground);
-        }
-        ctx.fillRect(0, 0, xSize, stepY);
-
-      }
-      if (styleInfo.TotalsRowCount)//total row
-      {
-        color = null;
-        if (styleOptions.totalRow && styleOptions.totalRow.dxf.fill && null != styleOptions.totalRow.dxf.fill.bg) {
-          color = styleOptions.totalRow.dxf.fill.bg;
-        }
-
-        if (color !== null) {
-          ctx.setFillStyle(color);
-          ctx.fillRect(0, stepY * 4, xSize, stepY);
-        }
-      }
-
-
-      //первая ячейка
-      if (styleOptions.firstHeaderCell && styleInfo.ShowFirstColumn) {
-        if (styleOptions.firstHeaderCell && styleOptions.firstHeaderCell.dxf.fill &&
-          null != styleOptions.firstHeaderCell.dxf.fill.bg) {
-          ctx.setFillStyle(styleOptions.firstHeaderCell.dxf.fill.bg);
-        } else {
-          ctx.setFillStyle(defaultColorBackground);
-        }
-        ctx.fillRect(0, 0, stepX, stepY);
-      }
-      //последняя в первой строке
-      if (styleOptions.lastHeaderCell && styleInfo.ShowLastColumn) {
-        if (styleOptions.lastHeaderCell && styleOptions.lastHeaderCell.dxf.fill &&
-          null != styleOptions.lastHeaderCell.dxf.fill.bg) {
-          ctx.setFillStyle(styleOptions.lastHeaderCell.dxf.fill.bg);
-        } else {
-          ctx.setFillStyle(defaultColorBackground);
-        }
-        ctx.fillRect(4 * stepX, 0, stepX, stepY);
-      }
-      //первая в последней строке
-      if (styleOptions.firstTotalCell && styleInfo.TotalsRowCount && styleInfo.ShowFirstColumn) {
-        if (styleOptions.firstTotalCell && styleOptions.firstTotalCell.dxf.fill &&
-          null != styleOptions.firstTotalCell.dxf.fill.bg) {
-          ctx.setFillStyle(styleOptions.firstTotalCell.dxf.fill.bg);
-        } else {
-          ctx.setFillStyle(defaultColorBackground);
-        }
-        ctx.fillRect(0, 4 * stepY, stepX, stepY);
-      }
-      //последняя ячейка
-      if (styleOptions.lastTotalCell && styleInfo.TotalsRowCount && styleInfo.ShowLastColumn) {
-        if (styleOptions.lastTotalCell && styleOptions.lastTotalCell.dxf.fill &&
-          null != styleOptions.lastTotalCell.dxf.fill.bg) {
-          ctx.setFillStyle(styleOptions.lastTotalCell.dxf.fill.bg);
-        } else {
-          ctx.setFillStyle(defaultColorBackground);
-        }
-        ctx.fillRect(4 * stepX, 4 * stepY, stepX, ySize);
-      }
-
-    } else {
-      ctx.setFillStyle(whiteColor);
-      ctx.fillRect(0, 0, xSize, ySize);
-    }
-
-
-    //**draw vertical and horizontal lines**
-    if (styleOptions != undefined) {
-      ctx.setLineWidth(1);
-      ctx.beginPath();
-      if (styleOptions.wholeTable && styleOptions.wholeTable.dxf.border) {
-        var borders = styleOptions.wholeTable.dxf.border;
-        if (borders.t.s !== c_oAscBorderStyles.None) {
-          ctx.setStrokeStyle(borders.t.c);
-          ctx.lineHor(0, 0, xSize);
-        }
-        if (borders.b.s !== c_oAscBorderStyles.None) {
-          ctx.setStrokeStyle(borders.b.c);
-          ctx.lineHor(0, ySize, xSize);
-        }
-        if (borders.l.s !== c_oAscBorderStyles.None) {
-          ctx.setStrokeStyle(borders.l.c);
-          ctx.lineVer(0, 0, ySize);
-        }
-        if (borders.r.s !== c_oAscBorderStyles.None) {
-          ctx.setStrokeStyle(borders.r.c);
-          ctx.lineVer(xSize - 1, 0, ySize);
-        }
-        if (borders.ih.s !== c_oAscBorderStyles.None) {
-          ctx.setStrokeStyle(borders.ih.c);
-          for (var n = 1; n < 5; n++) {
-            ctx.lineHor(0, stepY * n, xSize);
-          }
-          ctx.stroke();
-        }
-        if (borders.iv.s !== c_oAscBorderStyles.None) {
-          ctx.setStrokeStyle(borders.iv.c);
-          for (var n = 1; n < 5; n++) {
-            ctx.lineVer(stepX * n, 0, ySize);
-          }
-          ctx.stroke();
-        }
-
-      }
-
-      var border;
-      if (styleInfo.ShowRowStripes) {
-        if (styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.border) {
-          border = styleOptions.firstRowStripe.dxf.border;
-        } else if (styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.border) {
-          border = styleOptions.secondRowStripe.dxf.border;
-        }
-
-        if (border) {
-          for (n = 1; n < 5; n++) {
-            ctx.lineHor(0, stepY * n, xSize);
-          }
-          ctx.stroke();
-        }
-      }
-      if (styleOptions.totalRow && styleInfo.TotalsRowCount && styleOptions.totalRow.dxf.border) {
-        border = styleOptions.totalRow.dxf.border;
-        if (border.t.s !== c_oAscBorderStyles.None) {
-          ctx.setStrokeStyle(border.t.c);
-          ctx.lineVer(0, xSize, ySize);
-        }
-      }
-      if (styleOptions.headerRow && styleOptions.headerRow.dxf.border && styleInfo.HeaderRowCount)//header row
-      {
-        border = styleOptions.headerRow.dxf.border;
-        if (border.t.s !== c_oAscBorderStyles.None) {
-          ctx.setStrokeStyle(border.t.c);
-          ctx.lineHor(0, 0, xSize);
-        }
-        if (border.b.s !== c_oAscBorderStyles.None) {
-          ctx.setStrokeStyle(border.b.c);
-          ctx.lineHor(0, stepY, xSize);
-        }
-        ctx.stroke();
-      }
-      ctx.closePath();
-    }
-
-    //**draw marks line**
-    var defaultColor;
-    if (!styleOptions || !styleOptions.wholeTable || !styleOptions.wholeTable.dxf.font) {
-      defaultColor = blackColor;
-    } else {
-      defaultColor = styleOptions.wholeTable.dxf.font.getColor();
-    }
-    for (var n = 1; n < 6; n++) {
-      ctx.beginPath();
-      color = null;
-      if (n == 1 && styleOptions && styleOptions.headerRow && styleOptions.headerRow.dxf.font) {
-        color = styleOptions.headerRow.dxf.font.getColor();
-      } else if (n == 5 && styleOptions && styleOptions.totalRow && styleOptions.totalRow.dxf.font) {
-        color = styleOptions.totalRow.dxf.font.getColor();
-      } else if (styleOptions && styleOptions.headerRow && styleInfo.ShowRowStripes) {
-        if ((n == 2 || (n == 5 && !styleOptions.totalRow)) && styleOptions.firstRowStripe &&
-          styleOptions.firstRowStripe.dxf.font) {
-          color = styleOptions.firstRowStripe.dxf.font.getColor();
-        } else if (n == 3 && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font) {
-          color = styleOptions.secondRowStripe.dxf.font.getColor();
-        } else {
-          color = defaultColor
-        }
-      } else if (styleOptions && !styleOptions.headerRow && styleInfo.ShowRowStripes) {
-        if ((n == 1 || n == 3 || (n == 5 && !styleOptions.totalRow)) && styleOptions.firstRowStripe &&
-          styleOptions.firstRowStripe.dxf.font) {
-          color = styleOptions.firstRowStripe.dxf.font.getColor();
-        } else if ((n == 2 || n == 4) && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font) {
-          color = styleOptions.secondRowStripe.dxf.font.getColor();
-        } else {
-          color = defaultColor
-        }
-      } else {
-        color = defaultColor;
-      }
-      ctx.setStrokeStyle(color);
-      var k = 0;
-      var strY = n * stepY - stepY / 2;
-      while (k < 6) {
-        ctx.lineHor(k * stepX + 3 * pxToMM, strY, (k + 1) * stepX - 2 * pxToMM);
-        k++;
-      }
-      ctx.stroke();
-      ctx.closePath();
-    }
+		ctx.stroke();
+		ctx.closePath();
+	};
+	
+	var calculateRect = function(color, x1, y1, w, h)
+	{
+		ctx.beginPath();
+		ctx.setFillStyle(color);
+		ctx.fillRect(x1 + startX, y1 + startY, w, h);
+		ctx.closePath();
+	};
+	
+	var bbox = {c1: 0, r1: 0, c2: 4, r2: 4};
+	for (var i = 0; i < 5; i++) {
+		for (var j = 0; j < 5; j++) {
+			var color = null;
+			var curStyle = style.getStyle(bbox, i, j, styleInfo, headerRowCount, totalsRowCount);
+			
+			//fill
+			if(curStyle && curStyle.fill && curStyle.fill.bg)
+			{
+				color = curStyle.fill.bg;
+				calculateRect(color, j * stepX, i * stepY, (j + 1) * stepX - j * stepX, (i + 1) * stepY - i * stepY);
+			}
+			
+			//borders
+			//left
+			if(curStyle && curStyle.border && curStyle.border.l && curStyle.border.l.w !== 0)
+			{
+				color = curStyle.border.l.c;
+				calculateLineVer(color, j * lineStepX, i * stepY, (i + 1) * stepY);
+			}
+			//right
+			if(curStyle && curStyle.border && curStyle.border.r && curStyle.border.r.w !== 0)
+			{
+				color = curStyle.border.r.c;
+				calculateLineVer(color, (j + 1) * lineStepX, i * stepY, (i + 1) * stepY);
+			}
+			//top
+			if(curStyle && curStyle.border && curStyle.border.t && curStyle.border.t.w !== 0)
+			{
+				color = curStyle.border.t.c;
+				calculateLineHor(color, j * stepX, i * stepY, (j + 1) * stepX);
+			}
+			//bottom
+			if(curStyle && curStyle.border && curStyle.border.b && curStyle.border.b.w !== 0)
+			{
+				color = curStyle.border.b.c;
+				calculateLineHor(color, j * stepX, (i + 1) * stepY, (j + 1) * stepX);
+			}
+			
+			//marks
+			var color = defaultColor;
+			if(curStyle && curStyle.font && curStyle.font.c)
+			{
+				color = curStyle.font.c;
+			}
+			calculateLineHor(color, j * lineStepX + 3 * pxToMM, (i + 1) * stepY - stepY / 2, (j + 1) * lineStepX - 2 * pxToMM);
+		}
+	}
 
     return canvas.toDataURL("image/png");
   };

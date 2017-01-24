@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -12118,7 +12118,7 @@ CDTable.prototype =
         w.WriteString2(this.Get_Id());
     },
 
-    Read_FromBinary: function(r)
+    Read_FromBinary2: function(r)
     {
         this.Id = r.GetString2();
     },
@@ -25606,6 +25606,11 @@ CView3d.prototype =
         History.Add(this, {Type: AscDFH.historyitem_View3d_SetRAngAx, oldPr: this.rAngAx, newPr: pr});
         this.rAngAx = pr;
     },
+
+    getRAngAx: function(){
+        return this.rAngAx !== false;
+    },
+
     setRotX: function(pr)
     {
         History.Add(this, {Type: AscDFH.historyitem_View3d_SetRotX, oldPr: this.rotX, newPr: pr});

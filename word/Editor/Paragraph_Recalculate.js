@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -38,8 +38,8 @@ var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 // TODO: В колонтитулах быстрые пересчеты отключены. Надо реализовать.
 
 /**
- * Здесь мы пытаемся быстро пересчитать текущий параграф. Если быстрый пересчет срабатывает, тогда возвращаются страницы,
- * которые нужно перерисовать, в противном случае возвращается пустой массив.
+ * Здесь мы пытаемся быстро пересчитать текущий параграф. Если быстрый пересчет срабатывает, тогда возвращаются
+ * страницы, которые нужно перерисовать, в противном случае возвращается пустой массив.
  * @returns {*}
  */
 Paragraph.prototype.Recalculate_FastWholeParagraph = function()
@@ -908,7 +908,7 @@ Paragraph.prototype.private_RecalculateLine            = function(CurLine, CurPa
     //-------------------------------------------------------------------------------------------------------------
     // 2. Проверяем, является ли данная строка висячей
     //-------------------------------------------------------------------------------------------------------------
-    if(false === this.private_RecalculateLineWidow(CurLine, CurPage, PRS, ParaPr))
+    if (false === this.private_RecalculateLineWidow(CurLine, CurPage, PRS, ParaPr))
         return;
 
     //-------------------------------------------------------------------------------------------------------------
@@ -1200,9 +1200,9 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
 
         if (0 === CurLine)
         {
-            // Добавляем расстояние до параграфа (Pr.Spacing.Before)
-            if (0 === CurPage || true === this.Parent.Is_TableCellContent() || true === ParaPr.PageBreakBefore)
-                BaseLineOffset += ParaPr.Spacing.Before;
+			// Добавляем расстояние до параграфа (Pr.Spacing.Before)
+			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS))
+				BaseLineOffset += ParaPr.Spacing.Before;
 
             // Добавляем толщину границы параграфа (если граница задана)
             if ((true === ParaPr.Brd.First || 1 === CurPage) && border_Single === ParaPr.Brd.Top.Value)
@@ -1214,7 +1214,12 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
         PRS.BaseLineOffset = BaseLineOffset;
     }
     else
-        BaseLineOffset = PRS.BaseLineOffset;
+	{
+		if (this.Lines[CurLine].Info & paralineinfo_RangeY)
+			PRS.BaseLineOffset = this.Lines[CurLine].Metrics.Ascent;
+		else
+			BaseLineOffset = PRS.BaseLineOffset;
+	}
 
     var Top, Bottom;
     var Top2, Bottom2; // верх и низ без Pr.Spacing
@@ -1228,7 +1233,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
 
         if ( 0 === CurLine )
         {
-            if ( 0 === CurPage || true === this.Parent.Is_TableCellContent() )
+			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS))
             {
                 Top2    = Top + ParaPr.Spacing.Before;
                 Bottom2 = Top + ParaPr.Spacing.Before + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
@@ -1283,7 +1288,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
             Top  = PRS.Y;
             Top2 = PRS.Y;
 
-            if ( 0 === CurPage || true === this.Parent.Is_TableCellContent() || true === ParaPr.PageBreakBefore )
+			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS))
             {
                 Top2    = Top + ParaPr.Spacing.Before;
                 Bottom2 = Top + ParaPr.Spacing.Before + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
@@ -1458,7 +1463,6 @@ Paragraph.prototype.private_RecalculateLineBaseLine    = function(CurLine, CurPa
     if (this.Lines[CurLine].Info & paralineinfo_RangeY)
     {
         this.Lines[CurLine].Y = PRS.Y - this.Pages[CurPage].Y;
-        PRS.BaseLineOffset = this.Lines[CurLine].Metrics.Ascent;
     }
     else
     {
@@ -2143,6 +2147,31 @@ Paragraph.prototype.private_RecalculateMoveLineToNextPage = function(CurLine, Cu
 		PRS.RecalcResult = recalcresult_NextPage;
 		return false;
 	}
+};
+
+Paragraph.prototype.private_CheckNeedBeforeSpacing = function(CurPage, PRS)
+{
+	if (CurPage <= 0)
+		return true;
+
+	if (!this.Check_FirstPage(CurPage))
+		return false;
+
+	if (!(PRS.Parent instanceof CDocument))
+		return true;
+
+	// Если дошли до этого места, то тут все зависит от того на какой мы странице. Если на первой странице данной секции
+	// тогда добавляем расстояние, а если нет - нет. Но подсчет первой страницы здесь не совпадает с тем, как она
+	// считается для нумерации. Если разрыв секции идет на текущей странице, то первой считается сразу данная страница.
+
+	var LogicDocument = PRS.Parent;
+	var SectionIndex = LogicDocument.GetSectionIndexByElementIndex(this.Get_Index());
+	var FirstElement = LogicDocument.GetFirstElementInSection(SectionIndex);
+
+	if (!FirstElement || FirstElement.Get_AbsolutePage(0) === PRS.GetPageAbs())
+		return true;
+
+	return false;
 };
 
 var ERecalcPageType =

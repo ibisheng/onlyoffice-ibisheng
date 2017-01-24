@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -251,7 +251,8 @@ function CopyRunToPPTX(Run, Paragraph, bHyper)
     for ( var CurPos = 0; CurPos < Run.Content.length; CurPos++ )
     {
         var Item = Run.Content[CurPos];
-        if ( para_End !== Item.Type && Item.Type !== para_Drawing && Item.Type !== para_Comment)
+        if ( para_End !== Item.Type && Item.Type !== para_Drawing && Item.Type !== para_Comment &&
+            Item.Type !== para_PageCount && Item.Type !== para_FootnoteRef && Item.Type !== para_FootnoteReference)
         {
             NewRun.Add_ToContent( PosToAdd, Item.Copy(), false );
             ++PosToAdd;

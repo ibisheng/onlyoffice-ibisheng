@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -409,6 +409,7 @@ ParaRun.prototype.Add = function(Item, bMath)
 				var NewRun = this.private_SplitRunInCurPos();
 				if (NewRun)
 				{
+					NewRun.Set_VertAlign(undefined);
 					NewRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
 					NewRun.Cursor_MoveToStartPos();
 					NewRun.Add(Item, bMath);
@@ -855,6 +856,9 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
             }
             else
             {
+            	while (CurPos < this.Content.length && para_Drawing === this.Content[CurPos].Type && false === this.Content[CurPos].Is_Inline())
+					CurPos++;
+
                 if (CurPos >= this.Content.length || para_End === this.Content[CurPos].Type)
                     return false;
 
@@ -2458,14 +2462,17 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     if (para_ContinuationSeparator === ItemType)
                         Item.Update_Width(PRS);
 
-					if (para_FootnoteReference === ItemType)
+                    if (true !== PRS.IsFastRecalculate())
 					{
-						Item.UpdateNumber(PRS);
-						PRS.AddFootnoteReference(Item, PRS.GetCurrentContentPos(Pos));
-					}
-					else if (para_FootnoteRef === ItemType)
-					{
-						Item.UpdateNumber(PRS.TopDocument);
+						if (para_FootnoteReference === ItemType)
+						{
+							Item.UpdateNumber(PRS);
+							PRS.AddFootnoteReference(Item, PRS.GetCurrentContentPos(Pos));
+						}
+						else if (para_FootnoteRef === ItemType)
+						{
+							Item.UpdateNumber(PRS.TopDocument);
+						}
 					}
 
                     // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.
@@ -2880,8 +2887,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     Item.CheckRecalcAutoFit(oSectionPr);
                     if (true === Item.Is_Inline() || true === Para.Parent.Is_DrawingShape())
                     {
-                        if (true !== Item.Is_Inline())
-                            Item.Set_DrawingType(drawing_Inline);
+                    	// TODO: Нельзя что-то писать в историю во время пересчета, это действие надо делать при открытии
+                        // if (true !== Item.Is_Inline())
+                        //     Item.Set_DrawingType(drawing_Inline);
 
                         if (true === StartWord)
                             FirstItemOnLine = false;
@@ -5185,9 +5193,9 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
 
         if ((Math.abs( Diff ) < SearchPos.DiffX + 0.001 && (SearchPos.CenterMode || SearchPos.X > SearchPos.CurX)) && InMathText == false)
         {
-            SearchPos.DiffX = Math.abs( Diff );
-            SearchPos.Pos.Update( CurPos, Depth );
-            Result = true;
+			SearchPos.DiffX = Math.abs(Diff);
+			SearchPos.Pos.Update(CurPos, Depth);
+			Result = true;
 
             if ( Diff >= - 0.001 && Diff <= TempDx + 0.001 )
             {
@@ -5209,12 +5217,14 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
                 // Если мы ищем позицию для селекта, тогда нужно искать и за знаком параграфа
                 if ( true === StepEnd )
                 {
+					SearchPos.DiffX = Math.abs(Diff);
                     SearchPos.Pos.Update( this.Content.length, Depth );
                     Result = true;
                 }
             }
             else if ( CurPos === EndPos - 1 && para_NewLine != ItemType )
             {
+				SearchPos.DiffX = Math.abs(Diff);
                 SearchPos.Pos.Update( EndPos, Depth );
                 Result = true;
             }
@@ -5225,6 +5235,7 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
     // неправильную позицию вернем позицию начала данного путого рана.
     if ( SearchPos.DiffX > 1000000 - 1 )
     {
+    	SearchPos.DiffX = SearchPos.X - SearchPos.CurX;
         SearchPos.Pos.Update( StartPos, Depth );
         Result = true;
     }
@@ -5242,9 +5253,9 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
         Diff = SearchPos.X - SearchPos.CurX;
         if(SearchPos.InText == false && (bEmpty || StartPos !== EndPos) && (Math.abs( Diff ) < SearchPos.DiffX + 0.001 && (SearchPos.CenterMode || SearchPos.X > SearchPos.CurX)))
         {
-            SearchPos.DiffX = Math.abs( Diff );
-            SearchPos.Pos.Update( CurPos, Depth );
-            Result = true;
+			SearchPos.DiffX = Math.abs(Diff);
+			SearchPos.Pos.Update(CurPos, Depth);
+			Result = true;
         }
     }
 
@@ -5348,7 +5359,7 @@ ParaRun.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseConten
 		CurPos--;
 
 		var Item = this.Content[CurPos];
-		if (CurPos < 0 || (!(para_Drawing === Item.Type && false === Item.Is_Inline()) && !(para_FootnoteReference === Item.Type && true === Item.IsCustomMarkFollows())))
+		if (CurPos < 0 || (!(para_Drawing === Item.Type && false === Item.Is_Inline() && false === SearchPos.IsCheckAnchors()) && !(para_FootnoteReference === Item.Type && true === Item.IsCustomMarkFollows())))
 			break;
 	}
 
@@ -5378,7 +5389,7 @@ ParaRun.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseConte
 
 			var PrevItem     = this.Content[CurPos - 1];
 			var PrevItemType = PrevItem.Type;
-			if ((true !== StepEnd && para_End === PrevItemType) || (para_Drawing === PrevItemType && false === PrevItem.Is_Inline()) || (para_FootnoteReference === PrevItemType && true === PrevItem.IsCustomMarkFollows()))
+			if ((true !== StepEnd && para_End === PrevItemType) || (para_Drawing === PrevItemType && false === PrevItem.Is_Inline() && false === SearchPos.IsCheckAnchors()) || (para_FootnoteReference === PrevItemType && true === PrevItem.IsCustomMarkFollows()))
 				return;
 
 			break;

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -815,6 +815,9 @@ function CDrawingDocument()
 
 	this.OnRecalculatePage = function(index, pageObject)
 	{
+		if (this.m_oWordControl && this.m_oWordControl.MobileTouchManager)
+			this.m_oWordControl.MobileTouchManager.ClearContextMenu();
+
 		editor.sendEvent("asc_onDocumentChanged");
 
 		if (true === this.m_bIsSearching)
@@ -1432,6 +1435,27 @@ function CDrawingDocument()
 		var y_pix = (this.SlideCurrectRect.top + __y * dKoef + (_word_control.m_oMainContent.AbsolutePosition.T + _word_control.m_oMainView.AbsolutePosition.T) * g_dKoef_mm_to_pix) >> 0;
 
 		return {X : x_pix, Y : y_pix, Error : false};
+	}
+
+	this.ConvertCoordsToCursor3 = function (x, y, isGlobal)
+	{
+		var dKoef = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+
+		var _x = 0;
+		var _y = 0;
+		if (isGlobal)
+		{
+			_x = this.m_oWordControl.X;
+			_y = this.m_oWordControl.Y;
+
+			_x += (this.m_oWordControl.m_oMainContent.AbsolutePosition.L + this.m_oWordControl.m_oMainView.AbsolutePosition.L) * g_dKoef_mm_to_pix;
+			_y += (this.m_oWordControl.m_oMainContent.AbsolutePosition.T + this.m_oWordControl.m_oMainView.AbsolutePosition.T) * g_dKoef_mm_to_pix;
+		}
+
+		var x_pix = (this.SlideCurrectRect.left + x * dKoef + _x) >> 0;
+		var y_pix = (this.SlideCurrectRect.top + y * dKoef + _y) >> 0;
+
+		return {X: x_pix, Y: y_pix, Error: false};
 	}
 
 	this.ConvertCoordsToCursorWR_2 = function(x, y)
@@ -3862,6 +3886,9 @@ function CThumbnailsManager()
 			return;
 
 		var word_control = this.m_oWordControl;
+
+		if (word_control && word_control.MobileTouchManagerThumbnails)
+			word_control.MobileTouchManagerThumbnails.ClearContextMenu();
 
 		var canvas = word_control.m_oThumbnails.HtmlElement;
 		if (null == canvas)

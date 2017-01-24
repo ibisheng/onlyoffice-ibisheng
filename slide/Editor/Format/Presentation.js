@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -2230,7 +2230,11 @@ CPresentation.prototype =
             {
                 if(isRealObject(aSpTree[i].graphicObject) && typeof aSpTree[i].graphicObject.TableStyle === "string" && isRealObject(g_oTableId.Get_ById(aSpTree[i].graphicObject.TableStyle)))
                 {
-                    oMap[aSpTree[i].graphicObject.TableStyle] = true;
+                    var oStyle = AscCommon.g_oTableId.Get_ById(aSpTree[i].graphicObject.TableStyle);
+                    if(oStyle instanceof CStyle)
+                    {
+                        oMap[aSpTree[i].graphicObject.TableStyle] = true;
+                    }
                 }
             }
             else if(aSpTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape)
@@ -5324,6 +5328,46 @@ CPresentation.prototype =
             }
         }
         this.Document_UpdateUndoRedoState();
+    },
+
+
+    AddShapeOnCurrentPage: function (sPreset) {
+
+        if(!this.Slides[this.CurPage]){
+            return;
+        }
+        var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
+        oDrawingObjects.changeCurrentState(new AscFormat.StartAddNewShape(oDrawingObjects, sPreset));
+        this.OnMouseDown({}, this.Width/4, this.Height/4, this.CurPage);
+        this.OnMouseUp({}, this.Width/4, this.Height/4, this.CurPage);
+        this.Document_UpdateInterfaceState();
+        this.Document_UpdateRulersState();
+        this.Document_UpdateSelectionState();
+    },
+
+    Can_CopyCut: function()
+    {
+        if(!this.Slides[this.CurPage]){
+            return false;
+        }
+        var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
+        var oTargetContent = oDrawingObjects.getTargetDocContent();
+
+
+        if (oTargetContent)
+        {
+            if (true === oTargetContent.Is_SelectionUse() && true !== oTargetContent.Selection_IsEmpty(true))
+            {
+                 if (oTargetContent.Selection.StartPos !== oTargetContent.Selection.EndPos || type_Paragraph === oTargetContent.Content[oTargetContent.Selection.StartPos].Get_Type())
+                    return true;
+                else
+                    return oTargetContent.Content[oTargetContent.Selection.StartPos].Can_CopyCut();
+            }
+            return false;
+        }
+        else{
+            return oDrawingObjects.selectedObjects.length > 0;
+        }
     },
 
     StartAddShape: function(preset, _is_apply)

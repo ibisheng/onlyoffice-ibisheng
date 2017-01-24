@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -126,7 +126,7 @@
 	CMobileDelegateSimple.prototype.SetZoom = function(_value)
 	{
 	};
-	CMobileDelegateSimple.prototype.GetObjectTrack = function(x, y, page)
+	CMobileDelegateSimple.prototype.GetObjectTrack = function(x, y, page, bSelected)
 	{
 		return false;
 	};
@@ -217,9 +217,9 @@
 	{
 		this.HtmlPage.m_oApi.zoom(_value);
 	};
-	CMobileDelegateEditor.prototype.GetObjectTrack = function(x, y, page)
+	CMobileDelegateEditor.prototype.GetObjectTrack = function(x, y, page, bSelected)
 	{
-		return this.LogicDocument.DrawingObjects.isPointInDrawingObjects3(x, y, page);
+		return this.LogicDocument.DrawingObjects.isPointInDrawingObjects3(x, y, page, bSelected);
 	};
 	CMobileDelegateEditor.prototype.GetContextMenuType = function()
 	{
@@ -820,10 +820,8 @@
 	CMobileTouchManagerBase.prototype.CheckObjectTrack = function()
 	{
 		var pos = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
-
-		var dKoef                     = (100 * AscCommon.g_dKoef_pix_to_mm / this.delegate.GetZoom());
 		global_mouseEvent.KoefPixToMM = 5;
-		if (this.delegate.GetObjectTrack(pos.X, pos.Y, pos.Page))
+		if (this.delegate.GetObjectTrack(pos.X, pos.Y, pos.Page, true))
 		{
 			this.Mode      = AscCommon.MobileTouchMode.FlowObj;
 		}
@@ -834,6 +832,15 @@
 		global_mouseEvent.KoefPixToMM = 1;
 
 		return (AscCommon.MobileTouchMode.FlowObj == this.Mode);
+	};
+
+	CMobileTouchManagerBase.prototype.CheckObjectTrackBefore = function()
+	{
+		var pos = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
+		global_mouseEvent.KoefPixToMM = 5;
+		var bResult = this.delegate.GetObjectTrack(pos.X, pos.Y, pos.Page, false);
+		global_mouseEvent.KoefPixToMM = 1;
+		return bResult;
 	};
 
 	// в мобильной версии - меньше, чем "по ширине" - не делаем
@@ -1565,13 +1572,14 @@
 		global_mouseEvent.ClickCount = 1;
 
 		var nearPos = this.delegate.Logic_GetNearestPos(pos.X, pos.Y, pos.Page);
+		if (!nearPos)
+			return;
 
 		this.delegate.DrawingDocument.NeedScrollToTargetFlag = true;
 		var y = nearPos.Y;
-		if (isHalfHeight)
-			y += nearPos.Height / 2;
-		this.delegate.Logic_OnMouseDown(global_mouseEvent, nearPos.X, y, pos.Page);
-		this.delegate.Logic_OnMouseUp(global_mouseEvent, nearPos.X, y, pos.Page);
+
+		nearPos.Paragraph.Parent.MoveCursorToNearestPos(nearPos);
+        this.delegate.LogicDocument.Document_UpdateSelectionState();
 		this.delegate.DrawingDocument.NeedScrollToTargetFlag = false;
 
 		global_mouseEvent.ClickCount = old_click_count;

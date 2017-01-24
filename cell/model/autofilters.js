@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -902,7 +902,7 @@
 						this.sortColFilter(data.type, data.cellId, data.activeCells, null, data.displayName, data.color);
 						break;
 					case AscCH.historyitem_AutoFilter_Empty:
-						this.isEmptyAutoFilters(data.activeCells);
+						this.isEmptyAutoFilters(data.activeCells, null, null, data.val);
 						break;
 					case AscCH.historyitem_AutoFilter_ApplyMF:
 						this.applyAutoFilter(data.autoFiltersObject, data.activeCells);
@@ -1160,7 +1160,7 @@
 				}
 			},
 			
-			isEmptyAutoFilters: function(ar, insertType, exceptionArray)
+			isEmptyAutoFilters: function(ar, insertType, exceptionArray, bConvertTableFormulaToRef)
 			{
 				var worksheet = this.worksheet;
 				var activeCells = ar.clone();
@@ -1195,7 +1195,7 @@
 						if(isTablePart) {
 							oRange.setTableStyle(null);
 							//write formulas history before filter history
-							worksheet.deleteTablePart(index);
+							worksheet.deleteTablePart(index, bConvertTableFormulaToRef);
 						} else
 							worksheet.AutoFilter = null;
 							
@@ -1205,7 +1205,7 @@
 
 						//заносим в историю
 						if(isTablePart){
-							t._addHistoryObj(oldFilter, AscCH.historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, bbox);
+							t._addHistoryObj(oldFilter, AscCH.historyitem_AutoFilter_Empty, {activeCells: activeCells, val: bConvertTableFormulaToRef}, null, bbox);
                         }
 						else
 							t._addHistoryObj(oldFilter, AscCH.historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, oldFilter.Ref);
@@ -1564,7 +1564,7 @@
 						{
 							oldFilter = filter.clone(null);
 							
-							if(bTablePart && activeRange.r1 <= ref.r2 && activeRange.r2 >= ref.r2)
+							if(diff < 0 && bTablePart && activeRange.r1 <= ref.r2 && activeRange.r2 >= ref.r2)
 							{
 								filter.TotalsRowCount = null;
 							}
@@ -2689,6 +2689,37 @@
 				return range;
 			},
 			
+			convertTableToRange: function(tableName)
+			{
+				History.Create_NewPoint();
+				History.StartTransaction();
+				
+				var table = this._getFilterByDisplayName(tableName);
+				this._convertTableStyleToStyle(table);
+				this.isEmptyAutoFilters(table.Ref, null, null, true);
+				
+				History.EndTransaction();
+			},
+			
+			_convertTableStyleToStyle: function(table)
+			{
+				if(!table)
+				{
+					return;
+				}
+				
+				for(var i = table.Ref.r1; i <= table.Ref.r2; i++)
+				{
+					for(var j = table.Ref.c1; j <= table.Ref.c2; j++)
+					{
+						var cell = this.worksheet._getCell(i, j);
+						
+						var xfsFrom = cell.getCompiledStyle();
+						cell.setStyle(xfsFrom);
+					}
+				}
+			},
+			
 			_clearRange: function(range, isClearText)
 			{
 				range.setTableStyle(null);
@@ -3000,8 +3031,8 @@
 							}
 							//write formulas history before filter history
 							worksheet.handlers.trigger("changeColumnTablePart", filter.DisplayName);
-							for (var i = 0; i < toHistory.length; ++i) {
-								this._addHistoryObj.apply(this, toHistory[i]);
+							for (var k = 0; k < toHistory.length; ++k) {
+								this._addHistoryObj.apply(this, toHistory[k]);
 							}
 						}
 						else

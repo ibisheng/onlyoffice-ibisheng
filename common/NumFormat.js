@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -79,6 +79,9 @@ var SignType = {Positive: 1, Negative: 2, Null:3};
 var gc_nMaxDigCount = 15;//Максимальное число знаков точности
 var gc_nMaxDigCountView = 11;//Максимальное число знаков в ячейке
 var gc_nMaxMantissa = Math.pow(10, gc_nMaxDigCount);
+var gc_aTimeFormats = ['[$-F400]h:mm:ss AM/PM', 'h:mm;@', 'h:mm AM/PM;@', 'h:mm:ss;@', 'h:mm:ss AM/PM;@', 'mm:ss.0;@',
+	'[h]:mm:ss;@'];
+var gc_aFractionFormats = ['# ?/?', '# ??/??', '# ???/???', '# ?/2', '# ?/4', '# ?/8', '# ??/16', '# ?/10', '# ??/100'];
 
 var NumComporationOperators =
 {
@@ -165,11 +168,13 @@ function FormatObjBracket(sData)
                 {
                     var sFirstParam = aParams[0];
                     var sSecondParam = aParams[1];
-                    if(null != sFirstParam && sFirstParam.length > 0 && null != sSecondParam && sSecondParam.length > 0)
+                    if(null != sFirstParam && sFirstParam.length > 0)
                     {
                         this.CurrencyString = sFirstParam;
-                        this.Lid = sSecondParam;
                     }
+                    if (null != sSecondParam && sSecondParam.length > 0) {
+						this.Lid = sSecondParam;
+					}
                 }
             }
 			else if("=" == first || ">" == first || "<" == first)
@@ -278,11 +283,10 @@ function NumFormat(bAddMinusIfNes)
     this.bSlash = false;
     this.bWhole = false;
 	this.bCurrency = false;
-	this.bNumber = false;
-	this.bInteger = false;
 	this.bRepeat = false;
     this.Color = -1;
 	this.ComporationOperator = null;
+	this.LCID = null;
     
 	this.bGeneralChart = false;//если в формате только один текст(например в chart "Основной")
     this.bAddMinusIfNes = bAddMinusIfNes;//когда не задано форматирование для отрицательных чисел иногда надо вставлять минус
@@ -1365,8 +1369,13 @@ NumFormat.prototype =
                         sText += item.val;
                     } else if (numFormat_Bracket == item.type) {
                         if (null != item.CurrencyString) {
+							this.bCurrency = true;
                             sText += item.CurrencyString;
                         }
+						if (null != item.Lid) {
+							//Excel sometimes add 0x10000(0x442 and 0x10442)
+							this.LCID = parseInt(item.Lid, 16) & 0xFFFF;
+						}
                     }
                     else if (numFormat_DecimalPoint == item.type) {
                         sText += gc_sFormatDecimalPoint;
@@ -1382,17 +1391,8 @@ NumFormat.prototype =
                         }
                     }
                 }
-                var rxNumber = new RegExp("^[0#?]+(" + escapeRegExp(gc_sFormatDecimalPoint) + "[0#?]+)?$");
-                var match = this.formatString.match(rxNumber);
-                if (null != match) {
-                    if (null != match[1]) {
-                        this.bNumber = true;
-                    } else {
-                        this.bInteger = true;
                     }
                 }
-            }
-        }
         return this.valid;
     },
     isInvalidDateValue : function(number)
@@ -1425,6 +1425,9 @@ NumFormat.prototype =
     },
     format: function (number, nValType, dDigitsCount, cultureInfo, bChart)
     {
+		if (null != this.LCID) {
+			cultureInfo = g_aCultureInfos[this.LCID];
+		}
         if (null == cultureInfo)
             cultureInfo = g_oDefaultCultureInfo;
         if(null == nValType)
@@ -1977,37 +1980,12 @@ NumFormat.prototype =
         output.format = res;
         return true;
     },
-	getType : function()
-	{
-		var nType = c_oAscNumFormatType.Custom;
-		if(this.isGeneral())
-			nType = c_oAscNumFormatType.General;
-		else if(this.bTextFormat)
-			nType = c_oAscNumFormatType.Text;
-		else if(this.bDateTime)
-		{
-			if(this.bDate)
-				nType = c_oAscNumFormatType.Date;
-			else
-				nType = c_oAscNumFormatType.Time;
-		}
-		else if(this.nPercent > 0)
-			nType = c_oAscNumFormatType.Percent;
-		else if(this.bScientific)
-			nType = c_oAscNumFormatType.Scientific;
-		else if(this.bCurrency){
-			if(this.bRepeat)
-				nType = c_oAscNumFormatType.Accounting;
-			else
-				nType = c_oAscNumFormatType.Currency;
-		}
-		else if(this.bSlash)
-			nType = c_oAscNumFormatType.Fraction;
-		else if(this.bNumber)
-			nType = c_oAscNumFormatType.Number;
-		else if(this.bInteger)
-			nType = c_oAscNumFormatType.Integer;
-		return nType;
+	getFormatCellsInfo: function() {
+		var info = new Asc.asc_CFormatCellsInfo();
+		info.asc_setDecimalPlaces(this.aFracFormat.length);
+		info.asc_setSeparator(this.bThousandSep);
+		info.asc_setSymbol(this.LCID);
+		return info;
 	},
 	isGeneral: function() {
 		return 1 == this.aRawFormat.length && numFormat_General == this.aRawFormat[0].type;
@@ -2425,13 +2403,60 @@ CellFormat.prototype =
 		}
 		return result;
 	},
-	getType: function()
-	{
-		if(null != this.oPositiveFormat)
-			return this.oPositiveFormat.getType();
-		else if(null != this.aComporationFormats && this.aComporationFormats.length > 0)
-			return this.aComporationFormats[0].getType();
-		return c_oAscNumFormatType.General;
+	getType: function() {
+		return this.getTypeInfo().type;
+	},
+	getTypeInfo: function() {
+		var info;
+		if (null != this.oPositiveFormat) {
+			info = this.oPositiveFormat.getFormatCellsInfo();
+			info.asc_setType(this._getType(this.oPositiveFormat));
+		} else if (null != this.aComporationFormats && this.aComporationFormats.length > 0) {
+			info = this.aComporationFormats[0].getFormatCellsInfo();
+			info.asc_setType(this._getType(this.aComporationFormats[0]));
+		} else {
+			info = new Asc.asc_CFormatCellsInfo();
+			info.asc_setType(c_oAscNumFormatType.General);
+			info.asc_setDecimalPlaces(0);
+			info.asc_setSeparator(false);
+			info.asc_setSymbol(null);
+		}
+		return info;
+	},
+	_getType: function(format) {
+		var nType = c_oAscNumFormatType.Custom;
+		if (format.isGeneral()) {
+			nType = c_oAscNumFormatType.General;
+		}
+		else if (format.bDateTime) {
+			if (format.bDate) {
+				nType = c_oAscNumFormatType.Date;
+			} else {
+				nType = c_oAscNumFormatType.Time;
+			}
+		}
+		else if (format.bCurrency) {
+			if (format.bRepeat) {
+				nType = c_oAscNumFormatType.Accounting;
+			} else {
+				nType = c_oAscNumFormatType.Currency;
+			}
+		} else {
+			var info = format.getFormatCellsInfo();
+			var types = [c_oAscNumFormatType.Text, c_oAscNumFormatType.Percent, c_oAscNumFormatType.Scientific,
+				c_oAscNumFormatType.Number, c_oAscNumFormatType.Fraction];
+			for (var i = 0; i < types.length; ++i) {
+				var type = types[i];
+				info.asc_setType(type);
+				var formats = getFormatCells(info);
+				if (-1 != formats.indexOf(this.sFormat)) {
+					nType = type;
+					break;
+				}
+			}
+
+		}
+		return nType;
 	}
 };
 var oDecodeGeneralFormatCache = {};
@@ -3625,8 +3650,14 @@ function setCurrentCultureInfo(val) {
 		}
 		return true;
 	}
-	function getShortDateMonthFormat(bDate, bYear, separator, opt_cultureInfo) {
+	function getShortDateMonthFormat(bDate, bYear, opt_cultureInfo) {
 		var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
+		var separator;
+		if ('/' == AscCommon.g_oDefaultCultureInfo.DateSeparator) {
+			separator = '-';
+		} else {
+			separator = '/';
+		}
 		var sRes = '';
 		if (bDate) {
 			if (-1 != cultureInfo.ShortDatePattern.indexOf('1')) {
@@ -3670,6 +3701,446 @@ function setCurrentCultureInfo(val) {
 		}
 		return dateElems.join('/');
 	}
+
+	function getShortDateFormat2(day, month, year, opt_cultureInfo) {
+		var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
+		var dateElems = [];
+		for (var i = 0; i < cultureInfo.ShortDatePattern.length; ++i) {
+			switch (cultureInfo.ShortDatePattern[i]) {
+				case '0':
+				case '1':
+					if (day > 0) {
+						dateElems.push('d'.repeat(day));
+					}
+					break;
+				case '2':
+				case '3':
+					if (month > 0) {
+						dateElems.push('m'.repeat(month));
+					}
+					break;
+				case '4':
+				case '5':
+					if (year > 0) {
+						dateElems.push('y'.repeat(month));
+					}
+					break;
+			}
+		}
+		return dateElems.join('/');
+	}
+
+	function getNumberFormatSimple(opt_separate, opt_fraction) {
+		var numberFormat = opt_separate ? '#,##0' : '0';
+		if (opt_fraction > 0) {
+			numberFormat += '.' + '0'.repeat(opt_fraction);
+		}
+		return numberFormat;
+	}
+
+	function getNumberFormat(opt_cultureInfo, opt_separate, opt_fraction, opt_red) {
+		var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
+		var numberFormat = getNumberFormatSimple(opt_separate, opt_fraction);
+		var red = opt_red ? '[Red]' : '';
+
+		var positiveFormat;
+		var negativeFormat;
+		switch (cultureInfo.CurrencyNegativePattern) {
+			case 0:
+			case 4:
+			case 14:
+			case 15:
+				positiveFormat = numberFormat + '_)';
+				negativeFormat = '\\(' + numberFormat + '\\)';
+				break;
+			default:
+				positiveFormat = numberFormat + '_ ';
+				negativeFormat = '\\-' + numberFormat + '\\ ';
+				break;
+		}
+		return positiveFormat + ';' + red + negativeFormat;
+	}
+
+	function getLocaleFormat(opt_cultureInfo, opt_currency) {
+		var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
+		var symbol = opt_currency ? cultureInfo.CurrencySymbol : '';
+		return '[$' + symbol + '-' + cultureInfo.LCID.toString(16).toUpperCase() + ']';
+	}
+
+	function getCurrencyFormatSimple(opt_cultureInfo, opt_fraction, opt_currency, opt_currencyLocale, opt_red) {
+		var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
+		var numberFormat = getNumberFormatSimple(true, opt_fraction);
+		var signCurrencyFormat;
+		var signCurrencyFormatEnd;
+		var signCurrencyFormatSpace;
+		if (opt_currency) {
+			if (opt_currencyLocale) {
+				signCurrencyFormat = getLocaleFormat(cultureInfo, true);
+			} else {
+				signCurrencyFormat = '"' + cultureInfo.CurrencySymbol + '"';
+			}
+			signCurrencyFormatEnd = signCurrencyFormat;
+			signCurrencyFormatSpace = signCurrencyFormat + '\\ ';
+		} else {
+			signCurrencyFormatEnd = signCurrencyFormat = signCurrencyFormatSpace = '';
+			for (var i = 0; i < cultureInfo.CurrencySymbol.length; ++i) {
+				signCurrencyFormatEnd += '_' + cultureInfo.CurrencySymbol[i];
+			}
+		}
+		var red = opt_red ? '[Red]' : '';
+
+		var prefixs = ['_ ', '_-', '_(', '_)'];
+		var postfix = '';
+		var positiveFormat;
+		var negativeFormat;
+		switch (cultureInfo.CurrencyNegativePattern) {
+			case 0:
+				postfix = prefixs[3];
+				negativeFormat = '\\(' + signCurrencyFormat + numberFormat + '\\)';
+				break;
+			case 1:
+				negativeFormat = '\\-' + signCurrencyFormat + numberFormat;
+				break;
+			case 2:
+				negativeFormat = signCurrencyFormatSpace + '\\-' + numberFormat;
+				break;
+			case 3:
+				postfix = prefixs[1];
+				negativeFormat = signCurrencyFormatSpace + numberFormat + '\\-';
+				break;
+			case 4:
+				postfix = prefixs[3];
+				negativeFormat = '\\(' + numberFormat + signCurrencyFormatEnd + '\\)';
+				break;
+			case 5:
+				negativeFormat = '\\-' + numberFormat + signCurrencyFormatEnd;
+				break;
+			case 6:
+				negativeFormat = numberFormat + '\\-' + signCurrencyFormatEnd;
+				break;
+			case 7:
+				postfix = prefixs[1];
+				negativeFormat = numberFormat + signCurrencyFormatEnd + '\\-';
+				break;
+			case 8:
+				negativeFormat = '\\-' + numberFormat + '\\ ' + signCurrencyFormatEnd;
+				break;
+			case 9:
+				negativeFormat = '\\-' + signCurrencyFormatSpace + numberFormat;
+				break;
+			case 10:
+				postfix = prefixs[1];
+				negativeFormat = numberFormat + '\\ ' + signCurrencyFormatEnd + '\\-';
+				break;
+			case 11:
+				postfix = prefixs[1];
+				negativeFormat = signCurrencyFormatSpace + numberFormat + '\\-';
+				break;
+			case 12:
+				negativeFormat = signCurrencyFormatSpace + '\\-' + numberFormat;
+				break;
+			case 13:
+				negativeFormat = numberFormat + '\\-\\ ' + signCurrencyFormatEnd;
+				break;
+			case 14:
+				postfix = prefixs[3];
+				negativeFormat = '(' + signCurrencyFormat + numberFormat + '\\)';
+				break;
+			case 15:
+				postfix = prefixs[3];
+				negativeFormat = '\\(' + numberFormat + signCurrencyFormatEnd + '\\)';
+				break;
+		}
+		switch (cultureInfo.CurrencyPositivePattern) {
+			case 0:
+				positiveFormat = signCurrencyFormat + numberFormat;
+				break;
+			case 1:
+				positiveFormat = numberFormat + signCurrencyFormatEnd;
+				break;
+			case 2:
+				positiveFormat = signCurrencyFormatSpace + numberFormat;
+				break;
+			case 3:
+				positiveFormat = numberFormat + '\\ ' + signCurrencyFormatEnd;
+				break;
+		}
+		positiveFormat = positiveFormat + postfix;
+		return positiveFormat + ';' + red + negativeFormat;
+	}
+
+	function getCurrencyFormatSimple2(opt_cultureInfo, opt_fraction, opt_currency, opt_negative) {
+		var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
+		var numberFormat = getNumberFormatSimple(true, opt_fraction);
+		var signCurrencyFormat;
+		var signCurrencyFormatEnd;
+		var signCurrencyFormatSpace;
+		if (opt_currency) {
+			signCurrencyFormat = signCurrencyFormatEnd = getLocaleFormat(cultureInfo, true);
+			signCurrencyFormatSpace = signCurrencyFormat + '\\ ';
+		} else {
+			signCurrencyFormatEnd = signCurrencyFormat = signCurrencyFormatSpace = '';
+			for (var i = 0; i < cultureInfo.CurrencySymbol.length; ++i) {
+				signCurrencyFormatEnd += '_' + cultureInfo.CurrencySymbol[i];
+			}
+		}
+		var positiveFormat;
+		switch (cultureInfo.CurrencyNegativePattern) {
+			case 0:
+			case 1:
+			case 14:
+				positiveFormat = signCurrencyFormat + numberFormat;
+				break;
+			case 2:
+			case 3:
+			case 9:
+			case 10:
+			case 11:
+			case 12:
+				positiveFormat = signCurrencyFormatSpace + numberFormat;
+				break;
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 15:
+				positiveFormat = numberFormat + signCurrencyFormatEnd;
+				break;
+			case 8:
+			case 13:
+				positiveFormat = numberFormat + '\\ ' + signCurrencyFormatEnd;
+				break;
+		}
+		return opt_negative ? positiveFormat + ';[Red]' + positiveFormat : positiveFormat;
+	}
+
+	function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_currencyLocale) {
+		var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
+		var numberFormat = getNumberFormatSimple(true, opt_fraction);
+		var nullSignFormat = '* "-"';
+		if (opt_fraction) {
+			nullSignFormat += '?'.repeat(opt_fraction);
+		}
+		var signCurrencyFormat;
+		var signCurrencyFormatEnd;
+		var signCurrencyFormatSpace;
+		if (opt_currency) {
+			if (opt_currencyLocale) {
+				signCurrencyFormat = getLocaleFormat(cultureInfo, true);
+			} else {
+				signCurrencyFormat = '"' + cultureInfo.CurrencySymbol + '"';
+			}
+			signCurrencyFormatEnd = signCurrencyFormat;
+			signCurrencyFormatSpace = signCurrencyFormat + '\\ ';
+		} else {
+			signCurrencyFormatEnd = signCurrencyFormat = signCurrencyFormatSpace = '';
+			for (var i = 0; i < cultureInfo.CurrencySymbol.length; ++i) {
+				signCurrencyFormatEnd += '_' + cultureInfo.CurrencySymbol[i];
+			}
+		}
+
+		var prefixs = ['_ ', '_-', '_(', '_)'];
+		var prefix = prefixs[0];
+		var postfix = prefixs[0];
+		var positiveNumberFormat = '* ' + numberFormat;
+		var positiveFormat;
+		var negativeFormat;
+		var nullFormat;
+		switch (cultureInfo.CurrencyNegativePattern) {
+			case 0:
+				prefix = prefixs[2];
+				postfix = prefixs[3];
+				negativeFormat = prefix + signCurrencyFormat + '* \\(' + numberFormat + '\\)';
+				break;
+			case 1:
+				prefix = postfix = prefixs[1];
+				negativeFormat = '\\-' + signCurrencyFormat + '* ' + numberFormat + postfix;
+				break;
+			case 2:
+				negativeFormat = prefix + signCurrencyFormatSpace + '* \\-' + numberFormat + postfix;
+				break;
+			case 3:
+				prefix = postfix = prefixs[1];
+				negativeFormat = prefix + signCurrencyFormatSpace + '* ' + numberFormat + '\\-';
+				break;
+			case 4:
+				prefix = prefixs[2];
+				postfix = prefixs[3];
+				negativeFormat = prefix + '* \\(' + numberFormat + '\\)' + signCurrencyFormatEnd + postfix;
+				break;
+			case 5:
+				prefix = postfix = prefixs[1];
+				negativeFormat = '\\-* ' + numberFormat + signCurrencyFormatEnd + postfix;
+				break;
+			case 6:
+				negativeFormat = prefix + '* ' + numberFormat + '\\-' + signCurrencyFormatEnd + postfix;
+				break;
+			case 7:
+				negativeFormat = prefix + '* ' + numberFormat + signCurrencyFormatEnd + '\\-';
+				break;
+			case 8:
+				prefix = postfix = prefixs[1];
+				negativeFormat = '\\-* ' + numberFormat + '\\ ' + signCurrencyFormatEnd + postfix;
+				break;
+			case 9:
+				prefix = postfix = prefixs[1];
+				negativeFormat = '\\-' + signCurrencyFormatSpace + '* ' + numberFormat + postfix;
+				break;
+			case 10:
+				negativeFormat = prefix + '* ' + numberFormat + '\\ ' + signCurrencyFormatEnd + '\\-';
+				break;
+			case 11:
+				negativeFormat = prefix + signCurrencyFormatSpace + '* ' + numberFormat + '\\-';
+				break;
+			case 12:
+				negativeFormat = prefix + signCurrencyFormatSpace + '* \\-' + numberFormat + postfix;
+				break;
+			case 13:
+				negativeFormat = prefix + '* ' + numberFormat + '\\-\\ ' + signCurrencyFormatEnd + postfix;
+				break;
+			case 14:
+				prefix = prefixs[2];
+				postfix = prefixs[3];
+				negativeFormat = prefix + signCurrencyFormatSpace + '* \\(' + numberFormat + '\\)';
+				break;
+			case 15:
+				prefix = prefixs[2];
+				postfix = prefixs[3];
+				negativeFormat = prefix + '* \\(' + numberFormat + '\\)\\ ' + signCurrencyFormatEnd + postfix;
+				break;
+		}
+		switch (cultureInfo.CurrencyPositivePattern) {
+			case 0:
+				positiveFormat = signCurrencyFormat + positiveNumberFormat;
+				nullFormat = signCurrencyFormat + nullSignFormat;
+				break;
+			case 1:
+				positiveFormat = positiveNumberFormat + signCurrencyFormatEnd;
+				nullFormat = nullSignFormat + signCurrencyFormatEnd;
+				break;
+			case 2:
+				positiveFormat = signCurrencyFormatSpace + positiveNumberFormat;
+				nullFormat = signCurrencyFormatSpace + nullSignFormat;
+				break;
+			case 3:
+				positiveFormat = positiveNumberFormat + '\\ ' + signCurrencyFormatEnd;
+				nullFormat = nullSignFormat + '\\ ' + signCurrencyFormatEnd;
+				break;
+		}
+		positiveFormat = prefix + positiveFormat + postfix;
+		nullFormat = prefix + nullFormat + postfix;
+		var textFormat = prefix + '@' + postfix;
+		return positiveFormat + ';' + negativeFormat + ';' + nullFormat + ';' + textFormat;
+	}
+
+	function getFormatCells(info) {
+		var res = [];
+		if (info) {
+			var format;
+			var i;
+			var cultureInfo = g_aCultureInfos[info.symbol];
+			var currency = !!cultureInfo;
+			if (Asc.c_oAscNumFormatType.General === info.type) {
+				res.push(AscCommon.g_cGeneralFormat);
+			} else if (Asc.c_oAscNumFormatType.Number === info.type) {
+				var numberFormat = getNumberFormatSimple(info.separator, info.decimalPlaces);
+				res.push(numberFormat);
+				res.push(numberFormat + ';[Red]' + numberFormat);
+				res.push(getNumberFormat(cultureInfo, info.separator, info.decimalPlaces, false));
+				res.push(getNumberFormat(cultureInfo, info.separator, info.decimalPlaces, true));
+			} else if (Asc.c_oAscNumFormatType.Currency === info.type) {
+				res.push(getCurrencyFormatSimple2(cultureInfo, info.decimalPlaces, currency, false));
+				res.push(getCurrencyFormatSimple2(cultureInfo, info.decimalPlaces, currency, true));
+				res.push(getCurrencyFormatSimple(cultureInfo, info.decimalPlaces, currency, currency, false));
+				res.push(getCurrencyFormatSimple(cultureInfo, info.decimalPlaces, currency, currency, true));
+			} else if (Asc.c_oAscNumFormatType.Accounting === info.type) {
+				res.push(getCurrencyFormat(cultureInfo, info.decimalPlaces, currency, currency));
+			} else if (Asc.c_oAscNumFormatType.Date === info.type) {
+				//todo locale dependence
+				if (info.symbol == g_oDefaultCultureInfo.LCID) {
+					res.push(getShortDateFormat(cultureInfo));
+					res.push('[$-F800]dddd, mmmm dd, yyyy');
+				}
+				res.push(getShortDateFormat2(1, 1, 0, cultureInfo) + ';@');
+				res.push(getShortDateFormat2(1, 1, 2, cultureInfo) + ';@');
+				res.push(getShortDateFormat2(2, 2, 2, cultureInfo) + ';@');
+				res.push(getShortDateFormat2(1, 1, 4, cultureInfo) + ';@');
+				res.push(getShortDateFormat2(1, 1, 2, cultureInfo) + ' h:mm;@');
+				res.push('[$-409]' + getShortDateFormat2(1, 1, 2, cultureInfo) + ' h:mm AM/PM;@');
+				var locale = getLocaleFormat(cultureInfo, false);
+				res.push(locale + 'mmmmm;@');
+				res.push(locale + 'mmmm d, yyyy;@');
+				var separators = ['-', '/', ' '];
+				for (i = 0; i < separators.length; ++i) {
+					var separator = separators[i];
+					res.push(locale + 'd' + separator + 'mmm;@');
+					res.push(locale + 'd' + separator + 'mmm' + separator + 'yy;@');
+					res.push(locale + 'dd' + separator + 'mmm' + separator + 'yy;@');
+					res.push(locale + 'mmm' + separator + 'yy;@');
+					res.push(locale + 'mmmm' + separator + 'yy;@');
+					res.push(locale + 'mmmmm' + separator + 'yy;@');
+					res.push(locale + 'd' + separator + 'mmm' + separator + 'yyyy;@');
+				}
+			} else if (Asc.c_oAscNumFormatType.Time === info.type) {
+				res = gc_aTimeFormats;
+			} else if (Asc.c_oAscNumFormatType.Percent === info.type) {
+				format = '0';
+				if (info.decimalPlaces > 0) {
+					format += '.' + '0'.repeat(info.decimalPlaces);
+				}
+				format += '%';
+				res.push(format);
+			} else if (Asc.c_oAscNumFormatType.Fraction === info.type) {
+				res = gc_aFractionFormats;
+			} else if (Asc.c_oAscNumFormatType.Scientific === info.type) {
+				format = '0.' + '0'.repeat(info.decimalPlaces) + 'E+00';
+				res.push(format);
+			} else if (Asc.c_oAscNumFormatType.Text === info.type) {
+				res.push('@');
+			} else if (Asc.c_oAscNumFormatType.Custom === info.type) {
+				for (i = 0; i <= 4; ++i) {
+					res.push(AscCommonExcel.aStandartNumFormats[i]);
+				}
+				res.push(getCurrencyFormatSimple(null, 0, false, false, false));
+				res.push(getCurrencyFormatSimple(null, 0, false, false, true));
+				res.push(getCurrencyFormatSimple(null, 2, false, false, false));
+				res.push(getCurrencyFormatSimple(null, 2, false, false, true));
+				res.push(getCurrencyFormatSimple(null, 0, true, false, false));
+				res.push(getCurrencyFormatSimple(null, 0, true, false, true));
+				res.push(getCurrencyFormatSimple(null, 2, true, false, false));
+				res.push(getCurrencyFormatSimple(null, 2, true, false, true));
+				for (i = 9; i <= 13; ++i) {
+					res.push(AscCommonExcel.aStandartNumFormats[i]);
+				}
+				res.push(getShortDateFormat(null));
+				res.push(getShortDateMonthFormat(true, true, null));
+				res.push(getShortDateMonthFormat(true, false, null));
+				res.push(getShortDateMonthFormat(false, true, null));
+				for (i = 18; i <= 21; ++i) {
+					res.push(AscCommonExcel.aStandartNumFormats[i]);
+				}
+				res.push(getShortDateFormat(null) + " h:mm");
+				for (i = 45; i <= 49; ++i) {
+					res.push(AscCommonExcel.aStandartNumFormats[i]);
+				}
+				//todo add all used in workbook formats
+			} else {
+				res.push(AscCommon.g_cGeneralFormat);
+				res.push('0.00');
+				res.push('0.00E+00');
+				res.push(getCurrencyFormat(cultureInfo, 2, currency, true));
+				res.push(getCurrencyFormatSimple2(cultureInfo, 2, currency, false));
+				res.push(getShortDateFormat(cultureInfo));
+				//todo F400
+				res.push('[$-F400]h:mm:ss AM/PM');
+				res.push('0.00%');
+				res.push('# ?/?');
+				res.push('@');
+			}
+		}
+		return res;
+	}
+
 var g_aCultureInfos = {
 	1: {LCID: 1, Name: "ar", CurrencyPositivePattern: 2, CurrencyNegativePattern: 3, CurrencySymbol: "ر.س.‏", NumberDecimalSeparator: ".", NumberGroupSeparator: ",", NumberGroupSizes: [3], DayNames: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"], AbbreviatedDayNames: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"], MonthNames: ["محرم", "صفر", "ربيع الأول", "ربيع الثاني", "جمادى الأولى", "جمادى الثانية", "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة", ""], AbbreviatedMonthNames: ["محرم", "صفر", "ربيع الأول", "ربيع الثاني", "جمادى الأولى", "جمادى الثانية", "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة", ""], MonthGenitiveNames: [], AbbreviatedMonthGenitiveNames: [], AMDesignator: "ص", PMDesignator: "م", DateSeparator: "/", TimeSeparator: ":", ShortDatePattern: "134"},
 	2: {LCID: 2, Name: "bg", CurrencyPositivePattern: 3, CurrencyNegativePattern: 8, CurrencySymbol: "лв.", NumberDecimalSeparator: ",", NumberGroupSeparator: " ", NumberGroupSizes: [3], DayNames: ["неделя", "понеделник", "вторник", "сряда", "четвъртък", "петък", "събота"], AbbreviatedDayNames: ["нед", "пон", "вт", "ср", "четв", "пет", "съб"], MonthNames: ["януари", "февруари", "март", "април", "май", "юни", "юли", "август", "септември", "октомври", "ноември", "декември", ""], AbbreviatedMonthNames: ["яну", "фев", "мар", "апр", "май", "юни", "юли", "авг", "сеп", "окт", "ное", "дек", ""], MonthGenitiveNames: [], AbbreviatedMonthGenitiveNames: [], AMDesignator: "", PMDesignator: "", DateSeparator: ".", TimeSeparator: ":", ShortDatePattern: "025"},
@@ -4111,7 +4582,15 @@ var g_oDefaultCultureInfo = g_aCultureInfos[1033];//en-US//1033//fr-FR//1036//ba
     window["AscCommon"].DecodeGeneralFormat = DecodeGeneralFormat;
     window["AscCommon"].setCurrentCultureInfo = setCurrentCultureInfo;
 	window['AscCommon'].getShortDateFormat = getShortDateFormat;
+	window['AscCommon'].getShortDateFormat2 = getShortDateFormat2;
 	window['AscCommon'].getShortDateMonthFormat = getShortDateMonthFormat;
+	window['AscCommon'].getNumberFormatSimple = getNumberFormatSimple;
+	window['AscCommon'].getNumberFormat = getNumberFormat;
+	window['AscCommon'].getLocaleFormat = getLocaleFormat;
+	window['AscCommon'].getCurrencyFormatSimple = getCurrencyFormatSimple;
+	window['AscCommon'].getCurrencyFormatSimple2 = getCurrencyFormatSimple2;
+	window['AscCommon'].getCurrencyFormat = getCurrencyFormat;
+	window['AscCommon'].getFormatCells = getFormatCells;
 
     window["AscCommon"].gc_nMaxDigCount = gc_nMaxDigCount;
     window["AscCommon"].gc_nMaxDigCountView = gc_nMaxDigCountView;

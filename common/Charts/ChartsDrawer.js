@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -421,7 +421,7 @@ CChartsDrawer.prototype =
 		
 		if(this.nDimensionCount === 3)
 		{
-			if(!this.processor3D.view3D.rAngAx && (this.calcProp.type === c_oChartTypes.Bar || this.calcProp.type === c_oChartTypes.Line))
+			if(!this.processor3D.view3D.getRAngAx() && (this.calcProp.type === c_oChartTypes.Bar || this.calcProp.type === c_oChartTypes.Line))
 			{
 				var posX = chartSpace.chart.plotArea.valAx.posX;
 				var widthLabels = chartSpace.chart.plotArea.valAx.labels && chartSpace.chart.plotArea.valAx.labels.extX ? chartSpace.chart.plotArea.valAx.labels.extX : 0;
@@ -496,8 +496,9 @@ CChartsDrawer.prototype =
 		var widthLegend = chartSpace.chart.legend.extX;
 		var heightLegend = chartSpace.chart.legend.extY;
 		var x, y;
-		
-		switch ( chartSpace.chart.legend.legendPos )
+
+		var nLegendPos = chartSpace.chart.legend.legendPos !== null ? chartSpace.chart.legend.legendPos : c_oAscChartLegendShowSettings.right;
+		switch ( nLegendPos )
 		{
 			case c_oAscChartLegendShowSettings.left:
 			case c_oAscChartLegendShowSettings.leftOverlay:
@@ -621,7 +622,8 @@ CChartsDrawer.prototype =
 					fLegendExtY = chartSpace.chart.legend.naturalHeight;
 				}
 			}
-			switch ( chartSpace.chart.legend.legendPos )
+            var nLegendPos = chartSpace.chart.legend.legendPos !== null ? chartSpace.chart.legend.legendPos : c_oAscChartLegendShowSettings.right;
+			switch ( nLegendPos )
 			{
 				case c_oAscChartLegendShowSettings.left:
 				case c_oAscChartLegendShowSettings.leftOverlay:
@@ -2324,7 +2326,7 @@ CChartsDrawer.prototype =
 		var res = null;
 
 		var angleOy = chartSpace.chart.view3D && chartSpace.chart.view3D.rotY ? (- chartSpace.chart.view3D.rotY / 360) * (Math.PI * 2) : 0;
-		if(chartSpace.chart.view3D && !chartSpace.chart.view3D.rAngAx && angleOy !== 0)
+		if(chartSpace.chart.view3D && !chartSpace.chart.view3D.getRAngAx() && angleOy !== 0)
 		{
 			angleOy = Math.abs(angleOy);
 
@@ -3287,7 +3289,7 @@ CChartsDrawer.prototype =
 		
 		if(isTurnOn3DCharts && chartSpace && chartSpace.chart.view3D)
 		{
-			var isPerspective = !chartSpace.chart.view3D.rAngAx;
+			var isPerspective = !chartSpace.chart.view3D.getRAngAx();
 			
 			var isBar = typeChart === AscDFH.historyitem_type_BarChart && chart && chart.barDir !== AscFormat.BAR_DIR_BAR;
 			var isHBar = typeChart === AscDFH.historyitem_type_BarChart && chart && chart.barDir === AscFormat.BAR_DIR_BAR;
@@ -4708,7 +4710,7 @@ drawLineChart.prototype =
 		};
 		
 		
-		if(!this.cChartDrawer.processor3D.view3D.rAngAx)
+		if(!this.cChartDrawer.processor3D.view3D.getRAngAx())
 		{
 			var angle = Math.abs(this.cChartDrawer.processor3D.angleOy);
 			if(angle > Math.PI / 2 && angle < 3 * Math.PI / 2)
@@ -6254,7 +6256,7 @@ drawAreaChart.prototype =
 		if(!isStacked)
 		{
 			var angle = Math.abs(this.cChartDrawer.processor3D.angleOy);
-			if(!this.cChartDrawer.processor3D.view3D.rAngAx && angle > Math.PI / 2 && angle < 3 * Math.PI / 2)
+			if(!this.cChartDrawer.processor3D.view3D.getRAngAx() && angle > Math.PI / 2 && angle < 3 * Math.PI / 2)
 			{
 				for (var j = 0; j < this.paths.series.length; j++) 
 				{
@@ -6574,7 +6576,7 @@ drawHBarChart.prototype =
 		
 		if(this.cChartDrawer.nDimensionCount === 3)
 		{
-			if(this.cChartDrawer.processor3D.view3D.rAngAx)
+			if(this.cChartDrawer.processor3D.view3D.getRAngAx())
 			{
 				var angle = Math.abs(this.cChartDrawer.processor3D.angleOy);
 				this.sortZIndexPaths.sort (function sortArr(a, b)
@@ -6949,7 +6951,7 @@ drawHBarChart.prototype =
 		
 		paths = this.cChartDrawer.calculateRect3D(point1, point2, point3, point4, point5, point6, point7, point8, val, null, true);
 		
-		if(this.cChartDrawer.processor3D.view3D.rAngAx)
+		if(this.cChartDrawer.processor3D.view3D.getRAngAx())
 		{
 			var controlPoint1 = this.cChartDrawer._convertAndTurnPoint(x5 + width / 2, y5 - individualBarHeight / 2, z5);
 			var controlPoint2 = this.cChartDrawer._convertAndTurnPoint(x5 + width / 2, y5, z5 + perspectiveDepth / 2);
@@ -7229,7 +7231,7 @@ drawHBarChart.prototype =
 			}
 		};
 		
-		if(this.cChartDrawer.processor3D.view3D.rAngAx)
+		if(this.cChartDrawer.processor3D.view3D.getRAngAx())
 		{
 			for(var i = 0; i < this.sortZIndexPaths.length; i++)
 			{
@@ -7607,7 +7609,7 @@ drawPieChart.prototype =
 		
 		if(this.cChartDrawer.nDimensionCount === 3)
 		{
-			if(this.cChartDrawer.processor3D.view3D.rAngAx)
+			if(this.cChartDrawer.processor3D.view3D.getRAngAx())
 			{
 				this.properties3d = this.cChartDrawer.processor3D.calculatePropertiesForPieCharts();
 				this._recalculatePie3D();
@@ -11910,7 +11912,7 @@ gridChart.prototype =
 			var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 			var angleOz = 0;
 			
-			var rAngAx = this.cChartDrawer.processor3D.view3D.rAngAx;
+			var rAngAx = this.cChartDrawer.processor3D.view3D.getRAngAx();
 			var isVertLine = x === x1;
 			
 			var convertResult = this.cChartDrawer._convertAndTurnPoint(x, y, 0);
@@ -13499,7 +13501,7 @@ CSortFaces.prototype =
 			var diffY = centerChartY;
 			var diffZ = -1 / this.cChartDrawer.processor3D.rPerspective;
 			//TODO протестировать на bar и затем сделать для всех перспективных диаграмм данный сдвиг
-			if(!this.cChartDrawer.processor3D.view3D.rAngAx && this.chartProp.type === AscFormat.c_oChartTypes.Bar)
+			if(!this.cChartDrawer.processor3D.view3D.getRAngAx() && this.chartProp.type === AscFormat.c_oChartTypes.Bar)
 			{	
 				diffX -= this.cChartDrawer.processor3D.cameraDiffX;
 				diffY -= this.cChartDrawer.processor3D.cameraDiffY;
@@ -13507,7 +13509,7 @@ CSortFaces.prototype =
 			}
 			
 			//TODO пересмотреть правку!
-			if(diffZ > 0 && this.chartProp.type === AscFormat.c_oChartTypes.Bar && this.cChartDrawer.processor3D.view3D.rAngAx && (this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked"))
+			if(diffZ > 0 && this.chartProp.type === AscFormat.c_oChartTypes.Bar && this.cChartDrawer.processor3D.view3D.getRAngAx() && (this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked"))
 			{
 				diffZ -= 500;
 			}
@@ -13806,7 +13808,7 @@ CSortFaces.prototype =
 				var point3 = plain.points2[3];
 				
 				var projectIntersection = nIntersectionPlainAndLine;
-				if(!this.cChartDrawer.processor3D.view3D.rAngAx)
+				if(!this.cChartDrawer.processor3D.view3D.getRAngAx())
 				{
 					projectIntersection = t.cChartDrawer._convertAndTurnPoint(nIntersectionPlainAndLine.x, nIntersectionPlainAndLine.y, nIntersectionPlainAndLine.z, true, true);
 				}

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -227,20 +227,23 @@
 		Error  : 3
 	};
 
-	//NumFormat defines
+	/**
+	 * NumFormat defines
+	 * @enum {number}
+	 */
 	var c_oAscNumFormatType = {
+		None       : -1,
 		General    : 0,
-		Custom     : 1,
-		Text       : 2,
-		Number     : 3,
-		Integer    : 4,
-		Scientific : 5,
-		Currency   : 6,
-		Date       : 7,
-		Time       : 8,
-		Percent    : 9,
-		Fraction   : 10,
-		Accounting : 11
+		Number     : 1,
+		Scientific : 2,
+		Accounting : 3,
+		Currency   : 4,
+		Date       : 5,
+		Time       : 6,
+		Percent    : 7,
+		Fraction   : 8,
+		Text       : 9,
+		Custom     : 10
 	};
 
 	var c_oAscDrawingLayerType = {
@@ -578,7 +581,10 @@
 		Medium : 2,	// 2px
 		Thick  : 3		// 3px
 	};
-	// Располагаются в порядке значимости для отрисовки
+	/**
+	 * Располагаются в порядке значимости для отрисовки
+	 * @enum {number}
+	 */
 	var c_oAscBorderStyles    = {
 		None             : 0,
 		Double           : 1,
@@ -724,7 +730,7 @@
 		None      : 0,
 		Tab       : 1,
 		Semicolon : 2,
-		Сolon     : 3,
+		Colon     : 3,
 		Comma     : 4,
 		Space     : 5
 	};
@@ -869,9 +875,6 @@
     };
 
 
-
-
-
 	/** @enum {number} */
 	var c_oAscMathInterfaceBarPos = {
 		Top    : 0,
@@ -916,15 +919,12 @@
 		Right  : 2
 	};
 
-
-
 	/** @enum {number} */
 	var c_oAscMathInterfaceEqArrayAlign = {
 		Top    : 0,
 		Center : 1,
 		Bottom : 2
 	};
-
 
 	/** @enum {number} */
 	var c_oAscMathInterfaceNaryLimitLocation = {
@@ -938,7 +938,6 @@
 		Top    : 0,
 		Bottom : 1
 	};
-
 
 	var c_oAscEncodings    = [
 		[0, 28596, "ISO-8859-6", "Arabic (ISO 8859-6)"],
@@ -1207,18 +1206,18 @@
 	prot['BlockInteraction']             = prot.BlockInteraction;
 	window['Asc']['c_oAscNumFormatType'] = window['Asc'].c_oAscNumFormatType = c_oAscNumFormatType;
 	prot                                     = c_oAscNumFormatType;
+	prot['None']                             = prot.None;
 	prot['General']                          = prot.General;
-	prot['Custom']                           = prot.Custom;
-	prot['Text']                             = prot.Text;
 	prot['Number']                           = prot.Number;
-	prot['Integer']                          = prot.Integer;
 	prot['Scientific']                       = prot.Scientific;
+	prot['Accounting']                       = prot.Accounting;
 	prot['Currency']                         = prot.Currency;
 	prot['Date']                             = prot.Date;
 	prot['Time']                             = prot.Time;
 	prot['Percent']                          = prot.Percent;
 	prot['Fraction']                         = prot.Fraction;
-	prot['Accounting']                       = prot.Accounting;
+	prot['Text']                             = prot.Text;
+	prot['Custom']                           = prot.Custom;
 	window['Asc']['c_oAscDrawingLayerType']  = c_oAscDrawingLayerType;
 	prot                                     = c_oAscDrawingLayerType;
 	prot['BringToFront']                     = prot.BringToFront;
@@ -1424,6 +1423,22 @@
 	prot['Page']                           = prot.Page;
 	prot['Paragraph']                      = prot.Paragraph;
 	prot['TopMargin']                      = prot.TopMargin;
+	window['Asc']['c_oAscBorderStyles'] = window['AscCommon'].c_oAscBorderStyles = c_oAscBorderStyles;
+	prot                         = c_oAscPageOrientation;
+	prot['None']                 = prot.None;
+	prot['Double']               = prot.Double;
+	prot['Hair']                 = prot.Hair;
+	prot['DashDotDot']           = prot.DashDotDot;
+	prot['DashDot']              = prot.DashDot;
+	prot['Dotted']               = prot.Dotted;
+	prot['Dashed']               = prot.Dashed;
+	prot['Thin']                 = prot.Thin;
+	prot['MediumDashDotDot']     = prot.MediumDashDotDot;
+	prot['SlantDashDot']         = prot.SlantDashDot;
+	prot['MediumDashDot']        = prot.MediumDashDot;
+	prot['MediumDashed']         = prot.MediumDashed;
+	prot['Medium']               = prot.Medium;
+	prot['Thick']                = prot.Thick;
 	window['Asc']['c_oAscPageOrientation'] = window['Asc'].c_oAscPageOrientation = c_oAscPageOrientation;
 	prot                         = c_oAscPageOrientation;
 	prot['PagePortrait']         = prot.PagePortrait;
@@ -1645,7 +1660,6 @@
 	window["AscCommon"].c_oAscSizeRelFromV          = c_oAscSizeRelFromV;
 	window["AscCommon"].c_oAscWrapStyle             = c_oAscWrapStyle;
 	window["AscCommon"].c_oAscBorderWidth           = c_oAscBorderWidth;
-	window["AscCommon"].c_oAscBorderStyles          = c_oAscBorderStyles;
 	window["AscCommon"].c_oAscBorderType            = c_oAscBorderType;
 	window["AscCommon"].c_oAscLockTypes             = c_oAscLockTypes;
 	window["AscCommon"].c_oAscFormatPainterState    = c_oAscFormatPainterState;
@@ -1975,7 +1989,7 @@
 			_object["variations"].push(this.variations[i].serialize());
 		}
 		return _object;
-	}
+	};
 	CPlugin.prototype["deserialize"] = function(_object)
 	{
 		this.name       = (_object["name"] != null) ? _object["name"] : this.name;
@@ -1988,7 +2002,7 @@
 			_variation["deserialize"](_object["variations"][i]);
 			this.variations.push(_variation);
 		}
-	}
+	};
 
 	window["Asc"]["CPluginVariation"] = window["Asc"].CPluginVariation = CPluginVariation;
 	window["Asc"]["CPlugin"] = window["Asc"].CPlugin = CPlugin;

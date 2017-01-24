@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -2465,6 +2465,8 @@ CMathContent.prototype.Load_FromMenu = function(Type, Paragraph)
     this.Paragraph = Paragraph;
 
     var Pr = {ctrPrp: new CTextPr()};
+    Pr.ctrPrp.Italic = true;
+    Pr.ctrPrp.RFonts.Set_All("Cambria Math", -1);
 
     var MainType = Type >> 24;
 
@@ -2616,6 +2618,9 @@ CMathContent.prototype.private_LoadFromMenuSymbol = function(Type, Pr)
     if (-1 !== Code)
     {
         var TextPr, MathPr;
+
+        if (this.Content.length <= 0)
+			this.Correct_Content();
 
         if(this.Content.length > 0 && this.Content[this.CurPos].Type == para_Math_Run && this.Selection_IsEmpty() == true) // находимся в Run, селект отсутствует
         {
@@ -3524,13 +3529,43 @@ CMathContent.prototype.Get_CurrentParaPos = function()
 
     return new CParaPos( this.StartRange, this.StartLine, 0, 0 );
 };
-CMathContent.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos)
+CMathContent.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos, bUseCorrection)
 {
-    var nPos = (true !== bSelection ? this.CurPos : (false !== bStart ? this.Selection.StartPos : this.Selection.EndPos));
-    ContentPos.Add(nPos);
+    if (true === bUseCorrection && true === bSelection)
+	{
+		var nPos = false !== bStart ? this.Selection.StartPos : this.Selection.EndPos;
 
-    if (undefined !== this.Content[nPos])
-        this.Content[nPos].Get_ParaContentPos(bSelection, bStart, ContentPos);
+		if (para_Math_Run !== this.Content[nPos].Type
+			&& (this.Selection.StartPos !== this.Selection.EndPos || true !== this.Content[nPos].Is_InnerSelection())
+			&& ((true === bStart && nPos > 0) || (true !== bStart && nPos < this.Content.length - 1)))
+		{
+			if (true === bStart && nPos > 0)
+			{
+				ContentPos.Add(nPos - 1);
+				this.Content[nPos - 1].Get_EndPos(false, ContentPos, ContentPos.Get_Depth() + 1);
+			}
+			else
+			{
+				ContentPos.Add(nPos + 1);
+				this.Content[nPos + 1].Get_StartPos(ContentPos, ContentPos.Get_Depth() + 1);
+			}
+		}
+		else
+		{
+			ContentPos.Add(nPos);
+
+			if (undefined !== this.Content[nPos])
+				this.Content[nPos].Get_ParaContentPos(bSelection, bStart, ContentPos, bUseCorrection);
+		}
+	}
+	else
+	{
+		var nPos = (true !== bSelection ? this.CurPos : (false !== bStart ? this.Selection.StartPos : this.Selection.EndPos));
+		ContentPos.Add(nPos);
+
+		if (undefined !== this.Content[nPos])
+			this.Content[nPos].Get_ParaContentPos(bSelection, bStart, ContentPos, bUseCorrection);
+	}
 };
 CMathContent.prototype.Set_ParaContentPos = function(ContentPos, Depth)
 {

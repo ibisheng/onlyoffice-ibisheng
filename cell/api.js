@@ -1,5 +1,5 @@
 ﻿/*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -217,31 +217,40 @@ var editor;
     this.asc_SendThemeColors(_ret_array, standart_colors);
   };
 
-  spreadsheet_api.prototype.asc_getLocaleExample = function(val, number, date) {
-    var res = '';
-    var cultureInfo = AscCommon.g_aCultureInfos[val];
-    if (cultureInfo) {
-      var numFormatDigit = AscCommon.oNumFormatCache.get('#,##0.00');
-
-      var formatDate = AscCommon.getShortDateFormat(cultureInfo);
-      formatDate += " h:mm";
-      if (cultureInfo.AMDesignator && cultureInfo.PMDesignator) {
-        formatDate += " AM/PM";
-      }
-      var numFormatDate = AscCommon.oNumFormatCache.get(formatDate);
-
-      res += numFormatDigit.formatToChart(number, cultureInfo);
-      res += '; ';
-      res += numFormatDate.formatToChart(date.getExcelDateWithTime(), cultureInfo);
-    }
-    return res;
-  };
+  spreadsheet_api.prototype.asc_getCurrencySymbols = function () {
+		var result = {};
+		for (var key in AscCommon.g_aCultureInfos) {
+			result[key] = AscCommon.g_aCultureInfos[key].CurrencySymbol;
+		}
+		return result;
+	};
+	spreadsheet_api.prototype.asc_getLocaleExample = function(format, value, culture) {
+		var cultureInfo = AscCommon.g_aCultureInfos[culture] || AscCommon.g_oDefaultCultureInfo;
+		var numFormat = AscCommon.oNumFormatCache.get(format);
+		var res;
+		if (null == value) {
+			var ws = this.wbModel.getActiveWs();
+			var activeCell = ws.selectionRange.activeCell;
+			var cell = ws._getCellNoEmpty(activeCell.row, activeCell.col);
+			if (cell) {
+				res = cell.getValueForExample(numFormat, cultureInfo);
+			} else {
+				res = '';
+			}
+		} else {
+			res = numFormat.formatToChart(value, cultureInfo);
+		}
+		return res;
+	};
+	spreadsheet_api.prototype.asc_getFormatCells = function(info) {
+		return AscCommon.getFormatCells(info);
+	};
   spreadsheet_api.prototype.asc_getLocaleCurrency = function(val) {
     var cultureInfo = AscCommon.g_aCultureInfos[val];
     if (!cultureInfo) {
       cultureInfo = AscCommon.g_aCultureInfos[1033];
     }
-    return AscCommonExcel.getCurrencyFormat(cultureInfo, true, true, true);
+    return AscCommonExcel.getCurrencyFormat(cultureInfo, 2, true, true);
   };
   spreadsheet_api.prototype.asc_setLocale = function(val) {
     if (!this.isLoadFullApi) {
@@ -486,7 +495,12 @@ var editor;
     var ws = this.wb.getWorksheet();
     return ws.af_changeTableRange(tableName, range);
   };
-  
+
+  spreadsheet_api.prototype.asc_convertTableToRange = function(tableName) {
+    var ws = this.wb.getWorksheet();
+    return ws.af_convertTableToRange(tableName);
+  };
+
   spreadsheet_api.prototype.asc_getTablePictures = function (props) 
   { 
 	return this.wb.getTablePictures(props); 
@@ -1298,8 +1312,8 @@ var editor;
 	spreadsheet_api.prototype._sendWorkbookStyles = function () {
 		if (this.wbModel) {
 
-			if (!window['IS_NATIVE_EDITOR'] && window["NATIVE_EDITOR_ENJINE"]) {
-				// Для нативной версии (сборка) не генерируем стили
+			if (window["NATIVE_EDITOR_ENJINE"]) {
+				// Для нативной версии (сборка и приложение) не генерируем стили
 				return;
 			}
 
@@ -2756,7 +2770,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_setCellFormat = function(format) {
-    this.wb.getWorksheet().setSelectionInfo("format", format);
+    this.wb.setCellFormat(format);
     this.wb.restoreFocus();
   };
 
@@ -2916,7 +2930,7 @@ var editor;
     }
 
     // На view-режиме не нужно отправлять стили
-    if (true !== this.getViewMode() && !this.isMobileVersion) {
+    if (true !== this.getViewMode()) {
       // Отправка стилей
       this._sendWorkbookStyles();
     }
@@ -3245,7 +3259,9 @@ var editor;
 
   prot["asc_GetFontThumbnailsPath"] = prot.asc_GetFontThumbnailsPath;
   prot["asc_setDocInfo"] = prot.asc_setDocInfo;
-  prot["asc_getLocaleExample"] = prot.asc_getLocaleExample;
+	prot['asc_getCurrencySymbols'] = prot.asc_getCurrencySymbols;
+	prot['asc_getLocaleExample'] = prot.asc_getLocaleExample;
+	prot['asc_getFormatCells'] = prot.asc_getFormatCells;
   prot["asc_getLocaleCurrency"] = prot.asc_getLocaleCurrency;
   prot["asc_setLocale"] = prot.asc_setLocale;
   prot["asc_getEditorPermissions"] = prot.asc_getEditorPermissions;
@@ -3365,6 +3381,7 @@ var editor;
   prot["asc_deleteCellsInTable"] = prot.asc_deleteCellsInTable;
   prot["asc_changeDisplayNameTable"] = prot.asc_changeDisplayNameTable;
   prot["asc_changeTableRange"] = prot.asc_changeTableRange;
+  prot["asc_convertTableToRange"] = prot.asc_convertTableToRange;
   prot["asc_getTablePictures"] = prot.asc_getTablePictures;
 
   // Drawing objects interface

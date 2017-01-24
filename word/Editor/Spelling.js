@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -309,6 +309,14 @@ CParaSpellChecker.prototype =
 
     Add : function(StartPos, EndPos, Word, Lang)
     {
+    	if (Word.length > 0)
+		{
+			if (Word.charAt(Word.length - 1) == '\'')
+				Word = Word.substr(0, Word.length - 1);
+			if (Word.charAt(0) == '\'')
+				Word = Word.substr(1);
+		}
+
         var SpellCheckerEl = new CParaSpellCheckerElement( StartPos, EndPos, Word, Lang );
         this.Paragraph.Add_SpellCheckerElement( SpellCheckerEl );
         this.Elements.push( SpellCheckerEl );

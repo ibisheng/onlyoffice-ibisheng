@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1827,6 +1827,7 @@ function DrawingObjects() {
         shapeOverlayCtx = currentSheet.shapeOverlayCtx;
 
         trackOverlay = new AscCommon.COverlay();
+        trackOverlay.IsCellEditor = true;
         trackOverlay.init( shapeOverlayCtx.m_oContext, "ws-canvas-graphic-overlay", 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
 
         autoShapeTrack = new AscCommon.CAutoshapeTrack();

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -898,13 +898,19 @@
 					}
 					break;
 
-				case 53: // make strikethrough	Ctrl + 5
-				case 66: // make bold			Ctrl + b
-				case 73: // make italic			Ctrl + i
-				//case 83: // save				Ctrl + s
-				case 85: // make underline		Ctrl + u
-				case 89: // redo				Ctrl + y
-				case 90: // undo				Ctrl + z
+				case 49:  // set number format		Ctrl + Shift + !
+				case 50:  // set time format		Ctrl + Shift + @
+				case 51:  // set date format		Ctrl + Shift + #
+				case 52:  // set currency format	Ctrl + Shift + $
+				case 53:  // make strikethrough		Ctrl + 5
+				case 54:  // set exponential format Ctrl + Shift + ^
+				case 66:  // make bold				Ctrl + b
+				case 73:  // make italic			Ctrl + i
+				//case 83: // save					Ctrl + s
+				case 85:  // make underline			Ctrl + u
+				case 89:  // redo					Ctrl + y
+				case 90:  // undo					Ctrl + z
+				case 192: // set general format 	Ctrl + Shift + ~
 					if (isViewerMode || t.isSelectionDialogMode) {
 						stop();
 						return result;
@@ -929,28 +935,80 @@
 					// Вызовем обработчик
 					if (!t.__handlers) {
 						t.__handlers = {
-							53: function () {
-								t.handlers.trigger("setFontAttributes", "s");
+							49: function () {
+								if (!shiftKey) {
+									return false;
+								}
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Number);
+								return true;
+							}, 50: function () {
+								if (!shiftKey) {
+									return false;
+								}
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Time);
+								return true;
+							}, 51: function () {
+								if (!shiftKey) {
+									return false;
+								}
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Date);
+								return true;
+							}, 52: function () {
+								if (!shiftKey) {
+									return false;
+								}
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Currency);
+								return true;
+							}, 53: function () {
+								if (shiftKey) {
+									t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Percent);
+								} else {
+									t.handlers.trigger("setFontAttributes", "s");
+								}
+								return true;
+							}, 54: function () {
+								if (!shiftKey) {
+									return false;
+								}
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Scientific);
+								return true;
 							}, 65: function () {
 								t.handlers.trigger("changeSelection", /*isStartPoint*/true, -1, -1, /*isCoord*/true, /*isSelectMode*/
 									false, false);
+								return true;
 							}, 66: function () {
 								t.handlers.trigger("setFontAttributes", "b");
+								return true;
 							}, 73: function () {
 								t.handlers.trigger("setFontAttributes", "i");
+								return true;
 							}, 85: function () {
 								t.handlers.trigger("setFontAttributes", "u");
+								return true;
 							}, 80: function () {
 								t.handlers.trigger("print");
+								return true;
 							}, //83: function () {t.handlers.trigger("save");},
 							89: function () {
 								t.handlers.trigger("redo");
+								return true;
 							}, 90: function () {
 								t.handlers.trigger("undo");
+								return true;
+							},
+							192: function () {
+								if (!shiftKey) {
+									return false;
+								}
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.General);
+								return true;
 							}
 						};
 					}
-					t.__handlers[event.which]();
+					if (!t.__handlers[event.which]()) {
+						t.skipKeyPress = false;
+						return true;
+					}
 					return result;
 
 				case 61:  // Firefox, Opera (+/=)

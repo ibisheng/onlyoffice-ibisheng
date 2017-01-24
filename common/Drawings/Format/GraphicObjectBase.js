@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -414,6 +414,52 @@
             this.drawingBase.ext.cx = fExtX;
             this.drawingBase.ext.cy = fExtY;
         }
+    };
+
+    CGraphicObjectBase.prototype.getUniNvProps = function(){
+        return this.nvSpPr || this.nvPicPr || this.nvGrpSpPr || this.nvGraphicFramePr || null;
+    };
+    CGraphicObjectBase.prototype.getNvProps = function(){
+        var oUniNvPr = this.getUniNvProps();
+        if(oUniNvPr){
+            return oUniNvPr.cNvPr;
+        }
+        return null;
+    };
+
+    CGraphicObjectBase.prototype.setTitle = function(sTitle){
+        if(undefined === sTitle){
+            return;
+        }
+        var oNvPr = this.getNvProps();
+        if(oNvPr){
+            oNvPr.setTitle(sTitle ? sTitle : null);
+        }
+    };
+
+    CGraphicObjectBase.prototype.setDescription = function(sDescription){
+        if(undefined === sDescription){
+            return;
+        }
+        var oNvPr = this.getNvProps();
+        if(oNvPr){
+            oNvPr.setDecr(sDescription ? sDescription : null);
+        }
+    };
+   CGraphicObjectBase.prototype.getTitle = function(){
+        var oNvPr = this.getNvProps();
+        if(oNvPr){
+            return oNvPr.title ? oNvPr.title : undefined;
+        }
+        return undefined;
+    };
+
+    CGraphicObjectBase.prototype.getDescription = function(){
+        var oNvPr = this.getNvProps();
+        if(oNvPr){
+            return oNvPr.descr ? oNvPr.descr : undefined;
+        }
+        return undefined;
     };
 
     window['AscFormat'] = window['AscFormat'] || {};

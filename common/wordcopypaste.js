@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1424,7 +1424,7 @@ CopyProcessor.prototype =
                 this.oPresentationWriter.WriteBool(table_styles_ids[i] !== null);
                 if(table_styles_ids[i] !== null)
                 {
-                    this.oPresentationWriter.WriteULong(table_styles_ids[i]);
+                    this.oPresentationWriter.WriteString2(table_styles_ids[i]);
                 }
             }
 
@@ -3061,14 +3061,14 @@ PasteProcessor.prototype =
 					for(var i = 0; i < slide_count; ++i)
 					{
 						arr_layouts_id[i] = stream.GetString2();
-						var table_style_ids_len = stream.GetULong();
-						var table_style_ids = [];
-						for(var j = 0; j < table_style_ids_len; ++j)
+						var table_styles_ids_len = stream.GetULong();
+						var table_styles_ids = [];
+						for(var j = 0; j < table_styles_ids_len; ++j)
 						{
 							if(stream.GetBool())
-								table_style_ids.push(stream.GetULong());
+								table_styles_ids.push(stream.GetString2());
 							else
-								table_style_ids.push(-1);
+								table_styles_ids.push(-1);
 						}
 						arr_slides[i] = loader.ReadSlide(0);
 						var sp_tree = arr_slides[i].cSld.spTree;
@@ -3077,7 +3077,7 @@ PasteProcessor.prototype =
 						{
 							if(sp_tree[s] instanceof CGraphicFrame)
 							{
-								sp_tree[s].graphicObject.Set_TableStyle(table_style_ids[t], true);
+								sp_tree[s].graphicObject.Set_TableStyle(table_styles_ids[t], true);
 								++t;
 							}
 						}

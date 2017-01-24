@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -527,6 +527,7 @@ function CDocumentPageSection()
     this.YLimit2 = 0;
 
     this.Columns = [];
+    this.ColumnsSep = false;
 
     this.IterationsCount          = 0;
     this.CurrentY                 = 0;
@@ -669,6 +670,10 @@ CDocumentPageColumn.prototype.Reset = function()
     this.Y      = 0;
     this.XLimit = 0;
     this.YLimit = 0;
+};
+CDocumentPageColumn.prototype.IsEmpty = function()
+{
+	return this.Empty;
 };
 
 function CDocumentPage()
@@ -1853,6 +1858,14 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
                 this.DrawingDocument.OnEndRecalculate(false, true);
                 History.Reset_RecalcIndex();
                 this.private_UpdateCursorXY(true, true);
+
+                if (Para.Parent && Para.Parent.Get_TopDocumentContent)
+				{
+					var oTopDocument = Para.Parent.Get_TopDocumentContent();
+					if (oTopDocument instanceof CFootEndnote)
+						oTopDocument.OnFastRecalculate();
+				}
+
                 return;
             }
         }
@@ -1883,7 +1896,15 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
                 this.DrawingDocument.OnEndRecalculate(false, true);
                 History.Reset_RecalcIndex();
                 this.private_UpdateCursorXY(true, true);
-                return;
+
+                if (SimplePara.Parent && SimplePara.Parent.Get_TopDocumentContent)
+				{
+					var oTopDocument = SimplePara.Parent.Get_TopDocumentContent();
+					if (oTopDocument instanceof CFootEndnote)
+						oTopDocument.OnFastRecalculate();
+				}
+
+				return;
             }
         }
     }
@@ -2168,6 +2189,7 @@ CDocument.prototype.Recalculate_Page = function()
             {
                 Page.Sections[0].Columns[ColumnIndex] = new CDocumentPageColumn();
             }
+            Page.Sections[0].ColumnsSep = SectPr.Get_ColumnsSep();
         }
 
         var Count = this.Content.length;
@@ -2529,6 +2551,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
                             NewPageSection.EndPos        = Index;
                             NewPageSection.Y             = SectionY + 0.001;
                             NewPageSection.YLimit        = true === PageSection.Is_CalculatingSectionBottomLine() ? PageSection.YLimit2 : RealYLimit;
+                            NewPageSection.ColumnsSep    = NextSectInfo.SectPr.Get_ColumnsSep();
                             Page.Sections[_SectionIndex] = NewPageSection;
 
                             var ColumnsCount = NextSectInfo.SectPr.Get_ColumnsCount();
@@ -3603,6 +3626,14 @@ CDocument.prototype.Draw                                     = function(nPageInd
             var Column         = PageSection.Columns[ColumnIndex];
             var ColumnStartPos = Column.Pos;
             var ColumnEndPos   = Column.EndPos;
+
+            if (true === PageSection.ColumnsSep && ColumnIndex > 0 && !Column.IsEmpty())
+			{
+
+				var SepX = (Column.X + PageSection.Columns[ColumnIndex - 1].XLimit) / 2;
+				pGraphics.p_color(0, 0, 0, 255);
+				pGraphics.drawVerLine(c_oAscLineDrawingRule.Left, SepX, PageSection.Y, PageSection.YLimit, 0.75 * g_dKoef_pt_to_mm);
+			}
 
             // Плавающие объекты не должны попадать в клип колонок
             var FlowElements = [];
@@ -9354,6 +9385,19 @@ CDocument.prototype.GetCurrentSectionPr = function()
 
 	return oSectPr;
 };
+CDocument.prototype.GetFirstElementInSection = function(SectionIndex)
+{
+	if (SectionIndex <= 0)
+		return this.Content[0] ? this.Content[0] : null;
+
+	var nElementPos = this.SectionsInfo.Get_SectPr2(SectionIndex - 1).Index + 1;
+	return this.Content[nElementPos] ? this.Content[nElementPos] : null;
+};
+CDocument.prototype.GetSectionIndexByElementIndex = function(ElementIndex)
+{
+	return this.SectionsInfo.Get_Index(ElementIndex);
+};
+
 /**
  * Определяем использовать ли заливку текста в особых случаях, когда вызывается заливка параграфа.
  * @param bUse
@@ -9458,7 +9502,7 @@ CDocument.prototype.private_StartSelectionFromCurPos = function()
 			Y = _Y;
 		}
 
-		this.CurPage = CurPara.Get_StartPage_Absolute() + CurPara.CurPos.PagesPos;
+		this.CurPage = CurPara.Get_CurrentPage_Absolute();
 		this.Selection_SetStart(X, Y, MouseEvent);
 		MouseEvent.Type = AscCommon.g_mouse_event_type_move;
 		this.Selection_SetEnd(X, Y, MouseEvent);
@@ -11303,7 +11347,6 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 						NextId = StyleId;
 				}
 
-
 				if (StyleId === NextId)
 				{
 					// Продолжаем (в плане настроек) новый параграф
@@ -11323,6 +11366,14 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 				{
 					Item.Set_SectionPr(undefined);
 					NewParagraph.Set_SectionPr(SectPr);
+				}
+
+				var LastRun = Item.Content[Item.Content.length - 1];
+				if (LastRun && LastRun.Pr.Lang && LastRun.Pr.Lang.Val)
+				{
+					NewParagraph.Select_All();
+					NewParagraph.Add(new ParaTextPr({Lang : LastRun.Pr.Lang.Copy()}));
+					NewParagraph.Selection_Remove();
 				}
 			}
 			else
@@ -12674,6 +12725,7 @@ CDocument.prototype.controller_MoveCursorUp = function(AddToSelect)
 	this.private_UpdateCursorXY(false, true);
 	var Result = this.private_MoveCursorUp(this.CurPos.RealX, this.CurPos.RealY, AddToSelect);
 
+	// TODO: Вообще Word селектит до начала данной колонки в таком случае, а не до начала документа
 	if (true === AddToSelect && true !== Result)
 		this.Cursor_MoveToStartPos(true);
 

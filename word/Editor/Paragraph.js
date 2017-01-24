@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -3748,18 +3748,18 @@ Paragraph.prototype =
         this.CurPos.ContentPos = CurPos;
     },
 
-    Get_ParaContentPos : function(bSelection, bStart)
-    {
-        var ContentPos = new CParagraphContentPos();
+	Get_ParaContentPos : function(bSelection, bStart, bUseCorrection)
+	{
+		var ContentPos = new CParagraphContentPos();
 
-        var Pos = ( true !== bSelection ? this.CurPos.ContentPos : ( false !== bStart ? this.Selection.StartPos : this.Selection.EndPos ) );
+		var Pos = ( true !== bSelection ? this.CurPos.ContentPos : ( false !== bStart ? this.Selection.StartPos : this.Selection.EndPos ) );
 
-        ContentPos.Add( Pos );
+		ContentPos.Add(Pos);
 
-        this.Content[Pos].Get_ParaContentPos( bSelection, bStart, ContentPos );
+		this.Content[Pos].Get_ParaContentPos(bSelection, bStart, ContentPos, true === bUseCorrection ? true : false);
 
-        return ContentPos;
-    },
+		return ContentPos;
+	},
 
     Set_ParaContentPos : function(ContentPos, CorrectEndLinePos, Line, Range)
     {
@@ -4077,7 +4077,7 @@ Paragraph.prototype =
             SearchPos.InText = false;
 
         // Такое возможно, если все раны до этого (в том числе и этот) были пустыми, тогда, чтобы не возвращать
-        // неправильную позицию вернем позицию начала данного путого рана.
+        // неправильную позицию вернем позицию начала данного пустого рана.
         if ( SearchPos.DiffX > 1000000 - 1 )
         {
             SearchPos.Line  = -1;
@@ -4106,13 +4106,16 @@ Paragraph.prototype =
 
             if ( true !== AddToSelect )
             {
-                // Найдем левую точку селекта
-                var SelectPos = StartSelectionPos;
-                if ( StartSelectionPos.Compare( EndSelectionPos ) > 0 )
-                    SelectPos = EndSelectionPos;
+            	// Иногда нужно скоректировать позицию, например в формулах
+                var CorrectedStartPos = this.Get_ParaContentPos(true, true, true);
+                var CorrectedEndPos   = this.Get_ParaContentPos(true, false, true);
 
-                this.Selection_Remove();
-                this.Set_ParaContentPos( SelectPos, true, -1, -1 );
+				var SelectPos = CorrectedStartPos;
+				if (CorrectedStartPos.Compare(CorrectedEndPos) > 0)
+					SelectPos = CorrectedEndPos;
+
+				this.Selection_Remove();
+				this.Set_ParaContentPos(SelectPos, true, -1, -1);
             }
             else
             {
@@ -4207,14 +4210,16 @@ Paragraph.prototype =
                 }
                 else
                 {
-                    // Найдем левую точку селекта
-                    var SelectPos = EndSelectionPos;
-                    if ( StartSelectionPos.Compare( EndSelectionPos ) > 0 )
-                        SelectPos = StartSelectionPos;
+					// Иногда нужно скоректировать позицию, например в формулах
+					var CorrectedStartPos = this.Get_ParaContentPos(true, true, true);
+					var CorrectedEndPos   = this.Get_ParaContentPos(true, false, true);
 
-                    this.Selection_Remove();
+					var SelectPos = CorrectedEndPos;
+					if (CorrectedStartPos.Compare(CorrectedEndPos) > 0)
+						SelectPos = CorrectedStartPos;
 
-                    this.Set_ParaContentPos( SelectPos, true, -1, -1 );
+					this.Selection_Remove();
+					this.Set_ParaContentPos(SelectPos, true, -1, -1);
                 }
             }
             else
@@ -6937,7 +6942,7 @@ Paragraph.prototype =
         }
 
         var Para = null;
-        if ( true === this.Selection_IsFromStart() && true === this.Selection_CheckParaEnd() )
+        if ( true === this.Selection_IsFromStart(true) && true === this.Selection_CheckParaEnd() )
         {
             Para = this.Copy(this.Parent);
             DocContent.Add( new CSelectedElement( Para, true ) );
@@ -7984,7 +7989,10 @@ Paragraph.prototype =
                 }
                 else if (0 === this.Pr.NumPr.NumId)
                 {
-                    // Почему то Word в такой ситуации ведет себя так
+                	// Word значение 0 для NumId воспринимает как отсутствие нумерации
+					Lvl = -1;
+					Pr.ParaPr.NumPr = undefined;
+
                     Pr.ParaPr.Ind.Left      = 0;
                     Pr.ParaPr.Ind.FirstLine = 0;
                 }
@@ -8337,24 +8345,26 @@ Paragraph.prototype =
     },
 
     // Проверяем находится ли курсор в начале параграфа
-    Cursor_IsStart : function(_ContentPos)
+    Cursor_IsStart : function(_ContentPos, bCheckAnchors)
     {
-        // Просто попробуем переместится вправо от текущего положения, если мы не можем, значит
-        // мы стоим в конце параграфа.
+		// Просто попробуем переместится вправо от текущего положения, если мы не можем, значит
+		// мы стоим в конце параграфа.
 
-        var ContentPos = ( undefined === _ContentPos ? this.Get_ParaContentPos( false, false ) : _ContentPos );
-        var SearchPos  = new CParagraphSearchPos();
+		var ContentPos = ( undefined === _ContentPos ? this.Get_ParaContentPos(false, false) : _ContentPos );
+		var SearchPos  = new CParagraphSearchPos();
+		if (true === bCheckAnchors)
+			SearchPos.SetCheckAnchors();
 
-        this.Get_LeftPos( SearchPos, ContentPos );
+		this.Get_LeftPos(SearchPos, ContentPos);
 
-        if ( true === SearchPos.Found )
-            return false;
-        else
-            return true;
+		if (true === SearchPos.Found)
+			return false;
+		else
+			return true;
     },
 
     // Проверим, начинается ли выделение с начала параграфа
-    Selection_IsFromStart : function()
+    Selection_IsFromStart : function(bCheckAnchors)
     {
         if ( true === this.Is_SelectionUse() )
         {
@@ -8364,7 +8374,7 @@ Paragraph.prototype =
             if ( StartPos.Compare(EndPos) > 0 )
                 StartPos = EndPos;
             
-            if ( true != this.Cursor_IsStart( StartPos ) )
+            if ( true != this.Cursor_IsStart( StartPos, bCheckAnchors ) )
                 return false;
 
             return true;
@@ -12963,7 +12973,17 @@ function CParagraphSearchPos()
     this.UpdatePos   = false;
     
     this.ForSelection = false;
+
+    this.CheckAnchors = false;
 }
+CParagraphSearchPos.prototype.SetCheckAnchors = function(bCheck)
+{
+	this.CheckAnchors = bCheck;
+};
+CParagraphSearchPos.prototype.IsCheckAnchors = function()
+{
+	return this.CheckAnchors;
+};
 
 function CParagraphSearchPosXY()
 {

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -45,17 +45,14 @@
 	 */
 	function CMobileDelegateEditorPresentation(_manager)
 	{
+		this.Name = "slide";
 		CMobileDelegateEditorPresentation.superclass.constructor.call(this, _manager);
 	}
 	AscCommon.extendClass(CMobileDelegateEditorPresentation, AscCommon.CMobileDelegateEditor);
 
 	CMobileDelegateEditorPresentation.prototype.ConvertCoordsToCursor = function(x, y, page, isGlobal)
 	{
-		return this.DrawingDocument.ConvertCoordsToCursor(x, y);
-		if (isGlobal)
-			return this.DrawingDocument.ConvertCoordsToCursor(x, y);
-		else
-			return this.DrawingDocument.ConvertCoordsToCursorWR(x, y);
+		return this.DrawingDocument.ConvertCoordsToCursor3(x, y, isGlobal);
 	};
 	CMobileDelegateEditorPresentation.prototype.ConvertCoordsFromCursor = function(x, y)
 	{
@@ -95,9 +92,9 @@
 			H : (this.HtmlPage.SlideScrollMAX - this.HtmlPage.SlideScrollMIN + _controlH)
 		};
 	};
-	CMobileDelegateEditorPresentation.prototype.GetObjectTrack = function(x, y, page)
+	CMobileDelegateEditorPresentation.prototype.GetObjectTrack = function(x, y, page, bSelected)
 	{
-		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.isPointInDrawingObjects3(x, y, page);
+		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.isPointInDrawingObjects3(x, y, page, bSelected);
 	};
 	CMobileDelegateEditorPresentation.prototype.GetSelectionRectsBounds = function()
 	{
@@ -233,6 +230,11 @@
 		return { X : _posX, Y : _posY, Mode : _mode };
 	};
 
+	CMobileDelegateEditorPresentation.prototype.Logic_GetNearestPos = function(x, y, page)
+	{
+		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.getNearestPos2(x, y);
+	};
+
 	/**
 	 * @extends {AscCommon.CMobileTouchManagerBase}
 	 */
@@ -273,6 +275,7 @@
 	CMobileTouchManager.prototype.onTouchStart = function(e)
 	{
 		this.IsTouching = true;
+		AscCommon.g_inputContext.enableVirtualKeyboard();
 
 		if (this.delegate.IsReader())
 			return this.onTouchStart_renderer(e);
@@ -325,6 +328,29 @@
 			}
 			default:
 				break;
+		}
+
+		var isPreventDefault = false;
+		switch (this.Mode)
+		{
+			case AscCommon.MobileTouchMode.InlineObj:
+			case AscCommon.MobileTouchMode.FlowObj:
+			case AscCommon.MobileTouchMode.Zoom:
+			case AscCommon.MobileTouchMode.TableMove:
+			{
+				isPreventDefault = true;
+				break;
+			}
+			case AscCommon.MobileTouchMode.None:
+			case AscCommon.MobileTouchMode.Scroll:
+			{
+				isPreventDefault = this.CheckObjectTrackBefore();
+				break;
+			}
+			default:
+			{
+				break;
+			}
 		}
 
 		switch (this.Mode)
@@ -448,14 +474,13 @@
 			}
 		}
 
-		if (this.Api.isViewMode)
-		{
-			if (e.preventDefault)
-				e.preventDefault();
-			else
-				e.returnValue = false;
-			return false;
-		}
+		if (AscCommon.AscBrowser.isAndroid)
+			isPreventDefault = false;
+
+		if (this.Api.isViewMode || isPreventDefault)
+			AscCommon.stopEvent(e);
+
+		return false;
 	};
 	CMobileTouchManager.prototype.onTouchMove  = function(e)
 	{
@@ -628,6 +653,24 @@
 
 		var isCheckContextMenuMode = true;
 
+		var isPreventDefault = false;
+		switch (this.Mode)
+		{
+			case AscCommon.MobileTouchMode.Scroll:
+			case AscCommon.MobileTouchMode.InlineObj:
+			case AscCommon.MobileTouchMode.FlowObj:
+			case AscCommon.MobileTouchMode.Zoom:
+			case AscCommon.MobileTouchMode.TableMove:
+			{
+				isPreventDefault = true;
+				break;
+			}
+			default:
+			{
+				break;
+			}
+		}
+
 		switch (this.Mode)
 		{
 			case AscCommon.MobileTouchMode.Cursor:
@@ -644,6 +687,10 @@
 					this.delegate.Drawing_OnMouseDown(_e);
 					this.delegate.Drawing_OnMouseUp(_e);
 					this.Api.sendEvent("asc_onTapEvent", e);
+
+					var typeMenu = this.delegate.GetContextMenuType();
+					if (typeMenu == AscCommon.MobileTouchContextMenuType.Target)
+						isPreventDefault = false;
 				}
 				else
 				{
@@ -792,17 +839,13 @@
 				break;
 		}
 
-		if (this.Api.isViewMode)
-		{
-			if (e.preventDefault)
-				e.preventDefault();
-			else
-				e.returnValue = false;
-			return false;
-		}
+		if (this.Api.isViewMode || isPreventDefault)
+			AscCommon.g_inputContext.preventVirtualKeyboard(e);
 
 		if (true !== this.iScroll.isAnimating)
 			this.CheckContextMenuTouchEnd(isCheckContextMenuMode);
+
+		return false;
 	};
 
 	CMobileTouchManager.prototype.mainOnTouchStart = function(e)
@@ -810,7 +853,7 @@
 		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
 			return;
 
-		if (!this.Api.IsFocus)
+		if (!this.Api.asc_IsFocus())
 			this.Api.asc_enableKeyEvents(true);
 
 		var oWordControl = this.Api.WordControl;
@@ -841,6 +884,54 @@
 		oWordControl.IsUpdateOverlayOnlyEndReturn = false;
 		oWordControl.EndUpdateOverlay();
 		return ret;
+	};
+
+	CMobileTouchManager.prototype.CheckSelectTrack = function()
+	{
+		// сдвиг относительно табнейлов => нужно переопределить
+		if (!this.SelectEnabled)
+			return false;
+
+		var _matrix = this.delegate.GetSelectionTransform();
+		if (_matrix && global_MatrixTransformer.IsIdentity(_matrix))
+			_matrix = null;
+
+		// проверим на попадание в селект - это может произойти на любом mode
+		if (null != this.RectSelect1 && null != this.RectSelect2)
+		{
+			var pos1 = null;
+			var pos4 = null;
+
+			if (!_matrix)
+			{
+				pos1 = this.delegate.ConvertCoordsToCursor(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1, true);
+				pos4 = this.delegate.ConvertCoordsToCursor(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h, this.PageSelect2, true);
+			}
+			else
+			{
+				var _xx1 = _matrix.TransformPointX(this.RectSelect1.x, this.RectSelect1.y);
+				var _yy1 = _matrix.TransformPointY(this.RectSelect1.x, this.RectSelect1.y);
+
+				var _xx2 = _matrix.TransformPointX(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h);
+				var _yy2 = _matrix.TransformPointY(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h);
+
+				pos1 = this.delegate.ConvertCoordsToCursor(_xx1, _yy1, this.PageSelect1, true);
+				pos4 = this.delegate.ConvertCoordsToCursor(_xx2, _yy2, this.PageSelect2, true);
+			}
+
+			if (Math.abs(pos1.X - global_mouseEvent.X) < this.TrackTargetEps && Math.abs(pos1.Y - global_mouseEvent.Y) < this.TrackTargetEps)
+			{
+				this.Mode       = AscCommon.MobileTouchMode.Select;
+				this.DragSelect = 1;
+			}
+			else if (Math.abs(pos4.X - global_mouseEvent.X) < this.TrackTargetEps && Math.abs(pos4.Y - global_mouseEvent.Y) < this.TrackTargetEps)
+			{
+				this.Mode       = AscCommon.MobileTouchMode.Select;
+				this.DragSelect = 2;
+			}
+		}
+
+		return (this.Mode == AscCommon.MobileTouchMode.Select);
 	};
 
 	/**************************************************************************/
@@ -890,7 +981,18 @@
 	};
 	CMobileDelegateThumbnails.prototype.GetContextMenuPosition = function()
 	{
-		return { X : 0, Y : 0 };
+		var aSelected    = this.Thumbnails.GetSelectedArray();
+		var nSlideIndex  = Math.min.apply(Math, aSelected);
+		var ConvertedPos = this.Thumbnails.GetThumbnailPagePosition(nSlideIndex);
+
+		var _ret = { X : 0, Y : 0, Mode : AscCommon.MobileTouchContextMenuType.Slide };
+		if (ConvertedPos)
+		{
+			_ret.X = ConvertedPos.X;
+			_ret.Y = ConvertedPos.Y;
+		}
+
+		return _ret;
 	};
 
 	/**

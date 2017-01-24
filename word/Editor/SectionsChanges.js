@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -551,13 +551,13 @@ CChangesSectionPageNumTypeStart.prototype.private_SetValue = function(Value)
 };
 /**
  * @constructor
- * @extends {AscDFH.CChangesBaseLongValue}
+ * @extends {AscDFH.CChangesBaseBoolValue}
  */
 function CChangesSectionColumnsEqualWidth(Class, Old, New)
 {
 	CChangesSectionColumnsEqualWidth.superclass.constructor.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionColumnsEqualWidth, AscDFH.CChangesBaseLongValue);
+AscCommon.extendClass(CChangesSectionColumnsEqualWidth, AscDFH.CChangesBaseBoolValue);
 CChangesSectionColumnsEqualWidth.prototype.Type = AscDFH.historyitem_Section_Columns_EqualWidth;
 CChangesSectionColumnsEqualWidth.prototype.private_SetValue = function(Value)
 {

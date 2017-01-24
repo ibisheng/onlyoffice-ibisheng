@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1168,7 +1168,7 @@ Path.prototype = {
         if (!isLine)
             isRect = this.isSmartRect();
 
-        if (!isLine && !isRect)
+        if (window["NATIVE_EDITOR_ENJINE"] || ( !isLine && !isRect))
             return this.draw(shape_drawer);
 
         var _old_int = _graphics.m_bIntegerGrid;
@@ -1872,7 +1872,7 @@ Path.prototype = {
             if (!isLine)
                 isRect = this.isSmartRect();
 
-            if (!isLine && !isRect)
+            if (window["NATIVE_EDITOR_ENJINE"] || ( !isLine && !isRect))
                 return this.draw(shape_drawer);
 
             var _old_int = _graphics.m_bIntegerGrid;

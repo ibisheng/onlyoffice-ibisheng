@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1507,14 +1507,14 @@ CChangesParagraphSectPr.prototype.ReadFromBinary = function(Reader)
 	var nFlags = Reader.GetLong();
 
 	if (nFlags & 1)
-		this.New = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
-	else
 		this.New = undefined;
+	else
+		this.New = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 
 	if (nFlags & 2)
-		this.Old = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
-	else
 		this.Old = undefined;
+	else
+		this.Old = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 };
 CChangesParagraphSectPr.prototype.CreateReverseChange = function()
 {

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1595,6 +1595,8 @@
 		this.verticalTextAlign = null;
 		this.textArtProperties = null;
 		this.lockAspect = null;
+		this.title = null;
+		this.description = null;
 	}
 
 	asc_CShapeProperty.prototype = {
@@ -1633,29 +1635,37 @@
 		},
 
 		asc_getWidth: function () {
-			return this.w
+			return this.w;
 		}, asc_putWidth: function (v) {
 			this.w = v;
 		}, asc_getHeight: function () {
-			return this.h
+			return this.h;
 		}, asc_putHeight: function (v) {
 			this.h = v;
 		}, asc_getVerticalTextAlign: function () {
-			return this.verticalTextAlign
+			return this.verticalTextAlign;
 		}, asc_putVerticalTextAlign: function (v) {
 			this.verticalTextAlign = v;
 		}, asc_getVert: function () {
-			return this.vert
+			return this.vert;
 		}, asc_putVert: function (v) {
 			this.vert = v;
 		}, asc_getTextArtProperties: function () {
-			return this.textArtProperties
+			return this.textArtProperties;
 		}, asc_putTextArtProperties: function (v) {
 			this.textArtProperties = v;
 		}, asc_getLockAspect: function () {
 			return this.lockAspect
 		}, asc_putLockAspect: function (v) {
 			this.lockAspect = v;
+		}, asc_getTitle: function () {
+			return this.title;
+		}, asc_putTitle: function (v) {
+			this.title = v;
+		}, asc_getDescription: function () {
+			return this.description;
+		}, asc_putDescription: function (v) {
+			this.description = v;
 		}
 	};
 
@@ -1900,6 +1910,10 @@
 			this.pluginData = obj.pluginData !== undefined ? obj.pluginData : undefined;
 			this.oleWidth = obj.oleWidth != undefined ? obj.oleWidth : undefined;
 			this.oleHeight = obj.oleHeight != undefined ? obj.oleHeight : undefined;
+
+			this.title = obj.title != undefined ? obj.title : undefined;
+			this.description = obj.description != undefined ? obj.description : undefined;
+
 		} else {
 			this.CanBeFlow = true;
 			this.Width = undefined;
@@ -1936,6 +1950,8 @@
 
 			this.oleWidth = undefined;
 			this.oleHeight = undefined;
+            this.title = undefined;
+            this.description = undefined;
 		}
 	}
 
@@ -2142,6 +2158,22 @@
 
 		asc_putPluginData: function (v) {
 			this.pluginData = v;
+		},
+
+		asc_getTitle: function(){
+			return this.title;
+		},
+
+		asc_putTitle: function(v){
+			this.title = v;
+		},
+
+		asc_getDescription: function(){
+			return this.description;
+		},
+
+		asc_putDescription: function(v){
+			this.description = v;
 		}
 	};
 
@@ -3206,6 +3238,10 @@
 	prot["put_TextArtProperties"] = prot["asc_putTextArtProperties"] = prot.asc_putTextArtProperties;
 	prot["get_LockAspect"] = prot["asc_getLockAspect"] = prot.asc_getLockAspect;
 	prot["put_LockAspect"] = prot["asc_putLockAspect"] = prot.asc_putLockAspect;
+	prot["get_Title"] = prot["asc_getTitle"] = prot.asc_getTitle;
+	prot["put_Title"] = prot["asc_putTitle"] = prot.asc_putTitle;
+	prot["get_Description"] = prot["asc_getDescription"] = prot.asc_getDescription;
+	prot["put_Description"] = prot["asc_putDescription"] = prot.asc_putDescription;
 
 	window["Asc"]["asc_TextArtProperties"] = window["Asc"].asc_TextArtProperties = asc_TextArtProperties;
 	prot = asc_TextArtProperties.prototype;
@@ -3324,6 +3360,14 @@
 	prot["get_PluginData"] = prot["asc_getPluginData"] = prot.asc_getPluginData;
 	prot["put_PluginData"] = prot["asc_putPluginData"] = prot.asc_putPluginData;
 
+	prot["get_Title"] = prot["asc_getTitle"] = prot.asc_getTitle;
+	prot["put_Title"] = prot["asc_putTitle"] = prot.asc_putTitle;
+	prot["get_Description"] = prot["asc_getDescription"] = prot.asc_getDescription;
+	prot["put_Description"] = prot["asc_putDescription"] = prot.asc_putDescription;
+
+
+
+
 	window["AscCommon"].asc_CSelectedObject = asc_CSelectedObject;
 	prot = asc_CSelectedObject.prototype;
 	prot["get_ObjectType"] = prot["asc_getObjectType"] = prot.asc_getObjectType;
@@ -3415,6 +3459,8 @@
 	prot["get_UserId"] = prot.get_UserId;
 	prot["get_HaveChanges"] = prot.get_HaveChanges;
 	prot["get_LockedObjectType"] = prot.get_LockedObjectType;
+	prot["get_FootnoteText"] =  prot.get_FootnoteText;
+	prot["get_FootnoteNumber"] = prot.get_FootnoteNumber;
 
 	window["Asc"]["asc_CUserInfo"] = window["Asc"].asc_CUserInfo = asc_CUserInfo;
 	prot = asc_CUserInfo.prototype;

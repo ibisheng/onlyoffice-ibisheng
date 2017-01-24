@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -4828,6 +4828,8 @@ function CTablePr()
     this.TableInd              = undefined;
     this.TableW                = undefined;
     this.TableLayout           = undefined;
+    this.TableDescription      = undefined;
+    this.TableCaption          = undefined;
 }
 
 CTablePr.prototype =
@@ -4882,6 +4884,9 @@ CTablePr.prototype =
             TablePr.TableW = this.TableW.Copy();
 
         TablePr.TableLayout = this.TableLayout;
+
+        TablePr.TableDescription = this.TableDescription;
+        TablePr.TableCaption     = this.TableCaption;
 
         return TablePr;
     },
@@ -4943,6 +4948,12 @@ CTablePr.prototype =
 
         if ( undefined != TablePr.TableLayout )
             this.TableLayout = TablePr.TableLayout;
+
+        if (undefined !== TablePr.TableDescription)
+        	this.TableDescription = TablePr.TableDescription;
+
+        if (undefined !== TablePr.TableCaption)
+        	this.TableCaption = TablePr.TableCaption;
     },
 
     Is_Equal : function(TablePr)
@@ -4989,6 +5000,8 @@ CTablePr.prototype =
         this.TableInd              = 0;
         this.TableW                = new CTableMeasurement(tblwidth_Auto, 0);
         this.TableLayout           = tbllayout_AutoFit;
+        this.TableDescription      = "";
+        this.TableCaption          = "";
     },
 
     Set_FromObject : function(TablePr)
@@ -5104,6 +5117,9 @@ CTablePr.prototype =
             this.TableW = undefined;
 
         this.TableLayout = TablePr.TableLayout;
+
+        this.TableDescription = TablePr.TableDescription;
+        this.TableCaption     = TablePr.TableCaption;
     },
 
     Check_PresentationPr : function(Theme)
@@ -5260,6 +5276,18 @@ CTablePr.prototype =
             Flags |= 131072;
         }
 
+        if (undefined !== this.TableDescription)
+		{
+			Writer.WriteString2(this.TableDescription);
+			Flags |= 262144;
+		}
+
+		if (undefined !== this.TableCaption)
+		{
+			Writer.WriteString2(this.TableCaption);
+			Flags |= 524288;
+		}
+
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
         Writer.WriteLong( Flags );
@@ -5364,6 +5392,12 @@ CTablePr.prototype =
 
         if ( 131072 & Flags )
             this.TableLayout = Reader.GetLong();
+
+		if (262144 & Flags)
+			this.TableDescription = Reader.GetString2();
+
+		if (524288 & Flags)
+			this.TableCaption = Reader.GetString2();
     }
 };
 
@@ -7747,6 +7781,9 @@ CTextPr.prototype =
 
         if (this.Vanish !== TextPr.Vanish)
             return false;
+
+		if (!IsEqualStyleObjects(this.Shd, TextPr.Shd))
+			return false;
 
         return true;
     },

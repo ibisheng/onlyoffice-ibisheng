@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -4838,11 +4838,38 @@ function CBinaryFileWriter()
 
         this.WriteTheme = function(memory, theme)
         {
-            this.BinaryFileWriter.pos = 0;
+			if (this.BinaryFileWriter.UseContinueWriter)
+			{
+				this.BinaryFileWriter.ImData = memory.ImData;
+				this.BinaryFileWriter.data = memory.data;
+				this.BinaryFileWriter.len = memory.len;
+				this.BinaryFileWriter.pos = memory.pos;
+			}
+			else
+			{
+				this.TreeDrawingIndex++;
+				this.arrayStackStarts.push(this.BinaryFileWriter.pos);
+			}
+
             this.BinaryFileWriter.WriteTheme(theme);
 
-            memory.WriteBuffer(this.BinaryFileWriter.data, 0, this.BinaryFileWriter.pos);
-            this.BinaryFileWriter.pos = 0;
+			if (this.BinaryFileWriter.UseContinueWriter)
+			{
+				memory.ImData = this.BinaryFileWriter.ImData;
+				memory.data = this.BinaryFileWriter.data;
+				memory.len = this.BinaryFileWriter.len;
+				memory.pos = this.BinaryFileWriter.pos;
+			}
+			else
+			{
+				this.TreeDrawingIndex--;
+
+				var oldPos = this.arrayStackStarts[this.arrayStackStarts.length - 1];
+				memory.WriteBuffer(this.BinaryFileWriter.data, oldPos, this.BinaryFileWriter.pos - oldPos);
+				this.BinaryFileWriter.pos = oldPos;
+
+				this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
+			}
         }
     }
 

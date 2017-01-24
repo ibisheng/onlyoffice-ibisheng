@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -142,8 +142,8 @@ function CTableOutlineDr()
 
     // TABLE_STYLES
     this.TableStylesLastLook = null;
-    this.TableStylesSheckLook = null;
-    this.TableStylesSheckLookFlag = false;
+    this.TableStylesСheckLook = null;
+    this.TableStylesСheckLookFlag = false;
 
     this.TableStylesSendOne = false;
 
@@ -2040,16 +2040,16 @@ CDrawingDocument.prototype =
     ///////////////////////////////////////////
     StartTableStylesCheck : function()
     {
-        this.TableStylesSheckLookFlag = true;
+        this.TableStylesСheckLookFlag = true;
     },
 
     EndTableStylesCheck : function()
     {
-        this.TableStylesSheckLookFlag = false;
-        if (this.TableStylesSheckLook != null)
+        this.TableStylesСheckLookFlag = false;
+        if (this.TableStylesСheckLook != null)
         {
-            this.CheckTableStyles(this.TableStylesSheckLook);
-            this.TableStylesSheckLook = null;
+            this.CheckTableStyles(this.TableStylesСheckLook);
+            this.TableStylesСheckLook = null;
         }
     },
 
@@ -2071,9 +2071,9 @@ CDrawingDocument.prototype =
         if (true === this.TableStylesSendOne)
             return;
 
-        if (this.TableStylesSheckLookFlag)
+        if (this.TableStylesСheckLookFlag)
         {
-            this.TableStylesSheckLook = tableLook;
+            this.TableStylesСheckLook = tableLook;
             return;
         }
 

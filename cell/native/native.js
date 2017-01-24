@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -2726,10 +2726,9 @@ function asc_WriteCCelInfo(c, s) {
         s['WriteString2'](c.asc_getStyleName());
     }
 
-    if (null != c.asc_getNumFormatType()) {
-        s['WriteByte'](22);
-        s['WriteLong'](c.asc_getNumFormatType());
-    }
+	s['WriteByte'](22);
+	s['WriteLong'](c.c.asc_getNumFormatInfo().asc_getType());
+
     if (null != c.asc_getAngle()) {
         s['WriteByte'](23);
         s['WriteDouble2'](c.asc_getAngle());
@@ -4026,7 +4025,7 @@ function OfflineEditor () {
             asc_WriteUsers(users, stream);
             window["native"]["OnCallMenuEvent"](20101, stream); // ASC_COAUTH_EVENT_TYPE_PARTICIPANTS_CHANGED
         });
-     
+        
         _api.asc_registerCallback("asc_onParticipantsChanged", function(users) {
                                   var stream = global_memory_stream_menu;
                                   stream["ClearNoAttack"]();
@@ -4036,6 +4035,21 @@ function OfflineEditor () {
         
         _api.asc_registerCallback("asc_onSheetsChanged", function () {
                                   t.asc_WriteAllWorksheets(true, true);
+                                  });
+        
+        _api.asc_registerCallback("asc_onWorkbookLocked", function(locked) {
+                                  var stream = global_memory_stream_menu;
+                                  stream["ClearNoAttack"]();
+                                  stream["WriteBool"](locked);
+                                  window["native"]["OnCallMenuEvent"](20104, stream); // ASC_COAUTH_EVENT_TYPE_WORKBOOK_LOCKED
+                                  });
+        
+        _api.asc_registerCallback("asc_onWorksheetLocked", function(index, locked) {
+                                  var stream = global_memory_stream_menu;
+                                  stream["ClearNoAttack"]();
+                                  stream["WriteLong"](index);
+                                  stream["WriteBool"](locked);
+                                  window["native"]["OnCallMenuEvent"](20105, stream); // ASC_COAUTH_EVENT_TYPE_WORKSHEET_LOCKED
                                   });
         
         _api.asc_registerCallback("asc_onGetEditorPermissions", function(state) {
@@ -7577,7 +7591,7 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
                t.DocumentLoadComplete = true;
                
                t.asc_CheckGuiControlColors();
-               t.sendColorThemes();
+               t.sendColorThemes(_api.wbModel.theme);
                t.asc_ApplyColorScheme(false);
                
                t.sendStandartTextures();

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -936,17 +936,27 @@ CMathBase.prototype.Get_TextPr = function(ContentPos, Depth)
 };
 CMathBase.prototype.Get_CompiledTextPr  = function(Copy)
 {
-    var  TextPr = this.Content[0].Get_CompiledTextPr(true, true);
+	var TextPr = null;
 
-    for(var i = 1; i < this.Content.length; i++)
-    {
-        var CurTextPr = this.Content[i].Get_CompiledTextPr(false, true);
+	var nStartPos = 0;
+	var nCount = this.Content.length;
+	while (null === TextPr && nStartPos < nCount)
+	{
+		if (this.Is_ContentUse(this.Content[nStartPos]))
+			TextPr = this.Content[nStartPos].Get_CompiledTextPr(true, true);
 
-        if ( null !== CurTextPr )
-            TextPr = TextPr.Compare( CurTextPr );
-    }
+		nStartPos++;
+	}
 
-    return TextPr;
+	for (var nPos = nStartPos; nPos < nCount; ++nPos)
+	{
+		var CurTextPr = this.Content[nPos].Get_CompiledTextPr(false, true);
+
+		if (null !== CurTextPr)
+			TextPr = TextPr.Compare(CurTextPr);
+	}
+
+	return TextPr;
 };
 CMathBase.prototype.Get_CompiledPr = function(Copy)
 {
@@ -1707,13 +1717,13 @@ CMathBase.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine
 
     return bResult;
 };
-CMathBase.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos)
+CMathBase.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos, bUseCorrection)
 {
     var nPos = (true !== bSelection ? this.CurPos : (false !== bStart ? this.Selection.StartPos : this.Selection.EndPos));
     ContentPos.Add(nPos);
 
     if (undefined !== this.Content[nPos])
-        this.Content[nPos].Get_ParaContentPos(bSelection, bStart, ContentPos);
+        this.Content[nPos].Get_ParaContentPos(bSelection, bStart, ContentPos, bUseCorrection);
 };
 CMathBase.prototype.Set_ParaContentPos = function(ContentPos, Depth)
 {
