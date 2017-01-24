@@ -3748,18 +3748,18 @@ Paragraph.prototype =
         this.CurPos.ContentPos = CurPos;
     },
 
-    Get_ParaContentPos : function(bSelection, bStart)
-    {
-        var ContentPos = new CParagraphContentPos();
+	Get_ParaContentPos : function(bSelection, bStart, bUseCorrection)
+	{
+		var ContentPos = new CParagraphContentPos();
 
-        var Pos = ( true !== bSelection ? this.CurPos.ContentPos : ( false !== bStart ? this.Selection.StartPos : this.Selection.EndPos ) );
+		var Pos = ( true !== bSelection ? this.CurPos.ContentPos : ( false !== bStart ? this.Selection.StartPos : this.Selection.EndPos ) );
 
-        ContentPos.Add( Pos );
+		ContentPos.Add(Pos);
 
-        this.Content[Pos].Get_ParaContentPos( bSelection, bStart, ContentPos );
+		this.Content[Pos].Get_ParaContentPos(bSelection, bStart, ContentPos, true === bUseCorrection ? true : false);
 
-        return ContentPos;
-    },
+		return ContentPos;
+	},
 
     Set_ParaContentPos : function(ContentPos, CorrectEndLinePos, Line, Range)
     {
@@ -4106,13 +4106,16 @@ Paragraph.prototype =
 
             if ( true !== AddToSelect )
             {
-                // Найдем левую точку селекта
-                var SelectPos = StartSelectionPos;
-                if ( StartSelectionPos.Compare( EndSelectionPos ) > 0 )
-                    SelectPos = EndSelectionPos;
+            	// Иногда нужно скоректировать позицию, например в формулах
+                var CorrectedStartPos = this.Get_ParaContentPos(true, true, true);
+                var CorrectedEndPos   = this.Get_ParaContentPos(true, false, true);
 
-                this.Selection_Remove();
-                this.Set_ParaContentPos( SelectPos, true, -1, -1 );
+				var SelectPos = CorrectedStartPos;
+				if (CorrectedStartPos.Compare(CorrectedEndPos) > 0)
+					SelectPos = CorrectedEndPos;
+
+				this.Selection_Remove();
+				this.Set_ParaContentPos(SelectPos, true, -1, -1);
             }
             else
             {
@@ -4207,14 +4210,16 @@ Paragraph.prototype =
                 }
                 else
                 {
-                    // Найдем левую точку селекта
-                    var SelectPos = EndSelectionPos;
-                    if ( StartSelectionPos.Compare( EndSelectionPos ) > 0 )
-                        SelectPos = StartSelectionPos;
+					// Иногда нужно скоректировать позицию, например в формулах
+					var CorrectedStartPos = this.Get_ParaContentPos(true, true, true);
+					var CorrectedEndPos   = this.Get_ParaContentPos(true, false, true);
 
-                    this.Selection_Remove();
+					var SelectPos = CorrectedEndPos;
+					if (CorrectedStartPos.Compare(CorrectedEndPos) > 0)
+						SelectPos = CorrectedStartPos;
 
-                    this.Set_ParaContentPos( SelectPos, true, -1, -1 );
+					this.Selection_Remove();
+					this.Set_ParaContentPos(SelectPos, true, -1, -1);
                 }
             }
             else

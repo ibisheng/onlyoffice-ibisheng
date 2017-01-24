@@ -1583,12 +1583,12 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_ParaContentPosByXY = fun
 
     return Result;
 };
-CParagraphContentWithParagraphLikeContent.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos)
+CParagraphContentWithParagraphLikeContent.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos, bUseCorrection)
 {
-    var Pos = ( true === bSelection ? ( true === bStart ? this.State.Selection.StartPos : this.State.Selection.EndPos ) : this.State.ContentPos );
-    ContentPos.Add( Pos );
+	var Pos = ( true === bSelection ? ( true === bStart ? this.State.Selection.StartPos : this.State.Selection.EndPos ) : this.State.ContentPos );
+	ContentPos.Add(Pos);
 
-    this.Content[Pos].Get_ParaContentPos( bSelection, bStart, ContentPos );
+	this.Content[Pos].Get_ParaContentPos(bSelection, bStart, ContentPos, bUseCorrection);
 };
 CParagraphContentWithParagraphLikeContent.prototype.Set_ParaContentPos = function(ContentPos, Depth)
 {

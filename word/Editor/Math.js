@@ -2873,9 +2873,9 @@ ParaMath.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine,
 	return Result;
 };
 
-ParaMath.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos) // получить текущую логическую позицию
+ParaMath.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos, bUseCorrection)
 {
-    this.Root.Get_ParaContentPos(bSelection, bStart, ContentPos);
+    this.Root.Get_ParaContentPos(bSelection, bStart, ContentPos, bUseCorrection);
 };
 
 ParaMath.prototype.Set_ParaContentPos = function(ContentPos, Depth) // выставить логическую позицию в контенте
