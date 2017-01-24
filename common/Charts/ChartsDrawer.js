@@ -11647,21 +11647,15 @@ drawSurfaceChart.prototype =
 				
 			for(var j = 0; j < this.paths.test2[i].length; j++)
 			{
-				var seria = this.chartProp.series[i-1] ? this.chartProp.series[i-1] : this.chartProp.series[0];
-				var pt = seria.val.numRef.numCache.pts[0];
+				var style = this.cChartSpace.chart.plotArea.chart.compiledBandFormats[i - 1];
+				var brush = style && style.spPr ? style.spPr.Fill : null;
+				var pen = style && style.spPr ? style.spPr.ln : null;
 				
-				var brush = base_fills[i];
-				//pen = null;
-				
-				var props = this.cChartSpace.getParentObjects();
-				var duplicateBrush = brush;
-				duplicateBrush = brush.createDuplicate();
-				var cColorMod = new AscFormat.CColorMod;
-				duplicateBrush.addColorMod(cColorMod);
-				duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
-				
-				brush = duplicateBrush;
-				var pen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0.13);
+				//линии пока делаю по цвету как и заливку
+				if(!pen)
+				{
+					pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.13);
+				}
 				
 				this.cChartDrawer.drawPath(this.paths.test2[i][j], pen, brush);
 			}
