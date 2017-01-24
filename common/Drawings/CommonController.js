@@ -1259,7 +1259,7 @@ DrawingObjectsController.prototype =
 
 
 
-    isPointInDrawingObjects3: function(x, y, nPageIndex, bSelected)
+    isPointInDrawingObjects3: function(x, y, nPageIndex, bSelected, bText)
     {
         var oOldState = this.curState;
         this.changeCurrentState(new AscFormat.NullState(this));
@@ -1277,6 +1277,11 @@ DrawingObjectsController.prototype =
                 else
                 {
                     return false;
+                }
+            }
+            else{
+                if(bText){
+                    return true;
                 }
             }
         }
