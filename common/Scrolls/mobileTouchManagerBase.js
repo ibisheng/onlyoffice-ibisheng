@@ -126,7 +126,7 @@
 	CMobileDelegateSimple.prototype.SetZoom = function(_value)
 	{
 	};
-	CMobileDelegateSimple.prototype.GetObjectTrack = function(x, y, page, bSelected)
+	CMobileDelegateSimple.prototype.GetObjectTrack = function(x, y, page, bSelected, bText)
 	{
 		return false;
 	};
@@ -217,9 +217,9 @@
 	{
 		this.HtmlPage.m_oApi.zoom(_value);
 	};
-	CMobileDelegateEditor.prototype.GetObjectTrack = function(x, y, page, bSelected)
+	CMobileDelegateEditor.prototype.GetObjectTrack = function(x, y, page, bSelected, bText)
 	{
-		return this.LogicDocument.DrawingObjects.isPointInDrawingObjects3(x, y, page, bSelected);
+		return this.LogicDocument.DrawingObjects.isPointInDrawingObjects3(x, y, page, bSelected, bText);
 	};
 	CMobileDelegateEditor.prototype.GetContextMenuType = function()
 	{
@@ -839,6 +839,14 @@
 		var pos = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
 		global_mouseEvent.KoefPixToMM = 5;
 		var bResult = this.delegate.GetObjectTrack(pos.X, pos.Y, pos.Page, false);
+		global_mouseEvent.KoefPixToMM = 1;
+		return bResult;
+	};
+	CMobileTouchManagerBase.prototype.CheckObjectText = function()
+	{
+		var pos = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
+		global_mouseEvent.KoefPixToMM = 5;
+		var bResult = this.delegate.GetObjectTrack(pos.X, pos.Y, pos.Page, false, true);
 		global_mouseEvent.KoefPixToMM = 1;
 		return bResult;
 	};

@@ -127,9 +127,9 @@ function (window, undefined)
 	{
 		return this.WB.element;
 	};
-	CMobileDelegateEditorCell.prototype.GetObjectTrack = function(x, y, page, bSelected)
+	CMobileDelegateEditorCell.prototype.GetObjectTrack = function(x, y, page, bSelected, bText)
 	{
-		return this.WB.getWorksheet().objectRender.controller.isPointInDrawingObjects3(x, y, page, bSelected);
+		return this.WB.getWorksheet().objectRender.controller.isPointInDrawingObjects3(x, y, page, bSelected, bText);
 	};
 	CMobileDelegateEditorCell.prototype.GetSelectionRectsBounds = function()
 	{
@@ -168,8 +168,9 @@ function (window, undefined)
 		var _mode = AscCommon.MobileTouchContextMenuType.None;
 
 		var _controller = this.WB.getWorksheet().objectRender.controller;
+		var _selection = this.WB.GetSelectionRectsBounds();
 
-		if (!_controller.Is_SelectionUse())
+		if (!_controller.Is_SelectionUse() && !_selection)
 			_mode = AscCommon.MobileTouchContextMenuType.Target;
 
 		if (_controller.Get_SelectionBounds())
@@ -431,6 +432,7 @@ function (window, undefined)
 		var isPreventDefault = false;
 		switch (this.Mode)
 		{
+			case AscCommon.MobileTouchMode.Select: // in cell select too
 			case AscCommon.MobileTouchMode.InlineObj:
 			case AscCommon.MobileTouchMode.FlowObj:
 			case AscCommon.MobileTouchMode.Zoom:
@@ -442,7 +444,7 @@ function (window, undefined)
 			case AscCommon.MobileTouchMode.None:
 			case AscCommon.MobileTouchMode.Scroll:
 			{
-				isPreventDefault = this.CheckObjectTrackBefore();
+				isPreventDefault = !this.CheckObjectText();
 				break;
 			}
 			default:
@@ -671,6 +673,7 @@ function (window, undefined)
 		var isPreventDefault = false;
 		switch (this.Mode)
 		{
+			case AscCommon.MobileTouchMode.Select:  // in cell select too
 			case AscCommon.MobileTouchMode.Scroll:
 			case AscCommon.MobileTouchMode.InlineObj:
 			case AscCommon.MobileTouchMode.FlowObj:
@@ -742,7 +745,7 @@ function (window, undefined)
 				this.DragSelect = 0;
 				this.Mode       = AscCommon.MobileTouchMode.None;
 				this.delegate.Drawing_OnMouseUp(_e);
-				AscCommon.stopEvent(e);
+				//AscCommon.stopEvent(e);
 				break;
 			}
 			default:

@@ -92,9 +92,9 @@
 			H : (this.HtmlPage.SlideScrollMAX - this.HtmlPage.SlideScrollMIN + _controlH)
 		};
 	};
-	CMobileDelegateEditorPresentation.prototype.GetObjectTrack = function(x, y, page, bSelected)
+	CMobileDelegateEditorPresentation.prototype.GetObjectTrack = function(x, y, page, bSelected, bText)
 	{
-		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.isPointInDrawingObjects3(x, y, page, bSelected);
+		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.isPointInDrawingObjects3(x, y, page, bSelected, bText);
 	};
 	CMobileDelegateEditorPresentation.prototype.GetSelectionRectsBounds = function()
 	{
@@ -120,17 +120,18 @@
 	};
 	CMobileDelegateEditorPresentation.prototype.GetContextMenuType = function()
 	{
-		var _mode = AscCommon.MobileTouchContextMenuType.None;
+		var _mode = AscCommon.MobileTouchContextMenuType.Slide;
 
 		var _controller = this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects;
+		var _elementsCount = _controller.selectedObjects.length;
 
-		if (!_controller.Is_SelectionUse())
+		if (!_controller.Is_SelectionUse() && _elementsCount > 0)
 			_mode = AscCommon.MobileTouchContextMenuType.Target;
 
 		if (_controller.Get_SelectionBounds())
 			_mode = AscCommon.MobileTouchContextMenuType.Select;
 
-		if (_mode == 0 && _controller.getSelectedObjectsBounds())
+		if (_mode == AscCommon.MobileTouchContextMenuType.Slide && _controller.getSelectedObjectsBounds())
 			_mode = AscCommon.MobileTouchContextMenuType.Object;
 
 		return _mode;
@@ -344,7 +345,7 @@
 			case AscCommon.MobileTouchMode.None:
 			case AscCommon.MobileTouchMode.Scroll:
 			{
-				isPreventDefault = this.CheckObjectTrackBefore();
+				isPreventDefault = !this.CheckObjectText();
 				break;
 			}
 			default:
@@ -656,6 +657,7 @@
 		var isPreventDefault = false;
 		switch (this.Mode)
 		{
+			case AscCommon.MobileTouchMode.Select:
 			case AscCommon.MobileTouchMode.Scroll:
 			case AscCommon.MobileTouchMode.InlineObj:
 			case AscCommon.MobileTouchMode.FlowObj:
@@ -1026,6 +1028,7 @@
 			fadeScrollbars: true,
 			scrollX : true,
 			scroller_id : this.iScrollElement,
+			eventsElement : this.eventsElement,
 			bounce : true
 		});
 
@@ -1040,6 +1043,8 @@
 		this.IsTouching = true;
 		this.MoveAfterDown = false;
 
+		AscCommon.g_inputContext.enableVirtualKeyboard();
+
 		var _e = e.touches ? e.touches[0] : e;
 
 		AscCommon.check_MouseDownEvent(_e, false);
@@ -1051,10 +1056,8 @@
 		this.Mode = AscCommon.MobileTouchMode.Scroll;
 		this.iScroll._start(e);
 
-		if (e.preventDefault)
-			e.preventDefault();
-		else
-			e.returnValue = false;
+		AscCommon.stopEvent(e);
+		AscCommon.g_inputContext.HtmlArea.readOnly = true;
 		return false;
 	};
 	CMobileTouchManagerThumbnails.prototype.onTouchMove  = function(e)
@@ -1144,6 +1147,7 @@
 			this.CheckContextMenuTouchEnd(isCheckContextMenuMode);
 
 		AscCommon.stopEvent(e);
+		AscCommon.g_inputContext.HtmlArea.readOnly = false;
 		return false;
 	};
 
