@@ -180,24 +180,78 @@ CDocument.prototype.private_GetRevisionsChangeParagraph = function(Direction, Cu
             return SearchEngine;
     }
 
+    var oFootnote = CurrentPara.Parent ? CurrentPara.Parent.Get_TopDocumentContent() : null;
     var HdrFtr = CurrentPara.Get_HdrFtr();
     if (null !== HdrFtr)
     {
         this.private_GetRevisionsChangeParagraphInHdrFtr(SearchEngine, HdrFtr);
 
-        if (true !== SearchEngine.Is_Found())
-            this.private_GetRevisionsChangeParagraphInDocument(SearchEngine, Direction < 0 ? this.Content.length - 1 : 0);
+        if (Direction > 0)
+		{
+			if (true !== SearchEngine.Is_Found())
+				this.private_GetRevisionsChangeParagraphInDocument(SearchEngine, 0);
+
+			if (true !== SearchEngine.Is_Found())
+				this.private_GetRevisionsChangeParagraphInFooters(SearchEngine, null);
+		}
+		else
+		{
+			if (true !== SearchEngine.Is_Found())
+				this.private_GetRevisionsChangeParagraphInFooters(SearchEngine, null);
+
+			if (true !== SearchEngine.Is_Found())
+				this.private_GetRevisionsChangeParagraphInDocument(SearchEngine, this.Content.length - 1);
+		}
+
 
         if (true !== SearchEngine.Is_Found())
             this.private_GetRevisionsChangeParagraphInHdrFtr(SearchEngine, null);
     }
+    else if (oFootnote)
+	{
+		this.private_GetRevisionsChangeParagraphInFooters(SearchEngine, oFootnote);
+
+		if (Direction > 0)
+		{
+			if (true !== SearchEngine.Is_Found())
+				this.private_GetRevisionsChangeParagraphInHdrFtr(SearchEngine, null);
+
+			if (true !== SearchEngine.Is_Found())
+				this.private_GetRevisionsChangeParagraphInDocument(SearchEngine, 0);
+		}
+		else
+		{
+			if (true !== SearchEngine.Is_Found())
+				this.private_GetRevisionsChangeParagraphInDocument(SearchEngine, this.Content.length - 1);
+
+			if (true !== SearchEngine.Is_Found())
+				this.private_GetRevisionsChangeParagraphInHdrFtr(SearchEngine, null);
+		}
+
+		if (true !== SearchEngine.Is_Found())
+			this.private_GetRevisionsChangeParagraphInFooters(SearchEngine, null);
+	}
     else
     {
         var Pos = (true === this.Selection.Use && docpostype_DrawingObjects !== this.Get_DocPosType() ? (this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos) : this.CurPos.ContentPos);
         this.private_GetRevisionsChangeParagraphInDocument(SearchEngine, Pos);
 
-        if (true !== SearchEngine.Is_Found())
-            this.private_GetRevisionsChangeParagraphInHdrFtr(SearchEngine, null);
+        if (Direction > 0)
+		{
+			if (true !== SearchEngine.Is_Found())
+				this.private_GetRevisionsChangeParagraphInFooters(SearchEngine, null);
+
+			if (true !== SearchEngine.Is_Found())
+				this.private_GetRevisionsChangeParagraphInHdrFtr(SearchEngine, null);
+		}
+		else
+		{
+			if (true !== SearchEngine.Is_Found())
+				this.private_GetRevisionsChangeParagraphInHdrFtr(SearchEngine, null);
+
+			if (true !== SearchEngine.Is_Found())
+				this.private_GetRevisionsChangeParagraphInFooters(SearchEngine, null);
+		}
 
         if (true !== SearchEngine.Is_Found())
             this.private_GetRevisionsChangeParagraphInDocument(SearchEngine, Direction > 0 ? 0 : this.Content.length - 1);
@@ -257,6 +311,45 @@ CDocument.prototype.private_GetRevisionsChangeParagraphInHdrFtr = function(Searc
 
         AllHdrFtrs[Pos].Get_RevisionsChangeParagraph(SearchEngine);
     }
+};
+CDocument.prototype.private_GetRevisionsChangeParagraphInFooters = function(SearchEngine, oFootnote)
+{
+	var arrFootnotes = this.Get_FootnotesList(null, null);
+	var nCount = arrFootnotes.length;
+	if (nCount <= 0)
+		return;
+
+	var nPos = -1;
+	if (oFootnote)
+	{
+		for (var nIndex = 0; nIndex < nCount; ++nIndex)
+		{
+			if (arrFootnotes[nPos] === oFootnote)
+			{
+				nPos = nIndex;
+				break;
+			}
+		}
+	}
+
+	var nDirection = SearchEngine.Get_Direction();
+	if (nPos < 0 || nPos >= Count)
+	{
+		if (nDirection > 0)
+			nPos = 0;
+		else
+			nPos = nCount - 1;
+	}
+
+	arrFootnotes[nPos].Get_RevisionsChangeParagraph(SearchEngine);
+	while (true !== SearchEngine.Is_Found())
+	{
+		nPos = (nDirection > 0 ? nPos + 1 : nPos - 1);
+		if (nPos >= nCount || nPos < 0)
+			break;
+
+		arrFootnotes[nPos].Get_RevisionsChangeParagraph(SearchEngine);
+	}
 };
 CDocument.prototype.private_SelectRevisionChange = function(Change)
 {
@@ -475,6 +568,10 @@ CDocument.prototype.Accept_RevisionChanges = function(Type, bAll)
     {
         this.DrawingObjects.Accept_RevisionChanges(Type, bAll);
     }
+    else if (docpostype_Footnotes === this.CurPos.Type)
+	{
+		this.Footnotes.Accept_RevisionChanges(Type, bAll);
+	}
 
     if (true !== bAll)
     {
@@ -563,6 +660,10 @@ CDocument.prototype.Reject_RevisionChanges = function(Type, bAll)
     {
         this.DrawingObjects.Reject_RevisionChanges(Type, bAll);
     }
+    else if (docpostype_Footnotes === this.CurPos.Type)
+	{
+		this.Footnotes.Reject_RevisionChanges(Type, bAll);
+	}
 
     if (true !== bAll)
     {
@@ -762,4 +863,17 @@ CDocumentContent.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
 
         this.Content[Pos].Get_RevisionsChangeParagraph(SearchEngine);
     }
+};
+//----------------------------------------------------------------------------------------------------------------------
+// CFootnotesController
+//----------------------------------------------------------------------------------------------------------------------
+CFootnotesController.prototype.Accept_RevisionChanges = function(Type, bAll)
+{
+	if (null !== this.CurFootnote)
+		this.CurFootnote.Accept_RevisionChanges(Type, bAll);
+};
+CFootnotesController.prototype.Reject_RevisionChanges = function(Type, bAll)
+{
+	if (null !== this.CurFootnote)
+		this.CurFootnote.Reject_RevisionChanges(Type, bAll);
 };
