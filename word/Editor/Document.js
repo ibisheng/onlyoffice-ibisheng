@@ -5571,6 +5571,12 @@ CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
  */
 CDocument.prototype.Get_SelectedContent = function(bUseHistory)
 {
+	// При копировании нам не нужно, чтобы новые классы помечались как созданные в рецензировании, а при перетаскивании
+	// нужно.
+	var isTrack = this.Is_TrackRevisions() && !bUseHistory;
+	if (isTrack)
+		this.Set_TrackRevisions(false);
+
 	var bNeedTurnOffTableId = g_oTableId.m_bTurnOff === false && true !== bUseHistory;
 	if (!bUseHistory)
 		History.TurnOff();
@@ -5591,6 +5597,9 @@ CDocument.prototype.Get_SelectedContent = function(bUseHistory)
 	{
 		g_oTableId.m_bTurnOff = false;
 	}
+
+	if (isTrack)
+		this.Set_TrackRevisions(true);
 
 	return SelectedContent;
 };
