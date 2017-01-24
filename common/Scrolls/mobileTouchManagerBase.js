@@ -217,9 +217,9 @@
 	{
 		this.HtmlPage.m_oApi.zoom(_value);
 	};
-	CMobileDelegateEditor.prototype.GetObjectTrack = function(x, y, page)
+	CMobileDelegateEditor.prototype.GetObjectTrack = function(x, y, page, bSelected)
 	{
-		return this.LogicDocument.DrawingObjects.isPointInDrawingObjects3(x, y, page);
+		return this.LogicDocument.DrawingObjects.isPointInDrawingObjects3(x, y, page, bSelected);
 	};
 	CMobileDelegateEditor.prototype.GetContextMenuType = function()
 	{

@@ -127,9 +127,9 @@ function (window, undefined)
 	{
 		return this.WB.element;
 	};
-	CMobileDelegateEditorCell.prototype.GetObjectTrack = function(x, y, page)
+	CMobileDelegateEditorCell.prototype.GetObjectTrack = function(x, y, page, bSelected)
 	{
-		return this.WB.getWorksheet().objectRender.controller.isPointInDrawingObjects3(x, y, page);
+		return this.WB.getWorksheet().objectRender.controller.isPointInDrawingObjects3(x, y, page, bSelected);
 	};
 	CMobileDelegateEditorCell.prototype.GetSelectionRectsBounds = function()
 	{

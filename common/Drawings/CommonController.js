@@ -1259,7 +1259,7 @@ DrawingObjectsController.prototype =
 
 
 
-    isPointInDrawingObjects3: function(x, y)
+    isPointInDrawingObjects3: function(x, y, nPageIndex, bSelected)
     {
         var oOldState = this.curState;
         this.changeCurrentState(new AscFormat.NullState(this));
@@ -1270,7 +1270,8 @@ DrawingObjectsController.prototype =
         if(AscCommon.isRealObject(oResult)){
             if(oResult.cursorType !== "text"){
                 var object = g_oTableId.Get_ById(oResult.objectId);
-                if(AscCommon.isRealObject(object) && (object.selected) ){
+                if(AscCommon.isRealObject(object)
+                    && ((bSelected && object.selected) ||  !bSelected) ){
                     bRet = true;
                 }
                 else

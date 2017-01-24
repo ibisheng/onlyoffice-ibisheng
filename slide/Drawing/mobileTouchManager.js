@@ -92,9 +92,9 @@
 			H : (this.HtmlPage.SlideScrollMAX - this.HtmlPage.SlideScrollMIN + _controlH)
 		};
 	};
-	CMobileDelegateEditorPresentation.prototype.GetObjectTrack = function(x, y, page)
+	CMobileDelegateEditorPresentation.prototype.GetObjectTrack = function(x, y, page, bSelected)
 	{
-		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.isPointInDrawingObjects3(x, y, page);
+		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.isPointInDrawingObjects3(x, y, page, bSelected);
 	};
 	CMobileDelegateEditorPresentation.prototype.GetSelectionRectsBounds = function()
 	{
