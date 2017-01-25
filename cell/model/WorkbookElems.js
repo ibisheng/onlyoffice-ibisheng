@@ -5897,11 +5897,11 @@ TablePart.prototype.deleteTableColumns = function(activeRange)
 		this.removeDependencies(deleted);
 
 		//todo undo
-		// var deletedMap = {};
-		// for (var i = 0; i < deleted.length; ++i) {
-		// 	deletedMap[deleted[i].Name] = 1;
-		// }
-		// this.handlers.trigger("deleteColumnTablePart", this.DisplayName, deletedMap);
+		var deletedMap = {};
+		for (var i = 0; i < deleted.length; ++i) {
+			deletedMap[deleted[i].Name] = 1;
+		}
+		this.handlers.trigger("deleteColumnTablePart", this.DisplayName, deletedMap);
 	}
 
 };
@@ -6360,15 +6360,6 @@ function TableColumn() {
 			return true;
 		} else if (AscCommon.c_oNotifyParentType.Change === type) {
 			this.TotalsRowFormula.setIsDirty(false);
-		} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
-			if (eventData.isRebuild) {
-				var ws = this.TotalsRowFormula.ws;
-				this.TotalsRowFormula = null;//to prevent removeDependencies in applyTotalRowFormula
-				this.applyTotalRowFormula(eventData.assemble, ws, true);
-			} else {
-				this.TotalsRowFormula.Formula = eventData.assemble;
-				this.TotalsRowFormula.buildDependencies();
-			}
 		}
 	};
 	TableColumn.prototype.renameSheetCopy = function(ws, renameParams) {

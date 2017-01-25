@@ -919,14 +919,16 @@
 					case AscCH.historyitem_AutoFilter_Change:
 						if(data !== null && data.displayName)
 						{
+							var redrawTablesArr;
 							if(data.type === true)
 							{
-								this.insertLastTableColumn(data.displayName, data.activeCells);
+								redrawTablesArr = this.insertLastTableColumn(data.displayName, data.activeCells);
 							}	
 							else if(data.type === false)
 							{
-								this.insertLastTableRow(data.displayName, data.activeCells);
+								redrawTablesArr = this.insertLastTableRow(data.displayName, data.activeCells);
 							}
+							this.redrawStylesTables(redrawTablesArr);
 						}
 						break;
 					case AscCH.historyitem_AutoFilter_ChangeTableInfo:
@@ -1286,8 +1288,22 @@
 				}
 				return false;
 			},
-			
-			insertColumn: function(type, activeRange, insertType, displayNameFormatTable)
+			_cleanStylesTables: function(redrawTablesArr) {
+				for(var i = 0; i < redrawTablesArr.length; i++) {
+					this._cleanStyleTable(redrawTablesArr[i].oldfilterRef);
+				}
+			},
+			_setStylesTables: function(redrawTablesArr) {
+				for(var i = 0; i < redrawTablesArr.length; i++) {
+					this._setColorStyleTable(redrawTablesArr[i].newFilter.Ref, redrawTablesArr[i].newFilter, null, true);
+				}
+			},
+			redrawStylesTables: function(redrawTablesArr) {
+				//set styles for tables
+				this._cleanStylesTables(redrawTablesArr);
+				this._setStylesTables(redrawTablesArr);
+			},
+			insertColumn: function(type, activeRange, insertType, displayNameFormatTable, bHistoryStyles)
 			{
 				var worksheet = this.worksheet;
 				var t  = this;
@@ -1305,25 +1321,6 @@
 					activeRange.r1 = 0;
 					activeRange.r2 = AscCommon.gc_nMaxRow - 1;
 				}
-				
-				History.StartTransaction();
-				History.Create_NewPoint();
-				
-				var cleanStylesTables = function(redrawTablesArr)
-				{
-					for(var i = 0; i < redrawTablesArr.length; i++)
-					{
-						t._cleanStyleTable(redrawTablesArr[i].oldfilterRef);
-					}
-				};
-				
-				var setStylesTables = function(redrawTablesArr)
-				{
-					for(var i = 0; i < redrawTablesArr.length; i++)
-					{
-						t._setColorStyleTable(redrawTablesArr[i].newFilter.Ref, redrawTablesArr[i].newFilter, null, true);
-					}
-				};
 				
 				var changeFilter = function(filter, bTablePart)
 				{
@@ -1435,14 +1432,9 @@
 				
 				if(displayNameFormatTable && type == 'insCells')
 				{
-					this.insertLastTableColumn(displayNameFormatTable, activeRange);
+					redrawTablesArr = redrawTablesArr.concat(this.insertLastTableColumn(displayNameFormatTable, activeRange));
 				}
-				
-				//set styles for tables
-				cleanStylesTables(redrawTablesArr);
-				setStylesTables(redrawTablesArr);
-				
-				History.EndTransaction();
+				return redrawTablesArr;
 			},
 			
 			insertLastTableColumn: function(displayNameFormatTable, activeRange)
@@ -1453,25 +1445,6 @@
 				var bRedoChanges = worksheet.workbook.bRedoChanges;
 				
 				var redrawTablesArr = [];
-				
-				History.StartTransaction();
-				History.Create_NewPoint();
-				
-				var cleanStylesTables = function(redrawTablesArr)
-				{
-					for(var i = 0; i < redrawTablesArr.length; i++)
-					{
-						t._cleanStyleTable(redrawTablesArr[i].oldfilterRef);
-					}
-				};
-				
-				var setStylesTables = function(redrawTablesArr)
-				{
-					for(var i = 0; i < redrawTablesArr.length; i++)
-					{
-						t._setColorStyleTable(redrawTablesArr[i].newFilter.Ref, redrawTablesArr[i].newFilter, null, true);
-					}
-				};
 				
 				var changeFilter = function(filter)
 				{
@@ -1499,14 +1472,10 @@
 				{
 					//change TableParts
 					changeFilter(tablePart);
-					
-					//set styles for tables
-					cleanStylesTables(redrawTablesArr);
-					setStylesTables(redrawTablesArr);
 				}
 				
 				
-				History.EndTransaction();
+				return redrawTablesArr;
 			},
 			
 			insertRows: function(type, activeRange, insertType, displayNameFormatTable)
@@ -1528,25 +1497,6 @@
 					activeRange.c1 = 0;
 					activeRange.c2 = AscCommon.gc_nMaxCol - 1;
 				}
-				
-				History.StartTransaction();
-				History.Create_NewPoint();
-				
-				var cleanStylesTables = function(redrawTablesArr)
-				{
-					for(var i = 0; i < redrawTablesArr.length; i++)
-					{
-						t._cleanStyleTable(redrawTablesArr[i].oldfilterRef);
-					}
-				};
-				
-				var setStylesTables = function(redrawTablesArr)
-				{
-					for(var i = 0; i < redrawTablesArr.length; i++)
-					{
-						t._setColorStyleTable(redrawTablesArr[i].newFilter.Ref, redrawTablesArr[i].newFilter, null, true);
-					}
-				};
 				
 				var changeFilter = function(filter, bTablePart)
 				{
@@ -1611,14 +1561,10 @@
 				
 				if(displayNameFormatTable && type == 'insCell')
 				{
-					this.insertLastTableRow(displayNameFormatTable, activeRange);
+					redrawTablesArr = redrawTablesArr.concat(this.insertLastTableRow(displayNameFormatTable, activeRange));
 				}
 				
-				//set styles for tables
-				cleanStylesTables(redrawTablesArr);
-				setStylesTables(redrawTablesArr);
-				
-				History.EndTransaction();
+				return redrawTablesArr;
 			},
 			
 			insertLastTableRow: function(displayNameFormatTable, activeRange)
@@ -1629,25 +1575,6 @@
 				var bRedoChanges = worksheet.workbook.bRedoChanges;
 				
 				var redrawTablesArr = [];
-				
-				History.StartTransaction();
-				History.Create_NewPoint();
-				
-				var cleanStylesTables = function(redrawTablesArr)
-				{
-					for(var i = 0; i < redrawTablesArr.length; i++)
-					{
-						t._cleanStyleTable(redrawTablesArr[i].oldfilterRef);
-					}
-				};
-				
-				var setStylesTables = function(redrawTablesArr)
-				{
-					for(var i = 0; i < redrawTablesArr.length; i++)
-					{
-						t._setColorStyleTable(redrawTablesArr[i].newFilter.Ref, redrawTablesArr[i].newFilter, null, true);
-					}
-				};
 				
 				var changeFilter = function(filter)
 				{
@@ -1674,14 +1601,8 @@
 				{
 					//change TableParts
 					changeFilter(tablePart);
-					
-					//set styles for tables
-					cleanStylesTables(redrawTablesArr);
-					setStylesTables(redrawTablesArr);
 				}
-				
-				
-				History.EndTransaction();
+				return redrawTablesArr;
 			},
 			
 			sortColFilter: function(type, cellId, activeRange, sortProps, displayName, color) {
@@ -2926,8 +2847,6 @@
 					activeHistoryRange = null;
 				
 				History.Add(AscCommonExcel.g_oUndoRedoAutoFilters, type, ws.getId(), activeHistoryRange, oHistoryObject);
-				if(deleteFilterAfterDeleteColRow)
-					History.ChangeActionsEndToStart();
 			},
 			
 			_getCurrentWS : function() {

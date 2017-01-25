@@ -944,16 +944,6 @@ CHistory.prototype.GetSerializeArray = function()
 	}
 	return aRes;
 };
-//функция, которая перемещает последнее действие на первую позицию(в текущей точке)
-CHistory.prototype.ChangeActionsEndToStart = function()
-{
-	var curPoint = this.Points[this.Index];
-	if(curPoint && curPoint.Items.length > 0)
-	{
-		var endAction = curPoint.Items.pop();
-		curPoint.Items.unshift(endAction);
-	}
-};
 CHistory.prototype.loadFonts = function (fonts) {
     for (var i = 0; i < fonts.length; ++i) {
 		this.LoadFonts[fonts[i].name] = 1;

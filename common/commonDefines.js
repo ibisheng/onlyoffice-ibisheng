@@ -820,7 +820,7 @@
 		Shift: 1,
 		Move: 2,
 		Delete: 3,
-		Rebuild: 4,
+		RenameTableColumn: 4,
 		Changed: 5,
 		ChangeDefName: 6,
 		ChangeSheet: 7,
