@@ -181,6 +181,93 @@ function (window, undefined)
 
 		return _mode;
 	};
+	CMobileDelegateEditorCell.prototype.GetContextMenuInfo = function(info)
+	{
+		info.Clear();
+		var _info = null;
+		var _transform = null;
+
+		var _x = 0;
+		var _y = 0;
+
+		var _controller = this.WB.getWorksheet().objectRender.controller;
+		var _target = _controller.Is_SelectionUse();
+		var _selection = this.WB.GetSelectionRectsBounds();
+
+		if (!_target && !_selection)
+		{
+			_info = {
+				X : this.DrawingDocument.m_dTargetX,
+				Y : this.DrawingDocument.m_dTargetY,
+				Page : this.DrawingDocument.m_lTargetPage
+			};
+
+			_transform = this.DrawingDocument.TextMatrix;
+			if (_transform)
+			{
+				_x = _transform.TransformPointX(_info.X, _info.Y);
+				_y = _transform.TransformPointY(_info.X, _info.Y);
+
+				_info.X = _x;
+				_info.Y = _y;
+			}
+			info.targetPos = _info;
+		}
+
+		var _select = _controller.Get_SelectionBounds();
+		if (_select)
+		{
+			var _rect1 = _select.Start;
+			var _rect2 = _select.End;
+
+			_info = {
+				X1 : _rect1.X,
+				Y1 : _rect1.Y,
+				Page1 : _rect1.Page,
+				X2 : _rect2.X + _rect2.W,
+				Y2 : _rect2.Y + _rect2.H,
+				Page2 : _rect2.Page
+			};
+
+			_transform = this.DrawingDocument.SelectionMatrix;
+
+			if (_transform)
+			{
+				_x = _transform.TransformPointX(_info.X1, _info.Y1);
+				_y = _transform.TransformPointY(_info.X1, _info.Y1);
+				_info.X1 = _x;
+				_info.Y1 = _y;
+
+				_x = _transform.TransformPointX(_info.X2, _info.Y2);
+				_y = _transform.TransformPointY(_info.X2, _info.Y2);
+				_info.X2 = _x;
+				_info.Y2 = _y;
+			}
+
+			info.selectText = _info;
+		}
+		else if (_selection)
+		{
+			info.selectCell = {
+				X : _selection.X,
+				Y : _selection.Y,
+				W : _selection.W,
+				H : _selection.H
+			};
+		}
+
+		var _object_bounds = _controller.getSelectedObjectsBounds();
+		if ((0 == _mode) && _object_bounds)
+		{
+			info.selectBounds = {
+				X : _object_bounds.minX,
+				Y : _object_bounds.minY,
+				R : _object_bounds.maxX,
+				B : _object_bounds.maxY,
+				Page : _object_bounds.pageIndex
+			};
+		}
+	};
 	CMobileDelegateEditorCell.prototype.GetContextMenuPosition = function()
 	{
 		var _controller = this.WB.getWorksheet().objectRender.controller;

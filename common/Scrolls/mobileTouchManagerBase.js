@@ -60,6 +60,28 @@
 			Slide		: 4
 		};
 
+	function MobileTouchContextMenuLastInfo()
+	{
+		this.targetPos 				= null;
+		this.selectText 			= null;
+		this.selectCell 			= null;
+		this.objectBounds 			= null;
+		this.objectSlideThumbnail 	= null;
+	}
+	MobileTouchContextMenuLastInfo.prototype =
+	{
+		Clear : function()
+		{
+			this.targetPos 				= null;
+			this.selectText 			= null;
+			this.selectCell 			= null;
+			this.objectBounds 			= null;
+			this.objectSlideThumbnail 	= null;
+		}
+	};
+
+	AscCommon.MobileTouchContextMenuLastInfo = MobileTouchContextMenuLastInfo;
+
 	AscCommon.MOBILE_SELECT_TRACK_ROUND = 14;
 	AscCommon.MOBILE_TABLE_RULER_DIAMOND = 7;
 
@@ -133,6 +155,10 @@
 	CMobileDelegateSimple.prototype.GetContextMenuType = function()
 	{
 		return AscCommon.MobileTouchContextMenuType.None;
+	};
+	CMobileDelegateSimple.prototype.GetContextMenuInfo = function(info)
+	{
+		info.Clear();
 	};
 	CMobileDelegateEditor.prototype.GetContextMenuPosition = function()
 	{
@@ -239,6 +265,81 @@
 			_mode = AscCommon.MobileTouchContextMenuType.Object;
 
 		return _mode;
+	};
+	CMobileDelegateEditor.prototype.GetContextMenuInfo = function(info)
+	{
+		info.Clear();
+		var _info = null;
+		var _transform = null;
+
+		var _x = 0;
+		var _y = 0;
+
+		var _target = this.LogicDocument.Is_SelectionUse();
+		if (_target === false)
+		{
+			_info = {
+				X : this.DrawingDocument.m_dTargetX,
+				Y : this.DrawingDocument.m_dTargetY,
+				Page : this.DrawingDocument.m_lTargetPage
+			};
+
+			_transform = this.DrawingDocument.TextMatrix;
+			if (_transform)
+			{
+				_x = _transform.TransformPointX(_info.X, _info.Y);
+				_y = _transform.TransformPointY(_info.X, _info.Y);
+
+				_info.X = _x;
+				_info.Y = _y;
+			}
+			info.targetPos = _info;
+		}
+
+		var _select = this.LogicDocument.Get_SelectionBounds();
+		if (_select)
+		{
+			var _rect1 = _select.Start;
+			var _rect2 = _select.End;
+
+			_info = {
+				X1 : _rect1.X,
+				Y1 : _rect1.Y,
+				Page1 : _rect1.Page,
+				X2 : _rect2.X + _rect2.W,
+				Y2 : _rect2.Y + _rect2.H,
+				Page2 : _rect2.Page
+			};
+
+			_transform = this.DrawingDocument.SelectionMatrix;
+
+			if (_transform)
+			{
+				_x = _transform.TransformPointX(_info.X1, _info.Y1);
+				_y = _transform.TransformPointY(_info.X1, _info.Y1);
+				_info.X1 = _x;
+				_info.Y1 = _y;
+
+				_x = _transform.TransformPointX(_info.X2, _info.Y2);
+				_y = _transform.TransformPointY(_info.X2, _info.Y2);
+				_info.X2 = _x;
+				_info.Y2 = _y;
+			}
+
+			info.selectText = _info;
+		}
+
+		var _object_bounds = this.LogicDocument.DrawingObjects.getSelectedObjectsBounds();
+		if ((0 == _mode) && _object_bounds)
+		{
+			info.selectBounds = {
+				X : _object_bounds.minX,
+				Y : _object_bounds.minY,
+				R : _object_bounds.maxX,
+				B : _object_bounds.maxY,
+				Page : _object_bounds.pageIndex
+			};
+		}
 	};
 	CMobileDelegateEditor.prototype.GetContextMenuPosition = function()
 	{
@@ -477,6 +578,8 @@
 
 		/* context menu */
 		this.ContextMenuLastMode 		= AscCommon.MobileTouchContextMenuType.None;
+		this.ContextMenuLastInfo 		= new AscCommon.MobileTouchContextMenuLastInfo();
+
 		this.ContextMenuLastModeCounter = 0;
 		this.ContextMenuShowTimerId 	= -1;
 
