@@ -4542,7 +4542,6 @@ DrawingObjectsController.prototype =
         return ret;
     },
 	_getChartSpace: function (chartSeries, options, bUseCache) {
-        options.type = c_oAscChartTypeSettings.surfaceNormal;
 		switch (options.type) {
 			case c_oAscChartTypeSettings.lineNormal:
 			case c_oAscChartTypeSettings.lineNormalMarker:

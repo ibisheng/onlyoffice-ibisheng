@@ -9845,7 +9845,9 @@ CChartSpace.prototype.recalculateSeriesColors = function()
                             var compiled_line = new AscFormat.CLn();
                             compiled_line.merge(default_line);
                             compiled_line.Fill.merge(base_line_fills[i]);
-                            compiled_line.w *= style.line3;
+                            //compiled_line.w *= style.line3;
+                            compiled_line.Join = new AscFormat.LineJoin();
+                            compiled_line.Join.type = AscFormat.LineJoinType.Bevel;
                             if(oBandFmt && oBandFmt.spPr){
                                 compiled_line.merge(oBandFmt.spPr.ln);
                             }
