@@ -1995,7 +1995,7 @@ var editor;
     }
 
     ws = this.wb.getWorksheet();
-    d = ws.setSelectionUndoRedo(d[0].getBBox0(), true);
+    d = ws.setSelection(d[0].getBBox0(), true);
     if (d.deltaX) {
       this.controller.scrollHorizontal(d.deltaX);
     }

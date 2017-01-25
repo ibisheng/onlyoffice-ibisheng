@@ -7245,7 +7245,7 @@
         this.model.workbook.handlers.trigger( "asc_onHideComment" );
         this._updateSelectionNameAndInfo();
     };
-    WorksheetView.prototype.setSelectionUndoRedo = function (range, validRange) {
+    WorksheetView.prototype.setSelection = function (range, validRange) {
         // Проверка на валидность range.
         if (validRange && (range.c2 >= this.nColsCount || range.r2 >= this.nRowsCount)) {
             if (range.c2 >= this.nColsCount) {
@@ -11394,7 +11394,7 @@
 
                     //updates
                     if (styleName && addNameColumn) {
-                        t.setSelectionUndoRedo(filterRange);
+                        t.setSelection(filterRange);
                     }
                     t._onUpdateFormatTable(filterRange, !!(styleName), true);
 
@@ -11834,7 +11834,7 @@
         }
 
         if (!this.model.selectionRange.getLast().isEqual(range)) {
-            this.setSelectionUndoRedo(range);
+            this.setSelection(range);
         }
 
         var i, r = range.r1, bIsUpdate = false, w;
@@ -12536,7 +12536,7 @@
                 if (tablePart.Ref.intersection(activeRange)) {
                     if (t.model.autoFilters._activeRangeContainsTablePart(activeRange, tablePart.Ref)) {
                         var newActiveRange = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2, tablePart.Ref.r2);
-                        t.setSelectionUndoRedo(newActiveRange);
+                        t.setSelection(newActiveRange);
                     }
 
                     break;
@@ -12550,7 +12550,7 @@
                     if (tableParts[i].HeaderRowCount !== 0 && tableParts[i].Ref.containsRange(activeRange) && tableParts[i].Ref.r1 === activeRange.r1) {
                         var newActiveRange = new Asc.Range(activeRange.c1, activeRange.r1, activeRange.c1, tableParts[i].Ref.r2);
                         if (!activeRange.isEqual(newActiveRange)) {
-                            t.setSelectionUndoRedo(newActiveRange);
+                            t.setSelection(newActiveRange);
                         }
                         break;
                     }
@@ -12669,7 +12669,7 @@
             }
         }
 
-        t.setSelectionUndoRedo(new Asc.Range(startCol, startRow, endCol, endRow));
+        t.setSelection(new Asc.Range(startCol, startRow, endCol, endRow));
     };
 
     WorksheetView.prototype.af_changeFormatTableInfo = function (tableName, optionType, val) {
@@ -12698,7 +12698,7 @@
                     var endRow = newTableRef.r2 < ar.r2 ? newTableRef.r2 : ar.r2;
                     var newActiveRange = new Asc.Range(ar.c1, startRow, ar.c2, endRow);
 
-                    t.setSelectionUndoRedo(newActiveRange);
+                    t.setSelection(newActiveRange);
                     History.SetSelectionRedo(newActiveRange);
                 }
 
