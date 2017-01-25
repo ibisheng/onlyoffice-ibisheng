@@ -125,9 +125,6 @@
             this.vsbApiLockMouse = false;
             this.hsbApiLockMouse = false;
 
-			this.__handlers = null; // ToDo избавиться от этой переменной!
-
-
             return this;
 		}
 
@@ -668,7 +665,7 @@
 
 		/** @param event {KeyboardEvent} */
 		asc_CEventsController.prototype._onWindowKeyDown = function (event) {
-			var t = this, dc = 0, dr = 0, isViewerMode = t.settings.isViewerMode;
+			var t = this, dc = 0, dr = 0, isViewerMode = t.settings.isViewerMode, action = false;
 			var ctrlKey = event.metaKey || event.ctrlKey;
 			var shiftKey = event.shiftKey;
 
@@ -930,85 +927,91 @@
 						return true;
 					}
 
-					stop();
-
-					// Вызовем обработчик
-					if (!t.__handlers) {
-						t.__handlers = {
-							49: function () {
-								if (!shiftKey) {
-									return false;
-								}
+					switch (event.which) {
+						case 49:
+							if (shiftKey) {
 								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Number);
-								return true;
-							}, 50: function () {
-								if (!shiftKey) {
-									return false;
-								}
-								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Time);
-								return true;
-							}, 51: function () {
-								if (!shiftKey) {
-									return false;
-								}
-								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Date);
-								return true;
-							}, 52: function () {
-								if (!shiftKey) {
-									return false;
-								}
-								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Currency);
-								return true;
-							}, 53: function () {
-								if (shiftKey) {
-									t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Percent);
-								} else {
-									t.handlers.trigger("setFontAttributes", "s");
-								}
-								return true;
-							}, 54: function () {
-								if (!shiftKey) {
-									return false;
-								}
-								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Scientific);
-								return true;
-							}, 65: function () {
-								t.handlers.trigger("changeSelection", /*isStartPoint*/true, -1, -1, /*isCoord*/true, /*isSelectMode*/
-									false, false);
-								return true;
-							}, 66: function () {
-								t.handlers.trigger("setFontAttributes", "b");
-								return true;
-							}, 73: function () {
-								t.handlers.trigger("setFontAttributes", "i");
-								return true;
-							}, 85: function () {
-								t.handlers.trigger("setFontAttributes", "u");
-								return true;
-							}, 80: function () {
-								t.handlers.trigger("print");
-								return true;
-							}, //83: function () {t.handlers.trigger("save");},
-							89: function () {
-								t.handlers.trigger("redo");
-								return true;
-							}, 90: function () {
-								t.handlers.trigger("undo");
-								return true;
-							},
-							192: function () {
-								if (!shiftKey) {
-									return false;
-								}
-								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.General);
-								return true;
+								action = true;
 							}
-						};
+							break;
+						case 50:
+							if (shiftKey) {
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Time);
+								action = true;
+							}
+							break;
+						case 51:
+							if (shiftKey) {
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Date);
+								action = true;
+							}
+							break;
+						case 52:
+							if (shiftKey) {
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Currency);
+								action = true;
+							}
+							break;
+						case 53:
+							if (shiftKey) {
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Percent);
+							} else {
+								t.handlers.trigger("setFontAttributes", "s");
+							}
+							action = true;
+							break;
+						case 54:
+							if (shiftKey) {
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Scientific);
+								action = true;
+							}
+							break;
+						case 65:
+							t.handlers.trigger("changeSelection", /*isStartPoint*/true, -1, -1, /*isCoord*/true, /*isSelectMode*/
+								false, false);
+							action = true;
+							break;
+						case 66:
+							t.handlers.trigger("setFontAttributes", "b");
+							action = true;
+							break;
+						case 73:
+							t.handlers.trigger("setFontAttributes", "i");
+							action = true;
+							break;
+						case 80:
+							t.handlers.trigger("print");
+							action = true;
+							break;
+						/*case 83:
+							t.handlers.trigger("save");
+						 	action = true;
+							break;*/
+						case 85:
+							t.handlers.trigger("setFontAttributes", "u");
+							action = true;
+							break;
+						case 89:
+							t.handlers.trigger("redo");
+							action = true;
+							break;
+						case 90:
+							t.handlers.trigger("undo");
+							action = true;
+							break;
+						case 192:
+							if (shiftKey) {
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.General);
+								action = true;
+							}
+							break;
 					}
-					if (!t.__handlers[event.which]()) {
+
+					if (!action) {
 						t.skipKeyPress = false;
 						return true;
 					}
+					stop();
 					return result;
 
 				case 61:  // Firefox, Opera (+/=)
