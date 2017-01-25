@@ -5683,7 +5683,7 @@ CellArea.prototype = {
 	};
 	sparkline.prototype.setSqref = function (sqref) {
 		this.sqref = AscCommonExcel.g_oRangeCache.getAscRange(sqref).clone();
-		this.sqref.setAbs(true, true, true. true);
+		this.sqref.setAbs(true, true, true, true);
 	};
 	sparkline.prototype.setF = function (f) {
 		this.f = f;
