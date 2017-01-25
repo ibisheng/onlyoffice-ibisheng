@@ -295,6 +295,11 @@
 				var t = this;
 				t.pasteProcessor.clean();
 				
+				if(null === this.specialPasteProps)
+				{
+					this.pasteProcessor.oSpecialPaste.activeRange = ws.model.selectionRange.clone(ws.model);
+				}
+				
 				switch (_format)
 				{
 					case AscCommon.c_oAscClipboardDataFormat.HtmlElement:
@@ -402,7 +407,7 @@
 				return {base64: sBase64, html: container.innerHTML};
 			},
 			
-			getBinaryForCopy: function(worksheet)
+			getBinaryForCopy: function(worksheet, activeRange)
 			{
 				var objectRender = worksheet.objectRender;
 				var isIntoShape = objectRender.controller.getTargetDocContent();
@@ -418,7 +423,8 @@
 					pptx_content_writer.Start_UseFullUrl();
 
 					// ToDo multiselect ?
-					var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(worksheet.model.workbook, worksheet.model.selectionRange.getLast());
+					var selectionRange = activeRange ? activeRange : worksheet.model.selectionRange.getLast();
+					var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(worksheet.model.workbook, selectionRange);
 					sBase64 = "xslData;" + oBinaryFileWriter.Write();
 					
 					pptx_content_writer.End_UseFullUrl();

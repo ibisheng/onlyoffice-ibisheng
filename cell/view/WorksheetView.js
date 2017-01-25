@@ -8704,9 +8704,13 @@
             } else {
                 newRange = this._pasteFromHTML(val, true);
             }
-			var sBinary = window["Asc"]["editor"].wb.clipboard.copyProcessor.getBinaryForCopy(this);
-			window["Asc"]["editor"].wb.clipboard.pasteProcessor.oSpecialPaste.undoBinary = sBinary;
-			//this.oSpecialPaste.undoImgsId;
+			
+			if(!window["Asc"]["editor"].wb.clipboard.specialPasteProps)
+			{
+				var sBinary = window["Asc"]["editor"].wb.clipboard.copyProcessor.getBinaryForCopy(this, newRange);
+				window["Asc"]["editor"].wb.clipboard.pasteProcessor.oSpecialPaste.undoBinary = sBinary;
+				//this.oSpecialPaste.undoImgsId;
+			}
 			
             checkRange = [newRange];
         }
@@ -8722,6 +8726,12 @@
 		//откатываемся до того, что было до вставки
 		if(api.wb.clipboard.pasteProcessor.oSpecialPaste.undoBinary)
 		{
+			var tempProps = new AscCommonExcel.SpecialPasteProps();
+			api.wb.clipboard.specialPasteProps = tempProps;
+			
+			//меняем activeRange
+			this.model.selectionRange = api.wb.clipboard.pasteProcessor.oSpecialPaste.activeRange.clone(this.model);
+			
 			//откатываем данные в ячейках
 			api.wb.clipboard.pasteProcessor.pasteFromBinary(this, api.wb.clipboard.pasteProcessor.oSpecialPaste.undoBinary);
 			
@@ -8730,11 +8740,12 @@
 		}
 		
 		//далее специальная вставка
-		var tempProps = new AscCommonExcel.SpecialPasteProps();
-		tempProps.setProps(props);
-		api.wb.clipboard.specialPasteProps = tempProps;
 		if(api.wb.clipboard.pasteProcessor.oSpecialPaste.oPreSpecialPasteData)
-		{
+		{	
+			var tempProps = new AscCommonExcel.SpecialPasteProps();
+			tempProps.setProps(props);
+			api.wb.clipboard.specialPasteProps = tempProps;
+			
 			var oPreSpecialPasteData = api.wb.clipboard.pasteProcessor.oSpecialPaste.oPreSpecialPasteData;
 			api.wb.clipboard.pasteData(this, oPreSpecialPasteData._format, oPreSpecialPasteData.data1, oPreSpecialPasteData.data2, oPreSpecialPasteData.text_data);
 		}
@@ -9479,7 +9490,7 @@
 			var skipFormat = null;
 			var noSkipVal = null;
 			
-			rangeStyle.value = newVal.getValue();
+			rangeStyle.val = newVal.getValue();
 			var value2 = newVal.getValue2();
 			for (var nF = 0; nF < value2.length; nF++) {
 				if (value2[nF] && value2[nF].sId) {
@@ -9581,11 +9592,11 @@
 		{
 			arrFormula.push(rangeStyle.formula);
 		}
-		else if(rangeStyle.cellValueData)
+		else if(rangeStyle.cellValueData && specialPasteProps.font)
 		{	
 			rangeStyle.cellValueData.cell.setValueData(rangeStyle.cellValueData.valueData);
 		}
-		else if(rangeStyle.value2)
+		else if(rangeStyle.value2 && specialPasteProps.font)
 		{
 			if(formulaProps)
 			{
