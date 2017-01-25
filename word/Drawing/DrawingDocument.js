@@ -6676,6 +6676,16 @@ CStylesPainter.prototype =
 			}
 		}
 
+		if (_api.WordControl.bIsRetinaSupport)
+		{
+			this.STYLE_THUMBNAIL_WIDTH >>= 1;
+			this.STYLE_THUMBNAIL_HEIGHT >>= 1;
+		}
+
+		// export
+		this["STYLE_THUMBNAIL_WIDTH"] = this.STYLE_THUMBNAIL_WIDTH;
+		this["STYLE_THUMBNAIL_HEIGHT"] = this.STYLE_THUMBNAIL_HEIGHT;
+
 		// теперь просто отдаем евент наверх
 		_api.sync_InitEditorStyles(this);
 	},
