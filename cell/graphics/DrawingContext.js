@@ -908,10 +908,13 @@
 	 * @return {TextMetrics}  Returns the dimension of string {width: w, height: h}
 	 */
 	DrawingContext.prototype.measureText = function (text, units) {
-		var fm = this.fmgrGraphics[3],
-			r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX);
+		var code;
+		var fm = this.fmgrGraphics[3];
+		var r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX);
 		for (var tmp, w = 0, w2 = 0, i = 0; i < text.length; ++i) {
-			tmp = fm.MeasureChar(text.charCodeAt(i));
+			code = text.charCodeAt(i);
+			// Replace Non-breaking space(0xA0) with White-space(0x20)
+			tmp = fm.MeasureChar(0xA0 === code ? 0x20 : code);
 			w += asc_round(tmp.fAdvanceX); // ToDo скачет при wrap в ячейке и zoom
 		}
 		w2 = w - tmp.fAdvanceX + tmp.oBBox.fMaxX - tmp.oBBox.fMinX + 1;
@@ -936,6 +939,7 @@
 	};
 
 	DrawingContext.prototype.fillText = function (text, x, y, maxWidth, charWidths, angle) {
+		var code;
 		var manager = angle ? this.fmgrGraphics[1] : this.fmgrGraphics[0];
 
 		var _x = this._mift.transformPointX(x, y);
@@ -944,7 +948,9 @@
 		var length = text.length;
 		for (var i = 0; i < length; ++i) {
 			try {
-				_x = asc_round(manager.LoadString4C(text.charCodeAt(i), _x, _y));
+				code = text.charCodeAt(i);
+				// Replace Non-breaking space(0xA0) with White-space(0x20)
+				_x = asc_round(manager.LoadString4C(0xA0 === code ? 0x20: code, _x, _y));
 			} catch(err) {
 				// do nothing
 			}
