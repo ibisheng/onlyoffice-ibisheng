@@ -6751,7 +6751,46 @@
 
         return false;
     };
-
+	
+	//нужно ли спрашивать пользователя о расширении диапазона
+	WorksheetView.prototype.getSelectionSortInfo = function () {
+		//в случае попытки сортировать мультиселект, необходимо выдавать ошибку
+		var arn = this.model.selectionRange.getLast().clone(true);
+		
+		//null - не выдавать сообщение и не расширять, false - не выдавать сообщение и расширЯть, true - выдавать сообщение
+		var bResult = false;
+		//в случае одной выделенной ячейки - всегда не выдаём сообщение и автоматически расширяем
+		if(!arn.isOneCell())
+		{
+			var colCount = arn.c2 - arn.c1 + 1;
+			var rowCount = arn.r2 - arn.r1 + 1;
+			//если выделено более одного столбца и более одной строки - не выдаем сообщение и не расширяем
+			if(colCount > 1 && rowCount > 1)
+			{
+				bResult = null;
+			}
+			else
+			{
+				//далее проверяем есть ли смежные ячейки у startCol/startRow
+				var activeCell = this.model.selectionRange.activeCell;
+				var activeCellRange = new Asc.Range(activeCell.col, activeCell.row, activeCell.col, activeCell.row);
+				var expandRange = this.model.autoFilters._getAdjacentCellsAF(activeCellRange);
+				
+				//если диапазон не расширяется за счет близлежащих ячеек - не выдаем сообщение и не расширяем
+				if(arn.isEqual(expandRange) || activeCellRange.isEqual(expandRange))
+				{
+					bResult = null;
+				}
+				else
+				{
+					bResult = true;
+				}
+			}
+		}
+		
+		return bResult;
+	};
+	
     WorksheetView.prototype.getSelectionMathInfo = function () {
         var oSelectionMathInfo = new asc_CSelectionMathInfo();
         var sum = 0;
@@ -11674,7 +11713,7 @@
 
     };
 
-    WorksheetView.prototype.sortColFilter = function (type, cellId, displayName, color) {
+    WorksheetView.prototype.sortRange = function (type, cellId, displayName, color, bIsExpandRange) {
         var t = this;
         var ar = this.model.selectionRange.getLast().clone();
         var onChangeAutoFilterCallback = function (isSuccess) {
@@ -11698,12 +11737,31 @@
                 t._onUpdateFormatTable(sortProps.sortRange.bbox, false);
                 History.EndTransaction();
             };
-
-            if (null === sortProps) {
-                var rgbColor = color ?
-                  new AscCommonExcel.RgbColor((color.asc_getR() << 16) + (color.asc_getG() << 8) + color.asc_getB()) :
-                  null;
-                t.setSelectionInfo("sort", type, null, null, rgbColor);
+			
+			if (null === sortProps) {
+				var rgbColor = color ?  new AscCommonExcel.RgbColor((color.asc_getR() << 16) + (color.asc_getG() << 8) + color.asc_getB()) : null;
+				
+				//expand selectionRange
+				var selectionRange = t.model.selectionRange;
+				if(bIsExpandRange)
+				{
+					var lastRange = selectionRange.getLast().clone();
+					
+					var activeCell = selectionRange.activeCell;
+					var activeCellRange = new Asc.Range(activeCell.col, activeCell.row, activeCell.col, activeCell.row);
+					var expandRange = t.model.autoFilters._getAdjacentCellsAF(activeCellRange);
+					
+					selectionRange.ranges[selectionRange.ranges.length - 1] = expandRange;
+				}
+				//sort
+				t.setSelectionInfo("sort", type, null, null, rgbColor);
+				if(bIsExpandRange)
+				{	
+					selectionRange.ranges[selectionRange.ranges.length - 1] = lastRange;
+				}
+				
+				//TODO здесь необходимо селект перерисовывать
+			
             } else if (false !== sortProps) {
                 t._isLockedCells(sortProps.sortRange.bbox, /*subType*/null, onSortAutoFilterCallBack);
             }
