@@ -11742,25 +11742,20 @@
 				var rgbColor = color ?  new AscCommonExcel.RgbColor((color.asc_getR() << 16) + (color.asc_getG() << 8) + color.asc_getB()) : null;
 				
 				//expand selectionRange
-				var selectionRange = t.model.selectionRange;
 				if(bIsExpandRange)
 				{
-					var lastRange = selectionRange.getLast().clone();
-					
+					var selectionRange = t.model.selectionRange;
 					var activeCell = selectionRange.activeCell;
 					var activeCellRange = new Asc.Range(activeCell.col, activeCell.row, activeCell.col, activeCell.row);
 					var expandRange = t.model.autoFilters._getAdjacentCellsAF(activeCellRange);
 					
-					selectionRange.ranges[selectionRange.ranges.length - 1] = expandRange;
-				}
-				//sort
-				t.setSelectionInfo("sort", type, null, null, rgbColor);
-				if(bIsExpandRange)
-				{	
-					selectionRange.ranges[selectionRange.ranges.length - 1] = lastRange;
+					//change selection
+					t.setSelection(expandRange);
 				}
 				
-				//TODO здесь необходимо селект перерисовывать
+				//sort
+				t.setSelectionInfo("sort", type, null, null, rgbColor);
+				//TODO возможно стоит возвратить selection обратно
 			
             } else if (false !== sortProps) {
                 t._isLockedCells(sortProps.sortRange.bbox, /*subType*/null, onSortAutoFilterCallBack);
