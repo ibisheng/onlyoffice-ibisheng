@@ -11581,17 +11581,29 @@ drawSurfaceChart.prototype =
 		var y = 1/(points.length)*(summY);
 		
 		var sortArray = [];
+		var repeatePoint = [];
+		var nIndividualPoints = 0;
 		for(var i = 0; i < points.length; i++)
 		{
-			sortArray[i] = {tan: Math.atan2(points[i].x - x, points[i].y - y), point: points[i]};
+			var tan = Math.atan2(points[i].x - x, points[i].y - y);
+			if(!repeatePoint[tan])
+			{
+				sortArray[i] = {tan: tan, point: points[i]};
+				repeatePoint[tan] = 1;
+				nIndividualPoints++;
+			}
 		}
 		
-		sortArray.sort (function sortArr(a, b)
+		var path = null
+		if(nIndividualPoints > 2)
 		{
-			return  b.tan - a.tan;
-		});
-	
-		var path = this.cChartDrawer.calculatePathFacesArray(sortArray, true);
+			sortArray.sort (function sortArr(a, b)
+			{
+				return  b.tan - a.tan;
+			});
+		
+			path = this.cChartDrawer.calculatePathFacesArray(sortArray, true);
+		}
 		
 		return path
 	},
