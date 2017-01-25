@@ -3877,7 +3877,8 @@ function CThumbnailsManager()
 		this.CalculatePlaces();
 		this.m_bIsUpdate = true;
 
-		this.SetFocusElement(FOCUS_OBJECT_THUMBNAILS);
+		if (!this.m_oWordControl.m_oApi.isMobileVersion)
+			this.SetFocusElement(FOCUS_OBJECT_THUMBNAILS);
 	}
 
 	this.CalculatePlaces = function()
