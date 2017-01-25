@@ -722,7 +722,7 @@ IScroll.prototype = {
 		this.enabled = true;
 	},
 
-	refresh: function () {
+	refresh: function (_position) {
 		var rf = this.wrapper.offsetHeight;		// Force reflow
 
 		this.wrapperWidth	= this.wrapper.clientWidth;
@@ -758,6 +758,12 @@ IScroll.prototype = {
 		this.wrapperOffset = utils.offset(this.wrapper);
 
 		this._execEvent('refresh');
+
+		if (_position)
+		{
+			this.x = _position.X;
+			this.y = _position.Y;
+		}
 
 		this.resetPosition();
 

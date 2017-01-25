@@ -150,6 +150,10 @@
 	{
 		return { W : 100, H : 100 };
 	};
+	CMobileDelegateSimple.prototype.GetScrollPosition = function()
+	{
+		return null;
+	};
 	CMobileDelegateSimple.prototype.ScrollTo = function(_scroll)
 	{
 		return;
@@ -881,7 +885,8 @@
 			this.iScroll.scroller.style.width = _size.W + "px";
 			this.iScroll.scroller.style.height = _size.H + "px";
 
-			this.iScroll.refresh(true);
+			var _position = this.delegate.GetScrollPosition();
+			this.iScroll.refresh(_position);
 		}
 	};
 

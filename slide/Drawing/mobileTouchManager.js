@@ -118,6 +118,13 @@
 			this.HtmlPage.m_oScrollVerApi.scrollToY(-_scroll.y + this.HtmlPage.SlideScrollMIN);
 		}
 	};
+	CMobileDelegateEditorPresentation.prototype.GetScrollPosition = function()
+	{
+		var _x = this.HtmlPage.m_dScrollX;
+		var _y = this.HtmlPage.m_dScrollY - this.HtmlPage.SlideScrollMIN;
+
+		return { X: -_x, Y: -_y };
+	};
 	CMobileDelegateEditorPresentation.prototype.GetContextMenuType = function()
 	{
 		var _mode = AscCommon.MobileTouchContextMenuType.Slide;
@@ -709,8 +716,7 @@
 			{
 				// здесь нужно запускать отрисовку, если есть анимация зума
 				this.delegate.HtmlPage.NoneRepaintPages = false;
-				this.delegate.HtmlPage.m_bIsFullRepaint = true;
-				this.delegate.HtmlPage.OnScroll();
+				this.delegate.DrawingDocument.FirePaint();
 
 				this.Mode = AscCommon.MobileTouchMode.None;
 				isCheckContextMenuMode = false;

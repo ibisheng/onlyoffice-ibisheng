@@ -334,6 +334,8 @@ function CEditorPage(api)
 	this.m_nIntervalWaitAutoSave = 1000;
 	this.m_nLastAutosaveTime     = -1;
 
+	this.NoneRepaintPages = false;
+
 	this.m_oApi = api;
 	var oThis   = this;
 
@@ -2872,7 +2874,8 @@ function CEditorPage(api)
 
 	this.CheckZoom = function()
 	{
-		this.m_oDrawingDocument.ClearCachePages();
+		if (!this.NoneRepaintPages)
+			this.m_oDrawingDocument.ClearCachePages();
 	};
 
 	this.CalculateDocumentSize = function(bIsAttack)
