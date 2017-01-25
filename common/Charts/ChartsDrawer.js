@@ -11506,6 +11506,12 @@ drawSurfaceChart.prototype =
 				
 				res = [p1, p2];
 			}
+			else if(clearIntersectionPoints.length === 1)//одна точка, не равняющиеся ни одной точке сегмента
+			{
+				var p1 = clearIntersectionPoints[0];
+				
+				res = [p1];
+			}
 		}
 		else if(segmentIntersectionPoints.length && clearIntersectionPoints.length)
 		{
