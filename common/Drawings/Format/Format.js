@@ -12368,7 +12368,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
         return oLn;
     }
 
-    function builder_CreateChartTitle(sTitle, nFontSize, oDrawingDocument){
+    function builder_CreateChartTitle(sTitle, nFontSize, bIsBold, oDrawingDocument){
         if(typeof sTitle === "string" && sTitle.length > 0){
             var oTitle = new AscFormat.CTitle();
             oTitle.setOverlay(false);
@@ -12376,7 +12376,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
             var oTextBody = AscFormat.CreateTextBodyFromString(sTitle, oDrawingDocument, oTitle.tx);
             if(AscFormat.isRealNumber(nFontSize)){
                 oTextBody.content.Set_ApplyToAll(true);
-                oTextBody.content.Paragraph_Add(new ParaTextPr({ FontSize : nFontSize}));
+                oTextBody.content.Paragraph_Add(new ParaTextPr({ FontSize : nFontSize, Bold: bIsBold}));
                 oTextBody.content.Set_ApplyToAll(false);
             }
             oTitle.tx.setRich(oTextBody);
@@ -12386,7 +12386,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     }
 
 
-    function builder_CreateTitle(sTitle, nFontSize, oChartSpace)
+    function builder_CreateTitle(sTitle, nFontSize, bIsBold, oChartSpace)
     {
         if(typeof sTitle === "string" && sTitle.length > 0){
             var oTitle = new AscFormat.CTitle();
@@ -12395,7 +12395,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
             var oTextBody = AscFormat.CreateTextBodyFromString(sTitle, oChartSpace.getDrawingDocument(), oTitle.tx);
             if(AscFormat.isRealNumber(nFontSize)){
                 oTextBody.content.Set_ApplyToAll(true);
-                oTextBody.content.Paragraph_Add(new ParaTextPr({ FontSize : nFontSize}));
+                oTextBody.content.Paragraph_Add(new ParaTextPr({ FontSize : nFontSize, Bold: bIsBold}));
                 oTextBody.content.Set_ApplyToAll(false);
             }
             oTitle.tx.setRich(oTextBody);
@@ -12404,29 +12404,29 @@ function CorrectUniColor(asc_color, unicolor, flag)
         return null;
     }
 
-    function builder_SetChartTitle(oChartSpace, sTitle, nFontSize){
+    function builder_SetChartTitle(oChartSpace, sTitle, nFontSize, bIsBold){
         if(oChartSpace){
-            oChartSpace.chart.setTitle(builder_CreateChartTitle(sTitle, nFontSize, oChartSpace.getDrawingDocument()));
+            oChartSpace.chart.setTitle(builder_CreateChartTitle(sTitle, nFontSize, bIsBold, oChartSpace.getDrawingDocument()));
         }
     }
 
-    function builder_SetChartHorAxisTitle(oChartSpace, sTitle, nFontSize){
+    function builder_SetChartHorAxisTitle(oChartSpace, sTitle, nFontSize, bIsBold){
         if(oChartSpace){
             var horAxis = oChartSpace.chart.plotArea.getHorizontalAxis();
             if(horAxis){
-                horAxis.setTitle(builder_CreateTitle(sTitle, nFontSize, oChartSpace));
+                horAxis.setTitle(builder_CreateTitle(sTitle, nFontSize, bIsBold, oChartSpace));
             }
         }
     }
 
-    function builder_SetChartVertAxisTitle(oChartSpace, sTitle, nFontSize){
+    function builder_SetChartVertAxisTitle(oChartSpace, sTitle, nFontSize, bIsBold){
         if(oChartSpace){
             var verAxis = oChartSpace.chart.plotArea.getVerticalAxis();
             if(verAxis)
             {
                 if(typeof sTitle === "string" && sTitle.length > 0)
                 {
-                    verAxis.setTitle(builder_CreateTitle(sTitle, nFontSize, oChartSpace));
+                    verAxis.setTitle(builder_CreateTitle(sTitle, nFontSize, bIsBold, oChartSpace));
                     if(verAxis.title){
                         var _body_pr = new AscFormat.CBodyPr();
                         _body_pr.reset();
@@ -12607,6 +12607,76 @@ function CorrectUniColor(asc_color, unicolor, flag)
         }
     }
 
+
+    function builder_GetTickMark(sTickMark){
+        var nNewTickMark = null;
+        switch(sTickMark){
+            case 'cross':
+            {
+                nNewTickMark = Asc.c_oAscTickMark.TICK_MARK_CROSS;
+                break;
+            }
+            case 'in':
+            {
+                nNewTickMark = Asc.c_oAscTickMark.TICK_MARK_IN;
+                break;
+            }
+            case 'none':
+            {
+                nNewTickMark = Asc.c_oAscTickMark.TICK_MARK_NONE;
+                break;
+            }
+            case 'out':
+            {
+                nNewTickMark = Asc.c_oAscTickMark.TICK_MARK_OUT;
+                break;
+            }
+        }
+        return nNewTickMark;
+    }
+
+    function builder_SetChartAxisMajorTickMark(oAxis, sTickMark){
+        if(!oAxis){
+            return;
+        }
+        var nNewTickMark = builder_GetTickMark(sTickMark);
+        if(nNewTickMark !== null){
+            oAxis.setMajorTickMark(nNewTickMark);
+        }
+    }
+    function builder_SetChartAxisMinorTickMark(oAxis, sTickMark){
+        if(!oAxis){
+            return;
+        }
+        var nNewTickMark = builder_GetTickMark(sTickMark);
+        if(nNewTickMark !== null){
+            oAxis.setMinorTickMark(nNewTickMark);
+        }
+    }
+
+    function builder_SetChartHorAxisMajorTickMark(oChartSpace, sTickMark){
+        if(oChartSpace){
+            builder_SetChartAxisMajorTickMark(oChartSpace.chart.plotArea.getHorizontalAxis(), sTickMark);
+        }
+    }
+    function builder_SetChartHorAxisMinorTickMark(oChartSpace, sTickMark){
+        if(oChartSpace){
+            builder_SetChartAxisMinorTickMark(oChartSpace.chart.plotArea.getHorizontalAxis(), sTickMark);
+        }
+    }
+
+    function builder_SetChartVerAxisMajorTickMark(oChartSpace, sTickMark){
+        if(oChartSpace){
+            builder_SetChartAxisMajorTickMark(oChartSpace.chart.plotArea.getVerticalAxis(), sTickMark);
+        }
+    }
+    function builder_SetChartVerAxisMinorTickMark(oChartSpace, sTickMark){
+        if(oChartSpace){
+            builder_SetChartAxisMinorTickMark(oChartSpace.chart.plotArea.getVerticalAxis(), sTickMark);
+        }
+    }
+
+
     //----------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CreateFontRef = CreateFontRef;
@@ -12728,6 +12798,13 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].builder_SetChartHorAxisOrientation = builder_SetChartHorAxisOrientation;
     window['AscFormat'].builder_SetChartVertAxisTickLablePosition = builder_SetChartVertAxisTickLablePosition;
     window['AscFormat'].builder_SetChartHorAxisTickLablePosition = builder_SetChartHorAxisTickLablePosition;
+
+    window['AscFormat'].builder_SetChartHorAxisMajorTickMark = builder_SetChartHorAxisMajorTickMark;
+    window['AscFormat'].builder_SetChartHorAxisMinorTickMark = builder_SetChartHorAxisMinorTickMark;
+    window['AscFormat'].builder_SetChartVerAxisMajorTickMark = builder_SetChartVerAxisMajorTickMark;
+    window['AscFormat'].builder_SetChartVerAxisMinorTickMark = builder_SetChartVerAxisMinorTickMark;
+
+
 
     window['AscFormat'].Ax_Counter = Ax_Counter;
     window['AscFormat'].TYPE_TRACK = TYPE_TRACK;

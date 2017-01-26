@@ -126,9 +126,13 @@
 	 * */
 
 	/**
-	 *
 	 * @typedef {("none" | "nextTo" | "low" | "high")} TickLabelPosition
 	 * **/
+
+
+	/**
+	 * @typedef {("cross" | "in" | "none" | "out")} TickMark
+	 * */
 
 	/**
 	 * Class representing a base class for color types
@@ -913,30 +917,33 @@
 	 *  Specifies a chart title
 	 *  @param {string} sTitle
 	 *  @param {hps} nFontSize
+	 *  @param {?bool} bIsBold
 	 */
-	ApiChart.prototype.SetTitle = function (sTitle, nFontSize)
+	ApiChart.prototype.SetTitle = function (sTitle, nFontSize, bIsBold)
 	{
-		AscFormat.builder_SetChartTitle(this.Chart, sTitle, nFontSize);
+		AscFormat.builder_SetChartTitle(this.Chart, sTitle, nFontSize, bIsBold);
 	};
 
 	/**
 	 *  Specifies a horizontal axis title
 	 *  @param {string} sTitle
 	 *  @param {hps} nFontSize
+     *  @param {?bool} bIsBold
 	 * */
-	ApiChart.prototype.SetHorAxisTitle = function (sTitle, nFontSize)
+	ApiChart.prototype.SetHorAxisTitle = function (sTitle, nFontSize, bIsBold)
 	{
-		AscFormat.builder_SetChartHorAxisTitle(this.Chart, sTitle, nFontSize);
+		AscFormat.builder_SetChartHorAxisTitle(this.Chart, sTitle, nFontSize, bIsBold);
 	};
 
 	/**
 	 *  Specifies a vertical axis title
 	 *  @param {string} sTitle
 	 *  @param {hps} nFontSize
+	 *  @param {?bool} bIsBold
 	 * */
-	ApiChart.prototype.SetVerAxisTitle = function (sTitle, nFontSize)
+	ApiChart.prototype.SetVerAxisTitle = function (sTitle, nFontSize, bIsBold)
 	{
-		AscFormat.builder_SetChartVertAxisTitle(this.Chart, sTitle, nFontSize);
+		AscFormat.builder_SetChartVertAxisTitle(this.Chart, sTitle, nFontSize, bIsBold);
 	};
 
 
@@ -946,6 +953,40 @@
 	 * */
 	ApiChart.prototype.SetVerAxisOrientation = function(bIsMinMax){
 		AscFormat.builder_SetChartVertAxisOrientation(this.Chart, bIsMinMax);
+	};
+
+
+	/**
+	 * Specifies major tick mark for horizontal axis
+	 * @param {TickMark} sTickMark
+	 * */
+
+	ApiChart.prototype.SetHorAxisMajorTickMark = function(sTickMark){
+        AscFormat.builder_SetChartHorAxisMajorTickMark(this.Chart, sTickMark);
+	};/**
+	 * Specifies minor tick mark for horizontal axis
+	 * @param {TickMark} sTickMark
+	 * */
+
+	ApiChart.prototype.SetHorAxisMinorTickMark = function(sTickMark){
+        AscFormat.builder_SetChartHorAxisMinorTickMark(this.Chart, sTickMark);
+	};
+
+	/**
+	 * Specifies major tick mark for vertical axis
+	 * @param {TickMark} sTickMark
+	 * */
+
+	ApiChart.prototype.SetVertAxisMajorTickMark = function(sTickMark){
+        AscFormat.builder_SetChartVerAxisMajorTickMark(this.Chart, sTickMark);
+	};
+
+	/**
+	 * Specifies minor tick mark for vertical axis
+	 * @param {TickMark} sTickMark
+	 * */
+	ApiChart.prototype.SetVertAxisMinorTickMark = function(sTickMark){
+        AscFormat.builder_SetChartVerAxisMinorTickMark(this.Chart, sTickMark);
 	};
 
 	/**
@@ -1061,6 +1102,12 @@
 	ApiChart.prototype["SetShowDataLabels"]            =  ApiChart.prototype.SetShowDataLabels;
 	ApiChart.prototype["SetVertAxisTickLabelPosition"] =  ApiChart.prototype.SetVertAxisTickLabelPosition;
 	ApiChart.prototype["SetHorAxisTickLabelPosition"]  =  ApiChart.prototype.SetHorAxisTickLabelPosition;
+
+	ApiChart.prototype["SetHorAxisMajorTickMark"]  =  ApiChart.prototype.SetHorAxisMajorTickMark;
+	ApiChart.prototype["SetHorAxisMinorTickMark"]  =  ApiChart.prototype.SetHorAxisMinorTickMark;
+	ApiChart.prototype["SetVertAxisMajorTickMark"]  =  ApiChart.prototype.SetVertAxisMajorTickMark;
+	ApiChart.prototype["SetVertAxisMinorTickMark"]  =  ApiChart.prototype.SetVertAxisMinorTickMark;
+
 
 	ApiColor.prototype["GetClassType"]                 =  ApiColor.prototype.GetClassType;
 
