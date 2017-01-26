@@ -827,47 +827,6 @@ Processor3D.prototype._getMatrixRotateOy = function()
 	return this.matrixRotateOy;
 };
 
-Processor3D.prototype._getMatrixRotateAllAxis2 = function()
-{
-	var matrixRotateOY = this._getMatrixRotateOy2();
-	var matrixRotateOX = this._getMatrixRotateOx2();
-	
-	/*итоговая матрица
-	
-	|cosOy               0           sinOy      0|
-	|sinOx * sinOy     cosOx    -sinOx * cosOy  0|
-	|-sinOy * cosOx     sinOx     cosOy * cosOx  0|
-	|-sinOy              0        (cosOy + 1)   1|*/
-	
-	if(!this.matrixRotateAllAxis2)
-	{
-		this.matrixRotateAllAxis2 = Point3D.prototype.multiplyMatrix(matrixRotateOY, matrixRotateOX);
-	}
-	
-	return this.matrixRotateAllAxis2;
-};
-
-Processor3D.prototype._getMatrixRotateOx2 = function()
-{
-	//todo посмотреть возможность заменить массивы на Float32Array
-	if(!this.matrixRotateOx2)
-	{
-		this.matrixRotateOx2 = [[1, 0, 0, 0], [0, Math.cos(-this.angleOx), Math.sin(-this.angleOx), 0], [0, - Math.sin(-this.angleOx), Math.cos(-this.angleOx), 1], [0, 0, 0, 1]];
-	}
-	
-	return this.matrixRotateOx2;
-};
-
-Processor3D.prototype._getMatrixRotateOy2 = function()
-{
-	if(!this.matrixRotateOy2)
-	{
-		this.matrixRotateOy2 = [[Math.cos(-this.angleOy), 0, -Math.sin(-this.angleOy), 0], [0, 1, 0, 0], [Math.sin(-this.angleOy), 0, Math.cos(-this.angleOy), 1], [0, 0, 0, 1]];
-	}
-	
-	return this.matrixRotateOy2;
-};
-
 Processor3D.prototype._getMatrixRotateOz = function()
 {
 	return [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 0, 1]];
@@ -889,18 +848,6 @@ Processor3D.prototype._getPerspectiveProjectionMatrix = function(fov)
 	
 	return this.projectMatrix;
 };
-
-Processor3D.prototype._getPerspectiveProjectionMatrix2 = function(fov)
-{
-	/*var zf = this.rPerspective + this.depthPerspective;
-	var zn = this.rPerspective;
-	var q = zf / (zf - zn);
-	return [[1 / Math.tan(this.rPerspective / 2), 0, 0, 0], [0, 1 / Math.tan(this.rPerspective / 2), 0, 0], [0, 0, q, 1], [0, 0, -q * zn, 0]];*/
-	
-	return [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1 / fov], [0, 0, 0, 1]];
-};
-
-
 
 Processor3D.prototype.correctPointsPosition = function(chartSpace)
 {
