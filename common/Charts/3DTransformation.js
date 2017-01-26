@@ -1129,7 +1129,7 @@ Processor3D.prototype._calculateDepth = function()
 	{
 		angleOxKf = sinOx === 0 ? 0 : sinOx;
 		
-		if(type == AscFormat.c_oChartTypes.Area || type === AscFormat.c_oChartTypes.Surface)
+		if(type == AscFormat.c_oChartTypes.Area)
 			depth = (depthPercent / (angleOxKf*depthPercent + ((ptCount + (Math.floor((seriesCount - ptCount) / 2 - 0.5))) / seriesCount * hPercent))) * (heightOriginalChart);
 		else
 			depth = (depthPercent / (angleOxKf*depthPercent + ((ptCount + (Math.floor((seriesCount - ptCount) / 2))) / seriesCount * hPercent))) * (heightOriginalChart);
@@ -1225,7 +1225,7 @@ Processor3D.prototype._calculateScaleFromDepth = function (/*isSkip*/)
 		
 		var subType = this.chartsDrawer.calcProp.subType;
         var newDepth, newWidth;
-		if(!(subType == "standard" || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Line || (this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Area && subType == "normal")))
+		if(!(subType == "standard" || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Line || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Surface || (this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Area && subType == "normal")))
 		{
             newDepth = this.depthPerspective * Math.sin(-this.angleOx);
             newWidth = heightChart - newDepth;
@@ -2508,7 +2508,7 @@ Processor3D.prototype._calcAspectRatio = function()
 		
 		aspectRatioX = (widthOriginalChart / (heightOriginalChart / hPercent)) * this.specialStandardScaleX;
 	}
-	else if(subType === "standard" || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Line)
+	else if(subType === "standard" || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Line || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Surface)
 	{
 		var seriesCount = this.chartsDrawer.calcProp.seriesCount;
 		var ptCount = this.chartsDrawer.calcProp.ptCount;
