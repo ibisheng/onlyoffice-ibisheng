@@ -3558,7 +3558,7 @@ FormatParser.prototype =
 						else
 							dValue = (Date.UTC(nYear,nMounth,nDay,nHour,nMinute,nSecond) - Date.UTC(1899,11,31,0,0,0)) / (86400 * 1000);
 					}
-					if(dValue > 0)
+					if(dValue >= 0)
 					{
 						var sFormat;
 						if(true == bDate && true == bTime)
@@ -3587,7 +3587,7 @@ FormatParser.prototype =
 	},
 	isValidDate : function(nYear, nMounth, nDay)
 	{
-		if(nYear < 1900)
+		if(nYear < 1900 && !(1899 === nYear && 11 == nMounth && 31 == nDay))
 			return false;
 		else
 		{
