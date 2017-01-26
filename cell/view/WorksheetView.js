@@ -9585,10 +9585,9 @@
 			range.setFont(rangeStyle.font);
 		}
 		
-		//
 		
 		//***value***
-		if(rangeStyle.formula)
+		if(rangeStyle.formula && specialPasteProps.formula)
 		{
 			arrFormula.push(rangeStyle.formula);
 		}
