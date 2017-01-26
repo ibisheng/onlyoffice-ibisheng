@@ -1424,7 +1424,7 @@
 	prot['Paragraph']                      = prot.Paragraph;
 	prot['TopMargin']                      = prot.TopMargin;
 	window['Asc']['c_oAscBorderStyles'] = window['AscCommon'].c_oAscBorderStyles = c_oAscBorderStyles;
-	prot                         = c_oAscPageOrientation;
+	prot                         = c_oAscBorderStyles;
 	prot['None']                 = prot.None;
 	prot['Double']               = prot.Double;
 	prot['Hair']                 = prot.Hair;
