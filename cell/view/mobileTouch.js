@@ -212,6 +212,7 @@ function (window, undefined)
 				_info.Y = _y;
 			}
 			info.targetPos = _info;
+			return;
 		}
 
 		var _select = _controller.Get_SelectionBounds();
@@ -245,6 +246,7 @@ function (window, undefined)
 			}
 
 			info.selectText = _info;
+			return;
 		}
 		else if (_selection)
 		{
@@ -254,12 +256,13 @@ function (window, undefined)
 				W : _selection.W,
 				H : _selection.H
 			};
+			return;
 		}
 
 		var _object_bounds = _controller.getSelectedObjectsBounds();
-		if ((0 == _mode) && _object_bounds)
+		if (_object_bounds)
 		{
-			info.selectBounds = {
+			info.objectBounds = {
 				X : _object_bounds.minX,
 				Y : _object_bounds.minY,
 				R : _object_bounds.maxX,
@@ -756,7 +759,9 @@ function (window, undefined)
 		}
 
 		var isCheckContextMenuMode = true;
+
 		var isCheckContextMenuSelect = false;
+		var isCheckContextMenuCursor = (this.Mode == AscCommon.MobileTouchMode.Cursor);
 
 		var isPreventDefault = false;
 		switch (this.Mode)
@@ -845,7 +850,7 @@ function (window, undefined)
 			AscCommon.g_inputContext.preventVirtualKeyboard(e);
 
 		if (true !== this.iScroll.isAnimating)
-			this.CheckContextMenuTouchEnd(isCheckContextMenuMode, isCheckContextMenuSelect);
+			this.CheckContextMenuTouchEnd(isCheckContextMenuMode, isCheckContextMenuSelect, isCheckContextMenuCursor);
 
 		return false;
 	};

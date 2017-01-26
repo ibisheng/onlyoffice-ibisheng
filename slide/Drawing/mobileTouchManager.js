@@ -157,10 +157,17 @@
 		var _target = _controller.Is_SelectionUse();
 		if (_target === false)
 		{
+			/*
+			 _info = {
+			 X : this.DrawingDocument.m_dTargetX,
+			 Y : this.DrawingDocument.m_dTargetY,
+			 Page : this.DrawingDocument.m_lTargetPage
+			 };
+			 */
 			_info = {
-				X : this.DrawingDocument.m_dTargetX,
-				Y : this.DrawingDocument.m_dTargetY,
-				Page : this.DrawingDocument.m_lTargetPage
+				X : this.LogicDocument.TargetPos.X,
+				Y : this.LogicDocument.TargetPos.Y,
+				Page : this.LogicDocument.TargetPos.PageNum
 			};
 
 			_transform = this.DrawingDocument.TextMatrix;
@@ -173,6 +180,7 @@
 				_info.Y = _y;
 			}
 			info.targetPos = _info;
+			return;
 		}
 
 		var _select = _controller.Get_SelectionBounds();
@@ -206,12 +214,13 @@
 			}
 
 			info.selectText = _info;
+			return;
 		}
 
 		var _object_bounds = _controller.getSelectedObjectsBounds();
-		if ((0 == _mode) && _object_bounds)
+		if (_object_bounds)
 		{
-			info.selectBounds = {
+			info.objectBounds = {
 				X : _object_bounds.minX,
 				Y : _object_bounds.minY,
 				R : _object_bounds.maxX,
@@ -737,7 +746,9 @@
 		}
 
 		var isCheckContextMenuMode = true;
+
 		var isCheckContextMenuSelect = false;
+		var isCheckContextMenuCursor = (this.Mode == AscCommon.MobileTouchMode.Cursor);
 
 		var isPreventDefault = false;
 		switch (this.Mode)
@@ -930,7 +941,7 @@
 			AscCommon.g_inputContext.preventVirtualKeyboard(e);
 
 		if (true !== this.iScroll.isAnimating)
-			this.CheckContextMenuTouchEnd(isCheckContextMenuMode, isCheckContextMenuSelect);
+			this.CheckContextMenuTouchEnd(isCheckContextMenuMode, isCheckContextMenuSelect, isCheckContextMenuCursor);
 
 		return false;
 	};

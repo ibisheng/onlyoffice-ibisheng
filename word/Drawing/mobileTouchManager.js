@@ -458,7 +458,9 @@
 		}
 
 		var isCheckContextMenuMode = true;
+
 		var isCheckContextMenuSelect = false;
+		var isCheckContextMenuCursor = (this.Mode == AscCommon.MobileTouchMode.Cursor);
 
 		var isPreventDefault = false;
 		switch (this.Mode)
@@ -651,7 +653,7 @@
 			AscCommon.g_inputContext.preventVirtualKeyboard(e);
 
 		if (true !== this.iScroll.isAnimating)
-			this.CheckContextMenuTouchEnd(isCheckContextMenuMode, isCheckContextMenuSelect);
+			this.CheckContextMenuTouchEnd(isCheckContextMenuMode, isCheckContextMenuSelect, isCheckContextMenuCursor);
 
 		return false;
 	};

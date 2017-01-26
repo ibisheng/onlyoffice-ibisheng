@@ -77,6 +77,14 @@
 			this.selectCell 			= null;
 			this.objectBounds 			= null;
 			this.objectSlideThumbnail 	= null;
+		},
+		CopyTo : function(dst)
+		{
+			dst.targetPos 				= this.targetPos;
+			dst.selectText 				= this.selectText;
+			dst.selectCell 				= this.selectCell;
+			dst.objectBounds 			= this.objectBounds;
+			dst.objectSlideThumbnail 	= this.objectSlideThumbnail;
 		}
 	};
 
@@ -278,10 +286,17 @@
 		var _target = this.LogicDocument.Is_SelectionUse();
 		if (_target === false)
 		{
+			/*
 			_info = {
 				X : this.DrawingDocument.m_dTargetX,
 				Y : this.DrawingDocument.m_dTargetY,
 				Page : this.DrawingDocument.m_lTargetPage
+			};
+			*/
+			_info = {
+				X : this.LogicDocument.TargetPos.X,
+				Y : this.LogicDocument.TargetPos.Y,
+				Page : this.LogicDocument.TargetPos.PageNum
 			};
 
 			_transform = this.DrawingDocument.TextMatrix;
@@ -294,6 +309,7 @@
 				_info.Y = _y;
 			}
 			info.targetPos = _info;
+			return;
 		}
 
 		var _select = this.LogicDocument.Get_SelectionBounds();
@@ -327,12 +343,13 @@
 			}
 
 			info.selectText = _info;
+			return;
 		}
 
 		var _object_bounds = this.LogicDocument.DrawingObjects.getSelectedObjectsBounds();
-		if ((0 == _mode) && _object_bounds)
+		if (_object_bounds)
 		{
-			info.selectBounds = {
+			info.objectBounds = {
 				X : _object_bounds.minX,
 				Y : _object_bounds.minY,
 				R : _object_bounds.maxX,
@@ -579,6 +596,7 @@
 		/* context menu */
 		this.ContextMenuLastMode 		= AscCommon.MobileTouchContextMenuType.None;
 		this.ContextMenuLastInfo 		= new AscCommon.MobileTouchContextMenuLastInfo();
+		this.ContextMenuLastShow		= false;
 
 		this.ContextMenuLastModeCounter = 0;
 		this.ContextMenuShowTimerId 	= -1;
@@ -1030,7 +1048,7 @@
 		}, 500);
 	};
 
-	CMobileTouchManagerBase.prototype.CheckContextMenuTouchEnd = function(isCheck, isSelectTouch)
+	CMobileTouchManagerBase.prototype.CheckContextMenuTouchEndOld = function(isCheck, isSelectTouch, isGlassTouch)
 	{
 		// isCheck: если пришли сюда после скролла или зума (или их анимации) - то не нужно проверять состояние редактора.
 		// Нужно проверять последнее сохраненной состояние
@@ -1055,7 +1073,7 @@
 			this.SendShowContextMenu();
 	};
 
-	CMobileTouchManagerBase.prototype.CheckContextMenuTouchEndNew = function(isCheck, isSelectTouch)
+	CMobileTouchManagerBase.prototype.CheckContextMenuTouchEnd = function(isCheck, isSelectTouch, isGlassTouch)
 	{
 		// isCheck: если пришли сюда после скролла или зума (или их анимации) - то не нужно проверять состояние редактора.
 		// Нужно проверять последнее сохраненной состояние
@@ -1064,11 +1082,15 @@
 		var isSelectCell = false;
 		if (isCheck)
 		{
-			var oldLastInfo = this.ContextMenuLastInfo;
+			var oldLastInfo = new AscCommon.MobileTouchContextMenuLastInfo();
+			this.ContextMenuLastInfo.CopyTo(oldLastInfo);
+
 			var oldLasdMode = this.ContextMenuLastMode;
 
 			this.ContextMenuLastMode = this.delegate.GetContextMenuType();
-			this.delagate.GetContextMenuInfo(this.ContextMenuLastInfo);
+			this.delegate.GetContextMenuInfo(this.ContextMenuLastInfo);
+
+			isSelectCell = (this.ContextMenuLastInfo.selectCell != null);
 
 			var _data1 = null;
 			var _data2 = null;
@@ -1118,7 +1140,6 @@
 
 							if (_data1 && _data2)
 							{
-								isSelectCell = true;
 								if (Math.abs(_data1.X - _data2.X) < 0.1 &&
 									Math.abs(_data1.Y - _data2.Y) < 0.1 &&
 									Math.abs(_data1.W - _data2.W) < 0.1 &&
@@ -1172,7 +1193,7 @@
 				}
 			}
 
-			if (this.ContextMenuLastMode == oldLasdMode)
+			if (this.ContextMenuLastMode == oldLasdMode && isEqual)
 			{
 				this.ContextMenuLastModeCounter++;
 				this.ContextMenuLastModeCounter &= 0x01;
@@ -1181,14 +1202,87 @@
 			{
 				this.ContextMenuLastModeCounter = 0;
 			}
+
+			switch (this.ContextMenuLastMode)
+			{
+				case AscCommon.MobileTouchContextMenuType.Target:
+				{
+					isShowContextMenu = (1 == this.ContextMenuLastModeCounter);
+					break;
+				}
+				case AscCommon.MobileTouchContextMenuType.Select:
+				{
+					if (isSelectCell)
+						isShowContextMenu = (1 == this.ContextMenuLastModeCounter);
+					else
+						isShowContextMenu = true;
+					break;
+				}
+				case AscCommon.MobileTouchContextMenuType.Object:
+				{
+					isShowContextMenu = (0 == this.ContextMenuLastModeCounter);
+					break;
+				}
+				case AscCommon.MobileTouchContextMenuType.Slide:
+				{
+					isShowContextMenu = (1 == this.ContextMenuLastModeCounter);
+					break;
+				}
+				default:
+				{
+					isShowContextMenu = (1 == this.ContextMenuLastModeCounter);
+					break;
+				}
+			}
 		}
 		else
 		{
+			// меню для текстового селекта показываем всегда
+			isShowContextMenu = (!isSelectCell && (this.ContextMenuLastMode == AscCommon.MobileTouchContextMenuType.Select));
 
+			if (this.ContextMenuLastShow)
+			{
+				// эмулируем пропажу меню (клик туда же)
+				switch (this.ContextMenuLastMode)
+				{
+					case AscCommon.MobileTouchContextMenuType.Target:
+					case AscCommon.MobileTouchContextMenuType.Select:
+					{
+						this.ContextMenuLastModeCounter = 0;
+						break;
+					}
+					case AscCommon.MobileTouchContextMenuType.Object:
+					{
+						this.ContextMenuLastModeCounter = 1;
+						break;
+					}
+					case AscCommon.MobileTouchContextMenuType.Slide:
+					{
+						this.ContextMenuLastModeCounter = 0;
+						break;
+					}
+					default:
+					{
+						break;
+					}
+				}
+			}
 		}
 
-		if (this.ContextMenuLastMode > AscCommon.MobileTouchContextMenuType.None && 1 == this.ContextMenuLastModeCounter)
+		if (isSelectTouch)
+			isShowContextMenu = true;
+		if (isGlassTouch)
+			isShowContextMenu = true;
+
+		if (this.ContextMenuLastMode > AscCommon.MobileTouchContextMenuType.None && isShowContextMenu)
+		{
+			this.ContextMenuLastShow = true;
 			this.SendShowContextMenu();
+		}
+		else
+		{
+			this.ContextMenuLastShow = false;
+		}
 	};
 
 	CMobileTouchManagerBase.prototype.ClearContextMenu = function()
