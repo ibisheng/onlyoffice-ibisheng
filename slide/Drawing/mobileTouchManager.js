@@ -737,6 +737,7 @@
 		}
 
 		var isCheckContextMenuMode = true;
+		var isCheckContextMenuSelect = false;
 
 		var isPreventDefault = false;
 		switch (this.Mode)
@@ -819,6 +820,7 @@
 				var pos         = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
 				this.delegate.Logic_OnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
 				AscCommon.stopEvent(e);
+				isCheckContextMenuSelect = true;
 				break;
 			}
 			case AscCommon.MobileTouchMode.TableMove:
@@ -928,7 +930,7 @@
 			AscCommon.g_inputContext.preventVirtualKeyboard(e);
 
 		if (true !== this.iScroll.isAnimating)
-			this.CheckContextMenuTouchEnd(isCheckContextMenuMode);
+			this.CheckContextMenuTouchEnd(isCheckContextMenuMode, isCheckContextMenuSelect);
 
 		return false;
 	};

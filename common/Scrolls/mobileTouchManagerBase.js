@@ -1030,7 +1030,7 @@
 		}, 500);
 	};
 
-	CMobileTouchManagerBase.prototype.CheckContextMenuTouchEnd = function(isCheck)
+	CMobileTouchManagerBase.prototype.CheckContextMenuTouchEnd = function(isCheck, isSelectTouch)
 	{
 		// isCheck: если пришли сюда после скролла или зума (или их анимации) - то не нужно проверять состояние редактора.
 		// Нужно проверять последнее сохраненной состояние
@@ -1049,6 +1049,142 @@
 			}
 
 			this.ContextMenuLastMode = _mode;
+		}
+
+		if (this.ContextMenuLastMode > AscCommon.MobileTouchContextMenuType.None && 1 == this.ContextMenuLastModeCounter)
+			this.SendShowContextMenu();
+	};
+
+	CMobileTouchManagerBase.prototype.CheckContextMenuTouchEndNew = function(isCheck, isSelectTouch)
+	{
+		// isCheck: если пришли сюда после скролла или зума (или их анимации) - то не нужно проверять состояние редактора.
+		// Нужно проверять последнее сохраненной состояние
+
+		var isShowContextMenu = false;
+		var isSelectCell = false;
+		if (isCheck)
+		{
+			var oldLastInfo = this.ContextMenuLastInfo;
+			var oldLasdMode = this.ContextMenuLastMode;
+
+			this.ContextMenuLastMode = this.delegate.GetContextMenuType();
+			this.delagate.GetContextMenuInfo(this.ContextMenuLastInfo);
+
+			var _data1 = null;
+			var _data2 = null;
+
+			if (this.ContextMenuLastMode == oldLasdMode)
+			{
+				var isEqual = false;
+				switch (this.ContextMenuLastMode)
+				{
+					case AscCommon.MobileTouchContextMenuType.Target:
+					{
+						_data1 = this.ContextMenuLastInfo.targetPos;
+						_data2 = oldLastInfo.targetPos;
+
+						if (_data1 && _data2)
+						{
+							if (_data1.Page == _data1.Page &&
+								Math.abs(_data1.X - _data2.X) < 10 &&
+								Math.abs(_data1.Y - _data2.Y) < 10)
+							{
+								isEqual = true;
+							}
+						}
+
+						break;
+					}
+					case AscCommon.MobileTouchContextMenuType.Select:
+					{
+						_data1 = this.ContextMenuLastInfo.selectText;
+						_data2 = oldLastInfo.selectText;
+
+						if (_data1 && _data2)
+						{
+							if (_data1.Page1 == _data2.Page1 && _data1.Page2 == _data2.Page2 &&
+								Math.abs(_data1.X1 - _data2.X1) < 0.1 &&
+								Math.abs(_data1.Y1 - _data2.Y1) < 0.1 &&
+								Math.abs(_data1.X2 - _data2.X2) < 0.1 &&
+								Math.abs(_data1.Y2 - _data2.Y2) < 0.1)
+							{
+								isEqual = true;
+							}
+						}
+						else
+						{
+							_data1 = this.ContextMenuLastInfo.selectCell;
+							_data2 = oldLastInfo.selectCell;
+
+							if (_data1 && _data2)
+							{
+								isSelectCell = true;
+								if (Math.abs(_data1.X - _data2.X) < 0.1 &&
+									Math.abs(_data1.Y - _data2.Y) < 0.1 &&
+									Math.abs(_data1.W - _data2.W) < 0.1 &&
+									Math.abs(_data1.H - _data2.H) < 0.1)
+								{
+									isEqual = true;
+								}
+							}
+						}
+
+						break;
+					}
+					case AscCommon.MobileTouchContextMenuType.Object:
+					{
+						_data1 = this.ContextMenuLastInfo.objectBounds;
+						_data2 = oldLastInfo.objectBounds;
+
+						if (_data1 && _data2)
+						{
+							if (_data1.Page == _data2.Page &&
+								Math.abs(_data1.X - _data2.X) < 0.1 &&
+								Math.abs(_data1.Y - _data2.Y) < 0.1 &&
+								Math.abs(_data1.R - _data2.R) < 0.1 &&
+								Math.abs(_data1.B - _data2.B) < 0.1)
+							{
+								isEqual = true;
+							}
+						}
+
+						break;
+					}
+					case AscCommon.MobileTouchContextMenuType.Slide:
+					{
+						_data1 = this.ContextMenuLastInfo.objectSlideThumbnail;
+						_data2 = oldLastInfo.objectSlideThumbnail;
+
+						if (_data1 && _data2)
+						{
+							if (_data1.Slide == _data2.Slide)
+								isEqual = true;
+						}
+						else
+						{
+							isEqual = true;
+						}
+
+						break;
+					}
+					default:
+						break;
+				}
+			}
+
+			if (this.ContextMenuLastMode == oldLasdMode)
+			{
+				this.ContextMenuLastModeCounter++;
+				this.ContextMenuLastModeCounter &= 0x01;
+			}
+			else
+			{
+				this.ContextMenuLastModeCounter = 0;
+			}
+		}
+		else
+		{
+
 		}
 
 		if (this.ContextMenuLastMode > AscCommon.MobileTouchContextMenuType.None && 1 == this.ContextMenuLastModeCounter)

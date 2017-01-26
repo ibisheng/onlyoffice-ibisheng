@@ -756,6 +756,7 @@ function (window, undefined)
 		}
 
 		var isCheckContextMenuMode = true;
+		var isCheckContextMenuSelect = false;
 
 		var isPreventDefault = false;
 		switch (this.Mode)
@@ -833,6 +834,7 @@ function (window, undefined)
 				this.Mode       = AscCommon.MobileTouchMode.None;
 				this.delegate.Drawing_OnMouseUp(_e);
 				//AscCommon.stopEvent(e);
+				isCheckContextMenuSelect = true;
 				break;
 			}
 			default:
@@ -843,7 +845,7 @@ function (window, undefined)
 			AscCommon.g_inputContext.preventVirtualKeyboard(e);
 
 		if (true !== this.iScroll.isAnimating)
-			this.CheckContextMenuTouchEnd(isCheckContextMenuMode);
+			this.CheckContextMenuTouchEnd(isCheckContextMenuMode, isCheckContextMenuSelect);
 
 		return false;
 	};
