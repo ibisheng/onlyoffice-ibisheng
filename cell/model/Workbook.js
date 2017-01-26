@@ -2670,9 +2670,22 @@
 		this.handlers = handlers;
 		this._setHandlersTablePart();
 	};
-	Woorksheet.prototype._getValuesForConditionalFormatting = function(sqref, withEmpty) {
-		var range = this.getRange3(sqref.r1, sqref.c1, sqref.r2, sqref.c2);
-		return range._getValues(withEmpty);
+	Woorksheet.prototype._getValuesForConditionalFormatting = function(ranges, withEmpty) {
+		var res = [];
+		for (var i = 0; i < ranges.length; ++i) {
+			var elem = ranges[i];
+			var range = this.getRange3(elem.r1, elem.c1, elem.r2, elem.c2);
+			res = res.concat(range._getValues(withEmpty));
+		}
+		return res;
+	};
+	Woorksheet.prototype._isConditionalFormattingIntersect = function(range, ranges) {
+		for (var i = 0; i < ranges.length; ++i) {
+			if (range.isIntersect(ranges[i])) {
+				return true;
+			}
+		}
+		return false;
 	};
 	Woorksheet.prototype._updateConditionalFormatting = function(range) {
 		var oGradient1, oGradient2;
@@ -2680,15 +2693,16 @@
 		var aRules, oRule;
 		var oRuleElement = null;
 		var o;
-		var i, j, l, cell, sqref, values, value, v, tmp, min, mid, max, dxf, compareFunction, nc, sum;
+		var i, j, l, cf, cell, ranges, values, value, v, tmp, min, mid, max, dxf, compareFunction, nc, sum;
 		for (i = 0; i < aCFs.length; ++i) {
-			sqref = aCFs[i].sqref;
+			cf = aCFs[i]
+			ranges = cf.ranges;
 			// ToDo убрать null === sqref когда научимся мультиселект обрабатывать (\\192.168.5.2\source\DOCUMENTS\XLSX\Matematika Quantum Sedekah.xlsx)
-			if (null === sqref) {
+			if (!cf.isValid()) {
 				continue;
 			}
-			if (!range || range.isIntersect(sqref)) {
-				aRules = aCFs[i].aRules.sort(function(v1, v2) {
+			if (!range || this._isConditionalFormattingIntersect(range, ranges)) {
+				aRules = cf.aRules.sort(function(v1, v2) {
 					return v1.priority - v2.priority;
 				});
 				if (oRule = aRules[0]) {
@@ -2704,7 +2718,7 @@
 						nc = 0;
 						min = Number.MAX_VALUE;
 						max = -Number.MAX_VALUE;
-						values = this._getValuesForConditionalFormatting(sqref, false);
+						values = this._getValuesForConditionalFormatting(ranges, false);
 						for (cell = 0; cell < values.length; ++cell) {
 							value = values[cell];
 							if (CellValueType.Number === value.c.getType() && !isNaN(tmp = parseFloat(value.v))) {
@@ -2749,7 +2763,7 @@
 					} else if (AscCommonExcel.ECfType.top10 === oRule.type) {
 						if (oRule.rank > 0 && oRule.dxf) {
 							nc = 0;
-							values = this._getValuesForConditionalFormatting(sqref, false);
+							values = this._getValuesForConditionalFormatting(ranges, false);
 							o = oRule.bottom ? -Number.MAX_VALUE : Number.MAX_VALUE;
 							for (cell = 0; cell < values.length; ++cell) {
 								value = values[cell];
@@ -2777,7 +2791,7 @@
 						if (!oRule.dxf) {
 							continue;
 						}
-						values = this._getValuesForConditionalFormatting(sqref, false);
+						values = this._getValuesForConditionalFormatting(ranges, false);
 						sum = 0;
 						nc = 0;
 						for (cell = 0; cell < values.length; ++cell) {
@@ -2813,7 +2827,7 @@
 						if (!oRule.dxf) {
 							continue;
 						}
-						values = this._getValuesForConditionalFormatting(sqref, true);
+						values = this._getValuesForConditionalFormatting(ranges, true);
 
 						switch (oRule.type) {
 							case AscCommonExcel.ECfType.duplicateValues:

@@ -1116,6 +1116,14 @@
 		return output;
 	}
 
+	function getSqRefString(ranges) {
+		var refs = [];
+		for (var i = 0; i < ranges.length; ++i) {
+			refs.push(ranges[i].getName());
+		}
+		return refs.join(' ');
+	}
+
     /** @constructor */
     function BinaryTableWriter(memory, aDxfs, isCopyPaste)
     {
@@ -2645,11 +2653,7 @@
 			}
 			//this.bs.WriteItem(c_oSer_Selection.Pane, function(){oThis.memory.WriteByte();});
 			if (null != selectionRange.ranges) {
-				var refs = [];
-				for (var i = 0; i < selectionRange.ranges.length; ++i) {
-					refs.push(selectionRange.ranges[i].getName());
-				}
-				var sqref = refs.join(' ');
+				var sqref = getSqRefString(selectionRange.ranges);
 				this.bs.WriteItem(c_oSer_Selection.Sqref, function(){oThis.memory.WriteString3(sqref);});
 			}
 		};
@@ -3646,8 +3650,9 @@
 			if (null != oCf.pivot) {
 				this.bs.WriteItem(c_oSer_ConditionalFormatting.Pivot, function() {oThis.memory.WriteBool(oCf.pivot);});
 			}
-			if (null != oCf.sqref) {
-				this.bs.WriteItem(c_oSer_ConditionalFormatting.SqRef, function() {oThis.memory.WriteString3(oCf.sqref.getName());});
+			if (null != oCf.ranges) {
+				var sqref = getSqRefString(oCf.ranges);
+				this.bs.WriteItem(c_oSer_ConditionalFormatting.SqRef, function() {oThis.memory.WriteString3(sqref);});
 			}
 			for (var i = 0; i < oCf.aRules.length; ++i) {
 				this.bs.WriteItem(c_oSer_ConditionalFormatting.ConditionalFormattingRule, function() {oThis.WriteConditionalFormattingRule(oCf.aRules[i]);});
@@ -5740,7 +5745,9 @@
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadConditionalFormatting(t, l, oConditionalFormatting);
                 });
-                oWorksheet.aConditionalFormatting.push(oConditionalFormatting);
+				if (oConditionalFormatting.isValid()) {
+					oWorksheet.aConditionalFormatting.push(oConditionalFormatting);
+				}
             } else if (c_oSerWorksheetsTypes.SheetViews === type) {
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadSheetViews(t, l, oWorksheet.sheetViews);
@@ -6718,17 +6725,9 @@
 				selectionRange.activeCellId = this.stream.GetLong();
 			} else if (c_oSer_Selection.Sqref === type) {
 				var sqref = this.stream.GetString2LE(length);
-				var refs = sqref.split(' ');
-				var selectionOld = selectionRange.ranges;
-				selectionRange.ranges = [];
-				for (var i = 0; i < refs.length; ++i) {
-					var ref = AscCommonExcel.g_oRangeCache.getAscRange(refs[i]);
-					if (ref) {
-						selectionRange.ranges.push(ref.clone());
-					}
-				}
-				if (selectionRange.ranges.length === 0) {
-					selectionRange.ranges = selectionOld;
+				var selectionNew = AscCommonExcel.g_oRangeCache.getActiveRangesFromSqRef(sqref);
+				if (selectionNew.length > 0) {
+					selectionRange.ranges = selectionNew;
 				}
 			} else if (c_oSer_Selection.Pane === type) {
 				this.stream.GetUChar();
