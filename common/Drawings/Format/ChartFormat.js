@@ -3658,10 +3658,13 @@ CAreaSeries.prototype =
         this.spPr && this.spPr.checkBlipFillRasterImage(images);
         this.dLbls && this.dLbls.getAllRasterImages(images);
         this.marker && this.marker.spPr && this.marker.spPr.checkBlipFillRasterImage(images);
-        for(var i = 0; i < this.dPt.length; ++i)
+        if(this.dPt)
         {
-            this.dPt[i].spPr && this.dPt[i].spPr.checkBlipFillRasterImage(images);
-            this.dPt[i].marker && this.dPt[i].marker.spPr && this.dPt[i].marker.spPr.checkBlipFillRasterImage(images);
+            for(var i = 0; i < this.dPt.length; ++i)
+            {
+                this.dPt[i].spPr && this.dPt[i].spPr.checkBlipFillRasterImage(images);
+                this.dPt[i].marker && this.dPt[i].marker.spPr && this.dPt[i].marker.spPr.checkBlipFillRasterImage(images);
+            }
         }
     },
 
@@ -22411,6 +22414,9 @@ function CSurfaceChart()
 
     this.parent = null;
 
+    this.compiledBandFormats = [];
+
+
     this.Id = g_oIdCounter.Get_NewId();
 }
 
@@ -22456,6 +22462,19 @@ CSurfaceChart.prototype =
                 break;
             }
         }
+    },
+
+    isWireframe: function(){
+        return this.wireframe !== false;
+    },
+
+    getBandFmtByIndex: function(idx){
+        for(var i = 0; i < this.bandFmts.length; ++i){
+            if(this.bandFmts[i].idx === idx){
+                return this.bandFmts[i];
+            }
+        }
+        return null;
     },
 
     removeSeries: function(idx)
