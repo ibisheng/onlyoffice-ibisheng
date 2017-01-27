@@ -8465,8 +8465,8 @@ background-repeat: no-repeat;\
 	};
 	window["asc_docs_api"].prototype["asc_setParagraphStylesSizes"] = function(width, height)
 	{
-		GlobalSkin.STYLE_THUMBNAIL_WIDTH = width;
-		GlobalSkin.STYLE_THUMBNAIL_HEIGHT = height;
+		AscCommonWord.GlobalSkin.STYLE_THUMBNAIL_WIDTH = width;
+		AscCommonWord.GlobalSkin.STYLE_THUMBNAIL_HEIGHT = height;
 	};
 
 	// desktop editor spellcheck
