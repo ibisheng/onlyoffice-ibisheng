@@ -2043,7 +2043,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.asc_Save                     = function(isAutoSave)
 	{
 		this.IsUserSave = !isAutoSave;
-		if (true === this.canSave && !this.isLongAction())
+		if (true === this.canSave && !this.isLongAction() && this.asc_isDocumentCanSave())
 		{
 			this.canSave = false;
 
