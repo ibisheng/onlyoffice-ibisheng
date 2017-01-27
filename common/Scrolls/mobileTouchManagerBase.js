@@ -610,6 +610,8 @@
 
 		/* eventsElement */
 		this.eventsElement = _config.eventsElement;
+
+		this.pointerTouchesCoords = {};
 	}
 
 	CMobileTouchManagerBase.prototype.initEvents = function(_id)
@@ -1798,7 +1800,7 @@
 
 		this.MoveAfterDown = false;
 
-		if (e.touches && 2 == e.touches.length)
+		if ((e.touches && 2 == e.touches.length) || (2 == this.getPointerCount()))
 		{
 			this.Mode = AscCommon.MobileTouchMode.Zoom;
 		}
@@ -1832,13 +1834,7 @@
 			{
 				this.delegate.HtmlPage.NoneRepaintPages = true;
 
-				var _x1 = (e.touches[0].pageX !== undefined) ? e.touches[0].pageX : e.touches[0].clientX;
-				var _y1 = (e.touches[0].pageY !== undefined) ? e.touches[0].pageY : e.touches[0].clientY;
-
-				var _x2 = (e.touches[1].pageX !== undefined) ? e.touches[1].pageX : e.touches[1].clientX;
-				var _y2 = (e.touches[1].pageY !== undefined) ? e.touches[1].pageY : e.touches[1].clientY;
-
-				this.ZoomDistance = Math.sqrt((_x1 - _x2) * (_x1 - _x2) + (_y1 - _y2) * (_y1 - _y2));
+				this.ZoomDistance = this.getPointerDistance(e);
 				this.ZoomValue    = this.delegate.GetZoom();
 
 				break;
@@ -1875,19 +1871,14 @@
 			}
 			case AscCommon.MobileTouchMode.Zoom:
 			{
-				if (2 != e.touches.length)
+				var isTouch2 = ((e.touches && 2 == e.touches.length) || (2 == this.getPointerCount()));
+				if (!isTouch2)
 				{
 					this.Mode = AscCommon.MobileTouchMode.None;
 					return;
 				}
 
-				var _x1 = (e.touches[0].pageX !== undefined) ? e.touches[0].pageX : e.touches[0].clientX;
-				var _y1 = (e.touches[0].pageY !== undefined) ? e.touches[0].pageY : e.touches[0].clientY;
-
-				var _x2 = (e.touches[1].pageX !== undefined) ? e.touches[1].pageX : e.touches[1].clientX;
-				var _y2 = (e.touches[1].pageY !== undefined) ? e.touches[1].pageY : e.touches[1].clientY;
-
-				var zoomCurrentDist = Math.sqrt((_x1 - _x2) * (_x1 - _x2) + (_y1 - _y2) * (_y1 - _y2));
+				var zoomCurrentDist = this.getPointerDistance(e);
 
 				if (zoomCurrentDist == 0)
 					zoomCurrentDist = 1;
@@ -2003,6 +1994,83 @@
 	{
 		AscCommon.stopEvent(e);
 		return false;
+	};
+
+	CMobileTouchManagerBase.prototype.checkPointerMultiTouchAdd = function(e)
+	{
+		if (!this.checkPointerEvent(e))
+			return;
+
+		this.pointerTouchesCoords[e["pointerId"]] = {X:e.pageX, Y:e.pageY};
+	};
+	CMobileTouchManagerBase.prototype.checkPointerMultiTouchRemove = function(e)
+	{
+		if (!this.checkPointerEvent(e))
+			return;
+
+		delete this.pointerTouchesCoords[e["pointerId"]];
+	};
+	CMobileTouchManagerBase.prototype.checkPointerEvent = function(e)
+	{
+		if (!AscCommon.AscBrowser.isIE)
+			return false;
+
+		var _type = e.type;
+		if (_type.toLowerCase)
+			_type = _type.toLowerCase();
+
+		if (-1 == _type.indexOf("pointer"))
+			return -1;
+
+		if (undefined == e["pointerId"])
+			return false;
+
+		return true;
+	};
+	CMobileTouchManagerBase.prototype.getPointerDistance = function(e)
+	{
+		var isPointers = this.checkPointerEvent(e);
+		if (e.touches && (e.touches.length > 1) && !isPointers)
+		{
+			var _x1 = (e.touches[0].pageX !== undefined) ? e.touches[0].pageX : e.touches[0].clientX;
+			var _y1 = (e.touches[0].pageY !== undefined) ? e.touches[0].pageY : e.touches[0].clientY;
+
+			var _x2 = (e.touches[1].pageX !== undefined) ? e.touches[1].pageX : e.touches[1].clientX;
+			var _y2 = (e.touches[1].pageY !== undefined) ? e.touches[1].pageY : e.touches[1].clientY;
+
+			return Math.sqrt((_x1 - _x2) * (_x1 - _x2) + (_y1 - _y2) * (_y1 - _y2));
+		}
+		else if (isPointers)
+		{
+			var _touch1 = {X : 0, Y : 0};
+			var _touch2 = {X : 0, Y : 0};
+			var _counter = 0;
+
+			for (var i in this.pointerTouchesCoords)
+			{
+				if (_counter == 0)
+					_touch1 = this.pointerTouchesCoords[i];
+				else
+					_touch2 = this.pointerTouchesCoords[i];
+				++_counter;
+				if (_counter > 1)
+					break;
+			}
+
+			return Math.sqrt((_touch1.X - _touch2.X) * (_touch1.X - _touch2.X) + (_touch1.Y - _touch2.Y) * (_touch1.Y - _touch2.Y));
+		}
+
+		return 0;
+	};
+
+	CMobileTouchManagerBase.prototype.getPointerCount = function(e)
+	{
+		var _count = 0;
+
+		for (var i in this.pointerTouchesCoords)
+			++_count;
+
+		return _count;
 	};
 
 	//--------------------------------------------------------export----------------------------------------------------

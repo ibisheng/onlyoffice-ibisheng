@@ -475,6 +475,8 @@ function (window, undefined)
 		this.IsTouching = true;
 		AscCommon.g_inputContext.enableVirtualKeyboard();
 
+		this.checkPointerMultiTouchAdd(e);
+
 		global_mouseEvent.KoefPixToMM = 5;
 		AscCommon.check_MouseDownEvent(_e, true);
 		global_mouseEvent.KoefPixToMM = 1;
@@ -494,7 +496,7 @@ function (window, undefined)
 			bIsKoefPixToMM = this.CheckObjectTrack();
 		}
 
-		if (e.touches && 2 == e.touches.length)
+		if ((e.touches && 2 == e.touches.length) || (2 == this.getPointerCount()))
 		{
 			this.Mode = AscCommon.MobileTouchMode.Zoom;
 		}
@@ -630,13 +632,7 @@ function (window, undefined)
 			}
 			case AscCommon.MobileTouchMode.Zoom:
 			{
-				var _x1 = (e.touches[0].pageX !== undefined) ? e.touches[0].pageX : e.touches[0].clientX;
-				var _y1 = (e.touches[0].pageY !== undefined) ? e.touches[0].pageY : e.touches[0].clientY;
-
-				var _x2 = (e.touches[1].pageX !== undefined) ? e.touches[1].pageX : e.touches[1].clientX;
-				var _y2 = (e.touches[1].pageY !== undefined) ? e.touches[1].pageY : e.touches[1].clientY;
-
-				this.ZoomDistance = Math.sqrt((_x1 - _x2) * (_x1 - _x2) + (_y1 - _y2) * (_y1 - _y2));
+				this.ZoomDistance = this.getPointerDistance(e);
 				this.ZoomValue    = this.delegate.GetZoom();
 
 				break;
@@ -659,6 +655,8 @@ function (window, undefined)
 	};
 	CMobileTouchManager.prototype.onTouchMove  = function(e)
 	{
+		this.checkPointerMultiTouchAdd(e);
+
 		var _e = e.touches ? e.touches[0] : e;
 		if (this.Mode != AscCommon.MobileTouchMode.FlowObj && this.Mode != AscCommon.MobileTouchMode.TableMove)
 			AscCommon.check_MouseMoveEvent(e.touches ? e.touches[0] : e);
@@ -696,19 +694,14 @@ function (window, undefined)
 			}
 			case AscCommon.MobileTouchMode.Zoom:
 			{
-				if (2 != e.touches.length)
+				var isTouch2 = ((e.touches && 2 == e.touches.length) || (2 == this.getPointerCount()));
+				if (!isTouch2)
 				{
 					this.Mode = AscCommon.MobileTouchMode.None;
 					return;
 				}
 
-				var _x1 = (e.touches[0].pageX !== undefined) ? e.touches[0].pageX : e.touches[0].clientX;
-				var _y1 = (e.touches[0].pageY !== undefined) ? e.touches[0].pageY : e.touches[0].clientY;
-
-				var _x2 = (e.touches[1].pageX !== undefined) ? e.touches[1].pageX : e.touches[1].clientX;
-				var _y2 = (e.touches[1].pageY !== undefined) ? e.touches[1].pageY : e.touches[1].clientY;
-
-				var zoomCurrentDist = Math.sqrt((_x1 - _x2) * (_x1 - _x2) + (_y1 - _y2) * (_y1 - _y2));
+				var zoomCurrentDist = this.getPointerDistance(e);
 
 				if (zoomCurrentDist == 0)
 					zoomCurrentDist = 1;
@@ -845,6 +838,8 @@ function (window, undefined)
 			default:
 				break;
 		}
+
+		this.checkPointerMultiTouchRemove(e);
 
 		if (this.Api.isViewMode || isPreventDefault)
 			AscCommon.g_inputContext.preventVirtualKeyboard(e);
