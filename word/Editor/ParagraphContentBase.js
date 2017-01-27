@@ -1609,6 +1609,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_PosByElement = function(
     if ( this === Class )
         return true;
 
+    if (this.Content.length <= 0)
+    	return false;
+
     var StartPos = 0;
     var EndPos   = this.Content.length - 1;
 
@@ -1698,6 +1701,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_LastRunInRange = functio
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
 {
+	if (this.Content.length <= 0)
+		return false;
+
     var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length - 1 );
 
     this.Content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
@@ -1723,6 +1729,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_LeftPos = function(Searc
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
 {
+	if (this.Content.length <= 0)
+		return false;
+
     var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : 0 );
 
     this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, UseContentPos, StepEnd);
