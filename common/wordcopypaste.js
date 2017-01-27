@@ -5034,7 +5034,7 @@ PasteProcessor.prototype =
 					rPr.RFonts.EastAsia = {Name: oFontItem.Name, Index: oFontItem.Index};
 				}
             }
-            var font_size = node.style.fontSize;
+            var font_size = node.style ? node.style.fontSize : null;
             if(!font_size)
                 font_size = computedStyle.getPropertyValue( "font-size" );
             if(font_size)
