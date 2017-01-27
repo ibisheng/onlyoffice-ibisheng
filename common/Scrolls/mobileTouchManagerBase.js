@@ -1100,7 +1100,7 @@
 		}, 500);
 	};
 
-	CMobileTouchManagerBase.prototype.CheckContextMenuTouchEndOld = function(isCheck, isSelectTouch, isGlassTouch)
+	CMobileTouchManagerBase.prototype.CheckContextMenuTouchEndOld = function(isCheck, isSelectTouch, isGlassTouch, isTableRuler)
 	{
 		// isCheck: если пришли сюда после скролла или зума (или их анимации) - то не нужно проверять состояние редактора.
 		// Нужно проверять последнее сохраненной состояние
@@ -1125,7 +1125,7 @@
 			this.SendShowContextMenu();
 	};
 
-	CMobileTouchManagerBase.prototype.CheckContextMenuTouchEnd = function(isCheck, isSelectTouch, isGlassTouch)
+	CMobileTouchManagerBase.prototype.CheckContextMenuTouchEnd = function(isCheck, isSelectTouch, isGlassTouch, isTableRuler)
 	{
 		// isCheck: если пришли сюда после скролла или зума (или их анимации) - то не нужно проверять состояние редактора.
 		// Нужно проверять последнее сохраненной состояние
@@ -1245,6 +1245,10 @@
 				}
 			}
 
+			// после таблиц не показываем меню
+			if (isTableRuler)
+				isEqual = false;
+
 			if (this.ContextMenuLastMode == oldLasdMode && isEqual)
 			{
 				this.ContextMenuLastModeCounter++;
@@ -1292,7 +1296,7 @@
 			// меню для текстового селекта показываем всегда
 			isShowContextMenu = (!isSelectCell && (this.ContextMenuLastMode == AscCommon.MobileTouchContextMenuType.Select));
 
-			if (this.ContextMenuLastShow)
+			if (this.ContextMenuLastShow || isTableRuler)
 			{
 				// эмулируем пропажу меню (клик туда же)
 				switch (this.ContextMenuLastMode)
@@ -1536,6 +1540,15 @@
 		//var _mainFillStyle = "#DFDFDF";
 		var _mainFillStyle = "rgba(223, 223, 223, 0.5)";
 
+		var _drawingPage = null;
+		if (DrawingDocument.m_arrPages)
+			_drawingPage =  DrawingDocument.m_arrPages[DrawingDocument.m_lCurrentPage].drawingPage;
+		else
+			_drawingPage = DrawingDocument.SlideCurrectRect;
+
+		var _posMoveX = 0;
+		var _posMoveY = 0;
+
 		if (!_table_outline_dr.TableMatrix || global_MatrixTransformer.IsIdentity(_table_outline_dr.TableMatrix))
 		{
 			this.TableMovePoint = {X : _tableOutline.X, Y : _tableOutline.Y};
@@ -1550,7 +1563,9 @@
 
 			overlay.CheckPoint(TableMoveRect_x, TableMoveRect_y);
 			overlay.CheckPoint(TableMoveRect_x + _rectWidth, TableMoveRect_y + _rectWidth);
-			ctx.drawImage(window.g_table_track_mobile_move, TableMoveRect_x, TableMoveRect_y, window.g_table_track_mobile_move.size, window.g_table_track_mobile_move.size);
+
+			if (this.delegate.Name != "slide")
+				ctx.drawImage(window.g_table_track_mobile_move, TableMoveRect_x, TableMoveRect_y, window.g_table_track_mobile_move.size, window.g_table_track_mobile_move.size);
 
 			ctx.fillStyle = _mainFillStyle;
 
@@ -1588,8 +1603,8 @@
 			ctx.beginPath();
 
 			var dKoef = (HtmlPage.m_nZoomValue * g_dKoef_mm_to_pix / 100);
-			var xDst  = DrawingDocument.m_arrPages[DrawingDocument.m_lCurrentPage].drawingPage.left;
-			var yDst  = DrawingDocument.m_arrPages[DrawingDocument.m_lCurrentPage].drawingPage.top;
+			var xDst  = _drawingPage.left;
+			var yDst  = _drawingPage.top;
 
 			var _oldY = _table_markup.Rows[0].Y + _table_markup.Rows[0].H;
 
@@ -1640,12 +1655,12 @@
 			{
 				if (0 == this.TableCurrentMoveDir)
 				{
-					var _pos = DrawingDocument.ConvertCoordsToCursorWR(this.TableCurrentMoveValue, 0, _table_outline_dr.CurrentPageIndex);
+					var _pos = this.delegate.ConvertCoordsToCursor(this.TableCurrentMoveValue, 0, _table_outline_dr.CurrentPageIndex, false);
 					overlay.VertLine(_pos.X, true);
 				}
 				else
 				{
-					var _pos = DrawingDocument.ConvertCoordsToCursorWR(0, this.TableCurrentMoveValue, _table_outline_dr.CurrentPageIndex);
+					var _pos = this.delegate.ConvertCoordsToCursor(0, this.TableCurrentMoveValue, _table_outline_dr.CurrentPageIndex, false);
 					overlay.HorLine(_pos.Y, true);
 				}
 			}
@@ -1654,8 +1669,8 @@
 		{
 			var dKoef = (HtmlPage.m_nZoomValue * g_dKoef_mm_to_pix / 100);
 
-			var xDst  = DrawingDocument.m_arrPages[DrawingDocument.m_lCurrentPage].drawingPage.left;
-			var yDst  = DrawingDocument.m_arrPages[DrawingDocument.m_lCurrentPage].drawingPage.top;
+			var xDst  = _drawingPage.left;
+			var yDst  = _drawingPage.top;
 
 			ctx.lineWidth = 1 / dKoef;
 
@@ -1694,7 +1709,8 @@
 				_offset *= 2;
 			}
 
-			ctx.drawImage(window.g_table_track_mobile_move, this.TableMovePoint.X - _offset, this.TableMovePoint.Y - _offset, _rectW, _rectW);
+			if (this.delegate.Name != "slide")
+				ctx.drawImage(window.g_table_track_mobile_move, this.TableMovePoint.X - _offset, this.TableMovePoint.Y - _offset, _rectW, _rectW);
 
 			ctx.fillStyle = _mainFillStyle;
 
@@ -1780,12 +1796,18 @@
 			{
 				if (0 == this.TableCurrentMoveDir)
 				{
-					var _pos = DrawingDocument.ConvertCoordsToCursorWR(this.TableCurrentMoveValue, 0, _table_outline_dr.CurrentPageIndex, _table_outline_dr.TableMatrix);
+					_posMoveX = _table_outline_dr.TableMatrix.TransformPointX(this.TableCurrentMoveValue, 0);
+					_posMoveY = _table_outline_dr.TableMatrix.TransformPointY(this.TableCurrentMoveValue, 0);
+
+					var _pos = this.delegate.ConvertCoordsToCursor(_posMoveX, _posMoveY, _table_outline_dr.CurrentPageIndex, false);
 					overlay.VertLine(_pos.X, true);
 				}
 				else
 				{
-					var _pos = DrawingDocument.ConvertCoordsToCursorWR(0, this.TableCurrentMoveValue, _table_outline_dr.CurrentPageIndex, _table_outline_dr.TableMatrix);
+					_posMoveX = _table_outline_dr.TableMatrix.TransformPointX(0, this.TableCurrentMoveValue);
+					_posMoveY = _table_outline_dr.TableMatrix.TransformPointY(0, this.TableCurrentMoveValue);
+
+					var _pos = this.delegate.ConvertCoordsToCursor(_posMoveX, _posMoveY, _table_outline_dr.CurrentPageIndex, false);
 					overlay.HorLine(_pos.Y, true);
 				}
 			}

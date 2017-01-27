@@ -457,6 +457,7 @@
 
 		var isCheckContextMenuSelect = false;
 		var isCheckContextMenuCursor = (this.Mode == AscCommon.MobileTouchMode.Cursor);
+		var isCheckContextMenuTableRuler = false;
 
 		var isPreventDefault = false;
 		switch (this.Mode)
@@ -550,6 +551,8 @@
 			}
 			case AscCommon.MobileTouchMode.TableRuler:
 			{
+				isCheckContextMenuTableRuler = true;
+
 				var HtmlPage = this.delegate.HtmlPage;
 				var DrawingDocument = this.delegate.DrawingDocument;
 
@@ -651,7 +654,7 @@
 			AscCommon.g_inputContext.preventVirtualKeyboard(e);
 
 		if (true !== this.iScroll.isAnimating)
-			this.CheckContextMenuTouchEnd(isCheckContextMenuMode, isCheckContextMenuSelect, isCheckContextMenuCursor);
+			this.CheckContextMenuTouchEnd(isCheckContextMenuMode, isCheckContextMenuSelect, isCheckContextMenuCursor, isCheckContextMenuTableRuler);
 
 		return false;
 	};

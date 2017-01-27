@@ -668,7 +668,7 @@
 			case AscCommon.MobileTouchMode.TableRuler:
 			{
 				var DrawingDocument = this.delegate.DrawingDocument;
-				var pos = DrawingDocument.ConvertCoordsFromCursorPage(global_mouseEvent.X, global_mouseEvent.Y, DrawingDocument.TableOutlineDr.CurrentPageIndex);
+				var pos = DrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
 
 				var _Transform = null;
 				if (DrawingDocument.TableOutlineDr)
@@ -745,6 +745,7 @@
 
 		var isCheckContextMenuSelect = false;
 		var isCheckContextMenuCursor = (this.Mode == AscCommon.MobileTouchMode.Cursor);
+		var isCheckContextMenuTableRuler = false;
 
 		var isPreventDefault = false;
 		switch (this.Mode)
@@ -838,6 +839,8 @@
 			}
 			case AscCommon.MobileTouchMode.TableRuler:
 			{
+				isCheckContextMenuTableRuler = true;
+
 				var HtmlPage = this.delegate.HtmlPage;
 				var DrawingDocument = this.delegate.DrawingDocument;
 
@@ -854,7 +857,7 @@
 					_yOffset += (7 * g_dKoef_mm_to_pix);
 				}
 
-				var pos = DrawingDocument.ConvertCoordsFromCursorPage(global_mouseEvent.X, global_mouseEvent.Y, DrawingDocument.TableOutlineDr.CurrentPageIndex);
+				var pos = DrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
 
 				var _Transform = null;
 				if (DrawingDocument.TableOutlineDr)
@@ -939,7 +942,7 @@
 			AscCommon.g_inputContext.preventVirtualKeyboard(e);
 
 		if (true !== this.iScroll.isAnimating)
-			this.CheckContextMenuTouchEnd(isCheckContextMenuMode, isCheckContextMenuSelect, isCheckContextMenuCursor);
+			this.CheckContextMenuTouchEnd(isCheckContextMenuMode, isCheckContextMenuSelect, isCheckContextMenuCursor, isCheckContextMenuTableRuler);
 
 		return false;
 	};
