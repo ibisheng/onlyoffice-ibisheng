@@ -93,6 +93,10 @@
 		this.PasteImagesCount = 0;
 		this.PasteImagesCounter = 0;
 		this.PasteImagesBody = "";
+		
+		//special paste
+		this.specialPasteData = {};//данные последней вставки перед специальной вставкой
+		this.specialPasteUndoData = {};//для того, чтобы сделать повторную вставку с помощью special paste нужно сначала откатиться до того состояния, которое было до первой вставки
 	}
 
 	CClipboardBase.prototype =

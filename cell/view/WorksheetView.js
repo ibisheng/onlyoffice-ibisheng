@@ -8708,8 +8708,8 @@
 			if(!window["Asc"]["editor"].wb.clipboard.specialPasteProps)
 			{
 				var sBinary = window["Asc"]["editor"].wb.clipboard.copyProcessor.getBinaryForCopy(this, newRange);
-				window["Asc"]["editor"].wb.clipboard.pasteProcessor.oSpecialPaste.undoBinary = sBinary;
-				//this.oSpecialPaste.undoImgsId;
+				window['AscCommon'].g_clipboardBase.specialPasteUndoData.data = sBinary;
+				//window['AscCommon'].g_clipboardBase.specialPasteUndoData.images = images;
 			}
 			
             checkRange = [newRange];
@@ -8724,30 +8724,31 @@
 	WorksheetView.prototype.specialPaste = function (props) {
 		var api = window["Asc"]["editor"];
 		//откатываемся до того, что было до вставки
-		if(api.wb.clipboard.pasteProcessor.oSpecialPaste.undoBinary)
+		if(window['AscCommon'].g_clipboardBase.specialPasteUndoData.data)
 		{
 			var tempProps = new AscCommonExcel.SpecialPasteProps();
 			api.wb.clipboard.specialPasteProps = tempProps;
 			
 			//меняем activeRange
-			this.model.selectionRange = api.wb.clipboard.pasteProcessor.oSpecialPaste.activeRange.clone(this.model);
+			if(window['AscCommon'].g_clipboardBase.specialPasteData && window['AscCommon'].g_clipboardBase.specialPasteData.activeRange)
+			{
+				this.model.selectionRange = window['AscCommon'].g_clipboardBase.specialPasteData.activeRange.clone(this.model);
+			}
 			
 			//откатываем данные в ячейках
-			api.wb.clipboard.pasteProcessor.pasteFromBinary(this, api.wb.clipboard.pasteProcessor.oSpecialPaste.undoBinary);
-			
+			api.wb.clipboard.pasteProcessor.pasteFromBinary(this, window['AscCommon'].g_clipboardBase.specialPasteUndoData.data);
 			//удаляем вставленные изображения
-			
 		}
 		
 		//далее специальная вставка
-		if(api.wb.clipboard.pasteProcessor.oSpecialPaste.oPreSpecialPasteData)
+		if(window['AscCommon'].g_clipboardBase.specialPasteData)
 		{	
 			var tempProps = new AscCommonExcel.SpecialPasteProps();
 			tempProps.setProps(props);
 			api.wb.clipboard.specialPasteProps = tempProps;
 			
-			var oPreSpecialPasteData = api.wb.clipboard.pasteProcessor.oSpecialPaste.oPreSpecialPasteData;
-			api.wb.clipboard.pasteData(this, oPreSpecialPasteData._format, oPreSpecialPasteData.data1, oPreSpecialPasteData.data2, oPreSpecialPasteData.text_data);
+			var specialPasteData = window['AscCommon'].g_clipboardBase.specialPasteData;
+			api.wb.clipboard.pasteData(this, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data);
 		}
 	};
 	

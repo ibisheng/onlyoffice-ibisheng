@@ -297,7 +297,7 @@
 				
 				if(null === this.specialPasteProps)
 				{
-					this.pasteProcessor.oSpecialPaste.activeRange = ws.model.selectionRange.clone(ws.model);
+					window['AscCommon'].g_clipboardBase.specialPasteData.activeRange = ws.model.selectionRange.clone(ws.model);
 				}
 				
 				switch (_format)
@@ -363,7 +363,10 @@
 				
 				if(null === this.specialPasteProps)
 				{
-					this.pasteProcessor.oSpecialPaste.oPreSpecialPasteData = {_format: _format, data1: data1, data2: data2, text_data: text_data};
+					window['AscCommon'].g_clipboardBase.specialPasteData._format = _format;
+					window['AscCommon'].g_clipboardBase.specialPasteData.data1 = data1;
+					window['AscCommon'].g_clipboardBase.specialPasteData.data2 = data2;
+					window['AscCommon'].g_clipboardBase.specialPasteData.text_data = text_data;
 				}
 			}
 		};
