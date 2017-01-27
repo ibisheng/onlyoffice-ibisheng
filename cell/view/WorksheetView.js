@@ -8748,7 +8748,6 @@
 			{
 				var sBinary = window["Asc"]["editor"].wb.clipboard.copyProcessor.getBinaryForCopy(this, newRange);
 				window['AscCommon'].g_clipboardBase.specialPasteUndoData.data = sBinary;
-				//window['AscCommon'].g_clipboardBase.specialPasteUndoData.images = images;
 			}
 			
             checkRange = [newRange];
@@ -8762,21 +8761,33 @@
 	
 	WorksheetView.prototype.specialPaste = function (props) {
 		var api = window["Asc"]["editor"];
+		var g_clipboardBase = window['AscCommon'].g_clipboardBase;
 		//откатываемся до того, что было до вставки
-		if(window['AscCommon'].g_clipboardBase.specialPasteUndoData.data)
+		if(g_clipboardBase.specialPasteUndoData.data)
 		{
 			var tempProps = new AscCommonExcel.SpecialPasteProps();
 			api.wb.clipboard.specialPasteProps = tempProps;
 			
 			//меняем activeRange
-			if(window['AscCommon'].g_clipboardBase.specialPasteData && window['AscCommon'].g_clipboardBase.specialPasteData.activeRange)
+			if(g_clipboardBase.specialPasteData && g_clipboardBase.specialPasteData.activeRange)
 			{
-				this.model.selectionRange = window['AscCommon'].g_clipboardBase.specialPasteData.activeRange.clone(this.model);
+				this.model.selectionRange = g_clipboardBase.specialPasteData.activeRange.clone(this.model);
 			}
 			
 			//откатываем данные в ячейках
-			api.wb.clipboard.pasteProcessor.pasteFromBinary(this, window['AscCommon'].g_clipboardBase.specialPasteUndoData.data);
+			api.wb.clipboard.pasteProcessor.pasteFromBinary(this, g_clipboardBase.specialPasteUndoData.data);
 			//удаляем вставленные изображения
+			if(g_clipboardBase.specialPasteUndoData.images)
+			{
+				var images = g_clipboardBase.specialPasteUndoData.images;
+				for(var i = 0; i < images.length; i++)
+				{
+					var id = images[i];
+					var oObject = AscCommon.g_oTableId.Get_ById(id);
+					oObject.deleteDrawingBase(true);
+					oObject.setBDeleted(true);
+				}
+			}
 		}
 		
 		//далее специальная вставка
