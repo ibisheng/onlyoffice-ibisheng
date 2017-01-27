@@ -4238,6 +4238,8 @@
 					headerRowCount = options.HeaderRowCount;
 				if(null != options.TotalsRowCount)
 					totalsRowCount = options.TotalsRowCount;
+				
+				worksheet.workbook.dependencyFormulas.lockRecal();
 				if(style && worksheet.workbook.TableStyles && worksheet.workbook.TableStyles.AllStyles)
 				{
 					//заполняем названия столбцов
@@ -4339,6 +4341,7 @@
 						}
 					}
 				}
+				worksheet.workbook.dependencyFormulas.unlockRecal();
 			},
 			
 			getTableCellStyle: function(row, col)
