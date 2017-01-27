@@ -390,6 +390,12 @@
                 _elem2.style.bottom = "0px";
                 _elem2.style.width = "100%";
                 _elem2.style.height = "100%";
+
+                if (AscCommon.AscBrowser.isIE)
+				{
+					document.body.style["msTouchAction"] = "none";
+					document.body.style["touchAction"] = "none";
+				}
 			}
 		},
 
