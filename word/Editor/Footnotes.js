@@ -2427,17 +2427,29 @@ CFootnotesController.prototype.GetSelectionBounds = function()
 		}
 		else if (1 === this.Selection.Direction)
 		{
+			var StartBounds = this.Selection.Start.Footnote.Get_SelectionBounds();
+			var EndBounds   = this.Selection.End.Footnote.Get_SelectionBounds();
+
+			if (!StartBounds && !EndBounds)
+				return null;
+
 			var Result       = {};
-			Result.Start     = this.Selection.Start.Footnote.Get_SelectionBounds().Start;
-			Result.End       = this.Selection.End.Footnote.Get_SelectionBounds().End;
+			Result.Start     = StartBounds ? StartBounds.Start : EndBounds.Start;
+			Result.End       = EndBounds ? EndBounds.End : StartBounds.End;
 			Result.Direction = 1;
 			return Result;
 		}
 		else
 		{
+			var StartBounds = this.Selection.End.Footnote.Get_SelectionBounds();
+			var EndBounds   = this.Selection.Start.Footnote.Get_SelectionBounds();
+
+			if (!StartBounds && !EndBounds)
+				return null;
+
 			var Result       = {};
-			Result.Start     = this.Selection.End.Footnote.Get_SelectionBounds().Start;
-			Result.End       = this.Selection.Start.Footnote.Get_SelectionBounds().End;
+			Result.Start     = StartBounds ? StartBounds.Start : EndBounds.Start;
+			Result.End       = EndBounds ? EndBounds.End : StartBounds.End;
 			Result.Direction = -1;
 			return Result;
 		}
