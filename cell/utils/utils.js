@@ -1339,6 +1339,17 @@
 		RangeCache.prototype.getActiveRange = function (sRange) {
 			return this._getRange(sRange, 2);
 		};
+		RangeCache.prototype.getActiveRangesFromSqRef = function (sqRef) {
+			var res = [];
+			var refs = sqRef.split(' ');
+			for (var i = 0; i < refs.length; ++i) {
+				var ref = AscCommonExcel.g_oRangeCache.getAscRange(refs[i]);
+				if (ref) {
+					res.push(ref.clone());
+				}
+			}
+			return res;
+		};
 		RangeCache.prototype.getFormulaRange = function (sRange) {
 			return this._getRange(sRange, 3);
 		};
@@ -1900,6 +1911,8 @@
 			this.oOnUpdateTabColor = {};
 			this.oOnUpdateSheetViewSettings = {};
 			this.bAddRemoveRowCol = false;
+			this.bChangeActive = false;
+			this.activeSheet = null;
 		}
 
 

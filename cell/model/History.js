@@ -302,6 +302,9 @@ CHistory.prototype.UndoRedoPrepare = function (oRedoObjectParam, bUndo) {
 			}
 		}
 	}
+	if (window["NATIVE_EDITOR_ENJINE"] || !this.workbook.oApi.IsSendDocumentLoadCompleate) {
+		oRedoObjectParam.bChangeActive = true;
+	}
 };
 CHistory.prototype.RedoAdd = function(oRedoObjectParam, Class, Type, sheetid, range, Data, LocalChange)
 {
@@ -316,6 +319,12 @@ CHistory.prototype.RedoAdd = function(oRedoObjectParam, Class, Type, sheetid, ra
 	this.Add(Class, Type, sheetid, range, Data, LocalChange);
 	if(bNeedOff)
 		this.TurnOff();
+
+	var bChangeActive = oRedoObjectParam.bChangeActive && AscCommonExcel.g_oUndoRedoWorkbook === Class;
+	if (bChangeActive && null != oRedoObjectParam.activeSheet) {
+		//it can be delete action, so set active and get after action
+		this.workbook.setActiveById(oRedoObjectParam.activeSheet);
+	}
 
 	// ToDo Убрать это!!!
 	if(Class && !Class.Load_Changes && !Class.Load)
@@ -353,6 +362,9 @@ CHistory.prototype.RedoAdd = function(oRedoObjectParam, Class, Type, sheetid, ra
 	}
 			}
 		}
+	}
+	if (bChangeActive) {
+		oRedoObjectParam.activeSheet = this.workbook.getActiveWs().getId();
 	}
     var curPoint = this.Points[this.Index];
     if (curPoint) {
@@ -512,6 +524,9 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 				this.lastDrawingObjects = null;
 			}
 		}
+		if (oRedoObjectParam.bChangeActive && null != oRedoObjectParam.activeSheet) {
+			this.workbook.setActiveById(oRedoObjectParam.activeSheet);
+		}
 	}
 
 
@@ -566,7 +581,10 @@ CHistory.prototype._addRedoObjectParam = function (oRedoObjectParam, Point) {
 		oRedoObjectParam.bAddRemoveRowCol = true;
 	else if(AscCommonExcel.g_oUndoRedoAutoFilters === Point.Class && AscCH.historyitem_AutoFilter_ChangeTableInfo === Point.Type)
 		oRedoObjectParam.oChangeWorksheetUpdate[Point.SheetId] = Point.SheetId;
-		
+
+	if (null != Point.SheetId) {
+		oRedoObjectParam.activeSheet = Point.SheetId;
+	}
 };
 CHistory.prototype.Get_RecalcData = function(Point2)
 {
@@ -925,16 +943,6 @@ CHistory.prototype.GetSerializeArray = function()
 		aRes.push(aPointChanges);
 	}
 	return aRes;
-};
-//функция, которая перемещает последнее действие на первую позицию(в текущей точке)
-CHistory.prototype.ChangeActionsEndToStart = function()
-{
-	var curPoint = this.Points[this.Index];
-	if(curPoint && curPoint.Items.length > 0)
-	{
-		var endAction = curPoint.Items.pop();
-		curPoint.Items.unshift(endAction);
-	}
 };
 CHistory.prototype.loadFonts = function (fonts) {
     for (var i = 0; i < fonts.length; ++i) {

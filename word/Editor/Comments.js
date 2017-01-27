@@ -932,7 +932,7 @@ ParaComment.prototype =
         return false;
     },
 
-    Get_ParaContentPos : function(bSelection, bStart, ContentPos)
+    Get_ParaContentPos : function(bSelection, bStart, ContentPos, bUseCorrection)
     {
     },
 

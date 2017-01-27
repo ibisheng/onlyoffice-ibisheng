@@ -856,6 +856,9 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
             }
             else
             {
+            	while (CurPos < this.Content.length && para_Drawing === this.Content[CurPos].Type && false === this.Content[CurPos].Is_Inline())
+					CurPos++;
+
                 if (CurPos >= this.Content.length || para_End === this.Content[CurPos].Type)
                     return false;
 
@@ -3522,9 +3525,9 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
                 PRSC.Range.W += Item.Get_Width();
                 PRSC.Range.W += PRSC.SpaceLen;
 
-                // Учитываем только слова и пробелы, идущие после последнего таба
+				// Учитываем только слова и пробелы, идущие после последнего таба
 
-                PRSC.LettersSkip += PRSC.Letters;
+				PRSC.LettersSkip += PRSC.Letters;
                 PRSC.SpacesSkip  += PRSC.Spaces;
 
                 PRSC.Words   = 0;
@@ -5259,7 +5262,7 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
     return Result;
 };
 
-ParaRun.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos)
+ParaRun.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos, bUseCorrection)
 {
     var Pos = ( true !== bSelection ? this.State.ContentPos : ( false !== bStart ? this.State.Selection.StartPos : this.State.Selection.EndPos ) );
     ContentPos.Add(Pos);

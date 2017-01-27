@@ -6751,7 +6751,46 @@
 
         return false;
     };
-
+	
+	//нужно ли спрашивать пользователя о расширении диапазона
+	WorksheetView.prototype.getSelectionSortInfo = function () {
+		//в случае попытки сортировать мультиселект, необходимо выдавать ошибку
+		var arn = this.model.selectionRange.getLast().clone(true);
+		
+		//null - не выдавать сообщение и не расширять, false - не выдавать сообщение и расширЯть, true - выдавать сообщение
+		var bResult = false;
+		//в случае одной выделенной ячейки - всегда не выдаём сообщение и автоматически расширяем
+		if(!arn.isOneCell())
+		{
+			var colCount = arn.c2 - arn.c1 + 1;
+			var rowCount = arn.r2 - arn.r1 + 1;
+			//если выделено более одного столбца и более одной строки - не выдаем сообщение и не расширяем
+			if(colCount > 1 && rowCount > 1)
+			{
+				bResult = null;
+			}
+			else
+			{
+				//далее проверяем есть ли смежные ячейки у startCol/startRow
+				var activeCell = this.model.selectionRange.activeCell;
+				var activeCellRange = new Asc.Range(activeCell.col, activeCell.row, activeCell.col, activeCell.row);
+				var expandRange = this.model.autoFilters._getAdjacentCellsAF(activeCellRange);
+				
+				//если диапазон не расширяется за счет близлежащих ячеек - не выдаем сообщение и не расширяем
+				if(arn.isEqual(expandRange) || activeCellRange.isEqual(expandRange))
+				{
+					bResult = null;
+				}
+				else
+				{
+					bResult = true;
+				}
+			}
+		}
+		
+		return bResult;
+	};
+	
     WorksheetView.prototype.getSelectionMathInfo = function () {
         var oSelectionMathInfo = new asc_CSelectionMathInfo();
         var sum = 0;
@@ -7205,7 +7244,7 @@
         this.model.workbook.handlers.trigger( "asc_onHideComment" );
         this._updateSelectionNameAndInfo();
     };
-    WorksheetView.prototype.setSelectionUndoRedo = function (range, validRange) {
+    WorksheetView.prototype.setSelection = function (range, validRange) {
         // Проверка на валидность range.
         if (validRange && (range.c2 >= this.nColsCount || range.r2 >= this.nRowsCount)) {
             if (range.c2 >= this.nColsCount) {
@@ -11503,7 +11542,7 @@
 
                     //updates
                     if (styleName && addNameColumn) {
-                        t.setSelectionUndoRedo(filterRange);
+                        t.setSelection(filterRange);
                     }
                     t._onUpdateFormatTable(filterRange, !!(styleName), true);
 
@@ -11822,7 +11861,7 @@
 
     };
 
-    WorksheetView.prototype.sortColFilter = function (type, cellId, displayName, color) {
+    WorksheetView.prototype.sortRange = function (type, cellId, displayName, color, bIsExpandRange) {
         var t = this;
         var ar = this.model.selectionRange.getLast().clone();
         var onChangeAutoFilterCallback = function (isSuccess) {
@@ -11846,12 +11885,26 @@
                 t._onUpdateFormatTable(sortProps.sortRange.bbox, false);
                 History.EndTransaction();
             };
-
-            if (null === sortProps) {
-                var rgbColor = color ?
-                  new AscCommonExcel.RgbColor((color.asc_getR() << 16) + (color.asc_getG() << 8) + color.asc_getB()) :
-                  null;
-                t.setSelectionInfo("sort", type, null, null, rgbColor);
+			
+			if (null === sortProps) {
+				var rgbColor = color ?  new AscCommonExcel.RgbColor((color.asc_getR() << 16) + (color.asc_getG() << 8) + color.asc_getB()) : null;
+				
+				//expand selectionRange
+				if(bIsExpandRange)
+				{
+					var selectionRange = t.model.selectionRange;
+					var activeCell = selectionRange.activeCell;
+					var activeCellRange = new Asc.Range(activeCell.col, activeCell.row, activeCell.col, activeCell.row);
+					var expandRange = t.model.autoFilters._getAdjacentCellsAF(activeCellRange);
+					
+					//change selection
+					t.setSelection(expandRange);
+				}
+				
+				//sort
+				t.setSelectionInfo("sort", type, null, null, rgbColor);
+				//TODO возможно стоит возвратить selection обратно
+			
             } else if (false !== sortProps) {
                 t._isLockedCells(sortProps.sortRange.bbox, /*subType*/null, onSortAutoFilterCallBack);
             }
@@ -11924,7 +11977,7 @@
         }
 
         if (!this.model.selectionRange.getLast().isEqual(range)) {
-            this.setSelectionUndoRedo(range);
+            this.setSelection(range);
         }
 
         var i, r = range.r1, bIsUpdate = false, w;
@@ -12626,7 +12679,7 @@
                 if (tablePart.Ref.intersection(activeRange)) {
                     if (t.model.autoFilters._activeRangeContainsTablePart(activeRange, tablePart.Ref)) {
                         var newActiveRange = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2, tablePart.Ref.r2);
-                        t.setSelectionUndoRedo(newActiveRange);
+                        t.setSelection(newActiveRange);
                     }
 
                     break;
@@ -12640,7 +12693,7 @@
                     if (tableParts[i].HeaderRowCount !== 0 && tableParts[i].Ref.containsRange(activeRange) && tableParts[i].Ref.r1 === activeRange.r1) {
                         var newActiveRange = new Asc.Range(activeRange.c1, activeRange.r1, activeRange.c1, tableParts[i].Ref.r2);
                         if (!activeRange.isEqual(newActiveRange)) {
-                            t.setSelectionUndoRedo(newActiveRange);
+                            t.setSelection(newActiveRange);
                         }
                         break;
                     }
@@ -12759,7 +12812,7 @@
             }
         }
 
-        t.setSelectionUndoRedo(new Asc.Range(startCol, startRow, endCol, endRow));
+        t.setSelection(new Asc.Range(startCol, startRow, endCol, endRow));
     };
 
     WorksheetView.prototype.af_changeFormatTableInfo = function (tableName, optionType, val) {
@@ -12788,7 +12841,7 @@
                     var endRow = newTableRef.r2 < ar.r2 ? newTableRef.r2 : ar.r2;
                     var newActiveRange = new Asc.Range(ar.c1, startRow, ar.c2, endRow);
 
-                    t.setSelectionUndoRedo(newActiveRange);
+                    t.setSelection(newActiveRange);
                     History.SetSelectionRedo(newActiveRange);
                 }
 

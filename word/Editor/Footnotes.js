@@ -987,6 +987,7 @@ CFootnotesController.prototype.Set_CurrentElement = function(bUpdateStates, Page
 			this.LogicDocument.Selection.Start = false;
 		}
 
+		var bNeedRedraw = this.LogicDocument.Get_DocPosType() === docpostype_HdrFtr;
 		this.LogicDocument.Set_DocPosType(docpostype_Footnotes);
 
 		if (false != bUpdateStates)
@@ -994,6 +995,12 @@ CFootnotesController.prototype.Set_CurrentElement = function(bUpdateStates, Page
 			this.LogicDocument.Document_UpdateInterfaceState();
 			this.LogicDocument.Document_UpdateRulersState();
 			this.LogicDocument.Document_UpdateSelectionState();
+		}
+
+		if (bNeedRedraw)
+		{
+			this.LogicDocument.DrawingDocument.ClearCachePages();
+			this.LogicDocument.DrawingDocument.FirePaint();
 		}
 	}
 };

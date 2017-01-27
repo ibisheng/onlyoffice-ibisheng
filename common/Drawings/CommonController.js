@@ -1259,7 +1259,7 @@ DrawingObjectsController.prototype =
 
 
 
-    isPointInDrawingObjects3: function(x, y)
+    isPointInDrawingObjects3: function(x, y, nPageIndex, bSelected, bText)
     {
         var oOldState = this.curState;
         this.changeCurrentState(new AscFormat.NullState(this));
@@ -1270,12 +1270,18 @@ DrawingObjectsController.prototype =
         if(AscCommon.isRealObject(oResult)){
             if(oResult.cursorType !== "text"){
                 var object = g_oTableId.Get_ById(oResult.objectId);
-                if(AscCommon.isRealObject(object) && (object.selected) ){
+                if(AscCommon.isRealObject(object)
+                    && ((bSelected && object.selected) ||  !bSelected) ){
                     bRet = true;
                 }
                 else
                 {
                     return false;
+                }
+            }
+            else{
+                if(bText){
+                    return true;
                 }
             }
         }
@@ -1517,6 +1523,22 @@ DrawingObjectsController.prototype =
                 tx = oInvertTransform.TransformPointX(x, y);
                 ty = oInvertTransform.TransformPointY(x, y);
                 return oTragetDocContent.Get_NearestPos(0, tx, ty, false);
+            }
+        }
+        return null;
+    },
+
+    getNearestPos2: function(x, y){
+        var oTragetDocContent = this.getTargetDocContent(false, false);
+        if(oTragetDocContent){
+            var tx = x, ty = y;
+            var oTransform = oTragetDocContent.Get_ParentTextTransform();
+            if(oTransform){
+                var oInvertTransform = AscCommon.global_MatrixTransformer.Invert(oTransform);
+                tx = oInvertTransform.TransformPointX(x, y);
+                ty = oInvertTransform.TransformPointY(x, y);
+                var oNearestPos = oTragetDocContent.Get_NearestPos(0, tx, ty, false);
+                return oNearestPos;
             }
         }
         return null;
@@ -4585,6 +4607,14 @@ DrawingObjectsController.prototype =
 			case c_oAscChartTypeSettings.scatterSmooth:
 			case c_oAscChartTypeSettings.scatterSmoothMarker:
 				return AscFormat.CreateScatterChart(chartSeries, bUseCache, options);
+            case c_oAscChartTypeSettings.surfaceNormal:
+                return AscFormat.CreateSurfaceChart(chartSeries, bUseCache, options, false, false);
+            case c_oAscChartTypeSettings.surfaceWireframe:
+                return AscFormat.CreateSurfaceChart(chartSeries, bUseCache, options, false, true);
+            case c_oAscChartTypeSettings.contourNormal:
+                return AscFormat.CreateSurfaceChart(chartSeries, bUseCache, options, true, false);
+            case c_oAscChartTypeSettings.contourWireframe:
+                return AscFormat.CreateSurfaceChart(chartSeries, bUseCache, options, true, true);
 			// radar return CreateRadarChart(chartSeries);
 		}
 

@@ -60,6 +60,28 @@
 			Slide		: 4
 		};
 
+	function MobileTouchContextMenuLastInfo()
+	{
+		this.targetPos 				= null;
+		this.selectText 			= null;
+		this.selectCell 			= null;
+		this.objectBounds 			= null;
+		this.objectSlideThumbnail 	= null;
+	}
+	MobileTouchContextMenuLastInfo.prototype =
+	{
+		Clear : function()
+		{
+			this.targetPos 				= null;
+			this.selectText 			= null;
+			this.selectCell 			= null;
+			this.objectBounds 			= null;
+			this.objectSlideThumbnail 	= null;
+		}
+	};
+
+	AscCommon.MobileTouchContextMenuLastInfo = MobileTouchContextMenuLastInfo;
+
 	AscCommon.MOBILE_SELECT_TRACK_ROUND = 14;
 	AscCommon.MOBILE_TABLE_RULER_DIAMOND = 7;
 
@@ -126,13 +148,17 @@
 	CMobileDelegateSimple.prototype.SetZoom = function(_value)
 	{
 	};
-	CMobileDelegateSimple.prototype.GetObjectTrack = function(x, y, page)
+	CMobileDelegateSimple.prototype.GetObjectTrack = function(x, y, page, bSelected, bText)
 	{
 		return false;
 	};
 	CMobileDelegateSimple.prototype.GetContextMenuType = function()
 	{
 		return AscCommon.MobileTouchContextMenuType.None;
+	};
+	CMobileDelegateSimple.prototype.GetContextMenuInfo = function(info)
+	{
+		info.Clear();
 	};
 	CMobileDelegateEditor.prototype.GetContextMenuPosition = function()
 	{
@@ -149,6 +175,10 @@
 	CMobileDelegateSimple.prototype.GetScrollerSize = function()
 	{
 		return { W : 100, H : 100 };
+	};
+	CMobileDelegateSimple.prototype.GetScrollPosition = function()
+	{
+		return null;
 	};
 	CMobileDelegateSimple.prototype.ScrollTo = function(_scroll)
 	{
@@ -217,9 +247,9 @@
 	{
 		this.HtmlPage.m_oApi.zoom(_value);
 	};
-	CMobileDelegateEditor.prototype.GetObjectTrack = function(x, y, page)
+	CMobileDelegateEditor.prototype.GetObjectTrack = function(x, y, page, bSelected, bText)
 	{
-		return this.LogicDocument.DrawingObjects.isPointInDrawingObjects3(x, y, page);
+		return this.LogicDocument.DrawingObjects.isPointInDrawingObjects3(x, y, page, bSelected, bText);
 	};
 	CMobileDelegateEditor.prototype.GetContextMenuType = function()
 	{
@@ -235,6 +265,81 @@
 			_mode = AscCommon.MobileTouchContextMenuType.Object;
 
 		return _mode;
+	};
+	CMobileDelegateEditor.prototype.GetContextMenuInfo = function(info)
+	{
+		info.Clear();
+		var _info = null;
+		var _transform = null;
+
+		var _x = 0;
+		var _y = 0;
+
+		var _target = this.LogicDocument.Is_SelectionUse();
+		if (_target === false)
+		{
+			_info = {
+				X : this.DrawingDocument.m_dTargetX,
+				Y : this.DrawingDocument.m_dTargetY,
+				Page : this.DrawingDocument.m_lTargetPage
+			};
+
+			_transform = this.DrawingDocument.TextMatrix;
+			if (_transform)
+			{
+				_x = _transform.TransformPointX(_info.X, _info.Y);
+				_y = _transform.TransformPointY(_info.X, _info.Y);
+
+				_info.X = _x;
+				_info.Y = _y;
+			}
+			info.targetPos = _info;
+		}
+
+		var _select = this.LogicDocument.Get_SelectionBounds();
+		if (_select)
+		{
+			var _rect1 = _select.Start;
+			var _rect2 = _select.End;
+
+			_info = {
+				X1 : _rect1.X,
+				Y1 : _rect1.Y,
+				Page1 : _rect1.Page,
+				X2 : _rect2.X + _rect2.W,
+				Y2 : _rect2.Y + _rect2.H,
+				Page2 : _rect2.Page
+			};
+
+			_transform = this.DrawingDocument.SelectionMatrix;
+
+			if (_transform)
+			{
+				_x = _transform.TransformPointX(_info.X1, _info.Y1);
+				_y = _transform.TransformPointY(_info.X1, _info.Y1);
+				_info.X1 = _x;
+				_info.Y1 = _y;
+
+				_x = _transform.TransformPointX(_info.X2, _info.Y2);
+				_y = _transform.TransformPointY(_info.X2, _info.Y2);
+				_info.X2 = _x;
+				_info.Y2 = _y;
+			}
+
+			info.selectText = _info;
+		}
+
+		var _object_bounds = this.LogicDocument.DrawingObjects.getSelectedObjectsBounds();
+		if ((0 == _mode) && _object_bounds)
+		{
+			info.selectBounds = {
+				X : _object_bounds.minX,
+				Y : _object_bounds.minY,
+				R : _object_bounds.maxX,
+				B : _object_bounds.maxY,
+				Page : _object_bounds.pageIndex
+			};
+		}
 	};
 	CMobileDelegateEditor.prototype.GetContextMenuPosition = function()
 	{
@@ -473,6 +578,8 @@
 
 		/* context menu */
 		this.ContextMenuLastMode 		= AscCommon.MobileTouchContextMenuType.None;
+		this.ContextMenuLastInfo 		= new AscCommon.MobileTouchContextMenuLastInfo();
+
 		this.ContextMenuLastModeCounter = 0;
 		this.ContextMenuShowTimerId 	= -1;
 
@@ -492,33 +599,6 @@
 		this.eventsElement = _id;
 		this.iScroll.eventsElement = this.eventsElement;
 		this.iScroll._initEvents();
-
-		// затачиваемся на конкретные div в интерфейсе ( потом переделать? )
-		var _arrayElements = [];
-		var _testElem = document.getElementById("editor-navbar");
-		if (_testElem)
-			_arrayElements.push(_testElem);
-		_testElem = document.getElementById("cell-editing-box");
-		if (_testElem)
-			_arrayElements.push(_testElem);
-		_testElem = document.getElementsByClassName("statusbar")[0];
-		if (_testElem)
-			_arrayElements.push(_testElem);
-
-		for (var i = _arrayElements.length - 1; i >= 0; i--)
-		{
-			_arrayElements[i].onmousedown = _arrayElements[i]["ontouchstart"] =
-				_arrayElements[i].onmousemove = _arrayElements[i]["ontouchmove"] =
-					_arrayElements[i].onmouseup = _arrayElements[i]["ontouchend"] =
-						_arrayElements[i]["ontouchcancel"] = function(e) { AscCommon.stopEvent(e); };
-
-			/*
-			_arrayElements["onpointerdown"] = _arrayElements["onmspointerdown"] =
-				_arrayElements["onpointermove"] = _arrayElements["onmspointermove"] =
-					_arrayElements["onpointerup"] = _arrayElements["onmspointerup"] =
-						_arrayElements[i]["onpointercancel"] = _arrayElements[i]["onmspointercancel"] = function(e) { AscCommon.stopEvent(e); };
-			*/
-		}
 	};
 
 	// создание вспомогательного элемента, для прокрутки. по идее потом можно изменить
@@ -847,10 +927,8 @@
 	CMobileTouchManagerBase.prototype.CheckObjectTrack = function()
 	{
 		var pos = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
-
-		var dKoef                     = (100 * AscCommon.g_dKoef_pix_to_mm / this.delegate.GetZoom());
 		global_mouseEvent.KoefPixToMM = 5;
-		if (this.delegate.GetObjectTrack(pos.X, pos.Y, pos.Page))
+		if (this.delegate.GetObjectTrack(pos.X, pos.Y, pos.Page, true))
 		{
 			this.Mode      = AscCommon.MobileTouchMode.FlowObj;
 		}
@@ -861,6 +939,23 @@
 		global_mouseEvent.KoefPixToMM = 1;
 
 		return (AscCommon.MobileTouchMode.FlowObj == this.Mode);
+	};
+
+	CMobileTouchManagerBase.prototype.CheckObjectTrackBefore = function()
+	{
+		var pos = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
+		global_mouseEvent.KoefPixToMM = 5;
+		var bResult = this.delegate.GetObjectTrack(pos.X, pos.Y, pos.Page, false);
+		global_mouseEvent.KoefPixToMM = 1;
+		return bResult;
+	};
+	CMobileTouchManagerBase.prototype.CheckObjectText = function()
+	{
+		var pos = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
+		global_mouseEvent.KoefPixToMM = 5;
+		var bResult = this.delegate.GetObjectTrack(pos.X, pos.Y, pos.Page, false, true);
+		global_mouseEvent.KoefPixToMM = 1;
+		return bResult;
 	};
 
 	// в мобильной версии - меньше, чем "по ширине" - не делаем
@@ -893,7 +988,8 @@
 			this.iScroll.scroller.style.width = _size.W + "px";
 			this.iScroll.scroller.style.height = _size.H + "px";
 
-			this.iScroll.refresh(true);
+			var _position = this.delegate.GetScrollPosition();
+			this.iScroll.refresh(_position);
 		}
 	};
 
@@ -934,7 +1030,7 @@
 		}, 500);
 	};
 
-	CMobileTouchManagerBase.prototype.CheckContextMenuTouchEnd = function(isCheck)
+	CMobileTouchManagerBase.prototype.CheckContextMenuTouchEnd = function(isCheck, isSelectTouch)
 	{
 		// isCheck: если пришли сюда после скролла или зума (или их анимации) - то не нужно проверять состояние редактора.
 		// Нужно проверять последнее сохраненной состояние
@@ -953,6 +1049,142 @@
 			}
 
 			this.ContextMenuLastMode = _mode;
+		}
+
+		if (this.ContextMenuLastMode > AscCommon.MobileTouchContextMenuType.None && 1 == this.ContextMenuLastModeCounter)
+			this.SendShowContextMenu();
+	};
+
+	CMobileTouchManagerBase.prototype.CheckContextMenuTouchEndNew = function(isCheck, isSelectTouch)
+	{
+		// isCheck: если пришли сюда после скролла или зума (или их анимации) - то не нужно проверять состояние редактора.
+		// Нужно проверять последнее сохраненной состояние
+
+		var isShowContextMenu = false;
+		var isSelectCell = false;
+		if (isCheck)
+		{
+			var oldLastInfo = this.ContextMenuLastInfo;
+			var oldLasdMode = this.ContextMenuLastMode;
+
+			this.ContextMenuLastMode = this.delegate.GetContextMenuType();
+			this.delagate.GetContextMenuInfo(this.ContextMenuLastInfo);
+
+			var _data1 = null;
+			var _data2 = null;
+
+			if (this.ContextMenuLastMode == oldLasdMode)
+			{
+				var isEqual = false;
+				switch (this.ContextMenuLastMode)
+				{
+					case AscCommon.MobileTouchContextMenuType.Target:
+					{
+						_data1 = this.ContextMenuLastInfo.targetPos;
+						_data2 = oldLastInfo.targetPos;
+
+						if (_data1 && _data2)
+						{
+							if (_data1.Page == _data1.Page &&
+								Math.abs(_data1.X - _data2.X) < 10 &&
+								Math.abs(_data1.Y - _data2.Y) < 10)
+							{
+								isEqual = true;
+							}
+						}
+
+						break;
+					}
+					case AscCommon.MobileTouchContextMenuType.Select:
+					{
+						_data1 = this.ContextMenuLastInfo.selectText;
+						_data2 = oldLastInfo.selectText;
+
+						if (_data1 && _data2)
+						{
+							if (_data1.Page1 == _data2.Page1 && _data1.Page2 == _data2.Page2 &&
+								Math.abs(_data1.X1 - _data2.X1) < 0.1 &&
+								Math.abs(_data1.Y1 - _data2.Y1) < 0.1 &&
+								Math.abs(_data1.X2 - _data2.X2) < 0.1 &&
+								Math.abs(_data1.Y2 - _data2.Y2) < 0.1)
+							{
+								isEqual = true;
+							}
+						}
+						else
+						{
+							_data1 = this.ContextMenuLastInfo.selectCell;
+							_data2 = oldLastInfo.selectCell;
+
+							if (_data1 && _data2)
+							{
+								isSelectCell = true;
+								if (Math.abs(_data1.X - _data2.X) < 0.1 &&
+									Math.abs(_data1.Y - _data2.Y) < 0.1 &&
+									Math.abs(_data1.W - _data2.W) < 0.1 &&
+									Math.abs(_data1.H - _data2.H) < 0.1)
+								{
+									isEqual = true;
+								}
+							}
+						}
+
+						break;
+					}
+					case AscCommon.MobileTouchContextMenuType.Object:
+					{
+						_data1 = this.ContextMenuLastInfo.objectBounds;
+						_data2 = oldLastInfo.objectBounds;
+
+						if (_data1 && _data2)
+						{
+							if (_data1.Page == _data2.Page &&
+								Math.abs(_data1.X - _data2.X) < 0.1 &&
+								Math.abs(_data1.Y - _data2.Y) < 0.1 &&
+								Math.abs(_data1.R - _data2.R) < 0.1 &&
+								Math.abs(_data1.B - _data2.B) < 0.1)
+							{
+								isEqual = true;
+							}
+						}
+
+						break;
+					}
+					case AscCommon.MobileTouchContextMenuType.Slide:
+					{
+						_data1 = this.ContextMenuLastInfo.objectSlideThumbnail;
+						_data2 = oldLastInfo.objectSlideThumbnail;
+
+						if (_data1 && _data2)
+						{
+							if (_data1.Slide == _data2.Slide)
+								isEqual = true;
+						}
+						else
+						{
+							isEqual = true;
+						}
+
+						break;
+					}
+					default:
+						break;
+				}
+			}
+
+			if (this.ContextMenuLastMode == oldLasdMode)
+			{
+				this.ContextMenuLastModeCounter++;
+				this.ContextMenuLastModeCounter &= 0x01;
+			}
+			else
+			{
+				this.ContextMenuLastModeCounter = 0;
+			}
+		}
+		else
+		{
+
 		}
 
 		if (this.ContextMenuLastMode > AscCommon.MobileTouchContextMenuType.None && 1 == this.ContextMenuLastModeCounter)
@@ -1597,10 +1829,9 @@
 
 		this.delegate.DrawingDocument.NeedScrollToTargetFlag = true;
 		var y = nearPos.Y;
-		if (isHalfHeight)
-			y += nearPos.Height / 2;
-		this.delegate.Logic_OnMouseDown(global_mouseEvent, nearPos.X, y, pos.Page);
-		this.delegate.Logic_OnMouseUp(global_mouseEvent, nearPos.X, y, pos.Page);
+
+		nearPos.Paragraph.Parent.MoveCursorToNearestPos(nearPos);
+        this.delegate.LogicDocument.Document_UpdateSelectionState();
 		this.delegate.DrawingDocument.NeedScrollToTargetFlag = false;
 
 		global_mouseEvent.ClickCount = old_click_count;

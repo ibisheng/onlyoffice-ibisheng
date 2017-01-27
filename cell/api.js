@@ -446,9 +446,9 @@ var editor;
     ws.reapplyAutoFilter(displayName);
   };
 
-  spreadsheet_api.prototype.asc_sortColFilter = function(type, cellId, displayName, color) {
+  spreadsheet_api.prototype.asc_sortColFilter = function(type, cellId, displayName, color, bIsExpandRange) {
     var ws = this.wb.getWorksheet();
-    ws.sortColFilter(type, cellId, displayName, color);
+    ws.sortRange(type, cellId, displayName, color, bIsExpandRange);
   };
 
   spreadsheet_api.prototype.asc_getAddFormatTableOptions = function(range) {
@@ -1995,7 +1995,7 @@ var editor;
     }
 
     ws = this.wb.getWorksheet();
-    d = ws.setSelectionUndoRedo(d[0].getBBox0(), true);
+    d = ws.setSelection(d[0].getBBox0(), true);
     if (d.deltaX) {
       this.controller.scrollHorizontal(d.deltaX);
     }
@@ -2086,7 +2086,12 @@ var editor;
   spreadsheet_api.prototype.asc_mergeCellsDataLost = function(options) {
     return this.wb.getWorksheet().getSelectionMergeInfo(options);
   };
-
+  
+  //нужно ли спрашивать пользователя о расширении диапазона
+  spreadsheet_api.prototype.asc_sortCellsRangeExpand = function() {
+    return this.wb.getWorksheet().getSelectionSortInfo();
+  };
+  
   spreadsheet_api.prototype.asc_getSheetViewSettings = function() {
     return this.wb.getWorksheet().getSheetViewSettings();
   };

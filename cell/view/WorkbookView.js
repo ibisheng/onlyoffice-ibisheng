@@ -930,7 +930,7 @@
   WorkbookView.prototype._onSetSelection = function(range, validRange) {
     var ws = this.getWorksheet();
     ws._checkSelectionShape();
-    var d = ws.setSelectionUndoRedo(range, validRange);
+    var d = ws.setSelection(range, validRange);
     this.controller.scroll(d);
   };
 
@@ -2246,7 +2246,7 @@
     }
 
     if (result) {
-      return ws.setSelectionUndoRedo(result);
+      return ws.setSelection(result);
     }
     this._cleanFindResults();
     return null;

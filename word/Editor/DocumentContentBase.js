@@ -272,3 +272,17 @@ CDocumentContentBase.prototype.GotoFootnoteRef = function(isNext, isCurrent)
 
 	return false;
 };
+CDocumentContentBase.prototype.MoveCursorToNearestPos = function(oNearestPos)
+{
+	var oPara = oNearestPos.Paragraph;
+	var oParent = oPara.Parent;
+	if (oParent)
+	{
+		var oTopDocument = oParent.Is_TopDocument(true);
+		if (oTopDocument)
+			oTopDocument.Selection_Remove();
+	}
+
+	oPara.Set_ParaContentPos(oNearestPos.ContentPos, true, -1, -1);
+	oPara.Document_SetThisElementCurrent(true);
+};

@@ -1116,6 +1116,14 @@
 		return output;
 	}
 
+	function getSqRefString(ranges) {
+		var refs = [];
+		for (var i = 0; i < ranges.length; ++i) {
+			refs.push(ranges[i].getName());
+		}
+		return refs.join(' ');
+	}
+
     /** @constructor */
     function BinaryTableWriter(memory, aDxfs, isCopyPaste)
     {
@@ -2437,9 +2445,12 @@
                 oBinaryTableWriter = new BinaryTableWriter(this.memory, this.aDxfs, this.isCopyPaste);
                 this.bs.WriteItem(c_oSerWorksheetsTypes.TableParts, function(){oBinaryTableWriter.Write(ws.TableParts);});
             }
-            if (ws.aSparklineGroups.length > 0) {
+			if (ws.aSparklineGroups.length > 0) {
                 this.bs.WriteItem(c_oSerWorksheetsTypes.SparklineGroups, function(){oThis.WriteSparklineGroups(ws.aSparklineGroups);});
             }
+			for (var i = 0; i < ws.aConditionalFormatting.length; ++i) {
+				this.bs.WriteItem(c_oSerWorksheetsTypes.ConditionalFormatting, function(){oThis.WriteConditionalFormatting(ws.aConditionalFormatting[i]);});
+			}
         };
         this.WriteWorksheetProp = function(ws, index)
         {
@@ -2642,11 +2653,7 @@
 			}
 			//this.bs.WriteItem(c_oSer_Selection.Pane, function(){oThis.memory.WriteByte();});
 			if (null != selectionRange.ranges) {
-				var refs = [];
-				for (var i = 0; i < selectionRange.ranges.length; ++i) {
-					refs.push(selectionRange.ranges[i].getName());
-				}
-				var sqref = refs.join(' ');
+				var sqref = getSqRefString(selectionRange.ranges);
 				this.bs.WriteItem(c_oSer_Selection.Sqref, function(){oThis.memory.WriteString3(sqref);});
 			}
 		};
@@ -3637,6 +3644,140 @@
             for(var i = 0, length = aReplies.length; i < length; ++i)
                 this.bs.WriteItem( c_oSer_CommentData.Reply, function(){oThis.WriteCommentData(aReplies[i]);});
         };
+		this.WriteConditionalFormatting = function(oCf)
+		{
+			var oThis = this;
+			if (null != oCf.pivot) {
+				this.bs.WriteItem(c_oSer_ConditionalFormatting.Pivot, function() {oThis.memory.WriteBool(oCf.pivot);});
+			}
+			if (null != oCf.ranges) {
+				var sqref = getSqRefString(oCf.ranges);
+				this.bs.WriteItem(c_oSer_ConditionalFormatting.SqRef, function() {oThis.memory.WriteString3(sqref);});
+			}
+			for (var i = 0; i < oCf.aRules.length; ++i) {
+				this.bs.WriteItem(c_oSer_ConditionalFormatting.ConditionalFormattingRule, function() {oThis.WriteConditionalFormattingRule(oCf.aRules[i]);});
+			}
+		};
+		this.WriteConditionalFormattingRule = function(rule) {
+			var oThis = this;
+			if (null != rule.aboveAverage) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingRule.AboveAverage, function() {oThis.memory.WriteBool(rule.aboveAverage);});
+			}
+			if (null != rule.bottom) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingRule.Bottom, function() {oThis.memory.WriteBool(rule.bottom);});
+			}
+			if (null != rule.dxf) {
+				var DxfId = this.aDxfs.length;
+				this.aDxfs.push(rule.dxf);
+				this.bs.WriteItem(c_oSer_ConditionalFormattingRule.DxfId, function() {oThis.memory.WriteLong(DxfId);});
+			}
+			if (null != rule.equalAverage) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingRule.EqualAverage, function() {oThis.memory.WriteBool(rule.equalAverage);});
+			}
+			if (null != rule.operator) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingRule.Operator, function() {oThis.memory.WriteByte(rule.operator);});
+			}
+			if (null != rule.percent) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingRule.Percent, function() {oThis.memory.WriteBool(rule.percent);});
+			}
+			if (null != rule.priority) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingRule.Priority, function() {oThis.memory.WriteLong(rule.priority);});
+			}
+			if (null != rule.rank) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingRule.Rank, function() {oThis.memory.WriteLong(rule.rank);});
+			}
+			if (null != rule.stdDev) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingRule.StdDev, function() {oThis.memory.WriteLong(rule.stdDev);});
+			}
+			if (null != rule.stopIfTrue) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingRule.StopIfTrue, function() {oThis.memory.WriteBool(rule.stopIfTrue);});
+			}
+			if (null != rule.text) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingRule.Text, function() {oThis.memory.WriteString3(rule.text);});
+			}
+			if (null != rule.timePeriod) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingRule.TimePeriod, function() {oThis.memory.WriteString3(rule.timePeriod);});
+			}
+			if (null != rule.type) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingRule.Type, function() {oThis.memory.WriteByte(rule.type);});
+			}
+			for (var i = 0; i < rule.aRuleElements.length; ++i) {
+				var elem = rule.aRuleElements[i];
+				if (elem instanceof AscCommonExcel.CColorScale) {
+					this.bs.WriteItem(c_oSer_ConditionalFormattingRule.ColorScale, function() {oThis.WriteColorScale(elem);});
+				} else if (elem instanceof AscCommonExcel.CDataBar) {
+					this.bs.WriteItem(c_oSer_ConditionalFormattingRule.DataBar, function() {oThis.WriteDataBar(elem);});
+				} else if (elem instanceof AscCommonExcel.CFormulaCF) {
+					this.bs.WriteItem(c_oSer_ConditionalFormattingRule.FormulaCF, function() {oThis.memory.WriteString3(elem.Text);});
+				} else if (elem instanceof AscCommonExcel.CIconSet) {
+					this.bs.WriteItem(c_oSer_ConditionalFormattingRule.IconSet, function() {oThis.WriteIconSet(elem);});
+				}
+			}
+		};
+		this.WriteColorScale = function(colorScale) {
+			var oThis = this;
+			var i, elem;
+			for (i = 0; i < colorScale.aCFVOs.length; ++i) {
+				elem = colorScale.aCFVOs[i];
+				this.bs.WriteItem(c_oSer_ConditionalFormattingRuleColorScale.CFVO, function() {oThis.WriteCFVO(elem);});
+			}
+			for (i = 0; i < colorScale.aColors.length; ++i) {
+				elem = colorScale.aColors[i];
+				this.bs.WriteItem(c_oSer_ConditionalFormattingRuleColorScale.Color, function() {oThis.bs.WriteColorSpreadsheet(elem);});
+			}
+		};
+		this.WriteDataBar = function(dataBar) {
+			var oThis = this;
+			var i, elem;
+			if (null != dataBar.MaxLength) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingDataBar.MaxLength, function() {oThis.memory.WriteLong(dataBar.MaxLength);});
+			}
+			if (null != dataBar.MinLength) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingDataBar.MinLength, function() {oThis.memory.WriteLong(dataBar.MinLength);});
+			}
+			if (null != dataBar.ShowValue) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingDataBar.ShowValue, function() {oThis.memory.WriteBool(dataBar.ShowValue);});
+			}
+			if (null != dataBar.Color) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingDataBar.Color, function() {oThis.bs.WriteColorSpreadsheet(dataBar.Color);});
+			}
+			for (i = 0; i < dataBar.aCFVOs.length; ++i) {
+				elem = dataBar.aCFVOs[i];
+				this.bs.WriteItem(c_oSer_ConditionalFormattingRuleColorScale.CFVO, function() {oThis.WriteCFVO(elem);});
+			}
+		};
+		this.WriteIconSet = function(iconSet) {
+			var oThis = this;
+			var i, elem;
+			if (null != iconSet.IconSet) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingIconSet.IconSet, function() {oThis.memory.WriteByte(iconSet.IconSet);});
+			}
+			if (null != iconSet.Percent) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingIconSet.Percent, function() {oThis.memory.WriteBool(iconSet.Percent);});
+			}
+			if (null != iconSet.Reverse) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingIconSet.Reverse, function() {oThis.memory.WriteBool(iconSet.Reverse);});
+			}
+			if (null != iconSet.ShowValue) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingIconSet.ShowValue, function() {oThis.memory.WriteBool(iconSet.ShowValue);});
+			}
+			for (i = 0; i < iconSet.aCFVOs.length; ++i) {
+				elem = iconSet.aCFVOs[i];
+				this.bs.WriteItem(c_oSer_ConditionalFormattingRuleColorScale.CFVO, function() {oThis.WriteCFVO(elem);});
+			}
+		};
+		this.WriteCFVO = function(cfvo) {
+			var oThis = this;
+			if (null != cfvo.Gte) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingValueObject.Gte, function() {oThis.memory.WriteBool(cfvo.Gte);});
+			}
+			if (null != cfvo.Type) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingValueObject.Type, function() {oThis.memory.WriteByte(cfvo.Type);});
+			}
+			if (null != cfvo.Val) {
+				this.bs.WriteItem(c_oSer_ConditionalFormattingValueObject.Val, function() {oThis.memory.WriteString3(cfvo.Val);});
+			}
+		};
 		this.WriteSparklineGroups = function(aSparklineGroups)
         {
             var oThis = this;
@@ -5604,7 +5745,9 @@
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadConditionalFormatting(t, l, oConditionalFormatting);
                 });
-                oWorksheet.aConditionalFormatting.push(oConditionalFormatting);
+				if (oConditionalFormatting.isValid()) {
+					oWorksheet.aConditionalFormatting.push(oConditionalFormatting);
+				}
             } else if (c_oSerWorksheetsTypes.SheetViews === type) {
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadSheetViews(t, l, oWorksheet.sheetViews);
@@ -6582,17 +6725,9 @@
 				selectionRange.activeCellId = this.stream.GetLong();
 			} else if (c_oSer_Selection.Sqref === type) {
 				var sqref = this.stream.GetString2LE(length);
-				var refs = sqref.split(' ');
-				var selectionOld = selectionRange.ranges;
-				selectionRange.ranges = [];
-				for (var i = 0; i < refs.length; ++i) {
-					var ref = AscCommonExcel.g_oRangeCache.getAscRange(refs[i]);
-					if (ref) {
-						selectionRange.ranges.push(ref.clone());
-					}
-				}
-				if (selectionRange.ranges.length === 0) {
-					selectionRange.ranges = selectionOld;
+				var selectionNew = AscCommonExcel.g_oRangeCache.getActiveRangesFromSqRef(sqref);
+				if (selectionNew.length > 0) {
+					selectionRange.ranges = selectionNew;
 				}
 			} else if (c_oSer_Selection.Pane === type) {
 				this.stream.GetUChar();

@@ -424,7 +424,11 @@
 		scatterNone            : 31,
 		scatterSmooth          : 32,
 		scatterSmoothMarker    : 33,
-		unknown                : 34
+		surfaceNormal          : 34,
+		surfaceWireframe       : 35,
+		contourNormal          : 36,
+		contourWireframe       : 37,
+		unknown                : 38
 	};
 
 
@@ -820,7 +824,7 @@
 		Shift: 1,
 		Move: 2,
 		Delete: 3,
-		Rebuild: 4,
+		RenameTableColumn: 4,
 		Changed: 5,
 		ChangeDefName: 6,
 		ChangeSheet: 7,
@@ -1420,7 +1424,7 @@
 	prot['Paragraph']                      = prot.Paragraph;
 	prot['TopMargin']                      = prot.TopMargin;
 	window['Asc']['c_oAscBorderStyles'] = window['AscCommon'].c_oAscBorderStyles = c_oAscBorderStyles;
-	prot                         = c_oAscPageOrientation;
+	prot                         = c_oAscBorderStyles;
 	prot['None']                 = prot.None;
 	prot['Double']               = prot.Double;
 	prot['Hair']                 = prot.Hair;

@@ -815,6 +815,9 @@ function CDrawingDocument()
 
 	this.OnRecalculatePage = function(index, pageObject)
 	{
+		if (this.m_oWordControl && this.m_oWordControl.MobileTouchManager)
+			this.m_oWordControl.MobileTouchManager.ClearContextMenu();
+
 		editor.sendEvent("asc_onDocumentChanged");
 
 		if (true === this.m_bIsSearching)
@@ -3874,7 +3877,8 @@ function CThumbnailsManager()
 		this.CalculatePlaces();
 		this.m_bIsUpdate = true;
 
-		this.SetFocusElement(FOCUS_OBJECT_THUMBNAILS);
+		if (!this.m_oWordControl.m_oApi.isMobileVersion)
+			this.SetFocusElement(FOCUS_OBJECT_THUMBNAILS);
 	}
 
 	this.CalculatePlaces = function()
@@ -3883,6 +3887,9 @@ function CThumbnailsManager()
 			return;
 
 		var word_control = this.m_oWordControl;
+
+		if (word_control && word_control.MobileTouchManagerThumbnails)
+			word_control.MobileTouchManagerThumbnails.ClearContextMenu();
 
 		var canvas = word_control.m_oThumbnails.HtmlElement;
 		if (null == canvas)
@@ -4855,6 +4862,9 @@ function CSlideDrawer()
 
 	this.BoundsChecker = new AscFormat.CSlideBoundsChecker();
 
+	this.CacheSlidePixW = 1;
+	this.CacheSlidePixH = 1;
+
 	this.bIsEmptyPresentation = false;
 	this.IsRecalculateSlide   = false;
 
@@ -4927,6 +4937,12 @@ function CSlideDrawer()
 		// теперь смотрим, используем ли кэш для скролла
 		var _need_pix_width  = this.BoundsChecker.Bounds.max_x - this.BoundsChecker.Bounds.min_x + 1 + 2 * this.SlideEps;
 		var _need_pix_height = this.BoundsChecker.Bounds.max_y - this.BoundsChecker.Bounds.min_y + 1 + 2 * this.SlideEps;
+
+		if (this.m_oWordControl.NoneRepaintPages)
+			return;
+
+		this.CacheSlidePixW = _need_pix_width;
+		this.CacheSlidePixH = _need_pix_height;
 
 		this.IsCached = false;
 		if (4 * _need_pix_width * _need_pix_height < this.CONST_MAX_SLIDE_CACHE_SIZE)
@@ -5020,15 +5036,32 @@ function CSlideDrawer()
 
 		if (this.IsCached)
 		{
-			var w_px = (_bounds.max_x - _bounds.min_x + 1 + 2 * this.SlideEps) >> 0;
-			var h_px = (_bounds.max_y - _bounds.min_y + 1 + 2 * this.SlideEps) >> 0;
+			if (!this.m_oWordControl.NoneRepaintPages)
+			{
+				var w_px = (_bounds.max_x - _bounds.min_x + 1 + 2 * this.SlideEps) >> 0;
+				var h_px = (_bounds.max_y - _bounds.min_y + 1 + 2 * this.SlideEps) >> 0;
 
-			if (w_px > this.CachedCanvas.width)
-				w_px = this.CachedCanvas.width;
-			if (h_px > this.CachedCanvas.height)
-				h_px = this.CachedCanvas.height;
+				if (w_px > this.CachedCanvas.width)
+					w_px = this.CachedCanvas.width;
+				if (h_px > this.CachedCanvas.height)
+					h_px = this.CachedCanvas.height;
 
-			outputCtx.drawImage(this.CachedCanvas, 0, 0, w_px, h_px, (_x >> 0) - this.SlideEps, (_y >> 0) - this.SlideEps, w_px, h_px);
+				outputCtx.drawImage(this.CachedCanvas, 0, 0, w_px, h_px, (_x >> 0) - this.SlideEps, (_y >> 0) - this.SlideEps, w_px, h_px);
+			}
+			else
+			{
+				var w_px = (_bounds.max_x - _bounds.min_x + 1 + 2 * this.SlideEps) >> 0;
+				var h_px = (_bounds.max_y - _bounds.min_y + 1 + 2 * this.SlideEps) >> 0;
+
+				var w_px_src = this.CacheSlidePixW;
+				var h_px_src = this.CacheSlidePixH;
+				if (w_px_src > this.CachedCanvas.width)
+					w_px_src = this.CachedCanvas.width;
+				if (h_px_src > this.CachedCanvas.height)
+					h_px_src = this.CachedCanvas.height;
+
+				outputCtx.drawImage(this.CachedCanvas, 0, 0, w_px_src, h_px_src, (_x >> 0) - this.SlideEps, (_y >> 0) - this.SlideEps, w_px, h_px);
+			}
 		}
 		else
 		{

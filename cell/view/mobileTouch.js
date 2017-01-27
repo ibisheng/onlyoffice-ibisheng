@@ -127,9 +127,9 @@ function (window, undefined)
 	{
 		return this.WB.element;
 	};
-	CMobileDelegateEditorCell.prototype.GetObjectTrack = function(x, y, page)
+	CMobileDelegateEditorCell.prototype.GetObjectTrack = function(x, y, page, bSelected, bText)
 	{
-		return this.WB.getWorksheet().objectRender.controller.isPointInDrawingObjects3(x, y, page);
+		return this.WB.getWorksheet().objectRender.controller.isPointInDrawingObjects3(x, y, page, bSelected, bText);
 	};
 	CMobileDelegateEditorCell.prototype.GetSelectionRectsBounds = function()
 	{
@@ -168,17 +168,105 @@ function (window, undefined)
 		var _mode = AscCommon.MobileTouchContextMenuType.None;
 
 		var _controller = this.WB.getWorksheet().objectRender.controller;
+		var _selection = this.WB.GetSelectionRectsBounds();
 
-		if (!_controller.Is_SelectionUse())
+		if (!_controller.Is_SelectionUse() && !_selection)
 			_mode = AscCommon.MobileTouchContextMenuType.Target;
 
-		if (_controller.Get_SelectionBounds())
+		if (_controller.Get_SelectionBounds() || _selection)
 			_mode = AscCommon.MobileTouchContextMenuType.Select;
 
 		if (_mode == 0 && _controller.getSelectedObjectsBounds())
 			_mode = AscCommon.MobileTouchContextMenuType.Object;
 
 		return _mode;
+	};
+	CMobileDelegateEditorCell.prototype.GetContextMenuInfo = function(info)
+	{
+		info.Clear();
+		var _info = null;
+		var _transform = null;
+
+		var _x = 0;
+		var _y = 0;
+
+		var _controller = this.WB.getWorksheet().objectRender.controller;
+		var _target = _controller.Is_SelectionUse();
+		var _selection = this.WB.GetSelectionRectsBounds();
+
+		if (!_target && !_selection)
+		{
+			_info = {
+				X : this.DrawingDocument.m_dTargetX,
+				Y : this.DrawingDocument.m_dTargetY,
+				Page : this.DrawingDocument.m_lTargetPage
+			};
+
+			_transform = this.DrawingDocument.TextMatrix;
+			if (_transform)
+			{
+				_x = _transform.TransformPointX(_info.X, _info.Y);
+				_y = _transform.TransformPointY(_info.X, _info.Y);
+
+				_info.X = _x;
+				_info.Y = _y;
+			}
+			info.targetPos = _info;
+		}
+
+		var _select = _controller.Get_SelectionBounds();
+		if (_select)
+		{
+			var _rect1 = _select.Start;
+			var _rect2 = _select.End;
+
+			_info = {
+				X1 : _rect1.X,
+				Y1 : _rect1.Y,
+				Page1 : _rect1.Page,
+				X2 : _rect2.X + _rect2.W,
+				Y2 : _rect2.Y + _rect2.H,
+				Page2 : _rect2.Page
+			};
+
+			_transform = this.DrawingDocument.SelectionMatrix;
+
+			if (_transform)
+			{
+				_x = _transform.TransformPointX(_info.X1, _info.Y1);
+				_y = _transform.TransformPointY(_info.X1, _info.Y1);
+				_info.X1 = _x;
+				_info.Y1 = _y;
+
+				_x = _transform.TransformPointX(_info.X2, _info.Y2);
+				_y = _transform.TransformPointY(_info.X2, _info.Y2);
+				_info.X2 = _x;
+				_info.Y2 = _y;
+			}
+
+			info.selectText = _info;
+		}
+		else if (_selection)
+		{
+			info.selectCell = {
+				X : _selection.X,
+				Y : _selection.Y,
+				W : _selection.W,
+				H : _selection.H
+			};
+		}
+
+		var _object_bounds = _controller.getSelectedObjectsBounds();
+		if ((0 == _mode) && _object_bounds)
+		{
+			info.selectBounds = {
+				X : _object_bounds.minX,
+				Y : _object_bounds.minY,
+				R : _object_bounds.maxX,
+				B : _object_bounds.maxY,
+				Page : _object_bounds.pageIndex
+			};
+		}
 	};
 	CMobileDelegateEditorCell.prototype.GetContextMenuPosition = function()
 	{
@@ -382,6 +470,7 @@ function (window, undefined)
 	{
 		var _e = e.touches ? e.touches[0] : e;
 		this.IsTouching = true;
+		AscCommon.g_inputContext.enableVirtualKeyboard();
 
 		global_mouseEvent.KoefPixToMM = 5;
 		AscCommon.check_MouseDownEvent(_e, true);
@@ -425,6 +514,30 @@ function (window, undefined)
 			}
 			default:
 				break;
+		}
+
+		var isPreventDefault = false;
+		switch (this.Mode)
+		{
+			case AscCommon.MobileTouchMode.Select: // in cell select too
+			case AscCommon.MobileTouchMode.InlineObj:
+			case AscCommon.MobileTouchMode.FlowObj:
+			case AscCommon.MobileTouchMode.Zoom:
+			case AscCommon.MobileTouchMode.TableMove:
+			{
+				isPreventDefault = true;
+				break;
+			}
+			case AscCommon.MobileTouchMode.None:
+			case AscCommon.MobileTouchMode.Scroll:
+			{
+				isPreventDefault = !this.CheckObjectText();
+				break;
+			}
+			default:
+			{
+				break;
+			}
 		}
 
 		switch (this.Mode)
@@ -533,14 +646,13 @@ function (window, undefined)
 			}
 		}
 
-		if (this.Api.isViewMode)
-		{
-			if (e.preventDefault)
-				e.preventDefault();
-			else
-				e.returnValue = false;
-			return false;
-		}
+		if (AscCommon.AscBrowser.isAndroid)
+			isPreventDefault = false;
+
+		if (this.Api.isViewMode || isPreventDefault)
+			AscCommon.stopEvent(e);
+
+		return false;
 	};
 	CMobileTouchManager.prototype.onTouchMove  = function(e)
 	{
@@ -644,6 +756,26 @@ function (window, undefined)
 		}
 
 		var isCheckContextMenuMode = true;
+		var isCheckContextMenuSelect = false;
+
+		var isPreventDefault = false;
+		switch (this.Mode)
+		{
+			case AscCommon.MobileTouchMode.Select:  // in cell select too
+			case AscCommon.MobileTouchMode.Scroll:
+			case AscCommon.MobileTouchMode.InlineObj:
+			case AscCommon.MobileTouchMode.FlowObj:
+			case AscCommon.MobileTouchMode.Zoom:
+			case AscCommon.MobileTouchMode.TableMove:
+			{
+				isPreventDefault = true;
+				break;
+			}
+			default:
+			{
+				break;
+			}
+		}
 
 		switch (this.Mode)
 		{
@@ -661,6 +793,10 @@ function (window, undefined)
 					this.delegate.Drawing_OnMouseDown(_e);
 					this.delegate.Drawing_OnMouseUp(_e);
 					this.Api.sendEvent("asc_onTapEvent", e);
+
+					var typeMenu = this.delegate.GetContextMenuType();
+					if (typeMenu == AscCommon.MobileTouchContextMenuType.Target)
+						isPreventDefault = false;
 				}
 				else
 				{
@@ -697,24 +833,21 @@ function (window, undefined)
 				this.DragSelect = 0;
 				this.Mode       = AscCommon.MobileTouchMode.None;
 				this.delegate.Drawing_OnMouseUp(_e);
-				AscCommon.stopEvent(e);
+				//AscCommon.stopEvent(e);
+				isCheckContextMenuSelect = true;
 				break;
 			}
 			default:
 				break;
 		}
 
-		if (this.Api.isViewMode)
-		{
-			if (e.preventDefault)
-				e.preventDefault();
-			else
-				e.returnValue = false;
-			return false;
-		}
+		if (this.Api.isViewMode || isPreventDefault)
+			AscCommon.g_inputContext.preventVirtualKeyboard(e);
 
 		if (true !== this.iScroll.isAnimating)
-			this.CheckContextMenuTouchEnd(isCheckContextMenuMode);
+			this.CheckContextMenuTouchEnd(isCheckContextMenuMode, isCheckContextMenuSelect);
+
+		return false;
 	};
 
 	CMobileTouchManager.prototype.mainOnTouchStart = function(e)

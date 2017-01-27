@@ -375,6 +375,8 @@ function IScroll (el, options) {
 
 	this.scrollTo(this.options.startX, this.options.startY);
 	this.enable();
+
+	this.isDown = false;
 }
 
 IScroll.prototype = {
@@ -720,7 +722,7 @@ IScroll.prototype = {
 		this.enabled = true;
 	},
 
-	refresh: function () {
+	refresh: function (_position) {
 		var rf = this.wrapper.offsetHeight;		// Force reflow
 
 		this.wrapperWidth	= this.wrapper.clientWidth;
@@ -756,6 +758,12 @@ IScroll.prototype = {
 		this.wrapperOffset = utils.offset(this.wrapper);
 
 		this._execEvent('refresh');
+
+		if (_position)
+		{
+			this.x = _position.X;
+			this.y = _position.Y;
+		}
 
 		this.resetPosition();
 
@@ -1632,18 +1640,23 @@ IScroll.prototype = {
 		step();
 	},
 	handleEvent: function (e) {
-		switch ( e.type ) {
+		switch ( e.type )
+		{
 			case 'touchstart':
 			case 'pointerdown':
 			case 'MSPointerDown':
 			case 'mousedown':
+				this.isDown = true;
 				this.eventsElement ? this.manager.mainOnTouchStart(e) : this._start(e);
 				break;
 			case 'touchmove':
 			case 'pointermove':
 			case 'MSPointerMove':
 			case 'mousemove':
-				this.eventsElement ? this.manager.mainOnTouchMove(e) : (e);
+				if (this.isDown || e.srcElement == this.eventsElement)
+				{
+					this.eventsElement ? this.manager.mainOnTouchMove(e) : (e);
+				}
 				break;
 			case 'touchend':
 			case 'pointerup':
@@ -1653,7 +1666,11 @@ IScroll.prototype = {
 			case 'pointercancel':
 			case 'MSPointerCancel':
 			case 'mousecancel':
-				this.eventsElement ? this.manager.mainOnTouchEnd(e) : this._end(e);
+				if (this.isDown || e.srcElement == this.eventsElement)
+				{
+					this.eventsElement ? this.manager.mainOnTouchEnd(e) : this._end(e);
+				}
+				this.isDown = false;
 				break;
 			case 'orientationchange':
 			case 'resize':

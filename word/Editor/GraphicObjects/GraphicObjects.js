@@ -2897,11 +2897,24 @@ CGraphicObjects.prototype =
         return this.isPointInDrawingObjects(x, y, pageIndex, bSelected, true) > -1;
     },
 
-    isPointInDrawingObjects3: function(x, y, pageIndex)
+    isPointInDrawingObjects3: function(x, y, pageIndex, bSelected, bText)
     {
+        if(bText){
+            var ret;
+            this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
+            ret = this.curState.onMouseDown(global_mouseEvent, x, y, pageIndex);
+            this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
+            if(isRealObject(ret)){
+                if(ret.cursorType === "text")
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         var oOldState = this.curState;
         this.changeCurrentState(new AscFormat.NullState(this));
-        var bRet = this.isPointInDrawingObjects(x, y, pageIndex, true, true) > -1;
+        var bRet = this.isPointInDrawingObjects(x, y, pageIndex, bSelected, true) > -1;
         this.changeCurrentState(oOldState);
         return bRet;
     },

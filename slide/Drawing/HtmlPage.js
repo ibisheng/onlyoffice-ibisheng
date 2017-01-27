@@ -334,6 +334,8 @@ function CEditorPage(api)
 	this.m_nIntervalWaitAutoSave = 1000;
 	this.m_nLastAutosaveTime     = -1;
 
+	this.NoneRepaintPages = false;
+
 	this.m_oApi = api;
 	var oThis   = this;
 
@@ -2575,15 +2577,17 @@ function CEditorPage(api)
 
 		if (this.m_bIsHorScrollVisible)
 		{
-			this.m_oScrollHor.HtmlElement.style.display = 'block';
-
-			this.m_oPanelRight.Bounds.B = this.ScrollWidthPx * g_dKoef_pix_to_mm;
-			this.m_oMainView.Bounds.B   = this.ScrollWidthPx * g_dKoef_pix_to_mm;
-
 			if (this.m_oApi.isMobileVersion)
 			{
 				this.m_oPanelRight.Bounds.B = 0;
 				this.m_oMainView.Bounds.B   = 0;
+			}
+			else
+			{
+				this.m_oScrollHor.HtmlElement.style.display = 'block';
+
+				this.m_oPanelRight.Bounds.B = this.ScrollWidthPx * g_dKoef_pix_to_mm;
+				this.m_oMainView.Bounds.B   = this.ScrollWidthPx * g_dKoef_pix_to_mm;
 			}
 		}
 		else
@@ -2872,7 +2876,8 @@ function CEditorPage(api)
 
 	this.CheckZoom = function()
 	{
-		this.m_oDrawingDocument.ClearCachePages();
+		if (!this.NoneRepaintPages)
+			this.m_oDrawingDocument.ClearCachePages();
 	};
 
 	this.CalculateDocumentSize = function(bIsAttack)

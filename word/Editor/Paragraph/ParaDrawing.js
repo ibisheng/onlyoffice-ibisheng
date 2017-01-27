@@ -343,13 +343,11 @@ ParaDrawing.prototype.Get_Props = function(OtherProps)
 
 	Props.Locked        = this.Lock.Is_Locked();
 	var ParentParagraph = this.Get_ParentParagraph();
-	if (ParentParagraph)
+	if (ParentParagraph && undefined !== ParentParagraph.Parent)
 	{
-		if (ParentParagraph)
-		{
-			if (undefined != ParentParagraph.Parent && true === ParentParagraph.Parent.Is_DrawingShape())
-				Props.CanBeFlow = false;
-		}
+		var DocContent = ParentParagraph.Parent;
+		if (true === DocContent.Is_DrawingShape() || (DocContent.Get_TopDocumentContent() instanceof CFootEndnote))
+			Props.CanBeFlow = false;
 	}
 
     Props.title = this.docPr.title !== null ? this.docPr.title : undefined;

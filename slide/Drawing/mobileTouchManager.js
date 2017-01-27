@@ -92,9 +92,9 @@
 			H : (this.HtmlPage.SlideScrollMAX - this.HtmlPage.SlideScrollMIN + _controlH)
 		};
 	};
-	CMobileDelegateEditorPresentation.prototype.GetObjectTrack = function(x, y, page)
+	CMobileDelegateEditorPresentation.prototype.GetObjectTrack = function(x, y, page, bSelected, bText)
 	{
-		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.isPointInDrawingObjects3(x, y, page);
+		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.isPointInDrawingObjects3(x, y, page, bSelected, bText);
 	};
 	CMobileDelegateEditorPresentation.prototype.GetSelectionRectsBounds = function()
 	{
@@ -118,22 +118,107 @@
 			this.HtmlPage.m_oScrollVerApi.scrollToY(-_scroll.y + this.HtmlPage.SlideScrollMIN);
 		}
 	};
+	CMobileDelegateEditorPresentation.prototype.GetScrollPosition = function()
+	{
+		var _x = this.HtmlPage.m_dScrollX;
+		var _y = this.HtmlPage.m_dScrollY - this.HtmlPage.SlideScrollMIN;
+
+		return { X: -_x, Y: -_y };
+	};
 	CMobileDelegateEditorPresentation.prototype.GetContextMenuType = function()
 	{
-		var _mode = AscCommon.MobileTouchContextMenuType.None;
+		var _mode = AscCommon.MobileTouchContextMenuType.Slide;
 
 		var _controller = this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects;
+		var _elementsCount = _controller.selectedObjects.length;
 
-		if (!_controller.Is_SelectionUse())
+		if (!_controller.Is_SelectionUse() && _elementsCount > 0)
 			_mode = AscCommon.MobileTouchContextMenuType.Target;
 
 		if (_controller.Get_SelectionBounds())
 			_mode = AscCommon.MobileTouchContextMenuType.Select;
 
-		if (_mode == 0 && _controller.getSelectedObjectsBounds())
+		if (_mode == AscCommon.MobileTouchContextMenuType.Slide && _controller.getSelectedObjectsBounds())
 			_mode = AscCommon.MobileTouchContextMenuType.Object;
 
 		return _mode;
+	};
+	CMobileDelegateEditorPresentation.prototype.GetContextMenuInfo = function(info)
+	{
+		info.Clear();
+		var _info = null;
+		var _transform = null;
+
+		var _x = 0;
+		var _y = 0;
+
+		var _controller = this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects;
+
+		var _target = _controller.Is_SelectionUse();
+		if (_target === false)
+		{
+			_info = {
+				X : this.DrawingDocument.m_dTargetX,
+				Y : this.DrawingDocument.m_dTargetY,
+				Page : this.DrawingDocument.m_lTargetPage
+			};
+
+			_transform = this.DrawingDocument.TextMatrix;
+			if (_transform)
+			{
+				_x = _transform.TransformPointX(_info.X, _info.Y);
+				_y = _transform.TransformPointY(_info.X, _info.Y);
+
+				_info.X = _x;
+				_info.Y = _y;
+			}
+			info.targetPos = _info;
+		}
+
+		var _select = _controller.Get_SelectionBounds();
+		if (_select)
+		{
+			var _rect1 = _select.Start;
+			var _rect2 = _select.End;
+
+			_info = {
+				X1 : _rect1.X,
+				Y1 : _rect1.Y,
+				Page1 : _rect1.Page,
+				X2 : _rect2.X + _rect2.W,
+				Y2 : _rect2.Y + _rect2.H,
+				Page2 : _rect2.Page
+			};
+
+			_transform = this.DrawingDocument.SelectionMatrix;
+
+			if (_transform)
+			{
+				_x = _transform.TransformPointX(_info.X1, _info.Y1);
+				_y = _transform.TransformPointY(_info.X1, _info.Y1);
+				_info.X1 = _x;
+				_info.Y1 = _y;
+
+				_x = _transform.TransformPointX(_info.X2, _info.Y2);
+				_y = _transform.TransformPointY(_info.X2, _info.Y2);
+				_info.X2 = _x;
+				_info.Y2 = _y;
+			}
+
+			info.selectText = _info;
+		}
+
+		var _object_bounds = _controller.getSelectedObjectsBounds();
+		if ((0 == _mode) && _object_bounds)
+		{
+			info.selectBounds = {
+				X : _object_bounds.minX,
+				Y : _object_bounds.minY,
+				R : _object_bounds.maxX,
+				B : _object_bounds.maxY,
+				Page : _object_bounds.pageIndex
+			};
+		}
 	};
 	CMobileDelegateEditorPresentation.prototype.GetContextMenuPosition = function()
 	{
@@ -232,7 +317,7 @@
 
 	CMobileDelegateEditorPresentation.prototype.Logic_GetNearestPos = function(x, y, page)
 	{
-		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.getNearestPos(x, y);
+		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.getNearestPos2(x, y);
 	};
 
 	/**
@@ -275,6 +360,7 @@
 	CMobileTouchManager.prototype.onTouchStart = function(e)
 	{
 		this.IsTouching = true;
+		AscCommon.g_inputContext.enableVirtualKeyboard();
 
 		if (this.delegate.IsReader())
 			return this.onTouchStart_renderer(e);
@@ -327,6 +413,29 @@
 			}
 			default:
 				break;
+		}
+
+		var isPreventDefault = false;
+		switch (this.Mode)
+		{
+			case AscCommon.MobileTouchMode.InlineObj:
+			case AscCommon.MobileTouchMode.FlowObj:
+			case AscCommon.MobileTouchMode.Zoom:
+			case AscCommon.MobileTouchMode.TableMove:
+			{
+				isPreventDefault = true;
+				break;
+			}
+			case AscCommon.MobileTouchMode.None:
+			case AscCommon.MobileTouchMode.Scroll:
+			{
+				isPreventDefault = !this.CheckObjectText();
+				break;
+			}
+			default:
+			{
+				break;
+			}
 		}
 
 		switch (this.Mode)
@@ -450,14 +559,13 @@
 			}
 		}
 
-		if (this.Api.isViewMode)
-		{
-			if (e.preventDefault)
-				e.preventDefault();
-			else
-				e.returnValue = false;
-			return false;
-		}
+		if (AscCommon.AscBrowser.isAndroid)
+			isPreventDefault = false;
+
+		if (this.Api.isViewMode || isPreventDefault)
+			AscCommon.stopEvent(e);
+
+		return false;
 	};
 	CMobileTouchManager.prototype.onTouchMove  = function(e)
 	{
@@ -629,6 +737,26 @@
 		}
 
 		var isCheckContextMenuMode = true;
+		var isCheckContextMenuSelect = false;
+
+		var isPreventDefault = false;
+		switch (this.Mode)
+		{
+			case AscCommon.MobileTouchMode.Select:
+			case AscCommon.MobileTouchMode.Scroll:
+			case AscCommon.MobileTouchMode.InlineObj:
+			case AscCommon.MobileTouchMode.FlowObj:
+			case AscCommon.MobileTouchMode.Zoom:
+			case AscCommon.MobileTouchMode.TableMove:
+			{
+				isPreventDefault = true;
+				break;
+			}
+			default:
+			{
+				break;
+			}
+		}
 
 		switch (this.Mode)
 		{
@@ -646,6 +774,10 @@
 					this.delegate.Drawing_OnMouseDown(_e);
 					this.delegate.Drawing_OnMouseUp(_e);
 					this.Api.sendEvent("asc_onTapEvent", e);
+
+					var typeMenu = this.delegate.GetContextMenuType();
+					if (typeMenu == AscCommon.MobileTouchContextMenuType.Target)
+						isPreventDefault = false;
 				}
 				else
 				{
@@ -662,8 +794,7 @@
 			{
 				// здесь нужно запускать отрисовку, если есть анимация зума
 				this.delegate.HtmlPage.NoneRepaintPages = false;
-				this.delegate.HtmlPage.m_bIsFullRepaint = true;
-				this.delegate.HtmlPage.OnScroll();
+				this.delegate.DrawingDocument.FirePaint();
 
 				this.Mode = AscCommon.MobileTouchMode.None;
 				isCheckContextMenuMode = false;
@@ -689,6 +820,7 @@
 				var pos         = this.delegate.ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
 				this.delegate.Logic_OnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
 				AscCommon.stopEvent(e);
+				isCheckContextMenuSelect = true;
 				break;
 			}
 			case AscCommon.MobileTouchMode.TableMove:
@@ -794,17 +926,13 @@
 				break;
 		}
 
-		if (this.Api.isViewMode)
-		{
-			if (e.preventDefault)
-				e.preventDefault();
-			else
-				e.returnValue = false;
-			return false;
-		}
+		if (this.Api.isViewMode || isPreventDefault)
+			AscCommon.g_inputContext.preventVirtualKeyboard(e);
 
 		if (true !== this.iScroll.isAnimating)
-			this.CheckContextMenuTouchEnd(isCheckContextMenuMode);
+			this.CheckContextMenuTouchEnd(isCheckContextMenuMode, isCheckContextMenuSelect);
+
+		return false;
 	};
 
 	CMobileTouchManager.prototype.mainOnTouchStart = function(e)
@@ -812,7 +940,7 @@
 		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
 			return;
 
-		if (!this.Api.IsFocus)
+		if (!this.Api.asc_IsFocus())
 			this.Api.asc_enableKeyEvents(true);
 
 		var oWordControl = this.Api.WordControl;
@@ -938,9 +1066,29 @@
 	{
 		return AscCommon.MobileTouchContextMenuType.Slide;
 	};
+	CMobileDelegateThumbnails.prototype.GetContextMenuInfo = function(info)
+	{
+		info.Clear();
+
+		var aSelected    = this.Thumbnails.GetSelectedArray();
+		var nSlideIndex  = Math.min.apply(Math, aSelected);
+
+		info.objectSlideThumbnail = { Slide : nSlideIndex };
+	};
 	CMobileDelegateThumbnails.prototype.GetContextMenuPosition = function()
 	{
-		return { X : 0, Y : 0 };
+		var aSelected    = this.Thumbnails.GetSelectedArray();
+		var nSlideIndex  = Math.min.apply(Math, aSelected);
+		var ConvertedPos = this.Thumbnails.GetThumbnailPagePosition(nSlideIndex);
+
+		var _ret = { X : 0, Y : 0, Mode : AscCommon.MobileTouchContextMenuType.Slide };
+		if (ConvertedPos)
+		{
+			_ret.X = ConvertedPos.X;
+			_ret.Y = ConvertedPos.Y;
+		}
+
+		return _ret;
 	};
 
 	/**
@@ -974,6 +1122,7 @@
 			fadeScrollbars: true,
 			scrollX : true,
 			scroller_id : this.iScrollElement,
+			eventsElement : this.eventsElement,
 			bounce : true
 		});
 
@@ -988,6 +1137,8 @@
 		this.IsTouching = true;
 		this.MoveAfterDown = false;
 
+		AscCommon.g_inputContext.enableVirtualKeyboard();
+
 		var _e = e.touches ? e.touches[0] : e;
 
 		AscCommon.check_MouseDownEvent(_e, false);
@@ -999,10 +1150,8 @@
 		this.Mode = AscCommon.MobileTouchMode.Scroll;
 		this.iScroll._start(e);
 
-		if (e.preventDefault)
-			e.preventDefault();
-		else
-			e.returnValue = false;
+		AscCommon.stopEvent(e);
+		AscCommon.g_inputContext.HtmlArea.readOnly = true;
 		return false;
 	};
 	CMobileTouchManagerThumbnails.prototype.onTouchMove  = function(e)
@@ -1092,6 +1241,7 @@
 			this.CheckContextMenuTouchEnd(isCheckContextMenuMode);
 
 		AscCommon.stopEvent(e);
+		AscCommon.g_inputContext.HtmlArea.readOnly = false;
 		return false;
 	};
 
