@@ -2008,7 +2008,10 @@
 		if (!this.checkPointerEvent(e))
 			return;
 
-		delete this.pointerTouchesCoords[e["pointerId"]];
+		//delete this.pointerTouchesCoords[e["pointerId"]];
+
+		// на всякий случай - удаляем все.
+		this.pointerTouchesCoords = {};
 	};
 	CMobileTouchManagerBase.prototype.checkPointerEvent = function(e)
 	{
