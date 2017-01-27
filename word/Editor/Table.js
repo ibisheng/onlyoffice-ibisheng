@@ -11811,7 +11811,7 @@ CTable.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
     {
         case 0 : CurCell = _DocPos[Depth + 1].Position; break;
         case 1 : CurCell = 0; break;
-        case -1: CurCell = this.Content[StartRow].Get_CellsCount() - 1; break;
+        case -1: CurCell = this.Content[CurRow].Get_CellsCount() - 1; break;
     }
 
     var __DocPos = _DocPos, __Flag = _Flag;
