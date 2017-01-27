@@ -8465,8 +8465,16 @@ background-repeat: no-repeat;\
 	};
 	window["asc_docs_api"].prototype["asc_setParagraphStylesSizes"] = function(width, height)
 	{
-		AscCommonWord.GlobalSkin.STYLE_THUMBNAIL_WIDTH = width;
-		AscCommonWord.GlobalSkin.STYLE_THUMBNAIL_HEIGHT = height;
+		if (window["AscCommonWord"] && window["AscCommonWord"].GlobalSkin)
+		{
+			AscCommonWord.GlobalSkin.STYLE_THUMBNAIL_WIDTH = width;
+			AscCommonWord.GlobalSkin.STYLE_THUMBNAIL_HEIGHT = height;
+		}
+		else
+		{
+			AscCommon.TEMP_STYLE_THUMBNAIL_WIDTH = width;
+			AscCommon.TEMP_STYLE_THUMBNAIL_HEIGHT = height;
+		}
 	};
 
 	// desktop editor spellcheck
