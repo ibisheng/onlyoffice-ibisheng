@@ -74,9 +74,9 @@ var selectionflag_Numbering     = 0x001;
 var selectionflag_DrawingObject = 0x002;
 
 var search_Common              = 0x0000; // Поиск в простом тексте
-
 var search_Header              = 0x0100; // Поиск в верхнем колонтитуле
 var search_Footer              = 0x0200; // Поиск в нижнем колонтитуле
+var search_Footnote            = 0x0400; // Поиск в сноске
 
 var search_HdrFtr_All          = 0x0001; // Поиск в колонтитуле, который находится на всех страницах
 var search_HdrFtr_All_no_First = 0x0002; // Поиск в колонтитуле, который находится на всех страницах, кроме первой

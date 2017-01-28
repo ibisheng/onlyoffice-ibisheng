@@ -64,6 +64,7 @@ function CDocumentSearch()
     this.Direction     = true; // направление true - вперед, false - назад
     this.ClearOnRecalc = true; // Флаг, говорящий о том, запустился ли пересчет из-за Replace
     this.Selection     = false;
+    this.Footnotes     = [];
 }
 
 CDocumentSearch.prototype =
@@ -217,13 +218,21 @@ CDocumentSearch.prototype =
         this.Direction = bDirection;
     }
 };
+CDocumentSearch.prototype.SetFootnotes = function(arrFootnotes)
+{
+	this.Footnotes = arrFootnotes;
+};
+CDocumentSearch.prototype.GetFootnotes = function()
+{
+	return this.Footnotes;
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // CDocument
 //----------------------------------------------------------------------------------------------------------------------
 CDocument.prototype.Search = function(Str, Props, bDraw)
 {
-    var StartTime = new Date().getTime();
+    //var StartTime = new Date().getTime();
 
     if ( true === this.SearchEngine.Compare( Str, Props ) )
         return this.SearchEngine;
@@ -240,6 +249,15 @@ CDocument.prototype.Search = function(Str, Props, bDraw)
 
     // Поиск в колонтитулах
     this.SectionsInfo.Search( Str, Props, this.SearchEngine );
+
+    // Ищем в сносках
+	var arrFootnotes = this.Get_FootnotesList(null, null);
+	this.SearchEngine.SetFootnotes(arrFootnotes);
+	for (var nIndex = 0, nCount = arrFootnotes.length; nIndex < nCount; ++nIndex)
+	{
+		var oFootnote = arrFootnotes[nIndex];
+		oFootnote.Search(Str, Props, this.SearchEngine, search_Footnote);
+	}
 
     if (false !== bDraw)
     {
@@ -430,6 +448,47 @@ CDocument.prototype.Search_GetId = function(bNext)
     {
         return this.SectionsInfo.Search_GetId( bNext, this.HdrFtr.CurHdrFtr );
     }
+    else if (docpostype_Footnotes === this.CurPos.Type)
+	{
+		var oCurFootnote = this.Footnotes.CurFootnote;
+		var Id = oCurFootnote.Search_GetId(bNext, true);
+		if (null !== Id)
+			return Id;
+
+		var arrFootnotes = this.SearchEngine.GetFootnotes();
+		var nCurPos = -1;
+		var nCount  = arrFootnotes.length;
+		for (var nIndex = 0; nIndex < nCount; ++nIndex)
+		{
+			if (arrFootnotes[nIndex] === oCurFootnote)
+			{
+				nCurPos = nIndex;
+				break;
+			}
+		}
+
+		if (-1 === nCurPos)
+			return null;
+
+		if (true === bNext)
+		{
+			for (var nIndex = nCurPos + 1; nIndex < nCount; ++nIndex)
+			{
+				Id = arrFootnotes[nIndex].Search_GetId(bNext, false);
+				if (null != Id)
+					return Id;
+			}
+		}
+		else
+		{
+			for (var nIndex = nCurPos - 1; nIndex >= 0; --nIndex)
+			{
+				Id = arrFootnotes[nIndex].Search_GetId(bNext, false);
+				if (null != Id)
+					return Id;
+			}
+		}
+	}
 
     return null;
 };
