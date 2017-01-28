@@ -4609,6 +4609,19 @@ Paragraph.prototype =
         return ContentPos;
     },
 
+	Get_EndRangePos2 : function(CurLine, CurRange)
+	{
+		var ContentPos = new CParagraphContentPos();
+		if (!this.Lines[CurLine] || !this.Lines[CurLine].Ranges[CurRange])
+			return ContentPos;
+
+		var Depth = 0;
+		var Pos = this.Lines[CurLine].Ranges[CurRange].EndPos;
+		ContentPos.Update(Pos, Depth);
+		this.Content[Pos].Get_EndRangePos2(CurLine, CurRange, ContentPos, Depth + 1);
+		return ContentPos;
+	},
+
     Get_StartPos : function()
     {
         var ContentPos = new CParagraphContentPos();
@@ -12213,6 +12226,17 @@ Paragraph.prototype.CheckParaEnd = function()
 		oEndRun.Add_ToContent(0, new ParaEnd());
 		this.Add_ToContent(this.Content.length, oEndRun);
 	}
+};
+Paragraph.prototype.GetLineEndPos = function(CurLine)
+{
+	if (CurLine < 0 || CurLine >= this.Lines.length)
+		return new CParagraphContentPos();
+
+	var oLine = this.Lines[CurLine];
+	if (!oLine || oLine.Ranges.length <= 0)
+		return new CParagraphContentPos();
+
+	return this.Get_EndRangePos2(CurLine, oLine.Ranges.length - 1);
 };
 
 var pararecalc_0_All  = 0;

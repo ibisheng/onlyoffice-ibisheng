@@ -5662,6 +5662,14 @@ ParaRun.prototype.Get_StartRangePos2 = function(_CurLine, _CurRange, ContentPos,
     ContentPos.Update( Pos, Depth );
 };
 
+ParaRun.prototype.Get_EndRangePos2 = function(_CurLine, _CurRange, ContentPos, Depth)
+{
+	var CurLine  = _CurLine - this.StartLine;
+	var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
+	var Pos      = this.protected_GetRangeEndPos(CurLine, CurRange);
+	ContentPos.Update(Pos, Depth);
+};
+
 ParaRun.prototype.Get_StartPos = function(ContentPos, Depth)
 {
     ContentPos.Update( 0, Depth );

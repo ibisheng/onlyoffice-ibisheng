@@ -1865,6 +1865,15 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_StartRangePos2 = functio
 
     this.Content[Pos].Get_StartRangePos2( _CurLine, _CurRange, ContentPos, Depth + 1 );
 };
+CParagraphContentWithParagraphLikeContent.prototype.Get_EndRangePos2 = function(_CurLine, _CurRange, ContentPos, Depth)
+{
+	var CurLine  = _CurLine - this.StartLine;
+	var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+	var Pos = this.protected_GetRangeEndPos(CurLine, CurRange);
+	ContentPos.Update(Pos, Depth);
+	this.Content[Pos].Get_EndRangePos2(_CurLine, _CurRange, ContentPos, Depth + 1);
+};
 CParagraphContentWithParagraphLikeContent.prototype.Get_StartPos = function(ContentPos, Depth)
 {
     if ( this.Content.length > 0 )

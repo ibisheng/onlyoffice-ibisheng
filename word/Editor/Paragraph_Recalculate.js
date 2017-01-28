@@ -1835,15 +1835,16 @@ Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, Cu
 	if (PRS.Fast)
 		return true;
 
-	var oTopDocument = PRS.TopDocument;
-	var arrFootnotes = [];
+	var oTopDocument  = PRS.TopDocument;
+	var arrFootnotes  = [];
+	var oLineBreakPos = this.GetLineEndPos(CurLine);
 	for (var nIndex = 0, nCount = PRS.Footnotes.length; nIndex < nCount; ++nIndex)
 	{
 		var oFootnote = PRS.Footnotes[nIndex].FootnoteReference.Get_Footnote();
 		var oPos      = PRS.Footnotes[nIndex].Pos;
 
 		// Проверим позицию
-		if (true === PRS.MoveToLBP && PRS.LineBreakPos.Compare(oPos) <= 0)
+		if (oLineBreakPos.Compare(oPos) <= 0)
 			continue;
 
 		arrFootnotes.push(oFootnote);
