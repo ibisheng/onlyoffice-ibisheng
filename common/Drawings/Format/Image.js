@@ -45,6 +45,37 @@ var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
 
 var isRealObject = AscCommon.isRealObject;
 
+    AscDFH.changesFactory[AscDFH.historyitem_ImageShapeSetSpPr] =  AscDFH.CChangesDrawingsObject;
+    AscDFH.changesFactory[AscDFH.historyitem_ImageShapeSetBlipFill] =  AscDFH.CChangesDrawingsObjectNoId;
+    AscDFH.changesFactory[AscDFH.historyitem_ImageShapeSetParent] =  AscDFH.CChangesDrawingsObject;
+    AscDFH.changesFactory[AscDFH.historyitem_ImageShapeSetGroup] =  AscDFH.CChangesDrawingsObject;
+    AscDFH.changesFactory[AscDFH.historyitem_ImageShapeSetStyle] =  AscDFH.CChangesDrawingsObject;
+    AscDFH.changesFactory[AscDFH.historyitem_ImageShapeSetNvPicPr] =  AscDFH.CChangesDrawingsObject;
+
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_ImageShapeSetSpPr] =    function(oClass, value){oClass.spPr = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_ImageShapeSetBlipFill] =  function(oClass, value, FromLoad){
+        oClass.blipFill = value;
+        if(FromLoad){
+            if(typeof AscCommon.CollaborativeEditing !== "undefined")
+            {
+                if(typeof value.RasterImageId === "string" && value.RasterImageId.length > 0)
+                {
+                    AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(value.RasterImageId));
+                }
+            }
+        }
+    };
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_ImageShapeSetParent] =  function(oClass, value){oClass.parent = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_ImageShapeSetGroup] =   function(oClass, value){oClass.group = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_ImageShapeSetStyle] =   function(oClass, value){oClass.style = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_ImageShapeSetNvPicPr] =  function(oClass, value){oClass.nvPicPr = value;};
+
+
+
+    AscDFH.drawingsConstructorsMap[AscDFH.historyitem_ImageShapeSetBlipFill] = AscFormat.CBlipFill;
+
+
+
 function CImageShape()
 {
     CImageShape.superclass.constructor.call(this);
@@ -64,45 +95,39 @@ CImageShape.prototype.getObjectType = function()
     return AscDFH.historyitem_type_ImageShape;
 };
 
-CImageShape.prototype.setBDeleted = function(pr)
-{
-    History.Add(this, {Type: AscDFH.historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
-    this.bDeleted = pr;
-};
-
 CImageShape.prototype.setNvPicPr = function(pr)
 {
-    History.Add(this, {Type:AscDFH.historyitem_ImageShapeSetNvPicPr, oldPr: this.nvPicPr, newPr: pr});
+    History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_ImageShapeSetNvPicPr, this.nvPicPr, pr));
     this.nvPicPr = pr;
 };
 
 CImageShape.prototype.setSpPr = function(pr)
 {
-    History.Add(this, {Type:AscDFH.historyitem_ImageShapeSetSpPr, oldPr: this.spPr, newPr: pr});
+    History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_ImageShapeSetSpPr, this.spPr, pr));
     this.spPr = pr;
 };
 
 CImageShape.prototype.setBlipFill = function(pr)
 {
-    History.Add(this, {Type:AscDFH.historyitem_ImageShapeSetBlipFill, oldPr: this.blipFill, newPr: pr});
+    History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_ImageShapeSetBlipFill, this.blipFill, pr));
     this.blipFill = pr;
 };
 
 CImageShape.prototype.setParent = function(pr)
 {
-    History.Add(this, {Type: AscDFH.historyitem_ImageShapeSetParent, oldPr: this.parent, newPr: pr});
+    History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_ImageShapeSetParent, this.parent, pr));
     this.parent = pr;
 };
 
 CImageShape.prototype.setGroup = function(pr)
 {
-    History.Add(this, {Type: AscDFH.historyitem_ImageShapeSetGroup, oldPr: this.group, newPr: pr});
+    History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_ImageShapeSetGroup, this.group, pr));
     this.group = pr;
 };
 
 CImageShape.prototype.setStyle = function(pr)
 {
-    History.Add(this, {Type: AscDFH.historyitem_ImageShapeSetStyle, oldPr: this.style, newPr: pr});
+    History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_ImageShapeSetStyle, this.style, pr));
     this.style = pr;
 };
 
@@ -685,7 +710,7 @@ CImageShape.prototype.getPhIndex = function()
 
 CImageShape.prototype.setNvSpPr = function(pr)
 {
-    History.Add(this, {Type: AscDFH.historyitem_ImageShapeSetNvPicPr, oldPr: this.nvPicPr, newPr: pr});
+    History.Add(new AscDFH.CChangesDrawingsObject(this,  AscDFH.historyitem_ImageShapeSetNvPicPr, this.nvPicPr, pr));
     this.nvPicPr = pr;
 };
 
@@ -694,517 +719,6 @@ CImageShape.prototype.getAllImages = function(images)
     if(this.blipFill instanceof  AscFormat.CBlipFill && typeof this.blipFill.RasterImageId === "string")
     {
         images[AscCommon.getFullImageSrc2(this.blipFill.RasterImageId)] = true;
-    }
-};
-
-CImageShape.prototype.Undo = function(data)
-{
-    switch(data.Type)
-    {
-        case AscDFH.historyitem_AutoShapes_SetDrawingBasePos:{
-            if(this.drawingBase && this.drawingBase.Pos){
-                this.drawingBase.Pos.X = data.OldPr.X;
-                this.drawingBase.Pos.Y = data.OldPr.Y;
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseExt:{
-            if(this.drawingBase && this.drawingBase.ext){
-                this.drawingBase.ext.cx = data.OldPr.cx;
-                this.drawingBase.ext.cy = data.OldPr.cy;
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseType:
-        {
-            if(this.drawingBase)
-            {
-                this.drawingBase.Type = data.OldPr;
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetLocks:
-        {
-            this.locks = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetData:
-        {
-            this.m_sData = data.oldData;
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetApplicationId:
-        {
-            this.m_sApplicationId = data.oldId;
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetPixSizes:
-        {
-            this.m_nPixWidth = data.oldPr.w;
-            this.m_nPixHeight = data.oldPr.h;
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
-        {
-            this.fromSerialize = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
-        {
-            if(this.drawingBase)
-            {
-                this.drawingBase.from.col    = data.oldFromCol;
-                this.drawingBase.from.colOff = data.oldFromColOff;
-                this.drawingBase.from.row    = data.oldFromRow;
-                this.drawingBase.from.rowOff = data.oldFromRowOff;
-                this.drawingBase.to.col      = data.oldToCol;
-                this.drawingBase.to.colOff   = data.oldToColOff;
-                this.drawingBase.to.row      = data.oldToRow;
-                this.drawingBase.to.rowOff   = data.oldToRowOff;
-                this.drawingBase.Pos.X       = data.oldPosX;
-                this.drawingBase.Pos.Y       = data.oldPosY;
-                this.drawingBase.ext.cx      = data.oldCx;
-                this.drawingBase.ext.cy      = data.oldCy;
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
-        {
-            AscFormat.addToDrawings(this.worksheet, this, data.Pos);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
-        {
-            AscFormat.deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetWorksheet:
-        {
-            this.worksheet = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetBDeleted:
-        {
-            this.bDeleted = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetNvPicPr:
-        {
-            this.nvPicPr = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetSpPr:
-        {
-            this.spPr = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetBlipFill:
-        {
-            this.blipFill = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetParent:
-        {
-            this.parent = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetGroup:
-        {
-            this.group = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetStyle:
-        {
-            this.style = data.oldPr;
-            break;
-        }
-    }
-};
-
-CImageShape.prototype.Redo = function(data)
-{
-    switch(data.Type)
-    {
-        case AscDFH.historyitem_AutoShapes_SetDrawingBasePos:{
-            if(this.drawingBase && this.drawingBase.Pos){
-                this.drawingBase.Pos.X = data.NewPr.X;
-                this.drawingBase.Pos.Y = data.NewPr.Y;
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseExt:{
-            if(this.drawingBase && this.drawingBase.ext){
-                this.drawingBase.ext.cx = data.NewPr.cx;
-                this.drawingBase.ext.cy = data.NewPr.cy;
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseType:
-        {
-            if(this.drawingBase)
-            {
-                this.drawingBase.Type = data.NewPr;
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetLocks:
-        {
-            this.locks = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetData:
-        {
-            this.m_sData = data.newData;
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetApplicationId:
-        {
-            this.m_sApplicationId = data.newId;
-            break;
-        }
-
-        case AscDFH.historyitem_ImageShapeSetPixSizes:
-        {
-            this.m_nPixWidth = data.newPr.w;
-            this.m_nPixHeight = data.newPr.h;
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
-        {
-            this.fromSerialize = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
-        {
-            if(this.drawingBase)
-            {
-                this.drawingBase.from.col    = data.fromCol;
-                this.drawingBase.from.colOff = data.fromColOff;
-                this.drawingBase.from.row    = data.fromRow;
-                this.drawingBase.from.rowOff = data.fromRowOff;
-                this.drawingBase.to.col      = data.toCol;
-                this.drawingBase.to.colOff   = data.toColOff;
-                this.drawingBase.to.row      = data.toRow;
-                this.drawingBase.to.rowOff   = data.toRowOff;
-                this.drawingBase.Pos.X       = data.posX;
-                this.drawingBase.Pos.Y       = data.posY;
-                this.drawingBase.ext.cx      = data.cx;
-                this.drawingBase.ext.cy      = data.cy;
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
-        {
-            AscFormat.deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
-        {
-            AscFormat.addToDrawings(this.worksheet, this, data.Pos);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetWorksheet:
-        {
-            this.worksheet = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetBDeleted:
-        {
-            this.bDeleted = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetNvPicPr:
-        {
-            this.nvPicPr = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetSpPr:
-        {
-            this.spPr = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetBlipFill:
-        {
-            this.blipFill = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetParent:
-        {
-            this.parent = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetGroup:
-        {
-            this.group = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetStyle:
-        {
-            this.style = data.newPr;
-            break;
-        }
-    }
-};
-
-CImageShape.prototype.Save_Changes = function(data, w)
-{
-    w.WriteLong(data.Type);
-    switch(data.Type)
-    {
-        case AscDFH.historyitem_AutoShapes_SetDrawingBasePos:{
-
-            w.WriteDouble(data.NewPr.X);
-            w.WriteDouble(data.NewPr.Y);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseExt:{
-            w.WriteDouble(data.NewPr.cx);
-            w.WriteDouble(data.NewPr.cy);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseType:
-        {
-            w.WriteLong(data.NewPr);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetLocks:
-        {
-            w.WriteLong(data.newPr);
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetData:
-        {
-            AscFormat.writeString(w, data.newData);
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetApplicationId:
-        {
-
-            AscFormat.writeString(w, data.newId);
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetPixSizes:
-        {
-            AscFormat.writeLong(w, data.newPr.w);
-            AscFormat.writeLong(w, data.newPr.h);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
-        {
-            AscFormat.writeBool(w, data.newPr);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
-        {
-            AscFormat.writeDouble(w, data.fromCol   );
-            AscFormat.writeDouble(w, data.fromColOff);
-            AscFormat.writeDouble(w, data.fromRow   );
-            AscFormat.writeDouble(w, data.fromRowOff);
-            AscFormat.writeDouble(w, data.toCol);
-            AscFormat.writeDouble(w, data.toColOff);
-            AscFormat.writeDouble(w, data.toRow   );
-            AscFormat.writeDouble(w, data.toRowOff);
-
-
-            AscFormat.writeDouble(w, data.posX);
-            AscFormat.writeDouble(w, data.posY);
-            AscFormat.writeDouble(w, data.cx);
-            AscFormat.writeDouble(w, data.cy);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
-        {
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
-        {
-            var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
-            AscFormat.writeLong(w, Pos);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetWorksheet:
-        {
-            AscFormat.writeBool(w,isRealObject(data.newPr));
-            if(isRealObject(data.newPr))
-            {
-                AscFormat.writeString(w,data.newPr.getId());
-            }
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetNvPicPr:
-        case AscDFH.historyitem_ImageShapeSetSpPr:
-        case AscDFH.historyitem_ImageShapeSetParent:
-        case AscDFH.historyitem_ImageShapeSetGroup:
-        case AscDFH.historyitem_ImageShapeSetStyle:
-        {
-            AscFormat.writeObject(w, data.newPr);
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetBDeleted:
-        {
-            AscFormat.writeBool(w, data.newPr);
-            break;
-        }
-
-        case AscDFH.historyitem_ImageShapeSetBlipFill:
-        {
-            w.WriteBool(isRealObject(data.newPr));
-            if(isRealObject(data.newPr))
-            {
-                data.newPr.Write_ToBinary(w);
-            }
-            break;
-        }
-    }
-};
-
-CImageShape.prototype.Load_Changes = function(r)
-{
-    var type = r.GetLong();
-    switch(type)
-    {
-        case AscDFH.historyitem_AutoShapes_SetDrawingBasePos:{
-            if(this.drawingBase && this.drawingBase.Pos){
-                this.drawingBase.Pos.X = r.GetDouble();
-                this.drawingBase.Pos.Y = r.GetDouble();
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseExt:{
-            if(this.drawingBase && this.drawingBase.ext){
-                this.drawingBase.ext.cx = r.GetDouble();
-                this.drawingBase.ext.cy = r.GetDouble();
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseType:
-        {
-            if(this.drawingBase)
-            {
-                this.drawingBase.Type = r.GetLong();
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetLocks:
-        {
-            this.locks = r.GetLong();
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetData:
-        {
-            this.m_sData = AscFormat.readString(r);
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetApplicationId:
-        {
-            this.m_sApplicationId = AscFormat.readString(r);
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetPixSizes:
-        {
-            this.m_nPixWidth = AscFormat.readLong(r);
-            this.m_nPixHeight = AscFormat.readLong(r);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
-        {
-            this.fromSerialize = AscFormat.readBool(r);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
-        {
-            if(this.drawingBase)
-            {
-                this.drawingBase.from.col    = AscFormat.readDouble(r);
-                this.drawingBase.from.colOff = AscFormat.readDouble(r);
-                this.drawingBase.from.row    = AscFormat.readDouble(r);
-                this.drawingBase.from.rowOff = AscFormat.readDouble(r);
-                this.drawingBase.to.col      = AscFormat.readDouble(r);
-                this.drawingBase.to.colOff   = AscFormat.readDouble(r);
-                this.drawingBase.to.row      = AscFormat.readDouble(r);
-                this.drawingBase.to.rowOff   = AscFormat.readDouble(r);
-
-
-                this.drawingBase.Pos.X = AscFormat.readDouble(r);
-                this.drawingBase.Pos.Y = AscFormat.readDouble(r);
-                this.drawingBase.ext.cx = AscFormat.readDouble(r);
-                this.drawingBase.ext.cy = AscFormat.readDouble(r);
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
-        {
-            AscFormat.deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
-        {
-            var pos = AscFormat.readLong(r);
-            if(this.worksheet)
-            {
-                pos = this.worksheet.contentChanges.Check(AscCommon.contentchanges_Add, pos);
-            }
-            AscFormat.addToDrawings(this.worksheet, this, pos);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetWorksheet:
-        {
-            AscFormat.ReadWBModel(this, r);
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetBDeleted:
-        {
-            this.bDeleted = AscFormat.readBool(r);
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetNvPicPr:
-        {
-            this.nvPicPr = AscFormat.readObject(r);
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetSpPr:
-        {
-            this.spPr = AscFormat.readObject(r);
-            break;
-        }
-
-        case AscDFH.historyitem_ImageShapeSetBlipFill:
-        {
-            if(r.GetBool())
-            {
-                this.blipFill = new AscFormat.CBlipFill();
-                r.GetLong();
-                this.blipFill.Read_FromBinary(r);
-                if(typeof AscCommon.CollaborativeEditing !== "undefined")
-                {
-                    if(typeof this.blipFill.RasterImageId === "string" && this.blipFill.RasterImageId.length > 0)
-                    {
-                        AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(this.blipFill.RasterImageId));
-                    }
-                }
-            }
-            else
-            {
-                this.blipFill = null;
-            }
-            this.handleUpdateFill();
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetParent:
-        {
-            this.parent = AscFormat.readObject(r);
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetGroup:
-        {
-            this.group = AscFormat.readObject(r);
-            break;
-        }
-        case AscDFH.historyitem_ImageShapeSetStyle:
-        {
-            this.style = AscFormat.readObject(r);
-            break;
-        }
     }
 };
 

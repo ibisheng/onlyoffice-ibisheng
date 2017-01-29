@@ -191,6 +191,9 @@ CAscSlideTiming.prototype.Read_FromBinary = function(r)
     this.ShowLoop = AscFormat.readBool(r);
 };
 
+AscDFH.drawingsConstructorsMap[AscDFH.historyitem_SlideSetTiming            ] = CAscSlideTiming;
+
+
 // информация о темах --------------------------------------------
 
 function CAscThemeInfo(themeInfo)

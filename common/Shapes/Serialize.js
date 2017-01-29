@@ -3383,13 +3383,13 @@ function BinaryPPTYLoader()
                 break;
 
             if (0 == _at)
-                hf.dt = s.GetBool();
+                hf.setDt(s.GetBool());
             else if (1 == _at)
-                hf.ftr = s.GetBool();
+                hf.setFtr(s.GetBool());
             else if (2 == _at)
-                hf.hdr = s.GetBool();
+                hf.setHdr(s.GetBool());
             else if (3 == _at)
-                hf.sldNum = s.GetBool();
+                hf.setSldNum(s.GetBool());
         }
 
         s.Seek2(_e);

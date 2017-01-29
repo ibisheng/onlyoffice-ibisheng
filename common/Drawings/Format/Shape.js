@@ -478,7 +478,7 @@ function ConvertTableToGraphicFrame(oTable, oPresentation){
         }
         var nIndex = oTable2.Content.length;
         oTable2.Content[nIndex] = oNewRow;
-        History.Add( oTable2, { Type : AscDFH.historyitem_Table_AddRow, Pos : nIndex, Item : { Row : oTable2.Content[nIndex], TableRowsBottom : {}, RowsInfo : {} } } );
+        History.Add(new CChangesTableAddRow(oTable2, nIndex, [oNewRow]));
     }
 
     if(!oGraphicFrame.spPr){
@@ -622,6 +622,34 @@ function SetXfrmFromMetrics(oDrawing, metrics)
         oDrawing.spPr.xfrm.setOffY(metrics.y + metricExtY/2 - metricExtX/2);
     }
 }
+
+
+           AscDFH.changesFactory[AscDFH.historyitem_ShapeSetNvSpPr]   = AscDFH.CChangesDrawingsObject;
+           AscDFH.changesFactory[AscDFH.historyitem_ShapeSetSpPr]   = AscDFH.CChangesDrawingsObject;
+           AscDFH.changesFactory[AscDFH.historyitem_ShapeSetStyle]   = AscDFH.CChangesDrawingsObject;
+           AscDFH.changesFactory[AscDFH.historyitem_ShapeSetTxBody]   = AscDFH.CChangesDrawingsObject;
+           AscDFH.changesFactory[AscDFH.historyitem_ShapeSetTextBoxContent]   = AscDFH.CChangesDrawingsObject;
+           AscDFH.changesFactory[AscDFH.historyitem_ShapeSetBodyPr]   = AscDFH.CChangesDrawingsObjectNoId;
+           AscDFH.changesFactory[AscDFH.historyitem_AutoShapes_SetBFromSerialize]   = AscDFH.CChangesDrawingsBool;
+           AscDFH.changesFactory[AscDFH.historyitem_ShapeSetParent]   = AscDFH.CChangesDrawingsObject;
+           AscDFH.changesFactory[AscDFH.historyitem_ShapeSetGroup]   = AscDFH.CChangesDrawingsObject;
+           AscDFH.changesFactory[AscDFH.historyitem_ShapeSetWordShape]   = AscDFH.CChangesDrawingsBool;
+
+
+
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_ShapeSetNvSpPr]               = function(oClass, value){oClass.nvSpPr = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_ShapeSetSpPr]                 = function(oClass, value){oClass.spPr = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_ShapeSetStyle]                = function(oClass, value){oClass.style = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_ShapeSetTxBody]               = function(oClass, value){oClass.txBody = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_ShapeSetTextBoxContent]       = function(oClass, value){oClass.textBoxContent = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_ShapeSetBodyPr]               = function(oClass, value){oClass.bodyPr = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_AutoShapes_SetBFromSerialize] = function(oClass, value){oClass.fromSerialize = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_ShapeSetParent]               = function(oClass, value){oClass.parent = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_ShapeSetGroup]                = function(oClass, value){oClass.group = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_ShapeSetWordShape]            = function(oClass, value){oClass.bWordShape = value;};
+
+
+    AscDFH.drawingsConstructorsMap[AscDFH.historyitem_ShapeSetBodyPr] = AscFormat.CBodyPr;
 
 function CShape()
 {
@@ -781,23 +809,19 @@ CShape.prototype.documentCreateFontMap = function (map) {
     }
 };
 
-CShape.prototype.setBDeleted = function (pr) {
-    History.Add(this, {Type: AscDFH.historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
-    this.bDeleted = pr;
-};
 
 CShape.prototype.setNvSpPr = function (pr) {
-    History.Add(this, {Type: AscDFH.historyitem_ShapeSetNvSpPr, oldPr: this.nvSpPr, newPr: pr});
+    History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_ShapeSetNvSpPr, this.nvSpPr, pr));
     this.nvSpPr = pr;
 };
 
 CShape.prototype.setSpPr = function (spPr) {
-    History.Add(this, {Type: AscDFH.historyitem_ShapeSetSpPr, oldPr: this.spPr, newPr: spPr});
+    History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_ShapeSetSpPr, this.spPr, spPr));
     this.spPr = spPr;
 };
 
 CShape.prototype.setStyle = function (style) {
-    History.Add(this, {Type: AscDFH.historyitem_ShapeSetStyle, oldPr: this.style, newPr: style});
+    History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_ShapeSetStyle, this.style, style));
     this.style = style;
     var content = this.getDocContent();
 
@@ -810,21 +834,17 @@ CShape.prototype.setStyle = function (style) {
 };
 
 CShape.prototype.setTxBody = function (txBody) {
-    History.Add(this, {Type: AscDFH.historyitem_ShapeSetTxBody, oldPr: this.txBody, newPr: txBody});
+    History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_ShapeSetTxBody, this.txBody, txBody));
     this.txBody = txBody;
 };
 
 CShape.prototype.setTextBoxContent = function (textBoxContent) {
-    History.Add(this, {
-        Type: AscDFH.historyitem_ShapeSetTextBoxContent,
-        oldPr: this.textBoxContent,
-        newPr: textBoxContent
-    });
+    History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_ShapeSetTextBoxContent, this.textBoxContent, textBoxContent));
     this.textBoxContent = textBoxContent;
 };
 
 CShape.prototype.setBodyPr = function (pr) {
-    History.Add(this, {Type: AscDFH.historyitem_ShapeSetBodyPr, oldPr: this.bodyPr, newPr: pr});
+    History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_ShapeSetBodyPr, this.bodyPr, pr));
     this.bodyPr = pr;
     this.recalcInfo.recalcContent = true;
     this.recalcInfo.recalcTransformText = true;
@@ -908,7 +928,7 @@ CShape.prototype.clearContent = function () {
 
 CShape.prototype.setBFromSerialize = function(bVal)
 {
-    History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetBFromSerialize, oldPr: this.fromSerialize, newPr: bVal});
+    History.Add(new AscDFH.CChangesDrawingsBool(this, AscDFH.historyitem_AutoShapes_SetBFromSerialize, this.fromSerialize, bVal));
     this.fromSerialize = bVal;
 };
 
@@ -1051,12 +1071,12 @@ CShape.prototype.documentUpdateRulersState = function () {
 };
 
 CShape.prototype.setParent = function (parent) {
-    History.Add(this, {Type: AscDFH.historyitem_ShapeSetParent, oldPr: this.parent, newPr: parent});
+    History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_ShapeSetParent, this.parent, parent));
     this.parent = parent;
 };
 
 CShape.prototype.setGroup = function (group) {
-    History.Add(this, {Type: AscDFH.historyitem_ShapeSetGroup, oldPr: this.group, newPr: group});
+    History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_ShapeSetGroup, this.group, group));
     this.group = group;
 };
 
@@ -2172,7 +2192,7 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
 };
 
 CShape.prototype.setWordShape = function (pr) {
-    History.Add(this, {Type: AscDFH.historyitem_ShapeSetWordShape, oldPr: this.bWordShape, newPr: pr});
+    History.Add(new AscDFH.CChangesDrawingsBool(this, AscDFH.historyitem_ShapeSetWordShape, this.bWordShape, pr));
     this.bWordShape = pr;
 };
 
@@ -3436,118 +3456,6 @@ CShape.prototype.checkExtentsByDocContent = function(bForce, bNeedRecalc)
     return false;
 };
 
-
-CShape.prototype.checkDrawingBaseCoords = function()
-{
-    if(this.drawingBase && this.spPr && this.spPr.xfrm && !this.group)
-    {
-        var oldX = this.x, oldY = this.y, oldExtX = this.extX, oldExtY = this.extY;
-        this.x = this.spPr.xfrm.offX;
-        this.y = this.spPr.xfrm.offY;
-        this.extX = this.spPr.xfrm.extX;
-        this.extY = this.spPr.xfrm.extY;
-
-
-
-        var oldFromCol = this.drawingBase.from.col,
-            oldFromColOff =  this.drawingBase.from.colOff,
-            oldFromRow =  this.drawingBase.from.row,
-            oldFromRowOff =  this.drawingBase.from.rowOff,
-            oldToCol =       this.drawingBase.to.col,
-            oldToColOff =    this.drawingBase.to.colOff,
-            oldToRow    =    this.drawingBase.to.row,
-            oldToRowOff =    this.drawingBase.to.rowOff,
-            oldPosX     =    this.drawingBase.Pos.X,
-            oldPosY     =    this.drawingBase.Pos.Y,
-            oldCx       =    this.drawingBase.ext.cx,
-            oldCy       =    this.drawingBase.ext.cy;
-
-
-        this.drawingBase.setGraphicObjectCoords();
-        this.x = oldX;
-        this.y = oldY;
-        this.extX = oldExtX;
-        this.extY = oldExtY;
-        var from = this.drawingBase.from, to = this.drawingBase.to;
-        History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors,
-            fromCol       : from.col,
-            fromColOff    : from.colOff,
-            fromRow       : from.row,
-            fromRowOff    : from.rowOff,
-            toCol         : to.col,
-            toColOff      : to.colOff,
-            toRow         : to.row,
-            toRowOff      : to.rowOff,
-            posX          : this.drawingBase.Pos.X,
-            posY          : this.drawingBase.Pos.Y,
-            cx            : this.drawingBase.ext.cx,
-            cy            : this.drawingBase.ext.cy,
-
-            oldFromCol    : oldFromCol,
-            oldFromColOff : oldFromColOff,
-            oldFromRow    : oldFromRow,
-            oldFromRowOff : oldFromRowOff,
-            oldToCol      : oldToCol,
-            oldToColOff   : oldToColOff,
-            oldToRow      : oldToRow,
-            oldToRowOff   : oldToRowOff,
-            oldPosX       : oldPosX,
-            oldPosY       : oldPosY ,
-            oldCx         : oldCx,
-            oldCy         : oldCy
-    });
-    }
-};
-
-CShape.prototype.setDrawingBaseCoords = function(fromCol, fromColOff, fromRow, fromRowOff, toCol, toColOff, toRow, toRowOff, posX, posY, extX, extY)
-{
-    if(this.drawingBase)
-    {
-        History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors,
-            fromCol:    fromCol,
-            fromColOff: fromColOff,
-            fromRow   : fromRow,
-            fromRowOff: fromRowOff,
-            toCol:    toCol,
-            toColOff: toColOff,
-            toRow   : toRow,
-            toRowOff: toRowOff,
-            posX    : posX,
-            posY    : posY,
-            cx      : extX,
-            cy      : extY,
-
-            oldFromCol   : this.drawingBase.from.col,
-            oldFromColOff: this.drawingBase.from.colOff,
-            oldFromRow   : this.drawingBase.from.row,
-            oldFromRowOff: this.drawingBase.from.rowOff,
-            oldToCol     : this.drawingBase.to.col,
-            oldToColOff  : this.drawingBase.to.colOff,
-            oldToRow     : this.drawingBase.to.row,
-            oldToRowOff  : this.drawingBase.to.rowOff,
-            oldPosX      : this.drawingBase.Pos.X,
-            oldPosY      : this.drawingBase.Pos.Y,
-            oldCx        : this.drawingBase.ext.cx,
-            oldCy        : this.drawingBase.ext.cy
-        });
-
-
-        this.drawingBase.from.col    = fromCol;
-        this.drawingBase.from.colOff = fromColOff;
-        this.drawingBase.from.row    = fromRow;
-        this.drawingBase.from.rowOff = fromRowOff;
-
-        this.drawingBase.to.col    = toCol;
-        this.drawingBase.to.colOff = toColOff;
-        this.drawingBase.to.row    = toRow;
-        this.drawingBase.to.rowOff = toRowOff;
-
-        this.drawingBase.Pos.X  = posX;
-        this.drawingBase.Pos.Y  = posY;
-        this.drawingBase.ext.cx = extX;
-        this.drawingBase.ext.cy = extY;
-    }
-};
 
 CShape.prototype.getTransformMatrix = function ()
 {
@@ -5055,517 +4963,6 @@ CShape.prototype.Refresh_RecalcData2 = function(pageIndex/*для текста*/
     }
 };
 
-CShape.prototype.Undo = function (data)
-{
-    switch (data.Type)
-    {
-        case AscDFH.historyitem_AutoShapes_SetDrawingBasePos:{
-            if(this.drawingBase && this.drawingBase.Pos){
-                this.drawingBase.Pos.X = data.OldPr.X;
-                this.drawingBase.Pos.Y = data.OldPr.Y;
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseExt:{
-            if(this.drawingBase && this.drawingBase.ext){
-                this.drawingBase.ext.cx = data.OldPr.cx;
-                this.drawingBase.ext.cy = data.OldPr.cy;
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseType:{
-            if(this.drawingBase){
-                this.drawingBase.Type = data.OldPr;
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetLocks:
-        {
-            this.locks = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
-        {
-            this.fromSerialize = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
-        {
-            if(this.drawingBase)
-            {
-                this.drawingBase.from.col    = data.oldFromCol;
-                this.drawingBase.from.colOff = data.oldFromColOff;
-                this.drawingBase.from.row    = data.oldFromRow;
-                this.drawingBase.from.rowOff = data.oldFromRowOff;
-                this.drawingBase.to.col      = data.oldToCol;
-                this.drawingBase.to.colOff   = data.oldToColOff;
-                this.drawingBase.to.row      = data.oldToRow;
-                this.drawingBase.to.rowOff   = data.oldToRowOff;
-                this.drawingBase.Pos.X       = data.oldPosX;
-                this.drawingBase.Pos.Y       = data.oldPosY;
-                this.drawingBase.ext.cx      = data.oldCx;
-                this.drawingBase.ext.cy      = data.oldCy;
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
-        {
-            AscFormat.addToDrawings(this.worksheet, this, data.Pos);
-            break;
-        }
-
-        case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
-        {
-            AscFormat.deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetWorksheet:
-        {
-            this.worksheet = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetBDeleted:
-        {
-            this.bDeleted = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetNvSpPr:
-        {
-            this.nvSpPr = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetSpPr:
-        {
-            this.spPr = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetStyle:
-        {
-            this.style = data.oldPr;
-
-
-            this.recalcInfo.recalculateShapeStyleForParagraph = true;
-            if(this.recalcTextStyles)
-                this.recalcTextStyles();
-            var content = this.getDocContent();
-            if(content)
-            {
-                content.Recalc_AllParagraphs_CompiledPr();
-            }
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetTxBody:
-        {
-            this.txBody = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetTextBoxContent:
-        {
-            this.textBoxContent = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetParent:
-        {
-            this.parent = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetGroup:
-        {
-            this.group = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetBodyPr:
-        {
-            this.bodyPr = data.oldPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetWordShape:
-        {
-            this.bWordShape = data.oldPr;
-            break;
-        }
-    }
-};
-
-CShape.prototype.Redo = function (data)
-{
-    switch (data.Type)
-    {
-        case AscDFH.historyitem_AutoShapes_SetDrawingBasePos:{
-            if(this.drawingBase && this.drawingBase.Pos){
-                this.drawingBase.Pos.X = data.NewPr.X;
-                this.drawingBase.Pos.Y = data.NewPr.Y;
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseExt:{
-            if(this.drawingBase && this.drawingBase.ext){
-                this.drawingBase.ext.cx = data.NewPr.cx;
-                this.drawingBase.ext.cy = data.NewPr.cy;
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseType:{
-            if(this.drawingBase){
-                this.drawingBase.Type = data.NewPr;
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetLocks:
-        {
-            this.locks = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
-        {
-            this.fromSerialize = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
-        {
-            if(this.drawingBase)
-            {
-                this.drawingBase.from.col    = data.fromCol;
-                this.drawingBase.from.colOff = data.fromColOff;
-                this.drawingBase.from.row    = data.fromRow;
-                this.drawingBase.from.rowOff = data.fromRowOff;
-                this.drawingBase.to.col      = data.toCol;
-                this.drawingBase.to.colOff   = data.toColOff;
-                this.drawingBase.to.row      = data.toRow;
-                this.drawingBase.to.rowOff   = data.toRowOff;
-                this.drawingBase.Pos.X       = data.posX;
-                this.drawingBase.Pos.Y       = data.posY;
-                this.drawingBase.ext.cx      = data.cx;
-                this.drawingBase.ext.cy      = data.cy;
-            }
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
-        {
-            AscFormat.deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
-        {
-            AscFormat.addToDrawings(this.worksheet, this, data.Pos);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetWorksheet:
-        {
-            this.worksheet = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetBDeleted:
-        {
-            this.bDeleted = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetNvSpPr:
-        {
-            this.nvSpPr = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetSpPr:
-        {
-            this.spPr = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetStyle:
-        {
-            this.style = data.newPr;
-            var content = this.getDocContent();
-
-            this.recalcInfo.recalculateShapeStyleForParagraph = true;
-            if(this.recalcTextStyles)
-                this.recalcTextStyles();
-            if(content)
-            {
-                content.Recalc_AllParagraphs_CompiledPr();
-            }
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetTxBody:
-        {
-            this.txBody = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetTextBoxContent:
-        {
-            this.textBoxContent = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetParent:
-        {
-            this.parent = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetGroup:
-        {
-            this.group = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetBodyPr:
-        {
-            this.bodyPr = data.newPr;
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetWordShape:
-        {
-            this.bWordShape = data.newPr;
-            break;
-        }
-    }
-};
-
-CShape.prototype.Save_Changes = function (data, w)
-{
-    w.WriteLong(this.getObjectType());
-    w.WriteLong(data.Type);
-    switch (data.Type)
-    {
-        case AscDFH.historyitem_AutoShapes_SetDrawingBasePos:{
-
-            w.WriteDouble(data.NewPr.X);
-            w.WriteDouble(data.NewPr.Y);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseExt:{
-           w.WriteDouble(data.NewPr.cx);
-           w.WriteDouble(data.NewPr.cy);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseType:
-        {
-            w.WriteLong(data.NewPr);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetLocks:
-        {
-            w.WriteLong(data.newPr);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
-        {
-            AscFormat.writeBool(w, data.newPr);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
-        {
-            AscFormat.writeDouble(w, data.fromCol   );
-            AscFormat.writeDouble(w, data.fromColOff);
-            AscFormat.writeDouble(w, data.fromRow   );
-            AscFormat.writeDouble(w, data.fromRowOff);
-            AscFormat.writeDouble(w, data.toCol);
-            AscFormat.writeDouble(w, data.toColOff);
-            AscFormat.writeDouble(w, data.toRow   );
-            AscFormat.writeDouble(w, data.toRowOff);
-
-            AscFormat.writeDouble(w, data.posX);
-            AscFormat.writeDouble(w, data.posY);
-            AscFormat.writeDouble(w, data.cx);
-            AscFormat.writeDouble(w, data.cy);
-
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
-        {
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
-        {
-            var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
-            AscFormat.writeLong(w, Pos);
-            break;
-        }
-        case AscDFH.historyitem_AutoShapes_SetWorksheet:
-        {
-            AscFormat.writeBool(w, isRealObject(data.newPr));
-            if(isRealObject(data.newPr))
-            {
-                AscFormat.writeString(w, data.newPr.getId());
-            }
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetNvSpPr:
-        case AscDFH.historyitem_ShapeSetSpPr:
-        case AscDFH.historyitem_ShapeSetStyle:
-        case AscDFH.historyitem_ShapeSetTxBody:
-        case AscDFH.historyitem_ShapeSetTextBoxContent:
-        case AscDFH.historyitem_ShapeSetParent:
-        case AscDFH.historyitem_ShapeSetGroup:
-        {
-            AscFormat.writeObject(w, data.newPr);
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetBodyPr:
-        {
-            w.WriteBool(isRealObject(data.newPr));
-            if(isRealObject(data.newPr))
-            {
-               data.newPr.Write_ToBinary(w);
-            }
-            break;
-        }
-        case AscDFH.historyitem_ShapeSetWordShape:
-
-        case AscDFH.historyitem_ShapeSetBDeleted:
-        {
-            AscFormat.writeBool(w, data.newPr);
-            break;
-        }
-    }
-};
-
-CShape.prototype.Load_Changes = function (r)
-{
-    if (r.GetLong() === this.getObjectType())
-    {
-        var type = r.GetLong();
-        switch (type)
-        {
-            case AscDFH.historyitem_AutoShapes_SetDrawingBasePos:{
-                if(this.drawingBase && this.drawingBase.Pos){
-                    this.drawingBase.Pos.X = r.GetDouble();
-                    this.drawingBase.Pos.Y = r.GetDouble();
-                }
-                break;
-            }
-            case AscDFH.historyitem_AutoShapes_SetDrawingBaseExt:{
-                if(this.drawingBase && this.drawingBase.ext){
-                    this.drawingBase.ext.cx = r.GetDouble();
-                    this.drawingBase.ext.cy = r.GetDouble();
-                }
-                break;
-            }
-            case AscDFH.historyitem_AutoShapes_SetDrawingBaseType:
-            {
-                if(this.drawingBase)
-                {
-                    this.drawingBase.Type = r.GetLong();
-                }
-                break;
-            }
-            case AscDFH.historyitem_AutoShapes_SetLocks:
-            {
-                this.locks = r.GetLong();
-                break;
-            }
-            case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
-            {
-                this.fromSerialize = AscFormat.readBool(r);
-                break;
-            }
-            case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
-            {
-                if(this.drawingBase)
-                {
-                    this.drawingBase.from.col    = AscFormat.readDouble(r);
-                    this.drawingBase.from.colOff = AscFormat.readDouble(r);
-                    this.drawingBase.from.row    = AscFormat.readDouble(r);
-                    this.drawingBase.from.rowOff = AscFormat.readDouble(r);
-                    this.drawingBase.to.col      = AscFormat.readDouble(r);
-                    this.drawingBase.to.colOff   = AscFormat.readDouble(r);
-                    this.drawingBase.to.row      = AscFormat.readDouble(r);
-                    this.drawingBase.to.rowOff   = AscFormat.readDouble(r);
-
-                    this.drawingBase.Pos.X = AscFormat.readDouble(r);
-                    this.drawingBase.Pos.Y = AscFormat.readDouble(r);
-                    this.drawingBase.ext.cx = AscFormat.readDouble(r);
-                    this.drawingBase.ext.cy = AscFormat.readDouble(r);
-
-                }
-                break;
-            }
-            case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
-            {
-                AscFormat.deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
-                break;
-            }
-            case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
-            {
-                var pos = AscFormat.readLong(r);
-                if(this.worksheet)
-                {
-                    pos = this.worksheet.contentChanges.Check(AscCommon.contentchanges_Add, pos);
-                }
-                AscFormat.addToDrawings(this.worksheet, this, pos);
-                break;
-            }
-            case AscDFH.historyitem_AutoShapes_SetWorksheet:
-            {
-                AscFormat.ReadWBModel(this, r);
-                break;
-            }
-            case AscDFH.historyitem_ShapeSetBDeleted:
-            {
-                this.bDeleted = AscFormat.readBool(r);
-                break;
-            }
-            case AscDFH.historyitem_ShapeSetNvSpPr:
-            {
-                this.nvSpPr = AscFormat.readObject(r);
-                break;
-            }
-            case AscDFH.historyitem_ShapeSetSpPr:
-            {
-                this.spPr = AscFormat.readObject(r);
-                break;
-            }
-            case AscDFH.historyitem_ShapeSetStyle:
-            {
-                this.style = AscFormat.readObject(r);
-                var content = this.getDocContent();
-
-                this.recalcInfo.recalculateShapeStyleForParagraph = true;
-                if(this.recalcTextStyles)
-                    this.recalcTextStyles();
-                if(content)
-                {
-                    content.Recalc_AllParagraphs_CompiledPr();
-                }
-                break;
-            }
-            case AscDFH.historyitem_ShapeSetTxBody:
-            {
-                this.txBody = AscFormat.readObject(r);
-                break;
-            }
-            case AscDFH.historyitem_ShapeSetTextBoxContent:
-            {
-                this.textBoxContent = AscFormat.readObject(r);
-                break;
-            }
-            case AscDFH.historyitem_ShapeSetParent:
-            {
-                this.parent = AscFormat.readObject(r);
-                break;
-            }
-            case AscDFH.historyitem_ShapeSetGroup:
-            {
-                this.group = AscFormat.readObject(r);
-                break;
-            }
-            case AscDFH.historyitem_ShapeSetBodyPr:
-            {
-                if(r.GetBool())
-                {
-                    this.bodyPr = new AscFormat.CBodyPr();
-                    this.bodyPr.Read_FromBinary(r);
-                }
-                else
-                {
-                    this.bodyPr = null;
-                }
-                break;
-            }
-            case AscDFH.historyitem_ShapeSetWordShape:
-            {
-                this.bWordShape = AscFormat.readBool(r);
-                break;
-            }
-        }
-    }
-};
 
 CShape.prototype.Load_LinkData = function (linkData)
 {

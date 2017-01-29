@@ -6596,13 +6596,7 @@ background-repeat: no-repeat;\
 			}
 
 			History.Create_NewPoint(AscDFH.historydescription_Document_ChangeColorScheme);
-			var data = {
-				Type: AscDFH.historyitem_ChangeColorScheme,
-				oldScheme: theme.themeElements.clrScheme,
-				newScheme: scheme
-			};
-			theme.themeElements.clrScheme = scheme;
-			History.Add(this.WordControl.m_oLogicDocument.DrawingObjects, data);
+			theme.changeColorScheme(scheme);
 			this.WordControl.m_oDrawingDocument.CheckGuiControlColors();
 			this.chartPreviewManager.clearPreviews();
 			this.textArtPreviewManager.clear();

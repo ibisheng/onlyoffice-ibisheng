@@ -826,7 +826,7 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
         deltaAng = 90*(ty - this.startY)/(this.chartSizes.h/2);
         this.view3D.rotX = StratRotX + deltaAng;
 
-		if(oChartSpace.chart.plotArea && oChartSpace.chart.plotArea.chart && oChartSpace.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart){
+		if(oChartSpace.chart.plotArea && oChartSpace.chart.plotArea.charts[0] && oChartSpace.chart.plotArea.charts[0].getObjectType() === AscDFH.historyitem_type_PieChart){
 			if(this.view3D.rotX < 0){
                 this.view3D.rotX = 0;
             }

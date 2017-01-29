@@ -1884,9 +1884,9 @@ BinaryChartWriter.prototype.WriteCT_StrData = function (oVal) {
             oThis.WriteCT_UnsignedInt(oVal.ptCount);
         });
     }
-    if (null != oVal.pt) {
-        for (var i = 0, length = oVal.pt.length; i < length; ++i) {
-            var oCurVal = oVal.pt[i];
+    if (null != oVal.pts) {
+        for (var i = 0, length = oVal.pts.length; i < length; ++i) {
+            var oCurVal = oVal.pts[i];
             if (null != oCurVal) {
                 this.bs.WriteItem(c_oserct_strdataPT, function () {
                     oThis.WriteCT_StrVal(oCurVal);

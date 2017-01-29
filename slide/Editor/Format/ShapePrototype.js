@@ -85,18 +85,6 @@ CShape.prototype.Is_UseInDocument = function(drawingObjects)
     }
     return false;
 };
-CShape.prototype.setWorksheet = function(worksheet)
-{
-    AscCommon.History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
-    this.worksheet = worksheet;
-    if(this.spTree)
-    {
-        for(var i = 0; i < this.spTree.length; ++i)
-        {
-            this.spTree[i].setWorksheet(worksheet);
-        }
-    }
-};
 CShape.prototype.setDrawingBase = function(drawingBase)
 {
     this.drawingBase = drawingBase;

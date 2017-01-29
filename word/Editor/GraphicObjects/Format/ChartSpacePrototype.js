@@ -474,9 +474,9 @@ CChartSpace.prototype.checkShapeChildTransform = function(transform_text)
             {
                 if(this.chart.plotArea)
                 {
-                    if(this.chart.plotArea.chart && this.chart.plotArea.chart.series)
+                    if(this.chart.plotArea.charts[0] && this.chart.plotArea.charts[0].series)
                     {
-                        var series = this.chart.plotArea.chart.series;
+                        var series = this.chart.plotArea.charts[0].series;
                         for(var i = 0; i < series.length; ++i)
                         {
                             var ser = series[i];
