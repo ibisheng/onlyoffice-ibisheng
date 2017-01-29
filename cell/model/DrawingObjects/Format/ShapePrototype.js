@@ -599,6 +599,31 @@ CShape.prototype.Get_Worksheet = function()
     return this.worksheet;
 };
 
+
+
+    CShape.prototype.Set_CurrentElement = function()
+    {
+
+        var drawing_objects = this.getDrawingObjectsController();
+        if(drawing_objects)
+        {
+            drawing_objects.resetSelection(true);
+            if(this.group)
+            {
+                var main_group = this.group.getMainGroup();
+                drawing_objects.selectObject(main_group, 0);
+                main_group.selectObject(this, 0);
+                main_group.selection.textSelection = this;
+                drawing_objects.selection.groupSelection = main_group;
+            }
+            else
+            {
+                drawing_objects.selectObject(this, 0);
+                drawing_objects.selection.textSelection = this;
+            }
+        }
+    };
+
 AscFormat.CTextBody.prototype.Get_Worksheet = function()
 {
     return this.parent && this.parent.Get_Worksheet && this.parent.Get_Worksheet();

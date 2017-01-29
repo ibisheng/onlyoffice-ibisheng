@@ -2339,6 +2339,29 @@ CGraphicObjects.prototype =
         this.curState = state;
     },
 
+    handleDblClickEmptyShape: function(oShape){
+        if(!oShape.getDocContent() && !AscFormat.CheckLinePresetForParagraphAdd(oShape)){
+
+            if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
+            {
+                History.Create_NewPoint(AscDFH.historydescription_Document_GrObjectsBringBackward);
+                if(!oShape.bWordShape){
+                    oShape.createTextBody();
+                }
+                else{
+                    oShape.createTextBoxContent();
+                }
+                this.document.Recalculate();
+                var oContent = oShape.getDocContent();
+                oContent.Set_CurrentElement(0, true);
+                this.updateSelectionState();
+            }
+            this.clearTrackObjects();
+            this.clearPreTrackObjects();
+            this.changeCurrentState(new AscFormat.NullState(this));
+        }
+    },
+
     canGroup: function(bGetArray)
     {
         var selection_array = this.selectedObjects;

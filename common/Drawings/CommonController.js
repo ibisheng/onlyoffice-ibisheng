@@ -937,8 +937,6 @@ DrawingObjectsController.prototype =
 
 
     handleDblClickEmptyShape: function(oShape){
-        if(!this.drawingObjects.cSld)
-            return;
         this.checkSelectedObjectsAndCallback(function () {
             if(!oShape.getDocContent() && !CheckLinePresetForParagraphAdd(oShape)){
                 if(!oShape.bWordShape){
@@ -10500,4 +10498,5 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
 	window['AscFormat'].ApplyDLblsProps = ApplyDLblsProps;
 	window['AscFormat'].CollectDLbls = CollectDLbls;
 	window['AscFormat'].CollectSettingsSpPr = CollectSettingsSpPr;
+	window['AscFormat'].CheckLinePresetForParagraphAdd = CheckLinePresetForParagraphAdd;
 })(window);
