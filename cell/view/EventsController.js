@@ -918,8 +918,7 @@
 
 				case 80: // print           Ctrl + p
 					if (t.handlers.trigger("getCellEditMode")) {
-						stop();
-						return result;
+						return true;
 					}
 
 					if (!ctrlKey) {
