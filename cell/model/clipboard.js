@@ -2777,6 +2777,8 @@
 			this.isUsuallyPutImages = null;
 			this.maxLengthRowCount = 0;
 			
+			this.paragraphText = "";
+			
 			return this;
 		}
 
@@ -2871,6 +2873,8 @@
 			
 			_parseParagraph: function(paragraph, row, col, rowSpan, colSpan)
 			{
+				this.paragraphText = "";
+				
 				var content = paragraph.elem.Content;
 				var row, cTextPr, fontFamily = "Arial";
 				var text = null;
@@ -2960,10 +2964,12 @@
 					oNewItem.content.push(formatText);
 					
 					if(text !== null)
+					{
 						oNewItem.content[oNewItem.content.length - 1].text = text;
-						
+						this.paragraphText += text;
+					}	
 					text = "";
-				};
+				}
 
 				
 				//проходимся по контенту paragraph
@@ -3038,6 +3044,7 @@
 					}
 				}
 				
+				oNewItem.textVal = this.paragraphText;
 			},
 			
 			_parseParaRun: function(paraRun, oNewItem, paraPr, s, row, c1, text)
@@ -3125,8 +3132,11 @@
 					
 					
 					if(text !== null)
+					{
 						oNewItem.content[oNewItem.content.length - 1].text = text;
-						
+						this.paragraphText += text;
+					}
+					
 					cloneNewItem  = oNewItem.clone();
 					
 					text = "";

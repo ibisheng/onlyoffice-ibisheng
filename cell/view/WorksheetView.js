@@ -9141,6 +9141,7 @@
 			} else {
 				pastedRangeProps.value2 = contentCurrentObj;
 				pastedRangeProps.alignVertical = currentObj.va;
+				pastedRangeProps.val = currentObj.textVal;
 			}
 
 			if (contentCurrentObj.length === 1 && contentCurrentObj[0].format) {
