@@ -1361,6 +1361,9 @@ CFootnotesController.prototype.ClearParagraphFormatting = function()
 };
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
+	if (para_NewLine === oItem.Type && true === oItem.Is_PageOrColumnBreak())
+		return;
+
 	if (oItem instanceof ParaTextPr)
 	{
 		for (var sId in this.Selection.Footnotes)
