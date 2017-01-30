@@ -2459,10 +2459,10 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     // Отмечаем, что началось слово
                     StartWord = true;
 
-                    if (para_ContinuationSeparator === ItemType)
-                        Item.Update_Width(PRS);
+					if (para_ContinuationSeparator === ItemType || para_Separator === ItemType)
+						Item.UpdateWidth(PRS);
 
-                    if (true !== PRS.IsFastRecalculate())
+					if (true !== PRS.IsFastRecalculate())
 					{
 						if (para_FootnoteReference === ItemType)
 						{
