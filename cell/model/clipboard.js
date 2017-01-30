@@ -290,12 +290,12 @@
 				}
 			},
 
-			pasteData: function(ws, _format, data1, data2, text_data)
+			pasteData: function(ws, _format, data1, data2, text_data, bIsSpecialPaste)
 			{
 				var t = this;
 				t.pasteProcessor.clean();
 				
-				if(null === this.specialPasteProps)
+				if(!bIsSpecialPaste)
 				{
 					window['AscCommon'].g_clipboardBase.specialPasteData.activeRange = ws.model.selectionRange.clone(ws.model);
 					window['AscCommon'].g_clipboardBase.specialPasteUndoData.images = [];
@@ -362,7 +362,7 @@
 					}
 				}
 				
-				if(null === this.specialPasteProps)
+				if(!bIsSpecialPaste)
 				{
 					window['AscCommon'].g_clipboardBase.specialPasteData._format = _format;
 					window['AscCommon'].g_clipboardBase.specialPasteData.data1 = data1;

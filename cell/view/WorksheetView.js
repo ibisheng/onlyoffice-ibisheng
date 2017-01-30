@@ -8798,7 +8798,7 @@
 			api.wb.clipboard.specialPasteProps = tempProps;
 			
 			var specialPasteData = window['AscCommon'].g_clipboardBase.specialPasteData;
-			api.wb.clipboard.pasteData(this, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data);
+			api.wb.clipboard.pasteData(this, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data, true);
 		}
 	};
 	
