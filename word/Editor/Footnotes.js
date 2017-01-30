@@ -1053,6 +1053,16 @@ CFootnotesController.prototype.GotoPrevFootnote = function()
 		this.private_SetCurrentFootnoteNoSelection(oPrevFootnote);
 	}
 };
+CFootnotesController.prototype.GetNumberingInfo = function(ParaId, NumPr, oFootnote)
+{
+	var arrFootnotes     = this.LogicDocument.Get_FootnotesList(null, oFootnote);
+	var oNumberingEngine = new CDocumentNumberingInfoEngine(ParaId, NumPr, this.Get_Numbering());
+	for (var nIndex = 0, nCount = arrFootnotes.length; nIndex < nCount; ++nIndex)
+	{
+		arrFootnotes[nIndex].Get_NumberingInfo(oNumberingEngine, ParaId, NumPr);
+	}
+	return oNumberingEngine.Get_NumInfo();
+};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private area
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
