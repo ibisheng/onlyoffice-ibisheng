@@ -151,16 +151,28 @@ function (window, undefined)
 
 		if (_scroll.directionLocked == "v")
 		{
-			_api._onScrollY(-_scroll.y / _api.controller.settings.hscrollStep);
+			var _deltaY = -_scroll.y / _api.controller.settings.hscrollStep;
+			if (_scroll.y == _scroll.maxScrollY)
+				_deltaY += 1;
+			_api._onScrollY(_deltaY);
 		}
 		else if (_scroll.directionLocked == "h")
 		{
-			_api._onScrollX(-_scroll.x / _api.controller.settings.vscrollStep);
+			var _deltaX = -_scroll.x / _api.controller.settings.vscrollStep;
+			if (_scroll.x == _scroll.maxScrollX)
+				_deltaX += 1;
+			_api._onScrollX(_deltaX);
 		}
 		else if (_scroll.directionLocked == "n")
 		{
-			_api._onScrollX(-_scroll.x / _api.controller.settings.vscrollStep);
-			_api._onScrollY(-_scroll.y / _api.controller.settings.hscrollStep);
+			var _deltaY = -_scroll.y / _api.controller.settings.hscrollStep;
+			if (_scroll.y == _scroll.maxScrollY)
+				_deltaY += 1;
+			var _deltaX = -_scroll.x / _api.controller.settings.vscrollStep;
+			if (_scroll.x == _scroll.maxScrollX)
+				_deltaX += 1;
+			_api._onScrollX(_deltaX);
+			_api._onScrollY(_deltaY);
 		}
 	};
 	CMobileDelegateEditorCell.prototype.GetContextMenuType = function()
