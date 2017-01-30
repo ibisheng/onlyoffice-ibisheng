@@ -5474,6 +5474,13 @@ function BinaryPPTYLoader()
                 _graphic_frame.setSpPr(new AscFormat.CSpPr());
                 _graphic_frame.spPr.setParent(_graphic_frame);
             }
+            if(!_xfrm){
+                _xfrm = new AscFormat.CXfrm();
+                _xfrm.setOffX(0);
+                _xfrm.setOffY(0);
+                _xfrm.setExtX(0);
+                _xfrm.setExtY(0);
+            }
             _graphic_frame.spPr.setXfrm(_xfrm);
             _xfrm.setParent(_graphic_frame.spPr);
             _graphic_frame.setSpPr(_graphic_frame.spPr);
@@ -5491,6 +5498,13 @@ function BinaryPPTYLoader()
             {
                 _chart.setSpPr(new AscFormat.CSpPr());
                 _chart.spPr.setParent(_chart);
+            }
+            if(!_xfrm){
+                _xfrm = new AscFormat.CXfrm();
+                _xfrm.setOffX(0);
+                _xfrm.setOffY(0);
+                _xfrm.setExtX(0);
+                _xfrm.setExtY(0);
             }
             _chart.spPr.setXfrm(_xfrm);
             _xfrm.setParent(_chart.spPr);
