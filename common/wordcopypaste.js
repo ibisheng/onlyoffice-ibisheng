@@ -2114,7 +2114,6 @@ PasteProcessor.prototype =
                 }
                 Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
                 Item.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
-                this.oRecalcDocument.ContentLastChangePos = this.oRecalcDocument.CurPos.ContentPos;
             }
             else
             {
@@ -2192,7 +2191,6 @@ PasteProcessor.prototype =
                     oDoc.Internal_Content_Remove(LastPosCurDoc, 1);
                     LastPosCurDoc--;
                 }
-                this.oRecalcDocument.ContentLastChangePos = LastPos;
                 Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
                 Item.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
                 oDoc.CurPos.ContentPos = LastPosCurDoc;

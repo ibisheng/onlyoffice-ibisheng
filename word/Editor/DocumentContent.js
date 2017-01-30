@@ -2222,9 +2222,6 @@ CDocumentContent.prototype.Add_NewParagraph = function()
                 this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewParagraph);
                 this.CurPos.ContentPos++;
 
-                // Отмечаем, что последний измененный элемент - предыдущий параграф
-                this.ContentLastChangePos = this.CurPos.ContentPos - 1;
-
                 if (true === this.Is_TrackRevisions())
                 {
                     NewParagraph.Remove_PrChange();
@@ -2623,9 +2620,6 @@ CDocumentContent.prototype.Paragraph_Add                      = function(ParaIte
                                 // Если в TextPr только HighLight, тогда не надо ничего пересчитывать, только перерисовываем
                                 if (true === ParaItem.Value.Check_NeedRecalc())
                                 {
-                                    // Нам нужно пересчитать все изменения, начиная с первого элемента,
-                                    // попавшего в селект.
-                                    this.ContentLastChangePos = StartPos;
                                     this.Recalculate();
                                 }
                                 else
@@ -2663,9 +2657,6 @@ CDocumentContent.prototype.Paragraph_Add                      = function(ParaIte
 
                             if (false != bRecalculate)
                             {
-                                // Нам нужно пересчитать все изменения, начиная с первого элемента,
-                                // попавшего в селект.
-                                this.ContentLastChangePos = this.Selection.Data[0];
                                 this.Recalculate();
                             }
 
@@ -2690,8 +2681,6 @@ CDocumentContent.prototype.Paragraph_Add                      = function(ParaIte
                     this.Add_NewParagraph();
                     this.Content[this.CurPos.ContentPos - 1].Add(ParaItem);
                     this.Content[this.CurPos.ContentPos - 1].Clear_Formatting();
-                    // Нам нужно пересчитать все изменения, начиная с текущего элемента
-                    this.ContentLastChangePos = this.CurPos.ContentPos - 1;
                 }
                 else
                 {
@@ -2699,8 +2688,6 @@ CDocumentContent.prototype.Paragraph_Add                      = function(ParaIte
                     this.Add_NewParagraph();
                     this.Content[this.CurPos.ContentPos - 1].Add(ParaItem);
                     this.Content[this.CurPos.ContentPos - 1].Clear_Formatting();
-                    // Нам нужно пересчитать все изменения, начиная с текущего элемента
-                    this.ContentLastChangePos = this.CurPos.ContentPos - 2;
                 }
 
                 if (false != bRecalculate)
@@ -3210,28 +3197,9 @@ CDocumentContent.prototype.Remove                             = function(Count, 
                             this.CurPos.ContentPos--;
                         }
                     }
-
-                    // Нам нужно пересчитать все изменения, начиная с текущего элемента
-                    this.ContentLastChangePos = this.CurPos.ContentPos;
-
-                    this.Recalculate();
                 }
-                else
-                {
-                    if (true === bNumbering && undefined == this.Content[this.CurPos.ContentPos].Numbering_Get())
-                    {
-                        // Нам нужно пересчитать все изменения, начиная с предыдущего элемента
-                        this.ContentLastChangePos = this.CurPos.ContentPos - 1;
-                        this.Recalculate();
 
-                    }
-                    else
-                    {
-                        // Нам нужно пересчитать все изменения, начиная с текущего элемента
-                        this.ContentLastChangePos = this.CurPos.ContentPos;
-                        this.Recalculate();
-                    }
-                }
+                this.Recalculate();
 
                 var Item = this.Content[this.CurPos.ContentPos];
                 if (type_Paragraph == Item.GetType())
@@ -4626,12 +4594,8 @@ CDocumentContent.prototype.Set_ParagraphSpacing               = function(Spacing
                     Item.TurnOn_RecalcEvent();
                 }
             }
-            // Нам нужно пересчитать все изменения, начиная с первого элемента,
-            // попавшего в селект.
-            this.ContentLastChangePos = StartPos;
 
             this.Recalculate();
-
             return;
         }
 
@@ -4639,10 +4603,6 @@ CDocumentContent.prototype.Set_ParagraphSpacing               = function(Spacing
         if (type_Paragraph == Item.GetType())
         {
             Item.Set_Spacing(Spacing, false);
-
-            // Нам нужно пересчитать все изменения, начиная с текущего элемента
-            this.ContentLastChangePos = this.CurPos.ContentPos;
-
             this.Recalculate();
         }
         else if (type_Table == Item.GetType())
@@ -4730,14 +4690,8 @@ CDocumentContent.prototype.Set_ParagraphIndent                = function(Ind)
                 }
             }
 
-            // Нам нужно пересчитать все изменения, начиная с первого элемента,
-            // попавшего в селект.
-            this.ContentLastChangePos = StartPos;
-
             this.Recalculate();
-
             this.Interface_Update_ParaPr();
-
             return;
         }
 
@@ -4757,11 +4711,7 @@ CDocumentContent.prototype.Set_ParagraphIndent                = function(Ind)
                 Item.Set_Ind(Ind, false);
             }
 
-            // Нам нужно пересчитать все изменения, начиная с текущего элемента
-            this.ContentLastChangePos = this.CurPos.ContentPos;
-
             this.Recalculate();
-
             this.Interface_Update_ParaPr();
         }
         else if (type_Table == Item.GetType())
@@ -5277,11 +5227,7 @@ CDocumentContent.prototype.Set_ParagraphNumbering             = function(NumInfo
                 }
             }
 
-            // Нам нужно пересчитать все изменения, начиная с элемента, предшевствующего
-            // первому попавшему в селект.
-            this.ContentLastChangePos = StartPos - 1;
             this.Recalculate();
-
             return;
         }
 
@@ -5751,7 +5697,6 @@ CDocumentContent.prototype.Set_ParagraphNumbering             = function(NumInfo
 
             }
 
-            this.ContentLastChangePos = FirstChange;
             this.Recalculate();
             this.Interface_Update_ParaPr();
         }
@@ -5790,17 +5735,10 @@ CDocumentContent.prototype.Set_ParagraphPresentationNumbering = function(Bullet)
         {
             this.Content[Index].Add_PresentationNumbering(Bullet);
         }
-        // Нам нужно пересчитать все изменения, начиная с первого элемента,
-        // попавшего в селект.
-        this.ContentLastChangePos = StartPos;
-
         this.Recalculate();
-
         return;
     }
     this.Content[this.CurPos.ContentPos].Add_PresentationNumbering(Bullet);
-    // Нам нужно пересчитать все изменения, начиная с текущего элемента
-    this.ContentLastChangePos = this.CurPos.ContentPos;
     this.Recalculate();
 };
 CDocumentContent.prototype.Can_IncreaseParagraphLevel         = function(bIncrease)
@@ -5872,17 +5810,10 @@ CDocumentContent.prototype.Increase_ParagraphLevel            = function(bIncrea
         {
             this.Content[Index].Increase_Level(bIncrease);
         }
-        // Нам нужно пересчитать все изменения, начиная с первого элемента,
-        // попавшего в селект.
-        this.ContentLastChangePos = StartPos;
-
         this.Recalculate();
-
         return;
     }
     this.Content[this.CurPos.ContentPos].Increase_Level(bIncrease);
-    // Нам нужно пересчитать все изменения, начиная с текущего элемента
-    this.ContentLastChangePos = this.CurPos.ContentPos;
     this.Recalculate();
 };
 CDocumentContent.prototype.Set_ParagraphShd                   = function(Shd)
@@ -6029,12 +5960,7 @@ CDocumentContent.prototype.Set_ParagraphStyle                 = function(Name)
                     Item.TurnOn_RecalcEvent();
                 }
             }
-
-            // Нам нужно пересчитать все изменения, начиная с первого элемента,
-            // попавшего в селект.
-            this.ContentLastChangePos = StartPos;
             this.Recalculate();
-
             return;
         }
 
@@ -6042,9 +5968,6 @@ CDocumentContent.prototype.Set_ParagraphStyle                 = function(Name)
         if (type_Paragraph == Item.GetType())
         {
             Item.Style_Add(StyleId);
-
-            // Нам нужно пересчитать все изменения, начиная с текущего элемента
-            this.ContentLastChangePos = this.CurPos.ContentPos;
             this.Recalculate();
         }
         else if (type_Table == Item.GetType())
@@ -6052,9 +5975,6 @@ CDocumentContent.prototype.Set_ParagraphStyle                 = function(Name)
             Item.TurnOff_RecalcEvent();
             Item.Set_ParagraphStyle(Name);
             Item.TurnOn_RecalcEvent();
-
-            // Нам нужно пересчитать все изменения, начиная с предыдушего элемента
-            this.ContentLastChangePos = Math.max(this.CurPos.ContentPos - 1, 0);
             this.Recalculate();
         }
     }
@@ -6111,10 +6031,6 @@ CDocumentContent.prototype.Set_ParagraphTabs                  = function(Tabs)
                     Item.TurnOn_RecalcEvent();
                 }
             }
-            // Нам нужно пересчитать все изменения, начиная с первого элемента,
-            // попавшего в селект.
-            this.ContentLastChangePos = StartPos;
-
             this.Recalculate();
 
             if (editor)
@@ -6127,9 +6043,6 @@ CDocumentContent.prototype.Set_ParagraphTabs                  = function(Tabs)
         if (type_Paragraph == Item.GetType())
         {
             Item.Set_Tabs(Tabs);
-
-            // Нам нужно пересчитать все изменения, начиная с текущего элемента
-            this.ContentLastChangePos = this.CurPos.ContentPos;
             this.Recalculate();
             if (editor)
                 editor.Update_ParaTab(Default_Tab_Stop, Tabs);
@@ -6194,12 +6107,7 @@ CDocumentContent.prototype.Set_ParagraphContextualSpacing     = function(Value)
                     Item.TurnOn_RecalcEvent();
                 }
             }
-            // Нам нужно пересчитать все изменения, начиная с первого элемента,
-            // попавшего в селект.
-            this.ContentLastChangePos = StartPos;
-
             this.Recalculate();
-
             return;
         }
 
@@ -6207,10 +6115,6 @@ CDocumentContent.prototype.Set_ParagraphContextualSpacing     = function(Value)
         if (type_Paragraph == Item.GetType())
         {
             Item.Set_ContextualSpacing(Value);
-
-            // Нам нужно пересчитать все изменения, начиная с текущего элемента
-            this.ContentLastChangePos = this.CurPos.ContentPos;
-
             this.Recalculate();
         }
         else if (type_Table == Item.GetType())
@@ -6273,12 +6177,7 @@ CDocumentContent.prototype.Set_ParagraphKeepLines             = function(Value)
                     Item.TurnOn_RecalcEvent();
                 }
             }
-            // Нам нужно пересчитать все изменения, начиная с первого элемента,
-            // попавшего в селект.
-            this.ContentLastChangePos = StartPos;
-
             this.Recalculate();
-
             return;
         }
 
@@ -6286,10 +6185,6 @@ CDocumentContent.prototype.Set_ParagraphKeepLines             = function(Value)
         if (type_Paragraph == Item.GetType())
         {
             Item.Set_KeepLines(Value);
-
-            // Нам нужно пересчитать все изменения, начиная с текущего элемента
-            this.ContentLastChangePos = this.CurPos.ContentPos;
-
             this.Recalculate();
         }
         else if (type_Table == Item.GetType())
@@ -6348,12 +6243,7 @@ CDocumentContent.prototype.Set_ParagraphKeepNext              = function(Value)
                     Item.TurnOn_RecalcEvent();
                 }
             }
-            // Нам нужно пересчитать все изменения, начиная с первого элемента,
-            // попавшего в селект.
-            this.ContentLastChangePos = StartPos;
-
             this.Recalculate();
-
             return;
         }
 
@@ -6361,10 +6251,6 @@ CDocumentContent.prototype.Set_ParagraphKeepNext              = function(Value)
         if (type_Paragraph == Item.GetType())
         {
             Item.Set_KeepNext(Value);
-
-            // Нам нужно пересчитать все изменения, начиная с текущего элемента
-            this.ContentLastChangePos = this.CurPos.ContentPos;
-
             this.Recalculate();
         }
         else if (type_Table == Item.GetType())
@@ -6423,12 +6309,7 @@ CDocumentContent.prototype.Set_ParagraphWidowControl          = function(Value)
                     Item.TurnOn_RecalcEvent();
                 }
             }
-            // Нам нужно пересчитать все изменения, начиная с первого элемента,
-            // попавшего в селект.
-            this.ContentLastChangePos = StartPos;
-
             this.Recalculate();
-
             return;
         }
 
@@ -6436,10 +6317,6 @@ CDocumentContent.prototype.Set_ParagraphWidowControl          = function(Value)
         if (type_Paragraph == Item.GetType())
         {
             Item.Set_WidowControl(Value);
-
-            // Нам нужно пересчитать все изменения, начиная с текущего элемента
-            this.ContentLastChangePos = this.CurPos.ContentPos;
-
             this.Recalculate();
         }
         else if (type_Table == Item.GetType())
@@ -6623,11 +6500,6 @@ CDocumentContent.prototype.Paragraph_IncDecFontSize           = function(bIncrea
                             Item.TurnOn_RecalcEvent();
                         }
                     }
-
-                    // Нам нужно пересчитать все изменения, начиная с первого элемента,
-                    // попавшего в селект.
-                    this.ContentLastChangePos = StartPos;
-
                     this.Recalculate();
                     break;
                 }
@@ -6652,7 +6524,6 @@ CDocumentContent.prototype.Paragraph_IncDecFontSize           = function(bIncrea
         {
             if (true === Item.IncDec_FontSize(bIncrease))
             {
-                this.ContentLastChangePos = this.CurPos.ContentPos;
                 this.Recalculate();
             }
         }
