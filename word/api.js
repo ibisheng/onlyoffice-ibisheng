@@ -2119,7 +2119,8 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.asc_Save           = function(isAutoSave)
 	{
 		this.IsUserSave = !isAutoSave;
-		if (true === this.canSave && !this.isLongAction() && this.asc_isDocumentCanSave())
+		if (true === this.canSave && !this.isLongAction() && (this.asc_isDocumentCanSave() || History.Have_Changes() ||
+			AscCommon.CollaborativeEditing.Have_OtherChanges()))
 		{
 			this.canSave = false;
 

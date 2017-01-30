@@ -424,7 +424,7 @@ var editor;
 
   spreadsheet_api.prototype.asc_Save = function(isAutoSave) {
 	  if (!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction ||
-		  this.isLongAction() || !this.asc_isDocumentCanSave()) {
+		  this.isLongAction() || !(this.asc_isDocumentCanSave() || this.collaborativeEditing.haveOtherChanges())) {
       return;
     }
 
