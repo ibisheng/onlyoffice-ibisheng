@@ -259,7 +259,7 @@ g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("gl-ES", 0x0456));
 //{ "quz-BO", 0x046b },
 //{ "nso-ZA", 0x046c },
 //{ "ba-RU", 0x046d },
-//{ "lb-LU", 0x046e },
+g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("lb-LU", 0x046e));
 //{ "kl-GL", 0x046f },
 //{ "ig-NG", 0x0470 },
 //{ "kr-NG", 0x0471 },
