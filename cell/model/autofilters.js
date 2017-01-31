@@ -629,19 +629,21 @@
 						filterObj.filter.changeRef(null, newDiff - currentDiff);
 				}
 				
-				//open/close rows
+				
+				//****open/close rows****
+				var nOpenRowsCount = null;
 				if(!bUndoChanges && !bRedoChanges)
 				{
-					var hiddenObj = {start: currentFilter.Ref.r1 + 1, h: null};
-					
 					var startRow = autoFilter && autoFilter.Ref ? autoFilter.Ref.r1 + 1 : currentFilter.Ref.r1 + 1;
 					var endRow = autoFilter && autoFilter.Ref ? autoFilter.Ref.r2 : currentFilter.Ref.r2;
-					
 					if(currentFilter && !currentFilter.isAutoFilter() && currentFilter.TotalsRowCount)
 					{
 						endRow--;
 					}
 					
+					var hiddenObj = {start: currentFilter.Ref.r1 + 1, h: null};
+					var nHiddenRowCount = 0;
+					var nRowsCount = 0;
 					for(var i = startRow; i <= endRow; i++)
 					{	
 						var isHidden = false;
@@ -674,6 +676,10 @@
 							else if(hiddenObj.h !== isSetHidden)
 							{
 								worksheet.setRowHidden(hiddenObj.h, hiddenObj.start, i - 1);
+								if(true === hiddenObj.h)
+								{
+									nHiddenRowCount += i - hiddenObj.start;
+								}
 								
 								hiddenObj.h = isSetHidden;
 								hiddenObj.start = i;
@@ -682,14 +688,24 @@
 							if(i === endRow)
 							{
 								worksheet.setRowHidden(hiddenObj.h, hiddenObj.start, i);
+								if(true === hiddenObj.h)
+								{
+									nHiddenRowCount += i + 1 - hiddenObj.start;
+								}
 							}
+							nRowsCount++;
 						}
 						else if(hiddenObj.h !== null)
 						{
 							worksheet.setRowHidden(hiddenObj.h, hiddenObj.start, i - 1);
+							if(true === hiddenObj.h)
+							{
+								nHiddenRowCount += i - hiddenObj.start;
+							}
 							hiddenObj.h = null
 						}
 					}
+					nOpenRowsCount = nRowsCount - nHiddenRowCount;
 				}
 				
 				//history
@@ -699,7 +715,7 @@
 
 				this._resetTablePartStyle();
 				
-				return {minChangeRow: minChangeRow, rangeOldFilter: rangeOldFilter};
+				return {minChangeRow: minChangeRow, rangeOldFilter: rangeOldFilter, nOpenRowsCount: nOpenRowsCount};
 			},
 			
 			reapplyAutoFilter: function (displayName, ar) 
