@@ -236,7 +236,7 @@ g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("eu-ES", 0x042d));
 //{ "km-KH", 0x0453 },
 //{ "lo-LA", 0x0454 },
 //{ "my-MM", 0x0455 },
-//{ "gl-ES", 0x0456 },
+g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("gl-ES", 0x0456));
 //{ "kok-IN", 0x0457 },
 //{ "mni", 0x0458 },
 //{ "sd-IN", 0x0459 },
