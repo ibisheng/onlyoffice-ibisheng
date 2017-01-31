@@ -3117,7 +3117,7 @@ CAreaChart.prototype =
     {
         if(!pr)
             return;
-        History.Add(new CChangesDrawingsContent(this, AscDFH.historyitem_AreaChart_AddAxId,  this, this.axId.length, [pr], true));
+        History.Add(new CChangesDrawingsContent(this, AscDFH.historyitem_AreaChart_AddAxId, this.axId.length, [pr], true));
         this.axId.push(pr);
     },
 
