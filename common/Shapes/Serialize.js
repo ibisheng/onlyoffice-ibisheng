@@ -5985,7 +5985,7 @@ function BinaryPPTYLoader()
 
         s.Skip2(5); // type + len
         var _count = s.GetULong();
-
+        _count = Math.min(_count, row.Content.length);
 		for (var i = 0; i < _count; i++)
 		{
 			s.Skip2(1);

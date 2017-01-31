@@ -42,7 +42,7 @@ var isRealObject = AscCommon.isRealObject;
 var History = AscCommon.History;
 
     window['AscDFH'].drawingsChangesMap[AscDFH.historyitem_GraphicFrameSetSpPr] = function(oClass, value){oClass.spPr = value;};
-    window['AscDFH'].drawingsChangesMap[AscDFH.historyitem_GraphicFrameSetGraphicObject] = function(oClass, value){oClass.graphicObject = value;};
+    window['AscDFH'].drawingsChangesMap[AscDFH.historyitem_GraphicFrameSetGraphicObject] = function(oClass, value){oClass.graphicObject = value; if(value){value.Parent = oClass;}};
     window['AscDFH'].drawingsChangesMap[AscDFH.historyitem_GraphicFrameSetSetNvSpPr] = function(oClass, value){oClass.nvGraphicFramePr = value;};
     window['AscDFH'].drawingsChangesMap[AscDFH.historyitem_GraphicFrameSetSetParent] = function(oClass, value){oClass.parent = value;};
     window['AscDFH'].drawingsChangesMap[AscDFH.historyitem_GraphicFrameSetSetGroup] = function(oClass, value){oClass.group = value;};
