@@ -230,7 +230,7 @@ g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("eu-ES", 0x042d));
 //{ "as-IN", 0x044d },
 //{ "mr-IN", 0x044e },
 //{ "sa-IN", 0x044f },
-//{ "mn-MN", 0x0450 },
+g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("mn-MN", 0x0450));
 //{ "bo-CN", 0x0451 },
 //{ "cy-GB", 0x0452 },
 //{ "km-KH", 0x0453 },
