@@ -58,7 +58,7 @@ var isRealObject = AscCommon.isRealObject;
         if(FromLoad){
             if(typeof AscCommon.CollaborativeEditing !== "undefined")
             {
-                if(typeof value.RasterImageId === "string" && value.RasterImageId.length > 0)
+                if(value && (typeof value.RasterImageId === "string") && value.RasterImageId.length > 0)
                 {
                     AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(value.RasterImageId));
                 }

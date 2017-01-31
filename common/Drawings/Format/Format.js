@@ -119,7 +119,7 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
             if(FromLoad){
                 if(typeof AscCommon.CollaborativeEditing !== "undefined")
                 {
-                    if(oClass.Fill.fill && oClass.Fill.fill.type === c_oAscFill.FILL_TYPE_BLIP && typeof oClass.Fill.fill.RasterImageId === "string" && oClass.Fill.fill.RasterImageId.length > 0)
+                    if(oClass.Fill && oClass.Fill.fill && oClass.Fill.fill.type === c_oAscFill.FILL_TYPE_BLIP && typeof oClass.Fill.fill.RasterImageId === "string" && oClass.Fill.fill.RasterImageId.length > 0)
                     {
                         AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(oClass.Fill.fill.RasterImageId));
                     }
