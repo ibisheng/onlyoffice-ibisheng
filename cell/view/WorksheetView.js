@@ -6796,6 +6796,10 @@
         var sum = 0;
         var oExistCells = {};
 
+		if (window["NATIVE_EDITOR_ENJINE"]) {
+		    return oSelectionMathInfo;
+		}
+
         var t = this;
         this.model.selectionRange.ranges.forEach(function (item) {
             var tmp;
