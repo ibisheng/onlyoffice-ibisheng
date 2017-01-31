@@ -2725,9 +2725,11 @@ function asc_WriteCCelInfo(c, s) {
         s['WriteByte'](21);
         s['WriteString2'](c.asc_getStyleName());
     }
-
-	s['WriteByte'](22);
-	s['WriteLong'](c.c.asc_getNumFormatInfo().asc_getType());
+    
+    if (null != c.asc_getNumFormatInfo()) {
+        s['WriteByte'](22);
+        s['WriteLong'](c.asc_getNumFormatInfo().asc_getType());
+    }
 
     if (null != c.asc_getAngle()) {
         s['WriteByte'](23);
@@ -3853,15 +3855,15 @@ function OfflineEditor () {
         
         window["NativeSupportTimeouts"] = true;
         
-//        try
-//        {
-//            throw "OpenFile";
-//        }
-//        catch (e)
-//        {
-//            
-//        }
-
+        //        try
+        //        {
+        //            throw "OpenFile";
+        //        }
+        //        catch (e)
+        //        {
+        //            
+        //        }
+        
         this.initSettings = settings;
         
         this.beforeOpen();
@@ -3871,7 +3873,7 @@ function OfflineEditor () {
         deviceScale = window["native"]["GetDeviceScale"]();
 
         window.g_file_path = "native_open_file";
-        window.NATIVE_DOCUMENT_TYPE = window["native"]["GetEditorType"]();
+        window.NATIVE_DOCUMENT_TYPE = "";//window["native"]["GetEditorType"]();
         _api = new window["Asc"]["spreadsheet_api"]({});
 
         var userInfo = new Asc.asc_CUserInfo();
@@ -4656,16 +4658,18 @@ function OfflineEditor () {
 
         return objectId;
     };
-    this.offline_addShapeDrawingObject = function(params) {
+    this.offline_addShapeDrawingObject = function(options) {
         var ws = _api.wb.getWorksheet();
         var objectRender = ws.objectRender;
         var objectId = null;
         var current = {pos: 0};
-        var shapeProp = asc_menu_ReadShapePr(params[0], current);
-        var left = params[1];
-        var top = params[2];
-        var right = params[3];
-        var bottom  = params[4];
+      
+        var shapeProp = asc_menu_ReadShapePr(options["shape"], current);
+    
+        var left = options["l"];
+        var top = options["t"];
+        var right = options["r"];
+        var bottom = options["b"];
 
         function ascCvtRatio(fromUnits, toUnits) {
             return window["Asc"].getCvtRatio(fromUnits, toUnits, objectRender.getContext().getPPIX());
@@ -4696,17 +4700,19 @@ function OfflineEditor () {
 
         return objectId;
     };
-    this.offline_addChartDrawingObject = function(params) {
+    this.offline_addChartDrawingObject = function(options) {
         var ws = _api.wb.getWorksheet();
         var objectRender = ws.objectRender;
         var objectId = null;
         var current = {pos: 0};
-        var settings = asc_menu_ReadChartPr(params[0], current);
-        var left = params[1];
-        var top = params[2];
-        var right = params[3];
-        var bottom = params[4];
-
+       
+        var settings = asc_menu_ReadChartPr(options["chart"], current);
+        
+        var left = options["l"];
+        var top = options["t"];
+        var right = options["r"];
+        var bottom = options["b"];
+        
         var selectedRange = ws.getSelectedRange();
         if (selectedRange)
         {
@@ -5356,7 +5362,7 @@ window["native"]["offline_stz"] = function(v) {_s.zoom = v; _api.asc_setZoom(v);
 window["native"]["offline_ds"] = function(x, y, width, height, ratio, istoplayer) {_s.drawSheet(x, y, width, height, ratio, istoplayer);}
 window["native"]["offline_dh"] = function(x, y, width, height, type, ratio) {_s.drawHeader(x, y, width, height, type, ratio);}
 
-window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFormulaEditMode, isRangeResize, isChartRange, indexRange, resizeRange, targetCol, targetRow, select) {
+window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFormulaEditMode, isRangeResize, isChartRange, indexRange, c1, r1, c2, r2, targetCol, targetRow, select) {
     _s.isShapeAction = false;
 
     var ws = _api.wb.getWorksheet();
@@ -5444,7 +5450,7 @@ window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFor
 
             ws.startCellMoveResizeRange = null;
 
-            var rangeChange = new window["Asc"].Range(resizeRange[0], resizeRange[1], resizeRange[2], resizeRange[3]);
+            var rangeChange = new window["Asc"].Range(c1, r1, c2, r2);
             var target = {
                 formulaRange: rangeChange,
                 row: ct.row,
@@ -5493,7 +5499,7 @@ window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFor
 
     return null;
 }
-window["native"]["offline_mouse_move"] = function(x, y, isViewerMode, isRangeResize, isChartRange, indexRange, resizeRange, targetCol, targetRow, textPin) {
+window["native"]["offline_mouse_move"] = function(x, y, isViewerMode, isRangeResize, isChartRange, indexRange, c1, r1, c2, r2, targetCol, targetRow, textPin) {
     var ws = _api.wb.getWorksheet();
     var wb = _api.wb;
 
@@ -5506,7 +5512,7 @@ window["native"]["offline_mouse_move"] = function(x, y, isViewerMode, isRangeRes
         if (!isViewerMode) {
             var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
 
-            var rangeChange = new window["Asc"].Range(resizeRange[0], resizeRange[1], resizeRange[2], resizeRange[3]);
+            var rangeChange = new window["Asc"].Range(c1, r1, c2, r2);
             var target = {
                 //formulaRange: rangeChange,
                 row: isChartRange ? ct.row : targetRow,
@@ -5563,7 +5569,7 @@ window["native"]["offline_mouse_move"] = function(x, y, isViewerMode, isRangeRes
 
     return null;
 }
-window["native"]["offline_mouse_up"] = function(x, y, isViewerMode, isRangeResize, isChartRange, indexRange, resizeRange, targetCol, targetRow) {
+window["native"]["offline_mouse_up"] = function(x, y, isViewerMode, isRangeResize, isChartRange, indexRange, c1, r1, c2, r2, targetCol, targetRow) {
     var ret = null;
     var ws = _api.wb.getWorksheet();
     var wb = _api.wb;
@@ -5656,22 +5662,22 @@ window["native"]["offline_get_charts_ranges"] = function() {
 }
 window["native"]["offline_get_worksheet_bounds"] = function() {return _s.getMaxBounds();}
 window["native"]["offline_complete_cell"] = function(x, y) {return _s.getNearCellCoord(x, y);}
-window["native"]["offline_keyboard_down"] = function(keys) {
+window["native"]["offline_keyboard_down"] = function(inputKeys) {
     var wb = _api.wb;
     var ws = _api.wb.getWorksheet();
 
     var isFormulaEditMode = ws.isFormulaEditMode;
     ws.isFormulaEditMode = false;
 
-    for (var i = 0; i < keys.length; ++i) {
+    for (var i = 0; i < inputKeys.length; i += 3) {
 
-        var operationCode = keys[i][0];
+        var operationCode = inputKeys[i];
 
         // TODO: commands for text in shape
 
-        var codeKey = keys[i][2];
+        var codeKey = inputKeys[i + 2];
 
-        if (100 == keys[i][1]) {
+        if (100 == inputKeys[i + 1]) {
 
             var event = {which:codeKey,keyCode:codeKey,metaKey:false,altKey:false,ctrlKey:false,shiftKey:false, preventDefault:function(){}};
 
@@ -5819,18 +5825,24 @@ window["native"]["offline_cell_editor_test_cells"] = function(x, y, width, heigh
     wb.visibleRange = range;
 }
 
-window["native"]["offline_cell_editor_process_input_commands"] = function(commands, width, height, ratio) {
+window["native"]["offline_cell_editor_process_input_commands"] = function(sendArguments) {
+   
     _null_object.width = width * ratio;
     _null_object.height = height * ratio;
 
     var wb = _api.wb;
     var cellEditor =  _api.wb.cellEditor;
     var operationCode, left,right, position, value, value2;
+    
+    var width  = sendArguments[0];
+    var height = sendArguments[1];
+    var ratio  = sendArguments[2];
 
-    for (var i = 0; i < commands.length; ++i) {
-        operationCode = commands[i][0];
-        value = commands[i][1];
-        value2 = commands[i][2];
+    for (var i = 3; i < sendArguments.length; i += 4) {
+       
+        operationCode   = sendArguments[i + 0];
+        value           = sendArguments[i + 1];
+        value2          = sendArguments[i + 2];
 
         var event = {which:value,metaKey:undefined,ctrlKey:undefined};
         event.stopPropagation = function() {};
@@ -5876,7 +5888,7 @@ window["native"]["offline_cell_editor_process_input_commands"] = function(comman
 
             // PASTE
             case 4: {
-                cellEditor.pasteText(commands[i][3]);
+                cellEditor.pasteText(commands[i + 3]);
                 break;
             }
 
@@ -5919,22 +5931,22 @@ window["native"]["offline_cell_editor_process_input_commands"] = function(comman
         cellEditor.textRender.chars.length];
 }
 
-window["native"]["offline_cell_editor_mouse_event"] = function(events) {
+window["native"]["offline_cell_editor_mouse_event"] = function(sendEvents) {
 
     var left, right;
     var cellEditor =  _api.wb.cellEditor;
 
-    for (var i = 0; i < events.length; ++i) {
+    for (var i = 0; i < sendEvents.length; i += 5) {
         var event = {
-            pageX:events[i][1],
-            pageY:events[i][2],
+            pageX:events[i + 1],
+            pageY:events[i + 2],
             which: 1,
-            shiftKey:events[i][3],
+            shiftKey:events[i + 3],
             button:0
         };
 
-        if (events[i][3]) {
-            if (-1 == events[i][4]) {
+        if (events[i + 3]) {
+            if (-1 == events[i + 4]) {
                 left = Math.min(cellEditor.selectionBegin, cellEditor.selectionEnd);
                 right = Math.max(cellEditor.selectionBegin, cellEditor.selectionEnd);
                 cellEditor.cursorPos = left;
@@ -5944,7 +5956,7 @@ window["native"]["offline_cell_editor_mouse_event"] = function(events) {
                 _s.textSelection = -1;
             }
 
-            if (1 == events[i][4]) {
+            if (1 == events[i + 4]) {
                 left = Math.min(cellEditor.selectionBegin, cellEditor.selectionEnd);
                 right = Math.max(cellEditor.selectionBegin, cellEditor.selectionEnd);
                 cellEditor.cursorPos = right;
@@ -5955,7 +5967,7 @@ window["native"]["offline_cell_editor_mouse_event"] = function(events) {
             }
         }
 
-        if (0 === events[i][0]) {
+        if (0 === events[i + 0]) {
             var pos = cellEditor.cursorPos;
             left = cellEditor.selectionBegin;
             right = cellEditor.selectionEnd;
@@ -5975,14 +5987,14 @@ window["native"]["offline_cell_editor_mouse_event"] = function(events) {
                 cellEditor.selectionEnd = Math.max(left + 1, cellEditor.selectionEnd);
             }
 
-        } else if (1 === events[i][0]) {
+        } else if (1 === events[i + 0]) {
             cellEditor._onMouseUp(event);
             _s.textSelection = 0;
-        } else if (2 == events[i][0]) {
+        } else if (2 == events[i + 0]) {
 
             cellEditor._onMouseMove(event);
 
-        } else if (3 == events[i][0]) {
+        } else if (3 == events[i + 0]) {
             cellEditor.clickCounter.clickCount = 2;
             cellEditor._onMouseDown(event);
             cellEditor._onMouseUp(event);

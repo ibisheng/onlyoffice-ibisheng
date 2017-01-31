@@ -663,11 +663,11 @@ CShapeDrawer.prototype =
             case Asc.c_oAscFill.FILL_TYPE_BLIP:
             {
                 if (!_fill.srcRect)
-                    this.NativeGraphics["PD_put_BrushTextute"](_fill.RasterImageId);
+                    this.NativeGraphics["PD_put_BrushTexture"](_fill.RasterImageId);
                 else
                 {
                     var _sR = _fill.srcRect;
-                    this.NativeGraphics["PD_put_BrushTextute"](_fill.RasterImageId, _sR.l, _sR.t, _sR.r, _sR.b);
+                    this.NativeGraphics["PD_put_BrushTexture"](_fill.RasterImageId, _sR.l, _sR.t, _sR.r, _sR.b);
                 }
 
                 this.NativeGraphics["PD_put_BrushTextureMode"]((null == _fill.tile) ? 1 : 2);

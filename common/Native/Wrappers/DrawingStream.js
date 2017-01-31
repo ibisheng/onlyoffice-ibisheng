@@ -462,7 +462,7 @@ CDrawingStreamSerializer.prototype["PD_EndShapeDraw"] = function()
 {
     this.Memory.push(71);
 };
-CDrawingStreamSerializer.prototype["PD_put_BrushTextute"] = function(id, l, t, r, b)
+CDrawingStreamSerializer.prototype["PD_put_BrushTexture"] = function(id, l, t, r, b)
 {
     if (l === undefined)
     {
