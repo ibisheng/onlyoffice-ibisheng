@@ -19,6 +19,7 @@
 		"../cell/model/CollaborativeEditing.js",
 		"../common/apiBase.js",
 		"../common/Private/license.js",
+		"../word/apiCommon.js",
 		"../cell/api.js"
 	  ],
 	  "common": [		
@@ -30,6 +31,7 @@
         "../common/FontsFreeType/FontFile.js",
 		"../common/FontsFreeType/font_map.js",
         "../common/FontsFreeType/FontManager.js",
+		"../word/Editor/FontClassification.js",
 		
 		"../common/Drawings/Metafile.js",
 		"../common/FontsFreeType/TextMeasurer.js",
@@ -174,8 +176,7 @@
         "../word/Editor/Table/TableRowChanges.js",
         "../word/Editor/Table/TableCell.js",
         "../word/Editor/Table/TableCellChanges.js",
-        "../word/Editor/Serialize2.js",
-        "../word/Editor/FontClassification.js",
+        "../word/Editor/Serialize2.js",        
         "../word/Editor/Spelling.js",
 		"../word/Editor/Footnotes.js",
         "../word/Editor/FootnotesChanges.js",
@@ -194,8 +195,7 @@
         "../word/Math/radical.js",
         "../word/Math/operators.js",
         "../word/Math/accent.js",
-        "../word/Math/borderBox.js",
-        "../word/apiCommon.js",
+        "../word/Math/borderBox.js",        
 		
 		"../word/apiBuilder.js",
 		"../slide/apiBuilder.js",

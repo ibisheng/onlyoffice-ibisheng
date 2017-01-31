@@ -18,6 +18,7 @@
 		"../slide/Editor/CollaborativeEditing.js",
 		"../common/apiBase.js",
 		"../common/Private/license.js",
+		"../word/apiCommon.js"
         "../slide/api.js"
 	  ],
 	  "common": [
@@ -29,6 +30,7 @@
         "../common/FontsFreeType/FontFile.js",
 		"../common/FontsFreeType/font_map.js",
         "../common/FontsFreeType/FontManager.js",
+		"../word/Editor/FontClassification.js",
 		
 		"../common/Drawings/Metafile.js",
 		"../common/FontsFreeType/TextMeasurer.js",
@@ -178,14 +180,12 @@
 		"../word/Editor/Footnotes.js",
         "../word/Editor/FootnotesChanges.js",
 		"../word/Editor/FootEndNote.js",								
-        "../word/Editor/Search.js",
-        "../word/Editor/FontClassification.js",
+        "../word/Editor/Search.js",        
         
         "../slide/Editor/Format/ImagePrototype.js",
         "../slide/Editor/Format/GroupPrototype.js",
         "../slide/Editor/Format/ChartSpacePrototype.js",
         "../slide/apiCommon.js",
-        "../word/apiCommon.js",
 		
 		"../word/apiBuilder.js",
 		"../slide/apiBuilder.js",

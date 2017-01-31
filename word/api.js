@@ -2294,7 +2294,7 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.sync_ChangeActiveHeaderCallback = function(position, header)
 	{
-		this.sendEvent("asc_onChangeActiveHeader", position, new CHeader(header));
+		this.sendEvent("asc_onChangeActiveHeader", position, new Asc.CHeader(header));
 	};
 	asc_docs_api.prototype.sync_ReturnHeadersCallback      = function(headers)
 	{

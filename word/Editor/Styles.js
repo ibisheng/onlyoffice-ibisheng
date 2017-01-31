@@ -10112,3 +10112,19 @@ window["AscCommonWord"].highlight_None = highlight_None;
 window["AscCommonWord"].spacing_Auto = spacing_Auto;
 window["AscCommonWord"].wrap_NotBeside = wrap_NotBeside;
 window["AscCommonWord"].wrap_Around = wrap_Around;
+
+// Создаем глобальные дефолтовые стили, чтобы быстро можно было отдать дефолтовые настройки
+var g_oDocumentDefaultTextPr = new CTextPr();
+var g_oDocumentDefaultParaPr = new CParaPr();
+var g_oDocumentDefaultTablePr = new CTablePr();
+var g_oDocumentDefaultTableCellPr = new CTableCellPr();
+var g_oDocumentDefaultTableRowPr = new CTableRowPr();
+var g_oDocumentDefaultTableStylePr = new CTableStylePr();
+g_oDocumentDefaultTextPr.Init_Default();
+g_oDocumentDefaultParaPr.Init_Default();
+g_oDocumentDefaultTablePr.Init_Default();
+g_oDocumentDefaultTableCellPr.Init_Default();
+g_oDocumentDefaultTableRowPr.Init_Default();
+g_oDocumentDefaultTableStylePr.Init_Default();
+
+// ----------------------------------------------------------------
