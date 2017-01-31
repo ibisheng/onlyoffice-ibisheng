@@ -38,6 +38,10 @@ CParagraphContentBase.prototype.CanSplit = function()
 {
 	return false;
 };
+CParagraphContentBase.prototype.IsParagraphContentElement = function()
+{
+	return true;
+};
 
 /**
  * Это базовый класс для элементов содержимого(контент) параграфа, у которых есть свое содержимое.
@@ -1898,6 +1902,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_EndPos = function(Behind
 //----------------------------------------------------------------------------------------------------------------------
 CParagraphContentWithParagraphLikeContent.prototype.Set_SelectionContentPos = function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
 {
+	if (this.Content.length <= 0)
+		return;
+
     var Selection = this.Selection;
 
     var OldStartPos = Selection.StartPos;
@@ -1980,6 +1987,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_SelectionContentPos = fu
 };
 CParagraphContentWithParagraphLikeContent.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
+	if (this.Content.length <= 0)
+		return;
+
     if ((0 === StartFlag && (!StartDocPos[Depth] || this !== StartDocPos[Depth].Class)) || (0 === EndFlag && (!EndDocPos[Depth] || this !== EndDocPos[Depth].Class)))
         return;
 
@@ -2076,6 +2086,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_ContentSelection = funct
 };
 CParagraphContentWithParagraphLikeContent.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
 {
+	if (this.Content.length <= 0)
+		return;
+
     if (0 === Flag && (!DocPos[Depth] || this !== DocPos[Depth].Class))
         return;
 

@@ -1877,7 +1877,7 @@ background-repeat: no-repeat;\
 	{
 		this.IsUserSave = !isAutoSave;
 		if (true === this.canSave && !this.isLongAction() && (this.asc_isDocumentCanSave() || History.Have_Changes() ||
-			AscCommon.CollaborativeEditing.Have_OtherChanges()))
+			AscCommon.CollaborativeEditing.Have_OtherChanges() || true === isUndoRequest))
 		{
 			this.canSave = false;
 
