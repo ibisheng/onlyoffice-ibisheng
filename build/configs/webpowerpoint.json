@@ -18,7 +18,7 @@
 		"../slide/Editor/CollaborativeEditing.js",
 		"../common/apiBase.js",
 		"../common/Private/license.js",
-		"../word/apiCommon.js"
+		"../word/apiCommon.js",
         "../slide/api.js"
 	  ],
 	  "common": [
