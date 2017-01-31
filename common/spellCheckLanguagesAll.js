@@ -329,7 +329,7 @@ g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("es-ES", 0x0c0a));
 //{ "ar-LY", 0x1001 },
 //{ "zh-SG", 0x1004 },
 //{ "de-LU", 0x1007 },
-//{ "en-CA", 0x1009 },
+g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("en-CA", 0x1009));
 //{ "es-GT", 0x100a },
 //{ "fr-CH", 0x100c },
 //{ "hr-BA", 0x101a },
