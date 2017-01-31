@@ -349,7 +349,7 @@ g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("en-CA", 0x1009));
 //{ "sr-Latn-BA", 0x181a },
 //{ "sma-NO", 0x183b },
 //{ "ar-TN", 0x1c01 },
-//{ "en-ZA", 0x1c09 },
+g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("en-ZA", 0x1c09));
 //{ "es-DO", 0x1c0a },
 //{ "fr-West", 0x1c0c },
 //{ "sr-Cyrl-BA", 0x1c1a },
