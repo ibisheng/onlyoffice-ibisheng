@@ -398,7 +398,7 @@
         if(this.Presentation){
             var width = nWidth/36000.0;
             var height = nHeight/36000.0;
-            History.Add(new AscDFH.CChangesDrawingsObjectNoId(this.Presentation, AscDFH.historyitem_Presentation_SlideSize, new AscFormat.CDrawingBaseCoordsWritable(this.Presentation.Width,  this.Presentation.Height), new AscFromat.CDrawingBaseCoordsWritable(width,  height)));
+            History.Add(new AscDFH.CChangesDrawingsObjectNoId(this.Presentation, AscDFH.historyitem_Presentation_SlideSize, new AscFormat.CDrawingBaseCoordsWritable(this.Presentation.Width,  this.Presentation.Height), new AscFormat.CDrawingBaseCoordsWritable(width,  height)));
             this.Presentation.Width = width;
             this.Presentation.Height = height;
             this.Presentation.changeSlideSizeFunction(this.Presentation.Width, this.Presentation.Height);
