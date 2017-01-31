@@ -178,7 +178,7 @@ g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("pt-BR", 0x0416));
 //{ "rm-CH", 0x0417 },
 g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("ro-RO", 0x0418));
 g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("ru-RU", 0x0419));
-//{ "hr-HR", 0x041a },
+g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("hr-HR", 0x041a));
 g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("sk-SK", 0x041b));
 //{ "sq-AL", 0x041c },
 g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("sv-SE", 0x041d));
