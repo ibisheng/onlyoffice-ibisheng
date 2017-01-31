@@ -154,7 +154,7 @@ var g_spellCheckLanguages = [];
 //{ "prs", 0x008c },
 //{ "gd", 0x0091 },
 //{ "ar-SA", 0x0401 },
-//{ "bg-BG", 0x0402 },
+g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("bg-BG", 0x0402));
 g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("ca-ES", 0x0403));
 //{ "zh-TW", 0x0404 },
 g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("cs-CZ", 0x0405));
