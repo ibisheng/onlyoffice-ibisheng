@@ -7784,6 +7784,12 @@ CTextPr.prototype =
 
 		if (!IsEqualStyleObjects(this.Shd, TextPr.Shd))
 			return false;
+		if(undefined != TextPr.AscLine){
+		    return false;
+        }
+        if(undefined != TextPr.AscUnifill){
+            return false;
+        }
 
         return true;
     },
