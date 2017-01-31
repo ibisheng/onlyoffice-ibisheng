@@ -171,7 +171,7 @@ CDrawingsController.prototype.SetParagraphSpacing = function (Spacing)
 		{
 			var Paragraph = ParaDrawing.Parent;
 			Paragraph.Set_Spacing(Spacing, false);
-			this.Recalculate();
+			this.LogicDocument.Recalculate();
 		}
 	}
 	else
