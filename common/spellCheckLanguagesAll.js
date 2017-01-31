@@ -197,7 +197,7 @@ g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("lt-LT", 0x0427));
 g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("vi-VN", 0x042a));
 //{ "hy-AM", 0x042b },
 g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("az-Latn-AZ", 0x042c));
-//{ "eu-ES", 0x042d },
+g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("eu-ES", 0x042d));
 //{ "wen-DE", 0x042e },
 //{ "mk-MK", 0x042f },
 //{ "st-ZA", 0x0430 },
