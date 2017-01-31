@@ -6855,7 +6855,20 @@ CTextStyles.prototype =
         {
             this.otherStyle = null;
         }
+    },
+
+    Document_Get_AllFontNames: function(AllFonts){
+        if(this.titleStyle){
+            this.titleStyle.Document_Get_AllFontNames(AllFonts);
+        }
+        if(this.bodyStyle){
+            this.bodyStyle.Document_Get_AllFontNames(AllFonts);
+        }
+        if(this.otherStyle){
+            this.otherStyle.Document_Get_AllFontNames(AllFonts);
+        }
     }
+
 };
 
 //---------------------------
@@ -8619,6 +8632,15 @@ TextListStyle.prototype =
             else
             {
                 this.levels[i] = null;
+            }
+        }
+    },
+
+
+    Document_Get_AllFontNames: function(AllFonts){
+        for(var i = 0; i < 10; ++i){
+            if(this.levels[i] && this.levels[i].DefaultRunPr){
+                this.levels[i].DefaultRunPr.Document_Get_AllFontNames(AllFonts);
             }
         }
     }

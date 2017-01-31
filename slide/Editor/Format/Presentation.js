@@ -3438,11 +3438,25 @@ CPresentation.prototype =
 
     Document_Get_AllFontNames : function()
     {
-        var AllFonts = {};
-        for(var i =0 ; i < this.Slides.length; ++i)
+        var AllFonts = {}, i;
+        for(i =0 ; i < this.Slides.length; ++i)
         {
             this.Slides[i].getAllFonts(AllFonts)
         }
+        for(i = 0; i < this.slideMasters.length; ++i)
+        {
+            this.slideMasters[i].getAllFonts(AllFonts);
+        }
+        if(this.globalTableStyles)
+        {
+            this.globalTableStyles.Document_Get_AllFontNames(AllFonts);
+        }
+        delete AllFonts["+mj-lt"];
+        delete AllFonts["+mn-lt"];
+        delete AllFonts["+mj-ea"];
+        delete AllFonts["+mn-ea"];
+        delete AllFonts["+mj-cs"];
+        delete AllFonts["+mn-cs"];
         return AllFonts;
     },
 

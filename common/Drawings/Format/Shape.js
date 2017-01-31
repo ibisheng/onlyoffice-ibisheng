@@ -1089,6 +1089,9 @@ CShape.prototype.getAllImages = function (images) {
 CShape.prototype.getAllFonts = function (fonts) {
     if (this.txBody) {
         this.txBody.content.Document_Get_AllFontNames(fonts);
+        if(this.txBody && this.txBody.lstStyle){
+            this.txBody.lstStyle.Document_Get_AllFontNames(fonts);
+        }
         delete fonts["+mj-lt"];
         delete fonts["+mn-lt"];
         delete fonts["+mj-ea"];

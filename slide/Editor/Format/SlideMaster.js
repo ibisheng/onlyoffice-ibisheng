@@ -495,7 +495,20 @@ MasterSlide.prototype =
 
     getAllFonts: function(fonts)
     {
-        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        var i;
+        if(this.Theme){
+            this.Theme.Document_Get_AllFontNames(fonts);
+        }
+
+        if(this.txStyles){
+            this.txStyles.Document_Get_AllFontNames(fonts);
+        }
+
+        for(i = 0; i < this.sldLayoutLst.length; ++i){
+            this.sldLayoutLst[i].getAllFonts(fonts);
+        }
+
+        for(i = 0; i < this.cSld.spTree.length; ++i)
         {
             if(typeof  this.cSld.spTree[i].getAllFonts === "function")
                 this.cSld.spTree[i].getAllFonts(fonts);
