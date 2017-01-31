@@ -286,6 +286,7 @@ g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("lb-LU", 0x046e));
 //{ "plt-MG", 0x048d },
 //{ "gd-GB", 0x0491 },
 //{ "ar-IQ", 0x0801 },
+g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("ca-ES-valencia", 0x0803));
 //{ "zh-CN", 0x0804 },
 g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("de-CH", 0x0807));
 g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("en-GB", 0x0809));
