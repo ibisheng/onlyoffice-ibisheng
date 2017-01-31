@@ -1728,20 +1728,13 @@
 				oPasteFromBinaryWord._paste(ws, {content: [drawingObject.graphicObject.graphicObject]});
 			},
 			
-			editorPasteExec: function (worksheet, node, isText, onlyFromLocalStorage)
+			editorPasteExec: function (worksheet, node, isText)
             {
 				if(node == undefined)
 					return;
 					
 				var binaryResult, t = this;
 				t.alreadyLoadImagesOnServer = false;
-				
-				//****binary****
-				if(onlyFromLocalStorage)
-				{
-					onlyFromLocalStorage = null;
-					node = this.element;
-				}
 				
 				//если находимся внутри шейпа
 				var isIntoShape = worksheet.objectRender.controller.getTargetDocContent();
@@ -1750,7 +1743,7 @@
 					var callback = function(isSuccess)
 					{
 						if(isSuccess)
-							t._pasteInShape(worksheet, node, onlyFromLocalStorage, isIntoShape);
+							t._pasteInShape(worksheet, node, isIntoShape);
 					};
 					
 					worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
@@ -1761,7 +1754,7 @@
 				if(copyPasteUseBinary)
 				{
 					this.activeRange = worksheet.model.selectionRange.getLast().clone();
-					binaryResult = this._pasteFromBinaryClassHtml(worksheet, node, onlyFromLocalStorage, isIntoShape);
+					binaryResult = this._pasteFromBinaryClassHtml(worksheet, node, isIntoShape);
 					
 					if(binaryResult === true)
 						return;
@@ -1835,37 +1828,15 @@
             },
 			
 			//TODO rename
-			_pasteFromBinaryClassHtml: function(worksheet, node, onlyFromLocalStorage, isIntoShape)
+			_pasteFromBinaryClassHtml: function(worksheet, node, isIntoShape)
 			{
 				var base64 = null, base64FromWord = null, base64FromPresentation = null, t = this;
 				
-				if(onlyFromLocalStorage)
-				{
-					/*if(typeof t.lStorage == "object")
-					{
-						if(t.lStorage.htmlInShape)
-						{
-							return t.lStorage.htmlInShape;
-						}
-						else
-						{
-							window.GlobalPasteFlag = false;
-							window.GlobalPasteFlagCounter = 0;
-							return true;
-						}
-					}
-					else
-						base64 = t.lStorage;*/
-						
-					return;
-				}
-				else//find class xslData or docData
-				{
-					var returnBinary = this._getClassBinaryFromHtml(node);
-					base64 = returnBinary.base64;
-					base64FromWord = returnBinary.base64FromWord;
-					base64FromPresentation = returnBinary.base64FromPresentation;
-				}
+				//find class xslData or docData
+				var returnBinary = this._getClassBinaryFromHtml(node);
+				base64 = returnBinary.base64;
+				base64FromWord = returnBinary.base64FromWord;
+				base64FromPresentation = returnBinary.base64FromPresentation;
 					
 				var result = false;
 				if(base64 != null)//from excel
@@ -2214,7 +2185,7 @@
 				return res;
 			},
 			
-			_pasteInShape: function(worksheet, node, onlyFromLocalStorage, targetDocContent)
+			_pasteInShape: function(worksheet, node, targetDocContent)
 			{
 				targetDocContent.DrawingDocument.m_oLogicDocument = null;
 				
@@ -2223,10 +2194,6 @@
 				oPasteProcessor.bIsDoublePx = false;
 				
 				var newFonts;
-				
-				if(onlyFromLocalStorage)
-					node = this.element;//this.lStorage.htmlInShape ? this.lStorage.htmlInShape : this.lStorage;
-				
 				//если находимся внутри диаграммы убираем ссылки
 				if(targetDocContent && targetDocContent.Parent && targetDocContent.Parent.parent && targetDocContent.Parent.parent.chart)
 				{
