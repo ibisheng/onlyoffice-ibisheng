@@ -2986,7 +2986,7 @@ function CDrawingDocument()
 			graphics.transform(1, 0, 0, 1, 0, 0);
 			logicDoc.TablesForInterface[i].graphicObject.Draw(0, graphics);
 
-			var _styleD   = new CAscTableStyle();
+			var _styleD   = new Asc.CAscTableStyle();
 			_styleD.Type  = 0;
 			_styleD.Image = _canvas.toDataURL("image/png");
 			_styleD.Id    = logicDoc.TablesForInterface[i].graphicObject.TableStyle;

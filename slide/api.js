@@ -1350,6 +1350,7 @@ background-repeat: no-repeat;\
 		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 
 		//this.FontLoader.LoadEmbeddedFonts(this.DocumentUrl, this.WordControl.m_oLogicDocument.EmbeddedFonts);
+		this.WordControl.m_oDrawingDocument.CheckFontNeeds();
 		this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);
 
 		this.ParcedDocument = true;

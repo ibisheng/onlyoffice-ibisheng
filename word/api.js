@@ -657,7 +657,7 @@
 				oUnkTypeObj = new asc_CImgProperty(obj);
 				break;
 			case c_oAscTypeSelectElement.Table:
-				oUnkTypeObj = new CTableProp(obj);
+				oUnkTypeObj = new Asc.CTableProp(obj);
 				break;
 			case c_oAscTypeSelectElement.Header:
 				oUnkTypeObj = new CHeaderProp(obj);
@@ -3888,7 +3888,7 @@ background-repeat: no-repeat;\
 			var RGBA                      = tblProp.CellsBackground.Unifill.getRGBAColor();
 			tblProp.CellsBackground.Color = new AscCommonWord.CDocumentColor(RGBA.R, RGBA.G, RGBA.B, false);
 		}
-		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(c_oAscTypeSelectElement.Table, new CTableProp(tblProp));
+		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(c_oAscTypeSelectElement.Table, new Asc.CTableProp(tblProp));
 	};
 	asc_docs_api.prototype.sync_TblWrapStyleChangedCallback = function(style)
 	{
