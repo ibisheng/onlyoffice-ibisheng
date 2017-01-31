@@ -188,7 +188,7 @@ g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("tr-TR", 0x041f));
 //{ "id-ID", 0x0421 },
 g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("uk-UA", 0x0422));
 //{ "be-BY", 0x0423 },
-//{ "sl-SI", 0x0424 },
+g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("sl-SI", 0x0424));
 //{ "et-EE", 0x0425 },
 g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("lv-LV", 0x0426));
 g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("lt-LT", 0x0427));
