@@ -7790,6 +7790,9 @@ CTextPr.prototype =
         if(undefined != TextPr.AscUnifill){
             return false;
         }
+        if(undefined != TextPr.AscFill){
+            return false;
+        }
 
         return true;
     },
