@@ -806,7 +806,7 @@ ParaDrawing.prototype.Set_Props = function(Props)
 	}
 
 	if(undefined != Props.description){
-		this.docPr.setDecr(Props.description);
+		this.docPr.setDescr(Props.description);
 	}
 	if(undefined != Props.title){
 		this.docPr.setTitle(Props.title);
