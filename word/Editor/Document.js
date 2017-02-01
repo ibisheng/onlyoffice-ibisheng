@@ -8073,7 +8073,7 @@ CDocument.prototype.Document_UpdateInterfaceState = function(bSaveCurRevisionCha
 	this.Api.ClearPropObjCallback();
 
 	this.Controller.UpdateInterfaceState();
-	this.TrackRevisionsManager.End_CollectChanges(editor);
+	this.TrackRevisionsManager.End_CollectChanges(this.Api);
 
 	// Сообщаем, что список составлен
 	this.Api.sync_EndCatchSelectedElements();

@@ -1011,6 +1011,9 @@ background-repeat: no-repeat;\
 				{
 					var Lock = Class.Lock;
 
+					// Выставляем ID пользователя, залочившего данный элемент
+					Lock.Set_UserId(e["user"]);
+
 					var OldType = Class.Lock.Get_Type();
 					if (locktype_Other2 === OldType || locktype_Other3 === OldType)
 					{
@@ -1020,9 +1023,6 @@ background-repeat: no-repeat;\
 					{
 						Lock.Set_Type(locktype_Other, true);
 					}
-
-					// Выставляем ID пользователя, залочившего данный элемент
-					Lock.Set_UserId(e["user"]);
 
 					if (Class instanceof AscCommonWord.CHeaderFooterController)
 					{
@@ -6686,6 +6686,9 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.sync_EndCatchRevisionsChanges       = function()
 	{
 	};
+	asc_docs_api.prototype.asc_GetRevisionsChangesStack        = function()
+	{
+	};
 	asc_docs_api.prototype.sync_AddRevisionsChange             = function(Change)
 	{
 	};
@@ -7828,6 +7831,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_IsTrackRevisions']                      = asc_docs_api.prototype.asc_IsTrackRevisions;
 	asc_docs_api.prototype['sync_BeginCatchRevisionsChanges']           = asc_docs_api.prototype.sync_BeginCatchRevisionsChanges;
 	asc_docs_api.prototype['sync_EndCatchRevisionsChanges']             = asc_docs_api.prototype.sync_EndCatchRevisionsChanges;
+	asc_docs_api.prototype['asc_GetRevisionsChangesStack']              = asc_docs_api.prototype.asc_GetRevisionsChangesStack;
 	asc_docs_api.prototype['sync_AddRevisionsChange']                   = asc_docs_api.prototype.sync_AddRevisionsChange;
 	asc_docs_api.prototype['asc_AcceptChanges']                         = asc_docs_api.prototype.asc_AcceptChanges;
 	asc_docs_api.prototype['asc_RejectChanges']                         = asc_docs_api.prototype.asc_RejectChanges;
