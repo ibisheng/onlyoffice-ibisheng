@@ -1002,6 +1002,10 @@
 		this.FontLoader.LoadDocumentFonts2(this.WordControl.m_oLogicDocument.Fonts);
 	};
 
+    asc_docs_api.prototype.asc_GetRevisionsChangesStack = function()
+	{
+		return [];
+	};
 
 	asc_docs_api.prototype.asc_SetFastCollaborative = function(isOn)
 	{
