@@ -5958,7 +5958,7 @@ CBubbleChart.prototype =
     {
         if(this.series[idx])
         {
-            History.Add(new CChangesDrawingsContent(this, AscDFH.historyitem_CommonChart_RemoveSeries, idx, this.series.splice(idx, 1)[0], false));
+            History.Add(new CChangesDrawingsContent(this, AscDFH.historyitem_CommonChart_RemoveSeries, idx, this.series.splice(idx, 1), false));
         }
     },
     getSeriesConstructor: function()
@@ -8222,7 +8222,7 @@ CLineChart.prototype =
     {
         if(!pr)
             return;
-        History.Add(new CChangesDrawingsContent(this, AscDFH.historyitem_LineChart_AddAxId, this.axId,length, [pr], true));
+        History.Add(new CChangesDrawingsContent(this, AscDFH.historyitem_LineChart_AddAxId, this.axId.length, [pr], true));
         this.axId.push(pr);
     },
 
@@ -10689,7 +10689,7 @@ CScatterChart.prototype =
     {
         if(!pr)
             return;
-        History.Add(new CChangesDrawingsContent(this, AscDFH.historyitem_ScatterChart_AddAxId, this.axId.length, pr, true));
+        History.Add(new CChangesDrawingsContent(this, AscDFH.historyitem_ScatterChart_AddAxId, this.axId.length, [pr], true));
         this.axId.push(pr);
     },
 
