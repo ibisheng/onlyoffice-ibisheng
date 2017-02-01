@@ -358,7 +358,7 @@ function ConvertParagraphToWord(paragraph, docContent)
     return new_paragraph;
 }
 
-function CheckWordRunPr(Pr)
+function CheckWordRunPr(Pr, bMath)
 {
     var NewRPr = null;
     if(Pr.Unifill && Pr.Unifill.fill )
@@ -425,11 +425,17 @@ function CheckWordRunPr(Pr)
             }
         }
     }
+
+    if(bMath){
+        NewRPr = Pr.Copy();
+        NewRPr.RFonts.Set_All("Cambria Math", -1);
+    }
     return NewRPr;
 }
 
 function CheckWordParagraphContent(aContent)
 {
+    var NewRPr;
     for(var i = 0; i < aContent.length; ++i)
     {
         var oItem = aContent[i];
@@ -437,7 +443,7 @@ function CheckWordParagraphContent(aContent)
         {
             case para_Run:
             {
-                var NewRPr = CheckWordRunPr(oItem.Pr);
+                NewRPr = CheckWordRunPr(oItem.Pr);
                 if(NewRPr)
                 {
                     oItem.Set_Pr(NewRPr);
@@ -447,6 +453,23 @@ function CheckWordParagraphContent(aContent)
             case para_Hyperlink:
             {
                 CheckWordParagraphContent(oItem.Content);
+                break;
+            }
+            case para_Math:
+            {
+                if(oItem.Root && oItem.Root.Content)
+                {
+                    CheckWordParagraphContent(oItem.Root.Content);
+                }
+                break;
+            }
+            case para_Math_Run:
+            {
+                NewRPr = CheckWordRunPr(oItem.Pr, true);
+                if(NewRPr)
+                {
+                    oItem.Set_Pr(NewRPr);
+                }
                 break;
             }
         }
