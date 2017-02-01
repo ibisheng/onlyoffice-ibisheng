@@ -632,6 +632,7 @@
 				
 				//****open/close rows****
 				var nOpenRowsCount = null;
+				var nAllRowsCount = null;
 				if(!bUndoChanges && !bRedoChanges)
 				{
 					var startRow = autoFilter && autoFilter.Ref ? autoFilter.Ref.r1 + 1 : currentFilter.Ref.r1 + 1;
@@ -706,6 +707,7 @@
 						}
 					}
 					nOpenRowsCount = nRowsCount - nHiddenRowCount;
+					nAllRowsCount = endRow - startRow + 1;
 				}
 				
 				//history
@@ -715,7 +717,7 @@
 
 				this._resetTablePartStyle();
 				
-				return {minChangeRow: minChangeRow, rangeOldFilter: rangeOldFilter, nOpenRowsCount: nOpenRowsCount};
+				return {minChangeRow: minChangeRow, rangeOldFilter: rangeOldFilter, nOpenRowsCount: nOpenRowsCount, nAllRowsCount: nAllRowsCount};
 			},
 			
 			reapplyAutoFilter: function (displayName, ar) 
