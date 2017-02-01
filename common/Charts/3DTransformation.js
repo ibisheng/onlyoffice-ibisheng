@@ -2563,43 +2563,6 @@ Point3D.prototype =
 		this.z = multiplyMatrix.z;
 	},
 	
-	multiplyPointOnMatrix12: function(matrix)
-	{
-		var pointMatrix = [[this.x, this.y, this.z, 1]];
-		
-		var multiplyMatrix = this.multiplyMatrix(pointMatrix , matrix, true);
-		this.x = multiplyMatrix[0][0];
-		this.y = multiplyMatrix[0][1];
-		this.z = multiplyMatrix[0][2];
-	},
-	
-	multiplyMatrix2: function(A, B)
-	{
-		var rowsA = A.length, colsA = A[0].length,
-			rowsB = B.length, colsB = B[0].length,
-			C = [];
-
-		if (colsA != rowsB) return false;
-
-		for (var i = 0; i < rowsA; i++) C[i] = [];
-
-		for (var k = 0; k < colsB; k++)
-		{ 
-			for (var i = 0; i < rowsA; i++)
-			{ 
-				var temp = 0;
-				for (var j = 0; j < rowsB; j++) 
-				{
-					temp += A[i][j]*B[j][k];
-				}
-				
-			  C[i][k] = temp;
-			}
-		 }
-
-		return C;
-	},
-	
 	multiplyMatrix: function(A, B, pointOnMatrtix)
 	{	
 		var C = [];
