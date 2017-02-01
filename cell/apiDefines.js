@@ -365,7 +365,22 @@ var c_oAscPopUpSelectorType = {
     Group: 1,
     Custom: 2
   };
-
+  
+  var c_oSpecialPasteProps = {
+    formulas: 0,
+    formulasNumberFormating: 1,
+	keepSourceFormating: 2,
+	noBorders: 3,
+	keepSourceColumnWidths: 4, 
+	transpose: 5,
+	values: 6, 
+	valuesNumberFormating: 7,
+	formating: 8,
+	pasteLink: 9,
+	picture: 10,
+	linkedPicture: 11
+  };
+  
   var c_kMaxPrintPages = 1500;
 
   //----------------------------------------------------------export----------------------------------------------------
@@ -556,4 +571,18 @@ var c_oAscPopUpSelectorType = {
   prot['Individual'] = prot.Individual;
   prot['Group'] = prot.Group;
   prot['Custom'] = prot.Custom;
+  window['Asc']['c_oSpecialPasteProps'] = window['Asc'].c_oSpecialPasteProps = c_oSpecialPasteProps;
+  prot = c_oSpecialPasteProps;
+  prot['formulas'] = prot.formulas;
+  prot['formulasNumberFormating'] = prot.formulasNumberFormating;
+  prot['keepSourceFormating'] = prot.keepSourceFormating;
+  prot['noBorders'] = prot.noBorders;
+  prot['keepSourceColumnWidths'] = prot.keepSourceColumnWidths;
+  prot['transpose'] = prot.transpose;
+  prot['values'] = prot.values;
+  prot['valuesNumberFormating'] = prot.valuesNumberFormating;
+  prot['formating'] = prot.formating;
+  prot['pasteLink'] = prot.pasteLink;
+  prot['picture'] = prot.picture;
+  prot['linkedPicture'] = prot.linkedPicture;
 })(window);

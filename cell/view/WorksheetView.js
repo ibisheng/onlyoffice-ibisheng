@@ -8759,27 +8759,27 @@
         }
     };
 	
-	WorksheetView.prototype.specialPaste = function (props) {
+	WorksheetView.prototype.specialPaste = function (preSpecialPasteData, specialPasteData, props) {
 		var api = window["Asc"]["editor"];
-		var g_clipboardBase = window['AscCommon'].g_clipboardBase;
+		
 		//откатываемся до того, что было до вставки
-		if(g_clipboardBase.specialPasteUndoData.data)
+		if(preSpecialPasteData && preSpecialPasteData.data)
 		{
 			var tempProps = new AscCommonExcel.SpecialPasteProps();
 			api.wb.clipboard.specialPasteProps = tempProps;
 			
 			//меняем activeRange
-			if(g_clipboardBase.specialPasteData && g_clipboardBase.specialPasteData.activeRange)
+			if(specialPasteData && specialPasteData.activeRange)
 			{
-				this.model.selectionRange = g_clipboardBase.specialPasteData.activeRange.clone(this.model);
+				this.model.selectionRange = specialPasteData.activeRange.clone(this.model);
 			}
 			
 			//откатываем данные в ячейках
-			api.wb.clipboard.pasteProcessor.pasteFromBinary(this, g_clipboardBase.specialPasteUndoData.data);
+			api.wb.clipboard.pasteProcessor.pasteFromBinary(this, preSpecialPasteData.data);
 			//удаляем вставленные изображения
-			if(g_clipboardBase.specialPasteUndoData.images)
+			if(preSpecialPasteData.images)
 			{
-				var images = g_clipboardBase.specialPasteUndoData.images;
+				var images = preSpecialPasteData.images;
 				for(var i = 0; i < images.length; i++)
 				{
 					var id = images[i];
@@ -8791,13 +8791,9 @@
 		}
 		
 		//далее специальная вставка
-		if(window['AscCommon'].g_clipboardBase.specialPasteData)
+		if(specialPasteData)
 		{	
-			var tempProps = new AscCommonExcel.SpecialPasteProps();
-			tempProps.setProps(props);
-			api.wb.clipboard.specialPasteProps = tempProps;
-			
-			var specialPasteData = window['AscCommon'].g_clipboardBase.specialPasteData;
+			api.wb.clipboard.specialPasteProps = props;
 			api.wb.clipboard.pasteData(this, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data, true);
 		}
 	};

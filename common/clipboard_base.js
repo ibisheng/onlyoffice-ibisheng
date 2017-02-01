@@ -925,6 +925,18 @@
 					this.Api.asc_PasteData(this.LastCopyBinary[0].type, this.LastCopyBinary[0].data);
 			}
 			return _ret;
+		},
+		
+		Special_Paste : function(props)
+		{
+			this.Api.asc_SpecialPasteData(this.specialPasteUndoData, this.specialPasteData, props);
+			return true;
+		},
+		
+		Clean_SpecialPasteObj : function()
+		{
+			this.specialPasteData = {};
+			this.specialPasteUndoData = {};
 		}
 	};
 

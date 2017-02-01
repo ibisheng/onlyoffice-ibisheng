@@ -368,6 +368,16 @@ var editor;
     }
     return false;
   };
+  
+  spreadsheet_api.prototype.asc_SpecialPaste = function(props) {
+    return AscCommon.g_clipboardBase.Special_Paste(props);
+  };
+  
+  spreadsheet_api.prototype.asc_SpecialPasteData = function(preSpecialPasteData, specialPasteData, props) {
+	if (!this.getViewMode()) {
+      this.wb.specialPasteData(preSpecialPasteData, specialPasteData, props);
+    }
+  };
 
   spreadsheet_api.prototype.asc_Cut = function() {
     if (window["AscDesktopEditor"])

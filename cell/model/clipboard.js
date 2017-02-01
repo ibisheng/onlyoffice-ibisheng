@@ -49,6 +49,8 @@
 		var copyPasteUseBinary = true;
 		var CopyPasteCorrectString = AscCommon.CopyPasteCorrectString;
 		
+		var c_oSpecialPasteProps = Asc.c_oSpecialPasteProps
+		
 
 		function number2color(n) {
 			if( typeof(n)=="string" && n.indexOf("rgb")>-1)
@@ -119,7 +121,7 @@
 			{
 				switch(props)
 				{
-					case "formulas":
+					case c_oSpecialPasteProps.formulas:
 					{
 						//только формулы(или значения)
 						this.revert();
@@ -128,7 +130,7 @@
 						
 						break;
 					}
-					case "formulasNumberFormating":
+					case c_oSpecialPasteProps.formulasNumberFormating:
 					{
 						//только формулы(или значения) и числовой формат
 						this.revert();
@@ -138,62 +140,62 @@
 						
 						break;
 					}
-					case "keepSourceFormating":
+					case c_oSpecialPasteProps.keepSourceFormating:
 					{
 						//формулы и формат
 						break;
 					}
-					case "noBorders":
+					case c_oSpecialPasteProps.noBorders:
 					{
 						//всё кроме бордеров
 						this.borders = null;
 						break;
 					}
-					case "keepSourceColumnWidths":
+					case c_oSpecialPasteProps.keepSourceColumnWidths:
 					{
 						break;
 					}
-					case "transpose":
+					case c_oSpecialPasteProps.transpose:
 					{
 						
 						break;
 					}
 					
-					case "values":
+					case c_oSpecialPasteProps.values:
 					{
 						//только значения(вместо формул также вставляются значения)
 						this.revert();
 						this.val = true;
 					}
-					case "valuesNumberFormating":
+					case c_oSpecialPasteProps.valuesNumberFormating:
 					{
 						this.revert();
 						this.val = true;
 						this.numFormat = true;
 						break;
 					}
-					case "valuesSourceFormating":
+					case c_oSpecialPasteProps.valuesSourceFormating:
 					{
 						//все кроме формул
 						this.formula = null;
 						break;
 					}
 					
-					case "formating":
+					case c_oSpecialPasteProps.formating:
 					{
 						this.formula = null;
 						break;
 					}
-					case "pasteLink":
+					case c_oSpecialPasteProps.pasteLink:
 					{
 						this.revert();
 						break;
 					}
-					case "picture":
+					case c_oSpecialPasteProps.picture:
 					{
 						break;
 					}
-					case "linkedPicture":
+					case c_oSpecialPasteProps.linkedPicture:
 					{
 						break;
 					}
