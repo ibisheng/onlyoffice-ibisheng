@@ -77,6 +77,14 @@
 			this.selectCell 			= null;
 			this.objectBounds 			= null;
 			this.objectSlideThumbnail 	= null;
+		},
+		CopyTo : function(dst)
+		{
+			dst.targetPos 				= this.targetPos;
+			dst.selectText 				= this.selectText;
+			dst.selectCell 				= this.selectCell;
+			dst.objectBounds 			= this.objectBounds;
+			dst.objectSlideThumbnail 	= this.objectSlideThumbnail;
 		}
 	};
 
@@ -278,10 +286,17 @@
 		var _target = this.LogicDocument.Is_SelectionUse();
 		if (_target === false)
 		{
+			/*
 			_info = {
 				X : this.DrawingDocument.m_dTargetX,
 				Y : this.DrawingDocument.m_dTargetY,
 				Page : this.DrawingDocument.m_lTargetPage
+			};
+			*/
+			_info = {
+				X : this.LogicDocument.TargetPos.X,
+				Y : this.LogicDocument.TargetPos.Y,
+				Page : this.LogicDocument.TargetPos.PageNum
 			};
 
 			_transform = this.DrawingDocument.TextMatrix;
@@ -294,6 +309,7 @@
 				_info.Y = _y;
 			}
 			info.targetPos = _info;
+			return;
 		}
 
 		var _select = this.LogicDocument.Get_SelectionBounds();
@@ -327,12 +343,13 @@
 			}
 
 			info.selectText = _info;
+			return;
 		}
 
 		var _object_bounds = this.LogicDocument.DrawingObjects.getSelectedObjectsBounds();
-		if ((0 == _mode) && _object_bounds)
+		if (_object_bounds)
 		{
-			info.selectBounds = {
+			info.objectBounds = {
 				X : _object_bounds.minX,
 				Y : _object_bounds.minY,
 				R : _object_bounds.maxX,
@@ -579,6 +596,7 @@
 		/* context menu */
 		this.ContextMenuLastMode 		= AscCommon.MobileTouchContextMenuType.None;
 		this.ContextMenuLastInfo 		= new AscCommon.MobileTouchContextMenuLastInfo();
+		this.ContextMenuLastShow		= false;
 
 		this.ContextMenuLastModeCounter = 0;
 		this.ContextMenuShowTimerId 	= -1;
@@ -592,6 +610,8 @@
 
 		/* eventsElement */
 		this.eventsElement = _config.eventsElement;
+
+		this.pointerTouchesCoords = {};
 	}
 
 	CMobileTouchManagerBase.prototype.initEvents = function(_id)
@@ -620,13 +640,63 @@
 	// грузим в конструкторе, используем тогда, когда загружено (asc_complete)
 	CMobileTouchManagerBase.prototype.LoadMobileImages = function()
 	{
-		window.g_table_track_mobile_move = new Image();
-		window.g_table_track_mobile_move.asc_complete = false;
-		window.g_table_track_mobile_move.onload       = function()
+		window.g_table_track_mobile_move = document.createElement("canvas");
+
+		if (AscCommon.AscBrowser.isRetina)
 		{
-			window.g_table_track_mobile_move.asc_complete = true;
-		};
-		window.g_table_track_mobile_move.src          = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAArlJREFUeNqMlc9rWkEQx8ffGqMJBJpSUEIISInxpCfT1krioQQ85xISEKGBkGuhpxwEL4GAoOBJ8V9IxJCQ1l4SkFKxQvEfKEXQ0Nb4IxLtfBefvMeriQPj7ps377Mzu7OjZjgckoYlGo2+tFqtcZ1OFyAiG00nfx8eHj7f3d19SKfTP5g11LBRs7u761lYWPiytbVl9/l8ZDKZpqL1ej0qlUp0enr6p9FovM5kMhU92w02my0OmN/vJ0TcbreJVxZzCH9ARqORQqGQCurxeAC2n52dxfkxDOCMXq9/5fV6aTAYEIc/BkHYkWKx2Ni2ubn5X+j5+fkbweIf5GdFmoAhMkny+TzF43GyWCzi+ejoSIA3NjYUQA4IA5xMmGnhBO33+4rowuEwbW9vKz7Gdtzf36uiHH2n1eJQkCoE0WFeKBTE2O12qdlsKhQ2vLu6uhKjXMHSyuhivLi4oEQiQVLUk/T4+JiKxaLCJtKXQNDLy0tKJpM0NzcnrThR4HNyciLm6+vraiAEB8P1KE9hoqCMzGYzGQwG4asASoZAIEDz8/OUSqWeBGLxg4MDWl1dHe+rKkKUDWpqf3//SeDh4SG5XC5x6nKGYg+lW+J2u6nT6TwKBEzuo0pZPiJSyPX1NWWz2bFdy1UWiUQIt0rykUSe8pDrr837MCMvakgwGCSHw0G5XE487+3t0dLSkip6FDozumABOODVvt3c3PiXl5cVjq1Wi1ZWVmhnZ0dcL6fTqYoMUqlUYP8Klg7dhlNp3N7evuM7a0DZcE9UrL64uEh2u318APJ35XIZl6HN0I/1er2GfmhkfcGb/JYP4/3s7OwaL2Ceph/yvnU5i+/VajVVq9U+semnaLCjTvGM9TkuAaKesmP3WX+z/mKts3Y00l/ACDIzamfa0UKPCU4QR9tDEwIcfwH/BBgAl4G4NBf6Z6AAAAAASUVORK5CYII=";
+			window.g_table_track_mobile_move.width = 40;
+			window.g_table_track_mobile_move.height = 40;
+
+		}
+		else
+		{
+			window.g_table_track_mobile_move.width = 20;
+			window.g_table_track_mobile_move.height = 20;
+		}
+		window.g_table_track_mobile_move.asc_complete = true;
+		window.g_table_track_mobile_move.size = 20;
+
+		var _ctx = window.g_table_track_mobile_move.getContext("2d");
+		if (AscCommon.AscBrowser.isRetina)
+			_ctx.setTransform(2, 0, 0, 2, 0, 0);
+
+		_ctx.lineWidth = 1;
+
+		var r = 4;
+		var w = 19;
+		var h = 19;
+		var x = 0.5;
+		var y = 0.5;
+
+		_ctx.moveTo(x + r, y);
+		_ctx.lineTo(x + w - r, y);
+		_ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+		_ctx.lineTo(x + w, y + h - r);
+		_ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+		_ctx.lineTo(x + r, y + h);
+		_ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+		_ctx.lineTo(x, y + r);
+		_ctx.quadraticCurveTo(x, y, x + r, y);
+
+		_ctx.strokeStyle = "#747474";
+		_ctx.fillStyle = "#DFDFDF";
+		_ctx.fill();
+		_ctx.stroke();
+		_ctx.beginPath();
+
+		_ctx.moveTo(2, 10);
+		_ctx.lineTo(10, 2);
+		_ctx.lineTo(18, 10);
+		_ctx.lineTo(10, 18);
+		_ctx.closePath();
+
+		_ctx.fillStyle = "#146FE1";
+		_ctx.fill();
+		_ctx.beginPath();
+
+		_ctx.fillStyle = "#DFDFDF";
+		_ctx.fillRect(6, 6, 8, 8);
+		_ctx.beginPath();
 	};
 
 	// onTouchStart => попали ли в якорьки селекта, чтобы не начинать скроллы/зумы
@@ -1030,7 +1100,7 @@
 		}, 500);
 	};
 
-	CMobileTouchManagerBase.prototype.CheckContextMenuTouchEnd = function(isCheck, isSelectTouch)
+	CMobileTouchManagerBase.prototype.CheckContextMenuTouchEndOld = function(isCheck, isSelectTouch, isGlassTouch, isTableRuler)
 	{
 		// isCheck: если пришли сюда после скролла или зума (или их анимации) - то не нужно проверять состояние редактора.
 		// Нужно проверять последнее сохраненной состояние
@@ -1055,7 +1125,7 @@
 			this.SendShowContextMenu();
 	};
 
-	CMobileTouchManagerBase.prototype.CheckContextMenuTouchEndNew = function(isCheck, isSelectTouch)
+	CMobileTouchManagerBase.prototype.CheckContextMenuTouchEnd = function(isCheck, isSelectTouch, isGlassTouch, isTableRuler)
 	{
 		// isCheck: если пришли сюда после скролла или зума (или их анимации) - то не нужно проверять состояние редактора.
 		// Нужно проверять последнее сохраненной состояние
@@ -1064,11 +1134,15 @@
 		var isSelectCell = false;
 		if (isCheck)
 		{
-			var oldLastInfo = this.ContextMenuLastInfo;
+			var oldLastInfo = new AscCommon.MobileTouchContextMenuLastInfo();
+			this.ContextMenuLastInfo.CopyTo(oldLastInfo);
+
 			var oldLasdMode = this.ContextMenuLastMode;
 
 			this.ContextMenuLastMode = this.delegate.GetContextMenuType();
-			this.delagate.GetContextMenuInfo(this.ContextMenuLastInfo);
+			this.delegate.GetContextMenuInfo(this.ContextMenuLastInfo);
+
+			isSelectCell = (this.ContextMenuLastInfo.selectCell != null);
 
 			var _data1 = null;
 			var _data2 = null;
@@ -1118,7 +1192,6 @@
 
 							if (_data1 && _data2)
 							{
-								isSelectCell = true;
 								if (Math.abs(_data1.X - _data2.X) < 0.1 &&
 									Math.abs(_data1.Y - _data2.Y) < 0.1 &&
 									Math.abs(_data1.W - _data2.W) < 0.1 &&
@@ -1172,7 +1245,11 @@
 				}
 			}
 
-			if (this.ContextMenuLastMode == oldLasdMode)
+			// после таблиц не показываем меню
+			if (isTableRuler)
+				isEqual = false;
+
+			if (this.ContextMenuLastMode == oldLasdMode && isEqual)
 			{
 				this.ContextMenuLastModeCounter++;
 				this.ContextMenuLastModeCounter &= 0x01;
@@ -1181,14 +1258,87 @@
 			{
 				this.ContextMenuLastModeCounter = 0;
 			}
+
+			switch (this.ContextMenuLastMode)
+			{
+				case AscCommon.MobileTouchContextMenuType.Target:
+				{
+					isShowContextMenu = (1 == this.ContextMenuLastModeCounter);
+					break;
+				}
+				case AscCommon.MobileTouchContextMenuType.Select:
+				{
+					if (isSelectCell)
+						isShowContextMenu = (1 == this.ContextMenuLastModeCounter);
+					else
+						isShowContextMenu = true;
+					break;
+				}
+				case AscCommon.MobileTouchContextMenuType.Object:
+				{
+					isShowContextMenu = (0 == this.ContextMenuLastModeCounter);
+					break;
+				}
+				case AscCommon.MobileTouchContextMenuType.Slide:
+				{
+					isShowContextMenu = (1 == this.ContextMenuLastModeCounter);
+					break;
+				}
+				default:
+				{
+					isShowContextMenu = (1 == this.ContextMenuLastModeCounter);
+					break;
+				}
+			}
 		}
 		else
 		{
+			// меню для текстового селекта показываем всегда
+			isShowContextMenu = (!isSelectCell && (this.ContextMenuLastMode == AscCommon.MobileTouchContextMenuType.Select));
 
+			if (this.ContextMenuLastShow || isTableRuler)
+			{
+				// эмулируем пропажу меню (клик туда же)
+				switch (this.ContextMenuLastMode)
+				{
+					case AscCommon.MobileTouchContextMenuType.Target:
+					case AscCommon.MobileTouchContextMenuType.Select:
+					{
+						this.ContextMenuLastModeCounter = 0;
+						break;
+					}
+					case AscCommon.MobileTouchContextMenuType.Object:
+					{
+						this.ContextMenuLastModeCounter = 1;
+						break;
+					}
+					case AscCommon.MobileTouchContextMenuType.Slide:
+					{
+						this.ContextMenuLastModeCounter = 0;
+						break;
+					}
+					default:
+					{
+						break;
+					}
+				}
+			}
 		}
 
-		if (this.ContextMenuLastMode > AscCommon.MobileTouchContextMenuType.None && 1 == this.ContextMenuLastModeCounter)
+		if (isSelectTouch)
+			isShowContextMenu = true;
+		if (isGlassTouch)
+			isShowContextMenu = true;
+
+		if (this.ContextMenuLastMode > AscCommon.MobileTouchContextMenuType.None && isShowContextMenu)
+		{
+			this.ContextMenuLastShow = true;
 			this.SendShowContextMenu();
+		}
+		else
+		{
+			this.ContextMenuLastShow = false;
+		}
 	};
 
 	CMobileTouchManagerBase.prototype.ClearContextMenu = function()
@@ -1387,6 +1537,18 @@
 			_tableW += _cols[i];
 		}
 
+		//var _mainFillStyle = "#DFDFDF";
+		var _mainFillStyle = "rgba(223, 223, 223, 0.5)";
+
+		var _drawingPage = null;
+		if (DrawingDocument.m_arrPages)
+			_drawingPage =  DrawingDocument.m_arrPages[DrawingDocument.m_lCurrentPage].drawingPage;
+		else
+			_drawingPage = DrawingDocument.SlideCurrectRect;
+
+		var _posMoveX = 0;
+		var _posMoveY = 0;
+
 		if (!_table_outline_dr.TableMatrix || global_MatrixTransformer.IsIdentity(_table_outline_dr.TableMatrix))
 		{
 			this.TableMovePoint = {X : _tableOutline.X, Y : _tableOutline.Y};
@@ -1401,12 +1563,11 @@
 
 			overlay.CheckPoint(TableMoveRect_x, TableMoveRect_y);
 			overlay.CheckPoint(TableMoveRect_x + _rectWidth, TableMoveRect_y + _rectWidth);
-			ctx.drawImage(window.g_table_track_mobile_move, TableMoveRect_x, TableMoveRect_y);
 
-			var gradObj = ctx.createLinearGradient((pos1.X >> 0) + 0.5, TableMoveRect_y, (pos1.X >> 0) + 0.5, TableMoveRect_y + _rectWidth);
-			gradObj.addColorStop(0, "#f1f1f1");
-			gradObj.addColorStop(1, "#dfdfdf");
-			ctx.fillStyle = gradObj;
+			if (this.delegate.Name != "slide")
+				ctx.drawImage(window.g_table_track_mobile_move, TableMoveRect_x, TableMoveRect_y, window.g_table_track_mobile_move.size, window.g_table_track_mobile_move.size);
+
+			ctx.fillStyle = _mainFillStyle;
 
 			overlay.AddRoundRect((pos1.X >> 0) + 0.5, TableMoveRect_y, (pos2.X - pos1.X) >> 0, _rectWidth, 4);
 
@@ -1431,10 +1592,8 @@
 			var pos4 = DrawingDocument.ConvertCoordsToCursorWR(_tableOutline.X, _y2, DrawingDocument.m_lCurrentPage);
 
 			var _ttX = (pos1.X >> 0) + 0.5 - (_epsRects + _rectWidth);
-			gradObj  = ctx.createLinearGradient(_ttX, (pos3.Y >> 0) + 0.5, _ttX, (pos3.Y >> 0) + 0.5 + (pos4.Y - pos3.Y) >> 0);
-			gradObj.addColorStop(0, "#f1f1f1");
-			gradObj.addColorStop(1, "#dfdfdf");
-			ctx.fillStyle = gradObj;
+
+			ctx.fillStyle = _mainFillStyle;
 
 			overlay.AddRoundRect((pos1.X >> 0) + 1.5 - (_epsRects + _rectWidth), (pos3.Y >> 0) + 0.5, _rectWidth - 1, (pos4.Y - pos3.Y) >> 0, 4);
 
@@ -1444,8 +1603,8 @@
 			ctx.beginPath();
 
 			var dKoef = (HtmlPage.m_nZoomValue * g_dKoef_mm_to_pix / 100);
-			var xDst  = DrawingDocument.m_arrPages[DrawingDocument.m_lCurrentPage].drawingPage.left;
-			var yDst  = DrawingDocument.m_arrPages[DrawingDocument.m_lCurrentPage].drawingPage.top;
+			var xDst  = _drawingPage.left;
+			var yDst  = _drawingPage.top;
 
 			var _oldY = _table_markup.Rows[0].Y + _table_markup.Rows[0].H;
 
@@ -1496,12 +1655,12 @@
 			{
 				if (0 == this.TableCurrentMoveDir)
 				{
-					var _pos = DrawingDocument.ConvertCoordsToCursorWR(this.TableCurrentMoveValue, 0, _table_outline_dr.CurrentPageIndex);
+					var _pos = this.delegate.ConvertCoordsToCursor(this.TableCurrentMoveValue, 0, _table_outline_dr.CurrentPageIndex, false);
 					overlay.VertLine(_pos.X, true);
 				}
 				else
 				{
-					var _pos = DrawingDocument.ConvertCoordsToCursorWR(0, this.TableCurrentMoveValue, _table_outline_dr.CurrentPageIndex);
+					var _pos = this.delegate.ConvertCoordsToCursor(0, this.TableCurrentMoveValue, _table_outline_dr.CurrentPageIndex, false);
 					overlay.HorLine(_pos.Y, true);
 				}
 			}
@@ -1510,8 +1669,8 @@
 		{
 			var dKoef = (HtmlPage.m_nZoomValue * g_dKoef_mm_to_pix / 100);
 
-			var xDst  = DrawingDocument.m_arrPages[DrawingDocument.m_lCurrentPage].drawingPage.left;
-			var yDst  = DrawingDocument.m_arrPages[DrawingDocument.m_lCurrentPage].drawingPage.top;
+			var xDst  = _drawingPage.left;
+			var yDst  = _drawingPage.top;
 
 			ctx.lineWidth = 1 / dKoef;
 
@@ -1550,12 +1709,10 @@
 				_offset *= 2;
 			}
 
-			ctx.drawImage(window.g_table_track_mobile_move, this.TableMovePoint.X - _offset, this.TableMovePoint.Y - _offset, _rectW, _rectW);
+			if (this.delegate.Name != "slide")
+				ctx.drawImage(window.g_table_track_mobile_move, this.TableMovePoint.X - _offset, this.TableMovePoint.Y - _offset, _rectW, _rectW);
 
-			var gradObj = ctx.createLinearGradient(this.TableMovePoint.X, this.TableMovePoint.Y - _offset, this.TableMovePoint.X, this.TableMovePoint.Y - _offset + _rectW);
-			gradObj.addColorStop(0, "#f1f1f1");
-			gradObj.addColorStop(1, "#dfdfdf");
-			ctx.fillStyle = gradObj;
+			ctx.fillStyle = _mainFillStyle;
 
 			overlay.AddRoundRectCtx(ctx, this.TableMovePoint.X, this.TableMovePoint.Y - _offset, _tableW, _rectW, 5 / dKoef);
 
@@ -1576,10 +1733,7 @@
 				_y2 += _table_markup.Rows[i].H;
 			}
 
-			gradObj = ctx.createLinearGradient(this.TableMovePoint.X - _offset, this.TableMovePoint.Y, this.TableMovePoint.X - _offset, this.TableMovePoint.X - _offset + _y2 - _y1);
-			gradObj.addColorStop(0, "#f1f1f1");
-			gradObj.addColorStop(1, "#dfdfdf");
-			ctx.fillStyle = gradObj;
+			ctx.fillStyle = _mainFillStyle;
 
 			overlay.AddRoundRectCtx(ctx, this.TableMovePoint.X - _offset, this.TableMovePoint.Y, _rectW, _y2 - _y1, 5 / dKoef);
 
@@ -1642,12 +1796,18 @@
 			{
 				if (0 == this.TableCurrentMoveDir)
 				{
-					var _pos = DrawingDocument.ConvertCoordsToCursorWR(this.TableCurrentMoveValue, 0, _table_outline_dr.CurrentPageIndex, _table_outline_dr.TableMatrix);
+					_posMoveX = _table_outline_dr.TableMatrix.TransformPointX(this.TableCurrentMoveValue, 0);
+					_posMoveY = _table_outline_dr.TableMatrix.TransformPointY(this.TableCurrentMoveValue, 0);
+
+					var _pos = this.delegate.ConvertCoordsToCursor(_posMoveX, _posMoveY, _table_outline_dr.CurrentPageIndex, false);
 					overlay.VertLine(_pos.X, true);
 				}
 				else
 				{
-					var _pos = DrawingDocument.ConvertCoordsToCursorWR(0, this.TableCurrentMoveValue, _table_outline_dr.CurrentPageIndex, _table_outline_dr.TableMatrix);
+					_posMoveX = _table_outline_dr.TableMatrix.TransformPointX(0, this.TableCurrentMoveValue);
+					_posMoveY = _table_outline_dr.TableMatrix.TransformPointY(0, this.TableCurrentMoveValue);
+
+					var _pos = this.delegate.ConvertCoordsToCursor(_posMoveX, _posMoveY, _table_outline_dr.CurrentPageIndex, false);
 					overlay.HorLine(_pos.Y, true);
 				}
 			}
@@ -1662,7 +1822,7 @@
 
 		this.MoveAfterDown = false;
 
-		if (e.touches && 2 == e.touches.length)
+		if ((e.touches && 2 == e.touches.length) || (2 == this.getPointerCount()))
 		{
 			this.Mode = AscCommon.MobileTouchMode.Zoom;
 		}
@@ -1696,13 +1856,7 @@
 			{
 				this.delegate.HtmlPage.NoneRepaintPages = true;
 
-				var _x1 = (e.touches[0].pageX !== undefined) ? e.touches[0].pageX : e.touches[0].clientX;
-				var _y1 = (e.touches[0].pageY !== undefined) ? e.touches[0].pageY : e.touches[0].clientY;
-
-				var _x2 = (e.touches[1].pageX !== undefined) ? e.touches[1].pageX : e.touches[1].clientX;
-				var _y2 = (e.touches[1].pageY !== undefined) ? e.touches[1].pageY : e.touches[1].clientY;
-
-				this.ZoomDistance = Math.sqrt((_x1 - _x2) * (_x1 - _x2) + (_y1 - _y2) * (_y1 - _y2));
+				this.ZoomDistance = this.getPointerDistance(e);
 				this.ZoomValue    = this.delegate.GetZoom();
 
 				break;
@@ -1739,19 +1893,14 @@
 			}
 			case AscCommon.MobileTouchMode.Zoom:
 			{
-				if (2 != e.touches.length)
+				var isTouch2 = ((e.touches && 2 == e.touches.length) || (2 == this.getPointerCount()));
+				if (!isTouch2)
 				{
 					this.Mode = AscCommon.MobileTouchMode.None;
 					return;
 				}
 
-				var _x1 = (e.touches[0].pageX !== undefined) ? e.touches[0].pageX : e.touches[0].clientX;
-				var _y1 = (e.touches[0].pageY !== undefined) ? e.touches[0].pageY : e.touches[0].clientY;
-
-				var _x2 = (e.touches[1].pageX !== undefined) ? e.touches[1].pageX : e.touches[1].clientX;
-				var _y2 = (e.touches[1].pageY !== undefined) ? e.touches[1].pageY : e.touches[1].clientY;
-
-				var zoomCurrentDist = Math.sqrt((_x1 - _x2) * (_x1 - _x2) + (_y1 - _y2) * (_y1 - _y2));
+				var zoomCurrentDist = this.getPointerDistance(e);
 
 				if (zoomCurrentDist == 0)
 					zoomCurrentDist = 1;
@@ -1867,6 +2016,86 @@
 	{
 		AscCommon.stopEvent(e);
 		return false;
+	};
+
+	CMobileTouchManagerBase.prototype.checkPointerMultiTouchAdd = function(e)
+	{
+		if (!this.checkPointerEvent(e))
+			return;
+
+		this.pointerTouchesCoords[e["pointerId"]] = {X:e.pageX, Y:e.pageY};
+	};
+	CMobileTouchManagerBase.prototype.checkPointerMultiTouchRemove = function(e)
+	{
+		if (!this.checkPointerEvent(e))
+			return;
+
+		//delete this.pointerTouchesCoords[e["pointerId"]];
+
+		// на всякий случай - удаляем все.
+		this.pointerTouchesCoords = {};
+	};
+	CMobileTouchManagerBase.prototype.checkPointerEvent = function(e)
+	{
+		if (!AscCommon.AscBrowser.isIE)
+			return false;
+
+		var _type = e.type;
+		if (_type.toLowerCase)
+			_type = _type.toLowerCase();
+
+		if (-1 == _type.indexOf("pointer"))
+			return -1;
+
+		if (undefined == e["pointerId"])
+			return false;
+
+		return true;
+	};
+	CMobileTouchManagerBase.prototype.getPointerDistance = function(e)
+	{
+		var isPointers = this.checkPointerEvent(e);
+		if (e.touches && (e.touches.length > 1) && !isPointers)
+		{
+			var _x1 = (e.touches[0].pageX !== undefined) ? e.touches[0].pageX : e.touches[0].clientX;
+			var _y1 = (e.touches[0].pageY !== undefined) ? e.touches[0].pageY : e.touches[0].clientY;
+
+			var _x2 = (e.touches[1].pageX !== undefined) ? e.touches[1].pageX : e.touches[1].clientX;
+			var _y2 = (e.touches[1].pageY !== undefined) ? e.touches[1].pageY : e.touches[1].clientY;
+
+			return Math.sqrt((_x1 - _x2) * (_x1 - _x2) + (_y1 - _y2) * (_y1 - _y2));
+		}
+		else if (isPointers)
+		{
+			var _touch1 = {X : 0, Y : 0};
+			var _touch2 = {X : 0, Y : 0};
+			var _counter = 0;
+
+			for (var i in this.pointerTouchesCoords)
+			{
+				if (_counter == 0)
+					_touch1 = this.pointerTouchesCoords[i];
+				else
+					_touch2 = this.pointerTouchesCoords[i];
+				++_counter;
+				if (_counter > 1)
+					break;
+			}
+
+			return Math.sqrt((_touch1.X - _touch2.X) * (_touch1.X - _touch2.X) + (_touch1.Y - _touch2.Y) * (_touch1.Y - _touch2.Y));
+		}
+
+		return 0;
+	};
+
+	CMobileTouchManagerBase.prototype.getPointerCount = function(e)
+	{
+		var _count = 0;
+
+		for (var i in this.pointerTouchesCoords)
+			++_count;
+
+		return _count;
 	};
 
 	//--------------------------------------------------------export----------------------------------------------------

@@ -208,7 +208,7 @@ CHistory.prototype =
             for (var i = aItems.length - 1; i > _bottomIndex; i--)
             {
                 var oItem = aItems[i];
-                oItem.Class.Undo(oItem.Data);
+                oItem.Data.Undo();
             }
             oPoint.Items.length = _bottomIndex + 1;
             this.Document.Set_SelectionState( oPoint.State );
@@ -834,18 +834,22 @@ CHistory.prototype =
 		return (0 === this.TurnOffHistory);
     },
 
-    Reset_SavedIndex : function(IsUserSave)
-    {
-      this.SavedIndex = this.Index;
-      if (true === this.Is_UserSaveMode()) {
-        if (true === IsUserSave) {
-          this.UserSavedIndex = this.Index;
-          this.ForceSave = false;
-        }
-      } else {
-        this.ForceSave = false;
-      }
-    },
+	Reset_SavedIndex : function(IsUserSave)
+	{
+		this.SavedIndex = (null === this.SavedIndex && -1 === this.Index ? null : this.Index);
+		if (true === this.Is_UserSaveMode())
+		{
+			if (true === IsUserSave)
+			{
+				this.UserSavedIndex = this.Index;
+				this.ForceSave      = false;
+			}
+		}
+		else
+		{
+			this.ForceSave = false;
+		}
+	},
 
     Set_SavedIndex : function(Index)
     {

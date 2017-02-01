@@ -935,6 +935,24 @@ DrawingObjectsController.prototype =
         }
     },
 
+
+    handleDblClickEmptyShape: function(oShape){
+        this.checkSelectedObjectsAndCallback(function () {
+            if(!oShape.getDocContent() && !CheckLinePresetForParagraphAdd(oShape)){
+                if(!oShape.bWordShape){
+                    oShape.createTextBody();
+                }
+                else{
+                    oShape.createTextBoxContent();
+                }
+                this.recalculate();
+                var oContent = oShape.getDocContent();
+                oContent.Set_CurrentElement(0, true);
+                this.updateSelectionState();
+            }
+        },[], false);
+    },
+
     handleMoveHit: function(object, e, x, y, group, bInSelect, pageIndex, bWord)
     {
         var b_is_inline;
@@ -985,6 +1003,11 @@ DrawingObjectsController.prototype =
 
                     if (object.getObjectType() === AscDFH.historyitem_type_ChartSpace && this.handleChartDoubleClick)
                         this.handleChartDoubleClick(drawing, object, e, x, y, pageIndex);
+                    if(object.getObjectType() === AscDFH.historyitem_type_Shape){
+                        if(this.handleDblClickEmptyShape){
+                            this.handleDblClickEmptyShape(object);
+                        }
+                    }
                     if (object.getObjectType() === AscDFH.historyitem_type_OleObject && this.handleOleObjectDoubleClick){
                         this.handleOleObjectDoubleClick(drawing, object, e, x, y, pageIndex);
                     }
@@ -10475,4 +10498,5 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
 	window['AscFormat'].ApplyDLblsProps = ApplyDLblsProps;
 	window['AscFormat'].CollectDLbls = CollectDLbls;
 	window['AscFormat'].CollectSettingsSpPr = CollectSettingsSpPr;
+	window['AscFormat'].CheckLinePresetForParagraphAdd = CheckLinePresetForParagraphAdd;
 })(window);

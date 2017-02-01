@@ -59,7 +59,130 @@ var MOVE_DELTA = AscFormat.MOVE_DELTA;
 
 var cToRad2 = (Math.PI/60000)/180;
 
-function Path()
+
+function CChangesDrawingsAddPathCommand(Class, oCommand, nIndex){
+    this.Type = AscDFH.historyitem_PathAddPathCommand;
+    this.Command = oCommand;
+    this.Index = nIndex;
+    CChangesDrawingsAddPathCommand.superclass.constructor.call(this, Class);
+}
+AscCommon.extendClass(CChangesDrawingsAddPathCommand, AscDFH.CChangesBase);
+
+    CChangesDrawingsAddPathCommand.prototype.Undo = function(){
+        this.Class.ArrPathCommandInfo.splice(this.Index, 1);
+    };
+    CChangesDrawingsAddPathCommand.prototype.Redo = function(){
+        this.Class.ArrPathCommandInfo.splice(this.Index, 0, this.Command);
+    };
+
+
+    CChangesDrawingsAddPathCommand.prototype.WriteToBinary = function(Writer){
+        Writer.WriteLong(this.Index);
+        Writer.WriteLong(this.Command.id);
+        switch(this.Command.id){
+            case moveTo:
+            case lineTo:
+            {
+                Writer.WriteString2(this.Command.X);
+                Writer.WriteString2(this.Command.Y);
+                break;
+            }
+            case bezier3:
+            {
+                Writer.WriteString2(this.Command.X0);
+                Writer.WriteString2(this.Command.Y0);
+                Writer.WriteString2(this.Command.X1);
+                Writer.WriteString2(this.Command.Y1);
+                break;
+            }
+            case bezier4:
+            {
+                Writer.WriteString2(this.Command.X0);
+                Writer.WriteString2(this.Command.Y0);
+                Writer.WriteString2(this.Command.X1);
+                Writer.WriteString2(this.Command.Y1);
+                Writer.WriteString2(this.Command.X2);
+                Writer.WriteString2(this.Command.Y2);
+                break;
+            }
+            case arcTo:
+            {
+                Writer.WriteString2(this.Command.hR);
+                Writer.WriteString2(this.Command.wR);
+                Writer.WriteString2(this.Command.stAng);
+                Writer.WriteString2(this.Command.swAng);
+                break;
+            }
+            case close:
+            {
+                break;
+            }
+        }
+    };
+
+
+    CChangesDrawingsAddPathCommand.prototype.ReadFromBinary = function(Reader){
+        this.Index = Reader.GetLong();
+        this.Command = {};
+        this.Command.id = Reader.GetLong();
+        switch(this.Command.id){
+            case moveTo:
+            case lineTo:
+            {
+                this.Command.X = Reader.GetString2();
+                this.Command.Y = Reader.GetString2();
+                break;
+            }
+            case bezier3:
+            {
+                this.Command.X0 = Reader.GetString2();
+                this.Command.Y0 = Reader.GetString2();
+                this.Command.X1 = Reader.GetString2();
+                this.Command.Y1 = Reader.GetString2();
+                break;
+            }
+            case bezier4:
+            {
+                this.Command.X0 = Reader.GetString2();
+                this.Command.Y0 = Reader.GetString2();
+                this.Command.X1 = Reader.GetString2();
+                this.Command.Y1 = Reader.GetString2();
+                this.Command.X2 = Reader.GetString2();
+                this.Command.Y2 = Reader.GetString2();
+                break;
+            }
+            case arcTo:
+            {
+                this.Command.hR = Reader.GetString2();
+                this.Command.wR = Reader.GetString2();
+                this.Command.stAng = Reader.GetString2();
+                this.Command.swAng = Reader.GetString2();
+                break;
+            }
+            case close:
+            {
+                break;
+            }
+        }
+    };
+
+
+
+    AscDFH.changesFactory[AscDFH.historyitem_PathSetStroke] = AscDFH.CChangesDrawingsBool;
+    AscDFH.changesFactory[AscDFH.historyitem_PathSetExtrusionOk] = AscDFH.CChangesDrawingsBool;
+    AscDFH.changesFactory[AscDFH.historyitem_PathSetFill] = AscDFH.CChangesDrawingsString;
+    AscDFH.changesFactory[AscDFH.historyitem_PathSetPathH] = AscDFH.CChangesDrawingsLong;
+    AscDFH.changesFactory[AscDFH.historyitem_PathSetPathW] = AscDFH.CChangesDrawingsLong;
+    AscDFH.changesFactory[AscDFH.historyitem_PathAddPathCommand] = CChangesDrawingsAddPathCommand;
+
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_PathSetStroke] = function(oClass, value){oClass.stroke = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_PathSetExtrusionOk] = function(oClass, value){oClass.extrusionOk = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_PathSetFill] = function(oClass, value){oClass.fill = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_PathSetPathH] = function(oClass, value){oClass.pathH = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_PathSetPathW] = function(oClass, value){oClass.pathW = value;};
+
+
+    function Path()
 {
     this.stroke      = null;
     this.extrusionOk = null;
@@ -162,37 +285,37 @@ Path.prototype = {
 
     setStroke: function(pr)
     {
-        History.Add(this, {Type: AscDFH.historyitem_PathSetStroke, oldPr: this.stroke, newPr: pr});
+        History.Add(new AscDFH.CChangesDrawingsBool(this, AscDFH.historyitem_PathSetStroke, this.stroke, pr));
         this.stroke = pr;
     },
 
     setExtrusionOk: function(pr)
     {
-        History.Add(this, {Type: AscDFH.historyitem_PathSetExtrusionOk, oldPr: this.extrusionOk, newPr: pr});
+        History.Add(new AscDFH.CChangesDrawingsBool(this, AscDFH.historyitem_PathSetExtrusionOk, this.extrusionOk, pr));
         this.extrusionOk = pr;
     },
 
     setFill: function(pr)
     {
-        History.Add(this, {Type: AscDFH.historyitem_PathSetFill, oldPr: this.fill, newPr: pr});
+        History.Add(new AscDFH.CChangesDrawingsString(this, AscDFH.historyitem_PathSetFill, this.fill, pr));
         this.fill = pr;
     },
 
     setPathH: function(pr)
     {
-        History.Add(this, {Type: AscDFH.historyitem_PathSetPathH, oldPr: this.pathH, newPr: pr});
+        History.Add(new AscDFH.CChangesDrawingsLong(this, AscDFH.historyitem_PathSetPathH, this.pathH, pr));
         this.pathH = pr;
     },
 
     setPathW: function(pr)
     {
-        History.Add(this, {Type: AscDFH.historyitem_PathSetPathW, oldPr: this.pathW, newPr: pr});
+        History.Add(new AscDFH.CChangesDrawingsLong(this, AscDFH.historyitem_PathSetPathW, this.pathW, pr));
         this.pathW = pr;
     },
 
     addPathCommand: function(cmd)
     {
-        History.Add(this, {Type: AscDFH.historyitem_PathAddPathCommand, newPr: cmd});
+        History.Add(new CChangesDrawingsAddPathCommand(this, cmd, this.ArrPathCommandInfo.length));
         this.ArrPathCommandInfo.push(cmd);
     },
 
@@ -221,247 +344,9 @@ Path.prototype = {
         this.addPathCommand({id:bezier4, X0:x0, Y0:y0, X1:x1, Y1:y1, X2:x2, Y2:y2});
     },
 
-
     close: function()
     {
         this.addPathCommand({id:close});
-    },
-
-
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case AscDFH.historyitem_PathSetStroke:
-            {
-                this.stroke = data.oldPr;
-                break;
-            }
-            case AscDFH.historyitem_PathSetExtrusionOk:
-            {
-                this.extrusionOk = data.oldPr;
-                break;
-            }
-            case AscDFH.historyitem_PathSetFill:
-            {
-                this.fill = data.oldPr;
-                break;
-            }
-            case AscDFH.historyitem_PathSetPathH:
-            {
-                this.pathH = data.oldPr;
-                break;
-            }
-            case AscDFH.historyitem_PathSetPathW:
-            {
-                this.pathW = data.oldPr;
-                break;
-            }
-            case AscDFH.historyitem_PathAddPathCommand:
-            {
-                this.ArrPathCommandInfo.splice(this.ArrPathCommandInfo.length - 1, 1);
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case AscDFH.historyitem_PathSetStroke:
-            {
-                this.stroke = data.newPr;
-                break;
-            }
-            case AscDFH.historyitem_PathSetExtrusionOk:
-            {
-                this.extrusionOk = data.newPr;
-                break;
-            }
-            case AscDFH.historyitem_PathSetFill:
-            {
-                this.fill = data.newPr;
-                break;
-            }
-            case AscDFH.historyitem_PathSetPathH:
-            {
-                this.pathH = data.newPr;
-                break;
-            }
-            case AscDFH.historyitem_PathSetPathW:
-            {
-                this.pathW = data.newPr;
-                break;
-            }
-            case AscDFH.historyitem_PathAddPathCommand:
-            {
-                this.ArrPathCommandInfo.push(data.newPr);
-            }
-        }
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(data.Type);
-        switch (data.Type)
-        {
-            case AscDFH.historyitem_PathSetStroke:
-            case AscDFH.historyitem_PathSetExtrusionOk:
-            {
-                AscFormat.writeBool(w, data.newPr);
-                break;
-            }
-            case AscDFH.historyitem_PathSetFill:
-            {
-                AscFormat.writeString(w, data.newPr);
-                break;
-            }
-            case AscDFH.historyitem_PathSetPathH:
-            case AscDFH.historyitem_PathSetPathW:
-            {
-                AscFormat.writeLong(w, data.newPr);
-                break;
-            }
-            case AscDFH.historyitem_PathAddPathCommand:
-            {
-                switch (data.newPr.id)
-                {
-                    case moveTo:
-                    case lineTo:
-                    {
-                        w.WriteBool(true);
-                        AscFormat.writeLong(w, data.newPr.id);
-                        AscFormat.writeString(w, data.newPr.X);
-                        AscFormat.writeString(w, data.newPr.Y);
-                        break;
-                    }
-                    case bezier3:
-                    {
-                        w.WriteBool(true);
-                        AscFormat.writeLong(w, data.newPr.id);
-                        AscFormat.writeString(w, data.newPr.X0);
-                        AscFormat.writeString(w, data.newPr.Y0);
-                        AscFormat.writeString(w, data.newPr.X1);
-                        AscFormat.writeString(w, data.newPr.Y1);
-                        break;
-                    }
-                    case bezier4:
-                    {
-                        w.WriteBool(true);
-                        AscFormat.writeLong(w, data.newPr.id);
-                        AscFormat.writeString(w, data.newPr.X0);
-                        AscFormat.writeString(w, data.newPr.Y0);
-                        AscFormat.writeString(w, data.newPr.X1);
-                        AscFormat.writeString(w, data.newPr.Y1);
-                        AscFormat.writeString(w, data.newPr.X2);
-                        AscFormat.writeString(w, data.newPr.Y2);
-                        break;
-                    }
-                    case arcTo:
-                    {
-                        w.WriteBool(true);
-                        AscFormat.writeLong(w, data.newPr.id);
-                        AscFormat.writeString(w, data.newPr.hR);
-                        AscFormat.writeString(w, data.newPr.wR);
-                        AscFormat.writeString(w, data.newPr.stAng);
-                        AscFormat.writeString(w, data.newPr.swAng);
-                        break;
-                    }
-                    case close:
-                    {
-                        w.WriteBool(true);
-                        AscFormat.writeLong(w, data.newPr.id);
-                        break;
-                    }
-                }
-            }
-        }
-    },
-
-
-    Load_Changes: function(r)
-    {
-        var type = r.GetLong();
-        switch (type)
-        {
-            case AscDFH.historyitem_PathSetStroke:
-            {
-                this.stroke = AscFormat.readBool(r);
-                break;
-            }
-            case AscDFH.historyitem_PathSetExtrusionOk:
-            {
-                this.extrusionOk = AscFormat.readBool(r);
-                break;
-            }
-            case AscDFH.historyitem_PathSetFill:
-            {
-                this.fill = AscFormat.readString(r);
-                break;
-            }
-            case AscDFH.historyitem_PathSetPathH:
-            {
-                this.pathH = AscFormat.readLong(r);
-                break;
-            }
-            case AscDFH.historyitem_PathSetPathW:
-            {
-                this.pathW = AscFormat.readLong(r);
-                break;
-            }
-            case AscDFH.historyitem_PathAddPathCommand:
-            {
-                if(r.GetBool())
-                {
-                    var command_id = AscFormat.readLong(r);
-                    switch (command_id)
-                    {
-                        case moveTo:
-                        case lineTo:
-                        {
-                            var x = AscFormat.readString(r);
-                            var y = AscFormat.readString(r);
-                            this.ArrPathCommandInfo.push({id: command_id, X: x, Y: y});
-                            break;
-                        }
-                        case bezier3:
-                        {
-                            var X0 = AscFormat.readString(r);
-                            var Y0 = AscFormat.readString(r);
-                            var X1 = AscFormat.readString(r);
-                            var Y1 = AscFormat.readString(r);
-                            this.ArrPathCommandInfo.push({id: bezier3, X0: X0, Y0: Y0, X1: X1, Y1: Y1});
-                            break;
-                        }
-                        case bezier4:
-                        {
-                            var X0 = AscFormat.readString(r);
-                            var Y0 = AscFormat.readString(r);
-                            var X1 = AscFormat.readString(r);
-                            var Y1 = AscFormat.readString(r);
-                            var X2 = AscFormat.readString(r);
-                            var Y2 = AscFormat.readString(r);
-                            this.ArrPathCommandInfo.push({id: bezier4, X0: X0, Y0: Y0, X1: X1, Y1: Y1, X2: X2, Y2: Y2});
-                            break;
-                        }
-                        case arcTo:
-                        {
-                            var hR    = AscFormat.readString(r);
-                            var wR    = AscFormat.readString(r);
-                            var stAng = AscFormat.readString(r);
-                            var swAng = AscFormat.readString(r);
-                            this.ArrPathCommandInfo.push({id: arcTo, hR: hR, wR: wR, stAng: stAng, swAng: swAng});
-                            break;
-                        }
-                        case close:
-                        {
-                            this.ArrPathCommandInfo.push({id:close});
-                            break;
-                        }
-                    }
-                }
-            }
-        }
     },
 
     recalculate: function(gdLst, bResetPathsInfo)
@@ -1009,77 +894,6 @@ Path.prototype = {
         return false;
     },
 
-    calculateWrapPolygon: function(epsilon, graphics)
-    {
-        var arr_polygons = [];
-        var cur_polygon = [];
-        var path_commands = this.ArrPathCommand;
-        var path_commands_count = path_commands.length;
-        var last_x, last_y;
-        for(var  index = 0; index < path_commands_count; ++index)
-        {
-            var cur_command = path_commands[index];
-            switch (cur_command.id)
-            {
-                case moveTo:
-                case lineTo:
-                {
-                    cur_polygon.push({x: cur_command.X, y: cur_command.Y});
-                    last_x = cur_command.X;
-                    last_y = cur_command.Y;
-                    break;
-                }
-                case bezier3:
-                {
-                    cur_polygon = cur_polygon.concat(partition_bezier3(last_x, last_y, cur_command.X0, cur_command.Y0, cur_command.X1, cur_command.Y1, epsilon));
-                    last_x = cur_command.X1;
-                    last_y = cur_command.Y1;
-                    break;
-                }
-                case bezier4:
-                {
-                    cur_polygon = cur_polygon.concat(partition_bezier4(last_x, last_y, cur_command.X0, cur_command.Y0, cur_command.X1, cur_command.Y1, cur_command.X2, cur_command.Y2, epsilon));
-                    last_x = cur_command.X2;
-                    last_y = cur_command.Y2;
-                    break;
-                }
-
-                case arcTo:
-                {
-                    var arr_curve_bezier = getArrayPointsCurveBezierAtArcTo(last_x, last_y, cur_command.stX, cur_command.stY, cur_command.wR, cur_command.hR, cur_command.stAng, cur_command.swAng);
-                    if(arr_curve_bezier.length > 0)
-                    {
-                        last_x = arr_curve_bezier[arr_curve_bezier.length - 1].x4;
-                        last_y = arr_curve_bezier[arr_curve_bezier.length - 1].y4;
-                        for(var i = 0;  i < arr_curve_bezier.length; ++i)
-                        {
-                            var cur_curve_bezier = arr_curve_bezier[i];
-                            cur_polygon = cur_polygon.concat(partition_bezier4(cur_curve_bezier.x0, cur_curve_bezier.y0, cur_curve_bezier.x1, cur_curve_bezier.y1, cur_curve_bezier.x2, cur_curve_bezier.y2, cur_curve_bezier.x3, cur_curve_bezier.y3, epsilon))
-                        }
-                    }
-                    break;
-                }
-                case close:
-                {
-                    arr_polygons.push(cur_polygon);
-                    cur_polygon = [];
-                }
-            }
-        }
-
-        for(i = 0; i < arr_polygons.length; ++i)
-        {
-            var cur_polygon = arr_polygons[i];
-            graphics._m(cur_polygon[0].x, cur_polygon[0].y);
-            for(var j = 0; j < cur_polygon.length; ++j)
-            {
-                graphics._l(cur_polygon[j].x, cur_polygon[j].y);
-            }
-            graphics._z();
-            graphics.ds();
-        }
-    },
-
     isSmartLine : function()
     {
         if (this.ArrPathCommand.length != 2)
@@ -1613,44 +1427,6 @@ Path.prototype = {
                 ++commandIndex;
             }
             return null;
-        },
-
-        getCommandsCount: function(){
-            var i = 0;
-            var path = this.PathMemory.ArrPathCommand;
-            var len = path[this.startPos];
-            var commandIndex = 0;
-            while(i < len)
-            {
-                var cmd = path[this.startPos + i + 1];
-                switch(cmd)
-                {
-                    case moveTo:
-                    case lineTo:
-                    {
-                        i+=3;
-                        break;
-                    }
-                    case bezier3:
-                    {
-                        i+=5;
-                        break;
-                    }
-                    case bezier4:
-                    case arcTo:
-                    {
-                        i+=7;
-                        break;
-                    }
-                    case close:
-                    {
-                        i+=1;
-                        break;
-                    }
-                }
-                ++commandIndex;
-            }
-            return commandIndex;
         },
 
         check_bounds: function(shape_drawer)

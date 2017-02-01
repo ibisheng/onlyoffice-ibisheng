@@ -1778,6 +1778,19 @@ ParaSeparator.prototype.Copy     = function()
 {
 	return new ParaSeparator();
 };
+ParaSeparator.prototype.UpdateWidth = function(PRS)
+{
+	var oPara    = PRS.Paragraph;
+	var nCurPage = PRS.Page;
+
+	oPara.Parent.Update_ContentIndexing();
+	var oLimits = oPara.Parent.Get_PageContentStartPos2(oPara.PageNum, oPara.ColumnNum, nCurPage, oPara.Index);
+
+	var nWidth = (Math.min(50, (oLimits.XLimit - oLimits.X)) * TEXTWIDTH_DIVIDER) | 0;
+
+	this.Width        = nWidth;
+	this.WidthVisible = nWidth;
+};
 
 /**
  * Класс представляющий собой длинный разделитель (который в основном используется для сносок).
@@ -1818,7 +1831,7 @@ ParaContinuationSeparator.prototype.Copy         = function()
 {
 	return new ParaContinuationSeparator();
 };
-ParaContinuationSeparator.prototype.Update_Width = function(PRS)
+ParaContinuationSeparator.prototype.UpdateWidth = function(PRS)
 {
 	var oPara    = PRS.Paragraph;
 	var nCurPage = PRS.Page;

@@ -520,85 +520,6 @@
 		this.SymbolsWSCount = v;
 	};
 
-	/*----------------------------------------------------------------*/
-	/*functions for working with headers*/
-	/*
-	 структура заголовков, предварительно, выглядит так
-	 {
-	 headerText: "Header1",//заголовок
-	 pageNumber: 0, //содержит номер страницы, где находится искомая последовательность
-	 X: 0,//координаты по OX начала последовательности на данной страницы
-	 Y: 0,//координаты по OY начала последовательности на данной страницы
-	 level: 0//уровень заголовка
-	 }
-	 заголовки приходят либо в списке, либо последовательно.
-	 */
-	// CHeader
-	function CHeader(obj)
-	{
-		if (obj)
-		{
-			this.headerText = (undefined != obj.headerText) ? obj.headerText : null;	//заголовок
-			this.pageNumber = (undefined != obj.pageNumber) ? obj.pageNumber : null;	//содержит номер страницы, где находится искомая последовательность
-			this.X          = (undefined != obj.X) ? obj.X : null;								//координаты по OX начала последовательности на данной страницы
-			this.Y          = (undefined != obj.Y) ? obj.Y : null;								//координаты по OY начала последовательности на данной страницы
-			this.level      = (undefined != obj.level) ? obj.level : null;					//позиция заголовка
-		}
-		else
-		{
-			this.headerText = null;				//заголовок
-			this.pageNumber = null;				//содержит номер страницы, где находится искомая последовательность
-			this.X          = null;						//координаты по OX начала последовательности на данной страницы
-			this.Y          = null;						//координаты по OY начала последовательности на данной страницы
-			this.level      = null;					//позиция заголовка
-		}
-	}
-
-	CHeader.prototype.get_headerText = function()
-	{
-		return this.headerText;
-	};
-	CHeader.prototype.get_pageNumber = function()
-	{
-		return this.pageNumber;
-	};
-	CHeader.prototype.get_X          = function()
-	{
-		return this.X;
-	};
-	CHeader.prototype.get_Y          = function()
-	{
-		return this.Y;
-	};
-	CHeader.prototype.get_Level      = function()
-	{
-		return this.level;
-	};
-	var _fakeHeaders                 = [
-		new CHeader({headerText : "Header1", pageNumber : 0, X : 0, Y : 0, level : 1}),
-		new CHeader({headerText : "Header2", pageNumber : 0, X : 0, Y : 0, level : 1}),
-		new CHeader({headerText : "Header3", pageNumber : 0, X : 0, Y : 0, level : 2}),
-		new CHeader({headerText : "Header4", pageNumber : 0, X : 0, Y : 0, level : 1}),
-		new CHeader({headerText : "Header5", pageNumber : 0, X : 0, Y : 0, level : 1}),
-		new CHeader({headerText : "Header5", pageNumber : 0, X : 0, Y : 0, level : 1}),
-		new CHeader({headerText : "Header5", pageNumber : 0, X : 0, Y : 0, level : 2}),
-		new CHeader({headerText : "Header5", pageNumber : 0, X : 0, Y : 0, level : 3}),
-		new CHeader({headerText : "Header3", pageNumber : 0, X : 0, Y : 0, level : 4}),
-		new CHeader({headerText : "Header3", pageNumber : 0, X : 0, Y : 0, level : 5}),
-		new CHeader({headerText : "Header3", pageNumber : 0, X : 0, Y : 0, level : 6}),
-		new CHeader({headerText : "Header4", pageNumber : 0, X : 0, Y : 0, level : 7}),
-		new CHeader({headerText : "Header5", pageNumber : 0, X : 0, Y : 0, level : 8}),
-		new CHeader({headerText : "Header5", pageNumber : 0, X : 0, Y : 0, level : 1}),
-		new CHeader({headerText : "Header5", pageNumber : 0, X : 0, Y : 0, level : 1}),
-		new CHeader({headerText : "Header5", pageNumber : 0, X : 0, Y : 0, level : 2}),
-		new CHeader({headerText : "Header5", pageNumber : 0, X : 0, Y : 0, level : 3}),
-		new CHeader({headerText : "Header6", pageNumber : 0, X : 0, Y : 0, level : 1}),
-		new CHeader({headerText : "Header5", pageNumber : 0, X : 0, Y : 0, level : 0}),
-		new CHeader({headerText : "Header5", pageNumber : 0, X : 0, Y : 0, level : 1}),
-		new CHeader({headerText : "Header5", pageNumber : 0, X : 0, Y : 0, level : 0}),
-		new CHeader({headerText : "Header5", pageNumber : 0, X : 0, Y : 0, level : 0})
-	];
-
 	// CSearchResult - returns result of searching
 	function CSearchResult(obj)
 	{
@@ -622,75 +543,6 @@
 	CSearchResult.prototype.put_Text      = function(obj)
 	{
 		this.Object.text = obj;
-	};
-
-	function CTablePropLook(obj)
-	{
-		this.FirstCol = false;
-		this.FirstRow = false;
-		this.LastCol  = false;
-		this.LastRow  = false;
-		this.BandHor  = false;
-		this.BandVer  = false;
-
-		if (obj)
-		{
-			this.FirstCol = ( undefined === obj.m_bFirst_Col ? false : obj.m_bFirst_Col );
-			this.FirstRow = ( undefined === obj.m_bFirst_Row ? false : obj.m_bFirst_Row );
-			this.LastCol  = ( undefined === obj.m_bLast_Col ? false : obj.m_bLast_Col );
-			this.LastRow  = ( undefined === obj.m_bLast_Row ? false : obj.m_bLast_Row );
-			this.BandHor  = ( undefined === obj.m_bBand_Hor ? false : obj.m_bBand_Hor );
-			this.BandVer  = ( undefined === obj.m_bBand_Ver ? false : obj.m_bBand_Ver );
-		}
-	}
-
-	CTablePropLook.prototype.get_FirstCol = function()
-	{
-		return this.FirstCol;
-	};
-	CTablePropLook.prototype.put_FirstCol = function(v)
-	{
-		this.FirstCol = v;
-	};
-	CTablePropLook.prototype.get_FirstRow = function()
-	{
-		return this.FirstRow;
-	};
-	CTablePropLook.prototype.put_FirstRow = function(v)
-	{
-		this.FirstRow = v;
-	};
-	CTablePropLook.prototype.get_LastCol  = function()
-	{
-		return this.LastCol;
-	};
-	CTablePropLook.prototype.put_LastCol  = function(v)
-	{
-		this.LastCol = v;
-	};
-	CTablePropLook.prototype.get_LastRow  = function()
-	{
-		return this.LastRow;
-	};
-	CTablePropLook.prototype.put_LastRow  = function(v)
-	{
-		this.LastRow = v;
-	};
-	CTablePropLook.prototype.get_BandHor  = function()
-	{
-		return this.BandHor;
-	};
-	CTablePropLook.prototype.put_BandHor  = function(v)
-	{
-		this.BandHor = v;
-	};
-	CTablePropLook.prototype.get_BandVer  = function()
-	{
-		return this.BandVer;
-	};
-	CTablePropLook.prototype.put_BandVer  = function(v)
-	{
-		this.BandVer = v;
 	};
 
 	/**
@@ -1150,6 +1002,10 @@
 		this.FontLoader.LoadDocumentFonts2(this.WordControl.m_oLogicDocument.Fonts);
 	};
 
+    asc_docs_api.prototype.asc_GetRevisionsChangesStack = function()
+	{
+		return [];
+	};
 
 	asc_docs_api.prototype.asc_SetFastCollaborative = function(isOn)
 	{
@@ -1498,6 +1354,7 @@ background-repeat: no-repeat;\
 		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 
 		//this.FontLoader.LoadEmbeddedFonts(this.DocumentUrl, this.WordControl.m_oLogicDocument.EmbeddedFonts);
+		this.WordControl.m_oDrawingDocument.CheckFontNeeds();
 		this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);
 
 		this.ParcedDocument = true;
@@ -1589,7 +1446,7 @@ background-repeat: no-repeat;\
 		var TextPr = Doc.Get_Paragraph_TextPr();
 
 		// return { ParaPr: ParaPr, TextPr : TextPr };
-		return new AscCommonSlide.CParagraphAndTextProp(ParaPr, TextPr);	// uncomment if this method will be used externally. 20/03/2012 uncommented for testers
+		return new Asc.CParagraphAndTextProp(ParaPr, TextPr);	// uncomment if this method will be used externally. 20/03/2012 uncommented for testers
 	};
 
 	// -------
@@ -2039,7 +1896,8 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.asc_Save                     = function(isAutoSave)
 	{
 		this.IsUserSave = !isAutoSave;
-		if (true === this.canSave && !this.isLongAction())
+		if (true === this.canSave && !this.isLongAction() && (this.asc_isDocumentCanSave() || History.Have_Changes() ||
+			AscCommon.CollaborativeEditing.Have_OtherChanges()))
 		{
 			this.canSave = false;
 
@@ -2222,7 +2080,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.CollectHeaders                  = function()
 	{
-		this.sync_ReturnHeadersCallback(_fakeHeaders);
+		this.sync_ReturnHeadersCallback([]);
 	};
 	asc_docs_api.prototype.GetActiveHeader                 = function()
 	{
@@ -2234,7 +2092,7 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.sync_ChangeActiveHeaderCallback = function(position, header)
 	{
-		this.sendEvent("asc_onChangeActiveHeader", position, new CHeader(header));
+		this.sendEvent("asc_onChangeActiveHeader", position, new Asc.CHeader(header));
 	};
 	asc_docs_api.prototype.sync_ReturnHeadersCallback      = function(headers)
 	{
@@ -7053,27 +6911,8 @@ background-repeat: no-repeat;\
 	CDocInfoProp.prototype['put_SymbolsCount']   = CDocInfoProp.prototype.put_SymbolsCount;
 	CDocInfoProp.prototype['get_SymbolsWSCount'] = CDocInfoProp.prototype.get_SymbolsWSCount;
 	CDocInfoProp.prototype['put_SymbolsWSCount'] = CDocInfoProp.prototype.put_SymbolsWSCount;
-	CHeader.prototype['get_headerText']          = CHeader.prototype.get_headerText;
-	CHeader.prototype['get_pageNumber']          = CHeader.prototype.get_pageNumber;
-	CHeader.prototype['get_X']                   = CHeader.prototype.get_X;
-	CHeader.prototype['get_Y']                   = CHeader.prototype.get_Y;
-	CHeader.prototype['get_Level']               = CHeader.prototype.get_Level;
 	CSearchResult.prototype['get_Text']          = CSearchResult.prototype.get_Text;
 	CSearchResult.prototype['get_Navigator']     = CSearchResult.prototype.get_Navigator;
 	CSearchResult.prototype['put_Navigator']     = CSearchResult.prototype.put_Navigator;
 	CSearchResult.prototype['put_Text']          = CSearchResult.prototype.put_Text;
-
-	window['Asc']['CTablePropLook'] = window['Asc'].CTablePropLook = CTablePropLook;
-	CTablePropLook.prototype['get_FirstCol'] = CTablePropLook.prototype.get_FirstCol;
-	CTablePropLook.prototype['put_FirstCol'] = CTablePropLook.prototype.put_FirstCol;
-	CTablePropLook.prototype['get_FirstRow'] = CTablePropLook.prototype.get_FirstRow;
-	CTablePropLook.prototype['put_FirstRow'] = CTablePropLook.prototype.put_FirstRow;
-	CTablePropLook.prototype['get_LastCol']  = CTablePropLook.prototype.get_LastCol;
-	CTablePropLook.prototype['put_LastCol']  = CTablePropLook.prototype.put_LastCol;
-	CTablePropLook.prototype['get_LastRow']  = CTablePropLook.prototype.get_LastRow;
-	CTablePropLook.prototype['put_LastRow']  = CTablePropLook.prototype.put_LastRow;
-	CTablePropLook.prototype['get_BandHor']  = CTablePropLook.prototype.get_BandHor;
-	CTablePropLook.prototype['put_BandHor']  = CTablePropLook.prototype.put_BandHor;
-	CTablePropLook.prototype['get_BandVer']  = CTablePropLook.prototype.get_BandVer;
-	CTablePropLook.prototype['put_BandVer']  = CTablePropLook.prototype.put_BandVer;
 })(window, window.document);

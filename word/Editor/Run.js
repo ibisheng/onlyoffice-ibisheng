@@ -2459,10 +2459,10 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     // Отмечаем, что началось слово
                     StartWord = true;
 
-                    if (para_ContinuationSeparator === ItemType)
-                        Item.Update_Width(PRS);
+					if (para_ContinuationSeparator === ItemType || para_Separator === ItemType)
+						Item.UpdateWidth(PRS);
 
-                    if (true !== PRS.IsFastRecalculate())
+					if (true !== PRS.IsFastRecalculate())
 					{
 						if (para_FootnoteReference === ItemType)
 						{
@@ -5662,6 +5662,14 @@ ParaRun.prototype.Get_StartRangePos2 = function(_CurLine, _CurRange, ContentPos,
     ContentPos.Update( Pos, Depth );
 };
 
+ParaRun.prototype.Get_EndRangePos2 = function(_CurLine, _CurRange, ContentPos, Depth)
+{
+	var CurLine  = _CurLine - this.StartLine;
+	var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
+	var Pos      = this.protected_GetRangeEndPos(CurLine, CurRange);
+	ContentPos.Update(Pos, Depth);
+};
+
 ParaRun.prototype.Get_StartPos = function(ContentPos, Depth)
 {
     ContentPos.Update( 0, Depth );
@@ -5746,6 +5754,10 @@ ParaRun.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
         case -1: Pos = this.Content.length; break;
         case  0: Pos = DocPos[Depth].Position; break;
     }
+
+    var nLen = this.Content.length;
+    if (nLen > 0 && Pos >= nLen && para_End === this.Content[nLen - 1].Type)
+    	Pos = nLen - 1;
 
     this.State.ContentPos = Pos;
 };

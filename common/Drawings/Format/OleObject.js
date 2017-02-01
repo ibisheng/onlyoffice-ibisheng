@@ -38,6 +38,36 @@
      * @param {undefined} undefined
      */
 function (window, undefined) {
+
+
+        function COleSize(w, h){
+            this.w = w;
+            this.h = h;
+        }
+        COleSize.prototype.Write_ToBinary = function(Writer){
+            Writer.WriteLong(this.w);
+            Writer.WriteLong(this.h);
+        };
+        COleSize.prototype.Read_FromBinary = function(Reader){
+            this.w = Reader.GetLong();
+            this.h = Reader.GetLong();
+        };
+
+        AscDFH.changesFactory[AscDFH.historyitem_ImageShapeSetData] = AscDFH.CChangesDrawingsString;
+        AscDFH.changesFactory[AscDFH.historyitem_ImageShapeSetApplicationId] = AscDFH.CChangesDrawingsString;
+        AscDFH.changesFactory[AscDFH.historyitem_ImageShapeSetPixSizes] = AscDFH.CChangesDrawingsObjectNoId;
+
+
+        AscDFH.drawingsChangesMap[AscDFH.historyitem_ImageShapeSetData] = function(oClass, value){oClass.m_sData = value;};
+        AscDFH.drawingsChangesMap[AscDFH.historyitem_ImageShapeSetApplicationId] = function(oClass, value){oClass.m_sApplicationId = value;};
+        AscDFH.drawingsChangesMap[AscDFH.historyitem_ImageShapeSetPixSizes] = function(oClass, value){
+            if(value){
+                oClass.m_nPixWidth = value.w;
+                oClass.m_nPixHeight = value.h;
+            }
+        };
+        AscDFH.drawingsConstructorsMap[AscDFH.historyitem_ImageShapeSetPixSizes] = COleSize;
+
     function COleObject()
     {
         COleObject.superclass.constructor.call(this);
@@ -47,8 +77,6 @@ function (window, undefined) {
         this.m_nPixHeight = null;
         this.m_fDefaultSizeX = null;
         this.m_fDefaultSizeY = null;
-        this.Id = AscCommon.g_oIdCounter.Get_NewId();
-        AscCommon.g_oTableId.Add( this, this.Id );
     }
     AscCommon.extendClass(COleObject, AscFormat.CImageShape);
 
@@ -58,17 +86,17 @@ function (window, undefined) {
     };
     COleObject.prototype.setData = function(sData)
     {
-        AscCommon.History.Add(this, {Type:AscDFH.historyitem_ImageShapeSetData, oldData: this.m_sData,  newData: sData});
+        AscCommon.History.Add(new AscDFH.CChangesDrawingsString(this, AscDFH.historyitem_ImageShapeSetData, this.m_sData, sData));
         this.m_sData = sData;
     };
     COleObject.prototype.setApplicationId = function(sApplicationId)
     {
-        AscCommon.History.Add(this, {Type:AscDFH.historyitem_ImageShapeSetApplicationId, oldId: this.m_sApplicationId,  newId: sApplicationId});
+        AscCommon.History.Add(new AscDFH.CChangesDrawingsString(this, AscDFH.historyitem_ImageShapeSetApplicationId, this.m_sApplicationId, sApplicationId));
         this.m_sApplicationId = sApplicationId;
     };
     COleObject.prototype.setPixSizes = function(nPixWidth, nPixHeight)
     {
-        AscCommon.History.Add(this, {Type: AscDFH.historyitem_ImageShapeSetPixSizes, oldPr: {w: this.m_nPixWidth, h: this.m_nPixHeight}, newPr: {w: nPixWidth, h: nPixHeight}});
+        AscCommon.History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_ImageShapeSetPixSizes, new COleSize(this.m_nPixWidth, this.m_nPixHeight), new COleSize(nPixWidth, nPixHeight)));
         this.m_nPixWidth = nPixWidth;
         this.m_nPixHeight = nPixHeight;
     };

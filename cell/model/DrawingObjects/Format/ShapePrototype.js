@@ -44,18 +44,6 @@ var G_O_DEFAULT_COLOR_MAP = AscFormat.GenerateDefaultColorMap();
 CShape.prototype.setDrawingObjects = function(drawingObjects)
 {
 };
-CShape.prototype.setWorksheet = function(worksheet)
-{
-    History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
-    this.worksheet = worksheet;
-    if(this.spTree)
-    {
-        for(var i = 0; i < this.spTree.length; ++i)
-        {
-            this.spTree[i].setWorksheet(worksheet);
-        }
-    }
-};
 CShape.prototype.setDrawingBase = function(drawingBase)
 {
     this.drawingBase = drawingBase;
@@ -213,13 +201,53 @@ function addToDrawings(worksheet, graphic, position, lockByDefault, anchor)
     return ret;
 }
 
+function CChangesDrawingObjectsAddToDrawingObjects(Class, Pos){
+    this.Pos = Pos;
+    this.Type = AscDFH.historyitem_AutoShapes_AddToDrawingObjects;
+    CChangesDrawingObjectsAddToDrawingObjects.superclass.constructor.call(this, Class);
+}
+AscCommon.extendClass(CChangesDrawingObjectsAddToDrawingObjects, AscDFH.CChangesBase);
+    CChangesDrawingObjectsAddToDrawingObjects.prototype.Undo = function(){
+        AscFormat.deleteDrawingBase(this.Class.worksheet.Drawings, this.Class.Get_Id());
+    };
+    CChangesDrawingObjectsAddToDrawingObjects.prototype.Redo = function(){
+        AscFormat.addToDrawings(this.Class.worksheet, this.Class, this.Pos);
+    };
+    CChangesDrawingObjectsAddToDrawingObjects.prototype.WriteToBinary = function(Writer){
+        Writer.WriteLong(this.Pos);
+    };
+    CChangesDrawingObjectsAddToDrawingObjects.prototype.ReadFromBinary = function(Reader){
+        this.Pos = Reader.GetLong();
+    };
+
+    AscDFH.changesFactory[AscDFH.historyitem_AutoShapes_AddToDrawingObjects] = CChangesDrawingObjectsAddToDrawingObjects;
+function CChangesDrawingObjectsRemoveFromDrawingObjects(Class, Pos){
+    this.Type = AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects;
+    this.Pos = Pos;
+    CChangesDrawingObjectsRemoveFromDrawingObjects.superclass.constructor.call(this, Class);
+}
+AscCommon.extendClass(CChangesDrawingObjectsRemoveFromDrawingObjects, AscDFH.CChangesBase);
+    CChangesDrawingObjectsRemoveFromDrawingObjects.prototype.Undo = function(){
+        AscFormat.addToDrawings(this.Class.worksheet, this.Class, this.Pos);
+    };
+    CChangesDrawingObjectsRemoveFromDrawingObjects.prototype.Redo = function(){
+        AscFormat.deleteDrawingBase(this.Class.worksheet.Drawings, this.Class.Get_Id());
+    };
+    CChangesDrawingObjectsRemoveFromDrawingObjects.prototype.WriteToBinary = function(Writer){
+        Writer.WriteLong(this.Pos);
+    };
+    CChangesDrawingObjectsRemoveFromDrawingObjects.prototype.ReadFromBinary = function(Reader){
+        this.Pos = Reader.GetLong();
+    };
+
+    AscDFH.changesFactory[AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects] = CChangesDrawingObjectsRemoveFromDrawingObjects;
+
 CShape.prototype.addToDrawingObjects =  function(pos)
 {
     var position = addToDrawings(this.worksheet, this, pos, /*lockByDefault*/undefined, undefined);
-    var data = {Type: AscDFH.historyitem_AutoShapes_AddToDrawingObjects, Pos: position};
-    History.Add(this, data);
-    this.worksheet.addContentChanges(new AscCommon.CContentChangesElement(AscCommon.contentchanges_Add, data.Pos, 1, data));
-
+    //var data = {Type: AscDFH.historyitem_AutoShapes_AddToDrawingObjects, Pos: position};
+    History.Add(new CChangesDrawingObjectsAddToDrawingObjects(this, position));
+    //this.worksheet.addContentChanges(new AscCommon.CContentChangesElement(AscCommon.contentchanges_Add, data.Pos, 1, data));
     var nv_sp_pr, bNeedSet = false;
     switch(this.getObjectType()){
         case AscDFH.historyitem_type_Shape:{
@@ -260,9 +288,9 @@ CShape.prototype.deleteDrawingBase = function()
     var position = AscFormat.deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
     if(AscFormat.isRealNumber(position))
     {
-        var data = {Type: AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects, Pos: position};
-        History.Add(this, data);
-        this.worksheet.addContentChanges(new AscCommon.CContentChangesElement(AscCommon.contentchanges_Remove, data.Pos, 1, data));
+        //var data = {Type: AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects, Pos: position};
+        History.Add(new CChangesDrawingObjectsRemoveFromDrawingObjects(this, position));
+        //this.worksheet.addContentChanges(new AscCommon.CContentChangesElement(AscCommon.contentchanges_Remove, data.Pos, 1, data));
     }
     return position;
 };
@@ -423,10 +451,7 @@ CShape.prototype.handleUpdateGeometry = function()
 CShape.prototype.convertPixToMM = function(pix)
 {
     var drawingObjects =  getDrawingObjects_Sp(this);
-    var val = drawingObjects ? drawingObjects.convertMetric(pix, 0, 3) : 0;
-    if (AscCommon.AscBrowser.isRetina)
-        val *= 2;
-    return val;
+    return drawingObjects ? drawingObjects.convertMetric(pix, 0, 3) : 0;
 };
 CShape.prototype.getCanvasContext = function()
 {
@@ -573,6 +598,31 @@ CShape.prototype.Get_Worksheet = function()
 {
     return this.worksheet;
 };
+
+
+
+    CShape.prototype.Set_CurrentElement = function()
+    {
+
+        var drawing_objects = this.getDrawingObjectsController();
+        if(drawing_objects)
+        {
+            drawing_objects.resetSelection(true);
+            if(this.group)
+            {
+                var main_group = this.group.getMainGroup();
+                drawing_objects.selectObject(main_group, 0);
+                main_group.selectObject(this, 0);
+                main_group.selection.textSelection = this;
+                drawing_objects.selection.groupSelection = main_group;
+            }
+            else
+            {
+                drawing_objects.selectObject(this, 0);
+                drawing_objects.selection.textSelection = this;
+            }
+        }
+    };
 
 AscFormat.CTextBody.prototype.Get_Worksheet = function()
 {

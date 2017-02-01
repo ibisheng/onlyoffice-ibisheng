@@ -2953,6 +2953,11 @@ ParaMath.prototype.Get_StartRangePos2 = function(_CurLine, _CurRange, ContentPos
     return this.Root.Get_StartRangePos2(_CurLine, _CurRange, ContentPos, Depth);
 };
 
+ParaMath.prototype.Get_EndRangePos2 = function(_CurLine, _CurRange, ContentPos, Depth)
+{
+	return this.Root.Get_EndRangePos2(_CurLine, _CurRange, ContentPos, Depth);
+};
+
 ParaMath.prototype.Get_StartPos = function(ContentPos, Depth)
 {
     this.Root.Get_StartPos(ContentPos, Depth);

@@ -74,9 +74,9 @@ var selectionflag_Numbering     = 0x001;
 var selectionflag_DrawingObject = 0x002;
 
 var search_Common              = 0x0000; // Поиск в простом тексте
-
 var search_Header              = 0x0100; // Поиск в верхнем колонтитуле
 var search_Footer              = 0x0200; // Поиск в нижнем колонтитуле
+var search_Footnote            = 0x0400; // Поиск в сноске
 
 var search_HdrFtr_All          = 0x0001; // Поиск в колонтитуле, который находится на всех страницах
 var search_HdrFtr_All_no_First = 0x0002; // Поиск в колонтитуле, который находится на всех страницах, кроме первой
@@ -6769,10 +6769,7 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 83 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + S - save
     {
-        if (true === this.History.Have_Changes() || AscCommon.CollaborativeEditing.m_aChanges.length > 0)
-        {
-            this.DrawingDocument.m_oWordControl.m_oApi.asc_Save(false);
-        }
+		this.DrawingDocument.m_oWordControl.m_oApi.asc_Save(false);
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 85 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + U - делаем текст подчеркнутым
@@ -8076,7 +8073,7 @@ CDocument.prototype.Document_UpdateInterfaceState = function(bSaveCurRevisionCha
 	this.Api.ClearPropObjCallback();
 
 	this.Controller.UpdateInterfaceState();
-	this.TrackRevisionsManager.End_CollectChanges(editor);
+	this.TrackRevisionsManager.End_CollectChanges(this.Api);
 
 	// Сообщаем, что список составлен
 	this.Api.sync_EndCatchSelectedElements();

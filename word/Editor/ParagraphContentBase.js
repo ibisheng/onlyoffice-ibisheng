@@ -38,6 +38,10 @@ CParagraphContentBase.prototype.CanSplit = function()
 {
 	return false;
 };
+CParagraphContentBase.prototype.IsParagraphContentElement = function()
+{
+	return true;
+};
 
 /**
  * Это базовый класс для элементов содержимого(контент) параграфа, у которых есть свое содержимое.
@@ -1609,6 +1613,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_PosByElement = function(
     if ( this === Class )
         return true;
 
+    if (this.Content.length <= 0)
+    	return false;
+
     var StartPos = 0;
     var EndPos   = this.Content.length - 1;
 
@@ -1698,6 +1705,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_LastRunInRange = functio
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
 {
+	if (this.Content.length <= 0)
+		return false;
+
     var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length - 1 );
 
     this.Content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
@@ -1723,6 +1733,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_LeftPos = function(Searc
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
 {
+	if (this.Content.length <= 0)
+		return false;
+
     var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : 0 );
 
     this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, UseContentPos, StepEnd);
@@ -1856,6 +1869,15 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_StartRangePos2 = functio
 
     this.Content[Pos].Get_StartRangePos2( _CurLine, _CurRange, ContentPos, Depth + 1 );
 };
+CParagraphContentWithParagraphLikeContent.prototype.Get_EndRangePos2 = function(_CurLine, _CurRange, ContentPos, Depth)
+{
+	var CurLine  = _CurLine - this.StartLine;
+	var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+	var Pos = this.protected_GetRangeEndPos(CurLine, CurRange);
+	ContentPos.Update(Pos, Depth);
+	this.Content[Pos].Get_EndRangePos2(_CurLine, _CurRange, ContentPos, Depth + 1);
+};
 CParagraphContentWithParagraphLikeContent.prototype.Get_StartPos = function(ContentPos, Depth)
 {
     if ( this.Content.length > 0 )
@@ -1880,6 +1902,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_EndPos = function(Behind
 //----------------------------------------------------------------------------------------------------------------------
 CParagraphContentWithParagraphLikeContent.prototype.Set_SelectionContentPos = function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
 {
+	if (this.Content.length <= 0)
+		return;
+
     var Selection = this.Selection;
 
     var OldStartPos = Selection.StartPos;
@@ -1962,6 +1987,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_SelectionContentPos = fu
 };
 CParagraphContentWithParagraphLikeContent.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
+	if (this.Content.length <= 0)
+		return;
+
     if ((0 === StartFlag && (!StartDocPos[Depth] || this !== StartDocPos[Depth].Class)) || (0 === EndFlag && (!EndDocPos[Depth] || this !== EndDocPos[Depth].Class)))
         return;
 
@@ -2058,6 +2086,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_ContentSelection = funct
 };
 CParagraphContentWithParagraphLikeContent.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
 {
+	if (this.Content.length <= 0)
+		return;
+
     if (0 === Flag && (!DocPos[Depth] || this !== DocPos[Depth].Class))
         return;
 

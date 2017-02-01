@@ -88,7 +88,7 @@ function Processor3D(width, height, left, right, bottom, top, chartSpace, charts
 	
 	this.angleOx = this.view3D && this.view3D.rotX ? (- this.view3D.rotX / 360) * (Math.PI * 2) : 0;
 	this.angleOy = this.view3D && this.view3D.rotY ? (- this.view3D.rotY / 360) * (Math.PI * 2) : 0;
-	this.angleOz = this.view3D && this.view3D.rotZ ? (- this.view3D.rotZ / 360) * (Math.PI * 2) : 0;
+	//this.angleOz = this.view3D && this.view3D.rotZ ? (- this.view3D.rotZ / 360) * (Math.PI * 2) : 0;
 	
 	if(!this.view3D.getRAngAx() && AscFormat.c_oChartTypes.Pie === this.chartsDrawer.calcProp.type)
 	{	
@@ -1231,9 +1231,6 @@ Processor3D.prototype._calculateCameraDiff = function (/*isSkip*/)
 	//***Calculate cameraDiffZ***
 	if(!this.view3D.getRAngAx())
 	{
-		//медленная функция поиска сдвигов камеры(все сдвиги корректны)
-		//this._calculateCameraDiffZ(points, faces);
-	
 		//быстрая функция поиска сдвигов камеры
 		//console.time("sdf");
 		this._calculateCameraDiffZX(points, faces);
@@ -2119,160 +2116,11 @@ Processor3D.prototype._correctZPositionOY = function(x1, x2, z1, z2, minZ, y1, y
 	return {minZ: diffXZ3.minZ, diffY: diffXZ3.diffY};
 };
 
-Processor3D.prototype._calculateCameraDiffZ = function (points, faces)
-{
-	var widthCanvas = this.widthCanvas;
-	var originalWidthChart = widthCanvas - this.left - this.right;
-	
-	var heightCanvas = this.heightCanvas;
-	var heightChart = heightCanvas - this.top - this.bottom;
-
-	var widthChart = originalWidthChart;
-	var depthChart = this.depthPerspective;
-	
-	var minMaxOx = this._getMinMaxOx(points, faces);
-	var point1 = this.convertAndTurnPoint(minMaxOx.mostLeftPointX.x, minMaxOx.mostLeftPointX.y, minMaxOx.mostLeftPointX.z);
-	var point2 = this.convertAndTurnPoint(minMaxOx.mostRightPointX.x, minMaxOx.mostRightPointX.y, minMaxOx.mostRightPointX.z);
-	var x1 = point1.x;
-	var x2 = point2.x;
-	var y1 = point1.y;
-	var y2 = point2.y;
-	var diffX = Math.abs(x1 - x2);
-	var diffY = Math.abs(y1 - y2);
-	
-	//TODO медленная функция, рассчитать сдвиги!
-	while(diffX > widthChart || diffY > heightChart)
-	{
-		var minMaxOx = this._getMinMaxOx(points, faces);
-		var point1 = this.convertAndTurnPoint(minMaxOx.mostLeftPointX.x, minMaxOx.mostLeftPointX.y, minMaxOx.mostLeftPointX.z);
-		var point2 = this.convertAndTurnPoint(minMaxOx.mostRightPointX.x, minMaxOx.mostRightPointX.y, minMaxOx.mostRightPointX.z);
-
-		var x1 = point1.x;
-		var x2 = point2.x;
-		var y1 = point1.y;
-		var y2 = point2.y;
-		
-		var leftMargin = this.left - x1;
-		var rightMargin = x2 - (this.left + originalWidthChart);
-		
-		var topMargin = this.top - y1;
-		var bottomMargin = y2 - (this.top + heightChart);
-		
-		if(leftMargin > rightMargin)
-		{
-			this.cameraDiffX++;
-		}
-		else
-		{
-			this.cameraDiffX--;
-		}
-		
-		var diffX = Math.abs(x1 - x2);
-		var diffY = Math.abs(y1 - y2);
-
-		this.cameraDiffZ++;
-	}
-	
-	var minMaxOy = this._getMinMaxOy(points, faces);
-	var point1 = this.convertAndTurnPoint(minMaxOy.mostTopPointY.x, minMaxOy.mostTopPointY.y, minMaxOy.mostTopPointY.z);
-	var point2 = this.convertAndTurnPoint(minMaxOy.mostBottomPointY.x, minMaxOy.mostBottomPointY.y, minMaxOy.mostBottomPointY.z);
-	var y1 = point1.y;
-	var y2 = point2.y;
-	
-	var minMaxOx = this._getMinMaxOx(points, faces);
-	var point1 = this.convertAndTurnPoint(minMaxOx.mostLeftPointX.x, minMaxOx.mostLeftPointX.y, minMaxOx.mostLeftPointX.z);
-	var point2 = this.convertAndTurnPoint(minMaxOx.mostRightPointX.x, minMaxOx.mostRightPointX.y, minMaxOx.mostRightPointX.z);
-	var x1 = point1.x;
-	var x2 = point2.x;
-	
-	var diffY = Math.abs(y1 - y2);
-	
-	//TODO медленная функция, рассчитать сдвиги!
-	while(diffY > heightChart)
-	{
-		var minMaxOy = this._getMinMaxOy(points, faces);
-		var point1 = this.convertAndTurnPoint(minMaxOy.mostTopPointY.x, minMaxOy.mostTopPointY.y, minMaxOy.mostTopPointY.z);
-		var point2 = this.convertAndTurnPoint(minMaxOy.mostBottomPointY.x, minMaxOy.mostBottomPointY.y, minMaxOy.mostBottomPointY.z);
-
-		var y1 = point1.y;
-		var y2 = point2.y;
-		
-		var minMaxOx = this._getMinMaxOx(points, faces);
-		var point1 = this.convertAndTurnPoint(minMaxOx.mostLeftPointX.x, minMaxOx.mostLeftPointX.y, minMaxOx.mostLeftPointX.z);
-		var point2 = this.convertAndTurnPoint(minMaxOx.mostRightPointX.x, minMaxOx.mostRightPointX.y, minMaxOx.mostRightPointX.z);
-		var x1 = point1.x;
-		var x2 = point2.x;
-		
-		var leftMargin = this.left - x1;
-		var rightMargin = x2 - (this.left + originalWidthChart);
-		
-		var topMargin = this.top - y1;
-		var bottomMargin = y2 - (this.top + heightChart);
-		
-		if(leftMargin > rightMargin)
-		{
-			this.cameraDiffX++;
-		}
-		else
-		{
-			this.cameraDiffX--;
-		}
-		
-		var diffY = Math.abs(y1 - y2);
-
-		this.cameraDiffZ++;
-	}
-
-},
-
 Processor3D.prototype._calculateCameraDiffX = function (minMaxOx)
 {
 	//test ровно по центру, но циклом
 	var maxLeftPoint = minMaxOx.left;
 	var maxRightPoint = minMaxOx.right;
-	/*var mostLeftPointX = minMaxOx.mostLeftPointX;
-	var mostRightPointX = minMaxOx.mostRightPointX;
-	
-	var top = this.top;
-	var bottom = this.bottom;
-	
-	var left = this.left;
-	var right = this.right;
-	var widthCanvas = this.widthCanvas;
-	var originalWidthChart = widthCanvas - left - right;
-	
-	var heightCanvas = this.heightCanvas;
-	var heightChart = heightCanvas - top - bottom;
-
-	var widthChart = originalWidthChart;
-	var depthChart = this.depthPerspective;
-	
-	var reverseDiff = false;
-	var diffLeft = maxLeftPoint - left;
-	var diffRight = (widthChart + right) - maxRightPoint;
-	if(diffLeft > 0 && diffRight > 0 && diffRight < diffLeft)
-		reverseDiff = true;
-	else if(diffLeft > 0 && diffRight < 0)
-		reverseDiff = true;
-	else if(diffLeft < 0 && diffRight < 0 && diffRight < diffLeft)
-		reverseDiff = true;
-	
-	while(true)
-	{
-		var point1 = this.convertAndTurnPoint(mostLeftPointX.x, mostLeftPointX.y, mostLeftPointX.z, true);
-		var point2 = this.convertAndTurnPoint(mostRightPointX.x, mostRightPointX.y, mostRightPointX.z, true);
-		maxLeftPoint = point1.x;
-		maxRightPoint = point2.x;
-		
-		if(((Math.abs(maxLeftPoint - left) + 2) >= Math.abs(maxRightPoint - (widthChart + right)) && Math.abs(maxLeftPoint - left) - 2 <= Math.abs(maxRightPoint - (widthChart + right))) ||  Math.abs(this.cameraDiffX) > 1000)
-			break;
-		
-		if(reverseDiff)
-			this.cameraDiffX--;
-		else
-			this.cameraDiffX++;
-	}*/
-	
 	
 	//так ближе к тому, как смещает excel
 	var widthCanvas = this.widthCanvas;
@@ -2282,55 +2130,6 @@ Processor3D.prototype._calculateCameraDiffX = function (minMaxOx)
 	var diffRight  = (this.left + originalWidthChart) - maxRightPoint;
 	
 	this.cameraDiffX = (((diffRight - diffLeft) / 2) * ( 1 / (this.rPerspective) + this.cameraDiffZ)) / ( 1 / (this.rPerspective));
-	
-	
-	//***Calculate cameraDiffX***
-	/*var aspectRatio = (originalWidthChart) / (heightChart);
-	var minMaxOx = this._getMinMaxOx(points, faces);
-	var x = minMaxOx.mostLeftPointX.x / aspectRatio;
-	var y = minMaxOx.mostLeftPointX.y;
-	var z = minMaxOx.mostLeftPointX.z;
-	
-	var x1 = minMaxOx.mostRightPointX.x / aspectRatio;
-	var y1 = minMaxOx.mostRightPointX.y;
-	var z1 = minMaxOx.mostRightPointX.z;
-	
-	
-	var centerXDiff = heightChart / 2 + this.left / 2;
-	var centerYDiff = heightChart / 2 + this.top;
-	var centerZDiff = this.depthPerspective / 2;
-	
-	var cosy  = Math.cos(this.angleOy);
-	var siny  = Math.sin(this.angleOy);
-	var cosx  = Math.cos(this.angleOx);
-	var sinx  = Math.sin(this.angleOx);
-	var cosz  = Math.cos(this.angleOz);
-	var sinz  = Math.sin(this.angleOz);
-	
-	var right1 = heightChart + left;*/
-	
-	/*x = x - centerXDiff;
-	y = y - centerYDiff;
-	z = z - centerZDiff;
-	
-	x1 = x1 - centerXDiff;
-	y1 = y1 - centerYDiff;
-	z1 = z1 - centerZDiff;*/
-	
-	//(cosy * x - siny * z + this.cameraDiffX) / (1 + (cosx * (cosy * z + siny * cosz * x) - sinx * y + this.cameraDiffZ) * (this.rPerspective)) -left = 
-	//right - (cosy * x - siny * z + this.cameraDiffX) / (1 + (cosx * (cosy * z + siny * cosz * x) - sinx * y + this.cameraDiffZ) * (this.rPerspective))
-
-	/*var c = cosy * x - siny * z;
-	var c1 = cosy * x1 - siny * z1;
-	var b = (1 + (cosx * (cosy * z + siny * cosz * x) - sinx * y + this.cameraDiffZ) * (this.rPerspective));
-	var b1 = (1 + (cosx * (cosy * z1 + siny * cosz * x1) - sinx * y1 + this.cameraDiffZ) * (this.rPerspective));*/
-
-	//(c + this.cameraDiffX) / b - left = right - (c1 + this.cameraDiffX) / b1;
-
-	//с / b +  this.cameraDiffX / b + c1 / b1 + this.cameraDiffX / b1 = right + left
-	//this.cameraDiffX / b + this.cameraDiffX / b1 = right + left - c1 / b1 - c / b
-
-	//this.cameraDiffX = (-c1 / b1 - c / b + left + right1) * ((b * b1) / (b1 + b));
 };
 
 Processor3D.prototype._calculateCameraDiffY = function (maxTopPoint, maxBottomPoint)
@@ -2561,103 +2360,6 @@ Point3D.prototype =
 		this.x = multiplyMatrix.x;
 		this.y = multiplyMatrix.y;
 		this.z = multiplyMatrix.z;
-	},
-	
-	multiplyPointOnMatrix12: function(matrix)
-	{
-		var pointMatrix = [[this.x, this.y, this.z, 1]];
-		
-		var multiplyMatrix = this.multiplyMatrix(pointMatrix , matrix, true);
-		this.x = multiplyMatrix[0][0];
-		this.y = multiplyMatrix[0][1];
-		this.z = multiplyMatrix[0][2];
-	},
-	
-	multiplyMatrix2: function(A, B)
-	{
-		var rowsA = A.length, colsA = A[0].length,
-			rowsB = B.length, colsB = B[0].length,
-			C = [];
-
-		if (colsA != rowsB) return false;
-
-		for (var i = 0; i < rowsA; i++) C[i] = [];
-
-		for (var k = 0; k < colsB; k++)
-		{ 
-			for (var i = 0; i < rowsA; i++)
-			{ 
-				var temp = 0;
-				for (var j = 0; j < rowsB; j++) 
-				{
-					temp += A[i][j]*B[j][k];
-				}
-				
-			  C[i][k] = temp;
-			}
-		 }
-
-		return C;
-	},
-	
-	multiplyMatrix: function(A, B, pointOnMatrtix)
-	{	
-		var C = [];
-		
-		if(!pointOnMatrtix)
-		{
-			C[0] = [];
-			C[0][0] = A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0] + A[0][3] * B[3][0];
-			C[0][1] = A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1] + A[0][3] * B[3][1];
-			C[0][2] = A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2] + A[0][3] * B[3][2];
-			C[0][3] = A[0][0] * B[0][3] + A[0][1] * B[1][3] + A[0][2] * B[2][3] + A[0][3] * B[3][3];
-			
-			C[1] = [];
-			C[1][0] = A[1][0] * B[0][0] + A[1][1] * B[1][0] + A[1][2] * B[2][0] + A[1][3] * B[3][0];
-			C[1][1] = A[1][0] * B[0][1] + A[1][1] * B[1][1] + A[1][2] * B[2][1] + A[1][3] * B[3][1];
-			C[1][2] = A[1][0] * B[0][2] + A[1][1] * B[1][2] + A[1][2] * B[2][2] + A[1][3] * B[3][2];
-			C[1][3] = A[1][0] * B[0][3] + A[1][1] * B[1][3] + A[1][2] * B[2][3] + A[1][3] * B[3][3];
-			
-			C[2] = [];
-			C[2][0] = A[2][0] * B[0][0] + A[2][1] * B[1][0] + A[2][2] * B[2][0] + A[2][3] * B[3][0];
-			C[2][1] = A[2][0] * B[0][1] + A[2][1] * B[1][1] + A[2][2] * B[2][1] + A[2][3] * B[3][1];
-			C[2][2] = A[2][0] * B[0][2] + A[2][1] * B[1][2] + A[2][2] * B[2][2] + A[2][3] * B[3][2];
-			C[2][3] = A[2][0] * B[0][3] + A[2][1] * B[1][3] + A[2][2] * B[2][3] + A[2][3] * B[3][3];
-			
-			C[3] = [];
-			C[3][0] = A[3][0] * B[0][0] + A[3][1] * B[1][0] + A[3][2] * B[2][0] + A[3][3] * B[3][0];
-			C[3][1] = A[3][0] * B[0][1] + A[3][1] * B[1][1] + A[3][2] * B[2][1] + A[3][3] * B[3][1];
-			C[3][2] = A[3][0] * B[0][2] + A[3][1] * B[1][2] + A[3][2] * B[2][2] + A[3][3] * B[3][2];
-			C[3][3] = A[3][0] * B[0][3] + A[3][1] * B[1][3] + A[3][2] * B[2][3] + A[3][3] * B[3][3];
-		}
-		else
-		{
-			C[0] = [];
-			C[0][0] = A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0] + A[0][3] * B[3][0];
-			C[0][1] = A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1] + A[0][3] * B[3][1];
-			C[0][2] = A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2] + A[0][3] * B[3][2];
-			C[0][3] = A[0][0] * B[0][3] + A[0][1] * B[1][3] + A[0][2] * B[2][3] + A[0][3] * B[3][3];
-			
-			C[1] = [];
-			C[1][0] = B[0][0] + B[1][0] + B[2][0] + B[3][0];
-			C[1][1] = B[0][1] + B[1][1] + B[2][1] + B[3][1];
-			C[1][2] = B[0][2] + B[1][2] + B[2][2] + B[3][2];
-			C[1][3] = B[0][3] + B[1][3] + B[2][3] + B[3][3];
-			
-			C[2] = [];
-			C[2][0] = B[0][0] + B[1][0] + B[2][0] + B[3][0];
-			C[2][1] = B[0][1] + B[1][1] + B[2][1] + B[3][1];
-			C[2][2] = B[0][2] + B[1][2] + B[2][2] + B[3][2];
-			C[2][3] = B[0][3] + B[1][3] + B[2][3] + B[3][3];
-			
-			C[3] = [];
-			C[3][0] = B[0][0] + B[1][0] + B[2][0] + B[3][0];
-			C[3][1] = B[0][1] + B[1][1] + B[2][1] + B[3][1];
-			C[3][2] = B[0][2] + B[1][2] + B[2][2] + B[3][2];
-			C[3][3] = B[0][3] + B[1][3] + B[2][3] + B[3][3];
-		}
-		
-		return C;
 	}
 };
 

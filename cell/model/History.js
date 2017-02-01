@@ -879,7 +879,7 @@ CHistory.prototype.Is_On = function()
 	return (0 === this.TurnOffHistory);
 };
 CHistory.prototype.Reset_SavedIndex = function(IsUserSave) {
-  this.SavedIndex = this.Index;
+  this.SavedIndex = (null === this.SavedIndex && -1 === this.Index ? null : this.Index);
   if (this.Is_UserSaveMode()) {
     if (IsUserSave) {
       this.UserSavedIndex = this.Index;

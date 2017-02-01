@@ -119,15 +119,7 @@ CGroupShape.prototype.setDrawingObjects = function(drawingObjects)
     }
 };
 
-CGroupShape.prototype.setWorksheet = function(worksheet)
-{
-    AscCommon.History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
-    this.worksheet = worksheet;
-    for(var i = 0; i < this.spTree.length; ++i)
-    {
-        this.spTree[i].setWorksheet(worksheet);
-    }
-};
+
 
 CGroupShape.prototype.setDrawingBase = CShape.prototype.setDrawingBase;
 CGroupShape.prototype.deleteDrawingBase = CShape.prototype.deleteDrawingBase;

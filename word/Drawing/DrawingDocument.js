@@ -5948,7 +5948,7 @@ function CDrawingDocument()
 			editor.isShowTableEmptyLineAttack = false;
 			editor.isViewMode = _old_mode;
 
-			var _styleD = new CAscTableStyle();
+			var _styleD = new Asc.CAscTableStyle();
 			_styleD.Type = 0;
 			_styleD.Image = _canvas.toDataURL("image/png");
 			_styleD.Id = i;

@@ -1003,6 +1003,10 @@ ParaComment.prototype =
     {
     },
 
+	Get_EndRangePos2 : function(_CurLine, _CurRange, ContentPos, Depth)
+	{
+	},
+
     Get_StartPos : function(ContentPos, Depth)
     {
     },

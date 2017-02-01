@@ -55,6 +55,10 @@ Asc['asc_docs_api'].prototype.sync_EndCatchRevisionsChanges = function()
 {
     this.sendEvent("asc_onShowRevisionsChange", this.RevisionChangesStack);
 };
+Asc['asc_docs_api'].prototype.asc_GetRevisionsChangesStack = function()
+{
+	return this.RevisionChangesStack;
+};
 Asc['asc_docs_api'].prototype.sync_AddRevisionsChange = function(Change)
 {
     this.RevisionChangesStack.push(Change);

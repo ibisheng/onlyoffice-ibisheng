@@ -2114,7 +2114,6 @@ PasteProcessor.prototype =
                 }
                 Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
                 Item.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
-                this.oRecalcDocument.ContentLastChangePos = this.oRecalcDocument.CurPos.ContentPos;
             }
             else
             {
@@ -2192,7 +2191,6 @@ PasteProcessor.prototype =
                     oDoc.Internal_Content_Remove(LastPosCurDoc, 1);
                     LastPosCurDoc--;
                 }
-                this.oRecalcDocument.ContentLastChangePos = LastPos;
                 Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
                 Item.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
                 oDoc.CurPos.ContentPos = LastPosCurDoc;
@@ -5034,7 +5032,7 @@ PasteProcessor.prototype =
 					rPr.RFonts.EastAsia = {Name: oFontItem.Name, Index: oFontItem.Index};
 				}
             }
-            var font_size = node.style.fontSize;
+            var font_size = node.style ? node.style.fontSize : null;
             if(!font_size)
                 font_size = computedStyle.getPropertyValue( "font-size" );
             if(font_size)

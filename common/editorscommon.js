@@ -1975,12 +1975,39 @@ CLock.prototype.Set_Type = function(NewType, Redraw)
 
 	this.Type = NewType;
 
-	if ( false != Redraw )
+	var oApi = editor;
+	var oLogicDocument = oApi.WordControl.m_oLogicDocument;
+	if (false != Redraw && oLogicDocument)
 	{
 		// TODO: переделать перерисовку тут
-		var DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
-		DrawingDocument.ClearCachePages();
-		DrawingDocument.FirePaint();
+		var oDrawingDocument = oLogicDocument.DrawingDocument;
+		oDrawingDocument.ClearCachePages();
+		oDrawingDocument.FirePaint();
+
+		// TODO: Обновлять интерфейс нужно, потому что мы можем стоять изначально в незалоченном объекте, а тут он
+		//       может быть залочен.
+		var oRevisionsStack = oApi.asc_GetRevisionsChangesStack();
+		var arrParagraphs = [];
+		for (var nIndex = 0, nCount = oRevisionsStack.length; nIndex < nCount; ++nIndex)
+		{
+			arrParagraphs.push(oRevisionsStack[nIndex].get_Paragraph())
+		}
+
+		var bNeedUpdate = false;
+		for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
+		{
+			if (arrParagraphs[nIndex].Get_Lock() === this)
+			{
+				bNeedUpdate = true;
+				break;
+			}
+		}
+
+		if (bNeedUpdate)
+		{
+			oLogicDocument.TrackRevisionsManager.Clear_VisibleChanges();
+			oLogicDocument.Document_UpdateInterfaceState(false);
+		}
 	}
 };
 CLock.prototype.Check = function(Id)

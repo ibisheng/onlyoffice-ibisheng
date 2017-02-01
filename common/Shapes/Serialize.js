@@ -3383,13 +3383,13 @@ function BinaryPPTYLoader()
                 break;
 
             if (0 == _at)
-                hf.dt = s.GetBool();
+                hf.setDt(s.GetBool());
             else if (1 == _at)
-                hf.ftr = s.GetBool();
+                hf.setFtr(s.GetBool());
             else if (2 == _at)
-                hf.hdr = s.GetBool();
+                hf.setHdr(s.GetBool());
             else if (3 == _at)
-                hf.sldNum = s.GetBool();
+                hf.setSldNum(s.GetBool());
         }
 
         s.Seek2(_e);
@@ -5474,6 +5474,13 @@ function BinaryPPTYLoader()
                 _graphic_frame.setSpPr(new AscFormat.CSpPr());
                 _graphic_frame.spPr.setParent(_graphic_frame);
             }
+            if(!_xfrm){
+                _xfrm = new AscFormat.CXfrm();
+                _xfrm.setOffX(0);
+                _xfrm.setOffY(0);
+                _xfrm.setExtX(0);
+                _xfrm.setExtY(0);
+            }
             _graphic_frame.spPr.setXfrm(_xfrm);
             _xfrm.setParent(_graphic_frame.spPr);
             _graphic_frame.setSpPr(_graphic_frame.spPr);
@@ -5491,6 +5498,13 @@ function BinaryPPTYLoader()
             {
                 _chart.setSpPr(new AscFormat.CSpPr());
                 _chart.spPr.setParent(_chart);
+            }
+            if(!_xfrm){
+                _xfrm = new AscFormat.CXfrm();
+                _xfrm.setOffX(0);
+                _xfrm.setOffY(0);
+                _xfrm.setExtX(0);
+                _xfrm.setExtY(0);
             }
             _chart.spPr.setXfrm(_xfrm);
             _xfrm.setParent(_chart.spPr);
@@ -5971,7 +5985,7 @@ function BinaryPPTYLoader()
 
         s.Skip2(5); // type + len
         var _count = s.GetULong();
-
+        _count = Math.min(_count, row.Content.length);
 		for (var i = 0; i < _count; i++)
 		{
 			s.Skip2(1);

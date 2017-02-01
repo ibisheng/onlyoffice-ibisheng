@@ -1607,6 +1607,16 @@ CChangesParagraphPrChange.prototype.ReadFromBinary = function(Reader)
 	// Variable(CReviewInfo) : Old.ReviewInfo (4bit = 0)
 	var nFlags = Reader.GetLong();
 
+	this.New = {
+		PrChange   : undefined,
+		ReviewInfo : undefined
+	};
+
+	this.Old = {
+		PrChange   : undefined,
+		ReviewInfo : undefined
+	};
+
 	if (nFlags & 1)
 	{
 		this.New.PrChange = undefined;

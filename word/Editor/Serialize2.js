@@ -9609,15 +9609,15 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 		var res = c_oSerConstants.ReadOk;
 		var oThis = this;
 		if (c_oSerDocPr.Id === type) {
-			docPr.id = this.stream.GetLongLE();
+			docPr.setId(this.stream.GetLongLE());
 		} else if (c_oSerDocPr.Name === type) {
-			docPr.name = this.stream.GetString2LE(length);
+			docPr.setName(this.stream.GetString2LE(length));
 		} else if (c_oSerDocPr.Hidden === type) {
-			docPr.isHidden = this.stream.GetBool();
+			docPr.setIsHidden(this.stream.GetBool());
 		} else if (c_oSerDocPr.Title === type) {
-			docPr.title = this.stream.GetString2LE(length);
+			docPr.setTitle(this.stream.GetString2LE(length));
 		} else if (c_oSerDocPr.Descr === type) {
-			docPr.descr = this.stream.GetString2LE(length);
+			docPr.setDescr(this.stream.GetString2LE(length));
 		} else {
 			res = c_oSerConstants.ReadUnknown;
 		}

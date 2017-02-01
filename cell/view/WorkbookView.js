@@ -909,6 +909,10 @@
     }
 
     asc_applyFunction(callback, vsize, hsize);
+
+	if (this.Api.isMobileVersion) {
+	  this.MobileTouchManager.Resize();
+	}
   };
 
   WorkbookView.prototype._onScrollY = function(pos) {

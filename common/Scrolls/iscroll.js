@@ -86,7 +86,8 @@ var utils = (function () {
 		hasTransform: _transform !== false,
 		hasPerspective: _prefixStyle('perspective') in _elementStyle,
 		hasTouch: 'ontouchstart' in window,
-		hasPointer: false,//(!('ontouchstart' in window)) &&  (!!(window.PointerEvent || window.MSPointerEvent)), // IE10 is prefixed
+		//hasPointer: false,//(!('ontouchstart' in window)) &&  (!!(window.PointerEvent || window.MSPointerEvent)), // IE10 is prefixed
+		hasPointer: AscCommon.AscBrowser.isIE ? ((!('ontouchstart' in window)) &&  (!!(window.PointerEvent || window.MSPointerEvent))) : false,
 		hasTransition: _prefixStyle('transition') in _elementStyle
 	});
 
@@ -2150,6 +2151,9 @@ Indicator.prototype = {
 };
 
 IScroll.utils = utils;
+IScroll.prototype["handleEvent"] = IScroll.prototype.handleEvent;
+Indicator.prototype["handleEvent"] = Indicator.prototype.handleEvent;
+
 window.IScroll = IScroll;
 
 })(window, document, Math);

@@ -1053,6 +1053,16 @@ CFootnotesController.prototype.GotoPrevFootnote = function()
 		this.private_SetCurrentFootnoteNoSelection(oPrevFootnote);
 	}
 };
+CFootnotesController.prototype.GetNumberingInfo = function(ParaId, NumPr, oFootnote)
+{
+	var arrFootnotes     = this.LogicDocument.Get_FootnotesList(null, oFootnote);
+	var oNumberingEngine = new CDocumentNumberingInfoEngine(ParaId, NumPr, this.Get_Numbering());
+	for (var nIndex = 0, nCount = arrFootnotes.length; nIndex < nCount; ++nIndex)
+	{
+		arrFootnotes[nIndex].Get_NumberingInfo(oNumberingEngine, ParaId, NumPr);
+	}
+	return oNumberingEngine.Get_NumInfo();
+};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private area
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1361,6 +1371,9 @@ CFootnotesController.prototype.ClearParagraphFormatting = function()
 };
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
+	if (para_NewLine === oItem.Type && true === oItem.Is_PageOrColumnBreak())
+		return;
+
 	if (oItem instanceof ParaTextPr)
 	{
 		for (var sId in this.Selection.Footnotes)
@@ -2427,17 +2440,29 @@ CFootnotesController.prototype.GetSelectionBounds = function()
 		}
 		else if (1 === this.Selection.Direction)
 		{
+			var StartBounds = this.Selection.Start.Footnote.Get_SelectionBounds();
+			var EndBounds   = this.Selection.End.Footnote.Get_SelectionBounds();
+
+			if (!StartBounds && !EndBounds)
+				return null;
+
 			var Result       = {};
-			Result.Start     = this.Selection.Start.Footnote.Get_SelectionBounds().Start;
-			Result.End       = this.Selection.End.Footnote.Get_SelectionBounds().End;
+			Result.Start     = StartBounds ? StartBounds.Start : EndBounds.Start;
+			Result.End       = EndBounds ? EndBounds.End : StartBounds.End;
 			Result.Direction = 1;
 			return Result;
 		}
 		else
 		{
+			var StartBounds = this.Selection.End.Footnote.Get_SelectionBounds();
+			var EndBounds   = this.Selection.Start.Footnote.Get_SelectionBounds();
+
+			if (!StartBounds && !EndBounds)
+				return null;
+
 			var Result       = {};
-			Result.Start     = this.Selection.End.Footnote.Get_SelectionBounds().Start;
-			Result.End       = this.Selection.Start.Footnote.Get_SelectionBounds().End;
+			Result.Start     = StartBounds ? StartBounds.Start : EndBounds.Start;
+			Result.End       = EndBounds ? EndBounds.End : StartBounds.End;
 			Result.Direction = -1;
 			return Result;
 		}
