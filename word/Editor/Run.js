@@ -5755,6 +5755,10 @@ ParaRun.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
         case  0: Pos = DocPos[Depth].Position; break;
     }
 
+    var nLen = this.Content.length;
+    if (nLen > 0 && Pos >= nLen && para_End === this.Content[nLen - 1].Type)
+    	Pos = nLen - 1;
+
     this.State.ContentPos = Pos;
 };
 ParaRun.prototype.Set_SelectionAtEndPos = function()

@@ -759,10 +759,11 @@ CWordCollaborativeEditing.prototype.Undo = function()
 	for (var sId in mapDocumentContents)
 	{
 		var oDocumentContent = mapDocumentContents[sId];
-		if (oDocumentContent.Content.length <= 0)
+		var nContentLen = oDocumentContent.Content.length;
+		if (nContentLen <= 0 || type_Paragraph !== oDocumentContent.Content[nContentLen - 1].GetType())
 		{
 			var oNewParagraph = new AscCommonWord.Paragraph(oLogicDocument.Get_DrawingDocument(), oDocumentContent, 0, 0, 0, 0, 0, false);
-			oDocumentContent.Add_ToContent(0, oNewParagraph);
+			oDocumentContent.Add_ToContent(nContentLen, oNewParagraph);
 		}
 	}
 	for (var sId in mapParagraphs)
