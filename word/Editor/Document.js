@@ -6733,10 +6733,7 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 83 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + S - save
     {
-        if (true === this.History.Have_Changes() || AscCommon.CollaborativeEditing.m_aChanges.length > 0)
-        {
-            this.DrawingDocument.m_oWordControl.m_oApi.asc_Save(false);
-        }
+		this.DrawingDocument.m_oWordControl.m_oApi.asc_Save(false);
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 85 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + U - делаем текст подчеркнутым
