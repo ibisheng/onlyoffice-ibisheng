@@ -2513,7 +2513,6 @@
 	/** @param event {KeyboardEvent} */
 	CellEditor.prototype._onWindowKeyPress = function (event) {
 		var t = this;
-		var ctrlKey = event.metaKey || event.ctrlKey;
 
 		if (!window['IS_NATIVE_EDITOR']) {
 
@@ -2521,7 +2520,7 @@
 				return true;
 			}
 
-			if (t.skipKeyPress || event.which < 32 || event.altKey || ctrlKey) {
+			if (t.skipKeyPress || event.which < 32) {
 				t.skipKeyPress = true;
 				return true;
 			}

@@ -1032,10 +1032,7 @@
 					return result;
 
 				default:
-					// При зажатом Ctrl или Alt не вводим символ
-					if (!ctrlKey && !event.altKey) {
-						t.skipKeyPress = false;
-					}
+					t.skipKeyPress = false;
 					return true;
 
 			} // end of switch
