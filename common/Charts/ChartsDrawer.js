@@ -6825,9 +6825,28 @@ drawHBarChart.prototype =
 		var point = this.cChartDrawer.getIdxPoint(this.chartProp.series[ser], val);
 		var path = this.paths.series[ser][val];
 		
-		if(this.cChartDrawer.nDimensionCount === 3 && this.paths.series[ser][val][0])
+		if(this.cChartDrawer.nDimensionCount === 3 && this.paths.series[ser][val].frontPaths)
 		{
-			path = this.paths.series[ser][val][0];
+			var frontPaths = this.paths.series[ser][val].frontPaths;
+			if(this.cChartDrawer.nDimensionCount === 3)
+			{
+				if(AscFormat.isRealNumber(frontPaths[0]))
+				{
+					path = frontPaths[0];
+				}
+				else if(AscFormat.isRealNumber(frontPaths[5]))
+				{
+					path = frontPaths[5];
+				}
+				else if(AscFormat.isRealNumber(frontPaths[2]))
+				{
+					path = frontPaths[2];
+				}
+				else if(AscFormat.isRealNumber(frontPaths[3]))
+				{
+					path = frontPaths[3];
+				}
+			}
 		}
 		
 		if(!AscFormat.isRealNumber(path))
