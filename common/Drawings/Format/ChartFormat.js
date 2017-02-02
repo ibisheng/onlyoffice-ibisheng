@@ -12978,7 +12978,11 @@ CChart.prototype =
 
     Refresh_RecalcData: function()
     {
-        this.parent && this.parent.addToRecalculate();
+        if(this.parent)
+        {
+            this.parent.handleUpdateInternalChart();
+        }
+
     },
 
     getContentChangesByType: function(type){
