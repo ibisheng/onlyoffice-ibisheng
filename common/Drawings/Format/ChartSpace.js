@@ -11652,7 +11652,6 @@ function CreateLineChart(chartSeries, type, bUseCache, oOptions, b3D)
     cat_ax.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
     cat_ax.setMinorTickMark(c_oAscTickMark.TICK_MARK_OUT);
     cat_ax.setTickLblPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
-    cat_ax.setCrossAx(val_ax);
     cat_ax.setCrosses(AscFormat.CROSSES_AUTO_ZERO);
     cat_ax.setAuto(true);
     cat_ax.setLblAlgn(AscFormat.LBL_ALG_CTR);
@@ -11668,7 +11667,6 @@ function CreateLineChart(chartSeries, type, bUseCache, oOptions, b3D)
     val_ax.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
     val_ax.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
     val_ax.setTickLblPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
-    val_ax.setCrossAx(plot_area.catAx);
     val_ax.setCrosses(AscFormat.CROSSES_AUTO_ZERO);
     val_ax.setCrossBetween(AscFormat.CROSS_BETWEEN_BETWEEN);
     scaling = val_ax.scaling;
@@ -11798,7 +11796,6 @@ function CreateBarChart(chartSeries, type, bUseCache, oOptions, b3D, bDepth)
     cat_ax.setAxPos(AscFormat.AX_POS_B);
     cat_ax.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
     cat_ax.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
-    cat_ax.setCrossAx(val_ax);
     cat_ax.setCrosses(AscFormat.CROSSES_AUTO_ZERO);
     cat_ax.setAuto(true);
     cat_ax.setLblAlgn(AscFormat.LBL_ALG_CTR);
@@ -11826,7 +11823,6 @@ function CreateBarChart(chartSeries, type, bUseCache, oOptions, b3D, bDepth)
     val_ax.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
     val_ax.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
     val_ax.setTickLblPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
-    val_ax.setCrossAx(plot_area.catAx);
     val_ax.setCrosses(AscFormat.CROSSES_AUTO_ZERO);
     val_ax.setCrossBetween(AscFormat.CROSS_BETWEEN_BETWEEN);
     scaling = val_ax.scaling;
@@ -11942,7 +11938,6 @@ function CreateHBarChart(chartSeries, type, bUseCache, oOptions, b3D)
     cat_ax.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
     cat_ax.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
     cat_ax.setTickLblPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
-    cat_ax.setCrossAx(val_ax);
     cat_ax.setCrosses(AscFormat.CROSSES_AUTO_ZERO);
     cat_ax.setAuto(true);
     cat_ax.setLblAlgn(AscFormat.LBL_ALG_CTR);
@@ -11958,7 +11953,6 @@ function CreateHBarChart(chartSeries, type, bUseCache, oOptions, b3D)
     val_ax.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
     val_ax.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
     val_ax.setTickLblPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
-    val_ax.setCrossAx(plot_area.catAx);
     val_ax.setCrosses(AscFormat.CROSSES_AUTO_ZERO);
     val_ax.setCrossBetween(AscFormat.CROSS_BETWEEN_BETWEEN);
     scaling = val_ax.scaling;
@@ -12072,7 +12066,6 @@ function CreateAreaChart(chartSeries, type, bUseCache, oOptions)
     cat_ax.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
     cat_ax.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
     cat_ax.setTickLblPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
-    cat_ax.setCrossAx(val_ax);
     cat_ax.setCrosses(AscFormat.CROSSES_AUTO_ZERO);
     cat_ax.setAuto(true);
     cat_ax.setLblAlgn(AscFormat.LBL_ALG_CTR);
@@ -12087,7 +12080,6 @@ function CreateAreaChart(chartSeries, type, bUseCache, oOptions)
     val_ax.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
     val_ax.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
     val_ax.setTickLblPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
-    val_ax.setCrossAx(plot_area.catAx);
     val_ax.setCrosses(AscFormat.CROSSES_AUTO_ZERO);
     val_ax.setCrossBetween(AscFormat.CROSS_BETWEEN_MID_CAT);
     var scaling = val_ax.scaling;
@@ -12516,7 +12508,6 @@ function CreateStockChart(chartSeries, bUseCache, oOptions)
     cat_ax.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
     cat_ax.setMinorTickMark(c_oAscTickMark.TICK_MARK_OUT);
     cat_ax.setTickLblPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
-    cat_ax.setCrossAx(val_ax);
     cat_ax.setCrosses(AscFormat.CROSSES_AUTO_ZERO);
     cat_ax.setAuto(true);
     cat_ax.setLblAlgn(AscFormat.LBL_ALG_CTR);
@@ -12532,7 +12523,6 @@ function CreateStockChart(chartSeries, bUseCache, oOptions)
     val_ax.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
     val_ax.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
     val_ax.setTickLblPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
-    val_ax.setCrossAx(plot_area.catAx);
     val_ax.setCrosses(AscFormat.CROSSES_AUTO_ZERO);
     val_ax.setCrossBetween(AscFormat.CROSS_BETWEEN_BETWEEN);
     scaling = val_ax.scaling;
@@ -12744,12 +12734,10 @@ function CreateDefaultAxises(valFormatCode)
     val_ax.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
     val_ax.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
     val_ax.setTickLblPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
-    val_ax.setCrossAx(cat_ax);
     val_ax.setCrosses(AscFormat.CROSSES_AUTO_ZERO);
     val_ax.setCrossBetween(AscFormat.CROSS_BETWEEN_BETWEEN);
     scaling = val_ax.scaling;
     scaling.setOrientation(AscFormat.ORIENTATION_MIN_MAX);
-    cat_ax.setCrossAx(val_ax);
     //cat_ax.setTitle(new CTitle());
     //val_ax.setTitle(new CTitle());
    // var title = val_ax.title;
@@ -12774,7 +12762,6 @@ function CreateScatterAxis()
     cat_ax.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
     cat_ax.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
     cat_ax.setTickLblPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
-    cat_ax.setCrossAx(val_ax);
     cat_ax.setCrosses(AscFormat.CROSSES_AUTO_ZERO);
     cat_ax.scaling.setOrientation(AscFormat.ORIENTATION_MIN_MAX);
     val_ax.setScaling(new AscFormat.CScaling());
@@ -12785,7 +12772,6 @@ function CreateScatterAxis()
     val_ax.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
     val_ax.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
     val_ax.setTickLblPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
-    val_ax.setCrossAx(val_ax);
     val_ax.setCrosses(AscFormat.CROSSES_AUTO_ZERO);
     val_ax.setCrossBetween(AscFormat.CROSS_BETWEEN_BETWEEN);
     var scaling = val_ax.scaling;
