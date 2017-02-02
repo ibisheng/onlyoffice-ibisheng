@@ -161,6 +161,7 @@ module.exports = function(grunt) {
 		var sdkDstFolder = packageFile['compile']['sdk']['dst'];
 		var sdkAllMinDst = sdkDstFolder + '/sdk-all-min.js';
 		var sdkAllDst = sdkDstFolder + '/sdk-all.js';
+		var sdkAllCashe = sdkDstFolder + '/*.cache'
 		var sdkOpt = {
 			compilation_level: level,
 			warning_level: 'QUIET',
@@ -203,10 +204,18 @@ module.exports = function(grunt) {
 					dest: sdkAllDst
 				}
 			},
-			clean: [
-				sdkTmp,
-				tmp_sdk_path
-			],
+			clean: {
+				tmp: {
+					options: {
+						force: true
+					},
+					src: [
+						sdkTmp,
+						tmp_sdk_path,
+						sdkAllCashe
+					]
+				}
+			},
 			replace: {
 				version: {
 					options: {
