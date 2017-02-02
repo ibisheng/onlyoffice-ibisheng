@@ -1657,16 +1657,6 @@
 			return {x: x, y: y};
 		};
 
-		asc_CEventsController.prototype._onTouchStart = function (event) {
-			this.view.MobileTouchManager.onTouchStart(event);
-		};
-		asc_CEventsController.prototype._onTouchMove = function (event) {
-			this.view.MobileTouchManager.onTouchMove(event);
-		};
-		asc_CEventsController.prototype._onTouchEnd = function (event) {
-			this.view.MobileTouchManager.onTouchEnd(event);
-		};
-
 		//------------------------------------------------------------export---------------------------------------------------
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 		window["AscCommonExcel"].asc_CEventsController = asc_CEventsController;
