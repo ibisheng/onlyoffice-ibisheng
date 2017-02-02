@@ -1981,21 +1981,15 @@ function CEditorPage(api)
 			}
 
 			// Webkit
-			if (e.wheelDeltaY !== undefined)
+			if (undefined !== e.wheelDeltaY && 0 !== e.wheelDeltaY)
 			{
-				if (e.wheelDelta != 0)
-				{
-					//deltaY = (e.wheelDeltaY > 0) ? -45 : 45;
-					deltaY = -45 * e.wheelDeltaY / 120;
-				}
+				//deltaY = (e.wheelDeltaY > 0) ? -45 : 45;
+				deltaY = -45 * e.wheelDeltaY / 120;
 			}
-			if (e.wheelDeltaX !== undefined)
+			if (undefined !== e.wheelDeltaX && 0 !== e.wheelDeltaX)
 			{
-				if (e.wheelDeltaX != 0)
-				{
-					//deltaX = (e.wheelDeltaX > 0) ? -45 : 45;
-					deltaX = -45 * e.wheelDeltaX / 120;
-				}
+				//deltaX = (e.wheelDeltaX > 0) ? -45 : 45;
+				deltaX = -45 * e.wheelDeltaX / 120;
 			}
 		}
 
