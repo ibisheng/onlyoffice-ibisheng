@@ -616,9 +616,12 @@ Math.approxEqual = function ( a, b ) {
     return this.abs( a - b ) < 1e-15;
 };
 
-Math.sign = function ( x ) {
-    return x > 0 ? 1 : x < 0 ? -1 : 0;
-};
+if (typeof Math.sign != 'function') {
+	Math['sign'] = Math.sign = function (n) {
+		return n == 0 ? 0 : n < 0 ? -1 : 1;
+	};
+}
+
 
 RegExp.escape = function ( text ) {
     return text.replace( /[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&" );

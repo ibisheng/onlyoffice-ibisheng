@@ -3107,16 +3107,12 @@ cROUND.prototype.Calculate = function ( arg ) {
         return Math[n > 0 ? "floor" : "ceil"]( n );
     }
 
-    function sign( n ) {
-        return n == 0 ? 0 : n < 0 ? -1 : 1
-    }
-
     function Floor( number, significance ) {
         var quotient = number / significance;
         if ( quotient == 0 ) {
             return 0;
         }
-        var nolpiat = 5 * sign( quotient ) * Math.pow( 10, Math.floor( Math.log10( Math.abs( quotient ) ) ) - cExcelSignificantDigits );
+        var nolpiat = 5 * Math.sign( quotient ) * Math.pow( 10, Math.floor( Math.log10( Math.abs( quotient ) ) ) - cExcelSignificantDigits );
         return truncate( quotient + nolpiat ) * significance;
     }
 
