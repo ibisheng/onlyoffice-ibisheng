@@ -2780,6 +2780,11 @@ CUserCacheColor.prototype.init = function(nColor) {
       loadScript('./../../../../sdkjs/' + sdkName + '/sdk-all.js', callback);
     }
   }
+  function getAltGr (e) {
+  	var ctrlKey = e.metaKey || e.ctrlKey;
+  	var altKey = e.altKey;
+  	return (altKey && (AscBrowser.isMacOs ? !ctrlKey : ctrlKey));
+  }
 
 var g_oIdCounter = new CIdCounter();
 var g_oTableId = new CTableId();
@@ -2830,6 +2835,7 @@ window["SetDoctRendererParams"] = function(_params)
   window["AscCommon"].CContentChangesElement = CContentChangesElement;
 
   window["AscCommon"].loadSdk = loadSdk;
+  window["AscCommon"].getAltGr = getAltGr;
 
   window["AscCommon"].g_oDocumentUrls = g_oDocumentUrls;
   window["AscCommon"].FormulaTablePartInfo = FormulaTablePartInfo;

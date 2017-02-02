@@ -2162,7 +2162,7 @@
 	 */
 	CellEditor.prototype._onWindowKeyDown = function (event, isInput) {
 		var t = this, kind = undefined, hieroglyph = false;
-		var ctrlKey = event.metaKey || event.ctrlKey;
+		var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
 
 		if (!t.isOpened || (!isInput && !t.enableKeyEvents)) {
 			return true;

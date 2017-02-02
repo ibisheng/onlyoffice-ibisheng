@@ -323,7 +323,7 @@
 		// Будем делать dblClick как в Excel
 		asc_CEventsController.prototype.doMouseDblClick = function (event, isHideCursor) {
 			var t = this;
-			var ctrlKey = event.metaKey || event.ctrlKey;
+			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
 
 			// Для формулы не нужно выходить из редактирования ячейки
 			if (t.settings.isViewerMode || t.isFormulaEditMode || t.isSelectionDialogMode) {return true;}
@@ -528,7 +528,7 @@
 		 */
 		asc_CEventsController.prototype._changeSelectionDone = function (event) {
 			var coord = this._getCoordinates(event);
-			var ctrlKey = event.metaKey || event.ctrlKey;
+			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
 			if (false === ctrlKey) {
 				coord.x = -1;
 				coord.y = -1;
@@ -591,7 +591,8 @@
 		asc_CEventsController.prototype._changeFillHandleDone = function (event) {
 			// Закончили автозаполнение, пересчитаем
 			var coord = this._getCoordinates(event);
-			this.handlers.trigger("changeFillHandleDone", coord.x, coord.y, event.metaKey || event.ctrlKey);
+			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
+			this.handlers.trigger("changeFillHandleDone", coord.x, coord.y, ctrlKey);
 		};
 
 		/**
@@ -661,7 +662,8 @@
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._moveRangeHandleDone = function (event) {
 			// Закончили перемещение диапазона, пересчитаем
-			this.handlers.trigger("moveRangeHandleDone", event.metaKey || event.ctrlKey);
+			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
+			this.handlers.trigger("moveRangeHandleDone", ctrlKey);
 		};
 
 		asc_CEventsController.prototype._moveResizeRangeHandleDone = function (event, target) {
@@ -679,7 +681,7 @@
 		/** @param event {KeyboardEvent} */
 		asc_CEventsController.prototype._onWindowKeyDown = function (event) {
 			var t = this, dc = 0, dr = 0, isViewerMode = t.settings.isViewerMode;
-			var ctrlKey = event.metaKey || event.ctrlKey;
+			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
 			var shiftKey = event.shiftKey;
 
 			var result = true;
@@ -1215,7 +1217,7 @@
 			}
 
 			var t = this;
-			var ctrlKey = event.metaKey || event.ctrlKey;
+			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
 			var coord = t._getCoordinates(event);
 			event.isLocked = t.isMousePressed = true;
 
@@ -1456,7 +1458,7 @@
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseMove = function (event) {
 			var t = this;
-			var ctrlKey = event.metaKey || event.ctrlKey;
+			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
 			var coord = t._getCoordinates(event);
 
 			t.hasCursor = true;
@@ -1534,7 +1536,7 @@
 
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseWheel = function (event) {
-			var ctrlKey = event.metaKey || event.ctrlKey;
+			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
 			if (this.isFillHandleMode || this.isMoveRangeMode || this.isMoveResizeRange || ctrlKey) {
 				return true;
 			}
