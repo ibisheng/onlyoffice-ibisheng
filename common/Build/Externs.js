@@ -47,3 +47,18 @@ function _gaq(){};
 
 function constructor(){};
 function superclass(){};
+
+function touchstart(){};
+function touchmove(){};
+function touchend(){};
+function mousedown(){};
+function mousemove(){};
+function mouseup(){};
+function pointerdown(){};
+function pointermove(){};
+function pointerup(){};
+function MSPointerDown(){};
+function MSPointerMove(){};
+function MSPointerUp(){};
+
+function PointerEvent(){};
