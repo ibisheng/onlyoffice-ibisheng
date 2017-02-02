@@ -309,6 +309,54 @@
     window['AscDFH'].CChangesDrawingsContentLong = CChangesDrawingsContentLong;
 
 
+    function CChangesDrawingsContentLongMap(Class, Type, Pos, Items, isAdd){
+        CChangesDrawingsContentLongMap.superclass.constructor.call(this, Class, Type, Pos, Items, isAdd);
+    }
+    AscCommon.extendClass(CChangesDrawingsContentLongMap, AscDFH.CChangesDrawingsContentLong);
+
+
+    CChangesDrawingsContentLongMap.prototype.private_InsertInArrayLoad = function () {
+        if (this.PosArray.length <= 0 || this.Items.length <= 0)
+            return;
+        var aChangedArray = this.private_GetChangedArray();
+        if (null !== aChangedArray) {
+            for (var i = 0; i < this.Items.length; ++i) {
+                aChangedArray[this.PosArray[i]] = this.Items[i];
+            }
+        }
+    };
+
+    CChangesDrawingsContentLongMap.prototype.private_RemoveInArrayLoad = function () {
+
+        var aChangedArray = this.private_GetChangedArray();
+        if (null !== aChangedArray) {
+            for (var i = 0; i < this.PosArray.length; ++i) {
+                aChangedArray[this.PosArray[i]] = null;
+            }
+        }
+    };
+
+    CChangesDrawingsContentLongMap.prototype.private_InsertInArrayUndoRedo = function () {
+        var aChangedArray = this.private_GetChangedArray();
+        if (null !== aChangedArray) {
+            for (var i = 0; i < this.Items.length; ++i) {
+                aChangedArray[this.Pos + i] = this.Items[i];
+            }
+        }
+    };
+
+    CChangesDrawingsContentLongMap.prototype.private_RemoveInArrayUndoRedo = function () {
+        var aChangedArray = this.private_GetChangedArray();
+        if (null !== aChangedArray) {
+            for (var i = 0; i < this.Items.length; ++i) {
+                aChangedArray[this.Pos + i] = null;
+            }
+        }
+    };
+
+    window['AscDFH'].CChangesDrawingsContentLongMap = CChangesDrawingsContentLongMap;
+
+
     function CChangesDrawingChangeTheme(Class, Type, aIndexes){
         this.Type = Type;
         this.aIndexes = aIndexes;

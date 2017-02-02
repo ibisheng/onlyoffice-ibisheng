@@ -65,6 +65,7 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
     var CChangesDrawingsObject = AscDFH.CChangesDrawingsObject;
     var CChangesDrawingsContentNoId = AscDFH.CChangesDrawingsContentNoId;
     var CChangesDrawingsContentLong = AscDFH.CChangesDrawingsContentLong;
+    var CChangesDrawingsContentLongMap = AscDFH.CChangesDrawingsContentLongMap;
 
 
     var drawingsChangesMap = window['AscDFH'].drawingsChangesMap;
@@ -196,7 +197,7 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
     AscDFH.changesFactory[AscDFH.historyitem_SpPr_SetGeometry] = CChangesDrawingsObject;
     AscDFH.changesFactory[AscDFH.historyitem_SpPr_SetFill] = CChangesDrawingsObjectNoId;
     AscDFH.changesFactory[AscDFH.historyitem_SpPr_SetLn] = CChangesDrawingsObjectNoId;
-    AscDFH.changesFactory[AscDFH.historyitem_ClrMap_SetClr] = CChangesDrawingsContentLong;
+    AscDFH.changesFactory[AscDFH.historyitem_ClrMap_SetClr] = CChangesDrawingsContentLongMap;
     AscDFH.changesFactory[AscDFH.historyitem_ExtraClrScheme_SetClrScheme] = CChangesDrawingsObject;
     AscDFH.changesFactory[AscDFH.historyitem_ExtraClrScheme_SetClrMap] = CChangesDrawingsObject;
     AscDFH.changesFactory[AscDFH.historyitem_ThemeSetColorScheme] = CChangesDrawingsObjectNoId;
@@ -5878,6 +5879,7 @@ ClrScheme.prototype =
     Write_ToBinary: function (w)
     {
         w.WriteLong(this.colors.length);
+        w.WriteString2(this.name);
         for(var i = 0; i < this.colors.length; ++i)
         {
             w.WriteBool(isRealObject(this.colors[i]));
@@ -5886,11 +5888,13 @@ ClrScheme.prototype =
                 this.colors[i].Write_ToBinary(w);
             }
         }
+
     },
 
     Read_FromBinary: function (r)
     {
         var len = r.GetLong();
+        this.name = r.GetString2();
         for(var i = 0; i < len; ++i)
         {
             if(r.GetBool())
@@ -5903,6 +5907,7 @@ ClrScheme.prototype =
                 this.colors[i] = null;
             }
         }
+
     },
 
     setName: function(name)
@@ -5985,7 +5990,6 @@ ClrMap.prototype =
 
     setClr: function(index, clr)
     {
-
         History.Add(new CChangesDrawingsContentLong(this, AscDFH.historyitem_ClrMap_SetClr, index, [clr], true));
         this.color_map[index] = clr;
     }
