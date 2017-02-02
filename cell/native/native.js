@@ -2962,7 +2962,7 @@ function OfflineEditor () {
 
         window['AscFormat'].DrawingArea.prototype.drawSelection = function(drawingDocument) {
 
-            offlineEditor.flushTextMeasurer();
+            AscCommon.g_oTextMeasurer.Flush();
 
             var canvas = this.worksheet.objectRender.getDrawingCanvas();
             var shapeCtx = canvas.shapeCtx;
@@ -3376,8 +3376,6 @@ function OfflineEditor () {
             var oldrange = this.visibleRange;
             this.visibleRange = range;
 
-            //console.log('range:' + ' c1:' + c1 + ' r1:' + r1 + ' c2:' + c2 +' r2:' + r2);
-
             var cellsLeft_Local = this.cellsLeft;
             var cellsTop_Local  = this.cellsTop;
 
@@ -3391,7 +3389,7 @@ function OfflineEditor () {
 
             window["native"]["SwitchMemoryLayer"]();
 
-            offlineEditor.flushTextMeasurer();
+            AscCommon.g_oTextMeasurer.Flush();
 
             this.objectRender.showDrawingObjectsEx(false);
 
@@ -3873,7 +3871,7 @@ function OfflineEditor () {
         deviceScale = window["native"]["GetDeviceScale"]();
 
         window.g_file_path = "native_open_file";
-        window.NATIVE_DOCUMENT_TYPE = "";//window["native"]["GetEditorType"]();
+        window.NATIVE_DOCUMENT_TYPE = "";
         _api = new window["Asc"]["spreadsheet_api"]({});
 
         var userInfo = new Asc.asc_CUserInfo();
@@ -3996,7 +3994,7 @@ function OfflineEditor () {
         _api.asc_registerCallback("asc_onInitEditorStyles", function () {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
-            window["native"]["OnCallMenuEvent"](2405, stream); // ASC_SPREADSHEETS_EVENT_TYPE_TABLE_STYLES
+            window["native"]["OnCallMenuEvent"](2405, stream); // ASC_SPREADSHEETS_EVENT_TYPE_CELL_STYLES
         });
       
         _api.asc_registerCallback("asc_onError", function(id, level, errData) {
@@ -4761,13 +4759,6 @@ function OfflineEditor () {
         return objectId;
     };
 
-    this.offline_generateStyle = function() {
-        // Отправка стилей ячеек
-        var guiStyles = _api.wb.getCellStyles();
-        //bResult = this.handlers.trigger("asc_onInitEditorStyles", guiStyles);
-        // this.guiStyles = (false === bResult) ? guiStyles : null;
-    };
-
     this.offline_beforeInit = function () {
 
         // STYLE MANAGER
@@ -5350,17 +5341,21 @@ function OfflineEditor () {
         }
     };
     this.offline_afteInit = function () {window.AscAlwaysSaveAspectOnResizeTrack = true;};
-
-    this.flushTextMeasurer = function () {
-        AscCommon.g_oTextMeasurer.Flush();
-    };
 }
 var _s = new OfflineEditor();
 
 window["native"]["offline_of"] = function(arg) {_s.openFile(arg);}
 window["native"]["offline_stz"] = function(v) {_s.zoom = v; _api.asc_setZoom(v);}
-window["native"]["offline_ds"] = function(x, y, width, height, ratio, istoplayer) {_s.drawSheet(x, y, width, height, ratio, istoplayer);}
-window["native"]["offline_dh"] = function(x, y, width, height, type, ratio) {_s.drawHeader(x, y, width, height, type, ratio);}
+window["native"]["offline_ds"] = function(x, y, width, height, ratio, istoplayer) {
+    AscCommon.g_oTextMeasurer.Flush();
+    
+    _s.drawSheet(x, y, width, height, ratio, istoplayer);
+}
+window["native"]["offline_dh"] = function(x, y, width, height, ratio, type) {
+    AscCommon.g_oTextMeasurer.Flush();
+    
+    _s.drawHeader(x, y, width, height, type, ratio);
+}
 
 window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFormulaEditMode, isRangeResize, isChartRange, indexRange, c1, r1, c2, r2, targetCol, targetRow, select) {
     _s.isShapeAction = false;
@@ -5938,15 +5933,15 @@ window["native"]["offline_cell_editor_mouse_event"] = function(sendEvents) {
 
     for (var i = 0; i < sendEvents.length; i += 5) {
         var event = {
-            pageX:events[i + 1],
-            pageY:events[i + 2],
+            pageX:sendEvents[i + 1],
+            pageY:sendEvents[i + 2],
             which: 1,
-            shiftKey:events[i + 3],
+            shiftKey:sendEvents[i + 3],
             button:0
         };
 
-        if (events[i + 3]) {
-            if (-1 == events[i + 4]) {
+        if (sendEvents[i + 3]) {
+            if (-1 == sendEvents[i + 4]) {
                 left = Math.min(cellEditor.selectionBegin, cellEditor.selectionEnd);
                 right = Math.max(cellEditor.selectionBegin, cellEditor.selectionEnd);
                 cellEditor.cursorPos = left;
@@ -5956,7 +5951,7 @@ window["native"]["offline_cell_editor_mouse_event"] = function(sendEvents) {
                 _s.textSelection = -1;
             }
 
-            if (1 == events[i + 4]) {
+            if (1 == sendEvents[i + 4]) {
                 left = Math.min(cellEditor.selectionBegin, cellEditor.selectionEnd);
                 right = Math.max(cellEditor.selectionBegin, cellEditor.selectionEnd);
                 cellEditor.cursorPos = right;
@@ -5967,7 +5962,7 @@ window["native"]["offline_cell_editor_mouse_event"] = function(sendEvents) {
             }
         }
 
-        if (0 === events[i + 0]) {
+        if (0 === sendEvents[i + 0]) {
             var pos = cellEditor.cursorPos;
             left = cellEditor.selectionBegin;
             right = cellEditor.selectionEnd;
@@ -5987,14 +5982,14 @@ window["native"]["offline_cell_editor_mouse_event"] = function(sendEvents) {
                 cellEditor.selectionEnd = Math.max(left + 1, cellEditor.selectionEnd);
             }
 
-        } else if (1 === events[i + 0]) {
+        } else if (1 === sendEvents[i + 0]) {
             cellEditor._onMouseUp(event);
             _s.textSelection = 0;
-        } else if (2 == events[i + 0]) {
+        } else if (2 == sendEvents[i + 0]) {
 
             cellEditor._onMouseMove(event);
 
-        } else if (3 == events[i + 0]) {
+        } else if (3 == sendEvents[i + 0]) {
             cellEditor.clickCounter.clickCount = 2;
             cellEditor._onMouseDown(event);
             cellEditor._onMouseUp(event);
@@ -6382,7 +6377,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
 
         case 3: // ASC_MENU_EVENT_TYPE_UNDO
         {
-            _s.flushTextMeasurer();
+            AscCommon.g_oTextMeasurer.Flush();
 
             _api.asc_Undo();
             _s.asc_WriteAllWorksheets(true);
@@ -6390,7 +6385,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
         }
         case 4: // ASC_MENU_EVENT_TYPE_REDO
         {
-            _s.flushTextMeasurer();
+            AscCommon.g_oTextMeasurer.Flush();
 
             _api.asc_Redo();
             _s.asc_WriteAllWorksheets(true);
@@ -7095,6 +7090,12 @@ window["native"]["offline_apply_event"] = function(type,params) {
         case 2400: // ASC_SPREADSHEETS_EVENT_TYPE_COMPLETE_SEARCH
         {
             _api.asc_endFindText();
+            break;
+        }
+            
+        case 2405: // ASC_SPREADSHEETS_EVENT_TYPE_CELL_STYLES
+        {
+            _api.wb.getCellStyles();
             break;
         }
 
