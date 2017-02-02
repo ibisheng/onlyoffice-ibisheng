@@ -10521,8 +10521,8 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
             return oThis.ReadCT_SurfaceChart(t, l, oNewVal, aChartWithAxis);
         });
         //surface -> line
-        var line = this.ConvertSurfaceToLine(oNewVal, aChartWithAxis);
-        val.addChart(line);
+        //var line = this.ConvertSurfaceToLine(oNewVal, aChartWithAxis);
+        val.addChart(oNewVal);
     }
     else if (c_oserct_plotareaCATAX === type) {
         var oNewVal = new AscFormat.CCatAx();
