@@ -176,20 +176,8 @@
 	function check_KeyboardEvent(e)
 	{
 		global_keyboardEvent.AltKey = e.altKey;
-
-		if (e.metaKey !== undefined)
-			global_keyboardEvent.CtrlKey = e.ctrlKey || e.metaKey;
-		else
-			global_keyboardEvent.CtrlKey = e.ctrlKey;
-
-		global_keyboardEvent.AltGr = (global_keyboardEvent.CtrlKey && global_keyboardEvent.AltKey) ? true : false;
-		if (AscBrowser.isMacOs)
-		{
-			global_keyboardEvent.AltGr = (!global_keyboardEvent.CtrlKey && global_keyboardEvent.AltKey) ? true : false;
-		}
-
-		if (global_keyboardEvent.AltGr)
-			global_keyboardEvent.CtrlKey = false;
+		global_keyboardEvent.AltGr = AscCommon.getAltGr(e);
+		global_keyboardEvent.CtrlKey = !global_keyboardEvent.AltGr && (e.metaKey || e.ctrlKey);
 
 		global_keyboardEvent.ShiftKey = e.shiftKey;
 
