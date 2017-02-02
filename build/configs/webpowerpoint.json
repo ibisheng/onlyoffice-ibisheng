@@ -87,7 +87,7 @@
 		"../common/scroll.js",
 		"../common/Scrolls/iscroll.js",
 		"../common/Scrolls/mobileTouchManagerBase.js",
-		"../word/Drawing/mobileTouchManager.js",
+		"../slide/Drawing/mobileTouchManager.js",
 
         "../common/wordcopypaste.js",
 
