@@ -11114,7 +11114,12 @@ CStockChart.prototype =
     },
 
     Refresh_RecalcData: function()
-    {},
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateType();
+        }
+    },
     removeSeries: function(idx)
     {
         if(this.series[idx])
@@ -12475,7 +12480,7 @@ CTitle.prototype =
     {
         History.Add(new CChangesDrawingsObject(this, AscDFH.historyitem_CommonChartFormat_SetParent, this.parent, pr));
         this.parent = pr;
-            }
+    }
 };
 
 function CTrendLine()
@@ -12646,6 +12651,7 @@ function CUpDownBars()
     this.downBars = null;
     this.gapWidth = null;
     this.upBars   = null;
+    this.parent   = null;
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -12659,16 +12665,30 @@ CUpDownBars.prototype =
     },
 
     Refresh_RecalcData: function()
-    {},
+    {
+        if(this.parent){
+            this.parent.Refresh_RecalcData && this.parent.Refresh_RecalcData();
+        }
+    },
 
     getObjectType: function()
     {
         return AscDFH.historyitem_type_UpDownBars;
     },
+
+    setParent: function(pr)
+    {
+        History.Add(new CChangesDrawingsObject(this, AscDFH.historyitem_CommonChartFormat_SetParent, this.parent, pr));
+        this.parent = pr;
+    },
+
     setDownBars: function(pr)
     {
         History.Add(new CChangesDrawingsObject(this, AscDFH.historyitem_UpDownBars_SetDownBars, this.downBars, pr));
         this.downBars = pr;
+        if(this.downBars){
+            this.downBars.setParent(this);
+        }
     },
 
     setGapWidth: function(pr)
@@ -12682,6 +12702,21 @@ CUpDownBars.prototype =
     {
         History.Add(new CChangesDrawingsObject(this, AscDFH.historyitem_UpDownBars_SetUpBars, this.downBars, pr));
         this.upBars = pr;
+
+        if(this.upBars){
+            this.upBars.setParent(this);
+        }
+    },
+
+
+    handleUpdateFill: function()
+    {
+        this.Refresh_RecalcData();
+    },
+
+    handleUpdateLn: function()
+    {
+        this.Refresh_RecalcData();
     },
 
     createDuplicate: function()

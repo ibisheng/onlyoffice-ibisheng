@@ -24,6 +24,11 @@
     }
     AscCommon.extendClass(CChangesDrawingsBool, AscDFH.CChangesBaseBoolProperty);
     CChangesDrawingsBool.prototype.private_SetValue = private_SetValue;
+    CChangesDrawingsBool.prototype.Load = function(){
+        this.Redo();
+        this.RefreshRecalcData();
+    };
+
     CChangesDrawingsBool.prototype.ReadFromBinary = function (reader) {
         reader.Seek2(reader.GetCurPos() - 4);
         this.Type = reader.GetLong();
@@ -42,6 +47,10 @@
     AscCommon.extendClass(CChangesDrawingsLong, AscDFH.CChangesBaseLongProperty);
 
     CChangesDrawingsLong.prototype.private_SetValue = private_SetValue;
+    CChangesDrawingsLong.prototype.Load = function(){
+        this.Redo();
+        this.RefreshRecalcData();
+    };
     CChangesDrawingsLong.prototype.ReadFromBinary = function (reader) {
         reader.Seek2(reader.GetCurPos() - 4);
         this.Type = reader.GetLong();
@@ -59,6 +68,11 @@
     AscCommon.extendClass(CChangesDrawingsDouble, AscDFH.CChangesBaseDoubleProperty);
 
     CChangesDrawingsDouble.prototype.private_SetValue = private_SetValue;
+
+    CChangesDrawingsDouble.prototype.Load = function(){
+        this.Redo();
+        this.RefreshRecalcData();
+    };
     CChangesDrawingsDouble.prototype.ReadFromBinary = function (reader) {
 
         reader.Seek2(reader.GetCurPos() - 4);
@@ -78,6 +92,11 @@
     AscCommon.extendClass(CChangesDrawingsString, AscDFH.CChangesBaseStringProperty);
 
     CChangesDrawingsString.prototype.private_SetValue = private_SetValue;
+
+    CChangesDrawingsString.prototype.Load = function(){
+        this.Redo();
+        this.RefreshRecalcData();
+    };
     CChangesDrawingsString.prototype.ReadFromBinary = function (reader) {
         reader.Seek2(reader.GetCurPos() - 4);
         this.Type = reader.GetLong();
@@ -96,6 +115,10 @@
 
     AscCommon.extendClass(CChangesDrawingsObjectNoId, AscDFH.CChangesBaseObjectProperty);
     CChangesDrawingsObjectNoId.prototype.private_SetValue = private_SetValue;
+    CChangesDrawingsObjectNoId.prototype.Load = function(){
+        this.Redo();
+        this.RefreshRecalcData();
+    };
     window['AscDFH'].CChangesDrawingsObjectNoId = CChangesDrawingsObjectNoId;
     CChangesDrawingsObjectNoId.prototype.ReadFromBinary = function (reader) {
         reader.Seek2(reader.GetCurPos() - 4);
@@ -103,7 +126,6 @@
         this.FromLoad = true;
         CChangesDrawingsObjectNoId.superclass.ReadFromBinary.call(this, reader);
     };
-    CChangesDrawingsObjectNoId.prototype.private_SetValue = private_SetValue;
     CChangesDrawingsObjectNoId.prototype.private_CreateObject = function () {
         if (AscDFH.drawingsConstructorsMap[this.Type]) {
             return new AscDFH.drawingsConstructorsMap[this.Type]();
@@ -138,7 +160,10 @@
             AscDFH.drawingsChangesMap[this.Type](this.Class, oObject);
         }
     };
-
+    CChangesDrawingsObject.prototype.Load = function(){
+        this.Redo();
+        this.RefreshRecalcData();
+    };
     function CChangesDrawingsContent(Class, Type, Pos, Items, isAdd) {
         this.Type = Type;
         CChangesDrawingsContent.superclass.constructor.call(this, Class, Pos, Items, isAdd);
@@ -251,6 +276,7 @@
         else {
             this.private_RemoveInArrayLoad();
         }
+        this.RefreshRecalcData();
     };
 
     CChangesDrawingsContent.prototype.Undo = function () {
@@ -396,6 +422,11 @@
         this.Do();
     };
 
+    CChangesDrawingChangeTheme.prototype.Load = function(){
+        this.Redo();
+        this.RefreshRecalcData();
+    };
+
 
     window['AscDFH'].CChangesDrawingChangeTheme = CChangesDrawingChangeTheme;
 
@@ -444,6 +475,10 @@
          oSlide.timingLock = this.timingLock;
          oSlide.transitionLock = this.transitionLock;
          oSlide.layoutLock = this.layoutLock;
+    };
+    CChangesDrawingTimingLocks.prototype.Load = function(){
+        this.Redo();
+        this.RefreshRecalcData();
     };
 
     window['AscDFH'].CChangesDrawingTimingLocks = CChangesDrawingTimingLocks;
@@ -516,6 +551,10 @@
 
     CChangesSparklinesChangeData.prototype.Redo = function(){
         this.Fill(this.NewPr);
+    };
+    CChangesSparklinesChangeData.prototype.Load = function(){
+        this.Redo();
+        this.RefreshRecalcData();
     };
     window['AscDFH'].CChangesSparklinesChangeData = CChangesSparklinesChangeData;
 
@@ -612,6 +651,11 @@
     CChangesDrawingsExcelColor.prototype.Redo = function(){
         this.Fill(this.NewPr);
     };
+
+    CChangesDrawingsExcelColor.prototype.Load = function(){
+        this.Redo();
+        this.RefreshRecalcData();
+    };
     CChangesDrawingsExcelColor.prototype.Fill = function(Pr){
         var oClass = this.Class;
         switch(this.Type){
@@ -657,6 +701,10 @@
         if (this.Class.worksheet) {
             this.Class.worksheet.removeSparklineGroup(this.Class.Get_Id());
         }
+    };
+    CChangesDrawingsSparklinesRemove.prototype.Load = function(){
+        this.Redo();
+        this.RefreshRecalcData();
     };
     window['AscDFH'].CChangesDrawingsSparklinesRemove = CChangesDrawingsSparklinesRemove;
 
