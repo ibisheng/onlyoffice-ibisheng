@@ -8807,6 +8807,11 @@
 		var _clipboard = window["Asc"]["editor"].wb.clipboard;
 		var specialPasteProps = _clipboard.specialPasteProps;
 		
+		if ( val.props && val.props.onlyImages === true ) {
+			//this.handlers.trigger("showSpecialPasteOptions", autoFilterObject);
+			return;
+		}
+		
         var callTrigger = false;
         if (isLargeRange) {
             callTrigger = true;
@@ -8932,6 +8937,8 @@
             History.SetSelection(oSelection);
             History.SetSelectionRedo(oSelection);
         }
+		
+		//this.handlers.trigger("showSpecialPasteOptions", autoFilterObject);
     };
 
     WorksheetView.prototype._loadDataBeforePaste = function ( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth ) {
@@ -8982,11 +8989,8 @@
 								oImageMap[i] = url;
 							}
 						}
-
-						if ( pasteContent.props.onlyImages !== true ) 
-						{
-							t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
-						}
+						
+						t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
 						api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
 						isEndTransaction = true;
 					}
@@ -8995,12 +8999,9 @@
 						if(window["NATIVE_EDITOR_ENJINE"])
 						{
 							var oImageMap = {};
+							
 							AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
-
-							if ( pasteContent.props.onlyImages !== true ) 
-							{
-								t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
-							}
+							t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
 							api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
 							
 							isEndTransaction = true;
@@ -9009,12 +9010,11 @@
 						{
 							AscCommon.sendImgUrls( api, oObjectsForDownload.aUrls, function ( data ) {
 								var oImageMap = {};
+								
 								AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
-
-								if ( pasteContent.props.onlyImages !== true ) {
-									t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
-								}
+								t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
 								api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
+								
 								//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
 								History.EndTransaction();
 							}, true );
@@ -9022,7 +9022,7 @@
 						
 					}
 				}
-				else if ( pasteContent.props.onlyImages !== true ) 
+				else
 				{
 					t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
 					isEndTransaction = true;

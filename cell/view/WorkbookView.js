@@ -706,6 +706,12 @@
 				if (_canvas)
 					self.MobileTouchManager.CheckSelect(_canvas.trackOverlay, color);
 			}
+		},
+		"showSpecialPasteOptions": function(val) {
+			self.handlers.trigger("asc_onShowSpecialPasteOptions", val);
+		},
+		"hideSpecialPasteOptions": function() {
+			self.handlers.trigger("asc_onHideSpecialPasteOptions");
 		}
     });
 
