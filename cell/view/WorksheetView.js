@@ -8682,11 +8682,6 @@
                         t._loadDataBeforePaste(isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth);
                         bIsUpdate = false;
                         break;
-					 case "specialPaste":
-                        // Вставляем текст из локального буфера или нет
-                        t.specialPaste(val);
-                        bIsUpdate = false;
-                        break;
                     case "hyperlink":
                         if (val && val.hyperlinkModel) {
                             if (Asc.c_oAscHyperlinkType.RangeLink === val.asc_getType()) {
