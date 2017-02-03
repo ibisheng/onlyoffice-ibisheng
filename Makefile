@@ -6,19 +6,27 @@ OUTPUT = $(OUTPUT_DIR)
 
 WEBAPPS_DIR = web-apps
 WEBAPPS = $(OUTPUT)/$(WEBAPPS_DIR)
-GRUNT_FILES = build/Gruntfile.js.out ../web-apps/build/Gruntfile.js.out
+NODE_MODULES = build/node_modules ../web-apps/build/node_modules
+WEBAPPS_FILES = ../web-apps/deploy/web-apps/apps/documenteditor/main/app.js ../web-apps/deploy/web-apps/apps/presentationeditor/main/app.js ../web-apps/deploy/web-apps/apps/spreadsheeteditor/main/app.js
+SDKJS_FILES = word/sdk-all.js cell/sdk-all.js slide/sdk-all.js
 
 all: $(WEBAPPS)
 
-$(WEBAPPS): $(GRUNT_FILES)
+$(WEBAPPS): $(WEBAPPS_FILES)
 	mkdir -p $(OUTPUT)/$(WEBAPPS_DIR) && \
 		cp -r -t $(OUTPUT)/$(WEBAPPS_DIR) ../$(WEBAPPS_DIR)/deploy/** 
 
-$(GRUNT_FILES):
+$(WEBAPPS_FILES): $(NODE_MODULES) $(SDKJS_FILES)
+	cd ../$(WEBAPPS_DIR)/build  && \
+		$(GRUNT) deploy-$(filter %editor,$(subst /, ,$(@D))) $(GRUNT_FLAGS)
+
+$(NODE_MODULES):
 	cd $(@D) && \
-		npm install && \
-		$(GRUNT) $(GRUNT_FLAGS)
-	echo "Done" > $@
+		npm install
+
+$(SDKJS_FILES): $(NODE_MODULES)
+	cd build && \
+		$(GRUNT) build_$(@D) $(GRUNT_FLAGS)
 	
 clean:
-	rm -f $(GRUNT_FILES)
+	rm -f $(WEBAPPS_FILES) $(SDKJS_FILES)

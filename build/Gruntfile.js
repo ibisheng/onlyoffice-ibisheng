@@ -84,14 +84,17 @@ module.exports = function(grunt) {
         }
     });
 	
-	grunt.registerTask('build_webword',     ['build_webword_init', 'build_sdk']);
-	grunt.registerTask('build_webexcel',  ['build_webexcel_init', 'build_sdk']);
-	grunt.registerTask('build_webpowerpoint', ['build_webpowerpoint_init', 'build_sdk']);
+	grunt.registerTask('build_word',     ['build_webword_init', 'build_sdk']);
+	grunt.registerTask('build_cell',  ['build_webexcel_init', 'build_sdk']);
+	grunt.registerTask('build_slide', ['build_webpowerpoint_init', 'build_sdk']);
 
-	grunt.registerTask('build_all', ['build_webword_init', 'build_sdk', 'build_webexcel_init', 'build_sdk', 'build_webpowerpoint_init', 'build_sdk']);
+	grunt.registerTask('build_all', ['build_word', 'build_cell', 'build_slide']);
 	
 	grunt.registerTask('concat_sdk_init', function() {
-		var sdkTmp = 'sdk-tmp.js', sdkAllTmp = 'sdk-all-tmp.js', sdkAllMinTmp = 'sdk-all-min-tmp.js';
+		var sdkDstFolder = packageFile['compile']['sdk']['dst'];
+		var sdkTmp = sdkDstFolder + '/sdk-tmp.js';
+		var sdkAllTmp = sdkDstFolder + '/sdk-all-tmp.js';
+		var sdkAllMinTmp = sdkDstFolder + '/sdk-all-min-tmp.js';
 		var srcFilesMin = packageFile['compile']['sdk']['min'];
 		var srcFilesAll = packageFile['compile']['sdk']['common'];
 		var sdkOpt = {};
@@ -147,20 +150,28 @@ module.exports = function(grunt) {
 					dest: sdkTmp
 				}
 			},
-			clean: [
-				sdkAllMinTmp,
-				sdkAllTmp
-			]
+			clean: {
+				tmp: {
+					options: {
+						force: true
+					},
+					src: [
+						sdkAllMinTmp,
+						sdkAllTmp
+					]
+				}
+			}
 		});
 	});
 	
 	grunt.registerTask('compile_sdk_init', function() {
-		var sdkTmp = 'sdk-tmp.js';
 		var splitLine = '';
-		var tmp_sdk_path = 'sdk-js-tmp.js';
 		var sdkDstFolder = packageFile['compile']['sdk']['dst'];
+		var sdkTmp = sdkDstFolder + '/sdk-tmp.js';
+		var tmp_sdk_path = sdkDstFolder + '/sdk-js-tmp.js';
 		var sdkAllMinDst = sdkDstFolder + '/sdk-all-min.js';
 		var sdkAllDst = sdkDstFolder + '/sdk-all.js';
+		var sdkAllCashe = sdkDstFolder + '/*.cache'
 		var sdkOpt = {
 			compilation_level: level,
 			warning_level: 'QUIET',
@@ -203,10 +214,18 @@ module.exports = function(grunt) {
 					dest: sdkAllDst
 				}
 			},
-			clean: [
-				sdkTmp,
-				tmp_sdk_path
-			],
+			clean: {
+				tmp: {
+					options: {
+						force: true
+					},
+					src: [
+						sdkTmp,
+						tmp_sdk_path,
+						sdkAllCashe
+					]
+				}
+			},
 			replace: {
 				version: {
 					options: {

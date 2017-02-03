@@ -3143,9 +3143,10 @@ UndoRedoWoorksheet.prototype = {
 			else
 				row.setHeightProp(Data.oNewVal);
 			
-			//TODO проверить без этой перерисовки и убрать!!!
-			//var workSheetView = wb.oApi.wb.getWorksheetById(nSheetId);
-			//workSheetView.autoFilters.reDrawFilter(null, index);
+			//нужно для того, чтобы грамотно выставлялись цвета в ф/т при ручном скрытии строк, затрагивающих ф/т(undo/redo)
+			//TODO для случая скрытия строк фильтром(undo), может два раза вызываться функция setColorStyleTable - пересмотреть
+			var workSheetView = wb.oApi.wb.getWorksheetById(nSheetId);
+			workSheetView.model.autoFilters.reDrawFilter(null, index);
 		}
 		else if(AscCH.historyitem_Worksheet_RowHide == Type)
 		{
@@ -3170,11 +3171,8 @@ UndoRedoWoorksheet.prototype = {
 			
 			ws.setRowHidden(nRow, from, to);
 			
-			if(bUndo)
-			{
-				var workSheetView = wb.oApi.wb.getWorksheetById(nSheetId);
-				workSheetView.model.autoFilters.reDrawFilter(new Asc.Range(0, from, ws.nColsCount - 1, to));
-			}
+			var workSheetView = wb.oApi.wb.getWorksheetById(nSheetId);
+			workSheetView.model.autoFilters.reDrawFilter(new Asc.Range(0, from, ws.nColsCount - 1, to));
 		}
 		else if(AscCH.historyitem_Worksheet_AddRows == Type || AscCH.historyitem_Worksheet_RemoveRows == Type)
 		{

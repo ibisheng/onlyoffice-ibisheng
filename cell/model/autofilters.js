@@ -714,8 +714,11 @@
 				this._addHistoryObj(oldFilter, AscCH.historyitem_AutoFilter_ApplyMF,
 					{activeCells: ar, autoFiltersObject: autoFiltersObject});
 				History.EndTransaction();
-
-				this._resetTablePartStyle();
+				
+				if(!bUndoChanges && !bRedoChanges)
+				{
+					this._resetTablePartStyle();
+				}
 				
 				return {minChangeRow: minChangeRow, rangeOldFilter: rangeOldFilter, nOpenRowsCount: nOpenRowsCount, nAllRowsCount: nAllRowsCount};
 			},

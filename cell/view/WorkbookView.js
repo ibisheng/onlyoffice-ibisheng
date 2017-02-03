@@ -671,6 +671,8 @@
         self._onSelectionNameChanged.apply(self, arguments);
       }, "selectionMathInfoChanged": function() {
         self._onSelectionMathInfoChanged.apply(self, arguments);
+      },'onFilterInfo': function(countFilter, countRecords) {
+        self.handlers.trigger("asc_onFilterInfo", countFilter, countRecords);
       }, "onErrorEvent": function(errorId, level) {
         self.handlers.trigger("asc_onError", errorId, level);
       }, "slowOperation": function(isStart) {

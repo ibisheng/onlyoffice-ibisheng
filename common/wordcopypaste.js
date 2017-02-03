@@ -4611,7 +4611,45 @@ PasteProcessor.prototype =
         var computedStyle = this._getComputedStyle(node);
         if (computedStyle)
         {
-            //Ind
+			var font_family = computedStyle.getPropertyValue( "font-family" );
+			if(font_family && "" != font_family)
+			{
+				var oFontItem = this.oFonts[font_family];
+				if(null != oFontItem && null != oFontItem.Name && Para.TextPr && Para.TextPr.Value && Para.TextPr.Value.RFonts)
+				{
+					Para.TextPr.Value.RFonts.Ascii = {Name: oFontItem.Name, Index: oFontItem.Index};
+					Para.TextPr.Value.RFonts.HAnsi = {Name: oFontItem.Name, Index: oFontItem.Index};
+					Para.TextPr.Value.RFonts.CS = {Name: oFontItem.Name, Index: oFontItem.Index};
+					Para.TextPr.Value.RFonts.EastAsia = {Name: oFontItem.Name, Index: oFontItem.Index};
+				}
+			}
+
+			var font_size = node.style ? node.style.fontSize : null;
+			if(!font_size)
+				font_size = computedStyle.getPropertyValue( "font-size" );
+			if(font_size && Para.TextPr && Para.TextPr.Value)
+			{
+				var obj = this._ValueToMmType(font_size);
+				if(obj && "%" != obj.type && "none" != obj.type)
+				{
+					font_size = obj.val;
+					//���� ������� �� ������������ ������� ������� �������� ���������� ������, ��� ���������� ��� ������� 8, 11, 14, 20, 26pt
+					if("px" == obj.type && false == this.bIsDoublePx)
+						font_size = Math.round(font_size * g_dKoef_mm_to_pt);
+					else
+						font_size = Math.round(2 * font_size * g_dKoef_mm_to_pt) / 2;//���������� �������� ���������.
+					
+					//TODO use constant
+					if(font_size > 300)
+						font_size = 300;
+					else if(font_size === 0)
+						font_size = 1;
+						
+					Para.TextPr.Value.FontSize = font_size;
+				}
+			}
+			
+			//Ind
             var Ind = new CParaInd();
             var margin_left = computedStyle.getPropertyValue( "margin-left" );
 			

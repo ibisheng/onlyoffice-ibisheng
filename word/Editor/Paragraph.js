@@ -13570,6 +13570,7 @@ CParagraphRevisionsChangesChecker.prototype.Get_PrChangeUserId = function()
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].Paragraph = Paragraph;
 window['AscCommonWord'].UnknownValue = UnknownValue;
+window['AscCommonWord'].type_Paragraph = type_Paragraph;
 
 CRevisionsChange.prototype['get_UserId'] = CRevisionsChange.prototype.get_UserId;
 CRevisionsChange.prototype['put_UserId'] = CRevisionsChange.prototype.put_UserId;
