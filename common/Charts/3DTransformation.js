@@ -994,6 +994,11 @@ Processor3D.prototype._calculatePerspective = function(view3D)
 	var heightLine = this.heightCanvas - (this.top + this.bottom);
 	
 	var perspective = view3D && view3D.perspective ? view3D.perspective : global3DPersperctive;
+	if(view3D && 0 === view3D.perspective && this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Surface)
+	{
+		perspective = 1;
+	}
+	
 	var alpha = perspective / 4;//в xml проиходит двойной угол(в параметрах ms стоит 40, приходит в xml 80)
 	//TODO this.top - this.bottom пересмотреть
 	var catt = ((heightLine / 2 + (Math.abs(this.top - this.bottom)))) / Math.tan((alpha / 360) * (Math.PI * 2));
