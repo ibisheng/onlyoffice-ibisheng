@@ -84,11 +84,11 @@ module.exports = function(grunt) {
         }
     });
 	
-	grunt.registerTask('build_webword',     ['build_webword_init', 'build_sdk']);
-	grunt.registerTask('build_webexcel',  ['build_webexcel_init', 'build_sdk']);
-	grunt.registerTask('build_webpowerpoint', ['build_webpowerpoint_init', 'build_sdk']);
+	grunt.registerTask('build_word',     ['build_webword_init', 'build_sdk']);
+	grunt.registerTask('build_cell',  ['build_webexcel_init', 'build_sdk']);
+	grunt.registerTask('build_slide', ['build_webpowerpoint_init', 'build_sdk']);
 
-	grunt.registerTask('build_all', ['build_webword_init', 'build_sdk', 'build_webexcel_init', 'build_sdk', 'build_webpowerpoint_init', 'build_sdk']);
+	grunt.registerTask('build_all', ['build_word', 'build_cell', 'build_slide']);
 	
 	grunt.registerTask('concat_sdk_init', function() {
 		var sdkDstFolder = packageFile['compile']['sdk']['dst'];
