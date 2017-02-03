@@ -134,7 +134,7 @@
 				
 				this.images = null;
 			},
-			setProps: function(props)
+			asc_setProps: function(props)
 			{
 				switch(props)
 				{
@@ -4240,7 +4240,10 @@
 		//---------------------------------------------------------export---------------------------------------------------
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 		window["AscCommonExcel"].Clipboard = Clipboard;
-		window["AscCommonExcel"].SpecialPasteProps = SpecialPasteProps;
+		
+		window["Asc"]["SpecialPasteProps"]       = window["Asc"].SpecialPasteProps = SpecialPasteProps;
+		prot									 = SpecialPasteProps.prototype;
+		prot["asc_setProps"]				     = prot.asc_setProps;
 		
 		window["Asc"]["SpecialPasteShowOptions"] = window["Asc"].SpecialPasteShowOptions = SpecialPasteShowOptions;
 		prot									 = SpecialPasteShowOptions.prototype;
