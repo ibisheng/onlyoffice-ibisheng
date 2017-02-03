@@ -11539,6 +11539,9 @@
 
             if (null !== rangeOldFilter && !t.model.workbook.bUndoChanges && !t.model.workbook.bRedoChanges) {
                 t._onUpdateFormatTable(rangeOldFilter, false, true);
+				if (applyFilterProps.nOpenRowsCount !== applyFilterProps.nAllRowsCount) {
+					t.handlers.trigger('onFilterInfo', applyFilterProps.nOpenRowsCount, applyFilterProps.nAllRowsCount);
+				}
             }
 
             if (null !== minChangeRow) {
