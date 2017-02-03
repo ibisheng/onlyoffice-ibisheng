@@ -73,7 +73,7 @@ var numFormat_MonthMinute = 101;
 var numFormat_Percent = 102;
 var numFormat_General = 103;
 
-var FormatStates = {Decimal: 1, Frac: 2, Scientific: 3, Slash: 4};
+var FormatStates = {Decimal: 1, Frac: 2, Scientific: 3, Slash: 4, SlashFrac: 5};
 var SignType = {Positive: 1, Negative: 2, Null:3};
 
 var gc_nMaxDigCount = 15;//Максимальное число знаков точности
@@ -144,6 +144,8 @@ function FormatObjDecimalFrac(aLeft, aRight)
     this.aLeft = aLeft;//array формата левой части
     this.aRight = aRight;//array формата правой части
     this.bNumRight = false;
+	this.numerator = 0;
+	this.denominator = 0;
 }
 function FormatObjDateVal(type, nCount, bElapsed)
 {
@@ -931,11 +933,12 @@ NumFormat.prototype =
 	},
 	_parseNumber : function(number, aDecFormat, nFracLen, nValType, cultureInfo)
     {
-        var res = {bDigit: false, dec: 0, frac: 0, exponent: 0, exponentFrac: 0, scientific: 0, sign: SignType.Positive, date: {}};
+        var res = {bDigit: false, dec: 0, frac: 0, fraction: 0, exponent: 0, exponentFrac: 0, scientific: 0, sign: SignType.Positive, date: {}};
         if(CellValueType.String != nValType)
             res.bDigit = (number == number - 0);
         if(res.bDigit)
         {
+			res.fraction = number - Math.floor(number);
 			//Округляем
 			var parts = getNumberParts(number);
 			res.sign = parts.sign;
@@ -1127,13 +1130,13 @@ NumFormat.prototype =
 		}
         return {d: day, month: month, year: year, dayWeek: dayWeek, hour: h.val, min: min.val, sec: s.val, ms: ms.val, countDay: d.val };
 	},
-	_FormatNumber: function (number, exponent, format, nReadState, cultureInfo)
+	_FormatNumber: function (number, exponent, format, nReadState, cultureInfo, opt_forceNull)
 	{
         var aRes = [];
         var nFormatLen = format.length;
         if(nFormatLen > 0)
         {
-            if(FormatStates.Frac != nReadState)
+            if(FormatStates.Frac != nReadState && FormatStates.SlashFrac != nReadState)
             {
 				var sNumber = number + "";
 				var nNumberLen = sNumber.length;
@@ -1146,7 +1149,7 @@ NumFormat.prototype =
 					nNumberLen = sNumber.length;
 				}
                 var bIsNUll = false;
-                if("0" == sNumber)
+                if("0" == sNumber && !opt_forceNull)
                     bIsNUll = true;
                 //выравниваем длину
                 if(nNumberLen > nFormatLen)
@@ -1256,19 +1259,18 @@ NumFormat.prototype =
 					nStartNulls = Math.abs(exp);
                 var sNumber = val.toString();
                 var nNumberLen = sNumber.length;
-                //удаляем 0 на конце
-                var nLastNoNull = nNumberLen;
+				//удаляем 0 на конце
+				var nLastNoNull = nNumberLen;
                 for(var i = nNumberLen - 1; i >= 0; --i)
                 {
-                    if("0" != sNumber[i])
-                        break;
-                    nLastNoNull = i;
-                }
-                if(nLastNoNull < nNumberLen)
-                {
-                    sNumber = sNumber.substring(0, nLastNoNull);
-                    nNumberLen = sNumber.length;
-                }
+					if ("0" != sNumber[i])
+						break;
+					nLastNoNull = i;
+				}
+				if (nLastNoNull < nNumberLen && (FormatStates.SlashFrac != nReadState || 0 == nLastNoNull)) {
+					sNumber = sNumber.substring(0, nLastNoNull);
+					nNumberLen = sNumber.length;
+				}
                 //заполняем первые нули
                 for(var i = 0; i < nStartNulls; ++i)
                     aRes.push(new FormatObj(numFormat_Text, "0"));
@@ -1423,6 +1425,68 @@ NumFormat.prototype =
         }
         return res;
     },
+	_formatDecimalFrac: function(oParsedNumber) {
+		var forceNull = false;
+		for (var i = 0; i < this.aRawFormat.length; ++i) {
+			var item = this.aRawFormat[i];
+			if (numFormat_DecimalFrac == item.type) {
+				var frac = oParsedNumber.fraction;
+				var numerator = 0;
+				var denominator = 0;
+				if (item.bNumRight === true) {
+					//todo max denominator - 99999
+					denominator = item.aRight[0].val;
+					numerator = Math.round(denominator * frac);
+				} else if (frac > 0) {
+					//Continued fraction
+					//7 - excel max denominator length
+					var denominatorLen = Math.min(7, item.aRight.length);
+					var denominatorBound = Math.pow(10, denominatorLen);
+					var an = Math.floor(frac);
+					var xn1 = frac - an;
+					var pn1 = an;
+					var qn1 = 1;
+					var pn2 = 1;
+					var qn2 = 0;
+					do {
+						an = Math.floor(1 / xn1);
+						xn1 = 1 / xn1 - an;
+						var pn = an * pn1 + pn2;
+						var qn = an * qn1 + qn2;
+						pn2 = pn1;
+						pn1 = pn;
+						qn2 = qn1;
+						qn1 = qn;
+					} while (qn < denominatorBound);
+					numerator = pn2;
+					denominator = qn2;
+				}
+				if (numerator <= 0) {
+					numerator = 0;
+					if (this.bWhole === false) {
+						if (denominator <= 0) {
+							denominator = 1;
+						}
+					} else {
+						denominator = 0;
+					}
+				}
+				if (this.bWhole === false) {
+					numerator += denominator * oParsedNumber.dec;
+				} else if (numerator === denominator && 0 !== numerator) {
+					oParsedNumber.dec++;
+					numerator = 0;
+					denominator = 0;
+				}
+				if (0 === numerator && 0 === denominator) {
+					forceNull = true;
+				}
+				item.numerator = numerator;
+				item.denominator = denominator;
+			}
+		}
+		return forceNull;
+	},
     format: function (number, nValType, dDigitsCount, cultureInfo, bChart)
     {
 		if (null != this.LCID) {
@@ -1451,12 +1515,16 @@ NumFormat.prototype =
             {
                 return this._applyGeneralFormat(number, nValType, dDigitsCount, bChart, cultureInfo);
             }
+			var forceNull = false;
+			if (this.bSlash) {
+				forceNull = this._formatDecimalFrac(oParsedNumber);
+			}
             var aDec = [];
             var aFrac = [];
             var aScientific = [];
             if(true == oParsedNumber.bDigit)
             {
-                aDec = this._FormatNumber(oParsedNumber.dec, oParsedNumber.exponent, this.aDecFormat.concat(), FormatStates.Decimal, cultureInfo);
+                aDec = this._FormatNumber(oParsedNumber.dec, oParsedNumber.exponent, this.aDecFormat.concat(), FormatStates.Decimal, cultureInfo, forceNull);
                 aFrac = this._FormatNumber(oParsedNumber.frac, oParsedNumber.exponentFrac, this.aFracFormat.concat(), FormatStates.Frac, cultureInfo);
             }
             if(true == this.bAddMinusIfNes && SignType.Negative == oParsedNumber.sign)//&& oParsedNumber.dec > 0)
@@ -1534,95 +1602,43 @@ NumFormat.prototype =
                 }
                 else if(numFormat_DecimalFrac == item.type)
                 {
-                    if( oParsedNumber.frac !== 0 || this.bWhole === false)
-                    {
-						var frac = oParsedNumber.frac;
-						var fracExp = -frac.toString().length;
-						if(oParsedNumber.exponent < 0)
-							fracExp -= oParsedNumber.exponent;
-						frac *= Math.pow(10, fracExp);
-                        var numerator;
-                        var denominator;
-
-                        if(item.bNumRight === true)
-                        {
-                            denominator = item.aRight[0].val;
-                            numerator = Math.round(denominator * frac);
-
-                            if(this.bWhole === false)
-                                numerator += denominator * oParsedNumber.dec;
-
-                        }
-                        else if(frac == 0)
-                        {
-                            numerator = oParsedNumber.dec;
-                            denominator = 1;
-                        }
-                        else
-                        {
-                            var d = frac, n = frac;
-                            var a0 = 0, a1 = 1;
-                            var b0 = 1, b1 = 0;
-                            var eps = Math.pow(10, -15),
-                                arr = Math.pow(10, item.aRight.length ),
-                                delta = 1, a = 0, b = 0;
-
-                            while( (b < arr) && (delta > eps) )
-                            {
-                                var N = Math.floor(d);
-                                a = N * a1 + a0;
-                                b = N * b1 + b0;
-                                a0 = a1;
-                                a1 = a;
-                                b0 = b1;
-                                b1 = b;
-                                d = 1/(d - N);
-                                delta = Math.abs(n - a/b);
-                            }
-
-                            if( b > arr || b == arr)
-                            {
-                                numerator = a0;
-                                denominator = b0;
-                            }
-                            else{
-                                numerator = a;
-                                denominator = b;
-                            }
-
-                            if(this.bWhole === false)
-                                numerator += denominator*oParsedNumber.dec;
-                        }
-
-                        var aLeft = this._FormatNumber(numerator, 0, item.aLeft.concat(), FormatStates.Slash, cultureInfo);
-                        for(var j = 0, length = aLeft.length; j < length; ++j)
-                        {
-                            var subitem = aLeft[j];
-                            if(numFormat_Text == subitem.type)
-                                oCurText.text += subitem.val;
-                            else
-                                this._AddDigItem(res, oCurText, subitem);
-                        }
-                        oCurText.text += "/";
-
-                        if(item.bNumRight === true)
-                        {
-                            oCurText.text += item.aRight[0].val;
-                        }
-                        else
-                        {
-                            var aRight = this._FormatNumber(denominator, 0, item.aRight.concat(), FormatStates.Slash, cultureInfo);
-                            for(var j = 0, length = aRight.length; j < length; ++j)
-                            {
-                                var subitem = aRight[j];
-                                if(numFormat_Text == subitem.type)
-                                    oCurText.text += subitem.val;
-                                else
-                                    this._AddDigItem(res, oCurText, subitem);
-                            }
-                        }
-                    }
-
+                    var curForceNull = this.bWhole === false;
+					var aLeft = this._FormatNumber(item.numerator, 0, item.aLeft.concat(), FormatStates.Slash, cultureInfo, curForceNull);
+					for (var j = 0, length = aLeft.length; j < length; ++j) {
+						var subitem = aLeft[j];
+						if (subitem) {
+							this._AddDigItem(res, oCurText, subitem);
+						}
+					}
+					if ((item.numerator > 0 && item.denominator > 0) || curForceNull) {
+						oCurText.text += "/";
+					} else {
+						var oNewFont = new AscCommonExcel.Font();
+						oNewFont.skip = true;
+						this._CommitText(res, oCurText, "/", oNewFont);
+					}
+					if (item.bNumRight === true) {
+						var rightVal = item.aRight[0].val;
+						if (rightVal) {
+							if (item.denominator > 0) {
+								oCurText.text += rightVal;
+							} else {
+								for (var rightIdx = 0; rightIdx < rightVal.toString().length; ++rightIdx) {
+									var oNewFont = new AscCommonExcel.Font();
+									oNewFont.skip = true;
+									this._CommitText(res, oCurText, "0", oNewFont);
+								}
+							}
+						}
+					} else {
+						var aRight = this._FormatNumber(item.denominator, 0, item.aRight.concat(), FormatStates.SlashFrac, cultureInfo);
+						for (var j = 0, length = aRight.length; j < length; ++j) {
+							var subitem = aRight[j];
+							if (subitem) {
+								this._AddDigItem(res, oCurText, subitem);
+							}
+						}
+					}
                 }
                 else if(numFormat_Repeat == item.type)
                 {
