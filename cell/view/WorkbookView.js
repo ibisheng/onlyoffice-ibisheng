@@ -709,9 +709,6 @@
 		},
 		"showSpecialPasteOptions": function(val) {
 			self.handlers.trigger("asc_onShowSpecialPasteOptions", val);
-		},
-		"hideSpecialPasteOptions": function() {
-			self.handlers.trigger("asc_onHideSpecialPasteOptions");
 		}
     });
 
@@ -824,6 +821,9 @@
     });
     this.handlers.add('hiddenComments', function () {
       return !self.isShowComments;
+    });
+	this.model.handlers.add("hideSpecialPasteOptions", function() {
+      self.handlers.trigger("asc_onHideSpecialPasteOptions");
     });
 
     this.cellCommentator = new AscCommonExcel.CCellCommentator({

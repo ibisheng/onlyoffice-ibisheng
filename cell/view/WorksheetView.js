@@ -8808,7 +8808,7 @@
 		var specialPasteProps = _clipboard.specialPasteProps;
 		
 		if ( val.props && val.props.onlyImages === true ) {
-			//this.handlers.trigger("showSpecialPasteOptions", autoFilterObject);
+			this.handlers.trigger("showSpecialPasteOptions", [Asc.c_oSpecialPasteProps.picture]);
 			return;
 		}
 		
@@ -8938,7 +8938,18 @@
             History.SetSelectionRedo(oSelection);
         }
 		
-		//this.handlers.trigger("showSpecialPasteOptions", autoFilterObject);
+		var allowedSpecialPasteProps;
+		var sProps = Asc.c_oSpecialPasteProps;
+		if(fromBinary)
+		{
+			allowedSpecialPasteProps = [sProps.formulas, sProps.formulasNumberFormating, sProps.keepSourceFormating, sProps.noBorders, sProps.keepSourceColumnWidths, sProps.transpose, sProps.values, sProps.valuesNumberFormating, sProps.valuesSourceFormating, sProps.formating, sProps.pasteLink, sProps.picture, sProps.linkedPicture];
+		}
+		else
+		{
+			//matchDestinationFormatting - пока не добавляю, так как работает как и values
+			allowedSpecialPasteProps = [sProps.keepSourceFormating, sProps.values];
+		}
+		this.handlers.trigger("showSpecialPasteOptions", allowedSpecialPasteProps);
     };
 
     WorksheetView.prototype._loadDataBeforePaste = function ( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth ) {
