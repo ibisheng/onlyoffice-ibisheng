@@ -3561,6 +3561,8 @@ CMathContent.prototype.Get_ParaContentPos = function(bSelection, bStart, Content
 	else
 	{
 		var nPos = (true !== bSelection ? this.CurPos : (false !== bStart ? this.Selection.StartPos : this.Selection.EndPos));
+		nPos = Math.max(0, Math.min(nPos, this.Content.length - 1));
+
 		ContentPos.Add(nPos);
 
 		if (undefined !== this.Content[nPos])
@@ -3576,17 +3578,20 @@ CMathContent.prototype.Set_ParaContentPos = function(ContentPos, Depth)
     if (undefined === CurPos || CurPos < 0)
     {
         this.CurPos = 0;
-        this.Content[this.CurPos].Cursor_MoveToStartPos();
+        if (this.Content[this.CurPos])
+        	this.Content[this.CurPos].Cursor_MoveToStartPos();
     }
     else if (CurPos > this.Content.length - 1)
     {
         this.CurPos = this.Content.length - 1;
-        this.Content[this.CurPos].Cursor_MoveToEndPos(false);
+        if (this.Content[this.CurPos])
+        	this.Content[this.CurPos].Cursor_MoveToEndPos(false);
     }
     else
     {
         this.CurPos = CurPos;
-        this.Content[this.CurPos].Set_ParaContentPos(ContentPos, Depth + 1);
+        if (this.Content[this.CurPos])
+        	this.Content[this.CurPos].Set_ParaContentPos(ContentPos, Depth + 1);
     }
 };
 CMathContent.prototype.Selection_IsEmpty = function()
