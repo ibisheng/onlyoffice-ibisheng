@@ -8677,7 +8677,7 @@
                         break;
                     case "paste":
 						var _clipboard = window["Asc"]["editor"].wb.clipboard;
-						_clipboard.specialPasteProps = _clipboard.specialPasteProps ? _clipboard.specialPasteProps : new AscCommonExcel.SpecialPasteProps();
+						_clipboard.specialPasteProps = _clipboard.specialPasteProps ? _clipboard.specialPasteProps : new Asc.SpecialPasteProps();
 					
                         t._loadDataBeforePaste(isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth);
                         bIsUpdate = false;
@@ -8769,7 +8769,7 @@
 		//откатываемся до того, что было до вставки
 		if(preSpecialPasteData && preSpecialPasteData.data)
 		{
-			var tempProps = new AscCommonExcel.SpecialPasteProps();
+			var tempProps = new Asc.SpecialPasteProps();
 			api.wb.clipboard.specialPasteProps = tempProps;
 			
 			//меняем activeRange
