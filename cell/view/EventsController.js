@@ -323,7 +323,7 @@
 		// Будем делать dblClick как в Excel
 		asc_CEventsController.prototype.doMouseDblClick = function (event, isHideCursor) {
 			var t = this;
-			var ctrlKey = event.metaKey || event.ctrlKey;
+			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
 
 			// Для формулы не нужно выходить из редактирования ячейки
 			if (t.settings.isViewerMode || t.isFormulaEditMode || t.isSelectionDialogMode) {return true;}
@@ -528,7 +528,7 @@
 		 */
 		asc_CEventsController.prototype._changeSelectionDone = function (event) {
 			var coord = this._getCoordinates(event);
-			var ctrlKey = event.metaKey || event.ctrlKey;
+			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
 			if (false === ctrlKey) {
 				coord.x = -1;
 				coord.y = -1;
@@ -591,7 +591,8 @@
 		asc_CEventsController.prototype._changeFillHandleDone = function (event) {
 			// Закончили автозаполнение, пересчитаем
 			var coord = this._getCoordinates(event);
-			this.handlers.trigger("changeFillHandleDone", coord.x, coord.y, event.metaKey || event.ctrlKey);
+			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
+			this.handlers.trigger("changeFillHandleDone", coord.x, coord.y, ctrlKey);
 		};
 
 		/**
@@ -661,7 +662,8 @@
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._moveRangeHandleDone = function (event) {
 			// Закончили перемещение диапазона, пересчитаем
-			this.handlers.trigger("moveRangeHandleDone", event.metaKey || event.ctrlKey);
+			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
+			this.handlers.trigger("moveRangeHandleDone", ctrlKey);
 		};
 
 		asc_CEventsController.prototype._moveResizeRangeHandleDone = function (event, target) {
@@ -679,7 +681,7 @@
 		/** @param event {KeyboardEvent} */
 		asc_CEventsController.prototype._onWindowKeyDown = function (event) {
 			var t = this, dc = 0, dr = 0, isViewerMode = t.settings.isViewerMode;
-			var ctrlKey = event.metaKey || event.ctrlKey;
+			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
 			var shiftKey = event.shiftKey;
 
 			var result = true;
@@ -979,10 +981,7 @@
 					return result;
 
 				default:
-					// При зажатом Ctrl или Alt не вводим символ
-					if (!ctrlKey && !event.altKey) {
-						t.skipKeyPress = false;
-					}
+					t.skipKeyPress = false;
 					return true;
 
 			} // end of switch
@@ -1218,7 +1217,7 @@
 			}
 
 			var t = this;
-			var ctrlKey = event.metaKey || event.ctrlKey;
+			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
 			var coord = t._getCoordinates(event);
 			event.isLocked = t.isMousePressed = true;
 
@@ -1459,7 +1458,7 @@
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseMove = function (event) {
 			var t = this;
-			var ctrlKey = event.metaKey || event.ctrlKey;
+			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
 			var coord = t._getCoordinates(event);
 
 			t.hasCursor = true;
@@ -1537,7 +1536,7 @@
 
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseWheel = function (event) {
-			var ctrlKey = event.metaKey || event.ctrlKey;
+			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
 			if (this.isFillHandleMode || this.isMoveRangeMode || this.isMoveResizeRange || ctrlKey) {
 				return true;
 			}
@@ -1548,25 +1547,44 @@
                     return true;
             }
 
-			var delta = 0;
-			if (undefined !== event.wheelDelta && 0 !== event.wheelDelta) {
-				delta = -1 * event.wheelDelta / 40;
-			} else if (undefined != event.detail && 0 !== event.detail) {
-				// FF
-				delta = event.detail;
-			} else if (undefined != event.deltaY && 0 !== event.deltaY) {
-				// FF
-				delta = event.deltaY;
-			}
-			delta /= 3;
-
 			var self = this;
-			delta *= event.shiftKey ? 1 : this.settings.wheelScrollLines;
+			var deltaX = 0, deltaY = 0;
+			if (undefined !== event.wheelDelta && 0 !== event.wheelDelta) {
+				deltaY = -1 * event.wheelDelta / 40;
+			} else if (undefined !== event.detail && 0 !== event.detail) {
+				// FF
+				deltaY = event.detail;
+			}
+			if (event.axis !== undefined && event.axis === event.HORIZONTAL_AXIS) {
+				deltaX = deltaY;
+				deltaY = 0;
+			}
+
+			if (undefined !== event.wheelDeltaX && 0 !== event.wheelDeltaX) {
+				// Webkit
+				deltaX = -1 * event.wheelDeltaX / 40;
+			}
+			if (undefined !== event.wheelDeltaY && 0 !== event.wheelDeltaY) {
+				// Webkit
+				deltaY = -1 * event.wheelDeltaY / 40;
+			}
+			if (event.shiftKey) {
+				deltaX = deltaY;
+				deltaY = 0;
+			}
+
 			this.handlers.trigger("updateWorksheet", this.element, /*x*/undefined, /*y*/undefined, /*ctrlKey*/undefined,
-					function () {
-						event.shiftKey ? self.scrollHorizontal(delta, event) : self.scrollVertical(delta, event);
-						self._onMouseMove(event);
-					});
+				function () {
+					if (deltaX) {
+						deltaX = Math.sign(deltaX) * Math.ceil(Math.abs(deltaX / 3));
+						self.scrollHorizontal(deltaX, event);
+					}
+					if (deltaY) {
+						deltaY = Math.sign(deltaY) * Math.ceil(Math.abs(deltaY * self.settings.wheelScrollLines / 3));
+						self.scrollVertical(deltaY, event);
+					}
+					self._onMouseMove(event);
+				});
 			return true;
 		};
 
