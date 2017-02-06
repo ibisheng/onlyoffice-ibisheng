@@ -131,7 +131,7 @@ cCHAR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first ).tocNumber();
+        arg0 = arg0.cross( arguments[1].bbox ).tocNumber();
     }
     else if ( arg0 instanceof cArray ) {
         var ret = new cArray();
@@ -188,7 +188,7 @@ cCLEAN.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first ).tocNumber();
+        arg0 = arg0.cross( arguments[1].bbox ).tocNumber();
     }
     if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -236,7 +236,7 @@ cCODE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first ).tocString();
+        arg0 = arg0.cross( arguments[1].bbox ).tocString();
     }
     else if ( arg0 instanceof cArray ) {
         var ret = new cArray();
@@ -293,7 +293,7 @@ cCONCATENATE.prototype.Calculate = function ( arg ) {
     for ( var i = 0; i < this.argumentsCurrent; i++ ) {
         argI = arg[i];
         if ( argI instanceof cArea || argI instanceof cArea3D ) {
-            argI = argI.cross( arguments[1].first );
+            argI = argI.cross( arguments[1].bbox );
         }
         argI = argI.tocString();
         if ( argI instanceof cError ) {
@@ -423,13 +423,13 @@ cDOLLAR.prototype.Calculate = function ( arg ) {
         arg2 = arg[2] ? arg[2] : new cBool( false );
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
     if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
-        arg2 = arg2.cross( arguments[1].first );
+        arg2 = arg2.cross( arguments[1].bbox );
     }
 
     if ( arg0 instanceof cError ) return this.value = arg0;
@@ -542,10 +542,10 @@ cEXACT.prototype = Object.create( cBaseFunction.prototype );
 cEXACT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
 
     arg0 = arg0.tocString();
@@ -599,10 +599,10 @@ cFIND.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = this.getArguments() == 3 ? arg[2] : null, res, str, searchStr, pos = -1;
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
 
     arg0 = arg0.tocString();
@@ -611,7 +611,7 @@ cFIND.prototype.Calculate = function ( arg ) {
     if ( arg2 !== null ) {
 
         if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
-            arg2 = arg2.cross( arguments[1].first );
+            arg2 = arg2.cross( arguments[1].bbox );
         }
 
         arg2 = arg2.tocNumber();
@@ -766,13 +766,13 @@ cFIXED.prototype.Calculate = function ( arg ) {
         arg2 = arg[2] ? arg[2] : new cBool( false );
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
     if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
-        arg2 = arg2.cross( arguments[1].first );
+        arg2 = arg2.cross( arguments[1].bbox );
     }
 
     arg2 = arg2.tocBool();
@@ -889,10 +889,10 @@ cLEFT.prototype = Object.create( cBaseFunction.prototype );
 cLEFT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = this.argumentsCurrent == 1 ? new cNumber( 1 ) : arg[1];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
 
     arg0 = arg0.tocString();
@@ -953,7 +953,7 @@ cLEN.prototype = Object.create( cBaseFunction.prototype );
 cLEN.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
 
     arg0 = arg0.tocString();
@@ -1004,7 +1004,7 @@ cLOWER.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D )
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
 
     arg0 = arg0.tocString();
     if ( arg0 instanceof cArray )
@@ -1044,13 +1044,13 @@ cMID.prototype = Object.create( cBaseFunction.prototype );
 cMID.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
     if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
-        arg2 = arg2.cross( arguments[1].first );
+        arg2 = arg2.cross( arguments[1].bbox );
     }
 
     arg0 = arg0.tocString();
@@ -1149,7 +1149,7 @@ cPROPER.prototype.Calculate = function ( arg ) {
     }
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first ).tocString();
+        arg0 = arg0.cross( arguments[1].bbox ).tocString();
     }
     else if ( arg0 instanceof cArray ) {
         var ret = new cArray();
@@ -1205,7 +1205,7 @@ cREPLACE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first ).tocString();
+        arg0 = arg0.cross( arguments[1].bbox ).tocString();
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 ).tocString();
@@ -1214,7 +1214,7 @@ cREPLACE.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocString();
 
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first ).tocNumber();
+        arg1 = arg1.cross( arguments[1].bbox ).tocNumber();
     }
     else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 ).tocNumber();
@@ -1223,7 +1223,7 @@ cREPLACE.prototype.Calculate = function ( arg ) {
     arg1 = arg1.tocNumber();
 
     if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
-        arg2 = arg2.cross( arguments[1].first ).tocNumber();
+        arg2 = arg2.cross( arguments[1].bbox ).tocNumber();
     }
     else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElement( 0 ).tocNumber();
@@ -1232,7 +1232,7 @@ cREPLACE.prototype.Calculate = function ( arg ) {
     arg2 = arg2.tocNumber();
 
     if ( arg3 instanceof cArea || arg3 instanceof cArea3D ) {
-        arg3 = arg3.cross( arguments[1].first ).tocString();
+        arg3 = arg3.cross( arguments[1].bbox ).tocString();
     }
     else if ( arg3 instanceof cArray ) {
         arg3 = arg3.getElement( 0 ).tocString();
@@ -1315,14 +1315,14 @@ cREPT.prototype.Calculate = function ( arg ) {
 
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     arg0 = arg0.tocString();
     if ( arg0 instanceof cError )
         return this.value = arg0;
 
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first ).tocNumber();
+        arg1 = arg1.cross( arguments[1].bbox ).tocNumber();
     }
     else if ( arg1 instanceof cRef || arg1 instanceof cRef3D ) {
         arg1 = arg1.getValue();
@@ -1369,10 +1369,10 @@ cRIGHT.prototype = Object.create( cBaseFunction.prototype );
 cRIGHT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = this.argumentsCurrent == 1 ? new cNumber( 1 ) : arg[1];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
 
     arg0 = arg0.tocString();
@@ -1435,7 +1435,7 @@ cSEARCH.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber( 1 );
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first ).tocString();
+        arg0 = arg0.cross( arguments[1].bbox ).tocString();
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 ).tocString();
@@ -1444,7 +1444,7 @@ cSEARCH.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocString();
 
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first ).tocString();
+        arg1 = arg1.cross( arguments[1].bbox ).tocString();
     }
     else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 ).tocString();
@@ -1453,7 +1453,7 @@ cSEARCH.prototype.Calculate = function ( arg ) {
     arg1 = arg1.tocString();
 
     if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
-        arg2 = arg2.cross( arguments[1].first ).tocNumber();
+        arg2 = arg2.cross( arguments[1].bbox ).tocNumber();
     }
     else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElement( 0 ).tocNumber();
@@ -1541,7 +1541,7 @@ cSUBSTITUTE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3] ? arg[3] : new cNumber( 0 );
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first ).tocString();
+        arg0 = arg0.cross( arguments[1].bbox ).tocString();
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 ).tocString();
@@ -1550,7 +1550,7 @@ cSUBSTITUTE.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocString();
 
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first ).tocString();
+        arg1 = arg1.cross( arguments[1].bbox ).tocString();
     }
     else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 ).tocString();
@@ -1559,7 +1559,7 @@ cSUBSTITUTE.prototype.Calculate = function ( arg ) {
     arg1 = arg1.tocString();
 
     if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
-        arg2 = arg2.cross( arguments[1].first ).tocString();
+        arg2 = arg2.cross( arguments[1].bbox ).tocString();
     }
     else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElement( 0 ).tocString();
@@ -1568,7 +1568,7 @@ cSUBSTITUTE.prototype.Calculate = function ( arg ) {
     arg2 = arg2.tocString();
 
     if ( arg3 instanceof cArea || arg3 instanceof cArea3D ) {
-        arg3 = arg3.cross( arguments[1].first ).tocNumber();
+        arg3 = arg3.cross( arguments[1].bbox ).tocNumber();
     }
     else if ( arg3 instanceof cArray ) {
         arg3 = arg3.getElement( 0 ).tocNumber();
@@ -1638,7 +1638,7 @@ cT.prototype.Calculate = function ( arg ) {
     else if ( arg0 instanceof cString || arg0 instanceof cError )
         return this.value = arg0;
     else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg[0] instanceof cArray ) {
         arg0 = arg[0].getElementRowCol( 0, 0 );
@@ -1682,7 +1682,7 @@ cTEXT.prototype.Calculate = function ( arg ) {
         arg0 = arg0.getValue();
     }
     else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -1692,7 +1692,7 @@ cTEXT.prototype.Calculate = function ( arg ) {
         arg1 = arg1.getValue();
     }
     else if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
     else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
@@ -1759,7 +1759,7 @@ cTRIM.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first ).tocString();
+        arg0 = arg0.cross( arguments[1].bbox ).tocString();
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 ).tocString();
@@ -1806,7 +1806,7 @@ cUPPER.prototype = Object.create( cBaseFunction.prototype );
 cUPPER.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     if ( arg0 instanceof cArray )
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -1848,7 +1848,7 @@ cVALUE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );

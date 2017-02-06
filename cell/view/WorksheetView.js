@@ -9145,10 +9145,7 @@
                             }
                             var isMerged = false;
                             for (var mergeCheck = 0; mergeCheck < mergeArr.length; ++mergeCheck) {
-                                if (r + 1 + autoR * plRow <= mergeArr[mergeCheck].r2 &&
-                                  r + 1 + autoR * plRow >= mergeArr[mergeCheck].r1 &&
-                                  c + autoC * plCol + 1 <= mergeArr[mergeCheck].c2 &&
-                                  c + 1 + autoC * plCol >= mergeArr[mergeCheck].c1) {
+                                if (mergeArr[mergeCheck].contains(c + autoC * plCol, r + autoR * plRow)) {
                                     isMerged = true;
                                 }
                             }
@@ -9157,9 +9154,7 @@
                             if ((currentObj.colSpan > 1 || currentObj.rowSpan > 1) && !isMerged) {
                                 range.setOffsetLast(
                                   {offsetCol: currentObj.colSpan - 1, offsetRow: currentObj.rowSpan - 1});
-                                mergeArr[n] = {
-                                    r1: range.first.row, r2: range.last.row, c1: range.first.col, c2: range.last.col
-                                };
+                                mergeArr[n] = range.getBBox0();
                                 n++;
                                 if (contentCurrentObj[0] == undefined) {
                                     range.setValue('');

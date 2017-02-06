@@ -2168,18 +2168,6 @@ cArray.prototype.fillFromArray = function ( arr ) {
         this.countElement += arr[i].length;
     }
 };
-cArray.prototype.getElementByCell = function ( cellAddress ) {
-    if ( this.cellAddress ){
-        if( this.countElementInRow == 1 ){
-            this.getElementRowCol( cellAddress.getRow0(), 0 );
-        }
-        if( this.rowCount == 1 ){
-            this.getElementRowCol( 0, cellAddress.getCol0() );
-        }
-  } else {
-        return this.getElement( 0 );
-    }
-};
 
 /** @constructor */
 function cUndefined() {
@@ -2531,9 +2519,9 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 	cUnarMinusOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (arrElem, r, c) {
 				arrElem = arrElem.tocNumber();
@@ -2567,9 +2555,9 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 	cUnarPlusOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (cElementType.cellsRange === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			arg0 = arg0.getValue();
 		}
@@ -2597,18 +2585,18 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 	cAddOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		}
 		if (arg1 instanceof cArea) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		}
 		arg0 = arg0.tocNumber();
 		arg1 = arg1.tocNumber();
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "+", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "+", arguments[1].bbox);
 	};
 
 	/** @constructor */
@@ -2620,14 +2608,14 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 	cMinusOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		}
 		if (arg1 instanceof cArea) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		}
 		arg0 = arg0.tocNumber();
 		arg1 = arg1.tocNumber();
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "-", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "-", arguments[1].bbox);
 	};
 
 	/** @constructor */
@@ -2640,9 +2628,9 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 	cPercentOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (arrElem, r, c) {
 				arrElem = arrElem.tocNumber();
@@ -2674,15 +2662,15 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 	cPowOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg1 instanceof cArea) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		}
 		arg1 = arg1.tocNumber();
 		if (arg0 instanceof cError) {
@@ -2710,18 +2698,18 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 	cMultOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		}
 		if (arg1 instanceof cArea) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		}
 		arg0 = arg0.tocNumber();
 		arg1 = arg1.tocNumber();
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "*", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "*", arguments[1].bbox);
 	};
 
 	/** @constructor */
@@ -2733,18 +2721,18 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 	cDivOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		}
 		if (arg1 instanceof cArea) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		}
 		arg0 = arg0.tocNumber();
 		arg1 = arg1.tocNumber();
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "/", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "/", arguments[1].bbox);
 	};
 
 	/** @constructor */
@@ -2756,15 +2744,15 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 	cConcatSTROperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		}
 		arg0 = arg0.tocString();
 		if (arg1 instanceof cArea) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		}
 		arg1 = arg1.tocString();
 
@@ -2781,20 +2769,20 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 	cEqualsOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			arg0 = arg0.getValue();
 		}
 		if (cElementType.cellsRange === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg1.type || cElementType.cell3D === arg1.type) {
 			arg1 = arg1.getValue();
 		}
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "=", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "=", arguments[1].bbox);
 	};
 
 	/** @constructor */
@@ -2806,21 +2794,21 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 	cNotEqualsOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			arg0 = arg0.getValue();
 		}
 
 		if (cElementType.cellsRange === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg1.type || cElementType.cell3D === arg1.type) {
 			arg1 = arg1.getValue();
 		}
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "<>", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "<>", arguments[1].bbox);
 	};
 
 	/** @constructor */
@@ -2832,21 +2820,21 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 	cLessOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			arg0 = arg0.getValue();
 		}
 
 		if (cElementType.cellsRange === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg1.type || cElementType.cell3D === arg1.type) {
 			arg1 = arg1.getValue();
 		}
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "<", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "<", arguments[1].bbox);
 	};
 
 	/** @constructor */
@@ -2858,20 +2846,20 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 	cLessOrEqualOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			arg0 = arg0.getValue();
 		}
 		if (cElementType.cellsRange === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg1.type || cElementType.cell3D === arg1.type) {
 			arg1 = arg1.getValue();
 		}
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "<=", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "<=", arguments[1].bbox);
 	};
 
 	/** @constructor */
@@ -2883,20 +2871,20 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 	cGreaterOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			arg0 = arg0.getValue();
 		}
 		if (cElementType.cellsRange === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg1.type || cElementType.cell3D === arg1.type) {
 			arg1 = arg1.getValue();
 		}
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, ">", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, ">", arguments[1].bbox);
 	};
 
 	/** @constructor */
@@ -2908,20 +2896,20 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 	cGreaterOrEqualOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			arg0 = arg0.getValue();
 		}
 		if (cElementType.cellsRange === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg1.type || cElementType.cell3D === arg1.type) {
 			arg1 = arg1.getValue();
 		}
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, ">=", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, ">=", arguments[1].bbox);
 	};
 
 /* cFormulaOperators is container for holding all ECMA-376 operators, see chapter $18.17.2.2 in "ECMA-376, Second Edition, Part 1 - Fundamentals And Markup Language Reference" */
@@ -3593,8 +3581,8 @@ _func[cElementType.empty][cElementType.empty] = function ( arg0, arg1, what ) {
 _func[cElementType.cellsRange][cElementType.number] = _func[cElementType.cellsRange][cElementType.string] =
     _func[cElementType.cellsRange][cElementType.bool] = _func[cElementType.cellsRange][cElementType.error] =
     _func[cElementType.cellsRange][cElementType.array] =
-      _func[cElementType.cellsRange][cElementType.empty] = function(arg0, arg1, what, cellAddress) {
-            var cross = arg0.cross( cellAddress );
+      _func[cElementType.cellsRange][cElementType.empty] = function(arg0, arg1, what, bbox) {
+            var cross = arg0.cross( bbox );
             return _func[cross.type][arg1.type]( cross, arg1, what );
         };
 
@@ -3602,14 +3590,14 @@ _func[cElementType.cellsRange][cElementType.number] = _func[cElementType.cellsRa
 _func[cElementType.number][cElementType.cellsRange] = _func[cElementType.string][cElementType.cellsRange] =
     _func[cElementType.bool][cElementType.cellsRange] = _func[cElementType.error][cElementType.cellsRange] =
     _func[cElementType.array][cElementType.cellsRange] =
-      _func[cElementType.empty][cElementType.cellsRange] = function(arg0, arg1, what, cellAddress) {
-            var cross = arg1.cross( cellAddress );
+      _func[cElementType.empty][cElementType.cellsRange] = function(arg0, arg1, what, bbox) {
+            var cross = arg1.cross( bbox );
             return _func[arg0.type][cross.type]( arg0, cross, what );
         };
 
 
-_func[cElementType.cellsRange][cElementType.cellsRange] = function ( arg0, arg1, what, cellAddress ) {
-  var cross1 = arg0.cross(cellAddress), cross2 = arg1.cross(cellAddress);
+_func[cElementType.cellsRange][cElementType.cellsRange] = function ( arg0, arg1, what, bbox ) {
+  var cross1 = arg0.cross(bbox), cross2 = arg1.cross(bbox);
     return _func[cross1.type][cross2.type]( cross1, cross2, what );
 };
 
@@ -3706,7 +3694,7 @@ _func.binarySearch = function ( sElem, arrTagert, regExp ) {
 
 };
 
-_func[cElementType.number][cElementType.cell] = function ( arg0, arg1, what, cellAddress ) {
+_func[cElementType.number][cElementType.cell] = function ( arg0, arg1, what, bbox ) {
     var ar1 = arg1.tocNumber();
     switch ( what ) {
         case ">":
@@ -3760,7 +3748,7 @@ _func[cElementType.number][cElementType.cell] = function ( arg0, arg1, what, cel
     }
 
 };
-_func[cElementType.cell][cElementType.number] = function ( arg0, arg1, what, cellAddress ) {
+_func[cElementType.cell][cElementType.number] = function ( arg0, arg1, what, bbox ) {
     var ar0 = arg0.tocNumber();
     switch ( what ) {
         case ">":
@@ -3813,7 +3801,7 @@ _func[cElementType.cell][cElementType.number] = function ( arg0, arg1, what, cel
         }
     }
 };
-_func[cElementType.cell][cElementType.cell] = function ( arg0, arg1, what, cellAddress ) {
+_func[cElementType.cell][cElementType.cell] = function ( arg0, arg1, what, bbox ) {
     var ar0 = arg0.tocNumber();
     switch ( what ) {
         case ">":
@@ -3875,8 +3863,6 @@ _func[cElementType.cell3D] = _func[cElementType.cell];
 /** @constructor */
 function parserFormula( formula, parent, _ws ) {
     this.is3D = false;
-    // this.cellId = _cellId;
-    // this.cellAddress = g_oCellAddressUtils.getCellAddress( this.cellId );
     this.ws = _ws;
     this.wb = this.ws.workbook;
     this.value = null;
