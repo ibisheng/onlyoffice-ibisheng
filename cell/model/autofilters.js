@@ -2544,6 +2544,18 @@
 						
 						break;
 					}
+					case c_oAscChangeTableStyleInfo.title:
+					{
+						tablePart.changeAltText(val);
+						
+						break;
+					}
+					case c_oAscChangeTableStyleInfo.description:
+					{
+						tablePart.changeAltTextSummary(val);
+						
+						break;
+					}
 				}
 				
 				//History.TurnOn();

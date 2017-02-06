@@ -6960,6 +6960,9 @@
             cell_info.formatTableInfo.firstRow = curTablePart.HeaderRowCount === null;
             cell_info.formatTableInfo.tableRange = curTablePart.Ref.getAbsName();
             cell_info.formatTableInfo.filterButton = curTablePart.isShowButton();
+			
+			cell_info.formatTableInfo.altText = curTablePart.altText;
+            cell_info.formatTableInfo.altTextSummary = curTablePart.altTextSummary;
 
             this.af_setDisableProps(curTablePart, cell_info.formatTableInfo);
         }
