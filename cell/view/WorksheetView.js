@@ -6759,8 +6759,13 @@
 		
 		//null - не выдавать сообщение и не расширять, false - не выдавать сообщение и расширЯть, true - выдавать сообщение
 		var bResult = false;
-		//в случае одной выделенной ячейки - всегда не выдаём сообщение и автоматически расширяем
-		if(!arn.isOneCell())
+		
+		//если внутри форматированной таблиц, никогда не выдаем сообщение
+		if(this.model.autoFilters._isTablePartsContainsRange(arn))
+		{
+			bResult = null;
+		}
+		else if(!arn.isOneCell())//в случае одной выделенной ячейки - всегда не выдаём сообщение и автоматически расширяем
 		{
 			var colCount = arn.c2 - arn.c1 + 1;
 			var rowCount = arn.r2 - arn.r1 + 1;
@@ -11752,7 +11757,7 @@
 					var selectionRange = t.model.selectionRange;
 					var activeCell = selectionRange.activeCell;
 					var activeCellRange = new Asc.Range(activeCell.col, activeCell.row, activeCell.col, activeCell.row);
-					var expandRange = t.model.autoFilters._getAdjacentCellsAF(activeCellRange);
+					var expandRange = t.model.autoFilters._getAdjacentCellsAF(activeCellRange, true);
 					
 					//change selection
 					t.setSelection(expandRange);
