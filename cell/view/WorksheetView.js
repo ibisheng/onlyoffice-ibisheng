@@ -9654,11 +9654,11 @@
 		{
 			arrFormula.push(rangeStyle.formula);
 		}
-		else if(rangeStyle.cellValueData && specialPasteProps.font)
+		else if(rangeStyle.cellValueData && specialPasteProps.font && specialPasteProps.val)
 		{	
 			rangeStyle.cellValueData.cell.setValueData(rangeStyle.cellValueData.valueData);
 		}
-		else if(rangeStyle.value2 && specialPasteProps.font)
+		else if(rangeStyle.value2 && specialPasteProps.font && specialPasteProps.val)
 		{
 			if(formulaProps)
 			{

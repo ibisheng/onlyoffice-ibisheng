@@ -201,6 +201,7 @@
 					case c_oSpecialPasteProps.formating:
 					{
 						this.formula = null;
+						this.val = null;
 						break;
 					}
 					case c_oSpecialPasteProps.pasteLink:
