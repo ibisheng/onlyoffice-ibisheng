@@ -1694,13 +1694,21 @@ cStrucTable.prototype.toLocaleString = function () {
 			var i;
 			for (i = 0; i < this.hdtIndexes.length; ++i) {
 				if (0 != i) {
-					tblStr += FormulaSeparators.functionArgumentSeparatorDef;
+					if (isLocal) {
+						tblStr += FormulaSeparators.functionArgumentSeparator;
+					} else {
+						tblStr += FormulaSeparators.functionArgumentSeparatorDef;
+					}
 				}
 				tblStr += "[" + this._buildLocalTableString(this.hdtIndexes[i], isLocal) + "]";
 			}
 			if (this.hdtcstartIndex) {
 				if (this.hdtIndexes.length > 0) {
-					tblStr += FormulaSeparators.functionArgumentSeparatorDef;
+					if (isLocal) {
+						tblStr += FormulaSeparators.functionArgumentSeparator;
+					} else {
+						tblStr += FormulaSeparators.functionArgumentSeparatorDef;
+					}
 				}
 				var hdtcstart = this.hdtcstartIndex.name.replace(/#/g, "'#");
 				tblStr += "[" + hdtcstart + "]";
