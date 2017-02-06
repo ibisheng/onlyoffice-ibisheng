@@ -109,6 +109,12 @@ DrawingObjectsController.prototype.setTableProps = function(props)
     var by_type = this.getSelectedObjectsByTypes();
     if(by_type.tables.length === 1)
     {
+        var sCaption = props.TableCaption;
+        var sDescription = props.TableDescription;
+        by_type.tables[0].setTitle(sCaption);
+        by_type.tables[0].setDescription(sDescription);
+        props.TableCaption = undefined;
+        props.TableDescription = undefined;
         var target_text_object = AscFormat.getTargetTextObject(this);
         if(target_text_object === by_type.tables[0])
         {
@@ -120,6 +126,8 @@ DrawingObjectsController.prototype.setTableProps = function(props)
             by_type.tables[0].graphicObject.Set_Props(props);
             by_type.tables[0].graphicObject.Selection_Remove();
         }
+        props.TableCaption = sCaption;
+        props.TableDescription = sDescription;
         editor.WordControl.m_oLogicDocument.Check_GraphicFrameRowHeight(by_type.tables[0]);
     }
 };
