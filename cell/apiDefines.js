@@ -230,8 +230,7 @@ var c_oAscChangeTableStyleInfo = {
 	rowTotal: 5,
 	rowBanded: 6,
 	filterButton: 7,
-	title: 8,
-	description: 9
+	advancedSettings: 8
 };
 
 // Состояние редактора ячейки

@@ -417,6 +417,8 @@ var UndoRedoDataTypes = new function() {
     this.ColorFilter = 38;
 
     this.DefinedName = 39;
+	
+	this.AdvancedTableInfoSettings = 40;
 
     this.GlobalTableIdAdd = 44;
     this.GraphicObjects = 45;
@@ -485,6 +487,7 @@ var UndoRedoDataTypes = new function() {
 			case this.AutoFilter: return new UndoRedoData_AutoFilter(); break;
 			case this.AutoFiltersOptions: return new Asc.AutoFiltersOptions(); break;
 			case this.AutoFilterObj: return new Asc.AutoFilterObj(); break;
+			case this.AdvancedTableInfoSettings: return new Asc.AdvancedTableInfoSettings(); break;
 			case this.CustomFilters: return new Asc.CustomFilters(); break;
 			case this.CustomFilter: return new Asc.CustomFilter(); break;
             case this.ColorFilter: return new Asc.ColorFilter(); break;

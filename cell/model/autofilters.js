@@ -238,6 +238,53 @@
             asc_getSortColor : function() { return this.sortColor; }
 		};
 		
+		var g_oAdvancedTableInfoSettings = {
+			title		: 0,
+			descritption: 1
+		};
+		
+		function AdvancedTableInfoSettings () {
+
+			if ( !(this instanceof AutoFiltersOptions) ) {return new AutoFiltersOptions();}
+
+			this.Properties = g_oAdvancedTableInfoSettings;
+
+			this.title  = null;
+			this.descritption  = null;
+			
+			return this;
+		}
+		AdvancedTableInfoSettings.prototype = {
+			constructor: AdvancedTableInfoSettings,
+
+			getType : function () {
+				return UndoRedoDataTypes.AdvancedTableInfoSettings;
+			},
+			getProperties : function () {
+				return this.Properties;
+			},
+			getProperty : function (nType) {
+				switch (nType) {
+					case this.Properties.title: return this.title; break;
+					case this.Properties.descritption: return this.descritption; break;
+				}
+
+				return null;
+			},
+			setProperty : function (nType, value) {
+				switch (nType) {
+					case this.Properties.title: this.title = value;break;
+					case this.Properties.descritption: this.descritption = value;break;
+				}
+			},
+			
+			asc_setTitle : function(val) { this.title = val;},
+			asc_setDescritption : function(val) { this.descritption = val; },
+
+			asc_getTitle : function() { return this.title; },
+			asc_getDescritption : function() { return this.descritption; }
+		};
+		
 		var g_oAutoFilterObj = {
 			type		: 0,
 			filter		: 1
@@ -2544,15 +2591,12 @@
 						
 						break;
 					}
-					case c_oAscChangeTableStyleInfo.title:
+					case c_oAscChangeTableStyleInfo.advancedSettings:
 					{
-						tablePart.changeAltText(val);
-						
-						break;
-					}
-					case c_oAscChangeTableStyleInfo.description:
-					{
-						tablePart.changeAltTextSummary(val);
+						var title = val.asc_getTitle()
+						var description = val.asc_getDescription()
+						tablePart.changeAltText(title);
+						tablePart.changeAltTextSummary(description);
 						
 						break;
 					}
@@ -5153,6 +5197,13 @@
 		prot["asc_setFilter"]					= prot.asc_setFilter;
 		prot["asc_setType"]						= prot.asc_setType;
 		prot["asc_getFilter"]					= prot.asc_getFilter;
+		
+		window["Asc"]["AdvancedTableInfoSettings"] = window["Asc"].AdvancedTableInfoSettings = AdvancedTableInfoSettings;
+		prot									= AdvancedTableInfoSettings.prototype;
+		prot["asc_getTitle"]					= prot.asc_getTitle;
+		prot["asc_getDescription"]				= prot.asc_getDescription;
+		prot["asc_setTitle"]					= prot.asc_setTitle;
+		prot["asc_setDescription"]				= prot.asc_setDescription;
 		
 		window["AscCommonExcel"].AutoFiltersOptionsElements = AutoFiltersOptionsElements;
 		prot									= AutoFiltersOptionsElements.prototype;
