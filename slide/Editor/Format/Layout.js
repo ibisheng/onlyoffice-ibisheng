@@ -39,7 +39,7 @@ var History = AscCommon.History;
 AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetMaster] = AscDFH.CChangesDrawingsObject;
 AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetMatchingName] = AscDFH.CChangesDrawingsObject;
 AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetType] = AscDFH.CChangesDrawingsObject;
-AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetBg] = AscDFH.CChangesDrawingsObject;
+AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetBg] = AscDFH.CChangesDrawingsObjectNoId;
 AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetCSldName] = AscDFH.CChangesDrawingsObject;
 AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetShow] = AscDFH.CChangesDrawingsObject;
 AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetShowPhAnim] = AscDFH.CChangesDrawingsObject;
@@ -48,8 +48,8 @@ AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetClrMapOverride] = AscDFH.
 AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutAddToSpTree] = AscDFH.CChangesDrawingsContent;
 AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetSize] = AscDFH.CChangesDrawingsObjectNoId;
 
-
-AscDFH.drawingsConstructorsMap[ AscDFH.historyitem_SlideLayoutSetSize] = AscFormat.CDrawingBaseCoordsWritable;
+AscDFH.drawingsConstructorsMap[AscDFH.historyitem_SlideLayoutSetBg] = AscFormat.CBg;
+AscDFH.drawingsConstructorsMap[AscDFH.historyitem_SlideLayoutSetSize] = AscFormat.CDrawingBaseCoordsWritable;
 
 AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideLayoutSetMaster]            = function(oClass, value){oClass.Master = value;};
 AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideLayoutSetMatchingName]      = function(oClass, value){oClass.matchingName = value;};
@@ -157,7 +157,7 @@ SlideLayout.prototype =
 
     changeBackground: function(bg)
     {
-        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_SlideLayoutSetBg, this.cSld.Bg, bg));
+        History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_SlideLayoutSetBg, this.cSld.Bg, bg));
         this.cSld.Bg = bg;
     },
 
