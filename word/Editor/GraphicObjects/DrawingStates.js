@@ -728,11 +728,13 @@ RotateState.prototype =
                                 // На удалении включаем пересчет из-за бага (28015), чтобы во время добавления автофигуры на эту же страницу
                                 // расположение всех элементов было рассчитано с уже удаленной автофигурой.
 
-                                var bTrackRevisions = false;
-                                if(this.drawingObjects.document.TrackRevisions){
-                                    bTrackRevisions = true;
-                                    this.drawingObjects.document.TrackRevisions = false;
-                                }
+								// Автофигуры мы переносим так, как будто это происходит не в режиме рецензирования, но
+								// при этом мы должны сохранить их начальные настройки рецензирования.
+								var bTrackRevisions = this.drawingObjects.document.Is_TrackRevisions();
+								if (bTrackRevisions)
+									this.drawingObjects.document.Set_TrackRevisions(false);
+
+								var oOriginalRun = original.Parent.Get_DrawingObjectRun(original.Id);
 
                                 original.Remove_FromDocument(false);
                                 aNearestPos[i].Paragraph.Check_NearestPos(aNearestPos[i]);
@@ -740,12 +742,11 @@ RotateState.prototype =
                                 // Всегда создаем копию при переносе, чтобы не было проблем при совместном редактировании
                                 var originalCopy = original.Copy();
 								originalCopy.Set_XYForAdd(bounds.posX, bounds.posY, aNearestPos[i], pageIndex);
-								originalCopy.Add_ToDocument(aNearestPos[i], false);
+								originalCopy.Add_ToDocument(aNearestPos[i], false, null, oOriginalRun);
 								original.DocumentContent.Select_DrawingObject(originalCopy.Get_Id());
 
-                                if(bTrackRevisions){
-                                    this.drawingObjects.document.TrackRevisions = true;
-                                }
+								if (bTrackRevisions)
+									this.drawingObjects.document.Set_TrackRevisions(true);
                             }
                             else
                             {

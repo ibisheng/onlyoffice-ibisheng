@@ -2501,7 +2501,7 @@ PasteProcessor.prototype =
 				{
 					if(type_Paragraph === aContent.content[i].Get_Type())
 					{
-						newContent.push(AscFormat.ConvertParagraphToPPTX(aContent.content[i], this.oDocument.DrawingDocument, this.oDocument));
+						newContent.push(AscFormat.ConvertParagraphToPPTX(aContent.content[i], this.oDocument.DrawingDocument, this.oDocument, false, true));
 					}
 				}
 				
@@ -2587,7 +2587,7 @@ PasteProcessor.prototype =
 				element.Get_AllDrawingObjects(drawings);
 				if(type_Paragraph == element.GetType())//paragraph
 				{
-					selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element, null, null, true);
+					selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element, null, null, true, false);
 					elements.push(selectedElement);
 				}
 				else if(type_Table == element.GetType())//table
@@ -3879,7 +3879,7 @@ PasteProcessor.prototype =
                     {
                         if(cDocumentContent.Content[n] instanceof Paragraph)
                         {
-                            cDocumentContent.Content[nIndex] = AscFormat.ConvertParagraphToPPTX(cDocumentContent.Content[nIndex]);
+                            cDocumentContent.Content[nIndex] = AscFormat.ConvertParagraphToPPTX(cDocumentContent.Content[nIndex], null, null, true, false);
                             ++nIndex;
                         }
 

@@ -6759,8 +6759,13 @@
 		
 		//null - не выдавать сообщение и не расширять, false - не выдавать сообщение и расширЯть, true - выдавать сообщение
 		var bResult = false;
-		//в случае одной выделенной ячейки - всегда не выдаём сообщение и автоматически расширяем
-		if(!arn.isOneCell())
+		
+		//если внутри форматированной таблиц, никогда не выдаем сообщение
+		if(this.model.autoFilters._isTablePartsContainsRange(arn))
+		{
+			bResult = null;
+		}
+		else if(!arn.isOneCell())//в случае одной выделенной ячейки - всегда не выдаём сообщение и автоматически расширяем
 		{
 			var colCount = arn.c2 - arn.c1 + 1;
 			var rowCount = arn.r2 - arn.r1 + 1;
@@ -6960,6 +6965,9 @@
             cell_info.formatTableInfo.firstRow = curTablePart.HeaderRowCount === null;
             cell_info.formatTableInfo.tableRange = curTablePart.Ref.getAbsName();
             cell_info.formatTableInfo.filterButton = curTablePart.isShowButton();
+			
+			cell_info.formatTableInfo.altText = curTablePart.altText;
+            cell_info.formatTableInfo.altTextSummary = curTablePart.altTextSummary;
 
             this.af_setDisableProps(curTablePart, cell_info.formatTableInfo);
         }
@@ -9145,10 +9153,7 @@
                             }
                             var isMerged = false;
                             for (var mergeCheck = 0; mergeCheck < mergeArr.length; ++mergeCheck) {
-                                if (r + 1 + autoR * plRow <= mergeArr[mergeCheck].r2 &&
-                                  r + 1 + autoR * plRow >= mergeArr[mergeCheck].r1 &&
-                                  c + autoC * plCol + 1 <= mergeArr[mergeCheck].c2 &&
-                                  c + 1 + autoC * plCol >= mergeArr[mergeCheck].c1) {
+                                if (mergeArr[mergeCheck].contains(c + autoC * plCol, r + autoR * plRow)) {
                                     isMerged = true;
                                 }
                             }
@@ -9157,9 +9162,7 @@
                             if ((currentObj.colSpan > 1 || currentObj.rowSpan > 1) && !isMerged) {
                                 range.setOffsetLast(
                                   {offsetCol: currentObj.colSpan - 1, offsetRow: currentObj.rowSpan - 1});
-                                mergeArr[n] = {
-                                    r1: range.first.row, r2: range.last.row, c1: range.first.col, c2: range.last.col
-                                };
+                                mergeArr[n] = range.getBBox0();
                                 n++;
                                 if (contentCurrentObj[0] == undefined) {
                                     range.setValue('');
@@ -11754,7 +11757,7 @@
 					var selectionRange = t.model.selectionRange;
 					var activeCell = selectionRange.activeCell;
 					var activeCellRange = new Asc.Range(activeCell.col, activeCell.row, activeCell.col, activeCell.row);
-					var expandRange = t.model.autoFilters._getAdjacentCellsAF(activeCellRange);
+					var expandRange = t.model.autoFilters._getAdjacentCellsAF(activeCellRange, true);
 					
 					//change selection
 					t.setSelection(expandRange);

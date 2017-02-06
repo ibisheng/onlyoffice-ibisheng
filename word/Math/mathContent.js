@@ -1247,14 +1247,17 @@ CMathContent.prototype.addElementToContent = function(obj)
     this.Internal_Content_Add(this.Content.length, obj, false);
     this.CurPos = this.Content.length-1;
 };
-CMathContent.prototype.fillPlaceholders = function()
+CMathContent.prototype.SetPlaceholder = function()
 {
-    this.Content.length = 0;
+	this.Remove_FromContent(0, this.Content.length);
 
-    var oMRun = new ParaRun(null, true);
-    oMRun.fillPlaceholders();
-    this.addElementToContent(oMRun);
+    var oRun = new ParaRun(null, true);
+    oRun.AddMathPlaceholder();
 
+    this.addElementToContent(oRun);
+
+    this.Selection_Remove();
+    this.Cursor_MoveToEndPos();
 };
 //////////////////////////////////////
 CMathContent.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
@@ -1456,7 +1459,7 @@ CMathContent.prototype.Is_InclineLetter = function()
 CMathContent.prototype.IsPlaceholder = function()
 {
     var bPlh = false;
-    if(!this.bRoot && this.Content.length == 1)
+    if(this.Content.length == 1)
         bPlh  = this.Content[0].IsPlaceholder();
 
     return bPlh;
@@ -1735,43 +1738,37 @@ CMathContent.prototype.Correct_Content = function(bInnerCorrection)
         this.Add_ToContent(0, NewMathRun);
     }
 
-    // Если единственный элемент данного контента ран и он пустой, заполняем его плейсхолдером.
-    if (1 === this.Content.length && para_Math_Run === this.Content[0].Type && true === this.Content[0].Is_Empty())
-    {
-        var oPlaceHolder = new CMathText();
-        oPlaceHolder.fillPlaceholders();
-        this.Content[0].Add_ToContent(0, oPlaceHolder);
-    }
+	// Если единственный элемент данного контента ран и он пустой, заполняем его плейсхолдером
+	if (1 === this.Content.length && para_Math_Run === this.Content[0].Type && true === this.Content[0].Is_Empty())
+	{
+		this.Content[0].AddMathPlaceholder();
+	}
 
-    // не корректируем, если в контенте только один плейсхолдер
+	// Возможна ситуация, когда у нас остались лишние плейсхолдеры (либо их слишком много, либо они вообще не нужны)
+	if (true !== this.IsPlaceholder())
+	{
+		var isEmptyContent = true;
+		for (var nPos = 0, nCount = this.Content.length; nPos < nCount; ++nPos)
+		{
+			if (para_Math_Run === this.Content[nPos].Type)
+			{
+				this.Content[nPos].RemoveMathPlaceholder();
+				if (false === this.Content[nPos].Is_Empty())
+					isEmptyContent = false;
+			}
+			else
+			{
+				isEmptyContent = false;
+			}
+		}
 
-    var bOnlyPlh = this.Content.length == 1 && this.Content[0].OnlyOnePlaceholder();
+		if (isEmptyContent)
+			this.SetPlaceholder();
+	}
+};
 
-    if(bOnlyPlh == false)
-    {
-        var bEmptyContent = true;
-
-        for (var nPos = 0, nCount = this.Content.length; nPos < nCount; nPos++)
-        {
-            if(para_Math_Run === this.Content[nPos].Type)
-            {
-                this.Content[nPos].Math_Correct_Content();
-
-                if(false === this.Content[nPos].Is_Empty())
-                    bEmptyContent = false;
-            }
-            else
-            {
-                bEmptyContent = false;
-            }
-        }
-
-        if(bEmptyContent == true && this.bRoot == false)
-        {
-            this.Content[0].fillPlaceholders();
-            this.Content[0].Recalc_CompiledPr(true);
-        }
-    }
+CMathContent.prototype.IsPlaceholder = function()
+{
 
 };
 
@@ -3561,6 +3558,8 @@ CMathContent.prototype.Get_ParaContentPos = function(bSelection, bStart, Content
 	else
 	{
 		var nPos = (true !== bSelection ? this.CurPos : (false !== bStart ? this.Selection.StartPos : this.Selection.EndPos));
+		nPos = Math.max(0, Math.min(nPos, this.Content.length - 1));
+
 		ContentPos.Add(nPos);
 
 		if (undefined !== this.Content[nPos])
@@ -3576,17 +3575,20 @@ CMathContent.prototype.Set_ParaContentPos = function(ContentPos, Depth)
     if (undefined === CurPos || CurPos < 0)
     {
         this.CurPos = 0;
-        this.Content[this.CurPos].Cursor_MoveToStartPos();
+        if (this.Content[this.CurPos])
+        	this.Content[this.CurPos].Cursor_MoveToStartPos();
     }
     else if (CurPos > this.Content.length - 1)
     {
         this.CurPos = this.Content.length - 1;
-        this.Content[this.CurPos].Cursor_MoveToEndPos(false);
+        if (this.Content[this.CurPos])
+        	this.Content[this.CurPos].Cursor_MoveToEndPos(false);
     }
     else
     {
         this.CurPos = CurPos;
-        this.Content[this.CurPos].Set_ParaContentPos(ContentPos, Depth + 1);
+        if (this.Content[this.CurPos])
+        	this.Content[this.CurPos].Set_ParaContentPos(ContentPos, Depth + 1);
     }
 };
 CMathContent.prototype.Selection_IsEmpty = function()
@@ -3937,6 +3939,9 @@ CMathContent.prototype.Get_EndPos = function(BehindEnd, ContentPos, Depth)
 };
 CMathContent.prototype.Draw_HighLights = function(PDSH, bAll)
 {
+	if (!this.bRoot && this.Parent && true !== this.ParentElement.Is_ContentUse(this))
+		return;
+
     var Bound = this.Get_LineBound(PDSH.Line, PDSH.Range);
     PDSH.X    = Bound.X;
 

@@ -60,25 +60,37 @@ var MOVE_DELTA = AscFormat.MOVE_DELTA;
 var cToRad2 = (Math.PI/60000)/180;
 
 
-function CChangesDrawingsAddPathCommand(Class, oCommand, nIndex){
+function CChangesDrawingsAddPathCommand(Class, oCommand, nIndex, bReverse){
     this.Type = AscDFH.historyitem_PathAddPathCommand;
     this.Command = oCommand;
     this.Index = nIndex;
+    this.bReverse = bReverse;
     CChangesDrawingsAddPathCommand.superclass.constructor.call(this, Class);
 }
 AscCommon.extendClass(CChangesDrawingsAddPathCommand, AscDFH.CChangesBase);
 
     CChangesDrawingsAddPathCommand.prototype.Undo = function(){
-        this.Class.ArrPathCommandInfo.splice(this.Index, 1);
+        if(this.bReverse){
+            this.Class.ArrPathCommandInfo.splice(this.Index, 0, this.Command);
+        }
+        else{
+            this.Class.ArrPathCommandInfo.splice(this.Index, 1);
+        }
     };
     CChangesDrawingsAddPathCommand.prototype.Redo = function(){
-        this.Class.ArrPathCommandInfo.splice(this.Index, 0, this.Command);
+        if(this.bReverse){
+            this.Class.ArrPathCommandInfo.splice(this.Index, 1);
+        }
+        else{
+            this.Class.ArrPathCommandInfo.splice(this.Index, 0, this.Command);
+        }
     };
 
 
     CChangesDrawingsAddPathCommand.prototype.WriteToBinary = function(Writer){
         Writer.WriteLong(this.Index);
         Writer.WriteLong(this.Command.id);
+        Writer.WriteBool(!!this.bReverse);
         switch(this.Command.id){
             case moveTo:
             case lineTo:
@@ -125,6 +137,7 @@ AscCommon.extendClass(CChangesDrawingsAddPathCommand, AscDFH.CChangesBase);
         this.Index = Reader.GetLong();
         this.Command = {};
         this.Command.id = Reader.GetLong();
+        this.bReverse = Reader.GetBool();
         switch(this.Command.id){
             case moveTo:
             case lineTo:

@@ -280,7 +280,7 @@ cIFERROR.prototype.Calculate = function ( arg ) {
         arg0 = arg0.getValue();
     }
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
 
     if ( arg0 instanceof cError ) {
@@ -324,7 +324,7 @@ cNOT.prototype.Calculate = function ( arg ) {
     }
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
 
     if ( arg0 instanceof cString ) {

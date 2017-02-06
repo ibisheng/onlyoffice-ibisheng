@@ -425,6 +425,14 @@
         return false;
     };
 
+    CDrawingDocContent.prototype.Is_ChartTitleContent = function(){
+        if(this.Parent instanceof AscFormat.CTextBody &&
+        this.Parent.parent instanceof AscFormat.CTitle){
+            return true;
+        }
+        return false;
+    };
+
     CDrawingDocContent.prototype.Selection_Draw_Page = function(PageIndex){
         var CurPage = PageIndex;
         if (CurPage < 0 || CurPage >= this.Pages.length)

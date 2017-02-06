@@ -8322,24 +8322,22 @@ ParaRun.prototype.IsPlaceholder = function()
 {
     return this.Content.length == 1 && this.Content[0].IsPlaceholder();
 };
-ParaRun.prototype.fillPlaceholders = function()
+ParaRun.prototype.AddMathPlaceholder = function()
 {
-    var placeholder = new CMathText(false);
-    placeholder.fillPlaceholders();
-
-    this.Add_ToContent(0, placeholder, false);
+    var oPlaceholder = new CMathText(false);
+	oPlaceholder.SetPlaceholder();
+    this.Add_ToContent(0, oPlaceholder, false);
 };
-ParaRun.prototype.Math_Correct_Content = function()
+ParaRun.prototype.RemoveMathPlaceholder = function()
 {
-    for(var i = 0; i < this.Content.length; i++)
-    {
-        if(this.Content[i].Type == para_Math_Placeholder)
-            this.Remove_FromContent(i, 1, true);
-    }
-};
-ParaRun.prototype.OnlyOnePlaceholder = function()
-{
-    return this.Content.length == 1 && this.Content[0].Type == para_Math_Placeholder;
+	for (var nPos = 0; nPos < this.Content.length; ++nPos)
+	{
+		if (para_Math_Placeholder === this.Content[nPos].Type)
+		{
+			this.Remove_FromContent(nPos, 1, true);
+			nPos--;
+		}
+	}
 };
 ParaRun.prototype.Set_MathPr = function(MPrp)
 {
@@ -8534,6 +8532,10 @@ ParaRun.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
 ParaRun.prototype.Get_ReviewType = function()
 {
     return this.ReviewType;
+};
+ParaRun.prototype.Get_ReviewInfo = function()
+{
+	return this.ReviewInfo;
 };
 ParaRun.prototype.Get_ReviewColor = function()
 {

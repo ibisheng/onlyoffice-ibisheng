@@ -28,6 +28,10 @@
         this.Redo();
         this.RefreshRecalcData();
     };
+    CChangesDrawingsBool.prototype.CreateReverseChange = function()
+    {
+        return new this.constructor(this.Class, this.Type, this.New, this.Old, this.Color);
+    };
 
     CChangesDrawingsBool.prototype.ReadFromBinary = function (reader) {
         reader.Seek2(reader.GetCurPos() - 4);
@@ -44,7 +48,15 @@
         CChangesDrawingsLong.superclass.constructor.call(this, Class, _OldPr, _NewPr);
     }
 
+
     AscCommon.extendClass(CChangesDrawingsLong, AscDFH.CChangesBaseLongProperty);
+
+
+
+    CChangesDrawingsLong.prototype.CreateReverseChange = function()
+    {
+        return new this.constructor(this.Class, this.Type, this.New, this.Old, this.Color);
+    };
 
     CChangesDrawingsLong.prototype.private_SetValue = private_SetValue;
     CChangesDrawingsLong.prototype.Load = function(){
@@ -66,6 +78,11 @@
     }
 
     AscCommon.extendClass(CChangesDrawingsDouble, AscDFH.CChangesBaseDoubleProperty);
+
+    CChangesDrawingsDouble.prototype.CreateReverseChange = function()
+    {
+        return new this.constructor(this.Class, this.Type, this.New, this.Old, this.Color);
+    };
 
     CChangesDrawingsDouble.prototype.private_SetValue = private_SetValue;
 
@@ -91,6 +108,11 @@
 
     AscCommon.extendClass(CChangesDrawingsString, AscDFH.CChangesBaseStringProperty);
 
+    CChangesDrawingsString.prototype.CreateReverseChange = function()
+    {
+        return new this.constructor(this.Class, this.Type, this.New, this.Old, this.Color);
+    };
+
     CChangesDrawingsString.prototype.private_SetValue = private_SetValue;
 
     CChangesDrawingsString.prototype.Load = function(){
@@ -113,7 +135,12 @@
         CChangesDrawingsObjectNoId.superclass.constructor.call(this, Class, _OldPr, _NewPr);
     }
 
+
     AscCommon.extendClass(CChangesDrawingsObjectNoId, AscDFH.CChangesBaseObjectProperty);
+    CChangesDrawingsObjectNoId.prototype.CreateReverseChange = function()
+    {
+        return new this.constructor(this.Class, this.Type, this.New, this.Old, this.Color);
+    };
     CChangesDrawingsObjectNoId.prototype.private_SetValue = private_SetValue;
     CChangesDrawingsObjectNoId.prototype.Load = function(){
         this.Redo();
@@ -141,7 +168,13 @@
         CChangesDrawingsObject.superclass.constructor.call(this, Class, _OldPr, _NewPr);
     }
 
+
     AscCommon.extendClass(CChangesDrawingsObject, AscDFH.CChangesBaseStringProperty);
+
+    CChangesDrawingsObject.prototype.CreateReverseChange = function()
+    {
+        return new this.constructor(this.Class, this.Type, AscCommon.g_oTableId.Get_ById(this.New), AscCommon.g_oTableId.Get_ById(this.Old), this.Color);
+    };
     window['AscDFH'].CChangesDrawingsObject = CChangesDrawingsObject;
     CChangesDrawingsObject.prototype.ReadFromBinary = function (reader) {
         reader.Seek2(reader.GetCurPos() - 4);
@@ -175,10 +208,12 @@
         reader.Seek2(reader.GetCurPos() - 4);
         this.Type = reader.GetLong();
         this.Add = reader.GetBool();
+        this.Pos = reader.GetLong();
         CChangesDrawingsContent.superclass.ReadFromBinary.call(this, reader);
     };
     CChangesDrawingsContent.prototype.WriteToBinary = function (writer) {
         writer.WriteBool(this.IsAdd());
+        writer.WriteLong(this.Pos);
         CChangesDrawingsContent.superclass.WriteToBinary.call(this, writer);
     };
 
@@ -206,7 +241,7 @@
     };
 
     CChangesDrawingsContent.prototype.private_InsertInArrayLoad = function () {
-        if (this.PosArray.length <= 0 || this.Items.length <= 0)
+        if (this.Items.length <= 0)
             return;
 
         var aChangedArray = this.private_GetChangedArray();
@@ -214,10 +249,10 @@
             var oContentChanges = this.private_GetContentChanges(), nPos;
             for (var i = 0; i < this.Items.length; ++i) {
                 if (oContentChanges) {
-                    nPos = oContentChanges.Check(AscCommon.contentchanges_Add, this.PosArray[i]);
+                    nPos = oContentChanges.Check(AscCommon.contentchanges_Add, this.Pos + i);
                 }
                 else {
-                    nPos = this.PosArray[i];
+                    nPos = this.Pos + i;
                 }
 
                 var oElement = this.Items[i];
@@ -235,10 +270,10 @@
             var oContentChanges = this.private_GetContentChanges(), nPos;
             for (var i = 0; i < this.Items.length; ++i) {
                 if (oContentChanges) {
-                    nPos = oContentChanges.Check(AscCommon.contentchanges_Remove, this.PosArray[i]);
+                    nPos = oContentChanges.Check(AscCommon.contentchanges_Remove, this.Pos + i);
                 }
                 else {
-                    nPos = this.PosArray[i];
+                    nPos = this.Pos + i;
                 }
                 if (false === nPos) {
                     continue;
@@ -299,6 +334,23 @@
     CChangesDrawingsContent.prototype.IsContentChange = function () {
         return false;
     };
+    CChangesDrawingsContent.prototype.Copy = function()
+    {
+        var oChanges = new this.constructor(this.Class, this.Type, this.Pos, this.Items, this.Add);
+        oChanges.UseArray = this.UseArray;
+        oChanges.Pos = this.Pos;
+        for (var nIndex = 0, nCount = this.PosArray.length; nIndex < nCount; ++nIndex)
+            oChanges.PosArray[nIndex] = this.PosArray[nIndex];
+
+        return oChanges;
+    };
+
+    CChangesDrawingsContent.prototype.CreateReverseChange = function(){
+        var oRet = this.private_CreateReverseChange(CChangesDrawingsContent);
+        oRet.Type = this.Type;
+        oRet.Pos = this.Pos;
+        return oRet;
+    };
 
 
     function CChangesDrawingsContentNoId(Class, Type, Pos, Items, isAdd){
@@ -342,12 +394,12 @@
 
 
     CChangesDrawingsContentLongMap.prototype.private_InsertInArrayLoad = function () {
-        if (this.PosArray.length <= 0 || this.Items.length <= 0)
+        if (this.Items.length <= 0)
             return;
         var aChangedArray = this.private_GetChangedArray();
         if (null !== aChangedArray) {
             for (var i = 0; i < this.Items.length; ++i) {
-                aChangedArray[this.PosArray[i]] = this.Items[i];
+                aChangedArray[this.Pos + i] = this.Items[i];
             }
         }
     };
@@ -356,8 +408,8 @@
 
         var aChangedArray = this.private_GetChangedArray();
         if (null !== aChangedArray) {
-            for (var i = 0; i < this.PosArray.length; ++i) {
-                aChangedArray[this.PosArray[i]] = null;
+            for (var i = 0; i < this.Items.length; ++i) {
+                aChangedArray[this.Pos + i] = null;
             }
         }
     };
@@ -427,6 +479,9 @@
         this.RefreshRecalcData();
     };
 
+    CChangesDrawingChangeTheme.prototype.CreateReverseChange = function(){
+        return new CChangesDrawingChangeTheme(this.Class, this.Type, this.aIndexes);
+    };
 
     window['AscDFH'].CChangesDrawingChangeTheme = CChangesDrawingChangeTheme;
 
@@ -479,6 +534,10 @@
     CChangesDrawingTimingLocks.prototype.Load = function(){
         this.Redo();
         this.RefreshRecalcData();
+    };
+    CChangesDrawingTimingLocks.prototype.CreateReverseChange = function()
+    {
+        return new this.constructor(this.Class, null, null, null, null, null);
     };
 
     window['AscDFH'].CChangesDrawingTimingLocks = CChangesDrawingTimingLocks;
@@ -556,13 +615,18 @@
         this.Redo();
         this.RefreshRecalcData();
     };
+
+    CChangesSparklinesChangeData.prototype.CreateReverseChange = function(){
+        return new CChangesSparklinesChangeData(this.Class, this.NewPr, this.OldPr);
+    };
     window['AscDFH'].CChangesSparklinesChangeData = CChangesSparklinesChangeData;
 
 
 
-    function CChangesSparklinesRemoveData(Class, oSparkline){
+    function CChangesSparklinesRemoveData(Class, oSparkline, bReverse){
         this.Type = AscDFH.historyitem_Sparkline_RemoveData;
         this.sparkline = oSparkline;
+        this.bReverse = bReverse;
         CChangesSparklinesRemoveData.superclass.constructor.call(this, Class);
     }
     AscCommon.extendClass(CChangesSparklinesRemoveData, AscDFH.CChangesBase);
@@ -576,6 +640,7 @@
             Writer.WriteLong(this.sparkline.sqref.r1);
             Writer.WriteString2(this.sparkline.f);
         }
+        Writer.WriteBool(this.bReverse === true);
     };
     CChangesSparklinesRemoveData.prototype.ReadFromBinary = function(Reader){
         var bIsObject = Reader.GetLong();
@@ -586,13 +651,29 @@
             this.sparkline.sqref = new Asc.Range(col, row, col, row);
             this.sparkline.setF(Reader.GetString2());
         }
+        this.bReverse = Reader.GetBool();
     };
 
     CChangesSparklinesRemoveData.prototype.Undo = function(){
-        this.Class.arrSparklines.push(this.sparkline);
+        if(this.bReverse){
+            this.Class.remove(this.sparkline.sqref);
+        }
+        else{
+            this.Class.arrSparklines.push(this.sparkline);
+        }
+
     };
     CChangesSparklinesRemoveData.prototype.Redo = function(){
-        this.Class.remove(this.sparkline.sqref);
+        if(this.bReverse){
+            this.Class.arrSparklines.push(this.sparkline);
+        }
+        else{
+            this.Class.remove(this.sparkline.sqref);
+        }
+    };
+
+    CChangesSparklinesRemoveData.prototype.CreateReverseChange = function(){
+        return new CChangesSparklinesRemoveData(this.Class, this.sparkline, !this.bReverse);
     };
 
 
@@ -685,50 +766,60 @@
                 break;
         }
     };
+
+
+    CChangesDrawingsExcelColor.prototype.CreateReverseChange = function(){
+        return new CChangesDrawingsExcelColor(this.Class, this.Type, this.NewPr, this.OldPr);
+    };
+
     AscDFH.CChangesDrawingsExcelColor = CChangesDrawingsExcelColor;
 
-    function CChangesDrawingsSparklinesRemove(Class){
+    function CChangesDrawingsSparklinesRemove(Class, bReverse){
         this.Type = AscDFH.historyitem_Sparkline_RemoveSparkline;
+        this.bReverse = bReverse;
         CChangesDrawingsSparklinesRemove.superclass.constructor.call(this, Class);
     }
     AscCommon.extendClass(CChangesDrawingsSparklinesRemove, AscDFH.CChangesBase);
     CChangesDrawingsSparklinesRemove.prototype.Undo = function(){
         if (this.Class.worksheet) {
-            this.Class.worksheet.insertSparklineGroup(this.Class);
+            if(this.bReverse){
+                this.Class.worksheet.removeSparklineGroup(this.Class.Get_Id());
+            }
+            else{
+                this.Class.worksheet.insertSparklineGroup(this.Class);
+            }
+
         }
     };
     CChangesDrawingsSparklinesRemove.prototype.Redo = function(){
         if (this.Class.worksheet) {
-            this.Class.worksheet.removeSparklineGroup(this.Class.Get_Id());
+            if(this.bReverse){
+                this.Class.worksheet.insertSparklineGroup(this.Class);
+            }
+            else{
+                this.Class.worksheet.removeSparklineGroup(this.Class.Get_Id());
+            }
         }
     };
+
+    CChangesDrawingsSparklinesRemove.prototype.WriteToBinary = function(Writer){
+        Writer.WriteBool(!!this.bReverse);
+    };
+
+    CChangesDrawingsSparklinesRemove.prototype.ReadFromBinary = function(Reader){
+        this.bReverse = Reader.GetBool();
+    };
+
     CChangesDrawingsSparklinesRemove.prototype.Load = function(){
         this.Redo();
         this.RefreshRecalcData();
     };
+
+    CChangesDrawingsSparklinesRemove.prototype.CreateReverseChange = function(){
+        return new CChangesDrawingsSparklinesRemove(this.Class, !this.bReverse);
+    };
     window['AscDFH'].CChangesDrawingsSparklinesRemove = CChangesDrawingsSparklinesRemove;
 
-    function CChangesDrawingsSparklineRemoveData(Class, Col, Row){
-        this.Type = AscDFH.historyitem_Sparkline_RemoveData;
-        this.Col = Col;
-        this.Row = Row;
-        CChangesDrawingsSparklineRemoveData.superclass.constructor.call(this, Class);
-    }
-    CChangesDrawingsSparklineRemoveData.prototype.WriteToBinary = function(Writer){
-        Writer.WriteLong(this.Col);
-        Writer.WriteLong(this.Row);
-    };
-    CChangesDrawingsSparklineRemoveData.prototype.ReadFromBinary = function(Reader){
-        this.Col = Reader.GetLong();
-        this.Row = Reader.GetLong();
-    };
-
-    CChangesDrawingsSparklineRemoveData.prototype.Undo = function(){
-
-    };
-    CChangesDrawingsSparklineRemoveData.prototype.Redo = function(){
-        this.Class.remove(new Asc.Range(this.Col, this.Row, this.Col, this.Row));
-    };
 
 
 
