@@ -261,7 +261,7 @@ function CopyRunToPPTX(Run, Paragraph, bHyper)
     return NewRun;
 }
 
-function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent, bIsAddMath)
+function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent, bIsAddMath, bRemoveHyperlink)
 {
     var _drawing_document = isRealObject(drawingDocument) ? drawingDocument : paragraph.DrawingDocument;
     var _new_parent = isRealObject(newParent) ? newParent : paragraph.Parent;
@@ -309,7 +309,21 @@ function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent, bIsAddMat
         }
         else if(Item.Type === para_Hyperlink)
         {
-            new_paragraph.Internal_Content_Add(new_paragraph.Content.length, ConvertHyperlinkToPPTX(Item, new_paragraph), false);
+            if(bRemoveHyperlink === true)
+            {
+                for(var j = 0; j < Item.Content.length; ++j)
+                {
+                    if(Item.Content[j].Type === para_Run)
+                    {
+                        new_paragraph.Internal_Content_Add(new_paragraph.Content.length, CopyRunToPPTX(Item.Content[j], new_paragraph), false);
+                    }
+                }
+            }
+            else
+            {
+                new_paragraph.Internal_Content_Add(new_paragraph.Content.length, ConvertHyperlinkToPPTX(Item, new_paragraph), false);
+            }
+
         }
         else if(true === bIsAddMath && Item.Type === para_Math)
         {
