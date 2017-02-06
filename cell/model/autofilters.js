@@ -2544,6 +2544,18 @@
 						
 						break;
 					}
+					case c_oAscChangeTableStyleInfo.title:
+					{
+						tablePart.changeAltText(val);
+						
+						break;
+					}
+					case c_oAscChangeTableStyleInfo.description:
+					{
+						tablePart.changeAltTextSummary(val);
+						
+						break;
+					}
 				}
 				
 				//History.TurnOn();
@@ -2681,9 +2693,7 @@
 				if(cellId !== undefined)
 				{
 					var curCellId = cellId.split('af')[0];
-					var col = worksheet.getCell(new CellAddress(curCellId)).first.col - 1;
-					var row = worksheet.getCell(new CellAddress(curCellId)).first.row - 1;
-					activeRange =  new Asc.Range(col, row, col, row);
+					activeRange =  AscCommonExcel.g_oRangeCache.getAscRange(curCellId).clone();
 				}
 				
 				var ColId = null;

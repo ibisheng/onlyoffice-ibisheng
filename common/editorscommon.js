@@ -716,15 +716,18 @@ function build_local_rx(data){
 function build_rx_table_local(local){
 	rx_table_local = build_rx_table(local);
 }
-function build_rx_table(local){
-  cStrucTableLocalColumns = ( local ? local : {"h": "Headers", "d": "Data", "a": "All", "tr": "This row", "t": "Totals"} );
+function build_rx_table(local) {
+	cStrucTableLocalColumns = ( local ? local : {"h": "Headers", "d": "Data", "a": "All", "tr": "This row", "t": "Totals"} );
+	return build_rx_table_cur();
+}
+function build_rx_table_cur(){
     var loc_all = cStrucTableLocalColumns['a'],
         loc_headers = cStrucTableLocalColumns['h'],
         loc_data = cStrucTableLocalColumns['d'],
         loc_totals = cStrucTableLocalColumns['t'],
         loc_this_row = cStrucTableLocalColumns['tr'],
-        structured_tables_headata = new XRegExp('(?:\\[\\#'+loc_headers+'\\]\\,\\[\\#'+loc_data+'\\])'),
-        structured_tables_datals = new XRegExp('(?:\\[\\#'+loc_data+'\\]\\,\\[\\#'+loc_totals+'\\])' ),
+        structured_tables_headata = new XRegExp('(?:\\[\\#'+loc_headers+'\\]\\'+FormulaSeparators.functionArgumentSeparator+'\\[\\#'+loc_data+'\\])'),
+        structured_tables_datals = new XRegExp('(?:\\[\\#'+loc_data+'\\]\\'+FormulaSeparators.functionArgumentSeparator+'\\[\\#'+loc_totals+'\\])' ),
         structured_tables_userColumn = new XRegExp('(?:[' + str_namedRanges + '\\d.]|\\u0027[#\\[\\]\\u0027]|\\u0020|\\u0025)+'),
         structured_tables_reservedColumn = new XRegExp('\\#(?:'+loc_all+'|'+loc_headers+'|'+loc_totals+'|'+loc_data+'|'+loc_this_row+')|@');
 
@@ -736,7 +739,7 @@ function build_rx_table(local){
             "userColumnRange": XRegExp.build( '\\[(?<colStart>{{uc}})\\]\\:\\[(?<colEnd>{{uc}})\\]', {
                 "uc": structured_tables_userColumn
             } ),
-            "hdtcc"          : XRegExp.build( '(?<hdt>\\[{{rc}}\\]|{{hd}}|{{dt}})(?:\\,(?:\\[(?<hdtcstart>{{uc}})\\])(?:\\:(?:\\[(?<hdtcend>{{uc}})\\]))?)?', {
+            "hdtcc"          : XRegExp.build( '(?<hdt>\\[{{rc}}\\]|{{hd}}|{{dt}})(?:\\'+FormulaSeparators.functionArgumentSeparator+'(?:\\[(?<hdtcstart>{{uc}})\\])(?:\\:(?:\\[(?<hdtcend>{{uc}})\\]))?)?', {
                 "rc": structured_tables_reservedColumn,
 				"hd": structured_tables_headata,
 				"dt": structured_tables_datals,
@@ -1743,6 +1746,7 @@ parserHelper.prototype.setDigitSeparator = function( sep ){
 //		build_rx_array_local( cBoolLocal, digitSeparatorDef, null);
         rx_arraySeparators = new RegExp("^ *["+FormulaSeparators.arrayRowSeparatorDef+"\\"+FormulaSeparators.arrayColSeparatorDef+"] *");
     }
+	rx_table_local = build_rx_table_cur();
 };
   parserHelper.prototype.getColumnTypeByName = function(value) {
     var res;

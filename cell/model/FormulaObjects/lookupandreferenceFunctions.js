@@ -115,31 +115,31 @@
 			arg[3] : new cBool(true), sheetName = arg[4] ? arg[4] : new cEmpty();
 
 		if (cElementType.cellsRange === rowNumber.type || cElementType.cellsRange3D === rowNumber.type) {
-			rowNumber = rowNumber.cross(arguments[1].first);
+			rowNumber = rowNumber.cross(arguments[1].bbox);
 		} else if (cElementType.array === rowNumber.type) {
 			rowNumber = rowNumber.getElementRowCol(0, 0);
 		}
 
 		if (cElementType.cellsRange === colNumber.type || cElementType.cellsRange3D === colNumber.type) {
-			colNumber = colNumber.cross(arguments[1].first);
+			colNumber = colNumber.cross(arguments[1].bbox);
 		} else if (cElementType.array === colNumber.type) {
 			colNumber = colNumber.getElementRowCol(0, 0);
 		}
 
 		if (cElementType.cellsRange === refType.type || cElementType.cellsRange3D === refType.type) {
-			refType = refType.cross(arguments[1].first);
+			refType = refType.cross(arguments[1].bbox);
 		} else if (cElementType.array === refType.type) {
 			refType = refType.getElementRowCol(0, 0);
 		}
 
 		if (cElementType.cellsRange === A1RefType.type || cElementType.cellsRange3D === A1RefType.type) {
-			A1RefType = A1RefType.cross(arguments[1].first);
+			A1RefType = A1RefType.cross(arguments[1].bbox);
 		} else if (cElementType.array === A1RefType.type) {
 			A1RefType = A1RefType.getElementRowCol(0, 0);
 		}
 
 		if (cElementType.cellsRange === sheetName.type || cElementType.cellsRange3D === sheetName.type) {
-			sheetName = sheetName.cross(arguments[1].first);
+			sheetName = sheetName.cross(arguments[1].bbox);
 		} else if (cElementType.array === sheetName.type) {
 			sheetName = sheetName.getElementRowCol(0, 0);
 		}
@@ -243,7 +243,7 @@
 		var arg0 = arg[0];
 
 		if (cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		}
 		arg0 = arg0.tocNumber();
 
@@ -287,7 +287,7 @@
 		var arg0;
 		if (this.argumentsCurrent == 0) {
 			arg0 = arguments[1];
-			return this.value = new cNumber(arg0.getFirst().getCol());
+			return this.value = new cNumber(arg0.bbox.c1 + 1);
 		}
 		arg0 = arg[0];
 		var range;
@@ -295,7 +295,7 @@
 			cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
 			range = arg0.getRange();
 		}
-		return this.value = (range ? new cNumber(range.getFirst().getCol()) : new cError(cErrorType.bad_reference));
+		return this.value = (range ? new cNumber(range.bbox.c1 + 1) : new cError(cErrorType.bad_reference));
 	};
 	cCOLUMN.prototype.getInfo = function () {
 		return {
@@ -1020,7 +1020,7 @@
 		var arg0;
 		if (this.argumentsCurrent == 0) {
 			arg0 = arguments[1];
-			return this.value = new cNumber(arg0.getFirst().getRow());
+			return this.value = new cNumber(arg0.bbox.r1 + 1);
 		}
 		arg0 = arg[0];
 		var range;
@@ -1028,7 +1028,7 @@
 			cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
 			range = arg0.getRange();
 		}
-		return this.value = (range ? new cNumber(range.getFirst().getRow()) : new cError(cErrorType.bad_reference));
+		return this.value = (range ? new cNumber(range.bbox.r1 + 1) : new cError(cErrorType.bad_reference));
 	};
 	cROW.prototype.getInfo = function () {
 		return {

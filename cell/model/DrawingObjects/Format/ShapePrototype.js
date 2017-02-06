@@ -220,6 +220,10 @@ AscCommon.extendClass(CChangesDrawingObjectsAddToDrawingObjects, AscDFH.CChanges
         this.Pos = Reader.GetLong();
     };
 
+    CChangesDrawingObjectsAddToDrawingObjects.prototype.CreateReverseChange = function(){
+        return new CChangesDrawingObjectsRemoveFromDrawingObjects(this.Class, this.Pos);
+    };
+
     AscDFH.changesFactory[AscDFH.historyitem_AutoShapes_AddToDrawingObjects] = CChangesDrawingObjectsAddToDrawingObjects;
 function CChangesDrawingObjectsRemoveFromDrawingObjects(Class, Pos){
     this.Type = AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects;
@@ -238,6 +242,10 @@ AscCommon.extendClass(CChangesDrawingObjectsRemoveFromDrawingObjects, AscDFH.CCh
     };
     CChangesDrawingObjectsRemoveFromDrawingObjects.prototype.ReadFromBinary = function(Reader){
         this.Pos = Reader.GetLong();
+    };
+
+    CChangesDrawingObjectsRemoveFromDrawingObjects.prototype.CreateReverseChange = function(){
+        return new CChangesDrawingObjectsAddToDrawingObjects(this.Class, this.Pos);
     };
 
     AscDFH.changesFactory[AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects] = CChangesDrawingObjectsRemoveFromDrawingObjects;

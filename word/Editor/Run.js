@@ -8535,6 +8535,10 @@ ParaRun.prototype.Get_ReviewType = function()
 {
     return this.ReviewType;
 };
+ParaRun.prototype.Get_ReviewInfo = function()
+{
+	return this.ReviewInfo;
+};
 ParaRun.prototype.Get_ReviewColor = function()
 {
     if (this.ReviewInfo)

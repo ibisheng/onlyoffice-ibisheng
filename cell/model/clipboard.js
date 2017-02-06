@@ -1124,7 +1124,10 @@
 			_convertBeforeInsertIntoShapeContent: function(worksheet, content, isConvertToPPTX, target_doc_content)
 			{
 				var elements = [], selectedElement, element;
-				
+				var bRemoveHyperlink = false;
+				if(target_doc_content && target_doc_content.Is_ChartTitleContent && target_doc_content.Is_ChartTitleContent()){
+					bRemoveHyperlink = true;
+				}
 				for(var i = 0; i < content.length; i++)
 				{
 					selectedElement = new CSelectedElement();
@@ -1132,7 +1135,7 @@
 					
 					if(type_Paragraph === element.GetType())//paragraph
 					{
-						selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element, worksheet.model.DrawingDocument, target_doc_content, true);
+						selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element, worksheet.model.DrawingDocument, target_doc_content, true, bRemoveHyperlink);
 						elements.push(selectedElement);
 					}
 					else if(type_Table === element.GetType())//table
@@ -1143,7 +1146,7 @@
 						for(var j = 0; j < paragraphs.length; j++)
 						{
 							selectedElement = new CSelectedElement();
-							selectedElement.Element = AscFormat.ConvertParagraphToPPTX(paragraphs[j], worksheet.model.DrawingDocument, target_doc_content);
+							selectedElement.Element = AscFormat.ConvertParagraphToPPTX(paragraphs[j], worksheet.model.DrawingDocument, target_doc_content, true, bRemoveHyperlink);
 							elements.push(selectedElement);
 						}
 					}

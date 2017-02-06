@@ -6124,6 +6124,17 @@ TablePart.prototype.checkTotalRowFormula = function(ws)
 	}
 };
 
+TablePart.prototype.changeAltText = function(val)
+{
+	this.altText = val;
+};
+
+TablePart.prototype.changeAltTextSummary = function(val)
+{
+	this.altTextSummary = val;
+};
+
+
 /** @constructor */
 function AutoFilter() {
 	this.Ref = null;

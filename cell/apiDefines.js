@@ -229,7 +229,9 @@ var c_oAscChangeTableStyleInfo = {
 	rowHeader: 4,
 	rowTotal: 5,
 	rowBanded: 6,
-	filterButton: 7
+	filterButton: 7,
+	title: 8,
+	description: 9
 };
 
 // Состояние редактора ячейки

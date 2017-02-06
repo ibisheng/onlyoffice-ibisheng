@@ -550,6 +550,10 @@
     CGraphicObjectBase.prototype.getAllRasterImages = function(mapUrl){
     };
 
+    CGraphicObjectBase.prototype.checkCorrect = function(){
+        return true;
+    };
+
     CGraphicObjectBase.prototype.setDrawingBaseType = function(nType){
         if(this.drawingBase){
             History.Add(new AscDFH.CChangesDrawingsLong(this, AscDFH.historyitem_AutoShapes_SetDrawingBaseType, this.drawingBase.Type, nType));

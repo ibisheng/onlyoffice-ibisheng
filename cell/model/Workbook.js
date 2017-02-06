@@ -5330,8 +5330,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		}
 		else if (val.type == cElementType.cellsRange || val.type == cElementType.cellsRange3D) {
 			var nF = val.numFormat;
-			val = val.cross(new CellAddress(this.nRow, this.nCol, 0), this.ws.getId());
-//		val = val.getElementByCell(new CellAddress(cell));
+			val = val.cross(new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), this.ws.getId());
 			val.numFormat = nF;
 		}
 		this.formulaParsed.value = val;
@@ -5394,9 +5393,6 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 	function Range(worksheet, r1, c1, r2, c2){
 		this.worksheet = worksheet;
 		this.bbox = new Asc.Range(c1, r1, c2, r2);
-		//first last устарели, не убраны только для совместимости
-		this.first = new CellAddress(this.bbox.r1, this.bbox.c1, 0);
-		this.last = new CellAddress(this.bbox.r2, this.bbox.c2, 0);
 	}
 	Range.prototype.createFromBBox=function(worksheet, bbox){
 		var oRes = new Range(worksheet, bbox.r1, bbox.c1, bbox.r2, bbox.c2);
@@ -5407,12 +5403,6 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		if(!oNewWs)
 			oNewWs = this.worksheet;
 		return this.createFromBBox(oNewWs, this.bbox);
-	};
-	Range.prototype.getFirst=function(){
-		return this.first;
-	};
-	Range.prototype.getLast=function(){
-		return this.last;
 	};
 	Range.prototype._foreach=function(action){
 		if(null != action)
@@ -5745,12 +5735,12 @@ Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 		return 	cell.nRow >= this.bbox.r1 && cell.nCol >= this.bbox.c1 &&
 			cell.nRow <= this.bbox.r2 && cell.nCol <= this.bbox.c2;
 	};
-	Range.prototype.cross = function(cellAddress){
+	Range.prototype.cross = function(bbox){
 
-		if( cellAddress.getRow0() >= this.bbox.r1 && cellAddress.getRow0() <= this.bbox.r2 && this.bbox.c1 == this.bbox.c2)
-			return {r:cellAddress.getRow()};
-		if( cellAddress.getCol0() >= this.bbox.c1 && cellAddress.getCol0() <= this.bbox.c2 && this.bbox.r1 == this.bbox.r2)
-			return {c:cellAddress.getCol()};
+		if( bbox.r1 >= this.bbox.r1 && bbox.r1 <= this.bbox.r2 && this.bbox.c1 == this.bbox.c2)
+			return {r:bbox.r1 + 1};
+		if( bbox.c1 >= this.bbox.c1 && bbox.c1 <= this.bbox.c2 && this.bbox.r1 == this.bbox.r2)
+			return {c:bbox.c1 + 1};
 
 		return undefined;
 	};
@@ -5766,18 +5756,6 @@ Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 	Range.prototype.isOneCell=function(){
 		var oBBox = this.bbox;
 		return oBBox.r1 == oBBox.r2 && oBBox.c1 == oBBox.c2;
-	};
-	Range.prototype.isColumn = function(){
-		if(this.first.getRow() == 1 && this.last.getRow() == AscCommon.gc_nMaxRow)
-			return true;
-		else
-			return false;
-	};
-	Range.prototype.isRow = function(){
-		if(this.first.getCol() == 1 && this.last.getCol() == AscCommon.gc_nMaxCol)
-			return true;
-		else
-			return false;
 	};
 	Range.prototype.getBBox=function(){
 		//1 - based
@@ -6755,17 +6733,16 @@ Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 		}
 		return g_oDefaultFormat.Fill.bg;
 	};
-	Range.prototype.getBorderSrc=function(_cell){
+	Range.prototype.getBorderSrc=function(opt_row, opt_col){
 		//Возвращает как записано в файле, не проверяя бордеры соседних ячеек
 		//формат
 		//\{"l": {"s": "solid", "c": 0xff0000}, "t": {} ,"r": {} ,"b": {} ,"d": {},"dd": false ,"du": false }
 		//"s" values: none, thick, thin, medium, dashDot, dashDotDot, dashed, dotted, double, hair, mediumDashDot, mediumDashDotDot, mediumDashed, slantDashDot
 		//"dd" diagonal line, starting at the top left corner of the cell and moving down to the bottom right corner of the cell
 		//"du" diagonal line, starting at the bottom left corner of the cell and moving up to the top right corner of the cell
-		if(null == _cell)
-			_cell = this.getFirst();
-		var nRow = _cell.getRow0();
-		var nCol = _cell.getCol0();
+		var nRow = null != opt_row ? opt_row : this.bbox.r1;
+		var nCol = null != opt_col ? opt_col : this.bbox.c1;
+
 		var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 		if(null != cell)
 		{
@@ -6785,15 +6762,14 @@ Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 		}
 		return g_oDefaultFormat.Border;
 	};
-	Range.prototype.getBorder=function(_cell){
-		//_cell - optional
+	Range.prototype.getBorder=function(opt_row, opt_col){
 		//Возвращает как записано в файле, не проверяя бордеры соседних ячеек
 		//формат
 		//\{"l": {"s": "solid", "c": 0xff0000}, "t": {} ,"r": {} ,"b": {} ,"d": {},"dd": false ,"du": false }
 		//"s" values: none, thick, thin, medium, dashDot, dashDotDot, dashed, dotted, double, hair, mediumDashDot, mediumDashDotDot, mediumDashed, slantDashDot
 		//"dd" diagonal line, starting at the top left corner of the cell and moving down to the bottom right corner of the cell
 		//"du" diagonal line, starting at the bottom left corner of the cell and moving up to the top right corner of the cell
-		var oRes = this.getBorderSrc(_cell);
+		var oRes = this.getBorderSrc(opt_row, opt_col);
 		if(null != oRes)
 			return oRes;
 		else
@@ -6807,30 +6783,30 @@ Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 		//
 		//"dd" diagonal line, starting at the top left corner of the cell and moving down to the bottom right corner of the cell
 		//"du" diagonal line, starting at the bottom left corner of the cell and moving up to the top right corner of the cell
-		var borders = this.getBorder(this.getFirst()).clone();
+		var borders = this.getBorder(this.bbox.r1, this.bbox.c1).clone();
 		var nRow = this.bbox.r1;
 		var nCol = this.bbox.c1;
 		if(c_oAscBorderStyles.None === borders.l.s){
 			if(nCol > 1){
-				var left = this.getBorder(new CellAddress(nRow, nCol - 1, 0));
+				var left = this.getBorder(nRow, nCol - 1);
 				if(c_oAscBorderStyles.None !== left.r.s)
 					borders.l = left.r;
 			}
 		}
 		if(c_oAscBorderStyles.None === borders.t.s){
 			if(nRow > 1){
-				var top = this.getBorder(new CellAddress(nRow - 1, nCol, 0));
+				var top = this.getBorder(nRow - 1, nCol);
 				if(c_oAscBorderStyles.None !== top.b.s)
 					borders.t = top.b;
 			}
 		}
 		if(c_oAscBorderStyles.None === borders.r.s){
-			var right = this.getBorder(new CellAddress(nRow, nCol + 1, 0));
+			var right = this.getBorder(nRow, nCol + 1);
 			if(c_oAscBorderStyles.None !== right.l.s)
 				borders.r = right.l;
 		}
 		if(c_oAscBorderStyles.None === borders.b.s){
-			var bottom = this.getBorder(new CellAddress(nRow + 1, nCol, 0));
+			var bottom = this.getBorder(nRow + 1, nCol);
 			if(c_oAscBorderStyles.None !== bottom.t.s)
 				borders.b = bottom.t;
 		}
@@ -7641,8 +7617,6 @@ Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 		this.bbox.r2 += offset.offsetRow;
 		if( this.bbox.r2 < 0 )
 			this.bbox.r2 = 0;
-		this.first = new CellAddress(this.bbox.r1, this.bbox.c1, 0);
-		this.last = new CellAddress(this.bbox.r2, this.bbox.c2, 0);
 	};
 	Range.prototype.setOffsetFirst=function(offset){//offset = {offsetCol:intNumber, offsetRow:intNumber}
 		this.bbox.c1 += offset.offsetCol;
@@ -7651,7 +7625,6 @@ Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 		this.bbox.r1 += offset.offsetRow;
 		if( this.bbox.r1 < 0 )
 			this.bbox.r1 = 0;
-		this.first = new CellAddress(this.bbox.r1, this.bbox.c1, 0);
 	};
 	Range.prototype.setOffsetLast=function(offset){//offset = {offsetCol:intNumber, offsetRow:intNumber}
 		this.bbox.c2 += offset.offsetCol;
@@ -7660,7 +7633,6 @@ Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 		this.bbox.r2 += offset.offsetRow;
 		if( this.bbox.r2 < 0 )
 			this.bbox.r2 = 0;
-		this.last = new CellAddress(this.bbox.r2, this.bbox.c2, 0);
 	};
 	Range.prototype.intersect=function(range){
 		var oBBox1 = this.bbox;

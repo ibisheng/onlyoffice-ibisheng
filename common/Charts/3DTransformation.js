@@ -1402,7 +1402,8 @@ Processor3D.prototype._calculateCameraDiffZX = function (newPoints)
 	
 };
 
-Processor3D.prototype.checkOutSideArea = function(newPoints)
+//TODO если будут проблемы при маштабировании, вернуть функцию checkOutSideArea2 вместо checkOutSideArea
+Processor3D.prototype.checkOutSideArea2 = function(newPoints)
 {
 	var i = 0;
 	var maxI = 1000;
@@ -1481,6 +1482,116 @@ Processor3D.prototype.checkOutSideArea = function(newPoints)
 	
 };
 
+Processor3D.prototype.checkOutSideArea = function(newPoints)
+{
+	var t = this;
+	
+	var heightChart = this.heightCanvas - this.top - this.bottom;
+	var widthChart = this.widthCanvas - this.left - this.right;	
+	var DELTA = 3;
+	var maxCount = 1000;
+	var calculateZ = function()
+	{
+		var minMaxOx = t._getMinMaxOxPoints(newPoints, -t.cameraDiffZ);
+		t.cameraDiffX = -minMaxOx.diffX;
+		var x111 = t.convertAndTurnPoint(minMaxOx.tempX1, minMaxOx.tempY1, minMaxOx.tempZ1);
+		var x222 = t.convertAndTurnPoint(minMaxOx.tempX2, minMaxOx.tempY2, minMaxOx.tempZ2);
+		
+		var diffX = Math.abs(x222.x - x111.x);
+		
+		var minMaxOy = t._getMinMaxOyPoints(newPoints, t.cameraDiffZ);
+		t.cameraDiffY = -minMaxOy.diffY;
+		var y111 = t.convertAndTurnPoint(minMaxOy.tempX1, minMaxOy.tempY1, minMaxOy.tempZ1);
+		var y222 = t.convertAndTurnPoint(minMaxOy.tempX2, minMaxOy.tempY2, minMaxOy.tempZ2);
+		
+		var diffY = Math.abs(y222.y - y111.y);
+
+		if(diffX <= widthChart && diffY <= heightChart && ((widthChart - diffX) < DELTA ||  (heightChart - diffY) < DELTA))
+		{
+			return;
+        }
+
+        var count = 0;
+        var fStart = t.cameraDiffZ ? t.cameraDiffZ : 1;
+        var fLeftDiffZ, fRightDiffZ;
+        if(diffX < widthChart && diffY < heightChart)
+		{
+            fLeftDiffZ = 0;
+            fRightDiffZ = t.cameraDiffZ;
+		}
+		else
+		{
+            fLeftDiffZ = t.cameraDiffZ;
+            while (diffX >= widthChart || diffY >= heightChart)
+			{
+                count++;
+                t.cameraDiffZ += fStart/2;
+                minMaxOx = t._getMinMaxOxPoints(newPoints, -t.cameraDiffZ);
+                t.cameraDiffX = -minMaxOx.diffX;
+                x111 = t.convertAndTurnPoint(minMaxOx.tempX1, minMaxOx.tempY1, minMaxOx.tempZ1);
+                x222 = t.convertAndTurnPoint(minMaxOx.tempX2, minMaxOx.tempY2, minMaxOx.tempZ2);
+                diffX = Math.abs(x222.x - x111.x);
+                minMaxOy = t._getMinMaxOyPoints(newPoints, t.cameraDiffZ);
+                t.cameraDiffY = -minMaxOy.diffY;
+                y111 = t.convertAndTurnPoint(minMaxOy.tempX1, minMaxOy.tempY1, minMaxOy.tempZ1);
+                y222 = t.convertAndTurnPoint(minMaxOy.tempX2, minMaxOy.tempY2, minMaxOy.tempZ2);
+                diffY = Math.abs(y222.y - y111.y);
+				
+				if(count > maxCount)
+				{
+					return;
+				}
+            }
+            if(diffX <= widthChart && diffY <= heightChart && ((widthChart - diffX) < DELTA ||  (heightChart - diffY) < DELTA))
+			{
+                return;
+            }
+            fRightDiffZ = t.cameraDiffZ;
+        }
+		
+		
+		while((diffX > widthChart || diffY > heightChart) || (fRightDiffZ - fLeftDiffZ) > DELTA)
+		{
+            t.cameraDiffZ = fLeftDiffZ + ((fRightDiffZ - fLeftDiffZ)/2);
+
+            count++;
+            minMaxOx = t._getMinMaxOxPoints(newPoints, -t.cameraDiffZ);
+            t.cameraDiffX = -minMaxOx.diffX;
+            var x111 = t.convertAndTurnPoint(minMaxOx.tempX1, minMaxOx.tempY1, minMaxOx.tempZ1);
+            var x222 = t.convertAndTurnPoint(minMaxOx.tempX2, minMaxOx.tempY2, minMaxOx.tempZ2);
+
+
+            var diffX = Math.abs(x222.x - x111.x);
+
+            var minMaxOy = t._getMinMaxOyPoints(newPoints, t.cameraDiffZ);
+            t.cameraDiffY = -minMaxOy.diffY;
+            var y111 = t.convertAndTurnPoint(minMaxOy.tempX1, minMaxOy.tempY1, minMaxOy.tempZ1);
+            var y222 = t.convertAndTurnPoint(minMaxOy.tempX2, minMaxOy.tempY2, minMaxOy.tempZ2);
+
+            var diffY = Math.abs(y222.y - y111.y);
+			if(diffX < widthChart && diffY < heightChart)
+			{
+				if(((widthChart - diffX) < DELTA) || ((heightChart - diffY) < DELTA))
+				{
+					break;
+				}
+                fRightDiffZ = t.cameraDiffZ;
+			}
+			else 
+			{
+                fLeftDiffZ = t.cameraDiffZ;
+			}
+			
+			if(count > maxCount)
+			{
+				return;
+			}
+        }
+	};
+	
+	calculateZ();
+	
+};
 
 Processor3D.prototype._getMinMaxOxPoints = function(points, minZ)
 {

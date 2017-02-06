@@ -1649,6 +1649,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_ElementByPos = function(
         return this;
 
     var CurPos = ContentPos.Get(Depth);
+    if (!this.Content[CurPos])
+    	return null;
+
     return this.Content[CurPos].Get_ElementByPos(ContentPos, Depth + 1);
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_PosByDrawing = function(Id, ContentPos, Depth)

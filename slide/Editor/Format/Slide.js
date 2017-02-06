@@ -92,10 +92,6 @@ AscDFH.drawingContentChanges[AscDFH.historyitem_SlideRemoveFromSpTree     ] = fu
 AscDFH.drawingContentChanges[AscDFH.historyitem_SlideCommentsAddComment   ] =
 AscDFH.drawingContentChanges[AscDFH.historyitem_SlideCommentsRemoveComment] = function(oClass){return oClass.comments;};
 
-AscDFH.changesFactory[AscDFH.historyitem_SlideSetTiming            ] = AscDFH.CChangesDrawingsObjectNoId;
-AscDFH.changesFactory[AscDFH.historyitem_SlideSetSize              ] = AscDFH.CChangesDrawingsObjectNoId;
-AscDFH.changesFactory[AscDFH.historyitem_SlideSetBg                ] = AscDFH.CChangesDrawingsObjectNoId;
-
 AscDFH.drawingsConstructorsMap[AscDFH.historyitem_SlideSetSize              ] = AscFormat.CDrawingBaseCoordsWritable;
 AscDFH.drawingsConstructorsMap[AscDFH.historyitem_SlideSetBg                ] = AscFormat.CBg;
 

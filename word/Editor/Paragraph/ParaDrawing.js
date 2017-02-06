@@ -215,6 +215,17 @@ ParaDrawing.prototype.Search_GetId = function(bNext, bCurrent)
 		return this.GraphicObj.Search_GetId(bNext, bCurrent);
 	return null;
 };
+
+ParaDrawing.prototype.CheckCorrect = function(){
+	if(!this.GraphicObj){
+		return false;
+	}
+	if(this.GraphicObj && this.GraphicObj.checkCorrect){
+		return this.GraphicObj.checkCorrect();
+	}
+	return true;
+};
+
 ParaDrawing.prototype.Get_AllDrawingObjects = function(DrawingObjects)
 {
 	if (null == DrawingObjects)
@@ -1365,7 +1376,7 @@ ParaDrawing.prototype.Get_ParentParagraph = function()
 		return this.Parent.Paragraph;
 	return null;
 };
-ParaDrawing.prototype.Add_ToDocument = function(NearPos, bRecalculate, RunPr)
+ParaDrawing.prototype.Add_ToDocument = function(NearPos, bRecalculate, RunPr, Run)
 {
 	NearPos.Paragraph.Check_NearestPos(NearPos);
 
@@ -1375,8 +1386,11 @@ ParaDrawing.prototype.Add_ToDocument = function(NearPos, bRecalculate, RunPr)
 	var DrawingRun = new ParaRun(Para);
 	DrawingRun.Add_ToContent(0, this);
 
-	if (undefined !== RunPr)
+	if (RunPr)
 		DrawingRun.Set_Pr(RunPr.Copy());
+
+	if (Run)
+		DrawingRun.Set_ReviewTypeWithInfo(Run.Get_ReviewType(), Run.Get_ReviewInfo());
 
 	Para.Add_ToContent(0, DrawingRun);
 
