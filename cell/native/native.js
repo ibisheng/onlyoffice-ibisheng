@@ -3229,6 +3229,9 @@ function OfflineEditor () {
             if (-1 !== index) {
                 if (isColHeader) {
                     if (w < this.width_1px) {
+                        if (style !== kHeaderDefault) {
+                            return;
+                        }
                         // Это невидимый столбец
                         isZeroHeader = true;
                         // Отрисуем только границу
@@ -3245,6 +3248,9 @@ function OfflineEditor () {
                     }
                 } else {
                     if (h < this.height_1px) {
+                        if (style !== kHeaderDefault) {
+                            return;
+                        }
                         // Это невидимая строка
                         isZeroHeader = true;
                         // Отрисуем только границу
@@ -3261,37 +3267,37 @@ function OfflineEditor () {
                     }
                 }
             }
-
+            
             var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
             var st = this.settings.header.style[style];
             var x2 = x + w;
             var y2 = y + h;
             var x2WithoutBorder = x2 - this.width_1px;
             var y2WithoutBorder = y2 - this.height_1px;
-
+            
             // background только для видимых
             if (!isZeroHeader) {
                 // draw background
                 ctx.setFillStyle(st.background)
-                    .fillRect(x, y, w + 20, h + 20);
+                .fillRect(x, y, w + 5, h + 5);
             }
             // draw border
             ctx.setStrokeStyle(st.border)
-                .setLineWidth(1)
-                .beginPath();
+            .setLineWidth(1)
+            .beginPath();
             if (style !== kHeaderDefault && !isColHeader) {
                 // Select row (top border)
-                ctx.lineHorPrevPx(x, y, x2);
+            //    ctx.lineHorPrevPx(x, y, x2);
             }
-
+            
             // Right border
-            if (isColHeader) ctx.lineVerPrevPx(x2, y, y2);
+            if (isColHeader) ctx.lineVerPrevPx(x2, y, y2 + 5);
             // Bottom border
-            if (!isColHeader)ctx.lineHorPrevPx(x, y2, x2);
-
+            if (!isColHeader) ctx.lineHorPrevPx(x, y2, x2 + 5);
+            
             if (style !== kHeaderDefault && isColHeader) {
                 // Select col (left border)
-                //ctx.lineVerPrevPx(x, y, y2);
+                ctx.lineVerPrevPx(x, y, y2);
             }
             ctx.stroke();
 
@@ -3300,58 +3306,57 @@ function OfflineEditor () {
                 return;
 
             // draw text
-            var text  = isColHeader ? this._getColumnTitle(index) : this._getRowTitle(index);
-            var sr    = this.stringRender;
-            var tm    = this._roundTextMetrics( sr.measureString(text) );
-            var bl    = y2WithoutBorder - (isColHeader ? this.defaultRowDescender : this.rows[index].descender);
+            var text = isColHeader ? this._getColumnTitle(index) : this._getRowTitle(index);
+            var sr = this.stringRender;
+            var tm = this._roundTextMetrics(sr.measureString(text));
+            var bl = y2WithoutBorder - (isColHeader ? this.defaultRowDescender : this.rows[index].descender);
             var textX = this._calcTextHorizPos(x, x2WithoutBorder, tm, tm.width < w ? AscCommon.align_Center : AscCommon.align_Left);
             var textY = this._calcTextVertPos(y, y2WithoutBorder, bl, tm, Asc.c_oAscVAlign.Bottom);
             if (drawingCtx) {
                 ctx.AddClipRect(x, y, w, h);
                 ctx.setFillStyle(st.color)
-                    .fillText(text, textX, textY + tm.baseline, undefined, sr.charWidths);
+                .fillText(text, textX, textY + tm.baseline, undefined, sr.charWidths);
                 ctx.RemoveClipRect();
             } else {
                 ctx.save()
-                    .beginPath()
-                    .rect(x, y, w, h)
-                    .clip()
-                    .setFillStyle(st.color)
-                    .fillText(text, textX, textY + tm.baseline, undefined, sr.charWidths)
-                    .restore();
+                .beginPath()
+                .rect(x, y, w, h)
+                .clip()
+                .setFillStyle(st.color)
+                .fillText(text, textX, textY + tm.baseline, undefined, sr.charWidths)
+                .restore();
             }
         };
-
+        
         AscCommonExcel.WorksheetView.prototype.__drawRowHeaders = function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
-            if (undefined === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders())
+            if (undefined === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders()) {
                 return;
-
-            var range = new asc_Range(0, start, 1, end);
-            this._prepareCellTextMetricsCache(range);
-
-            var vr  = this.visibleRange;
+            }
+            var vr = this.visibleRange;
             var r = this.rows;
             var offsetX = (undefined !== offsetXForDraw) ? offsetXForDraw : this.headersLeft;
             var offsetY = (undefined !== offsetYForDraw) ? offsetYForDraw : r[vr.r1].top - this.cellsTop;
             if (undefined === drawingCtx && this.topLeftFrozenCell && undefined === offsetYForDraw) {
                 var rFrozen = this.topLeftFrozenCell.getRow0();
-                if (start < vr.r1)
+                if (start < vr.r1) {
                     offsetY = r[0].top - this.cellsTop;
-                else
+                } else {
                     offsetY -= r[rFrozen].top - r[0].top;
+                }
             }
-
-            if (asc_typeof(start) !== "number") {start = vr.r1;}
-            if (asc_typeof(end) !== "number") {end = vr.r2;}
-            if (style === undefined) {style = kHeaderDefault;}
-
+            
+            if (asc_typeof(start) !== "number") {
+                start = vr.r1;
+            }
+            if (asc_typeof(end) !== "number") {
+                end = vr.r2;
+            }
+            if (style === undefined) {
+                style = kHeaderDefault;
+            }
+            
             this._setFont(drawingCtx, this.model.getDefaultFontName(), this.model.getDefaultFontSize());
-
-            var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
-            var st = this.settings.header.style[style];
-            ctx.setFillStyle(st.border)
-                .fillRect(offsetX, -offsetY, this.headersWidth * 2, r[end].top - r[start].top);
-
+            
             // draw row headers
             for (var i = start; i <= end; ++i) {
                 this.__drawHeader(drawingCtx, offsetX, r[i].top - r[start].top - offsetY,
