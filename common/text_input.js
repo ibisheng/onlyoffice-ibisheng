@@ -165,6 +165,8 @@
 
 		this.virtualKeyboardClickTimeout = -1;
 		this.virtualKeyboardClickPrevent = false;
+
+		this.AndroidKeyboardDetectBackspace = false;
 	}
 
 	CTextInput.prototype =
@@ -256,6 +258,7 @@
 			};
 			this.HtmlArea["onkeypress"] = function(e)
 			{
+				oThis.AndroidKeyboardDetectBackspace = false;
 			    if (oThis.IsDisableKeyPress == true)
 			    {
 			        // macOS Sierra send keypress before copy event
@@ -274,27 +277,33 @@
 
 			this.HtmlArea.addEventListener("input", function(e)
 			{
+				oThis.AndroidKeyboardDetectBackspace = false;
 				return oThis.onInput(e);
 			}, false);
 			this.HtmlArea.addEventListener("textInput", function(e)
 			{
+				oThis.AndroidKeyboardDetectBackspace = false;
 				return oThis.onTextInput(e);
 			}, false);
 			this.HtmlArea.addEventListener("text", function(e)
 			{
+				oThis.AndroidKeyboardDetectBackspace = false;
 				return oThis.onTextInput(e);
 			}, false);
 
 			this.HtmlArea.addEventListener("compositionstart", function(e)
 			{
+				oThis.AndroidKeyboardDetectBackspace = false;
 				return oThis.onCompositionStart(e);
 			}, false);
 			this.HtmlArea.addEventListener("compositionupdate", function(e)
 			{
+				oThis.AndroidKeyboardDetectBackspace = false;
 				return oThis.onCompositionUpdate(e);
 			}, false);
 			this.HtmlArea.addEventListener("compositionend", function(e)
 			{
+				oThis.AndroidKeyboardDetectBackspace = false;
 				return oThis.onCompositionEnd(e);
 			}, false);
 
@@ -1001,6 +1010,12 @@
 
 		onKeyDown : function(e)
 		{
+			if (AscCommon.AscBrowser.isAndroid)
+			{
+				if (e.keyCode == 229 && e.charCode == 0 && e.key == "Unidentified")
+					this.AndroidKeyboardDetectBackspace = true;
+			}
+
 			this.isChromeKeysNoKeyPressPresent = false;
 			if (this.isSystem && this.isShow)
 			{
@@ -1096,6 +1111,9 @@
 		onKeyUp : function(e)
 		{
 			this.isChromeKeysNoKeyPressPresent = false;
+			var oldAndroidKeyboardDetectBackspace = this.AndroidKeyboardDetectBackspace;
+			this.AndroidKeyboardDetectBackspace = false;
+
 			if (this.isSystem && this.isShow)
 				return;
 
@@ -1114,7 +1132,19 @@
 			}
 
 			if (c_oCompositionState.end == this.compositionState)
+			{
+				if (AscCommon.AscBrowser.isAndroid && oldAndroidKeyboardDetectBackspace)
+				{
+					if (e.keyCode == 229 && e.charCode == 0 && e.key == "Unidentified")
+					{
+						// backspace? по-другому определить не могу
+						this.emulateKeyDownApi(8);
+						return false;
+					}
+				}
+
 				return this.Api.onKeyUp(e);
+			}
 
 			if (AscCommon.AscBrowser.isChrome ||
 				AscCommon.AscBrowser.isSafari ||
