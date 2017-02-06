@@ -2673,7 +2673,7 @@ Paragraph.prototype =
                 this.Content[StartPos].Remove(nCount, bOnAddText);
 
                 // Мы не удаляем последний элемент с ParaEnd
-                if (StartPos <= this.Content.length - 2  && true === this.Content[StartPos].Is_Empty() && true !== this.Content[StartPos].Is_CheckingNearestPos() && nCount > -1 && true !== bOnAddText)
+                if (StartPos <= this.Content.length - 2  && true === this.Content[StartPos].Is_Empty() && true !== this.Content[StartPos].Is_CheckingNearestPos() && ((nCount > -1 && true !== bOnAddText) || para_Run !== this.Content[StartPos].Type))
                 {
                     if ( this.Selection.StartPos === this.Selection.EndPos )
                         this.Selection.Use = false;

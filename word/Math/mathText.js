@@ -684,7 +684,7 @@ CMathText.prototype.private_getCode = function()
 
     return code;
 };
-CMathText.prototype.fillPlaceholders = function()
+CMathText.prototype.SetPlaceholder = function()
 {
     this.Type = para_Math_Placeholder;
     this.value = StartTextElement;

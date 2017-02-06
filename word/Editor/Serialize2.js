@@ -10241,7 +10241,7 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
 				{
 					var oContentElem = oEqArr.Content[j];
 					if (oContentElem.Content.length == 0)
-						oContentElem.fillPlaceholders();
+						oContentElem.SetPlaceholder();
 				}
 				oEqArr.setJustificationForConversion(props.mcJc);
 			}		
