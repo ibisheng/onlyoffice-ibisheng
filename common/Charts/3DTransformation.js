@@ -1536,6 +1536,11 @@ Processor3D.prototype.checkOutSideArea = function(newPoints)
                 y111 = t.convertAndTurnPoint(minMaxOy.tempX1, minMaxOy.tempY1, minMaxOy.tempZ1);
                 y222 = t.convertAndTurnPoint(minMaxOy.tempX2, minMaxOy.tempY2, minMaxOy.tempZ2);
                 diffY = Math.abs(y222.y - y111.y);
+				
+				if(count > maxCount)
+				{
+					return;
+				}
             }
             if(diffX <= widthChart && diffY <= heightChart && ((widthChart - diffX) < DELTA ||  (heightChart - diffY) < DELTA))
 			{
@@ -1576,12 +1581,12 @@ Processor3D.prototype.checkOutSideArea = function(newPoints)
 			{
                 fLeftDiffZ = t.cameraDiffZ;
 			}
+			
+			if(count > maxCount)
+			{
+				return;
+			}
         }
-		
-		if(count > maxCount)
-		{
-			return;
-		}
 	};
 	
 	calculateZ();
