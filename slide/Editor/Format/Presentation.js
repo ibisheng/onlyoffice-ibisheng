@@ -393,6 +393,7 @@ AscDFH.drawingContentChanges[AscDFH.historyitem_Presentation_RemoveSlide] = func
 AscDFH.drawingContentChanges[AscDFH.historyitem_Presentation_AddSlideMaster] = function(oClass){return oClass.slideMasters;};
 
 AscDFH.drawingsConstructorsMap[AscDFH.historyitem_Presentation_SetShowPr] = CShowPr;
+AscDFH.drawingsConstructorsMap[AscDFH.historyitem_Presentation_SlideSize] = AscFormat.CDrawingBaseCoordsWritable
 
 function CPresentation(DrawingDocument)
 {

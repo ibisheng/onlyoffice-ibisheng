@@ -215,6 +215,17 @@ ParaDrawing.prototype.Search_GetId = function(bNext, bCurrent)
 		return this.GraphicObj.Search_GetId(bNext, bCurrent);
 	return null;
 };
+
+ParaDrawing.prototype.CheckCorrect = function(){
+	if(!this.GraphicObj){
+		return false;
+	}
+	if(this.GraphicObj && this.GraphicObj.checkCorrect){
+		return this.GraphicObj.checkCorrect();
+	}
+	return true;
+};
+
 ParaDrawing.prototype.Get_AllDrawingObjects = function(DrawingObjects)
 {
 	if (null == DrawingObjects)
