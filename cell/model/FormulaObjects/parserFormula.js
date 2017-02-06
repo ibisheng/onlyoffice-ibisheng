@@ -1587,9 +1587,16 @@ cName.prototype.Calculate = function () {
 	};
 	cName.prototype.changeDefName = function (from, to) {
 		var sheetId = this.ws ? this.ws.getId() : null;
-		if (AscCommonExcel.getDefNameIndex(this.value) == AscCommonExcel.getDefNameIndex(from.name) &&
-			(null == from.sheetId || sheetId == from.sheetId )) {
-			this.value = to.name;
+		if (AscCommonExcel.getDefNameIndex(this.value) == AscCommonExcel.getDefNameIndex(from.name)) {
+			if (null == from.sheetId) {
+				//in case of changes in workbook defname should not be sheet defname
+				var defName = this.getDefName();
+				if (!(defName && null != defName.sheetId)) {
+					this.value = to.name;
+				}
+			} else if (sheetId == from.sheetId) {
+				this.value = to.name;
+			}
 		}
 	};
 
