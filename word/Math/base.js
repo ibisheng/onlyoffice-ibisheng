@@ -645,7 +645,7 @@ CMathBase.prototype.Draw_Elements = function(PDSE)
 
         for (var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
         {
-            this.Content[CurPos].Draw_Elements(PDSE);
+			this.Content[CurPos].Draw_Elements(PDSE);
         }
     }
 };
@@ -1868,7 +1868,7 @@ CMathBase.prototype.Draw_HighLights = function(PDSH, bAll)
     var bAllCont = this.Selection.StartPos !== this.Selection.EndPos;
 
     for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
-        this.Content[CurPos].Draw_HighLights(PDSH, bAllCont);
+		this.Content[CurPos].Draw_HighLights(PDSH, bAllCont);
 
     var Bound = this.Get_LineBound(PDSH.Line, PDSH.Range);
 

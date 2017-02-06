@@ -3939,6 +3939,9 @@ CMathContent.prototype.Get_EndPos = function(BehindEnd, ContentPos, Depth)
 };
 CMathContent.prototype.Draw_HighLights = function(PDSH, bAll)
 {
+	if (!this.bRoot && this.Parent && true !== this.ParentElement.Is_ContentUse(this))
+		return;
+
     var Bound = this.Get_LineBound(PDSH.Line, PDSH.Range);
     PDSH.X    = Bound.X;
 
