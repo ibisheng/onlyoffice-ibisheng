@@ -240,7 +240,7 @@
 		
 		var g_oAdvancedTableInfoSettings = {
 			title		: 0,
-			descritption: 1
+			description: 1
 		};
 		
 		function AdvancedTableInfoSettings () {
@@ -250,7 +250,7 @@
 			this.Properties = g_oAdvancedTableInfoSettings;
 
 			this.title  = null;
-			this.descritption  = null;
+			this.description  = null;
 			
 			return this;
 		}
@@ -266,7 +266,7 @@
 			getProperty : function (nType) {
 				switch (nType) {
 					case this.Properties.title: return this.title; break;
-					case this.Properties.descritption: return this.descritption; break;
+					case this.Properties.description: return this.description; break;
 				}
 
 				return null;
@@ -274,15 +274,15 @@
 			setProperty : function (nType, value) {
 				switch (nType) {
 					case this.Properties.title: this.title = value;break;
-					case this.Properties.descritption: this.descritption = value;break;
+					case this.Properties.description: this.description = value;break;
 				}
 			},
 			
 			asc_setTitle : function(val) { this.title = val;},
-			asc_setDescritption : function(val) { this.descritption = val; },
+			asc_setDescription : function(val) { this.description = val; },
 
 			asc_getTitle : function() { return this.title; },
-			asc_getDescritption : function() { return this.descritption; }
+			asc_getDescription : function() { return this.description; }
 		};
 		
 		var g_oAutoFilterObj = {
