@@ -3651,6 +3651,12 @@ CPresentation.prototype =
         }
     },
 
+	CheckTableStylesDefault: function(Slide)
+    {
+		var tableLook = new CTableLook(true, true, false, false, true, false);
+		return this.CheckTableStyles(Slide, tableLook);
+    },
+
     CheckTableStyles: function(Slide, TableLook)
     {
         if(!this.TablesForInterface)

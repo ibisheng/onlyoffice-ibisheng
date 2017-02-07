@@ -2074,8 +2074,7 @@ background-repeat: no-repeat;\
 		if (logicDoc.CurPage >= logicDoc.Slides.length)
 			return;
 
-		var tableLook = new CTableLook(true, true, false, false, true, false);
-		logicDoc.CheckTableStyles(logicDoc.Slides[logicDoc.CurPage], tableLook);
+		logicDoc.CheckTableStylesDefault(logicDoc.Slides[logicDoc.CurPage]);
 	};
 
 	asc_docs_api.prototype.CollectHeaders                  = function()
