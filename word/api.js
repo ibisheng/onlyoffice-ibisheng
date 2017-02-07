@@ -2430,6 +2430,10 @@ background-repeat: no-repeat;\
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextFontSize);
 			this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr({FontSize : Math.min(size, 100)}));
+
+			// для мобильной версии это важно
+			if (this.isMobileVersion)
+				this.UpdateInterfaceState();
 		}
 	};
 

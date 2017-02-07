@@ -2217,6 +2217,10 @@ background-repeat: no-repeat;\
 		{
 			History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
 			this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr({FontSize : Math.min(size, 100)}));
+
+			// для мобильной версии это важно
+			if (this.isMobileVersion)
+				this.UpdateInterfaceState();
 		}
 	};
 	asc_docs_api.prototype.put_TextPrBold             = function(value)
