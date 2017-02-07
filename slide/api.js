@@ -4949,7 +4949,13 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.changeSlideSize = function(width, height)
 	{
+		if (this.isMobileVersion && this.WordControl.MobileTouchManager)
+			this.WordControl.MobileTouchManager.BeginZoomCheck();
+
 		this.WordControl.m_oLogicDocument.changeSlideSize(width, height);
+
+		if (this.isMobileVersion && this.WordControl.MobileTouchManager)
+			this.WordControl.MobileTouchManager.EndZoomCheck();
 	};
 
 	asc_docs_api.prototype.AddSlide       = function(layoutIndex)

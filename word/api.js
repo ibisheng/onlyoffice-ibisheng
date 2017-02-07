@@ -3410,12 +3410,18 @@ background-repeat: no-repeat;\
 	{
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr))
 		{
+			if (this.isMobileVersion && this.WordControl.MobileTouchManager)
+				this.WordControl.MobileTouchManager.BeginZoomCheck();
+
 			this.WordControl.m_oDrawingDocument.m_bIsUpdateDocSize = true;
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetPageSize);
 			if (this.DocumentOrientation)
 				this.WordControl.m_oLogicDocument.Set_DocumentPageSize(width, height);
 			else
 				this.WordControl.m_oLogicDocument.Set_DocumentPageSize(height, width);
+
+			if (this.isMobileVersion && this.WordControl.MobileTouchManager)
+				this.WordControl.MobileTouchManager.EndZoomCheck();
 		}
 	};
 

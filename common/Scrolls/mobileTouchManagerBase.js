@@ -612,6 +612,8 @@
 		this.eventsElement = _config.eventsElement;
 
 		this.pointerTouchesCoords = {};
+
+		this.IsZoomCheckFit = false;
 	}
 
 	CMobileTouchManagerBase.prototype.initEvents = function(_id)
@@ -1045,6 +1047,23 @@
 			this.ZoomValue = this.ZoomValueMin;
 			this.delegate.SetZoom(this.ZoomValue);
 		}
+	};
+
+	CMobileTouchManagerBase.prototype.BeginZoomCheck = function()
+	{
+		var _zoomCurrent = this.delegate.GetZoom();
+		var _zoomFit = this.delegate.GetZoomFit();
+		this.IsZoomCheckFit = (_zoomCurrent == _zoomFit) ? true : false;
+
+	};
+	CMobileTouchManagerBase.prototype.EndZoomCheck = function()
+	{
+		var _zoomCurrent = this.delegate.GetZoom();
+		var _zoomFit = this.delegate.GetZoomFit();
+
+		if (this.IsZoomCheckFit || _zoomCurrent < _zoomFit)
+			this.delegate.SetZoom(this.delegate.GetZoomFit());
+		this.IsZoomCheckFit = false;
 	};
 
 	// изменился размер документа/экрана => нужно перескитать вспомогательный элемент для скролла
