@@ -35,7 +35,7 @@
 (function(window, undefined) {
   'use strict';
 
-  var asc_coAuthV = '3.0.9';
+  var asc_coAuthV = '4.3.0';
   var ConnectionState = AscCommon.ConnectionState;
   var c_oEditorId = AscCommon.c_oEditorId;
   var c_oCloseCode = AscCommon.c_oCloseCode;
