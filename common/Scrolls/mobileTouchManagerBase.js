@@ -1403,6 +1403,9 @@
 		ctx.strokeStyle = "#146FE1";
 		ctx.fillStyle 	= "#146FE1";
 
+		var _oldGlobalAlpha = ctx.globalAlpha;
+		ctx.globalAlpha = 1.0;
+
 		if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
 		{
 			var pos1 = this.delegate.ConvertCoordsToCursor(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1, false);
@@ -1488,6 +1491,8 @@
 
 			ctx.beginPath();
 		}
+
+		ctx.globalAlpha = _oldGlobalAlpha;
 	};
 
 	// отрисовка табличного селекта
