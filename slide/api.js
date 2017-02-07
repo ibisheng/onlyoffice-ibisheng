@@ -2074,6 +2074,11 @@ background-repeat: no-repeat;\
 		if (logicDoc.CurPage >= logicDoc.Slides.length)
 			return;
 
+		if (logicDoc.Slides.length == 0)
+		{
+			logicDoc.addNextSlide();
+		}
+
 		logicDoc.CheckTableStylesDefault(logicDoc.Slides[logicDoc.CurPage]);
 	};
 
