@@ -243,8 +243,7 @@
 
 			var bCheckRedraw = false,
                 bRedrawGraphicObjects = false,
-                bUnlockDefName = false,
-                dN;
+                bUnlockDefName = false;
 			if (bIsCollaborative && (0 < this.m_arrNeedUnlock.length ||
 				0 < this.m_arrNeedUnlock2.length)) {
 				bCheckRedraw = true;
