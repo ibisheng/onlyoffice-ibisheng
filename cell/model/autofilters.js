@@ -245,7 +245,7 @@
 		
 		function AdvancedTableInfoSettings () {
 
-			if ( !(this instanceof AutoFiltersOptions) ) {return new AutoFiltersOptions();}
+			if ( !(this instanceof AdvancedTableInfoSettings) ) {return new AdvancedTableInfoSettings();}
 
 			this.Properties = g_oAdvancedTableInfoSettings;
 
