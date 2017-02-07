@@ -127,13 +127,14 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
 	if (0 < aChanges.length || null !== deleteIndex)
 	{
 		this.private_OnSendOwnChanges(aChanges2, deleteIndex);
-		editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo);
+		editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo, editor.canUnlockDocument2);
 		AscCommon.History.CanNotAddChanges = true;
 	}
 	else
 	{
-		editor.CoAuthoringApi.unLockDocument(true);
+		editor.CoAuthoringApi.unLockDocument(true, editor.canUnlockDocument2);
 	}
+	editor.canUnlockDocument2 = false;
 
     if (-1 === this.m_nUseType)
     {

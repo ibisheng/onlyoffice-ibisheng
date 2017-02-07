@@ -1182,32 +1182,19 @@ background-repeat: no-repeat;\
 		};
 		this.CoAuthoringApi.onStartCoAuthoring       = function(isStartEvent)
 		{
-			AscCommon.CollaborativeEditing.Start_CollaborationEditing();
-			t.asc_setDrawCollaborationMarks(true);
-
-			if (t.ParcedDocument)
-			{
-				t.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
-
-				if (!isStartEvent)
-				{
-					if (true != History.Is_Clear())
-					{
-						AscCommon.CollaborativeEditing.Apply_Changes();
-						AscCommon.CollaborativeEditing.Send_Changes();
-					}
-					else
-					{
-						// Изменений нет, но нужно сбросить lock
-						t.CoAuthoringApi.unLockDocument(true);
-					}
+			if (t.ParcedDocument) {
+				if (isStartEvent) {
+					AscCommon.CollaborativeEditing.Start_CollaborationEditing();
+					t.asc_setDrawCollaborationMarks(true);
+					t.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
+				} else {
+					// Сохранять теперь должны на таймере автосохранения. Иначе могли два раза запустить сохранение, не дожидаясь окончания
+					t.canUnlockDocument = true;
+					t.canStartCoAuthoring = true;
 				}
-			}
-			else
-			{
+			} else {
 				t.isStartCoAuthoringOnEndLoad = true;
-				if (!isStartEvent)
-				{
+				if (!isStartEvent) {
 					// Документ еще не подгрузился, но нужно сбросить lock
 					t.CoAuthoringApi.unLockDocument(false);
 				}
@@ -1215,8 +1202,12 @@ background-repeat: no-repeat;\
 		};
 		this.CoAuthoringApi.onEndCoAuthoring         = function(isStartEvent)
 		{
-			AscCommon.CollaborativeEditing.End_CollaborationEditing();
-			t.asc_setDrawCollaborationMarks(false);
+			if (t.canUnlockDocument) {
+				t.canStartCoAuthoring = false;
+			} else {
+				AscCommon.CollaborativeEditing.End_CollaborationEditing();
+				t.asc_setDrawCollaborationMarks(false);
+			}
 		};
 	};
 
@@ -1801,6 +1792,13 @@ background-repeat: no-repeat;\
 			}
 			this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
+			this.canUnlockDocument2 = this.canUnlockDocument;
+			if (this.canUnlockDocument && this.canStartCoAuthoring) {
+				this.CoAuthoringApi.onStartCoAuthoring(true);
+				this.canStartCoAuthoring = false;
+				this.canUnlockDocument = false;
+			}
+
 			if (c_oAscCollaborativeMarksShowType.LastChanges === this.CollaborativeMarksShowType)
 			{
 				AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
@@ -1908,7 +1906,7 @@ background-repeat: no-repeat;\
 	{
 		this.IsUserSave = !isAutoSave;
 		if (true === this.canSave && !this.isLongAction() && (this.asc_isDocumentCanSave() || History.Have_Changes() ||
-			AscCommon.CollaborativeEditing.Have_OtherChanges() || true === isUndoRequest))
+			AscCommon.CollaborativeEditing.Have_OtherChanges() || true === isUndoRequest || this.canUnlockDocument))
 		{
 			this.canSave = false;
 

@@ -278,15 +278,17 @@
     }
   };
 
-  CDocsCoApi.prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo) {
+  CDocsCoApi.prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo, canUnlockDocument) {
     if (this._CoAuthoringApi && this._onlineWork) {
+      this._CoAuthoringApi.canUnlockDocument = canUnlockDocument;
       this._CoAuthoringApi.saveChanges(arrayChanges, null, deleteIndex, excelAdditionalInfo);
     }
   };
 
-  CDocsCoApi.prototype.unLockDocument = function(isSave) {
+  CDocsCoApi.prototype.unLockDocument = function(isSave, canUnlockDocument) {
     if (this._CoAuthoringApi && this._onlineWork) {
-      this._CoAuthoringApi.unLockDocument(isSave);
+      this._CoAuthoringApi.canUnlockDocument = canUnlockDocument;
+      this._CoAuthoringApi.unLockDocument(isSave, canUnlockDocument);
     }
   };
 
@@ -561,6 +563,8 @@
     this.changesIndex = 0;
     // Дополнительная информация для Excel
     this.excelAdditionalInfo = null;
+    // Unlock document
+    this.canUnlockDocument = false;
 
     this._url = "";
 
@@ -796,11 +800,12 @@
     this._send({'type': 'saveChanges', 'changes': JSON.stringify(arrayChanges.slice(startIndex, endIndex)),
       'startSaveChanges': (startIndex === 0), 'endSaveChanges': (endIndex === arrayChanges.length),
       'isCoAuthoring': this.isCoAuthoring, 'isExcel': this._isExcel, 'deleteIndex': this.deleteIndex,
-      'excelAdditionalInfo': this.excelAdditionalInfo ? JSON.stringify(this.excelAdditionalInfo) : null});
+      'excelAdditionalInfo': this.excelAdditionalInfo ? JSON.stringify(this.excelAdditionalInfo) : null,
+        'unlock': this.canUnlockDocument});
   };
 
   DocsCoApi.prototype.unLockDocument = function(isSave) {
-    this._send({'type': 'unLockDocument', 'isSave': isSave});
+    this._send({'type': 'unLockDocument', 'isSave': isSave, 'unlock': this.canUnlockDocument});
   };
 
   DocsCoApi.prototype.getUsers = function() {
@@ -891,13 +896,13 @@
   };
 
   DocsCoApi.prototype._onMessages = function(data, clear) {
-    if (data["messages"] && this.onMessage) {
+    if (ConnectionState.Authorized === this._state && data["messages"] && this.onMessage) {
       this.onMessage(data["messages"], clear);
     }
   };
 
   DocsCoApi.prototype._onCursor = function(data) {
-    if (data["messages"] && this.onCursor) {
+    if (ConnectionState.Authorized === this._state && data["messages"] && this.onCursor) {
       this.onCursor(data["messages"]);
     }
   };
@@ -909,7 +914,7 @@
   };
 
   DocsCoApi.prototype._onSession = function(data) {
-    if (data["messages"] && this.onSession) {
+    if (ConnectionState.Authorized === this._state && data["messages"] && this.onSession) {
       this.onSession(data["messages"]);
     }
   };
@@ -940,7 +945,7 @@
 	};
 
   DocsCoApi.prototype._onGetLock = function(data) {
-    if (data["locks"]) {
+    if (ConnectionState.Authorized === this._state && data["locks"]) {
       for (var key in data["locks"]) {
         if (data["locks"].hasOwnProperty(key)) {
           var lock = data["locks"][key], blockTmp = (this._isExcel || this._isPresentation) ? lock["block"]["guid"] : key, blockValue = (this._isExcel || this._isPresentation) ? lock["block"] : key;
@@ -978,7 +983,7 @@
   };
 
   DocsCoApi.prototype._onReleaseLock = function(data) {
-    if (data["locks"]) {
+    if (ConnectionState.Authorized === this._state && data["locks"]) {
       var bSendEnd = false;
       for (var block in data["locks"]) {
         if (data["locks"].hasOwnProperty(block)) {
@@ -1004,6 +1009,9 @@
   };
 
   DocsCoApi.prototype._onSaveChanges = function(data) {
+    if (ConnectionState.Authorized !== this._state) {
+      return;
+    }
     if (data["locks"]) {
       var bSendEnd = false;
       for (var block in data["locks"]) {
@@ -1196,6 +1204,9 @@
   };
 
   DocsCoApi.prototype._onConnectionStateChanged = function(data) {
+    if (ConnectionState.Authorized !== this._state) {
+      return;
+    }
     var userStateChanged = null, userId, stateChanged = false, isEditUser = true;
     if (this.onConnectionStateChanged) {
       userStateChanged = new AscCommon.asc_CUser(data['user']);

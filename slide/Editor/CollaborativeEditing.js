@@ -176,10 +176,11 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
     this.m_aNeedUnlock2.length = 0;
 
     if (0 < aChanges.length || null !== deleteIndex) {
-        editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo);
+        editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo, editor.canUnlockDocument2);
         AscCommon.History.CanNotAddChanges = true;
     } else
-        editor.CoAuthoringApi.unLockDocument(true);
+        editor.CoAuthoringApi.unLockDocument(true, editor.canUnlockDocument2);
+	editor.canUnlockDocument2 = false;
 
     if ( -1 === this.m_nUseType )
     {
