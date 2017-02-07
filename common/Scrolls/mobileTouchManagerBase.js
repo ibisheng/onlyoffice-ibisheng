@@ -1549,6 +1549,8 @@
 		var _posMoveX = 0;
 		var _posMoveY = 0;
 
+		var _PageNum = _table_outline_dr.CurrentPageIndex;
+
 		if (!_table_outline_dr.TableMatrix || global_MatrixTransformer.IsIdentity(_table_outline_dr.TableMatrix))
 		{
 			this.TableMovePoint = {X : _tableOutline.X, Y : _tableOutline.Y};
@@ -1618,7 +1620,7 @@
 				var _newPos = (i != _count) ? _table_markup.Rows[i].Y : _oldY;
 
 				var _p = {Y : _oldY, H : (_newPos - _oldY)};
-				var _y = DrawingDocument.ConvertCoordsToCursorWR(0, _oldY, _tableOutline.PageNum);
+				var _y = DrawingDocument.ConvertCoordsToCursorWR(0, _oldY, _PageNum);
 
 				ctx.beginPath();
 				overlay.AddDiamond(_x + 1.5 + (_rectWidth >> 1), _y.Y, AscCommon.MOBILE_TABLE_RULER_DIAMOND);
