@@ -249,8 +249,8 @@
 
 			this.Properties = g_oAdvancedTableInfoSettings;
 
-			this.title  = null;
-			this.description  = null;
+			this.title  = undefined;
+			this.description  = undefined;
 			
 			return this;
 		}
@@ -2471,8 +2471,8 @@
 				History.Create_NewPoint();
 				History.StartTransaction();
 				
-				//History.TurnOff();
 				var oldFilter = tablePart.clone(null);
+				var bAddHistoryPoint = true;
 				
 				switch(optionType)
 				{
@@ -2594,18 +2594,30 @@
 					case c_oAscChangeTableStyleInfo.advancedSettings:
 					{
 						var title = val.asc_getTitle()
-						var description = val.asc_getDescription()
-						tablePart.changeAltText(title);
-						tablePart.changeAltTextSummary(description);
+						var description = val.asc_getDescription();
+						
+						//если ничего не меняется в advancedSettings, не заносим точку в историю
+						bAddHistoryPoint = false;
+						if(undefined !== title)
+						{
+							tablePart.changeAltText(title);
+							bAddHistoryPoint = true;
+						}
+						if(undefined !== description)
+						{
+							tablePart.changeAltTextSummary(description);
+							bAddHistoryPoint = true;
+						}
 						
 						break;
 					}
 				}
 				
-				//History.TurnOn();
-				
-				this._addHistoryObj({oldFilter: oldFilter, newFilterRef: tablePart.Ref.clone()}, AscCH.historyitem_AutoFilter_ChangeTableInfo,
+				if(bAddHistoryPoint)
+				{
+					this._addHistoryObj({oldFilter: oldFilter, newFilterRef: tablePart.Ref.clone()}, AscCH.historyitem_AutoFilter_ChangeTableInfo,
 						{activeCells: tablePart.Ref.clone(), type: optionType, val: val, displayName: tableName});
+				}
 				
 				this._cleanStyleTable(tablePart.Ref);
 				this._setColorStyleTable(tablePart.Ref, tablePart, null, isSetValue, isSetType);
