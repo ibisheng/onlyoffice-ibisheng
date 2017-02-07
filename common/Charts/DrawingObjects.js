@@ -1256,8 +1256,6 @@ function DrawingObjects() {
             _this.showDrawingObjectsEx(lastTask.params.clearCanvas, lastTask.params.graphicOption, lastTask.params.printOptions);
             aDrawTasks.splice(0, (taskLen - 1 > 0) ? taskLen - 1 : 1);
         }
-
-		api._autoSave();
     }
 
     //-----------------------------------------------------------------------------------

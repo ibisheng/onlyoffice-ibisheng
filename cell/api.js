@@ -111,10 +111,7 @@ var editor;
     this.collaborativeEditing = null;
 
     // AutoSave
-    this.lastSaveTime = null;				// Время последнего сохранения
     this.autoSaveGapRealTime = 30;	  // Интервал быстрого автосохранения (когда выставлен флаг realtime) - 30 мс.
-    this.autoSaveGapFast = 2000;			// Интервал быстрого автосохранения (когда человек один) - 2 сек.
-    this.autoSaveGapSlow = 10 * 60 * 1000;	// Интервал медленного автосохранения (когда совместно) - 10 минут
 
     // Shapes
     this.isStartAddShape = false;

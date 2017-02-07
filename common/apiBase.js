@@ -96,6 +96,15 @@
 
 		// AutoSave
 		this.autoSaveGap = 0;					// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
+		this.lastSaveTime = null;				// Время последнего сохранения
+		this.autoSaveGapFast = 2000;			// Интервал быстрого автосохранения (когда человек один) - 2 сек.
+		this.autoSaveGapSlow = 10 * 60 * 1000;	// Интервал медленного автосохранения (когда совместно) - 10 минут
+		this.intervalWaitAutoSave = 1000;
+
+		// Unlock document
+		this.canUnlockDocument = false;
+		this.canUnlockDocument2 = false;		// Дублирующий флаг, только для saveChanges или unLockDocument
+		this.canStartCoAuthoring = false;
 
 		this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
@@ -476,6 +485,9 @@
 	baseEditorsApi.prototype.forceSave = function()
 	{
 		this.CoAuthoringApi.forceSave()
+	};
+	// Функция автосохранения. Переопределяется во всех редакторах
+	baseEditorsApi.prototype._autoSave = function () {
 	};
 	// Выставление интервала автосохранения (0 - означает, что автосохранения нет)
 	baseEditorsApi.prototype.asc_setAutoSaveGap                  = function(autoSaveGap)
@@ -982,6 +994,10 @@
 		}
 
 		this.pluginsManager     = Asc.createPluginsManager(this);
+
+		if (!window['IS_NATIVE_EDITOR']) {
+			setInterval(function() {t._autoSave();}, 40);
+		}
 	};
 
 	baseEditorsApi.prototype.sendStandartTextures = function()
