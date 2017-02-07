@@ -599,7 +599,7 @@ function checkPointInMap(map, worksheet, row, col)
 
 
 
-    drawingsChangesMap[AscDFH.historyitem_ChartSpace_SetNvGrFrProps                ] = function(oClass, value){oClass.nvGrFrProps   = value;};
+    drawingsChangesMap[AscDFH.historyitem_ChartSpace_SetNvGrFrProps                ] = function(oClass, value){oClass.nvGraphicFramePr   = value;};
     drawingsChangesMap[AscDFH.historyitem_ChartSpace_SetThemeOverride              ] = function(oClass, value){oClass.themeOverride = value;};
     drawingsChangesMap[AscDFH.historyitem_ShapeSetBDeleted                         ] = function(oClass, value){oClass.bDeleted = value;};
     drawingsChangesMap[AscDFH.historyitem_ChartSpace_SetParent                     ] = function(oClass, value){oClass.parent         = value;};
