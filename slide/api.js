@@ -1832,9 +1832,9 @@ background-repeat: no-repeat;\
 			this.canUnlockDocument2 = this.canUnlockDocument;
 			if (this.canUnlockDocument && this.canStartCoAuthoring) {
 				this.CoAuthoringApi.onStartCoAuthoring(true);
-				this.canStartCoAuthoring = false;
-				this.canUnlockDocument = false;
 			}
+			this.canStartCoAuthoring = false;
+			this.canUnlockDocument = false;
 
 			if (c_oAscCollaborativeMarksShowType.LastChanges === this.CollaborativeMarksShowType)
 			{

@@ -1439,9 +1439,9 @@ var editor;
       this.canUnlockDocument2 = this.canUnlockDocument;
       if (this.canUnlockDocument && this.canStartCoAuthoring) {
 		  this.CoAuthoringApi.onStartCoAuthoring(true);
-		  this.canStartCoAuthoring = false;
-		  this.canUnlockDocument = false;
 	  }
+	  this.canStartCoAuthoring = false;
+      this.canUnlockDocument = false;
 
       AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
       // Принимаем чужие изменения
@@ -2960,7 +2960,7 @@ var editor;
   /////////////////////////////////////////////////////////////////////////
   ////////////////////////////AutoSave api/////////////////////////////////
   /////////////////////////////////////////////////////////////////////////
-	spreadsheet_api.prototype._autoSave = function () { 
+	spreadsheet_api.prototype._autoSave = function () {
 		if (!this.DocumentLoadComplete || (!this.canUnlockDocument && 0 === this.autoSaveGap &&
 			(!this.collaborativeEditing.getFast() || !this.collaborativeEditing.getCollaborativeEditing())) ||
 			this.asc_getCellEditMode() || this.asc_getIsTrackShape() || this.isOpenedChartFrame ||
