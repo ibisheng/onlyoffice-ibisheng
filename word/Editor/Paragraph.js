@@ -342,20 +342,9 @@ Paragraph.prototype =
         return this.Id;
     },
 
-    SetId : function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
-    },
-
     Get_Id : function()
     {
         return this.GetId();
-    },
-
-    Set_Id : function(newId)
-    {
-        return this.SetId( newId );
     },
 
     Use_Wrap : function()

@@ -115,20 +115,6 @@
 
 		return null;
 	};
-	CTableId.prototype.Reset_Id = function(Class, Id_new, Id_old)
-	{
-		if (Class === this.m_aPairs[Id_old])
-		{
-			delete this.m_aPairs[Id_old];
-			this.m_aPairs[Id_new] = Class;
-
-			AscCommon.History.Add(new AscCommon.CChangesTableIdReset(this, Id_old, Id_new));
-		}
-		else
-		{
-			this.Add(Class, Id_new);
-		}
-	};
 	CTableId.prototype.Get_Id = function()
 	{
 		return this.Id;

@@ -153,11 +153,6 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
 }
 AscCommon.extendClass(CDocumentContent, CDocumentContentBase);
 
-CDocumentContent.prototype.Set_Id          = function(newId)
-{
-    g_oTableId.Reset_Id(this, newId, this.Id);
-    this.Id = newId;
-};
 CDocumentContent.prototype.Get_Id          = function()
 {
     return this.Id;

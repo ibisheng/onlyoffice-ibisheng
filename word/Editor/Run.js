@@ -125,12 +125,6 @@ ParaRun.prototype.Get_Type = function()
 //-----------------------------------------------------------------------------------
 // Функции для работы с Id
 //-----------------------------------------------------------------------------------
-ParaRun.prototype.Set_Id = function(newId)
-{
-    g_oTableId.Reset_Id( this, newId, this.Id );
-    this.Id = newId;
-};
-
 ParaRun.prototype.Get_Id = function()
 {
     return this.Id;

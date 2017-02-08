@@ -1242,7 +1242,6 @@
 	// Типы изменений в классе CTableId
 	//------------------------------------------------------------------------------------------------------------------
 	window['AscDFH'].historyitem_TableId_Add         = window['AscDFH'].historyitem_type_TableId | 1;
-	window['AscDFH'].historyitem_TableId_Reset       = window['AscDFH'].historyitem_type_TableId | 2;
 	window['AscDFH'].historyitem_TableId_Description = window['AscDFH'].historyitem_type_TableId | 0xFFFF;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе CDocument
@@ -1466,10 +1465,23 @@
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе CStyles
 	//------------------------------------------------------------------------------------------------------------------
-	window['AscDFH'].historyitem_Styles_Add                 = window['AscDFH'].historyitem_type_Styles | 1;
-	window['AscDFH'].historyitem_Styles_Remove              = window['AscDFH'].historyitem_type_Styles | 2;
-	window['AscDFH'].historyitem_Styles_ChangeDefaultTextPr = window['AscDFH'].historyitem_type_Styles | 3;
-	window['AscDFH'].historyitem_Styles_ChangeDefaultParaPr = window['AscDFH'].historyitem_type_Styles | 4;
+	window['AscDFH'].historyitem_Styles_Add                              = window['AscDFH'].historyitem_type_Styles | 1;
+	window['AscDFH'].historyitem_Styles_Remove                           = window['AscDFH'].historyitem_type_Styles | 2;
+	window['AscDFH'].historyitem_Styles_ChangeDefaultTextPr              = window['AscDFH'].historyitem_type_Styles | 3;
+	window['AscDFH'].historyitem_Styles_ChangeDefaultParaPr              = window['AscDFH'].historyitem_type_Styles | 4;
+	window['AscDFH'].historyitem_Styles_ChangeDefaultParagraphId         = window['AscDFH'].historyitem_type_Styles | 5;
+	window['AscDFH'].historyitem_Styles_ChangeDefaultCharacterId         = window['AscDFH'].historyitem_type_Styles | 6;
+	window['AscDFH'].historyitem_Styles_ChangeDefaultNumberingId         = window['AscDFH'].historyitem_type_Styles | 7;
+	window['AscDFH'].historyitem_Styles_ChangeDefaultTableId             = window['AscDFH'].historyitem_type_Styles | 8;
+	window['AscDFH'].historyitem_Styles_ChangeDefaultTableGridId         = window['AscDFH'].historyitem_type_Styles | 9;
+	window['AscDFH'].historyitem_Styles_ChangeDefaultHeadingsId          = window['AscDFH'].historyitem_type_Styles | 10;
+	window['AscDFH'].historyitem_Styles_ChangeDefaultParaListId          = window['AscDFH'].historyitem_type_Styles | 11;
+	window['AscDFH'].historyitem_Styles_ChangeDefaultHeaderId            = window['AscDFH'].historyitem_type_Styles | 12;
+	window['AscDFH'].historyitem_Styles_ChangeDefaultFooterId            = window['AscDFH'].historyitem_type_Styles | 13;
+	window['AscDFH'].historyitem_Styles_ChangeDefaultHyperlinkId         = window['AscDFH'].historyitem_type_Styles | 14;
+	window['AscDFH'].historyitem_Styles_ChangeDefaultFootnoteTextId      = window['AscDFH'].historyitem_type_Styles | 15;
+	window['AscDFH'].historyitem_Styles_ChangeDefaultFootnoteTextCharId  = window['AscDFH'].historyitem_type_Styles | 16;
+	window['AscDFH'].historyitem_Styles_ChangeDefaultFootnoteReferenceId = window['AscDFH'].historyitem_type_Styles | 17;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе ParaMath
 	//------------------------------------------------------------------------------------------------------------------

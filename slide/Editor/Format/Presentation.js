@@ -757,12 +757,6 @@ CPresentation.prototype =
         return this.Id;
     },
 
-    Set_Id : function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
-    },
-
     LoadEmptyDocument : function()
     {
         this.DrawingDocument.TargetStart();

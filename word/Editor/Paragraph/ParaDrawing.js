@@ -1041,11 +1041,6 @@ ParaDrawing.prototype.Copy = function()
 		c.Set_ParaMath(this.ParaMath.Copy());
 	return c;
 };
-ParaDrawing.prototype.Set_Id = function(newId)
-{
-	g_oTableId.Reset_Id(this, newId, this.Id);
-	this.Id = newId;
-};
 ParaDrawing.prototype.Get_Id = function()
 {
 	return this.Id;

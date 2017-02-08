@@ -1231,7 +1231,7 @@
         if (null != sOldId && oOldStyle)
         {
             oStyles.Remove(sOldId);
-            oStyle.Set_Id(sOldId);
+            oStyles.RemapIdReferences(sOldId, oStyle.Get_Id());
         }
 
         oStyles.Add(oStyle);

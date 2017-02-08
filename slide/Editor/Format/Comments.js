@@ -1048,12 +1048,6 @@ CComment.prototype =
         return this.Id;
     },
 
-    Set_Id: function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
-    },
-
     Write_ToBinary2: function(Writer)
     {
         Writer.WriteLong( AscDFH.historyitem_type_Comment );

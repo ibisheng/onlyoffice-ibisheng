@@ -66,10 +66,23 @@ AscDFH.changesFactory[AscDFH.historyitem_Style_SemiHidden]      = CChangesStyleS
 AscDFH.changesFactory[AscDFH.historyitem_Style_UnhideWhenUsed]  = CChangesStyleUnhideWhenUsed;
 AscDFH.changesFactory[AscDFH.historyitem_Style_Link]            = CChangesStyleLink;
 
-AscDFH.changesFactory[AscDFH.historyitem_Styles_Add]                 = CChangesStylesAdd;
-AscDFH.changesFactory[AscDFH.historyitem_Styles_Remove]              = CChangesStylesRemove;
-AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultTextPr] = CChangesStylesChangeDefaultTextPr;
-AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultParaPr] = CChangesStylesChangeDefaultParaPr;
+AscDFH.changesFactory[AscDFH.historyitem_Styles_Add]                              = CChangesStylesAdd;
+AscDFH.changesFactory[AscDFH.historyitem_Styles_Remove]                           = CChangesStylesRemove;
+AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultTextPr]              = CChangesStylesChangeDefaultTextPr;
+AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultParaPr]              = CChangesStylesChangeDefaultParaPr;
+AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultParagraphId]         = CChangesStylesChangeDefaultParagraphId;
+AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultCharacterId]         = CChangesStylesChangeDefaultCharacterId;
+AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultNumberingId]         = CChangesStylesChangeDefaultNumberingId;
+AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultTableId]             = CChangesStylesChangeDefaultTableId;
+AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultTableGridId]         = CChangesStylesChangeDefaultTableGridId;
+AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultHeadingsId]          = CChangesStylesChangeDefaultHeadingsId;
+AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultParaListId]          = CChangesStylesChangeDefaultParaListId;
+AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultHeaderId]            = CChangesStylesChangeDefaultHeaderId;
+AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultFooterId]            = CChangesStylesChangeDefaultFooterId;
+AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultHyperlinkId]         = CChangesStylesChangeDefaultHyperlinkId;
+AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultFootnoteTextId]      = CChangesStylesChangeDefaultFootnoteTextId;
+AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultFootnoteTextCharId]  = CChangesStylesChangeDefaultFootnoteTextCharId;
+AscDFH.changesFactory[AscDFH.historyitem_Styles_ChangeDefaultFootnoteReferenceId] = CChangesStylesChangeDefaultFootnoteReferenceId;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
@@ -111,8 +124,21 @@ AscDFH.changesRelationMap[AscDFH.historyitem_Styles_Remove]              = [
 	AscDFH.historyitem_Styles_Add,
 	AscDFH.historyitem_Styles_Remove
 ];
-AscDFH.changesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultTextPr] = [AscDFH.historyitem_Styles_ChangeDefaultTextPr];
-AscDFH.changesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultParaPr] = [AscDFH.historyitem_Styles_ChangeDefaultParaPr];
+AscDFH.changesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultTextPr]              = [AscDFH.historyitem_Styles_ChangeDefaultTextPr];
+AscDFH.changesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultParaPr]              = [AscDFH.historyitem_Styles_ChangeDefaultParaPr];
+AscDFH.changesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultParagraphId]         = [AscDFH.historyitem_Styles_ChangeDefaultParagraphId];
+AscDFH.changesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultCharacterId]         = [AscDFH.historyitem_Styles_ChangeDefaultCharacterId];
+AscDFH.changesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultNumberingId]         = [AscDFH.historyitem_Styles_ChangeDefaultNumberingId];
+AscDFH.changesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultTableId]             = [AscDFH.historyitem_Styles_ChangeDefaultTableId];
+AscDFH.changesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultTableGridId]         = [AscDFH.historyitem_Styles_ChangeDefaultTableGridId];
+AscDFH.changesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultHeadingsId]          = [AscDFH.historyitem_Styles_ChangeDefaultHeadingsId];
+AscDFH.changesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultParaListId]          = [AscDFH.historyitem_Styles_ChangeDefaultParaListId];
+AscDFH.changesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultHeaderId]            = [AscDFH.historyitem_Styles_ChangeDefaultHeaderId];
+AscDFH.changesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultFooterId]            = [AscDFH.historyitem_Styles_ChangeDefaultFooterId];
+AscDFH.changesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultHyperlinkId]         = [AscDFH.historyitem_Styles_ChangeDefaultHyperlinkId];
+AscDFH.changesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultFootnoteTextId]      = [AscDFH.historyitem_Styles_ChangeDefaultFootnoteTextId];
+AscDFH.changesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultFootnoteTextCharId]  = [AscDFH.historyitem_Styles_ChangeDefaultFootnoteTextCharId];
+AscDFH.changesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultFootnoteReferenceId] = [AscDFH.historyitem_Styles_ChangeDefaultFootnoteReferenceId];
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -957,4 +983,249 @@ CChangesStylesChangeDefaultParaPr.prototype.private_CreateObject = function()
 CChangesStylesChangeDefaultParaPr.prototype.private_SetValue = function(Value)
 {
 	this.Class.Default.ParaPr = Value;
+};
+/**
+ * @constructor
+ * @extends {CChangesStyleBaseStringProperty}
+ */
+function CChangesStylesChangeDefaultParagraphId(Class, Old, New)
+{
+	CChangesStylesChangeDefaultParagraphId.superclass.constructor.call(this, Class, Old, New);
+}
+AscCommon.extendClass(CChangesStylesChangeDefaultParagraphId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultParagraphId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultParagraphId;
+CChangesStylesChangeDefaultParagraphId.prototype.private_SetValue = function(Value)
+{
+	this.Class.Default.Paragraph = Value;
+};
+/**
+ * @constructor
+ * @extends {CChangesStyleBaseStringProperty}
+ */
+function CChangesStylesChangeDefaultCharacterId(Class, Old, New)
+{
+	CChangesStylesChangeDefaultCharacterId.superclass.constructor.call(this, Class, Old, New);
+}
+AscCommon.extendClass(CChangesStylesChangeDefaultCharacterId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultCharacterId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultCharacterId;
+CChangesStylesChangeDefaultCharacterId.prototype.private_SetValue = function(Value)
+{
+	this.Class.Default.Character = Value;
+};
+/**
+ * @constructor
+ * @extends {CChangesStyleBaseStringProperty}
+ */
+function CChangesStylesChangeDefaultNumberingId(Class, Old, New)
+{
+	CChangesStylesChangeDefaultNumberingId.superclass.constructor.call(this, Class, Old, New);
+}
+AscCommon.extendClass(CChangesStylesChangeDefaultNumberingId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultNumberingId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultNumberingId;
+CChangesStylesChangeDefaultNumberingId.prototype.private_SetValue = function(Value)
+{
+	this.Class.Default.Numbering = Value;
+};
+/**
+ * @constructor
+ * @extends {CChangesStyleBaseStringProperty}
+ */
+function CChangesStylesChangeDefaultTableId(Class, Old, New)
+{
+	CChangesStylesChangeDefaultTableId.superclass.constructor.call(this, Class, Old, New);
+}
+AscCommon.extendClass(CChangesStylesChangeDefaultTableId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultTableId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultTableId;
+CChangesStylesChangeDefaultTableId.prototype.private_SetValue = function(Value)
+{
+	this.Class.Default.Table = Value;
+};
+/**
+ * @constructor
+ * @extends {CChangesStyleBaseStringProperty}
+ */
+function CChangesStylesChangeDefaultTableGridId(Class, Old, New)
+{
+	CChangesStylesChangeDefaultTableGridId.superclass.constructor.call(this, Class, Old, New);
+}
+AscCommon.extendClass(CChangesStylesChangeDefaultTableGridId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultTableGridId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultTableGridId;
+CChangesStylesChangeDefaultTableGridId.prototype.private_SetValue = function(Value)
+{
+	this.Class.Default.TableGrid = Value;
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseProperty}
+ */
+function CChangesStylesChangeDefaultHeadingsId(Class, Old, New, Lvl)
+{
+	CChangesStylesChangeDefaultHeadingsId.superclass.constructor.call(this, Class, Old, New);
+	this.Lvl = Lvl;
+}
+AscCommon.extendClass(CChangesStylesChangeDefaultHeadingsId, AscDFH.CChangesBaseProperty);
+CChangesStylesChangeDefaultHeadingsId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultHeadingsId;
+CChangesStylesChangeDefaultHeadingsId.prototype.private_SetValue = function(Value)
+{
+	this.Class.Default.Headings[this.Lvl] = Value;
+};
+CChangesStylesChangeDefaultHeadingsId.prototype.WriteToBinary = function(Writer)
+{
+	// Long  : Lvl
+	// Long  : Flag
+	// 1-bit : Is undefined new
+	// 2-bit : Is null new
+	// 3-bit : Is undefined old
+	// 4-bit : Is null old
+	// String : New (1,2 - bits are zero)
+	// String : Old (3,4 - bits are zero)
+
+
+	Writer.WriteLong(this.Lvl);
+
+	var nFlags = 0;
+	if (undefined === this.New)
+		nFlags |= 1;
+	else if (null === this.New)
+		nFlags |= 2;
+
+	if (undefined === this.Old)
+		nFlags |= 4;
+	else if (null === this.Old)
+		nFlags |= 8;
+
+	Writer.WriteLong(nFlags);
+
+	if (undefined !== this.New && null !== this.New)
+		Writer.WriteString2(this.New);
+
+	if (undefined !== this.Old && null !== this.Old)
+		Writer.WriteString2(this.Old);
+};
+CChangesStylesChangeDefaultHeadingsId.prototype.ReadFromBinary = function(Reader)
+{
+	// Long  : Lvl
+	// Long  : Flag
+	// 1-bit : Is undefined new
+	// 2-bit : Is null new
+	// 3-bit : Is undefined old
+	// 4-bit : Is null old
+	// String : New (1,2 - bits are zero)
+	// String : Old (3,4 - bits are zero)
+
+	this.Lvl = Reader.GetLong();
+
+	var nFlags = Reader.GetLong();
+
+	if (nFlags & 1)
+		this.New = undefined;
+	else if (nFlags & 2)
+		this.New = null;
+	else
+		this.New = Reader.GetString2();
+
+	if (nFlags & 4)
+		this.Old = undefined;
+	else if (nFlags & 8)
+		this.Old = null;
+	else
+		this.Old = Reader.GetString2();
+};
+/**
+ * @constructor
+ * @extends {CChangesStyleBaseStringProperty}
+ */
+function CChangesStylesChangeDefaultParaListId(Class, Old, New)
+{
+	CChangesStylesChangeDefaultParaListId.superclass.constructor.call(this, Class, Old, New);
+}
+AscCommon.extendClass(CChangesStylesChangeDefaultParaListId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultParaListId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultParaListId;
+CChangesStylesChangeDefaultParaListId.prototype.private_SetValue = function(Value)
+{
+	this.Class.Default.ParaList = Value;
+};
+/**
+ * @constructor
+ * @extends {CChangesStyleBaseStringProperty}
+ */
+function CChangesStylesChangeDefaultHeaderId(Class, Old, New)
+{
+	CChangesStylesChangeDefaultHeaderId.superclass.constructor.call(this, Class, Old, New);
+}
+AscCommon.extendClass(CChangesStylesChangeDefaultHeaderId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultHeaderId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultHeaderId;
+CChangesStylesChangeDefaultHeaderId.prototype.private_SetValue = function(Value)
+{
+	this.Class.Default.Header = Value;
+};
+/**
+ * @constructor
+ * @extends {CChangesStyleBaseStringProperty}
+ */
+function CChangesStylesChangeDefaultFooterId(Class, Old, New)
+{
+	CChangesStylesChangeDefaultFooterId.superclass.constructor.call(this, Class, Old, New);
+}
+AscCommon.extendClass(CChangesStylesChangeDefaultFooterId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultFooterId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultFooterId;
+CChangesStylesChangeDefaultFooterId.prototype.private_SetValue = function(Value)
+{
+	this.Class.Default.Footer = Value;
+};
+/**
+ * @constructor
+ * @extends {CChangesStyleBaseStringProperty}
+ */
+function CChangesStylesChangeDefaultHyperlinkId(Class, Old, New)
+{
+	CChangesStylesChangeDefaultHyperlinkId.superclass.constructor.call(this, Class, Old, New);
+}
+AscCommon.extendClass(CChangesStylesChangeDefaultHyperlinkId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultHyperlinkId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultHyperlinkId;
+CChangesStylesChangeDefaultHyperlinkId.prototype.private_SetValue = function(Value)
+{
+	this.Class.Default.Header = Value;
+};
+/**
+ * @constructor
+ * @extends {CChangesStyleBaseStringProperty}
+ */
+function CChangesStylesChangeDefaultFootnoteTextId(Class, Old, New)
+{
+	CChangesStylesChangeDefaultFootnoteTextId.superclass.constructor.call(this, Class, Old, New);
+}
+AscCommon.extendClass(CChangesStylesChangeDefaultFootnoteTextId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultFootnoteTextId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultFootnoteTextId;
+CChangesStylesChangeDefaultFootnoteTextId.prototype.private_SetValue = function(Value)
+{
+	this.Class.Default.FootnoteText = Value;
+};
+/**
+ * @constructor
+ * @extends {CChangesStyleBaseStringProperty}
+ */
+function CChangesStylesChangeDefaultFootnoteTextCharId(Class, Old, New)
+{
+	CChangesStylesChangeDefaultFootnoteTextCharId.superclass.constructor.call(this, Class, Old, New);
+}
+AscCommon.extendClass(CChangesStylesChangeDefaultFootnoteTextCharId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultFootnoteTextCharId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultFootnoteTextCharId;
+CChangesStylesChangeDefaultFootnoteTextCharId.prototype.private_SetValue = function(Value)
+{
+	this.Class.Default.FootnoteTextChar = Value;
+};
+/**
+ * @constructor
+ * @extends {CChangesStyleBaseStringProperty}
+ */
+function CChangesStylesChangeDefaultFootnoteReferenceId(Class, Old, New)
+{
+	CChangesStylesChangeDefaultFootnoteReferenceId.superclass.constructor.call(this, Class, Old, New);
+}
+AscCommon.extendClass(CChangesStylesChangeDefaultFootnoteReferenceId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultFootnoteReferenceId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultFootnoteReferenceId;
+CChangesStylesChangeDefaultFootnoteReferenceId.prototype.private_SetValue = function(Value)
+{
+	this.Class.Default.FootnoteReference = Value;
 };
