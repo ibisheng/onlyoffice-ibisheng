@@ -149,7 +149,8 @@
     window['AscDFH'].CChangesDrawingsObjectNoId = CChangesDrawingsObjectNoId;
     CChangesDrawingsObjectNoId.prototype.ReadFromBinary = function (reader) {
         reader.Seek2(reader.GetCurPos() - 4);
-        this.Type = reader.GetLong();
+        var nType = reader.GetLong();
+        this.Type = nType;
         this.FromLoad = true;
         CChangesDrawingsObjectNoId.superclass.ReadFromBinary.call(this, reader);
     };
