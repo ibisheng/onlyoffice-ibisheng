@@ -12057,9 +12057,9 @@
 		
 		var _drawSortArrow = function(startX, startY, isDescending, heightArrow)
 		{
-			heightArrow = heightArrow * 0.75 * scaleIndex;
-			var widthArrow = 3 * 0.75 * scaleIndex;
-			var widthLine = 1 * 0.75 * scaleIndex;
+			heightArrow = heightArrow * height_1px * scaleIndex;
+			var widthArrow = 3 * width_1px * scaleIndex;
+			var widthLine = 1 * width_1px * scaleIndex;
 			
 			//isDescending = true - стрелочка смотрит вниз
 			//рисуем сверху вниз
@@ -12067,14 +12067,17 @@
 			ctx.beginPath();
 			ctx.lineVer(startX, startY, startY + heightArrow);
 			
-			
 			if(isDescending)
 			{
-				ctx.lineHor(startX - widthLine, startY + heightArrow - 2 * 0.75 * scaleIndex, startX - widthLine + widthArrow);
+				/*ctx.moveTo(startX, startY + heightArrow);
+				ctx.lineTo(startX - 1 * width_1px, startY + heightArrow - 3 * height_1px);
+				ctx.moveTo(startX, startY + heightArrow);
+				ctx.lineTo(startX + 2 * width_1px, startY + heightArrow - 3 * height_1px);*/
+				ctx.lineHor(startX - widthLine, startY + heightArrow - 2 * height_1px * scaleIndex, startX - widthLine + widthArrow);
 			}
 			else
 			{
-				ctx.lineHor(startX - widthLine, startY + 1 * 0.75 * scaleIndex, startX - widthLine + widthArrow);
+				ctx.lineHor(startX - widthLine, startY + 1 * height_1px * scaleIndex, startX - widthLine + widthArrow);
 			}
 			
 			ctx.setLineWidth(t.width_1px);
@@ -12085,11 +12088,11 @@
         var _drawFilterMark = function (x, y, height) 
 		{
             var size = 5.25 * scaleIndex;
-            var halfSize = Math.round((size / 2) / 0.75) * 0.75;
-            var meanLine = Math.round((size * Math.sqrt(3) / 3) / 0.75) * 0.75;//длина биссектрисы равностороннего треугольника
+            var halfSize = Math.round((size / 2) / height_1px) * height_1px;
+            var meanLine = Math.round((size * Math.sqrt(3) / 3) / height_1px) * height_1px;//длина биссектрисы равностороннего треугольника
             //округляем + смещаем
-            x = Math.round((x) / 0.75) * 0.75;
-            y = Math.round((y) / 0.75) * 0.75;
+            x = Math.round((x) / width_1px) * width_1px;
+            y = Math.round((y) / height_1px) * height_1px;
             var y1 = y - height;
 
             ws.drawingCtx
@@ -12116,12 +12119,12 @@
             //сюда приходят координаты центра кнопки
             //чтобы кнопка была в центре, необходимо сместить
             var leftDiff = size / 2;
-            var upDiff = Math.round(((size * Math.sqrt(3)) / 6) / 0.75) * 0.75;//радиус вписанной окружности в треугольник
+            var upDiff = Math.round(((size * Math.sqrt(3)) / 6) / height_1px) * height_1px;//радиус вписанной окружности в треугольник
             //округляем + смещаем
-            x = Math.round((x - leftDiff) / 0.75) * 0.75;
-            y = Math.round((y - upDiff) / 0.75) * 0.75;
-            var meanLine = Math.round((size * Math.sqrt(3) / 3) / 0.75) * 0.75;//длина биссектрисы равностороннего треугольника
-            var halfSize = Math.round((size / 2) / 0.75) * 0.75;
+            x = Math.round((x - leftDiff) / width_1px) * width_1px;
+            y = Math.round((y - upDiff) / height_1px) * height_1px;
+            var meanLine = Math.round((size * Math.sqrt(3) / 3) / width_1px) * width_1px;//длина биссектрисы равностороннего треугольника
+            var halfSize = Math.round((size / 2) / height_1px) * height_1px;
             //рисуем
             ws.drawingCtx
               .beginPath()
@@ -12133,7 +12136,42 @@
               .fill();
         };
 		
-		
+		var _drawButton = function(upLeftXButton, upLeftYButton)
+		{
+			//квадрат кнопки рисуем
+			_drawButtonBorder(upLeftXButton, upLeftYButton, width, height);
+			
+			//координаты центра
+			var centerX = upLeftXButton + (width / 2);
+			var centerY = upLeftYButton + (height / 2);
+			
+			/*if(null !== isApplySortState && isApplyAutoFilter)
+			{
+				var heigthObj = Math.ceil((height / 2) / height_1px) * height_1px + 1 * height_1px;
+				var marginTop = Math.floor(((height - heigthObj) / 2) / height_1px) * height_1px;
+				centerY = upLeftYButton + heigthObj + marginTop;
+				
+				_drawSortArrow(upLeftXButton + 4 * width_1px, upLeftYButton + 5 * height_1px, isApplySortState, 8);
+				_drawFilterMark(centerX + 2 * width_1px, centerY, heigthObj);
+			}
+			else if(null !== isApplySortState) 
+			{
+				_drawSortArrow(centerX + 2 * width_1px, upLeftYButton + 3 * height_1px, isApplySortState, 10);
+				_drawFilterDreieck(centerX - 3 * width_1px, centerY + 2 * height_1px, scaleIndex * 0.75);
+			}
+			else */if (isApplyAutoFilter) 
+			{
+				var heigthObj = Math.ceil((height / 2) / height_1px) * height_1px + 1 * height_1px;
+				var marginTop = Math.floor(((height - heigthObj) / 2) / height_1px) * height_1px;
+
+				centerY = upLeftYButton + heigthObj + marginTop;
+				_drawFilterMark(centerX, centerY, heigthObj);
+			} 
+			else 
+			{
+				_drawFilterDreieck(centerX, centerY, scaleIndex);
+			}
+		};
 		
 		var diffX = 0;
 		var diffY = 0;
@@ -12170,49 +12208,7 @@
 			height = rowHeight;
 		}
 		
-		//квадрат кнопки рисуем
-		_drawButtonBorder(x1 + diffX, y1 + diffY, width, height);
-
-		//координаты левого верхнего угла кнопки
-		var upLeftXButton = x1 + diffX;
-		var upLeftYButton = y1 + diffY;
-		var centerX, centerY;
-		/*if(null !== isApplySortState && isApplyAutoFilter)
-		{
-			centerX = upLeftXButton + (width / 2);
-			
-			var heigthObj = Math.ceil((height / 2) / 0.75) * 0.75 + 1 * 0.75;
-			var marginTop = Math.floor(((height - heigthObj) / 2) / 0.75) * 0.75;
-			centerY = upLeftYButton + heigthObj + marginTop;
-			
-			_drawSortArrow(upLeftXButton + 4 * 0.75, upLeftYButton + 5 * 0.75, isApplySortState, 8);
-			_drawFilterMark(centerX + 2 * 0.75, centerY, heigthObj);
-		}
-		else if(null !== isApplySortState) 
-		{
-			centerX = upLeftXButton + (width / 2);
-			centerY = upLeftYButton + (height / 2);
-			
-			_drawSortArrow(centerX + 2 * 0.75, upLeftYButton + 3 * 0.75, isApplySortState, 10);
-			_drawFilterDreieck(centerX - 3 * 0.75, centerY + 2 * 0.75, scaleIndex * 0.75);
-		}
-		else */if (isApplyAutoFilter) 
-		{
-			centerX = upLeftXButton + (width / 2);
-			
-			var heigthObj = Math.ceil((height / 2) / 0.75) * 0.75 + 1 * 0.75;
-			var marginTop = Math.floor(((height - heigthObj) / 2) / 0.75) * 0.75;
-
-			centerY = upLeftYButton + heigthObj + marginTop;
-			_drawFilterMark(centerX, centerY, heigthObj);
-		} 
-		else 
-		{
-			//центр кнопки
-			centerX = upLeftXButton + (width / 2);
-			centerY = upLeftYButton + (height / 2);
-			_drawFilterDreieck(centerX, centerY, scaleIndex);
-		}
+		_drawButton(x1 + diffX, y1 + diffY);
 	};
 	
     WorksheetView.prototype.af_checkCursor = function (x, y, offsetX, offsetY, frozenObj, r, c) {
