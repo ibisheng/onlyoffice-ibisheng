@@ -597,8 +597,6 @@ function checkPointInMap(map, worksheet, row, col)
     };
 
 
-
-
     drawingsChangesMap[AscDFH.historyitem_ChartSpace_SetNvGrFrProps                ] = function(oClass, value){oClass.nvGraphicFramePr   = value;};
     drawingsChangesMap[AscDFH.historyitem_ChartSpace_SetThemeOverride              ] = function(oClass, value){oClass.themeOverride = value;};
     drawingsChangesMap[AscDFH.historyitem_ShapeSetBDeleted                         ] = function(oClass, value){oClass.bDeleted = value;};
@@ -709,7 +707,7 @@ AscCommon.extendClass(CChartSpace, AscFormat.CGraphicObjectBase);
 
     CChartSpace.prototype.GetPath = function(index){
         return this.pathMemory.GetPath(index);
-    }
+    };
 
         CChartSpace.prototype.select = CShape.prototype.select;
 CChartSpace.prototype.checkDrawingBaseCoords = CShape.prototype.checkDrawingBaseCoords;
@@ -5254,6 +5252,8 @@ CChartSpace.prototype.recalculateAxis = function()
                                     bCorrectedLayoutRect = true;
                                 }
 
+                                point_interval = rect.w/intervals_count;
+
                                 if (cross_between === AscFormat.CROSS_BETWEEN_MID_CAT) {
                                     for (i = 0; i < string_pts.length; ++i)
                                         arr_cat_labels_points[i] = rect.x + point_interval * i;
@@ -5451,6 +5451,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                     bCorrectedLayoutRect = true;
                                 }
 
+                                point_interval = rect.w/intervals_count;
                                 if(cross_between === AscFormat.CROSS_BETWEEN_MID_CAT)
                                 {
                                     for(i = 0; i < string_pts.length; ++i)
@@ -5512,9 +5513,9 @@ CChartSpace.prototype.recalculateAxis = function()
                                 rect.w -= (rect.x + rect.w - this.extX);
                                 bCorrectedLayoutRect = true;
                             }
-                            if(bCorrectedLayoutRect){
-                                    point_interval = rect.w/intervals_count;
-                            }
+
+                            point_interval = rect.w/intervals_count;
+
 
                             if(cross_between === AscFormat.CROSS_BETWEEN_MID_CAT)
                             {
@@ -5574,9 +5575,8 @@ CChartSpace.prototype.recalculateAxis = function()
                                 rect.w -= (rect.x + rect.w - this.extX);
                                 bCorrectedLayoutRect = true;
                             }
-                            if(bCorrectedLayoutRect){
-                                point_interval = rect.w/intervals_count;
-                            }
+
+                            point_interval = rect.w/intervals_count;
                             if(cross_between === AscFormat.CROSS_BETWEEN_MID_CAT)
                             {
                                 for(i = 0; i < string_pts.length; ++i)
