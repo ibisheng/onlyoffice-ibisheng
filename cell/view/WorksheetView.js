@@ -12060,6 +12060,7 @@
 			heightArrow = heightArrow * height_1px * scaleIndex;
 			var widthArrow = 3 * width_1px * scaleIndex;
 			var widthLine = 1 * width_1px * scaleIndex;
+			var heightEndArrow = 3 * height_1px * scaleIndex;
 			
 			//isDescending = true - стрелочка смотрит вниз
 			//рисуем сверху вниз
@@ -12069,15 +12070,19 @@
 			
 			if(isDescending)
 			{
-				/*ctx.moveTo(startX, startY + heightArrow);
-				ctx.lineTo(startX - 1 * width_1px, startY + heightArrow - 3 * height_1px);
 				ctx.moveTo(startX, startY + heightArrow);
-				ctx.lineTo(startX + 2 * width_1px, startY + heightArrow - 3 * height_1px);*/
-				ctx.lineHor(startX - widthLine, startY + heightArrow - 2 * height_1px * scaleIndex, startX - widthLine + widthArrow);
+				ctx.lineTo(startX - (widthArrow - widthLine), startY + heightArrow - heightEndArrow);
+				ctx.moveTo(startX + widthArrow, startY + heightArrow - heightEndArrow);
+				ctx.lineTo(startX, startY + heightArrow);
+				//ctx.lineHor(startX - 2 * width_1px, startY + heightArrow - 1 * height_1px, startX  + 3 * width_1px);
 			}
 			else
 			{
-				ctx.lineHor(startX - widthLine, startY + 1 * height_1px * scaleIndex, startX - widthLine + widthArrow);
+				ctx.moveTo(startX, startY);
+				ctx.lineTo(startX - (widthArrow - widthLine), startY + heightEndArrow);
+				ctx.moveTo(startX + widthArrow, startY + heightEndArrow);
+				ctx.lineTo(startX, startY);
+				//ctx.lineHor(startX - widthLine, startY + 1 * height_1px * scaleIndex, startX - widthLine + widthArrow);
 			}
 			
 			ctx.setLineWidth(t.width_1px);
@@ -12136,6 +12141,7 @@
               .fill();
         };
 		
+		//TODO пересмотреть отрисовку кнопок + отрисовку при масштабировании
 		var _drawButton = function(upLeftXButton, upLeftYButton)
 		{
 			//квадрат кнопки рисуем
@@ -12145,21 +12151,21 @@
 			var centerX = upLeftXButton + (width / 2);
 			var centerY = upLeftYButton + (height / 2);
 			
-			/*if(null !== isApplySortState && isApplyAutoFilter)
+			if(null !== isApplySortState && isApplyAutoFilter)
 			{
 				var heigthObj = Math.ceil((height / 2) / height_1px) * height_1px + 1 * height_1px;
 				var marginTop = Math.floor(((height - heigthObj) / 2) / height_1px) * height_1px;
 				centerY = upLeftYButton + heigthObj + marginTop;
 				
-				_drawSortArrow(upLeftXButton + 4 * width_1px, upLeftYButton + 5 * height_1px, isApplySortState, 8);
+				_drawSortArrow(upLeftXButton + 4 * width_1px * scaleIndex, upLeftYButton + 5 * height_1px * scaleIndex, isApplySortState, 8);
 				_drawFilterMark(centerX + 2 * width_1px, centerY, heigthObj);
 			}
 			else if(null !== isApplySortState) 
 			{
-				_drawSortArrow(centerX + 2 * width_1px, upLeftYButton + 3 * height_1px, isApplySortState, 10);
+				_drawSortArrow(upLeftXButton + width - 5 * width_1px * scaleIndex, upLeftYButton + 3 * height_1px * scaleIndex, isApplySortState, 10);
 				_drawFilterDreieck(centerX - 3 * width_1px, centerY + 2 * height_1px, scaleIndex * 0.75);
 			}
-			else */if (isApplyAutoFilter) 
+			else if (isApplyAutoFilter) 
 			{
 				var heigthObj = Math.ceil((height / 2) / height_1px) * height_1px + 1 * height_1px;
 				var marginTop = Math.floor(((height - heigthObj) / 2) / height_1px) * height_1px;
