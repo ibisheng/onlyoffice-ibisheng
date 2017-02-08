@@ -3392,7 +3392,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
             || (chartType === AscDFH.historyitem_type_BarChart && this.chart.plotArea.charts[0].barDir !== AscFormat.BAR_DIR_BAR)){
             if(valAx){
                 if(AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this)){
-                    if(chartType === AscDFH.historyitem_type_AreaChart ){
+                    if(chartType === AscDFH.historyitem_type_AreaChart || chartType === AscDFH.historyitem_type_SurfaceChart ){
                         return AscFormat.isRealNumber(valAx.crossBetween) ? valAx.crossBetween : AscFormat.CROSS_BETWEEN_MID_CAT;
                     }
                     else if(chartType === AscDFH.historyitem_type_LineChart){
@@ -3403,7 +3403,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                     }
                 }
                 else{
-                    return AscFormat.isRealNumber(valAx.crossBetween) ? valAx.crossBetween :  (chartType === AscDFH.historyitem_type_AreaChart ? AscFormat.CROSS_BETWEEN_MID_CAT : AscFormat.CROSS_BETWEEN_BETWEEN);
+                    return AscFormat.isRealNumber(valAx.crossBetween) ? valAx.crossBetween :  ((chartType === AscDFH.historyitem_type_AreaChart|| chartType === AscDFH.historyitem_type_SurfaceChart ) ? AscFormat.CROSS_BETWEEN_MID_CAT : AscFormat.CROSS_BETWEEN_BETWEEN);
                 }
             }
         }
