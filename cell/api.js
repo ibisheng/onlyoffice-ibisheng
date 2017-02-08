@@ -2960,42 +2960,44 @@ var editor;
   /////////////////////////////////////////////////////////////////////////
   ////////////////////////////AutoSave api/////////////////////////////////
   /////////////////////////////////////////////////////////////////////////
-  spreadsheet_api.prototype._autoSave = function() {
-    if ((!this.canUnlockDocument && 0 === this.autoSaveGap && (!this.collaborativeEditing.getFast() || !this.collaborativeEditing.getCollaborativeEditing()))
-      || this.asc_getCellEditMode() || this.asc_getIsTrackShape() || this.isOpenedChartFrame ||
-      !History.IsEndTransaction() || !this.canSave) {
-      return;
-    }
+	spreadsheet_api.prototype._autoSave = function () { 
+		if (!this.DocumentLoadComplete || (!this.canUnlockDocument && 0 === this.autoSaveGap &&
+			(!this.collaborativeEditing.getFast() || !this.collaborativeEditing.getCollaborativeEditing())) ||
+			this.asc_getCellEditMode() || this.asc_getIsTrackShape() || this.isOpenedChartFrame ||
+			!History.IsEndTransaction() || !this.canSave) {
+			return;
+		}
 
-    if (this.canUnlockDocument) {
-      this.asc_Save(true);
-      return;
-    }
+		if (this.canUnlockDocument) {
+			this.asc_Save(true);
+			return;
+		}
 
-    if (!History.Have_Changes(true) && !(this.collaborativeEditing.getCollaborativeEditing() && 0 !== this.collaborativeEditing.getOwnLocksLength())) {
-      if (this.collaborativeEditing.getFast() && this.collaborativeEditing.haveOtherChanges()) {
-        AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
+		if (!History.Have_Changes(true) && !(this.collaborativeEditing.getCollaborativeEditing() &&
+			0 !== this.collaborativeEditing.getOwnLocksLength())) {
+			if (this.collaborativeEditing.getFast() && this.collaborativeEditing.haveOtherChanges()) {
+				AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
 
-        // Принимаем чужие изменения
-        this.collaborativeEditing.applyChanges();
-        // Пересылаем свои изменения (просто стираем чужие lock-и, т.к. своих изменений нет)
-        this.collaborativeEditing.sendChanges();
-        // Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
-        this.wb._onWSSelectionChanged();
-      }
-      return;
-    }
-    if (null === this.lastSaveTime) {
-      this.lastSaveTime = new Date();
-      return;
-    }
-    var saveGap = this.collaborativeEditing.getFast() ? this.autoSaveGapRealTime :
-      (this.collaborativeEditing.getCollaborativeEditing() ? this.autoSaveGapSlow : this.autoSaveGapFast);
-    var gap = new Date() - this.lastSaveTime - saveGap;
-    if (0 <= gap) {
-      this.asc_Save(true);
-    }
-  };
+				// Принимаем чужие изменения
+				this.collaborativeEditing.applyChanges();
+				// Пересылаем свои изменения (просто стираем чужие lock-и, т.к. своих изменений нет)
+				this.collaborativeEditing.sendChanges();
+				// Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
+				this.wb._onWSSelectionChanged();
+			}
+			return;
+		}
+		if (null === this.lastSaveTime) {
+			this.lastSaveTime = new Date();
+			return;
+		}
+		var saveGap = this.collaborativeEditing.getFast() ? this.autoSaveGapRealTime :
+			(this.collaborativeEditing.getCollaborativeEditing() ? this.autoSaveGapSlow : this.autoSaveGapFast);
+		var gap = new Date() - this.lastSaveTime - saveGap;
+		if (0 <= gap) {
+			this.asc_Save(true);
+		}
+	};
 
   spreadsheet_api.prototype._onUpdateDocumentCanSave = function() {
     // Можно модифицировать это условие на более быстрое (менять самим состояние в аргументах, а не запрашивать каждый раз)
