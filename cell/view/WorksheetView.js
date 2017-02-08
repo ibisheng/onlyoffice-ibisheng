@@ -11942,8 +11942,149 @@
             return false;
         }
 
-        var _drawFilterMark = function (x, y, height, index) {
-            var size = 5.25 * index;
+        var drawCurrentFilterButtons = function (filter) {
+			var autoFilter = filter.isAutoFilter() ? filter : filter.AutoFilter;
+            var range = new Asc.Range(filter.Ref.c1, filter.Ref.r1, filter.Ref.c2, filter.Ref.r1);
+			
+            if (range.isIntersect(updatedRange)) {
+                var row = range.r1;
+				
+				var sortCondition = filter.isApplySortConditions() ? filter.SortState.SortConditions[0] : null;
+                for (var col = range.c1; col <= range.c2; col++) {
+                    if (col >= updatedRange.c1 && col <= updatedRange.c2) {
+                        var isSetFilter = false;
+                        var isShowButton = true;
+						var isSortState = null;//true - ascending, false - descending
+
+						var colId = filter.isAutoFilter() ? t.model.autoFilters._getTrueColId(autoFilter, col - range.c1) : col - range.c1;
+                        if (autoFilter.FilterColumns && autoFilter.FilterColumns.length) {
+                            var filterColumn = null, filterColumnWithMerge = null;
+
+                            for (var i = 0; i < autoFilter.FilterColumns.length; i++) {
+                                if (autoFilter.FilterColumns[i].ColId === col - range.c1) {
+                                    filterColumn = autoFilter.FilterColumns[i];
+                                }
+
+                                if (colId === col - range.c1 && filterColumn !== null) {
+                                    filterColumnWithMerge = filterColumn;
+                                    break;
+                                } else if (autoFilter.FilterColumns[i].ColId === colId) {
+                                    filterColumnWithMerge = autoFilter.FilterColumns[i];
+                                }
+                            }
+
+                            if (filterColumnWithMerge && filterColumnWithMerge.isApplyAutoFilter()) {
+                                isSetFilter = true;
+                            }
+
+                            if (filterColumn && filterColumn.ShowButton === false) {
+                                isShowButton = false;
+                            }
+
+                        }
+						
+						if(sortCondition && sortCondition.Ref)
+						{
+							if(colId === sortCondition.Ref.c1 - range.c1)
+							{
+								isSortState = sortCondition.ConditionDescending;
+							}
+						}
+						
+                        if (isShowButton === false) {
+                            continue;
+                        }
+
+                        var width = 13;
+                        var height = 13;
+                        var rowHeight = ws.rows[row].height;
+                        if (rowHeight < height) {
+                            width = width * (rowHeight / height);
+                            height = rowHeight;
+                        }
+
+                        var x1 = ws.cols[col].left + ws.cols[col].width - width - 0.5;
+                        var y1 = ws.rows[row].top + ws.rows[row].height - height - 0.5;
+
+                        t.af_drawCurrentButton(x1 - offsetX, y1 - offsetY, {isSortState: isSortState, isSetFilter: isSetFilter, row: row, col: col});
+                    }
+                }
+            }
+        };
+
+        if (aWs.AutoFilter) {
+            drawCurrentFilterButtons(aWs.AutoFilter);
+        }
+        if (aWs.TableParts && aWs.TableParts.length) {
+            for (var i = 0; i < aWs.TableParts.length; i++) {
+                if (aWs.TableParts[i].AutoFilter && aWs.TableParts[i].HeaderRowCount !== 0) {
+                    drawCurrentFilterButtons(aWs.TableParts[i], true);
+                }
+            }
+        }
+
+        return true;
+    };
+	
+	WorksheetView.prototype.af_drawCurrentButton = function (x1, y1, props) {
+		var isApplyAutoFilter = props.isSetFilter;
+		var isApplySortState = props.isSortState;
+		
+		var ws = this;
+        var aWs = this.model;
+        var t = this;
+		
+		var width_1px = t.width_1px;
+		var height_1px = t.height_1px;
+		var height = 15 * width_1px;
+		var width = 15 * height_1px;
+        var m_oColor = new CColor(120, 120, 120);
+		
+		var rowHeight = ws.rows[props.row].height;
+		var colWidth = ws.cols[props.col].width;
+		
+		var scaleIndex = 1;
+		
+		var _drawButtonBorder = function(startX, startY, width, height)
+		{
+			ws.drawingCtx
+              .setFillStyle(ws.settings.cells.defaultState.background)
+              .setLineWidth(1)
+              .setStrokeStyle(ws.settings.cells.defaultState.border)
+              .fillRect(startX, startY, width, height)
+              .strokeRect(startX, startY, width, height);
+		};
+		
+		var _drawSortArrow = function(startX, startY, isDescending, heightArrow)
+		{
+			heightArrow = heightArrow * 0.75 * scaleIndex;
+			var widthArrow = 3 * 0.75 * scaleIndex;
+			var widthLine = 1 * 0.75 * scaleIndex;
+			
+			//isDescending = true - стрелочка смотрит вниз
+			//рисуем сверху вниз
+			var ctx = ws.drawingCtx;
+			ctx.beginPath();
+			ctx.lineVer(startX, startY, startY + heightArrow);
+			
+			
+			if(isDescending)
+			{
+				ctx.lineHor(startX - widthLine, startY + heightArrow - 2 * 0.75 * scaleIndex, startX - widthLine + widthArrow);
+			}
+			else
+			{
+				ctx.lineHor(startX - widthLine, startY + 1 * 0.75 * scaleIndex, startX - widthLine + widthArrow);
+			}
+			
+			ctx.setLineWidth(t.width_1px);
+			ctx.setStrokeStyle(m_oColor);
+			ctx.stroke();
+		};
+		
+        var _drawFilterMark = function (x, y, height) 
+		{
+            var size = 5.25 * scaleIndex;
             var halfSize = Math.round((size / 2) / 0.75) * 0.75;
             var meanLine = Math.round((size * Math.sqrt(3) / 3) / 0.75) * 0.75;//длина биссектрисы равностороннего треугольника
             //округляем + смещаем
@@ -11969,7 +12110,8 @@
               .fill();
         };
 
-        var _drawFilterDreieck = function (x, y, index) {
+        var _drawFilterDreieck = function (x, y, index) 
+		{
             var size = 5.25 * index;
             //сюда приходят координаты центра кнопки
             //чтобы кнопка была в центре, необходимо сместить
@@ -11990,145 +12132,89 @@
               .setFillStyle(m_oColor)
               .fill();
         };
+		
+		
+		
+		var diffX = 0;
+		var diffY = 0;
+		if ((colWidth - 2) < width && rowHeight < (height + 2)) 
+		{
+			if (rowHeight < colWidth) 
+			{
+				scaleIndex = rowHeight / height;
+				width = width * scaleIndex;
+				height = rowHeight;
+			} 
+			else 
+			{
+				scaleIndex = colWidth / width;
+				diffY = width - colWidth;
+				diffX = width - colWidth;
+				width = colWidth;
+				height = height * scaleIndex;
+			}
+		}
+		else if ((colWidth - 2) < width) 
+		{
+			scaleIndex = colWidth / width;
+			//смещения по x и y
+			diffY = width - colWidth;
+			diffX = width - colWidth + 2;
+			width = colWidth;
+			height = height * scaleIndex;
+		} 
+		else if (rowHeight < height) 
+		{
+			scaleIndex = rowHeight / height;
+			width = width * scaleIndex;
+			height = rowHeight;
+		}
+		
+		//квадрат кнопки рисуем
+		_drawButtonBorder(x1 + diffX, y1 + diffY, width, height);
 
-        var _drawButton = function (x1, y1, options) {
-            var isSet = options.isSetFilter;
-            var height = 11.25;
-            var width = 11.25;
-            var rowHeight = ws.rows[options.row].height;
-            var colWidth = ws.cols[options.col].width;
-            var index = 1;
-            var diffX = 0;
-            var diffY = 0;
-            if ((colWidth - 2) < width && rowHeight < (height + 2)) {
-                if (rowHeight < colWidth) {
-                    index = rowHeight / height;
-                    width = width * index;
-                    height = rowHeight;
-                } else {
-                    index = colWidth / width;
-                    diffY = width - colWidth;
-                    diffX = width - colWidth;
-                    width = colWidth;
-                    height = height * index;
-                }
-            } else if ((colWidth - 2) < width) {
-                index = colWidth / width;
-                //смещения по x и y
-                diffY = width - colWidth;
-                diffX = width - colWidth + 2;
-                width = colWidth;
-                height = height * index;
-            } else if (rowHeight < height) {
-                index = rowHeight / height;
-                width = width * index;
-                height = rowHeight;
-            }
-            //квадрат кнопки рисуем
-            ws.drawingCtx
-              .setFillStyle(ws.settings.cells.defaultState.background)
-              .setLineWidth(1)
-              .setStrokeStyle(ws.settings.cells.defaultState.border)
-              .fillRect(x1 + diffX, y1 + diffY, width, height)
-              .strokeRect(x1 + diffX, y1 + diffY, width, height);
+		//координаты левого верхнего угла кнопки
+		var upLeftXButton = x1 + diffX;
+		var upLeftYButton = y1 + diffY;
+		var centerX, centerY;
+		/*if(null !== isApplySortState && isApplyAutoFilter)
+		{
+			centerX = upLeftXButton + (width / 2);
+			
+			var heigthObj = Math.ceil((height / 2) / 0.75) * 0.75 + 1 * 0.75;
+			var marginTop = Math.floor(((height - heigthObj) / 2) / 0.75) * 0.75;
+			centerY = upLeftYButton + heigthObj + marginTop;
+			
+			_drawSortArrow(upLeftXButton + 4 * 0.75, upLeftYButton + 5 * 0.75, isApplySortState, 8);
+			_drawFilterMark(centerX + 2 * 0.75, centerY, heigthObj);
+		}
+		else if(null !== isApplySortState) 
+		{
+			centerX = upLeftXButton + (width / 2);
+			centerY = upLeftYButton + (height / 2);
+			
+			_drawSortArrow(centerX + 2 * 0.75, upLeftYButton + 3 * 0.75, isApplySortState, 10);
+			_drawFilterDreieck(centerX - 3 * 0.75, centerY + 2 * 0.75, scaleIndex * 0.75);
+		}
+		else */if (isApplyAutoFilter) 
+		{
+			centerX = upLeftXButton + (width / 2);
+			
+			var heigthObj = Math.ceil((height / 2) / 0.75) * 0.75 + 1 * 0.75;
+			var marginTop = Math.floor(((height - heigthObj) / 2) / 0.75) * 0.75;
 
-            //координаты левого верхнего угла кнопки
-            var upLeftXButton = x1 + diffX;
-            var upLeftYButton = y1 + diffY;
-            var centerX, centerY;
-            if (isSet) {
-                centerX = upLeftXButton + (width / 2);
-                var heigthObj = Math.ceil((height / 2) / 0.75) * 0.75;
-                var marginTop = Math.floor(((height - heigthObj) / 2) / 0.75) * 0.75;
-
-                centerY = upLeftYButton + heigthObj + marginTop;
-                _drawFilterMark(centerX, centerY, heigthObj, index);
-            } else {
-                //центр кнопки
-                centerX = upLeftXButton + (width / 2);
-                centerY = upLeftYButton + (height / 2);
-                _drawFilterDreieck(centerX, centerY, index);
-            }
-        };
-
-        var drawCurrentFilterButton = function (filter, isTablePart) {
-            var range = new Asc.Range(filter.Ref.c1, filter.Ref.r1, filter.Ref.c2, filter.Ref.r1);
-            if (range.isIntersect(updatedRange)) {
-                //TODO сделать isSetFilter
-                var isSetFilter = false;
-                var isShowButton = true;
-
-                var row = range.r1;
-                for (var col = range.c1; col <= range.c2; col++) {
-                    if (col >= updatedRange.c1 && col <= updatedRange.c2) {
-                        isSetFilter = false;
-                        isShowButton = true;
-
-                        if (filter.FilterColumns && filter.FilterColumns.length) {
-                            var colId = !isTablePart ? t.model.autoFilters._getTrueColId(filter, col - range.c1) :
-                            col - range.c1;
-                            var filterColumn = null, filterColumnWithMerge = null;
-
-                            for (var i = 0; i < filter.FilterColumns.length; i++) {
-                                if (filter.FilterColumns[i].ColId === col - range.c1) {
-                                    filterColumn = filter.FilterColumns[i];
-                                }
-
-                                if (colId === col - range.c1 && filterColumn !== null) {
-                                    filterColumnWithMerge = filterColumn;
-                                    break;
-                                } else if (filter.FilterColumns[i].ColId === colId) {
-                                    filterColumnWithMerge = filter.FilterColumns[i];
-                                }
-                            }
-
-                            if (filterColumnWithMerge && filterColumnWithMerge.isApplyAutoFilter()) {
-                                isSetFilter = true;
-                            }
-
-                            if (filterColumn && filterColumn.ShowButton === false) {
-                                isShowButton = false;
-                            }
-
-                        }
-
-                        if (isShowButton === false) {
-                            continue;
-                        }
-
-                        var width = 13;
-                        var height = 13;
-                        var rowHeight = ws.rows[row].height;
-                        if (rowHeight < height) {
-                            width = width * (rowHeight / height);
-                            height = rowHeight;
-                        }
-
-                        var x1 = ws.cols[col].left + ws.cols[col].width - width - 0.5;
-                        var y1 = ws.rows[row].top + ws.rows[row].height - height - 0.5;
-
-                        _drawButton(x1 - offsetX, y1 - offsetY,
-                          {sortState: false, isSetFilter: isSetFilter, row: row, col: col});
-                    }
-                }
-            }
-        };
-
-        if (aWs.AutoFilter) {
-            drawCurrentFilterButton(aWs.AutoFilter);
-        }
-
-        if (aWs.TableParts && aWs.TableParts.length) {
-            for (var i = 0; i < aWs.TableParts.length; i++) {
-                if (aWs.TableParts[i].AutoFilter && aWs.TableParts[i].HeaderRowCount !== 0) {
-                    drawCurrentFilterButton(aWs.TableParts[i].AutoFilter, true);
-                }
-            }
-        }
-
-        return true;
-    };
-
+			centerY = upLeftYButton + heigthObj + marginTop;
+			_drawFilterMark(centerX, centerY, heigthObj);
+		} 
+		else 
+		{
+			//центр кнопки
+			centerX = upLeftXButton + (width / 2);
+			centerY = upLeftYButton + (height / 2);
+			_drawFilterDreieck(centerX, centerY, scaleIndex);
+		}
+	};
+	
     WorksheetView.prototype.af_checkCursor = function (x, y, offsetX, offsetY, frozenObj, r, c) {
         var ws = this;
         var aWs = this.model;
