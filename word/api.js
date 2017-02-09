@@ -852,7 +852,7 @@ background-repeat: no-repeat;\
 
 		g_oIdCounter.Set_Load(true);
 
-		var openParams        = {checkFileSize : this.isMobileVersion, charCount : 0, parCount : 0};
+		var openParams        = {checkFileSize : /*this.isMobileVersion*/false, charCount : 0, parCount : 0};
 		var oBinaryFileReader = new AscCommonWord.BinaryFileReader(this.WordControl.m_oLogicDocument, openParams);
 		if (oBinaryFileReader.Read(gObject))
 		{
@@ -6946,7 +6946,7 @@ background-repeat: no-repeat;\
 
 		g_oIdCounter.Set_Load(true);
 
-		var openParams        = {checkFileSize : this.isMobileVersion, charCount : 0, parCount : 0};
+		var openParams        = {checkFileSize : /*this.isMobileVersion*/false, charCount : 0, parCount : 0};
 		var oBinaryFileReader = new AscCommonWord.BinaryFileReader(this.WordControl.m_oLogicDocument, openParams);
 
 		if (undefined === version)
