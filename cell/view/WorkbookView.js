@@ -2846,11 +2846,11 @@
 		var _offY = ws.cellsTop * asc_getcvt(1/*pt*/, 3/*mm*/, ws._getPPIY());
 
 		return {
-			X: asc.c_oAscSelectionType.RangeRow === type ? 0 : l - _offX,
-			Y: asc.c_oAscSelectionType.RangeCol === type ? 0 : t - _offY,
-			W: asc.c_oAscSelectionType.RangeRow === type ? ws.cellsLeft :
+			X: asc.c_oAscSelectionType.RangeRow === type ? -_offX : l - _offX,
+			Y: asc.c_oAscSelectionType.RangeCol === type ? -_offY : t - _offY,
+			W: asc.c_oAscSelectionType.RangeRow === type ? _offX :
 				ws.getCellLeft(range.c2, 3) - l + ws.getColumnWidth(range.c2, 3),
-			H: asc.c_oAscSelectionType.RangeCol === type ? ws.cellsTop :
+			H: asc.c_oAscSelectionType.RangeCol === type ? _offY :
 				ws.getCellTop(range.r2, 3) - t + ws.getRowHeight(range.r2, 3),
 			T: type
 		};
