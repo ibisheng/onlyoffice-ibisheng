@@ -196,7 +196,16 @@
       this.tableName = null;
 
       this.tableRange = null;
-
+      
+	  this.firstRow = null;
+      this.lastRow = null;
+      this.bandHor = null;
+      this.firstCol = null;
+      this.lastCol = null;
+      this.bandVer = null;
+      this.filterButton = null;
+	  
+	  //info send in menu - what you can do with row/col into table
       this.isInsertRowAbove = null;
       this.isInsertRowBelow = null;
       this.isInsertColumnLeft = null;
@@ -204,6 +213,9 @@
       this.isDeleteRow = null;
       this.isDeleteColumn = null;
       this.isDeleteTable = null;
+	  
+	  this.altText = null;
+	  this.altTextSummary = null;
     }
     asc_CFormatTableInfo.prototype = {
       asc_getTableStyleName: function() {
@@ -244,6 +256,12 @@
         return this.isDeleteColumn;
       }, asc_getIsDeleteTable: function() {
         return this.isDeleteTable;
+      },
+	  
+	  asc_getTitle: function() {
+        return this.altText;
+      }, asc_getDescription: function() {
+        return this.altTextSummary;
       }
     };
 
@@ -447,6 +465,8 @@
   prot["asc_getIsDeleteRow"] = prot.asc_getIsDeleteRow;
   prot["asc_getIsDeleteColumn"] = prot.asc_getIsDeleteColumn;
   prot["asc_getIsDeleteTable"] = prot.asc_getIsDeleteTable;
+  prot["asc_getTitle"] = prot.asc_getTitle;
+  prot["asc_getDescription"] = prot.asc_getDescription;
 
   window["AscCommonExcel"].asc_CCellInfo = asc_CCellInfo;
   prot = asc_CCellInfo.prototype;

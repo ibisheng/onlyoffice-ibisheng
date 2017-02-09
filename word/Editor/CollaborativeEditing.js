@@ -127,13 +127,14 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
 	if (0 < aChanges.length || null !== deleteIndex)
 	{
 		this.private_OnSendOwnChanges(aChanges2, deleteIndex);
-		editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo);
+		editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo, editor.canUnlockDocument2);
 		AscCommon.History.CanNotAddChanges = true;
 	}
 	else
 	{
-		editor.CoAuthoringApi.unLockDocument(true);
+		editor.CoAuthoringApi.unLockDocument(true, editor.canUnlockDocument2);
 	}
+	editor.canUnlockDocument2 = false;
 
     if (-1 === this.m_nUseType)
     {
@@ -740,6 +741,7 @@ CWordCollaborativeEditing.prototype.Undo = function()
 
 	var mapDocumentContents = {};
 	var mapParagraphs       = {};
+	var mapDrawings         = {};
 	for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
 	{
 		var oChange = arrReverseChanges[nIndex];
@@ -750,12 +752,29 @@ CWordCollaborativeEditing.prototype.Undo = function()
 			mapParagraphs[oClass.Get_Id()] = oClass;
 		else if (oClass.IsParagraphContentElement && true === oClass.IsParagraphContentElement() && true === oChange.IsContentChange() && oClass.Get_Paragraph())
 			mapParagraphs[oClass.Get_Paragraph().Get_Id()] = oClass.Get_Paragraph();
+		else if(oClass instanceof AscCommonWord.ParaDrawing){
+            mapDrawings[oClass.Get_Id()] = oClass;
+        }
 	}
 
 	// Создаем точку в истории. Делаем действия через обычные функции (с отключенным пересчетом), которые пишут в
 	// историю. Сохраняем список изменений в новой точке, удаляем данную точку.
 	var oHistory = AscCommon.History;
 	oHistory.CreateNewPointForCollectChanges();
+	var oDrawing;
+	for(var sId in mapDrawings){
+	    if(mapDrawings.hasOwnProperty(sId)){
+            oDrawing = mapDrawings[sId];
+            if(!oDrawing.CheckCorrect()){
+                var oParentParagraph = oDrawing.Get_ParentParagraph();
+                oDrawing.Remove_FromDocument(false);
+                if(oParentParagraph){
+                    mapParagraphs[oParentParagraph.Get_Id()] = oParentParagraph;
+                }
+            }
+        }
+
+    }
 	for (var sId in mapDocumentContents)
 	{
 		var oDocumentContent = mapDocumentContents[sId];
@@ -766,6 +785,7 @@ CWordCollaborativeEditing.prototype.Undo = function()
 			oDocumentContent.Add_ToContent(nContentLen, oNewParagraph);
 		}
 	}
+
 	for (var sId in mapParagraphs)
 	{
 		var oParagraph = mapParagraphs[sId];

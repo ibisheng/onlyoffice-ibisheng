@@ -206,7 +206,7 @@ CStyles.prototype.Create_StyleFromInterface = function(oAscStyle, bCheckLink)
             oStyle.Set_Next(oOldStyle.Get_Next());
 
         this.Remove(OldId);
-        oStyle.Set_Id(OldId);
+        this.RemapIdReferences(OldId, oStyle.GetId());
     }
 
     oStyle.Set_Name(sStyleName);

@@ -94,10 +94,14 @@
 	};
 	CMobileDelegateEditorPresentation.prototype.GetObjectTrack = function(x, y, page, bSelected, bText)
 	{
+		if (-1 == this.LogicDocument.CurPage)
+			return false;
 		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.isPointInDrawingObjects3(x, y, page, bSelected, bText);
 	};
 	CMobileDelegateEditorPresentation.prototype.GetSelectionRectsBounds = function()
 	{
+		if (-1 == this.LogicDocument.CurPage)
+			return null;
 		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.Get_SelectionBounds();
 	};
 	CMobileDelegateEditorPresentation.prototype.ScrollTo = function(_scroll)
@@ -129,6 +133,9 @@
 	{
 		var _mode = AscCommon.MobileTouchContextMenuType.Slide;
 
+		if (-1 == this.LogicDocument.CurPage)
+			return _mode;
+
 		var _controller = this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects;
 		var _elementsCount = _controller.selectedObjects.length;
 
@@ -151,6 +158,9 @@
 
 		var _x = 0;
 		var _y = 0;
+
+		if (-1 == this.LogicDocument.CurPage)
+			return;
 
 		var _controller = this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects;
 
@@ -231,6 +241,9 @@
 	};
 	CMobileDelegateEditorPresentation.prototype.GetContextMenuPosition = function()
 	{
+		if (-1 == this.LogicDocument.CurPage)
+			return { X : 0, Y : 0, Mode : AscCommon.MobileTouchContextMenuType.None };
+
 		var _controller = this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects;
 
 		var _posX = 0;
@@ -326,6 +339,8 @@
 
 	CMobileDelegateEditorPresentation.prototype.Logic_GetNearestPos = function(x, y, page)
 	{
+		if (-1 == this.LogicDocument.CurPage)
+			return null;
 		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.getNearestPos2(x, y);
 	};
 

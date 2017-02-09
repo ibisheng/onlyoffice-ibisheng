@@ -84,12 +84,6 @@ function CHeaderFooter(Parent, LogicDocument, DrawingDocument, Type)
 
 CHeaderFooter.prototype =
 {
-    Set_Id : function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
-    },
-
     Get_Id : function()
     {
         return this.Id;
@@ -1291,12 +1285,6 @@ function CHeaderFooterController(LogicDocument, DrawingDocument)
 
 CHeaderFooterController.prototype =
 {
-    Set_Id : function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
-    },
-
     Get_Id : function()
     {
         return this.Id;

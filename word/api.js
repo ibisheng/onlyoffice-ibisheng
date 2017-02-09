@@ -852,7 +852,7 @@ background-repeat: no-repeat;\
 
 		g_oIdCounter.Set_Load(true);
 
-		var openParams        = {checkFileSize : this.isMobileVersion, charCount : 0, parCount : 0};
+		var openParams        = {checkFileSize : /*this.isMobileVersion*/false, charCount : 0, parCount : 0};
 		var oBinaryFileReader = new AscCommonWord.BinaryFileReader(this.WordControl.m_oLogicDocument, openParams);
 		if (oBinaryFileReader.Read(gObject))
 		{
@@ -1182,32 +1182,19 @@ background-repeat: no-repeat;\
 		};
 		this.CoAuthoringApi.onStartCoAuthoring       = function(isStartEvent)
 		{
-			AscCommon.CollaborativeEditing.Start_CollaborationEditing();
-			t.asc_setDrawCollaborationMarks(true);
-
-			if (t.ParcedDocument)
-			{
-				t.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
-
-				if (!isStartEvent)
-				{
-					if (true != History.Is_Clear())
-					{
-						AscCommon.CollaborativeEditing.Apply_Changes();
-						AscCommon.CollaborativeEditing.Send_Changes();
-					}
-					else
-					{
-						// Изменений нет, но нужно сбросить lock
-						t.CoAuthoringApi.unLockDocument(true);
-					}
+			if (t.ParcedDocument) {
+				if (isStartEvent) {
+					AscCommon.CollaborativeEditing.Start_CollaborationEditing();
+					t.asc_setDrawCollaborationMarks(true);
+					t.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
+				} else {
+					// Сохранять теперь должны на таймере автосохранения. Иначе могли два раза запустить сохранение, не дожидаясь окончания
+					t.canUnlockDocument = true;
+					t.canStartCoAuthoring = true;
 				}
-			}
-			else
-			{
+			} else {
 				t.isStartCoAuthoringOnEndLoad = true;
-				if (!isStartEvent)
-				{
+				if (!isStartEvent) {
 					// Документ еще не подгрузился, но нужно сбросить lock
 					t.CoAuthoringApi.unLockDocument(false);
 				}
@@ -1215,8 +1202,12 @@ background-repeat: no-repeat;\
 		};
 		this.CoAuthoringApi.onEndCoAuthoring         = function(isStartEvent)
 		{
-			AscCommon.CollaborativeEditing.End_CollaborationEditing();
-			t.asc_setDrawCollaborationMarks(false);
+			if (t.canUnlockDocument) {
+				t.canStartCoAuthoring = false;
+			} else {
+				AscCommon.CollaborativeEditing.End_CollaborationEditing();
+				t.asc_setDrawCollaborationMarks(false);
+			}
 		};
 	};
 
@@ -1801,6 +1792,13 @@ background-repeat: no-repeat;\
 			}
 			this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
+			this.canUnlockDocument2 = this.canUnlockDocument;
+			if (this.canUnlockDocument && this.canStartCoAuthoring) {
+				this.CoAuthoringApi.onStartCoAuthoring(true);
+			}
+			this.canStartCoAuthoring = false;
+			this.canUnlockDocument = false;
+
 			if (c_oAscCollaborativeMarksShowType.LastChanges === this.CollaborativeMarksShowType)
 			{
 				AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
@@ -1872,12 +1870,43 @@ background-repeat: no-repeat;\
 			}
 		}
 	};
+	asc_docs_api.prototype._autoSave = function () {
+		if ((this.canUnlockDocument || this.autoSaveGap != 0) && !this.isViewMode) {
+			var _curTime = new Date().getTime();
+			if (-1 === this.lastSaveTime) {
+				this.lastSaveTime = _curTime;
+			}
 
+			if (this.canUnlockDocument) {
+				this.asc_Save(true);
+				this.lastSaveTime = _curTime;
+			} else {
+				var _bIsWaitScheme = false;
+				if (History.Points && History.Index >= 0 && History.Index < History.Points.length) {
+					if ((_curTime - History.Points[History.Index].Time) < this.intervalWaitAutoSave) {
+						_bIsWaitScheme = true;
+					}
+				}
+
+				if (!_bIsWaitScheme) {
+					var _interval = (AscCommon.CollaborativeEditing.m_nUseType <= 0) ? this.autoSaveGapSlow :
+						this.autoSaveGapFast;
+
+					if ((_curTime - this.lastSaveTime) > _interval) {
+						if (History.Have_Changes(true) == true) {
+							this.asc_Save(true);
+						}
+						this.lastSaveTime = _curTime;
+					}
+				}
+			}
+		}
+	};
 	asc_docs_api.prototype.asc_Save           = function(isAutoSave, isUndoRequest)
 	{
 		this.IsUserSave = !isAutoSave;
 		if (true === this.canSave && !this.isLongAction() && (this.asc_isDocumentCanSave() || History.Have_Changes() ||
-			AscCommon.CollaborativeEditing.Have_OtherChanges() || true === isUndoRequest))
+			AscCommon.CollaborativeEditing.Have_OtherChanges() || true === isUndoRequest || this.canUnlockDocument))
 		{
 			this.canSave = false;
 
@@ -2430,6 +2459,10 @@ background-repeat: no-repeat;\
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextFontSize);
 			this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr({FontSize : Math.min(size, 100)}));
+
+			// для мобильной версии это важно
+			if (this.isMobileVersion)
+				this.UpdateInterfaceState();
 		}
 	};
 
@@ -3406,12 +3439,18 @@ background-repeat: no-repeat;\
 	{
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr))
 		{
+			if (this.isMobileVersion && this.WordControl.MobileTouchManager)
+				this.WordControl.MobileTouchManager.BeginZoomCheck();
+
 			this.WordControl.m_oDrawingDocument.m_bIsUpdateDocSize = true;
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetPageSize);
 			if (this.DocumentOrientation)
 				this.WordControl.m_oLogicDocument.Set_DocumentPageSize(width, height);
 			else
 				this.WordControl.m_oLogicDocument.Set_DocumentPageSize(height, width);
+
+			if (this.isMobileVersion && this.WordControl.MobileTouchManager)
+				this.WordControl.MobileTouchManager.EndZoomCheck();
 		}
 	};
 
@@ -6907,7 +6946,7 @@ background-repeat: no-repeat;\
 
 		g_oIdCounter.Set_Load(true);
 
-		var openParams        = {checkFileSize : this.isMobileVersion, charCount : 0, parCount : 0};
+		var openParams        = {checkFileSize : /*this.isMobileVersion*/false, charCount : 0, parCount : 0};
 		var oBinaryFileReader = new AscCommonWord.BinaryFileReader(this.WordControl.m_oLogicDocument, openParams);
 
 		if (undefined === version)

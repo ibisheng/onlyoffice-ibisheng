@@ -343,12 +343,6 @@ function CComment(Parent, Data)
         return this.Id;
     };
 
-    this.Set_Id = function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
-    };
-
     this.Write_ToBinary2 = function(Writer)
     {
         Writer.WriteLong( AscDFH.historyitem_type_Comment );
@@ -435,12 +429,6 @@ function CComments()
     this.Get_Id = function()
     {
         return this.Id;
-    };
-
-    this.Set_Id = function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
     };
 
     this.Set_Use = function(Use)

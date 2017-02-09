@@ -612,6 +612,8 @@
 		this.eventsElement = _config.eventsElement;
 
 		this.pointerTouchesCoords = {};
+
+		this.IsZoomCheckFit = false;
 	}
 
 	CMobileTouchManagerBase.prototype.initEvents = function(_id)
@@ -1047,6 +1049,23 @@
 		}
 	};
 
+	CMobileTouchManagerBase.prototype.BeginZoomCheck = function()
+	{
+		var _zoomCurrent = this.delegate.GetZoom();
+		var _zoomFit = this.delegate.GetZoomFit();
+		this.IsZoomCheckFit = (_zoomCurrent == _zoomFit) ? true : false;
+
+	};
+	CMobileTouchManagerBase.prototype.EndZoomCheck = function()
+	{
+		var _zoomCurrent = this.delegate.GetZoom();
+		var _zoomFit = this.delegate.GetZoomFit();
+
+		if (this.IsZoomCheckFit || _zoomCurrent < _zoomFit)
+			this.delegate.SetZoom(this.delegate.GetZoomFit());
+		this.IsZoomCheckFit = false;
+	};
+
 	// изменился размер документа/экрана => нужно перескитать вспомогательный элемент для скролла
 	CMobileTouchManagerBase.prototype.Resize = function()
 	{
@@ -1403,6 +1422,9 @@
 		ctx.strokeStyle = "#146FE1";
 		ctx.fillStyle 	= "#146FE1";
 
+		var _oldGlobalAlpha = ctx.globalAlpha;
+		ctx.globalAlpha = 1.0;
+
 		if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
 		{
 			var pos1 = this.delegate.ConvertCoordsToCursor(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1, false);
@@ -1488,6 +1510,8 @@
 
 			ctx.beginPath();
 		}
+
+		ctx.globalAlpha = _oldGlobalAlpha;
 	};
 
 	// отрисовка табличного селекта
@@ -1548,6 +1572,8 @@
 
 		var _posMoveX = 0;
 		var _posMoveY = 0;
+
+		var _PageNum = _table_outline_dr.CurrentPageIndex;
 
 		if (!_table_outline_dr.TableMatrix || global_MatrixTransformer.IsIdentity(_table_outline_dr.TableMatrix))
 		{
@@ -1618,7 +1644,7 @@
 				var _newPos = (i != _count) ? _table_markup.Rows[i].Y : _oldY;
 
 				var _p = {Y : _oldY, H : (_newPos - _oldY)};
-				var _y = DrawingDocument.ConvertCoordsToCursorWR(0, _oldY, _tableOutline.PageNum);
+				var _y = DrawingDocument.ConvertCoordsToCursorWR(0, _oldY, _PageNum);
 
 				ctx.beginPath();
 				overlay.AddDiamond(_x + 1.5 + (_rectWidth >> 1), _y.Y, AscCommon.MOBILE_TABLE_RULER_DIAMOND);

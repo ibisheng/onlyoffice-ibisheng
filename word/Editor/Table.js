@@ -2489,20 +2489,9 @@ CTable.prototype =
         return this.Get_Id();
     },
 
-    SetId : function(newId)
-    {
-        this.Set_Id( newId );
-    },
-
     Get_Type : function()
     {
         return type_Table;
-    },
-
-    Set_Id : function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
     },
 
     Copy : function(Parent)

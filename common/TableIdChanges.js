@@ -111,61 +111,6 @@
 	 * @constructor
 	 * @extends {AscDFH.CChangesBase}
 	 */
-	function CChangesTableIdReset(Class, OldId, NewId)
-	{
-		CChangesTableIdReset.superclass.constructor.call(this, Class);
-
-		this.NewId = NewId;
-		this.OldId = OldId;
-	}
-	AscCommon.extendClass(CChangesTableIdReset, AscDFH.CChangesBase);
-	CChangesTableIdReset.prototype.Type = AscDFH.historyitem_TableId_Reset;
-	CChangesTableIdReset.prototype.Undo = function()
-	{
-	};
-	CChangesTableIdReset.prototype.Redo = function()
-	{
-	};
-	CChangesTableIdReset.prototype.WriteToBinary = function(Writer)
-	{
-		// String : New Id
-		// String : Old Id
-
-		Writer.WriteString2(this.NewId);
-		Writer.WriteString2(this.OldId);
-	};
-	CChangesTableIdReset.prototype.ReadFromBinary = function(Reader)
-	{
-		// String : New Id
-		// String : Old Id
-
-		this.NewId = Reader.GetString2();
-		this.OldId = Reader.GetString2();
-	};
-	CChangesTableIdReset.prototype.Load = function(Color)
-	{
-		var oTableId = this.Class;
-		if (oTableId.m_aPairs[this.OldId])
-		{
-			var Class = oTableId.m_aPairs[this.OldId];
-			delete oTableId.m_aPairs[this.OldId];
-			oTableId.m_aPairs[this.NewId] = Class;
-
-			Class.Id = this.NewId;
-		}
-	};
-	CChangesTableIdReset.prototype.RefreshRecalcData = function()
-	{
-	};
-	CChangesTableIdReset.prototype.CreateReverseChange = function()
-	{
-		return new CChangesTableIdReset(this.Class, this.NewId, this.OldId);
-	};
-	window["AscCommon"].CChangesTableIdReset = CChangesTableIdReset;
-	/**
-	 * @constructor
-	 * @extends {AscDFH.CChangesBase}
-	 */
 	function CChangesTableIdDescription(Class, FileCheckSum, FileSize, Description, ItemsCount, PointIndex, StartPoint, LastPoint, SumIndex, DeletedIndex)
 	{
 		CChangesTableIdDescription.superclass.constructor.call(this, Class);
@@ -374,7 +319,6 @@
 
 
 AscDFH.changesFactory[AscDFH.historyitem_TableId_Add]         = AscCommon.CChangesTableIdAdd;
-AscDFH.changesFactory[AscDFH.historyitem_TableId_Reset]       = AscCommon.CChangesTableIdReset;
 AscDFH.changesFactory[AscDFH.historyitem_TableId_Description] = AscCommon.CChangesTableIdDescription;
 
 AscDFH.changesFactory[AscDFH.historyitem_Common_AddWatermark] = AscCommon.CChangesCommonAddWaterMark;

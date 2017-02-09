@@ -960,25 +960,22 @@
 		};
 		this.CoAuthoringApi.onStartCoAuthoring       = function(isStartEvent)
 		{
-			if (t.ParcedDocument)
-			{
-				AscCommon.CollaborativeEditing.Start_CollaborationEditing();
-				t.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
-
-				if (true != History.Is_Clear())
-				{
-					AscCommon.CollaborativeEditing.Apply_Changes();
-					AscCommon.CollaborativeEditing.Send_Changes();
+			if (t.ParcedDocument) {
+				if (isStartEvent) {
+					AscCommon.CollaborativeEditing.Start_CollaborationEditing();
+					t.asc_setDrawCollaborationMarks(true);
+					t.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
+				} else {
+					// Сохранять теперь должны на таймере автосохранения. Иначе могли два раза запустить сохранение, не дожидаясь окончания
+					t.canUnlockDocument = true;
+					t.canStartCoAuthoring = true;
 				}
-				else
-				{
-					// Изменений нет, но нужно сбросить lock
+			} else {
+				t.isStartCoAuthoringOnEndLoad = true;
+				if (!isStartEvent) {
+					// Документ еще не подгрузился, но нужно сбросить lock
 					t.CoAuthoringApi.unLockDocument(false);
 				}
-			}
-			else
-			{
-				t.isStartCoAuthoringOnEndLoad = true;
 			}
 		};
 		this.CoAuthoringApi.onEndCoAuthoring         = function(isStartEvent)
@@ -1832,6 +1829,13 @@ background-repeat: no-repeat;\
 			}
 			this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
+			this.canUnlockDocument2 = this.canUnlockDocument;
+			if (this.canUnlockDocument && this.canStartCoAuthoring) {
+				this.CoAuthoringApi.onStartCoAuthoring(true);
+			}
+			this.canStartCoAuthoring = false;
+			this.canUnlockDocument = false;
+
 			if (c_oAscCollaborativeMarksShowType.LastChanges === this.CollaborativeMarksShowType)
 			{
 				AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
@@ -1892,12 +1896,45 @@ background-repeat: no-repeat;\
 			}
 		}
 	};
+	asc_docs_api.prototype._autoSave = function () {
+		if ((this.canUnlockDocument || this.autoSaveGap != 0) && !this.isViewMode) {
+			var _curTime = new Date().getTime();
+			if (-1 === this.lastSaveTime) {
+				this.lastSaveTime = _curTime;
+			}
 
+			if (this.canUnlockDocument) {
+				this.asc_Save(true);
+				this.lastSaveTime = _curTime;
+			} else {
+				var _bIsWaitScheme = false;
+				if (this.WordControl.m_oDrawingDocument &&
+					!this.WordControl.m_oDrawingDocument.TransitionSlide.IsPlaying() && History.Points &&
+					History.Index >= 0 && History.Index < History.Points.length) {
+					if ((_curTime - History.Points[History.Index].Time) < this.intervalWaitAutoSave) {
+						_bIsWaitScheme = true;
+					}
+				}
+
+				if (!_bIsWaitScheme) {
+					var _interval = (AscCommon.CollaborativeEditing.m_nUseType <= 0) ? this.autoSaveGapSlow :
+						this.autoSaveGapFast;
+
+					if ((_curTime - this.lastSaveTime) > _interval) {
+						if (History.Have_Changes(true) == true) {
+							this.asc_Save(true);
+						}
+						this.lastSaveTime = _curTime;
+					}
+				}
+			}
+		}
+	};
 	asc_docs_api.prototype.asc_Save                     = function(isAutoSave)
 	{
 		this.IsUserSave = !isAutoSave;
 		if (true === this.canSave && !this.isLongAction() && (this.asc_isDocumentCanSave() || History.Have_Changes() ||
-			AscCommon.CollaborativeEditing.Have_OtherChanges()))
+			AscCommon.CollaborativeEditing.Have_OtherChanges() || this.canUnlockDocument))
 		{
 			this.canSave = false;
 
@@ -2074,8 +2111,12 @@ background-repeat: no-repeat;\
 		if (logicDoc.CurPage >= logicDoc.Slides.length)
 			return;
 
-		var tableLook = new CTableLook(true, true, false, false, true, false);
-		logicDoc.CheckTableStyles(logicDoc.Slides[logicDoc.CurPage], tableLook);
+		if (logicDoc.Slides.length == 0)
+		{
+			logicDoc.addNextSlide();
+		}
+
+		logicDoc.CheckTableStylesDefault(logicDoc.Slides[logicDoc.CurPage]);
 	};
 
 	asc_docs_api.prototype.CollectHeaders                  = function()
@@ -2213,6 +2254,10 @@ background-repeat: no-repeat;\
 		{
 			History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
 			this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr({FontSize : Math.min(size, 100)}));
+
+			// для мобильной версии это важно
+			if (this.isMobileVersion)
+				this.UpdateInterfaceState();
 		}
 	};
 	asc_docs_api.prototype.put_TextPrBold             = function(value)
@@ -4941,7 +4986,13 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.changeSlideSize = function(width, height)
 	{
+		if (this.isMobileVersion && this.WordControl.MobileTouchManager)
+			this.WordControl.MobileTouchManager.BeginZoomCheck();
+
 		this.WordControl.m_oLogicDocument.changeSlideSize(width, height);
+
+		if (this.isMobileVersion && this.WordControl.MobileTouchManager)
+			this.WordControl.MobileTouchManager.EndZoomCheck();
 	};
 
 	asc_docs_api.prototype.AddSlide       = function(layoutIndex)
@@ -5815,6 +5866,9 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.sync_closeChartEditor = function()
 	{
 		this.sendEvent("asc_onCloseChartEditor");
+	};
+	asc_docs_api.prototype.asc_setDrawCollaborationMarks = function()
+	{
 	};
 
 	//-----------------------------------------------------------------

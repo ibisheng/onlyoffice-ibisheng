@@ -1022,14 +1022,14 @@ cBESSELI.prototype = Object.create( cBaseFunction.prototype );
  n = arg[1];
 
  if ( x instanceof cArea || x instanceof cArea3D ) {
- x = x.cross( arguments[1].first );
+ x = x.cross( arguments[1].bbox );
  }
  else if ( x instanceof cArray ) {
  x = x.getElementRowCol( 0, 0 );
  }
 
  if ( n instanceof cArea || n instanceof cArea3D ) {
- n = n.cross( arguments[1].first );
+ n = n.cross( arguments[1].bbox );
  }
  else if ( n instanceof cArray ) {
  n = n.getElementRowCol( 0, 0 );
@@ -1089,7 +1089,7 @@ cBIN2DEC.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -1139,14 +1139,14 @@ cBIN2HEX.prototype.Calculate = function ( arg ) {
         arg1 = arg[1] ? arg[1] : new cUndefined();
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
     else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
@@ -1201,14 +1201,14 @@ cBIN2OCT.prototype.Calculate = function ( arg ) {
         arg1 = arg[1] ? arg[1] : new cUndefined();
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
     else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
@@ -1263,21 +1263,21 @@ cCOMPLEX.prototype.Calculate = function ( arg ) {
         img = arg[1],
         suf = !arg[2] || arg[2] instanceof AscCommonExcel.cEmpty ? new cString( "i" ) : arg[2];
     if ( real instanceof cArea || img instanceof cArea3D ) {
-        real = real.cross( arguments[1].first );
+        real = real.cross( arguments[1].bbox );
     }
     else if ( real instanceof cArray ) {
         real = real.getElement( 0 );
     }
 
     if ( img instanceof cArea || img instanceof cArea3D ) {
-        img = img.cross( arguments[1].first );
+        img = img.cross( arguments[1].bbox );
     }
     else if ( img instanceof cArray ) {
         img = img.getElement( 0 );
     }
 
     if ( suf instanceof cArea || suf instanceof cArea3D ) {
-        suf = suf.cross( arguments[1].first );
+        suf = suf.cross( arguments[1].bbox );
     }
     else if ( suf instanceof cArray ) {
         suf = suf.getElement( 0 );
@@ -1329,14 +1329,14 @@ cDEC2BIN.prototype.Calculate = function ( arg ) {
         arg1 = arg[1] ? arg[1] : new cUndefined();
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
     else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
@@ -1386,14 +1386,14 @@ cDEC2HEX.prototype.Calculate = function ( arg ) {
         arg1 = arg[1] ? arg[1] : new cUndefined();
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
     else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
@@ -1443,14 +1443,14 @@ cDEC2OCT.prototype.Calculate = function ( arg ) {
         arg1 = arg[1] ? arg[1] : new cUndefined();
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
     else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
@@ -1500,14 +1500,14 @@ cDELTA.prototype.Calculate = function ( arg ) {
     var number1 = arg[0], number2 = !arg[1] ? new cNumber( 0 ) : arg[1];
 
     if ( number1 instanceof cArea || number2 instanceof cArea3D ) {
-        number1 = number1.cross( arguments[1].first );
+        number1 = number1.cross( arguments[1].bbox );
     }
     else if ( number1 instanceof cArray ) {
         number1 = number1.getElement( 0 );
     }
 
     if ( number2 instanceof cArea || number2 instanceof cArea3D ) {
-        number2 = number2.cross( arguments[1].first );
+        number2 = number2.cross( arguments[1].bbox );
     }
     else if ( number2 instanceof cArray ) {
         number2 = number2.getElement( 0 );
@@ -1543,14 +1543,14 @@ cERF.prototype.Calculate = function ( arg ) {
 
     var a = arg[0], b = arg[1] ? arg[1] : new cUndefined();
     if ( a instanceof cArea || a instanceof cArea3D ) {
-        a = a.cross( arguments[1].first );
+        a = a.cross( arguments[1].bbox );
     }
     else if ( a instanceof cArray ) {
         a = a.getElement( 0 );
     }
 
     if ( b instanceof cArea || b instanceof cArea3D ) {
-        b = b.cross( arguments[1].first );
+        b = b.cross( arguments[1].bbox );
     }
     else if ( b instanceof cArray ) {
         b = b.getElement( 0 );
@@ -1597,7 +1597,7 @@ cERFC.prototype.Calculate = function ( arg ) {
 
     var a = arg[0];
     if ( a instanceof cArea || a instanceof cArea3D ) {
-        a = a.cross( arguments[1].first );
+        a = a.cross( arguments[1].bbox );
     }
     else if ( a instanceof cArray ) {
         a = a.getElement( 0 );
@@ -1632,14 +1632,14 @@ cGESTEP.prototype.Calculate = function ( arg ) {
     var number1 = arg[0], number2 = !arg[1] ? new cNumber( 0 ) : arg[1];
 
     if ( number1 instanceof cArea || number2 instanceof cArea3D ) {
-        number1 = number1.cross( arguments[1].first );
+        number1 = number1.cross( arguments[1].bbox );
     }
     else if ( number1 instanceof cArray ) {
         number1 = number1.getElement( 0 );
     }
 
     if ( number2 instanceof cArea || number2 instanceof cArea3D ) {
-        number2 = number2.cross( arguments[1].first );
+        number2 = number2.cross( arguments[1].bbox );
     }
     else if ( number2 instanceof cArray ) {
         number2 = number2.getElement( 0 );
@@ -1677,14 +1677,14 @@ cHEX2BIN.prototype.Calculate = function ( arg ) {
         arg1 = arg[1] ? arg[1] : new cUndefined();
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
     else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
@@ -1748,7 +1748,7 @@ cHEX2DEC.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -1795,14 +1795,14 @@ cHEX2OCT.prototype.Calculate = function ( arg ) {
         arg1 = arg[1] ? arg[1] : new cUndefined();
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
     else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
@@ -1865,7 +1865,7 @@ cIMABS.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -1903,7 +1903,7 @@ cIMAGINARY.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -1941,7 +1941,7 @@ cIMARGUMENT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -1979,7 +1979,7 @@ cIMCONJUGATE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -2017,7 +2017,7 @@ cIMCOS.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -2057,7 +2057,7 @@ cIMDIV.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -2065,7 +2065,7 @@ cIMDIV.prototype.Calculate = function ( arg ) {
 
 
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
     else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
@@ -2108,7 +2108,7 @@ cIMEXP.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -2148,7 +2148,7 @@ cIMLN.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -2192,7 +2192,7 @@ cIMLOG10.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -2236,7 +2236,7 @@ cIMLOG2.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -2280,14 +2280,14 @@ cIMPOWER.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
     else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
@@ -2333,7 +2333,7 @@ cIMPRODUCT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -2420,7 +2420,7 @@ cIMREAL.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -2458,7 +2458,7 @@ cIMSIN.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -2498,7 +2498,7 @@ cIMSQRT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -2538,7 +2538,7 @@ cIMSUB.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -2546,7 +2546,7 @@ cIMSUB.prototype.Calculate = function ( arg ) {
 
 
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
     else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
@@ -2589,7 +2589,7 @@ cIMSUM.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], iStart = 1, res = 0, rate;
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -2677,14 +2677,14 @@ cOCT2BIN.prototype.Calculate = function ( arg ) {
         arg1 = arg[1] ? arg[1] : new cUndefined();
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
     else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
@@ -2748,7 +2748,7 @@ cOCT2DEC.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
@@ -2795,14 +2795,14 @@ cOCT2HEX.prototype.Calculate = function ( arg ) {
         arg1 = arg[1] ? arg[1] : new cUndefined();
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+        arg1 = arg1.cross( arguments[1].bbox );
     }
     else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );

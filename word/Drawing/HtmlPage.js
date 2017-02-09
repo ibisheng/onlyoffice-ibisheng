@@ -201,18 +201,12 @@ function CEditorPage(api)
 	this.m_oScrollHorApi = null;
 	this.m_oScrollVerApi = null;
 
-	this.m_nIntervalSlowAutosave = 600000;
-	this.m_nIntervalFastAutosave = 2000;
-	this.m_nIntervalWaitAutoSave = 1000;
-	this.m_nLastAutosaveTime     = -1;
-
 	this.arrayEventHandlers = [];
 
 	this.m_oTimerScrollSelect = -1;
 	this.IsFocus              = true;
 	this.m_bIsMouseLock       = false;
 
-	this.m_nTimeDrawingLast = 0;
 	this.DrawingFreeze      = false;
 
 	this.m_oHorRuler.m_oWordControl = this;
@@ -3574,7 +3568,6 @@ function CEditorPage(api)
         if (oWordControl.m_oApi.isLongAction())
             return;
 
-		oWordControl.m_nTimeDrawingLast = new Date().getTime();
 		var isRepaint                   = oWordControl.m_bIsScroll;
 		if (oWordControl.m_bIsScroll)
 		{
@@ -3596,36 +3589,6 @@ function CEditorPage(api)
 		}
 
 		oWordControl.m_oDrawingDocument.Collaborative_TargetsUpdate(isRepaint);
-
-		if (oWordControl.m_oApi.autoSaveGap != 0 && !oWordControl.m_oApi.isViewMode)
-		{
-			var _curTime = new Date().getTime();
-			if (-1 == oWordControl.m_nLastAutosaveTime)
-			{
-				oWordControl.m_nLastAutosaveTime = _curTime;
-			}
-
-			var _bIsWaitScheme = false;
-			if (History.Points && History.Index >= 0 && History.Index < History.Points.length)
-			{
-				if ((_curTime - History.Points[History.Index].Time) < oWordControl.m_nIntervalWaitAutoSave)
-					_bIsWaitScheme = true;
-			}
-
-			if (!_bIsWaitScheme)
-			{
-				var _interval = (AscCommon.CollaborativeEditing.m_nUseType <= 0) ? oWordControl.m_nIntervalSlowAutosave : oWordControl.m_nIntervalFastAutosave;
-
-				if ((_curTime - oWordControl.m_nLastAutosaveTime) > _interval)
-				{
-					if (History.Have_Changes(true) == true)
-					{
-						oWordControl.m_oApi.asc_Save(true);
-					}
-					oWordControl.m_nLastAutosaveTime = _curTime;
-				}
-			}
-		}
 
 		oWordControl.m_oApi.sendEvent("asc_onPaintTimer");
 		//window.requestAnimationFrame(oWordControl.onTimerScroll2);
@@ -3651,7 +3614,6 @@ function CEditorPage(api)
 		if (!oWordControl.m_oApi.bInit_word_control || oWordControl.m_oApi.isOnlyReaderMode)
 			return;
 
-		oWordControl.m_nTimeDrawingLast = new Date().getTime();
 		var isRepaint                   = oWordControl.m_bIsScroll;
 		if (oWordControl.m_bIsScroll)
 		{

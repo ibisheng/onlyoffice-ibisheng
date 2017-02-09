@@ -1522,11 +1522,6 @@ CDocument.prototype.Get_Id                         = function()
 {
     return this.Id;
 };
-CDocument.prototype.Set_Id                         = function(newId)
-{
-    g_oTableId.Reset_Id(this, newId, this.Id);
-    this.Id = newId;
-};
 CDocument.prototype.On_EndLoad                     = function()
 {
     // Обновляем информацию о секциях

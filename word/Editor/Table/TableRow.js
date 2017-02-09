@@ -95,12 +95,6 @@ function CTableRow(Table, Cols, TableGrid)
 
 CTableRow.prototype =
 {
-    Set_Id : function(newId)
-    {
-        AscCommon.g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
-    },
-
     Get_Id : function()
     {
         return this.Id;

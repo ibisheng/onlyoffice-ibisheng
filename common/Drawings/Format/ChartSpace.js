@@ -597,9 +597,7 @@ function checkPointInMap(map, worksheet, row, col)
     };
 
 
-
-
-    drawingsChangesMap[AscDFH.historyitem_ChartSpace_SetNvGrFrProps                ] = function(oClass, value){oClass.nvGrFrProps   = value;};
+    drawingsChangesMap[AscDFH.historyitem_ChartSpace_SetNvGrFrProps                ] = function(oClass, value){oClass.nvGraphicFramePr   = value;};
     drawingsChangesMap[AscDFH.historyitem_ChartSpace_SetThemeOverride              ] = function(oClass, value){oClass.themeOverride = value;};
     drawingsChangesMap[AscDFH.historyitem_ShapeSetBDeleted                         ] = function(oClass, value){oClass.bDeleted = value;};
     drawingsChangesMap[AscDFH.historyitem_ChartSpace_SetParent                     ] = function(oClass, value){oClass.parent         = value;};
@@ -709,7 +707,7 @@ AscCommon.extendClass(CChartSpace, AscFormat.CGraphicObjectBase);
 
     CChartSpace.prototype.GetPath = function(index){
         return this.pathMemory.GetPath(index);
-    }
+    };
 
         CChartSpace.prototype.select = CShape.prototype.select;
 CChartSpace.prototype.checkDrawingBaseCoords = CShape.prototype.checkDrawingBaseCoords;
@@ -3394,7 +3392,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
             || (chartType === AscDFH.historyitem_type_BarChart && this.chart.plotArea.charts[0].barDir !== AscFormat.BAR_DIR_BAR)){
             if(valAx){
                 if(AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this)){
-                    if(chartType === AscDFH.historyitem_type_AreaChart ){
+                    if(chartType === AscDFH.historyitem_type_AreaChart || chartType === AscDFH.historyitem_type_SurfaceChart ){
                         return AscFormat.isRealNumber(valAx.crossBetween) ? valAx.crossBetween : AscFormat.CROSS_BETWEEN_MID_CAT;
                     }
                     else if(chartType === AscDFH.historyitem_type_LineChart){
@@ -3405,7 +3403,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                     }
                 }
                 else{
-                    return AscFormat.isRealNumber(valAx.crossBetween) ? valAx.crossBetween :  (chartType === AscDFH.historyitem_type_AreaChart ? AscFormat.CROSS_BETWEEN_MID_CAT : AscFormat.CROSS_BETWEEN_BETWEEN);
+                    return AscFormat.isRealNumber(valAx.crossBetween) ? valAx.crossBetween :  ((chartType === AscDFH.historyitem_type_AreaChart|| chartType === AscDFH.historyitem_type_SurfaceChart ) ? AscFormat.CROSS_BETWEEN_MID_CAT : AscFormat.CROSS_BETWEEN_BETWEEN);
                 }
             }
         }
@@ -5254,6 +5252,8 @@ CChartSpace.prototype.recalculateAxis = function()
                                     bCorrectedLayoutRect = true;
                                 }
 
+                                point_interval = rect.w/intervals_count;
+
                                 if (cross_between === AscFormat.CROSS_BETWEEN_MID_CAT) {
                                     for (i = 0; i < string_pts.length; ++i)
                                         arr_cat_labels_points[i] = rect.x + point_interval * i;
@@ -5451,6 +5451,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                     bCorrectedLayoutRect = true;
                                 }
 
+                                point_interval = rect.w/intervals_count;
                                 if(cross_between === AscFormat.CROSS_BETWEEN_MID_CAT)
                                 {
                                     for(i = 0; i < string_pts.length; ++i)
@@ -5512,9 +5513,9 @@ CChartSpace.prototype.recalculateAxis = function()
                                 rect.w -= (rect.x + rect.w - this.extX);
                                 bCorrectedLayoutRect = true;
                             }
-                            if(bCorrectedLayoutRect){
-                                    point_interval = rect.w/intervals_count;
-                            }
+
+                            point_interval = rect.w/intervals_count;
+
 
                             if(cross_between === AscFormat.CROSS_BETWEEN_MID_CAT)
                             {
@@ -5574,9 +5575,8 @@ CChartSpace.prototype.recalculateAxis = function()
                                 rect.w -= (rect.x + rect.w - this.extX);
                                 bCorrectedLayoutRect = true;
                             }
-                            if(bCorrectedLayoutRect){
-                                point_interval = rect.w/intervals_count;
-                            }
+
+                            point_interval = rect.w/intervals_count;
                             if(cross_between === AscFormat.CROSS_BETWEEN_MID_CAT)
                             {
                                 for(i = 0; i < string_pts.length; ++i)

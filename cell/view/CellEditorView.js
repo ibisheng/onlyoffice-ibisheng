@@ -818,7 +818,7 @@
 
 		var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(this.options.cellName);
 		this._formula = new AscCommonExcel.parserFormula(s.substr(1), null, ws);
-		this._formula.parse();
+		this._formula.parse(true, true);
 
 		var r, offset, _e, _s, wsName = null, refStr, isName = false, _sColorPos;
 
@@ -943,7 +943,7 @@
 
 		var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(this.options.cellName);
 		this._formula = new AscCommonExcel.parserFormula(s.substr(1), null, ws);
-		this._formula.parse();
+		this._formula.parse(true, true);
 
 		if (this._formula.RefPos && this._formula.RefPos.length > 0) {
 			for (var index = 0; index < this._formula.RefPos.length; index++) {

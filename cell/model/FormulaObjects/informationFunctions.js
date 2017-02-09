@@ -135,7 +135,7 @@ cERROR_TYPE.prototype.Calculate = function ( arg ) {
         arg0 = arg0.getValue();
     }
     else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cArray ) {
         var ret = new cArray();
@@ -178,7 +178,7 @@ cISBLANK.prototype = Object.create( cBaseFunction.prototype );
 cISBLANK.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         arg0 = arg0.getValue();
@@ -221,7 +221,7 @@ cISERR.prototype.Calculate = function ( arg ) {
         arg0 = arg0.getElement( 0 );
     }
     else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         arg0 = arg0.getValue();
@@ -265,7 +265,7 @@ cISERROR.prototype.Calculate = function ( arg ) {
         arg0 = arg0.getElement( 0 );
     }
     else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         arg0 = arg0.getValue();
@@ -309,7 +309,7 @@ cISEVEN.prototype.Calculate = function ( arg ) {
         arg0 = arg0.getElement( 0 );
     }
     else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         arg0 = arg0.getValue();
@@ -357,7 +357,7 @@ cISLOGICAL.prototype.Calculate = function ( arg ) {
         arg0 = arg0.getElement( 0 );
     }
     else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         arg0 = arg0.getValue();
@@ -400,7 +400,7 @@ cISNA.prototype.Calculate = function ( arg ) {
         arg0 = arg0.getElement( 0 );
     }
     else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         arg0 = arg0.getValue();
@@ -444,7 +444,7 @@ cISNONTEXT.prototype.Calculate = function ( arg ) {
         arg0 = arg0.getElement( 0 );
     }
     else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         arg0 = arg0.getValue();
@@ -487,7 +487,7 @@ cISNUMBER.prototype.Calculate = function ( arg ) {
         arg0 = arg0.getElement( 0 );
     }
     else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         arg0 = arg0.getValue();
@@ -531,7 +531,7 @@ cISODD.prototype.Calculate = function ( arg ) {
         arg0 = arg0.getElement( 0 );
     }
     else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         arg0 = arg0.getValue();
@@ -611,7 +611,7 @@ cISTEXT.prototype.Calculate = function ( arg ) {
         arg0 = arg0.getElement( 0 );
     }
     else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         arg0 = arg0.getValue();
@@ -665,7 +665,7 @@ cN.prototype.Calculate = function ( arg ) {
         return this.value = arr;
     }
     else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         arg0 = arg0.getValue();
@@ -739,7 +739,7 @@ cTYPE.prototype = Object.create( cBaseFunction.prototype );
 cTYPE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+        arg0 = arg0.cross( arguments[1].bbox );
     }
     else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         arg0 = arg0.getValue();

@@ -381,17 +381,30 @@ function CalculateAhPolarList(ahPolarListInfo, ahPolarLst, gdLst)
     }
 }
 
-function CChangesGeometryAddAdj(Class, Name, OldValue, NewValue, OldAvValue){
+function CChangesGeometryAddAdj(Class, Name, OldValue, NewValue, OldAvValue, bReverse){
     this.Type = AscDFH.historyitem_GeometryAddAdj;
     this.Name = Name;
     this.OldValue = OldValue;
     this.NewValue = NewValue;
     this.OldAvValue = OldAvValue;
+    this.bReverse = bReverse;
     CChangesGeometryAddAdj.superclass.constructor.call(this, Class);
 }
 AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
 
-    CChangesGeometryAddAdj.prototype.Undo = function(){
+
+
+    CChangesGeometryAddAdj.prototype.CreateReverseChange = function(){
+        return new CChangesGeometryAddAdj(this.Class, this.Name, this.OldValue, this.NewValue, this.OldAvValue, !this.bReverse)
+    };
+
+    CChangesGeometryAddAdj.prototype.AddAdj = function(){
+
+        this.Class.gdLst[this.Name] = parseInt(this.NewValue);
+        this.Class.avLst[this.Name] = true;
+    };
+
+    CChangesGeometryAddAdj.prototype.RemoveAdj = function(){
         var _OldValue = parseInt(this.OldValue);
         if(!isNaN(_OldValue)){
             this.Class.gdLst[this.Name] = _OldValue;
@@ -402,38 +415,54 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
 
         this.Class.avLst[this.Name] = this.OldAvValue;
     };
+
+    CChangesGeometryAddAdj.prototype.Undo = function(){
+        if(this.bReverse){
+            this.AddAdj();
+        }
+        else{
+            this.RemoveAdj();
+        }
+    };
     CChangesGeometryAddAdj.prototype.Redo = function(){
-        this.Class.gdLst[this.Name] = parseInt(this.NewValue);
-        this.Class.avLst[this.Name] = true;
+        if(this.bReverse){
+            this.RemoveAdj();
+        }
+        else{
+            this.AddAdj();
+        }
     };
     CChangesGeometryAddAdj.prototype.WriteToBinary = function(Writer){
         Writer.WriteString2(this.Name);
         Writer.WriteString2(this.NewValue);
         AscFormat.writeString(Writer, this.OldValue);
         AscFormat.writeBool(Writer, this.OldAvValue);
+        Writer.WriteBool(!!this.bReverse);
     };
     CChangesGeometryAddAdj.prototype.ReadFromBinary = function(Reader){
         this.Name = Reader.GetString2();
         this.NewValue = Reader.GetString2();
         this.OldValue = AscFormat.readString(Reader);
         this.OldAvValue = AscFormat.readBool(Reader);
+        this.bReverse = Reader.GetBool();
     };
     AscDFH.changesFactory[AscDFH.historyitem_GeometryAddAdj] = CChangesGeometryAddAdj;
 
 
-    function CChangesGeometryAddGuide(Class, Name, formula, x, y, z){
+    function CChangesGeometryAddGuide(Class, Name, formula, x, y, z, bReverse){
         this.Type = AscDFH.historyitem_GeometryAddGuide;
         this.Name = Name;
         this.formula = formula;
         this.x = x;
         this.y = y;
         this.z = z;
+        this.bReverse = bReverse;
         CChangesGeometryAddGuide.superclass.constructor.call(this, Class);
     }
     AscCommon.extendClass(CChangesGeometryAddGuide, AscDFH.CChangesBase);
 
 
-    CChangesGeometryAddGuide.prototype.Undo = function(){
+    CChangesGeometryAddGuide.prototype.RemoveGuide = function(){
         var aGdLstInfo = this.Class.gdLstInfo;
         for(var i = aGdLstInfo.length - 1; i > -1 ; --i){
             var oCurGd = aGdLstInfo[i];
@@ -443,8 +472,26 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
             }
         }
     };
-    CChangesGeometryAddGuide.prototype.Redo = function(){
+
+    CChangesGeometryAddGuide.prototype.AddGuide = function(){
         this.Class.gdLstInfo.push({name: this.Name, formula: this.formula, x: this.x, y: this.y, z: this.z});
+    };
+
+    CChangesGeometryAddGuide.prototype.Undo = function(){
+        if(this.bReverse){
+            this.AddGuide();
+        }
+        else{
+            this.RemoveGuide();
+        }
+    };
+    CChangesGeometryAddGuide.prototype.Redo = function(){
+        if(this.bReverse){
+            this.RemoveGuide();
+        }
+        else{
+            this.AddGuide();
+        }
     };
     CChangesGeometryAddGuide.prototype.WriteToBinary = function(Writer){
         Writer.WriteString2(this.Name);
@@ -452,6 +499,7 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
         AscFormat.writeString(Writer, this.x);
         AscFormat.writeString(Writer, this.y);
         AscFormat.writeString(Writer, this.z);
+        Writer.WriteBool(!!this.bReverse);
     };
     CChangesGeometryAddGuide.prototype.ReadFromBinary = function(Reader){
         this.Name = Reader.GetString2();
@@ -459,20 +507,28 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
         this.x = AscFormat.readString(Reader);
         this.y = AscFormat.readString(Reader);
         this.z = AscFormat.readString(Reader);
+        this.bReverse = Reader.GetBool();
     };
+
+
+    CChangesGeometryAddGuide.prototype.CreateReverseChange = function(){
+        return new CChangesGeometryAddGuide(this.Class, this.Name, this.formula, this.x, this.y, this.z, !this.bReverse);
+    };
+
     AscDFH.changesFactory[AscDFH.historyitem_GeometryAddGuide] = CChangesGeometryAddGuide;
 
-    function CChangesGeometryAddCnx(Class, ang, x, y){
+    function CChangesGeometryAddCnx(Class, ang, x, y, bReverse){
         this.Type = AscDFH.historyitem_GeometryAddCnx;
         this.ang = ang;
         this.x = x;
         this.y = y;
+        this.bReverse = bReverse;
         CChangesGeometryAddCnx.superclass.constructor.call(this, Class);
     }
     AscCommon.extendClass(CChangesGeometryAddCnx, AscDFH.CChangesBase);
 
 
-    CChangesGeometryAddCnx.prototype.Undo = function(){
+    CChangesGeometryAddCnx.prototype.RemoveCnx = function(){
         var aCnxLstInfo = this.Class.cnxLstInfo;
         for(var i = aCnxLstInfo.length - 1; i > -1 ; --i){
             var oCurCnx = aCnxLstInfo[i];
@@ -481,23 +537,46 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
             }
         }
     };
-    CChangesGeometryAddCnx.prototype.Redo = function(){
+    CChangesGeometryAddCnx.prototype.AddCnx = function(){
         this.Class.cnxLstInfo.push({ang: this.ang, x: this.x, y: this.y});
+    };
+
+    CChangesGeometryAddCnx.prototype.Undo = function(){
+        if(this.bReverse){
+            this.AddCnx();
+        }
+        else{
+            this.RemoveCnx();
+        }
+    };
+    CChangesGeometryAddCnx.prototype.Redo = function(){
+        if(this.bReverse){
+            this.RemoveCnx();
+        }
+        else{
+            this.AddCnx();
+        }
     };
     CChangesGeometryAddCnx.prototype.WriteToBinary = function(Writer){
         AscFormat.writeString(Writer, this.ang);
         AscFormat.writeString(Writer, this.x);
         AscFormat.writeString(Writer, this.y);
+        Writer.WriteBool(!!this.bReverse);
     };
     CChangesGeometryAddCnx.prototype.ReadFromBinary = function(Reader){
         this.ang = AscFormat.readString(Reader);
         this.x = AscFormat.readString(Reader);
         this.y = AscFormat.readString(Reader);
+        this.bReverse = Reader.GetBool();
+    };
+
+    CChangesGeometryAddCnx.prototype.CreateReverseChange = function(){
+        return new CChangesGeometryAddCnx(this.Class, this.ang, this.x, this.y, !this.bReverse);
     };
     AscDFH.changesFactory[AscDFH.historyitem_GeometryAddCnx] = CChangesGeometryAddCnx;
 
 
-    function CChangesGeometryAddHandleXY(Class, gdRefX, minX, maxX, gdRefY, minY, maxY, posX, posY){
+    function CChangesGeometryAddHandleXY(Class, gdRefX, minX, maxX, gdRefY, minY, maxY, posX, posY, bReverse){
         this.Type = AscDFH.historyitem_GeometryAddHandleXY;
         this.gdRefX = gdRefX;
         this.minX = minX;
@@ -507,24 +586,41 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
         this.maxY = maxY;
         this.posX = posX;
         this.posY = posY;
+        this.bReverse = bReverse;
         CChangesGeometryAddHandleXY.superclass.constructor.call(this, Class);
     }
     AscCommon.extendClass(CChangesGeometryAddHandleXY, AscDFH.CChangesBase);
 
-
-    CChangesGeometryAddHandleXY.prototype.Undo = function(){
+    CChangesGeometryAddHandleXY.prototype.RemoveHandleXY = function(){
         var ahXYLstInfo = this.Class.ahXYLstInfo;
         for(var i = ahXYLstInfo.length - 1; i > -1 ; --i){
             var oCurXY = ahXYLstInfo[i];
             if(oCurXY.gdRefX == this.gdRefX && oCurXY.minX == this.minX && oCurXY.maxX == this.maxX &&
-            oCurXY.gdRefY == this.gdRefY && oCurXY.minY == this.minY && oCurXY.maxY == this.maxY &&
-            oCurXY.posX == this.posX && oCurXY.posY == this.posY){
+                oCurXY.gdRefY == this.gdRefY && oCurXY.minY == this.minY && oCurXY.maxY == this.maxY &&
+                oCurXY.posX == this.posX && oCurXY.posY == this.posY){
                 ahXYLstInfo.splice(i, 1);
             }
         }
     };
-    CChangesGeometryAddHandleXY.prototype.Redo = function(){
+    CChangesGeometryAddHandleXY.prototype.AddHandleXY = function(){
         this.Class.ahXYLstInfo.push({gdRefX: this.gdRefX, minX: this.minX, maxX: this.maxX, gdRefY: this.gdRefY, minY: this.minY, maxY: this.maxY, posX: this.posX,posY: this.posY});
+    };
+
+    CChangesGeometryAddHandleXY.prototype.Undo = function(){
+        if(this.bReverse){
+            this.AddHandleXY();
+        }
+        else{
+            this.RemoveHandleXY();
+        }
+    };
+    CChangesGeometryAddHandleXY.prototype.Redo = function(){
+        if(this.bReverse){
+            this.RemoveHandleXY();
+        }
+        else{
+            this.AddHandleXY();
+        }
     };
     CChangesGeometryAddHandleXY.prototype.WriteToBinary = function(Writer){
         AscFormat.writeString(Writer, this.gdRefX);
@@ -535,6 +631,7 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
         AscFormat.writeString(Writer, this.maxY);
         AscFormat.writeString(Writer, this.posX);
         AscFormat.writeString(Writer, this.posY);
+        Writer.WriteBool(!!this.bReverse);
     };
     CChangesGeometryAddHandleXY.prototype.ReadFromBinary = function(Reader){
         this.gdRefX = AscFormat.readString(Reader);
@@ -545,10 +642,15 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
         this.maxY = AscFormat.readString(Reader);
         this.posX = AscFormat.readString(Reader);
         this.posY = AscFormat.readString(Reader);
+        this.bReverse = Reader.GetBool();
+    };
+
+    CChangesGeometryAddHandleXY.prototype.CreateReverseChange = function(){
+        return new CChangesGeometryAddHandleXY(this.Class, this.gdRefX, this.minX, this.maxX, this.gdRefY, this.minY, this.maxY, this.posX, this.posY, !this.bReverse);
     };
     AscDFH.changesFactory[AscDFH.historyitem_GeometryAddHandleXY] = CChangesGeometryAddHandleXY;
 
-    function CChangesGeometryAddHandlePolar(Class, gdRefR, minR, maxR, gdRefAng, minAng, maxAng, posX, posY){
+    function CChangesGeometryAddHandlePolar(Class, gdRefR, minR, maxR, gdRefAng, minAng, maxAng, posX, posY, bReverse){
         this.Type = AscDFH.historyitem_GeometryAddHandleXY;
         this.gdRefAng = gdRefAng;
         this.minAng = minAng;
@@ -558,24 +660,43 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
         this.maxR = maxR;
         this.posX = posX;
         this.posY = posY;
+        this.bReverse = bReverse;
         CChangesGeometryAddHandlePolar.superclass.constructor.call(this, Class);
     }
     AscCommon.extendClass(CChangesGeometryAddHandlePolar, AscDFH.CChangesBase);
 
 
-    CChangesGeometryAddHandlePolar.prototype.Undo = function(){
+    CChangesGeometryAddHandlePolar.prototype.RemoveHandlePolar = function(){
         var ahPolarLstInfo = this.Class.ahPolarLstInfo;
         for(var i = ahPolarLstInfo.length - 1; i > -1 ; --i){
             var oCurPolar= ahPolarLstInfo[i];
             if(oCurPolar.gdRefR == this.gdRefR && oCurPolar.minR == this.minR && oCurPolar.maxR == this.maxR &&
-            oCurPolar.gdRefAng == this.gdRefAng && oCurPolar.minAng == this.minAng && oCurPolar.maxAng == this.maxAng &&
-            oCurPolar.posX == this.posX && oCurPolar.posY == this.posY){
+                oCurPolar.gdRefAng == this.gdRefAng && oCurPolar.minAng == this.minAng && oCurPolar.maxAng == this.maxAng &&
+                oCurPolar.posX == this.posX && oCurPolar.posY == this.posY){
                 ahPolarLstInfo.splice(i, 1);
             }
         }
     };
-    CChangesGeometryAddHandlePolar.prototype.Redo = function(){
+
+    CChangesGeometryAddHandlePolar.prototype.AddHandlePolar = function(){
         this.Class.ahPolarLstInfo.push({gdRefR: this.gdRefR, minR: this.minR, maxR: this.maxR, gdRefAng: this.gdRefAng, minAng: this.minAng, maxAng: this.maxAng, posX: this.posX,posY: this.posY});
+    };
+
+    CChangesGeometryAddHandlePolar.prototype.Undo = function(){
+        if(this.bReverse){
+            this.AddHandlePolar();
+        }
+        else{
+            this.RemoveHandlePolar();
+        }
+    };
+    CChangesGeometryAddHandlePolar.prototype.Redo = function(){
+        if(this.bReverse){
+            this.RemoveHandlePolar();
+        }
+        else{
+            this.AddHandlePolar();
+        }
     };
     CChangesGeometryAddHandlePolar.prototype.WriteToBinary = function(Writer){
         AscFormat.writeString(Writer, this.gdRefR);
@@ -586,6 +707,7 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
         AscFormat.writeString(Writer, this.maxAng);
         AscFormat.writeString(Writer, this.posX);
         AscFormat.writeString(Writer, this.posY);
+        Writer.WriteBool(!!this.bReverse);
     };
     CChangesGeometryAddHandlePolar.prototype.ReadFromBinary = function(Reader){
         this.gdRefR = AscFormat.readString(Reader);
@@ -596,35 +718,53 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
         this.maxAng = AscFormat.readString(Reader);
         this.posX = AscFormat.readString(Reader);
         this.posY = AscFormat.readString(Reader);
+        this.bReverse = Reader.GetBool();
+    };
+    CChangesGeometryAddHandlePolar.prototype.CreateReverseChange = function(){
+        return new CChangesGeometryAddHandlePolar(this.Class, this.gdRefR, this.minR, this.maxR, this.gdRefAng, this.minAng, this.maxAng, this.posX, this.posY, !this.bReverse);
     };
     AscDFH.changesFactory[AscDFH.historyitem_GeometryAddHandlePolar] = CChangesGeometryAddHandlePolar;
 
-    function CChangesGeometryAddRect(Class, l, t, r, b){
+    function CChangesGeometryAddRect(Class, l, t, r, b, bReverse){
         this.Type = AscDFH.historyitem_GeometryAddRect;
         this.l = l;
         this.t = t;
         this.r = r;
         this.b = b;
+        this.bReverse = bReverse;
         CChangesGeometryAddRect.superclass.constructor.call(this, Class);
     }
     AscCommon.extendClass(CChangesGeometryAddRect, AscDFH.CChangesBase);
     CChangesGeometryAddRect.prototype.Undo = function(){
-       this.Class.rectS = null;
+        if(this.bReverse){
+            this.Class.rectS = {l: this.l, t: this.t, r: this.r, b: this.b};
+        }
+        else{
+            this.Class.rectS = null;
+        }
+
     };
     CChangesGeometryAddRect.prototype.Redo = function(){
-        this.Class.rectS = {l: this.l, t: this.t, r: this.r, b: this.b};
+        if(this.bReverse){
+            this.Class.rectS = null;
+        }
+        else{
+            this.Class.rectS = {l: this.l, t: this.t, r: this.r, b: this.b};
+        }
     };
     CChangesGeometryAddRect.prototype.WriteToBinary = function(Writer){
         AscFormat.writeString(Writer, this.l);
         AscFormat.writeString(Writer, this.t);
         AscFormat.writeString(Writer, this.r);
         AscFormat.writeString(Writer, this.b);
+        Writer.WriteBool(!!this.bReverse);
     };
     CChangesGeometryAddRect.prototype.ReadFromBinary = function(Reader){
         this.l = AscFormat.readString(Reader);
         this.t = AscFormat.readString(Reader);
         this.r = AscFormat.readString(Reader);
         this.b = AscFormat.readString(Reader);
+        this.bReverse = Reader.GetBool();
     };
     AscDFH.changesFactory[AscDFH.historyitem_GeometryAddRect] = CChangesGeometryAddRect;
     AscDFH.changesFactory[AscDFH.historyitem_GeometrySetPreset ] = AscDFH.CChangesDrawingsString;
@@ -654,12 +794,6 @@ function Geometry()
     this.rectS = null;
 
     this.parent = null;
-
-    //коэффиценты линейной связи размеров автофигуры с размерами текстового ректа
-    this.kW = null;
-    this.bW = null;
-    this.kH = null;
-    this.bH = null;
 
     this.bDrawSmart = false;
 

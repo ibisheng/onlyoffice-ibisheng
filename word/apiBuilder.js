@@ -1231,7 +1231,7 @@
         if (null != sOldId && oOldStyle)
         {
             oStyles.Remove(sOldId);
-            oStyle.Set_Id(sOldId);
+            oStyles.RemapIdReferences(sOldId, oStyle.Get_Id());
         }
 
         oStyles.Add(oStyle);
@@ -4053,6 +4053,15 @@
     };
 
     /**
+     * Specifies a legend position
+     * @number nFontSize
+     * */
+    ApiChart.prototype.SetLegendFontSize = function(nFontSize)
+    {
+        AscFormat.builder_SetLegendFontSize(this.Chart, nFontSize);
+    };
+
+    /**
      * Spicifies a show options for data labels
      * @param {boolean} bShowSerName
      * @param {boolean} bShowCatName
@@ -4473,6 +4482,7 @@
     ApiChart.prototype["SetVerAxisOrientation"]        = ApiChart.prototype.SetVerAxisOrientation;
     ApiChart.prototype["SetHorAxisOrientation"]        = ApiChart.prototype.SetHorAxisOrientation;
     ApiChart.prototype["SetLegendPos"]                 = ApiChart.prototype.SetLegendPos;
+    ApiChart.prototype["SetLegendFontSize"]            = ApiChart.prototype.SetLegendFontSize;
     ApiChart.prototype["SetShowDataLabels"]            = ApiChart.prototype.SetShowDataLabels;
     ApiChart.prototype["SetVertAxisTickLabelPosition"] = ApiChart.prototype.SetVertAxisTickLabelPosition;
     ApiChart.prototype["SetHorAxisTickLabelPosition"]  = ApiChart.prototype.SetHorAxisTickLabelPosition;

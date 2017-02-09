@@ -259,22 +259,10 @@ CStyle.prototype =
         return this.Id;
     },
 
-    SetId : function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
-    },
-
     Get_Id : function()
     {
         return this.GetId();
     },
-
-    Set_Id : function(newId)
-    {
-        return this.SetId( newId );
-    },
-
 //-----------------------------------------------------------------------------------
 // Базовые функции для работы со стилем
 //-----------------------------------------------------------------------------------
@@ -318,6 +306,18 @@ CStyle.prototype =
 
         return Style;
     },
+
+	RemapIdReferences : function(OldId, NewId)
+	{
+		if (OldId === this.BasedOn)
+			this.Set_BasedOn(NewId);
+
+		if (OldId === this.Link)
+			this.Set_Link(NewId);
+
+		if (OldId === this.Next)
+			this.Set_Next(NewId);
+	},
 
 	Set_TextPr : function(Value)
 	{
@@ -3480,22 +3480,10 @@ CStyles.prototype =
         return this.Id;
     },
 
-    SetId : function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
-    },
-
     Get_Id : function()
     {
         return this.GetId();
     },
-
-    Set_Id : function(newId)
-    {
-        return this.SetId( newId );
-    },
-
 //-----------------------------------------------------------------------------------
 // Базовые функции для работы со стилем
 //-----------------------------------------------------------------------------------
@@ -3513,6 +3501,173 @@ CStyles.prototype =
 		History.Add(new CChangesStylesRemove(this, Id, this.Style[Id]));
 		delete this.Style[Id];
 		this.Update_Interface(Id);
+	},
+
+	SetDefaultParagraph : function(Id)
+	{
+		if (Id !== this.Default.Paragraph)
+		{
+			History.Add(new CChangesStylesChangeDefaultParagraphId(this, this.Default.Paragraph, Id));
+			this.Default.Paragraph = Id;
+		}
+	},
+
+	SetDefaultCharacter : function(Id)
+	{
+		if (Id !== this.Default.Character)
+		{
+			History.Add(new CChangesStylesChangeDefaultCharacterId(this, this.Default.Character, Id));
+			this.Default.Character = Id;
+		}
+	},
+
+	SetDefaultNumbering : function(Id)
+	{
+		if (Id !== this.Default.Numbering)
+		{
+			History.Add(new CChangesStylesChangeDefaultNumberingId(this, this.Default.Numbering, Id));
+			this.Default.Numbering = Id;
+		}
+	},
+
+	SetDefaultTable : function(Id)
+	{
+		if (Id !== this.Default.Table)
+		{
+			History.Add(new CChangesStylesChangeDefaultTableId(this, this.Default.Table, Id));
+			this.Default.Table = Id;
+		}
+	},
+
+	SetDefaultTableGrid : function(Id)
+	{
+		if (Id !== this.Default.TableGrid)
+		{
+			History.Add(new CChangesStylesChangeDefaultTableGridId(this, this.Default.TableGrid, Id));
+			this.Default.TableGrid = Id;
+		}
+	},
+
+	SetDefaultParaList : function(Id)
+	{
+		if (Id !== this.Default.ParaList)
+		{
+			History.Add(new CChangesStylesChangeDefaultParaListId(this, this.Default.ParaList, Id));
+			this.Default.ParaList = Id;
+		}
+	},
+
+	SetDefaultHeader : function(Id)
+	{
+		if (Id !== this.Default.Header)
+		{
+			History.Add(new CChangesStylesChangeDefaultHeaderId(this, this.Default.Header, Id));
+			this.Default.Header = Id;
+		}
+	},
+
+	SetDefaultFooter : function(Id)
+	{
+		if (Id !== this.Default.Footer)
+		{
+			History.Add(new CChangesStylesChangeDefaultFooterId(this, this.Default.Footer, Id));
+			this.Default.Footer = Id;
+		}
+	},
+	
+	SetDefaultHyperlink : function(Id)
+	{
+		if (Id !== this.Default.Hyperlink)
+		{
+			History.Add(new CChangesStylesChangeDefaultHyperlinkId(this, this.Default.Hyperlink, Id));
+			this.Default.Hyperlink = Id;
+		}
+	},
+
+	SetDefaultFootnoteText : function(Id)
+	{
+		if (Id !== this.Default.FootnoteText)
+		{
+			History.Add(new CChangesStylesChangeDefaultFootnoteTextId(this, this.Default.FootnoteText, Id));
+			this.Default.FootnoteText = Id;
+		}
+	},
+
+	SetDefaultFootnoteTextChar : function(Id)
+	{
+		if (Id !== this.Default.FootnoteTextChar)
+		{
+			History.Add(new CChangesStylesChangeDefaultFootnoteTextCharId(this, this.Default.FootnoteTextChar, Id));
+			this.Default.FootnoteTextChar = Id;
+		}
+	},
+
+	SetDefaultFootnoteReference : function(Id)
+	{
+		if (Id !== this.Default.FootnoteReference)
+		{
+			History.Add(new CChangesStylesChangeDefaultFootnoteReferenceId(this, this.Default.FootnoteReference, Id));
+			this.Default.FootnoteReference = Id;
+		}
+	},
+
+	SetDefaultHeading : function(Id, Lvl)
+	{
+		if (Id !== this.Default.Headings[Lvl])
+		{
+			History.Add(new CChangesStylesChangeDefaultHeadingsId(this, this.Default.Headings[Lvl], Id, Lvl));
+			this.Default.Headings[Lvl] = Id;
+		}
+	},
+
+	RemapIdReferences : function(OldId, NewId)
+	{
+		if (OldId === this.Default.Paragraph)
+			this.SetDefaultParagraph(NewId);
+
+		if (OldId === this.Default.Character)
+			this.SetDefaultCharacter(NewId);
+
+		if (OldId === this.Default.Numbering)
+			this.SetDefaultNumbering(NewId);
+
+		if (OldId === this.Default.Table)
+			this.SetDefaultTable(NewId);
+
+		if (OldId === this.Default.TableGrid)
+			this.SetDefaultTableGrid(NewId);
+
+		if (OldId === this.Default.ParaList)
+			this.SetDefaultParaList(NewId);
+
+		if (OldId === this.Default.Header)
+			this.SetDefaultHeader(NewId);
+
+		if (OldId === this.Default.Footer)
+			this.SetDefaultFooter(NewId);
+
+		if (OldId === this.Default.Hyperlink)
+			this.SetDefaultHyperlink(NewId);
+
+		if (OldId === this.Default.FootnoteText)
+			this.SetDefaultFootnoteText(NewId);
+
+		if (OldId === this.Default.FootnoteTextChar)
+			this.SetDefaultFootnoteTextChar(NewId);
+
+		if (OldId === this.Default.FootnoteReference)
+			this.SetDefaultFootnoteReference(NewId);
+
+		for (var nIndex = 0, nCount = this.Default.Headings.length; nIndex < nCount; ++nIndex)
+		{
+			if (OldId === this.Default.Headings[nIndex])
+				this.SetDefaultHeading(NewId, nIndex);
+		}
+
+		for (var Id in this.Style)
+		{
+			this.Style[Id].RemapIdReferences(OldId, NewId);
+		}
 	},
 
     Copy : function()

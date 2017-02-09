@@ -286,12 +286,16 @@ CMathBase.prototype.Get_TxtPrControlLetter = function(RPI) // TextPrControlLette
 
     return this.TextPrControlLetter;
 };
-CMathBase.prototype.fillPlaceholders = function()
+CMathBase.prototype.SetPlaceholder = function()
 {
-    for(var i=0; i < this.nRow; i++)
-        for(var j = 0; j < this.nCol; j++)
-            if(!this.elements[i][j].IsJustDraw())
-                this.elements[i][j].fillPlaceholders();
+	for (var i = 0; i < this.nRow; i++)
+	{
+		for (var j = 0; j < this.nCol; j++)
+		{
+			if (!this.elements[i][j].IsJustDraw())
+				this.elements[i][j].SetPlaceholder();
+		}
+	}
 };
 CMathBase.prototype.addMCToContent = function(elements)
 {
@@ -641,7 +645,7 @@ CMathBase.prototype.Draw_Elements = function(PDSE)
 
         for (var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
         {
-            this.Content[CurPos].Draw_Elements(PDSE);
+			this.Content[CurPos].Draw_Elements(PDSE);
         }
     }
 };
@@ -1864,7 +1868,7 @@ CMathBase.prototype.Draw_HighLights = function(PDSH, bAll)
     var bAllCont = this.Selection.StartPos !== this.Selection.EndPos;
 
     for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
-        this.Content[CurPos].Draw_HighLights(PDSH, bAllCont);
+		this.Content[CurPos].Draw_HighLights(PDSH, bAllCont);
 
     var Bound = this.Get_LineBound(PDSH.Line, PDSH.Range);
 

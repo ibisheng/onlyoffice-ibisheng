@@ -329,11 +329,6 @@ function CEditorPage(api)
 
 	this.IsUseNullThumbnailsSplitter = false;
 
-	this.m_nIntervalSlowAutosave = 600000;
-	this.m_nIntervalFastAutosave = 2000;
-	this.m_nIntervalWaitAutoSave = 1000;
-	this.m_nLastAutosaveTime     = -1;
-
 	this.NoneRepaintPages = false;
 
 	this.m_oApi = api;
@@ -3137,8 +3132,6 @@ function CEditorPage(api)
             return;
         }
 
-		oWordControl.m_nTimeDrawingLast = new Date().getTime();
-
 		var isRepaint = oWordControl.m_bIsScroll;
 		if (oWordControl.m_bIsScroll)
 		{
@@ -3166,36 +3159,6 @@ function CEditorPage(api)
 
 		oWordControl.m_oDrawingDocument.Collaborative_TargetsUpdate(isRepaint);
 
-		if (oWordControl.m_oApi.autoSaveGap != 0 && !oWordControl.m_oApi.isViewMode)
-		{
-			var _curTime = new Date().getTime();
-			if (-1 == oWordControl.m_nLastAutosaveTime)
-			{
-				oWordControl.m_nLastAutosaveTime = _curTime;
-			}
-
-			var _bIsWaitScheme = false;
-			if (History.Points && History.Index >= 0 && History.Index < History.Points.length)
-			{
-				if ((_curTime - History.Points[History.Index].Time) < oWordControl.m_nIntervalWaitAutoSave)
-					_bIsWaitScheme = true;
-			}
-
-			if (!_bIsWaitScheme)
-			{
-				var _interval = (AscCommon.CollaborativeEditing.m_nUseType <= 0) ? oWordControl.m_nIntervalSlowAutosave : oWordControl.m_nIntervalFastAutosave;
-
-				if ((_curTime - oWordControl.m_nLastAutosaveTime) > _interval && !oWordControl.m_oDrawingDocument.TransitionSlide.IsPlaying() && !oWordControl.m_oApi.isLongAction())
-				{
-					if (History.Have_Changes(true) == true)
-					{
-						oWordControl.m_oApi.asc_Save(true);
-					}
-					oWordControl.m_nLastAutosaveTime = _curTime;
-				}
-			}
-		}
-
 		oWordControl.m_nPaintTimerId = setTimeout(oWordControl.onTimerScroll, oWordControl.m_nTimerScrollInterval);
 		//window.requestAnimationFrame(oWordControl.onTimerScroll);
 	};
@@ -3203,7 +3166,6 @@ function CEditorPage(api)
 	this.onTimerScroll_sync = function(isThUpdateSync)
 	{
 		var oWordControl                = oThis;
-		oWordControl.m_nTimeDrawingLast = new Date().getTime();
 		var isRepaint                   = oWordControl.m_bIsScroll;
 		if (oWordControl.m_bIsScroll)
 		{

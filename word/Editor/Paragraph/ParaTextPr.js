@@ -86,11 +86,6 @@ ParaTextPr.prototype.Can_AddNumbering = function()
 {
 	return false;
 };
-ParaTextPr.prototype.Set_Id = function(newId)
-{
-	g_oTableId.Reset_Id(this, newId, this.Id);
-	this.Id = newId;
-};
 ParaTextPr.prototype.Get_Id = function()
 {
 	return this.Id;

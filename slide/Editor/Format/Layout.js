@@ -38,18 +38,18 @@ var History = AscCommon.History;
 
 AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetMaster] = AscDFH.CChangesDrawingsObject;
 AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetMatchingName] = AscDFH.CChangesDrawingsObject;
-AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetType] = AscDFH.CChangesDrawingsObject;
-AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetBg] = AscDFH.CChangesDrawingsObject;
-AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetCSldName] = AscDFH.CChangesDrawingsObject;
-AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetShow] = AscDFH.CChangesDrawingsObject;
-AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetShowPhAnim] = AscDFH.CChangesDrawingsObject;
-AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetShowMasterSp] = AscDFH.CChangesDrawingsObject;
+AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetType] = AscDFH.CChangesDrawingsLong;
+AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetBg] = AscDFH.CChangesDrawingsObjectNoId;
+AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetCSldName] = AscDFH.CChangesDrawingsString;
+AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetShow] = AscDFH.CChangesDrawingsBool;
+AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetShowPhAnim] = AscDFH.CChangesDrawingsBool;
+AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetShowMasterSp] = AscDFH.CChangesDrawingsBool;
 AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetClrMapOverride] = AscDFH.CChangesDrawingsObject;
 AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutAddToSpTree] = AscDFH.CChangesDrawingsContent;
 AscDFH.changesFactory[AscDFH.historyitem_SlideLayoutSetSize] = AscDFH.CChangesDrawingsObjectNoId;
 
-
-AscDFH.drawingsConstructorsMap[ AscDFH.historyitem_SlideLayoutSetSize] = AscFormat.CDrawingBaseCoordsWritable;
+AscDFH.drawingsConstructorsMap[AscDFH.historyitem_SlideLayoutSetBg] = AscFormat.CBg;
+AscDFH.drawingsConstructorsMap[AscDFH.historyitem_SlideLayoutSetSize] = AscFormat.CDrawingBaseCoordsWritable;
 
 AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideLayoutSetMaster]            = function(oClass, value){oClass.Master = value;};
 AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideLayoutSetMatchingName]      = function(oClass, value){oClass.matchingName = value;};
@@ -76,6 +76,7 @@ AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideLayoutSetShow]              = 
 AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideLayoutSetShowPhAnim]        = function(oClass, value){oClass.showMasterPhAnim = value;};
 AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideLayoutSetShowMasterSp]      = function(oClass, value){oClass.showMasterSp = value;};
 AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideLayoutSetClrMapOverride]    = function(oClass, value){oClass.clrMap = value;};
+AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideLayoutSetSize]              = function(oClass, value){oClass.Width = value.a; oClass.Height = value.b;};
 
 AscDFH.drawingContentChanges[AscDFH.historyitem_SlideLayoutAddToSpTree] = function(oClass){
     return oClass.cSld.spTree;
@@ -151,36 +152,36 @@ SlideLayout.prototype =
 
     setType: function(type)
     {
-        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_SlideLayoutSetType, this.type, type));
+        History.Add(new AscDFH.CChangesDrawingsLong(this, AscDFH.historyitem_SlideLayoutSetType, this.type, type));
         this.type = type;
     },
 
     changeBackground: function(bg)
     {
-        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_SlideLayoutSetBg, this.cSld.Bg, bg));
+        History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_SlideLayoutSetBg, this.cSld.Bg, bg));
         this.cSld.Bg = bg;
     },
 
     setCSldName: function(name)
     {
-        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_SlideLayoutSetCSldName, this.cSld.name, name));
+        History.Add(new AscDFH.CChangesDrawingsString(this, AscDFH.historyitem_SlideLayoutSetCSldName, this.cSld.name, name));
         this.cSld.name = name;
     },
     setShow: function(bShow)
     {
-        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_SlideLayoutSetShow, this.show, bShow));
+        History.Add(new AscDFH.CChangesDrawingsBool(this, AscDFH.historyitem_SlideLayoutSetShow, this.show, bShow));
         this.show = bShow;
     },
 
     setShowPhAnim: function(bShow)
     {
-        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_SlideLayoutSetShowPhAnim, this.showMasterPhAnim, bShow));
+        History.Add(new AscDFH.CChangesDrawingsBool(this, AscDFH.historyitem_SlideLayoutSetShowPhAnim, this.showMasterPhAnim, bShow));
         this.showMasterPhAnim = bShow;
     },
 
     setShowMasterSp: function(bShow)
     {
-        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_SlideLayoutSetShowMasterSp, this.showMasterSp, bShow));
+        History.Add(new AscDFH.CChangesDrawingsBool(this, AscDFH.historyitem_SlideLayoutSetShowMasterSp, this.showMasterSp, bShow));
         this.showMasterSp = bShow;
 
     },

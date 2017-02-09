@@ -238,6 +238,53 @@
             asc_getSortColor : function() { return this.sortColor; }
 		};
 		
+		var g_oAdvancedTableInfoSettings = {
+			title		: 0,
+			description: 1
+		};
+		
+		function AdvancedTableInfoSettings () {
+
+			if ( !(this instanceof AdvancedTableInfoSettings) ) {return new AdvancedTableInfoSettings();}
+
+			this.Properties = g_oAdvancedTableInfoSettings;
+
+			this.title  = undefined;
+			this.description  = undefined;
+			
+			return this;
+		}
+		AdvancedTableInfoSettings.prototype = {
+			constructor: AdvancedTableInfoSettings,
+
+			getType : function () {
+				return UndoRedoDataTypes.AdvancedTableInfoSettings;
+			},
+			getProperties : function () {
+				return this.Properties;
+			},
+			getProperty : function (nType) {
+				switch (nType) {
+					case this.Properties.title: return this.title; break;
+					case this.Properties.description: return this.description; break;
+				}
+
+				return null;
+			},
+			setProperty : function (nType, value) {
+				switch (nType) {
+					case this.Properties.title: this.title = value;break;
+					case this.Properties.description: this.description = value;break;
+				}
+			},
+			
+			asc_setTitle : function(val) { this.title = val;},
+			asc_setDescription : function(val) { this.description = val; },
+
+			asc_getTitle : function() { return this.title; },
+			asc_getDescription : function() { return this.description; }
+		};
+		
 		var g_oAutoFilterObj = {
 			type		: 0,
 			filter		: 1
@@ -2424,8 +2471,8 @@
 				History.Create_NewPoint();
 				History.StartTransaction();
 				
-				//History.TurnOff();
 				var oldFilter = tablePart.clone(null);
+				var bAddHistoryPoint = true;
 				
 				switch(optionType)
 				{
@@ -2544,12 +2591,33 @@
 						
 						break;
 					}
+					case c_oAscChangeTableStyleInfo.advancedSettings:
+					{
+						var title = val.asc_getTitle()
+						var description = val.asc_getDescription();
+						
+						//если ничего не меняется в advancedSettings, не заносим точку в историю
+						bAddHistoryPoint = false;
+						if(undefined !== title)
+						{
+							tablePart.changeAltText(title);
+							bAddHistoryPoint = true;
+						}
+						if(undefined !== description)
+						{
+							tablePart.changeAltTextSummary(description);
+							bAddHistoryPoint = true;
+						}
+						
+						break;
+					}
 				}
 				
-				//History.TurnOn();
-				
-				this._addHistoryObj({oldFilter: oldFilter, newFilterRef: tablePart.Ref.clone()}, AscCH.historyitem_AutoFilter_ChangeTableInfo,
+				if(bAddHistoryPoint)
+				{
+					this._addHistoryObj({oldFilter: oldFilter, newFilterRef: tablePart.Ref.clone()}, AscCH.historyitem_AutoFilter_ChangeTableInfo,
 						{activeCells: tablePart.Ref.clone(), type: optionType, val: val, displayName: tableName});
+				}
 				
 				this._cleanStyleTable(tablePart.Ref);
 				this._setColorStyleTable(tablePart.Ref, tablePart, null, isSetValue, isSetType);
@@ -2681,9 +2749,7 @@
 				if(cellId !== undefined)
 				{
 					var curCellId = cellId.split('af')[0];
-					var col = worksheet.getCell(new CellAddress(curCellId)).first.col - 1;
-					var row = worksheet.getCell(new CellAddress(curCellId)).first.row - 1;
-					activeRange =  new Asc.Range(col, row, col, row);
+					activeRange =  AscCommonExcel.g_oRangeCache.getAscRange(curCellId).clone();
 				}
 				
 				var ColId = null;
@@ -5143,6 +5209,13 @@
 		prot["asc_setFilter"]					= prot.asc_setFilter;
 		prot["asc_setType"]						= prot.asc_setType;
 		prot["asc_getFilter"]					= prot.asc_getFilter;
+		
+		window["Asc"]["AdvancedTableInfoSettings"] = window["Asc"].AdvancedTableInfoSettings = AdvancedTableInfoSettings;
+		prot									= AdvancedTableInfoSettings.prototype;
+		prot["asc_getTitle"]					= prot.asc_getTitle;
+		prot["asc_getDescription"]				= prot.asc_getDescription;
+		prot["asc_setTitle"]					= prot.asc_setTitle;
+		prot["asc_setDescription"]				= prot.asc_setDescription;
 		
 		window["AscCommonExcel"].AutoFiltersOptionsElements = AutoFiltersOptionsElements;
 		prot									= AutoFiltersOptionsElements.prototype;

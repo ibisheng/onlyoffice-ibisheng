@@ -111,10 +111,7 @@ var editor;
     this.collaborativeEditing = null;
 
     // AutoSave
-    this.lastSaveTime = null;				// Время последнего сохранения
     this.autoSaveGapRealTime = 30;	  // Интервал быстрого автосохранения (когда выставлен флаг realtime) - 30 мс.
-    this.autoSaveGapFast = 2000;			// Интервал быстрого автосохранения (когда человек один) - 2 сек.
-    this.autoSaveGapSlow = 10 * 60 * 1000;	// Интервал медленного автосохранения (когда совместно) - 10 минут
 
     // Shapes
     this.isStartAddShape = false;
@@ -315,28 +312,29 @@ var editor;
     this._asc_downloadAs(typeFile, c_oAscAsyncAction.DownloadAs, {downloadType: bIsDownloadEvent ? DownloadType.Download: DownloadType.None});
   };
 
-  spreadsheet_api.prototype.asc_Save = function(isAutoSave) {
-	  if (!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction ||
-		  this.isLongAction() || !(this.asc_isDocumentCanSave() || this.collaborativeEditing.haveOtherChanges())) {
-      return;
-    }
+	spreadsheet_api.prototype.asc_Save = function (isAutoSave) {
+		if (!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction ||
+			this.isLongAction() ||
+			!(this.asc_isDocumentCanSave() || this.collaborativeEditing.haveOtherChanges() || this.canUnlockDocument)) {
+			return;
+		}
 
-    this.IsUserSave = !isAutoSave;
-    if (this.IsUserSave) {
-      this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-    }
-    /* Нужно закрыть редактор (до выставления флага canSave, т.к. мы должны успеть отправить
-     asc_onDocumentModifiedChanged для подписки на сборку) Баг http://bugzilla.onlyoffice.com/show_bug.cgi?id=28331 */
-    this.asc_closeCellEditor();
+		this.IsUserSave = !isAutoSave;
+		if (this.IsUserSave) {
+			this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+		}
+      /* Нужно закрыть редактор (до выставления флага canSave, т.к. мы должны успеть отправить
+       asc_onDocumentModifiedChanged для подписки на сборку) Баг http://bugzilla.onlyoffice.com/show_bug.cgi?id=28331 */
+		this.asc_closeCellEditor();
 
-    // Не даем пользователю сохранять, пока не закончится сохранение
-    this.canSave = false;
+		// Не даем пользователю сохранять, пока не закончится сохранение
+		this.canSave = false;
 
-    var t = this;
-    this.CoAuthoringApi.askSaveChanges(function(e) {
-      t.onSaveCallback(e);
-    });
-  };
+		var t = this;
+		this.CoAuthoringApi.askSaveChanges(function (e) {
+			t.onSaveCallback(e);
+		});
+	};
 
   spreadsheet_api.prototype.asc_Print = function(adjustPrint, bIsDownloadEvent) {
     if (window["AscDesktopEditor"]) {
@@ -1193,25 +1191,29 @@ var editor;
         t.collaborativeEditing._recalcLockArray(c_oAscLockTypes.kLockTypeOther, oRecalcIndexColumns, oRecalcIndexRows);
       }
     };
-    this.CoAuthoringApi.onStartCoAuthoring = function(isStartEvent) {
-      t.startCollaborationEditing();
-
-      // На старте не нужно ничего делать
-      if (!isStartEvent) {
-        // Когда документ еще не загружен, нужно отпустить lock (при быстром открытии 2-мя пользователями)
-        if (!t.IsSendDocumentLoadCompleate) {
-          t.CoAuthoringApi.unLockDocument(false);
-        } else {
-          // Принимаем чужие изменения
-          t.collaborativeEditing.applyChanges();
-          // Пересылаем свои изменения
-          t.collaborativeEditing.sendChanges();
-        }
-      }
-    };
-    this.CoAuthoringApi.onEndCoAuthoring = function(isStartEvent) {
-      t.endCollaborationEditing();
-    };
+	  this.CoAuthoringApi.onStartCoAuthoring = function (isStartEvent) {
+		  // На старте не нужно ничего делать
+		  if (isStartEvent) {
+			  t.startCollaborationEditing();
+		  } else {
+			  // Когда документ еще не загружен, нужно отпустить lock (при быстром открытии 2-мя пользователями)
+			  if (!t.IsSendDocumentLoadCompleate) {
+				  t.startCollaborationEditing();
+				  t.CoAuthoringApi.unLockDocument(false);
+			  } else {
+				  // Сохранять теперь должны на таймере автосохранения. Иначе могли два раза запустить сохранение, не дожидаясь окончания
+				  t.canUnlockDocument = true;
+				  t.canStartCoAuthoring = true;
+			  }
+		  }
+	  };
+	  this.CoAuthoringApi.onEndCoAuthoring = function (isStartEvent) {
+		  if (t.canUnlockDocument) {
+			  t.canStartCoAuthoring = false;
+		  } else {
+			  t.endCollaborationEditing();
+		  }
+	  };
   };
 
   spreadsheet_api.prototype._onSaveChanges = function(recalcIndexColumns, recalcIndexRows) {
@@ -1226,11 +1228,12 @@ var editor;
         }
       }
       if (0 < arrChanges.length || null !== deleteIndex || null !== excelAdditionalInfo) {
-        this.CoAuthoringApi.saveChanges(arrChanges, deleteIndex, excelAdditionalInfo);
+        this.CoAuthoringApi.saveChanges(arrChanges, deleteIndex, excelAdditionalInfo, this.canUnlockDocument2);
         History.CanNotAddChanges = true;
       } else {
-        this.CoAuthoringApi.unLockDocument(true);
+        this.CoAuthoringApi.unLockDocument(true, this.canUnlockDocument2);
       }
+      this.canUnlockDocument2 = false;
     }
   };
 
@@ -1443,6 +1446,13 @@ var editor;
         this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
       }
 
+      this.canUnlockDocument2 = this.canUnlockDocument;
+      if (this.canUnlockDocument && this.canStartCoAuthoring) {
+		  this.CoAuthoringApi.onStartCoAuthoring(true);
+	  }
+	  this.canStartCoAuthoring = false;
+      this.canUnlockDocument = false;
+
       AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
       // Принимаем чужие изменения
       this.collaborativeEditing.applyChanges();
@@ -1467,8 +1477,6 @@ var editor;
           window["AscDesktopEditor"]["OnSave"]();
         }
       };
-
-      // Пересылаем всегда, но чистим только если началось совместное редактирование
       // Пересылаем свои изменения
       this.collaborativeEditing.sendChanges(this.IsUserSave);
     } else {
@@ -2962,36 +2970,44 @@ var editor;
   /////////////////////////////////////////////////////////////////////////
   ////////////////////////////AutoSave api/////////////////////////////////
   /////////////////////////////////////////////////////////////////////////
-  spreadsheet_api.prototype._autoSave = function() {
-    if ((0 === this.autoSaveGap && (!this.collaborativeEditing.getFast() || !this.collaborativeEditing.getCollaborativeEditing()))
-      || this.asc_getCellEditMode() || this.asc_getIsTrackShape() || this.isOpenedChartFrame ||
-      !History.IsEndTransaction() || !this.canSave) {
-      return;
-    }
-    if (!History.Have_Changes(true) && !(this.collaborativeEditing.getCollaborativeEditing() && 0 !== this.collaborativeEditing.getOwnLocksLength())) {
-      if (this.collaborativeEditing.getFast() && this.collaborativeEditing.haveOtherChanges()) {
-        AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
+	spreadsheet_api.prototype._autoSave = function () {
+		if (!this.DocumentLoadComplete || (!this.canUnlockDocument && 0 === this.autoSaveGap &&
+			(!this.collaborativeEditing.getFast() || !this.collaborativeEditing.getCollaborativeEditing())) ||
+			this.asc_getCellEditMode() || this.asc_getIsTrackShape() || this.isOpenedChartFrame ||
+			!History.IsEndTransaction() || !this.canSave) {
+			return;
+		}
 
-        // Принимаем чужие изменения
-        this.collaborativeEditing.applyChanges();
-        // Пересылаем свои изменения (просто стираем чужие lock-и, т.к. своих изменений нет)
-        this.collaborativeEditing.sendChanges();
-        // Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
-        this.wb._onWSSelectionChanged();
-      }
-      return;
-    }
-    if (null === this.lastSaveTime) {
-      this.lastSaveTime = new Date();
-      return;
-    }
-    var saveGap = this.collaborativeEditing.getFast() ? this.autoSaveGapRealTime :
-      (this.collaborativeEditing.getCollaborativeEditing() ? this.autoSaveGapSlow : this.autoSaveGapFast);
-    var gap = new Date() - this.lastSaveTime - saveGap;
-    if (0 <= gap) {
-      this.asc_Save(true);
-    }
-  };
+		if (this.canUnlockDocument) {
+			this.asc_Save(true);
+			return;
+		}
+
+		if (!History.Have_Changes(true) && !(this.collaborativeEditing.getCollaborativeEditing() &&
+			0 !== this.collaborativeEditing.getOwnLocksLength())) {
+			if (this.collaborativeEditing.getFast() && this.collaborativeEditing.haveOtherChanges()) {
+				AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
+
+				// Принимаем чужие изменения
+				this.collaborativeEditing.applyChanges();
+				// Пересылаем свои изменения (просто стираем чужие lock-и, т.к. своих изменений нет)
+				this.collaborativeEditing.sendChanges();
+				// Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
+				this.wb._onWSSelectionChanged();
+			}
+			return;
+		}
+		if (null === this.lastSaveTime) {
+			this.lastSaveTime = new Date();
+			return;
+		}
+		var saveGap = this.collaborativeEditing.getFast() ? this.autoSaveGapRealTime :
+			(this.collaborativeEditing.getCollaborativeEditing() ? this.autoSaveGapSlow : this.autoSaveGapFast);
+		var gap = new Date() - this.lastSaveTime - saveGap;
+		if (0 <= gap) {
+			this.asc_Save(true);
+		}
+	};
 
   spreadsheet_api.prototype._onUpdateDocumentCanSave = function() {
     // Можно модифицировать это условие на более быстрое (менять самим состояние в аргументах, а не запрашивать каждый раз)
@@ -3370,6 +3386,7 @@ var editor;
   prot["asc_sortCells"] = prot.asc_sortCells;
   prot["asc_emptyCells"] = prot.asc_emptyCells;
   prot["asc_mergeCellsDataLost"] = prot.asc_mergeCellsDataLost;
+  prot["asc_sortCellsRangeExpand"] = prot.asc_sortCellsRangeExpand;
   prot["asc_getSheetViewSettings"] = prot.asc_getSheetViewSettings;
 	prot["asc_setDisplayGridlines"] = prot.asc_setDisplayGridlines;
 	prot["asc_setDisplayHeadings"] = prot.asc_setDisplayHeadings;

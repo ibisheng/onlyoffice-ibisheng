@@ -51,7 +51,7 @@ AscDFH.drawingsConstructorsMap[AscDFH.historyitem_Comment_Position] = AscFormat.
 AscDFH.drawingsConstructorsMap[AscDFH.historyitem_Comment_Change] = CCommentData;
 
 
-AscDFH.drawingsChangesMap[AscDFH.historyitem_Comment_Position] = function(oClass, value){oClass.x = value.a, oClass.y = value.b;};
+AscDFH.drawingsChangesMap[AscDFH.historyitem_Comment_Position] = function(oClass, value){oClass.x = value.a; oClass.y = value.b;};
 AscDFH.drawingsChangesMap[AscDFH.historyitem_Comment_Change]   = function(oClass, value){oClass.Data = value;};
 AscDFH.drawingsChangesMap[AscDFH.historyitem_Comment_TypeInfo] = function(oClass, value){oClass.m_oTypeInfo = value;};
 
@@ -1046,12 +1046,6 @@ CComment.prototype =
     Get_Id: function()
     {
         return this.Id;
-    },
-
-    Set_Id: function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
     },
 
     Write_ToBinary2: function(Writer)

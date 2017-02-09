@@ -10090,6 +10090,30 @@ function CorrectUniColor(asc_color, unicolor, flag)
         }
     }
 
+    function builder_SetLegendFontSize(oChartSpace, nFontSize){
+        var oLegend = oChartSpace.chart.legend;
+        if(oLegend){
+            if(!oLegend.txPr)
+            {
+                oLegend.setTxPr(new AscFormat.CTextBody());
+            }
+            if(!oLegend.txPr.bodyPr)
+            {
+                oLegend.txPr.setBodyPr(new AscFormat.CBodyPr());
+            }
+            if(!oLegend.txPr.content)
+            {
+                oLegend.txPr.setContent(new AscFormat.CDrawingDocContent(oLegend.txPr, oChartSpace.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
+            }
+            var oPr = oLegend.txPr.content.Content[0].Pr.Copy();
+            if(!oPr.DefaultRunPr){
+                oPr.DefaultRunPr = new AscCommonWord.CTextPr();
+            }
+            oPr.DefaultRunPr.FontSize = nFontSize;
+            oLegend.txPr.content.Content[0].Set_Pr(oPr);
+        }
+    }
+
     function builder_SetShowDataLabels(oChartSpace, bShowSerName, bShowCatName, bShowVal, bShowPerecent){
         if(oChartSpace && oChartSpace.chart && oChartSpace.chart.plotArea && oChartSpace.chart.plotArea.charts[0]){
             var oChart = oChartSpace.chart.plotArea.charts[0];
@@ -10355,6 +10379,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].builder_SetChartHorAxisMinorTickMark = builder_SetChartHorAxisMinorTickMark;
     window['AscFormat'].builder_SetChartVerAxisMajorTickMark = builder_SetChartVerAxisMajorTickMark;
     window['AscFormat'].builder_SetChartVerAxisMinorTickMark = builder_SetChartVerAxisMinorTickMark;
+    window['AscFormat'].builder_SetLegendFontSize = builder_SetLegendFontSize;
 
 
 

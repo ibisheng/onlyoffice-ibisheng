@@ -7123,7 +7123,8 @@ DrawingObjectsController.prototype =
                             checkBorder(new_table_props.CellBorders.Right);
                             checkBorder(new_table_props.CellBorders.Left);
                         }
-
+                        new_table_props.TableDescription = drawing.getDescription();
+                        new_table_props.TableCaption = drawing.getTitle();
                     }
                     else
                     {

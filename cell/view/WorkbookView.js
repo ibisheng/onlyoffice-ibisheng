@@ -2849,7 +2849,8 @@
 		  return null;
 
 		var ws = this.getWorksheet();
-		var range = ws.getSelectedRange().bbox;
+		var range = ws.model.selectionRange.getLast();
+		var type = range.type;
 		var l = ws.getCellLeft(range.c1, 3);
 		var t = ws.getCellTop(range.r1, 3);
 
@@ -2857,10 +2858,13 @@
 		var _offY = ws.cellsTop * asc_getcvt(1/*pt*/, 3/*mm*/, ws._getPPIY());
 
 		return {
-			X: l - _offX,
-			Y: t - _offY,
-			W: ws.getCellLeft(range.c2, 3) - l + ws.getColumnWidth(range.c2, 3),
-			H: ws.getCellTop(range.r2, 3) - t + ws.getRowHeight(range.r2, 3)
+			X: asc.c_oAscSelectionType.RangeRow === type ? 0 : l - _offX,
+			Y: asc.c_oAscSelectionType.RangeCol === type ? 0 : t - _offY,
+			W: asc.c_oAscSelectionType.RangeRow === type ? ws.cellsLeft :
+				ws.getCellLeft(range.c2, 3) - l + ws.getColumnWidth(range.c2, 3),
+			H: asc.c_oAscSelectionType.RangeCol === type ? ws.cellsTop :
+				ws.getCellTop(range.r2, 3) - t + ws.getRowHeight(range.r2, 3),
+			T: type
 		};
 	};
 	WorkbookView.prototype.ConvertXYToLogic = function (x, y) {
