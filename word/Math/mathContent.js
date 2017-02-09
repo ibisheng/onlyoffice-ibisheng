@@ -1716,7 +1716,6 @@ CMathContent.prototype.private_CorrectContent = function()
     }
 
 };
-
 CMathContent.prototype.Correct_Content = function(bInnerCorrection)
 {
     if (true === bInnerCorrection)
@@ -1766,12 +1765,6 @@ CMathContent.prototype.Correct_Content = function(bInnerCorrection)
 			this.SetPlaceholder();
 	}
 };
-
-CMathContent.prototype.IsPlaceholder = function()
-{
-
-};
-
 CMathContent.prototype.Correct_ContentPos = function(nDirection)
 {
     var nCurPos = this.CurPos;
