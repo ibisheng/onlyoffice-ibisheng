@@ -3376,6 +3376,7 @@ var editor;
   prot["asc_sortCells"] = prot.asc_sortCells;
   prot["asc_emptyCells"] = prot.asc_emptyCells;
   prot["asc_mergeCellsDataLost"] = prot.asc_mergeCellsDataLost;
+  prot["asc_sortCellsRangeExpand"] = prot.asc_sortCellsRangeExpand;
   prot["asc_getSheetViewSettings"] = prot.asc_getSheetViewSettings;
 	prot["asc_setDisplayGridlines"] = prot.asc_setDisplayGridlines;
 	prot["asc_setDisplayHeadings"] = prot.asc_setDisplayHeadings;
