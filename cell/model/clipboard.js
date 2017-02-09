@@ -138,7 +138,11 @@
 			{
 				switch(props)
 				{
-					case c_oSpecialPasteProps.formulas:
+					case c_oSpecialPasteProps.paste:
+					{
+						break;
+					}
+					case c_oSpecialPasteProps.pasteOnlyFormula:
 					{
 						//только формулы(или значения)
 						this.revert();
@@ -147,7 +151,7 @@
 						
 						break;
 					}
-					case c_oSpecialPasteProps.formulasNumberFormating:
+					case c_oSpecialPasteProps.formulaNumberFormat:
 					{
 						//только формулы(или значения) и числовой формат
 						this.revert();
@@ -157,19 +161,48 @@
 						
 						break;
 					}
-					case c_oSpecialPasteProps.keepSourceFormating:
+					case c_oSpecialPasteProps.formulaAllFormatting:
 					{
 						//формулы и формат
 						break;
 					}
-					case c_oSpecialPasteProps.noBorders:
+					case c_oSpecialPasteProps.formulaWithoutBorders:
 					{
 						//всё кроме бордеров
 						this.borders = null;
 						break;
 					}
-					case c_oSpecialPasteProps.keepSourceColumnWidths:
+					case c_oSpecialPasteProps.formulaColumnWidth:
 					{
+						break;
+					}
+					case c_oSpecialPasteProps.mergeConditionalFormating:
+					{
+						break;
+					}
+					case c_oSpecialPasteProps.pasteOnlyValues:
+					{
+						//только значения(вместо формул также вставляются значения)
+						this.revert();
+						this.val = true;
+					}
+					case c_oSpecialPasteProps.valueNumberFormat:
+					{
+						this.revert();
+						this.val = true;
+						this.numFormat = true;
+						break;
+					}
+					case c_oSpecialPasteProps.valueAllFormating:
+					{
+						//все кроме формул
+						this.formula = null;
+						break;
+					}
+					case c_oSpecialPasteProps.pasteOnlyFormating:
+					{
+						this.formula = null;
+						this.val = null;
 						break;
 					}
 					case c_oSpecialPasteProps.transpose:
@@ -177,34 +210,7 @@
 						
 						break;
 					}
-					
-					case c_oSpecialPasteProps.values:
-					{
-						//только значения(вместо формул также вставляются значения)
-						this.revert();
-						this.val = true;
-					}
-					case c_oSpecialPasteProps.valuesNumberFormating:
-					{
-						this.revert();
-						this.val = true;
-						this.numFormat = true;
-						break;
-					}
-					case c_oSpecialPasteProps.keepSourceFormating:
-					{
-						//все кроме формул
-						this.formula = null;
-						break;
-					}
-					
-					case c_oSpecialPasteProps.formating:
-					{
-						this.formula = null;
-						this.val = null;
-						break;
-					}
-					case c_oSpecialPasteProps.pasteLink:
+					case c_oSpecialPasteProps.link:
 					{
 						this.revert();
 						break;
@@ -217,7 +223,14 @@
 					{
 						break;
 					}
-					
+					case c_oSpecialPasteProps.sourceformatting:
+					{
+						break;
+					}
+					case c_oSpecialPasteProps.destinationFormatting:
+					{
+						break;
+					}							
 				}
 			},
 			
