@@ -997,18 +997,18 @@ function (window, undefined)
 				ctx.moveTo(_x2C, (_koef * pos3.Y) >> 0);
 				ctx.lineTo(_x2C, (_koef * pos4.Y) >> 0);
 
-				if (_x2C > (_x1C + 10))
+				if (_x2C > (_x1C + 10 * _koef))
 				{
-					var _y1 = ((_koef * pos1.Y) >> 0) + 2;
-					var _y2 = ((_koef * pos2.Y) >> 0) - 2;
+					var _y1 = ((_koef * pos1.Y) >> 0) + 2 * _koef;
+					var _y2 = ((_koef * pos2.Y) >> 0) - 2 * _koef;
 
 					if (_y2 > _y1)
 					{
-						ctx.moveTo(_x2C - 3, _y1);
-						ctx.lineTo(_x2C - 3, _y2);
+						ctx.moveTo(_x2C - 3 * _koef, _y1);
+						ctx.lineTo(_x2C - 3 * _koef, _y2);
 
-						ctx.moveTo(_x2C - 6, _y1);
-						ctx.lineTo(_x2C - 6, _y2);
+						ctx.moveTo(_x2C - 6 * _koef, _y1);
+						ctx.lineTo(_x2C - 6 * _koef, _y2);
 					}
 				}
 
@@ -1040,18 +1040,18 @@ function (window, undefined)
 				ctx.moveTo((_koef * pos2.X) >> 0, _y2C);
 				ctx.lineTo((_koef * pos4.X) >> 0, _y2C);
 
-				if (_y2C > (_y1C + 10))
+				if (_y2C > (_y1C + 10 * _koef))
 				{
-					var _x1 = ((_koef * pos1.X) >> 0) + 2;
-					var _x2 = ((_koef * pos3.X) >> 0) - 2;
+					var _x1 = ((_koef * pos1.X) >> 0) + 2 * _koef;
+					var _x2 = ((_koef * pos3.X) >> 0) - 2 * _koef;
 
 					if (_x2 > _x1)
 					{
-						ctx.moveTo(_x1, _y2C - 3);
-						ctx.lineTo(_x2, _y2C - 3);
+						ctx.moveTo(_x1, _y2C - 3 * _koef);
+						ctx.lineTo(_x2, _y2C - 3 * _koef);
 
-						ctx.moveTo(_x1, _y2C - 6);
-						ctx.lineTo(_x2, _y2C - 6);
+						ctx.moveTo(_x1, _y2C - 6 * _koef);
+						ctx.lineTo(_x2, _y2C - 6 * _koef);
 					}
 				}
 
