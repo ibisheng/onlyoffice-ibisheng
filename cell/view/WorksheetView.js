@@ -9172,7 +9172,7 @@
 			for (var mergeCheck = 0; mergeCheck < mergeArr.length; ++mergeCheck) {
 				var tempRow = row + 1;
 				var tempCol = col + 1;
-				if (tempRow <= mergeArr[mergeCheck].r2 && tempRow >= mergeArr[mergeCheck].r1 && tempCol <= mergeArr[mergeCheck].c2 && tempCol >= mergeArr[mergeCheck].c1) {
+				if (mergeArr[mergeCheck].contains(tempCol, tempRow)) {
 					isMerged = true;
 				}
 			}
@@ -9388,7 +9388,7 @@
 			var isMerged = false;
 			
 			for (var mergeCheck = 0; mergeCheck < mergeArr.length; ++mergeCheck) {
-				if (nRow <= mergeArr[mergeCheck].r2 && nRow >= mergeArr[mergeCheck].r1 && nCol <= mergeArr[mergeCheck].c2 && nCol >= mergeArr[mergeCheck].c1) {
+				if (mergeArr[mergeCheck].contains(nCol, nRow)) {
 					isMerged = true;
 				}
 			}
