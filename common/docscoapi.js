@@ -610,6 +610,11 @@
     return this._state;
   };
 
+	DocsCoApi.prototype.check_state = function () {
+		return ConnectionState.Authorized === this._state || ConnectionState.SaveChanges === this._state ||
+			ConnectionState.AskSaveChanges === this._state;
+	};
+
   DocsCoApi.prototype.get_indexUser = function() {
     return this._indexUser;
   };
@@ -896,13 +901,13 @@
   };
 
   DocsCoApi.prototype._onMessages = function(data, clear) {
-    if (ConnectionState.Authorized === this._state && data["messages"] && this.onMessage) {
+    if (this.check_state() && data["messages"] && this.onMessage) {
       this.onMessage(data["messages"], clear);
     }
   };
 
   DocsCoApi.prototype._onCursor = function(data) {
-    if (ConnectionState.Authorized === this._state && data["messages"] && this.onCursor) {
+    if (this.check_state() && data["messages"] && this.onCursor) {
       this.onCursor(data["messages"]);
     }
   };
@@ -914,7 +919,7 @@
   };
 
   DocsCoApi.prototype._onSession = function(data) {
-    if (ConnectionState.Authorized === this._state && data["messages"] && this.onSession) {
+    if (this.check_state() && data["messages"] && this.onSession) {
       this.onSession(data["messages"]);
     }
   };
@@ -945,7 +950,7 @@
 	};
 
   DocsCoApi.prototype._onGetLock = function(data) {
-    if (ConnectionState.Authorized === this._state && data["locks"]) {
+    if (this.check_state() && data["locks"]) {
       for (var key in data["locks"]) {
         if (data["locks"].hasOwnProperty(key)) {
           var lock = data["locks"][key], blockTmp = (this._isExcel || this._isPresentation) ? lock["block"]["guid"] : key, blockValue = (this._isExcel || this._isPresentation) ? lock["block"] : key;
@@ -983,7 +988,7 @@
   };
 
   DocsCoApi.prototype._onReleaseLock = function(data) {
-    if (ConnectionState.Authorized === this._state && data["locks"]) {
+    if (this.check_state() && data["locks"]) {
       var bSendEnd = false;
       for (var block in data["locks"]) {
         if (data["locks"].hasOwnProperty(block)) {
@@ -1009,7 +1014,7 @@
   };
 
   DocsCoApi.prototype._onSaveChanges = function(data) {
-    if (ConnectionState.Authorized !== this._state) {
+    if (!this.check_state()) {
       return;
     }
     if (data["locks"]) {
@@ -1204,7 +1209,7 @@
   };
 
   DocsCoApi.prototype._onConnectionStateChanged = function(data) {
-    if (ConnectionState.Authorized !== this._state) {
+    if (!this.check_state()) {
       return;
     }
     var userStateChanged = null, userId, stateChanged = false, isEditUser = true;
