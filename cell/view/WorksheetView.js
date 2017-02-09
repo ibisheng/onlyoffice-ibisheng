@@ -8939,13 +8939,14 @@
 		var sProps = Asc.c_oSpecialPasteProps;
 		if(fromBinary)
 		{
-			allowedSpecialPasteProps = [sProps.formulas, sProps.formulasNumberFormating, sProps.keepSourceFormating, sProps.noBorders, sProps.keepSourceColumnWidths, sProps.transpose, sProps.values, sProps.valuesNumberFormating, sProps.keepSourceFormating, sProps.formating, sProps.pasteLink, sProps.picture, sProps.linkedPicture];
+			allowedSpecialPasteProps = [sProps.paste, sProps.pasteOnlyFormula, sProps.formulaNumberFormat, sProps.formulaAllFormatting, sProps.formulaWithoutBorders, sProps.formulaColumnWidth, sProps.mergeConditionalFormating, sProps.pasteOnlyValues, sProps.valueNumberFormat, sProps.valueAllFormating, sProps.pasteOnlyFormating, sProps.link];
 		}
 		else
 		{
 			//matchDestinationFormatting - пока не добавляю, так как работает как и values
-			allowedSpecialPasteProps = [sProps.keepSourceFormating, sProps.values];
+			allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
 		}
+		
 		specialPasteShowOptions.asc_setOptions(allowedSpecialPasteProps);
 		var cellCoord = this.getCellCoord(selectData[0].c2, selectData[0].r2);
 		specialPasteShowOptions.asc_setCellCoord(cellCoord);

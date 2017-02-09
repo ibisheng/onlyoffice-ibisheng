@@ -368,18 +368,24 @@ var c_oAscPopUpSelectorType = {
   };
   
   var c_oSpecialPasteProps = {
-    formulas: 0,
-    formulasNumberFormating: 1,
-	keepSourceFormating: 2,
-	noBorders: 3,
-	keepSourceColumnWidths: 4, 
-	transpose: 5,
-	values: 6, 
-	valuesNumberFormating: 7,
-	formating: 8,
-	pasteLink: 9,
-	picture: 10,
-	linkedPicture: 11
+    paste: 0,
+    pasteOnlyFormula: 1,
+	formulaNumberFormat: 2,
+	formulaAllFormatting: 3,
+	formulaWithoutBorders: 4, 
+	formulaColumnWidth: 5,
+	mergeConditionalFormating: 6, 
+	pasteOnlyValues: 7,
+	valueNumberFormat: 8,
+	valueAllFormating: 9,
+	pasteOnlyFormating: 10,
+	transpose: 11,
+	link: 12,
+	picture: 13,
+	linkedPicture: 14,
+	
+	sourceformatting: 15,
+	destinationFormatting: 16
   };
   
   var c_kMaxPrintPages = 1500;
