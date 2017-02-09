@@ -1172,16 +1172,14 @@ function (window, undefined)
 
 			if (this.RectSelectType == Asc.c_oAscSelectionType.RangeCol)
 			{
-				if (Math.abs(pos1.X - global_mouseEvent.X) < this.TrackTargetEps)
-					this.Mode = AscCommon.MobileTouchMode.SelectTrack;
-				else if (Math.abs(pos4.X - global_mouseEvent.X) < this.TrackTargetEps)
+				// только правая граница
+				if (Math.abs(pos4.X - global_mouseEvent.X) < this.TrackTargetEps)
 					this.Mode = AscCommon.MobileTouchMode.SelectTrack;
 			}
 			else if (this.RectSelectType == Asc.c_oAscSelectionType.RangeRow)
 			{
-				if (Math.abs(pos1.Y - global_mouseEvent.Y) < this.TrackTargetEps)
-					this.Mode = AscCommon.MobileTouchMode.SelectTrack;
-				else if (Math.abs(pos4.Y - global_mouseEvent.X) < this.TrackTargetEps)
+				// только нижняя граница
+				if (Math.abs(pos4.Y - global_mouseEvent.Y) < this.TrackTargetEps)
 					this.Mode = AscCommon.MobileTouchMode.SelectTrack;
 			}
 			else
