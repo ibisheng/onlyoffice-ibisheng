@@ -5334,7 +5334,6 @@ Paragraph.prototype =
             if ((para_Hyperlink === CurElement.Type || para_Math === CurElement.Type || para_Field === CurElement.Type) && true === CurElement.Is_Empty() && true !== CurElement.Is_CheckingNearestPos())
             {
                 this.Internal_Content_Remove(CurPos);
-                CurPos++;
             }
             else if (para_Comment === CurElement.Type && false === CurElement.Start)
             {

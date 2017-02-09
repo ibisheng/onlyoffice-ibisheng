@@ -762,19 +762,23 @@ CWordCollaborativeEditing.prototype.Undo = function()
 	var oHistory = AscCommon.History;
 	oHistory.CreateNewPointForCollectChanges();
 	var oDrawing;
-	for(var sId in mapDrawings){
-	    if(mapDrawings.hasOwnProperty(sId)){
-            oDrawing = mapDrawings[sId];
-            if(!oDrawing.CheckCorrect()){
-                var oParentParagraph = oDrawing.Get_ParentParagraph();
-                oDrawing.Remove_FromDocument(false);
-                if(oParentParagraph){
-                    mapParagraphs[oParentParagraph.Get_Id()] = oParentParagraph;
-                }
-            }
-        }
+	for (var sId in mapDrawings)
+	{
+		if (mapDrawings.hasOwnProperty(sId))
+		{
+			oDrawing = mapDrawings[sId];
+			if (!oDrawing.CheckCorrect())
+			{
+				var oParentParagraph = oDrawing.Get_ParentParagraph();
+				oDrawing.Remove_FromDocument(false);
+				if (oParentParagraph)
+				{
+					mapParagraphs[oParentParagraph.Get_Id()] = oParentParagraph;
+				}
+			}
+		}
+	}
 
-    }
 	for (var sId in mapDocumentContents)
 	{
 		var oDocumentContent = mapDocumentContents[sId];
@@ -798,6 +802,7 @@ CWordCollaborativeEditing.prototype.Undo = function()
 		arrReverseChanges.push(oHistoryPoint.Items[nIndex].Data);
 	}
 	oHistory.Remove_LastPoint();
+	this.Clear_DCChanges();
 
 	var oBinaryWriter = AscCommon.History.BinaryWriter;
 	var aSendingChanges = [];
