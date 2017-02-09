@@ -9182,7 +9182,7 @@
 				var offsetRow = currentObj.rowSpan - 1;
 				pastedRangeProps.offsetLast = {offsetCol: offsetCol, offsetRow: offsetRow};
 				
-				mergeArr.push({r1: range.first.row, r2: range.last.row + offsetRow, c1: range.first.col, c2: range.last.col + offsetCol});
+				mergeArr.push(new Asc.Range(range.bbox.c1, range.bbox.r1, range.bbox.c2 + offsetCol, range.bbox.r2 + offsetRow));
 				if (contentCurrentObj[0] == undefined) {
 					pastedRangeProps.val = '';
 				}
@@ -9407,12 +9407,12 @@
 					}
 					
 					pastedRangeProps.offsetLast = {offsetCol: offsetCol, offsetRow: offsetRow};
-					mergeArr.push({
-						r1: curMerge.r1 + arn.r1 - activeCellsPasteFragment.r1 + rowDiff,
-						r2: curMerge.r2 + arn.r1 - activeCellsPasteFragment.r1 + rowDiff,
-						c1: curMerge.c1 + arn.c1 - activeCellsPasteFragment.c1 + colDiff,
-						c2: curMerge.c2 + arn.c1 - activeCellsPasteFragment.c1 + colDiff
-					});
+					mergeArr.push(new Asc.Range(
+						curMerge.c1 + arn.c1 - activeCellsPasteFragment.c1 + colDiff,
+						curMerge.r1 + arn.r1 - activeCellsPasteFragment.r1 + rowDiff,
+						curMerge.c2 + arn.c1 - activeCellsPasteFragment.c1 + colDiff,
+						curMerge.r2 + arn.r1 - activeCellsPasteFragment.r1 + rowDiff
+					));
 				}
 			} 
 			else {
