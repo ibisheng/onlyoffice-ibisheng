@@ -622,6 +622,9 @@ function (window, undefined)
 				var _x2 = this.RectSelect2.x + this.RectSelect2.w - 0.5;
 				var _y2 = this.RectSelect2.y + this.RectSelect2.h - 0.5;
 
+				if (this.RectSelectType == Asc.c_oAscSelectionType.RangeCol || this.RectSelectType == Asc.c_oAscSelectionType.RangeRow)
+					AscCommon.global_mouseEvent.KoefPixToMM = -10; // чтобы не попасть в движения
+
 				if (1 == this.DragSelect)
 				{
 					global_mouseEvent.Button = 0;
@@ -667,7 +670,7 @@ function (window, undefined)
 			case AscCommon.MobileTouchMode.FlowObj:
 			case AscCommon.MobileTouchMode.SelectTrack:
 			{
-				if (bIsKoefPixToMM)
+				if (bIsKoefPixToMM || this.Mode == AscCommon.MobileTouchMode.SelectTrack)
 				{
 					global_mouseEvent.KoefPixToMM = 5;
 				}
@@ -874,10 +877,6 @@ function (window, undefined)
 			{
 				// TODO:
 				this.delegate.Drawing_OnMouseUp(e.changedTouches ? e.changedTouches[0] : e);
-
-				if (AscCommon.MobileTouchMode.SelectTrack == this.Mode)
-					this.delegate.Api.controller._onMouseLeave(e.changedTouches ? e.changedTouches[0] : e);
-
 				this.Mode = AscCommon.MobileTouchMode.None;
 				break;
 			}
@@ -896,6 +895,9 @@ function (window, undefined)
 		}
 
 		this.checkPointerMultiTouchRemove(e);
+
+		// нужен лив, чтобы сбросить состояния
+		this.delegate.Api.controller._onMouseLeave(e.changedTouches ? e.changedTouches[0] : e);
 
 		if (this.Api.isViewMode || isPreventDefault)
 			AscCommon.g_inputContext.preventVirtualKeyboard(e);

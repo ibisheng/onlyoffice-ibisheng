@@ -5933,11 +5933,11 @@
     };
 
     WorksheetView.prototype._hitResizeCorner = function (x1, y1, x2, y2) {
-        var wEps = this.width_1px, hEps = this.height_1px;
+        var wEps = this.width_1px * AscCommon.global_mouseEvent.KoefPixToMM, hEps = this.height_1px * AscCommon.global_mouseEvent.KoefPixToMM;
         return Math.abs(x2 - x1) <= wEps + this.width_2px && Math.abs(y2 - y1) <= hEps + this.height_2px;
     };
     WorksheetView.prototype._hitInRange = function (range, rangeType, vr, x, y, offsetX, offsetY) {
-        var wEps = this.width_2px, hEps = this.height_2px;
+        var wEps = this.width_2px * AscCommon.global_mouseEvent.KoefPixToMM, hEps = this.height_2px * AscCommon.global_mouseEvent.KoefPixToMM;
         var cursor, x1, x2, y1, y2, isResize;
         var col = -1, row = -1;
 
@@ -6119,13 +6119,14 @@
             offsetY = (y < this.cellsTop + heightDiff) ? 0 : offsetY - heightDiff;
         }
 
+        var epsChangeSize = 3 * AscCommon.global_mouseEvent.KoefPixToMM;
         if (x <= this.cellsLeft && y >= this.cellsTop) {
             r = this._findRowUnderCursor(y, true);
             if (r === null) {
                 return oResDefault;
             }
             isNotFirst = (r.row !== (-1 !== rFrozen ? 0 : this.visibleRange.r1));
-            f = !isViewerMode && (isNotFirst && y < r.top + 3 || y >= r.bottom - 3);
+            f = !isViewerMode && (isNotFirst && y < r.top + epsChangeSize || y >= r.bottom - epsChangeSize);
             // ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
             return {
                 cursor: f ? kCurRowResize : kCurRowSelect,
@@ -6141,7 +6142,7 @@
                 return oResDefault;
             }
             isNotFirst = c.col !== (-1 !== cFrozen ? 0 : this.visibleRange.c1);
-            f = !isViewerMode && (isNotFirst && x < c.left + 3 || x >= c.right - 3);
+            f = !isViewerMode && (isNotFirst && x < c.left + epsChangeSize || x >= c.right - epsChangeSize);
             // ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
             return {
                 cursor: f ? kCurColResize : kCurColSelect,

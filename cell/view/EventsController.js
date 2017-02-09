@@ -1540,7 +1540,8 @@
 
 			// Режим перемещения диапазона
 			if (t.isMoveRangeMode) {
-				event.currentTarget.style.cursor = ctrlKey ? "copy" : "move";
+				if (event.currentTarget && event.currentTarget.style)
+					event.currentTarget.style.cursor = ctrlKey ? "copy" : "move";
 				t._moveRangeHandle(event);
 				return true;
 			}
