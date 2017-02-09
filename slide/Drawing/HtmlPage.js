@@ -2854,8 +2854,6 @@ function CEditorPage(api)
 			_c.m_nCurrentTimeClearCache = 0;
 			_c.m_oDrawingDocument.CheckFontCache();
 		}
-
-		this.m_oLogicDocument.Continue_FastCollaborativeEditing();
 	};
 	this.OnScroll       = function()
 	{
