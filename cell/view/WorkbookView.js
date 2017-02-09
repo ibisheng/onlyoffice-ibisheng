@@ -2855,6 +2855,14 @@
 			T: type
 		};
 	};
+	WorkbookView.prototype.GetCaptionSize = function()
+	{
+		var ws = this.getWorksheet();
+		return {
+			W:  ws.cellsLeft * asc_getcvt(1/*pt*/, 3/*mm*/, ws._getPPIX()),
+			H: ws.cellsTop * asc_getcvt(1/*pt*/, 3/*mm*/, ws._getPPIY())
+		};
+	};
 	WorkbookView.prototype.ConvertXYToLogic = function (x, y) {
 	  return this.getWorksheet().ConvertXYToLogic(x, y);
 	};

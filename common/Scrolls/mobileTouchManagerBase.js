@@ -48,7 +48,8 @@
 			FlowObj    : 5,
 			Cursor     : 6,
 			TableMove  : 7,
-			TableRuler : 8
+			TableRuler : 8,
+			SelectTrack : 9
 		};
 
 	AscCommon.MobileTouchContextMenuType =
@@ -565,6 +566,7 @@
 		this.RectSelect2 = null;
 		this.PageSelect1 = 0;
 		this.PageSelect2 = 0;
+		this.RectSelectType = 0; // excel
 
 		this.TrackTargetEps = 20;
 
@@ -1385,6 +1387,8 @@
 		var _select = this.delegate.GetSelectionRectsBounds();
 		if (!_select)
 			return;
+
+		this.RectSelectType = (_select.Type === undefined) ? 0 : _select.Type;
 
 		var _rect1 = _select.Start;
 		var _rect2 = _select.End;
