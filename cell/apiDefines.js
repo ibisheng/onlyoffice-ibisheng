@@ -592,7 +592,6 @@ var c_oAscPopUpSelectorType = {
   prot['valueAllFormating'] = prot.valueAllFormating;
   prot['pasteOnlyFormating'] = prot.pasteOnlyFormating;
   prot['transpose'] = prot.transpose;
-  
   prot['link'] = prot.link;
   prot['picture'] = prot.picture;
   prot['linkedPicture'] = prot.linkedPicture;
