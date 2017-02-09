@@ -1834,7 +1834,7 @@ CMathContent.prototype.Get_TextPr = function(ContentPos, Depth)
 
     var TextPr;
 
-    if(this.IsPlaceholder())
+    if(true !== this.bRoot && this.IsPlaceholder())
         TextPr = this.Parent.Get_CtrPrp(true);
     else
         TextPr = this.Content[pos].Get_TextPr(ContentPos, Depth + 1);
@@ -1849,7 +1849,7 @@ CMathContent.prototype.Get_CompiledTextPr = function(Copy, bAll)
 {
     var TextPr = null;
 
-    if(this.IsPlaceholder())
+    if(true !== this.bRoot && this.IsPlaceholder())
     {
         TextPr = this.Parent.Get_CompiledCtrPrp_2();
     }
