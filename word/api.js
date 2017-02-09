@@ -1881,7 +1881,7 @@ background-repeat: no-repeat;\
 				this.asc_Save(true);
 				this.lastSaveTime = _curTime;
 			} else {
-				if (AscCommon.CollaborativeEditing.Is_Fast()) {
+				if (AscCommon.CollaborativeEditing.Is_Fast() && !AscCommon.CollaborativeEditing.Is_SingleUser()) {
 					this.WordControl.m_oLogicDocument.Continue_FastCollaborativeEditing();
 				} else {
 					var _bIsWaitScheme = false;
