@@ -146,35 +146,7 @@ function (window, undefined) {
 	window['AscCH'].historyitem_AutoFilter_ChangeColumnName = 16;
 	window['AscCH'].historyitem_AutoFilter_ChangeTotalRow = 17;
 
-	window['AscCH'].historyitem_Sparkline_Type = 1;
-	window['AscCH'].historyitem_Sparkline_LineWeight = 2;
-	window['AscCH'].historyitem_Sparkline_DisplayEmptyCellsAs = 3;
-	window['AscCH'].historyitem_Sparkline_Markers = 4;
-	window['AscCH'].historyitem_Sparkline_High = 5;
-	window['AscCH'].historyitem_Sparkline_Low = 6;
-	window['AscCH'].historyitem_Sparkline_First = 7;
-	window['AscCH'].historyitem_Sparkline_Last = 8;
-	window['AscCH'].historyitem_Sparkline_Negative = 9;
-	window['AscCH'].historyitem_Sparkline_DisplayXAxis = 10;
-	window['AscCH'].historyitem_Sparkline_DisplayHidden = 11;
-	window['AscCH'].historyitem_Sparkline_MinAxisType = 12;
-	window['AscCH'].historyitem_Sparkline_MaxAxisType = 13;
-	window['AscCH'].historyitem_Sparkline_RightToLeft = 14;
-	window['AscCH'].historyitem_Sparkline_ManualMax = 15;
-	window['AscCH'].historyitem_Sparkline_ManualMin = 16;
-	window['AscCH'].historyitem_Sparkline_DateAxis = 17;
-	window['AscCH'].historyitem_Sparkline_ColorSeries = 18;
-	window['AscCH'].historyitem_Sparkline_ColorNegative = 19;
-	window['AscCH'].historyitem_Sparkline_ColorAxis = 20;
-	window['AscCH'].historyitem_Sparkline_ColorMarkers = 21;
-	window['AscCH'].historyitem_Sparkline_ColorFirst = 22;
-	window['AscCH'].historyitem_Sparkline_colorLast = 23;
-	window['AscCH'].historyitem_Sparkline_ColorHigh = 24;
-	window['AscCH'].historyitem_Sparkline_ColorLow = 25;
-	window['AscCH'].historyitem_Sparkline_F = 26;
-	window['AscCH'].historyitem_Sparkline_ChangeData = 27;
-	window['AscCH'].historyitem_Sparkline_RemoveData = 28;
-	window['AscCH'].historyitem_Sparkline_RemoveSparkline = 29;
+
 
 function CHistory()
 {

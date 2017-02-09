@@ -591,6 +591,9 @@
     };
 
     CChangesSparklinesChangeData.prototype.ReadFromBinary = function(Reader){
+        Reader.Seek2(Reader.GetCurPos() - 4);
+        var nType = Reader.GetLong();
+        this.Type = nType;
         this.OldPr = this.ReadPr(Reader);
         this.NewPr = this.ReadPr(Reader);
     };
@@ -603,6 +606,7 @@
                 aSparklines.push(Pr[i].clone())
             }
         }
+        this.Class.cleanCache();
     };
 
     CChangesSparklinesChangeData.prototype.Undo = function(){
@@ -662,7 +666,7 @@
         else{
             this.Class.arrSparklines.push(this.sparkline);
         }
-
+        this.Class.cleanCache();
     };
     CChangesSparklinesRemoveData.prototype.Redo = function(){
         if(this.bReverse){
@@ -671,6 +675,7 @@
         else{
             this.Class.remove(this.sparkline.sqref);
         }
+        this.Class.cleanCache();
     };
 
     CChangesSparklinesRemoveData.prototype.CreateReverseChange = function(){
@@ -722,6 +727,9 @@
         this.WritePr(Writer, this.NewPr);
     };
     CChangesDrawingsExcelColor.prototype.ReadFromBinary = function(Reader){
+        Reader.Seek2(Reader.GetCurPos() - 4);
+        var nType = Reader.GetLong();
+        this.Type = nType;
         this.OldPr = this.ReadPr(Reader);
         this.NewPr = this.ReadPr(Reader);
     };
@@ -766,6 +774,7 @@
                 oClass.colorLow = Pr;
                 break;
         }
+        oClass.cleanCache();
     };
 
 
@@ -791,6 +800,7 @@
             }
 
         }
+        this.Class.cleanCache();
     };
     CChangesDrawingsSparklinesRemove.prototype.Redo = function(){
         if (this.Class.worksheet) {
@@ -801,6 +811,7 @@
                 this.Class.worksheet.removeSparklineGroup(this.Class.Get_Id());
             }
         }
+        this.Class.cleanCache();
     };
 
     CChangesDrawingsSparklinesRemove.prototype.WriteToBinary = function(Writer){
@@ -856,23 +867,23 @@ AscDFH.changesFactory[AscDFH.historyitem_Sparkline_ChangeData]          = AscDFH
 AscDFH.changesFactory[AscDFH.historyitem_Sparkline_RemoveData]          = AscDFH.CChangesSparklinesRemoveData;
 AscDFH.changesFactory[AscDFH.historyitem_Sparkline_RemoveSparkline]     = AscDFH.CChangesDrawingsSparklinesRemove;
 
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Type               ] = function(oClass, value){oClass.type                = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_LineWeight         ] = function(oClass, value){oClass.lineWeight          = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_DisplayEmptyCellsAs] = function(oClass, value){oClass.displayEmptyCellsAs = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Markers            ] = function(oClass, value){oClass.markers             = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_High               ] = function(oClass, value){oClass.high                = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Low                ] = function(oClass, value){oClass.low                 = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_First              ] = function(oClass, value){oClass.first               = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Last               ] = function(oClass, value){oClass.last                = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Negative           ] = function(oClass, value){oClass.negative            = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_DisplayXAxis       ] = function(oClass, value){oClass.displayXAxis        = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_DisplayHidden      ] = function(oClass, value){oClass.displayHidden       = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_MinAxisType        ] = function(oClass, value){oClass.minAxisType         = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_MaxAxisType        ] = function(oClass, value){oClass.maxAxisType         = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_RightToLeft        ] = function(oClass, value){oClass.rightToLeft         = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_ManualMax          ] = function(oClass, value){oClass.manualMax           = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_ManualMin          ] = function(oClass, value){oClass.manualMin           = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_DateAxis           ] = function(oClass, value){oClass.dateAxis            = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_F                  ] = function(oClass, value){oClass.f                   = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Type               ] = function(oClass, value){oClass.type                = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_LineWeight         ] = function(oClass, value){oClass.lineWeight          = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_DisplayEmptyCellsAs] = function(oClass, value){oClass.displayEmptyCellsAs = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Markers            ] = function(oClass, value){oClass.markers             = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_High               ] = function(oClass, value){oClass.high                = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Low                ] = function(oClass, value){oClass.low                 = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_First              ] = function(oClass, value){oClass.first               = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Last               ] = function(oClass, value){oClass.last                = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Negative           ] = function(oClass, value){oClass.negative            = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_DisplayXAxis       ] = function(oClass, value){oClass.displayXAxis        = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_DisplayHidden      ] = function(oClass, value){oClass.displayHidden       = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_MinAxisType        ] = function(oClass, value){oClass.minAxisType         = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_MaxAxisType        ] = function(oClass, value){oClass.maxAxisType         = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_RightToLeft        ] = function(oClass, value){oClass.rightToLeft         = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_ManualMax          ] = function(oClass, value){oClass.manualMax           = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_ManualMin          ] = function(oClass, value){oClass.manualMin           = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_DateAxis           ] = function(oClass, value){oClass.dateAxis            = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_F                  ] = function(oClass, value){oClass.f                   = value; oClass.cleanCache();};
 
 })(window);
