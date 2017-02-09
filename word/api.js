@@ -1881,22 +1881,26 @@ background-repeat: no-repeat;\
 				this.asc_Save(true);
 				this.lastSaveTime = _curTime;
 			} else {
-				var _bIsWaitScheme = false;
-				if (History.Points && History.Index >= 0 && History.Index < History.Points.length) {
-					if ((_curTime - History.Points[History.Index].Time) < this.intervalWaitAutoSave) {
-						_bIsWaitScheme = true;
-					}
-				}
-
-				if (!_bIsWaitScheme) {
-					var _interval = (AscCommon.CollaborativeEditing.m_nUseType <= 0) ? this.autoSaveGapSlow :
-						this.autoSaveGapFast;
-
-					if ((_curTime - this.lastSaveTime) > _interval) {
-						if (History.Have_Changes(true) == true) {
-							this.asc_Save(true);
+				if (AscCommon.CollaborativeEditing.Is_Fast()) {
+					this.WordControl.m_oLogicDocument.Continue_FastCollaborativeEditing();
+				} else {
+					var _bIsWaitScheme = false;
+					if (History.Points && History.Index >= 0 && History.Index < History.Points.length) {
+						if ((_curTime - History.Points[History.Index].Time) < this.intervalWaitAutoSave) {
+							_bIsWaitScheme = true;
 						}
-						this.lastSaveTime = _curTime;
+					}
+
+					if (!_bIsWaitScheme) {
+						var _interval = (AscCommon.CollaborativeEditing.m_nUseType <= 0) ? this.autoSaveGapSlow :
+							this.autoSaveGapFast;
+
+						if ((_curTime - this.lastSaveTime) > _interval) {
+							if (History.Have_Changes(true) == true) {
+								this.asc_Save(true);
+							}
+							this.lastSaveTime = _curTime;
+						}
 					}
 				}
 			}
