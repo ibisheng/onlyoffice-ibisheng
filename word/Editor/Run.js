@@ -6323,112 +6323,121 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
             var StartPos = this.State.Selection.StartPos;
             var EndPos   = this.State.Selection.EndPos;
 
-            var Direction = 1;
-            if ( StartPos > EndPos )
-            {
-                var Temp = StartPos;
-                StartPos = EndPos;
-                EndPos = Temp;
-                Direction = -1;
-            }
+            if (StartPos === EndPos)
+			{
+				CRun = this;
+				LRun = null;
+				RRun = null;
+			}
+			else
+			{
+				var Direction = 1;
+				if (StartPos > EndPos)
+				{
+					var Temp  = StartPos;
+					StartPos  = EndPos;
+					EndPos    = Temp;
+					Direction = -1;
+				}
 
-            // Если выделено не до конца, тогда разделяем по последней точке
-            if ( EndPos < this.Content.length )
-            {
-                RRun = LRun.Split_Run(EndPos);
-                RRun.Set_ReviewType(ReviewType);
-                if (IsPrChange)
-                    RRun.Add_PrChange();
-            }
+				// Если выделено не до конца, тогда разделяем по последней точке
+				if (EndPos < this.Content.length)
+				{
+					RRun = LRun.Split_Run(EndPos);
+					RRun.Set_ReviewType(ReviewType);
+					if (IsPrChange)
+						RRun.Add_PrChange();
+				}
 
-            // Если выделено не с начала, тогда делим по начальной точке
-            if ( StartPos > 0 )
-            {
-                CRun = LRun.Split_Run(StartPos);
-                CRun.Set_ReviewType(ReviewType);
-                if (IsPrChange)
-                    CRun.Add_PrChange();
-            }
-            else
-            {
-                CRun = LRun;
-                LRun = null;
-            }
+				// Если выделено не с начала, тогда делим по начальной точке
+				if (StartPos > 0)
+				{
+					CRun = LRun.Split_Run(StartPos);
+					CRun.Set_ReviewType(ReviewType);
+					if (IsPrChange)
+						CRun.Add_PrChange();
+				}
+				else
+				{
+					CRun = LRun;
+					LRun = null;
+				}
 
-            if ( null !== LRun )
-            {
-                LRun.Selection.Use      = true;
-                LRun.Selection.StartPos = LRun.Content.length;
-                LRun.Selection.EndPos   = LRun.Content.length;
-            }
+				if (null !== LRun)
+				{
+					LRun.Selection.Use      = true;
+					LRun.Selection.StartPos = LRun.Content.length;
+					LRun.Selection.EndPos   = LRun.Content.length;
+				}
 
-            CRun.Select_All(Direction);
+				CRun.Select_All(Direction);
 
-            if (true === bReview && true !== CRun.Have_PrChange())
-                CRun.Add_PrChange();
+				if (true === bReview && true !== CRun.Have_PrChange())
+					CRun.Add_PrChange();
 
-            if ( undefined === IncFontSize )
-                CRun.Apply_Pr( TextPr );
-            else
-            {
-                var _TextPr = new CTextPr();
-                var CurTextPr = this.Get_CompiledPr( false );
+				if (undefined === IncFontSize)
+					CRun.Apply_Pr(TextPr);
+				else
+				{
+					var _TextPr   = new CTextPr();
+					var CurTextPr = this.Get_CompiledPr(false);
 
-                CRun.private_AddCollPrChangeMine();
-                CRun.Set_FontSize( FontSize_IncreaseDecreaseValue( IncFontSize, CurTextPr.FontSize ) );
-            }
+					CRun.private_AddCollPrChangeMine();
+					CRun.Set_FontSize(FontSize_IncreaseDecreaseValue(IncFontSize, CurTextPr.FontSize));
+				}
 
-            if ( null !== RRun )
-            {
-                RRun.Selection.Use      = true;
-                RRun.Selection.StartPos = 0;
-                RRun.Selection.EndPos   = 0;
-            }
+				if (null !== RRun)
+				{
+					RRun.Selection.Use      = true;
+					RRun.Selection.StartPos = 0;
+					RRun.Selection.EndPos   = 0;
+				}
 
-            // Дополнительно проверим, если у нас para_End лежит в данном ране и попадает в выделение, тогда
-            // применим заданные настроки к символу конца параграфа
+				// Дополнительно проверим, если у нас para_End лежит в данном ране и попадает в выделение, тогда
+				// применим заданные настроки к символу конца параграфа
 
-            // TODO: Возможно, стоит на этапе пересчета запонимать, лежит ли para_End в данном ране. Чтобы в каждом
-            //       ране потом не бегать каждый раз по всему массиву в поисках para_End.
+				// TODO: Возможно, стоит на этапе пересчета запонимать, лежит ли para_End в данном ране. Чтобы в каждом
+				//       ране потом не бегать каждый раз по всему массиву в поисках para_End.
 
-            if ( true === this.Selection_CheckParaEnd() )
-            {
-                if ( undefined === IncFontSize )
-                {
-                    if(!TextPr.AscFill && !TextPr.AscLine && !TextPr.AscUnifill)
-                    {
-                        this.Paragraph.TextPr.Apply_TextPr( TextPr );
-                    }
-                    else
-                    {
-                        var EndTextPr = this.Paragraph.Get_CompiledPr2(false).TextPr.Copy();
-                        EndTextPr.Merge( this.Paragraph.TextPr.Value );
-                        if(TextPr.AscFill)
-                        {
-                            this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 0));
-                        }
-                        if(TextPr.AscUnifill)
-                        {
-                            this.Paragraph.TextPr.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, EndTextPr.Unifill, 0));
-                        }
-                        if(TextPr.AscLine)
-                        {
-                            this.Paragraph.TextPr.Set_TextOutline(AscFormat.CorrectUniStroke(TextPr.AscLine, EndTextPr.TextOutline, 0));
-                        }
-                    }
-                }
-                else
-                {
-                    var Para = this.Paragraph;
+				if (true === this.Selection_CheckParaEnd())
+				{
+					if (undefined === IncFontSize)
+					{
+						if (!TextPr.AscFill && !TextPr.AscLine && !TextPr.AscUnifill)
+						{
+							this.Paragraph.TextPr.Apply_TextPr(TextPr);
+						}
+						else
+						{
+							var EndTextPr = this.Paragraph.Get_CompiledPr2(false).TextPr.Copy();
+							EndTextPr.Merge(this.Paragraph.TextPr.Value);
+							if (TextPr.AscFill)
+							{
+								this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 0));
+							}
+							if (TextPr.AscUnifill)
+							{
+								this.Paragraph.TextPr.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, EndTextPr.Unifill, 0));
+							}
+							if (TextPr.AscLine)
+							{
+								this.Paragraph.TextPr.Set_TextOutline(AscFormat.CorrectUniStroke(TextPr.AscLine, EndTextPr.TextOutline, 0));
+							}
+						}
+					}
+					else
+					{
+						var Para = this.Paragraph;
 
-                    // Выставляем настройки для символа параграфа
-                    var EndTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
-                    EndTextPr.Merge( Para.TextPr.Value );
+						// Выставляем настройки для символа параграфа
+						var EndTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
+						EndTextPr.Merge(Para.TextPr.Value);
 
-                    // TODO: Как только перенесем историю изменений TextPr в сам класс CTextPr, переделать тут
-                    Para.TextPr.Set_FontSize( FontSize_IncreaseDecreaseValue( IncFontSize, EndTextPr.FontSize ) );
-                }
-            }
+						// TODO: Как только перенесем историю изменений TextPr в сам класс CTextPr, переделать тут
+						Para.TextPr.Set_FontSize(FontSize_IncreaseDecreaseValue(IncFontSize, EndTextPr.FontSize));
+					}
+				}
+			}
         }
         else
         {
