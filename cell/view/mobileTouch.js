@@ -1218,13 +1218,19 @@ function (window, undefined)
 			{
 				// только правая граница
 				if (Math.abs(pos4.X - global_mouseEvent.X) < this.TrackTargetEps)
-					this.Mode = AscCommon.MobileTouchMode.SelectTrack;
+				{
+					if (pos4.X > global_mouseEvent.X)
+						this.Mode = AscCommon.MobileTouchMode.SelectTrack;
+				}
 			}
 			else if (this.RectSelectType == Asc.c_oAscSelectionType.RangeRow)
 			{
 				// только нижняя граница
 				if (Math.abs(pos4.Y - global_mouseEvent.Y) < this.TrackTargetEps)
-					this.Mode = AscCommon.MobileTouchMode.SelectTrack;
+				{
+					if (pos4.Y > global_mouseEvent.Y)
+						this.Mode = AscCommon.MobileTouchMode.SelectTrack;
+				}
 			}
 			else
 			{
