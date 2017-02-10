@@ -1582,20 +1582,6 @@ CMathBase.prototype.Redo = function(Data)
 {
     Data.Redo(this);
 };
-CMathBase.prototype.Save_Changes = function(Data, Writer)
-{
-    Writer.WriteLong(this.ClassType);
-    WriteChanges_ToBinary(Data, Writer);
-};
-CMathBase.prototype.Load_Changes = function(Reader)
-{
-    var ClassType = Reader.GetLong();
-
-    if (this.ClassType !== ClassType)
-        return;
-
-    ReadChanges_FromBinary(Reader, this);
-};
 CMathBase.prototype.Get_AllFontNames = function(AllFonts)
 {
     this.CtrPrp.Document_Get_AllFontNames(AllFonts);

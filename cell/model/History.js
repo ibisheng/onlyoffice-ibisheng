@@ -229,19 +229,14 @@ CHistory.prototype.Undo = function()
 
 
 
-		if(!Item.Class.Read_FromBinary2 && !Item.Class.IsChangesClass)
+		if(!Item.Class.RefreshRecalcData)
 			Item.Class.Undo( Item.Type, Item.Data, Item.SheetId );
 		else
 		{
-            if (Item.Class && Item.Class.IsChangesClass && Item.Class.IsChangesClass())
+            if (Item.Class)
             {
                 Item.Class.Undo();
                 Item.Class.RefreshRecalcData();
-            }
-            else
-            {
-                Item.Class.Undo(Item.Type);
-                Item.Class.Refresh_RecalcData && Item.Class.Refresh_RecalcData(Item.Type);
             }
         }
 
@@ -299,39 +294,30 @@ CHistory.prototype.RedoAdd = function(oRedoObjectParam, Class, Type, sheetid, ra
 	}
 
 	// ToDo Убрать это!!!
-	if(Class && !Class.Load_Changes && !Class.Load)
-	{
+	if(Class && !Class.Load) {
 		Class.Redo( Type, Data, sheetid );
 	}
 	else
 	{
-		if(Class && Data && !Data.isDrawingCollaborativeData)
-			Class.Redo(Data);
+		if(Class && Data && !Data.isDrawingCollaborativeData){
+            Class.Redo(Data);
+		}
 		else
 		{
 			if(!Class){
 				if(Data.isDrawingCollaborativeData){
-			Data.oBinaryReader.Seek2(Data.nPos);
-                    var nReaderPos   = Data.oBinaryReader.GetCurPos();
-                    var nChangesType = Data.oBinaryReader.GetLong();
-
-                    var changedObject = AscCommon.g_oTableId.Get_ById(Data.sChangedObjectId);
-                    if(changedObject){
-
-                        var fChangesClass = AscDFH.changesFactory[nChangesType];
-                        if (fChangesClass)
-			{
-                            var oChange = new fChangesClass(changedObject);
-                            oChange.ReadFromBinary(Data.oBinaryReader);
-                            oChange.Load(new CDocumentColor(255, 255, 255));
-			}
-                        else
-			{
-                            Data.oBinaryReader.Seek2(nReaderPos);
-                            changedObject.Load_Changes(Data.oBinaryReader, null, new CDocumentColor(255, 255, 255));
-			}
-		}
-	}
+					Data.oBinaryReader.Seek2(Data.nPos);
+					var nChangesType = Data.oBinaryReader.GetLong();
+					var changedObject = AscCommon.g_oTableId.Get_ById(Data.sChangedObjectId);
+					if(changedObject){
+						var fChangesClass = AscDFH.changesFactory[nChangesType];
+						if (fChangesClass){
+							var oChange = new fChangesClass(changedObject);
+							oChange.ReadFromBinary(Data.oBinaryReader);
+							oChange.Load(new CDocumentColor(255, 255, 255));
+						}
+					}
+				}
 			}
 		}
 	}
@@ -354,29 +340,12 @@ CHistory.prototype.RedoExecute = function(Point, oRedoObjectParam)
 	for ( var Index = 0; Index < Point.Items.length; Index++ )
 	{
 		var Item = Point.Items[Index];
-		if(!Item.Class.Read_FromBinary2 && !Item.Class.IsChangesClass)
+		if(!Item.Class.RefreshRecalcData)
 			Item.Class.Redo( Item.Type, Item.Data, Item.SheetId );
 		else
 		{
-			if(!Item.Data || !Item.Data.isDrawingCollaborativeData)
-			{
-                if (Item.Class && Item.Class.IsChangesClass && Item.Class.IsChangesClass())
-                {
-                    Item.Class.Redo();
-                    Item.Class.RefreshRecalcData();
-                }
-			else
-			{
-                    Item.Class.Redo(Item.Type);
-                    Item.Class.Refresh_RecalcData && Item.Class.Refresh_RecalcData(Item.Type);
-                }
-
-            }
-			else
-			{
-				Item.Data.oBinaryReader.Seek(Item.Data.nPos);
-				Item.Class.Load_Changes(Item.Data.oBinaryReader, null, new CDocumentColor(255, 255, 255));
-			}
+			Item.Class.Redo();
+			Item.Class.RefreshRecalcData();
 		}
 		this._addRedoObjectParam(oRedoObjectParam, Item);
 	}

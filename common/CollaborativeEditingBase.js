@@ -588,6 +588,24 @@ CCollaborativeEditingBase.prototype.Refresh_DCChanges = function()
 
     this.Clear_DCChanges();
 };
+
+
+//-----------------------------------------------------------------------------------
+// Функции для работы с массивами PosExtChangesX, PosExtChangesY
+//-----------------------------------------------------------------------------------
+    CCollaborativeEditingBase.prototype.AddPosExtChanges = function(Item, ChangeObject){
+
+    };
+    CCollaborativeEditingBase.prototype.RefreshPosExtChanges = function(){
+
+    };
+    CCollaborativeEditingBase.prototype.RewritePosExtChanges = function(changesArr, scale, Binary_Writer)
+    {
+    };
+
+    CCollaborativeEditingBase.prototype.RefreshPosExtChanges = function()
+    {
+    };
 //-----------------------------------------------------------------------------------
 // Функции для работы с отметками изменений
 //-----------------------------------------------------------------------------------

@@ -101,6 +101,10 @@ function (window, undefined) {
         this.m_nPixHeight = nPixHeight;
     };
 
+    COleObject.prototype.canRotate = function () {
+        return false;
+    };
+
     COleObject.prototype.copy = function()
     {
         var copy = new COleObject();

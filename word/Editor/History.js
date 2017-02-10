@@ -243,15 +243,10 @@ CHistory.prototype =
                 {
                     var Item = Point.Items[Index];
 
-					if (Item.Data && Item.Data.IsChangesClass && Item.Data.IsChangesClass())
+					if (Item.Data)
 					{
 						Item.Data.Undo();
 						Item.Data.RefreshRecalcData();
-					}
-					else
-					{
-						Item.Class.Undo(Item.Data);
-						Item.Class.Refresh_RecalcData(Item.Data);
 					}
                     this.private_UpdateContentChangesOnUndo(Item);
                 }
@@ -265,15 +260,10 @@ CHistory.prototype =
             for (var Index = Point.Items.length - 1; Index >= 0; Index--)
             {
                 var Item = Point.Items[Index];
-				if (Item.Data && Item.Data.IsChangesClass && Item.Data.IsChangesClass())
+				if (Item.Data)
 				{
 					Item.Data.Undo();
 					Item.Data.RefreshRecalcData();
-				}
-				else
-				{
-					Item.Class.Undo(Item.Data);
-					Item.Class.Refresh_RecalcData(Item.Data);
 				}
 				this.private_UpdateContentChangesOnUndo(Item);
             }
@@ -302,15 +292,10 @@ CHistory.prototype =
         {
             var Item = Point.Items[Index];
 
-			if (Item.Data && Item.Data.IsChangesClass && Item.Data.IsChangesClass())
+			if (Item.Data)
 			{
 				Item.Data.Redo();
 				Item.Data.RefreshRecalcData();
-			}
-			else
-			{
-				Item.Class.Redo(Item.Data);
-				Item.Class.Refresh_RecalcData(Item.Data);
 			}
 			this.private_UpdateContentChangesOnRedo(Item);
         }
@@ -434,21 +419,14 @@ CHistory.prototype =
 		var Binary_Pos = this.BinaryWriter.GetCurPosition();
 
 		var Class;
-		if (_Class && _Class.IsChangesClass && _Class.IsChangesClass())
-		{
-			Class = _Class.GetClass();
-			Data  = _Class;
+		if (_Class) {
+            Class = _Class.GetClass();
+            Data = _Class;
 
-			this.BinaryWriter.WriteString2(Class.Get_Id());
-			this.BinaryWriter.WriteLong(_Class.Type);
-			_Class.WriteToBinary(this.BinaryWriter);
-		}
-		else
-		{
-			Class = _Class;
-			this.BinaryWriter.WriteString2(Class.Get_Id());
-			Class.Save_Changes(Data, this.BinaryWriter);
-		}
+            this.BinaryWriter.WriteString2(Class.Get_Id());
+            this.BinaryWriter.WriteLong(_Class.Type);
+            _Class.WriteToBinary(this.BinaryWriter);
+        }
 
 		var Binary_Len = this.BinaryWriter.GetCurPosition() - Binary_Pos;
 		var Item       = {
@@ -467,7 +445,7 @@ CHistory.prototype =
 		if (!this.CollaborativeEditing)
 			return;
 
-		if (_Class && _Class.IsChangesClass && _Class.IsChangesClass())
+		if (_Class)
 		{
 			if (_Class.IsContentChange())
 			{
@@ -483,55 +461,9 @@ CHistory.prototype =
 				else
 					this.CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, Data.Pos, Count);
 			}
-		}
-		else
-		{
-
-			var bPresentation = !(typeof CPresentation === "undefined");
-			var bSlide        = !(typeof Slide === "undefined");
-			if (( Class instanceof AscFormat.CDrawingDocContent && ( AscDFH.historyitem_DocumentContent_AddItem === Data.Type || AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
-				( bPresentation && Class instanceof CPresentation && (AscDFH.historyitem_Presentation_AddSlide === Data.Type || AscDFH.historyitem_Presentation_RemoveSlide === Data.Type)) ||
-				( bSlide && Class instanceof Slide && (AscDFH.historyitem_SlideAddToSpTree === Data.Type || AscDFH.historyitem_SlideRemoveFromSpTree === Data.Type))
-			)
-			{
-				var bAdd = ( ( Class instanceof AscFormat.CDrawingDocContent && AscDFH.historyitem_DocumentContent_AddItem === Data.Type ) ||
-					( bPresentation && Class instanceof CPresentation && (AscDFH.historyitem_Presentation_AddSlide === Data.Type )) ||
-					( bSlide && Class instanceof Slide && (AscDFH.historyitem_SlideAddToSpTree === Data.Type))
-				) ? true : false;
-
-				var Count = 1;
-
-				if (Class instanceof AscFormat.CDrawingDocContent && AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type)
-					Count = Data.Items.length;
-
-				var ContentChanges = new AscCommon.CContentChangesElement(( bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove ), Data.Pos, Count, Item);
-				Class.Add_ContentChanges(ContentChanges);
-				this.CollaborativeEditing.Add_NewDC(Class);
-
-				if (true === bAdd)
-					this.CollaborativeEditing.Update_DocumentPositionsOnAdd(Class, Data.Pos);
-				else
-					this.CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, Data.Pos, Count);
-			}
-		}
-
-		if (this.CollaborativeEditing.AddPosExtChanges && Class instanceof AscFormat.CXfrm)
-		{
-			if (AscDFH.historyitem_Xfrm_SetOffX === Data.Type ||
-				AscDFH.historyitem_Xfrm_SetOffY === Data.Type ||
-				AscDFH.historyitem_Xfrm_SetExtX === Data.Type ||
-				AscDFH.historyitem_Xfrm_SetExtY === Data.Type ||
-				AscDFH.historyitem_Xfrm_SetChOffX === Data.Type ||
-				AscDFH.historyitem_Xfrm_SetChOffY === Data.Type ||
-				AscDFH.historyitem_Xfrm_SetChExtX === Data.Type ||
-				AscDFH.historyitem_Xfrm_SetChExtY === Data.Type)
-			{
-				this.CollaborativeEditing.AddPosExtChanges(Item,
-					AscDFH.historyitem_Xfrm_SetOffX === Data.Type ||
-					AscDFH.historyitem_Xfrm_SetExtX === Data.Type ||
-					AscDFH.historyitem_Xfrm_SetChOffX === Data.Type ||
-					AscDFH.historyitem_Xfrm_SetChExtX === Data.Type);
-			}
+		    if(_Class.IsPosExtChange()){
+                this.CollaborativeEditing.AddPosExtChanges(Item, _Class);
+            }
 		}
 	},
 

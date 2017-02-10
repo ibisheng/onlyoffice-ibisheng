@@ -6,6 +6,21 @@
     window['AscDFH'].drawingsConstructorsMap = drawingConstructorsMap;
     window['AscDFH'].drawingContentChanges = drawingContentChanges;
 
+
+    var oPosExtMap = {};
+    oPosExtMap[AscDFH.historyitem_Xfrm_SetOffX]  = true;
+    oPosExtMap[AscDFH.historyitem_Xfrm_SetOffY]  = true;
+    oPosExtMap[AscDFH.historyitem_Xfrm_SetExtX]  = true;
+    oPosExtMap[AscDFH.historyitem_Xfrm_SetExtY]  = true;
+    oPosExtMap[AscDFH.historyitem_Xfrm_SetChOffX]  = true;
+    oPosExtMap[AscDFH.historyitem_Xfrm_SetChOffY]  = true;
+    oPosExtMap[AscDFH.historyitem_Xfrm_SetChExtX]  = true;
+    oPosExtMap[AscDFH.historyitem_Xfrm_SetChExtY]  = true;
+    var oPosExtHor = {};
+    oPosExtHor[AscDFH.historyitem_Xfrm_SetOffX]  = true;
+    oPosExtHor[AscDFH.historyitem_Xfrm_SetExtX]  = true;
+    oPosExtHor[AscDFH.historyitem_Xfrm_SetChOffX]  = true;
+    oPosExtHor[AscDFH.historyitem_Xfrm_SetChExtX]  = true;
     function private_SetValue(Value) {
         if (!this.Class) {
             return;
@@ -95,6 +110,12 @@
         reader.Seek2(reader.GetCurPos() - 4);
         this.Type = reader.GetLong();
         CChangesDrawingsDouble.superclass.ReadFromBinary.call(this, reader);
+    };
+    CChangesDrawingsDouble.prototype.IsPosExtChange = function () {
+        return !!oPosExtMap[this.Type];
+    };
+    CChangesDrawingsDouble.prototype.IsHorizontal = function () {
+        return !!oPosExtHor[this.Type];
     };
     window['AscDFH'].CChangesDrawingsDouble = CChangesDrawingsDouble;
 
@@ -353,6 +374,16 @@
         return oRet;
     };
 
+
+    function CChangesDrawingsContentPresentation(Class, Type, Pos, Items, isAdd){
+        CChangesDrawingsContentPresentation.superclass.constructor.call(this, Class, Type, Pos, Items, isAdd);
+    }
+    AscCommon.extendClass(CChangesDrawingsContentPresentation, CChangesDrawingsContent);
+    CChangesDrawingsContentPresentation.prototype.IsContentChange = function(){
+        return true;
+    };
+
+    window['AscDFH'].CChangesDrawingsContentPresentation = CChangesDrawingsContentPresentation;
 
     function CChangesDrawingsContentNoId(Class, Type, Pos, Items, isAdd){
         CChangesDrawingsContentNoId.superclass.constructor.call(this, Class, Type, Pos, Items, isAdd);

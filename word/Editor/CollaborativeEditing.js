@@ -100,10 +100,7 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
             var oChanges = new AscCommon.CCollaborativeChanges();
             oChanges.Set_FromUndoRedo(Item.Class, Item.Data, Item.Binary);
 
-			if (Item.Data.IsChangesClass && Item.Data.IsChangesClass())
-				aChanges2.push(Item.Data);
-			else
-				aChanges2.push(oChanges.m_pDatay);
+            aChanges2.push(Item.Data);
 
             aChanges.push(oChanges.m_pData);
         }
@@ -621,8 +618,8 @@ CWordCollaborativeEditing.prototype.private_CollectOwnChanges = function()
 		for (var Index = 0; Index < Point.Items.length; Index++)
 		{
 			var Item = Point.Items[Index];
-			if (Item.Data.IsChangesClass && Item.Data.IsChangesClass())
-				this.m_oOwnChanges.push(Item.Data);
+
+            this.m_oOwnChanges.push(Item.Data);
 		}
 	}
 };
@@ -690,7 +687,7 @@ CWordCollaborativeEditing.prototype.Undo = function()
 	for (var nIndex = nCount - 1; nIndex >= 0; --nIndex)
 	{
 		var oChange = this.m_aAllChanges[nPosition + nIndex];
-		if (!oChange || !oChange.IsChangesClass || !oChange.IsChangesClass())
+		if (!oChange)
 			continue;
 
 		var oClass = oChange.GetClass();
@@ -850,7 +847,7 @@ CWordCollaborativeEditing.prototype.private_CommutateContentChanges = function(o
 		for (var nIndex = nStartPosition, nOverallCount = this.m_aAllChanges.length; nIndex < nOverallCount; ++nIndex)
 		{
 			var oTempChange = this.m_aAllChanges[nIndex];
-			if (!oTempChange || !oTempChange.IsChangesClass || !oTempChange.IsChangesClass())
+			if (!oTempChange)
 				continue;
 
 			if (oChange.IsRelated(oTempChange))

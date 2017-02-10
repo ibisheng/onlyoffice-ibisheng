@@ -2919,11 +2919,6 @@
 		// В большинстве случаев загрузка чужого изменения работает как простое Redo
 		this.Redo();
 	};
-	CChangesBase.prototype.IsChangesClass = function()
-	{
-		// TODO: Эта функция добавлена пока все изменения не переделаны на классы
-		return true;
-	};
 	CChangesBase.prototype.GetClass = function()
 	{
 		return this.Class;
@@ -2944,6 +2939,10 @@
 	CChangesBase.prototype.Merge = function(oChange)
 	{
 		return true;
+	};
+	CChangesBase.prototype.IsPosExtChange = function(oChange)
+	{
+		return false;
 	};
 	window['AscDFH'].CChangesBase = CChangesBase;
 	/**

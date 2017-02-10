@@ -92,7 +92,7 @@ UndoRedoItemSerializable.prototype = {
 	SerializeInner : function(oBinaryWriter, collaborativeEditing)
 	{
 		//nClassType
-        if(!this.oClass.Save_Changes && !this.oClass.WriteToBinary)
+        if(!this.oClass.WriteToBinary)
         {
             oBinaryWriter.WriteBool(true);
             var nClassType = this.oClass.getClassType();
@@ -140,19 +140,10 @@ UndoRedoItemSerializable.prototype = {
         {
             oBinaryWriter.WriteBool(false);
             var Class;
-            if (this.oClass && this.oClass.IsChangesClass && this.oClass.IsChangesClass())
-            {
-                Class = this.oClass.GetClass();
-                oBinaryWriter.WriteString2(Class.Get_Id());
-                oBinaryWriter.WriteLong(this.oClass.Type);
-                this.oClass.WriteToBinary(oBinaryWriter);
-            }
-            else
-            {
-                oBinaryWriter.WriteString2(this.oClass.Get_Id());
-                this.oClass.Save_Changes(this.nActionType, oBinaryWriter);
-            }
-
+			Class = this.oClass.GetClass();
+			oBinaryWriter.WriteString2(Class.Get_Id());
+			oBinaryWriter.WriteLong(this.oClass.Type);
+			this.oClass.WriteToBinary(oBinaryWriter);
         }
 	},
 	SerializeDataObject : function(oBinaryWriter, oData, nSheetId, collaborativeEditing)
