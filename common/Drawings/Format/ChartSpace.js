@@ -3861,12 +3861,12 @@ CChartSpace.prototype.recalculateAxis = function()
                                 y_ax.labels.x = rect.x + hor_interval_width*(arr_x_val[arr_x_val.length-1] - arr_x_val[0]);
                                 y_ax.posX = rect.x + (crosses-arr_x_val[0])*hor_interval_width;
 
-                                if(y_ax.labels.x < 0){
+                                if(y_ax.labels.x < 0 && !bNeedReflect){
                                     rect.x -= y_ax.labels.x;
                                     rect.w += y_ax.labels.x;
                                     bCorrectedLayoutRect = true;
                                 }
-                                if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                if(y_ax.labels.x + y_ax.labels.extX > this.extX && !bNeedReflect){
                                     rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
                                     bCorrectedLayoutRect = true;
                                 }
@@ -3912,12 +3912,12 @@ CChartSpace.prototype.recalculateAxis = function()
                                 y_ax.posX = rect.x + (crosses-arr_x_val[0])*hor_interval_width;
 
 
-                                if(y_ax.labels.x < 0){
+                                if(y_ax.labels.x < 0 && !bNeedReflect){
                                     rect.x -= y_ax.labels.x;
                                     rect.w += y_ax.labels.x;
                                     bCorrectedLayoutRect = true;
                                 }
-                                if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                if(y_ax.labels.x + y_ax.labels.extX > this.extX && !bNeedReflect){
                                     rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
                                     bCorrectedLayoutRect = true;
                                 }
@@ -3988,12 +3988,12 @@ CChartSpace.prototype.recalculateAxis = function()
                                         arr_x_points[i] = rect.x + hor_interval_width*(arr_x_val[i] - arr_x_val[0]);
                                     }
 
-                                    if(y_ax.labels.x < 0){
+                                    if(y_ax.labels.x < 0 && !bNeedReflect){
                                         rect.x -= y_ax.labels.x;
                                         rect.w += y_ax.labels.x;
                                         bCorrectedLayoutRect = true;
                                     }
-                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX && !bNeedReflect){
                                         rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
                                         bCorrectedLayoutRect = true;
                                     }
@@ -4031,12 +4031,12 @@ CChartSpace.prototype.recalculateAxis = function()
                                     }
                                     y_ax.labels.x = y_ax.posX - y_ax.labels.extX;
 
-                                    if(y_ax.labels.x < 0){
+                                    if(y_ax.labels.x < 0 && !bNeedReflect){
                                         rect.x -= y_ax.labels.x;
                                         rect.w += y_ax.labels.x;
                                         bCorrectedLayoutRect = true;
                                     }
-                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX && !bNeedReflect){
                                         rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
                                         bCorrectedLayoutRect = true;
                                     }
@@ -4089,12 +4089,12 @@ CChartSpace.prototype.recalculateAxis = function()
                                 }
                                 y_ax.labels.x = y_ax.posX - (arr_x_val[arr_x_val.length-1]-crosses)*hor_interval_width - y_ax.labels.extX;
 
-                                if(y_ax.labels.x < 0){
+                                if(y_ax.labels.x < 0 && !bNeedReflect){
                                     rect.x -= y_ax.labels.x;
                                     rect.w += y_ax.labels.x;
                                     bCorrectedLayoutRect = true;
                                 }
-                                if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                if(y_ax.labels.x + y_ax.labels.extX > this.extX && !bNeedReflect){
                                     rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
                                     bCorrectedLayoutRect = true;
                                 }
@@ -4144,12 +4144,12 @@ CChartSpace.prototype.recalculateAxis = function()
                                 }
                                 y_ax.labels.x = rect.x + rect.w;
 
-                                if(y_ax.labels.x < 0){
+                                if(y_ax.labels.x < 0 && !bNeedReflect){
                                     rect.x -= y_ax.labels.x;
                                     rect.w += y_ax.labels.x;
                                     bCorrectedLayoutRect = true;
                                 }
-                                if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                if(y_ax.labels.x + y_ax.labels.extX > this.extX && !bNeedReflect){
                                     rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
                                     bCorrectedLayoutRect = true;
                                 }
@@ -4211,12 +4211,12 @@ CChartSpace.prototype.recalculateAxis = function()
 
 
 
-                                    if(y_ax.labels.x < 0){
+                                    if(y_ax.labels.x < 0 && !bNeedReflect){
                                         rect.x -= y_ax.labels.x;
                                         rect.w += y_ax.labels.x;
                                         bCorrectedLayoutRect = true;
                                     }
-                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX && !bNeedReflect){
                                         rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
                                         bCorrectedLayoutRect = true;
                                     }
@@ -4248,12 +4248,12 @@ CChartSpace.prototype.recalculateAxis = function()
 
 
 
-                                    if(y_ax.labels.x < 0){
+                                    if(y_ax.labels.x < 0 && !bNeedReflect){
                                         rect.x -= y_ax.labels.x;
                                         rect.w += y_ax.labels.x;
                                         bCorrectedLayoutRect = true;
                                     }
-                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX && !bNeedReflect){
                                         rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
                                         bCorrectedLayoutRect = true;
                                     }
@@ -5180,7 +5180,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             }
                             else{
                                 val_ax.labels.x = rect.x + rect.w;
-                                if(val_ax.labels.x < 0){
+                                if(val_ax.labels.x < 0 && !bNeedReflect){
                                     rect.x -= val_ax.labels.x;
                                     rect.w += val_ax.labels.x;
                                     val_ax.labels.x = 0;
@@ -5241,7 +5241,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             }
                             else{
                                 val_ax.labels.x = rect.x + left_points_width - val_ax.labels.extX;
-                                if(val_ax.labels.x < 0){
+                                if(val_ax.labels.x < 0 && !bNeedReflect){
                                     rect.x -= val_ax.labels.x;
                                     rect.w += val_ax.labels.x;
                                     val_ax.labels.x = 0;
@@ -5383,7 +5383,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             }
                             else{
                                 val_ax.labels.x = rect.x - val_ax.labels.extX;
-                                if(val_ax.labels.x < 0){
+                                if(val_ax.labels.x < 0 && !bNeedReflect){
                                     rect.x -= val_ax.labels.x;
                                     rect.w += val_ax.labels.x;
                                     val_ax.labels.x = 0;
@@ -5440,7 +5440,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             else
                             {
                                 val_ax.labels.x = rect.x + rect.w - right_point_width;
-                                if(val_ax.labels.x < 0){
+                                if(val_ax.labels.x < 0 && !bNeedReflect){
                                     rect.x -= val_ax.labels.x;
                                     rect.w += val_ax.labels.x;
                                     val_ax.labels.x = 0;
@@ -5503,7 +5503,7 @@ CChartSpace.prototype.recalculateAxis = function()
                         else{
                             val_ax.labels.x = rect.x + rect.w;
 
-                            if(val_ax.labels.x < 0){
+                            if(val_ax.labels.x < 0 && !bNeedReflect){
                                 rect.x -= val_ax.labels.x;
                                 rect.w += val_ax.labels.x;
                                 val_ax.labels.x = 0;
@@ -5565,7 +5565,7 @@ CChartSpace.prototype.recalculateAxis = function()
                         }
                         else{
                             val_ax.labels.x = rect.x - val_ax.labels.extX;
-                            if(val_ax.labels.x < 0){
+                            if(val_ax.labels.x < 0 && !bNeedReflect){
                                 rect.x -= val_ax.labels.x;
                                 rect.w += val_ax.labels.x;
                                 val_ax.labels.x = 0;

@@ -13341,6 +13341,13 @@ CView3d.prototype =
     },
 
     getRAngAx: function(){
+
+        if(AscFormat.isRealBool(this.rAngAx)){
+            return this.rAngAx;
+        }
+        if(AscFormat.isRealNumber(this.perspective)){
+            return false;
+        }
         return this.rAngAx !== false;
     },
 
@@ -13353,7 +13360,7 @@ CView3d.prototype =
     {
         History.Add(new CChangesDrawingsLong(this, AscDFH.historyitem_View3d_SetRotY, this.rotY, pr));
         this.rotY = pr;
-            }
+    }
 };
 
 function CreateTextBodyFromString(str, drawingDocument, parent)
