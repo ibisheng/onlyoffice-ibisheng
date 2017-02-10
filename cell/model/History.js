@@ -793,7 +793,10 @@ CHistory.prototype._sendCanUndoRedo = function()
 	this.workbook.handlers.trigger("setCanUndo", this.Can_Undo());
 	this.workbook.handlers.trigger("setCanRedo", this.Can_Redo());
 	this.workbook.handlers.trigger("setDocumentModified", this.Have_Changes());
-	this.workbook.handlers.trigger("hideSpecialPasteOptions");
+	if(!window["Asc"]["editor"].wb.clipboard.pasteStart)
+	{
+		this.workbook.handlers.trigger("hideSpecialPasteOptions");
+	}
 };
 CHistory.prototype.SetSelection = function(range)
 {

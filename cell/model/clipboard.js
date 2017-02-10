@@ -243,6 +243,8 @@
 			this.pasteProcessor = new PasteProcessorExcel();
 			
 			this.specialPasteProps = null;
+			//TODO возможно стоит перенести в clipboard_base
+			this.pasteStart = false;//если true - осуществляется вставка. false выставляется только по полному окончанию вставки(загрузки картинок и тд)
 			
 			return this;
 		}
@@ -328,6 +330,8 @@
 				var t = this;
 				t.pasteProcessor.clean();
 				
+				window["Asc"]["editor"].wb.clipboard.start_paste();
+				
 				if(!bIsSpecialPaste)
 				{
 					window['AscCommon'].g_clipboardBase.specialPasteData.activeRange = ws.model.selectionRange.clone(ws.model);
@@ -344,6 +348,7 @@
 							if(text)
 							{
 								window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+								window["Asc"]["editor"].wb.clipboard.end_paste();
 							}
 						}
 						else
@@ -368,6 +373,7 @@
 							if(text)
 							{
 								window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+								window["Asc"]["editor"].wb.clipboard.end_paste();
 							}
 						}
 						else
@@ -384,6 +390,7 @@
 							if(data1)
 							{
 								window["Asc"]["editor"].wb.cellEditor.pasteText(data1);
+								window["Asc"]["editor"].wb.clipboard.end_paste();
 							}
 						}
 						else
@@ -402,6 +409,18 @@
 					window['AscCommon'].g_clipboardBase.specialPasteData.data2 = data2;
 					window['AscCommon'].g_clipboardBase.specialPasteData.text_data = text_data;
 				}
+			},
+			
+			start_paste: function()
+			{
+				this.pasteStart = true;
+				console.log(this.pasteStart);
+			},
+			
+			end_paste: function()
+			{
+				this.pasteStart = false;
+				console.log(this.pasteStart);
 			}
 		};
 
@@ -1088,6 +1107,7 @@
 								{
 									t._insertBinaryIntoShapeContent(worksheet, [docContent]);
 								}
+								window["Asc"]["editor"].wb.clipboard.end_paste();
 							};
 							
 							worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
@@ -1127,6 +1147,7 @@
 						{
 							t._insertBinaryIntoShapeContent(worksheet, pasteData.content, true);
 						}
+						window["Asc"]["editor"].wb.clipboard.end_paste();
 					};
 							
 					worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
@@ -1163,6 +1184,7 @@
 						if(isCellEditMode)
 						{
 							var text = this._getTextFromWord(docContent);
+							window["Asc"]["editor"].wb.clipboard.end_paste();
 							return text;
 						}
 						else if(isIntoShape)
@@ -1171,8 +1193,9 @@
 							{
 								if(isSuccess)
 								{
-									t._insertBinaryIntoShapeContent(worksheet, docContent)
+									t._insertBinaryIntoShapeContent(worksheet, docContent);
 								}
+								window["Asc"]["editor"].wb.clipboard.end_paste();
 							};
 									
 							worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
@@ -1571,6 +1594,9 @@
                             ws.objectRender.controller.getGraphicObjectProps();
                     });
                 }
+				
+				window["Asc"]["editor"].wb.clipboard.end_paste();
+				
 			},
 			
 			_insertImagesFromBinaryWord: function(ws, data, aImagesSync)
@@ -1780,6 +1806,8 @@
 					{
 						if(isSuccess)
 							t._pasteInShape(worksheet, node, isIntoShape);
+							
+						window["Asc"]["editor"].wb.clipboard.end_paste();
 					};
 					
 					worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
@@ -2482,6 +2510,8 @@
 							else
 								isIntoShape.Paragraph_Add(new ParaText(_char));
 						}
+						
+						window["Asc"]["editor"].wb.clipboard.end_paste();
 					};
 					
 					worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);

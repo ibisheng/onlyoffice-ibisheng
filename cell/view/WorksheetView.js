@@ -8773,8 +8773,12 @@
 				this.model.selectionRange = specialPasteData.activeRange.clone(this.model);
 			}
 			
+			window["Asc"]["editor"].wb.clipboard.start_paste();
+			
 			//откатываем данные в ячейках
 			api.wb.clipboard.pasteProcessor.pasteFromBinary(this, preSpecialPasteData.data);
+			
+			window["Asc"]["editor"].wb.clipboard.start_paste();
 			//удаляем вставленные изображения
 			if(preSpecialPasteData.images)
 			{
@@ -8787,6 +8791,7 @@
 					oObject.setBDeleted(true);
 				}
 			}
+			window["Asc"]["editor"].wb.clipboard.end_paste();
 		}
 		
 		//далее специальная вставка
@@ -8962,6 +8967,7 @@
 		if(fromBinary)
 		{
 			t._pasteData(isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth);
+			window["Asc"]["editor"].wb.clipboard.end_paste();
 		}
 		else
 		{
@@ -9004,6 +9010,8 @@
 						
 						t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
 						api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
+						window["Asc"]["editor"].wb.clipboard.end_paste();
+						
 						isEndTransaction = true;
 					}
 					else 
@@ -9015,6 +9023,7 @@
 							AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
 							t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
 							api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
+							window["Asc"]["editor"].wb.clipboard.end_paste();
 							
 							isEndTransaction = true;
 						}
@@ -9026,6 +9035,7 @@
 								AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
 								t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
 								api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
+								window["Asc"]["editor"].wb.clipboard.end_paste();
 								
 								//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
 								History.EndTransaction();
@@ -9037,6 +9047,7 @@
 				else
 				{
 					t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
+					window["Asc"]["editor"].wb.clipboard.end_paste();
 					isEndTransaction = true;
 				}
 
