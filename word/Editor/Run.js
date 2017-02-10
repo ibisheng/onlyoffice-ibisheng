@@ -2746,8 +2746,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             bOverXEnd = X + WordLen + SpaceLen + BrkLen > XEnd; // BrkLen прибавляем дла случая, если идут подряд Brk Operators в конце
                             bOverXEndMWordLarge = X + WordLen + SpaceLen > XEnd; // ширину самого оператора не учитываем при расчете bMathWordLarge, т.к. он будет находится на следующей строке
 
-
-                            if(bOverXEnd)
+                            if(bOverXEnd && (true !== FirstItemOnLine || true === Word))
                             {
                                 // если вышли за границы не обновляем параметр bInsideOper, т.к. если уже были breakOperator, то, соответственно, он уже выставлен в true
                                 // а если на этом уровне не было breakOperator, то и обновлять его нне нужо
