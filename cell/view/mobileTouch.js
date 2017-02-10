@@ -896,8 +896,22 @@ function (window, undefined)
 
 		this.checkPointerMultiTouchRemove(e);
 
-		// нужен лив, чтобы сбросить состояния
-		this.delegate.Api.controller._onMouseLeave(e.changedTouches ? e.changedTouches[0] : e);
+		if (true)
+		{
+			// нужно послать мув в никуда, чтобы сбросить состояния (схема, где все решает мув а не даун)
+			var _e = {};
+
+			_e.pageX = -1000;
+			_e.pageY = -1000;
+
+			_e.altKey 	= false;
+			_e.shiftKey = false;
+			_e.ctrlKey 	= false;
+
+			_e.button 	= 0;
+
+			this.delegate.Api.controller._onMouseMove(_e);
+		}
 
 		if (this.Api.isViewMode || isPreventDefault)
 			AscCommon.g_inputContext.preventVirtualKeyboard(e);
