@@ -1234,7 +1234,7 @@ function (window, undefined)
 					this.Mode = AscCommon.MobileTouchMode.SelectTrack;
 				else if (Math.abs(pos1.Y - global_mouseEvent.Y) < this.TrackTargetEps && global_mouseEvent.X > pos1.X && global_mouseEvent.X < pos4.X)
 					this.Mode = AscCommon.MobileTouchMode.SelectTrack;
-				else if (Math.abs(pos4.Y - global_mouseEvent.X) < this.TrackTargetEps && global_mouseEvent.X > pos1.X && global_mouseEvent.X < pos4.X)
+				else if (Math.abs(pos4.Y - global_mouseEvent.Y) < this.TrackTargetEps && global_mouseEvent.X > pos1.X && global_mouseEvent.X < pos4.X)
 					this.Mode = AscCommon.MobileTouchMode.SelectTrack;
 			}
 		}
