@@ -5798,13 +5798,14 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 				ParaEIndex = DstIndex + 1;
 			}
 
+			var NewEmptyPara = null;
 			if (true === bAddEmptyPara)
 			{
 				// Создаем новый параграф
-				var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
-				NewParagraph.Set_Pr(ParaS.Pr);
-				NewParagraph.TextPr.Apply_TextPr(ParaS.TextPr.Value);
-				this.Internal_Content_Add(DstIndex + 1, NewParagraph);
+				NewEmptyPara = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+				NewEmptyPara.Set_Pr(ParaS.Pr);
+				NewEmptyPara.TextPr.Apply_TextPr(ParaS.TextPr.Value);
+				this.Internal_Content_Add(DstIndex + 1, NewEmptyPara);
 			}
 
 			var StartIndex = 0;
@@ -5852,17 +5853,23 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 				EndIndex--;
 			}
 
-
 			for (var Index = StartIndex; Index <= EndIndex; Index++)
 			{
 				this.Internal_Content_Add(DstIndex + Index, Elements[Index].Element);
 				this.Content[DstIndex + Index].Select_All();
 			}
 
+			var LastPos = DstIndex + ElementsCount - 1;
+			if (NewEmptyPara && NewEmptyPara === this.Content[LastPos + 1])
+			{
+				LastPos++;
+				this.Content[LastPos].Select_All();
+			}
+
 			this.Selection.Use      = true;
 			this.Selection.StartPos = DstIndex;
-			this.Selection.EndPos   = DstIndex + ElementsCount - 1;
-			this.CurPos.ContentPos  = DstIndex + ElementsCount - 1;
+			this.Selection.EndPos   = LastPos;
+			this.CurPos.ContentPos  = LastPos;
 		}
 
 		if (docpostype_DrawingObjects !== this.CurPos.Type)
