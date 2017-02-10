@@ -505,8 +505,8 @@
 	CMobileDelegateEditor.prototype.ScrollEnd = function(_scroll)
 	{
 		this.HtmlPage.NoneRepaintPages = (true === _scroll.isAnimating) ? true : false;
-		_scroll.manager.OnScrollAnimationEnd();
 		this.HtmlPage.OnScroll();
+		_scroll.manager.OnScrollAnimationEnd();
 	};
 	CMobileDelegateEditor.prototype.GetSelectionRectsBounds = function()
 	{
