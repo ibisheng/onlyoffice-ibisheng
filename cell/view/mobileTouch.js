@@ -1019,7 +1019,7 @@ function (window, undefined)
 				overlay.CheckPoint(_x1C, pos1.Y);
 				overlay.CheckPoint(_x2C, pos4.Y);
 
-				var _yC = _koef * (this.delegate.Size.H - pos4.Y) / 2;
+				var _yC = _koef * (this.delegate.Size.H + pos4.Y) / 2;
 				overlay.AddEllipse(_x1C, _yC, _koef * AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
 				overlay.AddEllipse(_x2C, _yC, _koef * AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
 				ctx.fill();
@@ -1062,7 +1062,7 @@ function (window, undefined)
 				overlay.CheckPoint(pos1.X, _y1C);
 				overlay.CheckPoint(pos4.X, _y2C);
 
-				var _xC = _koef * (this.delegate.Size.W - pos4.X) / 2;
+				var _xC = _koef * (this.delegate.Size.W + pos4.X) / 2;
 				overlay.AddEllipse(_xC, _y1C, _koef * AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
 				overlay.AddEllipse(_xC, _y2C, _koef * AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
 				ctx.fill();
