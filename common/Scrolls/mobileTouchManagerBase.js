@@ -1110,12 +1110,12 @@
 	CMobileTouchManagerBase.prototype.SendShowContextMenu = function()
 	{
 		if (-1 != this.ContextMenuShowTimerId)
-		{
 			clearTimeout(this.ContextMenuShowTimerId);
-		}
+
 		var that             = this;
 		this.ContextMenuShowTimerId = setTimeout(function()
 		{
+			that.ContextMenuShowTimerId = -1;
 			var _pos = that.delegate.GetContextMenuPosition();
 			that.Api.sendEvent("asc_onShowPopMenu", _pos.X, _pos.Y, (_pos.Mode > 1) ? true : false);
 		}, 500);
@@ -1366,6 +1366,10 @@
 	{
 		//this.ContextMenuLastMode 		= AscCommon.MobileTouchContextMenuType.None;
 		//this.ContextMenuLastModeCounter = 0;
+
+		if (this.ContextMenuShowTimerId != -1)
+			clearTimeout(this.ContextMenuShowTimerId);
+
 		this.Api.sendEvent("asc_onHidePopMenu");
 	};
 

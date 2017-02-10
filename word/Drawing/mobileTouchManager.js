@@ -92,7 +92,8 @@
 		AscCommon.check_MouseDownEvent(e.touches ? e.touches[0] : e, true);
 		global_mouseEvent.KoefPixToMM = 1;
 		global_mouseEvent.LockMouse();
-		this.Api.sendEvent("asc_onHidePopMenu");
+
+		this.ClearContextMenu();
 
 		this.TableCurrentMoveValueMin = null;
 		this.TableCurrentMoveValueMax = null;
@@ -759,7 +760,7 @@
 		// создаем делегата. инициализация его - ПОСЛЕ создания iScroll
 		this.delegate.Init(this);
 
-		this.Api.sendEvent("asc_onHidePopMenu");
+		this.ClearContextMenu();
 	};
 
 	CReaderTouchManager.prototype.onTouchStart = function(e)
