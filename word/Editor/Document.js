@@ -7823,7 +7823,12 @@ CDocument.prototype.EndFootnotesEditing = function()
 	if (docpostype_Footnotes === this.Get_DocPosType())
 	{
 		this.Set_DocPosType(docpostype_Content);
-		this.Cursor_MoveAt(0, 0, false);
+
+		this.Cursor_MoveToStartPos(false);
+
+		// TODO: Не всегда можно в данной функции использовать Cursor_MoveAt, потому что
+		//       данная страница еще может быть не рассчитана.
+		//this.Cursor_MoveAt(0, 0, false);
 
 		this.DrawingDocument.ClearCachePages();
 		this.DrawingDocument.FirePaint();
