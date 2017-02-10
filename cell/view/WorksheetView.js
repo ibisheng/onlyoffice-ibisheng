@@ -8746,6 +8746,9 @@
 			if(!window["Asc"]["editor"].wb.clipboard.specialPasteProps)
 			{
 				var sBinary = window["Asc"]["editor"].wb.clipboard.copyProcessor.getBinaryForCopy(this, newRange);
+				var specialPasteSelectionRange = new AscCommonExcel.SelectionRange();
+				specialPasteSelectionRange.ranges[0] = newRange.clone();
+				window['AscCommon'].g_clipboardBase.specialPasteData.activeRange = specialPasteSelectionRange;
 				window['AscCommon'].g_clipboardBase.specialPasteUndoData.data = sBinary;
 			}
 			
@@ -8760,6 +8763,9 @@
 	
 	WorksheetView.prototype.specialPaste = function (preSpecialPasteData, specialPasteData, props) {
 		var api = window["Asc"]["editor"];
+		
+		History.Create_NewPoint();
+        History.StartTransaction();
 		
 		//откатываемся до того, что было до вставки
 		if(preSpecialPasteData && preSpecialPasteData.data)
@@ -8802,6 +8808,8 @@
 			api.wb.clipboard.specialPasteProps = props;
 			api.wb.clipboard.pasteData(this, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data, true);
 		}
+		
+		History.EndTransaction();
 	};
 	
     WorksheetView.prototype._pasteData = function (isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth) {
@@ -8951,7 +8959,7 @@
 			var sProps = Asc.c_oSpecialPasteProps;
 			if(fromBinary)
 			{
-				allowedSpecialPasteProps = [sProps.paste, sProps.pasteOnlyFormula, sProps.formulaNumberFormat, sProps.formulaAllFormatting, sProps.formulaWithoutBorders, sProps.formulaColumnWidth, sProps.mergeConditionalFormating, sProps.pasteOnlyValues, sProps.valueNumberFormat, sProps.valueAllFormating, sProps.pasteOnlyFormating, sProps.link];
+				allowedSpecialPasteProps = [sProps.paste, sProps.pasteOnlyFormula, sProps.formulaNumberFormat, sProps.formulaAllFormatting, sProps.formulaWithoutBorders, sProps.formulaColumnWidth, sProps.pasteOnlyValues, sProps.valueNumberFormat, sProps.valueAllFormating, sProps.pasteOnlyFormating/*, sProps.link*/];
 			}
 			else
 			{
@@ -9658,7 +9666,7 @@
 			range.setCellStyle(rangeStyle.cellStyle);
 		}
 		//numFormat
-		if(rangeStyle.numFormat && specialPasteProps.cellStyle)
+		if(rangeStyle.numFormat && specialPasteProps.numFormat)
 		{
 			range.setNumFormat(rangeStyle.numFormat);
 		}
@@ -9732,7 +9740,7 @@
 			range.setWrap(rangeStyle.wrap);
 		}
 		//fill
-		if(rangeStyle.fill && specialPasteProps.fill)
+		if(specialPasteProps.fill)
 		{
 			range.setFill(rangeStyle.fill);
 		}

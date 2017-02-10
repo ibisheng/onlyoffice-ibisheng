@@ -185,6 +185,7 @@
 						//только значения(вместо формул также вставляются значения)
 						this.revert();
 						this.val = true;
+						break;
 					}
 					case c_oSpecialPasteProps.valueNumberFormat:
 					{
@@ -207,7 +208,6 @@
 					}
 					case c_oSpecialPasteProps.transpose:
 					{
-						
 						break;
 					}
 					case c_oSpecialPasteProps.link:
@@ -229,6 +229,9 @@
 					}
 					case c_oSpecialPasteProps.destinationFormatting:
 					{
+						//только значения(вместо формул также вставляются значения)
+						this.revert();
+						this.val = true;
 						break;
 					}							
 				}
