@@ -8586,7 +8586,7 @@ CDocument.prototype.Hyperlink_Add = function(HyperProps)
 			HyperProps.TextPr = Para.Get_TextPr(Para.Get_ParaContentPos(true, true));
 
 		this.Remove(1, false, false, true);
-		this.Selection_Remove();
+		this.RemoveTextSelection();
 	}
 
 	this.Controller.AddHyperlink(HyperProps);
@@ -15963,6 +15963,12 @@ CDocument.prototype.controller_GetCurrentSectionPr = function()
 //----------------------------------------------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------------------------------------------
+CDocument.prototype.RemoveTextSelection = function()
+{
+	this.Controller.RemoveTextSelection();
+};
+
+
 function CDocumentSelectionState()
 {
     this.Id        = null;

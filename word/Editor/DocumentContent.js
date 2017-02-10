@@ -9449,6 +9449,17 @@ CDocumentContent.prototype.Get_LogicDocument = function()
 {
 	return this.LogicDocument;
 };
+CDocumentContent.prototype.RemoveTextSelection = function()
+{
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		this.DrawingObjects.removeTextSelection();
+	}
+	else
+	{
+		this.Selection_Remove();
+	}
+};
 
 function CDocumentContentStartState(DocContent)
 {

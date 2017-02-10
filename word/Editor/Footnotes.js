@@ -3153,6 +3153,26 @@ CFootnotesController.prototype.GetColumnFields = function(nPageAbs, nColumnAbs)
 
 	return {X : oColumn.X, XLimit : oColumn.XLimit};
 };
+CFootnotesController.prototype.RemoveTextSelection = function()
+{
+	if (true === this.Selection.Use)
+	{
+		for (var sId in this.Selection.Footnotes)
+		{
+			if (this.Selection.Footnotes[sId] !== this.CurFootnote)
+				this.Selection.Footnotes[sId].Selection_Remove();
+		}
+
+		this.Selection.Use = false;
+	}
+
+	this.Selection.Footnotes = {};
+	if (this.CurFootnote)
+	{
+		this.Selection.Footnotes[this.CurFootnote.Get_Id()] = this.CurFootnote;
+		this.CurFootnote.RemoveTextSelection();
+	}
+};
 
 
 function CFootEndnotePageColumn()

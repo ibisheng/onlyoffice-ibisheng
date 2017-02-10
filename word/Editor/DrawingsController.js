@@ -512,4 +512,8 @@ CDrawingsController.prototype.GetCurrentSectionPr = function()
 {
 	return null;
 };
+CDrawingsController.prototype.RemoveTextSelection = function()
+{
+	this.DrawingObjects.removeTextSelection();
+};
 
