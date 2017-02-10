@@ -188,7 +188,7 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
     AscDFH.changesFactory[AscDFH.historyitem_Xfrm_SetChOffY] = CChangesDrawingsDouble;
     AscDFH.changesFactory[AscDFH.historyitem_Xfrm_SetChExtX] = CChangesDrawingsDouble;
     AscDFH.changesFactory[AscDFH.historyitem_Xfrm_SetChExtY] = CChangesDrawingsDouble;
-    AscDFH.changesFactory[AscDFH.historyitem_Xfrm_SetFlipH] = CChangesDrawingsDouble;
+    AscDFH.changesFactory[AscDFH.historyitem_Xfrm_SetFlipH] = CChangesDrawingsBool;
     AscDFH.changesFactory[AscDFH.historyitem_Xfrm_SetFlipV] = CChangesDrawingsBool;
     AscDFH.changesFactory[AscDFH.historyitem_Xfrm_SetRot] = CChangesDrawingsDouble;
     AscDFH.changesFactory[AscDFH.historyitem_SpPr_SetParent] = CChangesDrawingsObject;
@@ -5400,7 +5400,7 @@ CXfrm.prototype =
     setFlipH: function(pr)
     {
         this.checkFromSerialize();
-        History.Add(new CChangesDrawingsDouble(this, AscDFH.historyitem_Xfrm_SetFlipH, this.flipH,  pr));
+        History.Add(new CChangesDrawingsBool(this, AscDFH.historyitem_Xfrm_SetFlipH, this.flipH,  pr));
         this.flipH = pr;
         this.handleUpdateFlip();
     },
