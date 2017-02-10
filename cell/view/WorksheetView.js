@@ -8773,11 +8773,12 @@
 				this.model.selectionRange = specialPasteData.activeRange.clone(this.model);
 			}
 			
-			window["Asc"]["editor"].wb.clipboard.start_paste();
-			
 			//откатываем данные в ячейках
-			api.wb.clipboard.pasteProcessor.pasteFromBinary(this, preSpecialPasteData.data);
+			window["Asc"]["editor"].wb.clipboard.start_specialpaste();
+			api.wb.clipboard.pasteData(this, AscCommon.c_oAscClipboardDataFormat.Internal, preSpecialPasteData.data, null, null, true);
 			
+			
+			window["Asc"]["editor"].wb.clipboard.start_specialpaste();
 			window["Asc"]["editor"].wb.clipboard.start_paste();
 			//удаляем вставленные изображения
 			if(preSpecialPasteData.images)
@@ -8797,6 +8798,7 @@
 		//далее специальная вставка
 		if(specialPasteData)
 		{	
+			window["Asc"]["editor"].wb.clipboard.start_specialpaste();
 			api.wb.clipboard.specialPasteProps = props;
 			api.wb.clipboard.pasteData(this, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data, true);
 		}
@@ -8808,7 +8810,10 @@
 		var specialPasteProps = _clipboard.specialPasteProps;
 		
 		if ( val.props && val.props.onlyImages === true ) {
-			this.handlers.trigger("showSpecialPasteOptions", [Asc.c_oSpecialPasteProps.picture]);
+			if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
+			{
+				this.handlers.trigger("showSpecialPasteOptions", [Asc.c_oSpecialPasteProps.picture]);
+			}
 			return;
 		}
 		
@@ -8939,23 +8944,26 @@
         }
 		
 		//for special paste
-		var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
-		var allowedSpecialPasteProps;
-		var sProps = Asc.c_oSpecialPasteProps;
-		if(fromBinary)
+		if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
 		{
-			allowedSpecialPasteProps = [sProps.paste, sProps.pasteOnlyFormula, sProps.formulaNumberFormat, sProps.formulaAllFormatting, sProps.formulaWithoutBorders, sProps.formulaColumnWidth, sProps.mergeConditionalFormating, sProps.pasteOnlyValues, sProps.valueNumberFormat, sProps.valueAllFormating, sProps.pasteOnlyFormating, sProps.link];
+			var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
+			var allowedSpecialPasteProps;
+			var sProps = Asc.c_oSpecialPasteProps;
+			if(fromBinary)
+			{
+				allowedSpecialPasteProps = [sProps.paste, sProps.pasteOnlyFormula, sProps.formulaNumberFormat, sProps.formulaAllFormatting, sProps.formulaWithoutBorders, sProps.formulaColumnWidth, sProps.mergeConditionalFormating, sProps.pasteOnlyValues, sProps.valueNumberFormat, sProps.valueAllFormating, sProps.pasteOnlyFormating, sProps.link];
+			}
+			else
+			{
+				//matchDestinationFormatting - пока не добавляю, так как работает как и values
+				allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
+			}
+			
+			specialPasteShowOptions.asc_setOptions(allowedSpecialPasteProps);
+			var cellCoord = this.getCellCoord(selectData[0].c2, selectData[0].r2);
+			specialPasteShowOptions.asc_setCellCoord(cellCoord);
+			this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
 		}
-		else
-		{
-			//matchDestinationFormatting - пока не добавляю, так как работает как и values
-			allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
-		}
-		
-		specialPasteShowOptions.asc_setOptions(allowedSpecialPasteProps);
-		var cellCoord = this.getCellCoord(selectData[0].c2, selectData[0].r2);
-		specialPasteShowOptions.asc_setCellCoord(cellCoord);
-		this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
     };
 
     WorksheetView.prototype._loadDataBeforePaste = function ( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth ) {

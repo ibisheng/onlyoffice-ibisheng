@@ -245,6 +245,7 @@
 			this.specialPasteProps = null;
 			//TODO возможно стоит перенести в clipboard_base
 			this.pasteStart = false;//если true - осуществляется вставка. false выставляется только по полному окончанию вставки(загрузки картинок и тд)
+			this.specialPasteStart = false;
 			
 			return this;
 		}
@@ -414,14 +415,26 @@
 			start_paste: function()
 			{
 				this.pasteStart = true;
-				console.log(this.pasteStart);
+				//console.log("pasteStart: " + this.pasteStart);
 			},
 			
 			end_paste: function()
 			{
 				this.pasteStart = false;
-				console.log(this.pasteStart);
-			}
+				//console.log("pasteEnd: " + this.pasteStart);
+				if(this.specialPasteStart)
+				{
+					this.specialPasteStart = false;
+					//console.log("specialPasteEnd: " + this.specialPasteStart);
+				}
+				
+			},
+			
+			start_specialpaste: function()
+			{
+				this.specialPasteStart = true;
+				//console.log("specialPasteStart: " + this.specialPasteStart);
+			},
 		};
 
 		
