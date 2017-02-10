@@ -402,6 +402,10 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
 
         this.Class.gdLst[this.Name] = parseInt(this.NewValue);
         this.Class.avLst[this.Name] = true;
+        if(this.Class.parent && this.Class.parent.handleUpdateGeometry)
+        {
+            this.Class.parent.handleUpdateGeometry();
+        }
     };
 
     CChangesGeometryAddAdj.prototype.RemoveAdj = function(){
@@ -769,6 +773,7 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
     AscDFH.changesFactory[AscDFH.historyitem_GeometryAddRect] = CChangesGeometryAddRect;
     AscDFH.changesFactory[AscDFH.historyitem_GeometrySetPreset ] = AscDFH.CChangesDrawingsString;
     AscDFH.drawingsChangesMap[AscDFH.historyitem_GeometrySetPreset] = function(oClass, value){oClass.preset = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_GeometrySetParent] = function(oClass, value){oClass.parent = value;};
 
     AscDFH.changesFactory[AscDFH.historyitem_GeometryAddPath] = AscDFH.CChangesDrawingsContent;
     AscDFH.changesFactory[AscDFH.historyitem_GeometrySetParent] = AscDFH.CChangesDrawingsObject;
