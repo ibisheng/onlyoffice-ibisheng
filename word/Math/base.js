@@ -968,26 +968,12 @@ CMathBase.prototype.Get_CompiledPr = function(Copy)
 };
 CMathBase.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 {
-    this.Apply_TextPrToCtrPr(TextPr, IncFontSize, ApplyToAll);
+	this.Apply_TextPrToCtrPr(TextPr, IncFontSize, ApplyToAll);
 
-    // нужно пройтись по всем элементам  и вложенным формулам в том числе, чтобы пересчитать ctrPrp у всех мат объектов
-    // для некоторых формул (например, для итератора в Limit) важно учесть собственные настройки (ArgSize), а не только родительские, поэтому и нужно профтись по всем inline-формулам
-
-    for(var i=0; i < this.nRow; i++)
-        for(var j = 0; j < this.nCol; j++)
-            if(!this.elements[i][j].IsJustDraw())
-                this.elements[i][j].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
-
-    // такая ситуация может возникнуть при добавлении элементов из меню, и чтобы применились текстовые настройки при вставке нужно пройтись по контентам
-    // a Resize произойдет позже, после вставки = > массив this.elements заполнится позднее
-    if(this.nRow == 0 && this.nCol == 0)
-    {
-        for(var i = 0 ; i < this.Content.length; i++)
-        {
-            this.Content[i].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
-        }
-    }
-
+	for (var nIndex = 0; nIndex < this.Content.length; ++nIndex)
+	{
+		this.Content[nIndex].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
+	}
 };
 CMathBase.prototype.Apply_TextPrToCtrPr = function(TextPr, IncFontSize, ApplyToAll)
 {
