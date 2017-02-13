@@ -250,6 +250,8 @@
 			this.pasteStart = false;//если true - осуществляется вставка. false выставляется только по полному окончанию вставки(загрузки картинок и тд)
 			this.specialPasteStart = false;
 			
+			this.bIsEndTransaction = false;//если нужно сделать на end_paste endTransaction
+			
 			return this;
 		}
 
@@ -429,6 +431,12 @@
 				{
 					this.specialPasteStart = false;
 					//console.log("specialPasteEnd: " + this.specialPasteStart);
+				}
+				
+				if(this.bIsEndTransaction)
+				{	
+					this.bIsEndTransaction = false;
+					History.EndTransaction();
 				}
 				
 			},
@@ -1746,7 +1754,10 @@
                         drawingObject.graphicObject.checkDrawingBaseCoords();
                     }
 					drawingObject.graphicObject.recalculate();
-                    drawingObject.graphicObject.select(ws.objectRender.controller, 0);
+					if(0 === data.content.length)
+					{
+						drawingObject.graphicObject.select(ws.objectRender.controller, 0);
+					}
 				}
 
                 var old_val = api.ImageLoader.bIsAsyncLoadDocumentImages;

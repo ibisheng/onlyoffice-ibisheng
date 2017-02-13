@@ -8728,10 +8728,11 @@
                 t.handlers.trigger("slowOperation", false);
             }
 
-            //в случае, если вставляем из глобального буфера, транзакцию закрываем внутри функции _loadDataBeforePaste на callbacks от загрузки шрифтов и картинок
-            if (prop !== "paste" || (prop === "paste" && fromBinary)) {
-                History.EndTransaction();
-            }
+			//в случае, если вставляем из глобального буфера, транзакцию закрываем внутри функции _loadDataBeforePaste на callbacks от загрузки шрифтов и картинок
+			if (prop !== "paste" || (prop === "paste" && fromBinary)) {
+				History.EndTransaction();
+				window["Asc"]["editor"].wb.clipboard.end_paste();
+			}
         };
 		
 		//получаем диапазон вставки
@@ -8806,10 +8807,11 @@
 		{	
 			window["Asc"]["editor"].wb.clipboard.start_specialpaste();
 			api.wb.clipboard.specialPasteProps = props;
+			
+			//TODO пока для закрытия транзации выставляю флаг. пересмотреть!
+			window["Asc"]["editor"].wb.clipboard.bIsEndTransaction = true;
 			api.wb.clipboard.pasteData(this, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data, true);
 		}
-		
-		History.EndTransaction();
 	};
 	
     WorksheetView.prototype._pasteData = function (isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth) {
@@ -8983,7 +8985,6 @@
 		if(fromBinary)
 		{
 			t._pasteData(isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth);
-			window["Asc"]["editor"].wb.clipboard.end_paste();
 		}
 		else
 		{
@@ -9026,7 +9027,6 @@
 						
 						t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
 						api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
-						window["Asc"]["editor"].wb.clipboard.end_paste();
 						
 						isEndTransaction = true;
 					}
@@ -9039,7 +9039,6 @@
 							AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
 							t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
 							api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
-							window["Asc"]["editor"].wb.clipboard.end_paste();
 							
 							isEndTransaction = true;
 						}
@@ -9051,10 +9050,10 @@
 								AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
 								t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
 								api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
-								window["Asc"]["editor"].wb.clipboard.end_paste();
 								
 								//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
 								History.EndTransaction();
+								window["Asc"]["editor"].wb.clipboard.end_paste();
 							}, true );
 						}
 						
@@ -9063,7 +9062,6 @@
 				else
 				{
 					t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
-					window["Asc"]["editor"].wb.clipboard.end_paste();
 					isEndTransaction = true;
 				}
 
@@ -9071,6 +9069,7 @@
 				if ( isEndTransaction ) 
 				{
 					History.EndTransaction();
+					window["Asc"]["editor"].wb.clipboard.end_paste();
 				}
 			};
 			
@@ -9198,9 +9197,7 @@
 			//for merge
 			var isMerged = false;
 			for (var mergeCheck = 0; mergeCheck < mergeArr.length; ++mergeCheck) {
-				var tempRow = row + 1;
-				var tempCol = col + 1;
-				if (mergeArr[mergeCheck].contains(tempCol, tempRow)) {
+				if (mergeArr[mergeCheck].contains(col, row)) {
 					isMerged = true;
 				}
 			}
