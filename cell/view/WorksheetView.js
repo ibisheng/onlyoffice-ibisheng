@@ -8764,29 +8764,31 @@
 	
 	WorksheetView.prototype.specialPaste = function (preSpecialPasteData, specialPasteData, props) {
 		var api = window["Asc"]["editor"];
+		var t = this;
 		
-		History.Create_NewPoint();
-        History.StartTransaction();
-		
-		//откатываемся до того, что было до вставки
-		if(preSpecialPasteData && preSpecialPasteData.data)
+		if(!specialPasteData)
 		{
-			var tempProps = new Asc.SpecialPasteProps();
-			api.wb.clipboard.specialPasteProps = tempProps;
-			
-			//меняем activeRange
-			if(specialPasteData && specialPasteData.activeRange)
+			return;
+		}
+		
+		//не вызываю для отката api.wb.clipboard.pasteData, потому что внутри асинхронные методы - isLockedCells 
+		var undoPreviousPaste = function()
+		{
+			//откатываем данные в ячейках
+			var sBase64 = preSpecialPasteData.data.split('xslData;')[1];
+			var oBinaryFileReader = new AscCommonExcel.BinaryFileReader(true);
+			var tempWorkbook = new AscCommonExcel.Workbook();
+			pptx_content_loader.Start_UseFullUrl();
+			oBinaryFileReader.Read(sBase64, tempWorkbook);
+			window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange = oBinaryFileReader.copyPasteObj.activeRange;
+			var pasteData = null;
+			if (tempWorkbook)
+				pasteData = tempWorkbook.aWorksheets[0];
+			if(pasteData)
 			{
-				this.model.selectionRange = specialPasteData.activeRange.clone(this.model);
+				t._pasteFromBinary(pasteData, null, null, api.wb.clipboard.specialPasteProps);
 			}
 			
-			//откатываем данные в ячейках
-			window["Asc"]["editor"].wb.clipboard.start_specialpaste();
-			api.wb.clipboard.pasteData(this, AscCommon.c_oAscClipboardDataFormat.Internal, preSpecialPasteData.data, null, null, true);
-			
-			
-			window["Asc"]["editor"].wb.clipboard.start_specialpaste();
-			window["Asc"]["editor"].wb.clipboard.start_paste();
 			//удаляем вставленные изображения
 			if(preSpecialPasteData.images)
 			{
@@ -8799,19 +8801,35 @@
 					oObject.setBDeleted(true);
 				}
 			}
-			window["Asc"]["editor"].wb.clipboard.end_paste();
+		};
+		
+		//транзакция закроется в end_paste
+		History.Create_NewPoint();
+        History.StartTransaction();
+		
+		window["Asc"]["editor"].wb.clipboard.start_specialpaste();
+		window["Asc"]["editor"].wb.clipboard.start_paste();
+		
+		//откатываемся до того, что было до вставки
+		if(preSpecialPasteData && preSpecialPasteData.data)
+		{
+			var tempProps = new Asc.SpecialPasteProps();
+			api.wb.clipboard.specialPasteProps = tempProps;
+			
+			//меняем activeRange
+			if(specialPasteData.activeRange)
+			{
+				this.model.selectionRange = specialPasteData.activeRange.clone(this.model);
+			}
+			
+			undoPreviousPaste();
 		}
 		
 		//далее специальная вставка
-		if(specialPasteData)
-		{	
-			window["Asc"]["editor"].wb.clipboard.start_specialpaste();
-			api.wb.clipboard.specialPasteProps = props;
-			
-			//TODO пока для закрытия транзации выставляю флаг. пересмотреть!
-			window["Asc"]["editor"].wb.clipboard.bIsEndTransaction = true;
-			api.wb.clipboard.pasteData(this, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data, true);
-		}
+		api.wb.clipboard.specialPasteProps = props;
+		//TODO пока для закрытия транзации выставляю флаг. пересмотреть!
+		window["Asc"]["editor"].wb.clipboard.bIsEndTransaction = true;
+		api.wb.clipboard.pasteData(this, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data, true);
 	};
 	
     WorksheetView.prototype._pasteData = function (isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth) {
@@ -9275,7 +9293,7 @@
         var arrFormula = [];
 
         var pasteRange = window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange;
-        var activeCellsPasteFragment = AscCommonExcel.g_oRangeCache.getAscRange(pasteRange);
+        var activeCellsPasteFragment = typeof pasteRange === "string" ? AscCommonExcel.g_oRangeCache.getAscRange(pasteRange) : pasteRange;
         var rMax = (activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1) + arn.r1 + 1;
         var cMax = (activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1) + arn.c1 + 1;
 
