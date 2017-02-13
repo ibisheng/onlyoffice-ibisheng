@@ -2883,8 +2883,8 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
 		var oLim  = oLimLow.getIterator();
 		
 		this.bs.WriteItem(c_oSer_OMathContentType.LimLowPr, function(){oThis.WriteLimLowPr(oLimLow);});
+		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Lim, function(){oThis.WriteArgNodes(oLim);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});		
 	}
 	this.WriteLimLowPr = function(oLimLow)
 	{
