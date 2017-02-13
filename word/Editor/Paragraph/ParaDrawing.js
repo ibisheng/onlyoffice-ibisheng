@@ -1490,6 +1490,7 @@ ParaDrawing.prototype.Refresh_RecalcData = function(Data)
 
 				case AscDFH.historyitem_Drawing_SetSizeRelH:
 				case AscDFH.historyitem_Drawing_SetSizeRelV:
+				case AscDFH.historyitem_Drawing_SetGraphicObject:
 				{
 					if (this.GraphicObj)
 					{
