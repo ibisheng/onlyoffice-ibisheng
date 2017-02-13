@@ -4017,8 +4017,24 @@ CDocumentContent.prototype.Cursor_MoveStartOfLine             = function(AddToSe
 };
 CDocumentContent.prototype.Cursor_MoveAt = function(X, Y, AddToSelect, bRemoveOldSelection, CurPage)
 {
-    if (undefined != CurPage)
-        this.CurPage = CurPage;
+	if (this.Pages.length <= 0)
+		return;
+
+	if (undefined !== CurPage)
+	{
+		if (CurPage < 0)
+		{
+			CurPage = 0;
+			Y       = 0;
+		}
+		else if (CurPage >= this.Pages.length)
+		{
+			CurPage = this.Pages.length - 1;
+			Y       = this.Pages[CurPage].YLimit;
+		}
+
+		this.CurPage = CurPage;
+	}
 
     if (false != bRemoveOldSelection)
     {
@@ -7268,8 +7284,19 @@ CDocumentContent.prototype.Selection_Draw_Page = function(PageIndex)
 };
 CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent)
 {
-    if (CurPage < 0 || CurPage >= this.Pages.length)
-        CurPage = 0;
+	if (this.Pages.length <= 0)
+		return;
+
+	if (CurPage < 0)
+	{
+		CurPage = 0;
+		Y       = 0;
+	}
+	else if (CurPage >= this.Pages.length)
+	{
+		CurPage = this.Pages.length - 1;
+		Y       = this.Pages[CurPage].YLimit;
+	}
 
     this.CurPage = CurPage;
     var AbsPage  = this.Get_AbsolutePage(this.CurPage);
@@ -7395,6 +7422,20 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
 // Если bEnd = true, тогда это конец селекта.
 CDocumentContent.prototype.Selection_SetEnd          = function(X, Y, CurPage, MouseEvent)
 {
+	if (this.Pages.length <= 0)
+		return;
+
+	if (CurPage < 0)
+	{
+		CurPage = 0;
+		Y       = 0;
+	}
+	else if (CurPage >= this.Pages.length)
+	{
+		CurPage = this.Pages.length - 1;
+		Y       = this.Pages[CurPage].YLimit;
+	}
+
     if (docpostype_DrawingObjects === this.CurPos.Type)
     {
         var PageAbs = (this.Parent instanceof CHeaderFooter ? CurPage : this.Get_StartPage_Absolute(CurPage));
@@ -7410,9 +7451,6 @@ CDocumentContent.prototype.Selection_SetEnd          = function(X, Y, CurPage, M
         }
         return;
     }
-
-    if (CurPage < 0 || CurPage >= this.Pages.length)
-        CurPage = 0;
 
     this.CurPage = CurPage;
 
