@@ -945,6 +945,7 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
         var mapDocumentContents = {};
         var mapParagraphs       = {};
         var mapDrawings         = {};
+        var mapRuns             = {};
         for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
         {
             var oChange = arrReverseChanges[nIndex];
@@ -957,6 +958,9 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
                 mapParagraphs[oClass.Get_Paragraph().Get_Id()] = oClass.Get_Paragraph();
             else if(oClass instanceof AscCommonWord.ParaDrawing){
                 mapDrawings[oClass.Get_Id()] = oClass;
+            }
+            else if(oClass instanceof AscCommonWord.ParaRun){
+                mapRuns[oClass.Get_Id()] = oClass;
             }
         }
 
@@ -977,6 +981,23 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
                     if (oParentParagraph)
                     {
                         mapParagraphs[oParentParagraph.Get_Id()] = oParentParagraph;
+                    }
+                }
+            }
+        }
+
+        for(var sId in mapRuns){
+            if (mapRuns.hasOwnProperty(sId))
+            {
+                var oRun = mapRuns[sId];
+                for(var nIndex = oRun.Content.length - 1; nIndex > - 1; --nIndex){
+                    if(oRun.Content[nIndex] instanceof AscCommonWord.ParaDrawing){
+                        if(!oRun.Content[nIndex].CheckCorrect()){
+                            oRun.Remove_FromContent(nIndex, 1, false);
+                            if(oRun.Paragraph){
+                                mapParagraphs[oRun.Paragraph.Get_Id()] = oRun.Paragraph;
+                            }
+                        }
                     }
                 }
             }
