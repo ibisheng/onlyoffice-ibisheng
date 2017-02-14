@@ -11278,6 +11278,20 @@ CDocument.prototype.GetFootnotePr = function()
 	oFootnotePr.put_NumFormat(oSectPr.GetFootnoteNumFormat());
 	return oFootnotePr;
 };
+
+
+CDocument.prototype.TurnOffCheckChartSelection = function(){
+    if(this.DrawingObjects){
+        this.DrawingObjects.TurnOffCheckChartSelection();
+    }
+};
+
+CDocument.prototype.TurnOnCheckChartSelection = function(){
+    if(this.DrawingObjects){
+        this.DrawingObjects.TurnOnCheckChartSelection();
+    }
+};
+
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые вызываются из CLogicDocumentController
 //----------------------------------------------------------------------------------------------------------------------

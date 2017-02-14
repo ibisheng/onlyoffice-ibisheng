@@ -5990,7 +5990,7 @@ ClrMap.prototype =
 
     setClr: function(index, clr)
     {
-        History.Add(new CChangesDrawingsContentLong(this, AscDFH.historyitem_ClrMap_SetClr, index, [clr], true));
+        History.Add(new CChangesDrawingsContentLongMap(this, AscDFH.historyitem_ClrMap_SetClr, index, [clr], true));
         this.color_map[index] = clr;
     }
 };

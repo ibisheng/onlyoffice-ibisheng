@@ -85,7 +85,7 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
     }
     var deleteIndex = ( null === AscCommon.History.SavedIndex ? null : SumIndex );
 
-    var aChanges = [];
+    var aChanges = [], aChanges2 = [];
     for ( var PointIndex = StartPoint; PointIndex <= LastPoint; PointIndex++ )
     {
         var Point = AscCommon.History.Points[PointIndex];
@@ -96,6 +96,7 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
             var Item = Point.Items[Index];
             var oChanges = new AscCommon.CCollaborativeChanges();
             oChanges.Set_FromUndoRedo( Item.Class, Item.Data, Item.Binary );
+            aChanges2.push(Item.Data);
             aChanges.push( oChanges.m_pData );
         }
     }
@@ -175,6 +176,7 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
     this.m_aNeedUnlock2.length = 0;
 
     if (0 < aChanges.length || null !== deleteIndex) {
+        this.private_OnSendOwnChanges(aChanges2, deleteIndex);
         editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo, editor.canUnlockDocument2);
         AscCommon.History.CanNotAddChanges = true;
     } else
@@ -700,6 +702,12 @@ CCollaborativeEditing.prototype.Update_ForeignCursorLabelPosition = function(Use
 
     editor.sync_ShowForeignCursorLabel(UserId, X, Y, Color);
 };
+
+
+CCollaborativeEditing.prototype.private_RecalculateDocument = function(oRecalcData){
+    this.m_oLogicDocument.Recalculate(oRecalcData);
+};
+
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommon'] = window['AscCommon'] || {};

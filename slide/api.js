@@ -1810,7 +1810,7 @@ background-repeat: no-repeat;\
 		_logicDoc.Remove(1, true, true);
 	};
 
-	asc_docs_api.prototype.onSaveCallback = function(e)
+	asc_docs_api.prototype.onSaveCallback = function(e, isUndoRequest)
 	{
 		var t = this;
 		if (false == e["saveLock"])
@@ -1867,12 +1867,22 @@ background-repeat: no-repeat;\
 			{
 				CursorInfo = History.Get_DocumentPositionBinary();
 			}
+
+
 			// Пересылаем свои изменения
-			AscCommon.CollaborativeEditing.Send_Changes(this.IsUserSave, {
-				UserId      : this.CoAuthoringApi.getUserConnectionId(),
-				UserShortId : this.DocInfo.get_UserId(),
-				CursorInfo  : CursorInfo
-			});
+            if (isUndoRequest)
+            {
+                AscCommon.CollaborativeEditing.Set_GlobalLock(false);
+                AscCommon.CollaborativeEditing.Undo();
+            }
+            else
+			{
+                AscCommon.CollaborativeEditing.Send_Changes(this.IsUserSave, {
+                    UserId      : this.CoAuthoringApi.getUserConnectionId(),
+                    UserShortId : this.DocInfo.get_UserId(),
+                    CursorInfo  : CursorInfo
+                });
+			}
 		}
 		else
 		{
@@ -1934,18 +1944,18 @@ background-repeat: no-repeat;\
 			}
 		}
 	};
-	asc_docs_api.prototype.asc_Save                     = function(isAutoSave)
+	asc_docs_api.prototype.asc_Save                     = function(isAutoSave, isUndoRequest)
 	{
 		this.IsUserSave = !isAutoSave;
 		if (true === this.canSave && !this.isLongAction() && (this.asc_isDocumentCanSave() || History.Have_Changes() ||
-			AscCommon.CollaborativeEditing.Have_OtherChanges() || this.canUnlockDocument))
+			AscCommon.CollaborativeEditing.Have_OtherChanges() || true === isUndoRequest || this.canUnlockDocument))
 		{
 			this.canSave = false;
 
 			var t = this;
 			this.CoAuthoringApi.askSaveChanges(function(e)
 			{
-				t.onSaveCallback(e);
+				t.onSaveCallback(e, isUndoRequest);
 			});
 		}
 	};
@@ -2032,9 +2042,6 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.sync_CanUndoCallback         = function(bCanUndo)
 	{
-		if (true === AscCommon.CollaborativeEditing.Is_Fast() && true !== AscCommon.CollaborativeEditing.Is_SingleUser())
-			bCanUndo = false;
-
 		this.sendEvent("asc_onCanUndo", bCanUndo);
 	};
 	asc_docs_api.prototype.sync_CanRedoCallback         = function(bCanRedo)
@@ -6495,7 +6502,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['AddURL']                              = asc_docs_api.prototype.AddURL;
 	asc_docs_api.prototype['Help']                                = asc_docs_api.prototype.Help;
 	asc_docs_api.prototype['startGetDocInfo']                     = asc_docs_api.prototype.startGetDocInfo;
-	asc_docs_api.prototype['asc_setAdvancedOptions']              = asc_docs_api.prototype.asc_setAdvancedOptions;;
+	asc_docs_api.prototype['asc_setAdvancedOptions']              = asc_docs_api.prototype.asc_setAdvancedOptions;
 	asc_docs_api.prototype['stopGetDocInfo']                      = asc_docs_api.prototype.stopGetDocInfo;
 	asc_docs_api.prototype['sync_DocInfoCallback']                = asc_docs_api.prototype.sync_DocInfoCallback;
 	asc_docs_api.prototype['sync_GetDocInfoStartCallback']        = asc_docs_api.prototype.sync_GetDocInfoStartCallback;

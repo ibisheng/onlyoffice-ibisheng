@@ -368,7 +368,7 @@
     };
 
     CChangesDrawingsContent.prototype.CreateReverseChange = function(){
-        var oRet = this.private_CreateReverseChange(CChangesDrawingsContent);
+        var oRet = this.private_CreateReverseChange(this.constructor);
         oRet.Type = this.Type;
         oRet.Pos = this.Pos;
         return oRet;

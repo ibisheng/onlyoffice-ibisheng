@@ -496,6 +496,7 @@ function CPresentation(DrawingDocument)
     this.NeedUpdateTargetForCollaboration = false;
     this.oLastCheckContent = null;
     this.CompositeInput    = null;
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
    //
@@ -522,6 +523,17 @@ CPresentation.prototype =
      * Сообщаем о начале составного ввода текста.
      * @returns {boolean} Начался или нет составной ввод.
      */
+
+
+    TurnOffCheckChartSelection: function(){
+    },
+
+    TurnOnCheckChartSelection: function(){
+    },
+
+    Get_DrawingDocument: function(){
+        return this.DrawingDocument;
+    },
 
     Get_TargetDocContent: function(){
         if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects){
@@ -3770,22 +3782,25 @@ CPresentation.prototype =
 
     Document_UpdateUndoRedoState : function()
     {
+        if (true === this.TurnOffInterfaceEvents)
+            return;
+
+        if (true === AscCommon.CollaborativeEditing.Get_GlobalLockSelection())
+            return;
+
+        // TODO: Возможно стоит перенсти эту проверку в класс CHistory и присылать
+        //       данные события при изменении значения History.Index
 
         // Проверяем состояние Undo/Redo
-        editor.sync_CanUndoCallback( this.History.Can_Undo() );
-        editor.sync_CanRedoCallback( this.History.Can_Redo() );
 
-        if ( true === History.Have_Changes() )
-        {
-            // дублирование евента. когда будет undo-redo - тогда
-            // эти евенты начнут отличаться
-            editor.SetDocumentModified(true);
-			editor._onUpdateDocumentCanSave();
-        }
-        else
-        {
-            editor.SetUnchangedDocument();
-        }
+        var bCanUndo = this.History.Can_Undo();
+        if (true !== bCanUndo && editor && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
+            bCanUndo = this.CollaborativeEditing.CanUndo();
+
+        editor.sync_CanUndoCallback(bCanUndo);
+        editor.sync_CanRedoCallback(this.History.Can_Redo());
+        editor.CheckChangedDocument();
+
     },
 
     Document_UpdateCanAddHyperlinkState : function()
@@ -3834,15 +3849,27 @@ CPresentation.prototype =
 
     Document_Undo : function()
     {
-        if ( true === AscCommon.CollaborativeEditing.Get_GlobalLock() )
+
+        if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
             return;
 
-        this.clearThemeTimeouts();
-        this.History.Undo();
-        this.Recalculate(this.History.RecalculateData);
+        if (true !== this.History.Can_Undo() && this.Api && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
+        {
+            if (this.CollaborativeEditing.CanUndo() && true === this.Api.canSave)
+            {
+                this.CollaborativeEditing.Set_GlobalLock(true);
+                this.Api.asc_Save(true, true);
+            }
+        }
+        else
+        {
+            this.clearThemeTimeouts();
+            this.History.Undo();
+            this.Recalculate(this.History.RecalculateData);
 
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
+            this.Document_UpdateSelectionState();
+            this.Document_UpdateInterfaceState();
+        }
     },
 
     Document_Redo : function()
