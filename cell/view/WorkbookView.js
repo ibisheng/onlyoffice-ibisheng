@@ -1180,6 +1180,7 @@
       }
 
       ws.cellCommentator.updateCommentPosition();
+      ws.updateSpecialPasteOptionsPosition();
       this._onDocumentPlaceChanged();
     }
     ws.draw();

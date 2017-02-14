@@ -655,6 +655,7 @@
             this._prepareCellTextMetricsCache();
             this._shiftVisibleRange();
             this.cellCommentator.updateCommentPosition();
+            this.updateSpecialPasteOptionsPosition();
             this.handlers.trigger("onDocumentPlaceChanged");
             this.objectRender.drawingArea.reinitRanges();
             this.updateZoom = false;
@@ -673,6 +674,7 @@
         this._prepareCellTextMetricsCache();
         this._shiftVisibleRange();
         this.cellCommentator.updateCommentPosition();
+        this.updateSpecialPasteOptionsPosition();
         this.handlers.trigger("onDocumentPlaceChanged");
         this.objectRender.drawingArea.reinitRanges();
 
@@ -5605,7 +5607,7 @@
         //ToDo this.drawDepCells();
         this.cellCommentator.updateCommentPosition();
         this.cellCommentator.drawCommentCells();
-        window["Asc"]["editor"].wb.clipboard.updateSpecialPasteOptionsPosition(this);
+        this.updateSpecialPasteOptionsPosition();
         return this;
     };
 
@@ -5759,6 +5761,7 @@
         //ToDo this.drawDepCells();
         this.cellCommentator.updateCommentPosition();
         this.cellCommentator.drawCommentCells();
+        this.updateSpecialPasteOptionsPosition();
         return this;
     };
 
@@ -8987,7 +8990,7 @@
 				//matchDestinationFormatting - пока не добавляю, так как работает как и values
 				allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
 			}
-			_clipboard.showSpecialPasteOptions(this, allowedSpecialPasteProps, selectData[0]);
+			this.showSpecialPasteOptions(allowedSpecialPasteProps, selectData[0]);
 		}
     };
 
@@ -9785,6 +9788,46 @@
 			range.setHyperlink(rangeStyle.hyperlinkObj, true);
 		}
 	};
+
+	WorksheetView.prototype.showSpecialPasteOptions = function(props, range)
+	{
+		var _clipboard = window["Asc"]["editor"].wb.clipboard;
+		var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
+		_clipboard.specialPasteRange = range;
+		
+		var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
+		var cellCoord = this.getCellCoord(range.c2, range.r2);
+		if(!isVisible)
+		{
+			cellCoord._x = -1;
+			cellCoord._y = -1;
+		}
+		
+		specialPasteShowOptions.asc_setOptions(props);
+		specialPasteShowOptions.asc_setCellCoord(cellCoord);
+		this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
+	},
+
+	 WorksheetView.prototype.updateSpecialPasteOptionsPosition = function()
+	{
+		var _clipboard = window["Asc"]["editor"].wb.clipboard;
+		if(_clipboard.showSpecialPasteButton && _clipboard.specialPasteRange)
+		{
+			var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
+			var range = _clipboard.specialPasteRange;
+			
+			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
+			var cellCoord = this.getCellCoord(range.c2, range.r2);
+			if(!isVisible)
+			{
+				cellCoord._x = -1;
+				cellCoord._y = -1;
+			}
+			
+			specialPasteShowOptions.asc_setCellCoord(cellCoord);
+			this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
+		}
+	}
 
     // Залочена ли панель для закрепления
     WorksheetView.prototype._isLockedFrozenPane = function ( callback ) {
@@ -11443,6 +11486,7 @@
         this.model.onUpdateRanges(arrChanged);
         this.objectRender.rebuildChartGraphicObjects(arrChanged);
         this.cellCommentator.updateCommentPosition();
+        this.updateSpecialPasteOptionsPosition();
         this.handlers.trigger("onDocumentPlaceChanged");
         this.draw(lockDraw);
     };
