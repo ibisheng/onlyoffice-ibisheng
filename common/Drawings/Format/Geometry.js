@@ -412,6 +412,10 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
         var _OldValue = parseInt(this.OldValue);
         if(!isNaN(_OldValue)){
             this.Class.gdLst[this.Name] = _OldValue;
+            if(this.Class.parent && this.Class.parent.handleUpdateGeometry)
+            {
+                this.Class.parent.handleUpdateGeometry();
+            }
         }
         else{
             delete this.Class.gdLst[this.Name];
