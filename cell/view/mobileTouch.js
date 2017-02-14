@@ -407,8 +407,8 @@ function (window, undefined)
 			_mode = 2;
 		}
 
-		var _object_bounds = _controller.getSelectedObjectsBounds();
-		if ((0 == _mode) && _object_bounds)
+		var _object_bounds = _controller.getSelectedObjectsBounds(true);
+		if ((0 == _mode || 2 == _mode) && _object_bounds)
 		{
 			_pos = this.ConvertCoordsToCursor(_object_bounds.minX, _object_bounds.minY, _object_bounds.pageIndex);
 			_posX = _pos.X;
@@ -501,6 +501,13 @@ function (window, undefined)
 
 		// никаких таблиц
 		this.TableTrackEnabled = false;
+
+		this.CellEditorType = Asc.c_oAscCellEditorState.editEnd;
+
+		var _that = this;
+		this.Api.asc_registerCallback('asc_onEditCell', function(_state) {
+			_that.CellEditorType = _state;
+		});
 	};
 
 	CMobileTouchManager.prototype.MoveCursorToPoint = function()
@@ -684,6 +691,8 @@ function (window, undefined)
 			}
 			case AscCommon.MobileTouchMode.Zoom:
 			{
+				this.Api.asc_closeCellEditor();
+
 				this.ZoomDistance = this.getPointerDistance(e);
 				this.ZoomValue    = this.delegate.GetZoom();
 

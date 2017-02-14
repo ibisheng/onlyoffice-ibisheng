@@ -6362,9 +6362,9 @@ DrawingObjectsController.prototype =
         this.checkSelectedObjectsAndCallback(this.unGroupCallback, null, false, AscDFH.historydescription_CommonControllerUnGroup)
     },
 
-    getSelectedObjectsBounds: function()
+    getSelectedObjectsBounds: function(isTextSelectionUse)
     {
-        if(!this.getTargetDocContent() && this.selectedObjects.length > 0)
+        if((!this.getTargetDocContent() || true === isTextSelectionUse) && this.selectedObjects.length > 0)
         {
             var nPageIndex, aDrawings, oRes, aSelectedCopy, i;
             if(this.selection.groupSelection)

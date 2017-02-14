@@ -320,8 +320,8 @@
 			_mode = 2;
 		}
 
-		var _object_bounds = _controller.getSelectedObjectsBounds();
-		if ((0 == _mode) && _object_bounds)
+		var _object_bounds = _controller.getSelectedObjectsBounds(true);
+		if ((0 == _mode || 2 == _mode) && _object_bounds)
 		{
 			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(_object_bounds.minX, _object_bounds.minY, _object_bounds.pageIndex);
 			_posX = _pos.X;
