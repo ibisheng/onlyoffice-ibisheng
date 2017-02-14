@@ -9289,7 +9289,8 @@
 
     WorksheetView.prototype._pasteFromBinary = function (val, isCheckSelection, tablesMap, specialPasteProps) {
         var t = this;
-        var arn = t.model.selectionRange.getLast();
+		var trueActiveRange = t.model.selectionRange.getLast().clone();
+        var arn = t.model.selectionRange.getLast().clone();
         var arrFormula = [];
 
         var pasteRange = window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange;
@@ -9407,6 +9408,9 @@
             var maxACol = 1;
             var plRow = 0;
             var plCol = 0;
+			
+			trueActiveRange.r2 = arn.r2;
+			trueActiveRange.c2 = arn.c2;
         }
 		
 		
@@ -9565,7 +9569,8 @@
         }
 
         t.isChanged = true;
-        var arnFor = [arn, arrFormula];
+        var arnFor = [trueActiveRange, arrFormula];
+		this.setSelection(trueActiveRange);
 		
 		var _clipboard = window["Asc"]["editor"].wb.clipboard;
 		_clipboard.specialPasteProps = null;
@@ -11486,7 +11491,7 @@
         this.model.onUpdateRanges(arrChanged);
         this.objectRender.rebuildChartGraphicObjects(arrChanged);
         this.cellCommentator.updateCommentPosition();
-        this.updateSpecialPasteOptionsPosition();
+        //this.updateSpecialPasteOptionsPosition();
         this.handlers.trigger("onDocumentPlaceChanged");
         this.draw(lockDraw);
     };
