@@ -851,8 +851,10 @@ function (window, undefined)
 				if (!this.MoveAfterDown)
 				{
 					global_mouseEvent.Button = 0;
+					global_mouseEvent.KoefPixToMM = 5;
 					this.delegate.Drawing_OnMouseDown(_e);
 					this.delegate.Drawing_OnMouseUp(_e);
+					global_mouseEvent.KoefPixToMM = 1;
 					this.Api.sendEvent("asc_onTapEvent", e);
 
 					var typeMenu = this.delegate.GetContextMenuType();
