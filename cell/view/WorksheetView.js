@@ -9160,7 +9160,10 @@
         }
 
         //если не возникает конфликт, делаем unmerge
-        rangeUnMerge.unmerge();
+		if(specialPasteProps.format)
+		{
+			rangeUnMerge.unmerge();
+		}
 
         if (!isOneMerge) {
             arn.r2 = (rMax2 - 1 > 0) ? (rMax2 - 1) : 0;
@@ -9169,7 +9172,11 @@
 
         if (isMultiple)//случай автозаполнения сложных форм
         {
-            t.model.getRange3(lastSelection.r1, lastSelection.c1, lastSelection.r2, lastSelection.c2).unmerge();
+			if(specialPasteProps.format)
+			{
+				t.model.getRange3(lastSelection.r1, lastSelection.c1, lastSelection.r2, lastSelection.c2).unmerge();
+			}
+
             var maxARow = heightArea / heightPasteFr;
             var maxACol = widthArea / widthPasteFr;
             var plRow = (rMax2 - arn.r1);
@@ -9389,7 +9396,10 @@
             return newArr;
         }
         //если не возникает конфликт, делаем unmerge
-        rangeUnMerge.unmerge();
+		if(specialPasteProps.format)
+		{
+			rangeUnMerge.unmerge();
+		}
         if (!isOneMerge) {
             arn.r2 = rMax2 - 1;
             arn.c2 = cMax2 - 1;
@@ -9398,7 +9408,10 @@
        
         if (isMultiple)//случай автозаполнения сложных форм
         {
-            t.model.getRange3(arn.r1, arn.c1, arn.r2, arn.c2).unmerge();
+            if(specialPasteProps.format)
+			{
+				t.model.getRange3(trueActiveRange.r1, trueActiveRange.c1, trueActiveRange.r2, trueActiveRange.c2).unmerge();
+			}
             var maxARow = heightArea / heightPasteFr;
             var maxACol = widthArea / widthPasteFr;
             var plRow = (rMax2 - arn.r1);
@@ -9673,6 +9686,13 @@
 			}
 		};
 		
+		//offsetLast
+		if(rangeStyle.offsetLast && specialPasteProps.merge)
+		{
+			range.setOffsetLast(rangeStyle.offsetLast);
+			range.merge(rangeStyle.merge);
+		
+		}
 		
 		//for formula
 		if(formulaProps)
@@ -9736,13 +9756,6 @@
 		if(rangeStyle.fontSize && specialPasteProps.fontSize)
 		{
 			range.setFontsize(rangeStyle.fontSize);
-		}
-		//offsetLast
-		if(rangeStyle.offsetLast && specialPasteProps.merge)
-		{
-			range.setOffsetLast(rangeStyle.offsetLast);
-			range.merge(rangeStyle.merge);
-		
 		}
 		//borders
 		if(rangeStyle.borders && specialPasteProps.borders)

@@ -91,6 +91,8 @@
 			this.fill = true;
 			this.angle = true;
 			
+			this.format = true;
+			
 			this.images = true;
 		}
 		
@@ -114,6 +116,8 @@
 				this.fill = true;
 				this.angle = true;
 				
+				this.format = true;
+				
 				this.images = true;
 			},
 			revert: function()
@@ -131,6 +135,8 @@
 				this.wrap = null;
 				this.fill = null;
 				this.angle = null;
+				
+				this.format = null;
 				
 				this.images = null;
 			},
