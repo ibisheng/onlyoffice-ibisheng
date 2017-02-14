@@ -711,7 +711,10 @@
 		},
 		"showSpecialPasteOptions": function(val) {
 			self.handlers.trigger("asc_onShowSpecialPasteOptions", val);
-			//console.log("showSpecialPasteOptions");
+			if(!window["Asc"]["editor"].wb.clipboard.showSpecialPasteButton)
+			{
+				window["Asc"]["editor"].wb.clipboard.showSpecialPasteButton = true;
+			}
 		}
     });
 
@@ -826,8 +829,11 @@
       return !self.isShowComments;
     });
 	this.model.handlers.add("hideSpecialPasteOptions", function() {
-      self.handlers.trigger("asc_onHideSpecialPasteOptions");
-	  //console.log("hideSpecialPasteOptions");
+      if(window["Asc"]["editor"].wb.clipboard.showSpecialPasteButton)
+	  {
+		self.handlers.trigger("asc_onHideSpecialPasteOptions");
+		window["Asc"]["editor"].wb.clipboard.showSpecialPasteButton = false;
+	  }
     });
 
     this.cellCommentator = new AscCommonExcel.CCellCommentator({

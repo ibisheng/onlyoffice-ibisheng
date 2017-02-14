@@ -251,6 +251,9 @@
 			this.specialPasteStart = false;
 			
 			this.bIsEndTransaction = false;//если нужно сделать на end_paste endTransaction
+			this.showSpecialPasteButton = false;//нужно показывать или нет кнопку специальной вставки
+			
+			this.specialPasteRange = null;//для того, чтобы показать в нужном месте иконку(кнопку) специальной вставки
 			
 			return this;
 		}
@@ -446,6 +449,44 @@
 				this.specialPasteStart = true;
 				//console.log("specialPasteStart: " + this.specialPasteStart);
 			},
+			
+			showSpecialPasteOptions: function(ws, props, range)
+			{
+				var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
+				this.specialPasteRange = range;
+				
+				var isVisible = null !== ws.getCellVisibleRange(range.c2, range.r2);
+				var cellCoord = ws.getCellCoord(range.c2, range.r2);
+				if(!isVisible)
+				{
+					cellCoord._x = -1;
+					cellCoord._y = -1;
+				}
+				
+				specialPasteShowOptions.asc_setOptions(props);
+				specialPasteShowOptions.asc_setCellCoord(cellCoord);
+				ws.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
+			},
+			
+			updateSpecialPasteOptionsPosition: function(ws)
+			{
+				if(this.showSpecialPasteButton && this.specialPasteRange)
+				{
+					var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
+					var range = this.specialPasteRange;
+					
+					var isVisible = null !== ws.getCellVisibleRange(range.c2, range.r2);
+					var cellCoord = ws.getCellCoord(range.c2, range.r2);
+					if(!isVisible)
+					{
+						cellCoord._x = -1;
+						cellCoord._y = -1;
+					}
+					
+					specialPasteShowOptions.asc_setCellCoord(cellCoord);
+					ws.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
+				}
+			}
 		};
 
 		

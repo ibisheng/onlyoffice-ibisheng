@@ -5605,6 +5605,7 @@
         //ToDo this.drawDepCells();
         this.cellCommentator.updateCommentPosition();
         this.cellCommentator.drawCommentCells();
+        window["Asc"]["editor"].wb.clipboard.updateSpecialPasteOptionsPosition(this);
         return this;
     };
 
@@ -8974,7 +8975,7 @@
 		//for special paste
 		if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
 		{
-			var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
+			//var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
 			var allowedSpecialPasteProps;
 			var sProps = Asc.c_oSpecialPasteProps;
 			if(fromBinary)
@@ -8986,11 +8987,7 @@
 				//matchDestinationFormatting - пока не добавляю, так как работает как и values
 				allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
 			}
-			
-			specialPasteShowOptions.asc_setOptions(allowedSpecialPasteProps);
-			var cellCoord = this.getCellCoord(selectData[0].c2, selectData[0].r2);
-			specialPasteShowOptions.asc_setCellCoord(cellCoord);
-			this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
+			_clipboard.showSpecialPasteOptions(this, allowedSpecialPasteProps, selectData[0]);
 		}
     };
 
