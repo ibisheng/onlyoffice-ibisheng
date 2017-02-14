@@ -928,12 +928,12 @@
     var t = this;
     if (jwt) {
       t.jwtOpen = undefined;
-      t.jwtSession = jwt.token;
+      t.jwtSession = jwt['token'];
       if (null !== t.jwtTimeOutId) {
         clearTimeout(t.jwtTimeOutId);
         t.jwtTimeOutId = null;
       }
-      var timeout = Math.max(0, jwt.expires - t.maxAttemptCount * t.reconnectInterval);
+      var timeout = Math.max(0, jwt['expires'] - t.maxAttemptCount * t.reconnectInterval);
       t.jwtTimeOutId = setTimeout(function(){
         t.jwtTimeOutId = null;
         t._send({'type': 'refreshToken', 'jwtSession': t.jwtSession});
@@ -1267,7 +1267,7 @@
 
   DocsCoApi.prototype._onAuth = function(data) {
     var t = this;
-    this._onRefreshToken(data.jwt);
+    this._onRefreshToken(data['jwt']);
     if (true === this._isAuth) {
       this._state = ConnectionState.Authorized;
       // Мы должны только соединиться для получения файла. Совместное редактирование уже было отключено.
