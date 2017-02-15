@@ -1400,6 +1400,9 @@
 		if (!_rect1 || !_rect2)
 			return;
 
+		if (0 == _rect1.W && 0 == _rect1.H && _rect2.W == 0 && _rect2.H == 0)
+			return;
+
 		this.RectSelect1 	= new AscCommon._rect();
 		this.RectSelect1.x 	= _rect1.X;
 		this.RectSelect1.y 	= _rect1.Y;
