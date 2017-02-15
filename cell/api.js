@@ -1348,7 +1348,7 @@ var editor;
     this.wb = new AscCommonExcel.WorkbookView(this.wbModel, this.controller, this.handlers, this.HtmlElement, this.topLineEditorElement, this, this.collaborativeEditing, this.fontRenderingMode);
 
     if (this.isMobileVersion) {
-
+		this.wb.defaults.worksheetView.halfSelection = true;
         var _container = document.getElementById(this.HtmlElementName);
         if (_container)
           _container.style.overflow = "hidden";
