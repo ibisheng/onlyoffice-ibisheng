@@ -1702,6 +1702,7 @@ function DrawingObjects() {
                     var oShape = oTrack.getShape(false, _this.drawingDocument, null);
                     oShape.setWorksheet(worksheet.model);
                     oShape.addToDrawingObjects();
+                    oShape.select(_this.controller, 0);
                     worksheet.setSelectionShape(true);
                     _this.controller.startRecalculate();
                 });
