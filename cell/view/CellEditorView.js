@@ -1594,17 +1594,20 @@
 		// при такой комбинации ctrl+a, click, ctrl+a, click не обновляется selectionStart
 		// поэтому выполняем обработку после обработчика системы
 		setTimeout(function () {
-			var b = t.input.selectionStart;
-			var e = t.input.selectionEnd;
-			if (typeof b !== "undefined") {
-				if (t.cursorPos !== b || t.selectionBegin !== t.selectionEnd) {
-					t._moveCursor(kPosition, b);
-				}
-				if (b !== e) {
-					t._selectChars(kPosition, e);
-				}
-			}
+			t._updateCursorByTopLine();
 		});
+	};
+	CellEditor.prototype._updateCursorByTopLine = function () {
+		var b = this.input.selectionStart;
+		var e = this.input.selectionEnd;
+		if (typeof b !== "undefined") {
+			if (this.cursorPos !== b || this.selectionBegin !== t.selectionEnd) {
+				this._moveCursor(kPosition, b);
+			}
+			if (b !== e) {
+				this._selectChars(kPosition, e);
+			}
+		}
 	};
 
 	CellEditor.prototype._syncEditors = function () {
@@ -2676,6 +2679,7 @@
 		}
 		this.skipTLUpdate = true;
 		this.replaceText(0, this.textRender.getEndOfLine(this.cursorPos), this.input.value);
+		this._updateCursorByTopLine();
 		return true;
 	};
 
