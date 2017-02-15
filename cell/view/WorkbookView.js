@@ -120,6 +120,8 @@
     ctx.fillRect(1, 1, 1, 1);
     this.ptrnLineDotted1 = ctx.createPattern(cnv, "repeat");
 
+    this.halfSelection = false;
+
     return this;
   }
 
