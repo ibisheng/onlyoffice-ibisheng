@@ -4127,6 +4127,62 @@
     };
 
 
+
+    /**
+     * Specifies major vertical gridline's visual properties
+     * @param {?ApiStroke} oStroke
+     * */
+    ApiChart.prototype.SetMajorVerticalGridlines = function(oStroke)
+    {
+        AscFormat.builder_SetVerAxisMajorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+    };
+
+    /**
+     * Specifies minor vertical gridline's visual properties
+     * @param {?ApiStroke} oStroke
+     * */
+    ApiChart.prototype.SetMinorVerticalGridlines = function(oStroke)
+    {
+        AscFormat.builder_SetVerAxisMinorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+    };
+
+
+    /**
+     * Specifies major horizontal gridline's visual properties
+     * @param {?ApiStroke} oStroke
+     * */
+    ApiChart.prototype.SetMajorHorizontalGridlines = function(oStroke)
+    {
+        AscFormat.builder_SetHorAxisMajorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+    };
+
+    /**
+     * Specifies minor vertical gridline's visual properties
+     * @param {?ApiStroke} oStroke
+     * */
+    ApiChart.prototype.SetMinorHorizontalGridlines = function(oStroke)
+    {
+        AscFormat.builder_SetHorAxisMinorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+    };
+
+
+    /**
+     * Specifies font size for labels of horizontal axis
+     * @param {number} nFontSize
+     */
+    ApiChart.prototype.SetHorAxisLablesFontSize = function(nFontSize){
+        AscFormat.builder_SetHorAxisFontSize(this.Chart, nFontSize);
+    };
+
+    /**
+     * Specifies font size for labels of vertical axis
+     * @param {number} nFontSize
+     */
+    ApiChart.prototype.SetVertAxisLablesFontSize = function(nFontSize){
+        AscFormat.builder_SetVerAxisFontSize(this.Chart, nFontSize);
+    };
+
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiFill
@@ -4491,6 +4547,12 @@
     ApiChart.prototype["SetHorAxisMinorTickMark"]  =  ApiChart.prototype.SetHorAxisMinorTickMark;
     ApiChart.prototype["SetVertAxisMajorTickMark"]  =  ApiChart.prototype.SetVertAxisMajorTickMark;
     ApiChart.prototype["SetVertAxisMinorTickMark"]  =  ApiChart.prototype.SetVertAxisMinorTickMark;
+    ApiChart.prototype["SetMajorVerticalGridlines"]  =  ApiChart.prototype.SetMajorVerticalGridlines;
+    ApiChart.prototype["SetMinorVerticalGridlines"]  =  ApiChart.prototype.SetMinorVerticalGridlines;
+    ApiChart.prototype["SetMajorHorizontalGridlines"]  =  ApiChart.prototype.SetMajorHorizontalGridlines;
+    ApiChart.prototype["SetMinorHorizontalGridlines"]  =  ApiChart.prototype.SetMinorHorizontalGridlines;
+    ApiChart.prototype["SetHorAxisLablesFontSize"]  =  ApiChart.prototype.SetHorAxisLablesFontSize;
+    ApiChart.prototype["SetVertAxisLablesFontSize"]  =  ApiChart.prototype.SetVertAxisLablesFontSize;
 
     ApiFill.prototype["GetClassType"]                = ApiFill.prototype.GetClassType;
 

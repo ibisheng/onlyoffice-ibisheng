@@ -9999,8 +9999,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
         }
     }
 
-
-    function  builder_SetChartVertAxisOrientation(oChartSpace, bIsMinMax) {
+    function builder_SetChartVertAxisOrientation(oChartSpace, bIsMinMax) {
         if(oChartSpace){
             var verAxis = oChartSpace.chart.plotArea.getVerticalAxis();
             if(verAxis)
@@ -10017,7 +10016,6 @@ function CorrectUniColor(asc_color, unicolor, flag)
             }
         }
     }
-
 
     function builder_SetChartHorAxisOrientation(oChartSpace, bIsMinMax){
         if(oChartSpace){
@@ -10090,28 +10088,40 @@ function CorrectUniColor(asc_color, unicolor, flag)
         }
     }
 
-    function builder_SetLegendFontSize(oChartSpace, nFontSize){
-        var oLegend = oChartSpace.chart.legend;
-        if(oLegend){
-            if(!oLegend.txPr)
-            {
-                oLegend.setTxPr(new AscFormat.CTextBody());
-            }
-            if(!oLegend.txPr.bodyPr)
-            {
-                oLegend.txPr.setBodyPr(new AscFormat.CBodyPr());
-            }
-            if(!oLegend.txPr.content)
-            {
-                oLegend.txPr.setContent(new AscFormat.CDrawingDocContent(oLegend.txPr, oChartSpace.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
-            }
-            var oPr = oLegend.txPr.content.Content[0].Pr.Copy();
-            if(!oPr.DefaultRunPr){
-                oPr.DefaultRunPr = new AscCommonWord.CTextPr();
-            }
-            oPr.DefaultRunPr.FontSize = nFontSize;
-            oLegend.txPr.content.Content[0].Set_Pr(oPr);
+    function builder_SetObjectFontSize(oObject, nFontSize, oDrawingDocument){
+        if(!oObject){
+            return;
         }
+        if(!oObject.txPr)
+        {
+            oObject.setTxPr(new AscFormat.CTextBody());
+        }
+        if(!oObject.txPr.bodyPr)
+        {
+            oObject.txPr.setBodyPr(new AscFormat.CBodyPr());
+        }
+        if(!oObject.txPr.content)
+        {
+            oObject.txPr.setContent(new AscFormat.CDrawingDocContent(oObject.txPr, oDrawingDocument, 0, 0, 100, 500, false, false, true));
+        }
+        var oPr = oObject.txPr.content.Content[0].Pr.Copy();
+        if(!oPr.DefaultRunPr){
+            oPr.DefaultRunPr = new AscCommonWord.CTextPr();
+        }
+        oPr.DefaultRunPr.FontSize = nFontSize;
+        oObject.txPr.content.Content[0].Set_Pr(oPr);
+    }
+
+    function builder_SetLegendFontSize(oChartSpace, nFontSize){
+        builder_SetObjectFontSize(oChartSpace.chart.legend, nFontSize, oChartSpace.getDrawingDocument());
+    }
+
+    function builder_SetHorAxisFontSize(oChartSpace, nFontSize){
+        builder_SetObjectFontSize(oChartSpace.chart.plotArea.getHorizontalAxis(), nFontSize, oChartSpace.getDrawingDocument());
+    }
+
+    function builder_SetVerAxisFontSize(oChartSpace, nFontSize){
+        builder_SetObjectFontSize(oChartSpace.chart.plotArea.getVerticalAxis(), nFontSize, oChartSpace.getDrawingDocument());
     }
 
     function builder_SetShowDataLabels(oChartSpace, bShowSerName, bShowCatName, bShowVal, bShowPerecent){
@@ -10141,7 +10151,6 @@ function CorrectUniColor(asc_color, unicolor, flag)
             oChart.dLbls.setShowBubbleSize(false);
         }
     }
-
 
     function builder_SetChartAxisLabelsPos(oAxis, sPosition){
         if(!oAxis || !oAxis.setTickLblPos){
@@ -10177,12 +10186,12 @@ function CorrectUniColor(asc_color, unicolor, flag)
             builder_SetChartAxisLabelsPos(oChartSpace.chart.plotArea.getVerticalAxis(), sPosition);
         }
     }
+
     function builder_SetChartHorAxisTickLablePosition(oChartSpace, sPosition){
         if(oChartSpace){
             builder_SetChartAxisLabelsPos(oChartSpace.chart.plotArea.getHorizontalAxis(), sPosition);
         }
     }
-
 
     function builder_GetTickMark(sTickMark){
         var nNewTickMark = null;
@@ -10220,6 +10229,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
             oAxis.setMajorTickMark(nNewTickMark);
         }
     }
+
     function builder_SetChartAxisMinorTickMark(oAxis, sTickMark){
         if(!oAxis){
             return;
@@ -10235,6 +10245,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
             builder_SetChartAxisMajorTickMark(oChartSpace.chart.plotArea.getHorizontalAxis(), sTickMark);
         }
     }
+
     function builder_SetChartHorAxisMinorTickMark(oChartSpace, sTickMark){
         if(oChartSpace){
             builder_SetChartAxisMinorTickMark(oChartSpace.chart.plotArea.getHorizontalAxis(), sTickMark);
@@ -10246,12 +10257,48 @@ function CorrectUniColor(asc_color, unicolor, flag)
             builder_SetChartAxisMajorTickMark(oChartSpace.chart.plotArea.getVerticalAxis(), sTickMark);
         }
     }
+
     function builder_SetChartVerAxisMinorTickMark(oChartSpace, sTickMark){
         if(oChartSpace){
             builder_SetChartAxisMinorTickMark(oChartSpace.chart.plotArea.getVerticalAxis(), sTickMark);
         }
     }
 
+    function builder_SetAxisMajorGridlines(oAxis, oLn){
+        if(oAxis){
+            if(!oAxis.majorGridlines){
+                oAxis.setMajorGridlines(new AscFormat.CSpPr());
+            }
+            oAxis.majorGridlines.setLn(oLn);
+            if(!oAxis.majorGridlines.Fill && !oAxis.majorGridlines.ln){
+                oAxis.setMajorGridlines(null);
+            }
+        }
+    }
+    function builder_SetAxisMinorGridlines(oAxis, oLn){
+        if(oAxis){
+            if(!oAxis.minorGridlines){
+                oAxis.setMinorGridlines(new AscFormat.CSpPr());
+            }
+            oAxis.minorGridlines.setLn(oLn);
+            if(!oAxis.minorGridlines.Fill && !oAxis.minorGridlines.ln){
+                oAxis.setMinorGridlines(null);
+            }
+        }
+    }
+
+    function builder_SetHorAxisMajorGridlines(oChartSpace, oLn){
+        builder_SetAxisMajorGridlines(oChartSpace.chart.plotArea.getVerticalAxis(), oLn);
+    }
+    function builder_SetHorAxisMinorGridlines(oChartSpace, oLn){
+        builder_SetAxisMinorGridlines(oChartSpace.chart.plotArea.getVerticalAxis(), oLn);
+    }
+    function builder_SetVerAxisMajorGridlines(oChartSpace, oLn){
+        builder_SetAxisMajorGridlines(oChartSpace.chart.plotArea.getHorizontalAxis(), oLn);
+    }
+    function builder_SetVerAxisMinorGridlines(oChartSpace, oLn){
+        builder_SetAxisMinorGridlines(oChartSpace.chart.plotArea.getHorizontalAxis(), oLn);
+    }
 
     //----------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
@@ -10380,6 +10427,12 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].builder_SetChartVerAxisMajorTickMark = builder_SetChartVerAxisMajorTickMark;
     window['AscFormat'].builder_SetChartVerAxisMinorTickMark = builder_SetChartVerAxisMinorTickMark;
     window['AscFormat'].builder_SetLegendFontSize = builder_SetLegendFontSize;
+    window['AscFormat'].builder_SetHorAxisMajorGridlines = builder_SetHorAxisMajorGridlines;
+    window['AscFormat'].builder_SetHorAxisMinorGridlines = builder_SetHorAxisMinorGridlines;
+    window['AscFormat'].builder_SetVerAxisMajorGridlines = builder_SetVerAxisMajorGridlines;
+    window['AscFormat'].builder_SetVerAxisMinorGridlines = builder_SetVerAxisMinorGridlines;
+    window['AscFormat'].builder_SetHorAxisFontSize = builder_SetHorAxisFontSize;
+    window['AscFormat'].builder_SetVerAxisFontSize = builder_SetVerAxisFontSize;
 
 
 
