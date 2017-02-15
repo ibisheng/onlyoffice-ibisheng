@@ -40,6 +40,7 @@
   var c_oEditorId = AscCommon.c_oEditorId;
   var c_oCloseCode = AscCommon.c_oCloseCode;
   var c_oAscServerCommandErrors = AscCommon.c_oAscServerCommandErrors;
+  var c_oAscForceSaveTypes = AscCommon.c_oAscForceSaveTypes;
 
   // Класс надстройка, для online и offline работы
   function CDocsCoApi(options) {
@@ -53,6 +54,7 @@
       this.onCursor =  options.onCursor;
       this.onMeta =  options.onMeta;
       this.onSession =  options.onSession;
+	  this.onForceSave =  options.onForceSave;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
@@ -93,6 +95,9 @@
       };
       this._CoAuthoringApi.onSession = function(e) {
         t.callback_OnSession(e);
+      };
+	  this._CoAuthoringApi.onForceSave = function(e) {
+        t.callback_OnForceSave(e);
       };
       this._CoAuthoringApi.onLocksAcquired = function(e) {
         t.callback_OnLocksAcquired(e);
@@ -391,6 +396,12 @@
       this.onSession(e);
     }
   };
+  
+  CDocsCoApi.prototype.callback_OnForceSave = function(e) {
+    if (this.onForceSave) {
+      this.onForceSave(e);
+    }
+  };
 
   CDocsCoApi.prototype.callback_OnLocksAcquired = function(e) {
     if (this.onLocksAcquired) {
@@ -507,6 +518,7 @@
       this.onCursor = options.onCursor;
       this.onMeta = options.onMeta;
       this.onSession =  options.onSession;
+	  this.onForceSave =  options.onForceSave;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
@@ -542,7 +554,9 @@
 	this.jwtTimeOutId = null;
     this._id = null;
     this._sessionTimeConnect = null;
-	this._lastForceSaveId = null;
+	this._allChangesSaved = null;
+	this._lastForceSaveTime = null;
+	this._lastForceSaveButtonTime = null;
     this._indexUser = -1;
     // Если пользователей больше 1, то совместно редактируем
     this.isCoAuthoring = false;
@@ -559,6 +573,7 @@
     this.arrayChanges = null;
     // Время последнего сохранения (для разрыва соединения)
     this.lastOtherSaveTime = -1;
+	this.lastOwnSaveTime = -1;
     // Локальный индекс изменений
     this.changesIndex = 0;
     // Дополнительная информация для Excel
@@ -840,7 +855,7 @@
   };
 
 	DocsCoApi.prototype.forceSave = function() {
-		this._send({'type': 'forcesave', 'saveid': new Date().getTime()});
+		this._send({'type': 'forceSaveStart'});
 	};
 
   DocsCoApi.prototype.openDocument = function(data) {
@@ -941,11 +956,34 @@
     }
   };
   
-	DocsCoApi.prototype._onForceSave = function(data) {
+	DocsCoApi.prototype._onForceSaveStart = function(data) {
 		if (data['code'] === c_oAscServerCommandErrors.NoError) {
-			this._lastForceSaveId = data['saveid'];
+			this._lastForceSaveButtonTime = data['time'];
 		} else if (data['code'] !== c_oAscServerCommandErrors.NotModified) {
 			this.onWarning(c_oAscError.ID.Unknown);
+		}
+	};
+	DocsCoApi.prototype._onForceSave = function(data) {
+		if (c_oAscForceSaveTypes.Button === data['type']) {
+			if (this._lastForceSaveButtonTime == data['time']) {
+				this.onForceSave({type: c_oAscForceSaveTypes.Button, saved:true});
+			}
+		} else if(c_oAscForceSaveTypes.Timeout === data['type']) {
+			this._lastForceSaveTime = data['time'];
+			this._checkLastForceSave();
+		}
+	};
+	DocsCoApi.prototype._checkLastForceSave = function(data) {
+		if (null != this._lastForceSaveTime) {
+			var newState = false;
+			if((-1 == this.lastOtherSaveTime || this.lastOtherSaveTime <= this._lastForceSaveTime) &&
+				(-1 == this.lastOwnSaveTime || this.lastOwnSaveTime <= this._lastForceSaveTime)) {
+				newState = true;
+				}
+			if(newState != this._allChangesSaved){
+				this._allChangesSaved = newState;
+				this.onForceSave({type: c_oAscForceSaveTypes.Timeout, saved:this._allChangesSaved});
+			}
 		}
 	};
 
@@ -1104,7 +1142,12 @@
     if (-1 !== data['index']) {
       this.changesIndex = data['index'];
     }
-
+	
+    if (-1 !== data['time']) {
+      this.lastOwnSaveTime = data['time'];
+	  this._checkLastForceSave();
+    }
+	
     if (this.onUnSaveLock) {
       this.onUnSaveLock();
     }
@@ -1124,6 +1167,7 @@
             this.onSaveChanges(JSON.parse(changesOneUser), change['useridoriginal'], bFirstLoad);
           }
         }
+		this._checkLastForceSave();
       }
     }
   };
@@ -1306,6 +1350,7 @@
       this._state = ConnectionState.Authorized;
       this._id = data['sessionId'];
       this._sessionTimeConnect = data['sessionTimeConnect'];
+	  this._lastForceSaveTime = data['lastForceSaveTime'];
 
       this._onAuthParticipantsChanged(data['participants']);
 
@@ -1496,7 +1541,10 @@
         case 'refreshToken' :
           t._onRefreshToken(dataObject["messages"]);
           break;
-		case 'forcesave' :
+		case 'forceSaveStart' :
+			t._onForceSaveStart(dataObject["messages"]);
+			break;
+		case 'forceSave' :
 			t._onForceSave(dataObject["messages"]);
 			break;
       }
