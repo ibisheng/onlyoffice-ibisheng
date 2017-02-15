@@ -9807,19 +9807,29 @@
 		}
 	};
 
-	WorksheetView.prototype.showSpecialPasteOptions = function(props, range)
+	WorksheetView.prototype.showSpecialPasteOptions = function(props, range, positionShapeContent)
 	{
 		var _clipboard = window["Asc"]["editor"].wb.clipboard;
 		var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
 		_clipboard.specialPasteRange = range;
 		
-		var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
-		var cellCoord = this.getCellCoord(range.c2, range.r2);
-		if(!isVisible)
+		var cellCoord;
+		if(!positionShapeContent)
 		{
-			cellCoord._x = -1;
-			cellCoord._y = -1;
+			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
+			cellCoord = this.getCellCoord(range.c2, range.r2);
+			if(!isVisible)
+			{
+				cellCoord._x = -1;
+				cellCoord._y = -1;
+			}
 		}
+		else
+		{
+			//var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
+			cellCoord = new AscCommon.asc_CRect( positionShapeContent.x, positionShapeContent.y, 0, 0 );
+		}
+		
 		
 		specialPasteShowOptions.asc_setOptions(props);
 		specialPasteShowOptions.asc_setCellCoord(cellCoord);

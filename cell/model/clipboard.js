@@ -1373,6 +1373,36 @@
 				this._insertSelectedContentIntoShapeContent(worksheet, insertContent, target_doc_content);
 				
 				History.EndTransaction();
+				
+				//for special paste
+				if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
+				{
+					var sProps = Asc.c_oSpecialPasteProps;
+					var curParPos = isIntoShape.Content[isIntoShape.CurPos.ContentPos].CurPos;
+					var curShape = isIntoShape.Parent.parent;
+					
+					var asc_getcvt = Asc.getCvtRatio;
+					var mmToPx = asc_getcvt(3/*px*/, 0/*pt*/, worksheet._getPPIX());
+					var ptToPx = asc_getcvt(1/*px*/, 0/*pt*/, worksheet._getPPIX());
+					
+					var cellsLeftPx = worksheet.cellsLeft * ptToPx;
+					var cellsTopPx = worksheet.cellsTop * ptToPx;
+					var offsetXPx = worksheet.cols[worksheet.visibleRange.c1].left * ptToPx - cellsLeftPx;
+					var offsetYPx = worksheet.rows[worksheet.visibleRange.r1].top * ptToPx - cellsTopPx;
+					
+					var x_curParPosPx = curParPos.X * mmToPx;
+					var x_curShapePosPx = curShape.x * mmToPx + cellsLeftPx;
+					var xPos = x_curParPosPx + x_curShapePosPx - offsetXPx;
+					
+					var y_curParPosPx = curParPos.Y * mmToPx;
+					var y_curShapePosPx = curShape.y * mmToPx + cellsTopPx;
+					var yPos = y_curParPosPx + y_curShapePosPx - offsetYPx;
+					
+					var position = {x: xPos, y: yPos};
+					
+					var allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
+					worksheet.showSpecialPasteOptions(allowedSpecialPasteProps, null, position);
+				}
 			},
 			
 			_convertBeforeInsertIntoShapeContent: function(worksheet, content, isConvertToPPTX, target_doc_content)
@@ -2548,6 +2578,14 @@
 						}
 						
 						window["Asc"]["editor"].wb.clipboard.end_paste();
+						
+						//for special paste
+						if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
+						{
+							var sProps = Asc.c_oSpecialPasteProps;
+							var allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
+							//worksheet.showSpecialPasteOptions(allowedSpecialPasteProps);
+						}
 					};
 					
 					worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
