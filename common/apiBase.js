@@ -644,6 +644,13 @@
 				}
 			}
 		};
+		this.CoAuthoringApi.onForceSave = function(data) {
+			if (AscCommon.c_oAscForceSaveTypes.Button === data.type) {
+				t.sendEvent('asc_onForceSaveButton');
+			} else if (AscCommon.c_oAscForceSaveTypes.Timeout === data.type) {
+				t.sendEvent('asc_onForceSaveTimeout', data.saved);
+			}
+		};
 		/**
 		 * Event об отсоединении от сервера
 		 * @param {jQuery} e  event об отсоединении с причиной

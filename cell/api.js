@@ -1349,6 +1349,7 @@ var editor;
 
     if (this.isMobileVersion) {
 		this.wb.defaults.worksheetView.halfSelection = true;
+		this.wb.defaults.worksheetView.activeCellBorderColor = new CColor(79, 158, 79);
         var _container = document.getElementById(this.HtmlElementName);
         if (_container)
           _container.style.overflow = "hidden";
