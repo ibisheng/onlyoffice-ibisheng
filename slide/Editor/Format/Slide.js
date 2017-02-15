@@ -37,6 +37,55 @@ var g_oTableId = AscCommon.g_oTableId;
 var History = AscCommon.History;
 
 
+
+
+function CChangesDrawingsContentComments(Class, Type, Pos, Items, isAdd){
+    CChangesDrawingsContentComments.superclass.constructor.call(this, Class, Type, Pos, Items, isAdd);
+}
+AscCommon.extendClass(CChangesDrawingsContentComments, AscDFH.CChangesDrawingsContent);
+CChangesDrawingsContentComments.prototype.addToInterface = function(){
+    for(var i = 0; i < this.Items.length; ++i){
+        var oComment = this.Items[i];
+        editor.sync_AddComment(oComment.Get_Id(), oComment.Data);
+    }
+};
+CChangesDrawingsContentComments.prototype.removeFromInterface = function(){
+    for(var i = 0; i < this.Items.length; ++i){
+        editor.sync_RemoveComment(this.Items[i].Get_Id());
+    }
+};
+CChangesDrawingsContentComments.prototype.Undo = function(){
+    CChangesDrawingsContentComments.superclass.Undo.call(this);
+    if(this.IsAdd()){
+        this.removeFromInterface();
+    }
+    else{
+        this.addToInterface();
+    }
+};
+CChangesDrawingsContentComments.prototype.Redo = function(){
+    CChangesDrawingsContentComments.superclass.Redo.call(this);
+    if(this.IsAdd()){
+        this.addToInterface();
+    }
+    else{
+        this.removeFromInterface();
+    }
+};
+
+CChangesDrawingsContentComments.prototype.Load = function(){
+    CChangesDrawingsContentComments.superclass.Load.call(this);
+    if(this.IsAdd()){
+        this.addToInterface();
+    }
+    else{
+        this.removeFromInterface();
+    }
+};
+
+AscDFH.CChangesDrawingsContentComments = CChangesDrawingsContentComments;
+
+
 AscDFH.changesFactory[AscDFH.historyitem_SlideSetLocks             ] = AscDFH.CChangesDrawingTimingLocks;
 AscDFH.changesFactory[AscDFH.historyitem_SlideSetComments          ] = AscDFH.CChangesDrawingsObject    ;
 AscDFH.changesFactory[AscDFH.historyitem_SlideSetShow              ] = AscDFH.CChangesDrawingsBool      ;
@@ -52,8 +101,8 @@ AscDFH.changesFactory[AscDFH.historyitem_SlideRemoveFromSpTree     ] = AscDFH.CC
 AscDFH.changesFactory[AscDFH.historyitem_SlideSetCSldName          ] = AscDFH.CChangesDrawingsString    ;
 AscDFH.changesFactory[AscDFH.historyitem_SlideSetClrMapOverride    ] = AscDFH.CChangesDrawingsObject    ;
 AscDFH.changesFactory[AscDFH.historyitem_PropLockerSetId           ] = AscDFH.CChangesDrawingsString    ;
-AscDFH.changesFactory[AscDFH.historyitem_SlideCommentsAddComment   ] = AscDFH.CChangesDrawingsContent   ;
-AscDFH.changesFactory[AscDFH.historyitem_SlideCommentsRemoveComment] = AscDFH.CChangesDrawingsContent   ;
+AscDFH.changesFactory[AscDFH.historyitem_SlideCommentsAddComment   ] = AscDFH.CChangesDrawingsContentComments   ;
+AscDFH.changesFactory[AscDFH.historyitem_SlideCommentsRemoveComment] = AscDFH.CChangesDrawingsContentComments   ;
 
 
 AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideSetComments          ] = function(oClass, value){oClass.slideComments = value;};
@@ -1280,6 +1329,7 @@ AscFormat.CTextBody.prototype.checkCurrentPlaceholder = function()
 };
 
 
+
 function SlideComments(slide)
 {
     this.comments = [];
@@ -1318,7 +1368,7 @@ SlideComments.prototype =
 
     addComment: function(comment)
     {
-       History.Add(new AscDFH.CChangesDrawingsContent(this, AscDFH.historyitem_SlideCommentsAddComment, this.comments.length, [comment], true));
+       History.Add(new AscDFH.CChangesDrawingsContentComments(this, AscDFH.historyitem_SlideCommentsAddComment, this.comments.length, [comment], true));
         this.comments.splice(this.comments.length, 0, comment);
         comment.slideComments = this;
     },
@@ -1353,7 +1403,7 @@ SlideComments.prototype =
         {
             if(this.comments[i].Get_Id() === id)
             {
-                History.Add(new AscDFH.CChangesDrawingsContent(this, AscDFH.historyitem_SlideCommentsRemoveComment, i, [id], false));
+                History.Add(new AscDFH.CChangesDrawingsContentComments(this, AscDFH.historyitem_SlideCommentsRemoveComment, i, [id], false));
                 this.comments.splice(i, 1);
                 editor.sync_RemoveComment(id);
                 return;
