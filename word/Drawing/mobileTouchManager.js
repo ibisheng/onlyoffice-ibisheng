@@ -496,7 +496,8 @@
 					this.Api.sendEvent("asc_onTapEvent", e);
 
 					var typeMenu = this.delegate.GetContextMenuType();
-					if (typeMenu == AscCommon.MobileTouchContextMenuType.Target)
+					if (typeMenu == AscCommon.MobileTouchContextMenuType.Target ||
+						typeMenu == AscCommon.MobileTouchContextMenuType.Select)
 						isPreventDefault = false;
 				}
 				else

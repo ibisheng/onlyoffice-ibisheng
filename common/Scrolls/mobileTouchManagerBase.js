@@ -436,7 +436,7 @@
 		}
 
 		var _object_bounds = this.LogicDocument.DrawingObjects.getSelectedObjectsBounds(true);
-		if ((0 == _mode || 2 == _mode) && _object_bounds)
+		if (_object_bounds)
 		{
 			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(_object_bounds.minX, _object_bounds.minY, _object_bounds.pageIndex);
 			_posX = _pos.X;

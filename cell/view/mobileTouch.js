@@ -220,6 +220,11 @@ function (window, undefined)
 
 		return _mode;
 	};
+	CMobileDelegateEditorCell.prototype.IsInObject = function()
+	{
+		var _controller = this.WB.getWorksheet().objectRender.controller;
+		return (null != _controller.getSelectedObjectsBounds(true));
+	};
 	CMobileDelegateEditorCell.prototype.GetContextMenuInfo = function(info)
 	{
 		info.Clear();
@@ -408,7 +413,7 @@ function (window, undefined)
 		}
 
 		var _object_bounds = _controller.getSelectedObjectsBounds(true);
-		if ((0 == _mode || 2 == _mode) && _object_bounds)
+		if (_object_bounds)
 		{
 			_pos = this.ConvertCoordsToCursor(_object_bounds.minX, _object_bounds.minY, _object_bounds.pageIndex);
 			_posX = _pos.X;
@@ -858,7 +863,8 @@ function (window, undefined)
 					this.Api.sendEvent("asc_onTapEvent", e);
 
 					var typeMenu = this.delegate.GetContextMenuType();
-					if (typeMenu == AscCommon.MobileTouchContextMenuType.Target)
+					if (typeMenu == AscCommon.MobileTouchContextMenuType.Target ||
+						(typeMenu == AscCommon.MobileTouchContextMenuType.Select && this.delegate.IsInObject()))
 						isPreventDefault = false;
 				}
 				else
@@ -924,10 +930,13 @@ function (window, undefined)
 			this.delegate.Api.controller._onMouseMove(_e);
 		}
 
+		if (this.CellEditorType == Asc.c_oAscCellEditorState.editFormula)
+			isPreventDefault = false;
+
 		if (this.Api.isViewMode || isPreventDefault)
 			AscCommon.g_inputContext.preventVirtualKeyboard(e);
 
-		if (true !== this.iScroll.isAnimating)
+		if (true !== this.iScroll.isAnimating && (this.CellEditorType != Asc.c_oAscCellEditorState.editFormula))
 			this.CheckContextMenuTouchEnd(isCheckContextMenuMode, isCheckContextMenuSelect, isCheckContextMenuCursor);
 
 		return false;

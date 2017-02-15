@@ -321,7 +321,7 @@
 		}
 
 		var _object_bounds = _controller.getSelectedObjectsBounds(true);
-		if ((0 == _mode || 2 == _mode) && _object_bounds)
+		if (_object_bounds)
 		{
 			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(_object_bounds.minX, _object_bounds.minY, _object_bounds.pageIndex);
 			_posX = _pos.X;
@@ -799,7 +799,8 @@
 					this.Api.sendEvent("asc_onTapEvent", e);
 
 					var typeMenu = this.delegate.GetContextMenuType();
-					if (typeMenu == AscCommon.MobileTouchContextMenuType.Target)
+					if (typeMenu == AscCommon.MobileTouchContextMenuType.Target ||
+						typeMenu == AscCommon.MobileTouchContextMenuType.Select)
 						isPreventDefault = false;
 				}
 				else
