@@ -5813,7 +5813,7 @@
 	 * @private
 	 */
 	WorksheetView.prototype._findColUnderCursor = function (x, canReturnNull, half) {
-		var activeCellCol = this._getSelection().activeCell.col;
+		var activeCellCol = half ? this._getSelection().activeCell.col : -1;
 		var dx = 0;
 		var c = this.visibleRange.c1;
 		var offset = this.cols[c].left - this.cellsLeft;
@@ -5880,7 +5880,7 @@
 	 * @private
 	 */
 	WorksheetView.prototype._findRowUnderCursor = function (y, canReturnNull, half) {
-		var activeCellRow = this._getSelection().activeCell.row;
+		var activeCellRow = half ? this._getSelection().activeCell.row : -1;
 		var dy = 0;
 		var r = this.visibleRange.r1;
 		var offset = this.rows[r].top - this.cellsTop;
