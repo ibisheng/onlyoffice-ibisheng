@@ -8828,6 +8828,14 @@
 			
 			undoPreviousPaste();
 		}
+		else if(preSpecialPasteData && preSpecialPasteData.shapeSelectionState)
+		{
+			//таким образом удаляю вставляенный фрагмент до специальной вставки
+			var docContent = this.objectRender.controller.getTargetDocContent(true);
+			var State = preSpecialPasteData.shapeSelectionState;
+			docContent.Set_SelectionState(State, State.length - 1);
+			docContent.Remove(1, true, true);
+		}
 		
 		//далее специальная вставка
 		api.wb.clipboard.specialPasteProps = props;

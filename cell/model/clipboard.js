@@ -1370,6 +1370,17 @@
 				var target_doc_content = isIntoShape;
 				
 				insertContent.Elements = this._convertBeforeInsertIntoShapeContent(worksheet, content, isConvertToPPTX, target_doc_content);
+				
+				//TODO конвертирую в текст без форматирую. пеесмотреть!
+				var specialPasteProps = window["Asc"]["editor"].wb.clipboard.specialPasteProps;
+				if(specialPasteProps && !specialPasteProps.format)
+				{
+					for(var i = 0; i < insertContent.Elements.length; i++)
+					{
+						insertContent.Elements[i].Element.Clear_TextFormatting();
+					}
+				}
+				
 				this._insertSelectedContentIntoShapeContent(worksheet, insertContent, target_doc_content);
 				
 				History.EndTransaction();
@@ -1481,6 +1492,12 @@
 
                     paragraph.Check_NearestPos(NearPos);
 					target_doc_content.Insert_Content(selectedContent, NearPos);
+					
+					//TODO записываю активную область после каждой вставки. пересомтреть! не записывать при специальной вставке.
+					//if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
+					//{
+						window['AscCommon'].g_clipboardBase.specialPasteUndoData.shapeSelectionState = target_doc_content.Get_SelectionState();
+					//}
 					
 					worksheet.objectRender.controller.cursorMoveRight(false, false);
 					
