@@ -130,7 +130,15 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
         drawingsChangesMap[AscDFH.historyitem_SpPr_SetLn                        ] = function (oClass, value){oClass.ln       = value; oClass.handleUpdateLn();};
         drawingsChangesMap[AscDFH.historyitem_ExtraClrScheme_SetClrScheme       ] = function (oClass, value){oClass.clrScheme = value;};
         drawingsChangesMap[AscDFH.historyitem_ExtraClrScheme_SetClrMap          ] = function (oClass, value){oClass.clrMap    = value;};
-        drawingsChangesMap[AscDFH.historyitem_ThemeSetColorScheme               ] = function (oClass, value){oClass.themeElements.clrScheme = value;};
+        drawingsChangesMap[AscDFH.historyitem_ThemeSetColorScheme               ] = function (oClass, value){
+            oClass.themeElements.clrScheme = value;
+            var oWordGraphicObjects = oClass.GetWordDrawingObjects();
+            if(oWordGraphicObjects){
+                oWordGraphicObjects.drawingDocument.CheckGuiControlColors();
+                oWordGraphicObjects.document.Api.chartPreviewManager.clearPreviews();
+                oWordGraphicObjects.document.Api.textArtPreviewManager.clear();
+            }
+        };
         drawingsChangesMap[AscDFH.historyitem_ThemeSetFontScheme                ] = function (oClass, value){oClass.themeElements.fontScheme  = value;};
         drawingsChangesMap[AscDFH.historyitem_ThemeSetFmtScheme                 ] = function (oClass, value){oClass.themeElements.fmtScheme   = value;};
         drawingsChangesMap[AscDFH.historyitem_HF_SetDt                          ] = function (oClass, value){oClass.dt     = value;};
@@ -6504,8 +6512,32 @@ CTheme.prototype =
         this.themeElements.fmtScheme = fmtScheme;
     },
 
-    Refresh_RecalcData: function()
+    GetWordDrawingObjects: function(){
+        var oRet = typeof editor !== "undefined" &&
+            editor.WordControl &&
+            editor.WordControl.m_oLogicDocument &&
+            editor.WordControl.m_oLogicDocument.DrawingObjects;
+        return AscCommon.isRealObject(oRet) ? oRet : null;
+    },
+
+    Refresh_RecalcData: function(oData)
     {
+        if(oData){
+            if(oData.Type === AscDFH.historyitem_ThemeSetColorScheme){
+                var oWordGraphicObject = this.GetWordDrawingObjects();
+                if(oWordGraphicObject){
+                    History.RecalcData_Add({All: true});
+                    for(var i = 0; i < oWordGraphicObject.drawingObjects.length; ++i){
+                        if(oWordGraphicObject.drawingObjects[i].GraphicObj){
+                            oWordGraphicObject.drawingObjects[i].GraphicObj.handleUpdateFill();
+                            oWordGraphicObject.drawingObjects[i].GraphicObj.handleUpdateLn();
+                        }
+                    }
+                    oWordGraphicObject.document.Api.chartPreviewManager.clearPreviews();
+                    oWordGraphicObject.document.Api.textArtPreviewManager.clear();
+                }
+            }
+        }
     },
 
     getObjectType: function()
