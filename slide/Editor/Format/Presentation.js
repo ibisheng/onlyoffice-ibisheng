@@ -2359,8 +2359,22 @@ CPresentation.prototype =
                     else
                     {
                         if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
-                            History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                            this.Paragraph_Add(new ParaTab());
+
+                            if(target_content.Selection.StartPos === target_content.Selection.EndPos &&
+                                target_content.Content[target_content.CurPos.ContentPos].IsEmpty() &&
+                                target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr &&
+                                target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet &&
+                                target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet.isBullet() &&
+                                target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet.bulletType.type !== AscFormat.BULLET_TYPE_BULLET_NONE &&
+                                this.Can_IncreaseParagraphLevel(!e.ShiftKey)){
+                                this.Paragraph_IncDecIndent(!e.ShiftKey);
+                            }
+                            else{
+                                History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
+                                this.Paragraph_Add(new ParaTab());
+                            }
+
+
                         }
                     }
                 }
