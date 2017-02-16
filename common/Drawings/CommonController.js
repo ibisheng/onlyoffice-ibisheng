@@ -7675,6 +7675,7 @@ DrawingObjectsController.prototype =
         {
             oSelectedContent = this.document.Get_SelectedContent(true);
             oContent.Recalculate_Page(0, true);
+            oContent.Cursor_MoveToStartPos(false);
             oNearestPos = oContent.Get_NearestPos(0, 0, 0, false, undefined);
             oNearestPos.Paragraph.Check_NearestPos( oNearestPos );
             if(oSelectedContent && this.document.Can_InsertContent(oSelectedContent, oNearestPos))
@@ -7710,7 +7711,7 @@ DrawingObjectsController.prototype =
                 oSelectedContent.MoveDrawing = true;
 
                 oContent.Recalculate_Page(0, true);
-
+                oContent.Cursor_MoveToStartPos(false);
                 var paragraph = oContent.Content[oContent.CurPos.ContentPos];
                 if (null != paragraph && type_Paragraph == paragraph.GetType())
                 {
