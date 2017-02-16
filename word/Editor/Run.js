@@ -6322,7 +6322,7 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
             var StartPos = this.State.Selection.StartPos;
             var EndPos   = this.State.Selection.EndPos;
 
-            if (StartPos === EndPos)
+            if (StartPos === EndPos && 0 !== this.Content.length)
 			{
 				CRun = this;
 				LRun = null;

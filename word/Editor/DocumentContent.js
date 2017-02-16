@@ -2266,6 +2266,8 @@ CDocumentContent.prototype.Extend_ToPos                       = function(X, Y)
     while (true)
     {
         var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true);
+		var NewRun       = new ParaRun(NewParagraph, false);
+		NewParagraph.Add_ToContent(0, NewRun);
 
         var StyleId = LastPara.Style_Get();
         var NextId  = undefined;
