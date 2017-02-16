@@ -902,27 +902,27 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
                 var _oChange = oChange.Copy();
 
                 if (this.private_CommutateContentChanges(oContentChangesMap, oClass, _oChange, nPosition + nCount))
-                    arrChanges.splice(0, 0, _oChange);
+                	arrChanges.push(_oChange);
             }
             else
             {
                 var _oChange = oChange; // TODO: Тут надо бы сделать копирование
 
                 if (this.private_CommutatePropertyChanges(oClass, _oChange, nPosition + nCount))
-                    arrChanges.splice(0, 0, _oChange);
+					arrChanges.push(_oChange);
             }
         }
 
         // Удаляем запись о последнем изменении
         this.m_aOwnChangesIndexes.length = this.m_aOwnChangesIndexes.length - 1;
 
-        var arrReverseChanges = [];
-        for (var nIndex = 0, nCount = arrChanges.length; nIndex < nCount; ++nIndex)
-        {
-            var oReverseChange = arrChanges[nIndex].CreateReverseChange();
-            if (oReverseChange)
-                arrReverseChanges.splice(0, 0, oReverseChange);
-        }
+		var arrReverseChanges = [];
+		for (var nIndex = 0, nCount = arrChanges.length; nIndex < nCount; ++nIndex)
+		{
+			var oReverseChange = arrChanges[nIndex].CreateReverseChange();
+			if (oReverseChange)
+				arrReverseChanges.push(oReverseChange);
+		}
 
         // Накатываем изменения в данном клиенте
         var oLogicDocument = this.m_oLogicDocument;

@@ -11782,7 +11782,7 @@ CTable.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
             _DocPos = null;
             _Flag = 1;
         }
-        else if (CurRowRow > 0)
+        else if (CurRow > 0)
         {
             CurRow--;
             _DocPos = null;
