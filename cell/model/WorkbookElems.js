@@ -5393,7 +5393,13 @@ TablePart.prototype.moveRef = function(col, row) {
 	this.handlers.trigger("changeRefTablePart", this);
 
 	if(this.AutoFilter)
+	{
 		this.AutoFilter.moveRef(col, row);
+	}	
+	if(this.SortState)
+	{
+		this.SortState.moveRef(col, row);
+	}
 };
 TablePart.prototype.changeRef = function(col, row, bIsFirst) {
 	var ref = this.Ref.clone();
@@ -5408,7 +5414,13 @@ TablePart.prototype.changeRef = function(col, row, bIsFirst) {
 	this.handlers.trigger("changeRefTablePart", this);
 	
 	if(this.AutoFilter)
+	{
 		this.AutoFilter.changeRef(col, row, bIsFirst);
+	}
+	if(this.SortState)
+	{
+		this.SortState.changeRef(col, row, bIsFirst);
+	}
 };
 TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewTableColumns) {
 	if(!range)
@@ -5511,6 +5523,15 @@ TablePart.prototype.deleteTableColumns = function(activeRange)
 			deletedMap[deleted[i].Name] = 1;
 		}
 		this.handlers.trigger("deleteColumnTablePart", this.DisplayName, deletedMap);
+		
+		if(this.SortState) 
+		{
+			var bIsDeleteSortState = this.SortState.changeColumns(activeRange, true);
+			if(bIsDeleteSortState)
+			{
+				this.SortState = null;
+			}
+		}
 	}
 
 };
@@ -5543,6 +5564,23 @@ TablePart.prototype.addTableColumns = function(activeRange, autoFilters)
 	}
 	
 	this.TableColumns = newTableColumns;
+	
+	/*if(this.SortState && this.SortState.SortConditions && this.SortState.SortConditions[0])
+	{
+		var SortConditions = this.SortState.SortConditions[0];
+		if(activeRange.c1 <= SortConditions.Ref.c1)
+		{
+			var offset = activeRange.c2 - activeRange.c1 + 1;
+			SortConditions.Ref.c1 += offset;
+			SortConditions.Ref.c2 += offset;
+		}
+	}*/
+	
+	if(this.SortState) 
+	{
+		this.SortState.changeColumns(activeRange);
+	}
+	
 	this.buildDependencies();
 };
 
@@ -5787,6 +5825,11 @@ AutoFilter.prototype.moveRef = function(col, row) {
 	var ref = this.Ref.clone();
 	ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
 	
+	if(this.SortState)
+	{
+		this.SortState.moveRef(col, row);
+	}
+	
 	this.Ref = ref;
 };
 AutoFilter.prototype.changeRef = function(col, row, bIsFirst) {
@@ -5934,7 +5977,29 @@ AutoFilter.prototype._getFilterColumnByColId = function(colId)
 	}
 	
 	return res;
-}; 
+};
+
+//функция используется только для изменения данных сортировки, называется так как и в классе TablePart. возможно стоит переименовать.
+AutoFilter.prototype.deleteTableColumns = function(activeRange)
+{
+	if(this.SortState) 
+	{
+		var bIsDeleteSortState = this.SortState.changeColumns(activeRange, true);
+		if(bIsDeleteSortState)
+		{
+			this.SortState = null;
+		}
+	}
+};
+
+//функция используется только для изменения данных сортировки, называется так как и в классе TablePart. возможно стоит переименовать.
+AutoFilter.prototype.addTableColumns = function(activeRange)
+{
+	if(this.SortState) 
+	{
+		this.SortState.changeColumns(activeRange);
+	}
+};
 
 function FilterColumns() {
 	this.ColId = null;
@@ -5955,9 +6020,10 @@ function SortState() {
 	this.CaseSensitive = null;
 	this.SortConditions = null;
 }
+
 SortState.prototype.clone = function() {
 	var i, res = new SortState();
-	res.Ref = this.Ref;
+	res.Ref = this.Ref ? this.Ref.clone() : null;
 	res.CaseSensitive = this.CaseSensitive;
 	if (this.SortConditions) {
 		res.SortConditions = [];
@@ -5966,6 +6032,52 @@ SortState.prototype.clone = function() {
 	}
 	return res;
 };
+
+SortState.prototype.moveRef = function(col, row) {
+	var ref = this.Ref.clone();
+	ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+	
+	this.Ref = ref;
+	
+	if (this.SortConditions) {
+		for (var i = 0; i < this.SortConditions.length; ++i)
+			this.SortConditions[i].moveRef(col, row);
+	}
+};
+
+SortState.prototype.changeRef = function(col, row, bIsFirst) {
+	var ref = this.Ref.clone();
+	if(bIsFirst)
+		ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+	else
+		ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+	
+	this.Ref = ref;
+};
+
+SortState.prototype.changeColumns = function(activeRange, isDelete)
+{
+	var bIsSortStateDelete = true;
+	//если изменяем диапазон так, что удаляется колонка с сортировкой, удаляем ее
+	if (this.SortConditions) 
+	{
+		for (var i = 0; i < this.SortConditions.length; ++i)
+		{
+			var bIsSortConditionsDelete = this.SortConditions[i].changeColumns(activeRange, isDelete);
+			if(bIsSortConditionsDelete)
+			{
+				this.SortConditions[i] = null;
+			}
+			else
+			{
+				bIsSortStateDelete = false;
+			}
+		}
+	}
+	return bIsSortStateDelete;
+};
+
+
 /** @constructor */
 function TableColumn() {
 	this.Name = null;
@@ -7216,12 +7328,50 @@ function SortCondition() {
 }
 SortCondition.prototype.clone = function() {
 	var res = new SortCondition();
-	res.Ref = this.Ref;
+	res.Ref = this.Ref ? this.Ref.clone() : null;
 	res.ConditionSortBy = this.ConditionSortBy;
 	res.ConditionDescending = this.ConditionDescending;
 	if (this.dxf)
 		res.dxf = this.dxf.clone();
 	return res;
+};
+SortCondition.prototype.moveRef = function(col, row) {
+	var ref = this.Ref.clone();
+	ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+	
+	this.Ref = ref;
+};
+SortCondition.prototype.changeColumns = function(activeRange, isDelete) {
+	var bIsDeleteCurSortCondition = false;
+	var ref = this.Ref.clone();
+	var offsetCol = null;
+	
+	if(isDelete)
+	{
+		if(activeRange.c1 <= ref.c1 && activeRange.c2 >= ref.c1)
+		{
+			bIsDeleteCurSortCondition = true;
+		}
+		else if(activeRange.c1 < ref.c1)
+		{
+			offsetCol = -(activeRange.c2 - activeRange.c1 + 1);
+		}
+	}
+	else
+	{
+		if(activeRange.c1 <= ref.c1)
+		{
+			offsetCol = activeRange.c2 - activeRange.c1 + 1;
+		}
+	}
+	
+	if(null !== offsetCol)
+	{
+		ref.setOffset({offsetCol: offsetCol, offsetRow: 0});
+		this.Ref = ref;
+	}
+	
+	return bIsDeleteCurSortCondition;
 };
 
 function AutoFilterDateElem(start, end, dateTimeGrouping) {

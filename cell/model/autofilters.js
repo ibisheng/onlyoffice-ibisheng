@@ -1411,8 +1411,7 @@
 							{
 								diffColId = ref.c1 - activeRange.c2 - 1;
 								
-								if(bTablePart)
-									filter.deleteTableColumns(activeRange);
+								filter.deleteTableColumns(activeRange);
 								
 								filter.changeRef(-diffColId, null, true);
 							}
@@ -1424,9 +1423,9 @@
 							oldFilter = filter.clone(null);
 							diffColId = activeRange.c1 - ref.c2 - 1;
 							
-							if(diff < 0 && bTablePart)
+							if(diff < 0)
 								filter.deleteTableColumns(activeRange);
-							else if(bTablePart)
+							else
 								filter.addTableColumns(activeRange, t);
 							
 							filter.changeRef(diffColId);						
@@ -1435,9 +1434,9 @@
 						{
 							oldFilter = filter.clone(null);
 							
-							if(diff < 0 && bTablePart)
+							if(diff < 0)
 								filter.deleteTableColumns(activeRange);
-							else if(bTablePart)
+							else
 								filter.addTableColumns(activeRange, t);	
 							
 							filter.changeRef(diff);
@@ -1681,6 +1680,7 @@
 					sortProps = this.getPropForSort(cellId, activeRange, displayName);
 					
 				curFilter = sortProps.curFilter, sortRange = sortProps.sortRange, filterRef = sortProps.filterRef, startCol = sortProps.startCol, maxFilterRow = sortProps.maxFilterRow;
+				var bIsAutoFilter = curFilter.isAutoFilter();
 				
 				var onSortAutoFilterCallback = function(type)
 				{
@@ -1692,8 +1692,14 @@
 					//изменяем содержимое фильтра
 					if(!curFilter.SortState)
 					{
+						var sortStateRange = new Asc.Range(curFilter.Ref.c1, curFilter.Ref.r1, curFilter.Ref.c2, maxFilterRow);
+						if(bIsAutoFilter || (!bIsAutoFilter && null === curFilter.HeaderRowCount))
+						{
+							sortStateRange.r1++;
+						}
+						
 						curFilter.SortState = new AscCommonExcel.SortState();
-						curFilter.SortState.Ref = new Asc.Range(startCol, curFilter.Ref.r1, startCol, maxFilterRow);
+						curFilter.SortState.Ref = sortStateRange;
 						curFilter.SortState.SortConditions = [];
 						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 					}
@@ -1729,8 +1735,14 @@
 					//изменяем содержимое фильтра
 					if(!curFilter.SortState)
 					{
+						var sortStateRange = new Asc.Range(curFilter.Ref.c1, curFilter.Ref.r1, curFilter.Ref.c2, maxFilterRow);
+						if(bIsAutoFilter || (!bIsAutoFilter && null === curFilter.HeaderRowCount))
+						{
+							sortStateRange.r1++;
+						}
+						
 						curFilter.SortState = new AscCommonExcel.SortState();
-						curFilter.SortState.Ref = new Asc.Range(startCol, curFilter.Ref.r1, startCol, maxFilterRow);
+						curFilter.SortState.Ref = sortStateRange;
 						curFilter.SortState.SortConditions = [];
 						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 					}
