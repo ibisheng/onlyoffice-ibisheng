@@ -1860,6 +1860,10 @@ DrawingObjectsController.prototype =
                 }
                 else
                 {
+                    var oDocContent = this.selectedObjects[0].getDocContent();
+                    if(oDocContent){
+                        oDocContent.Cursor_MoveToEndPos(false);
+                    }
                     this.selectedObjects[0].applyTextFunction(docContentFunction, tableFunction, args);
                     this.selection.textSelection.select(this, this.selection.textSelection.selectStartPage);
                 }
