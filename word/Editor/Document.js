@@ -7206,15 +7206,24 @@ CDocument.prototype.OnMouseUp = function(e, X, Y, PageIndex)
 				var Comment_X       = this.Get_PageLimits(PageIndex).XLimit;
 				var Para            = g_oTableId.Get_ById(Comment.StartId);
 
-				var TextTransform = Para.Get_ParentTextTransform();
-				if (TextTransform)
+				if (!Para)
 				{
-					Comment_Y = TextTransform.TransformPointY(Comment.m_oStartInfo.X, Comment.m_oStartInfo.Y);
+					// Такое может быть, если комментарий добавлен к заголовку таблицы
+					this.Select_Comment(null, false);
+					editor.sync_HideComment();
 				}
+				else
+				{
+					var TextTransform = Para.Get_ParentTextTransform();
+					if (TextTransform)
+					{
+						Comment_Y = TextTransform.TransformPointY(Comment.m_oStartInfo.X, Comment.m_oStartInfo.Y);
+					}
 
-				var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(Comment_X, Comment_Y, Comment_PageNum);
-				this.Select_Comment(Comment.Get_Id(), false);
-				editor.sync_ShowComment(Comment.Get_Id(), Coords.X, Coords.Y);
+					var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(Comment_X, Comment_Y, Comment_PageNum);
+					this.Select_Comment(Comment.Get_Id(), false);
+					editor.sync_ShowComment(Comment.Get_Id(), Coords.X, Coords.Y);
+				}
 			}
 			else
 			{

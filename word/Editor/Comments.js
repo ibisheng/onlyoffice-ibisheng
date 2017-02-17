@@ -774,15 +774,19 @@ ParaComment.prototype =
                 Page = HdrFtr.RecalcInfo.CurPage;
         }
 
-        if ( true === this.Start )
-        {
-            Comment.Set_StartId( Para.Get_Id() );
-            Comment.Set_StartInfo( Page, X, Y, H );
-        }
-        else
-        {
-            Comment.Set_EndId( Para.Get_Id() );
-        }                
+		if (Para && Para === AscCommon.g_oTableId.Get_ById(Para.Get_Id()))
+		{
+			// Заглушка для повторяющегося заголовка в таблицах
+			if (true === this.Start)
+			{
+				Comment.Set_StartId(Para.Get_Id());
+				Comment.Set_StartInfo(Page, X, Y, H);
+			}
+			else
+			{
+				Comment.Set_EndId(Para.Get_Id());
+			}
+		}
     },
 
     Recalculate_PageEndInfo : function(PRSI, _CurLine, _CurRange)
