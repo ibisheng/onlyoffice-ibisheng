@@ -2884,6 +2884,10 @@ DrawingObjectsController.prototype =
         var sRange = chartSettings.getRange();
         var b_clear_formatting = false;
         chartSpace.resetSelection(true);
+        var oPr = this.getPropsFromChart(chart_space);
+        if(oPr.isEqual(chartSettings)){
+            return;
+        }
         if(this.drawingObjects && this.drawingObjects.getWorksheet && typeof sRange === "string" && sRange.length > 0)
         {
             var ws_view = this.drawingObjects.getWorksheet();
