@@ -579,7 +579,7 @@
 					t.CoAuthoringApi.auth(t.getViewMode());
 				} else {
 					//первый запрос или ответ не дошел надо повторить открытие
-					t.asc_LoadDocument(false, true);
+					t.asc_LoadDocument(undefined, true);
 				}
 			}
 			else
