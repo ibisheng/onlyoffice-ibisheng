@@ -1818,6 +1818,9 @@ background-repeat: no-repeat;\
 			this.CoAuthoringApi.onUnSaveLock = function()
 			{
 				t.CoAuthoringApi.onUnSaveLock = null;
+				if (t.isForceSaveOnUserSave && t.IsUserSave) {
+					t.forceSave();
+				}
 
 				// Выставляем, что документ не модифицирован
 				t.CheckChangedDocument();
@@ -1916,16 +1919,23 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.asc_Save           = function(isAutoSave, isUndoRequest)
 	{
 		this.IsUserSave = !isAutoSave;
-		if (true === this.canSave && !this.isLongAction() && (this.asc_isDocumentCanSave() || History.Have_Changes() ||
-			AscCommon.CollaborativeEditing.Have_OtherChanges() || true === isUndoRequest || this.canUnlockDocument))
+		if (true === this.canSave && !this.isLongAction())
 		{
-			this.canSave = false;
-
-			var t = this;
-			this.CoAuthoringApi.askSaveChanges(function(e)
+			if (this.asc_isDocumentCanSave() || History.Have_Changes() ||
+				AscCommon.CollaborativeEditing.Have_OtherChanges() || true === isUndoRequest || this.canUnlockDocument)
 			{
-				t.onSaveCallback(e, isUndoRequest);
-			});
+				this.canSave = false;
+
+				var t = this;
+				this.CoAuthoringApi.askSaveChanges(function(e)
+				{
+					t.onSaveCallback(e, isUndoRequest);
+				});
+			}
+			else if (this.isForceSaveOnUserSave && this.IsUserSave)
+			{
+				this.forceSave();
+			}
 		}
 	};
 	asc_docs_api.prototype.asc_DownloadOrigin = function(bIsDownloadEvent)
@@ -7540,6 +7550,8 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['Paste']                                     = asc_docs_api.prototype.Paste;
 	asc_docs_api.prototype['Share']                                     = asc_docs_api.prototype.Share;
 	asc_docs_api.prototype['asc_Save']                                  = asc_docs_api.prototype.asc_Save;
+	asc_docs_api.prototype['forceSave']                                 = asc_docs_api.prototype.forceSave;
+	asc_docs_api.prototype['asc_setIsForceSaveOnUserSave']              = asc_docs_api.prototype.asc_setIsForceSaveOnUserSave;
 	asc_docs_api.prototype['asc_DownloadAs']                            = asc_docs_api.prototype.asc_DownloadAs;
 	asc_docs_api.prototype['asc_DownloadAsMailMerge']                   = asc_docs_api.prototype.asc_DownloadAsMailMerge;
 	asc_docs_api.prototype['asc_DownloadOrigin']                        = asc_docs_api.prototype.asc_DownloadOrigin;

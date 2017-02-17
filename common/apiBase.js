@@ -139,6 +139,7 @@
 
 		this.canSave    = true;        // Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
 		this.IsUserSave = false;    // Флаг, контролирующий сохранение было сделано пользователем или нет (по умолчанию - нет)
+		this.isForceSaveOnUserSave = false;
 
 		// Version History
 		this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий
@@ -486,6 +487,10 @@
 	baseEditorsApi.prototype.forceSave = function()
 	{
 		this.CoAuthoringApi.forceSave()
+	};
+	baseEditorsApi.prototype.asc_setIsForceSaveOnUserSave = function(val)
+	{
+		this.isForceSaveOnUserSave = val;
 	};
 	// Функция автосохранения. Переопределяется во всех редакторах
 	baseEditorsApi.prototype._autoSave = function () {

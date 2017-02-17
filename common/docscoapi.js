@@ -865,7 +865,11 @@
   };
 
 	DocsCoApi.prototype.forceSave = function() {
-		this._send({'type': 'forceSaveStart'});
+		var newForceSaveButtonTime = Math.max(this.lastOtherSaveTime, this.lastOwnSaveTime);
+		if (this._lastForceSaveButtonTime < newForceSaveButtonTime) {
+			this._lastForceSaveButtonTime = newForceSaveButtonTime;
+			this._send({'type': 'forceSaveStart'});
+		}
 	};
 
   DocsCoApi.prototype.openDocument = function(data) {
@@ -971,7 +975,7 @@
       }, timeout);
     }
   };
-  
+
 	DocsCoApi.prototype._onForceSaveStart = function(data) {
 		if (data['code'] === c_oAscServerCommandErrors.NoError) {
 			this._lastForceSaveButtonTime = data['time'];
@@ -982,9 +986,10 @@
 	DocsCoApi.prototype._onForceSave = function(data) {
 		if (c_oAscForceSaveTypes.Button === data['type']) {
 			if (this._lastForceSaveButtonTime == data['time']) {
-				this.onForceSave({type: c_oAscForceSaveTypes.Button, saved:true});
+				this.onForceSave({type: c_oAscForceSaveTypes.Button, saved: true});
 			}
-		} else if(c_oAscForceSaveTypes.Timeout === data['type']) {
+		}
+		if (null != this._lastForceSaveTime) {
 			this._lastForceSaveTime = data['time'];
 			this._checkLastForceSave();
 		}
@@ -992,13 +997,13 @@
 	DocsCoApi.prototype._checkLastForceSave = function(data) {
 		if (null != this._lastForceSaveTime) {
 			var newState = false;
-			if((-1 == this.lastOtherSaveTime || this.lastOtherSaveTime <= this._lastForceSaveTime) &&
+			if ((-1 == this.lastOtherSaveTime || this.lastOtherSaveTime <= this._lastForceSaveTime) &&
 				(-1 == this.lastOwnSaveTime || this.lastOwnSaveTime <= this._lastForceSaveTime)) {
 				newState = true;
-				}
-			if(newState != this._allChangesSaved){
+			}
+			if (newState != this._allChangesSaved) {
 				this._allChangesSaved = newState;
-				this.onForceSave({type: c_oAscForceSaveTypes.Timeout, saved:this._allChangesSaved});
+				this.onForceSave({type: c_oAscForceSaveTypes.Timeout, saved: this._allChangesSaved});
 			}
 		}
 	};
