@@ -7367,6 +7367,17 @@ background-repeat: no-repeat;\
 		}
 	};
 
+	/************************* Plugins "methods" ************************/
+	window["asc_docs_api"].prototype["pluginMethod_OpenFile"] = function(binaryFile, fields, baseUrl)
+	{
+		return "openFileReturn";
+	};
+	window["asc_docs_api"].prototype["pluginMethod_GetFields"] = function()
+	{
+		return { url : "onlyoffice.com" };
+	};
+	/********************************************************************/
+
 	// desktop editor spellcheck
 	function CSpellCheckApi_desktop()
 	{
