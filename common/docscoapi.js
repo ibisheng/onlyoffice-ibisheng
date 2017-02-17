@@ -35,7 +35,6 @@
 (function(window, undefined) {
   'use strict';
 
-  var asc_coAuthV = '4.3.0';
   var ConnectionState = AscCommon.ConnectionState;
   var c_oEditorId = AscCommon.c_oEditorId;
   var c_oCloseCode = AscCommon.c_oCloseCode;
@@ -51,6 +50,7 @@
       this.onAuthParticipantsChanged = options.onAuthParticipantsChanged;
       this.onParticipantsChanged = options.onParticipantsChanged;
       this.onMessage = options.onMessage;
+      this.onServerVersion = options.onServerVersion;
       this.onCursor =  options.onCursor;
       this.onMeta =  options.onMeta;
       this.onSession =  options.onSession;
@@ -87,6 +87,9 @@
       this._CoAuthoringApi.onMessage = function(e, clear) {
         t.callback_OnMessage(e, clear);
       };
+      this._CoAuthoringApi.onServerVersion = function(e) {
+      	t.callback_OnServerVersion(e);
+	  };
       this._CoAuthoringApi.onCursor = function(e) {
         t.callback_OnCursor(e);
       };
@@ -379,6 +382,12 @@
     }
   };
 
+  CDocsCoApi.prototype.callback_OnServerVersion = function(e) {
+  	if (this.onServerVersion) {
+      this.onServerVersion(e);
+	}
+  };
+
   CDocsCoApi.prototype.callback_OnCursor = function(e) {
     if (this.onCursor) {
       this.onCursor(e);
@@ -515,6 +524,7 @@
       this.onAuthParticipantsChanged = options.onAuthParticipantsChanged;
       this.onParticipantsChanged = options.onParticipantsChanged;
       this.onMessage = options.onMessage;
+      this.onServerVersion = options.onServerVersion;
       this.onCursor = options.onCursor;
       this.onMeta = options.onMeta;
       this.onSession =  options.onSession;
@@ -921,6 +931,12 @@
     }
   };
 
+  DocsCoApi.prototype._onServerVersion = function (data) {
+  	if (this.onServerVersion) {
+		this.onServerVersion(data['buildVersion'], data['buildNumber']);
+	}
+  };
+
   DocsCoApi.prototype._onCursor = function(data) {
     if (this.check_state() && data["messages"] && this.onCursor) {
       this.onCursor(data["messages"]);
@@ -1315,8 +1331,11 @@
     if (true === this._isAuth) {
       this._state = ConnectionState.Authorized;
       // Мы должны только соединиться для получения файла. Совместное редактирование уже было отключено.
-      if (this.isCloseCoAuthoring)
-        return;
+      if (this.isCloseCoAuthoring) {
+		  return;
+	  }
+
+	  this._onServerVersion(data);
 
       // Мы уже авторизовывались, нужно обновить пользователей (т.к. пользователи могли входить и выходить пока у нас не было соединения)
       this._onAuthParticipantsChanged(data['participants']);
@@ -1451,8 +1470,7 @@
       'mode': this.mode,
       'permissions': this.permissions,
       'jwtOpen': this.jwtOpen,
-      'jwtSession': this.jwtSession,
-      'version': asc_coAuthV
+      'jwtSession': this.jwtSession
     });
   };
 

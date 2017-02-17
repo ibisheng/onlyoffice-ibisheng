@@ -546,6 +546,9 @@
 		{
 			t.sendEvent('asc_onCoAuthoringChatReceiveMessage', e, clear);
 		};
+		this.CoAuthoringApi.onServerVersion = function (buildVersion, buildNumber) {
+			t.sendEvent('asc_onServerVersion', buildVersion, buildNumber);
+		};
 		this.CoAuthoringApi.onAuthParticipantsChanged = function(e, count)
 		{
 			t.sendEvent("asc_onAuthParticipantsChanged", e, count);
