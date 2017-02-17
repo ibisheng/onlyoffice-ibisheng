@@ -1759,17 +1759,24 @@ background-repeat: no-repeat;\
 	    if (AscCommon.CollaborativeEditing.Get_GlobalLock())
 	        return;
 
-		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
-		switch (_format)
+		var _logicDoc = this.WordControl.m_oLogicDocument;
+		if (!_logicDoc)
+			return;
+
+		if (false === _logicDoc.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
-			case AscCommon.c_oAscClipboardDataFormat.HtmlElement:
-				AscCommon.Editor_Paste_Exec(this, data1, data2);
-				break;
-			case AscCommon.c_oAscClipboardDataFormat.Internal:
-				AscCommon.Editor_Paste_Exec(this, null, null, data1);
-				break;
-			default:
-				break;
+			_logicDoc.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
+			switch (_format)
+			{
+				case AscCommon.c_oAscClipboardDataFormat.HtmlElement:
+					AscCommon.Editor_Paste_Exec(this, data1, data2);
+					break;
+				case AscCommon.c_oAscClipboardDataFormat.Internal:
+					AscCommon.Editor_Paste_Exec(this, null, null, data1);
+					break;
+				default:
+					break;
+			}
 		}
 	};
 
