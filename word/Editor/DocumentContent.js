@@ -2801,8 +2801,11 @@ CDocumentContent.prototype.Remove                             = function(Count, 
 {
     if (true === this.ApplyToAll)
     {
+    	var oNewPara = new Paragraph(this.DrawingDocument, this, 0, this.X, this.Y, this.XLimit, this.YLimit, this.bPresentation === true);
+    	oNewPara.Correct_Content();
+
         this.Internal_Content_RemoveAll();
-        this.Internal_Content_Add(0, new Paragraph(this.DrawingDocument, this, 0, this.X, this.Y, this.XLimit, this.YLimit, this.bPresentation === true));
+        this.Internal_Content_Add(0, oNewPara);
 
         this.CurPos =
         {
