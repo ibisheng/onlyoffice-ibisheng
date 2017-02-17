@@ -394,7 +394,7 @@
 		this.sendEvent("asc_onPrint");
 	};
 	// Open
-	baseEditorsApi.prototype.asc_LoadDocument                    = function(isVersionHistory, isRepeat)
+	baseEditorsApi.prototype.asc_LoadDocument                    = function(versionHistory, isRepeat)
 	{
 		// Меняем тип состояния (на открытие)
 		this.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.Open;
@@ -410,13 +410,14 @@
 				"title"         : this.documentTitle,
 				"embeddedfonts" : this.isUseEmbeddedCutFonts
 			};
-			if (isVersionHistory)
+			if (versionHistory)
 			{
+				rData["jwt"] = versionHistory.token;
 				//чтобы результат пришел только этому соединению, а не всем кто в документе
 				rData["userconnectionid"] = this.CoAuthoringApi.getUserConnectionId();
 			}
 		}
-		if (isVersionHistory) {
+		if (versionHistory) {
 			this.CoAuthoringApi.versionHistory(rData);
 		} else {
 			this.CoAuthoringApi.auth(this.getViewMode(), rData);
