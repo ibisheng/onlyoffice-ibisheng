@@ -75,7 +75,7 @@
 			asc_getOptions : function(val) { return this.options; }
 		};
 		
-		function SpecialPasteProps()
+		function СSpecialPasteProps()
 		{
 			this.cellStyle = true;
 			this.val = true;
@@ -96,9 +96,9 @@
 			this.images = true;
 		}
 		
-		SpecialPasteProps.prototype = {
+		СSpecialPasteProps.prototype = {
 			
-			constructor: SpecialPasteProps,
+			constructor: СSpecialPasteProps,
 			
 			clean: function()
 			{
@@ -251,15 +251,11 @@
 			this.copyProcessor = new CopyProcessorExcel();
 			this.pasteProcessor = new PasteProcessorExcel();
 			
-			this.specialPasteProps = null;
+			this.bIsEndTransaction = false;//если нужно сделать на end_paste endTransaction
+			
 			//TODO возможно стоит перенести в clipboard_base
 			this.pasteStart = false;//если true - осуществляется вставка. false выставляется только по полному окончанию вставки(загрузки картинок и тд)
 			this.specialPasteStart = false;
-			
-			this.bIsEndTransaction = false;//если нужно сделать на end_paste endTransaction
-			this.showSpecialPasteButton = false;//нужно показывать или нет кнопку специальной вставки
-			
-			this.specialPasteRange = null;//для того, чтобы показать в нужном месте иконку(кнопку) специальной вставки
 			
 			return this;
 		}
@@ -1372,7 +1368,7 @@
 				insertContent.Elements = this._convertBeforeInsertIntoShapeContent(worksheet, content, isConvertToPPTX, target_doc_content);
 				
 				//TODO конвертирую в текст без форматирую. пеесмотреть!
-				var specialPasteProps = window["Asc"]["editor"].wb.clipboard.specialPasteProps;
+				var specialPasteProps = window['AscCommon'].g_clipboardBase.specialPasteProps;
 				if(specialPasteProps && !specialPasteProps.format)
 				{
 					for(var i = 0; i < insertContent.Elements.length; i++)
@@ -1408,8 +1404,8 @@
 					var allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
 					worksheet.showSpecialPasteOptions(allowedSpecialPasteProps, null, position);
 					
-					window["Asc"]["editor"].wb.clipboard.specialPasteRange = cursorPos;
-					window["Asc"]["editor"].wb.clipboard.specialPasteShapeId = isIntoShape.Id;
+					window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range = cursorPos;
+					window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId = isIntoShape.Id;
 				}
 			},
 			
@@ -1939,7 +1935,7 @@
 				};
 				
 				var aImagesToDownload = this._getImageFromHtml(node, true);
-				var specialPasteProps = this.Api.wb.clipboard.specialPasteProps;
+				var specialPasteProps = window['AscCommon'].g_clipboardBase.specialPasteProps;
 				if(aImagesToDownload !== null && (!specialPasteProps || (specialPasteProps && specialPasteProps.images)))//load to server
 				{
                     var api = Asc["editor"];
@@ -4376,8 +4372,8 @@
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 		window["AscCommonExcel"].Clipboard = Clipboard;
 		
-		window["Asc"]["SpecialPasteProps"]       = window["Asc"].SpecialPasteProps = SpecialPasteProps;
-		prot									 = SpecialPasteProps.prototype;
+		window["Asc"]["SpecialPasteProps"]       = window["Asc"].SpecialPasteProps = СSpecialPasteProps;
+		prot									 = СSpecialPasteProps.prototype;
 		prot["asc_setProps"]				     = prot.asc_setProps;
 		
 		window["Asc"]["SpecialPasteShowOptions"] = window["Asc"].SpecialPasteShowOptions = SpecialPasteShowOptions;

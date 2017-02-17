@@ -711,9 +711,9 @@
 		},
 		"showSpecialPasteOptions": function(val) {
 			self.handlers.trigger("asc_onShowSpecialPasteOptions", val);
-			if(!window["Asc"]["editor"].wb.clipboard.showSpecialPasteButton)
+			if(!window['AscCommon'].g_clipboardBase.showSpecialPasteButton)
 			{
-				window["Asc"]["editor"].wb.clipboard.showSpecialPasteButton = true;
+				window['AscCommon'].g_clipboardBase.showSpecialPasteButton = true;
 			}
 		}
     });
@@ -829,10 +829,10 @@
       return !self.isShowComments;
     });
 	this.model.handlers.add("hideSpecialPasteOptions", function() {
-      if(window["Asc"]["editor"].wb.clipboard.showSpecialPasteButton)
+      if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton)
 	  {
 		self.handlers.trigger("asc_onHideSpecialPasteOptions");
-		window["Asc"]["editor"].wb.clipboard.showSpecialPasteButton = false;
+		window['AscCommon'].g_clipboardBase.showSpecialPasteButton = false;
 	  }
     });
 

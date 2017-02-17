@@ -8680,8 +8680,8 @@
                         break;
                         break;
                     case "paste":
-						var _clipboard = window["Asc"]["editor"].wb.clipboard;
-						_clipboard.specialPasteProps = _clipboard.specialPasteProps ? _clipboard.specialPasteProps : new Asc.SpecialPasteProps();
+						var clipboardBase = window['AscCommon'].g_clipboardBase;
+						clipboardBase.specialPasteProps = clipboardBase.specialPasteProps ? clipboardBase.specialPasteProps : new Asc.SpecialPasteProps();
 					
                         t._loadDataBeforePaste(isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth);
                         bIsUpdate = false;
@@ -8748,7 +8748,7 @@
                 newRange = this._pasteFromHTML(val, true);
             }
 			
-			if(!window["Asc"]["editor"].wb.clipboard.specialPasteProps)
+			if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
 			{
 				var sBinary = window["Asc"]["editor"].wb.clipboard.copyProcessor.getBinaryForCopy(this, newRange);
 				var specialPasteSelectionRange = new AscCommonExcel.SelectionRange();
@@ -8790,7 +8790,7 @@
 				pasteData = tempWorkbook.aWorksheets[0];
 			if(pasteData)
 			{
-				t._pasteFromBinary(pasteData, null, null, api.wb.clipboard.specialPasteProps);
+				t._pasteFromBinary(pasteData, null, null, window['AscCommon'].g_clipboardBase.specialPasteProps);
 			}
 			
 			//удаляем вставленные изображения
@@ -8819,7 +8819,7 @@
 		if(!isIntoShape && preSpecialPasteData && preSpecialPasteData.data)
 		{
 			var tempProps = new Asc.SpecialPasteProps();
-			api.wb.clipboard.specialPasteProps = tempProps;
+			window['AscCommon'].g_clipboardBase.specialPasteProps = tempProps;
 			
 			//меняем activeRange
 			if(specialPasteData.activeRange)
@@ -8838,7 +8838,7 @@
 		}
 		
 		//далее специальная вставка
-		api.wb.clipboard.specialPasteProps = props;
+		window['AscCommon'].g_clipboardBase.specialPasteProps = props;
 		//TODO пока для закрытия транзации выставляю флаг. пересмотреть!
 		window["Asc"]["editor"].wb.clipboard.bIsEndTransaction = true;
 		api.wb.clipboard.pasteData(this, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data, true);
@@ -8846,8 +8846,8 @@
 	
     WorksheetView.prototype._pasteData = function (isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth) {
         var t = this;
-		var _clipboard = window["Asc"]["editor"].wb.clipboard;
-		var specialPasteProps = _clipboard.specialPasteProps;
+		var g_clipboardBase = window['AscCommon'].g_clipboardBase;
+		var specialPasteProps = g_clipboardBase.specialPasteProps;
 		
 		if ( val.props && val.props.onlyImages === true ) {
 			if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
@@ -9004,8 +9004,8 @@
 
     WorksheetView.prototype._loadDataBeforePaste = function ( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth ) {
         var t = this;
-		var _clipboard = window["Asc"]["editor"].wb.clipboard;
-		var specialPasteProps = _clipboard.specialPasteProps;
+		var clipboardBase = window['AscCommon'].g_clipboardBase;
+		var specialPasteProps = clipboardBase.specialPasteProps;
 		
 		//paste from excel binary
 		if(fromBinary)
@@ -9296,8 +9296,8 @@
         lastSelection.r2 = arn.r2;
         var arnFor = [arn, arrFormula];
 		
-		var _clipboard = window["Asc"]["editor"].wb.clipboard;
-		_clipboard.specialPasteProps = null;
+		var clipboardBase = window['AscCommon'].g_clipboardBase;
+		clipboardBase.specialPasteProps = null;
 		
         return arnFor;
     };
@@ -9593,8 +9593,8 @@
         var arnFor = [trueActiveRange, arrFormula];
 		this.setSelection(trueActiveRange);
 		
-		var _clipboard = window["Asc"]["editor"].wb.clipboard;
-		_clipboard.specialPasteProps = null;
+		var clipboardBase = window['AscCommon'].g_clipboardBase;
+		clipboardBase.specialPasteProps = null;
 		
         return arnFor;
     };
@@ -9819,7 +9819,7 @@
 	{
 		var _clipboard = window["Asc"]["editor"].wb.clipboard;
 		var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
-		_clipboard.specialPasteRange = range;
+		window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range = range;
 		
 		var cellCoord;
 		if(!positionShapeContent)
@@ -9848,12 +9848,12 @@
 	{
 		var _clipboard = window["Asc"]["editor"].wb.clipboard;
 		var isIntoShape = this.objectRender.controller.getTargetDocContent(true);
-		if(_clipboard.showSpecialPasteButton && isIntoShape)
+		if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton && isIntoShape)
 		{
-			if(_clipboard.specialPasteShapeId === isIntoShape.Id && _clipboard.specialPasteRange)
+			if(window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId === isIntoShape.Id)
 			{
 				var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
-				var range = _clipboard.specialPasteRange;
+				var range = window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range;
 				
 				/*var trueShapeSelection = isIntoShape.Get_SelectionState();
 				isIntoShape.Set_SelectionState(range, range.length - 1);*/
@@ -9883,10 +9883,10 @@
 				//isIntoShape.Set_SelectionState(trueShapeSelection, trueShapeSelection.length - 1);
 			}
 		}
-		else if(_clipboard.showSpecialPasteButton && _clipboard.specialPasteRange)
+		else if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton)
 		{
 			var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
-			var range = _clipboard.specialPasteRange;
+			var range = window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range;
 			
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
 			var cellCoord = this.getCellCoord(range.c2, range.r2);
