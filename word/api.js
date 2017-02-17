@@ -7377,7 +7377,8 @@ background-repeat: no-repeat;\
 	/************************* Plugins "methods" ************************/
 	window["asc_docs_api"].prototype["pluginMethod_OpenFile"] = function(binaryFile, fields, baseUrl)
 	{
-		return "openFileReturn";
+		this.asc_CloseFile();
+		this.OpenDocument2(this.DocumentUrl, binaryFile);
 	};
 	window["asc_docs_api"].prototype["pluginMethod_GetFields"] = function()
 	{
