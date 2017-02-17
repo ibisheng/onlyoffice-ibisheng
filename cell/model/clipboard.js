@@ -1389,30 +1389,27 @@
 				if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
 				{
 					var sProps = Asc.c_oSpecialPasteProps;
-					var curParPos = isIntoShape.Content[isIntoShape.CurPos.ContentPos].CurPos;
 					var curShape = isIntoShape.Parent.parent;
 					
 					var asc_getcvt = Asc.getCvtRatio;
 					var mmToPx = asc_getcvt(3/*px*/, 0/*pt*/, worksheet._getPPIX());
 					var ptToPx = asc_getcvt(1/*px*/, 0/*pt*/, worksheet._getPPIX());
 					
-					var cellsLeftPx = worksheet.cellsLeft * ptToPx;
-					var cellsTopPx = worksheet.cellsTop * ptToPx;
-					var offsetXPx = worksheet.cols[worksheet.visibleRange.c1].left * ptToPx - cellsLeftPx;
-					var offsetYPx = worksheet.rows[worksheet.visibleRange.r1].top * ptToPx - cellsTopPx;
+					var cellsLeft = worksheet.cellsLeft * ptToPx;
+					var cellsTop = worksheet.cellsTop * ptToPx;
 					
-					var x_curParPosPx = curParPos.X * mmToPx;
-					var x_curShapePosPx = curShape.x * mmToPx + cellsLeftPx;
-					var xPos = x_curParPosPx + x_curShapePosPx - offsetXPx;
-					
-					var y_curParPosPx = curParPos.Y * mmToPx;
-					var y_curShapePosPx = curShape.y * mmToPx + cellsTopPx;
-					var yPos = y_curParPosPx + y_curShapePosPx - offsetYPx;
-					
-					var position = {x: xPos, y: yPos};
+					var cursorPos = target_doc_content.Cursor_GetPos();
+					var offsetX = worksheet.cols[worksheet.visibleRange.c1].left * ptToPx - cellsLeft;
+					var offsetY = worksheet.rows[worksheet.visibleRange.r1].top * ptToPx - cellsTop;
+					var posX = curShape.transformText.TransformPointX(cursorPos.X, cursorPos.Y) * mmToPx - offsetX + cellsLeft;
+					var posY = curShape.transformText.TransformPointY(cursorPos.X, cursorPos.Y) * mmToPx - offsetY + cellsTop;
+					var position = {x: posX, y: posY};
 					
 					var allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
 					worksheet.showSpecialPasteOptions(allowedSpecialPasteProps, null, position);
+					
+					window["Asc"]["editor"].wb.clipboard.specialPasteRange = cursorPos;
+					window["Asc"]["editor"].wb.clipboard.specialPasteShapeId = isIntoShape.Id;
 				}
 			},
 			

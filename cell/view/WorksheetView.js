@@ -8815,7 +8815,8 @@
 		window["Asc"]["editor"].wb.clipboard.start_paste();
 		
 		//откатываемся до того, что было до вставки
-		if(preSpecialPasteData && preSpecialPasteData.data)
+		var isIntoShape = this.objectRender.controller.getTargetDocContent(true);
+		if(!isIntoShape && preSpecialPasteData && preSpecialPasteData.data)
 		{
 			var tempProps = new Asc.SpecialPasteProps();
 			api.wb.clipboard.specialPasteProps = tempProps;
@@ -8828,13 +8829,12 @@
 			
 			undoPreviousPaste();
 		}
-		else if(preSpecialPasteData && preSpecialPasteData.shapeSelectionState)
+		else if(isIntoShape && preSpecialPasteData && preSpecialPasteData.shapeSelectionState)
 		{
 			//таким образом удаляю вставляенный фрагмент до специальной вставки
-			var docContent = this.objectRender.controller.getTargetDocContent(true);
 			var State = preSpecialPasteData.shapeSelectionState;
-			docContent.Set_SelectionState(State, State.length - 1);
-			docContent.Remove(1, true, true);
+			isIntoShape.Set_SelectionState(State, State.length - 1);
+			isIntoShape.Remove(1, true, true);
 		}
 		
 		//далее специальная вставка
@@ -9847,7 +9847,43 @@
 	 WorksheetView.prototype.updateSpecialPasteOptionsPosition = function()
 	{
 		var _clipboard = window["Asc"]["editor"].wb.clipboard;
-		if(_clipboard.showSpecialPasteButton && _clipboard.specialPasteRange)
+		var isIntoShape = this.objectRender.controller.getTargetDocContent(true);
+		if(_clipboard.showSpecialPasteButton && isIntoShape)
+		{
+			if(_clipboard.specialPasteShapeId === isIntoShape.Id && _clipboard.specialPasteRange)
+			{
+				var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
+				var range = _clipboard.specialPasteRange;
+				
+				/*var trueShapeSelection = isIntoShape.Get_SelectionState();
+				isIntoShape.Set_SelectionState(range, range.length - 1);*/
+				
+				var sProps = Asc.c_oSpecialPasteProps;
+				var curShape = isIntoShape.Parent.parent;
+				
+				var asc_getcvt = Asc.getCvtRatio;
+				var mmToPx = asc_getcvt(3/*px*/, 0/*pt*/, this._getPPIX());
+				var ptToPx = asc_getcvt(1/*px*/, 0/*pt*/, this._getPPIX());
+				
+				var cellsLeft = this.cellsLeft * ptToPx;
+				var cellsTop = this.cellsTop * ptToPx;
+				
+				var cursorPos = range//isIntoShape.Cursor_GetPos();
+				var offsetX = this.cols[this.visibleRange.c1].left * ptToPx - cellsLeft;
+				var offsetY = this.rows[this.visibleRange.r1].top * ptToPx - cellsTop;
+				var posX = curShape.transformText.TransformPointX(cursorPos.X, cursorPos.Y) * mmToPx - offsetX + cellsLeft;
+				var posY = curShape.transformText.TransformPointY(cursorPos.X, cursorPos.Y) * mmToPx - offsetY + cellsTop;
+				
+				
+				cellCoord = new AscCommon.asc_CRect( posX, posY, 0, 0 );
+				
+				specialPasteShowOptions.asc_setCellCoord(cellCoord);
+				this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
+				
+				//isIntoShape.Set_SelectionState(trueShapeSelection, trueShapeSelection.length - 1);
+			}
+		}
+		else if(_clipboard.showSpecialPasteButton && _clipboard.specialPasteRange)
 		{
 			var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
 			var range = _clipboard.specialPasteRange;
