@@ -4246,7 +4246,7 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
                 }
 
                 if ( Item.Width > nMinWidth )
-                    nMinWidth = Item.Width;
+                    nMinWidth = Item.Get_Width();
 
                 if ( nSpaceLen > 0 )
                 {
@@ -4254,7 +4254,7 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
                     nSpaceLen     = 0;
                 }
 
-                nCurMaxWidth += Item.Width;
+                nCurMaxWidth += Item.Get_Width();
                 bCheckTextHeight = true;
                 break;
             }
