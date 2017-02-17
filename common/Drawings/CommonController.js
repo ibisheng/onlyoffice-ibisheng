@@ -4291,7 +4291,12 @@ DrawingObjectsController.prototype =
             ret.putShowCatName(data_labels.showCatName === true);
             ret.putShowVal(data_labels.showVal === true);
             ret.putSeparator(data_labels.separator);
-            ret.putDataLabelsPos(AscFormat.isRealNumber(data_labels.dLblPos) ? data_labels.dLblPos :  nDefaultDatalabelsPos);
+            if(data_labels.showSerName || data_labels.showCatName || data_labels.showVal){
+                ret.putDataLabelsPos(AscFormat.isRealNumber(data_labels.dLblPos) ? data_labels.dLblPos :  nDefaultDatalabelsPos);
+            }
+            else{
+                ret.putDataLabelsPos(c_oAscChartDataLabelsPos.none);
+            }
         }
         else
         {
