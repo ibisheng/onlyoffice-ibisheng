@@ -7427,7 +7427,10 @@ background-repeat: no-repeat;\
 			this.asc_SetBlockChainData(fields);
 		var oLogicDocument = this.WordControl.m_oLogicDocument;
 		if (oLogicDocument)
+		{
+			AscCommon.CollaborativeEditing.Set_GlobalLock(true);
 			oLogicDocument.SetFillingFormMode(true);
+		}
 	};
 	window["asc_docs_api"].prototype["pluginMethod_GetFields"] = function()
 	{
