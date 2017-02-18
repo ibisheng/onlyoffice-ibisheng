@@ -39,6 +39,7 @@ var fieldtype_UNKNOWN    = 0x0000;
 var fieldtype_MERGEFIELD = 0x0001;
 var fieldtype_PAGENUM    = 0x0002;
 var fieldtype_PAGECOUNT  = 0x0003;
+var fieldtype_FORMTEXT   = 0x0004;
 
 /**
  *
@@ -63,6 +64,8 @@ function ParaField(FieldType, Arguments, Switches)
     this.TemplateContent = this.Content;
 
     this.Bounds = {};
+
+    this.FormFieldName = "";
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     AscCommon.g_oTableId.Add( this, this.Id );
@@ -246,6 +249,107 @@ ParaField.prototype.Draw_HighLights = function(PDSH)
         PDSH.MMFields.Add(Y0, Y1, X0, X1, 0, 0, 0, 0  );
     }
 };
+ParaField.prototype.Is_UseInDocument = function()
+{
+	return (this.Paragraph && true === this.Paragraph.Is_UseInDocument() && true === this.Is_UseInParagraph() ? true : false);
+};
+ParaField.prototype.Is_UseInParagraph = function()
+{
+	if (!this.Paragraph)
+		return false;
+
+	var ContentPos = this.Paragraph.Get_PosByElement(this);
+	if (!ContentPos)
+		return false;
+
+	return true;
+};
+ParaField.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
+{
+	if (false === UseContentPos && this.Content.length > 0)
+	{
+		// При переходе в новый контент встаем в его конец
+		var CurPos = this.Content.length - 1;
+		this.Content[CurPos].Get_EndPos(false, SearchPos.Pos, Depth + 1);
+		SearchPos.Pos.Update(CurPos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	ParaField.superclass.Get_LeftPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
+};
+ParaField.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+{
+	if (false === UseContentPos && this.Content.length > 0)
+	{
+		// При переходе в новый контент встаем в его начало
+		this.Content[0].Get_StartPos(SearchPos.Pos, Depth + 1);
+		SearchPos.Pos.Update(0, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	ParaField.superclass.Get_RightPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
+};
+
+CParagraphContentWithParagraphLikeContent.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
+{
+	if (this.Content.length <= 0)
+		return false;
+
+	var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length - 1 );
+
+	this.Content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
+	SearchPos.Pos.Update( CurPos, Depth );
+
+	if ( true === SearchPos.Found )
+		return true;
+
+	CurPos--;
+
+	while ( CurPos >= 0 )
+	{
+		this.Content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, false);
+		SearchPos.Pos.Update( CurPos, Depth );
+
+		if ( true === SearchPos.Found )
+			return true;
+
+		CurPos--;
+	}
+
+	return false;
+};
+CParagraphContentWithParagraphLikeContent.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+{
+	if (this.Content.length <= 0)
+		return false;
+
+	var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : 0 );
+
+	this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, UseContentPos, StepEnd);
+	SearchPos.Pos.Update( CurPos, Depth );
+
+	if ( true === SearchPos.Found )
+		return true;
+
+	CurPos++;
+
+	var Count = this.Content.length;
+	while ( CurPos < this.Content.length )
+	{
+		this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, false, StepEnd);
+		SearchPos.Pos.Update( CurPos, Depth );
+
+		if ( true === SearchPos.Found )
+			return true;
+
+		CurPos++;
+	}
+
+	return false;
+};
+
 //----------------------------------------------------------------------------------------------------------------------
 // Работа с данными поля
 //----------------------------------------------------------------------------------------------------------------------
@@ -374,6 +478,25 @@ ParaField.prototype.private_GetMappedRun = function(Value)
     oRun.Set_Pr(this.Get_FirstTextPr());
 
     return oRun;
+};
+ParaField.prototype.SetFormFieldName = function(sName)
+{
+	History.Add(new CChangesParaFieldFormFieldName(this, this.FormFieldName, sName));
+	this.FormFieldName = sName;
+};
+ParaField.prototype.GetFormFieldName = function()
+{
+	return this.FormFieldName;
+};
+ParaField.prototype.GetValue = function()
+{
+	var oText = new CParagraphGetText();
+	oText.SetBreakOnNonText(false);
+	oText.SetParaEndToSpace(true);
+
+	this.Get_Text(oText);
+
+	return oText.Text;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования

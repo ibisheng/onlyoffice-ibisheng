@@ -1205,6 +1205,19 @@ CDocumentFieldsManager.prototype.Restore_MailMergeTemplate = function()
         }
     }
 };
+CDocumentFieldsManager.prototype.GetAllFieldsByType = function(nType)
+{
+	var arrFields = [];
+	for (var nIndex = 0, nCount = this.m_aFields.length; nIndex < nCount; ++nIndex)
+	{
+		var oField = this.m_aFields[nIndex];
+		if (nType === oField.Get_FieldType() && oField.Is_UseInDocument())
+		{
+			arrFields.push(oField);
+		}
+	}
+	return arrFields;
+};
 
 var selected_None              = -1;
 var selected_DrawingObject     = 0;
@@ -15990,6 +16003,30 @@ CDocument.prototype.controller_GetCurrentSectionPr = function()
 CDocument.prototype.RemoveTextSelection = function()
 {
 	this.Controller.RemoveTextSelection();
+};
+CDocument.prototype.AddFormTextField = function(sName, sDefaultText)
+{
+	if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content))
+	{
+		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddMailMergeField);
+
+		var oField = new ParaField(fieldtype_FORMTEXT);
+		var oRun = new ParaRun();
+		oField.SetFormFieldName(sName);
+		for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
+		{
+			oRun.Add_ToContent(nIndex, new ParaText(sDefaultText.charAt(nIndex)));
+		}
+		oField.Add_ToContent(0, oRun);
+
+		this.Register_Field(oField);
+		this.Paragraph_Add(oField);
+		this.Document_UpdateInterfaceState();
+	}
+};
+CDocument.prototype.GetAllFormTextFields = function()
+{
+	return this.FieldsManager.GetAllFieldsByType(fieldtype_FORMTEXT);
 };
 
 

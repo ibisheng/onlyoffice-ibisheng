@@ -37,14 +37,16 @@
  * Time: 18:59
  */
 
-AscDFH.changesFactory[AscDFH.historyitem_Field_AddItem]    = CChangesParaFieldAddItem;
-AscDFH.changesFactory[AscDFH.historyitem_Field_RemoveItem] = CChangesParaFieldRemoveItem;
+AscDFH.changesFactory[AscDFH.historyitem_Field_AddItem]       = CChangesParaFieldAddItem;
+AscDFH.changesFactory[AscDFH.historyitem_Field_RemoveItem]    = CChangesParaFieldRemoveItem;
+AscDFH.changesFactory[AscDFH.historyitem_Field_FormFieldName] = CChangesParaFieldFormFieldName;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
 //----------------------------------------------------------------------------------------------------------------------
-AscDFH.changesRelationMap[AscDFH.historyitem_Field_AddItem]    = [AscDFH.historyitem_Field_AddItem, AscDFH.historyitem_Field_RemoveItem];
-AscDFH.changesRelationMap[AscDFH.historyitem_Field_RemoveItem] = [AscDFH.historyitem_Field_AddItem, AscDFH.historyitem_Field_RemoveItem];
+AscDFH.changesRelationMap[AscDFH.historyitem_Field_AddItem]       = [AscDFH.historyitem_Field_AddItem, AscDFH.historyitem_Field_RemoveItem];
+AscDFH.changesRelationMap[AscDFH.historyitem_Field_RemoveItem]    = [AscDFH.historyitem_Field_AddItem, AscDFH.historyitem_Field_RemoveItem];
+AscDFH.changesRelationMap[AscDFH.historyitem_Field_FormFieldName] = [AscDFH.historyitem_Field_FormFieldName];
 //----------------------------------------------------------------------------------------------------------------------
 
 /**
@@ -174,4 +176,18 @@ CChangesParaFieldRemoveItem.prototype.IsRelated = function(oChanges)
 CChangesParaFieldRemoveItem.prototype.CreateReverseChange = function()
 {
 	return this.private_CreateReverseChange(CChangesParaFieldAddItem);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseStringProperty}
+ */
+function CChangesParaFieldFormFieldName(Class, Old, New)
+{
+	CChangesParaFieldFormFieldName.superclass.constructor.call(this, Class, Old, New);
+}
+AscCommon.extendClass(CChangesParaFieldFormFieldName, AscDFH.CChangesBaseStringProperty);
+CChangesParaFieldFormFieldName.prototype.Type = AscDFH.historyitem_Field_FormFieldName;
+CChangesParaFieldFormFieldName.prototype.private_SetValue = function(Value)
+{
+	this.Class.FormFieldName = Value;
 };

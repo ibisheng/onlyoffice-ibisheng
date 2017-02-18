@@ -3714,7 +3714,7 @@ Paragraph.prototype =
         }
 
         // Если курсор находится в начале или конце гиперссылки, тогда выводим его из гиперссылки
-        while ( CurPos > 0 && para_Run !== this.Content[CurPos].Type && para_Math !== this.Content[CurPos].Type && true === this.Content[CurPos].Cursor_Is_Start() )
+        while ( CurPos > 0 && para_Run !== this.Content[CurPos].Type && para_Math !== this.Content[CurPos].Type && para_Field !== this.Content[CurPos].Type && true === this.Content[CurPos].Cursor_Is_Start() )
         {
             if ( false === this.Content[CurPos - 1].Is_CursorPlaceable() )
                 break;
@@ -3723,7 +3723,7 @@ Paragraph.prototype =
             this.Content[CurPos].Cursor_MoveToEndPos();
         }
 
-        while ( CurPos < Count && para_Run !== this.Content[CurPos].Type && para_Math !== this.Content[CurPos].Type && true === this.Content[CurPos].Cursor_Is_End() )
+        while ( CurPos < Count && para_Run !== this.Content[CurPos].Type && para_Math !== this.Content[CurPos].Type && para_Field !== this.Content[CurPos].Type && true === this.Content[CurPos].Cursor_Is_End() )
         {
             if ( false === this.Content[CurPos + 1].Is_CursorPlaceable() )
                 break;
@@ -4406,7 +4406,7 @@ Paragraph.prototype =
 
         CurPos--;
 
-        if (CurPos >= 0 && para_Math === this.Content[CurPos + 1].Type)
+        if (CurPos >= 0 && (para_Math === this.Content[CurPos + 1].Type || para_Field === this.Content[CurPos + 1].Type))
         {
             // При выходе из формулы встаем в конец рана
             this.Content[CurPos].Get_EndPos(false, SearchPos.Pos, Depth + 1);
@@ -4443,7 +4443,7 @@ Paragraph.prototype =
         CurPos++;
 
         var Count = this.Content.length;
-        if (CurPos < Count && para_Math === this.Content[CurPos - 1].Type)
+        if (CurPos < Count && (para_Math === this.Content[CurPos - 1].Type || para_Field === this.Content[CurPos - 1].Type))
         {
             // При выходе из формулы встаем в конец рана
             this.Content[CurPos].Get_StartPos(SearchPos.Pos, Depth + 1);

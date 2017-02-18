@@ -6880,6 +6880,28 @@ background-repeat: no-repeat;\
 		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddSectionBreak);
 		return true;
 	};
+	//----------------------------------------------------------------------------------------------------------------------
+	// Работаем с полями
+	//----------------------------------------------------------------------------------------------------------------------
+	asc_docs_api.prototype.asc_GetAllFormTextFieldsContent = function()
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return [];
+
+		var arrFields = oLogicDocument.GetAllFormTextFields();
+		var arrResult = [];
+		for (var nIndex = 0, nCount = arrFields.length; nIndex < nCount; ++nIndex)
+		{
+			var oField = arrFields[nIndex];
+
+			var sName = oField.GetFormFieldName();
+			var sText = oField.GetValue();
+
+			arrResult.push({Name : sName, Text : sText});
+		}
+		return arrResult;
+	};
 
 	// input
 	asc_docs_api.prototype.Begin_CompositeInput = function()
