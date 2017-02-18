@@ -498,6 +498,14 @@ ParaField.prototype.GetValue = function()
 
 	return oText.Text;
 };
+ParaField.prototype.SetValue = function(sValue)
+{
+	var oRun = this.private_GetMappedRun(sValue);
+	oRun.Apply_TextPr(this.Get_TextPr(), undefined, true);
+	this.Remove_FromContent(0, this.Content.length);
+	this.Add_ToContent(0, oRun);
+	this.Cursor_MoveToStartPos();
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------

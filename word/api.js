@@ -6883,7 +6883,7 @@ background-repeat: no-repeat;\
 	//----------------------------------------------------------------------------------------------------------------------
 	// Работаем с полями
 	//----------------------------------------------------------------------------------------------------------------------
-	asc_docs_api.prototype.asc_GetAllFormTextFieldsContent = function()
+	asc_docs_api.prototype.asc_GetBlockChainData = function()
 	{
 		var oLogicDocument = this.WordControl.m_oLogicDocument;
 		if (!oLogicDocument)
@@ -6894,13 +6894,24 @@ background-repeat: no-repeat;\
 		for (var nIndex = 0, nCount = arrFields.length; nIndex < nCount; ++nIndex)
 		{
 			var oField = arrFields[nIndex];
-
-			var sName = oField.GetFormFieldName();
-			var sText = oField.GetValue();
-
-			arrResult.push({Name : sName, Text : sText});
+			arrResult.push(oField.GetValue());
 		}
 		return arrResult;
+	};
+	asc_docs_api.prototype.asc_SetBlockChainData = function(arrData)
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return [];
+
+		var arrFields = oLogicDocument.GetAllFormTextFields();
+		var arrResult = [];
+		for (var nIndex = 0, nCount = arrFields.length; nIndex < nCount; ++nIndex)
+		{
+			var oField = arrFields[nIndex];
+			oField.SetValue(arrData[nIndex] ? arrData[nIndex] : "");
+		}
+		oLogicDocument.Recalculate();
 	};
 
 	// input
