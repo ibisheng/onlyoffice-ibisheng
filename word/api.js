@@ -6911,7 +6911,7 @@ background-repeat: no-repeat;\
 			var oField = arrFields[nIndex];
 			oField.SetValue(arrData[nIndex] ? arrData[nIndex] : "");
 		}
-		oLogicDocument.Recalculate();
+		oLogicDocument.Recalculate_FromStart();
 	};
 
 	// input
@@ -7423,13 +7423,15 @@ background-repeat: no-repeat;\
 		this.asc_CloseFile();
 		this.OpenDocument2(this.DocumentUrl, binaryFile);
 
+		if (fields)
+			this.asc_SetBlockChainData(fields);
 		var oLogicDocument = this.WordControl.m_oLogicDocument;
 		if (oLogicDocument)
 			oLogicDocument.SetFillingFormMode(true);
 	};
 	window["asc_docs_api"].prototype["pluginMethod_GetFields"] = function()
 	{
-		return { url : "onlyoffice.com" };
+		return this.asc_GetBlockChainData();
 	};
 	/********************************************************************/
 
