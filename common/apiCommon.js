@@ -913,7 +913,7 @@
 					if (nOldType === c_oAscChartTypeSettings.hBarNormal || nOldType === c_oAscChartTypeSettings.hBarStacked ||
 						nOldType === c_oAscChartTypeSettings.hBarStackedPer) {
 						var bTemp = this.showHorAxis;
-						this.putShowHorAxis(this.showVerAxis)
+						this.putShowHorAxis(this.showVerAxis);
 						this.putShowVerAxis(bTemp);
 					} else if (nOldType === c_oAscChartTypeSettings.pie || nOldType === c_oAscChartTypeSettings.doughnut) {
 						this.putShowHorAxis(true);
@@ -940,7 +940,7 @@
 					} else if (nOldType !== c_oAscChartTypeSettings.hBarNormal &&
 						nOldType !== c_oAscChartTypeSettings.hBarStacked && nOldType !== c_oAscChartTypeSettings.hBarStackedPer) {
 						var bTemp = this.showHorAxis;
-						this.putShowHorAxis(this.showVerAxis)
+						this.putShowHorAxis(this.showVerAxis);
 						this.putShowVerAxis(bTemp);
 					}
 					//this.putHorGridLines(c_oAscGridLinesSettings.none);
