@@ -4238,6 +4238,26 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 							});
 						}
 					}
+					else if (fieldtype_FORMTEXT === item.Get_FieldType()){
+						if(this.saveParams && this.saveParams.bMailMergeDocx)
+							oThis.WriteParagraphContent(item, bUseSelection, false);
+						else
+						{
+							var Instr = "FORMTEXT";
+							for(var j = 0; j < item.Arguments.length; ++j){
+								var argument = item.Arguments[j];
+								argument = argument.replace(/(\\|")/g, "\\$1");
+								if(-1 != argument.indexOf(' '))
+									argument = "\"" + argument + "\"";
+								Instr += " " + argument;
+							}
+							for(var j = 0; j < item.Switches.length; ++j)
+								Instr += " \\" + item.Switches[j];
+							this.bs.WriteItem(c_oSerParType.FldSimple, function () {
+								oThis.WriteFldSimple(Instr, function(){oThis.WriteParagraphContent(item, bUseSelection, false);});
+							});
+						}
+					}
                     break;
 				case para_Hyperlink:
                     this.bs.WriteItem(c_oSerParType.Hyperlink, function () {
@@ -9348,6 +9368,11 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 			oRes = new ParaField(fieldtype_MERGEFIELD, aArguments, aSwitches);
             if (editor)
                editor.WordControl.m_oLogicDocument.Register_Field(oRes);
+		}
+		else if ("FORMTEXT" == sFieldType){
+			oRes = new ParaField(fieldtype_FORMTEXT, aArguments, aSwitches);
+			if (editor)
+				editor.WordControl.m_oLogicDocument.Register_Field(oRes);
 		}
 		return oRes;
 	}
