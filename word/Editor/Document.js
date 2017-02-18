@@ -16028,6 +16028,24 @@ CDocument.prototype.GetAllFormTextFields = function()
 {
 	return this.FieldsManager.GetAllFieldsByType(fieldtype_FORMTEXT);
 };
+CDocument.prototype.IsFillingFormMode = function()
+{
+	return this.FillingFormMode;
+};
+CDocument.prototype.SetFillingFormMode = function(isFillingForm)
+{
+	this.FillingFormMode = isFillingForm;
+};
+CDocument.prototype.IsInFormField = function()
+{
+	var oSelectedInfo = this.Get_SelectedElementsInfo();
+	var oField        = oSelectedInfo.Get_Field();
+
+	if (oSelectedInfo.Is_MixedSelection() || !oField || fieldtype_FORMTEXT !== oField.Get_FieldType())
+		return false;
+
+	return true;
+};
 
 
 function CDocumentSelectionState()

@@ -7422,6 +7422,10 @@ background-repeat: no-repeat;\
 	{
 		this.asc_CloseFile();
 		this.OpenDocument2(this.DocumentUrl, binaryFile);
+
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (oLogicDocument)
+			oLogicDocument.SetFillingFormMode(true);
 	};
 	window["asc_docs_api"].prototype["pluginMethod_GetFields"] = function()
 	{

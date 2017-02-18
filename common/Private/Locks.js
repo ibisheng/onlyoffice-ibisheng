@@ -39,7 +39,7 @@ if(typeof CDocument !== "undefined")
 {
 	CDocument.prototype.Document_Is_SelectionLocked = function(CheckType, AdditionalData, DontLockInFastMode)
 	{
-		if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
+		if (true === AscCommon.CollaborativeEditing.Get_GlobalLock() && (false === this.IsFillingFormMode() || false === this.IsInFormField()))
 			return true;
 
 		AscCommon.CollaborativeEditing.OnStart_CheckLock();
