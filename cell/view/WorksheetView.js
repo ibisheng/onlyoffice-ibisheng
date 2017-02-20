@@ -12452,7 +12452,7 @@
         var sortColor = null;
         if (filter && filter.SortState && filter.SortState.SortConditions && filter.SortState.SortConditions[0]) {
             var SortConditions = filter.SortState.SortConditions[0];
-            if (rangeButton.r1 == SortConditions.Ref.r1 && rangeButton.c1 == SortConditions.Ref.c1) {
+            if (rangeButton.c1 == SortConditions.Ref.c1) {
 
                 var conditionSortBy = SortConditions.ConditionSortBy;
                 switch (conditionSortBy) {
