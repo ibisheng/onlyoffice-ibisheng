@@ -1404,6 +1404,7 @@
 					var allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
 					worksheet.showSpecialPasteOptions(allowedSpecialPasteProps, null, position);
 					
+					window['AscCommon'].g_clipboardBase.specialPasteButtonProps = {};
 					window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range = cursorPos;
 					window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId = isIntoShape.Id;
 				}

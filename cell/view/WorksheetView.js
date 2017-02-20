@@ -9819,11 +9819,13 @@
 	{
 		var _clipboard = window["Asc"]["editor"].wb.clipboard;
 		var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
-		window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range = range;
 		
 		var cellCoord;
 		if(!positionShapeContent)
 		{
+			window['AscCommon'].g_clipboardBase.specialPasteButtonProps = {};
+			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range = range;
+			
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
 			cellCoord = this.getCellCoord(range.c2, range.r2);
 			if(!isVisible)
@@ -9890,7 +9892,7 @@
 			
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
 			var cellCoord = this.getCellCoord(range.c2, range.r2);
-			if(!isVisible)
+			if(!isVisible || window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId)
 			{
 				cellCoord._x = -1;
 				cellCoord._y = -1;
