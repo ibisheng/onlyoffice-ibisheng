@@ -3136,23 +3136,23 @@ DrawingObjectsController.prototype =
                     if(chart_type.grouping !== need_groupping)
                         chart_type.setGrouping(need_groupping);
 
-                    if(chart_type.gapWidth !== 150)
+                    if(!AscFormat.isRealNumber(chart_type.gapWidth))
                     {
                         chart_type.setGapWidth(150);
                     }
                     if(BAR_GROUPING_PERCENT_STACKED === need_groupping || BAR_GROUPING_STACKED === need_groupping)
                     {
-                        if(chart_type.overlap !== 100)
+                        if(!AscFormat.isRealNumber(chart_type.overlap))
                         {
                             chart_type.setOverlap(100);
                         }
                     }
                     else
                     {
-                        if(chart_type.overlap !== null)
+                        /*if(chart_type.overlap !== null)
                         {
                             chart_type.setOverlap(null);
-                        }
+                        }*/
                     }
 
                     axis_by_types = chart_type.getAxisByTypes();
@@ -3861,24 +3861,14 @@ DrawingObjectsController.prototype =
         var data_labels_pos_setting = chartSettings.getDataLabelsPos();
         if(AscFormat.isRealNumber(data_labels_pos_setting))
         {
-            if(data_labels_pos_setting === c_oAscChartDataLabelsPos.none)
-            {
+            if(data_labels_pos_setting === c_oAscChartDataLabelsPos.none){
                 if(chart_type.dLbls)
                     chart_type.setDLbls(null);
                 chart_type.removeDataLabels();
             }
             else
             {
-                if(AscFormat.isRealNumber(data_labels_pos_setting))
-                {
-                    chart_type.removeDataLabels();
-                    if(!chart_type.dLbls)
-                    {
-                        var d_lbls = new AscFormat.CDLbls();
-                        d_lbls.setShowVal(true);
-                        chart_type.setDLbls(d_lbls);
-                        chart_type.dLbls.setParent(chart_type);
-                    }
+                if(AscFormat.isRealNumber(data_labels_pos_setting)){
                     var finish_dlbl_pos =  data_labels_pos_setting;
 
                     switch (chart_type.getObjectType())
@@ -3947,49 +3937,69 @@ DrawingObjectsController.prototype =
                         }
                     }
 
-                    if(chart_type.dLbls.dLblPos !== finish_dlbl_pos)
-                        chart_type.dLbls.setDLblPos(finish_dlbl_pos);
+                    for(var i = 0; i < chart_type.series.length; ++i){
+                        if(chart_type.series[i].setDLbls){
+                            if(!chart_type.series[i].dLbls){
+                                var d_lbls = new AscFormat.CDLbls();
+                                d_lbls.setShowVal(true);
+                                chart_type.series[i].setDLbls(d_lbls);
+                                chart_type.series[i].dLbls.setParent(chart_type);
+                            }
+                            if(chart_type.series[i].dLbls.dLblPos !== finish_dlbl_pos){
+                                chart_type.series[i].dLbls.setDLblPos(finish_dlbl_pos);
+                            }
+                            for(var j = 0; j < chart_type.series[i].dLbls.dLbl.length; ++j){
+                                if(chart_type.series[i].dLbls.dLbl[j].dLblPos !== finish_dlbl_pos){
+                                    chart_type.series[i].dLbls.dLbl[j].setDLblPos(finish_dlbl_pos);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
         //подписи данных
         if(typeof chart_type.setDLbls === "function" && AscFormat.isRealNumber(chartSettings.getDataLabelsPos()) && chartSettings.getDataLabelsPos() !== c_oAscChartDataLabelsPos.none)
         {
-            var checkDataLabels = function(chartType)
-            {
-                chartType.removeDataLabels();
-                if(!chartType.dLbls)
-                {
-                    chartType.setDLbls(new AscFormat.CDLbls());
-                    chartType.dLbls.setParent(chartType);
-                }
-                return chartType.dLbls;
-            };
-            if(AscFormat.isRealBool(chartSettings.showCatName))
-                checkDataLabels(chart_type).setShowCatName(chartSettings.showCatName);
-            if(AscFormat.isRealBool(chartSettings.showSerName))
-                checkDataLabels(chart_type).setShowSerName(chartSettings.showSerName);
-            if(AscFormat.isRealBool(chartSettings.showVal))
-                checkDataLabels(chart_type).setShowVal(chartSettings.showVal);
-
-            var d_lbls2 = chart_type.dLbls;
-            if(d_lbls2)
-            {
-                if(!AscFormat.isRealBool(d_lbls2.showLegendKey) || d_lbls2.showLegendKey === true)
-                {
-                    d_lbls2.setShowLegendKey(false);
-                }
-                if(!AscFormat.isRealBool(d_lbls2.showPercent) || d_lbls2.showPercent === true)
-                {
-                    d_lbls2.setShowPercent(false);
-                }
-                if(!AscFormat.isRealBool(d_lbls2.showBubbleSize) || d_lbls2.showBubbleSize === true)
-                {
-                    d_lbls2.setShowBubbleSize(false);
+            if(AscFormat.isRealBool(chartSettings.showCatName) ||
+                AscFormat.isRealBool(chartSettings.showSerName) ||
+                AscFormat.isRealBool(chartSettings.showVal)){
+                var fCheckLbls = function(oLbl){
+                    if(AscFormat.isRealBool(chartSettings.showCatName)){
+                        oLbl.setShowCatName(chartSettings.showCatName);
+                    }
+                    if(AscFormat.isRealBool(chartSettings.showSerName)){
+                        oLbl.setShowSerName(chartSettings.showSerName);
+                    }
+                    if(AscFormat.isRealBool(chartSettings.showVal)){
+                        oLbl.setShowVal(chartSettings.showVal);
+                    }
+                    if(!AscFormat.isRealBool(oLbl.showLegendKey) || oLbl.showLegendKey === true)                {
+                        oLbl.setShowLegendKey(false);
+                    }
+                    if(!AscFormat.isRealBool(oLbl.showPercent) || oLbl.showPercent === true){
+                        oLbl.setShowPercent(false);
+                    }
+                    if(!AscFormat.isRealBool(oLbl.showBubbleSize) || oLbl.showBubbleSize === true){
+                        oLbl.setShowBubbleSize(false);
+                    }
+                    if(typeof chartSettings.separator === "string" && chartSettings.separator.length > 0)
+                        oLbl.setSeparator(chartSettings.separator);
+                };
+                for(var i = 0; i < chart_type.series.length; ++i){
+                    var oSeries = chart_type.series[i];
+                    if(oSeries.setDLbls){
+                        if(!oSeries.dLbls){
+                            oSeries.setDLbls(new AscFormat.CDLbls());
+                            oSeries.dLbls.setParent(oSeries);
+                        }
+                    }
+                    fCheckLbls(oSeries.dLbls);
+                    for(var j = 0; j < oSeries.dLbls.dLbl.length; ++j){
+                        fCheckLbls(oSeries.dLbls.dLbl[j]);
+                    }
                 }
             }
-            if(typeof chartSettings.separator === "string" && chartSettings.separator.length > 0)
-                checkDataLabels(chart_type).setSeparator(chartSettings.separator);
         }
 
         if(chart_type.getObjectType() === AscDFH.historyitem_type_LineChart )
@@ -10144,7 +10154,7 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
     for(i = 0; i < oChart.series.length; ++i){
         var pts = AscFormat.getPtsFromSeries(oChart.series[i]);
 
-        for(var j = oChart.series[i].dPt.length; j > -1; --j){
+        for(var j = oChart.series[i].dPt.length - 1; j > -1; --j){
             oChart.series[i].removeDPt(j);
         }
         if(oChart.getObjectType() === AscDFH.historyitem_type_PieChart || oChart.getObjectType() === AscDFH.historyitem_type_DoughnutChart){
@@ -10162,27 +10172,30 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
             ApplySpPr(aPreset[11], oChart.series[i], i, base_fills, bAccent1Background);
         }
         if(oChart.getObjectType() === AscDFH.historyitem_type_PieChart || oChart.getObjectType() === AscDFH.historyitem_type_DoughnutChart){
-            ApplyDLblsProps(aPreset[12], oChart.series[i], oDrawingDocument, i, base_fills, bCreate);
+            ApplyDLblsProps(aPreset[12], oChart.series[i], oDrawingDocument, i, base_fills, true);
             if(oChart.series[i].dLbls){
                 for(var j = 0; j < pts.length; ++j){
-                    var oDLbl = new AscFormat.CDLbl();
-                    ApplyTxPr(aPreset[12][0], oDLbl, oDrawingDocument, j, base_fills, bAccent1Background);
-                    ApplySpPr(aPreset[12][1], oDLbl, j, base_fills, bAccent1Background);
-                    oDLbl.setDLblPos(aPreset[12][2]);
-                    oDLbl.setSeparator(aPreset[12][3]);
-                    oDLbl.setShowBubbleSize(aPreset[12][4]);
-                    oDLbl.setShowCatName(aPreset[12][5]);
-                    oDLbl.setShowLegendKey(aPreset[12][7]);
-                    oDLbl.setShowPercent(aPreset[12][8]);
-                    oDLbl.setShowSerName(aPreset[12][9]);
-                    oDLbl.setShowVal(aPreset[12][10]);
-                    oDLbl.setIdx(pts[j].idx);
-                    oChart.series[i].dLbls.addDLbl(oDLbl);
+                    var oDLbl = oChart.series[i].dLbls.findDLblByIdx(pts[j].idx);
+                    if(!oDLbl){
+                        oDLbl = new AscFormat.CDLbl();
+                        oChart.series[i].dLbls.addDLbl(oDLbl);
+                        oDLbl.setIdx(pts[j].idx);
+                        ApplyTxPr(aPreset[12][0], oDLbl, oDrawingDocument, j, base_fills, bAccent1Background);
+                        ApplySpPr(aPreset[12][1], oDLbl, j, base_fills, bAccent1Background);
+                        oDLbl.setDLblPos(aPreset[12][2]);
+                        oDLbl.setSeparator(aPreset[12][3]);
+                        oDLbl.setShowBubbleSize(aPreset[12][4]);
+                        oDLbl.setShowCatName(aPreset[12][5]);
+                        oDLbl.setShowLegendKey(aPreset[12][7]);
+                        oDLbl.setShowPercent(aPreset[12][8]);
+                        oDLbl.setShowSerName(aPreset[12][9]);
+                        oDLbl.setShowVal(aPreset[12][10]);
+                    }
                 }
             }
         }
         else{
-            ApplyDLblsProps(aPreset[12], oChart.series[i], oDrawingDocument, i, base_fills, bCreate);
+            ApplyDLblsProps(aPreset[12], oChart.series[i], oDrawingDocument, i, base_fills, true);
         }
     }
 
