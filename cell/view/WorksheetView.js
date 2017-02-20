@@ -7233,6 +7233,7 @@
         if (this.isSelectOnShape) {
             this.isSelectOnShape = false;
             this.objectRender.unselectDrawingObjects();
+			this.updateSpecialPasteOptionsPosition();
         }
         return isSelectOnShape;
     };
@@ -7251,6 +7252,8 @@
         // отправляем евент для получения свойств картинки, шейпа или группы
         this.model.workbook.handlers.trigger( "asc_onHideComment" );
         this._updateSelectionNameAndInfo();
+		
+		this.updateSpecialPasteOptionsPosition();
     };
     WorksheetView.prototype.setSelection = function (range, validRange) {
         // Проверка на валидность range.
@@ -8816,10 +8819,17 @@
 		
 		//откатываемся до того, что было до вставки
 		var isIntoShape = this.objectRender.controller.getTargetDocContent(true);
-		if(!isIntoShape && preSpecialPasteData && preSpecialPasteData.data)
+		//курсор и специальная вставка не в шейпе + курсор в шейпе, специальная вставка на листе
+		if(preSpecialPasteData && preSpecialPasteData.data && !window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId)
 		{
 			var tempProps = new Asc.SpecialPasteProps();
 			window['AscCommon'].g_clipboardBase.specialPasteProps = tempProps;
+			
+			//переводим фокус из шейпа на лист
+			if(isIntoShape)
+			{
+				this.objectRender.controller.resetSelection();
+			}
 			
 			//меняем activeRange
 			if(specialPasteData.activeRange)
@@ -8829,7 +8839,7 @@
 			
 			undoPreviousPaste();
 		}
-		else if(isIntoShape && preSpecialPasteData && preSpecialPasteData.shapeSelectionState)
+		else if(isIntoShape && preSpecialPasteData && preSpecialPasteData.shapeSelectionState)//курсор и специальная вставка в шейпе
 		{
 			//таким образом удаляю вставляенный фрагмент до специальной вставки
 			var State = preSpecialPasteData.shapeSelectionState;
@@ -9305,6 +9315,7 @@
     WorksheetView.prototype._pasteFromBinary = function (val, isCheckSelection, tablesMap, specialPasteProps) {
         var t = this;
 		var trueActiveRange = t.model.selectionRange.getLast().clone();
+		var lastSelection = this.model.selectionRange.getLast();
         var arn = t.model.selectionRange.getLast().clone();
         var arrFormula = [];
 
@@ -9591,7 +9602,11 @@
 
         t.isChanged = true;
         var arnFor = [trueActiveRange, arrFormula];
-		this.setSelection(trueActiveRange);
+		
+		//TODO переделать на setSelection. закомментировал в связи с падением, когда вставляем ниже видимой зоны таблицы
+		//this.setSelection(trueActiveRange);
+		lastSelection.c2 = trueActiveRange.c2;
+        lastSelection.r2 = trueActiveRange.r2;
 		
 		var clipboardBase = window['AscCommon'].g_clipboardBase;
 		clipboardBase.specialPasteProps = null;
