@@ -11590,9 +11590,9 @@
                     {
                         type = Asc.c_oAscSortOptions.ByColorFont;
                         if (sortState.SortConditions[0].ConditionDescending) {
-                            type = Asc.c_oAscSortOptions.Ascending;
-                        } else {
                             type = Asc.c_oAscSortOptions.Descending;
+                        } else {
+                            type = Asc.c_oAscSortOptions.Ascending;
                         }
                     }
                 }
@@ -11986,7 +11986,7 @@
 						{
 							if(colId === sortCondition.Ref.c1 - range.c1)
 							{
-								isSortState = sortCondition.ConditionDescending;
+								isSortState = !sortCondition.ConditionDescending;
 							}
 						}
 
@@ -12470,7 +12470,7 @@
                     }
                     default:
                     {
-                        if (filter.SortState.SortConditions[0].ConditionDescending == false) {
+                        if (filter.SortState.SortConditions[0].ConditionDescending) {
                             sortVal = Asc.c_oAscSortOptions.Descending;
                         } else {
                             sortVal = Asc.c_oAscSortOptions.Ascending;
