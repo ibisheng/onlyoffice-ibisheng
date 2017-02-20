@@ -1234,18 +1234,20 @@ Num.prototype =
             break;
         }
       } else {
+		//todo currencyLocale true/false?
+		var currencyLocale = true;
         switch (this.id) {
           case 5:
-            res = AscCommon.getCurrencyFormatSimple(null, 0, true, false, false);
+            res = AscCommon.getCurrencyFormatSimple(null, 0, true, currencyLocale, false);
             break;
           case 6:
-            res = AscCommon.getCurrencyFormatSimple(null, 0, true, false, true);
+            res = AscCommon.getCurrencyFormatSimple(null, 0, true, currencyLocale, true);
             break;
           case 7:
-            res = AscCommon.getCurrencyFormatSimple(null, 2, true, false, false);
+            res = AscCommon.getCurrencyFormatSimple(null, 2, true, currencyLocale, false);
             break;
           case 8:
-            res = AscCommon.getCurrencyFormatSimple(null, 2, true, false, true);
+            res = AscCommon.getCurrencyFormatSimple(null, 2, true, currencyLocale, true);
             break;
           case 14:
             res = AscCommon.getShortDateFormat(null);
@@ -1262,28 +1264,28 @@ Num.prototype =
             res = AscCommon.getShortDateFormat(null);
             break;
           case 37:
-            res = AscCommon.getCurrencyFormatSimple(null, 0, false, false, false);
+            res = AscCommon.getCurrencyFormatSimple(null, 0, false, currencyLocale, false);
             break;
           case 38:
-            res = AscCommon.getCurrencyFormatSimple(null, 0, false, false, true);
+            res = AscCommon.getCurrencyFormatSimple(null, 0, false, currencyLocale, true);
             break;
           case 39:
-            res = AscCommon.getCurrencyFormatSimple(null, 2, false, false, false);
+            res = AscCommon.getCurrencyFormatSimple(null, 2, false, currencyLocale, false);
             break;
           case 40:
-            res = AscCommon.getCurrencyFormatSimple(null, 2, false, false, true);
+            res = AscCommon.getCurrencyFormatSimple(null, 2, false, currencyLocale, true);
             break;
           case 41:
-            res = AscCommon.getCurrencyFormat(null, 0, false, false);
+            res = AscCommon.getCurrencyFormat(null, 0, false, currencyLocale);
             break;
           case 42:
-            res = AscCommon.getCurrencyFormat(null, 0, true, false);
+            res = AscCommon.getCurrencyFormat(null, 0, true, currencyLocale);
             break;
           case 43:
-            res = AscCommon.getCurrencyFormat(null, 2, false, false);
+            res = AscCommon.getCurrencyFormat(null, 2, false, currencyLocale);
             break;
           case 44:
-            res = AscCommon.getCurrencyFormat(null, 2, true, false);
+            res = AscCommon.getCurrencyFormat(null, 2, true, currencyLocale);
             break;
         }
       }
