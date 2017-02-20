@@ -3277,6 +3277,7 @@ CChartSpace.prototype.recalculateReferences = function()
     {
         series = charts[i].series;
         var bHaveHidden = false, bHaveNoHidden = false;
+        var bCheckFormatCode = false;
         if(charts[i].getObjectType() !== AscDFH.historyitem_type_ScatterChart)
         {
             for(j = 0; j < series.length; ++j)
@@ -3297,6 +3298,27 @@ CChartSpace.prototype.recalculateReferences = function()
                 else
                 {
                     bHaveNoHidden = true;
+                    if(!bCheckFormatCode &&
+                        !((charts[i].getObjectType() === AscDFH.historyitem_type_BarChart && charts[i].grouping === AscFormat.BAR_GROUPING_PERCENT_STACKED)
+                        || (charts[i].getObjectType() !== AscDFH.historyitem_type_BarChart && charts[i].grouping === AscFormat.GROUPING_PERCENT_STACKED))){
+                        bCheckFormatCode = true;
+                        var aAxId = charts[i].axId;
+                        if(aAxId){
+                            for(var s = 0; s < aAxId.length; ++s){
+                                if(aAxId[s].getObjectType() === AscDFH.historyitem_type_ValAx){
+                                    if(aAxId[s].numFmt && aAxId[s].numFmt.sourceLinked){
+                                        var aPoints = AscFormat.getPtsFromSeries(ser);
+                                        if(aPoints[0] && typeof aPoints[0].formatCode === "string" && aPoints[0].formatCode.length > 0){
+                                            aAxId[s].numFmt.setFormatCode(aPoints[0].formatCode);
+                                        }
+                                        else{
+                                            aAxId[s].numFmt.setFormatCode("General");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
             }
@@ -3317,6 +3339,27 @@ CChartSpace.prototype.recalculateReferences = function()
                 else
                 {
                     bHaveNoHidden = true;
+
+                    if(!bCheckFormatCode){
+                        bCheckFormatCode = true;
+                        var aAxId = charts[i].axId;
+                        if(aAxId){
+                            for(var s = 0; s < aAxId.length; ++s){
+                                if(aAxId[s].getObjectType() === AscDFH.historyitem_type_ValAx){
+                                    if((aAxId[s].axPos === AscFormat.AX_POS_L || aAxId[s].axPos === AscFormat.AX_POS_R) && aAxId[s].numFmt && aAxId[s].numFmt.sourceLinked){
+                                        var aPoints = AscFormat.getPtsFromSeries(ser);
+                                        if(aPoints[0] && typeof aPoints[0].formatCode === "string" && aPoints[0].formatCode.length > 0){
+                                            aAxId[s].numFmt.setFormatCode(aPoints[0].formatCode);
+                                        }
+                                        else{
+                                            aAxId[s].numFmt.setFormatCode("General");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
         }
@@ -11563,6 +11606,18 @@ function CreateView3d(nRotX, nRotY, bRAngAx, nDepthPercent)
     return oView3d;
 }
 
+function GetNumFormatFromSeries(aAscSeries){
+    if(aAscSeries &&
+        aAscSeries[0] &&
+        aAscSeries[0].Val &&
+        aAscSeries[0].Val.NumCache &&
+        aAscSeries[0].Val.NumCache[0]){
+        if(typeof (aAscSeries[0].Val.NumCache[0].numFormatStr) === "string" && aAscSeries[0].Val.NumCache[0].numFormatStr.length > 0){
+            return aAscSeries[0].Val.NumCache[0].numFormatStr;
+        }
+    }
+    return "General";
+}
 
 function CreateLineChart(chartSeries, type, bUseCache, oOptions, b3D)
 {
@@ -11679,7 +11734,7 @@ function CreateLineChart(chartSeries, type, bUseCache, oOptions, b3D)
     }
     else
     {
-        format_code = "General";
+        format_code = GetNumFormatFromSeries(asc_series);
     }
     num_fmt.setFormatCode(format_code);
     num_fmt.setSourceLinked(true);
@@ -11816,7 +11871,7 @@ function CreateBarChart(chartSeries, type, bUseCache, oOptions, b3D, bDepth)
     }
     else
     {
-        format_code = "General";
+        format_code = GetNumFormatFromSeries(asc_series);
     }
     num_fmt.setFormatCode(format_code);
     num_fmt.setSourceLinked(true);
@@ -11965,7 +12020,7 @@ function CreateHBarChart(chartSeries, type, bUseCache, oOptions, b3D)
      }
      else */
     {
-        format_code = "General";
+        format_code = GetNumFormatFromSeries(asc_series);
     }
     num_fmt.setFormatCode(format_code);
     num_fmt.setSourceLinked(true);
@@ -12092,7 +12147,7 @@ function CreateAreaChart(chartSeries, type, bUseCache, oOptions)
     }
     else
     {
-        format_code = "General";
+        format_code = GetNumFormatFromSeries(asc_series);
     }
     num_fmt.setFormatCode(format_code);
     num_fmt.setSourceLinked(true);
@@ -12368,7 +12423,7 @@ function CreateScatterChart(chartSeries, bUseCache, oOptions)
     var scaling = val_ax.scaling;
     scaling.setOrientation(AscFormat.ORIENTATION_MIN_MAX);
     var num_fmt = val_ax.numFmt;
-    var format_code = "General";
+    var format_code = GetNumFormatFromSeries(asc_series);
     num_fmt.setFormatCode(format_code);
     num_fmt.setSourceLinked(true);
     if(scatter_chart.series.length > 1)
@@ -12529,7 +12584,7 @@ function CreateStockChart(chartSeries, bUseCache, oOptions)
     scaling.setOrientation(AscFormat.ORIENTATION_MIN_MAX);
     var num_fmt = val_ax.numFmt;
     var format_code;
-    format_code = "General";
+    format_code = GetNumFormatFromSeries(asc_series);
     num_fmt.setFormatCode(format_code);
     num_fmt.setSourceLinked(true);
     var legend = chart.legend;
@@ -12648,7 +12703,7 @@ function CreateStockChart(chartSeries, bUseCache, oOptions)
         oValAx.setAxPos(AscFormat.AX_POS_L);
         oValAx.setMajorGridlines(new AscFormat.CSpPr());
         var oNumFmt = new AscFormat.CNumFmt();
-        oNumFmt.setFormatCode("General");
+        oNumFmt.setFormatCode(GetNumFormatFromSeries(asc_series));
         oNumFmt.setSourceLinked(true);
         oValAx.setNumFmt(oNumFmt);
         oValAx.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);

@@ -3012,6 +3012,14 @@ DrawingObjectsController.prototype =
         var axis_by_types;
         var val_ax, cat_ax;
         object_type = chart_type.getObjectType();
+        var sDefaultValAxFormatCode = null;
+        if(chart_type && chart_type.series[0]){
+            var aPoints = AscFormat.getPtsFromSeries(chart_type.series[0]);
+            if(aPoints[0] && typeof aPoints[0].formatCode === "string" && aPoints[0].formatCode.length > 0){
+                sDefaultValAxFormatCode = aPoints[0].formatCode;
+            }
+        }
+        need_num_fmt = sDefaultValAxFormatCode;
 
         var checkSwapAxis = function(plotArea, chartType, newChartType)
         {
@@ -3026,7 +3034,7 @@ DrawingObjectsController.prototype =
             }
             if(!val_ax || !cat_ax)
             {
-                var axis_obj = AscFormat.CreateDefaultAxises(need_num_fmt);
+                var axis_obj = AscFormat.CreateDefaultAxises(need_num_fmt ? need_num_fmt : "General");
                 cat_ax = axis_obj.catAx;
                 val_ax = axis_obj.valAx;
             }
@@ -3110,8 +3118,10 @@ DrawingObjectsController.prototype =
                     || type === c_oAscChartTypeSettings.barNormal3d || type === c_oAscChartTypeSettings.barStacked3d
                     || type === c_oAscChartTypeSettings.hBarNormal || type === c_oAscChartTypeSettings.hBarStacked
                     || type === c_oAscChartTypeSettings.hBarNormal3d || type === c_oAscChartTypeSettings.hBarStacked3d
-                    || type === c_oAscChartTypeSettings.barNormal3dPerspective)
-                    need_num_fmt = "General";
+                    || type === c_oAscChartTypeSettings.barNormal3dPerspective){
+                    need_num_fmt = sDefaultValAxFormatCode;
+
+                }
                 else
                     need_num_fmt = "0%";
 
@@ -3238,8 +3248,10 @@ DrawingObjectsController.prototype =
                         if(!val_axis[i].numFmt)
                         {
                             val_axis[i].setNumFmt(new AscFormat.CNumFmt());
+                            val_axis[i].numFmt.setFormatCode(sDefaultValAxFormatCode ? sDefaultValAxFormatCode : "General");
+                            val_axis[i].numFmt.setSourceLinked(true);
                         }
-                        if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                        if(need_num_fmt && val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                     }
                 }
@@ -3293,8 +3305,10 @@ DrawingObjectsController.prototype =
                         if(!val_axis[i].numFmt)
                         {
                             val_axis[i].setNumFmt(new AscFormat.CNumFmt());
+                            val_axis[i].numFmt.setFormatCode(sDefaultValAxFormatCode ? sDefaultValAxFormatCode : "General");
+                            val_axis[i].numFmt.setSourceLinked(true);
                         }
-                        if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                        if(need_num_fmt && val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                         if(need_bar_dir = BAR_DIR_BAR)
                             val_axis[i].setAxPos(AscFormat.AX_POS_B);
@@ -3324,7 +3338,7 @@ DrawingObjectsController.prototype =
 
                 if(type === c_oAscChartTypeSettings.lineNormal || type === c_oAscChartTypeSettings.lineStacked  || type === c_oAscChartTypeSettings.line3d
                     || type === c_oAscChartTypeSettings.lineNormalMarker || type === c_oAscChartTypeSettings.lineStackedMarker)
-                    need_num_fmt = "General";
+                    need_num_fmt = sDefaultValAxFormatCode;
                 else
                     need_num_fmt = "0%";
 
@@ -3340,8 +3354,10 @@ DrawingObjectsController.prototype =
                         if(!val_axis[i].numFmt)
                         {
                             val_axis[i].setNumFmt(new AscFormat.CNumFmt());
+                            val_axis[i].numFmt.setFormatCode(sDefaultValAxFormatCode ? sDefaultValAxFormatCode : "General");
+                            val_axis[i].numFmt.setSourceLinked(true);
                         }
-                        if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                        if(need_num_fmt && val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                     }
 
@@ -3410,8 +3426,10 @@ DrawingObjectsController.prototype =
                         if(!val_axis[i].numFmt)
                         {
                             val_axis[i].setNumFmt(new AscFormat.CNumFmt());
+                            val_axis[i].numFmt.setFormatCode(sDefaultValAxFormatCode ? sDefaultValAxFormatCode : "General");
+                            val_axis[i].numFmt.setSourceLinked(true);
                         }
-                        if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                        if(need_num_fmt && val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                     }
                     if(type === c_oAscChartTypeSettings.line3d)
@@ -3560,7 +3578,7 @@ DrawingObjectsController.prototype =
                     need_groupping = GROUPING_PERCENT_STACKED;
 
                 if(type === c_oAscChartTypeSettings.areaNormal || type === c_oAscChartTypeSettings.areaStacked)
-                    need_num_fmt = "General";
+                    need_num_fmt = sDefaultValAxFormatCode;
                 else
                     need_num_fmt = "0%";
 
@@ -3574,8 +3592,10 @@ DrawingObjectsController.prototype =
                         if(!val_axis[i].numFmt)
                         {
                             val_axis[i].setNumFmt(new AscFormat.CNumFmt());
+                            val_axis[i].numFmt.setFormatCode(sDefaultValAxFormatCode ? sDefaultValAxFormatCode : "General");
+                            val_axis[i].numFmt.setSourceLinked(true);
                         }
-                        if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                        if(need_num_fmt && val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                     }
                 }
@@ -3591,8 +3611,10 @@ DrawingObjectsController.prototype =
                         if(!val_axis[i].numFmt)
                         {
                             val_axis[i].setNumFmt(new AscFormat.CNumFmt());
+                            val_axis[i].numFmt.setFormatCode(sDefaultValAxFormatCode ? sDefaultValAxFormatCode : "General");
+                            val_axis[i].numFmt.setSourceLinked(true);
                         }
-                        if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                        if(need_num_fmt && val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                     }
                     new_chart_type.setGrouping(need_groupping);
@@ -3640,6 +3662,7 @@ DrawingObjectsController.prototype =
                         if(!val_axis[i].numFmt)
                         {
                             val_axis[i].setNumFmt(new AscFormat.CNumFmt());
+                            val_axis[i].numFmt.setSourceLinked(true);
                         }
                         if(val_axis[i].numFmt.formatCode !== "General")
                             val_axis[i].numFmt.setFormatCode("General");
