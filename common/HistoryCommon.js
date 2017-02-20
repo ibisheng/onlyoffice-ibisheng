@@ -1628,9 +1628,10 @@
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе ParaField
 	//------------------------------------------------------------------------------------------------------------------
-	window['AscDFH'].historyitem_Field_AddItem       = window['AscDFH'].historyitem_type_Field | 1;
-	window['AscDFH'].historyitem_Field_RemoveItem    = window['AscDFH'].historyitem_type_Field | 2;
-	window['AscDFH'].historyitem_Field_FormFieldName = window['AscDFH'].historyitem_type_Field | 3;
+	window['AscDFH'].historyitem_Field_AddItem              = window['AscDFH'].historyitem_type_Field | 1;
+	window['AscDFH'].historyitem_Field_RemoveItem           = window['AscDFH'].historyitem_type_Field | 2;
+	window['AscDFH'].historyitem_Field_FormFieldName        = window['AscDFH'].historyitem_type_Field | 3;
+	window['AscDFH'].historyitem_Field_FormFieldDefaultText = window['AscDFH'].historyitem_type_Field | 4;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе Footnotes
 	//------------------------------------------------------------------------------------------------------------------

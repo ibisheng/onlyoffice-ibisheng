@@ -171,6 +171,8 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
 	this.Lock      = new AscCommon.CLock();
 
 	this.ParaMath = null;
+
+	this.SkipOnRecalculate = false;
 	//------------------------------------------------------------
 	g_oTableId.Add(this, this.Id);
 
@@ -1240,7 +1242,26 @@ ParaDrawing.prototype.Set_XYForAdd = function(X, Y, NearPos, PageNum)
 	{
 		var Layout = NearPos.Paragraph.Get_Layout(NearPos.ContentPos, this);
 		this.private_SetXYByLayout(X, Y, PageNum, Layout, true, true);
+
+		var oLogicDocument = this.document;
+		if (oLogicDocument)
+		{
+			this.SetSkipOnRecalculate(true);
+			oLogicDocument.Recalculate();
+			this.SetSkipOnRecalculate(false);
+		}
+
+		Layout = NearPos.Paragraph.Get_Layout(NearPos.ContentPos, this);
+		this.private_SetXYByLayout(X, Y, PageNum, Layout, true, true);
 	}
+};
+ParaDrawing.prototype.SetSkipOnRecalculate = function(isSkip)
+{
+	this.SkipOnRecalculate = isSkip;
+};
+ParaDrawing.prototype.IsSkipOnRecalculate = function()
+{
+	return this.SkipOnRecalculate;
 };
 ParaDrawing.prototype.Set_XY = function(X, Y, Paragraph, PageNum, bResetAlign)
 {
@@ -1251,6 +1272,17 @@ ParaDrawing.prototype.Set_XY = function(X, Y, Paragraph, PageNum, bResetAlign)
 			return;
 
 		var Layout = Paragraph.Get_Layout(ContentPos, this);
+		this.private_SetXYByLayout(X, Y, PageNum, Layout, (bResetAlign || true !== this.PositionH.Align ? true : false), (bResetAlign || true !== this.PositionV.Align ? true : false));
+
+		var oLogicDocument = this.document;
+		if (oLogicDocument)
+		{
+			this.SetSkipOnRecalculate(true);
+			oLogicDocument.Recalculate();
+			this.SetSkipOnRecalculate(false);
+		}
+
+		Layout = Paragraph.Get_Layout(ContentPos, this);
 		this.private_SetXYByLayout(X, Y, PageNum, Layout, (bResetAlign || true !== this.PositionH.Align ? true : false), (bResetAlign || true !== this.PositionV.Align ? true : false));
 	}
 };

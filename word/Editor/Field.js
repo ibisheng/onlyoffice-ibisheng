@@ -65,7 +65,8 @@ function ParaField(FieldType, Arguments, Switches)
 
     this.Bounds = {};
 
-    this.FormFieldName = "";
+	this.FormFieldName        = "";
+	this.FormFieldDefaultText = "";
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     AscCommon.g_oTableId.Add( this, this.Id );
@@ -231,8 +232,15 @@ ParaField.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRang
 
     ParaField.superclass.Recalculate_Range_Spaces.apply(this, arguments);
 
-    var X1 = PRSA.X;
-    this.Bounds[((CurLine << 16) & 0xFFFF0000) | (CurRange & 0x0000FFFF)] = {X0 : X0, X1 : X1, Y0: Y0, Y1 : Y1, PageIndex : _CurPage + PRSA.Paragraph.Get_StartPage_Absolute()};
+	var X1 = PRSA.X;
+
+	this.Bounds[((CurLine << 16) & 0xFFFF0000) | (CurRange & 0x0000FFFF)] = {
+		X0        : X0,
+		X1        : X1,
+		Y0        : Y0,
+		Y1        : Y1,
+		PageIndex : _CurPage + PRSA.Paragraph.Get_StartPage_Absolute()
+	};
 };
 ParaField.prototype.Draw_HighLights = function(PDSH)
 {
@@ -244,7 +252,7 @@ ParaField.prototype.Draw_HighLights = function(PDSH)
 
     var X1 = PDSH.X;
 
-    if (Math.abs(X0 - X1) > 0.001 && true === PDSH.DrawMMFields)
+    if (Math.abs(X0 - X1) > 0.001 && (true === PDSH.DrawMMFields || fieldtype_FORMTEXT === this.Get_FieldType()))
     {
         PDSH.MMFields.Add(Y0, Y1, X0, X1, 0, 0, 0, 0  );
     }
@@ -291,65 +299,32 @@ ParaField.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseCon
 
 	ParaField.superclass.Get_RightPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
 };
-
-CParagraphContentWithParagraphLikeContent.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
+ParaField.prototype.Remove = function(nDirection, bOnAddText)
 {
-	if (this.Content.length <= 0)
-		return false;
+	ParaField.superclass.Remove.call(this, nDirection, bOnAddText);
 
-	var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length - 1 );
-
-	this.Content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
-	SearchPos.Pos.Update( CurPos, Depth );
-
-	if ( true === SearchPos.Found )
-		return true;
-
-	CurPos--;
-
-	while ( CurPos >= 0 )
+	if (this.Is_Empty() && !bOnAddText && fieldtype_FORMTEXT === this.Get_FieldType() && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
 	{
-		this.Content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, false);
-		SearchPos.Pos.Update( CurPos, Depth );
-
-		if ( true === SearchPos.Found )
-			return true;
-
-		CurPos--;
+		var sDefaultText = this.FormFieldDefaultText == "" ? "     " : this.FormFieldDefaultText;
+		this.SetValue(sDefaultText);
 	}
-
-	return false;
 };
-CParagraphContentWithParagraphLikeContent.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+ParaField.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 {
-	if (this.Content.length <= 0)
-		return false;
+	ParaField.superclass.Shift_Range.call(this, Dx, Dy, _CurLine, _CurRange);
 
-	var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : 0 );
+	var CurLine = _CurLine - this.StartLine;
+	var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
 
-	this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, UseContentPos, StepEnd);
-	SearchPos.Pos.Update( CurPos, Depth );
-
-	if ( true === SearchPos.Found )
-		return true;
-
-	CurPos++;
-
-	var Count = this.Content.length;
-	while ( CurPos < this.Content.length )
+	var oRangeBounds = this.Bounds[((CurLine << 16) & 0xFFFF0000) | (CurRange & 0x0000FFFF)];
+	if (oRangeBounds)
 	{
-		this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, false, StepEnd);
-		SearchPos.Pos.Update( CurPos, Depth );
-
-		if ( true === SearchPos.Found )
-			return true;
-
-		CurPos++;
+		oRangeBounds.X0 += Dx;
+		oRangeBounds.X1 += Dx;
+		oRangeBounds.Y0 += Dy;
+		oRangeBounds.Y1 += Dy;
 	}
-
-	return false;
 };
-
 //----------------------------------------------------------------------------------------------------------------------
 // Работа с данными поля
 //----------------------------------------------------------------------------------------------------------------------
@@ -487,6 +462,11 @@ ParaField.prototype.SetFormFieldName = function(sName)
 ParaField.prototype.GetFormFieldName = function()
 {
 	return this.FormFieldName;
+};
+ParaField.prototype.SetFormFieldDefaultText = function(sText)
+{
+	History.Add(new CChangesParaFieldFormFieldDefaultText(this, this.FormFieldDefaultText, sText));
+	this.FormFieldDefaultText = sText;
 };
 ParaField.prototype.GetValue = function()
 {

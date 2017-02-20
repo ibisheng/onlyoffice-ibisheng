@@ -37,9 +37,9 @@ var changestype_Paragraph_Content = AscCommon.changestype_Paragraph_Content;
 
 if(typeof CDocument !== "undefined")
 {
-	CDocument.prototype.Document_Is_SelectionLocked = function(CheckType, AdditionalData, DontLockInFastMode)
+	CDocument.prototype.Document_Is_SelectionLocked = function(CheckType, AdditionalData, DontLockInFastMode, isFillingForm)
 	{
-		if (true === AscCommon.CollaborativeEditing.Get_GlobalLock() && (false === this.IsFillingFormMode() || false === this.IsInFormField()))
+		if (true === AscCommon.CollaborativeEditing.Get_GlobalLock() && true !== isFillingForm)
 			return true;
 
 		AscCommon.CollaborativeEditing.OnStart_CheckLock();

@@ -6096,7 +6096,7 @@ CDocument.prototype.OnKeyDown = function(e)
 
     if (e.KeyCode == 8 && false === editor.isViewMode) // BackSpace
     {
-        if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Remove, null, true))
+        if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Remove, null, true, this.IsFormFieldEditing()))
         {
             this.Create_NewHistoryPoint(AscDFH.historydescription_Document_BackSpaceButton);
             this.Remove(-1, true);
@@ -6267,7 +6267,11 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 32 && false === editor.isViewMode) // Space
     {
-        if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true))
+    	var bFillingForm = false;
+    	if (this.IsFormFieldEditing() && ((true === e.ShiftKey && true === e.CtrlKey) || true !== e.CtrlKey))
+			bFillingForm = true;
+
+        if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, bFillingForm))
         {
             this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SpaceButton);
 
@@ -6600,7 +6604,7 @@ CDocument.prototype.OnKeyDown = function(e)
     {
         if (true != e.ShiftKey)
         {
-            if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Delete, null, true))
+            if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Delete, null, true, this.IsFormFieldEditing()))
             {
                 this.Create_NewHistoryPoint(AscDFH.historydescription_Document_DeleteButton);
                 this.Remove(1, true);
@@ -6968,7 +6972,7 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 12288 && false === editor.isViewMode) // Space
     {
-        if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true))
+        if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, this.IsFormFieldEditing()))
         {
             this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SpaceButton);
 
@@ -7009,7 +7013,7 @@ CDocument.prototype.OnKeyPress = function(e)
 
 	if (Code > 0x20)
 	{
-		if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true))
+		if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, this.IsFormFieldEditing()))
 		{
 			this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddLetter);
 
@@ -8429,7 +8433,7 @@ CDocument.prototype.Create_NewHistoryPoint = function(Description)
 };
 CDocument.prototype.Document_Undo = function(Options)
 {
-	if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
+	if (true === AscCommon.CollaborativeEditing.Get_GlobalLock() && true !== this.IsFillingFormMode())
 		return;
 
 	if (true !== this.History.Can_Undo() && this.Api && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
@@ -8456,7 +8460,7 @@ CDocument.prototype.Document_Undo = function(Options)
 };
 CDocument.prototype.Document_Redo = function()
 {
-	if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
+	if (true === AscCommon.CollaborativeEditing.Get_GlobalLock() && true !== this.IsFillingFormMode())
 		return;
 
 	this.DrawingDocument.EndTrackTable(null, true);
@@ -16013,6 +16017,7 @@ CDocument.prototype.AddFormTextField = function(sName, sDefaultText)
 		var oField = new ParaField(fieldtype_FORMTEXT);
 		var oRun = new ParaRun();
 		oField.SetFormFieldName(sName);
+		oField.SetFormFieldDefaultText(sDefaultText);
 		for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
 		{
 			oRun.Add_ToContent(nIndex, new ParaText(sDefaultText.charAt(nIndex)));
@@ -16046,7 +16051,18 @@ CDocument.prototype.IsInFormField = function()
 
 	return true;
 };
+CDocument.prototype.StartFillingFormMode = function()
+{
+	this.SetFillingFormMode(true);
+	this.CollaborativeEditing.Set_GlobalLock(true)
+};
+CDocument.prototype.IsFormFieldEditing = function()
+{
+	if (true === this.CollaborativeEditing.Get_GlobalLock() && true === this.IsFillingFormMode() && true === this.IsInFormField())
+		return true;
 
+	return false;
+};
 
 function CDocumentSelectionState()
 {

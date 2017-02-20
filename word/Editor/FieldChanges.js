@@ -37,16 +37,18 @@
  * Time: 18:59
  */
 
-AscDFH.changesFactory[AscDFH.historyitem_Field_AddItem]       = CChangesParaFieldAddItem;
-AscDFH.changesFactory[AscDFH.historyitem_Field_RemoveItem]    = CChangesParaFieldRemoveItem;
-AscDFH.changesFactory[AscDFH.historyitem_Field_FormFieldName] = CChangesParaFieldFormFieldName;
+AscDFH.changesFactory[AscDFH.historyitem_Field_AddItem]              = CChangesParaFieldAddItem;
+AscDFH.changesFactory[AscDFH.historyitem_Field_RemoveItem]           = CChangesParaFieldRemoveItem;
+AscDFH.changesFactory[AscDFH.historyitem_Field_FormFieldName]        = CChangesParaFieldFormFieldName;
+AscDFH.changesFactory[AscDFH.historyitem_Field_FormFieldDefaultText] = CChangesParaFieldFormFieldDefaultText;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
 //----------------------------------------------------------------------------------------------------------------------
-AscDFH.changesRelationMap[AscDFH.historyitem_Field_AddItem]       = [AscDFH.historyitem_Field_AddItem, AscDFH.historyitem_Field_RemoveItem];
-AscDFH.changesRelationMap[AscDFH.historyitem_Field_RemoveItem]    = [AscDFH.historyitem_Field_AddItem, AscDFH.historyitem_Field_RemoveItem];
-AscDFH.changesRelationMap[AscDFH.historyitem_Field_FormFieldName] = [AscDFH.historyitem_Field_FormFieldName];
+AscDFH.changesRelationMap[AscDFH.historyitem_Field_AddItem]              = [AscDFH.historyitem_Field_AddItem, AscDFH.historyitem_Field_RemoveItem];
+AscDFH.changesRelationMap[AscDFH.historyitem_Field_RemoveItem]           = [AscDFH.historyitem_Field_AddItem, AscDFH.historyitem_Field_RemoveItem];
+AscDFH.changesRelationMap[AscDFH.historyitem_Field_FormFieldName]        = [AscDFH.historyitem_Field_FormFieldName];
+AscDFH.changesRelationMap[AscDFH.historyitem_Field_FormFieldDefaultText] = [AscDFH.historyitem_Field_FormFieldDefaultText];
 //----------------------------------------------------------------------------------------------------------------------
 
 /**
@@ -190,4 +192,18 @@ CChangesParaFieldFormFieldName.prototype.Type = AscDFH.historyitem_Field_FormFie
 CChangesParaFieldFormFieldName.prototype.private_SetValue = function(Value)
 {
 	this.Class.FormFieldName = Value;
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseStringProperty}
+ */
+function CChangesParaFieldFormFieldDefaultText(Class, Old, New)
+{
+	CChangesParaFieldFormFieldDefaultText.superclass.constructor.call(this, Class, Old, New);
+}
+AscCommon.extendClass(CChangesParaFieldFormFieldDefaultText, AscDFH.CChangesBaseStringProperty);
+CChangesParaFieldFormFieldDefaultText.prototype.Type = AscDFH.historyitem_Field_FormFieldDefaultText;
+CChangesParaFieldFormFieldDefaultText.prototype.private_SetValue = function(Value)
+{
+	this.Class.FormFieldDefaultText = Value;
 };
