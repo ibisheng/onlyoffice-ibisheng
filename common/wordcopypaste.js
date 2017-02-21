@@ -1888,7 +1888,7 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
     this.MsoStyles = {"mso-style-type": 1, "mso-pagination": 1, "mso-line-height-rule": 1, "mso-style-textfill-fill-color": 1, "mso-tab-count": 1,
         "tab-stops": 1, "list-style-type": 1, "mso-special-character": 1, "mso-column-break-before": 1, "mso-break-type": 1, "mso-padding-alt": 1, "mso-border-insidev": 1,
         "mso-border-insideh": 1, "mso-row-margin-left": 1, "mso-row-margin-right": 1, "mso-cellspacing": 1, "mso-border-alt": 1,
-        "mso-border-left-alt": 1, "mso-border-top-alt": 1, "mso-border-right-alt": 1, "mso-border-bottom-alt": 1, "mso-border-between": 1};
+        "mso-border-left-alt": 1, "mso-border-top-alt": 1, "mso-border-right-alt": 1, "mso-border-bottom-alt": 1, "mso-border-between": 1, "mso-list": 1};
     this.oBorderCache = {};
 }
 PasteProcessor.prototype =
@@ -4952,7 +4952,20 @@ PasteProcessor.prototype =
                     }
                 }
 				if(this.pasteInExcel !== true && Para.bFromDocument === true)
-					Para.Numbering_Add( NumId, 0 );
+				{
+					var lvl = 0;
+					if(pNoHtmlPr['mso-list'])
+					{
+						//TODO сделать полную поддержку mso-list при копировании списков из mso списков
+						var startIndex;
+						if(-1 != (startIndex = pNoHtmlPr['mso-list'].indexOf("level")))
+						{
+							//lvl = parseInt(pNoHtmlPr['mso-list'].substr(startIndex + 5, 1)) - 1;
+						}
+					}
+					
+					Para.Numbering_Add( NumId, lvl );
+				}
             }
             else
             {
@@ -6046,7 +6059,14 @@ PasteProcessor.prototype =
                         pPr.numType = numbering_presentationnumfrmt_ArabicPeriod;
                 }
             }
-
+			else if(pPr["mso-list"])
+			{
+				if("p" == sNodeName)
+				{
+					pPr.bNum = true;
+				}
+			}
+			
             if("img" == sNodeName && this.pasteInExcel !== true)
             {
                 if(PasteElementsId.g_bIsDocumentCopyPaste)
