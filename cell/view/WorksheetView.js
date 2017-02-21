@@ -8837,6 +8837,9 @@
 				this.model.selectionRange = specialPasteData.activeRange.clone(this.model);
 			}
 			
+			//нужно удалить данные предыдущей вставки(нужно для удаления ф/т)
+			t.model.autoFilters.isEmptyAutoFilters(this.model.selectionRange.getLast());
+			
 			undoPreviousPaste();
 		}
 		else if(isIntoShape && preSpecialPasteData && preSpecialPasteData.shapeSelectionState)//курсор и специальная вставка в шейпе
@@ -8876,7 +8879,7 @@
 		//добавляем форматированные таблицы
         var arnToRange = t.model.selectionRange.getLast();
         var tablesMap = null;
-        if (fromBinary && val.TableParts && val.TableParts.length) {
+        if (fromBinary && val.TableParts && val.TableParts.length && specialPasteProps.formatTable) {
             var range, tablePartRange, tables = val.TableParts, diffRow, diffCol, curTable, bIsAddTable;
             var activeRange = window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange;
             var refInsertBinary = AscCommonExcel.g_oRangeCache.getAscRange(activeRange);
@@ -9181,6 +9184,7 @@
 		if(specialPasteProps.format)
 		{
 			rangeUnMerge.unmerge();
+			//this.cellCommentator.deleteCommentsRange(rangeUnMerge.bbox);
 		}
 
         if (!isOneMerge) {
@@ -9418,6 +9422,7 @@
 		if(specialPasteProps.format)
 		{
 			rangeUnMerge.unmerge();
+			//this.cellCommentator.deleteCommentsRange(rangeUnMerge.bbox);
 		}
         if (!isOneMerge) {
             arn.r2 = rMax2 - 1;

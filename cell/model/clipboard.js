@@ -92,6 +92,7 @@
 			this.angle = true;
 			
 			this.format = true;
+			this.formatTable = true;
 			
 			this.images = true;
 		}
@@ -117,6 +118,7 @@
 				this.angle = true;
 				
 				this.format = true;
+				this.formatTable = true;
 				
 				this.images = true;
 			},
@@ -137,6 +139,7 @@
 				this.angle = null;
 				
 				this.format = null;
+				this.formatTable = null;
 				
 				this.images = null;
 			},
@@ -204,12 +207,14 @@
 					{
 						//все кроме формул
 						this.formula = null;
+						this.formatTable = null;
 						break;
 					}
 					case c_oSpecialPasteProps.pasteOnlyFormating:
 					{
 						this.formula = null;
 						this.val = null;
+						this.formatTable = null;
 						break;
 					}
 					case c_oSpecialPasteProps.transpose:
