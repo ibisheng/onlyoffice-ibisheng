@@ -635,10 +635,10 @@ CWrapPolygon.prototype =
         if(this.relativeArrPoints.length === 0)
         {
             this.arrPoints.length = 0;
-            this.localLeft = bounds.l - oDistance.L - AscFormat.getValOrDefault(oEffectExtent.L, 0);
-            this.localRight = bounds.r + oDistance.R + AscFormat.getValOrDefault(oEffectExtent.R, 0);
-            this.localTop = bounds.t - oDistance.T - AscFormat.getValOrDefault(oEffectExtent.T, 0);
-            this.localBottom = bounds.b + oDistance.B + AscFormat.getValOrDefault(oEffectExtent.B, 0);
+            this.localLeft = -oDistance.L - AscFormat.getValOrDefault(oEffectExtent.L, 0);
+            this.localRight = drawing.parent.Extent.W + oDistance.R + AscFormat.getValOrDefault(oEffectExtent.R, 0);
+            this.localTop =  -oDistance.T - AscFormat.getValOrDefault(oEffectExtent.T, 0);
+            this.localBottom = drawing.parent.Extent.H + oDistance.B + AscFormat.getValOrDefault(oEffectExtent.B, 0);
             return;
         }
         var relArr = this.relativeArrPoints;

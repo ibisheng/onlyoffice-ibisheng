@@ -829,7 +829,7 @@ ParaDrawing.prototype.CheckWH = function()
 {
 	if (!this.GraphicObj)
 		return;
-	var dW, dH, bInline = this.Is_Inline();
+	var dW, dH;
 	this.GraphicObj.recalculate();
 	var extX, extY;
 	if (this.GraphicObj.spPr.xfrm && AscFormat.isRealNumber(this.GraphicObj.spPr.xfrm.extX) && AscFormat.isRealNumber(this.GraphicObj.spPr.xfrm.extY))
@@ -862,10 +862,10 @@ ParaDrawing.prototype.CheckWH = function()
 		LineCorrect = (this.GraphicObj.pen.w == null) ? 12700 : parseInt(this.GraphicObj.pen.w);
 		LineCorrect /= 72000.0;
 	}
-	var EEL = (xc - dW / 2) - oBounds.l - LineCorrect;
-	var EET = (yc - dH / 2) - oBounds.t - LineCorrect;
-	var EER = oBounds.r + LineCorrect - (xc + dW / 2);
-	var EEB = oBounds.b + LineCorrect - (yc + dH / 2);
+	var EEL = (xc - this.Extent.W / 2) - oBounds.l - LineCorrect;
+	var EET = (yc - this.Extent.H / 2) - oBounds.t - LineCorrect;
+	var EER = oBounds.r + LineCorrect - (xc + this.Extent.W / 2);
+	var EEB = oBounds.b + LineCorrect - (yc + this.Extent.H / 2);
 	this.setEffectExtent(EEL > 0 ? EEL : 0, EET > 0 ? EET : 0, EER > 0 ? EER : 0, EEB > 0 ? EEB : 0);
 	this.Check_WrapPolygon();
 };
