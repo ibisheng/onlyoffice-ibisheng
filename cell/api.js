@@ -2615,7 +2615,16 @@ var editor;
 
   // Получить координаты активной ячейки
   spreadsheet_api.prototype.asc_getActiveCellCoord = function() {
-    return this.wb.getWorksheet().getActiveCellCoord();
+    var oWorksheet = this.wb.getWorksheet();
+    if(oWorksheet){
+      if(oWorksheet.isSelectOnShape){
+        return oWorksheet.objectRender.getContextMenuPosition();
+      }
+      else{
+          return oWorksheet.getActiveCellCoord();
+      }
+    }
+
   };
 
   // Получить координаты для каких-либо действий (для общей схемы)

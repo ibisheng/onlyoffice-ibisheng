@@ -1234,48 +1234,15 @@ DrawingObjectsController.prototype =
 
     getFromTargetTextObjectContextMenuPosition: function(oTargetTextObject, pageIndex)
     {
-        var dX, dY, oDocContent, oTransformText, oParagraph, document = editor.WordControl.m_oLogicDocument, dPosX = 0, dPosY = 0;
-        if(oTargetTextObject.getObjectType() === AscDFH.historyitem_type_Shape || oTargetTextObject.getObjectType() === AscDFH.historyitem_type_Title)
-        {
-            dPosX = document.TargetPos.X;
-            dPosY = document.TargetPos.Y;
-            oTransformText = oTargetTextObject.transformText;
-            return {X: oTransformText.TransformPointX(dPosX, dPosY), Y: oTransformText.TransformPointY(dPosX, dPosY), PageIndex: document.TargetPos.PageNum};
-        }
-        else if(oTargetTextObject.getObjectType() === AscDFH.historyitem_type_GraphicFrame)
-        {
-            var Doc = oTargetTextObject.graphicObject;
-            oTransformText = oTargetTextObject.transform;
-            if ( true === Doc.Is_SelectionUse() && !Doc.Selection_IsEmpty())
-            {
-                switch( Doc.Selection.Type )
-                {
-                    case table_Selection_Cell:
-                    {
-                        var oCellInfo = Doc.CurCell.Row.Get_CellInfo(Doc.CurCell.Index);
-                        var oCellMargins = Doc.CurCell.Get_Margins();
-                        dPosX = oCellInfo.X_content_start;
-                        dPosY = Doc.RowsInfo[Doc.CurCell.Row.Index].Y[0] + Doc.RowsInfo[Doc.CurCell.Row.Index].TopDy[0] + oCellMargins.Top.W +  Doc.CurCell.Temp.Y_VAlign_offset[0];
-                        dX = oTransformText.TransformPointX(dPosX, dPosY);
-                        dY = oTransformText.TransformPointY(dPosX, dPosY);
-                        return {X: dX, Y: dY, PageIndex: this.selectedObjects[0].selectStartPage};
-                    }
-                    case table_Selection_Text:
-                    {
-                        dPosX = document.TargetPos.X;
-                        dPosY = document.TargetPos.Y;
-                        oTransformText = oTargetTextObject.transformText;
-                        return {X: oTransformText.TransformPointX(dPosX, dPosY), Y: oTransformText.TransformPointY(dPosX, dPosY), PageIndex: document.TargetPos.PageNum};
-                    }
-                }
-            }
-            else
-            {
-                dPosX = document.TargetPos.X;
-                dPosY = document.TargetPos.Y;
-                oTransformText = oTargetTextObject.transformText;
-                return {X: oTransformText.TransformPointX(dPosX, dPosY), Y: oTransformText.TransformPointY(dPosX, dPosY), PageIndex: document.TargetPos.PageNum};
-            }
+        var oTransformText = oTargetTextObject.transformText;
+        var oTargetObjectOrTable = this.getTargetDocContent(false, true);
+        if(oTargetTextObject && oTargetObjectOrTable && oTargetObjectOrTable.Cursor_GetPos && oTransformText){
+            var oPos = oTargetObjectOrTable.Cursor_GetPos();
+            return {
+                X: oTransformText.TransformPointX(oPos.X, oPos.Y),
+                Y: oTransformText.TransformPointY(oPos.X, oPos.Y),
+                PageIndex: pageIndex
+            };
         }
         return {X: 0, Y: 0, PageIndex: pageIndex};
     },

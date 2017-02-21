@@ -3263,7 +3263,7 @@ CGraphicObjects.prototype =
     getLeftTopSelectedObjectByPage: function(pageIndex)
     {
         var oDrawingPage, oRes;
-        if(this.document.Get_DocPosType(docpostype_HdrFtr))
+        if(this.document.Get_DocPosType() === docpostype_HdrFtr)
         {
             if(this.graphicPages[pageIndex])
             {

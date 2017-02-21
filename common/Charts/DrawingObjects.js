@@ -1938,6 +1938,25 @@ function DrawingObjects() {
         return new Asc.Range(cmin, rmin, cmax, rmax, true);
     };
 
+
+    _this.getContextMenuPosition = function(){
+
+        if(!worksheet){
+            return new AscCommon.asc_CRect( 0, 0, 5, 5 );
+        }
+        var oPos = this.controller.getContextMenuPosition(0);
+
+        var _x = oPos.X * Asc.getCvtRatio(3, 0, worksheet._getPPIX()) + scrollOffset.getX();
+        var _y = oPos.Y * Asc.getCvtRatio(3, 0, worksheet._getPPIY()) + scrollOffset.getY();
+
+        var firstCol = worksheet.cols[worksheet.getFirstVisibleCol(true)];
+        var firstRow = worksheet.rows[worksheet.getFirstVisibleRow(true)];
+        if(!firstCol || !firstRow){
+            return new AscCommon.asc_CRect( 0, 0, 5, 5 );
+        }
+        return new AscCommon.asc_CRect(_x, _y, 0, 0 );
+    };
+
     _this.recalculate =  function(all)
     {
         _this.controller.recalculate2(all);
