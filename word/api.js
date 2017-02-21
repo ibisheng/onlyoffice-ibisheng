@@ -7424,13 +7424,13 @@ background-repeat: no-repeat;\
 	{
 		this.asc_CloseFile();
 
-		var oLogicDocument = this.WordControl.m_oLogicDocument;
 		this.FontLoader.IsLoadDocumentFonts2 = true;
 		this.OpenDocument2(this.DocumentUrl, binaryFile);
 
 		if (fields)
 			this.asc_SetBlockChainData(fields);
 
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
 		if (oLogicDocument)
 		{
 			AscCommon.CollaborativeEditing.Set_GlobalLock(true);
