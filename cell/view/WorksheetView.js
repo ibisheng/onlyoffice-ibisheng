@@ -9506,6 +9506,24 @@
 			}
 		};
 		
+		var getTableDxf = function(pasteRow, pasteCol, newVal)
+		{
+			var dxf = null;
+			var tables = val.autoFilters._intersectionRangeWithTableParts(newVal.bbox);
+			
+			if(tables && tables[0])
+			{
+				var table = tables[0];
+				var styleInfo = table.TableStyleInfo;
+				var styleForCurTable = t.model.workbook.TableStyles.AllStyles[styleInfo.Name];
+				
+				var headerRowCount = !!(null === table.HeaderRowCount || table.HeaderRowCount > 0);
+				dxf = styleForCurTable.getStyle(table.Ref, pasteRow, pasteCol, styleInfo, headerRowCount, table.HeaderRowCount);
+			}
+			
+			return dxf;
+		};
+		
 		var putInsertedCellIntoRange = function(nRow, nCol, pasteRow, pasteCol, rowDiff, colDiff, range, newVal)
 		{
 			var pastedRangeProps = {};
@@ -9564,6 +9582,8 @@
 				//hyperlink
 				pastedRangeProps.hyperlinkObj = newVal.getHyperlink();
 			}
+			
+			pastedRangeProps.tableDxf = getTableDxf(pasteRow, pasteCol, newVal);
 			
 			//apply props by cell
 			var formulaProps = {firstRange: firstRange, arrFormula: arrFormula, tablesMap: tablesMap, newVal: newVal, isOneMerge: isOneMerge, val: val};
@@ -9733,6 +9753,17 @@
 		{
 			range.setCellStyle(rangeStyle.cellStyle);
 		}
+		
+		//если не вставляем форматированную таблицу, но формат необходимо вставить
+		if(specialPasteProps.format && !specialPasteProps.formatTable && rangeStyle.tableDxf)
+		{
+			var cells = range.getCells();
+			if(cells && cells[0])
+			{
+				cells[0].setStyle(rangeStyle.tableDxf);
+			}
+		}
+		
 		//numFormat
 		if(rangeStyle.numFormat && specialPasteProps.numFormat)
 		{
@@ -9801,7 +9832,7 @@
 			range.setWrap(rangeStyle.wrap);
 		}
 		//fill
-		if(specialPasteProps.fill)
+		if(specialPasteProps.fill && rangeStyle.fill)
 		{
 			range.setFill(rangeStyle.fill);
 		}
