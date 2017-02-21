@@ -6911,7 +6911,9 @@ background-repeat: no-repeat;\
 			var oField = arrFields[nIndex];
 			oField.SetValue(arrData[nIndex] ? arrData[nIndex] : "");
 		}
-		oLogicDocument.Recalculate_FromStart();
+
+		if (!this.isLongAction())
+			oLogicDocument.Recalculate_FromStart();
 	};
 
 	// input
@@ -7421,11 +7423,14 @@ background-repeat: no-repeat;\
 	window["asc_docs_api"].prototype["pluginMethod_OpenFile"] = function(binaryFile, fields, baseUrl)
 	{
 		this.asc_CloseFile();
+
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		this.FontLoader.IsLoadDocumentFonts2 = true;
 		this.OpenDocument2(this.DocumentUrl, binaryFile);
 
 		if (fields)
 			this.asc_SetBlockChainData(fields);
-		var oLogicDocument = this.WordControl.m_oLogicDocument;
+
 		if (oLogicDocument)
 		{
 			AscCommon.CollaborativeEditing.Set_GlobalLock(true);

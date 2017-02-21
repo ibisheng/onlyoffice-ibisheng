@@ -285,6 +285,8 @@ function CEditorPage(api)
 	}
 	this.RequestAnimationOldTime = -1;
 
+	this.IsInitControl = false;
+
 	this.checkBodySize = function()
 	{
 		var off = jQuery("#" + this.Name).offset();
@@ -3447,6 +3449,9 @@ function CEditorPage(api)
 
 	this.InitControl = function()
 	{
+		if (this.IsInitControl)
+			return;
+
 		this.CalculateDocumentSize();
 
 		if (window["AscDesktopEditor"] && this.m_oDrawingDocument.m_oDocumentRenderer)
@@ -3494,6 +3499,8 @@ function CEditorPage(api)
         }
 
 		//this.m_oDrawingDocument.CheckFontCache();
+
+		this.IsInitControl = true;
 	};
 
 	this.OpenDocument = function(info)
