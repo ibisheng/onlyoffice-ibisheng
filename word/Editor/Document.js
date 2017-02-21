@@ -16873,6 +16873,11 @@ CTrackRevisionsManager.prototype.private_HaveParasToCheck = function()
 
     return false;
 };
+CTrackRevisionsManager.prototype.Get_AllChanges = function()
+{
+	this.Continue_TrackRevisions();
+	return this.Changes;
+};
 
 function CRevisionsChangeParagraphSearchEngine(Direction, CurrentPara, TrackManager)
 {

@@ -105,6 +105,40 @@ Asc['asc_docs_api'].prototype.asc_RejectAllChanges = function()
 {
     this.WordControl.m_oLogicDocument.Reject_AllRevisionChanges();
 };
+Asc['asc_docs_api'].prototype.asc_GetTrackRevisionsReportByAuthors = function()
+{
+	var oResult = {};
+	var oAllChanges = this.WordControl.m_oLogicDocument.TrackRevisionsManager.Get_AllChanges();
+	for (var ParaId in oAllChanges)
+	{
+		var arrChanges = oAllChanges[ParaId];
+		for (var nIndex = 0, nCount = arrChanges.length; nIndex < nCount; ++nIndex)
+		{
+			var oChange   = arrChanges[nIndex];
+			var sUserName = oChange.get_UserName();
+			var nDateTime = oChange.get_DateTime();
+
+			if (!oResult[sUserName])
+				oResult[sUserName] = [];
+
+			var arrUserChanges = oResult[sUserName];
+
+			var nPos = 0;
+			var nLen = arrUserChanges.length;
+			while (nPos < nLen)
+			{
+				if (nDateTime < arrUserChanges[nPos].get_DateTime())
+					break;
+
+				nPos++;
+			}
+
+			arrUserChanges.splice(nPos, 0, oChange);
+		}
+	}
+
+	return oResult;
+};
 
 Asc['asc_docs_api'].prototype['asc_SetTrackRevisions']               = Asc['asc_docs_api'].prototype.asc_SetTrackRevisions;
 Asc['asc_docs_api'].prototype['asc_IsTrackRevisions']                = Asc['asc_docs_api'].prototype.asc_IsTrackRevisions;
@@ -185,6 +219,9 @@ CDocument.prototype.private_GetRevisionsChangeParagraph = function(Direction, Cu
     }
 
     var oFootnote = CurrentPara.Parent ? CurrentPara.Parent.Get_TopDocumentContent() : null;
+    if (!(oFootnote instanceof CFootEndnote))
+    	oFootnote = null;
+
     var HdrFtr = CurrentPara.Get_HdrFtr();
     if (null !== HdrFtr)
     {
