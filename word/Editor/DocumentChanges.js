@@ -318,11 +318,15 @@ CChangesDocumentRemoveItem.prototype.Load = function(Color)
 			oDocument.Content[Pos].Prev = null;
 		}
 
-		if(oDocument.SectionsInfo)
+		if (0 <= Pos && Pos <= oDocument.Content.length - 1)
 		{
-            oDocument.SectionsInfo.Update_OnRemove(Pos, 1);
+			if (oDocument.SectionsInfo)
+			{
+				oDocument.SectionsInfo.Update_OnRemove(Pos, 1);
+			}
+
+			oDocument.private_ReindexContent(Pos);
 		}
-		oDocument.private_ReindexContent(Pos);
 	}
 };
 CChangesDocumentRemoveItem.prototype.IsRelated = function(oChanges)
