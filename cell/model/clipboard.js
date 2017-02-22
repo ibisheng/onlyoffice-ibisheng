@@ -449,6 +449,7 @@
 					History.EndTransaction();
 				}
 				
+				window['AscCommon'].g_clipboardBase.specialPasteProps = null;
 			},
 			
 			start_specialpaste: function()

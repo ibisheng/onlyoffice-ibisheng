@@ -8778,83 +8778,100 @@
 			return;
 		}
 		
-		//не вызываю для отката api.wb.clipboard.pasteData, потому что внутри асинхронные методы - isLockedCells 
-		var undoPreviousPaste = function()
+		var isIntoShape = t.objectRender.controller.getTargetDocContent(true);
+		var onSelectionCallback = function(isSuccess)
 		{
-			//откатываем данные в ячейках
-			var sBase64 = preSpecialPasteData.data.split('xslData;')[1];
-			var oBinaryFileReader = new AscCommonExcel.BinaryFileReader(true);
-			var tempWorkbook = new AscCommonExcel.Workbook();
-			pptx_content_loader.Start_UseFullUrl();
-			oBinaryFileReader.Read(sBase64, tempWorkbook);
-			window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange = oBinaryFileReader.copyPasteObj.activeRange;
-			var pasteData = null;
-			if (tempWorkbook)
-				pasteData = tempWorkbook.aWorksheets[0];
-			if(pasteData)
+			if(!isSuccess)
 			{
-				t._pasteFromBinary(pasteData, null, null, window['AscCommon'].g_clipboardBase.specialPasteProps);
+				return false;
 			}
 			
-			//удаляем вставленные изображения
-			if(preSpecialPasteData.images)
+			//не вызываю для отката api.wb.clipboard.pasteData, потому что внутри асинхронные методы - isLockedCells 
+			var undoPreviousPaste = function()
 			{
-				var images = preSpecialPasteData.images;
-				for(var i = 0; i < images.length; i++)
+				//откатываем данные в ячейках
+				var sBase64 = preSpecialPasteData.data.split('xslData;')[1];
+				var oBinaryFileReader = new AscCommonExcel.BinaryFileReader(true);
+				var tempWorkbook = new AscCommonExcel.Workbook();
+				pptx_content_loader.Start_UseFullUrl();
+				oBinaryFileReader.Read(sBase64, tempWorkbook);
+				window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange = oBinaryFileReader.copyPasteObj.activeRange;
+				var pasteData = null;
+				if (tempWorkbook)
+					pasteData = tempWorkbook.aWorksheets[0];
+				if(pasteData)
 				{
-					var id = images[i];
-					var oObject = AscCommon.g_oTableId.Get_ById(id);
-					oObject.deleteDrawingBase(true);
-					oObject.setBDeleted(true);
+					t._pasteFromBinary(pasteData, null, null, window['AscCommon'].g_clipboardBase.specialPasteProps);
 				}
+				
+				//удаляем вставленные изображения
+				if(preSpecialPasteData.images)
+				{
+					var images = preSpecialPasteData.images;
+					for(var i = 0; i < images.length; i++)
+					{
+						var id = images[i];
+						var oObject = AscCommon.g_oTableId.Get_ById(id);
+						oObject.deleteDrawingBase(true);
+						oObject.setBDeleted(true);
+					}
+				}
+			};
+			
+			//транзакция закроется в end_paste
+			History.Create_NewPoint();
+			History.StartTransaction();
+			
+			window["Asc"]["editor"].wb.clipboard.start_specialpaste();
+			window["Asc"]["editor"].wb.clipboard.start_paste();
+			
+			//откатываемся до того, что было до вставки
+			//курсор и специальная вставка не в шейпе + курсор в шейпе, специальная вставка на листе
+			if(preSpecialPasteData && preSpecialPasteData.data && !window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId)
+			{
+				var tempProps = new Asc.SpecialPasteProps();
+				window['AscCommon'].g_clipboardBase.specialPasteProps = tempProps;
+				
+				//переводим фокус из шейпа на лист
+				if(isIntoShape)
+				{
+					t.objectRender.controller.resetSelection();
+				}
+				
+				//меняем activeRange
+				if(specialPasteData.activeRange)
+				{
+					t.model.selectionRange = specialPasteData.activeRange.clone(t.model);
+				}
+				
+				//нужно удалить данные предыдущей вставки(нужно для удаления ф/т)
+				t.model.autoFilters.isEmptyAutoFilters(t.model.selectionRange.getLast());
+				
+				undoPreviousPaste();
 			}
+			else if(isIntoShape && preSpecialPasteData && preSpecialPasteData.shapeSelectionState)//курсор и специальная вставка в шейпе
+			{
+				//таким образом удаляю вставляенный фрагмент до специальной вставки
+				var State = preSpecialPasteData.shapeSelectionState;
+				isIntoShape.Set_SelectionState(State, State.length - 1);
+				isIntoShape.Remove(1, true, true);
+			}
+			
+			//далее специальная вставка
+			window['AscCommon'].g_clipboardBase.specialPasteProps = props;
+			//TODO пока для закрытия транзации выставляю флаг. пересмотреть!
+			window["Asc"]["editor"].wb.clipboard.bIsEndTransaction = true;
+			api.wb.clipboard.pasteData(t, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data, true);
 		};
 		
-		//транзакция закроется в end_paste
-		History.Create_NewPoint();
-        History.StartTransaction();
-		
-		window["Asc"]["editor"].wb.clipboard.start_specialpaste();
-		window["Asc"]["editor"].wb.clipboard.start_paste();
-		
-		//откатываемся до того, что было до вставки
-		var isIntoShape = this.objectRender.controller.getTargetDocContent(true);
-		//курсор и специальная вставка не в шейпе + курсор в шейпе, специальная вставка на листе
-		if(preSpecialPasteData && preSpecialPasteData.data && !window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId)
+		if(specialPasteData.activeRange && !isIntoShape)
 		{
-			var tempProps = new Asc.SpecialPasteProps();
-			window['AscCommon'].g_clipboardBase.specialPasteProps = tempProps;
-			
-			//переводим фокус из шейпа на лист
-			if(isIntoShape)
-			{
-				this.objectRender.controller.resetSelection();
-			}
-			
-			//меняем activeRange
-			if(specialPasteData.activeRange)
-			{
-				this.model.selectionRange = specialPasteData.activeRange.clone(this.model);
-			}
-			
-			//нужно удалить данные предыдущей вставки(нужно для удаления ф/т)
-			t.model.autoFilters.isEmptyAutoFilters(this.model.selectionRange.getLast());
-			
-			undoPreviousPaste();
+			this._isLockedCells(specialPasteData.activeRange.ranges, /*subType*/null, onSelectionCallback);
 		}
-		else if(isIntoShape && preSpecialPasteData && preSpecialPasteData.shapeSelectionState)//курсор и специальная вставка в шейпе
+		else
 		{
-			//таким образом удаляю вставляенный фрагмент до специальной вставки
-			var State = preSpecialPasteData.shapeSelectionState;
-			isIntoShape.Set_SelectionState(State, State.length - 1);
-			isIntoShape.Remove(1, true, true);
+			onSelectionCallback(true);
 		}
-		
-		//далее специальная вставка
-		window['AscCommon'].g_clipboardBase.specialPasteProps = props;
-		//TODO пока для закрытия транзации выставляю флаг. пересмотреть!
-		window["Asc"]["editor"].wb.clipboard.bIsEndTransaction = true;
-		api.wb.clipboard.pasteData(this, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data, true);
 	};
 	
     WorksheetView.prototype._pasteData = function (isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth) {
@@ -9310,9 +9327,6 @@
         lastSelection.r2 = arn.r2;
         var arnFor = [arn, arrFormula];
 		
-		var clipboardBase = window['AscCommon'].g_clipboardBase;
-		clipboardBase.specialPasteProps = null;
-		
         return arnFor;
     };
 
@@ -9635,9 +9649,6 @@
 		//this.setSelection(trueActiveRange);
 		lastSelection.c2 = trueActiveRange.c2;
         lastSelection.r2 = trueActiveRange.r2;
-		
-		var clipboardBase = window['AscCommon'].g_clipboardBase;
-		clipboardBase.specialPasteProps = null;
 		
         return arnFor;
     };
