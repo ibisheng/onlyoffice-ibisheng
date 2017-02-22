@@ -417,8 +417,7 @@
 					if(tablePartsContainsRange)
 					{
 						cloneFilter = tablePartsContainsRange.clone(null);
-						tablePartsContainsRange.AutoFilter = new AscCommonExcel.AutoFilter();
-						tablePartsContainsRange.AutoFilter.Ref = tablePartsContainsRange.Ref.clone();
+						tablePartsContainsRange.addAutoFilter();
 
 						//history
 						t._addHistoryObj(cloneFilter, AscCH.historyitem_AutoFilter_Add,
@@ -631,10 +630,7 @@
 					autoFilter = filterObj.filter.AutoFilter;	
 				if(!autoFilter)
 				{
-					autoFilter = new AscCommonExcel.AutoFilter();
-					autoFilter.Ref = currentFilter.Ref.clone();
-					
-					filterObj.filter.AutoFilter = autoFilter;
+					autoFilter = filterObj.filter.addAutoFilter();
 				}
 				
 				var newFilterColumn;
@@ -686,7 +682,10 @@
 					var endRow = autoFilter && autoFilter.Ref ? autoFilter.Ref.r2 : currentFilter.Ref.r2;
 					if(currentFilter && !currentFilter.isAutoFilter() && currentFilter.TotalsRowCount)
 					{
-						endRow--;
+						if(currentFilter.Ref.isEqual(autoFilter.Ref))
+						{
+							endRow--;
+						}
 					}
 					
 					var hiddenObj = {start: currentFilter.Ref.r1 + 1, h: null};
@@ -2516,7 +2515,7 @@
 							this._clearRange(clearRange, true);
 							
 							tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
-							tablePart.changeRef(null, -1);
+							tablePart.changeRef(null, -1, null, true);
 						}
 						else
 						{
@@ -2528,7 +2527,7 @@
 								isSetType = true;
 								
 								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
-								tablePart.changeRef(null, 1);
+								tablePart.changeRef(null, 1, null, true);
 							}
 							else
 							{
@@ -2538,7 +2537,7 @@
 								isSetType = true;
 								
 								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
-								tablePart.changeRef(null, 1);
+								tablePart.changeRef(null, 1, null, true);
 							}
 							
 							if(val === true)
@@ -2589,8 +2588,7 @@
 							
 							if(null === tablePart.AutoFilter)
 							{
-								tablePart.AutoFilter = new AscCommonExcel.AutoFilter();
-								tablePart.AutoFilter.Ref = tablePart.Ref.clone();
+								tablePart.addAutoFilter();
 							}
 						}
 						
@@ -3659,8 +3657,7 @@
 					
 					if(!bWithoutFilter)
 					{
-						newFilter.AutoFilter = new AscCommonExcel.AutoFilter();
-						newFilter.AutoFilter.Ref = ref;
+						newFilter.addAutoFilter();
 					}
 					
 					newFilter.TableStyleInfo = new AscCommonExcel.TableStyleInfo();

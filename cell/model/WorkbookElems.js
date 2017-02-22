@@ -5403,7 +5403,7 @@ TablePart.prototype.moveRef = function(col, row) {
 		this.SortState.moveRef(col, row);
 	}
 };
-TablePart.prototype.changeRef = function(col, row, bIsFirst) {
+TablePart.prototype.changeRef = function(col, row, bIsFirst, bIsNotChangeAutoFilter) {
 	var ref = this.Ref.clone();
 	if(bIsFirst)
 		ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
@@ -5415,7 +5415,7 @@ TablePart.prototype.changeRef = function(col, row, bIsFirst) {
 	//event
 	this.handlers.trigger("changeRefTablePart", this);
 	
-	if(this.AutoFilter)
+	if(this.AutoFilter && !bIsNotChangeAutoFilter)
 	{
 		this.AutoFilter.changeRef(col, row, bIsFirst);
 	}
@@ -5781,6 +5781,20 @@ TablePart.prototype.changeAltText = function(val)
 TablePart.prototype.changeAltTextSummary = function(val)
 {
 	this.altTextSummary = val;
+};
+
+TablePart.prototype.addAutoFilter = function()
+{
+	var autoFilter = new AscCommonExcel.AutoFilter();
+	var cloneRef = this.Ref.clone();
+	if(this.TotalsRowCount)
+	{
+		cloneRef.r2--
+	}
+	autoFilter.Ref = cloneRef;
+	
+	this.AutoFilter = autoFilter;
+	return autoFilter;
 };
 
 
