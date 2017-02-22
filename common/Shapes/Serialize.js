@@ -156,15 +156,17 @@ function BinaryPPTYLoader()
 
     this.ImageMapChecker = null;
 
-    this.IsUseFullSrc = false;
+    this.IsUseFullUrl = false;
+	this.insertDocumentUrlsData = false;
     this.RebuildImages = [];
 
     this.textBodyTextFit = [];
 	this.DocReadResult = null;
 
-    this.Start_UseFullUrl = function()
+    this.Start_UseFullUrl = function(insertDocumentUrlsData)
     {
         this.IsUseFullUrl = true;
+		this.insertDocumentUrlsData = insertDocumentUrlsData;
     };
 
     this.End_UseFullUrl = function()
@@ -2021,6 +2023,12 @@ function BinaryPPTYLoader()
                                             s.Skip2(6); // len + start attributes + type
 
                                             var sReadPath = s.GetString2();
+											if (this.IsUseFullUrl && this.insertDocumentUrlsData && this.insertDocumentUrlsData.imageMap) {
+												var sReadPathNew = this.insertDocumentUrlsData.imageMap[AscCommon.g_oDocumentUrls.mediaPrefix + sReadPath];
+												if(sReadPathNew){
+													sReadPath = sReadPathNew;
+												}
+											}
                                             uni_fill.fill.setRasterImageId(sReadPath);
 
                                             // TEST version ---------------
@@ -8433,9 +8441,9 @@ function CPres()
 
         this.ImageMapChecker = {};
 
-        this.Start_UseFullUrl = function()
+        this.Start_UseFullUrl = function(insertDocumentUrlsData)
         {
-            this.Reader.Start_UseFullUrl();
+            this.Reader.Start_UseFullUrl(insertDocumentUrlsData);
         }
         this.End_UseFullUrl = function()
         {

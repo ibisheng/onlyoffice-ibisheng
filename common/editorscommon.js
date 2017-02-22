@@ -884,6 +884,7 @@ function getExtentionByFormat (format) {
     case c_oAscFileType.FB2: return 'fb2'; break;
     case c_oAscFileType.MOBI: return 'mobi'; break;
     case c_oAscFileType.DOCY: return 'doct'; break;
+    case c_oAscFileType.CANVAS_WORD: return 'bin'; break;
     case c_oAscFileType.JSON: return 'json'; break;
     // Excel
     case c_oAscFileType.XLSX: return 'xlsx'; break;

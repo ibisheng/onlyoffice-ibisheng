@@ -438,6 +438,7 @@
 		this.IsSpellCheckCurrentWord = false;
 
 		this.mailMergeFileData = null;
+		this.insertDocumentUrlsData = null;
 
 		this.isCoMarksDraw  = false;
 		this.tmpCoMarksDraw = false;
@@ -2091,6 +2092,23 @@ background-repeat: no-repeat;\
 				} catch (e)
 				{
 					t.sendEvent("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
+				}
+			});
+		}
+		else if (this.insertDocumentUrlsData)
+		{
+			t.insertDocumentUrlsData.imageMap = url;
+			AscCommon.loadFileContent(url['output.bin'], function(result)
+			{
+				if (null === result)
+				{
+					t.sendEvent("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
+					return;
+				}
+				t.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, 'docData;'+result);
+				t.insertDocumentUrlsData.documents.shift();
+				if (0 == t.insertDocumentUrlsData.documents.length) {
+					t.insertDocumentUrlsData = null;
 				}
 			});
 		}
@@ -6439,6 +6457,13 @@ background-repeat: no-repeat;\
 			oAdditionalData['codepage']  = AscCommon.c_oAscCodePageUtf8;
 			oAdditionalData['delimiter'] = AscCommon.c_oAscCsvDelimiter.Comma
 		}
+		else if (this.insertDocumentUrlsData)
+		{
+			var last = this.insertDocumentUrlsData.documents[0];
+			oAdditionalData['url']       = last['url'];
+			oAdditionalData['format']    = last['format'];
+			oAdditionalData['outputurls']= true;
+		}
 		else if (c_oAscFileType.TXT === filetype && !options.txtOptions && null == options.oDocumentMailMerge && null == options.oMailMergeSendData)
 		{
 			// Мы открывали команду, надо ее закрыть.
@@ -7444,7 +7469,8 @@ background-repeat: no-repeat;\
 
 	window["asc_docs_api"].prototype["pluginMethod_InsertDocuments"] = function(arrDocuments)
 	{
-
+		this.insertDocumentUrlsData = {imageMap: null, documents: arrDocuments};
+		this.asc_DownloadAs(Asc.c_oAscFileType.CANVAS_WORD);
 	};
 	/********************************************************************/
 

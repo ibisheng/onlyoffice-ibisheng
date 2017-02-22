@@ -6165,8 +6165,9 @@ function BinaryFileReader(doc, openParams)
     };
     this.ReadFromString = function (sBase64, isCopyPaste) {
         //надо сбросить то, что остался после открытия документа
+		var api = this.Document.DrawingDocument.m_oWordControl.m_oApi;
         pptx_content_loader.Clear();
-        pptx_content_loader.Start_UseFullUrl();
+        pptx_content_loader.Start_UseFullUrl(api.insertDocumentUrlsData);
         this.stream = this.getbase64DecodedData(sBase64);
         this.ReadMainTable();
         var oReadResult = this.oReadResult;

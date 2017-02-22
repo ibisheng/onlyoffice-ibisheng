@@ -2514,6 +2514,9 @@ PasteProcessor.prototype =
 					oThis.InsertInDocument();
 					if(aContent.bAddNewStyles)
 						oThis.api.GenerateStyles();
+					if (oThis.api.insertDocumentUrlsData) {
+						oThis.api.asc_DownloadAs(Asc.c_oAscFileType.CANVAS_WORD);
+					}
 				}
 			}
 			
