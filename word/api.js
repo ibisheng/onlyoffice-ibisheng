@@ -7441,6 +7441,11 @@ background-repeat: no-repeat;\
 	{
 		return this.asc_GetBlockChainData();
 	};
+
+	window["asc_docs_api"].prototype["pluginMethod_InsertDocuments"] = function(arrDocuments)
+	{
+
+	};
 	/********************************************************************/
 
 	// desktop editor spellcheck
