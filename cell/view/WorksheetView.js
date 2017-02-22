@@ -9518,7 +9518,10 @@
 				var styleForCurTable = t.model.workbook.TableStyles.AllStyles[styleInfo.Name];
 				
 				var headerRowCount = !!(null === table.HeaderRowCount || table.HeaderRowCount > 0);
-				dxf = styleForCurTable.getStyle(table.Ref, pasteRow, pasteCol, styleInfo, headerRowCount, table.HeaderRowCount);
+				var bbox = {r1: 0, c1: 0, r2: table.Ref.r2 - table.Ref.r1, c2: table.Ref.c2 - table.Ref.c1};
+				pasteRow = pasteRow - table.Ref.r1;
+				pasteCol = pasteCol - table.Ref.c1;
+				dxf = styleForCurTable.getStyle(bbox, pasteRow, pasteCol, styleInfo, headerRowCount, table.TotalsRowCount);
 			}
 			
 			return dxf;
