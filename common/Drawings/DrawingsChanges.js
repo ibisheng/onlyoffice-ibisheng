@@ -383,6 +383,33 @@
         return true;
     };
 
+    CChangesDrawingsContentPresentation.prototype.Load = function(Color)
+    {
+        var aContent = this.private_GetChangedArray();
+        if(!Array.isArray(aContent)){
+            return;
+        }
+        if(this.IsAdd()){
+            if (this.PosArray.length <= 0 || this.Items.length <= 0)
+                return;
+            for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex){
+                var Pos     = this.Class.m_oContentChanges.Check(AscCommon.contentchanges_Add, true !== this.UseArray ? this.Pos + nIndex : this.PosArray[nIndex]);
+                var Element = this.Items[nIndex];
+                Pos = Math.min(Pos, aContent.length);
+                aContent.splice(Pos, 0, Element);
+            }
+        }
+        else{
+            for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex) {
+                var Pos = this.Class.m_oContentChanges.Check(AscCommon.contentchanges_Remove, true !== this.UseArray ? this.Pos : this.PosArray[nIndex]);
+
+                if (false === Pos)
+                    continue;
+                aContent.splice(Pos, 1);
+            }
+        }
+    };
+
     window['AscDFH'].CChangesDrawingsContentPresentation = CChangesDrawingsContentPresentation;
 
     function CChangesDrawingsContentNoId(Class, Type, Pos, Items, isAdd){
