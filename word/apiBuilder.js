@@ -1371,6 +1371,118 @@
         return true;
     };
 
+    /**
+     * Receive a report about all comments collected in the document.
+	 * @returns {object}
+     */
+    ApiDocument.prototype.GetCommentsReport = function()
+    {
+		var oResult = {};
+		var oReport = this.Document.Api.asc_GetCommentsReportByAuthors();
+		for (var sUserName in oReport)
+		{
+			var arrUserComments = oReport[sUserName];
+			oResult[sUserName] = [];
+
+			for (var nIndex = 0, nCount = arrUserComments.length; nIndex < nCount; ++nIndex)
+			{
+				var isAnswer     = oReport[sUserName][nIndex].Top ? false : true;
+				var oCommentData = oReport[sUserName][nIndex].Data;
+
+				if (isAnswer)
+				{
+					oResult[sUserName].push({
+						"IsAnswer"       : true,
+						"CommentMessage" : oCommentData.GetText(),
+						"DateTime"       : oCommentData.GetDateTime()
+					});
+				}
+				else
+				{
+					var sQuoteText = oCommentData.GetQuoteText();
+					oResult[sUserName].push({
+						"IsAnswer"       : false,
+						"CommentMessage" : oCommentData.GetText(),
+						"DateTime"       : oCommentData.GetDateTime(),
+						"QuoteText"      : sQuoteText,
+						"IsSolved"       : oCommentData.IsSolved()
+					});
+				}
+			}
+		}
+
+		return oResult;
+    };
+
+	/**
+	 * Receive a report about every change which was made in review mode in the document.
+	 * @returns {object}
+	 */
+	ApiDocument.prototype.GetReviewReport = function()
+	{
+		var oResult = {};
+		var oReport = this.Document.Api.asc_GetTrackRevisionsReportByAuthors();
+		for (var sUserName in oReport)
+		{
+			var arrUsersChanges = oReport[sUserName];
+			oResult[sUserName] = [];
+
+			for (var nIndex = 0, nCount = arrUsersChanges.length; nIndex < nCount; ++nIndex)
+			{
+				var oChange = oReport[sUserName][nIndex];
+
+				var nType = oChange.get_Type();
+				var oElement = {};
+				if (c_oAscRevisionsChangeType.TextAdd === nType)
+				{
+					oElement = {
+						"Type" : "TextAdd",
+						"Value" : oChange.get_Value()
+					};
+				}
+				else if (c_oAscRevisionsChangeType.TextRem == nType)
+				{
+					oElement = {
+						"Type" : "TextRem",
+						"Value" : oChange.get_Value()
+					};
+				}
+				else if (c_oAscRevisionsChangeType.ParaAdd === nType)
+				{
+					oElement = {
+						"Type" : "ParaAdd"
+					};
+				}
+				else if (c_oAscRevisionsChangeType.ParaRem === nType)
+				{
+					oElement = {
+						"Type" : "ParaRem"
+					};
+				}
+				else if (c_oAscRevisionsChangeType.TextPr === nType)
+				{
+					oElement = {
+						"Type" : "TextPr"
+					};
+				}
+				else if (c_oAscRevisionsChangeType.ParaPr === nType)
+				{
+					oElement = {
+						"Type" : "ParaPr"
+					};
+				}
+				else
+				{
+					oElement = {
+						"Type" : "Unknown"
+					};
+				}
+				oElement["Time"] = oChange.get_DateTime();
+				oResult[sUserName].push(oElement);
+			}
+		}
+		return oResult;
+	};
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiParagraph
@@ -4335,6 +4447,8 @@
     ApiDocument.prototype["SetEvenAndOddHdrFtr"]     = ApiDocument.prototype.SetEvenAndOddHdrFtr;
     ApiDocument.prototype["CreateNumbering"]         = ApiDocument.prototype.CreateNumbering;
     ApiDocument.prototype["InsertContent"]           = ApiDocument.prototype.InsertContent;
+	ApiDocument.prototype["GetCommentsReport"]       = ApiDocument.prototype.GetCommentsReport;
+	ApiDocument.prototype["GetReviewReport"]         = ApiDocument.prototype.GetReviewReport;
 
     ApiParagraph.prototype["GetClassType"]           = ApiParagraph.prototype.GetClassType;
     ApiParagraph.prototype["AddText"]                = ApiParagraph.prototype.AddText;
@@ -5035,3 +5149,17 @@
         return new ApiDocumentContent(oDocContent);
     };
 }(window, null));
+
+function TEST_BUILDER_REPORT()
+{
+	var oApi = editor;
+	var oDocument = oApi.GetDocument();
+
+	var oCommentsReport = oDocument.GetCommentsReport();
+	console.log(oCommentsReport);
+
+	var oReviewReport = oDocument.GetReviewReport();
+	console.log(oReviewReport);
+
+	oDocument.Document.Recalculate_FromStart();
+}

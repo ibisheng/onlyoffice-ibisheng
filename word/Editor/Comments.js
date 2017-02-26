@@ -230,6 +230,18 @@ CCommentData.prototype.GetReply = function(nIndex)
 {
 	return this.Get_Reply(nIndex);
 };
+CCommentData.prototype.GetText = function()
+{
+	return this.Get_Text();
+};
+CCommentData.prototype.GetQuoteText = function()
+{
+	return this.Get_QuoteText();
+};
+CCommentData.prototype.IsSolved = function()
+{
+	return this.m_bSolved;
+};
 
 function CCommentDrawingRect(X, Y, W, H, CommentId, InvertTransform)
 {
