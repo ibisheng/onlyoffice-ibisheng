@@ -1394,7 +1394,7 @@
 					oResult[sUserName].push({
 						"IsAnswer"       : true,
 						"CommentMessage" : oCommentData.GetText(),
-						"DateTime"       : oCommentData.GetDateTime()
+						"Date"           : oCommentData.GetDateTime()
 					});
 				}
 				else
@@ -1403,7 +1403,7 @@
 					oResult[sUserName].push({
 						"IsAnswer"       : false,
 						"CommentMessage" : oCommentData.GetText(),
-						"DateTime"       : oCommentData.GetDateTime(),
+						"Date"           : oCommentData.GetDateTime(),
 						"QuoteText"      : sQuoteText,
 						"IsSolved"       : oCommentData.IsSolved()
 					});
@@ -1433,18 +1433,19 @@
 
 				var nType = oChange.get_Type();
 				var oElement = {};
+				// TODO: Посмотреть почем Value приходит массивом.
 				if (c_oAscRevisionsChangeType.TextAdd === nType)
 				{
 					oElement = {
 						"Type" : "TextAdd",
-						"Value" : oChange.get_Value()
+						"Value" : oChange.get_Value().length ? oChange.get_Value()[0] : ""
 					};
 				}
 				else if (c_oAscRevisionsChangeType.TextRem == nType)
 				{
 					oElement = {
 						"Type" : "TextRem",
-						"Value" : oChange.get_Value()
+						"Value" : oChange.get_Value().length ? oChange.get_Value()[0] : ""
 					};
 				}
 				else if (c_oAscRevisionsChangeType.ParaAdd === nType)
@@ -1477,7 +1478,7 @@
 						"Type" : "Unknown"
 					};
 				}
-				oElement["Time"] = oChange.get_DateTime();
+				oElement["Date"] = oChange.get_DateTime();
 				oResult[sUserName].push(oElement);
 			}
 		}
@@ -5160,6 +5161,151 @@ function TEST_BUILDER_REPORT()
 
 	var oReviewReport = oDocument.GetReviewReport();
 	console.log(oReviewReport);
+
+
+	var oParagraph = oApi.CreateParagraph();
+	oDocument.Push(oParagraph);
+	oParagraph.AddText("Comments report");
+
+	var nRows = 1;
+	for (var sUserName in oCommentsReport)
+	{
+		nRows += oCommentsReport[sUserName].length;
+	}
+
+	var nCols = 6;
+	var oTable = oApi.CreateTable(nCols, nRows);
+	oDocument.Push(oTable);
+
+	function privateFillCell(nCurRow, nCurCol, sText)
+	{
+		var oRow         = oTable.GetRow(nCurRow);
+		var oCell        = oRow.GetCell(nCurCol);
+		var oCellContent = oCell.GetContent();
+		var oRun         = oCellContent.GetElement(0).AddText(sText);
+		return {Cell : oCell, Run : oRun};
+	}
+
+	privateFillCell(0, 0, "Name");
+	privateFillCell(0, 1, "Date");
+	privateFillCell(0, 2, "");
+	privateFillCell(0, 3, "Solved");
+	privateFillCell(0, 4, "Text");
+	privateFillCell(0, 5, "Quote text");
+
+	var nCurRow = 1;
+	for (var sUserName in oCommentsReport)
+	{
+		var arrUserComments = oCommentsReport[sUserName];
+		var arrCells = [];
+		for (var nIndex = 0, nCount = arrUserComments.length; nIndex < nCount; ++nIndex, ++nCurRow)
+		{
+			var oCommentInfo = oCommentsReport[sUserName][nIndex];
+			arrCells.push(privateFillCell(nCurRow, 0, "").Cell);
+			privateFillCell(nCurRow, 1, (new Date(oCommentInfo["Date"])).toLocaleString());
+			privateFillCell(nCurRow, 2, oCommentInfo["IsAnswer"] === true ? "answer" : "comment");
+
+			if (oCommentInfo["IsAnswer"] !== true)
+			{
+				if (oCommentInfo["IsSolved"] === true)
+					privateFillCell(nCurRow, 3, "yes").Run.SetColor(0, 255, 0);
+				else
+					privateFillCell(nCurRow, 3, "no").Run.SetColor(255, 0, 0);
+			}
+
+			privateFillCell(nCurRow, 4, oCommentInfo["CommentMessage"] ? oCommentInfo["CommentMessage"] : "");
+			privateFillCell(nCurRow, 5, oCommentInfo["QuoteText"] ? oCommentInfo["QuoteText"] : "");
+		}
+
+		var oMergedCell = oTable.MergeCells(arrCells);
+		if (oMergedCell)
+		{
+			var oCellContent = oMergedCell.GetContent();
+			oCellContent.GetElement(0).AddText(sUserName);
+		}
+		else if (arrCells.length > 0)
+		{
+			var oCellContent = arrCells[0].GetContent();
+			oCellContent.GetElement(0).AddText(sUserName);
+		}
+	}
+	oTable.SetStyle(oDocument.GetStyle("Bordered"));
+
+
+	oParagraph = oApi.CreateParagraph();
+	oDocument.Push(oParagraph);
+	oParagraph.AddText("Review report");
+
+	nRows = 1;
+	for (var sUserName in oReviewReport)
+	{
+		nRows += oReviewReport[sUserName].length;
+	}
+
+	nCols = 3;
+	oTable = oApi.CreateTable(nCols, nRows);
+	oDocument.Push(oTable);
+
+	privateFillCell(0, 0, "Name");
+	privateFillCell(0, 1, "Date");
+	privateFillCell(0, 2, "Change");
+
+	var nCurRow = 1;
+	for (var sUserName in oReviewReport)
+	{
+		var arrUserChanges = oReviewReport[sUserName];
+		var arrCells = [];
+		for (var nIndex = 0, nCount = arrUserChanges.length; nIndex < nCount; ++nIndex, ++nCurRow)
+		{
+			var oChangeInfo = arrUserChanges[nIndex];
+			arrCells.push(privateFillCell(nCurRow, 0, "").Cell);
+			privateFillCell(nCurRow, 1, (new Date(oChangeInfo["Date"])).toLocaleString());
+
+			var sType = oChangeInfo["Type"];
+			if ("TextAdd" === sType)
+			{
+				privateFillCell(nCurRow, 2, oChangeInfo["Value"]);
+			}
+			else if ("TextRem" === sType)
+			{
+				privateFillCell(nCurRow, 2, oChangeInfo["Value"]).Run.SetStrikeout(true);
+			}
+			else if ("TextPr" === sType)
+			{
+				privateFillCell(nCurRow, 2, "\<Formatted text\>").Run.SetItalic(true);
+			}
+			else if ("ParaAdd" === sType)
+			{
+				privateFillCell(nCurRow, 2, "\<Added paragraph\>").Run.SetItalic(true);
+			}
+			else if ("ParaRem" === sType)
+			{
+				privateFillCell(nCurRow, 2, "\<Removed paragraph\>").Run.SetItalic(true);
+			}
+			else if ("ParaPr" === sType)
+			{
+				privateFillCell(nCurRow, 2, "\<Formatted paragraph\>").Run.SetItalic(true);
+			}
+			else
+			{
+				privateFillCell(nCurRow, 2, "\<Unknown change\>").Run.SetUnderline(true);
+			}
+		}
+
+		var oMergedCell = oTable.MergeCells(arrCells);
+		if (oMergedCell)
+		{
+			var oCellContent = oMergedCell.GetContent();
+			oCellContent.GetElement(0).AddText(sUserName);
+		}
+		else if (arrCells.length > 0)
+		{
+			var oCellContent = arrCells[0].GetContent();
+			oCellContent.GetElement(0).AddText(sUserName);
+		}
+	}
+	oTable.SetStyle(oDocument.GetStyle("Bordered"));
+
 
 	oDocument.Document.Recalculate_FromStart();
 }
