@@ -140,20 +140,21 @@ Asc['asc_docs_api'].prototype.asc_GetTrackRevisionsReportByAuthors = function()
 	return oResult;
 };
 
-Asc['asc_docs_api'].prototype['asc_SetTrackRevisions']               = Asc['asc_docs_api'].prototype.asc_SetTrackRevisions;
-Asc['asc_docs_api'].prototype['asc_IsTrackRevisions']                = Asc['asc_docs_api'].prototype.asc_IsTrackRevisions;
-Asc['asc_docs_api'].prototype['sync_BeginCatchRevisionsChanges']     = Asc['asc_docs_api'].prototype.sync_BeginCatchRevisionsChanges;
-Asc['asc_docs_api'].prototype['sync_EndCatchRevisionsChanges']       = Asc['asc_docs_api'].prototype.sync_EndCatchRevisionsChanges;
-Asc['asc_docs_api'].prototype['sync_AddRevisionsChange']             = Asc['asc_docs_api'].prototype.sync_AddRevisionsChange;
-Asc['asc_docs_api'].prototype['asc_AcceptChanges']                   = Asc['asc_docs_api'].prototype.asc_AcceptChanges;
-Asc['asc_docs_api'].prototype['asc_RejectChanges']                   = Asc['asc_docs_api'].prototype.asc_RejectChanges;
-Asc['asc_docs_api'].prototype['asc_HaveRevisionsChanges']            = Asc['asc_docs_api'].prototype.asc_HaveRevisionsChanges;
-Asc['asc_docs_api'].prototype['asc_HaveNewRevisionsChanges']         = Asc['asc_docs_api'].prototype.asc_HaveNewRevisionsChanges;
-Asc['asc_docs_api'].prototype['asc_GetNextRevisionsChange']          = Asc['asc_docs_api'].prototype.asc_GetNextRevisionsChange;
-Asc['asc_docs_api'].prototype['asc_GetPrevRevisionsChange']          = Asc['asc_docs_api'].prototype.asc_GetPrevRevisionsChange;
-Asc['asc_docs_api'].prototype['sync_UpdateRevisionsChangesPosition'] = Asc['asc_docs_api'].prototype.sync_UpdateRevisionsChangesPosition;
-Asc['asc_docs_api'].prototype['asc_AcceptAllChanges']                = Asc['asc_docs_api'].prototype.asc_AcceptAllChanges;
-Asc['asc_docs_api'].prototype['asc_RejectAllChanges']                = Asc['asc_docs_api'].prototype.asc_RejectAllChanges;
+Asc['asc_docs_api'].prototype['asc_SetTrackRevisions']                = Asc['asc_docs_api'].prototype.asc_SetTrackRevisions;
+Asc['asc_docs_api'].prototype['asc_IsTrackRevisions']                 = Asc['asc_docs_api'].prototype.asc_IsTrackRevisions;
+Asc['asc_docs_api'].prototype['sync_BeginCatchRevisionsChanges']      = Asc['asc_docs_api'].prototype.sync_BeginCatchRevisionsChanges;
+Asc['asc_docs_api'].prototype['sync_EndCatchRevisionsChanges']        = Asc['asc_docs_api'].prototype.sync_EndCatchRevisionsChanges;
+Asc['asc_docs_api'].prototype['sync_AddRevisionsChange']              = Asc['asc_docs_api'].prototype.sync_AddRevisionsChange;
+Asc['asc_docs_api'].prototype['asc_AcceptChanges']                    = Asc['asc_docs_api'].prototype.asc_AcceptChanges;
+Asc['asc_docs_api'].prototype['asc_RejectChanges']                    = Asc['asc_docs_api'].prototype.asc_RejectChanges;
+Asc['asc_docs_api'].prototype['asc_HaveRevisionsChanges']             = Asc['asc_docs_api'].prototype.asc_HaveRevisionsChanges;
+Asc['asc_docs_api'].prototype['asc_HaveNewRevisionsChanges']          = Asc['asc_docs_api'].prototype.asc_HaveNewRevisionsChanges;
+Asc['asc_docs_api'].prototype['asc_GetNextRevisionsChange']           = Asc['asc_docs_api'].prototype.asc_GetNextRevisionsChange;
+Asc['asc_docs_api'].prototype['asc_GetPrevRevisionsChange']           = Asc['asc_docs_api'].prototype.asc_GetPrevRevisionsChange;
+Asc['asc_docs_api'].prototype['sync_UpdateRevisionsChangesPosition']  = Asc['asc_docs_api'].prototype.sync_UpdateRevisionsChangesPosition;
+Asc['asc_docs_api'].prototype['asc_AcceptAllChanges']                 = Asc['asc_docs_api'].prototype.asc_AcceptAllChanges;
+Asc['asc_docs_api'].prototype['asc_RejectAllChanges']                 = Asc['asc_docs_api'].prototype.asc_RejectAllChanges;
+Asc['asc_docs_api'].prototype['asc_GetTrackRevisionsReportByAuthors'] = Asc['asc_docs_api'].prototype.asc_GetTrackRevisionsReportByAuthors;
 //----------------------------------------------------------------------------------------------------------------------
 // CDocument
 //----------------------------------------------------------------------------------------------------------------------
