@@ -6843,8 +6843,9 @@
         // Показываем только данные для 2-х или более ячеек (http://bugzilla.onlyoffice.com/show_bug.cgi?id=24115)
         if (1 < oSelectionMathInfo.countNumbers) {
             // Мы должны отдавать в формате активной ячейки
-            var numFormat = this.model.getRange3(this.model.selectionRange.row, this.model.selectionRange.cell,
-              this.model.selectionRange.row, this.model.selectionRange.cell).getNumFormat();
+			var activeCell = this.model.selectionRange.activeCell;
+            var numFormat = this.model.getRange3(activeCell.row, activeCell.col,
+				activeCell.row, activeCell.col).getNumFormat();
             if (Asc.c_oAscNumFormatType.Time === numFormat.getType()) {
                 // Для времени нужно отдавать в формате [h]:mm:ss (http://bugzilla.onlyoffice.com/show_bug.cgi?id=26271)
                 numFormat = AscCommon.oNumFormatCache.get('[h]:mm:ss');
