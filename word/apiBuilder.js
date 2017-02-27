@@ -5242,13 +5242,14 @@ function TEST_BUILDER_REPORT()
 		nRows += oReviewReport[sUserName].length;
 	}
 
-	nCols = 3;
+	nCols = 4;
 	oTable = oApi.CreateTable(nCols, nRows);
 	oDocument.Push(oTable);
 
 	privateFillCell(0, 0, "Name");
 	privateFillCell(0, 1, "Date");
-	privateFillCell(0, 2, "Change");
+	privateFillCell(0, 2, "Action");
+	privateFillCell(0, 3, "");
 
 	var nCurRow = 1;
 	for (var sUserName in oReviewReport)
@@ -5264,31 +5265,33 @@ function TEST_BUILDER_REPORT()
 			var sType = oChangeInfo["Type"];
 			if ("TextAdd" === sType)
 			{
-				privateFillCell(nCurRow, 2, oChangeInfo["Value"]);
+				privateFillCell(nCurRow, 2, "Added text");
+				privateFillCell(nCurRow, 3, oChangeInfo["Value"]);
 			}
 			else if ("TextRem" === sType)
 			{
-				privateFillCell(nCurRow, 2, oChangeInfo["Value"]).Run.SetStrikeout(true);
+				privateFillCell(nCurRow, 2, "Removed text");
+				privateFillCell(nCurRow, 3, oChangeInfo["Value"]).Run.SetStrikeout(true);
 			}
 			else if ("TextPr" === sType)
 			{
-				privateFillCell(nCurRow, 2, "\<Formatted text\>").Run.SetItalic(true);
+				privateFillCell(nCurRow, 2, "Formatted text");
 			}
 			else if ("ParaAdd" === sType)
 			{
-				privateFillCell(nCurRow, 2, "\<Added paragraph\>").Run.SetItalic(true);
+				privateFillCell(nCurRow, 2, "Added paragraph");
 			}
 			else if ("ParaRem" === sType)
 			{
-				privateFillCell(nCurRow, 2, "\<Removed paragraph\>").Run.SetItalic(true);
+				privateFillCell(nCurRow, 2, "Removed paragraph");
 			}
 			else if ("ParaPr" === sType)
 			{
-				privateFillCell(nCurRow, 2, "\<Formatted paragraph\>").Run.SetItalic(true);
+				privateFillCell(nCurRow, 2, "Formatted paragraph");
 			}
 			else
 			{
-				privateFillCell(nCurRow, 2, "\<Unknown change\>").Run.SetUnderline(true);
+				privateFillCell(nCurRow, 2, "Unknown change");
 			}
 		}
 
