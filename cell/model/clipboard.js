@@ -432,17 +432,15 @@
 			start_paste: function()
 			{
 				this.pasteStart = true;
-				//console.log("pasteStart: " + this.pasteStart);
 			},
 			
 			end_paste: function()
 			{
 				this.pasteStart = false;
-				//console.log("pasteEnd: " + this.pasteStart);
+				
 				if(this.specialPasteStart)
 				{
 					this.specialPasteStart = false;
-					//console.log("specialPasteEnd: " + this.specialPasteStart);
 				}
 				
 				if(this.bIsEndTransaction)
@@ -457,7 +455,6 @@
 			start_specialpaste: function()
 			{
 				this.specialPasteStart = true;
-				//console.log("specialPasteStart: " + this.specialPasteStart);
 			}
 		};
 
@@ -729,7 +726,7 @@
 					
 					return htmlInShape;
 				}
-				else if(isSelectedImages && isSelectedImages != -1)
+				else if(isSelectedImages && isSelectedImages != -1)//графические объекты
 				{
 					if(this.Api && this.Api.isChartEditor)
 						return false;
@@ -907,16 +904,8 @@
 							span.title = hyperlink.Tooltip;
 					}
 					
-					if( val[i].sFormula )
-					{
-						span.textContent = val[i].text;
-						$(span).addClass("cellFrom_"+val[i].sId + "textFormula_" + "=" + val[i].sFormula);
-					}
-					else
-					{
-						span.textContent = val[i].text;
-					}
-					
+					span.textContent = val[i].text;
+
 					f = val[i].format;
 					var fn = f.getName();
 					var fs = f.getSize();
