@@ -275,6 +275,8 @@
 				var activeRange = ws.getSelectedRange();
 				var wb = window["Asc"]["editor"].wb;
 				
+				wb.handlers.trigger("hideSpecialPasteOptions");
+				
 				if(ws.getCellEditMode() === true)//text in cell
 				{
 					//only TEXT
