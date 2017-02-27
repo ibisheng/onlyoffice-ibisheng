@@ -157,7 +157,7 @@ function BinaryPPTYLoader()
     this.ImageMapChecker = null;
 
     this.IsUseFullUrl = false;
-	this.insertDocumentUrlsData = false;
+	this.insertDocumentUrlsData = null;
     this.RebuildImages = [];
 
     this.textBodyTextFit = [];

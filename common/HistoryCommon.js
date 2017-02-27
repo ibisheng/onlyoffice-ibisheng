@@ -1010,7 +1010,9 @@
 			case AscDFH.historydescription_Document_RemoveAllFootnotes:
 				sString = "Document_RemoveAllFootnotes                ";
 				break;
-
+			case AscDFH.historydescription_Document_InsertDocumentsByUrls:
+				sString = "Document_InsertDocumentsByUrls             ";
+				break;
 		}
 		return sString;
 	}
@@ -2855,6 +2857,7 @@
 	window['AscDFH'].historydescription_Document_AddFootnote                        = 0x013c;
 	window['AscDFH'].historydescription_Document_SetFootnotePr                      = 0x013d;
 	window['AscDFH'].historydescription_Document_RemoveAllFootnotes                 = 0x013e;
+	window['AscDFH'].historydescription_Document_InsertDocumentsByUrls              = 0x013f;
 
 
 
