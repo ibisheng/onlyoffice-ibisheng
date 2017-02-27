@@ -946,22 +946,23 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
         var mapParagraphs       = {};
         var mapDrawings         = {};
         var mapRuns             = {};
+        var mapTables           = {};
         for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
         {
             var oChange = arrReverseChanges[nIndex];
             var oClass  = oChange.GetClass();
-            if (oClass instanceof AscCommonWord.CDocument || oClass instanceof AscCommonWord.CDocumentContent)
-                mapDocumentContents[oClass.Get_Id()] = oClass;
-            else if (oClass instanceof AscCommonWord.Paragraph)
-                mapParagraphs[oClass.Get_Id()] = oClass;
-            else if (oClass.IsParagraphContentElement && true === oClass.IsParagraphContentElement() && true === oChange.IsContentChange() && oClass.Get_Paragraph())
-                mapParagraphs[oClass.Get_Paragraph().Get_Id()] = oClass.Get_Paragraph();
-            else if(oClass instanceof AscCommonWord.ParaDrawing){
-                mapDrawings[oClass.Get_Id()] = oClass;
-            }
-            else if(oClass instanceof AscCommonWord.ParaRun){
-                mapRuns[oClass.Get_Id()] = oClass;
-            }
+			if (oClass instanceof AscCommonWord.CDocument || oClass instanceof AscCommonWord.CDocumentContent)
+				mapDocumentContents[oClass.Get_Id()] = oClass;
+			else if (oClass instanceof AscCommonWord.Paragraph)
+				mapParagraphs[oClass.Get_Id()] = oClass;
+			else if (oClass.IsParagraphContentElement && true === oClass.IsParagraphContentElement() && true === oChange.IsContentChange() && oClass.Get_Paragraph())
+				mapParagraphs[oClass.Get_Paragraph().Get_Id()] = oClass.Get_Paragraph();
+			else if (oClass instanceof AscCommonWord.ParaDrawing)
+				mapDrawings[oClass.Get_Id()] = oClass;
+			else if (oClass instanceof AscCommonWord.ParaRun)
+				mapRuns[oClass.Get_Id()] = oClass;
+			else if (oClass instanceof AscCommonWord.CTable)
+				mapTables[oClass.Get_Id()] = oClass;
         }
 
         // Создаем точку в истории. Делаем действия через обычные функции (с отключенным пересчетом), которые пишут в
@@ -1003,10 +1004,35 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
             }
         }
 
+        for (var sId in mapTables)
+		{
+			var oTable = mapTables[sId];
+			for (var nCurRow = oTable.Content.length - 1; nCurRow >= 0; --nCurRow)
+			{
+				var oRow = oTable.Get_Row(nCurRow);
+				if (oRow.Get_CellsCount() <= 0)
+					oTable.Internal_Remove_Row(nCurRow);
+			}
+
+			if (oTable.Parent instanceof AscCommonWord.CDocument || oTable.Parent instanceof AscCommonWord.CDocumentContent)
+				mapDocumentContents[oTable.Parent.Get_Id()] = oTable.Parent;
+		}
+
         for (var sId in mapDocumentContents)
         {
             var oDocumentContent = mapDocumentContents[sId];
             var nContentLen = oDocumentContent.Content.length;
+			for (var nIndex = nContentLen - 1; nIndex >= 0; --nIndex)
+			{
+				var oElement = oDocumentContent.Content[nIndex];
+				if ((AscCommonWord.type_Paragraph === oElement.GetType() || AscCommonWord.type_Table === oElement.GetType()) && oElement.Content.length <= 0)
+				{
+					oDocumentContent.Remove_FromContent(nIndex, 1);
+					console.log("Deleted " + ( AscCommonWord.type_Table === oElement.GetType() ? "Table" : "Paragraph"));
+				}
+			}
+
+			nContentLen = oDocumentContent.Content.length;
             if (nContentLen <= 0 || AscCommonWord.type_Paragraph !== oDocumentContent.Content[nContentLen - 1].GetType())
             {
                 var oNewParagraph = new AscCommonWord.Paragraph(oLogicDocument.Get_DrawingDocument(), oDocumentContent, 0, 0, 0, 0, 0, false);
