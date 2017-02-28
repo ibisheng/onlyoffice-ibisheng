@@ -3768,9 +3768,9 @@ CShape.prototype.selectionSetStart = function (e, x, y, slideIndex)
             }
         }
         if(!(content.Is_TextSelectionUse() && e.ShiftKey))
-            content.Selection_SetStart(tx, ty, slideIndex, e);
+            content.Selection_SetStart(tx, ty, slideIndex - content.Get_StartPage_Relative(), e);
         else
-            content.Selection_SetEnd(tx, ty, slideIndex, e);
+            content.Selection_SetEnd(tx, ty, slideIndex - content.Get_StartPage_Relative(), e);
     }
 };
 
@@ -3783,7 +3783,7 @@ CShape.prototype.selectionSetEnd = function (e, x, y, slideIndex)
         ty = this.invertTransformText.TransformPointY(x, y);
         if(!(e.Type === AscCommon.g_mouse_event_type_up && this.rightButtonFlag))
         {
-            content.Selection_SetEnd(tx, ty, slideIndex, e);
+            content.Selection_SetEnd(tx, ty, slideIndex - content.Get_StartPage_Relative(), e);
         }
     }
     delete this.rightButtonFlag;
