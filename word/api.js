@@ -1755,7 +1755,7 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.asc_PasteData = function(_format, data1, data2, useCurrentPoint)
+	asc_docs_api.prototype.asc_PasteData = function(_format, data1, data2, text_data, useCurrentPoint)
 	{
 	    if (AscCommon.CollaborativeEditing.Get_GlobalLock())
 	        return;
@@ -2109,7 +2109,7 @@ background-repeat: no-repeat;\
 					return;
 				}
 				//t.WordControl.m_oLogicDocument.Add_NewParagraph();
-				t.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, 'docData;' + result, undefined, true);
+				t.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, 'docData;' + result, undefined, undefined, true);
 			});
 		}
 		else

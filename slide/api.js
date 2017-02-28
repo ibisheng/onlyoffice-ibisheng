@@ -1771,7 +1771,7 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.asc_PasteData = function(_format, data1, data2)
+	asc_docs_api.prototype.asc_PasteData = function(_format, data1, data2, text_data)
 	{
 	    if (this.getViewMode())
     	    return;
