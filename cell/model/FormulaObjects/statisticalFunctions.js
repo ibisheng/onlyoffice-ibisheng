@@ -1079,19 +1079,19 @@
 	cCOUNTIF.prototype = Object.create(cBaseFunction.prototype);
 	cCOUNTIF.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], _count = 0, valueForSearching;
-		if (!(arg0 instanceof cRef || arg0 instanceof cRef3D || arg0 instanceof cArea || arg0 instanceof cArea3D)) {
+		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type && cElementType.cellsRange !== arg0.type && cElementType.cellsRange3D !== arg0.type) {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
-		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
+		if (cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
 			arg1 = arg1.cross(arguments[1].bbox);
-		} else if (arg1 instanceof cArray) {
+		} else if (cElementType.array === arg1.type) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
 
 		arg1 = arg1.tocString();
 
-		if (!(arg1 instanceof cString)) {
+		if (cElementType.string !== arg1.type) {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
@@ -1105,11 +1105,11 @@
 			search = arg1;
 		}
 		valueForSearching = parseNum(search) ? new cNumber(search) : new cString(search);
-		if (arg0 instanceof cArea) {
+		if (cElementType.cellsRange === arg0.type) {
 			arg0.foreach2(function (_val) {
 				_count += matching(_val, valueForSearching, oper);
 			})
-		} else if (arg0 instanceof cArea3D) {
+		} else if (cElementType.cellsRange3D === arg0.type) {
 			val = arg0.getValue();
 			for (var i = 0; i < val.length; i++) {
 				_count += matching(val[i], valueForSearching, oper);
@@ -1129,10 +1129,87 @@
 
 	/** @constructor */
 	function cCOUNTIFS() {
-		cBaseFunction.call(this, "COUNTIFS");
+		this.name = "COUNTIFS";
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = 2;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 256;
+		this.formatType = {
+			def: -1, //подразумевается формат первой ячейки входящей в формулу.
+			noneFormat: -2
+		};
+		this.numFormat = this.formatType.def;
 	}
 
 	cCOUNTIFS.prototype = Object.create(cBaseFunction.prototype);
+	cCOUNTIFS.prototype.Calculate = function (arg) {
+		var i, j, arg0, arg1, valueForSearching, arg0Matrix, arg1Matrix, _count = 0;
+		var search, oper, match, operators = new RegExp("^ *[<=> ]+ *");
+		for (var k = 0; k < arg.length; k += 2) {
+			arg0 = arg[k];
+			arg1 = arg[k + 1];
+			if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type && cElementType.cellsRange !== arg0.type && cElementType.cellsRange3D !== arg0.type) {
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+
+			if (cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
+				arg1 = arg1.cross(arguments[1].bbox);
+			} else if (cElementType.array === arg1.type) {
+				arg1 = arg1.getElementRowCol(0, 0);
+			}
+
+			arg1 = arg1.tocString();
+			if (cElementType.string !== arg1.type) {
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+
+			arg1 = arg1.toString();
+			match = arg1.match(operators);
+			oper = null;
+			if (match) {
+				search = arg1.substr(match[0].length);
+				oper = match[0].replace(/\s/g, "");
+			} else {
+				search = arg1;
+			}
+			valueForSearching = parseNum(search) ? new cNumber(search) : new cString(search);
+			arg1Matrix = arg0.getMatrix();
+			if (!arg0Matrix) {
+				arg0Matrix = arg1Matrix;
+			}
+			if (arg0Matrix.length !== arg1Matrix.length) {
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+			for (i = 0; i < arg1Matrix.length; ++i) {
+				if (arg0Matrix[i].length !== arg1Matrix[i].length) {
+					return this.value = new cError(cErrorType.wrong_value_type);
+				}
+				for (j = 0; j < arg1Matrix[i].length; ++j) {
+					if (arg0Matrix[i][j] && !matching(arg1Matrix[i][j], valueForSearching, oper)) {
+						arg0Matrix[i][j] = null;
+					}
+				}
+			}
+		}
+
+		for (i = 0; i < arg0Matrix.length; ++i) {
+			for (j = 0; j < arg0Matrix[i].length; ++j) {
+				if (arg0Matrix[i][j]) {
+					++_count;
+				}
+			}
+		}
+		return this.value = new cNumber(_count);
+	};
+	cCOUNTIFS.prototype.checkArguments = function () {
+		return 0 === this.argumentsCurrent % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
+	};
+	cCOUNTIFS.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(criteria_range1, criteria1, [criteria_range2, criteria2], ...)"
+		};
+	};
 
 	/** @constructor */
 	function cCOVAR() {

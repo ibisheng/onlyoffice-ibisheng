@@ -4144,11 +4144,11 @@ cSQRTPI.prototype.getInfo = function () {
 			if (arg0Matrix.length !== arg1Matrix.length) {
 				return this.value = new cError(cErrorType.wrong_value_type);
             }
-			for (i = 0; i < arg1Matrix.length; i++) {
+			for (i = 0; i < arg1Matrix.length; ++i) {
 				if (arg0Matrix[i].length !== arg1Matrix[i].length) {
 					return this.value = new cError(cErrorType.wrong_value_type);
 				}
-				for (j = 0; j < arg1Matrix[i].length; j++) {
+				for (j = 0; j < arg1Matrix[i].length; ++j) {
 					if (arg0Matrix[i][j] && !AscCommonExcel.matching(arg1Matrix[i][j], valueForSearching, oper)) {
 						arg0Matrix[i][j] = null;
 					}
@@ -4157,8 +4157,8 @@ cSQRTPI.prototype.getInfo = function () {
         }
 
         var valMatrix0;
-        for (i = 0; i < arg0Matrix.length; i++) {
-            for (j = 0; j < arg0Matrix[i].length; j++) {
+        for (i = 0; i < arg0Matrix.length; ++i) {
+            for (j = 0; j < arg0Matrix[i].length; ++j) {
                 if ((valMatrix0 = arg0Matrix[i][j]) && cElementType.number === valMatrix0.type) {
                     _sum += valMatrix0.getValue();
                 }
