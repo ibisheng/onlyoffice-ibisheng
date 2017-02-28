@@ -4824,6 +4824,14 @@ PasteProcessor.prototype =
                 if(null != pNoHtmlPr.numType)
                     num = pNoHtmlPr.numType;
                 var type = pNoHtmlPr["list-style-type"];
+				
+				//TODO обработать символы из mso html
+				/*if(pNoHtmlPr['mso-list'])
+				{
+					var msoListIgnoreSymbol = this._getMsoListSymbol(node);
+					
+				}*/
+				
                 if(type)
                 {
                     switch(type)
@@ -4961,11 +4969,15 @@ PasteProcessor.prototype =
 						var startIndex;
 						if(-1 != (startIndex = pNoHtmlPr['mso-list'].indexOf("level")))
 						{
-							//lvl = parseInt(pNoHtmlPr['mso-list'].substr(startIndex + 5, 1)) - 1;
+							lvl = parseInt(pNoHtmlPr['mso-list'].substr(startIndex + 5, 1)) - 1;
 						}
+						
+						Para.Numbering_Set( NumId, lvl );
 					}
-					
-					Para.Numbering_Add( NumId, lvl );
+					else
+					{
+						Para.Numbering_Add( NumId, lvl );
+					}
 				}
             }
             else
@@ -5235,6 +5247,74 @@ PasteProcessor.prototype =
             }
         }
     },
+	_getMsoListSymbol: function(node)
+	{
+		var res = null;
+		var nodeList  = this._getMsoListIgnore(node);
+		if(nodeList)
+		{
+			var value = nodeList.innerText;
+			if(value)
+			{
+				for(var k = 0, length = value.length; k < length; k++)
+				{
+					var nUnicode = null;
+					var nCharCode = value.charCodeAt(k);
+					if (AscCommon.isLeadingSurrogateChar(nCharCode)) 
+					{
+						if (k + 1 < length) 
+						{
+							k++;
+							var nTrailingChar = value.charCodeAt(k);
+							nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
+						}
+					}
+					else
+						nUnicode = nCharCode;
+					
+					if (null != nUnicode) {
+						var Item;
+						if (0x20 != nUnicode && 0xA0 != nUnicode && 0x2009 != nUnicode) 
+						{
+							if(!res)
+							{
+								res = "";
+							}
+							res += value.charAt(k);
+						}
+					}
+				}
+			}
+		}
+		return res;
+	},
+	_getMsoListIgnore: function(node)
+	{
+		if(!node || (node && !node.children))
+		{
+			return null;
+		}
+		
+		for(var i = 0; i < node.children.length; i++)
+		{
+			var child = node.children[i];
+			var style = child.getAttribute("style");
+			if(style)
+			{
+				var pNoHtml = {};
+				this._parseCss(style, pNoHtml);
+				if("Ignore" === pNoHtml["mso-list"])
+				{
+					return child;
+				}
+			}
+			
+			if(child.children && child.children.length)
+			{
+				return this._getMsoListIgnore(child);
+			}
+		}
+	},
     _AddNextPrevToContent : function(oDoc)
     {
         var prev = null;
