@@ -4164,6 +4164,9 @@ cSQRTPI.prototype.getInfo = function () {
         }
         return this.value = new cNumber(_sum);
     };
+	cSUMIFS.prototype.checkArguments = function () {
+		return (this.argumentsCurrent % 2) && cBaseFunction.prototype.checkArguments.apply(this, arguments);
+    };
     cSUMIFS.prototype.getInfo = function () {
         return {
             name: this.name, args: "(sum-range, criteria_range1, criteria1, [criteria_range2, criteria2], ...)"
