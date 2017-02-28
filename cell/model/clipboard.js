@@ -1677,6 +1677,7 @@
 							isChange = true;
 							
 							var text = currentCellData[i].text;
+							var format = currentCellData[i].format;
 							var lengthOfText = text.length;
 							var iterCount = Math.ceil(lengthOfText / c_oAscMaxCellOrCommentLength);
 							var splitText;
@@ -1690,8 +1691,7 @@
 								if(!aResult.content[r][c].content)
 									aResult.content[r][c].content = [];
 								
-								aResult.content[r][c].content[0] = currentCellData[0];
-								aResult.content[r][c].content[0].text = splitText;
+								aResult.content[r][c].content[0] = {format: format, text: splitText};
 								
 								if(iterCount !== j + 1)
 									r++;
@@ -1699,7 +1699,9 @@
 						}
 					}
 					if(isChange)
+					{
 						result = {aResult: aResult, r: r, c: c};
+					}
 				}
 				
 				return result;
