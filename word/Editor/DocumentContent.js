@@ -4471,7 +4471,7 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
 				LastPos++;
 				this.Content[LastPos].Select_All();
 			}
-			else if (false === bConcatE && type_Paragraph === this.Content[LastPos + 1].Get_Type())
+			else if (LastPos + 1 < this.Content.length && false === bConcatE && type_Paragraph === this.Content[LastPos + 1].Get_Type())
 			{
 				LastPos++;
 				this.Content[LastPos].Selection.Use = true;
