@@ -12152,7 +12152,7 @@
 					var selectionRange = t.model.selectionRange;
 					var activeCell = selectionRange.activeCell.clone();
 					var activeCellRange = new Asc.Range(activeCell.col, activeCell.row, activeCell.col, activeCell.row);
-					var expandRange = t.model.autoFilters._getAdjacentCellsAF(activeCellRange);
+					var expandRange = t.model.autoFilters._getAdjacentCellsAF(activeCellRange, true);
 
 					//change selection
 					t.setSelection(expandRange);
