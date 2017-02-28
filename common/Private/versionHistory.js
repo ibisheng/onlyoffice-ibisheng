@@ -45,6 +45,7 @@
     this.newChangeId = -1;
     this.colors = null;
     this.changes = null;
+	this.token = null;
 
     if (newObj) {
       this.update(newObj);
@@ -59,6 +60,7 @@
       this.urlChanges = newObj.urlChanges;
       this.currentChangeId = -1;
       this.changes = null;
+	  this.token = newObj.token;
     }
     this.colors = newObj.colors;
     this.newChangeId = newObj.currentChangeId;
@@ -88,6 +90,9 @@
   asc_CVersionHistory.prototype.asc_setArrColors = function(val) {
     this.colors = val;
   };
+  asc_CVersionHistory.prototype.asc_setToken = function(val) {
+    this.token = val;
+  };
 
   window["Asc"].asc_CVersionHistory = window["Asc"]["asc_CVersionHistory"] = asc_CVersionHistory;
   prot = asc_CVersionHistory.prototype;
@@ -96,6 +101,7 @@
   prot["asc_setUrlChanges"] = prot.asc_setUrlChanges;
   prot["asc_setCurrentChangeId"] = prot.asc_setCurrentChangeId;
   prot["asc_setArrColors"] = prot.asc_setArrColors;
+  prot["asc_setToken"] = prot.asc_setToken;
 })(window);
 
 AscCommon.baseEditorsApi.prototype.asc_showRevision = function(newObj) {
@@ -120,7 +126,7 @@ AscCommon.baseEditorsApi.prototype.asc_showRevision = function(newObj) {
     this.DocInfo.put_Url(this.VersionHistory.url);
     this.documentUrlChanges = this.VersionHistory.urlChanges;
     this.asc_setDocInfo(this.DocInfo);
-    this.asc_LoadDocument(true);
+    this.asc_LoadDocument(this.VersionHistory);
   } else if (this.VersionHistory.currentChangeId < newObj.currentChangeId) {
     // Нужно только добавить некоторые изменения
     AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();

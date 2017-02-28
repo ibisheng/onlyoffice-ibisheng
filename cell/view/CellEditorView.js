@@ -154,6 +154,7 @@
 		//-----------------
 
 		this.objAutoComplete = {};
+		this.isAutoComplete = false;
 
 		/** @type RegExp */
 		this.reReplaceNL = /\r?\n|\r/g;
@@ -187,6 +188,7 @@
 		var t = this;
 		var z = t.defaults.canvasZIndex;
 		this.defaults.padding = settings.padding;
+		this.isAutoComplete = false;
 
 		if (null != this.element) {
 			t.canvasOuter = document.createElement('div');
@@ -328,7 +330,7 @@
 			// Иначе F2 по ячейке с '\n', у которой выключен wrap, не станет снова wrap. http://bugzilla.onlyoffice.com/show_bug.cgi?id=17590
 			if (0 < this.undoList.length || isFormula || this.textFlags.wrapOnlyNL) {
 				// Делаем замену текста на автодополнение, если есть select и текст полностью совпал.
-				if (this.selectionBegin !== this.selectionEnd && !isFormula) {
+				if (this.isAutoComplete && !isFormula) {
 					var s = this._getFragmentsText(this.options.fragments);
 					if (!AscCommon.isNumber(s)) {
 						var arrAutoComplete = this._getAutoComplete(s.toLowerCase());
@@ -1499,6 +1501,7 @@
 
 	CellEditor.prototype._moveCursor = function (kind, pos) {
 		var t = this;
+		this.isAutoComplete = false;
 		switch (kind) {
 			case kPrevChar:
 				t.cursorPos = t.textRender.getPrevChar(t.cursorPos);
@@ -1594,17 +1597,20 @@
 		// при такой комбинации ctrl+a, click, ctrl+a, click не обновляется selectionStart
 		// поэтому выполняем обработку после обработчика системы
 		setTimeout(function () {
-			var b = t.input.selectionStart;
-			var e = t.input.selectionEnd;
-			if (typeof b !== "undefined") {
-				if (t.cursorPos !== b || t.selectionBegin !== t.selectionEnd) {
-					t._moveCursor(kPosition, b);
-				}
-				if (b !== e) {
-					t._selectChars(kPosition, e);
-				}
-			}
+			t._updateCursorByTopLine();
 		});
+	};
+	CellEditor.prototype._updateCursorByTopLine = function () {
+		var b = this.input.selectionStart;
+		var e = this.input.selectionEnd;
+		if (typeof b !== "undefined") {
+			if (this.cursorPos !== b || this.selectionBegin !== t.selectionEnd) {
+				this._moveCursor(kPosition, b);
+			}
+			if (b !== e) {
+				this._selectChars(kPosition, e);
+			}
+		}
 	};
 
 	CellEditor.prototype._syncEditors = function () {
@@ -1667,6 +1673,7 @@
 			return false;
 		}
 
+		this.isAutoComplete = false;
 		this.dontUpdateText = true;
 
 		if (this.selectionBegin !== this.selectionEnd) {
@@ -1793,6 +1800,7 @@
 		var t = this;
 		var begPos, endPos;
 
+		this.isAutoComplete = false;
 		begPos = t.selectionBegin === t.selectionEnd ? t.cursorPos : t.selectionBegin;
 		t._moveCursor(kind, pos);
 		endPos = t.cursorPos;
@@ -2565,11 +2573,12 @@
 					t._addChars(newValue.substring(lengthInput));
 					t.selectionBegin = tmpCursorPos;
 					t._selectChars(kEndOfText);
+					this.isAutoComplete = true;
 				}
 			}
 		}
 
-		return t.isTopLineActive ? true : false; // prevent event bubbling
+		return t.isTopLineActive; // prevent event bubbling
 	};
 
 	/** @param event {KeyboardEvent} */
@@ -2676,6 +2685,7 @@
 		}
 		this.skipTLUpdate = true;
 		this.replaceText(0, this.textRender.getEndOfLine(this.cursorPos), this.input.value);
+		this._updateCursorByTopLine();
 		return true;
 	};
 

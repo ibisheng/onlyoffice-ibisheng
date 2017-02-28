@@ -1205,6 +1205,19 @@ CDocumentFieldsManager.prototype.Restore_MailMergeTemplate = function()
         }
     }
 };
+CDocumentFieldsManager.prototype.GetAllFieldsByType = function(nType)
+{
+	var arrFields = [];
+	for (var nIndex = 0, nCount = this.m_aFields.length; nIndex < nCount; ++nIndex)
+	{
+		var oField = this.m_aFields[nIndex];
+		if (nType === oField.Get_FieldType() && oField.Is_UseInDocument())
+		{
+			arrFields.push(oField);
+		}
+	}
+	return arrFields;
+};
 
 var selected_None              = -1;
 var selected_DrawingObject     = 0;
@@ -3872,6 +3885,7 @@ CDocument.prototype.Extend_ToPos = function(X, Y)
     {
         var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
         var NewRun       = new ParaRun(NewParagraph, false);
+        NewParagraph.Add_ToContent(0, NewRun);
 
         var StyleId = LastPara.Style_Get();
         var NextId  = undefined;
@@ -5798,13 +5812,14 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 				ParaEIndex = DstIndex + 1;
 			}
 
+			var NewEmptyPara = null;
 			if (true === bAddEmptyPara)
 			{
 				// Создаем новый параграф
-				var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
-				NewParagraph.Set_Pr(ParaS.Pr);
-				NewParagraph.TextPr.Apply_TextPr(ParaS.TextPr.Value);
-				this.Internal_Content_Add(DstIndex + 1, NewParagraph);
+				NewEmptyPara = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+				NewEmptyPara.Set_Pr(ParaS.Pr);
+				NewEmptyPara.TextPr.Apply_TextPr(ParaS.TextPr.Value);
+				this.Internal_Content_Add(DstIndex + 1, NewEmptyPara);
 			}
 
 			var StartIndex = 0;
@@ -5852,17 +5867,30 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 				EndIndex--;
 			}
 
-
 			for (var Index = StartIndex; Index <= EndIndex; Index++)
 			{
 				this.Internal_Content_Add(DstIndex + Index, Elements[Index].Element);
 				this.Content[DstIndex + Index].Select_All();
 			}
 
+			var LastPos = DstIndex + ElementsCount - 1;
+			if (NewEmptyPara && NewEmptyPara === this.Content[LastPos + 1])
+			{
+				LastPos++;
+				this.Content[LastPos].Select_All();
+			}
+			else if (false === bConcatE && type_Paragraph === this.Content[LastPos + 1].Get_Type())
+			{
+				LastPos++;
+				this.Content[LastPos].Selection.Use = true;
+				this.Content[LastPos].Selection_SetBegEnd(true, true);
+				this.Content[LastPos].Selection_SetBegEnd(false, true);
+			}
+
 			this.Selection.Use      = true;
 			this.Selection.StartPos = DstIndex;
-			this.Selection.EndPos   = DstIndex + ElementsCount - 1;
-			this.CurPos.ContentPos  = DstIndex + ElementsCount - 1;
+			this.Selection.EndPos   = LastPos;
+			this.CurPos.ContentPos  = LastPos;
 		}
 
 		if (docpostype_DrawingObjects !== this.CurPos.Type)
@@ -6075,7 +6103,7 @@ CDocument.prototype.OnKeyDown = function(e)
 
     if (e.KeyCode == 8 && false === editor.isViewMode) // BackSpace
     {
-        if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Remove, null, true))
+        if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Remove, null, true, this.IsFormFieldEditing()))
         {
             this.Create_NewHistoryPoint(AscDFH.historydescription_Document_BackSpaceButton);
             this.Remove(-1, true);
@@ -6246,7 +6274,11 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 32 && false === editor.isViewMode) // Space
     {
-        if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true))
+    	var bFillingForm = false;
+    	if (this.IsFormFieldEditing() && ((true === e.ShiftKey && true === e.CtrlKey) || true !== e.CtrlKey))
+			bFillingForm = true;
+
+        if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, bFillingForm))
         {
             this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SpaceButton);
 
@@ -6579,7 +6611,7 @@ CDocument.prototype.OnKeyDown = function(e)
     {
         if (true != e.ShiftKey)
         {
-            if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Delete, null, true))
+            if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Delete, null, true, this.IsFormFieldEditing()))
             {
                 this.Create_NewHistoryPoint(AscDFH.historydescription_Document_DeleteButton);
                 this.Remove(1, true);
@@ -6947,7 +6979,7 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 12288 && false === editor.isViewMode) // Space
     {
-        if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true))
+        if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, this.IsFormFieldEditing()))
         {
             this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SpaceButton);
 
@@ -6988,7 +7020,7 @@ CDocument.prototype.OnKeyPress = function(e)
 
 	if (Code > 0x20)
 	{
-		if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true))
+		if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, this.IsFormFieldEditing()))
 		{
 			this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddLetter);
 
@@ -7198,15 +7230,24 @@ CDocument.prototype.OnMouseUp = function(e, X, Y, PageIndex)
 				var Comment_X       = this.Get_PageLimits(PageIndex).XLimit;
 				var Para            = g_oTableId.Get_ById(Comment.StartId);
 
-				var TextTransform = Para.Get_ParentTextTransform();
-				if (TextTransform)
+				if (!Para)
 				{
-					Comment_Y = TextTransform.TransformPointY(Comment.m_oStartInfo.X, Comment.m_oStartInfo.Y);
+					// Такое может быть, если комментарий добавлен к заголовку таблицы
+					this.Select_Comment(null, false);
+					editor.sync_HideComment();
 				}
+				else
+				{
+					var TextTransform = Para.Get_ParentTextTransform();
+					if (TextTransform)
+					{
+						Comment_Y = TextTransform.TransformPointY(Comment.m_oStartInfo.X, Comment.m_oStartInfo.Y);
+					}
 
-				var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(Comment_X, Comment_Y, Comment_PageNum);
-				this.Select_Comment(Comment.Get_Id(), false);
-				editor.sync_ShowComment(Comment.Get_Id(), Coords.X, Coords.Y);
+					var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(Comment_X, Comment_Y, Comment_PageNum);
+					this.Select_Comment(Comment.Get_Id(), false);
+					editor.sync_ShowComment(Comment.Get_Id(), Coords.X, Coords.Y);
+				}
 			}
 			else
 			{
@@ -7823,7 +7864,12 @@ CDocument.prototype.EndFootnotesEditing = function()
 	if (docpostype_Footnotes === this.Get_DocPosType())
 	{
 		this.Set_DocPosType(docpostype_Content);
-		this.Cursor_MoveAt(0, 0, false);
+
+		this.Cursor_MoveToStartPos(false);
+
+		// TODO: Не всегда можно в данной функции использовать Cursor_MoveAt, потому что
+		//       данная страница еще может быть не рассчитана.
+		//this.Cursor_MoveAt(0, 0, false);
 
 		this.DrawingDocument.ClearCachePages();
 		this.DrawingDocument.FirePaint();
@@ -8394,7 +8440,7 @@ CDocument.prototype.Create_NewHistoryPoint = function(Description)
 };
 CDocument.prototype.Document_Undo = function(Options)
 {
-	if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
+	if (true === AscCommon.CollaborativeEditing.Get_GlobalLock() && true !== this.IsFillingFormMode())
 		return;
 
 	if (true !== this.History.Can_Undo() && this.Api && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
@@ -8421,7 +8467,7 @@ CDocument.prototype.Document_Undo = function(Options)
 };
 CDocument.prototype.Document_Redo = function()
 {
-	if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
+	if (true === AscCommon.CollaborativeEditing.Get_GlobalLock() && true !== this.IsFillingFormMode())
 		return;
 
 	this.DrawingDocument.EndTrackTable(null, true);
@@ -8574,7 +8620,7 @@ CDocument.prototype.Hyperlink_Add = function(HyperProps)
 			HyperProps.TextPr = Para.Get_TextPr(Para.Get_ParaContentPos(true, true));
 
 		this.Remove(1, false, false, true);
-		this.Selection_Remove();
+		this.RemoveTextSelection();
 	}
 
 	this.Controller.AddHyperlink(HyperProps);
@@ -11266,6 +11312,20 @@ CDocument.prototype.GetFootnotePr = function()
 	oFootnotePr.put_NumFormat(oSectPr.GetFootnoteNumFormat());
 	return oFootnotePr;
 };
+
+
+CDocument.prototype.TurnOffCheckChartSelection = function(){
+    if(this.DrawingObjects){
+        this.DrawingObjects.TurnOffCheckChartSelection();
+    }
+};
+
+CDocument.prototype.TurnOnCheckChartSelection = function(){
+    if(this.DrawingObjects){
+        this.DrawingObjects.TurnOnCheckChartSelection();
+    }
+};
+
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые вызываются из CLogicDocumentController
 //----------------------------------------------------------------------------------------------------------------------
@@ -15951,6 +16011,66 @@ CDocument.prototype.controller_GetCurrentSectionPr = function()
 //----------------------------------------------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------------------------------------------
+CDocument.prototype.RemoveTextSelection = function()
+{
+	this.Controller.RemoveTextSelection();
+};
+CDocument.prototype.AddFormTextField = function(sName, sDefaultText)
+{
+	if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content))
+	{
+		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddMailMergeField);
+
+		var oField = new ParaField(fieldtype_FORMTEXT);
+		var oRun = new ParaRun();
+		oField.SetFormFieldName(sName);
+		oField.SetFormFieldDefaultText(sDefaultText);
+		for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
+		{
+			oRun.Add_ToContent(nIndex, new ParaText(sDefaultText.charAt(nIndex)));
+		}
+		oField.Add_ToContent(0, oRun);
+
+		this.Register_Field(oField);
+		this.Paragraph_Add(oField);
+		this.Document_UpdateInterfaceState();
+	}
+};
+CDocument.prototype.GetAllFormTextFields = function()
+{
+	return this.FieldsManager.GetAllFieldsByType(fieldtype_FORMTEXT);
+};
+CDocument.prototype.IsFillingFormMode = function()
+{
+	return this.FillingFormMode;
+};
+CDocument.prototype.SetFillingFormMode = function(isFillingForm)
+{
+	this.FillingFormMode = isFillingForm;
+};
+CDocument.prototype.IsInFormField = function()
+{
+	var oSelectedInfo = this.Get_SelectedElementsInfo();
+	var oField        = oSelectedInfo.Get_Field();
+
+	if (oSelectedInfo.Is_MixedSelection() || !oField || fieldtype_FORMTEXT !== oField.Get_FieldType())
+		return false;
+
+	return true;
+};
+CDocument.prototype.StartFillingFormMode = function()
+{
+	this.SetFillingFormMode(true);
+	this.CollaborativeEditing.Set_GlobalLock(true)
+};
+CDocument.prototype.IsFormFieldEditing = function()
+{
+	if (true === this.CollaborativeEditing.Get_GlobalLock() && true === this.IsFillingFormMode() && true === this.IsInFormField())
+		return true;
+
+	return false;
+};
+
 function CDocumentSelectionState()
 {
     this.Id        = null;
@@ -16759,6 +16879,11 @@ CTrackRevisionsManager.prototype.private_HaveParasToCheck = function()
     }
 
     return false;
+};
+CTrackRevisionsManager.prototype.Get_AllChanges = function()
+{
+	this.Continue_TrackRevisions();
+	return this.Changes;
 };
 
 function CRevisionsChangeParagraphSearchEngine(Direction, CurrentPara, TrackManager)

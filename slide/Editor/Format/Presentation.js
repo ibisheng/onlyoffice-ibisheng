@@ -380,8 +380,8 @@ AscDFH.changesFactory[AscDFH.historyitem_Presentation_AddSlideMaster] = AscDFH.C
 AscDFH.changesFactory[AscDFH.historyitem_Presentation_ChangeTheme] = AscDFH.CChangesDrawingChangeTheme      ;
 AscDFH.changesFactory[AscDFH.historyitem_Presentation_SlideSize] = AscDFH.CChangesDrawingsObjectNoId      ;
 AscDFH.changesFactory[AscDFH.historyitem_Presentation_ChangeColorScheme] = AscDFH.CChangesDrawingChangeTheme      ;
-AscDFH.changesFactory[AscDFH.historyitem_Presentation_RemoveSlide] = AscDFH.CChangesDrawingsContent         ;
-AscDFH.changesFactory[AscDFH.historyitem_Presentation_AddSlide] = AscDFH.CChangesDrawingsContent         ;
+AscDFH.changesFactory[AscDFH.historyitem_Presentation_RemoveSlide] = AscDFH.CChangesDrawingsContentPresentation         ;
+AscDFH.changesFactory[AscDFH.historyitem_Presentation_AddSlide] = AscDFH.CChangesDrawingsContentPresentation         ;
 
 
 AscDFH.drawingsChangesMap[AscDFH.historyitem_Presentation_SetShowPr] = function(oClass, value){oClass.showPr  = value;};
@@ -393,7 +393,7 @@ AscDFH.drawingContentChanges[AscDFH.historyitem_Presentation_RemoveSlide] = func
 AscDFH.drawingContentChanges[AscDFH.historyitem_Presentation_AddSlideMaster] = function(oClass){return oClass.slideMasters;};
 
 AscDFH.drawingsConstructorsMap[AscDFH.historyitem_Presentation_SetShowPr] = CShowPr;
-AscDFH.drawingsConstructorsMap[AscDFH.historyitem_Presentation_SlideSize] = AscFormat.CDrawingBaseCoordsWritable
+AscDFH.drawingsConstructorsMap[AscDFH.historyitem_Presentation_SlideSize] = AscFormat.CDrawingBaseCoordsWritable;
 
 function CPresentation(DrawingDocument)
 {
@@ -496,6 +496,7 @@ function CPresentation(DrawingDocument)
     this.NeedUpdateTargetForCollaboration = false;
     this.oLastCheckContent = null;
     this.CompositeInput    = null;
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
    //
@@ -522,6 +523,17 @@ CPresentation.prototype =
      * Сообщаем о начале составного ввода текста.
      * @returns {boolean} Начался или нет составной ввод.
      */
+
+
+    TurnOffCheckChartSelection: function(){
+    },
+
+    TurnOnCheckChartSelection: function(){
+    },
+
+    Get_DrawingDocument: function(){
+        return this.DrawingDocument;
+    },
 
     Get_TargetDocContent: function(){
         if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects){
@@ -2347,8 +2359,22 @@ CPresentation.prototype =
                     else
                     {
                         if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
-                            History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                            this.Paragraph_Add(new ParaTab());
+
+                            if(target_content.Selection.StartPos === target_content.Selection.EndPos &&
+                                target_content.Content[target_content.CurPos.ContentPos].IsEmpty() &&
+                                target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr &&
+                                target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet &&
+                                target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet.isBullet() &&
+                                target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet.bulletType.type !== AscFormat.BULLET_TYPE_BULLET_NONE &&
+                                this.Can_IncreaseParagraphLevel(!e.ShiftKey)){
+                                this.Paragraph_IncDecIndent(!e.ShiftKey);
+                            }
+                            else{
+                                History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
+                                this.Paragraph_Add(new ParaTab());
+                            }
+
+
                         }
                     }
                 }
@@ -3770,22 +3796,25 @@ CPresentation.prototype =
 
     Document_UpdateUndoRedoState : function()
     {
+        if (true === this.TurnOffInterfaceEvents)
+            return;
+
+        if (true === AscCommon.CollaborativeEditing.Get_GlobalLockSelection())
+            return;
+
+        // TODO: Возможно стоит перенсти эту проверку в класс CHistory и присылать
+        //       данные события при изменении значения History.Index
 
         // Проверяем состояние Undo/Redo
-        editor.sync_CanUndoCallback( this.History.Can_Undo() );
-        editor.sync_CanRedoCallback( this.History.Can_Redo() );
 
-        if ( true === History.Have_Changes() )
-        {
-            // дублирование евента. когда будет undo-redo - тогда
-            // эти евенты начнут отличаться
-            editor.SetDocumentModified(true);
-			editor._onUpdateDocumentCanSave();
-        }
-        else
-        {
-            editor.SetUnchangedDocument();
-        }
+        var bCanUndo = this.History.Can_Undo();
+        if (true !== bCanUndo && editor && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
+            bCanUndo = this.CollaborativeEditing.CanUndo();
+
+        editor.sync_CanUndoCallback(bCanUndo);
+        editor.sync_CanRedoCallback(this.History.Can_Redo());
+        editor.CheckChangedDocument();
+
     },
 
     Document_UpdateCanAddHyperlinkState : function()
@@ -3834,15 +3863,27 @@ CPresentation.prototype =
 
     Document_Undo : function()
     {
-        if ( true === AscCommon.CollaborativeEditing.Get_GlobalLock() )
+
+        if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
             return;
 
-        this.clearThemeTimeouts();
-        this.History.Undo();
-        this.Recalculate(this.History.RecalculateData);
+        if (true !== this.History.Can_Undo() && this.Api && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
+        {
+            if (this.CollaborativeEditing.CanUndo() && true === this.Api.canSave)
+            {
+                this.CollaborativeEditing.Set_GlobalLock(true);
+                this.Api.asc_Save(true, true);
+            }
+        }
+        else
+        {
+            this.clearThemeTimeouts();
+            this.History.Undo();
+            this.Recalculate(this.History.RecalculateData);
 
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
+            this.Document_UpdateSelectionState();
+            this.Document_UpdateInterfaceState();
+        }
     },
 
     Document_Redo : function()
@@ -4776,7 +4817,7 @@ CPresentation.prototype =
     {
         if(AscFormat.isRealNumber(pos) && pos > -1 && pos < this.Slides.length)
         {
-            History.Add(new AscDFH.CChangesDrawingsContent(this, AscDFH.historyitem_Presentation_RemoveSlide, pos, [this.Slides[pos]], false));
+            History.Add(new AscDFH.CChangesDrawingsContentPresentation(this, AscDFH.historyitem_Presentation_RemoveSlide, pos, [this.Slides[pos]], false));
             this.Slides[pos].removeAllCommentsToInterface();
             return this.Slides.splice(pos, 1)[0];
         }
@@ -4785,7 +4826,7 @@ CPresentation.prototype =
 
     insertSlide: function(pos, slide)
     {
-        History.Add(new AscDFH.CChangesDrawingsContent(this, AscDFH.historyitem_Presentation_AddSlide, pos, [slide], true));
+        History.Add(new AscDFH.CChangesDrawingsContentPresentation(this, AscDFH.historyitem_Presentation_AddSlide, pos, [slide], true));
         this.Slides.splice(pos, 0, slide);
     },
 	

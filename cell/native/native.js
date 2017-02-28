@@ -7505,6 +7505,10 @@ function testLockedObjects () {
 
 window["AscCommonExcel"].WorksheetView.prototype._drawCollaborativeElementsMeOther = function (type, overlay) {
     var currentSheetId = this.model.getId(), i, strokeColor, arrayCells, oCellTmp;
+   
+    if (!currentSheetId)
+        return;
+    
     if (AscCommon.c_oAscLockTypes.kLockTypeMine === type) {
         strokeColor = AscCommonExcel.c_oAscCoAuthoringMeBorderColor;
         arrayCells = this.collaborativeEditing.getLockCellsMe(currentSheetId);
@@ -7517,6 +7521,8 @@ window["AscCommonExcel"].WorksheetView.prototype._drawCollaborativeElementsMeOth
     }
     
     var sheetId = this.model.getId();
+    if (!sheetId)
+        return;
     
     for (i = 0; i < arrayCells.length; ++i) {
         
@@ -7552,6 +7558,9 @@ window["AscCommonExcel"].WorksheetView.prototype._drawCollaborativeElementsMeOth
 
 window["AscCommonExcel"].WorksheetView.prototype._drawCollaborativeElementsAllLock = function (overlay) {
     var currentSheetId = this.model.getId();
+    if (!currentSheetId)
+        return;
+    
     var nLockAllType = this.collaborativeEditing.isLockAllOther(currentSheetId);
     if (Asc.c_oAscMouseMoveLockedObjectType.None !== nLockAllType) {
         var isAllRange = true, strokeColor = (Asc.c_oAscMouseMoveLockedObjectType.TableProperties === nLockAllType) ?
@@ -7559,6 +7568,10 @@ window["AscCommonExcel"].WorksheetView.prototype._drawCollaborativeElementsAllLo
         AscCommonExcel.c_oAscCoAuthoringOtherBorderColor, oAllRange = new window["Asc"].Range(0, 0, AscCommon.gc_nMaxCol0, AscCommon.gc_nMaxRow0);
         
         var left = this.cols[oAllRange.c1].left, top = this.rows[oAllRange.r1].top;
+        
+        var sheetId = this.model.getId();
+        if (!sheetId)
+            return;
         
         var userId = "";
         var lockInfo = this.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Range,

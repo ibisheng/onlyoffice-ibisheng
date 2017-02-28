@@ -634,11 +634,32 @@ CWrapPolygon.prototype =
         var bounds = drawing.bounds, oDistance = drawing.parent.Get_Distance(), oEffectExtent = drawing.parent.EffectExtent;
         if(this.relativeArrPoints.length === 0)
         {
+
+            var oEffectExtent = drawing.parent.EffectExtent;
+            var W, H;
+            if(AscFormat.isRealNumber(drawing.rot)){
+                if(AscFormat.checkNormalRotate(drawing.rot))
+                {
+                    W = drawing.parent.Extent.W;
+                    H = drawing.parent.Extent.H;
+                }
+                else
+                {
+                    W = drawing.parent.Extent.H;
+                    H = drawing.parent.Extent.W;
+                }
+            }
+            else{
+                W = drawing.parent.Extent.W;
+                H = drawing.parent.Extent.H;
+            }
+            var xc = drawing.localTransform.TransformPointX(drawing.extX / 2, drawing.extY / 2);
+            var yc = drawing.localTransform.TransformPointY(drawing.extX / 2, drawing.extY / 2);
             this.arrPoints.length = 0;
-            this.localLeft = bounds.l - oDistance.L - AscFormat.getValOrDefault(oEffectExtent.L, 0);
-            this.localRight = bounds.r + oDistance.R + AscFormat.getValOrDefault(oEffectExtent.R, 0);
-            this.localTop = bounds.t - oDistance.T - AscFormat.getValOrDefault(oEffectExtent.T, 0);
-            this.localBottom = bounds.b + oDistance.B + AscFormat.getValOrDefault(oEffectExtent.B, 0);
+            this.localLeft = - AscFormat.getValOrDefault(oEffectExtent.L, 0) + (xc - W / 2) - oDistance.L ;
+            this.localRight =  AscFormat.getValOrDefault(oEffectExtent.R, 0) + (xc + W / 2) + oDistance.R;
+            this.localTop = - AscFormat.getValOrDefault(oEffectExtent.T, 0) + (yc - H / 2) - oDistance.T;
+            this.localBottom = AscFormat.getValOrDefault(oEffectExtent.B, 0) + (yc + H / 2) + oDistance.B;
             return;
         }
         var relArr = this.relativeArrPoints;

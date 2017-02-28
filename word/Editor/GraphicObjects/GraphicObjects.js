@@ -287,6 +287,13 @@ CGraphicObjects.prototype =
         return false;
     },
 
+    removeTextSelection: function(){
+        var oTargetDocContent = this.getTargetDocContent();
+        if(oTargetDocContent && oTargetDocContent.Is_SelectionUse()){
+            oTargetDocContent.Selection_Remove();
+        }
+    },
+
     createImage: DrawingObjectsController.prototype.createImage,
     createOleObject: DrawingObjectsController.prototype.createOleObject,
     createTextArt: DrawingObjectsController.prototype.createTextArt,
@@ -3256,7 +3263,7 @@ CGraphicObjects.prototype =
     getLeftTopSelectedObjectByPage: function(pageIndex)
     {
         var oDrawingPage, oRes;
-        if(this.document.Get_DocPosType(docpostype_HdrFtr))
+        if(this.document.Get_DocPosType() === docpostype_HdrFtr)
         {
             if(this.graphicPages[pageIndex])
             {

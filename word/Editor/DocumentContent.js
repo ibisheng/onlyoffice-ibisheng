@@ -2266,6 +2266,8 @@ CDocumentContent.prototype.Extend_ToPos                       = function(X, Y)
     while (true)
     {
         var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true);
+		var NewRun       = new ParaRun(NewParagraph, false);
+		NewParagraph.Add_ToContent(0, NewRun);
 
         var StyleId = LastPara.Style_Get();
         var NextId  = undefined;
@@ -2799,8 +2801,11 @@ CDocumentContent.prototype.Remove                             = function(Count, 
 {
     if (true === this.ApplyToAll)
     {
+    	var oNewPara = new Paragraph(this.DrawingDocument, this, 0, this.X, this.Y, this.XLimit, this.YLimit, this.bPresentation === true);
+    	oNewPara.Correct_Content();
+
         this.Internal_Content_RemoveAll();
-        this.Internal_Content_Add(0, new Paragraph(this.DrawingDocument, this, 0, this.X, this.Y, this.XLimit, this.YLimit, this.bPresentation === true));
+        this.Internal_Content_Add(0, oNewPara);
 
         this.CurPos =
         {
@@ -4017,8 +4022,24 @@ CDocumentContent.prototype.Cursor_MoveStartOfLine             = function(AddToSe
 };
 CDocumentContent.prototype.Cursor_MoveAt = function(X, Y, AddToSelect, bRemoveOldSelection, CurPage)
 {
-    if (undefined != CurPage)
-        this.CurPage = CurPage;
+	if (this.Pages.length <= 0)
+		return;
+
+	if (undefined !== CurPage)
+	{
+		if (CurPage < 0)
+		{
+			CurPage = 0;
+			Y       = 0;
+		}
+		else if (CurPage >= this.Pages.length)
+		{
+			CurPage = this.Pages.length - 1;
+			Y       = this.Pages[CurPage].YLimit;
+		}
+
+		this.CurPage = CurPage;
+	}
 
     if (false != bRemoveOldSelection)
     {
@@ -4386,13 +4407,14 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
                 ParaEIndex = DstIndex + 1;
             }
 
+            var NewEmptyPara = null;
             if (true === bAddEmptyPara)
             {
                 // Создаем новый параграф
-                var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true);
-                NewParagraph.Set_Pr(ParaS.Pr);
-                NewParagraph.TextPr.Apply_TextPr(ParaS.TextPr.Value);
-                this.Internal_Content_Add(DstIndex + 1, NewParagraph);
+				NewEmptyPara = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true);
+				NewEmptyPara.Set_Pr(ParaS.Pr);
+				NewEmptyPara.TextPr.Apply_TextPr(ParaS.TextPr.Value);
+                this.Internal_Content_Add(DstIndex + 1, NewEmptyPara);
             }
 
             var StartIndex = 0;
@@ -4443,11 +4465,25 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
                 this.Content[DstIndex + Index].Select_All();
             }
 
+			var LastPos = DstIndex + ElementsCount - 1;
+			if (NewEmptyPara && NewEmptyPara === this.Content[LastPos + 1])
+			{
+				LastPos++;
+				this.Content[LastPos].Select_All();
+			}
+			else if (false === bConcatE && type_Paragraph === this.Content[LastPos + 1].Get_Type())
+			{
+				LastPos++;
+				this.Content[LastPos].Selection.Use = true;
+				this.Content[LastPos].Selection_SetBegEnd(true, true);
+				this.Content[LastPos].Selection_SetBegEnd(false, true);
+			}
+
             this.Selection.Start    = false;
             this.Selection.Use      = true;
             this.Selection.StartPos = DstIndex;
-            this.Selection.EndPos   = DstIndex + ElementsCount - 1;
-			this.CurPos.ContentPos  = DstIndex + ElementsCount - 1;
+            this.Selection.EndPos   = LastPos;
+			this.CurPos.ContentPos  = LastPos;
         }
 
         if (true === bNeedSelect)
@@ -7260,8 +7296,19 @@ CDocumentContent.prototype.Selection_Draw_Page = function(PageIndex)
 };
 CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent)
 {
-    if (CurPage < 0 || CurPage >= this.Pages.length)
-        CurPage = 0;
+	if (this.Pages.length <= 0)
+		return;
+
+	if (CurPage < 0)
+	{
+		CurPage = 0;
+		Y       = 0;
+	}
+	else if (CurPage >= this.Pages.length)
+	{
+		CurPage = this.Pages.length - 1;
+		Y       = this.Pages[CurPage].YLimit;
+	}
 
     this.CurPage = CurPage;
     var AbsPage  = this.Get_AbsolutePage(this.CurPage);
@@ -7387,6 +7434,20 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
 // Если bEnd = true, тогда это конец селекта.
 CDocumentContent.prototype.Selection_SetEnd          = function(X, Y, CurPage, MouseEvent)
 {
+	if (this.Pages.length <= 0)
+		return;
+
+	if (CurPage < 0)
+	{
+		CurPage = 0;
+		Y       = 0;
+	}
+	else if (CurPage >= this.Pages.length)
+	{
+		CurPage = this.Pages.length - 1;
+		Y       = this.Pages[CurPage].YLimit;
+	}
+
     if (docpostype_DrawingObjects === this.CurPos.Type)
     {
         var PageAbs = (this.Parent instanceof CHeaderFooter ? CurPage : this.Get_StartPage_Absolute(CurPage));
@@ -7402,9 +7463,6 @@ CDocumentContent.prototype.Selection_SetEnd          = function(X, Y, CurPage, M
         }
         return;
     }
-
-    if (CurPage < 0 || CurPage >= this.Pages.length)
-        CurPage = 0;
 
     this.CurPage = CurPage;
 
@@ -9440,6 +9498,17 @@ CDocumentContent.prototype.Set_LogicDocument = function(oLogicDocument)
 CDocumentContent.prototype.Get_LogicDocument = function()
 {
 	return this.LogicDocument;
+};
+CDocumentContent.prototype.RemoveTextSelection = function()
+{
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		this.DrawingObjects.removeTextSelection();
+	}
+	else
+	{
+		this.Selection_Remove();
+	}
 };
 
 function CDocumentContentStartState(DocContent)

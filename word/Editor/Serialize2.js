@@ -2899,8 +2899,8 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
 		var oLim  = oLimLow.getIterator();
 		
 		this.bs.WriteItem(c_oSer_OMathContentType.LimLowPr, function(){oThis.WriteLimLowPr(oLimLow);});
+		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Lim, function(){oThis.WriteArgNodes(oLim);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});		
 	}
 	this.WriteLimLowPr = function(oLimLow)
 	{
@@ -4224,6 +4224,26 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 						else
 						{
 							var Instr = "MERGEFIELD";
+							for(var j = 0; j < item.Arguments.length; ++j){
+								var argument = item.Arguments[j];
+								argument = argument.replace(/(\\|")/g, "\\$1");
+								if(-1 != argument.indexOf(' '))
+									argument = "\"" + argument + "\"";
+								Instr += " " + argument;
+							}
+							for(var j = 0; j < item.Switches.length; ++j)
+								Instr += " \\" + item.Switches[j];
+							this.bs.WriteItem(c_oSerParType.FldSimple, function () {
+								oThis.WriteFldSimple(Instr, function(){oThis.WriteParagraphContent(item, bUseSelection, false);});
+							});
+						}
+					}
+					else if (fieldtype_FORMTEXT === item.Get_FieldType()){
+						if(this.saveParams && this.saveParams.bMailMergeDocx)
+							oThis.WriteParagraphContent(item, bUseSelection, false);
+						else
+						{
+							var Instr = "FORMTEXT";
 							for(var j = 0; j < item.Arguments.length; ++j){
 								var argument = item.Arguments[j];
 								argument = argument.replace(/(\\|")/g, "\\$1");
@@ -5708,7 +5728,10 @@ function BinaryFileReader(doc, openParams)
             if(c_oSerConstants.ReadOk != res)
                 return res;
 			//todo сделать зачитывание в oReadResult, одновременно с кодом презентаций
-            res = (new Binary_SettingsTableReader(this.Document, this.oReadResult, this.stream)).Read();
+			if(!this.openParams.bCopyPaste)
+			{
+				res = (new Binary_SettingsTableReader(this.Document, this.oReadResult, this.stream)).Read();
+			}
             if(c_oSerConstants.ReadOk != res)
                 return res;
         }
@@ -5744,7 +5767,10 @@ function BinaryFileReader(doc, openParams)
                     // break;
                 case c_oSerTableTypes.HdrFtr:
 					//todo сделать зачитывание в oReadResult
-                    res = (new Binary_HdrFtrTableReader(this.Document, this.oReadResult,  this.openParams, this.stream)).Read();
+					if(!this.openParams.bCopyPaste)
+					{
+						res = (new Binary_HdrFtrTableReader(this.Document, this.oReadResult,  this.openParams, this.stream)).Read();
+					}
                     break;
                 // case c_oSerTableTypes.Numbering:
                     // res = (new Binary_NumberingTableReader(this.Document, this.stream, oDocxNum)).Read();
@@ -6139,8 +6165,9 @@ function BinaryFileReader(doc, openParams)
     };
     this.ReadFromString = function (sBase64, isCopyPaste) {
         //надо сбросить то, что остался после открытия документа
+		var api = this.Document.DrawingDocument.m_oWordControl.m_oApi;
         pptx_content_loader.Clear();
-        pptx_content_loader.Start_UseFullUrl();
+        pptx_content_loader.Start_UseFullUrl(api.insertDocumentUrlsData);
         this.stream = this.getbase64DecodedData(sBase64);
         this.ReadMainTable();
         var oReadResult = this.oReadResult;
@@ -8653,7 +8680,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
               Content.push(oNewTable);
             }
         }
-        else if ( c_oSerParType.sectPr === type )
+        else if ( c_oSerParType.sectPr === type && !this.openParams.bCopyPaste)
 		{
 			var oSectPr = oThis.Document.SectPr;
 			var oAdditional = {EvenAndOddHeaders: null};
@@ -9348,6 +9375,11 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 			oRes = new ParaField(fieldtype_MERGEFIELD, aArguments, aSwitches);
             if (editor)
                editor.WordControl.m_oLogicDocument.Register_Field(oRes);
+		}
+		else if ("FORMTEXT" == sFieldType){
+			oRes = new ParaField(fieldtype_FORMTEXT, aArguments, aSwitches);
+			if (editor)
+				editor.WordControl.m_oLogicDocument.Register_Field(oRes);
 		}
 		return oRes;
 	}

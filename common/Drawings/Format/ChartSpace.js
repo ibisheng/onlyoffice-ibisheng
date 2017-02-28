@@ -3037,7 +3037,8 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                         if(!row_hidden && !source_worksheet.getColHidden(j) || (this.displayHidden === true))
                         {
                             cell = source_worksheet.getCell3(range.r1, j);
-                            var value = parseFloat(cell.getValue());
+                            var sCellValue = cell.getValue();
+                            var value = parseFloat(sCellValue);
                             if(AscFormat.isRealNumber(value))
                             {
                                 hidden = false;
@@ -3071,14 +3072,30 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                             {
                                 if(AscFormat.isRealNumber(this.displayEmptyCellsAs) && this.displayEmptyCellsAs !== 1)
                                 {
-                                    if(this.displayEmptyCellsAs === 2)
+                                    if(this.displayEmptyCellsAs === 2 || ((typeof sCellValue === "string") && sCellValue.length > 0))
                                     {
                                         pt = new AscFormat.CNumericPoint();
                                         pt.setIdx(pt_index);
                                         pt.setVal(0);
                                         num_cache.addPt(pt);
+                                        if(aSpanPoints.length > 0 )
+                                        {
+                                            if(AscFormat.isRealNumber(nLastNoEmptyIndex))
+                                            {
+                                                var oStartPoint = num_cache.getPtByIndex(nLastNoEmptyIndex);
+                                                for(t = 0; t < aSpanPoints.length; ++t)
+                                                {
+                                                    aSpanPoints[t].val = oStartPoint.val + ((pt.val - oStartPoint.val)/(aSpanPoints.length + 1))*(t+1);
+                                                    num_cache.pts.splice(nSpliceIndex + t, 0, aSpanPoints[t]);
+                                                }
+                                            }
+                                            aSpanPoints.length = 0;
+                                        }
+                                        nLastNoEmptyIndex = pt_index;
+                                        nSpliceIndex = num_cache.pts.length;
+                                        dLastNoEmptyVal = pt.val;
                                     }
-                                    if(this.displayEmptyCellsAs === 0)
+                                    else if(this.displayEmptyCellsAs === 0 && ser.getObjectType() === AscDFH.historyitem_type_LineSeries)
                                     {
                                         pt = new AscFormat.CNumericPoint();
                                         pt.setIdx(pt_index);
@@ -3277,6 +3294,7 @@ CChartSpace.prototype.recalculateReferences = function()
     {
         series = charts[i].series;
         var bHaveHidden = false, bHaveNoHidden = false;
+        var bCheckFormatCode = false;
         if(charts[i].getObjectType() !== AscDFH.historyitem_type_ScatterChart)
         {
             for(j = 0; j < series.length; ++j)
@@ -3297,6 +3315,27 @@ CChartSpace.prototype.recalculateReferences = function()
                 else
                 {
                     bHaveNoHidden = true;
+                    if(!bCheckFormatCode &&
+                        !((charts[i].getObjectType() === AscDFH.historyitem_type_BarChart && charts[i].grouping === AscFormat.BAR_GROUPING_PERCENT_STACKED)
+                        || (charts[i].getObjectType() !== AscDFH.historyitem_type_BarChart && charts[i].grouping === AscFormat.GROUPING_PERCENT_STACKED))){
+                        bCheckFormatCode = true;
+                        var aAxId = charts[i].axId;
+                        if(aAxId){
+                            for(var s = 0; s < aAxId.length; ++s){
+                                if(aAxId[s].getObjectType() === AscDFH.historyitem_type_ValAx){
+                                    if(aAxId[s].numFmt && aAxId[s].numFmt.sourceLinked){
+                                        var aPoints = AscFormat.getPtsFromSeries(ser);
+                                        if(aPoints[0] && typeof aPoints[0].formatCode === "string" && aPoints[0].formatCode.length > 0){
+                                            aAxId[s].numFmt.setFormatCode(aPoints[0].formatCode);
+                                        }
+                                        else{
+                                            aAxId[s].numFmt.setFormatCode("General");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
             }
@@ -3317,6 +3356,27 @@ CChartSpace.prototype.recalculateReferences = function()
                 else
                 {
                     bHaveNoHidden = true;
+
+                    if(!bCheckFormatCode){
+                        bCheckFormatCode = true;
+                        var aAxId = charts[i].axId;
+                        if(aAxId){
+                            for(var s = 0; s < aAxId.length; ++s){
+                                if(aAxId[s].getObjectType() === AscDFH.historyitem_type_ValAx){
+                                    if((aAxId[s].axPos === AscFormat.AX_POS_L || aAxId[s].axPos === AscFormat.AX_POS_R) && aAxId[s].numFmt && aAxId[s].numFmt.sourceLinked){
+                                        var aPoints = AscFormat.getPtsFromSeries(ser);
+                                        if(aPoints[0] && typeof aPoints[0].formatCode === "string" && aPoints[0].formatCode.length > 0){
+                                            aAxId[s].numFmt.setFormatCode(aPoints[0].formatCode);
+                                        }
+                                        else{
+                                            aAxId[s].numFmt.setFormatCode("General");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
         }
@@ -3861,12 +3921,12 @@ CChartSpace.prototype.recalculateAxis = function()
                                 y_ax.labels.x = rect.x + hor_interval_width*(arr_x_val[arr_x_val.length-1] - arr_x_val[0]);
                                 y_ax.posX = rect.x + (crosses-arr_x_val[0])*hor_interval_width;
 
-                                if(y_ax.labels.x < 0){
+                                if(y_ax.labels.x < 0 && !bNeedReflect){
                                     rect.x -= y_ax.labels.x;
                                     rect.w += y_ax.labels.x;
                                     bCorrectedLayoutRect = true;
                                 }
-                                if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                if(y_ax.labels.x + y_ax.labels.extX > this.extX && !bNeedReflect){
                                     rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
                                     bCorrectedLayoutRect = true;
                                 }
@@ -3912,12 +3972,12 @@ CChartSpace.prototype.recalculateAxis = function()
                                 y_ax.posX = rect.x + (crosses-arr_x_val[0])*hor_interval_width;
 
 
-                                if(y_ax.labels.x < 0){
+                                if(y_ax.labels.x < 0 && !bNeedReflect){
                                     rect.x -= y_ax.labels.x;
                                     rect.w += y_ax.labels.x;
                                     bCorrectedLayoutRect = true;
                                 }
-                                if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                if(y_ax.labels.x + y_ax.labels.extX > this.extX && !bNeedReflect){
                                     rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
                                     bCorrectedLayoutRect = true;
                                 }
@@ -3988,12 +4048,12 @@ CChartSpace.prototype.recalculateAxis = function()
                                         arr_x_points[i] = rect.x + hor_interval_width*(arr_x_val[i] - arr_x_val[0]);
                                     }
 
-                                    if(y_ax.labels.x < 0){
+                                    if(y_ax.labels.x < 0 && !bNeedReflect){
                                         rect.x -= y_ax.labels.x;
                                         rect.w += y_ax.labels.x;
                                         bCorrectedLayoutRect = true;
                                     }
-                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX && !bNeedReflect){
                                         rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
                                         bCorrectedLayoutRect = true;
                                     }
@@ -4031,12 +4091,12 @@ CChartSpace.prototype.recalculateAxis = function()
                                     }
                                     y_ax.labels.x = y_ax.posX - y_ax.labels.extX;
 
-                                    if(y_ax.labels.x < 0){
+                                    if(y_ax.labels.x < 0 && !bNeedReflect){
                                         rect.x -= y_ax.labels.x;
                                         rect.w += y_ax.labels.x;
                                         bCorrectedLayoutRect = true;
                                     }
-                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX && !bNeedReflect){
                                         rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
                                         bCorrectedLayoutRect = true;
                                     }
@@ -4089,12 +4149,12 @@ CChartSpace.prototype.recalculateAxis = function()
                                 }
                                 y_ax.labels.x = y_ax.posX - (arr_x_val[arr_x_val.length-1]-crosses)*hor_interval_width - y_ax.labels.extX;
 
-                                if(y_ax.labels.x < 0){
+                                if(y_ax.labels.x < 0 && !bNeedReflect){
                                     rect.x -= y_ax.labels.x;
                                     rect.w += y_ax.labels.x;
                                     bCorrectedLayoutRect = true;
                                 }
-                                if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                if(y_ax.labels.x + y_ax.labels.extX > this.extX && !bNeedReflect){
                                     rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
                                     bCorrectedLayoutRect = true;
                                 }
@@ -4144,12 +4204,12 @@ CChartSpace.prototype.recalculateAxis = function()
                                 }
                                 y_ax.labels.x = rect.x + rect.w;
 
-                                if(y_ax.labels.x < 0){
+                                if(y_ax.labels.x < 0 && !bNeedReflect){
                                     rect.x -= y_ax.labels.x;
                                     rect.w += y_ax.labels.x;
                                     bCorrectedLayoutRect = true;
                                 }
-                                if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                if(y_ax.labels.x + y_ax.labels.extX > this.extX && !bNeedReflect){
                                     rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
                                     bCorrectedLayoutRect = true;
                                 }
@@ -4211,12 +4271,12 @@ CChartSpace.prototype.recalculateAxis = function()
 
 
 
-                                    if(y_ax.labels.x < 0){
+                                    if(y_ax.labels.x < 0 && !bNeedReflect){
                                         rect.x -= y_ax.labels.x;
                                         rect.w += y_ax.labels.x;
                                         bCorrectedLayoutRect = true;
                                     }
-                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX && !bNeedReflect){
                                         rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
                                         bCorrectedLayoutRect = true;
                                     }
@@ -4248,12 +4308,12 @@ CChartSpace.prototype.recalculateAxis = function()
 
 
 
-                                    if(y_ax.labels.x < 0){
+                                    if(y_ax.labels.x < 0 && !bNeedReflect){
                                         rect.x -= y_ax.labels.x;
                                         rect.w += y_ax.labels.x;
                                         bCorrectedLayoutRect = true;
                                     }
-                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX){
+                                    if(y_ax.labels.x + y_ax.labels.extX > this.extX && !bNeedReflect){
                                         rect.w -= (y_ax.labels.x + y_ax.labels.extX - this.extX);
                                         bCorrectedLayoutRect = true;
                                     }
@@ -5180,7 +5240,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             }
                             else{
                                 val_ax.labels.x = rect.x + rect.w;
-                                if(val_ax.labels.x < 0){
+                                if(val_ax.labels.x < 0 && !bNeedReflect){
                                     rect.x -= val_ax.labels.x;
                                     rect.w += val_ax.labels.x;
                                     val_ax.labels.x = 0;
@@ -5241,7 +5301,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             }
                             else{
                                 val_ax.labels.x = rect.x + left_points_width - val_ax.labels.extX;
-                                if(val_ax.labels.x < 0){
+                                if(val_ax.labels.x < 0 && !bNeedReflect){
                                     rect.x -= val_ax.labels.x;
                                     rect.w += val_ax.labels.x;
                                     val_ax.labels.x = 0;
@@ -5383,7 +5443,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             }
                             else{
                                 val_ax.labels.x = rect.x - val_ax.labels.extX;
-                                if(val_ax.labels.x < 0){
+                                if(val_ax.labels.x < 0 && !bNeedReflect){
                                     rect.x -= val_ax.labels.x;
                                     rect.w += val_ax.labels.x;
                                     val_ax.labels.x = 0;
@@ -5440,7 +5500,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             else
                             {
                                 val_ax.labels.x = rect.x + rect.w - right_point_width;
-                                if(val_ax.labels.x < 0){
+                                if(val_ax.labels.x < 0 && !bNeedReflect){
                                     rect.x -= val_ax.labels.x;
                                     rect.w += val_ax.labels.x;
                                     val_ax.labels.x = 0;
@@ -5503,7 +5563,7 @@ CChartSpace.prototype.recalculateAxis = function()
                         else{
                             val_ax.labels.x = rect.x + rect.w;
 
-                            if(val_ax.labels.x < 0){
+                            if(val_ax.labels.x < 0 && !bNeedReflect){
                                 rect.x -= val_ax.labels.x;
                                 rect.w += val_ax.labels.x;
                                 val_ax.labels.x = 0;
@@ -5565,7 +5625,7 @@ CChartSpace.prototype.recalculateAxis = function()
                         }
                         else{
                             val_ax.labels.x = rect.x - val_ax.labels.extX;
-                            if(val_ax.labels.x < 0){
+                            if(val_ax.labels.x < 0 && !bNeedReflect){
                                 rect.x -= val_ax.labels.x;
                                 rect.w += val_ax.labels.x;
                                 val_ax.labels.x = 0;
@@ -11563,6 +11623,18 @@ function CreateView3d(nRotX, nRotY, bRAngAx, nDepthPercent)
     return oView3d;
 }
 
+function GetNumFormatFromSeries(aAscSeries){
+    if(aAscSeries &&
+        aAscSeries[0] &&
+        aAscSeries[0].Val &&
+        aAscSeries[0].Val.NumCache &&
+        aAscSeries[0].Val.NumCache[0]){
+        if(typeof (aAscSeries[0].Val.NumCache[0].numFormatStr) === "string" && aAscSeries[0].Val.NumCache[0].numFormatStr.length > 0){
+            return aAscSeries[0].Val.NumCache[0].numFormatStr;
+        }
+    }
+    return "General";
+}
 
 function CreateLineChart(chartSeries, type, bUseCache, oOptions, b3D)
 {
@@ -11679,7 +11751,7 @@ function CreateLineChart(chartSeries, type, bUseCache, oOptions, b3D)
     }
     else
     {
-        format_code = "General";
+        format_code = GetNumFormatFromSeries(asc_series);
     }
     num_fmt.setFormatCode(format_code);
     num_fmt.setSourceLinked(true);
@@ -11816,7 +11888,7 @@ function CreateBarChart(chartSeries, type, bUseCache, oOptions, b3D, bDepth)
     }
     else
     {
-        format_code = "General";
+        format_code = GetNumFormatFromSeries(asc_series);
     }
     num_fmt.setFormatCode(format_code);
     num_fmt.setSourceLinked(true);
@@ -11965,7 +12037,7 @@ function CreateHBarChart(chartSeries, type, bUseCache, oOptions, b3D)
      }
      else */
     {
-        format_code = "General";
+        format_code = GetNumFormatFromSeries(asc_series);
     }
     num_fmt.setFormatCode(format_code);
     num_fmt.setSourceLinked(true);
@@ -12092,7 +12164,7 @@ function CreateAreaChart(chartSeries, type, bUseCache, oOptions)
     }
     else
     {
-        format_code = "General";
+        format_code = GetNumFormatFromSeries(asc_series);
     }
     num_fmt.setFormatCode(format_code);
     num_fmt.setSourceLinked(true);
@@ -12368,7 +12440,7 @@ function CreateScatterChart(chartSeries, bUseCache, oOptions)
     var scaling = val_ax.scaling;
     scaling.setOrientation(AscFormat.ORIENTATION_MIN_MAX);
     var num_fmt = val_ax.numFmt;
-    var format_code = "General";
+    var format_code = GetNumFormatFromSeries(asc_series);
     num_fmt.setFormatCode(format_code);
     num_fmt.setSourceLinked(true);
     if(scatter_chart.series.length > 1)
@@ -12529,7 +12601,7 @@ function CreateStockChart(chartSeries, bUseCache, oOptions)
     scaling.setOrientation(AscFormat.ORIENTATION_MIN_MAX);
     var num_fmt = val_ax.numFmt;
     var format_code;
-    format_code = "General";
+    format_code = GetNumFormatFromSeries(asc_series);
     num_fmt.setFormatCode(format_code);
     num_fmt.setSourceLinked(true);
     var legend = chart.legend;
@@ -12648,7 +12720,7 @@ function CreateStockChart(chartSeries, bUseCache, oOptions)
         oValAx.setAxPos(AscFormat.AX_POS_L);
         oValAx.setMajorGridlines(new AscFormat.CSpPr());
         var oNumFmt = new AscFormat.CNumFmt();
-        oNumFmt.setFormatCode("General");
+        oNumFmt.setFormatCode(GetNumFormatFromSeries(asc_series));
         oNumFmt.setSourceLinked(true);
         oValAx.setNumFmt(oNumFmt);
         oValAx.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);

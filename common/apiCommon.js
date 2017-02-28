@@ -140,6 +140,7 @@
 		this.AutosaveMinInterval = 300;
 		this.isAnalyticsEnable = false;
 		this.buildVersion = null;
+		this.buildNumber = null;
 		return this;
 	}
 
@@ -176,6 +177,9 @@
 	asc_CAscEditorPermissions.prototype.asc_getBuildVersion = function () {
 		return this.buildVersion;
 	};
+	asc_CAscEditorPermissions.prototype.asc_getBuildNumber = function () {
+		return this.buildNumber;
+	};
 
 	asc_CAscEditorPermissions.prototype.setLicenseType = function (v) {
 		this.licenseType = v;
@@ -194,6 +198,9 @@
 	};
 	asc_CAscEditorPermissions.prototype.setBuildVersion = function (v) {
 		this.buildVersion = v;
+	};
+	asc_CAscEditorPermissions.prototype.setBuildNumber = function (v) {
+		this.buildNumber = v;
 	};
 
 	/** @constructor */
@@ -220,6 +227,63 @@
 	}
 
 	asc_ValAxisSettings.prototype = {
+
+
+		isEqual: function(oPr){
+			if(!oPr){
+				return false;
+			}
+            if(this.minValRule !== oPr.minValRule){
+				return false;
+			}
+            if(this.minVal !== oPr.minVal){
+            	return false;
+			}
+            if(this.maxValRule !== oPr.maxValRule){
+            	return false;
+			}
+            if(this.maxVal !== oPr.maxVal){
+            	return false;
+			}
+            if(this.invertValOrder !== oPr.invertValOrder){
+            	return false;
+			}
+            if(this.logScale !== oPr.logScale){
+            	return false;
+			}
+            if(this.logBase !== oPr.logBase){
+            	return false;
+			}
+            if(this.dispUnitsRule !== oPr.dispUnitsRule){
+            	return false;
+			}
+            if(this.units !== oPr.units){
+            	return false;
+			}
+            if(this.showUnitsOnChart !== oPr.showUnitsOnChart){
+            	return false;
+			}
+            if(this.majorTickMark !== oPr.majorTickMark){
+            	return false;
+			}
+            if(this.minorTickMark !== oPr.minorTickMark){
+            	return false;
+			}
+            if(this.tickLabelsPos !== oPr.tickLabelsPos){
+            	return false;
+			}
+            if(this.crossesRule !== oPr.crossesRule){
+            	return false;
+			}
+            if(this.crosses !== oPr.crosses){
+            	return false;
+			}
+            if(this.axisType !== oPr.axisType){
+            	return false;
+			}
+
+			return true;
+		},
 
 		putAxisType: function (v) {
 			this.axisType = v;
@@ -328,6 +392,54 @@
 
 	asc_CatAxisSettings.prototype = {
 
+		isEqual: function(oPr){
+			if(!oPr){
+				return false;
+			}
+            if(this.intervalBetweenTick !== oPr.intervalBetweenTick){
+            	return false;
+			}
+            if(this.intervalBetweenLabelsRule !== oPr.intervalBetweenLabelsRule){
+            	return false;
+			}
+            if(this.intervalBetweenLabels !== oPr.intervalBetweenLabels){
+            	return false;
+			}
+            if(this.invertCatOrder !== oPr.invertCatOrder){
+            	return false;
+			}
+            if(this.labelsAxisDistance !== oPr.labelsAxisDistance){
+            	return false;
+			}
+            if(this.majorTickMark !== oPr.majorTickMark){
+            	return false;
+			}
+            if(this.minorTickMark !== oPr.minorTickMark){
+            	return false;
+			}
+            if(this.tickLabelsPos !== oPr.tickLabelsPos){
+            	return false;
+			}
+            if(this.crossesRule !== oPr.crossesRule){
+            	return false;
+			}
+            if(this.crosses !== oPr.crosses){
+            	return false;
+			}
+            if(this.labelsPosition !== oPr.labelsPosition){
+            	return false;
+			}
+            if(this.axisType !==  oPr.axisType){
+            	return false;
+			}
+            if(this.crossMinVal !== oPr.crossMinVal){
+            	return false;
+			}
+            if(this.crossMaxVal !== oPr.crossMaxVal){
+            	return false;
+			}
+			return true;
+		},
 		putIntervalBetweenTick: function (v) {
 			this.intervalBetweenTick = v;
 		}, putIntervalBetweenLabelsRule: function (v) {
@@ -450,6 +562,112 @@
 	}
 
 	asc_ChartSettings.prototype = {
+
+		equalBool: function(a, b){
+			return ((!!a) === (!!b));
+		},
+
+		isEqual: function(oPr){
+			if(!oPr){
+				return false;
+			}
+			if(this.style !== oPr.style){
+				return false;
+			}
+            if(this.title !== oPr.title){
+				return false;
+			}
+			if(this.rowCols !== oPr.rowCols){
+            	return false;
+			}
+			if(this.horAxisLabel !== oPr.horAxisLabel){
+				return false;
+			}
+            if(this.vertAxisLabel !== oPr.vertAxisLabel){
+				return false;
+			}
+			if(this.legendPos !== oPr.legendPos){
+           		return false;
+			}
+			if(this.dataLabelsPos !== oPr.dataLabelsPos){
+				return false;
+			}
+			if(this.vertAx !== oPr.vertAx){
+				return false;
+			}
+			if(this.horAx !== oPr.horAx){
+				return false;
+			}
+            if(this.horGridLines !== oPr.horGridLines){
+            	return false;
+			}
+            if(this.vertGridLines !== oPr.vertGridLines){
+            	return false;
+			}
+            if(this.type !== oPr.type){
+            	return false;
+			}
+            if(!this.equalBool(this.showSerName, oPr.showSerName)){
+            	return false;
+			}
+
+            if(!this.equalBool(this.showCatName, oPr.showCatName)){
+            	return false;
+			}
+            if(!this.equalBool(this.showVal, oPr.showVal)){
+            	return false;
+			}
+
+            if(this.separator !== oPr.separator &&
+			!(this.separator === ' ' && oPr.separator == null || oPr.separator === ' ' && this.separator == null)){
+            	return false;
+			}
+			if(!this.horAxisProps){
+            	if(oPr.horAxisProps){
+            		return false;
+				}
+			}
+			else{
+				if(!this.horAxisProps.isEqual(oPr.horAxisProps)){
+					return false;
+				}
+			}
+            if(!this.vertAxisProps){
+                if(oPr.vertAxisProps){
+                    return false;
+                }
+            }
+            else{
+                if(!this.vertAxisProps.isEqual(oPr.vertAxisProps)){
+                    return false;
+                }
+            }
+            if(this.range !== oPr.range){
+                return false;
+            }
+            if(!this.equalBool(this.inColumns, oPr.inColumns)){
+                return false;
+            }
+
+            if(!this.equalBool(this.showMarker, oPr.showMarker)){
+                return false;
+            }
+            if(!this.equalBool(this.bLine, oPr.bLine)){
+                return false;
+            }
+            if(!this.equalBool(this.smooth, oPr.smooth)){
+                return false;
+            }
+            if(!this.equalBool(this.showHorAxis, oPr.showHorAxis)){
+                return false;
+            }
+
+            if(!this.equalBool(this.showVerAxis, oPr.showVerAxis)){
+                return false;
+            }
+            return true;
+		},
+
 		putShowMarker: function (v) {
 			this.showMarker = v;
 		},
@@ -695,7 +913,7 @@
 					if (nOldType === c_oAscChartTypeSettings.hBarNormal || nOldType === c_oAscChartTypeSettings.hBarStacked ||
 						nOldType === c_oAscChartTypeSettings.hBarStackedPer) {
 						var bTemp = this.showHorAxis;
-						this.putShowHorAxis(this.showVerAxis)
+						this.putShowHorAxis(this.showVerAxis);
 						this.putShowVerAxis(bTemp);
 					} else if (nOldType === c_oAscChartTypeSettings.pie || nOldType === c_oAscChartTypeSettings.doughnut) {
 						this.putShowHorAxis(true);
@@ -722,7 +940,7 @@
 					} else if (nOldType !== c_oAscChartTypeSettings.hBarNormal &&
 						nOldType !== c_oAscChartTypeSettings.hBarStacked && nOldType !== c_oAscChartTypeSettings.hBarStackedPer) {
 						var bTemp = this.showHorAxis;
-						this.putShowHorAxis(this.showVerAxis)
+						this.putShowHorAxis(this.showVerAxis);
 						this.putShowVerAxis(bTemp);
 					}
 					//this.putHorGridLines(c_oAscGridLinesSettings.none);
@@ -2864,6 +3082,7 @@
 	prot["asc_getTrial"] = prot.asc_getTrial;
 	prot["asc_getRights"] = prot.asc_getRights;
 	prot["asc_getBuildVersion"] = prot.asc_getBuildVersion;
+	prot["asc_getBuildNumber"] = prot.asc_getBuildNumber;
 
 	window["AscCommon"].asc_ValAxisSettings = asc_ValAxisSettings;
 	prot = asc_ValAxisSettings.prototype;

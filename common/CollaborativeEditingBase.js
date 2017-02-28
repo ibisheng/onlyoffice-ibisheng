@@ -246,6 +246,14 @@ function CCollaborativeEditingBase()
     this.m_aForeignCursorsPos = new CDocumentPositionsManager();
     this.m_aForeignCursors    = {};
     this.m_aForeignCursorsId  = {};
+
+
+    this.m_nAllChangesSavedIndex = 0;
+
+    this.m_aAllChanges        = []; // Список всех изменений
+    this.m_aOwnChangesIndexes = []; // Список номеров своих изменений в общем списке, которые мы можем откатить
+
+    this.m_oOwnChanges        = [];
 }
 
 CCollaborativeEditingBase.prototype.Clear = function()
@@ -588,6 +596,24 @@ CCollaborativeEditingBase.prototype.Refresh_DCChanges = function()
 
     this.Clear_DCChanges();
 };
+
+
+//-----------------------------------------------------------------------------------
+// Функции для работы с массивами PosExtChangesX, PosExtChangesY
+//-----------------------------------------------------------------------------------
+    CCollaborativeEditingBase.prototype.AddPosExtChanges = function(Item, ChangeObject){
+
+    };
+    CCollaborativeEditingBase.prototype.RefreshPosExtChanges = function(){
+
+    };
+    CCollaborativeEditingBase.prototype.RewritePosExtChanges = function(changesArr, scale, Binary_Writer)
+    {
+    };
+
+    CCollaborativeEditingBase.prototype.RefreshPosExtChanges = function()
+    {
+    };
 //-----------------------------------------------------------------------------------
 // Функции для работы с отметками изменений
 //-----------------------------------------------------------------------------------
@@ -770,6 +796,432 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
 	{
 	    return true;
 	};
+
+
+	//-------------------------------------
+    ///
+    /////----------------------------------------
+    //----------------------------------------------------------------------------------------------------------------------
+//
+//----------------------------------------------------------------------------------------------------------------------
+    CCollaborativeEditingBase.prototype.private_ClearChanges = function()
+    {
+        this.m_aChanges = [];
+    };
+    CCollaborativeEditingBase.prototype.private_CollectOwnChanges = function()
+    {
+        var StartPoint = ( null === AscCommon.History.SavedIndex ? 0 : AscCommon.History.SavedIndex + 1 );
+        var LastPoint  = -1;
+
+        if (this.m_nUseType <= 0)
+            LastPoint = AscCommon.History.Points.length - 1;
+        else
+            LastPoint = AscCommon.History.Index;
+
+        for (var PointIndex = StartPoint; PointIndex <= LastPoint; PointIndex++)
+        {
+            var Point = AscCommon.History.Points[PointIndex];
+            for (var Index = 0; Index < Point.Items.length; Index++)
+            {
+                var Item = Point.Items[Index];
+
+                this.m_oOwnChanges.push(Item.Data);
+            }
+        }
+    };
+    CCollaborativeEditingBase.prototype.private_AddOverallChange = function(oChange)
+    {
+        // Здесь мы должны смержить пришедшее изменение с одним из наших изменений
+        for (var nIndex = 0, nCount = this.m_oOwnChanges.length; nIndex < nCount; ++nIndex)
+        {
+            if (oChange && oChange.Merge && false === oChange.Merge(this.m_oOwnChanges[nIndex]))
+                return false;
+        }
+
+        this.m_aAllChanges.push(oChange);
+        return true;
+    };
+    CCollaborativeEditingBase.prototype.private_OnSendOwnChanges = function(arrChanges, nDeleteIndex)
+    {
+        if (null !== nDeleteIndex)
+        {
+            this.m_aAllChanges.length = this.m_nAllChangesSavedIndex + nDeleteIndex;
+        }
+        else
+        {
+            this.m_nAllChangesSavedIndex = this.m_aAllChanges.length;
+        }
+
+        // TODO: Пока мы делаем это как одну точку, которую надо откатить. Надо пробежаться по массиву и разбить его
+        //       по отдельным действиям. В принципе, данная схема срабатывает в быстром совместном редактировании,
+        //       так что как правило две точки не успевают попасть в одно сохранение.
+        if (arrChanges.length > 0)
+        {
+            this.m_aOwnChangesIndexes.push({
+                Position : this.m_aAllChanges.length,
+                Count    : arrChanges.length
+            });
+
+            this.m_aAllChanges = this.m_aAllChanges.concat(arrChanges);
+        }
+    };
+    CCollaborativeEditingBase.prototype.Undo = function()
+    {
+        if (true === this.Get_GlobalLock())
+            return;
+
+        if (this.m_aOwnChangesIndexes.length <= 0)
+            return false;
+
+        // Формируем новую пачку действий, которые будут откатывать нужные нам действия.
+
+        // На первом шаге мы заданнуюю пачку изменений коммутируем с последними измениями. Смотрим на то какой набор
+        // изменений у нас получается.
+        // Объектная модель у нас простая: класс, в котором возможно есть массив элементов(тоже классов), у которого воможно
+        // есть набор свойств. Поэтому у нас ровно 2 типа изменений: изменения внутри массива элементов, либо изменения
+        // свойств. Изменения этих двух типов коммутируют между собой, изменения разных классов тоже коммутируют.
+        var arrChanges    = [];
+        var oIndexes      = this.m_aOwnChangesIndexes[this.m_aOwnChangesIndexes.length - 1];
+        var nPosition     = oIndexes.Position;
+        var nCount        = oIndexes.Count;
+        var nOverallCount = this.m_aAllChanges.length;
+
+        var oContentChangesMap = {
+
+        };
+
+        for (var nIndex = nCount - 1; nIndex >= 0; --nIndex)
+        {
+            var oChange = this.m_aAllChanges[nPosition + nIndex];
+            if (!oChange)
+                continue;
+
+            var oClass = oChange.GetClass();
+            if (oChange.IsContentChange())
+            {
+                var _oChange = oChange.Copy();
+
+                if (this.private_CommutateContentChanges(oContentChangesMap, oClass, _oChange, nPosition + nCount))
+                	arrChanges.push(_oChange);
+            }
+            else
+            {
+                var _oChange = oChange; // TODO: Тут надо бы сделать копирование
+
+                if (this.private_CommutatePropertyChanges(oClass, _oChange, nPosition + nCount))
+					arrChanges.push(_oChange);
+            }
+        }
+
+        // Удаляем запись о последнем изменении
+        this.m_aOwnChangesIndexes.length = this.m_aOwnChangesIndexes.length - 1;
+
+		var arrReverseChanges = [];
+		for (var nIndex = 0, nCount = arrChanges.length; nIndex < nCount; ++nIndex)
+		{
+			var oReverseChange = arrChanges[nIndex].CreateReverseChange();
+			if (oReverseChange)
+				arrReverseChanges.push(oReverseChange);
+		}
+
+        // Накатываем изменения в данном клиенте
+        var oLogicDocument = this.m_oLogicDocument;
+
+        oLogicDocument.DrawingDocument.EndTrackTable(null, true);
+        oLogicDocument.TurnOffCheckChartSelection();
+
+        var DocState = this.private_SaveDocumentState();
+
+        for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
+        {
+            arrReverseChanges[nIndex].Load();
+            this.m_aAllChanges.push(arrReverseChanges[nIndex]);
+        }
+
+        // Может так случиться, что в каких-то классах DocumentContent удалились все элементы, либо
+        // в классе Paragraph удалился знак конца параграфа. Нам необходимо проверить все классы на корректность, и если
+        // нужно, добавить дополнительные изменения.
+
+        var mapDocumentContents = {};
+        var mapParagraphs       = {};
+        var mapDrawings         = {};
+        var mapRuns             = {};
+        var mapTables           = {};
+        for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
+        {
+            var oChange = arrReverseChanges[nIndex];
+            var oClass  = oChange.GetClass();
+			if (oClass instanceof AscCommonWord.CDocument || oClass instanceof AscCommonWord.CDocumentContent)
+				mapDocumentContents[oClass.Get_Id()] = oClass;
+			else if (oClass instanceof AscCommonWord.Paragraph)
+				mapParagraphs[oClass.Get_Id()] = oClass;
+			else if (oClass.IsParagraphContentElement && true === oClass.IsParagraphContentElement() && true === oChange.IsContentChange() && oClass.Get_Paragraph())
+				mapParagraphs[oClass.Get_Paragraph().Get_Id()] = oClass.Get_Paragraph();
+			else if (oClass instanceof AscCommonWord.ParaDrawing)
+				mapDrawings[oClass.Get_Id()] = oClass;
+			else if (oClass instanceof AscCommonWord.ParaRun)
+				mapRuns[oClass.Get_Id()] = oClass;
+			else if (oClass instanceof AscCommonWord.CTable)
+				mapTables[oClass.Get_Id()] = oClass;
+        }
+
+        // Создаем точку в истории. Делаем действия через обычные функции (с отключенным пересчетом), которые пишут в
+        // историю. Сохраняем список изменений в новой точке, удаляем данную точку.
+        var oHistory = AscCommon.History;
+        oHistory.CreateNewPointForCollectChanges();
+        var oDrawing;
+        for (var sId in mapDrawings)
+        {
+            if (mapDrawings.hasOwnProperty(sId))
+            {
+                oDrawing = mapDrawings[sId];
+                if (!oDrawing.CheckCorrect())
+                {
+                    var oParentParagraph = oDrawing.Get_ParentParagraph();
+                    oDrawing.Remove_FromDocument(false);
+                    if (oParentParagraph)
+                    {
+                        mapParagraphs[oParentParagraph.Get_Id()] = oParentParagraph;
+                    }
+                }
+            }
+        }
+
+        for(var sId in mapRuns){
+            if (mapRuns.hasOwnProperty(sId))
+            {
+                var oRun = mapRuns[sId];
+                for(var nIndex = oRun.Content.length - 1; nIndex > - 1; --nIndex){
+                    if(oRun.Content[nIndex] instanceof AscCommonWord.ParaDrawing){
+                        if(!oRun.Content[nIndex].CheckCorrect()){
+                            oRun.Remove_FromContent(nIndex, 1, false);
+                            if(oRun.Paragraph){
+                                mapParagraphs[oRun.Paragraph.Get_Id()] = oRun.Paragraph;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (var sId in mapTables)
+		{
+			var oTable = mapTables[sId];
+			for (var nCurRow = oTable.Content.length - 1; nCurRow >= 0; --nCurRow)
+			{
+				var oRow = oTable.Get_Row(nCurRow);
+				if (oRow.Get_CellsCount() <= 0)
+					oTable.Internal_Remove_Row(nCurRow);
+			}
+
+			if (oTable.Parent instanceof AscCommonWord.CDocument || oTable.Parent instanceof AscCommonWord.CDocumentContent)
+				mapDocumentContents[oTable.Parent.Get_Id()] = oTable.Parent;
+		}
+
+        for (var sId in mapDocumentContents)
+        {
+            var oDocumentContent = mapDocumentContents[sId];
+            var nContentLen = oDocumentContent.Content.length;
+			for (var nIndex = nContentLen - 1; nIndex >= 0; --nIndex)
+			{
+				var oElement = oDocumentContent.Content[nIndex];
+				if ((AscCommonWord.type_Paragraph === oElement.GetType() || AscCommonWord.type_Table === oElement.GetType()) && oElement.Content.length <= 0)
+				{
+					oDocumentContent.Remove_FromContent(nIndex, 1);
+					console.log("Deleted " + ( AscCommonWord.type_Table === oElement.GetType() ? "Table" : "Paragraph"));
+				}
+			}
+
+			nContentLen = oDocumentContent.Content.length;
+            if (nContentLen <= 0 || AscCommonWord.type_Paragraph !== oDocumentContent.Content[nContentLen - 1].GetType())
+            {
+                var oNewParagraph = new AscCommonWord.Paragraph(oLogicDocument.Get_DrawingDocument(), oDocumentContent, 0, 0, 0, 0, 0, false);
+                oDocumentContent.Add_ToContent(nContentLen, oNewParagraph);
+            }
+        }
+
+        for (var sId in mapParagraphs)
+        {
+            var oParagraph = mapParagraphs[sId];
+            oParagraph.Correct_Content();
+            oParagraph.CheckParaEnd();
+        }
+        var oHistoryPoint = oHistory.Points[oHistory.Points.length - 1];
+        for (var nIndex = 0, nCount = oHistoryPoint.Items.length; nIndex < nCount; ++nIndex)
+        {
+            arrReverseChanges.push(oHistoryPoint.Items[nIndex].Data);
+        }
+        oHistory.Remove_LastPoint();
+        this.Clear_DCChanges();
+
+        var oBinaryWriter = AscCommon.History.BinaryWriter;
+        var aSendingChanges = [];
+        for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
+        {
+            var oReverseChange = arrReverseChanges[nIndex];
+            var oChangeClass   = oReverseChange.GetClass();
+
+            var nBinaryPos = oBinaryWriter.GetCurPosition();
+            oBinaryWriter.WriteString2(oChangeClass.Get_Id());
+            oBinaryWriter.WriteLong(oReverseChange.Type);
+            oReverseChange.WriteToBinary(oBinaryWriter);
+
+            var nBinaryLen = oBinaryWriter.GetCurPosition() - nBinaryPos;
+
+            var oChange = new AscCommon.CCollaborativeChanges();
+            oChange.Set_FromUndoRedo(oChangeClass, oReverseChange, {Pos : nBinaryPos, Len : nBinaryLen});
+            aSendingChanges.push(oChange.m_pData);
+        }
+        editor.CoAuthoringApi.saveChanges(aSendingChanges, null, null);
+
+        this.private_RestoreDocumentState(DocState);
+
+        oLogicDocument.TurnOnCheckChartSelection();
+        this.private_RecalculateDocument(AscCommon.History.Get_RecalcData(null, arrReverseChanges));
+
+        oLogicDocument.Document_UpdateSelectionState();
+        oLogicDocument.Document_UpdateInterfaceState();
+        oLogicDocument.Document_UpdateRulersState();
+    };
+    CCollaborativeEditingBase.prototype.CanUndo = function()
+    {
+        return this.m_aOwnChangesIndexes.length <= 0 ? false : true;
+    };
+    CCollaborativeEditingBase.prototype.private_CommutateContentChanges = function(oMap, oClass, oChange, nStartPosition)
+    {
+        var arrOtherActions = [];
+
+        if (oMap[oClass.Get_Id()])
+        {
+            arrOtherActions = oMap[oClass.Get_Id()];
+        }
+        else
+        {
+            for (var nIndex = nStartPosition, nOverallCount = this.m_aAllChanges.length; nIndex < nOverallCount; ++nIndex)
+            {
+                var oTempChange = this.m_aAllChanges[nIndex];
+                if (!oTempChange)
+                    continue;
+
+                if (oChange.IsRelated(oTempChange))
+                {
+                    arrOtherActions.push(oTempChange.ConvertToSimpleActions());
+                }
+            }
+
+            oMap[oClass.Get_Id()] = arrOtherActions;
+        }
+
+        var arrActions = oChange.ConvertToSimpleActions();
+
+        var arrCommutateActions = [];
+        for (var nActionIndex = arrActions.length - 1; nActionIndex >= 0; --nActionIndex)
+        {
+            var oAction = arrActions[nActionIndex];
+            var oResult = oAction;
+
+            for (var nIndex = 0, nOtherActionsCount = arrOtherActions.length; nIndex < nOtherActionsCount; ++nIndex)
+            {
+                var arrOActions = arrOtherActions[nIndex];
+                for (var nIndex2 = 0, nOtherActionsCount2 = arrOActions.length; nIndex2 < nOtherActionsCount2; ++nIndex2)
+                {
+                    var oOtherAction = arrOActions[nIndex2];
+
+                    if (false === this.private_Commutate(oAction, oOtherAction))
+                    {
+                        arrOActions.splice(nIndex2, 1);
+                        oResult = null;
+                        break;
+                    }
+                }
+
+                if (null === oResult)
+                    break;
+            }
+
+            if (null !== oResult)
+                arrCommutateActions.push(oResult);
+        }
+
+        if (arrCommutateActions.length > 0)
+            oChange.ConvertFromSimpleActions(arrCommutateActions);
+        else
+            return false;
+
+        return true;
+    };
+    CCollaborativeEditingBase.prototype.private_Commutate = function(oActionL, oActionR)
+    {
+        if (oActionL.Add)
+        {
+            if (oActionR.Add)
+            {
+                if (oActionL.Pos >= oActionR.Pos)
+                    oActionL.Pos++;
+                else
+                    oActionR.Pos--;
+            }
+            else
+            {
+                if (oActionL.Pos > oActionR.Pos)
+                    oActionL.Pos--;
+                else if (oActionL.Pos === oActionR.Pos)
+                    return false;
+                else
+                    oActionR.Pos--;
+            }
+        }
+        else
+        {
+            if (oActionR.Add)
+            {
+                if (oActionL.Pos >= oActionR.Pos)
+                    oActionL.Pos++;
+                else
+                    oActionR.Pos++;
+            }
+            else
+            {
+                if (oActionL.Pos > oActionR.Pos)
+                    oActionL.Pos--;
+                else
+                    oActionR.Pos++;
+            }
+        }
+
+        return true;
+    };
+    CCollaborativeEditingBase.prototype.private_CommutatePropertyChanges = function(oClass, oChange, nStartPosition)
+    {
+        // В GoogleDocs если 2 пользователя исправляют одно и тоже свойство у одного и того же класса, тогда Undo работает
+        // у обоих. Например, первый выставляет параграф по центру (изначально по левому), второй после этого по правому
+        // краю. Тогда на Undo первого пользователя возвращает параграф по левому краю, а у второго по центру, неважно в
+        // какой последовательности они вызывают Undo.
+        // Далем как у них: т.е. изменения свойств мы всегда откатываем, даже если данное свойсво менялось в последующих
+        // изменениях.
+
+        // Здесь вариант: свойство не откатываем, если оно менялось в одном из последующих действий. (для работы этого
+        // варианта нужно реализовать функцию IsRelated у всех изменений).
+
+        // // Значит это изменение свойства. Пробегаемся по всем следующим изменениям и смотрим, менялось ли такое
+        // // свойство у данного класса, если да, тогда данное изменение невозможно скоммутировать.
+        // for (var nIndex = nStartPosition, nOverallCount = this.m_aAllChanges.length; nIndex < nOverallCount; ++nIndex)
+        // {
+        // 	var oTempChange = this.m_aAllChanges[nIndex];
+        // 	if (!oTempChange || !oTempChange.IsChangesClass || !oTempChangeIsChangesClass())
+        // 		continue;
+        //
+        // 	if (oChange.IsRelated(oTempChange))
+        // 		return false;
+        // }
+
+        return true;
+    };
+
+
+    CCollaborativeEditingBase.prototype.private_RecalculateDocument = function(oRecalcData){
+
+    };
 
 
 //----------------------------------------------------------------------------------------------------------------------

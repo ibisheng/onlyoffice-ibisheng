@@ -417,8 +417,7 @@
 					if(tablePartsContainsRange)
 					{
 						cloneFilter = tablePartsContainsRange.clone(null);
-						tablePartsContainsRange.AutoFilter = new AscCommonExcel.AutoFilter();
-						tablePartsContainsRange.AutoFilter.Ref = tablePartsContainsRange.Ref.clone();
+						tablePartsContainsRange.addAutoFilter();
 
 						//history
 						t._addHistoryObj(cloneFilter, AscCH.historyitem_AutoFilter_Add,
@@ -631,10 +630,7 @@
 					autoFilter = filterObj.filter.AutoFilter;	
 				if(!autoFilter)
 				{
-					autoFilter = new AscCommonExcel.AutoFilter();
-					autoFilter.Ref = currentFilter.Ref.clone();
-					
-					filterObj.filter.AutoFilter = autoFilter;
+					autoFilter = filterObj.filter.addAutoFilter();
 				}
 				
 				var newFilterColumn;
@@ -686,7 +682,10 @@
 					var endRow = autoFilter && autoFilter.Ref ? autoFilter.Ref.r2 : currentFilter.Ref.r2;
 					if(currentFilter && !currentFilter.isAutoFilter() && currentFilter.TotalsRowCount)
 					{
-						endRow--;
+						if(currentFilter.Ref.isEqual(autoFilter.Ref))
+						{
+							endRow--;
+						}
 					}
 					
 					var hiddenObj = {start: currentFilter.Ref.r1 + 1, h: null};
@@ -1411,8 +1410,7 @@
 							{
 								diffColId = ref.c1 - activeRange.c2 - 1;
 								
-								if(bTablePart)
-									filter.deleteTableColumns(activeRange);
+								filter.deleteTableColumns(activeRange);
 								
 								filter.changeRef(-diffColId, null, true);
 							}
@@ -1424,9 +1422,9 @@
 							oldFilter = filter.clone(null);
 							diffColId = activeRange.c1 - ref.c2 - 1;
 							
-							if(diff < 0 && bTablePart)
+							if(diff < 0)
 								filter.deleteTableColumns(activeRange);
-							else if(bTablePart)
+							else
 								filter.addTableColumns(activeRange, t);
 							
 							filter.changeRef(diffColId);						
@@ -1435,9 +1433,9 @@
 						{
 							oldFilter = filter.clone(null);
 							
-							if(diff < 0 && bTablePart)
+							if(diff < 0)
 								filter.deleteTableColumns(activeRange);
-							else if(bTablePart)
+							else
 								filter.addTableColumns(activeRange, t);	
 							
 							filter.changeRef(diff);
@@ -1681,6 +1679,7 @@
 					sortProps = this.getPropForSort(cellId, activeRange, displayName);
 					
 				curFilter = sortProps.curFilter, sortRange = sortProps.sortRange, filterRef = sortProps.filterRef, startCol = sortProps.startCol, maxFilterRow = sortProps.maxFilterRow;
+				var bIsAutoFilter = curFilter.isAutoFilter();
 				
 				var onSortAutoFilterCallback = function(type)
 				{
@@ -1692,8 +1691,14 @@
 					//изменяем содержимое фильтра
 					if(!curFilter.SortState)
 					{
+						var sortStateRange = new Asc.Range(curFilter.Ref.c1, curFilter.Ref.r1, curFilter.Ref.c2, maxFilterRow);
+						if(bIsAutoFilter || (!bIsAutoFilter && null === curFilter.HeaderRowCount))
+						{
+							sortStateRange.r1++;
+						}
+						
 						curFilter.SortState = new AscCommonExcel.SortState();
-						curFilter.SortState.Ref = new Asc.Range(startCol, curFilter.Ref.r1, startCol, maxFilterRow);
+						curFilter.SortState.Ref = sortStateRange;
 						curFilter.SortState.SortConditions = [];
 						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 					}
@@ -1706,7 +1711,7 @@
 					var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
 					
 					curFilter.SortState.SortConditions[0].Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
-					curFilter.SortState.SortConditions[0].ConditionDescending = type === Asc.c_oAscSortOptions.Ascending;
+					curFilter.SortState.SortConditions[0].ConditionDescending = type !== Asc.c_oAscSortOptions.Ascending;
 
 					if(curFilter.TableStyleInfo)
 					{
@@ -1729,8 +1734,14 @@
 					//изменяем содержимое фильтра
 					if(!curFilter.SortState)
 					{
+						var sortStateRange = new Asc.Range(curFilter.Ref.c1, curFilter.Ref.r1, curFilter.Ref.c2, maxFilterRow);
+						if(bIsAutoFilter || (!bIsAutoFilter && null === curFilter.HeaderRowCount))
+						{
+							sortStateRange.r1++;
+						}
+						
 						curFilter.SortState = new AscCommonExcel.SortState();
-						curFilter.SortState.Ref = new Asc.Range(startCol, curFilter.Ref.r1, startCol, maxFilterRow);
+						curFilter.SortState.Ref = sortStateRange;
 						curFilter.SortState.SortConditions = [];
 						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 					}
@@ -2504,7 +2515,7 @@
 							this._clearRange(clearRange, true);
 							
 							tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
-							tablePart.changeRef(null, -1);
+							tablePart.changeRef(null, -1, null, true);
 						}
 						else
 						{
@@ -2516,7 +2527,7 @@
 								isSetType = true;
 								
 								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
-								tablePart.changeRef(null, 1);
+								tablePart.changeRef(null, 1, null, true);
 							}
 							else
 							{
@@ -2526,7 +2537,7 @@
 								isSetType = true;
 								
 								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
-								tablePart.changeRef(null, 1);
+								tablePart.changeRef(null, 1, null, true);
 							}
 							
 							if(val === true)
@@ -2577,8 +2588,7 @@
 							
 							if(null === tablePart.AutoFilter)
 							{
-								tablePart.AutoFilter = new AscCommonExcel.AutoFilter();
-								tablePart.AutoFilter.Ref = tablePart.Ref.clone();
+								tablePart.addAutoFilter();
 							}
 						}
 						
@@ -3647,8 +3657,7 @@
 					
 					if(!bWithoutFilter)
 					{
-						newFilter.AutoFilter = new AscCommonExcel.AutoFilter();
-						newFilter.AutoFilter.Ref = ref;
+						newFilter.addAutoFilter();
 					}
 					
 					newFilter.TableStyleInfo = new AscCommonExcel.TableStyleInfo();

@@ -486,7 +486,7 @@ AscCommon.extendClass(CGroupShape, AscFormat.CGraphicObjectBase);
 
                 var dExtX = this.spPr.xfrm.extX, dExtY = this.spPr.xfrm.extY;
                 var oParaDrawing = AscFormat.getParaDrawing(this);
-                if(oParaDrawing)
+                if(false && oParaDrawing)
                 {
                     if(oParaDrawing.SizeRelH || oParaDrawing.SizeRelV)
                     {

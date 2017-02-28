@@ -57,6 +57,30 @@
                         window.plugin_sendMessage(_message);
                     };
 
+					window.Asc.plugin.executeMethod = function(name, params)
+					{
+					    if (window.Asc.plugin.isWaitMethod === true)
+					        return false;
+
+					    window.Asc.plugin.isWaitMethod = true;
+
+						window.Asc.plugin.info.type = "method";
+						window.Asc.plugin.info.methodName = name;
+						window.Asc.plugin.info.data = params;
+
+						var _message = "";
+						try
+						{
+							_message = JSON.stringify(window.Asc.plugin.info);
+						}
+						catch(err)
+						{
+							_message = JSON.stringify({ type : data });
+						}
+						window.plugin_sendMessage(_message);
+						return true;
+					};
+
                     window.Asc.plugin.resizeWindow = function(width, height, minW, minH, maxW, maxH)
                     {
                         if (undefined == minW)
@@ -104,11 +128,18 @@
                         window.Asc.plugin.onExternalMouseUp();
                     break;
                 }
+                case "onMethodReturn":
+                {
+					window.Asc.plugin.isWaitMethod = false;
+                    if (window.Asc.plugin.onMethodReturn)
+                        window.Asc.plugin.onMethodReturn(pluginData.methodReturnData);
+                    break;
+                }
                 default:
                     break;
             }
         }
-    }
+    };
 
     window.onmousemove = function(e)
     {

@@ -1,10 +1,13 @@
 .idea/
 cell/sdk-all-min.js
 cell/sdk-all.js
+cell/sdk-all.cache
 slide/sdk-all-min.js
 slide/sdk-all.js
+slide/sdk-all.cache
 word/sdk-all-min.js
 word/sdk-all.js
+word/sdk-all.cache
 **/node_modules
 common/AllFonts.js
 common/Images/fonts_thumbnail.png

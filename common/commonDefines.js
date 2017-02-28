@@ -61,6 +61,7 @@
 		FB2  : 0x0049,
 		MOBI : 0x004a,
 		DOCY : 0x1001,
+		CANVAS_WORD : 0x2001,
 		JSON : 0x0808,	// Для mail-merge
 
 		// Excel

@@ -58,7 +58,7 @@ AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideLayoutSetBg]                = 
     oClass.cSld.Bg = value;
     if(FromLoad){
         var Fill;
-        if(oClass.cSld.Bg.bgPr && oClass.cSld.Bg.bgPr.Fill)
+        if(oClass.cSld.Bg && oClass.cSld.Bg.bgPr && oClass.cSld.Bg.bgPr.Fill)
         {
             Fill = oClass.cSld.Bg.bgPr.Fill;
         }

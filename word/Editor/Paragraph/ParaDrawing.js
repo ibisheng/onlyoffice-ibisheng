@@ -171,6 +171,8 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
 	this.Lock      = new AscCommon.CLock();
 
 	this.ParaMath = null;
+
+	this.SkipOnRecalculate = false;
 	//------------------------------------------------------------
 	g_oTableId.Add(this, this.Id);
 
@@ -827,30 +829,37 @@ ParaDrawing.prototype.CheckWH = function()
 {
 	if (!this.GraphicObj)
 		return;
-	var dW, dH, bInline = this.Is_Inline();
 	this.GraphicObj.recalculate();
-	var extX, extY;
-	if (this.GraphicObj.spPr.xfrm && AscFormat.isRealNumber(this.GraphicObj.spPr.xfrm.extX) && AscFormat.isRealNumber(this.GraphicObj.spPr.xfrm.extY))
+	var extX, extY, rot;
+	if (this.GraphicObj.spPr.xfrm )
 	{
-		extX = this.GraphicObj.spPr.xfrm.extX;
-		extY = this.GraphicObj.spPr.xfrm.extY;
+		if(AscFormat.isRealNumber(this.GraphicObj.spPr.xfrm.extX) && AscFormat.isRealNumber(this.GraphicObj.spPr.xfrm.extY))
+		{
+            extX = this.GraphicObj.spPr.xfrm.extX;
+            extY = this.GraphicObj.spPr.xfrm.extY;
+		}
+		else
+		{
+			extX = 5;
+			extY = 5;
+		}
+		if(AscFormat.isRealNumber(this.GraphicObj.spPr.xfrm.rot))
+		{
+			rot = this.GraphicObj.spPr.xfrm.rot;
+		}
+		else
+		{
+			rot = 0;
+		}
 	}
 	else
 	{
 		extX = 5;
 		extY = 5;
-	}
-	if (AscFormat.checkNormalRotate(AscFormat.isRealNumber(this.GraphicObj.rot) ? this.GraphicObj.rot : 0))
-	{
-		dW = extX;
-		dH = extY;
-	}
-	else
-	{
-		dH = extX;
-		dW = extY;
+		rot = 0;
 	}
 	this.setExtent(extX, extY);
+
 	var xc          = this.GraphicObj.localTransform.TransformPointX(this.GraphicObj.extX / 2, this.GraphicObj.extY / 2);
 	var yc          = this.GraphicObj.localTransform.TransformPointY(this.GraphicObj.extX / 2, this.GraphicObj.extY / 2);
 	var oBounds     = this.GraphicObj.bounds;
@@ -860,11 +869,17 @@ ParaDrawing.prototype.CheckWH = function()
 		LineCorrect = (this.GraphicObj.pen.w == null) ? 12700 : parseInt(this.GraphicObj.pen.w);
 		LineCorrect /= 72000.0;
 	}
-	var EEL = (xc - dW / 2) - oBounds.l - LineCorrect;
-	var EET = (yc - dH / 2) - oBounds.t - LineCorrect;
-	var EER = oBounds.r + LineCorrect - (xc + dW / 2);
-	var EEB = oBounds.b + LineCorrect - (yc + dH / 2);
-	this.setEffectExtent(EEL > 0 ? EEL : 0, EET > 0 ? EET : 0, EER > 0 ? EER : 0, EEB > 0 ? EEB : 0);
+    if(!AscFormat.checkNormalRotate(rot)){
+		var t = extX;
+        extX = extY;
+        extY = t;
+	}
+
+	var EEL = (xc - extX / 2) - oBounds.l + LineCorrect;
+	var EET = (yc - extY / 2) - oBounds.t + LineCorrect;
+	var EER = oBounds.r + LineCorrect - (xc + extX / 2);
+	var EEB = oBounds.b + LineCorrect - (yc + extY / 2);
+	this.setEffectExtent(EEL, EET, EER, EEB);
 	this.Check_WrapPolygon();
 };
 ParaDrawing.prototype.Check_WrapPolygon = function()
@@ -893,6 +908,7 @@ ParaDrawing.prototype.Draw = function( X, Y, pGraphics, pageIndex, align)
 		pGraphics.End_Command();
 	}
 };
+
 ParaDrawing.prototype.Measure = function()
 {
 	if (!this.GraphicObj)
@@ -904,20 +920,26 @@ ParaDrawing.prototype.Measure = function()
 	if (AscFormat.isRealNumber(this.Extent.W) && AscFormat.isRealNumber(this.Extent.H) && (!this.GraphicObj.checkAutofit || !this.GraphicObj.checkAutofit()) && !this.SizeRelH && !this.SizeRelV)
 	{
 		var oEffectExtent = this.EffectExtent;
-		var dW, dH;
-		if (AscFormat.checkNormalRotate(AscFormat.isRealNumber(this.GraphicObj.rot) ? this.GraphicObj.rot : 0))
-		{
-			dW = this.Extent.W;
-			dH = this.Extent.H;
-		}
-		else
-		{
-			dH = this.Extent.W;
-			dW = this.Extent.H;
-		}
 
-		this.Width        = dW + AscFormat.getValOrDefault(oEffectExtent.L, 0) + AscFormat.getValOrDefault(oEffectExtent.R, 0);
-		this.Height       = dH + AscFormat.getValOrDefault(oEffectExtent.T, 0) + AscFormat.getValOrDefault(oEffectExtent.B, 0);
+		var W, H;
+		if(AscFormat.isRealNumber(this.GraphicObj.rot)){
+            if(AscFormat.checkNormalRotate(this.GraphicObj.rot))
+            {
+                W = this.Extent.W;
+                H = this.Extent.H;
+            }
+            else
+			{
+                W = this.Extent.H;
+                H = this.Extent.W;
+			}
+		}
+		else{
+			W = this.Extent.W;
+			H = this.Extent.H;
+		}
+		this.Width        = W + AscFormat.getValOrDefault(oEffectExtent.L, 0) + AscFormat.getValOrDefault(oEffectExtent.R, 0);
+		this.Height       = H + AscFormat.getValOrDefault(oEffectExtent.T, 0) + AscFormat.getValOrDefault(oEffectExtent.B, 0);
 		this.WidthVisible = this.Width;
 	}
 	else
@@ -1240,7 +1262,26 @@ ParaDrawing.prototype.Set_XYForAdd = function(X, Y, NearPos, PageNum)
 	{
 		var Layout = NearPos.Paragraph.Get_Layout(NearPos.ContentPos, this);
 		this.private_SetXYByLayout(X, Y, PageNum, Layout, true, true);
+
+		var oLogicDocument = this.document;
+		if (oLogicDocument)
+		{
+			this.SetSkipOnRecalculate(true);
+			oLogicDocument.Recalculate();
+			this.SetSkipOnRecalculate(false);
+		}
+
+		Layout = NearPos.Paragraph.Get_Layout(NearPos.ContentPos, this);
+		this.private_SetXYByLayout(X, Y, PageNum, Layout, true, true);
 	}
+};
+ParaDrawing.prototype.SetSkipOnRecalculate = function(isSkip)
+{
+	this.SkipOnRecalculate = isSkip;
+};
+ParaDrawing.prototype.IsSkipOnRecalculate = function()
+{
+	return this.SkipOnRecalculate;
 };
 ParaDrawing.prototype.Set_XY = function(X, Y, Paragraph, PageNum, bResetAlign)
 {
@@ -1251,6 +1292,17 @@ ParaDrawing.prototype.Set_XY = function(X, Y, Paragraph, PageNum, bResetAlign)
 			return;
 
 		var Layout = Paragraph.Get_Layout(ContentPos, this);
+		this.private_SetXYByLayout(X, Y, PageNum, Layout, (bResetAlign || true !== this.PositionH.Align ? true : false), (bResetAlign || true !== this.PositionV.Align ? true : false));
+
+		var oLogicDocument = this.document;
+		if (oLogicDocument)
+		{
+			this.SetSkipOnRecalculate(true);
+			oLogicDocument.Recalculate();
+			this.SetSkipOnRecalculate(false);
+		}
+
+		Layout = Paragraph.Get_Layout(ContentPos, this);
 		this.private_SetXYByLayout(X, Y, PageNum, Layout, (bResetAlign || true !== this.PositionH.Align ? true : false), (bResetAlign || true !== this.PositionV.Align ? true : false));
 	}
 };
@@ -1490,6 +1542,7 @@ ParaDrawing.prototype.Refresh_RecalcData = function(Data)
 
 				case AscDFH.historyitem_Drawing_SetSizeRelH:
 				case AscDFH.historyitem_Drawing_SetSizeRelV:
+				case AscDFH.historyitem_Drawing_SetGraphicObject:
 				{
 					if (this.GraphicObj)
 					{

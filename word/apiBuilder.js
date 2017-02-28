@@ -1371,6 +1371,119 @@
         return true;
     };
 
+    /**
+     * Receive a report about all comments collected in the document.
+	 * @returns {object}
+     */
+    ApiDocument.prototype.GetCommentsReport = function()
+    {
+		var oResult = {};
+		var oReport = this.Document.Api.asc_GetCommentsReportByAuthors();
+		for (var sUserName in oReport)
+		{
+			var arrUserComments = oReport[sUserName];
+			oResult[sUserName] = [];
+
+			for (var nIndex = 0, nCount = arrUserComments.length; nIndex < nCount; ++nIndex)
+			{
+				var isAnswer     = oReport[sUserName][nIndex].Top ? false : true;
+				var oCommentData = oReport[sUserName][nIndex].Data;
+
+				if (isAnswer)
+				{
+					oResult[sUserName].push({
+						"IsAnswer"       : true,
+						"CommentMessage" : oCommentData.GetText(),
+						"Date"           : oCommentData.GetDateTime()
+					});
+				}
+				else
+				{
+					var sQuoteText = oCommentData.GetQuoteText();
+					oResult[sUserName].push({
+						"IsAnswer"       : false,
+						"CommentMessage" : oCommentData.GetText(),
+						"Date"           : oCommentData.GetDateTime(),
+						"QuoteText"      : sQuoteText,
+						"IsSolved"       : oCommentData.IsSolved()
+					});
+				}
+			}
+		}
+
+		return oResult;
+    };
+
+	/**
+	 * Receive a report about every change which was made in review mode in the document.
+	 * @returns {object}
+	 */
+	ApiDocument.prototype.GetReviewReport = function()
+	{
+		var oResult = {};
+		var oReport = this.Document.Api.asc_GetTrackRevisionsReportByAuthors();
+		for (var sUserName in oReport)
+		{
+			var arrUsersChanges = oReport[sUserName];
+			oResult[sUserName] = [];
+
+			for (var nIndex = 0, nCount = arrUsersChanges.length; nIndex < nCount; ++nIndex)
+			{
+				var oChange = oReport[sUserName][nIndex];
+
+				var nType = oChange.get_Type();
+				var oElement = {};
+				// TODO: Посмотреть почем Value приходит массивом.
+				if (c_oAscRevisionsChangeType.TextAdd === nType)
+				{
+					oElement = {
+						"Type" : "TextAdd",
+						"Value" : oChange.get_Value().length ? oChange.get_Value()[0] : ""
+					};
+				}
+				else if (c_oAscRevisionsChangeType.TextRem == nType)
+				{
+					oElement = {
+						"Type" : "TextRem",
+						"Value" : oChange.get_Value().length ? oChange.get_Value()[0] : ""
+					};
+				}
+				else if (c_oAscRevisionsChangeType.ParaAdd === nType)
+				{
+					oElement = {
+						"Type" : "ParaAdd"
+					};
+				}
+				else if (c_oAscRevisionsChangeType.ParaRem === nType)
+				{
+					oElement = {
+						"Type" : "ParaRem"
+					};
+				}
+				else if (c_oAscRevisionsChangeType.TextPr === nType)
+				{
+					oElement = {
+						"Type" : "TextPr"
+					};
+				}
+				else if (c_oAscRevisionsChangeType.ParaPr === nType)
+				{
+					oElement = {
+						"Type" : "ParaPr"
+					};
+				}
+				else
+				{
+					oElement = {
+						"Type" : "Unknown"
+					};
+				}
+				oElement["Date"] = oChange.get_DateTime();
+				oResult[sUserName].push(oElement);
+			}
+		}
+		return oResult;
+	};
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiParagraph
@@ -4127,6 +4240,62 @@
     };
 
 
+
+    /**
+     * Specifies major vertical gridline's visual properties
+     * @param {?ApiStroke} oStroke
+     * */
+    ApiChart.prototype.SetMajorVerticalGridlines = function(oStroke)
+    {
+        AscFormat.builder_SetVerAxisMajorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+    };
+
+    /**
+     * Specifies minor vertical gridline's visual properties
+     * @param {?ApiStroke} oStroke
+     * */
+    ApiChart.prototype.SetMinorVerticalGridlines = function(oStroke)
+    {
+        AscFormat.builder_SetVerAxisMinorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+    };
+
+
+    /**
+     * Specifies major horizontal gridline's visual properties
+     * @param {?ApiStroke} oStroke
+     * */
+    ApiChart.prototype.SetMajorHorizontalGridlines = function(oStroke)
+    {
+        AscFormat.builder_SetHorAxisMajorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+    };
+
+    /**
+     * Specifies minor vertical gridline's visual properties
+     * @param {?ApiStroke} oStroke
+     * */
+    ApiChart.prototype.SetMinorHorizontalGridlines = function(oStroke)
+    {
+        AscFormat.builder_SetHorAxisMinorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+    };
+
+
+    /**
+     * Specifies font size for labels of horizontal axis
+     * @param {number} nFontSize
+     */
+    ApiChart.prototype.SetHorAxisLablesFontSize = function(nFontSize){
+        AscFormat.builder_SetHorAxisFontSize(this.Chart, nFontSize);
+    };
+
+    /**
+     * Specifies font size for labels of vertical axis
+     * @param {number} nFontSize
+     */
+    ApiChart.prototype.SetVertAxisLablesFontSize = function(nFontSize){
+        AscFormat.builder_SetVerAxisFontSize(this.Chart, nFontSize);
+    };
+
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiFill
@@ -4279,6 +4448,8 @@
     ApiDocument.prototype["SetEvenAndOddHdrFtr"]     = ApiDocument.prototype.SetEvenAndOddHdrFtr;
     ApiDocument.prototype["CreateNumbering"]         = ApiDocument.prototype.CreateNumbering;
     ApiDocument.prototype["InsertContent"]           = ApiDocument.prototype.InsertContent;
+	ApiDocument.prototype["GetCommentsReport"]       = ApiDocument.prototype.GetCommentsReport;
+	ApiDocument.prototype["GetReviewReport"]         = ApiDocument.prototype.GetReviewReport;
 
     ApiParagraph.prototype["GetClassType"]           = ApiParagraph.prototype.GetClassType;
     ApiParagraph.prototype["AddText"]                = ApiParagraph.prototype.AddText;
@@ -4491,6 +4662,12 @@
     ApiChart.prototype["SetHorAxisMinorTickMark"]  =  ApiChart.prototype.SetHorAxisMinorTickMark;
     ApiChart.prototype["SetVertAxisMajorTickMark"]  =  ApiChart.prototype.SetVertAxisMajorTickMark;
     ApiChart.prototype["SetVertAxisMinorTickMark"]  =  ApiChart.prototype.SetVertAxisMinorTickMark;
+    ApiChart.prototype["SetMajorVerticalGridlines"]  =  ApiChart.prototype.SetMajorVerticalGridlines;
+    ApiChart.prototype["SetMinorVerticalGridlines"]  =  ApiChart.prototype.SetMinorVerticalGridlines;
+    ApiChart.prototype["SetMajorHorizontalGridlines"]  =  ApiChart.prototype.SetMajorHorizontalGridlines;
+    ApiChart.prototype["SetMinorHorizontalGridlines"]  =  ApiChart.prototype.SetMinorHorizontalGridlines;
+    ApiChart.prototype["SetHorAxisLablesFontSize"]  =  ApiChart.prototype.SetHorAxisLablesFontSize;
+    ApiChart.prototype["SetVertAxisLablesFontSize"]  =  ApiChart.prototype.SetVertAxisLablesFontSize;
 
     ApiFill.prototype["GetClassType"]                = ApiFill.prototype.GetClassType;
 

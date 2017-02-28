@@ -728,3 +728,7 @@ CDocumentControllerBase.prototype.GetColumnSize = function(){return {W : 0, H : 
  * @returns {CSectionPr?}
  */
 CDocumentControllerBase.prototype.GetCurrentSectionPr = function(){return null;};
+/**
+ * Отличие от RemoveSelection в том, что сбрасываем селект с текста, но не сбрасываем с автофигур
+ */
+CDocumentControllerBase.prototype.RemoveTextSelection = function(){};

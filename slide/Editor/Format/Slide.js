@@ -37,6 +37,55 @@ var g_oTableId = AscCommon.g_oTableId;
 var History = AscCommon.History;
 
 
+
+
+function CChangesDrawingsContentComments(Class, Type, Pos, Items, isAdd){
+    CChangesDrawingsContentComments.superclass.constructor.call(this, Class, Type, Pos, Items, isAdd);
+}
+AscCommon.extendClass(CChangesDrawingsContentComments, AscDFH.CChangesDrawingsContent);
+CChangesDrawingsContentComments.prototype.addToInterface = function(){
+    for(var i = 0; i < this.Items.length; ++i){
+        var oComment = this.Items[i];
+        editor.sync_AddComment(oComment.Get_Id(), oComment.Data);
+    }
+};
+CChangesDrawingsContentComments.prototype.removeFromInterface = function(){
+    for(var i = 0; i < this.Items.length; ++i){
+        editor.sync_RemoveComment(this.Items[i].Get_Id());
+    }
+};
+CChangesDrawingsContentComments.prototype.Undo = function(){
+    CChangesDrawingsContentComments.superclass.Undo.call(this);
+    if(this.IsAdd()){
+        this.removeFromInterface();
+    }
+    else{
+        this.addToInterface();
+    }
+};
+CChangesDrawingsContentComments.prototype.Redo = function(){
+    CChangesDrawingsContentComments.superclass.Redo.call(this);
+    if(this.IsAdd()){
+        this.addToInterface();
+    }
+    else{
+        this.removeFromInterface();
+    }
+};
+
+CChangesDrawingsContentComments.prototype.Load = function(){
+    CChangesDrawingsContentComments.superclass.Load.call(this);
+    if(this.IsAdd()){
+        this.addToInterface();
+    }
+    else{
+        this.removeFromInterface();
+    }
+};
+
+AscDFH.CChangesDrawingsContentComments = CChangesDrawingsContentComments;
+
+
 AscDFH.changesFactory[AscDFH.historyitem_SlideSetLocks             ] = AscDFH.CChangesDrawingTimingLocks;
 AscDFH.changesFactory[AscDFH.historyitem_SlideSetComments          ] = AscDFH.CChangesDrawingsObject    ;
 AscDFH.changesFactory[AscDFH.historyitem_SlideSetShow              ] = AscDFH.CChangesDrawingsBool      ;
@@ -47,13 +96,13 @@ AscDFH.changesFactory[AscDFH.historyitem_SlideSetNum               ] = AscDFH.CC
 AscDFH.changesFactory[AscDFH.historyitem_SlideSetTiming            ] = AscDFH.CChangesDrawingsObjectNoId;
 AscDFH.changesFactory[AscDFH.historyitem_SlideSetSize              ] = AscDFH.CChangesDrawingsObjectNoId;
 AscDFH.changesFactory[AscDFH.historyitem_SlideSetBg                ] = AscDFH.CChangesDrawingsObjectNoId;
-AscDFH.changesFactory[AscDFH.historyitem_SlideAddToSpTree          ] = AscDFH.CChangesDrawingsContent   ;
-AscDFH.changesFactory[AscDFH.historyitem_SlideRemoveFromSpTree     ] = AscDFH.CChangesDrawingsContent   ;
+AscDFH.changesFactory[AscDFH.historyitem_SlideAddToSpTree          ] = AscDFH.CChangesDrawingsContentPresentation   ;
+AscDFH.changesFactory[AscDFH.historyitem_SlideRemoveFromSpTree     ] = AscDFH.CChangesDrawingsContentPresentation   ;
 AscDFH.changesFactory[AscDFH.historyitem_SlideSetCSldName          ] = AscDFH.CChangesDrawingsString    ;
 AscDFH.changesFactory[AscDFH.historyitem_SlideSetClrMapOverride    ] = AscDFH.CChangesDrawingsObject    ;
 AscDFH.changesFactory[AscDFH.historyitem_PropLockerSetId           ] = AscDFH.CChangesDrawingsString    ;
-AscDFH.changesFactory[AscDFH.historyitem_SlideCommentsAddComment   ] = AscDFH.CChangesDrawingsContent   ;
-AscDFH.changesFactory[AscDFH.historyitem_SlideCommentsRemoveComment] = AscDFH.CChangesDrawingsContent   ;
+AscDFH.changesFactory[AscDFH.historyitem_SlideCommentsAddComment   ] = AscDFH.CChangesDrawingsContentComments   ;
+AscDFH.changesFactory[AscDFH.historyitem_SlideCommentsRemoveComment] = AscDFH.CChangesDrawingsContentComments   ;
 
 
 AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideSetComments          ] = function(oClass, value){oClass.slideComments = value;};
@@ -68,7 +117,7 @@ AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideSetBg                ] = funct
     oClass.cSld.Bg = value;
     if(FromLoad){
         var Fill;
-        if(oClass.cSld.Bg.bgPr && oClass.cSld.Bg.bgPr.Fill)
+        if(oClass.cSld.Bg && oClass.cSld.Bg.bgPr && oClass.cSld.Bg.bgPr.Fill)
         {
             Fill = oClass.cSld.Bg.bgPr.Fill;
         }
@@ -553,7 +602,7 @@ Slide.prototype =
     {
         this.checkDrawingUniNvPr(item);
         var _pos = AscFormat.isRealNumber(pos) ? pos : this.cSld.spTree.length;
-       History.Add(new AscDFH.CChangesDrawingsContent(this, AscDFH.historyitem_SlideAddToSpTree, _pos, [item], true));
+       History.Add(new AscDFH.CChangesDrawingsContentPresentation(this, AscDFH.historyitem_SlideAddToSpTree, _pos, [item], true));
         this.cSld.spTree.splice(_pos, 0, item);
     },
 
@@ -620,7 +669,7 @@ Slide.prototype =
         {
             if(sp_tree[i].Get_Id() === id)
             {
-               History.Add(new AscDFH.CChangesDrawingsContent(this, AscDFH.historyitem_SlideRemoveFromSpTree, i, [sp_tree[i]], false));
+               History.Add(new AscDFH.CChangesDrawingsContentPresentation(this, AscDFH.historyitem_SlideRemoveFromSpTree, i, [sp_tree[i]], false));
                 sp_tree.splice(i, 1);
                 return i;
             }
@@ -1280,6 +1329,7 @@ AscFormat.CTextBody.prototype.checkCurrentPlaceholder = function()
 };
 
 
+
 function SlideComments(slide)
 {
     this.comments = [];
@@ -1318,7 +1368,7 @@ SlideComments.prototype =
 
     addComment: function(comment)
     {
-       History.Add(new AscDFH.CChangesDrawingsContent(this, AscDFH.historyitem_SlideCommentsAddComment, this.comments.length, [comment], true));
+       History.Add(new AscDFH.CChangesDrawingsContentComments(this, AscDFH.historyitem_SlideCommentsAddComment, this.comments.length, [comment], true));
         this.comments.splice(this.comments.length, 0, comment);
         comment.slideComments = this;
     },
@@ -1353,7 +1403,7 @@ SlideComments.prototype =
         {
             if(this.comments[i].Get_Id() === id)
             {
-                History.Add(new AscDFH.CChangesDrawingsContent(this, AscDFH.historyitem_SlideCommentsRemoveComment, i, [id], false));
+                History.Add(new AscDFH.CChangesDrawingsContentComments(this, AscDFH.historyitem_SlideCommentsRemoveComment, i, [id], false));
                 this.comments.splice(i, 1);
                 editor.sync_RemoveComment(id);
                 return;

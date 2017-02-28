@@ -6,6 +6,21 @@
     window['AscDFH'].drawingsConstructorsMap = drawingConstructorsMap;
     window['AscDFH'].drawingContentChanges = drawingContentChanges;
 
+
+    var oPosExtMap = {};
+    oPosExtMap[AscDFH.historyitem_Xfrm_SetOffX]  = true;
+    oPosExtMap[AscDFH.historyitem_Xfrm_SetOffY]  = true;
+    oPosExtMap[AscDFH.historyitem_Xfrm_SetExtX]  = true;
+    oPosExtMap[AscDFH.historyitem_Xfrm_SetExtY]  = true;
+    oPosExtMap[AscDFH.historyitem_Xfrm_SetChOffX]  = true;
+    oPosExtMap[AscDFH.historyitem_Xfrm_SetChOffY]  = true;
+    oPosExtMap[AscDFH.historyitem_Xfrm_SetChExtX]  = true;
+    oPosExtMap[AscDFH.historyitem_Xfrm_SetChExtY]  = true;
+    var oPosExtHor = {};
+    oPosExtHor[AscDFH.historyitem_Xfrm_SetOffX]  = true;
+    oPosExtHor[AscDFH.historyitem_Xfrm_SetExtX]  = true;
+    oPosExtHor[AscDFH.historyitem_Xfrm_SetChOffX]  = true;
+    oPosExtHor[AscDFH.historyitem_Xfrm_SetChExtX]  = true;
     function private_SetValue(Value) {
         if (!this.Class) {
             return;
@@ -95,6 +110,12 @@
         reader.Seek2(reader.GetCurPos() - 4);
         this.Type = reader.GetLong();
         CChangesDrawingsDouble.superclass.ReadFromBinary.call(this, reader);
+    };
+    CChangesDrawingsDouble.prototype.IsPosExtChange = function () {
+        return !!oPosExtMap[this.Type];
+    };
+    CChangesDrawingsDouble.prototype.IsHorizontal = function () {
+        return !!oPosExtHor[this.Type];
     };
     window['AscDFH'].CChangesDrawingsDouble = CChangesDrawingsDouble;
 
@@ -347,12 +368,49 @@
     };
 
     CChangesDrawingsContent.prototype.CreateReverseChange = function(){
-        var oRet = this.private_CreateReverseChange(CChangesDrawingsContent);
+        var oRet = this.private_CreateReverseChange(this.constructor);
         oRet.Type = this.Type;
         oRet.Pos = this.Pos;
         return oRet;
     };
 
+
+    function CChangesDrawingsContentPresentation(Class, Type, Pos, Items, isAdd){
+        CChangesDrawingsContentPresentation.superclass.constructor.call(this, Class, Type, Pos, Items, isAdd);
+    }
+    AscCommon.extendClass(CChangesDrawingsContentPresentation, CChangesDrawingsContent);
+    CChangesDrawingsContentPresentation.prototype.IsContentChange = function(){
+        return true;
+    };
+
+    CChangesDrawingsContentPresentation.prototype.Load = function(Color)
+    {
+        var aContent = this.private_GetChangedArray();
+        if(!Array.isArray(aContent)){
+            return;
+        }
+        if(this.IsAdd()){
+            if (this.PosArray.length <= 0 || this.Items.length <= 0)
+                return;
+            for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex){
+                var Pos     = this.Class.m_oContentChanges.Check(AscCommon.contentchanges_Add, true !== this.UseArray ? this.Pos + nIndex : this.PosArray[nIndex]);
+                var Element = this.Items[nIndex];
+                Pos = Math.min(Pos, aContent.length);
+                aContent.splice(Pos, 0, Element);
+            }
+        }
+        else{
+            for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex) {
+                var Pos = this.Class.m_oContentChanges.Check(AscCommon.contentchanges_Remove, true !== this.UseArray ? this.Pos : this.PosArray[nIndex]);
+
+                if (false === Pos)
+                    continue;
+                aContent.splice(Pos, 1);
+            }
+        }
+    };
+
+    window['AscDFH'].CChangesDrawingsContentPresentation = CChangesDrawingsContentPresentation;
 
     function CChangesDrawingsContentNoId(Class, Type, Pos, Items, isAdd){
         CChangesDrawingsContentNoId.superclass.constructor.call(this, Class, Type, Pos, Items, isAdd);
@@ -591,6 +649,9 @@
     };
 
     CChangesSparklinesChangeData.prototype.ReadFromBinary = function(Reader){
+        Reader.Seek2(Reader.GetCurPos() - 4);
+        var nType = Reader.GetLong();
+        this.Type = nType;
         this.OldPr = this.ReadPr(Reader);
         this.NewPr = this.ReadPr(Reader);
     };
@@ -603,6 +664,7 @@
                 aSparklines.push(Pr[i].clone())
             }
         }
+        this.Class.cleanCache();
     };
 
     CChangesSparklinesChangeData.prototype.Undo = function(){
@@ -662,7 +724,7 @@
         else{
             this.Class.arrSparklines.push(this.sparkline);
         }
-
+        this.Class.cleanCache();
     };
     CChangesSparklinesRemoveData.prototype.Redo = function(){
         if(this.bReverse){
@@ -671,6 +733,7 @@
         else{
             this.Class.remove(this.sparkline.sqref);
         }
+        this.Class.cleanCache();
     };
 
     CChangesSparklinesRemoveData.prototype.CreateReverseChange = function(){
@@ -722,6 +785,9 @@
         this.WritePr(Writer, this.NewPr);
     };
     CChangesDrawingsExcelColor.prototype.ReadFromBinary = function(Reader){
+        Reader.Seek2(Reader.GetCurPos() - 4);
+        var nType = Reader.GetLong();
+        this.Type = nType;
         this.OldPr = this.ReadPr(Reader);
         this.NewPr = this.ReadPr(Reader);
     };
@@ -766,6 +832,7 @@
                 oClass.colorLow = Pr;
                 break;
         }
+        oClass.cleanCache();
     };
 
 
@@ -791,6 +858,7 @@
             }
 
         }
+        this.Class.cleanCache();
     };
     CChangesDrawingsSparklinesRemove.prototype.Redo = function(){
         if (this.Class.worksheet) {
@@ -801,6 +869,7 @@
                 this.Class.worksheet.removeSparklineGroup(this.Class.Get_Id());
             }
         }
+        this.Class.cleanCache();
     };
 
     CChangesDrawingsSparklinesRemove.prototype.WriteToBinary = function(Writer){
@@ -856,23 +925,23 @@ AscDFH.changesFactory[AscDFH.historyitem_Sparkline_ChangeData]          = AscDFH
 AscDFH.changesFactory[AscDFH.historyitem_Sparkline_RemoveData]          = AscDFH.CChangesSparklinesRemoveData;
 AscDFH.changesFactory[AscDFH.historyitem_Sparkline_RemoveSparkline]     = AscDFH.CChangesDrawingsSparklinesRemove;
 
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Type               ] = function(oClass, value){oClass.type                = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_LineWeight         ] = function(oClass, value){oClass.lineWeight          = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_DisplayEmptyCellsAs] = function(oClass, value){oClass.displayEmptyCellsAs = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Markers            ] = function(oClass, value){oClass.markers             = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_High               ] = function(oClass, value){oClass.high                = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Low                ] = function(oClass, value){oClass.low                 = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_First              ] = function(oClass, value){oClass.first               = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Last               ] = function(oClass, value){oClass.last                = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Negative           ] = function(oClass, value){oClass.negative            = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_DisplayXAxis       ] = function(oClass, value){oClass.displayXAxis        = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_DisplayHidden      ] = function(oClass, value){oClass.displayHidden       = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_MinAxisType        ] = function(oClass, value){oClass.minAxisType         = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_MaxAxisType        ] = function(oClass, value){oClass.maxAxisType         = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_RightToLeft        ] = function(oClass, value){oClass.rightToLeft         = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_ManualMax          ] = function(oClass, value){oClass.manualMax           = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_ManualMin          ] = function(oClass, value){oClass.manualMin           = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_DateAxis           ] = function(oClass, value){oClass.dateAxis            = value;};
-    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_F                  ] = function(oClass, value){oClass.f                   = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Type               ] = function(oClass, value){oClass.type                = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_LineWeight         ] = function(oClass, value){oClass.lineWeight          = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_DisplayEmptyCellsAs] = function(oClass, value){oClass.displayEmptyCellsAs = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Markers            ] = function(oClass, value){oClass.markers             = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_High               ] = function(oClass, value){oClass.high                = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Low                ] = function(oClass, value){oClass.low                 = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_First              ] = function(oClass, value){oClass.first               = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Last               ] = function(oClass, value){oClass.last                = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_Negative           ] = function(oClass, value){oClass.negative            = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_DisplayXAxis       ] = function(oClass, value){oClass.displayXAxis        = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_DisplayHidden      ] = function(oClass, value){oClass.displayHidden       = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_MinAxisType        ] = function(oClass, value){oClass.minAxisType         = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_MaxAxisType        ] = function(oClass, value){oClass.maxAxisType         = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_RightToLeft        ] = function(oClass, value){oClass.rightToLeft         = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_ManualMax          ] = function(oClass, value){oClass.manualMax           = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_ManualMin          ] = function(oClass, value){oClass.manualMin           = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_DateAxis           ] = function(oClass, value){oClass.dateAxis            = value; oClass.cleanCache();};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_Sparkline_F                  ] = function(oClass, value){oClass.f                   = value; oClass.cleanCache();};
 
 })(window);

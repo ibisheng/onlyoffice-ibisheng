@@ -884,6 +884,7 @@ function getExtentionByFormat (format) {
     case c_oAscFileType.FB2: return 'fb2'; break;
     case c_oAscFileType.MOBI: return 'mobi'; break;
     case c_oAscFileType.DOCY: return 'doct'; break;
+    case c_oAscFileType.CANVAS_WORD: return 'bin'; break;
     case c_oAscFileType.JSON: return 'json'; break;
     // Excel
     case c_oAscFileType.XLSX: return 'xlsx'; break;
@@ -2120,23 +2121,12 @@ CContentChangesElement.prototype.Refresh_BinaryData = function()
 	var Binary_Writer = AscCommon.History.BinaryWriter;
 	var Binary_Pos    = Binary_Writer.GetCurPosition();
 
-	if (this.m_pData.Data && this.m_pData.Data.IsChangesClass && this.m_pData.Data.IsChangesClass())
-	{
-		this.m_pData.Data.UseArray = true;
-		this.m_pData.Data.PosArray = this.m_aPositions;
+	this.m_pData.Data.UseArray = true;
+	this.m_pData.Data.PosArray = this.m_aPositions;
 
-		Binary_Writer.WriteString2(this.m_pData.Class.Get_Id());
-		Binary_Writer.WriteLong(this.m_pData.Data.Type);
-		this.m_pData.Data.WriteToBinary(Binary_Writer);
-	}
-	else
-	{
-		this.m_pData.Data.UseArray = true;
-		this.m_pData.Data.PosArray = this.m_aPositions;
-
-		Binary_Writer.WriteString2(this.m_pData.Class.Get_Id());
-		this.m_pData.Class.Save_Changes(this.m_pData.Data, Binary_Writer);
-	}
+	Binary_Writer.WriteString2(this.m_pData.Class.Get_Id());
+	Binary_Writer.WriteLong(this.m_pData.Data.Type);
+	this.m_pData.Data.WriteToBinary(Binary_Writer);
 
 	var Binary_Len = Binary_Writer.GetCurPosition() - Binary_Pos;
 

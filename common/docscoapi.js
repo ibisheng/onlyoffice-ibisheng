@@ -35,11 +35,11 @@
 (function(window, undefined) {
   'use strict';
 
-  var asc_coAuthV = '4.3.0';
   var ConnectionState = AscCommon.ConnectionState;
   var c_oEditorId = AscCommon.c_oEditorId;
   var c_oCloseCode = AscCommon.c_oCloseCode;
   var c_oAscServerCommandErrors = AscCommon.c_oAscServerCommandErrors;
+  var c_oAscForceSaveTypes = AscCommon.c_oAscForceSaveTypes;
 
   // Класс надстройка, для online и offline работы
   function CDocsCoApi(options) {
@@ -50,9 +50,11 @@
       this.onAuthParticipantsChanged = options.onAuthParticipantsChanged;
       this.onParticipantsChanged = options.onParticipantsChanged;
       this.onMessage = options.onMessage;
+      this.onServerVersion = options.onServerVersion;
       this.onCursor =  options.onCursor;
       this.onMeta =  options.onMeta;
       this.onSession =  options.onSession;
+	  this.onForceSave =  options.onForceSave;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
@@ -85,6 +87,9 @@
       this._CoAuthoringApi.onMessage = function(e, clear) {
         t.callback_OnMessage(e, clear);
       };
+      this._CoAuthoringApi.onServerVersion = function(e) {
+      	t.callback_OnServerVersion(e);
+	  };
       this._CoAuthoringApi.onCursor = function(e) {
         t.callback_OnCursor(e);
       };
@@ -93,6 +98,9 @@
       };
       this._CoAuthoringApi.onSession = function(e) {
         t.callback_OnSession(e);
+      };
+	  this._CoAuthoringApi.onForceSave = function(e) {
+        t.callback_OnForceSave(e);
       };
       this._CoAuthoringApi.onLocksAcquired = function(e) {
         t.callback_OnLocksAcquired(e);
@@ -374,6 +382,12 @@
     }
   };
 
+  CDocsCoApi.prototype.callback_OnServerVersion = function(e) {
+  	if (this.onServerVersion) {
+      this.onServerVersion(e);
+	}
+  };
+
   CDocsCoApi.prototype.callback_OnCursor = function(e) {
     if (this.onCursor) {
       this.onCursor(e);
@@ -389,6 +403,12 @@
   CDocsCoApi.prototype.callback_OnSession = function(e) {
     if (this.onSession) {
       this.onSession(e);
+    }
+  };
+  
+  CDocsCoApi.prototype.callback_OnForceSave = function(e) {
+    if (this.onForceSave) {
+      this.onForceSave(e);
     }
   };
 
@@ -504,9 +524,11 @@
       this.onAuthParticipantsChanged = options.onAuthParticipantsChanged;
       this.onParticipantsChanged = options.onParticipantsChanged;
       this.onMessage = options.onMessage;
+      this.onServerVersion = options.onServerVersion;
       this.onCursor = options.onCursor;
       this.onMeta = options.onMeta;
       this.onSession =  options.onSession;
+	  this.onForceSave =  options.onForceSave;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
@@ -542,7 +564,9 @@
 	this.jwtTimeOutId = null;
     this._id = null;
     this._sessionTimeConnect = null;
-	this._lastForceSaveId = null;
+	this._allChangesSaved = null;
+	this._lastForceSaveTime = null;
+	this._lastForceSaveButtonTime = null;
     this._indexUser = -1;
     // Если пользователей больше 1, то совместно редактируем
     this.isCoAuthoring = false;
@@ -559,6 +583,7 @@
     this.arrayChanges = null;
     // Время последнего сохранения (для разрыва соединения)
     this.lastOtherSaveTime = -1;
+	this.lastOwnSaveTime = -1;
     // Локальный индекс изменений
     this.changesIndex = 0;
     // Дополнительная информация для Excel
@@ -609,6 +634,11 @@
   DocsCoApi.prototype.get_state = function() {
     return this._state;
   };
+
+	DocsCoApi.prototype.check_state = function () {
+		return ConnectionState.Authorized === this._state || ConnectionState.SaveChanges === this._state ||
+			ConnectionState.AskSaveChanges === this._state;
+	};
 
   DocsCoApi.prototype.get_indexUser = function() {
     return this._indexUser;
@@ -835,7 +865,11 @@
   };
 
 	DocsCoApi.prototype.forceSave = function() {
-		this._send({'type': 'forcesave', 'saveid': new Date().getTime()});
+		var newForceSaveButtonTime = Math.max(this.lastOtherSaveTime, this.lastOwnSaveTime);
+		if (this._lastForceSaveButtonTime < newForceSaveButtonTime) {
+			this._lastForceSaveButtonTime = newForceSaveButtonTime;
+			this._send({'type': 'forceSaveStart'});
+		}
 	};
 
   DocsCoApi.prototype.openDocument = function(data) {
@@ -896,13 +930,19 @@
   };
 
   DocsCoApi.prototype._onMessages = function(data, clear) {
-    if (ConnectionState.Authorized === this._state && data["messages"] && this.onMessage) {
+    if (this.check_state() && data["messages"] && this.onMessage) {
       this.onMessage(data["messages"], clear);
     }
   };
 
+  DocsCoApi.prototype._onServerVersion = function (data) {
+  	if (this.onServerVersion) {
+		this.onServerVersion(data['buildVersion'], data['buildNumber']);
+	}
+  };
+
   DocsCoApi.prototype._onCursor = function(data) {
-    if (ConnectionState.Authorized === this._state && data["messages"] && this.onCursor) {
+    if (this.check_state() && data["messages"] && this.onCursor) {
       this.onCursor(data["messages"]);
     }
   };
@@ -914,7 +954,7 @@
   };
 
   DocsCoApi.prototype._onSession = function(data) {
-    if (ConnectionState.Authorized === this._state && data["messages"] && this.onSession) {
+    if (this.check_state() && data["messages"] && this.onSession) {
       this.onSession(data["messages"]);
     }
   };
@@ -923,29 +963,53 @@
     var t = this;
     if (jwt) {
       t.jwtOpen = undefined;
-      t.jwtSession = jwt.token;
+      t.jwtSession = jwt['token'];
       if (null !== t.jwtTimeOutId) {
         clearTimeout(t.jwtTimeOutId);
         t.jwtTimeOutId = null;
       }
-      var timeout = Math.max(0, jwt.expires - t.maxAttemptCount * t.reconnectInterval);
+      var timeout = Math.max(0, jwt['expires'] - t.maxAttemptCount * t.reconnectInterval);
       t.jwtTimeOutId = setTimeout(function(){
         t.jwtTimeOutId = null;
         t._send({'type': 'refreshToken', 'jwtSession': t.jwtSession});
       }, timeout);
     }
   };
-  
-	DocsCoApi.prototype._onForceSave = function(data) {
+
+	DocsCoApi.prototype._onForceSaveStart = function(data) {
 		if (data['code'] === c_oAscServerCommandErrors.NoError) {
-			this._lastForceSaveId = data['saveid'];
+			this._lastForceSaveButtonTime = data['time'];
 		} else if (data['code'] !== c_oAscServerCommandErrors.NotModified) {
 			this.onWarning(c_oAscError.ID.Unknown);
 		}
 	};
+	DocsCoApi.prototype._onForceSave = function(data) {
+		if (c_oAscForceSaveTypes.Button === data['type']) {
+			if (this._lastForceSaveButtonTime == data['time']) {
+				this.onForceSave({type: c_oAscForceSaveTypes.Button, saved: true});
+			}
+		}
+		if (null != this._lastForceSaveTime) {
+			this._lastForceSaveTime = data['time'];
+			this._checkLastForceSave();
+		}
+	};
+	DocsCoApi.prototype._checkLastForceSave = function(data) {
+		if (null != this._lastForceSaveTime) {
+			var newState = false;
+			if ((-1 == this.lastOtherSaveTime || this.lastOtherSaveTime <= this._lastForceSaveTime) &&
+				(-1 == this.lastOwnSaveTime || this.lastOwnSaveTime <= this._lastForceSaveTime)) {
+				newState = true;
+			}
+			if (newState != this._allChangesSaved) {
+				this._allChangesSaved = newState;
+				this.onForceSave({type: c_oAscForceSaveTypes.Timeout, saved: this._allChangesSaved});
+			}
+		}
+	};
 
   DocsCoApi.prototype._onGetLock = function(data) {
-    if (ConnectionState.Authorized === this._state && data["locks"]) {
+    if (this.check_state() && data["locks"]) {
       for (var key in data["locks"]) {
         if (data["locks"].hasOwnProperty(key)) {
           var lock = data["locks"][key], blockTmp = (this._isExcel || this._isPresentation) ? lock["block"]["guid"] : key, blockValue = (this._isExcel || this._isPresentation) ? lock["block"] : key;
@@ -983,7 +1047,7 @@
   };
 
   DocsCoApi.prototype._onReleaseLock = function(data) {
-    if (ConnectionState.Authorized === this._state && data["locks"]) {
+    if (this.check_state() && data["locks"]) {
       var bSendEnd = false;
       for (var block in data["locks"]) {
         if (data["locks"].hasOwnProperty(block)) {
@@ -1009,7 +1073,7 @@
   };
 
   DocsCoApi.prototype._onSaveChanges = function(data) {
-    if (ConnectionState.Authorized !== this._state) {
+    if (!this.check_state()) {
       return;
     }
     if (data["locks"]) {
@@ -1099,7 +1163,12 @@
     if (-1 !== data['index']) {
       this.changesIndex = data['index'];
     }
-
+	
+    if (-1 !== data['time']) {
+      this.lastOwnSaveTime = data['time'];
+	  this._checkLastForceSave();
+    }
+	
     if (this.onUnSaveLock) {
       this.onUnSaveLock();
     }
@@ -1119,6 +1188,7 @@
             this.onSaveChanges(JSON.parse(changesOneUser), change['useridoriginal'], bFirstLoad);
           }
         }
+		this._checkLastForceSave();
       }
     }
   };
@@ -1204,7 +1274,7 @@
   };
 
   DocsCoApi.prototype._onConnectionStateChanged = function(data) {
-    if (ConnectionState.Authorized !== this._state) {
+    if (!this.check_state()) {
       return;
     }
     var userStateChanged = null, userId, stateChanged = false, isEditUser = true;
@@ -1262,12 +1332,15 @@
 
   DocsCoApi.prototype._onAuth = function(data) {
     var t = this;
-    this._onRefreshToken(data.jwt);
+    this._onRefreshToken(data['jwt']);
     if (true === this._isAuth) {
       this._state = ConnectionState.Authorized;
       // Мы должны только соединиться для получения файла. Совместное редактирование уже было отключено.
-      if (this.isCloseCoAuthoring)
-        return;
+      if (this.isCloseCoAuthoring) {
+		  return;
+	  }
+
+	  this._onServerVersion(data);
 
       // Мы уже авторизовывались, нужно обновить пользователей (т.к. пользователи могли входить и выходить пока у нас не было соединения)
       this._onAuthParticipantsChanged(data['participants']);
@@ -1301,6 +1374,7 @@
       this._state = ConnectionState.Authorized;
       this._id = data['sessionId'];
       this._sessionTimeConnect = data['sessionTimeConnect'];
+	  this._lastForceSaveTime = data['lastForceSaveTime'];
 
       this._onAuthParticipantsChanged(data['participants']);
 
@@ -1401,8 +1475,7 @@
       'mode': this.mode,
       'permissions': this.permissions,
       'jwtOpen': this.jwtOpen,
-      'jwtSession': this.jwtSession,
-      'version': asc_coAuthV
+      'jwtSession': this.jwtSession
     });
   };
 
@@ -1491,7 +1564,10 @@
         case 'refreshToken' :
           t._onRefreshToken(dataObject["messages"]);
           break;
-		case 'forcesave' :
+		case 'forceSaveStart' :
+			t._onForceSaveStart(dataObject["messages"]);
+			break;
+		case 'forceSave' :
 			t._onForceSave(dataObject["messages"]);
 			break;
       }

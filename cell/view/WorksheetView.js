@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -5808,140 +5808,146 @@
         return result;
     };
 
-    // dX = true - считать с половиной следующей ячейки
-    WorksheetView.prototype._findColUnderCursor = function (x, canReturnNull, dX) {
-        var c = this.visibleRange.c1, offset = this.cols[c].left - this.cellsLeft, c2, x1, x2, cFrozen, widthDiff = 0;
-        if (x >= this.cellsLeft) {
-            if (this.topLeftFrozenCell) {
-                cFrozen = this.topLeftFrozenCell.getCol0();
-                widthDiff = this.cols[cFrozen].left - this.cols[0].left;
-                if (x < this.cellsLeft + widthDiff && 0 !== widthDiff) {
-                    c = 0;
-                    widthDiff = 0;
-                }
-            }
-            for (x1 = this.cellsLeft + widthDiff, c2 = this.cols.length - 1; c <= c2; ++c, x1 = x2) {
-                x2 = x1 + this.cols[c].width;
-                if (x1 <= x && x < x2) {
-                    if (dX) {
-                        // Учитываем половину ячейки
-                        if (x1 <= x && x < x1 + this.cols[c].width / 2.0) {
-                            // Это предыдущая ячейка
-                            --c;
-                            // Можем вернуть и -1 (но это только для fillHandle)
-                        }
-                    }
-                    return {col: c, left: x1, right: x2};
-                }
-            }
-            if (!canReturnNull) {
-                return {col: c2, left: this.cols[c2].left - offset, right: x2};
-            }
-        } else {
-            if (this.topLeftFrozenCell) {
-                cFrozen = this.topLeftFrozenCell.getCol0();
-                if (0 !== cFrozen) {
-                    c = 0;
-                    offset = this.cols[c].left - this.cellsLeft;
-                }
-            }
-            for (x2 = this.cellsLeft + this.cols[c].width, c2 = 0; c >= c2; --c, x2 = x1) {
-                x1 = this.cols[c].left - offset;
-                if (x1 <= x && x < x2) {
-                    if (dX) {
-                        // Учитываем половину ячейки
-                        if (x1 <= x && x < x1 + this.cols[c].width / 2.0) {
-                            // Это предыдущая ячейка
-                            --c;
-                            // Можем вернуть и -1 (но это только для fillHandle)
-                        }
-                    }
-                    return {col: c, left: x1, right: x2};
-                }
-            }
-            if (!canReturnNull) {
-                if (dX) {
-                    // Это предыдущая ячейка
-                    --c2;
-                    // Можем вернуть и -1 (но это только для fillHandle)
-                    return {col: c2};
-                }
-                return {col: c2, left: x1, right: x1 + this.cols[c2].width};
-            }
-        }
-        return null;
-    };
+	/**
+     *
+	 * @param x
+	 * @param canReturnNull
+	 * @param half - считать с половиной следующей ячейки
+	 * @returns {*}
+	 * @private
+	 */
+	WorksheetView.prototype._findColUnderCursor = function (x, canReturnNull, half) {
+		var activeCellCol = half ? this._getSelection().activeCell.col : -1;
+		var dx = 0;
+		var c = this.visibleRange.c1;
+		var offset = this.cols[c].left - this.cellsLeft;
+		var c2, x1, x2, cFrozen, widthDiff = 0;
+		if (x >= this.cellsLeft) {
+			if (this.topLeftFrozenCell) {
+				cFrozen = this.topLeftFrozenCell.getCol0();
+				widthDiff = this.cols[cFrozen].left - this.cols[0].left;
+				if (x < this.cellsLeft + widthDiff && 0 !== widthDiff) {
+					c = 0;
+					widthDiff = 0;
+				}
+			}
+			for (x1 = this.cellsLeft + widthDiff, c2 = this.cols.length - 1; c <= c2; ++c, x1 = x2) {
+				x2 = x1 + this.cols[c].width;
+				dx = half ? this.cols[c].width / 2.0 * Math.sign(c - activeCellCol) : 0;
+				if (x1 + dx > x) {
+					if (c !== this.visibleRange.c1) {
+						if (dx) {
+							c -= 1;
+							x2 = x1;
+							x1 -= this.cols[c].width;
+						}
+						return {col: c, left: x1, right: x2};
+					} else {
+						c = c2;
+						break;
+					}
+				} else if (x <= x2 + dx) {
+					return {col: c, left: x1, right: x2};
+				}
+			}
+			if (!canReturnNull) {
+				x1 = this.cols[c2].left - offset;
+				return {col: c2, left: x1, right: x1 + this.cols[c2].width};
+			}
+		} else {
+			if (this.topLeftFrozenCell) {
+				cFrozen = this.topLeftFrozenCell.getCol0();
+				if (0 !== cFrozen) {
+					c = 0;
+					offset = this.cols[c].left - this.cellsLeft;
+				}
+			}
+			for (x2 = this.cellsLeft + this.cols[c].width, c2 = 0; c >= c2; --c, x2 = x1) {
+				x1 = this.cols[c].left - offset;
+				if (x1 <= x && x < x2) {
+					return {col: c, left: x1, right: x2};
+				}
+			}
+			if (!canReturnNull) {
+				return {col: c2, left: x1, right: x1 + this.cols[c2].width};
+			}
+		}
+		return null;
+	};
 
-    // dY = true - считать с половиной следующей ячейки
-    WorksheetView.prototype._findRowUnderCursor = function (y, canReturnNull, dY) {
-        var r = this.visibleRange.r1, offset = this.rows[r].top - this.cellsTop, r2, y1, y2, rFrozen, heightDiff = 0;
-        if (y >= this.cellsTop) {
-            if (this.topLeftFrozenCell) {
-                rFrozen = this.topLeftFrozenCell.getRow0();
-                heightDiff = this.rows[rFrozen].top - this.rows[0].top;
-                if (y < this.cellsTop + heightDiff && 0 !== heightDiff) {
-                    r = 0;
-                    heightDiff = 0;
-                }
-            }
-            for (y1 = this.cellsTop + heightDiff, r2 = this.rows.length - 1; r <= r2; ++r, y1 = y2) {
-                y2 = y1 + this.rows[r].height;
-                if (y1 <= y && y < y2) {
-                    if (dY) {
-                        // Учитываем половину ячейки
-                        if (y1 <= y && y < y1 + this.rows[r].height / 2.0) {
-                            // Это предыдущая ячейка
-                            --r;
-                            // Можем вернуть и -1 (но это только для fillHandle)
-                        }
-                    }
-                    return {row: r, top: y1, bottom: y2};
-                }
-            }
-            if (!canReturnNull) {
-                return {row: r2, top: this.rows[r2].top - offset, bottom: y2};
-            }
-        } else {
-            if (this.topLeftFrozenCell) {
-                rFrozen = this.topLeftFrozenCell.getRow0();
-                if (0 !== rFrozen) {
-                    r = 0;
-                    offset = this.rows[r].top - this.cellsTop;
-                }
-            }
-            for (y2 = this.cellsTop + this.rows[r].height, r2 = 0; r >= r2; --r, y2 = y1) {
-                y1 = this.rows[r].top - offset;
-                if (y1 <= y && y < y2) {
-                    if (dY) {
-                        // Учитываем половину ячейки
-                        if (y1 <= y && y < y1 + this.rows[r].height / 2.0) {
-                            // Это предыдущая ячейка
-                            --r;
-                            // Можем вернуть и -1 (но это только для fillHandle)
-                        }
-                    }
-                    return {row: r, top: y1, bottom: y2};
-                }
-            }
-            if (!canReturnNull) {
-                if (dY) {
-                    // Это предыдущая ячейка
-                    --r2;
-                    // Можем вернуть и -1 (но это только для fillHandle)
-                    return {row: r2};
-                }
-                return {row: r2, top: y1, bottom: y1 + this.rows[r2].height};
-            }
-        }
-        return null;
-    };
+	/**
+     *
+	 * @param y
+	 * @param canReturnNull
+	 * @param half - считать с половиной следующей ячейки
+	 * @returns {*}
+	 * @private
+	 */
+	WorksheetView.prototype._findRowUnderCursor = function (y, canReturnNull, half) {
+		var activeCellRow = half ? this._getSelection().activeCell.row : -1;
+		var dy = 0;
+		var r = this.visibleRange.r1;
+		var offset = this.rows[r].top - this.cellsTop;
+		var r2, y1, y2, rFrozen, heightDiff = 0;
+		if (y >= this.cellsTop) {
+			if (this.topLeftFrozenCell) {
+				rFrozen = this.topLeftFrozenCell.getRow0();
+				heightDiff = this.rows[rFrozen].top - this.rows[0].top;
+				if (y < this.cellsTop + heightDiff && 0 !== heightDiff) {
+					r = 0;
+					heightDiff = 0;
+				}
+			}
+			for (y1 = this.cellsTop + heightDiff, r2 = this.rows.length - 1; r <= r2; ++r, y1 = y2) {
+				y2 = y1 + this.rows[r].height;
+				dy = half ? this.rows[r].height / 2.0 * Math.sign(r - activeCellRow) : 0;
+				if (y1 + dy > y) {
+					if (r !== this.visibleRange.r1) {
+						if (dy) {
+							r -= 1;
+							y2 = y1;
+							y1 -= this.rows[r].height;
+						}
+						return {row: r, top: y1, bottom: y2};
+					} else {
+						r = r2;
+						break;
+					}
+				} else if (y <= y2 + dy) {
+					return {row: r, top: y1, bottom: y2};
+				}
+			}
+			if (!canReturnNull) {
+				y1 = this.rows[r2].top - offset;
+				return {row: r2, top: y1, bottom: y1 + this.rows[r2].height};
+			}
+		} else {
+			if (this.topLeftFrozenCell) {
+				rFrozen = this.topLeftFrozenCell.getRow0();
+				if (0 !== rFrozen) {
+					r = 0;
+					offset = this.rows[r].top - this.cellsTop;
+				}
+			}
+			for (y2 = this.cellsTop + this.rows[r].height, r2 = 0; r >= r2; --r, y2 = y1) {
+				y1 = this.rows[r].top - offset;
+				if (y1 <= y && y < y2) {
+					return {row: r, top: y1, bottom: y2};
+				}
+			}
+			if (!canReturnNull) {
+				return {row: r2, top: y1, bottom: y1 + this.rows[r2].height};
+			}
+		}
+		return null;
+	};
 
     WorksheetView.prototype._hitResizeCorner = function (x1, y1, x2, y2) {
-        var wEps = this.width_1px, hEps = this.height_1px;
+        var wEps = this.width_1px * AscCommon.global_mouseEvent.KoefPixToMM, hEps = this.height_1px * AscCommon.global_mouseEvent.KoefPixToMM;
         return Math.abs(x2 - x1) <= wEps + this.width_2px && Math.abs(y2 - y1) <= hEps + this.height_2px;
     };
     WorksheetView.prototype._hitInRange = function (range, rangeType, vr, x, y, offsetX, offsetY) {
-        var wEps = this.width_2px, hEps = this.height_2px;
+        var wEps = this.width_2px * AscCommon.global_mouseEvent.KoefPixToMM, hEps = this.height_2px * AscCommon.global_mouseEvent.KoefPixToMM;
         var cursor, x1, x2, y1, y2, isResize;
         var col = -1, row = -1;
 
@@ -6123,13 +6129,14 @@
             offsetY = (y < this.cellsTop + heightDiff) ? 0 : offsetY - heightDiff;
         }
 
+        var epsChangeSize = 3 * AscCommon.global_mouseEvent.KoefPixToMM;
         if (x <= this.cellsLeft && y >= this.cellsTop) {
             r = this._findRowUnderCursor(y, true);
             if (r === null) {
                 return oResDefault;
             }
             isNotFirst = (r.row !== (-1 !== rFrozen ? 0 : this.visibleRange.r1));
-            f = !isViewerMode && (isNotFirst && y < r.top + 3 || y >= r.bottom - 3);
+            f = !isViewerMode && (isNotFirst && y < r.top + epsChangeSize || y >= r.bottom - epsChangeSize);
             // ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
             return {
                 cursor: f ? kCurRowResize : kCurRowSelect,
@@ -6145,7 +6152,7 @@
                 return oResDefault;
             }
             isNotFirst = c.col !== (-1 !== cFrozen ? 0 : this.visibleRange.c1);
-            f = !isViewerMode && (isNotFirst && x < c.left + 3 || x >= c.right - 3);
+            f = !isViewerMode && (isNotFirst && x < c.left + epsChangeSize || x >= c.right - epsChangeSize);
             // ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
             return {
                 cursor: f ? kCurColResize : kCurColSelect,
@@ -6511,19 +6518,20 @@
         });
     };
 
-    WorksheetView.prototype._calcSelectionEndPointByXY = function (x, y) {
-        var tmpSelection = this._getSelection();
-        var ar = tmpSelection.getLast();
-        x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
-        y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
+	WorksheetView.prototype._calcSelectionEndPointByXY = function (x, y) {
+		var tmpSelection = this._getSelection();
+		var ar = tmpSelection.getLast();
+		x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
+		y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
 
-        var res = new asc_Range(tmpSelection.activeCell.col, tmpSelection.activeCell.row, this._findColUnderCursor(
-          x).col, this._findRowUnderCursor(y).row, true);
-        if (ar.type === c_oAscSelectionType.RangeCells) {
-            this._fixSelectionOfMergedCells(res);
-        }
-        return res;
-    };
+		var res = new asc_Range(tmpSelection.activeCell.col, tmpSelection.activeCell.row, this._findColUnderCursor(x,
+			false, this.settings.halfSelection).col, this._findRowUnderCursor(y, false,
+			this.settings.halfSelection).row, true);
+		if (ar.type === c_oAscSelectionType.RangeCells) {
+			this._fixSelectionOfMergedCells(res);
+		}
+		return res;
+	};
 
     WorksheetView.prototype._calcSelectionEndPointByOffset = function (dc, dr) {
         var tmpSelection = this._getSelection();
@@ -6755,16 +6763,21 @@
 
         return false;
     };
-	
+
 	//нужно ли спрашивать пользователя о расширении диапазона
 	WorksheetView.prototype.getSelectionSortInfo = function () {
 		//в случае попытки сортировать мультиселект, необходимо выдавать ошибку
 		var arn = this.model.selectionRange.getLast().clone(true);
-		
+
 		//null - не выдавать сообщение и не расширять, false - не выдавать сообщение и расширЯть, true - выдавать сообщение
 		var bResult = false;
-		//в случае одной выделенной ячейки - всегда не выдаём сообщение и автоматически расширяем
-		if(!arn.isOneCell())
+
+		//если внутри форматированной таблиц, никогда не выдаем сообщение
+		if(this.model.autoFilters._isTablePartsContainsRange(arn))
+		{
+			bResult = null;
+		}
+		else if(!arn.isOneCell())//в случае одной выделенной ячейки - всегда не выдаём сообщение и автоматически расширяем
 		{
 			var colCount = arn.c2 - arn.c1 + 1;
 			var rowCount = arn.r2 - arn.r1 + 1;
@@ -6779,7 +6792,7 @@
 				var activeCell = this.model.selectionRange.activeCell;
 				var activeCellRange = new Asc.Range(activeCell.col, activeCell.row, activeCell.col, activeCell.row);
 				var expandRange = this.model.autoFilters._getAdjacentCellsAF(activeCellRange);
-				
+
 				//если диапазон не расширяется за счет близлежащих ячеек - не выдаем сообщение и не расширяем
 				if(arn.isEqual(expandRange) || activeCellRange.isEqual(expandRange))
 				{
@@ -6791,10 +6804,10 @@
 				}
 			}
 		}
-		
+
 		return bResult;
 	};
-	
+
     WorksheetView.prototype.getSelectionMathInfo = function () {
         var oSelectionMathInfo = new asc_CSelectionMathInfo();
         var sum = 0;
@@ -6834,8 +6847,9 @@
         // Показываем только данные для 2-х или более ячеек (http://bugzilla.onlyoffice.com/show_bug.cgi?id=24115)
         if (1 < oSelectionMathInfo.countNumbers) {
             // Мы должны отдавать в формате активной ячейки
-            var numFormat = this.model.getRange3(this.model.selectionRange.row, this.model.selectionRange.cell,
-              this.model.selectionRange.row, this.model.selectionRange.cell).getNumFormat();
+			var activeCell = this.model.selectionRange.activeCell;
+            var numFormat = this.model.getRange3(activeCell.row, activeCell.col,
+				activeCell.row, activeCell.col).getNumFormat();
             if (Asc.c_oAscNumFormatType.Time === numFormat.getType()) {
                 // Для времени нужно отдавать в формате [h]:mm:ss (http://bugzilla.onlyoffice.com/show_bug.cgi?id=26271)
                 numFormat = AscCommon.oNumFormatCache.get('[h]:mm:ss');
@@ -6965,6 +6979,9 @@
             cell_info.formatTableInfo.tableRange = curTablePart.Ref.getAbsName();
             cell_info.formatTableInfo.filterButton = curTablePart.isShowButton();
 
+			cell_info.formatTableInfo.altText = curTablePart.altText;
+            cell_info.formatTableInfo.altTextSummary = curTablePart.altTextSummary;
+
             this.af_setDisableProps(curTablePart, cell_info.formatTableInfo);
         }
 
@@ -6987,7 +7004,7 @@
 		cell_info.font.bold = font.getBold();
 		cell_info.font.italic = font.getItalic();
 		// ToDo убрать, когда будет реализовано двойное подчеркивание
-		cell_info.font.underline = (Asc.EUnderline.underlineNone !== font.getUnderline()); 
+		cell_info.font.underline = (Asc.EUnderline.underlineNone !== font.getUnderline());
 		cell_info.font.strikeout = font.getStrikeout();
 		cell_info.font.subscript = fa === AscCommon.vertalign_SubScript;
 		cell_info.font.superscript = fa === AscCommon.vertalign_SuperScript;
@@ -6995,7 +7012,8 @@
 
         cell_info.fill = new asc_CFill((null != bg) ? asc_obj2Color(bg) : bg);
 
-        cell_info.numFormatType = c.getNumFormatType();
+		cell_info.numFormat = c.getNumFormatStr();
+        cell_info.numFormatInfo = c.getNumFormatTypeInfo();
 
         // Получаем гиперссылку (//ToDo)
         var ar = selectionRange.getLast().clone();
@@ -7055,7 +7073,7 @@
 		}
 
         return cell_info;
-    };
+	};
 
     WorksheetView.prototype._getSelectionInfoObject = function () {
         var objectInfo = new asc_CCellInfo();
@@ -7565,11 +7583,11 @@
         var activeFillHandleCopy;
 
         // Колонка по X и строка по Y
-        var colByX = this._findColUnderCursor(x, /*canReturnNull*/false, /*dX*/true).col;
-        var rowByY = this._findRowUnderCursor(y, /*canReturnNull*/false, /*dX*/true).row;
+        var colByX = this._findColUnderCursor(x, /*canReturnNull*/false, true).col;
+        var rowByY = this._findRowUnderCursor(y, /*canReturnNull*/false, true).row;
         // Колонка по X и строка по Y (без половинчатого счета). Для сдвига видимой области
-        var colByXNoDX = this._findColUnderCursor(x, /*canReturnNull*/false, /*dX*/false).col;
-        var rowByYNoDY = this._findRowUnderCursor(y, /*canReturnNull*/false, /*dX*/false).row;
+        var colByXNoDX = this._findColUnderCursor(x, /*canReturnNull*/false, false).col;
+        var rowByYNoDY = this._findRowUnderCursor(y, /*canReturnNull*/false, false).row;
         // Сдвиг в столбцах и строках от крайней точки
         var dCol;
         var dRow;
@@ -7762,8 +7780,6 @@
 
                     this.activeFillHandle.r2 = ar.r1;
 
-                    // Когда идем назад, должна быть колонка на 1 больше
-                    this.activeFillHandle.c2 += 1;
                     // Случай, если мы еще не вышли из внутренней области
                     if (this.activeFillHandle.c2 == ar.c1) {
                         this.fillHandleArea = 2;
@@ -7775,9 +7791,6 @@
                     this.activeFillHandle.r1 = ar.r2;
 
                     this.activeFillHandle.r2 = ar.r1;
-
-                    // Когда идем назад, должна быть колонка на 1 больше
-                    this.activeFillHandle.c2 += 1;
 
                     if (this.activeFillHandle.c2 > this.activeFillHandle.c1) {
                         // Ситуация половинки последнего столбца
@@ -7838,8 +7851,6 @@
 
                     this.activeFillHandle.c2 = ar.c1;
 
-                    // Когда идем назад, должна быть строка на 1 больше
-                    this.activeFillHandle.r2 += 1;
                     // Случай, если мы еще не вышли из внутренней области
                     if (this.activeFillHandle.r2 == ar.r1) {
                         this.fillHandleArea = 2;
@@ -7851,9 +7862,6 @@
                     this.activeFillHandle.r1 = ar.r2;
 
                     this.activeFillHandle.c2 = ar.c1;
-
-                    // Когда идем назад, должна быть строка на 1 больше
-                    this.activeFillHandle.r2 += 1;
 
                     if (this.activeFillHandle.r2 > this.activeFillHandle.r1) {
                         // Ситуация половинки последней строки
@@ -8050,8 +8058,8 @@
         }
 
         // Колонка по X и строка по Y
-        var colByX = this._findColUnderCursor(x, /*canReturnNull*/false, /*dX*/false).col;
-        var rowByY = this._findRowUnderCursor(y, /*canReturnNull*/false, /*dY*/false).row;
+        var colByX = this._findColUnderCursor(x, /*canReturnNull*/false, false).col;
+        var rowByY = this._findRowUnderCursor(y, /*canReturnNull*/false, false).row;
 
         if (selectionRange.type == c_oAscSelectionType.RangeRow) {
             colByX = 0;
@@ -8176,8 +8184,8 @@
           this.arrActiveChartRanges[indexFormulaRange]).getLast().clone();
 
         // Колонка по X и строка по Y
-        var colByX = this._findColUnderCursor(x, /*canReturnNull*/false, /*dX*/false).col;
-        var rowByY = this._findRowUnderCursor(y, /*canReturnNull*/false, /*dY*/false).row;
+        var colByX = this._findColUnderCursor(x, /*canReturnNull*/false, false).col;
+        var rowByY = this._findRowUnderCursor(y, /*canReturnNull*/false, false).row;
 
         // Если мы только первый раз попали сюда, то копируем выделенную область
         if (null === this.startCellMoveResizeRange) {
@@ -8892,7 +8900,7 @@
             callTrigger = true;
             t.handlers.trigger("slowOperation", true);
         }
-		
+
 		//добавляем форматированные таблицы
         var arnToRange = t.model.selectionRange.getLast();
         var tablesMap = null;
@@ -8942,7 +8950,7 @@
 
                 tablesMap[curTable.DisplayName] = newDisplayName;
             }
-			
+
 			if(bIsAddTable)
 			{
 				t._isLockedDefNames(null, null);
@@ -11751,8 +11759,8 @@
                 t.handlers.trigger("selectionChanged");
                 return;
             }
-			
-			var addNameColumn, filterRange; 
+
+			var addNameColumn, filterRange;
             if (addFormatTableOptionsObj && isChangeAutoFilterToTablePart(addFormatTableOptionsObj) === true)//CHANGE FILTER TO TABLEPART
             {
 				filterRange = t.model.AutoFilter.Ref.clone();
@@ -11979,9 +11987,9 @@
                     {
                         type = Asc.c_oAscSortOptions.ByColorFont;
                         if (sortState.SortConditions[0].ConditionDescending) {
-                            type = Asc.c_oAscSortOptions.Ascending;
-                        } else {
                             type = Asc.c_oAscSortOptions.Descending;
+                        } else {
+                            type = Asc.c_oAscSortOptions.Ascending;
                         }
                     }
                 }
@@ -12134,26 +12142,27 @@
                 t._onUpdateFormatTable(sortProps.sortRange.bbox, false);
                 History.EndTransaction();
             };
-			
+
 			if (null === sortProps) {
 				var rgbColor = color ?  new AscCommonExcel.RgbColor((color.asc_getR() << 16) + (color.asc_getG() << 8) + color.asc_getB()) : null;
-				
+
 				//expand selectionRange
 				if(bIsExpandRange)
 				{
 					var selectionRange = t.model.selectionRange;
-					var activeCell = selectionRange.activeCell;
+					var activeCell = selectionRange.activeCell.clone();
 					var activeCellRange = new Asc.Range(activeCell.col, activeCell.row, activeCell.col, activeCell.row);
 					var expandRange = t.model.autoFilters._getAdjacentCellsAF(activeCellRange);
-					
+
 					//change selection
 					t.setSelection(expandRange);
+					selectionRange.activeCell = activeCell;
 				}
-				
+
 				//sort
 				t.setSelectionInfo("sort", type, null, null, rgbColor);
 				//TODO возможно стоит возвратить selection обратно
-			
+
             } else if (false !== sortProps) {
                 t._isLockedCells(sortProps.sortRange.bbox, /*subType*/null, onSortAutoFilterCallBack);
             }
@@ -12329,13 +12338,162 @@
             return false;
         }
 
-        var _drawFilterMark = function (x, y, height, index) {
-            var size = 5.25 * index;
-            var halfSize = Math.round((size / 2) / 0.75) * 0.75;
-            var meanLine = Math.round((size * Math.sqrt(3) / 3) / 0.75) * 0.75;//длина биссектрисы равностороннего треугольника
+        var drawCurrentFilterButtons = function (filter) {
+			var autoFilter = filter.isAutoFilter() ? filter : filter.AutoFilter;
+            var range = new Asc.Range(filter.Ref.c1, filter.Ref.r1, filter.Ref.c2, filter.Ref.r1);
+
+            if (range.isIntersect(updatedRange)) {
+                var row = range.r1;
+
+				var sortCondition = filter.isApplySortConditions() ? filter.SortState.SortConditions[0] : null;
+                for (var col = range.c1; col <= range.c2; col++) {
+                    if (col >= updatedRange.c1 && col <= updatedRange.c2) {
+                        var isSetFilter = false;
+                        var isShowButton = true;
+						var isSortState = null;//true - ascending, false - descending
+
+						var colId = filter.isAutoFilter() ? t.model.autoFilters._getTrueColId(autoFilter, col - range.c1) : col - range.c1;
+                        if (autoFilter.FilterColumns && autoFilter.FilterColumns.length) {
+                            var filterColumn = null, filterColumnWithMerge = null;
+
+                            for (var i = 0; i < autoFilter.FilterColumns.length; i++) {
+                                if (autoFilter.FilterColumns[i].ColId === col - range.c1) {
+                                    filterColumn = autoFilter.FilterColumns[i];
+                                }
+
+                                if (colId === col - range.c1 && filterColumn !== null) {
+                                    filterColumnWithMerge = filterColumn;
+                                    break;
+                                } else if (autoFilter.FilterColumns[i].ColId === colId) {
+                                    filterColumnWithMerge = autoFilter.FilterColumns[i];
+                                }
+                            }
+
+                            if (filterColumnWithMerge && filterColumnWithMerge.isApplyAutoFilter()) {
+                                isSetFilter = true;
+                            }
+
+                            if (filterColumn && filterColumn.ShowButton === false) {
+                                isShowButton = false;
+                            }
+
+                        }
+
+						if(sortCondition && sortCondition.Ref)
+						{
+							if(colId === sortCondition.Ref.c1 - range.c1)
+							{
+								isSortState = !sortCondition.ConditionDescending;
+							}
+						}
+
+                        if (isShowButton === false) {
+                            continue;
+                        }
+
+                        var width = 13;
+                        var height = 13;
+                        var rowHeight = ws.rows[row].height;
+                        if (rowHeight < height) {
+                            width = width * (rowHeight / height);
+                            height = rowHeight;
+                        }
+
+                        var x1 = ws.cols[col].left + ws.cols[col].width - width - 0.5;
+                        var y1 = ws.rows[row].top + ws.rows[row].height - height - 0.5;
+
+                        t.af_drawCurrentButton(x1 - offsetX, y1 - offsetY, {isSortState: isSortState, isSetFilter: isSetFilter, row: row, col: col});
+                    }
+                }
+            }
+        };
+
+        if (aWs.AutoFilter) {
+            drawCurrentFilterButtons(aWs.AutoFilter);
+        }
+        if (aWs.TableParts && aWs.TableParts.length) {
+            for (var i = 0; i < aWs.TableParts.length; i++) {
+                if (aWs.TableParts[i].AutoFilter && aWs.TableParts[i].HeaderRowCount !== 0) {
+                    drawCurrentFilterButtons(aWs.TableParts[i], true);
+                }
+            }
+        }
+
+        return true;
+    };
+
+	WorksheetView.prototype.af_drawCurrentButton = function (x1, y1, props) {
+		var isApplyAutoFilter = props.isSetFilter;
+		var isApplySortState = props.isSortState;
+
+		var ws = this;
+        var aWs = this.model;
+        var t = this;
+
+		var width_1px = t.width_1px;
+		var height_1px = t.height_1px;
+		var height = 15 * width_1px;
+		var width = 15 * height_1px;
+        var m_oColor = new CColor(120, 120, 120);
+
+		var rowHeight = ws.rows[props.row].height;
+		var colWidth = ws.cols[props.col].width;
+
+		var scaleIndex = 1;
+
+		var _drawButtonBorder = function(startX, startY, width, height)
+		{
+			ws.drawingCtx
+              .setFillStyle(ws.settings.cells.defaultState.background)
+              .setLineWidth(1)
+              .setStrokeStyle(ws.settings.cells.defaultState.border)
+              .fillRect(startX, startY, width, height)
+              .strokeRect(startX, startY, width, height);
+		};
+
+		var _drawSortArrow = function(startX, startY, isDescending, heightArrow)
+		{
+			heightArrow = heightArrow * height_1px * scaleIndex;
+			var widthArrow = 3 * width_1px * scaleIndex;
+			var widthLine = 1 * width_1px * scaleIndex;
+			var heightEndArrow = 3 * height_1px * scaleIndex;
+
+			//isDescending = true - стрелочка смотрит вниз
+			//рисуем сверху вниз
+			var ctx = ws.drawingCtx;
+			ctx.beginPath();
+			ctx.lineVer(startX, startY, startY + heightArrow);
+
+			if(isDescending)
+			{
+				ctx.moveTo(startX, startY + heightArrow);
+				ctx.lineTo(startX - (widthArrow - widthLine), startY + heightArrow - heightEndArrow);
+				ctx.moveTo(startX + widthArrow, startY + heightArrow - heightEndArrow);
+				ctx.lineTo(startX, startY + heightArrow);
+				//ctx.lineHor(startX - 2 * width_1px, startY + heightArrow - 1 * height_1px, startX  + 3 * width_1px);
+			}
+			else
+			{
+				ctx.moveTo(startX, startY);
+				ctx.lineTo(startX - (widthArrow - widthLine), startY + heightEndArrow);
+				ctx.moveTo(startX + widthArrow, startY + heightEndArrow);
+				ctx.lineTo(startX, startY);
+				//ctx.lineHor(startX - widthLine, startY + 1 * height_1px * scaleIndex, startX - widthLine + widthArrow);
+			}
+
+			ctx.setLineWidth(t.width_1px);
+			ctx.setStrokeStyle(m_oColor);
+			ctx.stroke();
+		};
+
+        var _drawFilterMark = function (x, y, height)
+		{
+            var size = 5.25 * scaleIndex;
+            var halfSize = Math.round((size / 2) / height_1px) * height_1px;
+            var meanLine = Math.round((size * Math.sqrt(3) / 3) / height_1px) * height_1px;//длина биссектрисы равностороннего треугольника
             //округляем + смещаем
-            x = Math.round((x) / 0.75) * 0.75;
-            y = Math.round((y) / 0.75) * 0.75;
+            x = Math.round((x) / width_1px) * width_1px;
+            y = Math.round((y) / height_1px) * height_1px;
             var y1 = y - height;
 
             ws.drawingCtx
@@ -12356,17 +12514,18 @@
               .fill();
         };
 
-        var _drawFilterDreieck = function (x, y, index) {
+        var _drawFilterDreieck = function (x, y, index)
+		{
             var size = 5.25 * index;
             //сюда приходят координаты центра кнопки
             //чтобы кнопка была в центре, необходимо сместить
             var leftDiff = size / 2;
-            var upDiff = Math.round(((size * Math.sqrt(3)) / 6) / 0.75) * 0.75;//радиус вписанной окружности в треугольник
+            var upDiff = Math.round(((size * Math.sqrt(3)) / 6) / height_1px) * height_1px;//радиус вписанной окружности в треугольник
             //округляем + смещаем
-            x = Math.round((x - leftDiff) / 0.75) * 0.75;
-            y = Math.round((y - upDiff) / 0.75) * 0.75;
-            var meanLine = Math.round((size * Math.sqrt(3) / 3) / 0.75) * 0.75;//длина биссектрисы равностороннего треугольника
-            var halfSize = Math.round((size / 2) / 0.75) * 0.75;
+            x = Math.round((x - leftDiff) / width_1px) * width_1px;
+            y = Math.round((y - upDiff) / height_1px) * height_1px;
+            var meanLine = Math.round((size * Math.sqrt(3) / 3) / width_1px) * width_1px;//длина биссектрисы равностороннего треугольника
+            var halfSize = Math.round((size / 2) / height_1px) * height_1px;
             //рисуем
             ws.drawingCtx
               .beginPath()
@@ -12378,144 +12537,82 @@
               .fill();
         };
 
-        var _drawButton = function (x1, y1, options) {
-            var isSet = options.isSetFilter;
-            var height = 11.25;
-            var width = 11.25;
-            var rowHeight = ws.rows[options.row].height;
-            var colWidth = ws.cols[options.col].width;
-            var index = 1;
-            var diffX = 0;
-            var diffY = 0;
-            if ((colWidth - 2) < width && rowHeight < (height + 2)) {
-                if (rowHeight < colWidth) {
-                    index = rowHeight / height;
-                    width = width * index;
-                    height = rowHeight;
-                } else {
-                    index = colWidth / width;
-                    diffY = width - colWidth;
-                    diffX = width - colWidth;
-                    width = colWidth;
-                    height = height * index;
-                }
-            } else if ((colWidth - 2) < width) {
-                index = colWidth / width;
-                //смещения по x и y
-                diffY = width - colWidth;
-                diffX = width - colWidth + 2;
-                width = colWidth;
-                height = height * index;
-            } else if (rowHeight < height) {
-                index = rowHeight / height;
-                width = width * index;
-                height = rowHeight;
-            }
-            //квадрат кнопки рисуем
-            ws.drawingCtx
-              .setFillStyle(ws.settings.cells.defaultState.background)
-              .setLineWidth(1)
-              .setStrokeStyle(ws.settings.cells.defaultState.border)
-              .fillRect(x1 + diffX, y1 + diffY, width, height)
-              .strokeRect(x1 + diffX, y1 + diffY, width, height);
+		//TODO пересмотреть отрисовку кнопок + отрисовку при масштабировании
+		var _drawButton = function(upLeftXButton, upLeftYButton)
+		{
+			//квадрат кнопки рисуем
+			_drawButtonBorder(upLeftXButton, upLeftYButton, width, height);
 
-            //координаты левого верхнего угла кнопки
-            var upLeftXButton = x1 + diffX;
-            var upLeftYButton = y1 + diffY;
-            var centerX, centerY;
-            if (isSet) {
-                centerX = upLeftXButton + (width / 2);
-                var heigthObj = Math.ceil((height / 2) / 0.75) * 0.75;
-                var marginTop = Math.floor(((height - heigthObj) / 2) / 0.75) * 0.75;
+			//координаты центра
+			var centerX = upLeftXButton + (width / 2);
+			var centerY = upLeftYButton + (height / 2);
 
-                centerY = upLeftYButton + heigthObj + marginTop;
-                _drawFilterMark(centerX, centerY, heigthObj, index);
-            } else {
-                //центр кнопки
-                centerX = upLeftXButton + (width / 2);
-                centerY = upLeftYButton + (height / 2);
-                _drawFilterDreieck(centerX, centerY, index);
-            }
-        };
+			if(null !== isApplySortState && isApplyAutoFilter)
+			{
+				var heigthObj = Math.ceil((height / 2) / height_1px) * height_1px + 1 * height_1px;
+				var marginTop = Math.floor(((height - heigthObj) / 2) / height_1px) * height_1px;
+				centerY = upLeftYButton + heigthObj + marginTop;
 
-        var drawCurrentFilterButton = function (filter, isTablePart) {
-            var range = new Asc.Range(filter.Ref.c1, filter.Ref.r1, filter.Ref.c2, filter.Ref.r1);
-            if (range.isIntersect(updatedRange)) {
-                //TODO сделать isSetFilter
-                var isSetFilter = false;
-                var isShowButton = true;
+				_drawSortArrow(upLeftXButton + 4 * width_1px * scaleIndex, upLeftYButton + 5 * height_1px * scaleIndex, isApplySortState, 8);
+				_drawFilterMark(centerX + 2 * width_1px, centerY, heigthObj);
+			}
+			else if(null !== isApplySortState)
+			{
+				_drawSortArrow(upLeftXButton + width - 5 * width_1px * scaleIndex, upLeftYButton + 3 * height_1px * scaleIndex, isApplySortState, 10);
+				_drawFilterDreieck(centerX - 3 * width_1px, centerY + 2 * height_1px, scaleIndex * 0.75);
+			}
+			else if (isApplyAutoFilter)
+			{
+				var heigthObj = Math.ceil((height / 2) / height_1px) * height_1px + 1 * height_1px;
+				var marginTop = Math.floor(((height - heigthObj) / 2) / height_1px) * height_1px;
 
-                var row = range.r1;
-                for (var col = range.c1; col <= range.c2; col++) {
-                    if (col >= updatedRange.c1 && col <= updatedRange.c2) {
-                        isSetFilter = false;
-                        isShowButton = true;
+				centerY = upLeftYButton + heigthObj + marginTop;
+				_drawFilterMark(centerX, centerY, heigthObj);
+			}
+			else
+			{
+				_drawFilterDreieck(centerX, centerY, scaleIndex);
+			}
+		};
 
-                        if (filter.FilterColumns && filter.FilterColumns.length) {
-                            var colId = !isTablePart ? t.model.autoFilters._getTrueColId(filter, col - range.c1) :
-                            col - range.c1;
-                            var filterColumn = null, filterColumnWithMerge = null;
+		var diffX = 0;
+		var diffY = 0;
+		if ((colWidth - 2) < width && rowHeight < (height + 2))
+		{
+			if (rowHeight < colWidth)
+			{
+				scaleIndex = rowHeight / height;
+				width = width * scaleIndex;
+				height = rowHeight;
+			}
+			else
+			{
+				scaleIndex = colWidth / width;
+				diffY = width - colWidth;
+				diffX = width - colWidth;
+				width = colWidth;
+				height = height * scaleIndex;
+			}
+		}
+		else if ((colWidth - 2) < width)
+		{
+			scaleIndex = colWidth / width;
+			//смещения по x и y
+			diffY = width - colWidth;
+			diffX = width - colWidth + 2;
+			width = colWidth;
+			height = height * scaleIndex;
+		}
+		else if (rowHeight < height)
+		{
+			scaleIndex = rowHeight / height;
+			width = width * scaleIndex;
+			height = rowHeight;
+		}
 
-                            for (var i = 0; i < filter.FilterColumns.length; i++) {
-                                if (filter.FilterColumns[i].ColId === col - range.c1) {
-                                    filterColumn = filter.FilterColumns[i];
-                                }
-
-                                if (colId === col - range.c1 && filterColumn !== null) {
-                                    filterColumnWithMerge = filterColumn;
-                                    break;
-                                } else if (filter.FilterColumns[i].ColId === colId) {
-                                    filterColumnWithMerge = filter.FilterColumns[i];
-                                }
-                            }
-
-                            if (filterColumnWithMerge && filterColumnWithMerge.isApplyAutoFilter()) {
-                                isSetFilter = true;
-                            }
-
-                            if (filterColumn && filterColumn.ShowButton === false) {
-                                isShowButton = false;
-                            }
-
-                        }
-
-                        if (isShowButton === false) {
-                            continue;
-                        }
-
-                        var width = 13;
-                        var height = 13;
-                        var rowHeight = ws.rows[row].height;
-                        if (rowHeight < height) {
-                            width = width * (rowHeight / height);
-                            height = rowHeight;
-                        }
-
-                        var x1 = ws.cols[col].left + ws.cols[col].width - width - 0.5;
-                        var y1 = ws.rows[row].top + ws.rows[row].height - height - 0.5;
-
-                        _drawButton(x1 - offsetX, y1 - offsetY,
-                          {sortState: false, isSetFilter: isSetFilter, row: row, col: col});
-                    }
-                }
-            }
-        };
-
-        if (aWs.AutoFilter) {
-            drawCurrentFilterButton(aWs.AutoFilter);
-        }
-
-        if (aWs.TableParts && aWs.TableParts.length) {
-            for (var i = 0; i < aWs.TableParts.length; i++) {
-                if (aWs.TableParts[i].AutoFilter && aWs.TableParts[i].HeaderRowCount !== 0) {
-                    drawCurrentFilterButton(aWs.TableParts[i].AutoFilter, true);
-                }
-            }
-        }
-
-        return true;
-    };
-
+		_drawButton(x1 + diffX, y1 + diffY);
+	};
+	
     WorksheetView.prototype.af_checkCursor = function (x, y, offsetX, offsetY, frozenObj, r, c) {
         var ws = this;
         var aWs = this.model;
@@ -12752,7 +12849,7 @@
         var sortColor = null;
         if (filter && filter.SortState && filter.SortState.SortConditions && filter.SortState.SortConditions[0]) {
             var SortConditions = filter.SortState.SortConditions[0];
-            if (rangeButton.r1 == SortConditions.Ref.r1 && rangeButton.c1 == SortConditions.Ref.c1) {
+            if (rangeButton.c1 == SortConditions.Ref.c1) {
 
                 var conditionSortBy = SortConditions.ConditionSortBy;
                 switch (conditionSortBy) {
@@ -12770,7 +12867,7 @@
                     }
                     default:
                     {
-                        if (filter.SortState.SortConditions[0].ConditionDescending == false) {
+                        if (filter.SortState.SortConditions[0].ConditionDescending) {
                             sortVal = Asc.c_oAscSortOptions.Descending;
                         } else {
                             sortVal = Asc.c_oAscSortOptions.Ascending;
@@ -13119,7 +13216,7 @@
             //add total row
             rangeUpTable =
               new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1);
-			
+
 			//add total table if down another format table
 			if(ws.autoFilters._isPartTablePartsUnderRange(tablePart.Ref)){
 				ws.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError,
@@ -13156,7 +13253,7 @@
                 if (val === false) {
                     res = tablePart.Ref;
                 } else {
-					var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1); 
+					var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1);
 					if(this.model.autoFilters._isEmptyRange(rangeUpTable, 0) && this.model.autoFilters.searchRangeInTableParts(rangeUpTable) === -1){
                     res = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2, tablePart.Ref.r2 + 1);
                 }
@@ -13171,7 +13268,7 @@
                 if (val === false) {
                     res = tablePart.Ref;
                 } else {
-					var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 - 1, tablePart.Ref.c2, tablePart.Ref.r1 - 1); 
+					var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 - 1, tablePart.Ref.c2, tablePart.Ref.r1 - 1);
 					if(this.model.autoFilters._isEmptyRange(rangeUpTable, 0) && this.model.autoFilters.searchRangeInTableParts(rangeUpTable) === -1){
                     res = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 - 1, tablePart.Ref.c2, tablePart.Ref.r2);
                 }
@@ -13544,6 +13641,46 @@
         formatTableInfo.isDeleteTable = true;
     };
 
+	WorksheetView.prototype.af_convertTableToRange = function (tableName) {
+        var t = this;
+
+        var callback = function (isSuccess) {
+            if (false === isSuccess) {
+                return;
+            }
+
+            History.Create_NewPoint();
+            History.StartTransaction();
+
+			t.model.workbook.dependencyFormulas.lockRecal();
+
+            t.model.autoFilters.convertTableToRange(tableName);
+            t._onUpdateFormatTable(tableRange, false, true);
+
+			t.model.workbook.dependencyFormulas.unlockRecal();
+
+            History.EndTransaction();
+        };
+
+        var table = t.model.autoFilters._getFilterByDisplayName(tableName);
+        var tableRange = null !== table ? table.Ref : null;
+
+        var lockRange = tableRange;
+        var callBackLockedDefNames = function (isSuccess) {
+            if (false === isSuccess) {
+                return;
+            }
+
+            t._isLockedCells(lockRange, null, callback);
+        };
+
+        //лочим данный именованный диапазон
+        var defNameId = t.model.workbook.dependencyFormulas.getDefNameByName(tableName, t.model.getId());
+        defNameId = defNameId ? defNameId.getNodeId() : null;
+
+        t._isLockedDefNames(callBackLockedDefNames, defNameId);
+    };
+
     WorksheetView.prototype.af_changeTableRange = function (tableName, range) {
         var t = this;
         range = AscCommonExcel.g_oRangeCache.getAscRange(range);
@@ -13648,30 +13785,32 @@
 		xL *= asc_getcvt(3/*mm*/, 1/*pt*/, this._getPPIX());
 		yL *= asc_getcvt(3/*mm*/, 1/*pt*/, this._getPPIY());
 
-		var c = this.visibleRange.c1, cFrozen, widthDiff;
-		var r = this.visibleRange.r1, rFrozen, heightDiff;
+		var c = this.visibleRange.c1, cFrozen, widthDiff = 0;
+		var r = this.visibleRange.r1, rFrozen, heightDiff = 0;
 		if (this.topLeftFrozenCell) {
 			cFrozen = this.topLeftFrozenCell.getCol0();
 			widthDiff = this.cols[cFrozen].left - this.cols[0].left;
-			if (xL < this.cellsLeft + widthDiff && 0 !== widthDiff) {
+			if (xL < widthDiff && 0 !== widthDiff) {
 				c = 0;
+				widthDiff = 0;
 			}
 
 			rFrozen = this.topLeftFrozenCell.getRow0();
 			heightDiff = this.rows[rFrozen].top - this.rows[0].top;
-			if (yL < this.cellsTop + heightDiff && 0 !== heightDiff) {
+			if (yL < heightDiff && 0 !== heightDiff) {
 				r = 0;
+				heightDiff = 0;
 			}
 		}
 
-		xL -= (this.cols[c].left - this.cellsLeft - this.cellsLeft);
-		yL -= (this.rows[r].top - this.cellsTop - this.cellsTop);
+		xL -= (this.cols[c].left - widthDiff - this.cellsLeft - this.cellsLeft);
+		yL -= (this.rows[r].top - heightDiff - this.cellsTop - this.cellsTop);
 
 		xL *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
 		yL *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
 		return {X: xL, Y: yL};
 	};
-    
+
     //------------------------------------------------------------export---------------------------------------------------
     window['AscCommonExcel'] = window['AscCommonExcel'] || {};
     window["AscCommonExcel"].WorksheetView = WorksheetView;

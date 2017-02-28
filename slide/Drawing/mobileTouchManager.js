@@ -320,8 +320,8 @@
 			_mode = 2;
 		}
 
-		var _object_bounds = _controller.getSelectedObjectsBounds();
-		if ((0 == _mode) && _object_bounds)
+		var _object_bounds = _controller.getSelectedObjectsBounds(true);
+		if (_object_bounds)
 		{
 			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(_object_bounds.minX, _object_bounds.minY, _object_bounds.pageIndex);
 			_posX = _pos.X;
@@ -395,7 +395,7 @@
 		AscCommon.check_MouseDownEvent(e.touches ? e.touches[0] : e, true);
 		global_mouseEvent.KoefPixToMM = 1;
 		global_mouseEvent.LockMouse();
-		this.Api.sendEvent("asc_onHidePopMenu");
+		this.ClearContextMenu();
 
 		this.TableCurrentMoveValueMin = null;
 		this.TableCurrentMoveValueMax = null;
@@ -799,7 +799,8 @@
 					this.Api.sendEvent("asc_onTapEvent", e);
 
 					var typeMenu = this.delegate.GetContextMenuType();
-					if (typeMenu == AscCommon.MobileTouchContextMenuType.Target)
+					if (typeMenu == AscCommon.MobileTouchContextMenuType.Target ||
+						typeMenu == AscCommon.MobileTouchContextMenuType.Select)
 						isPreventDefault = false;
 				}
 				else

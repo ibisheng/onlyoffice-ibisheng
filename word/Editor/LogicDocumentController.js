@@ -373,3 +373,7 @@ CLogicDocumentController.prototype.GetCurrentSectionPr = function()
 {
 	return this.LogicDocument.controller_GetCurrentSectionPr();
 };
+CLogicDocumentController.prototype.RemoveTextSelection = function()
+{
+	return this.RemoveSelection();
+};

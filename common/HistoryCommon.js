@@ -1010,7 +1010,9 @@
 			case AscDFH.historydescription_Document_RemoveAllFootnotes:
 				sString = "Document_RemoveAllFootnotes                ";
 				break;
-
+			case AscDFH.historydescription_Document_InsertDocumentsByUrls:
+				sString = "Document_InsertDocumentsByUrls             ";
+				break;
 		}
 		return sString;
 	}
@@ -1628,8 +1630,10 @@
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе ParaField
 	//------------------------------------------------------------------------------------------------------------------
-	window['AscDFH'].historyitem_Field_AddItem    = window['AscDFH'].historyitem_type_Field | 1;
-	window['AscDFH'].historyitem_Field_RemoveItem = window['AscDFH'].historyitem_type_Field | 2;
+	window['AscDFH'].historyitem_Field_AddItem              = window['AscDFH'].historyitem_type_Field | 1;
+	window['AscDFH'].historyitem_Field_RemoveItem           = window['AscDFH'].historyitem_type_Field | 2;
+	window['AscDFH'].historyitem_Field_FormFieldName        = window['AscDFH'].historyitem_type_Field | 3;
+	window['AscDFH'].historyitem_Field_FormFieldDefaultText = window['AscDFH'].historyitem_type_Field | 4;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе Footnotes
 	//------------------------------------------------------------------------------------------------------------------
@@ -2853,6 +2857,7 @@
 	window['AscDFH'].historydescription_Document_AddFootnote                        = 0x013c;
 	window['AscDFH'].historydescription_Document_SetFootnotePr                      = 0x013d;
 	window['AscDFH'].historydescription_Document_RemoveAllFootnotes                 = 0x013e;
+	window['AscDFH'].historydescription_Document_InsertDocumentsByUrls              = 0x013f;
 
 
 
@@ -2919,11 +2924,6 @@
 		// В большинстве случаев загрузка чужого изменения работает как простое Redo
 		this.Redo();
 	};
-	CChangesBase.prototype.IsChangesClass = function()
-	{
-		// TODO: Эта функция добавлена пока все изменения не переделаны на классы
-		return true;
-	};
 	CChangesBase.prototype.GetClass = function()
 	{
 		return this.Class;
@@ -2944,6 +2944,10 @@
 	CChangesBase.prototype.Merge = function(oChange)
 	{
 		return true;
+	};
+	CChangesBase.prototype.IsPosExtChange = function(oChange)
+	{
+		return false;
 	};
 	window['AscDFH'].CChangesBase = CChangesBase;
 	/**

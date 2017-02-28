@@ -39,6 +39,7 @@ var fieldtype_UNKNOWN    = 0x0000;
 var fieldtype_MERGEFIELD = 0x0001;
 var fieldtype_PAGENUM    = 0x0002;
 var fieldtype_PAGECOUNT  = 0x0003;
+var fieldtype_FORMTEXT   = 0x0004;
 
 /**
  *
@@ -63,6 +64,9 @@ function ParaField(FieldType, Arguments, Switches)
     this.TemplateContent = this.Content;
 
     this.Bounds = {};
+
+	this.FormFieldName        = "";
+	this.FormFieldDefaultText = "";
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     AscCommon.g_oTableId.Add( this, this.Id );
@@ -228,8 +232,15 @@ ParaField.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRang
 
     ParaField.superclass.Recalculate_Range_Spaces.apply(this, arguments);
 
-    var X1 = PRSA.X;
-    this.Bounds[((CurLine << 16) & 0xFFFF0000) | (CurRange & 0x0000FFFF)] = {X0 : X0, X1 : X1, Y0: Y0, Y1 : Y1, PageIndex : _CurPage + PRSA.Paragraph.Get_StartPage_Absolute()};
+	var X1 = PRSA.X;
+
+	this.Bounds[((CurLine << 16) & 0xFFFF0000) | (CurRange & 0x0000FFFF)] = {
+		X0        : X0,
+		X1        : X1,
+		Y0        : Y0,
+		Y1        : Y1,
+		PageIndex : _CurPage + PRSA.Paragraph.Get_StartPage_Absolute()
+	};
 };
 ParaField.prototype.Draw_HighLights = function(PDSH)
 {
@@ -241,10 +252,78 @@ ParaField.prototype.Draw_HighLights = function(PDSH)
 
     var X1 = PDSH.X;
 
-    if (Math.abs(X0 - X1) > 0.001 && true === PDSH.DrawMMFields)
+    if (Math.abs(X0 - X1) > 0.001 && (true === PDSH.DrawMMFields || fieldtype_FORMTEXT === this.Get_FieldType()))
     {
         PDSH.MMFields.Add(Y0, Y1, X0, X1, 0, 0, 0, 0  );
     }
+};
+ParaField.prototype.Is_UseInDocument = function()
+{
+	return (this.Paragraph && true === this.Paragraph.Is_UseInDocument() && true === this.Is_UseInParagraph() ? true : false);
+};
+ParaField.prototype.Is_UseInParagraph = function()
+{
+	if (!this.Paragraph)
+		return false;
+
+	var ContentPos = this.Paragraph.Get_PosByElement(this);
+	if (!ContentPos)
+		return false;
+
+	return true;
+};
+ParaField.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
+{
+	if (false === UseContentPos && this.Content.length > 0)
+	{
+		// При переходе в новый контент встаем в его конец
+		var CurPos = this.Content.length - 1;
+		this.Content[CurPos].Get_EndPos(false, SearchPos.Pos, Depth + 1);
+		SearchPos.Pos.Update(CurPos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	ParaField.superclass.Get_LeftPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
+};
+ParaField.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+{
+	if (false === UseContentPos && this.Content.length > 0)
+	{
+		// При переходе в новый контент встаем в его начало
+		this.Content[0].Get_StartPos(SearchPos.Pos, Depth + 1);
+		SearchPos.Pos.Update(0, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	ParaField.superclass.Get_RightPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
+};
+ParaField.prototype.Remove = function(nDirection, bOnAddText)
+{
+	ParaField.superclass.Remove.call(this, nDirection, bOnAddText);
+
+	if (this.Is_Empty() && !bOnAddText && fieldtype_FORMTEXT === this.Get_FieldType() && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	{
+		var sDefaultText = this.FormFieldDefaultText == "" ? "     " : this.FormFieldDefaultText;
+		this.SetValue(sDefaultText);
+	}
+};
+ParaField.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
+{
+	ParaField.superclass.Shift_Range.call(this, Dx, Dy, _CurLine, _CurRange);
+
+	var CurLine = _CurLine - this.StartLine;
+	var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+	var oRangeBounds = this.Bounds[((CurLine << 16) & 0xFFFF0000) | (CurRange & 0x0000FFFF)];
+	if (oRangeBounds)
+	{
+		oRangeBounds.X0 += Dx;
+		oRangeBounds.X1 += Dx;
+		oRangeBounds.Y0 += Dy;
+		oRangeBounds.Y1 += Dy;
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Работа с данными поля
@@ -374,6 +453,38 @@ ParaField.prototype.private_GetMappedRun = function(Value)
     oRun.Set_Pr(this.Get_FirstTextPr());
 
     return oRun;
+};
+ParaField.prototype.SetFormFieldName = function(sName)
+{
+	History.Add(new CChangesParaFieldFormFieldName(this, this.FormFieldName, sName));
+	this.FormFieldName = sName;
+};
+ParaField.prototype.GetFormFieldName = function()
+{
+	return this.FormFieldName;
+};
+ParaField.prototype.SetFormFieldDefaultText = function(sText)
+{
+	History.Add(new CChangesParaFieldFormFieldDefaultText(this, this.FormFieldDefaultText, sText));
+	this.FormFieldDefaultText = sText;
+};
+ParaField.prototype.GetValue = function()
+{
+	var oText = new CParagraphGetText();
+	oText.SetBreakOnNonText(false);
+	oText.SetParaEndToSpace(true);
+
+	this.Get_Text(oText);
+
+	return oText.Text;
+};
+ParaField.prototype.SetValue = function(sValue)
+{
+	var oRun = this.private_GetMappedRun(sValue);
+	oRun.Apply_TextPr(this.Get_TextPr(), undefined, true);
+	this.Remove_FromContent(0, this.Content.length);
+	this.Add_ToContent(0, oRun);
+	this.Cursor_MoveToStartPos();
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования

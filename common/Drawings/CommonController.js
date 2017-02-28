@@ -1234,48 +1234,15 @@ DrawingObjectsController.prototype =
 
     getFromTargetTextObjectContextMenuPosition: function(oTargetTextObject, pageIndex)
     {
-        var dX, dY, oDocContent, oTransformText, oParagraph, document = editor.WordControl.m_oLogicDocument, dPosX = 0, dPosY = 0;
-        if(oTargetTextObject.getObjectType() === AscDFH.historyitem_type_Shape || oTargetTextObject.getObjectType() === AscDFH.historyitem_type_Title)
-        {
-            dPosX = document.TargetPos.X;
-            dPosY = document.TargetPos.Y;
-            oTransformText = oTargetTextObject.transformText;
-            return {X: oTransformText.TransformPointX(dPosX, dPosY), Y: oTransformText.TransformPointY(dPosX, dPosY), PageIndex: document.TargetPos.PageNum};
-        }
-        else if(oTargetTextObject.getObjectType() === AscDFH.historyitem_type_GraphicFrame)
-        {
-            var Doc = oTargetTextObject.graphicObject;
-            oTransformText = oTargetTextObject.transform;
-            if ( true === Doc.Is_SelectionUse() && !Doc.Selection_IsEmpty())
-            {
-                switch( Doc.Selection.Type )
-                {
-                    case table_Selection_Cell:
-                    {
-                        var oCellInfo = Doc.CurCell.Row.Get_CellInfo(Doc.CurCell.Index);
-                        var oCellMargins = Doc.CurCell.Get_Margins();
-                        dPosX = oCellInfo.X_content_start;
-                        dPosY = Doc.RowsInfo[Doc.CurCell.Row.Index].Y[0] + Doc.RowsInfo[Doc.CurCell.Row.Index].TopDy[0] + oCellMargins.Top.W +  Doc.CurCell.Temp.Y_VAlign_offset[0];
-                        dX = oTransformText.TransformPointX(dPosX, dPosY);
-                        dY = oTransformText.TransformPointY(dPosX, dPosY);
-                        return {X: dX, Y: dY, PageIndex: this.selectedObjects[0].selectStartPage};
-                    }
-                    case table_Selection_Text:
-                    {
-                        dPosX = document.TargetPos.X;
-                        dPosY = document.TargetPos.Y;
-                        oTransformText = oTargetTextObject.transformText;
-                        return {X: oTransformText.TransformPointX(dPosX, dPosY), Y: oTransformText.TransformPointY(dPosX, dPosY), PageIndex: document.TargetPos.PageNum};
-                    }
-                }
-            }
-            else
-            {
-                dPosX = document.TargetPos.X;
-                dPosY = document.TargetPos.Y;
-                oTransformText = oTargetTextObject.transformText;
-                return {X: oTransformText.TransformPointX(dPosX, dPosY), Y: oTransformText.TransformPointY(dPosX, dPosY), PageIndex: document.TargetPos.PageNum};
-            }
+        var oTransformText = oTargetTextObject.transformText;
+        var oTargetObjectOrTable = this.getTargetDocContent(false, true);
+        if(oTargetTextObject && oTargetObjectOrTable && oTargetObjectOrTable.Cursor_GetPos && oTransformText){
+            var oPos = oTargetObjectOrTable.Cursor_GetPos();
+            return {
+                X: oTransformText.TransformPointX(oPos.X, oPos.Y),
+                Y: oTransformText.TransformPointY(oPos.X, oPos.Y),
+                PageIndex: pageIndex
+            };
         }
         return {X: 0, Y: 0, PageIndex: pageIndex};
     },
@@ -1860,6 +1827,10 @@ DrawingObjectsController.prototype =
                 }
                 else
                 {
+                    var oDocContent = this.selectedObjects[0].getDocContent();
+                    if(oDocContent){
+                        oDocContent.Cursor_MoveToEndPos(false);
+                    }
                     this.selectedObjects[0].applyTextFunction(docContentFunction, tableFunction, args);
                     this.selection.textSelection.select(this, this.selection.textSelection.selectStartPage);
                 }
@@ -2880,6 +2851,10 @@ DrawingObjectsController.prototype =
         var sRange = chartSettings.getRange();
         var b_clear_formatting = false;
         chartSpace.resetSelection(true);
+        var oPr = this.getPropsFromChart(chart_space);
+        if(oPr.isEqual(chartSettings)){
+            return;
+        }
         if(this.drawingObjects && this.drawingObjects.getWorksheet && typeof sRange === "string" && sRange.length > 0)
         {
             var ws_view = this.drawingObjects.getWorksheet();
@@ -3004,6 +2979,14 @@ DrawingObjectsController.prototype =
         var axis_by_types;
         var val_ax, cat_ax;
         object_type = chart_type.getObjectType();
+        var sDefaultValAxFormatCode = null;
+        if(chart_type && chart_type.series[0]){
+            var aPoints = AscFormat.getPtsFromSeries(chart_type.series[0]);
+            if(aPoints[0] && typeof aPoints[0].formatCode === "string" && aPoints[0].formatCode.length > 0){
+                sDefaultValAxFormatCode = aPoints[0].formatCode;
+            }
+        }
+        need_num_fmt = sDefaultValAxFormatCode;
 
         var checkSwapAxis = function(plotArea, chartType, newChartType)
         {
@@ -3018,7 +3001,7 @@ DrawingObjectsController.prototype =
             }
             if(!val_ax || !cat_ax)
             {
-                var axis_obj = AscFormat.CreateDefaultAxises(need_num_fmt);
+                var axis_obj = AscFormat.CreateDefaultAxises(need_num_fmt ? need_num_fmt : "General");
                 cat_ax = axis_obj.catAx;
                 val_ax = axis_obj.valAx;
             }
@@ -3102,8 +3085,10 @@ DrawingObjectsController.prototype =
                     || type === c_oAscChartTypeSettings.barNormal3d || type === c_oAscChartTypeSettings.barStacked3d
                     || type === c_oAscChartTypeSettings.hBarNormal || type === c_oAscChartTypeSettings.hBarStacked
                     || type === c_oAscChartTypeSettings.hBarNormal3d || type === c_oAscChartTypeSettings.hBarStacked3d
-                    || type === c_oAscChartTypeSettings.barNormal3dPerspective)
-                    need_num_fmt = "General";
+                    || type === c_oAscChartTypeSettings.barNormal3dPerspective){
+                    need_num_fmt = sDefaultValAxFormatCode;
+
+                }
                 else
                     need_num_fmt = "0%";
 
@@ -3118,23 +3103,23 @@ DrawingObjectsController.prototype =
                     if(chart_type.grouping !== need_groupping)
                         chart_type.setGrouping(need_groupping);
 
-                    if(chart_type.gapWidth !== 150)
+                    if(!AscFormat.isRealNumber(chart_type.gapWidth))
                     {
                         chart_type.setGapWidth(150);
                     }
                     if(BAR_GROUPING_PERCENT_STACKED === need_groupping || BAR_GROUPING_STACKED === need_groupping)
                     {
-                        if(chart_type.overlap !== 100)
+                        if(!AscFormat.isRealNumber(chart_type.overlap))
                         {
                             chart_type.setOverlap(100);
                         }
                     }
                     else
                     {
-                        if(chart_type.overlap !== null)
+                        /*if(chart_type.overlap !== null)
                         {
                             chart_type.setOverlap(null);
-                        }
+                        }*/
                     }
 
                     axis_by_types = chart_type.getAxisByTypes();
@@ -3230,8 +3215,10 @@ DrawingObjectsController.prototype =
                         if(!val_axis[i].numFmt)
                         {
                             val_axis[i].setNumFmt(new AscFormat.CNumFmt());
+                            val_axis[i].numFmt.setFormatCode(sDefaultValAxFormatCode ? sDefaultValAxFormatCode : "General");
+                            val_axis[i].numFmt.setSourceLinked(true);
                         }
-                        if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                        if(need_num_fmt && val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                     }
                 }
@@ -3285,8 +3272,10 @@ DrawingObjectsController.prototype =
                         if(!val_axis[i].numFmt)
                         {
                             val_axis[i].setNumFmt(new AscFormat.CNumFmt());
+                            val_axis[i].numFmt.setFormatCode(sDefaultValAxFormatCode ? sDefaultValAxFormatCode : "General");
+                            val_axis[i].numFmt.setSourceLinked(true);
                         }
-                        if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                        if(need_num_fmt && val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                         if(need_bar_dir = BAR_DIR_BAR)
                             val_axis[i].setAxPos(AscFormat.AX_POS_B);
@@ -3316,7 +3305,7 @@ DrawingObjectsController.prototype =
 
                 if(type === c_oAscChartTypeSettings.lineNormal || type === c_oAscChartTypeSettings.lineStacked  || type === c_oAscChartTypeSettings.line3d
                     || type === c_oAscChartTypeSettings.lineNormalMarker || type === c_oAscChartTypeSettings.lineStackedMarker)
-                    need_num_fmt = "General";
+                    need_num_fmt = sDefaultValAxFormatCode;
                 else
                     need_num_fmt = "0%";
 
@@ -3332,8 +3321,10 @@ DrawingObjectsController.prototype =
                         if(!val_axis[i].numFmt)
                         {
                             val_axis[i].setNumFmt(new AscFormat.CNumFmt());
+                            val_axis[i].numFmt.setFormatCode(sDefaultValAxFormatCode ? sDefaultValAxFormatCode : "General");
+                            val_axis[i].numFmt.setSourceLinked(true);
                         }
-                        if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                        if(need_num_fmt && val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                     }
 
@@ -3402,8 +3393,10 @@ DrawingObjectsController.prototype =
                         if(!val_axis[i].numFmt)
                         {
                             val_axis[i].setNumFmt(new AscFormat.CNumFmt());
+                            val_axis[i].numFmt.setFormatCode(sDefaultValAxFormatCode ? sDefaultValAxFormatCode : "General");
+                            val_axis[i].numFmt.setSourceLinked(true);
                         }
-                        if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                        if(need_num_fmt && val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                     }
                     if(type === c_oAscChartTypeSettings.line3d)
@@ -3552,7 +3545,7 @@ DrawingObjectsController.prototype =
                     need_groupping = GROUPING_PERCENT_STACKED;
 
                 if(type === c_oAscChartTypeSettings.areaNormal || type === c_oAscChartTypeSettings.areaStacked)
-                    need_num_fmt = "General";
+                    need_num_fmt = sDefaultValAxFormatCode;
                 else
                     need_num_fmt = "0%";
 
@@ -3566,8 +3559,10 @@ DrawingObjectsController.prototype =
                         if(!val_axis[i].numFmt)
                         {
                             val_axis[i].setNumFmt(new AscFormat.CNumFmt());
+                            val_axis[i].numFmt.setFormatCode(sDefaultValAxFormatCode ? sDefaultValAxFormatCode : "General");
+                            val_axis[i].numFmt.setSourceLinked(true);
                         }
-                        if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                        if(need_num_fmt && val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                     }
                 }
@@ -3583,8 +3578,10 @@ DrawingObjectsController.prototype =
                         if(!val_axis[i].numFmt)
                         {
                             val_axis[i].setNumFmt(new AscFormat.CNumFmt());
+                            val_axis[i].numFmt.setFormatCode(sDefaultValAxFormatCode ? sDefaultValAxFormatCode : "General");
+                            val_axis[i].numFmt.setSourceLinked(true);
                         }
-                        if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                        if(need_num_fmt && val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                     }
                     new_chart_type.setGrouping(need_groupping);
@@ -3632,6 +3629,7 @@ DrawingObjectsController.prototype =
                         if(!val_axis[i].numFmt)
                         {
                             val_axis[i].setNumFmt(new AscFormat.CNumFmt());
+                            val_axis[i].numFmt.setSourceLinked(true);
                         }
                         if(val_axis[i].numFmt.formatCode !== "General")
                             val_axis[i].numFmt.setFormatCode("General");
@@ -3830,24 +3828,14 @@ DrawingObjectsController.prototype =
         var data_labels_pos_setting = chartSettings.getDataLabelsPos();
         if(AscFormat.isRealNumber(data_labels_pos_setting))
         {
-            if(data_labels_pos_setting === c_oAscChartDataLabelsPos.none)
-            {
+            if(data_labels_pos_setting === c_oAscChartDataLabelsPos.none){
                 if(chart_type.dLbls)
                     chart_type.setDLbls(null);
                 chart_type.removeDataLabels();
             }
             else
             {
-                if(AscFormat.isRealNumber(data_labels_pos_setting))
-                {
-                    chart_type.removeDataLabels();
-                    if(!chart_type.dLbls)
-                    {
-                        var d_lbls = new AscFormat.CDLbls();
-                        d_lbls.setShowVal(true);
-                        chart_type.setDLbls(d_lbls);
-                        chart_type.dLbls.setParent(chart_type);
-                    }
+                if(AscFormat.isRealNumber(data_labels_pos_setting)){
                     var finish_dlbl_pos =  data_labels_pos_setting;
 
                     switch (chart_type.getObjectType())
@@ -3916,49 +3904,69 @@ DrawingObjectsController.prototype =
                         }
                     }
 
-                    if(chart_type.dLbls.dLblPos !== finish_dlbl_pos)
-                        chart_type.dLbls.setDLblPos(finish_dlbl_pos);
+                    for(var i = 0; i < chart_type.series.length; ++i){
+                        if(chart_type.series[i].setDLbls){
+                            if(!chart_type.series[i].dLbls){
+                                var d_lbls = new AscFormat.CDLbls();
+                                d_lbls.setShowVal(true);
+                                chart_type.series[i].setDLbls(d_lbls);
+                                chart_type.series[i].dLbls.setParent(chart_type);
+                            }
+                            if(chart_type.series[i].dLbls.dLblPos !== finish_dlbl_pos){
+                                chart_type.series[i].dLbls.setDLblPos(finish_dlbl_pos);
+                            }
+                            for(var j = 0; j < chart_type.series[i].dLbls.dLbl.length; ++j){
+                                if(chart_type.series[i].dLbls.dLbl[j].dLblPos !== finish_dlbl_pos){
+                                    chart_type.series[i].dLbls.dLbl[j].setDLblPos(finish_dlbl_pos);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
         //подписи данных
         if(typeof chart_type.setDLbls === "function" && AscFormat.isRealNumber(chartSettings.getDataLabelsPos()) && chartSettings.getDataLabelsPos() !== c_oAscChartDataLabelsPos.none)
         {
-            var checkDataLabels = function(chartType)
-            {
-                chartType.removeDataLabels();
-                if(!chartType.dLbls)
-                {
-                    chartType.setDLbls(new AscFormat.CDLbls());
-                    chartType.dLbls.setParent(chartType);
-                }
-                return chartType.dLbls;
-            };
-            if(AscFormat.isRealBool(chartSettings.showCatName))
-                checkDataLabels(chart_type).setShowCatName(chartSettings.showCatName);
-            if(AscFormat.isRealBool(chartSettings.showSerName))
-                checkDataLabels(chart_type).setShowSerName(chartSettings.showSerName);
-            if(AscFormat.isRealBool(chartSettings.showVal))
-                checkDataLabels(chart_type).setShowVal(chartSettings.showVal);
-
-            var d_lbls2 = chart_type.dLbls;
-            if(d_lbls2)
-            {
-                if(!AscFormat.isRealBool(d_lbls2.showLegendKey) || d_lbls2.showLegendKey === true)
-                {
-                    d_lbls2.setShowLegendKey(false);
-                }
-                if(!AscFormat.isRealBool(d_lbls2.showPercent) || d_lbls2.showPercent === true)
-                {
-                    d_lbls2.setShowPercent(false);
-                }
-                if(!AscFormat.isRealBool(d_lbls2.showBubbleSize) || d_lbls2.showBubbleSize === true)
-                {
-                    d_lbls2.setShowBubbleSize(false);
+            if(AscFormat.isRealBool(chartSettings.showCatName) ||
+                AscFormat.isRealBool(chartSettings.showSerName) ||
+                AscFormat.isRealBool(chartSettings.showVal)){
+                var fCheckLbls = function(oLbl){
+                    if(AscFormat.isRealBool(chartSettings.showCatName)){
+                        oLbl.setShowCatName(chartSettings.showCatName);
+                    }
+                    if(AscFormat.isRealBool(chartSettings.showSerName)){
+                        oLbl.setShowSerName(chartSettings.showSerName);
+                    }
+                    if(AscFormat.isRealBool(chartSettings.showVal)){
+                        oLbl.setShowVal(chartSettings.showVal);
+                    }
+                    if(!AscFormat.isRealBool(oLbl.showLegendKey) || oLbl.showLegendKey === true)                {
+                        oLbl.setShowLegendKey(false);
+                    }
+                    if(!AscFormat.isRealBool(oLbl.showPercent) || oLbl.showPercent === true){
+                        oLbl.setShowPercent(false);
+                    }
+                    if(!AscFormat.isRealBool(oLbl.showBubbleSize) || oLbl.showBubbleSize === true){
+                        oLbl.setShowBubbleSize(false);
+                    }
+                    if(typeof chartSettings.separator === "string" && chartSettings.separator.length > 0)
+                        oLbl.setSeparator(chartSettings.separator);
+                };
+                for(var i = 0; i < chart_type.series.length; ++i){
+                    var oSeries = chart_type.series[i];
+                    if(oSeries.setDLbls){
+                        if(!oSeries.dLbls){
+                            oSeries.setDLbls(new AscFormat.CDLbls());
+                            oSeries.dLbls.setParent(oSeries);
+                        }
+                    }
+                    fCheckLbls(oSeries.dLbls);
+                    for(var j = 0; j < oSeries.dLbls.dLbl.length; ++j){
+                        fCheckLbls(oSeries.dLbls.dLbl[j]);
+                    }
                 }
             }
-            if(typeof chartSettings.separator === "string" && chartSettings.separator.length > 0)
-                checkDataLabels(chart_type).setSeparator(chartSettings.separator);
         }
 
         if(chart_type.getObjectType() === AscDFH.historyitem_type_LineChart )
@@ -4283,7 +4291,12 @@ DrawingObjectsController.prototype =
             ret.putShowCatName(data_labels.showCatName === true);
             ret.putShowVal(data_labels.showVal === true);
             ret.putSeparator(data_labels.separator);
-            ret.putDataLabelsPos(AscFormat.isRealNumber(data_labels.dLblPos) ? data_labels.dLblPos :  nDefaultDatalabelsPos);
+            if(data_labels.showSerName || data_labels.showCatName || data_labels.showVal){
+                ret.putDataLabelsPos(AscFormat.isRealNumber(data_labels.dLblPos) ? data_labels.dLblPos :  nDefaultDatalabelsPos);
+            }
+            else{
+                ret.putDataLabelsPos(c_oAscChartDataLabelsPos.none);
+            }
         }
         else
         {
@@ -6362,9 +6375,9 @@ DrawingObjectsController.prototype =
         this.checkSelectedObjectsAndCallback(this.unGroupCallback, null, false, AscDFH.historydescription_CommonControllerUnGroup)
     },
 
-    getSelectedObjectsBounds: function()
+    getSelectedObjectsBounds: function(isTextSelectionUse)
     {
-        if(!this.getTargetDocContent() && this.selectedObjects.length > 0)
+        if((!this.getTargetDocContent() || true === isTextSelectionUse) && this.selectedObjects.length > 0)
         {
             var nPageIndex, aDrawings, oRes, aSelectedCopy, i;
             if(this.selection.groupSelection)
@@ -7671,6 +7684,7 @@ DrawingObjectsController.prototype =
         {
             oSelectedContent = this.document.Get_SelectedContent(true);
             oContent.Recalculate_Page(0, true);
+            oContent.Cursor_MoveToStartPos(false);
             oNearestPos = oContent.Get_NearestPos(0, 0, 0, false, undefined);
             oNearestPos.Paragraph.Check_NearestPos( oNearestPos );
             if(oSelectedContent && this.document.Can_InsertContent(oSelectedContent, oNearestPos))
@@ -7706,7 +7720,7 @@ DrawingObjectsController.prototype =
                 oSelectedContent.MoveDrawing = true;
 
                 oContent.Recalculate_Page(0, true);
-
+                oContent.Cursor_MoveToStartPos(false);
                 var paragraph = oContent.Content[oContent.CurPos.ContentPos];
                 if (null != paragraph && type_Paragraph == paragraph.GetType())
                 {
@@ -10107,7 +10121,7 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
     for(i = 0; i < oChart.series.length; ++i){
         var pts = AscFormat.getPtsFromSeries(oChart.series[i]);
 
-        for(var j = oChart.series[i].dPt.length; j > -1; --j){
+        for(var j = oChart.series[i].dPt.length - 1; j > -1; --j){
             oChart.series[i].removeDPt(j);
         }
         if(oChart.getObjectType() === AscDFH.historyitem_type_PieChart || oChart.getObjectType() === AscDFH.historyitem_type_DoughnutChart){
@@ -10125,27 +10139,30 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
             ApplySpPr(aPreset[11], oChart.series[i], i, base_fills, bAccent1Background);
         }
         if(oChart.getObjectType() === AscDFH.historyitem_type_PieChart || oChart.getObjectType() === AscDFH.historyitem_type_DoughnutChart){
-            ApplyDLblsProps(aPreset[12], oChart.series[i], oDrawingDocument, i, base_fills, bCreate);
+            ApplyDLblsProps(aPreset[12], oChart.series[i], oDrawingDocument, i, base_fills, true);
             if(oChart.series[i].dLbls){
                 for(var j = 0; j < pts.length; ++j){
-                    var oDLbl = new AscFormat.CDLbl();
-                    ApplyTxPr(aPreset[12][0], oDLbl, oDrawingDocument, j, base_fills, bAccent1Background);
-                    ApplySpPr(aPreset[12][1], oDLbl, j, base_fills, bAccent1Background);
-                    oDLbl.setDLblPos(aPreset[12][2]);
-                    oDLbl.setSeparator(aPreset[12][3]);
-                    oDLbl.setShowBubbleSize(aPreset[12][4]);
-                    oDLbl.setShowCatName(aPreset[12][5]);
-                    oDLbl.setShowLegendKey(aPreset[12][7]);
-                    oDLbl.setShowPercent(aPreset[12][8]);
-                    oDLbl.setShowSerName(aPreset[12][9]);
-                    oDLbl.setShowVal(aPreset[12][10]);
-                    oDLbl.setIdx(pts[j].idx);
-                    oChart.series[i].dLbls.addDLbl(oDLbl);
+                    var oDLbl = oChart.series[i].dLbls.findDLblByIdx(pts[j].idx);
+                    if(!oDLbl){
+                        oDLbl = new AscFormat.CDLbl();
+                        oChart.series[i].dLbls.addDLbl(oDLbl);
+                        oDLbl.setIdx(pts[j].idx);
+                        ApplyTxPr(aPreset[12][0], oDLbl, oDrawingDocument, j, base_fills, bAccent1Background);
+                        ApplySpPr(aPreset[12][1], oDLbl, j, base_fills, bAccent1Background);
+                        oDLbl.setDLblPos(aPreset[12][2]);
+                        oDLbl.setSeparator(aPreset[12][3]);
+                        oDLbl.setShowBubbleSize(aPreset[12][4]);
+                        oDLbl.setShowCatName(aPreset[12][5]);
+                        oDLbl.setShowLegendKey(aPreset[12][7]);
+                        oDLbl.setShowPercent(aPreset[12][8]);
+                        oDLbl.setShowSerName(aPreset[12][9]);
+                        oDLbl.setShowVal(aPreset[12][10]);
+                    }
                 }
             }
         }
         else{
-            ApplyDLblsProps(aPreset[12], oChart.series[i], oDrawingDocument, i, base_fills, bCreate);
+            ApplyDLblsProps(aPreset[12], oChart.series[i], oDrawingDocument, i, base_fills, true);
         }
     }
 

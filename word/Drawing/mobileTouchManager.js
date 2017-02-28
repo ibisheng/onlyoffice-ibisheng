@@ -92,7 +92,8 @@
 		AscCommon.check_MouseDownEvent(e.touches ? e.touches[0] : e, true);
 		global_mouseEvent.KoefPixToMM = 1;
 		global_mouseEvent.LockMouse();
-		this.Api.sendEvent("asc_onHidePopMenu");
+
+		this.ClearContextMenu();
 
 		this.TableCurrentMoveValueMin = null;
 		this.TableCurrentMoveValueMax = null;
@@ -495,7 +496,8 @@
 					this.Api.sendEvent("asc_onTapEvent", e);
 
 					var typeMenu = this.delegate.GetContextMenuType();
-					if (typeMenu == AscCommon.MobileTouchContextMenuType.Target)
+					if (typeMenu == AscCommon.MobileTouchContextMenuType.Target ||
+						typeMenu == AscCommon.MobileTouchContextMenuType.Select)
 						isPreventDefault = false;
 				}
 				else
@@ -759,7 +761,7 @@
 		// создаем делегата. инициализация его - ПОСЛЕ создания iScroll
 		this.delegate.Init(this);
 
-		this.Api.sendEvent("asc_onHidePopMenu");
+		this.ClearContextMenu();
 	};
 
 	CReaderTouchManager.prototype.onTouchStart = function(e)

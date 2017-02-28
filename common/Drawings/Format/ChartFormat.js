@@ -6684,6 +6684,15 @@ CDLbls.prototype =
             pr.parent = this;
         }
     },
+    removeDLbl: function(nIndex)
+    {
+        History.Add(new CChangesDrawingsContent(this, AscDFH.historyitem_DLbls_SetDLbl, nIndex, this.dLbl.splice(nIndex, 1), false));
+    },
+    removeAllDLbls: function(){
+        for(var i = this.dLbl.length - 1; i > -1; --i){
+            this.removeDLbl(i);
+        }
+    },
     setDLblPos: function(pr)
     {
         History.Add(new CChangesDrawingsLong(this, AscDFH.historyitem_DLbls_SetDLblPos, this.dLblPos, pr));
@@ -13341,6 +13350,13 @@ CView3d.prototype =
     },
 
     getRAngAx: function(){
+
+        if(AscFormat.isRealBool(this.rAngAx)){
+            return this.rAngAx;
+        }
+        if(AscFormat.isRealNumber(this.perspective)){
+            return false;
+        }
         return this.rAngAx !== false;
     },
 
@@ -13353,7 +13369,7 @@ CView3d.prototype =
     {
         History.Add(new CChangesDrawingsLong(this, AscDFH.historyitem_View3d_SetRotY, this.rotY, pr));
         this.rotY = pr;
-            }
+    }
 };
 
 function CreateTextBodyFromString(str, drawingDocument, parent)
@@ -13386,6 +13402,7 @@ function CreateDocContentFromString(str, drawingDocument, parent)
 
 function AddToContentFromString(content, str)
 {
+    content.Cursor_MoveToStartPos(false);
     for(var i = 0; i < str.length; ++i)
     {
         var ch = str[i];

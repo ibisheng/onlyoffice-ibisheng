@@ -43,7 +43,6 @@
    * Import
    * -----------------------------------------------------------------------------
    */
-  var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
   var c_oAscFormatPainterState = AscCommon.c_oAscFormatPainterState;
   var AscBrowser = AscCommon.AscBrowser;
   var CColor = AscCommon.CColor;
@@ -119,6 +118,8 @@
     ctx.fillRect(0, 0, 1, 1);
     ctx.fillRect(1, 1, 1, 1);
     this.ptrnLineDotted1 = ctx.createPattern(cnv, "repeat");
+
+    this.halfSelection = false;
 
     return this;
   }
@@ -2875,6 +2876,14 @@
 			H: asc.c_oAscSelectionType.RangeCol === type ? _offY :
 				ws.getCellTop(range.r2, 3) - t + ws.getRowHeight(range.r2, 3),
 			T: type
+		};
+	};
+	WorkbookView.prototype.GetCaptionSize = function()
+	{
+		var ws = this.getWorksheet();
+		return {
+			W:  ws.cellsLeft * asc_getcvt(1/*pt*/, 3/*mm*/, ws._getPPIX()),
+			H: ws.cellsTop * asc_getcvt(1/*pt*/, 3/*mm*/, ws._getPPIY())
 		};
 	};
 	WorkbookView.prototype.ConvertXYToLogic = function (x, y) {

@@ -2595,7 +2595,7 @@ CTable.prototype =
 
         if ( true != this.Is_Inline() )
         {
-            if ( false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
+            if ( false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties, null, true) )
             {
                 oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_MoveInlineTable);
 
@@ -2667,29 +2667,30 @@ CTable.prototype =
 
                     }
 
-                    if ( NewDocContent != OldDocContent )
-                    {
-                        // Сначала добавляем таблицу в новый класс
-                        NewDocContent.Internal_Content_Add( NewIndex, this );
+					var oTargetTable = AscCommon.CollaborativeEditing.Is_SingleUser() ? this : this.Copy(NewDocContent);
+					if (NewDocContent != OldDocContent)
+					{
+						// Сначала добавляем таблицу в новый класс
+						NewDocContent.Internal_Content_Add(NewIndex, oTargetTable);
 
-                        // Удаляем таблицу из родительского класса
-                        OldDocContent.Internal_Content_Remove( OldIndex, 1 );
+						// Удаляем таблицу из родительского класса
+						OldDocContent.Internal_Content_Remove(OldIndex, 1);
 
-                        this.Parent = NewDocContent;
-                    }
-                    else
-                    {
-                        if ( NearestPos.Paragraph.Index > this.Index )
-                        {
-                            NewDocContent.Internal_Content_Add( NewIndex, this );
-                            OldDocContent.Internal_Content_Remove( OldIndex, 1 );
-                        }
-                        else
-                        {
-                            OldDocContent.Internal_Content_Remove( OldIndex, 1 );
-                            NewDocContent.Internal_Content_Add( NewIndex, this );
-                        }
-                    }
+						oTargetTable.Parent = NewDocContent;
+					}
+					else
+					{
+						if (NearestPos.Paragraph.Index > this.Index)
+						{
+							NewDocContent.Internal_Content_Add(NewIndex, oTargetTable);
+							OldDocContent.Internal_Content_Remove(OldIndex, 1);
+						}
+						else
+						{
+							OldDocContent.Internal_Content_Remove(OldIndex, 1);
+							NewDocContent.Internal_Content_Add(NewIndex, oTargetTable);
+						}
+					}
                 }
 
                 editor.WordControl.m_oLogicDocument.Recalculate();
@@ -2700,7 +2701,7 @@ CTable.prototype =
         else
         {
             // Проверяем, можно ли двигать данную таблицу
-            if ( false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties, { Type : AscCommon.changestype_2_InlineObjectMove, PageNum : PageNum, X : X, Y : Y }) )
+            if ( false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties, { Type : AscCommon.changestype_2_InlineObjectMove, PageNum : PageNum, X : X, Y : Y }, true) )
             {
                 oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_MoveFlowTable);
 
@@ -2734,30 +2735,30 @@ CTable.prototype =
                         NewIndex++;
                     }
 
+					var oTargetTable = AscCommon.CollaborativeEditing.Is_SingleUser() ? this : this.Copy(NewDocContent);
+					if (NewDocContent != OldDocContent)
+					{
+						// Сначала добавляем таблицу в новый класс
+						NewDocContent.Internal_Content_Add(NewIndex, oTargetTable);
 
-                    if ( NewDocContent != OldDocContent )
-                    {
-                        // Сначала добавляем таблицу в новый класс
-                        NewDocContent.Internal_Content_Add( NewIndex, this );
+						// Удаляем таблицу из родительского класса
+						OldDocContent.Internal_Content_Remove(OldIndex, 1);
 
-                        // Удаляем таблицу из родительского класса
-                        OldDocContent.Internal_Content_Remove( OldIndex, 1 );
-
-                        this.Parent = NewDocContent;
-                    }
-                    else
-                    {
-                        if ( NearestPos.Paragraph.Index > this.Index )
-                        {
-                            NewDocContent.Internal_Content_Add( NewIndex, this );
-                            OldDocContent.Internal_Content_Remove( OldIndex, 1 );
-                        }
-                        else
-                        {
-                            OldDocContent.Internal_Content_Remove( OldIndex, 1 );
-                            NewDocContent.Internal_Content_Add( NewIndex, this );
-                        }
-                    }
+						oTargetTable.Parent = NewDocContent;
+					}
+					else
+					{
+						if (NearestPos.Paragraph.Index > this.Index)
+						{
+							NewDocContent.Internal_Content_Add(NewIndex, oTargetTable);
+							OldDocContent.Internal_Content_Remove(OldIndex, 1);
+						}
+						else
+						{
+							OldDocContent.Internal_Content_Remove(OldIndex, 1);
+							NewDocContent.Internal_Content_Add(NewIndex, oTargetTable);
+						}
+					}
 
                     editor.WordControl.m_oLogicDocument.Recalculate();
                 }
@@ -11782,7 +11783,7 @@ CTable.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
             _DocPos = null;
             _Flag = 1;
         }
-        else if (CurRowRow > 0)
+        else if (CurRow > 0)
         {
             CurRow--;
             _DocPos = null;
@@ -12689,3 +12690,4 @@ CTableAnchorPosition.prototype =
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CTable = CTable;
+window['AscCommonWord'].type_Table = type_Table;

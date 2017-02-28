@@ -2609,7 +2609,7 @@ Paragraph.prototype =
 
                 // TODO: Как только избавимся от para_End переделать здесь
                 // Последние 2 элемента не удаляем (один для para_End, второй для всего остального)
-                if (StartPos < this.Content.length - 2 && true === this.Content[StartPos].Is_Empty() && true !== this.Content[StartPos].Is_CheckingNearestPos())
+				if (StartPos < this.Content.length - 2 && true === this.Content[StartPos].Is_Empty() && true !== this.Content[StartPos].Is_CheckingNearestPos() && !bOnAddText)
                 {
                     if ( this.Selection.StartPos === this.Selection.EndPos )
                         this.Selection.Use = false;
@@ -3714,7 +3714,7 @@ Paragraph.prototype =
         }
 
         // Если курсор находится в начале или конце гиперссылки, тогда выводим его из гиперссылки
-        while ( CurPos > 0 && para_Run !== this.Content[CurPos].Type && para_Math !== this.Content[CurPos].Type && true === this.Content[CurPos].Cursor_Is_Start() )
+        while ( CurPos > 0 && para_Run !== this.Content[CurPos].Type && para_Math !== this.Content[CurPos].Type && para_Field !== this.Content[CurPos].Type && true === this.Content[CurPos].Cursor_Is_Start() )
         {
             if ( false === this.Content[CurPos - 1].Is_CursorPlaceable() )
                 break;
@@ -3723,7 +3723,7 @@ Paragraph.prototype =
             this.Content[CurPos].Cursor_MoveToEndPos();
         }
 
-        while ( CurPos < Count && para_Run !== this.Content[CurPos].Type && para_Math !== this.Content[CurPos].Type && true === this.Content[CurPos].Cursor_Is_End() )
+        while ( CurPos < Count && para_Run !== this.Content[CurPos].Type && para_Math !== this.Content[CurPos].Type && para_Field !== this.Content[CurPos].Type && true === this.Content[CurPos].Cursor_Is_End() )
         {
             if ( false === this.Content[CurPos + 1].Is_CursorPlaceable() )
                 break;
@@ -4406,7 +4406,7 @@ Paragraph.prototype =
 
         CurPos--;
 
-        if (CurPos >= 0 && para_Math === this.Content[CurPos + 1].Type)
+        if (CurPos >= 0 && (para_Math === this.Content[CurPos + 1].Type || para_Field === this.Content[CurPos + 1].Type))
         {
             // При выходе из формулы встаем в конец рана
             this.Content[CurPos].Get_EndPos(false, SearchPos.Pos, Depth + 1);
@@ -4443,7 +4443,7 @@ Paragraph.prototype =
         CurPos++;
 
         var Count = this.Content.length;
-        if (CurPos < Count && para_Math === this.Content[CurPos - 1].Type)
+        if (CurPos < Count && (para_Math === this.Content[CurPos - 1].Type || para_Field === this.Content[CurPos - 1].Type))
         {
             // При выходе из формулы встаем в конец рана
             this.Content[CurPos].Get_StartPos(SearchPos.Pos, Depth + 1);
@@ -5334,7 +5334,6 @@ Paragraph.prototype =
             if ((para_Hyperlink === CurElement.Type || para_Math === CurElement.Type || para_Field === CurElement.Type) && true === CurElement.Is_Empty() && true !== CurElement.Is_CheckingNearestPos())
             {
                 this.Internal_Content_Remove(CurPos);
-                CurPos++;
             }
             else if (para_Comment === CurElement.Type && false === CurElement.Start)
             {
@@ -6204,7 +6203,11 @@ Paragraph.prototype =
 
         if ( 0 === SelectionStartPos.Compare( SelectionEndPos ) && AscCommon.g_mouse_event_type_up === MouseEvent.Type )
         {
-            var NumPr = this.Numbering_Get();
+			var NumPr = this.Numbering_Get();
+			var oInfo = new CSelectedElementsInfo();
+			this.Get_SelectedElementsInfo(oInfo);
+			var oField = oInfo.Get_Field();
+
             if ( true === SearchPosXY.Numbering && undefined != NumPr )
             {
                 // Передвигаем курсор в начало параграфа
@@ -6214,6 +6217,12 @@ Paragraph.prototype =
                 this.Parent.Update_ContentIndexing();
                 this.Parent.Document_SelectNumbering(NumPr, this.Index);
             }
+            else if (oField && fieldtype_FORMTEXT === oField.Get_FieldType())
+			{
+				// TODO: Пока у нас невложенные поля так будет работать нормально. Со вложенными нужно переделать.
+				oField.Select_All(1);
+				this.Selection.Use = true;
+			}
             else
             {
                 var ClickCounter = MouseEvent.ClickCount % 2;
@@ -9096,16 +9105,21 @@ Paragraph.prototype =
                 var Y_Bottom_Margin = Page_Height - Y_Bottom_Field;
                 var Y_Top_Margin    = Y_Top_Field;
 
-                var Para    = DrawingLayout.Paragraph;
                 var CurPage = DrawingLayout.Page;
                 var Drawing = DrawingLayout.Drawing;
 
-                var DrawingObjects = this.Parent.DrawingObjects;
-                var PageLimits     = this.Parent.Get_PageLimits(this.PageNum + CurPage);
-                var PageFields     = this.Parent.Get_PageFields(this.PageNum + CurPage);
+				var PageAbs   = this.Get_AbsolutePage(CurPage);
+				var ColumnAbs = this.Get_AbsoluteColumn(CurPage);
 
-                var ColumnStartX = (0 === CurPage ? this.X_ColumnStart : this.Pages[CurPage].X);
-                var ColumnEndX   = (0 === CurPage ? this.X_ColumnEnd   : this.Pages[CurPage].XLimit);
+                var PageLimits     = this.Parent.Get_PageLimits(this.Get_AbsolutePage(PageAbs));
+                var PageFields     = this.Parent.Get_PageFields(this.Get_AbsolutePage(PageAbs));
+
+                var _CurPage = 0;
+                if (0 !== PageAbs && CurPage > ColumnAbs)
+					_CurPage = CurPage - ColumnAbs;
+
+				var ColumnStartX = this.Pages[_CurPage].X;
+				var ColumnEndX   = this.Pages[_CurPage].XLimit;
 
                 var Top_Margin    = Y_Top_Margin;
                 var Bottom_Margin = Y_Bottom_Margin;
@@ -9124,7 +9138,7 @@ Paragraph.prototype =
                     PageLimits = LD_PageLimits;
                 }
 
-                var ParagraphTop = (true != Drawing.Use_TextWrap() ? this.Lines[Para.Pages[CurPage].StartLine].Top + this.Pages[CurPage].Y : this.Pages[CurPage].Y);
+                var ParagraphTop = (true != Drawing.Use_TextWrap() ? this.Lines[this.Pages[_CurPage].StartLine].Top + this.Pages[_CurPage].Y : this.Pages[_CurPage].Y);
                 var Layout = new CParagraphLayout(DrawingLayout.X, DrawingLayout.Y , this.Get_AbsolutePage(CurPage), DrawingLayout.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, ParagraphTop);
                 return {ParagraphLayout : Layout, PageLimits : PageLimits};
             }
@@ -13017,6 +13031,7 @@ function CParagraphSearchPosXY()
     this.InText    = false;
     this.Numbering = false;
     this.End       = false;
+    this.Field     = null;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

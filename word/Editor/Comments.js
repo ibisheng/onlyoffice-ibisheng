@@ -210,6 +210,38 @@ function CCommentData()
         }
     };
 }
+CCommentData.prototype.GetUserName = function()
+{
+	return this.m_sUserName;
+};
+CCommentData.prototype.GetDateTime = function()
+{
+	var nTime = parseInt(this.m_sTime);
+	if (isNaN(nTime))
+		nTime = 0;
+
+	return nTime;
+};
+CCommentData.prototype.GetRepliesCount = function()
+{
+	return this.Get_RepliesCount();
+};
+CCommentData.prototype.GetReply = function(nIndex)
+{
+	return this.Get_Reply(nIndex);
+};
+CCommentData.prototype.GetText = function()
+{
+	return this.Get_Text();
+};
+CCommentData.prototype.GetQuoteText = function()
+{
+	return this.Get_QuoteText();
+};
+CCommentData.prototype.IsSolved = function()
+{
+	return this.m_bSolved;
+};
 
 function CCommentDrawingRect(X, Y, W, H, CommentId, InvertTransform)
 {
@@ -410,6 +442,10 @@ function CComment(Parent, Data)
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 }
+CComment.prototype.GetData = function()
+{
+	return this.Data;
+};
 
 var comments_NoComment        = 0;
 var comments_NonActiveComment = 1;
@@ -561,6 +597,10 @@ function CComments()
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 }
+CComments.prototype.GetAllComments = function()
+{
+	return this.m_aComments;
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // Класс для работы внутри параграфа
@@ -774,15 +814,19 @@ ParaComment.prototype =
                 Page = HdrFtr.RecalcInfo.CurPage;
         }
 
-        if ( true === this.Start )
-        {
-            Comment.Set_StartId( Para.Get_Id() );
-            Comment.Set_StartInfo( Page, X, Y, H );
-        }
-        else
-        {
-            Comment.Set_EndId( Para.Get_Id() );
-        }                
+		if (Para && Para === AscCommon.g_oTableId.Get_ById(Para.Get_Id()))
+		{
+			// Заглушка для повторяющегося заголовка в таблицах
+			if (true === this.Start)
+			{
+				Comment.Set_StartId(Para.Get_Id());
+				Comment.Set_StartInfo(Page, X, Y, H);
+			}
+			else
+			{
+				Comment.Set_EndId(Para.Get_Id());
+			}
+		}
     },
 
     Recalculate_PageEndInfo : function(PRSI, _CurLine, _CurRange)

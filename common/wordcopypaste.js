@@ -1888,7 +1888,7 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
     this.MsoStyles = {"mso-style-type": 1, "mso-pagination": 1, "mso-line-height-rule": 1, "mso-style-textfill-fill-color": 1, "mso-tab-count": 1,
         "tab-stops": 1, "list-style-type": 1, "mso-special-character": 1, "mso-column-break-before": 1, "mso-break-type": 1, "mso-padding-alt": 1, "mso-border-insidev": 1,
         "mso-border-insideh": 1, "mso-row-margin-left": 1, "mso-row-margin-right": 1, "mso-cellspacing": 1, "mso-border-alt": 1,
-        "mso-border-left-alt": 1, "mso-border-top-alt": 1, "mso-border-right-alt": 1, "mso-border-bottom-alt": 1, "mso-border-between": 1};
+        "mso-border-left-alt": 1, "mso-border-top-alt": 1, "mso-border-right-alt": 1, "mso-border-bottom-alt": 1, "mso-border-between": 1, "mso-list": 1};
     this.oBorderCache = {};
 }
 PasteProcessor.prototype =
@@ -2206,7 +2206,7 @@ PasteProcessor.prototype =
 	},
     ReadFromBinary : function(sBase64, oDocument)
 	{
-        var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
+        var openParams = { checkFileSize: false, charCount: 0, parCount: 0, bCopyPaste: true };
 		var doc = oDocument ? oDocument : this.oLogicDocument;
         var oBinaryFileReader = new AscCommonWord.BinaryFileReader(doc, openParams);
         var oRes = oBinaryFileReader.ReadFromString(sBase64, true);
@@ -2514,6 +2514,7 @@ PasteProcessor.prototype =
 					oThis.InsertInDocument();
 					if(aContent.bAddNewStyles)
 						oThis.api.GenerateStyles();
+					oThis.api.continueInsertDocumentUrls();
 				}
 			}
 			
@@ -4823,6 +4824,14 @@ PasteProcessor.prototype =
                 if(null != pNoHtmlPr.numType)
                     num = pNoHtmlPr.numType;
                 var type = pNoHtmlPr["list-style-type"];
+				
+				//TODO обработать символы из mso html
+				/*if(pNoHtmlPr['mso-list'])
+				{
+					var msoListIgnoreSymbol = this._getMsoListSymbol(node);
+					
+				}*/
+				
                 if(type)
                 {
                     switch(type)
@@ -4952,7 +4961,24 @@ PasteProcessor.prototype =
                     }
                 }
 				if(this.pasteInExcel !== true && Para.bFromDocument === true)
-					Para.Numbering_Add( NumId, 0 );
+				{
+					var lvl = 0;
+					if(pNoHtmlPr['mso-list'])
+					{
+						//TODO сделать полную поддержку mso-list при копировании списков из mso списков
+						var startIndex;
+						if(-1 != (startIndex = pNoHtmlPr['mso-list'].indexOf("level")))
+						{
+							lvl = parseInt(pNoHtmlPr['mso-list'].substr(startIndex + 5, 1)) - 1;
+						}
+						
+						Para.Numbering_Set( NumId, lvl );
+					}
+					else
+					{
+						Para.Numbering_Add( NumId, lvl );
+					}
+				}
             }
             else
             {
@@ -5221,6 +5247,74 @@ PasteProcessor.prototype =
             }
         }
     },
+	_getMsoListSymbol: function(node)
+	{
+		var res = null;
+		var nodeList  = this._getMsoListIgnore(node);
+		if(nodeList)
+		{
+			var value = nodeList.innerText;
+			if(value)
+			{
+				for(var k = 0, length = value.length; k < length; k++)
+				{
+					var nUnicode = null;
+					var nCharCode = value.charCodeAt(k);
+					if (AscCommon.isLeadingSurrogateChar(nCharCode)) 
+					{
+						if (k + 1 < length) 
+						{
+							k++;
+							var nTrailingChar = value.charCodeAt(k);
+							nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
+						}
+					}
+					else
+						nUnicode = nCharCode;
+					
+					if (null != nUnicode) {
+						var Item;
+						if (0x20 != nUnicode && 0xA0 != nUnicode && 0x2009 != nUnicode) 
+						{
+							if(!res)
+							{
+								res = "";
+							}
+							res += value.charAt(k);
+						}
+					}
+				}
+			}
+		}
+		return res;
+	},
+	_getMsoListIgnore: function(node)
+	{
+		if(!node || (node && !node.children))
+		{
+			return null;
+		}
+		
+		for(var i = 0; i < node.children.length; i++)
+		{
+			var child = node.children[i];
+			var style = child.getAttribute("style");
+			if(style)
+			{
+				var pNoHtml = {};
+				this._parseCss(style, pNoHtml);
+				if("Ignore" === pNoHtml["mso-list"])
+				{
+					return child;
+				}
+			}
+			
+			if(child.children && child.children.length)
+			{
+				return this._getMsoListIgnore(child);
+			}
+		}
+	},
     _AddNextPrevToContent : function(oDoc)
     {
         var prev = null;
@@ -6046,7 +6140,14 @@ PasteProcessor.prototype =
                         pPr.numType = numbering_presentationnumfrmt_ArabicPeriod;
                 }
             }
-
+			else if(pPr["mso-list"])
+			{
+				if("p" == sNodeName)
+				{
+					pPr.bNum = true;
+				}
+			}
+			
             if("img" == sNodeName && this.pasteInExcel !== true)
             {
                 if(PasteElementsId.g_bIsDocumentCopyPaste)

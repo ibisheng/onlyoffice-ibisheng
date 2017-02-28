@@ -139,6 +139,7 @@
 
 		this.canSave    = true;        // Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
 		this.IsUserSave = false;    // Флаг, контролирующий сохранение было сделано пользователем или нет (по умолчанию - нет)
+		this.isForceSaveOnUserSave = false;
 
 		// Version History
 		this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий
@@ -394,7 +395,7 @@
 		this.sendEvent("asc_onPrint");
 	};
 	// Open
-	baseEditorsApi.prototype.asc_LoadDocument                    = function(isVersionHistory, isRepeat)
+	baseEditorsApi.prototype.asc_LoadDocument                    = function(versionHistory, isRepeat)
 	{
 		// Меняем тип состояния (на открытие)
 		this.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.Open;
@@ -410,13 +411,14 @@
 				"title"         : this.documentTitle,
 				"embeddedfonts" : this.isUseEmbeddedCutFonts
 			};
-			if (isVersionHistory)
+			if (versionHistory)
 			{
+				rData["jwt"] = versionHistory.token;
 				//чтобы результат пришел только этому соединению, а не всем кто в документе
 				rData["userconnectionid"] = this.CoAuthoringApi.getUserConnectionId();
 			}
 		}
-		if (isVersionHistory) {
+		if (versionHistory) {
 			this.CoAuthoringApi.versionHistory(rData);
 		} else {
 			this.CoAuthoringApi.auth(this.getViewMode(), rData);
@@ -486,6 +488,10 @@
 	{
 		this.CoAuthoringApi.forceSave()
 	};
+	baseEditorsApi.prototype.asc_setIsForceSaveOnUserSave = function(val)
+	{
+		this.isForceSaveOnUserSave = val;
+	};
 	// Функция автосохранения. Переопределяется во всех редакторах
 	baseEditorsApi.prototype._autoSave = function () {
 	};
@@ -546,6 +552,9 @@
 		{
 			t.sendEvent('asc_onCoAuthoringChatReceiveMessage', e, clear);
 		};
+		this.CoAuthoringApi.onServerVersion = function (buildVersion, buildNumber) {
+			t.sendEvent('asc_onServerVersion', buildVersion, buildNumber);
+		};
 		this.CoAuthoringApi.onAuthParticipantsChanged = function(e, count)
 		{
 			t.sendEvent("asc_onAuthParticipantsChanged", e, count);
@@ -575,7 +584,7 @@
 					t.CoAuthoringApi.auth(t.getViewMode());
 				} else {
 					//первый запрос или ответ не дошел надо повторить открытие
-					t.asc_LoadDocument(false, true);
+					t.asc_LoadDocument(undefined, true);
 				}
 			}
 			else
@@ -642,6 +651,13 @@
 				} else {
 					t.CoAuthoringApi.disconnect(code, reason);
 				}
+			}
+		};
+		this.CoAuthoringApi.onForceSave = function(data) {
+			if (AscCommon.c_oAscForceSaveTypes.Button === data.type) {
+				t.sendEvent('asc_onForceSaveButton');
+			} else if (AscCommon.c_oAscForceSaveTypes.Timeout === data.type) {
+				t.sendEvent('asc_onForceSaveTimeout', data.saved);
 			}
 		};
 		/**

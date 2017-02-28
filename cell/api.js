@@ -313,13 +313,17 @@ var editor;
   };
 
 	spreadsheet_api.prototype.asc_Save = function (isAutoSave) {
+		this.IsUserSave = !isAutoSave;
 		if (!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction ||
-			this.isLongAction() ||
-			!(this.asc_isDocumentCanSave() || this.collaborativeEditing.haveOtherChanges() || this.canUnlockDocument)) {
+			this.isLongAction()) {
+			return;
+		} else if (!(this.asc_isDocumentCanSave() || this.collaborativeEditing.haveOtherChanges() || this.canUnlockDocument)) {
+			if (this.isForceSaveOnUserSave && this.IsUserSave) {
+				this.forceSave();
+			}
 			return;
 		}
 
-		this.IsUserSave = !isAutoSave;
 		if (this.IsUserSave) {
 			this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 		}
@@ -1358,7 +1362,8 @@ var editor;
     this.wb = new AscCommonExcel.WorkbookView(this.wbModel, this.controller, this.handlers, this.HtmlElement, this.topLineEditorElement, this, this.collaborativeEditing, this.fontRenderingMode);
 
     if (this.isMobileVersion) {
-
+		this.wb.defaults.worksheetView.halfSelection = true;
+		this.wb.defaults.worksheetView.activeCellBorderColor = new CColor(79, 158, 79);
         var _container = document.getElementById(this.HtmlElementName);
         if (_container)
           _container.style.overflow = "hidden";
@@ -1459,6 +1464,9 @@ var editor;
 
       this.CoAuthoringApi.onUnSaveLock = function() {
         t.CoAuthoringApi.onUnSaveLock = null;
+		if (t.isForceSaveOnUserSave && t.IsUserSave) {
+			t.forceSave();
+		}
 
         if (t.collaborativeEditing.getCollaborativeEditing()) {
           // Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
@@ -2617,7 +2625,16 @@ var editor;
 
   // Получить координаты активной ячейки
   spreadsheet_api.prototype.asc_getActiveCellCoord = function() {
-    return this.wb.getWorksheet().getActiveCellCoord();
+    var oWorksheet = this.wb.getWorksheet();
+    if(oWorksheet){
+      if(oWorksheet.isSelectOnShape){
+        return oWorksheet.objectRender.getContextMenuPosition();
+      }
+      else{
+          return oWorksheet.getActiveCellCoord();
+      }
+    }
+
   };
 
   // Получить координаты для каких-либо действий (для общей схемы)
@@ -3302,6 +3319,8 @@ var editor;
   prot["asc_LoadEmptyDocument"] = prot.asc_LoadEmptyDocument;
   prot["asc_DownloadAs"] = prot.asc_DownloadAs;
   prot["asc_Save"] = prot.asc_Save;
+  prot["forceSave"] = prot.forceSave;
+  prot["asc_setIsForceSaveOnUserSave"] = prot.asc_setIsForceSaveOnUserSave;
   prot["asc_Print"] = prot.asc_Print;
   prot["asc_Resize"] = prot.asc_Resize;
   prot["asc_Copy"] = prot.asc_Copy;

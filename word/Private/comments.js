@@ -32,27 +32,79 @@
 
 "use strict";
 
-Asc['asc_docs_api'].prototype.asc_addComment = function(AscCommentData) {
-  if (true === AscCommon.CollaborativeEditing.Get_GlobalLock()) {
-    return;
-  }
+Asc['asc_docs_api'].prototype.asc_addComment = function(AscCommentData)
+{
+	if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
+	{
+		return;
+	}
 
-  if (null == this.WordControl.m_oLogicDocument) {
-    return;
-  }
+	if (null == this.WordControl.m_oLogicDocument)
+	{
+		return;
+	}
 
-  // Комментарий без цитаты позволяем добавить всегда
-  if (true !== this.can_AddQuotedComment() || false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content)) {
-    var CommentData = new CCommentData();
-    CommentData.Read_FromAscCommentData(AscCommentData);
+	// Комментарий без цитаты позволяем добавить всегда
+	if (true !== this.can_AddQuotedComment() || false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content))
+	{
+		var CommentData = new CCommentData();
+		CommentData.Read_FromAscCommentData(AscCommentData);
 
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddComment);
-    var Comment = this.WordControl.m_oLogicDocument.Add_Comment(CommentData);
-    if (null != Comment) {
-      this.sync_AddComment(Comment.Get_Id(), CommentData);
-    }
+		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddComment);
+		var Comment = this.WordControl.m_oLogicDocument.Add_Comment(CommentData);
+		if (null != Comment)
+		{
+			this.sync_AddComment(Comment.Get_Id(), CommentData);
+		}
 
-    return Comment.Get_Id();
-  }
+		return Comment.Get_Id();
+	}
 };
-Asc['asc_docs_api'].prototype['asc_addComment'] = Asc['asc_docs_api'].prototype.asc_addComment;
+Asc['asc_docs_api'].prototype.asc_GetCommentsReportByAuthors = function()
+{
+	var oReport = {};
+
+	function privateProcessCommentData(isTopComment, oCommentData)
+	{
+		var sUserName = oCommentData.GetUserName();
+		var nDateTime = oCommentData.GetDateTime();
+
+		if (!oReport[sUserName])
+			oReport[sUserName] = [];
+
+		var arrUserComments = oReport[sUserName];
+
+		var nPos = 0;
+		var nLen = arrUserComments.length;
+		while (nPos < nLen)
+		{
+			if (nDateTime < arrUserComments[nPos].Data.GetDateTime())
+				break;
+
+			nPos++;
+		}
+
+		arrUserComments.splice(nPos, 0, {Top : isTopComment, Data : oCommentData});
+
+		for (var nIndex = 0, nCount = oCommentData.GetRepliesCount(); nIndex < nCount; ++nIndex)
+		{
+			privateProcessCommentData(false, oCommentData.GetReply(nIndex))
+		}
+	}
+
+	var oLogicDocument = this.WordControl.m_oLogicDocument;
+	if (!oLogicDocument)
+		return oReport;
+
+	var oAllComments = oLogicDocument.Comments.GetAllComments();
+	for (var sId in oAllComments)
+	{
+		var oComment = oAllComments[sId];
+		privateProcessCommentData(true, oComment.GetData());
+	}
+
+	return oReport;
+};
+
+Asc['asc_docs_api'].prototype['asc_addComment']                 = Asc['asc_docs_api'].prototype.asc_addComment;
+Asc['asc_docs_api'].prototype['asc_GetCommentsReportByAuthors'] = Asc['asc_docs_api'].prototype.asc_GetCommentsReportByAuthors;

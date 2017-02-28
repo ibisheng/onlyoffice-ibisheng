@@ -48,7 +48,8 @@
 			FlowObj    : 5,
 			Cursor     : 6,
 			TableMove  : 7,
-			TableRuler : 8
+			TableRuler : 8,
+			SelectTrack : 9
 		};
 
 	AscCommon.MobileTouchContextMenuType =
@@ -434,8 +435,8 @@
 			_mode = 2;
 		}
 
-		var _object_bounds = this.LogicDocument.DrawingObjects.getSelectedObjectsBounds();
-		if ((0 == _mode) && _object_bounds)
+		var _object_bounds = this.LogicDocument.DrawingObjects.getSelectedObjectsBounds(true);
+		if (_object_bounds)
 		{
 			_pos = this.DrawingDocument.ConvertCoordsToCursorWR(_object_bounds.minX, _object_bounds.minY, _object_bounds.pageIndex);
 			_posX = _pos.X;
@@ -504,8 +505,8 @@
 	CMobileDelegateEditor.prototype.ScrollEnd = function(_scroll)
 	{
 		this.HtmlPage.NoneRepaintPages = (true === _scroll.isAnimating) ? true : false;
-		_scroll.manager.OnScrollAnimationEnd();
 		this.HtmlPage.OnScroll();
+		_scroll.manager.OnScrollAnimationEnd();
 	};
 	CMobileDelegateEditor.prototype.GetSelectionRectsBounds = function()
 	{
@@ -565,6 +566,7 @@
 		this.RectSelect2 = null;
 		this.PageSelect1 = 0;
 		this.PageSelect2 = 0;
+		this.RectSelectType = 0; // excel
 
 		this.TrackTargetEps = 20;
 
@@ -1108,12 +1110,12 @@
 	CMobileTouchManagerBase.prototype.SendShowContextMenu = function()
 	{
 		if (-1 != this.ContextMenuShowTimerId)
-		{
 			clearTimeout(this.ContextMenuShowTimerId);
-		}
+
 		var that             = this;
 		this.ContextMenuShowTimerId = setTimeout(function()
 		{
+			that.ContextMenuShowTimerId = -1;
 			var _pos = that.delegate.GetContextMenuPosition();
 			that.Api.sendEvent("asc_onShowPopMenu", _pos.X, _pos.Y, (_pos.Mode > 1) ? true : false);
 		}, 500);
@@ -1364,6 +1366,10 @@
 	{
 		//this.ContextMenuLastMode 		= AscCommon.MobileTouchContextMenuType.None;
 		//this.ContextMenuLastModeCounter = 0;
+
+		if (this.ContextMenuShowTimerId != -1)
+			clearTimeout(this.ContextMenuShowTimerId);
+
 		this.Api.sendEvent("asc_onHidePopMenu");
 	};
 
@@ -1386,10 +1392,15 @@
 		if (!_select)
 			return;
 
+		this.RectSelectType = (_select.Type === undefined) ? 0 : _select.Type;
+
 		var _rect1 = _select.Start;
 		var _rect2 = _select.End;
 
 		if (!_rect1 || !_rect2)
+			return;
+
+		if (0 == _rect1.W && 0 == _rect1.H && _rect2.W == 0 && _rect2.H == 0)
 			return;
 
 		this.RectSelect1 	= new AscCommon._rect();

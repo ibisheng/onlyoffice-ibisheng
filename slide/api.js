@@ -1810,7 +1810,7 @@ background-repeat: no-repeat;\
 		_logicDoc.Remove(1, true, true);
 	};
 
-	asc_docs_api.prototype.onSaveCallback = function(e)
+	asc_docs_api.prototype.onSaveCallback = function(e, isUndoRequest)
 	{
 		var t = this;
 		if (false == e["saveLock"])
@@ -1847,7 +1847,9 @@ background-repeat: no-repeat;\
 			this.CoAuthoringApi.onUnSaveLock = function()
 			{
 				t.CoAuthoringApi.onUnSaveLock = null;
-
+				if (t.isForceSaveOnUserSave && t.IsUserSave) {
+					t.forceSave();
+				}
 				// Выставляем, что документ не модифицирован
 				t.CheckChangedDocument();
 				t.canSave    = true;
@@ -1867,12 +1869,22 @@ background-repeat: no-repeat;\
 			{
 				CursorInfo = History.Get_DocumentPositionBinary();
 			}
+
+
 			// Пересылаем свои изменения
-			AscCommon.CollaborativeEditing.Send_Changes(this.IsUserSave, {
-				UserId      : this.CoAuthoringApi.getUserConnectionId(),
-				UserShortId : this.DocInfo.get_UserId(),
-				CursorInfo  : CursorInfo
-			});
+            if (isUndoRequest)
+            {
+                AscCommon.CollaborativeEditing.Set_GlobalLock(false);
+                AscCommon.CollaborativeEditing.Undo();
+            }
+            else
+			{
+                AscCommon.CollaborativeEditing.Send_Changes(this.IsUserSave, {
+                    UserId      : this.CoAuthoringApi.getUserConnectionId(),
+                    UserShortId : this.DocInfo.get_UserId(),
+                    CursorInfo  : CursorInfo
+                });
+			}
 		}
 		else
 		{
@@ -1907,42 +1919,53 @@ background-repeat: no-repeat;\
 				this.asc_Save(true);
 				this.lastSaveTime = _curTime;
 			} else {
-				var _bIsWaitScheme = false;
-				if (this.WordControl.m_oDrawingDocument &&
-					!this.WordControl.m_oDrawingDocument.TransitionSlide.IsPlaying() && History.Points &&
-					History.Index >= 0 && History.Index < History.Points.length) {
-					if ((_curTime - History.Points[History.Index].Time) < this.intervalWaitAutoSave) {
-						_bIsWaitScheme = true;
-					}
-				}
-
-				if (!_bIsWaitScheme) {
-					var _interval = (AscCommon.CollaborativeEditing.m_nUseType <= 0) ? this.autoSaveGapSlow :
-						this.autoSaveGapFast;
-
-					if ((_curTime - this.lastSaveTime) > _interval) {
-						if (History.Have_Changes(true) == true) {
-							this.asc_Save(true);
+				if (AscCommon.CollaborativeEditing.Is_Fast() && !AscCommon.CollaborativeEditing.Is_SingleUser()) {
+					this.WordControl.m_oLogicDocument.Continue_FastCollaborativeEditing();
+				} else {
+					var _bIsWaitScheme = false;
+					if (this.WordControl.m_oDrawingDocument &&
+						!this.WordControl.m_oDrawingDocument.TransitionSlide.IsPlaying() && History.Points &&
+						History.Index >= 0 && History.Index < History.Points.length) {
+						if ((_curTime - History.Points[History.Index].Time) < this.intervalWaitAutoSave) {
+							_bIsWaitScheme = true;
 						}
-						this.lastSaveTime = _curTime;
+					}
+
+					if (!_bIsWaitScheme) {
+						var _interval = (AscCommon.CollaborativeEditing.m_nUseType <= 0) ? this.autoSaveGapSlow :
+							this.autoSaveGapFast;
+
+						if ((_curTime - this.lastSaveTime) > _interval) {
+							if (History.Have_Changes(true) == true) {
+								this.asc_Save(true);
+							}
+							this.lastSaveTime = _curTime;
+						}
 					}
 				}
 			}
 		}
 	};
-	asc_docs_api.prototype.asc_Save                     = function(isAutoSave)
+	asc_docs_api.prototype.asc_Save                     = function(isAutoSave, isUndoRequest)
 	{
 		this.IsUserSave = !isAutoSave;
-		if (true === this.canSave && !this.isLongAction() && (this.asc_isDocumentCanSave() || History.Have_Changes() ||
-			AscCommon.CollaborativeEditing.Have_OtherChanges() || this.canUnlockDocument))
+		if (true === this.canSave && !this.isLongAction())
 		{
-			this.canSave = false;
-
-			var t = this;
-			this.CoAuthoringApi.askSaveChanges(function(e)
+			if (this.asc_isDocumentCanSave() || History.Have_Changes() ||
+				AscCommon.CollaborativeEditing.Have_OtherChanges() || true === isUndoRequest || this.canUnlockDocument)
 			{
-				t.onSaveCallback(e);
-			});
+				this.canSave = false;
+
+				var t = this;
+				this.CoAuthoringApi.askSaveChanges(function(e)
+				{
+					t.onSaveCallback(e, isUndoRequest);
+				});
+			}
+			else if (this.isForceSaveOnUserSave && this.IsUserSave)
+			{
+				this.forceSave();
+			}
 		}
 	};
 	asc_docs_api.prototype.asc_DownloadAs               = function(typeFile, bIsDownloadEvent)
@@ -2028,9 +2051,6 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.sync_CanUndoCallback         = function(bCanUndo)
 	{
-		if (true === AscCommon.CollaborativeEditing.Is_Fast() && true !== AscCommon.CollaborativeEditing.Is_SingleUser())
-			bCanUndo = false;
-
 		this.sendEvent("asc_onCanUndo", bCanUndo);
 	};
 	asc_docs_api.prototype.sync_CanRedoCallback         = function(bCanRedo)
@@ -6486,12 +6506,14 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['Paste']                               = asc_docs_api.prototype.Paste;
 	asc_docs_api.prototype['Share']                               = asc_docs_api.prototype.Share;
 	asc_docs_api.prototype['asc_Save']                            = asc_docs_api.prototype.asc_Save;
+	asc_docs_api.prototype['forceSave']                           = asc_docs_api.prototype.forceSave;
+	asc_docs_api.prototype['asc_setIsForceSaveOnUserSave']        = asc_docs_api.prototype.asc_setIsForceSaveOnUserSave;
 	asc_docs_api.prototype['asc_DownloadAs']                      = asc_docs_api.prototype.asc_DownloadAs;
 	asc_docs_api.prototype['Resize']                              = asc_docs_api.prototype.Resize;
 	asc_docs_api.prototype['AddURL']                              = asc_docs_api.prototype.AddURL;
 	asc_docs_api.prototype['Help']                                = asc_docs_api.prototype.Help;
 	asc_docs_api.prototype['startGetDocInfo']                     = asc_docs_api.prototype.startGetDocInfo;
-	asc_docs_api.prototype['asc_setAdvancedOptions']              = asc_docs_api.prototype.asc_setAdvancedOptions;;
+	asc_docs_api.prototype['asc_setAdvancedOptions']              = asc_docs_api.prototype.asc_setAdvancedOptions;
 	asc_docs_api.prototype['stopGetDocInfo']                      = asc_docs_api.prototype.stopGetDocInfo;
 	asc_docs_api.prototype['sync_DocInfoCallback']                = asc_docs_api.prototype.sync_DocInfoCallback;
 	asc_docs_api.prototype['sync_GetDocInfoStartCallback']        = asc_docs_api.prototype.sync_GetDocInfoStartCallback;
