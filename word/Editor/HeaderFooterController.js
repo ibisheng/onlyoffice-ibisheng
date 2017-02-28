@@ -441,7 +441,7 @@ CHdrFtrController.prototype.RestoreDocumentStateAfterLoadChanges = function(Stat
 			if (true !== this.LogicDocument.DrawingObjects.Load_DocumentStateAfterLoadChanges(State))
 			{
 				HdrFtrContent.Set_DocPosType(docpostype_Content);
-				this.LogicDocument.Cursor_MoveAt(State.X ? State.X : 0, State.Y ? State.Y : 0, false);
+				HdrFtrContent.Cursor_MoveToStartPos();
 			}
 		}
 	}

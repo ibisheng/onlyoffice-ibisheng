@@ -4425,7 +4425,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         return false;
       }
 
-      var p = top_elem, func;
+      var p = top_elem, func, bError = false;
       this.elemArr.pop();
       if (this.elemArr.length != 0 && ( func = this.elemArr[this.elemArr.length - 1] ).type == cElementType.func) {
         p = this.elemArr.pop();
@@ -4437,12 +4437,19 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         } else {
           if (top_elem.getArguments() >= func.getMinArguments()) {
             func.setArgumentsCount(top_elem.getArguments());
+            if (!func.checkArguments()) {
+            	bError = true;
+			}
           } else {
-            this.outStack = [];
-            this.elemArr = [];
-            this.error.push(c_oAscError.ID.FrmlWrongCountArgument);
-            return false;
+          	bError = true;
           }
+
+          if (bError) {
+          	this.outStack = [];
+          	this.elemArr = [];
+          	this.error.push(c_oAscError.ID.FrmlWrongCountArgument);
+          	return false;
+		  }
         }
         } else {
           if (wasLeftParentheses &&
