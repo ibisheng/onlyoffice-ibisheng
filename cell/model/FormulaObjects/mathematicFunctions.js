@@ -4045,7 +4045,7 @@ cSQRTPI.prototype.getInfo = function () {
         } else {
             search = arg1;
         }
-        valueForSearching = AscCommonExcel.parseNum(search) ? new cNumber(search) : new cString(search);
+        valueForSearching = AscCommonExcel.matchingValue(search);
         if (cElementType.cellsRange === arg0.type) {
             var arg0Matrix = arg0.getMatrix(), arg2Matrix = arg2.getMatrix(), valMatrix2;
             for (var i = 0; i < arg0Matrix.length; i++) {
@@ -4138,7 +4138,7 @@ cSQRTPI.prototype.getInfo = function () {
                 search = arg2;
                 oper = null;
             }
-            valueForSearching = AscCommonExcel.parseNum(search) ? new cNumber(search) : new cString(search);
+            valueForSearching = AscCommonExcel.matchingValue(search);
 
 			var arg1Matrix = arg1.getMatrix();
 			if (arg0Matrix.length !== arg1Matrix.length) {

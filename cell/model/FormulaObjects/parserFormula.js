@@ -5364,6 +5364,10 @@ function parseNum( str ) {
     return !isNaN( str );
 }
 
+	function matchingValue(search) {
+		var parseRes = AscCommon.g_oFormatParser.parse(search);
+		return parseRes ? new cNumber(parseRes.value) : new cString(search);
+	}
 	function matching(x, y, operator) {
 		var res = false, rS;
 		if (cElementType.string === y.type) {
@@ -5673,6 +5677,7 @@ function rtl_math_erfc( x ) {
 
   window['AscCommonExcel'].parseNum = parseNum;
   window['AscCommonExcel'].matching = matching;
+	window['AscCommonExcel'].matchingValue = matchingValue;
   window['AscCommonExcel'].GetDiffDate360 = GetDiffDate360;
   window['AscCommonExcel'].searchRegExp2 = searchRegExp2;
   window['AscCommonExcel'].rtl_math_erf = rtl_math_erf;

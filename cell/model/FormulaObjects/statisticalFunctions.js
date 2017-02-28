@@ -588,7 +588,7 @@
 		} else {
 			search = arg1;
 		}
-		valueForSearching = parseNum(search) ? new cNumber(search) : new cString(search);
+		valueForSearching = AscCommonExcel.matchingValue(search);
 		if (cElementType.cellsRange === arg0.type) {
 			ws = arg0.getWS();
 			var tmpCellArg0 = arg0.getRange().getCells()[0], tmpCellArg2 = arg2.getRange(), offset, bbox, r2;
@@ -1104,7 +1104,7 @@
 		} else {
 			search = arg1;
 		}
-		valueForSearching = parseNum(search) ? new cNumber(search) : new cString(search);
+		valueForSearching = AscCommonExcel.matchingValue(search);
 		if (cElementType.cellsRange === arg0.type) {
 			arg0.foreach2(function (_val) {
 				_count += matching(_val, valueForSearching, oper);
@@ -1173,7 +1173,7 @@
 			} else {
 				search = arg1;
 			}
-			valueForSearching = parseNum(search) ? new cNumber(search) : new cString(search);
+			valueForSearching = AscCommonExcel.matchingValue(search);
 			arg1Matrix = arg0.getMatrix();
 			if (!arg0Matrix) {
 				arg0Matrix = arg1Matrix;
