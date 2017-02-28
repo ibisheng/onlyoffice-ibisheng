@@ -6079,7 +6079,7 @@ PasteProcessor.prototype =
                                 nUnicode = nCharCode;
                             if (null != nUnicode) {
                                 var Item;
-                                if (0x20 != nUnicode && 0xA0 != nUnicode && 0x2009 != nUnicode) {
+                                if (0x20 != nUnicode && 0x2009 != nUnicode) {
                                     Item = new ParaText();
                                     Item.Set_CharCode(nUnicode);
                                 }
