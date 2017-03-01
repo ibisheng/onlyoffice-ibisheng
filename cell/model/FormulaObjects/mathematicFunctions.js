@@ -4045,7 +4045,7 @@ cSQRTPI.prototype.getInfo = function () {
         } else {
             search = arg1;
         }
-        valueForSearching = AscCommonExcel.parseNum(search) ? new cNumber(search) : new cString(search);
+        valueForSearching = AscCommonExcel.matchingValue(search);
         if (cElementType.cellsRange === arg0.type) {
             var arg0Matrix = arg0.getMatrix(), arg2Matrix = arg2.getMatrix(), valMatrix2;
             for (var i = 0; i < arg0Matrix.length; i++) {
@@ -4138,25 +4138,27 @@ cSQRTPI.prototype.getInfo = function () {
                 search = arg2;
                 oper = null;
             }
-            valueForSearching = AscCommonExcel.parseNum(search) ? new cNumber(search) : new cString(search);
+            valueForSearching = AscCommonExcel.matchingValue(search);
 
-            if (cElementType.cellsRange === arg1.type) {
-                var arg1Matrix = arg1.getMatrix();
-                for (i = 0; i < arg1Matrix.length; i++) {
-                    for (j = 0; j < arg1Matrix[i].length; j++) {
-                        if (arg0Matrix[i][j] && !AscCommonExcel.matching(arg1Matrix[i][j], valueForSearching, oper)) {
-                            arg0Matrix[i][j] = null;
-                        }
-                    }
-                }
-            } else {
-                return this.value = new cError(cErrorType.wrong_value_type);
+			var arg1Matrix = arg1.getMatrix();
+			if (arg0Matrix.length !== arg1Matrix.length) {
+				return this.value = new cError(cErrorType.wrong_value_type);
             }
+			for (i = 0; i < arg1Matrix.length; ++i) {
+				if (arg0Matrix[i].length !== arg1Matrix[i].length) {
+					return this.value = new cError(cErrorType.wrong_value_type);
+				}
+				for (j = 0; j < arg1Matrix[i].length; ++j) {
+					if (arg0Matrix[i][j] && !AscCommonExcel.matching(arg1Matrix[i][j], valueForSearching, oper)) {
+						arg0Matrix[i][j] = null;
+					}
+				}
+			}
         }
 
         var valMatrix0;
-        for (i = 0; i < arg0Matrix.length; i++) {
-            for (j = 0; j < arg0Matrix[i].length; j++) {
+        for (i = 0; i < arg0Matrix.length; ++i) {
+            for (j = 0; j < arg0Matrix[i].length; ++j) {
                 if ((valMatrix0 = arg0Matrix[i][j]) && cElementType.number === valMatrix0.type) {
                     _sum += valMatrix0.getValue();
                 }
@@ -4165,7 +4167,7 @@ cSQRTPI.prototype.getInfo = function () {
         return this.value = new cNumber(_sum);
     };
 	cSUMIFS.prototype.checkArguments = function () {
-		return (this.argumentsCurrent % 2) && cBaseFunction.prototype.checkArguments.apply(this, arguments);
+		return 1 === this.argumentsCurrent % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
     };
     cSUMIFS.prototype.getInfo = function () {
         return {

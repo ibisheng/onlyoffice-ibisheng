@@ -1046,32 +1046,41 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
             oParagraph.Correct_Content();
             oParagraph.CheckParaEnd();
         }
+
+		var oBinaryWriter = AscCommon.History.BinaryWriter;
+		var aSendingChanges = [];
+		for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
+		{
+			var oReverseChange = arrReverseChanges[nIndex];
+			var oChangeClass   = oReverseChange.GetClass();
+
+			var nBinaryPos = oBinaryWriter.GetCurPosition();
+			oBinaryWriter.WriteString2(oChangeClass.Get_Id());
+			oBinaryWriter.WriteLong(oReverseChange.Type);
+			oReverseChange.WriteToBinary(oBinaryWriter);
+
+			var nBinaryLen = oBinaryWriter.GetCurPosition() - nBinaryPos;
+
+			var oChange = new AscCommon.CCollaborativeChanges();
+			oChange.Set_FromUndoRedo(oChangeClass, oReverseChange, {Pos : nBinaryPos, Len : nBinaryLen});
+			aSendingChanges.push(oChange.m_pData);
+		}
+
         var oHistoryPoint = oHistory.Points[oHistory.Points.length - 1];
         for (var nIndex = 0, nCount = oHistoryPoint.Items.length; nIndex < nCount; ++nIndex)
         {
+        	var oReverseChange = oHistoryPoint.Items[nIndex].Data;
+			var oChangeClass   = oReverseChange.GetClass();
+
+			var oChange = new AscCommon.CCollaborativeChanges();
+			oChange.Set_FromUndoRedo(oChangeClass, oReverseChange, {Pos : oHistoryPoint.Items[nIndex].Binary.Pos, Len : oHistoryPoint.Items[nIndex].Binary.Len});
+			aSendingChanges.push(oChange.m_pData);
+
             arrReverseChanges.push(oHistoryPoint.Items[nIndex].Data);
         }
         oHistory.Remove_LastPoint();
         this.Clear_DCChanges();
 
-        var oBinaryWriter = AscCommon.History.BinaryWriter;
-        var aSendingChanges = [];
-        for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
-        {
-            var oReverseChange = arrReverseChanges[nIndex];
-            var oChangeClass   = oReverseChange.GetClass();
-
-            var nBinaryPos = oBinaryWriter.GetCurPosition();
-            oBinaryWriter.WriteString2(oChangeClass.Get_Id());
-            oBinaryWriter.WriteLong(oReverseChange.Type);
-            oReverseChange.WriteToBinary(oBinaryWriter);
-
-            var nBinaryLen = oBinaryWriter.GetCurPosition() - nBinaryPos;
-
-            var oChange = new AscCommon.CCollaborativeChanges();
-            oChange.Set_FromUndoRedo(oChangeClass, oReverseChange, {Pos : nBinaryPos, Len : nBinaryLen});
-            aSendingChanges.push(oChange.m_pData);
-        }
         editor.CoAuthoringApi.saveChanges(aSendingChanges, null, null);
 
         this.private_RestoreDocumentState(DocState);

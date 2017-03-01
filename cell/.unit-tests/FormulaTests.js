@@ -2244,44 +2244,101 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), 3 );
     } );
 
-    test( "Test: \"COUNTIF\"", function () {
+    test( "Test: \"COUNTIFS\"", function () {
 
-        ws.getRange2( "A7" ).setValue( "3" );
-        ws.getRange2( "B7" ).setValue( "10" );
-        ws.getRange2( "C7" ).setValue( "7" );
-        ws.getRange2( "D7" ).setValue( "10" );
+        ws.getRange2( "A15" ).setValue( "Yes" );
+        ws.getRange2( "A16" ).setValue( "Yes" );
+        ws.getRange2( "A17" ).setValue( "Yes" );
+        ws.getRange2( "A18" ).setValue( "No" );
 
-        ws.getRange2( "A8" ).setValue( "apples" );
-        ws.getRange2( "B8" ).setValue( "oranges" );
-        ws.getRange2( "C8" ).setValue( "grapes" );
-        ws.getRange2( "D8" ).setValue( "melons" );
+        ws.getRange2( "B15" ).setValue( "No" );
+        ws.getRange2( "B16" ).setValue( "Yes" );
+        ws.getRange2( "B17" ).setValue( "Yes" );
+        ws.getRange2( "B18" ).setValue( "Yes" );
 
+		ws.getRange2( "C15" ).setValue( "No" );
+		ws.getRange2( "C16" ).setValue( "No" );
+		ws.getRange2( "C17" ).setValue( "Yes" );
+		ws.getRange2( "C18" ).setValue( "Yes" );
 
-        oParser = new parserFormula( "COUNTIF(A7:D7,\"=10\")", "A1", ws );
+        oParser = new parserFormula( "COUNTIFS(A15:C15,\"=Yes\")", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 1 );
+
+        oParser = new parserFormula( "COUNTIFS(A15:A18,\"=Yes\",B15:B18,\"=Yes\")", "B1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 2 );
 
-        oParser = new parserFormula( "COUNTIF(A7:D7,\">5\")", "B1", ws );
+		oParser = new parserFormula( "COUNTIFS(A18:C18,\"=Yes\",A16:C16,\"=Yes\")", "C1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 3 );
+        strictEqual( oParser.calculate().getValue(), 1 );
 
-        oParser = new parserFormula( "COUNTIF(A7:D7,\"<>10\")", "C1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 2 );
+		ws.getRange2( "D15" ).setValue( "1" );
+		ws.getRange2( "D16" ).setValue( "2" );
+		ws.getRange2( "D17" ).setValue( "3" );
+		ws.getRange2( "D18" ).setValue( "4" );
+		ws.getRange2( "D19" ).setValue( "5" );
+		ws.getRange2( "D20" ).setValue( "6" );
 
-        oParser = new parserFormula( "COUNTIF(A8:D8,\"*es\")", "A2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 3 );
+		ws.getRange2( "E15" ).setValue( "5/1/2011" );
+		ws.getRange2( "E16" ).setValue( "5/2/2011" );
+		ws.getRange2( "E17" ).setValue( "5/3/2011" );
+		ws.getRange2( "E18" ).setValue( "5/4/2011" );
+		ws.getRange2( "E19" ).setValue( "5/5/2011" );
+		ws.getRange2( "E20" ).setValue( "5/6/2011" );
 
-        oParser = new parserFormula( "COUNTIF(A8:D8,\"??a*\")", "B2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 2 );
+		oParser = new parserFormula( "COUNTIFS(D15:D20,\"<6\",D15:D20,\">1\")", "D1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 4 );
 
-        oParser = new parserFormula( "COUNTIF(A8:D8,\"*l*\")", "C2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 2 );
+		oParser = new parserFormula( "COUNTIFS(D15:D20,\"<5\",E15:E20,\"<5/3/2011\")", "E1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2 );
+
+		oParser = new parserFormula( "COUNTIFS(D15:D20,\"<\" & D19,E15:E20,\"<\" & E17)", "E1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2 );
 
     } );
+
+	test( "Test: \"COUNTIFS\"", function () {
+
+		ws.getRange2( "A7" ).setValue( "3" );
+		ws.getRange2( "B7" ).setValue( "10" );
+		ws.getRange2( "C7" ).setValue( "7" );
+		ws.getRange2( "D7" ).setValue( "10" );
+
+		ws.getRange2( "A8" ).setValue( "apples" );
+		ws.getRange2( "B8" ).setValue( "oranges" );
+		ws.getRange2( "C8" ).setValue( "grapes" );
+		ws.getRange2( "D8" ).setValue( "melons" );
+
+
+		oParser = new parserFormula( "COUNTIF(A7:D7,\"=10\")", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2 );
+
+		oParser = new parserFormula( "COUNTIF(A7:D7,\">5\")", "B1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 3 );
+
+		oParser = new parserFormula( "COUNTIF(A7:D7,\"<>10\")", "C1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2 );
+
+		oParser = new parserFormula( "COUNTIF(A8:D8,\"*es\")", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 3 );
+
+		oParser = new parserFormula( "COUNTIF(A8:D8,\"??a*\")", "B2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2 );
+
+		oParser = new parserFormula( "COUNTIF(A8:D8,\"*l*\")", "C2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2 );
+
+	} );
 
     test( "Test: \"COVAR\"", function () {
 

@@ -43,3 +43,6 @@ AscCommon.baseEditorsApi.prototype._onEndPermissions = function()
 		this.sendEvent('asc_onGetEditorPermissions', oResult);
 	}
 };
+
+// !!!
+window["compareVersions"] = true;

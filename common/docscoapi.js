@@ -980,7 +980,7 @@
 		if (data['code'] === c_oAscServerCommandErrors.NoError) {
 			this._lastForceSaveButtonTime = data['time'];
 		} else if (data['code'] !== c_oAscServerCommandErrors.NotModified) {
-			this.onWarning(c_oAscError.ID.Unknown);
+			this.onWarning(Asc.c_oAscError.ID.Unknown);
 		}
 	};
 	DocsCoApi.prototype._onForceSave = function(data) {
@@ -1320,7 +1320,7 @@
   };
 
   DocsCoApi.prototype._onWarning = function(data) {
-    this.onWarning(c_oAscError.ID.Warning);
+    this.onWarning(Asc.c_oAscError.ID.Warning);
   };
 
   DocsCoApi.prototype._onLicense = function(data) {

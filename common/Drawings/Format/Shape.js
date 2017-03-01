@@ -3255,6 +3255,7 @@ CShape.prototype.CheckNeedRecalcAutoFit  = function(oSectPr)
 
 CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
 {
+    var nStartPage = this.Get_AbsolutePage ? this.Get_AbsolutePage() : 0;
     var oRet = {w: 0, h: 0, contentH: 0};
     var l_ins, t_ins, r_ins, b_ins;
     if(oBodyPr)
@@ -3309,14 +3310,14 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
         {
             if(dMaxWidthRec < w && (!this.bWordShape && !this.bCheckAutoFitFlag))
             {
-                oDocContent.RecalculateContent(w, h, 0);
+                oDocContent.RecalculateContent(w, h, nStartPage);
                 oRet.w = w + 0.001;
                 oRet.contentH = oDocContent.Get_SummaryHeight();
                 oRet.h = oRet.contentH;
             }
             else
             {
-                oDocContent.RecalculateContent(dMaxWidthRec, h, 0);
+                oDocContent.RecalculateContent(dMaxWidthRec, h, nStartPage);
                 oRet.w = dMaxWidthRec + 0.001;
                 oRet.contentH = oDocContent.Get_SummaryHeight();
                 oRet.h = oRet.contentH;
@@ -3330,14 +3331,14 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
         {
             if(dMaxWidthRec < h && !this.bWordShape)
             {
-                oDocContent.RecalculateContent( h, h, 0);
+                oDocContent.RecalculateContent( h, h, nStartPage);
                 oRet.w = h + 0.001;
                 oRet.contentH = oDocContent.Get_SummaryHeight();
                 oRet.h = oRet.contentH;
             }
             else
             {
-                oDocContent.RecalculateContent(dMaxWidthRec, h, 0);
+                oDocContent.RecalculateContent(dMaxWidthRec, h, nStartPage);
                 oRet.w = dMaxWidthRec + 0.001;
                 oRet.contentH = oDocContent.Get_SummaryHeight();
                 oRet.h = oRet.contentH;
@@ -3415,7 +3416,7 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
         while ( recalcresult2_End !== RecalcResult  )
             RecalcResult = oDocContent.Recalculate_Page( CurPage++, true );*/
 
-        oDocContent.RecalculateContent(oRet.w, oRet.h, 0);
+        oDocContent.RecalculateContent(oRet.w, oRet.h, nStartPage);
 
         oRet.contentH = oDocContent.Get_SummaryHeight();
 
@@ -3768,9 +3769,9 @@ CShape.prototype.selectionSetStart = function (e, x, y, slideIndex)
             }
         }
         if(!(content.Is_TextSelectionUse() && e.ShiftKey))
-            content.Selection_SetStart(tx, ty, slideIndex, e);
+            content.Selection_SetStart(tx, ty, slideIndex - content.Get_StartPage_Relative(), e);
         else
-            content.Selection_SetEnd(tx, ty, slideIndex, e);
+            content.Selection_SetEnd(tx, ty, slideIndex - content.Get_StartPage_Relative(), e);
     }
 };
 
@@ -3783,7 +3784,7 @@ CShape.prototype.selectionSetEnd = function (e, x, y, slideIndex)
         ty = this.invertTransformText.TransformPointY(x, y);
         if(!(e.Type === AscCommon.g_mouse_event_type_up && this.rightButtonFlag))
         {
-            content.Selection_SetEnd(tx, ty, slideIndex, e);
+            content.Selection_SetEnd(tx, ty, slideIndex - content.Get_StartPage_Relative(), e);
         }
     }
     delete this.rightButtonFlag;

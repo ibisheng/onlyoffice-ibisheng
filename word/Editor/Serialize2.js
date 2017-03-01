@@ -6165,9 +6165,10 @@ function BinaryFileReader(doc, openParams)
     };
     this.ReadFromString = function (sBase64, isCopyPaste) {
         //надо сбросить то, что остался после открытия документа
-		var api = this.Document.DrawingDocument.m_oWordControl.m_oApi;
+		var api = isCopyPaste ? this.Document.DrawingDocument.m_oWordControl.m_oApi : null;
+		var insertDocumentUrlsData = api ? api.insertDocumentUrlsData : null;
         pptx_content_loader.Clear();
-        pptx_content_loader.Start_UseFullUrl(api.insertDocumentUrlsData);
+        pptx_content_loader.Start_UseFullUrl(insertDocumentUrlsData);
         this.stream = this.getbase64DecodedData(sBase64);
         this.ReadMainTable();
         var oReadResult = this.oReadResult;
@@ -6452,10 +6453,13 @@ function BinaryFileReader(doc, openParams)
 			}
 		}
 		//посылаем событие о добавлении комментариев
-		for(var i in oCommentsNewId)
+		if(api)
 		{
-			var oNewComment = oCommentsNewId[i];
-			this.Document.DrawingDocument.m_oWordControl.m_oApi.sync_AddComment( oNewComment.Id, oNewComment.Data );
+			for(var i in oCommentsNewId)
+			{
+				var oNewComment = oCommentsNewId[i];
+				api.sync_AddComment( oNewComment.Id, oNewComment.Data );
+			}
 		}
 		for (var i = 0, length = this.oReadResult.aTableCorrect.length; i < length; ++i) {
 			var table = this.oReadResult.aTableCorrect[i];
