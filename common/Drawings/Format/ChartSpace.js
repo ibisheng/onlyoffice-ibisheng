@@ -7912,197 +7912,196 @@ CChartSpace.prototype.hitInTextRect = function()
             var b_scatter_no_line = false;/*(this.chart.plotArea.charts[0].getObjectType() === AscDFH.historyitem_type_ScatterChart &&
          (this.chart.plotArea.charts[0].scatterStyle === AscFormat.SCATTER_STYLE_MARKER || this.chart.plotArea.charts[0].scatterStyle === AscFormat.SCATTER_STYLE_NONE));  */
             this.legendLength = null;
-            if( !this.chart.plotArea.charts[0].varyColors || (this.chart.plotArea.charts[0].getObjectType() !== AscDFH.historyitem_type_PieChart && this.chart.plotArea.charts[0].getObjectType() !== AscDFH.historyitem_type_DoughnutChart) && series.length !== 1)
-                if( !this.chart.plotArea.charts[0].varyColors
-                    || (this.chart.plotArea.charts[0].getObjectType() !== AscDFH.historyitem_type_PieChart && this.chart.plotArea.charts[0].getObjectType() !== AscDFH.historyitem_type_DoughnutChart) && series.length !== 1
-                    || this.chart.plotArea.charts[0].getObjectType() === AscDFH.historyitem_type_SurfaceChart)
+            if( !this.chart.plotArea.charts[0].varyColors
+                || (this.chart.plotArea.charts[0].getObjectType() !== AscDFH.historyitem_type_PieChart && this.chart.plotArea.charts[0].getObjectType() !== AscDFH.historyitem_type_DoughnutChart) && series.length !== 1
+                || this.chart.plotArea.charts[0].getObjectType() === AscDFH.historyitem_type_SurfaceChart)
+            {
+                var bSurfaceChart = false;
+                if(this.chart.plotArea.charts[0].getObjectType() === AscDFH.historyitem_type_SurfaceChart){
+                    this.legendLength = this.chart.plotArea.charts[0].compiledBandFormats.length;
+                    ser = series[0];
+                    bSurfaceChart = true;
+                }
+                else {
+                    this.legendLength = series.length;
+                }
+                for(i = 0; i < this.legendLength; ++i)
                 {
-                    var bSurfaceChart = false;
-                    if(this.chart.plotArea.charts[0].getObjectType() === AscDFH.historyitem_type_SurfaceChart){
-                        this.legendLength = this.chart.plotArea.charts[0].compiledBandFormats.length;
-                        ser = series[0];
-                        bSurfaceChart = true;
+                    if(!bSurfaceChart){
+                        ser = series[i];
+
+                        if(ser.isHiddenForLegend)
+                            continue;
+                        entry = legend.findLegendEntryByIndex(i);
+                        if(entry && entry.bDelete)
+                            continue;
+                        arr_str_labels.push(ser.getSeriesName());
                     }
-                    else {
-                        this.legendLength = series.length;
+                    else{
+                        entry = legend.findLegendEntryByIndex(i);
+                        if(entry && entry.bDelete)
+                            continue;
+                        var oBandFmt = this.chart.plotArea.charts[0].compiledBandFormats[i];
+                        arr_str_labels.push(oBandFmt.startValue + "-" + oBandFmt.endValue);
                     }
-                    for(i = 0; i < this.legendLength; ++i)
+                    calc_entry = new AscFormat.CalcLegendEntry(legend, this, i);
+                    calc_entry.txBody = AscFormat.CreateTextBodyFromString(arr_str_labels[arr_str_labels.length - 1], this.getDrawingDocument(), calc_entry);
+
+                    //if(entry)
+                    //    calc_entry.txPr = entry.txPr;
+
+                    /*if(calc_entryes[0])
+                     {
+                     calc_entry.lastStyleObject = calc_entryes[0].lastStyleObject;
+                     }*/
+                    calc_entryes.push(calc_entry);
+                    cur_width = calc_entry.txBody.getRectWidth(2000);
+                    if(cur_width > max_width)
+                        max_width = cur_width;
+
+                    cur_font_size = calc_entry.txBody.content.Content[0].CompiledPr.Pr.TextPr.FontSize;
+                    if(cur_font_size > max_font_size)
+                        max_font_size = cur_font_size;
+
+                    calc_entry.calcMarkerUnion = new AscFormat.CUnionMarker();
+                    union_marker = calc_entry.calcMarkerUnion;
+                    var pts = AscFormat.getPtsFromSeries(ser);
+                    switch(ser.getObjectType())
                     {
-                        if(!bSurfaceChart){
-                            ser = series[i];
-
-                            if(ser.isHiddenForLegend)
-                                continue;
-                            entry = legend.findLegendEntryByIndex(i);
-                            if(entry && entry.bDelete)
-                                continue;
-                            arr_str_labels.push(ser.getSeriesName());
-                        }
-                        else{
-                            entry = legend.findLegendEntryByIndex(i);
-                            if(entry && entry.bDelete)
-                                continue;
-                            var oBandFmt = this.chart.plotArea.charts[0].compiledBandFormats[i];
-                            arr_str_labels.push(oBandFmt.startValue + "-" + oBandFmt.endValue);
-                        }
-                        calc_entry = new AscFormat.CalcLegendEntry(legend, this, i);
-                        calc_entry.txBody = AscFormat.CreateTextBodyFromString(arr_str_labels[arr_str_labels.length - 1], this.getDrawingDocument(), calc_entry);
-
-                        //if(entry)
-                        //    calc_entry.txPr = entry.txPr;
-
-                        /*if(calc_entryes[0])
-                         {
-                         calc_entry.lastStyleObject = calc_entryes[0].lastStyleObject;
-                         }*/
-                        calc_entryes.push(calc_entry);
-                        cur_width = calc_entry.txBody.getRectWidth(2000);
-                        if(cur_width > max_width)
-                            max_width = cur_width;
-
-                        cur_font_size = calc_entry.txBody.content.Content[0].CompiledPr.Pr.TextPr.FontSize;
-                        if(cur_font_size > max_font_size)
-                            max_font_size = cur_font_size;
-
-                        calc_entry.calcMarkerUnion = new AscFormat.CUnionMarker();
-                        union_marker = calc_entry.calcMarkerUnion;
-                        var pts = AscFormat.getPtsFromSeries(ser);
-                        switch(ser.getObjectType())
+                        case AscDFH.historyitem_type_BarSeries:
+                        case AscDFH.historyitem_type_BubbleSeries:
+                        case AscDFH.historyitem_type_AreaSeries:
+                        case AscDFH.historyitem_type_PieSeries:
                         {
-                            case AscDFH.historyitem_type_BarSeries:
-                            case AscDFH.historyitem_type_BubbleSeries:
-                            case AscDFH.historyitem_type_AreaSeries:
-                            case AscDFH.historyitem_type_PieSeries:
+                            union_marker.marker = AscFormat.CreateMarkerGeometryByType(AscFormat.SYMBOL_SQUARE, null);
+                            union_marker.marker.pen = ser.compiledSeriesPen;
+                            union_marker.marker.brush = ser.compiledSeriesBrush;
+                            break;
+                        }
+                        case AscDFH.historyitem_type_SurfaceSeries:{
+
+                            var oBandFmt = this.chart.plotArea.charts[0].compiledBandFormats[i];
+                            union_marker.marker = AscFormat.CreateMarkerGeometryByType(AscFormat.SYMBOL_SQUARE, null);
+                            union_marker.marker.pen = oBandFmt.spPr.ln;
+                            union_marker.marker.brush = oBandFmt.spPr.Fill;
+                            break;
+                        }
+                        case AscDFH.historyitem_type_LineSeries:
+                        case AscDFH.historyitem_type_ScatterSer:
+                        case AscDFH.historyitem_type_SurfaceSeries:
+                        {
+                            if(AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this))
                             {
                                 union_marker.marker = AscFormat.CreateMarkerGeometryByType(AscFormat.SYMBOL_SQUARE, null);
                                 union_marker.marker.pen = ser.compiledSeriesPen;
                                 union_marker.marker.brush = ser.compiledSeriesBrush;
                                 break;
                             }
-                            case AscDFH.historyitem_type_SurfaceSeries:{
-
-                                var oBandFmt = this.chart.plotArea.charts[0].compiledBandFormats[i];
-                                union_marker.marker = AscFormat.CreateMarkerGeometryByType(AscFormat.SYMBOL_SQUARE, null);
-                                union_marker.marker.pen = oBandFmt.spPr.ln;
-                                union_marker.marker.brush = oBandFmt.spPr.Fill;
-                                break;
-                            }
-                            case AscDFH.historyitem_type_LineSeries:
-                            case AscDFH.historyitem_type_ScatterSer:
-                            case AscDFH.historyitem_type_SurfaceSeries:
+                            if(ser.compiledSeriesMarker)
                             {
-                                if(AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this))
+                                var pts = AscFormat.getPtsFromSeries(ser);
+                                union_marker.marker = AscFormat.CreateMarkerGeometryByType(ser.compiledSeriesMarker.symbol, null);
+                                if(pts[0] && pts[0].compiledMarker)
                                 {
-                                    union_marker.marker = AscFormat.CreateMarkerGeometryByType(AscFormat.SYMBOL_SQUARE, null);
-                                    union_marker.marker.pen = ser.compiledSeriesPen;
-                                    union_marker.marker.brush = ser.compiledSeriesBrush;
-                                    break;
-                                }
-                                if(ser.compiledSeriesMarker)
-                                {
-                                    var pts = AscFormat.getPtsFromSeries(ser);
-                                    union_marker.marker = AscFormat.CreateMarkerGeometryByType(ser.compiledSeriesMarker.symbol, null);
-                                    if(pts[0] && pts[0].compiledMarker)
-                                    {
-                                        union_marker.marker.brush = pts[0].compiledMarker.brush;
-                                        union_marker.marker.pen = pts[0].compiledMarker.pen;
+                                    union_marker.marker.brush = pts[0].compiledMarker.brush;
+                                    union_marker.marker.pen = pts[0].compiledMarker.pen;
 
-                                    }
                                 }
-
-                                if(ser.compiledSeriesPen && !b_scatter_no_line)
-                                {
-                                    union_marker.lineMarker = AscFormat.CreateMarkerGeometryByType(AscFormat.SYMBOL_DASH, null);
-                                    union_marker.lineMarker.pen = ser.compiledSeriesPen.createDuplicate(); //Копируем, так как потом возможно придется изменять толщину линии;
-                                }
-                                if(!b_scatter_no_line && !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this))
-                                    b_line_series = true;
-                                break;
                             }
-                        }
-                        if(union_marker.marker)
-                        {
-                            union_marker.marker.pen && union_marker.marker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-                            union_marker.marker.brush && union_marker.marker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-                        }
-                        union_marker.lineMarker && union_marker.lineMarker.pen && union_marker.lineMarker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-                    }
-                }
-                else
-                {
-                    ser = series[0];
-                    i = 1;
-                    while(ser && ser.isHiddenForLegend)
-                    {
-                        ser = series[i];
-                        ++i;
-                    }
-                    var pts = AscFormat.getPtsFromSeries(ser), pt;
-                    var cat_str_lit = getCatStringPointsFromSeries(ser);
-                    this.legendLength = pts.length;
-                    for(i = 0; i < pts.length; ++i)
-                    {
-                        entry = legend.findLegendEntryByIndex(i);
-                        if(entry && entry.bDelete)
-                            continue;
-                        pt = pts[i];
-                        var str_pt = cat_str_lit ? cat_str_lit.getPtByIndex(pt.idx) : null;
-                        if(str_pt)
-                            arr_str_labels.push(str_pt.val);
-                        else
-                            arr_str_labels.push((pt.idx + 1) + "");
 
-                        calc_entry = new AscFormat.CalcLegendEntry(legend, this, pt.idx);
-                        calc_entry.txBody = AscFormat.CreateTextBodyFromString(arr_str_labels[arr_str_labels.length - 1], this.getDrawingDocument(), calc_entry);
-
-                        //if(entry)
-                        //    calc_entry.txPr = entry.txPr;
-                        //if(calc_entryes[0])
-                        //{
-                        //    calc_entry.lastStyleObject = calc_entryes[0].lastStyleObject;
-                        //}
-                        calc_entryes.push(calc_entry);
-
-                        cur_width = calc_entry.txBody.getRectWidth(2000);
-                        if(cur_width > max_width)
-                            max_width = cur_width;
-
-                        cur_font_size = calc_entry.txBody.content.Content[0].CompiledPr.Pr.TextPr.FontSize;
-                        if(cur_font_size > max_font_size)
-                            max_font_size = cur_font_size;
-
-                        calc_entry.calcMarkerUnion = new AscFormat.CUnionMarker();
-                        union_marker = calc_entry.calcMarkerUnion;
-                        if(ser.getObjectType() === AscDFH.historyitem_type_LineSeries && !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this) || ser.getObjectType() === AscDFH.historyitem_type_ScatterSer)
-                        {
-                            if(pt.compiledMarker)
-                            {
-                                union_marker.marker = AscFormat.CreateMarkerGeometryByType(pt.compiledMarker.symbol, null);
-                                union_marker.marker.brush = pt.compiledMarker.pen.Fill;
-                                union_marker.marker.pen = pt.compiledMarker.pen;
-                            }
-                            if(pt.pen)
+                            if(ser.compiledSeriesPen && !b_scatter_no_line)
                             {
                                 union_marker.lineMarker = AscFormat.CreateMarkerGeometryByType(AscFormat.SYMBOL_DASH, null);
-                                union_marker.lineMarker.pen = pt.pen;
+                                union_marker.lineMarker.pen = ser.compiledSeriesPen.createDuplicate(); //Копируем, так как потом возможно придется изменять толщину линии;
                             }
                             if(!b_scatter_no_line && !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this))
                                 b_line_series = true;
+                            break;
                         }
-                        else
-                        {
-                            union_marker.marker = AscFormat.CreateMarkerGeometryByType(AscFormat.SYMBOL_SQUARE, null);
-                            union_marker.marker.pen = pt.pen;
-                            union_marker.marker.brush = pt.brush;
-                        }
-                        if(union_marker.marker)
-                        {
-                            union_marker.marker.pen && union_marker.marker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-                            union_marker.marker.brush && union_marker.marker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-                        }
-                        union_marker.lineMarker && union_marker.lineMarker.pen && union_marker.lineMarker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                     }
+                    if(union_marker.marker)
+                    {
+                        union_marker.marker.pen && union_marker.marker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        union_marker.marker.brush && union_marker.marker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                    }
+                    union_marker.lineMarker && union_marker.lineMarker.pen && union_marker.lineMarker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                 }
+            }
+            else
+            {
+                ser = series[0];
+                i = 1;
+                while(ser && ser.isHiddenForLegend)
+                {
+                    ser = series[i];
+                    ++i;
+                }
+                var pts = AscFormat.getPtsFromSeries(ser), pt;
+                var cat_str_lit = getCatStringPointsFromSeries(ser);
+                this.legendLength = pts.length;
+                for(i = 0; i < pts.length; ++i)
+                {
+                    entry = legend.findLegendEntryByIndex(i);
+                    if(entry && entry.bDelete)
+                        continue;
+                    pt = pts[i];
+                    var str_pt = cat_str_lit ? cat_str_lit.getPtByIndex(pt.idx) : null;
+                    if(str_pt)
+                        arr_str_labels.push(str_pt.val);
+                    else
+                        arr_str_labels.push((pt.idx + 1) + "");
+
+                    calc_entry = new AscFormat.CalcLegendEntry(legend, this, pt.idx);
+                    calc_entry.txBody = AscFormat.CreateTextBodyFromString(arr_str_labels[arr_str_labels.length - 1], this.getDrawingDocument(), calc_entry);
+
+                    //if(entry)
+                    //    calc_entry.txPr = entry.txPr;
+                    //if(calc_entryes[0])
+                    //{
+                    //    calc_entry.lastStyleObject = calc_entryes[0].lastStyleObject;
+                    //}
+                    calc_entryes.push(calc_entry);
+
+                    cur_width = calc_entry.txBody.getRectWidth(2000);
+                    if(cur_width > max_width)
+                        max_width = cur_width;
+
+                    cur_font_size = calc_entry.txBody.content.Content[0].CompiledPr.Pr.TextPr.FontSize;
+                    if(cur_font_size > max_font_size)
+                        max_font_size = cur_font_size;
+
+                    calc_entry.calcMarkerUnion = new AscFormat.CUnionMarker();
+                    union_marker = calc_entry.calcMarkerUnion;
+                    if(ser.getObjectType() === AscDFH.historyitem_type_LineSeries && !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this) || ser.getObjectType() === AscDFH.historyitem_type_ScatterSer)
+                    {
+                        if(pt.compiledMarker)
+                        {
+                            union_marker.marker = AscFormat.CreateMarkerGeometryByType(pt.compiledMarker.symbol, null);
+                            union_marker.marker.brush = pt.compiledMarker.pen.Fill;
+                            union_marker.marker.pen = pt.compiledMarker.pen;
+                        }
+                        if(pt.pen)
+                        {
+                            union_marker.lineMarker = AscFormat.CreateMarkerGeometryByType(AscFormat.SYMBOL_DASH, null);
+                            union_marker.lineMarker.pen = pt.pen;
+                        }
+                        if(!b_scatter_no_line && !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this))
+                            b_line_series = true;
+                    }
+                    else
+                    {
+                        union_marker.marker = AscFormat.CreateMarkerGeometryByType(AscFormat.SYMBOL_SQUARE, null);
+                        union_marker.marker.pen = pt.pen;
+                        union_marker.marker.brush = pt.brush;
+                    }
+                    if(union_marker.marker)
+                    {
+                        union_marker.marker.pen && union_marker.marker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        union_marker.marker.brush && union_marker.marker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                    }
+                    union_marker.lineMarker && union_marker.lineMarker.pen && union_marker.lineMarker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                }
+            }
             var marker_size;
             var distance_to_text;
             var line_marker_width;
