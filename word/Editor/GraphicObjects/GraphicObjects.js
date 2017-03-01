@@ -576,6 +576,7 @@ CGraphicObjects.prototype =
     },
 
     resetTextSelection: DrawingObjectsController.prototype.resetTextSelection,
+    collectPropsFromDLbls: DrawingObjectsController.prototype.collectPropsFromDLbls,
 
     setProps: function(oProps)
     {
