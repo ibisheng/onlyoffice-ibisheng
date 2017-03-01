@@ -9039,6 +9039,10 @@
 			}
 			this.showSpecialPasteOptions(allowedSpecialPasteProps, selectData[0]);
 		}
+		else
+		{
+			this.updateSpecialPasteOptionsPosition();
+		}
     };
 
     WorksheetView.prototype._loadDataBeforePaste = function ( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth ) {
