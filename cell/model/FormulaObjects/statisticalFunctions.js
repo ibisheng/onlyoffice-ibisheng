@@ -55,7 +55,6 @@
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
 	var _func = AscCommonExcel._func;
-	var parseNum = AscCommonExcel.parseNum;
 	var matching = AscCommonExcel.matching;
 
 	var maxGammaArgument = 171.624376956302;
@@ -494,9 +493,6 @@
 					sum = _func[sum.type][_argV.type](sum, _argV, "+");
 					count++;
 				} else if (cElementType.string === _argV.type) {
-					if (parseNum(_argV.getValue())) {
-						sum = _func[sum.type][_argV.type](sum, _argV.tocNumber(), "+");
-					}
 					count++;
 				}
 			} else if (cElementType.cellsRange === _arg.type || cElementType.cellsRange3D === _arg.type) {
@@ -507,9 +503,6 @@
 						sum = _func[sum.type][__arg.type](sum, __arg, "+");
 						count++;
 					} else if (cElementType.string === __arg.type) {
-						if (parseNum(__arg.getValue())) {
-							sum = _func[sum.type][__arg.type](sum, __arg.tocNumber(), "+");
-						}
 						count++;
 					}
 				}
