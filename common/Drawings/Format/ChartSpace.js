@@ -1129,6 +1129,10 @@ CChartSpace.prototype.applyLabelsFunction = function(fCallback, value)
                     var dLbl  = ser.dLbls.findDLblByIdx(pts[i].idx);
                     if(dLbl)
                     {
+                        if(ser.dLbls.txPr && !dLbl.txPr)
+                        {
+                            dLbl.setTxPr(ser.dLbls.txPr.createDuplicate());
+                        }
                         fCallback(dLbl, value, this.getDrawingDocument(), 10);
                     }
                 }
