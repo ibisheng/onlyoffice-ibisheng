@@ -95,6 +95,8 @@
 			this.formatTable = true;
 			
 			this.images = true;
+			
+			this.width = null;
 		}
 		
 		СSpecialPasteProps.prototype = {
@@ -121,6 +123,8 @@
 				this.formatTable = true;
 				
 				this.images = true;
+				
+				this.width = null;
 			},
 			revert: function()
 			{
@@ -142,6 +146,8 @@
 				this.formatTable = null;
 				
 				this.images = null;
+				
+				this.width = null;
 			},
 			asc_setProps: function(props)
 			{
@@ -183,6 +189,7 @@
 					}
 					case c_oSpecialPasteProps.formulaColumnWidth:
 					{
+						this.width = true;
 						break;
 					}
 					case c_oSpecialPasteProps.mergeConditionalFormating:

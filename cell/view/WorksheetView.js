@@ -8777,7 +8777,7 @@
         }
     };
 	
-	WorksheetView.prototype.specialPaste = function (preSpecialPasteData, specialPasteData, props) {
+	WorksheetView.prototype.specialPaste = function (specialPasteUndoData, specialPasteData, props) {
 		var api = window["Asc"]["editor"];
 		var t = this;
 		
@@ -8798,7 +8798,7 @@
 			var undoPreviousPaste = function()
 			{
 				//откатываем данные в ячейках
-				var sBase64 = preSpecialPasteData.data.split('xslData;')[1];
+				var sBase64 = specialPasteUndoData.data.split('xslData;')[1];
 				var oBinaryFileReader = new AscCommonExcel.BinaryFileReader(true);
 				var tempWorkbook = new AscCommonExcel.Workbook();
 				pptx_content_loader.Start_UseFullUrl();
@@ -8813,9 +8813,9 @@
 				}
 				
 				//удаляем вставленные изображения
-				if(preSpecialPasteData.images)
+				if(specialPasteUndoData.images)
 				{
-					var images = preSpecialPasteData.images;
+					var images = specialPasteUndoData.images;
 					for(var i = 0; i < images.length; i++)
 					{
 						var id = images[i];
@@ -8835,9 +8835,10 @@
 			
 			//откатываемся до того, что было до вставки
 			//курсор и специальная вставка не в шейпе + курсор в шейпе, специальная вставка на листе
-			if(preSpecialPasteData && preSpecialPasteData.data && !window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId)
+			if(specialPasteUndoData && specialPasteUndoData.data && !window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId)
 			{
 				var tempProps = new Asc.SpecialPasteProps();
+				tempProps.width = true;
 				window['AscCommon'].g_clipboardBase.specialPasteProps = tempProps;
 				
 				//переводим фокус из шейпа на лист
@@ -8857,10 +8858,10 @@
 				
 				undoPreviousPaste();
 			}
-			else if(isIntoShape && preSpecialPasteData && preSpecialPasteData.shapeSelectionState)//курсор и специальная вставка в шейпе
+			else if(isIntoShape && specialPasteUndoData && specialPasteUndoData.shapeSelectionState)//курсор и специальная вставка в шейпе
 			{
 				//таким образом удаляю вставляенный фрагмент до специальной вставки
-				var State = preSpecialPasteData.shapeSelectionState;
+				var State = specialPasteUndoData.shapeSelectionState;
 				isIntoShape.Set_SelectionState(State, State.length - 1);
 				isIntoShape.Remove(1, true, true);
 			}
@@ -9609,6 +9610,7 @@
 			}
 			
 			pastedRangeProps.tableDxf = getTableDxf(pasteRow, pasteCol, newVal);
+			pastedRangeProps.width = val._getCol(pasteCol);
 			
 			//apply props by cell
 			var formulaProps = {firstRange: firstRange, arrFormula: arrFormula, tablesMap: tablesMap, newVal: newVal, isOneMerge: isOneMerge, val: val};
@@ -9755,6 +9757,16 @@
 				//firstRange.setValue2(value2);
 			}
 		};
+		
+		
+		//column width
+		if(specialPasteProps.width && rangeStyle.width)
+		{
+			var widthProp = rangeStyle.width;
+			t.model.setColWidth(widthProp.width, range.bbox.c1, range.bbox.c1);
+			t.model.setColHidden(widthProp.hd, range.bbox.c1, range.bbox.c1);
+			t.model.setColBestFit(widthProp.BestFit, widthProp.width, range.bbox.c1, range.bbox.c1);
+		}
 		
 		//offsetLast
 		if(rangeStyle.offsetLast && specialPasteProps.merge)
