@@ -9550,6 +9550,7 @@
 			return dxf;
 		};
 		
+		var colsWidth = {};
 		var putInsertedCellIntoRange = function(nRow, nCol, pasteRow, pasteCol, rowDiff, colDiff, range, newVal)
 		{
 			var pastedRangeProps = {};
@@ -9610,7 +9611,11 @@
 			}
 			
 			pastedRangeProps.tableDxf = getTableDxf(pasteRow, pasteCol, newVal);
-			pastedRangeProps.width = val._getCol(pasteCol);
+			if(undefined === colsWidth[nCol])
+			{
+				colsWidth[nCol] = val._getCol(pasteCol);
+			}
+			pastedRangeProps.colsWidth = colsWidth;
 			
 			//apply props by cell
 			var formulaProps = {firstRange: firstRange, arrFormula: arrFormula, tablesMap: tablesMap, newVal: newVal, isOneMerge: isOneMerge, val: val};
@@ -9760,12 +9765,16 @@
 		
 		
 		//column width
-		if(specialPasteProps.width && rangeStyle.width)
+		var col = range.bbox.c1;
+		if(specialPasteProps.width && rangeStyle.colsWidth[col])
 		{
-			var widthProp = rangeStyle.width;
-			t.model.setColWidth(widthProp.width, range.bbox.c1, range.bbox.c1);
-			t.model.setColHidden(widthProp.hd, range.bbox.c1, range.bbox.c1);
-			t.model.setColBestFit(widthProp.BestFit, widthProp.width, range.bbox.c1, range.bbox.c1);
+			var widthProp = rangeStyle.colsWidth[col];
+			
+			t.model.setColWidth(widthProp.width, col, col);
+			t.model.setColHidden(widthProp.hd, col, col);
+			t.model.setColBestFit(widthProp.BestFit, widthProp.width, col, col);
+			
+			rangeStyle.colsWidth[col] = null;
 		}
 		
 		//offsetLast
