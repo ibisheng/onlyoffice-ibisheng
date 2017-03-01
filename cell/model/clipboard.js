@@ -1386,7 +1386,11 @@
 				History.EndTransaction();
 				
 				//for special paste
-				if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
+				//TODO пока выключаю специальную ставку внутри math, позже доработать и включить
+				var oInfo = new CSelectedElementsInfo();
+				var selectedElementsInfo = isIntoShape.Get_SelectedElementsInfo(oInfo);
+				var mathObj = oInfo.Get_Math();
+				if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart && null === mathObj)
 				{
 					var sProps = Asc.c_oSpecialPasteProps;
 					var curShape = isIntoShape.Parent.parent;
