@@ -2063,6 +2063,13 @@ $( function () {
         ws.getRange2( "E2" ).setValue( "TRUE" );
         ws.getRange2( "E3" ).setValue( "FALSE" );
 
+		ws.getRange2( "F2" ).setValue( "10" );
+		ws.getRange2( "F3" ).setValue( "7" );
+		ws.getRange2( "F4" ).setValue( "9" );
+		ws.getRange2( "F5" ).setValue( "2" );
+		ws.getRange2( "F6" ).setValue( "Not available" );
+		ws.getRange2( "F7" ).setValue( "" );
+
         oParser = new parserFormula( "AVERAGEA(10,E1)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 10 );
@@ -2074,6 +2081,14 @@ $( function () {
         oParser = new parserFormula( "AVERAGEA(10,E3)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 5 );
+
+		oParser = new parserFormula( "AVERAGEA(F2:F6)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 5.6 );
+
+		oParser = new parserFormula( "AVERAGEA(F2:F5,F7)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 7 );
 
     } );
 
