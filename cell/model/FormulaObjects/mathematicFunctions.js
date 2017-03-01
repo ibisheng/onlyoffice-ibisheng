@@ -4099,9 +4099,8 @@ cSQRTPI.prototype.getInfo = function () {
             }
         }
 
-        var _sum = 0;
         var arg0Matrix = arg0.getMatrix();
-        var i, j, arg1, arg2, valueForSearching, match, search, oper = null;
+        var i, j, arg1, arg2, valueForSearching, match, search, oper;
         for (var k = 1; k < arg.length; k += 2) {
             arg1 = arg[k];
             arg2 = arg[k + 1];
@@ -4156,6 +4155,7 @@ cSQRTPI.prototype.getInfo = function () {
 			}
         }
 
+		var _sum = 0;
         var valMatrix0;
         for (i = 0; i < arg0Matrix.length; ++i) {
             for (j = 0; j < arg0Matrix[i].length; ++j) {
