@@ -2090,6 +2090,37 @@ $( function () {
 
     } );
 
+	test( "Test: \"AVERAGEIFS\"", function () {
+
+		ws.getRange2( "E2" ).setValue( "Quiz" );
+		ws.getRange2( "E3" ).setValue( "Grade" );
+		ws.getRange2( "E4" ).setValue( "75" );
+		ws.getRange2( "E5" ).setValue( "94" );
+
+		ws.getRange2( "F2" ).setValue( "Quiz" );
+		ws.getRange2( "F3" ).setValue( "Grade" );
+		ws.getRange2( "F4" ).setValue( "85" );
+		ws.getRange2( "F5" ).setValue( "80" );
+
+		ws.getRange2( "G2" ).setValue( "Exam" );
+		ws.getRange2( "G3" ).setValue( "Grade" );
+		ws.getRange2( "G4" ).setValue( "87" );
+		ws.getRange2( "G5" ).setValue( "88" );
+
+		oParser = new parserFormula( "AVERAGEIFS(E2:E5,E2:E5,\">70\",E2:E5,\"<90\")", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 75 );
+
+		oParser = new parserFormula( "AVERAGEIFS(F2:F5,F2:F5,\">95\")", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#DIV/0!" );
+
+		oParser = new parserFormula( "AVERAGEIFS(G2:G5,G2:G5,\"<>Incomplete\",G2:G5,\">80\")", "A3", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 87.5 );
+
+	} );
+
     test( "Test: \"BINOMDIST\"", function () {
 
         function binomdist( x, n, p ) {
