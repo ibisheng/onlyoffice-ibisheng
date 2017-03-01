@@ -488,47 +488,47 @@
 		var count = 0, sum = new cNumber(0);
 		for (var i = 0; i < arg.length; i++) {
 			var _arg = arg[i];
-			if (_arg instanceof cRef || _arg instanceof cRef3D) {
+			if (cElementType.cell === _arg.type || cElementType.cell3D === _arg.type) {
 				var _argV = _arg.getValue();
-				if (_argV instanceof cNumber || _argV instanceof cBool) {
+				if (cElementType.number === _argV.type || cElementType.bool === _argV.type) {
 					sum = _func[sum.type][_argV.type](sum, _argV, "+");
 					count++;
-				} else if (_argV instanceof cString) {
+				} else if (cElementType.string === _argV.type) {
 					if (parseNum(_argV.getValue())) {
 						sum = _func[sum.type][_argV.type](sum, _argV.tocNumber(), "+");
 					}
 					count++;
 				}
-			} else if (_arg instanceof cArea || _arg instanceof cArea3D) {
+			} else if (cElementType.cellsRange === _arg.type || cElementType.cellsRange3D === _arg.type) {
 				var _argAreaValue = _arg.getValue();
 				for (var j = 0; j < _argAreaValue.length; j++) {
 					var __arg = _argAreaValue[j];
-					if (__arg instanceof cNumber || __arg instanceof cBool) {
+					if (cElementType.number === __arg.type || cElementType.bool === __arg.type) {
 						sum = _func[sum.type][__arg.type](sum, __arg, "+");
 						count++;
-					} else if (__arg instanceof cString) {
+					} else if (cElementType.string === __arg.type) {
 						if (parseNum(__arg.getValue())) {
 							sum = _func[sum.type][__arg.type](sum, __arg.tocNumber(), "+");
 						}
 						count++;
 					}
 				}
-			} else if (_arg instanceof cArray) {
+			} else if (cElementType.array === _arg.type) {
 				_arg.foreach(function (elem) {
 
-					if (elem instanceof cString || elem instanceof cEmpty) {
+					if (cElementType.string === elem.type || cElementType.empty === elem.type) {
 						return false;
 					}
 
 					var e = elem.tocNumber();
-					if (e instanceof cNumber) {
+					if (cElementType.number === e.type) {
 						sum = _func[sum.type][e.type](sum, e, "+");
 						count++;
 					}
 				})
 			} else {
 				_arg = _arg.tocNumber();
-				if (_arg instanceof cError) {
+				if (cElementType.error === _arg.type) {
 					return this.value = _arg;
 				}
 				sum = _func[sum.type][_arg.type](sum, _arg, "+");
