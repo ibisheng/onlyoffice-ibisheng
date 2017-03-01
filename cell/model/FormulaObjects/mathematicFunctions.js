@@ -3996,13 +3996,11 @@ cSQRTPI.prototype.getInfo = function () {
             noneFormat: -2
         };
         this.numFormat = this.formatType.def;
-        this.operatorRE = new RegExp("^ *[<=> ]+ *");
-        this.spaceRE = /\s/g;
     }
 
     cSUMIF.prototype = Object.create(cBaseFunction.prototype);
     cSUMIF.prototype.Calculate = function (arg) {
-        var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _sum = 0, valueForSearching;
+        var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _sum = 0, matchingInfo;
         if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type && cElementType.cellsRange !== arg0.type) {
             if (cElementType.cellsRange3D === arg0.type) {
                 arg0 = arg0.tocArea();
@@ -4037,21 +4035,13 @@ cSQRTPI.prototype.getInfo = function () {
             return this.value = new cError(cErrorType.wrong_value_type);
         }
 
-        arg1 = arg1.toString();
-        var match = arg1.match(this.operatorRE), search, oper;
-        if (match) {
-            search = arg1.substr(match[0].length);
-            oper = match[0].replace(this.spaceRE, "");
-        } else {
-            search = arg1;
-        }
-        valueForSearching = AscCommonExcel.matchingValue(search);
+		matchingInfo = AscCommonExcel.matchingValue(arg1.toString());
         if (cElementType.cellsRange === arg0.type) {
             var arg0Matrix = arg0.getMatrix(), arg2Matrix = arg2.getMatrix(), valMatrix2;
             for (var i = 0; i < arg0Matrix.length; i++) {
                 for (var j = 0; j < arg0Matrix[i].length; j++) {
                     if (arg2Matrix[i] && (valMatrix2 = arg2Matrix[i][j]) && cElementType.number === valMatrix2.type &&
-                      AscCommonExcel.matching(arg0Matrix[i][j], valueForSearching, oper)) {
+                      AscCommonExcel.matching(arg0Matrix[i][j], matchingInfo)) {
                         _sum += valMatrix2.getValue();
                     }
                 }
@@ -4081,8 +4071,6 @@ cSQRTPI.prototype.getInfo = function () {
             noneFormat: -2
         };
         this.numFormat = this.formatType.def;
-        this.operatorRE = new RegExp("^ *[<=> ]+ *");
-        this.spaceRE = /\s/g;
     }
 
     cSUMIFS.prototype = Object.create(cBaseFunction.prototype);
@@ -4100,7 +4088,7 @@ cSQRTPI.prototype.getInfo = function () {
         }
 
         var arg0Matrix = arg0.getMatrix();
-        var i, j, arg1, arg2, valueForSearching, match, search, oper;
+        var i, j, arg1, arg2, matchingInfo;
         for (var k = 1; k < arg.length; k += 2) {
             arg1 = arg[k];
             arg2 = arg[k + 1];
@@ -4128,16 +4116,7 @@ cSQRTPI.prototype.getInfo = function () {
                 return this.value = new cError(cErrorType.wrong_value_type);
             }
 
-            arg2 = arg2.toString();
-            match = arg2.match(this.operatorRE);
-            if (match) {
-                search = arg2.substr(match[0].length);
-                oper = match[0].replace(this.spaceRE, "");
-            } else {
-                search = arg2;
-                oper = null;
-            }
-            valueForSearching = AscCommonExcel.matchingValue(search);
+			matchingInfo = AscCommonExcel.matchingValue(arg2.toString());
 
 			var arg1Matrix = arg1.getMatrix();
 			if (arg0Matrix.length !== arg1Matrix.length) {
@@ -4148,7 +4127,7 @@ cSQRTPI.prototype.getInfo = function () {
 					return this.value = new cError(cErrorType.wrong_value_type);
 				}
 				for (j = 0; j < arg1Matrix[i].length; ++j) {
-					if (arg0Matrix[i][j] && !AscCommonExcel.matching(arg1Matrix[i][j], valueForSearching, oper)) {
+					if (arg0Matrix[i][j] && !AscCommonExcel.matching(arg1Matrix[i][j], matchingInfo)) {
 						arg0Matrix[i][j] = null;
 					}
 				}
