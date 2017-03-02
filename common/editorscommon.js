@@ -922,6 +922,10 @@ function InitOnMessage (callback) {
 
 						} else
 							callback(mapAscServerErrorToAscError(data["error"]));
+					} else if (data.type === "onExternalPluginMessage") {
+						var _iframe = document.getElementById("plugin_iframe");
+						if (_iframe)
+							_iframe.contentWindow.postMessage(event.data, "*");
 					}
 				} catch (err) {
 				}
