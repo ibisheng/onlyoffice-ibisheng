@@ -97,6 +97,7 @@
 			this.images = true;
 			
 			this.width = null;
+			this.transpose = null;
 		}
 		
 		СSpecialPasteProps.prototype = {
@@ -125,6 +126,7 @@
 				this.images = true;
 				
 				this.width = null;
+				this.transpose = null;
 			},
 			revert: function()
 			{
@@ -148,6 +150,7 @@
 				this.images = null;
 				
 				this.width = null;
+				this.transpose = null;
 			},
 			asc_setProps: function(props)
 			{
@@ -226,6 +229,7 @@
 					}
 					case c_oSpecialPasteProps.transpose:
 					{
+						this.transpose = true;
 						break;
 					}
 					case c_oSpecialPasteProps.link:

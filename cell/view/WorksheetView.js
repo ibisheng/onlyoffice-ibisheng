@@ -9030,7 +9030,7 @@
 			var sProps = Asc.c_oSpecialPasteProps;
 			if(fromBinary)
 			{
-				allowedSpecialPasteProps = [sProps.paste, sProps.pasteOnlyFormula, sProps.formulaNumberFormat, sProps.formulaAllFormatting, sProps.formulaWithoutBorders, sProps.formulaColumnWidth, sProps.pasteOnlyValues, sProps.valueNumberFormat, sProps.valueAllFormating, sProps.pasteOnlyFormating/*, sProps.link*/];
+				allowedSpecialPasteProps = [sProps.paste, sProps.pasteOnlyFormula, sProps.formulaNumberFormat, sProps.formulaAllFormatting, sProps.formulaWithoutBorders, sProps.formulaColumnWidth, sProps.transpose, sProps.pasteOnlyValues, sProps.valueNumberFormat, sProps.valueAllFormating, sProps.pasteOnlyFormating/*, sProps.link*/];
 			}
 			else
 			{
@@ -9628,21 +9628,22 @@
 		
         for (var autoR = 0; autoR < maxARow; ++autoR) {
             for (var autoC = 0; autoC < maxACol; ++autoC) {
-                for (var r = arn.r1; r < rMax; ++r) {
-                    for (var c = arn.c1; c < cMax; ++c) {
-                        var pasteRow = r - arn.r1 + activeCellsPasteFragment.r1;
-                        var pasteCol = c - arn.c1 + activeCellsPasteFragment.c1;
+                for (var r = 0; r < rMax - arn.r1; ++r) {
+                    for (var c = 0; c < cMax - arn.c1; ++c) {
+                        var pasteRow = r + activeCellsPasteFragment.r1;
+                        var pasteCol = c + activeCellsPasteFragment.c1;
                         var newVal = val.getCell3(pasteRow, pasteCol);
 
                         var curMerge = newVal.hasMerged();
 
                         if (undefined !== newVal) {
 							
-							var nRow = r + autoR * plRow;
+							var nRow = r + autoR * plRow + arn.r1;
+							var nCol = c + autoC * plCol + arn.c1;
+							
 							if (nRow > gc_nMaxRow0) {
 								nRow = gc_nMaxRow0;
 							}
-							var nCol = c + autoC * plCol;
 							if (nCol > gc_nMaxCol0) {
 								nCol = gc_nMaxCol0;
 							}
@@ -9651,9 +9652,9 @@
 							putInsertedCellIntoRange(nRow, nCol, pasteRow, pasteCol, autoR * plRow, autoC * plCol, range, newVal);
 							
                             //если замержили range
-                            c = range.bbox.c2 - autoC * plCol;
+                            c = range.bbox.c2 - autoC * plCol - arn.c1;
                             if (c === cMax) {
-                                r = range.bbox.r2 - autoC * plCol;
+                                r = range.bbox.r2 - autoC * plCol - arn.r1;
                             }
                         }
                     }
