@@ -8768,6 +8768,8 @@
 				var specialPasteSelectionRange = new AscCommonExcel.SelectionRange();
 				specialPasteSelectionRange.ranges[0] = newRange.clone();
 				g_clipboardBase.specialPasteData.activeRange = specialPasteSelectionRange;
+				
+				window['AscCommon'].g_clipboardBase.specialPasteUndoData.transpose = null;
 			}
 			else if(g_clipboardBase.specialPasteProps && g_clipboardBase.specialPasteProps.transpose)
 			{
@@ -9041,7 +9043,12 @@
 			var sProps = Asc.c_oSpecialPasteProps;
 			if(fromBinary)
 			{
-				allowedSpecialPasteProps = [sProps.paste, sProps.pasteOnlyFormula, sProps.formulaNumberFormat, sProps.formulaAllFormatting, sProps.formulaWithoutBorders, sProps.formulaColumnWidth, sProps.transpose, sProps.pasteOnlyValues, sProps.valueNumberFormat, sProps.valueAllFormating, sProps.pasteOnlyFormating/*, sProps.link*/];
+				allowedSpecialPasteProps = [sProps.paste, sProps.pasteOnlyFormula, sProps.formulaNumberFormat, sProps.formulaAllFormatting, sProps.formulaWithoutBorders, sProps.formulaColumnWidth,  sProps.pasteOnlyValues, sProps.valueNumberFormat, sProps.valueAllFormating, sProps.pasteOnlyFormating/*, sProps.link*/];
+				if(!(val.TableParts && val.TableParts.length))
+				{
+					//add transpose property
+					allowedSpecialPasteProps.push(sProps.transpose);
+				}
 			}
 			else
 			{
