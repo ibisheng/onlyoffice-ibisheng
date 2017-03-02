@@ -547,7 +547,7 @@ function CDrawingDocument()
     this.IsLockObjectsEnable    = false;
     this.LogicDocument          = null;
     this.m_bIsMouseLock         = false;
-    
+
     this.CanvasHitContext       = CreateHitControl();
 
     this.m_dTargetSize          = 0;
@@ -556,7 +556,7 @@ function CDrawingDocument()
     this.Frame = null;
     this.Table = null;
     this.AutoShapesTrack        = new AscCommon.CAutoshapeTrack();
-    
+
     this.m_oWordControl = this;
 
     this.IsUpdateOverlayOnlyEnd         = false;
@@ -576,9 +576,9 @@ function CDrawingDocument()
 
     this.IsKeyDownButNoPress    = false;
     this.bIsUseKeyPress         = false;
-    
+
     this.m_sLockedCursorType    = "";
-    
+
     this.AutoShapesTrackLockPageNum = -1;
 
     // inline text track
@@ -589,7 +589,7 @@ function CDrawingDocument()
     // frame rect
     this.FrameRect = { IsActive : false, Rect : { X : 0, Y : 0, R : 0, B : 0 }, Frame : null,
         Track : { X : 0, Y : 0, L : 0, T : 0, R : 0, B : 0, PageIndex : 0, Type : -1 }, IsTracked : false, PageIndex : 0 };
-	
+
 	// math rect
 	this.MathRect = { IsActive : false, Rect : { X : 0, Y : 0, R : 0, B : 0, PageIndex : 0 } };
 
@@ -626,7 +626,7 @@ CDrawingDocument.prototype =
         this.m_oApi.DocumentUrl = "";
         this.LogicDocument = window.editor.WordControl.m_oLogicDocument;
         this.LogicDocument.DrawingDocument = this;
-       
+
         this.selectionMatrix = null;
         this.isSelectionMatrix = false;
     },
@@ -781,7 +781,7 @@ CDrawingDocument.prototype =
             this.TextMatrix.sy = matrix.sy;
             this.TextMatrix.tx = matrix.tx;
             this.TextMatrix.ty = matrix.ty;
-            
+
             this.Native["DD_UpdateTargetTransform"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
         }
         else
@@ -904,6 +904,7 @@ CDrawingDocument.prototype =
     AddPageSelection : function(pageIndex, x, y, w, h)
     {
         this.selectionMatrix = this.TextMatrix;
+
         this.Native["DD_AddPageSelection"](pageIndex, x, y, w, h);
     },
     OnSelectEnd : function()
@@ -957,10 +958,10 @@ CDrawingDocument.prototype =
     {
         this.Native["DD_EndSearch"](bIsChange);
     },
-    
+
     SetTextSelectionOutline : function(isSelectionOutline)
     {
-        
+
     },
 
     // ruler states
@@ -1248,7 +1249,7 @@ CDrawingDocument.prototype =
     CheckFontNeeds : function()
     {
     },
-	
+
 	BeginDrawTracking: function()
     {
         if (this.AutoShapesTrack.BeginDrawTracking) {
@@ -1339,7 +1340,7 @@ CDrawingDocument.prototype =
     OnUpdateOverlay : function()
     {
         isSelectionMatrix = false;
-        
+
         if (this.IsUpdateOverlayOnlyEnd)
         {
             this.IsUpdateOverlayOnEndCheck = true;
@@ -1465,7 +1466,7 @@ CDrawingDocument.prototype =
         // 0 - none
         // 1 - select markers
         // 2 - drawing track
-        
+
         var matrixCheck = this.selectionMatrix; // this.TextMatrix
 
         check_MouseDownEvent(e, false);
@@ -1610,8 +1611,7 @@ CDrawingDocument.prototype =
 
                 var _isDrawings = this.LogicDocument.DrawingObjects.isPointInDrawingObjects2(pos.X, pos.Y, pos.Page, true);
 
-                if (_isDrawings)
-                {
+                if (_isDrawings) {
                     this.OnMouseDown(e);
                 }
 
@@ -1662,8 +1662,9 @@ CDrawingDocument.prototype =
              return;
              */
             var is_drawing = this.checkMouseDown_Drawing(pos);
-            if (is_drawing === true)
+            if (is_drawing === true) {
                 return;
+            }
 
             this.Native["DD_NeedScrollToTargetFlag"](true);
             this.LogicDocumentOnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
@@ -1791,8 +1792,8 @@ CDrawingDocument.prototype =
     {
         if (this.SelectDrag == 1 || this.SelectDrag == 2)
         {
-            global_mouseEvent.X += this.SelectMobileXOffset;
-            global_mouseEvent.Y += this.SelectMobileYOffset;
+            //  global_mouseEvent.X += this.SelectMobileXOffset;
+            //  global_mouseEvent.Y += this.SelectMobileYOffset;
         }
 
         var pos = null;
@@ -2033,7 +2034,7 @@ CDrawingDocument.prototype =
 
     __DD_ConvetToPageCoords : function(x, y, page)
     {
-        var pos = this.Native["DD_ConvetToPageCoords"](x, y, page);
+        var pos = window["native"]["DD_ConvetToPageCoords"](x, y, page);
         return { X : pos["X"], Y : pos["Y"], Page : pos["Page"] };
     },
 
@@ -2232,10 +2233,10 @@ CDrawingDocument.prototype =
 
         this.Native["DD_EndNativeDraw"](_stream);
     },
-    
+
     CheckGuiControlColors : function ()
     {
-        
+
     },
     SendControlColors : function()
     {
@@ -2875,7 +2876,7 @@ function check_MouseDownEvent(e, isClicks)
     {
         global_mouseEvent.ClickCount     = 1;
     }
-    
+
     global_mouseEvent.IsLocked = true;
 }
 
@@ -2905,7 +2906,7 @@ function check_MouseUpEvent(e)
     global_mouseEvent.Button    = e["Button"];
 
     global_mouseEvent.Sender    = null;
-    
+
     global_mouseEvent.IsLocked  = false;
 }
 

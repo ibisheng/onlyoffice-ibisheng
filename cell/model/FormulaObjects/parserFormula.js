@@ -5364,11 +5364,25 @@ function parseNum( str ) {
     return !isNaN( str );
 }
 
-	function matchingValue(search) {
+	var matchingOperators = new RegExp("^ *[<=> ]+ *");
+
+	function matchingValue(val) {
+		var search, op;
+		var match = val.match(matchingOperators);
+		if (match) {
+			search = val.substr(match[0].length);
+			op = match[0].replace(/\s/g, "");
+		} else {
+			search = val;
+			op = null;
+		}
+
 		var parseRes = AscCommon.g_oFormatParser.parse(search);
-		return parseRes ? new cNumber(parseRes.value) : new cString(search);
+		return {val: parseRes ? new cNumber(parseRes.value) : new cString(search), op: op};
 	}
-	function matching(x, y, operator) {
+	function matching(x, matchingInfo) {
+		var y = matchingInfo.val;
+		var operator = matchingInfo.op;
 		var res = false, rS;
 		if (cElementType.string === y.type) {
 			if ('<' === operator || '>' === operator || '<=' === operator || '>=' === operator) {

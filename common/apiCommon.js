@@ -833,13 +833,16 @@
         }
 
 			var bSwapGridLines = ((this.type === c_oAscChartTypeSettings.hBarNormal ||
-			this.type === c_oAscChartTypeSettings.hBarStacked || this.type === c_oAscChartTypeSettings.hBarStackedPer) !==
+			this.type === c_oAscChartTypeSettings.hBarStacked || this.type === c_oAscChartTypeSettings.hBarStackedPer
+			|| this.type === c_oAscChartTypeSettings.hBarNormal3d || this.type === c_oAscChartTypeSettings.hBarStacked3d
+			|| this.type === c_oAscChartTypeSettings.hBarStackedPer3d) !==
 			(type === c_oAscChartTypeSettings.hBarNormal || type === c_oAscChartTypeSettings.hBarStacked ||
-			type === c_oAscChartTypeSettings.hBarStackedPer)   );
+			type === c_oAscChartTypeSettings.hBarStackedPer || this.type === c_oAscChartTypeSettings.hBarNormal3d
+			|| this.type === c_oAscChartTypeSettings.hBarStacked3d || this.type === c_oAscChartTypeSettings.hBarStackedPer3d)   );
 			var bSwapLines = ((
 				type === c_oAscChartTypeSettings.lineNormal || type === c_oAscChartTypeSettings.lineStacked ||
 				type === c_oAscChartTypeSettings.lineStackedPer || type === c_oAscChartTypeSettings.lineNormalMarker ||
-				type === c_oAscChartTypeSettings.lineStackedMarker || type === c_oAscChartTypeSettings.lineStackedPerMarker
+				type === c_oAscChartTypeSettings.lineStackedMarker || type === c_oAscChartTypeSettings.lineStackedPerMarker || type === c_oAscChartTypeSettings.line3d
 
 			) !== (
 
@@ -847,7 +850,8 @@
 				this.type === c_oAscChartTypeSettings.lineStackedPer ||
 				this.type === c_oAscChartTypeSettings.lineNormalMarker ||
 				this.type === c_oAscChartTypeSettings.lineStackedMarker ||
-				this.type === c_oAscChartTypeSettings.lineStackedPerMarker
+				this.type === c_oAscChartTypeSettings.lineStackedPerMarker ||
+				this.type === c_oAscChartTypeSettings.line3d
 			));
 			var bSwapScatter = ((this.type === c_oAscChartTypeSettings.scatter) !==
 			(type === c_oAscChartTypeSettings.scatter));
@@ -872,6 +876,7 @@
 			}
 			switch (type) {
 				case c_oAscChartTypeSettings.pie                 :
+				case c_oAscChartTypeSettings.pie3d                 :
 				case c_oAscChartTypeSettings.doughnut            : {
 					this.putHorAxisProps(null);
 					this.putVertAxisProps(null);
@@ -884,16 +889,26 @@
 				case c_oAscChartTypeSettings.barNormal           :
 				case c_oAscChartTypeSettings.barStacked          :
 				case c_oAscChartTypeSettings.barStackedPer       :
+				case c_oAscChartTypeSettings.barNormal3d         :
+				case c_oAscChartTypeSettings.barStacked3d        :
+				case c_oAscChartTypeSettings.barStackedPer3d     :
+				case c_oAscChartTypeSettings.barNormal3dPerspective     :
 				case c_oAscChartTypeSettings.lineNormal          :
 				case c_oAscChartTypeSettings.lineStacked         :
 				case c_oAscChartTypeSettings.lineStackedPer      :
 				case c_oAscChartTypeSettings.lineNormalMarker    :
 				case c_oAscChartTypeSettings.lineStackedMarker   :
 				case c_oAscChartTypeSettings.lineStackedPerMarker:
+				case c_oAscChartTypeSettings.line3d:
 				case c_oAscChartTypeSettings.areaNormal          :
 				case c_oAscChartTypeSettings.areaStacked         :
 				case c_oAscChartTypeSettings.areaStackedPer      :
-				case c_oAscChartTypeSettings.stock               : {
+				case c_oAscChartTypeSettings.stock               :
+                case c_oAscChartTypeSettings.surfaceNormal       :
+                case c_oAscChartTypeSettings.surfaceWireframe    :
+                case c_oAscChartTypeSettings.contourNormal       :
+                case c_oAscChartTypeSettings.contourWireframe    :
+					{
 					if (!hor_axis_settings || hor_axis_settings.getAxisType() !== c_oAscAxisType.cat) {
 						new_hor_axis_settings = new asc_CatAxisSettings();
 						new_hor_axis_settings.setDefault();
@@ -911,11 +926,12 @@
 						this.putLine(true);
 					}
 					if (nOldType === c_oAscChartTypeSettings.hBarNormal || nOldType === c_oAscChartTypeSettings.hBarStacked ||
-						nOldType === c_oAscChartTypeSettings.hBarStackedPer) {
+						nOldType === c_oAscChartTypeSettings.hBarStackedPer || nOldType === c_oAscChartTypeSettings.hBarNormal3d ||
+						nOldType === c_oAscChartTypeSettings.hBarStacked3d || nOldType === c_oAscChartTypeSettings.hBarStackedPer3d) {
 						var bTemp = this.showHorAxis;
 						this.putShowHorAxis(this.showVerAxis);
 						this.putShowVerAxis(bTemp);
-					} else if (nOldType === c_oAscChartTypeSettings.pie || nOldType === c_oAscChartTypeSettings.doughnut) {
+					} else if (nOldType === c_oAscChartTypeSettings.pie || nOldType === c_oAscChartTypeSettings.pie3d || nOldType === c_oAscChartTypeSettings.doughnut) {
 						this.putShowHorAxis(true);
 						this.putShowVerAxis(true);
 					}
@@ -923,7 +939,11 @@
 				}
 				case c_oAscChartTypeSettings.hBarNormal          :
 				case c_oAscChartTypeSettings.hBarStacked         :
-				case c_oAscChartTypeSettings.hBarStackedPer      : {
+				case c_oAscChartTypeSettings.hBarStackedPer      :
+                case c_oAscChartTypeSettings.hBarNormal3d        :
+                case c_oAscChartTypeSettings.hBarStacked3d       :
+                case c_oAscChartTypeSettings.hBarStackedPer3d    :
+					{
 					if (!hor_axis_settings || hor_axis_settings.getAxisType() !== c_oAscAxisType.val) {
 						new_hor_axis_settings = new asc_ValAxisSettings();
 						new_hor_axis_settings.setDefault();
@@ -934,11 +954,12 @@
 						new_vert_axis_settings.setDefault();
 						this.putVertAxisProps(new_vert_axis_settings);
 					}
-					if (nOldType === c_oAscChartTypeSettings.pie || nOldType === c_oAscChartTypeSettings.doughnut) {
+					if (nOldType === c_oAscChartTypeSettings.pie || nOldType === c_oAscChartTypeSettings.pie3d || nOldType === c_oAscChartTypeSettings.doughnut) {
 						this.putShowHorAxis(true);
 						this.putShowVerAxis(true);
 					} else if (nOldType !== c_oAscChartTypeSettings.hBarNormal &&
-						nOldType !== c_oAscChartTypeSettings.hBarStacked && nOldType !== c_oAscChartTypeSettings.hBarStackedPer) {
+						nOldType !== c_oAscChartTypeSettings.hBarStacked && nOldType !== c_oAscChartTypeSettings.hBarStackedPer || nOldType !== c_oAscChartTypeSettings.hBarNormal3d ||
+                        nOldType !== c_oAscChartTypeSettings.hBarStacked3d || nOldType !== c_oAscChartTypeSettings.hBarStackedPer3d) {
 						var bTemp = this.showHorAxis;
 						this.putShowHorAxis(this.showVerAxis);
 						this.putShowVerAxis(bTemp);
@@ -972,11 +993,12 @@
 						this.putLine(false);
 					}
 					if (nOldType === c_oAscChartTypeSettings.hBarNormal || nOldType === c_oAscChartTypeSettings.hBarStacked ||
-						nOldType === c_oAscChartTypeSettings.hBarStackedPer) {
+						nOldType === c_oAscChartTypeSettings.hBarStackedPer || nOldType === c_oAscChartTypeSettings.hBarNormal3d ||
+                        nOldType === c_oAscChartTypeSettings.hBarStacked3d || nOldType === c_oAscChartTypeSettings.hBarStackedPer3d) {
 						var bTemp = this.showHorAxis;
-						this.putShowHorAxis(this.showVerAxis)
+						this.putShowHorAxis(this.showVerAxis);
 						this.putShowVerAxis(bTemp);
-					} else if (nOldType === c_oAscChartTypeSettings.pie || nOldType === c_oAscChartTypeSettings.doughnut) {
+					} else if (nOldType === c_oAscChartTypeSettings.pie || nOldType === c_oAscChartTypeSettings.pie3d || nOldType === c_oAscChartTypeSettings.doughnut) {
 						this.putShowHorAxis(true);
 						this.putShowVerAxis(true);
 					}

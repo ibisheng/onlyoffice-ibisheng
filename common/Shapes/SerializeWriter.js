@@ -2333,7 +2333,22 @@ function CBinaryFileWriter()
 
                 oThis.image_map[_src] = true;
 
-                if (oThis.IsUseFullUrl)
+                if (window["IsEmbedImagesInInternalFormat"] === true)
+                {
+                    var _image = editor.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(_src)];
+                    if (undefined !== _image)
+                    {
+                        var imgNatural = _image.Image;
+
+                        var _canvas = document.createElement("canvas");
+                        _canvas.width = imgNatural.width;
+                        _canvas.height = imgNatural.height;
+
+                        _canvas.getContext("2d").drawImage(imgNatural, 0, 0, _canvas.width, _canvas.height);
+                        _src = _canvas.toDataURL("image/png");
+                    }
+                }
+                else if (oThis.IsUseFullUrl)
                 {
                     if ((0 == _src.indexOf("theme")) && window.editor)
                     {

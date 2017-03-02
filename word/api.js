@@ -1665,13 +1665,10 @@ background-repeat: no-repeat;\
 		if (!this.WordControl.m_oLogicDocument)
 			return false;
 
-		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
-		{
-			if (AscCommon.g_clipboardBase.IsWorking())
-				return false;
+		if (AscCommon.g_clipboardBase.IsWorking())
+			return false;
 
-			return AscCommon.g_clipboardBase.Button_Paste();
-		}
+		return AscCommon.g_clipboardBase.Button_Paste();
 	};
 
 	asc_docs_api.prototype.Share = function()
@@ -1744,7 +1741,7 @@ background-repeat: no-repeat;\
     	    return;
 
 		var _logicDoc = this.WordControl.m_oLogicDocument;
-		if (!_logicDoc)
+		if (!_logicDoc || _logicDoc.Selection_IsEmpty(true))
 			return;
 
 		if (false === _logicDoc.Document_Is_SelectionLocked(changestype_Paragraph_Content))

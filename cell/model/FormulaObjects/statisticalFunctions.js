@@ -55,7 +55,6 @@
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
 	var _func = AscCommonExcel._func;
-	var parseNum = AscCommonExcel.parseNum;
 	var matching = AscCommonExcel.matching;
 
 	var maxGammaArgument = 171.624376956302;
@@ -488,47 +487,41 @@
 		var count = 0, sum = new cNumber(0);
 		for (var i = 0; i < arg.length; i++) {
 			var _arg = arg[i];
-			if (_arg instanceof cRef || _arg instanceof cRef3D) {
+			if (cElementType.cell === _arg.type || cElementType.cell3D === _arg.type) {
 				var _argV = _arg.getValue();
-				if (_argV instanceof cNumber || _argV instanceof cBool) {
+				if (cElementType.number === _argV.type || cElementType.bool === _argV.type) {
 					sum = _func[sum.type][_argV.type](sum, _argV, "+");
 					count++;
-				} else if (_argV instanceof cString) {
-					if (parseNum(_argV.getValue())) {
-						sum = _func[sum.type][_argV.type](sum, _argV.tocNumber(), "+");
-					}
+				} else if (cElementType.string === _argV.type) {
 					count++;
 				}
-			} else if (_arg instanceof cArea || _arg instanceof cArea3D) {
+			} else if (cElementType.cellsRange === _arg.type || cElementType.cellsRange3D === _arg.type) {
 				var _argAreaValue = _arg.getValue();
 				for (var j = 0; j < _argAreaValue.length; j++) {
 					var __arg = _argAreaValue[j];
-					if (__arg instanceof cNumber || __arg instanceof cBool) {
+					if (cElementType.number === __arg.type || cElementType.bool === __arg.type) {
 						sum = _func[sum.type][__arg.type](sum, __arg, "+");
 						count++;
-					} else if (__arg instanceof cString) {
-						if (parseNum(__arg.getValue())) {
-							sum = _func[sum.type][__arg.type](sum, __arg.tocNumber(), "+");
-						}
+					} else if (cElementType.string === __arg.type) {
 						count++;
 					}
 				}
-			} else if (_arg instanceof cArray) {
+			} else if (cElementType.array === _arg.type) {
 				_arg.foreach(function (elem) {
 
-					if (elem instanceof cString || elem instanceof cEmpty) {
+					if (cElementType.string === elem.type || cElementType.empty === elem.type) {
 						return false;
 					}
 
 					var e = elem.tocNumber();
-					if (e instanceof cNumber) {
+					if (cElementType.number === e.type) {
 						sum = _func[sum.type][e.type](sum, e, "+");
 						count++;
 					}
 				})
 			} else {
 				_arg = _arg.tocNumber();
-				if (_arg instanceof cError) {
+				if (cElementType.error === _arg.type) {
 					return this.value = _arg;
 				}
 				sum = _func[sum.type][_arg.type](sum, _arg, "+");
@@ -560,7 +553,7 @@
 
 	cAVERAGEIF.prototype = Object.create(cBaseFunction.prototype);
 	cAVERAGEIF.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _sum = 0, _count = 0, valueForSearching, ws;
+		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _sum = 0, _count = 0, matchingInfo, ws;
 		if ((cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
 			cElementType.cellsRange !== arg0.type) ||
 			(cElementType.cell !== arg2.type && cElementType.cell3D !== arg2.type &&
@@ -581,19 +574,13 @@
 		}
 
 		arg1 = arg1.toString();
-		var operators = new RegExp("^ *[<=> ]+ *"), match = arg1.match(operators), search, oper, val;
-		if (match) {
-			search = arg1.substr(match[0].length);
-			oper = match[0].replace(/\s/g, "");
-		} else {
-			search = arg1;
-		}
-		valueForSearching = AscCommonExcel.matchingValue(search);
+		var val;
+		matchingInfo = AscCommonExcel.matchingValue(arg1.toString());
 		if (cElementType.cellsRange === arg0.type) {
 			ws = arg0.getWS();
 			var tmpCellArg0 = arg0.getRange().getCells()[0], tmpCellArg2 = arg2.getRange(), offset, bbox, r2;
 			arg0.foreach2(function (v, cell) {
-				if (matching(v, valueForSearching, oper)) {
+				if (matching(v, matchingInfo)) {
 					offset = cell.getOffset(tmpCellArg0);
 					tmpCellArg2 = arg2.getRange();
 					tmpCellArg2.setOffset(offset);
@@ -613,7 +600,7 @@
 			})
 		} else {
 			val = arg0.getValue();
-			if (matching(val, valueForSearching, oper)) {
+			if (matching(val, matchingInfo)) {
 				var r = arg0.getRange();
 				ws = arg0.getWS();
 				var r1 = r.bbox.r1, c1 = arg2.getRange().bbox.c1;
@@ -639,10 +626,93 @@
 
 	/** @constructor */
 	function cAVERAGEIFS() {
-		cBaseFunction.call(this, "AVERAGEIFS");
+		this.name = "AVERAGEIFS";
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = 3;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 255;
+		this.formatType = {
+			def: -1, //подразумевается формат первой ячейки входящей в формулу.
+			noneFormat: -2
+		};
+		this.numFormat = this.formatType.def;
 	}
 
 	cAVERAGEIFS.prototype = Object.create(cBaseFunction.prototype);
+	cAVERAGEIFS.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
+			cElementType.cellsRange !== arg0.type) {
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+
+		var arg0Matrix = arg0.getMatrix();
+		var i, j, arg1, arg2, matchingInfo;
+		for (var k = 1; k < arg.length; k += 2) {
+			arg1 = arg[k];
+			arg2 = arg[k + 1];
+
+			if ((cElementType.cell !== arg1.type && cElementType.cell3D !== arg1.type &&
+				cElementType.cellsRange !== arg1.type)) {
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+
+			if (cElementType.cellsRange === arg2.type || cElementType.cellsRange3D === arg2.type) {
+				arg2 = arg2.cross(arguments[1].bbox);
+			} else if (cElementType.array === arg2.type) {
+				arg2 = arg2.getElementRowCol(0, 0);
+			}
+
+			arg2 = arg2.tocString();
+			if (cElementType.string !== arg2.type) {
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+			matchingInfo = AscCommonExcel.matchingValue(arg2.toString());
+
+			var arg1Matrix = arg1.getMatrix();
+			if (arg0Matrix.length !== arg1Matrix.length) {
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+
+			for (i = 0; i < arg1Matrix.length; ++i) {
+				if (arg0Matrix[i].length !== arg1Matrix[i].length) {
+					return this.value = new cError(cErrorType.wrong_value_type);
+				}
+				for (j = 0; j < arg1Matrix[i].length; ++j) {
+					if (arg0Matrix[i][j] && !AscCommonExcel.matching(arg1Matrix[i][j], matchingInfo)) {
+						arg0Matrix[i][j] = null;
+					}
+				}
+			}
+		}
+
+		var _sum = 0, _count = 0;
+		var valMatrix0;
+		for (i = 0; i < arg0Matrix.length; ++i) {
+			for (j = 0; j < arg0Matrix[i].length; ++j) {
+				if ((valMatrix0 = arg0Matrix[i][j]) && cElementType.number === valMatrix0.type) {
+					_sum += valMatrix0.getValue();
+					++_count;
+				}
+			}
+		}
+
+
+		if (0 === _count) {
+			return new cError(cErrorType.division_by_zero);
+		} else {
+			return this.value = new cNumber(_sum / _count);
+		}
+	};
+	cAVERAGEIFS.prototype.checkArguments = function () {
+		return 1 === this.argumentsCurrent % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
+	};
+	cAVERAGEIFS.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(average_range, criteria_range1, criteria1, [criteria_range2, criteria2], ...)"
+		};
+	};
 
 	/** @constructor */
 	function cBETADIST() {/*Нет реализации в Google Docs*/
@@ -1078,7 +1148,7 @@
 
 	cCOUNTIF.prototype = Object.create(cBaseFunction.prototype);
 	cCOUNTIF.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1], _count = 0, valueForSearching;
+		var arg0 = arg[0], arg1 = arg[1], _count = 0, matchingInfo;
 		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type && cElementType.cellsRange !== arg0.type && cElementType.cellsRange3D !== arg0.type) {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
@@ -1095,28 +1165,20 @@
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
-		arg1 = arg1.toString();
-		var operators = new RegExp("^ *[<=> ]+ *"), search, oper, val, match = arg1.match(operators);
-
-		if (match) {
-			search = arg1.substr(match[0].length);
-			oper = match[0].replace(/\s/g, "");
-		} else {
-			search = arg1;
-		}
-		valueForSearching = AscCommonExcel.matchingValue(search);
+		var val;
+		matchingInfo = AscCommonExcel.matchingValue(arg1.toString());
 		if (cElementType.cellsRange === arg0.type) {
 			arg0.foreach2(function (_val) {
-				_count += matching(_val, valueForSearching, oper);
+				_count += matching(_val, matchingInfo);
 			})
 		} else if (cElementType.cellsRange3D === arg0.type) {
 			val = arg0.getValue();
 			for (var i = 0; i < val.length; i++) {
-				_count += matching(val[i], valueForSearching, oper);
+				_count += matching(val[i], matchingInfo);
 			}
 		} else {
 			val = arg0.getValue();
-			_count += matching(val, valueForSearching, oper);
+			_count += matching(val, matchingInfo);
 		}
 
 		return this.value = new cNumber(_count);
@@ -1144,8 +1206,7 @@
 
 	cCOUNTIFS.prototype = Object.create(cBaseFunction.prototype);
 	cCOUNTIFS.prototype.Calculate = function (arg) {
-		var i, j, arg0, arg1, valueForSearching, arg0Matrix, arg1Matrix, _count = 0;
-		var search, oper, match, operators = new RegExp("^ *[<=> ]+ *");
+		var i, j, arg0, arg1, matchingInfo, arg0Matrix, arg1Matrix, _count = 0;
 		for (var k = 0; k < arg.length; k += 2) {
 			arg0 = arg[k];
 			arg1 = arg[k + 1];
@@ -1164,16 +1225,7 @@
 				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 
-			arg1 = arg1.toString();
-			match = arg1.match(operators);
-			oper = null;
-			if (match) {
-				search = arg1.substr(match[0].length);
-				oper = match[0].replace(/\s/g, "");
-			} else {
-				search = arg1;
-			}
-			valueForSearching = AscCommonExcel.matchingValue(search);
+			matchingInfo = AscCommonExcel.matchingValue(arg1.toString());
 			arg1Matrix = arg0.getMatrix();
 			if (!arg0Matrix) {
 				arg0Matrix = arg1Matrix;
@@ -1186,7 +1238,7 @@
 					return this.value = new cError(cErrorType.wrong_value_type);
 				}
 				for (j = 0; j < arg1Matrix[i].length; ++j) {
-					if (arg0Matrix[i][j] && !matching(arg1Matrix[i][j], valueForSearching, oper)) {
+					if (arg0Matrix[i][j] && !matching(arg1Matrix[i][j], matchingInfo)) {
 						arg0Matrix[i][j] = null;
 					}
 				}

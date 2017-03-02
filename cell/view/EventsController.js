@@ -1608,6 +1608,9 @@
 			} else if (undefined !== event.detail && 0 !== event.detail) {
 				// FF
 				deltaY = event.detail;
+			} else if (undefined !== event.deltaY && 0 !== event.deltaY) {
+				// FF
+				deltaY = event.deltaY;
 			}
 			if (event.axis !== undefined && event.axis === event.HORIZONTAL_AXIS) {
 				deltaX = deltaY;

@@ -4284,27 +4284,24 @@ DrawingObjectsController.prototype =
         ret.putVertAxisLabel(_label);
 
         var data_labels = plot_area.charts[0].dLbls;
+        var nDefaultDatalabelsPos = chart_type && chart_type.getDefaultDataLabelsPosition ? chart_type.getDefaultDataLabelsPosition() :  c_oAscChartDataLabelsPos.none;
+
         if(data_labels)
         {
-            var nDefaultDatalabelsPos = chart_type && chart_type.getDefaultDataLabelsPosition ? chart_type.getDefaultDataLabelsPosition() :  c_oAscChartDataLabelsPos.none;
-            ret.putShowSerName(data_labels.showSerName === true);
-            ret.putShowCatName(data_labels.showCatName === true);
-            ret.putShowVal(data_labels.showVal === true);
-            ret.putSeparator(data_labels.separator);
-            if(data_labels.showSerName || data_labels.showCatName || data_labels.showVal){
-                ret.putDataLabelsPos(AscFormat.isRealNumber(data_labels.dLblPos) ? data_labels.dLblPos :  nDefaultDatalabelsPos);
-            }
-            else{
-                ret.putDataLabelsPos(c_oAscChartDataLabelsPos.none);
-            }
+            this.collectPropsFromDLbls(nDefaultDatalabelsPos, data_labels, ret);
         }
         else
         {
-            ret.putShowSerName(false);
-            ret.putShowCatName(false);
-            ret.putShowVal(false);
-            ret.putSeparator("");
-            ret.putDataLabelsPos(c_oAscChartDataLabelsPos.none);
+            if(chart_type.series[0] && chart_type.series[0].dLbls){
+                this.collectPropsFromDLbls(nDefaultDatalabelsPos, chart_type.series[0].dLbls, ret);
+            }
+            else{
+                ret.putShowSerName(false);
+                ret.putShowCatName(false);
+                ret.putShowVal(false);
+                ret.putSeparator("");
+                ret.putDataLabelsPos(c_oAscChartDataLabelsPos.none);
+            }
         }
 
         if(chart.legend)
@@ -4581,6 +4578,19 @@ DrawingObjectsController.prototype =
         }
         ret.type = calc_chart_type;
         return ret;
+    },
+
+    collectPropsFromDLbls: function(nDefaultDatalabelsPos, data_labels, ret){
+        ret.putShowSerName(data_labels.showSerName === true);
+        ret.putShowCatName(data_labels.showCatName === true);
+        ret.putShowVal(data_labels.showVal === true);
+        ret.putSeparator(data_labels.separator);
+        if(data_labels.showSerName || data_labels.showCatName || data_labels.showVal){
+            ret.putDataLabelsPos(AscFormat.isRealNumber(data_labels.dLblPos) ? data_labels.dLblPos :  nDefaultDatalabelsPos);
+        }
+        else{
+            ret.putDataLabelsPos(c_oAscChartDataLabelsPos.none);
+        }
     },
 	_getChartSpace: function (chartSeries, options, bUseCache) {
 		switch (options.type) {

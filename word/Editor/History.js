@@ -613,7 +613,7 @@ CHistory.prototype =
         for (var TableId in this.RecalculateData.Tables)
         {
             var Table = AscCommon.g_oTableId.Get_ById(TableId);
-            if (null !== Table)
+            if (null !== Table && Table.Is_UseInDocument())
             {
                 if (true === Table.Check_ChangedTableGrid())
                 {
