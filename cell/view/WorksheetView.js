@@ -8759,13 +8759,19 @@
                 newRange = this._pasteFromHTML(val, true);
             }
 			
+			var g_clipboardBase = window['AscCommon'].g_clipboardBase;
 			if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
 			{
 				var sBinary = window["Asc"]["editor"].wb.clipboard.copyProcessor.getBinaryForCopy(this, newRange);
+				g_clipboardBase.specialPasteUndoData.data = sBinary;
+				
 				var specialPasteSelectionRange = new AscCommonExcel.SelectionRange();
 				specialPasteSelectionRange.ranges[0] = newRange.clone();
-				window['AscCommon'].g_clipboardBase.specialPasteData.activeRange = specialPasteSelectionRange;
-				window['AscCommon'].g_clipboardBase.specialPasteUndoData.data = sBinary;
+				g_clipboardBase.specialPasteData.activeRange = specialPasteSelectionRange;
+			}
+			else if(g_clipboardBase.specialPasteProps && g_clipboardBase.specialPasteProps.transpose)
+			{
+				window['AscCommon'].g_clipboardBase.specialPasteUndoData.transpose = true;
 			}
 			
             checkRange = [newRange];
@@ -8809,7 +8815,7 @@
 					pasteData = tempWorkbook.aWorksheets[0];
 				if(pasteData)
 				{
-					t._pasteFromBinary(pasteData, null, null, window['AscCommon'].g_clipboardBase.specialPasteProps);
+					t._pasteFromBinary(pasteData, null, null);
 				}
 				
 				//удаляем вставленные изображения
@@ -8839,6 +8845,11 @@
 			{
 				var tempProps = new Asc.SpecialPasteProps();
 				tempProps.width = true;
+				if(specialPasteUndoData.transpose)
+				{
+					tempProps.transpose = true;
+					specialPasteUndoData.transpose = null;
+				}
 				window['AscCommon'].g_clipboardBase.specialPasteProps = tempProps;
 				
 				//переводим фокус из шейпа на лист
@@ -8971,7 +8982,7 @@
         t.model.workbook.dependencyFormulas.lockRecal();
         var selectData;
         if (fromBinary) {
-            selectData = t._pasteFromBinary(val, null, tablesMap, specialPasteProps);
+            selectData = t._pasteFromBinary(val, null, tablesMap);
         } else {
             selectData = t._pasteFromHTML(val, null, specialPasteProps);
         }
@@ -9041,7 +9052,7 @@
 		}
 		else
 		{
-			this.updateSpecialPasteOptionsPosition();
+			this.updateSpecialPasteOptionsPosition(selectData[0]);
 		}
     };
 
@@ -9343,7 +9354,7 @@
         return arnFor;
     };
 
-    WorksheetView.prototype._pasteFromBinary = function (val, isCheckSelection, tablesMap, specialPasteProps) {
+    WorksheetView.prototype._pasteFromBinary = function (val, isCheckSelection, tablesMap) {
         var t = this;
 		var trueActiveRange = t.model.selectionRange.getLast().clone();
 		var lastSelection = this.model.selectionRange.getLast();
@@ -9352,8 +9363,19 @@
 
         var pasteRange = window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange;
         var activeCellsPasteFragment = typeof pasteRange === "string" ? AscCommonExcel.g_oRangeCache.getAscRange(pasteRange) : pasteRange;
-        var rMax = (activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1) + arn.r1 + 1;
-        var cMax = (activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1) + arn.c1 + 1;
+		
+		var g_clipboardBase = window['AscCommon'].g_clipboardBase;
+		var specialPasteProps = g_clipboardBase.specialPasteProps;
+		
+		var countPasteRow = activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1 + 1;
+		var countPasteCol = activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1 + 1;
+		if(specialPasteProps && specialPasteProps.transpose)
+		{
+			countPasteRow = activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1 + 1;
+			countPasteCol = activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1 + 1;
+		}
+        var rMax = countPasteRow + arn.r1;
+        var cMax = countPasteCol + arn.c1;
 
         if (cMax > gc_nMaxCol0) {
             cMax = gc_nMaxCol0;
@@ -9632,6 +9654,12 @@
                     for (var c = 0; c < cMax - arn.c1; ++c) {
                         var pasteRow = r + activeCellsPasteFragment.r1;
                         var pasteCol = c + activeCellsPasteFragment.c1;
+						if(specialPasteProps.transpose)
+						{
+							pasteRow = c + activeCellsPasteFragment.r1;
+							pasteCol = r + activeCellsPasteFragment.c1;
+						}
+						
                         var newVal = val.getCell3(pasteRow, pasteCol);
 
                         var curMerge = newVal.hasMerged();
@@ -9945,7 +9973,7 @@
 		this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
 	},
 
-	 WorksheetView.prototype.updateSpecialPasteOptionsPosition = function()
+	 WorksheetView.prototype.updateSpecialPasteOptionsPosition = function(changeActiveRange)
 	{
 		var _clipboard = window["Asc"]["editor"].wb.clipboard;
 		var isIntoShape = this.objectRender.controller.getTargetDocContent(true);
@@ -9987,6 +10015,10 @@
 		else if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton)
 		{
 			var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
+			if(changeActiveRange)
+			{
+				window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range = changeActiveRange;
+			}
 			var range = window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range;
 			
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
