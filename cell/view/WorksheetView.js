@@ -9584,7 +9584,7 @@
 		};
 		
 		var colsWidth = {};
-		var putInsertedCellIntoRange = function(nRow, nCol, pasteRow, pasteCol, rowDiff, colDiff, range, newVal)
+		var putInsertedCellIntoRange = function(nRow, nCol, pasteRow, pasteCol, rowDiff, colDiff, range, newVal, curMerge)
 		{
 			var pastedRangeProps = {};
 			//range может далее изменится в связи с наличием мерженных ячеек, firstRange - не меняется(ему делаем setValue, как первой ячейке в диапазоне мерженных)
@@ -9668,9 +9668,6 @@
 						}
 						
                         var newVal = val.getCell3(pasteRow, pasteCol);
-
-                        var curMerge = newVal.hasMerged();
-
                         if (undefined !== newVal) {
 							
 							var nRow = r + autoR * plRow + arn.r1;
@@ -9683,8 +9680,22 @@
 								nCol = gc_nMaxCol0;
 							}
 							
+							var curMerge = newVal.hasMerged();
+							if(curMerge && specialPasteProps.transpose)
+							{
+								var r1 = curMerge.r1;
+								var r2 = curMerge.r2;
+								var c1 = curMerge.c1;
+								var c2 = curMerge.c2;
+								
+								curMerge.r1 = c1;
+								curMerge.r2 = c2;
+								curMerge.c1 = r1;
+								curMerge.c2 = r2;
+							}
+							
 							var range = t.model.getRange3(nRow, nCol, nRow, nCol);
-							putInsertedCellIntoRange(nRow, nCol, pasteRow, pasteCol, autoR * plRow, autoC * plCol, range, newVal);
+							putInsertedCellIntoRange(nRow, nCol, pasteRow, pasteCol, autoR * plRow, autoC * plCol, range, newVal, curMerge);
 							
                             //если замержили range
                             c = range.bbox.c2 - autoC * plCol - arn.c1;
