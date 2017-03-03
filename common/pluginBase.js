@@ -135,6 +135,11 @@
                         window.Asc.plugin.onMethodReturn(pluginData.methodReturnData);
                     break;
                 }
+                case "onExternalPluginMessage":
+                {
+					if (window.Asc.plugin.onExternalPluginMessage && pluginData.data && pluginData.data.type)
+						window.Asc.plugin.onExternalPluginMessage(pluginData.data);
+                }
                 default:
                     break;
             }

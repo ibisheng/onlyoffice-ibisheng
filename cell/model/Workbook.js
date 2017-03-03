@@ -2546,9 +2546,6 @@
 		for (i = 0; i < wsFrom.aConditionalFormatting.length; ++i) {
 			this.aConditionalFormatting.push(wsFrom.aConditionalFormatting[i].clone());
 		}
-		for (i = 0; i < wsFrom.aSparklineGroups.length; ++i) {
-			this.aSparklineGroups.push(wsFrom.aSparklineGroups[i].clone());
-		}
 		if (wsFrom.sheetPr)
 			this.sheetPr = wsFrom.sheetPr.clone();
 

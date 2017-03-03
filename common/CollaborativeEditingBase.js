@@ -880,15 +880,10 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
         // Объектная модель у нас простая: класс, в котором возможно есть массив элементов(тоже классов), у которого воможно
         // есть набор свойств. Поэтому у нас ровно 2 типа изменений: изменения внутри массива элементов, либо изменения
         // свойств. Изменения этих двух типов коммутируют между собой, изменения разных классов тоже коммутируют.
-        var arrChanges    = [];
-        var oIndexes      = this.m_aOwnChangesIndexes[this.m_aOwnChangesIndexes.length - 1];
-        var nPosition     = oIndexes.Position;
-        var nCount        = oIndexes.Count;
-        var nOverallCount = this.m_aAllChanges.length;
-
-        var oContentChangesMap = {
-
-        };
+		var arrChanges = [];
+		var oIndexes   = this.m_aOwnChangesIndexes[this.m_aOwnChangesIndexes.length - 1];
+		var nPosition  = oIndexes.Position;
+		var nCount     = oIndexes.Count;
 
         for (var nIndex = nCount - 1; nIndex >= 0; --nIndex)
         {
@@ -901,8 +896,10 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
             {
                 var _oChange = oChange.Copy();
 
-                if (this.private_CommutateContentChanges(oContentChangesMap, oClass, _oChange, nPosition + nCount))
-                	arrChanges.push(_oChange);
+				if (this.private_CommutateContentChanges(_oChange, nPosition + nCount))
+					arrChanges.push(_oChange);
+
+				oChange.SetReverted(true);
             }
             else
             {
@@ -921,7 +918,10 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
 		{
 			var oReverseChange = arrChanges[nIndex].CreateReverseChange();
 			if (oReverseChange)
+			{
 				arrReverseChanges.push(oReverseChange);
+				oReverseChange.SetReverted(true);
+			}
 		}
 
         // Накатываем изменения в данном клиенте
@@ -1096,69 +1096,56 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
     {
         return this.m_aOwnChangesIndexes.length <= 0 ? false : true;
     };
-    CCollaborativeEditingBase.prototype.private_CommutateContentChanges = function(oMap, oClass, oChange, nStartPosition)
-    {
-        var arrOtherActions = [];
+    CCollaborativeEditingBase.prototype.private_CommutateContentChanges = function(oChange, nStartPosition)
+	{
+		var arrActions          = oChange.ConvertToSimpleActions();
+		var arrCommutateActions = [];
 
-        if (oMap[oClass.Get_Id()])
-        {
-            arrOtherActions = oMap[oClass.Get_Id()];
-        }
-        else
-        {
-            for (var nIndex = nStartPosition, nOverallCount = this.m_aAllChanges.length; nIndex < nOverallCount; ++nIndex)
-            {
-                var oTempChange = this.m_aAllChanges[nIndex];
-                if (!oTempChange)
-                    continue;
+		for (var nActionIndex = arrActions.length - 1; nActionIndex >= 0; --nActionIndex)
+		{
+			var oAction = arrActions[nActionIndex];
+			var oResult = oAction;
 
-                if (oChange.IsRelated(oTempChange))
-                {
-                    arrOtherActions.push(oTempChange.ConvertToSimpleActions());
-                }
-            }
+			for (var nIndex = nStartPosition, nOverallCount = this.m_aAllChanges.length; nIndex < nOverallCount; ++nIndex)
+			{
+				var oTempChange = this.m_aAllChanges[nIndex];
+				if (!oTempChange)
+					continue;
 
-            oMap[oClass.Get_Id()] = arrOtherActions;
-        }
+				if (oChange.IsRelated(oTempChange) &&  true !== oTempChange.IsReverted())
+				{
+					var arrOtherActions = oTempChange.ConvertToSimpleActions();
+					for (var nIndex2 = 0, nOtherActionsCount2 = arrOtherActions.length; nIndex2 < nOtherActionsCount2; ++nIndex2)
+					{
+						var oOtherAction = arrOtherActions[nIndex2];
 
-        var arrActions = oChange.ConvertToSimpleActions();
+						if (false === this.private_Commutate(oAction, oOtherAction))
+						{
+							arrOtherActions.splice(nIndex2, 1);
+							oResult = null;
+							break;
+						}
+					}
 
-        var arrCommutateActions = [];
-        for (var nActionIndex = arrActions.length - 1; nActionIndex >= 0; --nActionIndex)
-        {
-            var oAction = arrActions[nActionIndex];
-            var oResult = oAction;
+					oTempChange.ConvertFromSimpleActions(arrOtherActions);
+				}
 
-            for (var nIndex = 0, nOtherActionsCount = arrOtherActions.length; nIndex < nOtherActionsCount; ++nIndex)
-            {
-                var arrOActions = arrOtherActions[nIndex];
-                for (var nIndex2 = 0, nOtherActionsCount2 = arrOActions.length; nIndex2 < nOtherActionsCount2; ++nIndex2)
-                {
-                    var oOtherAction = arrOActions[nIndex2];
+				if (!oResult)
+					break;
 
-                    if (false === this.private_Commutate(oAction, oOtherAction))
-                    {
-                        arrOActions.splice(nIndex2, 1);
-                        oResult = null;
-                        break;
-                    }
-                }
+			}
 
-                if (null === oResult)
-                    break;
-            }
+			if (null !== oResult)
+				arrCommutateActions.push(oResult);
+		}
 
-            if (null !== oResult)
-                arrCommutateActions.push(oResult);
-        }
+		if (arrCommutateActions.length > 0)
+			oChange.ConvertFromSimpleActions(arrCommutateActions);
+		else
+			return false;
 
-        if (arrCommutateActions.length > 0)
-            oChange.ConvertFromSimpleActions(arrCommutateActions);
-        else
-            return false;
-
-        return true;
-    };
+		return true;
+	};
     CCollaborativeEditingBase.prototype.private_Commutate = function(oActionL, oActionR)
     {
         if (oActionL.Add)

@@ -331,6 +331,10 @@ CDocumentContent.prototype.Is_PointInDrawingObjects        = function(X, Y, Page
 {
     return this.LogicDocument && this.LogicDocument.DrawingObjects.pointInObjInDocContent(this, X, Y, Page_Abs);
 };
+CDocumentContent.prototype.Is_PointInFlowTable             = function(X, Y, PageAbs)
+{
+	return this.LogicDocument && null !== this.LogicDocument.DrawingObjects.getTableByXY(X, Y, PageAbs, this);
+};
 CDocumentContent.prototype.Get_Numbering                   = function()
 {
     return this.Parent.Get_Numbering();

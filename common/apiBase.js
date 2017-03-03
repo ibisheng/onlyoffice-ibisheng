@@ -140,6 +140,8 @@
 		this.canSave    = true;        // Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
 		this.IsUserSave = false;    // Флаг, контролирующий сохранение было сделано пользователем или нет (по умолчанию - нет)
 		this.isForceSaveOnUserSave = false;
+        this.forceSaveButtonTimeout = null;
+        this.forceSaveTimeoutTimeout = null;
 
 		// Version History
 		this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий
@@ -653,13 +655,47 @@
 				}
 			}
 		};
-		this.CoAuthoringApi.onForceSave = function(data) {
-			if (AscCommon.c_oAscForceSaveTypes.Button === data.type) {
-				t.sendEvent('asc_onForceSaveButton');
-			} else if (AscCommon.c_oAscForceSaveTypes.Timeout === data.type) {
-				t.sendEvent('asc_onForceSaveTimeout', data.saved);
-			}
-		};
+        this.CoAuthoringApi.onForceSave = function(data) {
+            if (AscCommon.c_oAscForceSaveTypes.Button === data.type) {
+                if (data.start) {
+                    if (null === t.forceSaveButtonTimeout) {
+                        t.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveButton);
+                    } else {
+                        clearInterval(t.forceSaveButtonTimeout);
+                    }
+                    t.forceSaveButtonTimeout = setInterval(function() {
+                        t.forceSaveButtonTimeout = null;
+                        t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveButton);
+                    }, Asc.c_nMaxConversionTime);
+                } else {
+                    if (null !== t.forceSaveButtonTimeout) {
+                        clearInterval(t.forceSaveButtonTimeout);
+                        t.forceSaveButtonTimeout = null;
+                        t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveButton);
+                    }
+                }
+            } else {
+                if (AscCommon.CollaborativeEditing.Is_Fast() || null !== t.forceSaveTimeoutTimeout) {
+                    if (data.start) {
+                        if (null === t.forceSaveTimeoutTimeout) {
+                            t.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveTimeout);
+                        } else {
+                            clearInterval(t.forceSaveTimeoutTimeout);
+                        }
+                        t.forceSaveTimeoutTimeout = setInterval(function() {
+                            t.forceSaveTimeoutTimeout = null;
+                            t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveTimeout);
+                        }, Asc.c_nMaxConversionTime);
+                    } else {
+                        if (null !== t.forceSaveTimeoutTimeout) {
+                            clearInterval(t.forceSaveTimeoutTimeout);
+                            t.forceSaveTimeoutTimeout = null;
+                            t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveTimeout);
+                        }
+                    }
+                }
+            }
+        };
 		/**
 		 * Event об отсоединении от сервера
 		 * @param {jQuery} e  event об отсоединении с причиной

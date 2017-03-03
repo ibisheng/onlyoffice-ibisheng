@@ -2898,6 +2898,8 @@
 	function CChangesBase(Class)
 	{
 		this.Class = Class;
+
+		this.Reverted = false;
 	}
 	CChangesBase.prototype.Type = window['AscDFH'].historyitem_Unknown_Unknown;
 	CChangesBase.prototype.Undo = function()
@@ -2949,6 +2951,14 @@
 	{
 		return false;
 	};
+	CChangesBase.prototype.IsReverted = function()
+	{
+		return this.Reverted;
+	};
+	CChangesBase.prototype.SetReverted = function(isReverted)
+	{
+		this.Reverted = isReverted;
+	};
 	window['AscDFH'].CChangesBase = CChangesBase;
 	/**
 	 * Базовый класс для изменений, которые меняют содержимое родительского класса.*
@@ -2964,6 +2974,8 @@
 		this.UseArray = false;
 		this.PosArray = [];
 		this.Add      = isAdd;
+
+		this.Reverted = false;
 	}
 	AscCommon.extendClass(CChangesBaseContentChange, CChangesBase);
 	CChangesBaseContentChange.prototype.IsContentChange = function()

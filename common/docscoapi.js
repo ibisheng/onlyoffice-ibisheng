@@ -565,8 +565,8 @@
     this._id = null;
     this._sessionTimeConnect = null;
 	this._allChangesSaved = null;
-	this._lastForceSaveTime = null;
 	this._lastForceSaveButtonTime = null;
+	this._lastForceSaveTimeoutTime = null;
     this._indexUser = -1;
     // Если пользователей больше 1, то совместно редактируем
     this.isCoAuthoring = false;
@@ -979,31 +979,25 @@
 	DocsCoApi.prototype._onForceSaveStart = function(data) {
 		if (data['code'] === c_oAscServerCommandErrors.NoError) {
 			this._lastForceSaveButtonTime = data['time'];
+            this.onForceSave({type: c_oAscForceSaveTypes.Button, start: true});
 		} else if (data['code'] !== c_oAscServerCommandErrors.NotModified) {
 			this.onWarning(Asc.c_oAscError.ID.Unknown);
 		}
 	};
 	DocsCoApi.prototype._onForceSave = function(data) {
-		if (c_oAscForceSaveTypes.Button === data['type']) {
+        var type = data['type'];
+		if (c_oAscForceSaveTypes.Button === type) {
 			if (this._lastForceSaveButtonTime == data['time']) {
-				this.onForceSave({type: c_oAscForceSaveTypes.Button, saved: true});
+				this.onForceSave({type: type, success: data['success']});
 			}
-		}
-		if (null != this._lastForceSaveTime) {
-			this._lastForceSaveTime = data['time'];
-			this._checkLastForceSave();
-		}
-	};
-	DocsCoApi.prototype._checkLastForceSave = function(data) {
-		if (null != this._lastForceSaveTime) {
-			var newState = false;
-			if ((-1 == this.lastOtherSaveTime || this.lastOtherSaveTime <= this._lastForceSaveTime) &&
-				(-1 == this.lastOwnSaveTime || this.lastOwnSaveTime <= this._lastForceSaveTime)) {
-				newState = true;
-			}
-			if (newState != this._allChangesSaved) {
-				this._allChangesSaved = newState;
-				this.onForceSave({type: c_oAscForceSaveTypes.Timeout, saved: this._allChangesSaved});
+		} else {
+			if (data['start']) {
+                this.onForceSave({type: type, start: true});
+				this._lastForceSaveTimeoutTime = data['time'];
+			} else {
+				if (this._lastForceSaveTimeoutTime == data['time']) {
+					this.onForceSave({type: type, success: data['success']});
+				}
 			}
 		}
 	};
@@ -1166,7 +1160,6 @@
 	
     if (-1 !== data['time']) {
       this.lastOwnSaveTime = data['time'];
-	  this._checkLastForceSave();
     }
 	
     if (this.onUnSaveLock) {
@@ -1188,7 +1181,6 @@
             this.onSaveChanges(JSON.parse(changesOneUser), change['useridoriginal'], bFirstLoad);
           }
         }
-		this._checkLastForceSave();
       }
     }
   };
@@ -1374,7 +1366,6 @@
       this._state = ConnectionState.Authorized;
       this._id = data['sessionId'];
       this._sessionTimeConnect = data['sessionTimeConnect'];
-	  this._lastForceSaveTime = data['lastForceSaveTime'];
 
       this._onAuthParticipantsChanged(data['participants']);
 

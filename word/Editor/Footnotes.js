@@ -3173,6 +3173,13 @@ CFootnotesController.prototype.RemoveTextSelection = function()
 		this.CurFootnote.RemoveTextSelection();
 	}
 };
+CFootnotesController.prototype.ResetRecalculateCache = function()
+{
+	for (var Id in this.Footnote)
+	{
+		this.Footnote[Id].Reset_RecalculateCache();
+	}
+};
 
 
 function CFootEndnotePageColumn()
