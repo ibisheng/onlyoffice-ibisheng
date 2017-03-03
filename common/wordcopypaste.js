@@ -1890,6 +1890,8 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
         "mso-border-insideh": 1, "mso-row-margin-left": 1, "mso-row-margin-right": 1, "mso-cellspacing": 1, "mso-border-alt": 1,
         "mso-border-left-alt": 1, "mso-border-top-alt": 1, "mso-border-right-alt": 1, "mso-border-bottom-alt": 1, "mso-border-between": 1, "mso-list": 1};
     this.oBorderCache = {};
+	
+	this.msoListMap = [];
 }
 PasteProcessor.prototype =
 {
@@ -4535,6 +4537,7 @@ PasteProcessor.prototype =
     _set_pPr : function(node, Para,  pNoHtmlPr)
     {
         //����������� ����� �� ������ � ������� �������� ��������
+		var t = this;
 		var sNodeName = node.nodeName.toLowerCase();
         if(node != this.oRootNode)
         {
@@ -4693,7 +4696,7 @@ PasteProcessor.prototype =
                 Ind.FirstLine = text_indent;
             // if(null != pPr.Ind.FirstLine && true == this.bUseScaleKoef)
             // pPr.Ind.FirstLine = pPr.Ind.FirstLine * this.dScaleKoef;
-            if(false == this._isEmptyProperty(Ind))
+            if(false == this._isEmptyProperty(Ind) && !pNoHtmlPr['mso-list'])
                 Para.Set_Ind(Ind);
             //Jc
             var text_align = computedStyle.getPropertyValue( "text-align" );
@@ -4815,138 +4818,51 @@ PasteProcessor.prototype =
             }
         }
 
-        //num
+        //*****num*****
         if(PasteElementsId.g_bIsDocumentCopyPaste)
         {
             if(true == pNoHtmlPr.bNum)
             {
-                var num = numbering_numfmt_Bullet;
-                if(null != pNoHtmlPr.numType)
-                    num = pNoHtmlPr.numType;
-                var type = pNoHtmlPr["list-style-type"];
-				
-				//TODO обработать символы из mso html
-				/*if(pNoHtmlPr['mso-list'])
+                var setListTextPr = function(AbstractNum)
 				{
-					var msoListIgnoreSymbol = this._getMsoListSymbol(node);
-					
-				}*/
-				
-                if(type)
-                {
-                    switch(type)
-                    {
-                        case "disc"       : num = numbering_numfmt_Bullet;break;
-                        case "decimal"    : num = numbering_numfmt_Decimal;break;
-                        case "lower-roman": num = numbering_numfmt_LowerRoman;break;
-                        case "upper-roman": num = numbering_numfmt_UpperRoman;break;
-                        case "lower-alpha": num = numbering_numfmt_LowerLetter;break;
-                        case "upper-alpha": num = numbering_numfmt_UpperLetter;break;
-                    }
-                }
-                //����� ���� ����������� �� Document.Set_ParagraphNumbering
-                
-                //������� ����������� ��������, ���� ��� ������ ���������, �� ����� ��� ������ �� ����������� ���������
-                var NumId = null;
-                if(this.aContent.length > 1)
-                {
-                    var prevElem = this.aContent[this.aContent.length - 2];
-                    if(null != prevElem && type_Paragraph === prevElem.GetType())
-                    {
-                        var PrevNumPr = prevElem.Numbering_Get();
-                        if ( null != PrevNumPr && true === this.oLogicDocument.Numbering.Check_Format( PrevNumPr.NumId, PrevNumPr.Lvl, num ) )
-                            NumId  = PrevNumPr.NumId;
-                    }
-                }
-                if(null == NumId && this.pasteInExcel !== true)
-                {
-                    // Создаем нумерацию
-                    NumId  = this.oLogicDocument.Numbering.Create_AbstractNum();
-                    var AbstractNum = this.oLogicDocument.Numbering.Get_AbstractNum(NumId);
-                    if (numbering_numfmt_Bullet === num)
-                    {
-                        AbstractNum.Create_Default_Bullet();
-                        var LvlText = String.fromCharCode(0x00B7);
-                        var NumTextPr = new CTextPr();
-                        NumTextPr.RFonts.Set_All("Symbol", -1);
+					//��������� ��������� ������ ����� �� ���������� ������� ���������� ��������
+					var oFirstTextChild = node;
+					while(true)
+					{
+						var bContinue = false;
+						for(var i = 0, length = oFirstTextChild.childNodes.length; i < length; i++)
+						{
+							var child = oFirstTextChild.childNodes[i];
+							var nodeType = child.nodeType;
 
-                        switch(type)
-                        {
-                            case "disc":
-                            {
-                                NumTextPr.RFonts.Set_All("Symbol", -1);
-                                LvlText = String.fromCharCode(0x00B7);
-                                break;
-                            }
-                            case "circle":
-                            {
-                                NumTextPr.RFonts.Set_All("Courier New", -1);
-                                LvlText = "o";
-                                break;
-                            }
-                            case "square":
-                            {
-                                NumTextPr.RFonts.Set_All("Wingdings", -1);
-                                LvlText = String.fromCharCode(0x00A7);
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        AbstractNum.Create_Default_Numbered();
-                    }
-
-                    for (var iLvl = 0; iLvl <= 8; iLvl++)
-                    {
-                        switch(num)
-                        {
-                            case numbering_numfmt_Bullet     : AbstractNum.Set_Lvl_Bullet(iLvl, LvlText, NumTextPr); break;
-                            case numbering_numfmt_Decimal    : AbstractNum.Set_Lvl_Numbered_2(iLvl);break;
-                            case numbering_numfmt_LowerRoman : AbstractNum.Set_Lvl_Numbered_5(iLvl);break;
-                            case numbering_numfmt_UpperRoman : AbstractNum.Set_Lvl_Numbered_9(iLvl);break;
-                            case numbering_numfmt_LowerLetter: AbstractNum.Set_Lvl_Numbered_8(iLvl);break;
-                            case numbering_numfmt_UpperLetter: AbstractNum.Set_Lvl_Numbered_6(iLvl);break;
-                        }
-                    }
-                    //��������� ��������� ������ ����� �� ���������� ������� ���������� ��������
-                    var oFirstTextChild = node;
-                    while(true)
-                    {
-                        var bContinue = false;
-                        for(var i = 0, length = oFirstTextChild.childNodes.length; i < length; i++)
-                        {
-                            var child = oFirstTextChild.childNodes[i];
-                            var nodeType = child.nodeType;
-
-                            if(!(Node.ELEMENT_NODE == nodeType || Node.TEXT_NODE == nodeType))
-                                continue;
-                            //�������� ������� ��������� ������ �� \t,\n,\r
-                            if( Node.TEXT_NODE == child.nodeType)
-                            {
-                                var value = child.nodeValue;
-                                if(!value)
-                                    continue;
-                                value = value.replace(/(\r|\t|\n)/g, '');
-                                if("" == value)
-                                    continue;
-                            }
-                            if(Node.ELEMENT_NODE == nodeType)
-                            {
-                                oFirstTextChild = child;
-                                bContinue = true;
-                                break;
-                            }
-                        }
-                        if(false == bContinue)
-                            break;
-                    }
-                    if(node != oFirstTextChild)
-                    {
-						if(!this.bIsPlainText)
+							if(!(Node.ELEMENT_NODE == nodeType || Node.TEXT_NODE == nodeType))
+								continue;
+							//�������� ������� ��������� ������ �� \t,\n,\r
+							if( Node.TEXT_NODE == child.nodeType)
+							{
+								var value = child.nodeValue;
+								if(!value)
+									continue;
+								value = value.replace(/(\r|\t|\n)/g, '');
+								if("" == value)
+									continue;
+							}
+							if(Node.ELEMENT_NODE == nodeType)
+							{
+								oFirstTextChild = child;
+								bContinue = true;
+								break;
+							}
+						}
+						if(false == bContinue)
+							break;
+					}
+					if(node != oFirstTextChild)
+					{
+						if(!t.bIsPlainText)
 						{
 							var oLvl = AbstractNum.Lvl[0];
-							var oTextPr = this._read_rPr(oFirstTextChild);
+							var oTextPr = t._read_rPr(oFirstTextChild);
 							if(numbering_numfmt_Bullet == num)
 								oTextPr.RFonts = oLvl.TextPr.RFonts.Copy();
 								
@@ -4958,25 +4874,201 @@ PasteProcessor.prototype =
 							//�������� ��������� �� node
 							AbstractNum.Apply_TextPr(0, oTextPr);
 						}
-                    }
-                }
-				if(this.pasteInExcel !== true && Para.bFromDocument === true)
+					}
+				};
+				
+				
+				if(pNoHtmlPr['mso-list'])
 				{
-					var lvl = 0;
-					if(pNoHtmlPr['mso-list'])
+					//get listId and level from mso-list property
+					var msoListIgnoreSymbol = this._getMsoListSymbol(node);
+					var num = this._getTypeMsoListSymbol(msoListIgnoreSymbol);
+					
+					var level = 0;
+					var listId = null;
+					var startIndex;
+					if(-1 != (startIndex = pNoHtmlPr['mso-list'].indexOf("level")))
 					{
-						//TODO сделать полную поддержку mso-list при копировании списков из mso списков
-						var startIndex;
-						if(-1 != (startIndex = pNoHtmlPr['mso-list'].indexOf("level")))
+						level = parseInt(pNoHtmlPr['mso-list'].substr(startIndex + 5, 1)) - 1;
+					}
+					if(-1 != (startIndex = pNoHtmlPr['mso-list'].indexOf("lfo")))
+					{
+						listId = pNoHtmlPr['mso-list'].substr(startIndex, 4);
+					}
+					
+					var NumId = null;
+					if(listId && this.msoListMap[listId])//find list id into map
+					{
+						NumId = this.msoListMap[listId];
+					}
+					
+					if(null == NumId && this.pasteInExcel !== true)//create new NumId
+					{
+						// Создаем нумерацию
+						NumId  = this.oLogicDocument.Numbering.Create_AbstractNum();
+						var AbstractNum = this.oLogicDocument.Numbering.Get_AbstractNum(NumId);
+						if (numbering_numfmt_Bullet === num)
 						{
-							lvl = parseInt(pNoHtmlPr['mso-list'].substr(startIndex + 5, 1)) - 1;
+							AbstractNum.Create_Default_Bullet();
+							var LvlText = String.fromCharCode(0x00B7);
+							var NumTextPr = new CTextPr();
+							NumTextPr.RFonts.Set_All("Symbol", -1);
+
+							switch(type)
+							{
+								case "disc":
+								{
+									NumTextPr.RFonts.Set_All("Symbol", -1);
+									LvlText = String.fromCharCode(0x00B7);
+									break;
+								}
+								case "circle":
+								{
+									NumTextPr.RFonts.Set_All("Courier New", -1);
+									LvlText = "o";
+									break;
+								}
+								case "square":
+								{
+									NumTextPr.RFonts.Set_All("Wingdings", -1);
+									LvlText = String.fromCharCode(0x00A7);
+									break;
+								}
+							}
+						}
+						else
+						{
+							AbstractNum.Create_Default_Numbered();
 						}
 						
-						Para.Numbering_Set( NumId, lvl );
+						switch(num)
+						{
+							case numbering_numfmt_Bullet     : AbstractNum.Set_Lvl_Bullet(level, LvlText, NumTextPr); break;
+							case numbering_numfmt_Decimal    : AbstractNum.Set_Lvl_Numbered_3(level);break;
+							case numbering_numfmt_LowerRoman : AbstractNum.Set_Lvl_Numbered_9(level);break;
+							case numbering_numfmt_UpperRoman : AbstractNum.Set_Lvl_Numbered_5(level);break;
+							case numbering_numfmt_LowerLetter: AbstractNum.Set_Lvl_Numbered_8(level);break;
+							case numbering_numfmt_UpperLetter: AbstractNum.Set_Lvl_Numbered_6(level);break;
+						}
+						
+						//setListTextPr(AbstractNum);
 					}
 					else
 					{
-						Para.Numbering_Add( NumId, lvl );
+						var AbstractNum = this.oLogicDocument.Numbering.Get_AbstractNum(NumId);
+						
+						switch(num)
+						{
+							case numbering_numfmt_Decimal    : AbstractNum.Set_Lvl_Numbered_3(level);break;
+							case numbering_numfmt_LowerRoman : AbstractNum.Set_Lvl_Numbered_9(level);break;
+							case numbering_numfmt_UpperRoman : AbstractNum.Set_Lvl_Numbered_5(level);break;
+							case numbering_numfmt_LowerLetter: AbstractNum.Set_Lvl_Numbered_8(level);break;
+							case numbering_numfmt_UpperLetter: AbstractNum.Set_Lvl_Numbered_6(level);break;
+						}
+					}
+					
+					
+					//put into map listId
+					if(!this.msoListMap[listId])
+					{
+						this.msoListMap[listId] = NumId;
+					}
+					
+					if(this.pasteInExcel !== true && Para.bFromDocument === true)
+					{
+						Para.Numbering_Set( NumId, level );
+					}
+				}
+				else
+				{
+					var num = numbering_numfmt_Bullet;
+					if(null != pNoHtmlPr.numType)
+						num = pNoHtmlPr.numType;
+					var type = pNoHtmlPr["list-style-type"];
+					
+					if(type)
+					{
+						switch(type)
+						{
+							case "disc"       : num = numbering_numfmt_Bullet;break;
+							case "decimal"    : num = numbering_numfmt_Decimal;break;
+							case "lower-roman": num = numbering_numfmt_LowerRoman;break;
+							case "upper-roman": num = numbering_numfmt_UpperRoman;break;
+							case "lower-alpha": num = numbering_numfmt_LowerLetter;break;
+							case "upper-alpha": num = numbering_numfmt_UpperLetter;break;
+						}
+					}
+					//����� ���� ����������� �� Document.Set_ParagraphNumbering
+					
+					//������� ����������� ��������, ���� ��� ������ ���������, �� ����� ��� ������ �� ����������� ���������
+					if(this.aContent.length > 1)
+					{
+						var prevElem = this.aContent[this.aContent.length - 2];
+						if(null != prevElem && type_Paragraph === prevElem.GetType())
+						{
+							var PrevNumPr = prevElem.Numbering_Get();
+							if ( null != PrevNumPr && true === this.oLogicDocument.Numbering.Check_Format( PrevNumPr.NumId, PrevNumPr.Lvl, num ) )
+								NumId  = PrevNumPr.NumId;
+						}
+					}
+					if(null == NumId && this.pasteInExcel !== true)
+					{
+						// Создаем нумерацию
+						NumId  = this.oLogicDocument.Numbering.Create_AbstractNum();
+						var AbstractNum = this.oLogicDocument.Numbering.Get_AbstractNum(NumId);
+						if (numbering_numfmt_Bullet === num)
+						{
+							AbstractNum.Create_Default_Bullet();
+							var LvlText = String.fromCharCode(0x00B7);
+							var NumTextPr = new CTextPr();
+							NumTextPr.RFonts.Set_All("Symbol", -1);
+
+							switch(type)
+							{
+								case "disc":
+								{
+									NumTextPr.RFonts.Set_All("Symbol", -1);
+									LvlText = String.fromCharCode(0x00B7);
+									break;
+								}
+								case "circle":
+								{
+									NumTextPr.RFonts.Set_All("Courier New", -1);
+									LvlText = "o";
+									break;
+								}
+								case "square":
+								{
+									NumTextPr.RFonts.Set_All("Wingdings", -1);
+									LvlText = String.fromCharCode(0x00A7);
+									break;
+								}
+							}
+						}
+						else
+						{
+							AbstractNum.Create_Default_Numbered();
+						}
+						
+						for (var iLvl = 0; iLvl <= 8; iLvl++)
+						{
+							switch(num)
+							{
+								case numbering_numfmt_Bullet     : AbstractNum.Set_Lvl_Bullet(iLvl, LvlText, NumTextPr); break;
+								case numbering_numfmt_Decimal    : AbstractNum.Set_Lvl_Numbered_2(iLvl);break;
+								case numbering_numfmt_LowerRoman : AbstractNum.Set_Lvl_Numbered_5(iLvl);break;
+								case numbering_numfmt_UpperRoman : AbstractNum.Set_Lvl_Numbered_9(iLvl);break;
+								case numbering_numfmt_LowerLetter: AbstractNum.Set_Lvl_Numbered_8(iLvl);break;
+								case numbering_numfmt_UpperLetter: AbstractNum.Set_Lvl_Numbered_6(iLvl);break;
+							}
+						}
+						
+						setListTextPr(AbstractNum);
+					}
+					
+					if(this.pasteInExcel !== true && Para.bFromDocument === true)
+					{
+						Para.Numbering_Add( NumId, 0 );
 					}
 				}
             }
@@ -5314,6 +5406,34 @@ PasteProcessor.prototype =
 				return this._getMsoListIgnore(child);
 			}
 		}
+	},
+	_getTypeMsoListSymbol: function(str)
+	{
+		//TODO пока делаю так, пересмотреть регулярные выражения
+		var res = numbering_numfmt_Bullet;
+		var number = parseInt(str);
+		if(!isNaN(number))
+		{
+			res = numbering_numfmt_Decimal;
+		}
+		else if(str.match(/^[I,X,V]/))
+		{
+			res = numbering_numfmt_UpperRoman;
+		}
+		else if(str.match(/^[i,x,v]/))
+		{
+			res = numbering_numfmt_LowerRoman;
+		}
+		else if(str.match(/^[A-Z]/))
+		{
+			res = numbering_numfmt_UpperLetter;
+		}
+		else if(str.match(/^[a-z]/))
+		{
+			res = numbering_numfmt_LowerLetter;
+		}
+		
+		return res;
 	},
     _AddNextPrevToContent : function(oDoc)
     {
