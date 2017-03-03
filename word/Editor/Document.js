@@ -3472,6 +3472,8 @@ CDocument.prototype.Reset_RecalculateCache                   = function()
     {
         this.Content[Index].Reset_RecalculateCache();
     }
+
+    this.Footnotes.ResetRecalculateCache();
 };
 CDocument.prototype.Stop_Recalculate                         = function()
 {
