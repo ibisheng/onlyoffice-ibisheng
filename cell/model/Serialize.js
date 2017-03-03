@@ -1685,8 +1685,8 @@
             if(null != border.r)
                 this.bs.WriteItem(c_oSerBorderTypes.End, function(){oThis.WriteBorderProp(border.r);});
             //Horizontal
-            if(null != border.h)
-                this.bs.WriteItem(c_oSerBorderTypes.Horizontal, function(){oThis.WriteBorderProp(border.h);});
+            if(null != border.ih)
+                this.bs.WriteItem(c_oSerBorderTypes.Horizontal, function(){oThis.WriteBorderProp(border.ih);});
             //Start
             if(null != border.l)
                 this.bs.WriteItem(c_oSerBorderTypes.Start, function(){oThis.WriteBorderProp(border.l);});
@@ -1694,8 +1694,8 @@
             if(null != border.t)
                 this.bs.WriteItem(c_oSerBorderTypes.Top, function(){oThis.WriteBorderProp(border.t);});
             //Vertical
-            if(null != border.v)
-                this.bs.WriteItem(c_oSerBorderTypes.Vertical, function(){oThis.WriteBorderProp(border.v);});
+            if(null != border.iv)
+                this.bs.WriteItem(c_oSerBorderTypes.Vertical, function(){oThis.WriteBorderProp(border.iv);});
             //DiagonalDown
             if(null != border.dd)
                 this.bs.WriteItem(c_oSerBorderTypes.DiagonalDown, function(){oThis.memory.WriteBool(border.dd);});
