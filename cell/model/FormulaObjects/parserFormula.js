@@ -1427,25 +1427,21 @@ cRef.prototype.getBBox0 = function () {
 		return excludeHiddenRows && this._valid && this.ws.getRowHidden(this.getRange().r1);
 	};
 
-/** @constructor */
-function cRef3D( val, _wsFrom, wb ) {/*Ref means Sheat1!A1 for example*/
-    this.constructor.call( this, val, cElementType.cell3D );
+	/** @constructor */
+	function cRef3D(val, ws) {/*Ref means Sheat1!A1 for example*/
+		this.constructor.call(this, val, cElementType.cell3D);
 
-		this.ws = null;
-		if (_wsFrom) {
-			this.ws = wb.getWorksheetByName(_wsFrom);
-		}
+		this.ws = ws;
 		this.range = null;
 		if (val && this.ws) {
 			this.range = this.ws.getRange2(val);
 		}
-}
+	}
 
 cRef3D.prototype = Object.create( cBaseType.prototype );
 cRef3D.prototype.clone = function (opt_ws) {
 	var ws = opt_ws ? opt_ws : this.ws;
-	var wb = ws.workbook;
-	var oRes = new cRef3D(null, null, wb);
+	var oRes = new cRef3D(null, null);
 //	cBaseType.prototype.cloneTo.call( this, oRes );
 	this.constructor.prototype.cloneTo.call(this, oRes);
 	if (opt_ws && this.ws.getName() == opt_ws.getName()) {
@@ -1846,9 +1842,10 @@ cStrucTable.prototype.toLocaleString = function () {
 		}
 		if (tableData.range) {
 			var refName = tableData.range.getAbsName();
-			var sheetName = this.wb.getWorksheetById(tableData.wsID).getName();
+			var wsFrom = this.wb.getWorksheetById(tableData.wsID);
+			var sheetName = wsFrom.getName();
 			if (tableData.range.isOneCell()) {
-				this.area = new cRef3D(refName, sheetName, this.wb);
+				this.area = new cRef3D(refName, wsFrom);
 			} else {
 				this.area = new cArea3D(refName, sheetName, sheetName, this.wb);
 			}
@@ -4052,7 +4049,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 			return false;
 		}
 
-		var stack = [], val, valUp, tmp, elem, len, indentCount = -1, args = [], prev, next, arr = null, bArrElemSign = false;
+		var stack = [], val, valUp, tmp, elem, len, indentCount = -1, args = [], prev, next, arr = null, bArrElemSign = false, wsF;
 		for (var i = 0, nLength = aTokens.length; i < nLength; ++i) {
 			found_operand = null;
 			val = aTokens[i].value;
@@ -4072,8 +4069,9 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 									tmp = AscCommonExcel.g_oRangeCache.getRange3D(val);
 									if (tmp) {
 										this.is3D = true;
+										wsF = this.wb.getWorksheetByName(tmp.sheet);
 										elem = (tmp.isOneCell() && (null === tmp.sheet2 || tmp.sheet === tmp.sheet2)) ?
-											new cRef3D(tmp.getName(), tmp.sheet, this.wb) :
+											new cRef3D(tmp.getName(), wsF) :
 											new cArea3D(tmp.getName(), tmp.sheet, null !== tmp.sheet2 ? tmp.sheet2 : tmp.sheet, this.wb);
 									} else {
 										this.error.push(c_oAscError.ID.FrmlWrongOperator);
@@ -4613,7 +4611,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
             found_operand = new cArea3D(this.operand_str.toUpperCase(), _wsFrom, _wsTo, this.wb);
             pos.oper = found_operand;
           } else {
-            found_operand = new cRef3D(this.operand_str.toUpperCase(), _wsFrom, this.wb);
+            found_operand = new cRef3D(this.operand_str.toUpperCase(), wsF);
             pos.oper = found_operand;
           }
           this.RefPos.push(pos);
