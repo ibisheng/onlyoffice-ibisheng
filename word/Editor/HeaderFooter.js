@@ -415,6 +415,11 @@ CHeaderFooter.prototype =
         return this.Content.Is_PointInDrawingObjects( X, Y, this.Content.Get_StartPage_Absolute() );
     },
 
+	Is_PointInFlowTable : function(X, Y)
+	{
+		return this.Content.Is_PointInFlowTable(X, Y, this.Content.Get_StartPage_Absolute());
+	},
+
     CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, bMathWrap)
     {
         return this.Content.CheckRange( X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, 0, false, bMathWrap );
@@ -2091,9 +2096,15 @@ CHeaderFooterController.prototype =
 
     Selection_SetStart : function(X,Y, PageIndex, MouseEvent, bActivate)
     {
-        // Если мы попадаем в заселекченную автофигуру, пусть она даже выходит за пределы
-        if ( true === this.LogicDocument.DrawingObjects.pointInSelectedObject(X, Y, PageIndex) )
-        {
+		var TempHdrFtr = null;
+		// Если мы попадаем в заселекченную автофигуру, пусть она даже выходит за пределы
+		if (true === this.LogicDocument.DrawingObjects.pointInSelectedObject(X, Y, PageIndex)
+			|| (null !== (TempHdrFtr = this.Pages[PageIndex].Header) && true === TempHdrFtr.Is_PointInFlowTable(X, Y))
+			|| (null !== (TempHdrFtr = this.Pages[PageIndex].Footer) && true === TempHdrFtr.Is_PointInFlowTable(X, Y)))
+		{
+			if (null !== TempHdrFtr)
+				this.CurHdrFtr = TempHdrFtr;
+
             var NewPos = this.DrawingDocument.ConvertCoordsToAnotherPage(X, Y, PageIndex, this.CurPage);
             var _X = NewPos.X;
             var _Y = NewPos.Y;
@@ -2112,7 +2123,6 @@ CHeaderFooterController.prototype =
         // Сначала проверяем, не попали ли мы в контент документа. Если да, тогда надо
         // активировать работу с самим документом (просто вернуть false здесь)
 
-        var TempHdrFtr = null;
         var PageMetrics = this.LogicDocument.Get_PageContentStartPos( PageIndex );
         
         if ( MouseEvent.ClickCount >= 2 && true != editor.isStartAddShape &&

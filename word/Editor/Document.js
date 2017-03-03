@@ -4984,7 +4984,7 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
     var bInText      = (null === this.Is_InText(X, Y, this.CurPage) ? false : true);
     var bTableBorder = (null === this.Is_TableBorder(X, Y, this.CurPage) ? false : true);
     var nInDrawing   = this.DrawingObjects.isPointInDrawingObjects(X, Y, this.CurPage, this);
-    var bFlowTable   = (null === this.DrawingObjects.getTableByXY(X, Y, this.CurPage, this) ? false : true);
+	var bFlowTable   = (null === this.DrawingObjects.getTableByXY(X, Y, this.CurPage, this) ? false : true);
 
     // Сначала посмотрим, попалили мы в текстовый селект (но при этом не в границу таблицы и не более чем одинарным кликом)
     if (-1 !== this.Selection.DragDrop.Flag && MouseEvent.ClickCount <= 1 && false === bTableBorder &&
