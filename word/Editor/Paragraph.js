@@ -9522,49 +9522,54 @@ Paragraph.prototype =
 
         if (editor && this.bFromDocument)
         {
-            var TrackManager = this.LogicDocument.Get_TrackRevisionsManager();
-            var _Y = 0, Page_abs = 0, TextTransform = undefined;
-            if (this.Pages.length > 0 && this.Lines.length > 0)
-            {
-                var ContentPos = this.Get_ParaContentPos(this.Selection.Use, true);
-                var ParaPos    = this.Get_ParaPosByContentPos(ContentPos);
-                Page_abs       = this.Get_AbsolutePage(ParaPos.Page);
-                _Y             = this.Pages[ParaPos.Page].Y + this.Lines[ParaPos.Line].Top;
-                TextTransform  = this.Get_ParentTextTransform();
-            }
-            var _X         = (this.LogicDocument ? this.LogicDocument.Get_PageLimits(Page_abs).XLimit : 0);
-            var Coords     = this.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, Page_abs, TextTransform);
+			var TrackManager = this.LogicDocument.Get_TrackRevisionsManager();
 
-            if (this === TrackManager.Get_CurrentChangeParagraph())
-            {
-                var Change = TrackManager.Get_CurrentChange();
-                if (null !== Change)
-                {
-                    Change.put_InternalPos(_X, _Y, Page_abs);
-                    TrackManager.Add_VisibleChange(Change);
-                }
-            }
-            else if (false === this.Selection.Use)
-            {
-                var Changes = TrackManager.Get_ParagraphChanges(this.Get_Id());
-                if (Changes.length > 0)
-                {
-                    for (var ChangeIndex = 0, ChangesCount = Changes.length; ChangeIndex < ChangesCount; ChangeIndex++)
-                    {
-                        var Change = Changes[ChangeIndex];
-                        var Type = Change.get_Type();
-                        if ((c_oAscRevisionsChangeType.TextAdd !== Type
-                            && c_oAscRevisionsChangeType.TextRem !== Type
-                            && c_oAscRevisionsChangeType.TextPr !== Type)
-                            || (StartPos.Compare(Change.get_StartPos()) >= 0
-                                && StartPos.Compare(Change.get_EndPos()) <= 0))
-                        {
-                            Change.put_InternalPos(_X, _Y, Page_abs);
-                            TrackManager.Add_VisibleChange(Change);
-                        }
-                    }
-                }
-            }
+			if (this.Pages.length <= 0 && this.Lines.length <= 0)
+				return;
+
+			var ContentPos = this.Get_ParaContentPos(this.Selection.Use, true);
+			var ParaPos    = this.Get_ParaPosByContentPos(ContentPos);
+
+			if (this.Pages.length <= ParaPos.Page || this.Lines.length <= ParaPos.Line)
+				return;
+
+			var Page_abs      = this.Get_AbsolutePage(ParaPos.Page);
+			var _Y            = this.Pages[ParaPos.Page].Y + this.Lines[ParaPos.Line].Top;
+			var TextTransform = this.Get_ParentTextTransform();
+
+			var _X     = (this.LogicDocument ? this.LogicDocument.Get_PageLimits(Page_abs).XLimit : 0);
+			var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, Page_abs, TextTransform);
+
+			if (this === TrackManager.Get_CurrentChangeParagraph())
+			{
+				var Change = TrackManager.Get_CurrentChange();
+				if (null !== Change)
+				{
+					Change.put_InternalPos(_X, _Y, Page_abs);
+					TrackManager.Add_VisibleChange(Change);
+				}
+			}
+			else if (false === this.Selection.Use)
+			{
+				var Changes = TrackManager.Get_ParagraphChanges(this.Get_Id());
+				if (Changes.length > 0)
+				{
+					for (var ChangeIndex = 0, ChangesCount = Changes.length; ChangeIndex < ChangesCount; ChangeIndex++)
+					{
+						var Change = Changes[ChangeIndex];
+						var Type   = Change.get_Type();
+						if ((c_oAscRevisionsChangeType.TextAdd !== Type
+							&& c_oAscRevisionsChangeType.TextRem !== Type
+							&& c_oAscRevisionsChangeType.TextPr !== Type)
+							|| (StartPos.Compare(Change.get_StartPos()) >= 0
+							&& StartPos.Compare(Change.get_EndPos()) <= 0))
+						{
+							Change.put_InternalPos(_X, _Y, Page_abs);
+							TrackManager.Add_VisibleChange(Change);
+						}
+					}
+				}
+			}
         }
     },
 
