@@ -43,6 +43,7 @@
 	var FONT_THUMBNAIL_HEIGHT = (7 * 96.0 / 25.4) >> 0;
 	var c_oAscMaxColumnWidth  = 255;
 	var c_oAscMaxRowHeight    = 409;
+	var c_nMaxConversionTime  = 900000;//depends on config
 
 	//files type for Saving & DownloadAs
 	var c_oAscFileType = {
@@ -187,7 +188,9 @@
 		LoadTheme         : 12, // загрузка темы
 		MailMergeLoadFile : 13, // загрузка файла для mail merge
 		DownloadMerge     : 14, // cкачать файл с mail merge
-		SendMailMerge     : 15  // рассылка mail merge по почте
+		SendMailMerge     : 15,  // рассылка mail merge по почте
+		ForceSaveButton   : 16,
+		ForceSaveTimeout  : 17
 	};
 
 	var c_oAscAdvancedOptionsID = {
@@ -1077,6 +1080,7 @@
 	window['Asc']['FONT_THUMBNAIL_HEIGHT'] = FONT_THUMBNAIL_HEIGHT;
 	window['Asc']['c_oAscMaxColumnWidth']  = window['Asc'].c_oAscMaxColumnWidth = c_oAscMaxColumnWidth;
 	window['Asc']['c_oAscMaxRowHeight'] = window['Asc'].c_oAscMaxRowHeight = c_oAscMaxRowHeight;
+    window['Asc']['c_nMaxConversionTime'] = window['Asc'].c_nMaxConversionTime = c_nMaxConversionTime;
 	window['Asc']['c_oAscFileType'] = window['Asc'].c_oAscFileType = c_oAscFileType;
 	prot                         = c_oAscFileType;
 	prot['UNKNOWN']              = prot.UNKNOWN;
