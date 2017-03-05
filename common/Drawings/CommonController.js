@@ -3100,8 +3100,12 @@ DrawingObjectsController.prototype =
 
                 if(chart_type.getObjectType() === AscDFH.historyitem_type_BarChart)
                 {
+                    var bChangedGrouping = false;
                     if(chart_type.grouping !== need_groupping)
+                    {
                         chart_type.setGrouping(need_groupping);
+                        bChangedGrouping = true;
+                    }
 
                     if(!AscFormat.isRealNumber(chart_type.gapWidth))
                     {
@@ -3116,10 +3120,10 @@ DrawingObjectsController.prototype =
                     }
                     else
                     {
-                        /*if(chart_type.overlap !== null)
+                        if(bChangedGrouping && chart_type.overlap !== null)
                         {
                             chart_type.setOverlap(null);
-                        }*/
+                        }
                     }
 
                     axis_by_types = chart_type.getAxisByTypes();
