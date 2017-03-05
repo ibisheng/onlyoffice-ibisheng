@@ -9742,6 +9742,15 @@ CPieSeries.prototype =
         return null;
     },
 
+    getDptByIdx: function(idx){
+        for(var i = 0; i < this.dPt.length; ++i){
+            if(this.dPt[i].idx === idx){
+                return this.dPt[i];
+            }
+        }
+        return null;
+    },
+
     Refresh_RecalcData: function()
     {},
 
