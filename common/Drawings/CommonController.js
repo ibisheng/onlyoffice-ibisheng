@@ -3101,6 +3101,7 @@ DrawingObjectsController.prototype =
                 if(chart_type.getObjectType() === AscDFH.historyitem_type_BarChart)
                 {
                     var bChangedGrouping = false;
+                    var nOldGrouping = chart_type.grouping;
                     if(chart_type.grouping !== need_groupping)
                     {
                         chart_type.setGrouping(need_groupping);
@@ -3113,7 +3114,7 @@ DrawingObjectsController.prototype =
                     }
                     if(BAR_GROUPING_PERCENT_STACKED === need_groupping || BAR_GROUPING_STACKED === need_groupping)
                     {
-                        if(!AscFormat.isRealNumber(chart_type.overlap))
+                        if(!AscFormat.isRealNumber(chart_type.overlap) || nOldGrouping !== BAR_GROUPING_PERCENT_STACKED || nOldGrouping !== BAR_GROUPING_STACKED)
                         {
                             chart_type.setOverlap(100);
                         }
