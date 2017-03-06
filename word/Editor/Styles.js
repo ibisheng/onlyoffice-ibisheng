@@ -6975,10 +6975,10 @@ CTextPr.prototype =
             this.Unifill = TextPr.Unifill.createDuplicate();
         else
         {
-            if(undefined != TextPr.Color)
-            {
-                this.Unifill = undefined;
-            }
+            //if(undefined != TextPr.Color)
+            //{
+            //    this.Unifill = undefined;
+            //}
         }
         if(undefined != TextPr.FontRef)
         {

@@ -1203,7 +1203,7 @@ var editor;
 			  // Когда документ еще не загружен, нужно отпустить lock (при быстром открытии 2-мя пользователями)
 			  if (!t.IsSendDocumentLoadCompleate) {
 				  t.startCollaborationEditing();
-				  t.CoAuthoringApi.unLockDocument(false);
+				  t.CoAuthoringApi.unLockDocument(false, true);
 			  } else {
 				  // Сохранять теперь должны на таймере автосохранения. Иначе могли два раза запустить сохранение, не дожидаясь окончания
 				  t.canUnlockDocument = true;

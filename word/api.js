@@ -1197,7 +1197,7 @@ background-repeat: no-repeat;\
 				t.isStartCoAuthoringOnEndLoad = true;
 				if (!isStartEvent) {
 					// Документ еще не подгрузился, но нужно сбросить lock
-					t.CoAuthoringApi.unLockDocument(false);
+					t.CoAuthoringApi.unLockDocument(false, true);
 				}
 			}
 		};
