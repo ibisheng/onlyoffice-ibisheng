@@ -576,16 +576,16 @@
 
 		function parseReference() {
 			if ((ref = parserHelp.is3DRef.call(o, o.Formula, o.pCurrPos))[0]) {
-				var _wsFrom = ref[1], _wsTo = ( (ref[2] !== null) && (ref[2] !== undefined) ) ? ref[2] : _wsFrom;
-				var wsFrom = wb.getWorksheetByName(_wsFrom);
-				if (!(wsFrom && wb.getWorksheetByName(_wsTo))) {
+				var wsFrom = wb.getWorksheetByName(ref[1]);
+				var wsTo = (null !== ref[2]) ? wb.getWorksheetByName(ref[2]) : wsFrom;
+				if (!(wsFrom && wsTo)) {
 					return t.value = new cError(cErrorType.bad_reference);
 				}
 				if (parserHelp.isArea.call(o, o.Formula, o.pCurrPos)) {
-					found_operand = new cArea3D(o.operand_str.toUpperCase(), _wsFrom, _wsTo, wb);
+					found_operand = new cArea3D(o.operand_str.toUpperCase(), wsFrom, wsTo);
 				} else if (parserHelp.isRef.call(o, o.Formula, o.pCurrPos)) {
-					if (_wsTo != _wsFrom) {
-						found_operand = new cArea3D(o.operand_str.toUpperCase(), _wsFrom, _wsTo, wb);
+					if (wsTo !== wsFrom) {
+						found_operand = new cArea3D(o.operand_str.toUpperCase(), wsFrom, wsTo);
 					} else {
 						found_operand = new cRef3D(o.operand_str.toUpperCase(), wsFrom);
 					}
@@ -595,7 +595,7 @@
 			} else if (parserHelp.isRef.call(o, o.Formula, o.pCurrPos, true)) {
 				found_operand = new cRef(o.operand_str.toUpperCase(), r1.worksheet);
 			} else if (parserHelp.isName.call(o, o.Formula, o.pCurrPos, wb)[0]) {
-				found_operand = new AscCommonExcel.cName(o.operand_str, wb, r1.worksheet);
+				found_operand = new AscCommonExcel.cName(o.operand_str, r1.worksheet);
 			}
 		}
 
@@ -957,7 +957,6 @@
 				return this.value = new cError(cErrorType.bad_reference);
 			}
 
-			var wsName = arg0.ws.getName();
 			if (box.r1 == box.r2 && box.c1 == box.c2) {
 				ref = g_oCellAddressUtils.colnumToColstrFromWsView(box.c1 + 1) + _getRowTitle(box.r1);
 				this.value = (cElementType.cell === arg0.type) ? new cRef(ref, arg0.ws) : new cRef3D(ref, arg0.ws);
@@ -965,7 +964,7 @@
 				ref = g_oCellAddressUtils.colnumToColstrFromWsView(box.c1 + 1) + _getRowTitle(box.r1) + ":" +
 					g_oCellAddressUtils.colnumToColstrFromWsView(box.c2 + 1) + _getRowTitle(box.r2);
 				this.value =
-					(cElementType.cell === arg0.type) ? new cArea(ref, arg0.ws) : new cArea3D(ref, wsName, wsName, arg0.wb);
+					(cElementType.cell === arg0.type) ? new cArea(ref, arg0.ws) : new cArea3D(ref, arg0.ws, arg0.ws);
 			}
 
 		} else if (cElementType.cellsRange === arg0.type) {

@@ -3276,7 +3276,7 @@ cMIRR.prototype.Calculate = function ( arg ) {
         } )
     }
     else if ( arg0 instanceof cArea3D ) {
-        if ( arg0.wsFrom == arg0.wsTo ) {
+        if ( arg0.isSingleSheet() ) {
             valueArray = arg0.getMatrix()[0];
         }
         else
@@ -5872,7 +5872,7 @@ cXIRR.prototype.Calculate = function ( arg ) {
         } )
     }
     else if ( arg0 instanceof cArea3D ) {
-        if ( arg0.wsFrom == arg0.wsTo ) {
+        if ( arg0.isSingleSheet() ) {
             _values = arg0.getMatrix()[0];
         }
         else {
@@ -5915,7 +5915,7 @@ cXIRR.prototype.Calculate = function ( arg ) {
         } )
     }
     else if ( arg1 instanceof cArea3D ) {
-        if ( arg1.wsFrom == arg1.wsTo ) {
+        if ( arg1.isSingleSheet() ) {
             _dates = arg1.getMatrix()[0];
         }
         else {
@@ -6052,7 +6052,7 @@ cXNPV.prototype.Calculate = function ( arg ) {
         } )
     }
     else if ( arg1 instanceof cArea3D ) {
-        if ( arg1.wsFrom == arg1.wsTo ) {
+        if ( arg1.isSingleSheet() ) {
             valueArray = arg1.getMatrix()[0];
         }
         else {
@@ -6092,7 +6092,7 @@ cXNPV.prototype.Calculate = function ( arg ) {
 //        dateArray = arg2.getMatrix();
     }
     else if ( arg2 instanceof cArea3D ) {
-        if ( arg2.wsFrom == arg2.wsTo ) {
+        if ( arg2.isSingleSheet() ) {
             dateArray = arg2.getMatrix()[0];
         }
         else {

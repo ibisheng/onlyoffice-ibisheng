@@ -982,19 +982,6 @@ $( function () {
     } );
 
     test( "Test: rename sheet #1", function () {
-        oParser = new parserFormula( "Лист2!A2", "A1", ws );
-        ok( oParser.parse() );
-        // strictEqual( oParser.parse(), true)
-        strictEqual( oParser.renameSheet( "Лист2", "Лист3" ).assemble(), "Лист3!A2" );
-
-        oParser = new parserFormula( "Лист2:Лист3!A2", "A1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.renameSheet( "Лист2", "Лист1" ).assemble(), "Лист1:Лист3!A2" );
-
-        oParser = new parserFormula( "Лист2!A2:A5", "A1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.renameSheet( "Лист2", "Лист3" ).assemble(), "Лист3!A2:A5" );
-
         ws = wb.getWorksheet( 0 );
         ws.getRange2( "S95" ).setValue( "2" );
         ws = wb.getWorksheet( 1 );

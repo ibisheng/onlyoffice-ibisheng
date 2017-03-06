@@ -1574,9 +1574,8 @@
 			var wsActive = this.getActiveWs();
 			var oWsFrom = this.aWorksheets[indexFrom];
 			var tempW = {
-				wFN: oWsFrom.getName(),
+				wF: oWsFrom,
 				wFI: indexFrom,
-				wFId: oWsFrom.getId(),
 				wTI: indexTo
 			};
 			//wTI index insert before
@@ -1584,7 +1583,7 @@
 				tempW.wTI++;
 			this.dependencyFormulas.lockRecal();
 			var collectDependencies = [];
-			this.dependencyFormulas.changeSheet(tempW.wFId, {replace: tempW}, null, collectDependencies);
+			this.dependencyFormulas.changeSheet(oWsFrom.getId(), {replace: tempW}, null, collectDependencies);
 			//move sheets
 			var movedSheet = this.aWorksheets.splice(indexFrom, 1);
 			this.aWorksheets.splice(indexTo, 0, movedSheet[0]);
