@@ -2613,6 +2613,14 @@
 			_paste : function(worksheet, pasteData)
 			{
 				var documentContent = pasteData.content;
+				
+				//у родителя(CDocument) проставляю контент. нужно для вставки извне нумерованного списка. ф-ия Internal_GetNumInfo требует наличие этих параграфов в родителе. 
+				var cDocument = documentContent[0] && documentContent[0].Parent instanceof CDocument ? documentContent[0].Parent : null;
+				if(cDocument.Content && 1 === cDocument.Content.length)
+				{
+					cDocument.Content = documentContent;
+				}
+				
 				var activeRange = worksheet.model.selectionRange.getLast().clone();
 				if(pasteData.images && pasteData.images.length)
 					this.isUsuallyPutImages = true;
