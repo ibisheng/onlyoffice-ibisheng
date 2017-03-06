@@ -1315,6 +1315,7 @@
 		else
 		{
 			// меню для текстового селекта показываем всегда
+			isSelectCell = (this.ContextMenuLastInfo && (this.ContextMenuLastInfo.selectCell != null)) ? true : false;
 			isShowContextMenu = (!isSelectCell && (this.ContextMenuLastMode == AscCommon.MobileTouchContextMenuType.Select));
 
 			if (this.ContextMenuLastShow || isTableRuler)
