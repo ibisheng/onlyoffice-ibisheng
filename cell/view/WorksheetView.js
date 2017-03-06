@@ -9546,12 +9546,24 @@
 					}
 					
 					pastedRangeProps.offsetLast = {offsetCol: offsetCol, offsetRow: offsetRow};
-					mergeArr.push(new Asc.Range(
-						curMerge.c1 + arn.c1 - activeCellsPasteFragment.c1 + colDiff,
-						curMerge.r1 + arn.r1 - activeCellsPasteFragment.r1 + rowDiff,
-						curMerge.c2 + arn.c1 - activeCellsPasteFragment.c1 + colDiff,
-						curMerge.r2 + arn.r1 - activeCellsPasteFragment.r1 + rowDiff
-					));
+					if(specialPasteProps.transpose)
+					{
+						mergeArr.push(new Asc.Range(
+							curMerge.c1 + arn.c1 - activeCellsPasteFragment.r1 + colDiff,
+							curMerge.r1 + arn.r1 - activeCellsPasteFragment.c1 + rowDiff,
+							curMerge.c2 + arn.c1 - activeCellsPasteFragment.r1 + colDiff,
+							curMerge.r2 + arn.r1 - activeCellsPasteFragment.c1 + rowDiff
+						));
+					}
+					else
+					{
+						mergeArr.push(new Asc.Range(
+							curMerge.c1 + arn.c1 - activeCellsPasteFragment.c1 + colDiff,
+							curMerge.r1 + arn.r1 - activeCellsPasteFragment.r1 + rowDiff,
+							curMerge.c2 + arn.c1 - activeCellsPasteFragment.c1 + colDiff,
+							curMerge.r2 + arn.r1 - activeCellsPasteFragment.r1 + rowDiff
+						));
+					}
 				}
 			} 
 			else {
@@ -9683,6 +9695,7 @@
 							var curMerge = newVal.hasMerged();
 							if(curMerge && specialPasteProps.transpose)
 							{
+								curMerge = curMerge.clone();
 								var r1 = curMerge.r1;
 								var r2 = curMerge.r2;
 								var c1 = curMerge.c1;
