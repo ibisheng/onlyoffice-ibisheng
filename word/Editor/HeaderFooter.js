@@ -945,13 +945,15 @@ CHeaderFooter.prototype =
             this.LogicDocument.DrawingObjects.OnMouseDown(MouseEvent, X, Y, PageIndex);
         }
         else
-            return this.Content.Selection_SetStart( X, Y, PageIndex, MouseEvent );
+		{
+			return this.Content.Selection_SetStart(X, Y, 0, MouseEvent);
+		}
     },
 
     Selection_SetEnd : function(X, Y, PageIndex, MouseEvent)
     {
         this.Set_Page( PageIndex );
-        return this.Content.Selection_SetEnd(X, Y, PageIndex, MouseEvent);
+        return this.Content.Selection_SetEnd(X, Y, 0, MouseEvent);
     },
 
     Selection_Is_TableBorderMove : function()
