@@ -2136,6 +2136,15 @@
 		return _count;
 	};
 
+	CMobileTouchManagerBase.prototype.showKeyboard = function()
+	{
+		if (AscCommon.g_inputContext)
+		{
+			// нужно проверить, виден ли только курсор!!! и сделать это в делегате
+			//AscCommon.g_inputContext.HtmlArea.focus();
+		}
+	};
+
 	//--------------------------------------------------------export----------------------------------------------------
 	AscCommon.CMobileDelegateSimple = CMobileDelegateSimple;
 	AscCommon.CMobileTouchManagerBase = CMobileTouchManagerBase;

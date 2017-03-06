@@ -1280,6 +1280,10 @@
 		return AscCommon.TextBoxInputMode;
 	};
 
+	baseEditorsApi.prototype.asc_OnHideContextMenu = function()
+	{
+	};
+
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommon']                = window['AscCommon'] || {};
 	window['AscCommon'].baseEditorsApi = baseEditorsApi;

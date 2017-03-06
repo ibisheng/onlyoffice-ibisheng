@@ -7495,6 +7495,14 @@ background-repeat: no-repeat;\
 	};
 	/********************************************************************/
 
+	asc_docs_api.prototype.asc_OnHideContextMenu = function()
+	{
+		if (this.WordControl.MobileTouchManager)
+		{
+			this.WordControl.MobileTouchManager.showKeyboard();
+		}
+	};
+
 	// desktop editor spellcheck
 	function CSpellCheckApi_desktop()
 	{
@@ -8040,6 +8048,8 @@ background-repeat: no-repeat;\
 	// mobile
 	asc_docs_api.prototype["asc_GetDefaultTableStyles"]             	= asc_docs_api.prototype.asc_GetDefaultTableStyles;
 	asc_docs_api.prototype["asc_Remove"]             					= asc_docs_api.prototype.asc_Remove;
+	asc_docs_api.prototype["asc_OnHideContextMenu"] 					= asc_docs_api.prototype.asc_OnHideContextMenu;
+
 	CDocInfoProp.prototype['get_PageCount']             = CDocInfoProp.prototype.get_PageCount;
 	CDocInfoProp.prototype['put_PageCount']             = CDocInfoProp.prototype.put_PageCount;
 	CDocInfoProp.prototype['get_WordsCount']            = CDocInfoProp.prototype.get_WordsCount;
