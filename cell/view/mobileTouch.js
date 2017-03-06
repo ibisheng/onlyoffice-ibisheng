@@ -67,15 +67,23 @@ function (window, undefined)
 		this.Size.W = _element.offsetWidth;
 		this.Size.H = _element.offsetHeight;
 	};
-	CMobileDelegateEditorCell.prototype.ConvertCoordsToCursor = function(x, y, page, isGlobal)
+	CMobileDelegateEditorCell.prototype.ConvertCoordsToCursor = function(x, y, page, isGlobal, isNoCell)
 	{
 		var _res = this.WB.ConvertLogicToXY(x, y);
 		var _point = {X: _res.X, Y: _res.Y, Page: 0, DrawPage: 0};
 
 		if (AscBrowser.isRetina)
 		{
-			_point.X >>= 1;
-			_point.Y >>= 1;
+			if (isNoCell === true)
+			{
+				_point.X /= 2;
+				_point.Y /= 2;
+			}
+			else
+			{
+				_point.X >>= 1;
+				_point.Y >>= 1;
+			}
 		}
 
 		if (isGlobal !== false)
@@ -992,11 +1000,11 @@ function (window, undefined)
 
 		if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
 		{
-			var pos1 = this.delegate.ConvertCoordsToCursor(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1, false);
-			var pos2 = this.delegate.ConvertCoordsToCursor(this.RectSelect1.x, this.RectSelect1.y + this.RectSelect1.h, this.PageSelect1, false);
+			var pos1 = this.delegate.ConvertCoordsToCursor(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1, false, true);
+			var pos2 = this.delegate.ConvertCoordsToCursor(this.RectSelect1.x, this.RectSelect1.y + this.RectSelect1.h, this.PageSelect1, false, true);
 
-			var pos3 = this.delegate.ConvertCoordsToCursor(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y, this.PageSelect2, false);
-			var pos4 = this.delegate.ConvertCoordsToCursor(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h, this.PageSelect2, false);
+			var pos3 = this.delegate.ConvertCoordsToCursor(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y, this.PageSelect2, false, true);
+			var pos4 = this.delegate.ConvertCoordsToCursor(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h, this.PageSelect2, false, true);
 
 			if (undefined === color)
 			{
@@ -1031,6 +1039,9 @@ function (window, undefined)
 				ctx.moveTo(_x2C, (_koef * pos3.Y) >> 0);
 				ctx.lineTo(_x2C, (_koef * pos4.Y) >> 0);
 
+				ctx.stroke();
+				ctx.beginPath();
+
 				if (_x2C > (_x1C + 10 * _koef))
 				{
 					var _y1 = ((_koef * pos1.Y) >> 0) + 2 * _koef;
@@ -1038,15 +1049,16 @@ function (window, undefined)
 
 					if (_y2 > _y1)
 					{
-						ctx.moveTo(_x2C - 3 * _koef, _y1);
-						ctx.lineTo(_x2C - 3 * _koef, _y2);
+						ctx.moveTo(_x2C - 2 * _koef, _y1);
+						ctx.lineTo(_x2C - 2 * _koef, _y2);
 
-						ctx.moveTo(_x2C - 6 * _koef, _y1);
 						ctx.lineTo(_x2C - 6 * _koef, _y2);
+						ctx.lineTo(_x2C - 6 * _koef, _y1);
+						ctx.closePath();
 					}
 				}
 
-				ctx.stroke();
+				ctx.fill();
 
 				ctx.beginPath();
 
@@ -1074,6 +1086,9 @@ function (window, undefined)
 				ctx.moveTo((_koef * pos2.X) >> 0, _y2C);
 				ctx.lineTo((_koef * pos4.X) >> 0, _y2C);
 
+				ctx.stroke();
+				ctx.beginPath();
+
 				if (_y2C > (_y1C + 10 * _koef))
 				{
 					var _x1 = ((_koef * pos1.X) >> 0) + 2 * _koef;
@@ -1081,15 +1096,16 @@ function (window, undefined)
 
 					if (_x2 > _x1)
 					{
-						ctx.moveTo(_x1, _y2C - 3 * _koef);
-						ctx.lineTo(_x2, _y2C - 3 * _koef);
+						ctx.moveTo(_x1, _y2C - 2 * _koef);
+						ctx.lineTo(_x2, _y2C - 2 * _koef);
 
-						ctx.moveTo(_x1, _y2C - 6 * _koef);
 						ctx.lineTo(_x2, _y2C - 6 * _koef);
+						ctx.lineTo(_x1, _y2C - 6 * _koef);
+						ctx.closePath();
 					}
 				}
 
-				ctx.stroke();
+				ctx.fill();
 
 				ctx.beginPath();
 
