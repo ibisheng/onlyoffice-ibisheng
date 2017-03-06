@@ -8270,6 +8270,8 @@ CTable.prototype =
         var Grid_end   = -1;
 
         var RowsInfo = [];
+        var nRowMin = -1;
+        var nRowMax = -1;
 
         for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
         {
@@ -8291,6 +8293,12 @@ CTable.prototype =
                         Grid_start : StartGridCol,
                         Grid_end   : EndGridCol
                     };
+
+                    if (-1 === nRowMax || RowIndex > nRowMax)
+                    	nRowMax = RowIndex;
+
+                    if (-1 === nRowMin || RowIndex < nRowMin)
+                    	nRowMin = RowIndex;
                 }
                 else
                 {
@@ -8302,6 +8310,16 @@ CTable.prototype =
                 }
             }
         }
+
+        // Проверим, что селект строк идет без пропусков
+        for (var nRowIndex = nRowMin; nRowIndex <= nRowMax; ++nRowIndex)
+		{
+			if (!RowsInfo[nRowIndex])
+			{
+				bCanMerge = false;
+				break;
+			}
+		}
 
         for ( var Index in RowsInfo )
         {
