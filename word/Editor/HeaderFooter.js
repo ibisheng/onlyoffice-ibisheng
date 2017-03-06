@@ -2107,10 +2107,8 @@ CHeaderFooterController.prototype =
 			if (null !== TempHdrFtr)
 				this.CurHdrFtr = TempHdrFtr;
 
-            var NewPos = this.DrawingDocument.ConvertCoordsToAnotherPage(X, Y, PageIndex, this.CurPage);
-            var _X = NewPos.X;
-            var _Y = NewPos.Y;
-            this.CurHdrFtr.Selection_SetStart( _X, _Y, this.CurPage, MouseEvent );
+			this.CurPage = PageIndex;
+			this.CurHdrFtr.Selection_SetStart(X, Y, PageIndex, MouseEvent);
             this.ChangeCurPageOnEnd = false;
 
             this.WaitMouseDown = false;

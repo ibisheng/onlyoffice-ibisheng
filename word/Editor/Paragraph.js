@@ -9110,9 +9110,10 @@ Paragraph.prototype =
 
 				var PageAbs   = this.Get_AbsolutePage(CurPage);
 				var ColumnAbs = this.Get_AbsoluteColumn(CurPage);
+				var PageRel   = PageAbs - this.Parent.Get_AbsolutePage(0);
 
-                var PageLimits     = this.Parent.Get_PageLimits(this.Get_AbsolutePage(PageAbs));
-                var PageFields     = this.Parent.Get_PageFields(this.Get_AbsolutePage(PageAbs));
+                var PageLimits     = this.Parent.Get_PageLimits(PageRel);
+                var PageFields     = this.Parent.Get_PageFields(PageRel);
 
                 var _CurPage = 0;
                 if (0 !== PageAbs && CurPage > ColumnAbs)
