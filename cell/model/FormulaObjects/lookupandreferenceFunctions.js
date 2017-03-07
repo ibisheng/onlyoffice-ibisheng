@@ -870,7 +870,7 @@
 
 		if (cElementType.array === arg1.type || cElementType.cellsRange === arg1.type) {
 			arg1 = arg1.getMatrix();
-		} else if (cElementType.cellsRange3D === arg1.type && arg1.wsFrom == arg1.wsTo) {
+		} else if (cElementType.cellsRange3D === arg1.type && arg1.isSingleSheet()) {
 			arg1 = arg1.getMatrix()[0];
 		} else if (cElementType.cell === arg1.type || cElementType.cell3D === arg1.type) {
 			arg1 = arg1.getMatrix();
