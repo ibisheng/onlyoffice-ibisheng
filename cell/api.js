@@ -3603,6 +3603,9 @@ var editor;
 
   prot["asc_InputClearKeyboardElement"] = prot.asc_InputClearKeyboardElement;
 
+  prot["asc_OnHideContextMenu"] = prot.asc_OnHideContextMenu;
+  prot["asc_OnHideContextMenu"] = prot.asc_OnShowContextMenu;
+
   // mobile
   prot["asc_Remove"] = prot.asc_Remove;
 })(window);

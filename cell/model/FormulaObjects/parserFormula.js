@@ -4962,7 +4962,7 @@ parserFormula.prototype.calculate = function(opt_defName, opt_range) {
 					}
 				}
 			} else if (elem.type === cElementType.cellsRange3D) {
-				if (elem.isSingleSheet() && sheetId == elem.wsFrom && elem.isValid()) {
+				if (elem.isSingleSheet() && sheetId == elem.wsFrom.getId() && elem.isValid()) {
 					_cellsBbox = elem.getBBox0();
 				}
 			}

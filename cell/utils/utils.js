@@ -1013,7 +1013,7 @@
 					continue;
 				}
 
-				while (this.activeCell.col >= curRange.c1 && this.activeCell.col <= curRange.c2 && fCheckSize(0, this.activeCell.col)) {
+				while (this.activeCell.col >= curRange.c1 && this.activeCell.col <= curRange.c2 && fCheckSize(-1, this.activeCell.col)) {
 					this.activeCell.col += dc || (dr > 0 ? +1 : -1);
 					done = false;
 				}
@@ -1021,7 +1021,7 @@
 					continue;
 				}
 
-				while (this.activeCell.row >= curRange.r1 && this.activeCell.row <= curRange.r2 && fCheckSize(this.activeCell.row, 0)) {
+				while (this.activeCell.row >= curRange.r1 && this.activeCell.row <= curRange.r2 && fCheckSize(this.activeCell.row, -1)) {
 					this.activeCell.row += dr || (dc > 0 ? +1 : -1);
 					done = false;
 				}

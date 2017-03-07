@@ -6861,6 +6861,9 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["AddShapeOnCurrentPage"] 				= asc_docs_api.prototype.AddShapeOnCurrentPage;
 	asc_docs_api.prototype["can_CopyCut"] 							= asc_docs_api.prototype.can_CopyCut;
 
+	asc_docs_api.prototype["asc_OnHideContextMenu"] 				= asc_docs_api.prototype.asc_OnHideContextMenu;
+	asc_docs_api.prototype["asc_OnShowContextMenu"] 				= asc_docs_api.prototype.asc_OnShowContextMenu;
+
 
 	window['Asc']['asc_CCommentData'] = window['Asc'].asc_CCommentData = asc_CCommentData;
 	asc_CCommentData.prototype['asc_getText']         = asc_CCommentData.prototype.asc_getText;

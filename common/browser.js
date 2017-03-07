@@ -54,7 +54,8 @@ var AscBrowser = {
     isArm : false,
     isMozilla : false,
 	isRetina : false,
-    isLinuxOS : false
+    isLinuxOS : false,
+	retinaPixelRatio : 1
 };
 
 // user agent lower case
@@ -121,6 +122,7 @@ AscBrowser.checkZoom = function()
 
 	AscBrowser.zoom = 1.0;
 	AscBrowser.isRetina = false;
+	AscBrowser.retinaPixelRatio = 1;
 
     if (AscBrowser.isChrome && !AscBrowser.isOpera && !AscBrowser.isMobile && document && document.firstElementChild && document.body)
     {
@@ -174,10 +176,19 @@ AscBrowser.checkZoom = function()
 			else
 				document.firstElementChild.style.zoom = "normal";
         }
+
+        if (AscBrowser.isRetina)
+        	AscBrowser.retinaPixelRatio = 2;
     }
     else
     {
 		AscBrowser.isRetina = (Math.abs(2 - (window.devicePixelRatio / AscBrowser.zoom)) < 0.01);
+
+		if (AscBrowser.isMobile)
+		{
+			AscBrowser.isRetina = (window.devicePixelRatio >= 1.9);
+			AscBrowser.retinaPixelRatio = window.devicePixelRatio;
+		}
     }
 };
 

@@ -7454,7 +7454,7 @@ CDocumentContent.prototype.Selection_SetEnd          = function(X, Y, CurPage, M
 
     if (docpostype_DrawingObjects === this.CurPos.Type)
     {
-        var PageAbs = (this.Parent instanceof CHeaderFooter ? CurPage : this.Get_StartPage_Absolute(CurPage));
+        var PageAbs = this.Get_StartPage_Absolute(CurPage);
         if (AscCommon.g_mouse_event_type_up == MouseEvent.Type)
         {
             this.LogicDocument.DrawingObjects.OnMouseUp(MouseEvent, X, Y, PageAbs);

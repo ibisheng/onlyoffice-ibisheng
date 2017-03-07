@@ -1316,8 +1316,8 @@
 		}
 		else
 		{
-			_canvas.width = (TABLE_STYLE_WIDTH_PIX << 1);
-			_canvas.height = (TABLE_STYLE_HEIGHT_PIX << 1);
+			_canvas.width = (TABLE_STYLE_WIDTH_PIX * AscCommon.AscBrowser.retinaPixelRatio);
+			_canvas.height = (TABLE_STYLE_HEIGHT_PIX * AscCommon.AscBrowser.retinaPixelRatio);
 		}
 		var ctx = _canvas.getContext('2d');
 

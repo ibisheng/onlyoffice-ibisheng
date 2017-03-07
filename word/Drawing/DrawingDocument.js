@@ -2425,8 +2425,8 @@ function CDrawingDocument()
 
 		if (this.m_oWordControl.bIsRetinaSupport)
 		{
-			w *= 2;
-			h *= 2;
+			w *= AscCommon.AscBrowser.retinaPixelRatio;
+			h *= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 		var _check = this.CheckPagesSizeMaximum(w, h);
@@ -3277,8 +3277,8 @@ function CDrawingDocument()
 		var _hh = this.m_oWordControl.m_oEditor.HtmlElement.height;
 		if (this.m_oWordControl.bIsRetinaSupport)
 		{
-			_ww >>= 1;
-			_hh >>= 1;
+			_ww /= AscCommon.AscBrowser.retinaPixelRatio;
+			_hh /= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 		var boxX = 0;
@@ -3394,8 +3394,8 @@ function CDrawingDocument()
 		var _hh = this.m_oWordControl.m_oEditor.HtmlElement.height;
 		if (this.m_oWordControl.bIsRetinaSupport)
 		{
-			_ww >>= 1;
-			_hh >>= 1;
+			_ww /= AscCommon.AscBrowser.retinaPixelRatio;
+			_hh /= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 		// �������, ����� �� ������ �� ������
@@ -5174,7 +5174,7 @@ function CDrawingDocument()
 	{
 		var pixHeigth = this.m_oWordControl.m_oEditor.HtmlElement.height;
 		if (this.m_oWordControl.bIsRetinaSupport)
-			pixHeigth >>= 1;
+			pixHeigth /= AscCommon.AscBrowser.retinaPixelRatio;
 		var pixBetweenPages = 20 * (this.m_lDrawingEnd - this.m_lDrawingFirst);
 
 		return (pixHeigth - pixBetweenPages) * g_dKoef_pix_to_mm * 100 / this.m_oWordControl.m_nZoomValue;
@@ -5871,8 +5871,8 @@ function CDrawingDocument()
 			}
 			else
 			{
-				_canvas_tables.width = (TABLE_STYLE_WIDTH_PIX << 1);
-				_canvas_tables.height = (TABLE_STYLE_HEIGHT_PIX << 1);
+				_canvas_tables.width = (TABLE_STYLE_WIDTH_PIX * AscCommon.AscBrowser.retinaPixelRatio);
+				_canvas_tables.height = (TABLE_STYLE_HEIGHT_PIX * AscCommon.AscBrowser.retinaPixelRatio);
 			}
 		}
 
@@ -6611,8 +6611,8 @@ CStylesPainter.prototype =
 	{
 		if (_api.WordControl.bIsRetinaSupport)
 		{
-			this.STYLE_THUMBNAIL_WIDTH <<= 1;
-			this.STYLE_THUMBNAIL_HEIGHT <<= 1;
+			this.STYLE_THUMBNAIL_WIDTH *= AscCommon.AscBrowser.retinaPixelRatio;
+			this.STYLE_THUMBNAIL_HEIGHT *= AscCommon.AscBrowser.retinaPixelRatio;
 			this.IsRetinaEnabled = true;
 		}
 
@@ -6678,8 +6678,8 @@ CStylesPainter.prototype =
 
 		if (_api.WordControl.bIsRetinaSupport)
 		{
-			this.STYLE_THUMBNAIL_WIDTH >>= 1;
-			this.STYLE_THUMBNAIL_HEIGHT >>= 1;
+			this.STYLE_THUMBNAIL_WIDTH /= AscCommon.AscBrowser.retinaPixelRatio;
+			this.STYLE_THUMBNAIL_HEIGHT /= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 		// export
@@ -6709,7 +6709,9 @@ CStylesPainter.prototype =
 		}
 		else
 		{
-			graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm / 2, _canvas.height * g_dKoef_pix_to_mm / 2);
+			graphics.init(ctx, _canvas.width, _canvas.height,
+				_canvas.width * g_dKoef_pix_to_mm / AscCommon.AscBrowser.retinaPixelRatio,
+				_canvas.height * g_dKoef_pix_to_mm / AscCommon.AscBrowser.retinaPixelRatio);
 		}
 		graphics.m_oFontManager = AscCommon.g_fontManager;
 
@@ -6761,7 +6763,9 @@ CStylesPainter.prototype =
 		}
 		else
 		{
-			graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm / 2, _canvas.height * g_dKoef_pix_to_mm / 2);
+			graphics.init(ctx, _canvas.width, _canvas.height,
+				_canvas.width * g_dKoef_pix_to_mm / AscCommon.AscBrowser.retinaPixelRatio,
+				_canvas.height * g_dKoef_pix_to_mm / AscCommon.AscBrowser.retinaPixelRatio);
 		}
 		graphics.m_oFontManager = AscCommon.g_fontManager;
 
@@ -6849,7 +6853,7 @@ CStylesPainter.prototype =
 
 		var dKoefToMM = g_dKoef_pix_to_mm;
 		if (this.IsRetinaEnabled)
-			dKoefToMM /= 2;
+			dKoefToMM /= AscCommon.AscBrowser.retinaPixelRatio;
 
 		if (window["flat_desine"] !== true)
 		{

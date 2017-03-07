@@ -861,7 +861,7 @@ function CEditorPage(api)
 				var _w = this.m_oEditor.HtmlElement.width;
 				if (this.bIsRetinaSupport)
 				{
-					_w >>= 1;
+					_w /= AscCommon.AscBrowser.retinaPixelRatio;
 				}
 				Zoom = 100 * _w * g_dKoef_pix_to_mm / this.m_dDocumentPageWidth;
 			}
@@ -898,8 +898,8 @@ function CEditorPage(api)
 
 		if (this.bIsRetinaSupport)
 		{
-			w >>= 1;
-			h >>= 1;
+			w /= AscCommon.AscBrowser.retinaPixelRatio;
+			h /= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 		var _hor_Zoom = 100;
@@ -1235,7 +1235,7 @@ function CEditorPage(api)
 		var _ctx = this.m_oLeftRuler_buttonsTabs.HtmlElement.getContext('2d');
 		if (this.bIsRetinaSupport)
 		{
-			_ctx.setTransform(2, 0, 0, 2, 0, 0);
+			_ctx.setTransform(AscCommon.AscBrowser.retinaPixelRatio, 0, 0, AscCommon.AscBrowser.retinaPixelRatio, 0, 0);
 		}
 		else
 		{
@@ -1435,7 +1435,7 @@ function CEditorPage(api)
 		// делаем заглушку
 		var minPosY = 20;
 		if (oThis.bIsRetinaSupport)
-			minPosY *= 2;
+			minPosY *= AscCommon.AscBrowser.retinaPixelRatio;
 		if (positionMinY < minPosY)
 			positionMinY = minPosY;
 
@@ -2556,8 +2556,8 @@ function CEditorPage(api)
 
 		if (this.bIsRetinaSupport)
 		{
-			settings.screenW /= 2;
-			settings.screenH /= 2;
+			settings.screenW /= AscCommon.AscBrowser.retinaPixelRatio;
+			settings.screenH /= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 		if (this.m_oScrollHor_)
@@ -2747,7 +2747,7 @@ function CEditorPage(api)
 
 		var _editor_width = this.m_oEditor.HtmlElement.width;
 		if (this.bIsRetinaSupport)
-			_editor_width /= 2;
+			_editor_width /= AscCommon.AscBrowser.retinaPixelRatio;
 
 		var oldVisible = this.m_bIsHorScrollVisible;
 		if (this.m_dDocumentWidth <= _editor_width)
@@ -3057,8 +3057,8 @@ function CEditorPage(api)
 
 		if (this.bIsRetinaSupport)
 		{
-			_width >>= 1;
-			_height >>= 1;
+			_width /= AscCommon.AscBrowser.retinaPixelRatio;
+			_height /= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 		var bIsFoundFirst = false;
@@ -3179,10 +3179,10 @@ function CEditorPage(api)
 			else
 			{
 				var _cur_page_rect = new AscCommon._rect();
-				_cur_page_rect.x   = drawPage.left << 1;
-				_cur_page_rect.y   = drawPage.top << 1;
-				_cur_page_rect.w   = (drawPage.right << 1) - _cur_page_rect.x;
-				_cur_page_rect.h   = (drawPage.bottom << 1) - _cur_page_rect.y;
+				_cur_page_rect.x   = drawPage.left * AscCommon.AscBrowser.retinaPixelRatio;
+				_cur_page_rect.y   = drawPage.top * AscCommon.AscBrowser.retinaPixelRatio;
+				_cur_page_rect.w   = (drawPage.right * AscCommon.AscBrowser.retinaPixelRatio) - _cur_page_rect.x;
+				_cur_page_rect.h   = (drawPage.bottom * AscCommon.AscBrowser.retinaPixelRatio) - _cur_page_rect.y;
 
 				rectsPages.push(_cur_page_rect);
 			}
@@ -3212,10 +3212,10 @@ function CEditorPage(api)
 				}
 				else
 				{
-					var __x = drawPage.left << 1;
-					var __y = drawPage.top << 1;
-					var __w = (drawPage.right << 1) - __x;
-					var __h = (drawPage.bottom << 1) - __y;
+					var __x = drawPage.left * AscCommon.AscBrowser.retinaPixelRatio;
+					var __y = drawPage.top * AscCommon.AscBrowser.retinaPixelRatio;
+					var __w = (drawPage.right * AscCommon.AscBrowser.retinaPixelRatio) - __x;
+					var __h = (drawPage.bottom * AscCommon.AscBrowser.retinaPixelRatio) - __y;
 					this.m_oDrawingDocument.m_arrPages[i].Draw(context, __x, __y, __w, __h);
 					//this.m_oBoundsController.CheckRect(__x, __y, __w, __h);
 				}
@@ -3244,10 +3244,10 @@ function CEditorPage(api)
 				var __h = drawPage.bottom - __y;
 				if (this.bIsRetinaSupport)
 				{
-					__x <<= 1;
-					__y <<= 1;
-					__w <<= 1;
-					__h <<= 1;
+					__x *= AscCommon.AscBrowser.retinaPixelRatio;
+					__y *= AscCommon.AscBrowser.retinaPixelRatio;
+					__w *= AscCommon.AscBrowser.retinaPixelRatio;
+					__h *= AscCommon.AscBrowser.retinaPixelRatio;
 				}
 
 				this.m_oDrawingDocument.CheckRecalculatePage(__w, __h, i);

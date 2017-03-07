@@ -151,7 +151,7 @@ COverlay.prototype =
     SetBaseTransform : function()
     {
         if (this.IsRetina)
-            this.m_oContext.setTransform(2, 0, 0, 2, 0, 0);
+            this.m_oContext.setTransform(AscCommon.AscBrowser.retinaPixelRatio, 0, 0, AscCommon.AscBrowser.retinaPixelRatio, 0, 0);
         else
             this.m_oContext.setTransform(1, 0, 0, 1, 0, 0);
     },
@@ -590,7 +590,7 @@ CAutoshapeTrack.prototype =
 
         this.Graphics = new AscCommon.CGraphics();
 
-        var _scale = this.m_oOverlay.IsRetina? 2 : 1;
+        var _scale = this.m_oOverlay.IsRetina? AscCommon.AscBrowser.retinaPixelRatio : 1;
 
         this.Graphics.init(this.m_oContext, _scale * (r - x), _scale * (b - y), w_mm, h_mm);
 
@@ -779,7 +779,7 @@ CAutoshapeTrack.prototype =
 
         this.Graphics = new AscCommon.CGraphics();
 
-        var _scale = this.m_oOverlay.IsRetina? 2 : 1;
+        var _scale = this.m_oOverlay.IsRetina? AscCommon.AscBrowser.retinaPixelRatio : 1;
 
         this.Graphics.init(this.m_oContext, _scale * (drawPage.right - drawPage.left), _scale * (drawPage.bottom - drawPage.top), oPage.width_mm, oPage.height_mm);
 

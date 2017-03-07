@@ -232,8 +232,8 @@ function CControl()
             var _W = ((_r - _x) * g_dKoef_mm_to_pix + 0.5) >> 0;
             var _H = ((_b - _y) * g_dKoef_mm_to_pix + 0.5) >> 0;
 
-            this.HtmlElement.width 	= _W << 1;
-            this.HtmlElement.height = _H << 1;
+            this.HtmlElement.width 	= _W *= AscCommon.AscBrowser.retinaPixelRatio;
+            this.HtmlElement.height = _H *= AscCommon.AscBrowser.retinaPixelRatio;
         }
         else
         {
