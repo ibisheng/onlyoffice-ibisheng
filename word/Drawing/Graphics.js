@@ -123,8 +123,8 @@ CGraphics.prototype =
     init : function(context,width_px,height_px,width_mm,height_mm)
     {
         this.m_oContext     = context;
-        this.m_lHeightPix   = height_px;
-        this.m_lWidthPix    = width_px;
+        this.m_lHeightPix   = height_px >> 0;
+        this.m_lWidthPix    = width_px >> 0;
         this.m_dWidthMM     = width_mm;
         this.m_dHeightMM    = height_mm;
         this.m_dDpiX        = 25.4 * this.m_lWidthPix / this.m_dWidthMM;

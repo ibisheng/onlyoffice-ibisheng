@@ -5234,8 +5234,8 @@ CellArea.prototype = {
 		canvas.width = 50;
 		canvas.height = 50;
 		if (AscCommon.AscBrowser.isRetina) {
-			canvas.width 	/= AscCommon.AscBrowser.retinaPixelRatio;
-			canvas.height 	/= AscCommon.AscBrowser.retinaPixelRatio;
+			canvas.width = AscCommon.AscBrowser.convertToRetinaValue(canvas.width, true);
+			canvas.height = AscCommon.AscBrowser.convertToRetinaValue(canvas.height, true);
 		}
 		var oSparklineView = new AscFormat.CSparklineView();
 		var oSparkline = new sparkline();

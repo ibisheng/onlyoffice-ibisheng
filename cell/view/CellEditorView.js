@@ -1302,14 +1302,14 @@
 		var width = widthStyle, height = heightStyle;
 
 		if ( isRetina ) {
-			left /= AscCommon.AscBrowser.retinaPixelRatio;
-			top /= AscCommon.AscBrowser.retinaPixelRatio;
+			left = AscCommon.AscBrowser.convertToRetinaValue(left);
+			top = AscCommon.AscBrowser.convertToRetinaValue(top);
 
-			widthStyle /= AscCommon.AscBrowser.retinaPixelRatio;
-			heightStyle /= AscCommon.AscBrowser.retinaPixelRatio;
+			widthStyle = AscCommon.AscBrowser.convertToRetinaValue(widthStyle);
+			heightStyle = AscCommon.AscBrowser.convertToRetinaValue(heightStyle);
 
-			width = widthStyle * AscCommon.AscBrowser.retinaPixelRatio;
-			height = heightStyle * AscCommon.AscBrowser.retinaPixelRatio;
+			width = AscCommon.AscBrowser.convertToRetinaValue(widthStyle, true);
+			height = AscCommon.AscBrowser.convertToRetinaValue(heightStyle, true);
 		}
 
 		this.canvasOuterStyle.left = left + 'px';
@@ -1470,9 +1470,9 @@
 		}
 
 		if (AscBrowser.isRetina) {
-			curLeft /= AscCommon.AscBrowser.retinaPixelRatio;
-			curTop /= AscCommon.AscBrowser.retinaPixelRatio;
-			curHeight /= AscCommon.AscBrowser.retinaPixelRatio;
+			curLeft = AscCommon.AscBrowser.convertToRetinaValue(curLeft);
+			curTop = AscCommon.AscBrowser.convertToRetinaValue(curTop);
+			curHeight = AscCommon.AscBrowser.convertToRetinaValue(curHeight);
 		}
 
 

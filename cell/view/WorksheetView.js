@@ -7233,10 +7233,10 @@
         var height = this.getRowHeight( row, /*px*/0 );
 
         if ( AscBrowser.isRetina ) {
-            xL /= AscCommon.AscBrowser.retinaPixelRatio;
-            yL /= AscCommon.AscBrowser.retinaPixelRatio;
-            width /= AscCommon.AscBrowser.retinaPixelRatio;
-            height /= AscCommon.AscBrowser.retinaPixelRatio;
+            xL = AscCommon.AscBrowser.convertToRetinaValue(xL);
+            yL = AscCommon.AscBrowser.convertToRetinaValue(yL);
+            width = AscCommon.AscBrowser.convertToRetinaValue(width);
+            height = AscCommon.AscBrowser.convertToRetinaValue(height);
         }
 
         return new AscCommon.asc_CRect( xL, yL, width, height );

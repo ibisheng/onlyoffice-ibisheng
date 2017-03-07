@@ -1708,8 +1708,8 @@ function CDrawingDocument(drawingObjects)
 
         if (this.m_oWordControl.bIsRetinaSupport)
         {
-            w *= AscCommon.AscBrowser.retinaPixelRatio;
-            h *= AscCommon.AscBrowser.retinaPixelRatio;
+            w = AscCommon.AscBrowser.convertToRetinaValue(w, true);
+			h = AscCommon.AscBrowser.convertToRetinaValue(h, true);
         }
 
         // заглушка под мобильную версию (iPad не рисует большие картинки (наверное страховка по памяти))

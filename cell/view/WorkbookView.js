@@ -1772,8 +1772,8 @@
     if (isRetina) {
       styleWidth = width;
       styleHeight = height;
-      width *= AscCommon.AscBrowser.retinaPixelRatio;
-      height *= AscCommon.AscBrowser.retinaPixelRatio;
+      width = AscCommon.AscBrowser.convertToRetinaValue(width, true);
+      height = AscCommon.AscBrowser.convertToRetinaValue(height, true);
     }
 
     if (oldWidth === width && oldHeight === height) {
@@ -2645,8 +2645,8 @@
     var styleThumbnailWidth = 61;
     var styleThumbnailHeight = 46;
     if (AscBrowser.isRetina) {
-      styleThumbnailWidth *= AscCommon.AscBrowser.retinaPixelRatio;
-      styleThumbnailHeight *= AscCommon.AscBrowser.retinaPixelRatio;
+      styleThumbnailWidth = AscCommon.AscBrowser.convertToRetinaValue(styleThumbnailWidth, true);
+      styleThumbnailHeight = AscCommon.AscBrowser.convertToRetinaValue(styleThumbnailHeight, true);
     }
 
     var canvas = document.createElement('canvas');

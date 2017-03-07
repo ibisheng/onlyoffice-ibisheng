@@ -197,6 +197,14 @@ AscBrowser.checkZoom = function()
 
 AscBrowser.checkZoom();
 
+AscBrowser.convertToRetinaValue = function(value, isScale)
+{
+	if (isScale === true)
+		return ((value * AscBrowser.retinaPixelRatio) + 0.5) >> 0;
+	else
+		return ((value / AscBrowser.retinaPixelRatio) + 0.5) >> 0;
+};
+
     //--------------------------------------------------------export----------------------------------------------------
     window['AscCommon'] = window['AscCommon'] || {};
     window['AscCommon'].AscBrowser = AscBrowser; // ToDo убрать window['AscBrowser']
