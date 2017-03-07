@@ -116,7 +116,8 @@ AscBrowser.checkZoom = function()
 {
     if (AscBrowser.isAndroid)
 	{
-		AscBrowser.isRetina = (Math.abs(2 - (window.devicePixelRatio / AscBrowser.zoom)) < 0.01);
+		AscBrowser.isRetina = (window.devicePixelRatio >= 1.9);
+		AscBrowser.retinaPixelRatio = window.devicePixelRatio;
 		return;
 	}
 
