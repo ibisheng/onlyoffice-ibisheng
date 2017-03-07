@@ -469,7 +469,7 @@
 				var _w = this.HtmlPage.m_oEditor.HtmlElement.width;
 				if (this.HtmlPage.bIsRetinaSupport)
 				{
-					_w >>= 1;
+					_w /= AscCommon.AscBrowser.retinaPixelRatio;
 				}
 				Zoom = 100 * _w * AscCommon.g_dKoef_pix_to_mm / this.HtmlPage.m_dDocumentPageWidth;
 			}
@@ -648,8 +648,8 @@
 
 		if (AscCommon.AscBrowser.isRetina)
 		{
-			window.g_table_track_mobile_move.width = 40;
-			window.g_table_track_mobile_move.height = 40;
+			window.g_table_track_mobile_move.width = (20 * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
+			window.g_table_track_mobile_move.height = (20 * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
 
 		}
 		else
@@ -1713,7 +1713,7 @@
 			ctx.lineWidth = 1 / dKoef;
 
 			if (overlay.IsRetina)
-				dKoef *= 2;
+				dKoef *= AscCommon.AscBrowser.retinaPixelRatio;
 
 			var _coord_transform = new AscCommon.CMatrix();
 			_coord_transform.sx  = dKoef;
@@ -1724,10 +1724,10 @@
 			var _diamond_size = AscCommon.MOBILE_TABLE_RULER_DIAMOND;
 			if (overlay.IsRetina)
 			{
-				_coord_transform.tx *= 2;
-				_coord_transform.ty *= 2;
+				_coord_transform.tx *= AscCommon.AscBrowser.retinaPixelRatio;
+				_coord_transform.ty *= AscCommon.AscBrowser.retinaPixelRatio;
 
-				_diamond_size *= 2;
+				_diamond_size *= AscCommon.AscBrowser.retinaPixelRatio;
 			}
 
 			ctx.save();
@@ -1743,8 +1743,8 @@
 			var _offset = (_epsRects + _rectWidth) / dKoef;
 			if (overlay.IsRetina)
 			{
-				_rectW *= 2;
-				_offset *= 2;
+				_rectW *= AscCommon.AscBrowser.retinaPixelRatio;
+				_offset *= AscCommon.AscBrowser.retinaPixelRatio;
 			}
 
 			if (this.delegate.Name != "slide")

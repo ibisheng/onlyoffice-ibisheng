@@ -768,8 +768,8 @@ CShapeDrawer.prototype =
 
                         if (editor.WordControl.bIsRetinaSupport)
                         {
-                            koefX /= 2;
-                            koefY /= 2;
+                            koefX /= AscCommon.AscBrowser.retinaPixelRatio;
+                            koefY /= AscCommon.AscBrowser.retinaPixelRatio;
                         }
                     }
 

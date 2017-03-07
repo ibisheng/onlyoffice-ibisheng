@@ -1283,6 +1283,9 @@
 	baseEditorsApi.prototype.asc_OnHideContextMenu = function()
 	{
 	};
+	baseEditorsApi.prototype.asc_OnShowContextMenu = function()
+	{
+	};
 
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommon']                = window['AscCommon'] || {};
