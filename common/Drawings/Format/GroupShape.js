@@ -1780,6 +1780,17 @@ AscCommon.extendClass(CGroupShape, AscFormat.CGraphicObjectBase);
     CGroupShape.prototype.Refresh_RecalcData = function()
     {};
 
+    CGroupShape.prototype.checkTypeCorrect = function()
+    {
+        if(!this.spPr){
+            return false;
+        }
+        if(this.spTree.length === 0){
+            return false;
+        }
+        return true;
+    };
+
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGroupShape = CGroupShape;

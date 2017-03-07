@@ -151,6 +151,18 @@ function (window, undefined) {
             AscFormat.CImageShape.prototype.handleUpdateExtents.call(this, []);
         }
     };
+    COleObject.prototype.checkTypeCorrect = function(){
+        if(!this.m_sData){
+            return false;
+        }
+        if(!this.m_sApplicationId){
+            return false;
+        }
+        if(this.m_nPixHeight === null || this.m_nPixHeight === null){
+            return false;
+        }
+        return true;
+    };
         window['AscFormat'] = window['AscFormat'] || {};
         window['AscFormat'].COleObject = COleObject;
 })(window);

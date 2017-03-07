@@ -947,6 +947,7 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
         var mapDrawings         = {};
         var mapRuns             = {};
         var mapTables           = {};
+        var mapGrObjects        = {};
         for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
         {
             var oChange = arrReverseChanges[nIndex];
@@ -963,12 +964,29 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
 				mapRuns[oClass.Get_Id()] = oClass;
 			else if (oClass instanceof AscCommonWord.CTable)
 				mapTables[oClass.Get_Id()] = oClass;
+			else if(oClass instanceof AscFormat.CShape || oClass instanceof AscFormat.CImageShape || oClass instanceof AscFormat.CChartSpace || oClass instanceof AscFormat.CGroupShape || oClass instanceof AscFormat.CGraphicFrame)
+                mapGrObjects[oClass.Get_Id()] = oClass;
         }
 
         // Создаем точку в истории. Делаем действия через обычные функции (с отключенным пересчетом), которые пишут в
         // историю. Сохраняем список изменений в новой точке, удаляем данную точку.
         var oHistory = AscCommon.History;
         oHistory.CreateNewPointForCollectChanges();
+        for(var sId in mapGrObjects){
+            var oShape = mapGrObjects[sId];
+            if(!oShape.checkCorrect()){
+                oShape.setBDeleted(true);
+                if(oShape.group){
+                    oShape.group.removeFromSpTree(oShape.Get_Id());
+                }
+                else if(AscFormat.Slide && (oShape.parent instanceof AscFormat.Slide)){
+                    oShape.parent.removeFromSpTreeById(oShape.Get_Id());
+                }
+                else if(AscCommonWord.ParaDrawing && (oShape.parent instanceof AscCommonWord.ParaDrawing)){
+                    mapDrawings[oShape.parent.Get_Id()] = oShape.parent;
+                }
+            }
+        }
         var oDrawing;
         for (var sId in mapDrawings)
         {
@@ -1046,6 +1064,8 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
             oParagraph.Correct_Content();
             oParagraph.CheckParaEnd();
         }
+
+
 
 		var oBinaryWriter = AscCommon.History.BinaryWriter;
 		var aSendingChanges = [];
@@ -1211,6 +1231,10 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
         // 		return false;
         // }
 
+        if(oChange.CheckCorrect && !oChange.CheckCorrect())
+        {
+            return false;
+        }
         return true;
     };
 

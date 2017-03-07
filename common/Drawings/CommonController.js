@@ -2855,6 +2855,9 @@ DrawingObjectsController.prototype =
         if(oPr.isEqual(chartSettings)){
             return;
         }
+        //Title Settings
+        chart_space.setChart(chart_space.chart.createDuplicate());
+        chart_space.setStyle(chart_space.style);
         if(this.drawingObjects && this.drawingObjects.getWorksheet && typeof sRange === "string" && sRange.length > 0)
         {
             var ws_view = this.drawingObjects.getWorksheet();
@@ -2916,7 +2919,6 @@ DrawingObjectsController.prototype =
                 return;
             }
         }
-        //Title Settings
         var chart = chart_space.chart;
         var title_show_settings = chartSettings.getTitle();
         if(title_show_settings === c_oAscChartTitleShowSettings.none)

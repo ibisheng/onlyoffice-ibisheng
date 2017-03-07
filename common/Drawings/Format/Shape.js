@@ -5270,6 +5270,13 @@ CShape.prototype.checkTextWarp = function(oContent, oBodyPr, dWidth, dHeight, bN
     return oRet;
 };
 
+CShape.prototype.checkTypeCorrect = function(){
+    if(!this.spPr){
+        return false;
+    }
+    return true;
+}
+
 function CreateBinaryReader(szSrc, offset, srcLen)
 {
     var nWritten = 0;

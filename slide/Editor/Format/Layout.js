@@ -327,6 +327,14 @@ SlideLayout.prototype =
             }
         }
     },
+
+    CheckCorrect: function(){
+        if(!this.Master){
+            return false;
+        }
+        return true;
+    },
+
     getMatchingShape:  Slide.prototype.getMatchingShape,/*function(type, idx, bSingleBody)
     {
         var _input_reduced_type;

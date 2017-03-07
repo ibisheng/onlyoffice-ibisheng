@@ -219,6 +219,20 @@
         this.Redo();
         this.RefreshRecalcData();
     };
+
+    CChangesDrawingsObject.prototype.CheckCorrect = function()
+    {
+        if(this.Old){
+            var oObject = AscCommon.g_oTableId.Get_ById(this.Old);
+            if(oObject.CheckCorrect){
+                if(!oObject.CheckCorrect()){
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+
     function CChangesDrawingsContent(Class, Type, Pos, Items, isAdd) {
         this.Type = Type;
         CChangesDrawingsContent.superclass.constructor.call(this, Class, Pos, Items, isAdd);
