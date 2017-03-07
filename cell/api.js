@@ -376,9 +376,9 @@ var editor;
     return AscCommon.g_clipboardBase.Special_Paste(props);
   };
   
-  spreadsheet_api.prototype.asc_SpecialPasteData = function(preSpecialPasteData, specialPasteData, props) {
+  spreadsheet_api.prototype.asc_SpecialPasteData = function(props) {
 	if (!this.getViewMode()) {
-      this.wb.specialPasteData(preSpecialPasteData, specialPasteData, props);
+      this.wb.specialPasteData(props);
     }
   };
 

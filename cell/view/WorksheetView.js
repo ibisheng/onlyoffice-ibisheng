@@ -8785,9 +8785,13 @@
         }
     };
 	
-	WorksheetView.prototype.specialPaste = function (specialPasteUndoData, specialPasteData, props) {
+	WorksheetView.prototype.specialPaste = function (props) {
 		var api = window["Asc"]["editor"];
 		var t = this;
+		
+		var clipboard_base = window['AscCommon'].g_clipboardBase;
+		var specialPasteUndoData = clipboard_base.specialPasteUndoData;
+		var specialPasteData = clipboard_base.specialPasteData;
 		
 		if(!specialPasteData)
 		{
@@ -8843,7 +8847,7 @@
 			
 			//откатываемся до того, что было до вставки
 			//курсор и специальная вставка не в шейпе + курсор в шейпе, специальная вставка на листе
-			if(specialPasteUndoData && specialPasteUndoData.data && !window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId)
+			if(specialPasteUndoData && specialPasteUndoData.data && !clipboard_base.specialPasteButtonProps.shapeId)
 			{
 				var tempProps = new Asc.SpecialPasteProps();
 				tempProps.width = true;
@@ -8852,7 +8856,7 @@
 					tempProps.transpose = true;
 					specialPasteUndoData.transpose = null;
 				}
-				window['AscCommon'].g_clipboardBase.specialPasteProps = tempProps;
+				clipboard_base.specialPasteProps = tempProps;
 				
 				//переводим фокус из шейпа на лист
 				if(isIntoShape)
@@ -8880,7 +8884,7 @@
 			}
 			
 			//далее специальная вставка
-			window['AscCommon'].g_clipboardBase.specialPasteProps = props;
+			clipboard_base.specialPasteProps = props;
 			//TODO пока для закрытия транзации выставляю флаг. пересмотреть!
 			window["Asc"]["editor"].wb.clipboard.bIsEndTransaction = true;
 			api.wb.clipboard.pasteData(t, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data, true);

@@ -935,7 +935,7 @@
 		
 		Special_Paste : function(props)
 		{
-			this.Api.asc_SpecialPasteData(this.specialPasteUndoData, this.specialPasteData, props);
+			this.Api.asc_SpecialPasteData(props);
 			return true;
 		},
 		

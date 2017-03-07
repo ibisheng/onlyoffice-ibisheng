@@ -2078,9 +2078,9 @@
     t.clipboard.pasteData(ws, _format, data1, data2, text_data);
   };
   
-  WorkbookView.prototype.specialPasteData = function(preSpecialPasteData, specialPasteData, props) {
+  WorkbookView.prototype.specialPasteData = function(props) {
     if (!this.getCellEditMode()) {
-		this.getWorksheet().specialPaste(preSpecialPasteData, specialPasteData, props);
+		this.getWorksheet().specialPaste(props);
 	}
   };
 
