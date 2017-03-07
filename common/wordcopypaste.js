@@ -5416,21 +5416,28 @@ PasteProcessor.prototype =
 		{
 			res = numbering_numfmt_Decimal;
 		}
-		else if(str.match(/^[I,X,V]/))
+		else if(1 === str.length && -1 !== str.indexOf("o"))
 		{
-			res = numbering_numfmt_UpperRoman;
+			res = numbering_numfmt_Bullet;
 		}
-		else if(str.match(/^[i,x,v]/))
+		else
 		{
-			res = numbering_numfmt_LowerRoman;
-		}
-		else if(str.match(/^[A-Z]/))
-		{
-			res = numbering_numfmt_UpperLetter;
-		}
-		else if(str.match(/^[a-z]/))
-		{
-			res = numbering_numfmt_LowerLetter;
+			if(str.match(/^[I,X,V]/))
+			{
+				res = numbering_numfmt_UpperRoman;
+			}
+			else if(str.match(/^[i,x,v]/))
+			{
+				res = numbering_numfmt_LowerRoman;
+			}
+			else if(str.match(/^[A-Z]/))
+			{
+				res = numbering_numfmt_UpperLetter;
+			}
+			else if(str.match(/^[a-z]/))
+			{
+				res = numbering_numfmt_LowerLetter;
+			}
 		}
 		
 		return res;
