@@ -957,7 +957,11 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
 			else if (oClass instanceof AscCommonWord.Paragraph)
 				mapParagraphs[oClass.Get_Id()] = oClass;
 			else if (oClass.IsParagraphContentElement && true === oClass.IsParagraphContentElement() && true === oChange.IsContentChange() && oClass.Get_Paragraph())
-				mapParagraphs[oClass.Get_Paragraph().Get_Id()] = oClass.Get_Paragraph();
+            {
+                mapParagraphs[oClass.Get_Paragraph().Get_Id()] = oClass.Get_Paragraph();
+                if (oClass instanceof AscCommonWord.ParaRun)
+                    mapRuns[oClass.Get_Id()] = oClass;
+            }
 			else if (oClass instanceof AscCommonWord.ParaDrawing)
 				mapDrawings[oClass.Get_Id()] = oClass;
 			else if (oClass instanceof AscCommonWord.ParaRun)
