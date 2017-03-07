@@ -2140,8 +2140,8 @@
 	{
 		if (AscCommon.g_inputContext)
 		{
-			// нужно проверить, виден ли только курсор!!! и сделать это в делегате
-			//AscCommon.g_inputContext.HtmlArea.focus();
+			if (this.ContextMenuLastMode ==  AscCommon.MobileTouchContextMenuType.Target)
+				AscCommon.g_inputContext.HtmlArea.focus();
 		}
 	};
 
