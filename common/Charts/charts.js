@@ -452,8 +452,8 @@ ChartPreviewManager.prototype.createChartPreview = function(type, styleIndex) {
             this._canvas_charts.height = this.CHART_PREVIEW_HEIGHT_PIX;
 
             if (AscCommon.AscBrowser.isRetina) {
-                this._canvas_charts.width <<= 1;
-                this._canvas_charts.height <<= 1;
+                this._canvas_charts.width *= AscCommon.AscBrowser.retinaPixelRatio;
+                this._canvas_charts.height *= AscCommon.AscBrowser.retinaPixelRatio;
             }
         }
 

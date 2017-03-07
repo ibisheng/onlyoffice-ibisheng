@@ -866,19 +866,19 @@ CAutoshapeTrack.prototype =
 			this.m_oOverlay.IsRetina = true;
             this.m_oOverlay.m_oContext.setTransform(1, 0, 0, 1, 0, 0);
 
-            left /= 2;
-            top /= 2;
-            width /= 2;
-            height /= 2;
+            left    /= AscCommon.AscBrowser.retinaPixelRatio;
+            top     /= AscCommon.AscBrowser.retinaPixelRatio;
+            width   /= AscCommon.AscBrowser.retinaPixelRatio;
+            height  /= AscCommon.AscBrowser.retinaPixelRatio;
 
             if (matrix)
 			{
-				matrix.tx /= 2;
-				matrix.ty /= 2;
+				matrix.tx /= AscCommon.AscBrowser.retinaPixelRatio;
+				matrix.ty /= AscCommon.AscBrowser.retinaPixelRatio;
 			}
 
 			this.m_oOverlay.m_oContext.translate(this.Graphics.m_oCoordTransform.tx, this.Graphics.m_oCoordTransform.ty);
-            this.m_oOverlay.m_oContext.scale(2, 2);
+            this.m_oOverlay.m_oContext.scale(AscCommon.AscBrowser.retinaPixelRatio, AscCommon.AscBrowser.retinaPixelRatio);
 			this.m_oOverlay.m_oContext.translate(-this.Graphics.m_oCoordTransform.tx, -this.Graphics.m_oCoordTransform.ty);
         }
 
@@ -1988,8 +1988,8 @@ CAutoshapeTrack.prototype =
 
 			if (matrix)
 			{
-				matrix.tx *= 2;
-				matrix.ty *= 2;
+				matrix.tx *= AscCommon.AscBrowser.retinaPixelRatio;
+				matrix.ty *= AscCommon.AscBrowser.retinaPixelRatio;
 			}
 		}
     },
@@ -2275,7 +2275,7 @@ CAutoshapeTrack.prototype =
         var dist = TRACK_ADJUSTMENT_SIZE / 2;
 
         if (!overlay.IsRetina && overlay.IsCellEditor && AscCommon.AscBrowser.isRetina)
-            dist *= 2;
+            dist *= AscCommon.AscBrowser.retinaPixelRatio;
 
         ctx.moveTo(cx - dist, cy);
         ctx.lineTo(cx, cy - dist);

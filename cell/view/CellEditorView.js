@@ -1308,8 +1308,8 @@
 			widthStyle /= AscCommon.AscBrowser.retinaPixelRatio;
 			heightStyle /= AscCommon.AscBrowser.retinaPixelRatio;
 
-			width = widthStyle *= AscCommon.AscBrowser.retinaPixelRatio;
-			height = heightStyle *= AscCommon.AscBrowser.retinaPixelRatio;
+			width = widthStyle * AscCommon.AscBrowser.retinaPixelRatio;
+			height = heightStyle * AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 		this.canvasOuterStyle.left = left + 'px';
