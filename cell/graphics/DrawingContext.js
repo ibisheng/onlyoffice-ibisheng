@@ -416,8 +416,8 @@
 		this.ppiY = 96;
 
 		if (AscCommon.AscBrowser.isRetina) {
-			this.ppiX <<= 1;
-			this.ppiY <<= 1;
+			this.ppiX *= AscCommon.AscBrowser.retinaPixelRatio;
+			this.ppiY *= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 		this._mct  = new Matrix();  // units transform

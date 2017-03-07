@@ -1302,14 +1302,14 @@
 		var width = widthStyle, height = heightStyle;
 
 		if ( isRetina ) {
-			left >>= 1;
-			top >>= 1;
+			left /= AscCommon.AscBrowser.retinaPixelRatio;
+			top /= AscCommon.AscBrowser.retinaPixelRatio;
 
-			widthStyle >>= 1;
-			heightStyle >>= 1;
+			widthStyle /= AscCommon.AscBrowser.retinaPixelRatio;
+			heightStyle /= AscCommon.AscBrowser.retinaPixelRatio;
 
-			width = widthStyle << 1;
-			height = heightStyle << 1;
+			width = widthStyle *= AscCommon.AscBrowser.retinaPixelRatio;
+			height = heightStyle *= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 		this.canvasOuterStyle.left = left + 'px';
@@ -1470,9 +1470,9 @@
 		}
 
 		if (AscBrowser.isRetina) {
-			curLeft >>= 1;
-			curTop >>= 1;
-			curHeight >>= 1;
+			curLeft /= AscCommon.AscBrowser.retinaPixelRatio;
+			curTop /= AscCommon.AscBrowser.retinaPixelRatio;
+			curHeight /= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 
@@ -2700,8 +2700,8 @@
 		var y = (((event.pageY * AscBrowser.zoom) >> 0) - offs.top) / this.ky;
 
 		if (AscBrowser.isRetina) {
-			x <<= 1;
-			y <<= 1;
+			x *= AscCommon.AscBrowser.retinaPixelRatio;
+			y *= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 		return {x: x, y: y};

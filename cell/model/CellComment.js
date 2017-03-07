@@ -933,11 +933,11 @@ CCellCommentator.prototype.getCommentsCoords = function(comments) {
 		coords.dHeightMM = this.pxToMm(coords.dHeightPX);
 
     if (AscCommon.AscBrowser.isRetina) {
-      coords.dWidthPX >>= 1;
-      coords.dHeightPX >>= 1;
-      coords.dLeftPX >>= 1;
-      coords.dTopPX >>= 1;
-      coords.dReverseLeftPX >>= 1;
+      coords.dWidthPX 		/= AscCommon.AscBrowser.retinaPixelRatio;
+      coords.dHeightPX 		/= AscCommon.AscBrowser.retinaPixelRatio;
+      coords.dLeftPX 		/= AscCommon.AscBrowser.retinaPixelRatio;
+      coords.dTopPX 		/= AscCommon.AscBrowser.retinaPixelRatio;
+      coords.dReverseLeftPX /= AscCommon.AscBrowser.retinaPixelRatio;
     }
 	}
 

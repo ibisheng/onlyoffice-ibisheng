@@ -6440,6 +6440,22 @@ background-repeat: no-repeat;\
 		return _renderer.Memory.data;
 	};
 
+	asc_docs_api.prototype.asc_OnHideContextMenu = function()
+	{
+		if (this.WordControl.MobileTouchManager)
+		{
+			this.WordControl.checkBodyOffset();
+			this.WordControl.MobileTouchManager.showKeyboard();
+		}
+	};
+	asc_docs_api.prototype.asc_OnShowContextMenu = function()
+	{
+		if (this.WordControl.MobileTouchManager)
+		{
+			this.WordControl.checkBodyOffset();
+		}
+	};
+
 	window["AscDesktopEditor_Save"] = function()
 	{
 		return editor.asc_Save(false);

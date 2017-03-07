@@ -1904,8 +1904,8 @@ function CDrawingDocument()
 		var _hh = this.m_oWordControl.m_oEditor.HtmlElement.height;
 		if (this.m_oWordControl.bIsRetinaSupport)
 		{
-			_ww >>= 1;
-			_hh >>= 1;
+			_ww /= AscCommon.AscBrowser.retinaPixelRatio;
+			_hh /= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 		var boxX = 0;
@@ -2434,7 +2434,7 @@ function CDrawingDocument()
 	{
 		var pixHeigth = this.m_oWordControl.m_oEditor.HtmlElement.height;
 		if (this.m_oWordControl.bIsRetinaSupport)
-			pixHeigth >>= 1;
+			pixHeigth /= AscCommon.AscBrowser.retinaPixelRatio;
 		var pixBetweenPages = 20 * (this.m_lDrawingEnd - this.m_lDrawingFirst);
 
 		return (pixHeigth - pixBetweenPages) * g_dKoef_pix_to_mm * 100 / this.m_oWordControl.m_nZoomValue;
@@ -5133,7 +5133,7 @@ function CSlideDrawer()
 
 		var dKoef = this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100;
 		if (this.m_oWordControl.bIsRetinaSupport)
-			dKoef *= 2;
+			dKoef *= AscCommon.AscBrowser.retinaPixelRatio;
 
 		var w_mm = this.m_oWordControl.m_oLogicDocument.Width;
 		var h_mm = this.m_oWordControl.m_oLogicDocument.Height;
@@ -5164,7 +5164,7 @@ function CSlideDrawer()
 			// поидее если был ресайз только
 			dKoef = this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100;
 			if (this.m_oWordControl.bIsRetinaSupport)
-				dKoef *= 2;
+				dKoef *= AscCommon.AscBrowser.retinaPixelRatio;
 
 			w_mm = this.m_oWordControl.m_oLogicDocument.Width;
 			h_mm = this.m_oWordControl.m_oLogicDocument.Height;
@@ -5253,8 +5253,8 @@ function CSlideDrawer()
 
 		if (this.m_oWordControl.bIsRetinaSupport)
 		{
-			_x = (_rect.left << 1) + _bounds.min_x;
-			_y = (_rect.top << 1) + _bounds.min_y;
+			_x = (_rect.left * AscCommon.AscBrowser.retinaPixelRatio) + _bounds.min_x;
+			_y = (_rect.top * AscCommon.AscBrowser.retinaPixelRatio) + _bounds.min_y;
 		}
 
 		if (this.bIsEmptyPresentation)
@@ -5305,7 +5305,7 @@ function CSlideDrawer()
 		{
 			var dKoef = this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100;
 			if (this.m_oWordControl.bIsRetinaSupport)
-				dKoef *= 2;
+				dKoef *= AscCommon.AscBrowser.retinaPixelRatio;
 
 			var w_mm = this.m_oWordControl.m_oLogicDocument.Width;
 			var h_mm = this.m_oWordControl.m_oLogicDocument.Height;

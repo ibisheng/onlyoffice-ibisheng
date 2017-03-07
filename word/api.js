@@ -7499,6 +7499,7 @@ background-repeat: no-repeat;\
 	{
 		if (this.WordControl.MobileTouchManager)
 		{
+			this.WordControl.checkBodyOffset();
 			this.WordControl.MobileTouchManager.showKeyboard();
 		}
 	};
@@ -7506,7 +7507,7 @@ background-repeat: no-repeat;\
 	{
 		if (this.WordControl.MobileTouchManager)
 		{
-
+			this.WordControl.checkBodyOffset();
 		}
 	};
 

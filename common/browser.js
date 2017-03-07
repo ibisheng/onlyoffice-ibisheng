@@ -183,6 +183,8 @@ AscBrowser.checkZoom = function()
     else
     {
 		AscBrowser.isRetina = (Math.abs(2 - (window.devicePixelRatio / AscBrowser.zoom)) < 0.01);
+		if (AscBrowser.isRetina)
+			AscBrowser.retinaPixelRatio = 2;
 
 		if (AscBrowser.isMobile)
 		{
