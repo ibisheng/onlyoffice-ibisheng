@@ -2307,10 +2307,10 @@ function CEditorPage(api)
 
 		if (this.bIsRetinaSupport)
 		{
-			settings.screenW /= AscCommon.AscBrowser.retinaPixelRatio;
-			settings.screenH /= AscCommon.AscBrowser.retinaPixelRatio;
+			settings.screenW = AscCommon.AscBrowser.convertToRetinaValue(settings.screenW);
+			settings.screenH = AscCommon.AscBrowser.convertToRetinaValue(settings.screenH);
 
-			settings.screenAddH /= AscCommon.AscBrowser.retinaPixelRatio;
+			settings.screenAddH = AscCommon.AscBrowser.convertToRetinaValue(settings.screenAddH);
 		}
 
 		if (this.m_bIsHorScrollVisible)
@@ -2753,14 +2753,14 @@ function CEditorPage(api)
 		var _srcH = this.m_oEditor.HtmlElement.height;
 		if (this.bIsRetinaSupport)
 		{
-			_srcW /= AscCommon.AscBrowser.retinaPixelRatio;
-			_srcH /= AscCommon.AscBrowser.retinaPixelRatio;
+			_srcW = (_srcW / AscCommon.AscBrowser.retinaPixelRatio) >> 0;
+			_srcH = (_srcH / AscCommon.AscBrowser.retinaPixelRatio) >> 0;
 
 			_bounds_slide = {
-				min_x : _bounds_slide.min_x / AscCommon.AscBrowser.retinaPixelRatio,
-				min_y : _bounds_slide.min_y / AscCommon.AscBrowser.retinaPixelRatio,
-				max_x : _bounds_slide.max_x / AscCommon.AscBrowser.retinaPixelRatio,
-				max_y : _bounds_slide.max_y / AscCommon.AscBrowser.retinaPixelRatio
+				min_x : (_bounds_slide.min_x / AscCommon.AscBrowser.retinaPixelRatio) >> 0,
+				min_y : (_bounds_slide.min_y / AscCommon.AscBrowser.retinaPixelRatio) >> 0,
+				max_x : (_bounds_slide.max_x / AscCommon.AscBrowser.retinaPixelRatio) >> 0,
+				max_y : (_bounds_slide.max_y / AscCommon.AscBrowser.retinaPixelRatio) >> 0
 			};
 		}
 
@@ -2894,14 +2894,14 @@ function CEditorPage(api)
 		var _srcH = this.m_oEditor.HtmlElement.height;
 		if (this.bIsRetinaSupport)
 		{
-			_srcW /= 1;
-			_srcH /= 1;
+			_srcW = (_srcW / AscCommon.AscBrowser.retinaPixelRatio) >> 0;
+			_srcH = (_srcH / AscCommon.AscBrowser.retinaPixelRatio) >> 0;
 
 			_bounds_slide = {
-				min_x : _bounds_slide.min_x / AscCommon.AscBrowser.retinaPixelRatio,
-				min_y : _bounds_slide.min_y / AscCommon.AscBrowser.retinaPixelRatio,
-				max_x : _bounds_slide.max_x / AscCommon.AscBrowser.retinaPixelRatio,
-				max_y : _bounds_slide.max_y / AscCommon.AscBrowser.retinaPixelRatio
+				min_x : (_bounds_slide.min_x / AscCommon.AscBrowser.retinaPixelRatio) >> 0,
+				min_y : (_bounds_slide.min_y / AscCommon.AscBrowser.retinaPixelRatio) >> 0,
+				max_x : (_bounds_slide.max_x / AscCommon.AscBrowser.retinaPixelRatio) >> 0,
+				max_y : (_bounds_slide.max_y / AscCommon.AscBrowser.retinaPixelRatio) >> 0
 			};
 		}
 
@@ -3014,14 +3014,14 @@ function CEditorPage(api)
 		var _srcH = this.m_oEditor.HtmlElement.height;
 		if (this.bIsRetinaSupport)
 		{
-			_srcW /= AscCommon.AscBrowser.retinaPixelRatio;
-			_srcH /= AscCommon.AscBrowser.retinaPixelRatio;
+			_srcW = (_srcW / AscCommon.AscBrowser.retinaPixelRatio) >> 0;
+			_srcH = (_srcH / AscCommon.AscBrowser.retinaPixelRatio) >> 0;
 
 			_bounds_slide = {
-				min_x : _bounds_slide.min_x / AscCommon.AscBrowser.retinaPixelRatio,
-				min_y : _bounds_slide.min_y / AscCommon.AscBrowser.retinaPixelRatio,
-				max_x : _bounds_slide.max_x / AscCommon.AscBrowser.retinaPixelRatio,
-				max_y : _bounds_slide.max_y / AscCommon.AscBrowser.retinaPixelRatio
+				min_x : (_bounds_slide.min_x / AscCommon.AscBrowser.retinaPixelRatio) >> 0,
+				min_y : (_bounds_slide.min_y / AscCommon.AscBrowser.retinaPixelRatio) >> 0,
+				max_x : (_bounds_slide.max_x / AscCommon.AscBrowser.retinaPixelRatio) >> 0,
+				max_y : (_bounds_slide.max_y / AscCommon.AscBrowser.retinaPixelRatio) >> 0
 			};
 		}
 

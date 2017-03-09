@@ -75,7 +75,7 @@
   }
 
   WorkbookCommentsModel.prototype.getId = function() {
-    return "workbook";
+    return null;
   };
   WorkbookCommentsModel.prototype.getMergedByCell = function() {
     return null;

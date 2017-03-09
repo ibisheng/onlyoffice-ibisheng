@@ -4273,6 +4273,13 @@ CDocument.prototype.Remove = function(nDirection, bOnlyText, bRemoveOnlySelectio
 	this.Document_UpdateInterfaceState();
 	this.Document_UpdateRulersState();
 };
+CDocument.prototype.RemoveBeforePaste = function()
+{
+	if (docpostype_DrawingObjects === this.Get_DocPosType() && null === this.DrawingObjects.getTargetDocContent())
+		this.Selection_Remove();
+	else
+		this.Remove(1, true, true, true);
+};
 CDocument.prototype.Cursor_GetPos = function()
 {
 	return this.Controller.GetCursorPosXY();

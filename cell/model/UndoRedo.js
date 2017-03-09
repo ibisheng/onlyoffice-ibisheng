@@ -3678,14 +3678,14 @@ UndoRedoComment.prototype = {
 	},
 	UndoRedo : function (Type, Data, nSheetId, bUndo)
 	{
-		var oModel = ("workbook" === nSheetId) ? this.wb : this.wb.getWorksheetById(nSheetId);
+		var oModel = (null == nSheetId) ? this.wb : this.wb.getWorksheetById(nSheetId);
 		if (!oModel.aComments)
 			oModel.aComments = [];
 
 		var api = window["Asc"]["editor"];
 		if (!api.wb)
 			return;
-		var ws = ("workbook" === nSheetId) ? api.wb : api.wb.getWorksheetById(nSheetId);
+		var ws = (null == nSheetId) ? api.wb : api.wb.getWorksheetById(nSheetId);
 		Data.worksheet = ws;
 
 		var cellCommentator = ws.cellCommentator;

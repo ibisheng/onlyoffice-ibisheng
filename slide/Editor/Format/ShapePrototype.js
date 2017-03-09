@@ -546,6 +546,15 @@ CShape.prototype.recalculateContent = function()
         }
         return oRecalcObject;
     }
+    else{
+        this.txWarpStructParamarks = null;
+        this.txWarpStruct = null;
+
+        this.txWarpStructParamarksNoTransform = null;
+        this.txWarpStructNoTransform = null;
+
+        this.recalcInfo.warpGeometry = null;
+    }
     return null;
 };
 
@@ -678,7 +687,10 @@ CShape.prototype.recalculateContent2 = function()
             this.txWarpStruct2 = null;
         }
     }
-
+    else{
+        this.txWarpStructParamarks2 = null;
+        this.txWarpStruct2 = null;
+    }
 };
 
 CShape.prototype.Get_ColorMap = function()

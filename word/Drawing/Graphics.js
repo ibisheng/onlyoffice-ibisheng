@@ -1320,8 +1320,8 @@ CGraphics.prototype =
         var _yPxOffset = 5;
         if (AscBrowser.isRetina)
         {
-            _xPxOffset *= AscCommon.AscBrowser.retinaPixelRatio;
-            _yPxOffset *= AscCommon.AscBrowser.retinaPixelRatio;
+            _xPxOffset = (_xPxOffset * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
+            _yPxOffset = (_yPxOffset * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
         }
 
         var __x = this.m_oFullTransform.TransformPointX(x, y) >> 0;
@@ -1378,8 +1378,8 @@ CGraphics.prototype =
         var _yPxOffset = 5;
         if (AscBrowser.isRetina)
         {
-            _xPxOffset *= AscCommon.AscBrowser.retinaPixelRatio;
-            _yPxOffset *= AscCommon.AscBrowser.retinaPixelRatio;
+			_xPxOffset = (_xPxOffset * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
+			_yPxOffset = (_yPxOffset * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
         }
 
         var __x = this.m_oFullTransform.TransformPointX(this.m_dWidthMM - x, y) >> 0;
@@ -1468,8 +1468,8 @@ CGraphics.prototype =
 
         if (_isRetina)
         {
-            _w1 *= AscCommon.AscBrowser.retinaPixelRatio;
-            _w2 *= AscCommon.AscBrowser.retinaPixelRatio;
+			_w1 = (_w1 * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
+			_w2 = (_w2 * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
         }
 
         var bIsNoIntGrid = this.m_bIntegerGrid;
@@ -1506,7 +1506,7 @@ CGraphics.prototype =
             }
         }
 
-        var _fontSize = _isRetina ? (9 * AscCommon.AscBrowser.retinaPixelRatio) : 9;
+        var _fontSize = _isRetina ? ((9 * AscCommon.AscBrowser.retinaPixelRatio) >> 0) : 9;
         this.DrawStringASCII("Courier New", _fontSize, false, false, _header_text, 2, yPos, true);
 
         if (bIsRepeat)
@@ -1569,8 +1569,8 @@ CGraphics.prototype =
 
         if (_isRetina)
         {
-            _w1 *= AscCommon.AscBrowser.retinaPixelRatio;
-            _w2 *= AscCommon.AscBrowser.retinaPixelRatio;
+			_w1 = (_w1 * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
+			_w2 = (_w2 * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
         }
 
         var _wmax = this.m_lWidthPix;
@@ -1609,7 +1609,7 @@ CGraphics.prototype =
             }
         }
 
-        var _fontSize = _isRetina ? (9 * AscCommon.AscBrowser.retinaPixelRatio) : 9;
+        var _fontSize = _isRetina ? ((9 * AscCommon.AscBrowser.retinaPixelRatio) >> 0) : 9;
         this.DrawStringASCII("Courier New", _fontSize, false, false, _header_text, 2, yPos, false);
 
         if (bIsRepeat)

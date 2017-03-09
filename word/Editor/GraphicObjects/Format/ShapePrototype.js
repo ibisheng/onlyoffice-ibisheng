@@ -268,7 +268,14 @@ CShape.prototype.getParentObjects = function ()
 CShape.prototype.recalculateTxBoxContent = function()
 {
     if(this.textBoxContent === null || this.textBoxContent.Parent !== this)
+    {
+        this.txWarpStructParamarks = null;
+        this.txWarpStruct = null;
+        this.txWarpStructParamarksNoTransform = null;
+        this.txWarpStructNoTransform = null;
+        this.recalcInfo.warpGeometry = null;
         return;
+    }
     this.txWarpStruct = null;
     var oBodyPr = this.getBodyPr();
     var oRecalcObj = this.recalculateDocContent(this.textBoxContent, oBodyPr);
