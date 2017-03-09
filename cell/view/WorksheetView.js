@@ -9989,12 +9989,7 @@
 			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range = range;
 			
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
-			cellCoord = this.getCellCoord(range.c2, range.r2);
-			if(!isVisible)
-			{
-				cellCoord._x = -1;
-				cellCoord._y = -1;
-			}
+			cellCoord = this.getSpecialPasteCoords(range, isVisible);
 		}
 		else
 		{
@@ -10008,7 +10003,7 @@
 		this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
 	},
 
-	 WorksheetView.prototype.updateSpecialPasteOptionsPosition = function(changeActiveRange)
+	WorksheetView.prototype.updateSpecialPasteOptionsPosition = function(changeActiveRange)
 	{
 		var _clipboard = window["Asc"]["editor"].wb.clipboard;
 		var isIntoShape = this.objectRender.controller.getTargetDocContent(true);
@@ -10054,20 +10049,45 @@
 			{
 				window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range = changeActiveRange;
 			}
-			var range = window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range;
 			
+			var range = window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range;
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
-			var cellCoord = this.getCellCoord(range.c2, range.r2);
-			if(!isVisible || window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId)
-			{
-				cellCoord._x = -1;
-				cellCoord._y = -1;
-			}
+			var cellCoord = this.getSpecialPasteCoords(range, isVisible);
 			
 			specialPasteShowOptions.asc_setCellCoord(cellCoord);
 			this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
 		}
-	}
+	};
+	
+	WorksheetView.prototype.getSpecialPasteCoords = function(range, isVisible)
+	{	
+		var disableCoords = function()
+		{
+			cellCoord._x = -1;
+			cellCoord._y = -1;
+		};
+		
+		//TODO пересмотреть когда иконка вылезает за пределы области видимости
+		var cellCoord = this.getCellCoord(range.c2, range.r2);
+		if(!isVisible || window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId)
+		{
+			disableCoords();
+		}
+		else
+		{
+			var visibleCellCoord = this.getCellCoord(this.visibleRange.c2, this.visibleRange.r2);
+			var offset = 3;
+			var widthIcon = 30 + offset;
+			var heightIcon = 22 + offset;
+			
+			if(cellCoord._x + widthIcon > visibleCellCoord._x || cellCoord._y + heightIcon > visibleCellCoord._y)
+			{
+				disableCoords();
+			}
+		}
+		
+		return cellCoord;
+	};
 
     // Залочена ли панель для закрепления
     WorksheetView.prototype._isLockedFrozenPane = function ( callback ) {
