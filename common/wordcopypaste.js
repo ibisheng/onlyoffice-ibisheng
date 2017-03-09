@@ -2256,7 +2256,7 @@ PasteProcessor.prototype =
 				var oThis = this;
 				//удаляем в начале, иначе может получиться что будем вставлять в элементы, которое потом удалим.
 				//todo с удалением в начале есть проблема, что удаляем элементы даже при пустом буфере
-				this.oLogicDocument.Remove(1, true, true, true);
+				this.oLogicDocument.RemoveBeforePaste();
 				this.oDocument = this._GetTargetDocument(this.oDocument);
 				
 				if(this.oDocument && this.oDocument.bPresentation){
