@@ -415,13 +415,25 @@
         }
         else{
             for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex) {
-                var Pos = this.Class.m_oContentChanges.Check(AscCommon.contentchanges_Remove, true !== this.UseArray ? this.Pos : this.PosArray[nIndex]);
-
-                if (false === Pos)
-                    continue;
-                aContent.splice(Pos, 1);
+                for(var j = 0; j < aContent.length; ++j){
+                    if(aContent[j] === this.Items[nIndex]){
+                        aContent.splice(j, 1);
+                        break;
+                    }
+                }
             }
         }
+    };
+
+    CChangesDrawingsContentPresentation.prototype.CheckCorrect = function(){
+        if(!this.IsAdd()){
+            for(var nIndex = 0; nIndex < this.Items.length; ++nIndex){
+                if(this.Items[nIndex].CheckCorrect && !this.Items[nIndex].CheckCorrect()){
+                    return false;
+                }
+            }
+        }
+        return true;
     };
 
     window['AscDFH'].CChangesDrawingsContentPresentation = CChangesDrawingsContentPresentation;
