@@ -76,13 +76,16 @@ function (window, undefined)
 		{
 			if (isNoCell === true)
 			{
-				_point.X /= 2;
-				_point.Y /= 2;
+				_point.X /= AscCommon.AscBrowser.retinaPixelRatio;
+				_point.Y /= AscCommon.AscBrowser.retinaPixelRatio;
 			}
 			else
 			{
-				_point.X >>= 1;
-				_point.Y >>= 1;
+				_point.X /= AscCommon.AscBrowser.retinaPixelRatio;
+				_point.Y /= AscCommon.AscBrowser.retinaPixelRatio;
+
+				_point.X = _point.X >> 0;
+				_point.Y = _point.Y >> 0;
 			}
 		}
 
@@ -101,8 +104,8 @@ function (window, undefined)
 
 		if (AscBrowser.isRetina)
 		{
-			_x <<= 1;
-			_y <<= 1;
+			_x *= AscCommon.AscBrowser.retinaPixelRatio;
+			_y *= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 		var _res = this.WB.ConvertXYToLogic(_x, _y);
@@ -993,7 +996,7 @@ function (window, undefined)
 			ctx.fillStyle = "rgba(" + color.r + "," + color.g + "," + color.b + "," + color.a + ")";
 		}
 
-		var _koef = AscCommon.AscBrowser.isRetina ? 2 : 1;
+		var _koef = AscCommon.AscBrowser.isRetina ? AscCommon.AscBrowser.retinaPixelRatio : 1;
 
 		var _oldGlobalAlpha = ctx.globalAlpha;
 		ctx.globalAlpha = 1.0;

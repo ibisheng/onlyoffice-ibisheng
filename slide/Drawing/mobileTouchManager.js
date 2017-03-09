@@ -63,7 +63,7 @@
 		var HtmlPage = this.HtmlPage;
 		var w = HtmlPage.m_oEditor.HtmlElement.width;
 		if (HtmlPage.bIsRetinaSupport)
-			w >>= 1;
+			w /= AscCommon.AscBrowser.retinaPixelRatio;
 
 		var h = (((HtmlPage.m_oBody.AbsolutePosition.B - HtmlPage.m_oBody.AbsolutePosition.T) -
 			(HtmlPage.m_oTopRuler.AbsolutePosition.B - HtmlPage.m_oTopRuler.AbsolutePosition.T)) * g_dKoef_mm_to_pix) >> 0;

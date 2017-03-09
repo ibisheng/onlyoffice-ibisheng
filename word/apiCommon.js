@@ -1316,8 +1316,8 @@
 		}
 		else
 		{
-			_canvas.width = (TABLE_STYLE_WIDTH_PIX * AscCommon.AscBrowser.retinaPixelRatio);
-			_canvas.height = (TABLE_STYLE_HEIGHT_PIX * AscCommon.AscBrowser.retinaPixelRatio);
+			_canvas.width = AscCommon.AscBrowser.convertToRetinaValue(TABLE_STYLE_WIDTH_PIX, true);
+			_canvas.height = AscCommon.AscBrowser.convertToRetinaValue(TABLE_STYLE_HEIGHT_PIX, true);
 		}
 		var ctx = _canvas.getContext('2d');
 

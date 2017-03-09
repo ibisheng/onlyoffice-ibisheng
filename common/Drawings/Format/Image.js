@@ -721,6 +721,16 @@ CImageShape.prototype.getAllImages = function(images)
         images[AscCommon.getFullImageSrc2(this.blipFill.RasterImageId)] = true;
     }
 };
+CImageShape.prototype.checkTypeCorrect = function()
+{
+    if(!this.blipFill){
+        return false;
+    }
+    if(!this.spPr){
+        return false;
+    }
+    return true;
+};
 
 CImageShape.prototype.Load_LinkData = function(linkData)
 {

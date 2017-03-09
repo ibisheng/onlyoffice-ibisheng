@@ -13003,6 +13003,13 @@ CChart.prototype =
 
     },
 
+    CheckCorrect: function(){
+        if(!this.plotArea){
+            return false;
+        }
+        return true;
+    },
+
     getContentChangesByType: function(type){
         switch(type){
             case AscDFH.historyitem_Chart_AddPivotFmt:{

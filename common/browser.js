@@ -116,7 +116,8 @@ AscBrowser.checkZoom = function()
 {
     if (AscBrowser.isAndroid)
 	{
-		AscBrowser.isRetina = (Math.abs(2 - (window.devicePixelRatio / AscBrowser.zoom)) < 0.01);
+		AscBrowser.isRetina = (window.devicePixelRatio >= 1.9);
+		AscBrowser.retinaPixelRatio = window.devicePixelRatio;
 		return;
 	}
 
@@ -183,6 +184,8 @@ AscBrowser.checkZoom = function()
     else
     {
 		AscBrowser.isRetina = (Math.abs(2 - (window.devicePixelRatio / AscBrowser.zoom)) < 0.01);
+		if (AscBrowser.isRetina)
+			AscBrowser.retinaPixelRatio = 2;
 
 		if (AscBrowser.isMobile)
 		{
@@ -193,6 +196,14 @@ AscBrowser.checkZoom = function()
 };
 
 AscBrowser.checkZoom();
+
+AscBrowser.convertToRetinaValue = function(value, isScale)
+{
+	if (isScale === true)
+		return ((value * AscBrowser.retinaPixelRatio) + 0.5) >> 0;
+	else
+		return ((value / AscBrowser.retinaPixelRatio) + 0.5) >> 0;
+};
 
     //--------------------------------------------------------export----------------------------------------------------
     window['AscCommon'] = window['AscCommon'] || {};

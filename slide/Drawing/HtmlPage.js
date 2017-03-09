@@ -345,7 +345,7 @@ function CEditorPage(api)
 			this.MainScrollsEnabledFlag = 0;
 	};
 
-	this.checkBodySize = function()
+	this.checkBodyOffset = function()
 	{
 		var off = jQuery("#" + this.Name).offset();
 
@@ -354,6 +354,11 @@ function CEditorPage(api)
 			this.X = off.left;
 			this.Y = off.top;
 		}
+	};
+
+	this.checkBodySize = function()
+	{
+		this.checkBodyOffset();
 
 		var el = document.getElementById(this.Name);
 
@@ -828,7 +833,7 @@ function CEditorPage(api)
 
 		var w = this.m_oEditor.HtmlElement.width;
 		if (this.bIsRetinaSupport)
-			w >>= 1;
+			w /= AscCommon.AscBrowser.retinaPixelRatio;
 
 		var Zoom       = 100;
 		var _pageWidth = this.m_oLogicDocument.Width * g_dKoef_mm_to_pix;
@@ -864,7 +869,7 @@ function CEditorPage(api)
 
 		var w = this.m_oEditor.HtmlElement.width;
 		if (this.bIsRetinaSupport)
-			w >>= 1;
+			w /= AscCommon.AscBrowser.retinaPixelRatio;
 
 		var h = (((this.m_oBody.AbsolutePosition.B - this.m_oBody.AbsolutePosition.T) -
 			(this.m_oTopRuler.AbsolutePosition.B - this.m_oTopRuler.AbsolutePosition.T)) * g_dKoef_mm_to_pix) >> 0;
@@ -1050,10 +1055,10 @@ function CEditorPage(api)
 
 		var w = this.m_oEditor.HtmlElement.width;
 		if (this.bIsRetinaSupport)
-			w >>= 1;
+			w /= AscCommon.AscBrowser.retinaPixelRatio;
 		var h = this.m_oEditor.HtmlElement.height;
 		if (this.bIsRetinaSupport)
-			h >>= 1;
+			h /= AscCommon.AscBrowser.retinaPixelRatio;
 
 		var boxR = w - 2;
 		var boxB = h - rectSize;
@@ -1129,7 +1134,7 @@ function CEditorPage(api)
 		var _ctx = this.m_oLeftRuler_buttonsTabs.HtmlElement.getContext('2d');
 		if (this.bIsRetinaSupport)
 		{
-			_ctx.setTransform(2, 0, 0, 2, 0, 0);
+			_ctx.setTransform(AscCommon.AscBrowser.retinaPixelRatio, 0, 0, AscCommon.AscBrowser.retinaPixelRatio, 0, 0);
 		}
 		else
 		{
@@ -2302,10 +2307,10 @@ function CEditorPage(api)
 
 		if (this.bIsRetinaSupport)
 		{
-			settings.screenW >>= 1;
-			settings.screenH >>= 1;
+			settings.screenW /= AscCommon.AscBrowser.retinaPixelRatio;
+			settings.screenH /= AscCommon.AscBrowser.retinaPixelRatio;
 
-			settings.screenAddH >>= 1;
+			settings.screenAddH /= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 		if (this.m_bIsHorScrollVisible)
@@ -2549,7 +2554,7 @@ function CEditorPage(api)
 	{
 		var w = this.m_oEditor.HtmlElement.width;
 		if (this.bIsRetinaSupport)
-			w >>= 1;
+			w /= AscCommon.AscBrowser.retinaPixelRatio;
 
 		var oldVisible = this.m_bIsHorScrollVisible;
 		if (this.m_dDocumentWidth <= w)
@@ -2748,14 +2753,14 @@ function CEditorPage(api)
 		var _srcH = this.m_oEditor.HtmlElement.height;
 		if (this.bIsRetinaSupport)
 		{
-			_srcW >>= 1;
-			_srcH >>= 1;
+			_srcW /= AscCommon.AscBrowser.retinaPixelRatio;
+			_srcH /= AscCommon.AscBrowser.retinaPixelRatio;
 
 			_bounds_slide = {
-				min_x : _bounds_slide.min_x >> 1,
-				min_y : _bounds_slide.min_y >> 1,
-				max_x : _bounds_slide.max_x >> 1,
-				max_y : _bounds_slide.max_y >> 1
+				min_x : _bounds_slide.min_x / AscCommon.AscBrowser.retinaPixelRatio,
+				min_y : _bounds_slide.min_y / AscCommon.AscBrowser.retinaPixelRatio,
+				max_x : _bounds_slide.max_x / AscCommon.AscBrowser.retinaPixelRatio,
+				max_y : _bounds_slide.max_y / AscCommon.AscBrowser.retinaPixelRatio
 			};
 		}
 
@@ -2889,14 +2894,14 @@ function CEditorPage(api)
 		var _srcH = this.m_oEditor.HtmlElement.height;
 		if (this.bIsRetinaSupport)
 		{
-			_srcW >>= 1;
-			_srcH >>= 1;
+			_srcW /= 1;
+			_srcH /= 1;
 
 			_bounds_slide = {
-				min_x : _bounds_slide.min_x >> 1,
-				min_y : _bounds_slide.min_y >> 1,
-				max_x : _bounds_slide.max_x >> 1,
-				max_y : _bounds_slide.max_y >> 1
+				min_x : _bounds_slide.min_x / AscCommon.AscBrowser.retinaPixelRatio,
+				min_y : _bounds_slide.min_y / AscCommon.AscBrowser.retinaPixelRatio,
+				max_x : _bounds_slide.max_x / AscCommon.AscBrowser.retinaPixelRatio,
+				max_y : _bounds_slide.max_y / AscCommon.AscBrowser.retinaPixelRatio
 			};
 		}
 
@@ -3009,14 +3014,14 @@ function CEditorPage(api)
 		var _srcH = this.m_oEditor.HtmlElement.height;
 		if (this.bIsRetinaSupport)
 		{
-			_srcW >>= 1;
-			_srcH >>= 1;
+			_srcW /= AscCommon.AscBrowser.retinaPixelRatio;
+			_srcH /= AscCommon.AscBrowser.retinaPixelRatio;
 
 			_bounds_slide = {
-				min_x : _bounds_slide.min_x >> 1,
-				min_y : _bounds_slide.min_y >> 1,
-				max_x : _bounds_slide.max_x >> 1,
-				max_y : _bounds_slide.max_y >> 1
+				min_x : _bounds_slide.min_x / AscCommon.AscBrowser.retinaPixelRatio,
+				min_y : _bounds_slide.min_y / AscCommon.AscBrowser.retinaPixelRatio,
+				max_x : _bounds_slide.max_x / AscCommon.AscBrowser.retinaPixelRatio,
+				max_y : _bounds_slide.max_y / AscCommon.AscBrowser.retinaPixelRatio
 			};
 		}
 

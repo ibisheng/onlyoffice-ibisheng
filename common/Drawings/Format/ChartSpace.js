@@ -714,6 +714,21 @@ CChartSpace.prototype.checkDrawingBaseCoords = CShape.prototype.checkDrawingBase
 CChartSpace.prototype.setDrawingBaseCoords = CShape.prototype.setDrawingBaseCoords;
 CChartSpace.prototype.deleteBFromSerialize = CShape.prototype.deleteBFromSerialize;
 CChartSpace.prototype.setBFromSerialize = CShape.prototype.setBFromSerialize;
+CChartSpace.prototype.checkTypeCorrect = function(){
+    if(!this.chart){
+        return false;
+    }
+    if(!this.chart.plotArea){
+        return false
+    }
+    if(this.chart.plotArea.charts.length === 0){
+        return false;
+    }
+    if(this.chart.plotArea.charts[0].series.length === 0){
+        return false;
+    }
+    return true;
+};
 CChartSpace.prototype.drawSelect = function(drawingDocument, nPageIndex)
     {
         var i;
@@ -2257,6 +2272,11 @@ CChartSpace.prototype.Refresh_RecalcData = function(data)
             this.recalcInfo.recalculateAxisCat = true;
             this.recalcInfo.recalculateAxisLabels = true;
             this.addToRecalculate();
+            break;
+        }
+        case AscDFH.historyitem_ChartSpace_SetChart:
+        {
+            this.handleUpdateType();
             break;
         }
     }

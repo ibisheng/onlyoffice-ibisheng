@@ -1788,8 +1788,8 @@
     if (isRetina) {
       styleWidth = width;
       styleHeight = height;
-      width <<= 1;
-      height <<= 1;
+      width = AscCommon.AscBrowser.convertToRetinaValue(width, true);
+      height = AscCommon.AscBrowser.convertToRetinaValue(height, true);
     }
 
     if (oldWidth === width && oldHeight === height) {
@@ -2667,8 +2667,8 @@
     var styleThumbnailWidth = 61;
     var styleThumbnailHeight = 46;
     if (AscBrowser.isRetina) {
-      styleThumbnailWidth <<= 1;
-      styleThumbnailHeight <<= 1;
+      styleThumbnailWidth = AscCommon.AscBrowser.convertToRetinaValue(styleThumbnailWidth, true);
+      styleThumbnailHeight = AscCommon.AscBrowser.convertToRetinaValue(styleThumbnailHeight, true);
     }
 
     var canvas = document.createElement('canvas');

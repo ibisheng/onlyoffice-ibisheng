@@ -1929,8 +1929,8 @@
       this.styleThumbnailWidthWithRetina = this.styleThumbnailWidth;
       this.styleThumbnailHeightWithRetina = this.styleThumbnailHeight;
       if (AscCommon.AscBrowser.isRetina) {
-        this.styleThumbnailWidthWithRetina <<= 1;
-        this.styleThumbnailHeightWithRetina <<= 1;
+        this.styleThumbnailWidthWithRetina = AscCommon.AscBrowser.convertToRetinaValue(this.styleThumbnailWidthWithRetina, true);
+        this.styleThumbnailHeightWithRetina = AscCommon.AscBrowser.convertToRetinaValue(this.styleThumbnailHeightWithRetina, true);
       }
     }
 

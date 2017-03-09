@@ -287,7 +287,7 @@ function CEditorPage(api)
 
 	this.IsInitControl = false;
 
-	this.checkBodySize = function()
+	this.checkBodyOffset = function()
 	{
 		var off = jQuery("#" + this.Name).offset();
 
@@ -296,6 +296,11 @@ function CEditorPage(api)
 			this.X = off.left;
 			this.Y = off.top;
 		}
+	}
+
+	this.checkBodySize = function()
+	{
+		this.checkBodyOffset();
 
 		var el = document.getElementById(this.Name);
 

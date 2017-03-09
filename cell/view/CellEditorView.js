@@ -1302,14 +1302,14 @@
 		var width = widthStyle, height = heightStyle;
 
 		if ( isRetina ) {
-			left >>= 1;
-			top >>= 1;
+			left = AscCommon.AscBrowser.convertToRetinaValue(left);
+			top = AscCommon.AscBrowser.convertToRetinaValue(top);
 
-			widthStyle >>= 1;
-			heightStyle >>= 1;
+			widthStyle = AscCommon.AscBrowser.convertToRetinaValue(widthStyle);
+			heightStyle = AscCommon.AscBrowser.convertToRetinaValue(heightStyle);
 
-			width = widthStyle << 1;
-			height = heightStyle << 1;
+			width = AscCommon.AscBrowser.convertToRetinaValue(widthStyle, true);
+			height = AscCommon.AscBrowser.convertToRetinaValue(heightStyle, true);
 		}
 
 		this.canvasOuterStyle.left = left + 'px';
@@ -1470,9 +1470,9 @@
 		}
 
 		if (AscBrowser.isRetina) {
-			curLeft >>= 1;
-			curTop >>= 1;
-			curHeight >>= 1;
+			curLeft = AscCommon.AscBrowser.convertToRetinaValue(curLeft);
+			curTop = AscCommon.AscBrowser.convertToRetinaValue(curTop);
+			curHeight = AscCommon.AscBrowser.convertToRetinaValue(curHeight);
 		}
 
 
@@ -2700,8 +2700,8 @@
 		var y = (((event.pageY * AscBrowser.zoom) >> 0) - offs.top) / this.ky;
 
 		if (AscBrowser.isRetina) {
-			x <<= 1;
-			y <<= 1;
+			x *= AscCommon.AscBrowser.retinaPixelRatio;
+			y *= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 		return {x: x, y: y};

@@ -2855,6 +2855,9 @@ DrawingObjectsController.prototype =
         if(oPr.isEqual(chartSettings)){
             return;
         }
+        //Title Settings
+        chart_space.setChart(chart_space.chart.createDuplicate());
+        chart_space.setStyle(chart_space.style);
         if(this.drawingObjects && this.drawingObjects.getWorksheet && typeof sRange === "string" && sRange.length > 0)
         {
             var ws_view = this.drawingObjects.getWorksheet();
@@ -2916,7 +2919,6 @@ DrawingObjectsController.prototype =
                 return;
             }
         }
-        //Title Settings
         var chart = chart_space.chart;
         var title_show_settings = chartSettings.getTitle();
         if(title_show_settings === c_oAscChartTitleShowSettings.none)
@@ -6571,7 +6573,7 @@ DrawingObjectsController.prototype =
         this.clearTrackObjects();
         this.resetSelection();
         this.changeCurrentState(new AscFormat.NullState(this));
-        if(selection_state.textObject)
+        if(selection_state.textObject && !selection_state.textObject.bDeleted)
         {
             this.selectObject(selection_state.textObject, selection_state.selectStartPage);
             this.selection.textSelection = selection_state.textObject;
@@ -6584,19 +6586,19 @@ DrawingObjectsController.prototype =
                 selection_state.textObject.getDocContent().Set_SelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
             }
         }
-        else if(selection_state.groupObject)
+        else if(selection_state.groupObject && !selection_state.groupObject.bDeleted)
         {
             this.selectObject(selection_state.groupObject, selection_state.selectStartPage);
             this.selection.groupSelection = selection_state.groupObject;
             selection_state.groupObject.setSelectionState(selection_state.groupSelection);
         }
-        else if(selection_state.chartObject)
+        else if(selection_state.chartObject && !selection_state.chartObject.bDeleted)
         {
             this.selectObject(selection_state.chartObject, selection_state.selectStartPage);
             this.selection.chartSelection = selection_state.chartObject;
             selection_state.chartObject.setSelectionState(selection_state.chartSelection);
         }
-        else if(selection_state.wrapObject)
+        else if(selection_state.wrapObject && !selection_state.wrapObject.bDeleted)
         {
             this.selectObject(selection_state.wrapObject, selection_state.selectStartPage);
             this.selection.wrapPolygonSelection = selection_state.wrapObject;
@@ -6605,7 +6607,10 @@ DrawingObjectsController.prototype =
         {
             for(var i = 0; i < selection_state.selection.length; ++i)
             {
-                this.selectObject(selection_state.selection[i].object, selection_state.selection[i].pageIndex);
+                if(!selection_state.selection[i].object.bDeleted)
+                {
+                    this.selectObject(selection_state.selection[i].object, selection_state.selection[i].pageIndex);
+                }
             }
         }
     },

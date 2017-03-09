@@ -551,6 +551,18 @@
     };
 
     CGraphicObjectBase.prototype.checkCorrect = function(){
+        if(this.bDeleted === true){
+            return false;
+        }
+        return this.checkTypeCorrect();
+    };
+
+
+    CGraphicObjectBase.prototype.CheckCorrect = function(){
+        return this.checkCorrect();
+    };
+
+    CGraphicObjectBase.prototype.checkTypeCorrect = function(){
         return true;
     };
 

@@ -7237,10 +7237,10 @@
         var height = this.getRowHeight( row, /*px*/0 );
 
         if ( AscBrowser.isRetina ) {
-            xL >>= 1;
-            yL >>= 1;
-            width >>= 1;
-            height >>= 1;
+            xL = AscCommon.AscBrowser.convertToRetinaValue(xL);
+            yL = AscCommon.AscBrowser.convertToRetinaValue(yL);
+            width = AscCommon.AscBrowser.convertToRetinaValue(width);
+            height = AscCommon.AscBrowser.convertToRetinaValue(height);
         }
 
         return new AscCommon.asc_CRect( xL, yL, width, height );

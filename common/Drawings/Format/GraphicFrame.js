@@ -1092,7 +1092,14 @@ CGraphicFrame.prototype.Refresh_RecalcData2 = function()
         this.recalcInfo.recalculateTable = true;
         this.recalcInfo.recalculateSizes = true;
         this.addToRecalculate();
-};
+    };
+CGraphicFrame.prototype.checkTypeCorrect = function()
+    {
+        if(!this.graphicObject){
+            return false;
+        }
+        return true;
+    };
 
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};

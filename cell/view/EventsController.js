@@ -1675,8 +1675,8 @@
 			var y = ((event.pageY * AscBrowser.zoom) >> 0) - offs.top;
 
 			if (AscBrowser.isRetina) {
-				x <<= 1;
-				y <<= 1;
+				x *= AscCommon.AscBrowser.retinaPixelRatio;
+				y *= AscCommon.AscBrowser.retinaPixelRatio;
 			}
 
 			return {x: x, y: y};
