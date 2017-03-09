@@ -2472,7 +2472,7 @@
 						}
 						else
 						{
-							sCurChar += t._copyPasteCorrectString(Char);
+							sCurChar += Char;
 						}
 						
 						if(i == length - 1)
@@ -2486,18 +2486,7 @@
 				aResult.props.rowSpanSpCount = 0;
 				
 				return aResult;
-			},
-			
-			_copyPasteCorrectString: function (str)
-			{
-				var res = str;
-				res = res.replace(/&/g,'&amp;');
-				res = res.replace(/</g,'&lt;');
-				res = res.replace(/>/g,'&gt;');
-				res = res.replace(/'/g,'&apos;');
-				res = res.replace(/"/g,'&quot;');
-				return res;
-			},
+			}
 		};
 		
 		/** @constructor */
