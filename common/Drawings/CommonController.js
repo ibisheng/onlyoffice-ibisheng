@@ -9761,7 +9761,7 @@ function CollectMarker(oMarker){
 
 function ApplyMarker(aPreset, oObject, index, aBaseColors){
 
-    if(!oObject || !oObject.setMarker){
+    if(!oObject || !oObject.setMarker || (oObject instanceof AscFormat.CLineChart)){
         return;
     }
     if(!aPreset){
