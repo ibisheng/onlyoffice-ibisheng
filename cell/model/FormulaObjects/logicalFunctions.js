@@ -63,10 +63,6 @@ function (window, undefined) {
     );
 
 function cAND() {
-//    cBaseFunction.call( this, "AND" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 255 );
-
     this.name = "AND";
     this.type = cElementType.func;
     this.value = null;
@@ -159,10 +155,6 @@ cAND.prototype.getInfo = function () {
 };
 
 function cFALSE() {
-//    cBaseFunction.call( this, "FALSE" );
-//    this.setArgumentsMin( 0 );
-//    this.setArgumentsMax( 0 );
-
     this.name = "FALSE";
     this.type = cElementType.func;
     this.value = null;
@@ -188,8 +180,6 @@ cFALSE.prototype.getInfo = function () {
 };
 
 function cIF() {
-//    cBaseFunction.call( this, "IF" );
-
     this.name = "IF";
     this.type = cElementType.func;
     this.value = null;
@@ -201,9 +191,6 @@ function cIF() {
         noneFormat:-2
     };
     this.numFormat = this.formatType.def;
-
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 3 );
 }
 
 cIF.prototype = Object.create( cBaseFunction.prototype );
@@ -252,10 +239,6 @@ cIF.prototype.getInfo = function () {
 };
 
 function cIFERROR() {
-//    cBaseFunction.call( this, "IFERROR" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "IFERROR";
     this.type = cElementType.func;
     this.value = null;
@@ -298,10 +281,6 @@ cIFERROR.prototype.getInfo = function () {
 };
 
 function cNOT() {
-//    cBaseFunction.call( this, "NOT" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "NOT";
     this.type = cElementType.func;
     this.value = null;
@@ -351,10 +330,6 @@ cNOT.prototype.getInfo = function () {
 };
 
 function cOR() {
-//    cBaseFunction.call( this, "OR" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 255 );
-
     this.name = "OR";
     this.type = cElementType.func;
     this.value = null;
@@ -440,10 +415,6 @@ cOR.prototype.getInfo = function () {
 };
 
 function cTRUE() {
-//    cBaseFunction.call( this, "TRUE" );
-//    this.setArgumentsMin( 0 );
-//    this.setArgumentsMax( 0 );
-
     this.name = "TRUE";
     this.type = cElementType.func;
     this.value = null;

@@ -2252,12 +2252,6 @@ cUndefined.prototype = Object.create( cBaseType.prototype );
     this.value = new cError(cErrorType.wrong_name);
     return this.value;
   };
-  cBaseFunction.prototype.setArgumentsMin = function (count) {
-    this.argumentsMin = count;
-  };
-  cBaseFunction.prototype.setArgumentsMax = function (count) {
-    this.argumentsMax = count;
-  };
   cBaseFunction.prototype.DecrementArguments = function () {
     --this.argumentsCurrent;
   };
@@ -2331,9 +2325,6 @@ cUndefined.prototype = Object.create( cBaseType.prototype );
       this.value.numFormat = numFormat;
     }
     return this.value;
-  };
-  cBaseFunction.prototype.setFormat = function (f) {
-    this.numFormat = f;
   };
   cBaseFunction.prototype.checkArguments = function () {
     return this.argumentsMin <= this.argumentsCurrent && this.argumentsCurrent <= this.argumentsMax;

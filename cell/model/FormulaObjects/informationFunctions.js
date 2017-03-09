@@ -70,22 +70,8 @@ function (window, undefined) {
         cNA,
         cTYPE
     );
-/*
- здесь вынесены функции, которы по назначению не могут быть использованы в веб редакторах документах.
- либо они будут реализованы с усеченным функционалом позже.
- "INFO" :function(){
- cBaseFunction.call(this,"INFO");
- },
- "CELL" :function(){
- cBaseFunction.call(this,"CELL");
- },
- */
 
 function cERROR_TYPE() {
-//    cBaseFunction.call( this, "ERROR.TYPE" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ERROR.TYPE";
     this.type = cElementType.func;
     this.value = null;
@@ -97,7 +83,6 @@ function cERROR_TYPE() {
         noneFormat:-2
     };
     this.numFormat = this.formatType.def;
-
 }
 
 cERROR_TYPE.prototype = Object.create( cBaseFunction.prototype );
@@ -156,10 +141,6 @@ cERROR_TYPE.prototype.getInfo = function () {
 };
 
 function cISBLANK() {
-//    cBaseFunction.call( this, "ISBLANK" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ISBLANK";
     this.type = cElementType.func;
     this.value = null;
@@ -196,10 +177,6 @@ cISBLANK.prototype.getInfo = function () {
 };
 
 function cISERR() {
-//    cBaseFunction.call( this, "ISERR" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ISERR";
     this.type = cElementType.func;
     this.value = null;
@@ -240,10 +217,6 @@ cISERR.prototype.getInfo = function () {
 };
 
 function cISERROR() {
-//    cBaseFunction.call( this, "ISERROR" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ISERROR";
     this.type = cElementType.func;
     this.value = null;
@@ -284,10 +257,6 @@ cISERROR.prototype.getInfo = function () {
 };
 
 function cISEVEN() {
-//    cBaseFunction.call( this, "ISEVEN" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ISEVEN";
     this.type = cElementType.func;
     this.value = null;
@@ -332,10 +301,6 @@ cISEVEN.prototype.getInfo = function () {
 };
 
 function cISLOGICAL() {
-//    cBaseFunction.call( this, "ISLOGICAL" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ISLOGICAL";
     this.type = cElementType.func;
     this.value = null;
@@ -375,10 +340,6 @@ cISLOGICAL.prototype.getInfo = function () {
 };
 
 function cISNA() {
-//    cBaseFunction.call( this, "ISNA" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ISNA";
     this.type = cElementType.func;
     this.value = null;
@@ -419,10 +380,6 @@ cISNA.prototype.getInfo = function () {
 };
 
 function cISNONTEXT() {
-//    cBaseFunction.call( this, "ISNONTEXT" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ISNONTEXT";
     this.type = cElementType.func;
     this.value = null;
@@ -462,10 +419,6 @@ cISNONTEXT.prototype.getInfo = function () {
 };
 
 function cISNUMBER() {
-//    cBaseFunction.call( this, "ISNUMBER" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ISNUMBER";
     this.type = cElementType.func;
     this.value = null;
@@ -506,10 +459,6 @@ cISNUMBER.prototype.getInfo = function () {
 };
 
 function cISODD() {
-//    cBaseFunction.call( this, "ISODD" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ISODD";
     this.type = cElementType.func;
     this.value = null;
@@ -554,10 +503,6 @@ cISODD.prototype.getInfo = function () {
 };
 
 function cISREF() {
-//    cBaseFunction.call( this, "ISREF" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ISREF";
     this.type = cElementType.func;
     this.value = null;
@@ -586,10 +531,6 @@ cISREF.prototype.getInfo = function () {
 };
 
 function cISTEXT() {
-//    cBaseFunction.call( this, "ISTEXT" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ISTEXT";
     this.type = cElementType.func;
     this.value = null;
@@ -630,11 +571,6 @@ cISTEXT.prototype.getInfo = function () {
 };
 
 function cN() {
-//    cBaseFunction.call( this, "N" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "N";
     this.type = cElementType.func;
     this.value = null;
@@ -687,10 +623,6 @@ cN.prototype.getInfo = function () {
 };
 
 function cNA() {
-//    cBaseFunction.call( this, "NA" );
-//    this.setArgumentsMin( 0 );
-//    this.setArgumentsMax( 0 );
-
     this.name = "NA";
     this.type = cElementType.func;
     this.value = null;
@@ -717,10 +649,6 @@ cNA.prototype.getInfo = function () {
 };
 
 function cTYPE() {
-//    cBaseFunction.call( this, "TYPE" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "TYPE";
     this.type = cElementType.func;
     this.value = null;

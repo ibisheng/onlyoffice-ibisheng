@@ -141,10 +141,6 @@ var cSubTotalFunctionType = {
 };
 
 function cABS() {
-//    cBaseFunction.call( this, "ABS" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ABS";
     this.type = cElementType.func;
     this.value = null;
@@ -191,10 +187,6 @@ cABS.prototype.getInfo = function () {
 };
 
 function cACOS() {
-//    cBaseFunction.call( this, "ACOS" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ACOS";
     this.type = cElementType.func;
     this.value = null;
@@ -243,10 +235,6 @@ cACOS.prototype.getInfo = function () {
 };
 
 function cACOSH() {
-//    cBaseFunction.call( this, "ACOSH" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ACOSH";
     this.type = cElementType.func;
     this.value = null;
@@ -295,10 +283,6 @@ cACOSH.prototype.getInfo = function () {
 };
 
 function cASIN() {
-//    cBaseFunction.call( this, "ASIN" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ASIN";
     this.type = cElementType.func;
     this.value = null;
@@ -347,10 +331,6 @@ cASIN.prototype.getInfo = function () {
 };
 
 function cASINH() {
-//    cBaseFunction.call( this, "ASINH" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ASINH";
     this.type = cElementType.func;
     this.value = null;
@@ -399,10 +379,6 @@ cASINH.prototype.getInfo = function () {
 };
 
 function cATAN() {
-//    cBaseFunction.call( this, "ATAN" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ATAN";
     this.type = cElementType.func;
     this.value = null;
@@ -452,10 +428,6 @@ cATAN.prototype.getInfo = function () {
 };
 
 function cATAN2() {
-//    cBaseFunction.call( this, "ATAN2" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "ATAN2";
     this.type = cElementType.func;
     this.value = null;
@@ -546,10 +518,6 @@ cATAN2.prototype.getInfo = function () {
 };
 
 function cATANH() {
-//    cBaseFunction.call( this, "ATANH" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ATANH";
     this.type = cElementType.func;
     this.value = null;
@@ -598,10 +566,6 @@ cATANH.prototype.getInfo = function () {
 };
 
 function cCEILING() {
-//    cBaseFunction.call( this, "CEILING" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "CEILING";
     this.type = cElementType.func;
     this.value = null;
@@ -706,10 +670,6 @@ cCEILING.prototype.getInfo = function () {
 };
 
 function cCOMBIN() {
-//    cBaseFunction.call( this, "COMBIN" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "COMBIN";
     this.type = cElementType.func;
     this.value = null;
@@ -803,10 +763,6 @@ cCOMBIN.prototype.getInfo = function () {
 };
 
 function cCOS() {
-//    cBaseFunction.call( this, "COS" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "COS";
     this.type = cElementType.func;
     this.value = null;
@@ -855,10 +811,6 @@ cCOS.prototype.getInfo = function () {
 };
 
 function cCOSH() {
-//    cBaseFunction.call( this, "COSH" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "COSH";
     this.type = cElementType.func;
     this.value = null;
@@ -907,10 +859,6 @@ cCOSH.prototype.getInfo = function () {
 };
 
 function cDEGREES() {
-//    cBaseFunction.call( this, "DEGREES" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "DEGREES";
     this.type = cElementType.func;
     this.value = null;
@@ -966,10 +914,6 @@ function cECMA_CEILING() {
 cECMA_CEILING.prototype = Object.create( cBaseFunction.prototype );
 
 function cEVEN() {
-//    cBaseFunction.call( this, "EVEN" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "EVEN";
     this.type = cElementType.func;
     this.value = null;
@@ -1039,10 +983,6 @@ cEVEN.prototype.getInfo = function () {
 };
 
 function cEXP() {
-//    cBaseFunction.call( this, "EXP" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "EXP";
     this.type = cElementType.func;
     this.value = null;
@@ -1094,10 +1034,6 @@ cEXP.prototype.getInfo = function () {
 };
 
 function cFACT() {
-//    cBaseFunction.call( this, "FACT" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "FACT";
     this.type = cElementType.func;
     this.value = null;
@@ -1151,10 +1087,6 @@ cFACT.prototype.getInfo = function () {
 };
 
 function cFACTDOUBLE() {
-//    cBaseFunction.call( this, "FACTDOUBLE" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "FACTDOUBLE";
     this.type = cElementType.func;
     this.value = null;
@@ -1229,10 +1161,6 @@ cFACTDOUBLE.prototype.getInfo = function () {
 };
 
 function cFLOOR() {
-//    cBaseFunction.call( this, "FLOOR" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "FLOOR";
     this.type = cElementType.func;
     this.value = null;
@@ -1336,10 +1264,6 @@ cFLOOR.prototype.getInfo = function () {
 };
 
 function cGCD() {
-//    cBaseFunction.call( this, "GCD" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 255 );
-
     this.name = "GCD";
     this.type = cElementType.func;
     this.value = null;
@@ -1440,10 +1364,6 @@ cGCD.prototype.getInfo = function () {
 };
 
 function cINT() {
-//    cBaseFunction.call( this, "INT" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "INT";
     this.type = cElementType.func;
     this.value = null;
@@ -1498,10 +1418,6 @@ function cISO_CEILING() {
 cISO_CEILING.prototype = Object.create( cBaseFunction.prototype );
 
 function cLCM() {
-//    cBaseFunction.call( this, "LCM" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 255 );
-
     this.name = "LCM";
     this.type = cElementType.func;
     this.value = null;
@@ -1606,10 +1522,6 @@ cLCM.prototype.getInfo = function () {
 };
 
 function cLN() {
-//    cBaseFunction.call( this, "LN" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "LN";
     this.type = cElementType.func;
     this.value = null;
@@ -1663,10 +1575,6 @@ cLN.prototype.getInfo = function () {
 };
 
 function cLOG() {
-//    cBaseFunction.call( this, "LOG" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "LOG";
     this.type = cElementType.func;
     this.value = null;
@@ -1763,10 +1671,6 @@ cLOG.prototype.getInfo = function () {
 };
 
 function cLOG10() {
-//    cBaseFunction.call( this, "LOG10" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "LOG10";
     this.type = cElementType.func;
     this.value = null;
@@ -1820,11 +1724,6 @@ cLOG10.prototype.getInfo = function () {
 };
 
 function cMDETERM() {
-//    cBaseFunction.call( this, "MDETERM" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "MDETERM";
     this.type = cElementType.func;
     this.value = null;
@@ -1911,11 +1810,6 @@ cMDETERM.prototype.getInfo = function () {
 };
 
 function cMINVERSE() {
-//    cBaseFunction.call( this, "MINVERSE" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "MINVERSE";
     this.type = cElementType.func;
     this.value = null;
@@ -2055,11 +1949,6 @@ cMINVERSE.prototype.getInfo = function () {
 };
 
 function cMMULT() {
-//    cBaseFunction.call( this, "MMULT" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "MMULT";
     this.type = cElementType.func;
     this.value = null;
@@ -2134,10 +2023,6 @@ cMMULT.prototype.getInfo = function () {
 };
 
 function cMOD() {
-//    cBaseFunction.call( this, "MOD" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "MOD";
     this.type = cElementType.func;
     this.value = null;
@@ -2149,7 +2034,6 @@ function cMOD() {
         noneFormat:-2
     };
     this.numFormat = this.formatType.def;
-
 }
 
 cMOD.prototype = Object.create( cBaseFunction.prototype );
@@ -2227,10 +2111,6 @@ cMOD.prototype.getInfo = function () {
 };
 
 function cMROUND() {
-//    cBaseFunction.call( this, "MROUND" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "MROUND";
     this.type = cElementType.func;
     this.value = null;
@@ -2338,10 +2218,6 @@ cMROUND.prototype.getInfo = function () {
 };
 
 function cMULTINOMIAL() {
-//    cBaseFunction.call( this, "MULTINOMIAL" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 255 );
-
     this.name = "MULTINOMIAL";
     this.type = cElementType.func;
     this.value = null;
@@ -2443,10 +2319,6 @@ cMULTINOMIAL.prototype.getInfo = function () {
 };
 
 function cODD() {
-//    cBaseFunction.call( this, "ODD" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "ODD";
     this.type = cElementType.func;
     this.value = null;
@@ -2516,10 +2388,6 @@ cODD.prototype.getInfo = function () {
 };
 
 function cPI() {
-//    cBaseFunction.call( this, "PI" );
-//    this.setArgumentsMin( 0 );
-//    this.setArgumentsMax( 0 );
-
     this.name = "PI";
     this.type = cElementType.func;
     this.value = null;
@@ -2546,10 +2414,6 @@ cPI.prototype.getInfo = function () {
 };
 
 function cPOWER() {
-//    cBaseFunction.call( this, "POWER" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "POWER";
     this.type = cElementType.func;
     this.value = null;
@@ -2693,10 +2557,6 @@ cPOWER.prototype.getInfo = function () {
 	};
 
 function cQUOTIENT() {
-//    cBaseFunction.call( this, "QUOTIENT" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "QUOTIENT";
     this.type = cElementType.func;
     this.value = null;
@@ -2780,10 +2640,6 @@ cQUOTIENT.prototype.getInfo = function () {
 };
 
 function cRADIANS() {
-//    cBaseFunction.call( this, "RADIANS" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "RADIANS";
     this.type = cElementType.func;
     this.value = null;
@@ -2836,10 +2692,6 @@ cRADIANS.prototype.getInfo = function () {
 };
 
 function cRAND() {
-//    cBaseFunction.call( this, "RAND" );
-//    this.setArgumentsMin( 0 );
-//    this.setArgumentsMax( 0 );
-
     this.name = "RAND";
     this.type = cElementType.func;
     this.value = null;
@@ -2866,10 +2718,6 @@ cRAND.prototype.getInfo = function () {
 };
 
 function cRANDBETWEEN() {
-//    cBaseFunction.call( this, "RANDBETWEEN" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "RANDBETWEEN";
     this.type = cElementType.func;
     this.value = null;
@@ -2950,10 +2798,6 @@ cRANDBETWEEN.prototype.getInfo = function () {
 };
 
 function cROMAN() {
-//    cBaseFunction.call( this, "ROMAN" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "ROMAN";
     this.type = cElementType.func;
     this.value = null;
@@ -3075,10 +2919,6 @@ cROMAN.prototype.getInfo = function () {
 };
 
 function cROUND() {
-//    cBaseFunction.call( this, "ROUND" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "ROUND";
     this.type = cElementType.func;
     this.value = null;
@@ -3223,10 +3063,6 @@ cROUND.prototype.getInfo = function () {
 };
 
 function cROUNDDOWN() {
-//    cBaseFunction.call( this, "ROUNDDOWN" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "ROUNDDOWN";
     this.type = cElementType.func;
     this.value = null;
@@ -3348,10 +3184,6 @@ cROUNDDOWN.prototype.getInfo = function () {
 };
 
 function cROUNDUP() {
-//    cBaseFunction.call( this, "ROUNDUP" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "ROUNDUP";
     this.type = cElementType.func;
     this.value = null;
@@ -3473,10 +3305,6 @@ cROUNDUP.prototype.getInfo = function () {
 };
 
 function cSERIESSUM() {
-//    cBaseFunction.call( this, "SERIESSUM" );
-//    this.setArgumentsMin( 4 );
-//    this.setArgumentsMax( 4 );
-
     this.name = "SERIESSUM";
     this.type = cElementType.func;
     this.value = null;
@@ -3556,10 +3384,6 @@ cSERIESSUM.prototype.getInfo = function () {
 };
 
 function cSIGN() {
-//    cBaseFunction.call( this, "SIGN" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "SIGN";
     this.type = cElementType.func;
     this.value = null;
@@ -3620,10 +3444,6 @@ cSIGN.prototype.getInfo = function () {
 };
 
 function cSIN() {
-//    cBaseFunction.call( this, "SIN" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "SIN";
     this.type = cElementType.func;
     this.value = null;
@@ -3672,10 +3492,6 @@ cSIN.prototype.getInfo = function () {
 };
 
 function cSINH() {
-//    cBaseFunction.call( this, "SINH" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "SINH";
     this.type = cElementType.func;
     this.value = null;
@@ -3724,10 +3540,6 @@ cSINH.prototype.getInfo = function () {
 };
 
 function cSQRT() {
-//    cBaseFunction.call( this, "SQRT" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "SQRT";
     this.type = cElementType.func;
     this.value = null;
@@ -3776,10 +3588,6 @@ cSQRT.prototype.getInfo = function () {
 };
 
 function cSQRTPI() {
-//    cBaseFunction.call( this, "SQRTPI" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "SQRTPI";
     this.type = cElementType.func;
     this.value = null;
@@ -3829,9 +3637,17 @@ cSQRTPI.prototype.getInfo = function () {
 
 	/** @constructor */
 	function cSUBTOTAL() {
-		cBaseFunction.call(this, "SUBTOTAL");
-		this.setArgumentsMin(1);
-		this.setArgumentsMax(255);
+		this.name = "SUBTOTAL";
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = 1;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 255;
+		this.formatType = {
+			def: -1, //подразумевается формат первой ячейки входящей в формулу.
+			noneFormat: -2
+		};
+		this.numFormat = this.formatType.def;
 	}
 
 	cSUBTOTAL.prototype = Object.create(cBaseFunction.prototype);
@@ -4155,10 +3971,6 @@ cSQRTPI.prototype.getInfo = function () {
     };
 
 function cSUMPRODUCT() {
-//    cBaseFunction.call( this, "SUMPRODUCT" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 255 );
-
     this.name = "SUMPRODUCT";
     this.type = cElementType.func;
     this.value = null;
@@ -4240,10 +4052,6 @@ cSUMPRODUCT.prototype.getInfo = function () {
 };
 
 function cSUMSQ() {
-//    cBaseFunction.call( this, "SUMSQ" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 255 );
-
     this.name = "SUMSQ";
     this.type = cElementType.func;
     this.value = null;
@@ -4309,10 +4117,6 @@ cSUMSQ.prototype.getInfo = function () {
 };
 
 function cSUMX2MY2() {
-//    cBaseFunction.call( this, "SUMX2MY2" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "SUMX2MY2";
     this.type = cElementType.func;
     this.value = null;
@@ -4407,10 +4211,6 @@ cSUMX2MY2.prototype.getInfo = function () {
 };
 
 function cSUMX2PY2() {
-//    cBaseFunction.call( this, "SUMX2PY2" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "SUMX2PY2";
     this.type = cElementType.func;
     this.value = null;
@@ -4505,10 +4305,6 @@ cSUMX2PY2.prototype.getInfo = function () {
 };
 
 function cSUMXMY2() {
-//    cBaseFunction.call( this, "SUMXMY2" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "SUMXMY2";
     this.type = cElementType.func;
     this.value = null;
@@ -4603,10 +4399,6 @@ cSUMXMY2.prototype.getInfo = function () {
 };
 
 function cTAN() {
-//    cBaseFunction.call( this, "TAN" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "TAN";
     this.type = cElementType.func;
     this.value = null;
@@ -4655,10 +4447,6 @@ cTAN.prototype.getInfo = function () {
 };
 
 function cTANH() {
-//    cBaseFunction.call( this, "TANH" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "TANH";
     this.type = cElementType.func;
     this.value = null;
@@ -4707,10 +4495,6 @@ cTANH.prototype.getInfo = function () {
 };
 
 function cTRUNC() {
-//    cBaseFunction.call(this, "TRUNC" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "TRUNC";
     this.type = cElementType.func;
     this.value = null;

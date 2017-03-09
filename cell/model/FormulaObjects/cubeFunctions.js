@@ -54,8 +54,6 @@ function (window, undefined) {
     );
 
 function cCUBEKPIMEMBER() {
-//    cBaseFunction.call( this, "CUBEKPIMEMBER" );
-
     this.name = "CUBEKPIMEMBER";
     this.type = cElementType.func;
     this.value = null;
@@ -73,8 +71,6 @@ function cCUBEKPIMEMBER() {
 cCUBEKPIMEMBER.prototype = Object.create( cBaseFunction.prototype );
 
 function cCUBEMEMBER() {
-//    cBaseFunction.call( this, "CUBEMEMBER" );
-
     this.name = "CUBEMEMBER";
     this.type = cElementType.func;
     this.value = null;
@@ -92,8 +88,6 @@ function cCUBEMEMBER() {
 cCUBEMEMBER.prototype = Object.create( cBaseFunction.prototype );
 
 function cCUBEMEMBERPROPERTY() {
-//    cBaseFunction.call( this, "CUBEMEMBERPROPERTY" );
-
     this.name = "CUBEMEMBERPROPERTY";
     this.type = cElementType.func;
     this.value = null;
@@ -111,8 +105,6 @@ function cCUBEMEMBERPROPERTY() {
 cCUBEMEMBERPROPERTY.prototype = Object.create( cBaseFunction.prototype );
 
 function cCUBERANKEDMEMBER() {
-//    cBaseFunction.call( this, "CUBERANKEDMEMBER" );
-
     this.name = "CUBERANKEDMEMBER";
     this.type = cElementType.func;
     this.value = null;
@@ -130,8 +122,6 @@ function cCUBERANKEDMEMBER() {
 cCUBERANKEDMEMBER.prototype = Object.create( cBaseFunction.prototype );
 
 function cCUBESET() {
-//    cBaseFunction.call( this, "CUBESET" );
-
     this.name = "CUBESET";
     this.type = cElementType.func;
     this.value = null;
@@ -149,8 +139,6 @@ function cCUBESET() {
 cCUBESET.prototype = Object.create( cBaseFunction.prototype );
 
 function cCUBESETCOUNT() {
-//    cBaseFunction.call( this, "CUBESETCOUNT" );
-
     this.name = "CUBESETCOUNT";
     this.type = cElementType.func;
     this.value = null;
@@ -168,8 +156,6 @@ function cCUBESETCOUNT() {
 cCUBESETCOUNT.prototype = Object.create( cBaseFunction.prototype );
 
 function cCUBEVALUE() {
-//    cBaseFunction.call( this, "CUBEVALUE" );
-
     this.name = "CUBEVALUE";
     this.type = cElementType.func;
     this.value = null;

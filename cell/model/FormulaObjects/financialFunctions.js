@@ -552,8 +552,6 @@ cFormulaFunctionGroup['Financial'].push(
 );
 
 function cACCRINT() {
-//    cBaseFunction.call( this, "ACCRINT" );
-
     this.name = "ACCRINT";
     this.type = cElementType.func;
     this.value = null;
@@ -727,8 +725,6 @@ cACCRINT.prototype.getInfo = function () {
 };
 
 function cACCRINTM() {
-//    cBaseFunction.call( this, "ACCRINTM" );
-
     this.name = "ACCRINTM";
     this.type = cElementType.func;
     this.value = null;
@@ -822,8 +818,6 @@ cACCRINTM.prototype.getInfo = function () {
 };
 
 function cAMORDEGRC() {
-//    cBaseFunction.call( this, "AMORDEGRC" );
-
     this.name = "AMORDEGRC";
     this.type = cElementType.func;
     this.value = null;
@@ -1032,8 +1026,6 @@ cAMORDEGRC.prototype.getInfo = function () {
 };
 
 function cAMORLINC() {
-//    cBaseFunction.call( this, "AMORLINC" );
-
     this.name = "AMORLINC";
     this.type = cElementType.func;
     this.value = null;
@@ -1174,8 +1166,6 @@ cAMORLINC.prototype.getInfo = function () {
 };
 
 function cCOUPDAYBS() {
-//    cBaseFunction.call( this, "COUPDAYBS" );
-
     this.name = "COUPDAYBS";
     this.type = cElementType.func;
     this.value = null;
@@ -1260,8 +1250,6 @@ cCOUPDAYBS.prototype.getInfo = function () {
 };
 
 function cCOUPDAYS() {
-//    cBaseFunction.call( this, "COUPDAYS" );
-
     this.name = "COUPDAYS";
     this.type = cElementType.func;
     this.value = null;
@@ -1345,8 +1333,6 @@ cCOUPDAYS.prototype.getInfo = function () {
 };
 
 function cCOUPDAYSNC() {
-//    cBaseFunction.call( this, "COUPDAYSNC" );
-
     this.name = "COUPDAYSNC";
     this.type = cElementType.func;
     this.value = null;
@@ -1430,8 +1416,6 @@ cCOUPDAYSNC.prototype.getInfo = function () {
 };
 
 function cCOUPNCD() {
-//    cBaseFunction.call( this, "COUPNCD" );
-
     this.name = "COUPNCD";
     this.type = cElementType.func;
     this.value = null;
@@ -1517,8 +1501,6 @@ cCOUPNCD.prototype.getInfo = function () {
 };
 
 function cCOUPNUM() {
-//    cBaseFunction.call( this, "COUPNUM" );
-
     this.name = "COUPNUM";
     this.type = cElementType.func;
     this.value = null;
@@ -1604,8 +1586,6 @@ cCOUPNUM.prototype.getInfo = function () {
 };
 
 function cCOUPPCD() {
-//    cBaseFunction.call( this, "COUPPCD" );
-
     this.name = "COUPPCD";
     this.type = cElementType.func;
     this.value = null;
@@ -1692,8 +1672,6 @@ cCOUPPCD.prototype.getInfo = function () {
 };
 
 function cCUMIPMT() {
-//    cBaseFunction.call( this, "CUMIPMT" );
-
     this.name = "CUMIPMT";
     this.type = cElementType.func;
     this.value = null;
@@ -1814,8 +1792,6 @@ cCUMIPMT.prototype.getInfo = function () {
 };
 
 function cCUMPRINC() {
-//    cBaseFunction.call( this, "CUMPRINC" );
-
     this.name = "CUMPRINC";
     this.type = cElementType.func;
     this.value = null;
@@ -1940,8 +1916,6 @@ cCUMPRINC.prototype.getInfo = function () {
 };
 
 function cDB() {
-//    cBaseFunction.call( this, "DB" );
-
     this.name = "DB";
     this.type = cElementType.func;
     this.value = null;
@@ -2057,8 +2031,6 @@ cDB.prototype.getInfo = function () {
 };
 
 function cDDB() {
-//    cBaseFunction.call( this, "DDB" );
-
     this.name = "DDB";
     this.type = cElementType.func;
     this.value = null;
@@ -2154,8 +2126,6 @@ cDDB.prototype.getInfo = function () {
 };
 
 function cDISC() {
-//    cBaseFunction.call( this, "DISC" );
-
     this.name = "DISC";
     this.type = cElementType.func;
     this.value = null;
@@ -2251,8 +2221,6 @@ cDISC.prototype.getInfo = function () {
 };
 
 function cDOLLARDE() {
-//    cBaseFunction.call( this, "DOLLARDE" );
-
     this.name = "DOLLARDE";
     this.type = cElementType.func;
     this.value = null;
@@ -2321,8 +2289,6 @@ cDOLLARDE.prototype.getInfo = function () {
 };
 
 function cDOLLARFR() {
-//    cBaseFunction.call( this, "DOLLARFR" );
-
     this.name = "DOLLARFR";
     this.type = cElementType.func;
     this.value = null;
@@ -2391,8 +2357,6 @@ cDOLLARFR.prototype.getInfo = function () {
 };
 
 function cDURATION() {
-//    cBaseFunction.call( this, "DURATION" );
-
     this.name = "DURATION";
     this.type = cElementType.func;
     this.value = null;
@@ -2497,8 +2461,6 @@ cDURATION.prototype.getInfo = function () {
 };
 
 function cEFFECT() {
-//    cBaseFunction.call( this, "EFFECT" );
-
     this.name = "EFFECT";
     this.type = cElementType.func;
     this.value = null;
@@ -2554,11 +2516,6 @@ cEFFECT.prototype.getInfo = function () {
 };
 
 function cFV() {
-//    cBaseFunction.call( this, "FV" );
-//    this.setArgumentsMin( 3 );
-//    this.setArgumentsMax( 5 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "FV";
     this.type = cElementType.func;
     this.value = null;
@@ -2644,8 +2601,6 @@ cFV.prototype.getInfo = function () {
 };
 
 function cFVSCHEDULE() {
-//    cBaseFunction.call( this, "FVSCHEDULE" );
-
     this.name = "FVSCHEDULE";
     this.type = cElementType.func;
     this.value = null;
@@ -2713,8 +2668,6 @@ cFVSCHEDULE.prototype.getInfo = function () {
 };
 
 function cINTRATE() {
-//    cBaseFunction.call( this, "INTRATE" );
-
     this.name = "INTRATE";
     this.type = cElementType.func;
     this.value = null;
@@ -2810,8 +2763,6 @@ cINTRATE.prototype.getInfo = function () {
 };
 
 function cIPMT() {
-//    cBaseFunction.call( this, "IPMT" );
-
     this.name = "IPMT";
     this.type = cElementType.func;
     this.value = null;
@@ -2913,8 +2864,6 @@ cIPMT.prototype.getInfo = function () {
 };
 
 function cIRR() {
-//    cBaseFunction.call( this, "IRR" );
-
     this.name = "IRR";
     this.type = cElementType.func;
     this.value = null;
@@ -3057,8 +3006,6 @@ cIRR.prototype.getInfo = function () {
 };
 
 function cISPMT() {
-//    cBaseFunction.call( this, "ISPMT" );
-
     this.name = "ISPMT";
     this.type = cElementType.func;
     this.value = null;
@@ -3129,8 +3076,6 @@ cISPMT.prototype.getInfo = function () {
 };
 
 function cMDURATION() {
-//    cBaseFunction.call( this, "MDURATION" );
-
     this.name = "MDURATION";
     this.type = cElementType.func;
     this.value = null;
@@ -3239,8 +3184,6 @@ cMDURATION.prototype.getInfo = function () {
 };
 
 function cMIRR() {
-//    cBaseFunction.call( this, "MIRR" );
-
     this.name = "MIRR";
     this.type = cElementType.func;
     this.value = null;
@@ -3359,8 +3302,6 @@ cMIRR.prototype.getInfo = function () {
 };
 
 function cNOMINAL() {
-//    cBaseFunction.call( this, "NOMINAL" );
-
     this.name = "NOMINAL";
     this.type = cElementType.func;
     this.value = null;
@@ -3420,11 +3361,6 @@ cNOMINAL.prototype.getInfo = function () {
 };
 
 function cNPER() {
-//    cBaseFunction.call( this, "NPER" );
-//    this.setArgumentsMin( 3 );
-//    this.setArgumentsMax( 5 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "NPER";
     this.type = cElementType.func;
     this.value = null;
@@ -3516,11 +3452,6 @@ cNPER.prototype.getInfo = function () {
 };
 
 function cNPV() {
-//    cBaseFunction.call( this, "NPV" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 255 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "NPV";
     this.type = cElementType.func;
     this.value = null;
@@ -3601,8 +3532,6 @@ cNPV.prototype.getInfo = function () {
 };
 
 function cODDFPRICE() {
-//    cBaseFunction.call( this, "ODDFPRICE" );
-
     this.name = "ODDFPRICE";
     this.type = cElementType.func;
     this.value = null;
@@ -3752,8 +3681,6 @@ cODDFPRICE.prototype.getInfo = function () {
 };
 
 function cODDFYIELD() {
-//    cBaseFunction.call( this, "ODDFYIELD" );
-
     this.name = "ODDFYIELD";
     this.type = cElementType.func;
     this.value = null;
@@ -3974,8 +3901,6 @@ cODDFYIELD.prototype.getInfo = function () {
 };
 
 function cODDLPRICE() {
-//    cBaseFunction.call( this, "ODDLPRICE" );
-
     this.name = "ODDLPRICE";
     this.type = cElementType.func;
     this.value = null;
@@ -4117,8 +4042,6 @@ cODDLPRICE.prototype.getInfo = function () {
 };
 
 function cODDLYIELD() {
-//    cBaseFunction.call( this, "ODDLYIELD" );
-
     this.name = "ODDLYIELD";
     this.type = cElementType.func;
     this.value = null;
@@ -4261,11 +4184,6 @@ cODDLYIELD.prototype.getInfo = function () {
 };
 
 function cPMT() {
-//    cBaseFunction.call( this, "PMT" );
-//    this.setArgumentsMin( 3 );
-//    this.setArgumentsMax( 5 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "PMT";
     this.type = cElementType.func;
     this.value = null;
@@ -4358,8 +4276,6 @@ cPMT.prototype.getInfo = function () {
 };
 
 function cPPMT() {
-//    cBaseFunction.call( this, "PPMT" );
-
     this.name = "PPMT";
     this.type = cElementType.func;
     this.value = null;
@@ -4463,8 +4379,6 @@ cPPMT.prototype.getInfo = function () {
 };
 
 function cPRICE() {
-//    cBaseFunction.call( this, "PRICE" );
-
     this.name = "PRICE";
     this.type = cElementType.func;
     this.value = null;
@@ -4585,8 +4499,6 @@ cPRICE.prototype.getInfo = function () {
 };
 
 function cPRICEDISC() {
-//    cBaseFunction.call( this, "PRICEDISC" );
-
     this.name = "PRICEDISC";
     this.type = cElementType.func;
     this.value = null;
@@ -4685,8 +4597,6 @@ cPRICEDISC.prototype.getInfo = function () {
 };
 
 function cPRICEMAT() {
-//    cBaseFunction.call( this, "PRICEMAT" );
-
     this.name = "PRICEMAT";
     this.type = cElementType.func;
     this.value = null;
@@ -4805,11 +4715,6 @@ cPRICEMAT.prototype.getInfo = function () {
 };
 
 function cPV() {
-//    cBaseFunction.call( this, "PV" );
-//    this.setArgumentsMin( 3 );
-//    this.setArgumentsMax( 5 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "PV";
     this.type = cElementType.func;
     this.value = null;
@@ -4895,8 +4800,6 @@ cPV.prototype.getInfo = function () {
 };
 
 function cRATE() {
-//    cBaseFunction.call( this, "RATE" );
-
     this.name = "RATE";
     this.type = cElementType.func;
     this.value = null;
@@ -4996,8 +4899,6 @@ cRATE.prototype.getInfo = function () {
 };
 
 function cRECEIVED() {
-//    cBaseFunction.call( this, "RECEIVED" );
-
     this.name = "RECEIVED";
     this.type = cElementType.func;
     this.value = null;
@@ -5095,8 +4996,6 @@ cRECEIVED.prototype.getInfo = function () {
 };
 
 function cSLN() {
-//    cBaseFunction.call( this, "SLN" );
-
     this.name = "SLN";
     this.type = cElementType.func;
     this.value = null;
@@ -5165,8 +5064,6 @@ cSLN.prototype.getInfo = function () {
 };
 
 function cSYD() {
-//    cBaseFunction.call( this, "SYD" );
-
     this.name = "SYD";
     this.type = cElementType.func;
     this.value = null;
@@ -5247,8 +5144,6 @@ cSYD.prototype.getInfo = function () {
 };
 
 function cTBILLEQ() {
-//    cBaseFunction.call( this, "TBILLEQ" );
-
     this.name = "TBILLEQ";
     this.type = cElementType.func;
     this.value = null;
@@ -5336,8 +5231,6 @@ cTBILLEQ.prototype.getInfo = function () {
 };
 
 function cTBILLPRICE() {
-//    cBaseFunction.call( this, "TBILLPRICE" );
-
     this.name = "TBILLPRICE";
     this.type = cElementType.func;
     this.value = null;
@@ -5420,8 +5313,6 @@ cTBILLPRICE.prototype.getInfo = function () {
 };
 
 function cTBILLYIELD() {
-//    cBaseFunction.call( this, "TBILLYIELD" );
-
     this.name = "TBILLYIELD";
     this.type = cElementType.func;
     this.value = null;
@@ -5506,8 +5397,6 @@ cTBILLYIELD.prototype.getInfo = function () {
 };
 
 function cVDB() {
-//    cBaseFunction.call( this, "VDB" );
-
     this.name = "VDB";
     this.type = cElementType.func;
     this.value = null;
@@ -5683,8 +5572,6 @@ cVDB.prototype.getInfo = function () {
 };
 
 function cXIRR() {
-//    cBaseFunction.call( this, "XIRR" );
-
     this.name = "XIRR";
     this.type = cElementType.func;
     this.value = null;
@@ -5969,8 +5856,6 @@ cXIRR.prototype.getInfo = function () {
 };
 
 function cXNPV() {
-//    cBaseFunction.call( this, "XNPV" );
-
     this.name = "XNPV";
     this.type = cElementType.func;
     this.value = null;
@@ -6120,8 +6005,6 @@ cXNPV.prototype.getInfo = function () {
 };
 
 function cYIELD() {
-//    cBaseFunction.call( this, "YIELD" );
-
     this.name = "YIELD";
     this.type = cElementType.func;
     this.value = null;
@@ -6244,8 +6127,6 @@ cYIELD.prototype.getInfo = function () {
 };
 
 function cYIELDDISC() {
-//    cBaseFunction.call( this, "YIELDDISC" );
-
     this.name = "YIELDDISC";
     this.type = cElementType.func;
     this.value = null;
@@ -6347,8 +6228,6 @@ cYIELDDISC.prototype.getInfo = function () {
 };
 
 function cYIELDMAT() {
-//    cBaseFunction.call( this, "YIELDMAT" );
-
     this.name = "YIELDMAT";
     this.type = cElementType.func;
     this.value = null;

@@ -108,10 +108,6 @@ function cBAHTTEXT() {
 cBAHTTEXT.prototype = Object.create( cBaseFunction.prototype );
 
 function cCHAR() {
-//    cBaseFunction.call( this, "CHAR" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "CHAR";
     this.type = cElementType.func;
     this.value = null;
@@ -164,10 +160,6 @@ cCHAR.prototype.getInfo = function () {
 };
 
 function cCLEAN() {
-//    cBaseFunction.call( this, "CLEAN" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "CLEAN";
     this.type = cElementType.func;
     this.value = null;
@@ -213,10 +205,6 @@ cCLEAN.prototype.getInfo = function () {
 };
 
 function cCODE() {
-//    cBaseFunction.call( this, "CODE" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "CODE";
     this.type = cElementType.func;
     this.value = null;
@@ -269,10 +257,6 @@ cCODE.prototype.getInfo = function () {
 };
 
 function cCONCATENATE() {
-//    cBaseFunction.call( this, "CONCATENATE" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 255 );
-
     this.name = "CONCATENATE";
     this.type = cElementType.func;
     this.value = null;
@@ -326,11 +310,6 @@ cCONCATENATE.prototype.getInfo = function () {
 };
 
 function cDOLLAR() {
-//    cBaseFunction.call( this, "DOLLAR" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 2 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "DOLLAR";
     this.type = cElementType.func;
     this.value = null;
@@ -520,10 +499,6 @@ cDOLLAR.prototype.getInfo = function () {
 };
 
 function cEXACT() {
-//    cBaseFunction.call( this, "EXACT" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "EXACT";
     this.type = cElementType.func;
     this.value = null;
@@ -576,10 +551,6 @@ cEXACT.prototype.getInfo = function () {
 };
 
 function cFIND() {
-//    cBaseFunction.call( this, "FIND" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 3 );
-
     this.name = "FIND";
     this.type = cElementType.func;
     this.value = null;
@@ -670,10 +641,6 @@ function cFINDB() {
 }
 
 function cFIXED() {
-//    cBaseFunction.call( this, "FIXED" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 3 );
-
     this.name = "FIXED";
     this.type = cElementType.func;
     this.value = null;
@@ -867,10 +834,6 @@ function cJIS() {
 cJIS.prototype = Object.create( cBaseFunction.prototype );
 
 function cLEFT() {
-//    cBaseFunction.call( this, "LEFT" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "LEFT";
     this.type = cElementType.func;
     this.value = null;
@@ -931,10 +894,6 @@ function cLEFTB() {
 }
 
 function cLEN() {
-//    cBaseFunction.call( this, "LEN" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "LEN";
     this.type = cElementType.func;
     this.value = null;
@@ -981,10 +940,6 @@ function cLENB() {
 }
 
 function cLOWER() {
-//    cBaseFunction.call( this, "LOWER" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "LOWER";
     this.type = cElementType.func;
     this.value = null;
@@ -1022,10 +977,6 @@ cLOWER.prototype.getInfo = function () {
 };
 
 function cMID() {
-//    cBaseFunction.call( this, "MID" );
-//    this.setArgumentsMin( 3 );
-//    this.setArgumentsMax( 3 );
-
     this.name = "MID";
     this.type = cElementType.func;
     this.value = null;
@@ -1104,10 +1055,6 @@ function cPHONETIC() {
 cPHONETIC.prototype = Object.create( cBaseFunction.prototype );
 
 function cPROPER() {
-//    cBaseFunction.call( this, "PROPER" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "PROPER";
     this.type = cElementType.func;
     this.value = null;
@@ -1182,10 +1129,6 @@ cPROPER.prototype.getInfo = function () {
 };
 
 function cREPLACE() {
-//    cBaseFunction.call( this, "REPLACE" );
-//    this.setArgumentsMin( 4 );
-//    this.setArgumentsMax( 4 );
-
     this.name = "REPLACE";
     this.type = cElementType.func;
     this.value = null;
@@ -1278,10 +1221,6 @@ function cREPLACEB() {
 }
 
 function cREPT() {
-//    cBaseFunction.call( this, "REPT" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "REPT";
     this.type = cElementType.func;
     this.value = null;
@@ -1347,10 +1286,6 @@ cREPT.prototype.getInfo = function () {
 };
 
 function cRIGHT() {
-//    cBaseFunction.call( this, "RIGHT" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "RIGHT";
     this.type = cElementType.func;
     this.value = null;
@@ -1411,10 +1346,6 @@ function cRIGHTB() {
 }
 
 function cSEARCH() {
-//    cBaseFunction.call( this, "SEARCH" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 3 );
-
     this.name = "SEARCH";
     this.type = cElementType.func;
     this.value = null;
@@ -1518,10 +1449,6 @@ function cSEARCHB() {
 }
 
 function cSUBSTITUTE() {
-//    cBaseFunction.call( this, "SUBSTITUTE" );
-//    this.setArgumentsMin( 3 );
-//    this.setArgumentsMax( 4 );
-
     this.name = "SUBSTITUTE";
     this.type = cElementType.func;
     this.value = null;
@@ -1611,10 +1538,6 @@ cSUBSTITUTE.prototype.getInfo = function () {
 };
 
 function cT() {
-//    cBaseFunction.call( this, "T" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "T";
     this.type = cElementType.func;
     this.value = null;
@@ -1657,10 +1580,6 @@ cT.prototype.getInfo = function () {
 };
 
 function cTEXT() {
-//    cBaseFunction.call( this, "TEXT" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
     this.name = "TEXT";
     this.type = cElementType.func;
     this.value = null;
@@ -1736,10 +1655,6 @@ cTEXT.prototype.getInfo = function () {
 };
 
 function cTRIM() {
-//    cBaseFunction.call( this, "TRIM" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "TRIM";
     this.type = cElementType.func;
     this.value = null;
@@ -1784,10 +1699,6 @@ cTRIM.prototype.getInfo = function () {
 };
 
 function cUPPER() {
-//    cBaseFunction.call( this, "UPPER" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-
     this.name = "UPPER";
     this.type = cElementType.func;
     this.value = null;
@@ -1824,11 +1735,6 @@ cUPPER.prototype.getInfo = function () {
 };
 
 function cVALUE() {
-//    cBaseFunction.call( this, "VALUE" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "VALUE";
     this.type = cElementType.func;
     this.value = null;

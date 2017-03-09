@@ -71,7 +71,7 @@ var DayCountBasis = {
     Actual365:3,
     // European 30/360
     Europ30_360:4
-}
+};
 
 function yearFrac( d1, d2, mode ) {
 
@@ -327,8 +327,6 @@ cFormulaFunctionGroup['DateAndTime'].push(
 );
 
 function cDATE() {
-//    cBaseFunction.call( this, "DATE", 3, 3 );
-
     this.name = "DATE";
     this.type = cElementType.func;
     this.value = null;
@@ -402,9 +400,6 @@ cDATE.prototype.getInfo = function () {
 };
 
 function cDATEDIF() {
-//    cBaseFunction.call( this, "DATEDIF", 3, 3 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "DATEDIF";
     this.type = cElementType.func;
     this.value = null;
@@ -516,9 +511,6 @@ cDATEDIF.prototype.getInfo = function () {
 };
 
 function cDATEVALUE() {
-//    cBaseFunction.call( this, "DATEVALUE", 1, 1 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "DATEVALUE";
     this.type = cElementType.func;
     this.value = null;
@@ -563,9 +555,6 @@ cDATEVALUE.prototype.getInfo = function () {
 };
 
 function cDAY() {
-//    cBaseFunction.call( this, "DAY", 1, 1 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "DAY";
     this.type = cElementType.func;
     this.value = null;
@@ -638,9 +627,6 @@ cDAY.prototype.getInfo = function () {
 };
 
 function cDAYS360() {
-//    cBaseFunction.call( this, "DAYS360", 2, 3 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "DAYS360";
     this.type = cElementType.func;
     this.value = null;
@@ -704,9 +690,6 @@ cDAYS360.prototype.getInfo = function () {
 };
 
 function cEDATE() {
-//    cBaseFunction.call( this, "EDATE", 2, 2 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "EDATE";
     this.type = cElementType.func;
     this.value = null;
@@ -784,9 +767,6 @@ cEDATE.prototype.getInfo = function () {
 };
 
 function cEOMONTH() {
-//    cBaseFunction.call( this, "EOMONTH", 2, 2 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "EOMONTH";
     this.type = cElementType.func;
     this.value = null;
@@ -854,9 +834,6 @@ cEOMONTH.prototype.getInfo = function () {
 };
 
 function cHOUR() {
-//    cBaseFunction.call( this, "HOUR", 1, 1 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "HOUR";
     this.type = cElementType.func;
     this.value = null;
@@ -926,9 +903,6 @@ cHOUR.prototype.getInfo = function () {
 };
 
 function cMINUTE() {
-//    cBaseFunction.call( this, "MINUTE", 1, 1 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "MINUTE";
     this.type = cElementType.func;
     this.value = null;
@@ -1000,9 +974,6 @@ cMINUTE.prototype.getInfo = function () {
 };
 
 function cMONTH() {
-//    cBaseFunction.call( this, "MONTH", 1, 1 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "MONTH";
     this.type = cElementType.func;
     this.value = null;
@@ -1074,9 +1045,6 @@ cMONTH.prototype.getInfo = function () {
 };
 
 function cNETWORKDAYS() {
-//    cBaseFunction.call( this, "NETWORKDAYS", 2, 3 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "NETWORKDAYS";
     this.type = cElementType.func;
     this.value = null;
@@ -1210,8 +1178,6 @@ function cNETWORKDAYS_INTL() {
 cNETWORKDAYS_INTL.prototype = Object.create( cBaseFunction.prototype );
 
 function cNOW() {
-//    cBaseFunction.call( this, "NOW", 0, 0 );
-
     this.name = "NOW";
     this.type = cElementType.func;
     this.value = null;
@@ -1241,9 +1207,6 @@ cNOW.prototype.getInfo = function () {
 };
 
 function cSECOND() {
-//    cBaseFunction.call( this, "SECOND", 1, 1 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "SECOND";
     this.type = cElementType.func;
     this.value = null;
@@ -1315,8 +1278,6 @@ cSECOND.prototype.getInfo = function () {
 };
 
 function cTIME() {
-//    cBaseFunction.call( this, "TIME", 3, 3 );
-
     this.name = "TIME";
     this.type = cElementType.func;
     this.value = null;
@@ -1380,9 +1341,6 @@ cTIME.prototype.getInfo = function () {
 };
 
 function cTIMEVALUE() {
-//    cBaseFunction.call( this, "TIMEVALUE", 1, 1 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "TIMEVALUE";
     this.type = cElementType.func;
     this.value = null;
@@ -1428,8 +1386,6 @@ cTIMEVALUE.prototype.getInfo = function () {
 };
 
 function cTODAY() {
-//    cBaseFunction.call( this, "TODAY", 0, 0 );
-
     this.name = "TODAY";
     this.type = cElementType.func;
     this.value = null;
@@ -1450,18 +1406,15 @@ cTODAY.prototype.Calculate = function () {
     if ( arguments[1].getNumFormatStr().toLowerCase() === "general" )
         this.value.numFormat = 14;
     return this.value;
-}
+};
 cTODAY.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"()"
     };
-}
+};
 
 function cWEEKDAY() {
-//    cBaseFunction.call( this, "WEEKDAY", 1, 2 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "WEEKDAY";
     this.type = cElementType.func;
     this.value = null;
@@ -1539,18 +1492,15 @@ cWEEKDAY.prototype.Calculate = function ( arg ) {
         return this.value = new cError( cErrorType.wrong_value_type );
 
     return this.value = new cNumber( weekday[new Date( (arg0.getValue() - (AscCommonExcel.c_DateCorrectConst + 1)) * c_msPerDay ).getUTCDay()] );
-}
+};
 cWEEKDAY.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( serial-value [ , weekday-start-flag ] )"
     };
-}
+};
 
 function cWEEKNUM() {
-//    cBaseFunction.call( this, "WEEKNUM", 1, 2 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "WEEKNUM";
     this.type = cElementType.func;
     this.value = null;
@@ -1660,18 +1610,15 @@ cWEEKNUM.prototype.Calculate = function ( arg ) {
 
     return this.value = new cNumber( WeekNumber( Date.prototype.getDateFromExcel( arg0.getValue() ), weekdayStartDay, type ) );
 
-}
+};
 cWEEKNUM.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( serial-value [ , weekday-start-flag ] )"
     };
-}
+};
 
 function cWORKDAY() {
-//    cBaseFunction.call( this, "WORKDAY", 2, 3 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "WORKDAY";
     this.type = cElementType.func;
     this.value = null;
@@ -1792,18 +1739,15 @@ cWORKDAY.prototype.getInfo = function () {
         name:this.name,
         args:"( start-date , day-offset [ , holidays ] )"
     };
-}
+};
 
 function cWORKDAY_INTL() {
     cBaseFunction.call( this, "WORKDAY.INTL" );
 }
 
-cWORKDAY_INTL.prototype = Object.create( cBaseFunction.prototype )
+cWORKDAY_INTL.prototype = Object.create( cBaseFunction.prototype );
 
 function cYEAR() {
-//    cBaseFunction.call( this, "YEAR", 1, 1 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "YEAR";
     this.type = cElementType.func;
     this.value = null;
@@ -1818,7 +1762,7 @@ function cYEAR() {
 
 }
 
-cYEAR.prototype = Object.create( cBaseFunction.prototype )
+cYEAR.prototype = Object.create( cBaseFunction.prototype );
 cYEAR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], val;
     if ( arg0 instanceof cArray ) {
@@ -1863,18 +1807,15 @@ cYEAR.prototype.Calculate = function ( arg ) {
         return this.setCA( new cError( cErrorType.not_numeric ), true, 0 );
     else
         return this.setCA( new cNumber( (new Date( (val - (AscCommonExcel.c_DateCorrectConst + 1)) * c_msPerDay )).getUTCFullYear() ), true, 0 );
-}
+};
 cYEAR.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( date-value )"
     };
-}
+};
 
 function cYEARFRAC() {
-//    cBaseFunction.call( this, "YEARFRAC", 2, 3 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "YEARFRAC";
     this.type = cElementType.func;
     this.value = null;
@@ -1889,7 +1830,7 @@ function cYEARFRAC() {
 
 }
 
-cYEARFRAC.prototype = Object.create( cBaseFunction.prototype )
+cYEARFRAC.prototype = Object.create( cBaseFunction.prototype );
 cYEARFRAC.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber( 0 );
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
