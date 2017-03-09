@@ -3926,7 +3926,7 @@ CPresentation.prototype =
         oDocState.Pos = [];
         oDocState.StartPos = [];
         oDocState.EndPos = [];
-
+        oDocState.CurPage = this.CurPage;
         if(this.Slides[this.CurPage]){
             oDocState.Slide = this.Slides[this.CurPage];
             this.Slides[this.CurPage].graphicObjects.Save_DocumentStateBeforeLoadChanges(oDocState);
@@ -3946,11 +3946,25 @@ CPresentation.prototype =
                         this.CurPage = i;
                         this.bGoToPage = true;
                         bFind = true;
+                        if(this.Slides[this.CurPage]){
+                            var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
+                            oDrawingObjects.clearPreTrackObjects();
+                            oDrawingObjects.clearTrackObjects();
+                            oDrawingObjects.resetSelection();
+                            oDrawingObjects.changeCurrentState(new AscFormat.NullState(oDrawingObjects));
+                        }
                     }
                 }
                 if(!bFind){
                     this.CurPage = this.Slides.length - 1;
                     this.bGoToPage = true;
+                    if(this.Slides[this.CurPage]){
+                        var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
+                        oDrawingObjects.clearPreTrackObjects();
+                        oDrawingObjects.clearTrackObjects();
+                        oDrawingObjects.resetSelection();
+                        oDrawingObjects.changeCurrentState(new AscFormat.NullState(oDrawingObjects));
+                    }
                     return;
                 }
             }
@@ -3960,6 +3974,21 @@ CPresentation.prototype =
             oDrawingObjects.resetSelection();
             oDrawingObjects.changeCurrentState(new AscFormat.NullState(oDrawingObjects));
             oDrawingObjects.loadDocumentStateAfterLoadChanges(oState);
+        }
+        else{
+            if(oState.CurPage === -1){
+                if(this.Slides.length > 0){
+                    this.CurPage = 0;
+                    this.bGoToPage = true;
+                }
+            }
+            if(this.Slides[this.CurPage]){
+                var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
+                oDrawingObjects.clearPreTrackObjects();
+                oDrawingObjects.clearTrackObjects();
+                oDrawingObjects.resetSelection();
+                oDrawingObjects.changeCurrentState(new AscFormat.NullState(oDrawingObjects));
+            }
         }
     },
 

@@ -662,6 +662,14 @@ Slide.prototype =
         }
     },
 
+    correctContent: function(){
+        for(var i = this.cSld.spTree.length - 1;  i > -1 ; --i){
+            if(this.cSld.spTree[i].bDeleted){
+                this.removeFromSpTreeById(this.cSld.spTree[i].Get_Id());
+            }
+        }
+    },
+
     removeFromSpTreeById: function(id)
     {
         var sp_tree = this.cSld.spTree;
