@@ -789,6 +789,7 @@
 				case 27: // Esc
 					t.handlers.trigger("stopFormatPainter");
 					t.handlers.trigger("stopAddShape");
+					t.handlers.trigger("hideSpecialPasteOptions");
 					return result;
 
 				case 144: //Num Lock

@@ -463,6 +463,11 @@
 				  } else {
 					  self.model.recalcWB(false);
 				  }
+			  },
+			  
+			  //special paste
+			  "hideSpecialPasteOptions": function () {
+				  self.handlers.trigger("hideSpecialPasteOptions");
 			  }
 		  });
 
