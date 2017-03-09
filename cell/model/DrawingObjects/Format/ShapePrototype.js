@@ -552,8 +552,7 @@ CShape.prototype.recalculateBounds = function()
 CShape.prototype.recalculateContent = function()
 {
     var content = this.getDocContent();
-    if(content)
-    {
+    if(content){
         var body_pr = this.getBodyPr();
 
         var oRecalcObj = this.recalculateDocContent(content, body_pr);
@@ -588,6 +587,15 @@ CShape.prototype.recalculateContent = function()
             this.txWarpStructNoTransform = oTextWarpContent.oTxWarpStructNoTransform;
         }
         return oRecalcObj;
+    }
+    else{
+        this.txWarpStructParamarks = null;
+        this.txWarpStruct = null;
+
+        this.txWarpStructParamarksNoTransform = null;
+        this.txWarpStructNoTransform = null;
+
+        this.recalcInfo.warpGeometry = null;
     }
     return null;
 };

@@ -4107,7 +4107,7 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
     }
 
     var oController = this.getDrawingObjectsController && this.getDrawingObjectsController();
-    if(!this.txWarpStruct && !this.txWarpStructParamarksNoTransform || (!this.txWarpStructParamarksNoTransform && oController && (AscFormat.getTargetTextObject(oController) === this)) /*|| this.haveSelectedDrawingInContent()*/)
+    if(!this.txWarpStruct && !this.txWarpStructParamarksNoTransform || (!this.txWarpStructParamarksNoTransform && oController && (AscFormat.getTargetTextObject(oController) === this) || (!this.txBody && !this.textBoxContent)) /*|| this.haveSelectedDrawingInContent()*/)
     {
         if (this.txBody)
         {
