@@ -2156,6 +2156,12 @@ CHeaderFooterController.prototype =
                     History.Create_NewPoint(AscDFH.historydescription_Document_AddHeader);
                     this.LogicDocument.Set_DocPosType(docpostype_HdrFtr);
                     HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Header, PageIndex );
+
+                    if (this.CurHdrFtr)
+                    	this.CurHdrFtr.Selection_Remove();
+
+                    this.CurHdrFtr = HdrFtr;
+
                     this.LogicDocument.Recalculate();
                 }
                 else
@@ -2175,6 +2181,12 @@ CHeaderFooterController.prototype =
                     History.Create_NewPoint(AscDFH.historydescription_Document_AddFooter);
                     this.LogicDocument.Set_DocPosType(docpostype_HdrFtr);
                     HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Footer, PageIndex );
+
+					if (this.CurHdrFtr)
+						this.CurHdrFtr.Selection_Remove();
+
+					this.CurHdrFtr = HdrFtr;
+
                     this.LogicDocument.Recalculate();
                 }
                 else
