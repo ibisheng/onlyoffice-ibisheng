@@ -5253,8 +5253,8 @@ function CSlideDrawer()
 
 		if (this.m_oWordControl.bIsRetinaSupport)
 		{
-			_x = (_rect.left * AscCommon.AscBrowser.retinaPixelRatio) + _bounds.min_x;
-			_y = (_rect.top * AscCommon.AscBrowser.retinaPixelRatio) + _bounds.min_y;
+			_x = ((_rect.left * AscCommon.AscBrowser.retinaPixelRatio) >> 0) + _bounds.min_x;
+			_y = ((_rect.top * AscCommon.AscBrowser.retinaPixelRatio) >> 0) + _bounds.min_y;
 		}
 
 		if (this.bIsEmptyPresentation)

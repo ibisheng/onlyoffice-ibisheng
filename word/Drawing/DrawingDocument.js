@@ -2425,8 +2425,8 @@ function CDrawingDocument()
 
 		if (this.m_oWordControl.bIsRetinaSupport)
 		{
-			w *= AscCommon.AscBrowser.retinaPixelRatio;
-			h *= AscCommon.AscBrowser.retinaPixelRatio;
+			w = AscCommon.AscBrowser.convertToRetinaValue(w, true);
+			h = AscCommon.AscBrowser.convertToRetinaValue(h, true);
 		}
 
 		var _check = this.CheckPagesSizeMaximum(w, h);
@@ -5871,8 +5871,8 @@ function CDrawingDocument()
 			}
 			else
 			{
-				_canvas_tables.width = (TABLE_STYLE_WIDTH_PIX * AscCommon.AscBrowser.retinaPixelRatio);
-				_canvas_tables.height = (TABLE_STYLE_HEIGHT_PIX * AscCommon.AscBrowser.retinaPixelRatio);
+				_canvas_tables.width = (TABLE_STYLE_WIDTH_PIX * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
+				_canvas_tables.height = (TABLE_STYLE_HEIGHT_PIX * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
 			}
 		}
 
@@ -6609,10 +6609,12 @@ CStylesPainter.prototype =
 {
 	GenerateStyles: function (_api, ds)
 	{
+		var _oldX = this.STYLE_THUMBNAIL_WIDTH;
+		var _oldY = this.STYLE_THUMBNAIL_HEIGHT;
 		if (_api.WordControl.bIsRetinaSupport)
 		{
-			this.STYLE_THUMBNAIL_WIDTH *= AscCommon.AscBrowser.retinaPixelRatio;
-			this.STYLE_THUMBNAIL_HEIGHT *= AscCommon.AscBrowser.retinaPixelRatio;
+			this.STYLE_THUMBNAIL_WIDTH 	= AscCommon.AscBrowser.convertToRetinaValue(this.STYLE_THUMBNAIL_WIDTH, true);
+			this.STYLE_THUMBNAIL_HEIGHT = AscCommon.AscBrowser.convertToRetinaValue(this.STYLE_THUMBNAIL_HEIGHT, true);
 			this.IsRetinaEnabled = true;
 		}
 
@@ -6678,8 +6680,8 @@ CStylesPainter.prototype =
 
 		if (_api.WordControl.bIsRetinaSupport)
 		{
-			this.STYLE_THUMBNAIL_WIDTH /= AscCommon.AscBrowser.retinaPixelRatio;
-			this.STYLE_THUMBNAIL_HEIGHT /= AscCommon.AscBrowser.retinaPixelRatio;
+			this.STYLE_THUMBNAIL_WIDTH = _oldX;
+			this.STYLE_THUMBNAIL_HEIGHT = _oldY;
 		}
 
 		// export
