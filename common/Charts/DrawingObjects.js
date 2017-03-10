@@ -3999,6 +3999,7 @@ function DrawingObjects() {
                     }
                 }
             }
+            api.exucuteHistoryEnd = false;
         }
 
     };
