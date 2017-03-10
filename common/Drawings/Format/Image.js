@@ -552,6 +552,12 @@ CImageShape.prototype.Refresh_RecalcData = function(data)
             this.addToRecalculate();
             break;
         }
+        case AscDFH.historyitem_ShapeSetBDeleted:{
+            if(!this.bDeleted){
+                this.addToRecalculate();
+            }
+            break;
+        }
     }
 };
 
