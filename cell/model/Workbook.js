@@ -1790,7 +1790,7 @@
 			}
 		} else if (opt_sheetId) {
 			formulas = [];
-			var ws = this.wb.getWorksheetById(opt_sheetId);
+			var ws = this.getWorksheetById(opt_sheetId);
 			ws.getAllFormulas(formulas);
 		} else {
 			formulas = this.getAllFormulas();
@@ -2960,6 +2960,7 @@
 						wsModel.oDrawingOjectsManager.updateChartReferencesWidthHistory(_lastName, _newName, true);
 				}
 			}
+			this.workbook.dependencyFormulas.calcTree();
 		}
 	};
 	Woorksheet.prototype.getTabColor=function(){
@@ -4712,7 +4713,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 				newFormula = this.formulaParsed.Formula;
 			}
 			oNewCell.formulaParsed = new parserFormula(newFormula, oNewCell, oNewWs);
-			this.ws.workbook.dependencyFormulas.addToBuildDependencyCell(oNewCell);
+			oNewWs.workbook.dependencyFormulas.addToBuildDependencyCell(oNewCell);
 		}
 		return oNewCell;
 	};
