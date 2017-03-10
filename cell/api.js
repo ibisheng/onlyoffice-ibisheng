@@ -221,7 +221,7 @@ var editor;
 		}
 		return result;
 	};
-	spreadsheet_api.prototype.asc_getLocaleExample = function(format, value, culture) {
+	spreadsheet_api.prototype.asc_getLocaleExample = function (format, value, culture) {
 		var cultureInfo = AscCommon.g_aCultureInfos[culture] || AscCommon.g_oDefaultCultureInfo;
 		var numFormat = AscCommon.oNumFormatCache.get(format);
 		var res;
@@ -239,8 +239,18 @@ var editor;
 		}
 		return res;
 	};
-	spreadsheet_api.prototype.asc_getFormatCells = function(info) {
-		return AscCommon.getFormatCells(info);
+	spreadsheet_api.prototype.asc_getFormatCells = function (info, culture) {
+		var tmp = AscCommon.g_oDefaultCultureInfo;
+		var isChange;
+		if (isChange = AscCommon.setCurrentCultureInfo(culture)) {
+			parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator);
+        }
+		var res = AscCommon.getFormatCells(info);
+		if (isChange) {
+			AscCommon.setCurrentCultureInfo(tmp.LCID);
+			parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator);
+        }
+		return res;
 	};
   spreadsheet_api.prototype.asc_getLocaleCurrency = function(val) {
     var cultureInfo = AscCommon.g_aCultureInfos[val];
