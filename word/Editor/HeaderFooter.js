@@ -2104,6 +2104,9 @@ CHeaderFooterController.prototype =
 			|| (null !== (TempHdrFtr = this.Pages[PageIndex].Header) && true === TempHdrFtr.Is_PointInFlowTable(X, Y))
 			|| (null !== (TempHdrFtr = this.Pages[PageIndex].Footer) && true === TempHdrFtr.Is_PointInFlowTable(X, Y)))
 		{
+			if (this.CurHdrFtr && ((null !== TempHdrFtr && TempHdrFtr !== this.CurHdrFtr) || this.CurPage !== PageIndex))
+				this.CurHdrFtr.Selection_Remove();
+
 			if (null !== TempHdrFtr)
 				this.CurHdrFtr = TempHdrFtr;
 
