@@ -4886,11 +4886,7 @@ PasteProcessor.prototype =
 				
 				
 				if(pNoHtmlPr['mso-list'])
-				{
-					//get listId and level from mso-list property
-					var msoListIgnoreSymbol = this._getMsoListSymbol(node);
-					var num = this._getTypeMsoListSymbol(msoListIgnoreSymbol);
-					
+				{	
 					var level = 0;
 					var listId = null;
 					var startIndex;
@@ -4908,6 +4904,12 @@ PasteProcessor.prototype =
 					{
 						NumId = this.msoListMap[listId];
 					}
+					
+					//get listId and level from mso-list property
+					var msoListIgnoreSymbol = this._getMsoListSymbol(node);
+					var listObj = this._getTypeMsoListSymbol(msoListIgnoreSymbol, (null === NumId));
+					var num = listObj.type;
+					var startPos = listObj.startPos;
 					
 					if(null == NumId && this.pasteInExcel !== true)//create new NumId
 					{
@@ -4958,9 +4960,15 @@ PasteProcessor.prototype =
 							case numbering_numfmt_UpperLetter: AbstractNum.Set_Lvl_Numbered_6(level);break;
 						}
 						
+						//проставляем начальную позицию
+						if(null !== startPos)
+						{
+							AbstractNum.Set_Lvl_Start(level, startPos);
+						}
+						
 						//setListTextPr(AbstractNum);
 					}
-					else
+					/*else
 					{
 						var AbstractNum = this.oLogicDocument.Numbering.Get_AbstractNum(NumId);
 						
@@ -4972,7 +4980,7 @@ PasteProcessor.prototype =
 							case numbering_numfmt_LowerLetter: AbstractNum.Set_Lvl_Numbered_8(level);break;
 							case numbering_numfmt_UpperLetter: AbstractNum.Set_Lvl_Numbered_6(level);break;
 						}
-					}
+					}*/
 					
 					
 					//put into map listId
@@ -5414,40 +5422,131 @@ PasteProcessor.prototype =
 			}
 		}
 	},
-	_getTypeMsoListSymbol: function(str)
+	_getTypeMsoListSymbol: function(str, getStartPosition)
 	{
+		var symbolsArr = [
+			"ivxlcdm",
+			"IVXLCDM",
+			"abcdefghijklmnopqrstuvwxyz", 
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+		];
+		
+		//TODO пересмотреть функцию перевода из римских чисел
+		var romanToIndex = function(text) 
+		{
+			var arab_number = [1,4,5,9,10,40,50,90,100,400,500,900,1000,4000,5000,9000,10000];
+			var rom_number = ["I","IV","V","IX","X","XL","L","XC","C","CD","D","CM","M", "M&#8577;","&#8577;","&#8577;&#8578;","&#8578;"];
+			
+			var text = text.toUpperCase();
+			var result = 0;
+			var pos = 0;
+			var i = arab_number.length - 1;
+			while (i >= 0 && pos < text.length) 
+			{
+				if (text.substr(pos, rom_number[i].length) == rom_number[i]) 
+				{
+					result += arab_number[i];
+					pos += rom_number[i].length;
+				}
+				else
+				{
+					i--;
+				}
+			}
+			return result;
+		};
+		
+		var latinToIndex = function(text) 
+		{
+			var text = text.toUpperCase();
+			var index = 0;
+			for(var i = 0; i < text.length; i++)
+			{
+				index += symbolsArr[3].indexOf(text[i]) + 1;
+			}
+			return index;
+		};
+		
+		var getFullListIndex = function(indexStr, str)
+		{
+			var fullListIndex = "";
+			for(var i = 0; i < str.length; i++)
+			{
+				var symbol = str[i];
+				if(-1 !== indexStr.indexOf(symbol))
+				{
+					fullListIndex += symbol;
+				}
+				else
+				{
+					break;
+				}
+			}
+			return fullListIndex;
+		};
+		
 		//TODO пока делаю так, пересмотреть регулярные выражения
-		var res = numbering_numfmt_Bullet;
+		var resType = numbering_numfmt_Bullet;
 		var number = parseInt(str);
+		var startPos = null, fullListIndex;
 		if(!isNaN(number))
 		{
-			res = numbering_numfmt_Decimal;
+			resType = numbering_numfmt_Decimal;
+			startPos = number;
 		}
 		else if(1 === str.length && -1 !== str.indexOf("o"))
 		{
-			res = numbering_numfmt_Bullet;
+			resType = numbering_numfmt_Bullet;
 		}
 		else
 		{
-			if(str.match(/^[I,X,V]/))
+			//1)смотрим на первый символ в строке
+			//2)ищем все символы, соответсвующие данному типу
+			//3)находим порядковый номер этих символов
+			var firstSymbol = str[0];
+			if(-1 !== symbolsArr[0].indexOf(firstSymbol))
 			{
-				res = numbering_numfmt_UpperRoman;
+				if(getStartPosition)
+				{
+					fullListIndex = getFullListIndex(symbolsArr[0], str);
+					startPos = romanToIndex(fullListIndex);
+				}
+				
+				resType = numbering_numfmt_LowerRoman;
 			}
-			else if(str.match(/^[i,x,v]/))
+			else if(-1 !== symbolsArr[1].indexOf(firstSymbol))
 			{
-				res = numbering_numfmt_LowerRoman;
+				if(getStartPosition)
+				{
+					fullListIndex = getFullListIndex(symbolsArr[1], str);
+					startPos = romanToIndex(fullListIndex);
+				}
+				
+				resType = numbering_numfmt_UpperRoman;
 			}
-			else if(str.match(/^[A-Z]/))
+			else if(-1 !== symbolsArr[2].indexOf(firstSymbol))
 			{
-				res = numbering_numfmt_UpperLetter;
+				if(getStartPosition)
+				{
+					fullListIndex = getFullListIndex(symbolsArr[2], str);
+					startPos = latinToIndex(fullListIndex);
+				}
+				
+				resType = numbering_numfmt_LowerLetter;
 			}
-			else if(str.match(/^[a-z]/))
+			else if(-1 !== symbolsArr[3].indexOf(firstSymbol))
 			{
-				res = numbering_numfmt_LowerLetter;
+				if(getStartPosition)
+				{
+					fullListIndex = getFullListIndex(symbolsArr[3], str);
+					startPos = latinToIndex(fullListIndex);
+				}
+				
+				resType = numbering_numfmt_UpperLetter;
 			}
 		}
 		
-		return res;
+		return {type: resType, startPos: startPos};
 	},
     _AddNextPrevToContent : function(oDoc)
     {

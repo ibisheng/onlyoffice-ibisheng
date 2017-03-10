@@ -961,17 +961,17 @@ CHeaderFooter.prototype =
         return this.Content.Selection_Is_TableBorderMove();
     },
 
-    Selection_Check : function(X, Y, Page_Abs, NearPos)
-    {
-        if (-1 === this.RecalcInfo.CurPage)
-            return false;
+	Selection_Check : function(X, Y, PageAbs, NearPos)
+	{
+		if (-1 === this.RecalcInfo.CurPage)
+			return false;
 
-        var HdrFtrPage = this.Content.Get_StartPage_Absolute();
-        if ( undefined !== NearPos || HdrFtrPage === Page_Abs )
-            return this.Content.Selection_Check( X, Y, Page_Abs, NearPos );
+		var HdrFtrPage = this.Content.Get_StartPage_Absolute();
+		if (undefined !== NearPos || HdrFtrPage === PageAbs)
+			return this.Content.Selection_Check(X, Y, 0, NearPos);
 
-        return false;
-    },
+		return false;
+	},
 
     // Селектим весь параграф
     Select_All : function()
@@ -2104,6 +2104,9 @@ CHeaderFooterController.prototype =
 			|| (null !== (TempHdrFtr = this.Pages[PageIndex].Header) && true === TempHdrFtr.Is_PointInFlowTable(X, Y))
 			|| (null !== (TempHdrFtr = this.Pages[PageIndex].Footer) && true === TempHdrFtr.Is_PointInFlowTable(X, Y)))
 		{
+			if (this.CurHdrFtr && ((null !== TempHdrFtr && TempHdrFtr !== this.CurHdrFtr) || this.CurPage !== PageIndex))
+				this.CurHdrFtr.Selection_Remove();
+
 			if (null !== TempHdrFtr)
 				this.CurHdrFtr = TempHdrFtr;
 
@@ -2156,6 +2159,12 @@ CHeaderFooterController.prototype =
                     History.Create_NewPoint(AscDFH.historydescription_Document_AddHeader);
                     this.LogicDocument.Set_DocPosType(docpostype_HdrFtr);
                     HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Header, PageIndex );
+
+                    if (this.CurHdrFtr)
+                    	this.CurHdrFtr.Selection_Remove();
+
+                    this.CurHdrFtr = HdrFtr;
+
                     this.LogicDocument.Recalculate();
                 }
                 else
@@ -2175,6 +2184,12 @@ CHeaderFooterController.prototype =
                     History.Create_NewPoint(AscDFH.historydescription_Document_AddFooter);
                     this.LogicDocument.Set_DocPosType(docpostype_HdrFtr);
                     HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Footer, PageIndex );
+
+					if (this.CurHdrFtr)
+						this.CurHdrFtr.Selection_Remove();
+
+					this.CurHdrFtr = HdrFtr;
+
                     this.LogicDocument.Recalculate();
                 }
                 else
@@ -2262,10 +2277,10 @@ CHeaderFooterController.prototype =
         return false;
     },
 
-    Selection_Check : function(X, Y, Page_Abs, NearPos)
+    Selection_Check : function(X, Y, PageAbs, NearPos)
     {
         if (null != this.CurHdrFtr)
-            return this.CurHdrFtr.Selection_Check(X, Y, 0, NearPos);
+            return this.CurHdrFtr.Selection_Check(X, Y, PageAbs, NearPos);
     },
 
     Selection_IsEmpty : function(bCheckHidden)

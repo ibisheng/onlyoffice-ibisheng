@@ -2236,17 +2236,17 @@ CShape.prototype.setWordShape = function (pr) {
     this.bWordShape = pr;
 };
 
-CShape.prototype.selectionCheck = function (X, Y, Page_Abs, NearPos) {
+CShape.prototype.selectionCheck = function (X, Y, PageAbs, NearPos) {
 
     var content = this.getDocContent();
     if (content) {
         if (undefined !== NearPos)
-            return content.Selection_Check(X, Y, Page_Abs, NearPos);
+            return content.Selection_Check(X, Y, 0, NearPos);
 
         if (isRealObject(content) && this.hitInTextRect(X, Y) && this.invertTransformText) {
             var t_x = this.invertTransformText.TransformPointX(X, Y);
             var t_y = this.invertTransformText.TransformPointY(X, Y);
-            return content.Selection_Check(t_x, t_y, Page_Abs, NearPos);
+            return content.Selection_Check(t_x, t_y, 0, NearPos);
         }
     }
     return false;

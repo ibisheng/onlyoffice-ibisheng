@@ -3295,6 +3295,10 @@ var editor;
 		this.asc_setViewMode(this.isViewMode);
 	};
 
+	spreadsheet_api.prototype.asc_OnShowContextMenu = function() {
+	  this.asc_closeCellEditor();
+    };
+
   /*
    * Export
    * -----------------------------------------------------------------------------

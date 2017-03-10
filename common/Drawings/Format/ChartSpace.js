@@ -2279,6 +2279,12 @@ CChartSpace.prototype.Refresh_RecalcData = function(data)
             this.handleUpdateType();
             break;
         }
+        case AscDFH.historyitem_ShapeSetBDeleted:{
+            if(!this.bDeleted){
+                this.handleUpdateType();
+            }
+            break;
+        }
     }
 };
 CChartSpace.prototype.getObjectType = function()

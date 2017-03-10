@@ -46,7 +46,6 @@ function (window, undefined) {
   var FormulaSeparators = AscCommon.FormulaSeparators;
   var parserHelp = AscCommon.parserHelp;
   var g_oFormatParser = AscCommon.g_oFormatParser;
-  var g_oCellAddressUtils = AscCommon.g_oCellAddressUtils;
   var CellAddress = AscCommon.CellAddress;
 
   var c_oAscError = Asc.c_oAscError;
@@ -629,329 +628,314 @@ RegExp.escape = function ( text ) {
 
 parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator);
 
-/** @constructor */
-function cBaseType( val, type ) {
-    this.needRecalc = false;
-    this.numFormat = null;
-    this.ca = false;
-    this.type = type;
-    this.value = val;
-}
-
-cBaseType.prototype.cloneTo = function(oRes) {
-  oRes.needRecalc = this.needRecalc;
-  oRes.numFormat = this.numFormat;
-  oRes.type = this.type;
-  oRes.value = this.value;
-  oRes.ca = this.ca;
-};
-cBaseType.prototype.getValue = function() {
-  return this.value;
-};
-cBaseType.prototype.toString = function() {
-  return this.value.toString();
-};
-cBaseType.prototype.toLocaleString = function() {
-  return this.toString();
-};
-
-/*Basic types of an elements used into formulas*/
-/** @constructor */
-function cNumber( val ) {
-    this.constructor.call( this, parseFloat( val ), cElementType.number );
-    var res;
-
-    if ( !isNaN( this.value ) && Math.abs( this.value ) !== Infinity ) {
-        res = this;
-  } else if (val instanceof cError) {
-        res = val;
-  } else {
-        res = new cError( cErrorType.not_numeric );
-    }
-    return res;
-}
-
-cNumber.prototype = Object.create( cBaseType.prototype );
-cNumber.prototype.tocString = function () {
-  return new cString(("" + this.value).replace(FormulaSeparators.digitSeparatorDef, FormulaSeparators.digitSeparator));
-};
-cNumber.prototype.tocNumber = function () {
-    return this;
-};
-cNumber.prototype.tocBool = function () {
-    return new cBool( this.value !== 0 );
-};
-cNumber.prototype.toLocaleString = function ( digitDelim ) {
-    var res = this.value.toString();
-  if (digitDelim) {
-    return res.replace(FormulaSeparators.digitSeparatorDef, FormulaSeparators.digitSeparator);
-  } else {
-        return res;
-  }
-};
-
-/** @constructor */
-function cString( val ) {
-    this.constructor.call( this, val, cElementType.string );
-}
-
-cString.prototype = Object.create( cBaseType.prototype );
-cString.prototype.tocNumber = function () {
-    var res, m = this.value;
-    if ( this.value === "" ) {
-        res = new cNumber( 0 );
-    }
-
-    /*if ( this.value[0] === '"' && this.value[this.value.length - 1] === '"' ) {
-     m = this.value.substring( 1, this.value.length - 1 );
-     }*/
-
-    if ( g_oFormatParser.isLocaleNumber( this.value ) ) {
-        var numberValue = g_oFormatParser.parseLocaleNumber( this.value );
-        if ( !isNaN( numberValue ) ) {
-            res = new cNumber( numberValue );
-        }
-    } else {
-        var parseRes = AscCommon.g_oFormatParser.parse(this.value);
-        if(null != parseRes) {
-            res = new cNumber( parseRes.value );
-        } else {
-            res = new cError( cErrorType.wrong_value_type );
-        }
-    }
-
-    return res;
-};
-cString.prototype.tocBool = function () {
-    var res;
-    if ( parserHelp.isBoolean( this.value, 0 ) ) {
-        res = new cBool( parserHelp.operand_str.toUpperCase() === cBoolLocal["t"].toUpperCase() );
-  } else {
-        res = this;
-    }
-    return res;
-};
-cString.prototype.tocString = function () {
-    return this;
-};
-
-/** @constructor */
-function cBool( val ) {
-	var v = false;
-	switch(val.toString().toUpperCase()){
-		case "TRUE":
-    case cBoolLocal["t"].toUpperCase():
-      v = true;
+	/** @constructor */
+	function cBaseType(val) {
+		this.needRecalc = false;
+		this.numFormat = null;
+		this.ca = false;
+		this.value = val;
 	}
-    this.constructor.call( this, v, cElementType.bool );
-}
 
-cBool.prototype = Object.create( cBaseType.prototype );
-cBool.prototype.toString = function () {
-    return this.value.toString().toUpperCase();
-};
-cBool.prototype.getValue = function () {
-    return this.toString();
-};
-cBool.prototype.tocNumber = function () {
-    return new cNumber( this.value ? 1.0 : 0.0 );
-};
-cBool.prototype.tocString = function () {
-    return new cString( this.value ? "TRUE" : "FALSE" );
-};
-cBool.prototype.toLocaleString = function () {
-    return new cString( this.value ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase() );
-};
-cBool.prototype.tocBool = function () {
-    return this;
-};
-cBool.prototype.toBool = function () {
-    return this.value;
-};
+	cBaseType.prototype.cloneTo = function (oRes) {
+		oRes.needRecalc = this.needRecalc;
+		oRes.numFormat = this.numFormat;
+		oRes.value = this.value;
+		oRes.ca = this.ca;
+	};
+	cBaseType.prototype.getValue = function () {
+		return this.value;
+	};
+	cBaseType.prototype.toString = function () {
+		return this.value.toString();
+	};
+	cBaseType.prototype.toLocaleString = function () {
+		return this.toString();
+	};
 
-/** @constructor */
-function cError( val ) {
-    this.constructor.call( this, val, cElementType.error );
+	/*Basic types of an elements used into formulas*/
+	/** @constructor */
+	function cNumber(val) {
+		this.constructor.call(this, parseFloat(val));
+		var res;
 
-    this.errorType = -1;
-
-    switch ( val ) {
-		case cErrorLocal["value"]:
-		case cErrorOrigin["value"]:
-        case cErrorType.wrong_value_type:
-        {
-            this.value = "#VALUE!";
-            this.errorType = cErrorType.wrong_value_type;
-            break;
-        }
-		case cErrorLocal["nil"]:
-		case cErrorOrigin["nil"]:
-        case cErrorType.null_value:
-        {
-            this.value = "#NULL!";
-            this.errorType = cErrorType.null_value;
-            break;
-        }
-		case cErrorLocal["div"]:
-		case cErrorOrigin["div"]:
-        case cErrorType.division_by_zero:
-        {
-            this.value = "#DIV/0!";
-            this.errorType = cErrorType.division_by_zero;
-            break;
-        }
-		case cErrorLocal["ref"]:
-		case cErrorOrigin["ref"]:
-        case cErrorType.bad_reference:
-        {
-            this.value = "#REF!";
-            this.errorType = cErrorType.bad_reference;
-            break;
-        }
-		case cErrorLocal["name"]:
-		case cErrorOrigin["name"]:
-        case cErrorType.wrong_name:
-        {
-            this.value = "#NAME?";
-            this.errorType = cErrorType.wrong_name;
-            break;
-        }
-		case cErrorLocal["num"]:
-		case cErrorOrigin["num"]:
-        case cErrorType.not_numeric:
-        {
-            this.value = "#NUM!";
-            this.errorType = cErrorType.not_numeric;
-            break;
-        }
-		case cErrorLocal["na"]:
-		case cErrorOrigin["na"]:
-        case cErrorType.not_available:
-        {
-            this.value = "#N/A";
-            this.errorType = cErrorType.not_available;
-            break;
-        }
-		case cErrorLocal["getdata"]:
-		case cErrorOrigin["getdata"]:
-        case cErrorType.getting_data:
-        {
-            this.value = "#GETTING_DATA";
-            this.errorType = cErrorType.getting_data;
-            break;
-        }
-		case cErrorLocal["uf"]:
-		case cErrorOrigin["uf"]:
-        case cErrorType.unsupported_function:
-        {
-            this.value = "#UNSUPPORTED_FUNCTION!";
-            this.errorType = cErrorType.unsupported_function;
-            break;
-        }
-    }
-
-    return this;
-}
-
-cError.prototype = Object.create( cBaseType.prototype );
-cError.prototype.tocNumber =
-  cError.prototype.tocString = cError.prototype.tocBool = cError.prototype.tocEmpty = function() {
-    return this;
-};
-cError.prototype.toLocaleString = function () {
-	switch ( this.value ) {
-		case cErrorOrigin["value"]:
-		case cErrorType.wrong_value_type:
-		{
-			return cErrorLocal["value"];
-			break;
+		if (!isNaN(this.value) && Math.abs(this.value) !== Infinity) {
+			res = this;
+		} else if (val instanceof cError) {
+			res = val;
+		} else {
+			res = new cError(cErrorType.not_numeric);
 		}
-		case cErrorOrigin["nil"]:
-		case cErrorType.null_value:
-		{
-			return cErrorLocal["nil"];
-			break;
+		return res;
+	}
+
+	cNumber.prototype = Object.create(cBaseType.prototype);
+	cNumber.prototype.type = cElementType.number;
+	cNumber.prototype.tocString = function () {
+		return new cString(("" + this.value).replace(FormulaSeparators.digitSeparatorDef,
+			FormulaSeparators.digitSeparator));
+	};
+	cNumber.prototype.tocNumber = function () {
+		return this;
+	};
+	cNumber.prototype.tocBool = function () {
+		return new cBool(this.value !== 0);
+	};
+	cNumber.prototype.toLocaleString = function (digitDelim) {
+		var res = this.value.toString();
+		if (digitDelim) {
+			return res.replace(FormulaSeparators.digitSeparatorDef, FormulaSeparators.digitSeparator);
+		} else {
+			return res;
 		}
-		case cErrorOrigin["div"]:
-		case cErrorType.division_by_zero:
-		{
-			return cErrorLocal["div"];
-			break;
+	};
+
+	/** @constructor */
+	function cString(val) {
+		this.constructor.call(this, val);
+	}
+
+	cString.prototype = Object.create(cBaseType.prototype);
+	cString.prototype.type = cElementType.string;
+	cString.prototype.tocNumber = function () {
+		var res, m = this.value;
+		if (this.value === "") {
+			res = new cNumber(0);
 		}
 
-		case cErrorOrigin["ref"]:
-		case cErrorType.bad_reference:
-		{
-			return cErrorLocal["ref"];
-			break;
+		/*if ( this.value[0] === '"' && this.value[this.value.length - 1] === '"' ) {
+		 m = this.value.substring( 1, this.value.length - 1 );
+		 }*/
+
+		if (g_oFormatParser.isLocaleNumber(this.value)) {
+			var numberValue = g_oFormatParser.parseLocaleNumber(this.value);
+			if (!isNaN(numberValue)) {
+				res = new cNumber(numberValue);
+			}
+		} else {
+			var parseRes = AscCommon.g_oFormatParser.parse(this.value);
+			if (null != parseRes) {
+				res = new cNumber(parseRes.value);
+			} else {
+				res = new cError(cErrorType.wrong_value_type);
+			}
 		}
 
-		case cErrorOrigin["name"]:
-		case cErrorType.wrong_name:
-		{
-			return cErrorLocal["name"];
-			break;
+		return res;
+	};
+	cString.prototype.tocBool = function () {
+		var res;
+		if (parserHelp.isBoolean(this.value, 0)) {
+			res = new cBool(parserHelp.operand_str.toUpperCase() === cBoolLocal["t"].toUpperCase());
+		} else {
+			res = this;
+		}
+		return res;
+	};
+	cString.prototype.tocString = function () {
+		return this;
+	};
+
+	/** @constructor */
+	function cBool(val) {
+		var v = false;
+		switch (val.toString().toUpperCase()) {
+			case "TRUE":
+			case cBoolLocal["t"].toUpperCase():
+				v = true;
+		}
+		this.constructor.call(this, v);
+	}
+
+	cBool.prototype = Object.create(cBaseType.prototype);
+	cBool.prototype.type = cElementType.bool;
+	cBool.prototype.toString = function () {
+		return this.value.toString().toUpperCase();
+	};
+	cBool.prototype.getValue = function () {
+		return this.toString();
+	};
+	cBool.prototype.tocNumber = function () {
+		return new cNumber(this.value ? 1.0 : 0.0);
+	};
+	cBool.prototype.tocString = function () {
+		return new cString(this.value ? "TRUE" : "FALSE");
+	};
+	cBool.prototype.toLocaleString = function () {
+		return new cString(this.value ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase());
+	};
+	cBool.prototype.tocBool = function () {
+		return this;
+	};
+	cBool.prototype.toBool = function () {
+		return this.value;
+	};
+
+	/** @constructor */
+	function cError(val) {
+		this.constructor.call(this, val);
+
+		this.errorType = -1;
+
+		switch (val) {
+			case cErrorLocal["value"]:
+			case cErrorOrigin["value"]:
+			case cErrorType.wrong_value_type: {
+				this.value = "#VALUE!";
+				this.errorType = cErrorType.wrong_value_type;
+				break;
+			}
+			case cErrorLocal["nil"]:
+			case cErrorOrigin["nil"]:
+			case cErrorType.null_value: {
+				this.value = "#NULL!";
+				this.errorType = cErrorType.null_value;
+				break;
+			}
+			case cErrorLocal["div"]:
+			case cErrorOrigin["div"]:
+			case cErrorType.division_by_zero: {
+				this.value = "#DIV/0!";
+				this.errorType = cErrorType.division_by_zero;
+				break;
+			}
+			case cErrorLocal["ref"]:
+			case cErrorOrigin["ref"]:
+			case cErrorType.bad_reference: {
+				this.value = "#REF!";
+				this.errorType = cErrorType.bad_reference;
+				break;
+			}
+			case cErrorLocal["name"]:
+			case cErrorOrigin["name"]:
+			case cErrorType.wrong_name: {
+				this.value = "#NAME?";
+				this.errorType = cErrorType.wrong_name;
+				break;
+			}
+			case cErrorLocal["num"]:
+			case cErrorOrigin["num"]:
+			case cErrorType.not_numeric: {
+				this.value = "#NUM!";
+				this.errorType = cErrorType.not_numeric;
+				break;
+			}
+			case cErrorLocal["na"]:
+			case cErrorOrigin["na"]:
+			case cErrorType.not_available: {
+				this.value = "#N/A";
+				this.errorType = cErrorType.not_available;
+				break;
+			}
+			case cErrorLocal["getdata"]:
+			case cErrorOrigin["getdata"]:
+			case cErrorType.getting_data: {
+				this.value = "#GETTING_DATA";
+				this.errorType = cErrorType.getting_data;
+				break;
+			}
+			case cErrorLocal["uf"]:
+			case cErrorOrigin["uf"]:
+			case cErrorType.unsupported_function: {
+				this.value = "#UNSUPPORTED_FUNCTION!";
+				this.errorType = cErrorType.unsupported_function;
+				break;
+			}
 		}
 
-		case cErrorOrigin["num"]:
-		case cErrorType.not_numeric:
-		{
-			return cErrorLocal["num"];
-			break;
-		}
+		return this;
+	}
 
-		case cErrorOrigin["na"]:
-		case cErrorType.not_available:
-		{
-			return cErrorLocal["na"];
-			break;
-		}
+	cError.prototype = Object.create(cBaseType.prototype);
+	cError.prototype.type = cElementType.error;
+	cError.prototype.tocNumber =
+		cError.prototype.tocString = cError.prototype.tocBool = cError.prototype.tocEmpty = function () {
+			return this;
+		};
+	cError.prototype.toLocaleString = function () {
+		switch (this.value) {
+			case cErrorOrigin["value"]:
+			case cErrorType.wrong_value_type: {
+				return cErrorLocal["value"];
+				break;
+			}
+			case cErrorOrigin["nil"]:
+			case cErrorType.null_value: {
+				return cErrorLocal["nil"];
+				break;
+			}
+			case cErrorOrigin["div"]:
+			case cErrorType.division_by_zero: {
+				return cErrorLocal["div"];
+				break;
+			}
 
-		case cErrorOrigin["getdata"]:
-		case cErrorType.getting_data:
-		{
-			return cErrorLocal["getdata"];
-			break;
-		}
+			case cErrorOrigin["ref"]:
+			case cErrorType.bad_reference: {
+				return cErrorLocal["ref"];
+				break;
+			}
 
-		case cErrorOrigin["uf"]:
-		case cErrorType.unsupported_function:
-		{
-			return cErrorLocal["uf"];
-			break;
+			case cErrorOrigin["name"]:
+			case cErrorType.wrong_name: {
+				return cErrorLocal["name"];
+				break;
+			}
+
+			case cErrorOrigin["num"]:
+			case cErrorType.not_numeric: {
+				return cErrorLocal["num"];
+				break;
+			}
+
+			case cErrorOrigin["na"]:
+			case cErrorType.not_available: {
+				return cErrorLocal["na"];
+				break;
+			}
+
+			case cErrorOrigin["getdata"]:
+			case cErrorType.getting_data: {
+				return cErrorLocal["getdata"];
+				break;
+			}
+
+			case cErrorOrigin["uf"]:
+			case cErrorType.unsupported_function: {
+				return cErrorLocal["uf"];
+				break;
+			}
+		}
+		return cErrorLocal["na"];
+	};
+	/*cError.prototype.toString = function () {
+	 return new cString( this.value ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase() );
+	 };*/
+
+	/** @constructor */
+	function cArea(val, ws) {/*Area means "A1:E5" for example*/
+		this.constructor.call(this, val);
+
+		this.ws = ws;
+		this.range = null;
+		if (val) {
+			this.range = ws.getRange2(val);
 		}
 	}
-	return cErrorLocal["na"];
-};
-/*cError.prototype.toString = function () {
-	return new cString( this.value ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase() );
-};*/
 
-/** @constructor */
-function cArea( val, ws ) {/*Area means "A1:E5" for example*/
-    this.constructor.call( this, val, cElementType.cellsRange );
-
-	this.ws = ws;
-	this.range = null;
-	if (val) {
-		this.range = ws.getRange2(val);
-	}
-}
-
-cArea.prototype = Object.create( cBaseType.prototype );
-cArea.prototype.clone = function (opt_ws) {
-	var ws = opt_ws ? opt_ws : this.ws;
-	var oRes = new cArea(null, ws);
-//	cBaseType.prototype.cloneTo.call( this, oRes );
-	this.constructor.prototype.cloneTo.call(this, oRes);
-	if (this.range) {
-		oRes.range = this.range.clone(ws);
-	}
-    return oRes;
-};
-cArea.prototype.getWsId = function () {
-    return this.ws.Id;
-};
+	cArea.prototype = Object.create(cBaseType.prototype);
+	cArea.prototype.type = cElementType.cellsRange;
+	cArea.prototype.clone = function (opt_ws) {
+		var ws = opt_ws ? opt_ws : this.ws;
+		var oRes = new cArea(null, ws);
+		this.cloneTo(oRes);
+		if (this.range) {
+			oRes.range = this.range.clone(ws);
+		}
+		return oRes;
+	};
+	cArea.prototype.getWsId = function () {
+		return this.ws.Id;
+	};
 	cArea.prototype.getValue = function (checkExclude, excludeHiddenRows) {
 		var val = [], r = this.getRange();
 		if (!r) {
@@ -975,67 +959,67 @@ cArea.prototype.getWsId = function () {
 		}
 		return res;
 	};
-cArea.prototype.getRange = function () {
+	cArea.prototype.getRange = function () {
 		if (!this.range) {
 			this.range = this.ws.getRange2(this._cells);
 		}
-    return this.range;
-};
-cArea.prototype.tocNumber = function () {
-    var v = this.getValue()[0];
-    if ( !v ) {
-        v = new cNumber( 0 );
-  } else {
-        v = v.tocNumber();
-    }
-    return v;
-};
-cArea.prototype.tocString = function () {
-    return this.getValue()[0].tocString();
-};
-cArea.prototype.tocBool = function () {
-    return this.getValue()[0].tocBool();
-};
-cArea.prototype.toString = function () {
-    var _c;
+		return this.range;
+	};
+	cArea.prototype.tocNumber = function () {
+		var v = this.getValue()[0];
+		if (!v) {
+			v = new cNumber(0);
+		} else {
+			v = v.tocNumber();
+		}
+		return v;
+	};
+	cArea.prototype.tocString = function () {
+		return this.getValue()[0].tocString();
+	};
+	cArea.prototype.tocBool = function () {
+		return this.getValue()[0].tocBool();
+	};
+	cArea.prototype.toString = function () {
+		var _c;
 
-    if ( this.range ) {
-        _c = this.range.getName();
-  } else {
-        _c = this.value;
-    }
-    if ( _c.indexOf( ":" ) < 0 ) {
-        _c = _c + ":" + _c;
-    }
-    return _c;
-};
-cArea.prototype.getWS = function () {
-    return this.ws;
-};
-cArea.prototype.getBBox = function () {
-    return this.getRange().getBBox();
-};
-cArea.prototype.getBBox0 = function () {
-    return this.getRange().getBBox0();
-};
-cArea.prototype.cross = function ( arg ) {
-    var r = this.getRange(), cross;
-    if ( !r ) {
-        return new cError( cErrorType.wrong_name );
-    }
-    cross = r.cross( arg );
-    if ( cross ) {
-        if ( cross.r != undefined ) {
-            return this.getValue2( cross.r - this.getBBox().r1, 0 );
-    } else if (cross.c != undefined) {
-            return this.getValue2( 0, cross.c - this.getBBox().c1 );
-        }
-    }
-    return new cError( cErrorType.wrong_value_type );
-};
-cArea.prototype.isValid = function () {
-    return !!this.getRange();
-};
+		if (this.range) {
+			_c = this.range.getName();
+		} else {
+			_c = this.value;
+		}
+		if (_c.indexOf(":") < 0) {
+			_c = _c + ":" + _c;
+		}
+		return _c;
+	};
+	cArea.prototype.getWS = function () {
+		return this.ws;
+	};
+	cArea.prototype.getBBox = function () {
+		return this.getRange().getBBox();
+	};
+	cArea.prototype.getBBox0 = function () {
+		return this.getRange().getBBox0();
+	};
+	cArea.prototype.cross = function (arg) {
+		var r = this.getRange(), cross;
+		if (!r) {
+			return new cError(cErrorType.wrong_name);
+		}
+		cross = r.cross(arg);
+		if (cross) {
+			if (cross.r != undefined) {
+				return this.getValue2(cross.r - this.getBBox().r1, 0);
+			} else if (cross.c != undefined) {
+				return this.getValue2(0, cross.c - this.getBBox().c1);
+			}
+		}
+		return new cError(cErrorType.wrong_value_type);
+	};
+	cArea.prototype.isValid = function () {
+		return !!this.getRange();
+	};
 	cArea.prototype.countCells = function () {
 		var r = this.getRange(), bbox = r.bbox, count = (Math.abs(bbox.c1 - bbox.c2) + 1) *
 			(Math.abs(bbox.r1 - bbox.r2) + 1);
@@ -1046,12 +1030,12 @@ cArea.prototype.isValid = function () {
 		});
 		return new cNumber(count);
 	};
-cArea.prototype.foreach = function ( action ) {
-    var r = this.getRange();
-    if ( r ) {
-        r._foreach2( action );
-    }
-};
+	cArea.prototype.foreach = function (action) {
+		var r = this.getRange();
+		if (r) {
+			r._foreach2(action);
+		}
+	};
 	cArea.prototype.foreach2 = function (action) {
 		var r = this.getRange();
 		if (r) {
@@ -1077,33 +1061,33 @@ cArea.prototype.foreach = function ( action ) {
 		});
 		return [arr];
 	};
-cArea.prototype.getRefMatrix = function () {
-    var t = this, arr = [], r = this.getRange();
-    r._foreach2( function ( cell, i, j, r1, c1 ) {
-    if (!arr[i - r1]) {
-            arr[i - r1] = [];
-    }
-    if (cell) {
-        arr[i - r1][j - c1] = new cRef( cell.getName(), t.ws );
-    } else {
-            arr[i - r1][j - c1] = new cRef( t.ws._getCell( i, j ).getName(), t.ws );
-    }
-    } );
-    return arr;
-};
-cArea.prototype.index = function ( r, c ) {
-    var bbox = this.getBBox0();
-    bbox.normalize();
-    var box = {c1: 1, c2: bbox.c2 - bbox.c1 + 1, r1: 1, r2: bbox.r2 - bbox.r1 + 1};
+	cArea.prototype.getRefMatrix = function () {
+		var t = this, arr = [], r = this.getRange();
+		r._foreach2(function (cell, i, j, r1, c1) {
+			if (!arr[i - r1]) {
+				arr[i - r1] = [];
+			}
+			if (cell) {
+				arr[i - r1][j - c1] = new cRef(cell.getName(), t.ws);
+			} else {
+				arr[i - r1][j - c1] = new cRef(t.ws._getCell(i, j).getName(), t.ws);
+			}
+		});
+		return arr;
+	};
+	cArea.prototype.index = function (r, c) {
+		var bbox = this.getBBox0();
+		bbox.normalize();
+		var box = {c1: 1, c2: bbox.c2 - bbox.c1 + 1, r1: 1, r2: bbox.r2 - bbox.r1 + 1};
 
-    if ( r < box.r1 || r > box.r2 || c < box.c1 || c > box.c2 ) {
-        return new cError( cErrorType.bad_reference );
-    }
-};
+		if (r < box.r1 || r > box.r2 || c < box.c1 || c > box.c2) {
+			return new cError(cErrorType.bad_reference);
+		}
+	};
 
 	/** @constructor */
 	function cArea3D(val, wsFrom, wsTo) {/*Area3D means "Sheat1!A1:E5" for example*/
-		this.constructor.call(this, val, cElementType.cellsRange3D);
+		this.constructor.call(this, val);
 
 		this.bbox = null;
 		if (val) {
@@ -1120,10 +1104,10 @@ cArea.prototype.index = function ( r, c ) {
 	}
 
 	cArea3D.prototype = Object.create(cBaseType.prototype);
+	cArea3D.prototype.type = cElementType.cellsRange3D;
 	cArea3D.prototype.clone = function () {
 		var oRes = new cArea3D(null, this.wsFrom, this.wsTo);
-//	cBaseType.prototype.cloneTo.call( this, oRes );
-		this.constructor.prototype.cloneTo.call(this, oRes);
+		this.cloneTo(oRes);
 		if (this.bbox) {
 			oRes.bbox = this.bbox.clone();
 		}
@@ -1351,7 +1335,7 @@ cArea.prototype.index = function ( r, c ) {
 
 	/** @constructor */
 	function cRef(val, ws) {/*Ref means A1 for example*/
-		this.constructor.call(this, val, cElementType.cell);
+		this.constructor.call(this, val);
 
 		this.ws = ws;
 		this.range = null;
@@ -1361,11 +1345,11 @@ cArea.prototype.index = function ( r, c ) {
 	}
 
 	cRef.prototype = Object.create(cBaseType.prototype);
+	cRef.prototype.type = cElementType.cell;
 	cRef.prototype.clone = function (opt_ws) {
 		var ws = opt_ws ? opt_ws : this.ws;
 		var oRes = new cRef(null, ws);
-//	cBaseType.prototype.cloneTo.call( this, oRes );
-		this.constructor.prototype.cloneTo.call(this, oRes);
+		this.cloneTo(oRes);
 		if (this.range) {
 			oRes.range = this.range.clone(ws);
 		}
@@ -1417,7 +1401,7 @@ cArea.prototype.index = function ( r, c ) {
 
 	/** @constructor */
 	function cRef3D(val, ws) {/*Ref means Sheat1!A1 for example*/
-		this.constructor.call(this, val, cElementType.cell3D);
+		this.constructor.call(this, val);
 
 		this.ws = ws;
 		this.range = null;
@@ -1427,11 +1411,11 @@ cArea.prototype.index = function ( r, c ) {
 	}
 
 	cRef3D.prototype = Object.create(cBaseType.prototype);
+	cRef3D.prototype.type = cElementType.cell3D;
 	cRef3D.prototype.clone = function (opt_ws) {
 		var ws = opt_ws ? opt_ws : this.ws;
 		var oRes = new cRef3D(null, null);
-//	cBaseType.prototype.cloneTo.call( this, oRes );
-		this.constructor.prototype.cloneTo.call(this, oRes);
+		this.cloneTo(oRes);
 		if (opt_ws && this.ws.getName() == opt_ws.getName()) {
 			oRes.ws = opt_ws;
 		} else {
@@ -1500,36 +1484,38 @@ cArea.prototype.index = function ( r, c ) {
 		return excludeHiddenRows && _r && this.ws.getRowHidden(_r.r1);
 	};
 
-/** @constructor */
-function cEmpty() {
-    this.constructor.call( this, "", cElementType.empty );
-}
+	/** @constructor */
+	function cEmpty() {
+		this.constructor.call(this, "");
+	}
 
-cEmpty.prototype = Object.create( cBaseType.prototype );
-cEmpty.prototype.tocNumber = function () {
-    return new cNumber( 0 );
-};
-cEmpty.prototype.tocBool = function () {
-    return new cBool( false );
-};
-cEmpty.prototype.tocString = function () {
-    return new cString( "" );
-};
-cEmpty.prototype.toString = function () {
-    return "";
-};
+	cEmpty.prototype = Object.create(cBaseType.prototype);
+	cEmpty.prototype.type = cElementType.empty;
+	cEmpty.prototype.tocNumber = function () {
+		return new cNumber(0);
+	};
+	cEmpty.prototype.tocBool = function () {
+		return new cBool(false);
+	};
+	cEmpty.prototype.tocString = function () {
+		return new cString("");
+	};
+	cEmpty.prototype.toString = function () {
+		return "";
+	};
 
 	/** @constructor */
 	function cName(val, ws) {
-		this.constructor.call(this, val, cElementType.name);
+		this.constructor.call(this, val);
 		this.ws = ws;
 	}
 
 	cName.prototype = Object.create(cBaseType.prototype);
+	cName.prototype.type = cElementType.name;
 	cName.prototype.clone = function (opt_ws) {
 		var ws = opt_ws ? opt_ws : this.ws;
 		var oRes = new cName(this.value, ws);
-		this.constructor.prototype.cloneTo.call(this, oRes);
+		this.cloneTo(oRes);
 		return oRes;
 	};
 	cName.prototype.toRef = function () {
@@ -1585,34 +1571,35 @@ cEmpty.prototype.toString = function () {
 		return this.ws;
 	};
 
-/** @constructor */
-function cStrucTable( val, wb, ws ) {
-    this.constructor.call( this, val, cElementType.table );
-    this.wb = wb;
-    this.ws = ws;
+	/** @constructor */
+	function cStrucTable(val, wb, ws) {
+		this.constructor.call(this, val);
+		this.wb = wb;
+		this.ws = ws;
 
-	this.tableName = null;
-	this.oneColumnIndex = null;
-	this.colStartIndex = null;
-	this.colEndIndex = null;
-	this.reservedColumnIndex = null;
-	this.hdtIndexes = null;
-	this.hdtcstartIndex = null;
-	this.hdtcendIndex = null;
+		this.tableName = null;
+		this.oneColumnIndex = null;
+		this.colStartIndex = null;
+		this.colEndIndex = null;
+		this.reservedColumnIndex = null;
+		this.hdtIndexes = null;
+		this.hdtcstartIndex = null;
+		this.hdtcendIndex = null;
 
-    this.isDynamic = false;//#This row
-    this.area = null;
-}
+		this.isDynamic = false;//#This row
+		this.area = null;
+	}
 
-cStrucTable.prototype = Object.create( cBaseType.prototype );
-	cStrucTable.prototype.createFromVal = function(val, wb, ws) {
+	cStrucTable.prototype = Object.create(cBaseType.prototype);
+	cStrucTable.prototype.type = cElementType.table;
+	cStrucTable.prototype.createFromVal = function (val, wb, ws) {
 		var res = new cStrucTable(val[0], wb, ws);
 		if (res._parseVal(val)) {
 			res._updateArea(null, false);
 		}
-		return (res.area && res.area.type != cElementType.error) ? res : new cError( cErrorType.bad_reference );
+		return (res.area && res.area.type != cElementType.error) ? res : new cError(cErrorType.bad_reference);
 	};
-	cStrucTable.prototype.clone = function(opt_ws) {
+	cStrucTable.prototype.clone = function (opt_ws) {
 		var ws = opt_ws ? opt_ws : this.ws;
 		var wb = ws.workbook;
 		var oRes = new cStrucTable(this.value, wb, ws);
@@ -1629,41 +1616,41 @@ cStrucTable.prototype = Object.create( cBaseType.prototype );
 
 		oRes.isDynamic = this.isDynamic;
 		if (this.area) {
-			if(this.area.clone){
+			if (this.area.clone) {
 				oRes.area = this.area.clone(opt_ws);
 			} else {
 				oRes.area = this.area;
 			}
 		}
-		this.constructor.prototype.cloneTo.call(this, oRes);
+		this.cloneTo(oRes);
 		return oRes;
 	};
-	cStrucTable.prototype._cloneIndex = function(val) {
+	cStrucTable.prototype._cloneIndex = function (val) {
 		if (val) {
 			return {wsID: val.wsID, index: val.index, name: val.name};
 		} else {
 			return val;
 		}
 	};
-cStrucTable.prototype.toRef = function (opt_bbox) {
-	//opt_bbox usefull only for #This row
-	//case null == opt_bbox works like FormulaTablePartInfo.data
-	var table = this.wb.getDefinesNames( this.tableName, this.ws ? this.ws.getId() : null );
-	if ( !table || !table.ref ) {
-		return new cError( cErrorType.wrong_name );
-	}
-    if(!this.area || this.isDynamic){
-        this._updateArea(opt_bbox, true );
-    }
-    return this.area;
-};
-cStrucTable.prototype.toString = function () {
-	return this._toString(false);
-};
-cStrucTable.prototype.toLocaleString = function () {
-	return this._toString(true);
-};
-	cStrucTable.prototype._toString = function(isLocal) {
+	cStrucTable.prototype.toRef = function (opt_bbox) {
+		//opt_bbox usefull only for #This row
+		//case null == opt_bbox works like FormulaTablePartInfo.data
+		var table = this.wb.getDefinesNames(this.tableName, this.ws ? this.ws.getId() : null);
+		if (!table || !table.ref) {
+			return new cError(cErrorType.wrong_name);
+		}
+		if (!this.area || this.isDynamic) {
+			this._updateArea(opt_bbox, true);
+		}
+		return this.area;
+	};
+	cStrucTable.prototype.toString = function () {
+		return this._toString(false);
+	};
+	cStrucTable.prototype.toLocaleString = function () {
+		return this._toString(true);
+	};
+	cStrucTable.prototype._toString = function (isLocal) {
 		var tblStr, columns_1, columns_2;
 		var table = this.wb.getDefinesNames(this.tableName, null);
 		if (!table) {
@@ -1715,7 +1702,7 @@ cStrucTable.prototype.toLocaleString = function () {
 		}
 		return tblStr;
 	};
-	cStrucTable.prototype._parseVal = function(val) {
+	cStrucTable.prototype._parseVal = function (val) {
 		var bRes = true;
 		this.tableName = val['tableName'];
 		if (val['oneColumn']) {
@@ -1746,8 +1733,7 @@ cStrucTable.prototype.toLocaleString = function () {
 			while (null !== (m = re.exec(val['hdt']))) {
 				var param = parserHelp.getColumnTypeByName(m[1]);
 				if (AscCommon.FormulaTablePartInfo.thisRow == param ||
-					AscCommon.FormulaTablePartInfo.headers == param ||
-					AscCommon.FormulaTablePartInfo.totals == param) {
+					AscCommon.FormulaTablePartInfo.headers == param || AscCommon.FormulaTablePartInfo.totals == param) {
 					this.isDynamic = true;
 				}
 				this.hdtIndexes.push(param);
@@ -1766,7 +1752,7 @@ cStrucTable.prototype.toLocaleString = function () {
 		}
 		return bRes;
 	};
-	cStrucTable.prototype._updateArea = function(opt_bbox, opt_toRef) {
+	cStrucTable.prototype._updateArea = function (opt_bbox, opt_toRef) {
 		var paramObj = {param: null, startCol: null, endCol: null, cell: opt_bbox, toRef: opt_toRef};
 		var isThisRow = false;
 		var tableData;
@@ -1783,7 +1769,7 @@ cStrucTable.prototype.toLocaleString = function () {
 		} else if (this.hdtIndexes || this.hdtcstartIndex) {
 			var data, range;
 			if (this.hdtIndexes) {
-				for(var  i = 0 ; i < this.hdtIndexes.length; ++i){
+				for (var i = 0; i < this.hdtIndexes.length; ++i) {
 					paramObj.param = this.hdtIndexes[i];
 					isThisRow = AscCommon.FormulaTablePartInfo.thisRow == paramObj.param;
 					data = this.wb.getTableRangeForFormula(this.tableName, paramObj);
@@ -1844,21 +1830,21 @@ cStrucTable.prototype.toLocaleString = function () {
 		return this.area;
 	};
 	cStrucTable.prototype._createAreaError = function (isThisRow) {
-		if(isThisRow){
-			return this.area = new cError( cErrorType.wrong_value_type );
+		if (isThisRow) {
+			return this.area = new cError(cErrorType.wrong_value_type);
 		} else {
-			return this.area = new cError( cErrorType.bad_reference );
+			return this.area = new cError(cErrorType.bad_reference);
 		}
 	};
-cStrucTable.prototype._buildLocalTableString = function (reservedColumn,local) {
-  return parserHelp.getColumnNameByType(reservedColumn, local);
-};
+	cStrucTable.prototype._buildLocalTableString = function (reservedColumn, local) {
+		return parserHelp.getColumnNameByType(reservedColumn, local);
+	};
 	cStrucTable.prototype.changeDefName = function (from, to) {
 		if (this.tableName == from.name) {
 			this.tableName = to.name;
 		}
 	};
-	cStrucTable.prototype.removeTableColumn = function(deleted) {
+	cStrucTable.prototype.removeTableColumn = function (deleted) {
 		if (this.oneColumnIndex) {
 			if (deleted[this.oneColumnIndex.name]) {
 				return true;
@@ -1909,12 +1895,12 @@ cStrucTable.prototype._buildLocalTableString = function (reservedColumn,local) {
 		}
 		return false;
 	};
-	cStrucTable.prototype.changeTableRef = function() {
-		if(!this.isDynamic){
+	cStrucTable.prototype.changeTableRef = function () {
+		if (!this.isDynamic) {
 			this._updateArea(null, false);
 		}
 	};
-	cStrucTable.prototype.renameTableColumn = function() {
+	cStrucTable.prototype.renameTableColumn = function () {
 		var bRes = true;
 		var columns1, columns2;
 		if (this.oneColumnIndex) {
@@ -1933,14 +1919,16 @@ cStrucTable.prototype._buildLocalTableString = function (reservedColumn,local) {
 			} else {
 				bRes = false;
 			}
-		} if (this.hdtcstartIndex) {
+		}
+		if (this.hdtcstartIndex) {
 			columns1 = this.wb.getTableNameColumnByIndex(this.tableName, this.hdtcstartIndex.index);
 			if (columns1) {
 				this.hdtcstartIndex.name = columns1.columnName;
 			} else {
 				bRes = false;
 			}
-		} if (this.hdtcendIndex) {
+		}
+		if (this.hdtcendIndex) {
 			columns1 = this.wb.getTableNameColumnByIndex(this.tableName, this.hdtcendIndex.index);
 			if (columns1) {
 				this.hdtcendIndex.name = columns1.columnName;
@@ -1954,10 +1942,10 @@ cStrucTable.prototype._buildLocalTableString = function (reservedColumn,local) {
 	/** @constructor */
 	function cName3D(val, ws) {
 		cName.call(this, val, ws);
-		this.type = cElementType.name3D;
 	}
 
 	cName3D.prototype = Object.create(cName.prototype);
+	cName3D.prototype.type = cElementType.name3D;
 	cName3D.prototype.clone = function (opt_ws) {
 		var ws;
 		if (opt_ws && opt_ws.getName() === this.ws.getName()) {
@@ -1966,7 +1954,7 @@ cStrucTable.prototype._buildLocalTableString = function (reservedColumn,local) {
 			ws = this.ws;
 		}
 		var oRes = new cName3D(this.value, ws);
-		this.constructor.prototype.cloneTo.call(this, oRes);
+		this.cloneTo(oRes);
 		return oRes;
 	};
 	cName3D.prototype.changeSheet = function (wsLast, wsNew) {
@@ -1978,187 +1966,192 @@ cStrucTable.prototype._buildLocalTableString = function (reservedColumn,local) {
 		return parserHelp.getEscapeSheetName(this.ws.getName()) + "!" + this.constructor.prototype.toString.call(this);
 	};
 
-/** @constructor */
-function cArray() {
-    this.constructor.call( this, undefined, cElementType.array );
-    this.array = [];
-    this.rowCount = 0;
-    this.countElementInRow = [];
-    this.countElement = 0;
-}
+	/** @constructor */
+	function cArray() {
+		this.constructor.call(this, undefined);
+		this.array = [];
+		this.rowCount = 0;
+		this.countElementInRow = [];
+		this.countElement = 0;
+	}
 
-cArray.prototype = Object.create( cBaseType.prototype );
-cArray.prototype.addRow = function () {
-    this.array[this.array.length] = [];
-    this.countElementInRow[this.rowCount++] = 0;
-};
-cArray.prototype.addElement = function ( element ) {
-    if ( this.array.length === 0 ) {
-        this.addRow();
-    }
-  var arr = this.array, subArr = arr[this.rowCount - 1];
-    subArr[subArr.length] = element;
-    this.countElementInRow[this.rowCount - 1]++;
-    this.countElement++;
-};
-cArray.prototype.getRow = function ( rowIndex ) {
-    if ( rowIndex < 0 || rowIndex > this.array.length - 1 ) {
-        return null;
-    }
-    return this.array[rowIndex];
-};
-cArray.prototype.getCol = function ( colIndex ) {
-    var col = [];
-    for ( var i = 0; i < this.rowCount; i++ ) {
-        col.push( this.array[i][colIndex] );
-    }
-    return col;
-};
-cArray.prototype.getElementRowCol = function ( row, col ) {
-    if ( row > this.rowCount || col > this.getCountElementInRow() ) {
-        return new cError( cErrorType.not_available );
-    }
-    return this.array[row][col];
-};
-cArray.prototype.getElement = function ( index ) {
-    for ( var i = 0; i < this.rowCount; i++ ) {
-        if ( index > this.countElementInRow[i].length ) {
-            index -= this.countElementInRow[i].length;
-    } else {
-            return this.array[i][index];
-        }
-    }
-    return null;
-};
-cArray.prototype.foreach = function ( action ) {
-    if ( typeof (action) !== 'function' ) {
-        return true;
-    }
-    for ( var ir = 0; ir < this.rowCount; ir++ ) {
-        for ( var ic = 0; ic < this.countElementInRow[ir]; ic++ ) {
-            if ( action.call( this, this.array[ir][ic], ir, ic ) ) {
-                return true;
-            }
-        }
-    }
-    return undefined;
-};
-cArray.prototype.getCountElement = function () {
-    return this.countElement;
-};
-cArray.prototype.getCountElementInRow = function () {
-    return this.countElementInRow[0];
-};
-cArray.prototype.getRowCount = function () {
-    return this.rowCount;
-};
-cArray.prototype.tocNumber = function () {
-    var retArr = new cArray();
-    for ( var ir = 0; ir < this.rowCount; ir++, retArr.addRow() ) {
-        for ( var ic = 0; ic < this.countElementInRow[ir]; ic++ ) {
-            retArr.addElement( this.array[ir][ic].tocNumber() );
-        }
-        if ( ir === this.rowCount - 1 ) {
-            break;
-        }
-    }
-    return retArr;
-};
-cArray.prototype.tocString = function () {
-    var retArr = new cArray();
-    for ( var ir = 0; ir < this.rowCount; ir++, retArr.addRow() ) {
-        for ( var ic = 0; ic < this.countElementInRow[ir]; ic++ ) {
-            retArr.addElement( this.array[ir][ic].tocString() );
-        }
-        if ( ir === this.rowCount - 1 ) {
-            break;
-        }
-    }
-    return retArr;
-};
-cArray.prototype.tocBool = function () {
-    var retArr = new cArray();
-    for ( var ir = 0; ir < this.rowCount; ir++, retArr.addRow() ) {
-        for ( var ic = 0; ic < this.countElementInRow[ir]; ic++ ) {
-            retArr.addElement( this.array[ir][ic].tocBool() );
-        }
-        if ( ir === this.rowCount - 1 ) {
-            break;
-        }
-    }
-    return retArr;
-};
-cArray.prototype.toString = function () {
-    var ret = "";
-  for (var ir = 0; ir < this.rowCount; ir++, ret += FormulaSeparators.arrayRowSeparatorDef) {
-    for (var ic = 0; ic < this.countElementInRow[ir]; ic++, ret += FormulaSeparators.arrayColSeparatorDef) {
-            if ( this.array[ir][ic] instanceof cString ) {
-                ret += '"' + this.array[ir][ic].toString() + '"';
-      } else {
-                ret += this.array[ir][ic].toString() + "";
-            }
-        }
-    if (ret[ret.length - 1] === FormulaSeparators.arrayColSeparatorDef) {
-            ret = ret.substring( 0, ret.length - 1 );
-        }
-    }
-  if (ret[ret.length - 1] === FormulaSeparators.arrayRowSeparatorDef) {
-        ret = ret.substring( 0, ret.length - 1 );
-    }
-    return "{" + ret + "}";
-};
-cArray.prototype.toLocaleString = function ( digitDelim ) {
-    var ret = "";
-  for (var ir = 0; ir < this.rowCount; ir++, ret += digitDelim ? FormulaSeparators.arrayRowSeparator : FormulaSeparators.arrayRowSeparatorDef) {
-    for (var ic = 0; ic < this.countElementInRow[ir];
-         ic++, ret += digitDelim ? FormulaSeparators.arrayColSeparator : FormulaSeparators.arrayColSeparatorDef) {
-            if ( this.array[ir][ic] instanceof cString ) {
-                ret += '"' + this.array[ir][ic].toLocaleString( digitDelim ) + '"';
-      } else {
-                ret += this.array[ir][ic].toLocaleString( digitDelim ) + "";
-            }
-        }
-    if (ret[ret.length - 1] === digitDelim ? FormulaSeparators.arrayColSeparator : FormulaSeparators.arrayColSeparatorDef) {
-            ret = ret.substring( 0, ret.length - 1 );
-        }
-    }
-  if (ret[ret.length - 1] === digitDelim ? FormulaSeparators.arrayRowSeparator : FormulaSeparators.arrayRowSeparatorDef) {
-        ret = ret.substring( 0, ret.length - 1 );
-    }
-    return "{" + ret + "}";
-};
-cArray.prototype.isValidArray = function () {
-    if ( this.countElement < 1 ) {
-        return false;
-    }
-    for ( var i = 0; i < this.rowCount - 1; i++ ) {
-        if ( this.countElementInRow[i] - this.countElementInRow[i + 1] !== 0 ) {
-            return false;
-        }
-    }
-    return true;
-};
-cArray.prototype.getValue2 = function ( i, j ) {
-    var result = this.array[i];
-    return result ? result[j] : result;
-};
-cArray.prototype.getMatrix = function () {
-    return this.array;
-};
-cArray.prototype.fillFromArray = function ( arr ) {
-    this.array = arr;
-    this.rowCount = arr.length;
-    for ( var i = 0; i < arr.length; i++ ) {
-        this.countElementInRow[i] = arr[i].length;
-        this.countElement += arr[i].length;
-    }
-};
+	cArray.prototype = Object.create(cBaseType.prototype);
+	cArray.prototype.type = cElementType.array;
+	cArray.prototype.addRow = function () {
+		this.array[this.array.length] = [];
+		this.countElementInRow[this.rowCount++] = 0;
+	};
+	cArray.prototype.addElement = function (element) {
+		if (this.array.length === 0) {
+			this.addRow();
+		}
+		var arr = this.array, subArr = arr[this.rowCount - 1];
+		subArr[subArr.length] = element;
+		this.countElementInRow[this.rowCount - 1]++;
+		this.countElement++;
+	};
+	cArray.prototype.getRow = function (rowIndex) {
+		if (rowIndex < 0 || rowIndex > this.array.length - 1) {
+			return null;
+		}
+		return this.array[rowIndex];
+	};
+	cArray.prototype.getCol = function (colIndex) {
+		var col = [];
+		for (var i = 0; i < this.rowCount; i++) {
+			col.push(this.array[i][colIndex]);
+		}
+		return col;
+	};
+	cArray.prototype.getElementRowCol = function (row, col) {
+		if (row > this.rowCount || col > this.getCountElementInRow()) {
+			return new cError(cErrorType.not_available);
+		}
+		return this.array[row][col];
+	};
+	cArray.prototype.getElement = function (index) {
+		for (var i = 0; i < this.rowCount; i++) {
+			if (index > this.countElementInRow[i].length) {
+				index -= this.countElementInRow[i].length;
+			} else {
+				return this.array[i][index];
+			}
+		}
+		return null;
+	};
+	cArray.prototype.foreach = function (action) {
+		if (typeof (action) !== 'function') {
+			return true;
+		}
+		for (var ir = 0; ir < this.rowCount; ir++) {
+			for (var ic = 0; ic < this.countElementInRow[ir]; ic++) {
+				if (action.call(this, this.array[ir][ic], ir, ic)) {
+					return true;
+				}
+			}
+		}
+		return undefined;
+	};
+	cArray.prototype.getCountElement = function () {
+		return this.countElement;
+	};
+	cArray.prototype.getCountElementInRow = function () {
+		return this.countElementInRow[0];
+	};
+	cArray.prototype.getRowCount = function () {
+		return this.rowCount;
+	};
+	cArray.prototype.tocNumber = function () {
+		var retArr = new cArray();
+		for (var ir = 0; ir < this.rowCount; ir++, retArr.addRow()) {
+			for (var ic = 0; ic < this.countElementInRow[ir]; ic++) {
+				retArr.addElement(this.array[ir][ic].tocNumber());
+			}
+			if (ir === this.rowCount - 1) {
+				break;
+			}
+		}
+		return retArr;
+	};
+	cArray.prototype.tocString = function () {
+		var retArr = new cArray();
+		for (var ir = 0; ir < this.rowCount; ir++, retArr.addRow()) {
+			for (var ic = 0; ic < this.countElementInRow[ir]; ic++) {
+				retArr.addElement(this.array[ir][ic].tocString());
+			}
+			if (ir === this.rowCount - 1) {
+				break;
+			}
+		}
+		return retArr;
+	};
+	cArray.prototype.tocBool = function () {
+		var retArr = new cArray();
+		for (var ir = 0; ir < this.rowCount; ir++, retArr.addRow()) {
+			for (var ic = 0; ic < this.countElementInRow[ir]; ic++) {
+				retArr.addElement(this.array[ir][ic].tocBool());
+			}
+			if (ir === this.rowCount - 1) {
+				break;
+			}
+		}
+		return retArr;
+	};
+	cArray.prototype.toString = function () {
+		var ret = "";
+		for (var ir = 0; ir < this.rowCount; ir++, ret += FormulaSeparators.arrayRowSeparatorDef) {
+			for (var ic = 0; ic < this.countElementInRow[ir]; ic++, ret += FormulaSeparators.arrayColSeparatorDef) {
+				if (this.array[ir][ic] instanceof cString) {
+					ret += '"' + this.array[ir][ic].toString() + '"';
+				} else {
+					ret += this.array[ir][ic].toString() + "";
+				}
+			}
+			if (ret[ret.length - 1] === FormulaSeparators.arrayColSeparatorDef) {
+				ret = ret.substring(0, ret.length - 1);
+			}
+		}
+		if (ret[ret.length - 1] === FormulaSeparators.arrayRowSeparatorDef) {
+			ret = ret.substring(0, ret.length - 1);
+		}
+		return "{" + ret + "}";
+	};
+	cArray.prototype.toLocaleString = function (digitDelim) {
+		var ret = "";
+		for (var ir = 0; ir < this.rowCount;
+			 ir++, ret += digitDelim ? FormulaSeparators.arrayRowSeparator : FormulaSeparators.arrayRowSeparatorDef) {
+			for (var ic = 0; ic < this.countElementInRow[ir]; ic++, ret +=
+				digitDelim ? FormulaSeparators.arrayColSeparator : FormulaSeparators.arrayColSeparatorDef) {
+				if (this.array[ir][ic] instanceof cString) {
+					ret += '"' + this.array[ir][ic].toLocaleString(digitDelim) + '"';
+				} else {
+					ret += this.array[ir][ic].toLocaleString(digitDelim) + "";
+				}
+			}
+			if (ret[ret.length - 1] === digitDelim ? FormulaSeparators.arrayColSeparator :
+					FormulaSeparators.arrayColSeparatorDef) {
+				ret = ret.substring(0, ret.length - 1);
+			}
+		}
+		if (ret[ret.length - 1] === digitDelim ? FormulaSeparators.arrayRowSeparator :
+				FormulaSeparators.arrayRowSeparatorDef) {
+			ret = ret.substring(0, ret.length - 1);
+		}
+		return "{" + ret + "}";
+	};
+	cArray.prototype.isValidArray = function () {
+		if (this.countElement < 1) {
+			return false;
+		}
+		for (var i = 0; i < this.rowCount - 1; i++) {
+			if (this.countElementInRow[i] - this.countElementInRow[i + 1] !== 0) {
+				return false;
+			}
+		}
+		return true;
+	};
+	cArray.prototype.getValue2 = function (i, j) {
+		var result = this.array[i];
+		return result ? result[j] : result;
+	};
+	cArray.prototype.getMatrix = function () {
+		return this.array;
+	};
+	cArray.prototype.fillFromArray = function (arr) {
+		this.array = arr;
+		this.rowCount = arr.length;
+		for (var i = 0; i < arr.length; i++) {
+			this.countElementInRow[i] = arr[i].length;
+			this.countElement += arr[i].length;
+		}
+	};
 
-/** @constructor */
-function cUndefined() {
-    this.value = undefined;
-}
-cUndefined.prototype = Object.create( cBaseType.prototype );
+	/** @constructor */
+	function cUndefined() {
+		this.value = undefined;
+	}
+
+	cUndefined.prototype = Object.create(cBaseType.prototype);
 
 	function checkTypeCell(cell) {
 		if (cell && !cell.isEmptyText()) {
@@ -2179,206 +2172,189 @@ cUndefined.prototype = Object.create( cBaseType.prototype );
 	}
 
   /*--------------------------------------------------------------------------*/
-  /*Base classes for operators & functions */
-  /** @constructor */
-  function cBaseOperator(name, priority, argumentCount) {
-    this.name = name ? name : '';
-    this.priority = (priority !== undefined) ? priority : 10;
-    this.type = cElementType.operator;
-    this.isRightAssociative = false;
-    this.argumentsCurrent = (argumentCount !== undefined) ? argumentCount : 2;
-    this.value = null;
-    this.formatType = {
-      def: -1, //подразумевается формат первой ячейки входящей в формулу.
-      noneFormat: -2
-    };
-    this.numFormat = this.formatType.def;
-  }
+	/*Base classes for operators & functions */
+	/** @constructor */
+	function cBaseOperator(name, priority, argumentCount) {
+		this.name = name ? name : '';
+		this.priority = (priority !== undefined) ? priority : 10;
+		this.isRightAssociative = false;
+		this.argumentsCurrent = (argumentCount !== undefined) ? argumentCount : 2;
+		this.value = null;
+	}
 
-  cBaseOperator.prototype.getArguments = function () {
-    return this.argumentsCurrent;
-  };
-  cBaseOperator.prototype.toString = function () {
-    return this.name;
-  };
-  cBaseOperator.prototype.Calculate = function () {
-    return null;
-  };
-  cBaseOperator.prototype.Assemble = function (arg) {
-    var str = "";
-    if (this.argumentsCurrent === 2) {
-      str = arg[0] + "" + this.name + "" + arg[1];
-    } else {
-      str = this.name + "" + arg[0];
-    }
-    return new cString(str);
-  };
-  cBaseOperator.prototype.Assemble2 = function (arg, start, count) {
-    var str = "";
-    if (this.argumentsCurrent === 2) {
-      str += arg[start + count - 2] + this.name + arg[start + count - 1];
-    } else {
-      str += this.name + arg[start];
-    }
-    return new cString(str);
-  };
-  cBaseOperator.prototype.Assemble2Locale = function (arg, start, count, locale, digitDelim) {
-    var str = "";
-    if (this.argumentsCurrent === 2) {
-      str += arg[start + count - 2].toLocaleString(digitDelim) + this.name +
-        arg[start + count - 1].toLocaleString(digitDelim);
-    } else {
-      str += this.name + arg[start];
-    }
-    return new cString(str);
-  };
+	cBaseOperator.prototype.type = cElementType.operator;
+	cBaseOperator.prototype.getArguments = function () {
+		return this.argumentsCurrent;
+	};
+	cBaseOperator.prototype.toString = function () {
+		return this.name;
+	};
+	cBaseOperator.prototype.Calculate = function () {
+		return null;
+	};
+	cBaseOperator.prototype.Assemble = function (arg) {
+		var str = "";
+		if (this.argumentsCurrent === 2) {
+			str = arg[0] + "" + this.name + "" + arg[1];
+		} else {
+			str = this.name + "" + arg[0];
+		}
+		return new cString(str);
+	};
+	cBaseOperator.prototype.Assemble2 = function (arg, start, count) {
+		var str = "";
+		if (this.argumentsCurrent === 2) {
+			str += arg[start + count - 2] + this.name + arg[start + count - 1];
+		} else {
+			str += this.name + arg[start];
+		}
+		return new cString(str);
+	};
+	cBaseOperator.prototype.Assemble2Locale = function (arg, start, count, locale, digitDelim) {
+		var str = "";
+		if (this.argumentsCurrent === 2) {
+			str += arg[start + count - 2].toLocaleString(digitDelim) + this.name +
+				arg[start + count - 1].toLocaleString(digitDelim);
+		} else {
+			str += this.name + arg[start];
+		}
+		return new cString(str);
+	};
 
-  /** @constructor */
-  function cBaseFunction(name, argMin, argMax) {
-    this.name = name;
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = argMin ? argMin : 0;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = argMax ? argMax : 255;
-    this.formatType = {
-      def: -1, //подразумевается формат первой ячейки входящей в формулу.
-      noneFormat: -2
-    };
-    this.numFormat = this.formatType.def;
+	/** @constructor */
+	function cBaseFunction(name, argMin, argMax) {
+		this.name = name;
+		this.value = null;
+		this.argumentsMin = argMin ? argMin : 0;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = argMax ? argMax : 255;
 //    this.isXLFN = rx_sFuncPref.test(this.name);
-  }
-  cBaseFunction.prototype.Calculate = function () {
-    this.value = new cError(cErrorType.wrong_name);
-    return this.value;
-  };
-  cBaseFunction.prototype.setArgumentsMin = function (count) {
-    this.argumentsMin = count;
-  };
-  cBaseFunction.prototype.setArgumentsMax = function (count) {
-    this.argumentsMax = count;
-  };
-  cBaseFunction.prototype.DecrementArguments = function () {
-    --this.argumentsCurrent;
-  };
-  cBaseFunction.prototype.IncrementArguments = function () {
-    ++this.argumentsCurrent;
-  };
-  cBaseFunction.prototype.setName = function (name) {
-    this.name = name;
-  };
-  cBaseFunction.prototype.setArgumentsCount = function (count) {
-    this.argumentsCurrent = count;
-  };
-  cBaseFunction.prototype.getArguments = function () {
-    return this.argumentsCurrent;
-  };
-  cBaseFunction.prototype.getMaxArguments = function () {
-    return this.argumentsMax;
-  };
-  cBaseFunction.prototype.getMinArguments = function () {
-    return this.argumentsMin;
-  };
-  cBaseFunction.prototype.Assemble = function (arg) {
-    var str = "";
-    for (var i = 0; i < arg.length; i++) {
-      str += arg[i].toString();
-      if (i !== arg.length - 1) {
-        str += ",";
-      }
-    }
-    if (this.isXLFN) {
-      return new cString("_xlfn." + this.name + "(" + str + ")");
-    }
-    return new cString(this.toString() + "(" + str + ")");
-  };
-  cBaseFunction.prototype.Assemble2 = function (arg, start, count) {
+	}
 
-    var str = "", c = start + count - 1;
-    for (var i = start; i <= c; i++) {
-      str += arg[i].toString();
-      if (i !== c) {
-        str += ",";
-      }
-    }
-    if (this.isXLFN) {
-      return new cString("_xlfn." + this.name + "(" + str + ")");
-    }
-    return new cString(this.toString() + "(" + str + ")");
-  };
-  cBaseFunction.prototype.Assemble2Locale = function (arg, start, count, locale, digitDelim) {
+	cBaseFunction.prototype.type = cElementType.func;
+	cBaseFunction.prototype.numFormat = AscCommonExcel.cNumFormatFirstCell;
+	cBaseFunction.prototype.Calculate = function () {
+		this.value = new cError(cErrorType.wrong_name);
+		return this.value;
+	};
+	cBaseFunction.prototype.DecrementArguments = function () {
+		--this.argumentsCurrent;
+	};
+	cBaseFunction.prototype.IncrementArguments = function () {
+		++this.argumentsCurrent;
+	};
+	cBaseFunction.prototype.setName = function (name) {
+		this.name = name;
+	};
+	cBaseFunction.prototype.setArgumentsCount = function (count) {
+		this.argumentsCurrent = count;
+	};
+	cBaseFunction.prototype.getArguments = function () {
+		return this.argumentsCurrent;
+	};
+	cBaseFunction.prototype.getMaxArguments = function () {
+		return this.argumentsMax;
+	};
+	cBaseFunction.prototype.getMinArguments = function () {
+		return this.argumentsMin;
+	};
+	cBaseFunction.prototype.Assemble = function (arg) {
+		var str = "";
+		for (var i = 0; i < arg.length; i++) {
+			str += arg[i].toString();
+			if (i !== arg.length - 1) {
+				str += ",";
+			}
+		}
+		if (this.isXLFN) {
+			return new cString("_xlfn." + this.name + "(" + str + ")");
+		}
+		return new cString(this.toString() + "(" + str + ")");
+	};
+	cBaseFunction.prototype.Assemble2 = function (arg, start, count) {
 
-    var name = this.toString(), str = "", c = start + count - 1, localeName = locale ? locale[name] : name;
+		var str = "", c = start + count - 1;
+		for (var i = start; i <= c; i++) {
+			str += arg[i].toString();
+			if (i !== c) {
+				str += ",";
+			}
+		}
+		if (this.isXLFN) {
+			return new cString("_xlfn." + this.name + "(" + str + ")");
+		}
+		return new cString(this.toString() + "(" + str + ")");
+	};
+	cBaseFunction.prototype.Assemble2Locale = function (arg, start, count, locale, digitDelim) {
 
-    localeName = localeName || this.toString();
-    for (var i = start; i <= c; i++) {
-      str += arg[i].toLocaleString(digitDelim);
-      if (i !== c) {
-        str += FormulaSeparators.functionArgumentSeparator;
-      }
-    }
-    return new cString(localeName + "(" + str + ")");
-  };
-  cBaseFunction.prototype.toString = function () {
-    return this.name.replace(rx_sFuncPref, "_xlfn.");
-  };
-  cBaseFunction.prototype.setCA = function (arg, ca, numFormat) {
-    this.value = arg;
-    if (ca) {
-      this.value.ca = true;
-    }
-    if (numFormat !== null && numFormat !== undefined) {
-      this.value.numFormat = numFormat;
-    }
-    return this.value;
-  };
-  cBaseFunction.prototype.setFormat = function (f) {
-    this.numFormat = f;
-  };
-  cBaseFunction.prototype.checkArguments = function () {
-    return this.argumentsMin <= this.argumentsCurrent && this.argumentsCurrent <= this.argumentsMax;
-  };
+		var name = this.toString(), str = "", c = start + count - 1, localeName = locale ? locale[name] : name;
 
-/** @constructor */
-function parentLeft() {
-    this.name = "(";
-    this.type = cElementType.operator;
-    this.argumentsCurrent = 1;
-}
+		localeName = localeName || this.toString();
+		for (var i = start; i <= c; i++) {
+			str += arg[i].toLocaleString(digitDelim);
+			if (i !== c) {
+				str += FormulaSeparators.functionArgumentSeparator;
+			}
+		}
+		return new cString(localeName + "(" + str + ")");
+	};
+	cBaseFunction.prototype.toString = function () {
+		return this.name.replace(rx_sFuncPref, "_xlfn.");
+	};
+	cBaseFunction.prototype.setCA = function (arg, ca, numFormat) {
+		this.value = arg;
+		if (ca) {
+			this.value.ca = true;
+		}
+		if (numFormat !== null && numFormat !== undefined) {
+			this.value.numFormat = numFormat;
+		}
+		return this.value;
+	};
+	cBaseFunction.prototype.checkArguments = function () {
+		return this.argumentsMin <= this.argumentsCurrent && this.argumentsCurrent <= this.argumentsMax;
+	};
 
-parentLeft.prototype.constructor = parentLeft;
-parentLeft.prototype.DecrementArguments = function () {
-    --this.argumentsCurrent;
-};
-parentLeft.prototype.IncrementArguments = function () {
-    ++this.argumentsCurrent;
-};
-parentLeft.prototype.toString = function () {
-    return this.name;
-};
-parentLeft.prototype.getArguments = function () {
-    return this.argumentsCurrent;
-};
-parentLeft.prototype.Assemble = function ( arg ) {
-    return new cString( "(" + arg + ")" );
-};
-parentLeft.prototype.Assemble2 = function ( arg, start, count ) {
-    return new cString( "(" + arg[start + count - 1] + ")" );
-};
-parentLeft.prototype.Assemble2Locale = function ( arg, start, count ) {
-    return this.Assemble2( arg, start, count );
-};
+	/** @constructor */
+	function parentLeft() {
+		this.name = "(";
+		this.argumentsCurrent = 1;
+	}
 
-/** @constructor */
-function parentRight() {
-    this.name = ")";
-    this.type = cElementType.operator;
-}
+	parentLeft.prototype.type = cElementType.operator;
+	parentLeft.prototype.constructor = parentLeft;
+	parentLeft.prototype.DecrementArguments = function () {
+		--this.argumentsCurrent;
+	};
+	parentLeft.prototype.IncrementArguments = function () {
+		++this.argumentsCurrent;
+	};
+	parentLeft.prototype.toString = function () {
+		return this.name;
+	};
+	parentLeft.prototype.getArguments = function () {
+		return this.argumentsCurrent;
+	};
+	parentLeft.prototype.Assemble = function (arg) {
+		return new cString("(" + arg + ")");
+	};
+	parentLeft.prototype.Assemble2 = function (arg, start, count) {
+		return new cString("(" + arg[start + count - 1] + ")");
+	};
+	parentLeft.prototype.Assemble2Locale = function (arg, start, count) {
+		return this.Assemble2(arg, start, count);
+	};
 
-parentRight.prototype.constructor = parentRight;
-parentRight.prototype.toString = function () {
-    return this.name;
-};
+	/** @constructor */
+	function parentRight() {
+		this.name = ")";
+	}
+
+	parentRight.prototype.type = cElementType.operator;
+	parentRight.prototype.constructor = parentRight;
+	parentRight.prototype.toString = function () {
+		return this.name;
+	};
 
 	/** @constructor */
 	function cRangeUnionOperator() {
@@ -4771,67 +4747,67 @@ parserFormula.prototype.parse = function(local, digitDelim) {
   }
 };
 
-parserFormula.prototype.calculate = function(opt_defName, opt_range) {
-	if (this.isCalculate) {
-		this.value = new cError(cErrorType.bad_reference);
+	parserFormula.prototype.calculate = function (opt_defName, opt_range) {
+		if (this.isCalculate) {
+			this.value = new cError(cErrorType.bad_reference);
+			this._endCalculate();
+			return this.value;
+		}
+		this.isCalculate = true;
+		if (this.outStack.length < 1) {
+			this.value = new cError(cErrorType.wrong_name);
+			this._endCalculate();
+			return this.value;
+		}
+		var rangeCell = null;
+		if (opt_range) {
+			rangeCell = opt_range;
+		} else if (this.parent && this.parent.onFormulaEvent) {
+			rangeCell = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.GetRangeCell);
+		}
+		if (!rangeCell) {
+			rangeCell = this.ws.getCell3(0, 0);
+		}
+
+		var elemArr = [], _tmp, numFormat = -1, currentElement = null;
+		for (var i = 0; i < this.outStack.length; i++) {
+			currentElement = this.outStack[i];
+			if (currentElement.name == "(") {
+				continue;
+			}
+			if (currentElement.type === cElementType.operator || currentElement.type === cElementType.func) {
+				if (elemArr.length < currentElement.getArguments()) {
+					elemArr = [];
+					this.value = new cError(cErrorType.unsupported_function);
+					this._endCalculate();
+					return this.value;
+				} else {
+					var arg = [];
+					for (var ind = 0; ind < currentElement.getArguments(); ind++) {
+						arg.unshift(elemArr.pop());
+					}
+					_tmp = currentElement.Calculate(arg, rangeCell, opt_defName, this.ws.getId());
+					if (null != _tmp.numFormat) {
+						numFormat = _tmp.numFormat;
+					} else if (0 > numFormat || AscCommonExcel.cNumFormatNone === currentElement.numFormat) {
+						numFormat = currentElement.numFormat;
+					}
+					elemArr.push(_tmp);
+				}
+			} else if (currentElement.type === cElementType.name || currentElement.type === cElementType.name3D) {
+				elemArr.push(currentElement.Calculate(arg, rangeCell));
+			} else if (currentElement.type === cElementType.table) {
+				elemArr.push(currentElement.toRef(rangeCell.getBBox0()));
+			} else {
+				elemArr.push(currentElement);
+			}
+		}
+		this.value = elemArr.pop();
+		this.value.numFormat = numFormat;
+
 		this._endCalculate();
 		return this.value;
-	}
-	this.isCalculate = true;
-	if (this.outStack.length < 1) {
-		this.value = new cError(cErrorType.wrong_name);
-		this._endCalculate();
-		return this.value;
-	}
-	var rangeCell = null;
-	if (opt_range) {
-		rangeCell = opt_range;
-	} else if (this.parent && this.parent.onFormulaEvent) {
-		rangeCell = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.GetRangeCell);
-	}
-	if (!rangeCell) {
-		rangeCell = this.ws.getCell3(0, 0);
-	}
-
-  var elemArr = [], _tmp, numFormat = -1, currentElement = null;
-  for (var i = 0; i < this.outStack.length; i++) {
-    currentElement = this.outStack[i];
-    if (currentElement.name == "(") {
-      continue;
-    }
-    if (currentElement.type == cElementType.operator || currentElement.type == cElementType.func) {
-      if (elemArr.length < currentElement.getArguments()) {
-        elemArr = [];
-		this.value = new cError(cErrorType.unsupported_function);
-		this._endCalculate();
-        return this.value;
-        } else {
-        var arg = [];
-        for (var ind = 0; ind < currentElement.getArguments(); ind++) {
-          arg.unshift(elemArr.pop());
-        }
-          _tmp = currentElement.Calculate(arg, rangeCell, opt_defName, this.ws.getId());
-        if (_tmp.numFormat !== undefined && _tmp.numFormat !== null) {
-          numFormat = _tmp.numFormat; //> numFormat ? _tmp.numFormat : numFormat;
-          } else if (numFormat < 0 || currentElement.numFormat < currentElement.formatType.def) {
-          numFormat = currentElement.numFormat;
-        }
-        elemArr.push(_tmp);
-      }
-      } else if (currentElement.type == cElementType.name || currentElement.type == cElementType.name3D) {
-      elemArr.push(currentElement.Calculate(arg, rangeCell));
-      } else if (currentElement.type == cElementType.table) {
-      elemArr.push(currentElement.toRef(rangeCell.getBBox0()));
-      } else {
-      elemArr.push(currentElement);
-    }
-  }
-  this.value = elemArr.pop();
-  this.value.numFormat = numFormat;
-
-    this._endCalculate();
-  return this.value;
-};
+	};
 	parserFormula.prototype._endCalculate = function() {
 		if (this.parent && this.parent.onFormulaEvent) {
 			this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.EndCalculate);
@@ -5602,52 +5578,54 @@ function rtl_math_erfc( x ) {
     return fErfc;
 }
 
-  //----------------------------------------------------------export----------------------------------------------------
-  window['AscCommonExcel'] = window['AscCommonExcel'] || {};
-  window['AscCommonExcel'].cElementType = cElementType;
-  window['AscCommonExcel'].cErrorType = cErrorType;
-  window['AscCommonExcel'].cExcelSignificantDigits = cExcelSignificantDigits;
-  window['AscCommonExcel'].cExcelMaxExponent = cExcelMaxExponent;
-  window['AscCommonExcel'].cExcelMinExponent = cExcelMinExponent;
-  window['AscCommonExcel'].c_Date1904Const = c_Date1904Const;
-  window['AscCommonExcel'].c_Date1900Const = c_Date1900Const;
-  window['AscCommonExcel'].c_DateCorrectConst = c_Date1900Const;
-  window['AscCommonExcel'].c_sPerDay = c_sPerDay;
-  window['AscCommonExcel'].c_msPerDay = c_msPerDay;
+	//----------------------------------------------------------export----------------------------------------------------
+	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+	window['AscCommonExcel'].cElementType = cElementType;
+	window['AscCommonExcel'].cErrorType = cErrorType;
+	window['AscCommonExcel'].cExcelSignificantDigits = cExcelSignificantDigits;
+	window['AscCommonExcel'].cExcelMaxExponent = cExcelMaxExponent;
+	window['AscCommonExcel'].cExcelMinExponent = cExcelMinExponent;
+	window['AscCommonExcel'].c_Date1904Const = c_Date1904Const;
+	window['AscCommonExcel'].c_Date1900Const = c_Date1900Const;
+	window['AscCommonExcel'].c_DateCorrectConst = c_Date1900Const;
+	window['AscCommonExcel'].c_sPerDay = c_sPerDay;
+	window['AscCommonExcel'].c_msPerDay = c_msPerDay;
+	window['AscCommonExcel'].cNumFormatFirstCell = -1;
+	window['AscCommonExcel'].cNumFormatNone = -2;
 
-  window['AscCommonExcel'].cNumber = cNumber;
-  window['AscCommonExcel'].cString = cString;
-  window['AscCommonExcel'].cBool = cBool;
-  window['AscCommonExcel'].cError = cError;
-  window['AscCommonExcel'].cArea = cArea;
-  window['AscCommonExcel'].cArea3D = cArea3D;
-  window['AscCommonExcel'].cRef = cRef;
-  window['AscCommonExcel'].cRef3D = cRef3D;
-  window['AscCommonExcel'].cEmpty = cEmpty;
-  window['AscCommonExcel'].cName = cName;
-  window['AscCommonExcel'].cArray = cArray;
-  window['AscCommonExcel'].cUndefined = cUndefined;
-  window['AscCommonExcel'].cBaseFunction = cBaseFunction;
+	window['AscCommonExcel'].cNumber = cNumber;
+	window['AscCommonExcel'].cString = cString;
+	window['AscCommonExcel'].cBool = cBool;
+	window['AscCommonExcel'].cError = cError;
+	window['AscCommonExcel'].cArea = cArea;
+	window['AscCommonExcel'].cArea3D = cArea3D;
+	window['AscCommonExcel'].cRef = cRef;
+	window['AscCommonExcel'].cRef3D = cRef3D;
+	window['AscCommonExcel'].cEmpty = cEmpty;
+	window['AscCommonExcel'].cName = cName;
+	window['AscCommonExcel'].cArray = cArray;
+	window['AscCommonExcel'].cUndefined = cUndefined;
+	window['AscCommonExcel'].cBaseFunction = cBaseFunction;
 
 	window['AscCommonExcel'].checkTypeCell = checkTypeCell;
-  window['AscCommonExcel'].cFormulaFunctionGroup = cFormulaFunctionGroup;
-  window['AscCommonExcel'].cFormulaFunction = cFormulaFunction;
+	window['AscCommonExcel'].cFormulaFunctionGroup = cFormulaFunctionGroup;
+	window['AscCommonExcel'].cFormulaFunction = cFormulaFunction;
 
-  window['AscCommonExcel'].cFormulaFunctionLocalized = null;
-  window['AscCommonExcel'].cFormulaFunctionToLocale = null;
+	window['AscCommonExcel'].cFormulaFunctionLocalized = null;
+	window['AscCommonExcel'].cFormulaFunctionToLocale = null;
 
-  window['AscCommonExcel'].getFormulasInfo = getFormulasInfo;
+	window['AscCommonExcel'].getFormulasInfo = getFormulasInfo;
 	window['AscCommonExcel'].getRangeByRef = getRangeByRef;
 
-  window['AscCommonExcel']._func = _func;
+	window['AscCommonExcel']._func = _func;
 
-  window['AscCommonExcel'].parserFormula = parserFormula;
+	window['AscCommonExcel'].parserFormula = parserFormula;
 
-  window['AscCommonExcel'].parseNum = parseNum;
-  window['AscCommonExcel'].matching = matching;
+	window['AscCommonExcel'].parseNum = parseNum;
+	window['AscCommonExcel'].matching = matching;
 	window['AscCommonExcel'].matchingValue = matchingValue;
-  window['AscCommonExcel'].GetDiffDate360 = GetDiffDate360;
-  window['AscCommonExcel'].searchRegExp2 = searchRegExp2;
-  window['AscCommonExcel'].rtl_math_erf = rtl_math_erf;
-  window['AscCommonExcel'].rtl_math_erfc = rtl_math_erfc;
+	window['AscCommonExcel'].GetDiffDate360 = GetDiffDate360;
+	window['AscCommonExcel'].searchRegExp2 = searchRegExp2;
+	window['AscCommonExcel'].rtl_math_erf = rtl_math_erf;
+	window['AscCommonExcel'].rtl_math_erfc = rtl_math_erfc;
 })(window);

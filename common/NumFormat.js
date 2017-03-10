@@ -931,7 +931,7 @@ NumFormat.prototype =
 		}
 		return nKoef;
 	},
-	_parseNumber : function(number, aDecFormat, nFracLen, nValType, cultureInfo)
+	_parseNumber : function(number, aDecFormat, nFracLen, nValType)
     {
         var res = {bDigit: false, dec: 0, frac: 0, fraction: 0, exponent: 0, exponentFrac: 0, scientific: 0, sign: SignType.Positive, date: {}};
         if(CellValueType.String != nValType)
@@ -1489,11 +1489,12 @@ NumFormat.prototype =
 	},
     format: function (number, nValType, dDigitsCount, cultureInfo, bChart)
     {
-		if (null != this.LCID) {
-			cultureInfo = g_aCultureInfos[this.LCID];
-		}
         if (null == cultureInfo)
             cultureInfo = g_oDefaultCultureInfo;
+        var cultureInfoLCID = cultureInfo;
+        if (null != this.LCID) {
+            cultureInfoLCID = g_aCultureInfos[this.LCID] || cultureInfo;
+        }
         if(null == nValType)
             nValType = CellValueType.Number;
         var res = [];
@@ -1510,7 +1511,7 @@ NumFormat.prototype =
                     return res;
                 }
             }
-            var oParsedNumber = this._parseNumber(number, this.aDecFormat, this.aFracFormat.length, nValType, cultureInfo);
+            var oParsedNumber = this._parseNumber(number, this.aDecFormat, this.aFracFormat.length, nValType);
             if (true == this.isGeneral() || (true == oParsedNumber.bDigit && true == this.bTextFormat) || (false == oParsedNumber.bDigit && false == this.bTextFormat) || (bChart && this.bGeneralChart))
             {
                 return this._applyGeneralFormat(number, nValType, dDigitsCount, bChart, cultureInfo);
@@ -1678,21 +1679,21 @@ NumFormat.prototype =
                     else if(item.val == 2)
                         oCurText.text += this._ZeroPad(m + 1);
                     else if (item.val == 3) {
-                        if (this.bDay && cultureInfo.AbbreviatedMonthGenitiveNames.length > 0)
-                            oCurText.text += cultureInfo.AbbreviatedMonthGenitiveNames[m];
+                        if (this.bDay && cultureInfoLCID.AbbreviatedMonthGenitiveNames.length > 0)
+                            oCurText.text += cultureInfoLCID.AbbreviatedMonthGenitiveNames[m];
                         else
-                            oCurText.text += cultureInfo.AbbreviatedMonthNames[m];
+                            oCurText.text += cultureInfoLCID.AbbreviatedMonthNames[m];
                     }
                     else if (item.val == 5) {
-                        var sMonthName = cultureInfo.MonthNames[m];
+                        var sMonthName = cultureInfoLCID.MonthNames[m];
                         if (sMonthName.length > 0)
                             oCurText.text += sMonthName[0];
                     }
                     else if (item.val > 0){
-                        if (this.bDay && cultureInfo.MonthGenitiveNames.length > 0)
-                            oCurText.text += cultureInfo.MonthGenitiveNames[m];
+                        if (this.bDay && cultureInfoLCID.MonthGenitiveNames.length > 0)
+                            oCurText.text += cultureInfoLCID.MonthGenitiveNames[m];
                         else
-                            oCurText.text += cultureInfo.MonthNames[m];
+                            oCurText.text += cultureInfoLCID.MonthNames[m];
                     }
                 }
                 else if(numFormat_Day == item.type)
@@ -1702,9 +1703,9 @@ NumFormat.prototype =
                     else if(item.val == 2)
                         oCurText.text += this._ZeroPad(oParsedNumber.date.d);
                     else if(item.val == 3)
-                        oCurText.text += cultureInfo.AbbreviatedDayNames[oParsedNumber.date.dayWeek];
+                        oCurText.text += cultureInfoLCID.AbbreviatedDayNames[oParsedNumber.date.dayWeek];
                     else if(item.val > 0)
-                        oCurText.text += cultureInfo.DayNames[oParsedNumber.date.dayWeek];
+                        oCurText.text += cultureInfoLCID.DayNames[oParsedNumber.date.dayWeek];
                     
                 }
                 else if(numFormat_Hour == item.type)
@@ -1744,8 +1745,8 @@ NumFormat.prototype =
                         oCurText.text += this._ZeroPad(s);
                 }
                 else if (numFormat_AmPm == item.type) {
-                    if (cultureInfo.AMDesignator.length > 0 && cultureInfo.PMDesignator.length > 0)
-                        oCurText.text += (oParsedNumber.date.hour < 12) ? cultureInfo.AMDesignator : cultureInfo.PMDesignator;
+                    if (cultureInfoLCID.AMDesignator.length > 0 && cultureInfoLCID.PMDesignator.length > 0)
+                        oCurText.text += (oParsedNumber.date.hour < 12) ? cultureInfoLCID.AMDesignator : cultureInfoLCID.PMDesignator;
                     else
                         oCurText.text += (oParsedNumber.date.hour < 12) ? "AM" : "PM";
                 }

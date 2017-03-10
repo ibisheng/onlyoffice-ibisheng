@@ -32,100 +32,99 @@
 
 "use strict";
 
-(
-/**
-* @param {Window} window
-* @param {undefined} undefined
-*/
-function (window, undefined) {
-    var cBaseFunction = AscCommonExcel.cBaseFunction;
-    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+(/**
+ * @param {Window} window
+ * @param {undefined} undefined
+ */
+	function (window, undefined) {
+	var cBaseFunction = AscCommonExcel.cBaseFunction;
+	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
-    cFormulaFunctionGroup['Database'] = cFormulaFunctionGroup['Database'] || [];
-    cFormulaFunctionGroup['Database'].push(
-        cDAVERAGE,
-        cDCOUNT,
-        cDCOUNTA,
-        cDGET,
-        cDMAX,
-        cDMIN,
-        cDPRODUCT,
-        cDSTDEV,
-        cDSTDEVP,
-        cDSUM,
-        cDVAR,
-        cDVARP
-    );
+	cFormulaFunctionGroup['Database'] = cFormulaFunctionGroup['Database'] || [];
+	cFormulaFunctionGroup['Database'].push(cDAVERAGE, cDCOUNT, cDCOUNTA, cDGET, cDMAX, cDMIN, cDPRODUCT, cDSTDEV,
+		cDSTDEVP, cDSUM, cDVAR, cDVARP);
 
-function cDAVERAGE() {
-    cBaseFunction.call( this, "DAVERAGE" );
-}
+	/** @constructor */
+	function cDAVERAGE() {
+		cBaseFunction.call(this, "DAVERAGE");
+	}
 
-cDAVERAGE.prototype = Object.create( cBaseFunction.prototype );
+	cDAVERAGE.prototype = Object.create(cBaseFunction.prototype);
 
-function cDCOUNT() {
-    cBaseFunction.call( this, "DCOUNT" );
-}
+	/** @constructor */
+	function cDCOUNT() {
+		cBaseFunction.call(this, "DCOUNT");
+	}
 
-cDCOUNT.prototype = Object.create( cBaseFunction.prototype );
+	cDCOUNT.prototype = Object.create(cBaseFunction.prototype);
 
-function cDCOUNTA() {
-    cBaseFunction.call( this, "DCOUNTA" );
-}
+	/** @constructor */
+	function cDCOUNTA() {
+		cBaseFunction.call(this, "DCOUNTA");
+	}
 
-cDCOUNTA.prototype = Object.create( cBaseFunction.prototype );
+	cDCOUNTA.prototype = Object.create(cBaseFunction.prototype);
 
-function cDGET() {
-    cBaseFunction.call( this, "DGET" );
-}
+	/** @constructor */
+	function cDGET() {
+		cBaseFunction.call(this, "DGET");
+	}
 
-cDGET.prototype = Object.create( cBaseFunction.prototype );
+	cDGET.prototype = Object.create(cBaseFunction.prototype);
 
-function cDMAX() {
-    cBaseFunction.call( this, "DMAX" );
-}
+	/** @constructor */
+	function cDMAX() {
+		cBaseFunction.call(this, "DMAX");
+	}
 
-cDMAX.prototype = Object.create( cBaseFunction.prototype );
+	cDMAX.prototype = Object.create(cBaseFunction.prototype);
 
-function cDMIN() {
-    cBaseFunction.call( this, "DMIN" );
-}
+	/** @constructor */
+	function cDMIN() {
+		cBaseFunction.call(this, "DMIN");
+	}
 
-cDMIN.prototype = Object.create( cBaseFunction.prototype );
+	cDMIN.prototype = Object.create(cBaseFunction.prototype);
 
-function cDPRODUCT() {
-    cBaseFunction.call( this, "DPRODUCT" );
-}
+	/** @constructor */
+	function cDPRODUCT() {
+		cBaseFunction.call(this, "DPRODUCT");
+	}
 
-cDPRODUCT.prototype = Object.create( cBaseFunction.prototype );
+	cDPRODUCT.prototype = Object.create(cBaseFunction.prototype);
 
-function cDSTDEV() {
-    cBaseFunction.call( this, "DSTDEV" );
-}
+	/** @constructor */
+	function cDSTDEV() {
+		cBaseFunction.call(this, "DSTDEV");
+	}
 
-cDSTDEV.prototype = Object.create( cBaseFunction.prototype );
+	cDSTDEV.prototype = Object.create(cBaseFunction.prototype);
 
-function cDSTDEVP() {
-    cBaseFunction.call( this, "DSTDEVP" );
-}
+	/** @constructor */
+	function cDSTDEVP() {
+		cBaseFunction.call(this, "DSTDEVP");
+	}
 
-cDSTDEVP.prototype = Object.create( cBaseFunction.prototype );
+	cDSTDEVP.prototype = Object.create(cBaseFunction.prototype);
 
-function cDSUM() {
-    cBaseFunction.call( this, "DSUM" );
-}
+	/** @constructor */
+	function cDSUM() {
+		cBaseFunction.call(this, "DSUM");
+	}
 
-cDSUM.prototype = Object.create( cBaseFunction.prototype );
+	cDSUM.prototype = Object.create(cBaseFunction.prototype);
 
-function cDVAR() {
-    cBaseFunction.call( this, "DVAR" );
-}
+	/** @constructor */
+	function cDVAR() {
+		cBaseFunction.call(this, "DVAR");
+	}
 
-cDVAR.prototype = Object.create( cBaseFunction.prototype );
+	cDVAR.prototype = Object.create(cBaseFunction.prototype);
 
-function cDVARP() {
-    cBaseFunction.call( this, "DVARP" );
-}
+	/** @constructor */
+	function cDVARP() {
+		cBaseFunction.call(this, "DVARP");
+	}
 
-cDVARP.prototype = Object.create( cBaseFunction.prototype );
+	cDVARP.prototype = Object.create(cBaseFunction.prototype);
 })(window);

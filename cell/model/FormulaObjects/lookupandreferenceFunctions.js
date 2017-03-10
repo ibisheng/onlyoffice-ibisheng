@@ -97,16 +97,10 @@
 	/** @constructor */
 	function cADDRESS() {
 		this.name = "ADDRESS";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
 		this.argumentsMax = 5;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cADDRESS.prototype = Object.create(cBaseFunction.prototype);
@@ -226,16 +220,10 @@
 	/** @constructor */
 	function cCHOOSE() {
 		this.name = "CHOOSE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
 		this.argumentsMax = 30;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cCHOOSE.prototype = Object.create(cBaseFunction.prototype);
@@ -270,16 +258,10 @@
 	/** @constructor */
 	function cCOLUMN() {
 		this.name = "COLUMN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
 		this.argumentsMax = 1;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cCOLUMN.prototype = Object.create(cBaseFunction.prototype);
@@ -306,16 +288,10 @@
 	/** @constructor */
 	function cCOLUMNS() {
 		this.name = "COLUMNS";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
 		this.argumentsMax = 1;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cCOLUMNS.prototype = Object.create(cBaseFunction.prototype);
@@ -347,16 +323,10 @@
 	/** @constructor */
 	function cHLOOKUP() {
 		this.name = "HLOOKUP";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
 		this.argumentsMax = 4;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cHLOOKUP.prototype = Object.create(cBaseFunction.prototype);
@@ -468,16 +438,10 @@
 	/** @constructor */
 	function cINDEX() {
 		this.name = "INDEX";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
 		this.argumentsMax = 4;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cINDEX.prototype = Object.create(cBaseFunction.prototype);
@@ -555,16 +519,10 @@
 	/** @constructor */
 	function cINDIRECT() {
 		this.name = "INDIRECT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
 		this.argumentsMax = 2;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cINDIRECT.prototype = Object.create(cBaseFunction.prototype);
@@ -635,16 +593,10 @@
 	/** @constructor */
 	function cLOOKUP() {
 		this.name = "LOOKUP";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
 		this.argumentsMax = 3;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cLOOKUP.prototype = Object.create(cBaseFunction.prototype);
@@ -786,16 +738,10 @@
 	/** @constructor */
 	function cMATCH() {
 		this.name = "MATCH";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
 		this.argumentsMax = 3;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cMATCH.prototype = Object.create(cBaseFunction.prototype);
@@ -897,16 +843,10 @@
 	/** @constructor */
 	function cOFFSET() {
 		this.name = "OFFSET";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
 		this.argumentsMax = 5;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cOFFSET.prototype = Object.create(cBaseFunction.prototype);
@@ -1003,16 +943,10 @@
 	/** @constructor */
 	function cROW() {
 		this.name = "ROW";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
 		this.argumentsMax = 1;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cROW.prototype = Object.create(cBaseFunction.prototype);
@@ -1039,16 +973,10 @@
 	/** @constructor */
 	function cROWS() {
 		this.name = "ROWS";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
 		this.argumentsMax = 1;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cROWS.prototype = Object.create(cBaseFunction.prototype);
@@ -1080,19 +1008,14 @@
 	/** @constructor */
 	function cTRANSPOSE() {
 		this.name = "TRANSPOSE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
 		this.argumentsMax = 1;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.noneFormat;
 	}
 
 	cTRANSPOSE.prototype = Object.create(cBaseFunction.prototype);
+	cTRANSPOSE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cTRANSPOSE.prototype.Calculate = function (arg) {
 
 		function TransposeMatrix(A) {
@@ -1218,16 +1141,10 @@
 	/** @constructor */
 	function cVLOOKUP() {
 		this.name = "VLOOKUP";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
 		this.argumentsMax = 4;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cVLOOKUP.prototype = Object.create(cBaseFunction.prototype);

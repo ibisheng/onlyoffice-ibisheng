@@ -1777,8 +1777,20 @@ AscCommon.extendClass(CGroupShape, AscFormat.CGraphicObjectBase);
         }
     };
 
-    CGroupShape.prototype.Refresh_RecalcData = function()
-    {};
+    CGroupShape.prototype.Refresh_RecalcData = function(oData)
+    {
+        if(oData){
+            switch (oData.Type){
+
+                case AscDFH.historyitem_ShapeSetBDeleted:{
+                    if(!this.bDeleted){
+                        this.addToRecalculate();
+                    }
+                    break;
+                }
+            }
+        }
+    };
 
     CGroupShape.prototype.checkTypeCorrect = function()
     {

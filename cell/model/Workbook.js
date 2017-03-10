@@ -1790,7 +1790,7 @@
 			}
 		} else if (opt_sheetId) {
 			formulas = [];
-			var ws = this.wb.getWorksheetById(opt_sheetId);
+			var ws = this.getWorksheetById(opt_sheetId);
 			ws.getAllFormulas(formulas);
 		} else {
 			formulas = this.getAllFormulas();
@@ -2960,6 +2960,7 @@
 						wsModel.oDrawingOjectsManager.updateChartReferencesWidthHistory(_lastName, _newName, true);
 				}
 			}
+			this.workbook.dependencyFormulas.calcTree();
 		}
 	};
 	Woorksheet.prototype.getTabColor=function(){
@@ -4712,7 +4713,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 				newFormula = this.formulaParsed.Formula;
 			}
 			oNewCell.formulaParsed = new parserFormula(newFormula, oNewCell, oNewWs);
-			this.ws.workbook.dependencyFormulas.addToBuildDependencyCell(oNewCell);
+			oNewWs.workbook.dependencyFormulas.addToBuildDependencyCell(oNewCell);
 		}
 		return oNewCell;
 	};
@@ -5263,12 +5264,11 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 	Cell.prototype._adjustCellFormat = function() {
 		if (this.formulaParsed && this.formulaParsed.value && this.formulaParsed.outStack) {
 			var valueCalc = this.formulaParsed.value;
-			if (valueCalc.numFormat !== undefined && valueCalc.numFormat >= 0) {
+			if (0 <= valueCalc.numFormat) {
 				if (aStandartNumFormatsId[this.getNumFormatStr()] == 0) {
 					this.setNumFormat(aStandartNumFormats[valueCalc.numFormat]);
 				}
-			}
-			else if (valueCalc.numFormat !== undefined && valueCalc.numFormat == -1) {
+			} else if (AscCommonExcel.cNumFormatFirstCell === valueCalc.numFormat) {
 				// ищет в формуле первый рэндж и устанавливает формат ячейки как формат первой ячейки в рэндже
 				for (var i = 0, length = this.formulaParsed.outStack.length; i < length; i++) {
 					var elem = this.formulaParsed.outStack[i];

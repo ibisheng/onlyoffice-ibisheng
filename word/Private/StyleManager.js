@@ -206,7 +206,17 @@ CStyles.prototype.Create_StyleFromInterface = function(oAscStyle, bCheckLink)
             oStyle.Set_Next(oOldStyle.Get_Next());
 
         this.Remove(OldId);
-        this.RemapIdReferences(OldId, oStyle.GetId());
+		this.RemapIdReferences(OldId, oStyle.GetId());
+
+		var oLogicDocument = editor.WordControl.m_oLogicDocument;
+		if (oLogicDocument)
+		{
+			var arrParagraphs = oLogicDocument.Get_AllParagraphsByStyle([OldId]);
+			for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
+			{
+				arrParagraphs[nIndex].Style_Add(oStyle.GetId(), true);
+			}
+		}
     }
 
     oStyle.Set_Name(sStyleName);

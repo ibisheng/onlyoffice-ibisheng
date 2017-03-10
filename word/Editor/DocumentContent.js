@@ -3146,7 +3146,7 @@ CDocumentContent.prototype.Remove                             = function(Count, 
                             }
                             else
                             {
-                                if (true === this.Content[this.CurPos.ContentPos - 1].IsEmpty())
+                                if (true === this.Content[this.CurPos.ContentPos - 1].IsEmpty() && undefined === this.Content[this.CurPos.ContentPos - 1].Numbering_Get())
                                 {
                                     // Просто удаляем предыдущий параграф
                                     this.Internal_Content_Remove(this.CurPos.ContentPos - 1, 1);

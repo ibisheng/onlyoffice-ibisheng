@@ -32,157 +32,93 @@
 
 "use strict";
 
-(
-/**
-* @param {Window} window
-* @param {undefined} undefined
+(/**
+ * @param {Window} window
+ * @param {undefined} undefined
  */
-function (window, undefined) {
-    var cElementType = AscCommonExcel.cElementType;
-    var cBaseFunction = AscCommonExcel.cBaseFunction;
-    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+	function (window, undefined) {
+	var cElementType = AscCommonExcel.cElementType;
+	var cBaseFunction = AscCommonExcel.cBaseFunction;
+	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
-    cFormulaFunctionGroup['Cube'] = cFormulaFunctionGroup['Cube'] || [];
-    cFormulaFunctionGroup['Cube'].push(
-        cCUBEKPIMEMBER,
-        cCUBEMEMBER,
-        cCUBEMEMBERPROPERTY,
-        cCUBERANKEDMEMBER,
-        cCUBESET,
-        cCUBESETCOUNT,
-        cCUBEVALUE
-    );
+	cFormulaFunctionGroup['Cube'] = cFormulaFunctionGroup['Cube'] || [];
+	cFormulaFunctionGroup['Cube'].push(cCUBEKPIMEMBER, cCUBEMEMBER, cCUBEMEMBERPROPERTY, cCUBERANKEDMEMBER, cCUBESET,
+		cCUBESETCOUNT, cCUBEVALUE);
 
-function cCUBEKPIMEMBER() {
-//    cBaseFunction.call( this, "CUBEKPIMEMBER" );
+	/** @constructor */
+	function cCUBEKPIMEMBER() {
+		this.name = "CUBEKPIMEMBER";
+		this.value = null;
+		this.argumentsMin = 0;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 255;
+	}
 
-    this.name = "CUBEKPIMEMBER";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 0;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 255;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
+	cCUBEKPIMEMBER.prototype = Object.create(cBaseFunction.prototype);
 
-}
+	/** @constructor */
+	function cCUBEMEMBER() {
+		this.name = "CUBEMEMBER";
+		this.value = null;
+		this.argumentsMin = 0;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 255;
+	}
 
-cCUBEKPIMEMBER.prototype = Object.create( cBaseFunction.prototype );
+	cCUBEMEMBER.prototype = Object.create(cBaseFunction.prototype);
 
-function cCUBEMEMBER() {
-//    cBaseFunction.call( this, "CUBEMEMBER" );
+	/** @constructor */
+	function cCUBEMEMBERPROPERTY() {
+		this.name = "CUBEMEMBERPROPERTY";
+		this.value = null;
+		this.argumentsMin = 0;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 255;
+	}
 
-    this.name = "CUBEMEMBER";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 0;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 255;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
+	cCUBEMEMBERPROPERTY.prototype = Object.create(cBaseFunction.prototype);
 
-}
+	/** @constructor */
+	function cCUBERANKEDMEMBER() {
+		this.name = "CUBERANKEDMEMBER";
+		this.value = null;
+		this.argumentsMin = 0;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 255;
+	}
 
-cCUBEMEMBER.prototype = Object.create( cBaseFunction.prototype );
+	cCUBERANKEDMEMBER.prototype = Object.create(cBaseFunction.prototype);
 
-function cCUBEMEMBERPROPERTY() {
-//    cBaseFunction.call( this, "CUBEMEMBERPROPERTY" );
+	/** @constructor */
+	function cCUBESET() {
+		this.name = "CUBESET";
+		this.value = null;
+		this.argumentsMin = 0;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 255;
+	}
 
-    this.name = "CUBEMEMBERPROPERTY";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 0;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 255;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
+	cCUBESET.prototype = Object.create(cBaseFunction.prototype);
 
-}
+	/** @constructor */
+	function cCUBESETCOUNT() {
+		this.name = "CUBESETCOUNT";
+		this.value = null;
+		this.argumentsMin = 0;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 255;
+	}
 
-cCUBEMEMBERPROPERTY.prototype = Object.create( cBaseFunction.prototype );
+	cCUBESETCOUNT.prototype = Object.create(cBaseFunction.prototype);
 
-function cCUBERANKEDMEMBER() {
-//    cBaseFunction.call( this, "CUBERANKEDMEMBER" );
+	/** @constructor */
+	function cCUBEVALUE() {
+		this.name = "CUBEVALUE";
+		this.value = null;
+		this.argumentsMin = 0;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 255;
+	}
 
-    this.name = "CUBERANKEDMEMBER";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 0;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 255;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
-
-}
-
-cCUBERANKEDMEMBER.prototype = Object.create( cBaseFunction.prototype );
-
-function cCUBESET() {
-//    cBaseFunction.call( this, "CUBESET" );
-
-    this.name = "CUBESET";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 0;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 255;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
-
-}
-
-cCUBESET.prototype = Object.create( cBaseFunction.prototype );
-
-function cCUBESETCOUNT() {
-//    cBaseFunction.call( this, "CUBESETCOUNT" );
-
-    this.name = "CUBESETCOUNT";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 0;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 255;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
-
-}
-
-cCUBESETCOUNT.prototype = Object.create( cBaseFunction.prototype );
-
-function cCUBEVALUE() {
-//    cBaseFunction.call( this, "CUBEVALUE" );
-
-    this.name = "CUBEVALUE";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 0;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 255;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
-
-}
-
-cCUBEVALUE.prototype = Object.create( cBaseFunction.prototype );
+	cCUBEVALUE.prototype = Object.create(cBaseFunction.prototype);
 })(window);
