@@ -936,6 +936,16 @@ Geometry.prototype=
         }
     },
 
+    CheckCorrect: function(){
+        if(!this.parent){
+            return false;
+        }
+        if(this.pathLst.length === 0){
+            return false;
+        }
+        return true;
+    },
+
     AddGuide: function(name, formula, x, y, z)
     {
         History.Add(new CChangesGeometryAddGuide(this, name, formula, x, y, z));
