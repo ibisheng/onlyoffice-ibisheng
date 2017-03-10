@@ -10285,10 +10285,16 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
 
 
     if(oChart.getObjectType() === AscDFH.historyitem_type_StockChart){
-        var oOlDSpPr = oChartSpace.spPr && oChartSpace.spPr.createDuplicate();
-        oChartSpace.setSpPr(null);
-        ApplySpPr(aPreset[23], oChartSpace);
-        oChart.setHiLowLines(oChartSpace.spPr);
+        var oSpPr = oChartSpace.spPr;
+        if(oChart.hiLowLines){
+            oChartSpace.spPr = oChart.hiLowLines;
+            ApplySpPr(aPreset[23], oChartSpace);
+        }
+        else{
+            oChartSpace.spPr = new AscFormat.CSpPr();
+            ApplySpPr(aPreset[23], oChartSpace);
+            oChart.setHiLowLines(oChartSpace.spPr);
+        }
 
         if(!aPreset[24]){
             oChart.setUpDownBars(null);
@@ -10297,15 +10303,30 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
             if(!oChart.upDownBars){
                 oChart.setUpDownBars(new AscFormat.CUpDownBars());
             }
-            oChartSpace.setSpPr(null);
-            ApplySpPr(aPreset[24][0], oChartSpace);
-            oChart.upDownBars.setDownBars(oChartSpace.spPr);
+
+            if(oChart.upDownBars.downBars){
+                oChartSpace.spPr = oChart.upDownBars.downBars;
+                ApplySpPr(aPreset[24][0], oChartSpace);
+            }
+            else{
+                oChartSpace.spPr = new AscFormat.CSpPr();
+                ApplySpPr(aPreset[24][0], oChartSpace);
+                oChart.upDownBars.setDownBars(oChartSpace.spPr);
+            }
+
             oChart.upDownBars.setGapWidth(aPreset[24][1]);
-            oChartSpace.setSpPr(null);
-            ApplySpPr(aPreset[24][2], oChartSpace);
-            oChart.upDownBars.setUpBars(oChartSpace.spPr);
+
+            if(oChart.upDownBars.upBars){
+                oChartSpace.spPr = oChart.upDownBars.upBars;
+                ApplySpPr(aPreset[24][2], oChartSpace);
+            }
+            else{
+                oChartSpace.spPr = new AscFormat.CSpPr();
+                ApplySpPr(aPreset[24][2], oChartSpace);
+                oChart.upDownBars.setUpBars(oChartSpace.spPr);
+            }
         }
-        oChartSpace.setSpPr(oOlDSpPr);
+        oChartSpace.spPr = oSpPr;
     }
 }
     function CMathPainter(_api)
