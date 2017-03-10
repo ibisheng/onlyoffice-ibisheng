@@ -58,7 +58,6 @@
 	/** @constructor */
 	function cERROR_TYPE() {
 		this.name = "ERROR.TYPE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -120,7 +119,6 @@
 	/** @constructor */
 	function cISBLANK() {
 		this.name = "ISBLANK";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -150,7 +148,6 @@
 	/** @constructor */
 	function cISERR() {
 		this.name = "ISERR";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -183,7 +180,6 @@
 	/** @constructor */
 	function cISERROR() {
 		this.name = "ISERROR";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -216,7 +212,6 @@
 	/** @constructor */
 	function cISEVEN() {
 		this.name = "ISEVEN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -254,7 +249,6 @@
 	/** @constructor */
 	function cISLOGICAL() {
 		this.name = "ISLOGICAL";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -287,7 +281,6 @@
 	/** @constructor */
 	function cISNA() {
 		this.name = "ISNA";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -320,7 +313,6 @@
 	/** @constructor */
 	function cISNONTEXT() {
 		this.name = "ISNONTEXT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -352,7 +344,6 @@
 	/** @constructor */
 	function cISNUMBER() {
 		this.name = "ISNUMBER";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -385,7 +376,6 @@
 	/** @constructor */
 	function cISODD() {
 		this.name = "ISODD";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -423,7 +413,6 @@
 	/** @constructor */
 	function cISREF() {
 		this.name = "ISREF";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -448,7 +437,6 @@
 	/** @constructor */
 	function cISTEXT() {
 		this.name = "ISTEXT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -481,7 +469,6 @@
 	/** @constructor */
 	function cN() {
 		this.name = "N";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -528,7 +515,6 @@
 	/** @constructor */
 	function cNA() {
 		this.name = "NA";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
@@ -548,7 +534,6 @@
 	/** @constructor */
 	function cTYPE() {
 		this.name = "TYPE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;

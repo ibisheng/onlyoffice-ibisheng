@@ -97,7 +97,6 @@
 	/** @constructor */
 	function cADDRESS() {
 		this.name = "ADDRESS";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -221,7 +220,6 @@
 	/** @constructor */
 	function cCHOOSE() {
 		this.name = "CHOOSE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -260,7 +258,6 @@
 	/** @constructor */
 	function cCOLUMN() {
 		this.name = "COLUMN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
@@ -291,7 +288,6 @@
 	/** @constructor */
 	function cCOLUMNS() {
 		this.name = "COLUMNS";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -327,7 +323,6 @@
 	/** @constructor */
 	function cHLOOKUP() {
 		this.name = "HLOOKUP";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -443,7 +438,6 @@
 	/** @constructor */
 	function cINDEX() {
 		this.name = "INDEX";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -525,7 +519,6 @@
 	/** @constructor */
 	function cINDIRECT() {
 		this.name = "INDIRECT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -600,7 +593,6 @@
 	/** @constructor */
 	function cLOOKUP() {
 		this.name = "LOOKUP";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -746,7 +738,6 @@
 	/** @constructor */
 	function cMATCH() {
 		this.name = "MATCH";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -852,7 +843,6 @@
 	/** @constructor */
 	function cOFFSET() {
 		this.name = "OFFSET";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -953,7 +943,6 @@
 	/** @constructor */
 	function cROW() {
 		this.name = "ROW";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
@@ -984,7 +973,6 @@
 	/** @constructor */
 	function cROWS() {
 		this.name = "ROWS";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1020,7 +1008,6 @@
 	/** @constructor */
 	function cTRANSPOSE() {
 		this.name = "TRANSPOSE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1154,7 +1141,6 @@
 	/** @constructor */
 	function cVLOOKUP() {
 		this.name = "VLOOKUP";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;

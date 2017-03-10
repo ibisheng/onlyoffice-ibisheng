@@ -297,7 +297,6 @@
 	/** @constructor */
 	function cDATE() {
 		this.name = "DATE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -367,7 +366,6 @@
 	/** @constructor */
 	function cDATEDIF() {
 		this.name = "DATEDIF";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -485,7 +483,6 @@
 	/** @constructor */
 	function cDATEVALUE() {
 		this.name = "DATEVALUE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -525,7 +522,6 @@
 	/** @constructor */
 	function cDAY() {
 		this.name = "DAY";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -598,7 +594,6 @@
 	/** @constructor */
 	function cDAYS360() {
 		this.name = "DAYS360";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -664,7 +659,6 @@
 	/** @constructor */
 	function cEDATE() {
 		this.name = "EDATE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -739,7 +733,6 @@
 	/** @constructor */
 	function cEOMONTH() {
 		this.name = "EOMONTH";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -805,7 +798,6 @@
 	/** @constructor */
 	function cHOUR() {
 		this.name = "HOUR";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -870,7 +862,6 @@
 	/** @constructor */
 	function cMINUTE() {
 		this.name = "MINUTE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -934,7 +925,6 @@
 	/** @constructor */
 	function cMONTH() {
 		this.name = "MONTH";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1003,7 +993,6 @@
 	/** @constructor */
 	function cNETWORKDAYS() {
 		this.name = "NETWORKDAYS";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -1136,7 +1125,6 @@
 	/** @constructor */
 	function cNOW() {
 		this.name = "NOW";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
@@ -1160,7 +1148,6 @@
 	/** @constructor */
 	function cSECOND() {
 		this.name = "SECOND";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1224,7 +1211,6 @@
 	/** @constructor */
 	function cTIME() {
 		this.name = "TIME";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -1285,7 +1271,6 @@
 	/** @constructor */
 	function cTIMEVALUE() {
 		this.name = "TIMEVALUE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1326,7 +1311,6 @@
 	/** @constructor */
 	function cTODAY() {
 		this.name = "TODAY";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
@@ -1350,7 +1334,6 @@
 	/** @constructor */
 	function cWEEKDAY() {
 		this.name = "WEEKDAY";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1433,7 +1416,6 @@
 	/** @constructor */
 	function cWEEKNUM() {
 		this.name = "WEEKNUM";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1549,7 +1531,6 @@
 	/** @constructor */
 	function cWORKDAY() {
 		this.name = "WORKDAY";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -1683,7 +1664,6 @@
 	/** @constructor */
 	function cYEAR() {
 		this.name = "YEAR";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1746,7 +1726,6 @@
 	/** @constructor */
 	function cYEARFRAC() {
 		this.name = "YEARFRAC";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;

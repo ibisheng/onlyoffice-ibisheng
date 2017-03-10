@@ -56,7 +56,6 @@
 	/** @constructor */
 	function cAND() {
 		this.name = "AND";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -132,7 +131,6 @@
 	/** @constructor */
 	function cFALSE() {
 		this.name = "FALSE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
@@ -152,7 +150,6 @@
 	/** @constructor */
 	function cIF() {
 		this.name = "IF";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -195,7 +192,6 @@
 	/** @constructor */
 	function cIFERROR() {
 		this.name = "IFERROR";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -230,7 +226,6 @@
 	/** @constructor */
 	function cNOT() {
 		this.name = "NOT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -270,7 +265,6 @@
 	/** @constructor */
 	function cOR() {
 		this.name = "OR";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -343,7 +337,6 @@
 	/** @constructor */
 	function cTRUE() {
 		this.name = "TRUE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;

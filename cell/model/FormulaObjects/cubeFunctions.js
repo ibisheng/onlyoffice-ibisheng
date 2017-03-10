@@ -48,7 +48,6 @@
 	/** @constructor */
 	function cCUBEKPIMEMBER() {
 		this.name = "CUBEKPIMEMBER";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
@@ -60,7 +59,6 @@
 	/** @constructor */
 	function cCUBEMEMBER() {
 		this.name = "CUBEMEMBER";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
@@ -72,7 +70,6 @@
 	/** @constructor */
 	function cCUBEMEMBERPROPERTY() {
 		this.name = "CUBEMEMBERPROPERTY";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
@@ -84,7 +81,6 @@
 	/** @constructor */
 	function cCUBERANKEDMEMBER() {
 		this.name = "CUBERANKEDMEMBER";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
@@ -96,7 +92,6 @@
 	/** @constructor */
 	function cCUBESET() {
 		this.name = "CUBESET";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
@@ -108,7 +103,6 @@
 	/** @constructor */
 	function cCUBESETCOUNT() {
 		this.name = "CUBESETCOUNT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
@@ -120,7 +114,6 @@
 	/** @constructor */
 	function cCUBEVALUE() {
 		this.name = "CUBEVALUE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;

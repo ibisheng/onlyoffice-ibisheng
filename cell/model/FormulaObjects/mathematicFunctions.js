@@ -84,7 +84,6 @@
 	/** @constructor */
 	function cABS() {
 		this.name = "ABS";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -122,7 +121,6 @@
 	/** @constructor */
 	function cACOS() {
 		this.name = "ACOS";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -162,7 +160,6 @@
 	/** @constructor */
 	function cACOSH() {
 		this.name = "ACOSH";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -202,7 +199,6 @@
 	/** @constructor */
 	function cASIN() {
 		this.name = "ASIN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -242,7 +238,6 @@
 	/** @constructor */
 	function cASINH() {
 		this.name = "ASINH";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -282,7 +277,6 @@
 	/** @constructor */
 	function cATAN() {
 		this.name = "ATAN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -322,7 +316,6 @@
 	/** @constructor */
 	function cATAN2() {
 		this.name = "ATAN2";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -396,7 +389,6 @@
 	/** @constructor */
 	function cATANH() {
 		this.name = "ATANH";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -436,7 +428,6 @@
 	/** @constructor */
 	function cCEILING() {
 		this.name = "CEILING";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -534,7 +525,6 @@
 	/** @constructor */
 	function cCOMBIN() {
 		this.name = "COMBIN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -622,7 +612,6 @@
 	/** @constructor */
 	function cCOS() {
 		this.name = "COS";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -662,7 +651,6 @@
 	/** @constructor */
 	function cCOSH() {
 		this.name = "COSH";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -702,7 +690,6 @@
 	/** @constructor */
 	function cDEGREES() {
 		this.name = "DEGREES";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -750,7 +737,6 @@
 	/** @constructor */
 	function cEVEN() {
 		this.name = "EVEN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -813,7 +799,6 @@
 	/** @constructor */
 	function cEXP() {
 		this.name = "EXP";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -855,7 +840,6 @@
 	/** @constructor */
 	function cFACT() {
 		this.name = "FACT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -902,7 +886,6 @@
 	/** @constructor */
 	function cFACTDOUBLE() {
 		this.name = "FACTDOUBLE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -968,7 +951,6 @@
 	/** @constructor */
 	function cFLOOR() {
 		this.name = "FLOOR";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -1069,7 +1051,6 @@
 	/** @constructor */
 	function cGCD() {
 		this.name = "GCD";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1167,7 +1148,6 @@
 	/** @constructor */
 	function cINT() {
 		this.name = "INT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1218,7 +1198,6 @@
 	/** @constructor */
 	function cLCM() {
 		this.name = "LCM";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1320,7 +1299,6 @@
 	/** @constructor */
 	function cLN() {
 		this.name = "LN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1368,7 +1346,6 @@
 	/** @constructor */
 	function cLOG() {
 		this.name = "LOG";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1461,7 +1438,6 @@
 	/** @constructor */
 	function cLOG10() {
 		this.name = "LOG10";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1509,7 +1485,6 @@
 	/** @constructor */
 	function cMDETERM() {
 		this.name = "MDETERM";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1596,7 +1571,6 @@
 	/** @constructor */
 	function cMINVERSE() {
 		this.name = "MINVERSE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1742,7 +1716,6 @@
 	/** @constructor */
 	function cMMULT() {
 		this.name = "MMULT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -1813,7 +1786,6 @@
 	/** @constructor */
 	function cMOD() {
 		this.name = "MOD";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -1901,7 +1873,6 @@
 	/** @constructor */
 	function cMROUND() {
 		this.name = "MROUND";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -2006,7 +1977,6 @@
 	/** @constructor */
 	function cMULTINOMIAL() {
 		this.name = "MULTINOMIAL";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -2100,7 +2070,6 @@
 	/** @constructor */
 	function cODD() {
 		this.name = "ODD";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -2163,7 +2132,6 @@
 	/** @constructor */
 	function cPI() {
 		this.name = "PI";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
@@ -2183,7 +2151,6 @@
 	/** @constructor */
 	function cPOWER() {
 		this.name = "POWER";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -2266,7 +2233,6 @@
 	/** @constructor */
 	function cPRODUCT() {
 		this.name = "PRODUCT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -2319,7 +2285,6 @@
 	/** @constructor */
 	function cQUOTIENT() {
 		this.name = "QUOTIENT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -2399,7 +2364,6 @@
 	/** @constructor */
 	function cRADIANS() {
 		this.name = "RADIANS";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -2443,7 +2407,6 @@
 	/** @constructor */
 	function cRAND() {
 		this.name = "RAND";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
@@ -2463,7 +2426,6 @@
 	/** @constructor */
 	function cRANDBETWEEN() {
 		this.name = "RANDBETWEEN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -2539,7 +2501,6 @@
 	/** @constructor */
 	function cROMAN() {
 		this.name = "ROMAN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -2650,7 +2611,6 @@
 	/** @constructor */
 	function cROUND() {
 		this.name = "ROUND";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -2799,7 +2759,6 @@
 	/** @constructor */
 	function cROUNDDOWN() {
 		this.name = "ROUNDDOWN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -2924,7 +2883,6 @@
 	/** @constructor */
 	function cROUNDUP() {
 		this.name = "ROUNDUP";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -3049,7 +3007,6 @@
 	/** @constructor */
 	function cSERIESSUM() {
 		this.name = "SERIESSUM";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 4;
 		this.argumentsCurrent = 0;
@@ -3122,7 +3079,6 @@
 	/** @constructor */
 	function cSIGN() {
 		this.name = "SIGN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -3175,7 +3131,6 @@
 	/** @constructor */
 	function cSIN() {
 		this.name = "SIN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -3215,7 +3170,6 @@
 	/** @constructor */
 	function cSINH() {
 		this.name = "SINH";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -3255,7 +3209,6 @@
 	/** @constructor */
 	function cSQRT() {
 		this.name = "SQRT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -3295,7 +3248,6 @@
 	/** @constructor */
 	function cSQRTPI() {
 		this.name = "SQRTPI";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -3335,7 +3287,6 @@
 	/** @constructor */
 	function cSUBTOTAL() {
 		this.name = "SUBTOTAL";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -3432,7 +3383,6 @@
 	/** @constructor */
 	function cSUM() {
 		this.name = "SUM";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -3489,7 +3439,6 @@
 	/** @constructor */
 	function cSUMIF() {
 		this.name = "SUMIF";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -3561,7 +3510,6 @@
 	/** @constructor */
 	function cSUMIFS() {
 		this.name = "SUMIFS";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -3654,7 +3602,6 @@
 	/** @constructor */
 	function cSUMPRODUCT() {
 		this.name = "SUMPRODUCT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -3727,7 +3674,6 @@
 	/** @constructor */
 	function cSUMSQ() {
 		this.name = "SUMSQ";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -3785,7 +3731,6 @@
 	/** @constructor */
 	function cSUMX2MY2() {
 		this.name = "SUMX2MY2";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -3870,7 +3815,6 @@
 	/** @constructor */
 	function cSUMX2PY2() {
 		this.name = "SUMX2PY2";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -3955,7 +3899,6 @@
 	/** @constructor */
 	function cSUMXMY2() {
 		this.name = "SUMXMY2";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -4040,7 +3983,6 @@
 	/** @constructor */
 	function cTAN() {
 		this.name = "TAN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -4080,7 +4022,6 @@
 	/** @constructor */
 	function cTANH() {
 		this.name = "TANH";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -4120,7 +4061,6 @@
 	/** @constructor */
 	function cTRUNC() {
 		this.name = "TRUNC";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;

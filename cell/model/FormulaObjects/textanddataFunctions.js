@@ -78,7 +78,6 @@
 	/** @constructor */
 	function cCHAR() {
 		this.name = "CHAR";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -125,7 +124,6 @@
 	/** @constructor */
 	function cCLEAN() {
 		this.name = "CLEAN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -166,7 +164,6 @@
 	/** @constructor */
 	function cCODE() {
 		this.name = "CODE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -213,7 +210,6 @@
 	/** @constructor */
 	function cCONCATENATE() {
 		this.name = "CONCATENATE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -259,7 +255,6 @@
 	/** @constructor */
 	function cDOLLAR() {
 		this.name = "DOLLAR";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -460,7 +455,6 @@
 	/** @constructor */
 	function cEXACT() {
 		this.name = "EXACT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -508,7 +502,6 @@
 	/** @constructor */
 	function cFIND() {
 		this.name = "FIND";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -603,7 +596,6 @@
 	/** @constructor */
 	function cFIXED() {
 		this.name = "FIXED";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -808,7 +800,6 @@
 	/** @constructor */
 	function cLEFT() {
 		this.name = "LEFT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -867,7 +858,6 @@
 	/** @constructor */
 	function cLEN() {
 		this.name = "LEN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -910,7 +900,6 @@
 	/** @constructor */
 	function cLOWER() {
 		this.name = "LOWER";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -945,7 +934,6 @@
 	/** @constructor */
 	function cMID() {
 		this.name = "MID";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -1031,7 +1019,6 @@
 	/** @constructor */
 	function cPROPER() {
 		this.name = "PROPER";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1099,7 +1086,6 @@
 	/** @constructor */
 	function cREPLACE() {
 		this.name = "REPLACE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 4;
 		this.argumentsCurrent = 0;
@@ -1186,7 +1172,6 @@
 	/** @constructor */
 	function cREPT() {
 		this.name = "REPT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -1250,7 +1235,6 @@
 	/** @constructor */
 	function cRIGHT() {
 		this.name = "RIGHT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1309,7 +1293,6 @@
 	/** @constructor */
 	function cSEARCH() {
 		this.name = "SEARCH";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -1408,7 +1391,6 @@
 	/** @constructor */
 	function cSUBSTITUTE() {
 		this.name = "SUBSTITUTE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -1491,7 +1473,6 @@
 	/** @constructor */
 	function cT() {
 		this.name = "T";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1526,7 +1507,6 @@
 	/** @constructor */
 	function cTEXT() {
 		this.name = "TEXT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -1599,7 +1579,6 @@
 	/** @constructor */
 	function cTRIM() {
 		this.name = "TRIM";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1637,7 +1616,6 @@
 	/** @constructor */
 	function cUPPER() {
 		this.name = "UPPER";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1670,7 +1648,6 @@
 	/** @constructor */
 	function cVALUE() {
 		this.name = "VALUE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;

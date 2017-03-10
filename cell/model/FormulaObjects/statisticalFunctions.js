@@ -325,7 +325,6 @@
 	/** @constructor */
 	function cAVEDEV() {
 		this.name = "AVEDEV";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -389,7 +388,6 @@
 	/** @constructor */
 	function cAVERAGE() {
 		this.name = "AVERAGE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -460,7 +458,6 @@
 	/** @constructor */
 	function cAVERAGEA() {
 		this.name = "AVERAGEA";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -524,7 +521,6 @@
 	/** @constructor */
 	function cAVERAGEIF() {
 		this.name = "AVERAGEIF";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -607,7 +603,6 @@
 	/** @constructor */
 	function cAVERAGEIFS() {
 		this.name = "AVERAGEIFS";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -706,7 +701,6 @@
 	/** @constructor */
 	function cBINOMDIST() {
 		this.name = "BINOMDIST";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 4;
 		this.argumentsCurrent = 0;
@@ -810,7 +804,6 @@
 	/** @constructor */
 	function cCONFIDENCE() {
 		this.name = "CONFIDENCE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -870,7 +863,6 @@
 	/** @constructor */
 	function cCORREL() {
 		this.name = "CORREL";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -953,7 +945,6 @@
 	/** @constructor */
 	function cCOUNT() {
 		this.name = "COUNT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1006,7 +997,6 @@
 	/** @constructor */
 	function cCOUNTA() {
 		this.name = "COUNTA";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1054,7 +1044,6 @@
 	/** @constructor */
 	function cCOUNTBLANK() {
 		this.name = "COUNTBLANK";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1082,7 +1071,6 @@
 	/** @constructor */
 	function cCOUNTIF() {
 		this.name = "COUNTIF";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -1135,7 +1123,6 @@
 	/** @constructor */
 	function cCOUNTIFS() {
 		this.name = "COUNTIFS";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -1204,7 +1191,6 @@
 	/** @constructor */
 	function cCOVAR() {
 		this.name = "COVAR";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -1281,7 +1267,6 @@
 	/** @constructor */
 	function cCRITBINOM() {
 		this.name = "CRITBINOM";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -1368,7 +1353,6 @@
 	/** @constructor */
 	function cDEVSQ() {
 		this.name = "DEVSQ";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1445,7 +1429,6 @@
 	/** @constructor */
 	function cEXPONDIST() {
 		this.name = "EXPONDIST";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -1521,7 +1504,6 @@
 	/** @constructor */
 	function cFISHER() {
 		this.name = "FISHER";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1567,7 +1549,6 @@
 	/** @constructor */
 	function cFISHERINV() {
 		this.name = "FISHERINV";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1613,7 +1594,6 @@
 	/** @constructor */
 	function cFORECAST() {
 		this.name = "FORECAST";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -1708,7 +1688,6 @@
 	/** @constructor */
 	function cFREQUENCY() {
 		this.name = "FREQUENCY";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -1815,7 +1794,6 @@
 	/** @constructor */
 	function cGAMMALN() {
 		this.name = "GAMMALN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1861,7 +1839,6 @@
 	/** @constructor */
 	function cGEOMEAN() {
 		this.name = "GEOMEAN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -1943,7 +1920,6 @@
 	/** @constructor */
 	function cHARMEAN() {
 		this.name = "HARMEAN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -2024,7 +2000,6 @@
 	/** @constructor */
 	function cHYPGEOMDIST() {
 		this.name = "HYPGEOMDIST";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 4;
 		this.argumentsCurrent = 0;
@@ -2099,7 +2074,6 @@
 	/** @constructor */
 	function cINTERCEPT() {
 		this.name = "INTERCEPT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -2182,7 +2156,6 @@
 	/** @constructor */
 	function cKURT() {
 		this.name = "KURT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -2271,7 +2244,6 @@
 	/** @constructor */
 	function cLARGE() {
 		this.name = "LARGE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -2357,7 +2329,6 @@
 	/** @constructor */
 	function cLOGINV() {
 		this.name = "LOGINV";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -2420,7 +2391,6 @@
 	/** @constructor */
 	function cLOGNORMDIST() {
 		this.name = "LOGNORMDIST";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -2483,7 +2453,6 @@
 	/** @constructor */
 	function cMAX() {
 		this.name = "MAX";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -2565,7 +2534,6 @@
 	/** @constructor */
 	function cMAXA() {
 		this.name = "MAXA";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -2649,7 +2617,6 @@
 	/** @constructor */
 	function cMEDIAN() {
 		this.name = "MEDIAN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -2725,7 +2692,6 @@
 	/** @constructor */
 	function cMIN() {
 		this.name = "MIN";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -2808,7 +2774,6 @@
 	/** @constructor */
 	function cMINA() {
 		this.name = "MINA";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -2893,7 +2858,6 @@
 	/** @constructor */
 	function cMODE() {
 		this.name = "MODE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -2989,7 +2953,6 @@
 	/** @constructor */
 	function cNEGBINOMDIST() {
 		this.name = "NEGBINOMDIST";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -3055,7 +3018,6 @@
 	/** @constructor */
 	function cNORMDIST() {
 		this.name = "NORMDIST";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 4;
 		this.argumentsCurrent = 0;
@@ -3134,7 +3096,6 @@
 	/** @constructor */
 	function cNORMINV() {
 		this.name = "NORMINV";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -3197,7 +3158,6 @@
 	/** @constructor */
 	function cNORMSDIST() {
 		this.name = "NORMSDIST";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -3237,7 +3197,6 @@
 	/** @constructor */
 	function cNORMSINV() {
 		this.name = "NORMSINV";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -3286,7 +3245,6 @@
 	/** @constructor */
 	function cPEARSON() {
 		this.name = "PEARSON";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -3370,7 +3328,6 @@
 	/** @constructor */
 	function cPERCENTILE() {
 		this.name = "PERCENTILE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -3434,7 +3391,6 @@
 	/** @constructor */
 	function cPERCENTRANK() {
 		this.name = "PERCENTRANK";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -3547,7 +3503,6 @@
 	/** @constructor */
 	function cPERMUT() {
 		this.name = "PERMUT";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -3635,7 +3590,6 @@
 	/** @constructor */
 	function cPOISSON() {
 		this.name = "POISSON";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -3711,7 +3665,6 @@
 	/** @constructor */
 	function cPROB() {
 		this.name = "PROB";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -3823,7 +3776,6 @@
 	/** @constructor */
 	function cQUARTILE() {
 		this.name = "QUARTILE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -3936,7 +3888,6 @@
 	/** @constructor */
 	function cRSQ() {
 		this.name = "RSQ";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -4021,7 +3972,6 @@
 	/** @constructor */
 	function cSKEW() {
 		this.name = "SKEW";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -4112,7 +4062,6 @@
 	/** @constructor */
 	function cSLOPE() {
 		this.name = "SLOPE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -4196,7 +4145,6 @@
 	/** @constructor */
 	function cSMALL() {
 		this.name = "SMALL";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -4274,7 +4222,6 @@
 	/** @constructor */
 	function cSTANDARDIZE() {
 		this.name = "STANDARDIZE";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
@@ -4337,7 +4284,6 @@
 	/** @constructor */
 	function cSTDEV() {
 		this.name = "STDEV";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -4403,7 +4349,6 @@
 	/** @constructor */
 	function cSTDEVA() {
 		this.name = "STDEVA";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -4466,7 +4411,6 @@
 	/** @constructor */
 	function cSTDEVP() {
 		this.name = "STDEVP";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -4542,7 +4486,6 @@
 	/** @constructor */
 	function cSTDEVPA() {
 		this.name = "STDEVPA";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -4632,7 +4575,6 @@
 	/** @constructor */
 	function cSTEYX() {
 		this.name = "STEYX";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
@@ -4754,7 +4696,6 @@
 	/** @constructor */
 	function cVAR() {
 		this.name = "VAR";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -4836,7 +4777,6 @@
 	/** @constructor */
 	function cVARA() {
 		this.name = "VARA";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -4930,7 +4870,6 @@
 	/** @constructor */
 	function cVARP() {
 		this.name = "VARP";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -5011,7 +4950,6 @@
 	/** @constructor */
 	function cVARdotP() {
 		this.name = "VAR.P";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
@@ -5029,7 +4967,6 @@
 	/** @constructor */
 	function cVARPA() {
 		this.name = "VARPA";
-		this.type = cElementType.func;
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
