@@ -32,662 +32,553 @@
 
 "use strict";
 
-(
-/**
-* @param {Window} window
-* @param {undefined} undefined
-*/
-function (window, undefined) {
-    var cElementType = AscCommonExcel.cElementType;
-    var cErrorType = AscCommonExcel.cErrorType;
-    var cNumber = AscCommonExcel.cNumber;
-    var cString = AscCommonExcel.cString;
-    var cBool = AscCommonExcel.cBool;
-    var cError = AscCommonExcel.cError;
-    var cArea = AscCommonExcel.cArea;
-    var cArea3D = AscCommonExcel.cArea3D;
-    var cRef = AscCommonExcel.cRef;
-    var cRef3D = AscCommonExcel.cRef3D;
-    var cArray = AscCommonExcel.cArray;
-    var cBaseFunction = AscCommonExcel.cBaseFunction;
-    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
-    
-    cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
-    cFormulaFunctionGroup['Information'].push(
-        cERROR_TYPE,
-        cISBLANK,
-        cISERR,
-        cISERROR,
-        cISEVEN,
-        cISLOGICAL,
-        cISNA,
-        cISNONTEXT,
-        cISNUMBER,
-        cISODD,
-        cISREF,
-        cISTEXT,
-        cN,
-        cNA,
-        cTYPE
-    );
+(/**
+ * @param {Window} window
+ * @param {undefined} undefined
+ */
+	function (window, undefined) {
+	var cElementType = AscCommonExcel.cElementType;
+	var cErrorType = AscCommonExcel.cErrorType;
+	var cNumber = AscCommonExcel.cNumber;
+	var cString = AscCommonExcel.cString;
+	var cBool = AscCommonExcel.cBool;
+	var cError = AscCommonExcel.cError;
+	var cArea = AscCommonExcel.cArea;
+	var cArea3D = AscCommonExcel.cArea3D;
+	var cRef = AscCommonExcel.cRef;
+	var cRef3D = AscCommonExcel.cRef3D;
+	var cArray = AscCommonExcel.cArray;
+	var cBaseFunction = AscCommonExcel.cBaseFunction;
+	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
-function cERROR_TYPE() {
-    this.name = "ERROR.TYPE";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 1;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 1;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
-}
+	cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
+	cFormulaFunctionGroup['Information'].push(cERROR_TYPE, cISBLANK, cISERR, cISERROR, cISEVEN, cISLOGICAL, cISNA,
+		cISNONTEXT, cISNUMBER, cISODD, cISREF, cISTEXT, cN, cNA, cTYPE);
 
-cERROR_TYPE.prototype = Object.create( cBaseFunction.prototype );
-cERROR_TYPE.prototype.Calculate = function ( arg ) {
-    function typeError( elem ) {
-        if ( elem instanceof cError ) {
-            switch ( elem.errorType ) {
-                case cErrorType.null_value:
-                    return new cNumber( 1 );
-                case cErrorType.division_by_zero:
-                    return new cNumber( 2 );
-                case cErrorType.wrong_value_type:
-                    return new cNumber( 3 );
-                case cErrorType.bad_reference :
-                    return new cNumber( 4 );
-                case cErrorType.wrong_name :
-                    return new cNumber( 5 );
-                case cErrorType.not_numeric :
-                    return new cNumber( 6 );
-                case cErrorType.not_available :
-                    return new cNumber( 7 );
-                case cErrorType.getting_data :
-                    return new cNumber( 8 );
-                default:
-                    return new cError( cErrorType.not_available );
-            }
-        }
-        else {
-            return new cError( cErrorType.not_available );
-        }
-    }
+	/** @constructor */
+	function cERROR_TYPE() {
+		this.name = "ERROR.TYPE";
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = 1;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 1;
+	}
 
-    var arg0 = arg[0];
-    if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-        arg0 = arg0.getValue();
-    }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].bbox );
-    }
-    else if ( arg0 instanceof cArray ) {
-        var ret = new cArray();
-        arg0.foreach( function ( elem, r, c ) {
-            if ( !ret.array[r] )
-                ret.addRow();
-            ret.addElement( found_operand );
-        } );
-        return this.value = ret;
-    }
-    return this.value = typeError( arg0 );
-};
-cERROR_TYPE.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"(value)"
-    };
-};
+	cERROR_TYPE.prototype = Object.create(cBaseFunction.prototype);
+	cERROR_TYPE.prototype.Calculate = function (arg) {
+		function typeError(elem) {
+			if (elem instanceof cError) {
+				switch (elem.errorType) {
+					case cErrorType.null_value:
+						return new cNumber(1);
+					case cErrorType.division_by_zero:
+						return new cNumber(2);
+					case cErrorType.wrong_value_type:
+						return new cNumber(3);
+					case cErrorType.bad_reference :
+						return new cNumber(4);
+					case cErrorType.wrong_name :
+						return new cNumber(5);
+					case cErrorType.not_numeric :
+						return new cNumber(6);
+					case cErrorType.not_available :
+						return new cNumber(7);
+					case cErrorType.getting_data :
+						return new cNumber(8);
+					default:
+						return new cError(cErrorType.not_available);
+				}
+			} else {
+				return new cError(cErrorType.not_available);
+			}
+		}
 
-function cISBLANK() {
-    this.name = "ISBLANK";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 1;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 1;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
+		var arg0 = arg[0];
+		if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
+			arg0 = arg0.getValue();
+		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].bbox);
+		} else if (arg0 instanceof cArray) {
+			var ret = new cArray();
+			arg0.foreach(function (elem, r, c) {
+				if (!ret.array[r]) {
+					ret.addRow();
+				}
+				ret.addElement(found_operand);
+			});
+			return this.value = ret;
+		}
+		return this.value = typeError(arg0);
+	};
+	cERROR_TYPE.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(value)"
+		};
+	};
 
-}
+	/** @constructor */
+	function cISBLANK() {
+		this.name = "ISBLANK";
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = 1;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 1;
+	}
 
-cISBLANK.prototype = Object.create( cBaseFunction.prototype );
-cISBLANK.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0];
-    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].bbox );
-    }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-        arg0 = arg0.getValue();
-    }
-    if ( arg0 instanceof AscCommonExcel.cEmpty )
-        return this.value = new cBool( true );
-    else
-        return this.value = new cBool( false );
-};
-cISBLANK.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"(value)"
-    };
-};
+	cISBLANK.prototype = Object.create(cBaseFunction.prototype);
+	cISBLANK.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].bbox);
+		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
+			arg0 = arg0.getValue();
+		}
+		if (arg0 instanceof AscCommonExcel.cEmpty) {
+			return this.value = new cBool(true);
+		} else {
+			return this.value = new cBool(false);
+		}
+	};
+	cISBLANK.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(value)"
+		};
+	};
 
-function cISERR() {
-    this.name = "ISERR";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 1;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 1;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
+	/** @constructor */
+	function cISERR() {
+		this.name = "ISERR";
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = 1;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 1;
+	}
 
-}
+	cISERR.prototype = Object.create(cBaseFunction.prototype);
+	cISERR.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (arg0 instanceof cArray) {
+			arg0 = arg0.getElement(0);
+		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].bbox);
+		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
+			arg0 = arg0.getValue();
+		}
 
-cISERR.prototype = Object.create( cBaseFunction.prototype );
-cISERR.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
-        arg0 = arg0.getElement( 0 );
-    }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].bbox );
-    }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-        arg0 = arg0.getValue();
-    }
+		if (arg0 instanceof cError && arg0.errorType != cErrorType.not_available) {
+			return this.value = new cBool(true);
+		} else {
+			return this.value = new cBool(false);
+		}
+	};
+	cISERR.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(value)"
+		};
+	};
 
-    if ( arg0 instanceof cError && arg0.errorType != cErrorType.not_available )
-        return this.value = new cBool( true );
-    else
-        return this.value = new cBool( false );
-};
-cISERR.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"(value)"
-    };
-};
+	/** @constructor */
+	function cISERROR() {
+		this.name = "ISERROR";
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = 1;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 1;
+	}
 
-function cISERROR() {
-    this.name = "ISERROR";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 1;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 1;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
+	cISERROR.prototype = Object.create(cBaseFunction.prototype);
+	cISERROR.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (arg0 instanceof cArray) {
+			arg0 = arg0.getElement(0);
+		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].bbox);
+		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
+			arg0 = arg0.getValue();
+		}
 
-}
+		if (arg0 instanceof cError) {
+			return this.value = new cBool(true);
+		} else {
+			return this.value = new cBool(false);
+		}
+	};
+	cISERROR.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(value)"
+		};
+	};
 
-cISERROR.prototype = Object.create( cBaseFunction.prototype );
-cISERROR.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
-        arg0 = arg0.getElement( 0 );
-    }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].bbox );
-    }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-        arg0 = arg0.getValue();
-    }
+	/** @constructor */
+	function cISEVEN() {
+		this.name = "ISEVEN";
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = 1;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 1;
+	}
 
-    if ( arg0 instanceof cError )
-        return this.value = new cBool( true );
-    else
-        return this.value = new cBool( false );
-};
-cISERROR.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"(value)"
-    };
-};
+	cISEVEN.prototype = Object.create(cBaseFunction.prototype);
+	cISEVEN.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (arg0 instanceof cArray) {
+			arg0 = arg0.getElement(0);
+		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].bbox);
+		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
+			arg0 = arg0.getValue();
+		}
 
-function cISEVEN() {
-    this.name = "ISEVEN";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 1;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 1;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		}
 
-}
+		arg0 = arg0.tocNumber();
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		} else {
+			return this.value = new cBool((arg0.getValue() & 1) == 0);
+		}
+	};
+	cISEVEN.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(number)"
+		};
+	};
 
-cISEVEN.prototype = Object.create( cBaseFunction.prototype );
-cISEVEN.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
-        arg0 = arg0.getElement( 0 );
-    }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].bbox );
-    }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-        arg0 = arg0.getValue();
-    }
+	/** @constructor */
+	function cISLOGICAL() {
+		this.name = "ISLOGICAL";
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = 1;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 1;
+	}
 
-    if ( arg0 instanceof cError )
-        return this.value = arg0;
+	cISLOGICAL.prototype = Object.create(cBaseFunction.prototype);
+	cISLOGICAL.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (arg0 instanceof cArray) {
+			arg0 = arg0.getElement(0);
+		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].bbox);
+		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
+			arg0 = arg0.getValue();
+		}
 
-    var arg0 = arg0.tocNumber();
-    if ( arg0 instanceof cError )
-        return this.value = arg0;
-    else
-        return this.value = new cBool( (arg0.getValue() & 1) == 0 );
-};
-cISEVEN.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"(number)"
-    };
-};
+		if (arg0 instanceof cBool) {
+			return this.value = new cBool(true);
+		} else {
+			return this.value = new cBool(false);
+		}
+	};
+	cISLOGICAL.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(value)"
+		};
+	};
 
-function cISLOGICAL() {
-    this.name = "ISLOGICAL";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 1;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 1;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
+	/** @constructor */
+	function cISNA() {
+		this.name = "ISNA";
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = 1;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 1;
+	}
 
-}
+	cISNA.prototype = Object.create(cBaseFunction.prototype);
+	cISNA.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (arg0 instanceof cArray) {
+			arg0 = arg0.getElement(0);
+		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].bbox);
+		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
+			arg0 = arg0.getValue();
+		}
 
-cISLOGICAL.prototype = Object.create( cBaseFunction.prototype );
-cISLOGICAL.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
-        arg0 = arg0.getElement( 0 );
-    }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].bbox );
-    }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-        arg0 = arg0.getValue();
-    }
+		if (arg0 instanceof cError && arg0.errorType == cErrorType.not_available) {
+			return this.value = new cBool(true);
+		} else {
+			return this.value = new cBool(false);
+		}
+	};
+	cISNA.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(value)"
+		};
+	};
 
-    if ( arg0 instanceof cBool )
-        return this.value = new cBool( true );
-    else return this.value = new cBool( false );
-};
-cISLOGICAL.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"(value)"
-    };
-};
+	/** @constructor */
+	function cISNONTEXT() {
+		this.name = "ISNONTEXT";
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = 1;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 1;
+	}
 
-function cISNA() {
-    this.name = "ISNA";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 1;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 1;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
+	cISNONTEXT.prototype = Object.create(cBaseFunction.prototype);
+	cISNONTEXT.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (arg0 instanceof cArray) {
+			arg0 = arg0.getElement(0);
+		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].bbox);
+		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
+			arg0 = arg0.getValue();
+		}
+		if (!(arg0 instanceof cString)) {
+			return this.value = new cBool(true);
+		} else {
+			return this.value = new cBool(false);
+		}
+	};
+	cISNONTEXT.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(value)"
+		};
+	};
 
-}
+	/** @constructor */
+	function cISNUMBER() {
+		this.name = "ISNUMBER";
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = 1;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 1;
+	}
 
-cISNA.prototype = Object.create( cBaseFunction.prototype );
-cISNA.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
-        arg0 = arg0.getElement( 0 );
-    }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].bbox );
-    }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-        arg0 = arg0.getValue();
-    }
+	cISNUMBER.prototype = Object.create(cBaseFunction.prototype);
+	cISNUMBER.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (arg0 instanceof cArray) {
+			arg0 = arg0.getElement(0);
+		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].bbox);
+		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
+			arg0 = arg0.getValue();
+		}
 
-    if ( arg0 instanceof cError && arg0.errorType == cErrorType.not_available )
-        return this.value = new cBool( true );
-    else
-        return this.value = new cBool( false );
-};
-cISNA.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"(value)"
-    };
-};
+		if (arg0 instanceof cNumber) {
+			return this.value = new cBool(true);
+		} else {
+			return this.value = new cBool(false);
+		}
+	};
+	cISNUMBER.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(value)"
+		};
+	};
 
-function cISNONTEXT() {
-    this.name = "ISNONTEXT";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 1;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 1;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
+	/** @constructor */
+	function cISODD() {
+		this.name = "ISODD";
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = 1;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 1;
+	}
 
-}
+	cISODD.prototype = Object.create(cBaseFunction.prototype);
+	cISODD.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (arg0 instanceof cArray) {
+			arg0 = arg0.getElement(0);
+		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].bbox);
+		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
+			arg0 = arg0.getValue();
+		}
 
-cISNONTEXT.prototype = Object.create( cBaseFunction.prototype );
-cISNONTEXT.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
-        arg0 = arg0.getElement( 0 );
-    }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].bbox );
-    }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-        arg0 = arg0.getValue();
-    }
-    if ( !(arg0 instanceof cString) )
-        return this.value = new cBool( true );
-    else
-        return this.value = new cBool( false );
-};
-cISNONTEXT.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"(value)"
-    };
-};
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		}
 
-function cISNUMBER() {
-    this.name = "ISNUMBER";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 1;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 1;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
+		arg0 = arg0.tocNumber();
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		} else {
+			return this.value = new cBool((arg0.getValue() & 1) == 1);
+		}
+	};
+	cISODD.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(number)"
+		};
+	};
 
-}
+	/** @constructor */
+	function cISREF() {
+		this.name = "ISREF";
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = 1;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 1;
+	}
 
-cISNUMBER.prototype = Object.create( cBaseFunction.prototype );
-cISNUMBER.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
-        arg0 = arg0.getElement( 0 );
-    }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].bbox );
-    }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-        arg0 = arg0.getValue();
-    }
+	cISREF.prototype = Object.create(cBaseFunction.prototype);
+	cISREF.prototype.Calculate = function (arg) {
+		if ((arg[0] instanceof cRef || arg[0] instanceof cArea || arg[0] instanceof cArea3D ||
+			arg[0] instanceof cRef3D) && arg[0].isValid && arg[0].isValid()) {
+			return this.value = new cBool(true);
+		} else {
+			return this.value = new cBool(false);
+		}
+	};
+	cISREF.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(value)"
+		};
+	};
 
-    if ( arg0 instanceof cNumber )
-        return this.value = new cBool( true );
-    else
-        return this.value = new cBool( false );
-};
-cISNUMBER.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"(value)"
-    };
-};
+	/** @constructor */
+	function cISTEXT() {
+		this.name = "ISTEXT";
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = 1;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 1;
+	}
 
-function cISODD() {
-    this.name = "ISODD";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 1;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 1;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
+	cISTEXT.prototype = Object.create(cBaseFunction.prototype);
+	cISTEXT.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (arg0 instanceof cArray) {
+			arg0 = arg0.getElement(0);
+		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].bbox);
+		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
+			arg0 = arg0.getValue();
+		}
 
-}
+		if (arg0 instanceof cString) {
+			return this.value = new cBool(true);
+		} else {
+			return this.value = new cBool(false);
+		}
+	};
+	cISTEXT.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(value)"
+		};
+	};
 
-cISODD.prototype = Object.create( cBaseFunction.prototype );
-cISODD.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
-        arg0 = arg0.getElement( 0 );
-    }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].bbox );
-    }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-        arg0 = arg0.getValue();
-    }
+	/** @constructor */
+	function cN() {
+		this.name = "N";
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = 1;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 1;
+	}
 
-    if ( arg0 instanceof cError )
-        return this.value = arg0;
+	cN.prototype = Object.create(cBaseFunction.prototype);
+	cN.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cN.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (arg0 instanceof cArray) {
+			var arr = new cArray();
+			arg.foreach(function (elem, r, c) {
+				if (elem instanceof cNumber || elem instanceof cError) {
+					arr.array[r][c] = elem;
+				} else if (elem instanceof cBool) {
+					arr.array[r][c] = elem.tocNumber();
+				} else {
+					arr.array[r][c] = new cNumber(0);
+				}
+			});
+			return this.value = arr;
+		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].bbox);
+		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
+			arg0 = arg0.getValue();
+		}
 
-    var arg0 = arg0.tocNumber();
-    if ( arg0 instanceof cError )
-        return this.value = arg0;
-    else
-        return this.value = new cBool( (arg0.getValue() & 1) == 1 );
-};
-cISODD.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"(number)"
-    };
-};
+		if (arg0 instanceof cNumber || arg0 instanceof cError) {
+			return this.value = arg0;
+		} else if (arg0 instanceof cBool) {
+			return this.value = arg0.tocNumber();
+		} else {
+			return this.value = new cNumber(0);
+		}
 
-function cISREF() {
-    this.name = "ISREF";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 1;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 1;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
+	};
+	cN.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(value)"
+		};
+	};
 
-}
+	/** @constructor */
+	function cNA() {
+		this.name = "NA";
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = 0;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 0;
+	}
 
-cISREF.prototype = Object.create( cBaseFunction.prototype );
-cISREF.prototype.Calculate = function ( arg ) {
-    if ( (arg[0] instanceof cRef || arg[0] instanceof cArea || arg[0] instanceof cArea3D || arg[0] instanceof cRef3D) && arg[0].isValid && arg[0].isValid() )
-        return this.value = new cBool( true );
-    else return this.value = new cBool( false );
-};
-cISREF.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"(value)"
-    };
-};
+	cNA.prototype = Object.create(cBaseFunction.prototype);
+	cNA.prototype.Calculate = function () {
+		return this.value = new cError(cErrorType.not_available);
+	};
+	cNA.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "()"
+		};
+	};
 
-function cISTEXT() {
-    this.name = "ISTEXT";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 1;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 1;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
+	/** @constructor */
+	function cTYPE() {
+		this.name = "TYPE";
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = 1;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = 1;
+	}
 
-}
+	cTYPE.prototype = Object.create(cBaseFunction.prototype);
+	cTYPE.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].bbox);
+		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
+			arg0 = arg0.getValue();
+		}
 
-cISTEXT.prototype = Object.create( cBaseFunction.prototype );
-cISTEXT.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
-        arg0 = arg0.getElement( 0 );
-    }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].bbox );
-    }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-        arg0 = arg0.getValue();
-    }
-
-    if ( arg0 instanceof cString )
-        return this.value = new cBool( true );
-    else
-        return this.value = new cBool( false );
-};
-cISTEXT.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"(value)"
-    };
-};
-
-function cN() {
-    this.name = "N";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 1;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 1;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.noneFormat;
-
-}
-
-cN.prototype = Object.create( cBaseFunction.prototype );
-cN.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
-        var arr = new cArray();
-        arg.foreach( function ( elem, r, c ) {
-            if ( elem instanceof cNumber || elem instanceof cError )
-                arr.array[r][c] = elem;
-            else if ( elem instanceof cBool )
-                arr.array[r][c] = elem.tocNumber();
-            else
-                arr.array[r][c] = new cNumber( 0 );
-        } )
-        return this.value = arr;
-    }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].bbox );
-    }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-        arg0 = arg0.getValue();
-    }
-
-    if ( arg0 instanceof cNumber || arg0 instanceof cError )
-        return this.value = arg0;
-    else if ( arg0 instanceof cBool )
-        return this.value = arg0.tocNumber();
-    else
-        return this.value = new cNumber( 0 );
-
-};
-cN.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"(value)"
-    };
-};
-
-function cNA() {
-    this.name = "NA";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 0;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 0;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
-
-}
-
-cNA.prototype = Object.create( cBaseFunction.prototype );
-cNA.prototype.Calculate = function () {
-    return this.value = new cError( cErrorType.not_available );
-};
-cNA.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"()"
-    };
-};
-
-function cTYPE() {
-    this.name = "TYPE";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 1;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 1;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
-
-}
-
-cTYPE.prototype = Object.create( cBaseFunction.prototype );
-cTYPE.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0];
-    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].bbox );
-    }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-        arg0 = arg0.getValue();
-    }
-
-    if ( arg0 instanceof cNumber )
-        return this.value = new cNumber( 1 );
-    else if ( arg0 instanceof cString )
-        return this.value = new cNumber( 2 )
-    else if ( arg0 instanceof cBool )
-        return this.value = new cNumber( 4 )
-    else if ( arg0 instanceof cError )
-        return this.value = new cNumber( 16 )
-    else
-        return this.value = new cNumber( 64 );
-};
-cTYPE.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"(value)"
-    };
-};
+		if (arg0 instanceof cNumber) {
+			return this.value = new cNumber(1);
+		} else if (arg0 instanceof cString) {
+			return this.value = new cNumber(2);
+		} else if (arg0 instanceof cBool) {
+			return this.value = new cNumber(4);
+		} else if (arg0 instanceof cError) {
+			return this.value = new cNumber(16);
+		} else {
+			return this.value = new cNumber(64);
+		}
+	};
+	cTYPE.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(value)"
+		};
+	};
 })(window);

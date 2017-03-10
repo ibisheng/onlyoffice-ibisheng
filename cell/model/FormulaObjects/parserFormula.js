@@ -46,7 +46,6 @@ function (window, undefined) {
   var FormulaSeparators = AscCommon.FormulaSeparators;
   var parserHelp = AscCommon.parserHelp;
   var g_oFormatParser = AscCommon.g_oFormatParser;
-  var g_oCellAddressUtils = AscCommon.g_oCellAddressUtils;
   var CellAddress = AscCommon.CellAddress;
 
   var c_oAscError = Asc.c_oAscError;
@@ -2188,11 +2187,6 @@ cUndefined.prototype = Object.create( cBaseType.prototype );
     this.isRightAssociative = false;
     this.argumentsCurrent = (argumentCount !== undefined) ? argumentCount : 2;
     this.value = null;
-    this.formatType = {
-      def: -1, //подразумевается формат первой ячейки входящей в формулу.
-      noneFormat: -2
-    };
-    this.numFormat = this.formatType.def;
   }
 
   cBaseOperator.prototype.getArguments = function () {
@@ -2233,102 +2227,99 @@ cUndefined.prototype = Object.create( cBaseType.prototype );
     return new cString(str);
   };
 
-  /** @constructor */
-  function cBaseFunction(name, argMin, argMax) {
-    this.name = name;
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = argMin ? argMin : 0;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = argMax ? argMax : 255;
-    this.formatType = {
-      def: -1, //подразумевается формат первой ячейки входящей в формулу.
-      noneFormat: -2
-    };
-    this.numFormat = this.formatType.def;
+	/** @constructor */
+	function cBaseFunction(name, argMin, argMax) {
+		this.name = name;
+		this.type = cElementType.func;
+		this.value = null;
+		this.argumentsMin = argMin ? argMin : 0;
+		this.argumentsCurrent = 0;
+		this.argumentsMax = argMax ? argMax : 255;
 //    this.isXLFN = rx_sFuncPref.test(this.name);
-  }
-  cBaseFunction.prototype.Calculate = function () {
-    this.value = new cError(cErrorType.wrong_name);
-    return this.value;
-  };
-  cBaseFunction.prototype.DecrementArguments = function () {
-    --this.argumentsCurrent;
-  };
-  cBaseFunction.prototype.IncrementArguments = function () {
-    ++this.argumentsCurrent;
-  };
-  cBaseFunction.prototype.setName = function (name) {
-    this.name = name;
-  };
-  cBaseFunction.prototype.setArgumentsCount = function (count) {
-    this.argumentsCurrent = count;
-  };
-  cBaseFunction.prototype.getArguments = function () {
-    return this.argumentsCurrent;
-  };
-  cBaseFunction.prototype.getMaxArguments = function () {
-    return this.argumentsMax;
-  };
-  cBaseFunction.prototype.getMinArguments = function () {
-    return this.argumentsMin;
-  };
-  cBaseFunction.prototype.Assemble = function (arg) {
-    var str = "";
-    for (var i = 0; i < arg.length; i++) {
-      str += arg[i].toString();
-      if (i !== arg.length - 1) {
-        str += ",";
-      }
-    }
-    if (this.isXLFN) {
-      return new cString("_xlfn." + this.name + "(" + str + ")");
-    }
-    return new cString(this.toString() + "(" + str + ")");
-  };
-  cBaseFunction.prototype.Assemble2 = function (arg, start, count) {
+	}
 
-    var str = "", c = start + count - 1;
-    for (var i = start; i <= c; i++) {
-      str += arg[i].toString();
-      if (i !== c) {
-        str += ",";
-      }
-    }
-    if (this.isXLFN) {
-      return new cString("_xlfn." + this.name + "(" + str + ")");
-    }
-    return new cString(this.toString() + "(" + str + ")");
-  };
-  cBaseFunction.prototype.Assemble2Locale = function (arg, start, count, locale, digitDelim) {
+	cBaseFunction.prototype.numFormat = AscCommonExcel.cNumFormatFirstCell;
+	cBaseFunction.prototype.Calculate = function () {
+		this.value = new cError(cErrorType.wrong_name);
+		return this.value;
+	};
+	cBaseFunction.prototype.DecrementArguments = function () {
+		--this.argumentsCurrent;
+	};
+	cBaseFunction.prototype.IncrementArguments = function () {
+		++this.argumentsCurrent;
+	};
+	cBaseFunction.prototype.setName = function (name) {
+		this.name = name;
+	};
+	cBaseFunction.prototype.setArgumentsCount = function (count) {
+		this.argumentsCurrent = count;
+	};
+	cBaseFunction.prototype.getArguments = function () {
+		return this.argumentsCurrent;
+	};
+	cBaseFunction.prototype.getMaxArguments = function () {
+		return this.argumentsMax;
+	};
+	cBaseFunction.prototype.getMinArguments = function () {
+		return this.argumentsMin;
+	};
+	cBaseFunction.prototype.Assemble = function (arg) {
+		var str = "";
+		for (var i = 0; i < arg.length; i++) {
+			str += arg[i].toString();
+			if (i !== arg.length - 1) {
+				str += ",";
+			}
+		}
+		if (this.isXLFN) {
+			return new cString("_xlfn." + this.name + "(" + str + ")");
+		}
+		return new cString(this.toString() + "(" + str + ")");
+	};
+	cBaseFunction.prototype.Assemble2 = function (arg, start, count) {
 
-    var name = this.toString(), str = "", c = start + count - 1, localeName = locale ? locale[name] : name;
+		var str = "", c = start + count - 1;
+		for (var i = start; i <= c; i++) {
+			str += arg[i].toString();
+			if (i !== c) {
+				str += ",";
+			}
+		}
+		if (this.isXLFN) {
+			return new cString("_xlfn." + this.name + "(" + str + ")");
+		}
+		return new cString(this.toString() + "(" + str + ")");
+	};
+	cBaseFunction.prototype.Assemble2Locale = function (arg, start, count, locale, digitDelim) {
 
-    localeName = localeName || this.toString();
-    for (var i = start; i <= c; i++) {
-      str += arg[i].toLocaleString(digitDelim);
-      if (i !== c) {
-        str += FormulaSeparators.functionArgumentSeparator;
-      }
-    }
-    return new cString(localeName + "(" + str + ")");
-  };
-  cBaseFunction.prototype.toString = function () {
-    return this.name.replace(rx_sFuncPref, "_xlfn.");
-  };
-  cBaseFunction.prototype.setCA = function (arg, ca, numFormat) {
-    this.value = arg;
-    if (ca) {
-      this.value.ca = true;
-    }
-    if (numFormat !== null && numFormat !== undefined) {
-      this.value.numFormat = numFormat;
-    }
-    return this.value;
-  };
-  cBaseFunction.prototype.checkArguments = function () {
-    return this.argumentsMin <= this.argumentsCurrent && this.argumentsCurrent <= this.argumentsMax;
-  };
+		var name = this.toString(), str = "", c = start + count - 1, localeName = locale ? locale[name] : name;
+
+		localeName = localeName || this.toString();
+		for (var i = start; i <= c; i++) {
+			str += arg[i].toLocaleString(digitDelim);
+			if (i !== c) {
+				str += FormulaSeparators.functionArgumentSeparator;
+			}
+		}
+		return new cString(localeName + "(" + str + ")");
+	};
+	cBaseFunction.prototype.toString = function () {
+		return this.name.replace(rx_sFuncPref, "_xlfn.");
+	};
+	cBaseFunction.prototype.setCA = function (arg, ca, numFormat) {
+		this.value = arg;
+		if (ca) {
+			this.value.ca = true;
+		}
+		if (numFormat !== null && numFormat !== undefined) {
+			this.value.numFormat = numFormat;
+		}
+		return this.value;
+	};
+	cBaseFunction.prototype.checkArguments = function () {
+		return this.argumentsMin <= this.argumentsCurrent && this.argumentsCurrent <= this.argumentsMax;
+	};
 
 /** @constructor */
 function parentLeft() {
@@ -4762,67 +4753,67 @@ parserFormula.prototype.parse = function(local, digitDelim) {
   }
 };
 
-parserFormula.prototype.calculate = function(opt_defName, opt_range) {
-	if (this.isCalculate) {
-		this.value = new cError(cErrorType.bad_reference);
+	parserFormula.prototype.calculate = function (opt_defName, opt_range) {
+		if (this.isCalculate) {
+			this.value = new cError(cErrorType.bad_reference);
+			this._endCalculate();
+			return this.value;
+		}
+		this.isCalculate = true;
+		if (this.outStack.length < 1) {
+			this.value = new cError(cErrorType.wrong_name);
+			this._endCalculate();
+			return this.value;
+		}
+		var rangeCell = null;
+		if (opt_range) {
+			rangeCell = opt_range;
+		} else if (this.parent && this.parent.onFormulaEvent) {
+			rangeCell = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.GetRangeCell);
+		}
+		if (!rangeCell) {
+			rangeCell = this.ws.getCell3(0, 0);
+		}
+
+		var elemArr = [], _tmp, numFormat = -1, currentElement = null;
+		for (var i = 0; i < this.outStack.length; i++) {
+			currentElement = this.outStack[i];
+			if (currentElement.name == "(") {
+				continue;
+			}
+			if (currentElement.type === cElementType.operator || currentElement.type === cElementType.func) {
+				if (elemArr.length < currentElement.getArguments()) {
+					elemArr = [];
+					this.value = new cError(cErrorType.unsupported_function);
+					this._endCalculate();
+					return this.value;
+				} else {
+					var arg = [];
+					for (var ind = 0; ind < currentElement.getArguments(); ind++) {
+						arg.unshift(elemArr.pop());
+					}
+					_tmp = currentElement.Calculate(arg, rangeCell, opt_defName, this.ws.getId());
+					if (null != _tmp.numFormat) {
+						numFormat = _tmp.numFormat;
+					} else if (0 > numFormat || AscCommonExcel.cNumFormatNone === currentElement.numFormat) {
+						numFormat = currentElement.numFormat;
+					}
+					elemArr.push(_tmp);
+				}
+			} else if (currentElement.type === cElementType.name || currentElement.type === cElementType.name3D) {
+				elemArr.push(currentElement.Calculate(arg, rangeCell));
+			} else if (currentElement.type === cElementType.table) {
+				elemArr.push(currentElement.toRef(rangeCell.getBBox0()));
+			} else {
+				elemArr.push(currentElement);
+			}
+		}
+		this.value = elemArr.pop();
+		this.value.numFormat = numFormat;
+
 		this._endCalculate();
 		return this.value;
-	}
-	this.isCalculate = true;
-	if (this.outStack.length < 1) {
-		this.value = new cError(cErrorType.wrong_name);
-		this._endCalculate();
-		return this.value;
-	}
-	var rangeCell = null;
-	if (opt_range) {
-		rangeCell = opt_range;
-	} else if (this.parent && this.parent.onFormulaEvent) {
-		rangeCell = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.GetRangeCell);
-	}
-	if (!rangeCell) {
-		rangeCell = this.ws.getCell3(0, 0);
-	}
-
-  var elemArr = [], _tmp, numFormat = -1, currentElement = null;
-  for (var i = 0; i < this.outStack.length; i++) {
-    currentElement = this.outStack[i];
-    if (currentElement.name == "(") {
-      continue;
-    }
-    if (currentElement.type == cElementType.operator || currentElement.type == cElementType.func) {
-      if (elemArr.length < currentElement.getArguments()) {
-        elemArr = [];
-		this.value = new cError(cErrorType.unsupported_function);
-		this._endCalculate();
-        return this.value;
-        } else {
-        var arg = [];
-        for (var ind = 0; ind < currentElement.getArguments(); ind++) {
-          arg.unshift(elemArr.pop());
-        }
-          _tmp = currentElement.Calculate(arg, rangeCell, opt_defName, this.ws.getId());
-        if (_tmp.numFormat !== undefined && _tmp.numFormat !== null) {
-          numFormat = _tmp.numFormat; //> numFormat ? _tmp.numFormat : numFormat;
-          } else if (numFormat < 0 || currentElement.numFormat < currentElement.formatType.def) {
-          numFormat = currentElement.numFormat;
-        }
-        elemArr.push(_tmp);
-      }
-      } else if (currentElement.type == cElementType.name || currentElement.type == cElementType.name3D) {
-      elemArr.push(currentElement.Calculate(arg, rangeCell));
-      } else if (currentElement.type == cElementType.table) {
-      elemArr.push(currentElement.toRef(rangeCell.getBBox0()));
-      } else {
-      elemArr.push(currentElement);
-    }
-  }
-  this.value = elemArr.pop();
-  this.value.numFormat = numFormat;
-
-    this._endCalculate();
-  return this.value;
-};
+	};
 	parserFormula.prototype._endCalculate = function() {
 		if (this.parent && this.parent.onFormulaEvent) {
 			this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.EndCalculate);
@@ -5593,52 +5584,54 @@ function rtl_math_erfc( x ) {
     return fErfc;
 }
 
-  //----------------------------------------------------------export----------------------------------------------------
-  window['AscCommonExcel'] = window['AscCommonExcel'] || {};
-  window['AscCommonExcel'].cElementType = cElementType;
-  window['AscCommonExcel'].cErrorType = cErrorType;
-  window['AscCommonExcel'].cExcelSignificantDigits = cExcelSignificantDigits;
-  window['AscCommonExcel'].cExcelMaxExponent = cExcelMaxExponent;
-  window['AscCommonExcel'].cExcelMinExponent = cExcelMinExponent;
-  window['AscCommonExcel'].c_Date1904Const = c_Date1904Const;
-  window['AscCommonExcel'].c_Date1900Const = c_Date1900Const;
-  window['AscCommonExcel'].c_DateCorrectConst = c_Date1900Const;
-  window['AscCommonExcel'].c_sPerDay = c_sPerDay;
-  window['AscCommonExcel'].c_msPerDay = c_msPerDay;
+	//----------------------------------------------------------export----------------------------------------------------
+	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+	window['AscCommonExcel'].cElementType = cElementType;
+	window['AscCommonExcel'].cErrorType = cErrorType;
+	window['AscCommonExcel'].cExcelSignificantDigits = cExcelSignificantDigits;
+	window['AscCommonExcel'].cExcelMaxExponent = cExcelMaxExponent;
+	window['AscCommonExcel'].cExcelMinExponent = cExcelMinExponent;
+	window['AscCommonExcel'].c_Date1904Const = c_Date1904Const;
+	window['AscCommonExcel'].c_Date1900Const = c_Date1900Const;
+	window['AscCommonExcel'].c_DateCorrectConst = c_Date1900Const;
+	window['AscCommonExcel'].c_sPerDay = c_sPerDay;
+	window['AscCommonExcel'].c_msPerDay = c_msPerDay;
+	window['AscCommonExcel'].cNumFormatFirstCell = -1;
+	window['AscCommonExcel'].cNumFormatNone = -2;
 
-  window['AscCommonExcel'].cNumber = cNumber;
-  window['AscCommonExcel'].cString = cString;
-  window['AscCommonExcel'].cBool = cBool;
-  window['AscCommonExcel'].cError = cError;
-  window['AscCommonExcel'].cArea = cArea;
-  window['AscCommonExcel'].cArea3D = cArea3D;
-  window['AscCommonExcel'].cRef = cRef;
-  window['AscCommonExcel'].cRef3D = cRef3D;
-  window['AscCommonExcel'].cEmpty = cEmpty;
-  window['AscCommonExcel'].cName = cName;
-  window['AscCommonExcel'].cArray = cArray;
-  window['AscCommonExcel'].cUndefined = cUndefined;
-  window['AscCommonExcel'].cBaseFunction = cBaseFunction;
+	window['AscCommonExcel'].cNumber = cNumber;
+	window['AscCommonExcel'].cString = cString;
+	window['AscCommonExcel'].cBool = cBool;
+	window['AscCommonExcel'].cError = cError;
+	window['AscCommonExcel'].cArea = cArea;
+	window['AscCommonExcel'].cArea3D = cArea3D;
+	window['AscCommonExcel'].cRef = cRef;
+	window['AscCommonExcel'].cRef3D = cRef3D;
+	window['AscCommonExcel'].cEmpty = cEmpty;
+	window['AscCommonExcel'].cName = cName;
+	window['AscCommonExcel'].cArray = cArray;
+	window['AscCommonExcel'].cUndefined = cUndefined;
+	window['AscCommonExcel'].cBaseFunction = cBaseFunction;
 
 	window['AscCommonExcel'].checkTypeCell = checkTypeCell;
-  window['AscCommonExcel'].cFormulaFunctionGroup = cFormulaFunctionGroup;
-  window['AscCommonExcel'].cFormulaFunction = cFormulaFunction;
+	window['AscCommonExcel'].cFormulaFunctionGroup = cFormulaFunctionGroup;
+	window['AscCommonExcel'].cFormulaFunction = cFormulaFunction;
 
-  window['AscCommonExcel'].cFormulaFunctionLocalized = null;
-  window['AscCommonExcel'].cFormulaFunctionToLocale = null;
+	window['AscCommonExcel'].cFormulaFunctionLocalized = null;
+	window['AscCommonExcel'].cFormulaFunctionToLocale = null;
 
-  window['AscCommonExcel'].getFormulasInfo = getFormulasInfo;
+	window['AscCommonExcel'].getFormulasInfo = getFormulasInfo;
 	window['AscCommonExcel'].getRangeByRef = getRangeByRef;
 
-  window['AscCommonExcel']._func = _func;
+	window['AscCommonExcel']._func = _func;
 
-  window['AscCommonExcel'].parserFormula = parserFormula;
+	window['AscCommonExcel'].parserFormula = parserFormula;
 
-  window['AscCommonExcel'].parseNum = parseNum;
-  window['AscCommonExcel'].matching = matching;
+	window['AscCommonExcel'].parseNum = parseNum;
+	window['AscCommonExcel'].matching = matching;
 	window['AscCommonExcel'].matchingValue = matchingValue;
-  window['AscCommonExcel'].GetDiffDate360 = GetDiffDate360;
-  window['AscCommonExcel'].searchRegExp2 = searchRegExp2;
-  window['AscCommonExcel'].rtl_math_erf = rtl_math_erf;
-  window['AscCommonExcel'].rtl_math_erfc = rtl_math_erfc;
+	window['AscCommonExcel'].GetDiffDate360 = GetDiffDate360;
+	window['AscCommonExcel'].searchRegExp2 = searchRegExp2;
+	window['AscCommonExcel'].rtl_math_erf = rtl_math_erf;
+	window['AscCommonExcel'].rtl_math_erfc = rtl_math_erfc;
 })(window);
