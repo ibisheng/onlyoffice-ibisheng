@@ -7102,8 +7102,11 @@ NoteSlide.prototype =
 // SLIDE ----------------------------
 function redrawSlide(slide, presentation, arrInd, pos,  direction, arr_slides)
 {
-    slide.recalculate();
-    presentation.DrawingDocument.OnRecalculatePage(slide.num, slide);
+    if(slide)
+    {
+        slide.recalculate();
+        presentation.DrawingDocument.OnRecalculatePage(slide.num, slide);
+    }
     if(direction == 0)
     {
         if(pos > 0)
