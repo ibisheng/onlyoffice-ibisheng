@@ -325,6 +325,58 @@ ParaField.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 		oRangeBounds.Y1 += Dy;
 	}
 };
+ParaField.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
+{
+	var bResult = ParaField.superclass.Get_LeftPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
+
+	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	{
+		this.Get_StartPos(SearchPos.Pos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	return bResult;
+};
+ParaField.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+{
+	var bResult = ParaField.superclass.Get_RightPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
+
+	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	{
+		this.Get_EndPos(false, SearchPos.Pos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	return bResult;
+};
+ParaField.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseContentPos)
+{
+	var bResult = ParaField.superclass.Get_WordStartPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
+
+	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	{
+		this.Get_StartPos(SearchPos.Pos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	return bResult;
+};
+ParaField.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+{
+	var bResult = ParaField.superclass.Get_WordEndPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
+
+	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	{
+		this.Get_EndPos(false, SearchPos.Pos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	return bResult;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Работа с данными поля
 //----------------------------------------------------------------------------------------------------------------------
@@ -485,6 +537,13 @@ ParaField.prototype.SetValue = function(sValue)
 	this.Remove_FromContent(0, this.Content.length);
 	this.Add_ToContent(0, oRun);
 	this.Cursor_MoveToStartPos();
+};
+ParaField.prototype.IsFillingForm = function()
+{
+	if (fieldtype_FORMTEXT === this.Get_FieldType())
+		return true;
+
+	return false;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
