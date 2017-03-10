@@ -990,6 +990,8 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         {
             var oUnifill = CreateUniFillFromExcelColor(oSparklineGroup.colorSeries);
             var oSerie = chart_space.chart.plotArea.charts[0].series[0];
+
+            oSerie.setSpPr(new AscFormat.CSpPr());
             if(nSparklineType === Asc.c_oAscSparklineType.Line)
             {
                 var oLn = oSerie.spPr.ln;

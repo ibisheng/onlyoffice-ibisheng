@@ -949,6 +949,8 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
         var mapTables           = {};
         var mapGrObjects        = {};
         var mapSlides           = {};
+        var mapLayouts          = {};
+        var bChangedLayout   = false;
         for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
         {
             var oChange = arrReverseChanges[nIndex];
@@ -971,8 +973,14 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
 				mapTables[oClass.Get_Id()] = oClass;
 			else if(oClass instanceof AscFormat.CShape || oClass instanceof AscFormat.CImageShape || oClass instanceof AscFormat.CChartSpace || oClass instanceof AscFormat.CGroupShape || oClass instanceof AscFormat.CGraphicFrame)
                 mapGrObjects[oClass.Get_Id()] = oClass;
-			else if(typeof AscCommonSlide !== "undefined" && AscCommonSlide.Slide && oClass instanceof AscCommonSlide.Slide){
-                mapSlides[oClass.Get_Id()] = oClass;
+			else if(typeof AscCommonSlide !== "undefined") {
+                if (AscCommonSlide.Slide && oClass instanceof AscCommonSlide.Slide) {
+                    mapSlides[oClass.Get_Id()] = oClass;
+                }
+                else if(AscCommonSlide.SlideLayout && oClass instanceof AscCommonSlide.SlideLayout){
+                    mapLayouts[oClass.Get_Id()] = oClass;
+                    bChangedLayout = true;
+                }
             }
         }
 
@@ -985,6 +993,18 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
                 mapSlides[sId].correctContent();
             }
         }
+
+        if(bChangedLayout){
+            for(var i = oLogicDocument.Slides.length - 1; i > -1 ; --i){
+                var Layout = oLogicDocument.Slides[i].Layout;
+                if(!Layout || mapLayouts[Layout.Get_Id()]){
+                    if(!oLogicDocument.Slides[i].CheckLayout()){
+                        oLogicDocument.removeSlide(i);
+                    }
+                }
+            }
+        }
+
         for(var sId in mapGrObjects){
             var oShape = mapGrObjects[sId];
             if(!oShape.checkCorrect()){

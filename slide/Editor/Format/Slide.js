@@ -195,6 +195,11 @@ function Slide(presentation, slideLayout, slideNum)
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 
+
+    this.lastLayoutType = null;
+    this.lastLayoutMatchingName = null;
+    this.lastLayoutName = null;
+
     if(presentation)
     {
         this.Width = presentation.Width;
@@ -513,6 +518,11 @@ Slide.prototype =
                 case AscDFH.historyitem_SlideSetLayout:
                 {
                     this.checkSlideTheme();
+                    if(this.Layout){
+                        this.lastLayoutType = this.Layout.type;
+                        this.lastLayoutMatchingName = this.Layout.matchingName;
+                        this.lastLayoutName = this.Layout.cSld.name;
+                    }
                     break;
                 }
             }
@@ -560,6 +570,11 @@ Slide.prototype =
     {
        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_SlideSetLayout, this.Layout, layout));
         this.Layout = layout;
+        if(layout){
+            this.lastLayoutType = layout.type;
+            this.lastLayoutMatchingName = layout.matchingName;
+            this.lastLayoutName = layout.cSld.name;
+        }
     },
 
     setSlideNum: function(num)
@@ -662,6 +677,27 @@ Slide.prototype =
         }
     },
 
+
+    CheckLayout: function(){
+        var bRet = true;
+        if(!this.Layout || !this.Layout.CheckCorrect()){
+            var oMaster =  this.presentation.slideMasters[0];
+            if(!oMaster){
+                bRet = false;
+            }
+            else{
+                var oLayout = oMaster.getMatchingLayout(this.lastLayoutType, this.lastLayoutMatchingName, this.lastLayoutName, undefined);
+                if(oLayout){
+                    this.setLayout(oLayout);
+                }
+                else{
+                    bRet = false;
+                }
+            }
+        }
+        return bRet;
+    },
+
     correctContent: function(){
         for(var i = this.cSld.spTree.length - 1;  i > -1 ; --i){
             if(this.cSld.spTree[i].bDeleted){
@@ -677,7 +713,7 @@ Slide.prototype =
         {
             if(sp_tree[i].Get_Id() === id)
             {
-               History.Add(new AscDFH.CChangesDrawingsContentPresentation(this, AscDFH.historyitem_SlideRemoveFromSpTree, i, [sp_tree[i]], false));
+                History.Add(new AscDFH.CChangesDrawingsContentPresentation(this, AscDFH.historyitem_SlideRemoveFromSpTree, i, [sp_tree[i]], false));
                 sp_tree.splice(i, 1);
                 return i;
             }

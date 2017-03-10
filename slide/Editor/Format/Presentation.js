@@ -943,6 +943,32 @@ CPresentation.prototype =
             if(_RecalcData.Drawings.ThemeInfo)
             {
                 this.clearThemeTimeouts();
+
+                if(_RecalcData.Drawings && _RecalcData.Drawings.Map)
+                {
+                    for(key in _RecalcData.Drawings.Map)
+                    {
+                        if(_RecalcData.Drawings.Map.hasOwnProperty(key))
+                        {
+                            var oSlide = _RecalcData.Drawings.Map[key];
+                            if(oSlide instanceof AscCommonSlide.Slide && AscFormat.isRealNumber(oSlide.num))
+                            {
+                                var ArrInd = _RecalcData.Drawings.ThemeInfo.ArrInd;
+                                for(i = 0; i < ArrInd.length; ++i)
+                                {
+                                    if(oSlide.num === ArrInd[i])
+                                    {
+                                        break;
+                                    }
+                                }
+                                if(i === ArrInd.length)
+                                {
+                                    _RecalcData.Drawings.ThemeInfo.ArrInd.push(oSlide.num);
+                                }
+                            }
+                        }
+                    }
+                }
                 var startRecalcIndex = _RecalcData.Drawings.ThemeInfo.ArrInd.indexOf(this.CurPage);
                 if(startRecalcIndex === -1)
                 {
