@@ -2805,6 +2805,7 @@ background-repeat: no-repeat;\
 					}
 				}
 			}
+            this.exucuteHistoryEnd = false;
 		}
 	};
 
