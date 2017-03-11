@@ -769,6 +769,12 @@
         this.bDeleted = pr;
     };
 
+
+    CGraphicObjectBase.prototype.getEditorType = function()
+    {
+        return 1;
+    };
+
 window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGraphicObjectBase = CGraphicObjectBase;
     window['AscFormat'].CGraphicBounds     = CGraphicBounds;

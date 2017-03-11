@@ -45,6 +45,10 @@ CGroupShape.prototype.addToRecalculate = function()
         this.drawingObjects.controller.objectsForRecalculate[this.Id] = this;
     }
 };
+    CGroupShape.prototype.getEditorType = function()
+    {
+        return 0;
+    };
 
 CGroupShape.prototype.handleUpdateFill = function()
 {

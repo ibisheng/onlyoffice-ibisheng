@@ -992,7 +992,7 @@ CMathBase.prototype.Apply_TextPrToCtrPr = function(TextPr, IncFontSize, ApplyToA
             var oCompiledPr = this.Get_CompiledCtrPrp();
             if(TextPr.AscFill)
             {
-                this.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oCompiledPr.TextFill, 0));
+                this.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oCompiledPr.TextFill, 1));
             }
             if(TextPr.AscUnifill)
             {

@@ -8046,27 +8046,27 @@ DrawingObjectsController.prototype =
             {
                 if(Props.Brd.Left && Props.Brd.Left.Color)
                 {
-                    Props.Brd.Left.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Left.Color);
+                    Props.Brd.Left.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Left.Color, 1);
                 }
                 if(Props.Brd.Top && Props.Brd.Top.Color)
                 {
-                    Props.Brd.Top.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Top.Color);
+                    Props.Brd.Top.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Top.Color, 1);
                 }
                 if(Props.Brd.Right && Props.Brd.Right.Color)
                 {
-                    Props.Brd.Right.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Right.Color);
+                    Props.Brd.Right.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Right.Color, 1);
                 }
                 if(Props.Brd.Bottom && Props.Brd.Bottom.Color)
                 {
-                    Props.Brd.Bottom.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Bottom.Color);
+                    Props.Brd.Bottom.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Bottom.Color, 1);
                 }
                 if(Props.Brd.InsideH && Props.Brd.InsideH.Color)
                 {
-                    Props.Brd.InsideH.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.InsideH.Color);
+                    Props.Brd.InsideH.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.InsideH.Color, 1);
                 }
                 if(Props.Brd.InsideV && Props.Brd.InsideV.Color)
                 {
-                    Props.Brd.InsideV.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.InsideV.Color);
+                    Props.Brd.InsideV.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.InsideV.Color, 1);
                 }
 
                 this.setParagraphBorders( Props.Brd );

@@ -1324,7 +1324,7 @@ CChartSpace.prototype.changeFill = function (unifill)
     {
         this.recalculatePenBrush();
     }
-    var unifill2 = AscFormat.CorrectUniFill(unifill, this.brush);
+    var unifill2 = AscFormat.CorrectUniFill(unifill, this.brush, this.getEditorType());
     unifill2.convertToPPTXMods();
     this.spPr.setFill(unifill2);
 };

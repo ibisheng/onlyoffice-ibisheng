@@ -510,6 +510,10 @@ CShape.prototype.recalculateBounds = function()
     this.bounds.w = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
     this.bounds.h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
 };
+    CShape.prototype.getEditorType = function()
+    {
+        return 0;
+    };
 
 CShape.prototype.recalculateContent = function()
 {

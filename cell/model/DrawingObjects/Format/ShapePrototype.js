@@ -44,6 +44,12 @@ var G_O_DEFAULT_COLOR_MAP = AscFormat.GenerateDefaultColorMap();
 CShape.prototype.setDrawingObjects = function(drawingObjects)
 {
 };
+
+
+    CShape.prototype.getEditorType = function()
+    {
+        return 0;
+    };
 CShape.prototype.setDrawingBase = function(drawingBase)
 {
     this.drawingBase = drawingBase;

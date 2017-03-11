@@ -6291,7 +6291,7 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
                     EndTextPr.Merge( this.Paragraph.TextPr.Value );
                     if(TextPr.AscFill)
                     {
-                        this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 0));
+                        this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 1));
                     }
                     if(TextPr.AscUnifill)
                     {
@@ -6416,7 +6416,7 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 							EndTextPr.Merge(this.Paragraph.TextPr.Value);
 							if (TextPr.AscFill)
 							{
-								this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 0));
+								this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 1));
 							}
 							if (TextPr.AscUnifill)
 							{
@@ -6719,7 +6719,7 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
             }
             this.Set_Unifill(undefined);
             this.Set_Color(undefined);
-            this.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oMergeUnifill, 0), AscCommon.isRealObject(TextPr.AscFill) && TextPr.AscFill.asc_CheckForseSet());
+            this.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oMergeUnifill, 1), AscCommon.isRealObject(TextPr.AscFill) && TextPr.AscFill.asc_CheckForseSet());
         }
     }
 

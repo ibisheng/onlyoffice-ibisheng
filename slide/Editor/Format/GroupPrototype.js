@@ -41,7 +41,10 @@ CGroupShape.prototype.handleUpdateTheme = CShape.prototype.handleUpdateTheme;
 CGroupShape.prototype.getSlideIndex = CShape.prototype.getSlideIndex;
 
 CGroupShape.prototype.Is_UseInDocument = CShape.prototype.Is_UseInDocument;
-
+CGroupShape.prototype.getEditorType = function()
+{
+    return 0;
+};
 CGroupShape.prototype.handleUpdateFill = function()
 {
     for(var i = 0; i < this.spTree.length; ++i)

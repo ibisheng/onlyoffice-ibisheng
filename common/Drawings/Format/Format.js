@@ -9521,11 +9521,11 @@ function CreateAscTextArtProps(oTextArtProps)
     return oRet;
 }
 
-function CreateUnifillFromAscColor(asc_color)
+function CreateUnifillFromAscColor(asc_color, editorId)
 {
     var Unifill = new CUniFill();
     Unifill.fill = new CSolidFill();
-    Unifill.fill.color = CorrectUniColor(asc_color, Unifill.fill.color);
+    Unifill.fill.color = CorrectUniColor(asc_color, Unifill.fill.color, editorId);
     return Unifill;
 }
 

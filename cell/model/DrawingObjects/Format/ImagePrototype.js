@@ -56,7 +56,10 @@ CImageShape.prototype.getRotateAngle = CShape.prototype.getRotateAngle;
 CImageShape.prototype.setWorksheet = CShape.prototype.setWorksheet;
 CImageShape.prototype.getDrawingObjectsController = CShape.prototype.getDrawingObjectsController;
 CImageShape.prototype.Is_UseInDocument = CShape.prototype.Is_UseInDocument;
-
+    CImageShape.prototype.getEditorType = function()
+    {
+        return 0;
+    };
 CImageShape.prototype.setRecalculateInfo = function()
 {
     this.recalcInfo =
