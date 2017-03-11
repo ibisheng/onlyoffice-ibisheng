@@ -4295,7 +4295,12 @@ DrawingObjectsController.prototype =
 
         if(data_labels)
         {
-            this.collectPropsFromDLbls(nDefaultDatalabelsPos, data_labels, ret);
+            if(chart_type.series[0] && chart_type.series[0].dLbls){
+                this.collectPropsFromDLbls(nDefaultDatalabelsPos, chart_type.series[0].dLbls, ret);
+            }
+            else{
+                this.collectPropsFromDLbls(nDefaultDatalabelsPos, data_labels, ret);
+            }
         }
         else
         {
@@ -4592,7 +4597,7 @@ DrawingObjectsController.prototype =
         ret.putShowCatName(data_labels.showCatName === true);
         ret.putShowVal(data_labels.showVal === true);
         ret.putSeparator(data_labels.separator);
-        if(data_labels.showSerName || data_labels.showCatName || data_labels.showVal){
+        if(data_labels.showSerName || data_labels.showCatName || data_labels.showVal || data_labels.showPercent){
             ret.putDataLabelsPos(AscFormat.isRealNumber(data_labels.dLblPos) ? data_labels.dLblPos :  nDefaultDatalabelsPos);
         }
         else{
