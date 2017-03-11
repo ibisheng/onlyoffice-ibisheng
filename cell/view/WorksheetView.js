@@ -7155,7 +7155,14 @@
             objectInfo.font.strikeout = textPr.Strikeout;
             objectInfo.font.subscript = textPr.VertAlign == AscCommon.vertalign_SubScript;
             objectInfo.font.superscript = textPr.VertAlign == AscCommon.vertalign_SuperScript;
-            if (textPr.Color) {
+            if(textPr.Unifill){
+                if(theme){
+                    textPr.Unifill.check(theme, this.objectRender.controller.getColorMap());
+                }
+                var oColor = textPr.Unifill.getRGBAColor();
+                objectInfo.font.color = AscCommon.CreateAscColorCustom(oColor.R, oColor.G, oColor.B);
+            }
+            else if (textPr.Color) {
                 objectInfo.font.color = AscCommon.CreateAscColorCustom(textPr.Color.r, textPr.Color.g, textPr.Color.b);
             }
 
