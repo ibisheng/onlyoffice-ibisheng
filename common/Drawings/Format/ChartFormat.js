@@ -8831,7 +8831,18 @@ CMultiLvlStrCache.prototype =
     {
         History.Add(new CChangesDrawingsLong(this, AscDFH.historyitem_MultiLvlStrCache_SetPtCount, this.ptCount, pr));
         this.ptCount = pr;
-            }
+        },
+
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(this.getObjectType());
+        w.WriteString2(this.Get_Id());
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    }
 };
 
 function CMultiLvlStrRef()
@@ -11567,6 +11578,7 @@ function CSurfaceChart()
     this.m_oBandFormatsContentChanges = new AscCommon.CContentChanges();
 
     this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
 
 CSurfaceChart.prototype =
