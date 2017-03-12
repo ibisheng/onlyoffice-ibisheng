@@ -3904,6 +3904,13 @@ CCatAx.prototype =
             this.setMinorTickMark(minorTickMark);
             bChanged = true;
         }
+        if(bChanged){
+            if(this.spPr && this.spPr.ln && this.spPr.ln.Fill
+                && this.spPr.ln.Fill.fill && this.spPr.ln.Fill.fill.type === window['Asc'].c_oAscFill.FILL_TYPE_NOFILL
+            && (this.majorTickMark !== c_oAscTickMark.TICK_MARK_NONE || this.minorTickMark !== c_oAscTickMark.TICK_MARK_NONE)){
+                this.spPr.setLn(null);
+            }
+        }
 
         if(AscFormat.isRealNumber(tickLabelsPos) && this.tickLblPos !== tickLabelsPos)
         {
@@ -5532,6 +5539,13 @@ CValAx.prototype =
         {
             this.setMinorTickMark(props.minorTickMark);
             bChanged = true;
+        }
+        if(bChanged){
+            if(this.spPr && this.spPr.ln && this.spPr.ln.Fill
+                && this.spPr.ln.Fill.fill && this.spPr.ln.Fill.fill.type === window['Asc'].c_oAscFill.FILL_TYPE_NOFILL
+                && (this.majorTickMark !== c_oAscTickMark.TICK_MARK_NONE || this.minorTickMark !== c_oAscTickMark.TICK_MARK_NONE)){
+                this.spPr.setLn(null);
+            }
         }
 
         if(AscFormat.isRealNumber(props.tickLabelsPos) && this.tickLblPos !== props.tickLabelsPos)
