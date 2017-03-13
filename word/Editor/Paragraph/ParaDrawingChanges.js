@@ -87,9 +87,10 @@ AscDFH.changesRelationMap[AscDFH.historyitem_Drawing_SetSizeRelV]       = [AscDF
  */
 function CChangesParaDrawingDrawingType(Class, Old, New, Color)
 {
-	CChangesParaDrawingDrawingType.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongValue.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingDrawingType, AscDFH.CChangesBaseLongValue);
+CChangesParaDrawingDrawingType.prototype = Object.create(AscDFH.CChangesBaseLongValue.prototype);
+CChangesParaDrawingDrawingType.prototype.constructor = CChangesParaDrawingDrawingType;
 CChangesParaDrawingDrawingType.prototype.Type = AscDFH.historyitem_Drawing_DrawingType;
 CChangesParaDrawingDrawingType.prototype.private_SetValue = function(Value)
 {
@@ -101,9 +102,10 @@ CChangesParaDrawingDrawingType.prototype.private_SetValue = function(Value)
  */
 function CChangesParaDrawingWrappingType(Class, Old, New, Color)
 {
-	CChangesParaDrawingWrappingType.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongValue.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingWrappingType, AscDFH.CChangesBaseLongValue);
+CChangesParaDrawingWrappingType.prototype = Object.create(AscDFH.CChangesBaseLongValue.prototype);
+CChangesParaDrawingWrappingType.prototype.constructor = CChangesParaDrawingWrappingType;
 CChangesParaDrawingWrappingType.prototype.Type = AscDFH.historyitem_Drawing_WrappingType;
 CChangesParaDrawingWrappingType.prototype.private_SetValue = function(Value)
 {
@@ -115,9 +117,10 @@ CChangesParaDrawingWrappingType.prototype.private_SetValue = function(Value)
  */
 function CChangesParaDrawingDistance(Class, Old, New, Color)
 {
-	CChangesParaDrawingDistance.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingDistance, AscDFH.CChangesBaseProperty);
+CChangesParaDrawingDistance.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesParaDrawingDistance.prototype.constructor = CChangesParaDrawingDistance;
 CChangesParaDrawingDistance.prototype.Type = AscDFH.historyitem_Drawing_Distance;
 CChangesParaDrawingDistance.prototype.private_SetValue = function(Value)
 {
@@ -191,9 +194,10 @@ CChangesParaDrawingDistance.prototype.ReadFromBinary = function(Reader)
  */
 function CChangesParaDrawingAllowOverlap(Class, Old, New, Color)
 {
-	CChangesParaDrawingAllowOverlap.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolValue.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingAllowOverlap, AscDFH.CChangesBaseBoolValue);
+CChangesParaDrawingAllowOverlap.prototype = Object.create(AscDFH.CChangesBaseBoolValue.prototype);
+CChangesParaDrawingAllowOverlap.prototype.constructor = CChangesParaDrawingAllowOverlap;
 CChangesParaDrawingAllowOverlap.prototype.Type = AscDFH.historyitem_Drawing_AllowOverlap;
 CChangesParaDrawingAllowOverlap.prototype.private_SetValue = function(Value)
 {
@@ -205,9 +209,10 @@ CChangesParaDrawingAllowOverlap.prototype.private_SetValue = function(Value)
  */
 function CChangesParaDrawingPositionH(Class, Old, New, Color)
 {
-	CChangesParaDrawingPositionH.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingPositionH, AscDFH.CChangesBaseProperty);
+CChangesParaDrawingPositionH.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesParaDrawingPositionH.prototype.constructor = CChangesParaDrawingPositionH;
 CChangesParaDrawingPositionH.prototype.Type = AscDFH.historyitem_Drawing_PositionH;
 CChangesParaDrawingPositionH.prototype.private_SetValue = function(Value)
 {
@@ -293,9 +298,10 @@ CChangesParaDrawingPositionH.prototype.ReadFromBinary = function(Reader)
  */
 function CChangesParaDrawingPositionV(Class, Old, New, Color)
 {
-	CChangesParaDrawingPositionV.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingPositionV, AscDFH.CChangesBaseProperty);
+CChangesParaDrawingPositionV.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesParaDrawingPositionV.prototype.constructor = CChangesParaDrawingPositionV;
 CChangesParaDrawingPositionV.prototype.Type = AscDFH.historyitem_Drawing_PositionV;
 CChangesParaDrawingPositionV.prototype.private_SetValue = function(Value)
 {
@@ -381,9 +387,10 @@ CChangesParaDrawingPositionV.prototype.ReadFromBinary = function(Reader)
  */
 function CChangesParaDrawingBehindDoc(Class, Old, New, Color)
 {
-	CChangesParaDrawingBehindDoc.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolValue.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingBehindDoc, AscDFH.CChangesBaseBoolValue);
+CChangesParaDrawingBehindDoc.prototype = Object.create(AscDFH.CChangesBaseBoolValue.prototype);
+CChangesParaDrawingBehindDoc.prototype.constructor = CChangesParaDrawingBehindDoc;
 CChangesParaDrawingBehindDoc.prototype.Type = AscDFH.historyitem_Drawing_BehindDoc;
 CChangesParaDrawingBehindDoc.prototype.private_SetValue = function(Value)
 {
@@ -395,9 +402,10 @@ CChangesParaDrawingBehindDoc.prototype.private_SetValue = function(Value)
  */
 function CChangesParaDrawingGraphicObject(Class, Old, New, Color)
 {
-	CChangesParaDrawingGraphicObject.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingGraphicObject, AscDFH.CChangesBaseProperty);
+CChangesParaDrawingGraphicObject.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesParaDrawingGraphicObject.prototype.constructor = CChangesParaDrawingGraphicObject;
 CChangesParaDrawingGraphicObject.prototype.Type = AscDFH.historyitem_Drawing_SetGraphicObject;
 CChangesParaDrawingGraphicObject.prototype.private_SetValue = function(Value)
 {
@@ -456,9 +464,10 @@ CChangesParaDrawingGraphicObject.prototype.ReadFromBinary = function(Reader)
  */
 function CChangesParaDrawingSimplePos(Class, Old, New, Color)
 {
-	CChangesParaDrawingSimplePos.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingSimplePos, AscDFH.CChangesBaseProperty);
+CChangesParaDrawingSimplePos.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesParaDrawingSimplePos.prototype.constructor = CChangesParaDrawingSimplePos;
 CChangesParaDrawingSimplePos.prototype.Type = AscDFH.historyitem_Drawing_SetSimplePos;
 CChangesParaDrawingSimplePos.prototype.private_SetValue = function(Value)
 {
@@ -508,9 +517,10 @@ CChangesParaDrawingSimplePos.prototype.ReadFromBinary = function(Reader)
  */
 function CChangesParaDrawingExtent(Class, Old, New, Color)
 {
-	CChangesParaDrawingExtent.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingExtent, AscDFH.CChangesBaseProperty);
+CChangesParaDrawingExtent.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesParaDrawingExtent.prototype.constructor = CChangesParaDrawingExtent;
 CChangesParaDrawingExtent.prototype.Type = AscDFH.historyitem_Drawing_SetExtent;
 CChangesParaDrawingExtent.prototype.private_SetValue = function(Value)
 {
@@ -562,9 +572,10 @@ CChangesParaDrawingExtent.prototype.Load = function()
  */
 function CChangesParaDrawingWrapPolygon(Class, Old, New, Color)
 {
-	CChangesParaDrawingWrapPolygon.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingWrapPolygon, AscDFH.CChangesBaseProperty);
+CChangesParaDrawingWrapPolygon.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesParaDrawingWrapPolygon.prototype.constructor = CChangesParaDrawingWrapPolygon;
 CChangesParaDrawingWrapPolygon.prototype.Type = AscDFH.historyitem_Drawing_SetWrapPolygon;
 CChangesParaDrawingWrapPolygon.prototype.private_SetValue = function(Value)
 {
@@ -587,9 +598,10 @@ CChangesParaDrawingWrapPolygon.prototype.ReadFromBinary = function(Reader)
  */
 function CChangesParaDrawingLocked(Class, Old, New, Color)
 {
-	CChangesParaDrawingLocked.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolValue.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingLocked, AscDFH.CChangesBaseBoolValue);
+CChangesParaDrawingLocked.prototype = Object.create(AscDFH.CChangesBaseBoolValue.prototype);
+CChangesParaDrawingLocked.prototype.constructor = CChangesParaDrawingLocked;
 CChangesParaDrawingLocked.prototype.Type = AscDFH.historyitem_Drawing_SetLocked;
 CChangesParaDrawingLocked.prototype.private_SetValue = function(Value)
 {
@@ -601,9 +613,10 @@ CChangesParaDrawingLocked.prototype.private_SetValue = function(Value)
  */
 function CChangesParaDrawingRelativeHeight(Class, Old, New, Color)
 {
-	CChangesParaDrawingRelativeHeight.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongValue.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingRelativeHeight, AscDFH.CChangesBaseLongValue);
+CChangesParaDrawingRelativeHeight.prototype = Object.create(AscDFH.CChangesBaseLongValue.prototype);
+CChangesParaDrawingRelativeHeight.prototype.constructor = CChangesParaDrawingRelativeHeight;
 CChangesParaDrawingRelativeHeight.prototype.Type = AscDFH.historyitem_Drawing_SetRelativeHeight;
 CChangesParaDrawingRelativeHeight.prototype.private_SetValue = function(Value)
 {
@@ -615,9 +628,10 @@ CChangesParaDrawingRelativeHeight.prototype.private_SetValue = function(Value)
  */
 function CChangesParaDrawingEffectExtent(Class, Old, New, Color)
 {
-	CChangesParaDrawingEffectExtent.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingEffectExtent, AscDFH.CChangesBaseProperty);
+CChangesParaDrawingEffectExtent.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesParaDrawingEffectExtent.prototype.constructor = CChangesParaDrawingEffectExtent;
 CChangesParaDrawingEffectExtent.prototype.Type = AscDFH.historyitem_Drawing_SetEffectExtent;
 CChangesParaDrawingEffectExtent.prototype.private_SetValue = function(Value)
 {
@@ -675,9 +689,10 @@ CChangesParaDrawingEffectExtent.prototype.ReadFromBinary = function(Reader)
  */
 function CChangesParaDrawingParent(Class, Old, New, Color)
 {
-	CChangesParaDrawingParent.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingParent, AscDFH.CChangesBaseProperty);
+CChangesParaDrawingParent.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesParaDrawingParent.prototype.constructor = CChangesParaDrawingParent;
 CChangesParaDrawingParent.prototype.Type = AscDFH.historyitem_Drawing_SetParent;
 CChangesParaDrawingParent.prototype.private_SetValue = function(Value)
 {
@@ -700,9 +715,10 @@ CChangesParaDrawingParent.prototype.ReadFromBinary = function(Reader)
  */
 function CChangesParaDrawingParaMath(Class, Old, New, Color)
 {
-	CChangesParaDrawingParaMath.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingParaMath, AscDFH.CChangesBaseProperty);
+CChangesParaDrawingParaMath.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesParaDrawingParaMath.prototype.constructor = CChangesParaDrawingParaMath;
 CChangesParaDrawingParaMath.prototype.Type = AscDFH.historyitem_Drawing_SetParaMath;
 CChangesParaDrawingParaMath.prototype.private_SetValue = function(Value)
 {
@@ -757,9 +773,10 @@ CChangesParaDrawingParaMath.prototype.ReadFromBinary = function(Reader)
  */
 function CChangesParaDrawingLayoutInCell(Class, Old, New, Color)
 {
-	CChangesParaDrawingLayoutInCell.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolValue.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingLayoutInCell, AscDFH.CChangesBaseBoolValue);
+CChangesParaDrawingLayoutInCell.prototype = Object.create(AscDFH.CChangesBaseBoolValue.prototype);
+CChangesParaDrawingLayoutInCell.prototype.constructor = CChangesParaDrawingLayoutInCell;
 CChangesParaDrawingLayoutInCell.prototype.Type = AscDFH.historyitem_Drawing_LayoutInCell;
 CChangesParaDrawingLayoutInCell.prototype.private_SetValue = function(Value)
 {
@@ -771,9 +788,10 @@ CChangesParaDrawingLayoutInCell.prototype.private_SetValue = function(Value)
  */
 function CChangesParaDrawingSizeRelH(Class, Old, New, Color)
 {
-	CChangesParaDrawingSizeRelH.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingSizeRelH, AscDFH.CChangesBaseProperty);
+CChangesParaDrawingSizeRelH.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesParaDrawingSizeRelH.prototype.constructor = CChangesParaDrawingSizeRelH;
 CChangesParaDrawingSizeRelH.prototype.Type = AscDFH.historyitem_Drawing_SetSizeRelH;
 CChangesParaDrawingSizeRelH.prototype.private_SetValue = function(Value)
 {
@@ -851,9 +869,10 @@ CChangesParaDrawingSizeRelH.prototype.ReadFromBinary = function(Reader)
  */
 function CChangesParaDrawingSizeRelV(Class, Old, New, Color)
 {
-	CChangesParaDrawingSizeRelV.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaDrawingSizeRelV, AscDFH.CChangesBaseProperty);
+CChangesParaDrawingSizeRelV.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesParaDrawingSizeRelV.prototype.constructor = CChangesParaDrawingSizeRelV;
 CChangesParaDrawingSizeRelV.prototype.Type = AscDFH.historyitem_Drawing_SetSizeRelV;
 CChangesParaDrawingSizeRelV.prototype.private_SetValue = function(Value)
 {

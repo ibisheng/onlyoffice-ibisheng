@@ -50,12 +50,14 @@
 	 */
 	function CChangesTableIdAdd(Class, Id, NewClass)
 	{
-		CChangesTableIdAdd.superclass.constructor.call(this, Class);
+		AscDFH.CChangesBase.call(this, Class);
 
 		this.Id       = Id;
 		this.NewClass = NewClass;
 	}
-	AscCommon.extendClass(CChangesTableIdAdd, AscDFH.CChangesBase);
+
+	CChangesTableIdAdd.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesTableIdAdd.prototype.constructor = CChangesTableIdAdd;
 	CChangesTableIdAdd.prototype.Type = AscDFH.historyitem_TableId_Add;
 	CChangesTableIdAdd.prototype.Undo = function()
 	{
@@ -113,7 +115,7 @@
 	 */
 	function CChangesTableIdDescription(Class, FileCheckSum, FileSize, Description, ItemsCount, PointIndex, StartPoint, LastPoint, SumIndex, DeletedIndex)
 	{
-		CChangesTableIdDescription.superclass.constructor.call(this, Class);
+		AscDFH.CChangesBase.call(this, Class);
 
 		this.FileCheckSum  = FileCheckSum;
 		this.FileSize      = FileSize;
@@ -126,7 +128,9 @@
 		this.DeletedIndex  = DeletedIndex;
 		this.VersionString = "@@Version.@@Build.@@Rev";
 	}
-	AscCommon.extendClass(CChangesTableIdDescription, AscDFH.CChangesBase);
+
+	CChangesTableIdDescription.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesTableIdDescription.prototype.constructor = CChangesTableIdDescription;
 	CChangesTableIdDescription.prototype.Type = AscDFH.historyitem_TableId_Description;
 	CChangesTableIdDescription.prototype.Undo = function()
 	{
@@ -241,11 +245,13 @@
 	 */
 	function CChangesCommonAddWaterMark(Class, Url)
 	{
-		CChangesCommonAddWaterMark.superclass.constructor.call(this, Class);
+		AscDFH.CChangesBase.call(this, Class);
 
 		this.Url = Url ? Url : "";
 	}
-	AscCommon.extendClass(CChangesCommonAddWaterMark, AscDFH.CChangesBase);
+
+	CChangesCommonAddWaterMark.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesCommonAddWaterMark.prototype.constructor = CChangesCommonAddWaterMark;
 	CChangesCommonAddWaterMark.prototype.Type = AscDFH.historyitem_Common_AddWatermark;
 	CChangesCommonAddWaterMark.prototype.Undo = function()
 	{

@@ -194,9 +194,10 @@ AscDFH.changesRelationMap[AscDFH.historyitem_MathDegree_SubSupType]    = [AscDFH
  */
 function CChangesMathContentAddItem(Class, Pos, Items)
 {
-	CChangesMathContentAddItem.superclass.constructor.call(this, Class, Pos, Items, true);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Items, true);
 }
-AscCommon.extendClass(CChangesMathContentAddItem, AscDFH.CChangesBaseContentChange);
+CChangesMathContentAddItem.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesMathContentAddItem.prototype.constructor = CChangesMathContentAddItem;
 CChangesMathContentAddItem.prototype.Type = AscDFH.historyitem_MathContent_AddItem;
 CChangesMathContentAddItem.prototype.Undo = function()
 {
@@ -256,9 +257,10 @@ CChangesMathContentAddItem.prototype.CreateReverseChange = function()
  */
 function CChangesMathContentRemoveItem(Class, Pos, Items)
 {
-	CChangesMathContentRemoveItem.superclass.constructor.call(this, Class, Pos, Items, false);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Items, false);
 }
-AscCommon.extendClass(CChangesMathContentRemoveItem, AscDFH.CChangesBaseContentChange);
+CChangesMathContentRemoveItem.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesMathContentRemoveItem.prototype.constructor = CChangesMathContentRemoveItem;
 CChangesMathContentRemoveItem.prototype.Type = AscDFH.historyitem_MathContent_RemoveItem;
 CChangesMathContentRemoveItem.prototype.Undo = function()
 {
@@ -317,9 +319,10 @@ CChangesMathContentRemoveItem.prototype.CreateReverseChange = function()
  */
 function CChangesMathContentArgSize(Class, Old, New)
 {
-	CChangesMathContentArgSize.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathContentArgSize, AscDFH.CChangesBaseLongProperty);
+CChangesMathContentArgSize.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesMathContentArgSize.prototype.constructor = CChangesMathContentArgSize;
 CChangesMathContentArgSize.prototype.Type = AscDFH.historyitem_MathContent_ArgSize;
 CChangesMathContentArgSize.prototype.private_SetValue = function(Value)
 {
@@ -335,9 +338,10 @@ CChangesMathContentArgSize.prototype.private_SetValue = function(Value)
  */
 function CChangesMathParaJc(Class, Old, New)
 {
-	CChangesMathParaJc.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathParaJc, AscDFH.CChangesBaseLongProperty);
+CChangesMathParaJc.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesMathParaJc.prototype.constructor = CChangesMathParaJc;
 CChangesMathParaJc.prototype.Type = AscDFH.historyitem_MathPara_Jc;
 CChangesMathParaJc.prototype.private_SetValue = function(Value)
 {
@@ -351,9 +355,10 @@ CChangesMathParaJc.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBaseAddItems(Class, Pos, Items)
 {
-	CChangesMathBaseAddItems.superclass.constructor.call(this, Class, Pos, Items, true);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Items, true);
 }
-AscCommon.extendClass(CChangesMathBaseAddItems, AscDFH.CChangesBaseContentChange);
+CChangesMathBaseAddItems.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesMathBaseAddItems.prototype.constructor = CChangesMathBaseAddItems;
 CChangesMathBaseAddItems.prototype.Type = AscDFH.historyitem_MathBase_AddItems;
 CChangesMathBaseAddItems.prototype.Undo = function()
 {
@@ -406,9 +411,10 @@ CChangesMathBaseAddItems.prototype.CreateReverseChange = function()
  */
 function CChangesMathBaseRemoveItems(Class, Pos, Items)
 {
-	CChangesMathBaseRemoveItems.superclass.constructor.call(this, Class, Pos, Items, false);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Items, false);
 }
-AscCommon.extendClass(CChangesMathBaseRemoveItems, AscDFH.CChangesBaseContentChange);
+CChangesMathBaseRemoveItems.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesMathBaseRemoveItems.prototype.constructor = CChangesMathBaseRemoveItems;
 CChangesMathBaseRemoveItems.prototype.Type = AscDFH.historyitem_MathBase_RemoveItems;
 CChangesMathBaseRemoveItems.prototype.Undo = function()
 {
@@ -457,9 +463,10 @@ CChangesMathBaseRemoveItems.prototype.CreateReverseChange = function()
  */
 function CChangesMathBaseFontSize(Class, Old, New)
 {
-	CChangesMathBaseFontSize.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBaseFontSize, AscDFH.CChangesBaseLongProperty);
+CChangesMathBaseFontSize.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesMathBaseFontSize.prototype.constructor = CChangesMathBaseFontSize;
 CChangesMathBaseFontSize.prototype.Type = AscDFH.historyitem_MathBase_FontSize;
 CChangesMathBaseFontSize.prototype.private_SetValue = function(Value)
 {
@@ -471,9 +478,10 @@ CChangesMathBaseFontSize.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBaseShd(Class, Old, New)
 {
-	CChangesMathBaseShd.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBaseShd, AscDFH.CChangesBaseObjectProperty);
+CChangesMathBaseShd.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesMathBaseShd.prototype.constructor = CChangesMathBaseShd;
 CChangesMathBaseShd.prototype.Type = AscDFH.historyitem_MathBase_Shd;
 CChangesMathBaseShd.prototype.private_CreateObject = function()
 {
@@ -489,9 +497,10 @@ CChangesMathBaseShd.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBaseColor(Class, Old, New)
 {
-	CChangesMathBaseColor.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBaseColor, AscDFH.CChangesBaseObjectProperty);
+CChangesMathBaseColor.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesMathBaseColor.prototype.constructor = CChangesMathBaseColor;
 CChangesMathBaseColor.prototype.Type = AscDFH.historyitem_MathBase_Color;
 CChangesMathBaseColor.prototype.private_CreateObject = function()
 {
@@ -507,9 +516,10 @@ CChangesMathBaseColor.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBaseUnifill(Class, Old, New)
 {
-	CChangesMathBaseUnifill.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBaseUnifill, AscDFH.CChangesBaseObjectProperty);
+CChangesMathBaseUnifill.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesMathBaseUnifill.prototype.constructor = CChangesMathBaseUnifill;
 CChangesMathBaseUnifill.prototype.Type = AscDFH.historyitem_MathBase_Unifill;
 CChangesMathBaseUnifill.prototype.private_CreateObject = function()
 {
@@ -525,9 +535,10 @@ CChangesMathBaseUnifill.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBaseUnderline(Class, Old, New)
 {
-	CChangesMathBaseUnderline.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBaseUnderline, AscDFH.CChangesBaseBoolProperty);
+CChangesMathBaseUnderline.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathBaseUnderline.prototype.constructor = CChangesMathBaseUnderline;
 CChangesMathBaseUnderline.prototype.Type = AscDFH.historyitem_MathBase_Underline;
 CChangesMathBaseUnderline.prototype.private_SetValue = function(Value)
 {
@@ -539,9 +550,10 @@ CChangesMathBaseUnderline.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBaseStrikeout(Class, Old, New)
 {
-	CChangesMathBaseStrikeout.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBaseStrikeout, AscDFH.CChangesBaseBoolProperty);
+CChangesMathBaseStrikeout.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathBaseStrikeout.prototype.constructor = CChangesMathBaseStrikeout;
 CChangesMathBaseStrikeout.prototype.Type = AscDFH.historyitem_MathBase_Strikeout;
 CChangesMathBaseStrikeout.prototype.private_SetValue = function(Value)
 {
@@ -553,9 +565,10 @@ CChangesMathBaseStrikeout.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBaseDoubleStrikeout(Class, Old, New)
 {
-	CChangesMathBaseDoubleStrikeout.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBaseDoubleStrikeout, AscDFH.CChangesBaseBoolProperty);
+CChangesMathBaseDoubleStrikeout.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathBaseDoubleStrikeout.prototype.constructor = CChangesMathBaseDoubleStrikeout;
 CChangesMathBaseDoubleStrikeout.prototype.Type = AscDFH.historyitem_MathBase_DoubleStrikeout;
 CChangesMathBaseDoubleStrikeout.prototype.private_SetValue = function(Value)
 {
@@ -567,9 +580,10 @@ CChangesMathBaseDoubleStrikeout.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBaseItalic(Class, Old, New)
 {
-	CChangesMathBaseItalic.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBaseItalic, AscDFH.CChangesBaseBoolProperty);
+CChangesMathBaseItalic.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathBaseItalic.prototype.constructor = CChangesMathBaseItalic;
 CChangesMathBaseItalic.prototype.Type = AscDFH.historyitem_MathBase_Italic;
 CChangesMathBaseItalic.prototype.private_SetValue = function(Value)
 {
@@ -581,9 +595,10 @@ CChangesMathBaseItalic.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBaseBold(Class, Old, New)
 {
-	CChangesMathBaseBold.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBaseBold, AscDFH.CChangesBaseBoolProperty);
+CChangesMathBaseBold.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathBaseBold.prototype.constructor = CChangesMathBaseBold;
 CChangesMathBaseBold.prototype.Type = AscDFH.historyitem_MathBase_Bold;
 CChangesMathBaseBold.prototype.private_SetValue = function(Value)
 {
@@ -595,9 +610,10 @@ CChangesMathBaseBold.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBaseRFontsAscii(Class, Old, New)
 {
-	CChangesMathBaseRFontsAscii.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBaseRFontsAscii, AscDFH.CChangesBaseProperty);
+CChangesMathBaseRFontsAscii.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesMathBaseRFontsAscii.prototype.constructor = CChangesMathBaseRFontsAscii;
 CChangesMathBaseRFontsAscii.prototype.Type = AscDFH.historyitem_MathBase_RFontsAscii;
 CChangesMathBaseRFontsAscii.prototype.private_SetValue = function(Value)
 {
@@ -677,9 +693,10 @@ CChangesMathBaseRFontsAscii.prototype.ReadFromBinary = function(Reader)
  */
 function CChangesMathBaseRFontsHAnsi(Class, Old, New)
 {
-	CChangesMathBaseRFontsHAnsi.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBaseRFontsHAnsi, AscDFH.CChangesBaseProperty);
+CChangesMathBaseRFontsHAnsi.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesMathBaseRFontsHAnsi.prototype.constructor = CChangesMathBaseRFontsHAnsi;
 CChangesMathBaseRFontsHAnsi.prototype.Type = AscDFH.historyitem_MathBase_RFontsHAnsi;
 CChangesMathBaseRFontsHAnsi.prototype.private_SetValue = function(Value)
 {
@@ -693,9 +710,10 @@ CChangesMathBaseRFontsHAnsi.prototype.ReadFromBinary = CChangesMathBaseRFontsAsc
  */
 function CChangesMathBaseRFontsCS(Class, Old, New)
 {
-	CChangesMathBaseRFontsCS.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBaseRFontsCS, AscDFH.CChangesBaseProperty);
+CChangesMathBaseRFontsCS.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesMathBaseRFontsCS.prototype.constructor = CChangesMathBaseRFontsCS;
 CChangesMathBaseRFontsCS.prototype.Type = AscDFH.historyitem_MathBase_RFontsCS;
 CChangesMathBaseRFontsCS.prototype.private_SetValue = function(Value)
 {
@@ -709,9 +727,10 @@ CChangesMathBaseRFontsCS.prototype.ReadFromBinary = CChangesMathBaseRFontsAscii.
  */
 function CChangesMathBaseRFontsEastAsia(Class, Old, New)
 {
-	CChangesMathBaseRFontsEastAsia.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBaseRFontsEastAsia, AscDFH.CChangesBaseProperty);
+CChangesMathBaseRFontsEastAsia.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesMathBaseRFontsEastAsia.prototype.constructor = CChangesMathBaseRFontsEastAsia;
 CChangesMathBaseRFontsEastAsia.prototype.Type = AscDFH.historyitem_MathBase_RFontsEastAsia;
 CChangesMathBaseRFontsEastAsia.prototype.private_SetValue = function(Value)
 {
@@ -725,9 +744,10 @@ CChangesMathBaseRFontsEastAsia.prototype.ReadFromBinary = CChangesMathBaseRFonts
  */
 function CChangesMathBaseRFontsHint(Class, Old, New)
 {
-	CChangesMathBaseRFontsHint.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBaseRFontsHint, AscDFH.CChangesBaseLongProperty);
+CChangesMathBaseRFontsHint.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesMathBaseRFontsHint.prototype.constructor = CChangesMathBaseRFontsHint;
 CChangesMathBaseRFontsHint.prototype.Type = AscDFH.historyitem_MathBase_RFontsHint;
 CChangesMathBaseRFontsHint.prototype.private_SetValue = function(Value)
 {
@@ -739,9 +759,10 @@ CChangesMathBaseRFontsHint.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBaseHighLight(Class, Old, New)
 {
-	CChangesMathBaseHighLight.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBaseHighLight, AscDFH.CChangesBaseProperty);
+CChangesMathBaseHighLight.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesMathBaseHighLight.prototype.constructor = CChangesMathBaseHighLight;
 CChangesMathBaseHighLight.prototype.Type = AscDFH.historyitem_MathBase_HighLight;
 CChangesMathBaseHighLight.prototype.private_SetValue = function(Value)
 {
@@ -833,9 +854,10 @@ CChangesMathBaseHighLight.prototype.ReadFromBinary = function(Reader)
  */
 function CChangesMathBaseReviewType(Class, Old, New)
 {
-	CChangesMathBaseReviewType.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBaseReviewType, AscDFH.CChangesBaseProperty);
+CChangesMathBaseReviewType.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesMathBaseReviewType.prototype.constructor = CChangesMathBaseReviewType;
 CChangesMathBaseReviewType.prototype.Type = AscDFH.historyitem_MathBase_ReviewType;
 CChangesMathBaseReviewType.prototype.private_SetValue = function(Value)
 {
@@ -905,9 +927,10 @@ CChangesMathBaseReviewType.prototype.ReadFromBinary = function(Reader)
  */
 function CChangesMathBaseTextFill(Class, Old, New)
 {
-	CChangesMathBaseTextFill.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBaseTextFill, AscDFH.CChangesBaseObjectProperty);
+CChangesMathBaseTextFill.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesMathBaseTextFill.prototype.constructor = CChangesMathBaseTextFill;
 CChangesMathBaseTextFill.prototype.Type = AscDFH.historyitem_MathBase_TextFill;
 CChangesMathBaseTextFill.prototype.private_CreateObject = function()
 {
@@ -923,9 +946,10 @@ CChangesMathBaseTextFill.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBaseTextOutline(Class, Old, New)
 {
-	CChangesMathBaseTextOutline.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBaseTextOutline, AscDFH.CChangesBaseObjectProperty);
+CChangesMathBaseTextOutline.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesMathBaseTextOutline.prototype.constructor = CChangesMathBaseTextOutline;
 CChangesMathBaseTextOutline.prototype.Type = AscDFH.historyitem_MathBase_TextOutline;
 CChangesMathBaseTextOutline.prototype.private_CreateObject = function()
 {
@@ -943,9 +967,10 @@ CChangesMathBaseTextOutline.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBoxAlnAt(Class, Old, New)
 {
-	CChangesMathBoxAlnAt.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBoxAlnAt, AscDFH.CChangesBaseLongProperty);
+CChangesMathBoxAlnAt.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesMathBoxAlnAt.prototype.constructor = CChangesMathBoxAlnAt;
 CChangesMathBoxAlnAt.prototype.Type = AscDFH.historyitem_MathBox_AlnAt;
 CChangesMathBoxAlnAt.prototype.private_SetValue = function(Value)
 {
@@ -967,9 +992,10 @@ CChangesMathBoxAlnAt.prototype.Merge = function(oChange)
  */
 function CChangesMathBoxForcedBreak(Class, Old, New)
 {
-	CChangesMathBoxForcedBreak.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBoxForcedBreak, AscDFH.CChangesBaseBoolProperty);
+CChangesMathBoxForcedBreak.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathBoxForcedBreak.prototype.constructor = CChangesMathBoxForcedBreak;
 CChangesMathBoxForcedBreak.prototype.Type = AscDFH.historyitem_MathBox_ForcedBreak;
 CChangesMathBoxForcedBreak.prototype.private_SetValue = function(Value)
 {
@@ -993,9 +1019,10 @@ CChangesMathBoxForcedBreak.prototype.Merge = function(oChange)
  */
 function CChangesMathFractionType(Class, Old, New)
 {
-	CChangesMathFractionType.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathFractionType, AscDFH.CChangesBaseLongProperty);
+CChangesMathFractionType.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesMathFractionType.prototype.constructor = CChangesMathFractionType;
 CChangesMathFractionType.prototype.Type = AscDFH.historyitem_MathFraction_Type;
 CChangesMathFractionType.prototype.private_SetValue = function(Value)
 {
@@ -1009,9 +1036,10 @@ CChangesMathFractionType.prototype.private_SetValue = function(Value)
  */
 function CChangesMathRadicalHideDegree(Class, Old, New)
 {
-	CChangesMathRadicalHideDegree.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathRadicalHideDegree, AscDFH.CChangesBaseBoolProperty);
+CChangesMathRadicalHideDegree.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathRadicalHideDegree.prototype.constructor = CChangesMathRadicalHideDegree;
 CChangesMathRadicalHideDegree.prototype.Type = AscDFH.historyitem_MathRadical_HideDegree;
 CChangesMathRadicalHideDegree.prototype.private_SetValue = function(Value)
 {
@@ -1025,9 +1053,10 @@ CChangesMathRadicalHideDegree.prototype.private_SetValue = function(Value)
  */
 function CChangesMathNaryLimLoc(Class, Old, New)
 {
-	CChangesMathNaryLimLoc.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathNaryLimLoc, AscDFH.CChangesBaseLongProperty);
+CChangesMathNaryLimLoc.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesMathNaryLimLoc.prototype.constructor = CChangesMathNaryLimLoc;
 CChangesMathNaryLimLoc.prototype.Type = AscDFH.historyitem_MathNary_LimLoc;
 CChangesMathNaryLimLoc.prototype.private_SetValue = function(Value)
 {
@@ -1039,9 +1068,10 @@ CChangesMathNaryLimLoc.prototype.private_SetValue = function(Value)
  */
 function CChangesMathNaryUpperLimit(Class, Old, New)
 {
-	CChangesMathNaryUpperLimit.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathNaryUpperLimit, AscDFH.CChangesBaseBoolProperty);
+CChangesMathNaryUpperLimit.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathNaryUpperLimit.prototype.constructor = CChangesMathNaryUpperLimit;
 CChangesMathNaryUpperLimit.prototype.Type = AscDFH.historyitem_MathNary_UpperLimit;
 CChangesMathNaryUpperLimit.prototype.private_SetValue = function(Value)
 {
@@ -1053,9 +1083,10 @@ CChangesMathNaryUpperLimit.prototype.private_SetValue = function(Value)
  */
 function CChangesMathNaryLowerLimit(Class, Old, New)
 {
-	CChangesMathNaryLowerLimit.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathNaryLowerLimit, AscDFH.CChangesBaseBoolProperty);
+CChangesMathNaryLowerLimit.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathNaryLowerLimit.prototype.constructor = CChangesMathNaryLowerLimit;
 CChangesMathNaryLowerLimit.prototype.Type = AscDFH.historyitem_MathNary_LowerLimit;
 CChangesMathNaryLowerLimit.prototype.private_SetValue = function(Value)
 {
@@ -1069,9 +1100,10 @@ CChangesMathNaryLowerLimit.prototype.private_SetValue = function(Value)
  */
 function CChangesMathDelimBegOper(Class, Old, New)
 {
-	CChangesMathDelimBegOper.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathDelimBegOper, AscDFH.CChangesBaseLongProperty);
+CChangesMathDelimBegOper.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesMathDelimBegOper.prototype.constructor = CChangesMathDelimBegOper;
 CChangesMathDelimBegOper.prototype.Type = AscDFH.historyitem_MathDelimiter_BegOper;
 CChangesMathDelimBegOper.prototype.private_SetValue = function(Value)
 {
@@ -1083,9 +1115,10 @@ CChangesMathDelimBegOper.prototype.private_SetValue = function(Value)
  */
 function CChangesMathDelimEndOper(Class, Old, New)
 {
-	CChangesMathDelimEndOper.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathDelimEndOper, AscDFH.CChangesBaseLongProperty);
+CChangesMathDelimEndOper.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesMathDelimEndOper.prototype.constructor = CChangesMathDelimEndOper;
 CChangesMathDelimEndOper.prototype.Type = AscDFH.historyitem_MathDelimiter_EndOper;
 CChangesMathDelimEndOper.prototype.private_SetValue = function(Value)
 {
@@ -1097,9 +1130,10 @@ CChangesMathDelimEndOper.prototype.private_SetValue = function(Value)
  */
 function CChangesMathDelimiterGrow(Class, Old, New)
 {
-	CChangesMathDelimiterGrow.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathDelimiterGrow, AscDFH.CChangesBaseBoolProperty);
+CChangesMathDelimiterGrow.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathDelimiterGrow.prototype.constructor = CChangesMathDelimiterGrow;
 CChangesMathDelimiterGrow.prototype.Type = AscDFH.historyitem_MathDelimiter_Grow;
 CChangesMathDelimiterGrow.prototype.private_SetValue = function(Value)
 {
@@ -1111,9 +1145,10 @@ CChangesMathDelimiterGrow.prototype.private_SetValue = function(Value)
  */
 function CChangesMathDelimiterShape(Class, Old, New)
 {
-	CChangesMathDelimiterShape.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathDelimiterShape, AscDFH.CChangesBaseLongProperty);
+CChangesMathDelimiterShape.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesMathDelimiterShape.prototype.constructor = CChangesMathDelimiterShape;
 CChangesMathDelimiterShape.prototype.Type = AscDFH.historyitem_MathDelimiter_Shape;
 CChangesMathDelimiterShape.prototype.private_SetValue = function(Value)
 {
@@ -1125,9 +1160,10 @@ CChangesMathDelimiterShape.prototype.private_SetValue = function(Value)
  */
 function CChangesMathDelimiterSetColumn(Class, Old, New)
 {
-	CChangesMathDelimiterSetColumn.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathDelimiterSetColumn, AscDFH.CChangesBaseLongProperty);
+CChangesMathDelimiterSetColumn.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesMathDelimiterSetColumn.prototype.constructor = CChangesMathDelimiterSetColumn;
 CChangesMathDelimiterSetColumn.prototype.Type = AscDFH.historyitem_MathDelimiter_SetColumn;
 CChangesMathDelimiterSetColumn.prototype.private_SetValue = function(Value)
 {
@@ -1141,9 +1177,10 @@ CChangesMathDelimiterSetColumn.prototype.private_SetValue = function(Value)
  */
 function CChangesMathGroupCharPr(Class, Old, New)
 {
-	CChangesMathGroupCharPr.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathGroupCharPr, AscDFH.CChangesBaseObjectProperty);
+CChangesMathGroupCharPr.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesMathGroupCharPr.prototype.constructor = CChangesMathGroupCharPr;
 CChangesMathGroupCharPr.prototype.Type = AscDFH.historyitem_MathGroupChar_Pr;
 CChangesMathGroupCharPr.prototype.private_CreateObject = function()
 {
@@ -1161,9 +1198,10 @@ CChangesMathGroupCharPr.prototype.private_SetValue = function(Value)
  */
 function CChangesMathLimitType(Class, Old, New)
 {
-	CChangesMathLimitType.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathLimitType, AscDFH.CChangesBaseLongProperty);
+CChangesMathLimitType.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesMathLimitType.prototype.constructor = CChangesMathLimitType;
 CChangesMathLimitType.prototype.Type = AscDFH.historyitem_MathLimit_Type;
 CChangesMathLimitType.prototype.private_SetValue = function(Value)
 {
@@ -1177,9 +1215,10 @@ CChangesMathLimitType.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBorderBoxTop(Class, Old, New)
 {
-	CChangesMathBorderBoxTop.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBorderBoxTop, AscDFH.CChangesBaseBoolProperty);
+CChangesMathBorderBoxTop.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathBorderBoxTop.prototype.constructor = CChangesMathBorderBoxTop;
 CChangesMathBorderBoxTop.prototype.Type = AscDFH.historyitem_MathBorderBox_Top;
 CChangesMathBorderBoxTop.prototype.private_SetValue = function(Value)
 {
@@ -1191,9 +1230,10 @@ CChangesMathBorderBoxTop.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBorderBoxBot(Class, Old, New)
 {
-	CChangesMathBorderBoxBot.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBorderBoxBot, AscDFH.CChangesBaseBoolProperty);
+CChangesMathBorderBoxBot.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathBorderBoxBot.prototype.constructor = CChangesMathBorderBoxBot;
 CChangesMathBorderBoxBot.prototype.Type = AscDFH.historyitem_MathBorderBox_Bot;
 CChangesMathBorderBoxBot.prototype.private_SetValue = function(Value)
 {
@@ -1205,9 +1245,10 @@ CChangesMathBorderBoxBot.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBorderBoxLeft(Class, Old, New)
 {
-	CChangesMathBorderBoxLeft.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBorderBoxLeft, AscDFH.CChangesBaseBoolProperty);
+CChangesMathBorderBoxLeft.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathBorderBoxLeft.prototype.constructor = CChangesMathBorderBoxLeft;
 CChangesMathBorderBoxLeft.prototype.Type = AscDFH.historyitem_MathBorderBox_Left;
 CChangesMathBorderBoxLeft.prototype.private_SetValue = function(Value)
 {
@@ -1219,9 +1260,10 @@ CChangesMathBorderBoxLeft.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBorderBoxRight(Class, Old, New)
 {
-	CChangesMathBorderBoxRight.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBorderBoxRight, AscDFH.CChangesBaseBoolProperty);
+CChangesMathBorderBoxRight.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathBorderBoxRight.prototype.constructor = CChangesMathBorderBoxRight;
 CChangesMathBorderBoxRight.prototype.Type = AscDFH.historyitem_MathBorderBox_Right;
 CChangesMathBorderBoxRight.prototype.private_SetValue = function(Value)
 {
@@ -1233,9 +1275,10 @@ CChangesMathBorderBoxRight.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBorderBoxHor(Class, Old, New)
 {
-	CChangesMathBorderBoxHor.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBorderBoxHor, AscDFH.CChangesBaseBoolProperty);
+CChangesMathBorderBoxHor.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathBorderBoxHor.prototype.constructor = CChangesMathBorderBoxHor;
 CChangesMathBorderBoxHor.prototype.Type = AscDFH.historyitem_MathBorderBox_Hor;
 CChangesMathBorderBoxHor.prototype.private_SetValue = function(Value)
 {
@@ -1247,9 +1290,10 @@ CChangesMathBorderBoxHor.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBorderBoxVer(Class, Old, New)
 {
-	CChangesMathBorderBoxVer.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBorderBoxVer, AscDFH.CChangesBaseBoolProperty);
+CChangesMathBorderBoxVer.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathBorderBoxVer.prototype.constructor = CChangesMathBorderBoxVer;
 CChangesMathBorderBoxVer.prototype.Type = AscDFH.historyitem_MathBorderBox_Ver;
 CChangesMathBorderBoxVer.prototype.private_SetValue = function(Value)
 {
@@ -1261,9 +1305,10 @@ CChangesMathBorderBoxVer.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBorderBoxTopLTR(Class, Old, New)
 {
-	CChangesMathBorderBoxTopLTR.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBorderBoxTopLTR, AscDFH.CChangesBaseBoolProperty);
+CChangesMathBorderBoxTopLTR.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathBorderBoxTopLTR.prototype.constructor = CChangesMathBorderBoxTopLTR;
 CChangesMathBorderBoxTopLTR.prototype.Type = AscDFH.historyitem_MathBorderBox_TopLTR;
 CChangesMathBorderBoxTopLTR.prototype.private_SetValue = function(Value)
 {
@@ -1275,9 +1320,10 @@ CChangesMathBorderBoxTopLTR.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBorderBoxTopRTL(Class, Old, New)
 {
-	CChangesMathBorderBoxTopRTL.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBorderBoxTopRTL, AscDFH.CChangesBaseBoolProperty);
+CChangesMathBorderBoxTopRTL.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathBorderBoxTopRTL.prototype.constructor = CChangesMathBorderBoxTopRTL;
 CChangesMathBorderBoxTopRTL.prototype.Type = AscDFH.historyitem_MathBorderBox_TopRTL;
 CChangesMathBorderBoxTopRTL.prototype.private_SetValue = function(Value)
 {
@@ -1291,9 +1337,10 @@ CChangesMathBorderBoxTopRTL.prototype.private_SetValue = function(Value)
  */
 function CChangesMathBarLinePos(Class, Old, New)
 {
-	CChangesMathBarLinePos.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathBarLinePos, AscDFH.CChangesBaseLongProperty);
+CChangesMathBarLinePos.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesMathBarLinePos.prototype.constructor = CChangesMathBarLinePos;
 CChangesMathBarLinePos.prototype.Type = AscDFH.historyitem_MathBar_LinePos;
 CChangesMathBarLinePos.prototype.private_SetValue = function(Value)
 {
@@ -1307,7 +1354,7 @@ CChangesMathBarLinePos.prototype.private_SetValue = function(Value)
  */
 function CChangesMathMatrixAddRow(Class, Pos, Items)
 {
-	CChangesMathMatrixAddRow.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 
 	this.Pos    = Pos;
 	this.Items  = Items;
@@ -1315,7 +1362,8 @@ function CChangesMathMatrixAddRow(Class, Pos, Items)
 	this.UseArray = false;
 	this.PosArray = [];
 }
-AscCommon.extendClass(CChangesMathMatrixAddRow, AscDFH.CChangesBase);
+CChangesMathMatrixAddRow.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesMathMatrixAddRow.prototype.constructor = CChangesMathMatrixAddRow;
 CChangesMathMatrixAddRow.prototype.Type = AscDFH.historyitem_MathMatrix_AddRow;
 CChangesMathMatrixAddRow.prototype.Undo = function()
 {
@@ -1384,7 +1432,7 @@ CChangesMathMatrixAddRow.prototype.Merge = function(oChange)
  */
 function CChangesMathMatrixRemoveRow(Class, Pos, Items)
 {
-	CChangesMathMatrixRemoveRow.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 
 	this.Pos    = Pos;
 	this.Items  = Items;
@@ -1392,7 +1440,8 @@ function CChangesMathMatrixRemoveRow(Class, Pos, Items)
 	this.UseArray = false;
 	this.PosArray = [];
 }
-AscCommon.extendClass(CChangesMathMatrixRemoveRow, AscDFH.CChangesBase);
+CChangesMathMatrixRemoveRow.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesMathMatrixRemoveRow.prototype.constructor = CChangesMathMatrixRemoveRow;
 CChangesMathMatrixRemoveRow.prototype.Type = AscDFH.historyitem_MathMatrix_RemoveRow;
 CChangesMathMatrixRemoveRow.prototype.Undo = function()
 {
@@ -1480,7 +1529,7 @@ CChangesMathMatrixRemoveRow.prototype.Merge = function(oChange)
  */
 function CChangesMathMatrixAddColumn(Class, Pos, Items)
 {
-	CChangesMathMatrixAddColumn.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 
 	this.Pos    = Pos;
 	this.Items  = Items;
@@ -1488,7 +1537,8 @@ function CChangesMathMatrixAddColumn(Class, Pos, Items)
 	this.UseArray = false;
 	this.PosArray = [];
 }
-AscCommon.extendClass(CChangesMathMatrixAddColumn, AscDFH.CChangesBase);
+CChangesMathMatrixAddColumn.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesMathMatrixAddColumn.prototype.constructor = CChangesMathMatrixAddColumn;
 CChangesMathMatrixAddColumn.prototype.Type = AscDFH.historyitem_MathMatrix_AddColumn;
 CChangesMathMatrixAddColumn.prototype.Undo = function()
 {
@@ -1516,7 +1566,7 @@ CChangesMathMatrixAddColumn.prototype.Merge = function(oChange)
  */
 function CChangesMathMatrixRemoveColumn(Class, Pos, Items)
 {
-	CChangesMathMatrixRemoveColumn.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 
 	this.Pos    = Pos;
 	this.Items  = Items;
@@ -1524,7 +1574,8 @@ function CChangesMathMatrixRemoveColumn(Class, Pos, Items)
 	this.UseArray = false;
 	this.PosArray = [];
 }
-AscCommon.extendClass(CChangesMathMatrixRemoveColumn, AscDFH.CChangesBase);
+CChangesMathMatrixRemoveColumn.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesMathMatrixRemoveColumn.prototype.constructor = CChangesMathMatrixRemoveColumn;
 CChangesMathMatrixRemoveColumn.prototype.Type = AscDFH.historyitem_MathMatrix_RemoveColumn;
 CChangesMathMatrixRemoveColumn.prototype.Undo = function()
 {
@@ -1552,9 +1603,10 @@ CChangesMathMatrixRemoveColumn.prototype.Merge = function(oChange)
  */
 function CChangesMathMatrixBaseJc(Class, Old, New)
 {
-	CChangesMathMatrixBaseJc.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathMatrixBaseJc, AscDFH.CChangesBaseLongProperty);
+CChangesMathMatrixBaseJc.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesMathMatrixBaseJc.prototype.constructor = CChangesMathMatrixBaseJc;
 CChangesMathMatrixBaseJc.prototype.Type = AscDFH.historyitem_MathMatrix_BaseJc;
 CChangesMathMatrixBaseJc.prototype.private_SetValue = function(Value)
 {
@@ -1566,11 +1618,12 @@ CChangesMathMatrixBaseJc.prototype.private_SetValue = function(Value)
  */
 function CChangesMathMatrixColumnJc(Class, Old, New, ColumnIndex)
 {
-	CChangesMathMatrixColumnJc.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 
 	this.ColumnIndex = ColumnIndex;
 }
-AscCommon.extendClass(CChangesMathMatrixColumnJc, AscDFH.CChangesBaseProperty);
+CChangesMathMatrixColumnJc.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesMathMatrixColumnJc.prototype.constructor = CChangesMathMatrixColumnJc;
 CChangesMathMatrixColumnJc.prototype.Type = AscDFH.historyitem_MathMatrix_ColumnJc;
 CChangesMathMatrixColumnJc.prototype.private_SetValue = function(Value)
 {
@@ -1646,11 +1699,12 @@ CChangesMathMatrixColumnJc.prototype.CreateReverseChange = function()
  */
 function CChangesMathMatrixInterval(Class, ItemType, OldRule, OldGap, NewRule, NewGap)
 {
-	CChangesMathMatrixInterval.superclass.constructor.call(this, Class, {Rule : OldRule, Gap : OldGap}, {Rule : NewRule, Gap : NewGap});
+	AscDFH.CChangesBaseProperty.call(this, Class, {Rule : OldRule, Gap : OldGap}, {Rule : NewRule, Gap : NewGap});
 
 	this.ItemType = ItemType;
 }
-AscCommon.extendClass(CChangesMathMatrixInterval, AscDFH.CChangesBaseProperty);
+CChangesMathMatrixInterval.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesMathMatrixInterval.prototype.constructor = CChangesMathMatrixInterval;
 CChangesMathMatrixInterval.prototype.Type = AscDFH.historyitem_MathMatrix_Interval;
 CChangesMathMatrixInterval.prototype.private_SetValue = function(Value)
 {
@@ -1741,9 +1795,10 @@ CChangesMathMatrixInterval.prototype.CreateReverseChange = function()
  */
 function CChangesMathMatrixPlh(Class, Old, New)
 {
-	CChangesMathMatrixPlh.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathMatrixPlh, AscDFH.CChangesBaseBoolProperty);
+CChangesMathMatrixPlh.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesMathMatrixPlh.prototype.constructor = CChangesMathMatrixPlh;
 CChangesMathMatrixPlh.prototype.Type = AscDFH.historyitem_MathMatrix_Plh;
 CChangesMathMatrixPlh.prototype.private_SetValue = function(Value)
 {
@@ -1757,9 +1812,10 @@ CChangesMathMatrixPlh.prototype.private_SetValue = function(Value)
  */
 function CChangesMathDegreeSubSupType(Class, Old, New)
 {
-	CChangesMathDegreeSubSupType.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesMathDegreeSubSupType, AscDFH.CChangesBaseLongProperty);
+CChangesMathDegreeSubSupType.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesMathDegreeSubSupType.prototype.constructor = CChangesMathDegreeSubSupType;
 CChangesMathDegreeSubSupType.prototype.Type = AscDFH.historyitem_MathDegree_SubSupType;
 CChangesMathDegreeSubSupType.prototype.private_SetValue = function(Value)
 {

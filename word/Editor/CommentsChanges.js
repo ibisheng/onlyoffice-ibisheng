@@ -67,9 +67,10 @@ AscDFH.changesRelationMap[AscDFH.historyitem_ParaComment_CommentId] = [AscDFH.hi
  */
 function CChangesCommentChange(Class, Old, New)
 {
-	CChangesCommentChange.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesCommentChange, AscDFH.CChangesBaseProperty);
+CChangesCommentChange.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesCommentChange.prototype.constructor = CChangesCommentChange;
 CChangesCommentChange.prototype.Type = AscDFH.historyitem_Comment_Change;
 CChangesCommentChange.prototype.WriteToBinary = function(Writer)
 {
@@ -100,9 +101,10 @@ CChangesCommentChange.prototype.private_SetValue = function(Value)
  */
 function CChangesCommentTypeInfo(Class, Old, New)
 {
-	CChangesCommentTypeInfo.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesCommentTypeInfo, AscDFH.CChangesBaseProperty);
+CChangesCommentTypeInfo.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesCommentTypeInfo.prototype.constructor = CChangesCommentTypeInfo;
 CChangesCommentTypeInfo.prototype.Type = AscDFH.historyitem_Comment_TypeInfo;
 CChangesCommentTypeInfo.prototype.WriteToBinary = function(Writer)
 {
@@ -150,12 +152,13 @@ CChangesCommentTypeInfo.prototype.private_SetValue = function(Value)
  */
 function CChangesCommentsAdd(Class, Id, Comment)
 {
-	CChangesCommentsAdd.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 
 	this.Id      = Id;
 	this.Comment = Comment;
 }
-AscCommon.extendClass(CChangesCommentsAdd, AscDFH.CChangesBase);
+CChangesCommentsAdd.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesCommentsAdd.prototype.constructor = CChangesCommentsAdd;
 CChangesCommentsAdd.prototype.Type = AscDFH.historyitem_Comments_Add;
 CChangesCommentsAdd.prototype.Undo = function()
 {
@@ -199,12 +202,13 @@ CChangesCommentsAdd.prototype.Merge = function(oChange)
  */
 function CChangesCommentsRemove(Class, Id, Comment)
 {
-	CChangesCommentsRemove.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 
 	this.Id      = Id;
 	this.Comment = Comment;
 }
-AscCommon.extendClass(CChangesCommentsRemove, AscDFH.CChangesBase);
+CChangesCommentsRemove.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesCommentsRemove.prototype.constructor = CChangesCommentsRemove;
 CChangesCommentsRemove.prototype.Type = AscDFH.historyitem_Comments_Remove;
 CChangesCommentsRemove.prototype.Undo = function()
 {
@@ -247,9 +251,10 @@ CChangesCommentsRemove.prototype.Merge = function(oChange)
  */
 function CChangesParaCommentCommentId(Class, Old, New)
 {
-	CChangesParaCommentCommentId.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesParaCommentCommentId, AscDFH.CChangesBaseProperty);
+CChangesParaCommentCommentId.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesParaCommentCommentId.prototype.constructor = CChangesParaCommentCommentId;
 CChangesParaCommentCommentId.prototype.Type = AscDFH.historyitem_ParaComment_CommentId;
 CChangesParaCommentCommentId.prototype.WriteToBinary = function(Writer)
 {

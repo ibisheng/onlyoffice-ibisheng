@@ -285,9 +285,10 @@ function private_ParaTextPrChangesOnMergeRFontsValue(oChange)
  */
 function CChangesParaTextPrBold(Class, Old, New, Color)
 {
-	CChangesParaTextPrBold.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrBold, AscDFH.CChangesBaseBoolProperty);
+CChangesParaTextPrBold.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesParaTextPrBold.prototype.constructor = CChangesParaTextPrBold;
 CChangesParaTextPrBold.prototype.Type = AscDFH.historyitem_TextPr_Bold;
 CChangesParaTextPrBold.prototype.private_SetValue = function(Value)
 {
@@ -300,9 +301,10 @@ CChangesParaTextPrBold.prototype.Merge = private_ParaTextPrChangesOnMergeValue;
  */
 function CChangesParaTextPrItalic(Class, Old, New, Color)
 {
-	CChangesParaTextPrItalic.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrItalic, AscDFH.CChangesBaseBoolProperty);
+CChangesParaTextPrItalic.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesParaTextPrItalic.prototype.constructor = CChangesParaTextPrItalic;
 CChangesParaTextPrItalic.prototype.Type = AscDFH.historyitem_TextPr_Italic;
 CChangesParaTextPrItalic.prototype.private_SetValue = function(Value)
 {
@@ -315,9 +317,10 @@ CChangesParaTextPrItalic.prototype.Merge = private_ParaTextPrChangesOnMergeValue
  */
 function CChangesParaTextPrStrikeout(Class, Old, New, Color)
 {
-	CChangesParaTextPrStrikeout.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrStrikeout, AscDFH.CChangesBaseBoolProperty);
+CChangesParaTextPrStrikeout.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesParaTextPrStrikeout.prototype.constructor = CChangesParaTextPrStrikeout;
 CChangesParaTextPrStrikeout.prototype.Type = AscDFH.historyitem_TextPr_Strikeout;
 CChangesParaTextPrStrikeout.prototype.private_SetValue = function(Value)
 {
@@ -330,9 +333,10 @@ CChangesParaTextPrStrikeout.prototype.Merge = private_ParaTextPrChangesOnMergeVa
  */
 function CChangesParaTextPrUnderline(Class, Old, New, Color)
 {
-	CChangesParaTextPrUnderline.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrUnderline, AscDFH.CChangesBaseBoolProperty);
+CChangesParaTextPrUnderline.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesParaTextPrUnderline.prototype.constructor = CChangesParaTextPrUnderline;
 CChangesParaTextPrUnderline.prototype.Type = AscDFH.historyitem_TextPr_Underline;
 CChangesParaTextPrUnderline.prototype.private_SetValue = function(Value)
 {
@@ -345,9 +349,10 @@ CChangesParaTextPrUnderline.prototype.Merge = private_ParaTextPrChangesOnMergeVa
  */
 function CChangesParaTextPrFontSize(Class, Old, New, Color)
 {
-	CChangesParaTextPrFontSize.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseDoubleProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrFontSize, AscDFH.CChangesBaseDoubleProperty);
+CChangesParaTextPrFontSize.prototype = Object.create(AscDFH.CChangesBaseDoubleProperty.prototype);
+CChangesParaTextPrFontSize.prototype.constructor = CChangesParaTextPrFontSize;
 CChangesParaTextPrFontSize.prototype.Type = AscDFH.historyitem_TextPr_FontSize;
 CChangesParaTextPrFontSize.prototype.private_SetValue = function(Value)
 {
@@ -360,9 +365,10 @@ CChangesParaTextPrFontSize.prototype.Merge = private_ParaTextPrChangesOnMergeVal
  */
 function CChangesParaTextPrColor(Class, Old, New, Color)
 {
-	CChangesParaTextPrColor.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrColor, AscDFH.CChangesBaseObjectProperty);
+CChangesParaTextPrColor.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParaTextPrColor.prototype.constructor = CChangesParaTextPrColor;
 CChangesParaTextPrColor.prototype.Type = AscDFH.historyitem_TextPr_Color;
 CChangesParaTextPrColor.prototype.private_SetValue = function(Value)
 {
@@ -379,9 +385,10 @@ CChangesParaTextPrColor.prototype.Merge = private_ParaTextPrChangesOnMergeValue;
  */
 function CChangesParaTextPrVertAlign(Class, Old, New, Color)
 {
-	CChangesParaTextPrVertAlign.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrVertAlign, AscDFH.CChangesBaseLongProperty);
+CChangesParaTextPrVertAlign.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesParaTextPrVertAlign.prototype.constructor = CChangesParaTextPrVertAlign;
 CChangesParaTextPrVertAlign.prototype.Type = AscDFH.historyitem_TextPr_VertAlign;
 CChangesParaTextPrVertAlign.prototype.private_SetValue = function(Value)
 {
@@ -394,9 +401,10 @@ CChangesParaTextPrVertAlign.prototype.Merge = private_ParaTextPrChangesOnMergeVa
  */
 function CChangesParaTextPrHighLight(Class, Old, New, Color)
 {
-	CChangesParaTextPrHighLight.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrHighLight, AscDFH.CChangesBaseProperty);
+CChangesParaTextPrHighLight.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesParaTextPrHighLight.prototype.constructor = CChangesParaTextPrHighLight;
 CChangesParaTextPrHighLight.prototype.Type = AscDFH.historyitem_TextPr_HighLight;
 CChangesParaTextPrHighLight.prototype.private_SetValue = function(Value)
 {
@@ -489,9 +497,10 @@ CChangesParaTextPrHighLight.prototype.Merge = private_ParaTextPrChangesOnMergeVa
  */
 function CChangesParaTextPrRStyle(Class, Old, New, Color)
 {
-	CChangesParaTextPrRStyle.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseStringProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrRStyle, AscDFH.CChangesBaseStringProperty);
+CChangesParaTextPrRStyle.prototype = Object.create(AscDFH.CChangesBaseStringProperty.prototype);
+CChangesParaTextPrRStyle.prototype.constructor = CChangesParaTextPrRStyle;
 CChangesParaTextPrRStyle.prototype.Type = AscDFH.historyitem_TextPr_RStyle;
 CChangesParaTextPrRStyle.prototype.private_SetValue = function(Value)
 {
@@ -504,9 +513,10 @@ CChangesParaTextPrRStyle.prototype.Merge = private_ParaTextPrChangesOnMergeValue
  */
 function CChangesParaTextPrSpacing(Class, Old, New, Color)
 {
-	CChangesParaTextPrSpacing.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseDoubleProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrSpacing, AscDFH.CChangesBaseDoubleProperty);
+CChangesParaTextPrSpacing.prototype = Object.create(AscDFH.CChangesBaseDoubleProperty.prototype);
+CChangesParaTextPrSpacing.prototype.constructor = CChangesParaTextPrSpacing;
 CChangesParaTextPrSpacing.prototype.Type = AscDFH.historyitem_TextPr_Spacing;
 CChangesParaTextPrSpacing.prototype.private_SetValue = function(Value)
 {
@@ -519,9 +529,10 @@ CChangesParaTextPrSpacing.prototype.Merge = private_ParaTextPrChangesOnMergeValu
  */
 function CChangesParaTextPrDStrikeout(Class, Old, New, Color)
 {
-	CChangesParaTextPrDStrikeout.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrDStrikeout, AscDFH.CChangesBaseBoolProperty);
+CChangesParaTextPrDStrikeout.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesParaTextPrDStrikeout.prototype.constructor = CChangesParaTextPrDStrikeout;
 CChangesParaTextPrDStrikeout.prototype.Type = AscDFH.historyitem_TextPr_DStrikeout;
 CChangesParaTextPrDStrikeout.prototype.private_SetValue = function(Value)
 {
@@ -534,9 +545,10 @@ CChangesParaTextPrDStrikeout.prototype.Merge = private_ParaTextPrChangesOnMergeV
  */
 function CChangesParaTextPrCaps(Class, Old, New, Color)
 {
-	CChangesParaTextPrCaps.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrCaps, AscDFH.CChangesBaseBoolProperty);
+CChangesParaTextPrCaps.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesParaTextPrCaps.prototype.constructor = CChangesParaTextPrCaps;
 CChangesParaTextPrCaps.prototype.Type = AscDFH.historyitem_TextPr_Caps;
 CChangesParaTextPrCaps.prototype.private_SetValue = function(Value)
 {
@@ -549,9 +561,10 @@ CChangesParaTextPrCaps.prototype.Merge = private_ParaTextPrChangesOnMergeValue;
  */
 function CChangesParaTextPrSmallCaps(Class, Old, New, Color)
 {
-	CChangesParaTextPrSmallCaps.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrSmallCaps, AscDFH.CChangesBaseBoolProperty);
+CChangesParaTextPrSmallCaps.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesParaTextPrSmallCaps.prototype.constructor = CChangesParaTextPrSmallCaps;
 CChangesParaTextPrSmallCaps.prototype.Type = AscDFH.historyitem_TextPr_SmallCaps;
 CChangesParaTextPrSmallCaps.prototype.private_SetValue = function(Value)
 {
@@ -564,9 +577,10 @@ CChangesParaTextPrSmallCaps.prototype.Merge = private_ParaTextPrChangesOnMergeVa
  */
 function CChangesParaTextPrPosition(Class, Old, New, Color)
 {
-	CChangesParaTextPrPosition.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseDoubleProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrPosition, AscDFH.CChangesBaseDoubleProperty);
+CChangesParaTextPrPosition.prototype = Object.create(AscDFH.CChangesBaseDoubleProperty.prototype);
+CChangesParaTextPrPosition.prototype.constructor = CChangesParaTextPrPosition;
 CChangesParaTextPrPosition.prototype.Type = AscDFH.historyitem_TextPr_Position;
 CChangesParaTextPrPosition.prototype.private_SetValue = function(Value)
 {
@@ -579,9 +593,10 @@ CChangesParaTextPrPosition.prototype.Merge = private_ParaTextPrChangesOnMergeVal
  */
 function CChangesParaTextPrValue(Class, Old, New, Color)
 {
-	CChangesParaTextPrValue.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrValue, AscDFH.CChangesBaseObjectProperty);
+CChangesParaTextPrValue.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParaTextPrValue.prototype.constructor = CChangesParaTextPrValue;
 CChangesParaTextPrValue.prototype.Type = AscDFH.historyitem_TextPr_Value;
 CChangesParaTextPrValue.prototype.private_SetValue = function(Value)
 {
@@ -782,9 +797,10 @@ CChangesParaTextPrValue.prototype.Merge = function(oChange)
  */
 function CChangesParaTextPrRFonts(Class, Old, New, Color)
 {
-	CChangesParaTextPrRFonts.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrRFonts, AscDFH.CChangesBaseObjectProperty);
+CChangesParaTextPrRFonts.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParaTextPrRFonts.prototype.constructor = CChangesParaTextPrRFonts;
 CChangesParaTextPrRFonts.prototype.Type = AscDFH.historyitem_TextPr_RFonts;
 CChangesParaTextPrRFonts.prototype.private_SetValue = function(Value)
 {
@@ -846,9 +862,10 @@ CChangesParaTextPrRFonts.prototype.Merge = function(oChange)
  */
 function CChangesParaTextPrRFontsAscii(Class, Old, New, Color)
 {
-	CChangesParaTextPrRFontsAscii.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrRFontsAscii, AscDFH.CChangesBaseProperty);
+CChangesParaTextPrRFontsAscii.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesParaTextPrRFontsAscii.prototype.constructor = CChangesParaTextPrRFontsAscii;
 CChangesParaTextPrRFontsAscii.prototype.Type = AscDFH.historyitem_TextPr_RFonts_Ascii;
 CChangesParaTextPrRFontsAscii.prototype.WriteToBinary = function(Writer)
 {
@@ -929,9 +946,10 @@ CChangesParaTextPrRFontsAscii.prototype.Merge = private_ParaTextPrChangesOnMerge
  */
 function CChangesParaTextPrRFontsHAnsi(Class, Old, New, Color)
 {
-	CChangesParaTextPrRFontsHAnsi.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrRFontsHAnsi, AscDFH.CChangesBaseProperty);
+CChangesParaTextPrRFontsHAnsi.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesParaTextPrRFontsHAnsi.prototype.constructor = CChangesParaTextPrRFontsHAnsi;
 CChangesParaTextPrRFontsHAnsi.prototype.Type = AscDFH.historyitem_TextPr_RFonts_HAnsi;
 CChangesParaTextPrRFontsHAnsi.prototype.WriteToBinary = function(Writer)
 {
@@ -1012,9 +1030,10 @@ CChangesParaTextPrRFontsHAnsi.prototype.Merge = private_ParaTextPrChangesOnMerge
  */
 function CChangesParaTextPrRFontsCS(Class, Old, New, Color)
 {
-	CChangesParaTextPrRFontsCS.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrRFontsCS, AscDFH.CChangesBaseProperty);
+CChangesParaTextPrRFontsCS.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesParaTextPrRFontsCS.prototype.constructor = CChangesParaTextPrRFontsCS;
 CChangesParaTextPrRFontsCS.prototype.Type = AscDFH.historyitem_TextPr_RFonts_CS;
 CChangesParaTextPrRFontsCS.prototype.WriteToBinary = function(Writer)
 {
@@ -1095,9 +1114,10 @@ CChangesParaTextPrRFontsCS.prototype.Merge = private_ParaTextPrChangesOnMergeRFo
  */
 function CChangesParaTextPrRFontsEastAsia(Class, Old, New, Color)
 {
-	CChangesParaTextPrRFontsEastAsia.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrRFontsEastAsia, AscDFH.CChangesBaseProperty);
+CChangesParaTextPrRFontsEastAsia.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesParaTextPrRFontsEastAsia.prototype.constructor = CChangesParaTextPrRFontsEastAsia;
 CChangesParaTextPrRFontsEastAsia.prototype.Type = AscDFH.historyitem_TextPr_RFonts_EastAsia;
 CChangesParaTextPrRFontsEastAsia.prototype.WriteToBinary = function(Writer)
 {
@@ -1178,9 +1198,10 @@ CChangesParaTextPrRFontsEastAsia.prototype.Merge = private_ParaTextPrChangesOnMe
  */
 function CChangesParaTextPrRFontsHint(Class, Old, New, Color)
 {
-	CChangesParaTextPrRFontsHint.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrRFontsHint, AscDFH.CChangesBaseLongProperty);
+CChangesParaTextPrRFontsHint.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesParaTextPrRFontsHint.prototype.constructor = CChangesParaTextPrRFontsHint;
 CChangesParaTextPrRFontsHint.prototype.Type = AscDFH.historyitem_TextPr_RFonts_Hint;
 CChangesParaTextPrRFontsHint.prototype.private_SetValue = function(Value)
 {
@@ -1193,9 +1214,10 @@ CChangesParaTextPrRFontsHint.prototype.Merge = private_ParaTextPrChangesOnMergeR
  */
 function CChangesParaTextPrLang(Class, Old, New, Color)
 {
-	CChangesParaTextPrLang.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrLang, AscDFH.CChangesBaseObjectProperty);
+CChangesParaTextPrLang.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParaTextPrLang.prototype.constructor = CChangesParaTextPrLang;
 CChangesParaTextPrLang.prototype.Type = AscDFH.historyitem_TextPr_Lang;
 CChangesParaTextPrLang.prototype.private_SetValue = function(Value)
 {
@@ -1247,9 +1269,10 @@ CChangesParaTextPrLang.prototype.Merge = function(oChange)
  */
 function CChangesParaTextPrLangBidi(Class, Old, New, Color)
 {
-	CChangesParaTextPrLangBidi.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrLangBidi, AscDFH.CChangesBaseLongProperty);
+CChangesParaTextPrLangBidi.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesParaTextPrLangBidi.prototype.constructor = CChangesParaTextPrLangBidi;
 CChangesParaTextPrLangBidi.prototype.Type = AscDFH.historyitem_TextPr_Lang_Bidi;
 CChangesParaTextPrLangBidi.prototype.private_SetValue = function(Value)
 {
@@ -1262,9 +1285,10 @@ CChangesParaTextPrLangBidi.prototype.Merge = private_ParaTextPrChangesOnMergeLan
  */
 function CChangesParaTextPrLangEastAsia(Class, Old, New, Color)
 {
-	CChangesParaTextPrLangEastAsia.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrLangEastAsia, AscDFH.CChangesBaseLongProperty);
+CChangesParaTextPrLangEastAsia.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesParaTextPrLangEastAsia.prototype.constructor = CChangesParaTextPrLangEastAsia;
 CChangesParaTextPrLangEastAsia.prototype.Type = AscDFH.historyitem_TextPr_Lang_EastAsia;
 CChangesParaTextPrLangEastAsia.prototype.private_SetValue = function(Value)
 {
@@ -1277,9 +1301,10 @@ CChangesParaTextPrLangEastAsia.prototype.Merge = private_ParaTextPrChangesOnMerg
  */
 function CChangesParaTextPrLangVal(Class, Old, New, Color)
 {
-	CChangesParaTextPrLangVal.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrLangVal, AscDFH.CChangesBaseLongProperty);
+CChangesParaTextPrLangVal.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesParaTextPrLangVal.prototype.constructor = CChangesParaTextPrLangVal;
 CChangesParaTextPrLangVal.prototype.Type = AscDFH.historyitem_TextPr_Lang_Val;
 CChangesParaTextPrLangVal.prototype.private_SetValue = function(Value)
 {
@@ -1292,9 +1317,10 @@ CChangesParaTextPrLangVal.prototype.Merge = private_ParaTextPrChangesOnMergeLang
  */
 function CChangesParaTextPrUnifill(Class, Old, New, Color)
 {
-	CChangesParaTextPrUnifill.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrUnifill, AscDFH.CChangesBaseObjectProperty);
+CChangesParaTextPrUnifill.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParaTextPrUnifill.prototype.constructor = CChangesParaTextPrUnifill;
 CChangesParaTextPrUnifill.prototype.Type = AscDFH.historyitem_TextPr_Unifill;
 CChangesParaTextPrUnifill.prototype.private_SetValue = function(Value)
 {
@@ -1326,9 +1352,10 @@ CChangesParaTextPrUnifill.prototype.Merge = private_ParaTextPrChangesOnMergeValu
  */
 function CChangesParaTextPrFontSizeCS(Class, Old, New, Color)
 {
-	CChangesParaTextPrFontSizeCS.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseDoubleProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrFontSizeCS, AscDFH.CChangesBaseDoubleProperty);
+CChangesParaTextPrFontSizeCS.prototype = Object.create(AscDFH.CChangesBaseDoubleProperty.prototype);
+CChangesParaTextPrFontSizeCS.prototype.constructor = CChangesParaTextPrFontSizeCS;
 CChangesParaTextPrFontSizeCS.prototype.Type = AscDFH.historyitem_TextPr_FontSizeCS;
 CChangesParaTextPrFontSizeCS.prototype.private_SetValue = function(Value)
 {
@@ -1341,9 +1368,10 @@ CChangesParaTextPrFontSizeCS.prototype.Merge = private_ParaTextPrChangesOnMergeV
  */
 function CChangesParaTextPrTextOutline(Class, Old, New, Color)
 {
-	CChangesParaTextPrTextOutline.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrTextOutline, AscDFH.CChangesBaseObjectProperty);
+CChangesParaTextPrTextOutline.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParaTextPrTextOutline.prototype.constructor = CChangesParaTextPrTextOutline;
 CChangesParaTextPrTextOutline.prototype.Type = AscDFH.historyitem_TextPr_Outline;
 CChangesParaTextPrTextOutline.prototype.private_SetValue = function(Value)
 {
@@ -1360,9 +1388,10 @@ CChangesParaTextPrTextOutline.prototype.Merge = private_ParaTextPrChangesOnMerge
  */
 function CChangesParaTextPrTextFill(Class, Old, New, Color)
 {
-	CChangesParaTextPrTextFill.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParaTextPrTextFill, AscDFH.CChangesBaseObjectProperty);
+CChangesParaTextPrTextFill.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParaTextPrTextFill.prototype.constructor = CChangesParaTextPrTextFill;
 CChangesParaTextPrTextFill.prototype.Type = AscDFH.historyitem_TextPr_Fill;
 CChangesParaTextPrTextFill.prototype.private_SetValue = function(Value)
 {

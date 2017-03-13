@@ -70,7 +70,7 @@ function (window, undefined) {
 
     function COleObject()
     {
-        COleObject.superclass.constructor.call(this);
+		AscFormat.CImageShape.call(this);
         this.m_sData = null;
         this.m_sApplicationId = null;
         this.m_nPixWidth = null;
@@ -78,7 +78,9 @@ function (window, undefined) {
         this.m_fDefaultSizeX = null;
         this.m_fDefaultSizeY = null;
     }
-    AscCommon.extendClass(COleObject, AscFormat.CImageShape);
+
+		COleObject.prototype = Object.create(AscFormat.CImageShape.prototype);
+		COleObject.prototype.constructor = COleObject;
 
     COleObject.prototype.getObjectType = function()
     {

@@ -66,11 +66,12 @@ AscDFH.changesRelationMap[AscDFH.historyitem_AbstractNum_ParaPrChange] = [
  */
 function CChangesAbstractNumLvlChange(Class, Old, New, Index)
 {
-	CChangesAbstractNumLvlChange.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 
 	this.Index = Index;
 }
-AscCommon.extendClass(CChangesAbstractNumLvlChange, AscDFH.CChangesBaseProperty);
+CChangesAbstractNumLvlChange.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesAbstractNumLvlChange.prototype.constructor = CChangesAbstractNumLvlChange;
 CChangesAbstractNumLvlChange.prototype.Type = AscDFH.historyitem_AbstractNum_LvlChange;
 CChangesAbstractNumLvlChange.prototype.WriteToBinary = function(Writer)
 {
@@ -142,11 +143,12 @@ CChangesAbstractNumLvlChange.prototype.Merge = function(oChange)
  */
 function CChangesAbstractNumTextPrChange(Class, Old, New, Index)
 {
-	CChangesAbstractNumTextPrChange.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 
 	this.Index = Index;
 }
-AscCommon.extendClass(CChangesAbstractNumTextPrChange, AscDFH.CChangesBaseProperty);
+CChangesAbstractNumTextPrChange.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesAbstractNumTextPrChange.prototype.constructor = CChangesAbstractNumTextPrChange;
 CChangesAbstractNumTextPrChange.prototype.Type = AscDFH.historyitem_AbstractNum_TextPrChange;
 CChangesAbstractNumTextPrChange.prototype.WriteToBinary = function(Writer)
 {
@@ -205,11 +207,12 @@ CChangesAbstractNumTextPrChange.prototype.Merge = function(oChange)
  */
 function CChangesAbstractNumParaPrChange(Class, Old, New, Index)
 {
-	CChangesAbstractNumParaPrChange.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 
 	this.Index = Index;
 }
-AscCommon.extendClass(CChangesAbstractNumParaPrChange, AscDFH.CChangesBaseProperty);
+CChangesAbstractNumParaPrChange.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesAbstractNumParaPrChange.prototype.constructor = CChangesAbstractNumParaPrChange;
 CChangesAbstractNumParaPrChange.prototype.Type = AscDFH.historyitem_AbstractNum_ParaPrChange;
 CChangesAbstractNumParaPrChange.prototype.WriteToBinary = function(Writer)
 {

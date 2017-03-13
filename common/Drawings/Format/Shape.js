@@ -690,7 +690,7 @@ function SetXfrmFromMetrics(oDrawing, metrics)
 
 function CShape()
 {
-    CShape.superclass.constructor.call(this);
+	AscFormat.CGraphicObjectBase.call(this);
     this.nvSpPr         = null;
     this.style          = null;
     this.txBody         = null;
@@ -700,10 +700,8 @@ function CShape()
     this.bWordShape     = null;//если этот флаг стоит в true то автофигура имеет формат как в редакторе документов
     this.bCheckAutoFitFlag = false;
 
-
     this.transformText = new CMatrix();
     this.invertTransformText = null;
-
 
     this.localTransformText = new CMatrix();
     this.worksheet = null;
@@ -715,12 +713,12 @@ function CShape()
     this.txWarpStructNoTransform = null;
     this.txWarpStructParamarksNoTransform = null;
 
-
-
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
     AscCommon.g_oTableId.Add( this, this.Id );
 }
-AscCommon.extendClass(CShape, AscFormat.CGraphicObjectBase);
+
+	CShape.prototype = Object.create(AscFormat.CGraphicObjectBase.prototype);
+	CShape.prototype.constructor = CShape;
 
 CShape.prototype.getObjectType = function () {
     return AscDFH.historyitem_type_Shape;

@@ -63,7 +63,7 @@ var History = AscCommon.History;
 
 function CGraphicFrame()
 {
-    CGraphicFrame.superclass.constructor.call(this);
+	AscFormat.CGraphicObjectBase.call(this);
     this.graphicObject = null;
     this.nvGraphicFramePr = null;
 
@@ -83,8 +83,8 @@ function CGraphicFrame()
     this.RecalcInfo = {};
 }
 
-AscCommon.extendClass(CGraphicFrame, AscFormat.CGraphicObjectBase);
-
+	CGraphicFrame.prototype = Object.create(AscFormat.CGraphicObjectBase.prototype);
+	CGraphicFrame.prototype.constructor = CGraphicFrame;
 
 CGraphicFrame.prototype.addToRecalculate = CShape.prototype.addToRecalculate;
 

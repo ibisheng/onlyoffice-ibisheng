@@ -46,7 +46,6 @@ function twttr(){};
 function _gaq(){};
 
 function constructor(){};
-function superclass(){};
 
 function touchstart(){};
 function touchmove(){};

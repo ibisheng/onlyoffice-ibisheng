@@ -65,6 +65,7 @@
 	}
 
 	cERROR_TYPE.prototype = Object.create(cBaseFunction.prototype);
+	cERROR_TYPE.prototype.constructor = cERROR_TYPE;
 	cERROR_TYPE.prototype.Calculate = function (arg) {
 		function typeError(elem) {
 			if (elem instanceof cError) {
@@ -126,6 +127,7 @@
 	}
 
 	cISBLANK.prototype = Object.create(cBaseFunction.prototype);
+	cISBLANK.prototype.constructor = cISBLANK;
 	cISBLANK.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -155,6 +157,7 @@
 	}
 
 	cISERR.prototype = Object.create(cBaseFunction.prototype);
+	cISERR.prototype.constructor = cISERR;
 	cISERR.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArray) {
@@ -187,6 +190,7 @@
 	}
 
 	cISERROR.prototype = Object.create(cBaseFunction.prototype);
+	cISERROR.prototype.constructor = cISERROR;
 	cISERROR.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArray) {
@@ -219,6 +223,7 @@
 	}
 
 	cISEVEN.prototype = Object.create(cBaseFunction.prototype);
+	cISEVEN.prototype.constructor = cISEVEN;
 	cISEVEN.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArray) {
@@ -256,6 +261,7 @@
 	}
 
 	cISLOGICAL.prototype = Object.create(cBaseFunction.prototype);
+	cISLOGICAL.prototype.constructor = cISLOGICAL;
 	cISLOGICAL.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArray) {
@@ -288,6 +294,7 @@
 	}
 
 	cISNA.prototype = Object.create(cBaseFunction.prototype);
+	cISNA.prototype.constructor = cISNA;
 	cISNA.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArray) {
@@ -320,6 +327,7 @@
 	}
 
 	cISNONTEXT.prototype = Object.create(cBaseFunction.prototype);
+	cISNONTEXT.prototype.constructor = cISNONTEXT;
 	cISNONTEXT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArray) {
@@ -351,6 +359,7 @@
 	}
 
 	cISNUMBER.prototype = Object.create(cBaseFunction.prototype);
+	cISNUMBER.prototype.constructor = cISNUMBER;
 	cISNUMBER.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArray) {
@@ -383,6 +392,7 @@
 	}
 
 	cISODD.prototype = Object.create(cBaseFunction.prototype);
+	cISODD.prototype.constructor = cISODD;
 	cISODD.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArray) {
@@ -420,6 +430,7 @@
 	}
 
 	cISREF.prototype = Object.create(cBaseFunction.prototype);
+	cISREF.prototype.constructor = cISREF;
 	cISREF.prototype.Calculate = function (arg) {
 		if ((arg[0] instanceof cRef || arg[0] instanceof cArea || arg[0] instanceof cArea3D ||
 			arg[0] instanceof cRef3D) && arg[0].isValid && arg[0].isValid()) {
@@ -444,6 +455,7 @@
 	}
 
 	cISTEXT.prototype = Object.create(cBaseFunction.prototype);
+	cISTEXT.prototype.constructor = cISTEXT;
 	cISTEXT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArray) {
@@ -476,6 +488,7 @@
 	}
 
 	cN.prototype = Object.create(cBaseFunction.prototype);
+	cN.prototype.constructor = cN;
 	cN.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cN.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
@@ -522,6 +535,7 @@
 	}
 
 	cNA.prototype = Object.create(cBaseFunction.prototype);
+	cNA.prototype.constructor = cNA;
 	cNA.prototype.Calculate = function () {
 		return this.value = new cError(cErrorType.not_available);
 	};
@@ -541,6 +555,7 @@
 	}
 
 	cTYPE.prototype = Object.create(cBaseFunction.prototype);
+	cTYPE.prototype.constructor = cTYPE;
 	cTYPE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {

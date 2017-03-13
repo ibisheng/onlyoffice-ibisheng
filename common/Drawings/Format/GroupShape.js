@@ -67,7 +67,7 @@ var CShape = AscFormat.CShape;
 
 function CGroupShape()
 {
-    CGroupShape.superclass.constructor.call(this);
+	AscFormat.CGraphicObjectBase.call(this);
     this.nvGrpSpPr = null;
     this.spTree    = [];
 
@@ -89,7 +89,8 @@ function CGroupShape()
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
     AscCommon.g_oTableId.Add(this, this.Id);
 }
-AscCommon.extendClass(CGroupShape, AscFormat.CGraphicObjectBase);
+	CGroupShape.prototype = Object.create(AscFormat.CGraphicObjectBase.prototype);
+	CGroupShape.prototype.constructor = CGroupShape;
 
     CGroupShape.prototype.getObjectType = function()
     {
@@ -1372,7 +1373,7 @@ AscCommon.extendClass(CGroupShape, AscFormat.CGraphicObjectBase);
         {
             this.spTree[i].normalize();
         }
-        CGroupShape.superclass.normalize.call(this);
+		AscFormat.CGraphicObjectBase.prototype.normalize.call(this);
         var xfrm = this.spPr.xfrm;
         xfrm.setChExtX(xfrm.extX);
         xfrm.setChExtY(xfrm.extY);

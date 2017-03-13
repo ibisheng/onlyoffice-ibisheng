@@ -46,9 +46,10 @@
 	function CMobileDelegateEditorPresentation(_manager)
 	{
 		this.Name = "slide";
-		CMobileDelegateEditorPresentation.superclass.constructor.call(this, _manager);
+		AscCommon.CMobileDelegateEditor.call(this, _manager);
 	}
-	AscCommon.extendClass(CMobileDelegateEditorPresentation, AscCommon.CMobileDelegateEditor);
+	CMobileDelegateEditorPresentation.prototype = Object.create(AscCommon.CMobileDelegateEditor.prototype);
+	CMobileDelegateEditorPresentation.prototype.constructor = CMobileDelegateEditorPresentation;
 
 	CMobileDelegateEditorPresentation.prototype.ConvertCoordsToCursor = function(x, y, page, isGlobal)
 	{
@@ -349,9 +350,10 @@
 	 */
 	function CMobileTouchManager(_config)
 	{
-		CMobileTouchManager.superclass.constructor.call(this, _config || {});
+		AscCommon.CMobileTouchManagerBase.call(this, _config || {});
 	}
-	AscCommon.extendClass(CMobileTouchManager, AscCommon.CMobileTouchManagerBase);
+	CMobileTouchManager.prototype = Object.create(AscCommon.CMobileTouchManagerBase.prototype);
+	CMobileTouchManager.prototype.constructor = CMobileTouchManager;
 
 	CMobileTouchManager.prototype.Init = function(_api)
 	{
@@ -1055,12 +1057,13 @@
 	 */
 	function CMobileDelegateThumbnails(_manager)
 	{
-		CMobileDelegateThumbnails.superclass.constructor.call(this, _manager);
+		AscCommon.CMobileDelegateSimple.call(this, _manager);
 
 		this.HtmlPage 			= this.Api.WordControl;
 		this.Thumbnails 		= this.HtmlPage.Thumbnails;
 	}
-	AscCommon.extendClass(CMobileDelegateThumbnails, AscCommon.CMobileDelegateSimple);
+	CMobileDelegateThumbnails.prototype = Object.create(AscCommon.CMobileDelegateSimple.prototype);
+	CMobileDelegateThumbnails.prototype.constructor = CMobileDelegateThumbnails;
 
 	CMobileDelegateThumbnails.prototype.GetScrollerParent = function()
 	{
@@ -1124,13 +1127,14 @@
 	 */
 	function CMobileTouchManagerThumbnails(_config)
 	{
-		CMobileTouchManagerThumbnails.superclass.constructor.call(this, _config || {});
+		AscCommon.CMobileTouchManagerBase.call(this, _config || {});
 
 		this.SelectEnabled = false;
 		this.TableTrackEnabled = false;
 		this.ZoomEnabled = false;
 	}
-	AscCommon.extendClass(CMobileTouchManagerThumbnails, AscCommon.CMobileTouchManagerBase);
+	CMobileTouchManagerThumbnails.prototype = Object.create(AscCommon.CMobileTouchManagerBase.prototype);
+	CMobileTouchManagerThumbnails.prototype.constructor = CMobileTouchManagerThumbnails;
 
 	CMobileTouchManagerThumbnails.prototype.Init = function(_api)
 	{

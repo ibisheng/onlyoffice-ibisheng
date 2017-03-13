@@ -1341,7 +1341,7 @@ function CDocumentSettings()
  */
 function CDocument(DrawingDocument, isMainLogicDocument)
 {
-    CDocument.superclass.constructor.call(this);
+	CDocumentContentBase.call(this);
 
     //------------------------------------------------------------------------------------------------------------------
     //  Сохраняем ссылки на глобальные объекты
@@ -1525,7 +1525,8 @@ function CDocument(DrawingDocument, isMainLogicDocument)
 
     this.StartTime = 0;
 }
-AscCommon.extendClass(CDocument, CDocumentContentBase);
+CDocument.prototype = Object.create(CDocumentContentBase.prototype);
+CDocument.prototype.constructor = CDocument;
 
 CDocument.prototype.Init                           = function()
 {

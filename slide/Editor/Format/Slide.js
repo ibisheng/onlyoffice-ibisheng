@@ -40,9 +40,10 @@ var History = AscCommon.History;
 
 
 function CChangesDrawingsContentComments(Class, Type, Pos, Items, isAdd){
-    CChangesDrawingsContentComments.superclass.constructor.call(this, Class, Type, Pos, Items, isAdd);
+	AscDFH.CChangesDrawingsContent.call(this, Class, Type, Pos, Items, isAdd);
 }
-AscCommon.extendClass(CChangesDrawingsContentComments, AscDFH.CChangesDrawingsContent);
+CChangesDrawingsContentComments.prototype = Object.create(AscDFH.CChangesDrawingsContent.prototype);
+CChangesDrawingsContentComments.prototype.constructor = CChangesDrawingsContentComments;
 CChangesDrawingsContentComments.prototype.addToInterface = function(){
     for(var i = 0; i < this.Items.length; ++i){
         var oComment = this.Items[i];
@@ -55,7 +56,7 @@ CChangesDrawingsContentComments.prototype.removeFromInterface = function(){
     }
 };
 CChangesDrawingsContentComments.prototype.Undo = function(){
-    CChangesDrawingsContentComments.superclass.Undo.call(this);
+	AscDFH.CChangesDrawingsContent.prototype.Undo.call(this);
     if(this.IsAdd()){
         this.removeFromInterface();
     }
@@ -64,7 +65,7 @@ CChangesDrawingsContentComments.prototype.Undo = function(){
     }
 };
 CChangesDrawingsContentComments.prototype.Redo = function(){
-    CChangesDrawingsContentComments.superclass.Redo.call(this);
+	AscDFH.CChangesDrawingsContent.prototype.Redo.call(this);
     if(this.IsAdd()){
         this.addToInterface();
     }
@@ -74,7 +75,7 @@ CChangesDrawingsContentComments.prototype.Redo = function(){
 };
 
 CChangesDrawingsContentComments.prototype.Load = function(){
-    CChangesDrawingsContentComments.superclass.Load.call(this);
+	AscDFH.CChangesDrawingsContent.prototype.Load.call(this);
     if(this.IsAdd()){
         this.addToInterface();
     }

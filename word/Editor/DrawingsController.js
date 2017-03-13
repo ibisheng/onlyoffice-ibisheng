@@ -14,11 +14,12 @@
  */
 function CDrawingsController(LogicDocument, DrawingsObjects)
 {
-	CDrawingsController.superclass.constructor.call(this, LogicDocument);
+	CDocumentControllerBase.call(this, LogicDocument);
 
 	this.DrawingObjects = DrawingsObjects;
 }
-AscCommon.extendClass(CDrawingsController, CDocumentControllerBase);
+CDrawingsController.prototype = Object.create(CDocumentControllerBase.prototype);
+CDrawingsController.prototype.constructor = CDrawingsController;
 
 CDrawingsController.prototype.CanTargetUpdate = function()
 {

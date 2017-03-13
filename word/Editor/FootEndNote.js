@@ -40,7 +40,7 @@
  */
 function CFootEndnote(DocumentController)
 {
-	CFootEndnote.superclass.constructor.call(this, DocumentController, DocumentController ? DocumentController.Get_DrawingDocument() : undefined, 0, 0, 0, 0, true, false, false);
+	CDocumentContent.call(this, DocumentController, DocumentController ? DocumentController.Get_DrawingDocument() : undefined, 0, 0, 0, 0, true, false, false);
 
 	this.Number            = 1;
 	this.SectPr            = null;
@@ -58,7 +58,8 @@ function CFootEndnote(DocumentController)
 	};
 }
 
-AscCommon.extendClass(CFootEndnote, CDocumentContent);
+CFootEndnote.prototype = Object.create(CDocumentContent.prototype);
+CFootEndnote.prototype.constructor = CFootEndnote;
 
 CFootEndnote.prototype.GetElementPageIndex = function(nPageAbs, nColumnAbs)
 {
@@ -82,12 +83,12 @@ CFootEndnote.prototype.Refresh_RecalcData2 = function(nIndex, nCurPage)
 CFootEndnote.prototype.Write_ToBinary2 = function(Writer)
 {
 	Writer.WriteLong(AscDFH.historyitem_type_FootEndNote);
-	CFootEndnote.superclass.Write_ToBinary2.call(this, Writer);
+	CDocumentContent.prototype.Write_ToBinary2.call(this, Writer);
 };
 CFootEndnote.prototype.Read_FromBinary2 = function(Reader)
 {
 	Reader.GetLong(); // Должен вернуть historyitem_type_DocumentContent
-	CFootEndnote.superclass.Read_FromBinary2.call(this, Reader);
+	CDocumentContent.prototype.Read_FromBinary2.call(this, Reader);
 };
 CFootEndnote.prototype.SetNumber = function(nNumber, oSectPr, bCustomMarkFollows)
 {
@@ -142,7 +143,7 @@ CFootEndnote.prototype.AddDefaultFootnoteContent = function(sText)
 CFootEndnote.prototype.Recalculate_Page = function(PageIndex, bStart)
 {
 	this.NeedUpdateHint = true;
-	return CFootEndnote.superclass.Recalculate_Page.call(this, PageIndex, bStart);
+	return CDocumentContent.prototype.Recalculate_Page.call(this, PageIndex, bStart);
 };
 CFootEndnote.prototype.GetHint = function()
 {

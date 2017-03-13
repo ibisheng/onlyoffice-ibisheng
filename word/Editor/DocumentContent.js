@@ -59,7 +59,7 @@ var c_oAscVAnchor = Asc.c_oAscVAnchor;
  */
 function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, TurnOffInnerWrap, bPresentation)
 {
-    CDocumentContent.superclass.constructor.call(this);
+	CDocumentContentBase.call(this);
 
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -151,7 +151,8 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
         this.Save_StartState();
     }
 }
-AscCommon.extendClass(CDocumentContent, CDocumentContentBase);
+CDocumentContent.prototype = Object.create(CDocumentContentBase.prototype);
+CDocumentContent.prototype.constructor = CDocumentContent;
 
 CDocumentContent.prototype.Get_Id          = function()
 {

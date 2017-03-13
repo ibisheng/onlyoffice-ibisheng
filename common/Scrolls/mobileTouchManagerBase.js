@@ -211,13 +211,15 @@
 	 */
 	function CMobileDelegateEditor(_manager)
 	{
-		CMobileDelegateEditor.superclass.constructor.call(this, _manager);
+		CMobileDelegateSimple.call(this, _manager);
 
 		this.HtmlPage 			= this.Api.WordControl;
 		this.LogicDocument		= this.Api.WordControl.m_oLogicDocument;
 		this.DrawingDocument 	= this.Api.WordControl.m_oDrawingDocument;
 	}
-	AscCommon.extendClass(CMobileDelegateEditor, CMobileDelegateSimple);
+
+	CMobileDelegateEditor.prototype = Object.create(CMobileDelegateSimple.prototype);
+	CMobileDelegateEditor.prototype.constructor = CMobileDelegateEditor;
 
 	CMobileDelegateEditor.prototype.GetSelectionTransform = function()
 	{

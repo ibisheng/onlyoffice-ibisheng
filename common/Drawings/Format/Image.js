@@ -78,17 +78,17 @@ var isRealObject = AscCommon.isRealObject;
 
 function CImageShape()
 {
-    CImageShape.superclass.constructor.call(this);
+	AscFormat.CGraphicObjectBase.call(this);
     this.nvPicPr  = null;
     this.blipFill = null;
     this.style    = null;
 
-
-
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
     AscCommon.g_oTableId.Add( this, this.Id );
 }
-AscCommon.extendClass(CImageShape, AscFormat.CGraphicObjectBase);
+
+	CImageShape.prototype = Object.create(AscFormat.CGraphicObjectBase.prototype);
+	CImageShape.prototype.constructor = CImageShape;
 
 CImageShape.prototype.getObjectType = function()
 {

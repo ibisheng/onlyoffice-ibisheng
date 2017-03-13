@@ -52,7 +52,7 @@ var reviewtype_Add    = 0x02;
  */
 function ParaRun(Paragraph, bMathRun)
 {
-    ParaRun.superclass.constructor.call(this);
+	CParagraphContentWithContentBase.call(this);
     
     this.Id         = AscCommon.g_oIdCounter.Get_NewId();  // Id данного элемента
     this.Type       = para_Run;                  // тип данного элемента
@@ -116,7 +116,8 @@ function ParaRun(Paragraph, bMathRun)
     }
 }
 
-AscCommon.extendClass(ParaRun, CParagraphContentWithContentBase);
+ParaRun.prototype = Object.create(CParagraphContentWithContentBase.prototype);
+ParaRun.prototype.constructor = ParaRun;
 
 ParaRun.prototype.Get_Type = function()
 {

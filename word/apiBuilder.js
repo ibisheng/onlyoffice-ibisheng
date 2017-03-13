@@ -57,9 +57,10 @@
      */
     function ApiDocument(Document)
     {
-        ApiDocument.superclass.constructor.call(this, Document);
+		ApiDocumentContent.call(this, Document);
     }
-    AscCommon.extendClass(ApiDocument, ApiDocumentContent);
+	ApiDocument.prototype = Object.create(ApiDocumentContent.prototype);
+	ApiDocument.prototype.constructor = ApiDocument;
 
     /**
      * Class representing a paragraph properties.
@@ -88,10 +89,11 @@
      */
     function ApiParagraph(Paragraph)
     {
-        ApiParagraph.superclass.constructor.call(this, this, Paragraph.Pr.Copy());
+		ApiParaPr.call(this, this, Paragraph.Pr.Copy());
         this.Paragraph = Paragraph;
     }
-    AscCommon.extendClass(ApiParagraph, ApiParaPr);
+	ApiParagraph.prototype = Object.create(ApiParaPr.prototype);
+	ApiParagraph.prototype.constructor = ApiParagraph;
 
     /**
      * Class representing a table properties.
@@ -110,10 +112,11 @@
      */
     function ApiTable(Table)
     {
-        ApiTable.superclass.constructor.call(this, this, Table.Pr.Copy());
+		ApiTablePr.call(this, this, Table.Pr.Copy());
         this.Table = Table;
     }
-    AscCommon.extendClass(ApiTable, ApiTablePr);
+	ApiTable.prototype = Object.create(ApiTablePr.prototype);
+	ApiTable.prototype.constructor = ApiTable;
 
     /**
      * Class representing a text properties.
@@ -132,10 +135,11 @@
      */
     function ApiRun(Run)
     {
-        ApiRun.superclass.constructor.call(this, this, Run.Pr.Copy());
+		ApiTextPr.call(this, this, Run.Pr.Copy());
         this.Run = Run;
     }
-    AscCommon.extendClass(ApiRun, ApiTextPr);
+	ApiRun.prototype = Object.create(ApiTextPr.prototype);
+	ApiRun.prototype.constructor = ApiRun;
 
     /**
      * Class representing a style.
@@ -172,10 +176,11 @@
      */
     function ApiTableRow(Row)
     {
-        ApiTableRow.superclass.constructor.call(this, this, Row.Pr.Copy());
+		ApiTableRowPr.call(this, this, Row.Pr.Copy());
         this.Row = Row;
     }
-    AscCommon.extendClass(ApiTableRow, ApiTableRowPr);
+	ApiTableRow.prototype = Object.create(ApiTableRowPr.prototype);
+	ApiTableRow.prototype.constructor = ApiTableRow;
 
     /**
      * Class representing a table cell proprties.
@@ -193,10 +198,11 @@
      */
     function ApiTableCell(Cell)
     {
-        ApiTableCell.superclass.constructor.call(this, this, Cell.Pr.Copy());
+		ApiTableCellPr.call(this, this, Cell.Pr.Copy());
         this.Cell = Cell;
     }
-    AscCommon.extendClass(ApiTableCell, ApiTableCellPr);
+	ApiTableCell.prototype = Object.create(ApiTableCellPr.prototype);
+	ApiTableCell.prototype.constructor = ApiTableCell;
 
     /**
      * Class representing a numbering properties.
@@ -252,10 +258,11 @@
      */
     function ApiImage(Image)
     {
-        ApiImage.superclass.constructor.call(this, Image.parent);
+		ApiDrawing.call(this, Image.parent);
         this.Image = Image
     }
-    AscCommon.extendClass(ApiImage, ApiDrawing);
+	ApiImage.prototype = Object.create(ApiDrawing.prototype);
+	ApiImage.prototype.constructor = ApiImage;
 
     /**
      * Class representing a shape.
@@ -263,10 +270,11 @@
      * */
     function ApiShape(Shape)
     {
-        ApiShape.superclass.constructor.call(this, Shape.parent);
+		ApiDrawing.call(this, Shape.parent);
         this.Shape = Shape;
     }
-    AscCommon.extendClass(ApiShape, ApiDrawing);
+	ApiShape.prototype = Object.create(ApiDrawing.prototype);
+	ApiShape.prototype.constructor = ApiShape;
 
     /**
      * Class representing a Chart.
@@ -275,10 +283,11 @@
      */
     function ApiChart(Chart)
     {
-        ApiChart.superclass.constructor.call(this, Chart.parent);
+		ApiDrawing.call(this, Chart.parent);
         this.Chart = Chart;
     }
-    AscCommon.extendClass(ApiChart, ApiDrawing);
+	ApiChart.prototype = Object.create(ApiDrawing.prototype);
+	ApiChart.prototype.constructor = ApiChart;
 
     /**
      * Class representing a base class for color types
@@ -294,9 +303,10 @@
      */
     function ApiRGBColor(r, g, b)
     {
-        ApiRGBColor.superclass.constructor.call(this, AscFormat.CreateUniColorRGB(r, g, b));
+		ApiUniColor.call(this, AscFormat.CreateUniColorRGB(r, g, b));
     }
-    AscCommon.extendClass(ApiRGBColor, ApiUniColor);
+	ApiRGBColor.prototype = Object.create(ApiUniColor.prototype);
+	ApiRGBColor.prototype.constructor = ApiRGBColor;
 
     /**
      * Class representing a Scheme Color
@@ -324,9 +334,10 @@
             case "tx2": {  oUniColor.color.id      = 16; break;}
             default: {  oUniColor.color.id      = 16; break;}
         }
-        ApiSchemeColor.superclass.constructor.call(this, oUniColor);
+		ApiUniColor.call(this, oUniColor);
     }
-    AscCommon.extendClass(ApiSchemeColor, ApiUniColor);
+	ApiSchemeColor.prototype = Object.create(ApiUniColor.prototype);
+	ApiSchemeColor.prototype.constructor = ApiSchemeColor;
 
     /**
      * Class representing a Preset Color
@@ -337,9 +348,10 @@
         var oUniColor = new AscFormat.CUniColor();
         oUniColor.setColor(new AscFormat.CPrstColor());
         oUniColor.color.id = sPresetColor;
-        ApiPresetColor.superclass.constructor.call(this, oUniColor);
+		ApiUniColor.call(this, oUniColor);
     }
-    AscCommon.extendClass(ApiPresetColor, ApiUniColor);
+	ApiPresetColor.prototype = Object.create(ApiUniColor.prototype);
+	ApiPresetColor.prototype.constructor = ApiPresetColor;
 
     /**
      * Class represent a base class fill

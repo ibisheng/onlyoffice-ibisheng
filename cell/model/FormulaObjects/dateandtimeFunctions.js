@@ -304,6 +304,7 @@
 	}
 
 	cDATE.prototype = Object.create(cBaseFunction.prototype);
+	cDATE.prototype.constructor = cDATE;
 	cDATE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], year, month, day;
 
@@ -373,6 +374,7 @@
 	}
 
 	cDATEDIF.prototype = Object.create(cBaseFunction.prototype);
+	cDATEDIF.prototype.constructor = cDATEDIF;
 	cDATEDIF.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDATEDIF.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -490,6 +492,7 @@
 	}
 
 	cDATEVALUE.prototype = Object.create(cBaseFunction.prototype);
+	cDATEVALUE.prototype.constructor = cDATEVALUE;
 	cDATEVALUE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDATEVALUE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
@@ -529,6 +532,7 @@
 	}
 
 	cDAY.prototype = Object.create(cBaseFunction.prototype);
+	cDAY.prototype.constructor = cDAY;
 	cDAY.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDAY.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], val;
@@ -601,6 +605,7 @@
 	}
 
 	cDAYS360.prototype = Object.create(cBaseFunction.prototype);
+	cDAYS360.prototype.constructor = cDAYS360;
 	cDAYS360.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDAYS360.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cBool(false);
@@ -666,6 +671,7 @@
 	}
 
 	cEDATE.prototype = Object.create(cBaseFunction.prototype);
+	cEDATE.prototype.constructor = cEDATE;
 	cEDATE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cEDATE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
@@ -740,6 +746,7 @@
 	}
 
 	cEOMONTH.prototype = Object.create(cBaseFunction.prototype);
+	cEOMONTH.prototype.constructor = cEOMONTH;
 	cEOMONTH.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cEOMONTH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
@@ -805,6 +812,7 @@
 	}
 
 	cHOUR.prototype = Object.create(cBaseFunction.prototype);
+	cHOUR.prototype.constructor = cHOUR;
 	cHOUR.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cHOUR.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], val;
@@ -869,6 +877,7 @@
 	}
 
 	cMINUTE.prototype = Object.create(cBaseFunction.prototype);
+	cMINUTE.prototype.constructor = cMINUTE;
 	cMINUTE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cMINUTE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], val;
@@ -932,6 +941,7 @@
 	}
 
 	cMONTH.prototype = Object.create(cBaseFunction.prototype);
+	cMONTH.prototype.constructor = cMONTH;
 	cMONTH.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cMONTH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], val;
@@ -1000,6 +1010,7 @@
 	}
 
 	cNETWORKDAYS.prototype = Object.create(cBaseFunction.prototype);
+	cNETWORKDAYS.prototype.constructor = cNETWORKDAYS;
 	cNETWORKDAYS.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cNETWORKDAYS.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -1121,6 +1132,7 @@
 	}
 
 	cNETWORKDAYS_INTL.prototype = Object.create(cBaseFunction.prototype);
+	cNETWORKDAYS_INTL.prototype.constructor = cNETWORKDAYS_INTL;
 
 	/** @constructor */
 	function cNOW() {
@@ -1132,6 +1144,7 @@
 	}
 
 	cNOW.prototype = Object.create(cBaseFunction.prototype);
+	cNOW.prototype.constructor = cNOW;
 	cNOW.prototype.Calculate = function () {
 		var d = new Date();
 		this.value = new cNumber(d.getExcelDate() +
@@ -1155,6 +1168,7 @@
 	}
 
 	cSECOND.prototype = Object.create(cBaseFunction.prototype);
+	cSECOND.prototype.constructor = cSECOND;
 	cSECOND.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cSECOND.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], val;
@@ -1218,6 +1232,7 @@
 	}
 
 	cTIME.prototype = Object.create(cBaseFunction.prototype);
+	cTIME.prototype.constructor = cTIME;
 	cTIME.prototype.Calculate = function (arg) {
 		var hour = arg[0], minute = arg[1], second = arg[2];
 
@@ -1278,6 +1293,7 @@
 	}
 
 	cTIMEVALUE.prototype = Object.create(cBaseFunction.prototype);
+	cTIMEVALUE.prototype.constructor = cTIMEVALUE;
 	cTIMEVALUE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cTIMEVALUE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
@@ -1318,6 +1334,7 @@
 	}
 
 	cTODAY.prototype = Object.create(cBaseFunction.prototype);
+	cTODAY.prototype.constructor = cTODAY;
 	cTODAY.prototype.Calculate = function () {
 		this.setCA(new cNumber(new Date().getExcelDate()), true);
 		if (arguments[1].getNumFormatStr().toLowerCase() === "general") {
@@ -1341,6 +1358,7 @@
 	}
 
 	cWEEKDAY.prototype = Object.create(cBaseFunction.prototype);
+	cWEEKDAY.prototype.constructor = cWEEKDAY;
 	cWEEKDAY.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cWEEKDAY.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber(1);
@@ -1423,6 +1441,7 @@
 	}
 
 	cWEEKNUM.prototype = Object.create(cBaseFunction.prototype);
+	cWEEKNUM.prototype.constructor = cWEEKNUM;
 	cWEEKNUM.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cWEEKNUM.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber(1), type = 0;
@@ -1538,6 +1557,7 @@
 	}
 
 	cWORKDAY.prototype = Object.create(cBaseFunction.prototype);
+	cWORKDAY.prototype.constructor = cWORKDAY;
 	cWORKDAY.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cWORKDAY.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -1660,6 +1680,7 @@
 	}
 
 	cWORKDAY_INTL.prototype = Object.create(cBaseFunction.prototype);
+	cWORKDAY_INTL.prototype.constructor = cWORKDAY_INTL;
 
 	/** @constructor */
 	function cYEAR() {
@@ -1671,6 +1692,7 @@
 	}
 
 	cYEAR.prototype = Object.create(cBaseFunction.prototype);
+	cYEAR.prototype.constructor = cYEAR;
 	cYEAR.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cYEAR.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], val;
@@ -1733,6 +1755,7 @@
 	}
 
 	cYEARFRAC.prototype = Object.create(cBaseFunction.prototype);
+	cYEARFRAC.prototype.constructor = cYEARFRAC;
 	cYEARFRAC.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cYEARFRAC.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber(0);

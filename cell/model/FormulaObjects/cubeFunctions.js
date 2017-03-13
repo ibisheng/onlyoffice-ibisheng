@@ -55,6 +55,7 @@
 	}
 
 	cCUBEKPIMEMBER.prototype = Object.create(cBaseFunction.prototype);
+	cCUBEKPIMEMBER.prototype.constructor = cCUBEKPIMEMBER;
 
 	/** @constructor */
 	function cCUBEMEMBER() {
@@ -66,6 +67,7 @@
 	}
 
 	cCUBEMEMBER.prototype = Object.create(cBaseFunction.prototype);
+	cCUBEMEMBER.prototype.constructor = cCUBEMEMBER;
 
 	/** @constructor */
 	function cCUBEMEMBERPROPERTY() {
@@ -77,6 +79,7 @@
 	}
 
 	cCUBEMEMBERPROPERTY.prototype = Object.create(cBaseFunction.prototype);
+	cCUBEMEMBERPROPERTY.prototype.constructor = cCUBEMEMBERPROPERTY;
 
 	/** @constructor */
 	function cCUBERANKEDMEMBER() {
@@ -88,6 +91,7 @@
 	}
 
 	cCUBERANKEDMEMBER.prototype = Object.create(cBaseFunction.prototype);
+	cCUBERANKEDMEMBER.prototype.constructor = cCUBERANKEDMEMBER;
 
 	/** @constructor */
 	function cCUBESET() {
@@ -99,6 +103,7 @@
 	}
 
 	cCUBESET.prototype = Object.create(cBaseFunction.prototype);
+	cCUBESET.prototype.constructor = cCUBESET;
 
 	/** @constructor */
 	function cCUBESETCOUNT() {
@@ -110,6 +115,7 @@
 	}
 
 	cCUBESETCOUNT.prototype = Object.create(cBaseFunction.prototype);
+	cCUBESETCOUNT.prototype.constructor = cCUBESETCOUNT;
 
 	/** @constructor */
 	function cCUBEVALUE() {
@@ -121,4 +127,5 @@
 	}
 
 	cCUBEVALUE.prototype = Object.create(cBaseFunction.prototype);
+	cCUBEVALUE.prototype.constructor = cCUBEVALUE;
 })(window);

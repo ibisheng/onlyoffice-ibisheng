@@ -72,7 +72,7 @@ var editor;
    * @extends {AscCommon.baseEditorsApi}
    */
   function spreadsheet_api(config) {
-    spreadsheet_api.superclass.constructor.call(this, config, AscCommon.c_oEditorId.Spreadsheet);
+    AscCommon.baseEditorsApi.call(this, config, AscCommon.c_oEditorId.Spreadsheet);
 
     /************ private!!! **************/
     this.topLineEditorName = config['id-input'] || '';
@@ -131,14 +131,14 @@ var editor;
     this._init();
     return this;
   }
-  AscCommon.extendClass(spreadsheet_api, AscCommon.baseEditorsApi);
-
+  spreadsheet_api.prototype = Object.create(AscCommon.baseEditorsApi.prototype);
+  spreadsheet_api.prototype.constructor = spreadsheet_api;
   spreadsheet_api.prototype.sendEvent = function() {
     this.handlers.trigger.apply(this.handlers, arguments);
   };
 
   spreadsheet_api.prototype._init = function() {
-    spreadsheet_api.superclass._init.call(this);
+    AscCommon.baseEditorsApi.prototype._init.call(this);
     this.topLineEditorElement = document.getElementById(this.topLineEditorName);
     // ToDo нужно ли это
     asc['editor'] = ( asc['editor'] || this );
@@ -3275,7 +3275,7 @@ var editor;
 			this.asc_setMobileVersion(true);
 		}
 
-		spreadsheet_api.superclass._onEndLoadSdk.call(this);
+		AscCommon.baseEditorsApi.prototype._onEndLoadSdk.call(this);
 
 		this.controller = new AscCommonExcel.asc_CEventsController();
 

@@ -63,9 +63,10 @@ AscDFH.changesRelationMap[AscDFH.historyitem_Hyperlink_RemoveItem] = [
  */
 function CChangesHyperlinkValue(Class, Old, New, Color)
 {
-	CChangesHyperlinkValue.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseStringValue.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesHyperlinkValue, AscDFH.CChangesBaseStringValue);
+CChangesHyperlinkValue.prototype = Object.create(AscDFH.CChangesBaseStringValue.prototype);
+CChangesHyperlinkValue.prototype.constructor = CChangesHyperlinkValue;
 CChangesHyperlinkValue.prototype.Type = AscDFH.historyitem_Hyperlink_Value;
 CChangesHyperlinkValue.prototype.private_SetValue = function(Value)
 {
@@ -77,9 +78,10 @@ CChangesHyperlinkValue.prototype.private_SetValue = function(Value)
  */
 function CChangesHyperlinkToolTip(Class, Old, New, Color)
 {
-	CChangesHyperlinkToolTip.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseStringValue.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesHyperlinkToolTip, AscDFH.CChangesBaseStringValue);
+CChangesHyperlinkToolTip.prototype = Object.create(AscDFH.CChangesBaseStringValue.prototype);
+CChangesHyperlinkToolTip.prototype.constructor = CChangesHyperlinkToolTip;
 CChangesHyperlinkToolTip.prototype.Type = AscDFH.historyitem_Hyperlink_ToolTip;
 CChangesHyperlinkToolTip.prototype.private_SetValue = function(Value)
 {
@@ -91,9 +93,10 @@ CChangesHyperlinkToolTip.prototype.private_SetValue = function(Value)
  */
 function CChangesHyperlinkAddItem(Class, Pos, Items)
 {
-	CChangesHyperlinkAddItem.superclass.constructor.call(this, Class, Pos, Items, true);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Items, true);
 }
-AscCommon.extendClass(CChangesHyperlinkAddItem, AscDFH.CChangesBaseContentChange);
+CChangesHyperlinkAddItem.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesHyperlinkAddItem.prototype.constructor = CChangesHyperlinkAddItem;
 CChangesHyperlinkAddItem.prototype.Type = AscDFH.historyitem_Hyperlink_AddItem;
 CChangesHyperlinkAddItem.prototype.Undo = function()
 {
@@ -155,9 +158,10 @@ CChangesHyperlinkAddItem.prototype.CreateReverseChange = function()
  */
 function CChangesHyperlinkRemoveItem(Class, Pos, Items)
 {
-	CChangesHyperlinkRemoveItem.superclass.constructor.call(this, Class, Pos, Items, false);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Items, false);
 }
-AscCommon.extendClass(CChangesHyperlinkRemoveItem, AscDFH.CChangesBaseContentChange);
+CChangesHyperlinkRemoveItem.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesHyperlinkRemoveItem.prototype.constructor = CChangesHyperlinkRemoveItem;
 CChangesHyperlinkRemoveItem.prototype.Type = AscDFH.historyitem_Hyperlink_RemoveItem;
 CChangesHyperlinkRemoveItem.prototype.Undo = function()
 {

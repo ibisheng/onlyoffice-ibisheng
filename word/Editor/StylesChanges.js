@@ -148,9 +148,10 @@ AscDFH.changesRelationMap[AscDFH.historyitem_Styles_ChangeDefaultFootnoteReferen
  */
 function CChangesStyleBaseObjectProperty(Class, Old, New)
 {
-	CChangesStyleBaseObjectProperty.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseObjectValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStyleBaseObjectProperty, AscDFH.CChangesBaseObjectValue);
+CChangesStyleBaseObjectProperty.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleBaseObjectProperty.prototype.constructor = CChangesStyleBaseObjectProperty;
 CChangesStyleBaseObjectProperty.prototype.Load = function()
 {
 	this.Redo();
@@ -163,9 +164,10 @@ CChangesStyleBaseObjectProperty.prototype.Load = function()
  */
 function CChangesStyleBaseStringProperty(Class, Old, New)
 {
-	CChangesStyleBaseStringProperty.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStyleBaseStringProperty, AscDFH.CChangesBaseProperty);
+CChangesStyleBaseStringProperty.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesStyleBaseStringProperty.prototype.constructor = CChangesStyleBaseStringProperty;
 CChangesStyleBaseStringProperty.prototype.WriteToBinary = function(Writer)
 {
 	// Long  : Flag
@@ -234,9 +236,10 @@ CChangesStyleBaseStringProperty.prototype.Load = function()
  */
 function CChangesStyleBaseBoolProperty(Class, Old, New)
 {
-	CChangesStyleBaseBoolProperty.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStyleBaseBoolProperty, AscDFH.CChangesBaseProperty);
+CChangesStyleBaseBoolProperty.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesStyleBaseBoolProperty.prototype.constructor = CChangesStyleBaseBoolProperty;
 CChangesStyleBaseBoolProperty.prototype.WriteToBinary = function(Writer)
 {
 	// Long  : Flag
@@ -305,9 +308,10 @@ CChangesStyleBaseBoolProperty.prototype.Load = function()
  */
 function CChangesStyleBaseLongProperty(Class, Old, New)
 {
-	CChangesStyleBaseLongProperty.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStyleBaseLongProperty, AscDFH.CChangesBaseProperty);
+CChangesStyleBaseLongProperty.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesStyleBaseLongProperty.prototype.constructor = CChangesStyleBaseLongProperty;
 CChangesStyleBaseLongProperty.prototype.WriteToBinary = function(Writer)
 {
 	// Long  : Flag
@@ -377,9 +381,10 @@ CChangesStyleBaseLongProperty.prototype.Load = function()
  */
 function CChangesStyleTextPr(Class, Old, New, Color)
 {
-	CChangesStyleTextPr.superclass.constructor.call(this, Class, Old, New, Color);
+	CChangesStyleBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesStyleTextPr, CChangesStyleBaseObjectProperty);
+CChangesStyleTextPr.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleTextPr.prototype.constructor = CChangesStyleTextPr;
 CChangesStyleTextPr.prototype.Type = AscDFH.historyitem_Style_TextPr;
 CChangesStyleTextPr.prototype.private_CreateObject = function()
 {
@@ -395,9 +400,10 @@ CChangesStyleTextPr.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleParaPr(Class, Old, New, Color)
 {
-	CChangesStyleParaPr.superclass.constructor.call(this, Class, Old, New, Color);
+	CChangesStyleBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesStyleParaPr, CChangesStyleBaseObjectProperty);
+CChangesStyleParaPr.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleParaPr.prototype.constructor = CChangesStyleParaPr;
 CChangesStyleParaPr.prototype.Type = AscDFH.historyitem_Style_ParaPr;
 CChangesStyleParaPr.prototype.private_CreateObject = function()
 {
@@ -413,9 +419,10 @@ CChangesStyleParaPr.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleTablePr(Class, Old, New, Color)
 {
-	CChangesStyleTablePr.superclass.constructor.call(this, Class, Old, New, Color);
+	CChangesStyleBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesStyleTablePr, CChangesStyleBaseObjectProperty);
+CChangesStyleTablePr.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleTablePr.prototype.constructor = CChangesStyleTablePr;
 CChangesStyleTablePr.prototype.Type = AscDFH.historyitem_Style_TablePr;
 CChangesStyleTablePr.prototype.private_CreateObject = function()
 {
@@ -431,9 +438,10 @@ CChangesStyleTablePr.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleTableRowPr(Class, Old, New, Color)
 {
-	CChangesStyleTableRowPr.superclass.constructor.call(this, Class, Old, New, Color);
+	CChangesStyleBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesStyleTableRowPr, CChangesStyleBaseObjectProperty);
+CChangesStyleTableRowPr.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleTableRowPr.prototype.constructor = CChangesStyleTableRowPr;
 CChangesStyleTableRowPr.prototype.Type = AscDFH.historyitem_Style_TableRowPr;
 CChangesStyleTableRowPr.prototype.private_CreateObject = function()
 {
@@ -449,9 +457,10 @@ CChangesStyleTableRowPr.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleTableCellPr(Class, Old, New, Color)
 {
-	CChangesStyleTableCellPr.superclass.constructor.call(this, Class, Old, New, Color);
+	CChangesStyleBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesStyleTableCellPr, CChangesStyleBaseObjectProperty);
+CChangesStyleTableCellPr.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleTableCellPr.prototype.constructor = CChangesStyleTableCellPr;
 CChangesStyleTableCellPr.prototype.Type = AscDFH.historyitem_Style_TableCellPr;
 CChangesStyleTableCellPr.prototype.private_CreateObject = function()
 {
@@ -467,9 +476,10 @@ CChangesStyleTableCellPr.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleTableBand1Horz(Class, Old, New, Color)
 {
-	CChangesStyleTableBand1Horz.superclass.constructor.call(this, Class, Old, New, Color);
+	CChangesStyleBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesStyleTableBand1Horz, CChangesStyleBaseObjectProperty);
+CChangesStyleTableBand1Horz.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleTableBand1Horz.prototype.constructor = CChangesStyleTableBand1Horz;
 CChangesStyleTableBand1Horz.prototype.Type = AscDFH.historyitem_Style_TableBand1Horz;
 CChangesStyleTableBand1Horz.prototype.private_CreateObject = function()
 {
@@ -485,9 +495,10 @@ CChangesStyleTableBand1Horz.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleTableBand1Vert(Class, Old, New, Color)
 {
-	CChangesStyleTableBand1Vert.superclass.constructor.call(this, Class, Old, New, Color);
+	CChangesStyleBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesStyleTableBand1Vert, CChangesStyleBaseObjectProperty);
+CChangesStyleTableBand1Vert.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleTableBand1Vert.prototype.constructor = CChangesStyleTableBand1Vert;
 CChangesStyleTableBand1Vert.prototype.Type = AscDFH.historyitem_Style_TableBand1Vert;
 CChangesStyleTableBand1Vert.prototype.private_CreateObject = function()
 {
@@ -503,9 +514,10 @@ CChangesStyleTableBand1Vert.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleTableBand2Horz(Class, Old, New, Color)
 {
-	CChangesStyleTableBand2Horz.superclass.constructor.call(this, Class, Old, New, Color);
+	CChangesStyleBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesStyleTableBand2Horz, CChangesStyleBaseObjectProperty);
+CChangesStyleTableBand2Horz.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleTableBand2Horz.prototype.constructor = CChangesStyleTableBand2Horz;
 CChangesStyleTableBand2Horz.prototype.Type = AscDFH.historyitem_Style_TableBand2Horz;
 CChangesStyleTableBand2Horz.prototype.private_CreateObject = function()
 {
@@ -521,9 +533,10 @@ CChangesStyleTableBand2Horz.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleTableBand2Vert(Class, Old, New, Color)
 {
-	CChangesStyleTableBand2Vert.superclass.constructor.call(this, Class, Old, New, Color);
+	CChangesStyleBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesStyleTableBand2Vert, CChangesStyleBaseObjectProperty);
+CChangesStyleTableBand2Vert.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleTableBand2Vert.prototype.constructor = CChangesStyleTableBand2Vert;
 CChangesStyleTableBand2Vert.prototype.Type = AscDFH.historyitem_Style_TableBand2Vert;
 CChangesStyleTableBand2Vert.prototype.private_CreateObject = function()
 {
@@ -539,9 +552,10 @@ CChangesStyleTableBand2Vert.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleTableFirstCol(Class, Old, New, Color)
 {
-	CChangesStyleTableFirstCol.superclass.constructor.call(this, Class, Old, New, Color);
+	CChangesStyleBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesStyleTableFirstCol, CChangesStyleBaseObjectProperty);
+CChangesStyleTableFirstCol.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleTableFirstCol.prototype.constructor = CChangesStyleTableFirstCol;
 CChangesStyleTableFirstCol.prototype.Type = AscDFH.historyitem_Style_TableFirstCol;
 CChangesStyleTableFirstCol.prototype.private_CreateObject = function()
 {
@@ -557,9 +571,10 @@ CChangesStyleTableFirstCol.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleTableFirstRow(Class, Old, New, Color)
 {
-	CChangesStyleTableFirstRow.superclass.constructor.call(this, Class, Old, New, Color);
+	CChangesStyleBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesStyleTableFirstRow, CChangesStyleBaseObjectProperty);
+CChangesStyleTableFirstRow.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleTableFirstRow.prototype.constructor = CChangesStyleTableFirstRow;
 CChangesStyleTableFirstRow.prototype.Type = AscDFH.historyitem_Style_TableFirstRow;
 CChangesStyleTableFirstRow.prototype.private_CreateObject = function()
 {
@@ -575,9 +590,10 @@ CChangesStyleTableFirstRow.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleTableLastCol(Class, Old, New, Color)
 {
-	CChangesStyleTableLastCol.superclass.constructor.call(this, Class, Old, New, Color);
+	CChangesStyleBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesStyleTableLastCol, CChangesStyleBaseObjectProperty);
+CChangesStyleTableLastCol.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleTableLastCol.prototype.constructor = CChangesStyleTableLastCol;
 CChangesStyleTableLastCol.prototype.Type = AscDFH.historyitem_Style_TableLastCol;
 CChangesStyleTableLastCol.prototype.private_CreateObject = function()
 {
@@ -593,9 +609,10 @@ CChangesStyleTableLastCol.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleTableLastRow(Class, Old, New, Color)
 {
-	CChangesStyleTableLastRow.superclass.constructor.call(this, Class, Old, New, Color);
+	CChangesStyleBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesStyleTableLastRow, CChangesStyleBaseObjectProperty);
+CChangesStyleTableLastRow.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleTableLastRow.prototype.constructor = CChangesStyleTableLastRow;
 CChangesStyleTableLastRow.prototype.Type = AscDFH.historyitem_Style_TableLastRow;
 CChangesStyleTableLastRow.prototype.private_CreateObject = function()
 {
@@ -611,9 +628,10 @@ CChangesStyleTableLastRow.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleTableTLCell(Class, Old, New, Color)
 {
-	CChangesStyleTableTLCell.superclass.constructor.call(this, Class, Old, New, Color);
+	CChangesStyleBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesStyleTableTLCell, CChangesStyleBaseObjectProperty);
+CChangesStyleTableTLCell.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleTableTLCell.prototype.constructor = CChangesStyleTableTLCell;
 CChangesStyleTableTLCell.prototype.Type = AscDFH.historyitem_Style_TableTLCell;
 CChangesStyleTableTLCell.prototype.private_CreateObject = function()
 {
@@ -629,9 +647,10 @@ CChangesStyleTableTLCell.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleTableTRCell(Class, Old, New, Color)
 {
-	CChangesStyleTableTRCell.superclass.constructor.call(this, Class, Old, New, Color);
+	CChangesStyleBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesStyleTableTRCell, CChangesStyleBaseObjectProperty);
+CChangesStyleTableTRCell.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleTableTRCell.prototype.constructor = CChangesStyleTableTRCell;
 CChangesStyleTableTRCell.prototype.Type = AscDFH.historyitem_Style_TableTRCell;
 CChangesStyleTableTRCell.prototype.private_CreateObject = function()
 {
@@ -647,9 +666,10 @@ CChangesStyleTableTRCell.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleTableBLCell(Class, Old, New, Color)
 {
-	CChangesStyleTableBLCell.superclass.constructor.call(this, Class, Old, New, Color);
+	CChangesStyleBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesStyleTableBLCell, CChangesStyleBaseObjectProperty);
+CChangesStyleTableBLCell.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleTableBLCell.prototype.constructor = CChangesStyleTableBLCell;
 CChangesStyleTableBLCell.prototype.Type = AscDFH.historyitem_Style_TableBLCell;
 CChangesStyleTableBLCell.prototype.private_CreateObject = function()
 {
@@ -665,9 +685,10 @@ CChangesStyleTableBLCell.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleTableBRCell(Class, Old, New, Color)
 {
-	CChangesStyleTableBRCell.superclass.constructor.call(this, Class, Old, New, Color);
+	CChangesStyleBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesStyleTableBRCell, CChangesStyleBaseObjectProperty);
+CChangesStyleTableBRCell.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleTableBRCell.prototype.constructor = CChangesStyleTableBRCell;
 CChangesStyleTableBRCell.prototype.Type = AscDFH.historyitem_Style_TableBRCell;
 CChangesStyleTableBRCell.prototype.private_CreateObject = function()
 {
@@ -683,9 +704,10 @@ CChangesStyleTableBRCell.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleTableWholeTable(Class, Old, New, Color)
 {
-	CChangesStyleTableWholeTable.superclass.constructor.call(this, Class, Old, New, Color);
+	CChangesStyleBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesStyleTableWholeTable, CChangesStyleBaseObjectProperty);
+CChangesStyleTableWholeTable.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStyleTableWholeTable.prototype.constructor = CChangesStyleTableWholeTable;
 CChangesStyleTableWholeTable.prototype.Type = AscDFH.historyitem_Style_TableWholeTable;
 CChangesStyleTableWholeTable.prototype.private_CreateObject = function()
 {
@@ -701,9 +723,10 @@ CChangesStyleTableWholeTable.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleName(Class, Old, New)
 {
-	CChangesStyleName.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseStringProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStyleName, CChangesStyleBaseStringProperty);
+CChangesStyleName.prototype = Object.create(CChangesStyleBaseStringProperty.prototype);
+CChangesStyleName.prototype.constructor = CChangesStyleName;
 CChangesStyleName.prototype.Type = AscDFH.historyitem_Style_Name;
 CChangesStyleName.prototype.private_SetValue = function(Value)
 {
@@ -715,9 +738,10 @@ CChangesStyleName.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleBasedOn(Class, Old, New)
 {
-	CChangesStyleBasedOn.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseStringProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStyleBasedOn, CChangesStyleBaseStringProperty);
+CChangesStyleBasedOn.prototype = Object.create(CChangesStyleBaseStringProperty.prototype);
+CChangesStyleBasedOn.prototype.constructor = CChangesStyleBasedOn;
 CChangesStyleBasedOn.prototype.Type = AscDFH.historyitem_Style_BasedOn;
 CChangesStyleBasedOn.prototype.private_SetValue = function(Value)
 {
@@ -729,9 +753,10 @@ CChangesStyleBasedOn.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleNext(Class, Old, New)
 {
-	CChangesStyleNext.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseStringProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStyleNext, CChangesStyleBaseStringProperty);
+CChangesStyleNext.prototype = Object.create(CChangesStyleBaseStringProperty.prototype);
+CChangesStyleNext.prototype.constructor = CChangesStyleNext;
 CChangesStyleNext.prototype.Type = AscDFH.historyitem_Style_Next;
 CChangesStyleNext.prototype.private_SetValue = function(Value)
 {
@@ -743,9 +768,10 @@ CChangesStyleNext.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleType(Class, Old, New)
 {
-	CChangesStyleType.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStyleType, AscDFH.CChangesBaseLongValue);
+CChangesStyleType.prototype = Object.create(AscDFH.CChangesBaseLongValue.prototype);
+CChangesStyleType.prototype.constructor = CChangesStyleType;
 CChangesStyleType.prototype.Type = AscDFH.historyitem_Style_Type;
 CChangesStyleType.prototype.private_SetValue = function(Value)
 {
@@ -762,9 +788,10 @@ CChangesStyleType.prototype.Load = function()
  */
 function CChangesStyleQFormat(Class, Old, New)
 {
-	CChangesStyleQFormat.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStyleQFormat, CChangesStyleBaseBoolProperty);
+CChangesStyleQFormat.prototype = Object.create(CChangesStyleBaseBoolProperty.prototype);
+CChangesStyleQFormat.prototype.constructor = CChangesStyleQFormat;
 CChangesStyleQFormat.prototype.Type = AscDFH.historyitem_Style_QFormat;
 CChangesStyleQFormat.prototype.private_SetValue = function(Value)
 {
@@ -776,9 +803,10 @@ CChangesStyleQFormat.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleUiPriority(Class, Old, New)
 {
-	CChangesStyleUiPriority.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStyleUiPriority, CChangesStyleBaseLongProperty);
+CChangesStyleUiPriority.prototype = Object.create(CChangesStyleBaseLongProperty.prototype);
+CChangesStyleUiPriority.prototype.constructor = CChangesStyleUiPriority;
 CChangesStyleUiPriority.prototype.Type = AscDFH.historyitem_Style_UiPriority;
 CChangesStyleUiPriority.prototype.private_SetValue = function(Value)
 {
@@ -790,9 +818,10 @@ CChangesStyleUiPriority.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleHidden(Class, Old, New)
 {
-	CChangesStyleHidden.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStyleHidden, CChangesStyleBaseBoolProperty);
+CChangesStyleHidden.prototype = Object.create(CChangesStyleBaseBoolProperty.prototype);
+CChangesStyleHidden.prototype.constructor = CChangesStyleHidden;
 CChangesStyleHidden.prototype.Type = AscDFH.historyitem_Style_Hidden;
 CChangesStyleHidden.prototype.private_SetValue = function(Value)
 {
@@ -804,9 +833,10 @@ CChangesStyleHidden.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleSemiHidden(Class, Old, New)
 {
-	CChangesStyleSemiHidden.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStyleSemiHidden, CChangesStyleBaseBoolProperty);
+CChangesStyleSemiHidden.prototype = Object.create(CChangesStyleBaseBoolProperty.prototype);
+CChangesStyleSemiHidden.prototype.constructor = CChangesStyleSemiHidden;
 CChangesStyleSemiHidden.prototype.Type = AscDFH.historyitem_Style_SemiHidden;
 CChangesStyleSemiHidden.prototype.private_SetValue = function(Value)
 {
@@ -818,9 +848,10 @@ CChangesStyleSemiHidden.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleUnhideWhenUsed(Class, Old, New)
 {
-	CChangesStyleUnhideWhenUsed.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseBoolProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStyleUnhideWhenUsed, CChangesStyleBaseBoolProperty);
+CChangesStyleUnhideWhenUsed.prototype = Object.create(CChangesStyleBaseBoolProperty.prototype);
+CChangesStyleUnhideWhenUsed.prototype.constructor = CChangesStyleUnhideWhenUsed;
 CChangesStyleUnhideWhenUsed.prototype.Type = AscDFH.historyitem_Style_UnhideWhenUsed;
 CChangesStyleUnhideWhenUsed.prototype.private_SetValue = function(Value)
 {
@@ -832,9 +863,10 @@ CChangesStyleUnhideWhenUsed.prototype.private_SetValue = function(Value)
  */
 function CChangesStyleLink(Class, Old, New)
 {
-	CChangesStyleLink.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseStringProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStyleLink, CChangesStyleBaseStringProperty);
+CChangesStyleLink.prototype = Object.create(CChangesStyleBaseStringProperty.prototype);
+CChangesStyleLink.prototype.constructor = CChangesStyleLink;
 CChangesStyleLink.prototype.Type = AscDFH.historyitem_Style_Link;
 CChangesStyleLink.prototype.private_SetValue = function(Value)
 {
@@ -848,12 +880,13 @@ CChangesStyleLink.prototype.private_SetValue = function(Value)
  */
 function CChangesStylesAdd(Class, Id, Style)
 {
-	CChangesStylesAdd.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 
 	this.Id    = Id;
 	this.Style = Style;
 }
-AscCommon.extendClass(CChangesStylesAdd, AscDFH.CChangesBase);
+CChangesStylesAdd.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesStylesAdd.prototype.constructor = CChangesStylesAdd;
 CChangesStylesAdd.prototype.Type = AscDFH.historyitem_Styles_Add;
 CChangesStylesAdd.prototype.Undo = function()
 {
@@ -901,12 +934,13 @@ CChangesStylesAdd.prototype.Merge = function(oChange)
  */
 function CChangesStylesRemove(Class, Id, Style)
 {
-	CChangesStylesRemove.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 
 	this.Id    = Id;
 	this.Style = Style;
 }
-AscCommon.extendClass(CChangesStylesRemove, AscDFH.CChangesBase);
+CChangesStylesRemove.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesStylesRemove.prototype.constructor = CChangesStylesRemove;
 CChangesStylesRemove.prototype.Type = AscDFH.historyitem_Styles_Remove;
 CChangesStylesRemove.prototype.Undo = function()
 {
@@ -954,9 +988,10 @@ CChangesStylesRemove.prototype.Merge = function(oChange)
  */
 function CChangesStylesChangeDefaultTextPr(Class, Old, New)
 {
-	CChangesStylesChangeDefaultTextPr.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseObjectValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStylesChangeDefaultTextPr, AscDFH.CChangesBaseObjectValue);
+CChangesStylesChangeDefaultTextPr.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStylesChangeDefaultTextPr.prototype.constructor = CChangesStylesChangeDefaultTextPr;
 CChangesStylesChangeDefaultTextPr.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultTextPr;
 CChangesStylesChangeDefaultTextPr.prototype.private_CreateObject = function()
 {
@@ -972,9 +1007,10 @@ CChangesStylesChangeDefaultTextPr.prototype.private_SetValue = function(Value)
  */
 function CChangesStylesChangeDefaultParaPr(Class, Old, New)
 {
-	CChangesStylesChangeDefaultParaPr.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseObjectValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStylesChangeDefaultParaPr, AscDFH.CChangesBaseObjectValue);
+CChangesStylesChangeDefaultParaPr.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesStylesChangeDefaultParaPr.prototype.constructor = CChangesStylesChangeDefaultParaPr;
 CChangesStylesChangeDefaultParaPr.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultParaPr;
 CChangesStylesChangeDefaultParaPr.prototype.private_CreateObject = function()
 {
@@ -990,9 +1026,10 @@ CChangesStylesChangeDefaultParaPr.prototype.private_SetValue = function(Value)
  */
 function CChangesStylesChangeDefaultParagraphId(Class, Old, New)
 {
-	CChangesStylesChangeDefaultParagraphId.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseStringProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStylesChangeDefaultParagraphId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultParagraphId.prototype = Object.create(CChangesStyleBaseStringProperty.prototype);
+CChangesStylesChangeDefaultParagraphId.prototype.constructor = CChangesStylesChangeDefaultParagraphId;
 CChangesStylesChangeDefaultParagraphId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultParagraphId;
 CChangesStylesChangeDefaultParagraphId.prototype.private_SetValue = function(Value)
 {
@@ -1004,9 +1041,10 @@ CChangesStylesChangeDefaultParagraphId.prototype.private_SetValue = function(Val
  */
 function CChangesStylesChangeDefaultCharacterId(Class, Old, New)
 {
-	CChangesStylesChangeDefaultCharacterId.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseStringProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStylesChangeDefaultCharacterId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultCharacterId.prototype = Object.create(CChangesStyleBaseStringProperty.prototype);
+CChangesStylesChangeDefaultCharacterId.prototype.constructor = CChangesStylesChangeDefaultCharacterId;
 CChangesStylesChangeDefaultCharacterId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultCharacterId;
 CChangesStylesChangeDefaultCharacterId.prototype.private_SetValue = function(Value)
 {
@@ -1018,9 +1056,10 @@ CChangesStylesChangeDefaultCharacterId.prototype.private_SetValue = function(Val
  */
 function CChangesStylesChangeDefaultNumberingId(Class, Old, New)
 {
-	CChangesStylesChangeDefaultNumberingId.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseStringProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStylesChangeDefaultNumberingId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultNumberingId.prototype = Object.create(CChangesStyleBaseStringProperty.prototype);
+CChangesStylesChangeDefaultNumberingId.prototype.constructor = CChangesStylesChangeDefaultNumberingId;
 CChangesStylesChangeDefaultNumberingId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultNumberingId;
 CChangesStylesChangeDefaultNumberingId.prototype.private_SetValue = function(Value)
 {
@@ -1032,9 +1071,10 @@ CChangesStylesChangeDefaultNumberingId.prototype.private_SetValue = function(Val
  */
 function CChangesStylesChangeDefaultTableId(Class, Old, New)
 {
-	CChangesStylesChangeDefaultTableId.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseStringProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStylesChangeDefaultTableId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultTableId.prototype = Object.create(CChangesStyleBaseStringProperty.prototype);
+CChangesStylesChangeDefaultTableId.prototype.constructor = CChangesStylesChangeDefaultTableId;
 CChangesStylesChangeDefaultTableId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultTableId;
 CChangesStylesChangeDefaultTableId.prototype.private_SetValue = function(Value)
 {
@@ -1046,9 +1086,10 @@ CChangesStylesChangeDefaultTableId.prototype.private_SetValue = function(Value)
  */
 function CChangesStylesChangeDefaultTableGridId(Class, Old, New)
 {
-	CChangesStylesChangeDefaultTableGridId.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseStringProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStylesChangeDefaultTableGridId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultTableGridId.prototype = Object.create(CChangesStyleBaseStringProperty.prototype);
+CChangesStylesChangeDefaultTableGridId.prototype.constructor = CChangesStylesChangeDefaultTableGridId;
 CChangesStylesChangeDefaultTableGridId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultTableGridId;
 CChangesStylesChangeDefaultTableGridId.prototype.private_SetValue = function(Value)
 {
@@ -1060,10 +1101,11 @@ CChangesStylesChangeDefaultTableGridId.prototype.private_SetValue = function(Val
  */
 function CChangesStylesChangeDefaultHeadingsId(Class, Old, New, Lvl)
 {
-	CChangesStylesChangeDefaultHeadingsId.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 	this.Lvl = Lvl;
 }
-AscCommon.extendClass(CChangesStylesChangeDefaultHeadingsId, AscDFH.CChangesBaseProperty);
+CChangesStylesChangeDefaultHeadingsId.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesStylesChangeDefaultHeadingsId.prototype.constructor = CChangesStylesChangeDefaultHeadingsId;
 CChangesStylesChangeDefaultHeadingsId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultHeadingsId;
 CChangesStylesChangeDefaultHeadingsId.prototype.private_SetValue = function(Value)
 {
@@ -1137,9 +1179,10 @@ CChangesStylesChangeDefaultHeadingsId.prototype.ReadFromBinary = function(Reader
  */
 function CChangesStylesChangeDefaultParaListId(Class, Old, New)
 {
-	CChangesStylesChangeDefaultParaListId.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseStringProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStylesChangeDefaultParaListId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultParaListId.prototype = Object.create(CChangesStyleBaseStringProperty.prototype);
+CChangesStylesChangeDefaultParaListId.prototype.constructor = CChangesStylesChangeDefaultParaListId;
 CChangesStylesChangeDefaultParaListId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultParaListId;
 CChangesStylesChangeDefaultParaListId.prototype.private_SetValue = function(Value)
 {
@@ -1151,9 +1194,10 @@ CChangesStylesChangeDefaultParaListId.prototype.private_SetValue = function(Valu
  */
 function CChangesStylesChangeDefaultHeaderId(Class, Old, New)
 {
-	CChangesStylesChangeDefaultHeaderId.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseStringProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStylesChangeDefaultHeaderId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultHeaderId.prototype = Object.create(CChangesStyleBaseStringProperty.prototype);
+CChangesStylesChangeDefaultHeaderId.prototype.constructor = CChangesStylesChangeDefaultHeaderId;
 CChangesStylesChangeDefaultHeaderId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultHeaderId;
 CChangesStylesChangeDefaultHeaderId.prototype.private_SetValue = function(Value)
 {
@@ -1165,9 +1209,10 @@ CChangesStylesChangeDefaultHeaderId.prototype.private_SetValue = function(Value)
  */
 function CChangesStylesChangeDefaultFooterId(Class, Old, New)
 {
-	CChangesStylesChangeDefaultFooterId.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseStringProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStylesChangeDefaultFooterId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultFooterId.prototype = Object.create(CChangesStyleBaseStringProperty.prototype);
+CChangesStylesChangeDefaultFooterId.prototype.constructor = CChangesStylesChangeDefaultFooterId;
 CChangesStylesChangeDefaultFooterId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultFooterId;
 CChangesStylesChangeDefaultFooterId.prototype.private_SetValue = function(Value)
 {
@@ -1179,9 +1224,10 @@ CChangesStylesChangeDefaultFooterId.prototype.private_SetValue = function(Value)
  */
 function CChangesStylesChangeDefaultHyperlinkId(Class, Old, New)
 {
-	CChangesStylesChangeDefaultHyperlinkId.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseStringProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStylesChangeDefaultHyperlinkId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultHyperlinkId.prototype = Object.create(CChangesStyleBaseStringProperty.prototype);
+CChangesStylesChangeDefaultHyperlinkId.prototype.constructor = CChangesStylesChangeDefaultHyperlinkId;
 CChangesStylesChangeDefaultHyperlinkId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultHyperlinkId;
 CChangesStylesChangeDefaultHyperlinkId.prototype.private_SetValue = function(Value)
 {
@@ -1193,9 +1239,10 @@ CChangesStylesChangeDefaultHyperlinkId.prototype.private_SetValue = function(Val
  */
 function CChangesStylesChangeDefaultFootnoteTextId(Class, Old, New)
 {
-	CChangesStylesChangeDefaultFootnoteTextId.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseStringProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStylesChangeDefaultFootnoteTextId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultFootnoteTextId.prototype = Object.create(CChangesStyleBaseStringProperty.prototype);
+CChangesStylesChangeDefaultFootnoteTextId.prototype.constructor = CChangesStylesChangeDefaultFootnoteTextId;
 CChangesStylesChangeDefaultFootnoteTextId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultFootnoteTextId;
 CChangesStylesChangeDefaultFootnoteTextId.prototype.private_SetValue = function(Value)
 {
@@ -1207,9 +1254,10 @@ CChangesStylesChangeDefaultFootnoteTextId.prototype.private_SetValue = function(
  */
 function CChangesStylesChangeDefaultFootnoteTextCharId(Class, Old, New)
 {
-	CChangesStylesChangeDefaultFootnoteTextCharId.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseStringProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStylesChangeDefaultFootnoteTextCharId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultFootnoteTextCharId.prototype = Object.create(CChangesStyleBaseStringProperty.prototype);
+CChangesStylesChangeDefaultFootnoteTextCharId.prototype.constructor = CChangesStylesChangeDefaultFootnoteTextCharId;
 CChangesStylesChangeDefaultFootnoteTextCharId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultFootnoteTextCharId;
 CChangesStylesChangeDefaultFootnoteTextCharId.prototype.private_SetValue = function(Value)
 {
@@ -1221,9 +1269,10 @@ CChangesStylesChangeDefaultFootnoteTextCharId.prototype.private_SetValue = funct
  */
 function CChangesStylesChangeDefaultFootnoteReferenceId(Class, Old, New)
 {
-	CChangesStylesChangeDefaultFootnoteReferenceId.superclass.constructor.call(this, Class, Old, New);
+	CChangesStyleBaseStringProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesStylesChangeDefaultFootnoteReferenceId, CChangesStyleBaseStringProperty);
+CChangesStylesChangeDefaultFootnoteReferenceId.prototype = Object.create(CChangesStyleBaseStringProperty.prototype);
+CChangesStylesChangeDefaultFootnoteReferenceId.prototype.constructor = CChangesStylesChangeDefaultFootnoteReferenceId;
 CChangesStylesChangeDefaultFootnoteReferenceId.prototype.Type = AscDFH.historyitem_Styles_ChangeDefaultFootnoteReferenceId;
 CChangesStylesChangeDefaultFootnoteReferenceId.prototype.private_SetValue = function(Value)
 {

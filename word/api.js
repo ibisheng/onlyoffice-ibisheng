@@ -404,7 +404,7 @@
 	 */
 	function asc_docs_api(config)
 	{
-		asc_docs_api.superclass.constructor.call(this, config, AscCommon.c_oEditorId.Word);
+		AscCommon.baseEditorsApi.call(this, config, AscCommon.c_oEditorId.Word);
 
 		if (window["AscDesktopEditor"])
 		{
@@ -515,7 +515,8 @@
 		this._init();
 	}
 
-	AscCommon.extendClass(asc_docs_api, AscCommon.baseEditorsApi);
+	asc_docs_api.prototype = Object.create(AscCommon.baseEditorsApi.prototype);
+	asc_docs_api.prototype.constructor = asc_docs_api;
 
 	asc_docs_api.prototype.sendEvent           = function()
 	{
@@ -2111,7 +2112,7 @@ background-repeat: no-repeat;\
 		}
 		else
 		{
-			asc_docs_api.superclass.processSavedFile.call(this, url, downloadType);
+			AscCommon.baseEditorsApi.prototype.processSavedFile.call(this, url, downloadType);
 		}
 	};
 	asc_docs_api.prototype.continueInsertDocumentUrls = function()
@@ -6895,7 +6896,7 @@ background-repeat: no-repeat;\
 		this.asc_setViewMode(this.isViewMode);
 		this.asc_setDrawCollaborationMarks(this.tmpCoMarksDraw);
 
-		asc_docs_api.superclass._onEndLoadSdk.call(this);
+		AscCommon.baseEditorsApi.prototype._onEndLoadSdk.call(this);
 
 		if (this.isOnlyReaderMode)
 			this.ImageLoader.bIsAsyncLoadDocumentImages = false;

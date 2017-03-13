@@ -56,7 +56,7 @@ var WRAP_HIT_TYPE_SECTION = 0x01;
  */
 function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
 {
-	ParaDrawing.superclass.constructor.call(this);
+	CRunElementBase.call(this);
 
 	this.Id          = AscCommon.g_oIdCounter.Get_NewId();
 	this.DrawingType = drawing_Inline;
@@ -185,7 +185,8 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
 		}
 	}
 }
-AscCommon.extendClass(ParaDrawing, CRunElementBase);
+ParaDrawing.prototype = Object.create(CRunElementBase.prototype);
+ParaDrawing.prototype.constructor = ParaDrawing;
 
 ParaDrawing.prototype.Type = para_Drawing;
 ParaDrawing.prototype.Get_Type = function()

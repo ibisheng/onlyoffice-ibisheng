@@ -792,7 +792,7 @@
 
 			if (3 == arguments.length) {
 				var range = arguments[0];
-				Range3D.superclass.constructor.call(this, range.c1, range.r1, range.c2, range.r2);
+				Range.call(this, range.c1, range.r1, range.c2, range.r2);
 				// ToDo стоит пересмотреть конструкторы.
 				this.refType1 = range.refType1;
 				this.refType2 = range.refType2;
@@ -800,29 +800,30 @@
 				this.sheet = arguments[1];
 				this.sheet2 = arguments[2];
 			} else if (arguments.length > 1) {
-				ActiveRange.superclass.constructor.apply(this, arguments);
+				Range.apply(this, arguments);
 			} else {
-				ActiveRange.superclass.constructor.call(this, 0, 0, 0, 0);
+				Range.call(this, 0, 0, 0, 0);
       }
 		}
-		AscCommon.extendClass(Range3D, Range);
+		Range3D.prototype = Object.create(Range.prototype);
+		Range3D.prototype.constructor = Range3D;
 		Range3D.prototype.isIntersect = function () {
 			var oRes = true;
 			
 			if (2 == arguments.length) {
 				oRes = this.sheet === arguments[1];
 			}
-			return oRes && Range3D.superclass.isIntersect.apply(this, arguments);
+			return oRes && Range.prototype.isIntersect.apply(this, arguments);
 		};
 		Range3D.prototype.clone = function () {
-			return new Range3D(ActiveRange.superclass.clone.apply(this, arguments), this.sheet, this.sheet2);
+			return new Range3D(Range.prototype.clone.apply(this, arguments), this.sheet, this.sheet2);
 		};
 		Range3D.prototype.setSheet = function (sheet, sheet2) {
 			this.sheet = sheet;
 			this.sheet2 = sheet2 ? sheet2 : sheet;
 		};
 		Range3D.prototype.getName = function () {
-			return AscCommon.parserHelp.get3DRef(this.sheet, Range3D.superclass.getName.apply(this));
+			return AscCommon.parserHelp.get3DRef(this.sheet, Range.prototype.getName.apply(this));
 		};
 
 		/**
@@ -1091,46 +1092,47 @@
 			if(1 == arguments.length)
 			{
 				var range = arguments[0];
-				ActiveRange.superclass.constructor.call(this, range.c1, range.r1, range.c2, range.r2);
+				Range.call(this, range.c1, range.r1, range.c2, range.r2);
 				// ToDo стоит пересмотреть конструкторы.
 				this.refType1 = range.refType1;
 				this.refType2 = range.refType2;
 			}
 			else if(arguments.length > 1)
-				ActiveRange.superclass.constructor.apply(this, arguments);
+				Range.apply(this, arguments);
 			else
-				ActiveRange.superclass.constructor.call(this, 0, 0, 0, 0);
+				Range.call(this, 0, 0, 0, 0);
 			this.type = c_oAscSelectionType.RangeCells;
 			this.startCol = 0; // Активная ячейка в выделении
 			this.startRow = 0; // Активная ячейка в выделении
 			this._updateAdditionalData();
 		}
-		AscCommon.extendClass(ActiveRange, Range);
-		
+
+		ActiveRange.prototype = Object.create(Range.prototype);
+		ActiveRange.prototype.constructor = ActiveRange;
 		ActiveRange.prototype.assign = function () {
-			ActiveRange.superclass.assign.apply(this, arguments);
+			Range.prototype.assign.apply(this, arguments);
 			this._updateAdditionalData();
 			return this;
 		};
 		ActiveRange.prototype.assign2 = function () {
-			ActiveRange.superclass.assign2.apply(this, arguments);
+			Range.prototype.assign2.apply(this, arguments);
 			this._updateAdditionalData();
 			return this;
 		};
 		ActiveRange.prototype.clone = function(){
-			var oRes = new ActiveRange(ActiveRange.superclass.clone.apply(this, arguments));
+			var oRes = new ActiveRange(Range.prototype.clone.apply(this, arguments));
 			oRes.type = this.type;
 			oRes.startCol = this.startCol;
 			oRes.startRow = this.startRow;
 			return oRes;
 		};
 		ActiveRange.prototype.normalize = function () {
-			ActiveRange.superclass.normalize.apply(this, arguments);
+			Range.prototype.normalize.apply(this, arguments);
 			this._updateAdditionalData();
 			return this;
 		};
 		ActiveRange.prototype.isEqualAll = function () {
-			var bRes = ActiveRange.superclass.isEqual.apply(this, arguments);
+			var bRes = Range.prototype.isEqual.apply(this, arguments);
 			if(bRes && arguments.length > 0)
 			{
 				var range = arguments[0];
@@ -1139,16 +1141,16 @@
 			return bRes;
 		};
 		ActiveRange.prototype.contains = function () {
-			return ActiveRange.superclass.contains.apply(this, arguments);
+			return Range.prototype.contains.apply(this, arguments);
 		};
 		ActiveRange.prototype.containsRange = function () {
-			return ActiveRange.superclass.containsRange.apply(this, arguments);
+			return Range.prototype.containsRange.apply(this, arguments);
 		};
 		ActiveRange.prototype.containsFirstLineRange = function () {
-			return ActiveRange.superclass.containsFirstLineRange.apply(this, arguments);
+			return Range.prototype.containsFirstLineRange.apply(this, arguments);
 		};
 		ActiveRange.prototype.intersection = function () {
-			var oRes = ActiveRange.superclass.intersection.apply(this, arguments);
+			var oRes = Range.prototype.intersection.apply(this, arguments);
 			if(null != oRes)
 			{
 				oRes = new ActiveRange(oRes);
@@ -1157,7 +1159,7 @@
 			return oRes;
 		};
 		ActiveRange.prototype.intersectionSimple = function () {
-			var oRes = ActiveRange.superclass.intersectionSimple.apply(this, arguments);
+			var oRes = Range.prototype.intersectionSimple.apply(this, arguments);
 			if(null != oRes)
 			{
 				oRes = new ActiveRange(oRes);
@@ -1166,17 +1168,17 @@
 			return oRes;
 		};
 		ActiveRange.prototype.union = function () {
-			var oRes = new ActiveRange(ActiveRange.superclass.union.apply(this, arguments));
+			var oRes = new ActiveRange(Range.prototype.union.apply(this, arguments));
 			oRes._updateAdditionalData();
 			return oRes;
 		};
 		ActiveRange.prototype.union2 = function () {
-			ActiveRange.superclass.union2.apply(this, arguments);
+			Range.prototype.union2.apply(this, arguments);
 			this._updateAdditionalData();
 			return this;
 		};
 		ActiveRange.prototype.union3 = function () {
-			ActiveRange.superclass.union3.apply(this, arguments);
+			Range.prototype.union3.apply(this, arguments);
 			this._updateAdditionalData();
 			return this;
 		};
@@ -1185,12 +1187,12 @@
 			this.setOffsetLast(offset);
 		};
 		ActiveRange.prototype.setOffsetFirst = function(offset){
-			ActiveRange.superclass.setOffsetFirst.apply(this, arguments);
+			Range.prototype.setOffsetFirst.apply(this, arguments);
 			this._updateAdditionalData();
 			return this;
 		};
 		ActiveRange.prototype.setOffsetLast = function(offset){
-			ActiveRange.superclass.setOffsetLast.apply(this, arguments);
+			Range.prototype.setOffsetLast.apply(this, arguments);
 			this._updateAdditionalData();
 			return this;
 		};
@@ -1226,37 +1228,39 @@
 			if(1 == arguments.length)
 			{
 				var range = arguments[0];
-				FormulaRange.superclass.constructor.call(this, range.c1, range.r1, range.c2, range.r2);
+				Range.call(this, range.c1, range.r1, range.c2, range.r2);
 			}
 			else if(arguments.length > 1)
-				FormulaRange.superclass.constructor.apply(this, arguments);
+				Range.apply(this, arguments);
 			else
-				FormulaRange.superclass.constructor.call(this, 0, 0, 0, 0);
+				Range.call(this, 0, 0, 0, 0);
 
 			this.refType1 = referenceType.R;
 			this.refType2 = referenceType.R;
 		}
-		AscCommon.extendClass(FormulaRange, Range);
+
+		FormulaRange.prototype = Object.create(Range.prototype);
+		FormulaRange.prototype.constructor = FormulaRange;
 		FormulaRange.prototype.clone = function () {
-			var oRes = new FormulaRange(FormulaRange.superclass.clone.apply(this, arguments));
+			var oRes = new FormulaRange(Range.prototype.clone.apply(this, arguments));
 			oRes.refType1 = this.refType1;
 			oRes.refType2 = this.refType2;
 			return oRes;
 		};
 		FormulaRange.prototype.intersection = function () {
-			var oRes = FormulaRange.superclass.intersection.apply(this, arguments);
+			var oRes = Range.prototype.intersection.apply(this, arguments);
 			if(null != oRes)
 				oRes = new FormulaRange(oRes);
 			return oRes;
 		};
 		FormulaRange.prototype.intersectionSimple = function () {
-			var oRes = FormulaRange.superclass.intersectionSimple.apply(this, arguments);
+			var oRes = Range.prototype.intersectionSimple.apply(this, arguments);
 			if(null != oRes)
 				oRes = new FormulaRange(oRes);
 			return oRes;
 		};
 		FormulaRange.prototype.union = function () {
-			return new FormulaRange(FormulaRange.superclass.union.apply(this, arguments));
+			return new FormulaRange(Range.prototype.union.apply(this, arguments));
 		};
 		FormulaRange.prototype.getName = function () {
 			var sRes = "";

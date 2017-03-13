@@ -84,6 +84,7 @@
 	}
 
 	cACOT.prototype = Object.create(cBaseFunction.prototype);
+	cACOT.prototype.constructor = cACOT;
 
 	/** @constructor */
 	function cACOTH() {
@@ -92,6 +93,7 @@
 	}
 
 	cACOTH.prototype = Object.create(cBaseFunction.prototype);
+	cACOTH.prototype.constructor = cACOTH;
 
 	/** @constructor */
 	function cAGGREGATE() {
@@ -100,6 +102,7 @@
 	}
 
 	cAGGREGATE.prototype = Object.create(cBaseFunction.prototype);
+	cAGGREGATE.prototype.constructor = cAGGREGATE;
 
 	/** @constructor */
 	function cARABIC() {
@@ -108,6 +111,7 @@
 	}
 
 	cARABIC.prototype = Object.create(cBaseFunction.prototype);
+	cARABIC.prototype.constructor = cARABIC;
 
 	/** @constructor */
 	function cBASE() {
@@ -116,6 +120,7 @@
 	}
 
 	cBASE.prototype = Object.create(cBaseFunction.prototype);
+	cBASE.prototype.constructor = cBASE;
 
 	/** @constructor */
 	function cBETA_DIST() {
@@ -124,6 +129,7 @@
 	}
 
 	cBETA_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cBETA_DIST.prototype.constructor = cBETA_DIST;
 
 	/** @constructor */
 	function cBETA_INV() {
@@ -132,6 +138,7 @@
 	}
 
 	cBETA_INV.prototype = Object.create(cBaseFunction.prototype);
+	cBETA_INV.prototype.constructor = cBETA_INV;
 
 	/** @constructor */
 	function cBINOM_DIST() {
@@ -140,6 +147,7 @@
 	}
 
 	cBINOM_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cBINOM_DIST.prototype.constructor = cBINOM_DIST;
 
 	/** @constructor */
 	function cBINOM_DIST_RANGE() {
@@ -148,6 +156,7 @@
 	}
 
 	cBINOM_DIST_RANGE.prototype = Object.create(cBaseFunction.prototype);
+	cBINOM_DIST_RANGE.prototype.constructor = cBINOM_DIST_RANGE;
 
 	/** @constructor */
 	function cBINOM_INV() {
@@ -156,6 +165,7 @@
 	}
 
 	cBINOM_INV.prototype = Object.create(cBaseFunction.prototype);
+	cBINOM_INV.prototype.constructor = cBINOM_INV;
 
 	/** @constructor */
 	function cBITAND() {
@@ -164,6 +174,7 @@
 	}
 
 	cBITAND.prototype = Object.create(cBaseFunction.prototype);
+	cBITAND.prototype.constructor = cBITAND;
 
 	/** @constructor */
 	function cBITLSHIFT() {
@@ -172,6 +183,7 @@
 	}
 
 	cBITLSHIFT.prototype = Object.create(cBaseFunction.prototype);
+	cBITLSHIFT.prototype.constructor = cBITLSHIFT;
 
 	/** @constructor */
 	function cBITOR() {
@@ -180,6 +192,7 @@
 	}
 
 	cBITOR.prototype = Object.create(cBaseFunction.prototype);
+	cBITOR.prototype.constructor = cBITOR;
 
 	/** @constructor */
 	function cBITRSHIFT() {
@@ -188,6 +201,7 @@
 	}
 
 	cBITRSHIFT.prototype = Object.create(cBaseFunction.prototype);
+	cBITRSHIFT.prototype.constructor = cBITRSHIFT;
 
 	/** @constructor */
 	function cBITXOR() {
@@ -196,6 +210,7 @@
 	}
 
 	cBITXOR.prototype = Object.create(cBaseFunction.prototype);
+	cBITXOR.prototype.constructor = cBITXOR;
 
 	/** @constructor */
 	function cCEILING_MATH() {
@@ -204,6 +219,7 @@
 	}
 
 	cCEILING_MATH.prototype = Object.create(cBaseFunction.prototype);
+	cCEILING_MATH.prototype.constructor = cCEILING_MATH;
 
 	/** @constructor */
 	function cCEILING_PRECISE() {
@@ -212,6 +228,7 @@
 	}
 
 	cCEILING_PRECISE.prototype = Object.create(cBaseFunction.prototype);
+	cCEILING_PRECISE.prototype.constructor = cCEILING_PRECISE;
 
 	/** @constructor */
 	function cCHISQ_DIST() {
@@ -220,6 +237,7 @@
 	}
 
 	cCHISQ_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cCHISQ_DIST.prototype.constructor = cCHISQ_DIST;
 
 	/** @constructor */
 	function cCHISQ_DIST_RT() {
@@ -228,6 +246,7 @@
 	}
 
 	cCHISQ_DIST_RT.prototype = Object.create(cBaseFunction.prototype);
+	cCHISQ_DIST_RT.prototype.constructor = cCHISQ_DIST_RT;
 
 	/** @constructor */
 	function cCHISQ_INV() {
@@ -236,6 +255,7 @@
 	}
 
 	cCHISQ_INV.prototype = Object.create(cBaseFunction.prototype);
+	cCHISQ_INV.prototype.constructor = cCHISQ_INV;
 
 	/** @constructor */
 	function cCHISQ_INV_RT() {
@@ -244,6 +264,7 @@
 	}
 
 	cCHISQ_INV_RT.prototype = Object.create(cBaseFunction.prototype);
+	cCHISQ_INV_RT.prototype.constructor = cCHISQ_INV_RT;
 
 	/** @constructor */
 	function cCHISQ_TEST() {
@@ -252,6 +273,7 @@
 	}
 
 	cCHISQ_TEST.prototype = Object.create(cBaseFunction.prototype);
+	cCHISQ_TEST.prototype.constructor = cCHISQ_TEST;
 
 	/** @constructor */
 	function cCOMBINA() {
@@ -260,6 +282,7 @@
 	}
 
 	cCOMBINA.prototype = Object.create(cBaseFunction.prototype);
+	cCOMBINA.prototype.constructor = cCOMBINA;
 
 	/** @constructor */
 	function cCONFIDENCE_NORM() {
@@ -268,6 +291,7 @@
 	}
 
 	cCONFIDENCE_NORM.prototype = Object.create(cBaseFunction.prototype);
+	cCONFIDENCE_NORM.prototype.constructor = cCONFIDENCE_NORM;
 
 	/** @constructor */
 	function cCONFIDENCE_T() {
@@ -276,6 +300,7 @@
 	}
 
 	cCONFIDENCE_T.prototype = Object.create(cBaseFunction.prototype);
+	cCONFIDENCE_T.prototype.constructor = cCONFIDENCE_T;
 
 	/** @constructor */
 	function cCOT() {
@@ -284,6 +309,7 @@
 	}
 
 	cCOT.prototype = Object.create(cBaseFunction.prototype);
+	cCOT.prototype.constructor = cCOT;
 
 	/** @constructor */
 	function cCOTH() {
@@ -292,6 +318,7 @@
 	}
 
 	cCOTH.prototype = Object.create(cBaseFunction.prototype);
+	cCOTH.prototype.constructor = cCOTH;
 
 	/** @constructor */
 	function cCOVARIANCE_P() {
@@ -300,6 +327,7 @@
 	}
 
 	cCOVARIANCE_P.prototype = Object.create(cBaseFunction.prototype);
+	cCOVARIANCE_P.prototype.constructor = cCOVARIANCE_P;
 
 	/** @constructor */
 	function cCOVARIANCE_S() {
@@ -308,6 +336,7 @@
 	}
 
 	cCOVARIANCE_S.prototype = Object.create(cBaseFunction.prototype);
+	cCOVARIANCE_S.prototype.constructor = cCOVARIANCE_S;
 
 	/** @constructor */
 	function cCSC() {
@@ -316,6 +345,7 @@
 	}
 
 	cCSC.prototype = Object.create(cBaseFunction.prototype);
+	cCSC.prototype.constructor = cCSC;
 
 	/** @constructor */
 	function cCSCH() {
@@ -324,6 +354,7 @@
 	}
 
 	cCSCH.prototype = Object.create(cBaseFunction.prototype);
+	cCSCH.prototype.constructor = cCSCH;
 
 	/** @constructor */
 	function cDAYS() {
@@ -332,6 +363,7 @@
 	}
 
 	cDAYS.prototype = Object.create(cBaseFunction.prototype);
+	cDAYS.prototype.constructor = cDAYS;
 
 	/** @constructor */
 	function cDBCS() {
@@ -340,6 +372,7 @@
 	}
 
 	cDBCS.prototype = Object.create(cBaseFunction.prototype);
+	cDBCS.prototype.constructor = cDBCS;
 
 	/** @constructor */
 	function cDECIMAL() {
@@ -348,6 +381,7 @@
 	}
 
 	cDECIMAL.prototype = Object.create(cBaseFunction.prototype);
+	cDECIMAL.prototype.constructor = cDECIMAL;
 
 	/** @constructor */
 	function cERF_PRECISE() {
@@ -356,6 +390,7 @@
 	}
 
 	cERF_PRECISE.prototype = Object.create(cBaseFunction.prototype);
+	cERF_PRECISE.prototype.constructor = cERF_PRECISE;
 
 	/** @constructor */
 	function cERFC_PRECISE() {
@@ -364,6 +399,7 @@
 	}
 
 	cERFC_PRECISE.prototype = Object.create(cBaseFunction.prototype);
+	cERFC_PRECISE.prototype.constructor = cERFC_PRECISE;
 
 	/** @constructor */
 	function cEXPON_DIST() {
@@ -372,6 +408,7 @@
 	}
 
 	cEXPON_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cEXPON_DIST.prototype.constructor = cEXPON_DIST;
 
 	/** @constructor */
 	function cF_DIST() {
@@ -380,6 +417,7 @@
 	}
 
 	cF_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cF_DIST.prototype.constructor = cF_DIST;
 
 	/** @constructor */
 	function cF_DIST_RT() {
@@ -388,6 +426,7 @@
 	}
 
 	cF_DIST_RT.prototype = Object.create(cBaseFunction.prototype);
+	cF_DIST_RT.prototype.constructor = cF_DIST_RT;
 
 	/** @constructor */
 	function cF_INV() {
@@ -396,6 +435,7 @@
 	}
 
 	cF_INV.prototype = Object.create(cBaseFunction.prototype);
+	cF_INV.prototype.constructor = cF_INV;
 
 	/** @constructor */
 	function cF_INV_RT() {
@@ -404,6 +444,7 @@
 	}
 
 	cF_INV_RT.prototype = Object.create(cBaseFunction.prototype);
+	cF_INV_RT.prototype.constructor = cF_INV_RT;
 
 	/** @constructor */
 	function cF_TEST() {
@@ -412,6 +453,7 @@
 	}
 
 	cF_TEST.prototype = Object.create(cBaseFunction.prototype);
+	cF_TEST.prototype.constructor = cF_TEST;
 
 	/** @constructor */
 	function cFILTERXML() {
@@ -420,6 +462,7 @@
 	}
 
 	cFILTERXML.prototype = Object.create(cBaseFunction.prototype);
+	cFILTERXML.prototype.constructor = cFILTERXML;
 
 	/** @constructor */
 	function cFLOOR_MATH() {
@@ -428,6 +471,7 @@
 	}
 
 	cFLOOR_MATH.prototype = Object.create(cBaseFunction.prototype);
+	cFLOOR_MATH.prototype.constructor = cFLOOR_MATH;
 
 	/** @constructor */
 	function cFLOOR_PRECISE() {
@@ -436,6 +480,7 @@
 	}
 
 	cFLOOR_PRECISE.prototype = Object.create(cBaseFunction.prototype);
+	cFLOOR_PRECISE.prototype.constructor = cFLOOR_PRECISE;
 
 	/** @constructor */
 	function cFORECAST_ETS() {
@@ -444,6 +489,7 @@
 	}
 
 	cFORECAST_ETS.prototype = Object.create(cBaseFunction.prototype);
+	cFORECAST_ETS.prototype.constructor = cFORECAST_ETS;
 
 	/** @constructor */
 	function cFORECAST_ETS_CONFINT() {
@@ -452,6 +498,7 @@
 	}
 
 	cFORECAST_ETS_CONFINT.prototype = Object.create(cBaseFunction.prototype);
+	cFORECAST_ETS_CONFINT.prototype.constructor = cFORECAST_ETS_CONFINT;
 
 	/** @constructor */
 	function cFORECAST_ETS_SEASONALITY() {
@@ -460,6 +507,7 @@
 	}
 
 	cFORECAST_ETS_SEASONALITY.prototype = Object.create(cBaseFunction.prototype);
+	cFORECAST_ETS_SEASONALITY.prototype.constructor = cFORECAST_ETS_SEASONALITY;
 
 	/** @constructor */
 	function cFORECAST_ETS_STAT() {
@@ -468,6 +516,7 @@
 	}
 
 	cFORECAST_ETS_STAT.prototype = Object.create(cBaseFunction.prototype);
+	cFORECAST_ETS_STAT.prototype.constructor = cFORECAST_ETS_STAT;
 
 	/** @constructor */
 	function cFORECAST_LINEAR() {
@@ -476,6 +525,7 @@
 	}
 
 	cFORECAST_LINEAR.prototype = Object.create(cBaseFunction.prototype);
+	cFORECAST_LINEAR.prototype.constructor = cFORECAST_LINEAR;
 
 	/** @constructor */
 	function cFORMULATEXT() {
@@ -484,6 +534,7 @@
 	}
 
 	cFORMULATEXT.prototype = Object.create(cBaseFunction.prototype);
+	cFORMULATEXT.prototype.constructor = cFORMULATEXT;
 
 	/** @constructor */
 	function cGAMMA() {
@@ -492,6 +543,7 @@
 	}
 
 	cGAMMA.prototype = Object.create(cBaseFunction.prototype);
+	cGAMMA.prototype.constructor = cGAMMA;
 
 	/** @constructor */
 	function cGAMMA_DIST() {
@@ -500,6 +552,7 @@
 	}
 
 	cGAMMA_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cGAMMA_DIST.prototype.constructor = cGAMMA_DIST;
 
 	/** @constructor */
 	function cGAMMA_INV() {
@@ -508,6 +561,7 @@
 	}
 
 	cGAMMA_INV.prototype = Object.create(cBaseFunction.prototype);
+	cGAMMA_INV.prototype.constructor = cGAMMA_INV;
 
 	/** @constructor */
 	function cGAMMALN_PRECISE() {
@@ -516,6 +570,7 @@
 	}
 
 	cGAMMALN_PRECISE.prototype = Object.create(cBaseFunction.prototype);
+	cGAMMALN_PRECISE.prototype.constructor = cGAMMALN_PRECISE;
 
 	/** @constructor */
 	function cGAUSS() {
@@ -524,6 +579,7 @@
 	}
 
 	cGAUSS.prototype = Object.create(cBaseFunction.prototype);
+	cGAUSS.prototype.constructor = cGAUSS;
 
 	/** @constructor */
 	function cHYPGEOM_DIST() {
@@ -532,6 +588,7 @@
 	}
 
 	cHYPGEOM_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cHYPGEOM_DIST.prototype.constructor = cHYPGEOM_DIST;
 
 	/** @constructor */
 	function cIFNA() {
@@ -540,6 +597,7 @@
 	}
 
 	cIFNA.prototype = Object.create(cBaseFunction.prototype);
+	cIFNA.prototype.constructor = cIFNA;
 
 	/** @constructor */
 	function cIMCOSH() {
@@ -548,6 +606,7 @@
 	}
 
 	cIMCOSH.prototype = Object.create(cBaseFunction.prototype);
+	cIMCOSH.prototype.constructor = cIMCOSH;
 
 	/** @constructor */
 	function cIMCOT() {
@@ -556,6 +615,7 @@
 	}
 
 	cIMCOT.prototype = Object.create(cBaseFunction.prototype);
+	cIMCOT.prototype.constructor = cIMCOT;
 
 	/** @constructor */
 	function cIMCSC() {
@@ -564,6 +624,7 @@
 	}
 
 	cIMCSC.prototype = Object.create(cBaseFunction.prototype);
+	cIMCSC.prototype.constructor = cIMCSC;
 
 	/** @constructor */
 	function cIMCSCH() {
@@ -572,6 +633,7 @@
 	}
 
 	cIMCSCH.prototype = Object.create(cBaseFunction.prototype);
+	cIMCSCH.prototype.constructor = cIMCSCH;
 
 	/** @constructor */
 	function cIMSEC() {
@@ -580,6 +642,7 @@
 	}
 
 	cIMSEC.prototype = Object.create(cBaseFunction.prototype);
+	cIMSEC.prototype.constructor = cIMSEC;
 
 	/** @constructor */
 	function cIMSECH() {
@@ -588,6 +651,7 @@
 	}
 
 	cIMSECH.prototype = Object.create(cBaseFunction.prototype);
+	cIMSECH.prototype.constructor = cIMSECH;
 
 	/** @constructor */
 	function cIMSINH() {
@@ -596,6 +660,7 @@
 	}
 
 	cIMSINH.prototype = Object.create(cBaseFunction.prototype);
+	cIMSINH.prototype.constructor = cIMSINH;
 
 	/** @constructor */
 	function cIMTAN() {
@@ -604,6 +669,7 @@
 	}
 
 	cIMTAN.prototype = Object.create(cBaseFunction.prototype);
+	cIMTAN.prototype.constructor = cIMTAN;
 
 	/** @constructor */
 	function cISFORMULA() {
@@ -612,6 +678,7 @@
 	}
 
 	cISFORMULA.prototype = Object.create(cBaseFunction.prototype);
+	cISFORMULA.prototype.constructor = cISFORMULA;
 
 	/** @constructor */
 	function cISOWEEKNUM() {
@@ -620,6 +687,7 @@
 	}
 
 	cISOWEEKNUM.prototype = Object.create(cBaseFunction.prototype);
+	cISOWEEKNUM.prototype.constructor = cISOWEEKNUM;
 
 	/** @constructor */
 	function cLOGNORM_DIST() {
@@ -628,6 +696,7 @@
 	}
 
 	cLOGNORM_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cLOGNORM_DIST.prototype.constructor = cLOGNORM_DIST;
 
 	/** @constructor */
 	function cLOGNORM_INV() {
@@ -636,6 +705,7 @@
 	}
 
 	cLOGNORM_INV.prototype = Object.create(cBaseFunction.prototype);
+	cLOGNORM_INV.prototype.constructor = cLOGNORM_INV;
 
 	/** @constructor */
 	function cMODE_MULT() {
@@ -644,6 +714,7 @@
 	}
 
 	cMODE_MULT.prototype = Object.create(cBaseFunction.prototype);
+	cMODE_MULT.prototype.constructor = cMODE_MULT;
 
 	/** @constructor */
 	function cMODE_SNGL() {
@@ -652,6 +723,7 @@
 	}
 
 	cMODE_SNGL.prototype = Object.create(cBaseFunction.prototype);
+	cMODE_SNGL.prototype.constructor = cMODE_SNGL;
 
 	/** @constructor */
 	function cMUNIT() {
@@ -660,6 +732,7 @@
 	}
 
 	cMUNIT.prototype = Object.create(cBaseFunction.prototype);
+	cMUNIT.prototype.constructor = cMUNIT;
 
 	/** @constructor */
 	function cNEGBINOM_DIST() {
@@ -668,6 +741,7 @@
 	}
 
 	cNEGBINOM_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cNEGBINOM_DIST.prototype.constructor = cNEGBINOM_DIST;
 
 	/** @constructor */
 	function cNORM_DIST() {
@@ -676,6 +750,7 @@
 	}
 
 	cNORM_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cNORM_DIST.prototype.constructor = cNORM_DIST;
 
 	/** @constructor */
 	function cNORM_INV() {
@@ -684,6 +759,7 @@
 	}
 
 	cNORM_INV.prototype = Object.create(cBaseFunction.prototype);
+	cNORM_INV.prototype.constructor = cNORM_INV;
 
 	/** @constructor */
 	function cNORM_S_DIST() {
@@ -692,6 +768,7 @@
 	}
 
 	cNORM_S_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cNORM_S_DIST.prototype.constructor = cNORM_S_DIST;
 
 	/** @constructor */
 	function cNORM_S_INV() {
@@ -700,6 +777,7 @@
 	}
 
 	cNORM_S_INV.prototype = Object.create(cBaseFunction.prototype);
+	cNORM_S_INV.prototype.constructor = cNORM_S_INV;
 
 	/** @constructor */
 	function cNUMBERVALUE() {
@@ -708,6 +786,7 @@
 	}
 
 	cNUMBERVALUE.prototype = Object.create(cBaseFunction.prototype);
+	cNUMBERVALUE.prototype.constructor = cNUMBERVALUE;
 
 	/** @constructor */
 	function cPDURATION() {
@@ -716,6 +795,7 @@
 	}
 
 	cPDURATION.prototype = Object.create(cBaseFunction.prototype);
+	cPDURATION.prototype.constructor = cPDURATION;
 
 	/** @constructor */
 	function cPERCENTILE_EXC() {
@@ -724,6 +804,7 @@
 	}
 
 	cPERCENTILE_EXC.prototype = Object.create(cBaseFunction.prototype);
+	cPERCENTILE_EXC.prototype.constructor = cPERCENTILE_EXC;
 
 	/** @constructor */
 	function cPERCENTILE_INC() {
@@ -732,6 +813,7 @@
 	}
 
 	cPERCENTILE_INC.prototype = Object.create(cBaseFunction.prototype);
+	cPERCENTILE_INC.prototype.constructor = cPERCENTILE_INC;
 
 	/** @constructor */
 	function cPERCENTRANK_EXC() {
@@ -740,6 +822,7 @@
 	}
 
 	cPERCENTRANK_EXC.prototype = Object.create(cBaseFunction.prototype);
+	cPERCENTRANK_EXC.prototype.constructor = cPERCENTRANK_EXC;
 
 	/** @constructor */
 	function cPERCENTRANK_INC() {
@@ -748,6 +831,7 @@
 	}
 
 	cPERCENTRANK_INC.prototype = Object.create(cBaseFunction.prototype);
+	cPERCENTRANK_INC.prototype.constructor = cPERCENTRANK_INC;
 
 	/** @constructor */
 	function cPERMUTATIONA() {
@@ -756,6 +840,7 @@
 	}
 
 	cPERMUTATIONA.prototype = Object.create(cBaseFunction.prototype);
+	cPERMUTATIONA.prototype.constructor = cPERMUTATIONA;
 
 	/** @constructor */
 	function cPHI() {
@@ -764,6 +849,7 @@
 	}
 
 	cPHI.prototype = Object.create(cBaseFunction.prototype);
+	cPHI.prototype.constructor = cPHI;
 
 	/** @constructor */
 	function cPOISSON_DIST() {
@@ -772,6 +858,7 @@
 	}
 
 	cPOISSON_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cPOISSON_DIST.prototype.constructor = cPOISSON_DIST;
 
 	/** @constructor */
 	function cQUARTILE_EXC() {
@@ -780,6 +867,7 @@
 	}
 
 	cQUARTILE_EXC.prototype = Object.create(cBaseFunction.prototype);
+	cQUARTILE_EXC.prototype.constructor = cQUARTILE_EXC;
 
 	/** @constructor */
 	function cQUARTILE_INC() {
@@ -788,6 +876,7 @@
 	}
 
 	cQUARTILE_INC.prototype = Object.create(cBaseFunction.prototype);
+	cQUARTILE_INC.prototype.constructor = cQUARTILE_INC;
 
 	/** @constructor */
 	function cQUERYSTRING() {
@@ -796,6 +885,7 @@
 	}
 
 	cQUERYSTRING.prototype = Object.create(cBaseFunction.prototype);
+	cQUERYSTRING.prototype.constructor = cQUERYSTRING;
 
 	/** @constructor */
 	function cRANK_AVG() {
@@ -804,6 +894,7 @@
 	}
 
 	cRANK_AVG.prototype = Object.create(cBaseFunction.prototype);
+	cRANK_AVG.prototype.constructor = cRANK_AVG;
 
 	/** @constructor */
 	function cRANK_EQ() {
@@ -812,6 +903,7 @@
 	}
 
 	cRANK_EQ.prototype = Object.create(cBaseFunction.prototype);
+	cRANK_EQ.prototype.constructor = cRANK_EQ;
 
 	/** @constructor */
 	function cRRI() {
@@ -820,6 +912,7 @@
 	}
 
 	cRRI.prototype = Object.create(cBaseFunction.prototype);
+	cRRI.prototype.constructor = cRRI;
 
 	/** @constructor */
 	function cSEC() {
@@ -828,6 +921,7 @@
 	}
 
 	cSEC.prototype = Object.create(cBaseFunction.prototype);
+	cSEC.prototype.constructor = cSEC;
 
 	/** @constructor */
 	function cSECH() {
@@ -836,6 +930,7 @@
 	}
 
 	cSECH.prototype = Object.create(cBaseFunction.prototype);
+	cSECH.prototype.constructor = cSECH;
 
 	/** @constructor */
 	function cSHEET() {
@@ -844,6 +939,7 @@
 	}
 
 	cSHEET.prototype = Object.create(cBaseFunction.prototype);
+	cSHEET.prototype.constructor = cSHEET;
 
 	/** @constructor */
 	function cSHEETS() {
@@ -852,6 +948,7 @@
 	}
 
 	cSHEETS.prototype = Object.create(cBaseFunction.prototype);
+	cSHEETS.prototype.constructor = cSHEETS;
 
 	/** @constructor */
 	function cSKEW_P() {
@@ -860,6 +957,7 @@
 	}
 
 	cSKEW_P.prototype = Object.create(cBaseFunction.prototype);
+	cSKEW_P.prototype.constructor = cSKEW_P;
 
 	/** @constructor */
 	function cSTDEV_P() {
@@ -868,6 +966,7 @@
 	}
 
 	cSTDEV_P.prototype = Object.create(cBaseFunction.prototype);
+	cSTDEV_P.prototype.constructor = cSTDEV_P;
 
 	/** @constructor */
 	function cSTDEV_S() {
@@ -876,6 +975,7 @@
 	}
 
 	cSTDEV_S.prototype = Object.create(cBaseFunction.prototype);
+	cSTDEV_S.prototype.constructor = cSTDEV_S;
 
 	/** @constructor */
 	function cT_DIST() {
@@ -884,6 +984,7 @@
 	}
 
 	cT_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cT_DIST.prototype.constructor = cT_DIST;
 
 	/** @constructor */
 	function cT_DIST_2T() {
@@ -892,6 +993,7 @@
 	}
 
 	cT_DIST_2T.prototype = Object.create(cBaseFunction.prototype);
+	cT_DIST_2T.prototype.constructor = cT_DIST_2T;
 
 	/** @constructor */
 	function cT_DIST_RT() {
@@ -900,6 +1002,7 @@
 	}
 
 	cT_DIST_RT.prototype = Object.create(cBaseFunction.prototype);
+	cT_DIST_RT.prototype.constructor = cT_DIST_RT;
 
 	/** @constructor */
 	function cT_INV() {
@@ -908,6 +1011,7 @@
 	}
 
 	cT_INV.prototype = Object.create(cBaseFunction.prototype);
+	cT_INV.prototype.constructor = cT_INV;
 
 	/** @constructor */
 	function cT_INV_2T() {
@@ -916,6 +1020,7 @@
 	}
 
 	cT_INV_2T.prototype = Object.create(cBaseFunction.prototype);
+	cT_INV_2T.prototype.constructor = cT_INV_2T;
 
 	/** @constructor */
 	function cT_TEST() {
@@ -924,6 +1029,7 @@
 	}
 
 	cT_TEST.prototype = Object.create(cBaseFunction.prototype);
+	cT_TEST.prototype.constructor = cT_TEST;
 
 	/** @constructor */
 	function cUNICHAR() {
@@ -932,6 +1038,7 @@
 	}
 
 	cUNICHAR.prototype = Object.create(cBaseFunction.prototype);
+	cUNICHAR.prototype.constructor = cUNICHAR;
 
 	/** @constructor */
 	function cUNICODE() {
@@ -940,6 +1047,7 @@
 	}
 
 	cUNICODE.prototype = Object.create(cBaseFunction.prototype);
+	cUNICODE.prototype.constructor = cUNICODE;
 
 	/** @constructor */
 	function cVAR_P() {
@@ -948,6 +1056,7 @@
 	}
 
 	cVAR_P.prototype = Object.create(cBaseFunction.prototype);
+	cVAR_P.prototype.constructor = cVAR_P;
 
 	/** @constructor */
 	function cVAR_S() {
@@ -956,6 +1065,7 @@
 	}
 
 	cVAR_S.prototype = Object.create(cBaseFunction.prototype);
+	cVAR_S.prototype.constructor = cVAR_S;
 
 	/** @constructor */
 	function cWEBSERVICE() {
@@ -964,6 +1074,7 @@
 	}
 
 	cWEBSERVICE.prototype = Object.create(cBaseFunction.prototype);
+	cWEBSERVICE.prototype.constructor = cWEBSERVICE;
 
 	/** @constructor */
 	function cWEIBULL_DIST() {
@@ -972,6 +1083,7 @@
 	}
 
 	cWEIBULL_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cWEIBULL_DIST.prototype.constructor = cWEIBULL_DIST;
 
 	/** @constructor */
 	function cXOR() {
@@ -980,6 +1092,7 @@
 	}
 
 	cXOR.prototype = Object.create(cBaseFunction.prototype);
+	cXOR.prototype.constructor = cXOR;
 
 	/** @constructor */
 	function cZ_TEST() {
@@ -988,4 +1101,5 @@
 	}
 
 	cZ_TEST.prototype = Object.create(cBaseFunction.prototype);
+	cZ_TEST.prototype.constructor = cZ_TEST;
 })(window);

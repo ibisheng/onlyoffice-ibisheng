@@ -91,6 +91,7 @@
 	}
 
 	cABS.prototype = Object.create(cBaseFunction.prototype);
+	cABS.prototype.constructor = cABS;
 	cABS.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -128,6 +129,7 @@
 	}
 
 	cACOS.prototype = Object.create(cBaseFunction.prototype);
+	cACOS.prototype.constructor = cACOS;
 	cACOS.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -167,6 +169,7 @@
 	}
 
 	cACOSH.prototype = Object.create(cBaseFunction.prototype);
+	cACOSH.prototype.constructor = cACOSH;
 	cACOSH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -206,6 +209,7 @@
 	}
 
 	cASIN.prototype = Object.create(cBaseFunction.prototype);
+	cASIN.prototype.constructor = cASIN;
 	cASIN.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -245,6 +249,7 @@
 	}
 
 	cASINH.prototype = Object.create(cBaseFunction.prototype);
+	cASINH.prototype.constructor = cASINH;
 	cASINH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -284,6 +289,7 @@
 	}
 
 	cATAN.prototype = Object.create(cBaseFunction.prototype);
+	cATAN.prototype.constructor = cATAN;
 	cATAN.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -323,6 +329,7 @@
 	}
 
 	cATAN2.prototype = Object.create(cBaseFunction.prototype);
+	cATAN2.prototype.constructor = cATAN2;
 	cATAN2.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -396,6 +403,7 @@
 	}
 
 	cATANH.prototype = Object.create(cBaseFunction.prototype);
+	cATANH.prototype.constructor = cATANH;
 	cATANH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -435,6 +443,7 @@
 	}
 
 	cCEILING.prototype = Object.create(cBaseFunction.prototype);
+	cCEILING.prototype.constructor = cCEILING;
 	cCEILING.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -532,6 +541,7 @@
 	}
 
 	cCOMBIN.prototype = Object.create(cBaseFunction.prototype);
+	cCOMBIN.prototype.constructor = cCOMBIN;
 	cCOMBIN.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -619,6 +629,7 @@
 	}
 
 	cCOS.prototype = Object.create(cBaseFunction.prototype);
+	cCOS.prototype.constructor = cCOS;
 	cCOS.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -658,6 +669,7 @@
 	}
 
 	cCOSH.prototype = Object.create(cBaseFunction.prototype);
+	cCOSH.prototype.constructor = cCOSH;
 	cCOSH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -697,6 +709,7 @@
 	}
 
 	cDEGREES.prototype = Object.create(cBaseFunction.prototype);
+	cDEGREES.prototype.constructor = cDEGREES;
 	cDEGREES.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -733,6 +746,7 @@
 	}
 
 	cECMA_CEILING.prototype = Object.create(cBaseFunction.prototype);
+	cECMA_CEILING.prototype.constructor = cECMA_CEILING;
 
 	/** @constructor */
 	function cEVEN() {
@@ -744,6 +758,7 @@
 	}
 
 	cEVEN.prototype = Object.create(cBaseFunction.prototype);
+	cEVEN.prototype.constructor = cEVEN;
 	cEVEN.prototype.Calculate = function (arg) {
 
 		function evenHelper(arg) {
@@ -806,6 +821,7 @@
 	}
 
 	cEXP.prototype = Object.create(cBaseFunction.prototype);
+	cEXP.prototype.constructor = cEXP;
 	cEXP.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -847,6 +863,7 @@
 	}
 
 	cFACT.prototype = Object.create(cBaseFunction.prototype);
+	cFACT.prototype.constructor = cFACT;
 	cFACT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -893,6 +910,7 @@
 	}
 
 	cFACTDOUBLE.prototype = Object.create(cBaseFunction.prototype);
+	cFACTDOUBLE.prototype.constructor = cFACTDOUBLE;
 	cFACTDOUBLE.prototype.Calculate = function (arg) {
 		function factDouble(n) {
 			if (n == 0) {
@@ -958,6 +976,7 @@
 	}
 
 	cFLOOR.prototype = Object.create(cBaseFunction.prototype);
+	cFLOOR.prototype.constructor = cFLOOR;
 	cFLOOR.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -1058,6 +1077,7 @@
 	}
 
 	cGCD.prototype = Object.create(cBaseFunction.prototype);
+	cGCD.prototype.constructor = cGCD;
 	cGCD.prototype.Calculate = function (arg) {
 
 		var _gcd = 0, argArr;
@@ -1155,6 +1175,7 @@
 	}
 
 	cINT.prototype = Object.create(cBaseFunction.prototype);
+	cINT.prototype.constructor = cINT;
 	cINT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -1194,6 +1215,7 @@
 	}
 
 	cISO_CEILING.prototype = Object.create(cBaseFunction.prototype);
+	cISO_CEILING.prototype.constructor = cISO_CEILING;
 
 	/** @constructor */
 	function cLCM() {
@@ -1205,6 +1227,7 @@
 	}
 
 	cLCM.prototype = Object.create(cBaseFunction.prototype);
+	cLCM.prototype.constructor = cLCM;
 	cLCM.prototype.Calculate = function (arg) {
 
 		var _lcm = 1, argArr;
@@ -1306,6 +1329,7 @@
 	}
 
 	cLN.prototype = Object.create(cBaseFunction.prototype);
+	cLN.prototype.constructor = cLN;
 	cLN.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -1353,6 +1377,7 @@
 	}
 
 	cLOG.prototype = Object.create(cBaseFunction.prototype);
+	cLOG.prototype.constructor = cLOG;
 	cLOG.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber(10);
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -1445,6 +1470,7 @@
 	}
 
 	cLOG10.prototype = Object.create(cBaseFunction.prototype);
+	cLOG10.prototype.constructor = cLOG10;
 	cLOG10.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -1492,6 +1518,7 @@
 	}
 
 	cMDETERM.prototype = Object.create(cBaseFunction.prototype);
+	cMDETERM.prototype.constructor = cMDETERM;
 	cMDETERM.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cMDETERM.prototype.Calculate = function (arg) {
 
@@ -1578,6 +1605,7 @@
 	}
 
 	cMINVERSE.prototype = Object.create(cBaseFunction.prototype);
+	cMINVERSE.prototype.constructor = cMINVERSE;
 	cMINVERSE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cMINVERSE.prototype.Calculate = function (arg) {
 
@@ -1723,6 +1751,7 @@
 	}
 
 	cMMULT.prototype = Object.create(cBaseFunction.prototype);
+	cMMULT.prototype.constructor = cMMULT;
 	cMMULT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cMMULT.prototype.Calculate = function (arg) {
 
@@ -1793,6 +1822,7 @@
 	}
 
 	cMOD.prototype = Object.create(cBaseFunction.prototype);
+	cMOD.prototype.constructor = cMOD;
 	cMOD.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -1880,6 +1910,7 @@
 	}
 
 	cMROUND.prototype = Object.create(cBaseFunction.prototype);
+	cMROUND.prototype.constructor = cMROUND;
 	cMROUND.prototype.Calculate = function (arg) {
 
 		var multiple;
@@ -1984,6 +2015,7 @@
 	}
 
 	cMULTINOMIAL.prototype = Object.create(cBaseFunction.prototype);
+	cMULTINOMIAL.prototype.constructor = cMULTINOMIAL;
 	cMULTINOMIAL.prototype.Calculate = function (arg) {
 		var arg0 = new cNumber(0), fact = 1;
 
@@ -2077,6 +2109,7 @@
 	}
 
 	cODD.prototype = Object.create(cBaseFunction.prototype);
+	cODD.prototype.constructor = cODD;
 	cODD.prototype.Calculate = function (arg) {
 
 		function oddHelper(arg) {
@@ -2139,6 +2172,7 @@
 	}
 
 	cPI.prototype = Object.create(cBaseFunction.prototype);
+	cPI.prototype.constructor = cPI;
 	cPI.prototype.Calculate = function () {
 		return new cNumber(Math.PI);
 	};
@@ -2158,6 +2192,7 @@
 	}
 
 	cPOWER.prototype = Object.create(cBaseFunction.prototype);
+	cPOWER.prototype.constructor = cPOWER;
 	cPOWER.prototype.Calculate = function (arg) {
 
 		function powerHelper(a, b) {
@@ -2240,6 +2275,7 @@
 	}
 
 	cPRODUCT.prototype = Object.create(cBaseFunction.prototype);
+	cPRODUCT.prototype.constructor = cPRODUCT;
 	cPRODUCT.prototype.Calculate = function (arg) {
 		var element, arg0 = new cNumber(1);
 		for (var i = 0; i < arg.length; i++) {
@@ -2292,6 +2328,7 @@
 	}
 
 	cQUOTIENT.prototype = Object.create(cBaseFunction.prototype);
+	cQUOTIENT.prototype.constructor = cQUOTIENT;
 	cQUOTIENT.prototype.Calculate = function (arg) {
 
 		function quotient(a, b) {
@@ -2371,6 +2408,7 @@
 	}
 
 	cRADIANS.prototype = Object.create(cBaseFunction.prototype);
+	cRADIANS.prototype.constructor = cRADIANS;
 	cRADIANS.prototype.Calculate = function (arg) {
 
 		function radiansHelper(ang) {
@@ -2414,6 +2452,7 @@
 	}
 
 	cRAND.prototype = Object.create(cBaseFunction.prototype);
+	cRAND.prototype.constructor = cRAND;
 	cRAND.prototype.Calculate = function () {
 		return this.setCA(new cNumber(Math.random()), true);
 	};
@@ -2433,6 +2472,7 @@
 	}
 
 	cRANDBETWEEN.prototype = Object.create(cBaseFunction.prototype);
+	cRANDBETWEEN.prototype.constructor = cRANDBETWEEN;
 	cRANDBETWEEN.prototype.Calculate = function (arg) {
 
 		function randBetween(a, b) {
@@ -2508,6 +2548,7 @@
 	}
 
 	cROMAN.prototype = Object.create(cBaseFunction.prototype);
+	cROMAN.prototype.constructor = cROMAN;
 	cROMAN.prototype.Calculate = function (arg) {
 		function roman(num, mode) {
 			if ((mode >= 0) && (mode < 5) && (num >= 0) && (num < 4000)) {
@@ -2618,6 +2659,7 @@
 	}
 
 	cROUND.prototype = Object.create(cBaseFunction.prototype);
+	cROUND.prototype.constructor = cROUND;
 	cROUND.prototype.Calculate = function (arg) {
 
 		function SignZeroPositive(number) {
@@ -2766,6 +2808,7 @@
 	}
 
 	cROUNDDOWN.prototype = Object.create(cBaseFunction.prototype);
+	cROUNDDOWN.prototype.constructor = cROUNDDOWN;
 	cROUNDDOWN.prototype.Calculate = function (arg) {
 		function rounddownHelper(number, num_digits) {
 			if (num_digits > AscCommonExcel.cExcelMaxExponent) {
@@ -2890,6 +2933,7 @@
 	}
 
 	cROUNDUP.prototype = Object.create(cBaseFunction.prototype);
+	cROUNDUP.prototype.constructor = cROUNDUP;
 	cROUNDUP.prototype.Calculate = function (arg) {
 		function roundupHelper(number, num_digits) {
 			if (num_digits > AscCommonExcel.cExcelMaxExponent) {
@@ -3014,6 +3058,7 @@
 	}
 
 	cSERIESSUM.prototype = Object.create(cBaseFunction.prototype);
+	cSERIESSUM.prototype.constructor = cSERIESSUM;
 	cSERIESSUM.prototype.Calculate = function (arg) {
 
 		function SERIESSUM(x, n, m, a) {
@@ -3086,6 +3131,7 @@
 	}
 
 	cSIGN.prototype = Object.create(cBaseFunction.prototype);
+	cSIGN.prototype.constructor = cSIGN;
 	cSIGN.prototype.Calculate = function (arg) {
 
 		function signHelper(arg) {
@@ -3138,6 +3184,7 @@
 	}
 
 	cSIN.prototype = Object.create(cBaseFunction.prototype);
+	cSIN.prototype.constructor = cSIN;
 	cSIN.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -3177,6 +3224,7 @@
 	}
 
 	cSINH.prototype = Object.create(cBaseFunction.prototype);
+	cSINH.prototype.constructor = cSINH;
 	cSINH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -3216,6 +3264,7 @@
 	}
 
 	cSQRT.prototype = Object.create(cBaseFunction.prototype);
+	cSQRT.prototype.constructor = cSQRT;
 	cSQRT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -3255,6 +3304,7 @@
 	}
 
 	cSQRTPI.prototype = Object.create(cBaseFunction.prototype);
+	cSQRTPI.prototype.constructor = cSQRTPI;
 	cSQRTPI.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -3294,6 +3344,7 @@
 	}
 
 	cSUBTOTAL.prototype = Object.create(cBaseFunction.prototype);
+	cSUBTOTAL.prototype.constructor = cSUBTOTAL;
 	cSUBTOTAL.prototype.Calculate = function (arg) {
 		var f, exclude = false, arg0 = arg[0];
 
@@ -3390,6 +3441,7 @@
 	}
 
 	cSUM.prototype = Object.create(cBaseFunction.prototype);
+	cSUM.prototype.constructor = cSUM;
 	cSUM.prototype.Calculate = function (arg) {
 		var element, _arg, arg0 = new cNumber(0);
 		for (var i = 0; i < arg.length; i++) {
@@ -3446,6 +3498,7 @@
 	}
 
 	cSUMIF.prototype = Object.create(cBaseFunction.prototype);
+	cSUMIF.prototype.constructor = cSUMIF;
 	cSUMIF.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _sum = 0, matchingInfo;
 		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
@@ -3517,6 +3570,7 @@
 	}
 
 	cSUMIFS.prototype = Object.create(cBaseFunction.prototype);
+	cSUMIFS.prototype.constructor = cSUMIFS;
 	cSUMIFS.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
@@ -3609,6 +3663,7 @@
 	}
 
 	cSUMPRODUCT.prototype = Object.create(cBaseFunction.prototype);
+	cSUMPRODUCT.prototype.constructor = cSUMPRODUCT;
 	cSUMPRODUCT.prototype.Calculate = function (arg) {
 		var arg0 = new cNumber(0), resArr = [], col = 0, row = 0, res = 1, _res = [], i;
 
@@ -3681,6 +3736,7 @@
 	}
 
 	cSUMSQ.prototype = Object.create(cBaseFunction.prototype);
+	cSUMSQ.prototype.constructor = cSUMSQ;
 	cSUMSQ.prototype.Calculate = function (arg) {
 		var arg0 = new cNumber(0), _arg;
 
@@ -3738,6 +3794,7 @@
 	}
 
 	cSUMX2MY2.prototype = Object.create(cBaseFunction.prototype);
+	cSUMX2MY2.prototype.constructor = cSUMX2MY2;
 	cSUMX2MY2.prototype.Calculate = function (arg) {
 
 		function sumX2MY2(a, b, _3d) {
@@ -3822,6 +3879,7 @@
 	}
 
 	cSUMX2PY2.prototype = Object.create(cBaseFunction.prototype);
+	cSUMX2PY2.prototype.constructor = cSUMX2PY2;
 	cSUMX2PY2.prototype.Calculate = function (arg) {
 
 		function sumX2MY2(a, b, _3d) {
@@ -3906,6 +3964,7 @@
 	}
 
 	cSUMXMY2.prototype = Object.create(cBaseFunction.prototype);
+	cSUMXMY2.prototype.constructor = cSUMXMY2;
 	cSUMXMY2.prototype.Calculate = function (arg) {
 
 		function sumX2MY2(a, b, _3d) {
@@ -3990,6 +4049,7 @@
 	}
 
 	cTAN.prototype = Object.create(cBaseFunction.prototype);
+	cTAN.prototype.constructor = cTAN;
 	cTAN.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -4029,6 +4089,7 @@
 	}
 
 	cTANH.prototype = Object.create(cBaseFunction.prototype);
+	cTANH.prototype.constructor = cTANH;
 	cTANH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -4068,6 +4129,7 @@
 	}
 
 	cTRUNC.prototype = Object.create(cBaseFunction.prototype);
+	cTRUNC.prototype.constructor = cTRUNC;
 	cTRUNC.prototype.Calculate = function (arg) {
 
 		function truncHelper(a, b) {
