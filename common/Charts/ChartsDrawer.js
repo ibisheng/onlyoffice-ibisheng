@@ -3412,7 +3412,7 @@ drawBarChart.prototype =
 		var widthOverLap       = individualBarWidth * (overlap / 100);
 		var hmargin            = (gapWidth / 100 * individualBarWidth) / 2;
 		
-		var nullPositionOX = this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase ?  this.chartProp.nullPositionOXLog : this.cChartSpace.chart.plotArea.catAx.posY * this.chartProp.pxToMM;
+		var nullPositionOX = this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase ? this.chartProp.nullPositionOXLog : this.chartProp.nullPositionOX;
 		
 		var height, startX, startY, val, paths, seriesHeight = [], tempValues = [], seria, startYColumnPosition, startXPosition, prevVal, idx, seriesCounter = 0;
 		var cubeCount = 0;
@@ -3615,7 +3615,7 @@ drawBarChart.prototype =
 	_getStartYColumnPosition: function (seriesHeight, i, j, val, yPoints)
 	{
 		var startY, height, curVal, prevVal, endBlockPosition, startBlockPosition;
-		var nullPositionOX = this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase ?  this.chartProp.nullPositionOXLog : this.cChartSpace.chart.plotArea.catAx.posY * this.chartProp.pxToMM;
+		var nullPositionOX = this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase ? this.chartProp.nullPositionOXLog : this.chartProp.nullPositionOX;
 		
 		
 		if(this.chartProp.subType == "stacked")
@@ -6646,7 +6646,7 @@ drawHBarChart.prototype =
 	{
 		var startY, width, curVal, prevVal, endBlockPosition, startBlockPosition;
 		var catAx = this.cChartSpace.chart.plotArea.catAx;
-		var nullPositionOX = catAx.posX !== null ? catAx.posX * this.chartProp.pxToMM : 0;
+		var nullPositionOX = this.chartProp.nullPositionOX/*catAx.posX !== null ? catAx.posX * this.chartProp.pxToMM : 0*/;
 		
 		if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
 		{
