@@ -2305,12 +2305,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cBaseFunction.prototype.getArguments = function () {
 		return this.argumentsCurrent;
 	};
-	cBaseFunction.prototype.getMaxArguments = function () {
-		return this.argumentsMax;
-	};
-	cBaseFunction.prototype.getMinArguments = function () {
-		return this.argumentsMin;
-	};
 	cBaseFunction.prototype.Assemble = function (arg) {
 		var str = "";
 		for (var i = 0; i < arg.length; i++) {
@@ -4501,13 +4495,13 @@ parserFormula.prototype.parse = function(local, digitDelim) {
       this.elemArr.pop();
       if (this.elemArr.length != 0 && ( func = this.elemArr[this.elemArr.length - 1] ).type == cElementType.func) {
         p = this.elemArr.pop();
-        if (top_elem.getArguments() > func.getMaxArguments()) {
+        if (top_elem.getArguments() > func.argumentsMax) {
           this.outStack = [];
           this.elemArr = [];
           this.error.push(c_oAscError.ID.FrmlWrongMaxArgument);
           return false;
         } else {
-          if (top_elem.getArguments() >= func.getMinArguments()) {
+          if (top_elem.getArguments() >= func.argumentsMin) {
             func.setArgumentsCount(top_elem.getArguments());
             if (!func.checkArguments()) {
             	bError = true;
