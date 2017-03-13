@@ -1503,17 +1503,47 @@
     //------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Insert watermark in the header of document
-     * @param {?string} } [sText="Watermark"]
+     * Insert watermark on each page of document
+     * @param {?string} } [sText="WATERMARK"]
      * @param {?boolean} [bIsDiagonal=true]
      */
     ApiDocument.prototype.InsertWatermark = function(sText, bIsDiagonal){
-
-        var oApiSection = this.GetFinalSection();
-        if(oApiSection){
-            privateInsertWatermarkToContent(oApiSection.GetHeader("title", false), sText, bIsDiagonal);
-            privateInsertWatermarkToContent(oApiSection.GetHeader("even", false), sText, bIsDiagonal);
-            privateInsertWatermarkToContent(oApiSection.GetHeader("default", true), sText, bIsDiagonal);
+        var oSectPrMap = {};
+        if(this.Document.SectPr){
+            oSectPrMap[this.Document.SectPr.Get_Id()] = this.Document.SectPr;
+        }
+        var oElement;
+        for(var i = 0; i < this.Document.Content.length; ++i){
+            oElement = this.Document.Content[i];
+            if(oElement instanceof Paragraph){
+                if(oElement.SectPr){
+                    oSectPrMap[oElement.SectPr.Get_Id()] = oElement.SectPr;
+                }
+            }
+        }
+        var oHeadersMap = {};
+        var oApiSection, oHeader;
+        for(var sId in oSectPrMap){
+            if(oSectPrMap.hasOwnProperty(sId)){
+                oApiSection = new ApiSection(oSectPrMap[sId]);
+                oHeader = oApiSection.GetHeader("title", false);
+                if(oHeader){
+                    oHeadersMap[oHeader.Document.Get_Id()] = oHeader;
+                }
+                oHeader = oApiSection.GetHeader("even", false);
+                if(oHeader){
+                    oHeadersMap[oHeader.Document.Get_Id()] = oHeader;
+                }
+                oHeader = oApiSection.GetHeader("default", true);
+                if(oHeader){
+                    oHeadersMap[oHeader.Document.Get_Id()] = oHeader;
+                }
+            }
+        }
+        for(var sId in oHeadersMap){
+            if(oHeadersMap.hasOwnProperty(sId)){
+                privateInsertWatermarkToContent(this.Document.Api, oHeadersMap[sId], sText, bIsDiagonal);
+            }
         }
     };
     /**
@@ -4948,7 +4978,7 @@
     }
 
     function private_CreateWatermark(sText, bDiagonal){
-        var sText2 = ((typeof (sText) === "string") && (sText.length > 0)) ? sText : "Watermark";
+        var sText2 = ((typeof (sText) === "string") && (sText.length > 0)) ? sText : "WATERMARK";
         var sFontName2 = undefined;
         var nFontSize2 = 2;
         var oTextFill2 = AscFormat.CreateUnfilFromRGB(127, 127, 127);
@@ -5034,7 +5064,7 @@
     }
 
 
-    function privateInsertWatermarkToContent(oContent, sText, bIsDiagonal){
+    function privateInsertWatermarkToContent(oApi, oContent, sText, bIsDiagonal){
         if(oContent){
             var nElementsCount = oContent.GetElementsCount();
             for(var i = 0; i < nElementsCount; ++i){
@@ -5045,7 +5075,7 @@
                 }
             }
             if(i === nElementsCount){
-                oElement = Api.CreateParagraph();
+                oElement = oApi.CreateParagraph();
                 oElement.AddDrawing(private_CreateWatermark(sText, bIsDiagonal));
                 oContent.Push(oElement);
             }
