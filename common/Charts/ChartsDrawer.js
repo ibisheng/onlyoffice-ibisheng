@@ -2470,12 +2470,13 @@ CChartsDrawer.prototype =
 	
 	_roundValues: function(values)
 	{
+		//ToDo пересмотреть округление. на числа << 0 могут быть проблемы!
 		var kF = 1000000000;
 		if(values.length)
 		{
 			for(var i = 0; i < values.length; i++)
 			{
-				values[i] = parseInt(values[i] * kF) / kF;
+				values[i] = Math.round(values[i] * kF) / kF;
 			}
 		}
 		
