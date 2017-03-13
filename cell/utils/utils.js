@@ -502,7 +502,7 @@
 			this.r1 = Math.min(this.r1, r);
 			this.r2 = Math.max(this.r2, r);
 		};
-		Range.prototype.setOffsetWithAbs = function(offset) {
+		Range.prototype.setOffsetWithAbs = function(offset, canResize) {
 			var temp;
 			var offsetRow = offset.offsetRow;
 			var offsetCol = offset.offsetCol;
@@ -520,7 +520,9 @@
 				this.r1 += offsetRow;
 				if (this.r1 < 0) {
 					this.r1 = 0;
-					return false;
+					if (!canResize) {
+						return false;
+					}
 				}
 				if (this.r1 > gc_nMaxRow0) {
 					this.r1 = gc_nMaxRow0;
@@ -531,7 +533,9 @@
 				this.c1 += offsetCol;
 				if (this.c1 < 0) {
 					this.c1 = 0;
-					return false;
+					if (!canResize) {
+						return false;
+					}
 				}
 				if (this.c1 > gc_nMaxCol0) {
 					this.c1 = gc_nMaxCol0;
@@ -546,7 +550,9 @@
 				}
 				if (this.r2 > gc_nMaxRow0) {
 					this.r2 = gc_nMaxRow0;
-					return false;
+					if (!canResize) {
+						return false;
+					}
 				}
 			}
 			if (!isAbsCol2) {
@@ -557,7 +563,9 @@
 				}
 				if (this.c2 > gc_nMaxCol0) {
 					this.c2 = gc_nMaxCol0;
-					return false;
+					if (!canResize) {
+						return false;
+					}
 				}
 			}
 			//switch abs flag

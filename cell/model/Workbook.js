@@ -4080,13 +4080,13 @@
 					row.c[j] = oTempCell;
 					if ( oTempCell.formulaParsed ) {
 						if(copyRange) {
-							oTempCell.formulaParsed.removeDependencies();
-							oTempCell.formulaParsed.changeOffset(offset);
-							oTempCell.formulaParsed.Formula = oTempCell.formulaParsed.assemble(true);
-							this.workbook.dependencyFormulas.addToBuildDependencyCell(oTempCell);
-						} else {
-							this.workbook.dependencyFormulas.addToChangedCell(oTempCell);
+							//todo rework after clone formulaParsed unparsed
+							oTempCell.formulaParsed.parse();
+							History.TurnOff();
+							oTempCell.changeOffset(offset, false, true);
+							History.TurnOn();
 						}
+						this.workbook.dependencyFormulas.addToBuildDependencyCell(oTempCell);
 					}
 				}
 			}
@@ -4863,16 +4863,17 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			cell.removeHyperlink();
 		}
 	};
-	Cell.prototype.setFormula = function(formula, bHistoryUndo) {
+	Cell.prototype.setFormulaTemplate = function(bHistoryUndo, action) {
 		var DataOld = null;
 		var DataNew = null;
 		if (History.Is_On())
 			DataOld = this.getValueData();
 
-		this.removeDependencies();
 		this.oValue.clean();
-		this.formulaParsed = new parserFormula(formula, this, this.ws);
-		this.ws.workbook.dependencyFormulas.addToBuildDependencyCell(this);
+		if (this.formulaParsed) {
+			this.formulaParsed.removeDependencies();
+		}
+		action(this);
 
 		if (History.Is_On()) {
 			DataNew = this.getValueData();
@@ -4881,6 +4882,19 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 				History.Add(AscCommonExcel.g_oUndoRedoCell, typeHistory, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew), bHistoryUndo);}
 
 		}
+	};
+	Cell.prototype.setFormula = function(formula, bHistoryUndo) {
+		this.setFormulaTemplate(bHistoryUndo, function(cell){
+			cell.formulaParsed = new parserFormula(formula, cell, cell.ws);
+			cell.ws.workbook.dependencyFormulas.addToBuildDependencyCell(cell);
+		});
+	};
+	Cell.prototype.changeOffset = function(offset, canResize, bHistoryUndo) {
+		this.setFormulaTemplate(bHistoryUndo, function(cell){
+			cell.formulaParsed.changeOffset(offset, canResize);
+			cell.formulaParsed.Formula = cell.formulaParsed.assemble(true);
+			cell.formulaParsed.buildDependencies();
+		});
 	};
 	Cell.prototype.removeDependencies = function() {
 		//удаляем сторое значение
@@ -8005,8 +8019,8 @@ Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 			}
 			var oUndoRedoBBox = new UndoRedoData_BBox({r1:nRowFirst0, c1:nColFirst0, r2:nLastRow0, c2:nLastCol0});
 			oRes = new AscCommonExcel.UndoRedoData_SortData(oUndoRedoBBox, aSortData);
-			History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_Sort, this.worksheet.getId(), new Asc.Range(0, nRowFirst0, gc_nMaxCol0, nLastRow0), oRes);
 			this._sortByArray(oUndoRedoBBox, aSortData);
+			History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_Sort, this.worksheet.getId(), new Asc.Range(0, nRowFirst0, gc_nMaxCol0, nLastRow0), oRes);
 		}
 		this.worksheet.workbook.dependencyFormulas.unlockRecal();
 		return oRes;
@@ -8079,15 +8093,14 @@ Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 				oTempCellsTo[nIndexTo] = rowTo.c[i];
 				if(null != oCurCell)
 				{
-					var lastName = oCurCell.getName();
+					if (oCurCell.formulaParsed) {
+						oCurCell.changeOffset({offsetCol: 0, offsetRow: shift}, true, true);
+					}
 					oCurCell.moveVer(shift);
 					rowTo.c[i] = oCurCell;
-					if (oCurCell.formulaParsed) {
-						History.TurnOff();
-						var _p_ = oCurCell.formulaParsed.clone(null, oCurCell, this);
-						var assemb = _p_.changeOffset({offsetCol: 0, offsetRow: shift}).assemble(true);
-						oCurCell.setFormula(assemb);
-						History.TurnOn();
+					if (oCurCell && oCurCell.getFormula()) {
+						//for #Ref
+						this.worksheet.workbook.dependencyFormulas.addToChangedCell(oCurCell);
 					}
 				}
 				else

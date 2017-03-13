@@ -4938,13 +4938,13 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 	};
 
 	/* Для обратной сборки функции иногда необходимо поменять ссылки на ячейки */
-	parserFormula.prototype.changeOffset = function (offset) {//offset = AscCommonExcel.CRangeOffset
+	parserFormula.prototype.changeOffset = function (offset, canResize) {//offset = AscCommonExcel.CRangeOffset
 		for (var i = 0; i < this.outStack.length; i++) {
-			this.changeOffsetElem(this.outStack[i], this.outStack, i, offset);
+			this.changeOffsetElem(this.outStack[i], this.outStack, i, offset, canResize);
 		}
 		return this;
 	};
-	parserFormula.prototype.changeOffsetElem = function(elem, container, index, offset) {//offset =
+	parserFormula.prototype.changeOffsetElem = function(elem, container, index, offset, canResize) {//offset =
 		// AscCommonExcel.CRangeOffset
 		var range, bbox = null, isErr = false;
 		if (cElementType.cell === elem.type || cElementType.cell3D === elem.type ||
@@ -4959,7 +4959,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 			bbox = elem.getBBox0();
 		}
 		if (bbox) {
-			if (bbox.setOffsetWithAbs(offset)) {
+			if (bbox.setOffsetWithAbs(offset, canResize)) {
 				isErr = false;
 				if (cElementType.cellsRange3D === elem.type) {
 					elem.bbox = bbox;
