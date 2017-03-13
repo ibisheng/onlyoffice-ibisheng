@@ -619,12 +619,17 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cFIND}
+	 */
 	function cFINDB() {
-		var r = new cFIND();
-		r.setName("FINDB");
-		return r;
+		cFIND.call(this);
+		this.name = "FINDB";
 	}
+
+	cFINDB.prototype = Object.create(cFIND.prototype);
+	cFINDB.prototype.constructor = cFINDB;
 
 	/**
 	 * @constructor
@@ -893,12 +898,17 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cLEFT}
+	 */
 	function cLEFTB() {
-		var r = new cLEFT();
-		r.setName("LEFTB");
-		return r;
+		cLEFT.call(this);
+		this.name = "LEFTB";
 	}
+
+	cLEFTB.prototype = Object.create(cLEFT.prototype);
+	cLEFTB.prototype.constructor = cLEFTB;
 
 	/**
 	 * @constructor
@@ -939,12 +949,17 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cLEN}
+	 */
 	function cLENB() {
-		var r = new cLEN();
-		r.setName("LENB");
-		return r;
+		cLEN.call(this);
+		this.name = "LENB";
 	}
+
+	cLENB.prototype = Object.create(cLEN.prototype);
+	cLENB.prototype.constructor = cLENB;
 
 	/**
 	 * @constructor
@@ -1059,12 +1074,17 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cMID}
+	 */
 	function cMIDB() {
-		var r = new cMID();
-		r.setName("MIDB");
-		return r;
+		cMID.call(this);
+		this.name = "MIDB";
 	}
+
+	cMIDB.prototype = Object.create(cMID.prototype);
+	cMIDB.prototype.constructor = cMIDB;
 
 	/**
 	 * @constructor
@@ -1231,12 +1251,17 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cREPLACE}
+	 */
 	function cREPLACEB() {
-		var r = new cREPLACE();
-		r.setName("REPLACEB");
-		return r;
+		cREPLACE.call(this);
+		this.name = "REPLACEB";
 	}
+
+	cREPLACEB.prototype = Object.create(cREPLACE.prototype);
+	cREPLACEB.prototype.constructor = cREPLACEB;
 
 	/**
 	 * @constructor
@@ -1360,12 +1385,17 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cRIGHT}
+	 */
 	function cRIGHTB() {
-		var r = new cRIGHT();
-		r.setName("RIGHTB");
-		return r;
+		cRIGHT.call(this);
+		this.name = "RIGHTB";
 	}
+
+	cRIGHTB.prototype = Object.create(cRIGHT.prototype);
+	cRIGHTB.prototype.constructor = cRIGHTB;
 
 	/**
 	 * @constructor
@@ -1462,12 +1492,17 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cRIGHT}
+	 */
 	function cSEARCHB() {
-		var r = new cSEARCH();
-		r.setName("SEARCHB");
-		return r;
+		cSEARCH.call(this);
+		this.name = "SEARCHB";
 	}
+
+	cSEARCHB.prototype = Object.create(cSEARCH.prototype);
+	cSEARCHB.prototype.constructor = cSEARCHB;
 
 	/**
 	 * @constructor

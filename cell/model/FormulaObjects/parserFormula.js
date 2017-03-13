@@ -2299,9 +2299,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cBaseFunction.prototype.IncrementArguments = function () {
 		++this.argumentsCurrent;
 	};
-	cBaseFunction.prototype.setName = function (name) {
-		this.name = name;
-	};
 	cBaseFunction.prototype.setArgumentsCount = function (count) {
 		this.argumentsCurrent = count;
 	};
