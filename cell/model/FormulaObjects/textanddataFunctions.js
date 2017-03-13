@@ -42,7 +42,6 @@
 	var g_oFormatParser = AscCommon.g_oFormatParser;
 	var oNumFormatCache = AscCommon.oNumFormatCache;
 
-	var cElementType = AscCommonExcel.cElementType;
 	var cErrorType = AscCommonExcel.cErrorType;
 	var cNumber = AscCommonExcel.cNumber;
 	var cString = AscCommonExcel.cString;
@@ -61,7 +60,10 @@
 		cFIND, cFINDB, cFIXED, cJIS, cLEFT, cLEFTB, cLEN, cLENB, cLOWER, cMID, cMIDB, cPHONETIC, cPROPER, cREPLACE,
 		cREPLACEB, cREPT, cRIGHT, cRIGHTB, cSEARCH, cSEARCHB, cSUBSTITUTE, cT, cTEXT, cTRIM, cUPPER, cVALUE);
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cASC() {
 		cBaseFunction.call(this, "ASC");
 	}
@@ -69,7 +71,10 @@
 	cASC.prototype = Object.create(cBaseFunction.prototype);
 	cASC.prototype.constructor = cASC;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cBAHTTEXT() {
 		cBaseFunction.call(this, "BAHTTEXT");
 	}
@@ -77,7 +82,10 @@
 	cBAHTTEXT.prototype = Object.create(cBaseFunction.prototype);
 	cBAHTTEXT.prototype.constructor = cBAHTTEXT;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCHAR() {
 		this.name = "CHAR";
 		this.value = null;
@@ -124,15 +132,16 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCLEAN() {
 		this.name = "CLEAN";
 		this.value = null;
 		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
 		this.argumentsMax = 1;
-
-
 	}
 
 	cCLEAN.prototype = Object.create(cBaseFunction.prototype);
@@ -165,7 +174,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCODE() {
 		this.name = "CODE";
 		this.value = null;
@@ -212,7 +224,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCONCATENATE() {
 		this.name = "CONCATENATE";
 		this.value = null;
@@ -258,7 +273,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cDOLLAR() {
 		this.name = "DOLLAR";
 		this.value = null;
@@ -459,7 +477,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cEXACT() {
 		this.name = "EXACT";
 		this.value = null;
@@ -507,7 +528,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cFIND() {
 		this.name = "FIND";
 		this.value = null;
@@ -602,7 +626,10 @@
 		return r;
 	}
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cFIXED() {
 		this.name = "FIXED";
 		this.value = null;
@@ -800,7 +827,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cJIS() {
 		cBaseFunction.call(this, "JIS");
 	}
@@ -808,7 +838,10 @@
 	cJIS.prototype = Object.create(cBaseFunction.prototype);
 	cJIS.prototype.constructor = cJIS;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cLEFT() {
 		this.name = "LEFT";
 		this.value = null;
@@ -867,7 +900,10 @@
 		return r;
 	}
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cLEN() {
 		this.name = "LEN";
 		this.value = null;
@@ -910,7 +946,10 @@
 		return r;
 	}
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cLOWER() {
 		this.name = "LOWER";
 		this.value = null;
@@ -945,7 +984,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cMID() {
 		this.name = "MID";
 		this.value = null;
@@ -1024,7 +1066,10 @@
 		return r;
 	}
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cPHONETIC() {
 		cBaseFunction.call(this, "PHONETIC");
 	}
@@ -1032,7 +1077,10 @@
 	cPHONETIC.prototype = Object.create(cBaseFunction.prototype);
 	cPHONETIC.prototype.constructor = cPHONETIC;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cPROPER() {
 		this.name = "PROPER";
 		this.value = null;
@@ -1100,7 +1148,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cREPLACE() {
 		this.name = "REPLACE";
 		this.value = null;
@@ -1187,7 +1238,10 @@
 		return r;
 	}
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cREPT() {
 		this.name = "REPT";
 		this.value = null;
@@ -1251,7 +1305,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cRIGHT() {
 		this.name = "RIGHT";
 		this.value = null;
@@ -1310,7 +1367,10 @@
 		return r;
 	}
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSEARCH() {
 		this.name = "SEARCH";
 		this.value = null;
@@ -1409,7 +1469,10 @@
 		return r;
 	}
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSUBSTITUTE() {
 		this.name = "SUBSTITUTE";
 		this.value = null;
@@ -1492,7 +1555,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cT() {
 		this.name = "T";
 		this.value = null;
@@ -1527,7 +1593,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cTEXT() {
 		this.name = "TEXT";
 		this.value = null;
@@ -1600,7 +1669,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cTRIM() {
 		this.name = "TRIM";
 		this.value = null;
@@ -1638,7 +1710,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cUPPER() {
 		this.name = "UPPER";
 		this.value = null;
@@ -1671,7 +1746,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cVALUE() {
 		this.name = "VALUE";
 		this.value = null;

@@ -55,7 +55,10 @@
 	cFormulaFunctionGroup['Information'].push(cERROR_TYPE, cISBLANK, cISERR, cISERROR, cISEVEN, cISLOGICAL, cISNA,
 		cISNONTEXT, cISNUMBER, cISODD, cISREF, cISTEXT, cN, cNA, cTYPE);
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cERROR_TYPE() {
 		this.name = "ERROR.TYPE";
 		this.value = null;
@@ -117,7 +120,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cISBLANK() {
 		this.name = "ISBLANK";
 		this.value = null;
@@ -147,7 +153,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cISERR() {
 		this.name = "ISERR";
 		this.value = null;
@@ -180,7 +189,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cISERROR() {
 		this.name = "ISERROR";
 		this.value = null;
@@ -213,7 +225,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cISEVEN() {
 		this.name = "ISEVEN";
 		this.value = null;
@@ -251,7 +266,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cISLOGICAL() {
 		this.name = "ISLOGICAL";
 		this.value = null;
@@ -284,7 +302,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cISNA() {
 		this.name = "ISNA";
 		this.value = null;
@@ -317,7 +338,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cISNONTEXT() {
 		this.name = "ISNONTEXT";
 		this.value = null;
@@ -349,7 +373,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cISNUMBER() {
 		this.name = "ISNUMBER";
 		this.value = null;
@@ -382,7 +409,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cISODD() {
 		this.name = "ISODD";
 		this.value = null;
@@ -420,7 +450,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cISREF() {
 		this.name = "ISREF";
 		this.value = null;
@@ -445,7 +478,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cISTEXT() {
 		this.name = "ISTEXT";
 		this.value = null;
@@ -478,7 +514,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cN() {
 		this.name = "N";
 		this.value = null;
@@ -525,7 +564,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cNA() {
 		this.name = "NA";
 		this.value = null;
@@ -545,7 +587,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cTYPE() {
 		this.name = "TYPE";
 		this.value = null;

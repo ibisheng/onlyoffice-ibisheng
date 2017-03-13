@@ -94,7 +94,10 @@
 		return new RegExp(vFS + "$", flags ? flags : "i");
 	}
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cADDRESS() {
 		this.name = "ADDRESS";
 		this.value = null;
@@ -191,11 +194,11 @@
 		}
 
 		strRef = this._getRef(this._absolute(absR, rowNumber, A1RefType),
-			this._absolute(absC, A1RefType ? g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) : colNumber, A1RefType),
-			A1RefType);
+			this._absolute(absC, A1RefType ? g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) : colNumber,
+				A1RefType), A1RefType);
 
-		return this.value =
-			new cString((cElementType.empty === sheetName.type) ? strRef : parserHelp.get3DRef(sheetName.toString(), strRef));
+		return this.value = new cString((cElementType.empty === sheetName.type) ? strRef :
+			parserHelp.get3DRef(sheetName.toString(), strRef));
 	};
 	cADDRESS.prototype._getRef = function (row, col, A1RefType) {
 		return A1RefType ? col + row : 'R' + row + 'C' + col;
@@ -211,7 +214,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cAREAS() {
 		cBaseFunction.call(this, "AREAS");
 	}
@@ -219,7 +225,10 @@
 	cAREAS.prototype = Object.create(cBaseFunction.prototype);
 	cAREAS.prototype.constructor = cAREAS;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCHOOSE() {
 		this.name = "CHOOSE";
 		this.value = null;
@@ -258,7 +267,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCOLUMN() {
 		this.name = "COLUMN";
 		this.value = null;
@@ -289,7 +301,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCOLUMNS() {
 		this.name = "COLUMNS";
 		this.value = null;
@@ -318,7 +333,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cGETPIVOTDATA() {
 		cBaseFunction.call(this, "GETPIVOTDATA");
 	}
@@ -326,7 +344,10 @@
 	cGETPIVOTDATA.prototype = Object.create(cBaseFunction.prototype);
 	cGETPIVOTDATA.prototype.constructor = cGETPIVOTDATA;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cHLOOKUP() {
 		this.name = "HLOOKUP";
 		this.value = null;
@@ -435,7 +456,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cHYPERLINK() {
 		cBaseFunction.call(this, "HYPERLINK");
 	}
@@ -443,7 +467,10 @@
 	cHYPERLINK.prototype = Object.create(cBaseFunction.prototype);
 	cHYPERLINK.prototype.constructor = cHYPERLINK;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cINDEX() {
 		this.name = "INDEX";
 		this.value = null;
@@ -455,9 +482,9 @@
 	cINDEX.prototype = Object.create(cBaseFunction.prototype);
 	cINDEX.prototype.constructor = cINDEX;
 	cINDEX.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1] && (cElementType.empty !== arg[1].type) ? arg[1] : new cNumber(1), arg2 = arg[2] &&
-		(cElementType.empty !== arg[2].type) ? arg[2] : new cNumber(1), arg3 = arg[3] &&
-		(cElementType.empty !== arg[3].type) ? arg[3] : new cNumber(1), res;
+		var arg0 = arg[0], arg1 = arg[1] && (cElementType.empty !== arg[1].type) ? arg[1] :
+			new cNumber(1), arg2 = arg[2] && (cElementType.empty !== arg[2].type) ? arg[2] :
+			new cNumber(1), arg3 = arg[3] && (cElementType.empty !== arg[3].type) ? arg[3] : new cNumber(1), res;
 
 		if (cElementType.cellsRange3D === arg0.type) {
 			arg0 = arg0.tocArea();
@@ -495,14 +522,16 @@
 			} else {
 				if (arg1 == 0 && arg2 > 0) {
 					var _a1 = ws.getRange3(bbox.r1, bbox.c1 + arg2 - 1, bbox.r1, bbox.c2 + arg2 - 1)
-						.getCells()[0].getName(), _a2 = ws.getRange3(bbox.r2, bbox.c1 + arg2 - 1, bbox.r2, bbox.c2 + arg2 - 1)
+						.getCells()[0].getName(), _a2 = ws.getRange3(bbox.r2, bbox.c1 + arg2 - 1, bbox.r2,
+						bbox.c2 + arg2 - 1)
 						.getCells()[0].getName();
 					res = new cArea(_a1.toString() + ":" + _a2.toString(), ws);
 				} else {
 					if (arg1 > Math.abs(bbox.r1 - bbox.r2) + 1 || arg2 > Math.abs(bbox.c1 - bbox.c2) + 1) {
 						res = new cError(cErrorType.bad_reference);
 					} else {
-						res = new cRef(ws.getRange3(bbox.r1 + arg1 - 1, bbox.c1 + arg2 - 1, bbox.r1 + arg1 - 1, bbox.c1 + arg2 - 1)
+						res = new cRef(ws.getRange3(bbox.r1 + arg1 - 1, bbox.c1 + arg2 - 1, bbox.r1 + arg1 - 1,
+							bbox.c1 + arg2 - 1)
 							.getCells()[0].getName(), ws);
 					}
 				}
@@ -525,7 +554,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cINDIRECT() {
 		this.name = "INDIRECT";
 		this.value = null;
@@ -600,7 +632,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cLOOKUP() {
 		this.name = "LOOKUP";
 		this.value = null;
@@ -643,7 +678,8 @@
 		}
 
 		if (cElementType.array === arg1.type && cElementType.array === arg2.type) {
-			if (arg1.getRowCount() != arg2.getRowCount() && arg1.getCountElementInRow() != arg2.getCountElementInRow()) {
+			if (arg1.getRowCount() != arg2.getRowCount() &&
+				arg1.getCountElementInRow() != arg2.getCountElementInRow()) {
 				return this.value = new cError(cErrorType.not_available);
 			}
 
@@ -746,7 +782,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cMATCH() {
 		this.name = "MATCH";
 		this.value = null;
@@ -764,7 +803,8 @@
 			var i, item, a1RowCount = a1.length, a1ColumnCount = a1[0].length, a2Value = a2.getValue(), arr, index = -1;
 			var a0Type = a0.type;
 			var a0Value = a0.getValue();
-			if(!(cElementType.number === a0Type || cElementType.string === a0Type || cElementType.bool === a0Type || cElementType.error === a0Type || cElementType.empty === a0Type)) {
+			if (!(cElementType.number === a0Type || cElementType.string === a0Type || cElementType.bool === a0Type ||
+				cElementType.error === a0Type || cElementType.empty === a0Type)) {
 				a0Type = a0Value.type;
 				a0Value = a0Value.getValue();
 			}
@@ -852,7 +892,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cOFFSET() {
 		this.name = "OFFSET";
 		this.value = null;
@@ -953,7 +996,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cROW() {
 		this.name = "ROW";
 		this.value = null;
@@ -984,7 +1030,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cROWS() {
 		this.name = "ROWS";
 		this.value = null;
@@ -1013,7 +1062,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cRTD() {
 		cBaseFunction.call(this, "RTD");
 	}
@@ -1021,7 +1073,10 @@
 	cRTD.prototype = Object.create(cBaseFunction.prototype);
 	cRTD.prototype.constructor = cRTD;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cTRANSPOSE() {
 		this.name = "TRANSPOSE";
 		this.value = null;
@@ -1058,7 +1113,8 @@
 			arg0 = arg0.getMatrix();
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			return this.value = arg0.getValue();
-		} else if (cElementType.number === arg0.type || cElementType.string === arg0.type || cElementType.bool === arg0.type || cElementType.error === arg0.type) {
+		} else if (cElementType.number === arg0.type || cElementType.string === arg0.type ||
+			cElementType.bool === arg0.type || cElementType.error === arg0.type) {
 			return this.value = arg0;
 		} else {
 			return this.value = new cError(cErrorType.not_available);
@@ -1073,7 +1129,9 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 */
 	function VHLOOKUPCache(bHor) {
 		this.cacheId = {};
 		this.cacheRanges = {};
@@ -1155,7 +1213,10 @@
 		this.cacheRanges = {};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cVLOOKUP() {
 		this.name = "VLOOKUP";
 		this.value = null;

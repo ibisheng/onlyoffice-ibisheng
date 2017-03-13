@@ -876,7 +876,10 @@
 		cIMABS, cIMAGINARY, cIMARGUMENT, cIMCONJUGATE, cIMCOS, cIMDIV, cIMEXP, cIMLN, cIMLOG10, cIMLOG2, cIMPOWER,
 		cIMPRODUCT, cIMREAL, cIMSIN, cIMSQRT, cIMSUB, cIMSUM, cOCT2BIN, cOCT2DEC, cOCT2HEX);
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cBESSELI() {
 		cBaseFunction.call(this, "BESSELI", 2, 2);
 	}
@@ -928,7 +931,10 @@
 	 };
 	 };*/
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cBESSELJ() {
 		cBaseFunction.call(this, "BESSELJ");
 	}
@@ -936,7 +942,10 @@
 	cBESSELJ.prototype = Object.create(cBaseFunction.prototype);
 	cBESSELJ.prototype.constructor = cBESSELJ;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cBESSELK() {
 		cBaseFunction.call(this, "BESSELK");
 	}
@@ -944,7 +953,10 @@
 	cBESSELK.prototype = Object.create(cBaseFunction.prototype);
 	cBESSELK.prototype.constructor = cBESSELK;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cBESSELY() {
 		cBaseFunction.call(this, "BESSELY");
 	}
@@ -952,7 +964,10 @@
 	cBESSELY.prototype = Object.create(cBaseFunction.prototype);
 	cBESSELY.prototype.constructor = cBESSELY;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cBIN2DEC() {
 		cBaseFunction.call(this, "BIN2DEC", 1, 1);
 	}
@@ -1000,7 +1015,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cBIN2HEX() {
 		cBaseFunction.call(this, "BIN2HEX", 1, 2);
 	}
@@ -1064,7 +1082,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cBIN2OCT() {
 		cBaseFunction.call(this, "BIN2OCT", 1, 2);
 	}
@@ -1128,7 +1149,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCOMPLEX() {
 		cBaseFunction.call(this, "COMPLEX", 2, 3);
 	}
@@ -1192,7 +1216,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCONVERT() {
 		cBaseFunction.call(this, "CONVERT");
 	}
@@ -1200,7 +1227,10 @@
 	cCONVERT.prototype = Object.create(cBaseFunction.prototype);
 	cCONVERT.prototype.constructor = cCONVERT;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cDEC2BIN() {
 		cBaseFunction.call(this, "DEC2BIN", 1, 2);
 	}
@@ -1259,7 +1289,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cDEC2HEX() {
 		cBaseFunction.call(this, "DEC2HEX", 1, 2);
 	}
@@ -1317,7 +1350,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cDEC2OCT() {
 		cBaseFunction.call(this, "DEC2OCT", 1, 2);
 	}
@@ -1375,7 +1411,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cDELTA() {
 		cBaseFunction.call(this, "DELTA", 1, 2);
 	}
@@ -1422,7 +1461,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cERF() {
 		cBaseFunction.call(this, "ERF", 1, 2);
 	}
@@ -1474,7 +1516,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cERFC() {
 		cBaseFunction.call(this, "ERFC", 1, 1);
 	}
@@ -1508,7 +1553,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cGESTEP() {
 		cBaseFunction.call(this, "GESTEP", 1, 2);
 	}
@@ -1555,7 +1603,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cHEX2BIN() {
 		cBaseFunction.call(this, "HEX2BIN", 1, 2);
 	}
@@ -1626,7 +1677,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cHEX2DEC() {
 		cBaseFunction.call(this, "HEX2DEC", 1, 1);
 	}
@@ -1673,7 +1727,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cHEX2OCT() {
 		cBaseFunction.call(this, "HEX2OCT", 1, 2);
 	}
@@ -1743,7 +1800,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIMABS() {
 		cBaseFunction.call(this, "IMABS", 1, 1);
 	}
@@ -1783,7 +1843,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIMAGINARY() {
 		cBaseFunction.call(this, "IMAGINARY", 1, 1);
 	}
@@ -1823,7 +1886,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIMARGUMENT() {
 		cBaseFunction.call(this, "IMARGUMENT", 1, 1);
 	}
@@ -1863,7 +1929,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIMCONJUGATE() {
 		cBaseFunction.call(this, "IMCONJUGATE", 1, 1);
 	}
@@ -1903,7 +1972,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIMCOS() {
 		cBaseFunction.call(this, "IMCOS", 1, 1);
 	}
@@ -1945,7 +2017,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIMDIV() {
 		cBaseFunction.call(this, "IMDIV", 2, 2);
 	}
@@ -1998,7 +2073,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIMEXP() {
 		cBaseFunction.call(this, "IMEXP", 1, 1);
 	}
@@ -2040,7 +2118,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIMLN() {
 		cBaseFunction.call(this, "IMLN", 1, 1);
 	}
@@ -2086,7 +2167,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIMLOG10() {
 		cBaseFunction.call(this, "IMLOG10", 1, 1);
 	}
@@ -2132,7 +2216,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIMLOG2() {
 		cBaseFunction.call(this, "IMLOG2", 1, 1);
 	}
@@ -2178,7 +2265,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIMPOWER() {
 		cBaseFunction.call(this, "IMPOWER", 2, 2);
 	}
@@ -2234,7 +2324,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIMPRODUCT() {
 		cBaseFunction.call(this, "IMPRODUCT", 1);
 	}
@@ -2332,7 +2425,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIMREAL() {
 		cBaseFunction.call(this, "IMREAL", 1, 1);
 	}
@@ -2372,7 +2468,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIMSIN() {
 		cBaseFunction.call(this, "IMSIN", 1, 1);
 	}
@@ -2414,7 +2513,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIMSQRT() {
 		cBaseFunction.call(this, "IMSQRT", 1, 1);
 	}
@@ -2456,7 +2558,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIMSUB() {
 		cBaseFunction.call(this, "IMSUB", 2, 2);
 	}
@@ -2509,7 +2614,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIMSUM() {
 		cBaseFunction.call(this, "IMSUM", 1);
 	}
@@ -2608,7 +2716,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cOCT2BIN() {
 		cBaseFunction.call(this, "OCT2BIN", 1, 2);
 	}
@@ -2679,7 +2790,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cOCT2DEC() {
 		cBaseFunction.call(this, "OCT2DEC", 1, 1);
 	}
@@ -2726,7 +2840,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cOCT2HEX() {
 		cBaseFunction.call(this, "OCT2HEX", 1, 2);
 	}

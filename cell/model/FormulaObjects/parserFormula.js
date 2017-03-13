@@ -653,7 +653,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	};
 
 	/*Basic types of an elements used into formulas*/
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
 	function cNumber(val) {
 		cBaseType.call(this, parseFloat(val));
 		var res;
@@ -690,7 +693,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
 	function cString(val) {
 		cBaseType.call(this, val);
 	}
@@ -737,7 +743,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this;
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
 	function cBool(val) {
 		var v = false;
 		switch (val.toString().toUpperCase()) {
@@ -773,7 +782,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.value;
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
 	function cError(val) {
 		cBaseType.call(this, val);
 
@@ -915,7 +927,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 return new cString( this.value ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase() );
 	 };*/
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
 	function cArea(val, ws) {/*Area means "A1:E5" for example*/
 		cBaseType.call(this, val);
 
@@ -1090,7 +1105,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
 	function cArea3D(val, wsFrom, wsTo) {/*Area3D means "Sheat1!A1:E5" for example*/
 		cBaseType.call(this, val);
 
@@ -1339,7 +1357,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.wsFrom === this.wsTo;
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
 	function cRef(val, ws) {/*Ref means A1 for example*/
 		cBaseType.call(this, val);
 
@@ -1406,7 +1427,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return excludeHiddenRows && this._valid && this.ws.getRowHidden(this.getRange().r1);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
 	function cRef3D(val, ws) {/*Ref means Sheat1!A1 for example*/
 		cBaseType.call(this, val);
 
@@ -1492,7 +1516,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return excludeHiddenRows && _r && this.ws.getRowHidden(_r.r1);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
 	function cEmpty() {
 		cBaseType.call(this, "");
 	}
@@ -1513,7 +1540,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return "";
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
 	function cName(val, ws) {
 		cBaseType.call(this, val);
 		this.ws = ws;
@@ -1581,7 +1611,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.ws;
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
 	function cStrucTable(val, wb, ws) {
 		cBaseType.call(this, val);
 		this.wb = wb;
@@ -1950,7 +1983,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return bRes;
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cName}
+	 */
 	function cName3D(val, ws) {
 		cName.call(this, val, ws);
 	}
@@ -1978,7 +2014,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return parserHelp.getEscapeSheetName(this.ws.getName()) + "!" + cName.prototype.toString.call(this);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
 	function cArray() {
 		cBaseType.call(this, undefined);
 		this.array = [];
@@ -2159,7 +2198,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
 	function cUndefined() {
 		this.value = undefined;
 	}
@@ -2368,7 +2410,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.name;
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cRangeUnionOperator() {
 		cBaseOperator.apply(this, [':', 50, 2]);
 	}
@@ -2420,7 +2465,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.value;
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cRangeIntersectionOperator() {
 		cBaseOperator.apply(this, [' ', 50, 2]);
 	}
@@ -2477,7 +2525,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	};
 
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cUnarMinusOperator() {
 		cBaseOperator.apply(this, ['un_minus'/**name operator*/, 49/**priority of operator*/, 1/**count arguments*/]);
 		this.isRightAssociative = true;
@@ -2514,7 +2565,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return new cString("-" + arg[start + count - 1]);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cUnarPlusOperator() {
 		cBaseOperator.apply(this, ['un_plus', 49, 1]);
 		this.isRightAssociative = true;
@@ -2546,7 +2600,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return new cString("+" + arg[start + count - 1]);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cAddOperator() {
 		cBaseOperator.apply(this, ['+', 20]);
 	}
@@ -2570,7 +2627,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "+", arguments[1].bbox);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cMinusOperator() {
 		cBaseOperator.apply(this, ['-', 20]);
 	}
@@ -2590,7 +2650,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "-", arguments[1].bbox);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cPercentOperator() {
 		cBaseOperator.apply(this, ['%', 45, 1]);
 		this.isRightAssociative = true;
@@ -2626,7 +2689,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return new cString(arg[start + count - 1] + this.name);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cPowOperator() {
 		cBaseOperator.apply(this, ['^', 40]);
 	}
@@ -2663,7 +2729,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.value = new cNumber(_v);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cMultOperator() {
 		cBaseOperator.apply(this, ['*', 30]);
 	}
@@ -2687,7 +2756,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "*", arguments[1].bbox);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cDivOperator() {
 		cBaseOperator.apply(this, ['/', 30]);
 	}
@@ -2711,7 +2783,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "/", arguments[1].bbox);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cConcatSTROperator() {
 		cBaseOperator.apply(this, ['&', 15]);
 	}
@@ -2737,7 +2812,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			arg1 instanceof cError ? arg1 : new cString(arg0.toString().concat(arg1.toString()));
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cEqualsOperator() {
 		cBaseOperator.apply(this, ['=', 10]);
 	}
@@ -2763,7 +2841,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "=", arguments[1].bbox);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cNotEqualsOperator() {
 		cBaseOperator.apply(this, ['<>', 10]);
 	}
@@ -2790,7 +2871,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "<>", arguments[1].bbox);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cLessOperator() {
 		cBaseOperator.apply(this, ['<', 10]);
 	}
@@ -2817,7 +2901,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "<", arguments[1].bbox);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cLessOrEqualOperator() {
 		cBaseOperator.apply(this, ['<=', 10]);
 	}
@@ -2843,7 +2930,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "<=", arguments[1].bbox);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cGreaterOperator() {
 		cBaseOperator.apply(this, ['>', 10]);
 	}
@@ -2869,7 +2959,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.value = _func[arg0.type][arg1.type](arg0, arg1, ">", arguments[1].bbox);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cGreaterOrEqualOperator() {
 		cBaseOperator.apply(this, ['>=', 10]);
 	}

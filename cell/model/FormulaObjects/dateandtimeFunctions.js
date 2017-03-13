@@ -294,7 +294,10 @@
 		cMINUTE, cMONTH, cNETWORKDAYS, cNETWORKDAYS_INTL, cNOW, cSECOND, cTIME, cTIMEVALUE, cTODAY, cWEEKDAY, cWEEKNUM,
 		cWORKDAY, cWORKDAY_INTL, cYEAR, cYEARFRAC);
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cDATE() {
 		this.name = "DATE";
 		this.value = null;
@@ -364,7 +367,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cDATEDIF() {
 		this.name = "DATEDIF";
 		this.value = null;
@@ -482,7 +488,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cDATEVALUE() {
 		this.name = "DATEVALUE";
 		this.value = null;
@@ -522,7 +531,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cDAY() {
 		this.name = "DAY";
 		this.value = null;
@@ -595,7 +607,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cDAYS360() {
 		this.name = "DAYS360";
 		this.value = null;
@@ -661,7 +676,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cEDATE() {
 		this.name = "EDATE";
 		this.value = null;
@@ -736,7 +754,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cEOMONTH() {
 		this.name = "EOMONTH";
 		this.value = null;
@@ -802,7 +823,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cHOUR() {
 		this.name = "HOUR";
 		this.value = null;
@@ -867,7 +891,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cMINUTE() {
 		this.name = "MINUTE";
 		this.value = null;
@@ -931,7 +958,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cMONTH() {
 		this.name = "MONTH";
 		this.value = null;
@@ -1000,7 +1030,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cNETWORKDAYS() {
 		this.name = "NETWORKDAYS";
 		this.value = null;
@@ -1126,7 +1159,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cNETWORKDAYS_INTL() {
 		cBaseFunction.call(this, "NETWORKDAYS.INTL");
 	}
@@ -1134,7 +1170,10 @@
 	cNETWORKDAYS_INTL.prototype = Object.create(cBaseFunction.prototype);
 	cNETWORKDAYS_INTL.prototype.constructor = cNETWORKDAYS_INTL;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cNOW() {
 		this.name = "NOW";
 		this.value = null;
@@ -1158,7 +1197,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSECOND() {
 		this.name = "SECOND";
 		this.value = null;
@@ -1222,7 +1264,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cTIME() {
 		this.name = "TIME";
 		this.value = null;
@@ -1283,7 +1328,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cTIMEVALUE() {
 		this.name = "TIMEVALUE";
 		this.value = null;
@@ -1324,7 +1372,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cTODAY() {
 		this.name = "TODAY";
 		this.value = null;
@@ -1348,7 +1399,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cWEEKDAY() {
 		this.name = "WEEKDAY";
 		this.value = null;
@@ -1431,7 +1485,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cWEEKNUM() {
 		this.name = "WEEKNUM";
 		this.value = null;
@@ -1547,7 +1604,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cWORKDAY() {
 		this.name = "WORKDAY";
 		this.value = null;
@@ -1674,7 +1734,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cWORKDAY_INTL() {
 		cBaseFunction.call(this, "WORKDAY.INTL");
 	}
@@ -1682,7 +1745,10 @@
 	cWORKDAY_INTL.prototype = Object.create(cBaseFunction.prototype);
 	cWORKDAY_INTL.prototype.constructor = cWORKDAY_INTL;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cYEAR() {
 		this.name = "YEAR";
 		this.value = null;
@@ -1745,7 +1811,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cYEARFRAC() {
 		this.name = "YEARFRAC";
 		this.value = null;

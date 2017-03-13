@@ -53,7 +53,10 @@
 	cFormulaFunctionGroup['Logical'] = cFormulaFunctionGroup['Logical'] || [];
 	cFormulaFunctionGroup['Logical'].push(cAND, cFALSE, cIF, cIFERROR, cNOT, cOR, cTRUE);
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cAND() {
 		this.name = "AND";
 		this.value = null;
@@ -129,7 +132,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cFALSE() {
 		this.name = "FALSE";
 		this.value = null;
@@ -149,7 +155,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIF() {
 		this.name = "IF";
 		this.value = null;
@@ -192,7 +201,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cIFERROR() {
 		this.name = "IFERROR";
 		this.value = null;
@@ -227,7 +239,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cNOT() {
 		this.name = "NOT";
 		this.value = null;
@@ -267,7 +282,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cOR() {
 		this.name = "OR";
 		this.value = null;
@@ -340,7 +358,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cTRUE() {
 		this.name = "TRUE";
 		this.value = null;

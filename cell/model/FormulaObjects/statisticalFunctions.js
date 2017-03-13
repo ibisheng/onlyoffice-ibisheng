@@ -322,7 +322,10 @@
 		}
 	}
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cAVEDEV() {
 		this.name = "AVEDEV";
 		this.value = null;
@@ -386,7 +389,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cAVERAGE() {
 		this.name = "AVERAGE";
 		this.value = null;
@@ -457,7 +463,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cAVERAGEA() {
 		this.name = "AVERAGEA";
 		this.value = null;
@@ -521,7 +530,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cAVERAGEIF() {
 		this.name = "AVERAGEIF";
 		this.value = null;
@@ -604,7 +616,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cAVERAGEIFS() {
 		this.name = "AVERAGEIFS";
 		this.value = null;
@@ -689,7 +704,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cBETADIST() {/*Нет реализации в Google Docs*/
 		cBaseFunction.call(this, "BETADIST");
 	}
@@ -697,7 +715,10 @@
 	cBETADIST.prototype = Object.create(cBaseFunction.prototype);
 	cBETADIST.prototype.constructor = cBETADIST;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cBETAINV() {/*Нет реализации в Google Docs*/
 		cBaseFunction.call(this, "BETAINV");
 	}
@@ -705,7 +726,10 @@
 	cBETAINV.prototype = Object.create(cBaseFunction.prototype);
 	cBETAINV.prototype.constructor = cBETAINV;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cBINOMDIST() {
 		this.name = "BINOMDIST";
 		this.value = null;
@@ -788,7 +812,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCHIDIST() {
 		cBaseFunction.call(this, "CHIDIST");
 	}
@@ -796,7 +823,10 @@
 	cCHIDIST.prototype = Object.create(cBaseFunction.prototype);
 	cCHIDIST.prototype.constructor = cCHIDIST;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCHIINV() {
 		cBaseFunction.call(this, "CHIINV");
 	}
@@ -804,7 +834,10 @@
 	cCHIINV.prototype = Object.create(cBaseFunction.prototype);
 	cCHIINV.prototype.constructor = cCHIINV;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCHITEST() {
 		cBaseFunction.call(this, "CHITEST");
 	}
@@ -812,7 +845,10 @@
 	cCHITEST.prototype = Object.create(cBaseFunction.prototype);
 	cCHITEST.prototype.constructor = cCHITEST;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCONFIDENCE() {
 		this.name = "CONFIDENCE";
 		this.value = null;
@@ -872,7 +908,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCORREL() {
 		this.name = "CORREL";
 		this.value = null;
@@ -955,7 +994,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCOUNT() {
 		this.name = "COUNT";
 		this.value = null;
@@ -1008,7 +1050,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCOUNTA() {
 		this.name = "COUNTA";
 		this.value = null;
@@ -1056,7 +1101,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCOUNTBLANK() {
 		this.name = "COUNTBLANK";
 		this.value = null;
@@ -1084,7 +1132,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCOUNTIF() {
 		this.name = "COUNTIF";
 		this.value = null;
@@ -1097,7 +1148,8 @@
 	cCOUNTIF.prototype.constructor = cCOUNTIF;
 	cCOUNTIF.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], _count = 0, matchingInfo;
-		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type && cElementType.cellsRange !== arg0.type && cElementType.cellsRange3D !== arg0.type) {
+		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
+			cElementType.cellsRange !== arg0.type && cElementType.cellsRange3D !== arg0.type) {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
@@ -1137,7 +1189,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCOUNTIFS() {
 		this.name = "COUNTIFS";
 		this.value = null;
@@ -1153,7 +1208,8 @@
 		for (var k = 0; k < arg.length; k += 2) {
 			arg0 = arg[k];
 			arg1 = arg[k + 1];
-			if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type && cElementType.cellsRange !== arg0.type && cElementType.cellsRange3D !== arg0.type) {
+			if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
+				cElementType.cellsRange !== arg0.type && cElementType.cellsRange3D !== arg0.type) {
 				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 
@@ -1206,7 +1262,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCOVAR() {
 		this.name = "COVAR";
 		this.value = null;
@@ -1283,7 +1342,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCRITBINOM() {
 		this.name = "CRITBINOM";
 		this.value = null;
@@ -1370,7 +1432,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cDEVSQ() {
 		this.name = "DEVSQ";
 		this.value = null;
@@ -1447,7 +1512,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cEXPONDIST() {
 		this.name = "EXPONDIST";
 		this.value = null;
@@ -1509,7 +1577,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cFDIST() {
 		cBaseFunction.call(this, "FDIST");
 	}
@@ -1517,7 +1588,10 @@
 	cFDIST.prototype = Object.create(cBaseFunction.prototype);
 	cFDIST.prototype.constructor = cFDIST;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cFINV() {
 		cBaseFunction.call(this, "FINV");
 	}
@@ -1525,7 +1599,10 @@
 	cFINV.prototype = Object.create(cBaseFunction.prototype);
 	cFINV.prototype.constructor = cFINV;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cFISHER() {
 		this.name = "FISHER";
 		this.value = null;
@@ -1571,7 +1648,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cFISHERINV() {
 		this.name = "FISHERINV";
 		this.value = null;
@@ -1617,7 +1697,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cFORECAST() {
 		this.name = "FORECAST";
 		this.value = null;
@@ -1712,7 +1795,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cFREQUENCY() {
 		this.name = "FREQUENCY";
 		this.value = null;
@@ -1798,7 +1884,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cFTEST() {
 		cBaseFunction.call(this, "FTEST");
 	}
@@ -1806,7 +1895,10 @@
 	cFTEST.prototype = Object.create(cBaseFunction.prototype);
 	cFTEST.prototype.constructor = cFTEST;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cGAMMADIST() {
 		cBaseFunction.call(this, "GAMMADIST");
 	}
@@ -1814,7 +1906,10 @@
 	cGAMMADIST.prototype = Object.create(cBaseFunction.prototype);
 	cGAMMADIST.prototype.constructor = cGAMMADIST;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cGAMMAINV() {
 		cBaseFunction.call(this, "GAMMAINV");
 	}
@@ -1822,7 +1917,10 @@
 	cGAMMAINV.prototype = Object.create(cBaseFunction.prototype);
 	cGAMMAINV.prototype.constructor = cGAMMAINV;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cGAMMALN() {
 		this.name = "GAMMALN";
 		this.value = null;
@@ -1868,7 +1966,10 @@
 		return {name: this.name, args: "(number)"}
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cGEOMEAN() {
 		this.name = "GEOMEAN";
 		this.value = null;
@@ -1943,7 +2044,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cGROWTH() {
 		cBaseFunction.call(this, "GROWTH");
 	}
@@ -1951,7 +2055,10 @@
 	cGROWTH.prototype = Object.create(cBaseFunction.prototype);
 	cGROWTH.prototype.constructor = cGROWTH;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cHARMEAN() {
 		this.name = "HARMEAN";
 		this.value = null;
@@ -2032,7 +2139,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cHYPGEOMDIST() {
 		this.name = "HYPGEOMDIST";
 		this.value = null;
@@ -2107,7 +2217,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cINTERCEPT() {
 		this.name = "INTERCEPT";
 		this.value = null;
@@ -2190,7 +2303,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cKURT() {
 		this.name = "KURT";
 		this.value = null;
@@ -2279,7 +2395,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cLARGE() {
 		this.name = "LARGE";
 		this.value = null;
@@ -2351,7 +2470,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cLINEST() {
 		cBaseFunction.call(this, "LINEST");
 	}
@@ -2359,7 +2481,10 @@
 	cLINEST.prototype = Object.create(cBaseFunction.prototype);
 	cLINEST.prototype.constructor = cLINEST;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cLOGEST() {
 		cBaseFunction.call(this, "LOGEST");
 	}
@@ -2367,7 +2492,10 @@
 	cLOGEST.prototype = Object.create(cBaseFunction.prototype);
 	cLOGEST.prototype.constructor = cLOGEST;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cLOGINV() {
 		this.name = "LOGINV";
 		this.value = null;
@@ -2430,7 +2558,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cLOGNORMDIST() {
 		this.name = "LOGNORMDIST";
 		this.value = null;
@@ -2493,7 +2624,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cMAX() {
 		this.name = "MAX";
 		this.value = null;
@@ -2575,7 +2709,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cMAXA() {
 		this.name = "MAXA";
 		this.value = null;
@@ -2659,7 +2796,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cMEDIAN() {
 		this.name = "MEDIAN";
 		this.value = null;
@@ -2735,7 +2875,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cMIN() {
 		this.name = "MIN";
 		this.value = null;
@@ -2818,7 +2961,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cMINA() {
 		this.name = "MINA";
 		this.value = null;
@@ -2903,7 +3049,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cMODE() {
 		this.name = "MODE";
 		this.value = null;
@@ -2999,7 +3148,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cNEGBINOMDIST() {
 		this.name = "NEGBINOMDIST";
 		this.value = null;
@@ -3065,7 +3217,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cNORMDIST() {
 		this.name = "NORMDIST";
 		this.value = null;
@@ -3144,7 +3299,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cNORMINV() {
 		this.name = "NORMINV";
 		this.value = null;
@@ -3207,7 +3365,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cNORMSDIST() {
 		this.name = "NORMSDIST";
 		this.value = null;
@@ -3247,7 +3408,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cNORMSINV() {
 		this.name = "NORMSINV";
 		this.value = null;
@@ -3296,7 +3460,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cPEARSON() {
 		this.name = "PEARSON";
 		this.value = null;
@@ -3380,7 +3547,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cPERCENTILE() {
 		this.name = "PERCENTILE";
 		this.value = null;
@@ -3444,7 +3614,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cPERCENTRANK() {
 		this.name = "PERCENTRANK";
 		this.value = null;
@@ -3557,7 +3730,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cPERMUT() {
 		this.name = "PERMUT";
 		this.value = null;
@@ -3645,7 +3821,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cPOISSON() {
 		this.name = "POISSON";
 		this.value = null;
@@ -3721,7 +3900,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cPROB() {
 		this.name = "PROB";
 		this.value = null;
@@ -3833,7 +4015,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cQUARTILE() {
 		this.name = "QUARTILE";
 		this.value = null;
@@ -3939,7 +4124,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cRANK() {
 		cBaseFunction.call(this, "RANK");
 	}
@@ -3947,7 +4135,10 @@
 	cRANK.prototype = Object.create(cBaseFunction.prototype);
 	cRANK.prototype.constructor = cRANK;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cRSQ() {
 		this.name = "RSQ";
 		this.value = null;
@@ -4032,7 +4223,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSKEW() {
 		this.name = "SKEW";
 		this.value = null;
@@ -4123,7 +4317,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSLOPE() {
 		this.name = "SLOPE";
 		this.value = null;
@@ -4207,7 +4404,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSMALL() {
 		this.name = "SMALL";
 		this.value = null;
@@ -4285,7 +4485,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSTANDARDIZE() {
 		this.name = "STANDARDIZE";
 		this.value = null;
@@ -4348,7 +4551,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSTDEV() {
 		this.name = "STDEV";
 		this.value = null;
@@ -4414,7 +4620,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSTDEVA() {
 		this.name = "STDEVA";
 		this.value = null;
@@ -4477,7 +4686,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSTDEVP() {
 		this.name = "STDEVP";
 		this.value = null;
@@ -4553,7 +4765,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSTDEVPA() {
 		this.name = "STDEVPA";
 		this.value = null;
@@ -4643,7 +4858,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSTEYX() {
 		this.name = "STEYX";
 		this.value = null;
@@ -4730,7 +4948,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cTDIST() {
 		cBaseFunction.call(this, "TDIST");
 	}
@@ -4738,7 +4959,10 @@
 	cTDIST.prototype = Object.create(cBaseFunction.prototype);
 	cTDIST.prototype.constructor = cTDIST;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cTINV() {
 		cBaseFunction.call(this, "TINV");
 	}
@@ -4746,7 +4970,10 @@
 	cTINV.prototype = Object.create(cBaseFunction.prototype);
 	cTINV.prototype.constructor = cTINV;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cTREND() {
 		cBaseFunction.call(this, "TREND");
 	}
@@ -4754,7 +4981,10 @@
 	cTREND.prototype = Object.create(cBaseFunction.prototype);
 	cTREND.prototype.constructor = cTREND;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cTRIMMEAN() {
 		cBaseFunction.call(this, "TRIMMEAN");
 	}
@@ -4762,7 +4992,10 @@
 	cTRIMMEAN.prototype = Object.create(cBaseFunction.prototype);
 	cTRIMMEAN.prototype.constructor = cTRIMMEAN;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cTTEST() {
 		cBaseFunction.call(this, "TTEST");
 	}
@@ -4770,7 +5003,10 @@
 	cTTEST.prototype = Object.create(cBaseFunction.prototype);
 	cTTEST.prototype.constructor = cTTEST;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cVAR() {
 		this.name = "VAR";
 		this.value = null;
@@ -4852,7 +5088,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cVARA() {
 		this.name = "VARA";
 		this.value = null;
@@ -4946,7 +5185,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cVARP() {
 		this.name = "VARP";
 		this.value = null;
@@ -5027,7 +5269,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cVARdotP() {
 		this.name = "VAR.P";
 		this.value = null;
@@ -5045,7 +5290,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cVARPA() {
 		this.name = "VARPA";
 		this.value = null;
@@ -5139,7 +5387,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cWEIBULL() {
 		cBaseFunction.call(this, "WEIBULL");
 	}
@@ -5147,7 +5398,10 @@
 	cWEIBULL.prototype = Object.create(cBaseFunction.prototype);
 	cWEIBULL.prototype.constructor = cWEIBULL;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cZTEST() {
 		cBaseFunction.call(this, "ZTEST");
 	}

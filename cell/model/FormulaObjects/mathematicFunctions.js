@@ -81,7 +81,10 @@
 		}
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cABS() {
 		this.name = "ABS";
 		this.value = null;
@@ -119,7 +122,10 @@
 		}
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cACOS() {
 		this.name = "ACOS";
 		this.value = null;
@@ -159,7 +165,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cACOSH() {
 		this.name = "ACOSH";
 		this.value = null;
@@ -199,7 +208,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cASIN() {
 		this.name = "ASIN";
 		this.value = null;
@@ -239,7 +251,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cASINH() {
 		this.name = "ASINH";
 		this.value = null;
@@ -279,7 +294,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cATAN() {
 		this.name = "ATAN";
 		this.value = null;
@@ -319,7 +337,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cATAN2() {
 		this.name = "ATAN2";
 		this.value = null;
@@ -393,7 +414,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cATANH() {
 		this.name = "ATANH";
 		this.value = null;
@@ -433,7 +457,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCEILING() {
 		this.name = "CEILING";
 		this.value = null;
@@ -531,7 +558,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCOMBIN() {
 		this.name = "COMBIN";
 		this.value = null;
@@ -619,7 +649,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCOS() {
 		this.name = "COS";
 		this.value = null;
@@ -659,7 +692,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCOSH() {
 		this.name = "COSH";
 		this.value = null;
@@ -699,7 +735,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cDEGREES() {
 		this.name = "DEGREES";
 		this.value = null;
@@ -740,7 +779,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cECMA_CEILING() {
 		cBaseFunction.call(this, "ECMA_CEILING");
 	}
@@ -748,7 +790,10 @@
 	cECMA_CEILING.prototype = Object.create(cBaseFunction.prototype);
 	cECMA_CEILING.prototype.constructor = cECMA_CEILING;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cEVEN() {
 		this.name = "EVEN";
 		this.value = null;
@@ -811,7 +856,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cEXP() {
 		this.name = "EXP";
 		this.value = null;
@@ -853,7 +901,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cFACT() {
 		this.name = "FACT";
 		this.value = null;
@@ -900,7 +951,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cFACTDOUBLE() {
 		this.name = "FACTDOUBLE";
 		this.value = null;
@@ -966,7 +1020,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cFLOOR() {
 		this.name = "FLOOR";
 		this.value = null;
@@ -1067,7 +1124,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cGCD() {
 		this.name = "GCD";
 		this.value = null;
@@ -1165,7 +1225,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cINT() {
 		this.name = "INT";
 		this.value = null;
@@ -1209,7 +1272,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cISO_CEILING() {
 		cBaseFunction.call(this, "ISO_CEILING");
 	}
@@ -1217,7 +1283,10 @@
 	cISO_CEILING.prototype = Object.create(cBaseFunction.prototype);
 	cISO_CEILING.prototype.constructor = cISO_CEILING;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cLCM() {
 		this.name = "LCM";
 		this.value = null;
@@ -1319,7 +1388,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cLN() {
 		this.name = "LN";
 		this.value = null;
@@ -1367,7 +1439,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cLOG() {
 		this.name = "LOG";
 		this.value = null;
@@ -1460,7 +1535,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cLOG10() {
 		this.name = "LOG10";
 		this.value = null;
@@ -1508,7 +1586,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cMDETERM() {
 		this.name = "MDETERM";
 		this.value = null;
@@ -1595,7 +1676,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cMINVERSE() {
 		this.name = "MINVERSE";
 		this.value = null;
@@ -1741,7 +1825,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cMMULT() {
 		this.name = "MMULT";
 		this.value = null;
@@ -1812,7 +1899,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cMOD() {
 		this.name = "MOD";
 		this.value = null;
@@ -1900,7 +1990,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cMROUND() {
 		this.name = "MROUND";
 		this.value = null;
@@ -2005,7 +2098,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cMULTINOMIAL() {
 		this.name = "MULTINOMIAL";
 		this.value = null;
@@ -2099,7 +2195,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cODD() {
 		this.name = "ODD";
 		this.value = null;
@@ -2162,7 +2261,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cPI() {
 		this.name = "PI";
 		this.value = null;
@@ -2182,7 +2284,10 @@
 		}
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cPOWER() {
 		this.name = "POWER";
 		this.value = null;
@@ -2265,7 +2370,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cPRODUCT() {
 		this.name = "PRODUCT";
 		this.value = null;
@@ -2318,7 +2426,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cQUOTIENT() {
 		this.name = "QUOTIENT";
 		this.value = null;
@@ -2398,7 +2509,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cRADIANS() {
 		this.name = "RADIANS";
 		this.value = null;
@@ -2442,7 +2556,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cRAND() {
 		this.name = "RAND";
 		this.value = null;
@@ -2462,7 +2579,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cRANDBETWEEN() {
 		this.name = "RANDBETWEEN";
 		this.value = null;
@@ -2538,7 +2658,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cROMAN() {
 		this.name = "ROMAN";
 		this.value = null;
@@ -2649,7 +2772,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cROUND() {
 		this.name = "ROUND";
 		this.value = null;
@@ -2798,7 +2924,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cROUNDDOWN() {
 		this.name = "ROUNDDOWN";
 		this.value = null;
@@ -2923,7 +3052,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cROUNDUP() {
 		this.name = "ROUNDUP";
 		this.value = null;
@@ -3048,7 +3180,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSERIESSUM() {
 		this.name = "SERIESSUM";
 		this.value = null;
@@ -3121,7 +3256,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSIGN() {
 		this.name = "SIGN";
 		this.value = null;
@@ -3174,7 +3312,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSIN() {
 		this.name = "SIN";
 		this.value = null;
@@ -3214,7 +3355,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSINH() {
 		this.name = "SINH";
 		this.value = null;
@@ -3254,7 +3398,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSQRT() {
 		this.name = "SQRT";
 		this.value = null;
@@ -3294,7 +3441,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSQRTPI() {
 		this.name = "SQRTPI";
 		this.value = null;
@@ -3334,7 +3484,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSUBTOTAL() {
 		this.name = "SUBTOTAL";
 		this.value = null;
@@ -3431,7 +3584,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSUM() {
 		this.name = "SUM";
 		this.value = null;
@@ -3488,7 +3644,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSUMIF() {
 		this.name = "SUMIF";
 		this.value = null;
@@ -3560,7 +3719,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSUMIFS() {
 		this.name = "SUMIFS";
 		this.value = null;
@@ -3653,7 +3815,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSUMPRODUCT() {
 		this.name = "SUMPRODUCT";
 		this.value = null;
@@ -3726,7 +3891,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSUMSQ() {
 		this.name = "SUMSQ";
 		this.value = null;
@@ -3784,7 +3952,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSUMX2MY2() {
 		this.name = "SUMX2MY2";
 		this.value = null;
@@ -3869,7 +4040,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSUMX2PY2() {
 		this.name = "SUMX2PY2";
 		this.value = null;
@@ -3954,7 +4128,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cSUMXMY2() {
 		this.name = "SUMXMY2";
 		this.value = null;
@@ -4039,7 +4216,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cTAN() {
 		this.name = "TAN";
 		this.value = null;
@@ -4079,7 +4259,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cTANH() {
 		this.name = "TANH";
 		this.value = null;
@@ -4119,7 +4302,10 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cTRUNC() {
 		this.name = "TRUNC";
 		this.value = null;
