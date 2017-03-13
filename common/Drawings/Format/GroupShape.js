@@ -243,7 +243,7 @@ AscCommon.extendClass(CGroupShape, AscFormat.CGraphicObjectBase);
         var aSplicedShape = this.spTree.splice(pos, 1);
         History.Add(new AscDFH.CChangesDrawingsContent(this,AscDFH.historyitem_GroupShapeRemoveFromSpTree, pos, aSplicedShape, false));
         this.handleUpdateSpTree();
-        return aSplicedShape;
+        return aSplicedShape[0];
     };
 
     CGroupShape.prototype.handleUpdateSpTree = function()

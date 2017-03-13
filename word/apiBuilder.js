@@ -1489,7 +1489,7 @@
     // ApiParagraph
     //
     //------------------------------------------------------------------------------------------------------------------
-    
+
     /**
      * Insert watermark in the header of document
      * @param {?string} } [sText="Watermark"]
@@ -4466,6 +4466,7 @@
     ApiDocument.prototype["InsertContent"]           = ApiDocument.prototype.InsertContent;
 	ApiDocument.prototype["GetCommentsReport"]       = ApiDocument.prototype.GetCommentsReport;
 	ApiDocument.prototype["GetReviewReport"]         = ApiDocument.prototype.GetReviewReport;
+	ApiDocument.prototype["InsertWatermark"]         = ApiDocument.prototype.InsertWatermark;
 
     ApiParagraph.prototype["GetClassType"]           = ApiParagraph.prototype.GetClassType;
     ApiParagraph.prototype["AddText"]                = ApiParagraph.prototype.AddText;
