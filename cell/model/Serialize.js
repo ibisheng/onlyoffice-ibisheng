@@ -5740,7 +5740,7 @@
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadComments(t,l, oWorksheet);
                 });
-            } else if (c_oSerWorksheetsTypes.ConditionalFormatting === type) {
+            } else if (c_oSerWorksheetsTypes.ConditionalFormatting === type && typeof AscCommonExcel.CConditionalFormatting != "undefined") {
                 oConditionalFormatting = new AscCommonExcel.CConditionalFormatting();
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadConditionalFormatting(t, l, oConditionalFormatting);
