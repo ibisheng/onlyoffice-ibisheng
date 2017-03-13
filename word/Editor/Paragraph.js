@@ -5474,7 +5474,7 @@ Paragraph.prototype =
                         EndTextPr.Merge( this.TextPr.Value );
                         if(TextPr.AscFill)
                         {
-                            this.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 0));
+                            this.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 1));
                         }
                         if(TextPr.AscUnifill)
                         {

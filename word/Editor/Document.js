@@ -1341,7 +1341,7 @@ function CDocumentSettings()
  */
 function CDocument(DrawingDocument, isMainLogicDocument)
 {
-    CDocument.superclass.constructor.call(this);
+	CDocumentContentBase.call(this);
 
     //------------------------------------------------------------------------------------------------------------------
     //  Сохраняем ссылки на глобальные объекты
@@ -1525,7 +1525,8 @@ function CDocument(DrawingDocument, isMainLogicDocument)
 
     this.StartTime = 0;
 }
-AscCommon.extendClass(CDocument, CDocumentContentBase);
+CDocument.prototype = Object.create(CDocumentContentBase.prototype);
+CDocument.prototype.constructor = CDocument;
 
 CDocument.prototype.Init                           = function()
 {
@@ -4334,13 +4335,21 @@ CDocument.prototype.Cursor_MoveUp = function(AddToSelect)
 {
 	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
-	this.Controller.MoveCursorUp(AddToSelect);
+
+	if (true === this.IsFillingFormMode())
+		this.MoveToFillingForm(false);
+	else
+		this.Controller.MoveCursorUp(AddToSelect);
 };
 CDocument.prototype.Cursor_MoveDown = function(AddToSelect)
 {
 	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
-	this.Controller.MoveCursorDown(AddToSelect);
+
+	if (true === this.IsFillingFormMode())
+		this.MoveToFillingForm(true);
+	else
+		this.Controller.MoveCursorDown(AddToSelect);
 };
 CDocument.prototype.Cursor_MoveEndOfLine = function(AddToSelect)
 {
@@ -16078,6 +16087,57 @@ CDocument.prototype.IsFormFieldEditing = function()
 		return true;
 
 	return false;
+};
+CDocument.prototype.MoveToFillingForm = function(bNext)
+{
+	var arrAllFields = this.GetAllFormTextFields();
+	if (arrAllFields.length <= 0)
+		return;
+
+	this.Selection_Remove();
+
+	var oInfo  = this.Get_SelectedElementsInfo();
+	var oField = oInfo.Get_Field();
+	var oForm  = null;
+	if (!oField || !oField.IsFillingForm())
+	{
+		oForm = arrAllFields[0];
+	}
+	else
+	{
+		for (var nIndex = 0, nCount = arrAllFields.length; nIndex < nCount; ++nIndex)
+		{
+			if (oField === arrAllFields[nIndex])
+			{
+				if (bNext)
+				{
+					if (nIndex < nCount - 1)
+						oForm = arrAllFields[nIndex + 1];
+					else
+						oForm = arrAllFields[0];
+				}
+				else
+				{
+					if (nIndex > 0)
+						oForm = arrAllFields[0];
+					else
+						oForm = arrAllFields[nCount - 1];
+				}
+
+				break;
+			}
+		}
+	}
+
+	if (oForm)
+	{
+		oForm.Cursor_MoveToStartPos();
+		if (oForm.Content.length >= 0 && para_Run === oForm.Content[0].Type)
+			oForm.Content[0].Make_ThisElementCurrent();
+
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateSelectionState();
+	}
 };
 
 function CDocumentSelectionState()

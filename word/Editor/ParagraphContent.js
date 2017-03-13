@@ -1527,7 +1527,8 @@ function ParaFootnoteReference(Footnote, CustomMark)
 	this.Run          = null;
 	this.Widths       = [];
 }
-AscCommon.extendClass(ParaFootnoteReference, CRunElementBase);
+ParaFootnoteReference.prototype = Object.create(CRunElementBase.prototype);
+ParaFootnoteReference.prototype.constructor = ParaFootnoteReference;
 ParaFootnoteReference.prototype.Type = para_FootnoteReference;
 ParaFootnoteReference.prototype.Get_Type = function()
 {
@@ -1710,9 +1711,10 @@ ParaFootnoteReference.prototype.GetCustomText = function()
  */
 function ParaFootnoteRef(Footnote)
 {
-	ParaFootnoteRef.superclass.constructor.call(this, Footnote);
+	ParaFootnoteReference.call(this, Footnote);
 }
-AscCommon.extendClass(ParaFootnoteRef, ParaFootnoteReference);
+ParaFootnoteRef.prototype = Object.create(ParaFootnoteReference.prototype);
+ParaFootnoteRef.prototype.constructor = ParaFootnoteRef;
 ParaFootnoteRef.prototype.Type = para_FootnoteRef;
 ParaFootnoteRef.prototype.Get_Type = function()
 {
@@ -1746,10 +1748,11 @@ ParaFootnoteRef.prototype.UpdateNumber = function(oFootnote)
  */
 function ParaSeparator()
 {
-	ParaSeparator.superclass.constructor.call(this);
+	CRunElementBase.call(this);
 	this.LineW = 0;
 }
-AscCommon.extendClass(ParaSeparator, CRunElementBase);
+ParaSeparator.prototype = Object.create(CRunElementBase.prototype);
+ParaSeparator.prototype.constructor = ParaSeparator;
 ParaSeparator.prototype.Type     = para_Separator;
 ParaSeparator.prototype.Get_Type = function()
 {
@@ -1799,10 +1802,11 @@ ParaSeparator.prototype.UpdateWidth = function(PRS)
  */
 function ParaContinuationSeparator()
 {
-	ParaContinuationSeparator.superclass.constructor.call(this);
+	CRunElementBase.call(this);
 	this.LineW = 0;
 }
-AscCommon.extendClass(ParaContinuationSeparator, CRunElementBase);
+ParaContinuationSeparator.prototype = Object.create(CRunElementBase.prototype);
+ParaContinuationSeparator.prototype.constructor = ParaContinuationSeparator;
 ParaContinuationSeparator.prototype.Type         = para_ContinuationSeparator;
 ParaContinuationSeparator.prototype.Get_Type     = function()
 {
@@ -1853,7 +1857,8 @@ function ParaPageCount(PageCount)
 	this.String    = "";
 	this.PageCount = undefined !== PageCount ? PageCount : 1;
 }
-AscCommon.extendClass(ParaPageCount, CRunElementBase);
+ParaPageCount.prototype = Object.create(CRunElementBase.prototype);
+ParaPageCount.prototype.constructor = ParaPageCount;
 ParaPageCount.prototype.Type = para_PageCount;
 ParaPageCount.prototype.Copy = function()
 {

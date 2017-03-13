@@ -219,7 +219,7 @@ CMathBorderBoxPr.prototype.Read_FromBinary = function(Reader)
  */
 function CBorderBox(props)
 {
-    CBorderBox.superclass.constructor.call(this);
+	CMathBase.call(this);
 
 	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -232,7 +232,8 @@ function CBorderBox(props)
 
     AscCommon.g_oTableId.Add(this, this.Id);
 }
-AscCommon.extendClass(CBorderBox, CMathBase);
+CBorderBox.prototype = Object.create(CMathBase.prototype);
+CBorderBox.prototype.constructor = CBorderBox;
 CBorderBox.prototype.ClassType = AscDFH.historyitem_type_borderBox;
 CBorderBox.prototype.kind      = MATH_BORDER_BOX;
 CBorderBox.prototype.init = function(props)
@@ -567,7 +568,7 @@ CBorderBox.prototype.Get_InterfaceProps = function()
  */
 function CMathMenuBorderBox(BorderBox)
 {
-    CMathMenuBorderBox.superclass.constructor.call(this, BorderBox);
+	CMathMenuBase.call(this, BorderBox);
 
     this.Type = Asc.c_oAscMathInterfaceType.BorderBox;
 
@@ -594,7 +595,8 @@ function CMathMenuBorderBox(BorderBox)
         this.HideTopRTL = undefined;
     }
 }
-AscCommon.extendClass(CMathMenuBorderBox, CMathMenuBase);
+CMathMenuBorderBox.prototype = Object.create(CMathMenuBase.prototype);
+CMathMenuBorderBox.prototype.constructor = CMathMenuBorderBox;
 CMathMenuBorderBox.prototype.get_HideTop = function(){return this.HideTop;};
 CMathMenuBorderBox.prototype.put_HideTop = function(bHideTop){this.HideTop = bHideTop;};
 CMathMenuBorderBox.prototype.get_HideBottom = function(){return this.HideBottom;};
@@ -777,7 +779,7 @@ CMathBoxPr.prototype.Read_FromBinary = function(Reader)
  */
 function CBox(props)
 {
-    CBox.superclass.constructor.call(this);
+	CMathBase.call(this);
 
 	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -790,7 +792,8 @@ function CBox(props)
 
     AscCommon.g_oTableId.Add( this, this.Id );
 }
-AscCommon.extendClass(CBox, CMathBase);
+CBox.prototype = Object.create(CMathBase.prototype);
+CBox.prototype.constructor = CBox;
 CBox.prototype.ClassType = AscDFH.historyitem_type_box;
 CBox.prototype.kind      = MATH_BOX;
 CBox.prototype.init = function(props)
@@ -951,11 +954,12 @@ CBox.prototype.Apply_ForcedBreak = function(Props)
  */
 function CMathMenuBox(Box)
 {
-    CMathMenuBox.superclass.constructor.call(this, Box);
+	CMathMenuBase.call(this, Box);
 
     this.Type = Asc.c_oAscMathInterfaceType.Box;
 }
-AscCommon.extendClass(CMathMenuBox, CMathMenuBase);
+CMathMenuBox.prototype = Object.create(CMathMenuBase.prototype);
+CMathMenuBox.prototype.constructor = CMathMenuBox;
 window["CMathMenuBox"] = CMathMenuBox;
 
 function CMathBarPr()
@@ -992,7 +996,7 @@ CMathBarPr.prototype.Read_FromBinary = function(Reader)
  */
 function CBar(props)
 {
-    CBar.superclass.constructor.call(this);
+	CCharacter.call(this);
 
 	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -1005,7 +1009,8 @@ function CBar(props)
 
     AscCommon.g_oTableId.Add( this, this.Id );
 }
-AscCommon.extendClass(CBar, CCharacter);
+CBar.prototype = Object.create(CCharacter.prototype);
+CBar.prototype.constructor = CBar;
 CBar.prototype.ClassType = AscDFH.historyitem_type_bar;
 CBar.prototype.kind      = MATH_BAR;
 CBar.prototype.init = function(props)
@@ -1041,7 +1046,7 @@ CBar.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
     this.ApplyProperties(RPI);
     this.operator.PreRecalc(this, ParaMath);
 
-    CBar.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
+	CCharacter.prototype.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
 };
 CBar.prototype.getAscent = function()
 {
@@ -1086,7 +1091,7 @@ CBar.prototype.raw_SetLinePos = function(Value)
  */
 function CMathMenuBar(Bar)
 {
-    CMathMenuBar.superclass.constructor.call(this, Bar);
+	CMathMenuBase.call(this, Bar);
 
     this.Type   = Asc.c_oAscMathInterfaceType.Bar;
 
@@ -1099,7 +1104,8 @@ function CMathMenuBar(Bar)
         this.Pos = undefined;
     }
 }
-AscCommon.extendClass(CMathMenuBar, CMathMenuBase);
+CMathMenuBar.prototype = Object.create(CMathMenuBase.prototype);
+CMathMenuBar.prototype.constructor = CMathMenuBar;
 
 CMathMenuBar.prototype.get_Pos = function(){return this.Pos};
 CMathMenuBar.prototype.put_Pos = function(Pos){this.Pos = Pos;};
@@ -1192,7 +1198,7 @@ CMathPhantomPr.prototype.Read_FromBinary = function(Reader)
  */
 function CPhantom(props)
 {
-    CPhantom.superclass.constructor.call(this);
+	CMathBase.call(this);
 
 	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -1203,7 +1209,8 @@ function CPhantom(props)
 
     AscCommon.g_oTableId.Add( this, this.Id );
 }
-AscCommon.extendClass(CPhantom, CMathBase);
+CPhantom.prototype = Object.create(CMathBase.prototype);
+CPhantom.prototype.constructor = CPhantom;
 CPhantom.prototype.ClassType = AscDFH.historyitem_type_phant;
 CPhantom.prototype.kind      = MATH_PHANTOM;
 CPhantom.prototype.init = function(props)

@@ -50,7 +50,7 @@ CParagraphContentBase.prototype.IsParagraphContentElement = function()
  */
 function CParagraphContentWithContentBase()
 {
-    CParagraphContentWithContentBase.superclass.constructor.call(this);
+	CParagraphContentBase.call(this);
     
     // Массив Lines разделен на три части
     // 1. Состоит из одного элемента, означающего количество строк
@@ -66,7 +66,8 @@ function CParagraphContentWithContentBase()
     this.StartRange  = -1;
 }
 
-AscCommon.extendClass(CParagraphContentWithContentBase, CParagraphContentBase);
+CParagraphContentWithContentBase.prototype = Object.create(CParagraphContentBase.prototype);
+CParagraphContentWithContentBase.prototype.constructor = CParagraphContentWithContentBase;
 
 CParagraphContentWithContentBase.prototype.Recalculate_Reset = function(StartRange, StartLine)
 {
@@ -214,7 +215,7 @@ CParagraphContentWithContentBase.prototype.CanSplit = function()
  */
 function CParagraphContentWithParagraphLikeContent()
 {
-    CParagraphContentWithParagraphLikeContent.superclass.constructor.call(this);
+	CParagraphContentWithContentBase.call(this);
 
     this.Type              = undefined;
     this.Paragraph         = null;                  // Ссылка на родительский класс параграф.
@@ -228,7 +229,8 @@ function CParagraphContentWithParagraphLikeContent()
     this.SearchMarks       = [];
 }
 
-AscCommon.extendClass(CParagraphContentWithParagraphLikeContent, CParagraphContentWithContentBase);
+CParagraphContentWithParagraphLikeContent.prototype = Object.create(CParagraphContentWithContentBase.prototype);
+CParagraphContentWithParagraphLikeContent.prototype.constructor = CParagraphContentWithParagraphLikeContent;
 
 CParagraphContentWithParagraphLikeContent.prototype.Get_Type = function()
 {

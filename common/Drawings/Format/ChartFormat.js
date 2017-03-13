@@ -3904,6 +3904,13 @@ CCatAx.prototype =
             this.setMinorTickMark(minorTickMark);
             bChanged = true;
         }
+        if(bChanged){
+            if(this.spPr && this.spPr.ln && this.spPr.ln.Fill
+                && this.spPr.ln.Fill.fill && this.spPr.ln.Fill.fill.type === window['Asc'].c_oAscFill.FILL_TYPE_NOFILL
+            && (this.majorTickMark !== c_oAscTickMark.TICK_MARK_NONE || this.minorTickMark !== c_oAscTickMark.TICK_MARK_NONE)){
+                this.spPr.setLn(null);
+            }
+        }
 
         if(AscFormat.isRealNumber(tickLabelsPos) && this.tickLblPos !== tickLabelsPos)
         {
@@ -5532,6 +5539,13 @@ CValAx.prototype =
         {
             this.setMinorTickMark(props.minorTickMark);
             bChanged = true;
+        }
+        if(bChanged){
+            if(this.spPr && this.spPr.ln && this.spPr.ln.Fill
+                && this.spPr.ln.Fill.fill && this.spPr.ln.Fill.fill.type === window['Asc'].c_oAscFill.FILL_TYPE_NOFILL
+                && (this.majorTickMark !== c_oAscTickMark.TICK_MARK_NONE || this.minorTickMark !== c_oAscTickMark.TICK_MARK_NONE)){
+                this.spPr.setLn(null);
+            }
         }
 
         if(AscFormat.isRealNumber(props.tickLabelsPos) && this.tickLblPos !== props.tickLabelsPos)
@@ -8831,7 +8845,18 @@ CMultiLvlStrCache.prototype =
     {
         History.Add(new CChangesDrawingsLong(this, AscDFH.historyitem_MultiLvlStrCache_SetPtCount, this.ptCount, pr));
         this.ptCount = pr;
-            }
+        },
+
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(this.getObjectType());
+        w.WriteString2(this.Get_Id());
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    }
 };
 
 function CMultiLvlStrRef()
@@ -11567,6 +11592,7 @@ function CSurfaceChart()
     this.m_oBandFormatsContentChanges = new AscCommon.CContentChanges();
 
     this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
 
 CSurfaceChart.prototype =

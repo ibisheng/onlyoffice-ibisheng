@@ -67,9 +67,10 @@ AscDFH.changesRelationMap[AscDFH.historyitem_Document_MathSettings]      = [AscD
  */
 function CChangesDocumentAddItem(Class, Pos, Items)
 {
-	CChangesDocumentAddItem.superclass.constructor.call(this, Class, Pos, Items, true);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Items, true);
 }
-AscCommon.extendClass(CChangesDocumentAddItem, AscDFH.CChangesBaseContentChange);
+CChangesDocumentAddItem.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesDocumentAddItem.prototype.constructor = CChangesDocumentAddItem;
 CChangesDocumentAddItem.prototype.Type = AscDFH.historyitem_Document_AddItem;
 CChangesDocumentAddItem.prototype.Undo = function()
 {
@@ -211,9 +212,10 @@ CChangesDocumentAddItem.prototype.CreateReverseChange = function()
  */
 function CChangesDocumentRemoveItem(Class, Pos, Items)
 {
-	CChangesDocumentRemoveItem.superclass.constructor.call(this, Class, Pos, Items, false);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Items, false);
 }
-AscCommon.extendClass(CChangesDocumentRemoveItem, AscDFH.CChangesBaseContentChange);
+CChangesDocumentRemoveItem.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesDocumentRemoveItem.prototype.constructor = CChangesDocumentRemoveItem;
 CChangesDocumentRemoveItem.prototype.Type = AscDFH.historyitem_Document_RemoveItem;
 CChangesDocumentRemoveItem.prototype.Undo = function()
 {
@@ -346,12 +348,13 @@ CChangesDocumentRemoveItem.prototype.CreateReverseChange = function()
  */
 function CChangesDocumentDefaultTab(Class, Old, New)
 {
-	CChangesDocumentDefaultTab.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 
 	this.Old = Old;
 	this.New = New;
 }
-AscCommon.extendClass(CChangesDocumentDefaultTab, AscDFH.CChangesBase);
+CChangesDocumentDefaultTab.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesDocumentDefaultTab.prototype.constructor = CChangesDocumentDefaultTab;
 CChangesDocumentDefaultTab.prototype.Type = AscDFH.historyitem_Document_DefaultTab;
 CChangesDocumentDefaultTab.prototype.Undo = function()
 {
@@ -385,12 +388,13 @@ CChangesDocumentDefaultTab.prototype.CreateReverseChange = function()
  */
 function CChangesDocumentEvenAndOddHeaders(Class, Old, New)
 {
-	CChangesDocumentEvenAndOddHeaders.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 
 	this.Old = Old;
 	this.New = New;
 }
-AscCommon.extendClass(CChangesDocumentEvenAndOddHeaders, AscDFH.CChangesBase);
+CChangesDocumentEvenAndOddHeaders.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesDocumentEvenAndOddHeaders.prototype.constructor = CChangesDocumentEvenAndOddHeaders;
 CChangesDocumentEvenAndOddHeaders.prototype.Type = AscDFH.historyitem_Document_EvenAndOddHeaders;
 CChangesDocumentEvenAndOddHeaders.prototype.Undo = function()
 {
@@ -424,12 +428,13 @@ CChangesDocumentEvenAndOddHeaders.prototype.CreateReverseChange = function()
  */
 function CChangesDocumentDefaultLanguage(Class, Old, New)
 {
-	CChangesDocumentDefaultLanguage.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 
 	this.Old = Old;
 	this.New = New;
 }
-AscCommon.extendClass(CChangesDocumentDefaultLanguage, AscDFH.CChangesBase);
+CChangesDocumentDefaultLanguage.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesDocumentDefaultLanguage.prototype.constructor = CChangesDocumentDefaultLanguage;
 CChangesDocumentDefaultLanguage.prototype.Type = AscDFH.historyitem_Document_DefaultLanguage;
 CChangesDocumentDefaultLanguage.prototype.Undo = function()
 {
@@ -467,12 +472,13 @@ CChangesDocumentDefaultLanguage.prototype.CreateReverseChange = function()
  */
 function CChangesDocumentMathSettings(Class, Old, New)
 {
-	CChangesDocumentMathSettings.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 
 	this.Old = Old;
 	this.New = New;
 }
-AscCommon.extendClass(CChangesDocumentMathSettings, AscDFH.CChangesBase);
+CChangesDocumentMathSettings.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesDocumentMathSettings.prototype.constructor = CChangesDocumentMathSettings;
 CChangesDocumentMathSettings.prototype.Type = AscDFH.historyitem_Document_MathSettings;
 CChangesDocumentMathSettings.prototype.Undo = function()
 {

@@ -42,7 +42,7 @@ var History = AscCommon.History;
  */
 function ParaHyperlink()
 {
-    ParaHyperlink.superclass.constructor.call(this);
+	CParagraphContentWithParagraphLikeContent.call(this);
 
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -55,7 +55,8 @@ function ParaHyperlink()
     AscCommon.g_oTableId.Add( this, this.Id );
 }
 
-AscCommon.extendClass(ParaHyperlink, CParagraphContentWithParagraphLikeContent);
+ParaHyperlink.prototype = Object.create(CParagraphContentWithParagraphLikeContent.prototype);
+ParaHyperlink.prototype.constructor = ParaHyperlink;
 
 ParaHyperlink.prototype.Get_Id = function()
 {
@@ -64,7 +65,7 @@ ParaHyperlink.prototype.Get_Id = function()
 
 ParaHyperlink.prototype.Copy = function(Selected)
 {
-    var NewHyperlink = ParaHyperlink.superclass.Copy.apply(this, arguments);
+    var NewHyperlink = CParagraphContentWithParagraphLikeContent.prototype.Copy.apply(this, arguments);
     NewHyperlink.Set_Value(this.Value);
     NewHyperlink.Set_ToolTip(this.ToolTip);
     NewHyperlink.Visited = this.Visited;
@@ -75,7 +76,7 @@ ParaHyperlink.prototype.Get_SelectedElementsInfo = function(Info)
 {
     Info.Set_Hyperlink(this);
 
-    ParaHyperlink.superclass.Get_SelectedElementsInfo.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Get_SelectedElementsInfo.apply(this, arguments);
 };
 
 ParaHyperlink.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
@@ -93,7 +94,7 @@ ParaHyperlink.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 
 	History.Add(new CChangesHyperlinkAddItem(this, Pos, [Item]));
 
-    ParaHyperlink.superclass.Add_ToContent.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Add_ToContent.apply(this, arguments);
 };
 
 ParaHyperlink.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
@@ -102,7 +103,7 @@ ParaHyperlink.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition
     var DeletedItems = this.Content.slice( Pos, Pos + Count );
     History.Add(new CChangesHyperlinkRemoveItem(this, Pos, DeletedItems));
 
-    ParaHyperlink.superclass.Remove_FromContent.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Remove_FromContent.apply(this, arguments);
 };
 
 ParaHyperlink.prototype.Add = function(Item)
@@ -246,7 +247,7 @@ ParaHyperlink.prototype.Clear_TextFormatting = function( DefHyper )
 
 ParaHyperlink.prototype.Split = function (ContentPos, Depth)
 {
-    var NewHyperlink = ParaHyperlink.superclass.Split.apply(this, arguments);
+    var NewHyperlink = CParagraphContentWithParagraphLikeContent.prototype.Split.apply(this, arguments);
     NewHyperlink.Set_Value(this.Value);
     NewHyperlink.Set_ToolTip(this.ToolTip);
     return NewHyperlink;
@@ -254,7 +255,7 @@ ParaHyperlink.prototype.Split = function (ContentPos, Depth)
 
 ParaHyperlink.prototype.CopyContent = function(Selected)
 {
-    var Content = ParaHyperlink.superclass.CopyContent.apply(this, arguments);
+    var Content = CParagraphContentWithParagraphLikeContent.prototype.CopyContent.apply(this, arguments);
 
     for (var CurPos = 0, Count = Content.length; CurPos < Count; CurPos++)
     {
@@ -271,14 +272,14 @@ ParaHyperlink.prototype.CopyContent = function(Selected)
 ParaHyperlink.prototype.Draw_Elements = function(PDSE)
 {
     PDSE.VisitedHyperlink = this.Visited;
-    ParaHyperlink.superclass.Draw_Elements.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Draw_Elements.apply(this, arguments);
     PDSE.VisitedHyperlink = false;
 };
 
 ParaHyperlink.prototype.Draw_Lines = function(PDSL)
 {
     PDSL.VisitedHyperlink = this.Visited;
-    ParaHyperlink.superclass.Draw_Lines.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Draw_Lines.apply(this, arguments);
     PDSL.VisitedHyperlink = false;
 };
 //-----------------------------------------------------------------------------------
@@ -395,7 +396,7 @@ ParaHyperlink.prototype.Document_UpdateInterfaceState = function()
 
     editor.sync_HyperlinkPropCallback(HyperProps);
 
-    ParaHyperlink.superclass.Document_UpdateInterfaceState.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Document_UpdateInterfaceState.apply(this, arguments);
 };
 
 function CParaHyperLinkStartState(HyperLink)

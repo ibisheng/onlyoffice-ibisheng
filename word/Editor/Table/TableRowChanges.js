@@ -108,9 +108,10 @@ function private_TableRowChangesOnMergePr(oChange)
  */
 function CChangesTableRowBefore(Class, Old, New, Color)
 {
-	CChangesTableRowBefore.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableRowBefore, AscDFH.CChangesBaseProperty);
+CChangesTableRowBefore.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesTableRowBefore.prototype.constructor = CChangesTableRowBefore;
 CChangesTableRowBefore.prototype.Type = AscDFH.historyitem_TableRow_Before;
 CChangesTableRowBefore.prototype.WriteToBinary = function(Writer)
 {
@@ -214,9 +215,10 @@ CChangesTableRowBefore.prototype.Merge = private_TableRowChangesOnMergePr;
  */
 function CChangesTableRowAfter(Class, Old, New, Color)
 {
-	CChangesTableRowAfter.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableRowAfter, AscDFH.CChangesBaseProperty);
+CChangesTableRowAfter.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesTableRowAfter.prototype.constructor = CChangesTableRowAfter;
 CChangesTableRowAfter.prototype.Type = AscDFH.historyitem_TableRow_After;
 CChangesTableRowAfter.prototype.WriteToBinary = function(Writer)
 {
@@ -320,9 +322,10 @@ CChangesTableRowAfter.prototype.Merge = private_TableRowChangesOnMergePr;
  */
 function CChangesTableRowCellSpacing(Class, Old, New, Color)
 {
-	CChangesTableRowCellSpacing.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableRowCellSpacing, AscDFH.CChangesBaseProperty);
+CChangesTableRowCellSpacing.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesTableRowCellSpacing.prototype.constructor = CChangesTableRowCellSpacing;
 CChangesTableRowCellSpacing.prototype.Type = AscDFH.historyitem_TableRow_CellSpacing;
 CChangesTableRowCellSpacing.prototype.WriteToBinary = function(Writer)
 {
@@ -391,9 +394,10 @@ CChangesTableRowCellSpacing.prototype.Merge = private_TableRowChangesOnMergePr;
  */
 function CChangesTableRowHeight(Class, Old, New, Color)
 {
-	CChangesTableRowHeight.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableRowHeight, AscDFH.CChangesBaseObjectProperty);
+CChangesTableRowHeight.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesTableRowHeight.prototype.constructor = CChangesTableRowHeight;
 CChangesTableRowHeight.prototype.Type = AscDFH.historyitem_TableRow_Height;
 CChangesTableRowHeight.prototype.private_CreateObject = function()
 {
@@ -412,9 +416,10 @@ CChangesTableRowHeight.prototype.Merge = private_TableRowChangesOnMergePr;
  */
 function CChangesTableRowAddCell(Class, Pos, Cells)
 {
-	CChangesTableRowAddCell.superclass.constructor.call(this, Class, Pos, Cells, true);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Cells, true);
 }
-AscCommon.extendClass(CChangesTableRowAddCell, AscDFH.CChangesBaseContentChange);
+CChangesTableRowAddCell.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesTableRowAddCell.prototype.constructor = CChangesTableRowAddCell;
 CChangesTableRowAddCell.prototype.Type = AscDFH.historyitem_TableRow_AddCell;
 CChangesTableRowAddCell.prototype.Undo = function()
 {
@@ -479,9 +484,10 @@ CChangesTableRowAddCell.prototype.CreateReverseChange = function()
  */
 function CChangesTableRowRemoveCell(Class, Pos, Cells)
 {
-	CChangesTableRowRemoveCell.superclass.constructor.call(this, Class, Pos, Cells, false);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Cells, false);
 }
-AscCommon.extendClass(CChangesTableRowRemoveCell, AscDFH.CChangesBaseContentChange);
+CChangesTableRowRemoveCell.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesTableRowRemoveCell.prototype.constructor = CChangesTableRowRemoveCell;
 CChangesTableRowRemoveCell.prototype.Type = AscDFH.historyitem_TableRow_RemoveCell;
 CChangesTableRowRemoveCell.prototype.Undo = function()
 {
@@ -544,9 +550,10 @@ CChangesTableRowRemoveCell.prototype.CreateReverseChange = function()
  */
 function CChangesTableRowTableHeader(Class, Old, New, Color)
 {
-	CChangesTableRowTableHeader.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableRowTableHeader, AscDFH.CChangesBaseBoolProperty);
+CChangesTableRowTableHeader.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesTableRowTableHeader.prototype.constructor = CChangesTableRowTableHeader;
 CChangesTableRowTableHeader.prototype.Type = AscDFH.historyitem_TableRow_TableHeader;
 CChangesTableRowTableHeader.prototype.private_SetValue = function(Value)
 {
@@ -561,9 +568,10 @@ CChangesTableRowTableHeader.prototype.Merge = private_TableRowChangesOnMergePr;
  */
 function CChangesTableRowPr(Class, Old, New, Color)
 {
-	CChangesTableRowPr.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectValue.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableRowPr, AscDFH.CChangesBaseObjectValue);
+CChangesTableRowPr.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesTableRowPr.prototype.constructor = CChangesTableRowPr;
 CChangesTableRowPr.prototype.Type = AscDFH.historyitem_TableRow_Pr;
 CChangesTableRowPr.prototype.private_CreateObject = function()
 {

@@ -388,11 +388,11 @@ function CChangesGeometryAddAdj(Class, Name, OldValue, NewValue, OldAvValue, bRe
     this.NewValue = NewValue;
     this.OldAvValue = OldAvValue;
     this.bReverse = bReverse;
-    CChangesGeometryAddAdj.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 }
-AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
 
-
+	CChangesGeometryAddAdj.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesGeometryAddAdj.prototype.constructor = CChangesGeometryAddAdj;
 
     CChangesGeometryAddAdj.prototype.CreateReverseChange = function(){
         return new CChangesGeometryAddAdj(this.Class, this.Name, this.OldValue, this.NewValue, this.OldAvValue, !this.bReverse)
@@ -465,10 +465,11 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
         this.y = y;
         this.z = z;
         this.bReverse = bReverse;
-        CChangesGeometryAddGuide.superclass.constructor.call(this, Class);
+		AscDFH.CChangesBase.call(this, Class);
     }
-    AscCommon.extendClass(CChangesGeometryAddGuide, AscDFH.CChangesBase);
 
+	CChangesGeometryAddGuide.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesGeometryAddGuide.prototype.constructor = CChangesGeometryAddGuide;
 
     CChangesGeometryAddGuide.prototype.RemoveGuide = function(){
         var aGdLstInfo = this.Class.gdLstInfo;
@@ -531,9 +532,11 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
         this.x = x;
         this.y = y;
         this.bReverse = bReverse;
-        CChangesGeometryAddCnx.superclass.constructor.call(this, Class);
+		AscDFH.CChangesBase.call(this, Class);
     }
-    AscCommon.extendClass(CChangesGeometryAddCnx, AscDFH.CChangesBase);
+
+	CChangesGeometryAddCnx.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesGeometryAddCnx.prototype.constructor = CChangesGeometryAddCnx;
 
 
     CChangesGeometryAddCnx.prototype.RemoveCnx = function(){
@@ -595,9 +598,11 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
         this.posX = posX;
         this.posY = posY;
         this.bReverse = bReverse;
-        CChangesGeometryAddHandleXY.superclass.constructor.call(this, Class);
+		AscDFH.CChangesBase.call(this, Class);
     }
-    AscCommon.extendClass(CChangesGeometryAddHandleXY, AscDFH.CChangesBase);
+
+	CChangesGeometryAddHandleXY.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesGeometryAddHandleXY.prototype.constructor = CChangesGeometryAddHandleXY;
 
     CChangesGeometryAddHandleXY.prototype.RemoveHandleXY = function(){
         var ahXYLstInfo = this.Class.ahXYLstInfo;
@@ -669,10 +674,11 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
         this.posX = posX;
         this.posY = posY;
         this.bReverse = bReverse;
-        CChangesGeometryAddHandlePolar.superclass.constructor.call(this, Class);
+		AscDFH.CChangesBase.call(this, Class);
     }
-    AscCommon.extendClass(CChangesGeometryAddHandlePolar, AscDFH.CChangesBase);
 
+	CChangesGeometryAddHandlePolar.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesGeometryAddHandlePolar.prototype.constructor = CChangesGeometryAddHandlePolar;
 
     CChangesGeometryAddHandlePolar.prototype.RemoveHandlePolar = function(){
         var ahPolarLstInfo = this.Class.ahPolarLstInfo;
@@ -740,9 +746,11 @@ AscCommon.extendClass(CChangesGeometryAddAdj, AscDFH.CChangesBase);
         this.r = r;
         this.b = b;
         this.bReverse = bReverse;
-        CChangesGeometryAddRect.superclass.constructor.call(this, Class);
+		AscDFH.CChangesBase.call(this, Class);
     }
-    AscCommon.extendClass(CChangesGeometryAddRect, AscDFH.CChangesBase);
+
+	CChangesGeometryAddRect.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesGeometryAddRect.prototype.constructor = CChangesGeometryAddRect;
     CChangesGeometryAddRect.prototype.Undo = function(){
         if(this.bReverse){
             this.Class.rectS = {l: this.l, t: this.t, r: this.r, b: this.b};

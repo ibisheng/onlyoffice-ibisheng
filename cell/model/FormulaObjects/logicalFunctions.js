@@ -63,6 +63,7 @@
 	}
 
 	cAND.prototype = Object.create(cBaseFunction.prototype);
+	cAND.prototype.constructor = cAND;
 	cAND.prototype.Calculate = function (arg) {
 		var argResult = null;
 		for (var i = 0; i < arg.length; i++) {
@@ -138,6 +139,7 @@
 	}
 
 	cFALSE.prototype = Object.create(cBaseFunction.prototype);
+	cFALSE.prototype.constructor = cFALSE;
 	cFALSE.prototype.Calculate = function () {
 		return this.value = new cBool(false);
 	};
@@ -157,6 +159,7 @@
 	}
 
 	cIF.prototype = Object.create(cBaseFunction.prototype);
+	cIF.prototype.constructor = cIF;
 	cIF.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 
@@ -199,6 +202,7 @@
 	}
 
 	cIFERROR.prototype = Object.create(cBaseFunction.prototype);
+	cIFERROR.prototype.constructor = cIFERROR;
 	cIFERROR.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArray) {
@@ -233,6 +237,7 @@
 	}
 
 	cNOT.prototype = Object.create(cBaseFunction.prototype);
+	cNOT.prototype.constructor = cNOT;
 	cNOT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArray) {
@@ -272,6 +277,7 @@
 	}
 
 	cOR.prototype = Object.create(cBaseFunction.prototype);
+	cOR.prototype.constructor = cOR;
 	cOR.prototype.Calculate = function (arg) {
 		var argResult = null;
 		for (var i = 0; i < arg.length; i++) {
@@ -344,6 +350,7 @@
 	}
 
 	cTRUE.prototype = Object.create(cBaseFunction.prototype);
+	cTRUE.prototype.constructor = cTRUE;
 	cTRUE.prototype.Calculate = function () {
 		return this.value = new cBool(true);
 	};

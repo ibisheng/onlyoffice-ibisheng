@@ -44,6 +44,12 @@ var G_O_DEFAULT_COLOR_MAP = AscFormat.GenerateDefaultColorMap();
 CShape.prototype.setDrawingObjects = function(drawingObjects)
 {
 };
+
+
+    CShape.prototype.getEditorType = function()
+    {
+        return 0;
+    };
 CShape.prototype.setDrawingBase = function(drawingBase)
 {
     this.drawingBase = drawingBase;
@@ -204,9 +210,10 @@ function addToDrawings(worksheet, graphic, position, lockByDefault, anchor)
 function CChangesDrawingObjectsAddToDrawingObjects(Class, Pos){
     this.Pos = Pos;
     this.Type = AscDFH.historyitem_AutoShapes_AddToDrawingObjects;
-    CChangesDrawingObjectsAddToDrawingObjects.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 }
-AscCommon.extendClass(CChangesDrawingObjectsAddToDrawingObjects, AscDFH.CChangesBase);
+	CChangesDrawingObjectsAddToDrawingObjects.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesDrawingObjectsAddToDrawingObjects.prototype.constructor = CChangesDrawingObjectsAddToDrawingObjects;
     CChangesDrawingObjectsAddToDrawingObjects.prototype.Undo = function(){
         AscFormat.deleteDrawingBase(this.Class.worksheet.Drawings, this.Class.Get_Id());
     };
@@ -228,9 +235,10 @@ AscCommon.extendClass(CChangesDrawingObjectsAddToDrawingObjects, AscDFH.CChanges
 function CChangesDrawingObjectsRemoveFromDrawingObjects(Class, Pos){
     this.Type = AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects;
     this.Pos = Pos;
-    CChangesDrawingObjectsRemoveFromDrawingObjects.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 }
-AscCommon.extendClass(CChangesDrawingObjectsRemoveFromDrawingObjects, AscDFH.CChangesBase);
+	CChangesDrawingObjectsRemoveFromDrawingObjects.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesDrawingObjectsRemoveFromDrawingObjects.prototype.constructor = CChangesDrawingObjectsRemoveFromDrawingObjects;
     CChangesDrawingObjectsRemoveFromDrawingObjects.prototype.Undo = function(){
         AscFormat.addToDrawings(this.Class.worksheet, this.Class, this.Pos);
     };

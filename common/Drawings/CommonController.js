@@ -4295,7 +4295,12 @@ DrawingObjectsController.prototype =
 
         if(data_labels)
         {
-            this.collectPropsFromDLbls(nDefaultDatalabelsPos, data_labels, ret);
+            if(chart_type.series[0] && chart_type.series[0].dLbls){
+                this.collectPropsFromDLbls(nDefaultDatalabelsPos, chart_type.series[0].dLbls, ret);
+            }
+            else{
+                this.collectPropsFromDLbls(nDefaultDatalabelsPos, data_labels, ret);
+            }
         }
         else
         {
@@ -4592,7 +4597,7 @@ DrawingObjectsController.prototype =
         ret.putShowCatName(data_labels.showCatName === true);
         ret.putShowVal(data_labels.showVal === true);
         ret.putSeparator(data_labels.separator);
-        if(data_labels.showSerName || data_labels.showCatName || data_labels.showVal){
+        if(data_labels.showSerName || data_labels.showCatName || data_labels.showVal || data_labels.showPercent){
             ret.putDataLabelsPos(AscFormat.isRealNumber(data_labels.dLblPos) ? data_labels.dLblPos :  nDefaultDatalabelsPos);
         }
         else{
@@ -8041,27 +8046,27 @@ DrawingObjectsController.prototype =
             {
                 if(Props.Brd.Left && Props.Brd.Left.Color)
                 {
-                    Props.Brd.Left.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Left.Color);
+                    Props.Brd.Left.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Left.Color, 1);
                 }
                 if(Props.Brd.Top && Props.Brd.Top.Color)
                 {
-                    Props.Brd.Top.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Top.Color);
+                    Props.Brd.Top.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Top.Color, 1);
                 }
                 if(Props.Brd.Right && Props.Brd.Right.Color)
                 {
-                    Props.Brd.Right.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Right.Color);
+                    Props.Brd.Right.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Right.Color, 1);
                 }
                 if(Props.Brd.Bottom && Props.Brd.Bottom.Color)
                 {
-                    Props.Brd.Bottom.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Bottom.Color);
+                    Props.Brd.Bottom.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Bottom.Color, 1);
                 }
                 if(Props.Brd.InsideH && Props.Brd.InsideH.Color)
                 {
-                    Props.Brd.InsideH.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.InsideH.Color);
+                    Props.Brd.InsideH.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.InsideH.Color, 1);
                 }
                 if(Props.Brd.InsideV && Props.Brd.InsideV.Color)
                 {
-                    Props.Brd.InsideV.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.InsideV.Color);
+                    Props.Brd.InsideV.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.InsideV.Color, 1);
                 }
 
                 this.setParagraphBorders( Props.Brd );
@@ -10285,10 +10290,16 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
 
 
     if(oChart.getObjectType() === AscDFH.historyitem_type_StockChart){
-        var oOlDSpPr = oChartSpace.spPr && oChartSpace.spPr.createDuplicate();
-        oChartSpace.setSpPr(null);
-        ApplySpPr(aPreset[23], oChartSpace);
-        oChart.setHiLowLines(oChartSpace.spPr);
+        var oSpPr = oChartSpace.spPr;
+        if(oChart.hiLowLines){
+            oChartSpace.spPr = oChart.hiLowLines;
+            ApplySpPr(aPreset[23], oChartSpace);
+        }
+        else{
+            oChartSpace.spPr = new AscFormat.CSpPr();
+            ApplySpPr(aPreset[23], oChartSpace);
+            oChart.setHiLowLines(oChartSpace.spPr);
+        }
 
         if(!aPreset[24]){
             oChart.setUpDownBars(null);
@@ -10297,15 +10308,30 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
             if(!oChart.upDownBars){
                 oChart.setUpDownBars(new AscFormat.CUpDownBars());
             }
-            oChartSpace.setSpPr(null);
-            ApplySpPr(aPreset[24][0], oChartSpace);
-            oChart.upDownBars.setDownBars(oChartSpace.spPr);
+
+            if(oChart.upDownBars.downBars){
+                oChartSpace.spPr = oChart.upDownBars.downBars;
+                ApplySpPr(aPreset[24][0], oChartSpace);
+            }
+            else{
+                oChartSpace.spPr = new AscFormat.CSpPr();
+                ApplySpPr(aPreset[24][0], oChartSpace);
+                oChart.upDownBars.setDownBars(oChartSpace.spPr);
+            }
+
             oChart.upDownBars.setGapWidth(aPreset[24][1]);
-            oChartSpace.setSpPr(null);
-            ApplySpPr(aPreset[24][2], oChartSpace);
-            oChart.upDownBars.setUpBars(oChartSpace.spPr);
+
+            if(oChart.upDownBars.upBars){
+                oChartSpace.spPr = oChart.upDownBars.upBars;
+                ApplySpPr(aPreset[24][2], oChartSpace);
+            }
+            else{
+                oChartSpace.spPr = new AscFormat.CSpPr();
+                ApplySpPr(aPreset[24][2], oChartSpace);
+                oChart.upDownBars.setUpBars(oChartSpace.spPr);
+            }
         }
-        oChartSpace.setSpPr(oOlDSpPr);
+        oChartSpace.spPr = oSpPr;
     }
 }
     function CMathPainter(_api)

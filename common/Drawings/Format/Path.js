@@ -65,9 +65,11 @@ function CChangesDrawingsAddPathCommand(Class, oCommand, nIndex, bReverse){
     this.Command = oCommand;
     this.Index = nIndex;
     this.bReverse = bReverse;
-    CChangesDrawingsAddPathCommand.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 }
-AscCommon.extendClass(CChangesDrawingsAddPathCommand, AscDFH.CChangesBase);
+
+	CChangesDrawingsAddPathCommand.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesDrawingsAddPathCommand.prototype.constructor = CChangesDrawingsAddPathCommand;
 
     CChangesDrawingsAddPathCommand.prototype.Undo = function(){
         if(this.bReverse){

@@ -76,7 +76,7 @@ CMathDegreePr.prototype.Read_FromBinary = function(Reader)
  */
 function CDegreeBase(props, bInside)
 {
-    CDegreeBase.superclass.constructor.call(this, bInside);
+	CMathBase.call(this, bInside);
 
     this.upBase = 0; // отступ сверху для основания
     this.upIter = 0; // отступ сверху для итератора
@@ -91,7 +91,8 @@ function CDegreeBase(props, bInside)
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 }
-AscCommon.extendClass(CDegreeBase, CMathBase);
+CDegreeBase.prototype = Object.create(CMathBase.prototype);
+CDegreeBase.prototype.constructor = CDegreeBase;
 CDegreeBase.prototype.init = function(props)
 {
     this.setProperties(props);
@@ -440,7 +441,7 @@ CDegreeBase.prototype.setIterator = function(iterator)
  */
 function CDegree(props, bInside)
 {
-    CDegree.superclass.constructor.call(this, props, bInside);
+	CDegreeBase.call(this, props, bInside);
 
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -449,7 +450,8 @@ function CDegree(props, bInside)
 
     AscCommon.g_oTableId.Add( this, this.Id );
 }
-AscCommon.extendClass(CDegree, CDegreeBase);
+CDegree.prototype = Object.create(CDegreeBase.prototype);
+CDegree.prototype.constructor = CDegree;
 CDegree.prototype.ClassType = AscDFH.historyitem_type_deg;
 CDegree.prototype.kind      = MATH_DEGREE;
 CDegree.prototype.init = function(props)
@@ -466,7 +468,7 @@ CDegree.prototype.fillContent = function()
     this.iterContent = this.Content[1];
     this.baseContent = this.Content[0];
 
-    CDegree.superclass.fillContent.call(this);
+    CDegreeBase.prototype.fillContent.call(this);
 };
 CDegree.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
@@ -523,7 +525,7 @@ CDegree.prototype.setPosition = function(pos, PosInfo)
 
     if(this.bOneLine || EndPos == Len - 1)
     {
-        CDegree.superclass.setPosition.call(this, pos, PosInfo);
+        CDegreeBase.prototype.setPosition.call(this, pos, PosInfo);
     }
     else
     {
@@ -549,12 +551,13 @@ CDegree.prototype.Can_ModifyArgSize = function()
  */
 function CIterators(iterUp, iterDn)
 {
-    CIterators.superclass.constructor.call(this, true);
+	CMathBase.call(this, true);
 
     this.iterUp = iterUp;
     this.iterDn = iterDn;
 }
-AscCommon.extendClass(CIterators, CMathBase);
+CIterators.prototype = Object.create(CMathBase.prototype);
+CIterators.prototype.constructor = CIterators;
 CIterators.prototype.init = function()
 {
     this.setDimension(2, 1);
@@ -693,7 +696,7 @@ CMathDegreeSubSupPr.prototype.Read_FromBinary = function(Reader)
  */
 function CDegreeSubSupBase(props, bInside)
 {
-    CDegreeSubSupBase.superclass.constructor.call(this, bInside);
+	CMathBase.call(this, bInside);
 
     this.bNaryInline = false;
 
@@ -705,7 +708,8 @@ function CDegreeSubSupBase(props, bInside)
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 }
-AscCommon.extendClass(CDegreeSubSupBase, CMathBase);
+CDegreeSubSupBase.prototype = Object.create(CMathBase.prototype);
+CDegreeSubSupBase.prototype.constructor = CDegreeSubSupBase;
 CDegreeSubSupBase.prototype.init = function(props)
 {
     this.setProperties(props);
@@ -735,7 +739,7 @@ CDegreeSubSupBase.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI,
 {
     this.bNaryInline = RPI.bNaryInline;
 
-    CDegreeSubSupBase.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
+	CMathBase.prototype.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
 };
 CDegreeSubSupBase.prototype.recalculateSize = function(oMeasure)
 {
@@ -896,7 +900,7 @@ CDegreeSubSupBase.prototype.setLowerIterator = function(iterator)
  */
 function CDegreeSubSup(props, bInside)
 {
-    CDegreeSubSup.superclass.constructor.call(this, props, bInside);
+	CDegreeSubSupBase.call(this, props, bInside);
 
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -905,7 +909,8 @@ function CDegreeSubSup(props, bInside)
 
     AscCommon.g_oTableId.Add( this, this.Id );
 }
-AscCommon.extendClass(CDegreeSubSup, CDegreeSubSupBase);
+CDegreeSubSup.prototype = Object.create(CDegreeSubSupBase.prototype);
+CDegreeSubSup.prototype.constructor = CDegreeSubSup;
 CDegreeSubSup.prototype.ClassType = AscDFH.historyitem_type_deg_subsup;
 CDegreeSubSup.prototype.kind      = MATH_DEGREESubSup;
 CDegreeSubSup.prototype.init = function(props)
@@ -930,7 +935,7 @@ CDegreeSubSup.prototype.fillContent = function()
      this.baseContent = this.Content[0];
      this.iters = new CIterators(this.Content[1], this.Content[2]);
 
-    CDegreeSubSup.superclass.fillContent.call(this);
+    CDegreeSubSupBase.prototype.fillContent.call(this);
 };
 CDegreeSubSup.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
@@ -977,7 +982,7 @@ CDegreeSubSup.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     if(this.bOneLine === true)
     {
-        CDegreeSubSup.superclass.Recalculate_Range.call(this, PRS, ParaPr, Depth);
+        CDegreeSubSupBase.prototype.Recalculate_Range.call(this, PRS, ParaPr, Depth);
     }
     else
     {
@@ -1043,7 +1048,7 @@ CDegreeSubSup.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurR
 {
     if(this.bOneLine == true)
     {
-        CDegreeSubSup.superclass.Recalculate_Range_Width.call(this, PRSC, _CurLine, _CurRange);
+        CDegreeSubSupBase.prototype.Recalculate_Range_Width.call(this, PRSC, _CurLine, _CurRange);
     }
     else
     {
@@ -1087,7 +1092,7 @@ CDegreeSubSup.prototype.setPosition = function(pos, PosInfo)
 {
     if(this.bOneLine)
     {
-        CDegreeSubSup.superclass.setPosition.call(this, pos, PosInfo);
+        CDegreeSubSupBase.prototype.setPosition.call(this, pos, PosInfo);
     }
     else
     {
@@ -1199,7 +1204,7 @@ CDegreeSubSup.prototype.Can_ModifyArgSize = function()
  */
 function CMathMenuScript(Script, Type)
 {
-    CMathMenuScript.superclass.constructor.call(this, Script);
+	CMathMenuBase.call(this, Script);
 
     this.Type       = Asc.c_oAscMathInterfaceType.Script;
 
@@ -1208,7 +1213,8 @@ function CMathMenuScript(Script, Type)
     else
         this.ScriptType = undefined;
 }
-AscCommon.extendClass(CMathMenuScript, CMathMenuBase);
+CMathMenuScript.prototype = Object.create(CMathMenuBase.prototype);
+CMathMenuScript.prototype.constructor = CMathMenuScript;
 
 CMathMenuScript.prototype.get_ScriptType = function(){return this.ScriptType;};
 CMathMenuScript.prototype.put_ScriptType = function(Type){this.ScriptType = Type;};

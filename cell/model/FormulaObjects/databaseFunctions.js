@@ -50,6 +50,7 @@
 	}
 
 	cDAVERAGE.prototype = Object.create(cBaseFunction.prototype);
+	cDAVERAGE.prototype.constructor = cDAVERAGE;
 
 	/** @constructor */
 	function cDCOUNT() {
@@ -57,6 +58,7 @@
 	}
 
 	cDCOUNT.prototype = Object.create(cBaseFunction.prototype);
+	cDCOUNT.prototype.constructor = cDCOUNT;
 
 	/** @constructor */
 	function cDCOUNTA() {
@@ -64,6 +66,7 @@
 	}
 
 	cDCOUNTA.prototype = Object.create(cBaseFunction.prototype);
+	cDCOUNTA.prototype.constructor = cDCOUNTA;
 
 	/** @constructor */
 	function cDGET() {
@@ -71,6 +74,7 @@
 	}
 
 	cDGET.prototype = Object.create(cBaseFunction.prototype);
+	cDGET.prototype.constructor = cDGET;
 
 	/** @constructor */
 	function cDMAX() {
@@ -78,6 +82,7 @@
 	}
 
 	cDMAX.prototype = Object.create(cBaseFunction.prototype);
+	cDMAX.prototype.constructor = cDMAX;
 
 	/** @constructor */
 	function cDMIN() {
@@ -85,6 +90,7 @@
 	}
 
 	cDMIN.prototype = Object.create(cBaseFunction.prototype);
+	cDMIN.prototype.constructor = cDMIN;
 
 	/** @constructor */
 	function cDPRODUCT() {
@@ -92,6 +98,7 @@
 	}
 
 	cDPRODUCT.prototype = Object.create(cBaseFunction.prototype);
+	cDPRODUCT.prototype.constructor = cDPRODUCT;
 
 	/** @constructor */
 	function cDSTDEV() {
@@ -99,6 +106,7 @@
 	}
 
 	cDSTDEV.prototype = Object.create(cBaseFunction.prototype);
+	cDSTDEV.prototype.constructor = cDSTDEV;
 
 	/** @constructor */
 	function cDSTDEVP() {
@@ -106,6 +114,7 @@
 	}
 
 	cDSTDEVP.prototype = Object.create(cBaseFunction.prototype);
+	cDSTDEVP.prototype.constructor = cDSTDEVP;
 
 	/** @constructor */
 	function cDSUM() {
@@ -113,6 +122,7 @@
 	}
 
 	cDSUM.prototype = Object.create(cBaseFunction.prototype);
+	cDSUM.prototype.constructor = cDSUM;
 
 	/** @constructor */
 	function cDVAR() {
@@ -120,6 +130,7 @@
 	}
 
 	cDVAR.prototype = Object.create(cBaseFunction.prototype);
+	cDVAR.prototype.constructor = cDVAR;
 
 	/** @constructor */
 	function cDVARP() {
@@ -127,4 +138,5 @@
 	}
 
 	cDVARP.prototype = Object.create(cBaseFunction.prototype);
+	cDVARP.prototype.constructor = cDVARP;
 })(window);

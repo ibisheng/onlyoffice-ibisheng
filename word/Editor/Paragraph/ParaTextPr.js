@@ -44,7 +44,7 @@
  */
 function ParaTextPr(Props)
 {
-	ParaTextPr.superclass.constructor.call(this);
+	CRunElementBase.call(this);
 
 	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -65,7 +65,8 @@ function ParaTextPr(Props)
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	g_oTableId.Add(this, this.Id);
 }
-AscCommon.extendClass(ParaTextPr, CRunElementBase);
+ParaTextPr.prototype = Object.create(CRunElementBase.prototype);
+ParaTextPr.prototype.constructor = ParaTextPr;
 
 ParaTextPr.prototype.Type = para_TextPr;
 ParaTextPr.prototype.Get_Type = function()

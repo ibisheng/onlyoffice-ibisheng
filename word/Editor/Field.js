@@ -51,7 +51,7 @@ var fieldtype_FORMTEXT   = 0x0004;
  */
 function ParaField(FieldType, Arguments, Switches)
 {
-    ParaField.superclass.constructor.call(this);
+	CParagraphContentWithParagraphLikeContent.call(this);
 
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -72,7 +72,8 @@ function ParaField(FieldType, Arguments, Switches)
     AscCommon.g_oTableId.Add( this, this.Id );
 }
 
-AscCommon.extendClass(ParaField, CParagraphContentWithParagraphLikeContent);
+ParaField.prototype = Object.create(CParagraphContentWithParagraphLikeContent.prototype);
+ParaField.prototype.constructor = ParaField;
 
 ParaField.prototype.Get_Id = function()
 {
@@ -80,7 +81,7 @@ ParaField.prototype.Get_Id = function()
 };
 ParaField.prototype.Copy = function(Selected)
 {
-    var NewField = ParaField.superclass.Copy.apply(this, arguments);
+    var NewField = CParagraphContentWithParagraphLikeContent.prototype.Copy.apply(this, arguments);
 
     // TODO: Сделать функциями с иторией
     NewField.FieldType = this.FieldType;
@@ -95,7 +96,7 @@ ParaField.prototype.Copy = function(Selected)
 ParaField.prototype.Get_SelectedElementsInfo = function(Info)
 {
     Info.Set_Field(this);
-    ParaField.superclass.Get_SelectedElementsInfo.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Get_SelectedElementsInfo.apply(this, arguments);
 };
 ParaField.prototype.Get_Bounds = function()
 {
@@ -110,7 +111,7 @@ ParaField.prototype.Get_Bounds = function()
 ParaField.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 {
 	History.Add(new CChangesParaFieldAddItem(this, Pos, [Item]));
-	ParaField.superclass.Add_ToContent.apply(this, arguments);
+	CParagraphContentWithParagraphLikeContent.prototype.Add_ToContent.apply(this, arguments);
 };
 ParaField.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
 {
@@ -118,7 +119,7 @@ ParaField.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
 	var DeletedItems = this.Content.slice(Pos, Pos + Count);
 	History.Add(new CChangesParaFieldRemoveItem(this, Pos, DeletedItems));
 
-	ParaField.superclass.Remove_FromContent.apply(this, arguments);
+	CParagraphContentWithParagraphLikeContent.prototype.Remove_FromContent.apply(this, arguments);
 };
 ParaField.prototype.Add = function(Item)
 {
@@ -230,7 +231,7 @@ ParaField.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRang
     var Y0 = PRSA.Y0;
     var Y1 = PRSA.Y1;
 
-    ParaField.superclass.Recalculate_Range_Spaces.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Recalculate_Range_Spaces.apply(this, arguments);
 
 	var X1 = PRSA.X;
 
@@ -248,7 +249,7 @@ ParaField.prototype.Draw_HighLights = function(PDSH)
     var Y0 = PDSH.Y0;
     var Y1 = PDSH.Y1;
 
-    ParaField.superclass.Draw_HighLights.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Draw_HighLights.apply(this, arguments);
 
     var X1 = PDSH.X;
 
@@ -284,7 +285,7 @@ ParaField.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseCont
 		return true;
 	}
 
-	ParaField.superclass.Get_LeftPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
+	CParagraphContentWithParagraphLikeContent.prototype.Get_LeftPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
 };
 ParaField.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
 {
@@ -297,11 +298,11 @@ ParaField.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseCon
 		return true;
 	}
 
-	ParaField.superclass.Get_RightPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
+	CParagraphContentWithParagraphLikeContent.prototype.Get_RightPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
 };
 ParaField.prototype.Remove = function(nDirection, bOnAddText)
 {
-	ParaField.superclass.Remove.call(this, nDirection, bOnAddText);
+	CParagraphContentWithParagraphLikeContent.prototype.Remove.call(this, nDirection, bOnAddText);
 
 	if (this.Is_Empty() && !bOnAddText && fieldtype_FORMTEXT === this.Get_FieldType() && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
 	{
@@ -311,7 +312,7 @@ ParaField.prototype.Remove = function(nDirection, bOnAddText)
 };
 ParaField.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 {
-	ParaField.superclass.Shift_Range.call(this, Dx, Dy, _CurLine, _CurRange);
+	CParagraphContentWithParagraphLikeContent.prototype.Shift_Range.call(this, Dx, Dy, _CurLine, _CurRange);
 
 	var CurLine = _CurLine - this.StartLine;
 	var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
@@ -324,6 +325,58 @@ ParaField.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 		oRangeBounds.Y0 += Dy;
 		oRangeBounds.Y1 += Dy;
 	}
+};
+ParaField.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
+{
+	var bResult = ParaField.superclass.Get_LeftPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
+
+	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	{
+		this.Get_StartPos(SearchPos.Pos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	return bResult;
+};
+ParaField.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+{
+	var bResult = ParaField.superclass.Get_RightPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
+
+	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	{
+		this.Get_EndPos(false, SearchPos.Pos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	return bResult;
+};
+ParaField.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseContentPos)
+{
+	var bResult = ParaField.superclass.Get_WordStartPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
+
+	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	{
+		this.Get_StartPos(SearchPos.Pos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	return bResult;
+};
+ParaField.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+{
+	var bResult = ParaField.superclass.Get_WordEndPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
+
+	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	{
+		this.Get_EndPos(false, SearchPos.Pos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	return bResult;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Работа с данными поля
@@ -485,6 +538,13 @@ ParaField.prototype.SetValue = function(sValue)
 	this.Remove_FromContent(0, this.Content.length);
 	this.Add_ToContent(0, oRun);
 	this.Cursor_MoveToStartPos();
+};
+ParaField.prototype.IsFillingForm = function()
+{
+	if (fieldtype_FORMTEXT === this.Get_FieldType())
+		return true;
+
+	return false;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования

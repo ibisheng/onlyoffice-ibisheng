@@ -132,64 +132,6 @@ $(function () {
 		strictEqual(Asc.round(-.1-.2-.9+.2), -1, "Asc.round(.1+.2+.9-.2)"); // -1.0000...2
 	});
 
-	test("AscCommon.extendClass", function test_extendClass() {
-		function Base(b1) {
-			this.b1 = b1;
-		}
-		Base.prototype.mb1 = function (b1) {this.b1=b1;};
-
-		function Child(b1, c1) {
-			Child.superclass.constructor.call(this, b1);
-			this.c1 = c1;
-		}
-		AscCommon.extendClass(Child, Base);
-		Child.prototype.mc1 = function (c1) {this.c1=c1;};
-
-		var x = new Child(1, 2);
-		ok(x !== undefined, "x = new Child(1, 2)");
-		ok(x.mb1 !== undefined, "x.mb1");
-		ok(x.mc1 !== undefined, "x.mc1");
-		equal(x.b1, 1, "x.b1");
-		equal(x.c1, 2, "x.c1");
-		x.mb1(3);
-		equal(x.b1, 3, "x.b1");
-		equal(x.c1, 2, "x.c1");
-		x.mc1(4);
-		equal(x.b1, 3, "x.b1");
-		equal(x.c1, 4, "x.c1");
-	});
-
-	test("AscCommon.extendClass with fabric method", function test_extendClass2() {
-		function Base(b1) {
-			if ( !(this instanceof Base) ) {return new Base(b1);}
-			this.b1 = b1;
-			return this;
-		}
-		Base.prototype.mb1 = function (b1) {this.b1=b1;};
-
-		function Child(b1, c1) {
-			if ( !(this instanceof Child) ) {return new Child(b1, c1);}
-			Child.superclass.constructor.call(this, b1);
-			this.c1 = c1;
-			return this;
-		}
-		AscCommon.extendClass(Child, Base);
-		Child.prototype.mc1 = function (c1) {this.c1=c1;};
-
-		var x = Child(1, 2);
-		ok(x !== undefined, "x = Child(1, 2)");
-		ok(x.mb1 !== undefined, "x.mb1");
-		ok(x.mc1 !== undefined, "x.mc1");
-		equal(x.b1, 1, "x.b1");
-		equal(x.c1, 2, "x.c1");
-		x.mb1(3);
-		equal(x.b1, 3, "x.b1");
-		equal(x.c1, 2, "x.c1");
-		x.mc1(4);
-		equal(x.b1, 3, "x.b1");
-		equal(x.c1, 4, "x.c1");
-	});
-
 	function check_range(range, c1, r1, c2, r2, msg) {
 		strictEqual(range.c1, c1, msg + ", c1");
 		strictEqual(range.r1, r1, msg + ", r1");

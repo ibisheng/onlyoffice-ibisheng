@@ -39,10 +39,12 @@
      * @extends {CDocumentContent}
      */
     function CDrawingDocContent(Parent, DrawingDocument, X, Y, XLimit, YLimit) {
-        CDrawingDocContent.superclass.constructor.call(this, Parent, DrawingDocument, X, Y, XLimit, YLimit, false, false, true);
+		CDocumentContent.call(this, Parent, DrawingDocument, X, Y, XLimit, YLimit, false, false, true);
         this.FullRecalc = new CDocumentRecalculateState();
     }
-    AscCommon.extendClass(CDrawingDocContent, CDocumentContent);
+
+	CDrawingDocContent.prototype = Object.create(CDocumentContent.prototype);
+	CDrawingDocContent.prototype.constructor = CDrawingDocContent;
 
     CDrawingDocContent.prototype.Get_SummaryHeight = function(){
         var fSummHeight = 0;

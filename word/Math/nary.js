@@ -164,7 +164,7 @@ CMathNaryPr.prototype.Read_FromBinary = function(Reader)
  */
 function CNary(props)
 {
-    CNary.superclass.constructor.call(this);
+	CMathBase.call(this);
 
 	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -183,7 +183,8 @@ function CNary(props)
 
     AscCommon.g_oTableId.Add( this, this.Id );
 }
-AscCommon.extendClass(CNary, CMathBase);
+CNary.prototype = Object.create(CMathBase.prototype);
+CNary.prototype.constructor = CNary;
 
 CNary.prototype.ClassType = AscDFH.historyitem_type_nary;
 CNary.prototype.kind      = MATH_NARY;
@@ -342,7 +343,7 @@ CNary.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
     if(RPI.bInline || RPI.bDecreasedComp)
         RPI.bNaryInline = true;
 
-    CNary.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
+    CMathBase.prototype.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
 
     RPI.bNaryInline = bNaryInline;
 };
@@ -569,7 +570,7 @@ CNary.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     if(this.bOneLine === true)
     {
-        CNary.superclass.Recalculate_Range.call(this, PRS, ParaPr, Depth);
+        CMathBase.prototype.Recalculate_Range.call(this, PRS, ParaPr, Depth);
     }
     else
     {
@@ -634,7 +635,7 @@ CNary.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 {
     if(this.bOneLine == true)
     {
-        CNary.superclass.Recalculate_Range_Width.call(this, PRSC, _CurLine, _CurRange);
+        CMathBase.prototype.Recalculate_Range_Width.call(this, PRSC, _CurLine, _CurRange);
     }
     else
     {
@@ -716,7 +717,7 @@ CNary.prototype.UpdateBoundsPosInfo = function(PRSA, _CurLine, _CurRange, _CurPa
     }
     else
     {
-        CNary.superclass.UpdateBoundsPosInfo.call(this, PRSA, _CurLine, _CurRange, _CurPage);
+        CMathBase.prototype.UpdateBoundsPosInfo.call(this, PRSA, _CurLine, _CurRange, _CurPage);
     }
 
 };
@@ -724,7 +725,7 @@ CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRa
 {
     if(this.bOneLine)
     {
-        CNary.superclass.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
+        CMathBase.prototype.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
     }
     else
     {
@@ -778,7 +779,7 @@ CNary.prototype.setPosition = function(pos, PosInfo)
 {
     if(this.bOneLine)
     {
-        CNary.superclass.setPosition.call(this, pos, PosInfo);
+        CMathBase.prototype.setPosition.call(this, pos, PosInfo);
     }
     else
     {
@@ -824,7 +825,7 @@ CNary.prototype.Can_ModifyArgSize = function()
  */
 function CMathMenuNary(Nary)
 {
-    CMathMenuNary.superclass.constructor.call(this, Nary);
+	CMathMenuBase.call(this, Nary);
 
     this.Type             = Asc.c_oAscMathInterfaceType.LargeOperator;
 
@@ -850,7 +851,8 @@ function CMathMenuNary(Nary)
         this.bCanChangeLimLoc 	= false;
     }
 }
-AscCommon.extendClass(CMathMenuNary, CMathMenuBase);
+CMathMenuNary.prototype = Object.create(CMathMenuBase.prototype);
+CMathMenuNary.prototype.constructor = CMathMenuNary;
 CMathMenuNary.prototype.can_ChangeLimitLocation = function(){ return this.bCanChangeLimLoc;};
 CMathMenuNary.prototype.get_LimitLocation       = function(){return this.LimLoc;};
 CMathMenuNary.prototype.put_LimitLocation       = function(LimLoc){this.LimLoc = LimLoc;};
@@ -881,7 +883,8 @@ function CNaryUnd(bInside)
     this.setDimension(2, 1);
     //this.init();
 }
-AscCommon.extendClass(CNaryUnd, CMathBase);
+CNaryUnd.prototype = Object.create(CMathBase.prototype);
+CNaryUnd.prototype.constructor = CNaryUnd;
 CNaryUnd.prototype.setDistance = function()
 {
     var zetta = this.Get_TxtPrControlLetter().FontSize*25.4/96;
@@ -935,7 +938,8 @@ function CNaryOvr(bInside)
 
     this.setDimension(2, 1);
 }
-AscCommon.extendClass(CNaryOvr, CMathBase);
+CNaryOvr.prototype = Object.create(CMathBase.prototype);
+CNaryOvr.prototype.constructor = CNaryOvr;
 CNaryOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
 {
     this.Parent = Parent;
@@ -1005,7 +1009,8 @@ function CNaryUndOvr(bInside)
 
     this.setDimension(3,1);
 }
-AscCommon.extendClass(CNaryUndOvr, CMathBase);
+CNaryUndOvr.prototype = Object.create(CMathBase.prototype);
+CNaryUndOvr.prototype.constructor = CNaryUndOvr;
 CNaryUndOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
 {
     this.Parent = Parent;
@@ -1189,7 +1194,8 @@ CNaryOperator.prototype.drawTextElem = function(x, y, pGraphics)
 
     pGraphics.SetFont(Font);
 
-    CNaryOperator.superclass.call.draw(this, x, y, pGraphics);
+    // ?????????????????????????????????????????????????????????
+    // CNaryOperator.superclass.call.draw(this, x, y, pGraphics);
 };
 CNaryOperator.prototype.IsJustDraw = function()
 {
@@ -1235,7 +1241,8 @@ function CSigma()
 {
     CNaryOperator.call(this);
 }
-AscCommon.extendClass(CSigma, CNaryOperator);
+CSigma.prototype = Object.create(CNaryOperator.prototype);
+CSigma.prototype.constructor = CSigma;
 CSigma.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1442,7 +1449,8 @@ function CProduct(bFlip)
 {
     CNaryOperator.call(this, bFlip);
 }
-AscCommon.extendClass(CProduct, CNaryOperator);
+CProduct.prototype = Object.create(CNaryOperator.prototype);
+CProduct.prototype.constructor = CProduct;
 CProduct.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1613,7 +1621,8 @@ function CUnion(bFlip)
 {
     CNaryOperator.call(this, bFlip);
 }
-AscCommon.extendClass(CUnion, CNaryOperator);
+CUnion.prototype = Object.create(CNaryOperator.prototype);
+CUnion.prototype.constructor = CUnion;
 CUnion.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1688,7 +1697,8 @@ function CLogicalOr(bFlip)
 {
     CNaryOperator.call(this, bFlip);
 }
-AscCommon.extendClass(CLogicalOr, CNaryOperator);
+CLogicalOr.prototype = Object.create(CNaryOperator.prototype);
+CLogicalOr.prototype.constructor = CLogicalOr;
 CLogicalOr.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1770,7 +1780,8 @@ function CIntegral()
 {
     CNaryOperator.call(this);
 }
-AscCommon.extendClass(CIntegral, CNaryOperator);
+CIntegral.prototype = Object.create(CNaryOperator.prototype);
+CIntegral.prototype.constructor = CIntegral;
 CIntegral.prototype.getCoord = function()
 {
     var X = [],
@@ -1905,7 +1916,8 @@ function CDoubleIntegral()
 {
     CIntegral.call(this);
 }
-AscCommon.extendClass(CDoubleIntegral, CIntegral);
+CDoubleIntegral.prototype = Object.create(CIntegral.prototype);
+CDoubleIntegral.prototype.constructor = CDoubleIntegral;
 CDoubleIntegral.prototype.drawPath = function(pGraphics, XX, YY, Width)
 {
     var XX2 = [],
@@ -1920,11 +1932,11 @@ CDoubleIntegral.prototype.drawPath = function(pGraphics, XX, YY, Width)
         YY2[i] = YY[i];
     }
 
-    CDoubleIntegral.superclass.drawPath.call(this, pGraphics, XX, YY);
+	CIntegral.prototype.drawPath.call(this, pGraphics, XX, YY);
     pGraphics.df();
 
     pGraphics._s();
-    CDoubleIntegral.superclass.drawPath.call(this, pGraphics, XX2, YY2);
+	CIntegral.prototype.drawPath.call(this, pGraphics, XX2, YY2);
 };
 CDoubleIntegral.prototype.calculateSizeGlyph = function()
 {
@@ -1951,7 +1963,8 @@ function CTripleIntegral()
 {
     CIntegral.call(this);
 }
-AscCommon.extendClass(CTripleIntegral, CIntegral);
+CTripleIntegral.prototype = Object.create(CIntegral.prototype);
+CTripleIntegral.prototype.constructor = CTripleIntegral;
 CTripleIntegral.prototype.drawPath = function(pGraphics, XX, YY, Width)
 {
     var XX2 = [],
@@ -1972,15 +1985,15 @@ CTripleIntegral.prototype.drawPath = function(pGraphics, XX, YY, Width)
         YY3[i] = YY[i];
     }
 
-    CTripleIntegral.superclass.drawPath.call(this, pGraphics, XX, YY);
+	CIntegral.prototype.drawPath.call(this, pGraphics, XX, YY);
     pGraphics.df();
 
     pGraphics._s();
-    CTripleIntegral.superclass.drawPath.call(this, pGraphics, XX2, YY2);
+	CIntegral.prototype.drawPath.call(this, pGraphics, XX2, YY2);
     pGraphics.df();
 
     pGraphics._s();
-    CTripleIntegral.superclass.drawPath.call(this, pGraphics, XX3, YY3);
+	CIntegral.prototype.drawPath.call(this, pGraphics, XX3, YY3);
 };
 CTripleIntegral.prototype.calculateSizeGlyph = function()
 {
@@ -2265,7 +2278,8 @@ function CClosedPathIntegral()
 {
     CNaryOperator.call(this);
 }
-AscCommon.extendClass(CClosedPathIntegral, CNaryOperator);
+CClosedPathIntegral.prototype = Object.create(CNaryOperator.prototype);
+CClosedPathIntegral.prototype.constructor = CClosedPathIntegral;
 CClosedPathIntegral.prototype.drawGlyph = function(parameters)
 {
     var x           = parameters.x,
@@ -2486,7 +2500,8 @@ function CContourIntegral()
 {
     CClosedPathIntegral.call(this);
 }
-AscCommon.extendClass(CContourIntegral, CClosedPathIntegral);
+CContourIntegral.prototype = Object.create(CClosedPathIntegral.prototype);
+CContourIntegral.prototype.constructor = CContourIntegral;
 CContourIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
 {
     var parameters =
@@ -2499,7 +2514,7 @@ CContourIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
         Circle:         new CCircle()
     };
 
-    CContourIntegral.superclass.drawGlyph.call(this, parameters);
+	CClosedPathIntegral.prototype.drawGlyph.call(this, parameters);
 };
 CContourIntegral.prototype.calculateSizeGlyph = function()
 {
@@ -2525,7 +2540,8 @@ function CSurfaceIntegral()
 {
     CClosedPathIntegral.call(this);
 }
-AscCommon.extendClass(CSurfaceIntegral, CClosedPathIntegral);
+CSurfaceIntegral.prototype = Object.create(CClosedPathIntegral.prototype);
+CSurfaceIntegral.prototype.constructor = CSurfaceIntegral;
 CSurfaceIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
 {
     var parameters =
@@ -2538,7 +2554,7 @@ CSurfaceIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
         Circle:         new CSurface()
     };
 
-    CSurfaceIntegral.superclass.drawGlyph.call(this, parameters);
+	CClosedPathIntegral.prototype.drawGlyph.call(this, parameters);
 };
 CSurfaceIntegral.prototype.calculateSizeGlyph = function()
 {
@@ -2564,7 +2580,8 @@ function CVolumeIntegral()
 {
     CClosedPathIntegral.call(this);
 }
-AscCommon.extendClass(CVolumeIntegral, CClosedPathIntegral);
+CVolumeIntegral.prototype = Object.create(CClosedPathIntegral.prototype);
+CVolumeIntegral.prototype.constructor = CVolumeIntegral;
 CVolumeIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
 {
     var parameters =
@@ -2577,7 +2594,7 @@ CVolumeIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
         Circle:         new CVolume()
     };
 
-    CVolumeIntegral.superclass.drawGlyph.call(this, parameters);
+	CClosedPathIntegral.prototype.drawGlyph.call(this, parameters);
 };
 CVolumeIntegral.prototype.calculateSizeGlyph = function()
 {

@@ -304,9 +304,10 @@ function private_ParagraphChangesOnMergeShdPr(oChange)
  */
 function CChangesParagraphAddItem(Class, Pos, Items)
 {
-	CChangesParagraphAddItem.superclass.constructor.call(this, Class, Pos, Items, true);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Items, true);
 }
-AscCommon.extendClass(CChangesParagraphAddItem, AscDFH.CChangesBaseContentChange);
+CChangesParagraphAddItem.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesParagraphAddItem.prototype.constructor = CChangesParagraphAddItem;
 CChangesParagraphAddItem.prototype.Type = AscDFH.historyitem_Paragraph_AddItem;
 CChangesParagraphAddItem.prototype.Undo = function()
 {
@@ -390,9 +391,10 @@ CChangesParagraphAddItem.prototype.CreateReverseChange = function()
  */
 function CChangesParagraphRemoveItem(Class, Pos, Items)
 {
-	CChangesParagraphRemoveItem.superclass.constructor.call(this, Class, Pos, Items, false);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Items, false);
 }
-AscCommon.extendClass(CChangesParagraphRemoveItem, AscDFH.CChangesBaseContentChange);
+CChangesParagraphRemoveItem.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesParagraphRemoveItem.prototype.constructor = CChangesParagraphRemoveItem;
 CChangesParagraphRemoveItem.prototype.Type = AscDFH.historyitem_Paragraph_RemoveItem;
 CChangesParagraphRemoveItem.prototype.Undo = function()
 {
@@ -454,9 +456,10 @@ CChangesParagraphRemoveItem.prototype.CreateReverseChange = function()
  */
 function CChangesParagraphNumbering(Class, Old, New, Color)
 {
-	CChangesParagraphNumbering.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphNumbering, AscDFH.CChangesBaseObjectProperty);
+CChangesParagraphNumbering.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParagraphNumbering.prototype.constructor = CChangesParagraphNumbering;
 CChangesParagraphNumbering.prototype.Type = AscDFH.historyitem_Paragraph_Numbering;
 CChangesParagraphNumbering.prototype.private_CreateObject = function()
 {
@@ -481,9 +484,10 @@ CChangesParagraphNumbering.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphAlign(Class, Old, New, Color)
 {
-	CChangesParagraphAlign.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphAlign, AscDFH.CChangesBaseLongProperty);
+CChangesParagraphAlign.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesParagraphAlign.prototype.constructor = CChangesParagraphAlign;
 CChangesParagraphAlign.prototype.Type = AscDFH.historyitem_Paragraph_Align;
 CChangesParagraphAlign.prototype.private_SetValue = function(Value)
 {
@@ -502,9 +506,10 @@ CChangesParagraphAlign.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphIndFirst(Class, Old, New, Color)
 {
-	CChangesParagraphIndFirst.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseDoubleProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphIndFirst, AscDFH.CChangesBaseDoubleProperty);
+CChangesParagraphIndFirst.prototype = Object.create(AscDFH.CChangesBaseDoubleProperty.prototype);
+CChangesParagraphIndFirst.prototype.constructor = CChangesParagraphIndFirst;
 CChangesParagraphIndFirst.prototype.Type = AscDFH.historyitem_Paragraph_Ind_First;
 CChangesParagraphIndFirst.prototype.private_SetValue = function(Value)
 {
@@ -527,9 +532,10 @@ CChangesParagraphIndFirst.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphIndLeft(Class, Old, New, Color)
 {
-	CChangesParagraphIndLeft.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseDoubleProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphIndLeft, AscDFH.CChangesBaseDoubleProperty);
+CChangesParagraphIndLeft.prototype = Object.create(AscDFH.CChangesBaseDoubleProperty.prototype);
+CChangesParagraphIndLeft.prototype.constructor = CChangesParagraphIndLeft;
 CChangesParagraphIndLeft.prototype.Type = AscDFH.historyitem_Paragraph_Ind_Left;
 CChangesParagraphIndLeft.prototype.private_SetValue = function(Value)
 {
@@ -552,9 +558,10 @@ CChangesParagraphIndLeft.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphIndRight(Class, Old, New, Color)
 {
-	CChangesParagraphIndRight.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseDoubleProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphIndRight, AscDFH.CChangesBaseDoubleProperty);
+CChangesParagraphIndRight.prototype = Object.create(AscDFH.CChangesBaseDoubleProperty.prototype);
+CChangesParagraphIndRight.prototype.constructor = CChangesParagraphIndRight;
 CChangesParagraphIndRight.prototype.Type = AscDFH.historyitem_Paragraph_Ind_Right;
 CChangesParagraphIndRight.prototype.private_SetValue = function(Value)
 {
@@ -577,9 +584,10 @@ CChangesParagraphIndRight.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphContextualSpacing(Class, Old, New, Color)
 {
-	CChangesParagraphContextualSpacing.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphContextualSpacing, AscDFH.CChangesBaseBoolProperty);
+CChangesParagraphContextualSpacing.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesParagraphContextualSpacing.prototype.constructor = CChangesParagraphContextualSpacing;
 CChangesParagraphContextualSpacing.prototype.Type = AscDFH.historyitem_Paragraph_ContextualSpacing;
 CChangesParagraphContextualSpacing.prototype.private_SetValue = function(Value)
 {
@@ -598,9 +606,10 @@ CChangesParagraphContextualSpacing.prototype.Load = private_ParagraphChangesOnLo
  */
 function CChangesParagraphKeepLines(Class, Old, New, Color)
 {
-	CChangesParagraphKeepLines.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphKeepLines, AscDFH.CChangesBaseBoolProperty);
+CChangesParagraphKeepLines.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesParagraphKeepLines.prototype.constructor = CChangesParagraphKeepLines;
 CChangesParagraphKeepLines.prototype.Type = AscDFH.historyitem_Paragraph_KeepLines;
 CChangesParagraphKeepLines.prototype.private_SetValue = function(Value)
 {
@@ -619,9 +628,10 @@ CChangesParagraphKeepLines.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphKeepNext(Class, Old, New, Color)
 {
-	CChangesParagraphKeepNext.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphKeepNext, AscDFH.CChangesBaseBoolProperty);
+CChangesParagraphKeepNext.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesParagraphKeepNext.prototype.constructor = CChangesParagraphKeepNext;
 CChangesParagraphKeepNext.prototype.Type = AscDFH.historyitem_Paragraph_KeepNext;
 CChangesParagraphKeepNext.prototype.private_SetValue = function(Value)
 {
@@ -640,9 +650,10 @@ CChangesParagraphKeepNext.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphPageBreakBefore(Class, Old, New, Color)
 {
-	CChangesParagraphPageBreakBefore.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphPageBreakBefore, AscDFH.CChangesBaseBoolProperty);
+CChangesParagraphPageBreakBefore.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesParagraphPageBreakBefore.prototype.constructor = CChangesParagraphPageBreakBefore;
 CChangesParagraphPageBreakBefore.prototype.Type = AscDFH.historyitem_Paragraph_PageBreakBefore;
 CChangesParagraphPageBreakBefore.prototype.private_SetValue = function(Value)
 {
@@ -661,9 +672,10 @@ CChangesParagraphPageBreakBefore.prototype.Load = private_ParagraphChangesOnLoad
  */
 function CChangesParagraphSpacingLine(Class, Old, New, Color)
 {
-	CChangesParagraphSpacingLine.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseDoubleProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphSpacingLine, AscDFH.CChangesBaseDoubleProperty);
+CChangesParagraphSpacingLine.prototype = Object.create(AscDFH.CChangesBaseDoubleProperty.prototype);
+CChangesParagraphSpacingLine.prototype.constructor = CChangesParagraphSpacingLine;
 CChangesParagraphSpacingLine.prototype.Type = AscDFH.historyitem_Paragraph_Spacing_Line;
 CChangesParagraphSpacingLine.prototype.private_SetValue = function(Value)
 {
@@ -686,9 +698,10 @@ CChangesParagraphSpacingLine.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphSpacingLineRule(Class, Old, New, Color)
 {
-	CChangesParagraphSpacingLineRule.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphSpacingLineRule, AscDFH.CChangesBaseLongProperty);
+CChangesParagraphSpacingLineRule.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesParagraphSpacingLineRule.prototype.constructor = CChangesParagraphSpacingLineRule;
 CChangesParagraphSpacingLineRule.prototype.Type = AscDFH.historyitem_Paragraph_Spacing_LineRule;
 CChangesParagraphSpacingLineRule.prototype.private_SetValue = function(Value)
 {
@@ -711,9 +724,10 @@ CChangesParagraphSpacingLineRule.prototype.Load = private_ParagraphChangesOnLoad
  */
 function CChangesParagraphSpacingBefore(Class, Old, New, Color)
 {
-	CChangesParagraphSpacingBefore.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseDoubleProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphSpacingBefore, AscDFH.CChangesBaseDoubleProperty);
+CChangesParagraphSpacingBefore.prototype = Object.create(AscDFH.CChangesBaseDoubleProperty.prototype);
+CChangesParagraphSpacingBefore.prototype.constructor = CChangesParagraphSpacingBefore;
 CChangesParagraphSpacingBefore.prototype.Type = AscDFH.historyitem_Paragraph_Spacing_Before;
 CChangesParagraphSpacingBefore.prototype.private_SetValue = function(Value)
 {
@@ -736,9 +750,10 @@ CChangesParagraphSpacingBefore.prototype.Load = private_ParagraphChangesOnLoadPr
  */
 function CChangesParagraphSpacingAfter(Class, Old, New, Color)
 {
-	CChangesParagraphSpacingAfter.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseDoubleProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphSpacingAfter, AscDFH.CChangesBaseDoubleProperty);
+CChangesParagraphSpacingAfter.prototype = Object.create(AscDFH.CChangesBaseDoubleProperty.prototype);
+CChangesParagraphSpacingAfter.prototype.constructor = CChangesParagraphSpacingAfter;
 CChangesParagraphSpacingAfter.prototype.Type = AscDFH.historyitem_Paragraph_Spacing_After;
 CChangesParagraphSpacingAfter.prototype.private_SetValue = function(Value)
 {
@@ -761,9 +776,10 @@ CChangesParagraphSpacingAfter.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphSpacingAfterAutoSpacing(Class, Old, New, Color)
 {
-	CChangesParagraphSpacingAfterAutoSpacing.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphSpacingAfterAutoSpacing, AscDFH.CChangesBaseBoolProperty);
+CChangesParagraphSpacingAfterAutoSpacing.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesParagraphSpacingAfterAutoSpacing.prototype.constructor = CChangesParagraphSpacingAfterAutoSpacing;
 CChangesParagraphSpacingAfterAutoSpacing.prototype.Type = AscDFH.historyitem_Paragraph_Spacing_AfterAutoSpacing;
 CChangesParagraphSpacingAfterAutoSpacing.prototype.private_SetValue = function(Value)
 {
@@ -786,9 +802,10 @@ CChangesParagraphSpacingAfterAutoSpacing.prototype.Load = private_ParagraphChang
  */
 function CChangesParagraphSpacingBeforeAutoSpacing(Class, Old, New, Color)
 {
-	CChangesParagraphSpacingBeforeAutoSpacing.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphSpacingBeforeAutoSpacing, AscDFH.CChangesBaseBoolProperty);
+CChangesParagraphSpacingBeforeAutoSpacing.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesParagraphSpacingBeforeAutoSpacing.prototype.constructor = CChangesParagraphSpacingBeforeAutoSpacing;
 CChangesParagraphSpacingBeforeAutoSpacing.prototype.Type = AscDFH.historyitem_Paragraph_Spacing_BeforeAutoSpacing;
 CChangesParagraphSpacingBeforeAutoSpacing.prototype.private_SetValue = function(Value)
 {
@@ -811,9 +828,10 @@ CChangesParagraphSpacingBeforeAutoSpacing.prototype.Load = private_ParagraphChan
  */
 function CChangesParagraphShdValue(Class, Old, New, Color)
 {
-	CChangesParagraphShdValue.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseByteProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphShdValue, AscDFH.CChangesBaseByteProperty);
+CChangesParagraphShdValue.prototype = Object.create(AscDFH.CChangesBaseByteProperty.prototype);
+CChangesParagraphShdValue.prototype.constructor = CChangesParagraphShdValue;
 CChangesParagraphShdValue.prototype.Type = AscDFH.historyitem_Paragraph_Shd_Value;
 CChangesParagraphShdValue.prototype.private_SetValue = function(Value)
 {
@@ -836,9 +854,10 @@ CChangesParagraphShdValue.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphShdColor(Class, Old, New, Color)
 {
-	CChangesParagraphShdColor.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphShdColor, AscDFH.CChangesBaseObjectProperty);
+CChangesParagraphShdColor.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParagraphShdColor.prototype.constructor = CChangesParagraphShdColor;
 CChangesParagraphShdColor.prototype.Type = AscDFH.historyitem_Paragraph_Shd_Color;
 CChangesParagraphShdColor.prototype.private_CreateObject = function()
 {
@@ -865,9 +884,10 @@ CChangesParagraphShdColor.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphShdUnifill(Class, Old, New, Color)
 {
-	CChangesParagraphShdUnifill.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphShdUnifill, AscDFH.CChangesBaseObjectProperty);
+CChangesParagraphShdUnifill.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParagraphShdUnifill.prototype.constructor = CChangesParagraphShdUnifill;
 CChangesParagraphShdUnifill.prototype.Type = AscDFH.historyitem_Paragraph_Shd_Unifill;
 CChangesParagraphShdUnifill.prototype.private_CreateObject = function()
 {
@@ -894,9 +914,10 @@ CChangesParagraphShdUnifill.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphShd(Class, Old, New, Color)
 {
-	CChangesParagraphShd.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphShd, AscDFH.CChangesBaseObjectProperty);
+CChangesParagraphShd.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParagraphShd.prototype.constructor = CChangesParagraphShd;
 CChangesParagraphShd.prototype.Type = AscDFH.historyitem_Paragraph_Shd;
 CChangesParagraphShd.prototype.private_CreateObject = function()
 {
@@ -950,9 +971,10 @@ CChangesParagraphShd.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphWidowControl(Class, Old, New, Color)
 {
-	CChangesParagraphWidowControl.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphWidowControl, AscDFH.CChangesBaseBoolProperty);
+CChangesParagraphWidowControl.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesParagraphWidowControl.prototype.constructor = CChangesParagraphWidowControl;
 CChangesParagraphWidowControl.prototype.Type = AscDFH.historyitem_Paragraph_WidowControl;
 CChangesParagraphWidowControl.prototype.private_SetValue = function(Value)
 {
@@ -971,9 +993,10 @@ CChangesParagraphWidowControl.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphTabs(Class, Old, New, Color)
 {
-	CChangesParagraphTabs.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphTabs, AscDFH.CChangesBaseObjectProperty);
+CChangesParagraphTabs.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParagraphTabs.prototype.constructor = CChangesParagraphTabs;
 CChangesParagraphTabs.prototype.Type = AscDFH.historyitem_Paragraph_Tabs;
 CChangesParagraphTabs.prototype.private_CreateObject = function()
 {
@@ -996,9 +1019,10 @@ CChangesParagraphTabs.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphPStyle(Class, Old, New, Color)
 {
-	CChangesParagraphPStyle.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseStringProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphPStyle, AscDFH.CChangesBaseStringProperty);
+CChangesParagraphPStyle.prototype = Object.create(AscDFH.CChangesBaseStringProperty.prototype);
+CChangesParagraphPStyle.prototype.constructor = CChangesParagraphPStyle;
 CChangesParagraphPStyle.prototype.Type = AscDFH.historyitem_Paragraph_PStyle;
 CChangesParagraphPStyle.prototype.private_SetValue = function(Value)
 {
@@ -1018,9 +1042,10 @@ CChangesParagraphPStyle.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphBordersBetween(Class, Old, New, Color)
 {
-	CChangesParagraphBordersBetween.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphBordersBetween, AscDFH.CChangesBaseObjectProperty);
+CChangesParagraphBordersBetween.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParagraphBordersBetween.prototype.constructor = CChangesParagraphBordersBetween;
 CChangesParagraphBordersBetween.prototype.Type = AscDFH.historyitem_Paragraph_Borders_Between;
 CChangesParagraphBordersBetween.prototype.private_CreateObject = function()
 {
@@ -1043,9 +1068,10 @@ CChangesParagraphBordersBetween.prototype.Load = private_ParagraphChangesOnLoadP
  */
 function CChangesParagraphBordersBottom(Class, Old, New, Color)
 {
-	CChangesParagraphBordersBottom.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphBordersBottom, AscDFH.CChangesBaseObjectProperty);
+CChangesParagraphBordersBottom.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParagraphBordersBottom.prototype.constructor = CChangesParagraphBordersBottom;
 CChangesParagraphBordersBottom.prototype.Type = AscDFH.historyitem_Paragraph_Borders_Bottom;
 CChangesParagraphBordersBottom.prototype.private_CreateObject = function()
 {
@@ -1068,9 +1094,10 @@ CChangesParagraphBordersBottom.prototype.Load = private_ParagraphChangesOnLoadPr
  */
 function CChangesParagraphBordersLeft(Class, Old, New, Color)
 {
-	CChangesParagraphBordersLeft.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphBordersLeft, AscDFH.CChangesBaseObjectProperty);
+CChangesParagraphBordersLeft.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParagraphBordersLeft.prototype.constructor = CChangesParagraphBordersLeft;
 CChangesParagraphBordersLeft.prototype.Type = AscDFH.historyitem_Paragraph_Borders_Left;
 CChangesParagraphBordersLeft.prototype.private_CreateObject = function()
 {
@@ -1093,9 +1120,10 @@ CChangesParagraphBordersLeft.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphBordersRight(Class, Old, New, Color)
 {
-	CChangesParagraphBordersRight.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphBordersRight, AscDFH.CChangesBaseObjectProperty);
+CChangesParagraphBordersRight.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParagraphBordersRight.prototype.constructor = CChangesParagraphBordersRight;
 CChangesParagraphBordersRight.prototype.Type = AscDFH.historyitem_Paragraph_Borders_Right;
 CChangesParagraphBordersRight.prototype.private_CreateObject = function()
 {
@@ -1118,9 +1146,10 @@ CChangesParagraphBordersRight.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphBordersTop(Class, Old, New, Color)
 {
-	CChangesParagraphBordersTop.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphBordersTop, AscDFH.CChangesBaseObjectProperty);
+CChangesParagraphBordersTop.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParagraphBordersTop.prototype.constructor = CChangesParagraphBordersTop;
 CChangesParagraphBordersTop.prototype.Type = AscDFH.historyitem_Paragraph_Borders_Top;
 CChangesParagraphBordersTop.prototype.private_CreateObject = function()
 {
@@ -1143,9 +1172,10 @@ CChangesParagraphBordersTop.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphPr(Class, Old, New, Color)
 {
-	CChangesParagraphPr.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphPr, AscDFH.CChangesBaseObjectProperty);
+CChangesParagraphPr.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParagraphPr.prototype.constructor = CChangesParagraphPr;
 CChangesParagraphPr.prototype.Type = AscDFH.historyitem_Paragraph_Pr;
 CChangesParagraphPr.prototype.private_CreateObject = function()
 {
@@ -1385,9 +1415,10 @@ CChangesParagraphPr.prototype.Load = private_ParagraphChangesOnLoadPr;
  */
 function CChangesParagraphPresentationPrBullet(Class, Old, New, Color)
 {
-	CChangesParagraphPresentationPrBullet.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphPresentationPrBullet, AscDFH.CChangesBaseObjectProperty);
+CChangesParagraphPresentationPrBullet.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParagraphPresentationPrBullet.prototype.constructor = CChangesParagraphPresentationPrBullet;
 CChangesParagraphPresentationPrBullet.prototype.Type = AscDFH.historyitem_Paragraph_PresentationPr_Bullet;
 CChangesParagraphPresentationPrBullet.prototype.private_CreateObject = function()
 {
@@ -1409,9 +1440,10 @@ CChangesParagraphPresentationPrBullet.prototype.private_SetValue = function(Valu
  */
 function CChangesParagraphPresentationPrLevel(Class, Old, New, Color)
 {
-	CChangesParagraphPresentationPrLevel.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphPresentationPrLevel, AscDFH.CChangesBaseLongProperty);
+CChangesParagraphPresentationPrLevel.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesParagraphPresentationPrLevel.prototype.constructor = CChangesParagraphPresentationPrLevel;
 CChangesParagraphPresentationPrLevel.prototype.Type = AscDFH.historyitem_Paragraph_PresentationPr_Level;
 CChangesParagraphPresentationPrLevel.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphPresentationPrLevel.prototype.private_SetValue = function(Value)
@@ -1429,9 +1461,10 @@ CChangesParagraphPresentationPrLevel.prototype.private_SetValue = function(Value
  */
 function CChangesParagraphFramePr(Class, Old, New, Color)
 {
-	CChangesParagraphFramePr.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphFramePr, AscDFH.CChangesBaseObjectProperty);
+CChangesParagraphFramePr.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParagraphFramePr.prototype.constructor = CChangesParagraphFramePr;
 CChangesParagraphFramePr.prototype.Type = AscDFH.historyitem_Paragraph_FramePr;
 CChangesParagraphFramePr.prototype.private_CreateObject = function()
 {
@@ -1452,12 +1485,13 @@ CChangesParagraphFramePr.prototype.Merge = private_ParagraphChangesOnMergePr;
  */
 function CChangesParagraphSectPr(Class, Old, New)
 {
-	CChangesParagraphSectPr.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 
 	this.Old = Old;
 	this.New = New;
 }
-AscCommon.extendClass(CChangesParagraphSectPr, AscDFH.CChangesBase);
+CChangesParagraphSectPr.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesParagraphSectPr.prototype.constructor = CChangesParagraphSectPr;
 CChangesParagraphSectPr.prototype.Type = AscDFH.historyitem_Paragraph_SectionPr;
 CChangesParagraphSectPr.prototype.Undo = function()
 {
@@ -1534,12 +1568,13 @@ CChangesParagraphSectPr.prototype.Merge = function(oChange)
  */
 function CChangesParagraphPrChange(Class, Old, New)
 {
-	CChangesParagraphPrChange.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 
 	this.Old = Old;
 	this.New = New;
 }
-AscCommon.extendClass(CChangesParagraphPrChange, AscDFH.CChangesBase);
+CChangesParagraphPrChange.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesParagraphPrChange.prototype.constructor = CChangesParagraphPrChange;
 CChangesParagraphPrChange.prototype.Type = AscDFH.historyitem_Paragraph_PrChange;
 CChangesParagraphPrChange.prototype.Undo = function()
 {
@@ -1681,9 +1716,10 @@ CChangesParagraphPrChange.prototype.Merge = function(oChange)
  */
 function CChangesParagraphPrReviewInfo(Class, Old, New, Color)
 {
-	CChangesParagraphPrReviewInfo.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesParagraphPrReviewInfo, AscDFH.CChangesBaseObjectProperty);
+CChangesParagraphPrReviewInfo.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesParagraphPrReviewInfo.prototype.constructor = CChangesParagraphPrReviewInfo;
 CChangesParagraphPrReviewInfo.prototype.Type = AscDFH.historyitem_Paragraph_PrReviewInfo;
 CChangesParagraphPrReviewInfo.prototype.private_CreateObject = function()
 {

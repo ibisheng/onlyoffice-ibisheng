@@ -472,6 +472,7 @@
 	}
 
 	cACCRINT.prototype = Object.create(cBaseFunction.prototype);
+	cACCRINT.prototype.constructor = cACCRINT;
 	cACCRINT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cACCRINT.prototype.Calculate = function (arg) {
 		var issue = arg[0], firstInterest = arg[1], settlement = arg[2], rate = arg[3], par = arg[4] &&
@@ -644,6 +645,7 @@
 	}
 
 	cACCRINTM.prototype = Object.create(cBaseFunction.prototype);
+	cACCRINTM.prototype.constructor = cACCRINTM;
 	cACCRINTM.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cACCRINTM.prototype.Calculate = function (arg) {
 		var issue = arg[0], settlement = arg[1], rate = arg[2], par = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] :
@@ -735,6 +737,7 @@
 	}
 
 	cAMORDEGRC.prototype = Object.create(cBaseFunction.prototype);
+	cAMORDEGRC.prototype.constructor = cAMORDEGRC;
 	cAMORDEGRC.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cAMORDEGRC.prototype.Calculate = function (arg) {
 		var cost = arg[0], datePurch = arg[1], firstPer = arg[2], salvage = arg[3], period = arg[4], rate = arg[5], basis = arg[6] &&
@@ -929,6 +932,7 @@
 	}
 
 	cAMORLINC.prototype = Object.create(cBaseFunction.prototype);
+	cAMORLINC.prototype.constructor = cAMORLINC;
 	cAMORLINC.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cAMORLINC.prototype.Calculate = function (arg) {
 		var cost = arg[0], datePurch = arg[1], firstPer = arg[2], salvage = arg[3], period = arg[4], rate = arg[5], basis = arg[6] &&
@@ -1061,6 +1065,7 @@
 	}
 
 	cCOUPDAYBS.prototype = Object.create(cBaseFunction.prototype);
+	cCOUPDAYBS.prototype.constructor = cCOUPDAYBS;
 	cCOUPDAYBS.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCOUPDAYBS.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], frequency = arg[2], basis = arg[3] && !(arg[3] instanceof cEmpty) ?
@@ -1141,6 +1146,7 @@
 	}
 
 	cCOUPDAYS.prototype = Object.create(cBaseFunction.prototype);
+	cCOUPDAYS.prototype.constructor = cCOUPDAYS;
 	cCOUPDAYS.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCOUPDAYS.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], frequency = arg[2], basis = arg[3] && !(arg[3] instanceof cEmpty) ?
@@ -1220,6 +1226,7 @@
 	}
 
 	cCOUPDAYSNC.prototype = Object.create(cBaseFunction.prototype);
+	cCOUPDAYSNC.prototype.constructor = cCOUPDAYSNC;
 	cCOUPDAYSNC.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCOUPDAYSNC.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], frequency = arg[2], basis = arg[3] && !(arg[3] instanceof cEmpty) ?
@@ -1299,6 +1306,7 @@
 	}
 
 	cCOUPNCD.prototype = Object.create(cBaseFunction.prototype);
+	cCOUPNCD.prototype.constructor = cCOUPNCD;
 	cCOUPNCD.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCOUPNCD.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], frequency = arg[2], basis = arg[3] && !(arg[3] instanceof cEmpty) ?
@@ -1380,6 +1388,7 @@
 	}
 
 	cCOUPNUM.prototype = Object.create(cBaseFunction.prototype);
+	cCOUPNUM.prototype.constructor = cCOUPNUM;
 	cCOUPNUM.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCOUPNUM.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], frequency = arg[2], basis = arg[3] && !(arg[3] instanceof cEmpty) ?
@@ -1461,6 +1470,7 @@
 	}
 
 	cCOUPPCD.prototype = Object.create(cBaseFunction.prototype);
+	cCOUPPCD.prototype.constructor = cCOUPPCD;
 	cCOUPPCD.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCOUPPCD.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], frequency = arg[2], basis = arg[3] && !(arg[3] instanceof cEmpty) ?
@@ -1544,6 +1554,7 @@
 	}
 
 	cCUMIPMT.prototype = Object.create(cBaseFunction.prototype);
+	cCUMIPMT.prototype.constructor = cCUMIPMT;
 	cCUMIPMT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCUMIPMT.prototype.Calculate = function (arg) {
 		var rate = arg[0], nper = arg[1], pv = arg[2], startPeriod = arg[3], endPeriod = arg[4], type = arg[5];
@@ -1662,6 +1673,7 @@
 	}
 
 	cCUMPRINC.prototype = Object.create(cBaseFunction.prototype);
+	cCUMPRINC.prototype.constructor = cCUMPRINC;
 	cCUMPRINC.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCUMPRINC.prototype.Calculate = function (arg) {
 		var rate = arg[0], nper = arg[1], pv = arg[2], startPeriod = arg[3], endPeriod = arg[4] &&
@@ -1782,6 +1794,7 @@
 	}
 
 	cDB.prototype = Object.create(cBaseFunction.prototype);
+	cDB.prototype.constructor = cDB;
 	cDB.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDB.prototype.Calculate = function (arg) {
 		var cost = arg[0], salvage = arg[1], life = arg[2], period = arg[3], month = arg[4] &&
@@ -1895,6 +1908,7 @@
 	}
 
 	cDDB.prototype = Object.create(cBaseFunction.prototype);
+	cDDB.prototype.constructor = cDDB;
 	cDDB.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDDB.prototype.Calculate = function (arg) {
 		var cost = arg[0], salvage = arg[1], life = arg[2], period = arg[3], factor = arg[4] &&
@@ -1986,6 +2000,7 @@
 	}
 
 	cDISC.prototype = Object.create(cBaseFunction.prototype);
+	cDISC.prototype.constructor = cDISC;
 	cDISC.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDISC.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], pr = arg[2], redemption = arg[3], basis = arg[4] &&
@@ -2078,6 +2093,7 @@
 	}
 
 	cDOLLARDE.prototype = Object.create(cBaseFunction.prototype);
+	cDOLLARDE.prototype.constructor = cDOLLARDE;
 	cDOLLARDE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDOLLARDE.prototype.Calculate = function (arg) {
 		var fractionalDollar = arg[0], fraction = arg[1];
@@ -2142,6 +2158,7 @@
 	}
 
 	cDOLLARFR.prototype = Object.create(cBaseFunction.prototype);
+	cDOLLARFR.prototype.constructor = cDOLLARFR;
 	cDOLLARFR.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDOLLARFR.prototype.Calculate = function (arg) {
 		var decimalDollar = arg[0], fraction = arg[1];
@@ -2206,6 +2223,7 @@
 	}
 
 	cDURATION.prototype = Object.create(cBaseFunction.prototype);
+	cDURATION.prototype.constructor = cDURATION;
 	cDURATION.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDURATION.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], coupon = arg[2], yld = arg[3], frequency = arg[4], basis = arg[5] &&
@@ -2307,6 +2325,7 @@
 	}
 
 	cEFFECT.prototype = Object.create(cBaseFunction.prototype);
+	cEFFECT.prototype.constructor = cEFFECT;
 	cEFFECT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cEFFECT.prototype.Calculate = function (arg) {
 		var nominalRate = arg[0], npery = arg[1];
@@ -2358,6 +2377,7 @@
 	}
 
 	cFV.prototype = Object.create(cBaseFunction.prototype);
+	cFV.prototype.constructor = cFV;
 	cFV.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cFV.prototype.Calculate = function (arg) {
 		var rate = arg[0], nper = arg[1], pmt = arg[2], pv = arg[3] ? arg[3] : new cNumber(0), type = arg[4] ? arg[4] :
@@ -2446,6 +2466,7 @@
 	}
 
 	cFVSCHEDULE.prototype = Object.create(cBaseFunction.prototype);
+	cFVSCHEDULE.prototype.constructor = cFVSCHEDULE;
 	cFVSCHEDULE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cFVSCHEDULE.prototype.Calculate = function (arg) {
 		var principal = arg[0], schedule = arg[1], shedList = [];
@@ -2503,6 +2524,7 @@
 	}
 
 	cINTRATE.prototype = Object.create(cBaseFunction.prototype);
+	cINTRATE.prototype.constructor = cINTRATE;
 	cINTRATE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cINTRATE.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], investment = arg[2], redemption = arg[3], basis = arg[4] &&
@@ -2596,6 +2618,7 @@
 	}
 
 	cIPMT.prototype = Object.create(cBaseFunction.prototype);
+	cIPMT.prototype.constructor = cIPMT;
 	cIPMT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cIPMT.prototype.Calculate = function (arg) {
 		var rate = arg[0], per = arg[1], nper = arg[2], pv = arg[3], fv = arg[4] ? arg[4] :
@@ -2698,6 +2721,7 @@
 	}
 
 	cIRR.prototype = Object.create(cBaseFunction.prototype);
+	cIRR.prototype.constructor = cIRR;
 	cIRR.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cIRR.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber(0.1);
@@ -2830,6 +2854,7 @@
 	}
 
 	cISPMT.prototype = Object.create(cBaseFunction.prototype);
+	cISPMT.prototype.constructor = cISPMT;
 	cISPMT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cISPMT.prototype.Calculate = function (arg) {
 		var rate = arg[0], per = arg[1], nper = arg[2], pv = arg[3];
@@ -2898,6 +2923,7 @@
 	}
 
 	cMDURATION.prototype = Object.create(cBaseFunction.prototype);
+	cMDURATION.prototype.constructor = cMDURATION;
 	cMDURATION.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cMDURATION.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], coupon = arg[2], yld = arg[3], frequency = arg[4], basis = arg[5] &&
@@ -3003,6 +3029,7 @@
 	}
 
 	cMIRR.prototype = Object.create(cBaseFunction.prototype);
+	cMIRR.prototype.constructor = cMIRR;
 	cMIRR.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cMIRR.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], invest = arg[1], reinvest = arg[2];
@@ -3113,6 +3140,7 @@
 	}
 
 	cNOMINAL.prototype = Object.create(cBaseFunction.prototype);
+	cNOMINAL.prototype.constructor = cNOMINAL;
 	cNOMINAL.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cNOMINAL.prototype.Calculate = function (arg) {
 		var effectRate = arg[0], npery = arg[1];
@@ -3168,6 +3196,7 @@
 	}
 
 	cNPER.prototype = Object.create(cBaseFunction.prototype);
+	cNPER.prototype.constructor = cNPER;
 	cNPER.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cNPER.prototype.Calculate = function (arg) {
 		var rate = arg[0], pmt = arg[1], pv = arg[2], fv = arg[3] ? arg[3] : new cNumber(0), type = arg[4] ? arg[4] :
@@ -3260,6 +3289,7 @@
 	}
 
 	cNPV.prototype = Object.create(cBaseFunction.prototype);
+	cNPV.prototype.constructor = cNPV;
 	cNPV.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cNPV.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], iStart = 1, res = 0, rate;
@@ -3335,6 +3365,7 @@
 	}
 
 	cODDFPRICE.prototype = Object.create(cBaseFunction.prototype);
+	cODDFPRICE.prototype.constructor = cODDFPRICE;
 	cODDFPRICE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cODDFPRICE.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], issue = arg[2], first_coupon = arg[3], rate = arg[4], yld = arg[5], redemption = arg[6], frequency = arg[7], basis = arg[8] &&
@@ -3474,6 +3505,7 @@
 	}
 
 	cODDFYIELD.prototype = Object.create(cBaseFunction.prototype);
+	cODDFYIELD.prototype.constructor = cODDFYIELD;
 	cODDFYIELD.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cODDFYIELD.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], issue = arg[2], first_coupon = arg[3], rate = arg[4], pr = arg[5], redemption = arg[6], frequency = arg[7], basis = arg[8] &&
@@ -3679,6 +3711,7 @@
 	}
 
 	cODDLPRICE.prototype = Object.create(cBaseFunction.prototype);
+	cODDLPRICE.prototype.constructor = cODDLPRICE;
 	cODDLPRICE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cODDLPRICE.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], last_interest = arg[2], rate = arg[3], yld = arg[4], redemption = arg[5], frequency = arg[6], basis = arg[7] &&
@@ -3814,6 +3847,7 @@
 	}
 
 	cODDLYIELD.prototype = Object.create(cBaseFunction.prototype);
+	cODDLYIELD.prototype.constructor = cODDLYIELD;
 	cODDLYIELD.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cODDLYIELD.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], last_interest = arg[2], rate = arg[3], pr = arg[4], redemption = arg[5], frequency = arg[6], basis = arg[7] &&
@@ -3950,6 +3984,7 @@
 	}
 
 	cPMT.prototype = Object.create(cBaseFunction.prototype);
+	cPMT.prototype.constructor = cPMT;
 	cPMT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cPMT.prototype.Calculate = function (arg) {
 		var rate = arg[0], nper = arg[1], pv = arg[2], fv = arg[3] ? arg[3] : new cNumber(0), type = arg[4] ? arg[4] :
@@ -4043,6 +4078,7 @@
 	}
 
 	cPPMT.prototype = Object.create(cBaseFunction.prototype);
+	cPPMT.prototype.constructor = cPPMT;
 	cPPMT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cPPMT.prototype.Calculate = function (arg) {
 		var rate = arg[0], per = arg[1], nper = arg[2], pv = arg[3], fv = arg[4] ? arg[4] :
@@ -4147,6 +4183,7 @@
 	}
 
 	cPRICE.prototype = Object.create(cBaseFunction.prototype);
+	cPRICE.prototype.constructor = cPRICE;
 	cPRICE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cPRICE.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], rate = arg[2], yld = arg[3], redemption = arg[4], frequency = arg[5], basis = arg[6] &&
@@ -4259,6 +4296,7 @@
 	}
 
 	cPRICEDISC.prototype = Object.create(cBaseFunction.prototype);
+	cPRICEDISC.prototype.constructor = cPRICEDISC;
 	cPRICEDISC.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cPRICEDISC.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], discount = arg[2], redemption = arg[3], basis = arg[4] &&
@@ -4350,6 +4388,7 @@
 	}
 
 	cPRICEMAT.prototype = Object.create(cBaseFunction.prototype);
+	cPRICEMAT.prototype.constructor = cPRICEMAT;
 	cPRICEMAT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cPRICEMAT.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], issue = arg[2], rate = arg[3], yld = arg[4], basis = arg[5] &&
@@ -4461,6 +4500,7 @@
 	}
 
 	cPV.prototype = Object.create(cBaseFunction.prototype);
+	cPV.prototype.constructor = cPV;
 	cPV.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cPV.prototype.Calculate = function (arg) {
 		var rate = arg[0], nper = arg[1], pmt = arg[2], fv = arg[3] ? arg[3] : new cNumber(0), type = arg[4] ? arg[4] :
@@ -4549,6 +4589,7 @@
 	}
 
 	cRATE.prototype = Object.create(cBaseFunction.prototype);
+	cRATE.prototype.constructor = cRATE;
 	cRATE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cRATE.prototype.Calculate = function (arg) {
 
@@ -4648,6 +4689,7 @@
 	}
 
 	cRECEIVED.prototype = Object.create(cBaseFunction.prototype);
+	cRECEIVED.prototype.constructor = cRECEIVED;
 	cRECEIVED.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cRECEIVED.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], investment = arg[2], discount = arg[3], basis = arg[4] &&
@@ -4740,6 +4782,7 @@
 	}
 
 	cSLN.prototype = Object.create(cBaseFunction.prototype);
+	cSLN.prototype.constructor = cSLN;
 	cSLN.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cSLN.prototype.Calculate = function (arg) {
 		var cost = arg[0], salvage = arg[1], life = arg[2];
@@ -4804,6 +4847,7 @@
 	}
 
 	cSYD.prototype = Object.create(cBaseFunction.prototype);
+	cSYD.prototype.constructor = cSYD;
 	cSYD.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cSYD.prototype.Calculate = function (arg) {
 		var cost = arg[0], salvage = arg[1], life = arg[2], per = arg[3];
@@ -4882,6 +4926,7 @@
 	}
 
 	cTBILLEQ.prototype = Object.create(cBaseFunction.prototype);
+	cTBILLEQ.prototype.constructor = cTBILLEQ;
 	cTBILLEQ.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cTBILLEQ.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], discount = arg[2];
@@ -4961,6 +5006,7 @@
 	}
 
 	cTBILLPRICE.prototype = Object.create(cBaseFunction.prototype);
+	cTBILLPRICE.prototype.constructor = cTBILLPRICE;
 	cTBILLPRICE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cTBILLPRICE.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], discount = arg[2];
@@ -5036,6 +5082,7 @@
 	}
 
 	cTBILLYIELD.prototype = Object.create(cBaseFunction.prototype);
+	cTBILLYIELD.prototype.constructor = cTBILLYIELD;
 	cTBILLYIELD.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cTBILLYIELD.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], pr = arg[2];
@@ -5112,6 +5159,7 @@
 	}
 
 	cVDB.prototype = Object.create(cBaseFunction.prototype);
+	cVDB.prototype.constructor = cVDB;
 	cVDB.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cVDB.prototype.Calculate = function (arg) {
 		var cost = arg[0], salvage = arg[1], life = arg[2], startPeriod = arg[3], endPeriod = arg[4], factor = arg[5] &&
@@ -5287,6 +5335,7 @@
 	}
 
 	cXIRR.prototype = Object.create(cBaseFunction.prototype);
+	cXIRR.prototype.constructor = cXIRR;
 	cXIRR.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cXIRR.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber(0.1);
@@ -5538,6 +5587,7 @@
 	}
 
 	cXNPV.prototype = Object.create(cBaseFunction.prototype);
+	cXNPV.prototype.constructor = cXNPV;
 	cXNPV.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cXNPV.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -5667,6 +5717,7 @@
 	}
 
 	cYIELD.prototype = Object.create(cBaseFunction.prototype);
+	cYIELD.prototype.constructor = cYIELD;
 	cYIELD.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cYIELD.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], rate = arg[2], pr = arg[3], redemption = arg[4], frequency = arg[5], basis = arg[6] &&
@@ -5781,6 +5832,7 @@
 	}
 
 	cYIELDDISC.prototype = Object.create(cBaseFunction.prototype);
+	cYIELDDISC.prototype.constructor = cYIELDDISC;
 	cYIELDDISC.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cYIELDDISC.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], pr = arg[2], redemption = arg[3], basis = arg[4] &&
@@ -5875,6 +5927,7 @@
 	}
 
 	cYIELDMAT.prototype = Object.create(cBaseFunction.prototype);
+	cYIELDMAT.prototype.constructor = cYIELDMAT;
 	cYIELDMAT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cYIELDMAT.prototype.Calculate = function (arg) {
 		var settlement = arg[0], maturity = arg[1], issue = arg[2], rate = arg[3], pr = arg[4], basis = arg[5] &&

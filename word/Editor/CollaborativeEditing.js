@@ -39,7 +39,7 @@
  */
 function CWordCollaborativeEditing()
 {
-    CWordCollaborativeEditing.superclass.constructor.call(this);
+	AscCommon.CCollaborativeEditingBase.call(this);
 
     this.m_oLogicDocument        = null;
     this.m_aDocumentPositions    = new AscCommon.CDocumentPositionsManager();
@@ -49,7 +49,8 @@ function CWordCollaborativeEditing()
     this.m_aForeignCursorsToShow = {};
 }
 
-AscCommon.extendClass(CWordCollaborativeEditing, AscCommon.CCollaborativeEditingBase);
+CWordCollaborativeEditing.prototype = Object.create(AscCommon.CCollaborativeEditingBase.prototype);
+CWordCollaborativeEditing.prototype.constructor = CWordCollaborativeEditing;
 
 CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalInfo, IsUpdateInterface)
 {

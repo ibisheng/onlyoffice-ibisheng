@@ -104,6 +104,7 @@
 	}
 
 	cADDRESS.prototype = Object.create(cBaseFunction.prototype);
+	cADDRESS.prototype.constructor = cADDRESS;
 	cADDRESS.prototype.Calculate = function (arg) {
 		var rowNumber = arg[0], colNumber = arg[1], refType = arg[2] ? arg[2] : new cNumber(1), A1RefType = arg[3] ?
 			arg[3] : new cBool(true), sheetName = arg[4] ? arg[4] : new cEmpty();
@@ -216,6 +217,7 @@
 	}
 
 	cAREAS.prototype = Object.create(cBaseFunction.prototype);
+	cAREAS.prototype.constructor = cAREAS;
 
 	/** @constructor */
 	function cCHOOSE() {
@@ -227,6 +229,7 @@
 	}
 
 	cCHOOSE.prototype = Object.create(cBaseFunction.prototype);
+	cCHOOSE.prototype.constructor = cCHOOSE;
 	cCHOOSE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 
@@ -265,6 +268,7 @@
 	}
 
 	cCOLUMN.prototype = Object.create(cBaseFunction.prototype);
+	cCOLUMN.prototype.constructor = cCOLUMN;
 	cCOLUMN.prototype.Calculate = function (arg) {
 		var arg0;
 		if (this.argumentsCurrent == 0) {
@@ -295,6 +299,7 @@
 	}
 
 	cCOLUMNS.prototype = Object.create(cBaseFunction.prototype);
+	cCOLUMNS.prototype.constructor = cCOLUMNS;
 	cCOLUMNS.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		var range;
@@ -319,6 +324,7 @@
 	}
 
 	cGETPIVOTDATA.prototype = Object.create(cBaseFunction.prototype);
+	cGETPIVOTDATA.prototype.constructor = cGETPIVOTDATA;
 
 	/** @constructor */
 	function cHLOOKUP() {
@@ -330,6 +336,7 @@
 	}
 
 	cHLOOKUP.prototype = Object.create(cBaseFunction.prototype);
+	cHLOOKUP.prototype.constructor = cHLOOKUP;
 	cHLOOKUP.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 		var arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool().value : true;
@@ -434,6 +441,7 @@
 	}
 
 	cHYPERLINK.prototype = Object.create(cBaseFunction.prototype);
+	cHYPERLINK.prototype.constructor = cHYPERLINK;
 
 	/** @constructor */
 	function cINDEX() {
@@ -445,6 +453,7 @@
 	}
 
 	cINDEX.prototype = Object.create(cBaseFunction.prototype);
+	cINDEX.prototype.constructor = cINDEX;
 	cINDEX.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1] && (cElementType.empty !== arg[1].type) ? arg[1] : new cNumber(1), arg2 = arg[2] &&
 		(cElementType.empty !== arg[2].type) ? arg[2] : new cNumber(1), arg3 = arg[3] &&
@@ -526,6 +535,7 @@
 	}
 
 	cINDIRECT.prototype = Object.create(cBaseFunction.prototype);
+	cINDIRECT.prototype.constructor = cINDIRECT;
 	cINDIRECT.prototype.Calculate = function (arg) {
 		var t = this, arg0 = arg[0].tocString(), arg1 = arg[1] ? arg[1] :
 			new cBool(true), r1 = arguments[1], wb = r1.worksheet.workbook, o = {
@@ -600,6 +610,7 @@
 	}
 
 	cLOOKUP.prototype = Object.create(cBaseFunction.prototype);
+	cLOOKUP.prototype.constructor = cLOOKUP;
 	cLOOKUP.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = this.argumentsCurrent == 2 ? arg1 : arg[2], resC = -1, resR = -1;
 
@@ -745,6 +756,7 @@
 	}
 
 	cMATCH.prototype = Object.create(cBaseFunction.prototype);
+	cMATCH.prototype.constructor = cMATCH;
 	cMATCH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber(1);
 
@@ -850,6 +862,7 @@
 	}
 
 	cOFFSET.prototype = Object.create(cBaseFunction.prototype);
+	cOFFSET.prototype.constructor = cOFFSET;
 	cOFFSET.prototype.Calculate = function (arg) {
 
 		function validBBOX(bbox) {
@@ -950,6 +963,7 @@
 	}
 
 	cROW.prototype = Object.create(cBaseFunction.prototype);
+	cROW.prototype.constructor = cROW;
 	cROW.prototype.Calculate = function (arg) {
 		var arg0;
 		if (this.argumentsCurrent == 0) {
@@ -980,6 +994,7 @@
 	}
 
 	cROWS.prototype = Object.create(cBaseFunction.prototype);
+	cROWS.prototype.constructor = cROWS;
 	cROWS.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		var range;
@@ -1004,6 +1019,7 @@
 	}
 
 	cRTD.prototype = Object.create(cBaseFunction.prototype);
+	cRTD.prototype.constructor = cRTD;
 
 	/** @constructor */
 	function cTRANSPOSE() {
@@ -1015,6 +1031,7 @@
 	}
 
 	cTRANSPOSE.prototype = Object.create(cBaseFunction.prototype);
+	cTRANSPOSE.prototype.constructor = cTRANSPOSE;
 	cTRANSPOSE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cTRANSPOSE.prototype.Calculate = function (arg) {
 
@@ -1148,6 +1165,7 @@
 	}
 
 	cVLOOKUP.prototype = Object.create(cBaseFunction.prototype);
+	cVLOOKUP.prototype.constructor = cVLOOKUP;
 	cVLOOKUP.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 		var arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool().value : true;

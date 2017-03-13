@@ -35,9 +35,11 @@
         this.Type = Type;
         var _OldPr = AscFormat.isRealBool(OldPr) ? OldPr : undefined;
         var _NewPr = AscFormat.isRealBool(NewPr) ? NewPr : undefined;
-        CChangesDrawingsBool.superclass.constructor.call(this, Class, _OldPr, _NewPr);
+		AscDFH.CChangesBaseBoolProperty.call(this, Class, _OldPr, _NewPr);
     }
-    AscCommon.extendClass(CChangesDrawingsBool, AscDFH.CChangesBaseBoolProperty);
+
+	CChangesDrawingsBool.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+	CChangesDrawingsBool.prototype.constructor = CChangesDrawingsBool;
     CChangesDrawingsBool.prototype.private_SetValue = private_SetValue;
     CChangesDrawingsBool.prototype.Load = function(){
         this.Redo();
@@ -51,7 +53,7 @@
     CChangesDrawingsBool.prototype.ReadFromBinary = function (reader) {
         reader.Seek2(reader.GetCurPos() - 4);
         this.Type = reader.GetLong();
-        CChangesDrawingsBool.superclass.ReadFromBinary.call(this, reader);
+		AscDFH.CChangesBaseBoolProperty.prototype.ReadFromBinary.call(this, reader);
     };
     window['AscDFH'].CChangesDrawingsBool = CChangesDrawingsBool;
 
@@ -60,13 +62,11 @@
         this.Type = Type;
         var _OldPr = AscFormat.isRealNumber(OldPr) ? ((OldPr + 0.5) >> 0) : undefined;
         var _NewPr = AscFormat.isRealNumber(NewPr) ? ((NewPr + 0.5) >> 0) : undefined;
-        CChangesDrawingsLong.superclass.constructor.call(this, Class, _OldPr, _NewPr);
+		AscDFH.CChangesBaseLongProperty.call(this, Class, _OldPr, _NewPr);
     }
 
-
-    AscCommon.extendClass(CChangesDrawingsLong, AscDFH.CChangesBaseLongProperty);
-
-
+	CChangesDrawingsLong.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+	CChangesDrawingsLong.prototype.constructor = CChangesDrawingsLong;
 
     CChangesDrawingsLong.prototype.CreateReverseChange = function()
     {
@@ -81,7 +81,7 @@
     CChangesDrawingsLong.prototype.ReadFromBinary = function (reader) {
         reader.Seek2(reader.GetCurPos() - 4);
         this.Type = reader.GetLong();
-        CChangesDrawingsLong.superclass.ReadFromBinary.call(this, reader);
+		AscDFH.CChangesBaseLongProperty.prototype.ReadFromBinary.call(this, reader);
     };
     window['AscDFH'].CChangesDrawingsLong = CChangesDrawingsLong;
 
@@ -89,10 +89,11 @@
         this.Type = Type;
         var _OldPr = AscFormat.isRealNumber(OldPr) ? OldPr : undefined;
         var _NewPr = AscFormat.isRealNumber(NewPr) ? NewPr : undefined;
-        CChangesDrawingsDouble.superclass.constructor.call(this, Class, _OldPr, _NewPr);
+		AscDFH.CChangesBaseDoubleProperty.call(this, Class, _OldPr, _NewPr);
     }
 
-    AscCommon.extendClass(CChangesDrawingsDouble, AscDFH.CChangesBaseDoubleProperty);
+	CChangesDrawingsDouble.prototype = Object.create(AscDFH.CChangesBaseDoubleProperty.prototype);
+	CChangesDrawingsDouble.prototype.constructor = CChangesDrawingsDouble;
 
     CChangesDrawingsDouble.prototype.CreateReverseChange = function()
     {
@@ -109,7 +110,7 @@
 
         reader.Seek2(reader.GetCurPos() - 4);
         this.Type = reader.GetLong();
-        CChangesDrawingsDouble.superclass.ReadFromBinary.call(this, reader);
+		AscDFH.CChangesBaseDoubleProperty.prototype.ReadFromBinary.call(this, reader);
     };
     CChangesDrawingsDouble.prototype.IsPosExtChange = function () {
         return !!oPosExtMap[this.Type];
@@ -124,10 +125,11 @@
         this.Type = Type;
         var _OldPr = typeof OldPr === "string" ? OldPr : undefined;
         var _NewPr = typeof NewPr === "string" ? NewPr : undefined;
-        CChangesDrawingsString.superclass.constructor.call(this, Class, _OldPr, _NewPr);
+		AscDFH.CChangesBaseStringProperty.call(this, Class, _OldPr, _NewPr);
     }
 
-    AscCommon.extendClass(CChangesDrawingsString, AscDFH.CChangesBaseStringProperty);
+	CChangesDrawingsString.prototype = Object.create(AscDFH.CChangesBaseStringProperty.prototype);
+	CChangesDrawingsString.prototype.constructor = CChangesDrawingsString;
 
     CChangesDrawingsString.prototype.CreateReverseChange = function()
     {
@@ -143,7 +145,7 @@
     CChangesDrawingsString.prototype.ReadFromBinary = function (reader) {
         reader.Seek2(reader.GetCurPos() - 4);
         this.Type = reader.GetLong();
-        CChangesDrawingsString.superclass.ReadFromBinary.call(this, reader);
+		AscDFH.CChangesBaseStringProperty.prototype.ReadFromBinary.call(this, reader);
     };
     window['AscDFH'].CChangesDrawingsString = CChangesDrawingsString;
 
@@ -153,11 +155,11 @@
         this.FromLoad = false;
         var _OldPr = AscCommon.isRealObject(OldPr) ? OldPr : undefined;
         var _NewPr = AscCommon.isRealObject(NewPr) ? NewPr : undefined;
-        CChangesDrawingsObjectNoId.superclass.constructor.call(this, Class, _OldPr, _NewPr);
+		AscDFH.CChangesBaseObjectProperty.call(this, Class, _OldPr, _NewPr);
     }
 
-
-    AscCommon.extendClass(CChangesDrawingsObjectNoId, AscDFH.CChangesBaseObjectProperty);
+	CChangesDrawingsObjectNoId.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+	CChangesDrawingsObjectNoId.prototype.constructor = CChangesDrawingsObjectNoId;
     CChangesDrawingsObjectNoId.prototype.CreateReverseChange = function()
     {
         return new this.constructor(this.Class, this.Type, this.New, this.Old, this.Color);
@@ -173,7 +175,7 @@
         var nType = reader.GetLong();
         this.Type = nType;
         this.FromLoad = true;
-        CChangesDrawingsObjectNoId.superclass.ReadFromBinary.call(this, reader);
+		AscDFH.CChangesBaseObjectProperty.prototype.ReadFromBinary.call(this, reader);
     };
     CChangesDrawingsObjectNoId.prototype.private_CreateObject = function () {
         if (AscDFH.drawingsConstructorsMap[this.Type]) {
@@ -187,11 +189,11 @@
         this.Type = Type;
         var _OldPr = OldPr && OldPr.Get_Id ? OldPr.Get_Id() : undefined;
         var _NewPr = NewPr && NewPr.Get_Id ? NewPr.Get_Id() : undefined;
-        CChangesDrawingsObject.superclass.constructor.call(this, Class, _OldPr, _NewPr);
+		AscDFH.CChangesBaseStringProperty.call(this, Class, _OldPr, _NewPr);
     }
 
-
-    AscCommon.extendClass(CChangesDrawingsObject, AscDFH.CChangesBaseStringProperty);
+	CChangesDrawingsObject.prototype = Object.create(AscDFH.CChangesBaseStringProperty.prototype);
+	CChangesDrawingsObject.prototype.constructor = CChangesDrawingsObject;
 
     CChangesDrawingsObject.prototype.CreateReverseChange = function()
     {
@@ -201,7 +203,7 @@
     CChangesDrawingsObject.prototype.ReadFromBinary = function (reader) {
         reader.Seek2(reader.GetCurPos() - 4);
         this.Type = reader.GetLong();
-        CChangesDrawingsObject.superclass.ReadFromBinary.call(this, reader);
+		AscDFH.CChangesBaseStringProperty.prototype.ReadFromBinary.call(this, reader);
     };
     CChangesDrawingsObject.prototype.private_SetValue = function (Value) {
         var oObject = null;
@@ -235,22 +237,23 @@
 
     function CChangesDrawingsContent(Class, Type, Pos, Items, isAdd) {
         this.Type = Type;
-        CChangesDrawingsContent.superclass.constructor.call(this, Class, Pos, Items, isAdd);
+		AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Items, isAdd);
     }
 
-    AscCommon.extendClass(CChangesDrawingsContent, AscDFH.CChangesBaseContentChange);
+	CChangesDrawingsContent.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+	CChangesDrawingsContent.prototype.constructor = CChangesDrawingsContent;
     window['AscDFH'].CChangesDrawingsContent = CChangesDrawingsContent;
     CChangesDrawingsContent.prototype.ReadFromBinary = function (reader) {
         reader.Seek2(reader.GetCurPos() - 4);
         this.Type = reader.GetLong();
         this.Add = reader.GetBool();
         this.Pos = reader.GetLong();
-        CChangesDrawingsContent.superclass.ReadFromBinary.call(this, reader);
+		AscDFH.CChangesBaseContentChange.prototype.ReadFromBinary.call(this, reader);
     };
     CChangesDrawingsContent.prototype.WriteToBinary = function (writer) {
         writer.WriteBool(this.IsAdd());
         writer.WriteLong(this.Pos);
-        CChangesDrawingsContent.superclass.WriteToBinary.call(this, writer);
+		AscDFH.CChangesBaseContentChange.prototype.WriteToBinary.call(this, writer);
     };
 
     CChangesDrawingsContent.prototype.private_WriteItem = function (Writer, Item) {
@@ -390,9 +393,11 @@
 
 
     function CChangesDrawingsContentPresentation(Class, Type, Pos, Items, isAdd){
-        CChangesDrawingsContentPresentation.superclass.constructor.call(this, Class, Type, Pos, Items, isAdd);
+		CChangesDrawingsContent.call(this, Class, Type, Pos, Items, isAdd);
     }
-    AscCommon.extendClass(CChangesDrawingsContentPresentation, CChangesDrawingsContent);
+
+	CChangesDrawingsContentPresentation.prototype = Object.create(CChangesDrawingsContent.prototype);
+	CChangesDrawingsContentPresentation.prototype.constructor = CChangesDrawingsContentPresentation;
     CChangesDrawingsContentPresentation.prototype.IsContentChange = function(){
         return true;
     };
@@ -439,10 +444,11 @@
     window['AscDFH'].CChangesDrawingsContentPresentation = CChangesDrawingsContentPresentation;
 
     function CChangesDrawingsContentNoId(Class, Type, Pos, Items, isAdd){
-        CChangesDrawingsContentNoId.superclass.constructor.call(this, Class, Type, Pos, Items, isAdd);
+		AscDFH.CChangesDrawingsContent.call(this, Class, Type, Pos, Items, isAdd);
     }
 
-    AscCommon.extendClass(CChangesDrawingsContentNoId, AscDFH.CChangesDrawingsContent);
+	CChangesDrawingsContentNoId.prototype = Object.create(AscDFH.CChangesDrawingsContent.prototype);
+	CChangesDrawingsContentNoId.prototype.constructor = CChangesDrawingsContentNoId;
 
     CChangesDrawingsContentNoId.prototype.private_WriteItem = function (Writer, Item) {
         Item.Write_ToBinary(Writer);
@@ -458,10 +464,11 @@
     window['AscDFH'].CChangesDrawingsContentNoId = CChangesDrawingsContentNoId;
 
     function CChangesDrawingsContentLong(Class, Type, Pos, Items, isAdd){
-        CChangesDrawingsContentLong.superclass.constructor.call(this, Class, Type, Pos, Items, isAdd);
+		AscDFH.CChangesDrawingsContent.call(this, Class, Type, Pos, Items, isAdd);
     }
 
-    AscCommon.extendClass(CChangesDrawingsContentLong, AscDFH.CChangesDrawingsContent);
+	CChangesDrawingsContentLong.prototype = Object.create(AscDFH.CChangesDrawingsContent.prototype);
+	CChangesDrawingsContentLong.prototype.constructor = CChangesDrawingsContentLong;
 
     CChangesDrawingsContentLong.prototype.private_WriteItem = function (Writer, Item) {
         Writer.WriteLong(Item);
@@ -473,9 +480,11 @@
 
 
     function CChangesDrawingsContentLongMap(Class, Type, Pos, Items, isAdd){
-        CChangesDrawingsContentLongMap.superclass.constructor.call(this, Class, Type, Pos, Items, isAdd);
+		AscDFH.CChangesDrawingsContentLong.call(this, Class, Type, Pos, Items, isAdd);
     }
-    AscCommon.extendClass(CChangesDrawingsContentLongMap, AscDFH.CChangesDrawingsContentLong);
+
+	CChangesDrawingsContentLongMap.prototype = Object.create(AscDFH.CChangesDrawingsContentLong.prototype);
+	CChangesDrawingsContentLongMap.prototype.constructor = CChangesDrawingsContentLongMap;
 
 
     CChangesDrawingsContentLongMap.prototype.private_InsertInArrayLoad = function () {
@@ -523,10 +532,11 @@
     function CChangesDrawingChangeTheme(Class, Type, aIndexes){
         this.Type = Type;
         this.aIndexes = aIndexes;
-        CChangesDrawingChangeTheme.superclass.constructor.call(this, Class);
+		AscDFH.CChangesBase.call(this, Class);
     }
 
-    AscCommon.extendClass(CChangesDrawingChangeTheme, AscDFH.CChangesBase);
+	CChangesDrawingChangeTheme.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesDrawingChangeTheme.prototype.constructor = CChangesDrawingChangeTheme;
 
     CChangesDrawingChangeTheme.prototype.WriteToBinary = function(Writer){
         Writer.WriteLong(this.aIndexes.length);
@@ -578,10 +588,11 @@
         this.timingLock = timingLock;
         this.transitionLock = transitionLock;
         this.layoutLock = layoutLock;
-        CChangesDrawingTimingLocks.superclass.constructor.call(this, Class);
+		AscDFH.CChangesBase.call(this, Class);
     }
 
-    AscCommon.extendClass(CChangesDrawingTimingLocks, AscDFH.CChangesBase);
+	CChangesDrawingTimingLocks.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesDrawingTimingLocks.prototype.constructor = CChangesDrawingTimingLocks;
 
     CChangesDrawingTimingLocks.prototype.WriteToBinary = function(Writer){
         AscFormat.writeObject(Writer, this.deleteLock);
@@ -632,11 +643,11 @@
         this.Type = AscDFH.historyitem_Sparkline_ChangeData;
         this.OldPr = OldPr;
         this.NewPr = NewPr;
-        CChangesSparklinesChangeData.superclass.constructor.call(this, Class);
+		AscDFH.CChangesBase.call(this, Class);
     }
-    AscCommon.extendClass(CChangesSparklinesChangeData, AscDFH.CChangesBase);
 
-
+	CChangesSparklinesChangeData.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesSparklinesChangeData.prototype.constructor = CChangesSparklinesChangeData;
 
     CChangesSparklinesChangeData.prototype.WritePr = function(Writer, Pr){
         var bIsArray = Array.isArray(Pr) ;
@@ -716,10 +727,11 @@
         this.Type = AscDFH.historyitem_Sparkline_RemoveData;
         this.sparkline = oSparkline;
         this.bReverse = bReverse;
-        CChangesSparklinesRemoveData.superclass.constructor.call(this, Class);
+		AscDFH.CChangesBase.call(this, Class);
     }
-    AscCommon.extendClass(CChangesSparklinesRemoveData, AscDFH.CChangesBase);
 
+	CChangesSparklinesRemoveData.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesSparklinesRemoveData.prototype.constructor = CChangesSparklinesRemoveData;
 
     CChangesSparklinesRemoveData.prototype.WriteToBinary = function(Writer){
         var bIsObject = AscCommon.isRealObject(this.sparkline);
@@ -773,11 +785,11 @@
         this.Type = Type;
         this.OldPr = OldPr;
         this.NewPr = NewPr;
-        CChangesDrawingsExcelColor.superclass.constructor.call(this, Class);
+		AscDFH.CChangesBase.call(this, Class);
     }
-    AscCommon.extendClass(CChangesDrawingsExcelColor, AscDFH.CChangesBase);
 
-
+	CChangesDrawingsExcelColor.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesDrawingsExcelColor.prototype.constructor = CChangesDrawingsExcelColor;
 
     CChangesDrawingsExcelColor.prototype.WritePr = function(Writer, Pr){
         var bIsObject = AscCommon.isRealObject(Pr) ;
@@ -871,9 +883,11 @@
     function CChangesDrawingsSparklinesRemove(Class, bReverse){
         this.Type = AscDFH.historyitem_Sparkline_RemoveSparkline;
         this.bReverse = bReverse;
-        CChangesDrawingsSparklinesRemove.superclass.constructor.call(this, Class);
+		AscDFH.CChangesBase.call(this, Class);
     }
-    AscCommon.extendClass(CChangesDrawingsSparklinesRemove, AscDFH.CChangesBase);
+
+	CChangesDrawingsSparklinesRemove.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesDrawingsSparklinesRemove.prototype.constructor = CChangesDrawingsSparklinesRemove;
     CChangesDrawingsSparklinesRemove.prototype.Undo = function(){
         if (this.Class.worksheet) {
             if(this.bReverse){

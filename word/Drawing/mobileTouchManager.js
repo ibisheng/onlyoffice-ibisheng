@@ -46,9 +46,10 @@
 	function CMobileTouchManager(_config)
 	{
 		this.Name = "word";
-		CMobileTouchManager.superclass.constructor.call(this, _config || {});
+		AscCommon.CMobileTouchManagerBase.call(this, _config || {});
 	}
-	AscCommon.extendClass(CMobileTouchManager, AscCommon.CMobileTouchManagerBase);
+	CMobileTouchManager.prototype = Object.create(AscCommon.CMobileTouchManagerBase.prototype);
+	CMobileTouchManager.prototype.constructor = CMobileTouchManager;
 
 	CMobileTouchManager.prototype.Init = function(_api)
 	{
@@ -705,11 +706,12 @@
 	 */
 	function CMobileDelegateEditorReader(_manager)
 	{
-		CMobileDelegateEditorReader.superclass.constructor.call(this, _manager);
+		AscCommon.CMobileDelegateSimple.call(this, _manager);
 
 		this.HtmlPage 			= this.Api.WordControl;
 	}
-	AscCommon.extendClass(CMobileDelegateEditorReader, AscCommon.CMobileDelegateSimple);
+	CMobileDelegateEditorReader.prototype = Object.create(AscCommon.CMobileDelegateSimple.prototype);
+	CMobileDelegateEditorReader.prototype.constructor = CMobileDelegateEditorReader;
 
 	CMobileDelegateEditorReader.prototype.GetZoom = function()
 	{
@@ -729,7 +731,7 @@
 	 */
 	function CReaderTouchManager(_config)
 	{
-		CReaderTouchManager.superclass.constructor.call(this, _config || {});
+		AscCommon.CMobileTouchManagerBase.call(this, _config || {});
 
 		this.SelectEnabled = false;
 		this.TableTrackEnabled = false;
@@ -737,7 +739,8 @@
 		this.bIsLock          = false;
 		this.bIsMoveAfterDown = false;
 	}
-	AscCommon.extendClass(CReaderTouchManager, AscCommon.CMobileTouchManagerBase);
+	CReaderTouchManager.prototype = Object.create(AscCommon.CMobileTouchManagerBase.prototype);
+	CReaderTouchManager.prototype.constructor = CReaderTouchManager;
 
 	CReaderTouchManager.prototype.Init = function(_api)
 	{

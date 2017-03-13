@@ -761,6 +761,9 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         settings.putHorAxisProps(cat_ax_props);
 
         AscFormat.DrawingObjectsController.prototype.applyPropsToChartSpace(settings, chart_space);
+
+        oSerie = chart_space.chart.plotArea.charts[0].series[0];
+        aSeriesPoints = AscFormat.getPtsFromSeries(oSerie);
         if(!chart_space.spPr)
             chart_space.setSpPr(new AscFormat.CSpPr());
 
@@ -991,7 +994,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             var oUnifill = CreateUniFillFromExcelColor(oSparklineGroup.colorSeries);
             var oSerie = chart_space.chart.plotArea.charts[0].series[0];
 
-            oSerie.setSpPr(new AscFormat.CSpPr());
+            //oSerie.setSpPr(new AscFormat.CSpPr());
             if(nSparklineType === Asc.c_oAscSparklineType.Line)
             {
                 var oLn = oSerie.spPr.ln;
@@ -3999,6 +4002,7 @@ function DrawingObjects() {
                     }
                 }
             }
+            api.exucuteHistoryEnd = false;
         }
 
     };

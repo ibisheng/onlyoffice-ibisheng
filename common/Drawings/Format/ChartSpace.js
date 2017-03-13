@@ -656,7 +656,7 @@ function checkPointInMap(map, worksheet, row, col)
 
 function CChartSpace()
 {
-    CChartSpace.superclass.constructor.call(this);
+	AscFormat.CGraphicObjectBase.call(this);
 
     this.nvGraphicFramePr = null;
     this.chart = null;
@@ -698,8 +698,9 @@ function CChartSpace()
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
-AscCommon.extendClass(CChartSpace, AscFormat.CGraphicObjectBase);
 
+	CChartSpace.prototype = Object.create(AscFormat.CGraphicObjectBase.prototype);
+	CChartSpace.prototype.constructor = CChartSpace;
 
     CChartSpace.prototype.AllocPath = function(){
         return this.pathMemory.AllocPath().startPos;
@@ -1324,7 +1325,7 @@ CChartSpace.prototype.changeFill = function (unifill)
     {
         this.recalculatePenBrush();
     }
-    var unifill2 = AscFormat.CorrectUniFill(unifill, this.brush);
+    var unifill2 = AscFormat.CorrectUniFill(unifill, this.brush, this.getEditorType());
     unifill2.convertToPPTXMods();
     this.spPr.setFill(unifill2);
 };

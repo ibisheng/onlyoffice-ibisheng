@@ -3880,12 +3880,13 @@ TreeRBNode.prototype = {
  * @extends {TreeRBNode}
  */
 function IntervalTreeRBNode(low, high, storedValue){
-	IntervalTreeRBNode.superclass.constructor.call(this, low, storedValue);
+	TreeRBNode.call(this, low, storedValue);
 	this.high = high;
 	this.maxHigh = this.high;
 	this.minLow = this.key;
 }
-AscCommon.extendClass(IntervalTreeRBNode, TreeRBNode);
+IntervalTreeRBNode.prototype = Object.create(TreeRBNode.prototype);
+IntervalTreeRBNode.prototype.constructor = IntervalTreeRBNode;
 IntervalTreeRBNode.prototype.isEqual = function (x) {
 	return this.key == x.key && this.high == x.high;
 };
@@ -4181,9 +4182,10 @@ TreeRB.prototype = {
  * @extends {TreeRB}
  */
 function IntervalTreeRB(){
-	IntervalTreeRB.superclass.constructor.call(this);
+	TreeRB.call(this);
 }
-AscCommon.extendClass(IntervalTreeRB, TreeRB);
+IntervalTreeRB.prototype = Object.create(TreeRB.prototype);
+IntervalTreeRB.prototype.constructor = IntervalTreeRB;
 IntervalTreeRB.prototype._init = function (x) {
 	this.nil = new IntervalTreeRBNode();
 	this.nil.left = this.nil.right = this.nil.parent = this.nil;
@@ -4231,7 +4233,7 @@ IntervalTreeRB.prototype._enumerateRecursion = function (low, high, x, enumResul
 };
 IntervalTreeRB.prototype._leftRotate = function (x) {
 	var y = x.right;
-	IntervalTreeRB.superclass._leftRotate.call(this, x);
+	TreeRB.prototype._leftRotate.call(this, x);
 
 	x.maxHigh = Math.max(x.left.maxHigh,Math.max(x.right.maxHigh,x.high));
 	x.minLow = Math.min(x.left.minLow,Math.min(x.right.minLow,x.key));
@@ -4240,7 +4242,7 @@ IntervalTreeRB.prototype._leftRotate = function (x) {
 };
 IntervalTreeRB.prototype._rightRotate = function (y) {
 	var x = y.left;
-	IntervalTreeRB.superclass._rightRotate.call(this, y);
+	TreeRB.prototype._rightRotate.call(this, y);
 	
 	y.maxHigh = Math.max(y.left.maxHigh,Math.max(y.right.maxHigh,y.high));
 	y.minLow = Math.min(y.left.minLow,Math.min(y.right.minLow,y.key));

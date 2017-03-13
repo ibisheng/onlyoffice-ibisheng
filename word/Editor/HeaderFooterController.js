@@ -18,10 +18,11 @@
  */
 function CHdrFtrController(LogicDocument, HdrFtr)
 {
-	CHdrFtrController.superclass.constructor.call(this, LogicDocument);
+	CDocumentControllerBase.call(this, LogicDocument);
 	this.HdrFtr = HdrFtr;
 }
-AscCommon.extendClass(CHdrFtrController, CDocumentControllerBase);
+CHdrFtrController.prototype = Object.create(CDocumentControllerBase.prototype);
+CHdrFtrController.prototype.constructor = CHdrFtrController;
 
 CHdrFtrController.prototype.CanTargetUpdate = function()
 {

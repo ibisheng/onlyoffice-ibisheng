@@ -332,6 +332,7 @@
 	}
 
 	cAVEDEV.prototype = Object.create(cBaseFunction.prototype);
+	cAVEDEV.prototype.constructor = cAVEDEV;
 	cAVEDEV.prototype.Calculate = function (arg) {
 		var count = 0, sum = new cNumber(0), arrX = [], i;
 		for (i = 0; i < arg.length; i++) {
@@ -395,6 +396,7 @@
 	}
 
 	cAVERAGE.prototype = Object.create(cBaseFunction.prototype);
+	cAVERAGE.prototype.constructor = cAVERAGE;
 	cAVERAGE.prototype.Calculate = function (arg) {
 		var count = 0, sum = new cNumber(0);
 		for (var i = 0; i < arg.length; i++) {
@@ -465,6 +467,7 @@
 	}
 
 	cAVERAGEA.prototype = Object.create(cBaseFunction.prototype);
+	cAVERAGEA.prototype.constructor = cAVERAGEA;
 	cAVERAGEA.prototype.Calculate = function (arg) {
 		var count = 0, sum = new cNumber(0);
 		for (var i = 0; i < arg.length; i++) {
@@ -528,6 +531,7 @@
 	}
 
 	cAVERAGEIF.prototype = Object.create(cBaseFunction.prototype);
+	cAVERAGEIF.prototype.constructor = cAVERAGEIF;
 	cAVERAGEIF.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _sum = 0, _count = 0, matchingInfo, ws;
 		if ((cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
@@ -610,6 +614,7 @@
 	}
 
 	cAVERAGEIFS.prototype = Object.create(cBaseFunction.prototype);
+	cAVERAGEIFS.prototype.constructor = cAVERAGEIFS;
 	cAVERAGEIFS.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
@@ -690,6 +695,7 @@
 	}
 
 	cBETADIST.prototype = Object.create(cBaseFunction.prototype);
+	cBETADIST.prototype.constructor = cBETADIST;
 
 	/** @constructor */
 	function cBETAINV() {/*Нет реализации в Google Docs*/
@@ -697,6 +703,7 @@
 	}
 
 	cBETAINV.prototype = Object.create(cBaseFunction.prototype);
+	cBETAINV.prototype.constructor = cBETAINV;
 
 	/** @constructor */
 	function cBINOMDIST() {
@@ -708,6 +715,7 @@
 	}
 
 	cBINOMDIST.prototype = Object.create(cBaseFunction.prototype);
+	cBINOMDIST.prototype.constructor = cBINOMDIST;
 	cBINOMDIST.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
@@ -786,6 +794,7 @@
 	}
 
 	cCHIDIST.prototype = Object.create(cBaseFunction.prototype);
+	cCHIDIST.prototype.constructor = cCHIDIST;
 
 	/** @constructor */
 	function cCHIINV() {
@@ -793,6 +802,7 @@
 	}
 
 	cCHIINV.prototype = Object.create(cBaseFunction.prototype);
+	cCHIINV.prototype.constructor = cCHIINV;
 
 	/** @constructor */
 	function cCHITEST() {
@@ -800,6 +810,7 @@
 	}
 
 	cCHITEST.prototype = Object.create(cBaseFunction.prototype);
+	cCHITEST.prototype.constructor = cCHITEST;
 
 	/** @constructor */
 	function cCONFIDENCE() {
@@ -811,6 +822,7 @@
 	}
 
 	cCONFIDENCE.prototype = Object.create(cBaseFunction.prototype);
+	cCONFIDENCE.prototype.constructor = cCONFIDENCE;
 	cCONFIDENCE.prototype.Calculate = function (arg) {
 
 		var alpha = arg[0], stdev_sigma = arg[1], size = arg[2];
@@ -870,6 +882,7 @@
 	}
 
 	cCORREL.prototype = Object.create(cBaseFunction.prototype);
+	cCORREL.prototype.constructor = cCORREL;
 	cCORREL.prototype.Calculate = function (arg) {
 
 		function correl(x, y) {
@@ -952,6 +965,7 @@
 	}
 
 	cCOUNT.prototype = Object.create(cBaseFunction.prototype);
+	cCOUNT.prototype.constructor = cCOUNT;
 	cCOUNT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCOUNT.prototype.Calculate = function (arg) {
 		var count = 0;
@@ -1004,6 +1018,7 @@
 	}
 
 	cCOUNTA.prototype = Object.create(cBaseFunction.prototype);
+	cCOUNTA.prototype.constructor = cCOUNTA;
 	cCOUNTA.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCOUNTA.prototype.Calculate = function (arg) {
 		var element, count = 0;
@@ -1051,6 +1066,7 @@
 	}
 
 	cCOUNTBLANK.prototype = Object.create(cBaseFunction.prototype);
+	cCOUNTBLANK.prototype.constructor = cCOUNTBLANK;
 	cCOUNTBLANK.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCOUNTBLANK.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
@@ -1078,6 +1094,7 @@
 	}
 
 	cCOUNTIF.prototype = Object.create(cBaseFunction.prototype);
+	cCOUNTIF.prototype.constructor = cCOUNTIF;
 	cCOUNTIF.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], _count = 0, matchingInfo;
 		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type && cElementType.cellsRange !== arg0.type && cElementType.cellsRange3D !== arg0.type) {
@@ -1130,6 +1147,7 @@
 	}
 
 	cCOUNTIFS.prototype = Object.create(cBaseFunction.prototype);
+	cCOUNTIFS.prototype.constructor = cCOUNTIFS;
 	cCOUNTIFS.prototype.Calculate = function (arg) {
 		var i, j, arg0, arg1, matchingInfo, arg0Matrix, arg1Matrix, _count = 0;
 		for (var k = 0; k < arg.length; k += 2) {
@@ -1198,6 +1216,7 @@
 	}
 
 	cCOVAR.prototype = Object.create(cBaseFunction.prototype);
+	cCOVAR.prototype.constructor = cCOVAR;
 	cCOVAR.prototype.Calculate = function (arg) {
 
 		function covar(x, y) {
@@ -1274,6 +1293,7 @@
 	}
 
 	cCRITBINOM.prototype = Object.create(cBaseFunction.prototype);
+	cCRITBINOM.prototype.constructor = cCRITBINOM;
 	cCRITBINOM.prototype.Calculate = function (arg) {
 		var n = arg[0], p = arg[1], alpha = arg[2];                    // alpha
 
@@ -1360,6 +1380,7 @@
 	}
 
 	cDEVSQ.prototype = Object.create(cBaseFunction.prototype);
+	cDEVSQ.prototype.constructor = cDEVSQ;
 	cDEVSQ.prototype.Calculate = function (arg) {
 
 		function devsq(x) {
@@ -1436,6 +1457,7 @@
 	}
 
 	cEXPONDIST.prototype = Object.create(cBaseFunction.prototype);
+	cEXPONDIST.prototype.constructor = cEXPONDIST;
 	cEXPONDIST.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
@@ -1493,6 +1515,7 @@
 	}
 
 	cFDIST.prototype = Object.create(cBaseFunction.prototype);
+	cFDIST.prototype.constructor = cFDIST;
 
 	/** @constructor */
 	function cFINV() {
@@ -1500,6 +1523,7 @@
 	}
 
 	cFINV.prototype = Object.create(cBaseFunction.prototype);
+	cFINV.prototype.constructor = cFINV;
 
 	/** @constructor */
 	function cFISHER() {
@@ -1511,6 +1535,7 @@
 	}
 
 	cFISHER.prototype = Object.create(cBaseFunction.prototype);
+	cFISHER.prototype.constructor = cFISHER;
 	cFISHER.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 
@@ -1556,6 +1581,7 @@
 	}
 
 	cFISHERINV.prototype = Object.create(cBaseFunction.prototype);
+	cFISHERINV.prototype.constructor = cFISHERINV;
 	cFISHERINV.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 
@@ -1601,6 +1627,7 @@
 	}
 
 	cFORECAST.prototype = Object.create(cBaseFunction.prototype);
+	cFORECAST.prototype.constructor = cFORECAST;
 	cFORECAST.prototype.Calculate = function (arg) {
 
 		function forecast(fx, y, x) {
@@ -1695,6 +1722,7 @@
 	}
 
 	cFREQUENCY.prototype = Object.create(cBaseFunction.prototype);
+	cFREQUENCY.prototype.constructor = cFREQUENCY;
 	cFREQUENCY.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cFREQUENCY.prototype.Calculate = function (arg) {
 
@@ -1776,6 +1804,7 @@
 	}
 
 	cFTEST.prototype = Object.create(cBaseFunction.prototype);
+	cFTEST.prototype.constructor = cFTEST;
 
 	/** @constructor */
 	function cGAMMADIST() {
@@ -1783,6 +1812,7 @@
 	}
 
 	cGAMMADIST.prototype = Object.create(cBaseFunction.prototype);
+	cGAMMADIST.prototype.constructor = cGAMMADIST;
 
 	/** @constructor */
 	function cGAMMAINV() {
@@ -1790,6 +1820,7 @@
 	}
 
 	cGAMMAINV.prototype = Object.create(cBaseFunction.prototype);
+	cGAMMAINV.prototype.constructor = cGAMMAINV;
 
 	/** @constructor */
 	function cGAMMALN() {
@@ -1801,6 +1832,7 @@
 	}
 
 	cGAMMALN.prototype = Object.create(cBaseFunction.prototype);
+	cGAMMALN.prototype.constructor = cGAMMALN;
 	cGAMMALN.prototype.Calculate = function (arg) {
 
 
@@ -1846,6 +1878,7 @@
 	}
 
 	cGEOMEAN.prototype = Object.create(cBaseFunction.prototype);
+	cGEOMEAN.prototype.constructor = cGEOMEAN;
 	cGEOMEAN.prototype.Calculate = function (arg) {
 
 		function geommean(x) {
@@ -1916,6 +1949,7 @@
 	}
 
 	cGROWTH.prototype = Object.create(cBaseFunction.prototype);
+	cGROWTH.prototype.constructor = cGROWTH;
 
 	/** @constructor */
 	function cHARMEAN() {
@@ -1927,6 +1961,7 @@
 	}
 
 	cHARMEAN.prototype = Object.create(cBaseFunction.prototype);
+	cHARMEAN.prototype.constructor = cHARMEAN;
 	cHARMEAN.prototype.Calculate = function (arg) {
 
 		function harmmean(x) {
@@ -2007,6 +2042,7 @@
 	}
 
 	cHYPGEOMDIST.prototype = Object.create(cBaseFunction.prototype);
+	cHYPGEOMDIST.prototype.constructor = cHYPGEOMDIST;
 	cHYPGEOMDIST.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
@@ -2081,6 +2117,7 @@
 	}
 
 	cINTERCEPT.prototype = Object.create(cBaseFunction.prototype);
+	cINTERCEPT.prototype.constructor = cINTERCEPT;
 	cINTERCEPT.prototype.Calculate = function (arg) {
 
 		function intercept(y, x) {
@@ -2163,6 +2200,7 @@
 	}
 
 	cKURT.prototype = Object.create(cBaseFunction.prototype);
+	cKURT.prototype.constructor = cKURT;
 	cKURT.prototype.Calculate = function (arg) {
 
 		function kurt(x) {
@@ -2251,6 +2289,7 @@
 	}
 
 	cLARGE.prototype = Object.create(cBaseFunction.prototype);
+	cLARGE.prototype.constructor = cLARGE;
 	cLARGE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cLARGE.prototype._getValue = function (arg0, arg1) {
 		if (cElementType.error === arg1.type) {
@@ -2318,6 +2357,7 @@
 	}
 
 	cLINEST.prototype = Object.create(cBaseFunction.prototype);
+	cLINEST.prototype.constructor = cLINEST;
 
 	/** @constructor */
 	function cLOGEST() {
@@ -2325,6 +2365,7 @@
 	}
 
 	cLOGEST.prototype = Object.create(cBaseFunction.prototype);
+	cLOGEST.prototype.constructor = cLOGEST;
 
 	/** @constructor */
 	function cLOGINV() {
@@ -2336,6 +2377,7 @@
 	}
 
 	cLOGINV.prototype = Object.create(cBaseFunction.prototype);
+	cLOGINV.prototype.constructor = cLOGINV;
 	cLOGINV.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -2398,6 +2440,7 @@
 	}
 
 	cLOGNORMDIST.prototype = Object.create(cBaseFunction.prototype);
+	cLOGNORMDIST.prototype.constructor = cLOGNORMDIST;
 	cLOGNORMDIST.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -2460,6 +2503,7 @@
 	}
 
 	cMAX.prototype = Object.create(cBaseFunction.prototype);
+	cMAX.prototype.constructor = cMAX;
 	cMAX.prototype.Calculate = function (arg) {
 		var v, element, argIVal, max = Number.NEGATIVE_INFINITY;
 		for (var i = 0; i < this.argumentsCurrent; i++) {
@@ -2541,6 +2585,7 @@
 	}
 
 	cMAXA.prototype = Object.create(cBaseFunction.prototype);
+	cMAXA.prototype.constructor = cMAXA;
 	cMAXA.prototype.Calculate = function (arg) {
 		var argI, argIVal, max = Number.NEGATIVE_INFINITY, v;
 		for (var i = 0; i < this.argumentsCurrent; i++) {
@@ -2624,6 +2669,7 @@
 	}
 
 	cMEDIAN.prototype = Object.create(cBaseFunction.prototype);
+	cMEDIAN.prototype.constructor = cMEDIAN;
 	cMEDIAN.prototype.Calculate = function (arg) {
 
 		function median(x) {
@@ -2699,6 +2745,7 @@
 	}
 
 	cMIN.prototype = Object.create(cBaseFunction.prototype);
+	cMIN.prototype.constructor = cMIN;
 	cMIN.prototype.Calculate = function (arg) {
 		var v, element, argIVal, min = Number.POSITIVE_INFINITY;
 		for (var i = 0; i < this.argumentsCurrent; i++) {
@@ -2781,6 +2828,7 @@
 	}
 
 	cMINA.prototype = Object.create(cBaseFunction.prototype);
+	cMINA.prototype.constructor = cMINA;
 	cMINA.prototype.Calculate = function (arg) {
 		var argI, argIVal, min = Number.POSITIVE_INFINITY, v;
 		for (var i = 0; i < this.argumentsCurrent; i++) {
@@ -2865,6 +2913,7 @@
 	}
 
 	cMODE.prototype = Object.create(cBaseFunction.prototype);
+	cMODE.prototype.constructor = cMODE;
 	cMODE.prototype.Calculate = function (arg) {
 
 		function mode(x) {
@@ -2960,6 +3009,7 @@
 	}
 
 	cNEGBINOMDIST.prototype = Object.create(cBaseFunction.prototype);
+	cNEGBINOMDIST.prototype.constructor = cNEGBINOMDIST;
 	cNEGBINOMDIST.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 
@@ -3025,6 +3075,7 @@
 	}
 
 	cNORMDIST.prototype = Object.create(cBaseFunction.prototype);
+	cNORMDIST.prototype.constructor = cNORMDIST;
 	cNORMDIST.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
@@ -3103,6 +3154,7 @@
 	}
 
 	cNORMINV.prototype = Object.create(cBaseFunction.prototype);
+	cNORMINV.prototype.constructor = cNORMINV;
 	cNORMINV.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -3165,6 +3217,7 @@
 	}
 
 	cNORMSDIST.prototype = Object.create(cBaseFunction.prototype);
+	cNORMSDIST.prototype.constructor = cNORMSDIST;
 	cNORMSDIST.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -3204,6 +3257,7 @@
 	}
 
 	cNORMSINV.prototype = Object.create(cBaseFunction.prototype);
+	cNORMSINV.prototype.constructor = cNORMSINV;
 	cNORMSINV.prototype.Calculate = function (arg) {
 
 		function normsinv(x) {
@@ -3252,6 +3306,7 @@
 	}
 
 	cPEARSON.prototype = Object.create(cBaseFunction.prototype);
+	cPEARSON.prototype.constructor = cPEARSON;
 	cPEARSON.prototype.Calculate = function (arg) {
 
 		function pearson(x, y) {
@@ -3335,6 +3390,7 @@
 	}
 
 	cPERCENTILE.prototype = Object.create(cBaseFunction.prototype);
+	cPERCENTILE.prototype.constructor = cPERCENTILE;
 	cPERCENTILE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cPERCENTILE.prototype.Calculate = function (arg) {
 
@@ -3398,6 +3454,7 @@
 	}
 
 	cPERCENTRANK.prototype = Object.create(cBaseFunction.prototype);
+	cPERCENTRANK.prototype.constructor = cPERCENTRANK;
 	cPERCENTRANK.prototype.Calculate = function (arg) {
 
 		function percentrank(A, x, k) {
@@ -3510,6 +3567,7 @@
 	}
 
 	cPERMUT.prototype = Object.create(cBaseFunction.prototype);
+	cPERMUT.prototype.constructor = cPERMUT;
 	cPERMUT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -3597,6 +3655,7 @@
 	}
 
 	cPOISSON.prototype = Object.create(cBaseFunction.prototype);
+	cPOISSON.prototype.constructor = cPOISSON;
 	cPOISSON.prototype.Calculate = function (arg) {
 
 		function poisson(x, l, cumulativeFlag) {
@@ -3672,6 +3731,7 @@
 	}
 
 	cPROB.prototype = Object.create(cBaseFunction.prototype);
+	cPROB.prototype.constructor = cPROB;
 	cPROB.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cPROB.prototype.Calculate = function (arg) {
 
@@ -3783,6 +3843,7 @@
 	}
 
 	cQUARTILE.prototype = Object.create(cBaseFunction.prototype);
+	cQUARTILE.prototype.constructor = cQUARTILE;
 	cQUARTILE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cQUARTILE.prototype.Calculate = function (arg) {
 
@@ -3884,6 +3945,7 @@
 	}
 
 	cRANK.prototype = Object.create(cBaseFunction.prototype);
+	cRANK.prototype.constructor = cRANK;
 
 	/** @constructor */
 	function cRSQ() {
@@ -3895,6 +3957,7 @@
 	}
 
 	cRSQ.prototype = Object.create(cBaseFunction.prototype);
+	cRSQ.prototype.constructor = cRSQ;
 	cRSQ.prototype.Calculate = function (arg) {
 
 		function rsq(x, y) {
@@ -3979,6 +4042,7 @@
 	}
 
 	cSKEW.prototype = Object.create(cBaseFunction.prototype);
+	cSKEW.prototype.constructor = cSKEW;
 	cSKEW.prototype.Calculate = function (arg) {
 
 		function skew(x) {
@@ -4069,6 +4133,7 @@
 	}
 
 	cSLOPE.prototype = Object.create(cBaseFunction.prototype);
+	cSLOPE.prototype.constructor = cSLOPE;
 	cSLOPE.prototype.Calculate = function (arg) {
 
 		function slope(y, x) {
@@ -4152,6 +4217,7 @@
 	}
 
 	cSMALL.prototype = Object.create(cBaseFunction.prototype);
+	cSMALL.prototype.constructor = cSMALL;
 	cSMALL.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cSMALL.prototype.Calculate = function (arg) {
 
@@ -4229,6 +4295,7 @@
 	}
 
 	cSTANDARDIZE.prototype = Object.create(cBaseFunction.prototype);
+	cSTANDARDIZE.prototype.constructor = cSTANDARDIZE;
 	cSTANDARDIZE.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -4291,6 +4358,7 @@
 	}
 
 	cSTDEV.prototype = Object.create(cBaseFunction.prototype);
+	cSTDEV.prototype.constructor = cSTDEV;
 	cSTDEV.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cSTDEV.prototype.Calculate = function (arg) {
 		var i, element, count = 0, sum = new cNumber(0), member = [];
@@ -4356,6 +4424,7 @@
 	}
 
 	cSTDEVA.prototype = Object.create(cBaseFunction.prototype);
+	cSTDEVA.prototype.constructor = cSTDEVA;
 	cSTDEVA.prototype.Calculate = function (arg) {
 		var count = 0, sum = new cNumber(0), member = [], i;
 		for (i = 0; i < arg.length; i++) {
@@ -4418,6 +4487,7 @@
 	}
 
 	cSTDEVP.prototype = Object.create(cBaseFunction.prototype);
+	cSTDEVP.prototype.constructor = cSTDEVP;
 	cSTDEVP.prototype.Calculate = function (arg) {
 		function _var(x) {
 			var i, tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
@@ -4493,6 +4563,7 @@
 	}
 
 	cSTDEVPA.prototype = Object.create(cBaseFunction.prototype);
+	cSTDEVPA.prototype.constructor = cSTDEVPA;
 	cSTDEVPA.prototype.Calculate = function (arg) {
 
 		function _var(x) {
@@ -4582,6 +4653,7 @@
 	}
 
 	cSTEYX.prototype = Object.create(cBaseFunction.prototype);
+	cSTEYX.prototype.constructor = cSTEYX;
 	cSTEYX.prototype.Calculate = function (arg) {
 
 		function steyx(y, x) {
@@ -4664,6 +4736,7 @@
 	}
 
 	cTDIST.prototype = Object.create(cBaseFunction.prototype);
+	cTDIST.prototype.constructor = cTDIST;
 
 	/** @constructor */
 	function cTINV() {
@@ -4671,6 +4744,7 @@
 	}
 
 	cTINV.prototype = Object.create(cBaseFunction.prototype);
+	cTINV.prototype.constructor = cTINV;
 
 	/** @constructor */
 	function cTREND() {
@@ -4678,6 +4752,7 @@
 	}
 
 	cTREND.prototype = Object.create(cBaseFunction.prototype);
+	cTREND.prototype.constructor = cTREND;
 
 	/** @constructor */
 	function cTRIMMEAN() {
@@ -4685,6 +4760,7 @@
 	}
 
 	cTRIMMEAN.prototype = Object.create(cBaseFunction.prototype);
+	cTRIMMEAN.prototype.constructor = cTRIMMEAN;
 
 	/** @constructor */
 	function cTTEST() {
@@ -4692,6 +4768,7 @@
 	}
 
 	cTTEST.prototype = Object.create(cBaseFunction.prototype);
+	cTTEST.prototype.constructor = cTTEST;
 
 	/** @constructor */
 	function cVAR() {
@@ -4703,6 +4780,7 @@
 	}
 
 	cVAR.prototype = Object.create(cBaseFunction.prototype);
+	cVAR.prototype.constructor = cVAR;
 	cVAR.prototype.Calculate = function (arg) {
 		function _var(x) {
 			if (x.length < 1) {
@@ -4784,6 +4862,7 @@
 	}
 
 	cVARA.prototype = Object.create(cBaseFunction.prototype);
+	cVARA.prototype.constructor = cVARA;
 	cVARA.prototype.Calculate = function (arg) {
 
 		function _var(x) {
@@ -4877,6 +4956,7 @@
 	}
 
 	cVARP.prototype = Object.create(cBaseFunction.prototype);
+	cVARP.prototype.constructor = cVARP;
 	cVARP.prototype.Calculate = function (arg) {
 		function _var(x) {
 			if (x.length < 1) {
@@ -4957,6 +5037,7 @@
 	}
 
 	cVARdotP.prototype = Object.create(cBaseFunction.prototype);
+	cVARdotP.prototype.constructor = cVARdotP;
 	cVARdotP.prototype.Calculate = cVARP.prototype.Calculate;
 	cVARdotP.prototype.getInfo = function () {
 		return {
@@ -4974,6 +5055,7 @@
 	}
 
 	cVARPA.prototype = Object.create(cBaseFunction.prototype);
+	cVARPA.prototype.constructor = cVARPA;
 	cVARPA.prototype.Calculate = function (arg) {
 
 		function _var(x) {
@@ -5063,6 +5145,7 @@
 	}
 
 	cWEIBULL.prototype = Object.create(cBaseFunction.prototype);
+	cWEIBULL.prototype.constructor = cWEIBULL;
 
 	/** @constructor */
 	function cZTEST() {
@@ -5070,6 +5153,7 @@
 	}
 
 	cZTEST.prototype = Object.create(cBaseFunction.prototype);
+	cZTEST.prototype.constructor = cZTEST;
 
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommonExcel'] = window['AscCommonExcel'] || {};

@@ -58,7 +58,10 @@ CImageShape.prototype.handleUpdateTheme = CShape.prototype.handleUpdateTheme;
 CImageShape.prototype.getIsSingleBody = CShape.prototype.getIsSingleBody;
 CImageShape.prototype.getSlideIndex = CShape.prototype.getSlideIndex;
 CImageShape.prototype.Is_UseInDocument = CShape.prototype.Is_UseInDocument;
-
+CImageShape.prototype.getEditorType = function()
+{
+    return 0;
+};
 CImageShape.prototype.setRecalculateInfo = function()
 {
     this.recalcInfo =

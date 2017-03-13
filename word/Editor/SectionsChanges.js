@@ -115,9 +115,10 @@ AscDFH.changesRelationMap[AscDFH.historyitem_Section_Footnote_NumFormat]  = [Asc
  */
 function CChangesSectionBaseHeaderFooter(Class, Old, New)
 {
-	CChangesSectionBaseHeaderFooter.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionBaseHeaderFooter, AscDFH.CChangesBaseProperty);
+CChangesSectionBaseHeaderFooter.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesSectionBaseHeaderFooter.prototype.constructor = CChangesSectionBaseHeaderFooter;
 CChangesSectionBaseHeaderFooter.prototype.WriteToBinary = function(Writer)
 {
 	// Long : Flags
@@ -166,9 +167,10 @@ CChangesSectionBaseHeaderFooter.prototype.ReadFromBinary = function(Reader)
  */
 function CChangesSectionPageOrient(Class, Old, New)
 {
-	CChangesSectionPageOrient.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseByteValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionPageOrient, AscDFH.CChangesBaseByteValue);
+CChangesSectionPageOrient.prototype = Object.create(AscDFH.CChangesBaseByteValue.prototype);
+CChangesSectionPageOrient.prototype.constructor = CChangesSectionPageOrient;
 CChangesSectionPageOrient.prototype.Type = AscDFH.historyitem_Section_PageSize_Orient;
 CChangesSectionPageOrient.prototype.private_SetValue = function(Value)
 {
@@ -180,9 +182,10 @@ CChangesSectionPageOrient.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionPageSize(Class, Old, New)
 {
-	CChangesSectionPageSize.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionPageSize, AscDFH.CChangesBaseProperty);
+CChangesSectionPageSize.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesSectionPageSize.prototype.constructor = CChangesSectionPageSize;
 CChangesSectionPageSize.prototype.Type = AscDFH.historyitem_Section_PageSize_Size;
 CChangesSectionPageSize.prototype.private_SetValue = function(Value)
 {
@@ -224,9 +227,10 @@ CChangesSectionPageSize.prototype.ReadFromBinary = function(Reader)
  */
 function CChangesSectionPageMargins(Class, Old, New)
 {
-	CChangesSectionPageMargins.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionPageMargins, AscDFH.CChangesBaseProperty);
+CChangesSectionPageMargins.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesSectionPageMargins.prototype.constructor = CChangesSectionPageMargins;
 CChangesSectionPageMargins.prototype.Type = AscDFH.historyitem_Section_PageMargins;
 CChangesSectionPageMargins.prototype.private_SetValue = function(Value)
 {
@@ -287,9 +291,10 @@ CChangesSectionPageMargins.prototype.ReadFromBinary = function(Reader)
  */
 function CChangesSectionType(Class, Old, New)
 {
-	CChangesSectionType.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseByteValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionType, AscDFH.CChangesBaseByteValue);
+CChangesSectionType.prototype = Object.create(AscDFH.CChangesBaseByteValue.prototype);
+CChangesSectionType.prototype.constructor = CChangesSectionType;
 CChangesSectionType.prototype.Type = AscDFH.historyitem_Section_Type;
 CChangesSectionType.prototype.private_SetValue = function(Value)
 {
@@ -301,9 +306,10 @@ CChangesSectionType.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionBordersLeft(Class, Old, New)
 {
-	CChangesSectionBordersLeft.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseObjectValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionBordersLeft, AscDFH.CChangesBaseObjectValue);
+CChangesSectionBordersLeft.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesSectionBordersLeft.prototype.constructor = CChangesSectionBordersLeft;
 CChangesSectionBordersLeft.prototype.Type = AscDFH.historyitem_Section_Borders_Left;
 CChangesSectionBordersLeft.prototype.private_CreateObject = function()
 {
@@ -319,9 +325,10 @@ CChangesSectionBordersLeft.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionBordersTop(Class, Old, New)
 {
-	CChangesSectionBordersTop.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseObjectValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionBordersTop, AscDFH.CChangesBaseObjectValue);
+CChangesSectionBordersTop.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesSectionBordersTop.prototype.constructor = CChangesSectionBordersTop;
 CChangesSectionBordersTop.prototype.Type = AscDFH.historyitem_Section_Borders_Top;
 CChangesSectionBordersTop.prototype.private_CreateObject = function()
 {
@@ -337,9 +344,10 @@ CChangesSectionBordersTop.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionBordersRight(Class, Old, New)
 {
-	CChangesSectionBordersRight.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseObjectValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionBordersRight, AscDFH.CChangesBaseObjectValue);
+CChangesSectionBordersRight.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesSectionBordersRight.prototype.constructor = CChangesSectionBordersRight;
 CChangesSectionBordersRight.prototype.Type = AscDFH.historyitem_Section_Borders_Right;
 CChangesSectionBordersRight.prototype.private_CreateObject = function()
 {
@@ -355,9 +363,10 @@ CChangesSectionBordersRight.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionBordersBottom(Class, Old, New)
 {
-	CChangesSectionBordersBottom.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseObjectValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionBordersBottom, AscDFH.CChangesBaseObjectValue);
+CChangesSectionBordersBottom.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesSectionBordersBottom.prototype.constructor = CChangesSectionBordersBottom;
 CChangesSectionBordersBottom.prototype.Type = AscDFH.historyitem_Section_Borders_Bottom;
 CChangesSectionBordersBottom.prototype.private_CreateObject = function()
 {
@@ -373,9 +382,10 @@ CChangesSectionBordersBottom.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionBordersDisplay(Class, Old, New)
 {
-	CChangesSectionBordersDisplay.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseByteValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionBordersDisplay, AscDFH.CChangesBaseByteValue);
+CChangesSectionBordersDisplay.prototype = Object.create(AscDFH.CChangesBaseByteValue.prototype);
+CChangesSectionBordersDisplay.prototype.constructor = CChangesSectionBordersDisplay;
 CChangesSectionBordersDisplay.prototype.Type = AscDFH.historyitem_Section_Borders_Display;
 CChangesSectionBordersDisplay.prototype.private_SetValue = function(Value)
 {
@@ -387,9 +397,10 @@ CChangesSectionBordersDisplay.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionBordersOffsetFrom(Class, Old, New)
 {
-	CChangesSectionBordersOffsetFrom.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseByteValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionBordersOffsetFrom, AscDFH.CChangesBaseByteValue);
+CChangesSectionBordersOffsetFrom.prototype = Object.create(AscDFH.CChangesBaseByteValue.prototype);
+CChangesSectionBordersOffsetFrom.prototype.constructor = CChangesSectionBordersOffsetFrom;
 CChangesSectionBordersOffsetFrom.prototype.Type = AscDFH.historyitem_Section_Borders_OffsetFrom;
 CChangesSectionBordersOffsetFrom.prototype.private_SetValue = function(Value)
 {
@@ -401,9 +412,10 @@ CChangesSectionBordersOffsetFrom.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionBordersZOrder(Class, Old, New)
 {
-	CChangesSectionBordersZOrder.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseByteValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionBordersZOrder, AscDFH.CChangesBaseByteValue);
+CChangesSectionBordersZOrder.prototype = Object.create(AscDFH.CChangesBaseByteValue.prototype);
+CChangesSectionBordersZOrder.prototype.constructor = CChangesSectionBordersZOrder;
 CChangesSectionBordersZOrder.prototype.Type = AscDFH.historyitem_Section_Borders_ZOrder;
 CChangesSectionBordersZOrder.prototype.private_SetValue = function(Value)
 {
@@ -415,9 +427,10 @@ CChangesSectionBordersZOrder.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionHeaderFirst(Class, Old, New)
 {
-	CChangesSectionHeaderFirst.superclass.constructor.call(this, Class, Old, New);
+	CChangesSectionBaseHeaderFooter.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionHeaderFirst, CChangesSectionBaseHeaderFooter);
+CChangesSectionHeaderFirst.prototype = Object.create(CChangesSectionBaseHeaderFooter.prototype);
+CChangesSectionHeaderFirst.prototype.constructor = CChangesSectionHeaderFirst;
 CChangesSectionHeaderFirst.prototype.Type = AscDFH.historyitem_Section_Header_First;
 CChangesSectionHeaderFirst.prototype.private_SetValue = function(Value)
 {
@@ -429,9 +442,10 @@ CChangesSectionHeaderFirst.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionHeaderEven(Class, Old, New)
 {
-	CChangesSectionHeaderEven.superclass.constructor.call(this, Class, Old, New);
+	CChangesSectionBaseHeaderFooter.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionHeaderEven, CChangesSectionBaseHeaderFooter);
+CChangesSectionHeaderEven.prototype = Object.create(CChangesSectionBaseHeaderFooter.prototype);
+CChangesSectionHeaderEven.prototype.constructor = CChangesSectionHeaderEven;
 CChangesSectionHeaderEven.prototype.Type = AscDFH.historyitem_Section_Header_Even;
 CChangesSectionHeaderEven.prototype.private_SetValue = function(Value)
 {
@@ -443,9 +457,10 @@ CChangesSectionHeaderEven.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionHeaderDefault(Class, Old, New)
 {
-	CChangesSectionHeaderDefault.superclass.constructor.call(this, Class, Old, New);
+	CChangesSectionBaseHeaderFooter.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionHeaderDefault, CChangesSectionBaseHeaderFooter);
+CChangesSectionHeaderDefault.prototype = Object.create(CChangesSectionBaseHeaderFooter.prototype);
+CChangesSectionHeaderDefault.prototype.constructor = CChangesSectionHeaderDefault;
 CChangesSectionHeaderDefault.prototype.Type = AscDFH.historyitem_Section_Header_Default;
 CChangesSectionHeaderDefault.prototype.private_SetValue = function(Value)
 {
@@ -457,9 +472,10 @@ CChangesSectionHeaderDefault.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionFooterFirst(Class, Old, New)
 {
-	CChangesSectionFooterFirst.superclass.constructor.call(this, Class, Old, New);
+	CChangesSectionBaseHeaderFooter.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionFooterFirst, CChangesSectionBaseHeaderFooter);
+CChangesSectionFooterFirst.prototype = Object.create(CChangesSectionBaseHeaderFooter.prototype);
+CChangesSectionFooterFirst.prototype.constructor = CChangesSectionFooterFirst;
 CChangesSectionFooterFirst.prototype.Type = AscDFH.historyitem_Section_Footer_First;
 CChangesSectionFooterFirst.prototype.private_SetValue = function(Value)
 {
@@ -471,9 +487,10 @@ CChangesSectionFooterFirst.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionFooterEven(Class, Old, New)
 {
-	CChangesSectionFooterEven.superclass.constructor.call(this, Class, Old, New);
+	CChangesSectionBaseHeaderFooter.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionFooterEven, CChangesSectionBaseHeaderFooter);
+CChangesSectionFooterEven.prototype = Object.create(CChangesSectionBaseHeaderFooter.prototype);
+CChangesSectionFooterEven.prototype.constructor = CChangesSectionFooterEven;
 CChangesSectionFooterEven.prototype.Type = AscDFH.historyitem_Section_Footer_Even;
 CChangesSectionFooterEven.prototype.private_SetValue = function(Value)
 {
@@ -485,9 +502,10 @@ CChangesSectionFooterEven.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionFooterDefault(Class, Old, New)
 {
-	CChangesSectionFooterDefault.superclass.constructor.call(this, Class, Old, New);
+	CChangesSectionBaseHeaderFooter.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionFooterDefault, CChangesSectionBaseHeaderFooter);
+CChangesSectionFooterDefault.prototype = Object.create(CChangesSectionBaseHeaderFooter.prototype);
+CChangesSectionFooterDefault.prototype.constructor = CChangesSectionFooterDefault;
 CChangesSectionFooterDefault.prototype.Type = AscDFH.historyitem_Section_Footer_Default;
 CChangesSectionFooterDefault.prototype.private_SetValue = function(Value)
 {
@@ -499,9 +517,10 @@ CChangesSectionFooterDefault.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionTitlePage(Class, Old, New)
 {
-	CChangesSectionTitlePage.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionTitlePage, AscDFH.CChangesBaseBoolValue);
+CChangesSectionTitlePage.prototype = Object.create(AscDFH.CChangesBaseBoolValue.prototype);
+CChangesSectionTitlePage.prototype.constructor = CChangesSectionTitlePage;
 CChangesSectionTitlePage.prototype.Type = AscDFH.historyitem_Section_TitlePage;
 CChangesSectionTitlePage.prototype.private_SetValue = function(Value)
 {
@@ -513,9 +532,10 @@ CChangesSectionTitlePage.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionPageMarginsHeader(Class, Old, New)
 {
-	CChangesSectionPageMarginsHeader.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseDoubleValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionPageMarginsHeader, AscDFH.CChangesBaseDoubleValue);
+CChangesSectionPageMarginsHeader.prototype = Object.create(AscDFH.CChangesBaseDoubleValue.prototype);
+CChangesSectionPageMarginsHeader.prototype.constructor = CChangesSectionPageMarginsHeader;
 CChangesSectionPageMarginsHeader.prototype.Type = AscDFH.historyitem_Section_PageMargins_Header;
 CChangesSectionPageMarginsHeader.prototype.private_SetValue = function(Value)
 {
@@ -527,9 +547,10 @@ CChangesSectionPageMarginsHeader.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionPageMarginsFooter(Class, Old, New)
 {
-	CChangesSectionPageMarginsFooter.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseDoubleValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionPageMarginsFooter, AscDFH.CChangesBaseDoubleValue);
+CChangesSectionPageMarginsFooter.prototype = Object.create(AscDFH.CChangesBaseDoubleValue.prototype);
+CChangesSectionPageMarginsFooter.prototype.constructor = CChangesSectionPageMarginsFooter;
 CChangesSectionPageMarginsFooter.prototype.Type = AscDFH.historyitem_Section_PageMargins_Footer;
 CChangesSectionPageMarginsFooter.prototype.private_SetValue = function(Value)
 {
@@ -541,9 +562,10 @@ CChangesSectionPageMarginsFooter.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionPageNumTypeStart(Class, Old, New)
 {
-	CChangesSectionPageNumTypeStart.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionPageNumTypeStart, AscDFH.CChangesBaseLongValue);
+CChangesSectionPageNumTypeStart.prototype = Object.create(AscDFH.CChangesBaseLongValue.prototype);
+CChangesSectionPageNumTypeStart.prototype.constructor = CChangesSectionPageNumTypeStart;
 CChangesSectionPageNumTypeStart.prototype.Type = AscDFH.historyitem_Section_PageNumType_Start;
 CChangesSectionPageNumTypeStart.prototype.private_SetValue = function(Value)
 {
@@ -555,9 +577,10 @@ CChangesSectionPageNumTypeStart.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionColumnsEqualWidth(Class, Old, New)
 {
-	CChangesSectionColumnsEqualWidth.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionColumnsEqualWidth, AscDFH.CChangesBaseBoolValue);
+CChangesSectionColumnsEqualWidth.prototype = Object.create(AscDFH.CChangesBaseBoolValue.prototype);
+CChangesSectionColumnsEqualWidth.prototype.constructor = CChangesSectionColumnsEqualWidth;
 CChangesSectionColumnsEqualWidth.prototype.Type = AscDFH.historyitem_Section_Columns_EqualWidth;
 CChangesSectionColumnsEqualWidth.prototype.private_SetValue = function(Value)
 {
@@ -569,9 +592,10 @@ CChangesSectionColumnsEqualWidth.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionColumnsSpace(Class, Old, New)
 {
-	CChangesSectionColumnsSpace.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseDoubleValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionColumnsSpace, AscDFH.CChangesBaseDoubleValue);
+CChangesSectionColumnsSpace.prototype = Object.create(AscDFH.CChangesBaseDoubleValue.prototype);
+CChangesSectionColumnsSpace.prototype.constructor = CChangesSectionColumnsSpace;
 CChangesSectionColumnsSpace.prototype.Type = AscDFH.historyitem_Section_Columns_Space;
 CChangesSectionColumnsSpace.prototype.private_SetValue = function(Value)
 {
@@ -583,9 +607,10 @@ CChangesSectionColumnsSpace.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionColumnsNum(Class, Old, New)
 {
-	CChangesSectionColumnsNum.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionColumnsNum, AscDFH.CChangesBaseLongValue);
+CChangesSectionColumnsNum.prototype = Object.create(AscDFH.CChangesBaseLongValue.prototype);
+CChangesSectionColumnsNum.prototype.constructor = CChangesSectionColumnsNum;
 CChangesSectionColumnsNum.prototype.Type = AscDFH.historyitem_Section_Columns_Num;
 CChangesSectionColumnsNum.prototype.private_SetValue = function(Value)
 {
@@ -597,9 +622,10 @@ CChangesSectionColumnsNum.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionColumnsSep(Class, Old, New)
 {
-	CChangesSectionColumnsSep.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseBoolValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionColumnsSep, AscDFH.CChangesBaseBoolValue);
+CChangesSectionColumnsSep.prototype = Object.create(AscDFH.CChangesBaseBoolValue.prototype);
+CChangesSectionColumnsSep.prototype.constructor = CChangesSectionColumnsSep;
 CChangesSectionColumnsSep.prototype.Type = AscDFH.historyitem_Section_Columns_Sep;
 CChangesSectionColumnsSep.prototype.private_SetValue = function(Value)
 {
@@ -611,11 +637,12 @@ CChangesSectionColumnsSep.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionColumnsCol(Class, Old, New, Index)
 {
-	CChangesSectionColumnsCol.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 
 	this.Index = Index;
 }
-AscCommon.extendClass(CChangesSectionColumnsCol, AscDFH.CChangesBaseProperty);
+CChangesSectionColumnsCol.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesSectionColumnsCol.prototype.constructor = CChangesSectionColumnsCol;
 CChangesSectionColumnsCol.prototype.Type = AscDFH.historyitem_Section_Columns_Col;
 CChangesSectionColumnsCol.prototype.private_SetValue = function(Value)
 {
@@ -708,9 +735,10 @@ CChangesSectionColumnsCol.prototype.Merge = function(oChange)
  */
 function CChangesSectionColumnsSetCols(Class, Old, New)
 {
-	CChangesSectionColumnsSetCols.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionColumnsSetCols, AscDFH.CChangesBaseProperty);
+CChangesSectionColumnsSetCols.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesSectionColumnsSetCols.prototype.constructor = CChangesSectionColumnsSetCols;
 CChangesSectionColumnsSetCols.prototype.Type = AscDFH.historyitem_Section_Columns_SetCols;
 CChangesSectionColumnsSetCols.prototype.private_SetValue = function(Value)
 {
@@ -785,9 +813,10 @@ CChangesSectionColumnsSetCols.prototype.Merge = function(oChange)
  */
 function CChangesSectionFootnotePos(Class, Old, New)
 {
-	CChangesSectionFootnotePos.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionFootnotePos, AscDFH.CChangesBaseLongProperty);
+CChangesSectionFootnotePos.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesSectionFootnotePos.prototype.constructor = CChangesSectionFootnotePos;
 CChangesSectionFootnotePos.prototype.Type = AscDFH.historyitem_Section_Footnote_Pos;
 CChangesSectionFootnotePos.prototype.private_SetValue = function(Value)
 {
@@ -799,9 +828,10 @@ CChangesSectionFootnotePos.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionFootnoteNumStart(Class, Old, New)
 {
-	CChangesSectionFootnoteNumStart.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionFootnoteNumStart, AscDFH.CChangesBaseLongProperty);
+CChangesSectionFootnoteNumStart.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesSectionFootnoteNumStart.prototype.constructor = CChangesSectionFootnoteNumStart;
 CChangesSectionFootnoteNumStart.prototype.Type = AscDFH.historyitem_Section_Footnote_NumStart;
 CChangesSectionFootnoteNumStart.prototype.private_SetValue = function(Value)
 {
@@ -813,9 +843,10 @@ CChangesSectionFootnoteNumStart.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionFootnoteNumRestart(Class, Old, New)
 {
-	CChangesSectionFootnoteNumRestart.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionFootnoteNumRestart, AscDFH.CChangesBaseLongProperty);
+CChangesSectionFootnoteNumRestart.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesSectionFootnoteNumRestart.prototype.constructor = CChangesSectionFootnoteNumRestart;
 CChangesSectionFootnoteNumRestart.prototype.Type = AscDFH.historyitem_Section_Footnote_NumRestart;
 CChangesSectionFootnoteNumRestart.prototype.private_SetValue = function(Value)
 {
@@ -827,9 +858,10 @@ CChangesSectionFootnoteNumRestart.prototype.private_SetValue = function(Value)
  */
 function CChangesSectionFootnoteNumFormat(Class, Old, New)
 {
-	CChangesSectionFootnoteNumFormat.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesSectionFootnoteNumFormat, AscDFH.CChangesBaseLongProperty);
+CChangesSectionFootnoteNumFormat.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesSectionFootnoteNumFormat.prototype.constructor = CChangesSectionFootnoteNumFormat;
 CChangesSectionFootnoteNumFormat.prototype.Type = AscDFH.historyitem_Section_Footnote_NumFormat;
 CChangesSectionFootnoteNumFormat.prototype.private_SetValue = function(Value)
 {

@@ -987,9 +987,10 @@ TrackPointWrapPointWrapPolygon.prototype =
 
 
 function CChangesWrapPolygonEdited(Class, OldPr, NewPr){
-    CChangesWrapPolygonEdited.superclass.constructor.call(this, Class, OldPr, NewPr);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, OldPr, NewPr);
 }
-AscCommon.extendClass(CChangesWrapPolygonEdited, AscDFH.CChangesBaseBoolProperty);
+CChangesWrapPolygonEdited.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesWrapPolygonEdited.prototype.constructor = CChangesWrapPolygonEdited;
 CChangesWrapPolygonEdited.prototype.Type = AscDFH.historyitem_WrapPolygonSetEdited;
 CChangesWrapPolygonEdited.prototype.private_SetValue = function(value){
     if(this.Class){
@@ -1003,9 +1004,10 @@ CChangesWrapPolygonEdited.prototype.private_SetValue = function(value){
 };
 
 function CChangesWrapPolygonWrapSide(Class, OldPr, NewPr){
-    CChangesWrapPolygonWrapSide.superclass.constructor.call(this, Class, OldPr, NewPr);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, OldPr, NewPr);
 }
-AscCommon.extendClass(CChangesWrapPolygonWrapSide, AscDFH.CChangesBaseLongProperty);
+CChangesWrapPolygonWrapSide.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesWrapPolygonWrapSide.prototype.constructor = CChangesWrapPolygonWrapSide;
 CChangesWrapPolygonWrapSide.prototype.Type = AscDFH.historyitem_WrapPolygonSetWrapSide;
 CChangesWrapPolygonWrapSide.prototype.private_SetValue = function(value){
     if(this.Class){
@@ -1020,9 +1022,10 @@ CChangesWrapPolygonWrapSide.prototype.private_SetValue = function(value){
 };
 
 function CChangesWrapPolygonRelPoints(Class, OldPr, NewPr){
-    CChangesWrapPolygonRelPoints.superclass.constructor.call(this, Class, OldPr, NewPr);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, OldPr, NewPr);
 }
-AscCommon.extendClass(CChangesWrapPolygonRelPoints, AscDFH.CChangesBaseObjectProperty);
+CChangesWrapPolygonRelPoints.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesWrapPolygonRelPoints.prototype.constructor = CChangesWrapPolygonRelPoints;
 CChangesWrapPolygonRelPoints.prototype.Type = AscDFH.historyitem_WrapPolygonSetRelPoints;
 CChangesWrapPolygonRelPoints.prototype.private_IsCreateEmptyObject = function(){
     return true;
@@ -1047,7 +1050,7 @@ CChangesWrapPolygonRelPoints.prototype.private_SetValue = function(value){
 };
 
 function ArrayWrapPoint(oArray){
-    ArrayWrapPoint.superclass.constructor.call(this);
+	Array.call(this);
     if(oArray){
         this.length = oArray.length;
         for(var i = 0;  i < oArray.length; ++i){
@@ -1057,7 +1060,8 @@ function ArrayWrapPoint(oArray){
         }
     }
 }
-AscCommon.extendClass(ArrayWrapPoint, Array);
+ArrayWrapPoint.prototype = Object.create(Array.prototype);
+ArrayWrapPoint.prototype.constructor = ArrayWrapPoint;
 ArrayWrapPoint.prototype.Write_ToBinary = function(Writer){
     Writer.WriteLong(this.length);
     for(var i = 0; i < this.length; ++i){

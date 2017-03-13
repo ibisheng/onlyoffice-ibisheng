@@ -70,38 +70,42 @@
      * @constructor
      */
     function ApiShape(oShape){
-        ApiShape.superclass.constructor.call(this, oShape);
+		ApiDrawing.call(this, oShape);
         this.Shape = oShape;
     }
-    AscCommon.extendClass(ApiShape, ApiDrawing);
+	ApiShape.prototype = Object.create(ApiDrawing.prototype);
+	ApiShape.prototype.constructor = ApiShape;
 
     /**
      * Class representing a image.
      * @constructor
      */
     function ApiImage(oImage){
-        ApiImage.superclass.constructor.call(this, oImage);
+		ApiDrawing.call(this, oImage);
     }
-    AscCommon.extendClass(ApiImage, ApiDrawing);
+	ApiImage.prototype = Object.create(ApiDrawing.prototype);
+	ApiImage.prototype.constructor = ApiImage;
 
     /**
      * Class representing a chart.
      * @constructor
      */
     function ApiChart(oChart){
-        ApiChart.superclass.constructor.call(this, oChart);
+		ApiDrawing.call(this, oChart);
         this.Chart = oChart;
     }
-    AscCommon.extendClass(ApiChart, ApiDrawing);
+	ApiChart.prototype = Object.create(ApiDrawing.prototype);
+	ApiChart.prototype.constructor = ApiChart;
 
     /**
      * Class representing a group of drawings.
      * @constructor
      */
     function ApiGroup(oGroup){
-        ApiGroup.superclass.constructor.call(this, oGroup);
+		ApiDrawing.call(this, oGroup);
     }
-    AscCommon.extendClass(ApiGroup, ApiDrawing);
+	ApiGroup.prototype = Object.create(ApiDrawing.prototype);
+	ApiGroup.prototype.constructor = ApiGroup;
 
 
     /**

@@ -882,6 +882,7 @@
 	}
 
 	cBESSELI.prototype = Object.create(cBaseFunction.prototype);
+	cBESSELI.prototype.constructor = cBESSELI;
 	/*cBESSELI.prototype.Calculate = function ( arg ) {
 	 var x = arg[0],
 	 n = arg[1];
@@ -933,6 +934,7 @@
 	}
 
 	cBESSELJ.prototype = Object.create(cBaseFunction.prototype);
+	cBESSELJ.prototype.constructor = cBESSELJ;
 
 	/** @constructor */
 	function cBESSELK() {
@@ -940,6 +942,7 @@
 	}
 
 	cBESSELK.prototype = Object.create(cBaseFunction.prototype);
+	cBESSELK.prototype.constructor = cBESSELK;
 
 	/** @constructor */
 	function cBESSELY() {
@@ -947,6 +950,7 @@
 	}
 
 	cBESSELY.prototype = Object.create(cBaseFunction.prototype);
+	cBESSELY.prototype.constructor = cBESSELY;
 
 	/** @constructor */
 	function cBIN2DEC() {
@@ -954,6 +958,7 @@
 	}
 
 	cBIN2DEC.prototype = Object.create(cBaseFunction.prototype);
+	cBIN2DEC.prototype.constructor = cBIN2DEC;
 	cBIN2DEC.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 
@@ -1001,6 +1006,7 @@
 	}
 
 	cBIN2HEX.prototype = Object.create(cBaseFunction.prototype);
+	cBIN2HEX.prototype.constructor = cBIN2HEX;
 	cBIN2HEX.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
@@ -1064,6 +1070,7 @@
 	}
 
 	cBIN2OCT.prototype = Object.create(cBaseFunction.prototype);
+	cBIN2OCT.prototype.constructor = cBIN2OCT;
 	cBIN2OCT.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
@@ -1127,6 +1134,7 @@
 	}
 
 	cCOMPLEX.prototype = Object.create(cBaseFunction.prototype);
+	cCOMPLEX.prototype.constructor = cCOMPLEX;
 	cCOMPLEX.prototype.Calculate = function (arg) {
 
 		var real = arg[0], img = arg[1], suf = !arg[2] || arg[2] instanceof AscCommonExcel.cEmpty ? new cString("i") :
@@ -1190,6 +1198,7 @@
 	}
 
 	cCONVERT.prototype = Object.create(cBaseFunction.prototype);
+	cCONVERT.prototype.constructor = cCONVERT;
 
 	/** @constructor */
 	function cDEC2BIN() {
@@ -1197,6 +1206,7 @@
 	}
 
 	cDEC2BIN.prototype = Object.create(cBaseFunction.prototype);
+	cDEC2BIN.prototype.constructor = cDEC2BIN;
 	cDEC2BIN.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
@@ -1255,6 +1265,7 @@
 	}
 
 	cDEC2HEX.prototype = Object.create(cBaseFunction.prototype);
+	cDEC2HEX.prototype.constructor = cDEC2HEX;
 	cDEC2HEX.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
@@ -1312,6 +1323,7 @@
 	}
 
 	cDEC2OCT.prototype = Object.create(cBaseFunction.prototype);
+	cDEC2OCT.prototype.constructor = cDEC2OCT;
 	cDEC2OCT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
@@ -1369,6 +1381,7 @@
 	}
 
 	cDELTA.prototype = Object.create(cBaseFunction.prototype);
+	cDELTA.prototype.constructor = cDELTA;
 	cDELTA.prototype.Calculate = function (arg) {
 
 		var number1 = arg[0], number2 = !arg[1] ? new cNumber(0) : arg[1];
@@ -1415,6 +1428,7 @@
 	}
 
 	cERF.prototype = Object.create(cBaseFunction.prototype);
+	cERF.prototype.constructor = cERF;
 	cERF.prototype.Calculate = function (arg) {
 
 		var a = arg[0], b = arg[1] ? arg[1] : new cUndefined();
@@ -1466,6 +1480,7 @@
 	}
 
 	cERFC.prototype = Object.create(cBaseFunction.prototype);
+	cERFC.prototype.constructor = cERFC;
 	cERFC.prototype.Calculate = function (arg) {
 
 		var a = arg[0];
@@ -1499,6 +1514,7 @@
 	}
 
 	cGESTEP.prototype = Object.create(cBaseFunction.prototype);
+	cGESTEP.prototype.constructor = cGESTEP;
 	cGESTEP.prototype.Calculate = function (arg) {
 
 		var number1 = arg[0], number2 = !arg[1] ? new cNumber(0) : arg[1];
@@ -1545,6 +1561,7 @@
 	}
 
 	cHEX2BIN.prototype = Object.create(cBaseFunction.prototype);
+	cHEX2BIN.prototype.constructor = cHEX2BIN;
 	cHEX2BIN.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
@@ -1615,6 +1632,7 @@
 	}
 
 	cHEX2DEC.prototype = Object.create(cBaseFunction.prototype);
+	cHEX2DEC.prototype.constructor = cHEX2DEC;
 	cHEX2DEC.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
@@ -1661,6 +1679,7 @@
 	}
 
 	cHEX2OCT.prototype = Object.create(cBaseFunction.prototype);
+	cHEX2OCT.prototype.constructor = cHEX2OCT;
 	cHEX2OCT.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
@@ -1730,6 +1749,7 @@
 	}
 
 	cIMABS.prototype = Object.create(cBaseFunction.prototype);
+	cIMABS.prototype.constructor = cIMABS;
 	cIMABS.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
@@ -1769,6 +1789,7 @@
 	}
 
 	cIMAGINARY.prototype = Object.create(cBaseFunction.prototype);
+	cIMAGINARY.prototype.constructor = cIMAGINARY;
 	cIMAGINARY.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
@@ -1808,6 +1829,7 @@
 	}
 
 	cIMARGUMENT.prototype = Object.create(cBaseFunction.prototype);
+	cIMARGUMENT.prototype.constructor = cIMARGUMENT;
 	cIMARGUMENT.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
@@ -1847,6 +1869,7 @@
 	}
 
 	cIMCONJUGATE.prototype = Object.create(cBaseFunction.prototype);
+	cIMCONJUGATE.prototype.constructor = cIMCONJUGATE;
 	cIMCONJUGATE.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
@@ -1886,6 +1909,7 @@
 	}
 
 	cIMCOS.prototype = Object.create(cBaseFunction.prototype);
+	cIMCOS.prototype.constructor = cIMCOS;
 	cIMCOS.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
@@ -1927,6 +1951,7 @@
 	}
 
 	cIMDIV.prototype = Object.create(cBaseFunction.prototype);
+	cIMDIV.prototype.constructor = cIMDIV;
 	cIMDIV.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1];
@@ -1979,6 +2004,7 @@
 	}
 
 	cIMEXP.prototype = Object.create(cBaseFunction.prototype);
+	cIMEXP.prototype.constructor = cIMEXP;
 	cIMEXP.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
@@ -2020,6 +2046,7 @@
 	}
 
 	cIMLN.prototype = Object.create(cBaseFunction.prototype);
+	cIMLN.prototype.constructor = cIMLN;
 	cIMLN.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
@@ -2065,6 +2092,7 @@
 	}
 
 	cIMLOG10.prototype = Object.create(cBaseFunction.prototype);
+	cIMLOG10.prototype.constructor = cIMLOG10;
 	cIMLOG10.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
@@ -2110,6 +2138,7 @@
 	}
 
 	cIMLOG2.prototype = Object.create(cBaseFunction.prototype);
+	cIMLOG2.prototype.constructor = cIMLOG2;
 	cIMLOG2.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
@@ -2155,6 +2184,7 @@
 	}
 
 	cIMPOWER.prototype = Object.create(cBaseFunction.prototype);
+	cIMPOWER.prototype.constructor = cIMPOWER;
 	cIMPOWER.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1];
@@ -2210,6 +2240,7 @@
 	}
 
 	cIMPRODUCT.prototype = Object.create(cBaseFunction.prototype);
+	cIMPRODUCT.prototype.constructor = cIMPRODUCT;
 	cIMPRODUCT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], t = this;
 
@@ -2307,6 +2338,7 @@
 	}
 
 	cIMREAL.prototype = Object.create(cBaseFunction.prototype);
+	cIMREAL.prototype.constructor = cIMREAL;
 	cIMREAL.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
@@ -2346,6 +2378,7 @@
 	}
 
 	cIMSIN.prototype = Object.create(cBaseFunction.prototype);
+	cIMSIN.prototype.constructor = cIMSIN;
 	cIMSIN.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
@@ -2387,6 +2420,7 @@
 	}
 
 	cIMSQRT.prototype = Object.create(cBaseFunction.prototype);
+	cIMSQRT.prototype.constructor = cIMSQRT;
 	cIMSQRT.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
@@ -2428,6 +2462,7 @@
 	}
 
 	cIMSUB.prototype = Object.create(cBaseFunction.prototype);
+	cIMSUB.prototype.constructor = cIMSUB;
 	cIMSUB.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1];
@@ -2480,6 +2515,7 @@
 	}
 
 	cIMSUM.prototype = Object.create(cBaseFunction.prototype);
+	cIMSUM.prototype.constructor = cIMSUM;
 	cIMSUM.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], t = this;
@@ -2578,6 +2614,7 @@
 	}
 
 	cOCT2BIN.prototype = Object.create(cBaseFunction.prototype);
+	cOCT2BIN.prototype.constructor = cOCT2BIN;
 	cOCT2BIN.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
@@ -2648,6 +2685,7 @@
 	}
 
 	cOCT2DEC.prototype = Object.create(cBaseFunction.prototype);
+	cOCT2DEC.prototype.constructor = cOCT2DEC;
 	cOCT2DEC.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
@@ -2694,6 +2732,7 @@
 	}
 
 	cOCT2HEX.prototype = Object.create(cBaseFunction.prototype);
+	cOCT2HEX.prototype.constructor = cOCT2HEX;
 	cOCT2HEX.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();

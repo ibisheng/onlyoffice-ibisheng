@@ -1011,7 +1011,7 @@ CMathPageInfo.prototype.Get_SpaceAlign = function(_Line, _Page)
  */
 function ParaMath()
 {
-    ParaMath.superclass.constructor.call(this);
+	CParagraphContentWithContentBase.call(this);
 
     this.Id                 = AscCommon.g_oIdCounter.Get_NewId();
     this.Type               = para_Math;
@@ -1053,7 +1053,8 @@ function ParaMath()
 	g_oTableId.Add( this, this.Id );
 }
 
-AscCommon.extendClass(ParaMath, CParagraphContentWithContentBase);
+ParaMath.prototype = Object.create(CParagraphContentWithContentBase.prototype);
+ParaMath.prototype.constructor = ParaMath;
 ParaMath.prototype.Get_Type = function()
 {
     return this.Type;

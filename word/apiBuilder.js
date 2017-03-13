@@ -57,9 +57,10 @@
      */
     function ApiDocument(Document)
     {
-        ApiDocument.superclass.constructor.call(this, Document);
+		ApiDocumentContent.call(this, Document);
     }
-    AscCommon.extendClass(ApiDocument, ApiDocumentContent);
+	ApiDocument.prototype = Object.create(ApiDocumentContent.prototype);
+	ApiDocument.prototype.constructor = ApiDocument;
 
     /**
      * Class representing a paragraph properties.
@@ -88,10 +89,11 @@
      */
     function ApiParagraph(Paragraph)
     {
-        ApiParagraph.superclass.constructor.call(this, this, Paragraph.Pr.Copy());
+		ApiParaPr.call(this, this, Paragraph.Pr.Copy());
         this.Paragraph = Paragraph;
     }
-    AscCommon.extendClass(ApiParagraph, ApiParaPr);
+	ApiParagraph.prototype = Object.create(ApiParaPr.prototype);
+	ApiParagraph.prototype.constructor = ApiParagraph;
 
     /**
      * Class representing a table properties.
@@ -110,10 +112,11 @@
      */
     function ApiTable(Table)
     {
-        ApiTable.superclass.constructor.call(this, this, Table.Pr.Copy());
+		ApiTablePr.call(this, this, Table.Pr.Copy());
         this.Table = Table;
     }
-    AscCommon.extendClass(ApiTable, ApiTablePr);
+	ApiTable.prototype = Object.create(ApiTablePr.prototype);
+	ApiTable.prototype.constructor = ApiTable;
 
     /**
      * Class representing a text properties.
@@ -132,10 +135,11 @@
      */
     function ApiRun(Run)
     {
-        ApiRun.superclass.constructor.call(this, this, Run.Pr.Copy());
+		ApiTextPr.call(this, this, Run.Pr.Copy());
         this.Run = Run;
     }
-    AscCommon.extendClass(ApiRun, ApiTextPr);
+	ApiRun.prototype = Object.create(ApiTextPr.prototype);
+	ApiRun.prototype.constructor = ApiRun;
 
     /**
      * Class representing a style.
@@ -172,10 +176,11 @@
      */
     function ApiTableRow(Row)
     {
-        ApiTableRow.superclass.constructor.call(this, this, Row.Pr.Copy());
+		ApiTableRowPr.call(this, this, Row.Pr.Copy());
         this.Row = Row;
     }
-    AscCommon.extendClass(ApiTableRow, ApiTableRowPr);
+	ApiTableRow.prototype = Object.create(ApiTableRowPr.prototype);
+	ApiTableRow.prototype.constructor = ApiTableRow;
 
     /**
      * Class representing a table cell proprties.
@@ -193,10 +198,11 @@
      */
     function ApiTableCell(Cell)
     {
-        ApiTableCell.superclass.constructor.call(this, this, Cell.Pr.Copy());
+		ApiTableCellPr.call(this, this, Cell.Pr.Copy());
         this.Cell = Cell;
     }
-    AscCommon.extendClass(ApiTableCell, ApiTableCellPr);
+	ApiTableCell.prototype = Object.create(ApiTableCellPr.prototype);
+	ApiTableCell.prototype.constructor = ApiTableCell;
 
     /**
      * Class representing a numbering properties.
@@ -252,10 +258,11 @@
      */
     function ApiImage(Image)
     {
-        ApiImage.superclass.constructor.call(this, Image.parent);
+		ApiDrawing.call(this, Image.parent);
         this.Image = Image
     }
-    AscCommon.extendClass(ApiImage, ApiDrawing);
+	ApiImage.prototype = Object.create(ApiDrawing.prototype);
+	ApiImage.prototype.constructor = ApiImage;
 
     /**
      * Class representing a shape.
@@ -263,10 +270,11 @@
      * */
     function ApiShape(Shape)
     {
-        ApiShape.superclass.constructor.call(this, Shape.parent);
+		ApiDrawing.call(this, Shape.parent);
         this.Shape = Shape;
     }
-    AscCommon.extendClass(ApiShape, ApiDrawing);
+	ApiShape.prototype = Object.create(ApiDrawing.prototype);
+	ApiShape.prototype.constructor = ApiShape;
 
     /**
      * Class representing a Chart.
@@ -275,10 +283,11 @@
      */
     function ApiChart(Chart)
     {
-        ApiChart.superclass.constructor.call(this, Chart.parent);
+		ApiDrawing.call(this, Chart.parent);
         this.Chart = Chart;
     }
-    AscCommon.extendClass(ApiChart, ApiDrawing);
+	ApiChart.prototype = Object.create(ApiDrawing.prototype);
+	ApiChart.prototype.constructor = ApiChart;
 
     /**
      * Class representing a base class for color types
@@ -294,9 +303,10 @@
      */
     function ApiRGBColor(r, g, b)
     {
-        ApiRGBColor.superclass.constructor.call(this, AscFormat.CreateUniColorRGB(r, g, b));
+		ApiUniColor.call(this, AscFormat.CreateUniColorRGB(r, g, b));
     }
-    AscCommon.extendClass(ApiRGBColor, ApiUniColor);
+	ApiRGBColor.prototype = Object.create(ApiUniColor.prototype);
+	ApiRGBColor.prototype.constructor = ApiRGBColor;
 
     /**
      * Class representing a Scheme Color
@@ -324,9 +334,10 @@
             case "tx2": {  oUniColor.color.id      = 16; break;}
             default: {  oUniColor.color.id      = 16; break;}
         }
-        ApiSchemeColor.superclass.constructor.call(this, oUniColor);
+		ApiUniColor.call(this, oUniColor);
     }
-    AscCommon.extendClass(ApiSchemeColor, ApiUniColor);
+	ApiSchemeColor.prototype = Object.create(ApiUniColor.prototype);
+	ApiSchemeColor.prototype.constructor = ApiSchemeColor;
 
     /**
      * Class representing a Preset Color
@@ -337,9 +348,10 @@
         var oUniColor = new AscFormat.CUniColor();
         oUniColor.setColor(new AscFormat.CPrstColor());
         oUniColor.color.id = sPresetColor;
-        ApiPresetColor.superclass.constructor.call(this, oUniColor);
+		ApiUniColor.call(this, oUniColor);
     }
-    AscCommon.extendClass(ApiPresetColor, ApiUniColor);
+	ApiPresetColor.prototype = Object.create(ApiUniColor.prototype);
+	ApiPresetColor.prototype.constructor = ApiPresetColor;
 
     /**
      * Class represent a base class fill
@@ -1491,6 +1503,20 @@
     //------------------------------------------------------------------------------------------------------------------
 
     /**
+     * Insert watermark in the header of document
+     * @param {?string} } [sText="Watermark"]
+     * @param {?boolean} [bIsDiagonal=true]
+     */
+    ApiDocument.prototype.InsertWatermark = function(sText, bIsDiagonal){
+
+        var oApiSection = this.GetFinalSection();
+        if(oApiSection){
+            privateInsertWatermarkToContent(oApiSection.GetHeader("title", false), sText, bIsDiagonal);
+            privateInsertWatermarkToContent(oApiSection.GetHeader("even", false), sText, bIsDiagonal);
+            privateInsertWatermarkToContent(oApiSection.GetHeader("default", true), sText, bIsDiagonal);
+        }
+    };
+    /**
      * Get the type of this class.
      * @returns {"document"}
      */
@@ -1959,7 +1985,9 @@
             else if ("default" === sType)
                 this.Section.Set_Header_Default(oHeader);
         }
-
+        if(!oHeader){
+            return null;
+        }
         return new ApiDocumentContent(oHeader.Get_DocumentContent());
     };
     /**
@@ -4450,6 +4478,7 @@
     ApiDocument.prototype["InsertContent"]           = ApiDocument.prototype.InsertContent;
 	ApiDocument.prototype["GetCommentsReport"]       = ApiDocument.prototype.GetCommentsReport;
 	ApiDocument.prototype["GetReviewReport"]         = ApiDocument.prototype.GetReviewReport;
+	ApiDocument.prototype["InsertWatermark"]         = ApiDocument.prototype.InsertWatermark;
 
     ApiParagraph.prototype["GetClassType"]           = ApiParagraph.prototype.GetClassType;
     ApiParagraph.prototype["AddText"]                = ApiParagraph.prototype.AddText;
@@ -4916,6 +4945,111 @@
             return Asc.c_oAscRelativeFromV.Paragraph;
 
         return Asc.c_oAscRelativeFromV.Page;
+    }
+
+    function private_CreateWatermark(sText, bDiagonal){
+        var sText2 = ((typeof (sText) === "string") && (sText.length > 0)) ? sText : "Watermark";
+        var sFontName2 = undefined;
+        var nFontSize2 = 2;
+        var oTextFill2 = AscFormat.CreateUnfilFromRGB(127, 127, 127);
+        oTextFill2.transparent = 127;
+
+        var MainLogicDocument = (editor && editor.WordControl && editor.WordControl.m_oLogicDocument ? editor && editor.WordControl && editor.WordControl.m_oLogicDocument : null);
+        var TrackRevisions = (MainLogicDocument ? MainLogicDocument.Is_TrackRevisions() : false);
+
+        if (MainLogicDocument && true === TrackRevisions)
+            MainLogicDocument.Set_TrackRevisions(false);
+
+        var oShape = new AscFormat.CShape();
+        oShape.setWordShape(true);
+        oShape.setBDeleted(false);
+        oShape.createTextBoxContent();
+        var oSpPr = new AscFormat.CSpPr();
+        var oXfrm = new AscFormat.CXfrm();
+        oXfrm.setOffX(0);
+        oXfrm.setOffY(0);
+
+
+        var fHeight = 45;
+        var fWidth;
+        if(bDiagonal !== false){
+            fWidth = 175;
+            oXfrm.setRot(7*Math.PI/4);
+        }
+        else{
+            fWidth = 165;
+        }
+
+        oXfrm.setExtX(fWidth);
+        oXfrm.setExtY(fHeight);
+        oSpPr.setXfrm(oXfrm);
+        oXfrm.setParent(oSpPr);
+        oSpPr.setFill(AscFormat.CreateNoFillUniFill());
+        oSpPr.setLn(AscFormat.CreateNoFillLine());
+        oSpPr.setGeometry(AscFormat.CreateGeometry("rect"));
+        oSpPr.geometry.setParent(oSpPr);
+        oShape.setSpPr(oSpPr);
+        oSpPr.setParent(oShape);
+        var oContent = oShape.getDocContent();
+        AscFormat.AddToContentFromString(oContent, sText2);
+        var oTextPr = new CTextPr();
+        oTextPr.FontSize = nFontSize2;
+        oTextPr.RFonts.Ascii = sFontName2;
+        oTextPr.TextFill = oTextFill2;
+        oContent.Set_ApplyToAll(true);
+        oContent.Paragraph_Add(new ParaTextPr(oTextPr));
+        oContent.Set_ParagraphAlign(AscCommon.align_Center);
+        oContent.Set_ApplyToAll(false);
+        var oBodyPr = oShape.getBodyPr().createDuplicate();
+        oBodyPr.rot = 0;
+        oBodyPr.spcFirstLastPara = false;
+        oBodyPr.vertOverflow = AscFormat.nOTOwerflow;
+        oBodyPr.horzOverflow = AscFormat.nOTOwerflow;
+        oBodyPr.vert = AscFormat.nVertTThorz;
+        oBodyPr.lIns = 2.54;
+        oBodyPr.tIns = 1.27;
+        oBodyPr.rIns = 2.54;
+        oBodyPr.bIns = 1.27;
+        oBodyPr.numCol = 1;
+        oBodyPr.spcCol = 0;
+        oBodyPr.rtlCol = 0;
+        oBodyPr.fromWordArt = false;
+        oBodyPr.anchor = 4;
+        oBodyPr.anchorCtr = false;
+        oBodyPr.forceAA = false;
+        oBodyPr.compatLnSpc = true;
+        oBodyPr.prstTxWarp = AscFormat.ExecuteNoHistory(function(){return AscFormat.CreatePrstTxWarpGeometry("textPlain");}, this, []);
+        oShape.setBodyPr(oBodyPr);
+        
+        var oLogicDocument = private_GetLogicDocument();
+        var oDrawingDocuemnt = private_GetDrawingDocument();
+        var oDrawing = new ParaDrawing(fWidth, fHeight, null, oDrawingDocuemnt, oLogicDocument, null);
+        oShape.setParent(oDrawing);
+        oDrawing.Set_GraphicObject(oShape);
+        var oApiShape = new ApiShape(oShape);
+        oApiShape.SetWrappingStyle("inFront");
+        oApiShape.SetHorAlign("margin", "center");
+        oApiShape.SetVerAlign("margin", "center");
+        return oApiShape;
+    }
+
+
+    function privateInsertWatermarkToContent(oContent, sText, bIsDiagonal){
+        if(oContent){
+            var nElementsCount = oContent.GetElementsCount();
+            for(var i = 0; i < nElementsCount; ++i){
+                var oElement = oContent.GetElement(i);
+                if(oElement.GetClassType() === "paragraph"){
+                    oElement.AddDrawing(private_CreateWatermark(sText, bIsDiagonal));
+                    break;
+                }
+            }
+            if(i === nElementsCount){
+                oElement = Api.CreateParagraph();
+                oElement.AddDrawing(private_CreateWatermark(sText, bIsDiagonal));
+                oContent.Push(oElement);
+            }
+        }
     }
 
     ApiDocument.prototype.OnChangeParaPr = function(oApiParaPr)

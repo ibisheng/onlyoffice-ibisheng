@@ -655,7 +655,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	/*Basic types of an elements used into formulas*/
 	/** @constructor */
 	function cNumber(val) {
-		this.constructor.call(this, parseFloat(val));
+		cBaseType.call(this, parseFloat(val));
 		var res;
 
 		if (!isNaN(this.value) && Math.abs(this.value) !== Infinity) {
@@ -669,6 +669,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cNumber.prototype = Object.create(cBaseType.prototype);
+	cNumber.prototype.constructor = cNumber;
 	cNumber.prototype.type = cElementType.number;
 	cNumber.prototype.tocString = function () {
 		return new cString(("" + this.value).replace(FormulaSeparators.digitSeparatorDef,
@@ -691,10 +692,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 	/** @constructor */
 	function cString(val) {
-		this.constructor.call(this, val);
+		cBaseType.call(this, val);
 	}
 
 	cString.prototype = Object.create(cBaseType.prototype);
+	cString.prototype.constructor = cString;
 	cString.prototype.type = cElementType.string;
 	cString.prototype.tocNumber = function () {
 		var res, m = this.value;
@@ -743,10 +745,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			case cBoolLocal["t"].toUpperCase():
 				v = true;
 		}
-		this.constructor.call(this, v);
+		cBaseType.call(this, v);
 	}
 
 	cBool.prototype = Object.create(cBaseType.prototype);
+	cBool.prototype.constructor = cBool;
 	cBool.prototype.type = cElementType.bool;
 	cBool.prototype.toString = function () {
 		return this.value.toString().toUpperCase();
@@ -772,7 +775,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 	/** @constructor */
 	function cError(val) {
-		this.constructor.call(this, val);
+		cBaseType.call(this, val);
 
 		this.errorType = -1;
 
@@ -846,6 +849,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cError.prototype = Object.create(cBaseType.prototype);
+	cError.prototype.constructor = cError;
 	cError.prototype.type = cElementType.error;
 	cError.prototype.tocNumber =
 		cError.prototype.tocString = cError.prototype.tocBool = cError.prototype.tocEmpty = function () {
@@ -913,7 +917,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 	/** @constructor */
 	function cArea(val, ws) {/*Area means "A1:E5" for example*/
-		this.constructor.call(this, val);
+		cBaseType.call(this, val);
 
 		this.ws = ws;
 		this.range = null;
@@ -923,6 +927,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cArea.prototype = Object.create(cBaseType.prototype);
+	cArea.prototype.constructor = cArea;
 	cArea.prototype.type = cElementType.cellsRange;
 	cArea.prototype.clone = function (opt_ws) {
 		var ws = opt_ws ? opt_ws : this.ws;
@@ -1087,7 +1092,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 	/** @constructor */
 	function cArea3D(val, wsFrom, wsTo) {/*Area3D means "Sheat1!A1:E5" for example*/
-		this.constructor.call(this, val);
+		cBaseType.call(this, val);
 
 		this.bbox = null;
 		if (val) {
@@ -1104,6 +1109,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cArea3D.prototype = Object.create(cBaseType.prototype);
+	cArea3D.prototype.constructor = cArea3D;
 	cArea3D.prototype.type = cElementType.cellsRange3D;
 	cArea3D.prototype.clone = function () {
 		var oRes = new cArea3D(null, this.wsFrom, this.wsTo);
@@ -1335,7 +1341,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 	/** @constructor */
 	function cRef(val, ws) {/*Ref means A1 for example*/
-		this.constructor.call(this, val);
+		cBaseType.call(this, val);
 
 		this.ws = ws;
 		this.range = null;
@@ -1345,6 +1351,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cRef.prototype = Object.create(cBaseType.prototype);
+	cRef.prototype.constructor = cRef;
 	cRef.prototype.type = cElementType.cell;
 	cRef.prototype.clone = function (opt_ws) {
 		var ws = opt_ws ? opt_ws : this.ws;
@@ -1401,7 +1408,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 	/** @constructor */
 	function cRef3D(val, ws) {/*Ref means Sheat1!A1 for example*/
-		this.constructor.call(this, val);
+		cBaseType.call(this, val);
 
 		this.ws = ws;
 		this.range = null;
@@ -1411,6 +1418,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cRef3D.prototype = Object.create(cBaseType.prototype);
+	cRef3D.prototype.constructor = cRef3D;
 	cRef3D.prototype.type = cElementType.cell3D;
 	cRef3D.prototype.clone = function (opt_ws) {
 		var ws = opt_ws ? opt_ws : this.ws;
@@ -1486,10 +1494,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 	/** @constructor */
 	function cEmpty() {
-		this.constructor.call(this, "");
+		cBaseType.call(this, "");
 	}
 
 	cEmpty.prototype = Object.create(cBaseType.prototype);
+	cEmpty.prototype.constructor = cEmpty;
 	cEmpty.prototype.type = cElementType.empty;
 	cEmpty.prototype.tocNumber = function () {
 		return new cNumber(0);
@@ -1506,11 +1515,12 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 	/** @constructor */
 	function cName(val, ws) {
-		this.constructor.call(this, val);
+		cBaseType.call(this, val);
 		this.ws = ws;
 	}
 
 	cName.prototype = Object.create(cBaseType.prototype);
+	cName.prototype.constructor = cName;
 	cName.prototype.type = cElementType.name;
 	cName.prototype.clone = function (opt_ws) {
 		var ws = opt_ws ? opt_ws : this.ws;
@@ -1573,7 +1583,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 	/** @constructor */
 	function cStrucTable(val, wb, ws) {
-		this.constructor.call(this, val);
+		cBaseType.call(this, val);
 		this.wb = wb;
 		this.ws = ws;
 
@@ -1591,6 +1601,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cStrucTable.prototype = Object.create(cBaseType.prototype);
+	cStrucTable.prototype.constructor = cStrucTable;
 	cStrucTable.prototype.type = cElementType.table;
 	cStrucTable.prototype.createFromVal = function (val, wb, ws) {
 		var res = new cStrucTable(val[0], wb, ws);
@@ -1945,6 +1956,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cName3D.prototype = Object.create(cName.prototype);
+	cName3D.prototype.constructor = cName3D;
 	cName3D.prototype.type = cElementType.name3D;
 	cName3D.prototype.clone = function (opt_ws) {
 		var ws;
@@ -1963,12 +1975,12 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 	};
 	cName3D.prototype.toString = function () {
-		return parserHelp.getEscapeSheetName(this.ws.getName()) + "!" + this.constructor.prototype.toString.call(this);
+		return parserHelp.getEscapeSheetName(this.ws.getName()) + "!" + cName.prototype.toString.call(this);
 	};
 
 	/** @constructor */
 	function cArray() {
-		this.constructor.call(this, undefined);
+		cBaseType.call(this, undefined);
 		this.array = [];
 		this.rowCount = 0;
 		this.countElementInRow = [];
@@ -1976,6 +1988,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cArray.prototype = Object.create(cBaseType.prototype);
+	cArray.prototype.constructor = cArray;
 	cArray.prototype.type = cElementType.array;
 	cArray.prototype.addRow = function () {
 		this.array[this.array.length] = [];
@@ -2152,6 +2165,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cUndefined.prototype = Object.create(cBaseType.prototype);
+	cUndefined.prototype.constructor = cUndefined;
 
 	function checkTypeCell(cell) {
 		if (cell && !cell.isEmptyText()) {
@@ -2322,7 +2336,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	parentLeft.prototype.type = cElementType.operator;
-	parentLeft.prototype.constructor = parentLeft;
 	parentLeft.prototype.DecrementArguments = function () {
 		--this.argumentsCurrent;
 	};
@@ -2351,7 +2364,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	parentRight.prototype.type = cElementType.operator;
-	parentRight.prototype.constructor = parentRight;
 	parentRight.prototype.toString = function () {
 		return this.name;
 	};
@@ -2362,6 +2374,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cRangeUnionOperator.prototype = Object.create(cBaseOperator.prototype);
+	cRangeUnionOperator.prototype.constructor = cRangeUnionOperator;
 	cRangeUnionOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], ws0, ws1, ws;
 		if (( cElementType.cell === arg0.type || cElementType.cellsRange === arg0.type ||
@@ -2413,6 +2426,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cRangeIntersectionOperator.prototype = Object.create(cBaseOperator.prototype);
+	cRangeIntersectionOperator.prototype.constructor = cRangeIntersectionOperator;
 	cRangeIntersectionOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], ws0, ws1, ws;
 		if (( cElementType.cell === arg0.type || cElementType.cellsRange === arg0.type ||
@@ -2470,6 +2484,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cUnarMinusOperator.prototype = Object.create(cBaseOperator.prototype);
+	cUnarMinusOperator.prototype.constructor = cUnarMinusOperator;
 	cUnarMinusOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea) {
@@ -2506,6 +2521,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cUnarPlusOperator.prototype = Object.create(cBaseOperator.prototype);
+	cUnarPlusOperator.prototype.constructor = cUnarPlusOperator;
 	cUnarPlusOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (cElementType.cellsRange === arg0.type) {
@@ -2536,6 +2552,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cAddOperator.prototype = Object.create(cBaseOperator.prototype);
+	cAddOperator.prototype.constructor = cAddOperator;
 	cAddOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
@@ -2559,6 +2576,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cMinusOperator.prototype = Object.create(cBaseOperator.prototype);
+	cMinusOperator.prototype.constructor = cMinusOperator;
 	cMinusOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
@@ -2579,6 +2597,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cPercentOperator.prototype = Object.create(cBaseOperator.prototype);
+	cPercentOperator.prototype.constructor = cPercentOperator;
 	cPercentOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea) {
@@ -2613,6 +2632,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cPowOperator.prototype = Object.create(cBaseOperator.prototype);
+	cPowOperator.prototype.constructor = cPowOperator;
 	cPowOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
@@ -2649,6 +2669,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cMultOperator.prototype = Object.create(cBaseOperator.prototype);
+	cMultOperator.prototype.constructor = cMultOperator;
 	cMultOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
@@ -2672,6 +2693,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cDivOperator.prototype = Object.create(cBaseOperator.prototype);
+	cDivOperator.prototype.constructor = cDivOperator;
 	cDivOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
@@ -2695,6 +2717,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cConcatSTROperator.prototype = Object.create(cBaseOperator.prototype);
+	cConcatSTROperator.prototype.constructor = cConcatSTROperator;
 	cConcatSTROperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
@@ -2720,6 +2743,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cEqualsOperator.prototype = Object.create(cBaseOperator.prototype);
+	cEqualsOperator.prototype.constructor = cEqualsOperator;
 	cEqualsOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
@@ -2745,6 +2769,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cNotEqualsOperator.prototype = Object.create(cBaseOperator.prototype);
+	cNotEqualsOperator.prototype.constructor = cNotEqualsOperator;
 	cNotEqualsOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
@@ -2771,6 +2796,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cLessOperator.prototype = Object.create(cBaseOperator.prototype);
+	cLessOperator.prototype.constructor = cLessOperator;
 	cLessOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
@@ -2797,6 +2823,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cLessOrEqualOperator.prototype = Object.create(cBaseOperator.prototype);
+	cLessOrEqualOperator.prototype.constructor = cLessOrEqualOperator;
 	cLessOrEqualOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
@@ -2822,6 +2849,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cGreaterOperator.prototype = Object.create(cBaseOperator.prototype);
+	cGreaterOperator.prototype.constructor = cGreaterOperator;
 	cGreaterOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
@@ -2847,6 +2875,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cGreaterOrEqualOperator.prototype = Object.create(cBaseOperator.prototype);
+	cGreaterOrEqualOperator.prototype.constructor = cGreaterOrEqualOperator;
 	cGreaterOrEqualOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {

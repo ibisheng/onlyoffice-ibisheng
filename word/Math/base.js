@@ -109,7 +109,7 @@ var c_oAscMathMainType = {
  */
 function CMathBase(bInside)
 {
-    CMathBase.superclass.constructor.call(this);
+	CParagraphContentWithParagraphLikeContent.call(this);
 
     this.Type = para_Math_Composition;
 
@@ -187,7 +187,8 @@ function CMathBase(bInside)
 
     return this;
 }
-AscCommon.extendClass(CMathBase, CParagraphContentWithParagraphLikeContent);
+CMathBase.prototype = Object.create(CParagraphContentWithParagraphLikeContent.prototype);
+CMathBase.prototype.constructor = CMathBase;
 CMathBase.prototype.setContent = function()
 {
     for(var i=0; i < this.nRow; i++)
@@ -518,7 +519,7 @@ CMathBase.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
     {
         this.Bounds.ShiftPos(CurLine, CurRange, Dx, Dy);
 
-        CMathBase.superclass.Shift_Range.call(this, Dx, Dy, _CurLine, _CurRange);
+		CParagraphContentWithParagraphLikeContent.prototype.Shift_Range.call(this, Dx, Dy, _CurLine, _CurRange);
     }
 };
 CMathBase.prototype.IsStartRange = function(_CurLine, _CurRange)
@@ -992,7 +993,7 @@ CMathBase.prototype.Apply_TextPrToCtrPr = function(TextPr, IncFontSize, ApplyToA
             var oCompiledPr = this.Get_CompiledCtrPrp();
             if(TextPr.AscFill)
             {
-                this.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oCompiledPr.TextFill, 0));
+                this.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oCompiledPr.TextFill, 1));
             }
             if(TextPr.AscUnifill)
             {
@@ -1431,7 +1432,7 @@ CMathBase.prototype.Save_RecalculateObject = function(Copy)
 CMathBase.prototype.Load_RecalculateObject = function(RecalcObj)
 {
     if(this.bOneLine == false)
-        CMathBase.superclass.Load_RecalculateObject.call(this, RecalcObj);
+        CParagraphContentWithParagraphLikeContent.prototype.Load_RecalculateObject.call(this, RecalcObj);
 
 };
 CMathBase.prototype.Fill_LogicalContent = function(nCount)
@@ -2539,7 +2540,7 @@ CMathBase.prototype.Set_ReviewType = function(Type, isSetToContent)
 		return;
 
 	if (false !== isSetToContent)
-		CMathBase.superclass.Set_ReviewType.apply(this, arguments);
+		CParagraphContentWithParagraphLikeContent.prototype.Set_ReviewType.apply(this, arguments);
 
 	if (Type !== this.ReviewType)
 	{
@@ -2555,7 +2556,7 @@ CMathBase.prototype.Set_ReviewTypeWithInfo = function(ReviewType, ReviewInfo)
 	if (!this.Id)
 		return;
 
-	CMathBase.superclass.Set_ReviewTypeWithInfo.apply(this, arguments);
+	CParagraphContentWithParagraphLikeContent.prototype.Set_ReviewTypeWithInfo.apply(this, arguments);
 
 	History.Add(new CChangesMathBaseReviewType(this, {Type : this.ReviewType, Info : this.ReviewInfo}, {Type : ReviewType, Info : ReviewInfo}));
 	this.raw_SetReviewType(ReviewType, ReviewInfo);
@@ -2608,7 +2609,7 @@ CMathBase.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth
     if (reviewtype_Common !== ReviewType)
         Checker.Begin_CheckOnlyTextPr();
 
-    CMathBase.superclass.Check_RevisionsChanges.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Check_RevisionsChanges.apply(this, arguments);
 
     if (reviewtype_Common !== ReviewType)
         Checker.End_CheckOnlyTextPr();
@@ -2636,7 +2637,7 @@ CMathBase.prototype.Accept_RevisionChanges = function(Type, bAll)
         }
     }
 
-    CMathBase.superclass.Accept_RevisionChanges.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Accept_RevisionChanges.apply(this, arguments);
 };
 CMathBase.prototype.Reject_RevisionChanges = function(Type, bAll)
 {
@@ -2661,7 +2662,7 @@ CMathBase.prototype.Reject_RevisionChanges = function(Type, bAll)
         }
     }
 
-    CMathBase.superclass.Reject_RevisionChanges.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Reject_RevisionChanges.apply(this, arguments);
 };
 CMathBase.prototype.Set_MenuProps = function(Props)
 {

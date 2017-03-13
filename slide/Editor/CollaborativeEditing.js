@@ -39,7 +39,7 @@
  */
 function CCollaborativeEditing()
 {
-    CCollaborativeEditing.superclass.constructor.call(this);
+	AscCommon.CCollaborativeEditingBase.call(this);
 
     this.m_oLogicDocument     = null;
     this.m_aDocumentPositions = new AscCommon.CDocumentPositionsManager();
@@ -54,8 +54,8 @@ function CCollaborativeEditing()
     this.m_aForeignCursorsToShow = {};
 }
 
-AscCommon.extendClass(CCollaborativeEditing, AscCommon.CCollaborativeEditingBase);
-
+CCollaborativeEditing.prototype = Object.create(AscCommon.CCollaborativeEditingBase.prototype);
+CCollaborativeEditing.prototype.constructor = CCollaborativeEditing;
 
 CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalInfo)
 {

@@ -264,11 +264,12 @@ function private_ParaRunChangesOnMergeLangTextPr(oChange)
  */
 function CChangesRunAddItem(Class, Pos, Items, Color)
 {
-	CChangesRunAddItem.superclass.constructor.call(this, Class, Pos, Items, true);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Items, true);
 
 	this.Color = true === Color ? true : false;
 }
-AscCommon.extendClass(CChangesRunAddItem, AscDFH.CChangesBaseContentChange);
+CChangesRunAddItem.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesRunAddItem.prototype.constructor = CChangesRunAddItem;
 CChangesRunAddItem.prototype.Type = AscDFH.historyitem_ParaRun_AddItem;
 CChangesRunAddItem.prototype.Undo = function()
 {
@@ -345,9 +346,10 @@ CChangesRunAddItem.prototype.CreateReverseChange = function()
  */
 function CChangesRunRemoveItem(Class, Pos, Items)
 {
-	CChangesRunRemoveItem.superclass.constructor.call(this, Class, Pos, Items, false);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Items, false);
 }
-AscCommon.extendClass(CChangesRunRemoveItem, AscDFH.CChangesBaseContentChange);
+CChangesRunRemoveItem.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesRunRemoveItem.prototype.constructor = CChangesRunRemoveItem;
 CChangesRunRemoveItem.prototype.Type = AscDFH.historyitem_ParaRun_RemoveItem;
 CChangesRunRemoveItem.prototype.Undo = function()
 {
@@ -419,9 +421,10 @@ CChangesRunRemoveItem.prototype.CreateReverseChange = function()
  */
 function CChangesRunBold(Class, Old, New, Color)
 {
-	CChangesRunBold.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunBold, AscDFH.CChangesBaseBoolProperty);
+CChangesRunBold.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesRunBold.prototype.constructor = CChangesRunBold;
 CChangesRunBold.prototype.Type = AscDFH.historyitem_ParaRun_Bold;
 CChangesRunBold.prototype.private_SetValue = function(Value)
 {
@@ -445,9 +448,10 @@ CChangesRunBold.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
  */
 function CChangesRunItalic(Class, Old, New, Color)
 {
-	CChangesRunItalic.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunItalic, AscDFH.CChangesBaseBoolProperty);
+CChangesRunItalic.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesRunItalic.prototype.constructor = CChangesRunItalic;
 CChangesRunItalic.prototype.Type = AscDFH.historyitem_ParaRun_Italic;
 CChangesRunItalic.prototype.private_SetValue = function(Value)
 {
@@ -471,9 +475,10 @@ CChangesRunItalic.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
  */
 function CChangesRunStrikeout(Class, Old, New, Color)
 {
-	CChangesRunStrikeout.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunStrikeout, AscDFH.CChangesBaseBoolProperty);
+CChangesRunStrikeout.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesRunStrikeout.prototype.constructor = CChangesRunStrikeout;
 CChangesRunStrikeout.prototype.Type = AscDFH.historyitem_ParaRun_Strikeout;
 CChangesRunStrikeout.prototype.private_SetValue = function(Value)
 {
@@ -497,9 +502,10 @@ CChangesRunStrikeout.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
  */
 function CChangesRunUnderline(Class, Old, New, Color)
 {
-	CChangesRunUnderline.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunUnderline, AscDFH.CChangesBaseBoolProperty);
+CChangesRunUnderline.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesRunUnderline.prototype.constructor = CChangesRunUnderline;
 CChangesRunUnderline.prototype.Type = AscDFH.historyitem_ParaRun_Underline;
 CChangesRunUnderline.prototype.private_SetValue = function(Value)
 {
@@ -523,9 +529,10 @@ CChangesRunUnderline.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
  */
 function CChangesRunFontSize(Class, Old, New, Color)
 {
-	CChangesRunFontSize.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseDoubleProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunFontSize, AscDFH.CChangesBaseDoubleProperty);
+CChangesRunFontSize.prototype = Object.create(AscDFH.CChangesBaseDoubleProperty.prototype);
+CChangesRunFontSize.prototype.constructor = CChangesRunFontSize;
 CChangesRunFontSize.prototype.Type = AscDFH.historyitem_ParaRun_FontSize;
 CChangesRunFontSize.prototype.private_SetValue = function(Value)
 {
@@ -549,9 +556,10 @@ CChangesRunFontSize.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
  */
 function CChangesRunColor(Class, Old, New, Color)
 {
-	CChangesRunColor.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunColor, AscDFH.CChangesBaseObjectProperty);
+CChangesRunColor.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesRunColor.prototype.constructor = CChangesRunColor;
 CChangesRunColor.prototype.Type = AscDFH.historyitem_ParaRun_Color;
 CChangesRunColor.prototype.private_CreateObject = function()
 {
@@ -579,9 +587,10 @@ CChangesRunColor.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
  */
 function CChangesRunVertAlign(Class, Old, New, Color)
 {
-	CChangesRunVertAlign.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunVertAlign, AscDFH.CChangesBaseLongProperty);
+CChangesRunVertAlign.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesRunVertAlign.prototype.constructor = CChangesRunVertAlign;
 CChangesRunVertAlign.prototype.Type = AscDFH.historyitem_ParaRun_VertAlign;
 CChangesRunVertAlign.prototype.private_SetValue = function(Value)
 {
@@ -605,9 +614,10 @@ CChangesRunVertAlign.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
  */
 function CChangesRunHighLight(Class, Old, New, Color)
 {
-	CChangesRunHighLight.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunHighLight, AscDFH.CChangesBaseProperty);
+CChangesRunHighLight.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesRunHighLight.prototype.constructor = CChangesRunHighLight;
 CChangesRunHighLight.prototype.Type = AscDFH.historyitem_ParaRun_HighLight;
 CChangesRunHighLight.prototype.WriteToBinary = function(Writer)
 {
@@ -711,9 +721,10 @@ CChangesRunHighLight.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
  */
 function CChangesRunRStyle(Class, Old, New, Color)
 {
-	CChangesRunRStyle.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseStringProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunRStyle, AscDFH.CChangesBaseStringProperty);
+CChangesRunRStyle.prototype = Object.create(AscDFH.CChangesBaseStringProperty.prototype);
+CChangesRunRStyle.prototype.constructor = CChangesRunRStyle;
 CChangesRunRStyle.prototype.Type = AscDFH.historyitem_ParaRun_RStyle;
 CChangesRunRStyle.prototype.private_SetValue = function(Value)
 {
@@ -737,9 +748,10 @@ CChangesRunRStyle.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
  */
 function CChangesRunSpacing(Class, Old, New, Color)
 {
-	CChangesRunSpacing.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseDoubleProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunSpacing, AscDFH.CChangesBaseDoubleProperty);
+CChangesRunSpacing.prototype = Object.create(AscDFH.CChangesBaseDoubleProperty.prototype);
+CChangesRunSpacing.prototype.constructor = CChangesRunSpacing;
 CChangesRunSpacing.prototype.Type = AscDFH.historyitem_ParaRun_Spacing;
 CChangesRunSpacing.prototype.private_SetValue = function(Value)
 {
@@ -763,9 +775,10 @@ CChangesRunSpacing.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
  */
 function CChangesRunDStrikeout(Class, Old, New, Color)
 {
-	CChangesRunDStrikeout.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunDStrikeout, AscDFH.CChangesBaseBoolProperty);
+CChangesRunDStrikeout.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesRunDStrikeout.prototype.constructor = CChangesRunDStrikeout;
 CChangesRunDStrikeout.prototype.Type = AscDFH.historyitem_ParaRun_DStrikeout;
 CChangesRunDStrikeout.prototype.private_SetValue = function(Value)
 {
@@ -789,9 +802,10 @@ CChangesRunDStrikeout.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
  */
 function CChangesRunCaps(Class, Old, New, Color)
 {
-	CChangesRunCaps.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunCaps, AscDFH.CChangesBaseBoolProperty);
+CChangesRunCaps.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesRunCaps.prototype.constructor = CChangesRunCaps;
 CChangesRunCaps.prototype.Type = AscDFH.historyitem_ParaRun_Caps;
 CChangesRunCaps.prototype.private_SetValue = function(Value)
 {
@@ -815,9 +829,10 @@ CChangesRunCaps.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
  */
 function CChangesRunSmallCaps(Class, Old, New, Color)
 {
-	CChangesRunSmallCaps.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunSmallCaps, AscDFH.CChangesBaseBoolProperty);
+CChangesRunSmallCaps.prototype = Object.create(AscDFH.CChangesBaseBoolProperty.prototype);
+CChangesRunSmallCaps.prototype.constructor = CChangesRunSmallCaps;
 CChangesRunSmallCaps.prototype.Type = AscDFH.historyitem_ParaRun_SmallCaps;
 CChangesRunSmallCaps.prototype.private_SetValue = function(Value)
 {
@@ -841,9 +856,10 @@ CChangesRunSmallCaps.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
  */
 function CChangesRunPosition(Class, Old, New, Color)
 {
-	CChangesRunPosition.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseDoubleProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunPosition, AscDFH.CChangesBaseDoubleProperty);
+CChangesRunPosition.prototype = Object.create(AscDFH.CChangesBaseDoubleProperty.prototype);
+CChangesRunPosition.prototype.constructor = CChangesRunPosition;
 CChangesRunPosition.prototype.Type = AscDFH.historyitem_ParaRun_Position;
 CChangesRunPosition.prototype.private_SetValue = function(Value)
 {
@@ -867,9 +883,10 @@ CChangesRunPosition.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
  */
 function CChangesRunRFonts(Class, Old, New, Color)
 {
-	CChangesRunRFonts.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunRFonts, AscDFH.CChangesBaseObjectProperty);
+CChangesRunRFonts.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesRunRFonts.prototype.constructor = CChangesRunRFonts;
 CChangesRunRFonts.prototype.Type = AscDFH.historyitem_ParaRun_RFonts;
 CChangesRunRFonts.prototype.private_CreateObject = function()
 {
@@ -942,9 +959,10 @@ CChangesRunRFonts.prototype.Merge = function(oChange)
  */
 function CChangesRunLang(Class, Old, New, Color)
 {
-	CChangesRunLang.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunLang, AscDFH.CChangesBaseObjectProperty);
+CChangesRunLang.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesRunLang.prototype.constructor = CChangesRunLang;
 CChangesRunLang.prototype.Type = AscDFH.historyitem_ParaRun_Lang;
 CChangesRunLang.prototype.private_CreateObject = function()
 {
@@ -1008,9 +1026,10 @@ CChangesRunLang.prototype.Merge = function(oChange)
  */
 function CChangesRunRFontsAscii(Class, Old, New, Color)
 {
-	CChangesRunRFontsAscii.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunRFontsAscii, AscDFH.CChangesBaseProperty);
+CChangesRunRFontsAscii.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesRunRFontsAscii.prototype.constructor = CChangesRunRFontsAscii;
 CChangesRunRFontsAscii.prototype.Type = AscDFH.historyitem_ParaRun_RFonts_Ascii;
 CChangesRunRFontsAscii.prototype.WriteToBinary = function(Writer)
 {
@@ -1102,9 +1121,10 @@ CChangesRunRFontsAscii.prototype.Merge = private_ParaRunChangesOnMergeRFontsText
  */
 function CChangesRunRFontsHAnsi(Class, Old, New, Color)
 {
-	CChangesRunRFontsHAnsi.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunRFontsHAnsi, AscDFH.CChangesBaseProperty);
+CChangesRunRFontsHAnsi.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesRunRFontsHAnsi.prototype.constructor = CChangesRunRFontsHAnsi;
 CChangesRunRFontsHAnsi.prototype.Type = AscDFH.historyitem_ParaRun_RFonts_HAnsi;
 CChangesRunRFontsHAnsi.prototype.WriteToBinary = function(Writer)
 {
@@ -1196,9 +1216,10 @@ CChangesRunRFontsHAnsi.prototype.Merge = private_ParaRunChangesOnMergeRFontsText
  */
 function CChangesRunRFontsCS(Class, Old, New, Color)
 {
-	CChangesRunRFontsCS.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunRFontsCS, AscDFH.CChangesBaseProperty);
+CChangesRunRFontsCS.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesRunRFontsCS.prototype.constructor = CChangesRunRFontsCS;
 CChangesRunRFontsCS.prototype.Type = AscDFH.historyitem_ParaRun_RFonts_CS;
 CChangesRunRFontsCS.prototype.WriteToBinary = function(Writer)
 {
@@ -1290,9 +1311,10 @@ CChangesRunRFontsCS.prototype.Merge = private_ParaRunChangesOnMergeRFontsTextPr;
  */
 function CChangesRunRFontsEastAsia(Class, Old, New, Color)
 {
-	CChangesRunRFontsEastAsia.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunRFontsEastAsia, AscDFH.CChangesBaseProperty);
+CChangesRunRFontsEastAsia.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesRunRFontsEastAsia.prototype.constructor = CChangesRunRFontsEastAsia;
 CChangesRunRFontsEastAsia.prototype.Type = AscDFH.historyitem_ParaRun_RFonts_EastAsia;
 CChangesRunRFontsEastAsia.prototype.WriteToBinary = function(Writer)
 {
@@ -1384,9 +1406,10 @@ CChangesRunRFontsEastAsia.prototype.Merge = private_ParaRunChangesOnMergeRFontsT
  */
 function CChangesRunRFontsHint(Class, Old, New, Color)
 {
-	CChangesRunRFontsHint.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunRFontsHint, AscDFH.CChangesBaseLongProperty);
+CChangesRunRFontsHint.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesRunRFontsHint.prototype.constructor = CChangesRunRFontsHint;
 CChangesRunRFontsHint.prototype.Type = AscDFH.historyitem_ParaRun_RFonts_Hint;
 CChangesRunRFontsHint.prototype.private_SetValue = function(Value)
 {
@@ -1410,9 +1433,10 @@ CChangesRunRFontsHint.prototype.Merge = private_ParaRunChangesOnMergeRFontsTextP
  */
 function CChangesRunLangBidi(Class, Old, New, Color)
 {
-	CChangesRunLangBidi.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunLangBidi, AscDFH.CChangesBaseLongProperty);
+CChangesRunLangBidi.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesRunLangBidi.prototype.constructor = CChangesRunLangBidi;
 CChangesRunLangBidi.prototype.Type = AscDFH.historyitem_ParaRun_Lang_Bidi;
 CChangesRunLangBidi.prototype.private_SetValue = function(Value)
 {
@@ -1437,9 +1461,10 @@ CChangesRunLangBidi.prototype.Merge = private_ParaRunChangesOnMergeLangTextPr;
  */
 function CChangesRunLangEastAsia(Class, Old, New, Color)
 {
-	CChangesRunLangEastAsia.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunLangEastAsia, AscDFH.CChangesBaseLongProperty);
+CChangesRunLangEastAsia.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesRunLangEastAsia.prototype.constructor = CChangesRunLangEastAsia;
 CChangesRunLangEastAsia.prototype.Type = AscDFH.historyitem_ParaRun_Lang_EastAsia;
 CChangesRunLangEastAsia.prototype.private_SetValue = function(Value)
 {
@@ -1464,9 +1489,10 @@ CChangesRunLangEastAsia.prototype.Merge = private_ParaRunChangesOnMergeLangTextP
  */
 function CChangesRunLangVal(Class, Old, New, Color)
 {
-	CChangesRunLangVal.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunLangVal, AscDFH.CChangesBaseLongProperty);
+CChangesRunLangVal.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesRunLangVal.prototype.constructor = CChangesRunLangVal;
 CChangesRunLangVal.prototype.Type = AscDFH.historyitem_ParaRun_Lang_Val;
 CChangesRunLangVal.prototype.private_SetValue = function(Value)
 {
@@ -1491,9 +1517,10 @@ CChangesRunLangVal.prototype.Merge = private_ParaRunChangesOnMergeLangTextPr;
  */
 function CChangesRunTextPr(Class, Old, New, Color)
 {
-	CChangesRunTextPr.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunTextPr, AscDFH.CChangesBaseObjectProperty);
+CChangesRunTextPr.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesRunTextPr.prototype.constructor = CChangesRunTextPr;
 CChangesRunTextPr.prototype.Type = AscDFH.historyitem_ParaRun_TextPr;
 CChangesRunTextPr.prototype.private_CreateObject = function()
 {
@@ -1727,9 +1754,10 @@ CChangesRunTextPr.prototype.Merge = function(oChange)
  */
 function CChangesRunUnifill(Class, Old, New, Color)
 {
-	CChangesRunUnifill.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunUnifill, AscDFH.CChangesBaseObjectProperty);
+CChangesRunUnifill.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesRunUnifill.prototype.constructor = CChangesRunUnifill;
 CChangesRunUnifill.prototype.Type = AscDFH.historyitem_ParaRun_Unifill;
 CChangesRunUnifill.prototype.private_CreateObject = function()
 {
@@ -1768,9 +1796,10 @@ CChangesRunUnifill.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
  */
 function CChangesRunShd(Class, Old, New, Color)
 {
-	CChangesRunShd.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunShd, AscDFH.CChangesBaseObjectProperty);
+CChangesRunShd.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesRunShd.prototype.constructor = CChangesRunShd;
 CChangesRunShd.prototype.Type = AscDFH.historyitem_ParaRun_Shd;
 CChangesRunShd.prototype.private_CreateObject = function()
 {
@@ -1809,9 +1838,10 @@ CChangesRunShd.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
  */
 function CChangesRunMathStyle(Class, Old, New)
 {
-	CChangesRunMathStyle.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesRunMathStyle, AscDFH.CChangesBaseLongProperty);
+CChangesRunMathStyle.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesRunMathStyle.prototype.constructor = CChangesRunMathStyle;
 CChangesRunMathStyle.prototype.Type = AscDFH.historyitem_ParaRun_MathStyle;
 CChangesRunMathStyle.prototype.private_SetValue = function(Value)
 {
@@ -1837,9 +1867,10 @@ CChangesRunMathStyle.prototype.Merge = function(oChange)
  */
 function CChangesRunMathPrp(Class, Old, New, Color)
 {
-	CChangesRunMathPrp.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunMathPrp, AscDFH.CChangesBaseObjectProperty);
+CChangesRunMathPrp.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesRunMathPrp.prototype.constructor = CChangesRunMathPrp;
 CChangesRunMathPrp.prototype.Type = AscDFH.historyitem_ParaRun_MathPrp;
 CChangesRunMathPrp.prototype.private_CreateObject = function()
 {
@@ -1894,9 +1925,10 @@ CChangesRunMathPrp.prototype.Merge = function(oChange)
  */
 function CChangesRunReviewType(Class, Old, New, Color)
 {
-	CChangesRunMathPrp.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunReviewType, AscDFH.CChangesBaseProperty);
+CChangesRunReviewType.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesRunReviewType.prototype.constructor = CChangesRunReviewType;
 CChangesRunReviewType.prototype.Type = AscDFH.historyitem_ParaRun_ReviewType;
 CChangesRunReviewType.prototype.WriteToBinary = function(Writer)
 {
@@ -1958,9 +1990,10 @@ CChangesRunReviewType.prototype.Merge = function(oChange)
  */
 function CChangesRunPrChange(Class, Old, New, Color)
 {
-	CChangesRunPrChange.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunPrChange, AscDFH.CChangesBaseProperty);
+CChangesRunPrChange.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesRunPrChange.prototype.constructor = CChangesRunPrChange;
 CChangesRunPrChange.prototype.Type = AscDFH.historyitem_ParaRun_PrChange;
 CChangesRunPrChange.prototype.WriteToBinary = function(Writer)
 {
@@ -2090,9 +2123,10 @@ CChangesRunPrChange.prototype.Merge = function(oChange)
  */
 function CChangesRunTextFill(Class, Old, New, Color)
 {
-	CChangesRunTextFill.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunTextFill, AscDFH.CChangesBaseObjectProperty);
+CChangesRunTextFill.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesRunTextFill.prototype.constructor = CChangesRunTextFill;
 CChangesRunTextFill.prototype.Type = AscDFH.historyitem_ParaRun_TextFill;
 CChangesRunTextFill.prototype.private_CreateObject = function()
 {
@@ -2120,9 +2154,10 @@ CChangesRunTextFill.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
  */
 function CChangesRunTextOutline(Class, Old, New, Color)
 {
-	CChangesRunTextOutline.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunTextOutline, AscDFH.CChangesBaseObjectProperty);
+CChangesRunTextOutline.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesRunTextOutline.prototype.constructor = CChangesRunTextOutline;
 CChangesRunTextOutline.prototype.Type = AscDFH.historyitem_ParaRun_TextOutline;
 CChangesRunTextOutline.prototype.private_CreateObject = function()
 {
@@ -2150,9 +2185,10 @@ CChangesRunTextOutline.prototype.Merge = private_ParaRunChangesOnMergeTextPr;
  */
 function CChangesRunPrReviewInfo(Class, Old, New, Color)
 {
-	CChangesRunPrReviewInfo.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunPrReviewInfo, AscDFH.CChangesBaseObjectProperty);
+CChangesRunPrReviewInfo.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesRunPrReviewInfo.prototype.constructor = CChangesRunPrReviewInfo;
 CChangesRunPrReviewInfo.prototype.Type = AscDFH.historyitem_ParaRun_PrReviewInfo;
 CChangesRunPrReviewInfo.prototype.private_CreateObject = function()
 {
@@ -2179,9 +2215,10 @@ CChangesRunPrReviewInfo.prototype.Merge = function(oChange)
  */
 function CChangesRunContentReviewInfo(Class, Old, New, Color)
 {
-	CChangesRunContentReviewInfo.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesRunContentReviewInfo, AscDFH.CChangesBaseObjectProperty);
+CChangesRunContentReviewInfo.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesRunContentReviewInfo.prototype.constructor = CChangesRunContentReviewInfo;
 CChangesRunContentReviewInfo.prototype.Type = AscDFH.historyitem_ParaRun_ContentReviewInfo;
 CChangesRunContentReviewInfo.prototype.private_CreateObject = function()
 {
@@ -2212,10 +2249,11 @@ CChangesRunContentReviewInfo.prototype.Merge = function(oChange)
  */
 function CChangesRunOnStartSplit(Class, Pos)
 {
-	CChangesRunOnStartSplit.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 	this.Pos = Pos;
 }
-AscCommon.extendClass(CChangesRunOnStartSplit, AscDFH.CChangesBase);
+CChangesRunOnStartSplit.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesRunOnStartSplit.prototype.constructor = CChangesRunOnStartSplit;
 CChangesRunOnStartSplit.prototype.Type = AscDFH.historyitem_ParaRun_OnStartSplit;
 CChangesRunOnStartSplit.prototype.Undo = function()
 {
@@ -2250,10 +2288,11 @@ CChangesRunOnStartSplit.prototype.Merge = function(oChange)
  */
 function CChangesRunOnEndSplit(Class, NewRun)
 {
-	CChangesRunOnEndSplit.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 	this.NewRun = NewRun;
 }
-AscCommon.extendClass(CChangesRunOnEndSplit, AscDFH.CChangesBase);
+CChangesRunOnEndSplit.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesRunOnEndSplit.prototype.constructor = CChangesRunOnEndSplit;
 CChangesRunOnEndSplit.prototype.Type = AscDFH.historyitem_ParaRun_OnEndSplit;
 CChangesRunOnEndSplit.prototype.Undo = function()
 {
@@ -2289,9 +2328,10 @@ CChangesRunOnEndSplit.prototype.Merge = function(oChange)
  */
 function CChangesRunMathAlnAt(Class, Old, New)
 {
-	CChangesRunMathAlnAt.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesRunMathAlnAt, AscDFH.CChangesBaseProperty);
+CChangesRunMathAlnAt.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesRunMathAlnAt.prototype.constructor = CChangesRunMathAlnAt;
 CChangesRunMathAlnAt.prototype.Type = AscDFH.historyitem_ParaRun_MathAlnAt;
 CChangesRunMathAlnAt.prototype.private_SetValue = function(Value)
 {
@@ -2356,12 +2396,13 @@ CChangesRunMathAlnAt.prototype.Merge = function(oChange)
  */
 function CChangesRunMathForcedBreak(Class, bInsert, alnAt)
 {
-	CChangesRunMathForcedBreak.superclass.constructor.call(this, Class);
+	AscDFH.CChangesBase.call(this, Class);
 
 	this.bInsert = bInsert;
 	this.alnAt   = alnAt;
 }
-AscCommon.extendClass(CChangesRunMathForcedBreak, AscDFH.CChangesBase);
+CChangesRunMathForcedBreak.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesRunMathForcedBreak.prototype.constructor = CChangesRunMathForcedBreak;
 CChangesRunMathForcedBreak.prototype.Type = AscDFH.historyitem_ParaRun_MathForcedBreak;
 CChangesRunMathForcedBreak.prototype.Undo = function()
 {

@@ -2967,7 +2967,7 @@
 	 */
 	function CChangesBaseContentChange(Class, Pos, Items, isAdd)
 	{
-		CChangesBaseContentChange.superclass.constructor.call(this, Class);
+		CChangesBase.call(this, Class);
 
 		this.Pos      = Pos;
 		this.Items    = Items;
@@ -2977,7 +2977,9 @@
 
 		this.Reverted = false;
 	}
-	AscCommon.extendClass(CChangesBaseContentChange, CChangesBase);
+
+	CChangesBaseContentChange.prototype = Object.create(CChangesBase.prototype);
+	CChangesBaseContentChange.prototype.constructor = CChangesBaseContentChange;
 	CChangesBaseContentChange.prototype.IsContentChange = function()
 	{
 		return true;
@@ -3164,13 +3166,15 @@
 	 */
 	function CChangesBaseProperty(Class, Old, New, Color)
 	{
-		CChangesBaseProperty.superclass.constructor.call(this, Class);
+		CChangesBase.call(this, Class);
 
 		this.Color = true === Color ? true : false;
 		this.Old   = Old;
 		this.New   = New;
 	}
-	AscCommon.extendClass(CChangesBaseProperty, CChangesBase);
+
+	CChangesBaseProperty.prototype = Object.create(CChangesBase.prototype);
+	CChangesBaseProperty.prototype.constructor = CChangesBaseProperty;
 	CChangesBaseProperty.prototype.Undo = function()
 	{
 		this.private_SetValue(this.Old);
@@ -3206,9 +3210,11 @@
 	 */
 	function CChangesBaseBoolProperty(Class, Old, New, Color)
 	{
-		CChangesBaseBoolProperty.superclass.constructor.call(this, Class, Old, New, Color);
+		CChangesBaseProperty.call(this, Class, Old, New, Color);
 	}
-	AscCommon.extendClass(CChangesBaseBoolProperty, CChangesBaseProperty);
+
+	CChangesBaseBoolProperty.prototype = Object.create(CChangesBaseProperty.prototype);
+	CChangesBaseBoolProperty.prototype.constructor = CChangesBaseBoolProperty;
 	CChangesBaseBoolProperty.prototype.WriteToBinary = function(Writer)
 	{
 		// Long  : Flag
@@ -3273,9 +3279,11 @@
 	 */
 	function CChangesBaseDoubleProperty(Class, Old, New, Color)
 	{
-		CChangesBaseDoubleProperty.superclass.constructor.call(this, Class, Old, New, Color);
+		CChangesBaseProperty.call(this, Class, Old, New, Color);
 	}
-	AscCommon.extendClass(CChangesBaseDoubleProperty, CChangesBaseProperty);
+
+	CChangesBaseDoubleProperty.prototype = Object.create(CChangesBaseProperty.prototype);
+	CChangesBaseDoubleProperty.prototype.constructor = CChangesBaseDoubleProperty;
 	CChangesBaseDoubleProperty.prototype.WriteToBinary = function(Writer)
 	{
 		// Long  : Flag
@@ -3339,9 +3347,11 @@
 	 */
 	function CChangesBaseObjectProperty(Class, Old, New, Color)
 	{
-		CChangesBaseObjectProperty.superclass.constructor.call(this, Class, Old, New, Color);
+		CChangesBaseProperty.call(this, Class, Old, New, Color);
 	}
-	AscCommon.extendClass(CChangesBaseObjectProperty, CChangesBaseProperty);
+
+	CChangesBaseObjectProperty.prototype = Object.create(CChangesBaseProperty.prototype);
+	CChangesBaseObjectProperty.prototype.constructor = CChangesBaseObjectProperty;
 	CChangesBaseObjectProperty.prototype.WriteToBinary = function(Writer)
 	{
 		// Long  : Flag
@@ -3431,9 +3441,11 @@
 	 */
 	function CChangesBaseLongProperty(Class, Old, New, Color)
 	{
-		CChangesBaseLongProperty.superclass.constructor.call(this, Class, Old, New, Color);
+		CChangesBaseProperty.call(this, Class, Old, New, Color);
 	}
-	AscCommon.extendClass(CChangesBaseLongProperty, CChangesBaseProperty);
+
+	CChangesBaseLongProperty.prototype = Object.create(CChangesBaseProperty.prototype);
+	CChangesBaseLongProperty.prototype.constructor = CChangesBaseLongProperty;
 	CChangesBaseLongProperty.prototype.WriteToBinary = function(Writer)
 	{
 		// Long  : Flag
@@ -3497,9 +3509,11 @@
 	 */
 	function CChangesBaseStringProperty(Class, Old, New, Color)
 	{
-		CChangesBaseStringProperty.superclass.constructor.call(this, Class, Old, New, Color);
+		CChangesBaseProperty.call(this, Class, Old, New, Color);
 	}
-	AscCommon.extendClass(CChangesBaseStringProperty, CChangesBaseProperty);
+
+	CChangesBaseStringProperty.prototype = Object.create(CChangesBaseProperty.prototype);
+	CChangesBaseStringProperty.prototype.constructor = CChangesBaseStringProperty;
 	CChangesBaseStringProperty.prototype.WriteToBinary = function(Writer)
 	{
 		// Long  : Flag
@@ -3563,9 +3577,11 @@
 	 */
 	function CChangesBaseByteProperty(Class, Old, New, Color)
 	{
-		CChangesBaseByteProperty.superclass.constructor.call(this, Class, Old, New, Color);
+		CChangesBaseProperty.call(this, Class, Old, New, Color);
 	}
-	AscCommon.extendClass(CChangesBaseByteProperty, CChangesBaseProperty);
+
+	CChangesBaseByteProperty.prototype = Object.create(CChangesBaseProperty.prototype);
+	CChangesBaseByteProperty.prototype.constructor = CChangesBaseByteProperty;
 	CChangesBaseByteProperty.prototype.WriteToBinary = function(Writer)
 	{
 		// Long  : Flag
@@ -3629,9 +3645,11 @@
 	 */
 	function CChangesBaseLongValue(Class, Old, New, Color)
 	{
-		CChangesBaseLongValue.superclass.constructor.call(this, Class, Old, New, Color);
+		CChangesBaseProperty.call(this, Class, Old, New, Color);
 	}
-	AscCommon.extendClass(CChangesBaseLongValue, CChangesBaseProperty);
+
+	CChangesBaseLongValue.prototype = Object.create(CChangesBaseProperty.prototype);
+	CChangesBaseLongValue.prototype.constructor = CChangesBaseLongValue;
 	CChangesBaseLongValue.prototype.WriteToBinary = function(Writer)
 	{
 		// Long  : New
@@ -3656,9 +3674,11 @@
 	 */
 	function CChangesBaseBoolValue(Class, Old, New, Color)
 	{
-		CChangesBaseBoolValue.superclass.constructor.call(this, Class, Old, New, Color);
+		CChangesBaseProperty.call(this, Class, Old, New, Color);
 	}
-	AscCommon.extendClass(CChangesBaseBoolValue, CChangesBaseProperty);
+
+	CChangesBaseBoolValue.prototype = Object.create(CChangesBaseProperty.prototype);
+	CChangesBaseBoolValue.prototype.constructor = CChangesBaseBoolValue;
 	CChangesBaseBoolValue.prototype.WriteToBinary = function(Writer)
 	{
 		// Bool  : New
@@ -3683,9 +3703,11 @@
 	 */
 	function CChangesBaseObjectValue(Class, Old, New, Color)
 	{
-		CChangesBaseObjectValue.superclass.constructor.call(this, Class, Old, New, Color);
+		CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 	}
-	AscCommon.extendClass(CChangesBaseObjectValue, CChangesBaseObjectProperty);
+
+	CChangesBaseObjectValue.prototype = Object.create(CChangesBaseObjectProperty.prototype);
+	CChangesBaseObjectValue.prototype.constructor = CChangesBaseObjectValue;
 	CChangesBaseObjectValue.prototype.private_IsCreateEmptyObject = function()
 	{
 		return true;
@@ -3698,9 +3720,11 @@
 	 */
 	function CChangesBaseStringValue(Class, Old, New, Color)
 	{
-		CChangesBaseStringValue.superclass.constructor.call(this, Class, Old, New, Color);
+		CChangesBaseProperty.call(this, Class, Old, New, Color);
 	}
-	AscCommon.extendClass(CChangesBaseStringValue, CChangesBaseProperty);
+
+	CChangesBaseStringValue.prototype = Object.create(CChangesBaseProperty.prototype);
+	CChangesBaseStringValue.prototype.constructor = CChangesBaseStringValue;
 	CChangesBaseStringValue.prototype.WriteToBinary = function(Writer)
 	{
 		// String : New
@@ -3725,9 +3749,11 @@
 	 */
 	function CChangesBaseByteValue(Class, Old, New, Color)
 	{
-		CChangesBaseByteValue.superclass.constructor.call(this, Class, Old, New, Color);
+		CChangesBaseProperty.call(this, Class, Old, New, Color);
 	}
-	AscCommon.extendClass(CChangesBaseByteValue, CChangesBaseProperty);
+
+	CChangesBaseByteValue.prototype = Object.create(CChangesBaseProperty.prototype);
+	CChangesBaseByteValue.prototype.constructor = CChangesBaseByteValue;
 	CChangesBaseByteValue.prototype.WriteToBinary = function(Writer)
 	{
 		// Byte  : New
@@ -3752,9 +3778,11 @@
 	 */
 	function CChangesBaseDoubleValue(Class, Old, New, Color)
 	{
-		CChangesBaseDoubleValue.superclass.constructor.call(this, Class, Old, New, Color);
+		CChangesBaseProperty.call(this, Class, Old, New, Color);
 	}
-	AscCommon.extendClass(CChangesBaseDoubleValue, CChangesBaseProperty);
+
+	CChangesBaseDoubleValue.prototype = Object.create(CChangesBaseProperty.prototype);
+	CChangesBaseDoubleValue.prototype.constructor = CChangesBaseDoubleValue;
 	CChangesBaseDoubleValue.prototype.WriteToBinary = function(Writer)
 	{
 		// Double : New

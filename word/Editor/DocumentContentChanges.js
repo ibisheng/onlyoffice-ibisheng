@@ -59,9 +59,10 @@ AscDFH.changesRelationMap[AscDFH.historyitem_DocumentContent_RemoveItem] = [
  */
 function CChangesDocumentContentAddItem(Class, Pos, Items)
 {
-	CChangesDocumentContentAddItem.superclass.constructor.call(this, Class, Pos, Items, true);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Items, true);
 }
-AscCommon.extendClass(CChangesDocumentContentAddItem, AscDFH.CChangesBaseContentChange);
+CChangesDocumentContentAddItem.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesDocumentContentAddItem.prototype.constructor = CChangesDocumentContentAddItem;
 CChangesDocumentContentAddItem.prototype.Type = AscDFH.historyitem_DocumentContent_AddItem;
 CChangesDocumentContentAddItem.prototype.Undo = function()
 {
@@ -194,9 +195,10 @@ CChangesDocumentContentAddItem.prototype.CreateReverseChange = function()
  */
 function CChangesDocumentContentRemoveItem(Class, Pos, Items)
 {
-	CChangesDocumentContentRemoveItem.superclass.constructor.call(this, Class, Pos, Items, false);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Items, false);
 }
-AscCommon.extendClass(CChangesDocumentContentRemoveItem, AscDFH.CChangesBaseContentChange);
+CChangesDocumentContentRemoveItem.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesDocumentContentRemoveItem.prototype.constructor = CChangesDocumentContentRemoveItem;
 CChangesDocumentContentRemoveItem.prototype.Type = AscDFH.historyitem_DocumentContent_RemoveItem;
 CChangesDocumentContentRemoveItem.prototype.Undo = function()
 {

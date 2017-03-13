@@ -59,7 +59,8 @@ function CAccentCircumflex()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(CAccentCircumflex, CGlyphOperator);
+CAccentCircumflex.prototype = Object.create(CGlyphOperator.prototype);
+CAccentCircumflex.prototype.constructor = CAccentCircumflex;
 CAccentCircumflex.prototype.calcSize = function(stretch)
 {
     var alpha = this.Parent.Get_TxtPrControlLetter().FontSize/36;
@@ -168,7 +169,8 @@ function CAccentLine()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(CAccentLine, CGlyphOperator);
+CAccentLine.prototype = Object.create(CGlyphOperator.prototype);
+CAccentLine.prototype.constructor = CAccentLine;
 CAccentLine.prototype.calcSize = function(stretch)
 {
     var alpha = this.Parent.Get_TxtPrControlLetter().FontSize/36;
@@ -200,7 +202,8 @@ function CAccentDoubleLine()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(CAccentDoubleLine, CGlyphOperator);
+CAccentDoubleLine.prototype = Object.create(CGlyphOperator.prototype);
+CAccentDoubleLine.prototype.constructor = CAccentDoubleLine;
 CAccentDoubleLine.prototype.calcSize = function(stretch)
 {
     var alpha = this.Parent.Get_TxtPrControlLetter().FontSize/36;
@@ -247,7 +250,8 @@ function CAccentTilde()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(CAccentTilde, CGlyphOperator);
+CAccentTilde.prototype = Object.create(CGlyphOperator.prototype);
+CAccentTilde.prototype.constructor = CAccentTilde;
 CAccentTilde.prototype.calcSize = function(stretch)
 {
     var betta = this.Parent.Get_TxtPrControlLetter().FontSize/36;
@@ -351,7 +355,8 @@ function CAccentBreve()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(CAccentBreve, CGlyphOperator);
+CAccentBreve.prototype = Object.create(CGlyphOperator.prototype);
+CAccentBreve.prototype.constructor = CAccentBreve;
 CAccentBreve.prototype.calcSize = function(stretch)
 {
     var betta = this.Parent.Get_TxtPrControlLetter().FontSize/36;
@@ -480,7 +485,7 @@ CMathAccentPr.prototype.Read_FromBinary = function(Reader)
  */
 function CAccent(props)
 {
-    CAccent.superclass.constructor.call(this);
+	CMathBase.call(this);
 
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -498,7 +503,8 @@ function CAccent(props)
 
     AscCommon.g_oTableId.Add( this, this.Id );	
 }
-AscCommon.extendClass(CAccent, CMathBase);
+CAccent.prototype = Object.create(CMathBase.prototype);
+CAccent.prototype.constructor = CAccent;
 
 CAccent.prototype.ClassType = AscDFH.historyitem_type_acc;
 CAccent.prototype.kind      = MATH_ACCENT;
@@ -575,7 +581,7 @@ CAccent.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
     this.ApplyProperties(RPI);
     this.operator.PreRecalc(this, ParaMath);
 
-    CAccent.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
+	CMathBase.prototype.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
 };
 CAccent.prototype.Resize = function(oMeasure, RPI)
 {
@@ -694,11 +700,12 @@ CAccent.prototype.Get_InterfaceProps = function()
  */
 function CMathMenuAccent(Accent)
 {
-    CMathMenuAccent.superclass.constructor.call(this, Accent);
+	CMathMenuBase.call(this, Accent);
 
     this.Type   = Asc.c_oAscMathInterfaceType.Accent;
 }
-AscCommon.extendClass(CMathMenuAccent, CMathMenuBase);
+CMathMenuAccent.prototype = Object.create(CMathMenuBase.prototype);
+CMathMenuAccent.prototype.constructor = CMathMenuAccent;
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

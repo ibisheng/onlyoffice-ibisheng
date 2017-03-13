@@ -63,7 +63,7 @@
 		 * @extends {AscCommonExcel.StringRender}
 		 */
 		function CellTextRender(drawingCtx) {
-			CellTextRender.superclass.constructor.call(this, drawingCtx);
+			AscCommonExcel.StringRender.apply(this, arguments);
 
 			/** @type RegExp */
 			this.reWordBegining = new XRegExp("[^\\p{L}\\p{N}][\\p{L}\\p{N}]", "i");
@@ -71,8 +71,8 @@
 			return this;
 		}
 
-		AscCommon.extendClass(CellTextRender, AscCommonExcel.StringRender);
-
+		CellTextRender.prototype = Object.create(AscCommonExcel.StringRender.prototype);
+		CellTextRender.prototype.constructor = CellTextRender;
 		CellTextRender.prototype.getLinesCount = function () {
 			return this.lines.length;
 		};

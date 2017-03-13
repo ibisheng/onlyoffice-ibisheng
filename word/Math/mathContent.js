@@ -1185,7 +1185,7 @@ CMPrp.prototype.Read_FromBinary = function(Reader)
  */
 function CMathContent()
 {
-    CMathContent.superclass.constructor.call(this);
+	CParagraphContentWithParagraphLikeContent.call(this);
 
 	this.Id = AscCommon.g_oIdCounter.Get_NewId();		
 
@@ -1237,7 +1237,8 @@ function CMathContent()
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     AscCommon.g_oTableId.Add( this, this.Id );
 }
-AscCommon.extendClass(CMathContent, CParagraphContentWithParagraphLikeContent);
+CMathContent.prototype = Object.create(CParagraphContentWithParagraphLikeContent.prototype);
+CMathContent.prototype.constructor = CMathContent;
 CMathContent.prototype.init = function()
 {
 
@@ -1558,7 +1559,7 @@ CMathContent.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 
     this.Bounds.ShiftPos(CurLine, CurRange, Dx, Dy);
 
-    CMathContent.superclass.Shift_Range.call(this, Dx, Dy, _CurLine, _CurRange);
+	CParagraphContentWithParagraphLikeContent.prototype.Shift_Range.call(this, Dx, Dy, _CurLine, _CurRange);
 };
 CMathContent.prototype.SetParent = function(Parent, ParaMath)
 {

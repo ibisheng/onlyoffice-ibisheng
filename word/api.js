@@ -404,7 +404,7 @@
 	 */
 	function asc_docs_api(config)
 	{
-		asc_docs_api.superclass.constructor.call(this, config, AscCommon.c_oEditorId.Word);
+		AscCommon.baseEditorsApi.call(this, config, AscCommon.c_oEditorId.Word);
 
 		if (window["AscDesktopEditor"])
 		{
@@ -515,7 +515,8 @@
 		this._init();
 	}
 
-	AscCommon.extendClass(asc_docs_api, AscCommon.baseEditorsApi);
+	asc_docs_api.prototype = Object.create(AscCommon.baseEditorsApi.prototype);
+	asc_docs_api.prototype.constructor = asc_docs_api;
 
 	asc_docs_api.prototype.sendEvent           = function()
 	{
@@ -2122,7 +2123,7 @@ background-repeat: no-repeat;\
 		}
 		else
 		{
-			asc_docs_api.superclass.processSavedFile.call(this, url, downloadType);
+			AscCommon.baseEditorsApi.prototype.processSavedFile.call(this, url, downloadType);
 		}
 	};
 	asc_docs_api.prototype.continueInsertDocumentUrls = function()
@@ -2882,27 +2883,27 @@ background-repeat: no-repeat;\
 			{
 				if (Props.Brd.Left && Props.Brd.Left.Color)
 				{
-					Props.Brd.Left.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Left.Color);
+					Props.Brd.Left.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Left.Color, 1);
 				}
 				if (Props.Brd.Top && Props.Brd.Top.Color)
 				{
-					Props.Brd.Top.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Top.Color);
+					Props.Brd.Top.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Top.Color, 1);
 				}
 				if (Props.Brd.Right && Props.Brd.Right.Color)
 				{
-					Props.Brd.Right.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Right.Color);
+					Props.Brd.Right.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Right.Color, 1);
 				}
 				if (Props.Brd.Bottom && Props.Brd.Bottom.Color)
 				{
-					Props.Brd.Bottom.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Bottom.Color);
+					Props.Brd.Bottom.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Bottom.Color, 1);
 				}
 				if (Props.Brd.InsideH && Props.Brd.InsideH.Color)
 				{
-					Props.Brd.InsideH.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.InsideH.Color);
+					Props.Brd.InsideH.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.InsideH.Color, 1);
 				}
 				if (Props.Brd.InsideV && Props.Brd.InsideV.Color)
 				{
-					Props.Brd.InsideV.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.InsideV.Color);
+					Props.Brd.InsideV.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.InsideV.Color, 1);
 				}
 
 				this.WordControl.m_oLogicDocument.Set_ParagraphBorders(Props.Brd);
@@ -3935,32 +3936,32 @@ background-repeat: no-repeat;\
 			{
 				if (obj.CellBorders.Left && obj.CellBorders.Left.Color)
 				{
-					obj.CellBorders.Left.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.Left.Color);
+					obj.CellBorders.Left.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.Left.Color, 1);
 				}
 				if (obj.CellBorders.Top && obj.CellBorders.Top.Color)
 				{
-					obj.CellBorders.Top.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.Top.Color);
+					obj.CellBorders.Top.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.Top.Color, 1);
 				}
 				if (obj.CellBorders.Right && obj.CellBorders.Right.Color)
 				{
-					obj.CellBorders.Right.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.Right.Color);
+					obj.CellBorders.Right.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.Right.Color, 1);
 				}
 				if (obj.CellBorders.Bottom && obj.CellBorders.Bottom.Color)
 				{
-					obj.CellBorders.Bottom.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.Bottom.Color);
+					obj.CellBorders.Bottom.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.Bottom.Color, 1);
 				}
 				if (obj.CellBorders.InsideH && obj.CellBorders.InsideH.Color)
 				{
-					obj.CellBorders.InsideH.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.InsideH.Color);
+					obj.CellBorders.InsideH.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.InsideH.Color, 1);
 				}
 				if (obj.CellBorders.InsideV && obj.CellBorders.InsideV.Color)
 				{
-					obj.CellBorders.InsideV.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.InsideV.Color);
+					obj.CellBorders.InsideV.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.InsideV.Color, 1);
 				}
 			}
 			if (obj.CellsBackground && obj.CellsBackground.Color)
 			{
-				obj.CellsBackground.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellsBackground.Color);
+				obj.CellsBackground.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellsBackground.Color, 1);
 			}
 
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ApplyTablePr);
@@ -4512,6 +4513,7 @@ background-repeat: no-repeat;\
 						}
 					}
 				}
+                this.exucuteHistoryEnd = false;
 			}
 		}
 	};
@@ -6905,7 +6907,7 @@ background-repeat: no-repeat;\
 		this.asc_setViewMode(this.isViewMode);
 		this.asc_setDrawCollaborationMarks(this.tmpCoMarksDraw);
 
-		asc_docs_api.superclass._onEndLoadSdk.call(this);
+		AscCommon.baseEditorsApi.prototype._onEndLoadSdk.call(this);
 
 		if (this.isOnlyReaderMode)
 			this.ImageLoader.bIsAsyncLoadDocumentImages = false;

@@ -13,9 +13,10 @@
  */
 function CLogicDocumentController(LogicDocument)
 {
-	CLogicDocumentController.superclass.constructor.call(this, LogicDocument);
+	CDocumentControllerBase.call(this, LogicDocument);
 }
-AscCommon.extendClass(CLogicDocumentController, CDocumentControllerBase);
+CLogicDocumentController.prototype = Object.create(CDocumentControllerBase.prototype);
+CLogicDocumentController.prototype.constructor = CLogicDocumentController;
 
 CLogicDocumentController.prototype.CanTargetUpdate = function()
 {

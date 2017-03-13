@@ -40,7 +40,7 @@
  */
 function CFootnotesController(LogicDocument)
 {
-	CFootnotesController.superclass.constructor.call(this, LogicDocument);
+	CDocumentControllerBase.call(this, LogicDocument);
 
 	this.Id = LogicDocument.Get_IdCounter().Get_NewId();
 
@@ -79,7 +79,8 @@ function CFootnotesController(LogicDocument)
 	LogicDocument.Get_TableId().Add(this, this.Id);
 }
 
-AscCommon.extendClass(CFootnotesController, CDocumentControllerBase);
+CFootnotesController.prototype = Object.create(CDocumentControllerBase.prototype);
+CFootnotesController.prototype.constructor = CFootnotesController;
 
 /**
  * Получаем Id данного класса.

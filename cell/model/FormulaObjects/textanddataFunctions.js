@@ -67,6 +67,7 @@
 	}
 
 	cASC.prototype = Object.create(cBaseFunction.prototype);
+	cASC.prototype.constructor = cASC;
 
 	/** @constructor */
 	function cBAHTTEXT() {
@@ -74,6 +75,7 @@
 	}
 
 	cBAHTTEXT.prototype = Object.create(cBaseFunction.prototype);
+	cBAHTTEXT.prototype.constructor = cBAHTTEXT;
 
 	/** @constructor */
 	function cCHAR() {
@@ -85,6 +87,7 @@
 	}
 
 	cCHAR.prototype = Object.create(cBaseFunction.prototype);
+	cCHAR.prototype.constructor = cCHAR;
 	cCHAR.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 
@@ -133,6 +136,7 @@
 	}
 
 	cCLEAN.prototype = Object.create(cBaseFunction.prototype);
+	cCLEAN.prototype.constructor = cCLEAN;
 	cCLEAN.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 
@@ -171,6 +175,7 @@
 	}
 
 	cCODE.prototype = Object.create(cBaseFunction.prototype);
+	cCODE.prototype.constructor = cCODE;
 	cCODE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 
@@ -217,6 +222,7 @@
 	}
 
 	cCONCATENATE.prototype = Object.create(cBaseFunction.prototype);
+	cCONCATENATE.prototype.constructor = cCONCATENATE;
 	cCONCATENATE.prototype.Calculate = function (arg) {
 		var arg0 = new cString(""), argI;
 		for (var i = 0; i < this.argumentsCurrent; i++) {
@@ -262,6 +268,7 @@
 	}
 
 	cDOLLAR.prototype = Object.create(cBaseFunction.prototype);
+	cDOLLAR.prototype.constructor = cDOLLAR;
 	cDOLLAR.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDOLLAR.prototype.Calculate = function (arg) {
 
@@ -462,6 +469,7 @@
 	}
 
 	cEXACT.prototype = Object.create(cBaseFunction.prototype);
+	cEXACT.prototype.constructor = cEXACT;
 	cEXACT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -509,6 +517,7 @@
 	}
 
 	cFIND.prototype = Object.create(cBaseFunction.prototype);
+	cFIND.prototype.constructor = cFIND;
 	cFIND.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = this.getArguments() == 3 ? arg[2] :
 			null, res, str, searchStr, pos = -1;
@@ -603,6 +612,7 @@
 	}
 
 	cFIXED.prototype = Object.create(cBaseFunction.prototype);
+	cFIXED.prototype.constructor = cFIXED;
 	cFIXED.prototype.Calculate = function (arg) {
 
 		function SignZeroPositive(number) {
@@ -796,6 +806,7 @@
 	}
 
 	cJIS.prototype = Object.create(cBaseFunction.prototype);
+	cJIS.prototype.constructor = cJIS;
 
 	/** @constructor */
 	function cLEFT() {
@@ -807,6 +818,7 @@
 	}
 
 	cLEFT.prototype = Object.create(cBaseFunction.prototype);
+	cLEFT.prototype.constructor = cLEFT;
 	cLEFT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = this.argumentsCurrent == 1 ? new cNumber(1) : arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -865,6 +877,7 @@
 	}
 
 	cLEN.prototype = Object.create(cBaseFunction.prototype);
+	cLEN.prototype.constructor = cLEN;
 	cLEN.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -907,6 +920,7 @@
 	}
 
 	cLOWER.prototype = Object.create(cBaseFunction.prototype);
+	cLOWER.prototype.constructor = cLOWER;
 	cLOWER.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 
@@ -941,6 +955,7 @@
 	}
 
 	cMID.prototype = Object.create(cBaseFunction.prototype);
+	cMID.prototype.constructor = cMID;
 	cMID.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -1015,6 +1030,7 @@
 	}
 
 	cPHONETIC.prototype = Object.create(cBaseFunction.prototype);
+	cPHONETIC.prototype.constructor = cPHONETIC;
 
 	/** @constructor */
 	function cPROPER() {
@@ -1026,6 +1042,7 @@
 	}
 
 	cPROPER.prototype = Object.create(cBaseFunction.prototype);
+	cPROPER.prototype.constructor = cPROPER;
 	cPROPER.prototype.Calculate = function (arg) {
 		var reg_PROPER = new RegExp("[-#$+*/^&%<\\[\\]='?_\\@!~`\">: ;.\\)\\(,]|\\d|\\s"), arg0 = arg[0];
 
@@ -1093,6 +1110,7 @@
 	}
 
 	cREPLACE.prototype = Object.create(cBaseFunction.prototype);
+	cREPLACE.prototype.constructor = cREPLACE;
 	cREPLACE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
@@ -1179,6 +1197,7 @@
 	}
 
 	cREPT.prototype = Object.create(cBaseFunction.prototype);
+	cREPT.prototype.constructor = cREPT;
 	cREPT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], res = "";
 		if (arg0 instanceof cError) {
@@ -1242,6 +1261,7 @@
 	}
 
 	cRIGHT.prototype = Object.create(cBaseFunction.prototype);
+	cRIGHT.prototype.constructor = cRIGHT;
 	cRIGHT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = this.argumentsCurrent == 1 ? new cNumber(1) : arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -1300,6 +1320,7 @@
 	}
 
 	cSEARCH.prototype = Object.create(cBaseFunction.prototype);
+	cSEARCH.prototype.constructor = cSEARCH;
 	cSEARCH.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber(1);
@@ -1398,6 +1419,7 @@
 	}
 
 	cSUBSTITUTE.prototype = Object.create(cBaseFunction.prototype);
+	cSUBSTITUTE.prototype.constructor = cSUBSTITUTE;
 	cSUBSTITUTE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3] ? arg[3] : new cNumber(0);
 
@@ -1480,6 +1502,7 @@
 	}
 
 	cT.prototype = Object.create(cBaseFunction.prototype);
+	cT.prototype.constructor = cT;
 	cT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
@@ -1514,6 +1537,7 @@
 	}
 
 	cTEXT.prototype = Object.create(cBaseFunction.prototype);
+	cTEXT.prototype.constructor = cTEXT;
 	cTEXT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
@@ -1586,6 +1610,7 @@
 	}
 
 	cTRIM.prototype = Object.create(cBaseFunction.prototype);
+	cTRIM.prototype.constructor = cTRIM;
 	cTRIM.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 
@@ -1623,6 +1648,7 @@
 	}
 
 	cUPPER.prototype = Object.create(cBaseFunction.prototype);
+	cUPPER.prototype.constructor = cUPPER;
 	cUPPER.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -1655,6 +1681,7 @@
 	}
 
 	cVALUE.prototype = Object.create(cBaseFunction.prototype);
+	cVALUE.prototype.constructor = cVALUE;
 	cVALUE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cVALUE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];

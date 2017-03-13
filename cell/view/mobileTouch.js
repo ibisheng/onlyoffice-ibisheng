@@ -54,10 +54,11 @@ function (window, undefined)
 		this.Offset = { X: 0, Y: 0};
 		this.Size = { W : 0, H : 0 };
 
-		CMobileDelegateEditorCell.superclass.constructor.call(this, _manager);
+		AscCommon.CMobileDelegateSimple.call(this, _manager);
 	}
-	AscCommon.extendClass(CMobileDelegateEditorCell, AscCommon.CMobileDelegateSimple);
 
+	CMobileDelegateEditorCell.prototype = Object.create(AscCommon.CMobileDelegateSimple.prototype);
+	CMobileDelegateEditorCell.prototype.constructor = CMobileDelegateEditorCell;
 	CMobileDelegateEditorCell.prototype.Resize = function()
 	{
 		var _element = document.getElementById("editor_sdk");
@@ -487,10 +488,12 @@ function (window, undefined)
 	 */
 	function CMobileTouchManager(_config)
 	{
-		CMobileTouchManager.superclass.constructor.call(this, _config || {});
+		AscCommon.CMobileTouchManagerBase.call(this, _config || {});
 	}
-	AscCommon.extendClass(CMobileTouchManager, AscCommon.CMobileTouchManagerBase);
 
+
+	CMobileTouchManager.prototype = Object.create(AscCommon.CMobileTouchManagerBase.prototype);
+	CMobileTouchManager.prototype.constructor = CMobileTouchManager;
 	CMobileTouchManager.prototype.Init = function(_api)
 	{
 		this.Api = _api;
@@ -1205,7 +1208,7 @@ function (window, undefined)
 	CMobileTouchManager.prototype.CheckSelectTrack = function()
 	{
 		if (this.RectSelectType != Asc.c_oAscSelectionType.RangeRow && this.RectSelectType != Asc.c_oAscSelectionType.RangeCol)
-			return CMobileTouchManager.superclass.CheckSelectTrack.call(this);
+			return AscCommon.CMobileTouchManagerBase.prototype.CheckSelectTrack.call(this);
 
 		// проверим на попадание в селект - это может произойти на любом mode
 		if (null != this.RectSelect1 && null != this.RectSelect2)

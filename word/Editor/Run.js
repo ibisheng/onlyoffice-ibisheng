@@ -52,7 +52,7 @@ var reviewtype_Add    = 0x02;
  */
 function ParaRun(Paragraph, bMathRun)
 {
-    ParaRun.superclass.constructor.call(this);
+	CParagraphContentWithContentBase.call(this);
     
     this.Id         = AscCommon.g_oIdCounter.Get_NewId();  // Id данного элемента
     this.Type       = para_Run;                  // тип данного элемента
@@ -116,7 +116,8 @@ function ParaRun(Paragraph, bMathRun)
     }
 }
 
-AscCommon.extendClass(ParaRun, CParagraphContentWithContentBase);
+ParaRun.prototype = Object.create(CParagraphContentWithContentBase.prototype);
+ParaRun.prototype.constructor = ParaRun;
 
 ParaRun.prototype.Get_Type = function()
 {
@@ -6291,7 +6292,7 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
                     EndTextPr.Merge( this.Paragraph.TextPr.Value );
                     if(TextPr.AscFill)
                     {
-                        this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 0));
+                        this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 1));
                     }
                     if(TextPr.AscUnifill)
                     {
@@ -6416,7 +6417,7 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 							EndTextPr.Merge(this.Paragraph.TextPr.Value);
 							if (TextPr.AscFill)
 							{
-								this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 0));
+								this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 1));
 							}
 							if (TextPr.AscUnifill)
 							{
@@ -6719,7 +6720,7 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
             }
             this.Set_Unifill(undefined);
             this.Set_Color(undefined);
-            this.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oMergeUnifill, 0), AscCommon.isRealObject(TextPr.AscFill) && TextPr.AscFill.asc_CheckForseSet());
+            this.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oMergeUnifill, 1), AscCommon.isRealObject(TextPr.AscFill) && TextPr.AscFill.asc_CheckForseSet());
         }
     }
 

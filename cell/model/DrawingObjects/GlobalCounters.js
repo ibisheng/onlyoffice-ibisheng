@@ -41,10 +41,11 @@
  */
 function CCollaborativeEditing()
 {
-    CCollaborativeEditing.superclass.constructor.call(this);
+	AscCommon.CCollaborativeEditingBase.call(this);
 }
 
-AscCommon.extendClass(CCollaborativeEditing, AscCommon.CCollaborativeEditingBase);
+CCollaborativeEditing.prototype = Object.create(AscCommon.CCollaborativeEditingBase.prototype);
+CCollaborativeEditing.prototype.constructor = CCollaborativeEditing;
 
 CCollaborativeEditing.prototype.Have_OtherChanges = function()
 {

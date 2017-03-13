@@ -69,7 +69,7 @@ CMathFractionPr.prototype.Read_FromBinary = function(Reader)
  */
 function CFraction(props)
 {
-    CFraction.superclass.constructor.call(this);
+	CMathBase.call(this);
 
 	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -83,7 +83,8 @@ function CFraction(props)
 
     AscCommon.g_oTableId.Add( this, this.Id );
 }
-AscCommon.extendClass(CFraction, CMathBase);
+CFraction.prototype = Object.create(CMathBase.prototype);
+CFraction.prototype.constructor = CFraction;
 
 CFraction.prototype.ClassType = AscDFH.historyitem_type_frac;
 CFraction.prototype.kind      = MATH_FRACTION;
@@ -139,7 +140,7 @@ CFraction.prototype.drawBarFraction = function(PDSE)
         PDSE.Graphics.drawHorLine(0, y1, x1, x2, penW);
     }
 
-    CFraction.superclass.Draw_Elements.call(this, PDSE);
+    CMathBase.prototype.Draw_Elements.call(this, PDSE);
 };
 CFraction.prototype.drawSkewedFraction = function(PDSE)
 {
@@ -227,7 +228,7 @@ CFraction.prototype.drawSkewedFraction = function(PDSE)
 
     this.drawFractionalLine(PDSE, xx1, yy1, xx2, yy2);
 
-    CFraction.superclass.Draw_Elements.call(this, PDSE);
+    CMathBase.prototype.Draw_Elements.call(this, PDSE);
 };
 CFraction.prototype.drawLinearFraction = function(PDSE)
 {
@@ -245,7 +246,7 @@ CFraction.prototype.drawLinearFraction = function(PDSE)
 
     this.drawFractionalLine(PDSE, x1, y1, x2, y2);
 
-    CFraction.superclass.Draw_Elements.call(this, PDSE);
+    CMathBase.prototype.Draw_Elements.call(this, PDSE);
 };
 CFraction.prototype.drawFractionalLine = function(PDSE, x1, y1, x2, y2)
 {
@@ -527,7 +528,7 @@ CFraction.prototype.setPosition = function(pos, PosInfo)
     }
     else
     {
-        CFraction.superclass.setPosition.call(this, pos, PosInfo);
+        CMathBase.prototype.setPosition.call(this, pos, PosInfo);
     }
 };
 CFraction.prototype.align = function(pos_x, pos_y)
@@ -622,7 +623,7 @@ CFraction.prototype.raw_SetFractionType = function(FractionType)
  */
 function CMathMenuFraction(Fraction)
 {
-    CMathMenuFraction.superclass.constructor.call(this, Fraction);
+	CMathMenuBase.call(this, Fraction);
 
     this.Type         = Asc.c_oAscMathInterfaceType.Fraction;
 
@@ -651,7 +652,8 @@ function CMathMenuFraction(Fraction)
         this.FractionType = undefined;
     }
 }
-AscCommon.extendClass(CMathMenuFraction, CMathMenuBase);
+CMathMenuFraction.prototype = Object.create(CMathMenuBase.prototype);
+CMathMenuFraction.prototype.constructor = CMathMenuFraction;
 
 CMathMenuFraction.prototype.get_FractionType = function(){return this.FractionType;};
 CMathMenuFraction.prototype.put_FractionType = function(Type){this.FractionType = Type;};
@@ -669,11 +671,12 @@ CMathMenuFraction.prototype["put_FractionType"] = CMathMenuFraction.prototype.pu
  */
 function CFractionBase(bInside, MathContent)
 {
-    CFractionBase.superclass.constructor.call(this, bInside);
+	CMathBase.call(this, bInside);
     this.gap = 0;
     this.init(MathContent);
 }
-AscCommon.extendClass(CFractionBase, CMathBase);
+CFractionBase.prototype = Object.create(CMathBase.prototype);
+CFractionBase.prototype.constructor = CFractionBase;
 CFractionBase.prototype.init = function(MathContent)
 {
     this.setDimension(1, 1);
@@ -704,9 +707,10 @@ CFractionBase.prototype.Get_Id = function()
  */
 function CNumerator(MathContent)
 {
-    CNumerator.superclass.constructor.call(this, true, MathContent);
+	CFractionBase.call(this, true, MathContent);
 }
-AscCommon.extendClass(CNumerator, CFractionBase);
+CNumerator.prototype = Object.create(CFractionBase.prototype);
+CNumerator.prototype.constructor = CNumerator;
 CNumerator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
@@ -760,9 +764,10 @@ CNumerator.prototype.recalculateSize = function()
  */
 function CDenominator(MathContent)
 {
-    CDenominator.superclass.constructor.call(this, true, MathContent);
+	CFractionBase.call(this, true, MathContent);
 }
-AscCommon.extendClass(CDenominator, CFractionBase);
+CDenominator.prototype = Object.create(CFractionBase.prototype);
+CDenominator.prototype.constructor = CDenominator;
 CDenominator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
@@ -803,7 +808,7 @@ CDenominator.prototype.setPosition = function(pos, PosInfo)
 {
     pos.y += this.gap;
 
-    CDenominator.superclass.setPosition.call(this, pos, PosInfo);
+	CFractionBase.prototype.setPosition.call(this, pos, PosInfo);
 };
 
 //--------------------------------------------------------export----------------------------------------------------

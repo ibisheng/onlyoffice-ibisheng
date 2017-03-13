@@ -57,9 +57,10 @@ AscDFH.changesRelationMap[AscDFH.historyitem_Field_FormFieldDefaultText] = [AscD
  */
 function CChangesParaFieldAddItem(Class, Pos, Items)
 {
-	CChangesParaFieldAddItem.superclass.constructor.call(this, Class, Pos, Items, true);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Items, true);
 }
-AscCommon.extendClass(CChangesParaFieldAddItem, AscDFH.CChangesBaseContentChange);
+CChangesParaFieldAddItem.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesParaFieldAddItem.prototype.constructor = CChangesParaFieldAddItem;
 CChangesParaFieldAddItem.prototype.Type = AscDFH.historyitem_Field_AddItem;
 CChangesParaFieldAddItem.prototype.Undo = function()
 {
@@ -122,9 +123,10 @@ CChangesParaFieldAddItem.prototype.CreateReverseChange = function()
  */
 function CChangesParaFieldRemoveItem(Class, Pos, Items)
 {
-	CChangesParaFieldRemoveItem.superclass.constructor.call(this, Class, Pos, Items, false);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Items, false);
 }
-AscCommon.extendClass(CChangesParaFieldRemoveItem, AscDFH.CChangesBaseContentChange);
+CChangesParaFieldRemoveItem.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesParaFieldRemoveItem.prototype.constructor = CChangesParaFieldRemoveItem;
 CChangesParaFieldRemoveItem.prototype.Type = AscDFH.historyitem_Field_RemoveItem;
 CChangesParaFieldRemoveItem.prototype.Undo = function()
 {
@@ -185,9 +187,10 @@ CChangesParaFieldRemoveItem.prototype.CreateReverseChange = function()
  */
 function CChangesParaFieldFormFieldName(Class, Old, New)
 {
-	CChangesParaFieldFormFieldName.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseStringProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesParaFieldFormFieldName, AscDFH.CChangesBaseStringProperty);
+CChangesParaFieldFormFieldName.prototype = Object.create(AscDFH.CChangesBaseStringProperty.prototype);
+CChangesParaFieldFormFieldName.prototype.constructor = CChangesParaFieldFormFieldName;
 CChangesParaFieldFormFieldName.prototype.Type = AscDFH.historyitem_Field_FormFieldName;
 CChangesParaFieldFormFieldName.prototype.private_SetValue = function(Value)
 {
@@ -199,9 +202,10 @@ CChangesParaFieldFormFieldName.prototype.private_SetValue = function(Value)
  */
 function CChangesParaFieldFormFieldDefaultText(Class, Old, New)
 {
-	CChangesParaFieldFormFieldDefaultText.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseStringProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesParaFieldFormFieldDefaultText, AscDFH.CChangesBaseStringProperty);
+CChangesParaFieldFormFieldDefaultText.prototype = Object.create(AscDFH.CChangesBaseStringProperty.prototype);
+CChangesParaFieldFormFieldDefaultText.prototype.constructor = CChangesParaFieldFormFieldDefaultText;
 CChangesParaFieldFormFieldDefaultText.prototype.Type = AscDFH.historyitem_Field_FormFieldDefaultText;
 CChangesParaFieldFormFieldDefaultText.prototype.private_SetValue = function(Value)
 {

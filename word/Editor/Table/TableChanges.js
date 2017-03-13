@@ -206,9 +206,10 @@ function private_TableChangesOnMergePr(oChange)
  */
 function CChangesTableTableW(Class, Old, New, Color)
 {
-	CChangesTableTableW.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableTableW, AscDFH.CChangesBaseObjectProperty);
+CChangesTableTableW.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesTableTableW.prototype.constructor = CChangesTableTableW;
 CChangesTableTableW.prototype.Type = AscDFH.historyitem_Table_TableW;
 CChangesTableTableW.prototype.private_CreateObject = function()
 {
@@ -227,9 +228,10 @@ CChangesTableTableW.prototype.Merge = private_TableChangesOnMergePr;
  */
 function CChangesTableTableCellMar(Class, Old, New, Color)
 {
-	CChangesTableTableCellMar.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableTableCellMar, AscDFH.CChangesBaseProperty);
+CChangesTableTableCellMar.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesTableTableCellMar.prototype.constructor = CChangesTableTableCellMar;
 CChangesTableTableCellMar.prototype.Type = AscDFH.historyitem_Table_TableCellMar;
 CChangesTableTableCellMar.prototype.WriteToBinary = function(Writer)
 {
@@ -411,9 +413,10 @@ CChangesTableTableCellMar.prototype.Merge = private_TableChangesOnMergePr;
  */
 function CChangesTableTableAlign(Class, Old, New, Color)
 {
-	CChangesTableTableAlign.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableTableAlign, AscDFH.CChangesBaseLongProperty);
+CChangesTableTableAlign.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesTableTableAlign.prototype.constructor = CChangesTableTableAlign;
 CChangesTableTableAlign.prototype.Type = AscDFH.historyitem_Table_TableAlign;
 CChangesTableTableAlign.prototype.private_SetValue = function(Value)
 {
@@ -428,9 +431,10 @@ CChangesTableTableAlign.prototype.Merge = private_TableChangesOnMergePr;
  */
 function CChangesTableTableInd(Class, Old, New, Color)
 {
-	CChangesTableTableInd.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseDoubleProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableTableInd, AscDFH.CChangesBaseDoubleProperty);
+CChangesTableTableInd.prototype = Object.create(AscDFH.CChangesBaseDoubleProperty.prototype);
+CChangesTableTableInd.prototype.constructor = CChangesTableTableInd;
 CChangesTableTableInd.prototype.Type = AscDFH.historyitem_Table_TableInd;
 CChangesTableTableInd.prototype.private_SetValue = function(Value)
 {
@@ -445,9 +449,10 @@ CChangesTableTableInd.prototype.Merge = private_TableChangesOnMergePr;
  */
 function CChangesTableTableBorderLeft(Class, Old, New, Color)
 {
-	CChangesTableTableBorderLeft.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableTableBorderLeft, AscDFH.CChangesBaseObjectProperty);
+CChangesTableTableBorderLeft.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesTableTableBorderLeft.prototype.constructor = CChangesTableTableBorderLeft;
 CChangesTableTableBorderLeft.prototype.Type = AscDFH.historyitem_Table_TableBorder_Left;
 CChangesTableTableBorderLeft.prototype.private_CreateObject = function()
 {
@@ -466,9 +471,10 @@ CChangesTableTableBorderLeft.prototype.Merge = private_TableChangesOnMergePr;
  */
 function CChangesTableTableBorderTop(Class, Old, New, Color)
 {
-	CChangesTableTableBorderTop.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableTableBorderTop, AscDFH.CChangesBaseObjectProperty);
+CChangesTableTableBorderTop.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesTableTableBorderTop.prototype.constructor = CChangesTableTableBorderTop;
 CChangesTableTableBorderTop.prototype.Type = AscDFH.historyitem_Table_TableBorder_Top;
 CChangesTableTableBorderTop.prototype.private_CreateObject = function()
 {
@@ -487,9 +493,10 @@ CChangesTableTableBorderTop.prototype.Merge = private_TableChangesOnMergePr;
  */
 function CChangesTableTableBorderRight(Class, Old, New, Color)
 {
-	CChangesTableTableBorderRight.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableTableBorderRight, AscDFH.CChangesBaseObjectProperty);
+CChangesTableTableBorderRight.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesTableTableBorderRight.prototype.constructor = CChangesTableTableBorderRight;
 CChangesTableTableBorderRight.prototype.Type = AscDFH.historyitem_Table_TableBorder_Right;
 CChangesTableTableBorderRight.prototype.private_CreateObject = function()
 {
@@ -508,9 +515,10 @@ CChangesTableTableBorderRight.prototype.Merge = private_TableChangesOnMergePr;
  */
 function CChangesTableTableBorderBottom(Class, Old, New, Color)
 {
-	CChangesTableTableBorderBottom.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableTableBorderBottom, AscDFH.CChangesBaseObjectProperty);
+CChangesTableTableBorderBottom.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesTableTableBorderBottom.prototype.constructor = CChangesTableTableBorderBottom;
 CChangesTableTableBorderBottom.prototype.Type = AscDFH.historyitem_Table_TableBorder_Bottom;
 CChangesTableTableBorderBottom.prototype.private_CreateObject = function()
 {
@@ -529,9 +537,10 @@ CChangesTableTableBorderBottom.prototype.Merge = private_TableChangesOnMergePr;
  */
 function CChangesTableTableBorderInsideH(Class, Old, New, Color)
 {
-	CChangesTableTableBorderInsideH.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableTableBorderInsideH, AscDFH.CChangesBaseObjectProperty);
+CChangesTableTableBorderInsideH.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesTableTableBorderInsideH.prototype.constructor = CChangesTableTableBorderInsideH;
 CChangesTableTableBorderInsideH.prototype.Type = AscDFH.historyitem_Table_TableBorder_InsideH;
 CChangesTableTableBorderInsideH.prototype.private_CreateObject = function()
 {
@@ -550,9 +559,10 @@ CChangesTableTableBorderInsideH.prototype.Merge = private_TableChangesOnMergePr;
  */
 function CChangesTableTableBorderInsideV(Class, Old, New, Color)
 {
-	CChangesTableTableBorderInsideV.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableTableBorderInsideV, AscDFH.CChangesBaseObjectProperty);
+CChangesTableTableBorderInsideV.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesTableTableBorderInsideV.prototype.constructor = CChangesTableTableBorderInsideV;
 CChangesTableTableBorderInsideV.prototype.Type = AscDFH.historyitem_Table_TableBorder_InsideV;
 CChangesTableTableBorderInsideV.prototype.private_CreateObject = function()
 {
@@ -571,9 +581,10 @@ CChangesTableTableBorderInsideV.prototype.Merge = private_TableChangesOnMergePr;
  */
 function CChangesTableTableShd(Class, Old, New, Color)
 {
-	CChangesTableTableShd.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableTableShd, AscDFH.CChangesBaseObjectProperty);
+CChangesTableTableShd.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesTableTableShd.prototype.constructor = CChangesTableTableShd;
 CChangesTableTableShd.prototype.Type = AscDFH.historyitem_Table_TableShd;
 CChangesTableTableShd.prototype.private_CreateObject = function()
 {
@@ -592,9 +603,10 @@ CChangesTableTableShd.prototype.Merge = private_TableChangesOnMergePr;
  */
 function CChangesTableInline(Class, Old, New, Color)
 {
-	CChangesTableInline.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolValue.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableInline, AscDFH.CChangesBaseBoolValue);
+CChangesTableInline.prototype = Object.create(AscDFH.CChangesBaseBoolValue.prototype);
+CChangesTableInline.prototype.constructor = CChangesTableInline;
 CChangesTableInline.prototype.Type = AscDFH.historyitem_Table_Inline;
 CChangesTableInline.prototype.private_SetValue = function(Value)
 {
@@ -607,9 +619,10 @@ CChangesTableInline.prototype.private_SetValue = function(Value)
  */
 function CChangesTableAddRow(Class, Pos, Rows)
 {
-	CChangesTableAddRow.superclass.constructor.call(this, Class, Pos, Rows, true);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Rows, true);
 }
-AscCommon.extendClass(CChangesTableAddRow, AscDFH.CChangesBaseContentChange);
+CChangesTableAddRow.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesTableAddRow.prototype.constructor = CChangesTableAddRow;
 CChangesTableAddRow.prototype.Type = AscDFH.historyitem_Table_AddRow;
 CChangesTableAddRow.prototype.Undo = function()
 {
@@ -680,9 +693,10 @@ CChangesTableAddRow.prototype.CreateReverseChange = function()
  */
 function CChangesTableRemoveRow(Class, Pos, Rows)
 {
-	CChangesTableRemoveRow.superclass.constructor.call(this, Class, Pos, Rows, false);
+	AscDFH.CChangesBaseContentChange.call(this, Class, Pos, Rows, false);
 }
-AscCommon.extendClass(CChangesTableRemoveRow, AscDFH.CChangesBaseContentChange);
+CChangesTableRemoveRow.prototype = Object.create(AscDFH.CChangesBaseContentChange.prototype);
+CChangesTableRemoveRow.prototype.constructor = CChangesTableRemoveRow;
 CChangesTableRemoveRow.prototype.Type = AscDFH.historyitem_Table_RemoveRow;
 CChangesTableRemoveRow.prototype.Undo = function()
 {
@@ -754,9 +768,10 @@ CChangesTableRemoveRow.prototype.CreateReverseChange = function()
  */
 function CChangesTableTableGrid(Class, Old, New)
 {
-	CChangesTableTableGrid.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesTableTableGrid, AscDFH.CChangesBaseProperty);
+CChangesTableTableGrid.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesTableTableGrid.prototype.constructor = CChangesTableTableGrid;
 CChangesTableTableGrid.prototype.Type = AscDFH.historyitem_Table_TableGrid;
 CChangesTableTableGrid.prototype.WriteToBinary = function(Writer)
 {
@@ -803,9 +818,10 @@ CChangesTableTableGrid.prototype.private_SetValue = function(Value)
  */
 function CChangesTableTableLook(Class, Old, New)
 {
-	CChangesTableTableLook.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseObjectValue.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesTableTableLook, AscDFH.CChangesBaseObjectValue);
+CChangesTableTableLook.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesTableTableLook.prototype.constructor = CChangesTableTableLook;
 CChangesTableTableLook.prototype.Type = AscDFH.historyitem_Table_TableLook;
 CChangesTableTableLook.prototype.private_SetValue = function(Value)
 {
@@ -823,9 +839,10 @@ CChangesTableTableLook.prototype.private_CreateObject = function()
  */
 function CChangesTableTableStyleRowBandSize(Class, Old, New, Color)
 {
-	CChangesTableTableStyleRowBandSize.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableTableStyleRowBandSize, AscDFH.CChangesBaseLongProperty);
+CChangesTableTableStyleRowBandSize.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesTableTableStyleRowBandSize.prototype.constructor = CChangesTableTableStyleRowBandSize;
 CChangesTableTableStyleRowBandSize.prototype.Type = AscDFH.historyitem_Table_TableStyleRowBandSize;
 CChangesTableTableStyleRowBandSize.prototype.private_SetValue = function(Value)
 {
@@ -840,9 +857,10 @@ CChangesTableTableStyleRowBandSize.prototype.Merge = private_TableChangesOnMerge
  */
 function CChangesTableTableStyleColBandSize(Class, Old, New, Color)
 {
-	CChangesTableTableStyleColBandSize.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableTableStyleColBandSize, AscDFH.CChangesBaseLongProperty);
+CChangesTableTableStyleColBandSize.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesTableTableStyleColBandSize.prototype.constructor = CChangesTableTableStyleColBandSize;
 CChangesTableTableStyleColBandSize.prototype.Type = AscDFH.historyitem_Table_TableStyleColBandSize;
 CChangesTableTableStyleColBandSize.prototype.private_SetValue = function(Value)
 {
@@ -857,9 +875,10 @@ CChangesTableTableStyleColBandSize.prototype.Merge = private_TableChangesOnMerge
  */
 function CChangesTableTableStyle(Class, Old, New)
 {
-	CChangesTableTableStyle.superclass.constructor.call(this, Class, Old, New);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
 }
-AscCommon.extendClass(CChangesTableTableStyle, AscDFH.CChangesBaseProperty);
+CChangesTableTableStyle.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesTableTableStyle.prototype.constructor = CChangesTableTableStyle;
 CChangesTableTableStyle.prototype.Type = AscDFH.historyitem_Table_TableStyle;
 CChangesTableTableStyle.prototype.WriteToBinary = function(Writer)
 {
@@ -915,9 +934,10 @@ CChangesTableTableStyle.prototype.private_SetValue = function(Value)
  */
 function CChangesTableAllowOverlap(Class, Old, New, Color)
 {
-	CChangesTableAllowOverlap.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseBoolValue.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableAllowOverlap, AscDFH.CChangesBaseBoolValue);
+CChangesTableAllowOverlap.prototype = Object.create(AscDFH.CChangesBaseBoolValue.prototype);
+CChangesTableAllowOverlap.prototype.constructor = CChangesTableAllowOverlap;
 CChangesTableAllowOverlap.prototype.Type = AscDFH.historyitem_Table_AllowOverlap;
 CChangesTableAllowOverlap.prototype.private_SetValue = function(Value)
 {
@@ -930,9 +950,10 @@ CChangesTableAllowOverlap.prototype.private_SetValue = function(Value)
  */
 function CChangesTablePositionH(Class, Old, New, Color)
 {
-	CChangesTablePositionH.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTablePositionH, AscDFH.CChangesBaseProperty);
+CChangesTablePositionH.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesTablePositionH.prototype.constructor = CChangesTablePositionH;
 CChangesTablePositionH.prototype.Type = AscDFH.historyitem_Table_PositionH;
 CChangesTablePositionH.prototype.WriteToBinary = function(Writer)
 {
@@ -1003,9 +1024,10 @@ CChangesTablePositionH.prototype.private_SetValue = function(Value)
  */
 function CChangesTablePositionV(Class, Old, New, Color)
 {
-	CChangesTablePositionV.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTablePositionV, AscDFH.CChangesBaseProperty);
+CChangesTablePositionV.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesTablePositionV.prototype.constructor = CChangesTablePositionV;
 CChangesTablePositionV.prototype.Type = AscDFH.historyitem_Table_PositionV;
 CChangesTablePositionV.prototype.WriteToBinary = function(Writer)
 {
@@ -1076,9 +1098,10 @@ CChangesTablePositionV.prototype.private_SetValue = function(Value)
  */
 function CChangesTableDistance(Class, Old, New, Color)
 {
-	CChangesTableDistance.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableDistance, AscDFH.CChangesBaseProperty);
+CChangesTableDistance.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesTableDistance.prototype.constructor = CChangesTableDistance;
 CChangesTableDistance.prototype.Type = AscDFH.historyitem_Table_Distance;
 CChangesTableDistance.prototype.WriteToBinary = function(Writer)
 {
@@ -1149,9 +1172,10 @@ CChangesTableDistance.prototype.private_SetValue = function(Value)
  */
 function CChangesTablePr(Class, Old, New, Color)
 {
-	CChangesTablePr.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseObjectValue.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTablePr, AscDFH.CChangesBaseObjectValue);
+CChangesTablePr.prototype = Object.create(AscDFH.CChangesBaseObjectValue.prototype);
+CChangesTablePr.prototype.constructor = CChangesTablePr;
 CChangesTablePr.prototype.Type = AscDFH.historyitem_Table_Pr;
 CChangesTablePr.prototype.private_CreateObject = function()
 {
@@ -1269,9 +1293,10 @@ CChangesTablePr.prototype.Merge = function(oChange)
  */
 function CChangesTableTableLayout(Class, Old, New, Color)
 {
-	CChangesTableTableLayout.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableTableLayout, AscDFH.CChangesBaseLongProperty);
+CChangesTableTableLayout.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesTableTableLayout.prototype.constructor = CChangesTableTableLayout;
 CChangesTableTableLayout.prototype.Type = AscDFH.historyitem_Table_TableLayout;
 CChangesTableTableLayout.prototype.private_SetValue = function(Value)
 {
@@ -1286,9 +1311,10 @@ CChangesTableTableLayout.prototype.Merge = private_TableChangesOnMergePr;
  */
 function CChangesTableTableDescription(Class, Old, New, Color)
 {
-	CChangesTableTableDescription.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseStringProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableTableDescription, AscDFH.CChangesBaseStringProperty);
+CChangesTableTableDescription.prototype = Object.create(AscDFH.CChangesBaseStringProperty.prototype);
+CChangesTableTableDescription.prototype.constructor = CChangesTableTableDescription;
 CChangesTableTableDescription.prototype.Type = AscDFH.historyitem_Table_TableDescription;
 CChangesTableTableDescription.prototype.private_SetValue = function(Value)
 {
@@ -1303,9 +1329,10 @@ CChangesTableTableDescription.prototype.Merge = private_TableChangesOnMergePr;
  */
 function CChangesTableTableCaption(Class, Old, New, Color)
 {
-	CChangesTableTableCaption.superclass.constructor.call(this, Class, Old, New, Color);
+	AscDFH.CChangesBaseStringProperty.call(this, Class, Old, New, Color);
 }
-AscCommon.extendClass(CChangesTableTableCaption, AscDFH.CChangesBaseStringProperty);
+CChangesTableTableCaption.prototype = Object.create(AscDFH.CChangesBaseStringProperty.prototype);
+CChangesTableTableCaption.prototype.constructor = CChangesTableTableCaption;
 CChangesTableTableCaption.prototype.Type = AscDFH.historyitem_Table_TableCaption;
 CChangesTableTableCaption.prototype.private_SetValue = function(Value)
 {
