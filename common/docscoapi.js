@@ -54,6 +54,7 @@
       this.onCursor =  options.onCursor;
       this.onMeta =  options.onMeta;
       this.onSession =  options.onSession;
+      this.onExpiredToken =  options.onExpiredToken;
 	  this.onForceSave =  options.onForceSave;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
@@ -98,6 +99,9 @@
       };
       this._CoAuthoringApi.onSession = function(e) {
         t.callback_OnSession(e);
+      };
+      this._CoAuthoringApi.onExpiredToken = function(e) {
+        t.callback_OnExpiredToken(e);
       };
 	  this._CoAuthoringApi.onForceSave = function(e) {
         t.callback_OnForceSave(e);
@@ -405,6 +409,12 @@
       this.onSession(e);
     }
   };
+
+  CDocsCoApi.prototype.callback_OnExpiredToken = function(e) {
+    if (this.onExpiredToken) {
+      this.onExpiredToken(e);
+    }
+  };
   
   CDocsCoApi.prototype.callback_OnForceSave = function(e) {
     if (this.onForceSave) {
@@ -528,6 +538,7 @@
       this.onCursor = options.onCursor;
       this.onMeta = options.onMeta;
       this.onSession =  options.onSession;
+      this.onExpiredToken =  options.onExpiredToken;
 	  this.onForceSave =  options.onForceSave;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
@@ -956,6 +967,12 @@
   DocsCoApi.prototype._onSession = function(data) {
     if (this.check_state() && data["messages"] && this.onSession) {
       this.onSession(data["messages"]);
+    }
+  };
+
+  DocsCoApi.prototype._onExpiredToken = function(data) {
+    if (this.onExpiredToken) {
+      this.onExpiredToken();
     }
   };
 
@@ -1554,6 +1571,9 @@
           break;
         case 'refreshToken' :
           t._onRefreshToken(dataObject["messages"]);
+          break;
+        case 'expiredToken' :
+          t._onExpiredToken();
           break;
 		case 'forceSaveStart' :
 			t._onForceSaveStart(dataObject["messages"]);

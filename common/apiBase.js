@@ -696,6 +696,9 @@
                 }
             }
         };
+		this.CoAuthoringApi.onExpiredToken = function() {
+			t.sendEvent('asc_onExpiredToken');
+		};
 		/**
 		 * Event об отсоединении от сервера
 		 * @param {jQuery} e  event об отсоединении с причиной
